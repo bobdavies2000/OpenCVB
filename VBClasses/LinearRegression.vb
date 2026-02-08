@@ -33,7 +33,7 @@ Namespace VBClasses
 
             For i = 0 To x.Count - 1
                 Dim pt As New cv.Point(x(i), y(i))
-                DrawCircle(dst2, pt, taskA.DotSize, cv.Scalar.Red)
+                DrawCircle(dst2, pt, tsk.DotSize, cv.Scalar.Red)
             Next
         End Sub
     End Class

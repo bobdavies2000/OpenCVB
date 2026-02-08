@@ -50,12 +50,12 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             dst2 = runRedList(src, labels(2))
 
-            Dim rc = taskA.oldrcD
+            Dim rc = tsk.oldrcD
 
-            If taskA.heartBeat Then
+            If tsk.heartBeat Then
                 Dim m = cv.Cv2.Moments(rc.mask, True)
                 Dim center = New cv.Point2f(m.M10 / rc.pixels, m.M01 / rc.pixels)
-                DrawCircle(taskA.color(rc.rect), center, taskA.DotSize, taskA.highlight)
+                DrawCircle(tsk.color(rc.rect), center, tsk.DotSize, tsk.highlight)
 
                 Dim mArea = cv.Mat.FromPixelData(4, 1, cv.MatType.CV_32F, {m.M20 / rc.pixels, m.Mu11 / rc.pixels, m.Mu11 / rc.pixels, m.Mu02 / rc.pixels})
                 Dim U As New cv.Mat
@@ -141,7 +141,7 @@ Namespace VBClasses
             Dim size = New cv.Size2f(10, 100) ' New cv.Size2f(W.Get(Of Double)(0, 0), W.Get(Of Double)(1, 0))
             Dim pt = New cv.Point2f(covar.mean.Get(Of Double)(0, 0), covar.mean.Get(Of Double)(0, 1))
             Dim rrect = New cv.RotatedRect(pt, size, angle)
-            dst2.Ellipse(rrect, taskA.highlight, taskA.lineWidth, taskA.lineType)
+            dst2.Ellipse(rrect, tsk.highlight, tsk.lineWidth, tsk.lineType)
 
             SetTrueText(strOut, 3)
         End Sub

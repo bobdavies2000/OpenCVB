@@ -13,14 +13,14 @@ Namespace VBClasses
             Return New cv.Scalar(msRNG.Next(50, 240), msRNG.Next(50, 240), msRNG.Next(50, 240))
         End Function
         Public Overrides Sub RunAlg(src As cv.Mat)
-            labels(2) = "ColorMap = " + taskA.gOptions.Palettes.Text
+            labels(2) = "ColorMap = " + tsk.gOptions.Palettes.Text
 
             If src.Type = cv.MatType.CV_32F Then
                 src = Mat_Convert.Mat_32f_To_8UC3(src)
                 src.ConvertTo(src, cv.MatType.CV_8U)
             End If
 
-            Dim mapIndex = Choose(taskA.paletteIndex + 1, cv.ColormapTypes.Autumn, cv.ColormapTypes.Bone,
+            Dim mapIndex = Choose(tsk.paletteIndex + 1, cv.ColormapTypes.Autumn, cv.ColormapTypes.Bone,
                                   cv.ColormapTypes.Cividis, cv.ColormapTypes.Cool, cv.ColormapTypes.Hot,
                                   cv.ColormapTypes.Hsv, cv.ColormapTypes.Inferno, cv.ColormapTypes.Jet,
                                   cv.ColormapTypes.Magma, cv.ColormapTypes.Ocean, cv.ColormapTypes.Parula,
@@ -132,7 +132,7 @@ Namespace VBClasses
             desc = "Create gradient image"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If taskA.heartBeat Then
+            If tsk.heartBeat Then
                 If standaloneTest() Then
                     ' every 30 frames try a different pair of random colors.
                     color1 = New cv.Scalar(msRNG.Next(0, 255), msRNG.Next(0, 255), msRNG.Next(0, 255))
@@ -166,7 +166,7 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             Static cvtScaleSlider = OptionParent.FindSlider("Convert And Scale")
-            If taskA.optionsChanged Then
+            If tsk.optionsChanged Then
                 gColor.color1 = cv.Scalar.Yellow
                 gColor.color2 = cv.Scalar.Red
                 Dim gradMat As New cv.Mat
@@ -192,10 +192,10 @@ Namespace VBClasses
                 End If
             End If
 
-            Dim depth8u = taskA.pcSplit(2).ConvertScaleAbs(cvtScaleSlider.Value)
+            Dim depth8u = tsk.pcSplit(2).ConvertScaleAbs(cvtScaleSlider.Value)
             Dim ColorMap = cv.Mat.FromPixelData(256, 1, cv.MatType.CV_8UC3, gradientColorMap.Data())
             cv.Cv2.ApplyColorMap(depth8u, dst2, ColorMap)
-            dst2.SetTo(0, taskA.noDepthMask)
+            dst2.SetTo(0, tsk.noDepthMask)
         End Sub
     End Class
 
@@ -212,7 +212,7 @@ Namespace VBClasses
             desc = "Build a colormap that best shows the depth.  NOTE: duplicate of NR_Palette_DepthColorMap but no slider."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If taskA.optionsChanged Then
+            If tsk.optionsChanged Then
                 gColor.color1 = cv.Scalar.Yellow
                 gColor.color2 = cv.Scalar.Red
                 Dim gradMat As New cv.Mat
@@ -229,8 +229,8 @@ Namespace VBClasses
                 gradientColorMap = gradientColorMap.Resize(New cv.Size(255, 1))
             End If
 
-            Dim sliderVal = If(taskA.settings.cameraName = "Intel(R) RealSense(TM) Depth Camera 435i", 50, 80)
-            Dim depth8u = taskA.pcSplit(2).ConvertScaleAbs(sliderVal)
+            Dim sliderVal = If(tsk.settings.cameraName = "Intel(R) RealSense(TM) Depth Camera 435i", 50, 80)
+            Dim depth8u = tsk.pcSplit(2).ConvertScaleAbs(sliderVal)
             Dim ColorMap = cv.Mat.FromPixelData(256, 1, cv.MatType.CV_8UC3, gradientColorMap.Data())
             cv.Cv2.ApplyColorMap(depth8u, dst2, ColorMap)
         End Sub
@@ -248,11 +248,11 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             Dim index As Integer
-            For Each r In taskA.gridRects
-                dst2(r).SetTo(taskA.scalarColors(index Mod 256))
+            For Each r In tsk.gridRects
+                dst2(r).SetTo(tsk.scalarColors(index Mod 256))
                 index += 1
             Next
-            labels(2) = "NR_Palette_Layout2D - " + CStr(taskA.gridRects.Count) + " regions"
+            labels(2) = "NR_Palette_Layout2D - " + CStr(tsk.gridRects.Count) + " regions"
         End Sub
     End Class
 
@@ -268,27 +268,27 @@ Namespace VBClasses
             desc = "Use a palette with the left and right images."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            dst2 = PaletteFull(taskA.leftView.ConvertScaleAbs)
-            dst3 = PaletteFull(taskA.rightView.ConvertScaleAbs)
+            dst2 = PaletteFull(tsk.leftView.ConvertScaleAbs)
+            dst3 = PaletteFull(tsk.rightView.ConvertScaleAbs)
         End Sub
     End Class
     Public Class NR_Palette_TaskColors : Inherits TaskParent
         Dim direction = 1
         Public Sub New()
             labels = {"", "", "ScalarColors", "VecColors"}
-            desc = "Display that taskA.scalarColors and taskA.vecColors"
+            desc = "Display that tsk.scalarColors and tsk.vecColors"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If taskA.brickSize <= 10 Then direction *= -1
-            If taskA.brickSize >= 100 Then direction *= -1
+            If tsk.brickSize <= 10 Then direction *= -1
+            If tsk.brickSize >= 100 Then direction *= -1
 
-            taskA.brickSize -= direction * 1
-            taskA.grid.Run(src)
+            tsk.brickSize -= direction * 1
+            tsk.grid.Run(src)
 
-            For i = 0 To taskA.gridRects.Count - 1
-                Dim gr = taskA.gridRects(i)
-                dst2(gr).SetTo(taskA.scalarColors(i Mod 256))
-                dst3(gr).SetTo(taskA.vecColors(i Mod 256))
+            For i = 0 To tsk.gridRects.Count - 1
+                Dim gr = tsk.gridRects(i)
+                dst2(gr).SetTo(tsk.scalarColors(i Mod 256))
+                dst3(gr).SetTo(tsk.vecColors(i Mod 256))
             Next
         End Sub
     End Class
@@ -305,7 +305,7 @@ Namespace VBClasses
         Dim activeSchemeName As String = ""
         Dim saveColorTransitionCount As Integer = -1
         Public Sub New()
-            Dim dirInfo = New DirectoryInfo(taskA.homeDir + "Data")
+            Dim dirInfo = New DirectoryInfo(tsk.homeDir + "Data")
             schemes = dirInfo.GetFiles("scheme*.jpg")
 
             If OptionParent.FindFrm(traceName + " Radio Buttons") Is Nothing Then
@@ -355,17 +355,17 @@ Namespace VBClasses
                         If i = 0 Then colorGrad = gradMat Else cv.Cv2.HConcat(colorGrad, gradMat, colorGrad)
                     Next
                     colorGrad = colorGrad.Resize(New cv.Size(256, 1))
-                    cv.Cv2.ImWrite(taskA.homeDir + "data\nextScheme.jpg", colorGrad) ' use this to create new color schemes.
+                    cv.Cv2.ImWrite(tsk.homeDir + "data\nextScheme.jpg", colorGrad) ' use this to create new color schemes.
                 Else
                     colorGrad = cv.Cv2.ImRead(schemeName).Row(0).Clone
                 End If
             End If
 
             SetTrueText("Use the 'Color Transitions' slider and radio buttons to change the color ranges.", 3)
-            Dim depth8u = taskA.pcSplit(2).ConvertScaleAbs(colorTransitionCount)
+            Dim depth8u = tsk.pcSplit(2).ConvertScaleAbs(colorTransitionCount)
             Dim colorMap = cv.Mat.FromPixelData(256, 1, cv.MatType.CV_8UC3, colorGrad.Data())
             cv.Cv2.ApplyColorMap(depth8u, dst2, colorMap)
-            dst2.SetTo(0, taskA.noDepthMask)
+            dst2.SetTo(0, tsk.noDepthMask)
         End Sub
     End Class
 
@@ -442,10 +442,10 @@ Namespace VBClasses
     Public Class Palette_CustomColorMap : Inherits TaskParent
         Public colorMap As cv.Mat
         Public Sub New()
-            labels(2) = "ColorMap = " + taskA.gOptions.Palettes.Text
+            labels(2) = "ColorMap = " + tsk.gOptions.Palettes.Text
             If standalone Then
-                Dim cMapDir As New DirectoryInfo(taskA.homeDir + "opencv/modules/imgproc/doc/pics/colormaps")
-                Dim str = cMapDir.FullName + "/colorscale_" + taskA.gOptions.Palettes.Text + ".jpg"
+                Dim cMapDir As New DirectoryInfo(tsk.homeDir + "opencv/modules/imgproc/doc/pics/colormaps")
+                Dim str = cMapDir.FullName + "/colorscale_" + tsk.gOptions.Palettes.Text + ".jpg"
                 Dim mapFile As New FileInfo(str)
                 Dim tmp = cv.Cv2.ImRead(mapFile.FullName)
 
@@ -567,14 +567,14 @@ Namespace VBClasses
     Public Class Palette_LoadColorMap : Inherits TaskParent
         Public whitebackground As Boolean
         Public colorMap As New cv.Mat
-        Dim cMapDir As New DirectoryInfo(taskA.homeDir + "opencv/modules/imgproc/doc/pics/colormaps")
+        Dim cMapDir As New DirectoryInfo(tsk.homeDir + "opencv/modules/imgproc/doc/pics/colormaps")
         Public Sub New()
             desc = "Apply the different color maps in OpenCV"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If taskA.optionsChanged Or colorMap.Rows <> 256 Then
-                labels(2) = "ColorMap = " + taskA.gOptions.Palettes.Text
-                Dim str = cMapDir.FullName + "/colorscale_" + taskA.gOptions.Palettes.Text + ".jpg"
+            If tsk.optionsChanged Or colorMap.Rows <> 256 Then
+                labels(2) = "ColorMap = " + tsk.gOptions.Palettes.Text
+                Dim str = cMapDir.FullName + "/colorscale_" + tsk.gOptions.Palettes.Text + ".jpg"
                 Dim mapFile As New FileInfo(str)
                 Dim tmp = cv.Cv2.ImRead(mapFile.FullName)
 
@@ -602,7 +602,7 @@ Namespace VBClasses
             desc = "Apply the different color maps in OpenCV.  Complications because some algorithms want black in the first entry."
         End Sub
         Private Sub rebuildColorMaps()
-            colorMapFull = cv.Mat.FromPixelData(256, 1, cv.MatType.CV_8UC3, taskA.vecColors)
+            colorMapFull = cv.Mat.FromPixelData(256, 1, cv.MatType.CV_8UC3, tsk.vecColors)
             colorMapWithBlack = colorMapFull.Clone
             colorMapWithBlack.Set(Of cv.Vec3b)(0, 0, New cv.Vec3b) ' black is the first color...
         End Sub
@@ -615,7 +615,7 @@ Namespace VBClasses
             Return dst3
         End Function
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If taskA.optionsChanged Or colorMapFull.Rows <> 256 Then rebuildColorMaps()
+            If tsk.optionsChanged Or colorMapFull.Rows <> 256 Then rebuildColorMaps()
 
             cv.Cv2.ApplyColorMap(src, dst2, colorMapFull)
             If standalone Then dst3 = colorMapFull.Resize(dst3.Size)
@@ -634,8 +634,8 @@ Namespace VBClasses
             desc = "Apply the different color maps in OpenCV"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If taskA.optionsChanged Or colorMap.Rows <> 256 Then
-                colorMap = cv.Mat.FromPixelData(256, 1, cv.MatType.CV_8UC3, taskA.vecColors)
+            If tsk.optionsChanged Or colorMap.Rows <> 256 Then
+                colorMap = cv.Mat.FromPixelData(256, 1, cv.MatType.CV_8UC3, tsk.vecColors)
                 colorMap.Set(Of cv.Vec3b)(0, 0, New cv.Vec3b) ' black is the first color...
             End If
 

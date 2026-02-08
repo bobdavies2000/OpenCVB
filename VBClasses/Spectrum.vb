@@ -12,7 +12,7 @@ Namespace VBClasses
             dSpec.Run(src)
             gSpec.Run(src)
 
-            If taskA.heartBeat And taskA.oldrcD.index > 0 Then
+            If tsk.heartBeat And tsk.oldrcD.index > 0 Then
                 strOut = dSpec.strOut + vbCrLf + vbCrLf
                 strOut += gSpec.strOut
             End If
@@ -37,8 +37,8 @@ Namespace VBClasses
 
             If standaloneTest() Then dst2 = runRedList(src, labels(2))
 
-            If taskA.heartBeat And taskA.oldrcD.index > 0 Then
-                Dim ranges = options.buildDepthRanges(taskA.pcSplit(0)(taskA.oldrcD.rect).Clone, " pointcloud X ")
+            If tsk.heartBeat And tsk.oldrcD.index > 0 Then
+                Dim ranges = options.buildDepthRanges(tsk.pcSplit(0)(tsk.oldrcD.rect).Clone, " pointcloud X ")
                 strOut = options.strOut
             End If
             SetTrueText(strOut, 3)
@@ -61,8 +61,8 @@ Namespace VBClasses
 
             If standaloneTest() Then dst2 = runRedList(src, labels(2))
 
-            If taskA.heartBeat And taskA.oldrcD.index > 0 Then
-                Dim ranges = options.buildDepthRanges(taskA.pcSplit(1)(taskA.oldrcD.rect).Clone, " pointcloud Y ")
+            If tsk.heartBeat And tsk.oldrcD.index > 0 Then
+                Dim ranges = options.buildDepthRanges(tsk.pcSplit(1)(tsk.oldrcD.rect).Clone, " pointcloud Y ")
                 strOut = options.strOut
             End If
             SetTrueText(strOut, 3)
@@ -84,8 +84,8 @@ Namespace VBClasses
             options.Run()
             If standaloneTest() Then dst2 = runRedList(src, labels(2))
 
-            If taskA.heartBeat And taskA.oldrcD.index > 0 Then
-                Dim ranges = options.buildDepthRanges(taskA.pcSplit(2)(taskA.oldrcD.rect).Clone, " pointcloud Z ")
+            If tsk.heartBeat And tsk.oldrcD.index > 0 Then
+                Dim ranges = options.buildDepthRanges(tsk.pcSplit(2)(tsk.oldrcD.rect).Clone, " pointcloud Z ")
                 strOut = options.strOut
             End If
             SetTrueText(strOut, 3)
@@ -113,7 +113,7 @@ Namespace VBClasses
 
             If standaloneTest() Then dst2 = runRedList(src, labels(2))
 
-            If taskA.heartBeat Then
+            If tsk.heartBeat Then
                 specX.Run(src)
                 strOut = specX.strOut + vbCrLf
                 specY.Run(src)
@@ -144,7 +144,7 @@ Namespace VBClasses
 
             If standaloneTest() Then dst2 = runRedList(src, labels(2))
 
-            If taskA.heartBeat Then
+            If tsk.heartBeat Then
                 sCloud.Run(src)
                 strOut = sCloud.strOut + vbCrLf
                 gSpec.Run(src)
@@ -174,15 +174,15 @@ Namespace VBClasses
             Dim split = src.Split()
             gSpec.typeSpec = " blue "
             gSpec.Run(split(0))
-            If taskA.heartBeat Then strOut = gSpec.strOut + vbCrLf
+            If tsk.heartBeat Then strOut = gSpec.strOut + vbCrLf
 
             gSpec.typeSpec = " green "
             gSpec.Run(split(1))
-            If taskA.heartBeat Then strOut += gSpec.strOut + vbCrLf
+            If tsk.heartBeat Then strOut += gSpec.strOut + vbCrLf
 
             gSpec.typeSpec = " red "
             gSpec.Run(split(2))
-            If taskA.heartBeat Then strOut += gSpec.strOut
+            If tsk.heartBeat Then strOut += gSpec.strOut
 
             SetTrueText(strOut, 3)
         End Sub
@@ -199,7 +199,7 @@ Namespace VBClasses
         Dim breakdown As New Spectrum_Breakdown
         Public Sub New()
             labels = {"", "Cell trimming information", "", "White is after trimming, gray is before trim, black is outside the cell mask."}
-            If standaloneTest() Then taskA.gOptions.displaydst1.checked = True
+            If standaloneTest() Then tsk.gOptions.displaydst1.checked = True
             desc = "Zoom in on the selected RedCloud cell before and after Spectrum filtering."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -207,7 +207,7 @@ Namespace VBClasses
 
             dst2 = runRedList(src, labels(2))
 
-            If taskA.heartBeat Then
+            If tsk.heartBeat Then
                 breakdown.Run(src)
                 SetTrueText(breakdown.strOut, 1)
 
@@ -240,7 +240,7 @@ Namespace VBClasses
                 dst2 = runRedList(src, labels(2))
             End If
 
-            Dim rc = taskA.oldrcD
+            Dim rc = tsk.oldrcD
             Dim ranges As List(Of rangeData), input As cv.Mat
             If rc.depthPixels / rc.pixels < 0.5 Then
                 input = New cv.Mat(rc.mask.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
@@ -248,7 +248,7 @@ Namespace VBClasses
                 input = input.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
             Else
                 input = New cv.Mat(rc.mask.Size(), cv.MatType.CV_32F, cv.Scalar.All(0))
-                taskA.pcSplit(2)(rc.rect).CopyTo(input, rc.mask)
+                tsk.pcSplit(2)(rc.rect).CopyTo(input, rc.mask)
             End If
             ranges = options.buildColorRanges(input, "GrayScale")
 
@@ -285,7 +285,7 @@ Namespace VBClasses
             End If
 
             rc.mask = rc.mask.Threshold(0, 255, cv.ThresholdTypes.Binary)
-            taskA.oldrcD = rc
+            tsk.oldrcD = rc
         End Sub
     End Class
 
@@ -306,11 +306,11 @@ Namespace VBClasses
             dst2 = runRedList(src, labels(2))
 
             dst3.SetTo(0)
-            For i = 0 To taskA.redList.oldrclist.Count - 1
-                taskA.oldrcD = taskA.redList.oldrclist(i)
+            For i = 0 To tsk.redList.oldrclist.Count - 1
+                tsk.oldrcD = tsk.redList.oldrclist(i)
                 breakdown.Run(src)
-                taskA.redList.oldrclist(i) = taskA.oldrcD
-                dst3(taskA.oldrcD.rect).SetTo(taskA.oldrcD.color, taskA.oldrcD.mask)
+                tsk.redList.oldrclist(i) = tsk.oldrcD
+                dst3(tsk.oldrcD.rect).SetTo(tsk.oldrcD.color, tsk.oldrcD.mask)
             Next
             breakdown.Run(src)
         End Sub
@@ -333,7 +333,7 @@ Namespace VBClasses
             gSpec.Run(src)
             dst2 = gSpec.dst2
             labels(2) = gSpec.labels(2)
-            If taskA.heartBeat Then strOut = gSpec.strOut
+            If tsk.heartBeat Then strOut = gSpec.strOut
             SetTrueText(strOut, 3)
         End Sub
     End Class
@@ -355,7 +355,7 @@ Namespace VBClasses
 
             dst2 = runRedList(src, labels(2))
 
-            Dim input = src(taskA.oldrcD.rect)
+            Dim input = src(tsk.oldrcD.rect)
             If input.Type <> cv.MatType.CV_8U Then input = input.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
             Dim ranges = options.buildColorRanges(input, typeSpec)
             strOut = options.strOut

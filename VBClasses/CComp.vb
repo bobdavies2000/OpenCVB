@@ -18,7 +18,7 @@ Namespace VBClasses
             rects.Clear()
             centroids.Clear()
 
-            dst2 = taskA.gray.Threshold(options.threshold, 255, cv.ThresholdTypes.BinaryInv) '  + cv.ThresholdTypes.Otsu
+            dst2 = tsk.gray.Threshold(options.threshold, 255, cv.ThresholdTypes.BinaryInv) '  + cv.ThresholdTypes.Otsu
 
             connectedComponents = cv.Cv2.ConnectedComponentsEx(dst2)
             connectedComponents.RenderBlobs(dst3)
@@ -51,7 +51,7 @@ Namespace VBClasses
         Dim shapes As cv.Mat
         Dim mats As New Mat_4Click
         Public Sub New()
-            Dim filePath As String = taskA.homeDir + "Data/Shapes.png"
+            Dim filePath As String = tsk.homeDir + "Data/Shapes.png"
             shapes = New cv.Mat(filePath, cv.ImreadModes.Color)
             labels(2) = "Largest connected component"
             labels(3) = "RectView, LabelView, Binary, grayscale"
@@ -78,7 +78,7 @@ Namespace VBClasses
             mats.mat(0) = rectView
             mats.mat(1) = labelview
             mats.mat(2) = binary
-            mats.mat(3) = taskA.gray
+            mats.mat(3) = tsk.gray
             mats.Run(emptyMat)
             dst2 = mats.dst2
             dst3 = mats.dst3
@@ -121,7 +121,7 @@ Namespace VBClasses
             desc = "Create connected components using RedCloud Hulls"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            ccomp.Run(taskA.gray)
+            ccomp.Run(tsk.gray)
             dst2 = ccomp.dst3
             ccomp.dst1.ConvertTo(dst1, cv.MatType.CV_8U)
             hulls.Run(dst1)
@@ -149,14 +149,14 @@ Namespace VBClasses
             desc = "Use a threshold slider on the CComp input"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            dst2 = taskA.gray
+            dst2 = tsk.gray
             options.Run()
 
-            If standaloneTest() Then dst2 = taskA.gray.Threshold(options.light, 255, cv.ThresholdTypes.BinaryInv)
+            If standaloneTest() Then dst2 = tsk.gray.Threshold(options.light, 255, cv.ThresholdTypes.BinaryInv)
 
             Dim stats As New cv.Mat
             Dim centroidRaw As New cv.Mat
-            numberOfLabels = taskA.gray.ConnectedComponentsWithStats(dst1, stats, centroidRaw)
+            numberOfLabels = tsk.gray.ConnectedComponentsWithStats(dst1, stats, centroidRaw)
 
             rects.Clear()
             areas.Clear()
@@ -177,9 +177,9 @@ Namespace VBClasses
                 If (r.Width = dst2.Width Or r.Height = dst2.Height) Or (r.Width = 1 Or r.Height = 1) Then Continue For
                 areas.Add(area)
                 unsortedRects.Add(r)
-                dst2.Rectangle(r, taskA.highlight, taskA.lineWidth)
+                dst2.Rectangle(r, tsk.highlight, tsk.lineWidth)
                 index.Add(i)
-                colors.Add(taskA.vecColors(colors.Count))
+                colors.Add(tsk.vecColors(colors.Count))
                 maskOrder.Add(area, unsortedMasks.Count)
                 unsortedMasks.Add(dst1.InRange(i, i)(r))
                 Dim c = New cv.Point(CInt(centroidRaw.Get(Of Double)(i, 0)), CInt(centroidRaw.Get(Of Double)(i, 1)))

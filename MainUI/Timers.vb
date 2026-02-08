@@ -4,12 +4,12 @@ Namespace MainApp
         Dim fpsWriteCount As Integer
         Dim totalBytesOfMemoryUsed As Integer
         Private Sub fpsTimer_Tick(sender As Object, e As EventArgs) Handles fpsTimer.Tick
-            If taskA Is Nothing Then Exit Sub
+            If tsk Is Nothing Then Exit Sub
             Static lastTime As DateTime = Now
             Static lastAlgorithmFrame As Integer
             Static lastCameraFrame As Integer
             If camera Is Nothing Then Exit Sub
-            If lastAlgorithmFrame > taskA.frameCount Then lastAlgorithmFrame = 0
+            If lastAlgorithmFrame > tsk.frameCount Then lastAlgorithmFrame = 0
             If lastCameraFrame > camera.cameraFrameCount Then lastCameraFrame = 0
 
             If isPlaying Then
@@ -20,17 +20,17 @@ Namespace MainApp
                 If taskTimerInterval = 0 Then Exit Sub
                 lastTime = timeNow
 
-                Dim algFrames = taskA.frameCount - lastAlgorithmFrame
+                Dim algFrames = tsk.frameCount - lastAlgorithmFrame
                 Dim camFrames = camera.cameraFrameCount - lastCameraFrame
 
-                lastAlgorithmFrame = taskA.frameCount
+                lastAlgorithmFrame = tsk.frameCount
                 lastCameraFrame = camera.cameraFrameCount
 
-                taskA.fpsCamera = camFrames / (taskTimerInterval / 1000)
-                If taskA.fpsCamera >= 99 Then taskA.fpsCamera = 99
+                tsk.fpsCamera = camFrames / (taskTimerInterval / 1000)
+                If tsk.fpsCamera >= 99 Then tsk.fpsCamera = 99
 
-                taskA.fpsAlgorithm = algFrames / (taskTimerInterval / 1000)
-                If taskA.fpsAlgorithm >= 99 Then taskA.fpsAlgorithm = 99
+                tsk.fpsAlgorithm = algFrames / (taskTimerInterval / 1000)
+                If tsk.fpsAlgorithm >= 99 Then tsk.fpsAlgorithm = 99
             End If
         End Sub
     End Class

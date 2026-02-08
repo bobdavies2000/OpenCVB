@@ -4,11 +4,11 @@ Public Class PixelViewerForm
     Public mousePoint As cv.Point
     Public saveText As String
     Private Sub PixelShow_Load(sender As Object, e As EventArgs) Handles MyBase.Load
-        Me.Left = taskA.mainFormLocation.X
-        Me.Top = taskA.mainFormLocation.Y - 40
+        Me.Left = tsk.mainFormLocation.X
+        Me.Top = tsk.mainFormLocation.Y - 40
 
-        Me.Width = taskA.mainFormLocation.Width
-        Me.Height = taskA.mainFormLocation.Height
+        Me.Width = tsk.mainFormLocation.Width
+        Me.Height = tsk.mainFormLocation.Height
         PixelViewerForm_ResizeEnd(sender, e)
         Timer1.Enabled = True
     End Sub

@@ -16,9 +16,9 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             unscrambled.Clear()
             Dim inputROI As New List(Of cv.Rect)
-            For j = 0 To taskA.gridRects.Count - 1
-                Dim gr = taskA.gridRects(j)
-                If gr.Width = taskA.brickSize And gr.Height = taskA.brickSize Then inputROI.Add(taskA.gridRects(j))
+            For j = 0 To tsk.gridRects.Count - 1
+                Dim gr = tsk.gridRects(j)
+                If gr.Width = tsk.brickSize And gr.Height = tsk.brickSize Then inputROI.Add(tsk.gridRects(j))
             Next
 
             scrambled = Shuffle(inputROI)
@@ -26,10 +26,10 @@ Namespace VBClasses
 
             ' display image with shuffled roi's
             For i = 0 To scrambled.Count - 1
-                Dim gr = taskA.gridRects(i)
+                Dim gr = tsk.gridRects(i)
                 Dim gr2 = scrambled(i)
-                If gr.Width = taskA.brickSize And gr.Height = taskA.brickSize And
-                   gr2.Width = taskA.brickSize And gr2.Height = taskA.brickSize Then dst2(gr2) = src(gr)
+                If gr.Width = tsk.brickSize And gr.Height = tsk.brickSize And
+                   gr2.Width = tsk.brickSize And gr2.Height = tsk.brickSize Then dst2(gr2) = src(gr)
             Next
         End Sub
     End Class
@@ -49,14 +49,14 @@ Namespace VBClasses
         Dim puzzleIndex As Integer
         Dim options As New Options_Puzzle
         Public Sub New()
-            If standalone Then taskA.gOptions.GridSlider.Value = 8
+            If standalone Then tsk.gOptions.GridSlider.Value = 8
             labels = {"", "", "Puzzle Input", "Puzzle Solver Output - missing pieces can result from identical cells (usually bright white)"}
             desc = "Solve the puzzle using matchTemplate"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
 
-            If taskA.optionsChanged Or options.startPuzzle Then
+            If tsk.optionsChanged Or options.startPuzzle Then
                 puzzle.Run(src)
                 dst2 = puzzle.dst2
                 dst3.SetTo(0)
@@ -87,7 +87,7 @@ Namespace VBClasses
     Public Class NR_Puzzle_SolverDynamic : Inherits TaskParent
         Dim puzzle As New Puzzle_Solver
         Public Sub New()
-            If standalone Then taskA.gOptions.GridSlider.Value = 8
+            If standalone Then tsk.gOptions.GridSlider.Value = 8
             labels = {"", "", "Latest Puzzle input image", "Puzzle Solver Output - missing pieces can occur because of motion or when cells are identical."}
             desc = "Instead of matching the original image as Puzzle_Solver, match the latest image from the camera."
         End Sub

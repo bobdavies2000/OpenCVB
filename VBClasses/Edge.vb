@@ -20,9 +20,9 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             Static saveSelection As String = ""
-            If saveSelection <> taskA.edgeMethod Then
-                saveSelection = taskA.edgeMethod
-                Select Case taskA.edgeMethod
+            If saveSelection <> tsk.edgeMethod Then
+                saveSelection = tsk.edgeMethod
+                Select Case tsk.edgeMethod
                     Case "Binarized Reduction"
                         edges = New NR_Edge_BinarizedReduction
                     Case "Binarized Sobel"
@@ -44,13 +44,13 @@ Namespace VBClasses
                 End Select
             End If
 
-            If src.Channels <> 1 Then src = taskA.grayStable
+            If src.Channels <> 1 Then src = tsk.grayStable
 
             edges.run(src)
             If edges.dst2.Channels <> 1 Then edges.dst2 = edges.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
             If edges.dst2.Type <> cv.MatType.CV_8UC1 Then edges.dst2.ConvertTo(edges.dst2, cv.MatType.CV_8U)
             dst2 = edges.dst2
-            labels(2) = traceName + " - selection = " + taskA.edgeMethod
+            labels(2) = traceName + " - selection = " + tsk.edgeMethod
         End Sub
     End Class
 
@@ -75,9 +75,9 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             Static saveSelection As String = ""
-            If saveSelection <> taskA.edgeMethod Then
-                saveSelection = taskA.edgeMethod
-                Select Case taskA.edgeMethod
+            If saveSelection <> tsk.edgeMethod Then
+                saveSelection = tsk.edgeMethod
+                Select Case tsk.edgeMethod
                     Case "Canny"
                         edges = New Edge_Canny
                     Case "Scharr"
@@ -103,7 +103,7 @@ Namespace VBClasses
 
             If dst2.Channels <> 1 Then dst2 = dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
             If dst2.Type <> cv.MatType.CV_8UC1 Then dst2.ConvertTo(dst2, cv.MatType.CV_8U)
-            labels(2) = traceName + " - selection = " + taskA.edgeMethod
+            labels(2) = traceName + " - selection = " + tsk.edgeMethod
         End Sub
     End Class
 
@@ -178,9 +178,9 @@ Namespace VBClasses
                 cv.Cv2.EdgePreservingFilter(src, dst2, cv.EdgePreservingMethods.NormconvFilter, options.EP_Sigma_s, options.EP_Sigma_r)
             End If
             If options.recurseCheck Then
-                cv.Cv2.EdgePreservingFilter(taskA.depthRGB, dst3, cv.EdgePreservingMethods.RecursFilter, options.EP_Sigma_s, options.EP_Sigma_r)
+                cv.Cv2.EdgePreservingFilter(tsk.depthRGB, dst3, cv.EdgePreservingMethods.RecursFilter, options.EP_Sigma_s, options.EP_Sigma_r)
             Else
-                cv.Cv2.EdgePreservingFilter(taskA.depthRGB, dst3, cv.EdgePreservingMethods.NormconvFilter, options.EP_Sigma_s, options.EP_Sigma_r)
+                cv.Cv2.EdgePreservingFilter(tsk.depthRGB, dst3, cv.EdgePreservingMethods.NormconvFilter, options.EP_Sigma_s, options.EP_Sigma_r)
             End If
         End Sub
     End Class
@@ -202,21 +202,21 @@ Namespace VBClasses
             labels(3) = "Thresholded Edge Mask (use slider to adjust)"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If standalone And taskA.testAllRunning Then
+            If standalone And tsk.testAllRunning Then
                 SetTrueText("The RandomForest edge detection takes so long " +
                         "that it is not tested during 'Test All' overnight runs.")
                 Exit Sub
             End If
             options.Run()
 
-            If taskA.frameCount < 100 Then SetTrueText("On the first call only, it takes a few seconds to load the randomForest model.", New cv.Point(10, 100))
+            If tsk.frameCount < 100 Then SetTrueText("On the first call only, it takes a few seconds to load the randomForest model.", New cv.Point(10, 100))
 
             ' why not do this in the constructor?  Because the message is held up by the lengthy process of loading the model.
-            If taskA.frameCount = 5 Then
-                Dim modelInfo = New FileInfo(taskA.homeDir + "Data/model.yml.gz")
+            If tsk.frameCount = 5 Then
+                Dim modelInfo = New FileInfo(tsk.homeDir + "Data/model.yml.gz")
                 cPtr = Edge_RandomForest_Open(modelInfo.FullName)
             End If
-            If taskA.frameCount > 5 Then ' the first images are skipped so the message above can be displayed.
+            If tsk.frameCount > 5 Then ' the first images are skipped so the message above can be displayed.
                 Marshal.Copy(src.Data, rgbData, 0, rgbData.Length)
                 Dim handleRGB = GCHandle.Alloc(rgbData, GCHandleType.Pinned)
                 Dim imagePtr = Edge_RandomForest_Run(cPtr, handleRGB.AddrOfPinnedObject(), src.Rows, src.Cols)
@@ -248,7 +248,7 @@ Namespace VBClasses
 
             Dim frequencies As New cv.Mat
             Dim src32f As New cv.Mat
-            taskA.gray.ConvertTo(src32f, cv.MatType.CV_32F, 1 / 255)
+            tsk.gray.ConvertTo(src32f, cv.MatType.CV_32F, 1 / 255)
             cv.Cv2.Dct(src32f, frequencies, cv.DctFlags.None)
 
             Dim roi As New cv.Rect(0, 0, options.removeFrequencies, src32f.Height)
@@ -300,13 +300,13 @@ Namespace VBClasses
             desc = "Edges that are consistent for x number of frames"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If taskA.optionsChanged Then saveFrames = New List(Of cv.Mat)
+            If tsk.optionsChanged Then saveFrames = New List(Of cv.Mat)
 
             edges.Run(src.Clone)
 
             Dim tmp = If(edges.dst2.Channels() = 1, edges.dst2.Clone, edges.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
             saveFrames.Add(tmp)
-            If saveFrames.Count > taskA.frameHistoryCount Then saveFrames.RemoveAt(0)
+            If saveFrames.Count > tsk.frameHistoryCount Then saveFrames.RemoveAt(0)
 
             dst2 = saveFrames(0)
             For i = 1 To saveFrames.Count - 1
@@ -378,13 +378,13 @@ Namespace VBClasses
             desc = "Isolate edges in the left and right views."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If taskA.mouseClickFlag Then taskA.mouseClickFlag = False ' preempt use of quadrants.
+            If tsk.mouseClickFlag Then tsk.mouseClickFlag = False ' preempt use of quadrants.
 
-            edges.Run(taskA.leftView)
-            dst2 = If(standaloneTest(), ShowAddweighted(edges.dst2, taskA.leftView, labels(2)), edges.dst2)
+            edges.Run(tsk.leftView)
+            dst2 = If(standaloneTest(), ShowAddweighted(edges.dst2, tsk.leftView, labels(2)), edges.dst2)
 
-            edges.Run(taskA.rightView)
-            dst3 = If(standaloneTest(), ShowAddweighted(edges.dst2, taskA.rightView, labels(3)), edges.dst2)
+            edges.Run(tsk.rightView)
+            dst3 = If(standaloneTest(), ShowAddweighted(edges.dst2, tsk.rightView, labels(3)), edges.dst2)
         End Sub
     End Class
 
@@ -400,19 +400,19 @@ Namespace VBClasses
         Dim redRects As New List(Of Integer)
         Dim options As New Options_EdgeMatching
         Public Sub New()
-            taskA.gOptions.GridSlider.Value = 16
+            tsk.gOptions.GridSlider.Value = 16
             desc = "Match edges in the left and right views to determine distance"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
 
-            dst2 = taskA.leftView
-            dst3 = taskA.rightView
+            dst2 = tsk.leftView
+            dst3 = tsk.rightView
 
-            Dim maxLocs(taskA.gridRects.Count - 1) As Integer
+            Dim maxLocs(tsk.gridRects.Count - 1) As Integer
             Dim highlights As New List(Of Integer)
-            For i = 0 To taskA.gridRects.Count - 1
-                Dim gr = taskA.gridRects(i)
+            For i = 0 To tsk.gridRects.Count - 1
+                Dim gr = tsk.gridRects(i)
                 Dim width = If(gr.X + gr.Width + options.searchDepth < dst2.Width,
                                       gr.Width + options.searchDepth, dst2.Width - gr.X - 1)
                 Dim searchgr = New cv.Rect(gr.X, gr.Y, width, gr.Height)
@@ -427,8 +427,8 @@ Namespace VBClasses
             Next
 
             If options.overlayChecked Then
-                dst2.SetTo(255, taskA.gridMask)
-                dst3.SetTo(255, taskA.gridMask)
+                dst2.SetTo(255, tsk.gridMask)
+                dst3.SetTo(255, tsk.gridMask)
             End If
 
             dst2 = If(dst2.Channels() = 3, dst2, dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR))
@@ -436,7 +436,7 @@ Namespace VBClasses
             If options.highlightChecked Then
                 labels(2) = "Matched grid segments in dst3 with disparity"
                 For Each i In highlights
-                    Dim gr = taskA.gridRects(i)
+                    Dim gr = tsk.gridRects(i)
                     dst3.Rectangle(gr, cv.Scalar.Red, 2)
                     gr.X += maxLocs(i)
                     dst2.Rectangle(gr, cv.Scalar.Red, 2)
@@ -446,13 +446,13 @@ Namespace VBClasses
                 labels(2) = "Click in dst3 to highlight segment in dst2"
                 If options.clearChecked Then
                     redRects.Clear()
-                    taskA.gridROIclicked = 0
+                    tsk.gridROIclicked = 0
                     options.clearChecked = False
                 End If
-                If taskA.gridROIclicked Then
-                    If redRects.Contains(taskA.gridROIclicked) = False Then redRects.Add(taskA.gridROIclicked)
+                If tsk.gridROIclicked Then
+                    If redRects.Contains(tsk.gridROIclicked) = False Then redRects.Add(tsk.gridROIclicked)
                     For Each i In redRects
-                        Dim gr = taskA.gridRects(i)
+                        Dim gr = tsk.gridRects(i)
                         dst3.Rectangle(gr, cv.Scalar.Red, 2)
                         gr.X += maxLocs(i)
                         dst2.Rectangle(gr, cv.Scalar.Red, 2)
@@ -528,10 +528,10 @@ Namespace VBClasses
             labels = {"", "", "Edges in Left Image", "Edges in Right Image (except on Kinect 4 Azure)"}
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            sobel.Run(taskA.rightView)
+            sobel.Run(tsk.rightView)
             dst3 = sobel.dst2.Clone()
 
-            sobel.Run(taskA.leftView)
+            sobel.Run(tsk.leftView)
             dst2 = sobel.dst2
         End Sub
     End Class
@@ -583,7 +583,7 @@ Namespace VBClasses
     Public Class Edge_ColorGap_VB : Inherits TaskParent
         Dim options As New Options_Edges3
         Public Sub New()
-            If standalone Then taskA.gOptions.displayDst1.Checked = True
+            If standalone Then tsk.gOptions.displayDst1.Checked = True
 
             labels = {"", "Vertical and Horizontal edges", "Vertical edges", "Horizontal edges"}
             dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
@@ -683,13 +683,13 @@ Namespace VBClasses
 
             dst2 = src.Canny(options.threshold1, options.threshold2, options.aperture, True)
             Static frameList As New List(Of cv.Mat)
-            If taskA.optionsChanged Then frameList.Clear()
+            If tsk.optionsChanged Then frameList.Clear()
             frameList.Add(dst2)
             dst3.SetTo(0)
             For Each m In frameList
                 dst3 = dst3 Or m
             Next
-            If frameList.Count >= taskA.frameHistoryCount Then frameList.RemoveAt(0)
+            If frameList.Count >= tsk.frameHistoryCount Then frameList.RemoveAt(0)
         End Sub
     End Class
 
@@ -711,7 +711,7 @@ Namespace VBClasses
             options1.Run()
 
             Dim gray = src
-            If src.Channels() = 3 Then gray = taskA.gray
+            If src.Channels() = 3 Then gray = tsk.gray
             Dim newFrame = gray(New cv.Range(options.vertPixels, gray.Rows - options.vertPixels),
                             New cv.Range(options.horizPixels, gray.Cols - options.horizPixels))
             newFrame = newFrame.Resize(gray.Size(), 0, 0, cv.InterpolationFlags.Nearest)
@@ -825,17 +825,17 @@ Namespace VBClasses
     Public Class NR_Edge_SobelCustomLeftRight : Inherits TaskParent
         Dim custom As New Edge_SobelCustom
         Public Sub New()
-            If standalone Then taskA.gOptions.displayDst1.Checked = True
-            If standalone Then taskA.gOptions.displayDst1.Checked = True
+            If standalone Then tsk.gOptions.displayDst1.Checked = True
+            If standalone Then tsk.gOptions.displayDst1.Checked = True
             labels = {"Left Image Custom 1", "Left Image Custom 2", "Right Image Custom 1", "Right Image Custom 2"}
             desc = "Show Sobel edge detection for both left and right images"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            custom.Run(taskA.leftView)
+            custom.Run(tsk.leftView)
             dst0 = custom.dst2.Clone
             dst1 = custom.dst3.Clone
 
-            custom.Run(taskA.rightView)
+            custom.Run(tsk.rightView)
             dst2 = custom.dst2
             dst3 = custom.dst3
         End Sub
@@ -893,7 +893,7 @@ Namespace VBClasses
 
             mats.mat(1) = runRedList(src, labels(3))
 
-            canny.Run(taskA.redList.dst2)
+            canny.Run(tsk.redList.dst2)
             mats.mat(2) = canny.dst2
 
             mats.mat(3) = mats.mat(2).SetTo(0, Not mats.mat(0))
@@ -921,9 +921,9 @@ Namespace VBClasses
             desc = "Find edges in a variety of Color8U algorithms then find the edges common to all."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If taskA.firstPass Then
+            If tsk.firstPass Then
                 Dim frmCheck = OptionParent.FindFrm("Options_ColorMethod CheckBoxes")
-                frmCheck.Left = taskA.gOptions.Width / 2
+                frmCheck.Left = tsk.gOptions.Width / 2
             End If
             options.Run()
 
@@ -992,7 +992,7 @@ Namespace VBClasses
             desc = "Accumulate Canny edges to highlight all real edges better."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            canny.Run(taskA.gray)
+            canny.Run(tsk.gray)
             accum.Run(canny.dst2)
             dst2 = accum.dst2
             labels(2) = "Accumulated canny edges."
@@ -1029,7 +1029,7 @@ Namespace VBClasses
             desc = "Ignore edges with zero - in C++ because it needs to be optimized."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            segments.Run(taskA.pcSplit(0))
+            segments.Run(tsk.pcSplit(0))
             src = segments.dst1 ' the byte version of the segmented image.
 
             Dim cppData(src.Total * src.ElemSize - 1) As Byte
@@ -1059,7 +1059,7 @@ Namespace VBClasses
             desc = "Ignore edges with zero - in C++ because it needs to be optimized."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            segments.Run(taskA.pcSplit(1))
+            segments.Run(tsk.pcSplit(1))
             src = segments.dst1 ' the byte version of the segmented image.
 
             Dim cppData(src.Total * src.ElemSize - 1) As Byte
@@ -1089,7 +1089,7 @@ Namespace VBClasses
             desc = "Ignore edges with zero - in C++ because it needs to be optimized."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            segments.Run(taskA.pcSplit(2))
+            segments.Run(tsk.pcSplit(2))
             src = segments.dst1 ' the byte version of the segmented image.
 
             Dim cppData(src.Total * src.ElemSize - 1) As Byte
@@ -1148,7 +1148,7 @@ Namespace VBClasses
     Public Class NR_Edge_LaplacianColor : Inherits TaskParent
         Dim options As New Options_LaplacianKernels
         Public Sub New()
-            If standalone Then taskA.gOptions.displayDst1.Checked = True
+            If standalone Then tsk.gOptions.displayDst1.Checked = True
             If standalone Then labels(3) = "Laplacian of DepthRGB"
             desc = "Show Laplacian edge detection with varying kernel sizes"
         End Sub
@@ -1171,7 +1171,7 @@ Namespace VBClasses
     Public Class Edge_Laplacian : Inherits TaskParent
         Dim options As New Options_LaplacianKernels
         Public Sub New()
-            If standalone Then taskA.gOptions.displayDst1.Checked = True
+            If standalone Then tsk.gOptions.displayDst1.Checked = True
             desc = "Show Laplacian edge detection with varying kernel sizes"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -1195,16 +1195,16 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             Static frm = OptionParent.FindFrm("Options_Edge_Basics Radio Buttons")
 
-            If taskA.heartBeatLT Then
-                Dim index = taskA.featureOptions.EdgeMethods.SelectedIndex + 1
-                If index >= taskA.featureOptions.EdgeMethods.Items.Count Then index = 0
-                taskA.featureOptions.EdgeMethods.SelectedIndex = index
+            If tsk.heartBeatLT Then
+                Dim index = tsk.featureOptions.EdgeMethods.SelectedIndex + 1
+                If index >= tsk.featureOptions.EdgeMethods.Items.Count Then index = 0
+                tsk.featureOptions.EdgeMethods.SelectedIndex = index
             End If
 
             edges.Run(src)
             dst2 = edges.dst2
 
-            strOut = "Current edge algorithm is " + taskA.featureOptions.EdgeMethods.SelectedText
+            strOut = "Current edge algorithm is " + tsk.featureOptions.EdgeMethods.SelectedText
             labels(2) = strOut
             SetTrueText(strOut, 3)
         End Sub
@@ -1273,14 +1273,14 @@ Namespace VBClasses
         Dim canny As New Edge_Canny
         Dim LRMeanSub As New MeanSubtraction_Basics
         Public Sub New()
-            desc = "Use canny on the left image of the meanSubtraction taskA algorithm."
+            desc = "Use canny on the left image of the meanSubtraction tsk algorithm."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             LRMeanSub.Run(src)
 
             canny.Run(LRMeanSub.dst2)
 
-            If taskA.optionsChanged Then dst2 = canny.dst2.Clone Else canny.dst2.CopyTo(dst2, taskA.motionRGB.motionMask)
+            If tsk.optionsChanged Then dst2 = canny.dst2.Clone Else canny.dst2.CopyTo(dst2, tsk.motionRGB.motionMask)
         End Sub
     End Class
 
@@ -1295,9 +1295,9 @@ Namespace VBClasses
             desc = "Show Sobel vertical and horizontal edge detection no options."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            dst0 = taskA.grayStable.Sobel(cv.MatType.CV_32F, 1, 0, 3)
-            dst1 = taskA.grayStable.Sobel(cv.MatType.CV_32F, 0, 1, 3)
-            Dim diagonal = taskA.grayStable.Sobel(cv.MatType.CV_32F, 1, 1, 3)
+            dst0 = tsk.grayStable.Sobel(cv.MatType.CV_32F, 1, 0, 3)
+            dst1 = tsk.grayStable.Sobel(cv.MatType.CV_32F, 0, 1, 3)
+            Dim diagonal = tsk.grayStable.Sobel(cv.MatType.CV_32F, 1, 1, 3)
             dst2 = (dst1 + dst0 + diagonal).ToMat.ConvertScaleAbs()
         End Sub
     End Class
@@ -1374,19 +1374,19 @@ Namespace VBClasses
     Public Class NR_Edge_NoDepth : Inherits TaskParent
         Dim edgeline As New EdgeLine_Basics
         Public Sub New()
-            If standalone Then taskA.gOptions.displayDst1.Checked = True
+            If standalone Then tsk.gOptions.displayDst1.Checked = True
             labels = {"", "", "All edges available", "Below - edges without depth, Above - edges with depth (color from contour.)"}
             desc = "Find the edges where there is depth and no depth."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            edgeline.Run(taskA.grayStable)
+            edgeline.Run(tsk.grayStable)
             dst2 = edgeline.dst2
 
             dst3.SetTo(0)
-            dst2.CopyTo(dst3, taskA.noDepthMask)
+            dst2.CopyTo(dst3, tsk.noDepthMask)
 
             dst1.SetTo(0)
-            dst2.CopyTo(dst1, taskA.depthMask)
+            dst2.CopyTo(dst1, tsk.depthMask)
         End Sub
     End Class
 
@@ -1431,7 +1431,7 @@ Namespace VBClasses
                 Dim pop = dst2(roi).CountNonZero
                 pops.Add(pop)
                 popSorted.Add(pop, i)
-                dst2.Rectangle(roi, 255, taskA.lineWidth)
+                dst2.Rectangle(roi, 255, tsk.lineWidth)
             Next
 
             Dim popAverage = If(pops.Count > 0, pops.Average, 0)
@@ -1442,15 +1442,15 @@ Namespace VBClasses
                          " and max = " + CStr(popMax) + ".  Circled cell has max features."
 
             Dim index = pops.IndexOf(pops.Max)
-            Dim gSize = taskA.brickSize
+            Dim gSize = tsk.brickSize
             Dim pt = New cv.Point(gEdges.featureRects(index).X + gSize / 2, gEdges.featureRects(index).Y + gSize / 2)
-            dst2.Circle(pt, gSize * 1.5, 255, taskA.lineWidth * 2)
+            dst2.Circle(pt, gSize * 1.5, 255, tsk.lineWidth * 2)
 
             dst3.SetTo(0)
-            dst3.Circle(pt, gSize * 1.5, 255, taskA.lineWidth * 2)
+            dst3.Circle(pt, gSize * 1.5, 255, tsk.lineWidth * 2)
             Dim count As Integer
             For Each index In popSorted.Values
-                dst3.Rectangle(gEdges.featureRects(index), white, taskA.lineWidth)
+                dst3.Rectangle(gEdges.featureRects(index), white, tsk.lineWidth)
                 count += 1
                 If count >= 20 Then Exit For
             Next
@@ -1467,7 +1467,7 @@ Namespace VBClasses
         Public ptLeft As New List(Of cv.Point)
         Public ptRight As New List(Of cv.Point)
         Public Sub New()
-            If standalone Then taskA.gOptions.displayDst1.Checked = True
+            If standalone Then tsk.gOptions.displayDst1.Checked = True
             labels(2) = "Move mouse to confirm edges are in both images "
             dst1 = New cv.Mat(dst0.Size, cv.MatType.CV_8U, 0)
             desc = "Confirm that any edges under the mouse is in both the left and right images."
@@ -1477,8 +1477,8 @@ Namespace VBClasses
             dst2 = edgesLR.dst2
             dst3 = edgesLR.dst3
 
-            Dim lp = New lpData(New cv.Point(0, taskA.mouseMovePoint.Y),
-                            New cv.Point(dst2.Width, taskA.mouseMovePoint.Y))
+            Dim lp = New lpData(New cv.Point(0, tsk.mouseMovePoint.Y),
+                            New cv.Point(dst2.Width, tsk.mouseMovePoint.Y))
 
             Dim r = New cv.Rect(lp.p1.X, lp.p1.Y, dst2.Width, 1)
             Dim tmp = dst2(r).FindNonZero()
@@ -1486,7 +1486,7 @@ Namespace VBClasses
             ptLeft.Clear()
             For i = 0 To tmp.Rows - 1
                 Dim pt = tmp.Get(Of cv.Point)(i, 0)
-                Dim depth = taskA.pcSplit(2).Get(Of Single)(pt.Y, pt.X)
+                Dim depth = tsk.pcSplit(2).Get(Of Single)(pt.Y, pt.X)
                 If depth > 0 Then
                     ptLeft.Add(pt)
                     SetTrueText(Format(depth, fmt1), pt, 1)
@@ -1498,10 +1498,10 @@ Namespace VBClasses
             ptRight.Clear()
             For i = 0 To tmp.Rows - 1
                 Dim pt = tmp.Get(Of cv.Point)(i, 0)
-                Dim depth = taskA.pcSplit(2).Get(Of Single)(pt.Y, pt.X)
+                Dim depth = tsk.pcSplit(2).Get(Of Single)(pt.Y, pt.X)
                 If depth > 0 Then
                     ptRight.Add(pt)
-                    SetTrueText(Format(depth, fmt1), New cv.Point(pt.X, taskA.mouseMovePoint.Y), 1)
+                    SetTrueText(Format(depth, fmt1), New cv.Point(pt.X, tsk.mouseMovePoint.Y), 1)
                 End If
             Next
             labels(2) = CStr(ptLeft.Count) + " points were found in the left view"
@@ -1516,9 +1516,9 @@ Namespace VBClasses
         Dim edgesLR As New Edge_LeftRight
         Public means As New List(Of Single)
         Public Sub New()
-            If standalone Then taskA.gOptions.displayDst1.Checked = True
-            If taskA.bricks Is Nothing Then taskA.bricks = New Brick_Basics
-            taskA.gOptions.GridSlider.Value *= 2
+            If standalone Then tsk.gOptions.displayDst1.Checked = True
+            If tsk.bricks Is Nothing Then tsk.bricks = New Brick_Basics
+            tsk.gOptions.GridSlider.Value *= 2
             desc = "Translate bricks with edges and depth from the left to the right view."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -1527,13 +1527,13 @@ Namespace VBClasses
             dst3 = edgesLR.dst3
 
             Dim count As Integer
-            For Each gr In taskA.bricks.brickList
+            For Each gr In tsk.bricks.brickList
                 If gr.depth = 0 Then Continue For
                 If gr.rRect.X < 0 Or gr.rRect.X + gr.rRect.Width >= dst2.Width Then Continue For
                 If gr.rRect.Width = 0 Or gr.rRect.Height = 0 Then Continue For
                 If dst2(gr.lRect).CountNonZero And dst3(gr.rRect).CountNonZero Then
-                    dst2.Rectangle(gr.lRect, white, taskA.lineWidth)
-                    dst3.Rectangle(gr.rRect, white, taskA.lineWidth)
+                    dst2.Rectangle(gr.lRect, white, tsk.lineWidth)
+                    dst3.Rectangle(gr.rRect, white, tsk.lineWidth)
                     count += 1
                 End If
             Next
@@ -1541,14 +1541,14 @@ Namespace VBClasses
             dst2 = dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
             dst3 = dst3.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
 
-            Dim index = taskA.gridMap.Get(Of Integer)(taskA.mouseMovePoint.Y, taskA.mouseMovePoint.X)
-            Dim br = taskA.bricks.brickList(index)
+            Dim index = tsk.gridMap.Get(Of Integer)(tsk.mouseMovePoint.Y, tsk.mouseMovePoint.X)
+            Dim br = tsk.bricks.brickList(index)
             SetTrueText(br.displayCell, 1)
-            dst2.Rectangle(br.lRect, taskA.highlight, taskA.lineWidth + 1)
-            dst3.Rectangle(br.rRect, taskA.highlight, taskA.lineWidth + 1)
-            taskA.color.Rectangle(br.lRect, taskA.highlight, taskA.lineWidth)
+            dst2.Rectangle(br.lRect, tsk.highlight, tsk.lineWidth + 1)
+            dst3.Rectangle(br.rRect, tsk.highlight, tsk.lineWidth + 1)
+            tsk.color.Rectangle(br.lRect, tsk.highlight, tsk.lineWidth)
 
-            labels(2) = CStr(count) + " (of " + CStr(taskA.bricks.brickList.Count) +
+            labels(2) = CStr(count) + " (of " + CStr(tsk.bricks.brickList.Count) +
                     ") bricks had edges and depth in the left image.  " +
                     "Move the mouse around to highlight partners.  Below right is right view."
         End Sub
@@ -1612,10 +1612,10 @@ Namespace VBClasses
             desc = "Set the max thresholds for Canny to get the minimum number of edge pixels for the left and right images."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            canny.Run(taskA.leftView)
+            canny.Run(tsk.leftView)
             dst2 = canny.dst2.Clone
 
-            canny.Run(taskA.rightView)
+            canny.Run(tsk.rightView)
             dst3 = canny.dst2
         End Sub
     End Class
@@ -1629,11 +1629,11 @@ Namespace VBClasses
             desc = "A general view of the different edge algorithms applied to the left and right images."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            edges.Run(taskA.leftView)
+            edges.Run(tsk.leftView)
             dst2 = edges.dst2.Clone
             labels(2) = "Left image " + edges.labels(2)
 
-            edges.Run(taskA.rightView)
+            edges.Run(tsk.rightView)
             dst3 = edges.dst2.Clone
             labels(2) = "Right image " + edges.labels(2)
         End Sub
@@ -1648,7 +1648,7 @@ Namespace VBClasses
         Dim frames As New History_Basics
         Dim diff As New Diff_Basics
         Public Sub New()
-            If standalone Then taskA.gOptions.displayDst1.Checked = True
+            If standalone Then tsk.gOptions.displayDst1.Checked = True
             labels(1) = "The Edge_Canny output for the current frame"
             labels(3) = "The difference from the current edges and the accumulated edges"
             desc = "Collect edges over several frames controlled with global frame history"
@@ -1664,7 +1664,7 @@ Namespace VBClasses
             diff.Run(dst1)
             diff.dst2.ConvertTo(dst3, cv.MatType.CV_8U)
 
-            labels(2) = "Accumulated edges over " + CStr(taskA.frameHistoryCount) + " frames."
+            labels(2) = "Accumulated edges over " + CStr(tsk.frameHistoryCount) + " frames."
         End Sub
     End Class
 End Namespace

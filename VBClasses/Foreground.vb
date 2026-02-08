@@ -20,7 +20,7 @@ Namespace VBClasses
             For i = 0 To classCount - 1
                 Dim tmp = simK.dst2.InRange(i, i)
                 depthMats.Add(tmp.Clone)
-                Dim depth = taskA.pcSplit(2).Mean(tmp)(0)
+                Dim depth = tsk.pcSplit(2).Mean(tmp)(0)
                 sortedMats.Add(depth, i)
             Next
 
@@ -34,10 +34,10 @@ Namespace VBClasses
                 dst1.SetTo(index + 1, tmp)
             Next
             dst2 = PaletteFull(dst1)
-            fg = taskA.pcSplit(2).Threshold(fgDepth, 255, cv.ThresholdTypes.BinaryInv).ConvertScaleAbs()
+            fg = tsk.pcSplit(2).Threshold(fgDepth, 255, cv.ThresholdTypes.BinaryInv).ConvertScaleAbs()
             dst0 = fg
 
-            fg.SetTo(0, taskA.noDepthMask)
+            fg.SetTo(0, tsk.noDepthMask)
             bg = Not fg
 
             dst3.SetTo(0)
@@ -57,14 +57,14 @@ Namespace VBClasses
         Public Sub New()
             OptionParent.FindSlider("KMeans k").Value = 2
             labels = {"", "", "Foreground Mask", "Background Mask"}
-            dst2 = New cv.Mat(New cv.Size(taskA.workRes.Width, taskA.workRes.Height), cv.MatType.CV_8U, cv.Scalar.All(0))
-            dst3 = New cv.Mat(New cv.Size(taskA.workRes.Width, taskA.workRes.Height), cv.MatType.CV_8U, cv.Scalar.All(0))
+            dst2 = New cv.Mat(New cv.Size(tsk.workRes.Width, tsk.workRes.Height), cv.MatType.CV_8U, cv.Scalar.All(0))
+            dst3 = New cv.Mat(New cv.Size(tsk.workRes.Width, tsk.workRes.Height), cv.MatType.CV_8U, cv.Scalar.All(0))
             desc = "Separate foreground and background using Kmeans with k=2."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            taskA.optionsChanged = True
+            tsk.optionsChanged = True
 
-            src = taskA.pcSplit(2).Threshold(1, 255, cv.ThresholdTypes.BinaryInv).ConvertScaleAbs()
+            src = tsk.pcSplit(2).Threshold(1, 255, cv.ThresholdTypes.BinaryInv).ConvertScaleAbs()
             km.Run(src)
 
             Dim minDistance = Single.MaxValue
@@ -78,10 +78,10 @@ Namespace VBClasses
             Next
             dst2.SetTo(0)
             dst2.SetTo(255, km.masks(minIndex))
-            dst2.SetTo(0, taskA.noDepthMask)
+            dst2.SetTo(0, tsk.noDepthMask)
 
             dst3 = Not dst2
-            dst3.SetTo(0, taskA.noDepthMask)
+            dst3.SetTo(0, tsk.noDepthMask)
         End Sub
     End Class
 
@@ -94,7 +94,7 @@ Namespace VBClasses
     Public Class Foreground_Hist3D : Inherits TaskParent
         Dim hcloud As New Hist3Dcloud_Basics
         Public Sub New()
-            hcloud.maskInput = taskA.noDepthMask
+            hcloud.maskInput = tsk.noDepthMask
             labels = {"", "", "Foreground", "Background"}
             desc = "Use the first class of hist3Dcloud_Basics as the definition of foreground"
         End Sub
@@ -102,7 +102,7 @@ Namespace VBClasses
             hcloud.Run(src)
 
             dst2.SetTo(0)
-            dst2 = hcloud.dst2.InRange(1, 1) Or taskA.noDepthMask
+            dst2 = hcloud.dst2.InRange(1, 1) Or tsk.noDepthMask
             dst3 = Not dst2
         End Sub
     End Class

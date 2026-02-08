@@ -1,9 +1,9 @@
 ﻿Imports VBClasses
 Public Class OptionsCombo
     Public Sub Setup(traceName As String, label As String, comboList As List(Of String))
-        Me.MdiParent = taskA.allOptions
+        Me.MdiParent = tsk.allOptions
         Me.Text = traceName + " ComboBox Options"
-        taskA.allOptions.addTitle(Me)
+        tsk.allOptions.addTitle(Me)
         ComboLabel.Text = label
         For i = 0 To comboList.Count - 1
             Box.Items.Add(comboList.ElementAt(i))

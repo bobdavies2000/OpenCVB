@@ -9,9 +9,9 @@ Namespace VBClasses
             desc = "Watershed API experiment.  Draw on the image to test."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If taskA.drawRect.Width > 0 And taskA.drawRect.Height > 0 Then rects.Add(taskA.drawRect)
+            If tsk.drawRect.Width > 0 And tsk.drawRect.Height > 0 Then rects.Add(tsk.drawRect)
 
-            If (standaloneTest() Or UseCorners) And taskA.optionsChanged Then
+            If (standaloneTest() Or UseCorners) And tsk.optionsChanged Then
                 For i = 0 To 4 - 1
                     Dim r As New cv.Rect(0, 0, src.Width / 10, src.Height / 10)
                     Select Case i
@@ -44,7 +44,7 @@ Namespace VBClasses
             Else
                 dst2 = src
             End If
-            taskA.drawRect = New cv.Rect
+            tsk.drawRect = New cv.Rect
             labels(2) = "There were " + CStr(rects.Count) + " regions defined as input"
         End Sub
     End Class
@@ -64,7 +64,7 @@ Namespace VBClasses
             desc = "Watershed the depth image using shadow, close, and far points."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            reduction.Run(taskA.depthRGB)
+            reduction.Run(tsk.depthRGB)
             dst3 = reduction.dst3
 
             watershed.Run(dst3)
@@ -88,7 +88,7 @@ Namespace VBClasses
             desc = "Watershed the four corners of the depth image."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            watershed.Run(taskA.depthRGB)
+            watershed.Run(tsk.depthRGB)
             dst2 = watershed.dst2
             labels(2) = watershed.labels(2)
         End Sub

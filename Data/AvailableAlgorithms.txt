@@ -1404,7 +1404,6 @@ Palette_Random
 Palette_RandomColorMap
 Palette_RandomColors
 Palette_Variable
-ParticleFilter_Example
 PCA_LineMask
 PCA_Mask
 PCA_NColor
@@ -1495,6 +1494,7 @@ RedCC_Color8U
 RedCloud_Basics
 RedCloud_Cell
 RedCloud_CellMask
+RedCloud_KNN
 RedCloud_LeftRight
 RedCloud_Sweep
 RedColor_Basics

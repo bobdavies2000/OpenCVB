@@ -6,7 +6,7 @@ Namespace VBClasses
             desc = "Hook to Polyline usage in EdgeLine_Motion"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            edgeline.Run(taskA.grayStable)
+            edgeline.Run(tsk.grayStable)
             dst2 = edgeline.dst2
             labels(2) = edgeline.labels(2)
 
@@ -36,7 +36,7 @@ Namespace VBClasses
 
             dst2 = New cv.Mat(src.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
             ' NOTE: when there are 2 points, there will be 1 line.
-            dst2.Polylines(pts, options.polyClosed, white, taskA.lineWidth, taskA.lineType)
+            dst2.Polylines(pts, options.polyClosed, white, tsk.lineWidth, tsk.lineType)
         End Sub
     End Class
 
@@ -53,7 +53,7 @@ Namespace VBClasses
             desc = "Create a random procedural image"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If taskA.frameCount Mod (taskA.fpsAlgorithm * 3) = 0 Then ' every x frames.
+            If tsk.frameCount Mod (tsk.fpsAlgorithm * 3) = 0 Then ' every x frames.
                 Dim h = src.Height, w = src.Width
                 Dim autorand As New Random
                 Dim points2f(10000) As cv.Point2f
@@ -67,7 +67,7 @@ Namespace VBClasses
                 pts.Add(points)
 
                 dst2 = New cv.Mat(src.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
-                dst2.Polylines(pts, False, white, taskA.lineWidth, taskA.lineType)
+                dst2.Polylines(pts, False, white, tsk.lineWidth, tsk.lineType)
                 dst2 = dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
             End If
 

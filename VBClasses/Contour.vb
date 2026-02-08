@@ -4,7 +4,7 @@ Namespace VBClasses
         Implements IDisposable
         Public classCount As Integer
         Public contourList As New List(Of contourData)
-        Public contourMap As New cv.Mat(taskA.workRes, cv.MatType.CV_32F, 0)
+        Public contourMap As New cv.Mat(tsk.workRes, cv.MatType.CV_32F, 0)
         Public sortContours As New Contour_Sort
         Dim edgeline As New EdgeLine_Basics
         Public Sub New()
@@ -13,16 +13,16 @@ Namespace VBClasses
         End Sub
         Public Function selectContour() As contourData
             Dim tour As New contourData
-            Dim id = contourMap.Get(Of Integer)(taskA.clickPoint.Y, taskA.clickPoint.X)
-            For Each taskA.contourD In contourList
-                If id = taskA.contourD.ID Then Exit For
+            Dim id = contourMap.Get(Of Integer)(tsk.clickPoint.Y, tsk.clickPoint.X)
+            For Each tsk.contourD In contourList
+                If id = tsk.contourD.ID Then Exit For
             Next
 
             For Each tour In contourList
                 If tour.ID = id Then Exit For
             Next
-            taskA.color(tour.rect).SetTo(cv.Scalar.White, tour.mask)
-            Return taskA.contourD
+            tsk.color(tour.rect).SetTo(cv.Scalar.White, tour.mask)
+            Return tsk.contourD
         End Function
         Public Shared Function buildContours(input As cv.Mat) As cv.Point()()
             Static options As New Options_Contours
@@ -35,7 +35,7 @@ Namespace VBClasses
 
             Dim mode = options.options2.ApproximationMode
             If options.retrievalMode = cv.RetrievalModes.FloodFill Then
-                Dim dst As New cv.Mat(taskA.workRes, cv.MatType.CV_8U, 0)
+                Dim dst As New cv.Mat(tsk.workRes, cv.MatType.CV_8U, 0)
                 input.ConvertTo(dst, cv.MatType.CV_32SC1)
                 cv.Cv2.FindContours(dst, allContours, Nothing, cv.RetrievalModes.FloodFill, mode)
             Else
@@ -47,7 +47,7 @@ Namespace VBClasses
             If src.Type = cv.MatType.CV_8U Then
                 dst3 = src
             Else
-                edgeline.Run(taskA.grayStable)
+                edgeline.Run(tsk.grayStable)
                 dst3 = edgeline.dst2
             End If
 
@@ -86,7 +86,7 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
 
-            edgeline.Run(taskA.grayStable)
+            edgeline.Run(tsk.grayStable)
             dst3 = edgeline.dst2
 
             Dim allContours As cv.Point()() = Nothing
@@ -131,22 +131,22 @@ Namespace VBClasses
     Public Class NR_Contour_Features : Inherits TaskParent
         Dim contours As New Contour_Basics
         Public Sub New()
-            If taskA.feat Is Nothing Then taskA.feat = New Feature_Basics
+            If tsk.feat Is Nothing Then tsk.feat = New Feature_Basics
             labels(3) = "Each of the feature points with their correlation coefficien"
             desc = "Show contours and features"
         End Sub
         Public Shared Function getCorrelation(lrect As cv.Rect) As Single
             Dim correlationMat As New cv.Mat
             Dim rRect As cv.Rect
-            Dim depth = taskA.pcSplit(2)(lrect).Mean(taskA.depthmask(lrect))
+            Dim depth = tsk.pcSplit(2)(lrect).Mean(tsk.depthmask(lrect))
             If depth = 0 Then Return 0 ' no correlation if there is no depth...
             rRect = lrect
-            rRect.X -= taskA.calibData.baseline * taskA.calibData.leftIntrinsics.fx / depth.Val0
-            If rRect.X < 0 Or rRect.X + rRect.Width >= taskA.color.Width Then
+            rRect.X -= tsk.calibData.baseline * tsk.calibData.leftIntrinsics.fx / depth.Val0
+            If rRect.X < 0 Or rRect.X + rRect.Width >= tsk.color.Width Then
                 Return 0 ' no correlation if there is no depth...
             End If
 
-            cv.Cv2.MatchTemplate(taskA.leftView(lrect), taskA.rightView(rRect), correlationMat, cv.TemplateMatchModes.CCoeffNormed)
+            cv.Cv2.MatchTemplate(tsk.leftView(lrect), tsk.rightView(rRect), correlationMat, cv.TemplateMatchModes.CCoeffNormed)
             Return correlationMat.Get(Of Single)(0, 0)
         End Function
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -154,15 +154,15 @@ Namespace VBClasses
             dst2 = contours.dst2
 
             dst3.SetTo(0)
-            For Each pt In taskA.feat.features
+            For Each pt In tsk.feat.features
                 DrawCircle(dst2, pt)
                 DrawCircle(dst3, pt)
-                Dim rect = taskA.gridRects(taskA.gridMap.Get(Of Integer)(pt.Y, pt.X))
+                Dim rect = tsk.gridRects(tsk.gridMap.Get(Of Integer)(pt.Y, pt.X))
                 Dim correlation = getCorrelation(rect)
                 SetTrueText(Format(correlation, fmt1), pt, 3)
             Next
             labels(2) = "There are " + CStr(contours.contourList.Count) + " contours and " +
-                    CStr(taskA.feat.features.Count) + " features."
+                    CStr(tsk.feat.features.Count) + " features."
         End Sub
     End Class
 
@@ -181,7 +181,7 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             contours.Run(src)
             dst2 = contours.dst2.Clone
-            bPoint.Run(taskA.grayStable)
+            bPoint.Run(tsk.grayStable)
 
             For Each pt In bPoint.ptList
                 DrawCircle(dst2, pt)
@@ -237,8 +237,8 @@ Namespace VBClasses
             dst2 = contours.dst2
             labels(2) = contours.labels(2)
 
-            For Each lp In taskA.lines.lpList
-                dst2.Line(lp.p1, lp.p2, taskA.highlight, taskA.lineWidth, taskA.lineWidth)
+            For Each lp In tsk.lines.lpList
+                dst2.Line(lp.p1, lp.p2, tsk.highlight, tsk.lineWidth, tsk.lineWidth)
             Next
         End Sub
     End Class
@@ -286,7 +286,7 @@ Namespace VBClasses
         Dim image As cv.Mat
         Public Sub New()
             labels = {"", "", "Identified horizontal lines - why is scale factor necessary?", "Identified vertical lines"}
-            image = cv.Cv2.ImRead(taskA.homeDir + "Data/invoice.jpg")
+            image = cv.Cv2.ImRead(tsk.homeDir + "Data/invoice.jpg")
             Dim dstSize = New cv.Size(dst2.Height * dst2.Width / image.Height, dst2.Height)
             Dim dstRect = New cv.Rect(0, 0, image.Width, dst2.Height)
             image = image.Resize(dstSize)
@@ -317,7 +317,7 @@ Namespace VBClasses
             Dim tour = cv.Cv2.FindContoursAsArray(removedH, cv.RetrievalModes.External, cv.ContourApproximationModes.ApproxSimple)
             tour = scaleTour(tour)
             For i = 0 To tour.Count - 1
-                cv.Cv2.DrawContours(dst2, tour, i, cv.Scalar.Black, taskA.lineWidth)
+                cv.Cv2.DrawContours(dst2, tour, i, cv.Scalar.Black, tsk.lineWidth)
             Next
 
             Dim vkernel = cv.Cv2.GetStructuringElement(cv.MorphShapes.Rect, New cv.Size(1, options.widthHeight))
@@ -327,7 +327,7 @@ Namespace VBClasses
             tour = cv.Cv2.FindContoursAsArray(removedV, cv.RetrievalModes.External, cv.ContourApproximationModes.ApproxSimple)
             tour = scaleTour(tour)
             For i = 0 To tour.Count - 1
-                cv.Cv2.DrawContours(dst3, tour, i, cv.Scalar.Black, taskA.lineWidth)
+                cv.Cv2.DrawContours(dst3, tour, i, cv.Scalar.Black, tsk.lineWidth)
             Next
         End Sub
     End Class
@@ -354,9 +354,9 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             sides.Run(src)
             dst2 = sides.dst2
-            Dim rc = taskA.oldrcD
+            Dim rc = tsk.oldrcD
 
-            If sides.corners.Count > 0 And taskA.heartBeat Then
+            If sides.corners.Count > 0 And tsk.heartBeat Then
                 ptLeft = sides.corners(1)
                 ptRight = sides.corners(2)
                 ptTop = sides.corners(3)
@@ -371,10 +371,10 @@ Namespace VBClasses
                 If rc.contour.Count > 0 Then
                     dst3.SetTo(0)
                     DrawTour(dst3(rc.rect), rc.contour, cv.Scalar.Yellow)
-                    dst3.Line(ptLeft, ptRight, white, taskA.lineWidth, taskA.lineWidth)
-                    dst3.Line(ptTop, ptBot, white, taskA.lineWidth, taskA.lineWidth)
+                    dst3.Line(ptLeft, ptRight, white, tsk.lineWidth, tsk.lineWidth)
+                    dst3.Line(ptTop, ptBot, white, tsk.lineWidth, tsk.lineWidth)
                 End If
-                If taskA.heartBeat Then
+                If tsk.heartBeat Then
                     strOut = "X     " + vbTab + "Y     " + vbTab + "Z " + vbTab + " 3D location (units=meters)" + vbCrLf
                     strOut += vec3fToString(vecLeft) + vbTab + " Left side average (blue)" + vbCrLf
                     strOut += vec3fToString(vecRight) + vbTab + " Right side average (red)" + vbCrLf
@@ -402,7 +402,7 @@ Namespace VBClasses
             desc = "Build a contour for the foreground"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            km.Run(taskA.pcSplit(2))
+            km.Run(tsk.pcSplit(2))
             dst2 = km.dst2
 
             contour.Run(dst2)
@@ -430,7 +430,7 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
             If standaloneTest() Then
-                If taskA.heartBeat Then
+                If tsk.heartBeat Then
                     rotatedRect.Run(src)
                     dst2 = rotatedRect.dst2
                 End If
@@ -482,14 +482,14 @@ Namespace VBClasses
 
             dst2 = runRedList(src, labels(2))
 
-            Dim tmp = taskA.oldrcD.mask.Clone
+            Dim tmp = tsk.oldrcD.mask.Clone
 
             Dim allContours As cv.Point()() = Nothing
             If options.retrievalMode = cv.RetrievalModes.FloodFill Then tmp.ConvertTo(tmp, cv.MatType.CV_32SC1)
             cv.Cv2.FindContours(tmp, allContours, Nothing, options.retrievalMode, options.ApproximationMode)
 
             dst3.SetTo(0)
-            cv.Cv2.DrawContours(dst3(taskA.oldrcD.rect), allContours, -1, cv.Scalar.Yellow)
+            cv.Cv2.DrawContours(dst3(tsk.oldrcD.rect), allContours, -1, cv.Scalar.Yellow)
         End Sub
     End Class
 
@@ -508,18 +508,18 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             dst2 = runRedList(src, labels(2))
 
-            Dim rc = taskA.oldrcD
+            Dim rc = tsk.oldrcD
 
             dst1.SetTo(0)
             dst3.SetTo(0)
 
             Dim bestContour = ContourBuild(rc.mask)
-            DrawTour(dst3(rc.rect), bestContour, white, taskA.lineWidth + 3)
+            DrawTour(dst3(rc.rect), bestContour, white, tsk.lineWidth + 3)
 
             Dim approxContour = ContourBuild(rc.mask, options.ApproximationMode)
             DrawTour(dst3(rc.rect), approxContour, cv.Scalar.Red)
 
-            If taskA.heartBeat Then labels(2) = "Contour points count reduced from " + CStr(bestContour.Count) +
+            If tsk.heartBeat Then labels(2) = "Contour points count reduced from " + CStr(bestContour.Count) +
                                            " to " + CStr(approxContour.Count)
         End Sub
     End Class
@@ -537,12 +537,12 @@ Namespace VBClasses
             desc = "Create a contour from some random points"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If taskA.heartBeat Then
+            If tsk.heartBeat Then
                 random.Run(src)
                 dst2.SetTo(0)
                 For Each p1 In random.PointList
                     For Each p2 In random.PointList
-                        dst2.Line(p1, p2, white, taskA.lineWidth, taskA.lineWidth)
+                        dst2.Line(p1, p2, white, tsk.lineWidth, tsk.lineWidth)
                     Next
                 Next
             End If
@@ -576,7 +576,7 @@ Namespace VBClasses
             options.Run()
 
             If standaloneTest() Then
-                If Not taskA.heartBeat Then Exit Sub
+                If Not tsk.heartBeat Then Exit Sub
                 rotatedRect.Run(src)
                 dst2 = rotatedRect.dst2
                 If dst2.Channels() = 3 Then
@@ -585,7 +585,7 @@ Namespace VBClasses
                     dst2 = dst2.ConvertScaleAbs(255)
                 End If
             Else
-                dst2 = taskA.gray
+                dst2 = tsk.gray
             End If
 
             If options.retrievalMode = cv.RetrievalModes.FloodFill Then dst2.ConvertTo(dst2, cv.MatType.CV_32SC1)
@@ -619,12 +619,12 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             If standalone Then
-                If Not taskA.heartBeat Then Exit Sub
+                If Not tsk.heartBeat Then Exit Sub
                 rotatedRect.Run(src)
                 dst2 = rotatedRect.dst2
                 dst2 = dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
             Else
-                If src.Type = cv.MatType.CV_8U Then dst2 = src Else dst2 = taskA.grayStable
+                If src.Type = cv.MatType.CV_8U Then dst2 = src Else dst2 = tsk.grayStable
             End If
 
             If dst2.Type = cv.MatType.CV_8U Then
@@ -667,17 +667,17 @@ Namespace VBClasses
                 labels(2) = contours.labels(2)
             End If
 
-            taskA.contourD = contours.selectContour()
+            tsk.contourD = contours.selectContour()
 
             strOut = vbCrLf + vbCrLf
-            Dim index = contours.contourList.IndexOf(taskA.contourD)
+            Dim index = contours.contourList.IndexOf(tsk.contourD)
             strOut += "Index = " + CStr(index) + vbCrLf
-            strOut += "Depth = " + Format(taskA.contourD.depth, fmt1) + vbCrLf
-            strOut += "Range (m) = " + Format(taskA.contourD.mm.range, fmt1) + vbCrLf
-            strOut += "Number of pixels in the mask: " + CStr(taskA.contourD.pixels) + vbCrLf
+            strOut += "Depth = " + Format(tsk.contourD.depth, fmt1) + vbCrLf
+            strOut += "Range (m) = " + Format(tsk.contourD.mm.range, fmt1) + vbCrLf
+            strOut += "Number of pixels in the mask: " + CStr(tsk.contourD.pixels) + vbCrLf
 
-            DrawRect(dst2, taskA.contourD.rect)
-            DrawCircle(dst2, taskA.contourD.maxDist)
+            DrawRect(dst2, tsk.contourD.rect)
+            DrawCircle(dst2, tsk.contourD.maxDist)
 
             SetTrueText(strOut, 3)
         End Sub
@@ -702,10 +702,10 @@ Namespace VBClasses
             labels(3) = hulls.labels(3)
 
             dst2 = src
-            For Each lp In taskA.lines.lpList
-                dst2.Line(lp.p1, lp.p2, taskA.highlight, taskA.lineWidth, taskA.lineWidth)
+            For Each lp In tsk.lines.lpList
+                dst2.Line(lp.p1, lp.p2, tsk.highlight, tsk.lineWidth, tsk.lineWidth)
             Next
-            labels(2) = taskA.lines.labels(2)
+            labels(2) = tsk.lines.labels(2)
         End Sub
     End Class
 
@@ -724,10 +724,10 @@ Namespace VBClasses
             dst2 = contours.dst2
             labels(2) = contours.labels(2)
 
-            taskA.contourD = contours.selectContour()
+            tsk.contourD = contours.selectContour()
 
             dst1.SetTo(0)
-            Dim indexD = contours.contourList.IndexOf(taskA.contourD)
+            Dim indexD = contours.contourList.IndexOf(tsk.contourD)
             For Each contour In contours.contourList
                 Dim index = contours.contourList.IndexOf(contour)
                 If index = indexD Then Continue For
@@ -757,11 +757,11 @@ Namespace VBClasses
             desc = "Add hulls and improved contours using ConvexityDefects to each contour cell"
         End Sub
         Public Function getSelectedHull() As contourData
-            Dim id = contourMap.Get(Of Integer)(taskA.ClickPoint.Y, taskA.ClickPoint.X)
-            For Each taskA.contourD In contours.contourList
-                If id = taskA.contourD.ID Then Exit For
+            Dim id = contourMap.Get(Of Integer)(tsk.ClickPoint.Y, tsk.ClickPoint.X)
+            For Each tsk.contourD In contours.contourList
+                If id = tsk.contourD.ID Then Exit For
             Next
-            Return taskA.contourD
+            Return tsk.contourD
         End Function
         Public Overrides Sub RunAlg(src As cv.Mat)
             contours.Run(src)
@@ -778,7 +778,7 @@ Namespace VBClasses
             Next
 
             dst3 = PaletteFull(contourMap)
-            If taskA.heartBeat Then labels(3) = CStr(contourList.Count) + " hulls"
+            If tsk.heartBeat Then labels(3) = CStr(contourList.Count) + " hulls"
         End Sub
     End Class
 
@@ -794,7 +794,7 @@ Namespace VBClasses
             plot.useFixedRange = True
             plot.max = rangeVal
             plot.min = -rangeVal
-            taskA.gOptions.DebugSlider.Value = 50
+            tsk.gOptions.DebugSlider.Value = 50
             dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_32F, 0)
             desc = "Find the edge points for each contour rect"
         End Sub
@@ -804,21 +804,21 @@ Namespace VBClasses
             If pt.Y = 0 Then pt.Y += offset
             If pt.X = 0 Then pt.X += offset
             If pt.Y = 0 Then pt.Y += offset
-            If pt.X = taskA.workRes.Width - 1 Then pt.X -= offset
-            If pt.Y = taskA.workRes.Height - 1 Then pt.Y -= offset
-            If pt.X = taskA.workRes.Width - 1 Then pt.X -= offset
-            If pt.Y = taskA.workRes.Height - 1 Then pt.Y -= offset
+            If pt.X = tsk.workRes.Width - 1 Then pt.X -= offset
+            If pt.Y = tsk.workRes.Height - 1 Then pt.Y -= offset
+            If pt.X = tsk.workRes.Width - 1 Then pt.X -= offset
+            If pt.Y = tsk.workRes.Height - 1 Then pt.Y -= offset
             Return pt
         End Function
         Public Overrides Sub RunAlg(src As cv.Mat)
             contours.Run(src)
             dst0 = dst1.Clone
-            dst2 = taskA.lines.dst3
-            labels(2) = taskA.lines.labels(2)
+            dst2 = tsk.lines.dst3
+            labels(2) = tsk.lines.labels(2)
 
             Dim ptList As New List(Of cv.Point)
             dst1.SetTo(0)
-            Dim maxLines = 3 ' taskA.gOptions.DebugSlider.Value * 2
+            Dim maxLines = 3 ' tsk.gOptions.DebugSlider.Value * 2
             For Each contour In contours.contourList
                 Dim index = contours.contourList.IndexOf(contour)
                 If index < 3 Then Continue For
@@ -891,7 +891,7 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
 
-            edges.Run(taskA.grayStable)
+            edges.Run(tsk.grayStable)
 
             Dim contours = cv.Cv2.FindContoursAsArray(edges.dst2, cv.RetrievalModes.Tree, cv.ContourApproximationModes.ApproxSimple)
             Dim sortedTours As New SortedList(Of Integer, Tuple(Of cv.RotatedRect, Integer))(New compareAllowIdenticalInteger)
@@ -911,8 +911,8 @@ Namespace VBClasses
             For i = 0 To sortedTours.Values.Count - 1
                 Dim tuple = sortedTours.Values(i)
                 Rectangle_Basics.DrawRotatedRect(tuple.Item1, dst2, 255)
-                DrawTour(dst2, contours(tuple.Item2).ToList, 0, taskA.lineWidth, cv.LineTypes.Link4)
-                DrawTour(dst1, contours(tuple.Item2).ToList, (i Mod 254) + 1, taskA.lineWidth, cv.LineTypes.Link4)
+                DrawTour(dst2, contours(tuple.Item2).ToList, 0, tsk.lineWidth, cv.LineTypes.Link4)
+                DrawTour(dst1, contours(tuple.Item2).ToList, (i Mod 254) + 1, tsk.lineWidth, cv.LineTypes.Link4)
             Next
 
             dst3 = PaletteBlackZero(dst1)
@@ -928,13 +928,13 @@ Namespace VBClasses
     Public Class NR_Contour_Info : Inherits TaskParent
         Dim contours As New Contour_Basics
         Public Sub New()
-            If standalone Then taskA.gOptions.displayDst0.Checked = True
+            If standalone Then tsk.gOptions.displayDst0.Checked = True
             desc = "Provide details about the selected contour's contourList entry."
         End Sub
         Public Shared Function contourDesc(contourMap As cv.Mat, contourList As List(Of contourData)) As String
             Dim tour As New contourData
-            Static pt = taskA.ClickPoint
-            If taskA.mouseClickFlag Then pt = taskA.ClickPoint
+            Static pt = tsk.ClickPoint
+            If tsk.mouseClickFlag Then pt = tsk.ClickPoint
             Dim id = contourMap.Get(Of Integer)(pt.Y, pt.X)
             Dim idFound As Boolean
             For Each tour In contourList
@@ -944,7 +944,7 @@ Namespace VBClasses
                 End If
             Next
             If idFound = False Then tour = contourList(0)
-            taskA.color(tour.rect).SetTo(cv.Scalar.White, tour.mask)
+            tsk.color(tour.rect).SetTo(cv.Scalar.White, tour.mask)
 
             Dim cDesc As String = ""
             cDesc += "ID = " + CStr(tour.ID) + " (grid index of maxDist)" + vbCrLf
@@ -964,9 +964,9 @@ Namespace VBClasses
             If contours.contourList.Count = 0 Then Exit Sub
             strOut = contourDesc(contours.contourMap, contours.contourList)
             dst0 = src
-            dst0(taskA.contourD.rect).SetTo(white, taskA.contourD.mask)
+            dst0(tsk.contourD.rect).SetTo(white, tsk.contourD.mask)
 
-            dst2.Rectangle(taskA.contourD.rect, taskA.highlight, taskA.lineWidth)
+            dst2.Rectangle(tsk.contourD.rect, tsk.highlight, tsk.lineWidth)
 
             SetTrueText(strOut, 3)
         End Sub
@@ -983,7 +983,7 @@ Namespace VBClasses
     Public Class Contour_Sort : Inherits TaskParent
         Public allContours As cv.Point()()
         Public contourList As New List(Of contourData)
-        Public contourMap As New cv.Mat(taskA.workRes, cv.MatType.CV_32S, 0)
+        Public contourMap As New cv.Mat(tsk.workRes, cv.MatType.CV_32S, 0)
         Public Sub New()
             dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
             desc = "Sort the contours by size and prepare the contour map"
@@ -1005,13 +1005,13 @@ Namespace VBClasses
             End If
 
             Dim sortedList As New SortedList(Of Integer, contourData)(New compareAllowIdenticalIntegerInverted)
-            Dim tourMat As New cv.Mat(taskA.workRes, cv.MatType.CV_8U, 0)
+            Dim tourMat As New cv.Mat(tsk.workRes, cv.MatType.CV_8U, 0)
             For Each ptArray In allContours
                 Dim tour = New contourData
                 tour.pixels = cv.Cv2.ContourArea(ptArray)
                 If tour.pixels < 5 Then Continue For
                 tour.points = New List(Of cv.Point)(ptArray)
-                If tour.pixels > taskA.color.Total * 3 / 4 Then Continue For ' toss this contour - it covers everything...
+                If tour.pixels > tsk.color.Total * 3 / 4 Then Continue For ' toss this contour - it covers everything...
 
                 tour.rect = tour.buildRect(ptArray)
                 If tour.rect.Width = 0 Or tour.rect.Height = 0 Then Continue For
@@ -1020,10 +1020,10 @@ Namespace VBClasses
                 Dim listOfPoints = New List(Of List(Of cv.Point))({ptArray.ToList})
                 cv.Cv2.DrawContours(tourMat, listOfPoints, 0, New cv.Scalar(sortedList.Count), -1, cv.LineTypes.Link8)
                 tour.mask = tourMat(tour.rect).Threshold(0, 255, cv.ThresholdTypes.Binary)
-                tour.depth = taskA.pcSplit(2)(tour.rect).Mean(taskA.depthMask(tour.rect))(0)
-                tour.mm = GetMinMax(taskA.pcSplit(2)(tour.rect), tour.mask)
+                tour.depth = tsk.pcSplit(2)(tour.rect).Mean(tsk.depthMask(tour.rect))(0)
+                tour.mm = GetMinMax(tsk.pcSplit(2)(tour.rect), tour.mask)
                 tour.maxDist = GetMaxDistContour(tour)
-                tour.ID = taskA.gridMap.Get(Of Integer)(tour.maxDist.Y, tour.maxDist.X)
+                tour.ID = tsk.gridMap.Get(Of Integer)(tour.maxDist.Y, tour.maxDist.X)
                 If tour.ID = 0 Then tour.ID = 1 ' stay away from zero...
                 tour.age = 1
                 sortedList.Add(tour.pixels, tour)
@@ -1062,7 +1062,7 @@ Namespace VBClasses
                 If standaloneTest() Then SetTrueText(strOut, 3)
             End If
 
-            If taskA.heartBeat Then
+            If tsk.heartBeat Then
                 labels(2) = "Matched " + CStr(matched) + "/" + CStr(contourList.Count) + " contours to the previous generation"
             End If
         End Sub
@@ -1076,7 +1076,7 @@ Namespace VBClasses
     Public Class Contour_SortNew : Inherits TaskParent
         Public allContours As cv.Point()()
         Public rcList As New List(Of contourData)
-        Public rcMap As New cv.Mat(taskA.workRes, cv.MatType.CV_32S, 0)
+        Public rcMap As New cv.Mat(tsk.workRes, cv.MatType.CV_32S, 0)
         Dim edgeline As New EdgeLine_Basics
         Public Sub New()
             dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
@@ -1092,19 +1092,19 @@ Namespace VBClasses
             Return mm.maxLoc
         End Function
         Public Overrides Sub RunAlg(src As cv.Mat)
-            edgeline.Run(taskA.grayStable)
+            edgeline.Run(tsk.grayStable)
             If standalone Then
                 allContours = Contour_Basics.buildContours(edgeline.dst2)
             End If
 
             Dim sortedList As New SortedList(Of Integer, contourData)(New compareAllowIdenticalIntegerInverted)
-            Dim tourMat As New cv.Mat(taskA.workRes, cv.MatType.CV_8U, 0)
+            Dim tourMat As New cv.Mat(tsk.workRes, cv.MatType.CV_8U, 0)
             For Each ptArray In allContours
                 Dim tour = New contourData
                 tour.pixels = cv.Cv2.ContourArea(ptArray)
                 If tour.pixels < 5 Then Continue For
                 tour.points = New List(Of cv.Point)(ptArray)
-                If tour.pixels > taskA.color.Total * 3 / 4 Then Continue For ' toss this contour - it covers everything...
+                If tour.pixels > tsk.color.Total * 3 / 4 Then Continue For ' toss this contour - it covers everything...
 
                 tour.rect = tour.buildRect(ptArray)
                 If tour.rect.Width = 0 Or tour.rect.Height = 0 Then Continue For
@@ -1113,10 +1113,10 @@ Namespace VBClasses
                 Dim listOfPoints = New List(Of List(Of cv.Point))({ptArray.ToList})
                 cv.Cv2.DrawContours(tourMat, listOfPoints, 0, New cv.Scalar(sortedList.Count), -1, cv.LineTypes.Link8)
                 tour.mask = tourMat(tour.rect).Threshold(0, 255, cv.ThresholdTypes.Binary)
-                tour.depth = taskA.pcSplit(2)(tour.rect).Mean(taskA.depthMask(tour.rect))(0)
-                tour.mm = GetMinMax(taskA.pcSplit(2)(tour.rect), tour.mask)
+                tour.depth = tsk.pcSplit(2)(tour.rect).Mean(tsk.depthMask(tour.rect))(0)
+                tour.mm = GetMinMax(tsk.pcSplit(2)(tour.rect), tour.mask)
                 tour.maxDist = GetMaxDistContour(tour)
-                tour.ID = taskA.gridMap.Get(Of Integer)(tour.maxDist.Y, tour.maxDist.X)
+                tour.ID = tsk.gridMap.Get(Of Integer)(tour.maxDist.Y, tour.maxDist.X)
                 If tour.ID = 0 Then tour.ID = 1 ' stay away from zero...
                 tour.age = 1
                 sortedList.Add(tour.pixels, tour)
@@ -1155,7 +1155,7 @@ Namespace VBClasses
                 If standaloneTest() Then SetTrueText(strOut, 3)
             End If
 
-            If taskA.heartBeat Then
+            If tsk.heartBeat Then
                 labels(2) = "Matched " + CStr(matched) + "/" + CStr(rcList.Count) + " contours to the previous generation"
             End If
         End Sub
@@ -1173,13 +1173,13 @@ Namespace VBClasses
         Dim edgeline As New EdgeLine_Basics
         Public Sub New()
             labels(3) = "Details for the selected contour."
-            taskA.featureOptions.Color8USource.SelectedItem = "EdgeLine_Basics"
+            tsk.featureOptions.Color8USource.SelectedItem = "EdgeLine_Basics"
             desc = "List retrieval mode contour finder"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
 
-            If src.Channels <> 1 Then edgeline.Run(taskA.grayStable) Else edgeline.Run(src)
+            If src.Channels <> 1 Then edgeline.Run(tsk.grayStable) Else edgeline.Run(src)
             dst3 = edgeline.dst2
 
             sortContours.allContours = Contour_Basics.buildContours(dst3)
@@ -1200,7 +1200,7 @@ Namespace VBClasses
         Implements IDisposable
         Public classCount As Integer
         Public contourList As New List(Of contourData)
-        Public contourMap As New cv.Mat(taskA.workRes, cv.MatType.CV_32F, 0)
+        Public contourMap As New cv.Mat(tsk.workRes, cv.MatType.CV_32F, 0)
         Dim color8u As New Color8U_Basics
         Public Sub New()
             labels(3) = "Input to OpenCV's FindContours"
@@ -1208,22 +1208,22 @@ Namespace VBClasses
         End Sub
         Public Function selectContour() As contourData
             Dim tour As New contourData
-            Dim id = contourMap.Get(Of Integer)(taskA.clickPoint.Y, taskA.clickPoint.X)
-            For Each taskA.contourD In contourList
-                If id = taskA.contourD.ID Then Exit For
+            Dim id = contourMap.Get(Of Integer)(tsk.clickPoint.Y, tsk.clickPoint.X)
+            For Each tsk.contourD In contourList
+                If id = tsk.contourD.ID Then Exit For
             Next
 
             For Each tour In contourList
                 If tour.ID = id Then Exit For
             Next
-            taskA.color(tour.rect).SetTo(cv.Scalar.White, tour.mask)
-            Return taskA.contourD
+            tsk.color(tour.rect).SetTo(cv.Scalar.White, tour.mask)
+            Return tsk.contourD
         End Function
         Public Overrides Sub RunAlg(src As cv.Mat)
             If src.Type = cv.MatType.CV_8U Then
                 dst3 = src
             Else
-                color8u.Run(taskA.grayStable)
+                color8u.Run(tsk.grayStable)
                 dst3 = color8u.dst2
             End If
 

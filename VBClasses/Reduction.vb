@@ -72,12 +72,12 @@ Namespace VBClasses
             reduction.Run(src)
             heat.Run(src)
 
-            Dim vecArray = taskA.lines.getRawVecs(heat.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
+            Dim vecArray = tsk.lines.getRawVecs(heat.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
             Dim lplist = Line_Basics.getRawLines(vecArray)
             setupTop.Run(heat.dst2)
             dst2 = setupTop.dst2
 
-            vecArray = taskA.lines.getRawVecs(heat.dst3.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
+            vecArray = tsk.lines.getRawVecs(heat.dst3.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
             lplist = Line_Basics.getRawLines(vecArray)
             setupSide.Run(heat.dst3)
             dst3 = setupSide.dst2
@@ -130,7 +130,7 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
 
-            If src.Type <> cv.MatType.CV_32FC3 Then src = taskA.pointCloud
+            If src.Type <> cv.MatType.CV_32FC3 Then src = tsk.pointCloud
             Dim split = src.Split()
             For i = 0 To split.Length - 1
                 If options.reduceXYZ(i) Then
@@ -143,8 +143,8 @@ Namespace VBClasses
             Next
 
             cv.Cv2.Merge(split, dst3)
-            dst3.SetTo(0, taskA.noDepthMask)
-            SetTrueText("taskA.PointCloud (or 32fc3 input) has been reduced and is in dst3")
+            dst3.SetTo(0, tsk.noDepthMask)
+            SetTrueText("tsk.PointCloud (or 32fc3 input) has been reduced and is in dst3")
         End Sub
     End Class
 
@@ -212,17 +212,17 @@ Namespace VBClasses
         Dim diff As New Diff_Basics
         Public Sub New()
             reduction.alwaysDisplay = True
-            If standalone Then taskA.gOptions.displayDst1.Checked = True
+            If standalone Then tsk.gOptions.displayDst1.Checked = True
             desc = "Compare reduction with and without motion."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
 
             reduction.Run(src)
             dst2 = reduction.dst3
-            If taskA.optionsChanged Then
+            If tsk.optionsChanged Then
                 dst3 = dst2
             Else
-                dst2.CopyTo(dst3, taskA.motionRGB.motionMask)
+                dst2.CopyTo(dst3, tsk.motionRGB.motionMask)
 
                 diff.lastFrame = dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
                 diff.Run(dst3)
@@ -244,9 +244,9 @@ Namespace VBClasses
             desc = "Use reduction to smooth depth data"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If src.Type <> cv.MatType.CV_32FC3 Then src = taskA.pcSplit(2)
+            If src.Type <> cv.MatType.CV_32FC3 Then src = tsk.pcSplit(2)
 
-            src *= 255 / taskA.MaxZmeters
+            src *= 255 / tsk.MaxZmeters
             src.ConvertTo(dst0, cv.MatType.CV_32S)
             reduction.Run(dst0)
             reduction.dst2.ConvertTo(dst2, cv.MatType.CV_32F)
@@ -287,8 +287,8 @@ Namespace VBClasses
             desc = "Reduce the grayscale image where there is no depth."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            dst3 = taskA.grayStable
-            dst3.SetTo(0, taskA.depthMask)
+            dst3 = tsk.grayStable
+            dst3.SetTo(0, tsk.depthMask)
             reduction.Run(dst3)
             dst2 = reduction.dst3
         End Sub

@@ -53,7 +53,7 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             If src.Channels() = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2Gray)
-            medianVal = computeMedian(src, New cv.Mat, src.Total, taskA.histogramBins, rangeMin, rangeMax)
+            medianVal = computeMedian(src, New cv.Mat, src.Total, tsk.histogramBins, rangeMin, rangeMax)
 
             If standaloneTest() Then
                 Dim mask = New cv.Mat
@@ -84,13 +84,13 @@ Namespace VBClasses
             Dim mean As Single, stdev As Single
             Dim mask = minMax.dst3 ' the mask for stable depth.
             dst3.SetTo(0)
-            taskA.depthRGB.CopyTo(dst3, mask)
+            tsk.depthRGB.CopyTo(dst3, mask)
             If mask.Type <> cv.MatType.CV_8U Then mask = mask.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-            cv.Cv2.MeanStdDev(taskA.pcSplit(2), mean, stdev, mask)
+            cv.Cv2.MeanStdDev(tsk.pcSplit(2), mean, stdev, mask)
             labels(3) = "stablized depth mean=" + Format(mean, fmt1) + " stdev=" + Format(stdev, fmt1)
 
-            dst2 = taskA.depthRGB
-            cv.Cv2.MeanStdDev(taskA.pcSplit(2), mean, stdev)
+            dst2 = tsk.depthRGB
+            cv.Cv2.MeanStdDev(tsk.pcSplit(2), mean, stdev)
             labels(2) = "raw depth mean=" + Format(mean, fmt1) + " stdev=" + Format(stdev, fmt1)
         End Sub
     End Class
@@ -155,7 +155,7 @@ Namespace VBClasses
             Static stdevSlider = OptionParent.FindSlider("Stdev Threshold")
             Dim stdevThreshold = CSng(stdevSlider.Value)
 
-            For Each roi In taskA.gridRects
+            For Each roi In tsk.gridRects
                 If roi.X + roi.Width < dst3.Width Then
                     Dim m1 = dst2.Get(Of Byte)(roi.Y, roi.X)
                     Dim m2 = dst2.Get(Of Byte)(roi.Y, roi.X + roi.Width)
@@ -214,8 +214,8 @@ Namespace VBClasses
                 dst3.Col(0).CopyTo(dst3.Col(i)) ' duplicate above col
             Next
 
-            dst2 = dst2.Subtract(cv.Scalar.All(taskA.calibData.leftIntrinsics.ppx))
-            dst3 = dst3.Subtract(cv.Scalar.All(taskA.calibData.leftIntrinsics.ppx))
+            dst2 = dst2.Subtract(cv.Scalar.All(tsk.calibData.leftIntrinsics.ppx))
+            dst3 = dst3.Subtract(cv.Scalar.All(tsk.calibData.leftIntrinsics.ppx))
 
             labels = {"", "", "Input Template showing columns", "Input Template showing rows"}
             desc = "Build a template for use with computing the point cloud"
@@ -237,14 +237,14 @@ Namespace VBClasses
             desc = "Create an image that is the mean of x number of previous images."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If taskA.optionsChanged Then images.Clear()
+            If tsk.optionsChanged Then images.Clear()
             dst3 = src.Clone
             If dst3.Type <> cv.MatType.CV_32F Then
                 If dst3.Channels() <> 1 Then dst3.ConvertTo(dst3, cv.MatType.CV_32FC3) Else dst3.ConvertTo(dst3, cv.MatType.CV_32F)
             End If
             cv.Cv2.Multiply(dst3, cv.Scalar.All(1 / (images.Count + 1)), dst3)
             images.Add(dst3.Clone)
-            If images.Count > taskA.frameHistoryCount Then images.RemoveAt(0)
+            If images.Count > tsk.frameHistoryCount Then images.RemoveAt(0)
 
             dst3.SetTo(0)
             For Each img In images
@@ -252,7 +252,7 @@ Namespace VBClasses
             Next
             If dst3.Type <> src.Type Then dst3.ConvertTo(dst2, src.Type) Else dst2 = dst3.Clone
             dst3 = Mat_Convert.Mat_32f_To_8UC3(dst3)
-            labels(2) = "Average image over previous " + CStr(taskA.frameHistoryCount) + " images"
+            labels(2) = "Average image over previous " + CStr(tsk.frameHistoryCount) + " images"
         End Sub
     End Class
 
@@ -268,19 +268,19 @@ Namespace VBClasses
             desc = "Mask off pixels where the difference is great and create an image that is the mean of x number of previous images."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If taskA.optionsChanged Then images.Clear()
+            If tsk.optionsChanged Then images.Clear()
             Dim nextImage As New cv.Mat
             If src.Type <> cv.MatType.CV_32F Then src.ConvertTo(nextImage, cv.MatType.CV_32F) Else nextImage = src
-            cv.Cv2.Multiply(nextImage, cv.Scalar.All(1 / taskA.frameHistoryCount), nextImage)
+            cv.Cv2.Multiply(nextImage, cv.Scalar.All(1 / tsk.frameHistoryCount), nextImage)
             images.Add(nextImage.Clone())
-            If images.Count > taskA.frameHistoryCount Then images.RemoveAt(0)
+            If images.Count > tsk.frameHistoryCount Then images.RemoveAt(0)
 
             nextImage.SetTo(0)
             For Each img In images
                 nextImage += img
             Next
             If nextImage.Type <> src.Type Then nextImage.ConvertTo(dst2, src.Type) Else dst2 = nextImage
-            labels(2) = "Average image over previous " + CStr(taskA.frameHistoryCount) + " images"
+            labels(2) = "Average image over previous " + CStr(tsk.frameHistoryCount) + " images"
         End Sub
     End Class
 
@@ -335,7 +335,7 @@ Namespace VBClasses
         Dim stdevSlider As New System.Windows.Forms.TrackBar
         Public Sub New()
             stdevSlider = OptionParent.FindSlider("Stdev Threshold")
-            taskA.gOptions.GridSlider.Value = 16
+            tsk.gOptions.GridSlider.Value = 16
 
             highStdevMask = New cv.Mat(dst2.Size(), cv.MatType.CV_8U)
             lowStdevMask = New cv.Mat(dst2.Size(), cv.MatType.CV_8U)
@@ -353,7 +353,7 @@ Namespace VBClasses
 
             Static lastFrame As cv.Mat = dst2.Clone()
             saveFrame = dst2.Clone
-            Parallel.ForEach(taskA.gridRects,
+            Parallel.ForEach(tsk.gridRects,
         Sub(roi)
             Dim mean As Single, stdev As Single
             cv.Cv2.MeanStdDev(dst2(roi), mean, stdev)
@@ -368,13 +368,13 @@ Namespace VBClasses
                 dst2(roi).SetTo(0)
             End If
         End Sub)
-            If taskA.gOptions.getShowGrid() Then dst2.SetTo(255, taskA.gridMask)
+            If tsk.gOptions.getShowGrid() Then dst2.SetTo(255, tsk.gridMask)
             dst3.SetTo(0)
             saveFrame.CopyTo(dst3, highStdevMask)
             lastFrame = saveFrame
             Dim stdevPercent = " stdev " + Format(stdevSlider.Value, "0.0")
-            labels(2) = CStr(updateCount) + " of " + CStr(taskA.gridRects.Count) + " segments with < " + stdevPercent
-            labels(3) = CStr(taskA.gridRects.Count - updateCount) + " out of " + CStr(taskA.gridRects.Count) + " had stdev > " + Format(stdevSlider.Value, "0.0")
+            labels(2) = CStr(updateCount) + " of " + CStr(tsk.gridRects.Count) + " segments with < " + stdevPercent
+            labels(3) = CStr(tsk.gridRects.Count - updateCount) + " out of " + CStr(tsk.gridRects.Count) + " had stdev > " + Format(stdevSlider.Value, "0.0")
         End Sub
     End Class
 End Namespace

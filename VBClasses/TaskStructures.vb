@@ -146,7 +146,7 @@ Namespace VBClasses
                 Dim polymp = currmp()
                 Dim d = polymp.p1.DistanceTo(polymp.p2)
                 For i = 0 To currPoly.Count - 1
-                    d = currPoly(i).DistanceTo(currPoly((i + 1) Mod taskA.polyCount))
+                    d = currPoly(i).DistanceTo(currPoly((i + 1) Mod tsk.polyCount))
                     currLength.Add(d)
                 Next
                 If lengthPrevious Is Nothing Then lengthPrevious = New List(Of Single)(currLength)
@@ -162,16 +162,16 @@ Namespace VBClasses
                 jitterCheck.SetTo(0)
             End Sub
             Public Function prevmp() As lpData
-                Return New lpData(prevPoly(polyPrevSideIndex), prevPoly((polyPrevSideIndex + 1) Mod taskA.polyCount))
+                Return New lpData(prevPoly(polyPrevSideIndex), prevPoly((polyPrevSideIndex + 1) Mod tsk.polyCount))
             End Function
             Public Function currmp() As lpData
                 If polyPrevSideIndex >= currPoly.Count - 1 Then polyPrevSideIndex = 0
-                Return New lpData(currPoly(polyPrevSideIndex), currPoly((polyPrevSideIndex + 1) Mod taskA.polyCount))
+                Return New lpData(currPoly(polyPrevSideIndex), currPoly((polyPrevSideIndex + 1) Mod tsk.polyCount))
             End Function
             Public Sub jitterTest(dst As cv.Mat, parent As Object) ' return true if there is nothing to change
                 If jitterCheck Is Nothing Then jitterCheck = New cv.Mat(dst.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
                 Dim polymp = currmp()
-                parent.DrawLine(jitterCheck, polymp.p1, polymp.p2, 255, taskA.lineWidth)
+                parent.DrawLine(jitterCheck, polymp.p1, polymp.p2, 255, tsk.lineWidth)
                 Dim jitterPixels = jitterCheck.CountNonZero
                 If jitterPixels = lastJitterPixels Then featureLineChanged = True Else featureLineChanged = False
                 lastJitterPixels = jitterPixels
@@ -366,18 +366,18 @@ Namespace VBClasses
             Public Function perpendicularPoints(pt As cv.Point2f) As lpData
                 Dim perpSlope = -1 / slope
                 Dim angleRadians As Double = Math.Atan(perpSlope)
-                Dim xShift = taskA.brickSize * Math.Cos(angleRadians)
-                Dim yShift = taskA.brickSize * Math.Sin(angleRadians)
+                Dim xShift = tsk.brickSize * Math.Cos(angleRadians)
+                Dim yShift = tsk.brickSize * Math.Sin(angleRadians)
                 Dim p1 = New cv.Point(pt.X + xShift, pt.Y + yShift)
                 Dim p2 = New cv.Point(pt.X - xShift, pt.Y - yShift)
                 If p1.X < 0 Then p1.X = 0
-                If p1.X >= taskA.color.Width Then p1.X = taskA.color.Width - 1
+                If p1.X >= tsk.color.Width Then p1.X = tsk.color.Width - 1
                 If p1.Y < 0 Then p1.Y = 0
-                If p1.Y >= taskA.color.Height Then p1.Y = taskA.color.Height - 1
+                If p1.Y >= tsk.color.Height Then p1.Y = tsk.color.Height - 1
                 If p2.X < 0 Then p2.X = 0
-                If p2.X >= taskA.color.Width Then p2.X = taskA.color.Width - 1
+                If p2.X >= tsk.color.Width Then p2.X = tsk.color.Width - 1
                 If p2.Y < 0 Then p2.Y = 0
-                If p2.Y >= taskA.color.Height Then p2.Y = taskA.color.Height - 1
+                If p2.Y >= tsk.color.Height Then p2.Y = tsk.color.Height - 1
                 Return New lpData(p1, p2)
             End Function
             Public Sub computeAngleDegrees()
@@ -393,9 +393,9 @@ Namespace VBClasses
             End Sub
             Public Shared Function validatePoint(pt As cv.Point2f) As cv.Point2f
                 If pt.X < 0 Then pt.X = 0
-                If pt.X > taskA.color.Width - 1 Then pt.X = taskA.color.Width - 1
+                If pt.X > tsk.color.Width - 1 Then pt.X = tsk.color.Width - 1
                 If pt.Y < 0 Then pt.Y = 0
-                If pt.Y > taskA.color.Height - 1 Then pt.Y = taskA.color.Height - 1
+                If pt.Y > tsk.color.Height - 1 Then pt.Y = tsk.color.Height - 1
                 Return pt
             End Function
             Sub New(_p1 As cv.Point2f, _p2 As cv.Point2f)
@@ -417,64 +417,64 @@ Namespace VBClasses
 
                 length = p1.DistanceTo(p2)
 
-                p1GridIndex = taskA.gridMap.Get(Of Integer)(p1.Y, p1.X)
-                p2GridIndex = taskA.gridMap.Get(Of Integer)(p2.Y, p2.X)
-                color = taskA.scalarColors(p1GridIndex Mod 255)
+                p1GridIndex = tsk.gridMap.Get(Of Integer)(p1.Y, p1.X)
+                p2GridIndex = tsk.gridMap.Get(Of Integer)(p2.Y, p2.X)
+                color = tsk.scalarColors(p1GridIndex Mod 255)
 
-                pVec1 = taskA.pointCloud.Get(Of cv.Vec3f)(p1.Y, p1.X)
+                pVec1 = tsk.pointCloud.Get(Of cv.Vec3f)(p1.Y, p1.X)
                 If Single.IsNaN(pVec1(0)) Or pVec1(2) = 0 Then
-                    Dim r = taskA.gridRects(p1GridIndex)
-                    pVec1 = New cv.Vec3f(0, 0, taskA.pcSplit(2)(r).Mean(taskA.depthmask(r)).Item(0))
+                    Dim r = tsk.gridRects(p1GridIndex)
+                    pVec1 = New cv.Vec3f(0, 0, tsk.pcSplit(2)(r).Mean(tsk.depthmask(r)).Item(0))
                 End If
 
-                pVec2 = taskA.pointCloud.Get(Of cv.Vec3f)(p2.Y, p2.X)
+                pVec2 = tsk.pointCloud.Get(Of cv.Vec3f)(p2.Y, p2.X)
                 If Single.IsNaN(pVec2(0)) Or pVec2(2) = 0 Then
-                    Dim r = taskA.gridRects(p2GridIndex)
-                    pVec2 = New cv.Vec3f(0, 0, taskA.pcSplit(2)(r).Mean(taskA.depthmask(r)).Item(0))
+                    Dim r = tsk.gridRects(p2GridIndex)
+                    pVec2 = New cv.Vec3f(0, 0, tsk.pcSplit(2)(r).Mean(tsk.depthmask(r)).Item(0))
                 End If
 
                 If p1.X <> p2.X Then
                     Dim b = p1.Y - p1.X * slope
                     If p1.Y = p2.Y Then
                         pE1 = New cv.Point2f(0, p1.Y)
-                        pE2 = New cv.Point2f(taskA.workRes.Width - 1, p1.Y)
+                        pE2 = New cv.Point2f(tsk.workRes.Width - 1, p1.Y)
                     Else
                         Dim x1 = -b / slope
-                        Dim x2 = (taskA.workRes.Height - b) / slope
+                        Dim x2 = (tsk.workRes.Height - b) / slope
                         Dim y1 = b
-                        Dim y2 = slope * taskA.workRes.Width + b
+                        Dim y2 = slope * tsk.workRes.Width + b
 
                         Dim pts As New List(Of cv.Point2f)
-                        If x1 >= 0 And x1 <= taskA.workRes.Width Then pts.Add(New cv.Point2f(x1, 0))
-                        If x2 >= 0 And x2 <= taskA.workRes.Width Then pts.Add(New cv.Point2f(x2, taskA.workRes.Height - 1))
-                        If y1 >= 0 And y1 <= taskA.workRes.Height Then pts.Add(New cv.Point2f(0, y1))
-                        If y2 >= 0 And y2 <= taskA.workRes.Height Then pts.Add(New cv.Point2f(taskA.workRes.Width - 1, y2))
+                        If x1 >= 0 And x1 <= tsk.workRes.Width Then pts.Add(New cv.Point2f(x1, 0))
+                        If x2 >= 0 And x2 <= tsk.workRes.Width Then pts.Add(New cv.Point2f(x2, tsk.workRes.Height - 1))
+                        If y1 >= 0 And y1 <= tsk.workRes.Height Then pts.Add(New cv.Point2f(0, y1))
+                        If y2 >= 0 And y2 <= tsk.workRes.Height Then pts.Add(New cv.Point2f(tsk.workRes.Width - 1, y2))
                         pE1 = pts(0)
                         If pts.Count < 2 Then
-                            If CInt(x2) >= taskA.workRes.Width Then pts.Add(New cv.Point2f(CInt(x2), taskA.workRes.Height - 1))
-                            If CInt(y2) >= taskA.workRes.Height Then pts.Add(New cv.Point2f(taskA.workRes.Width - 1, CInt(y2)))
+                            If CInt(x2) >= tsk.workRes.Width Then pts.Add(New cv.Point2f(CInt(x2), tsk.workRes.Height - 1))
+                            If CInt(y2) >= tsk.workRes.Height Then pts.Add(New cv.Point2f(tsk.workRes.Width - 1, CInt(y2)))
                         End If
                         pE2 = pts(1)
                     End If
                 Else
                     pE1 = New cv.Point2f(p1.X, 0)
-                    pE2 = New cv.Point2f(p1.X, taskA.workRes.Height - 1)
+                    pE2 = New cv.Point2f(p1.X, tsk.workRes.Height - 1)
                 End If
                 ptCenter = New cv.Point2f((p1.X + p2.X) / 2, (p1.Y + p2.Y) / 2)
 
-                Dim bpRow = taskA.bricksPerRow - 1
-                Dim bpCol = taskA.bricksPerCol - 1
-                If pE1.Y = 0 Then indexVTop = pE1.X / taskA.workRes.Width * bpRow
-                If pE1.Y = taskA.workRes.Height - 1 Then indexVBot = pE1.X / taskA.workRes.Width * bpRow
+                Dim bpRow = tsk.bricksPerRow - 1
+                Dim bpCol = tsk.bricksPerCol - 1
+                If pE1.Y = 0 Then indexVTop = pE1.X / tsk.workRes.Width * bpRow
+                If pE1.Y = tsk.workRes.Height - 1 Then indexVBot = pE1.X / tsk.workRes.Width * bpRow
 
-                If pE2.Y = 0 Then indexVTop = pE2.X / taskA.workRes.Width * bpRow
-                If pE2.Y = taskA.workRes.Height - 1 Then indexVBot = pE2.X / taskA.workRes.Width * bpRow
+                If pE2.Y = 0 Then indexVTop = pE2.X / tsk.workRes.Width * bpRow
+                If pE2.Y = tsk.workRes.Height - 1 Then indexVBot = pE2.X / tsk.workRes.Width * bpRow
 
-                If pE1.X = 0 Then indexHLeft = pE1.Y / taskA.workRes.Height * bpCol
-                If pE1.X = taskA.workRes.Width - 1 Then indexHRight = pE1.Y / taskA.workRes.Height * bpCol
+                If pE1.X = 0 Then indexHLeft = pE1.Y / tsk.workRes.Height * bpCol
+                If pE1.X = tsk.workRes.Width - 1 Then indexHRight = pE1.Y / tsk.workRes.Height * bpCol
 
-                If pE2.X = 0 Then indexHLeft = pE2.Y / taskA.workRes.Height * bpCol
-                If pE2.X = taskA.workRes.Width - 1 Then indexHRight = pE2.Y / taskA.workRes.Height * bpCol
+                If pE2.X = 0 Then indexHLeft = pE2.Y / tsk.workRes.Height * bpCol
+                If pE2.X = tsk.workRes.Width - 1 Then indexHRight = pE2.Y / tsk.workRes.Height * bpCol
 
                 computeAngleDegrees()
 
@@ -502,23 +502,23 @@ Namespace VBClasses
             End Function
             Public Function displayCell(ByRef dst As cv.Mat) As String
                 dst.SetTo(0)
-                For Each lp In taskA.lines.lpList
+                For Each lp In tsk.lines.lpList
                     dst.Line(lp.p1, lp.
-                             p2, white, taskA.lineWidth, cv.LineTypes.Link8)
-                    dst.Circle(lp.ptCenter, taskA.DotSize, taskA.highlight, -1)
+                             p2, white, tsk.lineWidth, cv.LineTypes.Link8)
+                    dst.Circle(lp.ptCenter, tsk.DotSize, tsk.highlight, -1)
                 Next
 
-                dst.Line(taskA.lpD.p1, taskA.lpD.p2, taskA.highlight, taskA.lineWidth + 1, taskA.lineType)
+                dst.Line(tsk.lpD.p1, tsk.lpD.p2, tsk.highlight, tsk.lineWidth + 1, tsk.lineType)
 
                 Dim strOut = "rcList index = " + CStr(index) + vbCrLf
-                strOut = "Line ID = " + CStr(taskA.lpD.p1GridIndex) + " Age = " + CStr(taskA.lpD.age) + vbCrLf
-                strOut += "Length (pixels) = " + Format(taskA.lpD.length, fmt1) + " index = " + CStr(taskA.lpD.index) + vbCrLf
-                strOut += "p1GridIndex = " + CStr(taskA.lpD.p1GridIndex) + " p2GridIndex = " + CStr(taskA.lpD.p2GridIndex) + vbCrLf
+                strOut = "Line ID = " + CStr(tsk.lpD.p1GridIndex) + " Age = " + CStr(tsk.lpD.age) + vbCrLf
+                strOut += "Length (pixels) = " + Format(tsk.lpD.length, fmt1) + " index = " + CStr(tsk.lpD.index) + vbCrLf
+                strOut += "p1GridIndex = " + CStr(tsk.lpD.p1GridIndex) + " p2GridIndex = " + CStr(tsk.lpD.p2GridIndex) + vbCrLf
 
-                strOut += "p1 = " + taskA.lpD.p1.ToString + ", p2 = " + taskA.lpD.p2.ToString + vbCrLf
-                strOut += "pE1 = " + taskA.lpD.pE1.ToString + ", pE2 = " + taskA.lpD.pE2.ToString + vbCrLf + vbCrLf
-                strOut += "RGB Angle = " + CStr(taskA.lpD.angle) + vbCrLf
-                strOut += "RGB Slope = " + Format(taskA.lpD.slope, fmt3) + vbCrLf
+                strOut += "p1 = " + tsk.lpD.p1.ToString + ", p2 = " + tsk.lpD.p2.ToString + vbCrLf
+                strOut += "pE1 = " + tsk.lpD.pE1.ToString + ", pE2 = " + tsk.lpD.pE2.ToString + vbCrLf + vbCrLf
+                strOut += "RGB Angle = " + CStr(tsk.lpD.angle) + vbCrLf
+                strOut += "RGB Slope = " + Format(tsk.lpD.slope, fmt3) + vbCrLf
                 strOut += vbCrLf + "NOTE: the Y-Axis is inverted - Y increases down so slopes are inverted." + vbCrLf + vbCrLf
                 Return strOut
             End Function
@@ -560,13 +560,13 @@ Namespace VBClasses
 
                     ' keep the hull points around (there aren't many of them.)
                     hull = cv.Cv2.ConvexHull(contour.ToArray, True).ToList
-                    gridIndex = taskA.gridMap.Get(Of Integer)(rect.TopLeft.Y + contour(0).Y,
+                    gridIndex = tsk.gridMap.Get(Of Integer)(rect.TopLeft.Y + contour(0).Y,
                                                               rect.TopLeft.X + contour(0).X)
                     buildMaxDist()
 
-                    color = taskA.vecColors(index Mod 255)
+                    color = tsk.vecColors(index Mod 255)
                     pixels = mask.CountNonZero
-                    depth = taskA.pcSplit(2)(rect).Mean(taskA.depthmask(rect))(0)
+                    depth = tsk.pcSplit(2)(rect).Mean(tsk.depthmask(rect))(0)
                 End If
             End Sub
             Public Shared Function getHullMask(hull As List(Of cv.Point), mask As cv.Mat) As cv.Mat

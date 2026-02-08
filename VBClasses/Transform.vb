@@ -40,19 +40,19 @@ Namespace VBClasses
 
             Dim output = "Use the check boxes to snapshot the different point clouds" + vbCrLf
 
-            If taskA.testAllRunning Then
-                If taskA.frameCount = 30 Then options.firstCheck = True
-                If taskA.frameCount = 60 Then options.secondCheck = True
+            If tsk.testAllRunning Then
+                If tsk.frameCount = 30 Then options.firstCheck = True
+                If tsk.frameCount = 60 Then options.secondCheck = True
             End If
 
             If options.firstCheck Then
-                pc1 = taskA.pointCloud.Clone()
+                pc1 = tsk.pointCloud.Clone()
                 options.firstCheck = False
                 output += "First point cloud captured" + vbCrLf
             End If
 
             If options.secondCheck Then
-                pc2 = taskA.pointCloud.Clone()
+                pc2 = tsk.pointCloud.Clone()
                 options.secondCheck = False
                 output += "Second point cloud captured" + vbCrLf
             End If
@@ -103,8 +103,8 @@ Namespace VBClasses
             imageCenter = New cv.Point2f(options.centerX, options.centerY)
             Dim rotationMat = cv.Cv2.GetRotationMatrix2D(imageCenter, options.angle, options.scale)
             cv.Cv2.WarpAffine(src, dst2, rotationMat, New cv.Size())
-            DrawCircle(dst2, imageCenter, taskA.DotSize * 2, cv.Scalar.Yellow)
-            DrawCircle(dst2, imageCenter, taskA.DotSize, cv.Scalar.Blue)
+            DrawCircle(dst2, imageCenter, tsk.DotSize * 2, cv.Scalar.Yellow)
+            DrawCircle(dst2, imageCenter, tsk.DotSize, cv.Scalar.Blue)
         End Sub
     End Class
 End Namespace

@@ -10,19 +10,19 @@ Public Class OptionsFileName
             PlayButton.Text = "Start"
             fileStarted = False
         End If
-        taskA.optionsChanged = True
+        tsk.optionsChanged = True
     End Sub
     Private Sub Button1_Click(sender As Object, e As EventArgs) Handles Button1.Click
         If OpenFileDialog1.ShowDialog() = DialogResult.OK Then
             filename.Text = OpenFileDialog1.FileName
-            taskA.optionsChanged = True
+            tsk.optionsChanged = True
         End If
         newFileName = True
     End Sub
     Public Sub Setup(traceName As String)
-        Me.MdiParent = taskA.allOptions
+        Me.MdiParent = tsk.allOptions
         Me.Text = traceName + " OpenFile Options"
-        taskA.allOptions.addTitle(Me)
+        tsk.allOptions.addTitle(Me)
     End Sub
     Public Sub setFileName(filespec As String)
         filename.Text = filespec

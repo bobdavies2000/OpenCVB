@@ -48,14 +48,14 @@ Namespace VBClasses
                     center = New cv.Point(input64.Cols / 2, input64.Rows / 2)
                     If src.Channels() = 1 Then src = src.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
                     dst2 = src.Clone
-                    dst2.Circle(center, radius, taskA.highlight, taskA.lineWidth + 2, taskA.lineType)
-                    dst2.Line(center, New cv.Point(center.X + shift.X, center.Y + shift.Y), cv.Scalar.Red, taskA.lineWidth + 1, taskA.lineType)
+                    dst2.Circle(center, radius, tsk.highlight, tsk.lineWidth + 2, tsk.lineType)
+                    dst2.Line(center, New cv.Point(center.X + shift.X, center.Y + shift.Y), cv.Scalar.Red, tsk.lineWidth + 1, tsk.lineType)
 
                     src(srcRect).CopyTo(dst3(stableRect))
 
                     If radius > 5 Then
-                        dst3.Circle(center, radius, taskA.highlight, taskA.lineWidth + 2, taskA.lineType)
-                        dst3.Line(center, New cv.Point(center.X + shift.X, center.Y + shift.Y), cv.Scalar.Red, taskA.lineWidth + 1, taskA.lineType)
+                        dst3.Circle(center, radius, tsk.highlight, tsk.lineWidth + 2, tsk.lineType)
+                        dst3.Line(center, New cv.Point(center.X + shift.X, center.Y + shift.Y), cv.Scalar.Red, tsk.lineWidth + 1, tsk.lineType)
                     End If
                 Else
                     resetLastFrame = True
@@ -119,11 +119,11 @@ Namespace VBClasses
             Dim shiftX = msRNG.Next(-options.FASTthreshold, options.FASTthreshold)
             Dim shiftY = msRNG.Next(-options.FASTthreshold, options.FASTthreshold)
 
-            If taskA.firstPass Then
+            If tsk.firstPass Then
                 lastShiftX = shiftX
                 lastShiftY = shiftY
             End If
-            If taskA.frameCount Mod 2 = 0 Then
+            If tsk.frameCount Mod 2 = 0 Then
                 shiftX = lastShiftX
                 shiftY = lastShiftY
             End If
@@ -158,11 +158,11 @@ Namespace VBClasses
             desc = "Use phase correlation on the depth data"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            Static lastFrame = taskA.pcSplit(2).Clone
-            phaseC.Run(taskA.pcSplit(2))
-            dst2 = taskA.pcSplit(2)
+            Static lastFrame = tsk.pcSplit(2).Clone
+            phaseC.Run(tsk.pcSplit(2))
+            dst2 = tsk.pcSplit(2)
             Dim tmp = New cv.Mat(dst2.Size(), cv.MatType.CV_32F, cv.Scalar.All(0))
-            If phaseC.resetLastFrame Then taskA.pcSplit(2).CopyTo(lastFrame)
+            If phaseC.resetLastFrame Then tsk.pcSplit(2).CopyTo(lastFrame)
             If Double.IsNaN(phaseC.response) Then
                 SetTrueText("PhaseCorrelate_Basics has detected NaN's in the input image.", 3)
             End If
@@ -174,11 +174,11 @@ Namespace VBClasses
                 tmp = tmp.Normalize(0, 255, cv.NormTypes.MinMax)
                 tmp.ConvertTo(dst3, cv.MatType.CV_8UC1)
 
-                dst3.Circle(phaseC.center, phaseC.radius, taskA.highlight, taskA.lineWidth + 2, taskA.lineType)
-                dst3.Line(phaseC.center, New cv.Point(phaseC.center.X + phaseC.shift.X, phaseC.center.Y + phaseC.shift.Y), cv.Scalar.Red, taskA.lineWidth + 1, taskA.lineType)
+                dst3.Circle(phaseC.center, phaseC.radius, tsk.highlight, tsk.lineWidth + 2, tsk.lineType)
+                dst3.Line(phaseC.center, New cv.Point(phaseC.center.X + phaseC.shift.X, phaseC.center.Y + phaseC.shift.Y), cv.Scalar.Red, tsk.lineWidth + 1, tsk.lineType)
             End If
 
-            lastFrame = taskA.pcSplit(2).Clone
+            lastFrame = tsk.pcSplit(2).Clone
         End Sub
     End Class
 

@@ -10,28 +10,28 @@ Namespace VBClasses
             desc = "Find and save only the stable points in the FAST output"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            Dim featurePoints = New List(Of cv.Point)(taskA.featurePoints)
+            Dim featurePoints = New List(Of cv.Point)(tsk.featurePoints)
             fast.Run(src)
 
-            Dim threshold = taskA.featurePoints.Count / 10
+            Dim threshold = tsk.featurePoints.Count / 10
 
             dst2 = src
             dst3.SetTo(0)
             Dim newPts As New List(Of cv.Point)
             Dim new2f As New List(Of cv.Point2f)
-            For i = 0 To taskA.featurePoints.Count - 1
-                Dim pt = taskA.featurePoints(i)
+            For i = 0 To tsk.featurePoints.Count - 1
+                Dim pt = tsk.featurePoints(i)
                 If featurePoints.Contains(pt) Then
-                    DrawCircle(dst2, pt, taskA.DotSize, cv.Scalar.Yellow)
+                    DrawCircle(dst2, pt, tsk.DotSize, cv.Scalar.Yellow)
                     newPts.Add(pt)
                     new2f.Add(fast.features(i))
                     dst3.Set(Of Byte)(pt.Y, pt.X, 255)
                 End If
             Next
 
-            taskA.featurePoints = If(newPts.Count <= threshold, taskA.featurePoints, New List(Of cv.Point)(newPts))
+            tsk.featurePoints = If(newPts.Count <= threshold, tsk.featurePoints, New List(Of cv.Point)(newPts))
             features = If(new2f.Count <= threshold, fast.features, New List(Of cv.Point2f)(new2f))
-            labels(2) = Format(taskA.featurePoints.Count, "000") + " identified FAST stable points - slider adjusts threshold"
+            labels(2) = Format(tsk.featurePoints.Count, "000") + " identified FAST stable points - slider adjusts threshold"
         End Sub
     End Class
 
@@ -52,19 +52,19 @@ Namespace VBClasses
             options.Run()
 
             dst2 = src.Clone
-            Dim kpoints() As cv.KeyPoint = cv.Cv2.FAST(taskA.gray, options.FASTthreshold, options.useNonMax)
+            Dim kpoints() As cv.KeyPoint = cv.Cv2.FAST(tsk.gray, options.FASTthreshold, options.useNonMax)
 
             features.Clear()
-            taskA.featurePoints.Clear()
+            tsk.featurePoints.Clear()
             For Each kp As cv.KeyPoint In kpoints
-                taskA.featurePoints.Add(New cv.Point(kp.Pt.X, kp.Pt.Y))
+                tsk.featurePoints.Add(New cv.Point(kp.Pt.X, kp.Pt.Y))
                 features.Add(kp.Pt)
             Next
 
             If standaloneTest() Then
                 dst3.SetTo(0)
                 For Each kp As cv.KeyPoint In kpoints
-                    DrawCircle(dst2, kp.Pt, taskA.DotSize, cv.Scalar.Yellow)
+                    DrawCircle(dst2, kp.Pt, tsk.DotSize, cv.Scalar.Yellow)
                     dst3.Set(Of Byte)(kp.Pt.Y, kp.Pt.X, 255)
                 Next
             End If
@@ -90,12 +90,12 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
 
-            mc = New cv.Mat(taskA.gray.Size(), cv.MatType.CV_32FC1, 0)
-            dst2 = New cv.Mat(taskA.gray.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
-            cv.Cv2.CornerEigenValsAndVecs(taskA.gray, dst2, options.blockSize, options.aperture, cv.BorderTypes.Default)
+            mc = New cv.Mat(tsk.gray.Size(), cv.MatType.CV_32FC1, 0)
+            dst2 = New cv.Mat(tsk.gray.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
+            cv.Cv2.CornerEigenValsAndVecs(tsk.gray, dst2, options.blockSize, options.aperture, cv.BorderTypes.Default)
 
-            For y = 0 To taskA.gray.Rows - 1
-                For x = 0 To taskA.gray.Cols - 1
+            For y = 0 To tsk.gray.Rows - 1
+                For x = 0 To tsk.gray.Cols - 1
                     Dim lambda_1 = dst2.Get(Of cv.Vec6f)(y, x)(0)
                     Dim lambda_2 = dst2.Get(Of cv.Vec6f)(y, x)(1)
                     mc.Set(Of Single)(y, x, lambda_1 * lambda_2 - 0.04 * Math.Pow(lambda_1 + lambda_2, 2))
@@ -106,10 +106,10 @@ Namespace VBClasses
 
             src.CopyTo(dst2)
             Dim count As Integer
-            For y = 0 To taskA.gray.Rows - 1
-                For x = 0 To taskA.gray.Cols - 1
+            For y = 0 To tsk.gray.Rows - 1
+                For x = 0 To tsk.gray.Cols - 1
                     If mc.Get(Of Single)(y, x) > mm.minVal + (mm.maxVal - mm.minVal) * options.quality / options.qualityMax Then
-                        DrawCircle(dst2, New cv.Point(x, y), taskA.DotSize, taskA.highlight)
+                        DrawCircle(dst2, New cv.Point(x, y), tsk.DotSize, tsk.highlight)
                         count += 1
                     End If
                 Next
@@ -138,13 +138,13 @@ Namespace VBClasses
             options.Run()
 
             Dim prob As New cv.Mat
-            cv.Cv2.PreCornerDetect(taskA.gray, prob, options.kernelSize)
+            cv.Cv2.PreCornerDetect(tsk.gray, prob, options.kernelSize)
 
             cv.Cv2.Normalize(prob, prob, 0, 255, cv.NormTypes.MinMax)
-            prob.ConvertTo(taskA.gray, cv.MatType.CV_8U)
-            median.Run(taskA.gray.Clone())
-            dst2 = taskA.gray.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-            dst3 = taskA.gray.Threshold(160, 255, cv.ThresholdTypes.BinaryInv).CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+            prob.ConvertTo(tsk.gray, cv.MatType.CV_8U)
+            median.Run(tsk.gray.Clone())
+            dst2 = tsk.gray.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+            dst3 = tsk.gray.Threshold(160, 255, cv.ThresholdTypes.BinaryInv).CvtColor(cv.ColorConversionCodes.GRAY2BGR)
             labels(3) = "median = " + CStr(median.medianVal)
         End Sub
     End Class
@@ -162,9 +162,9 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
 
-            Dim data(taskA.gray.Total - 1) As Byte
+            Dim data(tsk.gray.Total - 1) As Byte
             Dim handle = GCHandle.Alloc(data, GCHandleType.Pinned)
-            Marshal.Copy(taskA.gray.Data, data, 0, data.Length)
+            Marshal.Copy(tsk.gray.Data, data, 0, data.Length)
             Dim imagePtr = Corners_ShiTomasi(handle.AddrOfPinnedObject, src.Rows, src.Cols,
                                          options.blocksize, options.aperture)
             handle.Free()
@@ -183,9 +183,9 @@ Namespace VBClasses
     Public Class NR_Corners_BasicsCentroid : Inherits TaskParent
         Dim fast As New Corners_Basics
         Public Sub New()
-            taskA.kalman = New Kalman_Basics
+            tsk.kalman = New Kalman_Basics
             dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
-            ReDim taskA.kalman.kInput(1) ' 2 elements - cv.point
+            ReDim tsk.kalman.kInput(1) ' 2 elements - cv.point
             desc = "Find interesting points with the FAST and smooth the centroid with kalman"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -193,14 +193,14 @@ Namespace VBClasses
             dst2 = fast.dst2
             dst3.SetTo(0)
             For Each pt In fast.features
-                DrawCircle(dst3, pt, taskA.DotSize + 2, white)
+                DrawCircle(dst3, pt, tsk.DotSize + 2, white)
             Next
             Dim m = cv.Cv2.Moments(dst3, True)
             If m.M00 > 500 Then ' if more than x pixels are present (avoiding a zero area!)
-                taskA.kalman.kInput(0) = m.M10 / m.M00
-                taskA.kalman.kInput(1) = m.M01 / m.M00
-                taskA.kalman.Run(emptyMat)
-                DrawCircle(dst2, New cv.Point(taskA.kalman.kOutput(0), taskA.kalman.kOutput(1)), 10, cv.Scalar.Red)
+                tsk.kalman.kInput(0) = m.M10 / m.M00
+                tsk.kalman.kInput(1) = m.M01 / m.M00
+                tsk.kalman.Run(emptyMat)
+                DrawCircle(dst2, New cv.Point(tsk.kalman.kOutput(0), tsk.kalman.kOutput(1)), 10, cv.Scalar.Red)
             End If
         End Sub
     End Class
@@ -222,9 +222,9 @@ Namespace VBClasses
             dst2 = src.Clone
 
             fast.Run(src)
-            ReDim fastCenters(taskA.gridRects.Count - 1)
-            For i = 0 To taskA.gridRects.Count - 1
-                Dim gr = taskA.gridRects(i)
+            ReDim fastCenters(tsk.gridRects.Count - 1)
+            For i = 0 To tsk.gridRects.Count - 1
+                Dim gr = tsk.gridRects(i)
                 Dim tmp = fast.dst3(gr).FindNonZero()
                 If tmp.Rows > 0 Then
                     Dim mean = tmp.Mean()
@@ -233,9 +233,9 @@ Namespace VBClasses
             Next
 
             For i = 0 To fastCenters.Count - 1
-                DrawCircle(dst2, fastCenters(i), taskA.DotSize, cv.Scalar.Yellow)
+                DrawCircle(dst2, fastCenters(i), tsk.DotSize, cv.Scalar.Yellow)
             Next
-            ' dst2.SetTo(white, taskA.gridMask)
+            ' dst2.SetTo(white, tsk.gridMask)
         End Sub
     End Class
 
@@ -258,8 +258,8 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
 
-            Dim dataSrc(taskA.gray.Total - 1) As Byte
-            Marshal.Copy(taskA.gray.Data, dataSrc, 0, dataSrc.Length)
+            Dim dataSrc(tsk.gray.Total - 1) As Byte
+            Marshal.Copy(tsk.gray.Data, dataSrc, 0, dataSrc.Length)
             Dim handleSrc = GCHandle.Alloc(dataSrc, GCHandleType.Pinned)
             Dim imagePtr = Harris_Features_Run(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, options.threshold,
                                            options.neighborhood, options.aperture, options.harrisParm)
@@ -269,7 +269,7 @@ Namespace VBClasses
             '  gray32f = Convert32f_To_8UC3(gray32f)
             gray32f.ConvertTo(dst2, cv.MatType.CV_8U)
 
-            dst3 = ShowAddweighted(dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR), taskA.color, labels(3))
+            dst3 = ShowAddweighted(dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR), tsk.color, labels(3))
         End Sub
         Public Overloads Sub Dispose() Implements IDisposable.Dispose
             If cPtr <> 0 Then cPtr = Harris_Features_Close(cPtr)
@@ -295,8 +295,8 @@ Namespace VBClasses
 
             dst2 = src.Clone
 
-            Dim dataSrc(taskA.gray.Total) As Byte
-            Marshal.Copy(taskA.gray.Data, dataSrc, 0, dataSrc.Length)
+            Dim dataSrc(tsk.gray.Total) As Byte
+            Marshal.Copy(tsk.gray.Data, dataSrc, 0, dataSrc.Length)
 
             Dim handleSrc = GCHandle.Alloc(dataSrc, GCHandleType.Pinned)
             Dim imagePtr = Harris_Detector_Run(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, options.quality)
@@ -307,7 +307,7 @@ Namespace VBClasses
                 features.Clear()
                 For i = 0 To ptCount - 1
                     features.Add(New cv.Point2f(ptMat.Get(Of Integer)(i, 0), ptMat.Get(Of Integer)(i, 1)))
-                    DrawCircle(dst2, features(i), taskA.DotSize, cv.Scalar.Yellow)
+                    DrawCircle(dst2, features(i), tsk.DotSize, cv.Scalar.Yellow)
                 Next
             End If
         End Sub
@@ -332,12 +332,12 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             dst2 = runRedList(src, labels(2))
 
-            corners.Run(taskA.redList.rcMap)
+            corners.Run(tsk.redList.rcMap)
 
-            dst3 = taskA.color.Clone
+            dst3 = tsk.color.Clone
             For Each pt In corners.nPoints
-                DrawCircle(dst2, pt, taskA.DotSize, taskA.highlight)
-                DrawCircle(dst3, pt, taskA.DotSize, cv.Scalar.Yellow)
+                DrawCircle(dst2, pt, tsk.DotSize, tsk.highlight)
+                DrawCircle(dst3, pt, tsk.DotSize, cv.Scalar.Yellow)
             Next
         End Sub
     End Class
@@ -358,12 +358,12 @@ Namespace VBClasses
             fast.Run(src)
 
             If fast.features.Count = 0 Then Exit Sub ' completely dark?  No features...
-            cv.Cv2.CornerSubPix(taskA.gray, fast.features, New cv.Size(options.subpixSize, options.subpixSize),
+            cv.Cv2.CornerSubPix(tsk.gray, fast.features, New cv.Size(options.subpixSize, options.subpixSize),
                             New cv.Size(-1, -1), term)
 
             dst2 = src
             For Each pt In fast.features
-                DrawCircle(dst2, pt, taskA.DotSize, taskA.highlight)
+                DrawCircle(dst2, pt, tsk.DotSize, tsk.highlight)
             Next
         End Sub
     End Class

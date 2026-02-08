@@ -145,7 +145,6 @@ OEX
 OpAuto
 ORB
 Palette
-ParticleFilter
 PCA
 PCdiff
 Pendulum

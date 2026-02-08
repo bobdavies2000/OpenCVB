@@ -23,11 +23,11 @@ Namespace VBClasses
             If options.xmlCheck Then
                 Static xmlCheckBox = OptionParent.FindCheckBox("Open resulting xml file")
                 xmlCheckBox.checked = False
-                Dim fileinfo = New FileInfo(taskA.homeDir + "/RetinaDefaultParameters.xml")
+                Dim fileinfo = New FileInfo(tsk.homeDir + "/RetinaDefaultParameters.xml")
                 If fileinfo.Exists Then
-                    FileCopy(taskA.homeDir + "/RetinaDefaultParameters.xml", taskA.homeDir + "Data\RetinaDefaultParameters.xml")
+                    FileCopy(tsk.homeDir + "/RetinaDefaultParameters.xml", tsk.homeDir + "Data\RetinaDefaultParameters.xml")
                     fileinfo.Delete()
-                    MessageBox.Show("XML Parameters file is available at: " + taskA.homeDir + "Data\RetinaDefaultParameters.xml")
+                    MessageBox.Show("XML Parameters file is available at: " + tsk.homeDir + "Data\RetinaDefaultParameters.xml")
                 Else
                     MessageBox.Show("RetinaDefaultParameters.xml should have been created but was not found.  OpenCV error?")
                 End If
@@ -38,12 +38,12 @@ Namespace VBClasses
                 ReDim dataSrc(src.Total * src.ElemSize - 1)
                 saveUseLogSampling = options.useLogSampling
                 samplingFactor = options.sampleFactor
-                If taskA.testAllRunning = False Then cPtr = Retina_Basics_Open(src.Rows, src.Cols, options.useLogSampling, samplingFactor)
+                If tsk.testAllRunning = False Then cPtr = Retina_Basics_Open(src.Rows, src.Cols, options.useLogSampling, samplingFactor)
             End If
             Dim handleMagno = GCHandle.Alloc(magnoData, GCHandleType.Pinned)
             Dim handleSrc = GCHandle.Alloc(dataSrc, GCHandleType.Pinned)
             Dim imagePtr As IntPtr = 0
-            If taskA.testAllRunning = False Then
+            If tsk.testAllRunning = False Then
                 Marshal.Copy(src.Data, dataSrc, 0, dataSrc.Length)
                 imagePtr = Retina_Basics_Run(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols,
                                              handleMagno.AddrOfPinnedObject(), options.useLogSampling)
@@ -80,7 +80,7 @@ Namespace VBClasses
             labels(3) = "Current depth motion result"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            retina.Run(taskA.depthRGB)
+            retina.Run(tsk.depthRGB)
             dst3 = retina.dst3
             If lastMotion.Width = 0 Then lastMotion = retina.dst3
             dst2 = lastMotion Or retina.dst3

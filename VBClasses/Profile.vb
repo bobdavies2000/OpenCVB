@@ -17,7 +17,7 @@ Namespace VBClasses
         End Function
         Public Overrides Sub RunAlg(src As cv.Mat)
             dst2 = runRedList(src, labels(2))
-            Dim rc = taskA.oldrcD
+            Dim rc = tsk.oldrcD
             If rc.depthPixels = 0 Then
                 strOut = "There is no depth data for that cell."
                 Exit Sub
@@ -35,7 +35,7 @@ Namespace VBClasses
             rc.contour3D = New List(Of cv.Point3f)
             For i = 0 To rc.contour.Count - 1
                 Dim pt = rc.contour(i)
-                Dim vec = taskA.pointCloud(rc.rect).Get(Of cv.Point3f)(pt.Y, pt.X)
+                Dim vec = tsk.pointCloud(rc.rect).Get(Of cv.Point3f)(pt.Y, pt.X)
                 If Single.IsNaN(vec.Z) Or Single.IsInfinity(vec.Z) Then Continue For
                 If vec.Z Then
                     sortLeft.Add(pt.X, i)
@@ -59,7 +59,7 @@ Namespace VBClasses
 
             corners.Add(New cv.Point(rc.rect.X + rc.contour(0).X, rc.rect.Y + rc.contour(0).Y)) ' show the first contour point...
             cornersRaw.Add(rc.contour(0)) ' show the first contour point...
-            corners3D.Add(taskA.pointCloud.Get(Of cv.Point3f)(rc.rect.Y + rc.contour(0).Y, rc.rect.X + rc.contour(0).X))
+            corners3D.Add(tsk.pointCloud.Get(Of cv.Point3f)(rc.rect.Y + rc.contour(0).Y, rc.rect.X + rc.contour(0).X))
 
             For i As Integer = 0 To 6 - 1
                 Dim index As Integer = Choose(i + 1, 0, sortLeft.Count - 1, 0, sortTop.Count - 1, 0, sortFront.Count - 1)
@@ -68,17 +68,17 @@ Namespace VBClasses
                     Dim pt = rc.contour(ptList.ElementAt(index).Value)
                     cornersRaw.Add(pt)
                     corners.Add(New cv.Point(rc.rect.X + pt.X, rc.rect.Y + pt.Y))
-                    corners3D.Add(taskA.pointCloud(rc.rect).Get(Of cv.Point3f)(pt.Y, pt.X))
+                    corners3D.Add(tsk.pointCloud(rc.rect).Get(Of cv.Point3f)(pt.Y, pt.X))
                 End If
             Next
 
             For i = 0 To corners.Count - 1
-                DrawCircle(dst3, corners(i), taskA.DotSize + 2, cornerColors(i))
+                DrawCircle(dst3, corners(i), tsk.DotSize + 2, cornerColors(i))
             Next
 
-            If taskA.heartBeat Then
+            If tsk.heartBeat Then
                 strOut = "X     " + vbTab + "Y     " + vbTab + "Z " + vbTab + "units=meters" + vbCrLf
-                Dim w = taskA.brickSize
+                Dim w = tsk.brickSize
                 For i = 0 To corners.Count - 1
                     strOut += point3fToString(corners3D(i)) + vbTab + cornerNames(i) + vbCrLf
                 Next
@@ -100,7 +100,7 @@ Namespace VBClasses
                               "It is a common mistake to the OpenGL sliders to try to move cell but they don't - use 'Options_IMU' sliders"
         Dim options As New Options_IMU
         Public Sub New()
-            If standalone Then taskA.gOptions.setGravityUsage(False)
+            If standalone Then tsk.gOptions.setGravityUsage(False)
             labels(2) = "Top matrix is the current gMatrix while the bottom one includes the Y-axis rotation."
             desc = "Build the rotation matrix around the Y-axis"
         End Sub
@@ -115,9 +115,9 @@ Namespace VBClasses
             If standaloneTest() Then
                 options.Run()
                 strOut = "Gravity-oriented gMatrix" + vbCrLf
-                strOut += taskA.gravityMatrix.strOut + vbCrLf
+                strOut += tsk.gravityMatrix.strOut + vbCrLf
                 strOut += vbCrLf + "New gMatrix from sliders" + vbCrLf
-                strOut += IMU_GMatrix.gMatrixToStr(taskA.gravityMatrix.gMatrix) + vbCrLf + vbCrLf
+                strOut += IMU_GMatrix.gMatrixToStr(tsk.gravityMatrix.gMatrix) + vbCrLf + vbCrLf
                 strOut += "Angle X = " + Format(options.rotateX, fmt1) + vbCrLf
                 strOut += "Angle Y = " + Format(options.rotateY, fmt1) + vbCrLf
                 strOut += "Angle Z = " + Format(options.rotateZ, fmt1) + vbCrLf
@@ -136,27 +136,27 @@ Namespace VBClasses
         Public sides As New Profile_Basics
         Dim saveTrueText As New List(Of TrueText)
         Public Sub New()
-            If standalone Then taskA.gOptions.displaydst1.checked = True
+            If standalone Then tsk.gOptions.displaydst1.checked = True
             labels = {"", "", "Select a cell to analyze its contour", "Selected cell:  yellow = closer, blue = farther, white = no depth"}
             desc = "Visualize the derivative of X, Y, and Z in the contour of a RedCloud cell"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             sides.Run(src)
             dst2 = sides.dst2
-            Dim rc = taskA.oldrcD
+            Dim rc = tsk.oldrcD
 
             Dim offset As Integer = 30
             Dim rsizeX = (dst2.Width - offset * 2) / rc.rect.Width
             Dim rsizeY = (dst2.Height - offset * 2) / rc.rect.Height
             saveTrueText.Clear()
-            taskA.trueData.Clear()
+            tsk.trueData.Clear()
             dst3.SetTo(0)
 
             Dim color As cv.Scalar, near = cv.Scalar.Yellow, far = cv.Scalar.Blue
             If rc.index > 0 Then
                 For i = 0 To rc.contour.Count - 1
                     Dim pt = rc.contour(i)
-                    Dim vec = taskA.pointCloud(rc.rect).Get(Of cv.Point3f)(pt.Y, pt.X)
+                    Dim vec = tsk.pointCloud(rc.rect).Get(Of cv.Point3f)(pt.Y, pt.X)
                     pt = New cv.Point(pt.X * rsizeX + offset, pt.Y * rsizeY + offset)
                     Dim t = If(rc.mmZ.maxVal = 0, 0, (vec.Z - rc.mmZ.minVal) / (rc.mmZ.maxVal - rc.mmZ.minVal))
                     If vec.Z > 0 And t > 0 Then
@@ -167,12 +167,12 @@ Namespace VBClasses
                     Else
                         color = white
                     End If
-                    DrawCircle(dst3, pt, taskA.DotSize, color)
+                    DrawCircle(dst3, pt, tsk.DotSize, color)
 
                     If sides.cornersRaw.Contains(rc.contour(i)) Then
                         Dim index = sides.cornersRaw.IndexOf(rc.contour(i))
-                        DrawCircle(dst1, pt, taskA.DotSize + 5, white)
-                        DrawCircle(dst1, pt, taskA.DotSize + 3, sides.cornerColors(index))
+                        DrawCircle(dst1, pt, tsk.DotSize + 5, white)
+                        DrawCircle(dst1, pt, tsk.DotSize + 3, sides.cornerColors(index))
                         SetTrueText(sides.cornerNames(index), pt, 3)
                     End If
                 Next
@@ -185,7 +185,7 @@ Namespace VBClasses
             For i = 0 To sides.corners.Count - 1
                 color = sides.cornerColors(i)
                 SetTrueText(sides.cornerNames(i), sides.corners(i), 1)
-                DrawCircle(dst1, sides.corners(i), taskA.DotSize, color)
+                DrawCircle(dst1, sides.corners(i), tsk.DotSize, color)
             Next
             SetTrueText(strOut, 1)
             saveTrueText = New List(Of TrueText)(trueData)
@@ -232,8 +232,8 @@ Namespace VBClasses
         Dim maxAverage As Single
         Dim peakRotation As Integer
         Public Sub New()
-            taskA.gOptions.setGravityUsage(False)
-            If standalone Then taskA.gOptions.displayDst1.Checked = True
+            tsk.gOptions.setGravityUsage(False)
+            If standalone Then tsk.gOptions.displayDst1.Checked = True
             desc = "Rotate around Y-axis to find peaks - this algorithm fails to find the optimal rotation to find walls"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -243,7 +243,7 @@ Namespace VBClasses
 
             sides.Run(src)
             dst2 = sides.dst2
-            Dim rc = taskA.oldrcD
+            Dim rc = tsk.oldrcD
             If rc.contour3D.Count = 0 Then
                 SetTrueText("The selected cell has no 3D data.  The 3D data can only be computed from cells with depth data.", 1)
                 Exit Sub
@@ -252,7 +252,7 @@ Namespace VBClasses
 
             ySlider.Value += 1
             rotate.Run(src)
-            Dim output = (vecMat.Reshape(1, vecMat.Rows * vecMat.Cols) * taskA.gravityMatrix.gMatrix).ToMat  ' <<<<<<<<<<<<<<<<<<<<<<< this is the XYZ-axis rotation...
+            Dim output = (vecMat.Reshape(1, vecMat.Rows * vecMat.Cols) * tsk.gravityMatrix.gMatrix).ToMat  ' <<<<<<<<<<<<<<<<<<<<<<< this is the XYZ-axis rotation...
             vecMat = output.Reshape(3, vecMat.Rows)
 
             heat.Run(vecMat)
@@ -293,9 +293,9 @@ Namespace VBClasses
     Public Class NR_Profile_Kalman : Inherits TaskParent
         Dim sides As New Profile_Basics
         Public Sub New()
-            taskA.kalman = New Kalman_Basics
-            ReDim taskA.kalman.kInput(12 - 1)
-            If standalone Then taskA.gOptions.displayDst1.Checked = True
+            tsk.kalman = New Kalman_Basics
+            ReDim tsk.kalman.kInput(12 - 1)
+            If standalone Then tsk.gOptions.displayDst1.Checked = True
             labels = {"", "", "Profile_Basics output without Kalman", "Profile_Basics output with Kalman"}
             desc = "Use Kalman to smooth the results of the contour key points"
         End Sub
@@ -303,22 +303,22 @@ Namespace VBClasses
             sides.Run(src)
             dst1 = sides.dst2
             dst2 = sides.dst3
-            Dim rc = taskA.oldrcD
+            Dim rc = tsk.oldrcD
 
-            If taskA.kalman.kInput.Count <> sides.corners.Count * 2 Then ReDim taskA.kalman.kInput(sides.corners.Count * 2 - 1)
+            If tsk.kalman.kInput.Count <> sides.corners.Count * 2 Then ReDim tsk.kalman.kInput(sides.corners.Count * 2 - 1)
             For i = 0 To sides.corners.Count - 1
-                taskA.kalman.kInput(i * 2) = sides.corners(i).X
-                taskA.kalman.kInput(i * 2 + 1) = sides.corners(i).Y
+                tsk.kalman.kInput(i * 2) = sides.corners(i).X
+                tsk.kalman.kInput(i * 2 + 1) = sides.corners(i).Y
             Next
 
-            taskA.kalman.Run(emptyMat)
+            tsk.kalman.Run(emptyMat)
 
             If rc.index > 0 Then
                 dst3.SetTo(0)
                 DrawTour(dst3(rc.rect), rc.contour, cv.Scalar.Yellow)
                 For i = 0 To sides.corners.Count - 1
-                    Dim pt = New cv.Point(CInt(taskA.kalman.kOutput(i * 2)), CInt(taskA.kalman.kOutput(i * 2 + 1)))
-                    DrawCircle(dst3, pt, taskA.DotSize + 2, sides.cornerColors(i))
+                    Dim pt = New cv.Point(CInt(tsk.kalman.kOutput(i * 2)), CInt(tsk.kalman.kOutput(i * 2 + 1)))
+                    DrawCircle(dst3, pt, tsk.DotSize + 2, sides.cornerColors(i))
                 Next
             End If
             SetTrueText(sides.strOut, 3)

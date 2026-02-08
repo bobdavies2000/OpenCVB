@@ -9,7 +9,7 @@ Namespace VBClasses
         Public overLappingCount As Integer
         Public Sub New()
             dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
-            If standalone Then taskA.gOptions.showMotionMask.Checked = True
+            If standalone Then tsk.gOptions.showMotionMask.Checked = True
             ld = cv.XImgProc.CvXImgProc.CreateFastLineDetector
             desc = "If line is NOT in motion mask, then keep it.  If line is in motion mask, add it."
         End Sub
@@ -22,12 +22,12 @@ Namespace VBClasses
         Public Shared Function getRawLines(lines As cv.Vec4f()) As List(Of lpData)
             Dim lpList As New List(Of lpData)
             For Each v In lines
-                If v(0) >= 0 And v(0) <= taskA.workRes.Width And v(1) >= 0 And v(1) <= taskA.workRes.Height And
-                   v(2) >= 0 And v(2) <= taskA.workRes.Width And v(3) >= 0 And v(3) <= taskA.workRes.Height Then
+                If v(0) >= 0 And v(0) <= tsk.workRes.Width And v(1) >= 0 And v(1) <= tsk.workRes.Height And
+                   v(2) >= 0 And v(2) <= tsk.workRes.Width And v(3) >= 0 And v(3) <= tsk.workRes.Height Then
                     Dim p1 = New cv.Point(CInt(v(0)), CInt(v(1)))
                     Dim p2 = New cv.Point(CInt(v(2)), CInt(v(3)))
-                    If p1.X >= 0 And p1.X < taskA.workRes.Width And p1.Y >= 0 And p1.Y < taskA.workRes.Height And
-                       p2.X >= 0 And p2.X < taskA.workRes.Width And p2.Y >= 0 And p2.Y < taskA.workRes.Height Then
+                    If p1.X >= 0 And p1.X < tsk.workRes.Width And p1.Y >= 0 And p1.Y < tsk.workRes.Height And
+                       p2.X >= 0 And p2.X < tsk.workRes.Width And p2.Y >= 0 And p2.Y < tsk.workRes.Height Then
                         p1 = lpData.validatePoint(p1)
                         p2 = lpData.validatePoint(p2)
                         Dim lp = New lpData(p1, p2)
@@ -38,13 +38,13 @@ Namespace VBClasses
             Return lpList
         End Function
         Public Function getRawVecs(src As cv.Mat) As cv.Vec4f()
-            ' taskA.lines is always going to present.  Reuse the stateless lp detector.
+            ' tsk.lines is always going to present.  Reuse the stateless lp detector.
             Return ld.Detect(src)
         End Function
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If standalone Then motionMask = taskA.motionRGB.motionMask
+            If standalone Then motionMask = tsk.motionRGB.motionMask
 
-            If src.Channels <> 1 Or src.Type <> cv.MatType.CV_8U Then src = taskA.gray.Clone
+            If src.Channels <> 1 Or src.Type <> cv.MatType.CV_8U Then src = tsk.gray.Clone
             If lpList.Count <= 1 Then
                 motionMask.SetTo(255)
                 lpList = getRawLines(ld.Detect(src))
@@ -79,17 +79,17 @@ Namespace VBClasses
                         Continue For
                     End If
                 End If
-                dst3.Line(lp.p1, lp.p2, 255, taskA.lineWidth + 1, cv.LineTypes.Link4)
+                dst3.Line(lp.p1, lp.p2, 255, tsk.lineWidth + 1, cv.LineTypes.Link4)
                 lpList.Add(lp)
             Next
 
             dst2.SetTo(0)
             For Each lp In lpList
-                dst2.Line(lp.p1, lp.p2, lp.color, taskA.lineWidth, taskA.lineType)
+                dst2.Line(lp.p1, lp.p2, lp.color, tsk.lineWidth, tsk.lineType)
             Next
 
             If lpList.Count > 0 Then
-                If taskA.lpD.rect.Width = 0 Then taskA.lpD = lpList(0)
+                If tsk.lpD.rect.Width = 0 Then tsk.lpD = lpList(0)
             End If
 
             labels(2) = CStr(count) + " lines retained - " + CStr(newCount) + " were new"
@@ -107,14 +107,14 @@ Namespace VBClasses
     Public Class NR_Line_BasicsTest : Inherits TaskParent
         Dim lines As New Line_Basics
         Public Sub New()
-            desc = "Line_Basics is a taskA algorithm so this is the better way to test it."
+            desc = "Line_Basics is a tsk algorithm so this is the better way to test it."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            lines.motionMask = taskA.motionRGB.motionMask
-            lines.Run(taskA.gray)
+            lines.motionMask = tsk.motionRGB.motionMask
+            lines.Run(tsk.gray)
             dst2.SetTo(0)
             For Each lp In lines.lpList
-                dst2.Line(lp.p1, lp.p2, lp.color, taskA.lineWidth, taskA.lineType)
+                dst2.Line(lp.p1, lp.p2, lp.color, tsk.lineWidth, tsk.lineType)
             Next
             labels(2) = lines.labels(2)
         End Sub
@@ -137,12 +137,12 @@ Namespace VBClasses
             If src.Channels() = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
             If src.Type <> cv.MatType.CV_8U Then src.ConvertTo(src, cv.MatType.CV_8U)
 
-            Dim vecArray = taskA.lines.getRawVecs(src)
+            Dim vecArray = tsk.lines.getRawVecs(src)
             lpList = Line_Basics.getRawLines(vecArray)
 
             dst2.SetTo(0)
             For Each lp In lpList
-                dst2.Line(lp.p1, lp.p2, 255, taskA.lineWidth, taskA.lineType)
+                dst2.Line(lp.p1, lp.p2, 255, tsk.lineWidth, tsk.lineType)
             Next
 
             labels(2) = CStr(lpList.Count) + " lines were detected."
@@ -167,10 +167,10 @@ Namespace VBClasses
             Dim m = If(lp.slope = 0, lpData.maxSlope, -1 / lp.slope)
             Dim b = midPoint.Y - m * midPoint.X
             Dim p1 = New cv.Point2f(-b / m, 0)
-            Dim p2 = New cv.Point2f((taskA.workRes.Height - b) / m, taskA.workRes.Height)
+            Dim p2 = New cv.Point2f((tsk.workRes.Height - b) / m, tsk.workRes.Height)
 
-            Dim w = taskA.workRes.Width
-            Dim h = taskA.workRes.Height
+            Dim w = tsk.workRes.Width
+            Dim h = tsk.workRes.Height
 
             If p1.X < 0 Then p1 = New cv.Point2f(0, b)
             If p1.X > w Then p1 = New cv.Point2f(w, m * w + b)
@@ -185,13 +185,13 @@ Namespace VBClasses
             Return New lpData(p1, p2)
         End Function
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If standaloneTest() Then input = taskA.lpGravity
+            If standaloneTest() Then input = tsk.lpGravity
             dst2.SetTo(0)
-            dst2.Line(input.p1, input.p2, white, taskA.lineWidth, taskA.lineType)
+            dst2.Line(input.p1, input.p2, white, tsk.lineWidth, tsk.lineType)
 
             output = computePerp(input)
-            DrawCircle(dst2, input.ptCenter, taskA.DotSize + 2, cv.Scalar.Red)
-            dst2.Line(output.p1, output.p2, yellow, taskA.lineWidth, taskA.lineType)
+            DrawCircle(dst2, input.ptCenter, tsk.DotSize + 2, cv.Scalar.Red)
+            dst2.Line(output.p1, output.p2, yellow, tsk.lineWidth, tsk.lineType)
 
             If standaloneTest() Then SetTrueText("The line displayed at left is the gravity vector.", 3)
         End Sub
@@ -212,18 +212,18 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             dst2 = src.Clone
             Dim parallels As New SortedList(Of Single, Integer)(New compareAllowIdenticalSingleInverted)
-            For Each lp In taskA.lines.lpList
+            For Each lp In tsk.lines.lpList
                 parallels.Add(lp.angle, lp.index)
             Next
 
-            ReDim classes(taskA.lines.lpList.Count - 1)
+            ReDim classes(tsk.lines.lpList.Count - 1)
             Dim index As Integer, j As Integer
             unParallel.Clear()
             For i = 0 To parallels.Count - 1
-                Dim lp1 = taskA.lines.lpList(parallels.ElementAt(i).Value)
+                Dim lp1 = tsk.lines.lpList(parallels.ElementAt(i).Value)
                 For j = i + 1 To parallels.Count - 1
-                    Dim lp2 = taskA.lines.lpList(parallels.ElementAt(j).Value)
-                    If Math.Abs(lp1.angle - lp2.angle) < taskA.angleThreshold Then
+                    Dim lp2 = tsk.lines.lpList(parallels.ElementAt(j).Value)
+                    If Math.Abs(lp1.angle - lp2.angle) < tsk.angleThreshold Then
                         If classes(index) Is Nothing Then classes(index) = New List(Of Integer)({lp1.index})
                         classes(index).Add(lp2.index)
                     Else
@@ -240,21 +240,21 @@ Namespace VBClasses
             For i = 0 To classes.Count - 1
                 If classes(i) Is Nothing Then Exit For
                 For j = 0 To classes(i).Count - 1
-                    Dim lp = taskA.lines.lpList(classes(i).ElementAt(j))
-                    dst2.Line(lp.p1, lp.p2, lp.color, taskA.lineWidth * 2, taskA.lineType)
+                    Dim lp = tsk.lines.lpList(classes(i).ElementAt(j))
+                    dst2.Line(lp.p1, lp.p2, lp.color, tsk.lineWidth * 2, tsk.lineType)
                     SetTrueText(CStr(colorIndex), lp.ptCenter)
                 Next
                 colorIndex += 1
             Next
 
             For Each index In unParallel
-                Dim lp = taskA.lines.lpList(index)
+                Dim lp = tsk.lines.lpList(index)
                 vbc.DrawLine(dst2, lp)
                 SetTrueText("0", lp.ptCenter)
             Next
 
-            dst3 = taskA.lines.dst2
-            labels(3) = taskA.lines.labels(2)
+            dst3 = tsk.lines.dst2
+            labels(3) = tsk.lines.labels(2)
         End Sub
     End Class
 
@@ -292,7 +292,7 @@ Namespace VBClasses
         End Function
         Public Overrides Sub RunAlg(src As cv.Mat)
             If standalone Then
-                If taskA.heartBeat Then
+                If tsk.heartBeat Then
                     lp1 = New lpData(New cv.Point2f(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height)),
                              New cv.Point2f(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height)))
                     lp2 = New lpData(New cv.Point2f(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height)),
@@ -304,10 +304,10 @@ Namespace VBClasses
 
             If standaloneTest() Then
                 dst2.SetTo(0)
-                dst2.Line(lp1.p1, lp1.p2, cv.Scalar.Yellow, taskA.lineWidth, taskA.lineType)
-                dst2.Line(lp2.p1, lp2.p2, cv.Scalar.Yellow, taskA.lineWidth, taskA.lineType)
+                dst2.Line(lp1.p1, lp1.p2, cv.Scalar.Yellow, tsk.lineWidth, tsk.lineType)
+                dst2.Line(lp2.p1, lp2.p2, cv.Scalar.Yellow, tsk.lineWidth, tsk.lineType)
                 If intersectionPoint <> New cv.Point2f Then
-                    DrawCircle(dst2, intersectionPoint, taskA.DotSize + 4, white)
+                    DrawCircle(dst2, intersectionPoint, tsk.DotSize + 4, white)
                     labels(2) = "Intersection point = " + CStr(CInt(intersectionPoint.X)) + " x " + CStr(CInt(intersectionPoint.Y))
                 Else
                     labels(2) = "Parallel!!!"
@@ -326,14 +326,14 @@ Namespace VBClasses
     Public Class NR_Line_Select : Inherits TaskParent
         Public delaunay As New Delaunay_LineSelect
         Public Sub New()
-            If standalone Then taskA.gOptions.displayDst1.Checked = True
-            desc = "Select a line with mouse movement and put the selection into taskA.lpD."
+            If standalone Then tsk.gOptions.displayDst1.Checked = True
+            desc = "Select a line with mouse movement and put the selection into tsk.lpD."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             delaunay.Run(src)
             dst2 = delaunay.dst1
             labels(2) = delaunay.labels(2)
-            strOut = taskA.lpD.displayCell(dst3)
+            strOut = tsk.lpD.displayCell(dst3)
             SetTrueText(strOut, 1) ' the line info is already prepped in strout in delaunay.
         End Sub
     End Class
@@ -371,26 +371,26 @@ Namespace VBClasses
 
                 Dim minVal = deltaX.Min
                 Dim index = deltaX.IndexOf(minVal)
-                If minVal < taskA.brickSize Then
+                If minVal < tsk.brickSize Then
                     Dim lp = New lpData(p1, ptList(index))
                     If lp.indexVTop < 0 Or lp.indexVBot < 0 Then Continue For
                     lp.index = lpList.Count
                     lpList.Add(lp)
-                    dst2.Line(p1, ptList(index), taskA.highlight, taskA.lineWidth, taskA.lineType)
+                    dst2.Line(p1, ptList(index), tsk.highlight, tsk.lineWidth, tsk.lineType)
                 End If
             Next
 
-            Dim topGroups(taskA.bricksPerRow - 1) As List(Of Integer)
+            Dim topGroups(tsk.bricksPerRow - 1) As List(Of Integer)
             For Each lp In lpList
                 If topGroups(lp.indexVTop) Is Nothing Then topGroups(lp.indexVTop) = New List(Of Integer)
                 topGroups(lp.indexVTop).Add(lp.index)
             Next
 
-            Dim indexVTop = Math.Abs(taskA.gOptions.DebugSlider.Value)
+            Dim indexVTop = Math.Abs(tsk.gOptions.DebugSlider.Value)
             dst3.SetTo(0)
             If indexVTop < topGroups.Count Then
                 If topGroups(indexVTop) IsNot Nothing Then
-                    Dim botGroups(taskA.bricksPerRow - 1) As List(Of Integer)
+                    Dim botGroups(tsk.bricksPerRow - 1) As List(Of Integer)
                     For Each index In topGroups(indexVTop)
                         Dim lp = lpList(index)
                         If botGroups(lp.indexVBot) Is Nothing Then botGroups(lp.indexVBot) = New List(Of Integer)
@@ -428,29 +428,29 @@ Namespace VBClasses
         Public Sub New()
             plotHist.createHistogram = True
             plotHist.removeZeroEntry = True
-            If standalone Then taskA.gOptions.DebugCheckBox.Checked = True
-            If standalone Then taskA.gOptions.displayDst1.Checked = True
+            If standalone Then tsk.gOptions.DebugCheckBox.Checked = True
+            If standalone Then tsk.gOptions.displayDst1.Checked = True
             desc = "Show the histogram of the depth data for a line.  Use debug check box to study longest line."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             lineVert.Run(src)
             dst2 = lineVert.dst2
             For Each lp In lineVert.lpLeft
-                Dim depth = taskA.pcSplit(2)(lp.rect)
+                Dim depth = tsk.pcSplit(2)(lp.rect)
                 Dim depthMask As New cv.Mat(lp.rect.Size, cv.MatType.CV_8U, 0)
                 Dim p1 = New cv.Point2f(lp.p1.X - lp.rect.TopLeft.X, lp.p1.Y - lp.rect.TopLeft.Y)
                 Dim p2 = New cv.Point2f(lp.p2.X - lp.rect.BottomRight.X, lp.p2.Y - lp.rect.BottomRight.Y)
-                depthMask.Line(p1, p2, 255, taskA.lineWidth, taskA.lineType)
+                depthMask.Line(p1, p2, 255, tsk.lineWidth, tsk.lineType)
                 Dim mmDepth = GetMinMax(depth, depthMask)
                 plotHist.Run(depth)
                 Dim hist = plotHist.histArray.ToList
                 Dim bestIndex = hist.IndexOf(hist.Max)
-                Dim incr = (mmDepth.maxVal - mmDepth.minVal) / taskA.gOptions.HistBinBar.Value
+                Dim incr = (mmDepth.maxVal - mmDepth.minVal) / tsk.gOptions.HistBinBar.Value
                 lp.depth1 = mmDepth.minVal + incr * bestIndex
                 lp.depth2 = lp.depth1
-                If taskA.gOptions.DebugCheckBox.Checked Then
+                If tsk.gOptions.DebugCheckBox.Checked Then
                     dst1 = plotHist.dst2
-                    dst2.Rectangle(lp.rect, taskA.highlight, taskA.lineWidth)
+                    dst2.Rectangle(lp.rect, tsk.highlight, tsk.lineWidth)
                     SetTrueText("histogram indicates that the depth is likely at " + Format(lp.depth1, fmt1) + "m", 3)
                     Exit For
                 End If
@@ -465,17 +465,17 @@ Namespace VBClasses
     Public Class Line_Motion : Inherits TaskParent
         Dim lrLines As New Line_LeftRight
         Public Sub New()
-            If standalone Then taskA.gOptions.showMotionMask.Checked = True
+            If standalone Then tsk.gOptions.showMotionMask.Checked = True
             desc = "Show lines with motion and lines with no motion in the leftView."
         End Sub
         Private Function lpMotion(lp As lpData) As Boolean
             ' return true if either line endpoint was in the motion mask.
-            If taskA.lines.motionMask.Get(Of Byte)(lp.p1.Y, lp.p1.X) Then Return True
-            If taskA.lines.motionMask.Get(Of Byte)(lp.p2.Y, lp.p2.X) Then Return True
+            If tsk.lines.motionMask.Get(Of Byte)(lp.p1.Y, lp.p1.X) Then Return True
+            If tsk.lines.motionMask.Get(Of Byte)(lp.p2.Y, lp.p2.X) Then Return True
             Return False
         End Function
         Public Overrides Sub RunAlg(src As cv.Mat)
-            dst2 = taskA.leftView.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+            dst2 = tsk.leftView.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
             dst3 = dst2.Clone
             lrLines.Run(Nothing)
 
@@ -483,10 +483,10 @@ Namespace VBClasses
             Dim noMotionCount As Integer
             For Each lp In lrLines.linesLeft.lpList
                 If lpMotion(lp) Then
-                    dst2.Line(lp.p1, lp.p2, lp.color, taskA.lineWidth + 1, taskA.lineType)
+                    dst2.Line(lp.p1, lp.p2, lp.color, tsk.lineWidth + 1, tsk.lineType)
                     motionCount += 1
                 Else
-                    dst3.Line(lp.p1, lp.p2, lp.color, taskA.lineWidth + 1, taskA.lineType)
+                    dst3.Line(lp.p1, lp.p2, lp.color, tsk.lineWidth + 1, tsk.lineType)
                     noMotionCount += 1
                 End If
             Next
@@ -508,16 +508,16 @@ Namespace VBClasses
             desc = "Find the lines in the Left and Right images."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            motionLeft.Run(taskA.leftView)
+            motionLeft.Run(tsk.leftView)
             linesLeft.motionMask = motionLeft.dst3
-            linesLeft.Run(taskA.leftView)
+            linesLeft.Run(tsk.leftView)
 
             dst2 = linesLeft.dst2
             labels(2) = linesLeft.labels(2)
 
-            motionRight.Run(taskA.rightView)
+            motionRight.Run(tsk.rightView)
             linesRight.motionMask = motionRight.dst3
-            linesRight.Run(taskA.rightView)
+            linesRight.Run(tsk.rightView)
 
             dst3 = linesRight.dst2
             labels(3) = linesLeft.labels(2)
@@ -537,21 +537,21 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             lrLines.Run(src)
-            dst2 = taskA.leftView.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+            dst2 = tsk.leftView.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
             lpLeft.Clear()
             For Each lp In lrLines.linesLeft.lpList
                 If Math.Abs(lp.angle) > 87 Then
                     lpLeft.Add(lp)
-                    dst2.Line(lp.p1, lp.p2, lp.color, taskA.lineWidth, taskA.lineType)
+                    dst2.Line(lp.p1, lp.p2, lp.color, tsk.lineWidth, tsk.lineType)
                 End If
             Next
 
-            dst3 = taskA.rightView.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+            dst3 = tsk.rightView.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
             lpRight.Clear()
             For Each lp In lrLines.linesRight.lpList
                 If Math.Abs(lp.angle) > 87 Then
                     lpRight.Add(lp)
-                    dst3.Line(lp.p1, lp.p2, lp.color, taskA.lineWidth, taskA.lineType)
+                    dst3.Line(lp.p1, lp.p2, lp.color, tsk.lineWidth, tsk.lineType)
                 End If
             Next
         End Sub
@@ -587,7 +587,7 @@ Namespace VBClasses
         Dim options As New Options_LeftRightCorrelation
         Dim motionLeft As New Motion_Basics
         Public Sub New()
-            If standalone Then taskA.gOptions.displayDst0.Checked = True
+            If standalone Then tsk.gOptions.displayDst0.Checked = True
             labels = {"", "", "Left image: detected lines with stable track IDs", ""}
             desc = "Cursor.ai: Find all lines in the left image, identify each and track them."
         End Sub
@@ -607,10 +607,10 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
 
-            dst0 = taskA.leftView
-            motionLeft.Run(taskA.leftView)
+            dst0 = tsk.leftView
+            motionLeft.Run(tsk.leftView)
             lines.motionMask = motionLeft.dst3
-            lines.Run(taskA.leftView)
+            lines.Run(tsk.leftView)
             Dim raw = lines.lpList
 
             Dim usedRaw As New HashSet(Of lpData)
@@ -668,12 +668,12 @@ Namespace VBClasses
                 lpList.Add(t.lp)
             Next
 
-            dst2 = taskA.leftView.Clone
+            dst2 = tsk.leftView.Clone
             If dst2.Channels = 1 Then dst2 = dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
             dst1 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
 
             For Each t In tracked
-                dst2.Line(t.lp.p1, t.lp.p2, t.lp.color, taskA.lineWidth, taskA.lineType)
+                dst2.Line(t.lp.p1, t.lp.p2, t.lp.color, tsk.lineWidth, tsk.lineType)
                 dst1.Line(t.lp.p1, t.lp.p2, t.trackId Mod 255 + 1, 1, cv.LineTypes.Link4)
                 SetTrueText(CStr(t.trackId), New cv.Point(CInt(t.lp.ptCenter.X), CInt(t.lp.ptCenter.Y)), 2)
             Next
@@ -693,17 +693,17 @@ Namespace VBClasses
         Dim lpList As New List(Of lpData)
         Dim motionLeft As New Motion_Basics
         Public Sub New()
-            If standalone Then taskA.gOptions.displayDst0.Checked = True
+            If standalone Then tsk.gOptions.displayDst0.Checked = True
             dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
             desc = "Track lines in the left image."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
 
-            dst0 = taskA.leftView
-            motionLeft.Run(taskA.leftView)
+            dst0 = tsk.leftView
+            motionLeft.Run(tsk.leftView)
             lines.motionMask = motionLeft.dst3
-            lines.Run(taskA.leftView)
+            lines.Run(tsk.leftView)
             labels(2) = lines.labels(2)
 
             dst2.SetTo(0)
@@ -738,10 +738,10 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
 
-            If taskA.lines.lpList.Count = 0 Then Exit Sub
+            If tsk.lines.lpList.Count = 0 Then Exit Sub
 
             If standalone Then
-                lp = taskA.lines.lpList(0)
+                lp = tsk.lines.lpList(0)
                 If lp.length = 0 Then Exit Sub
             End If
 
@@ -750,13 +750,13 @@ Namespace VBClasses
 
             Dim r = lp.rect
             dst1.SetTo(0)
-            sobel.Run(taskA.gray)
+            sobel.Run(tsk.gray)
             sobel.dst2(r).CopyTo(dst1(r), dst3(r))
             DrawRect(dst1, r, black)
 
             Dim allPoints As New List(Of cv.Point)
             Dim brickList As New List(Of cv.Rect)
-            For Each rect In taskA.gridRects
+            For Each rect In tsk.gridRects
                 Dim brick = dst1(rect)
                 If brick.CountNonZero = 0 Then Continue For
                 Dim mm = GetMinMax(brick)
@@ -775,7 +775,7 @@ Namespace VBClasses
                 Dim pt = allPoints(i)
                 For j = i + 1 To allPoints.Count - 1
                     Dim lpTest = New lpData(pt, allPoints(j))
-                    'If Math.Abs(lp.angle - lpTest.angle) < taskA.angleThreshold Then
+                    'If Math.Abs(lp.angle - lpTest.angle) < tsk.angleThreshold Then
                     angles.Add(lpTest.angle)
                     ptList.Add(pt)
                     ptList.Add(allPoints(j))
@@ -820,8 +820,8 @@ Namespace VBClasses
             desc = "Find the brick list for each line in the lines.lplist"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            brickLines.lp = taskA.lines.lpList(0)
-            brickLines.Run(taskA.grayStable)
+            brickLines.lp = tsk.lines.lpList(0)
+            brickLines.Run(tsk.grayStable)
             'For Each r In brickLines.brickList
             '    DrawRect(dst3, r, white)
             'Next
@@ -837,7 +837,7 @@ Namespace VBClasses
         Public pointCloud As New cv.Mat
         Dim depthToWorld As New Cloud_DepthToWorld
         Public Sub New()
-            If standalone Then taskA.gOptions.displayDst1.Checked = True
+            If standalone Then tsk.gOptions.displayDst1.Checked = True
             labels(1) = "Move mouse over any image to see line."
             labels(3) = "Each rectangle is divided into 2 regions defined by the line."
             dst0 = New cv.Mat(dst0.Size, cv.MatType.CV_8U, 0)
@@ -858,18 +858,18 @@ Namespace VBClasses
             dst3.SetTo(0)
             dst0.SetTo(0)
             lpList.Clear()
-            For Each lp In taskA.lines.lpList
+            For Each lp In tsk.lines.lpList
                 Dim val = dst3.Get(Of Byte)(lp.ptCenter.Y, lp.ptCenter.X)
                 If val = 0 Then
                     dst0.Rectangle(lp.rect, lp.index + 1, -1)
                     dst3.Rectangle(lp.rect, lp.index + 1, -1)
-                    dst3.Line(lp.p1, lp.p2, 0, taskA.lineWidth, cv.LineTypes.Link8)
+                    dst3.Line(lp.p1, lp.p2, 0, tsk.lineWidth, cv.LineTypes.Link8)
                     lpList.Add(lp)
                 End If
             Next
             labels(2) = CStr(lpList.Count) + " non-overlapping lines were found."
 
-            For Each lp In taskA.lines.lpList
+            For Each lp In tsk.lines.lpList
                 If fillTriangle(lp, lp.rect.TopLeft) Then Continue For
                 If fillTriangle(lp, lp.rect.BottomRight) Then Continue For
 
@@ -881,8 +881,8 @@ Namespace VBClasses
             Next
 
             dst2 = PaletteBlackZero(dst3)
-            Dim pcZ = taskA.pcSplit(2).Clone
-            For Each lp In taskA.lines.lpList
+            Dim pcZ = tsk.pcSplit(2).Clone
+            For Each lp In tsk.lines.lpList
                 Dim mask1 = dst3(lp.rect).Clone
                 mask1 = mask1.InRange(255, 255)
                 Dim mask2 = Not mask1
@@ -901,16 +901,16 @@ Namespace VBClasses
                 End If
             Next
 
-            cv.Cv2.Merge({taskA.pcSplit(0), taskA.pcSplit(1), pcZ}, pointCloud)
+            cv.Cv2.Merge({tsk.pcSplit(0), tsk.pcSplit(1), pcZ}, pointCloud)
 
-            Dim index = dst0.Get(Of Byte)(taskA.mouseMovePoint.Y, taskA.mouseMovePoint.X) - 1
-            If taskA.lines.lpList.Count > 0 Then
+            Dim index = dst0.Get(Of Byte)(tsk.mouseMovePoint.Y, tsk.mouseMovePoint.X) - 1
+            If tsk.lines.lpList.Count > 0 Then
                 If index <= 0 Then
-                    If taskA.lpD Is Nothing Then taskA.lpD = taskA.lines.lpList(0)
+                    If tsk.lpD Is Nothing Then tsk.lpD = tsk.lines.lpList(0)
                 Else
-                    taskA.lpD = taskA.lines.lpList(index)
+                    tsk.lpD = tsk.lines.lpList(index)
                 End If
-                taskA.lpD.displayCell(dst1)
+                tsk.lpD.displayCell(dst1)
             End If
         End Sub
     End Class
@@ -921,7 +921,7 @@ Namespace VBClasses
 
     Public Class Line_Map : Inherits TaskParent
         Public Sub New()
-            If standalone Then taskA.gOptions.displayDst1.Checked = True
+            If standalone Then tsk.gOptions.displayDst1.Checked = True
             labels(1) = "Move mouse over any image to see line."
             labels(3) = "Each rectangle is divided into 2 regions defined by the line."
             dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
@@ -939,21 +939,21 @@ Namespace VBClasses
             Dim mmList As New List(Of mmData)
             Dim pad = 5
             dst3.SetTo(0)
-            For Each lp In taskA.lines.lpList
-                dst3.Line(lp.p1, lp.p2, lp.index + 1, taskA.lineWidth * 3, cv.LineTypes.Link8)
+            For Each lp In tsk.lines.lpList
+                dst3.Line(lp.p1, lp.p2, lp.index + 1, tsk.lineWidth * 3, cv.LineTypes.Link8)
             Next
-            labels(2) = CStr(taskA.lines.lpList.Count) + " non-overlapping lines were found."
+            labels(2) = CStr(tsk.lines.lpList.Count) + " non-overlapping lines were found."
 
             dst2 = PaletteBlackZero(dst3)
 
-            Dim index = dst3.Get(Of Byte)(taskA.mouseMovePoint.Y, taskA.mouseMovePoint.X) - 1
-            If taskA.lines.lpList.Count > 0 Then
+            Dim index = dst3.Get(Of Byte)(tsk.mouseMovePoint.Y, tsk.mouseMovePoint.X) - 1
+            If tsk.lines.lpList.Count > 0 Then
                 If index <= 0 Then
-                    If taskA.lpD Is Nothing Then taskA.lpD = taskA.lines.lpList(0)
+                    If tsk.lpD Is Nothing Then tsk.lpD = tsk.lines.lpList(0)
                 Else
-                    taskA.lpD = taskA.lines.lpList(index)
+                    tsk.lpD = tsk.lines.lpList(index)
                 End If
-                taskA.lpD.displayCell(dst1)
+                tsk.lpD.displayCell(dst1)
             End If
         End Sub
     End Class

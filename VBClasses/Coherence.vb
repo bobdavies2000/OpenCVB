@@ -24,7 +24,7 @@ Namespace VBClasses
             Dim xoffset = src.Width / 2 - side / 2
             Dim yoffset = src.Height / 2 - side / 2
             Dim srcRect = New cv.Rect(xoffset, yoffset, side, side)
-            If taskA.drawRect.Width <> 0 Then srcRect = taskA.drawRect
+            If tsk.drawRect.Width <> 0 Then srcRect = tsk.drawRect
 
             dst2 = src.Clone()
             src = src(srcRect)
@@ -82,7 +82,7 @@ Namespace VBClasses
             desc = "Find coherent lines in the depth image"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            coherent.Run(taskA.depthRGB)
+            coherent.Run(tsk.depthRGB)
             dst2 = coherent.dst2
         End Sub
     End Class

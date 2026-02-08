@@ -32,10 +32,10 @@ Namespace VBClasses
             labels(3) = "DFT_Basics Spectrum Magnitude"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            rows = cv.Cv2.GetOptimalDFTSize(taskA.gray.Rows)
-            cols = cv.Cv2.GetOptimalDFTSize(taskA.gray.Cols)
-            Dim padded = New cv.Mat(taskA.gray.Width, taskA.gray.Height, cv.MatType.CV_8UC3)
-            cv.Cv2.CopyMakeBorder(taskA.gray, padded, 0, rows - taskA.gray.Rows, 0, cols - taskA.gray.Cols, cv.BorderTypes.Constant, cv.Scalar.All(0))
+            rows = cv.Cv2.GetOptimalDFTSize(tsk.gray.Rows)
+            cols = cv.Cv2.GetOptimalDFTSize(tsk.gray.Cols)
+            Dim padded = New cv.Mat(tsk.gray.Width, tsk.gray.Height, cv.MatType.CV_8UC3)
+            cv.Cv2.CopyMakeBorder(tsk.gray, padded, 0, rows - tsk.gray.Rows, 0, cols - tsk.gray.Cols, cv.BorderTypes.Constant, cv.Scalar.All(0))
             Dim padded32 As New cv.Mat
             padded.ConvertTo(padded32, cv.MatType.CV_32F)
             Dim planes() = {padded32, New cv.Mat(padded.Size(), cv.MatType.CV_32F, cv.Scalar.All(0))}
@@ -83,7 +83,7 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             Dim gray32f As New cv.Mat
-            taskA.gray.ConvertTo(gray32f, cv.MatType.CV_32F)
+            tsk.gray.ConvertTo(gray32f, cv.MatType.CV_32F)
             Dim planes() = {gray32f, New cv.Mat(gray32f.Size(), cv.MatType.CV_32F, cv.Scalar.All(0))}
             Dim complex As New cv.Mat, complexImage As New cv.Mat
             cv.Cv2.Merge(planes, complex)
@@ -92,7 +92,7 @@ Namespace VBClasses
             dst2 = inverseDFT(complexImage)
 
             Dim diff As New cv.Mat
-            cv.Cv2.Absdiff(taskA.gray, dst2, diff)
+            cv.Cv2.Absdiff(tsk.gray, dst2, diff)
             mats.mat(0) = diff.Threshold(0, 255, cv.ThresholdTypes.Binary)
             mats.mat(1) = (diff * 50).ToMat
             mats.Run(emptyMat)
@@ -124,7 +124,7 @@ Namespace VBClasses
             options.Run()
             dft.Run(src)
 
-            If taskA.optionsChanged Then
+            If tsk.optionsChanged Then
                 Parallel.For(0, 2,
             Sub(k)
                 Dim r = options.radius / (k + 1), rNext As Double
@@ -167,7 +167,7 @@ Namespace VBClasses
             labels(3) = "Same filter with radius / 2"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            bfilter.Run(taskA.depthRGB.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
+            bfilter.Run(tsk.depthRGB.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
             dst2 = bfilter.dst2
             dst3 = bfilter.dst3
         End Sub
@@ -223,7 +223,7 @@ Namespace VBClasses
                     symShapes.Run(src)
                     dst2 = symShapes.dst2
                 Case "Draw Point"
-                    If taskA.heartBeat Then
+                    If tsk.heartBeat Then
                         dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
                         Dim pt1 = New cv.Point(msRNG.Next(0, dst2.Width / 10), msRNG.Next(0, dst2.Height / 10))
                         Dim pt2 = New cv.Point(msRNG.Next(0, dst2.Width / 10), msRNG.Next(0, dst2.Height / 10))

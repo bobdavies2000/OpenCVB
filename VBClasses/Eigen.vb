@@ -63,7 +63,7 @@ Namespace VBClasses
             desc = "Yellow line shows the ground truth used to create random points.  Add more points to match the ground truth."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If taskA.heartBeat = False Then Exit Sub
+            If tsk.heartBeat = False Then Exit Sub
             noisyLine.Run(src)
             dst2 = noisyLine.dst2
             Dim pointCount = noisyLine.eigen3D.PointList.Count
@@ -74,7 +74,7 @@ Namespace VBClasses
             Dim p1 = New cv.Point(line.X1, line.Y1)
             Dim p2 = New cv.Point(src.Width, line.Vy / line.Vx * src.Width + bb)
             Dim lp = findEdgePoints(New lpData(p1, p2))
-            dst2.Line(lp.p1, lp.p2, cv.Scalar.Red, taskA.lineWidth + 4, taskA.lineType)
+            dst2.Line(lp.p1, lp.p2, cv.Scalar.Red, tsk.lineWidth + 4, tsk.lineType)
 
             Dim pointMat = cv.Mat.FromPixelData(pointCount, 1, cv.MatType.CV_32FC2, noisyLine.PointList.ToArray)
             Dim mean = pointMat.Mean()
@@ -108,17 +108,17 @@ Namespace VBClasses
             m2 = (p2.Y - p1.Y) / (p2.X - p1.X)
 
             If Math.Abs(m2) > 1.0 Then
-                dst2.Line(p1, p2, taskA.highlight, taskA.lineWidth + 2, taskA.lineType)
+                dst2.Line(p1, p2, tsk.highlight, tsk.lineWidth + 2, tsk.lineType)
             Else
                 p1 = New cv.Point2f(mean.Val0 - Math.Cos(-theta) * len / 2, mean.Val1 - Math.Sin(-theta) * len / 2)
                 p2 = New cv.Point2f(mean.Val0 + Math.Cos(-theta) * len / 2, mean.Val1 + Math.Sin(-theta) * len / 2)
                 m2 = (p2.Y - p1.Y) / (p2.X - p1.X)
-                dst2.Line(p1, p2, cv.Scalar.Yellow, taskA.lineWidth + 1, taskA.lineType)
+                dst2.Line(p1, p2, cv.Scalar.Yellow, tsk.lineWidth + 1, tsk.lineType)
             End If
 
             p1 = New cv.Point(0, noisyLine.bb)
             p2 = New cv.Point(src.Width, noisyLine.m * src.Width + noisyLine.bb)
-            dst2.Line(p1, p2, cv.Scalar.Blue, taskA.lineWidth, taskA.lineType)
+            dst2.Line(p1, p2, cv.Scalar.Blue, tsk.lineWidth, tsk.lineType)
             SetTrueText("Ground Truth m = " + Format(noisyLine.m, fmt2) + " eigen m = " + Format(m2, fmt2) + "    len = " + CStr(CInt(len)) + vbCrLf +
                     "Confidence = " + Format(eigenVal.Get(Of Single)(0, 0) / eigenVal.Get(Of Single)(1, 0), fmt1) + vbCrLf +
                     "theta: atan2(" + Format(eigenVec.Get(Of Single)(1, 0), fmt1) + ", " + Format(eigenVec.Get(Of Single)(0, 0), fmt1) + ") = " +
@@ -176,7 +176,7 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
 
-            If standalone And taskA.heartBeat = False Then Exit Sub
+            If standalone And tsk.heartBeat = False Then Exit Sub
             dst2.SetTo(0)
             Dim width = src.Width, height = src.Height, depth = src.Height
 
@@ -205,7 +205,7 @@ Namespace VBClasses
                 Dim pt = New cv.Point3f(startx + i * incr + noiseOffsetX,
                                     Math.Max(0, Math.Min(m * (startx + i * incr) + bb + noiseOffsetY, height)), Rnd() * depth)
                 PointList.Add(pt)
-                DrawCircle(dst2, New cv.Point2f(pt.X, pt.Y), taskA.DotSize + 1, highLight)
+                DrawCircle(dst2, New cv.Point2f(pt.X, pt.Y), tsk.DotSize + 1, highLight)
             Next
         End Sub
     End Class

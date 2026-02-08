@@ -3,9 +3,9 @@ Public Class OptionsCheckbox
     Public Box As New List(Of CheckBox)
     Public Function Setup(traceName As String) As Boolean
         If OptionParent.FindFrm(traceName + " CheckBoxes") IsNot Nothing Then Return False
-        Me.MdiParent = taskA.allOptions
+        Me.MdiParent = tsk.allOptions
         Me.Text = traceName + " CheckBoxes"
-        taskA.allOptions.addTitle(Me)
+        tsk.allOptions.addTitle(Me)
         Me.Show()
         Return True
     End Function
@@ -18,7 +18,7 @@ Public Class OptionsCheckbox
         FlowLayoutPanel1.Controls.Add(Box(index))
     End Sub
     Private Sub Box_CheckChanged(sender As Object, e As EventArgs)
-        taskA.optionsChanged = True
+        tsk.optionsChanged = True
     End Sub
 
     Protected Overrides Sub Dispose(disposing As Boolean)

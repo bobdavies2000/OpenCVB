@@ -28,7 +28,7 @@ Namespace VBClasses
             For i = 0 To points.Count - 4 Step 3
                 For j = 0 To 100
                     Dim p2 = nextPoint(points, i, j / 100)
-                    If j > 0 Then dst2.Line(p1, p2, taskA.highlight, taskA.lineWidth, taskA.lineWidth)
+                    If j > 0 Then dst2.Line(p1, p2, tsk.highlight, tsk.lineWidth, tsk.lineWidth)
                     p1 = p2
                 Next
             Next
@@ -44,9 +44,9 @@ Namespace VBClasses
 
     Public Class NR_Bezier_Example : Inherits TaskParent
         Dim bezier As New Bezier_Basics
-        Public points() As cv.Point = {New cv.Point(taskA.DotSize, taskA.DotSize), New cv.Point(dst2.Width / 6, dst2.Width / 6),
+        Public points() As cv.Point = {New cv.Point(tsk.DotSize, tsk.DotSize), New cv.Point(dst2.Width / 6, dst2.Width / 6),
                                    New cv.Point(dst2.Width * 3 / 4, dst2.Height / 2),
-                                   New cv.Point(dst2.Width - taskA.DotSize * 2, dst2.Height - taskA.DotSize * 2)}
+                                   New cv.Point(dst2.Width - tsk.DotSize * 2, dst2.Height - tsk.DotSize * 2)}
         Public Sub New()
             desc = "Draw a Bezier curve based with the 4 input points."
         End Sub
@@ -55,16 +55,16 @@ Namespace VBClasses
             Dim p1 As cv.Point
             For i = 0 To 100 - 1
                 Dim p2 = bezier.nextPoint(points, 0, i / 100)
-                If i > 0 Then dst2.Line(p1, p2, taskA.highlight, taskA.lineWidth, taskA.lineWidth)
+                If i > 0 Then dst2.Line(p1, p2, tsk.highlight, tsk.lineWidth, tsk.lineWidth)
                 p1 = p2
             Next
 
             For i = 0 To points.Count - 1
-                DrawCircle(dst2, points(i), taskA.DotSize + 2, white)
+                DrawCircle(dst2, points(i), tsk.DotSize + 2, white)
             Next
 
-            dst2.Line(points(0), points(1), white, taskA.lineWidth, taskA.lineWidth)
-            dst2.Line(points(2), points(3), white, taskA.lineWidth, taskA.lineWidth)
+            dst2.Line(points(0), points(1), white, tsk.lineWidth, tsk.lineWidth)
+            dst2.Line(points(2), points(3), white, tsk.lineWidth, tsk.lineWidth)
         End Sub
     End Class
 End Namespace

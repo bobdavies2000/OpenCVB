@@ -20,7 +20,7 @@ Namespace VBClasses
             endX = 2
             startY = -1.5
             endY = 1.5
-            taskA.drawRectClear = True
+            tsk.drawRectClear = True
         End Sub
         Public Sub mandelbrotLoop(y As Integer)
             incrX = (endX - startX) / dst2.Width
@@ -56,22 +56,22 @@ Namespace VBClasses
             desc = "Run the classic Mandalbrot algorithm and allow zooming in"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If taskA.drawRect.Width <> 0 Then
-                Dim newStartX = mandel.startX + (mandel.endX - mandel.startX) * taskA.drawRect.X / src.Width
-                mandel.endX = mandel.startX + (mandel.endX - mandel.startX) * (taskA.drawRect.X + taskA.drawRect.Width) / src.Width
+            If tsk.drawRect.Width <> 0 Then
+                Dim newStartX = mandel.startX + (mandel.endX - mandel.startX) * tsk.drawRect.X / src.Width
+                mandel.endX = mandel.startX + (mandel.endX - mandel.startX) * (tsk.drawRect.X + tsk.drawRect.Width) / src.Width
                 mandel.startX = newStartX
 
-                Dim newStartY = mandel.startY + (mandel.endY - mandel.startY) * taskA.drawRect.Y / src.Height
-                Dim Height = taskA.drawRect.Width * src.Height / src.Width ' maintain aspect ratio across zooms...
-                mandel.endY = mandel.startY + (mandel.endY - mandel.startY) * (taskA.drawRect.Y + Height) / src.Height
+                Dim newStartY = mandel.startY + (mandel.endY - mandel.startY) * tsk.drawRect.Y / src.Height
+                Dim Height = tsk.drawRect.Width * src.Height / src.Width ' maintain aspect ratio across zooms...
+                mandel.endY = mandel.startY + (mandel.endY - mandel.startY) * (tsk.drawRect.Y + Height) / src.Height
                 mandel.startY = newStartY
 
-                taskA.drawRectClear = True
+                tsk.drawRectClear = True
             End If
             If mandel.options.resetCheck.Checked Then mandel.reset()
 
-            If taskA.optionsChanged Or saveDrawRect <> taskA.drawRect Then
-                saveDrawRect = taskA.drawRect
+            If tsk.optionsChanged Or saveDrawRect <> tsk.drawRect Then
+                saveDrawRect = tsk.drawRect
                 mandel.Run(src)
                 mandel.options.resetCheck.Checked = False
             End If
@@ -129,8 +129,8 @@ Namespace VBClasses
         End Function
         Public Overrides Sub RunAlg(src As cv.Mat)
             Static resetCheck = OptionParent.FindCheckBox("Reset to original Mandelbrot")
-            If savedMouse <> taskA.mouseMovePoint Or resetCheck.Checked Then
-                savedMouse = taskA.mouseMovePoint
+            If savedMouse <> tsk.mouseMovePoint Or resetCheck.Checked Then
+                savedMouse = tsk.mouseMovePoint
                 mandel.Run(src)
                 dst3 = mandel.dst2.Clone
 
@@ -139,8 +139,8 @@ Namespace VBClasses
                 Dim r = 2
                 dst2 = New cv.Mat(src.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
                 Dim m = mandel.zoom.mandel
-                rt = m.startX + (m.endX - m.startX) * taskA.mouseMovePoint.X / src.Width
-                mt = m.startY + (m.endY - m.startY) * taskA.mouseMovePoint.Y / src.Height
+                rt = m.startX + (m.endX - m.startX) * tsk.mouseMovePoint.X / src.Width
+                mt = m.startY + (m.endY - m.startY) * tsk.mouseMovePoint.Y / src.Height
                 Dim c = New Complex(rt, mt)
                 Parallel.For(src.Width \ 2 - src.Height \ 2, src.Width \ 2 + src.Height \ 2,
                 Sub(x)
@@ -209,13 +209,13 @@ Namespace VBClasses
             dst2 = runRedList(src, labels(2))
             dst3.SetTo(0)
 
-            Static rect = New cv.Rect(0, 0, taskA.oldrcD.rect.Width, taskA.oldrcD.rect.Height)
-            If taskA.optionsChanged Or taskA.mouseClickFlag Then
-                rect = New cv.Rect(0, 0, taskA.oldrcD.rect.Width, taskA.oldrcD.rect.Height)
+            Static rect = New cv.Rect(0, 0, tsk.oldrcD.rect.Width, tsk.oldrcD.rect.Height)
+            If tsk.optionsChanged Or tsk.mouseClickFlag Then
+                rect = New cv.Rect(0, 0, tsk.oldrcD.rect.Width, tsk.oldrcD.rect.Height)
             End If
 
-            If taskA.oldrcD.rect.Width = 0 Or taskA.oldrcD.rect.Height = 0 Then Exit Sub
-            taskA.oldrcD.mask.CopyTo(dst3(New cv.Rect(0, 0, taskA.oldrcD.rect.Width, taskA.oldrcD.rect.Height)))
+            If tsk.oldrcD.rect.Width = 0 Or tsk.oldrcD.rect.Height = 0 Then Exit Sub
+            tsk.oldrcD.mask.CopyTo(dst3(New cv.Rect(0, 0, tsk.oldrcD.rect.Width, tsk.oldrcD.rect.Height)))
             If rect.Width < rect.Height Then rect.Width = rect.Height Else rect.Height = rect.Width
             DrawRect(dst3, rect, white)
         End Sub

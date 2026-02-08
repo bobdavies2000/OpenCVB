@@ -9,7 +9,7 @@ Namespace VBClasses
             desc = "Subdivide an image based on the points provided."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If taskA.heartBeat And standalone Then
+            If tsk.heartBeat And standalone Then
                 Static random As New Random_Basics
                 random.Run(src)
                 inputPoints = New List(Of cv.Point2f)(random.PointList)
@@ -53,7 +53,7 @@ Namespace VBClasses
             desc = "Use Delaunay to subdivide an image into triangles."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If standaloneTest() Then If Not taskA.heartBeat Then Exit Sub
+            If standaloneTest() Then If Not tsk.heartBeat Then Exit Sub
             Dim subdiv As New cv.Subdiv2D(New cv.Rect(0, 0, dst2.Width, dst2.Height))
             random.Run(src)
             dst2.SetTo(0)
@@ -64,12 +64,12 @@ Namespace VBClasses
                     Dim e = edgeList(i)
                     Dim p0 = New cv.Point(Math.Round(e(0)), Math.Round(e(1)))
                     Dim p1 = New cv.Point(Math.Round(e(2)), Math.Round(e(3)))
-                    dst2.Line(p0, p1, white, taskA.lineWidth, taskA.lineWidth)
+                    dst2.Line(p0, p1, white, tsk.lineWidth, tsk.lineWidth)
                 Next
             Next
 
             For Each pt In random.PointList
-                DrawCircle(dst2, pt, taskA.DotSize + 1, cv.Scalar.Red)
+                DrawCircle(dst2, pt, tsk.DotSize + 1, cv.Scalar.Red)
             Next
 
             Dim facets = New cv.Point2f()() {Nothing}
@@ -85,8 +85,8 @@ Namespace VBClasses
                     ifacet(j) = New cv.Point(Math.Round(facets(i)(j).X), Math.Round(facets(i)(j).Y))
                 Next
                 ifacets(0) = ifacet
-                dst3.FillConvexPoly(ifacet, taskA.scalarColors(i Mod taskA.scalarColors.Length), cv.LineTypes.Link4)
-                cv.Cv2.Polylines(dst3, ifacets, True, cv.Scalar.Black, taskA.lineWidth, cv.LineTypes.Link4, 0)
+                dst3.FillConvexPoly(ifacet, tsk.scalarColors(i Mod tsk.scalarColors.Length), cv.LineTypes.Link4)
+                cv.Cv2.Polylines(dst3, ifacets, True, cv.Scalar.Black, tsk.lineWidth, cv.LineTypes.Link4, 0)
             Next
         End Sub
     End Class
@@ -104,7 +104,7 @@ Namespace VBClasses
             desc = "Generate random points and divide the image around those points."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If Not taskA.heartBeat Then Exit Sub ' too fast otherwise...
+            If Not tsk.heartBeat Then Exit Sub ' too fast otherwise...
             dst2.SetTo(0)
             Dim points = Enumerable.Range(0, 100).Select(Of cv.Point2f)(
             Function(i)
@@ -112,7 +112,7 @@ Namespace VBClasses
             End Function).ToArray()
 
             For Each p In points
-                DrawCircle(dst2, p, taskA.DotSize + 1, cv.Scalar.Red)
+                DrawCircle(dst2, p, tsk.DotSize + 1, cv.Scalar.Red)
             Next
             dst3 = dst2.Clone()
 
@@ -136,7 +136,7 @@ Namespace VBClasses
             For Each edge In edgelist
                 Dim p1 = New cv.Point2f(edge(0), edge(1))
                 Dim p2 = New cv.Point2f(edge(2), edge(3))
-                dst2.Line(p1, p2, cv.Scalar.Green, taskA.lineWidth, taskA.lineWidth)
+                dst2.Line(p1, p2, cv.Scalar.Green, tsk.lineWidth, tsk.lineWidth)
             Next
         End Sub
     End Class
@@ -161,7 +161,7 @@ Namespace VBClasses
             desc = "Create a region in an image for each point provided without using KNN."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If standaloneTest() And taskA.heartBeat Then
+            If standaloneTest() And tsk.heartBeat Then
                 random.Run(src)
                 inputPoints = New List(Of cv.Point2f)(random.PointList)
             End If
@@ -178,7 +178,7 @@ Namespace VBClasses
                 If index >= facet.facetList.Count Then Continue For
                 Dim nextFacet = facet.facetList(index)
                 ' insure that each facet has a unique generation number
-                If taskA.firstPass Then
+                If tsk.firstPass Then
                     g = usedG.Count
                 Else
                     g = generationMap.Get(Of Integer)(pt.Y, pt.X) + 1
@@ -216,7 +216,7 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             If standaloneTest() Then
-                If taskA.heartBeatLT Then random.Run(src)
+                If tsk.heartBeatLT Then random.Run(src)
                 inputPoints = New List(Of cv.Point2f)(random.PointList)
             End If
 
@@ -235,7 +235,7 @@ Namespace VBClasses
                 If index >= facet.facetList.Count Then Continue For
                 Dim nextFacet = facet.facetList(index)
                 ' insure that each facet has a unique generation number
-                If taskA.firstPass Then
+                If tsk.firstPass Then
                     g = usedG.Count
                 Else
                     g = generationMap.Get(Of Integer)(lp.p2.Y, lp.p2.X) + 1
@@ -261,14 +261,14 @@ Namespace VBClasses
         Dim randEnum As New Random_Enumerable
         Dim subdiv As New cv.Subdiv2D
         Public Sub New()
-            If standalone Then taskA.gOptions.displayDst1.Checked = True
+            If standalone Then tsk.gOptions.displayDst1.Checked = True
             facet32s = New cv.Mat(dst2.Size(), cv.MatType.CV_32SC1, 0)
             labels(1) = "Input points to subdiv"
             labels(3) = "Inconsistent colors in dst2 are duplicate randomCellColor output."
             desc = "Subdivide an image based on the points provided."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If taskA.heartBeat And standalone Then
+            If tsk.heartBeat And standalone Then
                 randEnum.Run(src)
                 inputPoints = New List(Of cv.Point2f)(randEnum.points)
             End If
@@ -301,7 +301,7 @@ Namespace VBClasses
 
             dst1.SetTo(0)
             For Each pt In inputPoints
-                dst1.Circle(New cv.Point(pt.X, pt.Y), taskA.DotSize, taskA.highlight, -1, cv.LineTypes.Link4)
+                dst1.Circle(New cv.Point(pt.X, pt.Y), tsk.DotSize, tsk.highlight, -1, cv.LineTypes.Link4)
             Next
             lastColor = dst2.Clone
             labels(2) = traceName + ": " + Format(inputPoints.Count, "000") + " cells were present."
@@ -316,14 +316,14 @@ Namespace VBClasses
     Public Class Delaunay_LineSelect : Inherits TaskParent
         Dim delaunay As New Delaunay_Basics
         Public Sub New()
-            If standalone Then taskA.gOptions.displayDst1.Checked = True
+            If standalone Then tsk.gOptions.displayDst1.Checked = True
             labels(2) = "Each delaunay cell will select the line that it contains."
             labels(3) = "The mouse is hovering over the Delaunay cell for the end point of the line."
             desc = "Create a map for selecting lines"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             delaunay.inputPoints.Clear()
-            For Each lp In taskA.lines.lpList
+            For Each lp In tsk.lines.lpList
                 delaunay.inputPoints.Add(lp.p1)
                 delaunay.inputPoints.Add(lp.ptCenter)
                 delaunay.inputPoints.Add(lp.p2)
@@ -333,7 +333,7 @@ Namespace VBClasses
 
             Dim facetList As New List(Of Integer)
             Dim ptList As New List(Of Integer)
-            For Each lp In taskA.lines.lpList
+            For Each lp In tsk.lines.lpList
                 facetList.Add(delaunay.dst1.Get(Of Byte)(lp.p1.Y, lp.p1.X))
                 facetList.Add(delaunay.dst1.Get(Of Byte)(lp.ptCenter.Y, lp.ptCenter.X))
                 facetList.Add(delaunay.dst1.Get(Of Byte)(lp.p2.Y, lp.p2.X))
@@ -343,33 +343,33 @@ Namespace VBClasses
                 ptList.Add(lp.index)
             Next
 
-            Dim facet = delaunay.dst1.Get(Of Byte)(taskA.mouseMovePoint.Y, taskA.mouseMovePoint.X)
+            Dim facet = delaunay.dst1.Get(Of Byte)(tsk.mouseMovePoint.Y, tsk.mouseMovePoint.X)
             Dim facetIndex = facetList.IndexOf(facet)
             If facetIndex = -1 Then Exit Sub
-            taskA.lpD = taskA.lines.lpList(ptList(facetIndex))
+            tsk.lpD = tsk.lines.lpList(ptList(facetIndex))
 
-            Static saveID As Integer = taskA.lpD.p1GridIndex
-            If taskA.lpD.p1GridIndex <> saveID Then
-                saveID = taskA.lpD.p1GridIndex
-                taskA.optionsChanged = True
+            Static saveID As Integer = tsk.lpD.p1GridIndex
+            If tsk.lpD.p1GridIndex <> saveID Then
+                saveID = tsk.lpD.p1GridIndex
+                tsk.optionsChanged = True
             End If
 
             Dim index1 As Integer, index2 As Integer, index3 As Integer
-            index1 = delaunay.dst1.Get(Of Byte)(taskA.lpD.p1.Y, taskA.lpD.p1.X)
-            index2 = delaunay.dst1.Get(Of Byte)(taskA.lpD.ptCenter.Y, taskA.lpD.ptCenter.X)
-            index3 = delaunay.dst1.Get(Of Byte)(taskA.lpD.p2.Y, taskA.lpD.p2.X)
+            index1 = delaunay.dst1.Get(Of Byte)(tsk.lpD.p1.Y, tsk.lpD.p1.X)
+            index2 = delaunay.dst1.Get(Of Byte)(tsk.lpD.ptCenter.Y, tsk.lpD.ptCenter.X)
+            index3 = delaunay.dst1.Get(Of Byte)(tsk.lpD.p2.Y, tsk.lpD.p2.X)
 
             dst3.SetTo(0)
-            dst3.FillConvexPoly(delaunay.facetList(index1), taskA.lpD.color, cv.LineTypes.Link4)
-            dst3.FillConvexPoly(delaunay.facetList(index2), taskA.lpD.color, cv.LineTypes.Link4)
-            dst3.FillConvexPoly(delaunay.facetList(index3), taskA.lpD.color, cv.LineTypes.Link4)
-            dst3.Line(taskA.lpD.p1, taskA.lpD.p2, cv.Scalar.Green, taskA.lineWidth, taskA.lineWidth)
+            dst3.FillConvexPoly(delaunay.facetList(index1), tsk.lpD.color, cv.LineTypes.Link4)
+            dst3.FillConvexPoly(delaunay.facetList(index2), tsk.lpD.color, cv.LineTypes.Link4)
+            dst3.FillConvexPoly(delaunay.facetList(index3), tsk.lpD.color, cv.LineTypes.Link4)
+            dst3.Line(tsk.lpD.p1, tsk.lpD.p2, cv.Scalar.Green, tsk.lineWidth, tsk.lineWidth)
 
-            If taskA.lpD Is Nothing Then taskA.lpD = taskA.lines.lpList(0)
-            strOut = taskA.lpD.displayCell(dst2)
+            If tsk.lpD Is Nothing Then tsk.lpD = tsk.lines.lpList(0)
+            strOut = tsk.lpD.displayCell(dst2)
             SetTrueText(strOut, 3)
 
-            For Each lp In taskA.lines.lpList
+            For Each lp In tsk.lines.lpList
                 index1 = delaunay.dst1.Get(Of Byte)(lp.p1.Y, lp.p1.X)
                 index2 = delaunay.dst1.Get(Of Byte)(lp.ptCenter.Y, lp.ptCenter.X)
                 index3 = delaunay.dst1.Get(Of Byte)(lp.p2.Y, lp.p2.X)
@@ -379,8 +379,8 @@ Namespace VBClasses
                 dst1.FillConvexPoly(delaunay.facetList(index3), lp.color, cv.LineTypes.Link4)
             Next
 
-            For Each lp In taskA.lines.lpList
-                dst2.Line(lp.p1, lp.p2, taskA.highlight, taskA.lineWidth, taskA.lineType)
+            For Each lp In tsk.lines.lpList
+                dst2.Line(lp.p1, lp.p2, tsk.highlight, tsk.lineWidth, tsk.lineType)
             Next
         End Sub
     End Class

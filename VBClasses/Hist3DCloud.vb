@@ -16,11 +16,11 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
 
-            If src.Type <> cv.MatType.CV_32FC3 Then src = taskA.pointCloud
+            If src.Type <> cv.MatType.CV_32FC3 Then src = tsk.pointCloud
 
             Dim bins = options.histogram3DBins
 
-            cv.Cv2.CalcHist({src}, {0, 1, 2}, maskInput, histogram, 3, {bins, bins, bins}, taskA.rangesCloud)
+            cv.Cv2.CalcHist({src}, {0, 1, 2}, maskInput, histogram, 3, {bins, bins, bins}, tsk.rangesCloud)
 
             ReDim histArray(bins - 1)
             Marshal.Copy(histogram.Data, histArray, 0, histArray.Length)
@@ -37,11 +37,11 @@ Namespace VBClasses
             classCount = simK.classCount
 
             cv.Cv2.CalcBackProject({src}, {2}, histogram, dst2,
-                                   {taskA.rangesCloud(taskA.rangesCloud.Count - 1)})
+                                   {tsk.rangesCloud(tsk.rangesCloud.Count - 1)})
             dst2 = dst2.ConvertScaleAbs
 
-            dst2.SetTo(0, taskA.noDepthMask)
-            'dst2.SetTo(classCount, taskA.maxDepthMask)
+            dst2.SetTo(0, tsk.noDepthMask)
+            'dst2.SetTo(classCount, tsk.maxDepthMask)
             dst3 = PaletteFull(dst2)
 
             labels(2) = simK.labels(2) + " with " + CStr(bins) + " histogram bins"
@@ -62,7 +62,7 @@ Namespace VBClasses
         Dim mats1 As New Mat_4Click
         Dim mats2 As New Mat_4Click
         Public Sub New()
-            If standalone Then taskA.gOptions.displaydst1.checked = True
+            If standalone Then tsk.gOptions.displaydst1.checked = True
             hist = New List(Of Histogram_Kalman)({New Histogram_Kalman, New Histogram_Kalman, New Histogram_Kalman})
             hist2d = New List(Of Hist2D_Cloud)({New Hist2D_Cloud, New Hist2D_Cloud, New Hist2D_Cloud})
             labels(2) = "Histograms (Kalman) for X (upper left), Y (upper right) and Z.  UseZeroDepth removes 0 (no depth) entries."
@@ -71,13 +71,13 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             For i = 0 To 2
-                hist(i).Run(taskA.pcSplit(i))
+                hist(i).Run(tsk.pcSplit(i))
                 mats1.mat(i) = hist(i).dst2.Clone
 
-                If i = 0 Then taskA.channels = {0, 1}
-                If i = 1 Then taskA.channels = {0, 2}
-                If i = 2 Then taskA.channels = {1, 2}
-                hist2d(i).Run(taskA.pointCloud)
+                If i = 0 Then tsk.channels = {0, 1}
+                If i = 1 Then tsk.channels = {0, 2}
+                If i = 2 Then tsk.channels = {1, 2}
+                hist2d(i).Run(tsk.pointCloud)
                 mats2.mat(i) = hist2d(i).histogram.ConvertScaleAbs
             Next
 
@@ -108,14 +108,14 @@ Namespace VBClasses
             options.Run()
 
             Dim bins = options.histogram3DBins
-            If src.Type <> cv.MatType.CV_32FC3 Then src = taskA.pointCloud
+            If src.Type <> cv.MatType.CV_32FC3 Then src = tsk.pointCloud
 
             Dim histInput(src.Total * src.ElemSize - 1) As Byte
             Marshal.Copy(src.Data, histInput, 0, histInput.Length)
 
-            Dim rx = New cv.Vec2f(-taskA.xRangeDefault, taskA.xRangeDefault)
-            Dim ry = New cv.Vec2f(-taskA.yRangeDefault, taskA.yRangeDefault)
-            Dim rz = New cv.Vec2f(0, taskA.MaxZmeters)
+            Dim rx = New cv.Vec2f(-tsk.xRangeDefault, tsk.xRangeDefault)
+            Dim ry = New cv.Vec2f(-tsk.yRangeDefault, tsk.yRangeDefault)
+            Dim rz = New cv.Vec2f(0, tsk.MaxZmeters)
 
             Dim handleInput = GCHandle.Alloc(histInput, GCHandleType.Pinned)
             Dim dstPtr = Hist3Dcloud_Run(handleInput.AddrOfPinnedObject(), src.Rows, src.Cols, bins,
@@ -145,7 +145,7 @@ Namespace VBClasses
             Marshal.Copy(samples, 0, histogram.Data, samples.Length)
             cv.Cv2.CalcBackProject({src}, {0, 1, 2}, histogram, dst2, ranges)
 
-            If taskA.heartBeat Then maskval += 1
+            If tsk.heartBeat Then maskval += 1
 
             If sortedHist.ElementAt(maskval).Key = 0 Then maskval = 0
             Dim index = sortedHist.ElementAt(maskval).Value
@@ -174,14 +174,14 @@ Namespace VBClasses
             options.Run()
 
             Dim bins = optionsEx.histogram3DBins
-            If src.Type <> cv.MatType.CV_32FC3 Then src = taskA.pointCloud
+            If src.Type <> cv.MatType.CV_32FC3 Then src = tsk.pointCloud
 
             Dim histInput(src.Total * 3 - 1) As Single
             Marshal.Copy(src.Data, histInput, 0, histInput.Length)
 
-            Dim rx = New cv.Vec2f(-taskA.xRangeDefault, taskA.xRangeDefault)
-            Dim ry = New cv.Vec2f(-taskA.yRangeDefault, taskA.yRangeDefault)
-            Dim rz = New cv.Vec2f(0, taskA.MaxZmeters)
+            Dim rx = New cv.Vec2f(-tsk.xRangeDefault, tsk.xRangeDefault)
+            Dim ry = New cv.Vec2f(-tsk.yRangeDefault, tsk.yRangeDefault)
+            Dim rz = New cv.Vec2f(0, tsk.MaxZmeters)
 
             Dim handleInput = GCHandle.Alloc(histInput, GCHandleType.Pinned)
             Dim imagePtr = BackProjectCloud_Run(handleInput.AddrOfPinnedObject(), src.Rows, src.Cols, bins, options.threshold3D,
@@ -190,9 +190,9 @@ Namespace VBClasses
             handleInput.Free()
 
             dst2 = cv.Mat.FromPixelData(dst2.Height, dst2.Width, cv.MatType.CV_8U, imagePtr)
-            dst2.SetTo(0, taskA.noDepthMask)
+            dst2.SetTo(0, tsk.noDepthMask)
             dst3.SetTo(0)
-            taskA.pointCloud.CopyTo(dst3, dst2)
+            tsk.pointCloud.CopyTo(dst3, dst2)
         End Sub
     End Class
 
@@ -215,7 +215,7 @@ Namespace VBClasses
             desc = "Present the 3D histogram as a typical histogram bar chart."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If src.Type <> cv.MatType.CV_32FC3 Then src = taskA.pointCloud
+            If src.Type <> cv.MatType.CV_32FC3 Then src = tsk.pointCloud
             hcloud.Run(src)
             ReDim histArray(hcloud.histogram.Total - 1)
             Marshal.Copy(hcloud.histogram.Data, histArray, 0, histArray.Length)

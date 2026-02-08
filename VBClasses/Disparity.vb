@@ -9,9 +9,9 @@ Namespace VBClasses
             desc = "Given a gr, find the match in the right view image."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            dst2 = taskA.color.Clone
+            dst2 = tsk.color.Clone
 
-            Dim index As Integer = taskA.gridMap.Get(Of Integer)(taskA.mouseMovePoint.Y, taskA.mouseMovePoint.X)
+            Dim index As Integer = tsk.gridMap.Get(Of Integer)(tsk.mouseMovePoint.Y, tsk.mouseMovePoint.X)
             Static saveIndex As Integer = index
             Static saveCorrelations As New List(Of Single)
             Static bestRect As cv.Rect
@@ -19,22 +19,22 @@ Namespace VBClasses
                 saveCorrelations.Clear()
                 saveIndex = index
             End If
-            rect = taskA.gridRects(index)
+            rect = tsk.gridRects(index)
 
-            match.template = taskA.leftView(rect)
+            match.template = tsk.leftView(rect)
             Dim maxDisparity As Integer = 128
             Dim searchRect = New cv.Rect(Math.Max(0, rect.X - maxDisparity), rect.Y,
                              rect.BottomRight.X - rect.X + maxDisparity, rect.Height)
 
-            rightView = taskA.rightView
+            rightView = tsk.rightView
 
-            dst2.Rectangle(rect, black, taskA.lineWidth)
+            dst2.Rectangle(rect, black, tsk.lineWidth)
             match.Run(rightView(searchRect))
             dst3 = rightView
             matchRect = match.newRect
 
-            dst3.Rectangle(searchRect, black, taskA.lineWidth)
-            '  dst3.Rectangle(match.newRect, black, taskA.lineWidth)
+            dst3.Rectangle(searchRect, black, tsk.lineWidth)
+            '  dst3.Rectangle(match.newRect, black, tsk.lineWidth)
             saveCorrelations.Add(match.correlation)
 
             Dim min = saveCorrelations.Min
@@ -44,7 +44,7 @@ Namespace VBClasses
                 bestRect = match.newRect
                 bestRect.Y = searchRect.Y
             End If
-            dst3.Rectangle(bestRect, white, taskA.lineWidth)
+            dst3.Rectangle(bestRect, white, tsk.lineWidth)
 
             If saveCorrelations.Count > 100 Then saveCorrelations.RemoveAt(0)
 
@@ -65,10 +65,10 @@ Namespace VBClasses
             desc = "Use features in bricks to confirm depth."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            edgeline.Run(taskA.leftView)
+            edgeline.Run(tsk.leftView)
             dst2 = edgeline.dst2.Clone
 
-            edgeline.Run(taskA.rightView)
+            edgeline.Run(tsk.rightView)
             dst3 = edgeline.dst2.Clone
 
             disparity.rightView = dst3
@@ -97,9 +97,9 @@ Namespace VBClasses
             Dim r1 = New cv.Rect(w, 0, dst2.Width - w, dst2.Height)
             Dim r2 = New cv.Rect(0, 0, r1.Width, dst2.Height)
             dst3.SetTo(0)
-            taskA.leftView(r1).CopyTo(dst3(r2))
+            tsk.leftView(r1).CopyTo(dst3(r2))
             disparity.rightView = dst3
-            disparity.Run(taskA.leftView)
+            disparity.Run(tsk.leftView)
             dst2 = disparity.dst2
             dst3 = disparity.dst3
             labels = disparity.labels
@@ -117,12 +117,12 @@ Namespace VBClasses
         Dim leftCells As New LeftRight_RedLeftGray
         Dim rightCells As New LeftRight_RedRightGray
         Public Sub New()
-            If standalone Then taskA.gOptions.displayDst1.Checked = True
+            If standalone Then tsk.gOptions.displayDst1.Checked = True
             dst1 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
             desc = "To validate Disparity_Basics, just shift the left image right.  Should always match."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            dst1 = taskA.rightView
+            dst1 = tsk.rightView
             leftCells.Run(src)
             rightCells.Run(src)
 
@@ -132,8 +132,8 @@ Namespace VBClasses
             dst3 = disparity.dst3
             labels = disparity.labels
 
-            taskA.color.Rectangle(disparity.rect, 255, taskA.lineWidth)
-            dst1.Rectangle(disparity.matchRect, 255, taskA.lineWidth)
+            tsk.color.Rectangle(disparity.rect, 255, tsk.lineWidth)
+            dst1.Rectangle(disparity.matchRect, 255, tsk.lineWidth)
         End Sub
     End Class
 
@@ -157,23 +157,23 @@ Namespace VBClasses
     ' The Function() relating depth To disparity Is only valid For a calibrated stereo setup.
     Public Class NR_Disparity_Inverse : Inherits TaskParent
         Public Sub New()
-            taskA.drawRect = New cv.Rect(dst2.Width / 2 - 10, dst2.Height / 2 - 10, 20, 20)
+            tsk.drawRect = New cv.Rect(dst2.Width / 2 - 10, dst2.Height / 2 - 10, 20, 20)
             desc = "Use the depth to find the disparity"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            dst2 = taskA.leftView
-            dst3 = taskA.rightView
+            dst2 = tsk.leftView
+            dst3 = tsk.rightView
             ' assuming StereoLabs Zed 2i camera for now.
             ' disparity = B * f / depth
-            Dim camInfo = taskA.calibData
-            If taskA.drawRect.Width > 0 Then
+            Dim camInfo = tsk.calibData
+            If tsk.drawRect.Width > 0 Then
                 Dim white As New cv.Vec3b(255, 255, 255)
-                For y = 0 To taskA.drawRect.Height - 1
-                    For x = 0 To taskA.drawRect.Width - 1
-                        Dim depth = taskA.pcSplit(2)(taskA.drawRect).Get(Of Single)(y, x)
+                For y = 0 To tsk.drawRect.Height - 1
+                    For x = 0 To tsk.drawRect.Width - 1
+                        Dim depth = tsk.pcSplit(2)(tsk.drawRect).Get(Of Single)(y, x)
                         If depth > 0 Then
                             Dim disp = camInfo.baseline * camInfo.leftIntrinsics.fx / depth
-                            dst3(taskA.drawRect).Set(Of cv.Vec3b)(y, x - disp, white)
+                            dst3(tsk.drawRect).Set(Of cv.Vec3b)(y, x - disp, white)
                         End If
                     Next
                 Next
@@ -192,11 +192,11 @@ Namespace VBClasses
         Dim color8u As New Color8U_LeftRight
         Dim disparity As New Disparity_Basics
         Public Sub New()
-            If standalone Then taskA.gOptions.displayDst1.Checked = True
+            If standalone Then tsk.gOptions.displayDst1.Checked = True
             desc = "Measure the impact of the color8u transforms on the bricks."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            dst1 = taskA.rightView.Clone
+            dst1 = tsk.rightView.Clone
             color8u.Run(src)
 
             dst2 = src.Clone
@@ -205,12 +205,12 @@ Namespace VBClasses
             dst3 = disparity.dst3
             labels = disparity.labels
 
-            taskA.color.Rectangle(disparity.rect, 255, taskA.lineWidth)
-            dst1.Rectangle(disparity.matchRect, 255, taskA.lineWidth)
+            tsk.color.Rectangle(disparity.rect, 255, tsk.lineWidth)
+            dst1.Rectangle(disparity.matchRect, 255, tsk.lineWidth)
 
-            Dim index As Integer = taskA.gridMap.Get(Of Integer)(taskA.ClickPoint.Y, taskA.ClickPoint.X)
-            Dim rect = taskA.gridRects(index)
-            dst2.Rectangle(rect, 255, taskA.lineWidth)
+            Dim index As Integer = tsk.gridMap.Get(Of Integer)(tsk.ClickPoint.Y, tsk.ClickPoint.X)
+            Dim rect = tsk.gridRects(index)
+            dst2.Rectangle(rect, 255, tsk.lineWidth)
         End Sub
     End Class
 

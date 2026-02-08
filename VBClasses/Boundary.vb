@@ -4,7 +4,7 @@ Namespace VBClasses
         Public redCPP As New RedList_CPP
         Dim color8U As New Color8U_Basics
         Public Sub New()
-            taskA.featureOptions.Color8USource.SelectedItem = "Bin4Way_Regions"
+            tsk.featureOptions.Color8USource.SelectedItem = "Bin4Way_Regions"
             dst3 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
             desc = "Create a mask of the RedCloud cell boundaries"
         End Sub
@@ -15,12 +15,12 @@ Namespace VBClasses
             redCPP.Run(dst1)
 
             dst3.SetTo(0)
-            For i = 1 To taskA.redList.oldrclist.Count - 1
-                Dim rc = taskA.redList.oldrclist(i)
-                DrawTour(dst3(rc.rect), rc.contour, 255, taskA.lineWidth)
+            For i = 1 To tsk.redList.oldrclist.Count - 1
+                Dim rc = tsk.redList.oldrclist(i)
+                DrawTour(dst3(rc.rect), rc.contour, 255, tsk.lineWidth)
             Next
 
-            labels(3) = $"{taskA.redList.oldrclist.Count} cells were found."
+            labels(3) = $"{tsk.redList.oldrclist.Count} cells were found."
         End Sub
     End Class
 
@@ -45,23 +45,23 @@ Namespace VBClasses
             bounds.Run(src)
 
             dst2.SetTo(0)
-            For Each rc In taskA.redList.oldrclist
-                dst2.Rectangle(rc.rect, taskA.highlight, taskA.lineWidth)
+            For Each rc In tsk.redList.oldrclist
+                dst2.Rectangle(rc.rect, tsk.highlight, tsk.lineWidth)
             Next
-            labels(2) = $"{taskA.redList.oldrclist.Count} rectangles before contain test"
+            labels(2) = $"{tsk.redList.oldrclist.Count} rectangles before contain test"
 
             rects.Clear()
-            For i = 0 To CInt(taskA.redList.oldrclist.Count * options.percentRect) - 1
-                rects.Add(taskA.redList.oldrclist(i).rect)
+            For i = 0 To CInt(tsk.redList.oldrclist.Count * options.percentRect) - 1
+                rects.Add(tsk.redList.oldrclist(i).rect)
             Next
 
             smallRects.Clear()
             smallContours.Clear()
-            For i = taskA.redList.oldrclist.Count - 1 To CInt(taskA.redList.oldrclist.Count * options.percentRect) Step -1
-                taskA.oldrcD = taskA.redList.oldrclist(i)
-                Dim r = taskA.oldrcD.rect
+            For i = tsk.redList.oldrclist.Count - 1 To CInt(tsk.redList.oldrclist.Count * options.percentRect) Step -1
+                tsk.oldrcD = tsk.redList.oldrclist(i)
+                Dim r = tsk.oldrcD.rect
                 Dim contained As Boolean = False
-                For Each rc In taskA.redList.oldrclist
+                For Each rc In tsk.redList.oldrclist
                     If r = rc.rect Then Continue For
                     If rc.rect.Contains(r) Then
                         contained = True
@@ -70,7 +70,7 @@ Namespace VBClasses
                 Next
 
                 If contained Then
-                    smallContours.Add(taskA.oldrcD.contour)
+                    smallContours.Add(tsk.oldrcD.contour)
                     smallRects.Add(r)
                 Else
                     rects.Add(r)
@@ -79,7 +79,7 @@ Namespace VBClasses
 
             dst3.SetTo(0)
             For Each r In rects
-                dst3.Rectangle(r, taskA.highlight, taskA.lineWidth)
+                dst3.Rectangle(r, tsk.highlight, tsk.lineWidth)
             Next
             labels(3) = $"{rects.Count} rectangles after contain test"
         End Sub
@@ -96,7 +96,7 @@ Namespace VBClasses
     Public Class NR_Boundary_RemovedRects : Inherits TaskParent
         Public bRects As New Boundary_Rectangles
         Public Sub New()
-            If standalone Then taskA.gOptions.displayDst1.Checked = True
+            If standalone Then tsk.gOptions.displayDst1.Checked = True
             desc = "Build the boundaries for oldrclist and remove interior rectangles"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -104,13 +104,13 @@ Namespace VBClasses
             dst2 = bRects.bounds.dst2.Clone
             dst3 = bRects.dst2
             dst1 = bRects.dst3
-            labels(3) = $"{taskA.redList.oldrclist.Count} cells before contain test"
+            labels(3) = $"{tsk.redList.oldrclist.Count} cells before contain test"
 
             For i = 0 To bRects.smallRects.Count - 1
-                DrawTour(dst2(bRects.smallRects(i)), bRects.smallContours(i), cv.Scalar.Black, taskA.lineWidth)
+                DrawTour(dst2(bRects.smallRects(i)), bRects.smallContours(i), cv.Scalar.Black, tsk.lineWidth)
             Next
             labels(1) = labels(2)
-            labels(2) = $"{taskA.redList.oldrclist.Count - bRects.smallRects.Count} cells after contain test"
+            labels(2) = $"{tsk.redList.oldrclist.Count - bRects.smallRects.Count} cells after contain test"
         End Sub
     End Class
 
@@ -122,7 +122,7 @@ Namespace VBClasses
     Public Class NR_Boundary_GuidedBP : Inherits TaskParent
         Dim guided As New GuidedBP_Depth
         Public Sub New()
-            taskA.gOptions.setHistogramBins(100)
+            tsk.gOptions.setHistogramBins(100)
             dst3 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
             desc = "Create a mask of the RedCloud cell boundaries using Guided Backprojection"
         End Sub
@@ -131,12 +131,12 @@ Namespace VBClasses
             dst2 = runRedList(guided.dst2, labels(2))
 
             dst3.SetTo(0)
-            For i = 1 To taskA.redList.oldrclist.Count - 1
-                Dim rc = taskA.redList.oldrclist(i)
-                DrawTour(dst3(rc.rect), rc.contour, 255, taskA.lineWidth)
+            For i = 1 To tsk.redList.oldrclist.Count - 1
+                Dim rc = tsk.redList.oldrclist(i)
+                DrawTour(dst3(rc.rect), rc.contour, 255, tsk.lineWidth)
             Next
 
-            labels(3) = $"{taskA.redList.oldrclist.Count} cells were found."
+            labels(3) = $"{tsk.redList.oldrclist.Count} cells were found."
         End Sub
     End Class
 
@@ -148,7 +148,7 @@ Namespace VBClasses
     Public Class NR_Boundary_RedColor : Inherits TaskParent
         Dim prep As New RedPrep_Core
         Public Sub New()
-            taskA.gOptions.MaxDepthBar.Value = 20
+            tsk.gOptions.MaxDepthBar.Value = 20
             dst3 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
             desc = "Find the RedCloud cell contours"
         End Sub
@@ -157,12 +157,12 @@ Namespace VBClasses
             dst2 = runRedList(prep.dst2, labels(2))
 
             dst3.SetTo(0)
-            For i = 1 To taskA.redList.oldrclist.Count - 1
-                Dim rc = taskA.redList.oldrclist(i)
-                DrawTour(dst3(rc.rect), rc.contour, 255, taskA.lineWidth)
+            For i = 1 To tsk.redList.oldrclist.Count - 1
+                Dim rc = tsk.redList.oldrclist(i)
+                DrawTour(dst3(rc.rect), rc.contour, 255, tsk.lineWidth)
             Next
 
-            labels(3) = $"{taskA.redList.oldrclist.Count} cells were found."
+            labels(3) = $"{tsk.redList.oldrclist.Count} cells were found."
         End Sub
     End Class
 
@@ -173,7 +173,7 @@ Namespace VBClasses
     Public Class NR_Boundary_RedCloud : Inherits TaskParent
         Dim prep As New RedPrep_Basics
         Public Sub New()
-            taskA.gOptions.MaxDepthBar.Value = 20
+            tsk.gOptions.MaxDepthBar.Value = 20
             dst3 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
             desc = "Find the RedCloud cell contours"
         End Sub
@@ -182,13 +182,13 @@ Namespace VBClasses
             dst2 = runRedCloud(prep.dst2, labels(2))
 
             dst3.SetTo(0)
-            For i = 1 To taskA.redCloud.rcList.Count - 1
-                Dim rc = taskA.redCloud.rcList(i)
+            For i = 1 To tsk.redCloud.rcList.Count - 1
+                Dim rc = tsk.redCloud.rcList(i)
                 Dim contour = vbc.ContourBuild(rc.mask)
-                DrawTour(dst3(rc.rect), contour, 255, taskA.lineWidth)
+                DrawTour(dst3(rc.rect), contour, 255, tsk.lineWidth)
             Next
 
-            labels(3) = $"{taskA.redCloud.rcList.Count} cells were found."
+            labels(3) = $"{tsk.redCloud.rcList.Count} cells were found."
         End Sub
     End Class
 End Namespace
