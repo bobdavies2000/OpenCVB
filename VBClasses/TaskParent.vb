@@ -36,7 +36,7 @@ Namespace VBClasses
         Public Sub New()
             traceName = Me.GetType.Name
 
-            If tsk.cpu.callTrace.Count = 0 Then tsk.cpu.callTrace.Add(tsk.Settings.algorithm + "\")
+            If task.cpu.callTrace.Count = 0 Then task.cpu.callTrace.Add(task.Settings.algorithm + "\")
 
             labels = {"", "", traceName, ""}
             Dim stackTrace = Environment.StackTrace
@@ -56,20 +56,20 @@ Namespace VBClasses
                 callStack = lines(i) + "\" + callStack
             Next
 
-            dst0 = New cv.Mat(tsk.workRes, cv.MatType.CV_8UC3, 0)
-            dst1 = New cv.Mat(tsk.workRes, cv.MatType.CV_8UC3, 0)
-            dst2 = New cv.Mat(tsk.workRes, cv.MatType.CV_8UC3, 0)
-            dst3 = New cv.Mat(tsk.workRes, cv.MatType.CV_8UC3, 0)
+            dst0 = New cv.Mat(task.workRes, cv.MatType.CV_8UC3, 0)
+            dst1 = New cv.Mat(task.workRes, cv.MatType.CV_8UC3, 0)
+            dst2 = New cv.Mat(task.workRes, cv.MatType.CV_8UC3, 0)
+            dst3 = New cv.Mat(task.workRes, cv.MatType.CV_8UC3, 0)
 
-            standalone = traceName = tsk.Settings.algorithm
+            standalone = traceName = task.Settings.algorithm
             callStack = callStack.Replace("at Startup\", "")
             callStack = callStack.Replace("at Windows\", "")
 
-            tsk.cpu.callTrace.Add(callStack)
+            task.cpu.callTrace.Add(callStack)
 
-            tsk.cpu.activeObjects.Add(Me)
+            task.cpu.activeObjects.Add(Me)
 
-            If standalone Then tsk.cpu.initialize(traceName)
+            If standalone Then task.cpu.initialize(traceName)
         End Sub
         Public Sub SetTrueText(text As String, pt As cv.Point, Optional picTag As Integer = 2)
             SetTrueTextBase(text, pt, picTag)
@@ -83,33 +83,33 @@ Namespace VBClasses
             trueData.Add(strnext)
         End Sub
         Public Function standaloneTest() As Boolean
-            If standalone Or tsk.cpu.displayObjectName = traceName Then Return True
+            If standalone Or task.cpu.displayObjectName = traceName Then Return True
             Return False
         End Function
         Public Sub DrawRect(dst As cv.Mat, rect As cv.Rect, color As cv.Scalar)
-            dst.Rectangle(rect, color, tsk.lineWidth, tsk.lineType)
+            dst.Rectangle(rect, color, task.lineWidth, task.lineType)
         End Sub
         Public Sub DrawRect(dst As cv.Mat, rect As cv.Rect)
-            dst.Rectangle(rect, tsk.highlight, tsk.lineWidth, tsk.lineType)
+            dst.Rectangle(rect, task.highlight, task.lineWidth, task.lineType)
         End Sub
         Public Sub DrawCircle(dst As cv.Mat, pt As cv.Point2f, radius As Integer, color As cv.Scalar,
                           Optional fillFlag As Integer = -1)
-            dst.Circle(pt, radius, color, fillFlag, tsk.lineType)
+            dst.Circle(pt, radius, color, fillFlag, task.lineType)
         End Sub
         Public Sub DrawCircle(dst As cv.Mat, pt As cv.Point2f)
-            dst.Circle(pt, tsk.DotSize, tsk.highlight, -1, tsk.lineType)
+            dst.Circle(pt, task.DotSize, task.highlight, -1, task.lineType)
         End Sub
         Public Sub DrawCircle(dst As cv.Mat, pt As cv.Point2f, color As cv.Scalar)
-            dst.Circle(pt, tsk.DotSize, color, -1, tsk.lineType)
+            dst.Circle(pt, task.DotSize, color, -1, task.lineType)
         End Sub
         Public Shared Function PaletteFull(input As cv.Mat) As cv.Mat
             Dim output As New cv.Mat
             If input.Type <> cv.MatType.CV_8U Then
                 Dim input8u As New cv.Mat
                 input.ConvertTo(input8u, cv.MatType.CV_8U)
-                cv.Cv2.ApplyColorMap(input8u, output, tsk.colorMap)
+                cv.Cv2.ApplyColorMap(input8u, output, task.colorMap)
             Else
-                cv.Cv2.ApplyColorMap(input, output, tsk.colorMap)
+                cv.Cv2.ApplyColorMap(input, output, task.colorMap)
             End If
 
             Return output
@@ -119,9 +119,9 @@ Namespace VBClasses
             If input.Type <> cv.MatType.CV_8U Then
                 Dim input8u As New cv.Mat
                 input.ConvertTo(input8u, cv.MatType.CV_8U)
-                cv.Cv2.ApplyColorMap(input8u, output, tsk.colorMapZeroIsBlack)
+                cv.Cv2.ApplyColorMap(input8u, output, task.colorMapZeroIsBlack)
             Else
-                cv.Cv2.ApplyColorMap(input, output, tsk.colorMapZeroIsBlack)
+                cv.Cv2.ApplyColorMap(input, output, task.colorMapZeroIsBlack)
             End If
 
             Return output
@@ -136,23 +136,23 @@ Namespace VBClasses
             Return addw.dst2
         End Function
         Public Function runRedList(src As cv.Mat, ByRef label As String, removeMask As cv.Mat) As cv.Mat
-            If tsk.redList Is Nothing Then tsk.redList = New XO_RedList_Basics
-            tsk.redList.inputRemoved = removeMask
-            tsk.redList.Run(src)
-            label = tsk.redList.labels(2)
-            Return tsk.redList.dst2
+            If task.redList Is Nothing Then task.redList = New XO_RedList_Basics
+            task.redList.inputRemoved = removeMask
+            task.redList.Run(src)
+            label = task.redList.labels(2)
+            Return task.redList.dst2
         End Function
         Public Function runRedList(src As cv.Mat, ByRef label As String) As cv.Mat
-            If tsk.redList Is Nothing Then tsk.redList = New XO_RedList_Basics
-            tsk.redList.Run(src)
-            label = tsk.redList.labels(2)
-            Return tsk.redList.dst2
+            If task.redList Is Nothing Then task.redList = New XO_RedList_Basics
+            task.redList.Run(src)
+            label = task.redList.labels(2)
+            Return task.redList.dst2
         End Function
         Public Function runRedCloud(src As cv.Mat, ByRef label As String) As cv.Mat
-            If tsk.redCloud Is Nothing Then tsk.redCloud = New RedCloud_Basics
-            tsk.redCloud.Run(src)
-            label = tsk.redCloud.labels(2)
-            Return tsk.redCloud.dst2
+            If task.redCloud Is Nothing Then task.redCloud = New RedCloud_Basics
+            task.redCloud.Run(src)
+            label = task.redCloud.labels(2)
+            Return task.redCloud.dst2
         End Function
         Public Shared Sub DrawTour(dst As cv.Mat, contour As List(Of cv.Point), color As cv.Scalar, Optional lineWidth As Integer = -1,
                         Optional lineType As cv.LineTypes = cv.LineTypes.Link8)
@@ -162,7 +162,7 @@ Namespace VBClasses
             cv.Cv2.DrawContours(dst, listOfPoints, 0, color, lineWidth, lineType)
         End Sub
         Public Sub Run(src As cv.Mat)
-            tsk.cpu.measureStartRun(traceName)
+            task.cpu.measureStartRun(traceName)
 
             trueData.Clear()
             Try
@@ -172,7 +172,7 @@ Namespace VBClasses
                 Debug.WriteLine($"Stack trace: {ex.StackTrace}")
             End Try
 
-            tsk.cpu.measureEndRun()
+            task.cpu.measureEndRun()
         End Sub
         Public Overridable Sub RunAlg(src As cv.Mat)
             ' every algorithm overrides this Sub 

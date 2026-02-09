@@ -7,11 +7,11 @@ Namespace VBClasses
             desc = "Display different font options available in OpenCV"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If Not tsk.heartBeat Then Exit Sub
-            Dim hersheyFont = Choose(tsk.frameCount Mod 7 + 1, cv.HersheyFonts.HersheyComplex, cv.HersheyFonts.HersheyComplexSmall, cv.HersheyFonts.HersheyDuplex,
+            If Not task.heartBeat Then Exit Sub
+            Dim hersheyFont = Choose(task.frameCount Mod 7 + 1, cv.HersheyFonts.HersheyComplex, cv.HersheyFonts.HersheyComplexSmall, cv.HersheyFonts.HersheyDuplex,
                                      cv.HersheyFonts.HersheyPlain, cv.HersheyFonts.HersheyScriptComplex, cv.HersheyFonts.HersheyScriptSimplex, cv.HersheyFonts.HersheySimplex,
                                      cv.HersheyFonts.HersheyTriplex, cv.HersheyFonts.Italic)
-            Dim hersheyName = Choose(tsk.frameCount Mod 7 + 1, "HersheyComplex", "HersheyComplexSmall", "HersheyDuplex", "HersheyPlain", "HersheyScriptComplex",
+            Dim hersheyName = Choose(task.frameCount Mod 7 + 1, "HersheyComplex", "HersheyComplexSmall", "HersheyDuplex", "HersheyPlain", "HersheyScriptComplex",
                                      "HersheyScriptSimplex", "HersheySimplex", "HersheyTriplex", "Italic")
             labels(2) = hersheyName
             If standalone Then labels(3) = "Italicized " + hersheyName
@@ -23,10 +23,10 @@ Namespace VBClasses
                     msg = hersheyName + " " + Format(size, fmt1)
                 End If
                 cv.Cv2.PutText(dst2, msg, New cv.Point(10, 30 + i * 30),
-                               hersheyFont, size, white, tsk.lineWidth, tsk.lineType)
+                               hersheyFont, size, white, task.lineWidth, task.lineType)
                 If standalone Then
                     Dim hersheyFontItalics = hersheyFont + cv.HersheyFonts.Italic
-                    cv.Cv2.PutText(dst3, hersheyName + " " + Format(size, fmt1), New cv.Point(10, 30 + i * 30), hersheyFontItalics, size, white, tsk.lineWidth, tsk.lineType)
+                    cv.Cv2.PutText(dst3, hersheyName + " " + Format(size, fmt1), New cv.Point(10, 30 + i * 30), hersheyFontItalics, size, white, task.lineWidth, task.lineType)
                 End If
             Next
         End Sub
@@ -50,7 +50,7 @@ Namespace VBClasses
             End If
 
             Dim maxLines = 31
-            If tsk.workres.height = 720 Or tsk.workres.height = 360 Or tsk.workres.height = 180 Then maxLines = 23
+            If task.workres.height = 720 Or task.workres.height = 360 Or task.workres.height = 180 Then maxLines = 23
             Dim clearRequested As Boolean
             If msgs.Count > maxLines Then
                 If msgs.Count < maxLines * 2 Then

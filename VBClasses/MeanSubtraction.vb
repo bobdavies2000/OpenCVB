@@ -23,11 +23,11 @@ Namespace VBClasses
             desc = "Apply mean subtraction to the left and right images."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            LRMeanSub.Run(tsk.leftView)
+            LRMeanSub.Run(task.leftView)
             dst2 = LRMeanSub.dst2.Clone
             labels(2) = "LeftView image"
 
-            LRMeanSub.Run(tsk.rightView)
+            LRMeanSub.Run(task.rightView)
             dst3 = LRMeanSub.dst2
             labels(3) = "RightView image"
         End Sub
@@ -65,8 +65,8 @@ Namespace VBClasses
             desc = "Apply mean subtraction to the left image."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            Dim mean = cv.Cv2.Mean(tsk.leftView)
-            cv.Cv2.Subtract(mean, tsk.leftView, dst2)
+            Dim mean = cv.Cv2.Mean(task.leftView)
+            cv.Cv2.Subtract(mean, task.leftView, dst2)
             dst2 *= 100 / scaleValue
         End Sub
     End Class

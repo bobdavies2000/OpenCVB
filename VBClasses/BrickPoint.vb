@@ -34,7 +34,6 @@ Namespace VBClasses
         Public ptList As New List(Of cv.Point)
         Public threshold As Single = 150
         Public Sub New()
-            If tsk.bricks Is Nothing Then tsk.bricks = New Brick_Basics
             desc = "Identify the highest intensity point in each gr given the input image."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -45,9 +44,9 @@ Namespace VBClasses
                 threshold = 255 ' thresholdSlider.value
             End If
 
-            dst2 = tsk.color.Clone
+            dst2 = task.color.Clone
             ptList.Clear()
-            For Each gr In tsk.bricks.brickList
+            For Each gr In task.bricks.brickList
                 Dim mm = GetMinMax(src(gr.rect))
                 Dim pt = New cv.Point(mm.maxLoc.X + gr.rect.X, mm.maxLoc.Y + gr.rect.Y)
                 If mm.maxVal >= threshold Then ptList.Add(New cv.Point(mm.maxLoc.X + gr.rect.X, mm.maxLoc.Y + gr.rect.Y))
@@ -57,7 +56,7 @@ Namespace VBClasses
                 DrawCircle(dst2, pt)
             Next
 
-            labels(2) = "Of the " + CStr(tsk.gridRects.Count) + " candidates, " + CStr(ptList.Count) +
+            labels(2) = "Of the " + CStr(task.gridRects.Count) + " candidates, " + CStr(ptList.Count) +
                     " had brickpoint intensity >= " + CStr(threshold)
         End Sub
     End Class
@@ -73,7 +72,7 @@ Namespace VBClasses
         Dim plotHist As New Plot_Histogram
         Dim bPoint As New BrickPoint_Basics
         Public Sub New()
-            tsk.gOptions.setHistogramBins(3)
+            task.gOptions.setHistogramBins(3)
             plotHist.maxRange = 255
             plotHist.minRange = 0
             plotHist.removeZeroEntry = False
@@ -81,23 +80,23 @@ Namespace VBClasses
             desc = "Plot the distribution of Sobel values for each ptBrick cell."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            bPoint.Run(tsk.gray)
+            bPoint.Run(task.gray)
 
             Dim sobelValues As New List(Of Byte)
-            For Each gr In tsk.bricks.brickList
+            For Each gr In task.bricks.brickList
                 sobelValues.Add(gr.mm.maxVal)
             Next
             plotHist.Run(cv.Mat.FromPixelData(sobelValues.Count, 1, cv.MatType.CV_8U, sobelValues.ToArray))
             dst2 = plotHist.dst2
 
-            Dim incr = (plotHist.maxRange - plotHist.minRange) / tsk.histogramBins
-            Dim histIndex = Math.Floor(tsk.mouseMovePoint.X / (dst2.Width / tsk.histogramBins))
+            Dim incr = (plotHist.maxRange - plotHist.minRange) / task.histogramBins
+            Dim histIndex = Math.Floor(task.mouseMovePoint.X / (dst2.Width / task.histogramBins))
             Dim minVal = CInt(histIndex * incr)
             Dim maxVal = CInt((histIndex + 1) * incr)
             labels(3) = "Sobel peak values from " + CStr(minVal) + " to " + CStr(maxVal)
 
             dst3 = src
-            For Each gr In tsk.bricks.brickList
+            For Each gr In task.bricks.brickList
                 If gr.mm.maxVal <= maxVal And gr.mm.maxVal >= minVal Then
                     DrawCircle(dst3, New cv.Point(gr.mm.maxLoc.X + gr.rect.X, gr.mm.maxLoc.Y + gr.rect.Y))
                 End If
@@ -117,7 +116,7 @@ Namespace VBClasses
             desc = "Run RedColor with the featureless mask from BrickPoint_FeatureLess"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            fLess.Run(tsk.grayStable)
+            fLess.Run(task.grayStable)
             dst2 = runRedList(src, labels(2), fLess.dst1)
         End Sub
     End Class
@@ -140,7 +139,7 @@ Namespace VBClasses
             dst2 = src.Clone
 
             Dim count As Integer
-            For Each gr In tsk.bricks.brickList
+            For Each gr In task.bricks.brickList
                 If gr.mm.maxLoc = newPoint Then Continue For
                 If gr.mm.maxVal <> 255 Then Continue For
                 If gr.mm.maxLoc.Y = gr.rect.Y Then
@@ -163,7 +162,6 @@ Namespace VBClasses
     Public Class NR_BrickPoint_DistanceAbove : Inherits TaskParent
         Dim plotHist As New Plot_Histogram
         Public Sub New()
-            If tsk.bricks Is Nothing Then tsk.bricks = New Brick_Basics
             plotHist.createHistogram = True
             plotHist.removeZeroEntry = False
             desc = "Show grid points based on their distance to the grid point above."
@@ -172,11 +170,11 @@ Namespace VBClasses
             Dim lpList As New List(Of lpData)
 
             Dim lpZero As New lpData(New cv.Point, New cv.Point)
-            For Each gr In tsk.bricks.brickList
+            For Each gr In task.bricks.brickList
                 If gr.rect.Y = 0 Then
                     lpList.Add(lpZero)
                 Else
-                    Dim gc1 = tsk.bricks.brickList(gr.index - tsk.bricksPerRow)
+                    Dim gc1 = task.bricks.brickList(gr.index - task.bricksPerRow)
                     Dim pt = New cv.Point(gr.mm.maxLoc.X + gr.rect.X, gr.mm.maxLoc.Y + gr.rect.Y)
                     Dim ptGc1 = New cv.Point(gc1.mm.maxLoc.X + gc1.rect.X, gc1.mm.maxLoc.Y + gc1.rect.Y)
                     Dim lp = New lpData(pt, ptGc1)
@@ -190,12 +188,12 @@ Namespace VBClasses
             Next
 
             Dim minLen = lengths.Min, maxLen = lengths.Max
-            If maxLen = tsk.brickSize And minLen = tsk.brickSize Then Exit Sub
+            If maxLen = task.brickSize And minLen = task.brickSize Then Exit Sub
 
             plotHist.Run(cv.Mat.FromPixelData(lengths.Count, 1, cv.MatType.CV_32F, lengths.ToArray))
             dst2 = plotHist.dst2
 
-            Dim brickRange = (maxLen - minLen) / tsk.histogramBins
+            Dim brickRange = (maxLen - minLen) / task.histogramBins
             Dim histList = plotHist.histArray.ToList
             Dim histindex = histList.IndexOf(histList.Max)
             histList(histindex) = 0
@@ -204,10 +202,10 @@ Namespace VBClasses
             Dim max = Math.Max(CInt((histindex + 1) * brickRange), CInt((histindex1 + 1) * brickRange))
 
             dst3 = src
-            For Each gr In tsk.bricks.brickList
+            For Each gr In task.bricks.brickList
                 Dim lp = lpList(gr.index)
                 If lp.length < min Or lp.length > max Then Continue For
-                dst3.Line(lp.p1, lp.p2, tsk.highlight, tsk.lineWidth, tsk.lineWidth)
+                dst3.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineWidth)
             Next
         End Sub
     End Class
@@ -226,7 +224,7 @@ Namespace VBClasses
             desc = "Display the grid points that have the highest possible max val - indicating the quality of the point."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            bPoint.Run(tsk.gray)
+            bPoint.Run(task.gray)
             labels(2) = bPoint.labels(2)
 
             dst2 = src.Clone
@@ -253,25 +251,25 @@ Namespace VBClasses
             desc = "Identify the bricks with the best edge counts - indicating the quality of the gr."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            bPoint.Run(tsk.gray)
+            bPoint.Run(task.gray)
 
             dst2 = src.Clone
             dst3.SetTo(0)
             bestBricks.Clear()
             sortedBricks.Clear()
             For Each pt In bPoint.ptList
-                Dim index = tsk.gridMap.Get(Of Integer)(pt.Y, pt.X)
-                Dim gr = tsk.bricks.brickList(index)
-                If gr.correlation > 0.9 And gr.depth < tsk.MaxZmeters Then sortedBricks.Add(bPoint.sobel.dst2(gr.rect).CountNonZero, gr.rect)
+                Dim index = task.gridMap.Get(Of Integer)(pt.Y, pt.X)
+                Dim gr = task.bricks.brickList(index)
+                If gr.correlation > 0.9 And gr.depth < task.MaxZmeters Then sortedBricks.Add(bPoint.sobel.dst2(gr.rect).CountNonZero, gr.rect)
             Next
 
             dst3 = bPoint.sobel.dst2
             For i = 0 To sortedBricks.Count - 1
                 Dim ele = sortedBricks.ElementAt(i)
-                dst2.Rectangle(ele.Value, tsk.highlight, tsk.lineWidth)
-                dst3.Rectangle(ele.Value, 255, tsk.lineWidth)
+                dst2.Rectangle(ele.Value, task.highlight, task.lineWidth)
+                dst3.Rectangle(ele.Value, 255, task.lineWidth)
             Next
-            labels(2) = CStr(sortedBricks.Count) + " bricks had max Sobel values with high left/right correlation and depth < " + CStr(CInt(tsk.MaxZmeters)) + "m"
+            labels(2) = CStr(sortedBricks.Count) + " bricks had max Sobel values with high left/right correlation and depth < " + CStr(CInt(task.MaxZmeters)) + "m"
         End Sub
     End Class
 
@@ -287,38 +285,38 @@ Namespace VBClasses
         Public results(,) As Single
         Public Sub New()
             labels(2) = "Cursor over each gr to see where the grid points are."
-            tsk.mouseMovePoint = New cv.Point(0, 0) ' this gr is often the most populated.
+            task.mouseMovePoint = New cv.Point(0, 0) ' this gr is often the most populated.
             desc = "Monitor the location of each gr point in a gr."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            bPoint.Run(tsk.gray)
+            bPoint.Run(task.gray)
 
             dst1 = bPoint.dst2
             dst3 = src
 
-            ReDim results(tsk.brickSize - 1, tsk.brickSize - 1)
+            ReDim results(task.brickSize - 1, task.brickSize - 1)
             For Each pt In bPoint.ptList
-                Dim index = tsk.gridMap.Get(Of Integer)(pt.Y, pt.X)
-                Dim gr = tsk.bricks.brickList(index)
+                Dim index = task.gridMap.Get(Of Integer)(pt.Y, pt.X)
+                Dim gr = task.bricks.brickList(index)
                 results(gr.mm.maxLoc.X, gr.mm.maxLoc.Y) += 1
             Next
 
-            Dim incrX = dst1.Width / tsk.brickSize
-            Dim incrY = dst1.Height / tsk.brickSize
-            Dim row = Math.Floor(tsk.mouseMovePoint.Y / incrY)
-            Dim col = Math.Floor(tsk.mouseMovePoint.X / incrX)
+            Dim incrX = dst1.Width / task.brickSize
+            Dim incrY = dst1.Height / task.brickSize
+            Dim row = Math.Floor(task.mouseMovePoint.Y / incrY)
+            Dim col = Math.Floor(task.mouseMovePoint.X / incrX)
 
-            dst2 = cv.Mat.FromPixelData(tsk.brickSize, tsk.brickSize, cv.MatType.CV_32F, results)
+            dst2 = cv.Mat.FromPixelData(task.brickSize, task.brickSize, cv.MatType.CV_32F, results)
 
-            For Each gr In tsk.bricks.brickList
+            For Each gr In task.bricks.brickList
                 If gr.mm.maxLoc.X = col And gr.mm.maxLoc.Y = row Then
                     Dim ptfeat = New cv.Point(gr.mm.maxLoc.X + gr.rect.X, gr.mm.maxLoc.Y + gr.rect.Y)
                     DrawCircle(dst3, ptfeat)
                 End If
             Next
 
-            For y = 0 To tsk.brickSize - 1
-                For x = 0 To tsk.brickSize - 1
+            For y = 0 To task.brickSize - 1
+                For x = 0 To task.brickSize - 1
                     SetTrueText(CStr(results(x, y)), New cv.Point(x * incrX, y * incrY), 2)
                 Next
             Next
@@ -392,7 +390,7 @@ Namespace VBClasses
             desc = "Join the 2 nearest points to each gr point to help find lines."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            bPoint.Run(tsk.gray)
+            bPoint.Run(task.gray)
             dst3 = bPoint.dst3
             If bPoint.ptList.Count < 3 Then Exit Sub
 
@@ -404,13 +402,13 @@ Namespace VBClasses
             For i = 0 To knn.neighbors.Count - 1
                 Dim p1 = knn.trainInput(i)
                 Dim p2 = knn.trainInput(knn.neighbors(i)(1))
-                dst3.Line(p1, p2, 255, tsk.lineWidth, tsk.lineWidth)
+                dst3.Line(p1, p2, 255, task.lineWidth, task.lineWidth)
                 lplist.Add(New lpData(p1, p2))
             Next
 
             dst2 = src.Clone
-            For Each lp In tsk.lines.lpList
-                dst2.Line(lp.p1, lp.p2, tsk.highlight, tsk.lineWidth, tsk.lineWidth)
+            For Each lp In task.lines.lpList
+                dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineWidth)
             Next
         End Sub
     End Class
@@ -421,7 +419,7 @@ Namespace VBClasses
     Public Class NR_BrickPoint_EndPoints : Inherits TaskParent
         Dim brickKNN As New BrickPoint_KNN
         Public Sub New()
-            If standalone Then tsk.gOptions.displayDst1.Checked = True
+            If standalone Then task.gOptions.displayDst1.Checked = True
             dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_32F, 0)
             desc = "Use the lp end points to find lines in the gr points"
         End Sub
@@ -452,7 +450,7 @@ Namespace VBClasses
 
             For Each index In lineList
                 Dim lp = lplist(index)
-                dst2.Line(lp.pE1, lp.pE2, tsk.highlight, tsk.lineWidth, tsk.lineWidth)
+                dst2.Line(lp.pE1, lp.pE2, task.highlight, task.lineWidth, task.lineWidth)
             Next
         End Sub
     End Class
@@ -470,11 +468,11 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             dst2 = src
-            sobel.Run(tsk.gray)
+            sobel.Run(task.gray)
             dst3 = sobel.dst2
 
             features.Clear()
-            For Each rect In tsk.gridRects
+            For Each rect In task.gridRects
                 Dim mm = GetMinMax(sobel.dst2(rect))
                 If mm.maxVal >= sobel.options.sobelThreshold Then
                     Dim pt = New cv.Point(mm.maxLoc.X + rect.X, mm.maxLoc.Y + rect.Y)
@@ -483,7 +481,7 @@ Namespace VBClasses
                 End If
             Next
 
-            labels(2) = "Of the " + CStr(tsk.gridRects.Count) + " candidates, " + CStr(features.Count) +
+            labels(2) = "Of the " + CStr(task.gridRects.Count) + " candidates, " + CStr(features.Count) +
                     " had brickpoint intensity >= " + CStr(sobel.options.sobelThreshold)
         End Sub
     End Class
@@ -545,8 +543,8 @@ Namespace VBClasses
                 threshold = thresholdSlider.value
             End If
 
-            dst2 = tsk.color.Clone
-            For Each rect In tsk.gridRects
+            dst2 = task.color.Clone
+            For Each rect In task.gridRects
                 Dim mm = GetMinMax(src(rect))
                 Dim pt = New cv.Point(mm.maxLoc.X + rect.X, mm.maxLoc.Y + rect.Y)
                 If mm.maxVal >= threshold Then DrawRect(dst2, rect)

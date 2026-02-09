@@ -23,26 +23,26 @@ Public Class SharpGLForm
     Public options As Options_SharpGL
     Public options1 As Options_GL
     Public options2 As Options_SharpGL2
-    Public ppx = tsk.calibData.leftIntrinsics.ppx
-    Public ppy = tsk.calibData.leftIntrinsics.ppy
-    Public fx = tsk.calibData.leftIntrinsics.fx
-    Public fy = tsk.calibData.leftIntrinsics.fy
+    Public ppx = task.calibData.leftIntrinsics.ppx
+    Public ppy = task.calibData.leftIntrinsics.ppy
+    Public fx = task.calibData.leftIntrinsics.fx
+    Public fy = task.calibData.leftIntrinsics.fy
     Public hulls As RedCloud_Basics
     Private Sub GLForm_Load(sender As Object, e As EventArgs) Handles Me.Load
         options = New Options_SharpGL
         options1 = New Options_GL
         options2 = New Options_SharpGL2
 
-        Me.Location = New Point(tsk.settings.sharpGLLeft, tsk.settings.sharpGLTop)
-        Me.Size = New Size(tsk.settings.sharpGLWidth, tsk.settings.sharpGLHeight)
+        Me.Location = New Point(task.settings.sharpGLLeft, task.settings.sharpGLTop)
+        Me.Size = New Size(task.settings.sharpGLWidth, task.settings.sharpGLHeight)
 
         gl = GLControl.OpenGL
     End Sub
     Private Sub sgl_FormClosing(sender As Object, e As FormClosingEventArgs) Handles Me.FormClosing
-        tsk.Settings.sharpGLLeft = Me.Left
-        tsk.Settings.sharpGLTop = Me.Top
-        tsk.Settings.sharpGLWidth = Me.Width
-        tsk.Settings.sharpGLHeight = Me.Height
+        task.Settings.sharpGLLeft = Me.Left
+        task.Settings.sharpGLTop = Me.Top
+        task.Settings.sharpGLWidth = Me.Width
+        task.Settings.sharpGLHeight = Me.Height
     End Sub
     Private Sub OpenGLControl_MouseDown(sender As Object, e As MouseEventArgs) Handles GLControl.MouseDown
         If e.Button = MouseButtons.Right Then
@@ -76,9 +76,9 @@ Public Class SharpGLForm
         End If
     End Sub
     Private Sub prepareSharpGL()
-        If tsk.gOptions.DebugCheckBox.Checked Then
-            tsk.gOptions.DebugCheckBox.Checked = False
-            tsk.sharpGL.resetView()
+        If task.gOptions.DebugCheckBox.Checked Then
+            task.gOptions.DebugCheckBox.Checked = False
+            task.sharpGL.resetView()
         End If
 
         gl.Viewport(0, 0, GLControl.Width, GLControl.Height)
@@ -86,7 +86,7 @@ Public Class SharpGLForm
         'gl.LoadIdentity()
 
         If options1.GL_LinearMode Then
-            Dim mmZ = GetMinMax(tsk.pcSplit(2))
+            Dim mmZ = GetMinMax(task.pcSplit(2))
             Dim xRange = options.xRange
             Dim yRange = options.yRange
             gl.Ortho(-xRange, xRange, -yRange, yRange, mmZ.minVal, mmZ.maxVal)
@@ -143,12 +143,12 @@ Public Class SharpGLForm
         gl.Begin(OpenGL.GL_QUADS)
 
         Dim count As Integer
-        For i = 0 To tsk.gridRects.Count - 1
-            Dim rect = tsk.gridRects(i)
-            Dim depth = -tsk.pcSplit(2)(rect).Mean(tsk.depthmask(rect))(0)
+        For i = 0 To task.gridRects.Count - 1
+            Dim rect = task.gridRects(i)
+            Dim depth = -task.pcSplit(2)(rect).Mean(task.depthmask(rect))(0)
             If depth = 0 Then Continue For
             count += 1
-            Dim color = tsk.color(rect).Mean()
+            Dim color = task.color(rect).Mean()
 
             gl.Color(CSng(color(2) / 255), CSng(color(1) / 255), CSng(color(0) / 255))
             Dim p0 = Cloud_Basics.worldCoordinates(rect.TopLeft, depth)
@@ -169,7 +169,7 @@ Public Class SharpGLForm
         'gl.StencilOp(OpenGL.GL_KEEP, OpenGL.GL_KEEP, OpenGL.GL_REPLACE) ' Replace stencil with 1 on depth pass
         For y = 0 To pc.Height - 1
             For x = 0 To pc.Width - 1
-                If tsk.depthmask.Get(Of Byte)(y, x) <> 0 Then
+                If task.depthmask.Get(Of Byte)(y, x) <> 0 Then
                     Dim vec As cv.Vec3f = pc.At(Of cv.Vec3f)(y, x)
                     Dim vec3b = rgb.Get(Of cv.Vec3b)(y, x)
                     gl.Color(vec3b(2) / 255, vec3b(1) / 255, vec3b(0) / 255)
@@ -182,11 +182,11 @@ Public Class SharpGLForm
         Return CStr(count) + " of " + CStr(pc.Total) + " points were rendered."
     End Function
     Private Sub readPointCloud()
-        tsk.sharpDepth = New cv.Mat(New cv.Size(GLControl.Width, GLControl.Height), cv.MatType.CV_32F, 0)
+        task.sharpDepth = New cv.Mat(New cv.Size(GLControl.Width, GLControl.Height), cv.MatType.CV_32F, 0)
         gl.ReadPixels(0, 0, GLControl.Width, GLControl.Height, OpenGL.GL_DEPTH_COMPONENT,
-                      OpenGL.GL_FLOAT, tsk.sharpDepth.Data)
-        tsk.sharpDepth = tsk.sharpDepth.Resize(tsk.workRes)
-        tsk.sharpDepth = tsk.sharpDepth.Flip(cv.FlipMode.X)
+                      OpenGL.GL_FLOAT, task.sharpDepth.Data)
+        task.sharpDepth = task.sharpDepth.Resize(task.workRes)
+        task.sharpDepth = task.sharpDepth.Flip(cv.FlipMode.X)
     End Sub
     Private Sub optionsSetup()
         options.Run()
@@ -198,8 +198,8 @@ Public Class SharpGLForm
         optionsSetup()
 
         Dim label = ""
-        If pointcloud Is Nothing Then pointcloud = tsk.pointCloud
-        If RGB Is Nothing Then RGB = tsk.color
+        If pointcloud Is Nothing Then pointcloud = task.pointCloud
+        If RGB Is Nothing Then RGB = task.color
         Select Case func
             Case Common.oCase.readPC
                 label = drawCloud(pointcloud, RGB)
@@ -207,7 +207,7 @@ Public Class SharpGLForm
 
             Case Common.oCase.readLines
                 label = drawCloud(pointcloud, RGB)
-                label += draw3DLines(tsk.lines.lpList)
+                label += draw3DLines(task.lines.lpList)
                 readPointCloud()
 
             Case Common.oCase.readQuads
@@ -248,12 +248,12 @@ Public Class SharpGLForm
                 drawQuads()
 
             Case Common.oCase.draw3DLines
-                label = draw3DLines(tsk.lines.lpList)
+                label = draw3DLines(task.lines.lpList)
 
             Case Common.oCase.draw3DLinesAndCloud
                 label = drawCloud(pointcloud, RGB)
 
-                label += " " + draw3DLines(tsk.lines.lpList)
+                label += " " + draw3DLines(task.lines.lpList)
         End Select
 
         gl.Flush()
@@ -269,7 +269,7 @@ Public Class SharpGLForm
             gl.Vertex(lp.pVec2(0), -lp.pVec2(1), -lp.pVec2(2))
         Next
         gl.End()
-        Return tsk.lines.labels(2)
+        Return task.lines.labels(2)
     End Function
     Public Function RunLines(func As Integer, lpList As List(Of lpData)) As String
         optionsSetup()
@@ -279,7 +279,7 @@ Public Class SharpGLForm
             Case Common.oCase.draw3DLines
                 label = draw3DLines(lpList)
             Case Common.oCase.draw3DLinesAndCloud
-                label = drawCloud(tsk.pointCloud, tsk.color)
+                label = drawCloud(task.pointCloud, task.color)
                 label += " " + draw3DLines(lpList)
         End Select
 
@@ -314,10 +314,10 @@ Public Class SharpGLForm
 
             Case Common.oCase.imageTriangles
                 If hulls Is Nothing Then hulls = New RedCloud_Basics
-                hulls.Run(tsk.color)
+                hulls.Run(task.color)
 
                 Dim textureID As UInt32() = New UInt32(0) {} ' Array to hold the texture ID
-                Dim rgba As cv.Mat = tsk.color.CvtColor(cv.ColorConversionCodes.BGR2RGBA)
+                Dim rgba As cv.Mat = task.color.CvtColor(cv.ColorConversionCodes.BGR2RGBA)
                 Dim bitmap As Bitmap = rgba.ToBitmap()
 
                 gl.GenTextures(1, textureID)
@@ -336,8 +336,8 @@ Public Class SharpGLForm
 
                 gl.Begin(OpenGL.GL_TRIANGLES)
 
-                Dim w = tsk.workRes.Width
-                Dim h = tsk.workRes.Height
+                Dim w = task.workRes.Width
+                Dim h = task.workRes.Height
                 Dim pt As cv.Point
                 Dim vec(2) As cv.Vec3f
                 Dim pts(2) As cv.Point
@@ -357,7 +357,7 @@ Public Class SharpGLForm
                             End Select
 
                             pts(j) = pt
-                            vec(j) = tsk.pointCloud.Get(Of cv.Vec3f)(pt.Y, pt.X)
+                            vec(j) = task.pointCloud.Get(Of cv.Vec3f)(pt.Y, pt.X)
                             If vec(j)(0) = 0 Or vec(j)(1) = 0 Or vec(j)(2) = 0 Then goodDepth = False
                         Next
 
@@ -380,10 +380,10 @@ Public Class SharpGLForm
         Return label
     End Function
     Private Sub SharpGLForm_ResizeEnd(sender As Object, e As EventArgs) Handles Me.ResizeEnd
-        tsk.Settings.sharpGLLeft = Me.Left
-        tsk.Settings.sharpGLTop = Me.Top
-        tsk.Settings.sharpGLWidth = Me.Width
-        tsk.Settings.sharpGLHeight = Me.Height
+        task.Settings.sharpGLLeft = Me.Left
+        task.Settings.sharpGLTop = Me.Top
+        task.Settings.sharpGLWidth = Me.Width
+        task.Settings.sharpGLHeight = Me.Height
     End Sub
 End Class
 

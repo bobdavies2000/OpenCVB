@@ -13,7 +13,7 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
 
-            If tsk.optionsChanged Then
+            If task.optionsChanged Then
                 BGSubtract_BGFG_Close(cPtr)
                 cPtr = BGSubtract_BGFG_Open(options.currMethod)
             End If
@@ -123,17 +123,17 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
 
-            If tsk.optionsChanged Or tsk.frameCount < 10 Then src.CopyTo(dst3)
+            If task.optionsChanged Or task.frameCount < 10 Then src.CopyTo(dst3)
             Dim threadCount = options.threadData(0)
             Dim width = options.threadData(1), height = options.threadData(2)
-            Dim taskArray(threadCount - 1) As System.Threading.Tasks.Task
+            Dim taskArray(threadCount - 1) As System.Threading.Tasks.task
             Dim xfactor = CInt(src.Width / width)
             Dim yfactor = Math.Max(CInt(src.Height / height), CInt(src.Width / width))
             dst2.SetTo(0)
             Dim motionFound As Boolean
             For i = 0 To threadCount - 1
                 Dim section = i
-                taskArray(i) = System.Threading.Tasks.Task.Factory.StartNew(
+                taskArray(i) = System.Threading.Tasks.task.Factory.StartNew(
                 Sub()
                     Dim roi = New cv.Rect((section Mod xfactor) * width, height * Math.Floor(section / yfactor), width, height)
                     Dim correlation As New cv.Mat
@@ -147,7 +147,7 @@ Namespace VBClasses
                     End If
                 End Sub)
             Next
-            System.Threading.Tasks.Task.WaitAll(taskArray)
+            System.Threading.Tasks.task.WaitAll(taskArray)
             If motionFound = False Then SetTrueText("No motion detected in any of the regions")
         End Sub
     End Class
@@ -190,13 +190,13 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
-            If tsk.frameCount < 120 Then
-                SetTrueText("Waiting to get sufficient frames to learn background.  frameCount = " + CStr(tsk.frameCount))
+            If task.frameCount < 120 Then
+                SetTrueText("Waiting to get sufficient frames to learn background.  frameCount = " + CStr(task.frameCount))
             Else
                 SetTrueText("")
             End If
 
-            gmg.Apply(tsk.gray, dst2, options.learnRate)
+            gmg.Apply(task.gray, dst2, options.learnRate)
             knn.Apply(dst2, dst2, options.learnRate)
         End Sub
         Public Overloads Sub Dispose() Implements IDisposable.Dispose
@@ -224,11 +224,11 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
-            grayMat = tsk.depthRGB.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+            grayMat = task.depthRGB.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
             MOGDepth.Apply(grayMat, grayMat, options.learnRate)
             dst2 = grayMat.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
 
-            MOGRGB.Apply(tsk.gray, dst3, options.learnRate)
+            MOGRGB.Apply(task.gray, dst3, options.learnRate)
         End Sub
         Public Overloads Sub Dispose() Implements IDisposable.Dispose
             If MOGDepth IsNot Nothing Then MOGDepth.Dispose()
@@ -246,7 +246,7 @@ Namespace VBClasses
             desc = "Use the bio-inspired retina algorithm to create a background/foreground using depth."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            retina.Run(tsk.depthRGB)
+            retina.Run(task.depthRGB)
             bgSub.Run(retina.dst3.Clone())
             dst2 = bgSub.dst2
             cv.Cv2.Subtract(bgSub.dst2, retina.dst3, dst3)
@@ -279,7 +279,7 @@ Namespace VBClasses
         Dim bgSub As New BGSubtract_Basics
         Dim video As New Video_Basics
         Public Sub New()
-            video.options.fileInfo = New FileInfo(tsk.homeDir + "opencv/Samples/Data/vtest.avi")
+            video.options.fileInfo = New FileInfo(task.homeDir + "opencv/Samples/Data/vtest.avi")
             desc = "Demonstrate all background subtraction algorithms in OpenCV using a video instead of camera."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -307,15 +307,15 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
-            If tsk.optionsChanged Then
-                If Not tsk.firstPass Then BGSubtract_Synthetic_Close(cPtr)
+            If task.optionsChanged Then
+                If Not task.firstPass Then BGSubtract_Synthetic_Close(cPtr)
 
                 Dim dataSrc(src.Total * src.ElemSize - 1) As Byte
                 Marshal.Copy(src.Data, dataSrc, 0, dataSrc.Length)
                 Dim handleSrc = GCHandle.Alloc(dataSrc, GCHandleType.Pinned)
 
                 cPtr = BGSubtract_Synthetic_Open(handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols,
-                                             tsk.homeDir + "opencv/Samples/Data/baboon.jpg",
+                                             task.homeDir + "opencv/Samples/Data/baboon.jpg",
                                              options.amplitude / 100, options.magnitude, options.waveSpeed / 100, options.objectSpeed)
                 handleSrc.Free()
             End If

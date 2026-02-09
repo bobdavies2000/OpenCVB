@@ -70,14 +70,14 @@ Namespace VBClasses
         Public Function PrepareReport(treeData As List(Of String)) As String
             Static percentTime As String = ""
 
-            Dim algorithm_ms = New List(Of Single)(tsk.cpu.algorithm_ms)
+            Dim algorithm_ms = New List(Of Single)(task.cpu.algorithm_ms)
             Dim sumTime As Single
             For i = 0 To algorithm_ms.Count - 1
                 sumTime += algorithm_ms(i)
             Next
             If sumTime = 0 Then Return percentTime
             For i = 0 To algorithm_ms.Count - 1
-                tsk.cpu.algorithm_ms(i) = 0
+                task.cpu.algorithm_ms(i) = 0
             Next
             For Each percent In algorithm_ms
                 percent /= sumTime
@@ -89,21 +89,21 @@ Namespace VBClasses
             For i = 0 To algorithm_ms.Count - 1
                 algorithm_ms(i) /= sumTime
                 If algorithm_ms(i) < 0 Then algorithm_ms(i) = 0
-                If i >= tsk.cpu.algorithmNames.Count Then Exit For
-                Dim str = Format(algorithm_ms(i), "00.0%") + " " + tsk.cpu.algorithmNames(i)
-                If tsk.cpu.displayObjectName IsNot Nothing Then
-                    If tsk.cpu.displayObjectName.Length > 0 Then
-                        If str.Contains(tsk.cpu.displayObjectName) Then percentStr = str
+                If i >= task.cpu.algorithmNames.Count Then Exit For
+                Dim str = Format(algorithm_ms(i), "00.0%") + " " + task.cpu.algorithmNames(i)
+                If task.cpu.displayObjectName IsNot Nothing Then
+                    If task.cpu.displayObjectName.Length > 0 Then
+                        If str.Contains(task.cpu.displayObjectName) Then percentStr = str
                     End If
                 End If
-                If tsk.cpu.algorithmNames(i).Contains("Wait For Input") Then
+                If task.cpu.algorithmNames(i).Contains("Wait For Input") Then
                     saveWaitTime = str
                 Else
                     PercentTimes.Add(algorithm_ms(i), str)
                 End If
             Next
-            Dim paintStr = Format(tsk.cpu.paintTime, fmt1) + " ms paint time"
-            tsk.cpu.paintTime = 0
+            Dim paintStr = Format(task.cpu.paintTime, fmt1) + " ms paint time"
+            task.cpu.paintTime = 0
 
             Dim otherTimes As New List(Of Single)
             For Each percent In PercentTimes.Keys
@@ -111,9 +111,9 @@ Namespace VBClasses
             Next
 
             percentTime = "Click on an algorithm to see more info. " + vbCrLf + vbCrLf
-            percentTime += "Algorithm FPS = " + Format(tsk.fpsAlgorithm, fmt0) + vbCrLf
-            percentTime += "Camera FPS = " + Format(tsk.fpsCamera, fmt0) + vbCrLf
-            percentTime += "Target Display FPS = " + CStr(tsk.Settings.FPSPaintTarget) + vbCrLf + vbCrLf
+            percentTime += "Algorithm FPS = " + Format(task.fpsAlgorithm, fmt0) + vbCrLf
+            percentTime += "Camera FPS = " + Format(task.fpsCamera, fmt0) + vbCrLf
+            percentTime += "Target Display FPS = " + CStr(task.Settings.FPSPaintTarget) + vbCrLf + vbCrLf
 
             Dim timeDataTree As New List(Of String)(treeData)
             percentTime += saveWaitTime + vbCrLf

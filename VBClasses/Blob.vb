@@ -93,8 +93,8 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             input.Run(src)
             dst2 = input.dst2
-            If tsk.frameCount Mod input.updateFrequency = 0 Then
-                Dim binary = tsk.gray.Threshold(0, 255, cv.ThresholdTypes.Otsu Or cv.ThresholdTypes.Binary)
+            If task.frameCount Mod input.updateFrequency = 0 Then
+                Dim binary = task.gray.Threshold(0, 255, cv.ThresholdTypes.Otsu Or cv.ThresholdTypes.Binary)
                 Dim labelView = dst2.EmptyClone
                 Dim stats As New cv.Mat
                 Dim centroids As New cv.Mat
@@ -103,15 +103,15 @@ Namespace VBClasses
                 cc.RenderBlobs(labelView)
 
                 For Each b In cc.Blobs.Skip(1)
-                    dst2.Rectangle(b.Rect, cv.Scalar.Red, tsk.lineWidth + 1, tsk.lineType)
+                    dst2.Rectangle(b.Rect, cv.Scalar.Red, task.lineWidth + 1, task.lineType)
                 Next
 
                 Dim maxBlob = cc.GetLargestBlob()
                 dst3.SetTo(0)
                 cc.FilterByBlob(dst2, dst3, maxBlob)
 
-                DrawCircle(dst3, New cv.Point(maxBlob.Centroid.X, maxBlob.Centroid.Y), tsk.DotSize + 3, cv.Scalar.Blue)
-                DrawCircle(dst3, New cv.Point(maxBlob.Centroid.X, maxBlob.Centroid.Y), tsk.DotSize, cv.Scalar.Yellow)
+                DrawCircle(dst3, New cv.Point(maxBlob.Centroid.X, maxBlob.Centroid.Y), task.DotSize + 3, cv.Scalar.Blue)
+                DrawCircle(dst3, New cv.Point(maxBlob.Centroid.X, maxBlob.Centroid.Y), task.DotSize, cv.Scalar.Yellow)
             End If
         End Sub
     End Class

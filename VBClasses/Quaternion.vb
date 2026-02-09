@@ -41,37 +41,37 @@ Namespace VBClasses
 
             Dim dt = host.HostInterruptDelayEstimate
 
-            Dim t = tsk.IMU_Translation
-            Dim predictedTranslation = New cv.Point3f(dt * (dt / 2 * tsk.IMU_Acceleration.X + tsk.IMU_AngularVelocity.X) + t.X,
-                                                  dt * (dt / 2 * tsk.IMU_Acceleration.Y + tsk.IMU_AngularVelocity.Y) + t.Y,
-                                                  dt * (dt / 2 * tsk.IMU_Acceleration.Z + tsk.IMU_AngularVelocity.Z) + t.Z)
+            Dim t = task.IMU_Translation
+            Dim predictedTranslation = New cv.Point3f(dt * (dt / 2 * task.IMU_Acceleration.X + task.IMU_AngularVelocity.X) + t.X,
+                                                  dt * (dt / 2 * task.IMU_Acceleration.Y + task.IMU_AngularVelocity.Y) + t.Y,
+                                                  dt * (dt / 2 * task.IMU_Acceleration.Z + task.IMU_AngularVelocity.Z) + t.Z)
 
-            Dim predictedW = New cv.Point3f(dt * (dt / 2 * tsk.IMU_AngularAcceleration.X + tsk.IMU_AngularVelocity.X),
-                                        dt * (dt / 2 * tsk.IMU_AngularAcceleration.Y + tsk.IMU_AngularVelocity.Y),
-                                        dt * (dt / 2 * tsk.IMU_AngularAcceleration.Z + tsk.IMU_AngularVelocity.Z))
+            Dim predictedW = New cv.Point3f(dt * (dt / 2 * task.IMU_AngularAcceleration.X + task.IMU_AngularVelocity.X),
+                                        dt * (dt / 2 * task.IMU_AngularAcceleration.Y + task.IMU_AngularVelocity.Y),
+                                        dt * (dt / 2 * task.IMU_AngularAcceleration.Z + task.IMU_AngularVelocity.Z))
 
             Dim predictedRotation As New Quaternion
-            predictedRotation = Quaternion.Multiply(quaternion_exp(predictedW), tsk.IMU_Rotation)
+            predictedRotation = Quaternion.Multiply(quaternion_exp(predictedW), task.IMU_Rotation)
 
-            Dim diffq = Quaternion.Subtract(tsk.IMU_Rotation, predictedRotation)
+            Dim diffq = Quaternion.Subtract(task.IMU_Rotation, predictedRotation)
 
             SetTrueText("IMU_Acceleration = " + vbTab +
-                                 Format(tsk.IMU_Acceleration.X, fmt3) + vbTab +
-                                 Format(tsk.IMU_Acceleration.Y, fmt3) + vbTab +
-                                 Format(tsk.IMU_Acceleration.Z, fmt3) + vbTab + vbCrLf +
+                                 Format(task.IMU_Acceleration.X, fmt3) + vbTab +
+                                 Format(task.IMU_Acceleration.Y, fmt3) + vbTab +
+                                 Format(task.IMU_Acceleration.Z, fmt3) + vbTab + vbCrLf +
                     "IMU_AngularAccel. = " + vbTab +
-                                 Format(tsk.IMU_AngularAcceleration.X, fmt3) + vbTab +
-                                 Format(tsk.IMU_AngularAcceleration.Y, fmt3) + vbTab +
-                                 Format(tsk.IMU_AngularAcceleration.Z, fmt3) + vbTab + vbCrLf +
+                                 Format(task.IMU_AngularAcceleration.X, fmt3) + vbTab +
+                                 Format(task.IMU_AngularAcceleration.Y, fmt3) + vbTab +
+                                 Format(task.IMU_AngularAcceleration.Z, fmt3) + vbTab + vbCrLf +
                     "IMU_AngularVelocity = " + vbTab +
-                                 Format(tsk.IMU_AngularVelocity.X, fmt3) + vbTab +
-                                 Format(tsk.IMU_AngularVelocity.Y, fmt3) + vbTab +
-                                 Format(tsk.IMU_AngularVelocity.Z, fmt3) + vbTab + vbCrLf + vbCrLf +
+                                 Format(task.IMU_AngularVelocity.X, fmt3) + vbTab +
+                                 Format(task.IMU_AngularVelocity.Y, fmt3) + vbTab +
+                                 Format(task.IMU_AngularVelocity.Z, fmt3) + vbTab + vbCrLf + vbCrLf +
                     "dt = " + dt.ToString() + vbCrLf + vbCrLf +
                     "Pose quaternion = " + vbTab +
-                                 Format(tsk.IMU_Rotation.X, fmt3) + vbTab +
-                                 Format(tsk.IMU_Rotation.Y, fmt3) + vbTab +
-                                 Format(tsk.IMU_Rotation.Z, fmt3) + vbTab + vbCrLf +
+                                 Format(task.IMU_Rotation.X, fmt3) + vbTab +
+                                 Format(task.IMU_Rotation.Y, fmt3) + vbTab +
+                                 Format(task.IMU_Rotation.Z, fmt3) + vbTab + vbCrLf +
                     "Prediction Rotation = " + vbTab +
                                  Format(predictedRotation.X, fmt3) + vbTab +
                                  Format(predictedRotation.Y, fmt3) + vbTab +

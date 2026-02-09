@@ -10,10 +10,10 @@ Namespace VBClasses
             desc = "A 2D histogram is built from 2 channels of any 3-channel input and the results are displayed."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            Dim index As Integer = tsk.gridMap.Get(Of Integer)(tsk.mouseMovePoint.Y, tsk.mouseMovePoint.X)
-            Dim gr = tsk.gridRects(index)
+            Dim index As Integer = task.gridMap.Get(Of Integer)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
+            Dim gr = task.gridRects(index)
 
-            colorFmt.Run(tsk.color)
+            colorFmt.Run(task.color)
             hist2d.Run(colorFmt.dst2)
             dst2 = hist2d.dst2
 
@@ -21,7 +21,7 @@ Namespace VBClasses
 
             Dim histogram As New cv.Mat
             If backProjectByGrid Then
-                histogram = tsk.gridMap.Clone
+                histogram = task.gridMap.Clone
             Else
                 histogram = New cv.Mat(hist2d.histogram.Size, cv.MatType.CV_32F, cv.Scalar.All(0))
                 hist2d.histogram(gr).CopyTo(histogram(gr))
@@ -38,9 +38,9 @@ Namespace VBClasses
                 dst3.SetTo(0)
                 dst3.SetTo(cv.Scalar.Yellow, dst0)
             End If
-            If tsk.heartBeat Then
+            If task.heartBeat Then
                 labels(2) = colorFmt.options.colorFormat + " format " + If(classCount > 0, CStr(classCount) + " classes", " ")
-                Dim c1 = tsk.channels(0), c2 = tsk.channels(1)
+                Dim c1 = task.channels(0), c2 = task.channels(1)
                 labels(3) = "That combination of channel " + CStr(c1) + "/" + CStr(c2) + " has " + CStr(bpCount) +
                             " pixels while image total is " + Format(dst0.Total, "0")
             End If
@@ -63,32 +63,32 @@ Namespace VBClasses
     '    Public colorFmt As New Color_Basics
     '    Public bpCol As Integer, bpRow As Integer
     '    Public Sub New()
-    '        If standalone Then tsk.gOptions.setGridSize(5)
+    '        If standalone Then task.gOptions.setGridSize(5)
     '        desc = "A 2D histogram is built from 2 channels of any 3-channel input and the results are displayed."
     '    End Sub
     '    Public Overrides sub RunAlg(src As cv.Mat)
-    '        bpCol = Math.Floor(tsk.mouseMovePoint.X / tsk.bricksPerRow)
-    '        bpRow = Math.Floor(tsk.mouseMovePoint.Y / tsk.bricksPerCol)
+    '        bpCol = Math.Floor(task.mouseMovePoint.X / task.bricksPerRow)
+    '        bpRow = Math.Floor(task.mouseMovePoint.Y / task.bricksPerCol)
 
     '        colorFmt.Run(src)
     '        hist2d.Run(colorFmt.dst2)
     '        dst2 = hist2d.dst2
 
-    '        minX = bpRow * xRange / tsk.brickSize
-    '        maxX = (bpRow + 1) * xRange / tsk.brickSize
-    '        minY = bpCol * yRange / tsk.brickSize
-    '        maxY = (bpCol + 1) * yRange / tsk.brickSize
+    '        minX = bpRow * xRange / task.brickSize
+    '        maxX = (bpRow + 1) * xRange / task.brickSize
+    '        minY = bpCol * yRange / task.brickSize
+    '        maxY = (bpCol + 1) * yRange / task.brickSize
 
     '        Dim ranges() = New cv.Rangef() {New cv.Rangef(minX, maxX), New cv.Rangef(minY, maxY)}
-    '        cv.Cv2.CalcBackProject({src}, tsk.gOptions.channels, hist2d.histogram, dst0, ranges)
+    '        cv.Cv2.CalcBackProject({src}, task.gOptions.channels, hist2d.histogram, dst0, ranges)
     '        Dim bpCount = hist2d.histogram.Get(Of Single)(bpRow, bpCol)
 
     '        dst3.SetTo(0)
     '        dst3.SetTo(cv.Scalar.Yellow, dst0)
-    '        If tsk.heartBeat Then
+    '        If task.heartBeat Then
     '            labels(2) = colorFmt.options.colorFormat + ": Cell minX/maxX " + Format(minX, "0") + "/" + Format(maxX, "0") + " minY/maxY " +
     '                                Format(minY, "0") + "/" + Format(maxY, "0")
-    '            Dim c1 = tsk.gOptions.channels(0), c2 = tsk.gOptions.channels(1)
+    '            Dim c1 = task.gOptions.channels(0), c2 = task.gOptions.channels(1)
     '            labels(3) = "That combination of channel " + CStr(c1) + "/" + CStr(c2) + " has " + CStr(bpCount) +
     '                        " pixels while image total is " + Format(dst0.Total, "0")
     '        End If
@@ -107,18 +107,18 @@ Namespace VBClasses
         Dim mats As New Mat_4Click
         Public Sub New()
             labels(2) = "Hue (upper left), sat (upper right), highlighted backprojection (bottom left)"
-            If standalone Then tsk.gOptions.GridSlider.Value = 10
+            If standalone Then task.gOptions.GridSlider.Value = 10
             desc = "Compare the hue and brightness images and the results of the Histogram_backprojection2d"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            hueSat.Run(tsk.color.Clone)
+            hueSat.Run(task.color.Clone)
             mats.mat(0) = hueSat.dst2
             mats.mat(1) = hueSat.dst3
 
-            backP.Run(tsk.color)
+            backP.Run(task.color)
             mats.mat(2) = backP.dst3
 
-            If tsk.firstPass Then mats.quadrant = 3
+            If task.firstPass Then mats.quadrant = 3
             mats.Run(emptyMat)
             dst2 = mats.dst2
             dst3 = mats.dst3
@@ -147,7 +147,7 @@ Namespace VBClasses
             heat.Run(src)
             dst2 = heat.dst2
 
-            cv.Cv2.CalcBackProject({tsk.pointCloud}, tsk.channelsTop, heat.histogramTop, dst1, tsk.rangesTop)
+            cv.Cv2.CalcBackProject({task.pointCloud}, task.channelsTop, heat.histogramTop, dst1, task.rangesTop)
             dst1 = dst1.ConvertScaleAbs()
             dst1.ConvertTo(dst1, cv.MatType.CV_8U)
             dst3 = PaletteFull(dst1)
@@ -168,7 +168,7 @@ Namespace VBClasses
             heat.Run(src)
             dst2 = heat.dst3
 
-            cv.Cv2.CalcBackProject({tsk.pointCloud}, tsk.channelsSide, heat.histogramSide, dst1, tsk.rangesSide)
+            cv.Cv2.CalcBackProject({task.pointCloud}, task.channelsSide, heat.histogramSide, dst1, task.rangesSide)
             dst1 = dst1.ConvertScaleAbs()
             dst1.ConvertTo(dst1, cv.MatType.CV_8U)
             dst3 = PaletteFull(dst1)
@@ -187,12 +187,12 @@ Namespace VBClasses
         Public histogram As New cv.Mat
         Public Sub New()
             dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_32FC3, 0)
-            tsk.gOptions.setHistogramBins(100) ' extra bins to help isolate the stragglers.
+            task.gOptions.setHistogramBins(100) ' extra bins to help isolate the stragglers.
             desc = "Filter a 2D histogram for the backprojection."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             If standaloneTest() Then
-                cv.Cv2.CalcHist({tsk.pointCloud}, tsk.channelsSide, New cv.Mat, histogram, 2, tsk.bins2D, tsk.rangesSide)
+                cv.Cv2.CalcHist({task.pointCloud}, task.channelsSide, New cv.Mat, histogram, 2, task.bins2D, task.rangesSide)
             End If
             'histogram.Col(0).SetTo(0)
             dst2 = histogram.Threshold(threshold, 255, cv.ThresholdTypes.Binary)
@@ -215,17 +215,17 @@ Namespace VBClasses
             options.Run()
 
             Dim histogram As New cv.Mat
-            cv.Cv2.CalcHist({tsk.pointCloud}, tsk.channelsSide, New cv.Mat, histogram, 2, tsk.bins2D, tsk.rangesSide)
+            cv.Cv2.CalcHist({task.pointCloud}, task.channelsSide, New cv.Mat, histogram, 2, task.bins2D, task.rangesSide)
 
             filter.threshold = options.sideThreshold
             filter.histogram = histogram
             filter.Run(src)
 
-            cv.Cv2.CalcBackProject({tsk.pointCloud}, tsk.channelsSide, filter.histogram, dst1, tsk.rangesSide)
+            cv.Cv2.CalcBackProject({task.pointCloud}, task.channelsSide, filter.histogram, dst1, task.rangesSide)
             dst1.ConvertTo(dst1, cv.MatType.CV_8U)
 
             dst2.SetTo(0)
-            tsk.pointCloud.CopyTo(dst2, dst1)
+            task.pointCloud.CopyTo(dst2, dst1)
         End Sub
     End Class
 
@@ -246,17 +246,17 @@ Namespace VBClasses
             options.Run()
 
             Dim histogram As New cv.Mat
-            cv.Cv2.CalcHist({tsk.pointCloud}, tsk.channelsSide, New cv.Mat, histogram, 2, tsk.bins2D, tsk.rangesSide)
+            cv.Cv2.CalcHist({task.pointCloud}, task.channelsSide, New cv.Mat, histogram, 2, task.bins2D, task.rangesSide)
 
             filter.threshold = options.topThreshold
             filter.histogram = histogram
             filter.Run(src)
 
-            cv.Cv2.CalcBackProject({tsk.pointCloud}, tsk.channelsTop, filter.dst2, dst1, tsk.rangesTop)
+            cv.Cv2.CalcBackProject({task.pointCloud}, task.channelsTop, filter.dst2, dst1, task.rangesTop)
             dst1.ConvertTo(dst1, cv.MatType.CV_8U)
 
             dst2.SetTo(0)
-            tsk.pointCloud.CopyTo(dst2, dst1)
+            task.pointCloud.CopyTo(dst2, dst1)
         End Sub
     End Class
 
@@ -278,8 +278,8 @@ Namespace VBClasses
             filterTop.Run(src)
 
             dst2.SetTo(0)
-            tsk.pointCloud.CopyTo(dst2, filterSide.dst1)
-            tsk.pointCloud.CopyTo(dst3, filterTop.dst1)
+            task.pointCloud.CopyTo(dst2, filterSide.dst1)
+            task.pointCloud.CopyTo(dst3, filterTop.dst1)
         End Sub
     End Class
 
@@ -316,46 +316,46 @@ Namespace VBClasses
         Dim options As New Options_BackProject2D
         Public Sub New()
             OptionParent.findRadio("HSV").Checked = True
-            If standalone Then tsk.gOptions.displayDst1.Checked = True
-            tsk.gOptions.GridSlider.Value = 10
+            If standalone Then task.gOptions.displayDst1.Checked = True
+            task.gOptions.GridSlider.Value = 10
             desc = "Backproject the whole row or column of the 2D histogram"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
 
-            dst0 = tsk.color.Clone
+            dst0 = task.color.Clone
 
             Dim selection = If(options.backProjectRow, "Row", "Col")
             labels(2) = "Histogram 2D with Backprojection by " + selection
 
-            backp.Run(tsk.color)
+            backp.Run(task.color)
             dst2 = Mat_Convert.Mat_32f_To_8UC3(backp.dst2) * 255
 
-            Dim gr = tsk.gridRects(tsk.gridMap.Get(Of Integer)(tsk.mouseMovePoint.Y,
-                                                                 tsk.mouseMovePoint.X))
+            Dim gr = task.gridRects(task.gridMap.Get(Of Integer)(task.mouseMovePoint.Y,
+                                                                 task.mouseMovePoint.X))
             Dim rect As cv.Rect
             If options.backProjectRow Then
                 rect = New cv.Rect(0, gr.Y, dst2.Width, gr.Height)
             Else
                 rect = New cv.Rect(gr.X, 0, gr.Width, dst2.Height)
             End If
-            dst2.Rectangle(rect, tsk.highlight, tsk.lineWidth)
+            dst2.Rectangle(rect, task.highlight, task.lineWidth)
             Dim histData As New cv.Mat(backp.hist2d.histogram.Size, cv.MatType.CV_32F, cv.Scalar.All(0))
             backp.hist2d.histogram(rect).CopyTo(histData(rect))
 
             Dim ranges() = backp.hist2d.ranges
-            cv.Cv2.CalcBackProject({tsk.color}, backp.hist2d.channels, histData, dst1, ranges)
+            cv.Cv2.CalcBackProject({task.color}, backp.hist2d.channels, histData, dst1, ranges)
 
             dst3.SetTo(0)
             dst3.SetTo(cv.Scalar.Yellow, dst1)
             dst0.SetTo(0, dst1)
 
-            If tsk.heartBeat Then
+            If task.heartBeat Then
                 Dim count = histData(rect).Sum
                 labels(3) = "Selected " + selection + " = " + CStr(histData(rect).CountNonZero) + " non-zero histogram entries representing total pixels of " + CStr(count)
             End If
 
-            If tsk.heartBeat Then
+            If task.heartBeat Then
                 strOut = "Use Global Algorithm Option 'grid Square Size' to control the 2D histogram." + vbCrLf +
                      "Move mouse in 2D histogram to select a row or column to backproject."
             End If

@@ -10,8 +10,8 @@ Namespace VBClasses
             Else
                 dst2 = runRedList(src, labels(2))
             End If
-            dst1 = tsk.redList.dst1
-            SetTrueText(tsk.redList.strOut, 3)
+            dst1 = task.redList.dst1
+            SetTrueText(task.redList.strOut, 3)
         End Sub
     End Class
 
@@ -21,12 +21,12 @@ Namespace VBClasses
 
     Public Class NR_Flood_CellStatsPlot : Inherits TaskParent
         Public Sub New()
-            tsk.gOptions.setHistogramBins(1000)
+            task.gOptions.setHistogramBins(1000)
             desc = "Provide cell stats on the flood_basics cells.  Identical to RedCell_FloodFill"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             dst2 = runRedList(src, labels(2))
-            SetTrueText(tsk.redList.strOut, 3)
+            SetTrueText(task.redList.strOut, 3)
         End Sub
     End Class
 
@@ -45,12 +45,12 @@ Namespace VBClasses
             If standalone Then dst2 = runRedList(src, labels(2))
 
             Dim removeCells As New List(Of Integer)
-            For i = tsk.redList.oldrclist.Count - 1 To 0 Step -1
-                Dim rc = tsk.redList.oldrclist(i)
+            For i = task.redList.oldrclist.Count - 1 To 0 Step -1
+                Dim rc = task.redList.oldrclist(i)
                 Dim nabs As New List(Of Integer)
                 Dim contains As New List(Of Integer)
-                For j = 0 To tsk.redList.oldrclist.Count - 1
-                    Dim rcBig = tsk.redList.oldrclist(j)
+                For j = 0 To task.redList.oldrclist.Count - 1
+                    Dim rcBig = task.redList.oldrclist(j)
                     If rcBig.rect.IntersectsWith(rc.rect) Then nabs.Add(rcBig.index)
                     If rcBig.rect.Contains(rc.rect) Then contains.Add(rcBig.index)
                 Next
@@ -59,11 +59,11 @@ Namespace VBClasses
 
             dst3.SetTo(0)
             For Each index In removeCells
-                Dim rc = tsk.redList.oldrclist(index)
+                Dim rc = task.redList.oldrclist(index)
                 dst3(rc.rect).SetTo(rc.color, rc.mask)
             Next
 
-            If tsk.heartBeat Then
+            If task.heartBeat Then
                 labels(3) = CStr(removeCells.Count) + " cells were completely contained in another cell's rect"
             End If
         End Sub
@@ -82,7 +82,7 @@ Namespace VBClasses
             desc = "Subdivide the Flood_Basics cells using depth tiers."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            Dim tier = tsk.gOptions.DebugSlider.Value
+            Dim tier = task.gOptions.DebugSlider.Value
 
             tiers.Run(src)
             If tier >= tiers.classCount Then tier = 0
@@ -123,15 +123,15 @@ Namespace VBClasses
             prep.Run(src)
             dst2 = prep.dst2
 
-            If tsk.mouseClickFlag Then
+            If task.mouseClickFlag Then
                 Dim rect As New cv.Rect
-                Dim pt = tsk.clickPoint
+                Dim pt = task.clickPoint
                 Dim mask = New cv.Mat(New cv.Size(dst2.Width + 2, dst2.Height + 2), cv.MatType.CV_8U, 0)
                 Dim flags = cv.FloodFillFlags.FixedRange Or (255 << 8) Or cv.FloodFillFlags.MaskOnly
                 Dim count = cv.Cv2.FloodFill(dst2, mask, pt, 255, rect, 0, 0, flags)
                 dst1.SetTo(0)
                 dst3 = mask(New cv.Rect(1, 1, dst2.Width, dst2.Height)).Clone
-                dst1.Rectangle(rect, 255, tsk.lineWidth)
+                dst1.Rectangle(rect, 255, task.lineWidth)
             End If
         End Sub
     End Class
@@ -153,7 +153,7 @@ Namespace VBClasses
             If standalone Then
                 Static color8U As New Color8U_Basics
                 color8U.Run(src)
-                inputRemoved = tsk.pcSplit(2).InRange(tsk.MaxZmeters, tsk.MaxZmeters).ConvertScaleAbs()
+                inputRemoved = task.pcSplit(2).InRange(task.MaxZmeters, task.MaxZmeters).ConvertScaleAbs()
                 src = color8U.dst2
             End If
 
@@ -164,7 +164,7 @@ Namespace VBClasses
             labels(2) = redC.labels(2)
             dst2 = redC.dst2.SetTo(0, inputRemoved)
 
-            If tsk.heartBeat Then labels(2) = $"{redC.rcList.Count} cells identified"
+            If task.heartBeat Then labels(2) = $"{redC.rcList.Count} cells identified"
 
             If showSelected Then Swarm_Flood.oldSelectCell()
         End Sub

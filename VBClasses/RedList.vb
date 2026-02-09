@@ -13,7 +13,7 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             contours.Run(src)
             If src.Type <> cv.MatType.CV_8U Then
-                If standalone And tsk.featureOptions.Color8USource.SelectedItem = "EdgeLine_Basics" Then
+                If standalone And task.featureOptions.Color8USource.SelectedItem = "EdgeLine_Basics" Then
                     dst1 = contours.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
                 Else
                     dst1 = Mat_Basics.srcMustBe8U(src)
@@ -32,7 +32,7 @@ Namespace VBClasses
             dst2 = cellGen.dst2
 
             For Each rc In cellGen.mdList
-                dst2.Circle(rc.maxDist, tsk.DotSize, tsk.highlight, -1)
+                dst2.Circle(rc.maxDist, task.DotSize, task.highlight, -1)
             Next
             labels(2) = cellGen.labels(2)
             labels(3) = ""
@@ -46,7 +46,7 @@ Namespace VBClasses
     Public Class NR_RedList_CellStatsPlot : Inherits TaskParent
         Dim cells As New XO_RedCell_BasicsPlot
         Public Sub New()
-            If standaloneTest() Then tsk.gOptions.displayDst1.Checked = True
+            If standaloneTest() Then task.gOptions.displayDst1.Checked = True
             cells.runRedCflag = True
             desc = "Display the stats for the selected cell"
         End Sub
@@ -116,7 +116,7 @@ Namespace VBClasses
     Public Class NR_RedList_Consistent : Inherits TaskParent
         Public Sub New()
             dst1 = New cv.Mat(dst1.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
-            tsk.featureOptions.ColorDiffSlider.Value = 1
+            task.featureOptions.ColorDiffSlider.Value = 1
             desc = "Remove RedColor results that are inconsistent with the previous frame."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -124,7 +124,7 @@ Namespace VBClasses
 
             dst3.SetTo(0)
             Dim count As Integer
-            For Each rc In tsk.redList.oldrclist
+            For Each rc In task.redList.oldrclist
                 If rc.age > 1 Then
                     dst3(rc.rect).SetTo(rc.color, rc.mask)
                     count += 1
@@ -160,26 +160,26 @@ Namespace VBClasses
 
             dst2 = runRedList(src, labels(2))
 
-            Dim rc = tsk.oldrcD
+            Dim rc = task.oldrcD
 
-            dst0 = tsk.color
+            dst0 = task.color
             Dim correlationMat As New cv.Mat, correlationXtoZ As Single, correlationYtoZ As Single
             dst3.SetTo(0)
             Select Case options.selection
                 Case 0
                     Dim pt = rc.maxDist
-                    dst2.Circle(pt, tsk.DotSize, tsk.highlight, -1, cv.LineTypes.AntiAlias)
+                    dst2.Circle(pt, task.DotSize, task.highlight, -1, cv.LineTypes.AntiAlias)
                     labels(3) = "maxDist Is at (" + CStr(pt.X) + ", " + CStr(pt.Y) + ")"
                 Case 1
-                    dst3(rc.rect).SetTo(vbNearFar((rc.depth) / tsk.MaxZmeters), rc.mask)
+                    dst3(rc.rect).SetTo(vbNearFar((rc.depth) / task.MaxZmeters), rc.mask)
                     labels(3) = "rc.depth Is highlighted in dst2"
                     labels(3) = "Mean depth for the cell Is " + Format(rc.depth, fmt3)
                 Case 2
-                    cv.Cv2.MatchTemplate(tsk.pcSplit(0)(rc.rect), tsk.pcSplit(2)(rc.rect), correlationMat, cv.TemplateMatchModes.CCoeffNormed, rc.mask)
+                    cv.Cv2.MatchTemplate(task.pcSplit(0)(rc.rect), task.pcSplit(2)(rc.rect), correlationMat, cv.TemplateMatchModes.CCoeffNormed, rc.mask)
                     correlationXtoZ = correlationMat.Get(Of Single)(0, 0)
                     labels(3) = "High correlation X to Z Is yellow, low correlation X to Z Is blue"
                 Case 3
-                    cv.Cv2.MatchTemplate(tsk.pcSplit(1)(rc.rect), tsk.pcSplit(2)(rc.rect), correlationMat, cv.TemplateMatchModes.CCoeffNormed, rc.mask)
+                    cv.Cv2.MatchTemplate(task.pcSplit(1)(rc.rect), task.pcSplit(2)(rc.rect), correlationMat, cv.TemplateMatchModes.CCoeffNormed, rc.mask)
                     correlationYtoZ = correlationMat.Get(Of Single)(0, 0)
                     labels(3) = "High correlation Y to Z Is yellow, low correlation Y to Z Is blue"
             End Select
@@ -237,8 +237,8 @@ Namespace VBClasses
 
             If standaloneTest() Then dst3 = PaletteFull(dst2)
 
-            If tsk.heartBeat Then labels(2) = "CV_8U result With " + CStr(classCount) + " regions."
-            If tsk.heartBeat Then labels(3) = "Palette version of the data In dst2 With " + CStr(classCount) + " regions."
+            If task.heartBeat Then labels(2) = "CV_8U result With " + CStr(classCount) + " regions."
+            If task.heartBeat Then labels(3) = "Palette version of the data In dst2 With " + CStr(classCount) + " regions."
         End Sub
         Public Overloads Sub Dispose() Implements IDisposable.Dispose
             If cPtr <> 0 Then cPtr = RedMask_Close(cPtr)
@@ -254,22 +254,22 @@ Namespace VBClasses
     Public Class NR_RedList_CellDepthHistogram : Inherits TaskParent
         Dim plot As New Plot_Histogram
         Public Sub New()
-            tsk.gOptions.setHistogramBins(100)
+            task.gOptions.setHistogramBins(100)
             plot.createHistogram = True
             desc = "Display the histogram of a selected RedColor cell."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             dst2 = runRedList(src, labels(2))
-            If tsk.heartBeat Then
-                Dim depth As cv.Mat = tsk.pcSplit(2)(tsk.oldrcD.rect)
-                depth.SetTo(0, tsk.noDepthMask(tsk.oldrcD.rect))
+            If task.heartBeat Then
+                Dim depth As cv.Mat = task.pcSplit(2)(task.oldrcD.rect)
+                depth.SetTo(0, task.noDepthMask(task.oldrcD.rect))
                 plot.minRange = 0
-                plot.maxRange = tsk.MaxZmeters
+                plot.maxRange = task.MaxZmeters
                 plot.Run(depth)
-                labels(3) = "0 meters to " + Format(tsk.MaxZmeters, fmt0) + " meters - vertical lines every meter"
+                labels(3) = "0 meters to " + Format(task.MaxZmeters, fmt0) + " meters - vertical lines every meter"
 
-                Dim incr = dst2.Width / tsk.MaxZmeters
-                For i = 1 To CInt(tsk.MaxZmeters - 1)
+                Dim incr = dst2.Width / task.MaxZmeters
+                For i = 1 To CInt(task.MaxZmeters - 1)
                     Dim x = incr * i
                     vbc.DrawLine(dst3, New cv.Point(x, 0), New cv.Point(x, dst2.Height), cv.Scalar.White)
                 Next

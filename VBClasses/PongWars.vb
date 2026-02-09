@@ -4,17 +4,17 @@ Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Class PongWars_Basics : Inherits TaskParent
         Dim sqWidth As Integer = 25
-        Dim sqHeight As Integer = 25 * tsk.workRes.Height / tsk.workRes.Width
-        Dim numSquaresX As Integer = tsk.workRes.Width / sqWidth
-        Dim numSquaresY As Integer = tsk.workRes.Height / sqHeight
+        Dim sqHeight As Integer = 25 * task.workRes.Height / task.workRes.Width
+        Dim numSquaresX As Integer = task.workRes.Width / sqWidth
+        Dim numSquaresY As Integer = task.workRes.Height / sqHeight
 
         Dim DAY_COLOR = 1, DAY_BALL_COLOR = 2, NIGHT_COLOR = 3, NIGHT_BALL_COLOR = 4
         Dim squares(numSquaresX - 1, numSquaresY - 1) As Integer
 
-        Dim p1 = New cv.Point(tsk.workRes.Width / 4, tsk.workRes.Height / 2)
+        Dim p1 = New cv.Point(task.workRes.Width / 4, task.workRes.Height / 2)
         Dim d1 As cv.Point2f = New cv.Point(12.5, -12.5)
 
-        Dim p2 = New cv.Point((tsk.workRes.Width / 4) * 3, tsk.workRes.Height / 2)
+        Dim p2 = New cv.Point((task.workRes.Width / 4) * 3, task.workRes.Height / 2)
         Dim d2 As cv.Point2f = New cv.Point(-12.5, 12.5)
 
         Dim iteration As Integer = 0
@@ -70,7 +70,7 @@ Namespace VBClasses
                 Next
             Next
 
-            If tsk.heartBeat Then labels(2) = $"Pong War: day {dayScore} | night {nightScore}"
+            If task.heartBeat Then labels(2) = $"Pong War: day {dayScore} | night {nightScore}"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             iteration += 1
@@ -101,15 +101,15 @@ Namespace VBClasses
                 For j As Integer = 0 To numSquaresY - 1
                     Dim rect = New cv.Rect(i * sqWidth, j * sqHeight, sqWidth, sqHeight)
                     Dim index = squares(i, j)
-                    dst2.Rectangle(rect, tsk.scalarColors(index), -1)
+                    dst2.Rectangle(rect, task.scalarColors(index), -1)
                 Next
             Next
 
             Dim pt = New cv.Point(CInt(p1.x - sqWidth / 2), CInt(p1.y - sqHeight / 2))
-            DrawCircle(dst2, pt, tsk.DotSize + 5, tsk.scalarColors(DAY_BALL_COLOR))
+            DrawCircle(dst2, pt, task.DotSize + 5, task.scalarColors(DAY_BALL_COLOR))
 
             pt = New cv.Point(CInt(p2.x - sqWidth / 2), CInt(p2.y - sqHeight / 2))
-            DrawCircle(dst2, pt, tsk.DotSize + 5, tsk.scalarColors(NIGHT_BALL_COLOR))
+            DrawCircle(dst2, pt, task.DotSize + 5, task.scalarColors(NIGHT_BALL_COLOR))
         End Sub
     End Class
 

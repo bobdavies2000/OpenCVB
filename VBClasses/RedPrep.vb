@@ -27,9 +27,9 @@ Namespace VBClasses
         End Function
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
-            reductionTarget = tsk.featureOptions.ReductionTargetSlider.Value
+            reductionTarget = task.featureOptions.ReductionTargetSlider.Value
 
-            If src.Type <> cv.MatType.CV_32FC3 Then src = tsk.pointCloud.Clone
+            If src.Type <> cv.MatType.CV_32FC3 Then src = task.pointCloud.Clone
 
             Dim pc32S As New cv.Mat
             src.ConvertTo(pc32S, cv.MatType.CV_32SC3, 1000 / reductionTarget)
@@ -37,12 +37,12 @@ Namespace VBClasses
 
             dst2.SetTo(0)
             Dim saveNoDepth As cv.Mat = Nothing
-            If src.Size <> tsk.workRes Then
-                saveNoDepth = tsk.noDepthMask.Clone
-                tsk.noDepthMask = tsk.noDepthMask.Resize(src.Size)
+            If src.Size <> task.workRes Then
+                saveNoDepth = task.noDepthMask.Clone
+                task.noDepthMask = task.noDepthMask.Resize(src.Size)
             End If
             If options.PrepX Then
-                prepEdges.Run(reduceChan(split(0), tsk.noDepthMask))
+                prepEdges.Run(reduceChan(split(0), task.noDepthMask))
                 If dst2.Size <> src.Size Then
                     dst2 = dst2.Resize(src.Size)
                     dst2 = dst2 Or prepEdges.dst3
@@ -52,12 +52,12 @@ Namespace VBClasses
             End If
 
             If options.PrepY Then
-                prepEdges.Run(reduceChan(split(1), tsk.noDepthMask))
+                prepEdges.Run(reduceChan(split(1), task.noDepthMask))
                 dst2 = dst2 Or prepEdges.dst3
             End If
 
             If options.PrepZ Then
-                prepEdges.Run(reduceChan(split(2), tsk.noDepthMask))
+                prepEdges.Run(reduceChan(split(2), task.noDepthMask))
                 dst2 = dst2 Or prepEdges.dst3
             End If
 
@@ -68,7 +68,7 @@ Namespace VBClasses
             ' this rectangle prevents bleeds at the image edges.  It is necessary.  Test without it to see the impact.
             dst2.Rectangle(New cv.Rect(0, 0, dst2.Width, dst2.Height), 255, 2)
 
-            If src.Size <> tsk.workRes Then tsk.noDepthMask = saveNoDepth.Clone
+            If src.Size <> task.workRes Then task.noDepthMask = saveNoDepth.Clone
             labels(2) = "Using reduction factor = " + CStr(reductionTarget)
         End Sub
     End Class
@@ -86,22 +86,22 @@ Namespace VBClasses
             desc = "Run the C++ PrepXY to create a list of mask, rect, and other info about image"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            Dim inputX(tsk.pcSplit(0).Total * tsk.pcSplit(0).ElemSize - 1) As Byte
-            Dim inputY(tsk.pcSplit(1).Total * tsk.pcSplit(1).ElemSize - 1) As Byte
+            Dim inputX(task.pcSplit(0).Total * task.pcSplit(0).ElemSize - 1) As Byte
+            Dim inputY(task.pcSplit(1).Total * task.pcSplit(1).ElemSize - 1) As Byte
 
-            Marshal.Copy(tsk.pcSplit(0).Data, inputX, 0, inputX.Length)
-            Marshal.Copy(tsk.pcSplit(1).Data, inputY, 0, inputY.Length)
+            Marshal.Copy(task.pcSplit(0).Data, inputX, 0, inputX.Length)
+            Marshal.Copy(task.pcSplit(1).Data, inputY, 0, inputY.Length)
 
             Dim handleX = GCHandle.Alloc(inputX, GCHandleType.Pinned)
             Dim handleY = GCHandle.Alloc(inputY, GCHandleType.Pinned)
 
             Dim imagePtr = PrepXY_Run(cPtr, handleX.AddrOfPinnedObject(), handleY.AddrOfPinnedObject(), src.Rows, src.Cols,
-                                  tsk.xRange, tsk.yRange, tsk.histogramBins)
+                                  task.xRange, task.yRange, task.histogramBins)
             handleX.Free()
             handleY.Free()
 
             dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, cv.MatType.CV_8U, imagePtr).Clone
-            dst2.SetTo(0, tsk.noDepthMask)
+            dst2.SetTo(0, task.noDepthMask)
 
             dst3 = PaletteBlackZero(dst2)
         End Sub
@@ -128,14 +128,14 @@ Namespace VBClasses
             For i = 0 To 1
                 Select Case i
                     Case 0 ' X Reduction
-                        dst1 = tsk.pcSplit(0)
-                        ranges = New cv.Rangef() {New cv.Rangef(-tsk.xRange, tsk.xRange)}
+                        dst1 = task.pcSplit(0)
+                        ranges = New cv.Rangef() {New cv.Rangef(-task.xRange, task.xRange)}
                     Case 1 ' Y Reduction
-                        dst1 = tsk.pcSplit(1)
-                        ranges = New cv.Rangef() {New cv.Rangef(-tsk.yRange, tsk.yRange)}
+                        dst1 = task.pcSplit(1)
+                        ranges = New cv.Rangef() {New cv.Rangef(-task.yRange, task.yRange)}
                 End Select
 
-                cv.Cv2.CalcHist({dst1}, {0}, tsk.depthmask, histogram, 1, {tsk.histogramBins}, ranges)
+                cv.Cv2.CalcHist({dst1}, {0}, task.depthmask, histogram, 1, {task.histogramBins}, ranges)
 
                 Dim histArray(histogram.Total - 1) As Single
                 Marshal.Copy(histogram.Data, histArray, 0, histArray.Length)
@@ -152,9 +152,9 @@ Namespace VBClasses
             Next
 
             dst3.ConvertTo(dst2, cv.MatType.CV_8U)
-            dst2.SetTo(0, tsk.noDepthMask)
+            dst2.SetTo(0, task.noDepthMask)
 
-            labels(2) = CStr(tsk.histogramBins * 2 - zeroCount) + " depth regions mapped (control with histogram bins.)"
+            labels(2) = CStr(task.histogramBins * 2 - zeroCount) + " depth regions mapped (control with histogram bins.)"
         End Sub
     End Class
 
@@ -230,12 +230,12 @@ Namespace VBClasses
             handleSrc.Free()
 
             dst3 = cv.Mat.FromPixelData(src.Rows, src.Cols, cv.MatType.CV_8U, imagePtr).Clone
-            If src.Size <> tsk.noDepthMask.Size Then
-                dst3.SetTo(255, tsk.noDepthMask.Resize(src.Size))
+            If src.Size <> task.noDepthMask.Size Then
+                dst3.SetTo(255, task.noDepthMask.Resize(src.Size))
                 dst2 = dst2.Resize(src.Size)
                 dst2.SetTo(0, dst3)
             Else
-                dst3.SetTo(255, tsk.noDepthMask)
+                dst3.SetTo(255, task.noDepthMask)
                 dst2.SetTo(0, dst3)
             End If
         End Sub
@@ -270,15 +270,15 @@ Namespace VBClasses
             End If
             chan = (chan - mm.minVal) * 255 / (mm.maxVal - mm.minVal)
             chan.ConvertTo(chan, cv.MatType.CV_8U)
-            chan.SetTo(0, tsk.noDepthMask)
+            chan.SetTo(0, task.noDepthMask)
             Return chan
         End Function
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
-            reductionTarget = tsk.featureOptions.ReductionTargetSlider.Value
+            reductionTarget = task.featureOptions.ReductionTargetSlider.Value
 
             Dim pc32S As New cv.Mat
-            tsk.pointCloud.ConvertTo(pc32S, cv.MatType.CV_32SC3, 1000 / reductionTarget)
+            task.pointCloud.ConvertTo(pc32S, cv.MatType.CV_32SC3, 1000 / reductionTarget)
             Dim split = pc32S.Split()
 
             dst2.SetTo(0)
@@ -300,9 +300,9 @@ Namespace VBClasses
             redSimple.Run(src)
             edges.Run(redSimple.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
             dst3 = edges.dst2
-            dst3.CopyTo(dst2, tsk.noDepthMask)
+            dst3.CopyTo(dst2, task.noDepthMask)
 
-            dst2.Rectangle(New cv.Rect(0, 0, dst2.Width - 1, dst2.Height - 1), 255, tsk.lineWidth)
+            dst2.Rectangle(New cv.Rect(0, 0, dst2.Width - 1, dst2.Height - 1), 255, task.lineWidth)
             labels(2) = "Using reduction factor = " + CStr(reductionTarget)
         End Sub
     End Class
@@ -323,7 +323,7 @@ Namespace VBClasses
             dst2 = edges.dst2
             labels(2) = edges.labels(2)
 
-            dst2.SetTo(0, tsk.noDepthMask)
+            dst2.SetTo(0, task.noDepthMask)
         End Sub
     End Class
 
@@ -344,7 +344,7 @@ Namespace VBClasses
             dst2 = edges.dst2
             labels(2) = edges.labels(2)
 
-            dst2.SetTo(0, tsk.noDepthMask)
+            dst2.SetTo(0, task.noDepthMask)
         End Sub
     End Class
 
@@ -363,7 +363,7 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             edges.Run(src)
             dst2 = edges.dst2
-            dst2.SetTo(0, tsk.noDepthMask)
+            dst2.SetTo(0, task.noDepthMask)
 
             labels(2) = edges.labels(2)
         End Sub
@@ -380,14 +380,14 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
-            Dim reductionTarget = tsk.featureOptions.ReductionTargetSlider.Value
+            Dim reductionTarget = task.featureOptions.ReductionTargetSlider.Value
 
             If reductionName = "" Then reductionName = options.reductionName
 
             Dim split() = {New cv.Mat, New cv.Mat, New cv.Mat}
-            tsk.pcSplit(0).ConvertTo(split(0), cv.MatType.CV_32S, 1000 / reductionTarget)
-            tsk.pcSplit(1).ConvertTo(split(1), cv.MatType.CV_32S, 1000 / reductionTarget)
-            tsk.pcSplit(2).ConvertTo(split(2), cv.MatType.CV_32S, 1000 / reductionTarget)
+            task.pcSplit(0).ConvertTo(split(0), cv.MatType.CV_32S, 1000 / reductionTarget)
+            task.pcSplit(1).ConvertTo(split(1), cv.MatType.CV_32S, 1000 / reductionTarget)
+            task.pcSplit(2).ConvertTo(split(2), cv.MatType.CV_32S, 1000 / reductionTarget)
 
             Select Case reductionName
                 Case "X Reduction"
@@ -418,7 +418,7 @@ Namespace VBClasses
             dst2 = (dst3 - mm.minVal) * 255 / (mm.maxVal - mm.minVal)
             dst2.ConvertTo(dst2, cv.MatType.CV_8U)
 
-            dst2.SetTo(0, tsk.noDepthMask)
+            dst2.SetTo(0, task.noDepthMask)
             labels(2) = "Using reduction factor = " + CStr(reductionTarget)
 
             If standaloneTest() Then

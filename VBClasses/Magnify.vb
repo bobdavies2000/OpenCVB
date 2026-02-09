@@ -2,12 +2,12 @@ Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Class Magnify_Basics : Inherits TaskParent
         Public Sub New()
-            tsk.drawRect = New cv.Rect(10, 10, 50, 50)
+            task.drawRect = New cv.Rect(10, 10, 50, 50)
             desc = "Magnify the drawn rectangle on dst2 and display it."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             dst2 = src
-            If tsk.drawRect.Width > 0 And tsk.drawRect.Height > 0 Then dst3 = src(tsk.drawRect)
+            If task.drawRect.Width > 0 And task.drawRect.Height > 0 Then dst3 = src(task.drawRect)
         End Sub
     End Class
 

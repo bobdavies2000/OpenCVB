@@ -34,9 +34,9 @@ Namespace VBClasses
             If standalone Then
                 Swarm_Flood.oldSelectCell()
                 dst3.SetTo(0)
-                For Each index In tsk.oldrcD.nabs
+                For Each index In task.oldrcD.nabs
                     If index < redC.rcList.Count Then
-                        DrawCircle(dst2, redC.rcList(index).maxDist, tsk.DotSize, tsk.highlight)
+                        DrawCircle(dst2, redC.rcList(index).maxDist, task.DotSize, task.highlight)
                     End If
                 Next
             End If
@@ -86,10 +86,10 @@ Namespace VBClasses
             Next
 
             If standaloneTest() Then
-                dst3 = tsk.color.Clone
+                dst3 = task.color.Clone
                 For Each pt In nPoints
-                    DrawCircle(dst2, pt, tsk.DotSize, tsk.highlight)
-                    DrawCircle(dst3, pt, tsk.DotSize, cv.Scalar.Yellow)
+                    DrawCircle(dst2, pt, task.DotSize, task.highlight)
+                    DrawCircle(dst3, pt, task.DotSize, cv.Scalar.Yellow)
                 Next
             End If
 
@@ -117,7 +117,7 @@ Namespace VBClasses
 
             corners.Run(redC.rcMap.Clone())
             For Each pt In corners.nPoints
-                DrawCircle(dst2, pt, tsk.DotSize, tsk.highlight)
+                DrawCircle(dst2, pt, task.DotSize, task.highlight)
             Next
 
             labels(2) = redC.labels(2) + " and " + CStr(corners.nPoints.Count) + " cell intersections"
@@ -178,17 +178,17 @@ Namespace VBClasses
             '    nabList(0).Clear() ' neighbors to zero are not interesting (yet?)
             '    rclist(0).nabs.Clear() ' not interesting.
 
-            '    If tsk.heartBeat And standaloneTest() Then
+            '    If task.heartBeat And standaloneTest() Then
             '        Static stats As New XO_RedCell_Basics
             '        If stats Is Nothing Then stats = New XO_RedCell_Basics
-            '        stats.Run(tsk.color)
+            '        stats.Run(task.color)
 
             '        strOut = stats.strOut
-            '        If nabList(tsk.rcD.index).Count > 0 Then
+            '        If nabList(task.rcD.index).Count > 0 Then
             '            strOut += "Neighbors: "
             '            dst1.SetTo(0)
-            '            dst1(tsk.rcD.rect).SetTo(tsk.rcD.color, tsk.rcD.mask)
-            '            For Each index In nabList(tsk.rcD.index)
+            '            dst1(task.rcD.rect).SetTo(task.rcD.color, task.rcD.mask)
+            '            For Each index In nabList(task.rcD.index)
             '                Dim rc = rclist(index)
             '                dst1(rc.rect).SetTo(rc.color, rc.mask)
             '                strOut += CStr(index) + ","

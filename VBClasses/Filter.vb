@@ -9,11 +9,11 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             Dim filterIndex As Integer
-            For Each cb In tsk.featureOptions.colorCheckbox
+            For Each cb In task.featureOptions.colorCheckbox
                 If cb.Checked Then
                     Select Case cb.Text
                         Case "Original"
-                            dst2 = tsk.color
+                            dst2 = task.color
                         Case "PhotoShop_WhiteBalance"
                             If filters(cb.Tag) Is Nothing Then filters(cb.Tag) = New PhotoShop_WhiteBalance
                         Case "PhotoShop_SharpenDetail"
@@ -25,7 +25,7 @@ Namespace VBClasses
                 End If
             Next
 
-            labels(2) = "Color input to all algorithms - " + tsk.featureOptions.colorCheckbox(filterIndex).Text
+            labels(2) = "Color input to all algorithms - " + task.featureOptions.colorCheckbox(filterIndex).Text
             If filterIndex > 0 Then
                 filters(filterIndex).run(dst2)
                 dst2 = filters(filterIndex).dst2
@@ -35,7 +35,7 @@ Namespace VBClasses
             labels(3) = grayFilter.labels(2)
             dst3 = grayFilter.dst2
 
-            tsk.color = dst2
+            task.color = dst2
         End Sub
     End Class
 
@@ -53,7 +53,7 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             dst2 = src
-            For Each cb In tsk.featureOptions.grayCheckbox
+            For Each cb In task.featureOptions.grayCheckbox
                 If cb.Checked Then
                     Select Case cb.Text
                         Case "Original"
@@ -76,7 +76,7 @@ Namespace VBClasses
                 End If
             Next
 
-            labels(2) = "Grayscale input to all algorithms - " + tsk.featureOptions.grayCheckbox(filterIndex).Text
+            labels(2) = "Grayscale input to all algorithms - " + task.featureOptions.grayCheckbox(filterIndex).Text
             If filterIndex > 0 Then
                 filters(filterIndex).run(dst2)
                 dst2 = filters(filterIndex).dst2
@@ -148,7 +148,7 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
-            Dim kernelSize As Integer = If(standaloneTest(), (tsk.frameCount Mod 20) + 1, options.kernelSize)
+            Dim kernelSize As Integer = If(standaloneTest(), (task.frameCount Mod 20) + 1, options.kernelSize)
             Dim kernel = New cv.Mat(kernelSize, kernelSize, cv.MatType.CV_32F).SetTo(1 / (kernelSize * kernelSize))
             dst2 = src.Filter2D(-1, kernel)
             labels(2) = "Normalized KernelSize = " + CStr(kernelSize)
@@ -198,7 +198,7 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
-            Dim kernelSize As Integer = If(standaloneTest(), (tsk.frameCount Mod 20) + 1, options.kernelSize)
+            Dim kernelSize As Integer = If(standaloneTest(), (task.frameCount Mod 20) + 1, options.kernelSize)
             Dim element = cv.Cv2.GetStructuringElement(cv.MorphShapes.Rect, New cv.Size(kernelSize, kernelSize))
             dst2 = src.Erode(element)
         End Sub
@@ -217,7 +217,7 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
-            Dim kernelSize As Integer = If(standaloneTest(), (tsk.frameCount Mod 20) + 1, options.kernelSize)
+            Dim kernelSize As Integer = If(standaloneTest(), (task.frameCount Mod 20) + 1, options.kernelSize)
             Dim element = cv.Cv2.GetStructuringElement(cv.MorphShapes.Rect, New cv.Size(kernelSize, kernelSize))
             dst2 = src.Dilate(element)
         End Sub
@@ -236,7 +236,7 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
-            Dim kernelSize As Integer = If(standaloneTest(), (tsk.frameCount Mod 20) + 1, options.kernelSize)
+            Dim kernelSize As Integer = If(standaloneTest(), (task.frameCount Mod 20) + 1, options.kernelSize)
             Dim kernel = (cv.Mat.Ones(cv.MatType.CV_32FC1, kernelSize, kernelSize) / (kernelSize * kernelSize)).ToMat
             dst2 = src.Filter2D(-1, kernel)
         End Sub
@@ -255,7 +255,7 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
-            Dim kernelSize As Integer = If(standaloneTest(), (tsk.frameCount Mod 20) + 1, options.kernelSize)
+            Dim kernelSize As Integer = If(standaloneTest(), (task.frameCount Mod 20) + 1, options.kernelSize)
             If kernelSize Mod 2 = 0 Then kernelSize += 1
             dst2 = src.MedianBlur(kernelSize)
         End Sub
@@ -280,7 +280,7 @@ Namespace VBClasses
             desc = "Create an equalized image of the grayscale input."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If src.Channels = 1 Then cv.Cv2.EqualizeHist(src, dst2) Else cv.Cv2.EqualizeHist(tsk.grayStable, dst2)
+            If src.Channels = 1 Then cv.Cv2.EqualizeHist(src, dst2) Else cv.Cv2.EqualizeHist(task.grayStable, dst2)
         End Sub
     End Class
 End Namespace

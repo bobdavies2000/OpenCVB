@@ -5,7 +5,7 @@ Imports jsonShared
 Namespace VBClasses
     Public Class AlgorithmTask : Implements IDisposable
         Public Sub Initialize(settings As jsonShared.Settings)
-            tsk.Settings = settings
+            task.Settings = settings
 
             rows = settings.workRes.Height
             cols = settings.workRes.Width
@@ -14,8 +14,8 @@ Namespace VBClasses
 
             allOptions = New OptionsContainer
             allOptions.Show()
-            allOptions.Location = New System.Drawing.Point(tsk.Settings.allOptionsLeft, tsk.Settings.allOptionsTop)
-            allOptions.Size = New System.Drawing.Size(tsk.Settings.allOptionsWidth, tsk.Settings.allOptionsHeight)
+            allOptions.Location = New System.Drawing.Point(task.Settings.allOptionsLeft, task.Settings.allOptionsTop)
+            allOptions.Size = New System.Drawing.Size(task.Settings.allOptionsWidth, task.Settings.allOptionsHeight)
             allOptions.positionedFromSettings = True
 
             If (settings.algorithm.StartsWith("GL_") Or settings.algorithm.StartsWith("NR_GL_")) And
@@ -25,7 +25,7 @@ Namespace VBClasses
                 sharpGL.Show()
             End If
 
-            Dim fps = tsk.Settings.FPSPaintTarget
+            Dim fps = task.Settings.FPSPaintTarget
             gOptions = New OptionsGlobal
             gOptions.TargetDisplaySlider.Value = fps
             featureOptions = New OptionsFeatures
@@ -48,7 +48,7 @@ Namespace VBClasses
             filterBasics = New Filter_Basics
             leftRightEnhanced = New LeftRight_Brightness
 
-            ' all the algorithms in the list are tsk algorithms that are children of the algorithm.
+            ' all the algorithms in the list are task algorithms that are children of the algorithm.
             For i = 1 To cpu.callTrace.Count - 1
                 cpu.callTrace(i) = settings.algorithm + "\" + cpu.callTrace(i)
             Next
@@ -61,7 +61,7 @@ Namespace VBClasses
             centerRect = New cv.Rect(workRes.Width / 4, workRes.Height / 4, workRes.Width / 2, workRes.Height / 2)
             fpList.Clear()
 
-            tsk.mouseMovePoint = New cv.Point(tsk.workRes.Width \ 2, tsk.workRes.Height \ 2)
+            task.mouseMovePoint = New cv.Point(task.workRes.Width \ 2, task.workRes.Height \ 2)
 
             myStopWatch = Stopwatch.StartNew()
             optionsChanged = True
@@ -79,12 +79,12 @@ Namespace VBClasses
 
             taskUpdate()
 
-            If tsk.firstPass Then tsk.cpu.initialize(Settings.algorithm)
+            If task.firstPass Then task.cpu.initialize(Settings.algorithm)
 
-            Dim src = tsk.color
-            If src.Width = 0 Or tsk.pointCloud.Width = 0 Then Exit Sub ' camera data is not ready.
+            Dim src = task.color
+            If src.Width = 0 Or task.pointCloud.Width = 0 Then Exit Sub ' camera data is not ready.
 
-            bins2D = {tsk.workRes.Height, tsk.workRes.Width}
+            bins2D = {task.workRes.Height, task.workRes.Width}
 
             ' run any universal algorithms here
             IMU_Acceleration = IMU_Acceleration
@@ -92,7 +92,7 @@ Namespace VBClasses
             IMU_FrameTime =
             IMU_AlphaFilter = 0.5 '  gOptions.imu_Alpha
 
-            grid.Run(tsk.color)
+            grid.Run(task.color)
             imuBasics.Run(emptyMat)
             gravityMatrix.Run(emptyMat)
 
@@ -106,7 +106,7 @@ Namespace VBClasses
             frameHistoryCount = 3 ' default value.  Use Options_History to update this value.
 
             filterBasics.Run(color)
-            tsk.gray = filterBasics.dst3
+            task.gray = filterBasics.dst3
             leftRightEnhanced.Run(Nothing)
 
             leftView = leftRightEnhanced.dst2.Clone
@@ -115,7 +115,7 @@ Namespace VBClasses
             If gOptions.UseMotionMask.Checked And firstPass = False Then
                 motionRGB.Run(gray)
 
-                If optionsChanged Or tsk.frameCount < 5 Then
+                If optionsChanged Or task.frameCount < 5 Then
                     grayStable = gray.Clone
                 Else
                     If motionRGB.motionList.Count > 0 Then gray.CopyTo(grayStable, motionRGB.motionMask)
@@ -145,12 +145,12 @@ Namespace VBClasses
                 If gifCreator.gifC.options.buildCheck.Checked Then
                     gifCreator.gifC.options.buildCheck.Checked = False
                     For i = 0 To gifImages.Count - 1
-                        Dim fileName As New FileInfo(tsk.homeDir + "Temp/image" + Format(i, "000") + ".bmp")
+                        Dim fileName As New FileInfo(task.homeDir + "Temp/image" + Format(i, "000") + ".bmp")
                         gifImages(i).Save(fileName.FullName)
                     Next
 
                     gifImages.Clear()
-                    Dim dirInfo As New DirectoryInfo(tsk.homeDir + "GifBuilder\bin\x64\Debug\net8.0\")
+                    Dim dirInfo As New DirectoryInfo(task.homeDir + "GifBuilder\bin\x64\Debug\net8.0\")
                     Dim dirData = dirInfo.GetDirectories()
                     Dim gifExe As New FileInfo(dirInfo.FullName + "GifBuilder.exe")
                     If gifExe.Exists = False Then
@@ -186,10 +186,10 @@ Namespace VBClasses
 
 
 
-            Dim displayObject = tsk.MainUI_Algorithm
-            Dim index = tsk.cpu.indexTask
-            If index > 0 And index < tsk.cpu.activeObjects.Count Then
-                displayObject = tsk.cpu.activeObjects(index - 1)
+            Dim displayObject = task.MainUI_Algorithm
+            Dim index = task.cpu.indexTask
+            If index > 0 And index < task.cpu.activeObjects.Count Then
+                displayObject = task.cpu.activeObjects(index - 1)
             End If
             Dim nextTrueData As List(Of TrueText) = displayObject.trueData
             trueData = New List(Of TrueText)(nextTrueData)
@@ -217,25 +217,24 @@ Namespace VBClasses
                 Dim pt = New cv.Point2f((lp.pE1.X + lp.pE2.X) / 2 + 5, (lp.pE1.Y + lp.pE2.Y) / 2)
             End If
 
-            If tsk.drawRect.Width > 0 And tsk.drawRect.Height > 0 Then
+            If task.drawRect.Width > 0 And task.drawRect.Height > 0 Then
                 For Each dst In dstList
-                    dst.Rectangle(tsk.drawRect, cv.Scalar.White, 1)
+                    dst.Rectangle(task.drawRect, cv.Scalar.White, 1)
                 Next
             End If
 
             trueData.Clear()
-            trueData.Add(New TrueText(tsk.depthAndDepthRange, New cv.Point(tsk.mouseMovePoint.X, tsk.mouseMovePoint.Y - 24), 1))
+            trueData.Add(New TrueText(task.depthAndDepthRange, New cv.Point(task.mouseMovePoint.X, task.mouseMovePoint.Y - 24), 1))
             For Each tt In displayObject.trueData
                 trueData.Add(tt)
             Next
 
             displayObject.trueData.Clear()
             labels = displayObject.labels
-            If tsk.gOptions.displayDst0.Checked = False Then labels(0) = tsk.resolutionDetails
-            If tsk.gOptions.displayDst1.Checked = False Then labels(1) = tsk.depthAndDepthRange.Replace(vbCrLf, "")
+            If task.gOptions.displayDst0.Checked = False Then labels(0) = task.resolutionDetails
+            If task.gOptions.displayDst1.Checked = False Then labels(1) = task.depthAndDepthRange.Replace(vbCrLf, "")
         End Sub
-        Private Sub pixelViewerOrGIFProcessing(src As cv.Mat, dst1 As cv.Mat,
-                                               dst2 As cv.Mat, dst3 As cv.Mat)
+        Private Sub pixelViewerOrGIFProcessing(src As cv.Mat, dst1 As cv.Mat, dst2 As cv.Mat, dst3 As cv.Mat)
             If PixelViewer IsNot Nothing Then
                 If pixelViewerOn Then
                     PixelViewer.viewerForm.Visible = True
@@ -259,14 +258,14 @@ Namespace VBClasses
             gridRects = New List(Of cv.Rect)
             optionsChanged = True
             firstPass = True
-            useXYRange = True ' Most projections of pointcloud data can use the xRange and yRange to improve tsk.results..
+            useXYRange = True ' Most projections of pointcloud data can use the xRange and yRange to improve task.results..
         End Sub
         Public Sub Dispose() Implements IDisposable.Dispose
             If allOptions IsNot Nothing Then allOptions.Dispose()
 
-            tsk.featureOptions.Close()
-            tsk.treeView.Close()
-            If tsk.sharpGL IsNot Nothing Then tsk.sharpGL.Close()
+            task.featureOptions.Close()
+            task.treeView.Close()
+            If task.sharpGL IsNot Nothing Then task.sharpGL.Close()
 
             GC.Collect()
         End Sub

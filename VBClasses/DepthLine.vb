@@ -7,15 +7,15 @@ Namespace VBClasses
         Public motionLeft As New Motion_Basics
         Public lpList As New List(Of lpData)
         Public Sub New()
-            If standalone Then tsk.gOptions.displayDst0.Checked = True
+            If standalone Then task.gOptions.displayDst0.Checked = True
             labels(0) = "LeftView after brightness/contrast transform."
             labels(3) = "Input to Line_Basics"
             desc = "Find lines in reduced the depth data."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If tsk.optionsChanged Then lines.lpList.Clear()
+            If task.optionsChanged Then lines.lpList.Clear()
 
-            dst0 = tsk.leftView
+            dst0 = task.leftView
 
             If src.Type <> cv.MatType.CV_32FC3 Then
                 prepEdges.Run(src)
@@ -23,7 +23,7 @@ Namespace VBClasses
                 prepEdges.dst3 = src
             End If
 
-            motionLeft.Run(tsk.leftView)
+            motionLeft.Run(task.leftView)
 
             lines.motionMask = motionLeft.dst3
             lines.Run(prepEdges.dst3)
@@ -42,7 +42,7 @@ Namespace VBClasses
         Dim lineD As New DepthLine_Basics
         Public lpList As New List(Of lpData)
         Public Sub New()
-            If standalone Then tsk.gOptions.displayDst0.Checked = True
+            If standalone Then task.gOptions.displayDst0.Checked = True
             desc = "Find vertical lines in the reduced depth data."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -50,7 +50,7 @@ Namespace VBClasses
             lineD.Run(src)
 
             lpList = New List(Of lpData)(lineD.lpList)
-            dst0 = tsk.leftView
+            dst0 = task.leftView
             dst2 = lineD.dst2
             dst3 = lineD.dst3
             labels = lineD.labels
@@ -64,7 +64,7 @@ Namespace VBClasses
         Dim lineD As New DepthLine_Basics
         Public lpList As New List(Of lpData)
         Public Sub New()
-            If standalone Then tsk.gOptions.displayDst0.Checked = True
+            If standalone Then task.gOptions.displayDst0.Checked = True
             desc = "Find vertical lines in the reduced depth data."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -72,7 +72,7 @@ Namespace VBClasses
             lineD.Run(src)
 
             lpList = New List(Of lpData)(lineD.lpList)
-            dst0 = tsk.leftView
+            dst0 = task.leftView
             dst2 = lineD.dst2
             dst3 = lineD.dst3
             labels = lineD.labels
@@ -86,7 +86,7 @@ Namespace VBClasses
         Dim lineD As New DepthLine_Basics
         Public lpList As New List(Of lpData)
         Public Sub New()
-            If standalone Then tsk.gOptions.displayDst0.Checked = True
+            If standalone Then task.gOptions.displayDst0.Checked = True
             desc = "Find horizontal lines in the reduced depth data."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -94,7 +94,7 @@ Namespace VBClasses
             lineD.Run(src)
 
             lpList = New List(Of lpData)(lineD.lpList)
-            dst0 = tsk.leftView
+            dst0 = task.leftView
             dst2 = lineD.dst2
             dst3 = lineD.dst3
             labels = lineD.labels
@@ -113,7 +113,7 @@ Namespace VBClasses
         Dim lineXY As New NR_DepthLine_XY
         Public lpList As New List(Of lpData)
         Public Sub New()
-            If standalone Then tsk.gOptions.displayDst0.Checked = True
+            If standalone Then task.gOptions.displayDst0.Checked = True
             desc = "Find vertical lines in the reduced depth data."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -121,13 +121,13 @@ Namespace VBClasses
             lineY.Run(src)
             lineXY.Run(src)
 
-            dst0 = tsk.leftView
+            dst0 = task.leftView
             dst2.SetTo(0)
             For Each lp In lineX.lpList
-                dst2.Line(lp.p1, lp.p2, white, tsk.lineWidth, tsk.lineType)
+                dst2.Line(lp.p1, lp.p2, white, task.lineWidth, task.lineType)
             Next
             For Each lp In lineY.lpList
-                dst2.Line(lp.p1, lp.p2, tsk.highlight, tsk.lineWidth, tsk.lineType)
+                dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
             Next
             labels(0) = lineX.labels(0)
 
@@ -148,22 +148,22 @@ Namespace VBClasses
         Dim lineY As New DepthLine_H
         Public lpList As New List(Of lpData)
         Public Sub New()
-            If standalone Then tsk.gOptions.displayDst0.Checked = True
+            If standalone Then task.gOptions.displayDst0.Checked = True
             desc = "Find horizontal and vertical lines in the reduced depth data."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             lineX.Run(src)
             lineY.Run(src)
 
-            dst0 = tsk.leftView
+            dst0 = task.leftView
 
             dst2.SetTo(0)
             For Each lp In lineX.lpList
-                dst2.Line(lp.p1, lp.p2, white, tsk.lineWidth, tsk.lineType)
+                dst2.Line(lp.p1, lp.p2, white, task.lineWidth, task.lineType)
             Next
 
             For Each lp In lineY.lpList
-                dst2.Line(lp.p1, lp.p2, tsk.highlight, tsk.lineWidth, tsk.lineType)
+                dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
             Next
 
             dst3 = lineX.dst3
@@ -190,20 +190,20 @@ Namespace VBClasses
         Public Sub New()
             lineX.reductionName = "X Reduction"
             lineY.reductionName = "Y Reduction"
-            tsk.featureOptions.ReductionTargetSlider.Value = 200
-            If standalone Then tsk.gOptions.displayDst0.Checked = True
+            task.featureOptions.ReductionTargetSlider.Value = 200
+            If standalone Then task.gOptions.displayDst0.Checked = True
             labels(3) = "Input to Line_Basics"
             desc = "Find horizontal and vertical lines in the reduced depth data."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If tsk.optionsChanged Then lpList.Clear()
+            If task.optionsChanged Then lpList.Clear()
             lineX.Run(src)
             lineY.Run(src)
 
             dst1 = lineX.dst3
             dst1 = dst1 Or lineY.dst3
 
-            dst0 = tsk.leftView
+            dst0 = task.leftView
             motionLeft.Run(dst0)
 
             lines.motionMask = motionLeft.dst3
@@ -213,9 +213,9 @@ Namespace VBClasses
             lpList = New List(Of lpData)(lines.lpList)
 
             dst3 = dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-            If tsk.toggleOn Then
+            If task.toggleOn Then
                 For Each lp In lpList
-                    dst3.Line(lp.p1, lp.p2, tsk.highlight, tsk.lineWidth * 2, tsk.lineType)
+                    dst3.Line(lp.p1, lp.p2, task.highlight, task.lineWidth * 2, task.lineType)
                 Next
             End If
 
@@ -240,11 +240,11 @@ Namespace VBClasses
             desc = "Identify the points where horizontal and vertical depth lines intersect."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If tsk.optionsChanged Then ptList.Clear()
+            If task.optionsChanged Then ptList.Clear()
 
             lineX.Run(src)
             lineY.Run(src)
-            motionLeft.Run(tsk.leftView)
+            motionLeft.Run(task.leftView)
 
             dst0.SetTo(0)
             dst1.SetTo(0)
@@ -278,21 +278,21 @@ Namespace VBClasses
                 Dim pt = ptMat.Get(Of cv.Point)(i, 0)
 
                 ' the grid rect may have already been found.
-                Dim index = tsk.gridMap.Get(Of Integer)(pt.Y, pt.X)
+                Dim index = task.gridMap.Get(Of Integer)(pt.Y, pt.X)
                 If ptGrid.Contains(index) = False Then
                     If motionLeft.dst3.Get(Of Byte)(pt.Y, pt.X) > 0 Then
                         ptList.Add(pt)
-                        Dim gr = tsk.gridRects(index)
+                        Dim gr = task.gridRects(index)
                         dst1(gr).SetTo(0)
-                        ptDepth.Add(tsk.pcSplit(2)(gr).Mean(tsk.depthmask(gr))(0))
+                        ptDepth.Add(task.pcSplit(2)(gr).Mean(task.depthmask(gr))(0))
                         ptGrid.Add(index)
                     End If
                 End If
             Next
 
-            dst2 = tsk.leftView.Clone
+            dst2 = task.leftView.Clone
             For Each pt In ptList
-                dst2.Circle(pt, tsk.DotSize, white, -1, tsk.lineType)
+                dst2.Circle(pt, task.DotSize, white, -1, task.lineType)
             Next
             Dim newCount = ptList.Count - count
             labels(2) = CStr(count) + " points were retained " + CStr(newCount) + " points were added."
@@ -307,7 +307,7 @@ Namespace VBClasses
         Dim lineY As New RedPrep_EdgeMask
         Dim texFlow As New TextureFlow_Basics
         Public Sub New()
-            tsk.featureOptions.ReductionTargetSlider.Value = 200
+            task.featureOptions.ReductionTargetSlider.Value = 200
             desc = "Use texture flow on the mesh input"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)

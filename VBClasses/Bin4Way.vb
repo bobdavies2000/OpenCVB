@@ -7,7 +7,7 @@ Namespace VBClasses
         Dim diff(3) As Diff_Basics
         Dim labelStr(3) As String, points(3) As cv.Point
         Public Sub New()
-            If standalone Then tsk.gOptions.displayDst1.Checked = True
+            If standalone Then task.gOptions.displayDst1.Checked = True
             dst0 = New cv.Mat(dst0.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
             For i = 0 To diff.Count - 1
                 diff(i) = New Diff_Basics
@@ -17,11 +17,11 @@ Namespace VBClasses
             desc = "Highlight the contours for each grid element with stats for each."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            Static index As Integer = tsk.gridMap.Get(Of Integer)(tsk.clickPoint.Y, tsk.clickPoint.X)
-            index = tsk.gridMap.Get(Of Integer)(tsk.clickPoint.Y, tsk.clickPoint.X)
-            Dim grSave = If(index < tsk.gridRects.Count, tsk.gridRects(index), New cv.Rect)
+            Static index As Integer = task.gridMap.Get(Of Integer)(task.clickPoint.Y, task.clickPoint.X)
+            index = task.gridMap.Get(Of Integer)(task.clickPoint.Y, task.clickPoint.X)
+            Dim grSave = If(index < task.gridRects.Count, task.gridRects(index), New cv.Rect)
 
-            If tsk.optionsChanged Then index = 0
+            If task.optionsChanged Then index = 0
 
             Dim matList(3) As cv.Mat
             For i = 0 To matList.Count - 1
@@ -30,7 +30,7 @@ Namespace VBClasses
             Next
 
             Dim quadrant As Integer
-            binary.Run(tsk.gray)
+            binary.Run(task.gray)
             binary.mats.Run(emptyMat)
             dst2 = binary.mats.dst2
             dst1 = binary.mats.dst3 * 0.5
@@ -43,14 +43,14 @@ Namespace VBClasses
                 dst0 = dst0 Or diff(i).dst2
             Next
 
-            Dim counts(3, tsk.gridRects.Count) As Integer
+            Dim counts(3, task.gridRects.Count) As Integer
             Dim contourCounts As New List(Of List(Of Integer))
             Dim means As New List(Of List(Of Single))
 
             Dim allContours As cv.Point()() = Nothing
             For i = 0 To counts.GetUpperBound(0)
-                For j = 0 To tsk.gridRects.Count - 1
-                    Dim gr = tsk.gridRects(j)
+                For j = 0 To task.gridRects.Count - 1
+                    Dim gr = task.gridRects(j)
                     Dim tmp = matList(i)(gr)
                     cv.Cv2.FindContours(tmp, allContours, Nothing, cv.RetrievalModes.External, cv.ContourApproximationModes.ApproxSimple)
                     If i = 0 Then
@@ -58,14 +58,14 @@ Namespace VBClasses
                         means.Add(New List(Of Single))
                     End If
                     contourCounts(j).Add(allContours.Count)
-                    means(j).Add(tsk.gray(gr).Mean(tmp)(0))
+                    means(j).Add(task.gray(gr).Mean(tmp)(0))
                     If i = quadrant Then SetTrueText(CStr(allContours.Count), gr.TopLeft, 1)
                     counts(i, j) = allContours.Count
                 Next
             Next
 
             Dim bump = 3
-            Dim ratio = dst2.Height / tsk.gridRects(0).Height
+            Dim ratio = dst2.Height / task.gridRects(0).Height
             For i = 0 To matList.Count - 1
                 Dim tmp As cv.Mat = matList(i)(grSave) * 0.5
                 Dim nextCount = tmp.CountNonZero
@@ -75,7 +75,7 @@ Namespace VBClasses
                 Dim r = New cv.Rect(0, 0, tmp.Width * ratio, tmp.Height * ratio)
                 mats.mat(i)(r) = tmp.Resize(New cv.Size(r.Width, r.Height))
 
-                If tsk.heartBeat Then
+                If task.heartBeat Then
                     Dim plus = mats.mat(i)(r).Width / 2
                     points(i) = Choose(i + 1, New cv.Point(bump + plus, bump), New cv.Point(bump + dst2.Width / 2 + plus, bump),
                                               New cv.Point(bump + plus, bump + dst2.Height / 2),
@@ -92,8 +92,8 @@ Namespace VBClasses
             mats.Run(emptyMat)
             dst3 = mats.dst2
 
-            dst1.Rectangle(grSave, white, tsk.lineWidth)
-            tsk.color.Rectangle(grSave, white, tsk.lineWidth)
+            dst1.Rectangle(grSave, white, task.lineWidth)
+            task.color.Rectangle(grSave, white, task.lineWidth)
         End Sub
     End Class
 
@@ -192,7 +192,7 @@ Namespace VBClasses
             dst2 = binary.dst2
             diff.Run(binary.dst3)
             dst3 = diff.dst2
-            If tsk.heartBeat Then labels(3) = "There are " + CStr(dst3.CountNonZero) + " unstable pixels"
+            If task.heartBeat Then labels(3) = "There are " + CStr(dst3.CountNonZero) + " unstable pixels"
         End Sub
     End Class
 
@@ -207,7 +207,7 @@ Namespace VBClasses
         Dim blur As New Blur_Basics
         Dim unstable As New Bin4Way_Unstable
         Public Sub New()
-            If standalone Then tsk.gOptions.displayDst1.Checked = True
+            If standalone Then task.gOptions.displayDst1.Checked = True
             desc = "Find unstable pixels but remove those that are also edges."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -219,7 +219,7 @@ Namespace VBClasses
             dst2 = unstable.dst2
             dst3 = unstable.dst3
 
-            If tsk.gOptions.DebugCheckBox.Checked = False Then dst3.SetTo(0, dst1)
+            If task.gOptions.DebugCheckBox.Checked = False Then dst3.SetTo(0, dst1)
         End Sub
     End Class
 
@@ -236,7 +236,7 @@ Namespace VBClasses
             desc = "Identify the unstable grayscale pixel values "
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            unstable.Run(tsk.gray)
+            unstable.Run(task.gray)
             dst2 = unstable.dst3
 
             Dim points = dst2.FindNonZero()
@@ -247,7 +247,7 @@ Namespace VBClasses
             Dim pixels As New List(Of Byte)
             Dim pixelSort As New SortedList(Of Byte, Integer)(New compareByte)
             For i = 0 To pts.Count - 1 Step 2
-                Dim val = tsk.gray.Get(Of Byte)(pts(i + 1), pts(i))
+                Dim val = task.gray.Get(Of Byte)(pts(i + 1), pts(i))
                 If pixels.Contains(val) = False Then
                     pixelSort.Add(val, 1)
                     pixels.Add(val)
@@ -280,7 +280,7 @@ Namespace VBClasses
                 strOut += CStr(index) + vbTab
             Next
             SetTrueText(strOut, 3)
-            If tsk.heartBeat Then labels(3) = "There are " + CStr(dst2.CountNonZero) + " unstable pixels"
+            If task.heartBeat Then labels(3) = "There are " + CStr(dst2.CountNonZero) + " unstable pixels"
         End Sub
     End Class
 
@@ -299,15 +299,15 @@ Namespace VBClasses
             desc = "Binarize an image using the valleys provided by HistValley_Basics"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            binary.Run(tsk.gray)
+            binary.Run(task.gray)
             Dim mask = binary.dst2.Clone
 
-            If tsk.heartBeat Then valley.Run(tsk.gray)
+            If task.heartBeat Then valley.Run(task.gray)
 
-            mats.mat(0) = tsk.gray.InRange(0, valley.valleys(1) - 1)
-            mats.mat(1) = tsk.gray.InRange(valley.valleys(1), valley.valleys(2) - 1)
-            mats.mat(2) = tsk.gray.InRange(valley.valleys(2), valley.valleys(3) - 1)
-            mats.mat(3) = tsk.gray.InRange(valley.valleys(3), 255)
+            mats.mat(0) = task.gray.InRange(0, valley.valleys(1) - 1)
+            mats.mat(1) = task.gray.InRange(valley.valleys(1), valley.valleys(2) - 1)
+            mats.mat(2) = task.gray.InRange(valley.valleys(2), valley.valleys(3) - 1)
+            mats.mat(3) = task.gray.InRange(valley.valleys(3), 255)
 
             mats.Run(emptyMat)
             dst2 = mats.dst2
@@ -328,13 +328,13 @@ Namespace VBClasses
         Public gapValues As New List(Of Byte)
         Dim boundaries(4) As Byte
         Public Sub New()
-            tsk.gOptions.setHistogramBins(255)
+            task.gOptions.setHistogramBins(255)
             desc = "Identify the unstable grayscale pixel values "
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            hist.Run(tsk.gray)
+            hist.Run(task.gray)
 
-            unstable.Run(tsk.gray)
+            unstable.Run(task.gray)
             dst2 = unstable.dst3
 
             Dim points = dst2.FindNonZero()
@@ -345,7 +345,7 @@ Namespace VBClasses
             Dim pixels As New List(Of Byte)
             Dim pixelSort As New SortedList(Of Byte, Integer)(New compareByte)
             For i = 0 To pts.Count - 1 Step 2
-                Dim val = tsk.gray.Get(Of Byte)(pts(i + 1), pts(i))
+                Dim val = task.gray.Get(Of Byte)(pts(i + 1), pts(i))
                 If pixels.Contains(val) = False Then
                     pixelSort.Add(val, 1)
                     pixels.Add(val)
@@ -389,7 +389,7 @@ Namespace VBClasses
                 strOut += CStr(index) + vbTab
             Next
             SetTrueText(strOut, 3)
-            If tsk.heartBeat Then labels(3) = "There are " + CStr(dst2.CountNonZero) + " unstable pixels"
+            If task.heartBeat Then labels(3) = "There are " + CStr(dst2.CountNonZero) + " unstable pixels"
         End Sub
     End Class
 
@@ -407,17 +407,17 @@ Namespace VBClasses
                 diff(i) = New Diff_Basics
                 mats.mat(i) = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
             Next
-            If standalone Then tsk.gOptions.displayDst1.Checked = True
+            If standalone Then task.gOptions.displayDst1.Checked = True
             dst1 = New cv.Mat(dst1.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
             labels(2) = "A 4-way split - darkest (upper left) to lightest (lower right)"
             desc = "Separate the quartiles of the image using the fuzzy grayscale pixel values"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            unstable.Run(tsk.gray)
+            unstable.Run(task.gray)
 
             Dim lastVal As Integer = 255
             For i = Math.Min(mats.mat.Count, unstable.gapValues.Count) - 1 To 0 Step -1
-                mats.mat(i) = tsk.gray.InRange(unstable.gapValues(i), lastVal)
+                mats.mat(i) = task.gray.InRange(unstable.gapValues(i), lastVal)
                 lastVal = unstable.gapValues(i)
             Next
 
@@ -429,7 +429,7 @@ Namespace VBClasses
             mats.Run(emptyMat)
             dst2 = mats.dst2
             dst3 = mats.dst3
-            If tsk.heartBeat Then labels(1) = "There are " + CStr(dst1.CountNonZero) + " unstable pixels"
+            If task.heartBeat Then labels(1) = "There are " + CStr(dst1.CountNonZero) + " unstable pixels"
         End Sub
     End Class
 
@@ -460,7 +460,7 @@ Namespace VBClasses
 
             dst2 = PaletteFull(dst0)
 
-            binaryRight.Run(tsk.rightView)
+            binaryRight.Run(task.rightView)
 
             dst1.SetTo(1, binaryRight.mats.mat(0))
             dst1.SetTo(2, binaryRight.mats.mat(1))
@@ -486,16 +486,16 @@ Namespace VBClasses
             desc = "Binarize an image and split it into quartiles using peaks."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            binary.Run(tsk.gray)
+            binary.Run(task.gray)
             Dim mask = binary.dst2.Clone
 
             Dim midColor = binary.meanScalar(0)
-            Dim topColor = cv.Cv2.Mean(tsk.gray, mask)(0)
-            Dim botColor = cv.Cv2.Mean(tsk.gray, Not mask)(0)
-            mats.mat(0) = tsk.gray.InRange(0, botColor)
-            mats.mat(1) = tsk.gray.InRange(botColor, midColor)
-            mats.mat(2) = tsk.gray.InRange(midColor, topColor)
-            mats.mat(3) = tsk.gray.InRange(topColor, 255)
+            Dim topColor = cv.Cv2.Mean(task.gray, mask)(0)
+            Dim botColor = cv.Cv2.Mean(task.gray, Not mask)(0)
+            mats.mat(0) = task.gray.InRange(0, botColor)
+            mats.mat(1) = task.gray.InRange(botColor, midColor)
+            mats.mat(2) = task.gray.InRange(midColor, topColor)
+            mats.mat(3) = task.gray.InRange(topColor, 255)
 
             mats.Run(emptyMat)
             dst2 = mats.dst2
@@ -513,7 +513,7 @@ Namespace VBClasses
         Dim bin4 As New Bin4Way_Basics
         Dim color8U As New Color8U_Basics
         Public Sub New()
-            If standalone Then tsk.gOptions.displayDst1.Checked = True
+            If standalone Then task.gOptions.displayDst1.Checked = True
             desc = "Test Bin4Way_Basics with different src inputs."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -550,7 +550,7 @@ Namespace VBClasses
                 diff(i).Run(binary.mats.mat(i))
                 dst3 = dst3 Or diff(i).dst2
             Next
-            If tsk.heartBeat Then labels(3) = "There are " + CStr(dst3.CountNonZero) + " unstable pixels"
+            If task.heartBeat Then labels(3) = "There are " + CStr(dst3.CountNonZero) + " unstable pixels"
         End Sub
     End Class
 
@@ -603,19 +603,19 @@ Namespace VBClasses
             desc = "Binarize an image and split it into quartiles using peaks."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            binary.Run(tsk.gray)
+            binary.Run(task.gray)
             Dim mask = binary.dst2.Clone
 
-            If tsk.heartBeat Then
+            If task.heartBeat Then
                 midColor = binary.meanScalar(0)
-                topColor = cv.Cv2.Mean(tsk.gray, mask)(0)
-                botColor = cv.Cv2.Mean(tsk.gray, Not mask)(0)
+                topColor = cv.Cv2.Mean(task.gray, mask)(0)
+                botColor = cv.Cv2.Mean(task.gray, Not mask)(0)
             End If
 
-            mats.mat(0) = tsk.gray.InRange(0, botColor)
-            mats.mat(1) = tsk.gray.InRange(botColor, midColor)
-            mats.mat(2) = tsk.gray.InRange(midColor, topColor)
-            mats.mat(3) = tsk.gray.InRange(topColor, 255)
+            mats.mat(0) = task.gray.InRange(0, botColor)
+            mats.mat(1) = task.gray.InRange(botColor, midColor)
+            mats.mat(2) = task.gray.InRange(midColor, topColor)
+            mats.mat(3) = task.gray.InRange(topColor, 255)
 
             mats.Run(emptyMat)
             dst2 = mats.dst2

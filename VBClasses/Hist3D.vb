@@ -18,9 +18,9 @@ Namespace VBClasses
 
             hCloud.Run(src)
             hCloud.dst2 += hColor.classCount + 1
-            hCloud.dst2.SetTo(0, tsk.noDepthMask)
+            hCloud.dst2.SetTo(0, task.noDepthMask)
 
-            hCloud.dst2.CopyTo(dst2, tsk.depthmask)
+            hCloud.dst2.CopyTo(dst2, task.depthmask)
             classCount = hColor.classCount + hCloud.classCount
 
             dst3 = PaletteFull(dst2)
@@ -44,7 +44,7 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             If standaloneTest() Then
-                tsk.gOptions.setHistogramBins(100)
+                task.gOptions.setHistogramBins(100)
                 plot.Run(src)
                 If plot.histogram.Rows = 0 Then Exit Sub
                 src = plot.histogram
@@ -125,7 +125,7 @@ Namespace VBClasses
             redC.Run(hColor.dst2)
             dst2 = redC.dst2
             labels(2) = redC.labels(2)
-            If redC.rcList.Count > 0 Then dst2(tsk.rcD.rect).SetTo(white, tsk.rcD.mask)
+            If redC.rcList.Count > 0 Then dst2(task.rcD.rect).SetTo(white, task.rcD.mask)
         End Sub
     End Class
 
@@ -145,7 +145,7 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             If standaloneTest() Then
                 fore.Run(src)
-                depthMask = fore.dst2 Or tsk.noDepthMask
+                depthMask = fore.dst2 Or task.noDepthMask
             End If
             hColor.inputMask = depthMask
             dst0 = Not depthMask
@@ -178,9 +178,9 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
 
-            If src.Channels() <> 3 Then src = tsk.color
+            If src.Channels() <> 3 Then src = task.color
             Dim bins = options.histogram3DBins
-            cv.Cv2.CalcHist({src}, {0, 1, 2}, New cv.Mat, histogram, 3, {bins, bins, bins}, tsk.rangesBGR)
+            cv.Cv2.CalcHist({src}, {0, 1, 2}, New cv.Mat, histogram, 3, {bins, bins, bins}, task.rangesBGR)
 
             ReDim histArray(histogram.Total - 1)
             Marshal.Copy(histogram.Data, histArray, 0, histArray.Length)
@@ -192,7 +192,7 @@ Namespace VBClasses
             classCount = bins * bins * bins
             Marshal.Copy(histArray, 0, histogram.Data, histArray.Length)
 
-            cv.Cv2.CalcBackProject({src}, {0, 1, 2}, histogram, dst2, tsk.rangesBGR)
+            cv.Cv2.CalcBackProject({src}, {0, 1, 2}, histogram, dst2, task.rangesBGR)
             dst3 = PaletteFull(dst2)
         End Sub
     End Class
@@ -217,8 +217,8 @@ Namespace VBClasses
 
             pixel.Run(src)
 
-            For Each rc In tsk.redList.oldrclist
-                cv.Cv2.CalcBackProject({src(rc.rect)}, {0, 1, 2}, pixel.histogram, dst2(rc.rect), tsk.rangesBGR)
+            For Each rc In task.redList.oldrclist
+                cv.Cv2.CalcBackProject({src(rc.rect)}, {0, 1, 2}, pixel.histogram, dst2(rc.rect), task.rangesBGR)
             Next
 
             dst3 = PaletteFull(dst2)
@@ -242,8 +242,8 @@ Namespace VBClasses
 
             dst2 = runRedList(pixel.dst2, labels(2))
 
-            If tsk.redList.oldrclist.Count > 0 Then
-                dst2(tsk.oldrcD.rect).SetTo(white, tsk.oldrcD.mask)
+            If task.redList.oldrclist.Count > 0 Then
+                dst2(task.oldrcD.rect).SetTo(white, task.oldrcD.mask)
             End If
         End Sub
     End Class
@@ -276,7 +276,7 @@ Namespace VBClasses
         Dim pixels As New Pixel_Vectors
         Dim hVector As New Hist3Dcolor_Vector
         Public Sub New()
-            tsk.gOptions.GridSlider.Value = 8
+            task.gOptions.GridSlider.Value = 8
             desc = "Build RedCloud pixel vectors and then measure each grid element's distance to those vectors."
         End Sub
         Private Function distanceN(vec1 As List(Of Single), vec2 As List(Of Single)) As Double
@@ -301,7 +301,7 @@ Namespace VBClasses
             dst3 = dst2.InRange(0, 0)
             If pixels.pixelVector.Count = 0 Then Exit Sub
             dst1.SetTo(0)
-            For Each gr In tsk.gridRects
+            For Each gr In task.gridRects
                 If dst3(gr).CountNonZero Then
                     Dim candidates As New List(Of Integer)
                     For y = 0 To gr.Height - 1

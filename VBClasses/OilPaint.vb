@@ -9,16 +9,16 @@ Namespace VBClasses
         Dim options As New Options_Pointilism
         Dim saveDrawRect As New cv.Rect
         Public Sub New()
-            tsk.drawRect = New cv.Rect(dst2.Cols * 3 / 8, dst2.Rows * 3 / 8, dst2.Cols * 2 / 8, dst2.Rows * 2 / 8)
+            task.drawRect = New cv.Rect(dst2.Cols * 3 / 8, dst2.Rows * 3 / 8, dst2.Cols * 2 / 8, dst2.Rows * 2 / 8)
             desc = "Alter the image to effect the pointilism style"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
 
             dst2 = src
-            Dim img = src(tsk.drawRect)
-            If saveDrawRect <> tsk.drawRect Then
-                saveDrawRect = tsk.drawRect
+            Dim img = src(task.drawRect)
+            If saveDrawRect <> task.drawRect Then
+                saveDrawRect = task.drawRect
                 ' only need to create the mask to order the brush strokes once.
                 randomMask = New cv.Mat(img.Size(), cv.MatType.CV_32SC2)
                 Dim nPt As New cv.Point
@@ -77,14 +77,14 @@ Namespace VBClasses
     Public Class NR_OilPaint_ManualVB : Inherits TaskParent
         Public options As New Options_OilPaint
         Public Sub New()
-            tsk.drawRect = New cv.Rect(dst2.Cols * 3 / 8, dst2.Rows * 3 / 8, dst2.Cols * 2 / 8, dst2.Rows * 2 / 8)
+            task.drawRect = New cv.Rect(dst2.Cols * 3 / 8, dst2.Rows * 3 / 8, dst2.Cols * 2 / 8, dst2.Rows * 2 / 8)
             desc = "Alter an image so it appears more like an oil painting.  Select a region of interest."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             Options.Run()
             Dim filterKern = options.filterSize Or 1
 
-            Dim roi = tsk.drawRect
+            Dim roi = task.drawRect
             src.CopyTo(dst2)
             Dim color = src(roi)
             Dim result1 = color.Clone()

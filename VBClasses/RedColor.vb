@@ -8,7 +8,7 @@ Namespace VBClasses
         Public rcMap As cv.Mat = New cv.Mat(dst2.Size, cv.MatType.CV_32S, 0)
         Public Sub New()
             cPtr = RedCloud_Open()
-            tsk.featureOptions.ReductionTargetSlider.Value = 20
+            task.featureOptions.ReductionTargetSlider.Value = 20
             desc = "Run the C++ RedCloud interface without a mask"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -80,13 +80,13 @@ Namespace VBClasses
                 rcList.Add(rc)
 
                 dst2(rc.rect).SetTo(rc.color, rc.mask)
-                dst2.Circle(rc.maxDist, tsk.DotSize, tsk.highlight, -1)
+                dst2.Circle(rc.maxDist, task.DotSize, task.highlight, -1)
 
                 SetTrueText(CStr(rc.age), rc.maxDist)
             Next
 
             RedCloud_Cell.selectCell(rcMap, rcList)
-            strOut = tsk.rcD.displayCell()
+            strOut = task.rcD.displayCell()
             SetTrueText(strOut, 3)
 
             labels(2) = CStr(unMatched) + " were new cells and " + CStr(matchCount) + " were matched, " +
@@ -160,7 +160,7 @@ Namespace VBClasses
                 Else
                     indexLast = -1
                 End If
-                If indexLast >= 0 And r1.IntersectsWith(r2) And tsk.optionsChanged = False Then
+                If indexLast >= 0 And r1.IntersectsWith(r2) And task.optionsChanged = False Then
                     rc.age = rcListLast(indexLast).age + 1
                     rc.color = rcListLast(indexLast).color
                     If rc.age >= 1000 Then rc.age = 2
@@ -184,12 +184,12 @@ Namespace VBClasses
                 rc.mask = rcMap(rc.rect).InRange(rc.index, rc.index)
                 rc.buildMaxDist()
                 dst2(rc.rect).SetTo(rc.color, rc.mask)
-                dst2.Circle(rc.maxDist, tsk.DotSize, tsk.highlight, -1)
+                dst2.Circle(rc.maxDist, task.DotSize, task.highlight, -1)
             Next
 
             If standaloneTest() Then
                 RedCloud_Cell.selectCell(rcMap, rcList)
-                If tsk.rcD IsNot Nothing Then strOut = tsk.rcD.displayCell()
+                If task.rcD IsNot Nothing Then strOut = task.rcD.displayCell()
                 SetTrueText(strOut, 3)
             End If
 
@@ -214,13 +214,13 @@ Namespace VBClasses
             desc = "Display the RedColor_Basics output for both the left and right images."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            reduction.Run(tsk.leftView)
+            reduction.Run(task.leftView)
 
             redLeft.Run(reduction.dst2)
             dst2 = PaletteFull(redLeft.dst2)
             labels(2) = redLeft.labels(2) + " in the left image"
 
-            reduction.Run(tsk.rightView)
+            reduction.Run(task.rightView)
 
             redRight.Run(reduction.dst2)
             dst3 = PaletteFull(redRight.dst2)
@@ -258,13 +258,12 @@ Namespace VBClasses
         Public brickList As New List(Of brickData)
         Dim redC As New RedColor_Basics
         Public Sub New()
-            If standalone Then tsk.gOptions.displayDst0.Checked = True
-            If tsk.bricks Is Nothing Then tsk.bricks = New Brick_Basics
+            If standalone Then task.gOptions.displayDst0.Checked = True
             desc = "Attach an color8u class to each gr."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            dst0 = tsk.leftView
-            color8u.Run(tsk.leftView)
+            dst0 = task.leftView
+            color8u.Run(task.leftView)
 
             redC.Run(color8u.dst3.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
             labels(2) = redC.labels(3)
@@ -272,7 +271,7 @@ Namespace VBClasses
 
             Dim count As Integer
             dst1.SetTo(0)
-            For Each gr As brickData In tsk.bricks.brickList
+            For Each gr As brickData In task.bricks.brickList
                 If redC.rcMap(gr.lRect).CountNonZero And gr.rRect.Width > 0 Then
                     dst2(gr.lRect).CopyTo(dst1(gr.rRect))
                     gr.colorClass = color8u.dst2.Get(Of Integer)
@@ -280,7 +279,7 @@ Namespace VBClasses
                 End If
             Next
 
-            dst3 = ShowAddweighted(dst1, tsk.rightView, labels(3))
+            dst3 = ShowAddweighted(dst1, task.rightView, labels(3))
             labels(3) += " " + CStr(count) + " bricks mapped into the right image."
         End Sub
     End Class
@@ -344,8 +343,8 @@ Namespace VBClasses
 
             rcGridMap.SetTo(0)
             dst3.SetTo(0)
-            For i = 0 To tsk.gridRects.Count - 1
-                Dim gr = tsk.gridRects(i)
+            For i = 0 To task.gridRects.Count - 1
+                Dim gr = task.gridRects(i)
 
                 Dim center = New cv.Point(CInt(gr.X + gr.Width / 2), CInt(gr.Y + gr.Height / 2))
                 Dim index = redC.rcMap.Get(Of Integer)(center.Y, center.X) - 1
@@ -377,7 +376,7 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             contours.Run(src)
             If src.Type <> cv.MatType.CV_8U Then
-                If standalone And tsk.featureOptions.Color8USource.SelectedItem = "EdgeLine_Basics" Then
+                If standalone And task.featureOptions.Color8USource.SelectedItem = "EdgeLine_Basics" Then
                     dst1 = contours.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
                 Else
                     dst1 = Mat_Basics.srcMustBe8U(src)

@@ -21,7 +21,7 @@ Namespace VBClasses
         Public Sub New()
             options = New Options_GeneticDrawing()
             For i = 0 To brushes.Count - 1
-                brushes(i) = cv.Cv2.ImRead(tsk.homeDir + "Data/GeneticDrawingBrushes/" + CStr(i) + ".jpg").CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+                brushes(i) = cv.Cv2.ImRead(task.homeDir + "Data/GeneticDrawingBrushes/" + CStr(i) + ".jpg").CvtColor(cv.ColorConversionCodes.BGR2GRAY)
             Next
 
             labels(2) = "(clkwise) original, imgStage, imgGeneration, magnitude"
@@ -100,7 +100,7 @@ Namespace VBClasses
             options.Run()
 
             Static r = New cv.Rect(0, 0, src.Width, src.Height)
-            If tsk.drawRect.Width > 0 Then r = tsk.drawRect
+            If task.drawRect.Width > 0 Then r = task.drawRect
             If restartRequested Then
                 restartRequested = False
                 dst3 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, 0)
@@ -109,7 +109,7 @@ Namespace VBClasses
                 stage = 0
 
                 If standaloneTest() Then
-                    src = If(options.snapCheck, src.Clone, cv.Cv2.ImRead(tsk.homeDir + "Data/GeneticDrawingExample.jpg").Resize(src.Size()))
+                    src = If(options.snapCheck, src.Clone, cv.Cv2.ImRead(task.homeDir + "Data/GeneticDrawingExample.jpg").Resize(src.Size()))
                 End If
 
                 src = If(src.Channels() = 3, src.CvtColor(cv.ColorConversionCodes.BGR2GRAY), src)
@@ -234,12 +234,12 @@ Namespace VBClasses
         Dim fileNameForm As OptionsFileName
         Public Sub New()
             fileNameForm = New OptionsFileName
-            fileNameForm.OpenFileDialog1.InitialDirectory = tsk.homeDir + "Data/"
+            fileNameForm.OpenFileDialog1.InitialDirectory = task.homeDir + "Data/"
             fileNameForm.OpenFileDialog1.FileName = "*.*"
             fileNameForm.OpenFileDialog1.CheckFileExists = False
             fileNameForm.OpenFileDialog1.Filter = "jpg (*.jpg)|*.jpg|png (*.png)|*.png|bmp (*.bmp)|*.bmp|All files (*.*)|*.*"
             fileNameForm.OpenFileDialog1.FilterIndex = 1
-            fileNameForm.filename.Text = tsk.homeDir + "Data/GeneticDrawingExample.jpg"
+            fileNameForm.filename.Text = task.homeDir + "Data/GeneticDrawingExample.jpg"
             fileNameForm.Text = "Select an image file to create a paint version"
             fileNameForm.FileNameLabel.Text = "Select a file for use with the Sound_Basics algorithm."
             fileNameForm.PlayButton.Hide()
@@ -251,7 +251,7 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
 
             Static fileInputName = New FileInfo(fileNameForm.filename.Text)
-            If inputFileName <> fileInputName.FullName Or tsk.optionsChanged Then
+            If inputFileName <> fileInputName.FullName Or task.optionsChanged Then
                 inputFileName = fileInputName.FullName
                 If fileInputName.Exists = False Then
                     labels(2) = "No input file specified or file not found."

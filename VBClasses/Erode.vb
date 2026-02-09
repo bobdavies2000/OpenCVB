@@ -11,7 +11,7 @@ Namespace VBClasses
             If options.noshape Or options.iterations = 0 Then dst2 = src Else dst2 = src.Erode(options.element, Nothing, options.iterations)
 
             If standaloneTest() Then
-                dst3 = tsk.depthRGB.Erode(options.element, Nothing, options.iterations)
+                dst3 = task.depthRGB.Erode(options.element, Nothing, options.iterations)
                 labels(3) = "Eroded Depth " + CStr(options.iterations) + " times"
             End If
             labels(2) = "Eroded BGR " + CStr(-options.iterations) + " times"
@@ -38,15 +38,15 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             Static dilateSlider = OptionParent.FindSlider("Dilate Iterations")
             Static erodeSlider = OptionParent.FindSlider("Erode Iterations")
-            erodeMask.Run(tsk.depthMask)
+            erodeMask.Run(task.depthMask)
             dst1 = Not erodeMask.dst2
 
-            dilate.Run(tsk.pcSplit(0))
+            dilate.Run(task.pcSplit(0))
             Dim mm As mmData = GetMinMax(dilate.dst2, erodeMask.dst2)
             dst2 = (dilate.dst2 - mm.minVal) / (mm.maxVal - mm.minVal)
             dst2.SetTo(0, dst1)
 
-            erode.Run(tsk.pcSplit(1))
+            erode.Run(task.pcSplit(1))
             mm = GetMinMax(dilate.dst2, erodeMask.dst2)
             dst3 = (erode.dst2 - mm.minVal) / (mm.maxVal - mm.minVal)
             dst3.SetTo(0, dst1)
@@ -67,14 +67,14 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
 
-            cv.Cv2.Erode(tsk.pcSplit(2), dst0, erode.options.element)
-            dst0 = tsk.pcSplit(2) - dst0
+            cv.Cv2.Erode(task.pcSplit(2), dst0, erode.options.element)
+            dst0 = task.pcSplit(2) - dst0
             dst3 = dst0.LessThan(options.flatDepth).ToMat
-            dst1 = tsk.pcSplit(2).GreaterThan(0).ToMat
-            dst1.SetTo(0, tsk.pcSplit(2).GreaterThan(tsk.MaxZmeters))
+            dst1 = task.pcSplit(2).GreaterThan(0).ToMat
+            dst1.SetTo(0, task.pcSplit(2).GreaterThan(task.MaxZmeters))
             dst3 = dst3 And dst1
             dst2.SetTo(0)
-            tsk.depthRGB.CopyTo(dst2, dst3)
+            task.depthRGB.CopyTo(dst2, dst3)
         End Sub
     End Class
 

@@ -13,8 +13,8 @@ Namespace VBClasses
             OptionParent.findRadio("FloodFill").Enabled = False
             OptionParent.findRadio("ApproxNone").Checked = True
 
-            dst0 = cv.Cv2.ImRead(tsk.homeDir + "Data/star1.png", cv.ImreadModes.Color).CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-            dst1 = cv.Cv2.ImRead(tsk.homeDir + "Data/star2.png", cv.ImreadModes.Color).CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+            dst0 = cv.Cv2.ImRead(task.homeDir + "Data/star1.png", cv.ImreadModes.Color).CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+            dst1 = cv.Cv2.ImRead(task.homeDir + "Data/star2.png", cv.ImreadModes.Color).CvtColor(cv.ColorConversionCodes.BGR2GRAY)
             desc = "MatchShapes compares single hull to single hull - pretty tricky"
         End Sub
         Public Function findBiggestHull(hull As cv.Point()(), maxLen As Integer, maxIndex As Integer, dst As cv.Mat) As Integer
@@ -26,7 +26,7 @@ Namespace VBClasses
             Next
 
             For Each p In hull(maxIndex)
-                DrawCircle(dst, p, tsk.DotSize, cv.Scalar.Yellow)
+                DrawCircle(dst, p, task.DotSize, cv.Scalar.Yellow)
             Next
             Return maxIndex
         End Function
@@ -78,22 +78,22 @@ Namespace VBClasses
             Dim myStandalone = standaloneTest() Or runStandalone
 
             If myStandalone Then
-                redC.Run(tsk.color)
+                redC.Run(task.color)
                 dst2 = redC.dst2.Clone
                 labels(2) = redC.labels(2)
 
                 If redC.rcList.Count = 0 Then Exit Sub
                 addTour.rcList = New List(Of rcData)(redC.rcList)
                 addTour.Run(src)
-                rc = tsk.rcD
+                rc = task.rcD
             End If
 
-            If tsk.heartBeat And myStandalone Then dst3.SetTo(0)
+            If task.heartBeat And myStandalone Then dst3.SetTo(0)
             similarCells.Clear()
 
-            If tsk.gOptions.displayDst0.Checked Then
-                dst0 = tsk.color.Clone
-                DrawTour(dst0(rc.rect), rc.contour, tsk.highlight)
+            If task.gOptions.displayDst0.Checked Then
+                dst0 = task.color.Clone
+                DrawTour(dst0(rc.rect), rc.contour, task.highlight)
             End If
 
             Dim minMatch As Single = Single.MaxValue
@@ -114,7 +114,7 @@ Namespace VBClasses
 
             If bestCell >= 0 Then
                 Dim rc = similarCells(bestCell)
-                DrawCircle(dst3, rc.maxDist, tsk.DotSize, white)
+                DrawCircle(dst3, rc.maxDist, task.DotSize, white)
                 SetTrueText("Best match", rc.maxDist, 3)
             End If
             If similarCells.Count = 0 Then SetTrueText("No matches with match value < " + Format(options.matchThreshold, fmt2), New cv.Point(5, 5), 3)
@@ -140,9 +140,9 @@ Namespace VBClasses
 
             hulls.Run(src)
             dst2 = hulls.dst2
-            If tsk.heartBeat Then dst3.SetTo(0)
+            If task.heartBeat Then dst3.SetTo(0)
 
-            Dim rcX = tsk.rcD
+            Dim rcX = task.rcD
 
             For Each rc In hulls.rclist
                 If rc.hull Is Nothing Or rcX.hull Is Nothing Then Continue For
@@ -177,11 +177,11 @@ Namespace VBClasses
             redC.Run(src)
             dst2 = redC.dst2
             labels(2) = redC.labels(2)
-            If tsk.heartBeat Then dst3.SetTo(0)
+            If task.heartBeat Then dst3.SetTo(0)
 
-            Dim rcX = tsk.rcD
+            Dim rcX = task.rcD
 
-            For Each rc In tsk.redList.oldrclist
+            For Each rc In task.redList.oldrclist
                 If rc.contour Is Nothing Then Continue For
                 Dim matchVal = cv.Cv2.MatchShapes(rcX.contour, rc.contour, options.matchOption)
                 If matchVal < options.matchThreshold Then DrawTour(dst3(rc.rect), rc.contour, white, -1)
@@ -213,10 +213,10 @@ Namespace VBClasses
             options.Run()
 
             If standaloneTest() Then
-                hulls.Run(tsk.color)
+                hulls.Run(task.color)
                 If hulls.rclist.Count = 0 Then Exit Sub
                 dst2 = hulls.dst2
-                rc = tsk.rcD
+                rc = task.rcD
             End If
 
             dst3.SetTo(0)

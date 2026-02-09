@@ -38,9 +38,9 @@ Namespace MainApp
         Private Sub Camera_FrameReady(sender As GenericCamera)
             ' Check if camera is still valid (might be Nothing during shutdown)
             If camera Is Nothing OrElse Not camera.isCapturing Then Exit Sub
-            If tsk Is Nothing Then Exit Sub
+            If vbc.task Is Nothing Then Exit Sub
 
-            If tsk.readyForCameraInput = False Then Exit Sub
+            If vbc.task.readyForCameraInput = False Then Exit Sub
             Static lastPaintTime As DateTime = Now
 
             If camera.frameProcessed = False Then Exit Sub
@@ -48,8 +48,8 @@ Namespace MainApp
 
             Me.BeginInvoke(Sub()
                                Try
-                                   If tsk Is Nothing Then Exit Sub
-                                   tsk.testAllRunning = testAllRunning
+                                   If vbc.task Is Nothing Then Exit Sub
+                                   vbc.task.testAllRunning = testAllRunning
 
                                    ' The testall timer will occasionally not get called after running test all overnight.
                                    ' The cause can be too many GDI or User Objects created and
@@ -58,53 +58,53 @@ Namespace MainApp
                                    ' But this doevents is intended to allow any shortfall to be addressed.
                                    If testAllRunning Then If camera.cameraFrameCount Mod 10 = 0 Then Application.DoEvents()
 
-                                   If tsk.cpu.algorithm_ms.Count = 0 Then tsk.cpu.startRun(settings.algorithm)
+                                   If vbc.task.cpu.algorithm_ms.Count = 0 Then vbc.task.cpu.startRun(settings.algorithm)
 
-                                   tsk.cpu.algorithmTimes(1) = Now
+                                   vbc.task.cpu.algorithmTimes(1) = Now
 
-                                   Dim elapsedWaitTicks = tsk.cpu.algorithmTimes(1).Ticks - tsk.cpu.algorithmTimes(0).Ticks
+                                   Dim elapsedWaitTicks = vbc.task.cpu.algorithmTimes(1).Ticks - vbc.task.cpu.algorithmTimes(0).Ticks
                                    Dim spanWait = New TimeSpan(elapsedWaitTicks)
-                                   tsk.cpu.algorithm_ms(0) += spanWait.Ticks / TimeSpan.TicksPerMillisecond
+                                   vbc.task.cpu.algorithm_ms(0) += spanWait.Ticks / TimeSpan.TicksPerMillisecond
 
-                                   tsk.cpu.algorithmTimes(0) = tsk.cpu.algorithmTimes(1)  ' start time algorithm = end time wait.
+                                   vbc.task.cpu.algorithmTimes(0) = vbc.task.cpu.algorithmTimes(1)  ' start time algorithm = end time wait.
 
                                    SyncLock camera.cameraMutex
-                                       camera.color.CopyTo(tsk.color)
-                                       camera.pointCloud.CopyTo(tsk.pointCloud)
-                                       camera.leftView.CopyTo(tsk.leftView)
-                                       camera.rightView.CopyTo(tsk.rightView)
-                                       tsk.IMU_Acceleration = camera.IMU_Acceleration
-                                       tsk.IMU_FrameTime = camera.IMU_FrameTime
-                                       tsk.IMU_AngularAcceleration = camera.IMU_AngularAcceleration
-                                       tsk.IMU_AngularVelocity = camera.IMU_AngularVelocity
+                                       camera.color.CopyTo(vbc.task.color)
+                                       camera.pointCloud.CopyTo(vbc.task.pointCloud)
+                                       camera.leftView.CopyTo(vbc.task.leftView)
+                                       camera.rightView.CopyTo(vbc.task.rightView)
+                                       vbc.task.IMU_Acceleration = camera.IMU_Acceleration
+                                       vbc.task.IMU_FrameTime = camera.IMU_FrameTime
+                                       vbc.task.IMU_AngularAcceleration = camera.IMU_AngularAcceleration
+                                       vbc.task.IMU_AngularVelocity = camera.IMU_AngularVelocity
                                    End SyncLock
 
-                                   tsk.RunAlgorithm()
+                                   vbc.task.RunAlgorithm()
 
-                                   tsk.cpu.algorithmTimes(1) = Now
+                                   vbc.task.cpu.algorithmTimes(1) = Now
 
-                                   elapsedWaitTicks = tsk.cpu.algorithmTimes(1).Ticks - tsk.cpu.algorithmTimes(0).Ticks
+                                   elapsedWaitTicks = vbc.task.cpu.algorithmTimes(1).Ticks - vbc.task.cpu.algorithmTimes(0).Ticks
 
                                    spanWait = New TimeSpan(elapsedWaitTicks)
-                                   tsk.cpu.algorithm_ms(1) += spanWait.Ticks / TimeSpan.TicksPerMillisecond
+                                   vbc.task.cpu.algorithm_ms(1) += spanWait.Ticks / TimeSpan.TicksPerMillisecond
 
-                                   tsk.cpu.algorithmTimes(0) = tsk.cpu.algorithmTimes(1) ' start time wait = end time algorithm
+                                   vbc.task.cpu.algorithmTimes(0) = vbc.task.cpu.algorithmTimes(1) ' start time wait = end time algorithm
 
-                                   tsk.mouseClickFlag = False
-                                   tsk.frameCount += 1
+                                   vbc.task.mouseClickFlag = False
+                                   vbc.task.frameCount += 1
 
-                                   elapsedWaitTicks = tsk.cpu.algorithmTimes(1).Ticks - lastPaintTime.Ticks
+                                   elapsedWaitTicks = vbc.task.cpu.algorithmTimes(1).Ticks - lastPaintTime.Ticks
                                    spanWait = New TimeSpan(elapsedWaitTicks)
                                    Dim msSinceLastPaint = spanWait.Ticks / TimeSpan.TicksPerMillisecond
 
-                                   Dim threshold = 1000 / tsk.Settings.FPSPaintTarget
+                                   Dim threshold = 1000 / vbc.task.Settings.FPSPaintTarget
 
                                    If msSinceLastPaint > threshold Then
-                                       lastPaintTime = tsk.cpu.algorithmTimes(1)
+                                       lastPaintTime = vbc.task.cpu.algorithmTimes(1)
                                        Dim tmp As cv.Mat
                                        For i = 0 To pics.Count - 1
-                                           tmp = tsk.dstList(i).Clone
-                                           tmp.Rectangle(tsk.drawRect, cv.Scalar.White, 1)
+                                           tmp = vbc.task.dstList(i).Clone
+                                           tmp.Rectangle(vbc.task.drawRect, cv.Scalar.White, 1)
                                            tmp = tmp.Resize(New cv.Size(settings.displayRes.Width, settings.displayRes.Height))
                                            If pics(i).Image IsNot Nothing Then pics(i).Image.Dispose()
                                            pics(i).Image = cvext.BitmapConverter.ToBitmap(tmp)

@@ -4,47 +4,46 @@ Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Class Intrinsics_Basics : Inherits TaskParent
         Public Sub New()
-            If standalone Then If tsk.bricks Is Nothing Then tsk.bricks = New Brick_Basics
-            If standalone Then tsk.gOptions.gravityPointCloud.Checked = False
+            If standalone Then task.gOptions.gravityPointCloud.Checked = False
             desc = "Some cameras don't provide aligned color and left images.  This algorithm tries to align the left and color image."
         End Sub
         Public Shared Function translate_LeftToRight(pt As cv.Point3f) As cv.Point2f
             Dim ptTranslated As cv.Point2f, ptTranslated3D As cv.Point3f
-            ptTranslated3D.X = tsk.calibData.LtoR_rotation(0) * pt.X +
-                               tsk.calibData.LtoR_rotation(1) * pt.Y +
-                               tsk.calibData.LtoR_rotation(2) * pt.Z + tsk.calibData.LtoR_translation(0)
-            ptTranslated3D.Y = tsk.calibData.LtoR_rotation(3) * pt.X +
-                               tsk.calibData.LtoR_rotation(4) * pt.Y +
-                               tsk.calibData.LtoR_rotation(5) * pt.Z + tsk.calibData.LtoR_translation(1)
-            ptTranslated3D.Z = tsk.calibData.LtoR_rotation(6) * pt.X +
-                               tsk.calibData.LtoR_rotation(7) * pt.Y +
-                               tsk.calibData.LtoR_rotation(8) * pt.Z + tsk.calibData.LtoR_translation(2)
-            ptTranslated.X = tsk.calibData.leftIntrinsics.fx * ptTranslated3D.X / ptTranslated3D.Z + tsk.calibData.leftIntrinsics.ppx
-            ptTranslated.Y = tsk.calibData.leftIntrinsics.fy * ptTranslated3D.Y / ptTranslated3D.Z + tsk.calibData.leftIntrinsics.ppy
+            ptTranslated3D.X = task.calibData.LtoR_rotation(0) * pt.X +
+                               task.calibData.LtoR_rotation(1) * pt.Y +
+                               task.calibData.LtoR_rotation(2) * pt.Z + task.calibData.LtoR_translation(0)
+            ptTranslated3D.Y = task.calibData.LtoR_rotation(3) * pt.X +
+                               task.calibData.LtoR_rotation(4) * pt.Y +
+                               task.calibData.LtoR_rotation(5) * pt.Z + task.calibData.LtoR_translation(1)
+            ptTranslated3D.Z = task.calibData.LtoR_rotation(6) * pt.X +
+                               task.calibData.LtoR_rotation(7) * pt.Y +
+                               task.calibData.LtoR_rotation(8) * pt.Z + task.calibData.LtoR_translation(2)
+            ptTranslated.X = task.calibData.leftIntrinsics.fx * ptTranslated3D.X / ptTranslated3D.Z + task.calibData.leftIntrinsics.ppx
+            ptTranslated.Y = task.calibData.leftIntrinsics.fy * ptTranslated3D.Y / ptTranslated3D.Z + task.calibData.leftIntrinsics.ppy
 
             Return ptTranslated
         End Function
         Public Shared Function translate_ColorToLeft(pt As cv.Point3f) As cv.Point2f
             Dim ptTranslated As cv.Point2f, ptTranslated3D As cv.Point3f
-            ptTranslated3D.X = tsk.calibData.ColorToLeft_rotation(0) * pt.X +
-                               tsk.calibData.ColorToLeft_rotation(1) * pt.Y +
-                               tsk.calibData.ColorToLeft_rotation(2) * pt.Z + tsk.calibData.ColorToLeft_translation(0)
-            ptTranslated3D.Y = tsk.calibData.ColorToLeft_rotation(3) * pt.X +
-                               tsk.calibData.ColorToLeft_rotation(4) * pt.Y +
-                               tsk.calibData.ColorToLeft_rotation(5) * pt.Z + tsk.calibData.ColorToLeft_translation(1)
-            ptTranslated3D.Z = tsk.calibData.ColorToLeft_rotation(6) * pt.X +
-                               tsk.calibData.ColorToLeft_rotation(7) * pt.Y +
-                               tsk.calibData.ColorToLeft_rotation(8) * pt.Z + tsk.calibData.ColorToLeft_translation(2)
-            ptTranslated.X = tsk.calibData.leftIntrinsics.fx * ptTranslated3D.X / ptTranslated3D.Z + tsk.calibData.leftIntrinsics.ppx
-            ptTranslated.Y = tsk.calibData.leftIntrinsics.fy * ptTranslated3D.Y / ptTranslated3D.Z + tsk.calibData.leftIntrinsics.ppy
+            ptTranslated3D.X = task.calibData.ColorToLeft_rotation(0) * pt.X +
+                               task.calibData.ColorToLeft_rotation(1) * pt.Y +
+                               task.calibData.ColorToLeft_rotation(2) * pt.Z + task.calibData.ColorToLeft_translation(0)
+            ptTranslated3D.Y = task.calibData.ColorToLeft_rotation(3) * pt.X +
+                               task.calibData.ColorToLeft_rotation(4) * pt.Y +
+                               task.calibData.ColorToLeft_rotation(5) * pt.Z + task.calibData.ColorToLeft_translation(1)
+            ptTranslated3D.Z = task.calibData.ColorToLeft_rotation(6) * pt.X +
+                               task.calibData.ColorToLeft_rotation(7) * pt.Y +
+                               task.calibData.ColorToLeft_rotation(8) * pt.Z + task.calibData.ColorToLeft_translation(2)
+            ptTranslated.X = task.calibData.leftIntrinsics.fx * ptTranslated3D.X / ptTranslated3D.Z + task.calibData.leftIntrinsics.ppx
+            ptTranslated.Y = task.calibData.leftIntrinsics.fy * ptTranslated3D.Y / ptTranslated3D.Z + task.calibData.leftIntrinsics.ppy
 
             Return ptTranslated
         End Function
         Public Overrides Sub RunAlg(src As cv.Mat)
             If standalone Then
-                dst2 = tsk.leftView.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+                dst2 = task.leftView.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
                 Dim vec = New cv.Vec3b(0, 255, 255) ' yellow
-                For Each gr In tsk.bricks.brickList
+                For Each gr In task.bricks.brickList
                     If gr.depth > 0 Then DrawCircle(dst2, gr.rect.TopLeft)
                 Next
             End If
@@ -56,8 +55,8 @@ Namespace VBClasses
 
     Public Class Intrinsics_TranslateRGBtoLeft : Inherits TaskParent
         Public Sub New()
-            tsk.gOptions.highlight.SelectedItem = "Red"
-            tsk.gOptions.LineWidth.Value += 1
+            task.gOptions.highlight.SelectedItem = "Red"
+            task.gOptions.LineWidth.Value += 1
             labels(3) = "The left image with the lines that can be translated on both ends."
             desc = "Translate a point from the RGB image to the left image.  Test with the longest line as input."
         End Sub
@@ -65,10 +64,10 @@ Namespace VBClasses
         ' Map a pixel from RGB image into Left IR image
         '---------------------------------------------
         Public Shared Function MapRgbToLeftIr(uRgb As Single, vRgb As Single, depth As Single) As cv.Point2f
-            Dim rgbintr = tsk.calibData.rgbIntrinsics
-            Dim leftintr = tsk.calibData.leftIntrinsics
-            Dim rotation = tsk.calibData.ColorToLeft_Rotation
-            Dim translation = tsk.calibData.ColorToLeft_Translation
+            Dim rgbintr = task.calibData.rgbIntrinsics
+            Dim leftintr = task.calibData.leftIntrinsics
+            Dim rotation = task.calibData.ColorToLeft_Rotation
+            Dim translation = task.calibData.ColorToLeft_Translation
 
             '-------------------------------
             ' 1. Unproject RGB pixel to 3D
@@ -106,23 +105,23 @@ Namespace VBClasses
 
         Public Overrides Sub RunAlg(src As cv.Mat)
             dst2 = src
-            dst3 = tsk.leftView.CvtColor(cv.ColorConversionCodes.GRAY2BGR) ' so we can show the red line...
+            dst3 = task.leftView.CvtColor(cv.ColorConversionCodes.GRAY2BGR) ' so we can show the red line...
             Dim count As Integer
-            If tsk.Settings.cameraName.startswith("StereoLabs") Then
-                For Each lp In tsk.lines.lpList
-                    dst2.Line(lp.p1, lp.p2, tsk.highlight, tsk.lineWidth, tsk.lineType)
-                    dst3.Line(lp.p1, lp.p2, tsk.highlight, tsk.lineWidth, tsk.lineType)
+            If task.Settings.cameraName.startswith("StereoLabs") Then
+                For Each lp In task.lines.lpList
+                    dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
+                    dst3.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
                 Next
             Else
-                For Each lp In tsk.lines.lpList
-                    dst2.Line(lp.p1, lp.p2, tsk.highlight, tsk.lineWidth, tsk.lineType)
-                    Dim depth1 = tsk.pointCloud.Get(Of cv.Point3f)(CInt(lp.p1.Y), CInt(lp.p1.X)).Z
-                    Dim depth2 = tsk.pointCloud.Get(Of cv.Point3f)(CInt(lp.p2.Y), CInt(lp.p2.X)).Z
+                For Each lp In task.lines.lpList
+                    dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
+                    Dim depth1 = task.pointCloud.Get(Of cv.Point3f)(CInt(lp.p1.Y), CInt(lp.p1.X)).Z
+                    Dim depth2 = task.pointCloud.Get(Of cv.Point3f)(CInt(lp.p2.Y), CInt(lp.p2.X)).Z
 
                     If depth1 > 0 And depth2 > 0 Then
                         Dim p1 = MapRgbToLeftIr(lp.p1.X, lp.p1.Y, depth1)
                         Dim p2 = MapRgbToLeftIr(lp.p2.X, lp.p2.Y, depth2)
-                        dst3.Line(p1, p2, tsk.highlight, tsk.lineWidth, tsk.lineType)
+                        dst3.Line(p1, p2, task.highlight, task.lineWidth, task.lineType)
                         count += 1
                     End If
                 Next
@@ -145,10 +144,10 @@ Namespace VBClasses
         '---------------------------------------------------------
         'Public Function MapLeftToRgb(uLeft As Single, vLeft As Single, depth As Single) As cv.Point2f
 
-        '    Dim rgbintr = tsk.calibData.rgbIntrinsics
-        '    Dim leftintr = tsk.calibData.leftIntrinsics
-        '    Dim rotation = tsk.calibData.ColorToLeft_Rotation
-        '    Dim translation = tsk.calibData.ColorToLeft_Translation
+        '    Dim rgbintr = task.calibData.rgbIntrinsics
+        '    Dim leftintr = task.calibData.leftIntrinsics
+        '    Dim rotation = task.calibData.ColorToLeft_Rotation
+        '    Dim translation = task.calibData.ColorToLeft_Translation
 
         '    '-----------------------------------------
         '    ' 1. Unproject Left IR pixel into 3D point
@@ -189,10 +188,10 @@ Namespace VBClasses
         ''-----------------------------------------
         '' Convert rotation[] → 3×3 Mat
         ''-----------------------------------------
-        'Dim R = cv.Mat.FromPixelData(3, 3, MatType.CV_32F, tsk.calibData.ColorToLeft_Rotation)
+        'Dim R = cv.Mat.FromPixelData(3, 3, MatType.CV_32F, task.calibData.ColorToLeft_Rotation)
 
         '' Convert translation[] → 3×1 Mat
-        'Dim T = cv.Mat.FromPixelData(3, 1, MatType.CV_32F, tsk.calibData.ColorToLeft_Translation)
+        'Dim T = cv.Mat.FromPixelData(3, 1, MatType.CV_32F, task.calibData.ColorToLeft_Translation)
 
         ''-----------------------------------------
         '' 1. Invert rotation: R_inv = R^T
@@ -230,17 +229,17 @@ Namespace VBClasses
 
         Public Overrides Sub RunAlg(src As cv.Mat)
             'dst2 = src
-            'dst3 = tsk.leftView.CvtColor(cv.ColorConversionCodes.GRAY2BGR) ' so we can show the red line...
+            'dst3 = task.leftView.CvtColor(cv.ColorConversionCodes.GRAY2BGR) ' so we can show the red line...
             'Dim count As Integer
-            'For Each lp In tsk.lines.lpList
-            '    dst2.Line(lp.p1, lp.p2, tsk.highlight, tsk.lineWidth, tsk.lineType)
-            '    Dim depth1 = tsk.pointCloud.Get(Of cv.Point3f)(CInt(lp.p1.Y), CInt(lp.p1.X)).Z
-            '    Dim depth2 = tsk.pointCloud.Get(Of cv.Point3f)(CInt(lp.p2.Y), CInt(lp.p2.X)).Z
+            'For Each lp In task.lines.lpList
+            '    dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
+            '    Dim depth1 = task.pointCloud.Get(Of cv.Point3f)(CInt(lp.p1.Y), CInt(lp.p1.X)).Z
+            '    Dim depth2 = task.pointCloud.Get(Of cv.Point3f)(CInt(lp.p2.Y), CInt(lp.p2.X)).Z
 
             '    If depth1 > 0 And depth2 > 0 Then
             '        Dim p1 = MapRgbToLeftIr(lp.p1.X, lp.p1.Y, depth1)
             '        Dim p2 = MapRgbToLeftIr(lp.p2.X, lp.p2.Y, depth2)
-            '        dst3.Line(p1, p2, tsk.highlight, tsk.lineWidth, tsk.lineType)
+            '        dst3.Line(p1, p2, task.highlight, task.lineWidth, task.lineType)
             '        count += 1
             '    End If
             'Next
@@ -254,38 +253,37 @@ Namespace VBClasses
 
     Public Class Intrinsics_MapLeftToRight : Inherits TaskParent
         Public Sub New()
-            If tsk.bricks Is Nothing Then tsk.bricks = New Brick_Basics
             desc = "Map a point from the left image to the right image"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             dst2 = src
-            dst3 = tsk.rightView.CvtColor(cv.ColorConversionCodes.GRAY2BGR) ' so we can show the red line...
+            dst3 = task.rightView.CvtColor(cv.ColorConversionCodes.GRAY2BGR) ' so we can show the red line...
             Dim count As Integer
-            If tsk.Settings.cameraName.StartsWith("StereoLabs") Then
-                For Each lp In tsk.lines.lpList
-                    Dim brick1 = tsk.bricks.brickList(lp.p1GridIndex)
-                    Dim brick2 = tsk.bricks.brickList(lp.p2GridIndex)
+            If task.Settings.cameraName.StartsWith("StereoLabs") Then
+                For Each lp In task.lines.lpList
+                    Dim brick1 = task.bricks.brickList(lp.p1GridIndex)
+                    Dim brick2 = task.bricks.brickList(lp.p2GridIndex)
                     Dim p1 = lp.p1 ' avoid updating list of lines.
                     Dim p2 = lp.p2
                     If brick1.depth > 0 And brick2.depth > 0 Then
-                        p1.X -= tsk.calibData.baseline * tsk.calibData.leftIntrinsics.fx / brick1.mmDepth.minVal
-                        p2.X -= tsk.calibData.baseline * tsk.calibData.leftIntrinsics.fx / brick2.mmDepth.minVal
-                        dst2.Line(lp.p1, lp.p2, lp.color, tsk.lineWidth + 1, tsk.lineType)
-                        dst3.Line(p1, p2, lp.color, tsk.lineWidth + 1, tsk.lineType)
+                        p1.X -= task.calibData.baseline * task.calibData.leftIntrinsics.fx / brick1.mmDepth.minVal
+                        p2.X -= task.calibData.baseline * task.calibData.leftIntrinsics.fx / brick2.mmDepth.minVal
+                        dst2.Line(lp.p1, lp.p2, lp.color, task.lineWidth + 1, task.lineType)
+                        dst3.Line(p1, p2, lp.color, task.lineWidth + 1, task.lineType)
                     Else
                         count += 1
                     End If
                 Next
             Else
-                'For Each lp In tsk.lines.lpList
-                '    dst2.Line(lp.p1, lp.p2, tsk.highlight, tsk.lineWidth, tsk.lineType)
-                '    Dim depth1 = tsk.pointCloud.Get(Of cv.Point3f)(CInt(lp.p1.Y), CInt(lp.p1.X)).Z
-                '    Dim depth2 = tsk.pointCloud.Get(Of cv.Point3f)(CInt(lp.p2.Y), CInt(lp.p2.X)).Z
+                'For Each lp In task.lines.lpList
+                '    dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
+                '    Dim depth1 = task.pointCloud.Get(Of cv.Point3f)(CInt(lp.p1.Y), CInt(lp.p1.X)).Z
+                '    Dim depth2 = task.pointCloud.Get(Of cv.Point3f)(CInt(lp.p2.Y), CInt(lp.p2.X)).Z
 
                 '    If depth1 > 0 And depth2 > 0 Then
                 '        Dim p1 = MapRgbToLeftIr(lp.p1.X, lp.p1.Y, depth1)
                 '        Dim p2 = MapRgbToLeftIr(lp.p2.X, lp.p2.Y, depth2)
-                '        dst3.Line(p1, p2, tsk.highlight, tsk.lineWidth, tsk.lineType)
+                '        dst3.Line(p1, p2, task.highlight, task.lineWidth, task.lineType)
                 '        count += 1
                 '    End If
                 'Next
