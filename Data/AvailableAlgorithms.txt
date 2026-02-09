@@ -5,6 +5,7 @@ ApproxPoly_Basics
 AsciiArt_Basics
 AsciiArt_Color
 BackProject_Basics
+BackProject_DepthMouse
 BackProject_DisplayColor
 BackProject_FeatureLess
 BackProject_Full
@@ -1497,6 +1498,7 @@ RedCloud_CellMask
 RedCloud_Core
 RedCloud_KNN
 RedCloud_LeftRight
+RedCloud_RGB
 RedColor_Basics
 RedColor_Bricks
 RedColor_GridRects

@@ -6,6 +6,8 @@ Namespace VBClasses
         Implements IDisposable
         Public hist As New Histogram_Basics
         Public minRange As cv.Scalar, maxRange As cv.Scalar
+        Public incr As Single
+        Public histIndex As Integer
         Public Sub New()
             labels(2) = "Move mouse to backproject a histogram column"
             desc = "Mouse over any bin to see the histogram backprojected."
@@ -22,8 +24,8 @@ Namespace VBClasses
 
             Dim totalPixels = dst2.Total ' assume we are including zeros.
             Dim colWidth = dst2.Width / tsk.histogramBins
-            Dim incr = (hist.mm.maxVal - hist.mm.minVal) / tsk.histogramBins
-            Dim histIndex = Math.Floor(tsk.mouseMovePoint.X / colWidth)
+            incr = (hist.mm.maxVal - hist.mm.minVal) / tsk.histogramBins
+            histIndex = Math.Floor(tsk.mouseMovePoint.X / colWidth)
 
             minRange = New cv.Scalar(histIndex * incr)
             maxRange = New cv.Scalar((histIndex + 1) * incr)
@@ -53,7 +55,6 @@ Namespace VBClasses
         Dim reduction As New Reduction_Basics
         Dim bProject As New BackProject_Basics
         Public Sub New()
-            OptionParent.findRadio("Use Simple Reduction").Checked = True
             labels(3) = "Backprojection of highlighted histogram bin"
             desc = "Use the histogram of a reduced BGR image to isolate featureless portions of an image."
         End Sub
@@ -67,39 +68,6 @@ Namespace VBClasses
             labels(2) = "Reduction = " + CStr(reductionTarget) + " and bins = " + CStr(tsk.histogramBins)
         End Sub
     End Class
-
-
-
-
-
-
-
-    Public Class BackProject_FeatureLess : Inherits TaskParent
-        Implements IDisposable
-        Dim bProject As New BackProject_Basics
-        Dim contours As New Contour_Basics
-        Public Sub New()
-            labels(3) = "Move mouse over the histogram to backproject a column"
-            desc = "Create a histogram of the featureless regions"
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            contours.Run(src)
-            contours.contourMap.ConvertTo(dst1, cv.MatType.CV_32F)
-            bProject.Run(dst1) ' calcHist doesn't support 32S
-            dst2 = bProject.dst2
-            dst3 = bProject.dst3
-            labels(2) = "Bins = " + CStr(tsk.histogramBins)
-        End Sub
-        Public Overloads Sub Dispose() Implements IDisposable.Dispose
-            bProject.Dispose()
-            contours.Dispose()
-        End Sub
-    End Class
-
-
-
-
-
 
 
 
@@ -797,6 +765,52 @@ Namespace VBClasses
             dst3 = bpDepth.dst2.InRange(index, index)
             Dim count = dst3.CountNonZero
             labels(3) = "Class " + CStr(index) + " had " + CStr(count) + " pixels after backprojection."
+        End Sub
+    End Class
+
+
+
+
+
+
+
+    Public Class BackProject_FeatureLess : Inherits TaskParent
+        Implements IDisposable
+        Dim bProject As New BackProject_Basics
+        Dim contours As New Contour_Basics
+        Public Sub New()
+            labels(3) = "Move mouse over the histogram to backproject a column"
+            desc = "Create a histogram of the featureless regions"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            contours.Run(src)
+            contours.contourMap.ConvertTo(dst1, cv.MatType.CV_32F)
+            bProject.Run(dst1) ' calcHist doesn't support 32S
+            dst2 = bProject.dst2
+            dst3 = bProject.dst3
+            labels(2) = "Bins = " + CStr(tsk.histogramBins)
+        End Sub
+        Public Overloads Sub Dispose() Implements IDisposable.Dispose
+            bProject.Dispose()
+            contours.Dispose()
+        End Sub
+    End Class
+
+
+
+
+
+    Public Class BackProject_DepthMouse : Inherits TaskParent
+        Dim bProject As New BackProject_Basics
+        Public Sub New()
+            labels(3) = "Move mouse over the histogram to backproject a column"
+            desc = "Create a histogram of depth regions"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            bProject.Run(tsk.pcSplit(2)) ' calcHist doesn't support 32S
+            dst2 = bProject.dst2
+            dst3 = bProject.dst3
+            labels(2) = bProject.labels(3)
         End Sub
     End Class
 

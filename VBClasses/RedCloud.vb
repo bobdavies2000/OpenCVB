@@ -106,7 +106,6 @@ Namespace VBClasses
                                 rc = New rcData(input(rect), rect, index)
                                 If rc.index < 0 Then Continue For
                                 newList.Add(rc.pixels, rc)
-                                If newList.Count >= 254 Then Dim k = 0
                                 index += 1
                                 rc.index = newList.Count
                             End If
@@ -296,6 +295,26 @@ Namespace VBClasses
                 Next
                 listOfPoints.Add(hullList)
                 dst3.FillPoly(listOfPoints, rc.color)
+            Next
+        End Sub
+    End Class
+
+
+
+
+    Public Class RedCloud_RGB : Inherits TaskParent
+        Dim redC As New RedCloud_Basics
+        Public Sub New()
+            desc = "Display the RGB data rather than the rc.color"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            redC.Run(src)
+            dst2 = redC.dst2
+            labels(2) = redC.labels(2)
+
+            dst3.SetTo(0)
+            For Each rc In redC.rcList
+                src(rc.rect).CopyTo(dst3(rc.rect), rc.mask)
             Next
         End Sub
     End Class

@@ -88,9 +88,10 @@ Namespace VBClasses
         Public gravityBasics As Gravity_Basics
         Public imuBasics As IMU_Basics
         Public motionRGB As Motion_Basics
-        Public contours As Contour_Basics_List
-        Public pcMotion As Motion_PointCloud
+        Public motionCloud As Motion_PointCloud
+        Public motionFeatures As cv.Point2f
         Public leftRightEnhanced As LeftRight_Brightness
+        Public contours As Contour_Basics_List
 
         Public GLRequest As Integer
         Public GLcloud As cv.Mat
@@ -127,7 +128,6 @@ Namespace VBClasses
         Public gridRatioX As Single ' translate from display width to workres to find grid element.
         Public gridRatioY As Single ' translate from display height to workres to find grid element.
 
-        Public fpMotion As cv.Point2f
 
         Public features As New List(Of cv.Point2f)
         Public fpFromGridCell As New List(Of Integer)

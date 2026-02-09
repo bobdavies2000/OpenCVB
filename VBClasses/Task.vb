@@ -42,7 +42,7 @@ Namespace VBClasses
             gravityBasics = New Gravity_Basics
             imuBasics = New IMU_Basics
             motionRGB = New Motion_Basics
-            pcMotion = New Motion_PointCloud
+            motionCloud = New Motion_PointCloud
             grid = New Grid_Basics
             lines = New Line_Basics
             filterBasics = New Filter_Basics
@@ -127,7 +127,7 @@ Namespace VBClasses
                 motionRGB.Run(gray)
             End If
 
-            pcMotion.Run(emptyMat) '******* this can rotate for gravity (if selected) *******
+            motionCloud.Run(emptyMat) '******* this may rotate for gravity if selected *******
             colorizer.Run(src)
 
             If feat IsNot Nothing Then feat.Run(src)
@@ -176,6 +176,7 @@ Namespace VBClasses
                 If PixelViewer IsNot Nothing Then PixelViewer.viewerForm.Activate()
                 activateTaskForms = False
             End If
+
 
 
 

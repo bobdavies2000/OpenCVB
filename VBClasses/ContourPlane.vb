@@ -110,8 +110,6 @@ Namespace VBClasses
                 rleft.Width = maxDist.X - contour.rect.X
                 rRight.X = rleft.X + rleft.Width
                 rRight.Width = contour.rect.Width - rleft.Width
-
-
             Next
         End Sub
     End Class

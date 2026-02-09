@@ -579,12 +579,12 @@ Namespace VBClasses
 
             plothist.Run(cv.Mat.FromPixelData(fcsM.xDist.Count, 1, cv.MatType.CV_32F, fcsM.xDist.ToArray))
             Dim xDist As New List(Of Single)(plothist.histArray)
-            tsk.fpMotion.X = plothist.minRange + xDist.IndexOf(xDist.Max) * incr
+            tsk.motionFeatures.X = plothist.minRange + xDist.IndexOf(xDist.Max) * incr
             mats.mat(0) = plothist.dst2.Clone
 
             plothist.Run(cv.Mat.FromPixelData(fcsM.yDist.Count, 1, cv.MatType.CV_32F, fcsM.yDist.ToArray))
             Dim yDist As New List(Of Single)(plothist.histArray)
-            tsk.fpMotion.Y = plothist.minRange + yDist.IndexOf(yDist.Max) * incr
+            tsk.motionFeatures.Y = plothist.minRange + yDist.IndexOf(yDist.Max) * incr
             mats.mat(1) = plothist.dst2.Clone
 
             mats.Run(emptyMat)
@@ -592,13 +592,13 @@ Namespace VBClasses
             dst3 = mats.dst3
 
             If fcsM.motionPercent < 50 Then
-                tsk.fpMotion.X = 0
-                tsk.fpMotion.Y = 0
+                tsk.motionFeatures.X = 0
+                tsk.motionFeatures.Y = 0
             End If
 
             strOut = "CameraMotion estimate: " + vbCrLf + vbCrLf
-            strOut += "Displacement in X: " + CStr(tsk.fpMotion.X) + vbCrLf
-            strOut += "Displacement in Y: " + CStr(tsk.fpMotion.Y) + vbCrLf
+            strOut += "Displacement in X: " + CStr(tsk.motionFeatures.X) + vbCrLf
+            strOut += "Displacement in Y: " + CStr(tsk.motionFeatures.Y) + vbCrLf
 
             SetTrueText(strOut, 1)
             SetTrueText("X distances" + rangeText, 2)

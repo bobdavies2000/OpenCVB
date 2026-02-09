@@ -3,6 +3,7 @@ Imports System.Runtime.InteropServices
 Imports System.Security.Claims
 Imports System.Threading
 Imports Orbbec
+Imports VBClasses.Structures
 Imports cv = OpenCvSharp
 
 Namespace MainApp

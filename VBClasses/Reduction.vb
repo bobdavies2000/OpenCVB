@@ -227,7 +227,6 @@ Namespace VBClasses
     Public Class Reduction_PointCloud : Inherits TaskParent
         Dim reduction As New Reduction_Basics
         Public Sub New()
-            OptionParent.findRadio("Use Simple Reduction").Checked = True
             labels = {"", "", "8-bit reduced depth", "Palettized output of the different depth levels found"}
             desc = "Use reduction to smooth depth data"
         End Sub
@@ -251,7 +250,6 @@ Namespace VBClasses
         Dim edges As New Edge_Laplacian
         Dim reduction As New Reduction_Basics
         Public Sub New()
-            OptionParent.findRadio("Use Simple Reduction").Checked = True
             desc = "Get the edges after reducing the image."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
