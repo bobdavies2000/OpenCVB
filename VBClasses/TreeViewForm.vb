@@ -59,7 +59,6 @@ Public Class TreeviewForm
                 ' Create if missing, or always create at leaf to allow duplicate names
                 If found Is Nothing Then
                     found = currentNodes.Add(part)
-                    found.Tag = nodeList.Count
                     nodeList.Add(found.Text)
                 End If
 
@@ -69,8 +68,6 @@ Public Class TreeviewForm
                 End If
             Next
         Next
-
-        tree.Nodes(tree.Nodes.Count - 1).Remove()
 
         tree.EndUpdate()
         tree.ExpandAll()
@@ -82,6 +79,9 @@ Public Class TreeviewForm
             treeData.Clear()
             For Each td In task.cpu.callTrace
                 If td.EndsWith("\") Then td = td.Substring(0, td.Length - 1)
+                If td.StartsWith(task.Settings.algorithm) = False Then
+                    td = task.Settings.algorithm + "\" + td
+                End If
                 treeData.Add(td)
             Next
             BuildTreeView(TreeView1, treeData)
@@ -102,7 +102,6 @@ Public Class TreeviewForm
     End Sub
     Private Sub TreeView1_AfterSelect(sender As Object, e As TreeViewEventArgs) Handles TreeView1.AfterSelect
         task.cpu.displayObjectName = e.Node.Text
-        task.cpu.indexTask = e.Node.Tag
         Timer2_Tick(sender, e)
     End Sub
 End Class

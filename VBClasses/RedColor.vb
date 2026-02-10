@@ -291,7 +291,7 @@ Namespace VBClasses
 
     Public Class RedColor_Hulls : Inherits TaskParent
         Public rclist As New List(Of rcData)
-        Public rcMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        Public rcMap As New cv.Mat(dst2.Size, cv.MatType.CV_32S, 0)
         Dim redC As New RedColor_Basics
         Public Sub New()
             labels = {"", "Cells where convexity defects failed", "", "Improved contour results Using OpenCV's ConvexityDefects"}
@@ -306,7 +306,7 @@ Namespace VBClasses
             rcMap.SetTo(0)
             rclist.Clear()
             For Each rc In redC.rcList
-                If rc.contour.Count >= 5 Then
+                If rc.contour.Count >= 3 Then
                     rc.hull = cv.Cv2.ConvexHull(rc.contour.ToArray, True).ToList
                     Dim hullIndices = cv.Cv2.ConvexHullIndices(rc.hull.ToArray, False)
                     Try

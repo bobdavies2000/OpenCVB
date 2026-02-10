@@ -73,6 +73,9 @@ Namespace VBClasses
             strOut = task.rcD.displayCell()
             SetTrueText(strOut, 3)
 
+            dst3 = redCore.dst3
+            labels(3) = redCore.labels(3)
+
             labels(2) = CStr(unMatched) + " were new cells and " + CStr(matchCount) + " were matched, " +
                             "average age: " + Format(matchAverage / rcList.Count, fmt1)
         End Sub

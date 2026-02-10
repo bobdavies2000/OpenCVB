@@ -248,7 +248,7 @@ Namespace VBClasses
         Dim redCs(3) As RedColor_Basics
         Dim mats As New Mat_4to1
         Dim rclist As New List(Of rcData)
-        Dim rcMap = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        Dim rcMap = New cv.Mat(dst2.Size, cv.MatType.CV_32S, 0)
         Public Sub New()
             For i = 0 To redCs.Count - 1
                 redCs(i) = New RedColor_Basics

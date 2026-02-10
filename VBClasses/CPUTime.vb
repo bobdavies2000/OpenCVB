@@ -12,7 +12,6 @@ Namespace VBClasses
         Public algorithmStack As New Stack()
         Public paintTime As Single
         Public displayObjectName As String
-        Public indexTask As Integer
         Public activeObjects As New List(Of Object)
 
         Public Sub initialize(algName As String)

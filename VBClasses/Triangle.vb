@@ -46,7 +46,7 @@ Namespace VBClasses
         Dim hulls As New RedColor_Hulls
         Public Sub New()
             If standalone Then task.gOptions.displayDst1.Checked = True
-            labels = {"", "Selected cell", "RedColor_Basics output", "Selected contour"}
+            labels = {"", "Selected hull", "RedColor_Basics output", "Selected contour"}
             desc = "Given a contour, convert that contour to a series of triangles"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -64,10 +64,12 @@ Namespace VBClasses
             Next
 
             dst1.SetTo(0)
-            For Each pt In rc.hull
-                pt = New cv.Point(pt.X + rc.rect.X, pt.Y + rc.rect.Y)
-                DrawCircle(dst1, pt, task.DotSize, cv.Scalar.Yellow)
-            Next
+            If rc.hull IsNot Nothing Then
+                For Each pt In rc.hull
+                    pt = New cv.Point(pt.X + rc.rect.X, pt.Y + rc.rect.Y)
+                    DrawCircle(dst1, pt, task.DotSize, cv.Scalar.Yellow)
+                Next
+            End If
 
             RedCloud_Cell.selectCell(hulls.rcMap, hulls.rclist)
             rc = If(task.rcD Is Nothing, hulls.rclist(0), task.rcD)

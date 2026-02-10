@@ -277,6 +277,7 @@ Namespace VBClasses
         Dim hVector As New Hist3Dcolor_Vector
         Public Sub New()
             task.gOptions.GridSlider.Value = 8
+            dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_32S, 0)
             desc = "Build RedCloud pixel vectors and then measure each grid element's distance to those vectors."
         End Sub
         Private Function distanceN(vec1 As List(Of Single), vec2 As List(Of Single)) As Double
@@ -329,8 +330,11 @@ Namespace VBClasses
                             End If
                         End If
                     ElseIf candidates.Count = 1 Then
+                        Dim index = candidates(0) - 1
+                        If index < pixels.rclist.Count Then
                             Dim cell = pixels.rclist(candidates(0) - 1)
-                        dst1(gr).SetTo(cell.color, dst3(gr))
+                            dst1(gr).SetTo(cell.color, dst3(gr))
+                        End If
                     End If
                 End If
             Next

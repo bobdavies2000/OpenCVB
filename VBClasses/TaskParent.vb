@@ -36,7 +36,9 @@ Namespace VBClasses
         Public Sub New()
             traceName = Me.GetType.Name
 
-            If task.cpu.callTrace.Count = 0 Then task.cpu.callTrace.Add(task.Settings.algorithm + "\")
+            If task.cpu.callTrace.Count = 0 Then
+                task.cpu.callTrace.Add(task.Settings.algorithm + "\")
+            End If
 
             labels = {"", "", traceName, ""}
             Dim stackTrace = Environment.StackTrace
@@ -65,8 +67,19 @@ Namespace VBClasses
             callStack = callStack.Replace("at Startup\", "")
             callStack = callStack.Replace("at Windows\", "")
 
+            'If callStack.StartsWith(task.Settings.algorithm) = False Then
+            '    callStack = task.Settings.algorithm + "\" + task.Settings.algorithm + "\" + callStack
+            'End If
+
             task.cpu.callTrace.Add(callStack)
 
+            Dim newCallTrace As New List(Of String)({task.cpu.callTrace(0)})
+            For i = 1 To task.cpu.callTrace.Count - 1
+                If task.cpu.callTrace(i) = task.cpu.callTrace(0) Then Continue For
+                newCallTrace.Add(task.cpu.callTrace(i))
+            Next
+
+            task.cpu.callTrace = newCallTrace
             task.cpu.activeObjects.Add(Me)
 
             If standalone Then task.cpu.initialize(traceName)

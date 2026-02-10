@@ -111,8 +111,7 @@ Namespace VBClasses
         Dim reduction As New Reduction_Basics
         Dim options As New Options_ReductionXYZ
         Public Sub New()
-            OptionParent.FindSlider("Simple Reduction").Maximum = 1000
-            OptionParent.FindSlider("Simple Reduction").Value = 400
+            task.featureOptions.ReductionTargetSlider.Value = 400
             desc = "Use reduction to slice the point cloud in 3 dimensions"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)

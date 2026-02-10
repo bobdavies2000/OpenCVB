@@ -47,6 +47,7 @@ Namespace VBClasses
             lines = New Line_Basics
             filterBasics = New Filter_Basics
             leftRightEnhanced = New LeftRight_Brightness
+            bricks = New Brick_Basics
 
             ' all the algorithms in the list are task algorithms that are children of the algorithm.
             For i = 1 To cpu.callTrace.Count - 1
@@ -129,9 +130,9 @@ Namespace VBClasses
 
             motionCloud.Run(emptyMat) '******* this may rotate for gravity if selected *******
             colorizer.Run(src)
+            bricks.Run(src)
 
             If feat IsNot Nothing Then feat.Run(src)
-            If bricks IsNot Nothing Then bricks.Run(src)
 
             If pixelViewerOn And PixelViewer Is Nothing Then
                 PixelViewer = New PixelViewer.Pixel_Viewer
@@ -187,9 +188,17 @@ Namespace VBClasses
 
 
             Dim displayObject = task.MainUI_Algorithm
-            Dim index = task.cpu.indexTask
-            If index > 0 And index < task.cpu.activeObjects.Count Then
-                displayObject = task.cpu.activeObjects(index - 1)
+            Dim index As Integer = 0
+            If task.cpu.displayObjectName IsNot Nothing Then
+                If task.cpu.displayObjectName <> displayObject.traceName Then
+                    For Each td In task.cpu.activeObjects
+                        If td.traceName.endswith(task.cpu.displayObjectName) Then
+                            index = task.cpu.activeObjects.IndexOf(td)
+                            Exit For
+                        End If
+                    Next
+                    displayObject = task.cpu.activeObjects(index)
+                End If
             End If
             Dim nextTrueData As List(Of TrueText) = displayObject.trueData
             trueData = New List(Of TrueText)(nextTrueData)

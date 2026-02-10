@@ -332,7 +332,10 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             dst2 = runRedList(src, labels(2))
 
-            corners.Run(task.redList.rcMap)
+            Dim input As New cv.Mat
+            task.redList.rcMap.ConvertTo(input, cv.MatType.CV_32S)
+
+            corners.Run(input)
 
             dst3 = task.color.Clone
             For Each pt In corners.nPoints

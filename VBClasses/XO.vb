@@ -1287,8 +1287,6 @@ Namespace VBClasses
         Dim reduction As New Reduction_Basics
         Const lineMatch = 254
         Public Sub New()
-            OptionParent.findRadio("Use Bitwise Reduction").Checked = True
-
             If OptionParent.FindFrm(traceName + " CheckBoxes") Is Nothing Then
                 check.Setup(traceName)
                 check.addCheckBox("Show intermediate vertical step task.results..")

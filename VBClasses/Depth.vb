@@ -323,7 +323,6 @@ Namespace VBClasses
         Public mats As New Mat_4to1
         Public colorize As New Depth_ColorMap
         Public Sub New()
-            OptionParent.findRadio("Use Bitwise Reduction").Checked = True
             labels(3) = "Mask of depth that is smooth"
             desc = "This attempt to get the depth data to 'calm' down is not working well enough to be useful - needs more work"
         End Sub
