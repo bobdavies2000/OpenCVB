@@ -51,8 +51,8 @@ Namespace MainApp
             For i = 0 To cameraNames.Count - 1
                 Dim searchname = cameraNames(i)
                 Dim present As Boolean = False
-                If searchname.StartsWith("Oak-3D") Then present = Settings.OakIndex3D >= 0
-                If searchname.StartsWith("Oak-4D") Then present = Settings.OakIndex4D >= 0
+                If searchname.StartsWith("Oak-3D") And countOak > 0 Then present = Settings.OakIndex3D >= 0
+                If searchname.StartsWith("Oak-4D") And countOak > 0 Then present = Settings.OakIndex4D >= 0
                 If searchname.StartsWith("StereoLabs ZED 2/2i") Then searchname = "ZED 2"
 
                 Dim subsetList As New List(Of String)
