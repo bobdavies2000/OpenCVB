@@ -13424,7 +13424,7 @@ Namespace VBClasses
 
 
 
-    Public Class Motion_PointCloud_MotionRect : Inherits TaskParent
+    Public Class Motion_Cloud_MotionRect : Inherits TaskParent
         Public originalPointcloud As cv.Mat
         Public Sub New()
             labels = {"", "", "Pointcloud updated only with motion Rect",
@@ -13529,7 +13529,7 @@ Namespace VBClasses
             If standaloneTest() Then
                 Static diff As New Diff_Depth32f
                 Dim split = originalPointcloud.Split()
-                diff.lastDepth32f = split(2)
+                diff.lastFrame = split(2)
                 diff.Run(task.pcSplit(2))
                 dst3 = diff.dst2
                 dst3.Rectangle(motionRect, white, task.lineWidth)
@@ -15179,7 +15179,7 @@ Namespace VBClasses
 
             sortedVerticals.Clear()
             sortedHorizontals.Clear()
-            For Each lp In lpList
+            For Each lp In lplist
                 Dim gr As New gravityLine
                 gr = updateGLine(src, gr, lp.p1, lp.p2)
                 allLines.Add(lp.p1.DistanceTo(lp.p2), gr)
@@ -17047,7 +17047,7 @@ Namespace VBClasses
 
 
 
-    Public Class XO_Motion_PointCloud : Inherits TaskParent
+    Public Class XO_Motion_Cloud : Inherits TaskParent
         Public originalPointcloud As cv.Mat
         Public Sub New()
             labels(1) = "The difference between the latest pointcloud and the motion-adjusted point cloud."
@@ -17117,7 +17117,7 @@ Namespace VBClasses
 
                 Static diff As New Diff_Depth32f
                 Dim split = dst3.Split()
-                diff.lastDepth32f = split(2)
+                diff.lastFrame = split(2)
                 diff.Run(task.pcSplit(2))
             End If
         End Sub
@@ -18450,6 +18450,107 @@ Namespace VBClasses
         End Sub
         Public Overloads Sub Dispose() Implements IDisposable.Dispose
             If cPtr <> 0 Then cPtr = ParticleFilterTest_Close(cPtr)
+        End Sub
+    End Class
+
+
+
+
+    Public Class XO_Motion_PointCloud : Inherits TaskParent
+        Public originalPointcloud As cv.Mat
+        Public Sub New()
+            labels(1) = "The difference between the latest pointcloud and the motion-adjusted point cloud."
+            labels(2) = "Point cloud after updating with the motion mask changes."
+            labels(3) = "task.pointcloud for the current frame."
+            desc = "Point cloud after updating with the motion mask"
+        End Sub
+        Public Shared Function checkNanInf(pc As cv.Mat) As cv.Mat
+            Dim count As Integer
+            Dim vec As New cv.Vec3f(0, 0, 0)
+            ' The stereolabs camera has some weird -inf and inf values in the Y-plane 
+            ' with and without gravity transform.  Probably my fault but just fix it here.
+            For y = 0 To pc.Rows - 1
+                For x = 0 To pc.Cols - 1
+                    Dim val = pc.Get(Of cv.Vec3f)(y, x)
+                    If Single.IsNaN(val(0)) Or Single.IsInfinity(val(0)) Then
+                        pc.Set(Of cv.Vec3f)(y, x, vec)
+                        count += 1
+                    End If
+                Next
+            Next
+
+            Return pc
+        End Function
+        Private Sub preparePointcloud()
+            If task.gOptions.gravityPointCloud.Checked Then
+                '******* this is the gravity rotation (" * task.gMatrix") *******
+                task.gravityCloud = (task.pointCloud.Reshape(1,
+                                    task.rows * task.cols) * task.gMatrix).ToMat.Reshape(3, task.rows)
+                task.pointCloud = task.gravityCloud
+            End If
+
+            ' The stereolabs camera has some weird -inf and inf values in the Y-plane 
+            ' with and without gravity transform.  Probably my fault but just fix it here.
+            If task.Settings.cameraName = "StereoLabs ZED 2/2i" Then
+                task.pointCloud = checkNanInf(task.pointCloud)
+            End If
+
+            task.pcSplit = task.pointCloud.Split
+
+            If task.optionsChanged Then
+                task.maxDepthMask = New cv.Mat(task.pcSplit(2).Size, cv.MatType.CV_8U, 0)
+            End If
+
+            If task.gOptions.TruncateDepth.Checked Then
+                task.pcSplit(2) = task.pcSplit(2).Threshold(task.MaxZmeters,
+                                                          task.MaxZmeters, cv.ThresholdTypes.Trunc)
+                task.maxDepthMask = task.pcSplit(2).InRange(task.MaxZmeters,
+                                                          task.MaxZmeters).ConvertScaleAbs()
+                cv.Cv2.Merge(task.pcSplit, task.pointCloud)
+            End If
+
+            task.depthmask = task.pcSplit(2).Threshold(0, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs
+            task.noDepthMask = Not task.depthmask
+
+            If task.xRange <> task.xRangeDefault Or task.yRange <> task.yRangeDefault Then
+                Dim xRatio = task.xRangeDefault / task.xRange
+                Dim yRatio = task.yRangeDefault / task.yRange
+                task.pcSplit(0) *= xRatio
+                task.pcSplit(1) *= yRatio
+
+                cv.Cv2.Merge(task.pcSplit, task.pointCloud)
+            End If
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            If task.heartBeatLT Or task.optionsChanged Or task.frameCount < 5 Then
+                dst2 = task.pointCloud.Clone
+            End If
+            originalPointcloud = task.pointCloud.Clone ' save the original camera pointcloud.
+
+            If task.optionsChanged Then
+                If task.rangesCloud Is Nothing Then
+                    Dim rx = New cv.Vec2f(-task.xRangeDefault, task.xRangeDefault)
+                    Dim ry = New cv.Vec2f(-task.yRangeDefault, task.yRangeDefault)
+                    Dim rz = New cv.Vec2f(0, task.MaxZmeters)
+                    task.rangesCloud = New cv.Rangef() {New cv.Rangef(rx.Item0, rx.Item1),
+                                                       New cv.Rangef(ry.Item0, ry.Item1),
+                                                       New cv.Rangef(rz.Item0, rz.Item1)}
+                End If
+            End If
+
+            task.pointCloud.CopyTo(dst2, task.motionRGB.motionMask)
+            task.pointCloud = dst2.Clone
+
+            preparePointcloud()
+
+            If standaloneTest() Then
+                dst3 = originalPointcloud.Clone
+
+                Static diff As New Diff_Depth32f
+                Dim split = dst3.Split()
+                diff.lastFrame = split(2)
+                diff.Run(task.pcSplit(2))
+            End If
         End Sub
     End Class
 End Namespace

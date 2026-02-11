@@ -139,43 +139,58 @@ Namespace VBClasses
 
 
 
-    Public Class Motion_PointCloud : Inherits TaskParent
-        Public originalPointcloud As cv.Mat
+    Public Class Motion_Right : Inherits TaskParent
+        Public motion As New Motion_Basics
         Public Sub New()
-            labels(1) = "The difference between the latest pointcloud and the motion-adjusted point cloud."
-            labels(2) = "Point cloud after updating with the motion mask changes."
-            labels(3) = "task.pointcloud for the current frame."
-            desc = "Point cloud after updating with the motion mask"
+            desc = "Build the MotionMask for the right camera."
         End Sub
-        Public Shared Function checkNanInf(pc As cv.Mat) As cv.Mat
-            Dim count As Integer
-            Dim vec As New cv.Vec3f(0, 0, 0)
-            ' The stereolabs camera has some weird -inf and inf values in the Y-plane 
-            ' with and without gravity transform.  Probably my fault but just fix it here.
-            For y = 0 To pc.Rows - 1
-                For x = 0 To pc.Cols - 1
-                    Dim val = pc.Get(Of cv.Vec3f)(y, x)
-                    If Single.IsNaN(val(0)) Or Single.IsInfinity(val(0)) Then
-                        pc.Set(Of cv.Vec3f)(y, x, vec)
-                        count += 1
-                    End If
-                Next
-            Next
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            motion.Run(task.rightView)
+            dst2 = motion.dst2
+            dst3 = motion.motionMask.Clone
+            labels(2) = motion.labels(2)
+            labels(3) = "The motion mask for the right image"
+        End Sub
+    End Class
 
-            Return pc
-        End Function
+
+
+
+    Public Class Motion_Left : Inherits TaskParent
+        Public motion As New Motion_Basics
+        Public Sub New()
+            desc = "Build the MotionMask for the left camera."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            motion.Run(task.leftView)
+            dst2 = motion.dst2
+            dst3 = motion.motionMask.Clone
+            labels(2) = motion.labels(2)
+            labels(3) = "The motion mask for the left image "
+        End Sub
+    End Class
+
+
+
+
+    Public Class Motion_Cloud : Inherits TaskParent
+        Public originalPointcloud As cv.Mat
+        Public motionList As New List(Of Integer)
+        Dim diff As New Diff_Depth32f
+        Public motionMask As cv.Mat = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 255)
+        Public Sub New()
+            If standalone Then task.gOptions.showMotionMask.Checked = True
+            dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_32F, 0)
+            dst3 = New cv.Mat(dst1.Size, cv.MatType.CV_32F, 0)
+            labels(3) = "The motion mask"
+            desc = "Find all the grid rects that had motion since the last frame."
+        End Sub
         Private Sub preparePointcloud()
             If task.gOptions.gravityPointCloud.Checked Then
                 '******* this is the gravity rotation (" * task.gMatrix") *******
                 task.gravityCloud = (task.pointCloud.Reshape(1,
                                     task.rows * task.cols) * task.gMatrix).ToMat.Reshape(3, task.rows)
                 task.pointCloud = task.gravityCloud
-            End If
-
-            ' The stereolabs camera has some weird -inf and inf values in the Y-plane 
-            ' with and without gravity transform.  Probably my fault but just fix it here.
-            If task.Settings.cameraName = "StereoLabs ZED 2/2i" Then
-                task.pointCloud = checkNanInf(task.pointCloud)
             End If
 
             task.pcSplit = task.pointCloud.Split
@@ -205,14 +220,7 @@ Namespace VBClasses
             End If
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If task.heartBeatLT Or task.optionsChanged Or task.frameCount < 5 Then
-                dst2 = task.pointCloud.Clone
-            End If
-            If task.Settings.cameraName = "StereoLabs ZED 2/2i" Then
-                originalPointcloud = checkNanInf(task.pointCloud).Clone
-            Else
-                originalPointcloud = task.pointCloud.Clone ' save the original camera pointcloud.
-            End If
+            originalPointcloud = task.pointCloud.Clone
 
             If task.optionsChanged Then
                 If task.rangesCloud Is Nothing Then
@@ -220,59 +228,35 @@ Namespace VBClasses
                     Dim ry = New cv.Vec2f(-task.yRangeDefault, task.yRangeDefault)
                     Dim rz = New cv.Vec2f(0, task.MaxZmeters)
                     task.rangesCloud = New cv.Rangef() {New cv.Rangef(rx.Item0, rx.Item1),
-                                                       New cv.Rangef(ry.Item0, ry.Item1),
-                                                       New cv.Rangef(rz.Item0, rz.Item1)}
+                                                        New cv.Rangef(ry.Item0, ry.Item1),
+                                                        New cv.Rangef(rz.Item0, rz.Item1)}
                 End If
             End If
 
-            task.pointCloud.CopyTo(dst2, task.motionRGB.motionMask)
-            task.pointCloud = dst2
-
             preparePointcloud()
 
-            If standaloneTest() Then
-                dst3 = originalPointcloud.Clone
+            diff.lastFrame = dst2
+            diff.Run(task.pcSplit(2))
 
-                Static diff As New Diff_Depth32f
-                Dim split = dst3.Split()
-                diff.lastDepth32f = split(2)
-                diff.Run(task.pcSplit(2))
-            End If
-        End Sub
-    End Class
+            motionList.Clear()
+            For i = 0 To task.gridRects.Count - 1
+                Dim diffCount = diff.dst2(task.gridRects(i)).CountNonZero
+                If diffCount >= task.motionThreshold Then
+                    For Each index In task.grid.gridNeighbors(i)
+                        If motionList.Contains(index) = False Then motionList.Add(index)
+                    Next
+                End If
+            Next
 
+            motionMask.SetTo(0)
+            For Each index In motionList
+                motionMask(task.gridRects(index)).SetTo(255)
+            Next
 
+            task.pcSplit(2).CopyTo(dst2, motionMask)
+            If standaloneTest() Then dst3 = motionMask
 
-
-
-    Public Class Motion_Right : Inherits TaskParent
-        Public motion As New Motion_Basics
-        Public Sub New()
-            desc = "Build the MotionMask for the right camera."
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            motion.Run(task.rightView)
-            dst2 = motion.dst2
-            dst3 =  motion.motionMask.Clone
-            labels(2) = motion.labels(2)
-            labels(3) = "The motion mask for the right image"
-        End Sub
-    End Class
-
-
-
-
-    Public Class Motion_Left : Inherits TaskParent
-        Public motion As New Motion_Basics
-        Public Sub New()
-            desc = "Build the MotionMask for the left camera."
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            motion.Run(task.leftView)
-            dst2 = motion.dst2
-            dst3 = motion.motionMask.Clone
-            labels(2) = motion.labels(2)
-            labels(3) = "The motion mask for the left image "
+            labels(2) = "Grid rects with motion: " + CStr(motionList.Count)
         End Sub
     End Class
 End Namespace

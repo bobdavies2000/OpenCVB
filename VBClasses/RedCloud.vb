@@ -1,4 +1,5 @@
 Imports System.Security.Cryptography
+Imports System.Text.RegularExpressions
 Imports OpenCvSharp
 Imports cv = OpenCvSharp
 Namespace VBClasses
@@ -73,11 +74,9 @@ Namespace VBClasses
             strOut = task.rcD.displayCell()
             SetTrueText(strOut, 3)
 
-            dst3 = redCore.dst3
-            labels(3) = redCore.labels(3)
-
             labels(2) = CStr(unMatched) + " were new cells and " + CStr(matchCount) + " were matched, " +
                             "average age: " + Format(matchAverage / rcList.Count, fmt1)
+            labels(3) = redCore.labels(3)
         End Sub
     End Class
 
@@ -318,6 +317,29 @@ Namespace VBClasses
             For Each rc In redC.rcList
                 src(rc.rect).CopyTo(dst3(rc.rect), rc.mask)
             Next
+        End Sub
+    End Class
+
+
+
+
+    Public Class RedCloud_Matches : Inherits TaskParent
+        Dim redC As New RedCloud_Basics
+        Public Sub New()
+            desc = "Display the RedCloud cells that matched to the previous frame."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            redC.Run(src)
+            labels(2) = redC.labels(2)
+
+            dst2.SetTo(0)
+            For Each rc In redC.rcList
+                If rc.age > 5 Then dst2(rc.rect).SetTo(rc.color, rc.mask)
+            Next
+
+            RedCloud_Cell.selectCell(redC.rcMap, redC.rcList)
+            strOut = task.rcD.displayCell()
+            SetTrueText(strOut, 3)
         End Sub
     End Class
 

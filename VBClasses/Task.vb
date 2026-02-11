@@ -42,7 +42,7 @@ Namespace VBClasses
             gravityBasics = New Gravity_Basics
             imuBasics = New IMU_Basics
             motionRGB = New Motion_Basics
-            motionCloud = New Motion_PointCloud
+            motionCloud = New Motion_Cloud
             grid = New Grid_Basics
             lines = New Line_Basics
             filterBasics = New Filter_Basics

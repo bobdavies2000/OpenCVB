@@ -88,7 +88,7 @@ Namespace VBClasses
         Public gravityBasics As Gravity_Basics
         Public imuBasics As IMU_Basics
         Public motionRGB As Motion_Basics
-        Public motionCloud As Motion_PointCloud
+        Public motionCloud As Motion_Cloud
         Public motionFeatures As cv.Point2f
         Public leftRightEnhanced As LeftRight_Brightness
         Public contours As Contour_Basics_List

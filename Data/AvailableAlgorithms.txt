@@ -479,10 +479,10 @@ ML_Basics
 ML_RemoveDups_CPP
 Moments_Basics
 Motion_Basics
+Motion_Cloud
+Motion_Cloud_MotionRect
 Motion_Left
 Motion_LeftTest
-Motion_PointCloud
-Motion_PointCloud_MotionRect
 Motion_Right
 Mouse_Basics
 MSER_Basics
@@ -1498,6 +1498,7 @@ RedCloud_CellMask
 RedCloud_Core
 RedCloud_KNN
 RedCloud_LeftRight
+RedCloud_Matches
 RedCloud_RGB
 RedColor_Basics
 RedColor_Bricks

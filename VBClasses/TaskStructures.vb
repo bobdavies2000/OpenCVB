@@ -590,7 +590,7 @@ Namespace VBClasses
                 strOut += "Rect: X = " + CStr(rect.X) + ", Y = " + CStr(rect.Y) + ", "
                 strOut += ", width = " + CStr(rect.Width) + ", height = " + CStr(rect.Height) + vbCrLf
                 strOut += "MaxDist = " + CStr(maxDist.X) + "," + CStr(maxDist.Y) + vbCrLf
-                strOut += "Depth = " + Format(depth, fmt1) + vbCrLf
+                strOut += "Depth = " + Format(depth, fmt3) + vbCrLf
                 strOut += "Color = " + color.ToString + vbCrLf
                 strOut += "Pixel count = " + CStr(pixels) + vbCrLf
                 If hull IsNot Nothing Then strOut += "Hull count = " + CStr(hull.Count) + vbCrLf
