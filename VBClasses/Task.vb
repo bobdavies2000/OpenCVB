@@ -67,6 +67,7 @@ Namespace VBClasses
             myStopWatch = Stopwatch.StartNew()
             optionsChanged = True
             readyForCameraInput = True
+            task.clickPoint = New cv.Point(CInt(workRes.Width / 2), CInt(workRes.Height / 2))
 
             Debug.WriteLine(vbCrLf + vbCrLf + vbCrLf + "Starting algorithm " + settings.algorithm)
             Debug.WriteLine(vbTab + CStr(AlgorithmTestAllCount) + " algorithms tested")

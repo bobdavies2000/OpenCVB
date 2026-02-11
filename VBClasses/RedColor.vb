@@ -6,12 +6,15 @@ Namespace VBClasses
         Public classCount As Integer
         Public rcList As New List(Of rcData)
         Public rcMap As cv.Mat = New cv.Mat(dst2.Size, cv.MatType.CV_32S, 0)
+        Public options As New Options_RedCloud
         Public Sub New()
             cPtr = RedCloud_Open()
             task.featureOptions.ReductionTargetSlider.Value = 20
             desc = "Run the C++ RedCloud interface without a mask"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
+            options.Run()
+
             dst1 = Mat_Basics.srcMustBe8U(src)
 
             Dim imagePtr As IntPtr
@@ -55,7 +58,7 @@ Namespace VBClasses
             Dim matchAverage As Single
             For Each rc In newList.Values
                 Dim maxDist = rc.maxDist
-                rc = RedCloud_Basics.rcDataMatch(rc, rcListLast, rcMapLast)
+                rc = RedCloud_Basics.rcDataMatch(rc, rcListLast, rcMapLast, options.rectOverlapRatio)
 
                 If rc.age = 1 Then unMatched += 1 Else matchCount += 1
                 matchAverage += rc.age

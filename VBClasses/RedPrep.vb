@@ -3,7 +3,7 @@ Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Class RedPrep_Basics : Inherits TaskParent
         Dim prepEdges As New RedPrep_Edges_CPP
-        Public options As New Options_RedCloud
+        Public options As New Options_RedPrep
         Dim reductionTarget As Integer
         Public Sub New()
             dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
@@ -249,7 +249,7 @@ Namespace VBClasses
 
     Public Class NR_RedPrep_CloudAndColor : Inherits TaskParent
         Dim prepEdges As New RedPrep_Edges_CPP
-        Public options As New Options_RedCloud
+        Public options As New Options_RedPrep
         Dim redSimple As New RedColor_Basics
         Dim edges As New EdgeLine_Basics
         Dim reductionTarget As Integer
@@ -373,7 +373,7 @@ Namespace VBClasses
 
 
     Public Class RedPrep_Core : Inherits TaskParent
-        Public options As New Options_RedCloud
+        Public options As New Options_RedPrep
         Public reductionName As String
         Public Sub New()
             desc = "Reduction transform for the point cloud"

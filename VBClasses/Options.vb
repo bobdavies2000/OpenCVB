@@ -7971,7 +7971,7 @@ Namespace VBClasses
         Public xBins As Integer = 30
         Public yBins As Integer = 30
         Public zBins As Integer = 100
-        Public rcOptions As New Options_RedCloud
+        Public rcOptions As New Options_RedPrep
         Public Sub New()
             If sliders.Setup(traceName) Then
                 sliders.setupTrackBar("Histogram threshold", 0, 1000, threshold)
@@ -8106,7 +8106,7 @@ Namespace VBClasses
 
 
 
-    Public Class Options_RedCloud : Inherits OptionParent
+    Public Class Options_RedPrep : Inherits OptionParent
         Public PrepX As Boolean
         Public PrepY As Boolean
         Public PrepZ As Boolean
@@ -8149,4 +8149,26 @@ Namespace VBClasses
             reductionName = frm.check(findRadioIndex(frm.check)).Text
         End Sub
     End Class
+
+
+
+
+
+    Public Class Options_RedCloud : Inherits OptionParent
+        Public ageThreshold As Integer
+        Public rectOverlapRatio As Integer
+        Public Sub New()
+            If sliders.Setup(traceName) Then
+                sliders.setupTrackBar("Age Threshold", 1, 50, 30)
+                sliders.setupTrackBar("Rect overlap ratio X100", 1, 100, 50)
+            End If
+        End Sub
+        Public Sub Run()
+            Static ageSlider = FindSlider("Age Threshold")
+            Static ratioSlider = FindSlider("Rect overlap ratio X100")
+            ageThreshold = ageSlider.value
+            rectOverlapRatio = ratioSlider.value / 100
+        End Sub
+    End Class
+
 End Namespace

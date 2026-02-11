@@ -1,6 +1,3 @@
-Imports System.Security.Cryptography
-Imports System.Text.RegularExpressions
-Imports OpenCvSharp
 Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Class RedCloud_Basics : Inherits TaskParent
@@ -8,12 +5,14 @@ Namespace VBClasses
         Public rcList As New List(Of rcData)
         Public rcMap As cv.Mat = New cv.Mat(dst2.Size, cv.MatType.CV_32S, 0)
         Public percentImage As Single
+        Public options As New Options_RedCloud
         Public Sub New()
             task.redCloud = Me
             task.featureOptions.ReductionTargetSlider.Value = 40
             desc = "Build contours for each cell"
         End Sub
-        Public Shared Function rcDataMatch(rc As rcData, rcListLast As List(Of rcData), rcMapLast As cv.Mat) As rcData
+        Public Shared Function rcDataMatch(rc As rcData, rcListLast As List(Of rcData),
+                                           rcMapLast As cv.Mat, overlapRatio As Single) As rcData
             Dim r1 = rc.rect
             Dim r2 = New cv.Rect(0, 0, 1, 1) ' fake rect for conditional below...
             Dim indexLast = rcMapLast.Get(Of Integer)(rc.maxDist.Y, rc.maxDist.X)
@@ -25,15 +24,16 @@ Namespace VBClasses
 
             If indexLast >= 0 And indexLast < rcListLast.Count And r1.IntersectsWith(r2) And task.optionsChanged = False Then
                 Dim lrc = rcListLast(indexLast)
-                If rc.rect.Contains(lrc.maxDist) Then
-                    Dim row = lrc.maxDist.Y - lrc.rect.Y
-                    Dim col = lrc.maxDist.X - lrc.rect.X
-                    If row < rc.mask.Height And col < rc.mask.Width And
-                       row >= 0 And col >= 0 Then
-                        If rc.mask.Get(Of Byte)(row, col) Then ' more doublechecking...
-                            rc.maxDist = lrc.maxDist
-                            rc.depth = lrc.depth
-                        End If
+                Dim rTest = rc.rect.Intersect(lrc.rect)
+                Dim rTotal = rTest.Width * rTest.Height
+                Dim lastTotal = lrc.rect.Width * lrc.rect.Height
+                Dim sizeRatio = If(rTotal > lastTotal, lastTotal / rTotal, rTotal / lastTotal)
+                If rc.rect.Contains(lrc.maxDist) Or sizeRatio > overlapRatio Then
+                    rc.maxDist = lrc.maxDist
+                    rc.depthDelta = Math.Abs(lrc.depth - rc.depth)
+                    If Single.IsInfinity(rc.depthDelta) Or rc.depthDelta < 0 Then
+                        rc.depthDelta = 0
+                        rc.depth = 0
                     End If
                 End If
 
@@ -45,6 +45,8 @@ Namespace VBClasses
             Return rc
         End Function
         Public Overrides Sub RunAlg(src As cv.Mat)
+            options.Run()
+
             redCore.Run(src)
             labels(3) = redCore.labels(3)
 
@@ -58,7 +60,7 @@ Namespace VBClasses
             Dim unMatched As Integer
             Dim matchAverage As Single
             For Each rc In redCore.rcList
-                rc = rcDataMatch(rc, rcListLast, rcMapLast)
+                rc = rcDataMatch(rc, rcListLast, rcMapLast, options.rectOverlapRatio)
 
                 If rc.age = 1 Then unMatched += 1 Else matchCount += 1
                 matchAverage += rc.age
@@ -325,21 +327,70 @@ Namespace VBClasses
 
     Public Class RedCloud_Matches : Inherits TaskParent
         Dim redC As New RedCloud_Basics
+        Public rcList As New List(Of rcData)
         Public Sub New()
+            task.featureOptions.ReductionTargetSlider.Value = 120
             desc = "Display the RedCloud cells that matched to the previous frame."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             redC.Run(src)
-            labels(2) = redC.labels(2)
+            labels(2) = redC.labels(2).Replace("new cells", "new cells (white)")
 
+            dst3.SetTo(0)
             dst2.SetTo(0)
+            rcList.Clear()
             For Each rc In redC.rcList
-                If rc.age > 5 Then dst2(rc.rect).SetTo(rc.color, rc.mask)
+                If rc.age >= redC.options.ageThreshold Or rc.age = task.frameCount Then
+                    dst2(rc.rect).SetTo(rc.color, rc.mask)
+                    dst3(rc.rect).SetTo(rc.color, rc.mask)
+                    rcList.Add(rc)
+                Else
+                    dst2(rc.rect).SetTo(white, rc.mask)
+                End If
             Next
 
             RedCloud_Cell.selectCell(redC.rcMap, redC.rcList)
             strOut = task.rcD.displayCell()
+            dst2.Rectangle(task.rcD.rect, task.highlight, task.lineWidth)
             SetTrueText(strOut, 3)
+            labels(3) = CStr(rcList.Count) + " matched cells below with > " + CStr(redC.options.ageThreshold) + " age"
+        End Sub
+    End Class
+
+
+
+
+
+    Public Class RedCloud_Matched : Inherits TaskParent
+        Dim redC As New RedCloud_Basics
+        Public rcList As New List(Of rcData)
+        Public Sub New()
+            task.featureOptions.ReductionTargetSlider.Value = 120
+            desc = "Use the first cell when age > 1"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            redC.Run(src)
+            labels(2) = redC.labels(2).Replace("new cells", "new cells (white)")
+
+            dst3.SetTo(0)
+            dst2.SetTo(0)
+            rcList.Clear()
+            For Each rc In redC.rcList
+                If rc.age >= redC.options.ageThreshold Or rc.age = task.frameCount Then
+                    dst2(rc.rect).SetTo(rc.color, rc.mask)
+                    dst3(rc.rect).SetTo(rc.color, rc.mask)
+                    rcList.Add(rc)
+                Else
+                    dst2(rc.rect).SetTo(white, rc.mask)
+                End If
+            Next
+
+            RedCloud_Cell.selectCell(redC.rcMap, redC.rcList)
+            strOut = task.rcD.displayCell()
+            dst2.Rectangle(task.rcD.rect, task.highlight, task.lineWidth)
+            SetTrueText(strOut, 3)
+            labels(3) = CStr(rcList.Count) + " matched cells below with > " + CStr(redC.options.ageThreshold) + " age"
+
         End Sub
     End Class
 

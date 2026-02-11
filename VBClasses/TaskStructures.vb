@@ -534,6 +534,7 @@ Namespace VBClasses
             Public color As cv.Scalar
             Public contour As List(Of cv.Point)
             Public depth As Single
+            Public depthDelta As Single
             Public hull As List(Of cv.Point)
             Public index As Integer
             Public indexLast As Integer ' only here for compatibility
@@ -567,6 +568,7 @@ Namespace VBClasses
                     color = task.vecColors(index Mod 255)
                     pixels = mask.CountNonZero
                     depth = task.pcSplit(2)(rect).Mean(task.depthmask(rect))(0)
+                    If Single.IsInfinity(depth) Then depthDelta = 0
                 End If
             End Sub
             Public Shared Function getHullMask(hull As List(Of cv.Point), mask As cv.Mat) As cv.Mat
@@ -591,6 +593,7 @@ Namespace VBClasses
                 strOut += ", width = " + CStr(rect.Width) + ", height = " + CStr(rect.Height) + vbCrLf
                 strOut += "MaxDist = " + CStr(maxDist.X) + "," + CStr(maxDist.Y) + vbCrLf
                 strOut += "Depth = " + Format(depth, fmt3) + vbCrLf
+                strOut += "DepthDelta (mm's) = " + Format(CInt(depthDelta * 1000), "00") + vbCrLf
                 strOut += "Color = " + color.ToString + vbCrLf
                 strOut += "Pixel count = " + CStr(pixels) + vbCrLf
                 If hull IsNot Nothing Then strOut += "Hull count = " + CStr(hull.Count) + vbCrLf

@@ -152,22 +152,22 @@ Partial Class OptionsFeatures
         ' 
         ' GrayGroup
         ' 
-        GrayGroup.Location = New Point(883, 13)
+        GrayGroup.Location = New Point(845, 13)
         GrayGroup.Margin = New Padding(4)
         GrayGroup.Name = "GrayGroup"
         GrayGroup.Padding = New Padding(4)
-        GrayGroup.Size = New Size(311, 498)
+        GrayGroup.Size = New Size(347, 294)
         GrayGroup.TabIndex = 16
         GrayGroup.TabStop = False
         GrayGroup.Text = "Grayscale source inputs"
         ' 
         ' ColorGroup
         ' 
-        ColorGroup.Location = New Point(1220, 11)
+        ColorGroup.Location = New Point(845, 315)
         ColorGroup.Margin = New Padding(4)
         ColorGroup.Name = "ColorGroup"
         ColorGroup.Padding = New Padding(4)
-        ColorGroup.Size = New Size(347, 498)
+        ColorGroup.Size = New Size(347, 163)
         ColorGroup.TabIndex = 17
         ColorGroup.TabStop = False
         ColorGroup.Text = "Color source inputs"
@@ -284,7 +284,7 @@ Partial Class OptionsFeatures
         ' 
         AutoScaleDimensions = New SizeF(12F, 30F)
         AutoScaleMode = AutoScaleMode.Font
-        ClientSize = New Size(1704, 543)
+        ClientSize = New Size(1205, 543)
         Controls.Add(Lab1)
         Controls.Add(ReductionTargetSlider)
         Controls.Add(Label8)

@@ -5203,7 +5203,7 @@ Namespace VBClasses
 
 
     Public Class XO_RedPrep_BasicsCalcHist : Inherits TaskParent
-        Dim options As New Options_RedCloud
+        Dim options As New Options_RedPrep
         Public Sub New()
             desc = "Simpler transforms for the point cloud using CalcHist instead of reduction."
         End Sub
@@ -17396,7 +17396,6 @@ Namespace VBClasses
                 If rc.indexLast > 0 Then
                     Dim lrc = task.redList.oldrclist(rc.indexLast)
                     rc.age = lrc.age + 1
-                    rc.depth = lrc.depth
                     rc.depthPixels = lrc.depthPixels
                     rc.mmX = lrc.mmX
                     rc.mmY = lrc.mmY
