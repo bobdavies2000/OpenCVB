@@ -8,7 +8,6 @@ Namespace VBClasses
         Public plotCount As Integer = 3
         Public Sub New()
             hist.plotRequested = True
-            labels(2) = "Plot of grayscale histogram"
             labels(3) = "Same Data but using OpenCV C++ plot"
             desc = "Plot data provided in src Mat"
         End Sub
@@ -49,7 +48,7 @@ Namespace VBClasses
 
 
 
-    Public Class NR_Plot_Depth : Inherits TaskParent
+    Public Class Plot_Depth : Inherits TaskParent
         Dim plotDepth As New Plot_Basics_CPP
         Dim hist As New Histogram_Basics
         Public Sub New()
@@ -71,7 +70,7 @@ Namespace VBClasses
 
             If task.heartBeat Then labels(2) = plotDepth.labels(2)
             Dim Split = Regex.Split(labels(2), "\W+")
-            Dim lineCount = CInt(Split(4))
+            Dim lineCount = CInt(Split(5))
             If lineCount > 0 Then
                 Dim meterDepth = src.Width \ lineCount
                 For i = 1 To lineCount
@@ -449,7 +448,8 @@ Namespace VBClasses
             handleY.Free()
 
             Dim maxX = srcX.Max, minX = srcX.Min, maxY = srcY.Max, minY = srcY.Min
-            labels(2) = "x-Axis: " + CStr(minX) + " to " + CStr(maxX) + ", y-axis: " + CStr(minY) + " to " + CStr(maxY)
+            labels(2) = "x-Axis: " + Format(minX, fmt2) + " to " + Format(maxX, fmt2) +
+                      ", y-axis: " + Format(minY, fmt2) + " to " + Format(maxY, fmt2)
         End Sub
         Public Overloads Sub Dispose() Implements IDisposable.Dispose
             If cPtr <> 0 Then cPtr = PlotOpenCV_Close(cPtr)
@@ -481,7 +481,8 @@ Namespace VBClasses
                 Dim pt = New cv.Point(dst2.Width * srcX(i) / maxX, dst2.Height - dst2.Height * srcY(i) / maxY)
                 DrawCircle(dst2, pt, task.DotSize, plotColor)
             Next
-            labels(2) = "x-Axis: " + CStr(minX) + " to " + CStr(maxX) + ", y-axis: " + CStr(minY) + " to " + CStr(maxY)
+            labels(2) = "x-Axis: " + Format(minX, fmt2) + " to " + Format(maxX, fmt2) +
+                      ", y-axis: " + Format(minY, fmt2) + " to " + Format(maxY, fmt2)
         End Sub
     End Class
 
@@ -596,7 +597,8 @@ Namespace VBClasses
                 End If
             Next
 
-            labels(2) = "x-Axis: " + CStr(minX) + " to " + CStr(maxX) + ", y-axis: " + CStr(minY) + " to " + CStr(maxY)
+            labels(2) = "x-Axis: " + Format(minX, fmt2) + " to " + Format(maxX, fmt2) +
+                      ", y-axis: " + Format(minY, fmt2) + " to " + Format(maxY, fmt2)
         End Sub
     End Class
 End Namespace

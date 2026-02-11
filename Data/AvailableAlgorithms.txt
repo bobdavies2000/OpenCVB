@@ -1235,7 +1235,6 @@ NR_Plane_Histogram
 NR_Plane_Horizontals
 NR_Plane_Verticals
 NR_Plot_Beats
-NR_Plot_Depth
 NR_Plot_Dots
 NR_PlyFormat_PlusRGB
 NR_PolyLine_IEnumerableExample
@@ -1444,6 +1443,7 @@ Plane_OnlyPlanes
 Plane_Points
 Plot_Basics
 Plot_Basics_CPP
+Plot_Depth
 Plot_Histogram
 Plot_Histogram2D
 Plot_OverTime
