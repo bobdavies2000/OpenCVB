@@ -1489,6 +1489,7 @@ Rectangle_Basics
 Rectangle_EnclosingPoints
 Rectangle_Fit
 Rectangle_Rotated
+RedCart_PrepData
 RedCC_Basics
 RedCC_BasicsCombined
 RedCC_Color8U

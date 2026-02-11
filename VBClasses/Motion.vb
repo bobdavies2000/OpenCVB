@@ -185,12 +185,44 @@ Namespace VBClasses
             labels(3) = "The motion mask"
             desc = "Find all the grid rects that had motion since the last frame."
         End Sub
+        Public Shared Function checkNanInf(pc As cv.Mat) As cv.Mat
+            ' these don't work because there are NaN's and Infinity's (both can be present)
+            ' cv.Cv2.PatchNaNs(pc, 0.0) 
+            ' Dim mask As New cv.Mat
+            ' cv.Cv2.Compare(pc, pc, mask, cv.CmpType.EQ)
+
+            Dim count As Integer
+            Dim vec As New cv.Vec3f(0, 0, 0)
+            ' The stereolabs camera has some weird -inf and inf values in the Y-plane 
+            ' with and without gravity transform.  Probably my fault but just fix it here.
+            For y = 0 To pc.Rows - 1
+                For x = 0 To pc.Cols - 1
+                    Dim val = pc.Get(Of cv.Vec3f)(y, x)
+                    If Single.IsNaN(val(0)) Or Single.IsInfinity(val(0)) Then
+                        pc.Set(Of cv.Vec3f)(y, x, vec)
+                        count += 1
+                    End If
+                Next
+            Next
+
+            'Dim mean As cv.Scalar, stdev As cv.Scalar
+            'cv.Cv2.MeanStdDev(originalPointcloud, mean, stdev)
+            'Debug.WriteLine("Before Motion mean " + mean.ToString())
+
+            Return pc
+        End Function
         Private Sub preparePointcloud()
             If task.gOptions.gravityPointCloud.Checked Then
                 '******* this is the gravity rotation (" * task.gMatrix") *******
                 task.gravityCloud = (task.pointCloud.Reshape(1,
                                     task.rows * task.cols) * task.gMatrix).ToMat.Reshape(3, task.rows)
                 task.pointCloud = task.gravityCloud
+            End If
+
+            ' The stereolabs camera has some weird -inf and inf values in the Y-plane 
+            ' with and without gravity transform.  Probably my fault but just fix it here.
+            If task.Settings.cameraName = "StereoLabs ZED 2/2i" Then
+                task.pointCloud = checkNanInf(task.pointCloud)
             End If
 
             task.pcSplit = task.pointCloud.Split

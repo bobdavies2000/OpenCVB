@@ -392,31 +392,31 @@ Namespace VBClasses
 
             Select Case reductionName
                 Case "X Reduction"
-                    dst3 = split(0) * reductionTarget
+                    dst1 = split(0) * reductionTarget
                 Case "Y Reduction"
-                    dst3 = split(1) * reductionTarget
+                    dst1 = split(1) * reductionTarget
                 Case "Z Reduction"
-                    dst3 = split(2) * reductionTarget
+                    dst1 = split(2) * reductionTarget
                 Case "XY Reduction"
-                    dst3 = (split(0) + split(1)) * reductionTarget
+                    dst1 = (split(0) + split(1)) * reductionTarget
                 Case "XZ Reduction"
-                    dst3 = (split(0) + split(2)) * reductionTarget
+                    dst1 = (split(0) + split(2)) * reductionTarget
                 Case "YZ Reduction"
-                    dst3 = (split(1) + split(2)) * reductionTarget
+                    dst1 = (split(1) + split(2)) * reductionTarget
                 Case "XYZ Reduction"
-                    dst3 = (split(0) + split(1) + split(2)) * reductionTarget
+                    dst1 = (split(0) + split(1) + split(2)) * reductionTarget
             End Select
 
-            Dim mm As mmData = GetMinMax(dst3)
+            Dim mm As mmData = GetMinMax(dst1)
             Dim dst32f As New cv.Mat
             If Math.Abs(mm.minVal) > mm.maxVal Then
                 mm.minVal = -mm.maxVal
-                dst3.ConvertTo(dst32f, cv.MatType.CV_32F)
+                dst1.ConvertTo(dst32f, cv.MatType.CV_32F)
                 Dim mask = dst32f.Threshold(mm.minVal, mm.minVal, cv.ThresholdTypes.BinaryInv)
                 mask.ConvertTo(mask, cv.MatType.CV_8U)
                 dst32f.SetTo(mm.minVal, mask)
             End If
-            dst2 = (dst3 - mm.minVal) * 255 / (mm.maxVal - mm.minVal)
+            dst2 = (dst1 - mm.minVal) * 255 / (mm.maxVal - mm.minVal)
             dst2.ConvertTo(dst2, cv.MatType.CV_8U)
 
             dst2.SetTo(0, task.noDepthMask)
@@ -426,12 +426,12 @@ Namespace VBClasses
                 Static plot As New Plot_Histogram
                 Static options1 As New Options_PointCloud
                 options1.Run()
-                mm = GetMinMax(dst2)
                 plot.createHistogram = True
                 plot.removeZeroEntry = False
                 plot.maxRange = mm.maxVal
+                mm = GetMinMax(dst2)
                 plot.Run(dst2)
-                dst1 = plot.dst2
+                dst3 = plot.dst2
 
                 For i = 0 To plot.histArray.Count - 1
                     plot.histArray(i) = i

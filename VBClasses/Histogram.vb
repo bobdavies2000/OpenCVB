@@ -1578,14 +1578,14 @@ Namespace VBClasses
             Else
                 If src.Type <> cv.MatType.CV_32F Then src = task.pcSplit(2)
                 mm = GetMinMax(src)
-                If mm.minVal = mm.maxVal Then Exit Sub
+                If mm.minVal >= mm.maxVal Then Exit Sub
                 plotHist.minRange = mm.minVal ' because OpenCV's histogram makes the ranges exclusive.
                 plotHist.maxRange = mm.maxVal
             End If
 
-            If plotHist.minRange = plotHist.maxRange Then Exit Sub ' at startup some cameras have no depth...
+            If plotHist.minRange >= plotHist.maxRange Then Exit Sub ' at startup some cameras have no depth...
             cv.Cv2.CalcHist({src}, {0}, New cv.Mat, histogram, 1, {task.histogramBins},
-                        {New cv.Rangef(plotHist.minRange, plotHist.maxRange)})
+                            {New cv.Rangef(plotHist.minRange, plotHist.maxRange)})
 
             plotHist.histogram = histogram
             plotHist.maxRange = task.MaxZmeters
