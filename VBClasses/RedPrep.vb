@@ -374,7 +374,7 @@ Namespace VBClasses
 
     Public Class RedPrep_Core : Inherits TaskParent
         Public options As New Options_RedPrep
-        Public reductionName As String
+        Public reductionName As String = ""
         Public Sub New()
             desc = "Reduction transform for the point cloud"
         End Sub
@@ -382,7 +382,8 @@ Namespace VBClasses
             options.Run()
             Dim reductionTarget = task.featureOptions.ReductionTargetSlider.Value
 
-            If reductionName = "" Then reductionName = options.reductionName
+            ' non-standalone uses must set the reductionName
+            If standalone Or reductionName = "" Then reductionName = options.reductionName
 
             Dim split() = {New cv.Mat, New cv.Mat, New cv.Mat}
             task.pcSplit(0).ConvertTo(split(0), cv.MatType.CV_32S, 1000 / reductionTarget)
