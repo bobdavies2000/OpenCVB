@@ -365,6 +365,7 @@ Namespace VBClasses
         Dim redC As New RedCloud_Basics
         Public rcList As New List(Of rcData)
         Public Sub New()
+            If standalone Then task.gOptions.displayDst1.Checked = True
             task.featureOptions.ReductionTargetSlider.Value = 120
             desc = "Use the first cell when age > 1"
         End Sub
@@ -372,7 +373,6 @@ Namespace VBClasses
             redC.Run(src)
             labels(2) = redC.labels(2).Replace("new cells", "new cells (white)")
 
-            dst3.SetTo(0)
             dst2.SetTo(0)
             rcList.Clear()
             For Each rc In redC.rcList
@@ -388,7 +388,7 @@ Namespace VBClasses
             RedCloud_Cell.selectCell(redC.rcMap, redC.rcList)
             strOut = task.rcD.displayCell()
             dst2.Rectangle(task.rcD.rect, task.highlight, task.lineWidth)
-            SetTrueText(strOut, 3)
+            SetTrueText(strOut, 1)
             labels(3) = CStr(rcList.Count) + " matched cells below with > " + CStr(redC.options.ageThreshold) + " age"
 
         End Sub
