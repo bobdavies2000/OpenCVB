@@ -22,80 +22,6 @@ Namespace VBClasses
 
 
 
-    Public Class RedCart_PrepX : Inherits TaskParent
-        Public redCore As New RedPrep_Core
-        Public classCount As Integer
-        Public lut As cv.Mat
-        Public Sub New()
-            task.fOptions.ReductionTargetSlider.Value = 50
-            desc = "Prep the vertical regions in the reduced depth data."
-        End Sub
-        Public Shared Function countClasses(input As cv.Mat, ByRef count As Integer) As cv.Mat
-            Dim histogram As New cv.Mat
-            Dim mm = GetMinMax(input)
-            Dim ranges = {New cv.Rangef(mm.minVal, mm.maxVal)}
-            cv.Cv2.CalcHist({input}, {0}, task.depthmask, histogram, 1, {255}, ranges)
-            Dim histArray(255) As Single
-            Marshal.Copy(histogram.Data, histArray, 0, histArray.Length)
-
-            count = 0
-            Dim threshold = input.Total * 0.001 ' ignore regions less than 0.1% - 1/10th of 1%
-            Dim lutArray As Byte() = New Byte(255) {}
-            Dim lutIndex As Integer = 1
-            For i = 0 To histArray.Count - 1
-                If histArray(i) > threshold Then
-                    lutArray(i) = lutIndex
-                    lutIndex += 1
-                    count += 1
-                End If
-            Next
-
-            Dim togg As Boolean
-            For i = 0 To lutArray.Count - 1
-                If lutArray(i) <> 0 Then
-                    If togg Then lutArray(i) = 255 Else lutArray(i) = 0
-                    togg = Not togg
-                End If
-            Next
-
-            Dim lut As New cv.Mat(1, 256, cv.MatType.CV_8U)
-            lut.SetArray(Of Byte)(lutArray)
-
-            Return input.LUT(lut)
-        End Function
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            redCore.reductionName = "X Reduction"
-            redCore.Run(src)
-            dst2 = redCore.dst3
-
-            lut = countClasses(redCore.dst2, classCount)
-            labels(2) = CStr(classCount) + " bands were found"
-        End Sub
-    End Class
-
-
-
-    Public Class RedCart_PrepY : Inherits TaskParent
-        Public redCore As New RedPrep_Core
-        Public classCount As Integer
-        Public lut As cv.Mat
-        Public Sub New()
-            task.fOptions.ReductionTargetSlider.Value = 50
-            desc = "Prep the horizontal regions in the reduced depth data."
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            redCore.reductionName = "Y Reduction"
-            redCore.Run(src)
-            dst2 = redCore.dst3
-
-            lut = RedCart_PrepX.countClasses(redCore.dst2, classCount)
-            labels(2) = CStr(classCount) + " bands were found"
-        End Sub
-    End Class
-
-
-
-
     Public Class RedCart_PrepStableY : Inherits TaskParent
         Public redCore As New RedPrep_Core
         Dim plotCore As New Plot_HistogramCoreRange
@@ -168,34 +94,6 @@ Namespace VBClasses
 
 
 
-    Public Class RedCart_PrepXYAlt : Inherits TaskParent
-        Dim redX As New RedCart_PrepX
-        Dim redY As New RedCart_PrepY
-        Public Sub New()
-            If standalone Then task.gOptions.displayDst1.Checked = True
-            desc = "Add the output of PrepX and PrepY"
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            redX.Run(src)
-            Dim xRegions8U = redX.lut
-            xRegions8U.SetTo(0, task.noDepthMask)
-            dst1 = PaletteBlackZero(xRegions8U)
-            labels(1) = CStr(redX.classCount) + " regions were found"
-
-            redY.Run(src)
-            dst3 = redY.dst2
-            Dim yRegions8U = redY.lut
-            yRegions8U.SetTo(0, task.noDepthMask)
-            dst3 = PaletteBlackZero(yRegions8U)
-            labels(3) = CStr(redY.classCount) + " regions were found"
-
-            dst2 = PaletteBlackZero(xRegions8U + yRegions8U)
-            labels(2) = CStr(redX.classCount + redY.classCount) + " regions were found"
-        End Sub
-    End Class
-
-
-
     Public Class RedCart_PrepXY : Inherits TaskParent
         Public redCore As New RedPrep_Core
         Public classCount As Integer
@@ -209,7 +107,7 @@ Namespace VBClasses
             redCore.Run(src)
             dst2 = redCore.dst3
 
-            lut = RedCart_PrepX.countClasses(redCore.dst2, classCount)
+            lut = RedCart_PrepX.countClasses(redCore.dst2, classCount, 255)
             labels(2) = CStr(classCount) + " regions were found"
         End Sub
     End Class
@@ -228,7 +126,7 @@ Namespace VBClasses
             ' redCore.reductionName = "XY Reduction" ' default
             redCore.Run(src)
 
-            dst2 = RedCart_PrepX.countClasses(redCore.dst2, classCount)
+            dst2 = RedCart_PrepX.countClasses(redCore.dst2, classCount, 255)
             labels(2) = CStr(classCount) + " regions were found"
 
             edges.Run(dst2)
@@ -289,6 +187,110 @@ Namespace VBClasses
         End Sub
         Protected Overrides Sub Finalize()
             RedCart_CPP_Close(cPtr)
+        End Sub
+    End Class
+
+
+
+
+    Public Class RedCart_PrepX : Inherits TaskParent
+        Public redCore As New RedPrep_Core
+        Public classCount As Integer
+        Public lut As cv.Mat
+        Public Sub New()
+            task.fOptions.ReductionTargetSlider.Value = 50
+            desc = "Prep the vertical regions in the reduced depth data."
+        End Sub
+        Public Shared Function countClasses(input As cv.Mat, ByRef count As Integer, colorIndex As Byte) As cv.Mat
+            Dim histogram As New cv.Mat
+            Dim mm = GetMinMax(input)
+            Dim ranges = {New cv.Rangef(mm.minVal, mm.maxVal)}
+            cv.Cv2.CalcHist({input}, {0}, task.depthmask, histogram, 1, {255}, ranges)
+            Dim histArray(255) As Single
+            Marshal.Copy(histogram.Data, histArray, 0, histArray.Length)
+
+            count = 0
+            Dim threshold = input.Total * 0.001 ' ignore regions less than 0.1% - 1/10th of 1%
+            Dim lutArray As Byte() = New Byte(255) {}
+            Dim lutIndex As Integer = 1
+            For i = 0 To histArray.Count - 1
+                If histArray(i) > threshold Then
+                    lutArray(i) = lutIndex
+                    lutIndex += 1
+                    count += 1
+                End If
+            Next
+
+            Dim togg As Boolean
+            For i = 0 To lutArray.Count - 1
+                If lutArray(i) <> 0 Then
+                    If togg Then lutArray(i) = colorIndex Else lutArray(i) = 0
+                    togg = Not togg
+                End If
+            Next
+
+            Dim lut As New cv.Mat(1, 256, cv.MatType.CV_8U)
+            lut.SetArray(Of Byte)(lutArray)
+
+            Return input.LUT(lut)
+        End Function
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            redCore.reductionName = "X Reduction"
+            redCore.Run(src)
+            dst2 = redCore.dst3
+
+            lut = countClasses(redCore.dst2, classCount, 64) ' 64
+            labels(2) = CStr(classCount) + " bands were found"
+        End Sub
+    End Class
+
+
+
+    Public Class RedCart_PrepY : Inherits TaskParent
+        Public redCore As New RedPrep_Core
+        Public classCount As Integer
+        Public lut As cv.Mat
+        Public Sub New()
+            task.fOptions.ReductionTargetSlider.Value = 50
+            desc = "Prep the horizontal regions in the reduced depth data."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            redCore.reductionName = "Y Reduction"
+            redCore.Run(src)
+            dst2 = redCore.dst3
+
+            lut = RedCart_PrepX.countClasses(redCore.dst2, classCount, 128) ' 128
+            labels(2) = CStr(classCount) + " bands were found"
+        End Sub
+    End Class
+
+
+
+
+    Public Class RedCart_PrepXYAlt : Inherits TaskParent
+        Dim redX As New RedCart_PrepX
+        Dim redY As New RedCart_PrepY
+        Public Sub New()
+            dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
+            dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+            dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
+
+            If standalone Then task.gOptions.displayDst1.Checked = True
+            desc = "Add the output of PrepX and PrepY.  Point camera at a wall for interesting results."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            redX.Run(src)
+            dst1 = redX.lut
+            dst1.SetTo(0, task.noDepthMask)
+            labels(1) = CStr(redX.classCount) + " regions were found"
+
+            redY.Run(src)
+            dst3 = redY.lut
+            dst3.SetTo(0, task.noDepthMask)
+            labels(3) = CStr(redY.classCount) + " regions were found"
+
+            dst2 = dst1 Or dst3
+            labels(2) = CStr(redX.classCount + redY.classCount) + " regions were found"
         End Sub
     End Class
 End Namespace

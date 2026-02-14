@@ -110,7 +110,7 @@ Namespace MainApp
             ' 
             ' AvailableAlgorithms
             ' 
-            AvailableAlgorithms.MaxDropDownItems = 50
+            AvailableAlgorithms.MaxDropDownItems = 5
             AvailableAlgorithms.MaxLength = 100
             AvailableAlgorithms.Name = "AvailableAlgorithms"
             AvailableAlgorithms.Size = New Size(350, 39)

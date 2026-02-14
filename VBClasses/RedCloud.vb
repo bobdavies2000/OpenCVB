@@ -394,4 +394,25 @@ Namespace VBClasses
         End Sub
     End Class
 
+
+
+
+
+    Public Class RedCloud_Checker : Inherits TaskParent
+        Dim redC As New RedCloud_Basics
+        Dim checker As New RedCart_PrepXYAlt
+        Public Sub New()
+            desc = "Use the checkerboard pattern as input to RedCloud.  Point camera at wall for interesting results."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            checker.Run(src)
+            dst3 = checker.dst2
+            labels(3) = checker.labels(2)
+
+            redC.Run(dst3)
+            dst2 = redC.dst2
+            labels(2) = redC.labels(2)
+        End Sub
+    End Class
+
 End Namespace
