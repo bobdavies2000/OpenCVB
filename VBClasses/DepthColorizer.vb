@@ -83,7 +83,7 @@ Namespace VBClasses
             End If
             If standaloneTest() Then dst2 = task.depthRGB
         End Sub
-        Public Overloads Sub Dispose() Implements IDisposable.Dispose
+        Protected Overrides Sub Finalize()
             If cPtr <> 0 Then cPtr = Depth_Colorizer_Close(cPtr)
         End Sub
     End Class
@@ -109,7 +109,7 @@ Namespace VBClasses
 
             If imagePtr <> 0 Then dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, cv.MatType.CV_8UC3, imagePtr)
         End Sub
-        Public Overloads Sub Dispose() Implements IDisposable.Dispose
+        Protected Overrides Sub Finalize()
             If cPtr <> 0 Then cPtr = Depth_Colorizer_Close(cPtr)
         End Sub
     End Class

@@ -585,7 +585,7 @@ Namespace VBClasses
                 dst3 = diff.ToMat().Threshold(1, 255, cv.ThresholdTypes.Binary)
             End If
         End Sub
-        Public Overloads Sub Dispose() Implements IDisposable.Dispose
+        Protected Overrides Sub Finalize()
             If cPtr <> 0 Then cPtr = WhiteBalance_Close(cPtr)
         End Sub
     End Class

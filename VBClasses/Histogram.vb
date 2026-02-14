@@ -987,7 +987,7 @@ Namespace VBClasses
             End If
             SetTrueText(strOut, 2)
         End Sub
-        Public Overloads Sub Dispose() Implements IDisposable.Dispose
+        Protected Overrides Sub Finalize()
             Histogram_1D_Close(cPtr)
         End Sub
     End Class
@@ -1017,7 +1017,7 @@ Namespace VBClasses
 
             SetTrueText(strOut, 2)
         End Sub
-        Public Overloads Sub Dispose() Implements IDisposable.Dispose
+        Protected Overrides Sub Finalize()
             Histogram_1D_Close(cPtr)
         End Sub
     End Class

@@ -8,7 +8,7 @@ Namespace VBClasses
         Public options As New Options_RedCloud
         Public Sub New()
             task.redCloud = Me
-            task.featureOptions.ReductionTargetSlider.Value = 40
+            task.fOptions.ReductionTargetSlider.Value = 40
             desc = "Build contours for each cell"
         End Sub
         Public Shared Function rcDataMatch(rc As rcData, rcListLast As List(Of rcData),
@@ -329,7 +329,7 @@ Namespace VBClasses
         Dim redC As New RedCloud_Basics
         Public rcList As New List(Of rcData)
         Public Sub New()
-            task.featureOptions.ReductionTargetSlider.Value = 120
+            task.fOptions.ReductionTargetSlider.Value = 120
             desc = "Display the RedCloud cells that matched to the previous frame."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -366,7 +366,7 @@ Namespace VBClasses
         Public rcList As New List(Of rcData)
         Public Sub New()
             If standalone Then task.gOptions.displayDst1.Checked = True
-            task.featureOptions.ReductionTargetSlider.Value = 120
+            task.fOptions.ReductionTargetSlider.Value = 120
             desc = "Use the first cell when age > 1"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)

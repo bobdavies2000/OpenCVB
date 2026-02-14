@@ -28,7 +28,7 @@ Namespace VBClasses
             Dim fps = task.Settings.FPSPaintTarget
             gOptions = New OptionsGlobal
             gOptions.TargetDisplaySlider.Value = fps
-            featureOptions = New OptionsFeatures
+            fOptions = New OptionsFeatures
             treeView = New TreeViewForm
 
             cpu.callTrace = New List(Of String)
@@ -55,7 +55,7 @@ Namespace VBClasses
             Next
 
             taskUpdate()
-            featureOptions.Show()
+            fOptions.Show()
             gOptions.Show()
             cloudOptions.Run()
             treeView.Show()
@@ -273,7 +273,7 @@ Namespace VBClasses
         Public Sub Dispose() Implements IDisposable.Dispose
             If allOptions IsNot Nothing Then allOptions.Dispose()
 
-            task.featureOptions.Close()
+            task.fOptions.Close()
             task.treeView.Close()
             If task.sharpGL IsNot Nothing Then task.sharpGL.Close()
 

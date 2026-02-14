@@ -9,7 +9,7 @@ Namespace VBClasses
         Public options As New Options_RedCloud
         Public Sub New()
             cPtr = RedCloud_Open()
-            task.featureOptions.ReductionTargetSlider.Value = 20
+            task.fOptions.ReductionTargetSlider.Value = 20
             desc = "Run the C++ RedCloud interface without a mask"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -95,7 +95,7 @@ Namespace VBClasses
             labels(2) = CStr(unMatched) + " were new cells and " + CStr(matchCount) + " were matched, " +
                             "average age: " + Format(matchAverage / rcList.Count, fmt1)
         End Sub
-        Public Overloads Sub Dispose() Implements IDisposable.Dispose
+        Protected Overrides Sub Finalize()
             If cPtr <> 0 Then cPtr = RedCloud_Close(cPtr)
         End Sub
     End Class
@@ -199,7 +199,7 @@ Namespace VBClasses
             labels(2) = CStr(classCount) + " cells. " + CStr(rcList.Count) + " cells >" +
                     " minpixels.  " + CStr(count) + " matched to previous generation"
         End Sub
-        Public Overloads Sub Dispose() Implements IDisposable.Dispose
+        Protected Overrides Sub Finalize()
             If cPtr <> 0 Then cPtr = RedCloud_Close(cPtr)
         End Sub
     End Class
@@ -379,7 +379,7 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             contours.Run(src)
             If src.Type <> cv.MatType.CV_8U Then
-                If standalone And task.featureOptions.Color8USource.SelectedItem = "EdgeLine_Basics" Then
+                If standalone And task.fOptions.Color8USource.SelectedItem = "EdgeLine_Basics" Then
                     dst1 = contours.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
                 Else
                     dst1 = Mat_Basics.srcMustBe8U(src)

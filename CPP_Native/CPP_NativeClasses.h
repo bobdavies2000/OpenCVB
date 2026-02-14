@@ -4059,57 +4059,6 @@ int* EdgeLineSimple_RunCPP(EdgeLineSimple* cPtr, int* dataPtr, int rows, int col
 
 
 
-class RedPrep_CPP
-{
-private:
-public:
-    Mat src, dst;
-    RedPrep_CPP(){}
-    void RunCPP() {
-        uchar pix1, pix2;
-        dst = Mat(src.rows, src.cols, CV_8U);
-        dst.setTo(0);
-        for (int y = 1; y < src.rows - 2; ++y) {
-            for (int x = 1; x < src.cols - 2; ++x) {
-                pix1 = src.at<uchar>(y, x);
-                pix2 = src.at<uchar>(y, x + 1);
-
-                if (pix1 != 0 && pix2 != 0 && pix1 != pix2) dst.at<uchar>(y, x) = 255;
-
-                pix2 = src.at<uchar>(y + 1, x);
-                if (pix1 != 0 && pix2 != 0 && pix1 != pix2) dst.at<uchar>(y, x) = 255;
-
-                pix2 = src.at<uchar>(y + 1, x + 1);
-                if (pix1 != 0 && pix2 != 0 && pix1 != pix2) dst.at<uchar>(y, x) = 255;
-            }
-        }
-    }
-};
-
-extern "C" __declspec(dllexport)
-RedPrep_CPP *RedPrep_CPP_Open() {
-    RedPrep_CPP *cPtr = new RedPrep_CPP();
-    return cPtr;
-}
-
-extern "C" __declspec(dllexport)
-void RedPrep_CPP_Close(RedPrep_CPP *cPtr)
-{
-    delete cPtr;
-}
-
-extern "C" __declspec(dllexport)
-int *RedPrep_CPP_RunCPP(RedPrep_CPP *cPtr, int *dataPtr, int rows, int cols)
-{
-		cPtr->src = Mat(rows, cols, CV_8UC1, dataPtr);
-		cPtr->RunCPP();
-		return (int *) cPtr->dst.data; 
-}
-
-
-
-
-
 
 
 class RedCloud16
@@ -4360,4 +4309,106 @@ extern "C" __declspec(dllexport)
 int* EdgeLineRaw_NextSegment(EdgeLineRaw* cPtr)
 {
     return (int*)&cPtr->segments[cPtr->segmentIndex++][0];
+}
+
+
+
+
+
+
+class RedPrep_CPP
+{
+private:
+public:
+    Mat src, dst;
+    RedPrep_CPP() {}
+    void RunCPP() {
+        uchar pix1, pix2;
+        dst = Mat(src.rows, src.cols, CV_8U);
+        dst.setTo(0);
+        for (int y = 1; y < src.rows - 2; ++y) {
+            for (int x = 1; x < src.cols - 2; ++x) {
+                pix1 = src.at<uchar>(y, x);
+                pix2 = src.at<uchar>(y, x + 1);
+
+                if (pix1 != 0 && pix2 != 0 && pix1 != pix2) dst.at<uchar>(y, x) = 255;
+
+                pix2 = src.at<uchar>(y + 1, x);
+                if (pix1 != 0 && pix2 != 0 && pix1 != pix2) dst.at<uchar>(y, x) = 255;
+
+                pix2 = src.at<uchar>(y + 1, x + 1);
+                if (pix1 != 0 && pix2 != 0 && pix1 != pix2) dst.at<uchar>(y, x) = 255;
+            }
+        }
+    }
+};
+
+extern "C" __declspec(dllexport)
+RedPrep_CPP* RedPrep_CPP_Open() {
+    RedPrep_CPP* cPtr = new RedPrep_CPP();
+    return cPtr;
+}
+
+extern "C" __declspec(dllexport)
+void RedPrep_CPP_Close(RedPrep_CPP* cPtr)
+{
+    delete cPtr;
+}
+
+extern "C" __declspec(dllexport)
+int* RedPrep_CPP_RunCPP(RedPrep_CPP* cPtr, int* dataPtr, int rows, int cols)
+{
+    cPtr->src = Mat(rows, cols, CV_8UC1, dataPtr);
+    cPtr->RunCPP();
+    return (int*)cPtr->dst.data;
+}
+
+
+
+
+class RedCart_CPP
+{
+private:
+public:
+    Mat src, dst;
+    RedCart_CPP() {}
+    void RunCPP() {
+        uchar pix1, pix2;
+        dst = Mat(src.rows, src.cols, CV_8U);
+        dst.setTo(0);
+        for (int y = 1; y < src.rows - 2; ++y) {
+            for (int x = 1; x < src.cols - 2; ++x) {
+                pix1 = src.at<uchar>(y, x);
+                pix2 = src.at<uchar>(y, x + 1);
+
+                if (pix1 != 0 && pix2 != 0 && pix1 != pix2) dst.at<uchar>(y, x) = 255;
+
+                pix2 = src.at<uchar>(y + 1, x);
+                if (pix1 != 0 && pix2 != 0 && pix1 != pix2) dst.at<uchar>(y, x) = 255;
+
+                pix2 = src.at<uchar>(y + 1, x + 1);
+                if (pix1 != 0 && pix2 != 0 && pix1 != pix2) dst.at<uchar>(y, x) = 255;
+            }
+        }
+    }
+};
+
+extern "C" __declspec(dllexport)
+RedCart_CPP* RedCart_CPP_Open() {
+    RedCart_CPP* cPtr = new RedCart_CPP();
+    return cPtr;
+}
+
+extern "C" __declspec(dllexport)
+void RedCart_CPP_Close(RedCart_CPP* cPtr)
+{
+    delete cPtr;
+}
+
+extern "C" __declspec(dllexport)
+int* RedCart_CPP_RunCPP(RedCart_CPP* cPtr, int* dataPtr, int rows, int cols)
+{
+    cPtr->src = Mat(rows, cols, CV_8UC1, dataPtr);
+    cPtr->RunCPP();
+    return (int*)cPtr->dst.data;
 }

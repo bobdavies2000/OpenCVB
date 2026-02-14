@@ -271,7 +271,7 @@ Namespace VBClasses
 
             dst3 = ShowAddweighted(dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR), task.color, labels(3))
         End Sub
-        Public Overloads Sub Dispose() Implements IDisposable.Dispose
+        Protected Overrides Sub Finalize()
             If cPtr <> 0 Then cPtr = Harris_Features_Close(cPtr)
         End Sub
     End Class
@@ -311,7 +311,7 @@ Namespace VBClasses
                 Next
             End If
         End Sub
-        Public Overloads Sub Dispose() Implements IDisposable.Dispose
+        Protected Overrides Sub Finalize()
             If cPtr <> 0 Then cPtr = Harris_Detector_Close(cPtr)
         End Sub
     End Class

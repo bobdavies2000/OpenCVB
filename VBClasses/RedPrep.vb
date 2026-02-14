@@ -27,7 +27,7 @@ Namespace VBClasses
         End Function
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
-            reductionTarget = task.featureOptions.ReductionTargetSlider.Value
+            reductionTarget = task.fOptions.ReductionTargetSlider.Value
 
             If src.Type <> cv.MatType.CV_32FC3 Then src = task.pointCloud.Clone
 
@@ -105,7 +105,7 @@ Namespace VBClasses
 
             dst3 = PaletteBlackZero(dst2)
         End Sub
-        Public Overloads Sub Dispose() Implements IDisposable.Dispose
+        Protected Overrides Sub Finalize()
             If cPtr <> 0 Then cPtr = PrepXY_Close(cPtr)
         End Sub
     End Class
@@ -239,7 +239,7 @@ Namespace VBClasses
                 dst2.SetTo(0, dst3)
             End If
         End Sub
-        Public Overloads Sub Dispose() Implements IDisposable.Dispose
+        Protected Overrides Sub Finalize()
             RedPrep_CPP_Close(cPtr)
         End Sub
     End Class
@@ -275,7 +275,7 @@ Namespace VBClasses
         End Function
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
-            reductionTarget = task.featureOptions.ReductionTargetSlider.Value
+            reductionTarget = task.fOptions.ReductionTargetSlider.Value
 
             Dim pc32S As New cv.Mat
             task.pointCloud.ConvertTo(pc32S, cv.MatType.CV_32SC3, 1000 / reductionTarget)
@@ -375,12 +375,14 @@ Namespace VBClasses
     Public Class RedPrep_Core : Inherits TaskParent
         Public options As New Options_RedPrep
         Public reductionName As String = ""
+        Public reducedImage As cv.Mat
+        Public reduced32f As New cv.Mat
         Public Sub New()
             desc = "Reduction transform for the point cloud"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
-            Dim reductionTarget = task.featureOptions.ReductionTargetSlider.Value
+            Dim reductionTarget = task.fOptions.ReductionTargetSlider.Value
 
             ' non-standalone uses must set the reductionName
             If standalone Or reductionName = "" Then reductionName = options.reductionName
@@ -392,51 +394,37 @@ Namespace VBClasses
 
             Select Case reductionName
                 Case "X Reduction"
-                    dst1 = split(0) * reductionTarget
+                    reducedImage = split(0) * reductionTarget
                 Case "Y Reduction"
-                    dst1 = split(1) * reductionTarget
+                    reducedImage = split(1) * reductionTarget
                 Case "Z Reduction"
-                    dst1 = split(2) * reductionTarget
+                    reducedImage = split(2) * reductionTarget
                 Case "XY Reduction"
-                    dst1 = (split(0) + split(1)) * reductionTarget
+                    reducedImage = (split(0) + split(1)) * reductionTarget
                 Case "XZ Reduction"
-                    dst1 = (split(0) + split(2)) * reductionTarget
+                    reducedImage = (split(0) + split(2)) * reductionTarget
                 Case "YZ Reduction"
-                    dst1 = (split(1) + split(2)) * reductionTarget
+                    reducedImage = (split(1) + split(2)) * reductionTarget
                 Case "XYZ Reduction"
-                    dst1 = (split(0) + split(1) + split(2)) * reductionTarget
+                    reducedImage = (split(0) + split(1) + split(2)) * reductionTarget
             End Select
 
-            Dim mm As mmData = GetMinMax(dst1)
-            Dim dst32f As New cv.Mat
-            If Math.Abs(mm.minVal) > mm.maxVal Then
+            Dim mm As mmData = GetMinMax(reducedImage)
+            reducedImage.ConvertTo(reduced32f, cv.MatType.CV_32F)
+            If Math.Abs(mm.minVal) > mm.maxVal Then ' keep things symmetric...
                 mm.minVal = -mm.maxVal
-                dst1.ConvertTo(dst32f, cv.MatType.CV_32F)
-                Dim mask = dst32f.Threshold(mm.minVal, mm.minVal, cv.ThresholdTypes.BinaryInv)
+                Dim shift32f = reduced32f.Clone
+                Dim mask = shift32f.Threshold(mm.minVal, mm.minVal, cv.ThresholdTypes.BinaryInv)
                 mask.ConvertTo(mask, cv.MatType.CV_8U)
-                dst32f.SetTo(mm.minVal, mask)
+                shift32f.SetTo(mm.minVal, mask)
             End If
-            dst2 = (dst1 - mm.minVal) * 255 / (mm.maxVal - mm.minVal)
+            dst2 = (reducedImage - mm.minVal) * 255 / (mm.maxVal - mm.minVal)
             dst2.ConvertTo(dst2, cv.MatType.CV_8U)
 
             dst2.SetTo(0, task.noDepthMask)
             labels(2) = "Using reduction factor = " + CStr(reductionTarget)
 
-            If standaloneTest() Then
-                Static plot As New Plot_Histogram
-                Static options1 As New Options_PointCloud
-                options1.Run()
-                plot.createHistogram = True
-                plot.removeZeroEntry = False
-                plot.maxRange = mm.maxVal
-                mm = GetMinMax(dst2)
-                plot.Run(dst2)
-                dst3 = plot.dst2
-
-                For i = 0 To plot.histArray.Count - 1
-                    plot.histArray(i) = i
-                Next
-            End If
+            dst3 = PaletteBlackZero(dst2)
         End Sub
     End Class
 

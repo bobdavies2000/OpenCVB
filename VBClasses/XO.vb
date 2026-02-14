@@ -1020,7 +1020,7 @@ Namespace VBClasses
             Next
             labels(2) = CStr(lpList.Count) + " lines were detected in the current frame"
         End Sub
-        Public Overloads Sub Dispose() Implements IDisposable.Dispose
+        Protected Overrides Sub Finalize()
             ld.Dispose()
         End Sub
     End Class
@@ -2386,7 +2386,7 @@ Namespace VBClasses
             labels(2) = "Top View (looking down)"
             labels(3) = "Side View"
         End Sub
-        Public Overloads Sub Dispose() Implements IDisposable.Dispose
+        Protected Overrides Sub Finalize()
             SimpleProjectionClose(cPtr)
         End Sub
     End Class
@@ -2428,7 +2428,7 @@ Namespace VBClasses
             labels(2) = "Top View (looking down)"
             labels(3) = "Side View"
         End Sub
-        Public Overloads Sub Dispose() Implements IDisposable.Dispose
+        Protected Overrides Sub Finalize()
             SimpleProjectionClose(cPtr)
         End Sub
     End Class
@@ -4263,7 +4263,7 @@ Namespace VBClasses
             SetTrueText(CStr(classCount) + " unique BGR pixels were found in the src." + vbCrLf +
                     "Or " + Format(classCount / src.Total, "0%") + " of the input were unique pixels.")
         End Sub
-        Public Overloads Sub Dispose() Implements IDisposable.Dispose
+        Protected Overrides Sub Finalize()
             Pixels_Vector_Close(cPtr)
         End Sub
     End Class
@@ -5692,7 +5692,7 @@ Namespace VBClasses
         Public sides As New XO_FPoly_Sides
         Dim options As New Options_Features
         Public Sub New()
-            task.featureOptions.FeatureSampleSize.Value = 30
+            task.fOptions.FeatureSampleSize.Value = 30
             If dst2.Width >= 640 Then OptionParent.FindSlider("Resync if feature moves > X pixels").Value = 15
             If standalone Then task.gOptions.displayDst1.Checked = True
             labels = {"", "Feature Polygon with perpendicular lines for center of rotation.", "Feature polygon created by highest generation counts",
@@ -5948,7 +5948,7 @@ Namespace VBClasses
         Dim optionsEx As New Options_Features
         Public Sub New()
             center = New XO_FPoly_Center
-            task.featureOptions.FeatureSampleSize.Value = 30
+            task.fOptions.FeatureSampleSize.Value = 30
             If dst2.Width >= 640 Then OptionParent.FindSlider("Resync if feature moves > X pixels").Value = 15
             If standalone Then task.gOptions.displayDst1.Checked = True
             labels = {"", "Feature Polygon with perpendicular lines for center of rotation.",
@@ -6619,7 +6619,7 @@ Namespace VBClasses
         Dim options As New Options_Diff
         Public Sub New()
             If standalone Then task.gOptions.displayDst1.Checked = True
-            task.featureOptions.ColorDiffSlider.Value = 10
+            task.fOptions.ColorDiffSlider.Value = 10
             desc = "Build the image mask of the differences between the current frame and resync image"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -6935,7 +6935,7 @@ Namespace VBClasses
         Dim optionsEx As New Options_Features
         Public Sub New()
             dst0 = New cv.Mat(dst0.Size(), cv.MatType.CV_32F, cv.Scalar.All(0))
-            task.featureOptions.FeatureSampleSize.Value = 20
+            task.fOptions.FeatureSampleSize.Value = 20
             labels(3) = "Feature points with anchor"
             desc = "Feature Grid: compute distances between good features from frame to frame"
         End Sub
@@ -8789,7 +8789,7 @@ Namespace VBClasses
             labels(2) = CStr(lpList.Count) + " highlighted lines were detected in the current frame. Others were too similar."
             labels(3) = "There were " + CStr(removeList.Count) + " coincident lines"
         End Sub
-        Public Overloads Sub Dispose() Implements IDisposable.Dispose
+        Protected Overrides Sub Finalize()
             ld.Dispose()
         End Sub
     End Class
@@ -8848,7 +8848,7 @@ Namespace VBClasses
 
             labels(2) = CStr(lpList.Count) + " lines were detected in the current frame"
         End Sub
-        Public Overloads Sub Dispose() Implements IDisposable.Dispose
+        Protected Overrides Sub Finalize()
             ld.Dispose()
         End Sub
     End Class
@@ -9211,7 +9211,7 @@ Namespace VBClasses
 
             labels(2) = CStr(task.gridRects.Count) + " regions with " + CStr(mlInput.Count) + " used for learning and " + CStr(predictList.Count) + " were predicted"
         End Sub
-        Public Overloads Sub Dispose() Implements IDisposable.Dispose
+        Protected Overrides Sub Finalize()
             If rtree IsNot Nothing Then rtree.Dispose()
         End Sub
     End Class
@@ -9317,7 +9317,7 @@ Namespace VBClasses
     Public Class XO_GL_Draw3DLinesAndCloud : Inherits TaskParent
         Dim line3D As New XO_Line3D_ReconstructLines
         Public Sub New()
-            task.featureOptions.FeatureSampleSize.Value = task.featureOptions.FeatureSampleSize.Maximum
+            task.fOptions.FeatureSampleSize.Value = task.fOptions.FeatureSampleSize.Maximum
             desc = "Draw the RGB lines in SharpGL and include the line points."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -9689,7 +9689,7 @@ Namespace VBClasses
                 diff(i) = New XO_Motion_Diff
                 history(i) = New History_Basics8U
             Next
-            task.featureOptions.ColorDiffSlider.Value = 10
+            task.fOptions.ColorDiffSlider.Value = 10
             dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
             labels = {"", "", "Mask of unreliable color data", "Color image after removing unreliable pixels"}
             desc = "Accumulate those color pixels that are volatile - different by more than the global options 'Color Difference threshold'"
@@ -10650,7 +10650,7 @@ Namespace VBClasses
             If task.heartBeat Then labels(2) = "CV_8U result With " + CStr(classCount) + " regions."
             If task.heartBeat Then labels(3) = "Palette version Of the data In dst2 With " + CStr(classCount) + " regions."
         End Sub
-        Public Overloads Sub Dispose() Implements IDisposable.Dispose
+        Protected Overrides Sub Finalize()
             If cPtr <> 0 Then cPtr = RedCloud_Close(cPtr)
         End Sub
     End Class
@@ -10734,7 +10734,7 @@ Namespace VBClasses
         Dim diffs As New List(Of cv.Mat)
         Public Sub New()
             dst1 = New cv.Mat(dst1.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
-            task.featureOptions.ColorDiffSlider.Value = 1
+            task.fOptions.ColorDiffSlider.Value = 1
             desc = "Remove RedCloud results that are inconsistent with the previous frame."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -10957,7 +10957,7 @@ Namespace VBClasses
 
     Public Class XO_RedList_NoDepth : Inherits TaskParent
         Public Sub New()
-            task.featureOptions.Color8USource.SelectedItem = "Reduction_Basics"
+            task.fOptions.Color8USource.SelectedItem = "Reduction_Basics"
             desc = "Run RedList_Basics on just the regions with no depth."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -11648,7 +11648,7 @@ Namespace VBClasses
             Next
             labels(3) = CStr(RectList.Count) + " cells were found."
         End Sub
-        Public Overloads Sub Dispose() Implements IDisposable.Dispose
+        Protected Overrides Sub Finalize()
             If cPtr <> 0 Then cPtr = RedCloud_Close(cPtr)
         End Sub
     End Class
@@ -12257,7 +12257,7 @@ Namespace VBClasses
             End If
             DrawRect(dst2, motionRect, 255)
         End Sub
-        Public Overloads Sub Dispose() Implements IDisposable.Dispose
+        Protected Overrides Sub Finalize()
             If cPtr <> 0 Then cPtr = BGSubtract_BGFG_Close(cPtr)
         End Sub
     End Class
@@ -12392,7 +12392,7 @@ Namespace VBClasses
             If task.heartBeat Then labels(2) = "CV_8U result With " + CStr(classCount) + " regions."
             If task.heartBeat Then labels(3) = "Palette version Of the data In dst2 With " + CStr(classCount) + " regions."
         End Sub
-        Public Overloads Sub Dispose() Implements IDisposable.Dispose
+        Protected Overrides Sub Finalize()
             If cPtr <> 0 Then cPtr = RedCloud_Close(cPtr)
         End Sub
     End Class
@@ -12756,7 +12756,7 @@ Namespace VBClasses
 
             dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, cv.MatType.CV_8U, imagePtr).Clone
         End Sub
-        Public Overloads Sub Dispose() Implements IDisposable.Dispose
+        Protected Overrides Sub Finalize()
             Density_2D_Close(cPtr)
         End Sub
     End Class
@@ -12803,7 +12803,7 @@ Namespace VBClasses
 
             dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, cv.MatType.CV_8U, imagePtr).Clone
         End Sub
-        Public Overloads Sub Dispose() Implements IDisposable.Dispose
+        Protected Overrides Sub Finalize()
             Density_Count_Close(cPtr)
         End Sub
     End Class
@@ -12937,7 +12937,7 @@ Namespace VBClasses
 
             dst3.SetTo(0)
         End Sub
-        Public Overloads Sub Dispose() Implements IDisposable.Dispose
+        Protected Overrides Sub Finalize()
             EdgeLineRaw_Close(cPtr)
         End Sub
     End Class
@@ -13005,7 +13005,7 @@ Namespace VBClasses
 
             dst3.SetTo(0)
         End Sub
-        Public Overloads Sub Dispose() Implements IDisposable.Dispose
+        Protected Overrides Sub Finalize()
             EdgeLineRaw_Close(cPtr)
         End Sub
     End Class
@@ -13020,7 +13020,7 @@ Namespace VBClasses
         Public options As New Options_Contours
         Public Sub New()
             labels(3) = "Details for the selected contour."
-            task.featureOptions.Color8USource.SelectedItem = "EdgeLine_Basics"
+            task.fOptions.Color8USource.SelectedItem = "EdgeLine_Basics"
             desc = "List retrieval mode contour finder"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -13051,7 +13051,7 @@ Namespace VBClasses
         Dim sortContours As New Contour_Sort
         Public Sub New()
             OptionParent.findRadio("CComp").Checked = True
-            task.featureOptions.Color8USource.SelectedItem = "EdgeLine_Basics"
+            task.fOptions.Color8USource.SelectedItem = "EdgeLine_Basics"
             desc = "CComp retrieval mode contour finder"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -13883,7 +13883,7 @@ Namespace VBClasses
             Next
             labels(2) = CStr(RectList.Count) + " cells were found."
         End Sub
-        Public Overloads Sub Dispose() Implements IDisposable.Dispose
+        Protected Overrides Sub Finalize()
             If cPtr <> 0 Then cPtr = RedCloud_Close(cPtr)
         End Sub
     End Class
@@ -15468,7 +15468,7 @@ Namespace VBClasses
         Dim options As New Options_KNN
         Dim feat As New Feature_General
         Public Sub New()
-            task.featureOptions.FeatureSampleSize.Value = 200
+            task.fOptions.FeatureSampleSize.Value = 200
             dotSlider = OptionParent.FindSlider("Average distance multiplier")
             If standalone Then task.gOptions.displayDst1.Checked = True
             labels = {"", "Histogram of Y-Axis camera motion", "Yellow points are good features and the white trail in the center estimates camera motion.", "Histogram of X-Axis camera motion"}
@@ -15651,7 +15651,7 @@ Namespace VBClasses
                 Next
             Next
         End Sub
-        Public Overloads Sub Dispose() Implements IDisposable.Dispose
+        Protected Overrides Sub Finalize()
             If knn IsNot Nothing Then knn.Dispose()
         End Sub
     End Class
@@ -15878,7 +15878,7 @@ Namespace VBClasses
             handleSrc.Free()
             If imagePtr <> 0 Then dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, cv.MatType.CV_8UC1, imagePtr)
         End Sub
-        Public Overloads Sub Dispose() Implements IDisposable.Dispose
+        Protected Overrides Sub Finalize()
             EdgeLine_Image_Close(cPtr)
         End Sub
     End Class
@@ -16020,7 +16020,7 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             contours.Run(src)
             If src.Type <> cv.MatType.CV_8U Then
-                If standalone And task.featureOptions.Color8USource.SelectedItem = "EdgeLine_Basics" Then
+                If standalone And task.fOptions.Color8USource.SelectedItem = "EdgeLine_Basics" Then
                     dst1 = contours.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
                 Else
                     dst1 = Mat_Basics.srcMustBe8U(src)
@@ -16058,7 +16058,7 @@ Namespace VBClasses
         Implements IDisposable
         Public bricks As New List(Of Integer)
         Public Sub New()
-            task.featureOptions.ColorDiffSlider.Value = 25
+            task.fOptions.ColorDiffSlider.Value = 25
             cPtr = RedList_FindBricks_Open()
             desc = "Find all the RedCloud cells touched by the mask created by the Motion_History rectangle"
         End Sub
@@ -16091,7 +16091,7 @@ Namespace VBClasses
             Next
             labels(3) = CStr(count) + " cells were found using the motion mask"
         End Sub
-        Public Overloads Sub Dispose() Implements IDisposable.Dispose
+        Protected Overrides Sub Finalize()
             RedList_FindBricks_Close(cPtr)
         End Sub
     End Class
@@ -16481,16 +16481,16 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             If task.heartBeatLT Then
-                Static index As Integer = task.featureOptions.Color8USource.SelectedIndex + 1
-                If index >= task.featureOptions.Color8USource.Items.Count Then index = 0
-                task.featureOptions.Color8USource.SelectedIndex = index
+                Static index As Integer = task.fOptions.Color8USource.SelectedIndex + 1
+                If index >= task.fOptions.Color8USource.Items.Count Then index = 0
+                task.fOptions.Color8USource.SelectedIndex = index
             End If
 
             color8u.Run(src)
             classCount = color8u.classCount
             dst2 = PaletteFull(color8u.dst2)
 
-            strOut = "Current color source = " + task.featureOptions.Color8USource.Text
+            strOut = "Current color source = " + task.fOptions.Color8USource.Text
             SetTrueText(strOut, 2)
         End Sub
     End Class
@@ -16848,7 +16848,7 @@ Namespace VBClasses
             dst2 = dst1.Resize(task.workRes)
 
             If task.firstPass Then
-                task.featureOptions.ReductionTargetSlider.Value = 200
+                task.fOptions.ReductionTargetSlider.Value = 200
             End If
 
             Dim ratio = task.workRes.Width \ minRes.Width
@@ -17202,7 +17202,7 @@ Namespace VBClasses
             cv.Cv2.ImShow("Hit space bar to advance to the next frame", dst2)
             cv.Cv2.WaitKey(10) ' No need for waitkey with imshow in OpenCVB - finishing a buffer is the same thing so waitkey just delays by 1 second here.
         End Sub
-        Public Overloads Sub Dispose() Implements IDisposable.Dispose
+        Protected Overrides Sub Finalize()
             cv.Cv2.DestroyWindow("Hit space bar to advance to the next frame")
         End Sub
     End Class
@@ -17336,7 +17336,7 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             contours.Run(src)
             If src.Type <> cv.MatType.CV_8U Then
-                If standalone And task.featureOptions.Color8USource.SelectedItem = "EdgeLine_Basics" Then
+                If standalone And task.fOptions.Color8USource.SelectedItem = "EdgeLine_Basics" Then
                     dst1 = contours.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
                 Else
                     dst1 = Mat_Basics.srcMustBe8U(src)
@@ -17870,7 +17870,7 @@ Namespace VBClasses
             Dim output = New cv.Mat(ptList.Count, 1, cv.MatType.CV_32FC1, cv.Scalar.All(0))
             rtree.Predict(predMat, output)
         End Sub
-        Public Overloads Sub Dispose() Implements IDisposable.Dispose
+        Protected Overrides Sub Finalize()
             If rtree IsNot Nothing Then rtree.Dispose()
         End Sub
     End Class
@@ -17940,7 +17940,7 @@ Namespace VBClasses
                 End If
             Next
         End Sub
-        Public Overloads Sub Dispose() Implements IDisposable.Dispose
+        Protected Overrides Sub Finalize()
             If rtree IsNot Nothing Then rtree.Dispose()
         End Sub
     End Class
@@ -18447,7 +18447,7 @@ Namespace VBClasses
             Dim imagePtr = ParticleFilterTest_Run(cPtr)
             dst2 = cv.Mat.FromPixelData(dst2.Rows, dst2.Cols, cv.MatType.CV_8UC3, imagePtr).Clone
         End Sub
-        Public Overloads Sub Dispose() Implements IDisposable.Dispose
+        Protected Overrides Sub Finalize()
             If cPtr <> 0 Then cPtr = ParticleFilterTest_Close(cPtr)
         End Sub
     End Class

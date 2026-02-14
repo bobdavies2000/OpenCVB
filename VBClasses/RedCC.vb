@@ -122,6 +122,7 @@ Namespace VBClasses
             color8u.Run(task.gray)
             dst3 = color8u.dst3
 
+            redC.rcMap.ConvertTo(dst1, cv.MatType.CV_8U)
             dst2 = PaletteFull(color8u.dst2 + dst1)
 
             RedCloud_Cell.selectCell(redC.rcMap, redC.rcList)

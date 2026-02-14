@@ -11,7 +11,7 @@ Namespace VBClasses
         Dim cornerHistory As New List(Of List(Of cv.Point2f))
         Dim feat As New Feature_General
         Public Sub New()
-            task.featureOptions.FeatureSampleSize.Value = task.featureOptions.FeatureSampleSize.Maximum
+            task.fOptions.FeatureSampleSize.Value = task.fOptions.FeatureSampleSize.Maximum
             dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
             dst3 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
             desc = "Track the GoodFeatures across a frame history and connect the first and last good.corners in the history."

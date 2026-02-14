@@ -13,7 +13,7 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             contours.Run(src)
             If src.Type <> cv.MatType.CV_8U Then
-                If standalone And task.featureOptions.Color8USource.SelectedItem = "EdgeLine_Basics" Then
+                If standalone And task.fOptions.Color8USource.SelectedItem = "EdgeLine_Basics" Then
                     dst1 = contours.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
                 Else
                     dst1 = Mat_Basics.srcMustBe8U(src)
@@ -116,7 +116,7 @@ Namespace VBClasses
     Public Class NR_RedList_Consistent : Inherits TaskParent
         Public Sub New()
             dst1 = New cv.Mat(dst1.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
-            task.featureOptions.ColorDiffSlider.Value = 1
+            task.fOptions.ColorDiffSlider.Value = 1
             desc = "Remove RedColor results that are inconsistent with the previous frame."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -240,7 +240,7 @@ Namespace VBClasses
             If task.heartBeat Then labels(2) = "CV_8U result With " + CStr(classCount) + " regions."
             If task.heartBeat Then labels(3) = "Palette version of the data In dst2 With " + CStr(classCount) + " regions."
         End Sub
-        Public Overloads Sub Dispose() Implements IDisposable.Dispose
+        Protected Overrides Sub Finalize()
             If cPtr <> 0 Then cPtr = RedMask_Close(cPtr)
         End Sub
     End Class

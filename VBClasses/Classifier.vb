@@ -25,7 +25,7 @@ Namespace VBClasses
 
             SetTrueText("Click the global DebugCheckBox to get another set of points.", 3)
         End Sub
-        Public Overloads Sub Dispose() Implements IDisposable.Dispose
+        Protected Overrides Sub Finalize()
             OEX_Points_Classifier_Close(cPtr)
         End Sub
     End Class
@@ -101,7 +101,7 @@ Namespace VBClasses
             dst2 = PaletteFull(dst0)
             imagePtr = OEX_ShowPoints(cPtr, dst2.Rows, dst2.Cols, task.DotSize)
         End Sub
-        Public Overloads Sub Dispose() Implements IDisposable.Dispose
+        Protected Overrides Sub Finalize()
             OEX_Points_Classifier_Close(cPtr)
         End Sub
     End Class
@@ -188,7 +188,7 @@ Namespace VBClasses
             'Next
             'If zeroOutput Then SetTrueText("None of the neighbors were as similar to the selected cell.", 3)
         End Sub
-        Public Overloads Sub Dispose() Implements IDisposable.Dispose
+        Protected Overrides Sub Finalize()
             If cPtr <> 0 Then Classifier_Bayesian_Close(cPtr)
         End Sub
     End Class

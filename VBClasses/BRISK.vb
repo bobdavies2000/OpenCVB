@@ -25,7 +25,7 @@ Namespace VBClasses
             Next
             labels(2) = CStr(features.Count) + " features found with BRISK"
         End Sub
-        Public Overloads Sub Dispose() Implements IDisposable.Dispose
+        Protected Overrides Sub Finalize()
             brisk.Dispose()
         End Sub
     End Class

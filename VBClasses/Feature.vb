@@ -112,7 +112,7 @@ Namespace VBClasses
             End If
 
             strOut = ""
-            Select Case task.featureOptions.FeatureMethod.Text
+            Select Case task.fOptions.FeatureMethod.Text
                 Case "GoodFeatures"
                     ptLatest = cv.Cv2.GoodFeaturesToTrack(task.gray, task.FeatureSampleSize, options.quality,
                                                       options.minDistance, New cv.Mat,
@@ -202,11 +202,11 @@ Namespace VBClasses
                 Next
             End If
 
-            strOut += "  " + CStr(task.features.Count) + " features were found using '" + task.featureOptions.FeatureMethod.Text +
+            strOut += "  " + CStr(task.features.Count) + " features were found using '" + task.fOptions.FeatureMethod.Text +
                   "' method."
             If task.heartBeat Then labels(2) = strOut
         End Sub
-        Public Overloads Sub Dispose() Implements IDisposable.Dispose
+        Protected Overrides Sub Finalize()
             If cPtr <> 0 Then cPtr = Agast_Close(cPtr)
         End Sub
     End Class
@@ -528,7 +528,7 @@ Namespace VBClasses
                 DrawCircle(dst2, kazeKeyPoints(i).Pt, task.DotSize, task.highlight)
             Next
         End Sub
-        Public Overloads Sub Dispose() Implements IDisposable.Dispose
+        Protected Overrides Sub Finalize()
             If kaze IsNot Nothing Then kaze.Dispose()
         End Sub
     End Class
@@ -589,7 +589,7 @@ Namespace VBClasses
         Dim match As New Match_Basics
         Dim feat As New Feature_General
         Public Sub New()
-            task.featureOptions.FeatureSampleSize.Value = 150
+            task.fOptions.FeatureSampleSize.Value = 150
             desc = "Use correlation coefficient to keep features from frame to frame."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -779,7 +779,7 @@ Namespace VBClasses
             Next
             labels(2) = $"Found {keypoints.Length} features with agast"
         End Sub
-        Public Overloads Sub Dispose() Implements IDisposable.Dispose
+        Protected Overrides Sub Finalize()
             If agastFD IsNot Nothing Then agastFD.Dispose()
         End Sub
     End Class

@@ -115,7 +115,7 @@ Namespace VBClasses
             dst1 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
             If standalone Then task.gOptions.displayDst0.Checked = True
             If standalone Then task.gOptions.displayDst1.Checked = True
-            task.featureOptions.ColorDiffSlider.Value = 6
+            task.fOptions.ColorDiffSlider.Value = 6
             desc = "Emphasize differences between the accumulated left view and the left view."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)

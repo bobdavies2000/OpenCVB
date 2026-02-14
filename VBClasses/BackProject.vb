@@ -40,7 +40,7 @@ Namespace VBClasses
             labels(3) = $"Highlight pixels {CInt(minRange(0))}-{CInt(maxRange(0))} with {CInt(count)} of {totalPixels}"
             dst2.Rectangle(New cv.Rect(CInt(histIndex) * colWidth, 0, colWidth, dst2.Height), cv.Scalar.Yellow, task.lineWidth)
         End Sub
-        Public Overloads Sub Dispose() Implements IDisposable.Dispose
+        Protected Overrides Sub Finalize()
             hist.Dispose()
         End Sub
     End Class
@@ -59,7 +59,7 @@ Namespace VBClasses
             desc = "Use the histogram of a reduced BGR image to isolate featureless portions of an image."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            Dim reductionTarget = task.featureOptions.ReductionTargetSlider.Value
+            Dim reductionTarget = task.fOptions.ReductionTargetSlider.Value
             reduction.Run(src)
 
             bProject.Run(reduction.dst2)
@@ -790,7 +790,7 @@ Namespace VBClasses
             dst3 = bProject.dst3
             labels(2) = "Bins = " + CStr(task.histogramBins)
         End Sub
-        Public Overloads Sub Dispose() Implements IDisposable.Dispose
+        Protected Overrides Sub Finalize()
             bProject.Dispose()
             contours.Dispose()
         End Sub

@@ -80,7 +80,7 @@ Namespace VBClasses
             dst2 = split(0)
             dst3 = split(1)
         End Sub
-        Public Overloads Sub Dispose() Implements IDisposable.Dispose
+        Protected Overrides Sub Finalize()
             If cPtr <> 0 Then cPtr = Sort_MLPrepTest_Close(cPtr)
         End Sub
     End Class

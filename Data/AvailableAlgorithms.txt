@@ -1240,7 +1240,6 @@ NR_PlyFormat_PlusRGB
 NR_PolyLine_IEnumerableExample
 NR_PolyLine_Random
 NR_PongWars_Two
-NR_ProCon_Variation
 NR_Profile_ConcentrationSide
 NR_Profile_Derivative
 NR_Profile_Kalman
@@ -1446,6 +1445,7 @@ Plot_Basics_CPP
 Plot_Depth
 Plot_Histogram
 Plot_Histogram2D
+Plot_HistogramCoreRange
 Plot_OverTime
 Plot_OverTimeFixedScale
 Plot_OverTimeScalar
@@ -1455,6 +1455,7 @@ PlyFormat_Basics
 PolyLine_Basics
 PongWars_Basics
 ProCon_Basics
+ProCon_Variation
 Profile_Basics
 Profile_ConcentrationTop
 Profile_Rotation
@@ -1489,7 +1490,16 @@ Rectangle_Basics
 Rectangle_EnclosingPoints
 Rectangle_Fit
 Rectangle_Rotated
+RedCart_CheckerBoardWall
+RedCart_CPP
 RedCart_PrepData
+RedCart_PrepStableY
+RedCart_PrepX
+RedCart_PrepXY
+RedCart_PrepXYAlt
+RedCart_PrepY
+RedCart_TriangleDots
+RedCart_Validate
 RedCC_Basics
 RedCC_BasicsCombined
 RedCC_Color8U

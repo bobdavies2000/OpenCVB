@@ -54,7 +54,7 @@ Namespace VBClasses
             If options.numSuperPixels < 255 Then labels *= 255 / options.numSuperPixels
             labels.ConvertTo(dst3, cv.MatType.CV_8U)
         End Sub
-        Public Overloads Sub Dispose() Implements IDisposable.Dispose
+        Protected Overrides Sub Finalize()
             If cPtr <> 0 Then cPtr = SuperPixel_Close(cPtr)
         End Sub
     End Class

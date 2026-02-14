@@ -225,7 +225,7 @@ Namespace VBClasses
                 dst3 = cv.Mat.FromPixelData(src.Rows, src.Cols, cv.MatType.CV_8U, imagePtr).Threshold(options.edgeRFthreshold, 255, cv.ThresholdTypes.Binary)
             End If
         End Sub
-        Public Overloads Sub Dispose() Implements IDisposable.Dispose
+        Protected Overrides Sub Finalize()
             If cPtr <> 0 Then cPtr = Edge_RandomForest_Close(cPtr)
         End Sub
     End Class
@@ -566,7 +566,7 @@ Namespace VBClasses
             dst3.SetTo(0)
             src.CopyTo(dst3, Not dst2)
         End Sub
-        Public Overloads Sub Dispose() Implements IDisposable.Dispose
+        Protected Overrides Sub Finalize()
             If cPtr <> 0 Then cPtr = Edge_ColorGap_Close(cPtr)
         End Sub
     End Class
@@ -626,7 +626,7 @@ Namespace VBClasses
         Dim reduction As New Reduction_Basics
         Dim edge As New Edge_Basics
         Public Sub New()
-            task.featureOptions.ReductionTargetSlider.Value = 1
+            task.fOptions.ReductionTargetSlider.Value = 1
             labels = {"", "", "Edges in the Reduction output", "Reduction_Basics output"}
             desc = "Find edges in the reduction image."
         End Sub
@@ -1041,7 +1041,7 @@ Namespace VBClasses
             dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, cv.MatType.CV_8UC1, imagePtr)
             dst3 = segments.dst3
         End Sub
-        Public Overloads Sub Dispose() Implements IDisposable.Dispose
+        Protected Overrides Sub Finalize()
             Edge_DiffX_Close(cPtr)
         End Sub
     End Class
@@ -1071,7 +1071,7 @@ Namespace VBClasses
             dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, cv.MatType.CV_8UC1, imagePtr)
             dst3 = segments.dst3
         End Sub
-        Public Overloads Sub Dispose() Implements IDisposable.Dispose
+        Protected Overrides Sub Finalize()
             Edge_DiffY_Close(cPtr)
         End Sub
     End Class
@@ -1101,7 +1101,7 @@ Namespace VBClasses
             dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, cv.MatType.CV_8UC1, imagePtr)
             dst3 = segments.dst3
         End Sub
-        Public Overloads Sub Dispose() Implements IDisposable.Dispose
+        Protected Overrides Sub Finalize()
             Edge_DiffY_Close(cPtr)
         End Sub
     End Class
@@ -1196,15 +1196,15 @@ Namespace VBClasses
             Static frm = OptionParent.FindFrm("Options_Edge_Basics Radio Buttons")
 
             If task.heartBeatLT Then
-                Dim index = task.featureOptions.EdgeMethods.SelectedIndex + 1
-                If index >= task.featureOptions.EdgeMethods.Items.Count Then index = 0
-                task.featureOptions.EdgeMethods.SelectedIndex = index
+                Dim index = task.fOptions.EdgeMethods.SelectedIndex + 1
+                If index >= task.fOptions.EdgeMethods.Items.Count Then index = 0
+                task.fOptions.EdgeMethods.SelectedIndex = index
             End If
 
             edges.Run(src)
             dst2 = edges.dst2
 
-            strOut = "Current edge algorithm is " + task.featureOptions.EdgeMethods.SelectedText
+            strOut = "Current edge algorithm is " + task.fOptions.EdgeMethods.SelectedText
             labels(2) = strOut
             SetTrueText(strOut, 3)
         End Sub
@@ -1238,7 +1238,7 @@ Namespace VBClasses
             dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, cv.MatType.CV_8UC3, imagePtr).Clone
             dst3 = src Or dst2
         End Sub
-        Public Overloads Sub Dispose() Implements IDisposable.Dispose
+        Protected Overrides Sub Finalize()
             If cPtr <> 0 Then cPtr = Edge_Deriche_Close(cPtr)
         End Sub
     End Class

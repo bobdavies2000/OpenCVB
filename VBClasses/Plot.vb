@@ -451,7 +451,7 @@ Namespace VBClasses
             labels(2) = "x-Axis: " + Format(minX, fmt2) + " to " + Format(maxX, fmt2) +
                       ", y-axis: " + Format(minY, fmt2) + " to " + Format(maxY, fmt2)
         End Sub
-        Public Overloads Sub Dispose() Implements IDisposable.Dispose
+        Protected Overrides Sub Finalize()
             If cPtr <> 0 Then cPtr = PlotOpenCV_Close(cPtr)
         End Sub
     End Class
@@ -486,6 +486,40 @@ Namespace VBClasses
         End Sub
     End Class
 
+
+
+
+    Public Class Plot_Points : Inherits TaskParent
+        Public input As New List(Of cv.Point2d)
+        Public output As New List(Of cv.Point)
+        Public minX As Double = 0, maxX As Double = dst2.Width
+        Public minY As Double = -task.xRange, maxY As Double = task.xRange
+        Public Sub New()
+            For i = 0 To 50 ' something to plot if standaloneTest().
+                input.Add(New cv.Point2d(i, i * i * i))
+            Next
+            desc = "Plot the requested points..."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            dst2.SetTo(0)
+            output.Clear()
+            For i = 0 To input.Count - 1
+                Dim y = input(i).Y
+                If Single.IsNaN(y) Then y = 0
+                Dim pt = New cv.Point(dst2.Width * (input(i).X - minX) \ (maxX - minX),
+                                  dst2.Height - dst2.Height * (y - minY) \ (maxY - minY))
+                If pt.Y <> dst2.Height / 2 Then
+                    DrawCircle(dst2, pt, task.DotSize, task.highlight)
+                    output.Add(pt)
+                Else
+                    output.Add(newPoint)
+                End If
+            Next
+
+            labels(2) = "x-Axis: " + Format(minX, fmt2) + " to " + Format(maxX, fmt2) +
+                      ", y-axis: " + Format(minY, fmt2) + " to " + Format(maxY, fmt2)
+        End Sub
+    End Class
 
 
 
@@ -533,12 +567,6 @@ Namespace VBClasses
                 histogram = src
             End If
 
-            If histogram Is Nothing Then
-                createHistogram = True
-                SetTrueText("The histogram is empty.", 3)
-                Exit Sub
-            End If
-
             If removeZeroEntry Then histogram.Set(Of Single)(0, 0, 0) ' let's not plot the values at zero...i.e. Depth at 0, for instance, needs to be removed.
             ReDim histArray(histogram.Rows - 1)
             Marshal.Copy(histogram.Data, histArray, 0, histArray.Length)
@@ -570,35 +598,68 @@ Namespace VBClasses
 
 
 
-    Public Class Plot_Points : Inherits TaskParent
-        Public input As New List(Of cv.Point2d)
-        Public output As New List(Of cv.Point)
-        Public minX As Double = 0, maxX As Double = dst2.Width
-        Public minY As Double = -task.xRange, maxY As Double = task.xRange
+
+    Public Class Plot_HistogramCoreRange : Inherits TaskParent
+        Public redCore As New RedPrep_Core
+        Public minRange As Single
+        Public maxRange As Single
+        Public plotHist As New Plot_Histogram
+        Dim plotHistNew As New Plot_Histogram
         Public Sub New()
-            For i = 0 To 50 ' something to plot if standaloneTest().
-                input.Add(New cv.Point2d(i, i * i * i))
-            Next
-            desc = "Plot the requested points..."
+            plotHistNew.createHistogram = True
+            plotHist.createHistogram = True
+            task.gOptions.HistBinBar.Value = task.gOptions.HistBinBar.Maximum
+            labels(2) = "Histogram before finding the single range"
+            labels(3) = "Histogram after finding the single range"
+            desc = "Remove outliers from the histogram by finding the single range with no gaps."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            dst2.SetTo(0)
-            output.Clear()
-            For i = 0 To input.Count - 1
-                Dim y = input(i).Y
-                If Single.IsNaN(y) Then y = 0
-                Dim pt = New cv.Point(dst2.Width * (input(i).X - minX) \ (maxX - minX),
-                                  dst2.Height - dst2.Height * (y - minY) \ (maxY - minY))
-                If pt.Y <> dst2.Height / 2 Then
-                    DrawCircle(dst2, pt, task.DotSize, task.highlight)
-                    output.Add(pt)
+            If standalone Then
+                redCore.reductionName = "Y Reduction"
+                redCore.Run(src)
+            End If
+
+            Dim mm = GetMinMax(redCore.reduced32f)
+
+            plotHist.minRange = mm.minVal
+            plotHist.maxRange = mm.maxVal
+            plotHist.Run(redCore.reduced32f)
+            Dim histArray = plotHist.histArray
+            Dim incr = mm.range / task.gOptions.HistBinBar.Value
+            dst2 = plotHist.dst2
+
+            ' find the largest cluster of histogram entries
+            Dim clusters As New List(Of List(Of Integer))
+            Dim nextCluster As New List(Of Integer)
+            For i = 0 To histArray.Length - 1
+                If histArray(i) > 100 Then
+                    nextCluster.Add(i)
                 Else
-                    output.Add(newPoint)
+                    If nextCluster.Count > 0 Then clusters.Add(nextCluster)
+                    nextCluster = New List(Of Integer)
+                End If
+            Next
+            If nextCluster.Count > 0 Then clusters.Add(nextCluster)
+
+            Dim maxCluster As Integer
+            Dim maxCount As Integer
+            For i = 0 To clusters.Count - 1
+                If clusters(i).Count > maxCount Then
+                    maxCount = clusters(i).Count
+                    maxCluster = i
                 End If
             Next
 
-            labels(2) = "x-Axis: " + Format(minX, fmt2) + " to " + Format(maxX, fmt2) +
-                      ", y-axis: " + Format(minY, fmt2) + " to " + Format(maxY, fmt2)
+            Dim minRange = mm.minVal + incr * (clusters(maxCluster)(0) - 1)
+            Dim maxRange = mm.minVal + incr * (clusters(maxCluster).Last + 1)
+            If maxRange > 6000 Then Dim k = 0
+            labels(3) = "Histogram after trim to " + Format(minRange, fmt0) + " to " + Format(maxRange, fmt0)
+
+                plotHistNew.minRange = minRange
+                plotHistNew.maxRange = maxRange
+                    plotHistNew.Run(redCore.reduced32f)
+                    dst3 = plotHistNew.dst2
         End Sub
     End Class
+
 End Namespace

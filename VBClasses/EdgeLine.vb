@@ -52,7 +52,7 @@ Namespace VBClasses
             labels(2) = CStr(classCount) + " line segments were found with motion threshold of " +
                         CStr(task.motionThreshold) + " pixels changed in a grid rect."
         End Sub
-        Public Overloads Sub Dispose() Implements IDisposable.Dispose
+        Protected Overrides Sub Finalize()
             EdgeLineRaw_Close(cPtr)
         End Sub
     End Class
@@ -168,7 +168,7 @@ Namespace VBClasses
             If dst2.Width >= 1280 Then imageEdgeWidth = 4
             dst2.Rectangle(New cv.Rect(0, 0, dst2.Width - 1, dst2.Height - 1), 255, imageEdgeWidth) ' prevent leaks at the image boundary...
         End Sub
-        Public Overloads Sub Dispose() Implements IDisposable.Dispose
+        Protected Overrides Sub Finalize()
             EdgeLineSimple_Close(cPtr)
         End Sub
     End Class
@@ -239,7 +239,7 @@ Namespace VBClasses
             Next
 
         End Sub
-        Public Overloads Sub Dispose() Implements IDisposable.Dispose
+        Protected Overrides Sub Finalize()
             EdgeLineRaw_Close(cPtr)
         End Sub
     End Class
@@ -280,7 +280,7 @@ Namespace VBClasses
                 labels(3) = "There were " + CStr(EdgeLine_UnchangedCount(cPtr)) + " edge/lines retained from the previous image."
             End If
         End Sub
-        Public Overloads Sub Dispose() Implements IDisposable.Dispose
+        Protected Overrides Sub Finalize()
             EdgeLine_Close(cPtr)
         End Sub
     End Class

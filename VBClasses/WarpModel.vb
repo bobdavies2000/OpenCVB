@@ -124,7 +124,7 @@ Namespace VBClasses
             End If
             SetTrueText(outStr, New cv.Point(aligned.Width + 10, 220))
         End Sub
-        Public Overloads Sub Dispose() Implements IDisposable.Dispose
+        Protected Overrides Sub Finalize()
             If cPtr <> 0 Then cPtr = WarpModel_Close(cPtr)
         End Sub
     End Class

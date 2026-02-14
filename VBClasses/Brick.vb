@@ -826,7 +826,7 @@ Namespace VBClasses
         Public Sub New()
             featureMask = New cv.Mat(dst3.Size, cv.MatType.CV_8U)
             fLessMask = New cv.Mat(dst3.Size, cv.MatType.CV_8U)
-            task.featureOptions.EdgeMethods.SelectedItem() = "Laplacian"
+            task.fOptions.EdgeMethods.SelectedItem() = "Laplacian"
             desc = "Add edges to features"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)

@@ -34,7 +34,7 @@ Namespace VBClasses
                                   color:=cv.Scalar.FromRgb(255, 0, 0),
                                   flags:=cv.DrawMatchesFlags.DrawRichKeypoints)
         End Sub
-        Public Overloads Sub Dispose() Implements IDisposable.Dispose
+        Protected Overrides Sub Finalize()
             If simpleBlob IsNot Nothing Then simpleBlob.Dispose()
         End Sub
     End Class

@@ -9,7 +9,7 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             Dim filterIndex As Integer
-            For Each cb In task.featureOptions.colorCheckbox
+            For Each cb In task.fOptions.colorCheckbox
                 If cb.Checked Then
                     Select Case cb.Text
                         Case "Original"
@@ -25,7 +25,7 @@ Namespace VBClasses
                 End If
             Next
 
-            labels(2) = "Color input to all algorithms - " + task.featureOptions.colorCheckbox(filterIndex).Text
+            labels(2) = "Color input to all algorithms - " + task.fOptions.colorCheckbox(filterIndex).Text
             If filterIndex > 0 Then
                 filters(filterIndex).run(dst2)
                 dst2 = filters(filterIndex).dst2
@@ -49,11 +49,11 @@ Namespace VBClasses
                                          "NR_Filter_Equalize", "NR_Filter_Laplacian", "MeanSubtraction_Gray", "PhotoShop_Gamma"}
         Dim filters(filterList.Count - 1) As Object
         Public Sub New()
-            desc = "Demo the RGB Filters selected in 'FeatureOptions'.  If none selected, just the input is displayed."
+            desc = "Demo the RGB Filters selected in 'fOptions'.  If none selected, just the input is displayed."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             dst2 = src
-            For Each cb In task.featureOptions.grayCheckbox
+            For Each cb In task.fOptions.grayCheckbox
                 If cb.Checked Then
                     Select Case cb.Text
                         Case "Original"
@@ -76,7 +76,7 @@ Namespace VBClasses
                 End If
             Next
 
-            labels(2) = "Grayscale input to all algorithms - " + task.featureOptions.grayCheckbox(filterIndex).Text
+            labels(2) = "Grayscale input to all algorithms - " + task.fOptions.grayCheckbox(filterIndex).Text
             If filterIndex > 0 Then
                 filters(filterIndex).run(dst2)
                 dst2 = filters(filterIndex).dst2

@@ -5,7 +5,7 @@ Namespace VBClasses
         Public lines3D As New List(Of cv.Point3f)
         Public lines3DMat As New cv.Mat
         Public Sub New()
-            If standalone Then task.featureOptions.FeatureSampleSize.Value = 10
+            If standalone Then task.fOptions.FeatureSampleSize.Value = 10
             desc = "Find the end point depth for the top X longest lines."
         End Sub
         'Public Shared Function getDepth(lp As lpData) As lpData

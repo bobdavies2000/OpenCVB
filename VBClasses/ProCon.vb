@@ -33,7 +33,6 @@ Namespace VBClasses
         End Function
         Public Sub Consumer()
             While 1
-                If task.MainUI_Algorithm.traceName <> traceName Then Exit While
                 If task.frameCount < 0 Then Exit While
                 SyncLock mutex
                     head = success(head)
@@ -71,7 +70,9 @@ Namespace VBClasses
             If options.buffer.Length <> options.bufferSize Then
                 SyncLock mutex
                     ReDim options.buffer(options.bufferSize - 1)
-                    options.buffer = Enumerable.Repeat(-1, options.buffer.Length).ToArray
+                    For i = 0 To options.buffer.Count - 1
+                        options.buffer(i) = CDbl(i)
+                    Next
                     frameCount = 0
                     head = -1
                     tail = -1
@@ -82,7 +83,7 @@ Namespace VBClasses
                 flow.Run(src)
             End SyncLock
         End Sub
-        Public Overloads Sub Dispose() Implements IDisposable.Dispose
+        Protected Overrides Sub Finalize()
             terminateProducer = True
             terminateConsumer = True
         End Sub
@@ -93,7 +94,7 @@ Namespace VBClasses
 
 
     ' https://www.codeproject.com/Articles/5280034/Generation-of-Infinite-Sequences-in-Csharp-and-Unm
-    Public Class NR_ProCon_Variation : Inherits TaskParent
+    Public Class ProCon_Variation : Inherits TaskParent
         Implements IDisposable
         Dim procon As ProCon_Basics
         Dim frameCount As Integer
@@ -117,7 +118,7 @@ Namespace VBClasses
             End SyncLock
             procon.Run(src)
         End Sub
-        Public Overloads Sub Dispose() Implements IDisposable.Dispose
+        Protected Overrides Sub Finalize()
             procon.terminateConsumer = True
             procon.terminateProducer = True
         End Sub

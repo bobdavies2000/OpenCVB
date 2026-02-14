@@ -4,7 +4,7 @@ Namespace VBClasses
         Public options As New Options_ImageOffset
         Public options1 As New Options_Diff
         Public Sub New()
-            task.featureOptions.ColorDiffSlider.Value = 10
+            task.fOptions.ColorDiffSlider.Value = 10
             desc = "Find depth regions where neighboring pixels are close in depth"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)

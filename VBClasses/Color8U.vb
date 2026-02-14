@@ -3,15 +3,15 @@ Namespace VBClasses
     Public Class Color8U_Basics : Inherits TaskParent
         Public classCount As Integer
         Public classifier As Object
-        Dim colorMethods(task.featureOptions.colorMethods.Count) As Object
+        Dim colorMethods(task.fOptions.colorMethods.Count) As Object
         Public Sub New()
             dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, 0)
             desc = "Classify pixels by color using a variety of techniques"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             If task.optionsChanged Or classifier Is Nothing Then
-                Dim index = task.featureOptions.Color8USource.SelectedIndex
-                Select Case task.featureOptions.Color8USource.Text
+                Dim index = task.fOptions.Color8USource.SelectedIndex
+                Select Case task.fOptions.Color8USource.Text
                     Case "BackProject_Full"
                         If colorMethods(index) Is Nothing Then colorMethods(index) = New BackProject_Full
                     Case "Bin4Way_Regions"
@@ -36,7 +36,7 @@ Namespace VBClasses
                 classifier = colorMethods(index)
             End If
 
-            If task.featureOptions.Color8USource.Text = "PCA_NColor_CPP" Then
+            If task.fOptions.Color8USource.Text = "PCA_NColor_CPP" Then
                 classifier.Run(src.Clone)
             Else
                 If src.Type = cv.MatType.CV_8U Then
@@ -50,7 +50,7 @@ Namespace VBClasses
             classCount = classifier.classCount
 
             dst3 = PaletteFull(dst2)
-            labels(3) = "dst3 = PaletteFull(dst2) - " + task.featureOptions.Color8USource.Text
+            labels(3) = "dst3 = PaletteFull(dst2) - " + task.fOptions.Color8USource.Text
             labels(2) = "Color8U_Basics: method = " + classifier.tracename + " produced " + CStr(classCount) +
                         " pixel classifications"
         End Sub

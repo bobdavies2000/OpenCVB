@@ -144,7 +144,7 @@ Namespace VBClasses
             Next
             If standaloneTest() Then displayResults()
         End Sub
-        Public Overloads Sub Dispose() Implements IDisposable.Dispose
+        Protected Overrides Sub Finalize()
             If knn IsNot Nothing Then knn.Dispose()
         End Sub
     End Class
@@ -241,7 +241,7 @@ Namespace VBClasses
                 Next
             Next
         End Sub
-        Public Overloads Sub Dispose() Implements IDisposable.Dispose
+        Protected Overrides Sub Finalize()
             If knn IsNot Nothing Then knn.Dispose()
         End Sub
     End Class
@@ -294,7 +294,7 @@ Namespace VBClasses
                 Next
             Next
         End Sub
-        Public Overloads Sub Dispose() Implements IDisposable.Dispose
+        Protected Overrides Sub Finalize()
             If knn IsNot Nothing Then knn.Dispose()
         End Sub
     End Class
@@ -561,7 +561,7 @@ Namespace VBClasses
                 Next
             Next
         End Sub
-        Public Overloads Sub Dispose() Implements IDisposable.Dispose
+        Protected Overrides Sub Finalize()
             If knn IsNot Nothing Then knn.Dispose()
         End Sub
     End Class
@@ -942,7 +942,7 @@ Namespace VBClasses
         Dim options As New Options_Features
         Dim feat As New Feature_General
         Public Sub New()
-            If standalone Then task.featureOptions.FeatureMethod.SelectedItem = "AGAST"
+            If standalone Then task.fOptions.FeatureMethod.SelectedItem = "AGAST"
             desc = "Enforce a minimum distance to the next feature threshold"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)

@@ -900,7 +900,7 @@ Namespace VBClasses
             labels(2) = "The CV_8U image is below.  Values range from 0 to " + CStr(classCount)
             labels(3) = "The upper left image is mapped to " + CStr(classCount) + " colors below.  "
         End Sub
-        Public Overloads Sub Dispose() Implements IDisposable.Dispose
+        Protected Overrides Sub Finalize()
             PCA_NColor_Close(cPtr)
         End Sub
     End Class
@@ -962,7 +962,7 @@ Namespace VBClasses
             inputData = cv.Mat.FromPixelData(count, 3, cv.MatType.CV_32F, imagePtr).Clone
             SetTrueText("Data has been prepared and resides in inputData public")
         End Sub
-        Public Overloads Sub Dispose() Implements IDisposable.Dispose
+        Protected Overrides Sub Finalize()
             PCA_Prep_Close(cPtr)
         End Sub
     End Class

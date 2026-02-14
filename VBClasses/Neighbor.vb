@@ -201,7 +201,7 @@ Namespace VBClasses
 
             labels(3) = CStr(nabCount) + " neighbor pairs were found."
         End Sub
-        Public Overloads Sub Dispose() Implements IDisposable.Dispose
+        Protected Overrides Sub Finalize()
             Neighbor_Close(cPtr)
         End Sub
     End Class

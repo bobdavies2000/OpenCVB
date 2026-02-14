@@ -1332,6 +1332,7 @@ Namespace VBClasses
 
 
 
+
         <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)>
         Public Function RedPrep_CPP_Open() As IntPtr
         End Function
@@ -1340,6 +1341,18 @@ Namespace VBClasses
         End Sub
         <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)>
         Public Function RedPrep_CPP_RunCPP(cPtr As IntPtr, dataPtr As IntPtr, rows As Integer, cols As Integer) As IntPtr
+        End Function
+
+
+
+        <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)>
+        Public Function RedCart_CPP_Open() As IntPtr
+        End Function
+        <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)>
+        Public Sub RedCart_CPP_Close(cPtr As IntPtr)
+        End Sub
+        <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)>
+        Public Function RedCart_CPP_RunCPP(cPtr As IntPtr, dataPtr As IntPtr, rows As Integer, cols As Integer) As IntPtr
         End Function
     End Module
 End Namespace

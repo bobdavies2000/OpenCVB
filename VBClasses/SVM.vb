@@ -52,7 +52,7 @@ Namespace VBClasses
                 Next
             End If
         End Sub
-        Public Overloads Sub Dispose() Implements IDisposable.Dispose
+        Protected Overrides Sub Finalize()
             If svm IsNot Nothing Then svm.Dispose()
         End Sub
     End Class
@@ -157,7 +157,7 @@ Namespace VBClasses
                 DrawCircle(dst3, pt, task.DotSize + 2, color)
             Next
         End Sub
-        Public Overloads Sub Dispose() Implements IDisposable.Dispose
+        Protected Overrides Sub Finalize()
             If svm IsNot Nothing Then svm.Dispose()
         End Sub
     End Class

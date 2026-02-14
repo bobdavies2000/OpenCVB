@@ -23,7 +23,7 @@ Namespace VBClasses
                 Next kpt
             End If
         End Sub
-        Public Overloads Sub Dispose() Implements IDisposable.Dispose
+        Protected Overrides Sub Finalize()
             If detector IsNot Nothing Then detector.Dispose()
         End Sub
     End Class

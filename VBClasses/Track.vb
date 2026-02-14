@@ -24,7 +24,7 @@ Namespace VBClasses
             outputRect = track.outputRect
             SetTrueText("Draw a rectangle around any object to be tracked in the BGR image above.", 3)
         End Sub
-        Public Overloads Sub Dispose() Implements IDisposable.Dispose
+        Protected Overrides Sub Finalize()
             If cPtr <> 0 Then cPtr = Track_Basics_Close(cPtr)
         End Sub
     End Class
@@ -68,7 +68,7 @@ Namespace VBClasses
             dst2.Rectangle(outputRect, white, task.lineWidth)
             SetTrueText("Draw a rectangle around any object to be tracked in the BGR image above.", 3)
         End Sub
-        Public Overloads Sub Dispose() Implements IDisposable.Dispose
+        Protected Overrides Sub Finalize()
             If cPtr <> 0 Then cPtr = Track_Basics_Close(cPtr)
         End Sub
     End Class

@@ -324,7 +324,7 @@ Namespace VBClasses
             Dim imagePtr = Random_PatternGenerator_Run(cPtr, src.Rows, src.Cols)
             dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, cv.MatType.CV_8UC1, imagePtr).Clone
         End Sub
-        Public Overloads Sub Dispose() Implements IDisposable.Dispose
+        Protected Overrides Sub Finalize()
             If cPtr <> 0 Then cPtr = Random_PatternGenerator_Close(cPtr)
         End Sub
     End Class

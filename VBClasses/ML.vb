@@ -127,7 +127,7 @@ Namespace VBClasses
                 predictions.ConvertTo(predictions, cv.MatType.CV_32F)
             End If
         End Sub
-        Public Overloads Sub Dispose() Implements IDisposable.Dispose
+        Protected Overrides Sub Finalize()
             If normalBayes IsNot Nothing Then normalBayes.Dispose()
             If knearest IsNot Nothing Then knearest.Dispose()
             If svm IsNot Nothing Then svm.Dispose()
@@ -203,7 +203,7 @@ Namespace VBClasses
             labels(2) = "prediction, shadow, Depth Mask < " + CStr(task.MaxZmeters) + ", Learn Input"
             dst3 = mats.dst3
         End Sub
-        Public Overloads Sub Dispose() Implements IDisposable.Dispose
+        Protected Overrides Sub Finalize()
             If rtree IsNot Nothing Then rtree.Dispose()
         End Sub
     End Class
@@ -285,7 +285,7 @@ Namespace VBClasses
             dst3 = mats.dst2
             labels(3) = "shadow, empty, Depth Mask < " + CStr(task.MaxZmeters) + ", Learn Input"
         End Sub
-        Public Overloads Sub Dispose() Implements IDisposable.Dispose
+        Protected Overrides Sub Finalize()
             If rtree IsNot Nothing Then rtree.Dispose()
         End Sub
     End Class
@@ -307,13 +307,13 @@ Namespace VBClasses
         Dim color8U As New Color8U_Basics
         Dim rtree As RTrees
         Public Sub New()
-            task.featureOptions.Color8USource.SelectedItem() = "Bin4Way_Regions"
+            task.fOptions.Color8USource.SelectedItem() = "Bin4Way_Regions"
             desc = "Prepare a grid of color and depth data."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             color8U.Run(src)
             dst2 = color8U.dst3
-            labels(2) = "Output of Color8U_Basics running " + task.featureOptions.Color8USource.Text
+            labels(2) = "Output of Color8U_Basics running " + task.fOptions.Color8USource.Text
 
             If rtree Is Nothing Then rtree = cv.ML.RTrees.Create()
             Dim mlInput As New List(Of mlColor)
@@ -358,7 +358,7 @@ Namespace VBClasses
             Next
 
         End Sub
-        Public Overloads Sub Dispose() Implements IDisposable.Dispose
+        Protected Overrides Sub Finalize()
             If rtree IsNot Nothing Then rtree.Dispose()
         End Sub
     End Class
@@ -382,13 +382,13 @@ Namespace VBClasses
         Dim color8U As New Color8U_Basics
         Dim rtree As RTrees
         Public Sub New()
-            task.featureOptions.Color8USource.SelectedItem() = "Bin4Way_Regions"
+            task.fOptions.Color8USource.SelectedItem() = "Bin4Way_Regions"
             desc = "Prepare a grid of color and depth data."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             color8U.Run(src)
             dst2 = color8U.dst3
-            labels(2) = "Output of Color8U_Basics running " + task.featureOptions.Color8USource.Text
+            labels(2) = "Output of Color8U_Basics running " + task.fOptions.Color8USource.Text
 
             If rtree Is Nothing Then rtree = cv.ML.RTrees.Create()
             Dim mlInput As New List(Of mlColorInTier)
@@ -432,7 +432,7 @@ Namespace VBClasses
                 dst3(gr).SetTo(depth, task.noDepthMask(gr))
             Next
         End Sub
-        Public Overloads Sub Dispose() Implements IDisposable.Dispose
+        Protected Overrides Sub Finalize()
             If rtree IsNot Nothing Then rtree.Dispose()
         End Sub
     End Class
@@ -461,7 +461,7 @@ Namespace VBClasses
 
             labels(3) = "The BGR data in dst2 after removing duplicate BGR entries.  Input count = " + CStr(dst2.Total) + " output = " + CStr(compressedCount)
         End Sub
-        Public Overloads Sub Dispose() Implements IDisposable.Dispose
+        Protected Overrides Sub Finalize()
             If cPtr <> 0 Then cPtr = ML_RemoveDups_Close(cPtr)
         End Sub
     End Class

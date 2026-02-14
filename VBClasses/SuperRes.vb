@@ -57,7 +57,7 @@ Namespace VBClasses
                 optFlow = Nothing ' start over...
             End If
         End Sub
-        Public Overloads Sub Dispose() Implements IDisposable.Dispose
+        Protected Overrides Sub Finalize()
             If optFlow IsNot Nothing Then optFlow.Dispose()
         End Sub
     End Class

@@ -213,7 +213,7 @@ Namespace VBClasses
                 dst2.Rectangle(z, cv.Scalar.Yellow, 1)
             Next
         End Sub
-        Public Overloads Sub Dispose() Implements IDisposable.Dispose
+        Protected Overrides Sub Finalize()
             If mser IsNot Nothing Then mser.Dispose()
         End Sub
     End Class
@@ -546,7 +546,7 @@ Namespace VBClasses
             Next
             labels(2) = CStr(boxes.Count) + " regions were found using MSER"
         End Sub
-        Public Overloads Sub Dispose() Implements IDisposable.Dispose
+        Protected Overrides Sub Finalize()
             If mser IsNot Nothing Then mser.Dispose()
         End Sub
     End Class
@@ -614,7 +614,7 @@ Namespace VBClasses
             src.SetTo(white, dst3)
             dst2 = runRedList(src, labels(2))
         End Sub
-        Public Overloads Sub Dispose() Implements IDisposable.Dispose
+        Protected Overrides Sub Finalize()
             MSER_Close(cPtr)
         End Sub
     End Class
@@ -710,7 +710,7 @@ Namespace VBClasses
             End If
             labels(2) = CStr(classcount) + " regions identified"
         End Sub
-        Public Overloads Sub Dispose() Implements IDisposable.Dispose
+        Protected Overrides Sub Finalize()
             MSER_Close(cPtr)
         End Sub
     End Class

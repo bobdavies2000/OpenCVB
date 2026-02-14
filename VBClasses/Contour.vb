@@ -1173,7 +1173,7 @@ Namespace VBClasses
         Dim edgeline As New EdgeLine_Basics
         Public Sub New()
             labels(3) = "Details for the selected contour."
-            task.featureOptions.Color8USource.SelectedItem = "EdgeLine_Basics"
+            task.fOptions.Color8USource.SelectedItem = "EdgeLine_Basics"
             desc = "List retrieval mode contour finder"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)

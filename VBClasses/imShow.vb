@@ -9,7 +9,7 @@ Namespace VBClasses
             If task.testAllRunning Then Exit Sub ' when testing, this can occasionally fail - mysterious.
             If src.Width > 0 Then cv.Cv2.ImShow("color", src)
         End Sub
-        Public Overloads Sub Dispose() Implements IDisposable.Dispose
+        Protected Overrides Sub Finalize()
             cv.Cv2.DestroyWindow("color")
         End Sub
     End Class
@@ -28,7 +28,7 @@ Namespace VBClasses
             cv.Cv2.ImShow("Point cloud", task.pointCloud)
             dst2 = task.pointCloud.Clone
         End Sub
-        Public Overloads Sub Dispose() Implements IDisposable.Dispose
+        Protected Overrides Sub Finalize()
             cv.Cv2.DestroyWindow("Point cloud")
         End Sub
     End Class

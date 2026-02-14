@@ -133,7 +133,7 @@ Namespace VBClasses
             End If
             pBackSub.Apply(src, dst2, options.learnRate)
         End Sub
-        Public Overloads Sub Dispose() Implements IDisposable.Dispose
+        Protected Overrides Sub Finalize()
             If pBackSub IsNot Nothing Then pBackSub.Dispose()
         End Sub
     End Class
@@ -609,7 +609,7 @@ Namespace VBClasses
 
             dst2 = cv.Mat.FromPixelData(img.Rows + 4, img.Cols + 4, cv.MatType.CV_8UC3, imagePtr).Clone
         End Sub
-        Public Overloads Sub Dispose() Implements IDisposable.Dispose
+        Protected Overrides Sub Finalize()
             OEX_FitEllipse_Close(cPtr)
         End Sub
     End Class

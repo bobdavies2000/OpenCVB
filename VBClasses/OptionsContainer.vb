@@ -65,7 +65,7 @@ Public Class OptionsContainer
     End Sub
     Private Sub ToolStripButton1_Click(sender As Object, e As EventArgs) Handles ToolStripButton1.Click
         layoutOptions(normalRequest:=True)
-        task.featureOptions.BringToFront()
+        task.fOptions.BringToFront()
         task.gOptions.BringToFront()
         task.gOptions.BringToFront()
     End Sub

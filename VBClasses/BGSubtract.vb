@@ -27,7 +27,7 @@ Namespace VBClasses
             dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, cv.MatType.CV_8UC1, imagePtr)
             labels(2) = options.methodDesc
         End Sub
-        Public Overloads Sub Dispose() Implements IDisposable.Dispose
+        Protected Overrides Sub Finalize()
             If cPtr <> 0 Then cPtr = BGSubtract_BGFG_Close(cPtr)
         End Sub
     End Class
@@ -54,7 +54,7 @@ Namespace VBClasses
 
             dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, cv.MatType.CV_8UC1, imagePtr)
         End Sub
-        Public Overloads Sub Dispose() Implements IDisposable.Dispose
+        Protected Overrides Sub Finalize()
             If cPtr <> 0 Then cPtr = BGSubtract_BGFG_Close(cPtr)
         End Sub
     End Class
@@ -80,7 +80,7 @@ Namespace VBClasses
             If src.Channels() = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
             MOG2.Apply(src, dst2, options.learnRate)
         End Sub
-        Public Overloads Sub Dispose() Implements IDisposable.Dispose
+        Protected Overrides Sub Finalize()
             If MOG2 IsNot Nothing Then MOG2.Dispose()
         End Sub
     End Class
@@ -103,7 +103,7 @@ Namespace VBClasses
             Dim learnRate = If(dst2.Width >= 1280, 0.5, 0.1) ' learn faster with large images (slower frame rate)
             MOG2.Apply(src, dst2, learnRate)
         End Sub
-        Public Overloads Sub Dispose() Implements IDisposable.Dispose
+        Protected Overrides Sub Finalize()
             If MOG2 IsNot Nothing Then MOG2.Dispose()
         End Sub
     End Class
@@ -126,14 +126,14 @@ Namespace VBClasses
             If task.optionsChanged Or task.frameCount < 10 Then src.CopyTo(dst3)
             Dim threadCount = options.threadData(0)
             Dim width = options.threadData(1), height = options.threadData(2)
-            Dim taskArray(threadCount - 1) As System.Threading.Tasks.task
+            Dim taskArray(threadCount - 1) As System.Threading.Tasks.Task
             Dim xfactor = CInt(src.Width / width)
             Dim yfactor = Math.Max(CInt(src.Height / height), CInt(src.Width / width))
             dst2.SetTo(0)
             Dim motionFound As Boolean
             For i = 0 To threadCount - 1
                 Dim section = i
-                taskArray(i) = System.Threading.Tasks.task.Factory.StartNew(
+                taskArray(i) = System.Threading.Tasks.Task.Factory.StartNew(
                 Sub()
                     Dim roi = New cv.Rect((section Mod xfactor) * width, height * Math.Floor(section / yfactor), width, height)
                     Dim correlation As New cv.Mat
@@ -147,7 +147,7 @@ Namespace VBClasses
                     End If
                 End Sub)
             Next
-            System.Threading.Tasks.task.WaitAll(taskArray)
+            System.Threading.Tasks.Task.WaitAll(taskArray)
             If motionFound = False Then SetTrueText("No motion detected in any of the regions")
         End Sub
     End Class
@@ -168,7 +168,7 @@ Namespace VBClasses
             If src.Channels() = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
             MOG.Apply(src, dst2, options.learnRate)
         End Sub
-        Public Overloads Sub Dispose() Implements IDisposable.Dispose
+        Protected Overrides Sub Finalize()
             If MOG IsNot Nothing Then MOG.Dispose()
         End Sub
     End Class
@@ -199,7 +199,7 @@ Namespace VBClasses
             gmg.Apply(task.gray, dst2, options.learnRate)
             knn.Apply(dst2, dst2, options.learnRate)
         End Sub
-        Public Overloads Sub Dispose() Implements IDisposable.Dispose
+        Protected Overrides Sub Finalize()
             If gmg IsNot Nothing Then gmg.Dispose()
             If knn IsNot Nothing Then knn.Dispose()
         End Sub
@@ -230,7 +230,7 @@ Namespace VBClasses
 
             MOGRGB.Apply(task.gray, dst3, options.learnRate)
         End Sub
-        Public Overloads Sub Dispose() Implements IDisposable.Dispose
+        Protected Overrides Sub Finalize()
             If MOGDepth IsNot Nothing Then MOGDepth.Dispose()
             If MOGRGB IsNot Nothing Then MOGRGB.Dispose()
         End Sub
@@ -322,7 +322,7 @@ Namespace VBClasses
             Dim imagePtr = BGSubtract_Synthetic_Run(cPtr)
             If imagePtr <> 0 Then dst2 = cv.Mat.FromPixelData(dst2.Rows, dst2.Cols, cv.MatType.CV_8UC3, imagePtr).Clone
         End Sub
-        Public Overloads Sub Dispose() Implements IDisposable.Dispose
+        Protected Overrides Sub Finalize()
             If cPtr <> 0 Then cPtr = BGSubtract_Synthetic_Close(cPtr)
         End Sub
     End Class

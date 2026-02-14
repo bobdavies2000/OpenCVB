@@ -10,7 +10,7 @@ Namespace VBClasses
         Public optionsChanged As Boolean
         Public allOptions As OptionsContainer
         Public gOptions As OptionsGlobal
-        Public featureOptions As OptionsFeatures
+        Public fOptions As OptionsFeatures
         Public treeView As TreeViewForm
         Public homeDir As String
 

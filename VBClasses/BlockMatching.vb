@@ -42,7 +42,7 @@ Namespace VBClasses
             dst2(rect) = colorizer.dst2(rect)
             dst3 = task.rightView.Resize(src.Size())
         End Sub
-        Public Overloads Sub Dispose() Implements IDisposable.Dispose
+        Protected Overrides Sub Finalize()
             If blockMatch IsNot Nothing Then blockMatch.Dispose()
         End Sub
     End Class

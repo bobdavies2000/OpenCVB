@@ -65,7 +65,7 @@ Namespace VBClasses
             dst1.SetTo(0, dst3)
             labels(1) = "There were " + CStr(sortContours.Count) + " contour > 100 points."
         End Sub
-        Public Overloads Sub Dispose() Implements IDisposable.Dispose
+        Protected Overrides Sub Finalize()
             If cPtr <> 0 Then cPtr = Fuzzy_Close(cPtr)
         End Sub
     End Class

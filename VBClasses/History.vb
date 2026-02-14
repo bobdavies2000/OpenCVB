@@ -111,7 +111,7 @@ Namespace VBClasses
         Dim frames As New History_BasicsNoSaturation
         Dim diff As New Diff_Basics
         Public Sub New()
-            task.featureOptions.ColorDiffSlider.Value = 1
+            task.fOptions.ColorDiffSlider.Value = 1
             labels(3) = "Adjust 'Color Difference Thresold' to change trouble spots."
             desc = "Find the floodfill trouble spots."
         End Sub

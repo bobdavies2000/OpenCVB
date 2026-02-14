@@ -9,7 +9,7 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             If src.Channels() <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
-            Dim reductionTarget = task.featureOptions.ReductionTargetSlider.Value
+            Dim reductionTarget = task.fOptions.ReductionTargetSlider.Value
 
             classCount = Math.Ceiling(255 / reductionTarget)
 
@@ -111,7 +111,7 @@ Namespace VBClasses
         Dim reduction As New Reduction_Basics
         Dim options As New Options_ReductionXYZ
         Public Sub New()
-            task.featureOptions.ReductionTargetSlider.Value = 400
+            task.fOptions.ReductionTargetSlider.Value = 400
             desc = "Use reduction to slice the point cloud in 3 dimensions"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)

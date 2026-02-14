@@ -4,7 +4,7 @@ Namespace VBClasses
         Public redCPP As New RedList_CPP
         Dim color8U As New Color8U_Basics
         Public Sub New()
-            task.featureOptions.Color8USource.SelectedItem = "Bin4Way_Regions"
+            task.fOptions.Color8USource.SelectedItem = "Bin4Way_Regions"
             dst3 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
             desc = "Create a mask of the RedCloud cell boundaries"
         End Sub

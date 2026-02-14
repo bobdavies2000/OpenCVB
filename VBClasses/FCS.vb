@@ -691,7 +691,7 @@ Namespace VBClasses
         Dim options As New Options_Features
         Public Sub New()
             OptionParent.FindSlider("Min Distance").Value = 60
-            task.featureOptions.FeatureMethod.SelectedItem() = "LineInput"
+            task.fOptions.FeatureMethod.SelectedItem() = "LineInput"
             labels(3) = "Cell boundaries with the age (in frames) for each cell."
             desc = "Use lines as input to FCS."
         End Sub

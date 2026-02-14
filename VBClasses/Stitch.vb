@@ -39,7 +39,7 @@ Namespace VBClasses
                 If status = cv.Stitcher.Status.ErrorNeedMoreImgs Then SetTrueText("Need more images", 3)
             End If
         End Sub
-        Public Overloads Sub Dispose() Implements IDisposable.Dispose
+        Protected Overrides Sub Finalize()
             If sticherObj IsNot Nothing Then sticherObj.Dispose()
         End Sub
     End Class

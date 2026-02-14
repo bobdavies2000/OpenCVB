@@ -21,7 +21,7 @@ Namespace VBClasses
             Next
             labels(2) = CStr(keypoints.Count) + " key points were identified"
         End Sub
-        Public Overloads Sub Dispose() Implements IDisposable.Dispose
+        Protected Overrides Sub Finalize()
             If orb IsNot Nothing Then orb.Dispose()
         End Sub
     End Class

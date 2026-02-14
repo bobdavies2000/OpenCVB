@@ -20,7 +20,7 @@ Namespace VBClasses
             dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, cv.MatType.CV_32FC3, imagePtr).Clone
             If standaloneTest() Then dst3 = task.pointCloud
         End Sub
-        Public Overloads Sub Dispose() Implements IDisposable.Dispose
+        Protected Overrides Sub Finalize()
             Guess_Depth_Close(cPtr)
         End Sub
     End Class
@@ -54,7 +54,7 @@ Namespace VBClasses
             dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, cv.MatType.CV_32FC3, cppData).Clone
             If standaloneTest() Then dst3 = task.pointCloud
         End Sub
-        Public Overloads Sub Dispose() Implements IDisposable.Dispose
+        Protected Overrides Sub Finalize()
             Guess_ImageEdges_Close(cPtr)
         End Sub
     End Class

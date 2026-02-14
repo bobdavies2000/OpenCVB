@@ -1,5 +1,6 @@
 ﻿Imports System.IO
 Imports System.Numerics
+Imports System.Windows.Forms.Design.AxImporter
 Imports OpenCvSharp.ML
 Imports cv = OpenCvSharp
 Namespace VBClasses
@@ -27,12 +28,12 @@ Namespace VBClasses
             Static pointSlider As TrackBar = FindSlider("Pointsize")
             Static xSlider As TrackBar = FindSlider("SharpGL X range")
             Static ySlider As TrackBar = FindSlider("SharpGL Y range")
-            perspective = perspectiveSlider.value
-            zNear = zNearSlider.value / 100
-            zFar = zFarSlider.value
-            pointSize = pointSlider.value
-            xRange = xSlider.value
-            yRange = ySlider.value
+            perspective = perspectiveSlider.Value
+            zNear = zNearSlider.Value / 100
+            zFar = zFarSlider.Value
+            pointSize = pointSlider.Value
+            xRange = xSlider.Value
+            yRange = ySlider.Value
         End Sub
     End Class
 
@@ -877,7 +878,7 @@ Namespace VBClasses
 
 
     Public Class Options_ProCon : Inherits OptionParent
-        Public buffer(9) As Integer
+        Public buffer(9) As Double
         Public pduration As Integer = 1
         Public cduration As Integer = 1
         Public bufferSize As Integer = 0
@@ -887,7 +888,9 @@ Namespace VBClasses
                 sliders.setupTrackBar("Producer Workload Duration (ms)", 1, 1000, pduration)
                 sliders.setupTrackBar("Consumer Workload Duration (ms)", 1, 1000, cduration)
             End If
-            buffer = Enumerable.Repeat(-1, buffer.Length).ToArray
+            For i = 0 To buffer.Length - 1
+                buffer(i) = CDbl(i)
+            Next
         End Sub
         Public Sub Run()
             Static sizeSlider = OptionParent.FindSlider("Buffer Size")
@@ -6933,7 +6936,7 @@ Namespace VBClasses
         Public Sub New()
             If FindFrm(traceName + " CheckBox Options") Is Nothing Then
                 check.Setup(traceName)
-                For Each alg In task.featureOptions.colorMethods
+                For Each alg In task.fOptions.colorMethods
                     check.addCheckBox(alg)
                 Next
                 check.Box(4).Checked = True

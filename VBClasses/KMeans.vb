@@ -140,7 +140,7 @@ Namespace VBClasses
             Dim imagePtr = KMeans_MultiGaussian_RunCPP(cPtr, src.Rows, src.Cols)
             If imagePtr <> 0 And task.heartBeat Then dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, cv.MatType.CV_8UC3, imagePtr).Clone()
         End Sub
-        Public Overloads Sub Dispose() Implements IDisposable.Dispose
+        Protected Overrides Sub Finalize()
             If cPtr <> 0 Then cPtr = KMeans_MultiGaussian_Close(cPtr)
         End Sub
     End Class
@@ -207,7 +207,7 @@ Namespace VBClasses
             dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, cv.MatType.CV_8UC3, imagePtr)
             SetTrueText("Use 'Max Depth' in the global options to set the boundary between blue and yellow.", 3)
         End Sub
-        Public Overloads Sub Dispose() Implements IDisposable.Dispose
+        Protected Overrides Sub Finalize()
             If cPtr <> 0 Then cPtr = Kmeans_Simple_Close(cPtr)
         End Sub
     End Class

@@ -95,7 +95,7 @@ Namespace VBClasses
             labels(2) = CStr(count) + " lines retained - " + CStr(newCount) + " were new"
             If removeOverlappingLines Then labels(2) += ". " + CStr(overLappingCount) + " overlaps removed."
         End Sub
-        Public Overloads Sub Dispose() Implements IDisposable.Dispose
+        Protected Overrides Sub Finalize()
             ld.Dispose()
         End Sub
     End Class

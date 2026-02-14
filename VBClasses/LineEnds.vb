@@ -4,7 +4,7 @@ Namespace VBClasses
         Dim match As New LineEnds_Correlation
         Public correlations As New List(Of Single)
         Public Sub New()
-            task.featureOptions.MatchCorrSlider.Value = 90
+            task.fOptions.MatchCorrSlider.Value = 90
             desc = "Track each of the lines found in Line_Basics"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)

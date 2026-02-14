@@ -23,7 +23,7 @@ Namespace VBClasses
             SetTrueText("Review the 'Visual Studio's Immediate Window' output to see the sharedResults.images..", 3)
             If imagePtr <> 0 Then dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, IIf(src.Channels() = 3, cv.MatType.CV_8UC3, cv.MatType.CV_8UC1), imagePtr).Clone
         End Sub
-        Public Overloads Sub Dispose() Implements IDisposable.Dispose
+        Protected Overrides Sub Finalize()
             If cPtr <> 0 Then cPtr = HMM_Close(cPtr)
         End Sub
     End Class

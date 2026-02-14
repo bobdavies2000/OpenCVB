@@ -61,7 +61,7 @@ Namespace VBClasses
                 dst3 = cv.Mat.FromPixelData(src.Rows / nextFactor, src.Cols / nextFactor, cv.MatType.CV_8U, magnoData).Resize(src.Size())
             End If
         End Sub
-        Public Overloads Sub Dispose() Implements IDisposable.Dispose
+        Protected Overrides Sub Finalize()
             If cPtr <> 0 Then cPtr = Retina_Basics_Close(cPtr)
         End Sub
     End Class

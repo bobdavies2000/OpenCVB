@@ -32,7 +32,7 @@ Namespace VBClasses
             SetTrueText("This algorithm runs but always returns zero - I don't see my mistake?" + vbCrLf +
                         "Needs work but investing further is not needed - we have disparity from the device.", 3)
         End Sub
-        Public Overloads Sub Dispose() Implements IDisposable.Dispose
+        Protected Overrides Sub Finalize()
             If cPtr <> 0 Then cPtr = SemiGlobalMatching_Close(cPtr)
         End Sub
     End Class

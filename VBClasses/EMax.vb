@@ -62,7 +62,7 @@ Namespace VBClasses
             dst2 = palette.dst2
             centers = New List(Of cv.Point2f)(emaxInput.centers)
         End Sub
-        Public Overloads Sub Dispose() Implements IDisposable.Dispose
+        Protected Overrides Sub Finalize()
             If cPtr <> 0 Then cPtr = EMax_Close(cPtr)
         End Sub
     End Class
@@ -200,7 +200,7 @@ Namespace VBClasses
                 Next
             Next
         End Sub
-        Public Overloads Sub Dispose() Implements IDisposable.Dispose
+        Protected Overrides Sub Finalize()
             If em_model IsNot Nothing Then em_model.Dispose()
         End Sub
     End Class
