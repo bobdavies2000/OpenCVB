@@ -212,6 +212,7 @@ Namespace MainApp
         End Sub
         Private Sub MainForm_Closing(sender As Object, e As FormClosingEventArgs) Handles Me.FormClosing
             If TestAllTimer.Enabled = False Then SaveJsonSettings()
+            task.frameCount = -1
             If isPlaying Then
                 vbc.task.Dispose()
                 isPlaying = False

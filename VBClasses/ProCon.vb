@@ -32,8 +32,8 @@ Namespace VBClasses
             Return (index + 1) Mod options.buffer.Length
         End Function
         Public Sub Consumer()
+            Static framecountCheck = task.frameCount
             While 1
-                If task.frameCount < 0 Then Exit While
                 SyncLock mutex
                     head = success(head)
                     Dim item = options.buffer(head)
@@ -42,13 +42,14 @@ Namespace VBClasses
                         options.buffer(head) = -1
                     End If
                 End SyncLock
-                If terminateConsumer Then Exit While
+                If terminateConsumer Or task.frameCount < framecountCheck Then Exit While
+                framecountCheck = task.frameCount
                 Application.DoEvents()
             End While
         End Sub
         Private Sub Producer()
+            Static framecountCheck = task.frameCount
             While 1
-                If task.frameCount < 0 Then Exit While
                 SyncLock mutex
                     tail = success(tail)
                     If options.buffer(tail) = -1 Then
@@ -57,15 +58,12 @@ Namespace VBClasses
                         frameCount += 1
                     End If
                 End SyncLock
-                If terminateProducer Then Exit While
+                If terminateProducer Or task.frameCount < framecountCheck Then Exit While
+                framecountCheck = task.frameCount
                 Application.DoEvents()
             End While
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If task.testAllRunning Then
-                SetTrueText("ProCon_Basics is well-tested but threads hang around during overnight testing. " + vbCrLf + "Skipping for now...")
-                Exit Sub
-            End If
             options.Run()
             If options.buffer.Length <> options.bufferSize Then
                 SyncLock mutex
@@ -104,10 +102,6 @@ Namespace VBClasses
             desc = "DijKstra's Producer/Consumer - similar to Basics above but producer is the algorithm thread."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If task.testAllRunning Then
-                SetTrueText("NR_ProCon_Variation is well-tested but threads hang around during overnight testing. " + vbCrLf + "Skipping for now...")
-                Exit Sub
-            End If
             SyncLock procon.mutex
                 procon.tail = procon.success(procon.tail)
                 If procon.options.buffer(procon.tail) = -1 Then
