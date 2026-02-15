@@ -263,7 +263,7 @@ Namespace VBClasses
                     SetTrueText(Format(gather.stdevList(i), fmt1), gr.TopLeft, 3)
                 End If
             Next
-            If task.heartBeat Then labels = {"", "", CStr(task.gridRects.Count - gather.rects.Count) + " gr's had low standard deviation",
+            labels = {"", "", CStr(task.gridRects.Count - gather.rects.Count) + " gr's had low standard deviation",
                                          "Stdev average = " + Format(gather.stdevList.Average, fmt1)}
         End Sub
     End Class

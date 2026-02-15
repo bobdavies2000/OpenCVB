@@ -8149,7 +8149,7 @@ Namespace VBClasses
             PrepAddEdges = PrepEdges.checked
 
             Static frm = FindFrm(traceName + " Radio Buttons")
-            reductionName = frm.check(findRadioIndex(frm.check)).Text
+            If frm.check.count > 0 Then reductionName = frm.check(findRadioIndex(frm.check)).Text
         End Sub
     End Class
 

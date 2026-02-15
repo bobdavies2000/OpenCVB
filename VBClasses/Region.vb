@@ -233,7 +233,7 @@ Namespace VBClasses
             dst2 = PaletteFull(dst1)
             dst2.SetTo(0, connect.dst2)
             dst3 = ShowAddweighted(src, dst2, labels(3))
-            If task.heartBeat Then labels(2) = "There were " + CStr(redM.mdList.Count) + " connected contours found."
+            labels(2) = "There were " + CStr(redM.mdList.Count) + " connected contours found."
         End Sub
     End Class
 
@@ -278,7 +278,7 @@ Namespace VBClasses
             Next
 
             dst3 = ShowAddweighted(src, dst2, labels(3))
-            If task.heartBeat Then labels(2) = "There were " + CStr(redM.mdList.Count) + " connected contours found."
+            labels(2) = "There were " + CStr(redM.mdList.Count) + " connected contours found."
         End Sub
     End Class
 

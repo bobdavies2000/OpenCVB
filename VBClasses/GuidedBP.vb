@@ -272,8 +272,8 @@ Namespace VBClasses
             sideRects = hotPoints(histSide.dst3)
             dst3 = PaletteBlackZero(histSide.dst3)
 
-            If task.heartBeat Then labels(2) = "Top " + CStr(topRects.Count) + " objects identified in the top view."
-            If task.heartBeat Then labels(3) = "Top " + CStr(sideRects.Count) + " objects identified in the side view."
+            labels(2) = "Top " + CStr(topRects.Count) + " objects identified in the top view."
+            labels(3) = "Top " + CStr(sideRects.Count) + " objects identified in the side view."
         End Sub
     End Class
 
@@ -365,8 +365,8 @@ Namespace VBClasses
             classCount = topRects.Count + sideRects.Count
 
             If task.mouseClickFlag Then selectedPoint = task.clickPoint
-            If task.heartBeat Then labels(2) = CStr(topRects.Count) + " objects were identified in the top view."
-            If task.heartBeat Then labels(3) = CStr(sideRects.Count) + " objects were identified in the side view."
+            labels(2) = CStr(topRects.Count) + " objects were identified in the top view."
+            labels(3) = CStr(sideRects.Count) + " objects were identified in the side view."
         End Sub
     End Class
 
@@ -421,7 +421,7 @@ Namespace VBClasses
             dst2 = PaletteFull(backP)
             classCount = topRects.Count
 
-            If task.heartBeat Then labels(2) = CStr(topRects.Count) + " objects were identified in the top view."
+            labels(2) = CStr(topRects.Count) + " objects were identified in the top view."
         End Sub
     End Class
 End Namespace

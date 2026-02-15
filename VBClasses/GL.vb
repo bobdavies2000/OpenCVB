@@ -411,7 +411,7 @@ Namespace VBClasses
                 dst3 = task.sharpDepth * (mm.maxVal - mm.minVal) + mm.minVal
                 dst3.SetTo(0, Not pcMask)
             End If
-            If task.heartBeat Then labels(2) = msg
+            labels(2) = msg
         End Sub
     End Class
 

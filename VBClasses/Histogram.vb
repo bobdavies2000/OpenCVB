@@ -845,7 +845,7 @@ Namespace VBClasses
                     Case 2
                         dst3 = plotHist.dst2.Clone
                 End Select
-                If task.heartBeat Then labels(i + 1) = "Histogram " + Choose(i + 1, "X", "Y", "Z") + " ranges from " +
+                labels(i + 1) = "Histogram " + Choose(i + 1, "X", "Y", "Z") + " ranges from " +
                                    Format(plotHist.minRange, "0.0") + "m to " + Format(plotHist.maxRange, "0.0") + "m"
             Next
         End Sub

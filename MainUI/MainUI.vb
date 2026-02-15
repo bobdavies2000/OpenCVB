@@ -259,7 +259,7 @@ Namespace MainApp
                        CStr(algorithmCountActive) + " algorithms " + " - " +
                        CStr(CInt(CodeLineCount / algorithmCount)) + " lines each (avg) - " + settings.cameraName
         End Sub
-        Private Sub SaveJsonSettings()
+        Public Sub SaveJsonSettings()
             updateAlgorithmHistory()
             settings.MainFormLeft = Me.Left
             settings.MainFormTop = Me.Top

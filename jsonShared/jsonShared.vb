@@ -22,7 +22,6 @@ Namespace jsonShared
         Public desiredFPS As Integer = 60
         Public displayRes As cv.Size = New cv.Size(320, 240)
 
-        Public FPSPaintTarget As Integer = 30
         Public Image_Basics_Name As String = ""
 
         Public MainFormLeft As Integer = 0
@@ -30,6 +29,7 @@ Namespace jsonShared
         Public MainFormWidth As Integer = 1867
         Public MainFormHeight As Integer = 1134
 
+        Public paintFrequency As Integer
         Public plyFileName As String = ""
         Public resolutionsSupported As List(Of Boolean)
 

@@ -85,7 +85,7 @@ Namespace VBClasses
             dst2.SetTo(classCount, task.maxDepthMask)
 
             dst3 = PaletteFull(dst2)
-            If task.heartBeat Then labels(2) = "dst2 = CV_8U version of depth segmented into " + CStr(classCount) + " clusters."
+            labels(2) = "dst2 = CV_8U version of depth segmented into " + CStr(classCount) + " clusters."
             dst0 = dst2.Threshold(0, 255, cv.ThresholdTypes.Binary)
         End Sub
     End Class

@@ -2093,7 +2093,7 @@ Namespace VBClasses
 
             ' quad.Run(src)
 
-            If task.heartBeat Then labels(2) = CStr(task.bricks.brickList.Count) + " bricks have the useful depth values."
+            labels(2) = CStr(task.bricks.brickList.Count) + " bricks have the useful depth values."
         End Sub
     End Class
 
@@ -2575,7 +2575,7 @@ Namespace VBClasses
             mats.mat(2) = PaletteFull(dst1)
 
             mats.mat(3) = ShowAddweighted(src, mats.mat(2), labels(3))
-            If task.heartBeat Then labels(2) = CStr(indexV + indexH) + " regions were found that were connected in depth."
+            labels(2) = CStr(indexV + indexH) + " regions were found that were connected in depth."
 
             mats.Run(emptyMat)
             dst2 = mats.dst2
@@ -3048,7 +3048,7 @@ Namespace VBClasses
                 End If
             Next
 
-            If task.heartBeat Then labels(2) = "Starting with " + Format(task.lines.lpList.Count, "000") +
+            labels(2) = "Starting with " + Format(task.lines.lpList.Count, "000") +
                                " lines, there are " + Format(raw3D.Count, "000") + " with depth data."
             If raw3D.Count = 0 Then
                 SetTrueText("No vertical or horizontal lines were found")
@@ -9864,7 +9864,7 @@ Namespace VBClasses
 
             contourList = sortContours.contourList
             contourMap = sortContours.contourMap
-            If task.heartBeat Then labels(2) = sortContours.labels(2)
+            labels(2) = sortContours.labels(2)
             dst2 = sortContours.dst2
         End Sub
     End Class
@@ -10647,8 +10647,8 @@ Namespace VBClasses
 
             If standalone Then dst3 = PaletteFull(dst2)
 
-            If task.heartBeat Then labels(2) = "CV_8U result With " + CStr(classCount) + " regions."
-            If task.heartBeat Then labels(3) = "Palette version Of the data In dst2 With " + CStr(classCount) + " regions."
+            labels(2) = "CV_8U result With " + CStr(classCount) + " regions."
+            labels(3) = "Palette version Of the data In dst2 With " + CStr(classCount) + " regions."
         End Sub
         Protected Overrides Sub Finalize()
             If cPtr <> 0 Then cPtr = RedCloud_Close(cPtr)
@@ -11392,7 +11392,7 @@ Namespace VBClasses
 
             dst2 = XO_RedList_MaxDist.RebuildRCMap(sortedCells.Values.ToList)
 
-            If task.heartBeat Then labels(2) = CStr(task.redList.oldrclist.Count) + " cells were identified and matched to the previous image"
+            labels(2) = CStr(task.redList.oldrclist.Count) + " cells were identified and matched to the previous image"
         End Sub
     End Class
 
@@ -12389,8 +12389,8 @@ Namespace VBClasses
 
             If standalone Then dst3 = PaletteFull(dst2)
 
-            If task.heartBeat Then labels(2) = "CV_8U result With " + CStr(classCount) + " regions."
-            If task.heartBeat Then labels(3) = "Palette version Of the data In dst2 With " + CStr(classCount) + " regions."
+            labels(2) = "CV_8U result With " + CStr(classCount) + " regions."
+            labels(3) = "Palette version Of the data In dst2 With " + CStr(classCount) + " regions."
         End Sub
         Protected Overrides Sub Finalize()
             If cPtr <> 0 Then cPtr = RedCloud_Close(cPtr)
@@ -12648,7 +12648,7 @@ Namespace VBClasses
 
             'dst2 = RebuildRCMap(sortedCells)
 
-            If task.heartBeat Then labels(2) = CStr(redC.rcList.Count) + " cells were identified and matched to the previous image"
+            labels(2) = CStr(redC.rcList.Count) + " cells were identified and matched to the previous image"
         End Sub
     End Class
 
@@ -12694,7 +12694,7 @@ Namespace VBClasses
 
             dst2 = XO_RedList_MaxDist.RebuildRCMap(sortedCells.Values.ToList)
 
-            If task.heartBeat Then labels(2) = CStr(task.redList.oldrclist.Count) + " cells were identified and matched to the previous image"
+            labels(2) = CStr(task.redList.oldrclist.Count) + " cells were identified and matched to the previous image"
         End Sub
     End Class
 
@@ -12729,7 +12729,7 @@ Namespace VBClasses
 
             dst2 = cellGen.dst2
 
-            If task.heartBeat Then labels(2) = $"{task.redList.oldrclist.Count} cells identified"
+            labels(2) = $"{task.redList.oldrclist.Count} cells identified"
 
             If showSelected Then Swarm_Flood.oldSelectCell()
         End Sub
@@ -14671,7 +14671,7 @@ Namespace VBClasses
             If task.heartBeat And task.gOptions.DebugCheckBox.Checked Then
                 lpListLast = New List(Of lpData)(task.lines.lpList)
             End If
-            If task.heartBeat Then labels(3) = CStr(count) + " lines were matched."
+            labels(3) = CStr(count) + " lines were matched."
         End Sub
     End Class
 
@@ -17448,7 +17448,7 @@ Namespace VBClasses
                 sortedCells.Add(rc.pixels, rc)
             Next
 
-            If task.heartBeat Then labels(2) = CStr(mdList.Count) + " total cells"
+            labels(2) = CStr(mdList.Count) + " total cells"
             dst2 = XO_RedList_MaxDist.RebuildRCMap(sortedCells.Values.ToList.ToList)
         End Sub
     End Class
@@ -17499,7 +17499,7 @@ Namespace VBClasses
 
             dst2 = XO_RedList_MaxDist.RebuildRCMap(sortedCells.Values.ToList)
 
-            If task.heartBeat Then labels(2) = CStr(task.redList.oldrclist.Count) + " cells were identified and matched to the previous image"
+            labels(2) = CStr(task.redList.oldrclist.Count) + " cells were identified and matched to the previous image"
         End Sub
     End Class
 

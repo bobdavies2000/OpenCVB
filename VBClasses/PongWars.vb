@@ -70,7 +70,7 @@ Namespace VBClasses
                 Next
             Next
 
-            If task.heartBeat Then labels(2) = $"Pong War: day {dayScore} | night {nightScore}"
+            labels(2) = $"Pong War: day {dayScore} | night {nightScore}"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             iteration += 1

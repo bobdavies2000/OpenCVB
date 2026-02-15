@@ -140,7 +140,7 @@ Namespace VBClasses
                 dst2(rc.rect).SetTo(rc.color, rc.mask)
             Next
 
-            If task.heartBeat Then labels(2) = detect.labels(2) + " and " + CStr(matchCount) + " were matched to the previous frame"
+            labels(2) = detect.labels(2) + " and " + CStr(matchCount) + " were matched to the previous frame"
         End Sub
     End Class
 
@@ -353,7 +353,7 @@ Namespace VBClasses
                 DrawTour(dst3(rc.rect), rc.hull, rc.color, -1)
             Next
 
-            If task.heartBeat Then labels(2) = CStr(task.redList.oldrclist.Count) + " Regions with average size " +
+            labels(2) = CStr(task.redList.oldrclist.Count) + " Regions with average size " +
                                            If(task.redList.oldrclist.Count > 0,
                                            CStr(CInt(pixels / task.redList.oldrclist.Count)), "0")
         End Sub

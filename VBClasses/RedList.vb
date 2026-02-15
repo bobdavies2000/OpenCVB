@@ -237,8 +237,8 @@ Namespace VBClasses
 
             If standaloneTest() Then dst3 = PaletteFull(dst2)
 
-            If task.heartBeat Then labels(2) = "CV_8U result With " + CStr(classCount) + " regions."
-            If task.heartBeat Then labels(3) = "Palette version of the data In dst2 With " + CStr(classCount) + " regions."
+            labels(2) = "CV_8U result With " + CStr(classCount) + " regions."
+            labels(3) = "Palette version of the data In dst2 With " + CStr(classCount) + " regions."
         End Sub
         Protected Overrides Sub Finalize()
             If cPtr <> 0 Then cPtr = RedMask_Close(cPtr)

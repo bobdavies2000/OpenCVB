@@ -714,7 +714,7 @@ Namespace VBClasses
             dst0.SetTo(white, dst3)
 
             If standaloneTest() Then dst2 = PaletteFull(dst2)
-            If task.heartBeat Then labels(2) = Format(classCount, "000") + " regions were found"
+            labels(2) = Format(classCount, "000") + " regions were found"
         End Sub
     End Class
 

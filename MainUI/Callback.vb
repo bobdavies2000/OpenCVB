@@ -97,9 +97,18 @@ Namespace MainApp
                                    spanWait = New TimeSpan(elapsedWaitTicks)
                                    Dim msSinceLastPaint = spanWait.Ticks / TimeSpan.TicksPerMillisecond
 
-                                   Dim threshold = 1000 / vbc.task.Settings.FPSPaintTarget
+                                   Dim threshold = 1000 / vbc.task.Settings.paintFrequency
+                                   Dim runPaint As Boolean = False
+                                   If Single.IsInfinity(threshold) Then
+                                       If task.heartBeatCount Mod 5 = 0 Then runPaint = True
+                                   End If
+                                   If threshold < 0 Then
+                                       If task.heartBeat Then runPaint = True
+                                   ElseIf msSinceLastPaint > threshold Then
+                                       runPaint = True
+                                   End If
 
-                                   If msSinceLastPaint > threshold Then
+                                   If runPaint Then
                                        lastPaintTime = vbc.task.cpu.algorithmTimes(1)
                                        Dim tmp As cv.Mat
                                        For i = 0 To pics.Count - 1

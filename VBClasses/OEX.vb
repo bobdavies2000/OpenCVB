@@ -36,7 +36,7 @@ Namespace VBClasses
                 Dim r = New cv.Rect(i * binW, dst2.Height - h, binW, h)
                 dst3.Rectangle(r, cv.Scalar.Black, -1)
             Next
-            If task.heartBeat Then labels(3) = $"The max value below is {peakValue}"
+            labels(3) = $"The max value below is {peakValue}"
         End Sub
     End Class
 

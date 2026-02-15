@@ -62,13 +62,9 @@ Namespace VBClasses
             task.afterHeartBeatLT = If(lastHeartBeatLT, True, False)
             lastHeartBeatLT = task.heartBeatLT
 
-            Static heartBeatCount As Integer = 5
             If task.heartBeat Then
-                heartBeatCount += 1
-                If heartBeatCount >= 5 Then
-                    task.heartBeatLT = True
-                    heartBeatCount = 0
-                End If
+                task.heartBeatCount += 1
+                If task.heartBeatCount Mod 5 = 0 Then task.heartBeatLT = True
             End If
 
             Dim frameDuration = 1000 / task.fpsAlgorithm

@@ -78,14 +78,14 @@ Public Class OptionsGlobal
         GridSlider.Value = task.brickSize
         DotSizeSlider.Value = task.DotSize
         DotSizeLabel.Text = CStr(DotSizeSlider.Value)
-        FPSDisplayLabel.Text = CStr(TargetDisplaySlider.Value)
         LineWidth.Value = task.lineWidth
         HistBinBar.Value = 16
         labelBinsCount.Text = CStr(HistBinBar.Value)
 
         DebugSliderLabel.Text = CStr(DebugSlider.Value)
 
-        ShowSplash.Checked = CBool(GetSetting("OpenCVB", "ShowSplash", "ShowSplash", True))
+		ShowSplash.Checked = CBool(GetSetting("OpenCVB", "ShowSplash", "ShowSplash", True))
+        PaintFrequencyLabel.Text = task.Settings.paintFrequency
 
         Me.Left = 0
         Me.Top = 30
@@ -137,11 +137,11 @@ Public Class OptionsGlobal
         labelBinsCount.Text = CStr(task.histogramBins)
         task.optionsChanged = True
     End Sub
-    Private Sub DisplayFPSSlider_ValueChanged(sender As Object, e As EventArgs) Handles TargetDisplaySlider.ValueChanged
+    Private Sub DisplayFPSSlider_ValueChanged(sender As Object, e As EventArgs) Handles PaintFrequencySlider.ValueChanged
         task.optionsChanged = True
-        task.Settings.FPSPaintTarget = TargetDisplaySlider.Value
-        FPSDisplayLabel.Text = CStr(TargetDisplaySlider.Value)
-    End Sub
+		PaintFrequencyLabel.Text = CStr(PaintFrequencySlider.Value)
+		task.Settings.paintFrequency = PaintFrequencySlider.Value
+	End Sub
     Private Sub gravityPointCloud_CheckedChanged(sender As Object, e As EventArgs) Handles gravityPointCloud.CheckedChanged
         task.optionsChanged = True
     End Sub

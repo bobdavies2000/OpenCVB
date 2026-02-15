@@ -273,7 +273,7 @@ Namespace VBClasses
                 plotSLR.Run(src)
                 dst2 = plotSLR.dst2
                 dst3 = plotSLR.dst3
-                If task.heartBeat Then labels(2) = plotSLR.plot.labels(2)
+                labels(2) = plotSLR.plot.labels(2)
             End If
         End Sub
     End Class

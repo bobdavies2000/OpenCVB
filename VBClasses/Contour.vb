@@ -519,7 +519,7 @@ Namespace VBClasses
             Dim approxContour = ContourBuild(rc.mask, options.ApproximationMode)
             DrawTour(dst3(rc.rect), approxContour, cv.Scalar.Red)
 
-            If task.heartBeat Then labels(2) = "Contour points count reduced from " + CStr(bestContour.Count) +
+            labels(2) = "Contour points count reduced from " + CStr(bestContour.Count) +
                                            " to " + CStr(approxContour.Count)
         End Sub
     End Class
@@ -778,7 +778,7 @@ Namespace VBClasses
             Next
 
             dst3 = PaletteFull(contourMap)
-            If task.heartBeat Then labels(3) = CStr(contourList.Count) + " hulls"
+            labels(3) = CStr(contourList.Count) + " hulls"
         End Sub
     End Class
 

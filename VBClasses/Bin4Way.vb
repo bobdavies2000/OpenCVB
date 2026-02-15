@@ -192,7 +192,7 @@ Namespace VBClasses
             dst2 = binary.dst2
             diff.Run(binary.dst3)
             dst3 = diff.dst2
-            If task.heartBeat Then labels(3) = "There are " + CStr(dst3.CountNonZero) + " unstable pixels"
+            labels(3) = "There are " + CStr(dst3.CountNonZero) + " unstable pixels"
         End Sub
     End Class
 
@@ -280,7 +280,7 @@ Namespace VBClasses
                 strOut += CStr(index) + vbTab
             Next
             SetTrueText(strOut, 3)
-            If task.heartBeat Then labels(3) = "There are " + CStr(dst2.CountNonZero) + " unstable pixels"
+            labels(3) = "There are " + CStr(dst2.CountNonZero) + " unstable pixels"
         End Sub
     End Class
 
@@ -389,7 +389,7 @@ Namespace VBClasses
                 strOut += CStr(index) + vbTab
             Next
             SetTrueText(strOut, 3)
-            If task.heartBeat Then labels(3) = "There are " + CStr(dst2.CountNonZero) + " unstable pixels"
+            labels(3) = "There are " + CStr(dst2.CountNonZero) + " unstable pixels"
         End Sub
     End Class
 
@@ -429,7 +429,7 @@ Namespace VBClasses
             mats.Run(emptyMat)
             dst2 = mats.dst2
             dst3 = mats.dst3
-            If task.heartBeat Then labels(1) = "There are " + CStr(dst1.CountNonZero) + " unstable pixels"
+            labels(1) = "There are " + CStr(dst1.CountNonZero) + " unstable pixels"
         End Sub
     End Class
 
@@ -550,7 +550,7 @@ Namespace VBClasses
                 diff(i).Run(binary.mats.mat(i))
                 dst3 = dst3 Or diff(i).dst2
             Next
-            If task.heartBeat Then labels(3) = "There are " + CStr(dst3.CountNonZero) + " unstable pixels"
+            labels(3) = "There are " + CStr(dst3.CountNonZero) + " unstable pixels"
         End Sub
     End Class
 

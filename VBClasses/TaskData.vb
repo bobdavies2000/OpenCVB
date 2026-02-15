@@ -161,6 +161,7 @@ Namespace VBClasses
         Public frameCount As Integer = 1
         Public heartBeat As Boolean
         Public heartBeatLT As Boolean = True ' long term heartbeat - every X seconds.
+        Public heartBeatCount As Integer
         Public quarterBeat As Boolean
         Public quarter(3) As Boolean
         Public midHeartBeat As Boolean

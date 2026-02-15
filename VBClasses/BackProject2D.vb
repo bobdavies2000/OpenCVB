@@ -38,12 +38,10 @@ Namespace VBClasses
                 dst3.SetTo(0)
                 dst3.SetTo(cv.Scalar.Yellow, dst0)
             End If
-            If task.heartBeat Then
-                labels(2) = colorFmt.options.colorFormat + " format " + If(classCount > 0, CStr(classCount) + " classes", " ")
-                Dim c1 = task.channels(0), c2 = task.channels(1)
-                labels(3) = "That combination of channel " + CStr(c1) + "/" + CStr(c2) + " has " + CStr(bpCount) +
-                            " pixels while image total is " + Format(dst0.Total, "0")
-            End If
+            labels(2) = colorFmt.options.colorFormat + " format " + If(classCount > 0, CStr(classCount) + " classes", " ")
+            Dim c1 = task.channels(0), c2 = task.channels(1)
+            labels(3) = "That combination of channel " + CStr(c1) + "/" + CStr(c2) + " has " + CStr(bpCount) +
+                        " pixels while image total is " + Format(dst0.Total, "0")
             SetTrueText("Use Global Algorithm Option 'grid Square Size' to control the 2D backprojection",
                         New cv.Point(10, dst3.Height - 20), 3)
         End Sub

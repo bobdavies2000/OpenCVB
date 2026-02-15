@@ -112,7 +112,13 @@ Namespace VBClasses
             percentTime = "Click on an algorithm to see more info. " + vbCrLf + vbCrLf
             percentTime += "Algorithm FPS = " + Format(task.fpsAlgorithm, fmt0) + vbCrLf
             percentTime += "Camera FPS = " + Format(task.fpsCamera, fmt0) + vbCrLf
-            percentTime += "Target Display FPS = " + CStr(task.Settings.FPSPaintTarget) + vbCrLf + vbCrLf
+            If task.Settings.paintFrequency < 0 Then
+                percentTime += "Paint Frequency: every heart beat" + vbCrLf + vbCrLf
+            ElseIf task.Settings.paintFrequency = 0 Then
+                percentTime += "Paint Freq: long-term heart beat" + vbCrLf + vbCrLf
+            Else
+                percentTime += "Paint Frequency: " + CStr(task.Settings.paintFrequency) + vbCrLf + vbCrLf
+            End If
 
             Dim timeDataTree As New List(Of String)(treeData)
             percentTime += saveWaitTime + vbCrLf

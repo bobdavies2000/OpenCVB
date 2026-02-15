@@ -54,8 +54,8 @@ Namespace VBClasses
 
             dst3 = PaletteBlackZero(dst2)
 
-            If task.heartBeat Then labels(2) = "CV_8U result with " + CStr(classCount) + " regions."
-            If task.heartBeat Then labels(3) = "Palette version of the data in dst2 with " + CStr(classCount) + " regions."
+            labels(2) = "CV_8U result with " + CStr(classCount) + " regions."
+            labels(3) = "Palette version of the data in dst2 with " + CStr(classCount) + " regions."
         End Sub
         Protected Overrides Sub Finalize()
             If cPtr <> 0 Then cPtr = RedMask_Close(cPtr)

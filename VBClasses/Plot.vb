@@ -68,7 +68,7 @@ Namespace VBClasses
             plotDepth.Run(src)
             dst2 = plotDepth.dst2
 
-            If task.heartBeat Then labels(2) = plotDepth.labels(2)
+            labels(2) = plotDepth.labels(2)
             Dim Split = Regex.Split(labels(2), "\W+")
             Dim lineCount = CInt(Split(5))
             If lineCount > 0 Then
@@ -591,7 +591,7 @@ Namespace VBClasses
                 Next
                 If addLabels Then Plot_Basics.AddPlotScale(dst2, mm.minVal, mm.maxVal)
             End If
-            If task.heartBeat Then labels(2) = CStr(CInt(mm.maxVal)) + " max value " + CStr(CInt(mm.minVal)) + " min value"
+            labels(2) = CStr(CInt(mm.maxVal)) + " max value " + CStr(CInt(mm.minVal)) + " min value"
         End Sub
     End Class
 

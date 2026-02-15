@@ -32,7 +32,7 @@ Namespace VBClasses
 
             strOut = CStr(features.Count) + " features were found using 'BrickPoints' method. " +
                      CStr(count) + " features were skipped."
-            If task.heartBeat Then labels(2) = strOut
+            labels(2) = strOut
         End Sub
     End Class
 
@@ -204,7 +204,7 @@ Namespace VBClasses
 
             strOut += "  " + CStr(task.features.Count) + " features were found using '" + task.fOptions.FeatureMethod.Text +
                   "' method."
-            If task.heartBeat Then labels(2) = strOut
+            labels(2) = strOut
         End Sub
         Protected Overrides Sub Finalize()
             If cPtr <> 0 Then cPtr = Agast_Close(cPtr)
@@ -304,7 +304,7 @@ Namespace VBClasses
                 End If
             Next
 
-            If task.heartBeat Then labels(3) = CStr(stationary) + " features were stationary and " + CStr(motion) + " features had some motion."
+            labels(3) = CStr(stationary) + " features were stationary and " + CStr(motion) + " features had some motion."
             ptLast = New List(Of cv.Point)(ptList)
         End Sub
     End Class

@@ -25,9 +25,7 @@ Namespace VBClasses
                 sharpGL.Show()
             End If
 
-            Dim fps = task.Settings.FPSPaintTarget
             gOptions = New OptionsGlobal
-            gOptions.TargetDisplaySlider.Value = fps
             fOptions = New OptionsFeatures
             treeView = New TreeViewForm
 
@@ -69,6 +67,7 @@ Namespace VBClasses
             readyForCameraInput = True
             task.clickPoint = New cv.Point(CInt(workRes.Width / 2), CInt(workRes.Height / 2))
 
+            task.gOptions.PaintFrequencySlider.Value = task.Settings.paintFrequency
             Debug.WriteLine(vbCrLf + vbCrLf + vbCrLf + "Starting algorithm " + settings.algorithm)
             Debug.WriteLine(vbTab + CStr(AlgorithmTestAllCount) + " algorithms tested")
             AlgorithmTestAllCount += 1

@@ -25,8 +25,8 @@ Partial Class OptionsGlobal
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(OptionsGlobal))
         Label1 = New Label()
         GroupBox1 = New GroupBox()
-        TargetDisplaySlider = New TrackBar()
-        FPSDisplayLabel = New Label()
+        PaintFrequencySlider = New TrackBar()
+        PaintFrequencyLabel = New Label()
         Label9 = New Label()
         DotSizeSlider = New TrackBar()
         DotSizeLabel = New Label()
@@ -67,7 +67,7 @@ Partial Class OptionsGlobal
         DepthGroupBox = New GroupBox()
         ShowSplash = New CheckBox()
         GroupBox1.SuspendLayout()
-        CType(TargetDisplaySlider, ComponentModel.ISupportInitialize).BeginInit()
+        CType(PaintFrequencySlider, ComponentModel.ISupportInitialize).BeginInit()
         CType(DotSizeSlider, ComponentModel.ISupportInitialize).BeginInit()
         CType(LineWidth, ComponentModel.ISupportInitialize).BeginInit()
         CType(HistBinBar, ComponentModel.ISupportInitialize).BeginInit()
@@ -89,8 +89,8 @@ Partial Class OptionsGlobal
         ' 
         ' GroupBox1
         ' 
-        GroupBox1.Controls.Add(TargetDisplaySlider)
-        GroupBox1.Controls.Add(FPSDisplayLabel)
+        GroupBox1.Controls.Add(PaintFrequencySlider)
+        GroupBox1.Controls.Add(PaintFrequencyLabel)
         GroupBox1.Controls.Add(Label9)
         GroupBox1.Controls.Add(DotSizeSlider)
         GroupBox1.Controls.Add(DotSizeLabel)
@@ -115,35 +115,34 @@ Partial Class OptionsGlobal
         GroupBox1.TabIndex = 1
         GroupBox1.TabStop = False
         ' 
-        ' TargetDisplaySlider
+        ' PaintFrequencySlider
         ' 
-        TargetDisplaySlider.Location = New Point(230, 28)
-        TargetDisplaySlider.Margin = New Padding(3, 4, 3, 4)
-        TargetDisplaySlider.Maximum = 60
-        TargetDisplaySlider.Minimum = 1
-        TargetDisplaySlider.Name = "TargetDisplaySlider"
-        TargetDisplaySlider.Size = New Size(549, 69)
-        TargetDisplaySlider.TabIndex = 12
-        TargetDisplaySlider.TickStyle = TickStyle.None
-        TargetDisplaySlider.Value = 30
+        PaintFrequencySlider.Location = New Point(230, 28)
+        PaintFrequencySlider.Margin = New Padding(3, 4, 3, 4)
+        PaintFrequencySlider.Maximum = 60
+        PaintFrequencySlider.Minimum = -1
+        PaintFrequencySlider.Name = "PaintFrequencySlider"
+        PaintFrequencySlider.Size = New Size(549, 69)
+        PaintFrequencySlider.TabIndex = 12
+        PaintFrequencySlider.TickStyle = TickStyle.None
         ' 
-        ' FPSDisplayLabel
+        ' PaintFrequencyLabel
         ' 
-        FPSDisplayLabel.AutoSize = True
-        FPSDisplayLabel.Location = New Point(778, 28)
-        FPSDisplayLabel.Name = "FPSDisplayLabel"
-        FPSDisplayLabel.Size = New Size(168, 30)
-        FPSDisplayLabel.TabIndex = 11
-        FPSDisplayLabel.Text = "FPSDisplayLabel"
+        PaintFrequencyLabel.AutoSize = True
+        PaintFrequencyLabel.Location = New Point(778, 28)
+        PaintFrequencyLabel.Name = "PaintFrequencyLabel"
+        PaintFrequencyLabel.Size = New Size(211, 30)
+        PaintFrequencyLabel.TabIndex = 11
+        PaintFrequencyLabel.Text = "PaintFrequencyLabel"
         ' 
         ' Label9
         ' 
         Label9.AutoSize = True
-        Label9.Location = New Point(27, 28)
+        Label9.Location = New Point(38, 28)
         Label9.Name = "Label9"
-        Label9.Size = New Size(190, 30)
+        Label9.Size = New Size(166, 30)
         Label9.TabIndex = 10
-        Label9.Text = "Target Display FPS"
+        Label9.Text = "Paint Frequency"
         ' 
         ' DotSizeSlider
         ' 
@@ -567,7 +566,7 @@ Partial Class OptionsGlobal
         Text = "OptionsGlobal"
         GroupBox1.ResumeLayout(False)
         GroupBox1.PerformLayout()
-        CType(TargetDisplaySlider, ComponentModel.ISupportInitialize).EndInit()
+        CType(PaintFrequencySlider, ComponentModel.ISupportInitialize).EndInit()
         CType(DotSizeSlider, ComponentModel.ISupportInitialize).EndInit()
         CType(LineWidth, ComponentModel.ISupportInitialize).EndInit()
         CType(HistBinBar, ComponentModel.ISupportInitialize).EndInit()
@@ -621,8 +620,8 @@ Partial Class OptionsGlobal
     Friend WithEvents Label14 As Label
     Friend WithEvents DepthGroupBox As GroupBox
     Friend WithEvents Label3 As Label
-    Friend WithEvents TargetDisplaySlider As TrackBar
-    Friend WithEvents FPSDisplayLabel As Label
+    Friend WithEvents PaintFrequencySlider As TrackBar
+    Friend WithEvents PaintFrequencyLabel As Label
     Friend WithEvents Label9 As Label
     Friend WithEvents ShowSplash As CheckBox
 End Class

@@ -130,7 +130,7 @@ Namespace VBClasses
             desc = "Create the grid of bricks with good visibility"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If task.heartBeat Then labels(2) = CStr(task.bricks.brickDepthCount) + " bricks have reasonable depth."
+            labels(2) = CStr(task.bricks.brickDepthCount) + " bricks have reasonable depth."
 
             dst2 = task.bricks.dst2
             dst3 = task.bricks.dst3

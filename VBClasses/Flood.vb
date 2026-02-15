@@ -164,7 +164,7 @@ Namespace VBClasses
             labels(2) = redC.labels(2)
             dst2 = redC.dst2.SetTo(0, inputRemoved)
 
-            If task.heartBeat Then labels(2) = $"{redC.rcList.Count} cells identified"
+            labels(2) = $"{redC.rcList.Count} cells identified"
 
             If showSelected Then Swarm_Flood.oldSelectCell()
         End Sub

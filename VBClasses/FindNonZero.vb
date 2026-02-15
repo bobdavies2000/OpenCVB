@@ -66,7 +66,7 @@ Namespace VBClasses
                 soloPoints.Add(nZero.ptMat.Get(Of cv.Point)(i, 0))
             Next
 
-            If task.heartBeat Then labels(2) = $"There were {soloPoints.Count} points found"
+            labels(2) = $"There were {soloPoints.Count} points found"
         End Sub
     End Class
 

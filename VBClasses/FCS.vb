@@ -172,7 +172,7 @@ Namespace VBClasses
 
             If standaloneTest() Then dst2 = PaletteFull(fcsMap)
 
-            If task.heartBeat Then labels(2) = traceName + ": " + CStr(inputFeatures.Count) + " cells found."
+            labels(2) = traceName + ": " + CStr(inputFeatures.Count) + " cells found."
         End Sub
     End Class
 
@@ -705,7 +705,7 @@ Namespace VBClasses
                 SetTrueTextBase(CStr(fp.age), fp.pt, 2)
             Next
 
-            If task.heartBeat Then labels(2) = CStr(task.features.Count) + " lines were used to create " +
+            labels(2) = CStr(task.features.Count) + " lines were used to create " +
                                            CStr(task.fpList.Count) + " cells"
         End Sub
     End Class
