@@ -100,7 +100,10 @@ Namespace MainApp
                                    Dim threshold = 1000 / vbc.task.Settings.paintFrequency
                                    Dim runPaint As Boolean = False
                                    If Single.IsInfinity(threshold) Then
-                                       If task.heartBeatCount Mod 5 = 0 Then runPaint = True
+                                       If task.heartBeatCount Mod 5 = 0 Or task.frameCount <= 10 Then
+                                           task.heartBeatCount += 1
+                                           runPaint = True
+                                       End If
                                    End If
                                    If threshold < 0 Then
                                        If task.heartBeat Then runPaint = True
