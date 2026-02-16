@@ -6,6 +6,7 @@ Namespace VBClasses
     Public Class AlgorithmTask : Implements IDisposable
         Public Sub Initialize(settings As jsonShared.Settings)
             task.Settings = settings
+            Dim paintFreq = task.Settings.paintFrequency
 
             rows = settings.workRes.Height
             cols = settings.workRes.Width
@@ -67,7 +68,7 @@ Namespace VBClasses
             readyForCameraInput = True
             task.clickPoint = New cv.Point(CInt(workRes.Width / 2), CInt(workRes.Height / 2))
 
-            task.gOptions.PaintFrequencySlider.Value = task.Settings.paintFrequency
+            task.gOptions.PaintFreqSlider.Value = paintFreq
             Debug.WriteLine(vbCrLf + vbCrLf + vbCrLf + "Starting algorithm " + settings.algorithm)
             Debug.WriteLine(vbTab + CStr(AlgorithmTestAllCount) + " algorithms tested")
             AlgorithmTestAllCount += 1

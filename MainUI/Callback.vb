@@ -97,19 +97,22 @@ Namespace MainApp
                                    spanWait = New TimeSpan(elapsedWaitTicks)
                                    Dim msSinceLastPaint = spanWait.Ticks / TimeSpan.TicksPerMillisecond
 
-                                   Dim threshold = 1000 / vbc.task.Settings.paintFrequency
+                                   Dim freq = vbc.task.Settings.paintFrequency
+                                   Dim threshold As Integer = If(freq = 0, 0, 1000 / freq)
                                    Dim runPaint As Boolean = False
-                                   If Single.IsInfinity(threshold) Then
-                                       If task.heartBeatCount Mod 5 = 0 Or task.frameCount <= 10 Then
-                                           task.heartBeatCount += 1
-                                           runPaint = True
-                                       End If
-                                   End If
-                                   If threshold < 0 Then
-                                       If task.heartBeat Then runPaint = True
-                                   ElseIf msSinceLastPaint > threshold Then
-                                       runPaint = True
-                                   End If
+                                   Select Case threshold
+                                       Case -500 ' paint on heartbeatLT
+                                           If task.heartBeat Then runPaint = True
+                                       Case -1000 ' paint on the heartbeat, but only every 5th heartbeat
+                                           runPaint = False ' do not update at all for -1 
+                                       Case 0 ' stop painting altogether
+                                           If task.heartBeatCount Mod 5 = 0 Or task.frameCount <= 10 Then
+                                               task.heartBeatCount += 1
+                                               runPaint = True
+                                           End If
+                                       Case Else
+                                           If msSinceLastPaint > threshold Then runPaint = True
+                                   End Select
 
                                    If runPaint Then
                                        lastPaintTime = vbc.task.cpu.algorithmTimes(1)

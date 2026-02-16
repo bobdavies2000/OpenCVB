@@ -137,11 +137,11 @@ Public Class OptionsGlobal
         labelBinsCount.Text = CStr(task.histogramBins)
         task.optionsChanged = True
     End Sub
-    Private Sub DisplayFPSSlider_ValueChanged(sender As Object, e As EventArgs) Handles PaintFrequencySlider.ValueChanged
+    Private Sub DisplayFPSSlider_ValueChanged(sender As Object, e As EventArgs) Handles PaintFreqSlider.ValueChanged
         task.optionsChanged = True
-		PaintFrequencyLabel.Text = CStr(PaintFrequencySlider.Value)
-		task.Settings.paintFrequency = PaintFrequencySlider.Value
-	End Sub
+        PaintFrequencyLabel.Text = CStr(PaintFreqSlider.Value)
+        task.Settings.paintFrequency = PaintFreqSlider.Value
+    End Sub
     Private Sub gravityPointCloud_CheckedChanged(sender As Object, e As EventArgs) Handles gravityPointCloud.CheckedChanged
         task.optionsChanged = True
     End Sub

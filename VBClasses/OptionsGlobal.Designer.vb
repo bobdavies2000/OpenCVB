@@ -25,7 +25,7 @@ Partial Class OptionsGlobal
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(OptionsGlobal))
         Label1 = New Label()
         GroupBox1 = New GroupBox()
-        PaintFrequencySlider = New TrackBar()
+        PaintFreqSlider = New TrackBar()
         PaintFrequencyLabel = New Label()
         Label9 = New Label()
         DotSizeSlider = New TrackBar()
@@ -67,7 +67,7 @@ Partial Class OptionsGlobal
         DepthGroupBox = New GroupBox()
         ShowSplash = New CheckBox()
         GroupBox1.SuspendLayout()
-        CType(PaintFrequencySlider, ComponentModel.ISupportInitialize).BeginInit()
+        CType(PaintFreqSlider, ComponentModel.ISupportInitialize).BeginInit()
         CType(DotSizeSlider, ComponentModel.ISupportInitialize).BeginInit()
         CType(LineWidth, ComponentModel.ISupportInitialize).BeginInit()
         CType(HistBinBar, ComponentModel.ISupportInitialize).BeginInit()
@@ -89,7 +89,7 @@ Partial Class OptionsGlobal
         ' 
         ' GroupBox1
         ' 
-        GroupBox1.Controls.Add(PaintFrequencySlider)
+        GroupBox1.Controls.Add(PaintFreqSlider)
         GroupBox1.Controls.Add(PaintFrequencyLabel)
         GroupBox1.Controls.Add(Label9)
         GroupBox1.Controls.Add(DotSizeSlider)
@@ -115,16 +115,17 @@ Partial Class OptionsGlobal
         GroupBox1.TabIndex = 1
         GroupBox1.TabStop = False
         ' 
-        ' PaintFrequencySlider
+        ' PaintFreqSlider
         ' 
-        PaintFrequencySlider.Location = New Point(230, 28)
-        PaintFrequencySlider.Margin = New Padding(3, 4, 3, 4)
-        PaintFrequencySlider.Maximum = 60
-        PaintFrequencySlider.Minimum = -1
-        PaintFrequencySlider.Name = "PaintFrequencySlider"
-        PaintFrequencySlider.Size = New Size(549, 69)
-        PaintFrequencySlider.TabIndex = 12
-        PaintFrequencySlider.TickStyle = TickStyle.None
+        PaintFreqSlider.Location = New Point(230, 28)
+        PaintFreqSlider.Margin = New Padding(3, 4, 3, 4)
+        PaintFreqSlider.Maximum = 60
+        PaintFreqSlider.Minimum = -2
+        PaintFreqSlider.Name = "PaintFreqSlider"
+        PaintFreqSlider.Size = New Size(549, 69)
+        PaintFreqSlider.TabIndex = 12
+        PaintFreqSlider.TickStyle = TickStyle.None
+        PaintFreqSlider.Value = 30
         ' 
         ' PaintFrequencyLabel
         ' 
@@ -566,7 +567,7 @@ Partial Class OptionsGlobal
         Text = "OptionsGlobal"
         GroupBox1.ResumeLayout(False)
         GroupBox1.PerformLayout()
-        CType(PaintFrequencySlider, ComponentModel.ISupportInitialize).EndInit()
+        CType(PaintFreqSlider, ComponentModel.ISupportInitialize).EndInit()
         CType(DotSizeSlider, ComponentModel.ISupportInitialize).EndInit()
         CType(LineWidth, ComponentModel.ISupportInitialize).EndInit()
         CType(HistBinBar, ComponentModel.ISupportInitialize).EndInit()
@@ -620,7 +621,7 @@ Partial Class OptionsGlobal
     Friend WithEvents Label14 As Label
     Friend WithEvents DepthGroupBox As GroupBox
     Friend WithEvents Label3 As Label
-    Friend WithEvents PaintFrequencySlider As TrackBar
+    Friend WithEvents PaintFreqSlider As TrackBar
     Friend WithEvents PaintFrequencyLabel As Label
     Friend WithEvents Label9 As Label
     Friend WithEvents ShowSplash As CheckBox
