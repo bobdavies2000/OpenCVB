@@ -1490,11 +1490,13 @@ Rectangle_Basics
 Rectangle_EnclosingPoints
 Rectangle_Fit
 Rectangle_Rotated
+RedCart_Basics
 RedCart_CheckerBoardWall
 RedCart_CPP
 RedCart_PrepData
 RedCart_PrepStableY
 RedCart_PrepX
+RedCart_PrepXOld
 RedCart_PrepXY
 RedCart_PrepXYAlt
 RedCart_PrepY
