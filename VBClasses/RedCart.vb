@@ -6,7 +6,6 @@ Namespace VBClasses
         Public prepData As New RedPrep_Core
         Dim redC As New RedCloud_Basics
         Public Sub New()
-            task.fOptions.ReductionSlider.Value = 50
             labels(3) = "Use debug slider to select region to display."
             OptionParent.findRadio("X Reduction").Checked = True
             desc = "Run RedCloud on the output of RedPrep_Core"
@@ -29,7 +28,6 @@ Namespace VBClasses
         Public lutList As New List(Of Byte)
         Public Sub New()
             task.gOptions.DebugSlider.Value = 1
-            task.fOptions.ReductionSlider.Value = 50
             labels(3) = "Use debug slider to select region to display."
             OptionParent.findRadio("X Reduction").Checked = True
             desc = "Prepare the grid of point cloud data."
@@ -89,7 +87,6 @@ Namespace VBClasses
         Public classCount As Integer
         Public Sub New()
             If standalone Then task.gOptions.displayDst1.Checked = True
-            If standalone Then task.fOptions.ReductionSlider.Value = 50
             desc = "Identify each region using the debug slider."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -122,7 +119,6 @@ Namespace VBClasses
         Public redCart As New RedCart_Basics
         Public Sub New()
             OptionParent.findRadio("XY Reduction").Checked = True
-            task.fOptions.ReductionSlider.Value = 50
             desc = "Prep the XY regions in the reduced depth data."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -138,7 +134,6 @@ Namespace VBClasses
     Public Class RedCart_PrepData : Inherits TaskParent
         Dim prepData As New RedPrep_Core
         Public Sub New()
-            task.fOptions.ReductionSlider.Value = 50
             desc = "Prepare the grid of point cloud data."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -194,7 +189,6 @@ Namespace VBClasses
         Public classCount As Integer
         Dim edges As New Edge_Basics
         Public Sub New()
-            task.fOptions.ReductionSlider.Value = 50
             desc = "Use this algorithm to build a checkerboard when pointing at a wall."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -215,7 +209,6 @@ Namespace VBClasses
     Public Class RedCart_TriangleDots : Inherits TaskParent
         Dim checkers As New RedPrep_Core
         Public Sub New()
-            task.fOptions.ReductionSlider.Value = 50
             desc = "Find any "
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -241,7 +234,6 @@ Namespace VBClasses
         Implements IDisposable
         Dim prep As New RedPrep_Core
         Public Sub New()
-            task.fOptions.ReductionSlider.Value = 50
             cPtr = RedCart_CPP_Open()
             desc = "Hit the locations where floodfill slips up by placeing a dot in the intersection."
         End Sub
@@ -274,7 +266,6 @@ Namespace VBClasses
         Public lut As cv.Mat
         Public Sub New()
             OptionParent.findRadio("X Reduction").Checked = True
-            task.fOptions.ReductionSlider.Value = 50
             desc = "Prep the vertical regions in the reduced depth data."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -293,7 +284,6 @@ Namespace VBClasses
         Public classCount As Integer
         Public Sub New()
             OptionParent.findRadio("Y Reduction").Checked = True
-            task.fOptions.ReductionSlider.Value = 50
             desc = "Prep the horizontal regions in the reduced depth data."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -344,7 +334,6 @@ Namespace VBClasses
         Public classCount As Integer
         Public Sub New()
             OptionParent.findRadio("X Reduction").Checked = True
-            task.fOptions.ReductionSlider.Value = 50
             desc = "Prep the vertical regions in the reduced depth data."
         End Sub
 

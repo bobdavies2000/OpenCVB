@@ -378,7 +378,6 @@ Namespace VBClasses
         Public reduced32s As New cv.Mat
         Public reduced32f As New cv.Mat
         Public Sub New()
-            If standalone Then task.fOptions.ReductionSlider.Value = 50
             desc = "Reduction transform for the point cloud"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)

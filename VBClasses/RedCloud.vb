@@ -8,7 +8,6 @@ Namespace VBClasses
         Public options As New Options_RedCloud
         Public Sub New()
             task.redCloud = Me
-            task.fOptions.ReductionSlider.Value = 40
             desc = "Build contours for each cell"
         End Sub
         Public Shared Function rcDataMatch(rc As rcData, rcListLast As List(Of rcData),
@@ -128,7 +127,8 @@ Namespace VBClasses
 
             rcList = sweepImage(src)
 
-            If standaloneTest() Then dst2 = PaletteBlackZero(dst3)
+            dst2 = PaletteBlackZero(src)
+            dst2.SetTo(0, task.noDepthMask)
             labels(2) = "RedCloud cells identified: " + CStr(rcList.Count)
 
             Static unchanged As Integer
@@ -422,7 +422,7 @@ Namespace VBClasses
 
 
     Public Class RedCloud_PrepCore : Inherits TaskParent
-        Dim redCore As New RedCloud_Core
+        Dim redC As New RedCloud_Basics
         Dim prepData As New RedPrep_Core
         Public Sub New()
             OptionParent.findRadio("X Reduction").Checked = True
@@ -433,9 +433,13 @@ Namespace VBClasses
             dst3 = prepData.dst2
             labels(3) = prepData.labels(2)
 
-            redCore.Run(dst3)
-            dst2 = redCore.dst2
-            labels(2) = redCore.labels(2)
+            redC.Run(dst3)
+            dst2 = redC.dst2
+            labels(2) = redC.labels(2)
+
+            RedCloud_Cell.selectCell(redC.rcMap, redC.rcList)
+            strOut = task.rcD.displayCell()
+            SetTrueText(strOut, 3)
         End Sub
     End Class
 End Namespace

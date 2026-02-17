@@ -652,10 +652,10 @@ Namespace VBClasses
             If maxRange > 6000 Then Dim k = 0
             labels(3) = "Histogram after trim to " + Format(minRange, fmt0) + " to " + Format(maxRange, fmt0)
 
-                plotHistNew.minRange = minRange
-                plotHistNew.maxRange = maxRange
-                    plotHistNew.Run(redCore.reduced32f)
-                    dst3 = plotHistNew.dst2
+            plotHistNew.minRange = minRange
+            plotHistNew.maxRange = maxRange
+            plotHistNew.Run(redCore.reduced32f)
+            dst3 = plotHistNew.dst2
         End Sub
     End Class
 
