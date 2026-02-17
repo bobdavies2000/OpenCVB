@@ -121,10 +121,12 @@ Namespace VBClasses
             Return New List(Of rcData)(newList.Values)
         End Function
         Public Overrides Sub RunAlg(src As cv.Mat)
-            prepEdges.Run(src)
-            dst3 = prepEdges.dst2.Clone
+            If src.Channels <> 1 Then
+                prepEdges.Run(src)
+                src = prepEdges.dst2.Clone
+            End If
 
-            rcList = sweepImage(dst3)
+            rcList = sweepImage(src)
 
             If standaloneTest() Then dst2 = PaletteBlackZero(dst3)
             labels(2) = "RedCloud cells identified: " + CStr(rcList.Count)
@@ -415,4 +417,25 @@ Namespace VBClasses
         End Sub
     End Class
 
+
+
+
+
+    Public Class RedCloud_PrepCore : Inherits TaskParent
+        Dim redCore As New RedCloud_Core
+        Dim prepData As New RedPrep_Core
+        Public Sub New()
+            OptionParent.findRadio("X Reduction").Checked = True
+            desc = "Use the output of RedPrep_Core with RedCloud"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            prepData.Run(src)
+            dst3 = prepData.dst2
+            labels(3) = prepData.labels(2)
+
+            redCore.Run(dst3)
+            dst2 = redCore.dst2
+            labels(2) = redCore.labels(2)
+        End Sub
+    End Class
 End Namespace

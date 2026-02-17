@@ -1394,7 +1394,7 @@ Namespace VBClasses
         Dim grid As New Grid_Basics
         Public histogram As New cv.Mat
         Public histArray() As Single
-        Dim options As New Options_PointCloud
+        Dim options As New Options_PrepData
         Public Sub New()
             task.gOptions.setHistogramBins(9)
             labels = {"", "", "Plot of 2D histogram", "All non-zero entries in the 2D histogram"}
@@ -1403,7 +1403,7 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
 
-            Select Case options.rcOptions.reductionName
+            Select Case options.reductionName
                 Case "X Reduction", "Y Reduction", "Z Reduction"
                     cv.Cv2.CalcHist({task.pointCloud}, task.channels, New cv.Mat(), histogram,
                                  task.channelCount, task.histBinList, task.ranges)

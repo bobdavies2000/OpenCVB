@@ -5204,16 +5204,19 @@ Namespace VBClasses
 
     Public Class XO_RedPrep_BasicsCalcHist : Inherits TaskParent
         Dim options As New Options_RedPrep
+        Dim optionsPrep As New Options_PrepData
         Public Sub New()
+            OptionParent.findRadio("XY Reduction").Checked = True
             desc = "Simpler transforms for the point cloud using CalcHist instead of reduction."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
+            optionsPrep.Run()
 
             Dim histogram As New cv.Mat
 
             Dim channels() As Integer = {0}
-            Select Case options.reductionName
+            Select Case optionsPrep.reductionName
                 Case "X Reduction"
                     dst0 = task.pcSplit(0)
                 Case "Y Reduction"

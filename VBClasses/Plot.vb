@@ -606,6 +606,7 @@ Namespace VBClasses
         Public plotHist As New Plot_Histogram
         Dim plotHistNew As New Plot_Histogram
         Public Sub New()
+            OptionParent.findRadio("Y Reduction").Checked = True
             plotHistNew.createHistogram = True
             plotHist.createHistogram = True
             task.gOptions.HistBinBar.Value = task.gOptions.HistBinBar.Maximum
@@ -614,11 +615,7 @@ Namespace VBClasses
             desc = "Remove outliers from the histogram by finding the single range with no gaps."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If standalone Then
-                redCore.reductionName = "Y Reduction"
-                redCore.Run(src)
-            End If
-
+            If standalone Then redCore.Run(src)
             Dim mm = GetMinMax(redCore.reduced32f)
 
             plotHist.minRange = mm.minVal

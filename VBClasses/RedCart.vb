@@ -4,6 +4,27 @@ Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Class RedCart_Basics : Inherits TaskParent
         Public prepData As New RedPrep_Core
+        Dim redC As New RedCloud_Basics
+        Public Sub New()
+            task.fOptions.ReductionSlider.Value = 50
+            labels(3) = "Use debug slider to select region to display."
+            OptionParent.findRadio("X Reduction").Checked = True
+            desc = "Run RedCloud on the output of RedPrep_Core"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            prepData.Run(emptyMat)
+            redC.Run(src)
+            dst2 = redC.dst2
+            labels(2) = redC.labels(2)
+        End Sub
+    End Class
+
+
+
+
+
+    Public Class RedCart_Basics1 : Inherits TaskParent
+        Public prepData As New RedPrep_Core
         Public lut As New cv.Mat
         Public lutList As New List(Of Byte)
         Public Sub New()
@@ -64,7 +85,7 @@ Namespace VBClasses
 
 
     Public Class RedCart_Debug : Inherits TaskParent
-        Dim redCart As New RedCart_Basics
+        Dim redCart As New RedCart_Basics1
         Public classCount As Integer
         Public Sub New()
             If standalone Then task.gOptions.displayDst1.Checked = True
@@ -180,7 +201,7 @@ Namespace VBClasses
             ' prepData.reductionName = "XY Reduction" ' default
             prepData.Run(src)
 
-            Dim lut = RedCart_Basics.countClasses(prepData.dst2, labels(2))
+            Dim lut = RedCart_Basics1.countClasses(prepData.dst2, labels(2))
             dst2 = prepData.dst2.LUT(lut)
 
             edges.Run(dst2)
@@ -252,15 +273,15 @@ Namespace VBClasses
         Public classCount As Integer
         Public lut As cv.Mat
         Public Sub New()
+            OptionParent.findRadio("X Reduction").Checked = True
             task.fOptions.ReductionSlider.Value = 50
             desc = "Prep the vertical regions in the reduced depth data."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            prepData.reductionName = "X Reduction"
             prepData.Run(src)
             dst2 = prepData.dst3
 
-            Dim lut = RedCart_Basics.countClasses(prepData.dst2, labels(2))
+            Dim lut = RedCart_Basics1.countClasses(prepData.dst2, labels(2))
             dst2 = prepData.dst2.LUT(lut)
         End Sub
     End Class
@@ -271,15 +292,15 @@ Namespace VBClasses
         Public prepData As New RedPrep_Core
         Public classCount As Integer
         Public Sub New()
+            OptionParent.findRadio("Y Reduction").Checked = True
             task.fOptions.ReductionSlider.Value = 50
             desc = "Prep the horizontal regions in the reduced depth data."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            prepData.reductionName = "Y Reduction"
             prepData.Run(src)
             dst2 = prepData.dst3
 
-            Dim lut = RedCart_Basics.countClasses(prepData.dst2, labels(2))
+            Dim lut = RedCart_Basics1.countClasses(prepData.dst2, labels(2))
             dst2 = prepData.dst2.LUT(lut)
         End Sub
     End Class
@@ -322,16 +343,16 @@ Namespace VBClasses
         Public prepData As New RedPrep_Core
         Public classCount As Integer
         Public Sub New()
+            OptionParent.findRadio("X Reduction").Checked = True
             task.fOptions.ReductionSlider.Value = 50
             desc = "Prep the vertical regions in the reduced depth data."
         End Sub
 
         Public Overrides Sub RunAlg(src As cv.Mat)
-            prepData.reductionName = "X Reduction"
             prepData.Run(src)
             dst2 = prepData.dst3
 
-            Dim lut = RedCart_Basics.countClasses(prepData.dst2, labels(2))
+            Dim lut = RedCart_Basics1.countClasses(prepData.dst2, labels(2))
             dst2 = prepData.dst2.LUT(lut)
         End Sub
     End Class

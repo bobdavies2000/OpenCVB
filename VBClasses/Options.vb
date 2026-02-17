@@ -7975,6 +7975,7 @@ Namespace VBClasses
         Public yBins As Integer = 30
         Public zBins As Integer = 100
         Public rcOptions As New Options_RedPrep
+        Public options As New Options_PrepData
         Public Sub New()
             If sliders.Setup(traceName) Then
                 sliders.setupTrackBar("Histogram threshold", 0, 1000, threshold)
@@ -7996,6 +7997,7 @@ Namespace VBClasses
         End Sub
         Public Sub setupCalcHist()
             rcOptions.Run()
+            options.Run()
 
             ' The specification for each camera spells out the FOV angle
             ' The sliders adjust the depth data histogram to fill the frustrum which is built from the specification FOV
@@ -8054,7 +8056,7 @@ Namespace VBClasses
             task.rangesCloud = New cv.Rangef() {New cv.Rangef(rx.Item0, rx.Item1), New cv.Rangef(ry.Item0, ry.Item1),
                                                 New cv.Rangef(rz.Item0, rz.Item1)}
 
-            Select Case rcOptions.reductionName
+            Select Case options.reductionName
                 Case "X Reduction"
                     task.ranges = New cv.Rangef() {New cv.Rangef(rx.Item0, rx.Item1)}
                     task.channels = {0}
@@ -8114,7 +8116,6 @@ Namespace VBClasses
         Public PrepY As Boolean
         Public PrepZ As Boolean
         Public PrepAddEdges As Boolean
-        Public reductionName As String = "XY Reduction"
         Sub New()
             If FindFrm(traceName + " CheckBox Options") Is Nothing Then
                 check.Setup(traceName)
@@ -8125,6 +8126,28 @@ Namespace VBClasses
                 check.Box(0).Checked = True
                 check.Box(1).Checked = True
             End If
+        End Sub
+        Public Sub Run()
+            Static PrepXBox = FindCheckBox("Prep Edges in X")
+            Static PrepYBox = FindCheckBox("Prep Edges in Y")
+            Static PrepZBox = FindCheckBox("Prep Edges in Z")
+            Static PrepEdges = FindCheckBox("Add RGB Edges")
+
+            PrepX = PrepXBox.checked
+            PrepY = PrepYBox.checked
+            PrepZ = PrepZBox.checked
+            PrepAddEdges = PrepEdges.checked
+        End Sub
+    End Class
+
+
+
+
+
+    Public Class Options_PrepData : Inherits OptionParent
+        Public PrepAddEdges As Boolean
+        Public reductionName As String = "XY Reduction"
+        Sub New()
             If FindFrm(traceName + " Radio Buttons") Is Nothing Then
                 radio.Setup(traceName)
                 radio.addRadio("X Reduction")
@@ -8138,16 +8161,6 @@ Namespace VBClasses
             End If
         End Sub
         Public Sub Run()
-            Static PrepXBox = FindCheckBox("Prep Edges in X")
-            Static PrepYBox = FindCheckBox("Prep Edges in Y")
-            Static PrepZBox = FindCheckBox("Prep Edges in Z")
-            Static PrepEdges = FindCheckBox("Add RGB Edges")
-
-            PrepX = PrepXBox.checked
-            PrepY = PrepYBox.checked
-            PrepZ = PrepZBox.checked
-            PrepAddEdges = PrepEdges.checked
-
             Static frm = FindFrm(traceName + " Radio Buttons")
             If frm.check.count > 0 Then reductionName = frm.check(findRadioIndex(frm.check)).Text
         End Sub

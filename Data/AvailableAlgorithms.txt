@@ -1491,6 +1491,7 @@ Rectangle_EnclosingPoints
 Rectangle_Fit
 Rectangle_Rotated
 RedCart_Basics
+RedCart_Basics1
 RedCart_CheckerBoardWall
 RedCart_CPP
 RedCart_Debug
@@ -1514,6 +1515,7 @@ RedCloud_KNN
 RedCloud_LeftRight
 RedCloud_Matched
 RedCloud_Matches
+RedCloud_PrepCore
 RedCloud_RGB
 RedColor_Basics
 RedColor_Bricks

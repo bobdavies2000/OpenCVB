@@ -374,7 +374,7 @@ Namespace VBClasses
 
     Public Class RedPrep_Core : Inherits TaskParent
         Public options As New Options_RedPrep
-        Public reductionName As String = ""
+        Public optionsPrep As New Options_PrepData
         Public reduced32s As New cv.Mat
         Public reduced32f As New cv.Mat
         Public Sub New()
@@ -383,17 +383,16 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
-            Dim reductionFactor = task.fOptions.ReductionSlider.Value
+            optionsPrep.Run()
 
-            ' non-standalone uses must set the reductionName
-            If standalone Or reductionName = "" Then reductionName = options.reductionName
+            Dim reductionFactor = task.fOptions.ReductionSlider.Value
 
             Dim split() = {New cv.Mat, New cv.Mat, New cv.Mat}
             task.pcSplit(0).ConvertTo(split(0), cv.MatType.CV_32S, 1000 / reductionFactor)
             task.pcSplit(1).ConvertTo(split(1), cv.MatType.CV_32S, 1000 / reductionFactor)
             task.pcSplit(2).ConvertTo(split(2), cv.MatType.CV_32S, 1000 / reductionFactor)
 
-            Select Case reductionName
+            Select Case optionsPrep.reductionName
                 Case "X Reduction"
                     reduced32s = split(0) * reductionFactor
                 Case "Y Reduction"
@@ -435,11 +434,11 @@ Namespace VBClasses
         Public reductionName As String
         Public prep As New RedPrep_Core
         Public Sub New()
+            OptionParent.findRadio("XY Reduction").Checked = True
             dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
             desc = "Get the edges in the RedPrep_Core output"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            prep.reductionName = reductionName
             prep.Run(src)
             dst2 = prep.dst2
             labels(2) = prep.labels(2)
