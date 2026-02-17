@@ -626,7 +626,7 @@ Namespace VBClasses
         Dim reduction As New Reduction_Basics
         Dim edge As New Edge_Basics
         Public Sub New()
-            task.fOptions.ReductionTargetSlider.Value = 1
+            task.fOptions.ReductionSlider.Value = 1
             labels = {"", "", "Edges in the Reduction output", "Reduction_Basics output"}
             desc = "Find edges in the reduction image."
         End Sub

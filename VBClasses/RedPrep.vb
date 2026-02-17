@@ -27,7 +27,7 @@ Namespace VBClasses
         End Function
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
-            reductionTarget = task.fOptions.ReductionTargetSlider.Value
+            reductionTarget = task.fOptions.ReductionSlider.Value
 
             If src.Type <> cv.MatType.CV_32FC3 Then src = task.pointCloud.Clone
 
@@ -275,7 +275,7 @@ Namespace VBClasses
         End Function
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
-            reductionTarget = task.fOptions.ReductionTargetSlider.Value
+            reductionTarget = task.fOptions.ReductionSlider.Value
 
             Dim pc32S As New cv.Mat
             task.pointCloud.ConvertTo(pc32S, cv.MatType.CV_32SC3, 1000 / reductionTarget)
@@ -375,54 +375,52 @@ Namespace VBClasses
     Public Class RedPrep_Core : Inherits TaskParent
         Public options As New Options_RedPrep
         Public reductionName As String = ""
-        Public reducedImage As cv.Mat
+        Public reduced32s As New cv.Mat
         Public reduced32f As New cv.Mat
         Public Sub New()
+            If standalone Then task.fOptions.ReductionSlider.Value = 50
             desc = "Reduction transform for the point cloud"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
-            Dim reductionTarget = task.fOptions.ReductionTargetSlider.Value
+            Dim reductionFactor = task.fOptions.ReductionSlider.Value
 
             ' non-standalone uses must set the reductionName
             If standalone Or reductionName = "" Then reductionName = options.reductionName
 
             Dim split() = {New cv.Mat, New cv.Mat, New cv.Mat}
-            task.pcSplit(0).ConvertTo(split(0), cv.MatType.CV_32S, 1000 / reductionTarget)
-            task.pcSplit(1).ConvertTo(split(1), cv.MatType.CV_32S, 1000 / reductionTarget)
-            task.pcSplit(2).ConvertTo(split(2), cv.MatType.CV_32S, 1000 / reductionTarget)
+            task.pcSplit(0).ConvertTo(split(0), cv.MatType.CV_32S, 1000 / reductionFactor)
+            task.pcSplit(1).ConvertTo(split(1), cv.MatType.CV_32S, 1000 / reductionFactor)
+            task.pcSplit(2).ConvertTo(split(2), cv.MatType.CV_32S, 1000 / reductionFactor)
 
             Select Case reductionName
                 Case "X Reduction"
-                    reducedImage = split(0) * reductionTarget
+                    reduced32s = split(0) * reductionFactor
                 Case "Y Reduction"
-                    reducedImage = split(1) * reductionTarget
+                    reduced32s = split(1) * reductionFactor
                 Case "Z Reduction"
-                    reducedImage = split(2) * reductionTarget
+                    reduced32s = split(2) * reductionFactor
                 Case "XY Reduction"
-                    reducedImage = (split(0) + split(1)) * reductionTarget
+                    reduced32s = (split(0) + split(1)) * reductionFactor
                 Case "XZ Reduction"
-                    reducedImage = (split(0) + split(2)) * reductionTarget
+                    reduced32s = (split(0) + split(2)) * reductionFactor
                 Case "YZ Reduction"
-                    reducedImage = (split(1) + split(2)) * reductionTarget
+                    reduced32s = (split(1) + split(2)) * reductionFactor
                 Case "XYZ Reduction"
-                    reducedImage = (split(0) + split(1) + split(2)) * reductionTarget
+                    reduced32s = (split(0) + split(1) + split(2)) * reductionFactor
             End Select
 
-            Dim mm As mmData = GetMinMax(reducedImage)
-            reducedImage.ConvertTo(reduced32f, cv.MatType.CV_32F)
-            If Math.Abs(mm.minVal) > mm.maxVal Then ' keep things symmetric...
-                mm.minVal = -mm.maxVal
-                Dim shift32f = reduced32f.Clone
-                Dim mask = shift32f.Threshold(mm.minVal, mm.minVal, cv.ThresholdTypes.BinaryInv)
-                mask.ConvertTo(mask, cv.MatType.CV_8U)
-                shift32f.SetTo(mm.minVal, mask)
-            End If
-            dst2 = (reducedImage - mm.minVal) * 255 / (mm.maxVal - mm.minVal)
-            dst2.ConvertTo(dst2, cv.MatType.CV_8U)
+            Dim mm As mmData
+            mm.minVal = -1000
+            mm.maxVal = 1000
 
+            reduced32s.ConvertTo(reduced32f, cv.MatType.CV_32F)
+
+            dst2 = (reduced32s - mm.minVal) * 255 / (mm.maxVal - mm.minVal)
+            dst2.ConvertTo(dst2, cv.MatType.CV_8U)
             dst2.SetTo(0, task.noDepthMask)
-            labels(2) = "Using reduction factor = " + CStr(reductionTarget)
+
+            labels(2) = "Using reduction amount = " + CStr(reductionFactor)
 
             dst3 = PaletteBlackZero(dst2)
         End Sub

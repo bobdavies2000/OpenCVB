@@ -9,7 +9,7 @@ Namespace VBClasses
         Public options As New Options_RedCloud
         Public Sub New()
             cPtr = RedCloud_Open()
-            task.fOptions.ReductionTargetSlider.Value = 20
+            task.fOptions.ReductionSlider.Value = 20
             desc = "Run the C++ RedCloud interface without a mask"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)

@@ -6,7 +6,7 @@ Namespace VBClasses
             desc = "Create stripes throughout the image with reduction"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            Dim reductionTarget = task.fOptions.ReductionTargetSlider.Value
+            Dim reductionTarget = task.fOptions.ReductionSlider.Value
 
             If src.Type <> cv.MatType.CV_32FC1 Then src = task.pcSplit(0)
             Dim depth32f As cv.Mat = src * 1000

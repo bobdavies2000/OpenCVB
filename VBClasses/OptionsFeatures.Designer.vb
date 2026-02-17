@@ -43,14 +43,14 @@ Partial Class OptionsFeatures
         MotionThreshold = New Label()
         MotionPixelLabel1 = New Label()
         MotionPixelSlider = New TrackBar()
-        ReductionTargetSlider = New TrackBar()
+        ReductionSlider = New TrackBar()
         Label8 = New Label()
         Lab1 = New Label()
         CType(FeatureSampleSize, ComponentModel.ISupportInitialize).BeginInit()
         CType(MatchCorrSlider, ComponentModel.ISupportInitialize).BeginInit()
         CType(ColorDiffSlider, ComponentModel.ISupportInitialize).BeginInit()
         CType(MotionPixelSlider, ComponentModel.ISupportInitialize).BeginInit()
-        CType(ReductionTargetSlider, ComponentModel.ISupportInitialize).BeginInit()
+        CType(ReductionSlider, ComponentModel.ISupportInitialize).BeginInit()
         SuspendLayout()
         ' 
         ' FeatureMethod
@@ -250,16 +250,16 @@ Partial Class OptionsFeatures
         MotionPixelSlider.TabIndex = 28
         MotionPixelSlider.Value = 5
         ' 
-        ' ReductionTargetSlider
+        ' ReductionSlider
         ' 
-        ReductionTargetSlider.Location = New Point(235, 148)
-        ReductionTargetSlider.Margin = New Padding(4)
-        ReductionTargetSlider.Maximum = 1000
-        ReductionTargetSlider.Minimum = 1
-        ReductionTargetSlider.Name = "ReductionTargetSlider"
-        ReductionTargetSlider.Size = New Size(550, 69)
-        ReductionTargetSlider.TabIndex = 1000
-        ReductionTargetSlider.Value = 400
+        ReductionSlider.Location = New Point(235, 148)
+        ReductionSlider.Margin = New Padding(4)
+        ReductionSlider.Maximum = 1000
+        ReductionSlider.Minimum = 1
+        ReductionSlider.Name = "ReductionSlider"
+        ReductionSlider.Size = New Size(550, 69)
+        ReductionSlider.TabIndex = 1000
+        ReductionSlider.Value = 400
         ' 
         ' Label8
         ' 
@@ -268,7 +268,7 @@ Partial Class OptionsFeatures
         Label8.Name = "Label8"
         Label8.Size = New Size(209, 30)
         Label8.TabIndex = 30
-        Label8.Text = "Reduction Target"
+        Label8.Text = "Reduction Factor"
         ' 
         ' Lab1
         ' 
@@ -286,7 +286,7 @@ Partial Class OptionsFeatures
         AutoScaleMode = AutoScaleMode.Font
         ClientSize = New Size(1205, 543)
         Controls.Add(Lab1)
-        Controls.Add(ReductionTargetSlider)
+        Controls.Add(ReductionSlider)
         Controls.Add(Label8)
         Controls.Add(MotionPixelLabel1)
         Controls.Add(MotionPixelSlider)
@@ -316,7 +316,7 @@ Partial Class OptionsFeatures
         CType(MatchCorrSlider, ComponentModel.ISupportInitialize).EndInit()
         CType(ColorDiffSlider, ComponentModel.ISupportInitialize).EndInit()
         CType(MotionPixelSlider, ComponentModel.ISupportInitialize).EndInit()
-        CType(ReductionTargetSlider, ComponentModel.ISupportInitialize).EndInit()
+        CType(ReductionSlider, ComponentModel.ISupportInitialize).EndInit()
         ResumeLayout(False)
         PerformLayout()
     End Sub
@@ -344,7 +344,7 @@ Partial Class OptionsFeatures
     Friend WithEvents MotionPixelLabel1 As Label
     Friend WithEvents MotionPixelSlider As TrackBar
     Friend WithEvents Label7 As Label
-    Friend WithEvents ReductionTargetSlider As TrackBar
+    Friend WithEvents ReductionSlider As TrackBar
     Friend WithEvents Label8 As Label
     Friend WithEvents Lab1 As Label
 End Class

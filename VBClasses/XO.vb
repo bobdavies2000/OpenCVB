@@ -16848,7 +16848,7 @@ Namespace VBClasses
             dst2 = dst1.Resize(task.workRes)
 
             If task.firstPass Then
-                task.fOptions.ReductionTargetSlider.Value = 200
+                task.fOptions.ReductionSlider.Value = 200
             End If
 
             Dim ratio = task.workRes.Width \ minRes.Width

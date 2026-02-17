@@ -65,7 +65,7 @@ Public Class OptionsFeatures
             Color8USource.Items.Add(method)
         Next
         Color8USource.SelectedItem = "Reduction_Basics"
-        ReductionTargetSlider.Value = 150
+        ReductionSlider.Value = 150
 
         Select Case task.workRes.Width
             Case 1920
@@ -114,8 +114,8 @@ Public Class OptionsFeatures
 
 
 
-    Private Sub ReductionTargetSlider_ValueChanged(sender As Object, e As EventArgs) Handles ReductionTargetSlider.ValueChanged
-        Lab1.Text = Format(ReductionTargetSlider.Value, fmt0)
+    Private Sub ReductionSlider_ValueChanged(sender As Object, e As EventArgs) Handles ReductionSlider.ValueChanged
+        Lab1.Text = Format(ReductionSlider.Value, fmt0)
         task.optionsChanged = True
     End Sub
     Private Sub FCorrSlider_ValueChanged(sender As Object, e As EventArgs) Handles MatchCorrSlider.ValueChanged

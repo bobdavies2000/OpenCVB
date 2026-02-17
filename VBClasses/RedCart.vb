@@ -1,18 +1,19 @@
-﻿Imports System.Net
-Imports System.Runtime.InteropServices
+﻿Imports System.Runtime.InteropServices
 Imports OpenCvSharp
 Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Class RedCart_Basics : Inherits TaskParent
-        Dim redCore As New RedPrep_Core
-        Public classCount As Integer
+        Public prepData As New RedPrep_Core
+        Public lut As New cv.Mat
+        Public lutList As New List(Of Byte)
         Public Sub New()
-            task.fOptions.ReductionTargetSlider.Value = 50
+            task.gOptions.DebugSlider.Value = 1
+            task.fOptions.ReductionSlider.Value = 50
+            labels(3) = "Use debug slider to select region to display."
             OptionParent.findRadio("X Reduction").Checked = True
             desc = "Prepare the grid of point cloud data."
         End Sub
-        Public Shared Function countClasses(input As cv.Mat, ByRef count As Integer, colorIndex As Byte,
-                                            ByRef label As String) As cv.Mat
+        Public Shared Function countClasses(input As cv.Mat, ByRef label As String) As cv.Mat
             Dim histogram As New cv.Mat
             Dim mm = GetMinMax(input)
             Dim ranges = {New cv.Rangef(mm.minVal, mm.maxVal)}
@@ -20,42 +21,41 @@ Namespace VBClasses
             Dim histArray(255) As Single
             Marshal.Copy(histogram.Data, histArray, 0, histArray.Length)
 
-            count = 0
-            Dim threshold = input.Total * 0.001 ' ignore regions less than 0.1% - 1/10th of 1%
-            Dim lutArray As Byte() = New Byte(255) {}
-            Dim lutIndex As Integer = 1
-            For i = 0 To histArray.Count - 1
-                If histArray(i) > threshold Then
-                    lutArray(i) = lutIndex
-                    lutIndex += 1
-                    count += 1
-                End If
-            Next
-
-            Dim togg As Boolean
-            For i = 0 To lutArray.Count - 1
-                If lutArray(i) <> 0 Then
-                    If togg Then lutArray(i) = colorIndex Else lutArray(i) = 0
-                    togg = Not togg
+            Dim sizeThreshold = input.Total * 0.001 ' ignore regions less than 0.1% - 1/10th of 1%
+            Dim lutArray(255) As Byte
+            Dim regionList As New List(Of Integer)
+            For i = 1 To histArray.Count - 1
+                If histArray(i) > sizeThreshold Then
+                    regionList.Add(i)
+                    lutArray(i) = regionList.Count
                 End If
             Next
 
             Dim lut As New cv.Mat(1, 256, cv.MatType.CV_8U)
             lut.SetArray(Of Byte)(lutArray)
 
-            label = CStr(count) + " non-zero regions."
+            label = CStr(regionList.Count) + " non-zero regions."
             Return lut
         End Function
         Public Overrides Sub RunAlg(src As cv.Mat)
-            redCore.Run(emptyMat)
-            dst3 = redCore.dst2
-            labels(3) = redCore.labels(2)
+            prepData.Run(emptyMat)
+            labels(2) = prepData.labels(2)
 
-            Dim lut = RedCart_Basics.countClasses(redCore.dst2, classCount, 255, labels(2))
-            dst2 = redCore.dst2.LUT(lut)
+            lut = countClasses(prepData.dst2.Clone, labels(2))
+            lutList.Clear()
+            For i = 0 To lut.Cols - 1
+                Dim val = lut.Get(Of Byte)(0, i)
+                If val > 0 Then lutList.Add(val)
+            Next
+            dst1 = prepData.dst2.LUT(lut)
+            dst2 = PaletteBlackZero(dst1)
 
-            Dim val = redCore.reduced32f.Get(Of Single)(task.clickPoint.Y, task.clickPoint.X)
-            SetTrueText("Reduced value = " + Format(val, fmt3), 3)
+            If standalone Then
+                Dim index = Math.Abs(task.gOptions.DebugSlider.Value)
+                If index < lutList.Count Then
+                    dst3 = dst1.InRange(index, index)
+                End If
+            End If
         End Sub
     End Class
 
@@ -64,77 +64,71 @@ Namespace VBClasses
 
 
     Public Class RedCart_Debug : Inherits TaskParent
-        Dim redCore As New RedPrep_Core
+        Dim redCart As New RedCart_Basics
         Public classCount As Integer
         Public Sub New()
+            If standalone Then task.gOptions.displayDst1.Checked = True
+            If standalone Then task.fOptions.ReductionSlider.Value = 50
             desc = "Identify each region using the debug slider."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            redCore.Run(emptyMat)
-            dst3 = redCore.dst2
-            labels(3) = redCore.labels(2)
+            redCart.Run(emptyMat)
+            dst3 = redCart.dst2
+            labels(3) = redCart.labels(2)
+            strOut = ""
 
-            Dim lut = RedCart_Basics.countClasses(redCore.dst2, classCount, 255, labels(2))
-            dst2 = redCore.dst2.LUT(lut)
+            For i = 1 To redCart.lutList.Count - 1
+                dst2 = redCart.dst1.InRange(i, i)
+                Dim mean = redCart.prepData.reduced32s.Mean(dst2)
+                strOut += "Mean of selected region " + CStr(i) + " = " + Format(mean(0), fmt0) + "  "
+                If i Mod 2 = 0 Then strOut += vbCrLf
+            Next
+
+            dst2 = (redCart.prepData.reduced32s - -1000) * 255 / (2000)
+            dst2.ConvertTo(dst2, cv.MatType.CV_8U)
+            dst2.SetTo(0, task.noDepthMask)
+
+
+            labels(1) = CStr(redCart.lutList.Count) + " non-zero regions."
+            SetTrueText(strOut, 1)
         End Sub
     End Class
 
+
+
+
+    Public Class RedCart_PrepXY : Inherits TaskParent
+        Public redCart As New RedCart_Basics
+        Public Sub New()
+            OptionParent.findRadio("XY Reduction").Checked = True
+            task.fOptions.ReductionSlider.Value = 50
+            desc = "Prep the XY regions in the reduced depth data."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            redCart.Run(src)
+            dst2 = PaletteBlackZero(redCart.dst1)
+            labels(2) = redCart.labels(2)
+        End Sub
+    End Class
 
 
 
 
     Public Class RedCart_PrepData : Inherits TaskParent
-        Dim redCore As New RedPrep_Core
+        Dim prepData As New RedPrep_Core
         Public Sub New()
-            task.fOptions.ReductionTargetSlider.Value = 50
+            task.fOptions.ReductionSlider.Value = 50
             desc = "Prepare the grid of point cloud data."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            redCore.Run(emptyMat)
-            dst2 = PaletteBlackZero(redCore.dst2)
-            labels(2) = redCore.labels(2)
+            prepData.Run(emptyMat)
+            dst2 = PaletteBlackZero(prepData.dst2)
+            labels(2) = prepData.labels(2)
 
-            Dim val = redCore.reduced32f.Get(Of Single)(task.clickPoint.Y, task.clickPoint.X)
+            Dim val = prepData.reduced32f.Get(Of Single)(task.clickPoint.Y, task.clickPoint.X)
             SetTrueText("Depth = " + Format(val, fmt3), 3)
         End Sub
     End Class
-
-
-
-
-    Public Class RedCart_PrepStableY : Inherits TaskParent
-        Public redCore As New RedPrep_Core
-        Dim plotCore As New Plot_HistogramCoreRange
-        Public lpList As New List(Of lpData)
-        Public Sub New()
-            plotCore.redCore = redCore
-            task.gOptions.HistBinBar.Value = task.gOptions.HistBinBar.Maximum
-            task.fOptions.ReductionTargetSlider.Value = 50
-            desc = "Prep the Horizontal regions in the reduced depth data."
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            redCore.reductionName = "Y Reduction"
-            redCore.Run(src)
-            dst2 = redCore.dst3
-            labels(2) = redCore.labels(2)
-
-            Dim mm = GetMinMax(redCore.reduced32f)
-
-            If task.heartBeat Then
-                plotCore.Run(redCore.reduced32f)
-                labels(3) = plotCore.labels(2)
-            End If
-
-            labels(3) = "Values range from " + Format(plotCore.minRange, fmt0) +
-                        " to " + Format(plotCore.maxRange, fmt0)
-            dst3 = plotCore.dst3
-
-            Dim val = redCore.reduced32f.Get(Of Single)(task.clickPoint.Y, task.clickPoint.X)
-            labels(3) = "Overall min/max " + CStr(mm.minVal) + "/" + CStr(mm.maxVal) + " " +
-                        "Depth = " + Format(val, fmt0)
-        End Sub
-    End Class
-
 
 
 
@@ -151,18 +145,18 @@ Namespace VBClasses
             dst2 = redCart.dst2
             labels(2) = redCart.labels(2)
 
-            Dim mm = GetMinMax(redCart.redCore.reduced32f)
+            Dim mm = GetMinMax(redCart.prepData.reduced32f)
             Dim ranges = {New cv.Rangef(mm.minVal, mm.maxVal)}
             Dim histogram As New cv.Mat
             Dim histBins As Integer = 500
-            cv.Cv2.CalcHist({redCart.redCore.reduced32f}, {0}, task.depthmask, histogram, 1, {histBins}, ranges)
+            cv.Cv2.CalcHist({redCart.prepData.reduced32f}, {0}, task.depthmask, histogram, 1, {histBins}, ranges)
             Dim histArray(histogram.Rows - 1) As Single
             Marshal.Copy(histogram.Data, histArray, 0, histArray.Length)
             Dim incr = mm.range / histBins
 
             dst1.SetTo(0)
             For i = 0 To histArray.Count - 1
-                Dim tmp = redCart.redCore.reduced32f.InRange(mm.minVal + incr * i, mm.minVal + incr * (i + 1))
+                Dim tmp = redCart.prepData.reduced32f.InRange(mm.minVal + incr * i, mm.minVal + incr * (i + 1))
                 dst1.SetTo(i + 1, tmp)
             Next
             dst1.SetTo(0, task.noDepthMask)
@@ -174,39 +168,20 @@ Namespace VBClasses
 
 
 
-    Public Class RedCart_PrepXY : Inherits TaskParent
-        Public redCore As New RedPrep_Core
-        Public classCount As Integer
-        Public Sub New()
-            task.fOptions.ReductionTargetSlider.Value = 50
-            desc = "Prep the XY regions in the reduced depth data."
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            redCore.reductionName = "XY Reduction"
-            redCore.Run(src)
-            dst2 = redCore.dst3
-
-            Dim lut = RedCart_Basics.countClasses(redCore.dst2, classCount, 255, labels(2))
-            dst2 = redCore.dst2.LUT(lut)
-        End Sub
-    End Class
-
-
-
     Public Class RedCart_CheckerBoardWall : Inherits TaskParent
-        Public redCore As New RedPrep_Core
+        Public prepData As New RedPrep_Core
         Public classCount As Integer
         Dim edges As New Edge_Basics
         Public Sub New()
-            task.fOptions.ReductionTargetSlider.Value = 50
+            task.fOptions.ReductionSlider.Value = 50
             desc = "Use this algorithm to build a checkerboard when pointing at a wall."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            ' redCore.reductionName = "XY Reduction" ' default
-            redCore.Run(src)
+            ' prepData.reductionName = "XY Reduction" ' default
+            prepData.Run(src)
 
-            Dim lut = RedCart_Basics.countClasses(redCore.dst2, classCount, 255, labels(2))
-            dst2 = redCore.dst2.LUT(lut)
+            Dim lut = RedCart_Basics.countClasses(prepData.dst2, labels(2))
+            dst2 = prepData.dst2.LUT(lut)
 
             edges.Run(dst2)
             dst3 = edges.dst2
@@ -219,7 +194,7 @@ Namespace VBClasses
     Public Class RedCart_TriangleDots : Inherits TaskParent
         Dim checkers As New RedPrep_Core
         Public Sub New()
-            task.fOptions.ReductionTargetSlider.Value = 50
+            task.fOptions.ReductionSlider.Value = 50
             desc = "Find any "
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -245,7 +220,7 @@ Namespace VBClasses
         Implements IDisposable
         Dim prep As New RedPrep_Core
         Public Sub New()
-            task.fOptions.ReductionTargetSlider.Value = 50
+            task.fOptions.ReductionSlider.Value = 50
             cPtr = RedCart_CPP_Open()
             desc = "Hit the locations where floodfill slips up by placeing a dot in the intersection."
         End Sub
@@ -273,39 +248,39 @@ Namespace VBClasses
 
 
     Public Class RedCart_PrepXOld : Inherits TaskParent
-        Public redCore As New RedPrep_Core
+        Public prepData As New RedPrep_Core
         Public classCount As Integer
         Public lut As cv.Mat
         Public Sub New()
-            task.fOptions.ReductionTargetSlider.Value = 50
+            task.fOptions.ReductionSlider.Value = 50
             desc = "Prep the vertical regions in the reduced depth data."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            redCore.reductionName = "X Reduction"
-            redCore.Run(src)
-            dst2 = redCore.dst3
+            prepData.reductionName = "X Reduction"
+            prepData.Run(src)
+            dst2 = prepData.dst3
 
-            Dim lut = RedCart_Basics.countClasses(redCore.dst2, classCount, 255, labels(2))
-            dst2 = redCore.dst2.LUT(lut)
+            Dim lut = RedCart_Basics.countClasses(prepData.dst2, labels(2))
+            dst2 = prepData.dst2.LUT(lut)
         End Sub
     End Class
 
 
 
     Public Class RedCart_PrepY : Inherits TaskParent
-        Public redCore As New RedPrep_Core
+        Public prepData As New RedPrep_Core
         Public classCount As Integer
         Public Sub New()
-            task.fOptions.ReductionTargetSlider.Value = 50
+            task.fOptions.ReductionSlider.Value = 50
             desc = "Prep the horizontal regions in the reduced depth data."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            redCore.reductionName = "Y Reduction"
-            redCore.Run(src)
-            dst2 = redCore.dst3
+            prepData.reductionName = "Y Reduction"
+            prepData.Run(src)
+            dst2 = prepData.dst3
 
-            Dim lut = RedCart_Basics.countClasses(redCore.dst2, classCount, 255, labels(2))
-            dst2 = redCore.dst2.LUT(lut)
+            Dim lut = RedCart_Basics.countClasses(prepData.dst2, labels(2))
+            dst2 = prepData.dst2.LUT(lut)
         End Sub
     End Class
 
@@ -344,20 +319,20 @@ Namespace VBClasses
 
 
     Public Class RedCart_PrepX : Inherits TaskParent
-        Public redCore As New RedPrep_Core
+        Public prepData As New RedPrep_Core
         Public classCount As Integer
         Public Sub New()
-            task.fOptions.ReductionTargetSlider.Value = 50
+            task.fOptions.ReductionSlider.Value = 50
             desc = "Prep the vertical regions in the reduced depth data."
         End Sub
 
         Public Overrides Sub RunAlg(src As cv.Mat)
-            redCore.reductionName = "X Reduction"
-            redCore.Run(src)
-            dst2 = redCore.dst3
+            prepData.reductionName = "X Reduction"
+            prepData.Run(src)
+            dst2 = prepData.dst3
 
-            Dim lut = RedCart_Basics.countClasses(redCore.dst2, classCount, 255, labels(2))
-            dst2 = redCore.dst2.LUT(lut)
+            Dim lut = RedCart_Basics.countClasses(prepData.dst2, labels(2))
+            dst2 = prepData.dst2.LUT(lut)
         End Sub
     End Class
 End Namespace

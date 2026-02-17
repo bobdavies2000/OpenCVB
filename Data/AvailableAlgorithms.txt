@@ -1495,7 +1495,6 @@ RedCart_CheckerBoardWall
 RedCart_CPP
 RedCart_Debug
 RedCart_PrepData
-RedCart_PrepStableY
 RedCart_PrepX
 RedCart_PrepXOld
 RedCart_PrepXY

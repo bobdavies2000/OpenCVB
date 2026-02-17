@@ -190,7 +190,7 @@ Namespace VBClasses
         Public Sub New()
             lineX.reductionName = "X Reduction"
             lineY.reductionName = "Y Reduction"
-            task.fOptions.ReductionTargetSlider.Value = 200
+            task.fOptions.ReductionSlider.Value = 200
             If standalone Then task.gOptions.displayDst0.Checked = True
             labels(3) = "Input to Line_Basics"
             desc = "Find horizontal and vertical lines in the reduced depth data."
@@ -307,7 +307,7 @@ Namespace VBClasses
         Dim lineY As New RedPrep_EdgeMask
         Dim texFlow As New TextureFlow_Basics
         Public Sub New()
-            task.fOptions.ReductionTargetSlider.Value = 200
+            task.fOptions.ReductionSlider.Value = 200
             desc = "Use texture flow on the mesh input"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)

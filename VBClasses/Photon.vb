@@ -46,7 +46,7 @@ Namespace VBClasses
             desc = ""
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            Dim reductionTarget = task.fOptions.ReductionTargetSlider.Value
+            Dim reductionTarget = task.fOptions.ReductionSlider.Value
 
             reduction.Run(src)
             dst1 = reduction.dst2

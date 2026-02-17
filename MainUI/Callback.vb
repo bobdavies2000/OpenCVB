@@ -97,21 +97,20 @@ Namespace MainApp
                                    spanWait = New TimeSpan(elapsedWaitTicks)
                                    Dim msSinceLastPaint = spanWait.Ticks / TimeSpan.TicksPerMillisecond
 
-                                   Dim freq = vbc.task.Settings.paintFrequency
-                                   Dim threshold As Integer = If(freq = 0, 0, 1000 / freq)
+                                   Dim selection = vbc.task.Settings.paintFrequency
                                    Dim runPaint As Boolean = False
-                                   Select Case threshold
-                                       Case -500 ' paint on heartbeatLT
+                                   Select Case selection
+                                       Case -2 ' paint on the heartbeat
                                            If task.heartBeat Then runPaint = True
-                                       Case -1000 ' paint on the heartbeat, but only every 5th heartbeat
-                                           runPaint = False ' do not update at all for -1 
-                                       Case 0 ' stop painting altogether
+                                       Case -1 ' paint on heartbeatLT
                                            If task.heartBeatCount Mod 5 = 0 Or task.frameCount <= 10 Then
                                                task.heartBeatCount += 1
                                                runPaint = True
                                            End If
+                                       Case 0 ' stop painting altogether
+                                           runPaint = False
                                        Case Else
-                                           If msSinceLastPaint > threshold Then runPaint = True
+                                           If msSinceLastPaint > 1000 / selection Then runPaint = True
                                    End Select
 
                                    If runPaint Then
