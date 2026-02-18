@@ -409,7 +409,7 @@ Namespace VBClasses
             End Select
 
             Dim mm As mmData
-            mm.minVal = -1000
+            mm.minVal = -1000 ' need to validate that this fixed range only eliminates outliers.
             mm.maxVal = 1000
 
             reduced32s.ConvertTo(reduced32f, cv.MatType.CV_32F)

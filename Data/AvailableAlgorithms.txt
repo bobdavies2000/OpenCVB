@@ -1496,6 +1496,7 @@ RedCart_CheckerBoardWall
 RedCart_CPP
 RedCart_Debug
 RedCart_PrepData
+RedCart_PrepWC
 RedCart_PrepX
 RedCart_PrepXOld
 RedCart_PrepXY
@@ -1515,7 +1516,6 @@ RedCloud_KNN
 RedCloud_LeftRight
 RedCloud_Matched
 RedCloud_Matches
-RedCloud_PrepCore
 RedCloud_RGB
 RedColor_Basics
 RedColor_Bricks

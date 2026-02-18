@@ -88,6 +88,7 @@ Namespace VBClasses
         Public prepEdges As New RedPrep_Basics
         Public rcList As New List(Of rcData)
         Public Sub New()
+            dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
             desc = "Find the biggest chunks of consistent depth data "
         End Sub
         Public Shared Function sweepImage(input As cv.Mat) As List(Of rcData)
@@ -127,16 +128,12 @@ Namespace VBClasses
 
             rcList = sweepImage(src)
 
-            dst2 = PaletteBlackZero(src)
-            dst2.SetTo(0, task.noDepthMask)
+            dst2.SetTo(0)
+            For Each rc In rcList
+                dst2(rc.rect).SetTo(rc.index, rc.mask)
+            Next
+            dst3 = PaletteBlackZero(dst2)
             labels(2) = "RedCloud cells identified: " + CStr(rcList.Count)
-
-            Static unchanged As Integer
-            If task.motionRGB.motionList.Count = 0 Then
-                unchanged += 1
-                labels(3) = "The rcMap was unchanged " + CStr(unchanged) + " times since last heartBeatLT"
-            End If
-            If task.heartBeatLT Then unchanged = 0
         End Sub
     End Class
 
@@ -414,32 +411,6 @@ Namespace VBClasses
             redC.Run(dst3)
             dst2 = redC.dst2
             labels(2) = redC.labels(2)
-        End Sub
-    End Class
-
-
-
-
-
-    Public Class RedCloud_PrepCore : Inherits TaskParent
-        Dim redC As New RedCloud_Basics
-        Dim prepData As New RedPrep_Core
-        Public Sub New()
-            OptionParent.findRadio("X Reduction").Checked = True
-            desc = "Use the output of RedPrep_Core with RedCloud"
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            prepData.Run(src)
-            dst3 = prepData.dst2
-            labels(3) = prepData.labels(2)
-
-            redC.Run(dst3)
-            dst2 = redC.dst2
-            labels(2) = redC.labels(2)
-
-            RedCloud_Cell.selectCell(redC.rcMap, redC.rcList)
-            strOut = task.rcD.displayCell()
-            SetTrueText(strOut, 3)
         End Sub
     End Class
 End Namespace

@@ -345,4 +345,30 @@ Namespace VBClasses
             dst2 = prepData.dst2.LUT(lut)
         End Sub
     End Class
+
+
+
+
+
+    Public Class RedCart_PrepWC : Inherits TaskParent
+        Dim prepData As New RedPrep_Core
+        Public Sub New()
+            OptionParent.findRadio("X Reduction").Checked = True
+            desc = "Prepare the absolute coordinates of the World Coordinates."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            Static radioX = OptionParent.findRadio("X Reduction")
+            Static radioY = OptionParent.findRadio("Y Reduction")
+
+            radioX.checked = True
+            prepData.Run(src)
+            dst2 = prepData.dst2
+            labels(2) = prepData.labels(2)
+
+            radioY.checked = True
+            prepData.Run(src)
+            dst3 = prepData.dst2
+            labels(3) = prepData.labels(2)
+        End Sub
+    End Class
 End Namespace
