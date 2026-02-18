@@ -71,6 +71,7 @@ Namespace VBClasses
 
     Public Class RedWC_Validate : Inherits TaskParent
         Public wcData As New RedWC_Basics
+        Public regionList As New List(Of Integer)
         Public Sub New()
             If standalone Then OptionParent.findRadio("X Reduction").Checked = True
             desc = "Identify each WC region."
@@ -89,8 +90,14 @@ Namespace VBClasses
 
                 If CInt(mean(0)) Mod task.fOptions.ReductionSlider.Value = 0 Then
                     Dim region = CInt(mean(0) / task.fOptions.ReductionSlider.Value)
-                    strOut += "region " + CStr(region) + " = " + Format(mean(0), fmt0) + "  "
-                    If i Mod 3 = 0 And i > 0 Then strOut += vbCrLf
+                    If region = 0 Then
+                        strOut += vbCrLf + If(i Mod 3 = 2, vbCrLf, vbTab)
+                        strOut += "region " + Format(region, "00") + " mean " + Format(mean(0), fmt0) + vbCrLf
+                        strOut += vbCrLf
+                    Else
+                        strOut += "region " + Format(region, "00") + " mean " + Format(mean(0), fmt0) + vbTab
+                        If i Mod 3 = 2 Then strOut += vbCrLf
+                    End If
                     count += 1
                 End If
             Next
@@ -105,32 +112,17 @@ Namespace VBClasses
 
 
     Public Class RedWC_ValidateX : Inherits TaskParent
-        Dim redWC As New RedWC_X
+        Dim wcValidate As New RedWC_Validate
         Public Sub New()
             If standalone Then OptionParent.findRadio("X Reduction").Checked = True
             desc = "Identify each WC region."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            redWC.Run(emptyMat)
-            dst2 = redWC.wcData.dst2
+            wcValidate.Run(emptyMat)
+            dst2 = wcValidate.wcData.dst2
+            labels(2) = wcValidate.labels(2)
 
-            Dim regionlist = RedWC_Basics.countRegions(dst2, labels(3))
-            strOut = ""
-            Dim count As Integer
-            For i = 0 To regionlist.Count - 1
-                Dim index = regionlist(i)
-                dst0 = dst2.InRange(index, index)
-                Dim mean = redWC.wcData.prepData.reduced32s.Mean(dst0)
-
-                If CInt(mean(0)) Mod task.fOptions.ReductionSlider.Value = 0 Then
-                    Dim region = CInt(mean(0) / task.fOptions.ReductionSlider.Value)
-                    strOut += "region " + CStr(region) + " = " + Format(mean(0), fmt0) + "  "
-                    If i Mod 3 = 0 And i > 0 Then strOut += vbCrLf
-                    count += 1
-                End If
-            Next
-            SetTrueText(strOut, 3)
-            labels(2) = CStr(Count) + " regions were found"
+            SetTrueText(wcValidate.strOut, 3)
         End Sub
     End Class
 
