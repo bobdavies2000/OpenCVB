@@ -46,6 +46,8 @@ Namespace VBClasses
             filterBasics = New Filter_Basics
             leftRightEnhanced = New LeftRight_Brightness
             bricks = New Brick_Basics
+            cloudOptions = New Options_PointCloud
+            cloudOptions.Run()
 
             ' all the algorithms in the list are task algorithms that are children of the algorithm.
             For i = 1 To cpu.callTrace.Count - 1

@@ -111,8 +111,12 @@ Namespace VBClasses
                 If contours1.sortContours.allContours(0).Count > 0 Then
                     hull = cv.Cv2.ConvexHull(contours1.sortContours.allContours(0), True).ToList
 
-                    DrawTour(dst3, contours2.sortContours.allContours(0).ToList, white, -1)
-                    DrawTour(dst3, hull, white, task.lineWidth)
+                    If contours2.sortContours.allContours.Count > 0 Then
+                        If contours1.sortContours.allContours(0).Count > 0 Then
+                            DrawTour(dst3, contours2.sortContours.allContours(0).ToList, white, -1)
+                            DrawTour(dst3, hull, white, task.lineWidth)
+                        End If
+                    End If
                 End If
             End If
         End Sub

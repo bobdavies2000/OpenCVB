@@ -91,6 +91,7 @@ Namespace VBClasses
         Public motionFeatures As cv.Point2f
         Public leftRightEnhanced As LeftRight_Brightness
         Public contours As Contour_Basics_List
+        Public cloudOptions As Options_PointCloud
 
         Public GLRequest As Integer
         Public GLcloud As cv.Mat
