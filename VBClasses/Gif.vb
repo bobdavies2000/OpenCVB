@@ -1,6 +1,5 @@
 Imports System.Drawing.Imaging
 Imports System.IO
-Imports System.Runtime.Intrinsics
 Imports cv = OpenCvSharp
 Imports cvext = OpenCvSharp.Extensions
 

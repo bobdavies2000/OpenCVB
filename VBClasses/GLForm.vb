@@ -1,7 +1,6 @@
 ﻿Imports SharpGL
 Imports cv = OpenCvSharp
 Imports OpenCvSharp.Extensions
-Imports System.ComponentModel
 Imports VBClasses
 Public Class SharpGLForm
     Dim gl As OpenGL
