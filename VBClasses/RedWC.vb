@@ -3,37 +3,33 @@ Namespace VBClasses
     Public Class RedWC_Basics : Inherits TaskParent
         Public prepData As New RedPrep_Core
         Public wcMap As New cv.Mat(dst2.Size, cv.MatType.CV_32F, 0)
+        Public regionList As New List(Of Integer)
         Public Sub New()
             If standalone Then OptionParent.findRadio("X Reduction").Checked = True
             desc = "Prepare the absolute coordinates of the World Coordinates."
         End Sub
-        Public Shared Function countRegions(input As cv.Mat, ByRef label As String) As List(Of Integer)
-            Dim histogram As New cv.Mat
-            cv.Cv2.CalcHist({input}, {0}, task.depthmask, histogram, 1, {256}, {New cv.Rangef(0, 256)})
-            Dim histArray() As Single = Nothing
-            histogram.GetArray(Of Single)(histArray)
-
-            Dim sizeThreshold = input.Total * 0.001 ' ignore regions less than 0.1% - 1/10th of 1%
-            Dim lutArray(255) As Byte
-            Dim regionList As New List(Of Integer)
-            For i = 1 To histArray.Count - 1
-                If histArray(i) > sizeThreshold Then regionList.Add(i)
-            Next
-
-            label = CStr(regionList.Count) + " non-zero regions more than " +
-                    CStr(CInt(sizeThreshold)) + " pixels"
-            Return regionList
-        End Function
         Public Overrides Sub RunAlg(src As cv.Mat)
             prepData.Run(src)
             dst2 = prepData.dst2
 
             Dim reduction = task.fOptions.ReductionSlider.Value
-            Dim regionlist = RedWC_Basics.countRegions(dst2, labels(3))
+            Dim histogram As New cv.Mat
+            cv.Cv2.CalcHist({dst2}, {0}, task.depthmask, histogram, 1, {256}, {New cv.Rangef(0, 256)})
+            Dim histArray() As Single = Nothing
+            histogram.GetArray(Of Single)(histArray)
+
+            Dim sizeThreshold = dst2.Total * 0.001 ' ignore regions less than 0.1% - 1/10th of 1%
+            Dim lutArray(255) As Byte
+            regionList.Clear()
+            For i = 1 To histArray.Count - 1
+                If histArray(i) > sizeThreshold Then regionList.Add(i)
+            Next
+
+            labels(2) = CStr(regionList.Count) + " non-zero regions > " + CStr(CInt(sizeThreshold)) + " pixels"
             Dim count As Integer
             wcMap.SetTo(0)
-            For i = 0 To regionlist.Count - 1
-                Dim index = regionlist(i)
+            For i = 0 To regionList.Count - 1
+                Dim index = regionList(i)
                 dst0 = dst2.InRange(index, index)
                 Dim mean = prepData.reduced32s.Mean(dst0)
 
@@ -97,7 +93,7 @@ Namespace VBClasses
             wcData.Run(emptyMat)
             dst2 = wcData.dst2
 
-            Dim regionlist = RedWC_Basics.countRegions(dst2, labels(3))
+            regionList = wcData.regionList
             strOut = ""
             Dim count As Integer
             wcMap.SetTo(0)
