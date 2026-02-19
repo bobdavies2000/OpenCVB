@@ -73,6 +73,7 @@ Namespace MainApp
                     If Settings.cameraPresent(i) Then
                         Settings.cameraFound = True
                         If Settings.cameraName = Nothing Then Settings.cameraName = cameraNames(i)
+                        Settings.captureRes = New cv.Size(1280, 720)
                         Exit For
                     End If
                 Next

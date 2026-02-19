@@ -1,5 +1,4 @@
 Imports System.Runtime.InteropServices
-Imports System.Security.Claims
 Imports System.Threading
 Imports Orbbec
 Imports cv = OpenCvSharp
@@ -14,6 +13,16 @@ Namespace MainApp
         Dim acceleration As cv.Point3f, angularVelocity As cv.Point3f, timeStamp As Int64
         Dim PtCloud As New PointCloudFilter
         Dim initialTime As Int64 = timeStamp
+        ''' <summary>Get video stream profile; if requested w/h/format/fps is not supported, use device default (avoids "No matched video stream profile" error).</summary>
+        Private Shared Function GetOrbVideoProfile(profileList As StreamProfileList, w As Integer, h As Integer, format As Format, fps As Integer) As StreamProfile
+            Try
+                Return profileList.GetVideoStreamProfile(w, h, format, fps)
+            Catch ex As NativeException
+                If profileList.ProfileCount() = 0 Then Throw
+                Return profileList.GetProfile(0)
+            End Try
+        End Function
+
         Public Sub New(_workRes As cv.Size, _captureRes As cv.Size, deviceName As String)
             captureRes = _captureRes
             workRes = _workRes
@@ -27,14 +36,16 @@ Namespace MainApp
             Dim fps = 0
             Dim w = captureRes.Width, h = captureRes.Height
             pipe = New Pipeline()
-            Dim colorProfile As StreamProfile = pipe.GetStreamProfileList(SensorType.OB_SENSOR_COLOR).
-                                            GetVideoStreamProfile(w, h, Format.OB_FORMAT_BGR, fps)
-            Dim depthProfile As StreamProfile = pipe.GetStreamProfileList(SensorType.OB_SENSOR_DEPTH).
-                                            GetVideoStreamProfile(w, h, Format.OB_FORMAT_Y16, fps)
-            Dim leftProfile As StreamProfile = pipe.GetStreamProfileList(SensorType.OB_SENSOR_IR_LEFT).
-                                           GetVideoStreamProfile(w, h, Format.OB_FORMAT_Y8, fps)
-            Dim rightProfile As StreamProfile = pipe.GetStreamProfileList(SensorType.OB_SENSOR_IR_RIGHT).
-                                            GetVideoStreamProfile(w, h, Format.OB_FORMAT_Y8, fps)
+            ' Try requested resolution/format; fall back to device default if "No matched video stream profile" (unsupported combo).
+            Dim colorProfile As StreamProfile = GetOrbVideoProfile(pipe.GetStreamProfileList(SensorType.OB_SENSOR_COLOR), w, h, Format.OB_FORMAT_BGR, fps)
+            Dim depthProfile As StreamProfile = GetOrbVideoProfile(pipe.GetStreamProfileList(SensorType.OB_SENSOR_DEPTH), w, h, Format.OB_FORMAT_Y16, fps)
+            Dim leftProfile As StreamProfile = GetOrbVideoProfile(pipe.GetStreamProfileList(SensorType.OB_SENSOR_IR_LEFT), w, h, Format.OB_FORMAT_Y8, fps)
+            Dim rightProfile As StreamProfile = GetOrbVideoProfile(pipe.GetStreamProfileList(SensorType.OB_SENSOR_IR_RIGHT), w, h, Format.OB_FORMAT_Y8, fps)
+            ' Use actual color stream size (e.g. when default profile was used)
+            Dim colorVideo = colorProfile.As(Of VideoStreamProfile)()
+            If colorVideo IsNot Nothing Then
+                captureRes = New cv.Size(CInt(colorVideo.GetWidth()), CInt(colorVideo.GetHeight()))
+            End If
             Dim config As New Config()
             config.EnableStream(colorProfile)
             config.EnableStream(depthProfile)
