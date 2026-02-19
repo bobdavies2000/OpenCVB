@@ -2,6 +2,7 @@
 Namespace VBClasses
     Public Class RedWC_Basics : Inherits TaskParent
         Public prepData As New RedPrep_Core
+        Public wcMap As New cv.Mat(dst2.Size, cv.MatType.CV_32F, 0)
         Public Sub New()
             If standalone Then OptionParent.findRadio("X Reduction").Checked = True
             desc = "Prepare the absolute coordinates of the World Coordinates."
@@ -19,12 +20,30 @@ Namespace VBClasses
                 If histArray(i) > sizeThreshold Then regionList.Add(i)
             Next
 
-            label = CStr(regionList.Count) + " non-zero regions more than " + CStr(CInt(sizeThreshold)) + " pixels"
+            label = CStr(regionList.Count) + " non-zero regions more than " +
+                    CStr(CInt(sizeThreshold)) + " pixels"
             Return regionList
         End Function
         Public Overrides Sub RunAlg(src As cv.Mat)
             prepData.Run(src)
             dst2 = prepData.dst2
+
+            Dim reduction = task.fOptions.ReductionSlider.Value
+            Dim regionlist = RedWC_Basics.countRegions(dst2, labels(3))
+            Dim count As Integer
+            wcMap.SetTo(0)
+            For i = 0 To regionlist.Count - 1
+                Dim index = regionlist(i)
+                dst0 = dst2.InRange(index, index)
+                Dim mean = prepData.reduced32s.Mean(dst0)
+
+                If CInt(mean(0)) Mod reduction = 0 Then
+                    Dim region = CInt(mean(0) / reduction)
+                    wcMap.SetTo(region, dst0)
+                    count += 1
+                End If
+            Next
+
             labels(2) = prepData.labels(2)
         End Sub
     End Class
@@ -150,9 +169,8 @@ Namespace VBClasses
 
     Public Class RedWC_RedCloud : Inherits TaskParent
         Dim redC As New RedCloud_Basics
-        Dim wcData As New RedWC_Basics
-        Dim wcMapX As cv.Mat
-        Dim wcMapY As cv.Mat
+        Dim wcDataX As New RedWC_Basics
+        Dim wcDataY As New RedWC_Basics
         Public rcList As New List(Of rcData)
         Public Sub New()
             desc = "Assign world coordinates to each RedCloud cell"
@@ -162,12 +180,10 @@ Namespace VBClasses
             Static reductionY = OptionParent.findRadio("Y Reduction")
 
             reductionX.checked = True
-            wcData.Run(emptyMat)
-            wcMapX = wcData.dst2.Clone
+            wcDataX.Run(emptyMat)
 
             reductionY.checked = True
-            wcData.Run(emptyMat)
-            wcMapY = wcData.dst2.Clone
+            wcDataY.Run(emptyMat)
 
             redC.Run(src)
             dst2 = redC.dst2
@@ -176,8 +192,9 @@ Namespace VBClasses
             rcList.Clear()
             Dim reduction = task.fOptions.ReductionSlider.Value
             For Each rc In redC.rcList
-                Dim x = wcMapY.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
-                Dim y = wcMapX.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
+                ' NOTE: X and Y are flipped here but for good reason.
+                Dim x = wcDataY.wcMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
+                Dim y = wcDataX.wcMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
                 rc.region = New cv.Point(CInt(x / reduction), CInt(y / reduction))
                 rcList.Add(rc)
             Next
