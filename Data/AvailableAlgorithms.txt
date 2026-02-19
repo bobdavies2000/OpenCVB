@@ -1534,6 +1534,7 @@ RedTrack_Basics
 Reduction_Basics
 Reduction_PointCloud
 RedWC_Basics
+RedWC_RedCloud
 RedWC_Validate
 RedWC_ValidateX
 RedWC_ValidateY
