@@ -21,10 +21,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="OpenCvSharp4" Version="4.11.0.20250507" />
-    <PackageReference Include="OpenCvSharp4.Extensions" Version="4.11.0.20250507" />
-    <PackageReference Include="OpenCvSharp4.runtime.win" Version="4.11.0.20250507" />
-    <PackageReference Include="OpenCvSharp4.Windows" Version="4.11.0.20250507" />
+    <PackageReference Include="OpenCvSharp4" Version="4.13.0.20260214" />
+    <PackageReference Include="OpenCvSharp4.Extensions" Version="4.13.0.20260214" />
+    <PackageReference Include="OpenCvSharp4.runtime.win" Version="4.13.0.20260214" />
+    <PackageReference Include="OpenCvSharp4.Windows" Version="4.13.0.20260214" />
+    <PackageReference Include="OpenCvSharp4.WpfExtensions" Version="4.13.0.20260214" />
     <PackageReference Include="SharpGL" Version="3.1.1" />
     <PackageReference Include="SharpGL.SceneGraph" Version="3.1.1" />
     <PackageReference Include="SharpGL.WinForms" Version="3.1.1" />
