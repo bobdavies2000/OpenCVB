@@ -114,16 +114,18 @@ Namespace VBClasses
 
             Dim count As Integer
             For Each rc In edgeLine.rcList
-                If histarray(rc.index - 1) > 0 And rc.contour.Count > 0 Then
-                    count += 1
-                    rc.index = newList.Count + 1
-                    If rc.contour.Count > 0 Then
-                        Dim gIndex = task.gridMap.Get(Of Integer)(rc.contour(0).Y, rc.contour(0).X)
-                        rc.color = task.vecColors(gIndex Mod 255)
-                    End If
-                    newList.Add(rc)
+                If rc.index > 0 Then
+                    If histarray(rc.index - 1) > 0 And rc.contour.Count > 0 Then
+                        count += 1
+                        rc.index = newList.Count + 1
+                        If rc.contour.Count > 0 Then
+                            Dim gIndex = task.gridMap.Get(Of Integer)(rc.contour(0).Y, rc.contour(0).X)
+                            rc.color = task.vecColors(gIndex Mod 255)
+                        End If
+                        newList.Add(rc)
 
-                    rcDataDraw(rc)
+                        rcDataDraw(rc)
+                    End If
                 End If
             Next
 

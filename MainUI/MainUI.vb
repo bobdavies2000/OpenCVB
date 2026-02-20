@@ -119,7 +119,7 @@ Namespace MainApp
         End Sub
         Private Sub updateAlgorithmHistory()
             Dim copyList As List(Of String)
-            Dim maxHistory As Integer = 50
+            Dim maxHistory As Integer = 30
             If TestAllTimer.Enabled Then Exit Sub
 
             If algHistory.Contains(AvailableAlgorithms.Text) Then
@@ -145,7 +145,7 @@ Namespace MainApp
                 RecentList.DropDownItems.Add(algHistory(i))
                 AddHandler RecentList.DropDownItems(i).Click, AddressOf algHistory_Clicked
                 settings.algorithmHistory.Add(algHistory(i))
-                If algHistory.Count >= maxHistory Then Exit For
+                If RecentList.DropDownItems.Count >= maxHistory Then Exit For
             Next
         End Sub
         Public Sub New()

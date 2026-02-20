@@ -203,20 +203,22 @@ Namespace VBClasses
 
             Dim index = redWC.redC.rcMap.Get(Of Integer)(task.clickPoint.Y, task.clickPoint.X)
             dst3.SetTo(0)
-            Dim rcCenter = redWC.rcList(index - 1)
-            labels(3) = "The highlighted cell neighbors for rc = " + CStr(rcCenter.index)
-            SetTrueText(rcCenter.displayCell, 1)
-            For y = -1 To 1
-                For x = 1 To 1
-                    Dim region = New cv.Point(rcCenter.region.X + x, rcCenter.region.Y + y)
-                    index = redWC.rcTranslate.IndexOf(region)
-                    If index >= 0 Then
-                        Dim rc = redWC.rcList(index)
-                        dst2(rc.rect).SetTo(white, rc.mask)
-                        dst3(rc.rect).SetTo(white, rc.mask)
-                    End If
+            If index > 0 Then
+                Dim rcCenter = redWC.rcList(index - 1)
+                labels(3) = "The highlighted cell neighbors for rc = " + CStr(rcCenter.index)
+                SetTrueText(rcCenter.displayCell, 1)
+                For y = -1 To 1
+                    For x = -1 To 1
+                        Dim region = New cv.Point(rcCenter.region.X + x, rcCenter.region.Y + y)
+                        index = redWC.rcTranslate.IndexOf(region)
+                        If index >= 0 Then
+                            Dim rc = redWC.rcList(index)
+                            dst2(rc.rect).SetTo(white, rc.mask)
+                            dst3(rc.rect).SetTo(white, rc.mask)
+                        End If
+                    Next
                 Next
-            Next
+            End If
         End Sub
     End Class
 

@@ -545,7 +545,6 @@ Namespace VBClasses
             Public rect As cv.Rect
             Public region As cv.Point
             Public eq As cv.Vec4f ' only here for compatibility
-            Public nabs As New List(Of Integer) ' only here for compatibility
             Public Sub New()
             End Sub
             Public Sub New(_mask As cv.Mat, _rect As cv.Rect, _index As Integer, Optional minContours As Integer = 3)

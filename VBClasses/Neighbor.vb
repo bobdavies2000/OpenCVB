@@ -6,6 +6,7 @@ Namespace VBClasses
         Public runRedCflag As Boolean = False
         Public options As New Options_Neighbors
         Dim redC As New RedColor_Basics
+        Public nabs As New List(Of Integer)
         Public Sub New()
             desc = "Find all the neighbors with KNN"
         End Sub
@@ -25,9 +26,10 @@ Namespace VBClasses
             knn.trainInput = New List(Of cv.Point2f)(knn.queries)
             knn.Run(src)
 
+            nabs.Clear()
             For Each rc In redC.rcList
                 For i = 0 To Math.Min(knn.neighbors.Count, options.neighbors) - 1
-                    rc.nabs.Add(knn.neighbors(rc.index - 1)(i))
+                    nabs.Add(knn.neighbors(rc.index - 1)(i))
                 Next
             Next
 
