@@ -25,6 +25,7 @@ Namespace MainApp
                 Using streamReader As New StreamReader(jsonFileName)
                     Dim jsonSettings = streamReader.ReadToEnd()
                     If jsonSettings <> "" Then
+                        streamReader.Close()
                         settings = JsonConvert.DeserializeObject(Of jsonShared.Settings)(jsonSettings)
                         If settings.algorithm = "" Then settings.algorithm = "AddWeighted_Basics"
                         settings = initialize(settings)
@@ -82,6 +83,8 @@ Namespace MainApp
             If Settings.cameraFound = False Then
                 MessageBox.Show("There are no supported cameras present!" + vbCrLf + vbCrLf)
             End If
+
+            Save(Settings)
 
             Return Settings
         End Function

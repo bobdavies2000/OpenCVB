@@ -8,6 +8,7 @@ Namespace VBClasses
         Public options As New Options_Features
         Public Sub New()
             task.bricks = Me
+            If task.bricks Is Nothing Then task.bricks = New Brick_Basics
             labels(3) = "Right camera image.  Highlighted rectangle matches the dst2 (left) rectangle."
             desc = "Create the grid of bricks that reduce depth volatility"
         End Sub

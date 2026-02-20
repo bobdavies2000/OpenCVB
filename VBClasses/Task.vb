@@ -45,7 +45,6 @@ Namespace VBClasses
             lines = New Line_Basics
             filterBasics = New Filter_Basics
             leftRightEnhanced = New LeftRight_Brightness
-            bricks = New Brick_Basics
             cloudOptions = New Options_PointCloud
             cloudOptions.Run()
 
@@ -131,7 +130,7 @@ Namespace VBClasses
 
             motionCloud.Run(emptyMat) '******* this may rotate for gravity if selected *******
             colorizer.Run(src)
-            bricks.Run(src)
+            If bricks IsNot Nothing Then bricks.Run(src)
 
             If feat IsNot Nothing Then feat.Run(src)
 
