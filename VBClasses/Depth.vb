@@ -1259,6 +1259,7 @@ Namespace VBClasses
 
     Public Class NR_Depth_ErrorEstimate : Inherits TaskParent
         Public Sub New()
+            If task.bricks Is Nothing Then task.bricks = New Brick_Basics
             dst1 = New cv.Mat(dst2.Size, cv.MatType.CV_32F)
             labels(2) = "Colorized depth error estimate for the current image"
             desc = "Provide an estimate of the error based on the depth - a linear estimate based on the '2% at 2 meters' statement."
@@ -1292,6 +1293,7 @@ Namespace VBClasses
 
     Public Class NR_Depth_MinMaxToVoronoi : Inherits TaskParent
         Public Sub New()
+            If task.bricks Is Nothing Then task.bricks = New Brick_Basics
             task.kalman = New Kalman_Basics
             ReDim task.kalman.kInput(task.gridRects.Count * 4 - 1)
             labels = {"", "", "Red is min distance, blue is max distance", "Voronoi representation of min point (only) for each cell."}
@@ -1438,6 +1440,7 @@ Namespace VBClasses
     Public Class Depth_ReliableLines : Inherits TaskParent
         Dim rightPoints As New List(Of cv.Point)
         Public Sub New()
+            If task.bricks Is Nothing Then task.bricks = New Brick_Basics
             desc = "Find the lines that are consistent in both the left and right images."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)

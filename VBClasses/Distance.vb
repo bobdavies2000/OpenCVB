@@ -493,6 +493,7 @@ Namespace VBClasses
     Public Class NR_Distance_DepthBricks : Inherits TaskParent
         Dim dist As New Distance_Depth
         Public Sub New()
+            If task.bricks Is Nothing Then task.bricks = New Brick_Basics
             task.gOptions.DebugSlider.Value = 20
             desc = "Threshold the maxDist in each gr to highlight centers for key objects.  Use the 'DebugSlider' to provide the value."
         End Sub

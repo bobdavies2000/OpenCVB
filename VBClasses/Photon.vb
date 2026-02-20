@@ -121,6 +121,7 @@ Namespace VBClasses
         Dim hist As New Histogram_Basics
         Dim distances As New List(Of Single)
         Public Sub New()
+            If task.bricks Is Nothing Then task.bricks = New Brick_Basics
             hist.plotHist.removeZeroEntry = False
             task.gOptions.setHistogramBins(10)
             task.gOptions.UseMotionMask.Checked = False

@@ -1,4 +1,4 @@
-﻿Imports System.Security.Cryptography
+Imports System.Security.Cryptography
 Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Class Cloud_Basics : Inherits TaskParent
@@ -409,6 +409,7 @@ Namespace VBClasses
 
     Public Class NR_Cloud_GridInspector : Inherits TaskParent
         Public Sub New()
+            If task.bricks Is Nothing Then task.bricks = New Brick_Basics
             dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
             task.mouseMovePoint.X = dst2.Width / 2
             desc = "Inspect x, y, and z values by gr"
@@ -639,6 +640,7 @@ Namespace VBClasses
     Public Class NR_Cloud_Continuous_GridX : Inherits TaskParent
         Dim options As New Options_Features
         Public Sub New()
+            If task.bricks Is Nothing Then task.bricks = New Brick_Basics
             dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
             dst3 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
             desc = "Show where the pointcloud is continuous at the gr resolution"
@@ -676,6 +678,7 @@ Namespace VBClasses
     Public Class NR_Cloud_Continuous_GridXY : Inherits TaskParent
         Dim options As New Options_Features
         Public Sub New()
+            If task.bricks Is Nothing Then task.bricks = New Brick_Basics
             dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
             desc = "Show where the pointcloud is continuous at the gr resolution"
         End Sub

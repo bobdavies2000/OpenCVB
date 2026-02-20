@@ -44,6 +44,7 @@ Namespace VBClasses
     Public Class NR_LineRect_CenterNeighbor : Inherits TaskParent
         Public options As New Options_LineRect
         Public Sub New()
+            If task.bricks Is Nothing Then task.bricks = New Brick_Basics
             desc = "Remove lines which have similar depth in bricks on either side of a line."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -98,6 +99,7 @@ Namespace VBClasses
     Public Class NR_LineRect_CenterRange : Inherits TaskParent
         Public options As New Options_LineRect
         Public Sub New()
+            If task.bricks Is Nothing Then task.bricks = New Brick_Basics
             desc = "Remove lines which have similar depth in bricks on either side of a line."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)

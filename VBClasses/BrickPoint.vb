@@ -1,4 +1,4 @@
-﻿Imports cv = OpenCvSharp
+Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Class BrickPoint_Basics : Inherits TaskParent
         Public sobel As New Edge_Sobel
@@ -34,6 +34,7 @@ Namespace VBClasses
         Public ptList As New List(Of cv.Point)
         Public threshold As Single = 150
         Public Sub New()
+            If task.bricks Is Nothing Then task.bricks = New Brick_Basics
             desc = "Identify the highest intensity point in each gr given the input image."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -72,6 +73,7 @@ Namespace VBClasses
         Dim plotHist As New Plot_Histogram
         Dim bPoint As New BrickPoint_Basics
         Public Sub New()
+            If task.bricks Is Nothing Then task.bricks = New Brick_Basics
             task.gOptions.setHistogramBins(3)
             plotHist.maxRange = 255
             plotHist.minRange = 0
@@ -130,6 +132,7 @@ Namespace VBClasses
     Public Class NR_BrickPoint_TopRow : Inherits TaskParent
         Dim bPoint As New BrickPoint_Basics
         Public Sub New()
+            If task.bricks Is Nothing Then task.bricks = New Brick_Basics
             labels(3) = "BrickPoint_Basics output of intensity = 255 - not necessarily in the top row of the gr."
             desc = "BackProject the top row of the survey results into the RGB image - might help identify vertical lines (see dst3)."
         End Sub
@@ -162,6 +165,7 @@ Namespace VBClasses
     Public Class NR_BrickPoint_DistanceAbove : Inherits TaskParent
         Dim plotHist As New Plot_Histogram
         Public Sub New()
+            If task.bricks Is Nothing Then task.bricks = New Brick_Basics
             plotHist.createHistogram = True
             plotHist.removeZeroEntry = False
             desc = "Show grid points based on their distance to the grid point above."
@@ -248,6 +252,7 @@ Namespace VBClasses
         Public bestBricks As New List(Of cv.Point)
         Public sortedBricks As New SortedList(Of Integer, cv.Rect)(New compareAllowIdenticalIntegerInverted)
         Public Sub New()
+            If task.bricks Is Nothing Then task.bricks = New Brick_Basics
             desc = "Identify the bricks with the best edge counts - indicating the quality of the gr."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -284,6 +289,7 @@ Namespace VBClasses
         Dim bPoint As New BrickPoint_Basics
         Public results(,) As Single
         Public Sub New()
+            If task.bricks Is Nothing Then task.bricks = New Brick_Basics
             labels(2) = "Cursor over each gr to see where the grid points are."
             task.mouseMovePoint = New cv.Point(0, 0) ' this gr is often the most populated.
             desc = "Monitor the location of each gr point in a gr."

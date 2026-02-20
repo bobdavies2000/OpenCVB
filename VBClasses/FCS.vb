@@ -185,6 +185,7 @@ Namespace VBClasses
         Dim subdiv As New cv.Subdiv2D
         Dim feat As New Feature_General
         Public Sub New()
+            If task.bricks Is Nothing Then task.bricks = New Brick_Basics
             dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
             task.fpMap = New cv.Mat(dst2.Size(), cv.MatType.CV_32F, 0)
             labels(3) = "CV_8U map of Delaunay cells."
@@ -614,6 +615,7 @@ Namespace VBClasses
 
     Public Class FCS_Info : Inherits TaskParent
         Public Sub New()
+            If task.bricks Is Nothing Then task.bricks = New Brick_Basics
             desc = "Display the contents of the Feature Coordinate System (FCS) cell."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)

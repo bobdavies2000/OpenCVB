@@ -1516,6 +1516,7 @@ Namespace VBClasses
         Dim edgesLR As New Edge_LeftRight
         Public means As New List(Of Single)
         Public Sub New()
+            If task.bricks Is Nothing Then task.bricks = New Brick_Basics
             If standalone Then task.gOptions.displayDst1.Checked = True
             desc = "Translate bricks with edges and depth from the left to the right view."
         End Sub

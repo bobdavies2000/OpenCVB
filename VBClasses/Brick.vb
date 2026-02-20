@@ -1,4 +1,3 @@
-﻿Imports System.Windows.Forms.Design.AxImporter
 Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Class Brick_Basics : Inherits TaskParent
@@ -8,7 +7,6 @@ Namespace VBClasses
         Public options As New Options_Features
         Public Sub New()
             task.bricks = Me
-            If task.bricks Is Nothing Then task.bricks = New Brick_Basics
             labels(3) = "Right camera image.  Highlighted rectangle matches the dst2 (left) rectangle."
             desc = "Create the grid of bricks that reduce depth volatility"
         End Sub
@@ -92,6 +90,7 @@ Namespace VBClasses
 
     Public Class NR_Brick_FullDepth : Inherits TaskParent
         Public Sub New()
+            If task.bricks Is Nothing Then task.bricks = New Brick_Basics
             labels(2) = "Left image bricks - no overlap.  Click in any column to highlight that column."
             labels(3) = "Right image: corresponding bricks.  Overlap indicates uncertainty about depth."
             desc = "Display the bricks for all cells with depth."
@@ -126,6 +125,7 @@ Namespace VBClasses
 
     Public Class NR_Brick_InstantUpdate : Inherits TaskParent
         Public Sub New()
+            If task.bricks Is Nothing Then task.bricks = New Brick_Basics
             task.bricks.instantUpdate = True
             labels(3) = "Pointcloud image for cells with good visibility"
             desc = "Create the grid of bricks with good visibility"
@@ -252,6 +252,7 @@ Namespace VBClasses
     Public Class Brick_CorrelationInput : Inherits TaskParent
         Dim LRMeanSub As New MeanSubtraction_LeftRight
         Public Sub New()
+            If task.bricks Is Nothing Then task.bricks = New Brick_Basics
             desc = "Given a left image cell, find it's match in the right image, and display their correlation."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -283,6 +284,7 @@ Namespace VBClasses
 
     Public Class Brick_Info : Inherits TaskParent
         Public Sub New()
+            If task.bricks Is Nothing Then task.bricks = New Brick_Basics
             task.clickPoint = New cv.Point(dst2.Width / 2, dst2.Height / 2)
             desc = "Display the info about the select gr."
         End Sub
@@ -318,6 +320,7 @@ Namespace VBClasses
 
     Public Class NR_Brick_LeftToColor : Inherits TaskParent
         Public Sub New()
+            If task.bricks Is Nothing Then task.bricks = New Brick_Basics
             If task.Settings.cameraName.StartsWith("Intel(R) RealSense(TM) Depth Camera") Then task.gOptions.gravityPointCloud.Checked = False
             desc = "Align gr left rectangles in color with the left image.  StereoLabs and Orbbec already match."
         End Sub
@@ -345,6 +348,7 @@ Namespace VBClasses
         Public means As New List(Of Single)
         Dim myBricks As New List(Of Integer)
         Public Sub New()
+            If task.bricks Is Nothing Then task.bricks = New Brick_Basics
             labels(2) = "Move the mouse in the color image to see the matches in left and right images. Click to clear the rectangles."
             labels(3) = "Right view with the translated trace of bricks under the mouse."
             If task.Settings.cameraName.StartsWith("Intel(R) RealSense(TM) Depth Camera") Then task.gOptions.gravityPointCloud.Checked = False
@@ -383,6 +387,7 @@ Namespace VBClasses
 
     Public Class NR_Brick_RGBtoLeft : Inherits TaskParent
         Public Sub New()
+            If task.bricks Is Nothing Then task.bricks = New Brick_Basics
             labels(3) = "Right camera image..."
             If task.Settings.cameraName.StartsWith("Intel(R) RealSense(TM) Depth Camera") Then
                 task.gOptions.gravityPointCloud.Checked = False
@@ -424,6 +429,7 @@ Namespace VBClasses
     Public Class NR_Brick_RegionLines : Inherits TaskParent
         Dim regions As New Region_Contours
         Public Sub New()
+            If task.bricks Is Nothing Then task.bricks = New Brick_Basics
             desc = "Lines can mean cells are connected."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -452,6 +458,7 @@ Namespace VBClasses
     Public Class NR_Brick_CloudMaxVal : Inherits TaskParent
         Dim template As New Math_Intrinsics
         Public Sub New()
+            If task.bricks Is Nothing Then task.bricks = New Brick_Basics
             dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_32FC3, 0)
             desc = "Use RGB motion bricks to determine if depth has changed in any gr."
         End Sub
@@ -490,6 +497,7 @@ Namespace VBClasses
     Public Class NR_Brick_CloudMean : Inherits TaskParent
         Dim template As New Math_Intrinsics
         Public Sub New()
+            If task.bricks Is Nothing Then task.bricks = New Brick_Basics
             dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_32FC3, 0)
             desc = "Use RGB motion bricks to determine if depth has changed in any gr."
         End Sub
@@ -526,6 +534,7 @@ Namespace VBClasses
     Public Class NR_Brick_CloudRange : Inherits TaskParent
         Dim template As New Math_Intrinsics
         Public Sub New()
+            If task.bricks Is Nothing Then task.bricks = New Brick_Basics
             dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_32FC3, 0)
             desc = "Use RGB motion bricks to determine if depth has changed in any gr."
         End Sub
@@ -568,6 +577,7 @@ Namespace VBClasses
     Public Class Brick_Features : Inherits TaskParent
         Public featureBricks As New List(Of cv.Rect)
         Public Sub New()
+            If task.bricks Is Nothing Then task.bricks = New Brick_Basics
             task.gOptions.LineWidth.Value = 3
             If task.feat Is Nothing Then task.feat = New Feature_Basics
             labels(3) = "Featureless areas"
@@ -615,6 +625,7 @@ Namespace VBClasses
         Public feat As New Brick_EdgeFlips
         Public boundaryCells As New List(Of List(Of Integer))
         Public Sub New()
+            If task.bricks Is Nothing Then task.bricks = New Brick_Basics
             labels(2) = "Gray and black regions are featureless while white has features..."
             dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U)
             desc = "Find the boundary cells between feature and featureless cells."
@@ -736,6 +747,7 @@ Namespace VBClasses
 
     Public Class NR_Brick_CorrelationMap : Inherits TaskParent
         Public Sub New()
+            If task.bricks Is Nothing Then task.bricks = New Brick_Basics
             labels(3) = "The map to identify each gr's depth."
             dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
             desc = "Display a heatmap of the correlation of the left and right images for each gr."
@@ -788,6 +800,7 @@ Namespace VBClasses
     Public Class Brick_LeftRight : Inherits TaskParent
         Public means As New List(Of Single)
         Public Sub New()
+            If task.bricks Is Nothing Then task.bricks = New Brick_Basics
             labels(2) = "Only every other colum is shown to make it clear which bricks are being translated (can get crowded otherwise.)"
             labels(3) = "Right view with the translated bricks shown at left."
             desc = "Map the column of bricks in the color image into the left view and then to the right view."
@@ -825,6 +838,7 @@ Namespace VBClasses
         Public fLessMask As New cv.Mat
         Public fLessRects As New List(Of cv.Rect)
         Public Sub New()
+            If task.bricks Is Nothing Then task.bricks = New Brick_Basics
             featureMask = New cv.Mat(dst3.Size, cv.MatType.CV_8U)
             fLessMask = New cv.Mat(dst3.Size, cv.MatType.CV_8U)
             task.fOptions.EdgeMethods.SelectedItem() = "Laplacian"
@@ -899,6 +913,7 @@ Namespace VBClasses
         Dim options As New Options_LeftRightCorrelation
         Public edges As New Edge_Basics
         Public Sub New()
+            If task.bricks Is Nothing Then task.bricks = New Brick_Basics
             dst3 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
             desc = "Add edges to features"
         End Sub
@@ -928,6 +943,7 @@ Namespace VBClasses
         Dim options As New Options_LeftRightCorrelation
         Dim motionLeft As New Motion_Basics
         Public Sub New()
+            If task.bricks Is Nothing Then task.bricks = New Brick_Basics
             labels(2) = "The lines are for the left image."
             dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
             desc = "Find all the bricks that contain lines"
@@ -963,6 +979,7 @@ Namespace VBClasses
         Dim lines As New Line_Basics
         Dim options As New Options_LeftRightCorrelation
         Public Sub New()
+            If task.bricks Is Nothing Then task.bricks = New Brick_Basics
             dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
             labels(2) = "Left view (stable)"
             desc = "Find all the bricks that have a high range (> X mm's)"
@@ -991,6 +1008,7 @@ Namespace VBClasses
     Public Class Brick_Plot : Inherits TaskParent
         Dim plotHist As New Plot_Histogram
         Public Sub New()
+            If task.bricks Is Nothing Then task.bricks = New Brick_Basics
             plotHist.createHistogram = True
             plotHist.addLabels = False
             plotHist.removeZeroEntry = False
@@ -1038,6 +1056,7 @@ Namespace VBClasses
         Dim options As New Options_LeftRightCorrelation
         Dim motionLeft As New Motion_Basics
         Public Sub New()
+            If task.bricks Is Nothing Then task.bricks = New Brick_Basics
             If standalone Then task.gOptions.displayDst0.Checked = True
             labels(2) = "The lines are for the left image."
             dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)

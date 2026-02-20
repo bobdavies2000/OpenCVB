@@ -6,6 +6,7 @@ Namespace VBClasses
         Public hRects As New List(Of cv.Rect)
         Public vRects As New List(Of cv.Rect)
         Public Sub New()
+            If task.bricks Is Nothing Then task.bricks = New Brick_Basics
             dst0 = New cv.Mat(dst0.Size, cv.MatType.CV_32S, 0)
             dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_32S, 0)
             labels(2) = "Move mouse over a line to see the depth values.  Results will be in Labels(3)"
@@ -85,6 +86,7 @@ Namespace VBClasses
         Public quadMat As New cv.Mat
         Public inputRects As New List(Of cv.Rect)
         Public Sub New()
+            If task.bricks Is Nothing Then task.bricks = New Brick_Basics
             desc = "Build Quads for each rectangle in the list horizontal rectangles."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -134,6 +136,7 @@ Namespace VBClasses
         Dim rowStart As Integer, bottomRight As cv.Point, topLeft As cv.Point
         Dim options As New Options_Features
         Public Sub New()
+            If task.bricks Is Nothing Then task.bricks = New Brick_Basics
             desc = "Connect cells that are close in depth"
         End Sub
         Private Sub hTestRect(brick1 As brickData, brick2 As brickData, nextStart As Integer)
@@ -247,6 +250,7 @@ Namespace VBClasses
         Public connect As New XO_Region_Rects
         Public mdLargest As New List(Of maskData)
         Public Sub New()
+            If task.bricks Is Nothing Then task.bricks = New Brick_Basics
             dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
             task.gOptions.TruncateDepth.Checked = True
             desc = "Find the main regions connected in depth and build a contour for each."
@@ -288,6 +292,7 @@ Namespace VBClasses
 
     Public Class Region_DepthCorrelation : Inherits TaskParent
         Public Sub New()
+            If task.bricks Is Nothing Then task.bricks = New Brick_Basics
             dst0 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
             dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
             labels(3) = "The matching bricks in the right view that were used in the correlation computation"

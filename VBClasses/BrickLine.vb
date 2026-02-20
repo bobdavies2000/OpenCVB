@@ -1,10 +1,11 @@
-﻿Imports cv = OpenCvSharp
+Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Class BrickLine_Basics : Inherits TaskParent
         Dim hist As New Histogram_GridCell
         Public edgeRequest As Boolean
         Public options As New Options_Features
         Public Sub New()
+            If task.bricks Is Nothing Then task.bricks = New Brick_Basics
             labels(2) = "Use 'Selected Feature' in 'Options_Features' to highlight different edges."
             desc = "Given lines or edges, build a grid of cells that cover them."
         End Sub
@@ -104,6 +105,7 @@ Namespace VBClasses
     Public Class BrickLine_DepthGap : Inherits TaskParent
         Dim findCells As New BrickLine_Basics
         Public Sub New()
+            If task.bricks Is Nothing Then task.bricks = New Brick_Basics
             labels(2) = "Cells highlighted below have a significant gap in depth from their neighbors."
             desc = "Find cells mapping the edges/lines which are not near any other cell - they are neighboring edges/lines but not in depth."
         End Sub

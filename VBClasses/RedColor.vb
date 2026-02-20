@@ -261,6 +261,7 @@ Namespace VBClasses
         Public brickList As New List(Of brickData)
         Dim redC As New RedColor_Basics
         Public Sub New()
+            If task.bricks Is Nothing Then task.bricks = New Brick_Basics
             If standalone Then task.gOptions.displayDst0.Checked = True
             desc = "Attach an color8u class to each gr."
         End Sub
