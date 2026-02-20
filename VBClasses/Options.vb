@@ -40,7 +40,6 @@ Namespace VBClasses
 
 
 
-
     Public Class Options_SharpGL2 : Inherits OptionParent
         Public eye As cv.Vec3f = New cv.Vec3f(0, 0, 0)
         Public Sub New()
@@ -8186,5 +8185,4 @@ Namespace VBClasses
             rectOverlapRatio = ratioSlider.value / 100
         End Sub
     End Class
-
 End Namespace

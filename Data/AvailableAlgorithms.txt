@@ -1534,12 +1534,11 @@ RedTrack_Basics
 Reduction_Basics
 Reduction_PointCloud
 RedWC_Basics
+RedWC_Neighbors
 RedWC_RedCloud
 RedWC_Validate
 RedWC_ValidateX
 RedWC_ValidateY
-RedWC_X
-RedWC_Y
 Region_Basics
 Region_Contours
 Region_Core

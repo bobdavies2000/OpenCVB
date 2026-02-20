@@ -1,4 +1,6 @@
-﻿Imports cv = OpenCvSharp
+﻿Imports System.Windows.Documents
+Imports System.Windows.Forms.Design.AxImporter
+Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Class RedWC_Basics : Inherits TaskParent
         Public prepData As New RedPrep_Core
@@ -27,7 +29,7 @@ Namespace VBClasses
 
             labels(2) = CStr(regionList.Count) + " non-zero regions > " + CStr(CInt(sizeThreshold)) + " pixels"
             Dim count As Integer
-            wcMap.SetTo(0)
+            wcMap.SetTo(255)
             For i = 0 To regionList.Count - 1
                 Dim index = regionList(i)
                 dst0 = dst2.InRange(index, index)
@@ -44,36 +46,6 @@ Namespace VBClasses
         End Sub
     End Class
 
-
-
-
-
-
-    Public Class RedWC_X : Inherits TaskParent
-        Public wcData As New RedWC_Basics
-        Public Sub New()
-            desc = "Assign world coordinates to each rcList entry."
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            wcData.Run(src)
-            dst2 = PaletteBlackZero(wcData.dst2)
-        End Sub
-    End Class
-
-
-
-
-
-    Public Class RedWC_Y : Inherits TaskParent
-        Public wcData As New RedWC_Basics
-        Public Sub New()
-            desc = "Assign world coordinates to each rcList entry."
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            wcData.Run(src)
-            dst2 = PaletteBlackZero(wcData.dst2)
-        End Sub
-    End Class
 
 
 
@@ -164,10 +136,11 @@ Namespace VBClasses
 
 
     Public Class RedWC_RedCloud : Inherits TaskParent
-        Dim redC As New RedCloud_Basics
+        Public redC As New RedCloud_Basics
         Dim wcDataX As New RedWC_Basics
         Dim wcDataY As New RedWC_Basics
         Public rcList As New List(Of rcData)
+        Public rcTranslate As New List(Of cv.Point)
         Public Sub New()
             desc = "Assign world coordinates to each RedCloud cell"
         End Sub
@@ -188,24 +161,62 @@ Namespace VBClasses
             rcList.Clear()
             Dim reduction = task.fOptions.ReductionSlider.Value
             For Each rc In redC.rcList
-                ' NOTE: X and Y are flipped here but for good reason.
-                Dim x = wcDataY.wcMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
-                Dim y = wcDataX.wcMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
-                rc.region = New cv.Point(CInt(x / reduction), CInt(y / reduction))
+                Dim x = wcDataX.wcMap.Get(Of Single)(rc.maxDist.Y, rc.maxDist.X)
+                Dim y = wcDataY.wcMap.Get(Of Single)(rc.maxDist.Y, rc.maxDist.X)
+                rc.region = New cv.Point(CInt(x), CInt(y))
                 rcList.Add(rc)
             Next
 
-            If standalone Then
-                Dim region As Integer = Math.Abs(task.gOptions.DebugSlider.Value)
-                labels(2) = "The highlighted cells are in X region " + CStr(region)
-                dst3.SetTo(0)
-                For Each rc In rcList
-                    If rc.region.X = region Then
+            rcTranslate.Clear()
+            For Each rc In rcList
+                rcTranslate.Add(rc.region)
+            Next
+
+            If standaloneTest() Then
+                Dim index = redC.rcMap.Get(Of Integer)(task.clickPoint.Y, task.clickPoint.X)
+                If index > 0 Then
+                    Dim rcClick = rcList(index - 1)
+                    strOut = rcClick.displayCell()
+                    SetTrueText(strOut, 3)
+                    dst2(rcClick.rect).SetTo(white, rcClick.mask)
+                    dst3.SetTo(0)
+                    dst3(rcClick.rect).SetTo(white, rcClick.mask)
+                End If
+            End If
+        End Sub
+    End Class
+
+
+
+
+
+    Public Class RedWC_Neighbors : Inherits TaskParent
+        Dim redWC As New RedWC_RedCloud
+        Public Sub New()
+            task.gOptions.displayDst1.Checked = True
+            desc = "Identify the neighbors of the cell that was clicked"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            redWC.Run(src)
+            dst2 = redWC.dst2
+            labels(2) = redWC.labels(2)
+
+            Dim index = redWC.redC.rcMap.Get(Of Integer)(task.clickPoint.Y, task.clickPoint.X)
+            dst3.SetTo(0)
+            Dim rcCenter = redWC.rcList(index - 1)
+            labels(3) = "The highlighted cell neighbors for rc = " + CStr(rcCenter.index)
+            SetTrueText(rcCenter.displayCell, 1)
+            For y = -1 To 1
+                For x = 1 To 1
+                    Dim region = New cv.Point(rcCenter.region.X + x, rcCenter.region.Y + y)
+                    index = redWC.rcTranslate.IndexOf(region)
+                    If index >= 0 Then
+                        Dim rc = redWC.rcList(index)
                         dst2(rc.rect).SetTo(white, rc.mask)
                         dst3(rc.rect).SetTo(white, rc.mask)
                     End If
                 Next
-            End If
+            Next
         End Sub
     End Class
 
