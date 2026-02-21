@@ -23,7 +23,7 @@ Namespace VBClasses
                 cv.Cv2.CalcHist({src}, {0, 1, 2}, inputMask, histogram, 3, {bins, bins, bins}, task.rangesBGR)
 
                 ReDim histArray(histogram.Total - 1)
-                Marshal.Copy(histogram.Data, histArray, 0, histArray.Length)
+                histogram.GetArray(Of Single)(histArray)
                 histogram1D = cv.Mat.FromPixelData(histogram.Total, 1, cv.MatType.CV_32F, histArray)
 
                 simK.Run(histogram1D)
@@ -63,10 +63,13 @@ Namespace VBClasses
             For z = 0 To bins - 1
                 For y = 0 To bins - 1
                     For x = 0 To bins - 1
-                        Dim val = hColor.histArray(x * bins * bins + y * bins + z)
-                        If val > 0 Then
-                            pixels.Add(New cv.Point3f(CInt(255 * x / bins), CInt(255 * y / bins), CInt(255 * z / bins)))
-                            counts.Add(val)
+                        Dim index = x * bins * bins + y * bins + z
+                        If index < hColor.histArray.Count Then
+                            Dim val = hColor.histArray(x * bins * bins + y * bins + z)
+                            If val > 0 Then
+                                pixels.Add(New cv.Point3f(CInt(255 * x / bins), CInt(255 * y / bins), CInt(255 * z / bins)))
+                                counts.Add(val)
+                            End If
                         End If
                     Next
                 Next
@@ -133,7 +136,7 @@ Namespace VBClasses
                 cv.Cv2.CalcHist({src}, {0, 1, 2}, maskInput, histogram, 3, hBins, task.rangesBGR)
 
                 Dim histArray(histogram.Total - 1) As Single
-                Marshal.Copy(histogram.Data, histArray, 0, histArray.Length)
+                histogram.GetArray(Of Single)(histArray)
 
                 Dim boundaries As New List(Of Integer)
                 Dim zeroMode As Boolean
@@ -243,8 +246,8 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
 
-            Dim histInput(src.Total * src.ElemSize - 1) As Byte
-            Marshal.Copy(src.Data, histInput, 0, histInput.Length)
+            Dim histInput(src.Total - 1) As cv.Vec3b
+            src.GetArray(Of cv.Vec3b)(histInput)
 
             Dim handleInput = GCHandle.Alloc(histInput, GCHandleType.Pinned)
             Dim bins = options.histogram3DBins
@@ -254,7 +257,7 @@ Namespace VBClasses
             histogram = cv.Mat.FromPixelData(bins, 1, cv.MatType.CV_32F, imagePtr)
             If prepareImage Then
                 Dim histArray(histogram.Total - 1) As Single
-                Marshal.Copy(histogram.Data, histArray, 0, histArray.Length)
+                histogram.GetArray(Of Single)(histArray)
                 histogram1D = cv.Mat.FromPixelData(histArray.Count, 1, cv.MatType.CV_32F, histArray)
 
                 simK.Run(histogram)
@@ -326,7 +329,7 @@ Namespace VBClasses
             cv.Cv2.CalcHist({src}, {0, 1, 2}, inputMask, histogram, 3, binArray, task.rangesBGR)
 
             ReDim histArray(histogram.Total - 1)
-            Marshal.Copy(histogram.Data, histArray, 0, histArray.Length)
+            histogram.GetArray(Of Single)(histArray)
             If standaloneTest() Then SetTrueText("Vector prepared in histArray")
         End Sub
     End Class

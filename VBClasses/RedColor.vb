@@ -19,7 +19,7 @@ Namespace VBClasses
 
             Dim imagePtr As IntPtr
             Dim inputData(dst1.Total - 1) As Byte
-            Marshal.Copy(dst1.Data, inputData, 0, inputData.Length)
+            dst1.GetArray(Of Byte)(inputData)
             Dim handleInput = GCHandle.Alloc(inputData, GCHandleType.Pinned)
 
             imagePtr = RedCloud_Run(cPtr, handleInput.AddrOfPinnedObject(), dst1.Rows, dst1.Cols)
@@ -117,7 +117,7 @@ Namespace VBClasses
 
             Dim imagePtr As IntPtr
             Dim inputData(dst1.Total - 1) As Byte
-            Marshal.Copy(dst1.Data, inputData, 0, inputData.Length)
+            dst1.GetArray(Of Byte)(inputData)
             Dim handleInput = GCHandle.Alloc(inputData, GCHandleType.Pinned)
 
             imagePtr = RedCloud_Run(cPtr, handleInput.AddrOfPinnedObject(), dst1.Rows, dst1.Cols)
@@ -133,7 +133,6 @@ Namespace VBClasses
 
             Dim rects(classCount * 4) As Integer
             Marshal.Copy(rectData.Data, rects, 0, rects.Length)
-
 
             Dim rcListLast = New List(Of rcData)(rcList)
             Dim rcMapLast As cv.Mat = rcMap.Clone

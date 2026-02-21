@@ -146,7 +146,7 @@ Namespace VBClasses
             Next
 
             ReDim eLabels(eLabelMat.Rows - 1)
-            Marshal.Copy(eLabelMat.Data, eLabels, 0, eLabels.Length)
+            eLabelMat.GetArray(Of Integer)(eLabels)
         End Sub
     End Class
 

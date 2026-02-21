@@ -51,7 +51,7 @@ Namespace VBClasses
             End If
 
             ReDim histArray(src.Total - 1)
-            Marshal.Copy(src.Data, histArray, 0, histArray.Length)
+            src.GetArray(Of Single)(histArray)
 
             classCount = 1
             Dim index As Integer
@@ -183,7 +183,7 @@ Namespace VBClasses
             cv.Cv2.CalcHist({src}, {0, 1, 2}, New cv.Mat, histogram, 3, {bins, bins, bins}, task.rangesBGR)
 
             ReDim histArray(histogram.Total - 1)
-            Marshal.Copy(histogram.Data, histArray, 0, histArray.Length)
+            histogram.GetArray(Of Single)(histArray)
 
             For i = 0 To histArray.Count - 1
                 histArray(i) = i + 1

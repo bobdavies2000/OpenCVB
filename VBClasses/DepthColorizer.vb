@@ -1,4 +1,4 @@
-﻿Imports System.Runtime.InteropServices
+Imports System.Runtime.InteropServices
 Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Class DepthColorizer_Basics : Inherits TaskParent
@@ -62,9 +62,9 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             If task.gOptions.displayDst1.Checked = False Or standaloneTest() Then
                 If cPtr = 0 Then cPtr = Depth_Colorizer_Open()
-                Dim depthData(task.pcSplit(2).Total * task.pcSplit(2).ElemSize - 1) As Byte
+                Dim depthData(task.pcSplit(2).Total - 1) As Single
+                task.pcSplit(2).GetArray(Of Single)(depthData)
                 Dim handleSrc = GCHandle.Alloc(depthData, GCHandleType.Pinned)
-                Marshal.Copy(task.pcSplit(2).Data, depthData, 0, depthData.Length)
                 Dim imagePtr = Depth_Colorizer_Run(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, task.MaxZmeters)
                 handleSrc.Free()
 
@@ -101,9 +101,9 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             If src.Type <> cv.MatType.CV_32F Then src = task.pcSplit(2)
 
-            Dim depthData(src.Total * src.ElemSize - 1) As Byte
+            Dim depthData(src.Total - 1) As Single
+            src.GetArray(Of Single)(depthData)
             Dim handleSrc = GCHandle.Alloc(depthData, GCHandleType.Pinned)
-            Marshal.Copy(src.Data, depthData, 0, depthData.Length)
             Dim imagePtr = Depth_Colorizer_Run(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, task.MaxZmeters)
             handleSrc.Free()
 

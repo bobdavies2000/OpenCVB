@@ -571,9 +571,9 @@ Namespace VBClasses
             Dim thresholdVal As Single = thresholdSlider.Value / 100
 
             If src.Channels <> 3 Then src = task.color.Clone
-            Dim rgbData(src.Total * src.ElemSize - 1) As Byte
+            Dim rgbData(src.Total - 1) As cv.Vec3b
             Dim handleSrc = GCHandle.Alloc(rgbData, GCHandleType.Pinned) ' pin it for the duration...
-            Marshal.Copy(src.Data, rgbData, 0, rgbData.Length)
+            src.GetArray(Of cv.Vec3b)(rgbData)
 
             Dim imagePtr = WhiteBalance_Run(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, thresholdVal)
             handleSrc.Free()

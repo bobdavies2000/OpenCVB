@@ -16,8 +16,8 @@ Namespace VBClasses
 
             If task.clickPoint <> newPoint Then center = task.clickPoint
 
-            Dim cppData(src.Total * src.ElemSize - 1) As Byte
-            Marshal.Copy(src.Data, cppData, 0, cppData.Length)
+            Dim cppData(src.Total - 1) As cv.Vec3b
+            src.GetArray(Of cv.Vec3b)(cppData)
             Dim handleSrc = GCHandle.Alloc(cppData, GCHandleType.Pinned)
             Dim imagePtr = Vignetting_RunCPP(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, options.radius, center.X, center.Y, removeVig)
             handleSrc.Free()

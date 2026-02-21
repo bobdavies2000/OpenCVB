@@ -1,4 +1,4 @@
-﻿Imports System.Runtime.InteropServices
+Imports System.Runtime.InteropServices
 Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Class OpAuto_Valley : Inherits TaskParent
@@ -21,7 +21,7 @@ Namespace VBClasses
             End If
 
             Dim histArray(src.Total - 1) As Single
-            Marshal.Copy(src.Data, histArray, 0, histArray.Length)
+            src.GetArray(Of Single)(histArray)
 
             Dim histList = histArray.ToList
 

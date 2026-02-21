@@ -14,8 +14,8 @@ Namespace VBClasses
                 SetTrueText("When NR_HMM_Example_CPP is run repeatedly as part of a 'Test All', it can run out of OpenCL memory.")
                 Exit Sub
             End If
-            Dim dataSrc(src.Total * src.ElemSize - 1) As Byte
-            Marshal.Copy(src.Data, dataSrc, 0, dataSrc.Length)
+            Dim dataSrc(src.Total - 1) As cv.Vec3b
+            src.GetArray(Of cv.Vec3b)(dataSrc)
             Dim handleSrc = GCHandle.Alloc(dataSrc, GCHandleType.Pinned)
             Dim imagePtr = HMM_Run(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, src.Channels)
             handleSrc.Free()

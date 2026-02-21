@@ -15,7 +15,7 @@ Namespace VBClasses
             If src.Channels() = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
             If src.Total <> grayData.Length Then ReDim grayData(src.Total - 1)
             Dim grayHandle = GCHandle.Alloc(grayData, GCHandleType.Pinned)
-            Marshal.Copy(src.Data, grayData, 0, grayData.Length)
+            src.GetArray(Of Byte)(grayData)
             Dim imagePtr = Salience_Run(cPtr, options.numScales, grayHandle.AddrOfPinnedObject, src.Height, src.Width)
             grayHandle.Free()
 
@@ -48,7 +48,7 @@ Namespace VBClasses
                 Dim input = src(roi).Clone()
                 Dim grayData(input.Total - 1) As Byte
                 Dim grayHandle = GCHandle.Alloc(grayData, GCHandleType.Pinned)
-                Marshal.Copy(input.Data, grayData, 0, grayData.Length)
+                input.GetArray(Of Byte)(grayData)
                 Dim imagePtr = Salience_Run(cPtr, salience.options.numScales, grayHandle.AddrOfPinnedObject, roi.Height, roi.Width)
                 grayHandle.Free()
 

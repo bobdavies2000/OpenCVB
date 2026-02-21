@@ -228,8 +228,8 @@ Namespace VBClasses
             output += "Upper right image is Generic Indexer and it took " + CStr(watch.ElapsedMilliseconds) + "ms" + vbCrLf + vbCrLf
 
             watch = Stopwatch.StartNew()
-            Dim colorArray(cols * rows * rgb.ElemSize - 1) As Byte
-            Marshal.Copy(rgb.Data, colorArray, 0, colorArray.Length)
+            Dim colorArray(cols * rows - 1) As cv.Vec3b
+            rgb.GetArray(Of cv.Vec3b)(colorArray)
             For i = 0 To colorArray.Length - 3 Step 3
                 colorArray(i).SwapWith(colorArray(i + 2))
             Next
@@ -746,12 +746,12 @@ Namespace VBClasses
             If task.heartBeat Then
                 Dim nSize = New cv.Size(src.Width / 8, src.Height / 8)
                 dst1 = src.Resize(nSize)
-                Dim samples(dst1.Total * dst1.ElemSize - 1) As Byte
-                Marshal.Copy(dst1.Data, samples, 0, samples.Length)
+                Dim samples(dst1.Total - 1) As cv.Vec3b
+                dst1.GetArray(Of cv.Vec3b)(samples)
 
                 Dim sorted As New SortedList(Of Integer, cv.Vec3b)(New compareAllowIdenticalIntegerInverted)
                 For i = 0 To samples.Count - 1 Step 3
-                    Dim vecA = New cv.Vec3b(samples(i), samples(i + 1), samples(i + 2))
+                    Dim vecA = samples(i)
                     Dim gPixel = CInt(vecA(2) * 0.299 + vecA(1) * 0.587 + vecA(0) * 0.114)
                     If sorted.ContainsKey(gPixel) = False Then sorted.Add(gPixel, vecA)
                 Next
@@ -803,7 +803,6 @@ Namespace VBClasses
             cv.Cv2.ApplyColorMap(tmp, dst3, mapper.colorMap)
         End Sub
     End Class
-
 
 
 

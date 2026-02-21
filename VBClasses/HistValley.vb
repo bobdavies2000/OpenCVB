@@ -138,10 +138,10 @@ Namespace VBClasses
                 hist.Run(src)
                 dst2 = hist.dst2
                 ReDim histArray(hist.histogram.Rows - 1)
-                Marshal.Copy(hist.histogram.Data, histArray, 0, histArray.Length)
+                hist.histogram.GetArray(Of Single)(histArray)
             Else
                 ReDim histArray(src.Rows - 1)
-                Marshal.Copy(src.Data, histArray, 0, histArray.Length)
+                src.GetArray(Of Single)(histArray)
             End If
 
             Dim histList = histArray.ToList
@@ -275,7 +275,7 @@ Namespace VBClasses
             End If
 
             Dim histArray(src.Total - 1) As Single
-            Marshal.Copy(src.Data, histArray, 0, histArray.Length)
+            src.GetArray(Of Single)(histArray)
 
             Dim histList = histArray.ToList
 
@@ -659,7 +659,7 @@ Namespace VBClasses
             End If
 
             Dim histArray(histogram.Total - 1) As Single
-            Marshal.Copy(histogram.Data, histArray, 0, histArray.Length)
+            histogram.GetArray(Of Single)(histArray)
 
             Dim histList = histArray.ToList()
             Dim maxVal = histList.Max

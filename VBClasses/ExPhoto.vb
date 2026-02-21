@@ -57,8 +57,8 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
 
-            Dim dataSrc(src.Total * src.ElemSize - 1) As Byte
-            Marshal.Copy(src.Data, dataSrc, 0, dataSrc.Length)
+            Dim dataSrc(src.Total - 1) As cv.Vec3b
+            src.GetArray(Of cv.Vec3b)(dataSrc)
             Dim handleSrc = GCHandle.Alloc(dataSrc, GCHandleType.Pinned)
             Dim imagePtr = ExPhoto_OilPaint_Run(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols,
                                            options.blockSize, options.dynamicRatio, options.colorCode)
@@ -122,10 +122,10 @@ Namespace VBClasses
             dst3 = src.Clone
             dst3 = src.SetTo(0, dst1)
 
-            Dim dataSrc(src.Total * src.ElemSize - 1) As Byte
-            Dim maskData(dst1.Total * dst1.ElemSize - 1) As Byte
-            Marshal.Copy(src.Data, dataSrc, 0, dataSrc.Length)
-            Marshal.Copy(dst1.Data, maskData, 0, maskData.Length)
+            Dim dataSrc(src.Total - 1) As cv.Vec3b
+            Dim maskData(dst1.Total - 1) As Byte
+            src.GetArray(Of cv.Vec3b)(dataSrc)
+            dst1.GetArray(Of Byte)(maskData)
             Dim handleSrc = GCHandle.Alloc(dataSrc, GCHandleType.Pinned)
             Dim handleMask = GCHandle.Alloc(maskData, GCHandleType.Pinned)
             Dim imagePtr = ExPhoto_Inpaint_Run(cPtr, handleSrc.AddrOfPinnedObject(), handleMask.AddrOfPinnedObject(), src.Rows, src.Cols, iType)

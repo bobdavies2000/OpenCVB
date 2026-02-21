@@ -89,7 +89,7 @@ Namespace VBClasses
                 Dim ranges1 = New cv.Rangef() {New cv.Rangef(0, edgeLine.rcList.Count)}
                 cv.Cv2.CalcHist({dst2}, {0}, task.motionRGB.motionMask, histogram,
                             1, {edgeLine.rcList.Count}, ranges1)
-                Marshal.Copy(histogram.Data, histarray, 0, histarray.Length)
+                histogram.GetArray(Of Single)(histarray)
 
                 For i = 1 To histarray.Count - 1
                     If histarray(i) = 0 Then
@@ -110,7 +110,7 @@ Namespace VBClasses
             Dim ranges2 = New cv.Rangef() {New cv.Rangef(0, edgeLine.classCount)}
             cv.Cv2.CalcHist({edgeLine.dst2}, {0}, task.motionRGB.motionMask, histogram,
                         1, {edgeLine.classCount}, ranges2)
-            Marshal.Copy(histogram.Data, histarray, 0, histarray.Length)
+            histogram.GetArray(Of Single)(histarray)
 
             Dim count As Integer
             For Each rc In edgeLine.rcList
@@ -157,7 +157,7 @@ Namespace VBClasses
             Dim input = If(src.Channels() = 1, src.Clone, src.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
 
             Dim cppData(input.Total - 1) As Byte
-            Marshal.Copy(input.Data, cppData, 0, cppData.Length)
+            input.GetArray(Of Byte)(cppData)
             Dim handleSrc = GCHandle.Alloc(cppData, GCHandleType.Pinned)
             Dim imagePtr = EdgeLineSimple_RunCPP(cPtr, handleSrc.AddrOfPinnedObject(), input.Rows, input.Cols, task.lineWidth * 2)
             handleSrc.Free()
@@ -218,7 +218,7 @@ Namespace VBClasses
             If src.Channels() <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
             Dim cppData(src.Total - 1) As Byte
-            Marshal.Copy(src.Data, cppData, 0, cppData.Length)
+            src.GetArray(Of Byte)(cppData)
             Dim handleSrc = GCHandle.Alloc(cppData, GCHandleType.Pinned)
             Dim imagePtr = EdgeLineRaw_RunCPP(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, task.lineWidth)
             handleSrc.Free()
@@ -263,11 +263,11 @@ Namespace VBClasses
             Dim input = If(src.Channels() = 1, src.Clone, task.grayStable.Clone)
 
             Dim cppData(input.Total - 1) As Byte
-            Marshal.Copy(input.Data, cppData, 0, cppData.Length)
+            input.GetArray(Of Byte)(cppData)
             Dim handleSrc = GCHandle.Alloc(cppData, GCHandleType.Pinned)
 
             Dim maskData(task.motionRGB.motionMask.Total - 1) As Byte
-            Marshal.Copy(task.motionRGB.motionMask.Data, maskData, 0, maskData.Length)
+            task.motionRGB.motionMask.GetArray(Of Byte)(maskData)
             Dim handleMask = GCHandle.Alloc(maskData, GCHandleType.Pinned)
 
             Dim imagePtr = EdgeLine_RunCPP(cPtr, handleSrc.AddrOfPinnedObject(), handleMask.AddrOfPinnedObject(), input.Rows, input.Cols,

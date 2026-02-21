@@ -1,4 +1,4 @@
-﻿Imports System.Runtime.InteropServices
+Imports System.Runtime.InteropServices
 Imports OpenCvSharp
 Imports cv = OpenCvSharp
 Namespace VBClasses
@@ -14,7 +14,7 @@ Namespace VBClasses
             Dim histogram As New cv.Mat
             cv.Cv2.CalcHist({input}, {0}, task.depthmask, histogram, 1, {256}, {New cv.Rangef(0, 256)})
             Dim histArray(255) As Single
-            Marshal.Copy(histogram.Data, histArray, 0, histArray.Length)
+            histogram.GetArray(Of Single)(histArray)
 
             Dim sizeThreshold = input.Total * 0.001 ' ignore regions less than 0.1% - 1/10th of 1%
             Dim lutArray(255) As Byte
@@ -132,7 +132,7 @@ Namespace VBClasses
             Dim histBins As Integer = 500
             cv.Cv2.CalcHist({redCart.prepData.reduced32f}, {0}, task.depthmask, histogram, 1, {histBins}, ranges)
             Dim histArray(histogram.Rows - 1) As Single
-            Marshal.Copy(histogram.Data, histArray, 0, histArray.Length)
+            histogram.GetArray(Of Single)(histArray)
             Dim incr = mm.range / histBins
 
             dst1.SetTo(0)
@@ -185,7 +185,7 @@ Namespace VBClasses
             labels(2) = prep.labels(2)
 
             Dim cppData(dst2.Total - 1) As Byte
-            Marshal.Copy(dst2.Data, cppData, 0, cppData.Length - 1)
+            dst2.GetArray(Of Byte)(cppData)
             Dim handleSrc = GCHandle.Alloc(cppData, GCHandleType.Pinned)
             Dim imagePtr = RedCart_CPP_RunCPP(cPtr, handleSrc.AddrOfPinnedObject(), dst2.Rows, dst2.Cols)
             handleSrc.Free()

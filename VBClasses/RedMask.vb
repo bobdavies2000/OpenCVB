@@ -13,7 +13,7 @@ Namespace VBClasses
             dst1 = Mat_Basics.srcMustBe8U(src)
 
             Dim inputData(dst1.Total - 1) As Byte
-            Marshal.Copy(dst1.Data, inputData, 0, inputData.Length)
+            dst1.GetArray(Of Byte)(inputData)
             Dim handleInput = GCHandle.Alloc(inputData, GCHandleType.Pinned)
 
             Dim imagePtr = RedMask_Run(cPtr, handleInput.AddrOfPinnedObject(), dst1.Rows, dst1.Cols,
@@ -28,6 +28,7 @@ Namespace VBClasses
             Dim rectData = cv.Mat.FromPixelData(classCount, 1, cv.MatType.CV_32SC4, RedMask_Rects(cPtr))
             Dim rects(classCount * 4) As Integer
             Marshal.Copy(rectData.Data, rects, 0, rects.Length)
+
             Dim rectlist As New List(Of cv.Rect)
             For i = 0 To rects.Count - 4 Step 4
                 rectlist.Add(New cv.Rect(rects(i), rects(i + 1), rects(i + 2), rects(i + 3)))

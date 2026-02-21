@@ -569,7 +569,7 @@ Namespace VBClasses
 
             If removeZeroEntry Then histogram.Set(Of Single)(0, 0, 0) ' let's not plot the values at zero...i.e. Depth at 0, for instance, needs to be removed.
             ReDim histArray(histogram.Rows - 1)
-            Marshal.Copy(histogram.Data, histArray, 0, histArray.Length)
+            histogram.GetArray(Of Single)(histArray)
 
             dst2.SetTo(backColor)
             barWidth = dst2.Width / histogram.Rows
@@ -577,21 +577,26 @@ Namespace VBClasses
 
             mm = GetMinMax(histogram)
 
-            If Math.Abs(mm.maxVal - mm.minVal) > 0 And histogram.Rows > 0 Then
-                Dim incr = 255 / histogram.Rows
-                For i = 0 To histArray.Count - 1
-                    If Single.IsNaN(histArray(i)) Then histArray(i) = 0
-                    If histArray(i) > 0 Then
-                        Dim h = histArray(i) * dst2.Height \ mm.maxVal
-                        Dim sIncr = (i Mod 256) * incr
-                        Dim color = New cv.Scalar(sIncr, sIncr, sIncr)
-                        If histogram.Rows > 255 Then color = cv.Scalar.Black
-                        cv.Cv2.Rectangle(dst2, New cv.Rect(i * barWidth, dst2.Height - h, Math.Max(1, barWidth), h), color, -1)
-                    End If
-                Next
-                If addLabels Then Plot_Basics.AddPlotScale(dst2, mm.minVal, mm.maxVal)
+            ' somewacky values for the stereolabs devices.
+            If mm.minVal > 100000000 And mm.maxVal < 100000000 Then
+                If Math.Abs(mm.maxVal - mm.minVal) > 0 And histogram.Rows > 0 Then
+                    Dim incr = 255 / histogram.Rows
+                    For i = 0 To histArray.Count - 1
+                        If Single.IsNaN(histArray(i)) Then histArray(i) = 0
+                        If histArray(i) > 0 Then
+                            Dim h As Single = histArray(i) * dst2.Height / mm.maxVal
+                            Dim sIncr = (i Mod 256) * incr
+                            Dim color = New cv.Scalar(sIncr, sIncr, sIncr)
+                            If histogram.Rows > 255 Then color = cv.Scalar.Black
+                            cv.Cv2.Rectangle(dst2, New cv.Rect(i * barWidth, dst2.Height - h,
+                                                               Math.Max(1, barWidth), h), color, -1)
+                        End If
+                    Next
+                    If addLabels Then Plot_Basics.AddPlotScale(dst2, mm.minVal, mm.maxVal)
+                End If
+                labels(2) = CStr(CInt(mm.maxVal)) + " max value " + CStr(CInt(mm.minVal)) + " min value"
             End If
-            labels(2) = CStr(CInt(mm.maxVal)) + " max value " + CStr(CInt(mm.minVal)) + " min value"
+
         End Sub
     End Class
 

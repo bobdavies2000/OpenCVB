@@ -194,11 +194,11 @@ Namespace VBClasses
     '  https://docs.opencvb.org/3.1.0/d0/da5/tutorial_ximgproc_prediction.html
     Public Class NR_Edge_RandomForest_CPP : Inherits TaskParent
         Implements IDisposable
-        Dim rgbData() As Byte
+        Dim rgbData() As cv.Vec3b
         Dim options As New Options_Edges2
         Public Sub New()
             desc = "Detect edges using structured forests - Opencv Contrib"
-            ReDim rgbData(dst2.Total * dst2.ElemSize - 1)
+            ReDim rgbData(dst2.Total - 1)
             labels(3) = "Thresholded Edge Mask (use slider to adjust)"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -217,7 +217,7 @@ Namespace VBClasses
                 cPtr = Edge_RandomForest_Open(modelInfo.FullName)
             End If
             If task.frameCount > 5 Then ' the first images are skipped so the message above can be displayed.
-                Marshal.Copy(src.Data, rgbData, 0, rgbData.Length)
+                src.GetArray(Of cv.Vec3b)(rgbData)
                 Dim handleRGB = GCHandle.Alloc(rgbData, GCHandleType.Pinned)
                 Dim imagePtr = Edge_RandomForest_Run(cPtr, handleRGB.AddrOfPinnedObject(), src.Rows, src.Cols)
                 handleRGB.Free()
@@ -557,7 +557,7 @@ Namespace VBClasses
             If src.Channels() <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
             Dim dataSrc(src.Total * src.ElemSize) As Byte
-            Marshal.Copy(src.Data, dataSrc, 0, dataSrc.Length)
+            src.GetArray(Of Byte)(dataSrc)
             Dim handleSrc = GCHandle.Alloc(dataSrc, GCHandleType.Pinned)
             Dim imagePtr = Edge_ColorGap_Run(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, distanceSlider.Value And 254, diff)
             handleSrc.Free()
@@ -1033,7 +1033,7 @@ Namespace VBClasses
             src = segments.dst1 ' the byte version of the segmented image.
 
             Dim cppData(src.Total * src.ElemSize - 1) As Byte
-            Marshal.Copy(src.Data, cppData, 0, cppData.Length - 1)
+            src.GetArray(Of Byte)(cppData)
             Dim handleSrc = GCHandle.Alloc(cppData, GCHandleType.Pinned)
             Dim imagePtr = Edge_DiffX_RunCPP(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, src.Channels)
             handleSrc.Free()
@@ -1063,7 +1063,7 @@ Namespace VBClasses
             src = segments.dst1 ' the byte version of the segmented image.
 
             Dim cppData(src.Total * src.ElemSize - 1) As Byte
-            Marshal.Copy(src.Data, cppData, 0, cppData.Length - 1)
+            src.GetArray(Of Byte)(cppData)
             Dim handleSrc = GCHandle.Alloc(cppData, GCHandleType.Pinned)
             Dim imagePtr = Edge_DiffY_RunCPP(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, src.Channels)
             handleSrc.Free()
@@ -1093,7 +1093,7 @@ Namespace VBClasses
             src = segments.dst1 ' the byte version of the segmented image.
 
             Dim cppData(src.Total * src.ElemSize - 1) As Byte
-            Marshal.Copy(src.Data, cppData, 0, cppData.Length - 1)
+            src.GetArray(Of Byte)(cppData)
             Dim handleSrc = GCHandle.Alloc(cppData, GCHandleType.Pinned)
             Dim imagePtr = Edge_DiffY_RunCPP(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, src.Channels)
             handleSrc.Free()
@@ -1229,8 +1229,8 @@ Namespace VBClasses
             options.Run()
             If src.Channels = 1 Then src = src.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
 
-            Dim dataSrc(src.Total * src.ElemSize - 1) As Byte
-            Marshal.Copy(src.Data, dataSrc, 0, dataSrc.Length)
+            Dim dataSrc(src.Total - 1) As cv.Vec3b
+            src.GetArray(Of cv.Vec3b)(dataSrc)
             Dim handleSrc = GCHandle.Alloc(dataSrc, GCHandleType.Pinned)
             Dim imagePtr = Edge_Deriche_Run(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, options.alpha, options.omega)
             handleSrc.Free()

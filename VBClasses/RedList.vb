@@ -214,7 +214,7 @@ Namespace VBClasses
             dst1 = Mat_Basics.srcMustBe8U(src)
 
             Dim inputData(dst1.Total - 1) As Byte
-            Marshal.Copy(dst1.Data, inputData, 0, inputData.Length)
+            dst1.GetArray(Of Byte)(inputData)
             Dim handleInput = GCHandle.Alloc(inputData, GCHandleType.Pinned)
 
             Dim imagePtr = RedMask_Run(cPtr, handleInput.AddrOfPinnedObject(), dst1.Rows, dst1.Cols, 0)

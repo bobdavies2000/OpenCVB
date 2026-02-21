@@ -19,12 +19,12 @@ Namespace VBClasses
             dst0 = histogram.Normalize(0, classCount, cv.NormTypes.MinMax) ' for the backprojection.
 
             Dim histArray(histogram.Total - 1) As Single
-            Marshal.Copy(histogram.Data, histArray, 0, histArray.Length)
+            histogram.GetArray(Of Single)(histArray)
 
             Dim peakValue = histArray.ToList.Max
 
             histogram = histogram.Normalize(0, 1, cv.NormTypes.MinMax)
-            Marshal.Copy(histogram.Data, histArray, 0, histArray.Length)
+            histogram.GetArray(Of Single)(histArray)
 
             cv.Cv2.CalcBackProject({hsv}, {0}, dst0, dst2, ranges)
 
@@ -602,6 +602,7 @@ Namespace VBClasses
 
             Dim cppData(img.Total * img.ElemSize - 1) As Byte
             Marshal.Copy(img.Data, cppData, 0, cppData.Length)
+
             Dim handleSrc = GCHandle.Alloc(cppData, GCHandleType.Pinned)
             Dim imagePtr = OEX_FitEllipse_RunCPP(cPtr, handleSrc.AddrOfPinnedObject(), img.Rows, img.Cols,
                                              options.threshold, options.fitType)

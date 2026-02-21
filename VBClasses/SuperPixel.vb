@@ -38,8 +38,8 @@ Namespace VBClasses
 
             Dim input = src
             If input.Channels() = 1 Then input = input.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-            Dim dataSrc(input.Total * input.ElemSize - 1) As Byte
-            Marshal.Copy(input.Data, dataSrc, 0, dataSrc.Length)
+            Dim dataSrc(input.Total - 1) As cv.Vec3b
+            input.GetArray(Of cv.Vec3b)(dataSrc)
             Dim handleSrc = GCHandle.Alloc(dataSrc, GCHandleType.Pinned)
             Dim imagePtr = SuperPixel_Run(cPtr, handleSrc.AddrOfPinnedObject())
             handleSrc.Free()

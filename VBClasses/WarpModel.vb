@@ -79,10 +79,10 @@ Namespace VBClasses
                 End If
             End If
 
-            Dim dataSrc(src.Total * src.ElemSize - 1) As Byte
-            Dim src2Data(src2.Total * src2.ElemSize - 1) As Byte
-            Marshal.Copy(src.Data, dataSrc, 0, dataSrc.Length)
-            Marshal.Copy(src2.Data, src2Data, 0, src2Data.Length)
+            Dim dataSrc(src.Total - 1) As Byte
+            Dim src2Data(src2.Total - 1) As Byte
+            src.GetArray(Of Byte)(dataSrc)
+            src2.GetArray(Of Byte)(src2Data)
             Dim handleSrc = GCHandle.Alloc(dataSrc, GCHandleType.Pinned)
             Dim handleSrc2 = GCHandle.Alloc(src2Data, GCHandleType.Pinned)
 

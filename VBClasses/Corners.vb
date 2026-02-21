@@ -164,7 +164,7 @@ Namespace VBClasses
 
             Dim data(task.gray.Total - 1) As Byte
             Dim handle = GCHandle.Alloc(data, GCHandleType.Pinned)
-            Marshal.Copy(task.gray.Data, data, 0, data.Length)
+            task.gray.GetArray(Of Byte)(data)
             Dim imagePtr = Corners_ShiTomasi(handle.AddrOfPinnedObject, src.Rows, src.Cols,
                                          options.blocksize, options.aperture)
             handle.Free()
@@ -259,7 +259,7 @@ Namespace VBClasses
             options.Run()
 
             Dim dataSrc(task.gray.Total - 1) As Byte
-            Marshal.Copy(task.gray.Data, dataSrc, 0, dataSrc.Length)
+            task.gray.GetArray(Of Byte)(dataSrc)
             Dim handleSrc = GCHandle.Alloc(dataSrc, GCHandleType.Pinned)
             Dim imagePtr = Harris_Features_Run(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, options.threshold,
                                            options.neighborhood, options.aperture, options.harrisParm)
@@ -296,7 +296,7 @@ Namespace VBClasses
             dst2 = src.Clone
 
             Dim dataSrc(task.gray.Total) As Byte
-            Marshal.Copy(task.gray.Data, dataSrc, 0, dataSrc.Length)
+            task.gray.GetArray(Of Byte)(dataSrc)
 
             Dim handleSrc = GCHandle.Alloc(dataSrc, GCHandleType.Pinned)
             Dim imagePtr = Harris_Detector_Run(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, options.quality)

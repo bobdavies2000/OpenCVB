@@ -1677,7 +1677,7 @@ Namespace VBClasses
             If lastList.Count > 0 Then
                 lpRectMap.SetTo(0, Not task.motionRGB.motionMask)
                 cv.Cv2.CalcHist({lpRectMap}, {0}, emptyMat, histogram, 1, {lastList.Count}, New cv.Rangef() {New cv.Rangef(0, lastList.Count)})
-                Marshal.Copy(histogram.Data, histarray, 0, histarray.Length)
+                histogram.GetArray(Of Single)(histarray)
 
                 For i = 1 To histarray.Count - 1
                     If histarray(i) = 0 Then lpList.Add(lastList(i))
@@ -1690,7 +1690,7 @@ Namespace VBClasses
             Dim tmp = lines.lpRectMap.Clone
             tmp.SetTo(0, Not task.motionRGB.motionMask)
             cv.Cv2.CalcHist({tmp}, {0}, emptyMat, histogram, 1, {lines.lpList.Count}, New cv.Rangef() {New cv.Rangef(0, lines.lpList.Count)})
-            Marshal.Copy(histogram.Data, histarray, 0, histarray.Length)
+            histogram.GetArray(Of Single)(histarray)
 
             For i = 1 To histarray.Count - 1
                 If histarray(i) > 0 Then lpList.Add(lines.lpList(i))
@@ -2376,7 +2376,7 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             If task.firstPass Then ReDim depthBytes(task.pcSplit(2).Total * task.pcSplit(2).ElemSize - 1)
 
-            Marshal.Copy(task.pcSplit(2).Data, depthBytes, 0, depthBytes.Length)
+            task.pcSplit(2).GetArray(Of Byte)(depthBytes)
             Dim handleDepth = GCHandle.Alloc(depthBytes, GCHandleType.Pinned)
 
             Dim imagePtr = SimpleProjectionRun(cPtr, handleDepth.AddrOfPinnedObject, 0, task.MaxZmeters, task.pcSplit(2).Height, task.pcSplit(2).Width)
@@ -4261,7 +4261,7 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             If task.drawRect <> New cv.Rect Then src = src(task.drawRect)
             Dim cppData(src.Total * src.ElemSize - 1) As Byte
-            Marshal.Copy(src.Data, cppData, 0, cppData.Length)
+            src.GetArray(Of Byte)(cppData)
             Dim handleSrc = GCHandle.Alloc(cppData, GCHandleType.Pinned)
             Dim classCount = Pixels_Vector_RunCPP(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols)
             handleSrc.Free()
@@ -4779,7 +4779,7 @@ Namespace VBClasses
 
                 cv.Cv2.CalcHist({dst1}, {0}, task.motionRGB.motionMask, histogram, 1, {lpList.Count}, New cv.Rangef() {New cv.Rangef(0, lpList.Count)})
 
-                Marshal.Copy(histogram.Data, histarray, 0, histarray.Length)
+                histogram.GetArray(Of Single)(histarray)
             End If
 
             Return histarray
@@ -5251,7 +5251,7 @@ Namespace VBClasses
             cv.Cv2.CalcHist({dst0}, channels, task.depthmask, histogram, 1, {task.histogramBins}, ranges)
 
             Dim histArray(histogram.Total - 1) As Single
-            Marshal.Copy(histogram.Data, histArray, 0, histArray.Length)
+            histogram.GetArray(Of Single)(histArray)
 
             For i = 0 To histArray.Count - 1
                 histArray(i) = i
@@ -5372,7 +5372,7 @@ Namespace VBClasses
                 cv.Cv2.CalcHist({task.redList.rcMap(gr.rect)}, {0}, emptyMat, histogram, 1, {task.redList.oldrclist.Count},
                              New cv.Rangef() {New cv.Rangef(1, task.redList.oldrclist.Count)})
 
-                Marshal.Copy(histogram.Data, histarray, 0, histarray.Length)
+                histogram.GetArray(Of Single)(histarray)
                 ' if multiple lines intersect a grid rect, choose the largest redcloud cell containing them.
                 ' The largest will be the index of the first non-zero histogram entry.
                 For j = 1 To histarray.Count - 1
@@ -7938,7 +7938,7 @@ Namespace VBClasses
                                  New cv.Rangef() {New cv.Rangef(1, lplist.Count)})
 
                     Dim histArray(histogram.Total - 1) As Single
-                    Marshal.Copy(histogram.Data, histArray, 0, histArray.Length)
+                    histogram.GetArray(Of Single)(histArray)
 
                     Dim histList = histArray.ToList
                     ' pick the lp that has the most pixels in the lp.rect.
@@ -9579,7 +9579,7 @@ Namespace VBClasses
             points = dst3.FindNonZero()
 
             Dim ptArray(points.Total - 1) As Integer
-            Marshal.Copy(points.Data, ptArray, 0, ptArray.Length)
+            points.GetArray(Of Integer)(ptArray)
 
             Dim ptList As New List(Of cv.Point)
             Dim indexMid As Integer = -1
@@ -9770,7 +9770,7 @@ Namespace VBClasses
                 cv.Cv2.CalcHist({dst0}, {0}, task.depthMask, histogram, 1, {task.histogramBins}, ranges)
 
                 Dim histArray(histogram.Total - 1) As Single
-                Marshal.Copy(histogram.Data, histArray, 0, histArray.Length)
+                histogram.GetArray(Of Single)(histArray)
 
                 For j = 0 To histArray.Count - 1
                     histArray(j) = j
@@ -10638,7 +10638,7 @@ Namespace VBClasses
             dst1 = Mat_Basics.srcMustBe8U(src)
 
             Dim inputData(dst1.Total - 1) As Byte
-            Marshal.Copy(dst1.Data, inputData, 0, inputData.Length)
+            dst1.GetArray(Of Byte)(inputData)
             Dim handleInput = GCHandle.Alloc(inputData, GCHandleType.Pinned)
 
             Dim imagePtr = RedCloud_Run(cPtr, handleInput.AddrOfPinnedObject(), dst1.Rows, dst1.Cols)
@@ -10651,7 +10651,7 @@ Namespace VBClasses
             Dim rectData = cv.Mat.FromPixelData(classCount, 1, cv.MatType.CV_32SC4, RedCloud_Rects(cPtr))
 
             Dim rects(classCount * 4) As Integer
-            Marshal.Copy(rectData.Data, rects, 0, rects.Length)
+            rectData.GetArray(Of Integer)(rects)
 
             rectList.Clear()
             For i = 0 To classCount * 4 - 4 Step 4
@@ -11083,7 +11083,7 @@ Namespace VBClasses
             Dim usedList As New List(Of Integer)
             For Each md In mdList
                 cv.Cv2.CalcHist({task.redList.rcMap(md.rect)}, {0}, md.mask, histogram, 1, {255}, ranges)
-                Marshal.Copy(histogram.Data, histArray, 0, histArray.Length)
+                histogram.GetArray(Of Single)(histArray)
                 Dim index = oldrclist.Count
                 Dim c = dst1.Get(Of cv.Vec3b)(md.maxDist.Y, md.maxDist.X)
                 Dim color = New cv.Scalar(c(0), c(1), c(2))
@@ -11180,7 +11180,7 @@ Namespace VBClasses
             Dim histArray(mdList.Count - 1) As Single
             For Each rc In task.redList.oldrclist
                 cv.Cv2.CalcHist({dst1(rc.rect)}, {0}, rc.mask, histogram, 1, {255}, ranges)
-                Marshal.Copy(histogram.Data, histArray, 0, histArray.Length)
+                histogram.GetArray(Of Single)(histArray)
                 Dim index = histArray.ToList.IndexOf(histArray.Max)
                 Dim md = mdList(index)
                 rc.color = task.scalarColors(md.index)
@@ -11631,7 +11631,7 @@ Namespace VBClasses
 
             Dim imagePtr As IntPtr
             Dim inputData(dst1.Total - 1) As Byte
-            Marshal.Copy(dst1.Data, inputData, 0, inputData.Length)
+            dst1.GetArray(Of Byte)(inputData)
             Dim handleInput = GCHandle.Alloc(inputData, GCHandleType.Pinned)
 
             imagePtr = RedCloud_Run(cPtr, handleInput.AddrOfPinnedObject(), dst1.Rows, dst1.Cols)
@@ -11647,7 +11647,7 @@ Namespace VBClasses
             Dim rectData = cv.Mat.FromPixelData(classCount, 1, cv.MatType.CV_32SC4, RedCloud_Rects(cPtr))
 
             Dim rects(classCount * 4) As Integer
-            Marshal.Copy(rectData.Data, rects, 0, rects.Length)
+            rectData.GetArray(Of Integer)(rects)
 
             Dim minPixels = dst2.Total * 0.001
             RectList.Clear()
@@ -12248,7 +12248,7 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             Dim dataSrc(src.Total * src.ElemSize - 1) As Byte
-            Marshal.Copy(src.Data, dataSrc, 0, dataSrc.Length)
+            src.GetArray(Of Byte)(dataSrc)
             Dim handleSrc = GCHandle.Alloc(dataSrc, GCHandleType.Pinned)
             Dim imagePtr = BGSubtract_BGFG_Run(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, src.Channels, learnRate)
             handleSrc.Free()
@@ -12350,7 +12350,7 @@ Namespace VBClasses
             cv.Cv2.CalcHist({dst1}, {0}, New cv.Mat, histogram, 1, {task.histogramBins}, ranges)
 
             Dim histArray(histogram.Rows - 1) As Single
-            Marshal.Copy(histogram.Data, histArray, 0, histArray.Length)
+            histogram.GetArray(Of Single)(histArray)
 
             Dim pcUsed As New List(Of Integer)
             If task.heartBeat Then dst3 = dst2.Clone
@@ -12380,7 +12380,7 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             Dim inputData(src.Total - 1) As Byte
-            Marshal.Copy(src.Data, inputData, 0, inputData.Length)
+            src.GetArray(Of Byte)(inputData)
             Dim handleInput = GCHandle.Alloc(inputData, GCHandleType.Pinned)
 
             Dim imagePtr = RedCloud_Run(cPtr, handleInput.AddrOfPinnedObject(), dst1.Rows, dst1.Cols)
@@ -12393,7 +12393,7 @@ Namespace VBClasses
             Dim rectData = cv.Mat.FromPixelData(classCount, 1, cv.MatType.CV_32SC4, RedCloud_Rects(cPtr))
 
             Dim rects(classCount * 4) As Integer
-            Marshal.Copy(rectData.Data, rects, 0, rects.Length)
+            rectData.GetArray(Of Integer)(rects)
 
             rectList.Clear()
             For i = 0 To classCount * 4 - 4 Step 4
@@ -12762,7 +12762,7 @@ Namespace VBClasses
             If src.Type <> cv.MatType.CV_32F Then src = task.pcSplit(2)
 
             Dim cppData(src.Total * src.ElemSize - 1) As Byte
-            Marshal.Copy(src.Data, cppData, 0, cppData.Length)
+            src.GetArray(Of Byte)(cppData)
             Dim handleSrc = GCHandle.Alloc(cppData, GCHandleType.Pinned)
             Dim imagePtr = Density_2D_RunCPP(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols)
             handleSrc.Free()
@@ -12809,7 +12809,7 @@ Namespace VBClasses
             If src.Type <> cv.MatType.CV_32F Then src = task.pcSplit(2)
 
             Dim cppData(src.Total * src.ElemSize - 1) As Byte
-            Marshal.Copy(src.Data, cppData, 0, cppData.Length)
+            src.GetArray(Of Byte)(cppData)
             Dim handleSrc = GCHandle.Alloc(cppData, GCHandleType.Pinned)
             Dim imagePtr = Density_Count_RunCPP(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols)
             handleSrc.Free()
@@ -12907,7 +12907,7 @@ Namespace VBClasses
             If src.Channels() <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
             Dim cppData(src.Total - 1) As Byte
-            Marshal.Copy(src.Data, cppData, 0, cppData.Length)
+            src.GetArray(Of Byte)(cppData)
             Dim handleSrc = GCHandle.Alloc(cppData, GCHandleType.Pinned)
             Dim imageEdgeWidth = 2
             Dim imagePtr = EdgeLineRaw_RunCPP(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, imageEdgeWidth)
@@ -12923,7 +12923,7 @@ Namespace VBClasses
             classCount = EdgeLineRaw_GetSegCount(cPtr)
             If classCount = 0 Then Exit Sub ' nothing to work with....
             Dim rects(classCount * 4) As Integer
-            Marshal.Copy(rectData.Data, rects, 0, rects.Length)
+            rectData.GetArray(Of Integer)(rects)
 
             rectList.Clear()
             For i = 0 To classCount * 4 - 4 Step 4
@@ -12972,7 +12972,7 @@ Namespace VBClasses
             If src.Channels <> 1 Then src = task.grayStable
 
             Dim cppData(src.Total - 1) As Byte
-            Marshal.Copy(src.Data, cppData, 0, cppData.Length)
+            src.GetArray(Of Byte)(cppData)
             Dim handlesrc = GCHandle.Alloc(cppData, GCHandleType.Pinned)
             Dim imagePtr = EdgeLineRaw_RunCPP(cPtr, handlesrc.AddrOfPinnedObject(), src.Rows, src.Cols,
                                           task.lineWidth)
@@ -12989,7 +12989,7 @@ Namespace VBClasses
             classCount = EdgeLineRaw_GetSegCount(cPtr)
             If classCount = 0 Then Exit Sub ' nothing to work with....
             Dim rects(classCount * 4) As Integer
-            Marshal.Copy(rectData.Data, rects, 0, rects.Length)
+            rectData.GetArray(Of Integer)(rects)
 
             Dim rectList As New List(Of cv.Rect)
             rectList.Clear()
@@ -13869,7 +13869,7 @@ Namespace VBClasses
 
             Dim imagePtr As IntPtr
             Dim inputData(dst1.Total - 1) As Byte
-            Marshal.Copy(dst1.Data, inputData, 0, inputData.Length)
+            dst1.GetArray(Of Byte)(inputData)
             Dim handleInput = GCHandle.Alloc(inputData, GCHandleType.Pinned)
 
             imagePtr = RedCloud_Run(cPtr, handleInput.AddrOfPinnedObject(), dst1.Rows, dst1.Cols)
@@ -13885,7 +13885,7 @@ Namespace VBClasses
             Dim rectData = cv.Mat.FromPixelData(classCount, 1, cv.MatType.CV_32SC4, RedCloud_Rects(cPtr))
 
             Dim rects(classCount * 4) As Integer
-            Marshal.Copy(rectData.Data, rects, 0, rects.Length)
+            rectData.GetArray(Of Integer)(rects)
 
             Dim minPixels = dst2.Total * 0.001
             RectList.Clear()
@@ -14425,7 +14425,7 @@ Namespace VBClasses
                             New cv.Rangef() {New cv.Rangef(0, task.lines.lpList.Count)})
 
                 Dim histArray(histogram.Total - 1) As Single
-                Marshal.Copy(histogram.Data, histArray, 0, histArray.Length)
+                histogram.GetArray(Of Single)(histArray)
 
                 Dim distances As New List(Of Single)
                 Dim indexLast As New List(Of Integer)
@@ -14593,7 +14593,7 @@ Namespace VBClasses
                             New cv.Rangef() {New cv.Rangef(0, task.lines.lpList.Count)})
 
                 Dim histArray(histogram.Total - 1) As Single
-                Marshal.Copy(histogram.Data, histArray, 0, histArray.Length)
+                histogram.GetArray(Of Single)(histArray)
 
                 knn.trainInput.Clear()
                 knn.queries.Clear()
@@ -14976,7 +14976,7 @@ Namespace VBClasses
                                  New cv.Rangef() {New cv.Rangef(1, lplist.Count)})
 
                     Dim histArray(histogram.Total - 1) As Single
-                    Marshal.Copy(histogram.Data, histArray, 0, histArray.Length)
+                    histogram.GetArray(Of Single)(histArray)
 
                     Dim histList = histArray.ToList
                     ' pick the lp that has the most pixels in the lp.rect.
@@ -15886,7 +15886,7 @@ Namespace VBClasses
             If src.Channels() <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
             Dim cppData(src.Total - 1) As Byte
-            Marshal.Copy(src.Data, cppData, 0, cppData.Length)
+            src.GetArray(Of Byte)(cppData)
             Dim handleSrc = GCHandle.Alloc(cppData, GCHandleType.Pinned)
             Dim imagePtr = EdgeLine_Image_RunCPP(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, task.lineWidth)
             handleSrc.Free()
@@ -16083,7 +16083,7 @@ Namespace VBClasses
             dst2 = runRedList(src, labels(2))
 
             Dim cppData(task.redList.rcMap.Total - 1) As Byte
-            Marshal.Copy(task.redList.rcMap.Data, cppData, 0, cppData.Length)
+            task.redList.rcMap.GetArray(Of Byte)(cppData)
             Dim handleSrc = GCHandle.Alloc(cppData, GCHandleType.Pinned)
             Dim imagePtr = RedList_FindBricks_RunCPP(cPtr, handleSrc.AddrOfPinnedObject(), dst1.Rows, dst1.Cols)
             handleSrc.Free()

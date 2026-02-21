@@ -44,7 +44,7 @@ Namespace VBClasses
             End If
 
             ReDim histArray(histogram.Total - 1)
-            Marshal.Copy(histogram.Data, histArray, 0, histArray.Length)
+            histogram.GetArray(Of Single)(histArray)
 
             If task.heartBeatLT Then
                 strOut = "Distance" + vbTab + "Value" + vbTab + "Count" + vbTab + "min val: " +
@@ -970,8 +970,8 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             If src.Channels() <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
-            Dim cppData(src.Total * src.ElemSize - 1) As Byte
-            Marshal.Copy(src.Data, cppData, 0, cppData.Length - 1)
+            Dim cppData(src.Total - 1) As cv.Vec3b
+            src.GetArray(Of cv.Vec3b)(cppData)
             Dim handleSrc = GCHandle.Alloc(cppData, GCHandleType.Pinned)
             Dim imagePtr = Histogram_1D_RunCPP(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, task.histogramBins)
             handleSrc.Free()
@@ -1005,8 +1005,8 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             If src.Channels() <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
-            Dim cppData(src.Total * src.ElemSize - 1) As Byte
-            Marshal.Copy(src.Data, cppData, 0, cppData.Length - 1)
+            Dim cppData(src.Total - 1) As cv.Vec3b
+            src.GetArray(Of cv.Vec3b)(cppData)
             Dim handleSrc = GCHandle.Alloc(cppData, GCHandleType.Pinned)
             Dim imagePtr = Histogram_1D_RunCPP(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, task.histogramBins)
             handleSrc.Free()
@@ -1161,7 +1161,7 @@ Namespace VBClasses
 
             cv.Cv2.CalcHist({task.pcSplit(2)}, {0}, inputOnlyMask, histogram, 1, {task.histogramBins}, ranges)
             ReDim histArray(histogram.Total - 1)
-            Marshal.Copy(histogram.Data, histArray, 0, histArray.Length)
+            histogram.GetArray(Of Single)(histArray)
 
             If standaloneTest() Then
                 plotHist.Run(histogram)
@@ -1273,7 +1273,7 @@ Namespace VBClasses
             If mm.maxVal > 0 Then
                 cv.Cv2.CalcHist({src}, {0}, mask, histogram, 1, {mm.maxVal + 1}, New cv.Rangef() {New cv.Rangef(0, mm.maxVal + 1)})
                 If histogram.Rows > 0 Then
-                    Marshal.Copy(histogram.Data, histarray, 0, histarray.Length)
+                    histogram.GetArray(Of Single)(histarray)
                 End If
             End If
             If standalone And histarray.Count > 1 Then
@@ -1429,7 +1429,7 @@ Namespace VBClasses
 
                     histogram = hcloud.histogram
                     Dim histData(histogram.Total - 1) As Single
-                    Marshal.Copy(histogram.Data, histData, 0, histData.Length)
+                    histogram.GetArray(Of Single)(histData)
 
                     If histData.Count > 255 And task.histogramBins > 3 Then
                         task.histogramBins -= 1
@@ -1459,7 +1459,7 @@ Namespace VBClasses
             dst3 = PaletteFull(dst2)
 
             Dim histArray(histogram.Total - 1) As Single
-            Marshal.Copy(histogram.Data, histArray, 0, histArray.Length)
+            histogram.GetArray(Of Single)(histArray)
         End Sub
     End Class
 

@@ -25,7 +25,7 @@ Namespace VBClasses
             If dst0.Channels() <> 1 Then dst0 = dst0.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
             Dim dataSrc(dst0.Total) As Byte
-            Marshal.Copy(dst0.Data, dataSrc, 0, dataSrc.Length)
+            dst0.GetArray(Of Byte)(dataSrc)
             Dim handleSrc = GCHandle.Alloc(dataSrc, GCHandleType.Pinned)
             Dim imagePtr = Fuzzy_Run(cPtr, handleSrc.AddrOfPinnedObject(), dst0.Rows, dst0.Cols)
             handleSrc.Free()

@@ -306,7 +306,7 @@ Namespace VBClasses
                 Dim rowCol As cv.Mat = task.pcSplit(0).Row(y)
 
                 Dim dataY(rowCol.Total - 1) As Single
-                Marshal.Copy(rowCol.Data, dataY, 0, dataY.Length)
+                rowCol.GetArray(Of Single)(dataY)
                 Dim inputY As New List(Of Double)
                 For Each ele In dataY
                     inputY.Add(CDbl(ele))
@@ -354,7 +354,7 @@ Namespace VBClasses
                 rowCol = cv.Mat.FromPixelData(1, rowCol.Rows, cv.MatType.CV_32FC1, rowCol.Data)
 
                 Dim dataY(rowCol.Total - 1) As Single
-                Marshal.Copy(rowCol.Data, dataY, 0, dataY.Length)
+                rowCol.GetArray(Of Single)(dataY)
                 Dim inputY As New List(Of Double)
                 For Each ele In dataY
                     inputY.Add(CDbl(ele))

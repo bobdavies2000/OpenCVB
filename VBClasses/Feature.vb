@@ -121,8 +121,8 @@ Namespace VBClasses
                 Case "AGAST"
                     If cPtr = 0 Then cPtr = Agast_Open()
                     src = task.color.Clone
-                    Dim dataSrc(src.Total * src.ElemSize - 1) As Byte
-                    Marshal.Copy(src.Data, dataSrc, 0, dataSrc.Length)
+                    Dim dataSrc(src.Total - 1) As cv.Vec3b
+                    src.GetArray(Of cv.Vec3b)(dataSrc)
 
                     Dim handleSrc = GCHandle.Alloc(dataSrc, GCHandleType.Pinned)
                     Dim imagePtr = Agast_Run(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, options.agastThreshold)

@@ -1,4 +1,4 @@
-﻿Imports System.Runtime.InteropServices
+Imports System.Runtime.InteropServices
 Imports cv = OpenCvSharp
 ' https://docs.opencvb.org/3.4/dc/df6/tutorial_py_Histogram_backprojection.html
 Namespace VBClasses
@@ -707,7 +707,7 @@ Namespace VBClasses
             Next
 
             Dim histArray(plotHist.histogram.Rows - 1) As Single
-            Marshal.Copy(plotHist.histogram.Data, histArray, 0, histArray.Length)
+            plotHist.histogram.GetArray(Of Single)(histArray)
 
             cv.Cv2.CalcBackProject({src}, {0}, plotHist.histogram, dst2, plotHist.ranges)
             dst2.ConvertTo(dst2, cv.MatType.CV_8U)

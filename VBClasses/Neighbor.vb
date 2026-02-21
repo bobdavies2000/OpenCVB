@@ -66,7 +66,7 @@ Namespace VBClasses
             End If
 
             Dim samples(src.Total - 1) As Integer
-            Marshal.Copy(src.Data, samples, 0, samples.Length)
+            src.GetArray(Of Integer)(samples)
 
             Dim w = dst2.Width
             nPoints.Clear()
@@ -153,7 +153,7 @@ Namespace VBClasses
             End If
 
             Dim mapData(src.Total - 1) As Integer
-            Marshal.Copy(src.Data, mapData, 0, mapData.Length)
+            src.GetArray(Of Integer)(mapData)
             Dim handleSrc = GCHandle.Alloc(mapData, GCHandleType.Pinned)
             Dim nabCount = Neighbor_RunCPP(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols)
             handleSrc.Free()

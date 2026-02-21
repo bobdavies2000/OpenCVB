@@ -65,7 +65,7 @@ Namespace VBClasses
 
             Dim tmp32f As New cv.Mat
             dst2.ConvertTo(tmp32f, cv.MatType.CV_32F)
-            Marshal.Copy(tmp32f.Data, task.kalman.kInput, 0, task.kalman.kInput.Length)
+            tmp32f.GetArray(Of Single)(task.kalman.kInput)
             task.kalman.Run(emptyMat)
 
             Dim results(task.kalman.kInput.Length - 1) As Byte

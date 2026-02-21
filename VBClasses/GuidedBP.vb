@@ -188,7 +188,7 @@ Namespace VBClasses
             hist.Run(src)
 
             Dim histArray(hist.histogram.Total - 1) As Single
-            Marshal.Copy(hist.histogram.Data, histArray, 0, histArray.Length)
+            hist.histogram.GetArray(Of Single)(histArray)
 
             Dim histList = histArray.ToList
             histArray(histList.IndexOf(histList.Max)) = 0

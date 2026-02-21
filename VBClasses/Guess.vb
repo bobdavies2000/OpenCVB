@@ -11,8 +11,8 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             If src.Type <> cv.MatType.CV_32FC3 Then src = task.pointCloud
 
-            Dim cppData(src.Total * src.ElemSize - 1) As Byte
-            Marshal.Copy(src.Data, cppData, 0, cppData.Length)
+            Dim cppData(src.Total - 1) As cv.Vec3f
+            src.GetArray(Of cv.Vec3f)(cppData)
             Dim handleSrc = GCHandle.Alloc(cppData, GCHandleType.Pinned)
             Dim imagePtr = Guess_Depth_RunCPP(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols)
             handleSrc.Free()
@@ -45,8 +45,8 @@ Namespace VBClasses
 
             If src.Type <> cv.MatType.CV_32FC3 Then src = task.pointCloud
 
-            Dim cppData(src.Total * src.ElemSize - 1) As Byte
-            Marshal.Copy(src.Data, cppData, 0, cppData.Length)
+            Dim cppData(src.Total - 1) As cv.Vec3f
+            src.GetArray(Of cv.Vec3f)(cppData)
             Dim handleSrc = GCHandle.Alloc(cppData, GCHandleType.Pinned)
             Dim imagePtr = Guess_ImageEdges_RunCPP(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, distSlider.value)
             handleSrc.Free()

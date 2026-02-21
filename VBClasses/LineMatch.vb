@@ -145,7 +145,6 @@ Namespace VBClasses
 
 
 
-
     Public Class LineMatch_Slices : Inherits TaskParent
         Public xSlices As New List(Of List(Of Byte))
         Public ySlices As New List(Of List(Of Byte))
@@ -189,6 +188,7 @@ Namespace VBClasses
             lpMapLast = task.lines.dst1.Clone
         End Sub
     End Class
+
 
 
 

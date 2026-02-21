@@ -319,8 +319,8 @@ Namespace VBClasses
             desc = "Generate random patterns for use with 'Random Pattern Calibration'"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            Dim dataSrc(src.Total * src.ElemSize - 1) As Byte
-            Marshal.Copy(src.Data, dataSrc, 0, dataSrc.Length)
+            Dim dataSrc(src.Total - 1) As cv.Vec3b
+            src.GetArray(Of cv.Vec3b)(dataSrc)
             Dim imagePtr = Random_PatternGenerator_Run(cPtr, src.Rows, src.Cols)
             dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, cv.MatType.CV_8UC1, imagePtr).Clone
         End Sub

@@ -53,7 +53,7 @@ Namespace VBClasses
             End If
 
             Dim dataSrc(src.Total) As Byte
-            Marshal.Copy(src.Data, dataSrc, 0, dataSrc.Length)
+            src.GetArray(Of Byte)(dataSrc)
             Dim handleSrc = GCHandle.Alloc(dataSrc, GCHandleType.Pinned)
             Dim r = inputRect
             If r.Width = 0 Or r.Height = 0 Then r = task.drawRect
