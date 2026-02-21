@@ -337,18 +337,18 @@ Namespace MainApp
             Dim ratioY = pic.Height / settings.workRes.Height
 
             Dim brush As New SolidBrush(Color.White)
-            If testAllRunning Then
-                Dim pt = New cv.Point(10, 5)
-                g.DrawString("Text markups are removed during testing to reduce GDI objects.", windowsFont, brush,
-                              CSng(pt.X * ratioX), CSng(pt.Y * ratioY))
-            Else
-                For Each tt In vbc.task.trueData
-                    If tt.text Is Nothing Then Continue For
-                    If tt.text.Length > 0 And tt.picTag = pic.Tag Then
-                        g.DrawString(tt.text, windowsFont, brush, CSng(tt.pt.X * ratioX), CSng(tt.pt.Y * ratioY))
-                    End If
-                Next
-            End If
+            'If testAllRunning Then
+            '    Dim pt = New cv.Point(10, 5)
+            '    g.DrawString("Text markups are removed during testing to reduce GDI objects.", windowsFont, brush,
+            '                  CSng(pt.X * ratioX), CSng(pt.Y * ratioY))
+            'Else
+            For Each tt In vbc.task.trueData
+                If tt.text Is Nothing Then Continue For
+                If tt.text.Length > 0 And tt.picTag = pic.Tag Then
+                    g.DrawString(tt.text, windowsFont, brush, CSng(tt.pt.X * ratioX), CSng(tt.pt.Y * ratioY))
+                End If
+            Next
+            'End If
             brush.Dispose()
 
             Dim timeEnd As DateTime = Now

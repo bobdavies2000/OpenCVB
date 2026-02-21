@@ -198,8 +198,8 @@ Namespace VBClasses
 
             Dim mm As mmData = GetMinMax(src, task.depthMask)
 
-            Dim cppData(src.Total - 1) As cv.Vec3b
-            src.GetArray(Of cv.Vec3b)(cppData)
+            Dim cppData(src.Total - 1) As Single
+            src.GetArray(Of Single)(cppData)
             Dim handleSrc = GCHandle.Alloc(cppData, GCHandleType.Pinned)
             Dim imagePtr = Kmeans_Simple_RunCPP(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, CSng(mm.minVal), task.MaxZmeters)
             handleSrc.Free()

@@ -644,6 +644,7 @@ Namespace VBClasses
 
 
 
+
     Public Class MSER_CPP : Inherits TaskParent
         Implements IDisposable
         Dim options As New Options_MSER
@@ -652,7 +653,7 @@ Namespace VBClasses
         Public maskCounts As New List(Of Integer)
         Public classcount As Integer
         Public Sub New()
-            OptionParent.findCheckBox("Use grayscale input").Checked = False
+            OptionParent.FindCheckBox("Use grayscale input").Checked = False
             options.Run()
             cPtr = MSER_Open(options.delta, options.minArea, options.maxArea, options.maxVariation, options.minDiversity,
                          options.maxEvolution, options.areaThreshold, options.minMargin, options.edgeBlurSize, options.pass2Setting)
@@ -667,8 +668,8 @@ Namespace VBClasses
             End If
 
             If options.graySetting And src.Channels() = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-            Dim cppData(src.Total - 1) As Byte
-            src.GetArray(Of Byte)(cppData)
+            Dim cppData(src.Total * src.ElemSize - 1) As Byte
+            Marshal.Copy(src.Data, cppData, 0, cppData.Length)
             Dim handleSrc = GCHandle.Alloc(cppData, GCHandleType.Pinned)
             Dim imagePtr = MSER_RunCPP(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, src.Channels)
             handleSrc.Free()

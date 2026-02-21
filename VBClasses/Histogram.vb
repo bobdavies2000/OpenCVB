@@ -970,8 +970,8 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             If src.Channels() <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
-            Dim cppData(src.Total - 1) As cv.Vec3b
-            src.GetArray(Of cv.Vec3b)(cppData)
+            Dim cppData(src.Total - 1) As Byte
+            src.GetArray(Of Byte)(cppData)
             Dim handleSrc = GCHandle.Alloc(cppData, GCHandleType.Pinned)
             Dim imagePtr = Histogram_1D_RunCPP(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, task.histogramBins)
             handleSrc.Free()
@@ -1005,8 +1005,8 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             If src.Channels() <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
-            Dim cppData(src.Total - 1) As cv.Vec3b
-            src.GetArray(Of cv.Vec3b)(cppData)
+            Dim cppData(src.Total - 1) As Byte
+            src.GetArray(Of Byte)(cppData)
             Dim handleSrc = GCHandle.Alloc(cppData, GCHandleType.Pinned)
             Dim imagePtr = Histogram_1D_RunCPP(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, task.histogramBins)
             handleSrc.Free()

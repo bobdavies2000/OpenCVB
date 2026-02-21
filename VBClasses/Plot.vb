@@ -578,7 +578,7 @@ Namespace VBClasses
             mm = GetMinMax(histogram)
 
             ' somewacky values for the stereolabs devices.
-            If mm.minVal > 100000000 And mm.maxVal < 100000000 Then
+            If mm.minVal > -100000000 And mm.maxVal < 100000000 Then
                 If Math.Abs(mm.maxVal - mm.minVal) > 0 And histogram.Rows > 0 Then
                     Dim incr = 255 / histogram.Rows
                     For i = 0 To histArray.Count - 1
