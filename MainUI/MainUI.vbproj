@@ -4,6 +4,10 @@
 <EnableMyApplicationFramework>false</EnableMyApplicationFramework>
     <OutputType>WinExe</OutputType>
     <TargetFramework>net8.0-windows7.0</TargetFramework>
+    <!-- OpenCvSharp4.WpfExtensions (transitive from OpenCvSharp4.Windows) has no net8.0 assets; NU1701 suppressed -->
+    <NoWarn>$(NoWarn);NU1701</NoWarn>
+    <!-- System.CodeDom 11 preview warns about net8.0-windows; suppress to keep current TFM -->
+    <SuppressTfmSupportBuildWarnings>true</SuppressTfmSupportBuildWarnings>
     <RuntimeIdentifier>win-x64</RuntimeIdentifier>
     <UseWindowsForms>true</UseWindowsForms>
     <MyType>console</MyType>

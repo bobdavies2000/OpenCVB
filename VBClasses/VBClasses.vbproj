@@ -2,7 +2,11 @@
 
   <PropertyGroup>
     <RootNamespace></RootNamespace>
-    <TargetFramework>net8.0-windows7.0</TargetFramework>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <!-- OpenCvSharp4.WpfExtensions (transitive from OpenCvSharp4.Windows) has no net8.0 assets; NU1701 suppressed -->
+    <NoWarn>$(NoWarn);NU1701</NoWarn>
+    <!-- System.CodeDom 11 preview warns about net8.0-windows; suppress to keep current TFM -->
+    <SuppressTfmSupportBuildWarnings>true</SuppressTfmSupportBuildWarnings>
     <UseWindowsForms>true</UseWindowsForms>
 	  <ImplicitUsings>enable</ImplicitUsings>
 	  <Nullable>enable</Nullable>
@@ -48,7 +52,7 @@
   </ItemGroup>
 
   <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
-    <Exec Command="&quot;$(SolutionDir)UI_Generator\bin\x64\Release\net10.0\UI_Generator.exe&quot;" />
+    <Exec Command="&quot;$(SolutionDir)UI_Generator\bin\x64\Release\net8.0\UI_Generator.exe&quot;" />
   </Target>
 
 </Project>

@@ -1,4 +1,4 @@
-﻿using sl;
+using sl;
 using System.Drawing;
 using Cv = OpenCvSharp;
 
@@ -43,6 +43,25 @@ public class CamZed
 
     private static sl.RuntimeParameters RuntimeParameters = new sl.RuntimeParameters();
     private static ulong IMU_StartTime = 0; // Use ulong for timestamps
+
+    /// <summary>Returns true if a ZED 2/2i (or compatible) camera is present. Used by MainUI for device enumeration.</summary>
+    //public static bool IsZed2Present()
+    //{
+    //    try
+    //    {
+    //        var cam = new sl.Camera(0);
+    //        var p = new sl.InitParameters();
+    //        p.cameraFPS = 0;
+    //        sl.ERROR_CODE err = cam.Open(ref p);
+    //        if (err == sl.ERROR_CODE.SUCCESS)
+    //        {
+    //            cam.Close();
+    //            return true;
+    //        }
+    //    }
+    //    catch { /* SDK not available or no camera */ }
+    //    return false;
+    //}
 
     sl.Mat colorSL = new sl.Mat();
     sl.Mat rightSL = new sl.Mat();

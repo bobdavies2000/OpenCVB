@@ -1,7 +1,9 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <!-- OpenCvSharp4.WpfExtensions (transitive from OpenCvSharp4.Windows) has no net8.0 assets; NU1701 suppressed -->
+    <NoWarn>$(NoWarn);NU1701</NoWarn>
 	  <RuntimeIdentifier>win-x64</RuntimeIdentifier>
 	  <PublishSingleFile>true</PublishSingleFile>
 	  <PublishReadyToRun>true</PublishReadyToRun>
