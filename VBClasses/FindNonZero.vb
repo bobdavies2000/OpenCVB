@@ -93,14 +93,13 @@ Namespace VBClasses
             cv.Cv2.FindNonZero(dst2(lp.rect), tmp)
             If tmp.Rows = 0 Then Exit Sub ' nothing to work on...
 
-            Dim points(tmp.Rows * 2 - 1) As Integer
-            Marshal.Copy(tmp.Data, points, 0, points.Length)
+            Dim points(tmp.Rows - 1) As cv.Point
+            tmp.GetArray(Of cv.Point)(points)
 
             ' line end points guaranteed to have depth (line is tossed if not.)  LastDepth can be 0 on first pass.
             ptList.Clear()
-            For i = 0 To points.Count - 1 Step 2
-                Dim pt = New cv.Point(points(i), points(i + 1))
-                ptList.Add(pt)
+            For i = 0 To points.Count - 1
+                ptList.Add(points(i))
             Next
             If ptList.Count = 0 Then Exit Sub
 
@@ -139,14 +138,13 @@ Namespace VBClasses
             cv.Cv2.FindNonZero(dst2(lp.rect), tmp)
             If tmp.Rows = 0 Then Exit Sub ' nothing to work on...
 
-            Dim points(tmp.Rows * 2 - 1) As Integer
-            Marshal.Copy(tmp.Data, points, 0, points.Length)
+            Dim points(tmp.Rows - 1) As cv.Point
+            tmp.GetArray(Of cv.Point)(points)
 
             ' line end points guaranteed to have depth (line is tossed if not.)  LastDepth can be 0 on first pass.
             ptList.Clear()
-            For i = 0 To points.Count - 1 Step 2
-                Dim pt = New cv.Point(points(i), points(i + 1))
-                ptList.Add(pt)
+            For i = 0 To points.Count - 1
+                ptList.Add(points(i))
             Next
             If ptList.Count = 0 Then Exit Sub
 
