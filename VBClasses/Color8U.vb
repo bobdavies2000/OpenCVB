@@ -279,8 +279,10 @@ Namespace VBClasses
                         Dim vec = src.Get(Of cv.Vec3b)(y, x)
                         distances.Add(Distance_Basics.distance3D(pt, New cv.Vec3b(vec.Item0, vec.Item1, vec.Item2)))
                     Next
-                    Dim best = top(distances.IndexOf(distances.Min))
-                    dst2.Set(Of cv.Vec3b)(y, x, New cv.Vec3b(best.Item0, best.Item1, best.Item2))
+                    If distances.Count > 0 Then
+                        Dim best = top(distances.IndexOf(distances.Min))
+                        dst2.Set(Of cv.Vec3b)(y, x, New cv.Vec3b(best.Item0, best.Item1, best.Item2))
+                    End If
                 Next
             Next
             labels(2) = "The BGR image mapped to " + CStr(topX.mapTopX) + " colors"

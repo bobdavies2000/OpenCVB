@@ -112,6 +112,7 @@ Namespace VBClasses
             End If
 
             strOut = ""
+            ptLatest.Clear()
             Select Case task.fOptions.FeatureMethod.Text
                 Case "GoodFeatures"
                     ptLatest = cv.Cv2.GoodFeaturesToTrack(task.gray, task.FeatureSampleSize, options.quality,

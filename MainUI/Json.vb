@@ -1,11 +1,42 @@
 Imports System.IO
-Imports System.Management
 Imports System.Runtime.InteropServices
+Imports System.Text
 Imports jsonShared
 Imports Newtonsoft.Json
 Imports cv = OpenCvSharp
 Namespace MainApp
     Public Class jsonIO
+        ' SetupAPI constants for device enumeration (no WMI)
+        Private Const DIGCF_PRESENT As UInteger = 2
+        Private Const DIGCF_ALLCLASSES As UInteger = 4
+        Private Const SPDRP_DEVICEDESC As UInteger = 0
+        Private Const SPDRP_FRIENDLYNAME As UInteger = 12
+
+        <StructLayout(LayoutKind.Sequential)>
+        Private Structure SP_DEVINFO_DATA
+            Public cbSize As UInteger
+            Public ClassGuid As Guid
+            Public DevInst As UInteger
+            Public Reserved As UIntPtr
+        End Structure
+
+        <DllImport("setupapi.dll", CharSet:=CharSet.Auto, SetLastError:=True)>
+        Private Shared Function SetupDiGetClassDevs(ByVal ClassGuid As IntPtr, ByVal Enumerator As String, ByVal hwndParent As IntPtr, ByVal Flags As UInteger) As IntPtr
+        End Function
+
+        <DllImport("setupapi.dll", SetLastError:=True)>
+        Private Shared Function SetupDiEnumDeviceInfo(ByVal DeviceInfoSet As IntPtr, ByVal MemberIndex As UInteger, ByRef DeviceInfoData As SP_DEVINFO_DATA) As Boolean
+        End Function
+
+        <DllImport("setupapi.dll", CharSet:=CharSet.Auto, SetLastError:=True)>
+        Private Shared Function SetupDiGetDeviceRegistryProperty(ByVal DeviceInfoSet As IntPtr, ByRef DeviceInfoData As SP_DEVINFO_DATA, ByVal [Property] As UInteger,
+            ByRef PropertyRegDataType As UInteger, ByVal PropertyBuffer As Byte(), ByVal PropertyBufferSize As UInteger, ByRef RequiredSize As UInteger) As Boolean
+        End Function
+
+        <DllImport("setupapi.dll", SetLastError:=True)>
+        Private Shared Function SetupDiDestroyDeviceInfoList(ByVal DeviceInfoSet As IntPtr) As Boolean
+        End Function
+
         <DllImport("Cam_Oak-D.dll", CallingConvention:=CallingConvention.Cdecl)>
         Private Shared Function OakDDevices() As Integer
         End Function
@@ -88,42 +119,68 @@ Namespace MainApp
 
             Return Settings
         End Function
+        ''' <summary>Enumerate PnP device names using SetupAPI (no WMI). Returns same style list as before for camera detection.</summary>
         Public Function USBenumeration() As List(Of String)
             Static usblist As New List(Of String)
-            Dim info As ManagementObject
-            Dim search As ManagementObjectSearcher
-            search = New ManagementObjectSearcher("SELECT * From Win32_PnPEntity")
-            If usblist.Count = 0 Then
-                For Each info In search.Get()
-                    Dim Name = CType(info("Caption"), String)
-                    If Name IsNot Nothing Then
-                        usblist.Add(Name)
-                        ' This enumeration can tell us about the cameras present.  Built on first pass.
-                        If InStr(Name, "Xeon") Or InStr(Name, "Chipset") Or InStr(Name, "Generic") Or InStr(Name, "Bluetooth") Or
-                            InStr(Name, "Monitor") Or InStr(Name, "Mouse") Or InStr(Name, "NVIDIA") Or InStr(Name, "HID-compliant") Or
-                            InStr(Name, " CPU ") Or InStr(Name, "PCI Express") Or Name.StartsWith("USB ") Or
-                            Name.StartsWith("Microsoft") Or Name.StartsWith("Motherboard") Or InStr(Name, "SATA") Or
-                            InStr(Name, "Volume") Or Name.StartsWith("WAN") Or InStr(Name, "ACPI") Or
-                            Name.StartsWith("HID") Or InStr(Name, "OneNote") Or Name.StartsWith("Samsung") Or
-                            Name.StartsWith("System ") Or Name.StartsWith("HP") Or InStr(Name, "Wireless") Or
-                            Name.StartsWith("SanDisk") Or InStr(Name, "Wi-Fi") Or Name.StartsWith("Media ") Or
-                            Name.StartsWith("High precision") Or Name.StartsWith("High Definition ") Or
-                            InStr(Name, "Remote") Or InStr(Name, "Numeric") Or InStr(Name, "UMBus ") Or
-                            Name.StartsWith("Plug or Play") Or InStr(Name, "Print") Or Name.StartsWith("Direct memory") Or
-                            InStr(Name, "interrupt controller") Or Name.StartsWith("NVVHCI") Or Name.StartsWith("Plug and Play") Or
-                            Name.StartsWith("ASMedia") Or Name = "Fax" Or Name.StartsWith("Speakers") Or
-                            InStr(Name, "Host Controller") Or InStr(Name, "Management Engine") Or InStr(Name, "Legacy") Or
-                            Name.StartsWith("NDIS") Or Name.StartsWith("Logitech USB Input Device") Or
-                            Name.StartsWith("Simple Device") Or InStr(Name, "Ethernet") Or Name.StartsWith("WD ") Or
-                            InStr(Name, "Composite Bus Enumerator") Or InStr(Name, "Turbo Boost") Or Name.StartsWith("Realtek") Or
-                            Name.StartsWith("PCI-to-PCI") Or Name.StartsWith("Network Controller") Or Name.StartsWith("ATAPI ") Or
-                            Name.Contains("Gen Intel(R) ") Then
+            If usblist.Count > 0 Then Return usblist
+
+            Dim deviceInfoSet = SetupDiGetClassDevs(IntPtr.Zero, Nothing, IntPtr.Zero, DIGCF_PRESENT Or DIGCF_ALLCLASSES)
+            If deviceInfoSet = IntPtr.Zero OrElse deviceInfoSet = New IntPtr(-1) Then Return usblist
+
+            Try
+                Dim devInfo As SP_DEVINFO_DATA
+                devInfo.cbSize = CUInt(Marshal.SizeOf(GetType(SP_DEVINFO_DATA)))
+                devInfo.ClassGuid = Guid.Empty
+                devInfo.DevInst = 0
+                devInfo.Reserved = UIntPtr.Zero
+
+                Dim memberIndex As UInteger = 0
+                Const bufSize As Integer = 1024
+                Dim buf As Byte() = New Byte(bufSize - 1) {}
+                Dim reqSize As UInteger = 0
+                Dim regType As UInteger = 0
+
+                While SetupDiEnumDeviceInfo(deviceInfoSet, memberIndex, devInfo)
+                    Dim name As String = Nothing
+                    ' Prefer friendly name, fall back to device description (same as WMI Caption). CharSet.Auto = Unicode on Windows.
+                    If SetupDiGetDeviceRegistryProperty(deviceInfoSet, devInfo, SPDRP_FRIENDLYNAME, regType, buf, bufSize, reqSize) AndAlso reqSize > 0 Then
+                        name = Encoding.Unicode.GetString(buf, 0, CInt(Math.Min(reqSize, bufSize))).TrimEnd(Chr(0))
+                    End If
+                    If String.IsNullOrEmpty(name) AndAlso SetupDiGetDeviceRegistryProperty(deviceInfoSet, devInfo, SPDRP_DEVICEDESC, regType, buf, bufSize, reqSize) AndAlso reqSize > 0 Then
+                        name = Encoding.Unicode.GetString(buf, 0, CInt(Math.Min(reqSize, bufSize))).TrimEnd(Chr(0))
+                    End If
+                    If name IsNot Nothing AndAlso name.Length > 0 Then
+                        usblist.Add(name)
+                        ' Same debug filtering as before: log names that might be new cameras
+                        If InStr(name, "Xeon") Or InStr(name, "Chipset") Or InStr(name, "Generic") Or InStr(name, "Bluetooth") Or
+                            InStr(name, "Monitor") Or InStr(name, "Mouse") Or InStr(name, "NVIDIA") Or InStr(name, "HID-compliant") Or
+                            InStr(name, " CPU ") Or InStr(name, "PCI Express") Or name.StartsWith("USB ") Or
+                            name.StartsWith("Microsoft") Or name.StartsWith("Motherboard") Or InStr(name, "SATA") Or
+                            InStr(name, "Volume") Or name.StartsWith("WAN") Or InStr(name, "ACPI") Or
+                            name.StartsWith("HID") Or InStr(name, "OneNote") Or name.StartsWith("Samsung") Or
+                            name.StartsWith("System ") Or name.StartsWith("HP") Or InStr(name, "Wireless") Or
+                            name.StartsWith("SanDisk") Or InStr(name, "Wi-Fi") Or name.StartsWith("Media ") Or
+                            name.StartsWith("High precision") Or name.StartsWith("High Definition ") Or
+                            InStr(name, "Remote") Or InStr(name, "Numeric") Or InStr(name, "UMBus ") Or
+                            name.StartsWith("Plug or Play") Or InStr(name, "Print") Or name.StartsWith("Direct memory") Or
+                            InStr(name, "interrupt controller") Or name.StartsWith("NVVHCI") Or name.StartsWith("Plug and Play") Or
+                            name.StartsWith("ASMedia") Or name = "Fax" Or name.StartsWith("Speakers") Or
+                            InStr(name, "Host Controller") Or InStr(name, "Management Engine") Or InStr(name, "Legacy") Or
+                            name.StartsWith("NDIS") Or name.StartsWith("Logitech USB Input Device") Or
+                            name.StartsWith("Simple Device") Or InStr(name, "Ethernet") Or name.StartsWith("WD ") Or
+                            InStr(name, "Composite Bus Enumerator") Or InStr(name, "Turbo Boost") Or name.StartsWith("Realtek") Or
+                            name.StartsWith("PCI-to-PCI") Or name.StartsWith("Network Controller") Or name.StartsWith("ATAPI ") Or
+                            name.Contains("Gen Intel(R) ") Then
                         Else
-                            Debug.WriteLine(Name) ' looking for new cameras 
+                            Debug.WriteLine(name) ' looking for new cameras
                         End If
                     End If
-                Next
-            End If
+                    devInfo.cbSize = CUInt(Marshal.SizeOf(GetType(SP_DEVINFO_DATA)))
+                    memberIndex += 1
+                End While
+            Finally
+                SetupDiDestroyDeviceInfoList(deviceInfoSet)
+            End Try
             Return usblist
         End Function
         Public Sub Save(settings As jsonShared.Settings)
