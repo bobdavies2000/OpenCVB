@@ -71,20 +71,20 @@ Namespace MainApp
         Public Function initialize(Settings As jsonShared.Settings) As jsonShared.Settings
             Dim usbList = USBenumeration()
 
-            Dim countOak = OakDDevices()
-            For i = 0 To countOak - 1
-                Dim strPtr = OakDNextDevice()
-                Dim productName As String = Marshal.PtrToStringAnsi(strPtr)
-                If productName.StartsWith("OAK-D") Then Settings.OakIndex3D = i
-                If productName.StartsWith("OAK-4") Then Settings.OakIndex4D = i
-            Next
+            'Dim countOak = OakDDevices()
+            'For i = 0 To countOak - 1
+            '    Dim strPtr = OakDNextDevice()
+            '    Dim productName As String = Marshal.PtrToStringAnsi(strPtr)
+            '    If productName.StartsWith("OAK-D") Then Settings.OakIndex3D = i
+            '    If productName.StartsWith("OAK-4") Then Settings.OakIndex4D = i
+            'Next
 
             Settings.cameraPresent = New List(Of Boolean)
             For i = 0 To cameraNames.Count - 1
                 Dim searchname = cameraNames(i)
                 Dim present As Boolean = False
-                If searchname.StartsWith("Oak-3D") And countOak > 0 Then present = Settings.OakIndex3D >= 0
-                If searchname.StartsWith("Oak-4D") And countOak > 0 Then present = Settings.OakIndex4D >= 0
+                'If searchname.StartsWith("Oak-3D") And countOak > 0 Then present = Settings.OakIndex3D >= 0
+                'If searchname.StartsWith("Oak-4D") And countOak > 0 Then present = Settings.OakIndex4D >= 0
                 If searchname.StartsWith("StereoLabs ZED 2/2i") Then searchname = "ZED 2"
 
                 Dim subsetList As New List(Of String)

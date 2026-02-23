@@ -7,6 +7,11 @@ if not exist librealsense (
 	"c:\Program Files\Git\bin\git.exe" clone "https://github.com/IntelRealSense/librealsense"
 )
 
+
+if not exist zed-sdk (
+	"c:\Program Files\Git\bin\git.exe" clone "https://github.com/stereolabs/zed-sdk.git"
+)
+
 if not exist OpenCV (
 	"c:\Program Files\Git\bin\git.exe" clone "https://github.com/opencv/opencv.git"
 	cd OpenCV
@@ -53,6 +58,12 @@ if not exist OrbbecSDK_CSharp\Build (
 	msbuild.exe OrbbecSDK_CSharp/Build/ob_csharp.slnx /p:Configuration=Release
 )
 
+if not exist zed-sdk\Build (
+	cmake -S OrbbecSDK_CSharp -B OrbbecSDK_CSharp/Build -DCMAKE_CONFIGURATION_TYPES=Debug;Release; -DCMAKE_INSTALL_PREFIX=OrbbecSDK/Build
+	msbuild.exe OrbbecSDK_CSharp/Build/ob_csharp.slnx /p:Configuration=Debug
+	msbuild.exe OrbbecSDK_CSharp/Build/ob_csharp.slnx /p:Configuration=Release
+)
+
 if not exist OakD\depthai-core\Build (
 	echo Building Oak-D camera support...
 	mkdir OakD\depthai-core\Build
@@ -70,16 +81,13 @@ echo Camera Support Installation Summary
 echo ========================================
 echo.
 echo Oak-D Camera (Luxonis):
-echo   - depthai-core is cloned to OakD/depthai-core
-echo   - Cam_Oak-D.dll is built and copied to the bin folder
-echo   - No additional SDK installation required
+echo   - should not require any additional setup
 echo.
 echo StereoLabs ZED Camera:
-echo   - Goto: https://download.stereolabs.com/zedsdk/4.1/cu121/win
-echo   - Install Stereolabs SDK with CUDA 12
+echo   - Goto: https://download.stereolabs.com/zedsdk/
+echo   - Install Stereolabs SDK with CUDA 12 (or latest) support
 echo   - StereoLabs SDK install may also download and install CUDA if not already present.
 echo   - Set CUDA_PATH=C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v12.X
-echo   - To disable StereoLabs support, edit OpenCVB's 'camera/cameraDefines.hpp'
 echo.
 echo Intel RealSense Camera:
 echo   - librealsense is built automatically with C# bindings
@@ -87,4 +95,4 @@ echo.
 echo Orbbec Gemini Camera:
 echo   - OrbbecSDK and OrbbecSDK_CSharp are built automatically
 echo.
-SET /P ok="Press Enter to continue after reading the above messages."
+SET /P ok="Press Enter to continue after reviewing the log."
