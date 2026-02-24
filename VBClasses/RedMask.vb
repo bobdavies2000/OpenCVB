@@ -25,15 +25,11 @@ Namespace VBClasses
             classCount = RedMask_Count(cPtr)
             If classCount <= 1 Then Exit Sub ' no data to process.
 
-            Dim rectData = cv.Mat.FromPixelData(classCount, 1, cv.MatType.CV_32SC4, RedMask_Rects(cPtr))
-            Dim rects(classCount * 4) As Integer
-            Marshal.Copy(rectData.Data, rects, 0, rects.Length)
+            Dim rectData = cv.Mat.FromPixelData(classCount, 1, cv.MatType.CV_32SC4, RedCloud_Rects(cPtr))
+            Dim rects(classCount - 1) As cv.Rect
+            rectData.GetArray(Of cv.Rect)(rects)
 
-            Dim rectlist As New List(Of cv.Rect)
-            For i = 0 To rects.Count - 4 Step 4
-                rectlist.Add(New cv.Rect(rects(i), rects(i + 1), rects(i + 2), rects(i + 3)))
-            Next
-
+            Dim rectlist = rects.ToList
             mdList.Clear()
             mdList.Add(New maskData) ' add a placeholder for zero...
             For i = 0 To classCount - 1

@@ -225,16 +225,11 @@ Namespace VBClasses
             classCount = Math.Min(RedMask_Count(cPtr), identifyCount * 2)
             If classCount = 0 Then Exit Sub ' no data to process.
 
-            Dim rectData = cv.Mat.FromPixelData(classCount, 1, cv.MatType.CV_32SC4, RedMask_Rects(cPtr))
+            Dim rectData = cv.Mat.FromPixelData(classCount, 1, cv.MatType.CV_32SC4, RedCloud_Rects(cPtr))
+            Dim rects(classCount - 1) As cv.Rect
+            rectData.GetArray(Of cv.Rect)(rects)
 
-            Dim rects(classCount * 4) As Integer
-            Marshal.Copy(rectData.Data, rects, 0, rects.Length)
-
-            rectList.Clear()
-            For i = 0 To classCount * 4 - 4 Step 4
-                rectList.Add(New cv.Rect(rects(i), rects(i + 1), rects(i + 2), rects(i + 3)))
-            Next
-
+            rectList = rects.ToList
             If standaloneTest() Then dst3 = PaletteFull(dst2)
 
             labels(2) = "CV_8U result With " + CStr(classCount) + " regions."

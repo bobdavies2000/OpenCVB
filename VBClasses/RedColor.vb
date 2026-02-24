@@ -27,13 +27,11 @@ Namespace VBClasses
             dst0 = cv.Mat.FromPixelData(dst1.Rows, dst1.Cols, cv.MatType.CV_8U, imagePtr).Clone
 
             classCount = RedCloud_Count(cPtr)
-
             If classCount = 0 Then Exit Sub ' no data to process.
 
             Dim rectData = cv.Mat.FromPixelData(classCount, 1, cv.MatType.CV_32SC4, RedCloud_Rects(cPtr))
-
-            Dim rects(classCount * 4) As Integer
-            Marshal.Copy(rectData.Data, rects, 0, rects.Length)
+            Dim rects(classCount - 1) As cv.Rect
+            rectData.GetArray(Of cv.Rect)(rects)
 
             Dim rcListLast = New List(Of rcData)(rcList)
             Dim rcMapLast As cv.Mat = rcMap.Clone
@@ -41,9 +39,8 @@ Namespace VBClasses
             Dim minPixels As Integer = dst2.Total * 0.001
             Dim index As Integer = 1
             Dim newList As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
-            For i = 0 To rects.Length - 4 Step 4
-                Dim r = New cv.Rect(rects(i), rects(i + 1), rects(i + 2), rects(i + 3))
-                Dim rc = New rcData(dst0(r), r, index)
+            For i = 0 To rects.Count - 1
+                Dim rc = New rcData(dst0(rects(i)), rects(i), index)
                 If rc.pixels < minPixels Then Continue For
                 newList.Add(rc.pixels, rc)
                 index += 1
@@ -128,11 +125,9 @@ Namespace VBClasses
 
             If classCount = 0 Then Exit Sub ' no data to process.
 
-            Dim rectData = cv.Mat.FromPixelData(classCount, 1, cv.MatType.CV_32SC4,
-                                            RedCloud_Rects(cPtr))
-
-            Dim rects(classCount * 4) As Integer
-            Marshal.Copy(rectData.Data, rects, 0, rects.Length)
+            Dim rectData = cv.Mat.FromPixelData(classCount, 1, cv.MatType.CV_32SC4, RedCloud_Rects(cPtr))
+            Dim rects(classCount - 1) As cv.Rect
+            rectData.GetArray(Of cv.Rect)(rects)
 
             Dim rcListLast = New List(Of rcData)(rcList)
             Dim rcMapLast As cv.Mat = rcMap.Clone
@@ -140,9 +135,8 @@ Namespace VBClasses
             Dim minPixels As Integer = dst2.Total * 0.001
             Dim index As Integer = 1
             Dim newList As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
-            For i = 0 To rects.Length - 4 Step 4
-                Dim r = New cv.Rect(rects(i), rects(i + 1), rects(i + 2), rects(i + 3))
-                Dim rc = New rcData(dst0(r), r, index)
+            For i = 0 To rects.Count - 1
+                Dim rc = New rcData(dst0(rects(i)), rects(i), index)
                 If rc.pixels < minPixels Then Continue For
                 newList.Add(rc.pixels, rc)
                 index += 1

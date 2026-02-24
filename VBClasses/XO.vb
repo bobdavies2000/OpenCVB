@@ -10649,15 +10649,10 @@ Namespace VBClasses
             If classCount = 0 Then Exit Sub ' no data to process.
 
             Dim rectData = cv.Mat.FromPixelData(classCount, 1, cv.MatType.CV_32SC4, RedCloud_Rects(cPtr))
+            Dim rects(classCount - 1) As cv.Rect
+            rectData.GetArray(Of cv.Rect)(rects)
 
-            Dim rects(classCount * 4) As Integer
-            rectData.GetArray(Of Integer)(rects)
-
-            rectList.Clear()
-            For i = 0 To classCount * 4 - 4 Step 4
-                rectList.Add(New cv.Rect(rects(i), rects(i + 1), rects(i + 2), rects(i + 3)))
-            Next
-
+            rectList = rects.ToList
             If standalone Then dst3 = PaletteFull(dst2)
 
             labels(2) = "CV_8U result With " + CStr(classCount) + " regions."
@@ -11645,18 +11640,15 @@ Namespace VBClasses
             If classCount = 0 Then Exit Sub ' no data to process.
 
             Dim rectData = cv.Mat.FromPixelData(classCount, 1, cv.MatType.CV_32SC4, RedCloud_Rects(cPtr))
-
-            Dim rects(classCount * 4) As Integer
-            rectData.GetArray(Of Integer)(rects)
+            Dim rects(classCount - 1) As cv.Rect
+            rectData.GetArray(Of cv.Rect)(rects)
 
             Dim minPixels = dst2.Total * 0.001
             RectList.Clear()
-
-            For i = 0 To rects.Length - 4 Step 4
-                Dim r = New cv.Rect(rects(i), rects(i + 1), rects(i + 2), rects(i + 3))
-                If r.Width * r.Height >= minPixels Then
-                    RectList.Add(r)
-                    dst3.Rectangle(r, task.highlight, task.lineWidth)
+            For i = 0 To rects.Length - 1
+                If rects(i).Width * rects(i).Height >= minPixels Then
+                    RectList.Add(rects(i))
+                    dst3.Rectangle(rects(i), task.highlight, task.lineWidth)
                 End If
             Next
             labels(3) = CStr(RectList.Count) + " cells were found."
@@ -12391,15 +12383,10 @@ Namespace VBClasses
             If classCount = 0 Then Exit Sub ' no data to process.
 
             Dim rectData = cv.Mat.FromPixelData(classCount, 1, cv.MatType.CV_32SC4, RedCloud_Rects(cPtr))
+            Dim rects(classCount - 1) As cv.Rect
+            rectData.GetArray(Of cv.Rect)(rects)
 
-            Dim rects(classCount * 4) As Integer
-            rectData.GetArray(Of Integer)(rects)
-
-            rectList.Clear()
-            For i = 0 To classCount * 4 - 4 Step 4
-                rectList.Add(New cv.Rect(rects(i), rects(i + 1), rects(i + 2), rects(i + 3)))
-            Next
-
+            rectList = rects.ToList
             If standalone Then dst3 = PaletteFull(dst2)
 
             labels(2) = "CV_8U result With " + CStr(classCount) + " regions."
@@ -12918,18 +12905,14 @@ Namespace VBClasses
             If dst2.Width >= 1280 Then imageEdgeWidth = 4
             dst2.Rectangle(New cv.Rect(0, 0, dst2.Width - 1, dst2.Height - 1), 255, imageEdgeWidth) ' prevent leaks at the image boundary...
 
-            Dim rectData = cv.Mat.FromPixelData(classCount, 1, cv.MatType.CV_32SC4, EdgeLineRaw_Rects(cPtr))
-
             classCount = EdgeLineRaw_GetSegCount(cPtr)
             If classCount = 0 Then Exit Sub ' nothing to work with....
-            Dim rects(classCount * 4) As Integer
-            rectData.GetArray(Of Integer)(rects)
 
-            rectList.Clear()
-            For i = 0 To classCount * 4 - 4 Step 4
-                rectList.Add(New cv.Rect(rects(i), rects(i + 1), rects(i + 2), rects(i + 3)))
-            Next
+            Dim rectData = cv.Mat.FromPixelData(classCount, 1, cv.MatType.CV_32SC4, RedCloud_Rects(cPtr))
+            Dim rects(classCount - 1) As cv.Rect
+            rectData.GetArray(Of cv.Rect)(rects)
 
+            rectList = rects.ToList
             segments.Clear()
             Dim pointCount As Integer
             For i = 0 To classCount - 1
@@ -12984,19 +12967,14 @@ Namespace VBClasses
             ' prevent leaks at the image boundary...
             dst2.Rectangle(New cv.Rect(0, 0, dst2.Width - 1, dst2.Height - 1), 255, imageEdgeWidth)
 
-            Dim rectData = cv.Mat.FromPixelData(classCount, 1, cv.MatType.CV_32SC4, EdgeLineRaw_Rects(cPtr))
-
             classCount = EdgeLineRaw_GetSegCount(cPtr)
             If classCount = 0 Then Exit Sub ' nothing to work with....
-            Dim rects(classCount * 4) As Integer
-            rectData.GetArray(Of Integer)(rects)
 
-            Dim rectList As New List(Of cv.Rect)
-            rectList.Clear()
-            For i = 0 To classCount * 4 - 4 Step 4
-                rectList.Add(New cv.Rect(rects(i), rects(i + 1), rects(i + 2), rects(i + 3)))
-            Next
+            Dim rectData = cv.Mat.FromPixelData(classCount, 1, cv.MatType.CV_32SC4, RedCloud_Rects(cPtr))
+            Dim rects(classCount - 1) As cv.Rect
+            rectData.GetArray(Of cv.Rect)(rects)
 
+            Dim rectList = rects.ToList
             segments.Clear()
             Dim pointCount As Integer
             For i = 0 To classCount - 1
@@ -13883,16 +13861,13 @@ Namespace VBClasses
             If classCount = 0 Then Exit Sub ' no data to process.
 
             Dim rectData = cv.Mat.FromPixelData(classCount, 1, cv.MatType.CV_32SC4, RedCloud_Rects(cPtr))
-
-            Dim rects(classCount * 4) As Integer
-            rectData.GetArray(Of Integer)(rects)
+            Dim rects(classCount - 1) As cv.Rect
+            rectData.GetArray(Of cv.Rect)(rects)
 
             Dim minPixels = dst2.Total * 0.001
             RectList.Clear()
-
-            For i = 0 To rects.Length - 4 Step 4
-                Dim r = New cv.Rect(rects(i), rects(i + 1), rects(i + 2), rects(i + 3))
-                If r.Width * r.Height >= minPixels Then RectList.Add(r)
+            For i = 0 To rects.Length - 1
+                If rects(i).Width * rects(i).Height >= minPixels Then RectList.Add(rects(i))
             Next
             labels(2) = CStr(RectList.Count) + " cells were found."
         End Sub

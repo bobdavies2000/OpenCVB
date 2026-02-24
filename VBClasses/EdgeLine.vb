@@ -34,7 +34,7 @@ Namespace VBClasses
             classCount = Math.Min(EdgeLineRaw_GetSegCount(cPtr), 255)
             If classCount = 0 Then Exit Sub ' nothing to work with....
 
-            Dim rects(classCount) As cv.Rect
+            Dim rects(classCount - 1) As cv.Rect
             Dim rectData = cv.Mat.FromPixelData(classCount, 1, cv.MatType.CV_32SC4, rectPtr)
             rectData.GetArray(Of cv.Rect)(rects)
 
