@@ -17,7 +17,7 @@ Namespace VBClasses
             Dim indexLast = rcMapLast.Get(Of Integer)(rc.maxDist.Y, rc.maxDist.X)
 
             If indexLast > 0 And indexLast < rcListLast.Count Then
-                indexLast -= 1 ' index is 1 less than the rcMap value
+                indexLast -= 1 ' index is 1 less than the rcMap value - avoiding 0 which means no depth.
                 r2 = rcListLast(indexLast).rect
             End If
 

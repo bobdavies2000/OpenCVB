@@ -65,7 +65,7 @@ Public Class OptionsFeatures
             Color8USource.Items.Add(method)
         Next
         Color8USource.SelectedItem = "Reduction_Basics"
-        ReductionSlider.Value = 50
+        ReductionSlider.Value = 100
 
         Select Case task.workRes.Width
             Case 1920
