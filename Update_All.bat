@@ -68,7 +68,7 @@ if not exist OakD\depthai-core\Build (
 	echo Building Oak-D camera support...
 	mkdir OakD\depthai-core\Build
 	cd OakD\depthai-core\Build
-	cmake .. -DCMAKE_BUILD_TYPE=Debug;Release -DDEPTHAI_BUILD_EXAMPLES=ON -DBUILD_SHARED_LIBS=ON -DDEPTHAI_SANITIZE=OFF -DOpenCV_DIR=..\..\..\OpenCV\Build
+	cmake .. -DCMAKE_BUILD_TYPE=Release -DDEPTHAI_BUILD_EXAMPLES=OFF -DBUILD_SHARED_LIBS=ON -DDEPTHAI_SANITIZE=OFF -DOpenCV_DIR=..\..\..\OpenCV\Build
 	cmake --build . --config Release
 	cmake --build . --config Debug
 	echo Oak-D camera support built successfully.

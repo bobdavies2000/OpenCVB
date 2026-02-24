@@ -10,18 +10,15 @@ Namespace VBClasses
             desc = "Assign world coordinates to each RedCloud cell"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
+            wcDataX.prepData.presetReductionName = "X Reduction"
+            wcDataX.Run(emptyMat)
+
+            wcDataX.prepData.presetReductionName = "Y Reduction"
+            wcDataY.Run(emptyMat)
+
             redC.Run(src)
             dst2 = redC.dst2
             labels(2) = redC.labels(2)
-
-            Static reductionX = OptionParent.findRadio("X Reduction")
-            Static reductionY = OptionParent.findRadio("Y Reduction")
-
-            reductionX.checked = True
-            wcDataX.Run(emptyMat)
-
-            reductionY.checked = True
-            wcDataY.Run(emptyMat)
 
             rcList.Clear()
             Dim reduction = task.fOptions.ReductionSlider.Value
