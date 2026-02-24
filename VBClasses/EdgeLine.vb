@@ -16,7 +16,7 @@ Namespace VBClasses
             If src.Channels <> 1 Then src = task.grayStable
 
             Dim cppData(src.Total - 1) As Byte
-            Marshal.Copy(src.Data, cppData, 0, cppData.Length)
+            src.GetArray(Of Byte)(cppData)
             Dim handlesrc = GCHandle.Alloc(cppData, GCHandleType.Pinned)
             Dim imagePtr = EdgeLineRaw_RunCPP(cPtr, handlesrc.AddrOfPinnedObject(), src.Rows, src.Cols,
                                               task.lineWidth)
@@ -30,20 +30,20 @@ Namespace VBClasses
 
             Dim rectPtr = EdgeLineRaw_Rects(cPtr)
             If rectPtr = IntPtr.Zero Then Exit Sub ' no rects
-            Dim rectData = cv.Mat.FromPixelData(classCount, 1, cv.MatType.CV_32SC4, rectPtr)
 
             classCount = Math.Min(EdgeLineRaw_GetSegCount(cPtr), 255)
             If classCount = 0 Then Exit Sub ' nothing to work with....
-            Dim rects(classCount * 4) As Integer
-            Marshal.Copy(rectData.Data, rects, 0, rects.Length)
+
+            Dim rects(classCount) As cv.Rect
+            Dim rectData = cv.Mat.FromPixelData(classCount, 1, cv.MatType.CV_32SC4, rectPtr)
+            rectData.GetArray(Of cv.Rect)(rects)
 
             dst3.SetTo(0)
             rcList.Clear()
-            For i = 0 To classCount * 4 - 4 Step 4
-                Dim r = New cv.Rect(rects(i), rects(i + 1), rects(i + 2), rects(i + 3))
+            For i = 0 To classCount - 1
                 Dim index = rcList.Count + 1
-                Dim mask = rcMap(r)
-                Dim rc = New rcData(mask, r, index)
+                Dim mask = rcMap(rects(i))
+                Dim rc = New rcData(mask, rects(i), index)
 
                 rcList.Add(rc)
                 If standaloneTest() Then dst3(rc.rect).SetTo(task.scalarColors(rc.gridIndex Mod 255), rc.mask)
@@ -226,7 +226,6 @@ Namespace VBClasses
 
             Dim segCount = EdgeLineRaw_GetSegCount(cPtr)
             segments.Clear()
-
             For i = 0 To segCount - 1
                 Dim len = EdgeLineRaw_NextLength(cPtr)
                 Dim nextSeg(len - 1) As Integer
