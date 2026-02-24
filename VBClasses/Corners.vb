@@ -370,4 +370,26 @@ Namespace VBClasses
             Next
         End Sub
     End Class
+
+
+
+
+
+    Public Class Corners_RedPrepData : Inherits TaskParent
+        Dim prep As New RedPrep_Core
+        Dim fast As New Corners_Basics
+        Public Sub New()
+            desc = "Find the corners in the RedPrep XY data."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            prep.Run(src)
+            dst2 = prep.dst2
+            labels(2) = prep.labels(2)
+
+            fast.Run(prep.dst3)
+            dst3 = fast.dst2
+            labels(3) = fast.labels(2)
+        End Sub
+    End Class
+
 End Namespace

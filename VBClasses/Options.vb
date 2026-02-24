@@ -8173,16 +8173,11 @@ Namespace VBClasses
         Public ageThreshold As Integer
         Public rectOverlapRatio As Integer
         Public Sub New()
-            If sliders.Setup(traceName) Then
-                sliders.setupTrackBar("Age Threshold", 1, 50, 30)
-                sliders.setupTrackBar("Rect overlap ratio X100", 1, 100, 50)
-            End If
+            If sliders.Setup(traceName) Then sliders.setupTrackBar("Age Threshold", 1, 50, 30)
         End Sub
         Public Sub Run()
             Static ageSlider = FindSlider("Age Threshold")
-            Static ratioSlider = FindSlider("Rect overlap ratio X100")
             ageThreshold = ageSlider.value
-            rectOverlapRatio = ratioSlider.value / 100
         End Sub
     End Class
 End Namespace

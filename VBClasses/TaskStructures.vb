@@ -544,6 +544,7 @@ Namespace VBClasses
             Public pixels As Integer
             Public rect As cv.Rect
             Public region As cv.Point
+            Public colorChange As Integer ' 0 no change, 1 , 
             Public eq As cv.Vec4f ' only here for compatibility
             Public Sub New()
             End Sub

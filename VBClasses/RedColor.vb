@@ -7,93 +7,19 @@ Namespace VBClasses
         Public rcList As New List(Of rcData)
         Public rcMap As cv.Mat = New cv.Mat(dst2.Size, cv.MatType.CV_32S, 0)
         Public options As New Options_RedCloud
+        Public redFlood As New RedCloud_FloodFill
         Public Sub New()
-            cPtr = RedCloud_Open()
-            task.fOptions.ReductionSlider.Value = 20
             desc = "Run the C++ RedCloud interface without a mask"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
 
-            dst1 = Mat_Basics.srcMustBe8U(src)
+            redFlood.Run(Mat_Basics.srcMustBe8U(src))
+            dst2 = redFlood.dst2
+            labels(2) = redFlood.labels(2)
 
-            Dim imagePtr As IntPtr
-            Dim inputData(dst1.Total - 1) As Byte
-            dst1.GetArray(Of Byte)(inputData)
-            Dim handleInput = GCHandle.Alloc(inputData, GCHandleType.Pinned)
-
-            imagePtr = RedCloud_Run(cPtr, handleInput.AddrOfPinnedObject(), dst1.Rows, dst1.Cols)
-            handleInput.Free()
-            dst0 = cv.Mat.FromPixelData(dst1.Rows, dst1.Cols, cv.MatType.CV_8U, imagePtr).Clone
-
-            classCount = RedCloud_Count(cPtr)
-            If classCount = 0 Then Exit Sub ' no data to process.
-
-            Dim rectData = cv.Mat.FromPixelData(classCount, 1, cv.MatType.CV_32SC4, RedCloud_Rects(cPtr))
-            Dim rects(classCount - 1) As cv.Rect
-            rectData.GetArray(Of cv.Rect)(rects)
-
-            Dim rcListLast = New List(Of rcData)(rcList)
-            Dim rcMapLast As cv.Mat = rcMap.Clone
-
-            Dim minPixels As Integer = dst2.Total * 0.001
-            Dim index As Integer = 1
-            Dim newList As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
-            For i = 0 To rects.Count - 1
-                Dim rc = New rcData(dst0(rects(i)), rects(i), index)
-                If rc.pixels < minPixels Then Continue For
-                newList.Add(rc.pixels, rc)
-                index += 1
-            Next
-
-            rcList.Clear()
-            dst2.SetTo(0)
-            Dim changed As Integer
-            Dim usedColor As New List(Of cv.Scalar)
-            Dim matchCount As Integer
-            Dim unMatched As Integer
-            Dim matchAverage As Single
-            For Each rc In newList.Values
-                Dim maxDist = rc.maxDist
-                rc = RedCloud_Basics.rcDataMatch(rc, rcListLast, rcMapLast, options.rectOverlapRatio)
-
-                If rc.age = 1 Then unMatched += 1 Else matchCount += 1
-                matchAverage += rc.age
-
-                rc.index = rcList.Count + 1
-
-                ' The first cell often contains other cells completely within it.
-                ' These often cause the maxdist to move around.
-                ' So just fix the color here and create a stable image.
-                ' The cells within the largest cell will switch colors but many cells are stable.
-                If rc.index = 1 Then rc.color = blue
-                If maxDist <> rc.maxDist Then changed += 1
-
-                rcMap(rc.rect).SetTo(rc.index, rc.mask)
-
-                If usedColor.Contains(rc.color) Then
-                    rc.color = Palette_Basics.randomCellColor()
-                    rc.age = 1
-                End If
-                usedColor.Add(rc.color)
-
-                rcList.Add(rc)
-
-                dst2(rc.rect).SetTo(rc.color, rc.mask)
-                dst2.Circle(rc.maxDist, task.DotSize, task.highlight, -1)
-
-                SetTrueText(CStr(rc.age), rc.maxDist)
-            Next
-
-            RedCloud_Cell.selectCell(rcMap, rcList)
-            strOut = task.rcD.displayCell()
-            SetTrueText(strOut, 3)
-
-            labels(2) = CStr(unMatched) + " were new cells and " + CStr(matchCount) + " were matched, " +
-                            "average age: " + Format(matchAverage / rcList.Count, fmt1)
-        End Sub
-        Protected Overrides Sub Finalize()
-            If cPtr <> 0 Then cPtr = RedCloud_Close(cPtr)
+            rcMap = redFlood.rcMap.Clone
+            rcList = New List(Of rcData)(redFlood.rcList)
         End Sub
     End Class
 
