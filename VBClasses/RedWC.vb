@@ -12,9 +12,13 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             wcDataX.prepData.presetReductionName = "X Reduction"
             wcDataX.Run(emptyMat)
+            strOut = wcDataX.labels(2) + vbCrLf
 
             wcDataX.prepData.presetReductionName = "Y Reduction"
             wcDataY.Run(emptyMat)
+            strOut += wcDataY.labels(2) + vbCrLf
+
+            dst1 = wcDataX.dst2 + wcDataY.dst2
 
             redC.Run(src)
             dst2 = redC.dst2
@@ -38,13 +42,13 @@ Namespace VBClasses
                 Dim index = redC.rcMap.Get(Of Integer)(task.clickPoint.Y, task.clickPoint.X)
                 If index > 0 Then
                     Dim rcClick = rcList(index - 1)
-                    strOut = rcClick.displayCell()
-                    SetTrueText(strOut, 3)
+                    strOut += rcClick.displayCell()
                     dst2(rcClick.rect).SetTo(white, rcClick.mask)
                     dst3.SetTo(0)
                     dst3(rcClick.rect).SetTo(white, rcClick.mask)
                 End If
             End If
+            SetTrueText(strOut, 3)
         End Sub
     End Class
 
@@ -79,7 +83,6 @@ Namespace VBClasses
             Next
 
             labels(2) = CStr(regionList.Count) + " non-zero regions > " + CStr(CInt(sizeThreshold)) + " pixels"
-            Dim count As Integer
             wcMap.SetTo(255)
             For i = 0 To regionList.Count - 1
                 Dim index = regionList(i)
@@ -89,11 +92,8 @@ Namespace VBClasses
                 If CInt(mean(0)) Mod reduction = 0 Then
                     Dim region = CInt(mean(0) / reduction)
                     wcMap.SetTo(region, dst0)
-                    count += 1
                 End If
             Next
-
-            labels(2) = prepData.labels(2)
         End Sub
     End Class
 

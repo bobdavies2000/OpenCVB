@@ -5,6 +5,9 @@ Namespace VBClasses
         Public task As AlgorithmTask
         Public AlgorithmTestAllCount As Integer = 1
 
+        Public wcMinVal As Single = -1000
+        Public wcMaxVal As Single = 1000
+
         Public Const fmt0 = "0"
         Public Const fmt1 = "0.0"
         Public Const fmt2 = "0.00"

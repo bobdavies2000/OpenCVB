@@ -86,11 +86,11 @@ Namespace VBClasses
             desc = "Run the C++ PrepXY to create a list of mask, rect, and other info about image"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            Dim inputX(task.pcSplit(0).Total * task.pcSplit(0).ElemSize - 1) As Byte
-            Dim inputY(task.pcSplit(1).Total * task.pcSplit(1).ElemSize - 1) As Byte
+            Dim inputX(task.pcSplit(0).Total - 1) As Single
+            Dim inputY(task.pcSplit(1).Total - 1) As Single
 
-            Marshal.Copy(task.pcSplit(0).Data, inputX, 0, inputX.Length)
-            Marshal.Copy(task.pcSplit(1).Data, inputY, 0, inputY.Length)
+            task.pcSplit(0).GetArray(Of Single)(inputX)
+            task.pcSplit(1).GetArray(Of Single)(inputY)
 
             Dim handleX = GCHandle.Alloc(inputX, GCHandleType.Pinned)
             Dim handleY = GCHandle.Alloc(inputY, GCHandleType.Pinned)
@@ -412,13 +412,9 @@ Namespace VBClasses
                     reduced32s = (split(0) + split(1) + split(2)) * reductionFactor
             End Select
 
-            Dim mm As mmData
-            mm.minVal = -1000 ' need to validate that this fixed range only eliminates outliers.
-            mm.maxVal = 1000
-
             reduced32s.ConvertTo(reduced32f, cv.MatType.CV_32F)
 
-            dst2 = (reduced32s - mm.minVal) * 255 / (mm.maxVal - mm.minVal)
+            dst2 = (reduced32s - wcMinVal) * 255 / (wcMaxVal - wcMinVal)
             dst2.ConvertTo(dst2, cv.MatType.CV_8U)
             dst2.SetTo(0, task.noDepthMask)
 

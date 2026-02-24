@@ -615,46 +615,37 @@ Namespace VBClasses
             plotHistNew.createHistogram = True
             plotHist.createHistogram = True
             task.gOptions.HistBinBar.Value = task.gOptions.HistBinBar.Maximum
-            labels(2) = "Histogram before finding the single range"
-            labels(3) = "Histogram after finding the single range"
             desc = "Remove outliers from the histogram by finding the single range with no gaps."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             If standalone Then redCore.Run(src)
-            Dim mm = GetMinMax(redCore.reduced32f)
 
-            plotHist.minRange = mm.minVal
-            plotHist.maxRange = mm.maxVal
+            plotHist.minRange = wcMinVal
+            plotHist.maxRange = wcMaxVal
             plotHist.Run(redCore.reduced32f)
             Dim histArray = plotHist.histArray
-            Dim incr = mm.range / task.gOptions.HistBinBar.Value
+            Dim incr = (wcMaxVal - wcMinVal) / task.gOptions.HistBinBar.Value
             dst2 = plotHist.dst2
 
-            ' find the largest cluster of histogram entries
-            Dim clusters As New List(Of List(Of Integer))
-            Dim nextCluster As New List(Of Integer)
-            For i = 0 To histArray.Length - 1
-                If histArray(i) > 100 Then
-                    nextCluster.Add(i)
-                Else
-                    If nextCluster.Count > 0 Then clusters.Add(nextCluster)
-                    nextCluster = New List(Of Integer)
-                End If
-            Next
-            If nextCluster.Count > 0 Then clusters.Add(nextCluster)
+            Dim histList = plotHist.histArray.ToList
+            Dim index = histList.IndexOf(histList.Max)
 
-            Dim maxCluster As Integer
             Dim maxCount As Integer
-            For i = 0 To clusters.Count - 1
-                If clusters(i).Count > maxCount Then
-                    maxCount = clusters(i).Count
-                    maxCluster = i
-                End If
+            Dim minIndex As Integer
+            Dim maxIndex As Integer
+            For minIndex = index To 0 Step -1
+                If histList(minIndex) = 0 Then Exit For
+                maxCount += histList(minIndex)
             Next
 
-            Dim minRange = mm.minVal + incr * (clusters(maxCluster)(0) - 1)
-            Dim maxRange = mm.minVal + incr * (clusters(maxCluster).Last + 1)
-            If maxRange > 6000 Then Dim k = 0
+            For maxIndex = index + 1 To histList.Count - 1
+                If histList(maxIndex) = 0 Then Exit For
+                maxCount += histList(maxIndex)
+            Next
+
+            Dim minRange = wcMinVal + incr * minIndex
+            Dim maxRange = wcMinVal + incr * maxIndex
+            labels(2) = "Histogram with fixed range from " + Format(wcMinVal, fmt0) + " to " + Format(wcMaxVal, fmt0)
             labels(3) = "Histogram after trim to " + Format(minRange, fmt0) + " to " + Format(maxRange, fmt0)
 
             plotHistNew.minRange = minRange
