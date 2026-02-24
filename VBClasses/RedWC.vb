@@ -1,8 +1,62 @@
-﻿Imports System.Windows.Documents
-Imports System.Windows.Forms.Design.AxImporter
-Imports cv = OpenCvSharp
+﻿Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Class RedWC_Basics : Inherits TaskParent
+        Public redC As New RedCloud_Basics
+        Dim wcDataX As New RedWC_Core
+        Dim wcDataY As New RedWC_Core
+        Public rcList As New List(Of rcData)
+        Public rcTranslate As New List(Of cv.Point)
+        Public Sub New()
+            desc = "Assign world coordinates to each RedCloud cell"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            redC.Run(src)
+            dst2 = redC.dst2
+            labels(2) = redC.labels(2)
+
+            Static reductionX = OptionParent.findRadio("X Reduction")
+            Static reductionY = OptionParent.findRadio("Y Reduction")
+
+            reductionX.checked = True
+            wcDataX.Run(emptyMat)
+
+            reductionY.checked = True
+            wcDataY.Run(emptyMat)
+
+            rcList.Clear()
+            Dim reduction = task.fOptions.ReductionSlider.Value
+            For Each rc In redC.rcList
+                Dim x = wcDataX.wcMap.Get(Of Single)(rc.maxDist.Y, rc.maxDist.X)
+                Dim y = wcDataY.wcMap.Get(Of Single)(rc.maxDist.Y, rc.maxDist.X)
+                rc.region = New cv.Point(CInt(x), CInt(y))
+                rcList.Add(rc)
+            Next
+
+            rcTranslate.Clear()
+            For Each rc In rcList
+                rcTranslate.Add(rc.region)
+            Next
+
+            If standaloneTest() Then
+                Dim index = redC.rcMap.Get(Of Integer)(task.clickPoint.Y, task.clickPoint.X)
+                If index > 0 Then
+                    Dim rcClick = rcList(index - 1)
+                    strOut = rcClick.displayCell()
+                    SetTrueText(strOut, 3)
+                    dst2(rcClick.rect).SetTo(white, rcClick.mask)
+                    dst3.SetTo(0)
+                    dst3(rcClick.rect).SetTo(white, rcClick.mask)
+                End If
+            End If
+        End Sub
+    End Class
+
+
+
+
+
+
+    Public Class RedWC_Core : Inherits TaskParent
         Public prepData As New RedPrep_Core
         Public wcMap As New cv.Mat(dst2.Size, cv.MatType.CV_32F, 0)
         Public regionList As New List(Of Integer)
@@ -54,7 +108,7 @@ Namespace VBClasses
 
 
     Public Class RedWC_Validate : Inherits TaskParent
-        Public wcData As New RedWC_Basics
+        Public wcData As New RedWC_Core
         Public regionList As New List(Of Integer)
         Public wcMap As New cv.Mat(dst2.Size, cv.MatType.CV_32S, 0)
         Public Sub New()
@@ -69,8 +123,8 @@ Namespace VBClasses
             strOut = ""
             Dim count As Integer
             wcMap.SetTo(0)
-            For i = 0 To regionlist.Count - 1
-                Dim index = regionlist(i)
+            For i = 0 To regionList.Count - 1
+                Dim index = regionList(i)
                 dst0 = dst2.InRange(index, index)
                 Dim mean = wcData.prepData.reduced32s.Mean(dst0)
 
@@ -135,63 +189,8 @@ Namespace VBClasses
 
 
 
-    Public Class RedWC_RedCloud : Inherits TaskParent
-        Public redC As New RedCloud_Basics
-        Dim wcDataX As New RedWC_Basics
-        Dim wcDataY As New RedWC_Basics
-        Public rcList As New List(Of rcData)
-        Public rcTranslate As New List(Of cv.Point)
-        Public Sub New()
-            desc = "Assign world coordinates to each RedCloud cell"
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            Static reductionX = OptionParent.findRadio("X Reduction")
-            Static reductionY = OptionParent.findRadio("Y Reduction")
-
-            reductionX.checked = True
-            wcDataX.Run(emptyMat)
-
-            reductionY.checked = True
-            wcDataY.Run(emptyMat)
-
-            redC.Run(src)
-            dst2 = redC.dst2
-            labels(2) = redC.labels(2)
-
-            rcList.Clear()
-            Dim reduction = task.fOptions.ReductionSlider.Value
-            For Each rc In redC.rcList
-                Dim x = wcDataX.wcMap.Get(Of Single)(rc.maxDist.Y, rc.maxDist.X)
-                Dim y = wcDataY.wcMap.Get(Of Single)(rc.maxDist.Y, rc.maxDist.X)
-                rc.region = New cv.Point(CInt(x), CInt(y))
-                rcList.Add(rc)
-            Next
-
-            rcTranslate.Clear()
-            For Each rc In rcList
-                rcTranslate.Add(rc.region)
-            Next
-
-            If standaloneTest() Then
-                Dim index = redC.rcMap.Get(Of Integer)(task.clickPoint.Y, task.clickPoint.X)
-                If index > 0 Then
-                    Dim rcClick = rcList(index - 1)
-                    strOut = rcClick.displayCell()
-                    SetTrueText(strOut, 3)
-                    dst2(rcClick.rect).SetTo(white, rcClick.mask)
-                    dst3.SetTo(0)
-                    dst3(rcClick.rect).SetTo(white, rcClick.mask)
-                End If
-            End If
-        End Sub
-    End Class
-
-
-
-
-
     Public Class RedWC_Neighbors : Inherits TaskParent
-        Dim redWC As New RedWC_RedCloud
+        Dim redWC As New RedWC_Basics
         Public Sub New()
             task.gOptions.displayDst1.Checked = True
             desc = "Identify the neighbors of the cell that was clicked"
