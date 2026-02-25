@@ -181,7 +181,7 @@ Namespace VBClasses
 
             Dim flatCount = 0
             For Each rc In plane.redC.rcList
-                If rc.depth < 1.0 Then Continue For ' close objects look like planes.
+                If rc.wcMean(2) < 1.0 Then Continue For ' close objects look like planes.
                 Dim RMSerror As Double = 0
                 Dim pixelCount = 0
                 For y = 0 To rc.rect.Height - 1
@@ -233,7 +233,7 @@ Namespace VBClasses
                         Dim pt = task.pointCloud(rc.rect).Get(Of cv.Point3f)(y, x)
                         ' a*x + b*y + c*z + k = 0 ---> z = -(k + a*x + b*y) / c
                         pt.Z = -(rc.eq(0) * pt.X + rc.eq(1) * pt.Y + rc.eq(3)) / rc.eq(2)
-                        If rc.depth <= pt.Z Then
+                        If rc.wcMean(2) <= pt.Z Then
                             dst3(rc.rect).Set(Of cv.Point3f)(y, x, pt)
                         End If
                     End If

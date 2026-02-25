@@ -36,10 +36,10 @@ Namespace VBClasses
                 Dim lastTotal = lrc.rect.Width * lrc.rect.Height
                 If rc.rect.Contains(lrc.maxDist) Then
                     rc.maxDist = lrc.maxDist
-                    rc.depthDelta = Math.Abs(lrc.depth - rc.depth)
+                    rc.depthDelta = Math.Abs(lrc.wcMean(2) - rc.wcMean(2))
                     If Single.IsInfinity(rc.depthDelta) Or rc.depthDelta < 0 Then
                         rc.depthDelta = 0
-                        rc.depth = 0
+                        rc.wcMean(2) = 0
                     End If
                 Else
                     rc.colorChange = 5

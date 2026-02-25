@@ -155,11 +155,11 @@ Namespace VBClasses
 
                 If index >= hulls.rclist.Count Then Continue For
                 Dim rc = hulls.rclist(index)
-                If rc.depth = 0 Then Continue For
+                If rc.wcMean(2) = 0 Then Continue For
 
                 If colorList(i) <> rc.color Then depthList(i).Clear()
 
-                depthList(i).Add(rc.depth)
+                depthList(i).Add(rc.wcMean(2))
                 colorList(i) = rc.color
 
                 If depthList(i).Count > 0 Then

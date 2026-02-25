@@ -38,13 +38,13 @@ Namespace VBClasses
             For Each rc In redC.rcList
                 Dim x = wcDataX.wcMap.Get(Of Single)(rc.maxDist.Y, rc.maxDist.X)
                 Dim y = wcDataY.wcMap.Get(Of Single)(rc.maxDist.Y, rc.maxDist.X)
-                rc.region = New cv.Point(CInt(x), CInt(y))
+                rc.wc = New cv.Point(CInt(x), CInt(y))
                 rcList.Add(rc)
             Next
 
             rcTranslate.Clear()
             For Each rc In rcList
-                rcTranslate.Add(rc.region)
+                rcTranslate.Add(rc.wc)
             Next
 
             If standaloneTest() Then
@@ -217,7 +217,7 @@ Namespace VBClasses
                 SetTrueText(rcCenter.displayCell, 1)
                 For y = -1 To 1
                     For x = -1 To 1
-                        Dim region = New cv.Point(rcCenter.region.X + x, rcCenter.region.Y + y)
+                        Dim region = New cv.Point(rcCenter.wc.X + x, rcCenter.wc.Y + y)
                         index = redWC.rcTranslate.IndexOf(region)
                         If index >= 0 Then
                             Dim rc = redWC.rcList(index)

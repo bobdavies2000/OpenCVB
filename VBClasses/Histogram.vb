@@ -1245,7 +1245,7 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             dst2 = runRedList(src, labels(2))
             hist.rc = task.rcD
-            If hist.rc.index = 0 Or hist.rc.depth = 0 Then Exit Sub
+            If hist.rc.index = 0 Or hist.rc.wcMean(2) = 0 Then Exit Sub
 
             dst0.SetTo(0)
             task.pcSplit(2)(hist.rc.rect).CopyTo(dst0)

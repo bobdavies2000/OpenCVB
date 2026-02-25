@@ -55,6 +55,7 @@ Namespace VBClasses
         Public lineType As cv.LineTypes
         Public histogramBins As Integer
         Public MaxZmeters As Single
+        Public reduction As Integer
         Public highlight As cv.Scalar
         Public closeRequest As Boolean
         Public paletteIndex As Integer

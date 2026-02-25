@@ -10374,9 +10374,9 @@ Namespace VBClasses
             strOut += vbTab + CStr(CInt(rc.color(2))) + vbCrLf
             strOut += "rc.maxDist = " + CStr(rc.maxDist.X) + "," + CStr(rc.maxDist.Y) + vbCrLf
 
-            strOut += If(rc.depth > 0, "Cell is marked as having depth" + vbCrLf, "")
+            strOut += If(rc.wcMean(2) > 0, "Cell is marked as having depth" + vbCrLf, "")
             strOut += "Pixels " + Format(rc.pixels, "###,###") + vbCrLf + "depth pixels "
-            If rc.depth > 0 Then
+            If rc.wcMean(2) > 0 Then
                 Dim depthPixels = task.depthmask(rc.rect).CountNonZero()
                 strOut += Format(depthPixels, "###,###") + " or " +
                           Format(depthPixels / rc.pixels, "0%") + " depth " + vbCrLf
@@ -10384,7 +10384,7 @@ Namespace VBClasses
                 strOut += Format(rc.pixels, "###,###") + " - no depth data" + vbCrLf
             End If
 
-            strOut += "Cell Depth in 3D: z = " + vbTab + Format(rc.depth, fmt2) + vbCrLf
+            strOut += "Cell Depth in 3D: z = " + vbTab + Format(rc.wcMean(2), fmt2) + vbCrLf
 
             Dim tmp = New cv.Mat(task.oldrcD.mask.Rows, task.oldrcD.mask.Cols, cv.MatType.CV_32F, cv.Scalar.All(0))
             task.pcSplit(2)(task.oldrcD.rect).CopyTo(tmp, task.oldrcD.mask)
@@ -16374,7 +16374,7 @@ Namespace VBClasses
             dst2 = runRedList(src, labels(2))
 
             Dim rc = task.rcD
-            If rc.depth Then
+            If rc.wcMean(2) Then
                 eq.rc = rc
                 eq.Run(src)
                 rc = eq.rc
@@ -18580,13 +18580,13 @@ Namespace VBClasses
             For Each rc In redC.rcList
                 Dim x = wcDataX.wcMap.Get(Of Single)(rc.maxDist.Y, rc.maxDist.X)
                 Dim y = wcDataY.wcMap.Get(Of Single)(rc.maxDist.Y, rc.maxDist.X)
-                rc.region = New cv.Point(CInt(x), CInt(y))
+                rc.wc = New cv.Point(CInt(x), CInt(y))
                 rcList.Add(rc)
             Next
 
             rcTranslate.Clear()
             For Each rc In rcList
-                rcTranslate.Add(rc.region)
+                rcTranslate.Add(rc.wc)
             Next
 
             If standaloneTest() Then
