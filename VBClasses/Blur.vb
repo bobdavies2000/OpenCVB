@@ -92,12 +92,12 @@ Namespace VBClasses
             dst3 = dst3.Normalize(255)
             dst3 = dst3.ConvertScaleAbs(255)
 
-            dst3 = (dst3 * 1 / options.reduction).ToMat
-            dst3 = (dst3 * options.reduction).ToMat
+            dst3 = (dst3 * 1 / options.blurReduction).ToMat
+            dst3 = (dst3 * options.blurReduction).ToMat
 
             dst3 = ShowAddweighted(dst3, task.color, labels(3))
 
-            labels(2) = "Blur = " + CStr(options.nextPercent) + "% Reduction Factor = " + CStr(options.reduction)
+            labels(2) = "Blur = " + CStr(options.nextPercent) + "% Reduction Factor = " + CStr(options.blurReduction)
             If task.frameCount Mod options.frameCycle = 0 Then options.nextPercent -= 1
             If options.nextPercent <= 0 Then options.nextPercent = options.savePercent
         End Sub

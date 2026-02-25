@@ -4026,18 +4026,18 @@ Namespace VBClasses
     Public Class Options_BlurTopo : Inherits OptionParent
         Public savePercent As Double = 0
         Public nextPercent As Double = 20
-        Public reduction As Integer = 20
+        Public blurReduction As Integer = 20
         Public frameCycle As Integer = 0.5
         Public kernelSize As Double = 101
         Public Sub New()
             If sliders.Setup(traceName) Then
                 sliders.setupTrackBar("Percent of Blurring", 0, 100, nextPercent)
-                sliders.setupTrackBar("Blur Color Reduction", 2, 64, reduction * 100)
+                sliders.setupTrackBar("Blur Color Reduction", 2, 64, blurReduction * 100)
                 sliders.setupTrackBar("Frame Count Cycle", 1, 200, frameCycle)
             End If
         End Sub
         Public Sub Run()
-            Static reductionSlider = OptionParent.FindSlider("Blur Color Reduction")
+            Static blurSlider = OptionParent.FindSlider("Blur Color Reduction")
             Static frameSlider = OptionParent.FindSlider("Frame Count Cycle")
             Static percentSlider = OptionParent.FindSlider("Percent of Blurring")
 
@@ -4047,7 +4047,7 @@ Namespace VBClasses
             End If
 
             frameCycle = frameSlider.value
-            reduction = reductionSlider.value / 100
+            blurReduction = blurSlider.value / 100
             kernelSize = nextPercent \ 100 * task.cols Or 1
         End Sub
     End Class

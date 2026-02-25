@@ -4,13 +4,12 @@ Namespace VBClasses
     Public Class RedPrep_Basics : Inherits TaskParent
         Dim prepEdges As New RedPrep_Edges_CPP
         Public options As New Options_RedPrep
-        Dim reductionTarget As Integer
         Public Sub New()
             dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
             desc = "Reduction transform for the point cloud"
         End Sub
         Private Function reduceChan(chan As cv.Mat, noDepthmask As cv.Mat) As cv.Mat
-            chan *= reductionTarget
+            chan *= task.reduction
             Dim mm As mmData = GetMinMax(chan)
             Dim dst32f As New cv.Mat
             If Math.Abs(mm.minVal) > mm.maxVal Then
@@ -27,12 +26,11 @@ Namespace VBClasses
         End Function
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
-            reductionTarget = task.fOptions.ReductionSlider.Value
 
             If src.Type <> cv.MatType.CV_32FC3 Then src = task.pointCloud.Clone
 
             Dim pc32S As New cv.Mat
-            src.ConvertTo(pc32S, cv.MatType.CV_32SC3, 1000 / reductionTarget)
+            src.ConvertTo(pc32S, cv.MatType.CV_32SC3, 1000 / task.reduction)
             Dim split = pc32S.Split()
 
             dst2.SetTo(0)
@@ -69,7 +67,7 @@ Namespace VBClasses
             dst2.Rectangle(New cv.Rect(0, 0, dst2.Width, dst2.Height), 255, 2)
 
             If src.Size <> task.workRes Then task.noDepthMask = saveNoDepth.Clone
-            labels(2) = "Using reduction factor = " + CStr(reductionTarget)
+            labels(2) = "Using reduction factor = " + CStr(task.reduction)
         End Sub
     End Class
 
@@ -252,13 +250,12 @@ Namespace VBClasses
         Public options As New Options_RedPrep
         Dim redSimple As New RedColor_Basics
         Dim edges As New EdgeLine_Basics
-        Dim reductionTarget As Integer
         Public Sub New()
             dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
             desc = "Reduction transform for the point cloud"
         End Sub
         Private Function reduceChan(chan As cv.Mat) As cv.Mat
-            chan *= reductionTarget
+            chan *= task.reduction
             Dim mm As mmData = GetMinMax(chan)
             Dim dst32f As New cv.Mat
             If Math.Abs(mm.minVal) > mm.maxVal Then
@@ -275,10 +272,9 @@ Namespace VBClasses
         End Function
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
-            reductionTarget = task.fOptions.ReductionSlider.Value
 
             Dim pc32S As New cv.Mat
-            task.pointCloud.ConvertTo(pc32S, cv.MatType.CV_32SC3, 1000 / reductionTarget)
+            task.pointCloud.ConvertTo(pc32S, cv.MatType.CV_32SC3, 1000 / task.reduction)
             Dim split = pc32S.Split()
 
             dst2.SetTo(0)
@@ -303,7 +299,7 @@ Namespace VBClasses
             dst3.CopyTo(dst2, task.noDepthMask)
 
             dst2.Rectangle(New cv.Rect(0, 0, dst2.Width - 1, dst2.Height - 1), 255, task.lineWidth)
-            labels(2) = "Using reduction factor = " + CStr(reductionTarget)
+            labels(2) = "Using reduction factor = " + CStr(task.reduction)
         End Sub
     End Class
 
@@ -385,31 +381,29 @@ Namespace VBClasses
             options.Run()
             optionsPrep.Run()
 
-            Dim reductionFactor = task.fOptions.ReductionSlider.Value
-
             Dim split() = {New cv.Mat, New cv.Mat, New cv.Mat}
-            task.pcSplit(0).ConvertTo(split(0), cv.MatType.CV_32S, 1000 / reductionFactor)
-            task.pcSplit(1).ConvertTo(split(1), cv.MatType.CV_32S, 1000 / reductionFactor)
-            task.pcSplit(2).ConvertTo(split(2), cv.MatType.CV_32S, 1000 / reductionFactor)
+            task.pcSplit(0).ConvertTo(split(0), cv.MatType.CV_32S, 1000 / task.reduction)
+            task.pcSplit(1).ConvertTo(split(1), cv.MatType.CV_32S, 1000 / task.reduction)
+            task.pcSplit(2).ConvertTo(split(2), cv.MatType.CV_32S, 1000 / task.reduction)
 
             Dim reductionName As String = optionsPrep.reductionName
             If presetReductionName <> "" Then reductionName = presetReductionName
 
             Select Case reductionName
                 Case "X Reduction"
-                    reduced32s = split(0) * reductionFactor
+                    reduced32s = split(0) * task.reduction
                 Case "Y Reduction"
-                    reduced32s = split(1) * reductionFactor
+                    reduced32s = split(1) * task.reduction
                 Case "Z Reduction"
-                    reduced32s = split(2) * reductionFactor
+                    reduced32s = split(2) * task.reduction
                 Case "XY Reduction"
-                    reduced32s = (split(0) + split(1)) * reductionFactor
+                    reduced32s = (split(0) + split(1)) * task.reduction
                 Case "XZ Reduction"
-                    reduced32s = (split(0) + split(2)) * reductionFactor
+                    reduced32s = (split(0) + split(2)) * task.reduction
                 Case "YZ Reduction"
-                    reduced32s = (split(1) + split(2)) * reductionFactor
+                    reduced32s = (split(1) + split(2)) * task.reduction
                 Case "XYZ Reduction"
-                    reduced32s = (split(0) + split(1) + split(2)) * reductionFactor
+                    reduced32s = (split(0) + split(1) + split(2)) * task.reduction
             End Select
 
             reduced32s.ConvertTo(reduced32f, cv.MatType.CV_32F)
@@ -418,7 +412,7 @@ Namespace VBClasses
             dst2.ConvertTo(dst2, cv.MatType.CV_8U)
             dst2.SetTo(0, task.noDepthMask)
 
-            labels(2) = "Using reduction amount = " + CStr(reductionFactor)
+            labels(2) = "Using reduction amount = " + CStr(task.reduction)
 
             dst3 = PaletteBlackZero(dst2)
         End Sub

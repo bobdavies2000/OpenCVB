@@ -34,7 +34,6 @@ Namespace VBClasses
             dst2.SetTo(0, indexer.dst3)
 
             rcList.Clear()
-            Dim reduction = task.fOptions.ReductionSlider.Value
             For Each rc In redC.rcList
                 Dim x = wcDataX.wcMap.Get(Of Single)(rc.maxDist.Y, rc.maxDist.X)
                 Dim y = wcDataY.wcMap.Get(Of Single)(rc.maxDist.Y, rc.maxDist.X)
@@ -78,7 +77,6 @@ Namespace VBClasses
             prepData.Run(src)
             dst2 = prepData.dst2
 
-            Dim reduction = task.fOptions.ReductionSlider.Value
             Dim histogram As New cv.Mat
             cv.Cv2.CalcHist({dst2}, {0}, task.depthmask, histogram, 1, {256}, {New cv.Rangef(0, 256)})
             Dim histArray() As Single = Nothing
@@ -98,8 +96,8 @@ Namespace VBClasses
                 dst0 = dst2.InRange(index, index)
                 Dim mean = prepData.reduced32s.Mean(dst0)
 
-                If CInt(mean(0)) Mod reduction = 0 Then
-                    Dim region = CInt(mean(0) / reduction)
+                If CInt(mean(0)) Mod task.reduction = 0 Then
+                    Dim region = CInt(mean(0) / task.reduction)
                     wcMap.SetTo(region, dst0)
                 End If
             Next
@@ -137,8 +135,8 @@ Namespace VBClasses
                 dst0 = dst2.InRange(index, index)
                 Dim mean = wcData.prepData.reduced32s.Mean(dst0)
 
-                If CInt(mean(0)) Mod task.fOptions.ReductionSlider.Value = 0 Then
-                    Dim region = CInt(mean(0) / task.fOptions.ReductionSlider.Value)
+                If CInt(mean(0)) Mod task.reduction = 0 Then
+                    Dim region = CInt(mean(0) / task.reduction)
                     wcMap.SetTo(region, dst0)
                     If region = 0 Then
                         strOut += vbCrLf + If(i Mod 3 = 2 Or i Mod 3 = 1, vbCrLf, "")

@@ -9,12 +9,10 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             If src.Channels() <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
-            Dim reductionTarget = task.fOptions.ReductionSlider.Value
+            classCount = Math.Ceiling(255 / task.reduction)
 
-            classCount = Math.Ceiling(255 / reductionTarget)
-
-            dst2 = src / reductionTarget
-            labels(2) = "Reduced image - factor = " + CStr(reductionTarget)
+            dst2 = src / task.reduction
+            labels(2) = "Reduced image - factor = " + CStr(task.reduction)
 
             If standaloneTest() Or alwaysDisplay Then dst3 = PaletteBlackZero(dst2)
             labels(2) = CStr(classCount) + " colors after reduction - 8uC1 below"

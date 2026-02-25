@@ -18576,7 +18576,6 @@ Namespace VBClasses
             labels(2) = redC.labels(2)
 
             rcList.Clear()
-            Dim reduction = task.fOptions.ReductionSlider.Value
             For Each rc In redC.rcList
                 Dim x = wcDataX.wcMap.Get(Of Single)(rc.maxDist.Y, rc.maxDist.X)
                 Dim y = wcDataY.wcMap.Get(Of Single)(rc.maxDist.Y, rc.maxDist.X)

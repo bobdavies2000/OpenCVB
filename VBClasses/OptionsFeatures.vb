@@ -116,6 +116,7 @@ Public Class OptionsFeatures
 
     Private Sub ReductionSlider_ValueChanged(sender As Object, e As EventArgs) Handles ReductionSlider.ValueChanged
         Lab1.Text = Format(ReductionSlider.Value, fmt0)
+        task.reduction = ReductionSlider.Value
         task.optionsChanged = True
     End Sub
     Private Sub FCorrSlider_ValueChanged(sender As Object, e As EventArgs) Handles MatchCorrSlider.ValueChanged

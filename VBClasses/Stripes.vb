@@ -6,18 +6,16 @@ Namespace VBClasses
             desc = "Create stripes throughout the image with reduction"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            Dim reductionTarget = task.fOptions.ReductionSlider.Value
-
             If src.Type <> cv.MatType.CV_32FC1 Then src = task.pcSplit(0)
             Dim depth32f As cv.Mat = src * 1000
             Dim depth32S As New cv.Mat
             depth32f.ConvertTo(depth32S, cv.MatType.CV_32S)
 
             Dim mm = GetMinMax(depth32S, task.depthmask)
-            dst2 = cv.Cv2.Abs(depth32S) / reductionTarget
+            dst2 = cv.Cv2.Abs(depth32S) / task.reduction
             Dim maxVal = Math.Min(Math.Abs(mm.minVal), mm.maxVal) ' symmetric around 0
             If maxVal = 0 Then maxVal = mm.maxVal ' symmetric around 0 except for Z where all values are above 0
-            classCount = maxVal \ reductionTarget
+            classCount = maxVal \ task.reduction
 
             dst3 = PaletteFull(dst2)
             mm = GetMinMax(dst2, task.depthmask)
