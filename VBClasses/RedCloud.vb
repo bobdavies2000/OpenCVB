@@ -524,24 +524,25 @@ Namespace VBClasses
 
             Dim clickIndex = redC.redC.rcMap.Get(Of Integer)(task.clickPoint.Y, task.clickPoint.X) - 1
 
+            If clickIndex = 0 Then
+                SetTrueText("Click on any cell with depth.", 3)
+                Exit Sub
+            End If
+
             dst3.SetTo(0)
             Dim rc = redC.rcList(clickIndex)
+            dst3(rc.rect).SetTo(rc.color, rc.mask)
+
             Select Case rc.colorChange
-                Case 0 ' not changed
-                    dst3(rc.rect).SetTo(rc.color, rc.mask)
                 Case 1 ' indexLast < 0
-                    dst3(rc.rect).SetTo(task.highlight, rc.mask)
                     labels(3) = "indexLast < 0"
                 Case 2 ' last index < current rclist.count
-                    dst3(rc.rect).SetTo(red, rc.mask)
                     labels(3) = "last index < current rclist.count"
                 Case 3 ' last rect does not intersect with the current rect
-                    dst3(rc.rect).SetTo(grayColor, rc.mask)
                     labels(3) = "Last rect does not intersect with the current rect"
                 Case 4 ' Options changed.
-                    dst3(rc.rect).SetTo(cv.Scalar.Aqua, rc.mask)
+                    labels(3) = "task options changed"
                 Case 5 ' maxDist is not in the last rect
-                    dst3(rc.rect).SetTo(cv.Scalar.Aqua, rc.mask)
                     labels(3) = "maxDist is not in the last rect"
             End Select
         End Sub

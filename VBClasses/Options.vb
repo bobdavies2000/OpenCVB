@@ -8110,6 +8110,21 @@ Namespace VBClasses
 
 
 
+    Public Class Options_RedCloud : Inherits OptionParent
+        Public ageThreshold As Integer
+        Public rectOverlapRatio As Integer
+        Public Sub New()
+            If sliders.Setup(traceName) Then sliders.setupTrackBar("Age Threshold", 1, 50, 30)
+        End Sub
+        Public Sub Run()
+            Static ageSlider = FindSlider("Age Threshold")
+            ageThreshold = ageSlider.value
+        End Sub
+    End Class
+
+
+
+
     Public Class Options_RedPrep : Inherits OptionParent
         Public PrepX As Boolean
         Public PrepY As Boolean
@@ -8165,19 +8180,4 @@ Namespace VBClasses
         End Sub
     End Class
 
-
-
-
-
-    Public Class Options_RedCloud : Inherits OptionParent
-        Public ageThreshold As Integer
-        Public rectOverlapRatio As Integer
-        Public Sub New()
-            If sliders.Setup(traceName) Then sliders.setupTrackBar("Age Threshold", 1, 50, 30)
-        End Sub
-        Public Sub Run()
-            Static ageSlider = FindSlider("Age Threshold")
-            ageThreshold = ageSlider.value
-        End Sub
-    End Class
 End Namespace

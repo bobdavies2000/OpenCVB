@@ -125,6 +125,7 @@ Corners_Core
 Corners_Harris
 Corners_HarrisDetector_CPP
 Corners_RedPrepData
+Corners_RedPrepXY
 Corners_ShiTomasi_CPP
 Covariance_Basics
 Covariance_Images
