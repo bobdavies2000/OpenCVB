@@ -512,7 +512,7 @@ Namespace VBClasses
 
 
     Public Class RedCloud_ColorChangeCause : Inherits TaskParent
-        Dim redC As New RedWC_Basics
+        Dim redC As New RedWC_BasicsOld
         Public Sub New()
             desc = "Click on a cell to determine why it is changing colors."
         End Sub

@@ -569,7 +569,9 @@ Namespace VBClasses
                     color = task.vecColors(index Mod 255)
                     pixels = mask.CountNonZero
                     wcMean = task.pointCloud(rect).Mean(task.depthmask(rect))
-                    '  Dim x = wcMean(0) * 1000 /
+                    Dim x = wcMean(0) * 1000 \ task.reduction
+                    Dim y = wcMean(1) * 1000 \ task.reduction
+                    wc = New cv.Point(x, y)
                     If Single.IsInfinity(wcMean(2)) Then depthDelta = 0
                 End If
             End Sub

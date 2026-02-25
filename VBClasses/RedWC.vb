@@ -1,6 +1,27 @@
 ﻿Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Class RedWC_Basics : Inherits TaskParent
+        Public indexer As New Indexer_Basics
+        Public redC As New RedCloud_FloodFill
+        Public Sub New()
+            desc = "Assign abstract world coordinates to each cell."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            indexer.Run(src)
+            dst2 = indexer.dst2
+            labels(2) = indexer.labels(2)
+
+
+        End Sub
+    End Class
+
+
+
+
+
+
+
+    Public Class RedWC_BasicsOld : Inherits TaskParent
         Public redC As New RedCloud_FloodFill
         Public indexer As New Indexer_Basics
         Dim wcDataX As New RedWC_Core
@@ -197,7 +218,7 @@ Namespace VBClasses
 
 
     Public Class RedWC_Neighbors : Inherits TaskParent
-        Dim redWC As New RedWC_Basics
+        Dim redWC As New RedWC_BasicsOld
         Public Sub New()
             task.gOptions.displayDst1.Checked = True
             desc = "Identify the neighbors of the cell that was clicked"
