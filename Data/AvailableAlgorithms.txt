@@ -380,6 +380,7 @@ IMU_PlotHostFrameTimes
 IMU_PlotIMUFrameTime
 IMU_Vertical
 IMU_VerticalVerify
+Indexer_Basics
 InPaint_Basics
 Interpolate_Basics
 Interpolate_Kalman

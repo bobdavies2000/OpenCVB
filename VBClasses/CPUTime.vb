@@ -101,7 +101,7 @@ Namespace VBClasses
                     PercentTimes.Add(algorithm_ms(i), str)
                 End If
             Next
-            Dim paintStr = Format(task.cpu.paintTime, fmt1) + " ms paint time"
+            Dim paintStr = Format(task.cpu.paintTime, fmt1) + " ms paint time / second"
             task.cpu.paintTime = 0
 
             Dim otherTimes As New List(Of Single)

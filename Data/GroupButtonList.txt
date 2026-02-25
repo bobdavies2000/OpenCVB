@@ -106,6 +106,7 @@ Image
 ImageOffset
 ImShow
 IMU
+Indexer
 InPaint
 Interpolate
 Intrinsics

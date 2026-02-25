@@ -2,6 +2,7 @@
 Namespace VBClasses
     Public Class RedWC_Basics : Inherits TaskParent
         Public redC As New RedCloud_FloodFill
+        Public indexer As New Indexer_Basics
         Dim wcDataX As New RedWC_Core
         Dim wcDataY As New RedWC_Core
         Public rcList As New List(Of rcData)
@@ -13,19 +14,20 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             wcDataX.prepData.presetReductionName = "X Reduction"
             wcDataX.Run(emptyMat)
-            strOut = wcDataX.labels(2) + vbCrLf
+            strOut = CStr(wcDataX.regionList.Count) + " non-zero vertical regions" + vbCrLf
 
             wcDataX.prepData.presetReductionName = "Y Reduction"
             wcDataY.Run(emptyMat)
-            strOut += wcDataY.labels(2) + vbCrLf
+            strOut += CStr(wcDataY.regionList.Count) + " non-zero horizontal regions" + vbCrLf
 
-            dst1 = wcDataX.dst2 Or wcDataY.dst2
-            Dim mm = GetMinMax(dst1)
-            labels(1) = "min = " + Format(mm.minVal, fmt0) + " max = " + Format(mm.maxVal, fmt0)
+            indexer.Run(src)
+            dst1 = indexer.dst2
+            dst1.SetTo(0, indexer.dst3)
 
             redC.Run(dst1)
             dst2 = redC.dst2
             labels(2) = redC.labels(2)
+            dst2.SetTo(0, indexer.dst3)
 
             rcList.Clear()
             Dim reduction = task.fOptions.ReductionSlider.Value
@@ -66,8 +68,7 @@ Namespace VBClasses
         Public wcMap As New cv.Mat(dst2.Size, cv.MatType.CV_32F, 0)
         Public regionList As New List(Of Integer)
         Public Sub New()
-            If standalone Then OptionParent.findRadio("X Reduction").Checked = True
-            desc = "Prepare the absolute coordinates of the World Coordinates."
+            desc = "Prepare the absolute world coordinates."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             prepData.Run(src)
@@ -98,6 +99,9 @@ Namespace VBClasses
                     wcMap.SetTo(region, dst0)
                 End If
             Next
+
+            dst3 = PaletteBlackZero(wcMap)
+            dst3.SetTo(0, task.noDepthMask)
         End Sub
     End Class
 
@@ -221,5 +225,4 @@ Namespace VBClasses
             End If
         End Sub
     End Class
-
 End Namespace

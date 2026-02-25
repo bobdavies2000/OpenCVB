@@ -18543,4 +18543,64 @@ Namespace VBClasses
             End If
         End Sub
     End Class
+
+
+
+
+
+    Public Class XO_RedWC_Basics : Inherits TaskParent
+        Public redC As New RedCloud_FloodFill
+        Dim wcDataX As New RedWC_Core
+        Dim wcDataY As New RedWC_Core
+        Public rcList As New List(Of rcData)
+        Public rcTranslate As New List(Of cv.Point)
+        Public Sub New()
+            If standalone Then task.gOptions.displayDst1.Checked = True
+            desc = "Assign world coordinates to each RedCloud cell"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            wcDataX.prepData.presetReductionName = "X Reduction"
+            wcDataX.Run(emptyMat)
+            strOut = CStr(wcDataX.regionList.Count) + " non-zero vertical regions" + vbCrLf
+
+            wcDataX.prepData.presetReductionName = "Y Reduction"
+            wcDataY.Run(emptyMat)
+            strOut += CStr(wcDataY.regionList.Count) + " non-zero horizontal regions" + vbCrLf
+
+            dst1 = wcDataX.dst2 Or wcDataY.dst2
+            Dim mm = GetMinMax(dst1)
+            labels(1) = "min = " + Format(mm.minVal, fmt0) + " max = " + Format(mm.maxVal, fmt0)
+
+            redC.Run(dst1)
+            dst2 = redC.dst2
+            labels(2) = redC.labels(2)
+
+            rcList.Clear()
+            Dim reduction = task.fOptions.ReductionSlider.Value
+            For Each rc In redC.rcList
+                Dim x = wcDataX.wcMap.Get(Of Single)(rc.maxDist.Y, rc.maxDist.X)
+                Dim y = wcDataY.wcMap.Get(Of Single)(rc.maxDist.Y, rc.maxDist.X)
+                rc.region = New cv.Point(CInt(x), CInt(y))
+                rcList.Add(rc)
+            Next
+
+            rcTranslate.Clear()
+            For Each rc In rcList
+                rcTranslate.Add(rc.region)
+            Next
+
+            If standaloneTest() Then
+                Dim index = redC.rcMap.Get(Of Integer)(task.clickPoint.Y, task.clickPoint.X)
+                If index > 0 And index < rcList.Count Then
+                    Dim rcClick = rcList(index - 1)
+                    strOut += rcClick.displayCell()
+                    dst2(rcClick.rect).SetTo(white, rcClick.mask)
+                    dst3.SetTo(0)
+                    dst3(rcClick.rect).SetTo(white, rcClick.mask)
+                End If
+            End If
+            If standaloneTest() Then dst2.SetTo(0, task.noDepthMask)
+            SetTrueText(strOut, 3)
+        End Sub
+    End Class
 End Namespace
