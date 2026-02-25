@@ -16,15 +16,19 @@ Namespace VBClasses
             wcDataX.Run(emptyMat)
             strOut = CStr(wcDataX.regionList.Count) + " non-zero vertical regions" + vbCrLf
 
+            indexer.Run(wcDataX.dst2)
+            dst1 = indexer.dst2
+            dst1.SetTo(0, indexer.dst3)
+
             wcDataX.prepData.presetReductionName = "Y Reduction"
             wcDataY.Run(emptyMat)
             strOut += CStr(wcDataY.regionList.Count) + " non-zero horizontal regions" + vbCrLf
 
-            indexer.Run(src)
+            indexer.Run(wcDataY.dst2)
             dst1 = indexer.dst2
             dst1.SetTo(0, indexer.dst3)
 
-            redC.Run(dst1)
+            redC.Run(src)
             dst2 = redC.dst2
             labels(2) = redC.labels(2)
             dst2.SetTo(0, indexer.dst3)
