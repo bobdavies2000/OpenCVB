@@ -179,7 +179,7 @@ RedMask
 RedPrep
 RedTrack
 Reduction
-RedWC
+RedWG
 Region
 Remap
 Resize

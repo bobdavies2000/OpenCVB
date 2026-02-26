@@ -22,14 +22,10 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             indexer.Run(src)
             dst1 = indexer.dst3.Dilate(element, Nothing, 1)
-            dst0 = Not indexer.dst2.Threshold(0, 255, cv.ThresholdTypes.Binary)
-            dst1.SetTo(255, dst0)
-
             redC.Run(dst1)
+
             dst2 = redC.dst2
             labels(2) = redC.labels(2)
-            dst2.SetTo(0, dst1)
-            redC.rcMap.SetTo(0, dst1)
 
             strOut = RedCloud_Cell.selectCell(redC.rcMap, redC.rcList)
             If task.rcD IsNot Nothing Then dst2.Rectangle(task.rcD.rect, task.highlight, task.lineWidth)
@@ -420,14 +416,14 @@ Namespace VBClasses
 
 
     Public Class RedCloud_ColorChangeCause : Inherits TaskParent
-        Dim redC As New RedWC_BasicsOld
+        Dim redC As New RedCloud_Basics
         Public Sub New()
             desc = "Click on a cell to determine why it is changing colors."
         End Sub
         Public Shared Function findCause(rcMap As cv.Mat, rcList As List(Of rcData)) As String
             Dim clickIndex = rcMap.Get(Of Integer)(task.clickPoint.Y, task.clickPoint.X)
             findCause = ""
-            If clickIndex > 0 Then
+            If clickIndex > 0 And clickIndex < rcList.Count Then
                 Dim rc = rcList(clickIndex - 1)
                 Select Case rc.colorChange
                     Case causes.indexLastBelowZero
@@ -450,7 +446,7 @@ Namespace VBClasses
             labels(2) = redC.labels(2)
             dst2.SetTo(0, task.noDepthMask)
 
-            labels(3) = findCause(redC.redC.rcMap, redC.rcList)
+            labels(3) = findCause(redC.rcMap, redC.rcList)
         End Sub
     End Class
 

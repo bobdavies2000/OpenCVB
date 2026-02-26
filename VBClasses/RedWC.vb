@@ -1,9 +1,12 @@
-﻿Imports cv = OpenCvSharp
+﻿Imports System.Runtime.InteropServices
+Imports System.Windows.Documents
+Imports cv = OpenCvSharp
 Namespace VBClasses
-    Public Class RedWC_Basics : Inherits TaskParent
+    Public Class RedWG_Basics : Inherits TaskParent
         Dim redC As New RedCloud_Basics
         Dim currSet As New List(Of cv.Point)
         Public Sub New()
+            If standalone Then task.gOptions.displayDst1.Checked = True
             desc = "Identify where RedCloud world coordinates are changing"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -13,18 +16,26 @@ Namespace VBClasses
 
             Dim lastSet As New List(Of cv.Point)(currSet)
             dst2.SetTo(0)
-            dst3.SetTo(0)
-            Dim count As Integer
+            Static count As Integer
+            If task.heartBeatLT Or task.frameCount = 2 Then
+                dst3.SetTo(0)
+                count = 0
+            End If
+            currSet.Clear()
             For Each rc In redC.rcList
-                currSet.Add(rc.wc)
-                If lastSet.Contains(rc.wc) Then
+                currSet.Add(rc.wGrid)
+                If lastSet.Contains(rc.wGrid) Then
                     dst2(rc.rect).SetTo(rc.color, rc.mask)
                 Else
                     dst3(rc.rect).SetTo(rc.color, rc.mask)
                     count += 1
                 End If
             Next
-            labels(3) = CStr(count) + " cells were not consistently present based on the wc value"
+
+            strOut = RedCloud_Cell.selectCell(redC.rcMap, redC.rcList)
+            SetTrueText(strOut, 1)
+
+            labels(3) = CStr(count) + " cells were not matched using wc since the last heartbeat"
         End Sub
     End Class
 
@@ -32,67 +43,30 @@ Namespace VBClasses
 
 
 
-
-
-
-    Public Class RedWC_BasicsOld : Inherits TaskParent
-        Public redC As New RedCloud_FloodFill
-        Public indexer As New Indexer_Basics
-        Dim wcDataX As New RedWC_Core
-        Dim wcDataY As New RedWC_Core
-        Public rcList As New List(Of rcData)
-        Public rcTranslate As New List(Of cv.Point)
+    Public Class RedWG_ValidateRows : Inherits TaskParent
+        Dim redC As New RedCloud_Basics
         Public Sub New()
-            If standalone Then task.gOptions.displayDst1.Checked = True
-            desc = "Assign world coordinates to each RedCloud cell"
+            desc = "Validate how consistent the world grid entries are."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            wcDataX.prepData.presetReductionName = "X Reduction"
-            wcDataX.Run(emptyMat)
-            strOut = CStr(wcDataX.regionList.Count) + " non-zero vertical regions" + vbCrLf
-
-            indexer.Run(wcDataX.dst2)
-            dst1 = indexer.dst2
-            dst1.SetTo(0, indexer.dst3)
-
-            wcDataX.prepData.presetReductionName = "Y Reduction"
-            wcDataY.Run(emptyMat)
-            strOut += CStr(wcDataY.regionList.Count) + " non-zero horizontal regions" + vbCrLf
-
-            indexer.Run(wcDataY.dst2)
-            dst1 = indexer.dst2
-            dst1.SetTo(0, indexer.dst3)
-
             redC.Run(src)
             dst2 = redC.dst2
             labels(2) = redC.labels(2)
-            dst2.SetTo(0, indexer.dst3)
 
-            rcList.Clear()
+            Dim ptY As New List(Of Integer)
             For Each rc In redC.rcList
-                Dim x = wcDataX.wcMap.Get(Of Single)(rc.maxDist.Y, rc.maxDist.X)
-                Dim y = wcDataY.wcMap.Get(Of Single)(rc.maxDist.Y, rc.maxDist.X)
-                rc.wc = New cv.Point(CInt(x), CInt(y))
-                rcList.Add(rc)
+                ptY.Add(rc.wGrid.Y)
             Next
 
-            rcTranslate.Clear()
-            For Each rc In rcList
-                rcTranslate.Add(rc.wc)
+            Static row As Integer = ptY.Min
+
+            For Each rc In redC.rcList
+                If rc.wGrid.Y = row Then dst2(rc.rect).SetTo(white, rc.mask)
             Next
 
-            If standaloneTest() Then
-                Dim index = redC.rcMap.Get(Of Integer)(task.clickPoint.Y, task.clickPoint.X)
-                If index > 0 And index < rcList.Count Then
-                    Dim rcClick = rcList(index - 1)
-                    strOut += rcClick.displayCell()
-                    dst2(rcClick.rect).SetTo(white, rcClick.mask)
-                    dst3.SetTo(0)
-                    dst3(rcClick.rect).SetTo(white, rcClick.mask)
-                End If
-            End If
-            If standaloneTest() Then dst2.SetTo(0, task.noDepthMask)
-            SetTrueText(strOut, 3)
+            If task.heartBeat Then row += 1
+            SetTrueText("World Grid Row " + CStr(row) + " highlighted", 3)
+            If row > ptY.Max Then row = ptY.Min
         End Sub
     End Class
 
@@ -100,166 +74,32 @@ Namespace VBClasses
 
 
 
-
-    Public Class RedWC_Core : Inherits TaskParent
-        Public prepData As New RedPrep_Core
-        Public wcMap As New cv.Mat(dst2.Size, cv.MatType.CV_32F, 0)
-        Public regionList As New List(Of Integer)
+    Public Class RedWG_ValidateCols : Inherits TaskParent
+        Dim redC As New RedCloud_Basics
         Public Sub New()
-            desc = "Prepare the absolute world coordinates."
+            desc = "Validate how consistent the world grid entries are."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            prepData.Run(src)
-            dst2 = prepData.dst2
+            redC.Run(src)
+            dst2 = redC.dst2
+            labels(2) = redC.labels(2)
 
-            Dim histogram As New cv.Mat
-            cv.Cv2.CalcHist({dst2}, {0}, task.depthmask, histogram, 1, {256}, {New cv.Rangef(0, 256)})
-            Dim histArray() As Single = Nothing
-            histogram.GetArray(Of Single)(histArray)
-
-            Dim sizeThreshold = dst2.Total * 0.001 ' ignore regions less than 0.1% - 1/10th of 1%
-            Dim lutArray(255) As Byte
-            regionList.Clear()
-            For i = 1 To histArray.Count - 1
-                If histArray(i) > sizeThreshold Then regionList.Add(i)
+            Dim ptX As New List(Of Integer)
+            For Each rc In redC.rcList
+                ptX.Add(rc.wGrid.X)
             Next
 
-            labels(2) = CStr(regionList.Count) + " non-zero regions > " + CStr(CInt(sizeThreshold)) + " pixels"
-            wcMap.SetTo(255)
-            For i = 0 To regionList.Count - 1
-                Dim index = regionList(i)
-                dst0 = dst2.InRange(index, index)
-                Dim mean = prepData.reduced32s.Mean(dst0)
+            Static column As Integer = -10
+            If column < ptX.Min Then column = ptX.Min
 
-                If CInt(mean(0)) Mod task.reduction = 0 Then
-                    Dim region = CInt(mean(0) / task.reduction)
-                    wcMap.SetTo(region, dst0)
-                End If
+            For Each rc In redC.rcList
+                If rc.wGrid.X = column Then dst2(rc.rect).SetTo(white, rc.mask)
             Next
 
-            dst3 = PaletteBlackZero(wcMap)
-            dst3.SetTo(0, task.noDepthMask)
+            If task.heartBeat Then column += 1
+            SetTrueText("World Grid Col " + CStr(column) + " highlighted", 3)
+            If column > ptX.Max Then column = ptX.Min
         End Sub
     End Class
 
-
-
-
-
-
-
-
-    Public Class RedWC_Validate : Inherits TaskParent
-        Public wcData As New RedWC_Core
-        Public regionList As New List(Of Integer)
-        Public wcMap As New cv.Mat(dst2.Size, cv.MatType.CV_32S, 0)
-        Public Sub New()
-            If standalone Then OptionParent.findRadio("X Reduction").Checked = True
-            desc = "Identify each WC region."
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            wcData.Run(emptyMat)
-            dst2 = wcData.dst2
-
-            regionList = wcData.regionList
-            strOut = ""
-            Dim count As Integer
-            wcMap.SetTo(0)
-            For i = 0 To regionList.Count - 1
-                Dim index = regionList(i)
-                dst0 = dst2.InRange(index, index)
-                Dim mean = wcData.prepData.reduced32s.Mean(dst0)
-
-                If CInt(mean(0)) Mod task.reduction = 0 Then
-                    Dim region = CInt(mean(0) / task.reduction)
-                    wcMap.SetTo(region, dst0)
-                    If region = 0 Then
-                        strOut += vbCrLf + If(i Mod 3 = 2 Or i Mod 3 = 1, vbCrLf, "")
-                        strOut += "region " + Format(region, "00") + " mean " + Format(mean(0), fmt0) + vbCrLf
-                        strOut += vbCrLf
-                    Else
-                        strOut += "region " + Format(region, "00") + " mean " + Format(mean(0), fmt0) + vbTab
-                        If i Mod 3 = 2 Then strOut += vbCrLf
-                    End If
-                    count += 1
-                End If
-            Next
-            SetTrueText(strOut, 3)
-            labels(2) = CStr(count) + " regions were found"
-        End Sub
-    End Class
-
-
-
-
-
-
-    Public Class RedWC_ValidateX : Inherits TaskParent
-        Dim wcValidate As New RedWC_Validate
-        Public Sub New()
-            If standalone Then OptionParent.findRadio("X Reduction").Checked = True
-            desc = "Identify each WC region."
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            wcValidate.Run(emptyMat)
-            dst2 = wcValidate.wcData.dst2
-            labels(2) = wcValidate.labels(2)
-
-            SetTrueText(wcValidate.strOut, 3)
-        End Sub
-    End Class
-
-
-
-
-    Public Class RedWC_ValidateY : Inherits TaskParent
-        Dim wcValidate As New RedWC_Validate
-        Public Sub New()
-            If standalone Then OptionParent.findRadio("Y Reduction").Checked = True
-            desc = "Identify each WC region."
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            wcValidate.Run(emptyMat)
-            dst2 = wcValidate.wcData.dst2
-            labels(2) = wcValidate.labels(2)
-
-            SetTrueText(wcValidate.strOut, 3)
-        End Sub
-    End Class
-
-
-
-
-
-    Public Class RedWC_Neighbors : Inherits TaskParent
-        Dim redWC As New RedWC_BasicsOld
-        Public Sub New()
-            task.gOptions.displayDst1.Checked = True
-            desc = "Identify the neighbors of the cell that was clicked"
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            redWC.Run(src)
-            dst2 = redWC.dst2
-            labels(2) = redWC.labels(2)
-
-            Dim index = redWC.redC.rcMap.Get(Of Integer)(task.clickPoint.Y, task.clickPoint.X)
-            dst3.SetTo(0)
-            If index > 0 Then
-                Dim rcCenter = redWC.rcList(index - 1)
-                labels(3) = "The highlighted cell neighbors for rc = " + CStr(rcCenter.index)
-                SetTrueText(rcCenter.displayCell, 1)
-                For y = -1 To 1
-                    For x = -1 To 1
-                        Dim region = New cv.Point(rcCenter.wc.X + x, rcCenter.wc.Y + y)
-                        index = redWC.rcTranslate.IndexOf(region)
-                        If index >= 0 Then
-                            Dim rc = redWC.rcList(index)
-                            dst2(rc.rect).SetTo(white, rc.mask)
-                            dst3(rc.rect).SetTo(white, rc.mask)
-                        End If
-                    Next
-                Next
-            End If
-        End Sub
-    End Class
 End Namespace

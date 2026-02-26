@@ -1538,13 +1538,9 @@ RedPrep_EdgesZ
 RedTrack_Basics
 Reduction_Basics
 Reduction_PointCloud
-RedWC_Basics
-RedWC_BasicsOld
-RedWC_Core
-RedWC_Neighbors
-RedWC_Validate
-RedWC_ValidateX
-RedWC_ValidateY
+RedWG_Basics
+RedWG_ValidateCols
+RedWG_ValidateRows
 Region_Basics
 Region_Contours
 Region_Core

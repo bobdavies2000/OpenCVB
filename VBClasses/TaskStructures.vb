@@ -543,7 +543,7 @@ Namespace VBClasses
             Public maxDist As cv.Point
             Public pixels As Integer
             Public rect As cv.Rect
-            Public wc As cv.Point
+            Public wGrid As cv.Point
             Public colorChange As Integer ' 0 no change, 1 , 
             Public eq As cv.Vec4f ' only here for compatibility
             Public Sub New()
@@ -571,7 +571,7 @@ Namespace VBClasses
                     wcMean = task.pointCloud(rect).Mean(task.depthmask(rect))
                     Dim x = Math.Round(wcMean(0) * 1000 / task.reduction)
                     Dim y = Math.Round(wcMean(1) * 1000 / task.reduction)
-                    wc = New cv.Point(x, y)
+                    wGrid = New cv.Point(x, y)
                     If Single.IsInfinity(wcMean(2)) Then depthDelta = 0
                 End If
             End Sub
@@ -603,7 +603,7 @@ Namespace VBClasses
                 strOut += "Color = " + color.ToString + vbCrLf
                 strOut += "Pixel count = " + CStr(pixels) + vbCrLf
                 If hull IsNot Nothing Then strOut += "Hull count = " + CStr(hull.Count) + vbCrLf
-                strOut += "wc (region id) = " + CStr(wc.X) + ", " + CStr(wc.Y)
+                strOut += "wc (region id) = " + CStr(wGrid.X) + ", " + CStr(wGrid.Y)
                 Return strOut
             End Function
         End Class

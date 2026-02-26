@@ -58,13 +58,12 @@ public:
         {
             for (int x = 0; x < src.cols; x++)
             {
-                if (mask.at<unsigned char>(y, x) == 0)
+                if (src.at<unsigned char>(y, x) == 0)
                 {
                     pt = Point(x, y);
                     int count = floodFill(src, mask, pt, 255, &rect, 0, 0, 4 | floodFlag | (255 << 8));
                     if (rect.width > 1 && rect.height > 1) sizeSorted.insert(make_pair(count, pt));
                 }
-
             }
         }
 
