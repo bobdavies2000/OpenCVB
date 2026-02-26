@@ -9343,7 +9343,7 @@ Namespace VBClasses
             dst0.SetTo(0, Not dst2)
 
             dst1.SetTo(red)
-            strOut = task.sharpGL.RunSharp(Common.oCase.draw3DLinesAndCloud, dst0, task.lines.dst2)
+            strOut = task.sharpGL.RunSharp(oCase.draw3DLinesAndCloud, dst0, task.lines.dst2)
             SetTrueText(strOut, 3)
 
             dst2 = task.lines.dst2

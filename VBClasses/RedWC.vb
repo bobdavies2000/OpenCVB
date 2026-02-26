@@ -1,10 +1,9 @@
-﻿Imports System.Windows
-Imports System.Windows.Documents
-Imports cv = OpenCvSharp
+﻿Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Class RedWC_Basics : Inherits TaskParent
         Public indexer As New Indexer_Basics
         Public redC As New RedCloud_FloodFill
+        Dim causal As New RedCloud_ColorChangeCause
         Dim element As New cv.Mat
         Public Sub New()
             element = cv.Cv2.GetStructuringElement(cv.MorphShapes.Rect, New cv.Size(3, 3))
@@ -22,6 +21,10 @@ Namespace VBClasses
 
             strOut = RedCloud_Cell.selectCell(redC.rcMap, redC.rcList)
             If strOut <> "" Then SetTrueText(strOut, 3) Else SetTrueText("Click on any cell", 3)
+
+            Dim causeLabel = RedCloud_ColorChangeCause.findCause(redC.rcMap, redC.rcList)
+
+            If causeLabel <> "" Then labels(3) = causeLabel
         End Sub
     End Class
 

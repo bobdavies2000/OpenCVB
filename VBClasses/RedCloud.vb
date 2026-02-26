@@ -1,6 +1,13 @@
 Imports System.Runtime.InteropServices
 Imports cv = OpenCvSharp
 Namespace VBClasses
+    Public Enum causes
+        indexLastBelowZero
+        indexLastAboveCount
+        intersectLastRectFailed
+        optionsChange
+        maxDistOutsideOfLastRect
+    End Enum
     Public Class RedCloud_Basics : Inherits TaskParent
         Public redCore As New RedCloud_Core
         Public rcList As New List(Of rcData)
@@ -24,10 +31,10 @@ Namespace VBClasses
                 r2 = rcListLast(indexLast).rect
             End If
 
-            If indexLast < 0 Then rc.colorChange = 1
-            If indexLast >= rcListLast.Count Then rc.colorChange = 2
-            If r1.IntersectsWith(r2) = False Then rc.colorChange = 3
-            If task.optionsChanged Then rc.colorChange = 4
+            If indexLast < 0 Then rc.colorChange = causes.indexLastBelowZero
+            If indexLast >= rcListLast.Count Then rc.colorChange = causes.indexLastAboveCount
+            If r1.IntersectsWith(r2) = False Then rc.colorChange = causes.intersectLastRectFailed
+            If task.optionsChanged Then rc.colorChange = causes.optionsChange
 
             If indexLast >= 0 And indexLast < rcListLast.Count And r1.IntersectsWith(r2) And task.optionsChanged = False Then
                 Dim lrc = rcListLast(indexLast)
@@ -42,7 +49,7 @@ Namespace VBClasses
                         rc.wcMean(2) = 0
                     End If
                 Else
-                    rc.colorChange = 5
+                    rc.colorChange = causes.maxDistOutsideOfLastRect
                 End If
 
                 rc.age = lrc.age + 1
@@ -510,35 +517,33 @@ Namespace VBClasses
         Public Sub New()
             desc = "Click on a cell to determine why it is changing colors."
         End Sub
+        Public Shared Function findCause(rcMap As cv.Mat, rcList As List(Of rcData)) As String
+            Dim strOut As String = ""
+            Dim clickIndex = rcMap.Get(Of Integer)(task.clickPoint.Y, task.clickPoint.X)
+
+            If clickIndex = 0 Then Return strOut
+
+            Dim rc = rcList(clickIndex - 1)
+            Select Case rc.colorChange
+                Case causes.indexLastBelowZero ' indexLast < 0
+                    strOut = "indexLast < 0"
+                Case causes.indexLastAboveCount ' last index < current rclist.count
+                    strOut = "last index < current rclist.count"
+                Case causes.intersectLastRectFailed ' last rect does not intersect with the current rect
+                    strOut = "Last rect does not intersect with the current rect"
+                Case causes.optionsChange ' Options changed.
+                    strOut = "task options changed"
+                Case causes.maxDistOutsideOfLastRect ' maxDist is not in the last rect
+                    strOut = "maxDist is not in the last rect"
+            End Select
+        End Function
         Public Overrides Sub RunAlg(src As cv.Mat)
             redC.Run(src)
             dst2 = redC.dst2
             labels(2) = redC.labels(2)
             dst2.SetTo(0, task.noDepthMask)
 
-            Dim clickIndex = redC.redC.rcMap.Get(Of Integer)(task.clickPoint.Y, task.clickPoint.X) - 1
-
-            If clickIndex = 0 Then
-                SetTrueText("Click on any cell with depth.", 3)
-                Exit Sub
-            End If
-
-            dst3.SetTo(0)
-            Dim rc = redC.rcList(clickIndex)
-            dst3(rc.rect).SetTo(rc.color, rc.mask)
-
-            Select Case rc.colorChange
-                Case 1 ' indexLast < 0
-                    labels(3) = "indexLast < 0"
-                Case 2 ' last index < current rclist.count
-                    labels(3) = "last index < current rclist.count"
-                Case 3 ' last rect does not intersect with the current rect
-                    labels(3) = "Last rect does not intersect with the current rect"
-                Case 4 ' Options changed.
-                    labels(3) = "task options changed"
-                Case 5 ' maxDist is not in the last rect
-                    labels(3) = "maxDist is not in the last rect"
-            End Select
+            labels(3) = findCause(redC.redC.rcMap, redC.rcList)
         End Sub
     End Class
 End Namespace

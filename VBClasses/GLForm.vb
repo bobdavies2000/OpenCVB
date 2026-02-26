@@ -200,27 +200,27 @@ Public Class SharpGLForm
         If pointcloud Is Nothing Then pointcloud = task.pointCloud
         If RGB Is Nothing Then RGB = task.color
         Select Case func
-            Case Common.oCase.readPC
+            Case oCase.readPC
                 label = drawCloud(pointcloud, RGB)
                 readPointCloud()
 
-            Case Common.oCase.readLines
+            Case oCase.readLines
                 label = drawCloud(pointcloud, RGB)
                 label += draw3DLines(task.lines.lpList)
                 readPointCloud()
 
-            Case Common.oCase.readQuads
+            Case oCase.readQuads
                 label = drawQuads()
                 readPointCloud()
 
-            Case Common.oCase.drawPointCloudRGB
+            Case oCase.drawPointCloudRGB
                 'gl.ClearStencil(0)
                 'gl.Clear(OpenGL.GL_COLOR_BUFFER_BIT Or OpenGL.GL_DEPTH_BUFFER_BIT Or OpenGL.GL_STENCIL_BUFFER_BIT)
 
                 label = drawCloud(pointcloud, RGB)
 
 
-            Case Common.oCase.line3D
+            Case oCase.line3D
                 gl.Begin(OpenGL.GL_POINTS)
                 Dim count As Integer, all255 As Boolean
                 If RGB Is Nothing Then all255 = True
@@ -243,13 +243,13 @@ Public Class SharpGLForm
                 label = CStr(count) + " points were rendered for the selected line(s)."
 
 
-            Case Common.oCase.quadBasics
+            Case oCase.quadBasics
                 drawQuads()
 
-            Case Common.oCase.draw3DLines
+            Case oCase.draw3DLines
                 label = draw3DLines(task.lines.lpList)
 
-            Case Common.oCase.draw3DLinesAndCloud
+            Case oCase.draw3DLinesAndCloud
                 label = drawCloud(pointcloud, RGB)
 
                 label += " " + draw3DLines(task.lines.lpList)
@@ -275,9 +275,9 @@ Public Class SharpGLForm
 
         Dim label = ""
         Select Case func
-            Case Common.oCase.draw3DLines
+            Case oCase.draw3DLines
                 label = draw3DLines(lpList)
-            Case Common.oCase.draw3DLinesAndCloud
+            Case oCase.draw3DLinesAndCloud
                 label = drawCloud(task.pointCloud, task.color)
                 label += " " + draw3DLines(lpList)
         End Select
@@ -290,7 +290,7 @@ Public Class SharpGLForm
 
         Dim label = ""
         Select Case func
-            Case Common.oCase.colorTriangles
+            Case oCase.colorTriangles
                 Dim vec As cv.Vec3f
                 gl.Begin(OpenGL.GL_TRIANGLES)
 
@@ -311,7 +311,7 @@ Public Class SharpGLForm
                 gl.End()
                 label = CStr(dataBuffer.Count) + " triangles were sent to OpenGL."
 
-            Case Common.oCase.imageTriangles
+            Case oCase.imageTriangles
                 If hulls Is Nothing Then hulls = New RedCloud_Basics
                 hulls.Run(task.color)
 
