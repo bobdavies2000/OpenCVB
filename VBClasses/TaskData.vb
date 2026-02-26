@@ -78,7 +78,7 @@ Namespace VBClasses
         Public colorizer As DepthColorizer_Basics
         Public redList As XO_RedList_Basics
         Public redListNew As RedList_Basics
-        Public redCloud As RedCloud_Basics
+        Public redCloud As RedCloud_PrepEdges
         Public gravityMatrix As IMU_GMatrix
         Public lines As Line_Basics
         Public grid As Grid_Basics

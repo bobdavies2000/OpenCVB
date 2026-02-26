@@ -4,7 +4,7 @@ Namespace VBClasses
         Dim prep As New RedPrep_Core
         Public Sub New()
             dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
-            desc = "Find edges in the RedPrep output using indexers"
+            desc = "Find edges in the reduced point cloud output using indexers"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             If src.Channels <> 1 Then

@@ -1,32 +1,33 @@
 ﻿Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Class RedWC_Basics : Inherits TaskParent
-        Public indexer As New Indexer_Basics
-        Public redC As New RedCloud_FloodFill
-        Dim causal As New RedCloud_ColorChangeCause
-        Dim element As New cv.Mat
+        Dim redC As New RedCloud_Basics
+        Dim currSet As New List(Of cv.Point)
         Public Sub New()
-            element = cv.Cv2.GetStructuringElement(cv.MorphShapes.Rect, New cv.Size(3, 3))
-            desc = "Assign abstract world coordinates to each cell."
+            desc = "Identify where RedCloud world coordinates are changing"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            indexer.Run(src)
-            dst1 = indexer.dst3.Dilate(element, Nothing, 1)
-
-            redC.Run(dst1)
+            redC.Run(src)
             dst2 = redC.dst2
             labels(2) = redC.labels(2)
-            dst2.SetTo(0, dst1)
-            redC.rcMap.SetTo(0, dst1)
 
-            strOut = RedCloud_Cell.selectCell(redC.rcMap, redC.rcList)
-            If strOut <> "" Then SetTrueText(strOut, 3) Else SetTrueText("Click on any cell", 3)
-
-            Dim causeLabel = RedCloud_ColorChangeCause.findCause(redC.rcMap, redC.rcList)
-
-            If causeLabel <> "" Then labels(3) = causeLabel
+            Dim lastSet As New List(Of cv.Point)(currSet)
+            dst2.SetTo(0)
+            dst3.SetTo(0)
+            Dim count As Integer
+            For Each rc In redC.rcList
+                currSet.Add(rc.wc)
+                If lastSet.Contains(rc.wc) Then
+                    dst2(rc.rect).SetTo(rc.color, rc.mask)
+                Else
+                    dst3(rc.rect).SetTo(rc.color, rc.mask)
+                    count += 1
+                End If
+            Next
+            labels(3) = CStr(count) + " cells were not consistently present based on the wc value"
         End Sub
     End Class
+
 
 
 

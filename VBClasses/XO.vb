@@ -9963,7 +9963,7 @@ Namespace VBClasses
 
 
 
-    Public Class XO_RedCloud_BasicsXY : Inherits TaskParent
+    Public Class XO_RedCloud_PrepEdgesXY : Inherits TaskParent
         Dim prep As New RedPrep_Depth
         Dim redMask As New RedMask_Basics
         Dim cellGen As New XO_RedCell_Color
@@ -9988,7 +9988,7 @@ Namespace VBClasses
 
 
 
-    Public Class XO_RedCloud_BasicsTest : Inherits TaskParent
+    Public Class XO_RedCloud_PrepEdgesTest : Inherits TaskParent
         Dim redCold As New XO_RedCloud_HeartBeat
         Dim prep As New RedPrep_Basics
         Public rcList As New List(Of rcData)
@@ -10036,7 +10036,7 @@ Namespace VBClasses
 
 
 
-    Public Class XO_RedCloud_Basics_CPP : Inherits TaskParent
+    Public Class XO_RedCloud_PrepEdges_CPP : Inherits TaskParent
         Dim prep As New RedPrep_Basics
         Dim stats As New XO_RedCell_Color
         Public Sub New()
@@ -10057,7 +10057,7 @@ Namespace VBClasses
 
 
 
-    Public Class XO_RedCloud_Basics : Inherits TaskParent
+    Public Class XO_RedCloud_PrepEdges : Inherits TaskParent
         Dim prepEdges As New RedPrep_EdgeMask
         Public rcList As New List(Of rcData)
         Public Sub New()
@@ -12322,7 +12322,7 @@ Namespace VBClasses
 
 
     Public Class XO_RedCloud_MotionSimple : Inherits TaskParent
-        Dim redContours As New RedCloud_Basics
+        Dim redContours As New RedCloud_PrepEdges
         Public Sub New()
             task.gOptions.HistBinBar.Maximum = 255
             task.gOptions.HistBinBar.Value = 255
@@ -12528,7 +12528,7 @@ Namespace VBClasses
 
 
     Public Class XO_RedCloud_HeartBeat : Inherits TaskParent
-        Dim redCore As New RedCloud_Basics
+        Dim redCore As New RedCloud_PrepEdges
         Public rcList As New List(Of rcData)
         Public percentImage As Single
         Public rcMap = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
@@ -15644,7 +15644,7 @@ Namespace VBClasses
 
     Public Class XO_KNN_Hulls : Inherits TaskParent
         Dim knn As New KNN_Basics
-        Dim redC As New RedCloud_Basics
+        Dim redC As New RedCloud_PrepEdges
         Public matchList As New List(Of cv.Point2f)
         Public Sub New()
             knn.desiredMatches = 2

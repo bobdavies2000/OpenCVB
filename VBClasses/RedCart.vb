@@ -4,7 +4,7 @@ Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Class RedCart_Basics : Inherits TaskParent
         Public prepData As New RedPrep_Core
-        Dim redC As New RedCloud_Basics
+        Dim redC As New RedCloud_PrepEdges
         Public Sub New()
             labels(3) = "Use debug slider to select region to display."
             OptionParent.findRadio("X Reduction").Checked = True

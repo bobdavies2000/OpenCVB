@@ -2,6 +2,7 @@ Imports System.Runtime.InteropServices
 Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Enum causes
+        indexLastGood
         indexLastBelowZero
         indexLastAboveCount
         intersectLastRectFailed
@@ -9,6 +10,49 @@ Namespace VBClasses
         maxDistOutsideOfLastRect
     End Enum
     Public Class RedCloud_Basics : Inherits TaskParent
+        Public indexer As New Indexer_Basics
+        Public redC As New RedCloud_FloodFill
+        Dim element As New cv.Mat
+        Public rcList As New List(Of rcData)
+        Public rcMap As cv.Mat
+        Public Sub New()
+            element = cv.Cv2.GetStructuringElement(cv.MorphShapes.Rect, New cv.Size(3, 3))
+            desc = "Assign abstract world coordinates to each cell."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            indexer.Run(src)
+            dst1 = indexer.dst3.Dilate(element, Nothing, 1)
+            dst0 = Not indexer.dst2.Threshold(0, 255, cv.ThresholdTypes.Binary)
+            dst1.SetTo(255, dst0)
+
+            redC.Run(dst1)
+            dst2 = redC.dst2
+            labels(2) = redC.labels(2)
+            dst2.SetTo(0, dst1)
+            redC.rcMap.SetTo(0, dst1)
+
+            strOut = RedCloud_Cell.selectCell(redC.rcMap, redC.rcList)
+            If task.rcD IsNot Nothing Then dst2.Rectangle(task.rcD.rect, task.highlight, task.lineWidth)
+            If strOut <> "" Then SetTrueText(strOut, 3) Else SetTrueText("Click on any cell", 3)
+
+            Dim causeLabel = RedCloud_ColorChangeCause.findCause(redC.rcMap, redC.rcList)
+
+            If causeLabel <> "" Then
+                If labels(3) = "" Then labels(3) = causeLabel Else labels(3) += ", " + causeLabel
+                If labels(3).Length > 80 Then labels(3) = causeLabel
+            End If
+
+            rcList = New List(Of rcData)(redC.rcList)
+            rcMap = redC.rcMap.Clone
+        End Sub
+    End Class
+
+
+
+
+
+
+    Public Class RedCloud_PrepEdges : Inherits TaskParent
         Public redCore As New RedCloud_Core
         Public rcList As New List(Of rcData)
         Public rcMap As cv.Mat = New cv.Mat(dst2.Size, cv.MatType.CV_32S, 0)
@@ -21,22 +65,25 @@ Namespace VBClasses
         Public Shared Function rcDataMatch(rc As rcData, rcListLast As List(Of rcData),
                                            rcMapLast As cv.Mat) As rcData
             Dim r1 = rc.rect
-            Dim r2 = New cv.Rect(0, 0, 1, 1) ' fake rect for conditional below...
             Dim indexLast = rcMapLast.Get(Of Integer)(rc.maxDist.Y, rc.maxDist.X)
 
-            If indexLast > 0 And indexLast < rcListLast.Count Then
-                ' rcList index is 1 less than the rcMap value because a 0 rcMap value means not mapped.
-                ' All pixels are mapped with color but withh depth, rcMap has 0's where there is no depth.
-                indexLast -= 1
-                r2 = rcListLast(indexLast).rect
+            If indexLast = 0 Then
+                rc.colorChange = causes.indexLastBelowZero
+            Else
+                If indexLast < rcListLast.Count Then
+                    ' rcList index is 1 less than the rcMap value because a 0 rcMap value means not mapped.
+                    ' All pixels are mapped with color but withh depth, rcMap has 0's where there is no depth.
+                    indexLast -= 1
+                    Dim r2 = rcListLast(indexLast).rect
+                    If r1.IntersectsWith(r2) = False Then rc.colorChange = causes.intersectLastRectFailed
+                Else
+                    rc.colorChange = causes.indexLastAboveCount
+                End If
             End If
 
-            If indexLast < 0 Then rc.colorChange = causes.indexLastBelowZero
-            If indexLast >= rcListLast.Count Then rc.colorChange = causes.indexLastAboveCount
-            If r1.IntersectsWith(r2) = False Then rc.colorChange = causes.intersectLastRectFailed
             If task.optionsChanged Then rc.colorChange = causes.optionsChange
 
-            If indexLast >= 0 And indexLast < rcListLast.Count And r1.IntersectsWith(r2) And task.optionsChanged = False Then
+            If rc.colorChange = 0 And task.optionsChanged = False Then
                 Dim lrc = rcListLast(indexLast)
                 Dim rTest = rc.rect.Intersect(lrc.rect)
                 Dim rTotal = rTest.Width * rTest.Height
@@ -216,41 +263,6 @@ Namespace VBClasses
 
 
 
-
-    Public Class RedCloud_Cell : Inherits TaskParent
-        Public Sub New()
-            desc = "Display the output of a RedCloud cell."
-        End Sub
-        Public Shared Function selectCell(rcMap As cv.Mat, rcList As List(Of rcData)) As String
-            Dim clickIndex As Integer = 0, strOut As String
-            If rcList.Count > 0 Then
-                clickIndex = rcMap.Get(Of Integer)(task.clickPoint.Y, task.clickPoint.X)
-                If clickIndex > 0 And clickIndex < rcList.Count Then
-                    task.rcD = rcList(clickIndex - 1)
-                Else
-                    task.rcD = Nothing
-                End If
-            End If
-            If task.rcD Is Nothing Then
-                strOut = ""
-            Else
-                strOut = task.rcD.displayCell()
-                If clickIndex > 0 Then
-                    task.color(task.rcD.rect).SetTo(white, task.rcD.mask)
-                End If
-            End If
-            Return strOut
-        End Function
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            If standalone Then dst2 = runRedCloud(src, labels(2))
-
-            selectCell(task.redCloud.rcMap, task.redCloud.rcList)
-            SetTrueText(strOut, 3)
-        End Sub
-    End Class
-
-
-
     Public Class RedCloud_LeftRight : Inherits TaskParent
         Public Sub New()
             If task.bricks Is Nothing Then task.bricks = New Brick_Basics
@@ -278,7 +290,7 @@ Namespace VBClasses
 
 
     Public Class RedCloud_KNN : Inherits TaskParent
-        Dim redC As New RedCloud_Basics
+        Dim redC As New RedCloud_PrepEdges
         Dim knn As New KNN_Basics
         Public hulls As New List(Of List(Of cv.Point))
         Public Sub New()
@@ -317,7 +329,7 @@ Namespace VBClasses
 
 
     Public Class RedCloud_RGB : Inherits TaskParent
-        Dim redC As New RedCloud_Basics
+        Dim redC As New RedCloud_PrepEdges
         Public Sub New()
             desc = "Display the RGB data rather than the rc.color"
         End Sub
@@ -337,7 +349,7 @@ Namespace VBClasses
 
 
     Public Class RedCloud_Matches : Inherits TaskParent
-        Dim redC As New RedCloud_Basics
+        Dim redC As New RedCloud_PrepEdges
         Public rcList As New List(Of rcData)
         Public Sub New()
             task.fOptions.ReductionSlider.Value = 120
@@ -372,7 +384,7 @@ Namespace VBClasses
 
 
     Public Class RedCloud_Matched : Inherits TaskParent
-        Dim redC As New RedCloud_Basics
+        Dim redC As New RedCloud_PrepEdges
         Public rcList As New List(Of rcData)
         Public Sub New()
             If standalone Then task.gOptions.displayDst1.Checked = True
@@ -399,6 +411,77 @@ Namespace VBClasses
             If task.rcD IsNot Nothing Then dst2.Rectangle(task.rcD.rect, task.highlight, task.lineWidth)
             SetTrueText(strOut, 1)
             labels(3) = CStr(rcList.Count) + " matched cells below with > " + CStr(redC.options.ageThreshold) + " age"
+        End Sub
+    End Class
+
+
+
+
+
+
+    Public Class RedCloud_ColorChangeCause : Inherits TaskParent
+        Dim redC As New RedWC_BasicsOld
+        Public Sub New()
+            desc = "Click on a cell to determine why it is changing colors."
+        End Sub
+        Public Shared Function findCause(rcMap As cv.Mat, rcList As List(Of rcData)) As String
+            Dim clickIndex = rcMap.Get(Of Integer)(task.clickPoint.Y, task.clickPoint.X)
+            findCause = ""
+            If clickIndex > 0 Then
+                Dim rc = rcList(clickIndex - 1)
+                Select Case rc.colorChange
+                    Case causes.indexLastBelowZero
+                        findCause = "indexLast = 0"
+                    Case causes.indexLastAboveCount
+                        findCause = "last index >= last rclist"
+                    Case causes.intersectLastRectFailed
+                        findCause = "Current/Last don't intersect"
+                    Case causes.optionsChange
+                        findCause = "task options changed"
+                    Case causes.maxDistOutsideOfLastRect
+                        findCause = "maxDist outside last rect"
+                End Select
+            End If
+            Return findCause
+        End Function
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            redC.Run(src)
+            dst2 = redC.dst2
+            labels(2) = redC.labels(2)
+            dst2.SetTo(0, task.noDepthMask)
+
+            labels(3) = findCause(redC.redC.rcMap, redC.rcList)
+        End Sub
+    End Class
+
+
+
+
+
+    Public Class RedCloud_Cell : Inherits TaskParent
+        Public Sub New()
+            desc = "Display the output of a RedCloud cell."
+        End Sub
+        Public Shared Function selectCell(rcMap As cv.Mat, rcList As List(Of rcData)) As String
+            Dim clickIndex As Integer = 0, strOut As String = ""
+            If rcList.Count > 0 Then
+                clickIndex = rcMap.Get(Of Integer)(task.clickPoint.Y, task.clickPoint.X)
+                If clickIndex > 0 And clickIndex < rcList.Count Then
+                    task.rcD = rcList(clickIndex - 1)
+                    strOut = task.rcD.displayCell()
+                    task.color(task.rcD.rect).SetTo(white, task.rcD.mask)
+                    task.color.Rectangle(task.rcD.rect, task.highlight, task.lineWidth)
+                Else
+                    If task.rcD IsNot Nothing Then task.rcD = Nothing
+                End If
+            End If
+            Return strOut
+        End Function
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            If standalone Then dst2 = runRedCloud(src, labels(2))
+
+            selectCell(task.redCloud.rcMap, task.redCloud.rcList)
+            SetTrueText(strOut, 3)
         End Sub
     End Class
 
@@ -465,7 +548,7 @@ Namespace VBClasses
             Dim matchAverage As Single
             For Each rc In newList.Values
                 Dim maxDist = rc.maxDist
-                rc = RedCloud_Basics.rcDataMatch(rc, rcListLast, rcMapLast)
+                rc = RedCloud_PrepEdges.rcDataMatch(rc, rcListLast, rcMapLast)
 
                 If rc.age = 1 Then unMatched += 1 Else matchCount += 1
                 matchAverage += rc.age
@@ -479,8 +562,6 @@ Namespace VBClasses
                 If rc.index = 1 Then rc.color = blue
                 If maxDist <> rc.maxDist Then changed += 1
 
-                rcMap(rc.rect).SetTo(rc.index, rc.mask)
-
                 If usedColor.Contains(rc.color) Then
                     rc.color = Palette_Basics.randomCellColor()
                     rc.age = 1
@@ -490,8 +571,7 @@ Namespace VBClasses
                 rcList.Add(rc)
 
                 dst2(rc.rect).SetTo(rc.color, rc.mask)
-                ' dst2.Circle(rc.maxDist, task.DotSize, task.highlight, -1)
-                ' SetTrueText(CStr(rc.age), rc.maxDist)
+                rcMap(rc.rect).SetTo(rc.index, rc.mask)
             Next
 
             If standalone Then
@@ -505,45 +585,6 @@ Namespace VBClasses
         End Sub
         Protected Overrides Sub Finalize()
             If cPtr <> 0 Then cPtr = RedCloud_Close(cPtr)
-        End Sub
-    End Class
-
-
-
-
-
-    Public Class RedCloud_ColorChangeCause : Inherits TaskParent
-        Dim redC As New RedWC_BasicsOld
-        Public Sub New()
-            desc = "Click on a cell to determine why it is changing colors."
-        End Sub
-        Public Shared Function findCause(rcMap As cv.Mat, rcList As List(Of rcData)) As String
-            Dim strOut As String = ""
-            Dim clickIndex = rcMap.Get(Of Integer)(task.clickPoint.Y, task.clickPoint.X)
-
-            If clickIndex = 0 Then Return strOut
-
-            Dim rc = rcList(clickIndex - 1)
-            Select Case rc.colorChange
-                Case causes.indexLastBelowZero ' indexLast < 0
-                    strOut = "indexLast < 0"
-                Case causes.indexLastAboveCount ' last index < current rclist.count
-                    strOut = "last index < current rclist.count"
-                Case causes.intersectLastRectFailed ' last rect does not intersect with the current rect
-                    strOut = "Last rect does not intersect with the current rect"
-                Case causes.optionsChange ' Options changed.
-                    strOut = "task options changed"
-                Case causes.maxDistOutsideOfLastRect ' maxDist is not in the last rect
-                    strOut = "maxDist is not in the last rect"
-            End Select
-        End Function
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            redC.Run(src)
-            dst2 = redC.dst2
-            labels(2) = redC.labels(2)
-            dst2.SetTo(0, task.noDepthMask)
-
-            labels(3) = findCause(redC.redC.rcMap, redC.rcList)
         End Sub
     End Class
 End Namespace

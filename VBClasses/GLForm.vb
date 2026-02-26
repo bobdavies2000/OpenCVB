@@ -26,7 +26,7 @@ Public Class SharpGLForm
     Public ppy = task.calibData.leftIntrinsics.ppy
     Public fx = task.calibData.leftIntrinsics.fx
     Public fy = task.calibData.leftIntrinsics.fy
-    Public hulls As RedCloud_Basics
+    Public hulls As RedCloud_PrepEdges
     Private Sub GLForm_Load(sender As Object, e As EventArgs) Handles Me.Load
         options = New Options_SharpGL
         options1 = New Options_GL
@@ -312,7 +312,7 @@ Public Class SharpGLForm
                 label = CStr(dataBuffer.Count) + " triangles were sent to OpenGL."
 
             Case oCase.imageTriangles
-                If hulls Is Nothing Then hulls = New RedCloud_Basics
+                If hulls Is Nothing Then hulls = New RedCloud_PrepEdges
                 hulls.Run(task.color)
 
                 Dim textureID As UInt32() = New UInt32(0) {} ' Array to hold the texture ID
