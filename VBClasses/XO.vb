@@ -11457,8 +11457,7 @@ Namespace VBClasses
                 Next
             Next
 
-            RedCloud_Cell.selectCell(rcMap, rcList)
-            If task.rcD IsNot Nothing Then strOut = task.rcD.displayCell()
+            strOut = RedCloud_Cell.selectCell(rcMap, rcList)
             SetTrueText(strOut, 3)
 
             labels(2) = "Cells found = " + CStr(rcList.Count) + " and " + CStr(newList.Count) + " were color only cells."
@@ -12485,11 +12484,10 @@ Namespace VBClasses
                 rcList.Add(rc)
             Next
 
-            RedCloud_Cell.selectCell(task.redCloud.rcMap, task.redCloud.rcList)
-            If task.rcD IsNot Nothing Then strOut = task.rcD.displayCell + vbCrLf + vbCrLf +
-                    Format(percentImage, "0.0%") + " of image" + vbCrLf +
-                    CStr(rcList.Count) + " cells present"
-
+            strOut = RedCloud_Cell.selectCell(task.redCloud.rcMap, task.redCloud.rcList)
+            If task.rcD IsNot Nothing Then strOut += vbCrLf + vbCrLf +
+                                           Format(percentImage, "0.0%") + " of image" + vbCrLf +
+                                           CStr(rcList.Count) + " cells present"
             SetTrueText(strOut, 1)
 
             rcListLast = New List(Of rcData)(rcList)
@@ -12586,9 +12584,10 @@ Namespace VBClasses
                 labels(2) = CStr(rcList.Count) + " regions were identified "
             End If
 
-            RedCloud_Cell.selectCell(rcMap, rcList)
-            If task.rcD IsNot Nothing Then
-                strOut = task.rcD.displayCell + vbCrLf + vbCrLf + Format(percentImage, "0.0%") + " of image" + vbCrLf + CStr(rcList.Count) + " cells present"
+            strOut = RedCloud_Cell.selectCell(rcMap, rcList)
+            If task.rcD IsNot Nothing And task.rcD.pixels > 0 Then
+                strOut += vbCrLf + vbCrLf + Format(percentImage, "0.0%") + " of image" + vbCrLf +
+                          CStr(rcList.Count) + " cells present"
                 task.color(task.rcD.rect).SetTo(white, task.rcD.mask)
             End If
             SetTrueText(strOut, 1)
@@ -13820,8 +13819,7 @@ Namespace VBClasses
                     SetTrueText(CStr(rc.age), rc.maxDist)
                 Next
 
-                RedCloud_Cell.selectCell(task.redCloud.rcMap, task.redCloud.rcList)
-                If task.rcD IsNot Nothing Then strOut = task.rcD.displayCell()
+                strOut = RedCloud_Cell.selectCell(task.redCloud.rcMap, task.redCloud.rcList)
                 SetTrueText(strOut, 3)
             End If
 
@@ -13927,8 +13925,7 @@ Namespace VBClasses
             rcListLast = New List(Of rcData)(rcList)
             rcMapLast = rcMap.Clone
 
-            RedCloud_Cell.selectCell(rcMap, rcList)
-            If task.rcD IsNot Nothing Then strOut = task.rcD.displayCell()
+            strOut = RedCloud_Cell.selectCell(rcMap, rcList)
             SetTrueText(strOut, 1)
         End Sub
     End Class
@@ -14002,8 +13999,7 @@ Namespace VBClasses
                 Next
                 labels(3) = "There were " + CStr(rcLost.Count) + " cells temporarily lost."
 
-                RedCloud_Cell.selectCell(rcMap, rcList)
-                If task.rcD IsNot Nothing Then strOut = task.rcD.displayCell()
+                strOut = RedCloud_Cell.selectCell(rcMap, rcList)
                 SetTrueText(strOut, 3)
             End If
         End Sub
@@ -14038,8 +14034,7 @@ Namespace VBClasses
             dst2 = redC.dst2
 
             If standaloneTest() Then
-                RedCloud_Cell.selectCell(redC.rcMap, redC.rcList)
-                If task.rcD IsNot Nothing Then strOut = task.rcD.displayCell()
+                strOut = RedCloud_Cell.selectCell(redC.rcMap, redC.rcList)
                 SetTrueText(strOut, 3)
             End If
         End Sub
@@ -14067,8 +14062,7 @@ Namespace VBClasses
             dst2 = redC.dst2
 
             If standaloneTest() Then
-                RedCloud_Cell.selectCell(redC.rcMap, redC.rcList)
-                If task.rcD IsNot Nothing Then strOut = task.rcD.displayCell()
+                strOut = RedCloud_Cell.selectCell(redC.rcMap, redC.rcList)
                 SetTrueText(strOut, 3)
             End If
         End Sub
@@ -14123,8 +14117,7 @@ Namespace VBClasses
                     dst2.Circle(rc.maxDist, task.DotSize, task.highlight, -1)
                 Next
 
-                RedCloud_Cell.selectCell(rcMap, rcList)
-                If task.rcD IsNot Nothing Then strOut = task.rcD.displayCell()
+                strOut = RedCloud_Cell.selectCell(rcMap, rcList)
                 SetTrueText(strOut, 3)
             End If
 
@@ -14208,9 +14201,8 @@ Namespace VBClasses
                 rc.mask = rc.mask Or colorMask
             Next
 
-            RedCloud_Cell.selectCell(task.redCloud.rcMap, task.redCloud.rcList)
-            If task.rcD IsNot Nothing Then
-                strOut = task.rcD.displayCell
+            strOut = RedCloud_Cell.selectCell(task.redCloud.rcMap, task.redCloud.rcList)
+            If task.rcD IsNot Nothing And task.rcD.pixels > 0 Then
                 dst3.SetTo(0)
                 dst3(task.rcD.rect).SetTo(white, task.rcD.mask)
                 task.color(task.rcD.rect).SetTo(white, task.rcD.mask)
@@ -16851,8 +16843,7 @@ Namespace VBClasses
                 task.redCloud.rcMap(rc.rect).SetTo(rc.index, rc.mask)
             Next
 
-            RedCloud_Cell.selectCell(task.redCloud.rcMap, task.redCloud.rcList)
-            If task.rcD IsNot Nothing Then strOut = task.rcD.displayCell()
+            strOut = RedCloud_Cell.selectCell(task.redCloud.rcMap, task.redCloud.rcList)
             SetTrueText(strOut, 3)
         End Sub
     End Class

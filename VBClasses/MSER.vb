@@ -87,7 +87,7 @@ Namespace VBClasses
             redC.Run(src)
             dst2 = redC.dst2
             labels(2) = redC.labels(2)
-            RedCloud_Cell.selectCell(redC.rcMap, redC.rcList)
+            strOut = RedCloud_Cell.selectCell(redC.rcMap, redC.rcList)
         End Sub
     End Class
 

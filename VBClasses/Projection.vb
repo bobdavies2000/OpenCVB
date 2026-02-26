@@ -258,11 +258,11 @@ Namespace VBClasses
             dst1 = heat.dst2.Clone
             dst3 = heat.dst3.Clone
 
-            Dim rc = task.rcD
-
-            dst0.SetTo(0)
-            task.pointCloud(rc.rect).CopyTo(dst0(rc.rect), rc.mask)
-
+            If redC.rcList.Count > 0 Then
+                Dim rc = redC.rcList(0) ' just pick the biggest cell for now...
+                dst0.SetTo(0)
+                task.pointCloud(rc.rect).CopyTo(dst0(rc.rect), rc.mask)
+            End If
             heatCell.Run(dst0)
             Dim maskTop = heatCell.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY).Threshold(0, 255, cv.ThresholdTypes.Binary)
             Dim maskSide = heatCell.dst3.CvtColor(cv.ColorConversionCodes.BGR2GRAY).Threshold(0, 255, cv.ThresholdTypes.Binary)

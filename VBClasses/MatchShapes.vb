@@ -98,6 +98,7 @@ Namespace VBClasses
 
             Dim minMatch As Single = Single.MaxValue
             bestCell = -1
+            If rc Is Nothing Or rc.contour Is Nothing Then Exit Sub ' nothing to work on...
             For i = 0 To addTour.rcList.Count - 1
                 Dim rc2 = addTour.rcList(i)
                 If rc2.contour Is Nothing Then Continue For

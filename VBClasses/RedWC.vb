@@ -1,17 +1,27 @@
-﻿Imports cv = OpenCvSharp
+﻿Imports System.Windows
+Imports System.Windows.Documents
+Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Class RedWC_Basics : Inherits TaskParent
         Public indexer As New Indexer_Basics
         Public redC As New RedCloud_FloodFill
+        Dim element As New cv.Mat
         Public Sub New()
+            element = cv.Cv2.GetStructuringElement(cv.MorphShapes.Rect, New cv.Size(3, 3))
             desc = "Assign abstract world coordinates to each cell."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             indexer.Run(src)
-            dst2 = indexer.dst2
-            labels(2) = indexer.labels(2)
+            dst1 = indexer.dst3.Dilate(element, Nothing, 1)
 
+            redC.Run(dst1)
+            dst2 = redC.dst2
+            labels(2) = redC.labels(2)
+            dst2.SetTo(0, dst1)
+            redC.rcMap.SetTo(0, dst1)
 
+            strOut = RedCloud_Cell.selectCell(redC.rcMap, redC.rcList)
+            If strOut <> "" Then SetTrueText(strOut, 3) Else SetTrueText("Click on any cell", 3)
         End Sub
     End Class
 

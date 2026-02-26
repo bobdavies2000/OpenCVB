@@ -110,8 +110,7 @@ Namespace VBClasses
             Next
 
             If standaloneTest() Then
-                RedCloud_Cell.selectCell(rcMap, rcList)
-                If task.rcD IsNot Nothing Then strOut = task.rcD.displayCell()
+                strOut = RedCloud_Cell.selectCell(rcMap, rcList)
                 SetTrueText(strOut, 3)
             End If
 
@@ -276,7 +275,7 @@ Namespace VBClasses
                 dst3(gr).SetTo(rc.color)
                 rcGridMap(gr).SetTo(rc.index)
             Next
-            RedCloud_Cell.selectCell(redC.rcMap, redC.rcList)
+            strOut = RedCloud_Cell.selectCell(redC.rcMap, redC.rcList)
         End Sub
     End Class
 
@@ -330,7 +329,7 @@ Namespace VBClasses
             labels(2) = cellGen.labels(2)
             labels(3) = ""
             SetTrueText("", newPoint, 1)
-            RedCloud_Cell.selectCell(rcMap, rclist)
+            strOut = RedCloud_Cell.selectCell(rcMap, rclist)
         End Sub
     End Class
 End Namespace

@@ -71,7 +71,7 @@ Namespace VBClasses
                 Next
             End If
 
-            RedCloud_Cell.selectCell(hulls.rcMap, hulls.rclist)
+            strOut = RedCloud_Cell.selectCell(hulls.rcMap, hulls.rclist)
             rc = If(task.rcD Is Nothing, hulls.rclist(0), task.rcD)
         End Sub
     End Class

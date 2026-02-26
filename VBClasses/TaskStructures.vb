@@ -601,7 +601,7 @@ Namespace VBClasses
                 strOut += "Color = " + color.ToString + vbCrLf
                 strOut += "Pixel count = " + CStr(pixels) + vbCrLf
                 If hull IsNot Nothing Then strOut += "Hull count = " + CStr(hull.Count) + vbCrLf
-                strOut += "WC Coordinates (region) = " + CStr(wc.X) + ", " + CStr(wc.Y)
+                strOut += "wc (region id) = " + CStr(wc.X) + ", " + CStr(wc.Y)
                 Return strOut
             End Function
         End Class

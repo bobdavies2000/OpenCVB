@@ -24,12 +24,11 @@ Namespace VBClasses
             Static picTag As Integer = task.mousePicTag
             If task.mouseClickFlag Then picTag = task.mousePicTag
             If picTag = 2 Then
-                RedCloud_Cell.selectCell(redC2.rcMap, redC2.rcList)
+                strOut = RedCloud_Cell.selectCell(redC2.rcMap, redC2.rcList)
             Else
-                RedCloud_Cell.selectCell(redC1.rcMap, redC1.rcList)
+                strOut = RedCloud_Cell.selectCell(redC1.rcMap, redC1.rcList)
             End If
 
-            If task.rcD IsNot Nothing Then strOut = task.rcD.displayCell()
             SetTrueText(strOut, 1)
         End Sub
     End Class
@@ -71,8 +70,7 @@ Namespace VBClasses
             dst2 = redC1.dst2
 
             rcList = New List(Of rcData)(redC1.rcList)
-            RedCloud_Cell.selectCell(redC1.rcMap, rcList)
-            If task.rcD IsNot Nothing Then strOut = task.rcD.displayCell()
+            strOut = RedCloud_Cell.selectCell(redC1.rcMap, rcList)
             SetTrueText(strOut, 3)
         End Sub
     End Class
@@ -125,11 +123,10 @@ Namespace VBClasses
             redC.rcMap.ConvertTo(dst1, cv.MatType.CV_8U)
             dst2 = PaletteFull(color8u.dst2 + dst1)
 
-            RedCloud_Cell.selectCell(redC.rcMap, redC.rcList)
-            If task.rcD IsNot Nothing Then strOut = task.rcD.displayCell()
+            strOut = RedCloud_Cell.selectCell(redC.rcMap, redC.rcList)
             SetTrueText(strOut, 1)
 
-            If task.rcD IsNot Nothing And task.rcD.rect.Width > 0 Then
+            If task.rcD IsNot Nothing And task.rcD.pixels > 0 Then
                 dst3(task.rcD.rect).SetTo(white, task.rcD.mask)
             End If
         End Sub
@@ -153,11 +150,11 @@ Namespace VBClasses
             dst2 = redCC.dst2
             labels(2) = redCC.labels(2)
 
-            RedCloud_Cell.selectCell(task.redCloud.rcMap, task.redCloud.rcList)
-            RedCloud_Cell.selectCell(redCC.redC1.rcMap, redCC.redC1.rcList)
+            strOut = RedCloud_Cell.selectCell(task.redCloud.rcMap, task.redCloud.rcList)
+            strOut = RedCloud_Cell.selectCell(redCC.redC1.rcMap, redCC.redC1.rcList)
             labels(3) = "Select a RedCloud cell to see the histogram"
 
-            SetTrueText(task.rcD.displayCell, 1)
+            If task.rcD IsNot Nothing Then SetTrueText(task.rcD.displayCell, 1)
 
             Dim depth As cv.Mat = task.pcSplit(2)(task.rcD.rect)
             depth.SetTo(0, task.noDepthMask(task.rcD.rect))

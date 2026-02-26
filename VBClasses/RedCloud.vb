@@ -80,8 +80,7 @@ Namespace VBClasses
                 dst2(rc.rect).SetTo(rc.color, rc.mask)
             Next
 
-            RedCloud_Cell.selectCell(rcMap, rcList)
-            strOut = task.rcD.displayCell()
+            strOut = RedCloud_Cell.selectCell(rcMap, rcList)
             SetTrueText(strOut, 3)
 
             labels(2) = CStr(unMatched) + " were new cells and " + CStr(matchCount) + " were matched, " +
@@ -163,8 +162,7 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             dst2 = runRedCloud(src, labels(2))
 
-            RedCloud_Cell.selectCell(task.redCloud.rcMap, task.redCloud.rcList)
-            If task.rcD IsNot Nothing Then strOut = task.rcD.displayCell
+            strOut = RedCloud_Cell.selectCell(task.redCloud.rcMap, task.redCloud.rcList)
             SetTrueText(strOut, 1)
 
             labels(3) = "Select a RedCloud cell to see the histogram"
@@ -216,33 +214,30 @@ Namespace VBClasses
         Public Sub New()
             desc = "Display the output of a RedCloud cell."
         End Sub
-        Public Shared Sub selectCell(rcMap As cv.Mat, rcList As List(Of rcData))
+        Public Shared Function selectCell(rcMap As cv.Mat, rcList As List(Of rcData)) As String
+            Dim clickIndex As Integer = 0, strOut As String
             If rcList.Count > 0 Then
-                Dim clickIndex = rcMap.Get(Of Integer)(task.clickPoint.Y, task.clickPoint.X) - 1
-                If clickIndex >= 0 And clickIndex < rcList.Count Then
-                    task.rcD = rcList(clickIndex)
+                clickIndex = rcMap.Get(Of Integer)(task.clickPoint.Y, task.clickPoint.X)
+                If clickIndex > 0 And clickIndex < rcList.Count Then
+                    task.rcD = rcList(clickIndex - 1)
                 Else
-                    If task.rcD Is Nothing And rcList.Count > 0 Then
-                        task.rcD = rcList(0)
-                    Else
-                        task.rcD = Nothing
-                    End If
+                    task.rcD = Nothing
                 End If
             End If
             If task.rcD Is Nothing Then
-                ' placeholder rcData to avoid errors downstream.
-                task.rcD = New rcData(New cv.Mat(New cv.Size(1, 1), cv.MatType.CV_8U, 255),
-                                              New cv.Rect(0, 0, 1, 1), 0)
+                strOut = ""
+            Else
+                strOut = task.rcD.displayCell()
+                If clickIndex > 0 Then
+                    task.color(task.rcD.rect).SetTo(white, task.rcD.mask)
+                End If
             End If
-            If task.rcD.rect.Contains(task.clickPoint) Then
-                task.color(task.rcD.rect).SetTo(white, task.rcD.mask)
-            End If
-        End Sub
+            Return strOut
+        End Function
         Public Overrides Sub RunAlg(src As cv.Mat)
             If standalone Then dst2 = runRedCloud(src, labels(2))
 
             selectCell(task.redCloud.rcMap, task.redCloud.rcList)
-            If task.rcD IsNot Nothing Then strOut = task.rcD.displayCell()
             SetTrueText(strOut, 3)
         End Sub
     End Class
@@ -358,9 +353,8 @@ Namespace VBClasses
                 End If
             Next
 
-            RedCloud_Cell.selectCell(redC.rcMap, redC.rcList)
-            strOut = task.rcD.displayCell()
-            dst2.Rectangle(task.rcD.rect, task.highlight, task.lineWidth)
+            strOut = RedCloud_Cell.selectCell(redC.rcMap, redC.rcList)
+            If task.rcD IsNot Nothing Then dst2.Rectangle(task.rcD.rect, task.highlight, task.lineWidth)
             SetTrueText(strOut, 3)
             labels(3) = CStr(rcList.Count) + " matched cells below with > " + CStr(redC.options.ageThreshold) + " age"
         End Sub
@@ -394,9 +388,8 @@ Namespace VBClasses
                 End If
             Next
 
-            RedCloud_Cell.selectCell(redC.rcMap, redC.rcList)
-            strOut = task.rcD.displayCell()
-            dst2.Rectangle(task.rcD.rect, task.highlight, task.lineWidth)
+            strOut = RedCloud_Cell.selectCell(redC.rcMap, redC.rcList)
+            If task.rcD IsNot Nothing Then dst2.Rectangle(task.rcD.rect, task.highlight, task.lineWidth)
             SetTrueText(strOut, 1)
             labels(3) = CStr(rcList.Count) + " matched cells below with > " + CStr(redC.options.ageThreshold) + " age"
         End Sub
@@ -494,10 +487,11 @@ Namespace VBClasses
                 ' SetTrueText(CStr(rc.age), rc.maxDist)
             Next
 
-            If standaloneTest() Then dst2.SetTo(0, task.noDepthMask)
-            RedCloud_Cell.selectCell(rcMap, rcList)
-            strOut = task.rcD.displayCell()
-            SetTrueText(strOut, 3)
+            If standalone Then
+                dst2.SetTo(0, task.noDepthMask)
+                strOut = RedCloud_Cell.selectCell(rcMap, rcList)
+                SetTrueText(strOut, 3)
+            End If
 
             labels(2) = CStr(unMatched) + " were new cells and " + CStr(matchCount) + " were matched, " +
                             "average age: " + Format(matchAverage / rcList.Count, fmt1)

@@ -405,21 +405,22 @@ Namespace VBClasses
             labels(2) = redC.labels(2)
 
             Dim rc = task.rcD
-            labels(2) = "Selected cell has " + CStr(rc.contour.Count) + " points."
-
-            ' this contour will have more depth data behind it.  Simplified contours will lose lots of depth data.
-            rc.contour = ContourBuild(rc.mask)
-
             Dim pt As cv.Point3f, list2D As New List(Of cv.Point)
-            ptList.Clear()
-            For i = 0 To rc.contour.Count - 1
-                pt = task.pointCloud.Get(Of cv.Point3f)(rc.contour(i).Y, rc.contour(i).X)
-                If pt.Z > 0 Then
-                    ptList.Add(pt)
-                    list2D.Add(rc.contour(i))
-                    If ptList.Count > 100 Then Exit For
-                End If
-            Next
+            If rc.contour IsNot Nothing Then
+                labels(2) = "Selected cell has " + CStr(rc.contour.Count) + " points."
+                ' this contour will have more depth data behind it.  Simplified contours will lose lots of depth data.
+                rc.contour = ContourBuild(rc.mask)
+
+                ptList.Clear()
+                For i = 0 To rc.contour.Count - 1
+                    pt = task.pointCloud.Get(Of cv.Point3f)(rc.contour(i).Y, rc.contour(i).X)
+                    If pt.Z > 0 Then
+                        ptList.Add(pt)
+                        list2D.Add(rc.contour(i))
+                        If ptList.Count > 100 Then Exit For
+                    End If
+                Next
+            End If
 
             If task.heartBeat Or needOutput Then
                 ptList2D.Clear()
