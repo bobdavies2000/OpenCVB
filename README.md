@@ -1,4 +1,4 @@
-**February 20, 2026 – Task Variable, Brick_Basics, RedCloud Maps, Paint Frequency,**
+**February 26, 2026 – Task Variable, Brick_Basics, RedCloud Maps, Paint Frequency, “World Grid”, and PixelViewer.**
 
 -   Over 1600 algorithms are included, averaging 36 lines of code per algorithm.
     -   Over 400 additional obsolete algorithms compiled for reference use.
