@@ -61,6 +61,8 @@ Namespace VBClasses
             fpList.Clear()
 
             task.mouseMovePoint = New cv.Point(task.workRes.Width \ 2, task.workRes.Height \ 2)
+            task.mainFormLocation = New cv.Rect(task.Settings.MainFormLeft, task.Settings.MainFormTop,
+                                                task.Settings.MainFormWidth, task.Settings.MainFormHeight)
 
             myStopWatch = Stopwatch.StartNew()
             optionsChanged = True
@@ -98,7 +100,6 @@ Namespace VBClasses
             gravityMatrix.Run(emptyMat)
 
             If gOptions.CreateGif.Checked Then
-                heartBeat = False
                 optionsChanged = False
             Else
                 heartBeat = heartBeat Or optionsChanged Or mouseClickFlag
@@ -134,10 +135,10 @@ Namespace VBClasses
 
             If feat IsNot Nothing Then feat.Run(src)
 
-            If pixelViewerOn And PixelViewer Is Nothing Then
-                PixelViewer = New PixelViewer.Pixel_Viewer
-            Else
-                If pixelViewerOn = False Then PixelViewer = Nothing
+            If vbc.task.pixelViewerOn Then
+                If vbc.task.PixelViewer Is Nothing Then
+                    vbc.task.PixelViewer = New PixelViewer.Pixel_Viewer
+                End If
             End If
 
             If gOptions.CreateGif.Checked Then
@@ -245,17 +246,13 @@ Namespace VBClasses
         End Sub
         Private Sub pixelViewerOrGIFProcessing(src As cv.Mat, dst1 As cv.Mat, dst2 As cv.Mat, dst3 As cv.Mat)
             If PixelViewer IsNot Nothing Then
-                If pixelViewerOn Then
-                    PixelViewer.viewerForm.Visible = True
-                    PixelViewer.viewerForm.Show()
-                    PixelViewer.dst0Input = src
-                    PixelViewer.dst1Input = dst1
-                    PixelViewer.dst2Input = dst2
-                    PixelViewer.dst3Input = dst3
-                    PixelViewer.Run(src)
-                Else
-                    PixelViewer.viewerForm.Visible = False
-                End If
+                PixelViewer.viewerForm.Visible = True
+                PixelViewer.viewerForm.Show()
+                PixelViewer.dst0Input = src
+                PixelViewer.dst1Input = dst1
+                PixelViewer.dst2Input = dst2
+                PixelViewer.dst3Input = dst3
+                PixelViewer.Run(src)
             End If
 
             If gifCreator IsNot Nothing Then gifCreator.createNextGifImage()

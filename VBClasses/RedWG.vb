@@ -1,5 +1,6 @@
 ﻿Imports System.Runtime.InteropServices
 Imports System.Windows.Documents
+Imports OpenCvSharp
 Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Class RedWG_Basics : Inherits TaskParent
@@ -59,14 +60,18 @@ Namespace VBClasses
             Next
 
             Static row As Integer = ptY.Min
+            If ptY.Count = 0 Then
+                SetTrueText("There are no cells available" + vbCrLf + "Increase the reduction factor.")
+                Exit Sub
+            End If
 
             For Each rc In redC.rcList
                 If rc.wGrid.Y = row Then dst2(rc.rect).SetTo(white, rc.mask)
             Next
 
-            If task.heartBeat Then row += 1
+            If task.heartBeat Or row < ptY.Min Then row += 1
             SetTrueText("World Grid Row " + CStr(row) + " highlighted", 3)
-            If row > ptY.Max Then row = ptY.Min
+            If row >= ptY.Max Then row = ptY.Min
         End Sub
     End Class
 
@@ -89,8 +94,11 @@ Namespace VBClasses
                 ptX.Add(rc.wGrid.X)
             Next
 
-            Static column As Integer = -10
-            If column < ptX.Min Then column = ptX.Min
+            Static column As Integer = ptX.Min
+            If ptX.Count = 0 Then
+                SetTrueText("There are no cells available" + vbCrLf + "Increase the reduction factor.")
+                Exit Sub
+            End If
 
             For Each rc In redC.rcList
                 If rc.wGrid.X = column Then dst2(rc.rect).SetTo(white, rc.mask)
@@ -98,7 +106,7 @@ Namespace VBClasses
 
             If task.heartBeat Then column += 1
             SetTrueText("World Grid Col " + CStr(column) + " highlighted", 3)
-            If column > ptX.Max Then column = ptX.Min
+            If column >= ptX.Max Then column = ptX.Min
         End Sub
     End Class
 

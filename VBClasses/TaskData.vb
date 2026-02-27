@@ -84,6 +84,7 @@ Namespace VBClasses
         Public grid As Grid_Basics
         Public palette As Palette_LoadColorMap
         Public PixelViewer As Pixel_Viewer
+        Public pixelViewerOn As Boolean
         Public filterBasics As Filter_Basics
         Public gravityBasics As Gravity_Basics
         Public imuBasics As IMU_Basics
@@ -235,7 +236,6 @@ Namespace VBClasses
         Public pipeName As String
 
         Public labels() = {"", "", "", ""}
-        Public pixelViewerOn As Boolean
 
         Public topCameraPoint As cv.Point
         Public sideCameraPoint As cv.Point

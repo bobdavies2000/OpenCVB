@@ -17,7 +17,6 @@ Namespace MainApp
         Dim magnifyIndex As Integer
         Dim windowsFont = New System.Drawing.Font("Tahoma", 9)
         Dim pixelViewerRect As cv.Rect
-        Dim pixelViewerOn As Boolean
         Private Sub MainForm_Load(sender As Object, e As EventArgs) Handles MyBase.Load
             updatePath(homeDir + "bin\", "Oak-3D/Oak-4D camera support.")
             updatePath(homeDir + "OakD\depthai-core\Build\vcpkg_installed\x64-windows\bin\", "Oak-3D/Oak-4D camera support.")
@@ -337,18 +336,12 @@ Namespace MainApp
             Dim ratioY = pic.Height / settings.workRes.Height
 
             Dim brush As New SolidBrush(Color.White)
-            'If testAllRunning Then
-            '    Dim pt = New cv.Point(10, 5)
-            '    g.DrawString("Text markups are removed during testing to reduce GDI objects.", windowsFont, brush,
-            '                  CSng(pt.X * ratioX), CSng(pt.Y * ratioY))
-            'Else
             For Each tt In vbc.task.trueData
                 If tt.text Is Nothing Then Continue For
                 If tt.text.Length > 0 And tt.picTag = pic.Tag Then
                     g.DrawString(tt.text, windowsFont, brush, CSng(tt.pt.X * ratioX), CSng(tt.pt.Y * ratioY))
                 End If
             Next
-            'End If
             brush.Dispose()
 
             Dim timeEnd As DateTime = Now
@@ -504,7 +497,7 @@ Namespace MainApp
 
         Private Sub PixelViewer_Click(sender As Object, e As EventArgs) Handles PixelViewer.Click
             PixelViewer.Checked = Not PixelViewer.Checked
-            pixelViewerOn = PixelViewer.Checked
+            vbc.task.pixelViewerOn = PixelViewer.Checked
         End Sub
     End Class
 End Namespace
