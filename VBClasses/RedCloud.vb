@@ -8,6 +8,8 @@ Namespace VBClasses
         intersectLastRectFailed
         optionsChange
         maxDistOutsideOfLastRect
+        duplicateColor
+        wGridNotInLastList
     End Enum
     Public Class RedCloud_Basics : Inherits TaskParent
         Public indexer As New Indexer_Corners
@@ -17,9 +19,96 @@ Namespace VBClasses
         Public Sub New()
             desc = "Assign abstract world coordinates to each cell."
         End Sub
+        Public Shared Function rcDataMatch(rc As rcData, rcListLast As List(Of rcData),
+                                           rcMapLast As cv.Mat) As rcData
+            Dim r1 = rc.rect
+            Dim indexLast = rcMapLast.Get(Of Integer)(rc.maxDist.Y, rc.maxDist.X)
+
+            If indexLast = 0 Then
+                rc.colorChange = causes.indexLastBelowZero
+            Else
+                If indexLast < rcListLast.Count Then
+                    ' rcList index is 1 less than the rcMap value because a 0 rcMap value means not mapped.
+                    ' All pixels are mapped with color but withh depth, rcMap has 0's where there is no depth.
+                    indexLast -= 1
+                    Dim r2 = rcListLast(indexLast).rect
+                    If r1.IntersectsWith(r2) = False Then rc.colorChange = causes.intersectLastRectFailed
+                Else
+                    rc.colorChange = causes.indexLastAboveCount
+                End If
+            End If
+
+            If task.optionsChanged Then rc.colorChange = causes.optionsChange
+
+            If rc.colorChange = 0 Then
+                Dim lrc = rcListLast(indexLast)
+                Dim rTest = rc.rect.Intersect(lrc.rect)
+                Dim rTotal = rTest.Width * rTest.Height
+                Dim lastTotal = lrc.rect.Width * lrc.rect.Height
+                If rc.rect.Contains(lrc.maxDist) Then
+                    rc.maxDist = lrc.maxDist
+                    rc.depthDelta = Math.Abs(lrc.wcMean(2) - rc.wcMean(2))
+                    If Single.IsInfinity(rc.depthDelta) Or rc.depthDelta < 0 Then
+                        rc.depthDelta = 0
+                        rc.wcMean(2) = 0
+                    End If
+                Else
+                    rc.colorChange = causes.maxDistOutsideOfLastRect
+                End If
+
+                rc.age = lrc.age + 1
+                If rc.age > 1000 Then rc.age = 2
+
+                rc.color = lrc.color
+            End If
+            Return rc
+        End Function
+        Public Shared Function rcMatch(rc As rcData, rcListLast As List(Of rcData),
+                                       wGridLastList As List(Of cv.Point)) As rcData
+            Dim r1 = rc.rect
+            Dim indexLast As Integer
+            If wGridLastList.Contains(rc.wGrid) Then
+                indexLast = wGridLastList.IndexOf(rc.wGrid)
+                If indexLast < rcListLast.Count Then
+                    ' rcList index is 1 less than the rcMap value because a 0 rcMap value means not mapped.
+                    ' All pixels are mapped with color but withh depth, rcMap has 0's where there is no depth.
+                    Dim r2 = rcListLast(indexLast).rect
+                    If r1.IntersectsWith(r2) = False Then rc.colorChange = causes.intersectLastRectFailed
+                Else
+                    rc.colorChange = causes.indexLastAboveCount
+                End If
+            Else
+                rc.colorChange = causes.wGridNotInLastList
+            End If
+
+            If task.optionsChanged Then rc.colorChange = causes.optionsChange
+
+            If rc.colorChange = 0 Then
+                Dim lrc = rcListLast(indexLast)
+                Dim rTest = rc.rect.Intersect(lrc.rect)
+                Dim rTotal = rTest.Width * rTest.Height
+                Dim lastTotal = lrc.rect.Width * lrc.rect.Height
+                If rc.rect.Contains(lrc.maxDist) Then
+                    rc.maxDist = lrc.maxDist
+                    rc.depthDelta = Math.Abs(lrc.wcMean(2) - rc.wcMean(2))
+                    If Single.IsInfinity(rc.depthDelta) Or rc.depthDelta < 0 Then
+                        rc.depthDelta = 0
+                        rc.wcMean(2) = 0
+                    End If
+                Else
+                    rc.colorChange = causes.maxDistOutsideOfLastRect
+                End If
+
+                rc.age = lrc.age + 1
+                If rc.age > 1000 Then rc.age = 2
+
+                rc.color = lrc.color
+            End If
+            Return rc
+        End Function
         Public Overrides Sub RunAlg(src As cv.Mat)
             indexer.Run(src)
-            redC.Run(indexer.dst3)
+            redC.Run(indexer.dst2)
 
             dst2 = redC.dst2
             labels(2) = redC.labels(2)
@@ -55,50 +144,6 @@ Namespace VBClasses
             task.redCloud = Me
             desc = "Build contours for each cell"
         End Sub
-        Public Shared Function rcDataMatch(rc As rcData, rcListLast As List(Of rcData),
-                                           rcMapLast As cv.Mat) As rcData
-            Dim r1 = rc.rect
-            Dim indexLast = rcMapLast.Get(Of Integer)(rc.maxDist.Y, rc.maxDist.X)
-
-            If indexLast = 0 Then
-                rc.colorChange = causes.indexLastBelowZero
-            Else
-                If indexLast < rcListLast.Count Then
-                    ' rcList index is 1 less than the rcMap value because a 0 rcMap value means not mapped.
-                    ' All pixels are mapped with color but withh depth, rcMap has 0's where there is no depth.
-                    indexLast -= 1
-                    Dim r2 = rcListLast(indexLast).rect
-                    If r1.IntersectsWith(r2) = False Then rc.colorChange = causes.intersectLastRectFailed
-                Else
-                    rc.colorChange = causes.indexLastAboveCount
-                End If
-            End If
-
-            If task.optionsChanged Then rc.colorChange = causes.optionsChange
-
-            If rc.colorChange = 0 And task.optionsChanged = False Then
-                Dim lrc = rcListLast(indexLast)
-                Dim rTest = rc.rect.Intersect(lrc.rect)
-                Dim rTotal = rTest.Width * rTest.Height
-                Dim lastTotal = lrc.rect.Width * lrc.rect.Height
-                If rc.rect.Contains(lrc.maxDist) Then
-                    rc.maxDist = lrc.maxDist
-                    rc.depthDelta = Math.Abs(lrc.wcMean(2) - rc.wcMean(2))
-                    If Single.IsInfinity(rc.depthDelta) Or rc.depthDelta < 0 Then
-                        rc.depthDelta = 0
-                        rc.wcMean(2) = 0
-                    End If
-                Else
-                    rc.colorChange = causes.maxDistOutsideOfLastRect
-                End If
-
-                rc.age = lrc.age + 1
-                If rc.age > 1000 Then rc.age = 2
-
-                rc.color = lrc.color
-            End If
-            Return rc
-        End Function
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
 
@@ -115,7 +160,7 @@ Namespace VBClasses
             Dim unMatched As Integer
             Dim matchAverage As Single
             For Each rc In redCore.rcList
-                rc = rcDataMatch(rc, rcListLast, rcMapLast)
+                rc = RedCloud_Basics.rcDataMatch(rc, rcListLast, rcMapLast)
 
                 If rc.age = 1 Then unMatched += 1 Else matchCount += 1
                 matchAverage += rc.age
@@ -433,6 +478,10 @@ Namespace VBClasses
                         findCause = "task options changed"
                     Case causes.maxDistOutsideOfLastRect
                         findCause = "maxDist outside last rect"
+                    Case causes.duplicateColor
+                        findCause = "Duplicate Color"
+                    Case causes.wGridNotInLastList
+                        findCause = "wGrid point absent"
                 End Select
             End If
             Return findCause
@@ -487,6 +536,7 @@ Namespace VBClasses
         Public classCount As Integer
         Public rcList As New List(Of rcData)
         Public rcMap As cv.Mat = New cv.Mat(dst2.Size, cv.MatType.CV_32S, 0)
+        Public wGridList As New List(Of cv.Point)
         Public options As New Options_RedCloud
         Public Sub New()
             cPtr = RedCloud_Open()
@@ -541,7 +591,7 @@ Namespace VBClasses
             Dim matchAverage As Single
             For Each rc In newList.Values
                 Dim maxDist = rc.maxDist
-                rc = RedCloud_PrepEdges.rcDataMatch(rc, rcListLast, rcMapLast)
+                rc = RedCloud_Basics.rcMatch(rc, rcListLast, wGridList)
 
                 If rc.age = 1 Then unMatched += 1 Else matchCount += 1
                 matchAverage += rc.age
@@ -558,6 +608,7 @@ Namespace VBClasses
                 If usedColor.Contains(rc.color) Then
                     rc.color = Palette_Basics.randomCellColor()
                     rc.age = 1
+                    rc.colorChange = causes.duplicateColor
                 End If
                 usedColor.Add(rc.color)
 
@@ -573,6 +624,10 @@ Namespace VBClasses
                 SetTrueText(strOut, 3)
             End If
 
+            wGridList.Clear()
+            For Each rc In rcList
+                wGridList.Add(rc.wGrid)
+            Next
             labels(2) = CStr(unMatched) + " were new cells and " + CStr(matchCount) + " were matched, " +
                             "average age: " + Format(matchAverage / rcList.Count, fmt1)
         End Sub
