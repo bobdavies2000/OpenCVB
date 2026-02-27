@@ -533,6 +533,9 @@ Namespace VBClasses
                 If rc.index = 0 Then SetTrueText("Select a cell in the image at left.")
             End If
 
+            If rc Is Nothing Then Exit Sub
+            If rc.contour Is Nothing Then Exit Sub
+
             Dim offset = rc.contour.Count \ 4 - 1
             Dim xList As New List(Of Single)
             Dim yList As New List(Of Single)

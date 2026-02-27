@@ -126,8 +126,10 @@ Namespace VBClasses
             strOut = RedCloud_Cell.selectCell(redC.rcMap, redC.rcList)
             SetTrueText(strOut, 1)
 
-            If task.rcD IsNot Nothing And task.rcD.pixels > 0 Then
-                dst3(task.rcD.rect).SetTo(white, task.rcD.mask)
+            If task.rcD IsNot Nothing Then
+                If task.rcD.pixels > 0 Then
+                    dst3(task.rcD.rect).SetTo(white, task.rcD.mask)
+                End If
             End If
         End Sub
     End Class
