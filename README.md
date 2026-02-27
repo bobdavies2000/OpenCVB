@@ -1,3 +1,39 @@
+**February 20, 2026 – Task Variable, Brick_Basics, RedCloud Maps, Paint Frequency,**
+
+-   Over 1600 algorithms are included, averaging 36 lines of code per algorithm.
+    -   Over 400 additional obsolete algorithms compiled for reference use.
+-   The name of the main structure in the algorithm task is “task” (as before.)
+    -   Task is a reserved word in VB.Net but has been used all along.
+    -   The only conflict was when debugging the MainUI task.
+    -   Most of the debugging is in the VBClasses project where it worked fine.
+    -   Solution: when debugging MainUI, refer to the task variable as “vbc.task”.
+-   Brick_Basics is a task algorithm that is run on every frame when requested.
+    -   To request the brick data, call the constructor for “task.bricks”.
+-   All the RedCloud cell maps are now 32-bit integers (previously byte)
+    -   This allows RedCloud to manage more than 255 cells.
+    -   An example output of the expanded RedCloud coverage is below.
+-   OpenCVB’s global options “Target Display FPS” controls how often paint runs.
+    -   The time spent painting images is displayed in the TreeView output.
+    -   The paint overhead can vary from 0 to 150 ms (Core i9 desktop.)
+    -   Updating too fast makes interpretation difficult.
+    -   Updating slowly reduces the need for heartbeat testing.
+    -   Paint Frequency = 0 – stop updating the images.
+    -   Paint Frequency = -1 - Update images after long-term heartbeats.
+    -   Paint Frequency = -2 - Update images after heartbeats.
+-   OpenCVB was upgraded to use the latest version of OpenCVSharp.
+-   This version introduces the “world grid” identifier for RedCloud cells.
+    -   The identifier allows building groups of cells that are related.
+    -   The exaggerated separation of cells is to increase consistency.
+    -   The world grid element at (0, 0) is in the center of the image (highlighted.)
+    -   World grid elements at the left side of the image are negative.
+    -   World grid elements in the top half of the image are also negative.
+    -   World grid elements correspond to world coordinates – just reduced.
+-   Support for the Pixel Viewer in the main form (![](media/e407cd0499d360be6b74c77841842e2d.png)) has been restored.
+
+**![](media/79fd9b5635a46cd75f1940a451c47e10.gif)**
+
+**RedWG_ValidateCols and RedWG_Validate_Rows :** *These 2 algorithms are used to validate the assignment of the “world grid” identifiers. Each cell is now part of a row or column. The world grid id’s are the reduced X and Y values of the point cloud and can be used to identify cells. Cell size is controlled with the “Reduction Factor” in the global feature options.  There is a limit to how small the cells may be due to the exaggerated separation when constructing the cells. All RedCloud algorithms now produce the world grid id’s.*
+
 **February 5, 2026 – Oak 3D, Enhanced Left/Right Views, Left/Right Motion, Left/Right Lines, TreeView, Gravity, Depth Lines**
 
 -   Over 1500 algorithms are included, averaging 36 lines of code per algorithm.
@@ -372,7 +408,7 @@
     -   C\# interface for StereoLabs Gemini cameras - CamZed.
     -   C++ algorithms running native C++ - CPP_Native.
     -   Main project for the user interface (includes the camera task.)
-    -   VBCLasses project containing all the VB.Net algorithms.
+    -   VBClasses project containing all the VB.Net algorithms.
 -   Projects removed from the OpenCVB solution:
     -   OpenGL, Orbbec SDK, C++ camera interfaces for OakD, StereoLabs, Orbbec.
     -   OakD project will return soon – Oak-D Pro 4 (pre-order) not yet working.
