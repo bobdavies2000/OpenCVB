@@ -18828,4 +18828,43 @@ Namespace VBClasses
             End If
         End Sub
     End Class
+
+
+
+
+
+    Public Class XO_RedCloud_Basics1 : Inherits TaskParent
+        Public indexer As New Indexer_Basics
+        Public redC As New RedCloud_FloodFill
+        Dim element As New cv.Mat
+        Public rcList As New List(Of rcData)
+        Public rcMap As cv.Mat
+        Public Sub New()
+            element = cv.Cv2.GetStructuringElement(cv.MorphShapes.Rect, New cv.Size(3, 3))
+            desc = "Assign abstract world coordinates to each cell."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            indexer.Run(src)
+            dst1 = indexer.dst3.Dilate(element, Nothing, 1)
+            redC.Run(dst1)
+
+            dst2 = redC.dst2
+            labels(2) = redC.labels(2)
+
+            strOut = RedCloud_Cell.selectCell(redC.rcMap, redC.rcList)
+            If task.rcD IsNot Nothing Then dst2.Rectangle(task.rcD.rect, task.highlight, task.lineWidth)
+            If strOut <> "" Then SetTrueText(strOut, 3) Else SetTrueText("Click on any cell", 3)
+
+            Dim causeLabel = RedCloud_ColorChangeCause.findCause(redC.rcMap, redC.rcList)
+
+            If causeLabel <> "" Then
+                If labels(3) = "" Then labels(3) = causeLabel Else labels(3) += ", " + causeLabel
+                If labels(3).Length > 80 Then labels(3) = causeLabel
+            End If
+
+            rcList = New List(Of rcData)(redC.rcList)
+            rcMap = redC.rcMap.Clone
+        End Sub
+    End Class
+
 End Namespace

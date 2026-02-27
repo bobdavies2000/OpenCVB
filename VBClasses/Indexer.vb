@@ -37,4 +37,94 @@ Namespace VBClasses
             dst3.SetTo(255, task.noDepthMask)
         End Sub
     End Class
+
+
+
+
+
+    Public Class Indexer_RedPrepXY : Inherits TaskParent
+        Dim prep As New RedPrep_Core
+        Public Sub New()
+            dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
+            desc = "Find the corners in the RedPrep XY data and clip.  Identical to Indexer_Basics"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            prep.Run(src)
+            dst2 = prep.dst2
+            labels(2) = prep.labels(2)
+
+            dst0 = dst2.Clone
+            Dim indexer1 As cv.MatIndexer(Of Byte) = dst0.GetGenericIndexer(Of Byte)()
+            For y = 0 To dst0.Rows - 1
+                For x = 1 To dst0.Cols - 1
+                    If indexer1(y, x) = indexer1(y, x - 1) Then indexer1(y, x - 1) = 0
+                Next
+            Next
+
+            dst1 = dst2.Clone
+            Dim indexer2 As cv.MatIndexer(Of Byte) = dst1.GetGenericIndexer(Of Byte)()
+            For x = 0 To dst1.Cols - 1
+                For y = 1 To dst1.Rows - 1
+                    If indexer2(y, x) = indexer2(y - 1, x) Then indexer2(y - 1, x) = 0
+                Next
+            Next
+
+            dst3.SetTo(0)
+            dst3.SetTo(255, dst0)
+            dst3.SetTo(255, dst1)
+            dst3.SetTo(255, task.noDepthMask)
+        End Sub
+    End Class
+
+
+
+
+    Public Class Indexer_Corners : Inherits TaskParent
+        Dim prep As New RedPrep_Core
+        Dim vals As New List(Of Byte)
+        Public Sub New()
+            If standalone Then task.gOptions.displayDst1.Checked = True
+            dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
+            desc = "Find the corners in the RedPrep XY data and clip.  Identical to Indexer_Basics"
+        End Sub
+        Private Sub addVal(val As Byte)
+            If vals.Contains(val) = False Then vals.Add(val)
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            prep.Run(src)
+            dst2 = prep.dst2
+            labels(2) = prep.labels(2)
+
+            dst3 = dst2.Clone
+            Dim indexer As cv.MatIndexer(Of Byte) = dst3.GetGenericIndexer(Of Byte)()
+            Dim rectList As New List(Of cv.Rect)
+            For y = 1 To dst3.Rows - 3
+                For x = 1 To dst3.Cols - 3
+                    vals.Clear()
+                    vals.Add(indexer(y - 1, x - 1))
+                    addVal(indexer(y - 1, x))
+                    addVal(indexer(y - 1, x + 1))
+                    addVal(indexer(y, x - 1))
+                    addVal(indexer(y, x))
+                    addVal(indexer(y, x + 1))
+                    addVal(indexer(y + 1, x - 1))
+                    addVal(indexer(y + 1, x))
+                    addVal(indexer(y + 1, x + 1))
+                    If vals.Count > 2 Then rectList.Add(New cv.Rect(x - 1, y - 1, 3, 3))
+                Next
+            Next
+
+            Dim count As Integer
+            dst1.SetTo(0)
+            For Each r In rectList
+                Dim val = indexer(r.TopLeft.Y, r.TopLeft.X)
+                If val <> 0 Then
+                    dst1(r).SetTo(255)
+                    dst3(r).SetTo(0)
+                    count += 1
+                End If
+            Next
+            labels(3) = CStr(count) + " corners found"
+        End Sub
+    End Class
 End Namespace

@@ -10,19 +10,16 @@ Namespace VBClasses
         maxDistOutsideOfLastRect
     End Enum
     Public Class RedCloud_Basics : Inherits TaskParent
-        Public indexer As New Indexer_Basics
+        Public indexer As New Indexer_Corners
         Public redC As New RedCloud_FloodFill
-        Dim element As New cv.Mat
         Public rcList As New List(Of rcData)
         Public rcMap As cv.Mat
         Public Sub New()
-            element = cv.Cv2.GetStructuringElement(cv.MorphShapes.Rect, New cv.Size(3, 3))
             desc = "Assign abstract world coordinates to each cell."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             indexer.Run(src)
-            dst1 = indexer.dst3.Dilate(element, Nothing, 1)
-            redC.Run(dst1)
+            redC.Run(indexer.dst3)
 
             dst2 = redC.dst2
             labels(2) = redC.labels(2)
