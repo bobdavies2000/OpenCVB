@@ -81,7 +81,7 @@ public:
                     floodPoints.push_back(it->second);
 
                     if (fill >= 255)
-                        break; // just taking up to the top X largest objects found.
+                        fill = 0; // start over 
                     fill++;
                 }
             }

@@ -90,12 +90,12 @@ Namespace MainApp
 
                                    vbc.task.cpu.algorithmTimes(0) = vbc.task.cpu.algorithmTimes(1) ' start time wait = end time algorithm
 
-                                   vbc.task.mouseClickFlag = False
-                                   vbc.task.frameCount += 1
-
                                    elapsedWaitTicks = vbc.task.cpu.algorithmTimes(1).Ticks - lastPaintTime.Ticks
                                    spanWait = New TimeSpan(elapsedWaitTicks)
                                    Dim msSinceLastPaint = spanWait.Ticks / TimeSpan.TicksPerMillisecond
+
+                                   vbc.task.mouseClickFlag = False
+                                   vbc.task.frameCount += 1
 
                                    Dim selection = vbc.task.Settings.paintFrequency
                                    Dim runPaint As Boolean = False

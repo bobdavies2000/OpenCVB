@@ -1,7 +1,4 @@
-﻿Imports System.Runtime.InteropServices
-Imports System.Windows.Documents
-Imports OpenCvSharp
-Imports cv = OpenCvSharp
+﻿Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Class RedWG_Basics : Inherits TaskParent
         Dim redC As New RedCloud_Basics
@@ -36,7 +33,7 @@ Namespace VBClasses
             strOut = RedCloud_Cell.selectCell(redC.rcMap, redC.rcList)
             SetTrueText(strOut, 1)
 
-            labels(3) = CStr(count) + " cells were not matched using wc since the last heartbeat"
+            labels(3) = CStr(count) + " cells were not matched using wc since the last heartbeatLT"
         End Sub
     End Class
 

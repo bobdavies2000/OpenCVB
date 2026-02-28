@@ -17,10 +17,11 @@ Namespace jsonShared
         Public OakIndex3D As Integer = -1
         Public OakIndex4D As Integer = -1
 
-        Public captureRes As New cv.Size(640, 480)
+        Public captureRes As New cv.Size(1280, 720)
+        Public workRes As New cv.Size(320, 180)
 
         Public desiredFPS As Integer = 60
-        Public displayRes As cv.Size = New cv.Size(320, 240)
+        Public displayRes As cv.Size = New cv.Size(320, 180)
 
         Public Image_Basics_Name As String = ""
 
@@ -29,7 +30,7 @@ Namespace jsonShared
         Public MainFormWidth As Integer = 1867
         Public MainFormHeight As Integer = 1134
 
-        Public paintFrequency As Integer
+        Public paintFrequency As Integer = 30
         Public plyFileName As String = ""
         Public resolutionsSupported As List(Of Boolean)
 
@@ -47,7 +48,6 @@ Namespace jsonShared
         Public TreeViewHeight As Integer = 500
 
         Public VideoFileName As String = ""
-        Public workRes As New cv.Size(320, 240)
     End Class
     Public Interface ISettingsUpdater
         Sub UpdateSetting(key As String, value As Object)

@@ -54,8 +54,6 @@ Public Class Options
         End Select
     End Sub
     Private Sub cameraRadioButton_CheckChanged(sender As Object, e As EventArgs)
-        If formLoadComplete = False Then Exit Sub
-
         settings.cameraName = sender.text
 
         defineCameraResolutions()

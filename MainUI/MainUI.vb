@@ -421,9 +421,6 @@ Namespace MainApp
         Private Sub OptionsButton_Click(sender As Object, e As EventArgs) Handles OptionsButton.Click
             If TestAllTimer.Enabled Then TestAllButton_Click(sender, e)
 
-            Debug.WriteLine(vbCrLf + "OptionsTesting GDI: " & GdiMonitor.GetGdiCount())
-            Debug.WriteLine("OptionsTesting USER: " & GdiMonitor.GetUserCount())
-
             StartStopTask()
             Dim optionsForm As New Options()
             If optionsForm.ShowDialog() = DialogResult.OK Then SaveJsonSettings()

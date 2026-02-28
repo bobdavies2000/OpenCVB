@@ -71,6 +71,8 @@ Namespace MainApp
         Public Function initialize(Settings As jsonShared.Settings) As jsonShared.Settings
             Dim usbList = USBenumeration()
 
+            If Settings.paintFrequency = 0 Then Settings.paintFrequency = 30
+
             'Dim countOak = OakDDevices()
             'For i = 0 To countOak - 1
             '    Dim strPtr = OakDNextDevice()
