@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <RootNamespace></RootNamespace>
@@ -51,8 +51,10 @@
     </Reference>
   </ItemGroup>
 
-  <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
-    <Exec Command="&quot;$(SolutionDir)UI_Generator\bin\x64\Release\net8.0\UI_Generator.exe&quot;" />
+  <!-- Build UI_Generator first, then run it to generate sources. Runs before compile so generated code is available. -->
+  <Target Name="RunUI_Generator" BeforeTargets="CoreCompile">
+    <MSBuild Projects="$(MSBuildThisFileDirectory)..\UI_Generator\UI_Generator.vbproj" Targets="Build" Properties="Configuration=$(Configuration);Platform=$(Platform)" />
+    <Exec Command="&quot;$(MSBuildThisFileDirectory)..\UI_Generator\bin\$(Platform)\$(Configuration)\net8.0\UI_Generator.exe&quot;" />
   </Target>
 
 </Project>

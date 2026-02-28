@@ -37,6 +37,116 @@ using namespace ximgproc;
 using namespace ml;
 
 #include "CPP_Parent.h"
+class RedCloudNew
+{
+private:
+public:
+    Mat src, result;
+    vector<Rect>cellRects;
+    vector<Point> floodPoints;
+
+    RedCloudNew() {}
+    bool checkVals(std::vector<uchar> vals, uchar val)
+    {
+        if (val == 0) return true;
+        bool test = std::find(vals.begin(), vals.end(), val) != vals.end();
+        return test;
+    }
+    void RunCPP() {
+        Mat mask(cv::Size(src.cols + 2, src.rows + 2), CV_8U);
+        mask.setTo(0);
+        Rect rect;
+
+        multimap<int, Point, greater<int>> sizeSorted;
+        int floodFlag = 4 | FLOODFILL_MASK_ONLY | FLOODFILL_FIXED_RANGE;
+		Point pt; uchar val;
+        for (int y = 1; y < src.rows - 2; y++)
+        {
+            for (int x = 1; x < src.cols - 2; x++)
+            {
+                std::vector<uchar> vals;
+                vals.reserve(9);
+
+                vals.push_back(src.at<uchar>(y - 1, x - 1));
+
+                val = src.at<uchar>(y - 1, x);
+                if (checkVals(vals, val) == false) vals.push_back(val);
+
+                val = src.at<uchar>(y - 1, x + 1);
+                if (checkVals(vals, val) == false) vals.push_back(val);
+
+                val = src.at<uchar>(y, x - 1);
+                if (checkVals(vals, val) == false) vals.push_back(val);
+
+                val = src.at<uchar>(y, x);
+                if (checkVals(vals, val) == false) vals.push_back(val);
+
+                val = src.at<uchar>(y, x + 1);
+                if (checkVals(vals, val) == false) vals.push_back(val);
+
+                val = src.at<uchar>(y + 1, x - 1);
+                if (checkVals(vals, val) == false) vals.push_back(val);
+
+                val = src.at<uchar>(y + 1, x);
+                if (checkVals(vals, val) == false) vals.push_back(val);
+
+                val = src.at<uchar>(y + 1, x + 1);
+                if (checkVals(vals, val) == false) vals.push_back(val);
+
+                if (vals.size() > 2)
+                {
+					cv::Rect r(x - 1, y - 1, 3, 3);
+                    src(r).setTo(0);
+                }
+
+                if (src.at<uchar>(y, x) != 0)
+                {
+                    pt = Point(x, y);
+                    int count = floodFill(src, mask, pt, 255, &rect, 0, 0, 4 | floodFlag | (255 << 8));
+                    if (rect.width > 1 && rect.height > 1) sizeSorted.insert(make_pair(count, pt));
+                }
+            }
+        }
+
+        cellRects.clear();
+        floodPoints.clear();
+        mask.setTo(0);
+        int fill = 1;
+        for (auto it = sizeSorted.begin(); it != sizeSorted.end(); it++)
+        {
+            if (floodFill(src, mask, it->second, fill, &rect, 0, 0, 4 | floodFlag | (fill << 8)) >= 1)
+            {
+                cellRects.push_back(rect);
+                floodPoints.push_back(it->second);
+
+                if (fill >= 255)
+                    fill = 0; // start over 
+                fill++;
+            }
+        }
+        Rect r = Rect(1, 1, mask.cols - 2, mask.rows - 2);
+        mask(r).copyTo(result);
+    }
+};
+
+extern "C" __declspec(dllexport) RedCloudNew* RedCloudNew_Open() { return new RedCloudNew(); }
+extern "C" __declspec(dllexport) int RedCloudNew_Count(RedCloudNew* cPtr) { return (int)cPtr->cellRects.size(); }
+extern "C" __declspec(dllexport) int* RedCloudNew_Rects(RedCloudNew* cPtr) { return (int*)&cPtr->cellRects[0]; }
+extern "C" __declspec(dllexport) int* RedCloudNew_Close(RedCloudNew* cPtr) { delete cPtr; return (int*)0; }
+
+extern "C" __declspec(dllexport) int*
+RedCloudNew_Run(RedCloudNew* cPtr, int* dataPtr, int rows, int cols)
+{
+    cPtr->src = Mat(rows, cols, CV_8U, dataPtr);
+    cPtr->RunCPP();
+    return (int*)cPtr->result.data;
+}
+
+
+
+
+
+
 class RedCloud
 {
 private:
