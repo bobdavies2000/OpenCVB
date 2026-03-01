@@ -164,7 +164,7 @@ public:
                 {
                     pt = Point(x, y);
                     int count = floodFill(src, mask, pt, srcFill, &rect, 0, 0, 4 | floodFlag | (maskFill << 8));
-                    if (rect.width > 1 && rect.height > 1) sizeSorted.insert(make_pair(count, pt));
+                    if (count > 1) sizeSorted.insert(make_pair(count, pt));
                 }
             }
         }
@@ -174,7 +174,8 @@ public:
         maskFill = 1;
         for (auto it = sizeSorted.begin(); it != sizeSorted.end(); it++)
         {
-            if (floodFill(src, mask, it->second, srcFill, &rect, 0, 0, 4 | floodFlag | (maskFill << 8)) >= 1)
+            int count = floodFill(src, mask, it->second, srcFill, &rect, 0, 0, 4 | floodFlag | (maskFill << 8));
+            if (count > 1)
             {
                 cellRects.push_back(rect);
                 maskFill++;
