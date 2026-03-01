@@ -60,6 +60,7 @@ public:
         multimap<int, Point, greater<int>> sizeSorted;
         int floodFlag = 4 | FLOODFILL_MASK_ONLY | FLOODFILL_FIXED_RANGE;
 		Point pt; uchar val;
+        int count = 0;
         for (int y = 1; y < src.rows - 2; y++)
         {
             for (int x = 1; x < src.cols - 2; x++)
@@ -67,8 +68,9 @@ public:
                 std::vector<uchar> vals;
                 vals.reserve(9);
 
-                vals.push_back(src.at<uchar>(y - 1, x - 1));
-
+                val = src.at<uchar>(y - 1, x - 1);
+                if (checkVals(vals, val) == false) vals.push_back(val);
+                
                 val = src.at<uchar>(y - 1, x);
                 if (checkVals(vals, val) == false) vals.push_back(val);
 
@@ -97,6 +99,7 @@ public:
                 {
 					cv::Rect r(x - 1, y - 1, 3, 3);
                     src(r).setTo(0);
+                    count += 1;
                 }
 
                 if (src.at<uchar>(y, x) != 0)
