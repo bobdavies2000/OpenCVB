@@ -64,58 +64,6 @@ Namespace VBClasses
             End If
             Return rc
         End Function
-        Public Shared Function rcMatch(rc As rcData, rcListLast As List(Of rcData),
-                                       wGridLastList As List(Of cv.Point),
-                                       rcMapLast As cv.Mat) As rcData
-            Dim r1 = rc.rect
-            Dim indexLast = wGridLastList.IndexOf(rc.wGrid)
-            If indexLast >= 0 And indexLast < rcListLast.Count Then
-                ' rcList index is 1 less than the rcMap value because a 0 rcMap value means not mapped.
-                ' All pixels are mapped with color but withh depth, rcMap has 0's where there is no depth.
-                Dim r2 = rcListLast(indexLast).rect
-                If r1.IntersectsWith(r2) = False Then rc.colorChange = causes.intersectLastRectFailed
-            Else
-                rc.colorChange = causes.wGridNotInLastList
-            End If
-
-            If task.optionsChanged Then rc.colorChange = causes.optionsChange
-
-            If rc.colorChange <> causes.lastCellFound Then
-                ' try use the maxDist point to find the last rect.
-                indexLast = rcMapLast.Get(Of Integer)(rc.maxDist.Y, rc.maxDist.X)
-                If indexLast >= 0 And indexLast < rcListLast.Count Then
-                    Dim r2 = rcListLast(indexLast).rect
-                    If r1.IntersectsWith(r2) = False Then
-                        rc.colorChange = causes.intersectLastRectFailed
-                    Else
-                        rc.colorChange = causes.lastCellFound
-                    End If
-                End If
-            End If
-
-            If rc.colorChange = causes.lastCellFound Then
-                Dim lrc = rcListLast(indexLast)
-                Dim rTest = rc.rect.Intersect(lrc.rect)
-                Dim rTotal = rTest.Width * rTest.Height
-                Dim lastTotal = lrc.rect.Width * lrc.rect.Height
-                If rc.rect.Contains(lrc.maxDist) Then
-                    rc.maxDist = lrc.maxDist
-                    rc.depthDelta = Math.Abs(lrc.wcMean(2) - rc.wcMean(2))
-                    If Single.IsInfinity(rc.depthDelta) Or rc.depthDelta < 0 Then
-                        rc.depthDelta = 0
-                        rc.wcMean(2) = 0
-                    End If
-                Else
-                    rc.colorChange = causes.maxDistOutsideOfLastRect
-                End If
-
-                rc.age = lrc.age + 1
-                If rc.age > 1000 Then rc.age = 2
-
-                rc.color = lrc.color
-            End If
-            Return rc
-        End Function
         Public Overrides Sub RunAlg(src As cv.Mat)
             indexer.Run(src)
             redC.Run(indexer.dst2)
@@ -573,113 +521,6 @@ Namespace VBClasses
 
 
 
-    Public Class RedCloud_FloodFill : Inherits TaskParent
-        Implements IDisposable
-        Public classCount As Integer
-        Public rcList As New List(Of rcData)
-        Public rcMap As cv.Mat = New cv.Mat(dst2.Size, cv.MatType.CV_32S, 0)
-        Public wGridList As New List(Of cv.Point)
-        Public options As New Options_RedCloud
-        Public Sub New()
-            cPtr = RedCloud_Open()
-            desc = "Run the C++ RedCloud interface without a mask"
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            options.Run()
-
-            If src.Channels <> 1 Then
-                Static prepData As New RedPrep_Core
-                prepData.Run(src)
-                dst1 = prepData.dst2
-            Else
-                dst1 = src
-            End If
-
-            Dim imagePtr As IntPtr
-            Dim inputData(dst1.Total - 1) As Byte
-            dst1.GetArray(Of Byte)(inputData)
-            Dim handleInput = GCHandle.Alloc(inputData, GCHandleType.Pinned)
-
-            imagePtr = RedCloud_Run(cPtr, handleInput.AddrOfPinnedObject(), dst1.Rows, dst1.Cols)
-            handleInput.Free()
-            dst0 = cv.Mat.FromPixelData(dst1.Rows, dst1.Cols, cv.MatType.CV_8U, imagePtr).Clone
-
-            classCount = RedCloud_Count(cPtr)
-            If classCount = 0 Then Exit Sub ' no data to process.
-
-            Dim rectData = cv.Mat.FromPixelData(classCount, 1, cv.MatType.CV_32SC4, RedCloud_Rects(cPtr))
-            Dim rects(classCount - 1) As cv.Rect
-            rectData.GetArray(Of cv.Rect)(rects)
-
-            Dim rcListLast = New List(Of rcData)(rcList)
-            Dim rcMapLast As cv.Mat = rcMap.Clone
-
-            Dim minPixels As Integer = dst2.Total * 0.001
-            If task.reduction < 50 Then minPixels = 0
-            Dim index As Integer = 1
-            Dim newList As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
-            For i = 0 To rects.Count - 1
-                Dim rc = New rcData(dst0(rects(i)), rects(i), index)
-                If rc.pixels < minPixels Then Continue For
-                newList.Add(rc.pixels, rc)
-                index += 1
-            Next
-
-            rcList.Clear()
-            dst2.SetTo(0)
-            Dim changed As Integer
-            Dim matchCount As Integer
-            Dim unMatched As Integer
-            Dim matchAverage As Single
-            For Each rc In newList.Values
-                Dim maxDist = rc.maxDist
-                rc = RedCloud_Basics.rcMatch(rc, rcListLast, wGridList, rcMapLast)
-
-                If rc.age = 1 Then unMatched += 1 Else matchCount += 1
-                matchAverage += rc.age
-
-                rc.index = rcList.Count + 1
-
-                ' The first cell often contains other cells completely within it.
-                ' These often causes the maxdist to move around.
-                ' So just fix the color here and create a stable image.
-                ' The cells within the largest cell will switch colors but many cells are stable.
-                If rc.index = 1 Then rc.color = blue
-                If maxDist <> rc.maxDist Then changed += 1
-
-                rcList.Add(rc)
-
-                If rc.pixels = 0 Then
-                    ' when the cell is very small, pixels can be zero - buildcontours failed.  No mask.
-                    'dst2(rc.rect).SetTo(rc.color)
-                    'rcMap(rc.rect).SetTo(rc.index)
-                Else
-                    dst2(rc.rect).SetTo(rc.color, rc.mask)
-                    rcMap(rc.rect).SetTo(rc.index, rc.mask)
-                End If
-            Next
-
-            If standalone Then
-                strOut = RedCloud_Cell.selectCell(rcMap, rcList)
-                SetTrueText(strOut, 3)
-            End If
-
-            wGridList.Clear()
-            For Each rc In rcList
-                wGridList.Add(rc.wGrid)
-            Next
-
-            labels(2) = CStr(unMatched) + " were new cells and " + CStr(matchCount) + " were matched, " +
-                            "average age: " + Format(matchAverage / rcList.Count, fmt1)
-        End Sub
-        Protected Overrides Sub Finalize()
-            If cPtr <> 0 Then cPtr = RedCloud_Close(cPtr)
-        End Sub
-    End Class
-
-
-
-
     Public Class RedCloud_BasicsNew : Inherits TaskParent
         Public redC As New RedCloud_FloodFill
         Public rcList As New List(Of rcData)
@@ -823,7 +664,7 @@ Namespace VBClasses
         Public options As New Options_RedCloud
         Public Sub New()
             cPtr = RedCloudNew_Open()
-            desc = "Run the C++ RedCloud interface without a mask"
+            desc = "This is before matching to previous generation."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
@@ -843,7 +684,10 @@ Namespace VBClasses
 
             imagePtr = RedCloudNew_Run(cPtr, handleInput.AddrOfPinnedObject(), dst1.Rows, dst1.Cols)
             handleInput.Free()
-            dst0 = cv.Mat.FromPixelData(dst1.Rows, dst1.Cols, cv.MatType.CV_8U, imagePtr).Clone
+
+            Dim rMask = New cv.Rect(1, 1, dst1.Width, dst1.Height)
+            Dim mask = cv.Mat.FromPixelData(dst1.Rows + 2, dst1.Cols + 2, cv.MatType.CV_8U, imagePtr)
+            dst0 = mask(rMask).Clone
 
             classCount = RedCloudNew_Count(cPtr)
             If classCount = 0 Then Exit Sub ' no data to process.
@@ -875,7 +719,7 @@ Namespace VBClasses
             dst3.SetTo(0)
             For Each rc In newList.Values
                 Dim maxDist = rc.maxDist
-                rc = RedCloud_Basics.rcMatch(rc, rcListLast, wGridList, rcMapLast)
+                rc = RedCloud_FloodFill.rcMatch(rc, rcListLast, wGridList, rcMapLast)
 
                 If rc.age = 1 Then unMatched += 1 Else matchCount += 1
                 matchAverage += rc.age
@@ -916,6 +760,169 @@ Namespace VBClasses
         End Sub
         Protected Overrides Sub Finalize()
             If cPtr <> 0 Then cPtr = RedCloudNew_Close(cPtr)
+        End Sub
+    End Class
+
+
+
+
+
+    Public Class RedCloud_FloodFill : Inherits TaskParent
+        Implements IDisposable
+        Public classCount As Integer
+        Public rcList As New List(Of rcData)
+        Public rcMap As cv.Mat = New cv.Mat(dst2.Size, cv.MatType.CV_32S, 0)
+        Public wGridList As New List(Of cv.Point)
+        Public options As New Options_RedCloud
+        Public Sub New()
+            cPtr = RedCloud_Open()
+            desc = "RedCloud results before matching to previous generation."
+        End Sub
+        Public Shared Function rcMatch(rc As rcData, rcListLast As List(Of rcData),
+                                       wGridLastList As List(Of cv.Point),
+                                       rcMapLast As cv.Mat) As rcData
+            Dim r1 = rc.rect
+            Dim indexLast = wGridLastList.IndexOf(rc.wGrid)
+            If indexLast >= 0 And indexLast < rcListLast.Count Then
+                ' rcList index is 1 less than the rcMap value because a 0 rcMap value means not mapped.
+                ' All pixels are mapped with color but withh depth, rcMap has 0's where there is no depth.
+                Dim r2 = rcListLast(indexLast).rect
+                If r1.IntersectsWith(r2) = False Then rc.colorChange = causes.intersectLastRectFailed
+            Else
+                rc.colorChange = causes.wGridNotInLastList
+            End If
+
+            If task.optionsChanged Then rc.colorChange = causes.optionsChange
+
+            If rc.colorChange <> causes.lastCellFound Then
+                ' try use the maxDist point to find the last rect.
+                indexLast = rcMapLast.Get(Of Integer)(rc.maxDist.Y, rc.maxDist.X)
+                If indexLast >= 0 And indexLast < rcListLast.Count Then
+                    Dim r2 = rcListLast(indexLast).rect
+                    If r1.IntersectsWith(r2) = False Then
+                        rc.colorChange = causes.intersectLastRectFailed
+                    Else
+                        rc.colorChange = causes.lastCellFound
+                    End If
+                End If
+            End If
+
+            If rc.colorChange = causes.lastCellFound Then
+                Dim lrc = rcListLast(indexLast)
+                Dim rTest = rc.rect.Intersect(lrc.rect)
+                Dim rTotal = rTest.Width * rTest.Height
+                Dim lastTotal = lrc.rect.Width * lrc.rect.Height
+                If rc.rect.Contains(lrc.maxDist) Then
+                    rc.maxDist = lrc.maxDist
+                    rc.depthDelta = Math.Abs(lrc.wcMean(2) - rc.wcMean(2))
+                    If Single.IsInfinity(rc.depthDelta) Or rc.depthDelta < 0 Then
+                        rc.depthDelta = 0
+                        rc.wcMean(2) = 0
+                    End If
+                Else
+                    rc.colorChange = causes.maxDistOutsideOfLastRect
+                End If
+
+                rc.age = lrc.age + 1
+                If rc.age > 1000 Then rc.age = 2
+
+                rc.color = lrc.color
+            End If
+            Return rc
+        End Function
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            options.Run()
+
+            If src.Channels <> 1 Then
+                Static indexer As New Indexer_Corners
+                indexer.Run(src)
+                dst1 = indexer.dst2
+            Else
+                dst1 = src
+            End If
+
+            Dim imagePtr As IntPtr
+            Dim inputData(dst1.Total - 1) As Byte
+            dst1.GetArray(Of Byte)(inputData)
+            Dim handleInput = GCHandle.Alloc(inputData, GCHandleType.Pinned)
+
+            imagePtr = RedCloud_Run(cPtr, handleInput.AddrOfPinnedObject(), dst1.Rows, dst1.Cols)
+            handleInput.Free()
+
+            Dim rMask = New cv.Rect(1, 1, dst1.Width, dst1.Height)
+            Dim mask = cv.Mat.FromPixelData(dst1.Rows + 2, dst1.Cols + 2, cv.MatType.CV_8U, imagePtr)
+            dst0 = mask(rMask).Clone
+
+            classCount = RedCloud_Count(cPtr)
+            If classCount = 0 Then Exit Sub ' no data to process.
+
+            Dim rectData = cv.Mat.FromPixelData(classCount, 1, cv.MatType.CV_32SC4, RedCloud_Rects(cPtr))
+            Dim rects(classCount - 1) As cv.Rect
+            rectData.GetArray(Of cv.Rect)(rects)
+
+            Dim rcListLast = New List(Of rcData)(rcList)
+            Dim rcMapLast As cv.Mat = rcMap.Clone
+
+            Dim minPixels As Integer = dst2.Total * 0.001
+            If task.reduction < 50 Then minPixels = 0
+            Dim index As Integer = 1
+            Dim newList As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
+            For i = 0 To rects.Count - 1
+                Dim rc = New rcData(dst0(rects(i)), rects(i), index)
+                If rc.pixels < minPixels Then Continue For
+                newList.Add(rc.pixels, rc)
+                index += 1
+            Next
+
+            rcList.Clear()
+            dst2.SetTo(0)
+            Dim changed As Integer
+            Dim matchCount As Integer
+            Dim unMatched As Integer
+            Dim matchAverage As Single
+            For Each rc In newList.Values
+                Dim maxDist = rc.maxDist
+                rc = rcMatch(rc, rcListLast, wGridList, rcMapLast)
+
+                If rc.age = 1 Then unMatched += 1 Else matchCount += 1
+                matchAverage += rc.age
+
+                rc.index = rcList.Count + 1
+
+                ' The first cell often contains other cells completely within it.
+                ' These often causes the maxdist to move around.
+                ' So just fix the color here and create a stable image.
+                ' The cells within the largest cell will switch colors but many cells are stable.
+                If rc.index = 1 Then rc.color = blue
+                If maxDist <> rc.maxDist Then changed += 1
+
+                rcList.Add(rc)
+
+                If rc.pixels = 0 Then
+                    ' when the cell is very small, pixels can be zero - buildcontours failed.  No mask.
+                    'dst2(rc.rect).SetTo(rc.color)
+                    'rcMap(rc.rect).SetTo(rc.index)
+                Else
+                    dst2(rc.rect).SetTo(rc.color, rc.mask)
+                    rcMap(rc.rect).SetTo(rc.index, rc.mask)
+                End If
+            Next
+
+            If standalone Then
+                strOut = RedCloud_Cell.selectCell(rcMap, rcList)
+                SetTrueText(strOut, 3)
+            End If
+
+            wGridList.Clear()
+            For Each rc In rcList
+                wGridList.Add(rc.wGrid)
+            Next
+
+            labels(2) = CStr(unMatched) + " were new cells and " + CStr(matchCount) + " were matched, " +
+                            "average age: " + Format(matchAverage / rcList.Count, fmt1)
+        End Sub
+        Protected Overrides Sub Finalize()
+            If cPtr <> 0 Then cPtr = RedCloud_Close(cPtr)
         End Sub
     End Class
 End Namespace

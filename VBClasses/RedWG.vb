@@ -1,7 +1,7 @@
 ﻿Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Class RedWG_Basics : Inherits TaskParent
-        Dim redC As New RedCloud_Basics
+        Dim redC As New RedCloud_FloodFill
         Dim currSet As New List(Of cv.Point)
         Public Sub New()
             If standalone Then task.gOptions.displayDst1.Checked = True
