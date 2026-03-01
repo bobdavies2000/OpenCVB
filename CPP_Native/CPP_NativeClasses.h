@@ -57,8 +57,8 @@ public:
 
         int floodFlag = 4 | FLOODFILL_MASK_ONLY | FLOODFILL_FIXED_RANGE;
 		Point pt; unsigned char val;
-        int maskFill = 1;
-        int srcFill = 255; // src is not getting filled.
+        int maskFill = 255; 
+        int srcFill = 255; // src is untouched here...
         cellRects.clear();
         vector<int>floodPoints;
         Rect rect;
