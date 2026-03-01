@@ -1509,13 +1509,13 @@ RedCC_Basics
 RedCC_BasicsCombined
 RedCC_Color8U
 RedCloud_Basics
-RedCloud_BasicsNew
+RedCloud_BasicsLined
 RedCloud_Cell
 RedCloud_CellMask
 RedCloud_ColorChangeCause
 RedCloud_Core
-RedCloud_FloodFill
-RedCloud_FloodFillNew
+RedCloud_Flood
+RedCloud_FloodLine
 RedCloud_KNN
 RedCloud_LeftRight
 RedCloud_Matched

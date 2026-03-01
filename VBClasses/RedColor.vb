@@ -7,7 +7,7 @@ Namespace VBClasses
         Public rcList As New List(Of rcData)
         Public rcMap As cv.Mat = New cv.Mat(dst2.Size, cv.MatType.CV_32S, 0)
         Public options As New Options_RedCloud
-        Public redFlood As New RedCloud_FloodFill
+        Public redFlood As New RedCloud_Flood
         Public Sub New()
             desc = "Run the C++ RedCloud interface without a mask"
         End Sub

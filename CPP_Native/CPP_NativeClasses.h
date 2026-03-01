@@ -62,7 +62,7 @@ public:
         cellRects.clear();
         vector<int>floodPoints;
         Rect rect;
-        int plugCount = 0;
+        multimap<int, Point, greater<int>> sizeSorted;
         for (int y = 1; y < src.rows - 2; y++)
         {
             for (int x = 1; x < src.cols - 2; x++)
@@ -72,7 +72,7 @@ public:
 
                 val = src.at<unsigned char>(y - 1, x - 1);
                 if (checkVals(vals, val) == false) vals.push_back(val);
-                
+
                 val = src.at<unsigned char>(y - 1, x);
                 if (checkVals(vals, val) == false) vals.push_back(val);
 
@@ -99,22 +99,36 @@ public:
 
                 if (vals.size() > 2)
                 {
-					cv::Rect r(x - 1, y - 1, 3, 3);
+                    cv::Rect r(x - 1, y - 1, 3, 3);
                     src(r).setTo(0);
-					plugCount++;
                 }
+            }
+        }
 
+        for (int y = 1; y < src.rows - 2; y++)
+        {
+            for (int x = 1; x < src.cols - 2; x++)
+            {
                 if (mask.at<unsigned char>(y, x) == 0 && src.at<unsigned char>(y, x) != 0)
                 {
                     pt = Point(x, y);
                     int count = floodFill(src, mask, pt, srcFill, &rect, 0, 0, 4 | floodFlag | (maskFill << 8));
-                    if (count > 1)
-                    {
-                        cellRects.push_back(rect);
-                        maskFill++;
-                        if (maskFill >= 256) maskFill = 1;
-                    }
+                    if (count > 0) sizeSorted.insert(make_pair(count, pt));
                 }
+            }
+        }
+
+        cellRects.clear();
+        mask.setTo(0);
+        maskFill = 1;
+        for (auto it = sizeSorted.begin(); it != sizeSorted.end(); it++)
+        {
+            int count = floodFill(src, mask, it->second, srcFill, &rect, 0, 0, 4 | floodFlag | (maskFill << 8));
+            if (count > 0)
+            {
+                cellRects.push_back(rect);
+                maskFill++;
+                if (maskFill >= 256) maskFill = 1; // start over 
             }
         }
     }
