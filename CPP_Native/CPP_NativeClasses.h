@@ -57,10 +57,12 @@ public:
 
         int floodFlag = 4 | FLOODFILL_MASK_ONLY | FLOODFILL_FIXED_RANGE;
 		Point pt; unsigned char val;
-        int fill = 1;
+        int maskFill = 1;
+        int srcFill = 255; // src is not getting filled.
         cellRects.clear();
         vector<int>floodPoints;
         Rect rect;
+        int plugCount = 0;
         for (int y = 1; y < src.rows - 2; y++)
         {
             for (int x = 1; x < src.cols - 2; x++)
@@ -99,17 +101,18 @@ public:
                 {
 					cv::Rect r(x - 1, y - 1, 3, 3);
                     src(r).setTo(0);
+					plugCount++;
                 }
 
                 if (mask.at<unsigned char>(y, x) == 0 && src.at<unsigned char>(y, x) != 0)
                 {
                     pt = Point(x, y);
-                    int count = floodFill(src, mask, pt, 255, &rect, 0, 0, 4 | floodFlag | (fill << 8));
+                    int count = floodFill(src, mask, pt, srcFill, &rect, 0, 0, 4 | floodFlag | (maskFill << 8));
                     if (count > 1)
                     {
                         cellRects.push_back(rect);
-                        fill++;
-                        if (fill >= 256) fill = 1;
+                        maskFill++;
+                        if (maskFill >= 256) maskFill = 1;
                     }
                 }
             }
@@ -148,6 +151,7 @@ public:
         mask = Mat(cv::Size(src.cols + 2, src.rows + 2), CV_8U);
         mask.setTo(0);
         Rect rect;
+        int maskFill = 255; int srcFill = 255; // src is untouched here...
 
         multimap<int, Point, greater<int>> sizeSorted;
         int floodFlag = 4 | FLOODFILL_MASK_ONLY | FLOODFILL_FIXED_RANGE;
@@ -159,7 +163,7 @@ public:
                 if (src.at<unsigned char>(y, x) == 0)
                 {
                     pt = Point(x, y);
-                    int count = floodFill(src, mask, pt, 255, &rect, 0, 0, 4 | floodFlag | (255 << 8));
+                    int count = floodFill(src, mask, pt, srcFill, &rect, 0, 0, 4 | floodFlag | (maskFill << 8));
                     if (rect.width > 1 && rect.height > 1) sizeSorted.insert(make_pair(count, pt));
                 }
             }
@@ -167,19 +171,14 @@ public:
 
         cellRects.clear();
         mask.setTo(0);
-        int fill = 1;
+        maskFill = 1;
         for (auto it = sizeSorted.begin(); it != sizeSorted.end(); it++)
         {
-            if (floodFill(src, mask, it->second, fill, &rect, 0, 0, 4 | floodFlag | (fill << 8)) >= 1)
+            if (floodFill(src, mask, it->second, srcFill, &rect, 0, 0, 4 | floodFlag | (maskFill << 8)) >= 1)
             {
-                if (rect.width * rect.height > 0)
-                {
-                    cellRects.push_back(rect);
-
-                    if (fill >= 255)
-                        fill = 0; // start over 
-                    fill++;
-                }
+                cellRects.push_back(rect);
+                maskFill++;
+                if (maskFill >= 256) maskFill = 1; // start over 
             }
         }
     }

@@ -655,117 +655,6 @@ Namespace VBClasses
 
 
 
-    Public Class RedCloud_FloodFillNew : Inherits TaskParent
-        Implements IDisposable
-        Public classCount As Integer
-        Public rcList As New List(Of rcData)
-        Public rcMap As cv.Mat = New cv.Mat(dst2.Size, cv.MatType.CV_32S, 0)
-        Public wGridList As New List(Of cv.Point)
-        Public options As New Options_RedCloud
-        Public Sub New()
-            cPtr = RedCloudNew_Open()
-            desc = "This is before matching to previous generation."
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            options.Run()
-
-            If src.Channels <> 1 Then
-                Static prepData As New RedPrep_Core
-                prepData.Run(src)
-                dst1 = prepData.dst2
-            Else
-                dst1 = src
-            End If
-
-            Dim imagePtr As IntPtr
-            Dim inputData(dst1.Total - 1) As Byte
-            dst1.GetArray(Of Byte)(inputData)
-            Dim handleInput = GCHandle.Alloc(inputData, GCHandleType.Pinned)
-
-            imagePtr = RedCloudNew_Run(cPtr, handleInput.AddrOfPinnedObject(), dst1.Rows, dst1.Cols)
-            handleInput.Free()
-
-            Dim rMask = New cv.Rect(1, 1, dst1.Width, dst1.Height)
-            Dim mask = cv.Mat.FromPixelData(dst1.Rows + 2, dst1.Cols + 2, cv.MatType.CV_8U, imagePtr)
-            dst0 = mask(rMask).Clone
-
-            classCount = RedCloudNew_Count(cPtr)
-            If classCount = 0 Then Exit Sub ' no data to process.
-
-            Dim rectData = cv.Mat.FromPixelData(classCount, 1, cv.MatType.CV_32SC4, RedCloudNew_Rects(cPtr))
-            Dim rects(classCount - 1) As cv.Rect
-            rectData.GetArray(Of cv.Rect)(rects)
-
-            Dim rcListLast = New List(Of rcData)(rcList)
-            Dim rcMapLast As cv.Mat = rcMap.Clone
-
-            Dim minPixels As Integer = dst2.Total * 0.001
-            If task.reduction < 50 Then minPixels = 0
-            Dim index As Integer = 1
-            Dim newList As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
-            For i = 0 To rects.Count - 1
-                Dim rc = New rcData(dst0(rects(i)), rects(i), index)
-                If rc.pixels < minPixels Then Continue For
-                newList.Add(rc.pixels, rc)
-                index += 1
-            Next
-
-            rcList.Clear()
-            dst2.SetTo(0)
-            Dim changed As Integer
-            Dim matchCount As Integer
-            Dim unMatched As Integer
-            Dim matchAverage As Single
-            dst3.SetTo(0)
-            For Each rc In newList.Values
-                Dim maxDist = rc.maxDist
-                rc = RedCloud_FloodFill.rcMatch(rc, rcListLast, wGridList, rcMapLast)
-
-                If rc.age = 1 Then unMatched += 1 Else matchCount += 1
-                matchAverage += rc.age
-
-                rc.index = rcList.Count + 1
-
-                ' The first cell often contains other cells completely within it.
-                ' These often causes the maxdist to move around.
-                ' So just fix the color here and create a stable image.
-                ' The cells within the largest cell will switch colors but many cells are stable.
-                If rc.index = 1 Then rc.color = blue
-                If maxDist <> rc.maxDist Then changed += 1
-
-                rcList.Add(rc)
-
-                If rc.pixels = 0 Then
-                    ' when the cell is very small, pixels can be zero - buildcontours failed.  No mask.
-                    'dst2(rc.rect).SetTo(rc.color)
-                    'rcMap(rc.rect).SetTo(rc.index)
-                Else
-                    dst2(rc.rect).SetTo(rc.color, rc.mask)
-                    rcMap(rc.rect).SetTo(rc.index, rc.mask)
-                End If
-            Next
-
-            If standalone Then
-                strOut = RedCloud_Cell.selectCell(rcMap, rcList)
-                SetTrueText(strOut, 3)
-            End If
-
-            wGridList.Clear()
-            For Each rc In rcList
-                wGridList.Add(rc.wGrid)
-            Next
-
-            labels(2) = CStr(unMatched) + " were new cells and " + CStr(matchCount) + " were matched, " +
-                            "average age: " + Format(matchAverage / rcList.Count, fmt1)
-        End Sub
-        Protected Overrides Sub Finalize()
-            If cPtr <> 0 Then cPtr = RedCloudNew_Close(cPtr)
-        End Sub
-    End Class
-
-
-
-
 
     Public Class RedCloud_FloodFill : Inherits TaskParent
         Implements IDisposable
@@ -923,6 +812,115 @@ Namespace VBClasses
         End Sub
         Protected Overrides Sub Finalize()
             If cPtr <> 0 Then cPtr = RedCloud_Close(cPtr)
+        End Sub
+    End Class
+
+
+
+
+
+    Public Class RedCloud_FloodFillNew : Inherits TaskParent
+        Implements IDisposable
+        Public classCount As Integer
+        Public rcList As New List(Of rcData)
+        Public rcMap As cv.Mat = New cv.Mat(dst2.Size, cv.MatType.CV_32S, 0)
+        Public wGridList As New List(Of cv.Point)
+        Public options As New Options_RedCloud
+        Public Sub New()
+            cPtr = RedCloudNew_Open()
+            desc = "This is before matching to previous generation."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            options.Run()
+
+            If src.Channels <> 1 Then
+                Static prepData As New RedPrep_Core
+                prepData.Run(src)
+                dst1 = prepData.dst2
+            Else
+                dst1 = src
+            End If
+
+            Dim imagePtr As IntPtr
+            Dim inputData(dst1.Total - 1) As Byte
+            dst1.GetArray(Of Byte)(inputData)
+            Dim handleInput = GCHandle.Alloc(inputData, GCHandleType.Pinned)
+
+            imagePtr = RedCloudNew_Run(cPtr, handleInput.AddrOfPinnedObject(), dst1.Rows, dst1.Cols)
+            handleInput.Free()
+
+            Dim rMask = New cv.Rect(1, 1, dst1.Width, dst1.Height)
+            Dim mask = cv.Mat.FromPixelData(dst1.Rows + 2, dst1.Cols + 2, cv.MatType.CV_8U, imagePtr)
+            dst0 = mask(rMask).Clone
+
+            classCount = RedCloudNew_Count(cPtr)
+            If classCount = 0 Then Exit Sub ' no data to process.
+
+            Dim rectData = cv.Mat.FromPixelData(classCount, 1, cv.MatType.CV_32SC4, RedCloudNew_Rects(cPtr))
+            Dim rects(classCount - 1) As cv.Rect
+            rectData.GetArray(Of cv.Rect)(rects)
+
+            Dim rcListLast = New List(Of rcData)(rcList)
+            Dim rcMapLast As cv.Mat = rcMap.Clone
+
+            Dim index As Integer = 1
+            Dim newList As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
+            For i = 0 To rects.Count - 1
+                Dim rc = New rcData(dst0(rects(i)), rects(i), index)
+                newList.Add(rc.pixels, rc)
+                index += 1
+            Next
+
+            rcList.Clear()
+            dst2.SetTo(0)
+            Dim changed As Integer
+            Dim matchCount As Integer
+            Dim unMatched As Integer
+            Dim matchAverage As Single
+            dst3.SetTo(0)
+            For Each rc In newList.Values
+                Dim maxDist = rc.maxDist
+                rc = RedCloud_FloodFill.rcMatch(rc, rcListLast, wGridList, rcMapLast)
+
+                If rc.age = 1 Then unMatched += 1 Else matchCount += 1
+                matchAverage += rc.age
+
+                rc.index = rcList.Count + 1
+
+                ' The first cell often contains other cells completely within it.
+                ' These often causes the maxdist to move around.
+                ' So just fix the color here and create a stable image.
+                ' The cells within the largest cell will switch colors but many cells are stable.
+                If rc.index = 1 Then rc.color = blue
+                If maxDist <> rc.maxDist Then changed += 1
+
+                rcList.Add(rc)
+
+                If rc.pixels = 0 Then
+                    ' when the cell is very small, pixels can be zero - buildcontours failed.  No mask.
+                    'dst2(rc.rect).SetTo(rc.color)
+                    'rcMap(rc.rect).SetTo(rc.index)
+                Else
+                    dst2(rc.rect).SetTo(rc.color, rc.mask)
+                    rcMap(rc.rect).SetTo(rc.index, rc.mask)
+                End If
+            Next
+
+            If standalone Then
+                strOut = RedCloud_Cell.selectCell(rcMap, rcList)
+                SetTrueText(strOut, 3)
+            End If
+
+            wGridList.Clear()
+            For Each rc In rcList
+                wGridList.Add(rc.wGrid)
+            Next
+
+            labels(2) = CStr(unMatched) + " were new cells and " + CStr(matchCount) + " were matched, " +
+                            "average age: " + Format(matchAverage / rcList.Count, fmt1)
+        End Sub
+        Protected Overrides Sub Finalize()
+            If cPtr <> 0 Then cPtr = RedCloudNew_Close(cPtr)
         End Sub
     End Class
 End Namespace
