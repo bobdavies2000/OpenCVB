@@ -43,10 +43,9 @@ private:
 public:
     Mat src, result;
     vector<Rect>cellRects;
-    vector<Point> floodPoints;
 
     RedCloudNew() {}
-    bool checkVals(std::vector<uchar> vals, uchar val)
+    bool checkVals(std::vector<unsigned char> vals, unsigned char val)
     {
         if (val == 0) return true;
         bool test = std::find(vals.begin(), vals.end(), val) != vals.end();
@@ -54,45 +53,46 @@ public:
     }
     void RunCPP() {
         Mat mask(cv::Size(src.cols + 2, src.rows + 2), CV_8U);
-        mask.setTo(0);
         Rect rect;
+        mask.setTo(0);
 
         multimap<int, Point, greater<int>> sizeSorted;
         int floodFlag = 4 | FLOODFILL_MASK_ONLY | FLOODFILL_FIXED_RANGE;
-		Point pt; uchar val;
+		Point pt; unsigned char val;
         int count = 0;
+        int fill = 1;
         for (int y = 1; y < src.rows - 2; y++)
         {
             for (int x = 1; x < src.cols - 2; x++)
             {
-                std::vector<uchar> vals;
+                std::vector<unsigned char> vals;
                 vals.reserve(9);
 
-                val = src.at<uchar>(y - 1, x - 1);
+                val = src.at<unsigned char>(y - 1, x - 1);
                 if (checkVals(vals, val) == false) vals.push_back(val);
                 
-                val = src.at<uchar>(y - 1, x);
+                val = src.at<unsigned char>(y - 1, x);
                 if (checkVals(vals, val) == false) vals.push_back(val);
 
-                val = src.at<uchar>(y - 1, x + 1);
+                val = src.at<unsigned char>(y - 1, x + 1);
                 if (checkVals(vals, val) == false) vals.push_back(val);
 
-                val = src.at<uchar>(y, x - 1);
+                val = src.at<unsigned char>(y, x - 1);
                 if (checkVals(vals, val) == false) vals.push_back(val);
 
-                val = src.at<uchar>(y, x);
+                val = src.at<unsigned char>(y, x);
                 if (checkVals(vals, val) == false) vals.push_back(val);
 
-                val = src.at<uchar>(y, x + 1);
+                val = src.at<unsigned char>(y, x + 1);
                 if (checkVals(vals, val) == false) vals.push_back(val);
 
-                val = src.at<uchar>(y + 1, x - 1);
+                val = src.at<unsigned char>(y + 1, x - 1);
                 if (checkVals(vals, val) == false) vals.push_back(val);
 
-                val = src.at<uchar>(y + 1, x);
+                val = src.at<unsigned char>(y + 1, x);
                 if (checkVals(vals, val) == false) vals.push_back(val);
 
-                val = src.at<uchar>(y + 1, x + 1);
+                val = src.at<unsigned char>(y + 1, x + 1);
                 if (checkVals(vals, val) == false) vals.push_back(val);
 
                 if (vals.size() > 2)
@@ -102,33 +102,31 @@ public:
                     count += 1;
                 }
 
-                if (src.at<uchar>(y, x) != 0)
+                if (mask.at<unsigned char>(y + 1, x + 1) == 0 && src.at<unsigned char>(y, x) != 0)
                 {
                     pt = Point(x, y);
-                    int count = floodFill(src, mask, pt, 255, &rect, 0, 0, 4 | floodFlag | (255 << 8));
-                    if (rect.width > 1 && rect.height > 1) sizeSorted.insert(make_pair(count, pt));
+                    int count = floodFill(src, mask, pt, 0, &rect, 0, 0, 4 | floodFlag | (255 << 8));
+                    if (rect.width > 1 && rect.height > 1)
+                    {
+                        sizeSorted.insert(make_pair(count, pt));
+                    }
                 }
             }
         }
 
         cellRects.clear();
-        floodPoints.clear();
         mask.setTo(0);
-        int fill = 1;
         for (auto it = sizeSorted.begin(); it != sizeSorted.end(); it++)
         {
-            if (floodFill(src, mask, it->second, fill, &rect, 0, 0, 4 | floodFlag | (fill << 8)) >= 1)
+            if (floodFill(src, mask, it->second, fill, &rect, 0, 0, 4 | floodFlag | (fill << 8)) > 1)
             {
                 cellRects.push_back(rect);
-                floodPoints.push_back(it->second);
-
-                if (fill >= 255)
-                    fill = 0; // start over 
+                if (fill >= 255) fill = 0; // start over 
                 fill++;
             }
         }
-        Rect r = Rect(1, 1, mask.cols - 2, mask.rows - 2);
-        mask(r).copyTo(result);
+        Rect rMask = Rect(1, 1, src.cols, src.rows);
+        mask(rMask).copyTo(result);
     }
 };
 
@@ -156,7 +154,6 @@ private:
 public:
     Mat src, result;
     vector<Rect>cellRects;
-    vector<Point> floodPoints;
 
     RedCloud() {}
     void RunCPP() {
@@ -181,7 +178,6 @@ public:
         }
 
         cellRects.clear();
-        floodPoints.clear();
         mask.setTo(0);
         int fill = 1;
         for (auto it = sizeSorted.begin(); it != sizeSorted.end(); it++)
@@ -191,7 +187,6 @@ public:
                 if (rect.width * rect.height > 0)
                 {
                     cellRects.push_back(rect);
-                    floodPoints.push_back(it->second);
 
                     if (fill >= 255)
                         fill = 0; // start over 
@@ -227,7 +222,6 @@ private:
 public:
     Mat src, result, inputMask;
     vector<Rect>cellRects;
-    vector<Point> floodPoints;
 
     RedCloudMask() {}
     void RunCPP() {
@@ -257,7 +251,6 @@ public:
         }
 
         cellRects.clear();
-        floodPoints.clear();
         mask.setTo(0);
         int fill = 1;
         for (auto it = sizeSorted.begin(); it != sizeSorted.end(); it++)
@@ -267,7 +260,6 @@ public:
                 if (rect.width * rect.height > 0)
                 {
                     cellRects.push_back(rect);
-                    floodPoints.push_back(it->second);
 
                     if (fill >= 255)
                         break; // just taking up to the top X largest objects found.
@@ -302,7 +294,6 @@ class PrepXY
 private:
 public:
     Mat dst, result;
-    vector<Point> floodPoints;
 
     PrepXY() {}
     void RunCPP(Mat splitX, Mat splitY, float xRange, float yRange, int bins) {
@@ -366,7 +357,6 @@ private:
 public:
     Mat src, result;
     vector<Rect>cellRects;
-    vector<Point> floodPoints;
 
     RedMask() {}
     void RunCPP(int minSize) {
@@ -390,7 +380,6 @@ public:
         }
 
         cellRects.clear();
-        floodPoints.clear();
         int fill = 1;
         result.setTo(0);
         Rect rect;
@@ -399,7 +388,6 @@ public:
             if (floodFill(src, result, it->second, fill, &rect, 0, 0, 4 | floodFlag | (fill << 8)) >= 1)
             {
                 cellRects.push_back(rect);
-                floodPoints.push_back(it->second);
 
                 if (fill >= 255) break; // just taking up to the top X largest objects found.
                 fill++;
@@ -724,9 +712,9 @@ public:
             float t = depthImage[i] / maxDepth;
             if (t > 0 && t <= 1)
             {
-                *rgb++ = uchar(((1 - t) * nearColor[0] + t * farColor[0]) * 255);
-                *rgb++ = uchar(((1 - t) * nearColor[1] + t * farColor[1]) * 255);
-                *rgb++ = uchar(((1 - t) * nearColor[2] + t * farColor[2]) * 255);
+                *rgb++ = unsigned char(((1 - t) * nearColor[0] + t * farColor[0]) * 255);
+                *rgb++ = unsigned char(((1 - t) * nearColor[1] + t * farColor[1]) * 255);
+                *rgb++ = unsigned char(((1 - t) * nearColor[2] + t * farColor[2]) * 255);
             }
             else {
                 *rgb++ = 0; *rgb++ = 0; *rgb++ = 0;
@@ -779,14 +767,14 @@ public:
         {
             for (int x = 0; x < depth32f.cols; ++x)
             {
-                uchar m = mask.at<uchar>(y, x);
+                unsigned char m = mask.at<unsigned char>(y, x);
                 if (m == 255)
                 {
                     float d = depth32f.at<float>(y, x);
                     float dy = hRange * (d - desiredMin) / range;
-                    if (dy > 0 && dy < hRange) viewTop.at<uchar>(int((hRange - dy)), x) = 0;
+                    if (dy > 0 && dy < hRange) viewTop.at<unsigned char>(int((hRange - dy)), x) = 0;
                     float dx = wRange * (d - desiredMin) / range;
-                    if (dx < wRange && dx > 0) viewSide.at<uchar>(y, int(dx)) = 0;
+                    if (dx < wRange && dx > 0) viewSide.at<unsigned char>(y, int(dx)) = 0;
                 }
             }
         }
@@ -1180,10 +1168,10 @@ public:
             //#pragma omp parallel for 
             for (int x = 1; x < src.cols - 3; ++x)
             {
-                int pixel = src.at<uchar>(y, x);
+                int pixel = src.at<unsigned char>(y, x);
                 Rect r = Rect(x, y, 3, 3);
                 Scalar sum = cv::sum(src(r));
-                if (sum.val[0] == double(pixel * 9)) dst.at<uchar>(y + 1, x + 1) = pixel;
+                if (sum.val[0] == double(pixel * 9)) dst.at<unsigned char>(y + 1, x + 1) = pixel;
             }
         }
     }
@@ -1435,7 +1423,7 @@ static Mat newImage;
 // The rows and cols are both -1 so I had assumed there was a bug but the data is accessible with the at method.
 // If you attempt the same access to the data in managed code, it does not work (AFAIK).
 extern "C" __declspec(dllexport)
-uchar* BackProjectBGR_Run(int* bgrPtr, int rows, int cols, int bins, float threshold)
+unsigned char* BackProjectBGR_Run(int* bgrPtr, int rows, int cols, int bins, float threshold)
 {
     Mat input = Mat(rows, cols, CV_8UC3, bgrPtr);
     float hRange0[] = { 0, 256 };
@@ -1456,7 +1444,7 @@ uchar* BackProjectBGR_Run(int* bgrPtr, int rows, int cols, int bins, float thres
 
     calcBackProject(&input, 1, channels, histogram, newImage, range);
 
-    return (uchar*)newImage.data;
+    return (unsigned char*)newImage.data;
 }
 
 
@@ -1464,7 +1452,7 @@ uchar* BackProjectBGR_Run(int* bgrPtr, int rows, int cols, int bins, float thres
 
 
 extern "C" __declspec(dllexport)
-uchar* Hist3Dcloud_Run(int* inputPtr, int rows, int cols, int bins,
+unsigned char* Hist3Dcloud_Run(int* inputPtr, int rows, int cols, int bins,
     float minX, float minY, float minZ,
     float maxX, float maxY, float maxZ)
 {
@@ -1479,7 +1467,7 @@ uchar* Hist3Dcloud_Run(int* inputPtr, int rows, int cols, int bins,
     static Mat histogram;
     calcHist(&input, 1, channel, Mat(), histogram, 3, hbins, range, true, false); // for 3D histograms, all 3 bins must be equal.
 
-    return (uchar*)histogram.data;
+    return (unsigned char*)histogram.data;
 }
 
 
@@ -1492,7 +1480,7 @@ uchar* Hist3Dcloud_Run(int* inputPtr, int rows, int cols, int bins,
 static Mat mask;
 
 extern "C" __declspec(dllexport)
-uchar* BackProjectCloud_Run(int* inputPtr, int rows, int cols, int bins, float threshold,
+unsigned char* BackProjectCloud_Run(int* inputPtr, int rows, int cols, int bins, float threshold,
     float minX, float minY, float minZ,
     float maxX, float maxY, float maxZ)
 {
@@ -1517,7 +1505,7 @@ uchar* BackProjectCloud_Run(int* inputPtr, int rows, int cols, int bins, float t
     calcBackProject(&input, 1, channels, histogram, mask32f, range);
     mask32f.convertTo(mask, CV_8U);
 
-    return (uchar*)mask.data;
+    return (unsigned char*)mask.data;
 }
 
 
@@ -1789,14 +1777,14 @@ public:
         {
             Rect box = boxes[it->second];
             //Point center = Point(box.x + box.width / 2, box.y + box.height / 2);
-            //int val = dst.at<uchar>(center.y, center.x);
+            //int val = dst.at<unsigned char>(center.y, center.x);
             //if (val == 255)
             //{
             floodPoints.push_back(regions[it->second][0]);
             maskCounts.push_back((int)regions[it->second].size());
             for (Point pt : regions[it->second])
             {
-                dst.at<uchar>(pt.y, pt.x) = index;
+                dst.at<unsigned char>(pt.y, pt.x) = index;
             }
             index++;
             containers.push_back(box);
@@ -2205,14 +2193,14 @@ public:
                 temp *= temp;
                 if (removal)
                 {
-                    dst.at<Vec3b>(y, x)[0] = saturate_cast<uchar>((src.at<Vec3b>(y, x)[0]) / temp);
-                    dst.at<Vec3b>(y, x)[1] = saturate_cast<uchar>((src.at<Vec3b>(y, x)[1]) / temp);
-                    dst.at<Vec3b>(y, x)[2] = saturate_cast<uchar>((src.at<Vec3b>(y, x)[2]) / temp);
+                    dst.at<Vec3b>(y, x)[0] = saturate_cast<unsigned char>((src.at<Vec3b>(y, x)[0]) / temp);
+                    dst.at<Vec3b>(y, x)[1] = saturate_cast<unsigned char>((src.at<Vec3b>(y, x)[1]) / temp);
+                    dst.at<Vec3b>(y, x)[2] = saturate_cast<unsigned char>((src.at<Vec3b>(y, x)[2]) / temp);
                 }
                 else {
-                    dst.at<Vec3b>(y, x)[0] = saturate_cast<uchar>((src.at<Vec3b>(y, x)[0]) * temp);
-                    dst.at<Vec3b>(y, x)[1] = saturate_cast<uchar>((src.at<Vec3b>(y, x)[1]) * temp);
-                    dst.at<Vec3b>(y, x)[2] = saturate_cast<uchar>((src.at<Vec3b>(y, x)[2]) * temp);
+                    dst.at<Vec3b>(y, x)[0] = saturate_cast<unsigned char>((src.at<Vec3b>(y, x)[0]) * temp);
+                    dst.at<Vec3b>(y, x)[1] = saturate_cast<unsigned char>((src.at<Vec3b>(y, x)[1]) * temp);
+                    dst.at<Vec3b>(y, x)[2] = saturate_cast<unsigned char>((src.at<Vec3b>(y, x)[2]) * temp);
                 }
             }
         }
@@ -2979,9 +2967,9 @@ public:
         }
         for (size_t i = 0; i < pts.size(); i++) {
             Point2f pnt = scale * cv::Point2f(pts[i].x - origin.x, pts[i].y - origin.y);
-            img.at<cv::Vec3b>(int(pnt.y), int(pnt.x))[0] = (uchar)color[0];
-            img.at<cv::Vec3b>(int(pnt.y), int(pnt.x))[1] = (uchar)color[1];
-            img.at<cv::Vec3b>(int(pnt.y), int(pnt.x))[2] = (uchar)color[2];
+            img.at<cv::Vec3b>(int(pnt.y), int(pnt.x))[0] = (unsigned char)color[0];
+            img.at<cv::Vec3b>(int(pnt.y), int(pnt.x))[1] = (unsigned char)color[1];
+            img.at<cv::Vec3b>(int(pnt.y), int(pnt.x))[2] = (unsigned char)color[2];
         };
     }
 
@@ -3171,7 +3159,7 @@ private:
 public:
     Mat src, contour;
     vector<Point> nPoints;
-    vector<uchar> cellData;
+    vector<unsigned char> cellData;
     void RunCPP()
     {
         nPoints.clear();
@@ -3179,14 +3167,14 @@ public:
         for (int y = 1; y < src.rows - 3; y++)
             for (int x = 1; x < src.cols - 3; x++)
             {
-                vector<uchar> nabs;
-                vector<uchar> ids = { 0, 0, 0, 0 };
+                vector<unsigned char> nabs;
+                vector<unsigned char> ids = { 0, 0, 0, 0 };
                 int index = 0;
                 for (int yy = y; yy < y + 2; yy++)
                 {
                     for (int xx = x; xx < x + 2; xx++)
                     {
-                        uchar val = src.at<uchar>(yy, xx);
+                        unsigned char val = src.at<unsigned char>(yy, xx);
                         if (count(nabs.begin(), nabs.end(), val) == 0)
                         {
                             nabs.push_back(val);
@@ -3256,12 +3244,12 @@ public:
         for (int y = 1; y < src.rows - 2; y++)
             for (int x = 1; x < src.cols - 2; x++)
             {
-                Point pt = Point(src.at<uchar>(y, x), src.at<uchar>(y, x - 1));
+                Point pt = Point(src.at<unsigned char>(y, x), src.at<unsigned char>(y, x - 1));
                 if (pt.x == pt.y) continue;
                 if (pt.x == 0 || pt.y == 0) continue;
                 if (count(nPoints.begin(), nPoints.end(), pt) == 0)
                 {
-                    pt = Point(src.at<uchar>(y, x - 1), src.at<uchar>(y, x));
+                    pt = Point(src.at<unsigned char>(y, x - 1), src.at<unsigned char>(y, x));
                     if (count(nPoints.begin(), nPoints.end(), pt) == 0) nPoints.push_back(pt);
                 }
             }
@@ -3404,30 +3392,30 @@ public:
         for (int y = 0; y < src.rows; y++)
             for (int x = 1; x < src.cols - 1; x++)
             {
-                int last = src.at<uchar>(y, x - 1);
-                int curr = src.at<uchar>(y, x);
+                int last = src.at<unsigned char>(y, x - 1);
+                int curr = src.at<unsigned char>(y, x);
                 if (last != curr)
                 {
                     edgeCountBefore++;
-                    if (last == src.at<uchar>(y, x + 1))
-                        src.at<uchar>(y, x) = last;
+                    if (last == src.at<unsigned char>(y, x + 1))
+                        src.at<unsigned char>(y, x) = last;
                 }
             }
         for (int y = 1; y < src.rows - 1; y++)
             for (int x = 0; x < src.cols; x++)
             {
-                int last = src.at<uchar>(y - 1, x);
-                int curr = src.at<uchar>(y, x);
+                int last = src.at<unsigned char>(y - 1, x);
+                int curr = src.at<unsigned char>(y, x);
                 if (last != curr)
-                    if (last == src.at<uchar>(y + 1, x))
-                        src.at<uchar>(y, x) = last;
+                    if (last == src.at<unsigned char>(y + 1, x))
+                        src.at<unsigned char>(y, x) = last;
             }
         edgeCountAfter = 0;
         for (int y = 0; y < src.rows; y++)
             for (int x = 1; x < src.cols; x++)
             {
-                int last = src.at<uchar>(y, x - 1);
-                int curr = src.at<uchar>(y, x);
+                int last = src.at<unsigned char>(y, x - 1);
+                int curr = src.at<unsigned char>(y, x);
                 if (last != curr) edgeCountAfter++;
             }
     }
@@ -3481,7 +3469,7 @@ public:
         {
             for (int x = 0; x < src.cols - kSize; x++)
             {
-                if (src.at<uchar>(y + 1, x + 1) != 0)
+                if (src.at<unsigned char>(y + 1, x + 1) != 0)
                 {
                     r.x = x;
                     r.y = y;
@@ -3523,8 +3511,8 @@ public:
     void RunCPP() {
         if (dst.rows == 0) dst = Mat(src.rows, src.cols, CV_8U);
         dst.setTo(0);
-        uchar* in = src.data;
-        uchar* out = dst.data;
+        unsigned char* in = src.data;
+        unsigned char* out = dst.data;
         for (int y = 0; y < src.rows; y++)
         {
             int segID = 0;
@@ -3578,8 +3566,8 @@ public:
     void RunCPP() {
         if (dst.rows == 0) dst = Mat(src.rows, src.cols, CV_8U);
         dst.setTo(0);
-        uchar* in = src.data;
-        uchar* out = dst.data;
+        unsigned char* in = src.data;
+        unsigned char* out = dst.data;
         for (int x = 0; x < src.cols; x++)
         {
             int segID = 0;
@@ -4435,21 +4423,21 @@ public:
     Mat src, dst;
     RedPrep_CPP() {}
     void RunCPP() {
-        uchar pix1, pix2;
+        unsigned char pix1, pix2;
         dst = Mat(src.rows, src.cols, CV_8U);
         dst.setTo(0);
         for (int y = 1; y < src.rows - 2; ++y) {
             for (int x = 1; x < src.cols - 2; ++x) {
-                pix1 = src.at<uchar>(y, x);
-                pix2 = src.at<uchar>(y, x + 1);
+                pix1 = src.at<unsigned char>(y, x);
+                pix2 = src.at<unsigned char>(y, x + 1);
 
-                if (pix1 != 0 && pix2 != 0 && pix1 != pix2) dst.at<uchar>(y, x) = 255;
+                if (pix1 != 0 && pix2 != 0 && pix1 != pix2) dst.at<unsigned char>(y, x) = 255;
 
-                pix2 = src.at<uchar>(y + 1, x);
-                if (pix1 != 0 && pix2 != 0 && pix1 != pix2) dst.at<uchar>(y, x) = 255;
+                pix2 = src.at<unsigned char>(y + 1, x);
+                if (pix1 != 0 && pix2 != 0 && pix1 != pix2) dst.at<unsigned char>(y, x) = 255;
 
-                pix2 = src.at<uchar>(y + 1, x + 1);
-                if (pix1 != 0 && pix2 != 0 && pix1 != pix2) dst.at<uchar>(y, x) = 255;
+                pix2 = src.at<unsigned char>(y + 1, x + 1);
+                if (pix1 != 0 && pix2 != 0 && pix1 != pix2) dst.at<unsigned char>(y, x) = 255;
             }
         }
     }
@@ -4485,21 +4473,21 @@ public:
     Mat src, dst;
     RedCart_CPP() {}
     void RunCPP() {
-        uchar pix1, pix2;
+        unsigned char pix1, pix2;
         dst = Mat(src.rows, src.cols, CV_8U);
         dst.setTo(0);
         for (int y = 1; y < src.rows - 2; ++y) {
             for (int x = 1; x < src.cols - 2; ++x) {
-                pix1 = src.at<uchar>(y, x);
-                pix2 = src.at<uchar>(y, x + 1);
+                pix1 = src.at<unsigned char>(y, x);
+                pix2 = src.at<unsigned char>(y, x + 1);
 
-                if (pix1 != 0 && pix2 != 0 && pix1 != pix2) dst.at<uchar>(y, x) = 255;
+                if (pix1 != 0 && pix2 != 0 && pix1 != pix2) dst.at<unsigned char>(y, x) = 255;
 
-                pix2 = src.at<uchar>(y + 1, x);
-                if (pix1 != 0 && pix2 != 0 && pix1 != pix2) dst.at<uchar>(y, x) = 255;
+                pix2 = src.at<unsigned char>(y + 1, x);
+                if (pix1 != 0 && pix2 != 0 && pix1 != pix2) dst.at<unsigned char>(y, x) = 255;
 
-                pix2 = src.at<uchar>(y + 1, x + 1);
-                if (pix1 != 0 && pix2 != 0 && pix1 != pix2) dst.at<uchar>(y, x) = 255;
+                pix2 = src.at<unsigned char>(y + 1, x + 1);
+                if (pix1 != 0 && pix2 != 0 && pix1 != pix2) dst.at<unsigned char>(y, x) = 255;
             }
         }
     }
