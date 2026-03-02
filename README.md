@@ -1,3 +1,29 @@
+**March 1, 2026 – World Grid, Json, Defaults, UI_Generator, RedCloud Cells.**
+
+-   Over 1600 algorithms are included, averaging 36 lines of code per algorithm.
+    -   Over 400 additional obsolete algorithms compiled for reference use.
+-   The “world grid” identifier is used to match RedCloud cells to earlier frames.
+    -   If “world grid” fails, the previous maxDist approach is used.
+-   When the json settings are deleted, there were some poor choices for defaults.
+    -   Default is to capture at 1280x720 with working resolution of 320x180.
+    -   Paint frequency defaults to 30 frames per second (not zero!)
+-   The UI_Generator pre-build event now builds and runs UI_Generator.
+    -   Previously, the event used the .exe which may not been built yet.
+    -   This only affects the first build after cleaning the entire solution.
+-   For RedCloud algorithms, the exaggerated separation was removed.
+    -   Floodfill was targeting zeros with edges at 255.
+    -   Floodfill now targets nonzero values right to boundary.
+    -   There are no longer any gaps between cells.
+-   The lower limit on the size of RedCloud cells is removed.
+    -   Tiny cells are not consistently identified – depth data is too volatile.
+    -   The example below demonstrates reducing the cell size.
+    -   Large capture resolutions did not create world grid coordinates.
+    -   Now large capture resolutions work properly (if slowly.)
+
+**![](media/3f1ec0fae20f772bbae9711ecda5e327.gif)RedCloud_Basics:** *The cell size is reduced significantly in this demo of how RedCloud cells are detected. At the largest cell size, holes are inserted to restrain the floodfill that would normally leak. At extremely small cell sizes, the corner holes predominate and cells may not appear. At the largest cell size, it is easy to confirm that cells retain their color. At the lower cell sizes, the small cell size limits the ability of the algorithm to identify the cell in the previous generation. The identified cell in the upper left image is the default cell at the center of the image. Clicking on any cell will track that cell in the color image. The details of the cell are listed in the lower right image.*
+
+**![](media/7ffc0c976b0edd81b2b8becbc4d9cc80.gif)RedWG_ValidateRows** *The “world grid” coordinates are consistent at the smaller cell sizes. Each cell in a world grid row is highlighted in white in the lower left image. The cells will shift slightly because of the volatility of the depth but consistent cell color indicates that the cell was identified in the current and previous frame. Using a wall as a target produces results that are almost too good but the algorithm will work regardless of context. The shelving at the right side of the image shows how gaps will appear on uneven surfaces.*
+
 **February 26, 2026 – Task Variable, Brick_Basics, RedCloud Maps, Paint Frequency, “World Grid”, and PixelViewer.**
 
 -   Over 1600 algorithms are included, averaging 36 lines of code per algorithm.
