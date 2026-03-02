@@ -158,9 +158,15 @@ Namespace VBClasses
                     If gifExe.Exists = False Then
                         MessageBox.Show("GifBuilder.exe was not found!")
                     Else
-                        Dim gifProcess As New Process
-                        gifProcess.StartInfo.FileName = gifExe.FullName
-                        gifProcess.Start()
+                        Try
+                            Dim gifProcess As New Process
+                            gifProcess.StartInfo.FileName = gifExe.FullName
+                            gifProcess.StartInfo.UseShellExecute = False
+                            gifProcess.StartInfo.CreateNoWindow = False
+                            gifProcess.Start()
+                        Catch ex As System.ComponentModel.Win32Exception When ex.Message?.Contains("The operation completed successfully") OrElse ex.NativeErrorCode = 0
+                            ' Process started; Windows sometimes reports success as this exception.
+                        End Try
                     End If
                 End If
             End If

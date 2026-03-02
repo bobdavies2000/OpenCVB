@@ -19,58 +19,6 @@ Namespace VBClasses
         Public Sub New()
             desc = "Assign abstract world coordinates to each RedCloud cell."
         End Sub
-        Public Shared Function rcMatch(rc As rcData, rcListLast As List(Of rcData),
-                                       wGridLastList As List(Of cv.Point),
-                                       rcMapLast As cv.Mat) As rcData
-            Dim r1 = rc.rect
-            Dim indexLast = wGridLastList.IndexOf(rc.wGrid)
-            If indexLast >= 0 And indexLast < rcListLast.Count Then
-                ' rcList index is 1 less than the rcMap value because a 0 rcMap value means not mapped.
-                ' All pixels are mapped with color but withh depth, rcMap has 0's where there is no depth.
-                Dim r2 = rcListLast(indexLast).rect
-                If r1.IntersectsWith(r2) = False Then rc.colorChange = causes.intersectLastRectFailed
-            Else
-                rc.colorChange = causes.wGridNotInLastList
-            End If
-
-            If task.optionsChanged Then rc.colorChange = causes.optionsChange
-
-            If rc.colorChange <> causes.lastCellFound Then
-                ' try use the maxDist point to find the last rect.
-                indexLast = rcMapLast.Get(Of Integer)(rc.maxDist.Y, rc.maxDist.X)
-                If indexLast >= 0 And indexLast < rcListLast.Count Then
-                    Dim r2 = rcListLast(indexLast).rect
-                    If r1.IntersectsWith(r2) = False Then
-                        rc.colorChange = causes.intersectLastRectFailed
-                    Else
-                        rc.colorChange = causes.lastCellFound
-                    End If
-                End If
-            End If
-
-            If rc.colorChange = causes.lastCellFound Then
-                Dim lrc = rcListLast(indexLast)
-                Dim rTest = rc.rect.Intersect(lrc.rect)
-                Dim rTotal = rTest.Width * rTest.Height
-                Dim lastTotal = lrc.rect.Width * lrc.rect.Height
-                If rc.rect.Contains(lrc.maxDist) Then
-                    rc.maxDist = lrc.maxDist
-                    rc.depthDelta = Math.Abs(lrc.wcMean(2) - rc.wcMean(2))
-                    If Single.IsInfinity(rc.depthDelta) Or rc.depthDelta < 0 Then
-                        rc.depthDelta = 0
-                        rc.wcMean(2) = 0
-                    End If
-                Else
-                    rc.colorChange = causes.maxDistOutsideOfLastRect
-                End If
-
-                rc.age = lrc.age + 1
-                If rc.age > 1000 Then rc.age = 2
-
-                rc.color = lrc.color
-            End If
-            Return rc
-        End Function
         Public Overrides Sub RunAlg(src As cv.Mat)
             redC.Run(src)
 

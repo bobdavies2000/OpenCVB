@@ -53,12 +53,12 @@ Namespace VBClasses
 
     Public Class Neighbor_Intersects : Inherits TaskParent
         Public nPoints As New List(Of cv.Point)
-        Dim redC As New RedColor_Basics
         Public Sub New()
             desc = "Find the corner points where multiple cells intersect."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             If standaloneTest() Or src.Type <> cv.MatType.CV_8U Then
+                Static redC As New RedColor_Basics
                 redC.Run(src)
                 dst2 = redC.dst2
                 labels(2) = redC.labels(2)
@@ -73,7 +73,7 @@ Namespace VBClasses
             Dim kSize As Integer = 2
             For y = 0 To dst1.Height - kSize
                 For x = 0 To dst1.Width - kSize
-                    Dim nabs As New SortedList(Of Byte, Byte)
+                    Dim nabs As New SortedList(Of Integer, Integer)
                     For yy = y To y + kSize - 1
                         For xx = x To x + kSize - 1
                             Dim val = samples(yy * w + xx)

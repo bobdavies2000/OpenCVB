@@ -12,6 +12,7 @@ Namespace VBClasses
                 rc = task.rcD
             End If
 
+            If rc Is Nothing Then Exit Sub
             volZ.rc = rc
             volZ.Run(src)
             dst3 = volZ.dst3

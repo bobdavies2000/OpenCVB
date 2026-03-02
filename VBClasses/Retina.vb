@@ -6,7 +6,6 @@ Imports System.Windows.Forms
 Namespace VBClasses
     Public Class Retina_Basics_CPP : Inherits TaskParent
         Implements IDisposable
-        Dim startInfo As New ProcessStartInfo
         Dim magnoData(0) As Byte
         Dim dataSrc(0) As Byte
         Dim samplingFactor As Single = -1 ' force open

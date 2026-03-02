@@ -156,10 +156,15 @@ Namespace VBClasses
             strOut = RedCloud_Cell.selectCell(redCC.redC1.rcMap, redCC.redC1.rcList)
             labels(3) = "Select a RedCloud cell to see the histogram"
 
-            If task.rcD IsNot Nothing Then SetTrueText(task.rcD.displayCell, 1)
+            If task.rcD Is Nothing Then
+                SetTrueText("Click on any cell to see the plot of the depth.", 1)
+                Exit Sub
+            End If
 
+            SetTrueText(task.rcD.displayCell, 1)
             Dim depth As cv.Mat = task.pcSplit(2)(task.rcD.rect)
             depth.SetTo(0, task.noDepthMask(task.rcD.rect))
+
             plot.minRange = 0
             plot.maxRange = task.MaxZmeters
             plot.Run(depth)

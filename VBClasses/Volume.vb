@@ -11,6 +11,8 @@ Namespace VBClasses
                 dst2 = runRedList(src, labels(2))
                 rc = task.rcD
             End If
+
+            If rc Is Nothing Then Exit Sub
             If rc.contour Is Nothing Then Exit Sub
 
             Dim xList As New List(Of Single)
