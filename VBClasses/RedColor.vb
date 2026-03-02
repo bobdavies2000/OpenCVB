@@ -32,7 +32,7 @@ Namespace VBClasses
         Public rcList As New List(Of rcData)
         Public rcMap As cv.Mat = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         Public Sub New()
-            cPtr = RedCloud_Open()
+            cPtr = RedCloudLined_Open()
             desc = "Run the C++ RedCloud interface without a mask"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -43,15 +43,15 @@ Namespace VBClasses
             dst1.GetArray(Of Byte)(inputData)
             Dim handleInput = GCHandle.Alloc(inputData, GCHandleType.Pinned)
 
-            imagePtr = RedCloud_Run(cPtr, handleInput.AddrOfPinnedObject(), dst1.Rows, dst1.Cols)
+            imagePtr = RedCloudLined_Run(cPtr, handleInput.AddrOfPinnedObject(), dst1.Rows, dst1.Cols)
             handleInput.Free()
             dst0 = cv.Mat.FromPixelData(dst1.Rows, dst1.Cols, cv.MatType.CV_8U, imagePtr).Clone
 
-            classCount = RedCloud_Count(cPtr)
+            classCount = RedCloudLined_Count(cPtr)
 
             If classCount = 0 Then Exit Sub ' no data to process.
 
-            Dim rectData = cv.Mat.FromPixelData(classCount, 1, cv.MatType.CV_32SC4, RedCloud_Rects(cPtr))
+            Dim rectData = cv.Mat.FromPixelData(classCount, 1, cv.MatType.CV_32SC4, RedCloudLined_Rects(cPtr))
             Dim rects(classCount - 1) As cv.Rect
             rectData.GetArray(Of cv.Rect)(rects)
 
@@ -118,7 +118,7 @@ Namespace VBClasses
                     " minpixels.  " + CStr(count) + " matched to previous generation"
         End Sub
         Protected Overrides Sub Finalize()
-            If cPtr <> 0 Then cPtr = RedCloud_Close(cPtr)
+            If cPtr <> 0 Then cPtr = RedCloudLined_Close(cPtr)
         End Sub
     End Class
 

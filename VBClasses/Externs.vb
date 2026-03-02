@@ -1068,20 +1068,20 @@ Namespace VBClasses
 
 
         <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)>
-        Public Function RedCloud_Open() As IntPtr
+        Public Function RedCloudLined_Open() As IntPtr
         End Function
         <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)>
-        Public Function RedCloud_Close(cPtr As IntPtr) As IntPtr
+        Public Function RedCloudLined_Close(cPtr As IntPtr) As IntPtr
         End Function
         <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)>
-        Public Function RedCloud_Rects(cPtr As IntPtr) As IntPtr
+        Public Function RedCloudLined_Rects(cPtr As IntPtr) As IntPtr
         End Function
 
         <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)>
-        Public Function RedCloud_Count(cPtr As IntPtr) As Integer
+        Public Function RedCloudLined_Count(cPtr As IntPtr) As Integer
         End Function
         <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)>
-        Public Function RedCloud_Run(cPtr As IntPtr, dataPtr As IntPtr, rows As Integer,
+        Public Function RedCloudLined_Run(cPtr As IntPtr, dataPtr As IntPtr, rows As Integer,
                                      cols As Integer) As IntPtr
         End Function
 
@@ -1090,20 +1090,20 @@ Namespace VBClasses
 
 
         <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)>
-        Public Function RedCloudNew_Open() As IntPtr
+        Public Function RedCloudFill_Open() As IntPtr
         End Function
         <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)>
-        Public Function RedCloudNew_Close(cPtr As IntPtr) As IntPtr
+        Public Function RedCloudFill_Close(cPtr As IntPtr) As IntPtr
         End Function
         <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)>
-        Public Function RedCloudNew_Rects(cPtr As IntPtr) As IntPtr
+        Public Function RedCloudFill_Rects(cPtr As IntPtr) As IntPtr
         End Function
 
         <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)>
-        Public Function RedCloudNew_Count(cPtr As IntPtr) As Integer
+        Public Function RedCloudFill_Count(cPtr As IntPtr) As Integer
         End Function
         <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)>
-        Public Function RedCloudNew_Run(cPtr As IntPtr, dataPtr As IntPtr, rows As Integer,
+        Public Function RedCloudFill_Run(cPtr As IntPtr, dataPtr As IntPtr, rows As Integer,
                                      cols As Integer) As IntPtr
         End Function
 

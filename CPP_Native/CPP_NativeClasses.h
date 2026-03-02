@@ -37,14 +37,14 @@ using namespace ximgproc;
 using namespace ml;
 
 #include "CPP_Parent.h"
-class RedCloudNew
+class RedCloudFill
 {
 private:
 public:
     Mat src, mask;
     vector<Rect>cellRects;
 
-    RedCloudNew() {}
+    RedCloudFill() {}
     bool checkVals(std::vector<unsigned char> vals, unsigned char val)
     {
         if (val == 0) return true;
@@ -134,13 +134,13 @@ public:
     }
 };
 
-extern "C" __declspec(dllexport) RedCloudNew* RedCloudNew_Open() { return new RedCloudNew(); }
-extern "C" __declspec(dllexport) int RedCloudNew_Count(RedCloudNew* cPtr) { return (int)cPtr->cellRects.size(); }
-extern "C" __declspec(dllexport) int* RedCloudNew_Rects(RedCloudNew* cPtr) { return (int*)&cPtr->cellRects[0]; }
-extern "C" __declspec(dllexport) int* RedCloudNew_Close(RedCloudNew* cPtr) { delete cPtr; return (int*)0; }
+extern "C" __declspec(dllexport) RedCloudFill* RedCloudFill_Open() { return new RedCloudFill(); }
+extern "C" __declspec(dllexport) int RedCloudFill_Count(RedCloudFill* cPtr) { return (int)cPtr->cellRects.size(); }
+extern "C" __declspec(dllexport) int* RedCloudFill_Rects(RedCloudFill* cPtr) { return (int*)&cPtr->cellRects[0]; }
+extern "C" __declspec(dllexport) int* RedCloudFill_Close(RedCloudFill* cPtr) { delete cPtr; return (int*)0; }
 
 extern "C" __declspec(dllexport) int*
-RedCloudNew_Run(RedCloudNew* cPtr, int* dataPtr, int rows, int cols)
+RedCloudFill_Run(RedCloudFill* cPtr, int* dataPtr, int rows, int cols)
 {
     cPtr->src = Mat(rows, cols, CV_8U, dataPtr);
     cPtr->RunCPP();
@@ -153,14 +153,14 @@ RedCloudNew_Run(RedCloudNew* cPtr, int* dataPtr, int rows, int cols)
 
 
 
-class RedCloud
+class RedCloudLined
 {
 private:
 public:
     Mat src, mask;
     vector<Rect>cellRects;
 
-    RedCloud() {}
+    RedCloudLined() {}
     void RunCPP() {
         mask = Mat(cv::Size(src.cols + 2, src.rows + 2), CV_8U);
         mask.setTo(0);
@@ -199,84 +199,18 @@ public:
     }
 };
 
-extern "C" __declspec(dllexport) RedCloud* RedCloud_Open() { return new RedCloud(); }
-extern "C" __declspec(dllexport) int RedCloud_Count(RedCloud* cPtr) { return (int)cPtr->cellRects.size(); }
-extern "C" __declspec(dllexport) int* RedCloud_Rects(RedCloud* cPtr) { return (int*)&cPtr->cellRects[0]; }
-extern "C" __declspec(dllexport) int* RedCloud_Close(RedCloud* cPtr) { delete cPtr; return (int*)0; }
+extern "C" __declspec(dllexport) RedCloudLined* RedCloudLined_Open() { return new RedCloudLined(); }
+extern "C" __declspec(dllexport) int RedCloudLined_Count(RedCloudLined* cPtr) { return (int)cPtr->cellRects.size(); }
+extern "C" __declspec(dllexport) int* RedCloudLined_Rects(RedCloudLined* cPtr) { return (int*)&cPtr->cellRects[0]; }
+extern "C" __declspec(dllexport) int* RedCloudLined_Close(RedCloudLined* cPtr) { delete cPtr; return (int*)0; }
 
 extern "C" __declspec(dllexport) int*
-RedCloud_Run(RedCloud* cPtr, int* dataPtr, int rows, int cols)
+RedCloudLined_Run(RedCloudLined* cPtr, int* dataPtr, int rows, int cols)
 {
     cPtr->src = Mat(rows, cols, CV_8U, dataPtr);
     cPtr->RunCPP();
     return (int*)cPtr->mask.data;
 }
-
-
-
-
-
-//class RedCloud
-//{
-//private:
-//public:
-//    Mat src, mask;
-//    vector<Rect>cellRects;
-//
-//    RedCloud() {}
-//    void RunCPP() {
-//        mask = Mat(Size(src.cols + 2, src.rows + 2), CV_8U);
-//        mask.setTo(0);
-//        Rect rect;
-//
-//        multimap<int, Point, greater<int>> sizeSorted;
-//        int floodFlag = 4 | FLOODFILL_MASK_ONLY | FLOODFILL_FIXED_RANGE;
-//        Point pt;
-//        for (int y = 0; y < src.rows; y++)
-//        {
-//            for (int x = 0; x < src.cols; x++)
-//            {
-//                if (mask.at<unsigned char>(y + 1, x + 1) == 0 && src.at<unsigned char>(y, x) != 0)
-//                {
-//                    pt = Point(x, y);
-//                    int count = floodFill(src, mask, pt, 255, &rect, 0, 0, 4 | floodFlag | (255 << 8));
-//                    if (count > 1) sizeSorted.insert(make_pair(count, pt));
-//                }
-//            }
-//        }
-//
-//        cellRects.clear();
-//        mask.setTo(0);
-//        int fill = 1;
-//        for (auto it = sizeSorted.begin(); it != sizeSorted.end(); it++)
-//        {
-//            if (floodFill(src, mask, it->second, fill, &rect, 0, 0, 4 | floodFlag | (fill << 8)) > 1)
-//            {
-//                if (rect.width < src.cols or rect.height < src.rows)
-//                {
-//                    cellRects.push_back(rect);
-//
-//                    if (fill >= 255)
-//                        fill = 0; // start over 
-//                    fill++;
-//                }
-//            }
-//        }
-//    }
-//};
-//
-//extern "C" __declspec(dllexport) RedCloud* RedCloud_Open() { return new RedCloud(); }
-//extern "C" __declspec(dllexport) int RedCloud_Count(RedCloud* cPtr) { return (int)cPtr->cellRects.size(); }
-//extern "C" __declspec(dllexport) int* RedCloud_Rects(RedCloud* cPtr) { return (int*)&cPtr->cellRects[0]; }
-//extern "C" __declspec(dllexport) int* RedCloud_Close(RedCloud* cPtr) { delete cPtr; return (int*)0; }
-//
-//extern "C" __declspec(dllexport) int*
-//RedCloud_Run(RedCloud* cPtr, int* dataPtr, int rows, int cols)
-//{
-//    cPtr->src = Mat(rows, cols, CV_8U, dataPtr);
-//    cPtr->RunCPP();
-//    return (int*)cPtr->mask.data;
-//}
 
 
 

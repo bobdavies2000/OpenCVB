@@ -10631,7 +10631,7 @@ Namespace VBClasses
         Public rectList As New List(Of cv.Rect)
         Public identifyCount As Integer = 255
         Public Sub New()
-            cPtr = RedCloud_Open()
+            cPtr = RedCloudLined_Open()
             desc = "Run the C++ RedCloud Interface With Or without a mask"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -10641,14 +10641,14 @@ Namespace VBClasses
             dst1.GetArray(Of Byte)(inputData)
             Dim handleInput = GCHandle.Alloc(inputData, GCHandleType.Pinned)
 
-            Dim imagePtr = RedCloud_Run(cPtr, handleInput.AddrOfPinnedObject(), dst1.Rows, dst1.Cols)
+            Dim imagePtr = RedCloudLined_Run(cPtr, handleInput.AddrOfPinnedObject(), dst1.Rows, dst1.Cols)
             handleInput.Free()
             dst2 = cv.Mat.FromPixelData(dst1.Rows, dst1.Cols, cv.MatType.CV_8U, imagePtr).Clone
 
-            classCount = Math.Min(RedCloud_Count(cPtr), identifyCount * 2)
+            classCount = Math.Min(RedCloudLined_Count(cPtr), identifyCount * 2)
             If classCount = 0 Then Exit Sub ' no data to process.
 
-            Dim rectData = cv.Mat.FromPixelData(classCount, 1, cv.MatType.CV_32SC4, RedCloud_Rects(cPtr))
+            Dim rectData = cv.Mat.FromPixelData(classCount, 1, cv.MatType.CV_32SC4, RedCloudLined_Rects(cPtr))
             Dim rects(classCount - 1) As cv.Rect
             rectData.GetArray(Of cv.Rect)(rects)
 
@@ -10659,7 +10659,7 @@ Namespace VBClasses
             labels(3) = "Palette version Of the data In dst2 With " + CStr(classCount) + " regions."
         End Sub
         Protected Overrides Sub Finalize()
-            If cPtr <> 0 Then cPtr = RedCloud_Close(cPtr)
+            If cPtr <> 0 Then cPtr = RedCloudLined_Close(cPtr)
         End Sub
     End Class
 
@@ -11617,7 +11617,7 @@ Namespace VBClasses
         Public classCount As Integer
         Public RectList As New List(Of cv.Rect)
         Public Sub New()
-            cPtr = RedCloud_Open()
+            cPtr = RedCloudLined_Open()
             desc = "Run the C++ RedCloud interface without a mask"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -11628,17 +11628,17 @@ Namespace VBClasses
             dst1.GetArray(Of Byte)(inputData)
             Dim handleInput = GCHandle.Alloc(inputData, GCHandleType.Pinned)
 
-            imagePtr = RedCloud_Run(cPtr, handleInput.AddrOfPinnedObject(), dst1.Rows, dst1.Cols)
+            imagePtr = RedCloudLined_Run(cPtr, handleInput.AddrOfPinnedObject(), dst1.Rows, dst1.Cols)
             handleInput.Free()
             dst2 = cv.Mat.FromPixelData(dst1.Rows, dst1.Cols, cv.MatType.CV_8U, imagePtr).Clone
             dst3 = PaletteFull(dst2)
 
-            classCount = RedCloud_Count(cPtr)
+            classCount = RedCloudLined_Count(cPtr)
             labels(2) = "CV_8U version with " + CStr(classCount) + " cells."
 
             If classCount = 0 Then Exit Sub ' no data to process.
 
-            Dim rectData = cv.Mat.FromPixelData(classCount, 1, cv.MatType.CV_32SC4, RedCloud_Rects(cPtr))
+            Dim rectData = cv.Mat.FromPixelData(classCount, 1, cv.MatType.CV_32SC4, RedCloudLined_Rects(cPtr))
             Dim rects(classCount - 1) As cv.Rect
             rectData.GetArray(Of cv.Rect)(rects)
 
@@ -11653,7 +11653,7 @@ Namespace VBClasses
             labels(3) = CStr(RectList.Count) + " cells were found."
         End Sub
         Protected Overrides Sub Finalize()
-            If cPtr <> 0 Then cPtr = RedCloud_Close(cPtr)
+            If cPtr <> 0 Then cPtr = RedCloudLined_Close(cPtr)
         End Sub
     End Class
 
@@ -12322,7 +12322,7 @@ Namespace VBClasses
 
 
     Public Class XO_RedCloud_MotionSimple : Inherits TaskParent
-        Dim redContours As New RedCloud_PrepEdges
+        Dim redContours As New RedCloud_Contours
         Public Sub New()
             task.gOptions.HistBinBar.Maximum = 255
             task.gOptions.HistBinBar.Value = 255
@@ -12366,7 +12366,7 @@ Namespace VBClasses
         Public rectList As New List(Of cv.Rect)
         Public identifyCount As Integer = 255
         Public Sub New()
-            cPtr = RedCloud_Open()
+            cPtr = RedCloudLined_Open()
             desc = "Run the C++ RedCloud to create a list of mask, rect, and other info about image"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -12374,14 +12374,14 @@ Namespace VBClasses
             src.GetArray(Of Byte)(inputData)
             Dim handleInput = GCHandle.Alloc(inputData, GCHandleType.Pinned)
 
-            Dim imagePtr = RedCloud_Run(cPtr, handleInput.AddrOfPinnedObject(), dst1.Rows, dst1.Cols)
+            Dim imagePtr = RedCloudLined_Run(cPtr, handleInput.AddrOfPinnedObject(), dst1.Rows, dst1.Cols)
             handleInput.Free()
             dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, cv.MatType.CV_8U, imagePtr).Clone
 
-            classCount = Math.Min(RedCloud_Count(cPtr), identifyCount * 2)
+            classCount = Math.Min(RedCloudLined_Count(cPtr), identifyCount * 2)
             If classCount = 0 Then Exit Sub ' no data to process.
 
-            Dim rectData = cv.Mat.FromPixelData(classCount, 1, cv.MatType.CV_32SC4, RedCloud_Rects(cPtr))
+            Dim rectData = cv.Mat.FromPixelData(classCount, 1, cv.MatType.CV_32SC4, RedCloudLined_Rects(cPtr))
             Dim rects(classCount - 1) As cv.Rect
             rectData.GetArray(Of cv.Rect)(rects)
 
@@ -12392,7 +12392,7 @@ Namespace VBClasses
             labels(3) = "Palette version Of the data In dst2 With " + CStr(classCount) + " regions."
         End Sub
         Protected Overrides Sub Finalize()
-            If cPtr <> 0 Then cPtr = RedCloud_Close(cPtr)
+            If cPtr <> 0 Then cPtr = RedCloudLined_Close(cPtr)
         End Sub
     End Class
 
@@ -12528,7 +12528,7 @@ Namespace VBClasses
 
 
     Public Class XO_RedCloud_HeartBeat : Inherits TaskParent
-        Dim redCore As New RedCloud_PrepEdges
+        Dim redCore As New RedCloud_Contours
         Public rcList As New List(Of rcData)
         Public percentImage As Single
         Public rcMap = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
@@ -12907,7 +12907,7 @@ Namespace VBClasses
             classCount = EdgeLineRaw_GetSegCount(cPtr)
             If classCount = 0 Then Exit Sub ' nothing to work with....
 
-            Dim rectData = cv.Mat.FromPixelData(classCount, 1, cv.MatType.CV_32SC4, RedCloud_Rects(cPtr))
+            Dim rectData = cv.Mat.FromPixelData(classCount, 1, cv.MatType.CV_32SC4, EdgeLineRaw_Rects(cPtr))
             Dim rects(classCount - 1) As cv.Rect
             rectData.GetArray(Of cv.Rect)(rects)
 
@@ -12969,7 +12969,7 @@ Namespace VBClasses
             classCount = EdgeLineRaw_GetSegCount(cPtr)
             If classCount = 0 Then Exit Sub ' nothing to work with....
 
-            Dim rectData = cv.Mat.FromPixelData(classCount, 1, cv.MatType.CV_32SC4, RedCloud_Rects(cPtr))
+            Dim rectData = cv.Mat.FromPixelData(classCount, 1, cv.MatType.CV_32SC4, EdgeLineRaw_Rects(cPtr))
             Dim rects(classCount - 1) As cv.Rect
             rectData.GetArray(Of cv.Rect)(rects)
 
@@ -13837,7 +13837,7 @@ Namespace VBClasses
         Public classCount As Integer
         Public RectList As New List(Of cv.Rect)
         Public Sub New()
-            cPtr = RedCloud_Open()
+            cPtr = RedCloudLined_Open()
             desc = "Run the C++ RedCloud interface without a mask"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -13848,17 +13848,17 @@ Namespace VBClasses
             dst1.GetArray(Of Byte)(inputData)
             Dim handleInput = GCHandle.Alloc(inputData, GCHandleType.Pinned)
 
-            imagePtr = RedCloud_Run(cPtr, handleInput.AddrOfPinnedObject(), dst1.Rows, dst1.Cols)
+            imagePtr = RedCloudLined_Run(cPtr, handleInput.AddrOfPinnedObject(), dst1.Rows, dst1.Cols)
             handleInput.Free()
             dst3 = cv.Mat.FromPixelData(dst1.Rows, dst1.Cols, cv.MatType.CV_8U, imagePtr).Clone
             dst2 = PaletteFull(dst3)
 
-            classCount = RedCloud_Count(cPtr)
+            classCount = RedCloudLined_Count(cPtr)
             labels(3) = "CV_8U version with " + CStr(classCount) + " cells."
 
             If classCount = 0 Then Exit Sub ' no data to process.
 
-            Dim rectData = cv.Mat.FromPixelData(classCount, 1, cv.MatType.CV_32SC4, RedCloud_Rects(cPtr))
+            Dim rectData = cv.Mat.FromPixelData(classCount, 1, cv.MatType.CV_32SC4, RedCloudLined_Rects(cPtr))
             Dim rects(classCount - 1) As cv.Rect
             rectData.GetArray(Of cv.Rect)(rects)
 
@@ -13870,7 +13870,7 @@ Namespace VBClasses
             labels(2) = CStr(RectList.Count) + " cells were found."
         End Sub
         Protected Overrides Sub Finalize()
-            If cPtr <> 0 Then cPtr = RedCloud_Close(cPtr)
+            If cPtr <> 0 Then cPtr = RedCloudLined_Close(cPtr)
         End Sub
     End Class
 
@@ -15644,7 +15644,7 @@ Namespace VBClasses
 
     Public Class XO_KNN_Hulls : Inherits TaskParent
         Dim knn As New KNN_Basics
-        Dim redC As New RedCloud_PrepEdges
+        Dim redC As New RedCloud_Contours
         Public matchList As New List(Of cv.Point2f)
         Public Sub New()
             knn.desiredMatches = 2

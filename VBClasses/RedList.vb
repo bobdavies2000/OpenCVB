@@ -225,7 +225,7 @@ Namespace VBClasses
             classCount = Math.Min(RedMask_Count(cPtr), identifyCount * 2)
             If classCount = 0 Then Exit Sub ' no data to process.
 
-            Dim rectData = cv.Mat.FromPixelData(classCount, 1, cv.MatType.CV_32SC4, RedCloud_Rects(cPtr))
+            Dim rectData = cv.Mat.FromPixelData(classCount, 1, cv.MatType.CV_32SC4, RedMask_Rects(cPtr))
             Dim rects(classCount - 1) As cv.Rect
             rectData.GetArray(Of cv.Rect)(rects)
 

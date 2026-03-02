@@ -1513,6 +1513,7 @@ RedCloud_BasicsLined
 RedCloud_Cell
 RedCloud_CellMask
 RedCloud_ColorChangeCause
+RedCloud_Contours
 RedCloud_Core
 RedCloud_Flood
 RedCloud_FloodLine
@@ -1520,7 +1521,6 @@ RedCloud_KNN
 RedCloud_LeftRight
 RedCloud_Matched
 RedCloud_Matches
-RedCloud_PrepEdges
 RedCloud_Reliable
 RedCloud_RGB
 RedColor_Basics

@@ -19,50 +19,6 @@ Namespace VBClasses
         Public Sub New()
             desc = "Assign abstract world coordinates to each RedCloud cell."
         End Sub
-        Public Shared Function rcDataMatch(rc As rcData, rcListLast As List(Of rcData),
-                                           rcMapLast As cv.Mat) As rcData
-            Dim r1 = rc.rect
-            Dim indexLast = rcMapLast.Get(Of Integer)(rc.maxDist.Y, rc.maxDist.X)
-
-            If indexLast = 0 Then
-                rc.colorChange = causes.indexLastBelowZero
-            Else
-                If indexLast < rcListLast.Count Then
-                    ' rcList index is 1 less than the rcMap value because a 0 rcMap value means not mapped.
-                    ' All pixels are mapped with color but withh depth, rcMap has 0's where there is no depth.
-                    indexLast -= 1
-                    Dim r2 = rcListLast(indexLast).rect
-                    If r1.IntersectsWith(r2) = False Then rc.colorChange = causes.intersectLastRectFailed
-                Else
-                    rc.colorChange = causes.indexLastAboveCount
-                End If
-            End If
-
-            If task.optionsChanged Then rc.colorChange = causes.optionsChange
-
-            If rc.colorChange = causes.lastCellFound Then
-                Dim lrc = rcListLast(indexLast)
-                Dim rTest = rc.rect.Intersect(lrc.rect)
-                Dim rTotal = rTest.Width * rTest.Height
-                Dim lastTotal = lrc.rect.Width * lrc.rect.Height
-                If rc.rect.Contains(lrc.maxDist) Then
-                    rc.maxDist = lrc.maxDist
-                    rc.depthDelta = Math.Abs(lrc.wcMean(2) - rc.wcMean(2))
-                    If Single.IsInfinity(rc.depthDelta) Or rc.depthDelta < 0 Then
-                        rc.depthDelta = 0
-                        rc.wcMean(2) = 0
-                    End If
-                Else
-                    rc.colorChange = causes.maxDistOutsideOfLastRect
-                End If
-
-                rc.age = lrc.age + 1
-                If rc.age > 1000 Then rc.age = 2
-
-                rc.color = lrc.color
-            End If
-            Return rc
-        End Function
         Public Shared Function rcMatch(rc As rcData, rcListLast As List(Of rcData),
                                        wGridLastList As List(Of cv.Point),
                                        rcMapLast As cv.Mat) As rcData
@@ -153,6 +109,48 @@ Namespace VBClasses
         Public Sub New()
             desc = "Assign abstract world coordinates to each RedCloud cell."
         End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            indexer.Run(src)
+            redC.Run(indexer.dst2)
+
+            dst2 = redC.dst2
+            labels(2) = redC.labels(2)
+
+            strOut = RedCloud_Cell.selectCell(redC.rcMap, redC.rcList)
+            If task.rcD IsNot Nothing Then dst2.Rectangle(task.rcD.rect, task.highlight, task.lineWidth)
+            If strOut <> "" Then SetTrueText(strOut, 3) Else SetTrueText("Click on any cell", 3)
+
+            Dim causeLabel = RedCloud_ColorChangeCause.findCause(redC.rcMap, redC.rcList)
+            If task.mouseClickFlag Then
+                causeLabel = ""
+                labels(3) = ""
+            End If
+
+            If causeLabel <> "" Then
+                If labels(3) = "" Then labels(3) = causeLabel Else labels(3) += ", " + causeLabel
+                If labels(3).Length > 80 Then labels(3) = causeLabel
+            End If
+
+            rcList = New List(Of rcData)(redC.rcList)
+            rcMap = redC.rcMap.Clone
+        End Sub
+    End Class
+
+
+
+
+
+
+    Public Class RedCloud_Contours : Inherits TaskParent
+        Public redCore As New RedCloud_Core
+        Public rcList As New List(Of rcData)
+        Public rcMap As cv.Mat = New cv.Mat(dst2.Size, cv.MatType.CV_32S, 0)
+        Public percentImage As Single
+        Public options As New Options_RedCloud
+        Public Sub New()
+            task.redCloud = Me
+            desc = "Build contours for each cell"
+        End Sub
         Public Shared Function rcDataMatch(rc As rcData, rcListLast As List(Of rcData),
                                            rcMapLast As cv.Mat) As rcData
             Dim r1 = rc.rect
@@ -198,48 +196,6 @@ Namespace VBClasses
             Return rc
         End Function
         Public Overrides Sub RunAlg(src As cv.Mat)
-            indexer.Run(src)
-            redC.Run(indexer.dst2)
-
-            dst2 = redC.dst2
-            labels(2) = redC.labels(2)
-
-            strOut = RedCloud_Cell.selectCell(redC.rcMap, redC.rcList)
-            If task.rcD IsNot Nothing Then dst2.Rectangle(task.rcD.rect, task.highlight, task.lineWidth)
-            If strOut <> "" Then SetTrueText(strOut, 3) Else SetTrueText("Click on any cell", 3)
-
-            Dim causeLabel = RedCloud_ColorChangeCause.findCause(redC.rcMap, redC.rcList)
-            If task.mouseClickFlag Then
-                causeLabel = ""
-                labels(3) = ""
-            End If
-
-            If causeLabel <> "" Then
-                If labels(3) = "" Then labels(3) = causeLabel Else labels(3) += ", " + causeLabel
-                If labels(3).Length > 80 Then labels(3) = causeLabel
-            End If
-
-            rcList = New List(Of rcData)(redC.rcList)
-            rcMap = redC.rcMap.Clone
-        End Sub
-    End Class
-
-
-
-
-
-
-    Public Class RedCloud_PrepEdges : Inherits TaskParent
-        Public redCore As New RedCloud_Core
-        Public rcList As New List(Of rcData)
-        Public rcMap As cv.Mat = New cv.Mat(dst2.Size, cv.MatType.CV_32S, 0)
-        Public percentImage As Single
-        Public options As New Options_RedCloud
-        Public Sub New()
-            task.redCloud = Me
-            desc = "Build contours for each cell"
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
 
             redCore.Run(src)
@@ -255,7 +211,7 @@ Namespace VBClasses
             Dim unMatched As Integer
             Dim matchAverage As Single
             For Each rc In redCore.rcList
-                rc = RedCloud_Basics.rcDataMatch(rc, rcListLast, rcMapLast)
+                rc = rcDataMatch(rc, rcListLast, rcMapLast)
 
                 If rc.age = 1 Then unMatched += 1 Else matchCount += 1
                 matchAverage += rc.age
@@ -423,7 +379,7 @@ Namespace VBClasses
 
 
     Public Class RedCloud_KNN : Inherits TaskParent
-        Dim redC As New RedCloud_PrepEdges
+        Dim redC As New RedCloud_Contours
         Dim knn As New KNN_Basics
         Public hulls As New List(Of List(Of cv.Point))
         Public Sub New()
@@ -462,7 +418,7 @@ Namespace VBClasses
 
 
     Public Class RedCloud_RGB : Inherits TaskParent
-        Dim redC As New RedCloud_PrepEdges
+        Dim redC As New RedCloud_Contours
         Public Sub New()
             desc = "Display the RGB data rather than the rc.color"
         End Sub
@@ -482,7 +438,7 @@ Namespace VBClasses
 
 
     Public Class RedCloud_Matches : Inherits TaskParent
-        Dim redC As New RedCloud_PrepEdges
+        Dim redC As New RedCloud_Contours
         Public rcList As New List(Of rcData)
         Public Sub New()
             task.fOptions.ReductionSlider.Value = 120
@@ -517,7 +473,7 @@ Namespace VBClasses
 
 
     Public Class RedCloud_Matched : Inherits TaskParent
-        Dim redC As New RedCloud_PrepEdges
+        Dim redC As New RedCloud_Contours
         Public rcList As New List(Of rcData)
         Public Sub New()
             If standalone Then task.gOptions.displayDst1.Checked = True
@@ -670,7 +626,7 @@ Namespace VBClasses
         Public wGridList As New List(Of cv.Point)
         Public options As New Options_RedCloud
         Public Sub New()
-            cPtr = RedCloud_Open()
+            cPtr = RedCloudLined_Open()
             desc = "RedCloud results before matching to previous generation."
         End Sub
         Public Shared Function rcMatch(rc As rcData, rcListLast As List(Of rcData),
@@ -741,17 +697,17 @@ Namespace VBClasses
             dst1.GetArray(Of Byte)(inputData)
             Dim handleInput = GCHandle.Alloc(inputData, GCHandleType.Pinned)
 
-            imagePtr = RedCloud_Run(cPtr, handleInput.AddrOfPinnedObject(), dst1.Rows, dst1.Cols)
+            imagePtr = RedCloudLined_Run(cPtr, handleInput.AddrOfPinnedObject(), dst1.Rows, dst1.Cols)
             handleInput.Free()
 
             Dim rMask = New cv.Rect(1, 1, dst1.Width, dst1.Height)
             Dim mask = cv.Mat.FromPixelData(dst1.Rows + 2, dst1.Cols + 2, cv.MatType.CV_8U, imagePtr)
             dst0 = mask(rMask).Clone
 
-            classCount = RedCloud_Count(cPtr)
+            classCount = RedCloudLined_Count(cPtr)
             If classCount = 0 Then Exit Sub ' no data to process.
 
-            Dim rectData = cv.Mat.FromPixelData(classCount, 1, cv.MatType.CV_32SC4, RedCloud_Rects(cPtr))
+            Dim rectData = cv.Mat.FromPixelData(classCount, 1, cv.MatType.CV_32SC4, RedCloudLined_Rects(cPtr))
             Dim rects(classCount - 1) As cv.Rect
             rectData.GetArray(Of cv.Rect)(rects)
 
@@ -817,7 +773,7 @@ Namespace VBClasses
                             "average age: " + Format(matchAverage / rcList.Count, fmt1)
         End Sub
         Protected Overrides Sub Finalize()
-            If cPtr <> 0 Then cPtr = RedCloud_Close(cPtr)
+            If cPtr <> 0 Then cPtr = RedCloudLined_Close(cPtr)
         End Sub
     End Class
 
@@ -833,7 +789,7 @@ Namespace VBClasses
         Public wGridList As New List(Of cv.Point)
         Public options As New Options_RedCloud
         Public Sub New()
-            cPtr = RedCloudNew_Open()
+            cPtr = RedCloudFill_Open()
             desc = "This is before matching to previous generation."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -852,17 +808,17 @@ Namespace VBClasses
             dst1.GetArray(Of Byte)(inputData)
             Dim handleInput = GCHandle.Alloc(inputData, GCHandleType.Pinned)
 
-            imagePtr = RedCloudNew_Run(cPtr, handleInput.AddrOfPinnedObject(), dst1.Rows, dst1.Cols)
+            imagePtr = RedCloudFill_Run(cPtr, handleInput.AddrOfPinnedObject(), dst1.Rows, dst1.Cols)
             handleInput.Free()
 
             Dim rMask = New cv.Rect(1, 1, dst1.Width, dst1.Height)
             Dim mask = cv.Mat.FromPixelData(dst1.Rows + 2, dst1.Cols + 2, cv.MatType.CV_8U, imagePtr)
             dst0 = mask(rMask).Clone
 
-            classCount = RedCloudNew_Count(cPtr)
+            classCount = RedCloudFill_Count(cPtr)
             If classCount = 0 Then Exit Sub ' no data to process.
 
-            Dim rectData = cv.Mat.FromPixelData(classCount, 1, cv.MatType.CV_32SC4, RedCloudNew_Rects(cPtr))
+            Dim rectData = cv.Mat.FromPixelData(classCount, 1, cv.MatType.CV_32SC4, RedCloudFill_Rects(cPtr))
             Dim rects(classCount - 1) As cv.Rect
             rectData.GetArray(Of cv.Rect)(rects)
 
@@ -926,7 +882,7 @@ Namespace VBClasses
                             "average age: " + Format(matchAverage / rcList.Count, fmt1)
         End Sub
         Protected Overrides Sub Finalize()
-            If cPtr <> 0 Then cPtr = RedCloudNew_Close(cPtr)
+            If cPtr <> 0 Then cPtr = RedCloudFill_Close(cPtr)
         End Sub
     End Class
 End Namespace
