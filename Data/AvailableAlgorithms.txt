@@ -1286,6 +1286,7 @@ NR_RedCC_Merge
 NR_RedCloud_Basics
 NR_RedCloud_CellDepthHistogram
 NR_RedCloud_CellMask
+NR_RedCloud_ColorChangeCause
 NR_RedColor_CPP
 NR_RedColor_NWay
 NR_RedList_CellDepthHistogram
@@ -1511,7 +1512,6 @@ RedCC_Basics
 RedCC_BasicsCombined
 RedCC_Color8U
 RedCloud_Basics
-RedCloud_ColorChangeCause
 RedCloud_Contours
 RedCloud_Core
 RedCloud_Flood_CPP

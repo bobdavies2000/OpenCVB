@@ -18855,7 +18855,7 @@ Namespace VBClasses
             If task.rcD IsNot Nothing Then dst2.Rectangle(task.rcD.rect, task.highlight, task.lineWidth)
             If strOut <> "" Then SetTrueText(strOut, 3) Else SetTrueText("Click on any cell", 3)
 
-            Dim causeLabel = RedCloud_ColorChangeCause.findCause(redC.rcMap, redC.rcList)
+            Dim causeLabel = RedUtil_Basics.findCause(redC.rcMap, redC.rcList)
 
             If causeLabel <> "" Then
                 If labels(3) = "" Then labels(3) = causeLabel Else labels(3) += ", " + causeLabel
@@ -19003,7 +19003,7 @@ Namespace VBClasses
             If task.rcD IsNot Nothing Then dst2.Rectangle(task.rcD.rect, task.highlight, task.lineWidth)
             If strOut <> "" Then SetTrueText(strOut, 3) Else SetTrueText("Click on any cell", 3)
 
-            Dim causeLabel = RedCloud_ColorChangeCause.findCause(redC.rcMap, redC.rcList)
+            Dim causeLabel = RedUtil_Basics.findCause(redC.rcMap, redC.rcList)
             If task.mouseClickFlag Then
                 causeLabel = ""
                 labels(3) = ""

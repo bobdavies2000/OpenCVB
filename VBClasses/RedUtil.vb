@@ -4,6 +4,30 @@ Namespace VBClasses
         Public Sub New()
             desc = "Provide a home for some shared utility functions for the RedCloud algorithms."
         End Sub
+        Public Shared Function findCause(rcMap As cv.Mat, rcList As List(Of rcData)) As String
+            Dim clickIndex = rcMap.Get(Of Integer)(task.clickPoint.Y, task.clickPoint.X)
+            findCause = ""
+            If clickIndex > 0 And clickIndex < rcList.Count Then
+                Dim rc = rcList(clickIndex - 1)
+                Select Case rc.colorChange
+                    Case causes.indexLastBelowZero
+                        findCause = "indexLast = 0"
+                    Case causes.indexLastAboveCount
+                        findCause = "last index >= last rclist"
+                    Case causes.intersectLastRectFailed
+                        findCause = "Current/Last don't intersect"
+                    Case causes.optionsChange
+                        findCause = "task options changed"
+                    Case causes.maxDistOutsideOfLastRect
+                        findCause = "maxDist outside last rect"
+                    Case causes.colorSync
+                        findCause = "Resyncing Colors"
+                    Case causes.wGridNotInLastList
+                        findCause = "wGrid point absent"
+                End Select
+            End If
+            Return findCause
+        End Function
         Public Shared Function rcDataMatch(rc As rcData, rcListLast As List(Of rcData),
                                            rcMapLast As cv.Mat) As rcData
             Dim r1 = rc.rect

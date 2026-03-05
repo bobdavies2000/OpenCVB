@@ -33,7 +33,7 @@ Namespace VBClasses
             If task.rcD IsNot Nothing Then dst2.Rectangle(task.rcD.rect, task.highlight, task.lineWidth)
             If strOut <> "" Then SetTrueText(strOut, 3) Else SetTrueText("Click on any cell", 3)
 
-            Dim causeLabel = RedCloud_ColorChangeCause.findCause(redC.rcMap, redC.rcList)
+            Dim causeLabel = RedUtil_Basics.findCause(redC.rcMap, redC.rcList)
             If task.mouseClickFlag Then
                 causeLabel = ""
                 labels(3) = ""
@@ -70,7 +70,7 @@ Namespace VBClasses
             If task.rcD IsNot Nothing Then dst2.Rectangle(task.rcD.rect, task.highlight, task.lineWidth)
             If strOut <> "" Then SetTrueText(strOut, 3) Else SetTrueText("Click on any cell", 3)
 
-            Dim causeLabel = RedCloud_ColorChangeCause.findCause(redC.rcMap, redC.rcList)
+            Dim causeLabel = RedUtil_Basics.findCause(redC.rcMap, redC.rcList)
             If task.mouseClickFlag Then
                 causeLabel = ""
                 labels(3) = ""
@@ -416,42 +416,18 @@ Namespace VBClasses
 
 
 
-    Public Class RedCloud_ColorChangeCause : Inherits TaskParent
+    Public Class NR_RedCloud_ColorChangeCause : Inherits TaskParent
         Dim redC As New RedCloud_Basics
         Public Sub New()
             desc = "Click on a cell to determine why it is changing colors."
         End Sub
-        Public Shared Function findCause(rcMap As cv.Mat, rcList As List(Of rcData)) As String
-            Dim clickIndex = rcMap.Get(Of Integer)(task.clickPoint.Y, task.clickPoint.X)
-            findCause = ""
-            If clickIndex > 0 And clickIndex < rcList.Count Then
-                Dim rc = rcList(clickIndex - 1)
-                Select Case rc.colorChange
-                    Case causes.indexLastBelowZero
-                        findCause = "indexLast = 0"
-                    Case causes.indexLastAboveCount
-                        findCause = "last index >= last rclist"
-                    Case causes.intersectLastRectFailed
-                        findCause = "Current/Last don't intersect"
-                    Case causes.optionsChange
-                        findCause = "task options changed"
-                    Case causes.maxDistOutsideOfLastRect
-                        findCause = "maxDist outside last rect"
-                    Case causes.colorSync
-                        findCause = "Resyncing Colors"
-                    Case causes.wGridNotInLastList
-                        findCause = "wGrid point absent"
-                End Select
-            End If
-            Return findCause
-        End Function
         Public Overrides Sub RunAlg(src As cv.Mat)
             redC.Run(src)
             dst2 = redC.dst2
             labels(2) = redC.labels(2)
             dst2.SetTo(0, task.noDepthMask)
 
-            labels(3) = findCause(redC.rcMap, redC.rcList)
+            labels(3) = RedUtil_Basics.findCause(redC.rcMap, redC.rcList)
         End Sub
     End Class
 
