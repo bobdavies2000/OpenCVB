@@ -63,6 +63,7 @@ public:
         vector<int>floodPoints;
         Rect rect;
         multimap<int, Point, greater<int>> sizeSorted;
+
         for (int y = 1; y < src.rows - 2; y++)
         {
             for (int x = 1; x < src.cols - 2; x++)
@@ -97,9 +98,16 @@ public:
                 val = src.at<unsigned char>(y + 1, x + 1);
                 if (checkVals(vals, val) == false) vals.push_back(val);
 
-                if (vals.size() > 2)
+                int maxValue = *std::max_element(vals.begin(), vals.end());
+                int minValue = *std::min_element(vals.begin(), vals.end());
+
+                if (vals.size() > 2 || (maxValue == 2 && minValue == 1))
                 {
                     cv::Rect r(x - 1, y - 1, 3, 3);
+     //               if (r.x < 0) r.x = 0;
+     //               if (r.y < 0) r.y = 0;
+     //               if (r.x + r.width >= src.cols) r.width = src.cols - r.x - 1;
+					//if (r.y + r.height >= src.rows) r.height = src.rows - r.y - 1;
                     src(r).setTo(0);
                 }
             }
@@ -149,6 +157,35 @@ RedCloudFill_Run(RedCloudFill* cPtr, int* dataPtr, int rows, int cols)
 
 
 
+////  val1 val3 x1
+////  val2 val0 x2
+////  x    x    x
+//for (int y = 1; y < src.rows - 2; y++)
+//{
+//    for (int x = 1; x < src.cols - 2; x++)
+//    {
+//        uchar val0 = src.at<unsigned char>(y, x);
+//        uchar val1 = src.at<unsigned char>(y - 1, x - 1);
+//        uchar val2 = src.at<unsigned char>(y, x - 1);
+//        uchar val3 = src.at<unsigned char>(y - 1, x);
+//        if (val1 != val3)
+//        {
+//            if (val2 == val3 && val2 != val0)
+//            {
+//                src.at<unsigned char>(y, x) = 0;
+//                src.at<unsigned char>(y - 1, x - 1) = 0;
+//                src.at<unsigned char>(y, x - 1) = 0;
+//                src.at<unsigned char>(y - 1, x) = 0;
+
+//                src.at<unsigned char>(y - 1, x + 1) = 0;
+//                src.at<unsigned char>(y, x + 1) = 0;
+//                src.at<unsigned char>(y + 1, x + 1) = 0;
+//                src.at<unsigned char>(y + 1, x) = 0;
+//                src.at<unsigned char>(y + 1, x - 1) = 0;
+//            }
+//        }
+//    }
+//}
 
 
 

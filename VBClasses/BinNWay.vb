@@ -34,7 +34,7 @@ Namespace VBClasses
                 labels(2) = redC.labels(2)
                 dst2 = redC.dst2
 
-                strOut = RedCloud_Cell.selectCell(redC.rcMap, redC.rcList)
+                strOut = RedUtil_Basics.selectCell(redC.rcMap, redC.rcList)
                 SetTrueText(strOut, 1)
             End If
             labels(3) = CStr(options.gradations) + " of the motion-adjusted gray image."

@@ -180,8 +180,8 @@ Namespace VBClasses
             If r.Y < 0 Then r.Y = 0
             If r.X > width Then r.X = width - 1
             If r.Y > height Then r.Y = height - 1
-            If r.X + r.Width > width Then r.Width = width - r.X - 1
-            If r.Y + r.Height > height Then r.Height = height - r.Y - 1
+            If r.X + r.Width >= width Then r.Width = width - r.X - 1
+            If r.Y + r.Height >= height Then r.Height = height - r.Y - 1
             Return r
         End Function
     End Module

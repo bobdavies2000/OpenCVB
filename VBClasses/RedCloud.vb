@@ -13,7 +13,49 @@ Namespace VBClasses
         wGridNotInLastList
     End Enum
     Public Class RedCloud_Basics : Inherits TaskParent
-        Public redC As New RedCloud_Flood
+        Dim prepXY As New RedPrep_XY_Add
+        Public redC As New RedCloud_Flood_CPP
+        Public rcList As New List(Of rcData)
+        Public rcMap As cv.Mat
+        Public Sub New()
+            task.fOptions.ReductionSlider.Value = 200
+            desc = "Use the more complete RedPrep_XY_Add as input to RedCloud."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            prepXY.Run(src)
+            prepXY.dst2.ConvertTo(dst2, cv.MatType.CV_8U)
+
+            redC.Run(dst2)
+            dst2 = redC.dst2
+            labels(2) = redC.labels(2)
+
+            strOut = RedUtil_Basics.selectCell(redC.rcMap, redC.rcList)
+            If task.rcD IsNot Nothing Then dst2.Rectangle(task.rcD.rect, task.highlight, task.lineWidth)
+            If strOut <> "" Then SetTrueText(strOut, 3) Else SetTrueText("Click on any cell", 3)
+
+            Dim causeLabel = RedCloud_ColorChangeCause.findCause(redC.rcMap, redC.rcList)
+            If task.mouseClickFlag Then
+                causeLabel = ""
+                labels(3) = ""
+            End If
+
+            If causeLabel <> "" Then
+                If labels(3) = "" Then labels(3) = causeLabel Else labels(3) += ", " + causeLabel
+                If labels(3).Length > 80 Then labels(3) = causeLabel
+            End If
+
+            rcList = New List(Of rcData)(redC.rcList)
+            rcMap = redC.rcMap.Clone
+        End Sub
+    End Class
+
+
+
+
+
+
+    Public Class NR_RedCloud_Basics : Inherits TaskParent
+        Public redC As New RedCloud_Flood_CPP
         Public rcList As New List(Of rcData)
         Public rcMap As cv.Mat
         Public Sub New()
@@ -24,7 +66,7 @@ Namespace VBClasses
             dst2 = redC.dst2
             labels(2) = redC.labels(2)
 
-            strOut = RedCloud_Cell.selectCell(redC.rcMap, redC.rcList)
+            strOut = RedUtil_Basics.selectCell(redC.rcMap, redC.rcList)
             If task.rcD IsNot Nothing Then dst2.Rectangle(task.rcD.rect, task.highlight, task.lineWidth)
             If strOut <> "" Then SetTrueText(strOut, 3) Else SetTrueText("Click on any cell", 3)
 
@@ -44,44 +86,6 @@ Namespace VBClasses
         End Sub
     End Class
 
-
-
-
-
-    Public Class RedCloud_BasicsLined : Inherits TaskParent
-        Public indexer As New Indexer_Corners
-        Public redC As New RedCloud_FloodLine
-        Public rcList As New List(Of rcData)
-        Public rcMap As cv.Mat
-        Public Sub New()
-            desc = "Assign abstract world coordinates to each RedCloud cell."
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            indexer.Run(src)
-            redC.Run(indexer.dst2)
-
-            dst2 = redC.dst2
-            labels(2) = redC.labels(2)
-
-            strOut = RedCloud_Cell.selectCell(redC.rcMap, redC.rcList)
-            If task.rcD IsNot Nothing Then dst2.Rectangle(task.rcD.rect, task.highlight, task.lineWidth)
-            If strOut <> "" Then SetTrueText(strOut, 3) Else SetTrueText("Click on any cell", 3)
-
-            Dim causeLabel = RedCloud_ColorChangeCause.findCause(redC.rcMap, redC.rcList)
-            If task.mouseClickFlag Then
-                causeLabel = ""
-                labels(3) = ""
-            End If
-
-            If causeLabel <> "" Then
-                If labels(3) = "" Then labels(3) = causeLabel Else labels(3) += ", " + causeLabel
-                If labels(3).Length > 80 Then labels(3) = causeLabel
-            End If
-
-            rcList = New List(Of rcData)(redC.rcList)
-            rcMap = redC.rcMap.Clone
-        End Sub
-    End Class
 
 
 
@@ -98,50 +102,6 @@ Namespace VBClasses
             task.redCloud = Me
             desc = "Build contours for each cell"
         End Sub
-        Public Shared Function rcDataMatch(rc As rcData, rcListLast As List(Of rcData),
-                                           rcMapLast As cv.Mat) As rcData
-            Dim r1 = rc.rect
-            Dim indexLast = rcMapLast.Get(Of Integer)(rc.maxDist.Y, rc.maxDist.X)
-
-            If indexLast = 0 Then
-                rc.colorChange = causes.indexLastBelowZero
-            Else
-                If indexLast < rcListLast.Count Then
-                    ' rcList index is 1 less than the rcMap value because a 0 rcMap value means not mapped.
-                    ' All pixels are mapped with color but withh depth, rcMap has 0's where there is no depth.
-                    indexLast -= 1
-                    Dim r2 = rcListLast(indexLast).rect
-                    If r1.IntersectsWith(r2) = False Then rc.colorChange = causes.intersectLastRectFailed
-                Else
-                    rc.colorChange = causes.indexLastAboveCount
-                End If
-            End If
-
-            If task.optionsChanged Then rc.colorChange = causes.optionsChange
-
-            If rc.colorChange = causes.lastCellFound Then
-                Dim lrc = rcListLast(indexLast)
-                Dim rTest = rc.rect.Intersect(lrc.rect)
-                Dim rTotal = rTest.Width * rTest.Height
-                Dim lastTotal = lrc.rect.Width * lrc.rect.Height
-                If rc.rect.Contains(lrc.maxDist) Then
-                    rc.maxDist = lrc.maxDist
-                    rc.depthDelta = Math.Abs(lrc.wcMean(2) - rc.wcMean(2))
-                    If Single.IsInfinity(rc.depthDelta) Or rc.depthDelta < 0 Then
-                        rc.depthDelta = 0
-                        rc.wcMean(2) = 0
-                    End If
-                Else
-                    rc.colorChange = causes.maxDistOutsideOfLastRect
-                End If
-
-                rc.age = lrc.age + 1
-                If rc.age > 1000 Then rc.age = 2
-
-                rc.color = lrc.color
-            End If
-            Return rc
-        End Function
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
 
@@ -158,7 +118,7 @@ Namespace VBClasses
             Dim unMatched As Integer
             Dim matchAverage As Single
             For Each rc In redCore.rcList
-                rc = rcDataMatch(rc, rcListLast, rcMapLast)
+                rc = RedUtil_Basics.rcDataMatch(rc, rcListLast, rcMapLast)
 
                 If rc.age = 1 Then unMatched += 1 Else matchCount += 1
                 matchAverage += rc.age
@@ -170,7 +130,7 @@ Namespace VBClasses
                 dst2(rc.rect).SetTo(rc.color, rc.mask)
             Next
 
-            strOut = RedCloud_Cell.selectCell(rcMap, rcList)
+            strOut = RedUtil_Basics.selectCell(rcMap, rcList)
             SetTrueText(strOut, 3)
 
             labels(2) = CStr(unMatched) + " were new cells and " + CStr(matchCount) + " were matched, " +
@@ -193,7 +153,8 @@ Namespace VBClasses
             Dim index As Integer = 1
             Dim rect As New cv.Rect
             Dim mask = New cv.Mat(New cv.Size(input.Width + 2, input.Height + 2), cv.MatType.CV_8U, 0)
-            Dim flags As cv.FloodFillFlags = cv.FloodFillFlags.Link4 ' Or cv.FloodFillFlags.MaskOnly ' maskonly is expensive but why?
+            '  Or cv.FloodFillFlags.MaskOnly - maskonly is expensive but why?
+            Dim flags As cv.FloodFillFlags = cv.FloodFillFlags.Link4
             Dim minSize As Integer = input.Total * 0.0001
             Dim rc As rcData = Nothing
             Dim newList As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
@@ -228,7 +189,7 @@ Namespace VBClasses
 
             dst2.SetTo(0)
             For Each rc In rcList
-                dst2(rc.rect).SetTo(rc.index, rc.mask)
+                dst2(rc.rect).SetTo(rc.index Mod 254, rc.mask)
             Next
             dst3 = PaletteBlackZero(dst2)
             labels(2) = "RedCloud cells identified: " + CStr(rcList.Count)
@@ -252,7 +213,7 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             dst2 = runRedCloud(src, labels(2))
 
-            strOut = RedCloud_Cell.selectCell(task.redCloud.rcMap, task.redCloud.rcList)
+            strOut = RedUtil_Basics.selectCell(task.redCloud.rcMap, task.redCloud.rcList)
             SetTrueText(strOut, 1)
 
             labels(3) = "Select a RedCloud cell to see the histogram"
@@ -277,7 +238,7 @@ Namespace VBClasses
 
 
 
-    Public Class RedCloud_CellMask : Inherits TaskParent
+    Public Class NR_RedCloud_CellMask : Inherits TaskParent
         Dim redMotion As New XO_RedCloud_Motion
         Public Sub New()
             dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
@@ -408,7 +369,7 @@ Namespace VBClasses
                 End If
             Next
 
-            strOut = RedCloud_Cell.selectCell(redC.rcMap, redC.rcList)
+            strOut = RedUtil_Basics.selectCell(redC.rcMap, redC.rcList)
             If task.rcD IsNot Nothing Then dst2.Rectangle(task.rcD.rect, task.highlight, task.lineWidth)
             SetTrueText(strOut, 3)
             labels(3) = CStr(rcList.Count) + " matched cells below with > " + CStr(redC.options.ageThreshold) + " age"
@@ -443,7 +404,7 @@ Namespace VBClasses
                 End If
             Next
 
-            strOut = RedCloud_Cell.selectCell(redC.rcMap, redC.rcList)
+            strOut = RedUtil_Basics.selectCell(redC.rcMap, redC.rcList)
             If task.rcD IsNot Nothing Then dst2.Rectangle(task.rcD.rect, task.highlight, task.lineWidth)
             SetTrueText(strOut, 1)
             labels(3) = CStr(rcList.Count) + " matched cells below with > " + CStr(redC.options.ageThreshold) + " age"
@@ -526,209 +487,7 @@ Namespace VBClasses
 
 
 
-    Public Class RedCloud_Cell : Inherits TaskParent
-        Public Sub New()
-            desc = "Display the output of a RedCloud cell."
-        End Sub
-        Public Shared Function selectCell(rcMap As cv.Mat, rcList As List(Of rcData)) As String
-            Dim clickIndex As Integer = 0, strOut As String = ""
-            If rcList.Count > 0 Then
-                clickIndex = rcMap.Get(Of Integer)(task.clickPoint.Y, task.clickPoint.X)
-                If clickIndex > 0 And clickIndex < rcList.Count Then
-                    task.rcD = rcList(clickIndex - 1)
-                    If task.rcD.pixels >= 10 Then
-                        strOut = task.rcD.displayCell()
-                        task.color(task.rcD.rect).SetTo(white, task.rcD.mask)
-                        task.color.Rectangle(task.rcD.rect, task.highlight, task.lineWidth)
-                    Else
-                        strOut = "RedCloud cell is too small to identify."
-                        Dim gridIndex = task.gridMap.Get(Of Integer)(task.clickPoint.Y, task.clickPoint.X)
-                        task.color(task.gridRects(gridIndex)).SetTo(white)
-                        task.color.Rectangle(task.gridRects(gridIndex), task.highlight, task.lineWidth)
-                    End If
-                Else
-                    If task.rcD IsNot Nothing Then task.rcD = Nothing
-                End If
-            End If
-            Return strOut
-        End Function
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            If standalone Then dst2 = runRedCloud(src, labels(2))
-
-            selectCell(task.redCloud.rcMap, task.redCloud.rcList)
-            SetTrueText(strOut, 3)
-        End Sub
-    End Class
-
-
-
-
-
-
-    Public Class RedCloud_FloodLine : Inherits TaskParent
-        Implements IDisposable
-        Public classCount As Integer
-        Public rcList As New List(Of rcData)
-        Public rcMap As cv.Mat = New cv.Mat(dst2.Size, cv.MatType.CV_32S, 0)
-        Public wGridList As New List(Of cv.Point)
-        Public options As New Options_RedCloud
-        Public Sub New()
-            cPtr = RedCloudLined_Open()
-            desc = "RedCloud results before matching to previous generation."
-        End Sub
-        Public Shared Function rcMatch(rc As rcData, rcListLast As List(Of rcData),
-                                       wGridLastList As List(Of cv.Point),
-                                       rcMapLast As cv.Mat) As rcData
-            Dim r1 = rc.rect
-            Dim indexLast = wGridLastList.IndexOf(rc.wGrid)
-            If indexLast >= 0 And indexLast < rcListLast.Count Then
-                ' rcList index is 1 less than the rcMap value because a 0 rcMap value means not mapped.
-                ' All pixels are mapped with color but withh depth, rcMap has 0's where there is no depth.
-                Dim r2 = rcListLast(indexLast).rect
-                If r1.IntersectsWith(r2) = False Then rc.colorChange = causes.intersectLastRectFailed
-            Else
-                rc.colorChange = causes.wGridNotInLastList
-            End If
-
-            If task.optionsChanged Then rc.colorChange = causes.optionsChange
-
-            If rc.colorChange <> causes.lastCellFound Then
-                ' try use the maxDist point to find the last rect.
-                indexLast = rcMapLast.Get(Of Integer)(rc.maxDist.Y, rc.maxDist.X)
-                If indexLast >= 0 And indexLast < rcListLast.Count Then
-                    Dim r2 = rcListLast(indexLast).rect
-                    If r1.IntersectsWith(r2) = False Then
-                        rc.colorChange = causes.intersectLastRectFailed
-                    Else
-                        rc.colorChange = causes.lastCellFound
-                    End If
-                End If
-            End If
-
-            If rc.colorChange = causes.lastCellFound Then
-                Dim lrc = rcListLast(indexLast)
-                Dim rTest = rc.rect.Intersect(lrc.rect)
-                Dim rTotal = rTest.Width * rTest.Height
-                Dim lastTotal = lrc.rect.Width * lrc.rect.Height
-                If rc.rect.Contains(lrc.maxDist) Then
-                    rc.maxDist = lrc.maxDist
-                    rc.depthDelta = Math.Abs(lrc.wcMean(2) - rc.wcMean(2))
-                    If Single.IsInfinity(rc.depthDelta) Or rc.depthDelta < 0 Then
-                        rc.depthDelta = 0
-                        rc.wcMean(2) = 0
-                    End If
-                Else
-                    rc.colorChange = causes.maxDistOutsideOfLastRect
-                End If
-
-                rc.age = lrc.age + 1
-                If rc.age > 1000 Then rc.age = 2
-
-                rc.color = lrc.color
-            End If
-            Return rc
-        End Function
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            options.Run()
-
-            If src.Channels <> 1 Then
-                Static indexer As New Indexer_Corners
-                indexer.Run(src)
-                dst1 = indexer.dst2
-            Else
-                dst1 = src
-            End If
-
-            Dim imagePtr As IntPtr
-            Dim inputData(dst1.Total - 1) As Byte
-            dst1.GetArray(Of Byte)(inputData)
-            Dim handleInput = GCHandle.Alloc(inputData, GCHandleType.Pinned)
-
-            imagePtr = RedCloudLined_Run(cPtr, handleInput.AddrOfPinnedObject(), dst1.Rows, dst1.Cols)
-            handleInput.Free()
-
-            Dim rMask = New cv.Rect(1, 1, dst1.Width, dst1.Height)
-            Dim mask = cv.Mat.FromPixelData(dst1.Rows + 2, dst1.Cols + 2, cv.MatType.CV_8U, imagePtr)
-            dst0 = mask(rMask).Clone
-
-            classCount = RedCloudLined_Count(cPtr)
-            If classCount = 0 Then Exit Sub ' no data to process.
-
-            Dim rectData = cv.Mat.FromPixelData(classCount, 1, cv.MatType.CV_32SC4, RedCloudLined_Rects(cPtr))
-            Dim rects(classCount - 1) As cv.Rect
-            rectData.GetArray(Of cv.Rect)(rects)
-
-            Dim rcListLast = New List(Of rcData)(rcList)
-            Dim rcMapLast As cv.Mat = rcMap.Clone
-
-            Dim minPixels As Integer = dst2.Total * 0.001
-            If task.reduction < 50 Then minPixels = 0
-            Dim index As Integer = 1
-            Dim newList As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
-            For i = 0 To rects.Count - 1
-                Dim rc = New rcData(dst0(rects(i)), rects(i), index)
-                If rc.pixels < minPixels Then Continue For
-                newList.Add(rc.pixels, rc)
-                index += 1
-            Next
-
-            rcList.Clear()
-            dst2.SetTo(0)
-            Dim changed As Integer
-            Dim matchCount As Integer
-            Dim unMatched As Integer
-            Dim matchAverage As Single
-            For Each rc In newList.Values
-                Dim maxDist = rc.maxDist
-                rc = rcMatch(rc, rcListLast, wGridList, rcMapLast)
-
-                If rc.age = 1 Then unMatched += 1 Else matchCount += 1
-                matchAverage += rc.age
-
-                rc.index = rcList.Count + 1
-
-                ' The first cell often contains other cells completely within it.
-                ' These often causes the maxdist to move around.
-                ' So just fix the color here and create a stable image.
-                ' The cells within the largest cell will switch colors but many cells are stable.
-                If rc.index = 1 Then rc.color = blue
-                If maxDist <> rc.maxDist Then changed += 1
-
-                rcList.Add(rc)
-
-                If rc.pixels = 0 Then
-                    ' when the cell is very small, pixels can be zero - buildcontours failed.  No mask.
-                    'dst2(rc.rect).SetTo(rc.color)
-                    'rcMap(rc.rect).SetTo(rc.index)
-                Else
-                    dst2(rc.rect).SetTo(rc.color, rc.mask)
-                    rcMap(rc.rect).SetTo(rc.index, rc.mask)
-                End If
-            Next
-
-            If standalone Then
-                strOut = RedCloud_Cell.selectCell(rcMap, rcList)
-                SetTrueText(strOut, 3)
-            End If
-
-            wGridList.Clear()
-            For Each rc In rcList
-                wGridList.Add(rc.wGrid)
-            Next
-
-            labels(2) = CStr(unMatched) + " were new cells and " + CStr(matchCount) + " were matched, " +
-                            "average age: " + Format(matchAverage / rcList.Count, fmt1)
-        End Sub
-        Protected Overrides Sub Finalize()
-            If cPtr <> 0 Then cPtr = RedCloudLined_Close(cPtr)
-        End Sub
-    End Class
-
-
-
-
-
-    Public Class RedCloud_Flood : Inherits TaskParent
+    Public Class RedCloud_Flood_CPP : Inherits TaskParent
         Implements IDisposable
         Public classCount As Integer
         Public rcList As New List(Of rcData)
@@ -789,7 +548,7 @@ Namespace VBClasses
             dst3.SetTo(0)
             For Each rc In newList.Values
                 Dim maxDist = rc.maxDist
-                rc = RedCloud_FloodLine.rcMatch(rc, rcListLast, wGridList, rcMapLast)
+                rc = RedUtil_Basics.rcMatch(rc, rcListLast, wGridList, rcMapLast)
 
                 If rc.age = 1 Then unMatched += 1 Else matchCount += 1
                 matchAverage += rc.age
@@ -816,7 +575,7 @@ Namespace VBClasses
             Next
 
             If standalone Then
-                strOut = RedCloud_Cell.selectCell(rcMap, rcList)
+                strOut = RedUtil_Basics.selectCell(rcMap, rcList)
                 SetTrueText(strOut, 3)
             End If
 
@@ -832,46 +591,4 @@ Namespace VBClasses
             If cPtr <> 0 Then cPtr = RedCloudFill_Close(cPtr)
         End Sub
     End Class
-
-
-
-
-    Public Class RedCloud_XY_Add : Inherits TaskParent
-        Dim prep As New RedPrep_XY_Add
-        Public redC As New RedCloud_Flood
-        Public rcList As New List(Of rcData)
-        Public rcMap As cv.Mat
-        Public Sub New()
-            task.fOptions.ReductionSlider.Value = 200
-            desc = "Use the more complete RedPrep_XY_Add as input to RedCloud."
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            prep.Run(src)
-            prep.dst2.ConvertTo(dst2, cv.MatType.CV_8U)
-
-            redC.Run(dst2)
-            dst2 = redC.dst2
-            labels(2) = redC.labels(2)
-
-            strOut = RedCloud_Cell.selectCell(redC.rcMap, redC.rcList)
-            If task.rcD IsNot Nothing Then dst2.Rectangle(task.rcD.rect, task.highlight, task.lineWidth)
-            If strOut <> "" Then SetTrueText(strOut, 3) Else SetTrueText("Click on any cell", 3)
-
-            Dim causeLabel = RedCloud_ColorChangeCause.findCause(redC.rcMap, redC.rcList)
-            If task.mouseClickFlag Then
-                causeLabel = ""
-                labels(3) = ""
-            End If
-
-            If causeLabel <> "" Then
-                If labels(3) = "" Then labels(3) = causeLabel Else labels(3) += ", " + causeLabel
-                If labels(3).Length > 80 Then labels(3) = causeLabel
-            End If
-
-            rcList = New List(Of rcData)(redC.rcList)
-            rcMap = redC.rcMap.Clone
-
-        End Sub
-    End Class
-
 End Namespace

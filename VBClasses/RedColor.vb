@@ -7,7 +7,7 @@ Namespace VBClasses
         Public rcList As New List(Of rcData)
         Public rcMap As cv.Mat = New cv.Mat(dst2.Size, cv.MatType.CV_32S, 0)
         Public options As New Options_RedCloud
-        Public redFlood As New RedCloud_Flood
+        Public redFlood As New RedCloud_Flood_CPP
         Public Sub New()
             desc = "Run the C++ RedCloud interface without a mask"
         End Sub
@@ -110,7 +110,7 @@ Namespace VBClasses
             Next
 
             If standaloneTest() Then
-                strOut = RedCloud_Cell.selectCell(rcMap, rcList)
+                strOut = RedUtil_Basics.selectCell(rcMap, rcList)
                 SetTrueText(strOut, 3)
             End If
 
@@ -275,7 +275,7 @@ Namespace VBClasses
                 dst3(gr).SetTo(rc.color)
                 rcGridMap(gr).SetTo(rc.index)
             Next
-            strOut = RedCloud_Cell.selectCell(redC.rcMap, redC.rcList)
+            strOut = RedUtil_Basics.selectCell(redC.rcMap, redC.rcList)
         End Sub
     End Class
 
@@ -329,7 +329,7 @@ Namespace VBClasses
             labels(2) = cellGen.labels(2)
             labels(3) = ""
             SetTrueText("", newPoint, 1)
-            strOut = RedCloud_Cell.selectCell(rcMap, rclist)
+            strOut = RedUtil_Basics.selectCell(rcMap, rclist)
         End Sub
     End Class
 End Namespace

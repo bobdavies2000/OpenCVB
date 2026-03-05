@@ -24,9 +24,9 @@ Namespace VBClasses
             Static picTag As Integer = task.mousePicTag
             If task.mouseClickFlag Then picTag = task.mousePicTag
             If picTag = 2 Then
-                strOut = RedCloud_Cell.selectCell(redC2.rcMap, redC2.rcList)
+                strOut = RedUtil_Basics.selectCell(redC2.rcMap, redC2.rcList)
             Else
-                strOut = RedCloud_Cell.selectCell(redC1.rcMap, redC1.rcList)
+                strOut = RedUtil_Basics.selectCell(redC1.rcMap, redC1.rcList)
             End If
 
             SetTrueText(strOut, 1)
@@ -70,7 +70,7 @@ Namespace VBClasses
             dst2 = redC1.dst2
 
             rcList = New List(Of rcData)(redC1.rcList)
-            strOut = RedCloud_Cell.selectCell(redC1.rcMap, rcList)
+            strOut = RedUtil_Basics.selectCell(redC1.rcMap, rcList)
             SetTrueText(strOut, 3)
         End Sub
     End Class
@@ -123,7 +123,7 @@ Namespace VBClasses
             redC.rcMap.ConvertTo(dst1, cv.MatType.CV_8U)
             dst2 = PaletteFull(color8u.dst2 + dst1)
 
-            strOut = RedCloud_Cell.selectCell(redC.rcMap, redC.rcList)
+            strOut = RedUtil_Basics.selectCell(redC.rcMap, redC.rcList)
             SetTrueText(strOut, 1)
 
             If task.rcD IsNot Nothing Then
@@ -152,8 +152,8 @@ Namespace VBClasses
             dst2 = redCC.dst2
             labels(2) = redCC.labels(2)
 
-            strOut = RedCloud_Cell.selectCell(task.redCloud.rcMap, task.redCloud.rcList)
-            strOut = RedCloud_Cell.selectCell(redCC.redC1.rcMap, redCC.redC1.rcList)
+            strOut = RedUtil_Basics.selectCell(task.redCloud.rcMap, task.redCloud.rcList)
+            strOut = RedUtil_Basics.selectCell(redCC.redC1.rcMap, redCC.redC1.rcList)
             labels(3) = "Select a RedCloud cell to see the histogram"
 
             If task.rcD Is Nothing Then

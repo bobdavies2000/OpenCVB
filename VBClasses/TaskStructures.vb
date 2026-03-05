@@ -594,7 +594,7 @@ Namespace VBClasses
                 Dim strOut = "rcList index = " + CStr(index) + vbCrLf
                 strOut += "Age = " + CStr(age) + vbCrLf
                 strOut += "Rect: X = " + CStr(rect.X) + ", Y = " + CStr(rect.Y) + ", "
-                strOut += ", width = " + CStr(rect.Width) + ", height = " + CStr(rect.Height) + vbCrLf
+                strOut += "width = " + CStr(rect.Width) + ", height = " + CStr(rect.Height) + vbCrLf
                 strOut += "MaxDist = " + CStr(maxDist.X) + "," + CStr(maxDist.Y) + vbCrLf
                 strOut += "World Coordinates = " + Format(wcMean(0), fmt3) + " " +
                                                    Format(wcMean(1), fmt3) + " " +

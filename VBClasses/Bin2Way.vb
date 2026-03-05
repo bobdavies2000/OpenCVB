@@ -287,7 +287,7 @@ Namespace VBClasses
 
             dst3 = PaletteFull(rcMap)
 
-            strOut = RedCloud_Cell.selectCell(rcMap, rclist)
+            strOut = RedUtil_Basics.selectCell(rcMap, rclist)
             SetTrueText(strOut, 1)
         End Sub
     End Class

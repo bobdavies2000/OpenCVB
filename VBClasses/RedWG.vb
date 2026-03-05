@@ -1,7 +1,7 @@
 ﻿Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Class RedWG_Basics : Inherits TaskParent
-        Dim redC As New RedCloud_Flood
+        Dim redC As New RedCloud_Flood_CPP
         Dim currSet As New List(Of cv.Point)
         Public Sub New()
             If standalone Then task.gOptions.displayDst1.Checked = True
@@ -30,7 +30,7 @@ Namespace VBClasses
                 End If
             Next
 
-            strOut = RedCloud_Cell.selectCell(redC.rcMap, redC.rcList)
+            strOut = RedUtil_Basics.selectCell(redC.rcMap, redC.rcList)
             SetTrueText(strOut, 1)
 
             labels(3) = CStr(count) + " cells were not matched using wc since the last heartbeatLT"

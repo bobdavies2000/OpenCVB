@@ -180,7 +180,7 @@ Namespace VBClasses
             Next
             labels(2) = traceName + " completed with " + Format(quadData.Count / 5, fmt0) +
                                 " quad sets (with a 5th element for color)"
-            strOut = RedCloud_Cell.selectCell(hulls.rcMap, hulls.rclist)
+            strOut = RedUtil_Basics.selectCell(hulls.rcMap, hulls.rclist)
         End Sub
     End Class
 
