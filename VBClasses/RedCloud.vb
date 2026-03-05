@@ -21,7 +21,6 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             redC.Run(src)
-
             dst2 = redC.dst2
             labels(2) = redC.labels(2)
 
@@ -782,7 +781,7 @@ Namespace VBClasses
             Next
 
             rcList.Clear()
-            dst2.SetTo(0)
+            dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8UC3, 0)
             Dim changed As Integer
             Dim matchCount As Integer
             Dim unMatched As Integer
@@ -833,4 +832,46 @@ Namespace VBClasses
             If cPtr <> 0 Then cPtr = RedCloudFill_Close(cPtr)
         End Sub
     End Class
+
+
+
+
+    Public Class RedCloud_XY_Add : Inherits TaskParent
+        Dim prep As New RedPrep_XY_Add
+        Public redC As New RedCloud_Flood
+        Public rcList As New List(Of rcData)
+        Public rcMap As cv.Mat
+        Public Sub New()
+            task.fOptions.ReductionSlider.Value = 200
+            desc = "Use the more complete RedPrep_XY_Add as input to RedCloud."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            prep.Run(src)
+            prep.dst2.ConvertTo(dst2, cv.MatType.CV_8U)
+
+            redC.Run(dst2)
+            dst2 = redC.dst2
+            labels(2) = redC.labels(2)
+
+            strOut = RedCloud_Cell.selectCell(redC.rcMap, redC.rcList)
+            If task.rcD IsNot Nothing Then dst2.Rectangle(task.rcD.rect, task.highlight, task.lineWidth)
+            If strOut <> "" Then SetTrueText(strOut, 3) Else SetTrueText("Click on any cell", 3)
+
+            Dim causeLabel = RedCloud_ColorChangeCause.findCause(redC.rcMap, redC.rcList)
+            If task.mouseClickFlag Then
+                causeLabel = ""
+                labels(3) = ""
+            End If
+
+            If causeLabel <> "" Then
+                If labels(3) = "" Then labels(3) = causeLabel Else labels(3) += ", " + causeLabel
+                If labels(3).Length > 80 Then labels(3) = causeLabel
+            End If
+
+            rcList = New List(Of rcData)(redC.rcList)
+            rcMap = redC.rcMap.Clone
+
+        End Sub
+    End Class
+
 End Namespace

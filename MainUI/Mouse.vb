@@ -65,7 +65,7 @@ Namespace MainApp
             End If
 
             StatusLabel.Text = String.Format("X: {0}, Y: {1}    ", x, y)
-            vbc.task.mouseMovePoint = New cv.Point(x, y)
+            vbc.task.mouseMovePoint = lpData.validatePoint(New cv.Point(x, y))
             If vbc.task IsNot Nothing Then
                 StatusLabel.Text += String.Format("Last click: {0}, {1}    ", vbc.task.clickPoint.X, vbc.task.clickPoint.Y)
             End If

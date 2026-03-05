@@ -393,9 +393,10 @@ Namespace VBClasses
             End Sub
             Public Shared Function validatePoint(pt As cv.Point2f) As cv.Point2f
                 If pt.X < 0 Then pt.X = 0
-                If pt.X > task.color.Width - 1 Then pt.X = task.color.Width - 1
+                If pt.X >= task.color.Width Then pt.X = task.color.Width - 1
                 If pt.Y < 0 Then pt.Y = 0
-                If pt.Y > task.color.Height - 1 Then pt.Y = task.color.Height - 1
+                If pt.Y >= task.color.Height Then pt.Y = task.color.Height - 1
+
                 Return pt
             End Function
             Sub New(_p1 As cv.Point2f, _p2 As cv.Point2f)

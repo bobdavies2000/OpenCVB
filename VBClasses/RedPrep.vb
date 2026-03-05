@@ -408,11 +408,22 @@ Namespace VBClasses
 
             reduced32s.ConvertTo(reduced32f, cv.MatType.CV_32F)
 
-            dst2 = (reduced32s - wcMinVal) * 255 / (wcMaxVal - wcMinVal)
+            ' everything gets slammed between -1000 and 1000.  Good idea? I dunno...
+            dst2 = (reduced32s - wcMinVal) * 254 / (wcMaxVal - wcMinVal)
             dst2.ConvertTo(dst2, cv.MatType.CV_8U)
+            dst2 += 1
             dst2.SetTo(0, task.noDepthMask)
 
             labels(2) = "Using reduction amount = " + CStr(task.reduction)
+
+            If standalone Then
+                Dim ranges = New cv.Rangef() {New cv.Rangef(-1, 256)}
+                Dim histogram As New cv.Mat
+                cv.Cv2.CalcHist({dst2}, {0}, task.depthmask, histogram, 1, {256}, ranges)
+                Dim histArray(255) As Single
+                histogram.GetArray(Of Single)(histArray)
+                If histogram.Sum <> task.depthmask.CountNonZero Then Throw New Exception("can't happen.")
+            End If
 
             dst3 = PaletteBlackZero(dst2)
         End Sub
@@ -452,6 +463,26 @@ Namespace VBClasses
             Next
 
             dst2.SetTo(0, dst3)
+        End Sub
+    End Class
+
+
+
+
+
+    Public Class RedPrep_XY_Add : Inherits TaskParent
+        Public Sub New()
+            desc = "Prepare the X and Y regions and add them together."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            task.pcSplit(0).ConvertTo(dst0, cv.MatType.CV_32S, 1000 / task.reduction)
+            task.pcSplit(1).ConvertTo(dst1, cv.MatType.CV_32S, 1000 / task.reduction)
+
+            cv.Cv2.Add(dst0 * task.reduction, dst1 * task.reduction, dst2)
+            dst2 = cv.Cv2.Abs(dst0 + dst1) + 1
+            dst2.SetTo(0, task.noDepthMask)
+
+            dst3 = PaletteBlackZero(dst2)
         End Sub
     End Class
 End Namespace

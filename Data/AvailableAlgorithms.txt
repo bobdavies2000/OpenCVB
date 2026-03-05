@@ -1523,6 +1523,7 @@ RedCloud_Matched
 RedCloud_Matches
 RedCloud_Reliable
 RedCloud_RGB
+RedCloud_XY_Add
 RedColor_Basics
 RedColor_Bricks
 RedColor_GridRects
@@ -1538,6 +1539,7 @@ RedPrep_Depth
 RedPrep_EdgeMask
 RedPrep_Edges_CPP
 RedPrep_EdgesZ
+RedPrep_XY_Add
 RedTrack_Basics
 Reduction_Basics
 Reduction_PointCloud
