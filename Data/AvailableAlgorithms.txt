@@ -581,7 +581,6 @@ NR_Blur_PlusHistogram
 NR_Blur_TopoMap
 NR_BlurMotion_Deblur
 NR_Boundary_GuidedBP
-NR_Boundary_RedCloud
 NR_Boundary_RedColor
 NR_Boundary_RemovedRects
 NR_Brick_CloudMaxVal
@@ -1542,6 +1541,7 @@ Reduction_Basics
 Reduction_PointCloud
 RedUtil_Basics
 RedWG_Basics
+RedWG_Duplicates
 RedWG_ValidateCols
 RedWG_ValidateRows
 Region_Basics

@@ -165,30 +165,4 @@ Namespace VBClasses
             labels(3) = $"{task.redList.oldrclist.Count} cells were found."
         End Sub
     End Class
-
-
-
-
-
-    Public Class NR_Boundary_RedCloud : Inherits TaskParent
-        Dim prep As New RedPrep_Basics
-        Public Sub New()
-            task.gOptions.MaxDepthBar.Value = 20
-            dst3 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
-            desc = "Find the RedCloud cell contours"
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            prep.Run(src)
-            dst2 = runRedCloud(prep.dst2, labels(2))
-
-            dst3.SetTo(0)
-            For i = 1 To task.redCloud.rcList.Count - 1
-                Dim rc = task.redCloud.rcList(i)
-                Dim contour = vbc.ContourBuild(rc.mask)
-                DrawTour(dst3(rc.rect), contour, 255, task.lineWidth)
-            Next
-
-            labels(3) = $"{task.redCloud.rcList.Count} cells were found."
-        End Sub
-    End Class
 End Namespace

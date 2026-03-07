@@ -96,7 +96,6 @@ Namespace VBClasses
         Public redCore As New RedCloud_Core
         Public rcList As New List(Of rcData)
         Public rcMap As cv.Mat = New cv.Mat(dst2.Size, cv.MatType.CV_32S, 0)
-        Public percentImage As Single
         Public options As New Options_RedCloud
         Public Sub New()
             task.redCloud = Me

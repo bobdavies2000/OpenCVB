@@ -596,24 +596,31 @@ Namespace VBClasses
 
 
     Public Class NR_GL_ImageHullsColor : Inherits TaskParent
+        Dim redC As New RedCloud_Basics
         Public Sub New()
-            desc = "Prepare triangles from the RedCloud_HeartBeat output"
+            desc = "Prepare triangles from the RedCloud_Basics output"
         End Sub
-        Public Shared Function buildBuffer() As List(Of cv.Vec3f)
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            redC.Run(src)
+            dst2 = redC.dst2
+            labels(2) = redC.labels(2)
+
             Dim dataBuffer As New List(Of cv.Vec3f)
             Dim vec(2) As cv.Vec3f, pt As cv.Point
-            For Each pc In task.redCloud.rcList
-                Dim count As Single = pc.hull.Count
-                For i = 0 To pc.hull.Count - 1
+            For Each rc In redC.rcList
+                If rc.hull Is Nothing Then Continue For
+                Dim count As Single = rc.hull.Count
+                For i = 0 To rc.hull.Count - 1
                     Dim goodDepth As Boolean = True
                     For j = 0 To vec.Length - 1
                         Select Case j
                             Case 0
-                                pt = New cv.Point(CInt(pc.hull(i).X + pc.rect.X), CInt(pc.hull(i).Y + pc.rect.Y))
+                                pt = New cv.Point(CInt(rc.hull(i).X + rc.rect.X), CInt(rc.hull(i).Y + rc.rect.Y))
                             Case 1
-                                pt = pc.maxDist
+                                pt = rc.maxDist
                             Case 2
-                                pt = New cv.Point(CInt(pc.hull((i + 1) Mod count).X + pc.rect.X), CInt(pc.hull((i + 1) Mod count).Y + pc.rect.Y))
+                                pt = New cv.Point(CInt(rc.hull((i + 1) Mod count).X + rc.rect.X),
+                                                  CInt(rc.hull((i + 1) Mod count).Y + rc.rect.Y))
                         End Select
 
                         vec(j) = task.pointCloud.Get(Of cv.Vec3f)(pt.Y, pt.X)
@@ -621,20 +628,15 @@ Namespace VBClasses
                     Next
 
                     If goodDepth Then
-                        dataBuffer.Add(New cv.Vec3f(pc.color(2), pc.color(1), pc.color(0)))
+                        dataBuffer.Add(New cv.Vec3f(rc.color(2), rc.color(1), rc.color(0)))
                         For j = 0 To vec.Length - 1
                             dataBuffer.Add(New cv.Vec3f(vec(j)(0), vec(j)(1), vec(j)(2)))
                         Next
                     End If
                 Next
             Next
-            Return dataBuffer
-        End Function
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            dst2 = runRedCloud(src, labels(2))
-            labels(3) = task.redCloud.labels(3)
 
-            strOut = task.sharpGL.RunTriangles(oCase.colorTriangles, buildBuffer())
+            strOut = task.sharpGL.RunTriangles(oCase.colorTriangles, dataBuffer)
         End Sub
     End Class
 
@@ -652,9 +654,7 @@ Namespace VBClasses
 
             dst2 = task.sharpGL.hulls.dst2
             dst3 = task.sharpGL.hulls.dst3
-            labels(2) = task.sharpGL.hulls.labels(2) + " " + Format(task.sharpGL.hulls.percentImage, "0.0%") +
-                    " of depth data used."
-            labels(3) = task.sharpGL.hulls.labels(3)
+            labels(2) = task.sharpGL.hulls.labels(2)
         End Sub
     End Class
 

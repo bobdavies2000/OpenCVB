@@ -111,4 +111,21 @@ Namespace VBClasses
 
 
 
+    Public Class RedWG_Duplicates : Inherits TaskParent
+        Dim redC As New RedCloud_Basics
+        Public Sub New()
+            desc = "Consolidate duplicate world grid coordinates."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            redC.Run(src)
+            dst2 = redC.dst2
+            labels(2) = redC.labels(2)
+
+            Dim dups As New SortedList(Of String, Integer)
+            For Each rc In redC.rcList
+                dups.Add(Format(rc.wGrid.X, "000") + Format(rc.wGrid.Y, "000"), rc.index)
+            Next
+        End Sub
+    End Class
+
 End Namespace

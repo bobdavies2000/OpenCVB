@@ -12322,17 +12322,17 @@ Namespace VBClasses
 
 
     Public Class XO_RedCloud_MotionSimple : Inherits TaskParent
-        Dim redContours As New RedCloud_Contours
+        Dim redC As New RedCloud_Basics
         Public Sub New()
             task.gOptions.HistBinBar.Maximum = 255
             task.gOptions.HistBinBar.Value = 255
             desc = "Use motion to identify which cells changed."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            redContours.Run(src)
-            dst1 = redContours.dst1
-            dst2 = redContours.dst2
-            labels(2) = redContours.labels(2)
+            redC.Run(src)
+            dst1 = redC.dst1
+            dst2 = redC.dst2
+            labels(2) = redC.labels(2)
 
             dst1.SetTo(0, Not task.motionRGB.motionMask)
 
@@ -12347,7 +12347,7 @@ Namespace VBClasses
             If task.heartBeat Then dst3 = dst2.Clone
             For i = 1 To histArray.Count - 1
                 If histArray(i) > 0 And pcUsed.Contains(i) = False Then
-                    Dim rc = redContours.rcList(i)
+                    Dim rc = redC.rcList(i)
                     dst3(rc.rect).SetTo(task.scalarColors(rc.index), rc.mask)
                     pcUsed.Add(i)
                 End If
