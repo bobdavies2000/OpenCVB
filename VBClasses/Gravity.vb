@@ -359,8 +359,8 @@ Namespace VBClasses
             If task.gOptions.gravityPointCloud.Checked Then Return task.pcSplit(index) ' already oriented to gravity
 
             ' rebuild the pointcloud so it is oriented to gravity.
-            Dim pc = (task.pointCloud.Reshape(1, task.pointCloud.Rows * task.pointCloud.Cols) * task.gMatrix).ToMat.Reshape(3, task.pointCloud.Rows)
-            Dim split = pc.Split()
+            Dim rc = (task.pointCloud.Reshape(1, task.pointCloud.Rows * task.pointCloud.Cols) * task.gMatrix).ToMat.Reshape(3, task.pointCloud.Rows)
+            Dim split = rc.Split()
             Return split(index)
         End Function
         Private Function findTransition(startRow As Integer, stopRow As Integer, stepRow As Integer) As cv.Point2f

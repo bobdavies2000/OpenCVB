@@ -161,15 +161,15 @@ Public Class SharpGLForm
         gl.End()
         Return CStr(count) + " grid rects had depth."
     End Function
-    Private Function drawCloud(pc As cv.Mat, rgb As cv.Mat) As String
+    Private Function drawCloud(rc As cv.Mat, rgb As cv.Mat) As String
         gl.Begin(OpenGL.GL_POINTS)
         Dim count As Integer
         'gl.StencilFunc(CType(OpenGL.GL_ALWAYS, Enumerations.StencilFunction), CInt(1), &HFF) ' Always pass stencil test
         'gl.StencilOp(OpenGL.GL_KEEP, OpenGL.GL_KEEP, OpenGL.GL_REPLACE) ' Replace stencil with 1 on depth pass
-        For y = 0 To pc.Height - 1
-            For x = 0 To pc.Width - 1
+        For y = 0 To rc.Height - 1
+            For x = 0 To rc.Width - 1
                 If task.depthmask.Get(Of Byte)(y, x) <> 0 Then
-                    Dim vec As cv.Vec3f = pc.At(Of cv.Vec3f)(y, x)
+                    Dim vec As cv.Vec3f = rc.At(Of cv.Vec3f)(y, x)
                     Dim vec3b = rgb.Get(Of cv.Vec3b)(y, x)
                     gl.Color(vec3b(2) / 255, vec3b(1) / 255, vec3b(0) / 255)
                     gl.Vertex(vec.Item0, -vec.Item1, -vec.Item2)
@@ -178,7 +178,7 @@ Public Class SharpGLForm
             Next
         Next
         gl.End()
-        Return CStr(count) + " of " + CStr(pc.Total) + " points were rendered."
+        Return CStr(count) + " of " + CStr(rc.Total) + " points were rendered."
     End Function
     Private Sub readPointCloud()
         task.sharpDepth = New cv.Mat(New cv.Size(GLControl.Width, GLControl.Height), cv.MatType.CV_32F, 0)
@@ -341,18 +341,18 @@ Public Class SharpGLForm
                 Dim vec(2) As cv.Vec3f
                 Dim pts(2) As cv.Point
                 Dim triangleCount As Integer
-                For Each pc In hulls.rcList
-                    Dim count As Single = pc.hull.Count
-                    For i = 0 To pc.hull.Count - 1
+                For Each rc In hulls.rcList
+                    Dim count As Single = rc.hull.Count
+                    For i = 0 To rc.hull.Count - 1
                         Dim goodDepth As Boolean = True
                         For j = 0 To vec.Length - 1
                             Select Case j
                                 Case 0
-                                    pt = New cv.Point(CInt(pc.hull(i).X + pc.rect.X), CInt(pc.hull(i).Y + pc.rect.Y))
+                                    pt = New cv.Point(CInt(rc.hull(i).X + rc.rect.X), CInt(rc.hull(i).Y + rc.rect.Y))
                                 Case 1
-                                    pt = pc.maxDist
+                                    pt = rc.maxDist
                                 Case 2
-                                    pt = New cv.Point(CInt(pc.hull((i + 1) Mod count).X + pc.rect.X), CInt(pc.hull((i + 1) Mod count).Y + pc.rect.Y))
+                                    pt = New cv.Point(CInt(rc.hull((i + 1) Mod count).X + rc.rect.X), CInt(rc.hull((i + 1) Mod count).Y + rc.rect.Y))
                             End Select
 
                             pts(j) = pt

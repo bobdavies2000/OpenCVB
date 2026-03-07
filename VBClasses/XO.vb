@@ -224,12 +224,12 @@ Namespace VBClasses
             desc = "Create lines for the gravity vector and horizon vector in the camera image"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            Dim pc = task.pointCloud
-            Dim split = pc.Split()
+            Dim rc = task.pointCloud
+            Dim split = rc.Split()
             split(2).SetTo(task.MaxZmeters)
-            cv.Cv2.Merge(split, pc)
+            cv.Cv2.Merge(split, rc)
 
-            pc = (pc.Reshape(1, pc.Rows * pc.Cols) * task.gMatrix).ToMat.Reshape(3, pc.Rows)
+            rc = (rc.Reshape(1, rc.Rows * rc.Cols) * task.gMatrix).ToMat.Reshape(3, rc.Rows)
 
             dst1 = split(1).InRange(-0.05, 0.05)
             dst1.SetTo(0, task.noDepthMask)
@@ -10013,8 +10013,8 @@ Namespace VBClasses
             Dim mask = New cv.Mat(New cv.Size(dst3.Width + 2, dst3.Height + 2), cv.MatType.CV_8U, 0)
             rcList.Clear()
             Dim maskRect = New cv.Rect(1, 1, dst3.Width, dst3.Height)
-            For Each pc In redCold.rcList
-                Dim count = cv.Cv2.FloodFill(dst3, mask, pc.maxDist, index, rect, 0, 0, flags)
+            For Each rc In redCold.rcList
+                Dim count = cv.Cv2.FloodFill(dst3, mask, rc.maxDist, index, rect, 0, 0, flags)
                 If count >= minCount And count < maxCount Then
                     Dim pd = New rcData(dst3(rect), rect, index)
                     dst2(rect).SetTo(task.scalarColors(index), mask(rect))
@@ -10088,9 +10088,9 @@ Namespace VBClasses
                             Dim r = New cv.Rect(rect.X + 1, rect.Y + 1, rect.Width - 1, rect.Height - 1)
                             maskUsed.Rectangle(r, 255, -1)
                             If count >= minCount And count < maxCount Then
-                                Dim pc = New rcData(mask(r), r, index)
+                                Dim rc = New rcData(mask(r), r, index)
                                 index += 1
-                                newList.Add(pc.maxDist.Y, pc)
+                                newList.Add(rc.maxDist.Y, rc)
                             End If
                         End If
                     End If
@@ -10099,11 +10099,11 @@ Namespace VBClasses
 
             rcList.Clear()
             dst1.SetTo(0)
-            For Each pc In newList.Values
-                pc.index = rcList.Count + 1
-                rcList.Add(pc)
-                dst1(pc.rect).SetTo(pc.index Mod 255, pc.mask)
-                SetTrueText(CStr(pc.index), New cv.Point(pc.rect.X, pc.rect.Y))
+            For Each rc In newList.Values
+                rc.index = rcList.Count + 1
+                rcList.Add(rc)
+                dst1(rc.rect).SetTo(rc.index Mod 255, rc.mask)
+                SetTrueText(CStr(rc.index), New cv.Point(rc.rect.X, rc.rect.Y))
             Next
             dst2 = PaletteBlackZero(dst1)
 
@@ -10327,12 +10327,10 @@ Namespace VBClasses
             Dim percentDepth As New List(Of Single)
             For Each rc In task.redList.oldrclist
                 If rc.depthPixels > 0 Then dst1(rc.rect).SetTo(255, rc.mask)
-                If rc.depthPixels > 0 And rc.index > 0 Then
-                    Dim pc = rc.depthPixels / rc.pixels
-                    percentDepth.Add(pc)
+                Dim ratio As Single = rc.depthPixels / rc.pixels
+                percentDepth.Add(ratio)
 
-                    If pc < 0.5 Then dst3(rc.rect).SetTo(rc.color, rc.mask)
-                End If
+                If ratio < 0.5 Then dst3(rc.rect).SetTo(rc.color, rc.mask)
             Next
 
             Dim beforeCount = dst1.CountNonZero
@@ -10564,15 +10562,15 @@ Namespace VBClasses
             dst1.SetTo(0)
             dst3.SetTo(0)
             Dim percentDepth As New List(Of Single)
-            For Each pc In task.redCloud.rcList
-                If pc.pixels > 0 Then dst1(pc.rect).SetTo(255, pc.mask)
-                If pc.pixels > 0 Then
-                    Dim tmp As cv.Mat = task.depthmask(pc.rect) And pc.mask
+            For Each rc In task.redCloud.rcList
+                If rc.pixels > 0 Then dst1(rc.rect).SetTo(255, rc.mask)
+                If rc.pixels > 0 Then
+                    Dim tmp As cv.Mat = task.depthmask(rc.rect) And rc.mask
 
-                    Dim percent = tmp.CountNonZero / pc.pixels
+                    Dim percent = tmp.CountNonZero / rc.pixels
                     percentDepth.Add(percent)
 
-                    If percent < 0.5 Then dst3(pc.rect).SetTo(pc.color, pc.mask)
+                    If percent < 0.5 Then dst3(rc.rect).SetTo(rc.color, rc.mask)
                 End If
             Next
 
@@ -10608,11 +10606,11 @@ Namespace VBClasses
 
             dst3.SetTo(0)
             Dim hullCounts As New List(Of Integer)
-            For Each pc In task.redCloud.rcList
-                pc.hull = cv.Cv2.ConvexHull(pc.hull.ToArray, True).ToList
-                DrawTour(dst3(pc.rect), pc.hull, pc.color, -1)
-                hullCounts.Add(pc.hull.Count)
-                SetTrueText(CStr(pc.age), pc.maxDist)
+            For Each rc In task.redCloud.rcList
+                rc.hull = cv.Cv2.ConvexHull(rc.hull.ToArray, True).ToList
+                DrawTour(dst3(rc.rect), rc.hull, rc.color, -1)
+                hullCounts.Add(rc.hull.Count)
+                SetTrueText(CStr(rc.age), rc.maxDist)
             Next
             labels(3) = "Average hull length = " + Format(hullCounts.Average, fmt1) + " points.  "
         End Sub
@@ -11442,12 +11440,12 @@ Namespace VBClasses
                         Dim count = cv.Cv2.FloodFill(dst1, mask, pt, index, rect, 0, 0, flags)
                         If rect.Width > 0 And rect.Height > 0 Then
                             'If count >= minCount Then
-                            Dim pc = New rcData(dst3(rect), rect, index)
-                            If pc Is Nothing Then Continue For
-                            pc.color = task.scalarColors(pc.index)
-                            newList.Add(pc)
-                            'dst1(pc.rect).SetTo(pc.index Mod 255, pc.mask)
-                            SetTrueText(CStr(pc.index), pc.rect.TopLeft)
+                            Dim rc = New rcData(dst3(rect), rect, index)
+                            If rc Is Nothing Then Continue For
+                            rc.color = task.scalarColors(rc.index)
+                            newList.Add(rc)
+                            'dst1(rc.rect).SetTo(rc.index Mod 255, rc.mask)
+                            SetTrueText(CStr(rc.index), rc.rect.TopLeft)
                             index += 1
                             'Else
                             '    dst1(rect).SetTo(255, mask(rect))
@@ -13421,21 +13419,21 @@ Namespace VBClasses
                   "Diff of camera depth And motion-updated depth (always different)"}
             desc = "Update the pointcloud only with the motion Rect.  Resync heartbeatLT."
         End Sub
-        Public Shared Function checkNanInf(pc As cv.Mat) As cv.Mat
+        Public Shared Function checkNanInf(rc As cv.Mat) As cv.Mat
             ' these don't work because there are NaN's and Infinity's (both are often present)
-            ' cv.Cv2.PatchNaNs(pc, 0.0) 
+            ' cv.Cv2.PatchNaNs(rc, 0.0) 
             ' Dim mask As New cv.Mat
-            ' cv.Cv2.Compare(pc, pc, mask, cv.CmpType.EQ)
+            ' cv.Cv2.Compare(rc, rc, mask, cv.CmpType.EQ)
 
             Dim count As Integer
             Dim vec As New cv.Vec3f(0, 0, 0)
             ' The stereolabs camera has some weird -inf and inf values in the Y-plane 
             ' with and without gravity transform.  Probably my fault but just fix it here.
-            For y = 0 To pc.Rows - 1
-                For x = 0 To pc.Cols - 1
-                    Dim val = pc.Get(Of cv.Vec3f)(y, x)
+            For y = 0 To rc.Rows - 1
+                For x = 0 To rc.Cols - 1
+                    Dim val = rc.Get(Of cv.Vec3f)(y, x)
                     If Single.IsNaN(val(0)) Or Single.IsInfinity(val(0)) Then
-                        pc.Set(Of cv.Vec3f)(y, x, vec)
+                        rc.Set(Of cv.Vec3f)(y, x, vec)
                         count += 1
                     End If
                 Next
@@ -13445,7 +13443,7 @@ Namespace VBClasses
             'cv.Cv2.MeanStdDev(originalPointcloud, mean, stdev)
             'Debug.WriteLine("Before Motion mean " + mean.ToString())
 
-            Return pc
+            Return rc
         End Function
         Public Sub preparePointcloud()
             If task.gOptions.gravityPointCloud.Checked Then
@@ -15659,11 +15657,11 @@ Namespace VBClasses
 
             knn.ptListQuery.Clear()
             dst3.SetTo(0)
-            For Each pc In redC.rcList
-                dst3(pc.rect).SetTo(pc.color, pc.mask)
-                For Each pt In pc.hull
-                    dst2(pc.rect).Circle(pt, task.DotSize, task.highlight, -1)
-                    knn.ptListQuery.Add(New cv.Point(CInt(pt.X) + pc.rect.X, CInt(pt.Y) + pc.rect.Y))
+            For Each rc In redC.rcList
+                dst3(rc.rect).SetTo(rc.color, rc.mask)
+                For Each pt In rc.hull
+                    dst2(rc.rect).Circle(pt, task.DotSize, task.highlight, -1)
+                    knn.ptListQuery.Add(New cv.Point(CInt(pt.X) + rc.rect.X, CInt(pt.Y) + rc.rect.Y))
                 Next
             Next
 
@@ -18445,22 +18443,22 @@ Namespace VBClasses
             labels(3) = "task.pointcloud for the current frame."
             desc = "Point cloud after updating with the motion mask"
         End Sub
-        Public Shared Function checkNanInf(pc As cv.Mat) As cv.Mat
+        Public Shared Function checkNanInf(rc As cv.Mat) As cv.Mat
             Dim count As Integer
             Dim vec As New cv.Vec3f(0, 0, 0)
             ' The stereolabs camera has some weird -inf and inf values in the Y-plane 
             ' with and without gravity transform.  Probably my fault but just fix it here.
-            For y = 0 To pc.Rows - 1
-                For x = 0 To pc.Cols - 1
-                    Dim val = pc.Get(Of cv.Vec3f)(y, x)
+            For y = 0 To rc.Rows - 1
+                For x = 0 To rc.Cols - 1
+                    Dim val = rc.Get(Of cv.Vec3f)(y, x)
                     If Single.IsNaN(val(0)) Or Single.IsInfinity(val(0)) Then
-                        pc.Set(Of cv.Vec3f)(y, x, vec)
+                        rc.Set(Of cv.Vec3f)(y, x, vec)
                         count += 1
                     End If
                 Next
             Next
 
-            Return pc
+            Return rc
         End Function
         Private Sub preparePointcloud()
             If task.gOptions.gravityPointCloud.Checked Then
