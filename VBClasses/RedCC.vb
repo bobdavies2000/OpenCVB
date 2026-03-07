@@ -81,20 +81,22 @@ Namespace VBClasses
 
     Public Class RedCC_Color8U : Inherits TaskParent
         Public color8u As New Color8U_Basics
+        Dim redC As New RedCloud_Basics
         Public Sub New()
             desc = "Map the colors in the point cloud."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            dst2 = runRedCloud(src, labels(2))
+            redC.Run(src)
+            dst2 = redC.dst2
+            labels(2) = redC.labels(2)
 
             color8u.Run(task.gray)
             dst3 = color8u.dst3
             labels(3) = color8u.labels(2)
 
             If standaloneTest() Then
-                For Each rc In task.redCloud.rcList
+                For Each rc In redC.rcList
                     dst2.Circle(rc.maxDist, task.DotSize, task.highlight, -1)
-                    SetTrueText(CStr(rc.age), rc.maxDist)
                 Next
             End If
         End Sub
