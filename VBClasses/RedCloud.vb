@@ -203,6 +203,7 @@ Namespace VBClasses
 
     Public Class NR_RedCloud_CellDepthHistogram : Inherits TaskParent
         Dim plot As New Plot_Histogram
+        Dim redC As New RedCloud_Basics
         Public Sub New()
             task.gOptions.setHistogramBins(100)
             If standalone Then task.gOptions.displayDst1.Checked = True
@@ -210,15 +211,23 @@ Namespace VBClasses
             desc = "Display the histogram of a selected RedCloud cell."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            dst2 = runRedCloud(src, labels(2))
+            redC.Run(src)
+            dst2 = redC.dst2
+            labels(2) = redC.labels(2)
 
-            strOut = RedUtil_Basics.selectCell(task.redCloud.rcMap, task.redCloud.rcList)
+            If task.firstPass Then
+                task.rcD = redC.rcList(0)
+                task.clickPoint = task.rcD.maxDist
+            End If
+
+            strOut = RedUtil_Basics.selectCell(redC.rcMap, redC.rcList)
             SetTrueText(strOut, 1)
 
             labels(3) = "Select a RedCloud cell to see the histogram"
 
             Dim depth As cv.Mat = task.pcSplit(2)(task.rcD.rect)
             depth.SetTo(0, task.noDepthMask(task.rcD.rect))
+            cv.Cv2.ImShow("depth", depth)
             plot.minRange = 0
             plot.maxRange = task.MaxZmeters
             plot.Run(depth)
