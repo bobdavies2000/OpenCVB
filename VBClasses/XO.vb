@@ -12550,27 +12550,27 @@ Namespace VBClasses
 
 
     Public Class XO_RedCloud_HeartBeat : Inherits TaskParent
-        Dim redCore As New RedCloud_Contours
+        Dim redC As New RedCloud_Basics
         Public rcList As New List(Of rcData)
         Public percentImage As Single
         Public rcMap = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         Public prepEdges As New RedPrep_Basics
         Public Sub New()
             If standalone Then task.gOptions.displayDst1.Checked = True
-            redCore.redCore.prepEdges = prepEdges
+            redC.redCore.prepEdges = prepEdges
             desc = "Run RedCloud_Map on the heartbeat but just floodFill at maxDist otherwise."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             If task.heartBeat Or task.optionsChanged Then
-                redCore.Run(src)
-                dst2 = redCore.dst2
-                labels(2) = redCore.labels(2)
-                rcList = New List(Of rcData)(redCore.rcList)
-                dst3 = redCore.dst2
-                dst1 = redCore.redCore.prepEdges.dst2
-                labels(3) = redCore.labels(2)
+                redC.Run(src)
+                dst2 = redC.dst2
+                labels(2) = redC.labels(2)
+                rcList = New List(Of rcData)(redC.rcList)
+                dst3 = redC.dst2
+                dst1 = redC.redCore.prepEdges.dst2
+                labels(3) = redC.labels(2)
             Else
-                Dim rcListLast = New List(Of rcData)(redCore.rcList)
+                Dim rcListLast = New List(Of rcData)(redC.rcList)
 
                 prepEdges.Run(src)
                 dst1 = prepEdges.dst2.Threshold(0, 255, cv.ThresholdTypes.Binary)
@@ -15645,7 +15645,7 @@ Namespace VBClasses
 
     Public Class XO_KNN_Hulls : Inherits TaskParent
         Dim knn As New KNN_Basics
-        Dim redC As New RedCloud_Contours
+        Dim redC As New RedCloud_Basics
         Public matchList As New List(Of cv.Point2f)
         Public Sub New()
             knn.desiredMatches = 2

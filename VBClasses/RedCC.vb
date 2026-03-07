@@ -5,7 +5,7 @@ Namespace VBClasses
         Public rcList As List(Of rcData)
         Public rcMap As cv.Mat
         Public redC1 As New RedColor_Basics
-        Dim redC2 As New RedCloud_Contours
+        Public redC2 As New RedCloud_Basics
         Public Sub New()
             If standalone Then task.gOptions.displayDst1.Checked = True
             desc = "Insert the RedCloud cells into the RedColor_Basics input."
@@ -41,7 +41,7 @@ Namespace VBClasses
         Dim reduction As New Reduction_Basics
         Public rcList As List(Of rcData)
         Public redC1 As New RedColor_Basics
-        Public redC2 As New RedCloud_Contours
+        Public redC2 As New RedCloud_Basics
         Public Sub New()
             If standalone Then task.gOptions.displayDst1.Checked = True
             labels(1) = "Contours of each RedCloud cell - if missing some, CV_8U is the problem."
@@ -108,7 +108,7 @@ Namespace VBClasses
 
 
     Public Class NR_RedCC_Merge : Inherits TaskParent
-        Public redC As New RedCloud_Contours
+        Public redC As New RedCloud_Basics
         Public color8u As New Color8U_Basics
         Public Sub New()
             If standalone Then task.gOptions.displayDst1.Checked = True

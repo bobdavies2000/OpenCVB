@@ -13,6 +13,55 @@ Namespace VBClasses
         wGridNotInLastList
     End Enum
     Public Class RedCloud_Basics : Inherits TaskParent
+        Public redCore As New RedCloud_Core
+        Public rcList As New List(Of rcData)
+        Public rcMap As cv.Mat = New cv.Mat(dst2.Size, cv.MatType.CV_32S, 0)
+        Public options As New Options_RedCloud
+        Public Sub New()
+            desc = "Build contours for each cell"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            options.Run()
+
+            redCore.Run(src)
+            labels(3) = redCore.labels(3)
+
+            Dim rcListLast As New List(Of rcData)(rcList)
+            Dim rcMapLast As cv.Mat = rcMap.Clone
+
+            rcList.Clear()
+            rcMap.SetTo(0)
+            dst2.SetTo(0)
+            Dim matchCount As Integer
+            Dim unMatched As Integer
+            Dim matchAverage As Single
+            For Each rc In redCore.rcList
+                rc = RedUtil_Basics.rcDataMatch(rc, rcListLast, rcMapLast)
+
+                If rc.age = 1 Then unMatched += 1 Else matchCount += 1
+                matchAverage += rc.age
+                rc.index = rcList.Count + 1
+                rcMap(rc.rect).SetTo(rc.index, rc.mask)
+
+                rcList.Add(rc)
+
+                dst2(rc.rect).SetTo(rc.color, rc.mask)
+            Next
+
+            strOut = RedUtil_Basics.selectCell(rcMap, rcList)
+            SetTrueText(strOut, 3)
+
+            labels(2) = CStr(unMatched) + " were new cells and " + CStr(matchCount) + " were matched, " +
+                            "average age: " + Format(matchAverage / rcList.Count, fmt1)
+            labels(3) = redCore.labels(3)
+        End Sub
+    End Class
+
+
+
+
+
+    Public Class RedCloud_BasicsFlood : Inherits TaskParent
         Dim prepXY As New RedPrep_XY_Add
         Public redC As New RedCloud_Flood_CPP
         Public rcList As New List(Of rcData)
@@ -87,55 +136,6 @@ Namespace VBClasses
     End Class
 
 
-
-
-
-
-
-    Public Class RedCloud_Contours : Inherits TaskParent
-        Public redCore As New RedCloud_Core
-        Public rcList As New List(Of rcData)
-        Public rcMap As cv.Mat = New cv.Mat(dst2.Size, cv.MatType.CV_32S, 0)
-        Public options As New Options_RedCloud
-        Public Sub New()
-            desc = "Build contours for each cell"
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            options.Run()
-
-            redCore.Run(src)
-            labels(3) = redCore.labels(3)
-
-            Dim rcListLast As New List(Of rcData)(rcList)
-            Dim rcMapLast As cv.Mat = rcMap.Clone
-
-            rcList.Clear()
-            rcMap.SetTo(0)
-            dst2.SetTo(0)
-            Dim matchCount As Integer
-            Dim unMatched As Integer
-            Dim matchAverage As Single
-            For Each rc In redCore.rcList
-                rc = RedUtil_Basics.rcDataMatch(rc, rcListLast, rcMapLast)
-
-                If rc.age = 1 Then unMatched += 1 Else matchCount += 1
-                matchAverage += rc.age
-                rc.index = rcList.Count + 1
-                rcMap(rc.rect).SetTo(rc.index, rc.mask)
-
-                rcList.Add(rc)
-
-                dst2(rc.rect).SetTo(rc.color, rc.mask)
-            Next
-
-            strOut = RedUtil_Basics.selectCell(rcMap, rcList)
-            SetTrueText(strOut, 3)
-
-            labels(2) = CStr(unMatched) + " were new cells and " + CStr(matchCount) + " were matched, " +
-                            "average age: " + Format(matchAverage / rcList.Count, fmt1)
-            labels(3) = redCore.labels(3)
-        End Sub
-    End Class
 
 
 
@@ -274,7 +274,7 @@ Namespace VBClasses
 
 
     Public Class RedCloud_KNN : Inherits TaskParent
-        Dim redC As New RedCloud_Contours
+        Dim redC As New RedCloud_Basics
         Dim knn As New KNN_Basics
         Public hulls As New List(Of List(Of cv.Point))
         Public Sub New()
@@ -313,7 +313,7 @@ Namespace VBClasses
 
 
     Public Class RedCloud_RGB : Inherits TaskParent
-        Dim redC As New RedCloud_Contours
+        Dim redC As New RedCloud_Basics
         Public Sub New()
             desc = "Display the RGB data rather than the rc.color"
         End Sub
@@ -333,7 +333,7 @@ Namespace VBClasses
 
 
     Public Class RedCloud_Matches : Inherits TaskParent
-        Dim redC As New RedCloud_Contours
+        Dim redC As New RedCloud_Basics
         Public rcList As New List(Of rcData)
         Public Sub New()
             task.fOptions.ReductionSlider.Value = 120
@@ -368,7 +368,7 @@ Namespace VBClasses
 
 
     Public Class RedCloud_Matched : Inherits TaskParent
-        Dim redC As New RedCloud_Contours
+        Dim redC As New RedCloud_Basics
         Public rcList As New List(Of rcData)
         Public Sub New()
             If standalone Then task.gOptions.displayDst1.Checked = True

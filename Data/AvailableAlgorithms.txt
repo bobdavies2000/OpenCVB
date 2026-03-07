@@ -1510,7 +1510,7 @@ RedCC_Basics
 RedCC_BasicsCombined
 RedCC_Color8U
 RedCloud_Basics
-RedCloud_Contours
+RedCloud_BasicsFlood
 RedCloud_Core
 RedCloud_Flood_CPP
 RedCloud_KNN
