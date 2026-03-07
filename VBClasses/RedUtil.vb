@@ -1,6 +1,7 @@
 ﻿Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Class RedUtil_Basics : Inherits TaskParent
+        Dim redC As New RedCloud_Basics
         Public Sub New()
             desc = "Provide a home for some shared utility functions for the RedCloud algorithms."
         End Sub
@@ -147,9 +148,11 @@ Namespace VBClasses
             Return strOut
         End Function
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If standalone Then dst2 = runRedCloud(src, labels(2))
+            redC.Run(src)
+            dst2 = redC.dst2
+            labels(2) = redC.labels(2)
 
-            selectCell(Task.redCloud.rcMap, Task.redCloud.rcList)
+            selectCell(redC.rcMap, redC.rcList)
             SetTrueText(strOut, 3)
         End Sub
     End Class

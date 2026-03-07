@@ -203,7 +203,6 @@ SVM
 Swarm
 Texture
 TextureFlow
-Thickness
 Threshold
 Track
 Triangle

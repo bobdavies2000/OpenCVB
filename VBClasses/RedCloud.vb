@@ -98,7 +98,6 @@ Namespace VBClasses
         Public rcMap As cv.Mat = New cv.Mat(dst2.Size, cv.MatType.CV_32S, 0)
         Public options As New Options_RedCloud
         Public Sub New()
-            task.redCloud = Me
             desc = "Build contours for each cell"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -245,41 +244,21 @@ Namespace VBClasses
 
 
 
-
-    Public Class NR_RedCloud_CellMask : Inherits TaskParent
-        Dim redMotion As New XO_RedCloud_Motion
-        Public Sub New()
-            dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
-            desc = "Create a mask that outlines all the RedCloud cells."
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            redMotion.Run(src)
-
-            dst3.SetTo(0)
-            For Each rc In task.redCloud.rcList
-                Dim listOfPoints = New List(Of List(Of cv.Point))({rc.contour})
-                cv.Cv2.DrawContours(dst3(rc.rect), listOfPoints, 0, white, task.lineWidth, cv.LineTypes.Link8)
-            Next
-
-            dst2 = task.redCloud.redCore.dst1
-        End Sub
-    End Class
-
-
-
-
     Public Class RedCloud_LeftRight : Inherits TaskParent
+        Dim redC As New RedCloud_Basics
         Public Sub New()
             If task.bricks Is Nothing Then task.bricks = New Brick_Basics
             desc = "Map the RedCloud output into the right view."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            dst2 = runRedCloud(src, labels(2))
+            redC.Run(src)
+            dst2 = redC.dst2
+            labels(2) = redC.labels(2)
 
             Dim count As Integer
             dst1.SetTo(0)
             For Each gr As brickData In task.bricks.brickList
-                If task.redCloud.rcMap(gr.lRect).CountNonZero And gr.rRect.Width > 0 Then
+                If redC.rcMap(gr.lRect).CountNonZero And gr.rRect.Width > 0 Then
                     dst2(gr.lRect).CopyTo(dst1(gr.rRect))
                     count += 1
                 End If

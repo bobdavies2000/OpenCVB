@@ -1284,7 +1284,6 @@ NR_RedCC_CellHistogram
 NR_RedCC_Merge
 NR_RedCloud_Basics
 NR_RedCloud_CellDepthHistogram
-NR_RedCloud_CellMask
 NR_RedCloud_ColorChangeCause
 NR_RedColor_CPP
 NR_RedColor_NWay
@@ -1602,7 +1601,6 @@ Swarm_Basics
 Swarm_Flood
 Texture_Basics
 TextureFlow_Basics
-Thickness_Basics
 Threshold_Basics
 Threshold_ByChannels
 Threshold_Definitions

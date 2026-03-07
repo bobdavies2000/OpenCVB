@@ -161,12 +161,6 @@ Namespace VBClasses
             label = task.redList.labels(2)
             Return task.redList.dst2
         End Function
-        Public Function runRedCloud(src As cv.Mat, ByRef label As String) As cv.Mat
-            If task.redCloud Is Nothing Then task.redCloud = New RedCloud_Contours
-            task.redCloud.Run(src)
-            label = task.redCloud.labels(2)
-            Return task.redCloud.dst2
-        End Function
         Public Shared Sub DrawTour(dst As cv.Mat, contour As List(Of cv.Point), color As cv.Scalar, Optional lineWidth As Integer = -1,
                         Optional lineType As cv.LineTypes = cv.LineTypes.Link8)
             If contour Is Nothing Then Exit Sub

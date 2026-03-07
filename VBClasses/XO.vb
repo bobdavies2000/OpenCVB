@@ -10039,13 +10039,17 @@ Namespace VBClasses
     Public Class XO_RedCloud_PrepEdges_CPP : Inherits TaskParent
         Dim prep As New RedPrep_Basics
         Dim stats As New XO_RedCell_Color
+        Dim redC As New RedCloud_Basics
         Public Sub New()
             OptionParent.findRadio("XY Reduction").Checked = True
             If standalone Then task.gOptions.displayDst1.Checked = True
             desc = "Run the reduced pointcloud output through the RedList_CPP algorithm."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            dst2 = runRedCloud(prep.dst2, labels(2))
+            redC.Run(src)
+            dst2 = redC.dst2
+            labels(2) = redC.labels(2)
+
             If standaloneTest() Then
                 stats.Run(src)
                 dst1 = stats.dst3
@@ -10170,13 +10174,17 @@ Namespace VBClasses
 
     Public Class XO_RedCloud_XY : Inherits TaskParent
         Dim prep As New RedPrep_Core
+        Dim redC As New RedCloud_Basics
         Public Sub New()
             OptionParent.findRadio("XY Reduction").Checked = True
             labels(3) = "Above is the depth histogram of the selected cell.  Below are the stats for the same cell"
             desc = "Build XY RedCloud cells."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            dst2 = runRedCloud(prep.dst2, labels(2))
+            redC.Run(src)
+            dst2 = redC.dst2
+            labels(2) = redC.labels(2)
+
             If standaloneTest() Then
                 Static stats As New XO_RedCell_Basics
                 stats.Run(src)
@@ -10551,18 +10559,21 @@ Namespace VBClasses
 
 
     Public Class XO_RedCell_ValidateColorCloud : Inherits TaskParent
+        Dim redC As New RedCloud_Basics
         Public Sub New()
             labels(3) = "Cells shown below have rc.depthPixels / rc.pixels < 50%"
             dst1 = New cv.Mat(dst1.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
             desc = "Validate that all the RedCloud cells are correctly identified."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            dst2 = runRedCloud(src, labels(2))
+            redC.Run(src)
+            dst2 = redC.dst2
+            labels(2) = redC.labels(2)
 
             dst1.SetTo(0)
             dst3.SetTo(0)
             Dim percentDepth As New List(Of Single)
-            For Each rc In task.redCloud.rcList
+            For Each rc In redC.rcList
                 If rc.pixels > 0 Then dst1(rc.rect).SetTo(255, rc.mask)
                 If rc.pixels > 0 Then
                     Dim tmp As cv.Mat = task.depthmask(rc.rect) And rc.mask
@@ -10598,15 +10609,18 @@ Namespace VBClasses
 
 
     Public Class XO_RedCloud_Hulls : Inherits TaskParent
+        Dim redC As New RedCloud_Basics
         Public Sub New()
             desc = "Create a hull for each RedCloud cell."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            dst2 = runRedCloud(src, labels(2))
+            redC.Run(src)
+            dst2 = redC.dst2
+            labels(2) = redC.labels(2)
 
             dst3.SetTo(0)
             Dim hullCounts As New List(Of Integer)
-            For Each rc In task.redCloud.rcList
+            For Each rc In redC.rcList
                 rc.hull = cv.Cv2.ConvexHull(rc.hull.ToArray, True).ToList
                 DrawTour(dst3(rc.rect), rc.hull, rc.color, -1)
                 hullCounts.Add(rc.hull.Count)
@@ -11409,17 +11423,20 @@ Namespace VBClasses
     Public Class XO_RedCloudAndColor_Basics : Inherits TaskParent
         Public rcList As New List(Of rcData)
         Public rcMap = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        Dim redC As New RedCloud_Basics
         Dim reduction As New Reduction_Basics
         Public Sub New()
             task.gOptions.UseMotionMask.Checked = False
             desc = "Use RedColor for regions with no depth to add cells to RedCloud"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            dst2 = runRedCloud(src, labels(1))
+            redC.Run(src)
+            dst2 = redC.dst2
+            labels(2) = redC.labels(2)
 
             Static rcListLast = New List(Of rcData)
             Dim rcMapLast = rcMap.clone
-            rcList = New List(Of rcData)(task.redCloud.rcList)
+            rcList = New List(Of rcData)(redC.rcList)
 
             dst3 = task.gray
             dst3.SetTo(0, task.depthmask)
@@ -12437,6 +12454,7 @@ Namespace VBClasses
         Public rcList As New List(Of rcData)
         Public rcMap As cv.Mat = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         Public percentImage As Single
+        Dim redC As New RedCloud_Basics
         Public Sub New()
             If standalone Then task.gOptions.displayDst1.Checked = True
             desc = "Build contours for each cell"
@@ -12449,8 +12467,10 @@ Namespace VBClasses
             Return Nothing
         End Function
         Public Overrides Sub RunAlg(src As cv.Mat)
-            dst3 = runRedCloud(src, labels(3))
-            labels(2) = task.redCloud.labels(2) + If(standalone, "  Age of each cell is displayed as well.", "")
+            redC.Run(src)
+            dst3 = redC.dst2
+            labels(2) = redC.labels(2)
+            labels(2) = redC.labels(2) + If(standalone, "  Age of each cell is displayed as well.", "")
 
             Static rcListLast = New List(Of rcData)(rcList)
             Static rcMapLast As cv.Mat = rcMap.Clone
@@ -12460,7 +12480,7 @@ Namespace VBClasses
             rcMap.SetTo(0)
             dst2.SetTo(0)
             Dim unchangedCount As Integer
-            For Each rc In task.redCloud.rcList
+            For Each rc In redC.rcList
                 Dim r1 = rc.rect
                 r2 = New cv.Rect(0, 0, 1, 1) ' fake rect for conditional below...
                 Dim indexLast = rcMapLast.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X) - 1
@@ -12482,7 +12502,7 @@ Namespace VBClasses
                 rcList.Add(rc)
             Next
 
-            strOut = RedUtil_Basics.selectCell(task.redCloud.rcMap, task.redCloud.rcList)
+            strOut = RedUtil_Basics.selectCell(redC.rcMap, redC.rcList)
             If task.rcD IsNot Nothing Then strOut += vbCrLf + vbCrLf +
                                            Format(percentImage, "0.0%") + " of image" + vbCrLf +
                                            CStr(rcList.Count) + " cells present"
@@ -12497,18 +12517,22 @@ Namespace VBClasses
 
 
     Public Class XO_RedCloud_MotionCells : Inherits TaskParent
+        Dim redC As New RedCloud_Basics
         Public Sub New()
             task.gOptions.HistBinBar.Maximum = 255
             task.gOptions.HistBinBar.Value = 255
             desc = "Use motion to identify which cells changed."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            dst2 = runRedCloud(src, labels(2))
-            dst1 = task.redCloud.dst1
+            redC.Run(src)
+            dst2 = redC.dst2
+            labels(2) = redC.labels(2)
+
+            dst1 = redC.dst1
 
             dst3.SetTo(0)
             Dim count As Integer
-            For Each rc In task.redCloud.rcList
+            For Each rc In redC.rcList
                 If rc.age > 10 Then
                     dst3(rc.rect).SetTo(rc.color, rc.mask)
                     count += 1
@@ -13755,14 +13779,17 @@ Namespace VBClasses
 
     Public Class XO_RedCloud_Defect : Inherits TaskParent
         Public hull As New List(Of cv.Point)
+        Dim redC As New RedCloud_Basics
         Public Sub New()
             desc = "Find defects in the RedCloud cells."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            dst2 = runRedCloud(src, labels(2))
+            redC.Run(src)
+            dst2 = redC.dst2
+            labels(2) = redC.labels(2)
 
             dst3.SetTo(0)
-            For Each rc In task.redCloud.rcList
+            For Each rc In redC.rcList
                 Dim contour = ContourBuild(rc.mask)
                 Dim hullIndices = cv.Cv2.ConvexHullIndices(contour, False)
                 For i = 0 To contour.Count - 1
@@ -13797,14 +13824,17 @@ Namespace VBClasses
 
 
     Public Class XO_RedCloud_Motion : Inherits TaskParent
+        Public redC As New RedCloud_Basics
         Public Sub New()
             desc = "Run RedCloud with the motion-updated version of the pointcloud."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             Static unchanged As Integer
             Dim motionRect = XO_Motion_RectHistory.getMotionRect()
-            If motionRect.Width Or task.redCloud Is Nothing Then
-                dst2 = runRedCloud(task.pointCloud, labels(2))
+            If motionRect.Width Or redC Is Nothing Then
+                redC.Run(src)
+                dst2 = redC.dst2
+                labels(2) = redC.labels(2)
             Else
                 unchanged += 1
             End If
@@ -13813,11 +13843,11 @@ Namespace VBClasses
             dst2.Rectangle(motionRect, task.highlight, task.lineWidth)
 
             If standaloneTest() Then
-                For Each rc In task.redCloud.rcList
+                For Each rc In redC.rcList
                     SetTrueText(CStr(rc.age), rc.maxDist)
                 Next
 
-                strOut = RedUtil_Basics.selectCell(task.redCloud.rcMap, task.redCloud.rcList)
+                strOut = RedUtil_Basics.selectCell(redC.rcMap, redC.rcList)
                 SetTrueText(strOut, 3)
             End If
 
@@ -14021,7 +14051,7 @@ Namespace VBClasses
             reduction.Run(src)
 
             Dim index = reduction.classCount + 1
-            For Each rc In task.redCloud.rcList
+            For Each rc In redC.rcList
                 reduction.dst2(rc.rect).SetTo(index, rc.mask)
                 index += 1
                 If index >= 255 Then Exit For
@@ -14038,33 +14068,6 @@ Namespace VBClasses
         End Sub
     End Class
 
-
-
-
-
-    Public Class XO_RedColor_CloudMask : Inherits TaskParent
-        Dim redCell As New NR_RedCloud_CellMask
-        Dim reduction As New Reduction_Basics
-        Dim redC As New RedColor_Basics
-        Public Sub New()
-            desc = "Use the NR_RedCloud_CellMask to build better RedColor cells."
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            redCell.Run(src)
-
-            reduction.Run(src)
-            reduction.dst2.SetTo(0, redCell.dst3)
-
-            redC.Run(reduction.dst2)
-            labels(2) = redC.labels(2)
-            dst2 = redC.dst2
-
-            If standaloneTest() Then
-                strOut = RedUtil_Basics.selectCell(redC.rcMap, redC.rcList)
-                SetTrueText(strOut, 3)
-            End If
-        End Sub
-    End Class
 
 
 
@@ -14151,7 +14154,7 @@ Namespace VBClasses
             End If
 
             colorIDList.Clear()
-            For Each rc In task.redCloud.rcList
+            For Each rc In redCC.redC.rcList
                 Dim tmp = dst1(rc.rect)
                 tmp.SetTo(0, Not rc.mask)
 
@@ -14184,14 +14187,14 @@ Namespace VBClasses
     Public Class XO_RedCC_UseHistIDs : Inherits TaskParent
         Dim histID As New XO_RedCC_Histograms
         Public Sub New()
-            desc = "Add the colors to the cell mask if they are in the use colorIDs"
+            desc = "Add the colors to the cell mask if they are in the used colorIDs"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             histID.Run(src)
             dst2 = histID.dst2
             labels(2) = histID.labels(2)
 
-            For Each rc In task.redCloud.rcList
+            For Each rc In histID.redCC.redC.rcList
                 Dim colorMask As New cv.Mat(rc.rect.Size, cv.MatType.CV_8U, 0)
                 For Each index In histID.colorIDList(rc.index - 1)
                     colorMask = colorMask Or histID.redCC.color8u.dst2(rc.rect).InRange(index, index)
@@ -14199,7 +14202,7 @@ Namespace VBClasses
                 rc.mask = rc.mask Or colorMask
             Next
 
-            strOut = RedUtil_Basics.selectCell(task.redCloud.rcMap, task.redCloud.rcList)
+            strOut = RedUtil_Basics.selectCell(histID.redCC.redC.rcMap, histID.redCC.redC.rcList)
             If task.rcD IsNot Nothing And task.rcD.pixels > 0 Then
                 dst3.SetTo(0)
                 dst3(task.rcD.rect).SetTo(white, task.rcD.mask)
@@ -16806,6 +16809,7 @@ Namespace VBClasses
 
     Public Class XO_RedCloud_Small : Inherits TaskParent
         Dim minRes As cv.Size
+        Dim redC As New RedCloud_Basics
         Public Sub New()
             Select Case CStr(task.cols) + "x" + CStr(task.rows)
                 Case "1920x1080", "960x540", "480x270"
@@ -16824,7 +16828,10 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             Dim minRect = New cv.Rect(0, 0, minRes.Width, minRes.Height)
             If src.Size <> minRes Then src = task.pointCloud.Resize(minRes) Else src = task.pointCloud
-            dst1 = runRedCloud(src, labels(2))(minRect)
+            redC.Run(src)
+            dst1 = redC.dst2(minRect)
+            labels(2) = redC.labels(2)
+
             dst2 = dst1.Resize(task.workRes)
 
             If task.firstPass Then
@@ -16832,16 +16839,16 @@ Namespace VBClasses
             End If
 
             Dim ratio = task.workRes.Width \ minRes.Width
-            task.redCloud.rcMap.SetTo(0)
-            For Each rc In task.redCloud.rcList
+            redC.rcMap.SetTo(0)
+            For Each rc In redC.rcList
                 Dim r = rc.rect
                 rc.rect = New cv.Rect(r.X * ratio, r.Y * ratio, r.Width * ratio, r.Height * ratio)
                 Dim maskSize = New cv.Size(rc.rect.Width, rc.rect.Height)
                 rc.mask = rc.mask.Resize(maskSize)
-                task.redCloud.rcMap(rc.rect).SetTo(rc.index, rc.mask)
+                redC.rcMap(rc.rect).SetTo(rc.index, rc.mask)
             Next
 
-            strOut = RedUtil_Basics.selectCell(task.redCloud.rcMap, task.redCloud.rcList)
+            strOut = RedUtil_Basics.selectCell(redC.rcMap, redC.rcList)
             SetTrueText(strOut, 3)
         End Sub
     End Class

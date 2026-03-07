@@ -40,8 +40,8 @@ Namespace VBClasses
     Public Class RedCC_BasicsCombined : Inherits TaskParent
         Dim reduction As New Reduction_Basics
         Public rcList As List(Of rcData)
-        Dim redC1 As New RedColor_Basics
-        Dim redC2 As New RedCloud_Contours
+        Public redC1 As New RedColor_Basics
+        Public redC2 As New RedCloud_Contours
         Public Sub New()
             If standalone Then task.gOptions.displayDst1.Checked = True
             labels(1) = "Contours of each RedCloud cell - if missing some, CV_8U is the problem."
@@ -54,7 +54,7 @@ Namespace VBClasses
             reduction.Run(src)
 
             Dim index = reduction.classCount + 1
-            For Each rc In task.redCloud.rcList
+            For Each rc In redC2.rcList
                 reduction.dst2(rc.rect).SetTo(index, rc.mask)
                 Dim listOfPoints = New List(Of List(Of cv.Point))({rc.contour})
                 cv.Cv2.DrawContours(reduction.dst2(rc.rect), listOfPoints, 0,
@@ -81,7 +81,7 @@ Namespace VBClasses
 
     Public Class RedCC_Color8U : Inherits TaskParent
         Public color8u As New Color8U_Basics
-        Dim redC As New RedCloud_Basics
+        Public redC As New RedCloud_Basics
         Public Sub New()
             desc = "Map the colors in the point cloud."
         End Sub
@@ -154,8 +154,6 @@ Namespace VBClasses
             dst2 = redCC.dst2
             labels(2) = redCC.labels(2)
 
-            strOut = RedUtil_Basics.selectCell(task.redCloud.rcMap, task.redCloud.rcList)
-            strOut = RedUtil_Basics.selectCell(redCC.redC1.rcMap, redCC.redC1.rcList)
             labels(3) = "Select a RedCloud cell to see the histogram"
 
             If task.rcD Is Nothing Then
