@@ -180,7 +180,7 @@ RedPrep
 RedTrack
 Reduction
 RedUtil
-RedWG
+RedWGrid
 Region
 Remap
 Resize

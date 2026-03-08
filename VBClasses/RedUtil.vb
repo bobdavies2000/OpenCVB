@@ -128,21 +128,21 @@ Namespace VBClasses
         Public Shared Function selectCell(rcMap As cv.Mat, rcList As List(Of rcData)) As String
             Dim clickIndex As Integer = 0, strOut As String = ""
             If rcList.Count > 0 Then
-                clickIndex = rcMap.Get(Of Integer)(Task.clickPoint.Y, Task.clickPoint.X)
+                clickIndex = rcMap.Get(Of Integer)(vbc.task.clickPoint.Y, vbc.task.clickPoint.X)
                 If clickIndex > 0 And clickIndex < rcList.Count Then
-                    Task.rcD = rcList(clickIndex - 1)
-                    If Task.rcD.pixels >= 10 Then
-                        strOut = Task.rcD.displayCell()
-                        Task.color(Task.rcD.rect).SetTo(white, Task.rcD.mask)
-                        Task.color.Rectangle(Task.rcD.rect, Task.highlight, Task.lineWidth)
+                    vbc.task.rcD = rcList(clickIndex - 1)
+                    If vbc.task.rcD.pixels >= 10 Then
+                        strOut = vbc.task.rcD.displayCell()
+                        vbc.task.color(vbc.task.rcD.rect).SetTo(white, vbc.task.rcD.mask)
+                        vbc.task.color.Rectangle(vbc.task.rcD.rect, vbc.task.highlight, vbc.task.lineWidth)
                     Else
                         strOut = "RedCloud cell is too small to identify."
-                        Dim gridIndex = Task.gridMap.Get(Of Integer)(Task.clickPoint.Y, Task.clickPoint.X)
-                        Task.color(Task.gridRects(gridIndex)).SetTo(white)
-                        Task.color.Rectangle(Task.gridRects(gridIndex), Task.highlight, Task.lineWidth)
+                        Dim gridIndex = vbc.task.gridMap.Get(Of Integer)(vbc.task.clickPoint.Y, vbc.task.clickPoint.X)
+                        task.color(vbc.task.gridRects(gridIndex)).SetTo(white)
+                        task.color.Rectangle(vbc.task.gridRects(gridIndex), vbc.task.highlight, vbc.task.lineWidth)
                     End If
                 Else
-                    If Task.rcD IsNot Nothing Then Task.rcD = Nothing
+                    If vbc.task.rcD IsNot Nothing Then vbc.task.rcD = Nothing
                 End If
             End If
             Return strOut

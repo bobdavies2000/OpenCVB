@@ -1,7 +1,7 @@
 ﻿Imports cv = OpenCvSharp
 Namespace VBClasses
-    Public Class RedWG_Basics : Inherits TaskParent
-        Dim redC As New RedCloud_Flood_CPP
+    Public Class RedWGrid_Basics : Inherits TaskParent
+        Dim redC As New RedCloud_Basics
         Dim currSet As New List(Of cv.Point)
         Public Sub New()
             If standalone Then task.gOptions.displayDst1.Checked = True
@@ -33,7 +33,7 @@ Namespace VBClasses
             strOut = RedUtil_Basics.selectCell(redC.rcMap, redC.rcList)
             SetTrueText(strOut, 1)
 
-            labels(3) = CStr(count) + " cells were not matched using wc since the last heartbeatLT"
+            labels(3) = CStr(count) + " unstable cells = not matched since the last heartbeatLT"
         End Sub
     End Class
 
@@ -41,7 +41,7 @@ Namespace VBClasses
 
 
 
-    Public Class RedWG_ValidateRows : Inherits TaskParent
+    Public Class RedWGrid_ValidateRows : Inherits TaskParent
         Dim redC As New RedCloud_Basics
         Public Sub New()
             desc = "Validate how consistent the world grid entries are."
@@ -76,10 +76,11 @@ Namespace VBClasses
 
 
 
-    Public Class RedWG_ValidateCols : Inherits TaskParent
+    Public Class RedWGrid_ValidateCols : Inherits TaskParent
         Dim redC As New RedCloud_Basics
         Public rcList As New List(Of rcData)
         Public column As Integer
+        Public ptX As New List(Of Integer)
         Public Sub New()
             desc = "Validate how consistent the world grid entries are."
         End Sub
@@ -91,7 +92,7 @@ Namespace VBClasses
                 rcList = redC.rcList
             End If
 
-            Dim ptX As New List(Of Integer)
+            ptX.Clear()
             For Each rc In rcList
                 ptX.Add(rc.wGrid.X)
             Next
@@ -116,19 +117,16 @@ Namespace VBClasses
 
 
 
-    Public Class RedWG_Duplicates : Inherits TaskParent
-        Dim redC As New RedCloud_Basics
+    Public Class RedWGrid_Duplicates : Inherits TaskParent
+        Public redC As New RedCloud_Basics
         Public rcList As New List(Of rcData)
         Public rcMap As New cv.Mat(dst2.Size, cv.MatType.CV_32S, 0)
-        Dim validC As New RedWG_ValidateCols
         Public Sub New()
-            validC.column = 0
             dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
             desc = "Consolidate duplicate world grid coordinates."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             redC.Run(src)
-            dst2 = redC.dst2
             labels(2) = redC.labels(2)
 
             Dim dups As New SortedList(Of String, Integer)(New compareAllowIdenticalString)
@@ -153,6 +151,7 @@ Namespace VBClasses
                     If rc1 Is Nothing Then
                         newList.Add(redC.rcList(dups.Values(i - 1)))
                     Else
+                        rc1.multiMask = True
                         rc1.rect = r
                         rc1.mask = dst1(r)
                         newList.Add(rc1)
@@ -161,17 +160,78 @@ Namespace VBClasses
                 End If
             Next
 
-            rcList = New List(Of rcData)(newList)
+            rcList.Clear()
             rcMap.SetTo(0)
-            For Each rc In rcList
+            dst2.SetTo(0)
+            For Each rc In newList
+                rc = New rcData(rc.mask, rc.rect, rcList.Count + 1)
                 rcMap(rc.rect).SetTo(rc.color, rc.mask)
+                rcList.Add(rc)
+                dst2(rc.rect).SetTo(rc.color, rc.mask)
             Next
 
-            validC.rcList = rcList
-            validC.dst2 = dst2
-            validC.Run(Nothing)
-            SetTrueText(validC.strOut, 3)
             labels(3) = CStr(count) + " duplicate world grid coordinates found"
+        End Sub
+    End Class
+
+
+
+
+
+    Public Class RedWGrid_Click : Inherits TaskParent
+        Dim dups As New RedWGrid_Duplicates
+        Dim options As New Options_WGrid
+        Public Sub New()
+            desc = "Click on any RedCloud cell to see similar cells connected by the wGrid point."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            options.Run()
+
+            dups.Run(src)
+            dst2 = dups.dst2
+            labels(2) = dups.labels(2)
+
+            strOut = RedUtil_Basics.selectCell(dups.redC.rcMap, dups.redC.rcList)
+            If task.rcD Is Nothing Then
+                SetTrueText("Click on any cell present in dst2", 3)
+                Exit Sub
+            End If
+
+            SetTrueText(strOut, 3)
+
+            Select Case options.clickName
+                Case "Identify Row"
+                    Dim row = task.rcD.wGrid.Y
+                    If row <> 0 Then Dim k = 0
+                    For Each rc In dups.redC.rcList
+                        If rc.wGrid.Y = row Then
+                            dst2(rc.rect).SetTo(white, rc.mask)
+                        End If
+                    Next
+                    labels(3) = "Row " + CStr(row) + " selected"
+                Case "Identify Col"
+                    Dim col = task.rcD.wGrid.X
+                    For Each rc In dups.redC.rcList
+                        If rc.wGrid.X = col Then
+                            dst2(rc.rect).SetTo(white, rc.mask)
+                        End If
+                    Next
+                    labels(3) = "Col " + CStr(col) + " selected"
+                Case "Identify Neighbors"
+                    Dim row = task.rcD.wGrid.Y
+                    Dim col = task.rcD.wGrid.X
+                    For Each rc In dups.redC.rcList
+                        If Math.Abs(task.rcD.wGrid.X - rc.wGrid.X) <= 1 And
+                           Math.Abs(task.rcD.wGrid.Y - rc.wGrid.Y) <= 1 Then
+                            dst2(rc.rect).SetTo(white, rc.mask)
+                        End If
+                    Next
+                Case "Identify Multi-Mask Cells"
+                    For Each rc In dups.redC.rcList
+                        If rc.multiMask Then dst2(rc.rect).SetTo(white, rc.mask)
+                    Next
+            End Select
+
         End Sub
     End Class
 

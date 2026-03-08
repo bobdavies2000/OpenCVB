@@ -8180,4 +8180,26 @@ Namespace VBClasses
         End Sub
     End Class
 
+
+
+
+
+    Public Class Options_WGrid : Inherits OptionParent
+        Public clickName As String
+        Public Sub New()
+            If FindFrm(traceName + " Radio Buttons") Is Nothing Then
+                radio.Setup(traceName)
+                radio.addRadio("Identify Row")
+                radio.addRadio("Identify Col")
+                radio.addRadio("Identify Neighbors")
+                radio.addRadio("Identify Multi-Mask Cells")
+                radio.check(0).Checked = True
+            End If
+        End Sub
+        Public Sub Run()
+            Static frm = FindFrm(traceName + " Radio Buttons")
+            clickName = frm.check(findRadioIndex(frm.check)).Text
+        End Sub
+    End Class
+
 End Namespace

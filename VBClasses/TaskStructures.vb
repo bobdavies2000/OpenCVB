@@ -542,6 +542,7 @@ Namespace VBClasses
             Public gridIndex As Integer
             Public mask As cv.Mat
             Public maxDist As cv.Point
+            Public multiMask As Boolean ' indicates if RedWGrid found duplicate wGrid points in the rclist.
             Public pixels As Integer
             Public rect As cv.Rect
             Public wGrid As cv.Point
@@ -549,12 +550,13 @@ Namespace VBClasses
             Public eq As cv.Vec4f ' only here for compatibility
             Public Sub New()
             End Sub
-            Public Sub New(_mask As cv.Mat, _rect As cv.Rect, _index As Integer, Optional minContours As Integer = 3)
+            Public Sub New(_mask As cv.Mat, _rect As cv.Rect, _index As Integer,
+                           Optional combinedMask As Boolean = False)
                 rect = _rect
                 mask = _mask.InRange(_index, _index)
                 contour = ContourBuild(mask)
                 index = _index
-                If contour.Count >= minContours Then
+                If contour.Count >= 3 Then ' need at least 3 points for a contour.
                     Dim listOfPoints = New List(Of List(Of cv.Point))({contour})
                     mask = New cv.Mat(mask.Size, cv.MatType.CV_8U, 0)
                     cv.Cv2.DrawContours(mask, listOfPoints, 0, cv.Scalar.All(index), -1, cv.LineTypes.Link4)
@@ -562,7 +564,7 @@ Namespace VBClasses
                     ' keep the hull points around (there aren't many of them.)
                     hull = cv.Cv2.ConvexHull(contour.ToArray, True).ToList
                 Else
-                    mask = New cv.Mat(rect.Size, cv.MatType.CV_8U, 255)
+                    mask = _mask
                 End If
                 buildMaxDist()
 

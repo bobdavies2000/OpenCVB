@@ -1539,10 +1539,11 @@ RedTrack_Basics
 Reduction_Basics
 Reduction_PointCloud
 RedUtil_Basics
-RedWG_Basics
-RedWG_Duplicates
-RedWG_ValidateCols
-RedWG_ValidateRows
+RedWGrid_Basics
+RedWGrid_Click
+RedWGrid_Duplicates
+RedWGrid_ValidateCols
+RedWGrid_ValidateRows
 Region_Basics
 Region_Contours
 Region_Core
