@@ -19023,4 +19023,80 @@ Namespace VBClasses
             rcMap = redC.rcMap.Clone
         End Sub
     End Class
+
+
+
+
+
+    Public Class XO_RedWGrid_ValidateRows : Inherits TaskParent
+        Dim redC As New RedCloud_Basics
+        Public Sub New()
+            desc = "Validate how consistent the world grid entries are."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            redC.Run(src)
+            dst2 = redC.dst2
+            labels(2) = redC.labels(2)
+
+            Dim ptY As New List(Of Integer)
+            For Each rc In redC.rcList
+                ptY.Add(rc.wGrid.Y)
+            Next
+
+            Static row As Integer = ptY.Min
+            If ptY.Count = 0 Then
+                SetTrueText("There are no cells available" + vbCrLf + "Increase the reduction factor.")
+                Exit Sub
+            End If
+
+            For Each rc In redC.rcList
+                If rc.wGrid.Y = row Then dst2(rc.rect).SetTo(white, rc.mask)
+            Next
+
+            If task.heartBeat Or row < ptY.Min Then row += 1
+            SetTrueText("World Grid Row " + CStr(row) + " highlighted", 3)
+            If row >= ptY.Max Then row = ptY.Min
+        End Sub
+    End Class
+
+
+
+
+
+    Public Class XO_RedWGrid_ValidateCols : Inherits TaskParent
+        Dim redC As New RedCloud_Basics
+        Public rcList As New List(Of rcData)
+        Public column As Integer
+        Public ptX As New List(Of Integer)
+        Public Sub New()
+            desc = "Validate how consistent the world grid entries are."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            If src IsNot Nothing Then
+                redC.Run(src)
+                dst2 = redC.dst2
+                labels(2) = redC.labels(2)
+                rcList = redC.rcList
+            End If
+
+            ptX.Clear()
+            For Each rc In rcList
+                ptX.Add(rc.wGrid.X)
+            Next
+
+            If ptX.Count = 0 Then
+                SetTrueText("There are no cells available" + vbCrLf + "Increase the reduction factor.")
+                Exit Sub
+            End If
+
+            For Each rc In rcList
+                If rc.wGrid.X = column Then dst2(rc.rect).SetTo(white, rc.mask)
+            Next
+
+            If task.heartBeat Then column += 1
+            strOut = "World Grid Col " + CStr(column) + " highlighted"
+            SetTrueText(strOut, 3)
+            If column >= ptX.Max Then column = ptX.Min
+        End Sub
+    End Class
 End Namespace

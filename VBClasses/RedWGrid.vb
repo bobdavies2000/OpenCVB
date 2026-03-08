@@ -41,82 +41,6 @@ Namespace VBClasses
 
 
 
-    Public Class RedWGrid_ValidateRows : Inherits TaskParent
-        Dim redC As New RedCloud_Basics
-        Public Sub New()
-            desc = "Validate how consistent the world grid entries are."
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            redC.Run(src)
-            dst2 = redC.dst2
-            labels(2) = redC.labels(2)
-
-            Dim ptY As New List(Of Integer)
-            For Each rc In redC.rcList
-                ptY.Add(rc.wGrid.Y)
-            Next
-
-            Static row As Integer = ptY.Min
-            If ptY.Count = 0 Then
-                SetTrueText("There are no cells available" + vbCrLf + "Increase the reduction factor.")
-                Exit Sub
-            End If
-
-            For Each rc In redC.rcList
-                If rc.wGrid.Y = row Then dst2(rc.rect).SetTo(white, rc.mask)
-            Next
-
-            If task.heartBeat Or row < ptY.Min Then row += 1
-            SetTrueText("World Grid Row " + CStr(row) + " highlighted", 3)
-            If row >= ptY.Max Then row = ptY.Min
-        End Sub
-    End Class
-
-
-
-
-
-    Public Class RedWGrid_ValidateCols : Inherits TaskParent
-        Dim redC As New RedCloud_Basics
-        Public rcList As New List(Of rcData)
-        Public column As Integer
-        Public ptX As New List(Of Integer)
-        Public Sub New()
-            desc = "Validate how consistent the world grid entries are."
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            If src IsNot Nothing Then
-                redC.Run(src)
-                dst2 = redC.dst2
-                labels(2) = redC.labels(2)
-                rcList = redC.rcList
-            End If
-
-            ptX.Clear()
-            For Each rc In rcList
-                ptX.Add(rc.wGrid.X)
-            Next
-
-            If ptX.Count = 0 Then
-                SetTrueText("There are no cells available" + vbCrLf + "Increase the reduction factor.")
-                Exit Sub
-            End If
-
-            For Each rc In rcList
-                If rc.wGrid.X = column Then dst2(rc.rect).SetTo(white, rc.mask)
-            Next
-
-            If task.heartBeat Then column += 1
-            strOut = "World Grid Col " + CStr(column) + " highlighted"
-            SetTrueText(strOut, 3)
-            If column >= ptX.Max Then column = ptX.Min
-        End Sub
-    End Class
-
-
-
-
-
     Public Class RedWGrid_Duplicates : Inherits TaskParent
         Public redC As New RedCloud_Basics
         Public rcList As New List(Of rcData)
@@ -146,6 +70,8 @@ Namespace VBClasses
                     dst1(r).SetTo(0)
                     dst1(rc1.rect).SetTo(255, rc1.mask)
                     dst1(rc2.rect).SetTo(255, rc2.mask)
+                    rc1.rect = r
+                    rc1.mask = dst1(r)
                     count += 1
                 Else
                     If rc1 Is Nothing Then
@@ -164,12 +90,22 @@ Namespace VBClasses
             rcMap.SetTo(0)
             dst2.SetTo(0)
             For Each rc In newList
-                rc = New rcData(rc.mask, rc.rect, rcList.Count + 1)
-                rcMap(rc.rect).SetTo(rc.color, rc.mask)
+                If rc.multiMask Then rc = New rcData(rc.mask, rc.rect, rcList.Count + 1, rc.multiMask)
+                rc.index = rcList.Count + 1
+                rcMap(rc.rect).SetTo(rc.index, rc.mask)
                 rcList.Add(rc)
                 dst2(rc.rect).SetTo(rc.color, rc.mask)
             Next
 
+            For Each rc In rcList
+                If rc.multiMask = False Then
+                    Dim k = 0
+                End If
+            Next
+            strOut = RedUtil_Basics.selectCell(rcMap, rcList)
+            SetTrueText(strOut, 3)
+
+            labels(2) = CStr(rcList.Count) + " cells remain after removing " + CStr(count) + " duplicate wGrid points."
             labels(3) = CStr(count) + " duplicate world grid coordinates found"
         End Sub
     End Class
@@ -191,7 +127,7 @@ Namespace VBClasses
             dst2 = dups.dst2
             labels(2) = dups.labels(2)
 
-            strOut = RedUtil_Basics.selectCell(dups.redC.rcMap, dups.redC.rcList)
+            strOut = RedUtil_Basics.selectCell(dups.rcMap, dups.rcList)
             If task.rcD Is Nothing Then
                 SetTrueText("Click on any cell present in dst2", 3)
                 Exit Sub
@@ -202,7 +138,6 @@ Namespace VBClasses
             Select Case options.clickName
                 Case "Identify Row"
                     Dim row = task.rcD.wGrid.Y
-                    If row <> 0 Then Dim k = 0
                     For Each rc In dups.redC.rcList
                         If rc.wGrid.Y = row Then
                             dst2(rc.rect).SetTo(white, rc.mask)

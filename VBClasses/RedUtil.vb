@@ -142,7 +142,7 @@ Namespace VBClasses
                         task.color.Rectangle(vbc.task.gridRects(gridIndex), vbc.task.highlight, vbc.task.lineWidth)
                     End If
                 Else
-                    If vbc.task.rcD IsNot Nothing Then vbc.task.rcD = Nothing
+                    vbc.task.rcD = Nothing
                 End If
             End If
             Return strOut

@@ -1542,8 +1542,6 @@ RedUtil_Basics
 RedWGrid_Basics
 RedWGrid_Click
 RedWGrid_Duplicates
-RedWGrid_ValidateCols
-RedWGrid_ValidateRows
 Region_Basics
 Region_Contours
 Region_Core
