@@ -674,6 +674,13 @@ Namespace VBClasses
                 Return -1
             End Function
         End Class
+        Public Class compareAllowIdenticalString : Implements IComparer(Of String)
+            Public Function Compare(ByVal a As String, ByVal b As String) As Integer Implements IComparer(Of String).Compare
+                ' why have compare for just unequal?  So we can get duplicates.  Nothing below returns a zero (equal)
+                If a <= b Then Return 1
+                Return -1
+            End Function
+        End Class
         Public Class compareByte : Implements IComparer(Of Byte)
             Public Function Compare(ByVal a As Byte, ByVal b As Byte) As Integer Implements IComparer(Of Byte).Compare
                 If a <= b Then Return -1

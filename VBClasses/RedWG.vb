@@ -78,31 +78,36 @@ Namespace VBClasses
 
     Public Class RedWG_ValidateCols : Inherits TaskParent
         Dim redC As New RedCloud_Basics
+        Public rcList As New List(Of rcData)
+        Public column As Integer
         Public Sub New()
             desc = "Validate how consistent the world grid entries are."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            redC.Run(src)
-            dst2 = redC.dst2
-            labels(2) = redC.labels(2)
+            If src IsNot Nothing Then
+                redC.Run(src)
+                dst2 = redC.dst2
+                labels(2) = redC.labels(2)
+                rcList = redC.rcList
+            End If
 
             Dim ptX As New List(Of Integer)
-            For Each rc In redC.rcList
+            For Each rc In rcList
                 ptX.Add(rc.wGrid.X)
             Next
 
-            Static column As Integer = ptX.Min
             If ptX.Count = 0 Then
                 SetTrueText("There are no cells available" + vbCrLf + "Increase the reduction factor.")
                 Exit Sub
             End If
 
-            For Each rc In redC.rcList
+            For Each rc In rcList
                 If rc.wGrid.X = column Then dst2(rc.rect).SetTo(white, rc.mask)
             Next
 
             If task.heartBeat Then column += 1
-            SetTrueText("World Grid Col " + CStr(column) + " highlighted", 3)
+            strOut = "World Grid Col " + CStr(column) + " highlighted"
+            SetTrueText(strOut, 3)
             If column >= ptX.Max Then column = ptX.Min
         End Sub
     End Class
@@ -113,7 +118,12 @@ Namespace VBClasses
 
     Public Class RedWG_Duplicates : Inherits TaskParent
         Dim redC As New RedCloud_Basics
+        Public rcList As New List(Of rcData)
+        Public rcMap As New cv.Mat(dst2.Size, cv.MatType.CV_32S, 0)
+        Dim validC As New RedWG_ValidateCols
         Public Sub New()
+            validC.column = 0
+            dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
             desc = "Consolidate duplicate world grid coordinates."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -121,10 +131,47 @@ Namespace VBClasses
             dst2 = redC.dst2
             labels(2) = redC.labels(2)
 
-            Dim dups As New SortedList(Of String, Integer)
+            Dim dups As New SortedList(Of String, Integer)(New compareAllowIdenticalString)
             For Each rc In redC.rcList
-                dups.Add(Format(rc.wGrid.X, "000") + Format(rc.wGrid.Y, "000"), rc.index)
+                dups.Add(Format(rc.wGrid.X, "000") + Format(rc.wGrid.Y, "000"), rc.index - 1)
             Next
+
+            Dim count As Integer
+            Dim newList As New List(Of rcData)
+            Dim rc1 As rcData = Nothing, rc2 As rcData
+            Dim r As cv.Rect
+            For i = 1 To dups.Count - 1
+                If dups.Keys(i - 1) = dups.Keys(i) Then
+                    If rc1 Is Nothing Then rc1 = redC.rcList(dups.Values(i - 1))
+                    rc2 = redC.rcList(dups.Values(i))
+                    r = rc1.rect.Union(rc2.rect)
+                    dst1(r).SetTo(0)
+                    dst1(rc1.rect).SetTo(255, rc1.mask)
+                    dst1(rc2.rect).SetTo(255, rc2.mask)
+                    count += 1
+                Else
+                    If rc1 Is Nothing Then
+                        newList.Add(redC.rcList(dups.Values(i - 1)))
+                    Else
+                        rc1.rect = r
+                        rc1.mask = dst1(r)
+                        newList.Add(rc1)
+                        rc1 = Nothing
+                    End If
+                End If
+            Next
+
+            rcList = New List(Of rcData)(newList)
+            rcMap.SetTo(0)
+            For Each rc In rcList
+                rcMap(rc.rect).SetTo(rc.color, rc.mask)
+            Next
+
+            validC.rcList = rcList
+            validC.dst2 = dst2
+            validC.Run(Nothing)
+            SetTrueText(validC.strOut, 3)
+            labels(3) = CStr(count) + " duplicate world grid coordinates found"
         End Sub
     End Class
 
