@@ -20,7 +20,7 @@ Namespace VBClasses
             options.Run()
             src.CopyTo(dst2)
             Dim mask As cv.Mat = drawRandomLine(dst2)
-            cv.Cv2.Inpaint(dst2, mask, dst3, task.lineWidth, If(options.telea, cv.InpaintMethod.Telea, cv.InpaintMethod.NS))
+            cv.Cv2.Inpaint(dst2, mask, dst3, task.lineWidth, If(options.telea, cv.InpaintTypes.Telea, cv.InpaintTypes.NS))
         End Sub
     End Class
 
@@ -40,7 +40,8 @@ Namespace VBClasses
             Options.Run()
             noise.Run(src) ' create some noise in the result1 image.
             dst2 = noise.dst2
-            cv.Cv2.Inpaint(dst2, noise.noiseMask, dst3, noise.options.noiseWidth, If(options.telea, cv.InpaintMethod.Telea, cv.InpaintMethod.NS))
+            cv.Cv2.Inpaint(dst2, noise.noiseMask, dst3, noise.options.noiseWidth, If(options.telea,
+                           cv.InpaintTypes.Telea, cv.InpaintTypes.NS))
         End Sub
     End Class
 
@@ -61,7 +62,7 @@ Namespace VBClasses
             options.Run()
             If src.Type <> cv.MatType.CV_32F Then src = task.pcSplit(2)
             dst2 = src.Clone
-            cv.Cv2.Inpaint(src, task.noDepthMask, dst3, 20, If(options.telea, cv.InpaintMethod.Telea, cv.InpaintMethod.NS))
+            cv.Cv2.Inpaint(src, task.noDepthMask, dst3, 20, If(options.telea, cv.InpaintTypes.Telea, cv.InpaintTypes.NS))
         End Sub
     End Class
 
@@ -86,7 +87,7 @@ Namespace VBClasses
             For i = 0 To task.pcSplit.Count - 1
                 split(i) = New cv.Mat
                 cv.Cv2.Inpaint(task.pcSplit(i), task.noDepthMask, split(i), 20,
-                            If(options.telea, cv.InpaintMethod.Telea, cv.InpaintMethod.NS))
+                            If(options.telea, cv.InpaintTypes.Telea, cv.InpaintTypes.NS))
             Next
             cv.Cv2.Merge(split, dst3)
         End Sub
@@ -105,7 +106,7 @@ Namespace VBClasses
 
             ' Apply inpainting to fill missing pixels
             cv.Cv2.Inpaint(task.pcSplit(2), task.noDepthMask, dst2, options.radius,
-                           If(options.telea, cv.InpaintMethod.Telea, cv.InpaintMethod.NS))
+                           If(options.telea, cv.InpaintTypes.Telea, cv.InpaintTypes.NS))
         End Sub
     End Class
 

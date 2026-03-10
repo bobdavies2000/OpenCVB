@@ -4486,7 +4486,7 @@ Namespace VBClasses
         Public blueChange As Double = 0.5
         Public greenChange As Double = 0.5
         Public redChange As Double = 1.5
-        Public cloneFlag As cv.SeamlessCloneMethods = cv.SeamlessCloneMethods.MixedClone
+        Public cloneFlag As cv.SeamlessCloneFlags = cv.SeamlessCloneFlags.MixedClone
         Public Sub New()
             If sliders.Setup(traceName) Then
                 sliders.setupTrackBar("Alpha", 0, 20, alpha * 10)
@@ -4524,7 +4524,7 @@ Namespace VBClasses
             Static frm = FindFrm(traceName + " Radio Buttons")
             For i = 0 To frm.check.Count - 1
                 If frm.check(i).Checked Then
-                    cloneFlag = Choose(i + 1, cv.SeamlessCloneMethods.MixedClone, cv.SeamlessCloneMethods.MonochromeTransfer, cv.SeamlessCloneMethods.NormalClone)
+                    cloneFlag = Choose(i + 1, cv.SeamlessCloneFlags.MixedClone, cv.SeamlessCloneFlags.MonochromeTransfer, cv.SeamlessCloneFlags.NormalClone)
                     Exit For
                 End If
             Next

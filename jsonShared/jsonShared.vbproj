@@ -7,10 +7,10 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="OpenCvSharp4" Version="4.13.0.20260222" />
-    <PackageReference Include="OpenCvSharp4.Extensions" Version="4.13.0.20260222" />
-    <PackageReference Include="OpenCvSharp4.runtime.win" Version="4.13.0.20260222" />
-    <PackageReference Include="OpenCvSharp4.Windows" Version="4.13.0.20260222" />
+    <PackageReference Include="OpenCvSharp4" Version="4.13.0.20260308" />
+    <PackageReference Include="OpenCvSharp4.Extensions" Version="4.13.0.20260308" />
+    <PackageReference Include="OpenCvSharp4.runtime.win" Version="4.13.0.20260302" />
+    <PackageReference Include="OpenCvSharp4.Windows" Version="4.13.0.20260302" />
   </ItemGroup>
 
 </Project>

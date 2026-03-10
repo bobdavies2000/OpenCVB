@@ -392,10 +392,10 @@ Namespace VBClasses
                 If angle < -90.0 Then angle += 180.0
             End Sub
             Public Shared Function validatePoint(pt As cv.Point2f) As cv.Point2f
-                If pt.X < 0 Then pt.X = 0
-                If pt.X >= task.color.Width Then pt.X = task.color.Width - 1
-                If pt.Y < 0 Then pt.Y = 0
-                If pt.Y >= task.color.Height Then pt.Y = task.color.Height - 1
+                If CInt(pt.X) < 0 Then pt.X = 0
+                If CInt(pt.X) >= task.color.Width Then pt.X = task.color.Width - 1
+                If CInt(pt.Y) < 0 Then pt.Y = 0
+                If CInt(pt.Y) >= task.color.Height Then pt.Y = task.color.Height - 1
 
                 Return pt
             End Function
