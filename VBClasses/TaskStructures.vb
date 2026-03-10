@@ -553,14 +553,8 @@ Namespace VBClasses
             Public Sub New(_mask As cv.Mat, _rect As cv.Rect, _index As Integer,
                            Optional combinedMask As Boolean = False)
                 rect = _rect
-                If combinedMask = False Then
-                    mask = _mask.InRange(_index, _index)
-                    contour = ContourBuild(mask)
-                Else
-                    mask = _mask
-                    hull = Nothing
-                    contour = Nothing
-                End If
+                mask = _mask.InRange(_index, _index)
+                contour = ContourBuild(mask)
                 index = _index
                 If contour IsNot Nothing Then
                     If contour.Count >= 3 And combinedMask = False Then ' need at least 3 points for a contour.
@@ -572,7 +566,7 @@ Namespace VBClasses
                         hull = cv.Cv2.ConvexHull(contour.ToArray, True).ToList
                     End If
                 End If
-                If combinedMask = False Then buildMaxDist()
+                buildMaxDist()
 
                 gridIndex = task.gridMap.Get(Of Integer)(maxDist.Y, maxDist.X)
                 color = task.vecColors(index Mod 255)
@@ -581,7 +575,6 @@ Namespace VBClasses
                 Dim x = Math.Round(wcMean(0) * 1000 / task.reduction)
                 Dim y = Math.Round(wcMean(1) * 1000 / task.reduction)
                 wGrid = New cv.Point(x, y)
-                multiMask = combinedMask
                 If Single.IsInfinity(wcMean(2)) Then depthDelta = 0
             End Sub
             Public Shared Function getHullMask(hull As List(Of cv.Point), mask As cv.Mat) As cv.Mat

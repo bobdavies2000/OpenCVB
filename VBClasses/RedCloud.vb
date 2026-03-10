@@ -48,7 +48,7 @@ Namespace VBClasses
                 dst2(rc.rect).SetTo(rc.color, rc.mask)
             Next
 
-            If standalone Then
+            If standaloneTest() Then
                 strOut = RedUtil_Basics.selectCell(rcMap, rcList)
                 SetTrueText(strOut, 3)
             End If

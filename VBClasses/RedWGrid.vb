@@ -120,45 +120,59 @@ Namespace VBClasses
 
             Dim count As Integer
             Dim newList As New List(Of rcData)
-            Dim rc1 As rcData = redC.rcList(dups.Values(0))
-            Dim rc2 As rcData = redC.rcList(dups.Values(1))
-            Dim r = rc1.rect
+            Dim rc1 As rcData = Nothing
+            Dim rc2 As rcData = Nothing
+            Dim r As cv.Rect
             dst1.SetTo(0)
-            dst1(r).SetTo(255, rc1.mask)
             For i = 1 To dups.Count - 1
-                If dups.Keys(i - 1) = dups.Keys(i) Then
-                    rc2 = redC.rcList(dups.Values(i))
+                If rc1 Is Nothing Then rc1 = redC.rcList(dups.Values(i - 1))
+                rc2 = redC.rcList(dups.Values(i))
+                If rc1.wGrid = New cv.Point(-1, 0) Then Dim k = 0
+
+                If rc1.wGrid = rc2.wGrid Then
                     r = rc1.rect.Union(rc2.rect)
                     dst1(r).SetTo(0)
                     dst1(rc1.rect).SetTo(255, rc1.mask)
                     dst1(rc2.rect).SetTo(255, rc2.mask)
                     rc1.rect = r
-                    rc1.multiMask = True
                     rc1.mask = dst1(r).Clone
+                    rc1.color = If(rc1.pixels > rc2.pixels, rc1.color, rc2.color)
+                    rc1.multiMask = True
                     count += 1
                 Else
-                    rc1.rect = r
-                    rc1.mask = dst1(r).Clone
+                    If rc1.multiMask Then
+                        rc1.contour = Nothing
+                        rc1.hull = Nothing
+                        rc1.pixels = rc1.mask.CountNonZero
+                    End If
                     newList.Add(rc1)
-                    rc1 = redC.rcList(dups.Values(i))
+                    rc1 = Nothing
                 End If
             Next
+
+            If rc1 IsNot Nothing Then
+                rc1.contour = Nothing
+                rc1.hull = Nothing
+                rc1.pixels = rc1.mask.CountNonZero
+                newList.Add(rc1)
+            Else
+                newList.Add(rc2)
+            End If
 
             rcList.Clear()
             rcMap.SetTo(0)
             dst2.SetTo(0)
             For Each rc In newList
-                If rc.multiMask Then
-                    rc = New rcData(rc.mask, rc.rect, rcList.Count + 1, rc.multiMask)
-                End If
                 rc.index = rcList.Count + 1
                 rcMap(rc.rect).SetTo(rc.index, rc.mask)
                 rcList.Add(rc)
                 dst2(rc.rect).SetTo(rc.color, rc.mask)
             Next
 
-            strOut = RedUtil_Basics.selectCell(rcMap, rcList)
-            SetTrueText(strOut, 3)
+            If standaloneTest() Then
+                strOut = RedUtil_Basics.selectCell(rcMap, rcList)
+                SetTrueText(strOut, 3)
+            End If
 
             labels(2) = CStr(rcList.Count) + " cells remain after removing " + CStr(count) + " duplicate wGrid points."
             labels(3) = CStr(count) + " duplicate world grid coordinates found"
