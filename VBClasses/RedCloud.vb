@@ -48,8 +48,10 @@ Namespace VBClasses
                 dst2(rc.rect).SetTo(rc.color, rc.mask)
             Next
 
-            strOut = RedUtil_Basics.selectCell(rcMap, rcList)
-            SetTrueText(strOut, 3)
+            If standalone Then
+                strOut = RedUtil_Basics.selectCell(rcMap, rcList)
+                SetTrueText(strOut, 3)
+            End If
 
             labels(2) = CStr(unMatched) + " were new cells and " + CStr(matchCount) + " were matched, " +
                             "average age: " + Format(matchAverage / rcList.Count, fmt1)

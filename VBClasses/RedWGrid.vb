@@ -41,79 +41,6 @@ Namespace VBClasses
 
 
 
-    Public Class RedWGrid_Duplicates : Inherits TaskParent
-        Public redC As New RedCloud_Basics
-        Public rcList As New List(Of rcData)
-        Public rcMap As New cv.Mat(dst2.Size, cv.MatType.CV_32S, 0)
-        Public Sub New()
-            dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
-            desc = "Consolidate duplicate world grid coordinates."
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            redC.Run(src)
-            labels(2) = redC.labels(2)
-
-            Dim dups As New SortedList(Of String, Integer)(New compareAllowIdenticalString)
-            For Each rc In redC.rcList
-                dups.Add(Format(rc.wGrid.X, "000") + Format(rc.wGrid.Y, "000"), rc.index - 1)
-            Next
-
-            Dim count As Integer
-            Dim newList As New List(Of rcData)
-            Dim rc1 As rcData = Nothing, rc2 As rcData
-            Dim r As cv.Rect
-            For i = 1 To dups.Count - 1
-                If dups.Keys(i - 1) = dups.Keys(i) Then
-                    If rc1 Is Nothing Then rc1 = redC.rcList(dups.Values(i - 1))
-                    rc2 = redC.rcList(dups.Values(i))
-                    r = rc1.rect.Union(rc2.rect)
-                    dst1(r).SetTo(0)
-                    dst1(rc1.rect).SetTo(255, rc1.mask)
-                    dst1(rc2.rect).SetTo(255, rc2.mask)
-                    rc1.rect = r
-                    rc1.mask = dst1(r)
-                    count += 1
-                Else
-                    If rc1 Is Nothing Then
-                        newList.Add(redC.rcList(dups.Values(i - 1)))
-                    Else
-                        rc1.multiMask = True
-                        rc1.rect = r
-                        rc1.mask = dst1(r)
-                        newList.Add(rc1)
-                        rc1 = Nothing
-                    End If
-                End If
-            Next
-
-            rcList.Clear()
-            rcMap.SetTo(0)
-            dst2.SetTo(0)
-            For Each rc In newList
-                If rc.multiMask Then rc = New rcData(rc.mask, rc.rect, rcList.Count + 1, rc.multiMask)
-                rc.index = rcList.Count + 1
-                rcMap(rc.rect).SetTo(rc.index, rc.mask)
-                rcList.Add(rc)
-                dst2(rc.rect).SetTo(rc.color, rc.mask)
-            Next
-
-            For Each rc In rcList
-                If rc.multiMask = False Then
-                    Dim k = 0
-                End If
-            Next
-            strOut = RedUtil_Basics.selectCell(rcMap, rcList)
-            SetTrueText(strOut, 3)
-
-            labels(2) = CStr(rcList.Count) + " cells remain after removing " + CStr(count) + " duplicate wGrid points."
-            labels(3) = CStr(count) + " duplicate world grid coordinates found"
-        End Sub
-    End Class
-
-
-
-
-
     Public Class RedWGrid_Click : Inherits TaskParent
         Dim dups As New RedWGrid_Duplicates
         Dim options As New Options_WGrid
@@ -170,4 +97,68 @@ Namespace VBClasses
         End Sub
     End Class
 
+
+
+
+
+    Public Class RedWGrid_Duplicates : Inherits TaskParent
+        Public redC As New RedCloud_Basics
+        Public rcList As New List(Of rcData)
+        Public rcMap As New cv.Mat(dst2.Size, cv.MatType.CV_32S, 0)
+        Public Sub New()
+            dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
+            desc = "Consolidate duplicate world grid coordinates."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            redC.Run(src)
+            labels(2) = redC.labels(2)
+
+            Dim dups As New SortedList(Of String, Integer)(New compareAllowIdenticalString)
+            For Each rc In redC.rcList
+                dups.Add(Format(rc.wGrid.X, "000") + Format(rc.wGrid.Y, "000"), rc.index - 1)
+            Next
+
+            Dim count As Integer
+            Dim newList As New List(Of rcData)
+            Dim rc1 As rcData = redC.rcList(dups.Values(0))
+            Dim rc2 As rcData = redC.rcList(dups.Values(1))
+            Dim r = rc1.rect
+            dst1.SetTo(0)
+            For i = 1 To dups.Count - 1
+                If dups.Keys(i - 1) = dups.Keys(i) Then
+                    rc2 = redC.rcList(dups.Values(i))
+                    r = rc1.rect.Union(rc2.rect)
+                    dst1(r).SetTo(0)
+                    dst1(rc1.rect).SetTo(255, rc1.mask)
+                    dst1(rc2.rect).SetTo(255, rc2.mask)
+                    rc1.rect = r
+                    rc1.multiMask = True
+                    rc1.mask = dst1(r).Clone
+                    count += 1
+                Else
+                    rc1.rect = r
+                    rc1.mask = dst1(r).Clone
+                    newList.Add(rc1)
+                    rc1 = redC.rcList(dups.Values(i - 1))
+                End If
+            Next
+
+            rcList.Clear()
+            rcMap.SetTo(0)
+            dst2.SetTo(0)
+            For Each rc In newList
+                If rc.multiMask Then rc = New rcData(rc.mask, rc.rect, rcList.Count + 1, rc.multiMask)
+                rc.index = rcList.Count + 1
+                rcMap(rc.rect).SetTo(rc.index, rc.mask)
+                rcList.Add(rc)
+                dst2(rc.rect).SetTo(rc.color, rc.mask)
+            Next
+
+            strOut = RedUtil_Basics.selectCell(rcMap, rcList)
+            SetTrueText(strOut, 3)
+
+            labels(2) = CStr(rcList.Count) + " cells remain after removing " + CStr(count) + " duplicate wGrid points."
+            labels(3) = CStr(count) + " duplicate world grid coordinates found"
+        End Sub
+    End Class
 End Namespace
