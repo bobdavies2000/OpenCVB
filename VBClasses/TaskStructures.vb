@@ -555,20 +555,24 @@ Namespace VBClasses
                 rect = _rect
                 If combinedMask = False Then
                     mask = _mask.InRange(_index, _index)
+                    contour = ContourBuild(mask)
                 Else
                     mask = _mask
+                    hull = Nothing
+                    contour = Nothing
                 End If
-                contour = ContourBuild(mask)
                 index = _index
-                If contour.Count >= 3 And combinedMask = False Then ' need at least 3 points for a contour.
-                    Dim listOfPoints = New List(Of List(Of cv.Point))({contour})
-                    mask = New cv.Mat(mask.Size, cv.MatType.CV_8U, 0)
-                    cv.Cv2.DrawContours(mask, listOfPoints, 0, cv.Scalar.All(index), -1, cv.LineTypes.Link4)
+                If contour IsNot Nothing Then
+                    If contour.Count >= 3 And combinedMask = False Then ' need at least 3 points for a contour.
+                        Dim listOfPoints = New List(Of List(Of cv.Point))({contour})
+                        mask = New cv.Mat(mask.Size, cv.MatType.CV_8U, 0)
+                        cv.Cv2.DrawContours(mask, listOfPoints, 0, cv.Scalar.All(index), -1, cv.LineTypes.Link4)
 
-                    ' keep the hull points around (there aren't many of them.)
-                    hull = cv.Cv2.ConvexHull(contour.ToArray, True).ToList
+                        ' keep the hull points around (there aren't many of them.)
+                        hull = cv.Cv2.ConvexHull(contour.ToArray, True).ToList
+                    End If
                 End If
-                buildMaxDist()
+                If combinedMask = False Then buildMaxDist()
 
                 gridIndex = task.gridMap.Get(Of Integer)(maxDist.Y, maxDist.X)
                 color = task.vecColors(index Mod 255)

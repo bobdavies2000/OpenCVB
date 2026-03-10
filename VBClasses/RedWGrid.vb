@@ -124,6 +124,7 @@ Namespace VBClasses
             Dim rc2 As rcData = redC.rcList(dups.Values(1))
             Dim r = rc1.rect
             dst1.SetTo(0)
+            dst1(r).SetTo(255, rc1.mask)
             For i = 1 To dups.Count - 1
                 If dups.Keys(i - 1) = dups.Keys(i) Then
                     rc2 = redC.rcList(dups.Values(i))
@@ -139,7 +140,7 @@ Namespace VBClasses
                     rc1.rect = r
                     rc1.mask = dst1(r).Clone
                     newList.Add(rc1)
-                    rc1 = redC.rcList(dups.Values(i - 1))
+                    rc1 = redC.rcList(dups.Values(i))
                 End If
             Next
 
@@ -147,7 +148,9 @@ Namespace VBClasses
             rcMap.SetTo(0)
             dst2.SetTo(0)
             For Each rc In newList
-                If rc.multiMask Then rc = New rcData(rc.mask, rc.rect, rcList.Count + 1, rc.multiMask)
+                If rc.multiMask Then
+                    rc = New rcData(rc.mask, rc.rect, rcList.Count + 1, rc.multiMask)
+                End If
                 rc.index = rcList.Count + 1
                 rcMap(rc.rect).SetTo(rc.index, rc.mask)
                 rcList.Add(rc)
