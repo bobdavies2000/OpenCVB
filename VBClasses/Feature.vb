@@ -30,8 +30,8 @@ Namespace VBClasses
                 DrawCircle(dst2, pt)
             Next
 
-            strOut = CStr(features.Count) + " features were found using 'BrickPoints' method. " +
-                     CStr(count) + " features were skipped."
+            strOut = CStr(features.Count) + " features found ('BrickPoints' method). " +
+                     CStr(count) + " dropped."
             labels(2) = strOut
         End Sub
     End Class
@@ -262,12 +262,13 @@ Namespace VBClasses
                 DrawCircle(dst2, pt)
             Next
 
+            delaunay.bPoint.ptList = New List(Of cv.Point)(feat.features)
             delaunay.Run(src)
             dst3 = delaunay.dst2
             For Each pt In delaunay.bPoint.ptList
                 DrawCircle(dst3, pt, task.DotSize, white)
             Next
-            labels(3) = "There were " + CStr(task.features.Count) + " Delaunay contours"
+            labels(3) = "There were " + CStr(feat.features.Count) + " Delaunay contours"
         End Sub
     End Class
 
