@@ -119,7 +119,6 @@ Namespace VBClasses
                                 rc.index - 1)
             Next
 
-            Dim count As Integer
             Dim newList As New List(Of rcData)
             Dim rc1 As rcData = Nothing
             Dim rc2 As rcData = Nothing
@@ -129,16 +128,21 @@ Namespace VBClasses
                 If rc1 Is Nothing Then rc1 = redC.rcList(dups.Values(i - 1))
                 rc2 = redC.rcList(dups.Values(i))
 
-                If rc1.wGrid = rc2.wGrid Then
+                If rc1.wGrid.X = rc2.wGrid.X And rc1.wGrid.Y = rc2.wGrid.Y And
+                    Math.Abs(rc1.wcMean(2) - rc2.wcMean(2)) < 1.0 Then
                     r = rc1.rect.Union(rc2.rect)
                     dst1(r).SetTo(0)
                     dst1(rc1.rect).SetTo(255, rc1.mask)
                     dst1(rc2.rect).SetTo(255, rc2.mask)
                     rc1.rect = r
                     rc1.mask = dst1(r).Clone
-                    rc1.color = If(rc1.pixels > rc2.pixels, rc1.color, rc2.color)
+                    ' take the values of depthdelta and wcmean from the larger of the 2 rcData's
+                    If rc1.pixels < rc2.pixels Then
+                        rc1.depthDelta = rc2.depthDelta
+                        rc1.wcMean = rc2.wcMean
+                    End If
                     rc1.multiMask = True
-                    count += 1
+                    If rc1.wGrid.X = -2 And rc1.wGrid.Y = 0 Then Dim k = 0
                 Else
                     If rc1.multiMask Then
                         rc1.contour = Nothing
@@ -162,11 +166,17 @@ Namespace VBClasses
             rcList.Clear()
             rcMap.SetTo(0)
             dst2.SetTo(0)
+            Dim count As Integer
             For Each rc In newList
+                If rc.multiMask Then count += 1
                 rc.index = rcList.Count + 1
                 rcMap(rc.rect).SetTo(rc.index, rc.mask)
                 rcList.Add(rc)
                 dst2(rc.rect).SetTo(rc.color, rc.mask)
+
+                If task.gOptions.DebugCheckBox.Checked And rc.multiMask Then
+                    dst2(rc.rect).SetTo(task.highlight, rc.mask)
+                End If
             Next
 
             If standaloneTest() Then
@@ -175,7 +185,7 @@ Namespace VBClasses
             End If
 
             labels(2) = CStr(rcList.Count) + " cells remain after merging masks for " + CStr(count) + " wGrid points."
-            labels(3) = CStr(count) + " duplicate world grid coordinates found"
+            labels(3) = CStr(count) + " multi-mask cells found"
         End Sub
     End Class
 End Namespace

@@ -1,4 +1,5 @@
-﻿Imports OpenCvSharp
+﻿Imports Newtonsoft.Json.Linq
+Imports OpenCvSharp
 Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Module Structures
@@ -575,6 +576,9 @@ Namespace VBClasses
                 Dim x = Math.Round(wcMean(0) * 1000 / task.reduction)
                 Dim y = Math.Round(wcMean(1) * 1000 / task.reduction)
                 Dim z = Math.Round(wcMean(2) * 1000 / task.reduction)
+                If Math.Abs(x) < 0.000000000001 Then x = 0
+                If Math.Abs(y) < 0.000000000001 Then y = 0
+                If Math.Abs(z) < 0.000000000001 Then z = 0
                 wGrid = New cv.Point3d(x, y, z)
                 If Single.IsInfinity(wcMean(2)) Then depthDelta = 0
             End Sub
@@ -608,8 +612,10 @@ Namespace VBClasses
                 strOut += "World Grid coordinates = " + CStr(wGrid.X) + ", " + CStr(wGrid.Y) + ", " +
                                                         CStr(wGrid.Z) + vbCrLf
                 strOut += "Multi-Mask flag = " + CStr(multiMask) + vbCrLf
-                If hull IsNot Nothing Then strOut += "Hull count = " + CStr(hull.Count) + vbCrLf
-                If contour IsNot Nothing Then strOut += "Hull count = " + CStr(contour.Count) + vbCrLf
+                strOut += "Hull count = "
+                strOut += If(hull Is Nothing, "0", CStr(hull.Count)) + vbCrLf
+                strOut += "Contour count = "
+                strOut += If(contour Is Nothing, "0", CStr(hull.Count)) + vbCrLf
                 Return strOut
             End Function
         End Class
