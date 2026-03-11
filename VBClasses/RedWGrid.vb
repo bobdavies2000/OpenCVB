@@ -2,7 +2,7 @@
 Namespace VBClasses
     Public Class RedWGrid_Basics : Inherits TaskParent
         Dim redC As New RedCloud_Basics
-        Dim currSet As New List(Of cv.Point)
+        Dim currSet As New List(Of cv.Point3d)
         Public Sub New()
             If standalone Then task.gOptions.displayDst1.Checked = True
             desc = "Identify where RedCloud world coordinates are changing"
@@ -12,7 +12,7 @@ Namespace VBClasses
             dst2 = redC.dst2
             labels(2) = redC.labels(2)
 
-            Dim lastSet As New List(Of cv.Point)(currSet)
+            Dim lastSet As New List(Of cv.Point3d)(currSet)
             dst2.SetTo(0)
             Static count As Integer
             If task.heartBeatLT Or task.frameCount = 2 Then
@@ -115,7 +115,8 @@ Namespace VBClasses
 
             Dim dups As New SortedList(Of String, Integer)(New compareAllowIdenticalString)
             For Each rc In redC.rcList
-                dups.Add(Format(rc.wGrid.X, "000") + Format(rc.wGrid.Y, "000"), rc.index - 1)
+                dups.Add(Format(rc.wGrid.X, "000") + Format(rc.wGrid.Y, "000") + Format(rc.wGrid.Z, "000"),
+                                rc.index - 1)
             Next
 
             Dim count As Integer
@@ -127,7 +128,6 @@ Namespace VBClasses
             For i = 1 To dups.Count - 1
                 If rc1 Is Nothing Then rc1 = redC.rcList(dups.Values(i - 1))
                 rc2 = redC.rcList(dups.Values(i))
-                If rc1.wGrid = New cv.Point(-1, 0) Then Dim k = 0
 
                 If rc1.wGrid = rc2.wGrid Then
                     r = rc1.rect.Union(rc2.rect)
@@ -174,7 +174,7 @@ Namespace VBClasses
                 SetTrueText(strOut, 3)
             End If
 
-            labels(2) = CStr(rcList.Count) + " cells remain after removing " + CStr(count) + " duplicate wGrid points."
+            labels(2) = CStr(rcList.Count) + " cells remain after merging masks for " + CStr(count) + " wGrid points."
             labels(3) = CStr(count) + " duplicate world grid coordinates found"
         End Sub
     End Class

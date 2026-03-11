@@ -18549,7 +18549,7 @@ Namespace VBClasses
         Dim wcDataX As New XO_RedWC_Core
         Dim wcDataY As New XO_RedWC_Core
         Public rcList As New List(Of rcData)
-        Public rcTranslate As New List(Of cv.Point)
+        Public rcTranslate As New List(Of cv.Point3d)
         Public Sub New()
             If standalone Then task.gOptions.displayDst1.Checked = True
             desc = "Assign world coordinates to each RedCloud cell"
@@ -18575,7 +18575,7 @@ Namespace VBClasses
             For Each rc In redC.rcList
                 Dim x = wcDataX.wcMap.Get(Of Single)(rc.maxDist.Y, rc.maxDist.X)
                 Dim y = wcDataY.wcMap.Get(Of Single)(rc.maxDist.Y, rc.maxDist.X)
-                rc.wGrid = New cv.Point(CInt(x), CInt(y))
+                rc.wGrid = New cv.Point3d(CInt(x), CInt(y), 0)
                 rcList.Add(rc)
             Next
 
@@ -18612,7 +18612,7 @@ Namespace VBClasses
         Dim wcDataX As New XO_RedWC_Core
         Dim wcDataY As New XO_RedWC_Core
         Public rcList As New List(Of rcData)
-        Public rcTranslate As New List(Of cv.Point)
+        Public rcTranslate As New List(Of cv.Point3d)
         Public Sub New()
             If standalone Then task.gOptions.displayDst1.Checked = True
             desc = "Assign world coordinates to each RedCloud cell"
@@ -18643,7 +18643,7 @@ Namespace VBClasses
             For Each rc In redC.rcList
                 Dim x = wcDataX.wcMap.Get(Of Single)(rc.maxDist.Y, rc.maxDist.X)
                 Dim y = wcDataY.wcMap.Get(Of Single)(rc.maxDist.Y, rc.maxDist.X)
-                rc.wGrid = New cv.Point(CInt(x), CInt(y))
+                rc.wGrid = New cv.Point3d(CInt(x), CInt(y), 0)
                 rcList.Add(rc)
             Next
 
@@ -18821,7 +18821,7 @@ Namespace VBClasses
                 SetTrueText(rcCenter.displayCell, 1)
                 For y = -1 To 1
                     For x = -1 To 1
-                        Dim region = New cv.Point(rcCenter.wGrid.X + x, rcCenter.wGrid.Y + y)
+                        Dim region = New cv.Point3d(rcCenter.wGrid.X + x, rcCenter.wGrid.Y + y, 0)
                         index = redWC.rcTranslate.IndexOf(region)
                         If index >= 0 Then
                             Dim rc = redWC.rcList(index)
@@ -18882,7 +18882,7 @@ Namespace VBClasses
         Public classCount As Integer
         Public rcList As New List(Of rcData)
         Public rcMap As cv.Mat = New cv.Mat(dst2.Size, cv.MatType.CV_32S, 0)
-        Public wGridList As New List(Of cv.Point)
+        Public wGridList As New List(Of cv.Point3d)
         Public options As New Options_RedCloud
         Public Sub New()
             cPtr = RedCloudLined_Open()

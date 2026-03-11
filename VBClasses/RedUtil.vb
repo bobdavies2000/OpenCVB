@@ -74,7 +74,7 @@ Namespace VBClasses
             Return rc
         End Function
         Public Shared Function rcMatch(rc As rcData, rcListLast As List(Of rcData),
-                                       wGridLastList As List(Of cv.Point),
+                                       wGridLastList As List(Of cv.Point3d),
                                        rcMapLast As cv.Mat) As rcData
             Dim r1 = rc.rect
             Dim indexLast = wGridLastList.IndexOf(rc.wGrid)

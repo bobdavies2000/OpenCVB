@@ -457,7 +457,7 @@ Namespace VBClasses
         Public classCount As Integer
         Public rcList As New List(Of rcData)
         Public rcMap As cv.Mat = New cv.Mat(dst2.Size, cv.MatType.CV_32S, 0)
-        Public wGridList As New List(Of cv.Point)
+        Public wGridList As New List(Of cv.Point3d)
         Public options As New Options_RedCloud
         Public Sub New()
             cPtr = RedCloudFill_Open()

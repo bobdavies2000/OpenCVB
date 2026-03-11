@@ -545,7 +545,7 @@ Namespace VBClasses
             Public multiMask As Boolean ' indicates if RedWGrid found duplicate wGrid points in the rclist.
             Public pixels As Integer
             Public rect As cv.Rect
-            Public wGrid As cv.Point
+            Public wGrid As cv.Point3d
             Public colorChange As Integer ' 0 no change, 1 , 
             Public eq As cv.Vec4f ' only here for compatibility
             Public Sub New()
@@ -574,7 +574,8 @@ Namespace VBClasses
                 wcMean = task.pointCloud(rect).Mean(task.depthmask(rect))
                 Dim x = Math.Round(wcMean(0) * 1000 / task.reduction)
                 Dim y = Math.Round(wcMean(1) * 1000 / task.reduction)
-                wGrid = New cv.Point(x, y)
+                Dim z = Math.Round(wcMean(2) * 1000 / task.reduction)
+                wGrid = New cv.Point3d(x, y, z)
                 If Single.IsInfinity(wcMean(2)) Then depthDelta = 0
             End Sub
             Public Shared Function getHullMask(hull As List(Of cv.Point), mask As cv.Mat) As cv.Mat
@@ -604,9 +605,11 @@ Namespace VBClasses
                 strOut += "DepthDelta (mm's) = " + Format(CInt(depthDelta * 1000), "00") + vbCrLf
                 strOut += "Color = " + color.ToString + vbCrLf
                 strOut += "Pixel count = " + CStr(pixels) + vbCrLf
-                If hull IsNot Nothing Then strOut += "Hull count = " + CStr(hull.Count) + vbCrLf
-                strOut += "World Grid coordinates = " + CStr(wGrid.X) + ", " + CStr(wGrid.Y) + vbCrLf
+                strOut += "World Grid coordinates = " + CStr(wGrid.X) + ", " + CStr(wGrid.Y) + ", " +
+                                                        CStr(wGrid.Z) + vbCrLf
                 strOut += "Multi-Mask flag = " + CStr(multiMask) + vbCrLf
+                If hull IsNot Nothing Then strOut += "Hull count = " + CStr(hull.Count) + vbCrLf
+                If contour IsNot Nothing Then strOut += "Hull count = " + CStr(contour.Count) + vbCrLf
                 Return strOut
             End Function
         End Class
