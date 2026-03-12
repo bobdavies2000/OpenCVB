@@ -2,7 +2,6 @@ Imports cv = OpenCvSharp
 Namespace VBClasses
     ''' <summary>Compute the gravity vector using the complementary filter: fuse gyro (fast, drifts) with accelerometer (slow, stable).</summary>
     Public Class Gravity_Basics : Inherits TaskParent
-        Public options As New Options_Features
         Dim lastTimeStamp As Double
         Dim optionsIMU As New Options_IMU
         ''' <summary>Unit gravity vector in body/sensor frame (points down).</summary>

@@ -203,8 +203,6 @@ Namespace VBClasses
                 Next
             End If
 
-            strOut += "  " + CStr(task.features.Count) + " features were found using '" + task.fOptions.FeatureMethod.Text +
-                  "' method."
             labels(2) = strOut
         End Sub
         Protected Overrides Sub Finalize()

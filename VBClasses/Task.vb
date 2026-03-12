@@ -45,8 +45,6 @@ Namespace VBClasses
             lines = New Line_Basics
             filterBasics = New Filter_Basics
             leftRightEnhanced = New LeftRight_Brightness
-            cloudOptions = New Options_PointCloud
-            cloudOptions.Run()
 
             ' all the algorithms in the list are task algorithms that are children of the algorithm.
             For i = 1 To cpu.callTrace.Count - 1
@@ -70,6 +68,7 @@ Namespace VBClasses
             task.clickPoint = New cv.Point(CInt(workRes.Width / 2), CInt(workRes.Height / 2))
 
             task.gOptions.PaintFreqSlider.Value = paintFreq
+            Options_PointCloud.setupCalcHist()
             Debug.WriteLine(vbCrLf + vbCrLf + vbCrLf + "Starting algorithm " + settings.algorithm)
             Debug.WriteLine(vbTab + CStr(AlgorithmTestAllCount) + " algorithms tested")
             AlgorithmTestAllCount += 1

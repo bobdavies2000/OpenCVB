@@ -386,10 +386,9 @@ Namespace VBClasses
             task.pcSplit(1).ConvertTo(split(1), cv.MatType.CV_32S, 1000 / task.reduction)
             task.pcSplit(2).ConvertTo(split(2), cv.MatType.CV_32S, 1000 / task.reduction)
 
-            Dim reductionName As String = optionsPrep.reductionName
-            If presetReductionName <> "" Then reductionName = presetReductionName
+            If presetReductionName <> "" Then task.reductionName = presetReductionName
 
-            Select Case reductionName
+            Select Case task.reductionName
                 Case "X Reduction"
                     reduced32s = split(0) * task.reduction
                 Case "Y Reduction"

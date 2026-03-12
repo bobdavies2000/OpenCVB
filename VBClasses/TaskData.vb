@@ -92,7 +92,6 @@ Namespace VBClasses
         Public motionFeatures As cv.Point2f
         Public leftRightEnhanced As LeftRight_Brightness
         Public contours As Contour_Basics_List
-        Public cloudOptions As Options_PointCloud
 
         Public GLRequest As Integer
         Public GLcloud As cv.Mat
@@ -206,6 +205,7 @@ Namespace VBClasses
         Public channelIndex As Integer = 0
         Public channels() As Integer = {0, 1}
         Public histBinList() As Integer
+        Public reductionName As String = "XY Reduction"
         Public ranges() As cv.Rangef
         Public rangesBGR() As cv.Rangef = New cv.Rangef() {New cv.Rangef(0, 256), New cv.Rangef(0, 256), New cv.Rangef(0, 256)}
         Public rangesHSV() As cv.Rangef = New cv.Rangef() {New cv.Rangef(0, 180), New cv.Rangef(0, 256), New cv.Rangef(0, 256)}

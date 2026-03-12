@@ -7967,6 +7967,77 @@ Namespace VBClasses
 
 
 
+    Public Class Options_RedCloud : Inherits OptionParent
+        Public ageThreshold As Integer
+        Public rectOverlapRatio As Integer
+        Public Sub New()
+            If sliders.Setup(traceName) Then sliders.setupTrackBar("Age Threshold", 1, 50, 30)
+        End Sub
+        Public Sub Run()
+            Static ageSlider = FindSlider("Age Threshold")
+            ageThreshold = ageSlider.value
+        End Sub
+    End Class
+
+
+
+
+    Public Class Options_RedPrep : Inherits OptionParent
+        Public PrepX As Boolean
+        Public PrepY As Boolean
+        Public PrepZ As Boolean
+        Public PrepAddEdges As Boolean
+        Sub New()
+            If FindFrm(traceName + " CheckBox Options") Is Nothing Then
+                check.Setup(traceName)
+                check.addCheckBox("Prep Edges in X")
+                check.addCheckBox("Prep Edges in Y")
+                check.addCheckBox("Prep Edges in Z")
+                check.addCheckBox("Add RGB Edges")
+                check.Box(0).Checked = True
+                check.Box(1).Checked = True
+            End If
+        End Sub
+        Public Sub Run()
+            Static PrepXBox = FindCheckBox("Prep Edges in X")
+            Static PrepYBox = FindCheckBox("Prep Edges in Y")
+            Static PrepZBox = FindCheckBox("Prep Edges in Z")
+            Static PrepEdges = FindCheckBox("Add RGB Edges")
+
+            PrepX = PrepXBox.checked
+            PrepY = PrepYBox.checked
+            PrepZ = PrepZBox.checked
+            PrepAddEdges = PrepEdges.checked
+        End Sub
+    End Class
+
+
+
+
+
+    Public Class Options_WGrid : Inherits OptionParent
+        Public clickName As String
+        Public Sub New()
+            If FindFrm(traceName + " Radio Buttons") Is Nothing Then
+                radio.Setup(traceName)
+                radio.addRadio("Identify Row")
+                radio.addRadio("Identify Col")
+                radio.addRadio("Identify Neighbors")
+                radio.addRadio("Identify Multi-Mask Cells")
+                radio.check(0).Checked = True
+            End If
+        End Sub
+        Public Sub Run()
+            Static frm = FindFrm(traceName + " Radio Buttons")
+            clickName = frm.check(findRadioIndex(frm.check)).Text
+        End Sub
+    End Class
+
+
+
+
+
+
 
     Public Class Options_PointCloud : Inherits OptionParent
         Public threshold As Integer = 60
@@ -7974,7 +8045,6 @@ Namespace VBClasses
         Public yBins As Integer = 30
         Public zBins As Integer = 100
         Public rcOptions As New Options_RedPrep
-        Public options As New Options_PrepData
         Public Sub New()
             If sliders.Setup(traceName) Then
                 sliders.setupTrackBar("Histogram threshold", 0, 1000, threshold)
@@ -7994,10 +8064,7 @@ Namespace VBClasses
 
             setupCalcHist()
         End Sub
-        Public Sub setupCalcHist()
-            rcOptions.Run()
-            options.Run()
-
+        Public Shared Sub setupCalcHist()
             ' The specification for each camera spells out the FOV angle
             ' The sliders adjust the depth data histogram to fill the frustrum which is built from the specification FOV
             Select Case task.Settings.cameraName
@@ -8054,8 +8121,7 @@ Namespace VBClasses
             Dim rz = New cv.Vec2f(0, task.MaxZmeters)
             task.rangesCloud = New cv.Rangef() {New cv.Rangef(rx.Item0, rx.Item1), New cv.Rangef(ry.Item0, ry.Item1),
                                                 New cv.Rangef(rz.Item0, rz.Item1)}
-
-            Select Case options.reductionName
+            Select Case task.reductionName
                 Case "X Reduction"
                     task.ranges = New cv.Rangef() {New cv.Rangef(rx.Item0, rx.Item1)}
                     task.channels = {0}
@@ -8094,6 +8160,8 @@ Namespace VBClasses
             End Select
         End Sub
         Public Sub Run()
+            rcOptions.Run()
+
             Static xSlider = OptionParent.FindSlider("Histogram X bins")
             Static ySlider = OptionParent.FindSlider("Histogram Y bins")
             Static zSlider = OptionParent.FindSlider("Histogram Z bins")
@@ -8109,58 +8177,9 @@ Namespace VBClasses
 
 
 
-
-    Public Class Options_RedCloud : Inherits OptionParent
-        Public ageThreshold As Integer
-        Public rectOverlapRatio As Integer
-        Public Sub New()
-            If sliders.Setup(traceName) Then sliders.setupTrackBar("Age Threshold", 1, 50, 30)
-        End Sub
-        Public Sub Run()
-            Static ageSlider = FindSlider("Age Threshold")
-            ageThreshold = ageSlider.value
-        End Sub
-    End Class
-
-
-
-
-    Public Class Options_RedPrep : Inherits OptionParent
-        Public PrepX As Boolean
-        Public PrepY As Boolean
-        Public PrepZ As Boolean
-        Public PrepAddEdges As Boolean
-        Sub New()
-            If FindFrm(traceName + " CheckBox Options") Is Nothing Then
-                check.Setup(traceName)
-                check.addCheckBox("Prep Edges in X")
-                check.addCheckBox("Prep Edges in Y")
-                check.addCheckBox("Prep Edges in Z")
-                check.addCheckBox("Add RGB Edges")
-                check.Box(0).Checked = True
-                check.Box(1).Checked = True
-            End If
-        End Sub
-        Public Sub Run()
-            Static PrepXBox = FindCheckBox("Prep Edges in X")
-            Static PrepYBox = FindCheckBox("Prep Edges in Y")
-            Static PrepZBox = FindCheckBox("Prep Edges in Z")
-            Static PrepEdges = FindCheckBox("Add RGB Edges")
-
-            PrepX = PrepXBox.checked
-            PrepY = PrepYBox.checked
-            PrepZ = PrepZBox.checked
-            PrepAddEdges = PrepEdges.checked
-        End Sub
-    End Class
-
-
-
-
-
     Public Class Options_PrepData : Inherits OptionParent
         Public PrepAddEdges As Boolean
-        Public reductionName As String = "XY Reduction"
+        Dim options As New Options_PointCloud
         Sub New()
             If FindFrm(traceName + " Radio Buttons") Is Nothing Then
                 radio.Setup(traceName)
@@ -8176,29 +8195,8 @@ Namespace VBClasses
         End Sub
         Public Sub Run()
             Static frm = FindFrm(traceName + " Radio Buttons")
-            If frm.check.count > 0 Then reductionName = frm.check(findRadioIndex(frm.check)).Text
-        End Sub
-    End Class
-
-
-
-
-
-    Public Class Options_WGrid : Inherits OptionParent
-        Public clickName As String
-        Public Sub New()
-            If FindFrm(traceName + " Radio Buttons") Is Nothing Then
-                radio.Setup(traceName)
-                radio.addRadio("Identify Row")
-                radio.addRadio("Identify Col")
-                radio.addRadio("Identify Neighbors")
-                radio.addRadio("Identify Multi-Mask Cells")
-                radio.check(0).Checked = True
-            End If
-        End Sub
-        Public Sub Run()
-            Static frm = FindFrm(traceName + " Radio Buttons")
-            clickName = frm.check(findRadioIndex(frm.check)).Text
+            task.reductionName = frm.check(findRadioIndex(frm.check)).Text
+            options.Run()
         End Sub
     End Class
 

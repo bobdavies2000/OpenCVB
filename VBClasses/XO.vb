@@ -5225,7 +5225,7 @@ Namespace VBClasses
             Dim histogram As New cv.Mat
 
             Dim channels() As Integer = {0}
-            Select Case optionsPrep.reductionName
+            Select Case task.reductionName
                 Case "X Reduction"
                     dst0 = task.pcSplit(0)
                 Case "Y Reduction"
@@ -5439,10 +5439,13 @@ Namespace VBClasses
         Public lpInput As lpData
         Public foundLine As Boolean
         Dim match As New LineEnds_Correlation
+        Dim options As New Options_Features
         Public Sub New()
             desc = "Track an individual line as best as possible."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
+            options.Run()
+
             Dim lplist = task.lines.lpList
             If standalone And foundLine = False Then lpInput = task.lines.lpList(0)
 
@@ -5489,7 +5492,7 @@ Namespace VBClasses
 
                 Dim deltaX1 = Math.Abs(task.lpGravity.pE1.X - lpInput.pE1.X)
                 Dim deltaX2 = Math.Abs(task.lpGravity.pE2.X - lpInput.pE2.X)
-                If Math.Abs(deltaX1 - deltaX2) > task.gravityBasics.options.pixelThreshold Then
+                If Math.Abs(deltaX1 - deltaX2) > options.pixelThreshold Then
                     lpInput = task.lines.lpList(0)
                 End If
                 subsetrect = lpInput.rect
@@ -8583,10 +8586,13 @@ Namespace VBClasses
 
     Public Class XO_Line_GravityToAverage : Inherits TaskParent
         Public vertList As New List(Of lpData)
+        Dim options As New Options_Features
         Public Sub New()
             desc = "Highlight both vertical and horizontal lines - not terribly good..."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
+            options.Run()
+
             Dim gravityDelta As Single = task.lpGravity.pE1.X - task.lpGravity.pE2.X
 
             dst2 = src
@@ -8596,7 +8602,7 @@ Namespace VBClasses
             For Each lp In task.lines.lpList
                 If Math.Abs(lp.angle) > 45 And Math.Sign(task.lpGravity.slope) = Math.Sign(lp.slope) Then
                     Dim delta = lp.pE1.X - lp.pE2.X
-                    If Math.Abs(gravityDelta - delta) < task.gravityBasics.options.pixelThreshold Then
+                    If Math.Abs(gravityDelta - delta) < options.pixelThreshold Then
                         deltaList.Add(delta)
                         vertList.Add(lp)
                         vbc.DrawLine(dst2, lp.pE1, lp.pE2)
