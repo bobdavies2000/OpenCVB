@@ -291,4 +291,45 @@ Namespace VBClasses
             labels(2) = "Grid rects with motion: " + CStr(motionList.Count)
         End Sub
     End Class
+
+
+
+
+
+    Public Class Motion_Correlation : Inherits TaskParent
+        Dim cList As New List(Of Single)
+        Public Sub New()
+            desc = "Measure the correlation of grid elements that appear to have changed."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            Static lastsrc As cv.Mat = src.Clone
+            dst2 = src.Clone
+            Dim correlationMat As New cv.Mat
+            Dim testCorrelation As Single = 0
+            If cList.Count > 0 Then testCorrelation = cList.Max * 0.8
+            cList.Clear()
+            dst3 = src
+            For Each index In task.motionRGB.motionList
+                Dim r = task.gridRects(index)
+                dst2.Rectangle(r, white, task.lineWidth)
+                cv.Cv2.MatchTemplate(dst2(r), lastsrc(r), correlationMat, cv.TemplateMatchModes.CCoeffNormed)
+
+                Dim corr = correlationMat.Get(Of Single)(0, 0)
+                cList.Add(corr)
+
+                If corr < testCorrelation Then
+                    dst3.Rectangle(r, white, task.lineWidth)
+                Else
+                    dst3.Rectangle(r, task.highlight, task.lineWidth)
+                End If
+            Next
+
+            lastsrc = src.Clone
+
+            If cList.Count > 0 Then
+                labels(2) = "Average correlation = " + Format(cList.Average, fmt1) + ", min = " + Format(cList.Min, fmt1) +
+                            ", max = " + Format(cList.Max, fmt1)
+            End If
+        End Sub
+    End Class
 End Namespace

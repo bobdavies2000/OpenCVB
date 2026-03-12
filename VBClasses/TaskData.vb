@@ -90,7 +90,7 @@ Namespace VBClasses
         Public motionRGB As Motion_Basics
         Public motionCloud As Motion_Cloud
         Public motionFeatures As cv.Point2f
-        Public leftRightEnhanced As LeftRight_Brightness
+        Public leftRightBrightness As LeftRight_Brightness
         Public contours As Contour_Basics_List
 
         Public GLRequest As Integer

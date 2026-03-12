@@ -126,6 +126,7 @@ Corners_Harris
 Corners_HarrisDetector_CPP
 Corners_RedPrepData
 Corners_ShiTomasi_CPP
+Correlation_Basics
 Covariance_Basics
 Covariance_Images
 DCT_Basics
@@ -484,6 +485,7 @@ Moments_Basics
 Motion_Basics
 Motion_Cloud
 Motion_Cloud_MotionRect
+Motion_Correlation
 Motion_Left
 Motion_LeftTest
 Motion_Right
@@ -680,7 +682,6 @@ NR_Corners_Harris_CPP
 NR_Corners_PreCornerDetect
 NR_Corners_RedCloud
 NR_Corners_SubPix
-NR_Correlation_Basics
 NR_Covariance_Test
 NR_CSV_Basics
 NR_DCT_Depth

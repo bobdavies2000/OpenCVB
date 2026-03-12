@@ -37,6 +37,7 @@ Color8U
 Contour
 Convex
 Corners
+Correlation
 Covariance
 DCT
 Delaunay

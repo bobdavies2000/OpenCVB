@@ -44,7 +44,7 @@ Namespace VBClasses
             grid = New Grid_Basics
             lines = New Line_Basics
             filterBasics = New Filter_Basics
-            leftRightEnhanced = New LeftRight_Brightness
+            leftRightBrightness = New LeftRight_Brightness
 
             ' all the algorithms in the list are task algorithms that are children of the algorithm.
             For i = 1 To cpu.callTrace.Count - 1
@@ -108,10 +108,9 @@ Namespace VBClasses
 
             filterBasics.Run(color)
             task.gray = filterBasics.dst3
-            leftRightEnhanced.Run(Nothing)
-
-            leftView = leftRightEnhanced.dst2.Clone
-            rightView = leftRightEnhanced.dst3.Clone
+            leftRightBrightness.Run(Nothing)
+            leftView = leftRightBrightness.dst2.Clone
+            rightView = leftRightBrightness.dst3.Clone
 
             If gOptions.UseMotionMask.Checked And firstPass = False Then
                 motionRGB.Run(gray)
