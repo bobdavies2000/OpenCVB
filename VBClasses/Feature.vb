@@ -41,56 +41,6 @@ Namespace VBClasses
 
 
 
-    Public Class NR_Feature_BrickLine : Inherits TaskParent
-        Public features As New List(Of cv.Point)
-        Public Sub New()
-            task.gOptions.LineWidth.Value = 3
-            If task.feat Is Nothing Then task.feat = New Feature_Basics
-            desc = "Find the lines implied in the gr points."
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            Dim sortByGrid As New SortedList(Of Integer, cv.Point)(New compareAllowIdenticalInteger)
-            For Each pt In task.feat.features
-                Dim lineIndex = task.lines.dst1.Get(Of Byte)(pt.Y, pt.X)
-                If lineIndex = 0 Then Continue For
-                Dim gridindex = task.gridMap.Get(Of Integer)(pt.Y, pt.X)
-                sortByGrid.Add(gridindex, pt)
-            Next
-
-            Dim brickLines(task.lines.lpList.Count - 1) As List(Of cv.Point)
-            dst3.SetTo(0)
-            features.Clear()
-            For Each pt In sortByGrid.Values
-                Dim lineIndex = task.lines.dst1.Get(Of Byte)(pt.Y, pt.X) - 1
-                If brickLines(lineIndex) Is Nothing Then
-                    brickLines(lineIndex) = New List(Of cv.Point)({pt})
-                Else
-                    brickLines(lineIndex).Add(pt)
-                End If
-
-                features.Add(pt)
-            Next
-
-            dst2 = src.Clone
-            For i = 0 To brickLines.Count - 1
-                If brickLines(i) Is Nothing Then Continue For
-                If brickLines.Count = 1 Then Continue For
-                Dim pt = brickLines(i)(0)
-                If pt = brickLines(i).Last Then Continue For
-                Dim color = vecToScalar(task.lines.dst2.Get(Of cv.Vec3b)(pt.Y, pt.X))
-                DrawCircle(dst3, pt, color)
-                vbc.DrawLine(dst2, pt, brickLines(i).Last, color)
-                vbc.DrawLine(dst3, pt, brickLines(i).Last, color)
-            Next
-        End Sub
-    End Class
-
-
-
-
-
-
-
     Public Class Feature_General : Inherits TaskParent
         Implements IDisposable
         Public options As New Options_Features
@@ -214,31 +164,6 @@ Namespace VBClasses
 
 
 
-    ' https://docs.opencv.org/3.4/d7/d8b/tutorial_py_lucas_kanade.html
-    Public Class NR_Feature_NoMotionTest : Inherits TaskParent
-        Public options As New Options_Features
-        Dim method As New Feature_General
-        Public Sub New()
-            desc = "Find good features to track in a BGR image without using correlation coefficients which produce more consistent sharedResults.images.."
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            options.Run()
-            dst2 = src.Clone
-
-            method.Run(src)
-
-            For Each pt In task.features
-                DrawCircle(dst2, pt, task.DotSize, task.highlight)
-            Next
-
-            labels(2) = method.labels(2)
-        End Sub
-    End Class
-
-
-
-
-
 
 
     Public Class Feature_Delaunay : Inherits TaskParent
@@ -270,6 +195,31 @@ Namespace VBClasses
         End Sub
     End Class
 
+
+
+
+
+
+    ' https://docs.opencv.org/3.4/d7/d8b/tutorial_py_lucas_kanade.html
+    Public Class NR_Feature_NoMotionTest : Inherits TaskParent
+        Public options As New Options_Features
+        Dim method As New Feature_General
+        Public Sub New()
+            desc = "Find good features to track in a BGR image without using correlation coefficients which produce more consistent sharedResults.images.."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            options.Run()
+            dst2 = src.Clone
+
+            method.Run(src)
+
+            For Each pt In task.features
+                DrawCircle(dst2, pt, task.DotSize, task.highlight)
+            Next
+
+            labels(2) = method.labels(2)
+        End Sub
+    End Class
 
 
 
@@ -790,26 +740,50 @@ Namespace VBClasses
 
 
 
-    Public Class Feature_NoMotion : Inherits TaskParent
-        Dim feat As New Feature_General
+    Public Class NR_Feature_BrickLine : Inherits TaskParent
+        Public features As New List(Of cv.Point)
         Public Sub New()
-            task.gOptions.UseMotionMask.Checked = False
-            dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
-            desc = "Find good features to track in a BGR image using the motion mask+"
+            task.gOptions.LineWidth.Value = 3
+            If task.feat Is Nothing Then task.feat = New Feature_Basics
+            desc = "Find the lines implied in the gr points."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            feat.Run(task.grayStable)
-            dst2 = src.Clone
-
-            dst3.SetTo(0)
-            For Each pt In task.featurePoints
-                DrawCircle(dst2, pt, task.DotSize, task.highlight)
-                dst3.Set(Of Byte)(pt.Y, pt.X, 255)
+            Dim sortByGrid As New SortedList(Of Integer, cv.Point)(New compareAllowIdenticalInteger)
+            For Each pt In task.feat.features
+                Dim lineIndex = task.lines.dst1.Get(Of Byte)(pt.Y, pt.X)
+                If lineIndex = 0 Then Continue For
+                Dim gridindex = task.gridMap.Get(Of Integer)(pt.Y, pt.X)
+                sortByGrid.Add(gridindex, pt)
             Next
 
-            labels(2) = feat.labels(2)
+            Dim brickLines(task.lines.lpList.Count - 1) As List(Of cv.Point)
+            dst3.SetTo(0)
+            features.Clear()
+            For Each pt In sortByGrid.Values
+                Dim lineIndex = task.lines.dst1.Get(Of Byte)(pt.Y, pt.X) - 1
+                If brickLines(lineIndex) Is Nothing Then
+                    brickLines(lineIndex) = New List(Of cv.Point)({pt})
+                Else
+                    brickLines(lineIndex).Add(pt)
+                End If
+
+                features.Add(pt)
+            Next
+
+            dst2 = src.Clone
+            For i = 0 To brickLines.Count - 1
+                If brickLines(i) Is Nothing Then Continue For
+                If brickLines.Count = 1 Then Continue For
+                Dim pt = brickLines(i)(0)
+                If pt = brickLines(i).Last Then Continue For
+                Dim color = vecToScalar(task.lines.dst2.Get(Of cv.Vec3b)(pt.Y, pt.X))
+                DrawCircle(dst3, pt, color)
+                vbc.DrawLine(dst2, pt, brickLines(i).Last, color)
+                vbc.DrawLine(dst3, pt, brickLines(i).Last, color)
+            Next
         End Sub
     End Class
+
 
 
 
@@ -846,66 +820,6 @@ Namespace VBClasses
             labels(3) = "The " + CStr(stable.Count) + " points are present for more than one frame."
         End Sub
     End Class
-
-
-
-
-
-    Public Class NR_Feature_StableVisualize : Inherits TaskParent
-        Dim noMotion As New Feature_NoMotion
-        Public fpStable As New List(Of fpData)
-        Public ptStable As New List(Of cv.Point)
-        Public Sub New()
-            desc = "Identify features that consistently present in the image - with motion ignored."
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            Dim lastFeatures As New List(Of cv.Point)(task.featurePoints)
-
-            noMotion.Run(src)
-
-            dst2 = src
-            Dim stable As New List(Of cv.Point)
-            For Each pt In task.featurePoints
-                If lastFeatures.Contains(pt) Then
-                    DrawCircle(dst2, pt, task.DotSize, task.highlight)
-                    stable.Add(pt)
-                End If
-            Next
-            lastFeatures = New List(Of cv.Point)(stable)
-            labels(2) = noMotion.labels(2) + " and " + CStr(stable.Count) + " appeared on earlier frames "
-
-            Dim fpNew As New List(Of fpData)
-            Dim ptNew As New List(Of cv.Point)
-            For Each pt In stable
-                Dim fp As New fpData
-                If ptStable.Contains(pt) Then
-                    Dim index = ptStable.IndexOf(pt)
-                    fp = fpStable(index)
-                    fp.age += 1
-                Else
-                    fp.age = 1
-                    fp.pt = pt
-                End If
-
-                fp.index = fpNew.Count
-                fpNew.Add(fp)
-                ptNew.Add(pt)
-            Next
-
-            fpStable = New List(Of fpData)(fpNew)
-            ptStable = New List(Of cv.Point)(ptNew)
-
-            dst3.SetTo(0)
-            For Each fp In fpStable
-                If fp.age > 2 Then
-                    DrawCircle(dst3, fp.pt, task.DotSize, task.highlight)
-                    SetTrueText(CStr(fp.age), fp.pt, 3)
-                End If
-            Next
-        End Sub
-    End Class
-
-
 
 
 
@@ -958,4 +872,86 @@ Namespace VBClasses
         End Sub
     End Class
 
+
+
+
+
+
+    Public Class Feature_NoMotion : Inherits TaskParent
+        Dim feat As New Feature_General
+        Public Sub New()
+            task.gOptions.UseMotionMask.Checked = False
+            dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
+            desc = "Find good features to track in a BGR image using the motion mask+"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            feat.Run(task.grayStable)
+            dst2 = src.Clone
+
+            dst3.SetTo(0)
+            For Each pt In task.featurePoints
+                DrawCircle(dst2, pt, task.DotSize, task.highlight)
+                dst3.Set(Of Byte)(pt.Y, pt.X, 255)
+            Next
+
+            labels(2) = feat.labels(2)
+        End Sub
+    End Class
+
+
+
+
+    Public Class Feature_Stable : Inherits TaskParent
+        Dim noMotion As New Feature_NoMotion
+        Public fpStable As New List(Of fpData)
+        Public ptStable As New List(Of cv.Point)
+        Public Sub New()
+            desc = "Identify features that consistently present in the image - with motion ignored."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            Dim lastFeatures As New List(Of cv.Point)(task.featurePoints)
+
+            noMotion.Run(src)
+
+            dst2 = src
+            Dim stable As New List(Of cv.Point)
+            For Each pt In task.featurePoints
+                If lastFeatures.Contains(pt) Then
+                    DrawCircle(dst2, pt, task.DotSize, task.highlight)
+                    stable.Add(pt)
+                End If
+            Next
+            lastFeatures = New List(Of cv.Point)(stable)
+            labels(2) = noMotion.labels(2) + " and " + CStr(stable.Count) + " appeared on earlier frames "
+
+            Dim fpNew As New List(Of fpData)
+            Dim ptNew As New List(Of cv.Point)
+            For Each pt In stable
+                Dim fp As New fpData
+                If ptStable.Contains(pt) Then
+                    Dim index = ptStable.IndexOf(pt)
+                    fp = fpStable(index)
+                    fp.age += 1
+                Else
+                    fp.age = 1
+                    fp.pt = pt
+                End If
+
+                fp.index = fpNew.Count
+                fpNew.Add(fp)
+                ptNew.Add(pt)
+            Next
+
+            fpStable = New List(Of fpData)(fpNew)
+            ptStable = New List(Of cv.Point)(ptNew)
+
+            dst3.SetTo(0)
+            For Each fp In fpStable
+                If fp.age > 2 Then
+                    DrawCircle(dst3, fp.pt, task.DotSize, task.highlight)
+                    SetTrueText(CStr(fp.age), fp.pt, 3)
+                End If
+            Next
+        End Sub
+    End Class
 End Namespace
