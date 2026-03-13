@@ -91,7 +91,7 @@ Namespace VBClasses
 
             If rc.colorChange <> causes.lastCellFound Then
                 ' try use the maxDist point to find the last rect.
-                indexLast = rcMapLast.Get(Of Integer)(rc.maxDist.Y, rc.maxDist.X)
+                indexLast = rcMapLast.Get(Of Integer)(rc.maxDist.Y, rc.maxDist.X) - 1
                 If indexLast >= 0 And indexLast < rcListLast.Count Then
                     Dim r2 = rcListLast(indexLast).rect
                     If r1.IntersectsWith(r2) = False Then

@@ -513,6 +513,7 @@ Namespace VBClasses
             dst3.SetTo(0)
             For Each rc In newList.Values
                 Dim maxDist = rc.maxDist
+                If maxDist = New cv.Point(315, 19) Then Dim k = 0
                 rc = RedUtil_Basics.rcMatch(rc, rcListLast, wGridList, rcMapLast)
 
                 If rc.age = 1 Then unMatched += 1 Else matchCount += 1

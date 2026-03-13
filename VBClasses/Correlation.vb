@@ -1,7 +1,8 @@
 Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Class Correlation_Basics : Inherits TaskParent
-        Dim cList As New List(Of Single)
+        Public cList As New List(Of Single)
+        Public corrThreshold As Single
         Dim plotHist As New Plot_Histogram
         Public Sub New()
             plotHist.createHistogram = True
@@ -9,7 +10,7 @@ Namespace VBClasses
             task.gOptions.HistBinBar.Value = task.gOptions.HistBinBar.Maximum
             If standalone Then task.gOptions.displayDst1.Checked = True
             labels(1) = "Click on a rectangle to see the correlation of the current to last image."
-            desc = "Measure the correlation of all grid elements."
+            desc = "Measure the correlation of all grid squares."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             Static lastsrc As cv.Mat = task.gray.Clone
@@ -38,16 +39,15 @@ Namespace VBClasses
                 dst3 = plotHist.dst2
 
                 Dim lastEntry = plotHist.histArray.Last
-                Dim lastCorr = (2.0 - 2.0 / task.histogramBins) / 2
                 labels(2) = "Correlation Min = " + Format(cList.Min - 1, fmt1) + ", Max = " + Format(cList.Max - 1, fmt1)
                 labels(3) = CStr(lastEntry) + " (" + Format(lastEntry / task.gSquares.Count, "0%") +
-                            ") had correlation >= " + Format(lastCorr, fmt2) + "  Plot below ranges from -1 to 1"
+                            ") had correlation >= " + Format(corrThreshold - 1, fmt2) + "  Plot below ranges from -1 to 1"
 
-                Dim testCorr = 2.0 - 2.0 / task.histogramBins
+                corrThreshold = 2.0 - 2.0 / task.histogramBins
                 Dim mmRangeTest As New List(Of Double)
                 For i = 0 To task.gSquares.Count - 1
                     Dim r = task.gSquares(i)
-                    If testCorr >= cList(i) Then
+                    If cList(i) < corrThreshold Then
                         dst2.Rectangle(r, white, task.lineWidth)
                         mmRangeTest.Add(mmRanges(i))
                     End If
@@ -58,10 +58,11 @@ Namespace VBClasses
                 SetTrueText("Click on any grid rect to see its grayscale range." + vbCrLf +
                             "Min gray = " + Format(mm.minVal, fmt0) + vbCrLf +
                             "Max Gray = " + Format(mm.maxVal, fmt0) + vbCrLf +
-                            "Range = " + Format(mm.range, fmt0) + vbCrLf +
+                            "Range = " + Format(mm.range, fmt0) + vbCrLf + vbCrLf +
+                            "Surveying then deteriorated correlations:" + vbCrLf +
                             If(mmRangeTest.Count = 0, "",
-                            "Min RangeTest = " + Format(mmRangeTest.Min, fmt1) + vbCrLf +
-                            "Max RangeTest = " + Format(mmRangeTest.Max, fmt1)), 1)
+                            "Min Range = " + Format(mmRangeTest.Min, fmt1) + vbCrLf +
+                            "Max Range = " + Format(mmRangeTest.Max, fmt1)), 1)
             End If
         End Sub
     End Class

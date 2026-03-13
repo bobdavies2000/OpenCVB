@@ -250,6 +250,9 @@ FeatureFlow_LeftRight
 FeatureFlow_LeftRightHist
 FeatureFlow_LucasKanade
 FeatureLess_Basics
+FeatureLess_Compare
+FeatureLess_Correlations
+FeatureLess_RedColor
 Filter_Basics
 Filter_BasicsGray
 FindMinRect_Basics
@@ -859,13 +862,13 @@ NR_Feature_TraceDelaunay
 NR_Feature_WithDepth
 NR_FeatureFlow_Basics
 NR_FeatureFlow_LeftRight1
+NR_FeatureLess_Basics
 NR_FeatureLess_Canny
 NR_FeatureLess_DCT
 NR_FeatureLess_Groups
 NR_FeatureLess_Histogram
 NR_FeatureLess_History
 NR_FeatureLess_LeftRight
-NR_FeatureLess_RedColor
 NR_FeatureLess_Sobel
 NR_FeatureLess_Unique3Pixels
 NR_FeatureLess_UniquePixels

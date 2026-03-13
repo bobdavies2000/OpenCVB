@@ -1,6 +1,86 @@
+Imports System.Windows.Documents
 Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Class FeatureLess_Basics : Inherits TaskParent
+        Public Sub New()
+            dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+            desc = "Identify featureless squares using the gray scale range - see 'Correlation_Basics'."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            dst3 = src
+            dst2.SetTo(0)
+            Dim count As Integer
+            Dim rangeThreshold As Integer = 30
+            For Each gs In task.gSquares
+                Dim mm = GetMinMax(task.gray(gs))
+                If mm.range < rangeThreshold Then
+                    dst2(gs).SetTo(255)
+                    count += 1
+                    dst3.Rectangle(gs, white, task.lineWidth)
+                End If
+            Next
+            labels(3) = CStr(count) + " grid squares were found to be featureless (range < " + CStr(rangeThreshold) + ")"
+        End Sub
+    End Class
+
+
+
+
+    Public Class FeatureLess_Correlations : Inherits TaskParent
+        Dim corr As New Correlation_Basics
+        Public Sub New()
+            dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+            desc = "Identify featureless squares using the gray scale range - see 'Correlation_Basics'."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            If standaloneTest() Then dst3 = src
+            corr.Run(src)
+            labels(3) = corr.labels(3)
+
+            dst2.SetTo(0)
+            For i = 0 To corr.cList.Count - 1
+                Dim gs = task.gSquares(i)
+                If corr.cList(i) < corr.corrThreshold Then
+                    dst2(gs).SetTo(255)
+                    If standaloneTest() Then src.Rectangle(gs, white, task.lineWidth)
+                End If
+            Next
+        End Sub
+    End Class
+
+
+
+
+    Public Class FeatureLess_Compare : Inherits TaskParent
+        Dim fLess As New FeatureLess_Basics
+        Dim corr As New Correlation_Basics
+        Public Sub New()
+            labels(3) = "The red squares below are differences from the correlation calculation"
+            desc = "Compare the correlation results with the range threshold results."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            fLess.Run(src)
+            dst2 = fLess.dst3
+
+            corr.Run(src)
+            dst3 = corr.dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+
+            For i = 0 To corr.cList.Count - 1
+                Dim correlation = corr.cList(i)
+                If correlation < corr.corrThreshold Then
+                    Dim gs = task.gSquares(i)
+                    Dim val = fLess.dst2.Get(Of Byte)(gs.TopLeft.Y, gs.TopLeft.X)
+                    If val = 0 Then dst3.Rectangle(gs, red, -1)
+                End If
+            Next
+        End Sub
+    End Class
+
+
+
+
+
+    Public Class NR_FeatureLess_Basics : Inherits TaskParent
         Dim edgeline As New EdgeLine_Basics
         Public Sub New()
             If task.contours Is Nothing Then task.contours = New Contour_Basics_List
@@ -249,15 +329,33 @@ Namespace VBClasses
 
 
 
-    Public Class NR_FeatureLess_RedColor : Inherits TaskParent
+    Public Class FeatureLess_RedColor : Inherits TaskParent
         Dim fLess As New FeatureLess_Basics
+        Dim redC As New RedColor_Basics
         Public Sub New()
-            desc = "Use the featureLess_Basics output as input to RedList_Basics"
+            If standalone Then task.gOptions.displayDst1.Checked = True
+            desc = "Use the featureLess_Basics output as input to RedColor_Basics"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             fLess.Run(src)
-            dst3 = fLess.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-            dst2 = runRedList(dst3, labels(2))
+            dst2 = fLess.dst2
+            labels(2) = fLess.labels(3)
+
+            redC.Run(dst2)
+            dst3 = redC.dst2
+            labels(3) = redC.labels(2)
+
+            For Each rc In redC.rcList
+                dst3.Circle(rc.maxDist, task.DotSize, task.highlight, -1)
+            Next
+
+            If standaloneTest() Then
+                strOut = RedUtil_Basics.selectCell(redC.rcMap, redC.rcList)
+                If redC.rcList.Count > 0 And task.rcD Is Nothing Then
+                    task.clickPoint = redC.rcList(0).maxDist
+                End If
+                SetTrueText(strOut, 1)
+            End If
         End Sub
     End Class
 End Namespace
