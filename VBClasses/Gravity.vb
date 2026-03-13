@@ -254,9 +254,9 @@ Namespace VBClasses
             If rotateAngle >= angle Then rotateAngle = -angle
 
             dst1 = src
-            For Each gr In task.bricks.brickList
-                Dim pt = New cv.Point(gr.mm.maxLoc.X + gr.rect.X, gr.mm.maxLoc.Y + gr.rect.Y)
-                If pt.Y = gr.rect.Y Then
+            For Each gs In task.bricks.brickList
+                Dim pt = New cv.Point(gs.mm.maxLoc.X + gs.rect.X, gs.mm.maxLoc.Y + gs.rect.Y)
+                If pt.Y = gs.rect.Y Then
                     DrawCircle(dst1, pt)
                 End If
             Next

@@ -228,7 +228,7 @@ Namespace VBClasses
             Dim updateCount As Integer
             mask.SetTo(0)
 
-            For Each roi In task.gridRects
+            For Each roi In task.gSquares
                 Dim correlation As New cv.Mat, mean As Single, stdev As Single
                 cv.Cv2.MeanStdDev(dst2(roi), mean, stdev)
                 If stdev > optionsMatch.stdevThreshold Then
@@ -252,9 +252,9 @@ Namespace VBClasses
             lastFrame = saveFrame
             Dim corrPercent = Format(task.fCorrThreshold, "0.0%") + " correlation"
             labels(2) = "Correlation value for each cell is shown. " + CStr(updateCount) + " of " +
-                     CStr(task.gridRects.Count) + " with < " + corrPercent + " or stdev < " +
+                     CStr(task.gSquares.Count) + " with < " + corrPercent + " or stdev < " +
                      Format(optionsMatch.stdevThreshold, fmt0)
-            labels(3) = CStr(task.gridRects.Count - updateCount) + " segments out of " + CStr(task.gridRects.Count) + " had > " + corrPercent
+            labels(3) = CStr(task.gSquares.Count - updateCount) + " segments out of " + CStr(task.gSquares.Count) + " had > " + corrPercent
         End Sub
     End Class
 
@@ -548,17 +548,17 @@ Namespace VBClasses
 
     Public Class Match_Brick : Inherits TaskParent
         Public match As New Match_Basics1
-        Public gridIndex As Integer ' provide this - it identifies the gr 
+        Public gridIndex As Integer ' provide this - it identifies the gs 
         Public correlation As Single
         Public deltaX As Single, deltaY As Single
         Public Sub New()
-            desc = "Match a gr's movement from the previous frame."
+            desc = "Match a gs's movement from the previous frame."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             If standalone Then gridIndex = task.lines.lpList(0).p1GridIndex
             Static lastImage As cv.Mat = task.gray.Clone
 
-            Dim rect = task.gridRects(gridIndex)
+            Dim rect = task.gSquares(gridIndex)
             match.template = task.gray(rect)
             Dim searchrect = task.gridNabeRects(gridIndex)
 
@@ -613,29 +613,29 @@ Namespace VBClasses
                 Exit Sub
             End If
 
-            Dim gr As gravityLine
+            Dim gs As gravityLine
             brickCells.Clear()
             match.tCells.Clear()
             For i = 0 To sortedLines.Count - 1
-                gr = sortedLines.ElementAt(i).Value
+                gs = sortedLines.ElementAt(i).Value
 
                 If i = 0 Then
                     dst1.SetTo(0)
-                    gr.tc1.template.CopyTo(dst1(gr.tc1.rect))
-                    gr.tc2.template.CopyTo(dst1(gr.tc2.rect))
+                    gs.tc1.template.CopyTo(dst1(gs.tc1.rect))
+                    gs.tc2.template.CopyTo(dst1(gs.tc2.rect))
                 End If
 
                 match.tCells.Clear()
-                match.tCells.Add(gr.tc1)
-                match.tCells.Add(gr.tc2)
+                match.tCells.Add(gs.tc1)
+                match.tCells.Add(gs.tc2)
 
                 match.Run(src)
                 Dim threshold = task.fCorrThreshold
                 If match.tCells(0).correlation >= threshold And match.tCells(1).correlation >= threshold Then
-                    gr.tc1 = match.tCells(0)
-                    gr.tc2 = match.tCells(1)
-                    gr = gLines.updateGLine(src, gr, gr.tc1.center, gr.tc2.center)
-                    If gr.len3D > 0 Then brickCells.Add(gr)
+                    gs.tc1 = match.tCells(0)
+                    gs.tc2 = match.tCells(1)
+                    gs = gLines.updateGLine(src, gs, gs.tc1.center, gs.tc2.center)
+                    If gs.len3D > 0 Then brickCells.Add(gs)
                 End If
             Next
 
@@ -644,14 +644,14 @@ Namespace VBClasses
 
             For i = 0 To brickCells.Count - 1
                 Dim tc As New tCell
-                gr = brickCells(i)
+                gs = brickCells(i)
                 Dim p1 As cv.Point2f, p2 As cv.Point2f
                 For j = 0 To 2 - 1
-                    tc = Choose(j + 1, gr.tc1, gr.tc2)
+                    tc = Choose(j + 1, gs.tc1, gs.tc2)
                     If j = 0 Then p1 = tc.center Else p2 = tc.center
                 Next
-                SetTrueText(CStr(i) + vbCrLf + tc.strOut + vbCrLf + Format(gr.arcY, fmt1), gr.tc1.center, 2)
-                SetTrueText(CStr(i) + vbCrLf + tc.strOut + vbCrLf + Format(gr.arcY, fmt1), gr.tc1.center, 3)
+                SetTrueText(CStr(i) + vbCrLf + tc.strOut + vbCrLf + Format(gs.arcY, fmt1), gs.tc1.center, 2)
+                SetTrueText(CStr(i) + vbCrLf + tc.strOut + vbCrLf + Format(gs.arcY, fmt1), gs.tc1.center, 3)
 
                 vbc.DrawLine(dst2, p1, p2, task.highlight)
                 vbc.DrawLine(dst3, p1, p2, task.highlight)

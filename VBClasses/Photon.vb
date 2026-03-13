@@ -127,7 +127,7 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             Dim currColors As New List(Of cv.Vec3b)
-            For Each roi In task.gridRects
+            For Each roi In task.gSquares
                 currColors.Add(task.bricks.dst2.Get(Of cv.Vec3b)(roi.Y, roi.X))
             Next
 

@@ -255,7 +255,7 @@ Namespace VBClasses
 
         Public Class brickData
             Public age As Integer = 1
-            Public center As cv.Point ' center of the gr
+            Public center As cv.Point ' center of the gs
             Public color As cv.Scalar
             Public colorClass As Integer
             Public corners As New List(Of cv.Point3f)
@@ -425,13 +425,13 @@ Namespace VBClasses
 
                 pVec1 = task.pointCloud.Get(Of cv.Vec3f)(p1.Y, p1.X)
                 If Single.IsNaN(pVec1(0)) Or pVec1(2) = 0 Then
-                    Dim r = task.gridRects(p1GridIndex)
+                    Dim r = task.gSquares(p1GridIndex)
                     pVec1 = New cv.Vec3f(0, 0, task.pcSplit(2)(r).Mean(task.depthmask(r)).Item(0))
                 End If
 
                 pVec2 = task.pointCloud.Get(Of cv.Vec3f)(p2.Y, p2.X)
                 If Single.IsNaN(pVec2(0)) Or pVec2(2) = 0 Then
-                    Dim r = task.gridRects(p2GridIndex)
+                    Dim r = task.gSquares(p2GridIndex)
                     pVec2 = New cv.Vec3f(0, 0, task.pcSplit(2)(r).Mean(task.depthmask(r)).Item(0))
                 End If
 

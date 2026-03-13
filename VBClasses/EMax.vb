@@ -116,7 +116,7 @@ Namespace VBClasses
             options.Run()
 
             If task.optionsChanged Then grid.Run(dst2)
-            regionCount = grid.gridRects.Count
+            regionCount = grid.gSquares.Count
 
             Dim samples = New cv.Mat(regionCount * options.samplesPerRegion, 2, cv.MatType.CV_32F).Reshape(2, 0)
             Dim eLabelMat = New cv.Mat(regionCount * options.samplesPerRegion, 1, cv.MatType.CV_32S)
@@ -136,7 +136,7 @@ Namespace VBClasses
             Dim gIndex As Integer = -1
             For i = 0 To regionCount * options.samplesPerRegion - 1
                 If i Mod options.samplesPerRegion = 0 Then gIndex += 1
-                Dim roi = grid.gridRects(gIndex)
+                Dim roi = grid.gSquares(gIndex)
                 Dim pt = samples.Get(Of cv.Point2f)(i, 0)
                 centers.Add(pt)
                 Dim ePt = New cv.Point2f(CInt(roi.X + pt.X), CInt(roi.Y + pt.Y))

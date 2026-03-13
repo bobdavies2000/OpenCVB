@@ -160,29 +160,29 @@ Namespace VBClasses
 
             ' find the most featureless roi
             Dim maxIndex As Integer
-            Dim grCounts(task.gridRects.Count - 1)
-            For i = 0 To task.gridRects.Count - 1
-                grCounts(i) = mask(task.gridRects(i)).CountNonZero
+            Dim grCounts(task.gSquares.Count - 1)
+            For i = 0 To task.gSquares.Count - 1
+                grCounts(i) = mask(task.gSquares(i)).CountNonZero
                 If grCounts(i) > grCounts(maxIndex) Then maxIndex = i
             Next
 
             mats.mat(3) = New cv.Mat(src.Size(), cv.MatType.CV_8UC3, cv.Scalar.All(0))
-            src(task.gridRects(maxIndex)).CopyTo(mats.mat(3)(task.gridRects(maxIndex)), mask(task.gridRects(maxIndex)))
+            src(task.gSquares(maxIndex)).CopyTo(mats.mat(3)(task.gSquares(maxIndex)), mask(task.gSquares(maxIndex)))
             mats.Run(emptyMat)
             dst3 = mats.dst2
 
-            Dim gr = task.gridRects(maxIndex) ' this is where the debug comes in.  We just want to look at one region which hopefully is a single plane.
-            If gr.X = task.gridRects(maxIndex).X And gr.Y = task.gridRects(maxIndex).Y Then
-                If grCounts(maxIndex) > gr.Width * gr.Height / 4 Then
+            Dim gs = task.gSquares(maxIndex) ' this is where the debug comes in.  We just want to look at one region which hopefully is a single plane.
+            If gs.X = task.gSquares(maxIndex).X And gs.Y = task.gSquares(maxIndex).Y Then
+                If grCounts(maxIndex) > gs.Width * gs.Height / 4 Then
                     Dim fitPoints As New List(Of cv.Point3f)
                     Dim minDepth = Single.MaxValue, maxDepth = Single.MinValue
-                    For j = 0 To gr.Height - 1
-                        For i = 0 To gr.Width - 1
-                            Dim nextD = task.pcSplit(2)(gr).Get(Of Single)(j, i)
+                    For j = 0 To gs.Height - 1
+                        For i = 0 To gs.Width - 1
+                            Dim nextD = task.pcSplit(2)(gs).Get(Of Single)(j, i)
                             If nextD <> 0 Then
                                 If minDepth > nextD Then minDepth = nextD
                                 If maxDepth < nextD Then maxDepth = nextD
-                                Dim wpt = New cv.Point3f(gr.X + i, gr.Y + j, nextD)
+                                Dim wpt = New cv.Point3f(gs.X + i, gs.Y + j, nextD)
                                 fitPoints.Add(Cloud_Basics.worldCoordinates(wpt))
                             End If
                         Next
@@ -191,8 +191,8 @@ Namespace VBClasses
                         Dim eq = Plane_Basics.fitDepthPlane(fitPoints)
                         If Single.IsNaN(eq(0)) = False Then
                             flow.nextMsg = "a=" + Format(eq(0), fmt2) + " b=" + Format(eq(1), fmt2) + " c=" + Format(Math.Abs(eq(2)), fmt2) +
-                              vbTab + "depth=" + Format(-eq(3), fmt2) + "m " + "gr(x,y) = " + Format(gr.X, "000") + "," +
-                              Format(gr.Y, "000") + vbTab + "Min=" + Format(minDepth, fmt1) + "m " + " Max=" + Format(maxDepth, fmt1) + "m"
+                              vbTab + "depth=" + Format(-eq(3), fmt2) + "m " + "gs(x,y) = " + Format(gs.X, "000") + "," +
+                              Format(gs.Y, "000") + vbTab + "Min=" + Format(minDepth, fmt1) + "m " + " Max=" + Format(maxDepth, fmt1) + "m"
                         End If
                     End If
                 End If

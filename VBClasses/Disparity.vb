@@ -6,7 +6,7 @@ Namespace VBClasses
         Public rect As cv.Rect
         Public matchRect As cv.Rect
         Public Sub New()
-            desc = "Given a gr, find the match in the right view image."
+            desc = "Given a gs, find the match in the right view image."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             dst2 = task.color.Clone
@@ -19,7 +19,7 @@ Namespace VBClasses
                 saveCorrelations.Clear()
                 saveIndex = index
             End If
-            rect = task.gridRects(index)
+            rect = task.gSquares(index)
 
             match.template = task.leftView(rect)
             Dim maxDisparity As Integer = 128
@@ -209,7 +209,7 @@ Namespace VBClasses
             dst1.Rectangle(disparity.matchRect, 255, task.lineWidth)
 
             Dim index As Integer = task.gridMap.Get(Of Integer)(task.ClickPoint.Y, task.ClickPoint.X)
-            Dim rect = task.gridRects(index)
+            Dim rect = task.gSquares(index)
             dst2.Rectangle(rect, 255, task.lineWidth)
         End Sub
     End Class

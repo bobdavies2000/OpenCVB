@@ -142,8 +142,8 @@ Public Class SharpGLForm
         gl.Begin(OpenGL.GL_QUADS)
 
         Dim count As Integer
-        For i = 0 To task.gridRects.Count - 1
-            Dim rect = task.gridRects(i)
+        For i = 0 To task.gSquares.Count - 1
+            Dim rect = task.gSquares(i)
             Dim depth = -task.pcSplit(2)(rect).Mean(task.depthmask(rect))(0)
             If depth = 0 Then Continue For
             count += 1

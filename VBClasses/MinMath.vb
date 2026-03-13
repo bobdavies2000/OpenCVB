@@ -59,14 +59,14 @@ Namespace VBClasses
         Dim bPoints As New BrickPoint_Basics
         Public Sub New()
             If task.bricks Is Nothing Then task.bricks = New Brick_Basics
-            desc = "Connect each gr to its neighbors"
+            desc = "Connect each gs to its neighbors"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             bPoints.Run(src)
             dst2 = bPoints.dst2
             labels(2) = bPoints.labels(2)
 
-            For Each gr In task.bricks.brickList
+            For Each gs In task.bricks.brickList
             Next
         End Sub
     End Class
@@ -81,7 +81,7 @@ Namespace VBClasses
         Dim bPoint As New BrickPoint_Basics
         Dim knn As New KNN_Basics
         Public Sub New()
-            desc = "Connect each gr point with its nearest neighbor"
+            desc = "Connect each gs point with its nearest neighbor"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             bPoint.Run(src)

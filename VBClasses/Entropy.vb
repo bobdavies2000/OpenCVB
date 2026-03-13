@@ -57,14 +57,14 @@ Namespace VBClasses
             desc = "Find the highest entropy section of the color image."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            Dim entropyList(task.gridRects.Count - 1) As Single
+            Dim entropyList(task.gSquares.Count - 1) As Single
             Dim maxEntropy As Single = Single.MinValue
             Dim minEntropy As Single = Single.MaxValue
             trueData.Clear()
 
             src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
             dst1.SetTo(0)
-            For Each roi In task.gridRects
+            For Each roi In task.gSquares
                 If roi.Width = roi.Height Then
                     entropy.Run(src(roi))
                     dst1(roi).SetTo(entropy.entropyVal)
@@ -183,7 +183,7 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             If task.firstPass Then
-                For Each roi In task.gridRects
+                For Each roi In task.gSquares
                     Dim xSub = roi.X + roi.Width
                     Dim ySub = roi.Y + roi.Height
                     If ySub <= dst2.Height / 3 Then
@@ -227,15 +227,15 @@ Namespace VBClasses
             Dim dimensions() = New Integer() {task.histogramBins}
             Dim ranges() = New cv.Rangef() {New cv.Rangef(0, 255)}
             Dim hist As New cv.Mat
-            For i = 0 To task.gridRects.Count - 1
-                Dim gr = task.gridRects(i)
-                cv.Cv2.CalcHist({dst1(gr)}, {0}, New cv.Mat(), hist, 1, dimensions, ranges)
+            For i = 0 To task.gSquares.Count - 1
+                Dim gs = task.gSquares(i)
+                cv.Cv2.CalcHist({dst1(gs)}, {0}, New cv.Mat(), hist, 1, dimensions, ranges)
                 hist = hist.Normalize(0, hist.Rows, cv.NormTypes.MinMax)
 
-                Dim nextEntropy = entropy.channelEntropy(dst1(gr).Total, hist) * 1000
+                Dim nextEntropy = entropy.channelEntropy(dst1(gs).Total, hist) * 1000
 
                 entropies(subDivisions(i)).Add(nextEntropy)
-                eROI(subDivisions(i)).Add(gr)
+                eROI(subDivisions(i)).Add(gs)
             Next
 
             Dim str = If(task.toggleOn, "minimum", "maximum")

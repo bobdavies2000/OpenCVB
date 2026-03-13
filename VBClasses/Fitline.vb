@@ -222,14 +222,14 @@ Namespace VBClasses
         Dim fitline As New FitLine_Basics
         Public Sub New()
             dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
-            desc = "Find lines within each gr."
+            desc = "Find lines within each gs."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             edges.Run(src)
             dst2 = edges.dst2
 
             dst3.SetTo(0)
-            For Each rect In task.gridRects
+            For Each rect In task.gSquares
                 If dst2(rect).CountNonZero >= 5 Then
                     nZero.Run(dst2(rect))
 

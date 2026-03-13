@@ -7277,13 +7277,13 @@ Namespace VBClasses
         Public height As Integer = 8
         Public Sub New()
             If sliders.Setup(traceName) Then
-                sliders.setupTrackBar("gr Width", 1, task.cols, width)
-                sliders.setupTrackBar("gr Height", 1, task.rows, height)
+                sliders.setupTrackBar("gs Width", 1, task.cols, width)
+                sliders.setupTrackBar("gs Height", 1, task.rows, height)
             End If
         End Sub
         Public Sub Run()
-            Static widthSlider = OptionParent.FindSlider("gr Width")
-            Static heightSlider = OptionParent.FindSlider("gr Height")
+            Static widthSlider = OptionParent.FindSlider("gs Width")
+            Static heightSlider = OptionParent.FindSlider("gs Height")
             width = widthSlider.value
             height = heightSlider.value
         End Sub
@@ -7362,7 +7362,7 @@ Namespace VBClasses
                 sliders.setupTrackBar("OpenGL yaw (degrees)", -180, 180, yaw)
                 sliders.setupTrackBar("OpenGL pitch (degrees)", -180, 180, pitch)
                 sliders.setupTrackBar("OpenGL roll (degrees)", -180, 180, roll)
-                If task.settings.cameraName = "Intel(R) RealSense(TM) Depth Camera 435i" Then
+                If task.Settings.cameraName = "Intel(R) RealSense(TM) Depth Camera 435i" Then
                     OptionParent.FindSlider("OpenGL yaw (degrees)").Value = 135
                 End If
             End If
@@ -7931,13 +7931,13 @@ Namespace VBClasses
         Public lineTrackerWidth As Integer
         Public Sub New()
             If sliders.Setup(traceName) Then
-                sliders.setupTrackBar("Left to Right gr correlation Minimum X100", 0, 100, 70)
+                sliders.setupTrackBar("Left to Right gs correlation Minimum X100", 0, 100, 70)
                 sliders.setupTrackBar("Range in mm's", 1, 100, 20)
                 sliders.setupTrackBar("Line_Tracker width", 1, 20, 5)
             End If
         End Sub
         Public Sub Run()
-            Static corrSlider = FindSlider("Left to Right gr correlation Minimum X100")
+            Static corrSlider = FindSlider("Left to Right gs correlation Minimum X100")
             Static rangeSlider = FindSlider("Range in mm's")
             Static widthSlider = FindSlider("Line_Tracker width")
             correlation = corrSlider.value / 100

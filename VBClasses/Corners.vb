@@ -224,13 +224,13 @@ Namespace VBClasses
             dst2 = src.Clone
 
             fast.Run(src)
-            ReDim fastCenters(task.gridRects.Count - 1)
-            For i = 0 To task.gridRects.Count - 1
-                Dim gr = task.gridRects(i)
-                Dim tmp = fast.dst3(gr).FindNonZero()
+            ReDim fastCenters(task.gSquares.Count - 1)
+            For i = 0 To task.gSquares.Count - 1
+                Dim gs = task.gSquares(i)
+                Dim tmp = fast.dst3(gs).FindNonZero()
                 If tmp.Rows > 0 Then
                     Dim mean = tmp.Mean()
-                    fastCenters(i) = New cv.Point2f(gr.X + mean(0), gr.Y + mean(1))
+                    fastCenters(i) = New cv.Point2f(gs.X + mean(0), gs.Y + mean(1))
                 End If
             Next
 

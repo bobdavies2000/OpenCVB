@@ -248,11 +248,11 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             Dim index As Integer
-            For Each r In task.gridRects
+            For Each r In task.gSquares
                 dst2(r).SetTo(task.scalarColors(index Mod 256))
                 index += 1
             Next
-            labels(2) = "NR_Palette_Layout2D - " + CStr(task.gridRects.Count) + " regions"
+            labels(2) = "NR_Palette_Layout2D - " + CStr(task.gSquares.Count) + " regions"
         End Sub
     End Class
 
@@ -285,10 +285,10 @@ Namespace VBClasses
             task.brickSize -= direction * 1
             task.grid.Run(src)
 
-            For i = 0 To task.gridRects.Count - 1
-                Dim gr = task.gridRects(i)
-                dst2(gr).SetTo(task.scalarColors(i Mod 256))
-                dst3(gr).SetTo(task.vecColors(i Mod 256))
+            For i = 0 To task.gSquares.Count - 1
+                Dim gs = task.gSquares(i)
+                dst2(gs).SetTo(task.scalarColors(i Mod 256))
+                dst3(gs).SetTo(task.vecColors(i Mod 256))
             Next
         End Sub
     End Class

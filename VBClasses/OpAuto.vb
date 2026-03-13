@@ -126,7 +126,7 @@ Namespace VBClasses
             End If
 
             Dim pointPop As New SortedList(Of Single, cv.Point)(New compareAllowIdenticalSingleInverted)
-            For Each roi In task.gridRects
+            For Each roi In task.gSquares
                 Dim mm As mmData = GetMinMax(src(roi))
                 If mm.maxVal = 0 Then Continue For
                 pointPop.Add(mm.maxVal, New cv.Point(roi.X + mm.maxLoc.X, roi.Y + mm.maxLoc.Y))

@@ -33,7 +33,7 @@ Namespace VBClasses
             svm.Train(dataMat, cv.ML.SampleTypes.RowSample, resMat)
 
             dst3.SetTo(0)
-            For Each roi In task.gridRects
+            For Each roi In task.gSquares
                 If roi.X > src.Height Then Continue For ' working only with square - not rectangles.
                 Dim samples() As Single = {roi.X / src.Height, roi.Y / src.Height}
                 If svm.Predict(cv.Mat.FromPixelData(1, 2, cv.MatType.CV_32F, samples)) = 1 Then

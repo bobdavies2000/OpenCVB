@@ -16,9 +16,9 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             unscrambled.Clear()
             Dim inputROI As New List(Of cv.Rect)
-            For j = 0 To task.gridRects.Count - 1
-                Dim gr = task.gridRects(j)
-                If gr.Width = task.brickSize And gr.Height = task.brickSize Then inputROI.Add(task.gridRects(j))
+            For j = 0 To task.gSquares.Count - 1
+                Dim gs = task.gSquares(j)
+                If gs.Width = task.brickSize And gs.Height = task.brickSize Then inputROI.Add(task.gSquares(j))
             Next
 
             scrambled = Shuffle(inputROI)
@@ -26,10 +26,10 @@ Namespace VBClasses
 
             ' display image with shuffled roi's
             For i = 0 To scrambled.Count - 1
-                Dim gr = task.gridRects(i)
+                Dim gs = task.gSquares(i)
                 Dim gr2 = scrambled(i)
-                If gr.Width = task.brickSize And gr.Height = task.brickSize And
-                   gr2.Width = task.brickSize And gr2.Height = task.brickSize Then dst2(gr2) = src(gr)
+                If gs.Width = task.brickSize And gs.Height = task.brickSize And
+                   gr2.Width = task.brickSize And gr2.Height = task.brickSize Then dst2(gr2) = src(gs)
             Next
         End Sub
     End Class

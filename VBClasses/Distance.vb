@@ -231,7 +231,7 @@ Namespace VBClasses
 
             Dim maxList As New List(Of Double)
             Dim ptList As New List(Of cv.Point)
-            For Each rect In task.gridRects
+            For Each rect In task.gSquares
                 Dim mm = GetMinMax(distance32f(rect))
                 maxList.Add(mm.maxVal)
                 If mm.maxVal > 0 Then ptList.Add(New cv.Point(mm.maxLoc.X + rect.X, mm.maxLoc.Y + rect.Y))
@@ -248,8 +248,8 @@ Namespace VBClasses
 
             Dim max = maxList.Max
             dst2.SetTo(0)
-            For i = 0 To task.gridRects.Count - 1
-                Dim rect = task.gridRects(i)
+            For i = 0 To task.gSquares.Count - 1
+                Dim rect = task.gSquares(i)
                 dst2(rect).SetTo(255 * maxList(i) / max)
             Next
         End Sub
@@ -272,7 +272,7 @@ Namespace VBClasses
 
             Dim maxList As New List(Of Double)
             Dim ptList As New List(Of cv.Point)
-            For Each rect In task.gridRects
+            For Each rect In task.gSquares
                 Dim mm = GetMinMax(distance32f(rect))
                 maxList.Add(mm.maxVal)
                 If mm.maxVal > 0 Then ptList.Add(New cv.Point(mm.maxLoc.X + rect.X, mm.maxLoc.Y + rect.Y))
@@ -288,8 +288,8 @@ Namespace VBClasses
 
             Dim max = maxList.Max
             dst2.SetTo(0)
-            For i = 0 To task.gridRects.Count - 1
-                Dim rect = task.gridRects(i)
+            For i = 0 To task.gSquares.Count - 1
+                Dim rect = task.gSquares(i)
                 dst2(rect).SetTo(255 * maxList(i) / max)
             Next
         End Sub
@@ -495,7 +495,7 @@ Namespace VBClasses
         Public Sub New()
             If task.bricks Is Nothing Then task.bricks = New Brick_Basics
             task.gOptions.DebugSlider.Value = 20
-            desc = "Threshold the maxDist in each gr to highlight centers for key objects.  Use the 'DebugSlider' to provide the value."
+            desc = "Threshold the maxDist in each gs to highlight centers for key objects.  Use the 'DebugSlider' to provide the value."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             dist.Run(src)
@@ -503,10 +503,10 @@ Namespace VBClasses
             dst3 = src.Clone
 
             Dim threshold = Math.Abs(task.gOptions.DebugSlider.Value)
-            For Each gr In task.bricks.brickList
-                Dim mm = GetMinMax(dst2(gr.rect))
+            For Each gs In task.bricks.brickList
+                Dim mm = GetMinMax(dst2(gs.rect))
                 If mm.maxVal >= threshold Then
-                    Dim pt = New cv.Point(mm.maxLoc.X + gr.rect.X, mm.maxLoc.Y + gr.rect.Y)
+                    Dim pt = New cv.Point(mm.maxLoc.X + gs.rect.X, mm.maxLoc.Y + gs.rect.Y)
                     DrawCircle(dst3, pt)
                 End If
             Next

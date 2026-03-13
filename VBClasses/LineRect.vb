@@ -113,8 +113,8 @@ Namespace VBClasses
             For Each lp In task.lines.lpList
                 Dim center = New cv.Point((lp.p1.X + lp.p2.X) \ 2, (lp.p1.Y + lp.p2.Y) \ 2)
                 Dim index As Integer = task.gridMap.Get(Of Integer)(center.Y, center.X)
-                Dim gr = task.bricks.brickList(index)
-                If gr.mm.maxVal - gr.mm.minVal > depthThreshold Then
+                Dim gs = task.bricks.brickList(index)
+                If gs.mm.maxVal - gs.mm.minVal > depthThreshold Then
                     dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, cv.LineTypes.Link4)
                     depthLines += 1
                 Else

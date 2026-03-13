@@ -409,20 +409,20 @@ Namespace VBClasses
             dst2 = task.leftView
             dst3 = task.rightView
 
-            Dim maxLocs(task.gridRects.Count - 1) As Integer
+            Dim maxLocs(task.gSquares.Count - 1) As Integer
             Dim highlights As New List(Of Integer)
-            For i = 0 To task.gridRects.Count - 1
-                Dim gr = task.gridRects(i)
-                Dim width = If(gr.X + gr.Width + options.searchDepth < dst2.Width,
-                                      gr.Width + options.searchDepth, dst2.Width - gr.X - 1)
-                Dim searchgr = New cv.Rect(gr.X, gr.Y, width, gr.Height)
-                match.template = dst3(gr)
+            For i = 0 To task.gSquares.Count - 1
+                Dim gs = task.gSquares(i)
+                Dim width = If(gs.X + gs.Width + options.searchDepth < dst2.Width,
+                                      gs.Width + options.searchDepth, dst2.Width - gs.X - 1)
+                Dim searchgr = New cv.Rect(gs.X, gs.Y, width, gs.Height)
+                match.template = dst3(gs)
                 match.Run(dst2(searchgr))
 
                 maxLocs(i) = match.newRect.X
                 If match.correlation > options.threshold Or redRects.Contains(i) Then
                     highlights.Add(i)
-                    SetTrueText(Format(match.correlation, fmt2), New cv.Point(gr.X, gr.Y), 3)
+                    SetTrueText(Format(match.correlation, fmt2), New cv.Point(gs.X, gs.Y), 3)
                 End If
             Next
 
@@ -436,11 +436,11 @@ Namespace VBClasses
             If options.highlightChecked Then
                 labels(2) = "Matched grid segments in dst3 with disparity"
                 For Each i In highlights
-                    Dim gr = task.gridRects(i)
-                    dst3.Rectangle(gr, cv.Scalar.Red, 2)
-                    gr.X += maxLocs(i)
-                    dst2.Rectangle(gr, cv.Scalar.Red, 2)
-                    SetTrueText(CStr(maxLocs(i)), New cv.Point(gr.X, gr.Y), 2)
+                    Dim gs = task.gSquares(i)
+                    dst3.Rectangle(gs, cv.Scalar.Red, 2)
+                    gs.X += maxLocs(i)
+                    dst2.Rectangle(gs, cv.Scalar.Red, 2)
+                    SetTrueText(CStr(maxLocs(i)), New cv.Point(gs.X, gs.Y), 2)
                 Next
             Else
                 labels(2) = "Click in dst3 to highlight segment in dst2"
@@ -452,11 +452,11 @@ Namespace VBClasses
                 If task.gridROIclicked Then
                     If redRects.Contains(task.gridROIclicked) = False Then redRects.Add(task.gridROIclicked)
                     For Each i In redRects
-                        Dim gr = task.gridRects(i)
-                        dst3.Rectangle(gr, cv.Scalar.Red, 2)
-                        gr.X += maxLocs(i)
-                        dst2.Rectangle(gr, cv.Scalar.Red, 2)
-                        SetTrueText(CStr(maxLocs(i)), New cv.Point(gr.X, gr.Y), 2)
+                        Dim gs = task.gSquares(i)
+                        dst3.Rectangle(gs, cv.Scalar.Red, 2)
+                        gs.X += maxLocs(i)
+                        dst2.Rectangle(gs, cv.Scalar.Red, 2)
+                        SetTrueText(CStr(maxLocs(i)), New cv.Point(gs.X, gs.Y), 2)
                     Next
                 End If
             End If
@@ -1526,13 +1526,13 @@ Namespace VBClasses
             dst3 = edgesLR.dst3
 
             Dim count As Integer
-            For Each gr In task.bricks.brickList
-                If gr.depth = 0 Then Continue For
-                If gr.rRect.X < 0 Or gr.rRect.X + gr.rRect.Width >= dst2.Width Then Continue For
-                If gr.rRect.Width = 0 Or gr.rRect.Height = 0 Then Continue For
-                If dst2(gr.lRect).CountNonZero And dst3(gr.rRect).CountNonZero Then
-                    dst2.Rectangle(gr.lRect, white, task.lineWidth)
-                    dst3.Rectangle(gr.rRect, white, task.lineWidth)
+            For Each gs In task.bricks.brickList
+                If gs.depth = 0 Then Continue For
+                If gs.rRect.X < 0 Or gs.rRect.X + gs.rRect.Width >= dst2.Width Then Continue For
+                If gs.rRect.Width = 0 Or gs.rRect.Height = 0 Then Continue For
+                If dst2(gs.lRect).CountNonZero And dst3(gs.rRect).CountNonZero Then
+                    dst2.Rectangle(gs.lRect, white, task.lineWidth)
+                    dst3.Rectangle(gs.rRect, white, task.lineWidth)
                     count += 1
                 End If
             Next

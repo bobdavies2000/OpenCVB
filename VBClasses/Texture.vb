@@ -29,7 +29,7 @@ Namespace VBClasses
             End If
             If tChange Then
                 Dim sortcounts As New SortedList(Of Integer, cv.Rect)(New compareAllowIdenticalIntegerInverted)
-                For Each roi In task.gridRects
+                For Each roi In task.gSquares
                     sortcounts.Add(dst2(roi).CountNonZero, roi)
                 Next
                 If standaloneTest() Then dst3.Rectangle(sortcounts.ElementAt(0).Value, white, 2)

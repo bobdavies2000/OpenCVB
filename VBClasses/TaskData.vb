@@ -28,7 +28,7 @@ Namespace VBClasses
         Public noDepthMask As cv.Mat
         Public depthRGB As cv.Mat
 
-        Public gridRects As List(Of cv.Rect)
+        Public gSquares As List(Of cv.Rect)
         Public firstPass As Boolean = True
 
         ' treeview data
@@ -111,7 +111,7 @@ Namespace VBClasses
 
         Public fpMap As New cv.Mat ' feature map
 
-        Public brickD As brickData ' the currently selected gr
+        Public brickD As brickData ' the currently selected gs
         Public rcD As New rcData ' the currently selected redCloud Cell
         Public oldrcD As New oldrcData ' the currently selected redColor Cell
         Public lpD As New lpData ' the currently selected line pair

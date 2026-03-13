@@ -17,7 +17,7 @@ Namespace VBClasses
 
         '    Dim depth As New cv.Mat(lp.rect.Size, cv.MatType.CV_8U, 0)
 
-        '    Dim r = task.gridRects(lp.p1GridIndex)
+        '    Dim r = task.gSquares(lp.p1GridIndex)
         '    Dim depth = task.pcSplit(2)(r).Mean(task.depthmask(r))(0)
 
         'End Function
@@ -28,11 +28,11 @@ Namespace VBClasses
             lines3D.Clear()
 
             For Each lp In task.lines.lpList
-                Dim rect1 = task.gridRects(task.gridMap.Get(Of Integer)(lp.p1.Y, lp.p1.X))
+                Dim rect1 = task.gSquares(task.gridMap.Get(Of Integer)(lp.p1.Y, lp.p1.X))
                 Dim depth1 = task.pcSplit(2)(rect1).Mean(task.depthmask(rect1))(0)
                 If depth1 = 0 Then Continue For
 
-                Dim rect2 = task.gridRects(task.gridMap.Get(Of Integer)(lp.p1.Y, lp.p1.X))
+                Dim rect2 = task.gSquares(task.gridMap.Get(Of Integer)(lp.p1.Y, lp.p1.X))
                 Dim depth2 = task.pcSplit(2)(rect2).Mean(task.depthmask(rect2))(0)
                 If depth2 = 0 Then Continue For
 

@@ -1437,7 +1437,7 @@ Namespace VBClasses
                     If histData.Count < 128 And task.histogramBins < task.gOptions.HistBinBar.Maximum Then
                         task.histogramBins += 1
                     End If
-                    If task.gridRects.Count < histData.Length And task.brickSize > 2 Then
+                    If task.gSquares.Count < histData.Length And task.brickSize > 2 Then
                         task.brickSize -= 1
                         grid.Run(src)
                         dst2.SetTo(0)
@@ -1445,12 +1445,12 @@ Namespace VBClasses
                     histData(0) = 0 ' count of zero pixels - distorts sharedResults.images...
 
                     Dim maxVal = histData.ToList.Max
-                    For i = 0 To task.gridRects.Count - 1
-                        Dim gr = task.gridRects(i)
+                    For i = 0 To task.gSquares.Count - 1
+                        Dim gs = task.gSquares(i)
                         If i >= histData.Length Then
-                            dst2(gr).SetTo(0)
+                            dst2(gs).SetTo(0)
                         Else
-                            dst2(gr).SetTo(255 * histData(i) / maxVal)
+                            dst2(gs).SetTo(255 * histData(i) / maxVal)
                         End If
                     Next
                     labels(2) = "2D plot of the resulting 3D histogram."

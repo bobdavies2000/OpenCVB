@@ -93,12 +93,12 @@ Namespace VBClasses
             If standalone Then lpInput = task.lines.lpList(0)
             Static lastImage = task.gray.Clone
 
-            Dim rect = task.gridRects(lpInput.p1GridIndex)
+            Dim rect = task.gSquares(lpInput.p1GridIndex)
             match.template = task.gray(rect)
             match.Run(lastImage(task.gridNabeRects(lpInput.p1GridIndex)))
             p1Correlation = match.correlation
 
-            rect = task.gridRects(lpInput.p2GridIndex)
+            rect = task.gSquares(lpInput.p2GridIndex)
             match.template = task.gray(rect)
             match.Run(lastImage(task.gridNabeRects(lpInput.p2GridIndex)))
             p2Correlation = match.correlation

@@ -756,7 +756,7 @@ Namespace VBClasses
 
             Dim allPoints As New List(Of cv.Point)
             Dim brickList As New List(Of cv.Rect)
-            For Each rect In task.gridRects
+            For Each rect In task.gSquares
                 Dim brick = dst1(rect)
                 If brick.CountNonZero = 0 Then Continue For
                 Dim mm = GetMinMax(brick)

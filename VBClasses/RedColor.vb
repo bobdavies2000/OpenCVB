@@ -181,7 +181,7 @@ Namespace VBClasses
         Public Sub New()
             If task.bricks Is Nothing Then task.bricks = New Brick_Basics
             If standalone Then task.gOptions.displayDst0.Checked = True
-            desc = "Attach an color8u class to each gr."
+            desc = "Attach an color8u class to each gs."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             dst0 = task.leftView
@@ -193,10 +193,10 @@ Namespace VBClasses
 
             Dim count As Integer
             dst1.SetTo(0)
-            For Each gr As brickData In task.bricks.brickList
-                If redC.rcMap(gr.lRect).CountNonZero And gr.rRect.Width > 0 Then
-                    dst2(gr.lRect).CopyTo(dst1(gr.rRect))
-                    gr.colorClass = color8u.dst2.Get(Of Integer)
+            For Each gs As brickData In task.bricks.brickList
+                If redC.rcMap(gs.lRect).CountNonZero And gs.rRect.Width > 0 Then
+                    dst2(gs.lRect).CopyTo(dst1(gs.rRect))
+                    gs.colorClass = color8u.dst2.Get(Of Integer)
                     count += 1
                 End If
             Next
@@ -255,7 +255,7 @@ Namespace VBClasses
         Dim redC As New RedColor_Basics
         Public rcGridMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0) ' map of rc data to grid map
         Public Sub New()
-            labels(3) = "RedColor output mapped into the gridrects."
+            labels(3) = "RedColor output mapped into the gSquares."
             desc = "Create a triangle representation of the point cloud with RedCloud data"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -265,15 +265,15 @@ Namespace VBClasses
 
             rcGridMap.SetTo(0)
             dst3.SetTo(0)
-            For i = 0 To task.gridRects.Count - 1
-                Dim gr = task.gridRects(i)
+            For i = 0 To task.gSquares.Count - 1
+                Dim gs = task.gSquares(i)
 
-                Dim center = New cv.Point(CInt(gr.X + gr.Width / 2), CInt(gr.Y + gr.Height / 2))
+                Dim center = New cv.Point(CInt(gs.X + gs.Width / 2), CInt(gs.Y + gs.Height / 2))
                 Dim index = redC.rcMap.Get(Of Integer)(center.Y, center.X) - 1
                 If index >= redC.rcList.Count Or index < 0 Then Continue For
                 Dim rc = redC.rcList(index)
-                dst3(gr).SetTo(rc.color)
-                rcGridMap(gr).SetTo(rc.index)
+                dst3(gs).SetTo(rc.color)
+                rcGridMap(gs).SetTo(rc.index)
             Next
             strOut = RedUtil_Basics.selectCell(redC.rcMap, redC.rcList)
         End Sub

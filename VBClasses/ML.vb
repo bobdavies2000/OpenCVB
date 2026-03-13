@@ -320,19 +320,19 @@ Namespace VBClasses
             Dim mResponse As New List(Of Single)
             Dim predictList As New List(Of mlColor)
             Dim grPredict As New List(Of cv.Rect)
-            For i = 0 To task.gridRects.Count - 1
-                Dim gr = task.gridRects(i)
+            For i = 0 To task.gSquares.Count - 1
+                Dim gs = task.gSquares(i)
                 Dim mls As mlColor
-                mls.colorIndex = color8U.dst2.Get(Of Byte)(gr.Y, gr.X)
-                mls.x = gr.X
-                mls.y = gr.Y
+                mls.colorIndex = color8U.dst2.Get(Of Byte)(gs.Y, gs.X)
+                mls.x = gs.X
+                mls.y = gs.Y
 
-                If task.noDepthMask(gr).CountNonZero > 0 Then
-                    grPredict.Add(gr)
+                If task.noDepthMask(gs).CountNonZero > 0 Then
+                    grPredict.Add(gs)
                     predictList.Add(mls)
                 Else
                     mlInput.Add(mls)
-                    mResponse.Add(task.pcSplit(2)(gr).Mean())
+                    mResponse.Add(task.pcSplit(2)(gs).Mean())
                 End If
             Next
 
@@ -352,9 +352,9 @@ Namespace VBClasses
             dst3 = task.pcSplit(2).Clone
             For i = 0 To predictList.Count - 1
                 Dim mls = predictList(i)
-                Dim gr = grPredict(i)
+                Dim gs = grPredict(i)
                 Dim depth = output.Get(Of Single)(i, 0)
-                dst3(gr).SetTo(depth, task.noDepthMask(gr))
+                dst3(gs).SetTo(depth, task.noDepthMask(gs))
             Next
 
         End Sub
@@ -395,19 +395,19 @@ Namespace VBClasses
             Dim mResponse As New List(Of Single)
             Dim predictList As New List(Of mlColorInTier)
             Dim grPredict As New List(Of cv.Rect)
-            For i = 0 To task.gridRects.Count - 1
-                Dim gr = task.gridRects(i)
+            For i = 0 To task.gSquares.Count - 1
+                Dim gs = task.gSquares(i)
                 Dim mls As mlColorInTier
-                mls.colorIndex = color8U.dst2.Get(Of Byte)(gr.Y, gr.X)
-                mls.x = gr.X
-                mls.y = gr.Y
+                mls.colorIndex = color8U.dst2.Get(Of Byte)(gs.Y, gs.X)
+                mls.x = gs.X
+                mls.y = gs.Y
 
-                If task.noDepthMask(gr).CountNonZero > 0 Then
-                    grPredict.Add(gr)
+                If task.noDepthMask(gs).CountNonZero > 0 Then
+                    grPredict.Add(gs)
                     predictList.Add(mls)
                 Else
                     mlInput.Add(mls)
-                    mResponse.Add(task.pcSplit(2)(gr).Mean())
+                    mResponse.Add(task.pcSplit(2)(gs).Mean())
                 End If
             Next
 
@@ -427,9 +427,9 @@ Namespace VBClasses
             dst3 = task.pcSplit(2).Clone
             For i = 0 To predictList.Count - 1
                 Dim mls = predictList(i)
-                Dim gr = grPredict(i)
+                Dim gs = grPredict(i)
                 Dim depth = output.Get(Of Single)(i, 0)
-                dst3(gr).SetTo(depth, task.noDepthMask(gr))
+                dst3(gs).SetTo(depth, task.noDepthMask(gs))
             Next
         End Sub
         Protected Overrides Sub Finalize()

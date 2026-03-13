@@ -6,7 +6,7 @@ Namespace VBClasses
         Public feature2f As New List(Of cv.Point2f)
         Dim bPoint As New BrickPoint_Minimum
         Public Sub New()
-            desc = "Gather features from the sobel gr points and preserve those representing lines."
+            desc = "Gather features from the sobel gs points and preserve those representing lines."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             Dim lastFeatures As New List(Of cv.Point)(bPoint.features)
@@ -552,7 +552,7 @@ Namespace VBClasses
                 Dim val = task.motionRGB.motionMask.Get(Of Byte)(pt.Y, pt.X)
                 If val = 0 Then
                     Dim index As Integer = task.gridMap.Get(Of Integer)(pt.Y, pt.X)
-                    Dim r = task.gridRects(index)
+                    Dim r = task.gSquares(index)
                     match.template = fpLastSrc(r)
                     match.Run(src(r))
                     If match.correlation > task.fCorrThreshold Then matched.Add(pt)
@@ -611,7 +611,7 @@ Namespace VBClasses
             features.Clear()
             For Each pt In ptList
                 Dim index As Integer = task.gridMap.Get(Of Integer)(pt.Y, pt.X)
-                Dim r = task.gridRects(index)
+                Dim r = task.gSquares(index)
                 cv.Cv2.MatchTemplate(src(r), lastSrc(r), correlationMat, mode)
                 If correlationMat.Get(Of Single)(0, 0) >= task.fCorrThreshold Then
                     features.Add(pt)
@@ -745,7 +745,7 @@ Namespace VBClasses
         Public Sub New()
             task.gOptions.LineWidth.Value = 3
             If task.feat Is Nothing Then task.feat = New Feature_Basics
-            desc = "Find the lines implied in the gr points."
+            desc = "Find the lines implied in the gs points."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             Dim sortByGrid As New SortedList(Of Integer, cv.Point)(New compareAllowIdenticalInteger)

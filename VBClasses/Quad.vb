@@ -7,7 +7,7 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             Dim colorStdev As cv.Scalar, colorMean As cv.Scalar
-            For Each rect In task.gridRects
+            For Each rect In task.gSquares
                 cv.Cv2.MeanStdDev(task.rightView(rect), colorMean, colorStdev)
                 dst2(rect).SetTo(colorMean)
             Next
@@ -40,7 +40,7 @@ Namespace VBClasses
             If task.optionsChanged Then
                 depthList1 = New List(Of List(Of Single))
                 depthList2 = New List(Of List(Of Single))
-                For i = 0 To task.gridRects.Count
+                For i = 0 To task.gSquares.Count
                     depthList1.Add(New List(Of Single))
                     depthList2.Add(New List(Of Single))
                     colorList.Add(black)
@@ -52,10 +52,10 @@ Namespace VBClasses
 
             Dim depth32f As cv.Mat = task.pcSplit(2) * 1000, depth32s As New cv.Mat
             depth32f.ConvertTo(depth32s, cv.MatType.CV_32S)
-            For i = 0 To task.gridRects.Count - 1
-                Dim gr = task.gridRects(i)
+            For i = 0 To task.gSquares.Count - 1
+                Dim gs = task.gSquares(i)
 
-                Dim center = New cv.Point(CInt(gr.X + gr.Width / 2), CInt(gr.Y + gr.Height / 2))
+                Dim center = New cv.Point(CInt(gs.X + gs.Width / 2), CInt(gs.Y + gs.Height / 2))
                 Dim index = task.redList.rcMap.Get(Of Byte)(center.Y, center.X)
 
                 If index <= 0 Or index >= task.redList.oldrclist.Count Then
@@ -73,7 +73,7 @@ Namespace VBClasses
                     depthList2(i).Clear()
                 End If
 
-                Dim mm = GetMinMax(depth32s(gr), task.depthmask(gr))
+                Dim mm = GetMinMax(depth32s(gs), task.depthmask(gs))
                 depthList1(i).Add(mm.minVal / 1000)
                 depthList2(i).Add(mm.maxVal / 1000)
                 colorList(i) = rc.color
@@ -84,18 +84,18 @@ Namespace VBClasses
                 Dim depthCount = If(d1 = d2, 1, 2)
                 For j = 0 To depthCount - 1
                     Dim depth = Choose(j + 1, d1, d2)
-                    Dim topLeft = Cloud_Basics.worldCoordinates(New cv.Point3f(gr.X, gr.Y, depth))
-                    Dim botRight = Cloud_Basics.worldCoordinates(New cv.Point3f(gr.X + gr.Width, gr.Y + gr.Height, depth))
+                    Dim topLeft = Cloud_Basics.worldCoordinates(New cv.Point3f(gs.X, gs.Y, depth))
+                    Dim botRight = Cloud_Basics.worldCoordinates(New cv.Point3f(gs.X + gs.Width, gs.Y + gs.Height, depth))
 
                     Dim color = rc.color
-                    dst3(gr).SetTo(color)
+                    dst3(gs).SetTo(color)
                     quadData.Add(New cv.Point3f(color(0), color(1), color(2)))
                     quadData.Add(New cv.Point3f(topLeft.X + shift.X, topLeft.Y + shift.Y, depth + shift.Z))
                     quadData.Add(New cv.Point3f(botRight.X + shift.X, topLeft.Y + shift.Y, depth + shift.Z))
                     quadData.Add(New cv.Point3f(botRight.X + shift.X, botRight.Y + shift.Y, depth + shift.Z))
                     quadData.Add(New cv.Point3f(topLeft.X + shift.X, botRight.Y + shift.Y, depth + shift.Z))
                 Next
-                SetTrueText(Format(d1, fmt1) + vbCrLf + Format(d2, fmt1), New cv.Point(gr.X, gr.Y), 3)
+                SetTrueText(Format(d1, fmt1) + vbCrLf + Format(d2, fmt1), New cv.Point(gs.X, gs.Y), 3)
 
                 If depthList1(i).Count >= depthListMaxCount Then depthList1(i).RemoveAt(0)
                 If depthList2(i).Count >= depthListMaxCount Then depthList2(i).RemoveAt(0)
@@ -132,7 +132,7 @@ Namespace VBClasses
 
             If task.optionsChanged Then
                 depthList = New List(Of List(Of Single))
-                For i = 0 To task.gridRects.Count
+                For i = 0 To task.gSquares.Count
                     depthList.Add(New List(Of Single))
                     colorList.Add(black)
                 Next
@@ -141,10 +141,10 @@ Namespace VBClasses
             quadData.Clear()
             dst3.SetTo(0)
 
-            For i = 0 To task.gridRects.Count - 1
-                Dim gr = task.gridRects(i)
+            For i = 0 To task.gSquares.Count - 1
+                Dim gs = task.gSquares(i)
 
-                Dim center = New cv.Point(CInt(gr.X + gr.Width / 2), CInt(gr.Y + gr.Height / 2))
+                Dim center = New cv.Point(CInt(gs.X + gs.Width / 2), CInt(gs.Y + gs.Height / 2))
                 Dim index = hulls.rcMap.Get(Of Byte)(center.Y, center.X)
 
                 If index <= 0 Then
@@ -163,11 +163,11 @@ Namespace VBClasses
                 colorList(i) = rc.color
 
                 If depthList(i).Count > 0 Then
-                    dst3(gr).SetTo(colorList(i))
+                    dst3(gs).SetTo(colorList(i))
 
                     Dim depth = depthList(i).Average
-                    Dim topLeft = Cloud_Basics.worldCoordinates(New cv.Point3f(gr.X, gr.Y, depth))
-                    Dim botRight = Cloud_Basics.worldCoordinates(New cv.Point3f(gr.X + gr.Width, gr.Y + gr.Height, depth))
+                    Dim topLeft = Cloud_Basics.worldCoordinates(New cv.Point3f(gs.X, gs.Y, depth))
+                    Dim botRight = Cloud_Basics.worldCoordinates(New cv.Point3f(gs.X + gs.Width, gs.Y + gs.Height, depth))
 
                     quadData.Add(New cv.Point3f(rc.color(0), rc.color(1), rc.color(2)))
                     quadData.Add(New cv.Point3f(topLeft.X + shift.X, topLeft.Y + shift.Y, depth + shift.Z))
@@ -199,7 +199,7 @@ Namespace VBClasses
         Dim depthMaxList As New List(Of List(Of Single))
         Dim myListMax = 10
         Public Sub New()
-            desc = "Create triangles from each gr in point cloud"
+            desc = "Create triangles from each gs in point cloud"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             dst2 = runRedList(src, labels(2))
@@ -207,7 +207,7 @@ Namespace VBClasses
             If task.optionsChanged Then
                 depthMinList.Clear()
                 depthMaxList.Clear()
-                For i = 0 To task.gridRects.Count - 1
+                For i = 0 To task.gSquares.Count - 1
                     depthMinList.Add(New List(Of Single))
                     depthMaxList.Add(New List(Of Single))
                 Next
@@ -222,13 +222,13 @@ Namespace VBClasses
 
             Dim min(4 - 1) As cv.Point3f, max(4 - 1) As cv.Point3f
             depths.Clear()
-            For i = 0 To task.gridRects.Count - 1
-                Dim gr = task.gridRects(i)
-                Dim center = New cv.Point(gr.X + gr.Width / 2, gr.Y + gr.Height / 2)
+            For i = 0 To task.gSquares.Count - 1
+                Dim gs = task.gSquares(i)
+                Dim center = New cv.Point(gs.X + gs.Width / 2, gs.Y + gs.Height / 2)
                 Dim index = task.redList.rcMap.Get(Of Byte)(center.Y, center.X)
                 Dim depthMin As Single = 0, depthMax As Single = 0, minLoc As cv.Point, maxLoc As cv.Point
                 If index >= 0 And task.redList.oldrclist.Count > 0 Then
-                    task.pcSplit(2)(gr).MinMaxLoc(depthMin, depthMax, minLoc, maxLoc, task.depthmask(gr))
+                    task.pcSplit(2)(gs).MinMaxLoc(depthMin, depthMax, minLoc, maxLoc, task.depthmask(gs))
                     Dim rc = task.redList.oldrclist(index)
                     depthMin = If(depthMax > rc.depth, rc.depth, depthMin)
 
@@ -242,8 +242,8 @@ Namespace VBClasses
                         Dim color = rc.color
                         quadData.Add(New cv.Point3f(color(2) / 255, color(1) / 255, color(0) / 255))
                         For j = 0 To 4 - 1
-                            Dim x = Choose(j + 1, gr.X, gr.X + gr.Width, gr.X + gr.Width, gr.X)
-                            Dim y = Choose(j + 1, gr.Y, gr.Y, gr.Y + gr.Height, gr.Y + gr.Height)
+                            Dim x = Choose(j + 1, gs.X, gs.X + gs.Width, gs.X + gs.Width, gs.X)
+                            Dim y = Choose(j + 1, gs.Y, gs.Y, gs.Y + gs.Height, gs.Y + gs.Height)
                             min(j) = Cloud_Basics.worldCoordinates(New cv.Point3f(x, y, depthMin))
                             max(j) = Cloud_Basics.worldCoordinates(New cv.Point3f(x, y, depthMax))
                             min(j) += shift
@@ -275,7 +275,7 @@ Namespace VBClasses
                         quadData.Add(min(3))
                         quadData.Add(max(3))
 
-                        SetTrueText(Format(depthMin, fmt1) + vbCrLf + Format(depthMax, fmt1), New cv.Point(gr.X, gr.Y))
+                        SetTrueText(Format(depthMin, fmt1) + vbCrLf + Format(depthMax, fmt1), New cv.Point(gs.X, gs.Y))
                         If depthMinList(i).Count >= myListMax Then depthMinList(i).RemoveAt(0)
                         If depthMaxList(i).Count >= myListMax Then depthMaxList(i).RemoveAt(0)
                     End If
@@ -283,7 +283,7 @@ Namespace VBClasses
                     depths.Add(depthMax)
                 End If
             Next
-            labels(2) = traceName + " completed: " + Format(task.gridRects.Count, fmt0) + " gr's produced " +
+            labels(2) = traceName + " completed: " + Format(task.gSquares.Count, fmt0) + " gs's produced " +
                                 Format(quadData.Count / 25, fmt0) + " six sided bricks with color"
             SetTrueText("There should be no 0.0 values in the list of min and max depths in the dst2 image.", 3)
         End Sub

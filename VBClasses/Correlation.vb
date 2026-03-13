@@ -19,8 +19,8 @@ Namespace VBClasses
             dst3 = src
             Dim mmList As New List(Of mmData)
             Dim mmRanges As New List(Of Double)
-            For i = 0 To task.gridRects.Count - 1
-                Dim r = task.gridRects(i)
+            For i = 0 To task.gSquares.Count - 1
+                Dim r = task.gSquares(i)
                 cv.Cv2.MatchTemplate(task.gray(r), lastsrc(r), correlationMat, cv.TemplateMatchModes.CCoeffNormed)
 
                 Dim corr = correlationMat.Get(Of Single)(0, 0) + 1
@@ -40,14 +40,14 @@ Namespace VBClasses
                 Dim lastEntry = plotHist.histArray.Last
                 Dim lastCorr = (2.0 - 2.0 / task.histogramBins) / 2
                 labels(2) = "Correlation Min = " + Format(cList.Min - 1, fmt1) + ", Max = " + Format(cList.Max - 1, fmt1)
-                labels(3) = CStr(lastEntry) + " (" + Format(lastEntry / task.gridRects.Count, "0%") +
-                            ") had correlation > " + Format(lastCorr, fmt2) + "  Plot below ranges from -1 to 1"
+                labels(3) = CStr(lastEntry) + " (" + Format(lastEntry / task.gSquares.Count, "0%") +
+                            ") had correlation >= " + Format(lastCorr, fmt2) + "  Plot below ranges from -1 to 1"
 
                 Dim testCorr = 2.0 - 2.0 / task.histogramBins
                 Dim mmRangeTest As New List(Of Double)
-                For i = 0 To task.gridRects.Count - 1
-                    Dim r = task.gridRects(i)
-                    If testCorr > cList(i) Then
+                For i = 0 To task.gSquares.Count - 1
+                    Dim r = task.gSquares(i)
+                    If testCorr >= cList(i) Then
                         dst2.Rectangle(r, white, task.lineWidth)
                         mmRangeTest.Add(mmRanges(i))
                     End If
