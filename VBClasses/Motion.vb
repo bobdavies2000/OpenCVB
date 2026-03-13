@@ -298,7 +298,9 @@ Namespace VBClasses
 
     Public Class Motion_Correlation : Inherits TaskParent
         Dim cList As New List(Of Single)
+        Dim plotHist As New Plot_Histogram
         Public Sub New()
+            plotHist.createHistogram = True
             desc = "Measure the correlation of grid elements that appear to have changed."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -309,6 +311,7 @@ Namespace VBClasses
             If cList.Count > 0 Then testCorrelation = cList.Max * 0.8
             cList.Clear()
             dst3 = src
+            Dim count As Integer
             For Each index In task.motionRGB.motionList
                 Dim r = task.gridRects(index)
                 dst2.Rectangle(r, white, task.lineWidth)
@@ -322,13 +325,18 @@ Namespace VBClasses
                 Else
                     dst3.Rectangle(r, task.highlight, task.lineWidth)
                 End If
+
+                If corr >= 0.98 Then count += 1
             Next
 
             lastsrc = src.Clone
 
             If cList.Count > 0 Then
-                labels(2) = "Average correlation = " + Format(cList.Average, fmt1) + ", min = " + Format(cList.Min, fmt1) +
-                            ", max = " + Format(cList.Max, fmt1)
+                plotHist.Run(cv.Mat.FromPixelData(cList.Count, 1, cv.MatType.CV_32F, cList.ToArray))
+                dst3 = plotHist.dst2
+
+                labels(2) = "Min = " + Format(cList.Min, fmt1) + ", Max = " + Format(cList.Max, fmt1)
+                labels(3) = CStr(count) + " had a correlation of 0.98 (" + Format(count / cList.Count, "0%") + ")"
             End If
         End Sub
     End Class

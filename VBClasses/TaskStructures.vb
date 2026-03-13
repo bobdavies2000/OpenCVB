@@ -255,21 +255,21 @@ Namespace VBClasses
 
         Public Class brickData
             Public age As Integer = 1
+            Public center As cv.Point ' center of the gr
             Public color As cv.Scalar
+            Public colorClass As Integer
+            Public corners As New List(Of cv.Point3f)
             Public correlation As Single
+            Public depth As Single
             Public index As Integer
 
-            Public rect As cv.Rect ' rectange under the cursor in the color image.
             Public lRect As New cv.Rect ' Intel RealSense camera use this. They don't align left and color automatically.
             Public rRect As New cv.Rect ' The rect in the right image matching the left image rect.
 
-            Public center As cv.Point ' center of the gr
-            Public depth As Single
+            Public mm As mmData ' min and max values of the depth data.
             Public mmDepth As mmData
 
-            Public mm As mmData ' min and max values of the depth data.
-            Public corners As New List(Of cv.Point3f)
-            Public colorClass As Integer
+            Public rect As cv.Rect ' rectange under the cursor in the color image.
             Public Function displayCell() As String
                 Dim strOut = "rcList index = " + CStr(index) + vbCrLf
                 strOut += "Age = " + CStr(age) + vbCrLf

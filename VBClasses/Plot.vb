@@ -537,6 +537,7 @@ Namespace VBClasses
         Public addLabels As Boolean = True
         Public removeZeroEntry As Boolean = True
         Public createHistogram As Boolean = False
+        Public shadeValues As Boolean = True
         Public histMask As New cv.Mat
         Public mm As mmData
         Public Sub New()
@@ -581,16 +582,21 @@ Namespace VBClasses
             If mm.minVal > -100000000 And mm.maxVal < 100000000 Then
                 If Math.Abs(mm.maxVal - mm.minVal) > 0 And histogram.Rows > 0 Then
                     Dim incr = 255 / histogram.Rows
+                    Dim color As cv.Scalar
                     For i = 0 To histArray.Count - 1
                         If Single.IsNaN(histArray(i)) Then histArray(i) = 0
                         If histArray(i) > 0 Then
                             Dim h As Single = histArray(i) * dst2.Height / mm.maxVal
-                            Dim sIncr = (i Mod 256) * incr
-                            Dim color = New cv.Scalar(sIncr, sIncr, sIncr)
-                            If histogram.Rows > 255 Then color = cv.Scalar.Black
+                            If shadeValues Then
+                                Dim sIncr = (i Mod 256) * incr
+                                color = New cv.Scalar(sIncr, sIncr, sIncr)
+                                If histogram.Rows > 255 Then color = cv.Scalar.Black
+                            Else
+                                color = cv.Scalar.Black
+                            End If
                             cv.Cv2.Rectangle(dst2, New cv.Rect(i * barWidth, dst2.Height - h,
                                                                Math.Max(1, barWidth), h), color, -1)
-                        End If
+                            End If
                     Next
                     If addLabels Then Plot_Basics.AddPlotScale(dst2, mm.minVal, mm.maxVal)
                 End If

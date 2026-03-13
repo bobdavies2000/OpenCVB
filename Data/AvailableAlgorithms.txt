@@ -682,6 +682,7 @@ NR_Corners_Harris_CPP
 NR_Corners_PreCornerDetect
 NR_Corners_RedCloud
 NR_Corners_SubPix
+NR_Correlation_Basics
 NR_Covariance_Test
 NR_CSV_Basics
 NR_DCT_Depth
