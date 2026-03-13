@@ -1,3 +1,29 @@
+**March 15, 2026 – World Grid, RedUtil, Correlation, Grid Squares.**
+
+-   Over 1600 algorithms are included, averaging 36 lines of code per algorithm.
+    -   Over 400 additional obsolete algorithms compiled for reference use.
+-   Improvements to “world grid” consolidate related RedCloud cells.
+    -   Cells with the same world grid coordinates appear as a single RedCloud cell.
+    -   Cells with poor depth data are merged into a single RedCloud cell.
+    -   Poor depth cells may be highlighted with the debug check box (see below.)
+-   RedUtil.vb added to provide some common shared functions for RedCloud.
+-   Correlation measures similarity but identical images can produce unexpected results.
+    -   Each square’s correlation is computed for the current and previous image.
+    -   When there is no motion, correlations are expected to be high.
+    -   But as much as 50% of the image can have correlations below expectations.
+    -   Correlation measures the relative relationships of pixels.
+        -   But when pixels are in a narrow range, relationships can flip.
+    -   Pixels flipping in a narrow range can cause correlations to deteriorate.
+-   In the first image below, the value of this deterioration is clear.
+    -   Grid squares with a narrow range of values are identified
+    -   Each grid square with deteriorated correlation is **featureless**.
+
+![](media/b400e6ed803f8dde3ca5cd2498716272.png)
+
+**Correlation_Basics:** *The plot of the histogram in the lower right image shows that 50% of the grid rectangles have a correlation \> 0.94 (see label.) There is no motion in the image so every square should be near perfect correlation. The lower left image highlights the rectangles with \< 0.94 correlation, decidedly less than perfect correlation. Why? The image sensor generates approximately the same values for featureless regions but the relative values within a square can have a high impact on correlation when all the pixels are about the same. Random variations in the number of photons striking the sensor can occur and flip the relative value relationships. When all the pixels are in a narrow range, the changes in the relative values will cause correlation to deteriorate. The resulting sets of squares with less than 0.94 correlation define* **featureless** regions*.*
+
+**![](media/4440d76162c930304ff40c0c079602f2.gif)RedWGrid_Basics:** *Cells with the same world grid coordinates are merged into a single RedCloud cell. The selected RedCloud cell contains multiple masks and is highlighted in the top left image in white. Poor depth creates gaps in the depth that prevent RedCloud from finding all the pixels in a cell. The depth data is in the upper right image. The lower right image contains the cell description with world grid coordinates of 7, 2. The yellow highlights in the lower left image represent the cells that have multiple masks. The cells are largely at the periphery of the image where the depth data is less reliable.*
+
 **March 1, 2026 – World Grid, Json, Defaults, UI_Generator, RedCloud Cells.**
 
 -   Over 1600 algorithms are included, averaging 36 lines of code per algorithm.
