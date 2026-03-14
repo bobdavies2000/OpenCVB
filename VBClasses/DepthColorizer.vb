@@ -70,13 +70,14 @@ Namespace VBClasses
 
                 If imagePtr <> 0 Then task.depthRGB = cv.Mat.FromPixelData(src.Rows, src.Cols, cv.MatType.CV_8UC3, imagePtr)
 
+                Dim depth = task.pcSplit(2).Get(Of Single)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
                 Dim gridIndex = task.gridMap.Get(Of Integer)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
-                Dim depthGrid = task.pcSplit(2)(task.gSquares(gridIndex))
-                Dim mask = task.depthmask(task.gSquares(gridIndex))
-                Dim depth = depthGrid.Mean(mask)(0)
-                Dim mm = GetMinMax(depthGrid, mask)
-                task.depthAndDepthRange = "Depth = " + Format(depth, fmt1) + "m grid = " + CStr(gridIndex) +
-                                          " " + vbCrLf + "Depth range = " +
+                Dim r = task.gSquares(gridIndex)
+                Dim depthGrid = task.pcSplit(2)(r)
+                Dim brickDepth = depthGrid.Mean(task.depthmask(r))(0)
+                Dim mm = GetMinMax(depthGrid, task.depthmask(r))
+                task.depthAndDepthRange = "Pixel/Brick Depth " + Format(depth, fmt3) + "/" + Format(brickDepth, fmt3) +
+                                          "m grid = " + CStr(gridIndex) + " " + vbCrLf + "Depth range = " +
                                           Format(mm.maxVal - mm.minVal, fmt3) + "m"
             Else
                 task.depthAndDepthRange = ""

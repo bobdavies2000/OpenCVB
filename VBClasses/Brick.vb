@@ -1073,9 +1073,8 @@ Namespace VBClasses
         Dim options As New Options_DiffDepth
         Public depthJumpers As New List(Of Integer)
         Dim fLess As New FeatureLess_Basics
-        Dim edges As New Edge_Canny
         Public Sub New()
-            OptionParent.FindSlider("Depth varies more than X mm's").Value = 1
+            OptionParent.FindSlider("Depth varies more than X mm's").Value = 30
             dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
             desc = "Visualize where bricks have variable depth."
         End Sub
@@ -1094,33 +1093,77 @@ Namespace VBClasses
                 depthList.Add(depth)
             Next
 
-            If standalone Then
+            If standaloneTest() Then
+                Static edges As New Edge_Canny
                 edges.Run(src)
                 dst3 = edges.dst2
             Else
                 dst3.SetTo(0)
             End If
 
-            Static lastDepthList = New List(Of Single)(depthList)
-            depthJumpers.Clear()
-            For i = 0 To depthList.Count - 1
-                Dim r = task.gSquares(i)
-                Dim val = fLess.dst2.Get(Of Byte)(r.TopLeft.Y, r.TopLeft.X)
-                If val = 0 Then
-                    val = task.depthmask.Get(Of Byte)(r.TopLeft.Y, r.TopLeft.X)
-                    If val <> 0 Then
-                        Dim diff = depthList(i) - lastDepthList(i)
+            If task.heartBeat Then
+                Static lastDepthList = New List(Of Single)(depthList)
+                depthJumpers.Clear()
+                For i = 0 To depthList.Count - 1
+                    Dim r = task.gSquares(i)
+                    Dim val = fLess.dst2.Get(Of Byte)(r.TopLeft.Y, r.TopLeft.X)
+                    If val = 0 And depthList(i) <> 0 And lastDepthList(i) <> 0 Then
+                        Dim diff = Math.Abs(depthList(i) - lastDepthList(i))
                         If diff > options.meters Then
                             dst3(task.gSquares(i)).SetTo(255)
                             depthJumpers.Add(i)
                         End If
                     End If
-                End If
-            Next
+                Next
 
-            lastDepthList = New List(Of Single)(depthList)
-            labels(3) = CStr(depthJumpers.Count) + " grid squares had depth variability > " + Format(options.meters, fmt3) + " meters"
+                lastDepthList = New List(Of Single)(depthList)
+                labels(3) = CStr(depthJumpers.Count) + " grid squares had depth variability > " + Format(options.meters, fmt3) + " meters"
+            End If
         End Sub
     End Class
 
+
+
+
+    Public Class Brick_Ranges : Inherits TaskParent
+        Dim options As New Options_DiffDepth
+        Public rangeJumpers As New List(Of Integer)
+        Dim fLess As New FeatureLess_Basics
+        Public Sub New()
+            OptionParent.FindSlider("Depth varies more than X mm's").Value = 30
+            dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
+            desc = "Visualize where bricks have variable depth."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            options.Run()
+
+            fLess.Run(task.leftView)
+            dst2 = src.Clone
+            dst2.SetTo(0, fLess.dst2)
+            labels(2) = fLess.labels(2)
+
+            If standaloneTest() Then
+                Static edges As New Edge_Canny
+                edges.Run(src)
+                dst3 = edges.dst2
+            Else
+                dst3.SetTo(0)
+            End If
+
+            If task.heartBeat Then
+                rangeJumpers.Clear()
+                For i = 0 To task.gSquares.Count - 1
+                    Dim r = task.gSquares(i)
+                    Dim mm = GetMinMax(task.pcSplit(2)(r), task.depthmask(r))
+                    If mm.range >= options.meters Then
+                        rangeJumpers.Add(i)
+                        dst3(task.gSquares(i)).SetTo(255)
+                    End If
+                Next
+            End If
+
+            labels(3) = CStr(rangeJumpers.Count) + " grid squares had depth range > " +
+                        Format(options.meters, fmt3) + " meters"
+        End Sub
+    End Class
 End Namespace

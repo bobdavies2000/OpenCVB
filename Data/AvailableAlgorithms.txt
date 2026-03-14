@@ -58,6 +58,7 @@ Brick_Features
 Brick_LeftRight
 Brick_LeftRightMouse
 Brick_Plot
+Brick_Ranges
 Brick_Variability
 BrickLine_Basics
 BrickLine_DepthGap
