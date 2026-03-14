@@ -7931,13 +7931,13 @@ Namespace VBClasses
         Public lineTrackerWidth As Integer
         Public Sub New()
             If sliders.Setup(traceName) Then
-                sliders.setupTrackBar("Left to Right gs correlation Minimum X100", 0, 100, 70)
+                sliders.setupTrackBar("Left to Right grid square correlation Minimum X100", 0, 100, 70)
                 sliders.setupTrackBar("Range in mm's", 1, 100, 20)
                 sliders.setupTrackBar("Line_Tracker width", 1, 20, 5)
             End If
         End Sub
         Public Sub Run()
-            Static corrSlider = FindSlider("Left to Right gs correlation Minimum X100")
+            Static corrSlider = FindSlider("Left to Right grid square correlation Minimum X100")
             Static rangeSlider = FindSlider("Range in mm's")
             Static widthSlider = FindSlider("Line_Tracker width")
             correlation = corrSlider.value / 100

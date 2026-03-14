@@ -814,7 +814,7 @@ Namespace VBClasses
             ReDim task.kalman.kInput(task.gSquares.Count * 4 - 1)
 
             labels = {"", "", "Red is min distance, blue is max distance", "Voronoi representation of min point (only) for each cell."}
-            desc = "Find min and max depth in each gs and create a voronoi representation using the min and max points."
+            desc = "Find min and max depth in each grid square and create a voronoi representation using the min and max points."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             If task.optionsChanged Then ReDim task.kalman.kInput(task.gSquares.Count * 4 - 1)
@@ -2723,7 +2723,7 @@ Namespace VBClasses
     Public Class XO_Region_RedColor : Inherits TaskParent
         Dim connect As New Region_Contours
         Public Sub New()
-            desc = "Color each redCell with the color of the nearest gs region."
+            desc = "Color each redCell with the color of the nearest grid square region."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             connect.Run(src)
@@ -2777,7 +2777,7 @@ Namespace VBClasses
 
 
     Public Class XO_Brick_FeatureGaps : Inherits TaskParent
-        Dim feat As New Brick_Features
+        Dim feat As New NR_BrickPoint_Features
         Dim gaps As New XO_Region_Gaps
         Public Sub New()
             labels(2) = "The output of Brick_Gaps overlaid with the output of the Brick_Features"
@@ -9044,7 +9044,7 @@ Namespace VBClasses
         Dim match As New Match_Basics
         Dim saveMat As New cv.Mat
         Public Sub New()
-            labels(2) = "Track the feature in the gs in the neighbors"
+            labels(2) = "Track the feature in the grid square in the neighbors"
             desc = "Find the top feature cells and track them in the next frame."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -11479,7 +11479,7 @@ Namespace VBClasses
 
     Public Class XO_MinMath_Line : Inherits TaskParent
         Dim bPoints As New BrickPoint_Basics
-        Public lpList As New List(Of lpData) ' lines after being checked with gs points.
+        Public lpList As New List(Of lpData) ' lines after being checked with grid square points.
         Public Sub New()
             desc = "Track lines with brickpoints."
         End Sub
@@ -11516,7 +11516,7 @@ Namespace VBClasses
             For Each index In linesFound
                 Dim lp = task.lines.lpList(index - 1)
             Next
-            labels(3) = CStr(linesFound.Count) + " lines were confirmed by gs points."
+            labels(3) = CStr(linesFound.Count) + " lines were confirmed by grid square points."
         End Sub
     End Class
 
@@ -14305,7 +14305,7 @@ Namespace VBClasses
         Public Sub New()
             If task.feat Is Nothing Then task.feat = New Feature_Basics
             If task.feat Is Nothing Then task.feat = New Feature_Basics
-            desc = "Assign gs points to each of the lines"
+            desc = "Assign grid square points to each of the lines"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             dst2 = task.lines.dst2

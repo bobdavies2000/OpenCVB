@@ -88,7 +88,7 @@ Namespace VBClasses
 
 
     Public Class NR_TextureFlow_Bricks : Inherits TaskParent
-        Dim bPoint As New BrickPoint_Best
+        Dim bPoint As New NR_BrickPoint_Best
         Dim flow As New TextureFlow_Basics
         Dim knn As New KNN_Basics
         Public Sub New()

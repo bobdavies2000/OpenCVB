@@ -170,8 +170,8 @@ Namespace VBClasses
             src(task.gSquares(maxIndex)).CopyTo(mats.mat(3)(task.gSquares(maxIndex)), mask(task.gSquares(maxIndex)))
             mats.Run(emptyMat)
             dst3 = mats.dst2
-
-            Dim gs = task.gSquares(maxIndex) ' this is where the debug comes in.  We just want to look at one region which hopefully is a single plane.
+            ' this is where the debug comes in.  We just want to look at one region which hopefully is a single plane.
+            Dim gs = task.gSquares(maxIndex)
             If gs.X = task.gSquares(maxIndex).X And gs.Y = task.gSquares(maxIndex).Y Then
                 If grCounts(maxIndex) > gs.Width * gs.Height / 4 Then
                     Dim fitPoints As New List(Of cv.Point3f)

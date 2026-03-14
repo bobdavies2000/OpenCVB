@@ -6,7 +6,7 @@ Namespace VBClasses
         Public feature2f As New List(Of cv.Point2f)
         Dim bPoint As New BrickPoint_Minimum
         Public Sub New()
-            desc = "Gather features from the sobel gs points and preserve those representing lines."
+            desc = "Gather features from the sobel grid square points and preserve those representing lines."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             Dim lastFeatures As New List(Of cv.Point)(bPoint.features)
@@ -51,7 +51,7 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
 
-            If standaloneTest() Then dst2 = task.color.Clone
+            dst2 = task.color.Clone
 
             Dim ptNew As New List(Of cv.Point2f)
             If task.optionsChanged = False Then
@@ -147,11 +147,9 @@ Namespace VBClasses
                 task.fpFromGridCell.Add(nextIndex)
             Next
 
-            If standaloneTest() Then
-                For Each pt In task.features
-                    DrawCircle(dst2, pt, task.DotSize, task.highlight)
-                Next
-            End If
+            For Each pt In task.features
+                DrawCircle(dst2, pt, task.DotSize, task.highlight)
+            Next
 
             labels(2) = strOut
         End Sub
@@ -745,7 +743,7 @@ Namespace VBClasses
         Public Sub New()
             task.gOptions.LineWidth.Value = 3
             If task.feat Is Nothing Then task.feat = New Feature_Basics
-            desc = "Find the lines implied in the gs points."
+            desc = "Find the lines implied in the grid square points."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             Dim sortByGrid As New SortedList(Of Integer, cv.Point)(New compareAllowIdenticalInteger)

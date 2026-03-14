@@ -1,7 +1,7 @@
 Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Class HighVis_Basics : Inherits TaskParent
-        Dim info As New Brick_Info
+        Dim info As New NR_Brick_Info
         Public Sub New()
             If task.bricks Is Nothing Then task.bricks = New Brick_Basics
             dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)

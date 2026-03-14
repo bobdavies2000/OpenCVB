@@ -208,7 +208,7 @@ Namespace VBClasses
         Public noEdges As New List(Of Integer)
         Dim edgeline As New EdgeLine_Basics
         Public Sub New()
-            desc = "Define each gs according to whether it has edges or not.  Ignore peripheral bricks..."
+            desc = "Define each grid square according to whether it has edges or not.  Ignore peripheral bricks..."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             edgeline.Run(task.grayStable)

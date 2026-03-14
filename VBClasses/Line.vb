@@ -343,7 +343,7 @@ Namespace VBClasses
 
 
     Public Class NR_Line_Vertical : Inherits TaskParent
-        Dim vbPoints As New BrickPoint_Vertical
+        Dim vbPoints As New NR_BrickPoint_Vertical
         Dim knn As New KNN_Basics
         Public Sub New()
             desc = "Match points to the nearest line that is also vertical"

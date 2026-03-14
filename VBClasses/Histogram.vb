@@ -1293,7 +1293,7 @@ Namespace VBClasses
 
 
     Public Class NR_Histogram_ToggleFeatureLess : Inherits TaskParent
-        Dim fLess As New BrickPoint_FeatureLess
+        Dim fLess As New NR_BrickPoint_FeatureLess
         Dim plotHist As New Plot_Histogram
         Public Sub New()
             plotHist.maxRange = 255

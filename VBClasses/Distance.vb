@@ -495,7 +495,7 @@ Namespace VBClasses
         Public Sub New()
             If task.bricks Is Nothing Then task.bricks = New Brick_Basics
             task.gOptions.DebugSlider.Value = 20
-            desc = "Threshold the maxDist in each gs to highlight centers for key objects.  Use the 'DebugSlider' to provide the value."
+            desc = "Threshold the maxDist in each grid square to highlight centers for key objects.  Use the 'DebugSlider' to provide the value."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             dist.Run(src)

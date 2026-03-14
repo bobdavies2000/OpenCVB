@@ -643,7 +643,7 @@ Namespace VBClasses
             If task.bricks Is Nothing Then task.bricks = New Brick_Basics
             dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
             dst3 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
-            desc = "Show where the pointcloud is continuous at the gs resolution"
+            desc = "Show where the pointcloud is continuous at the grid square resolution"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
@@ -680,7 +680,7 @@ Namespace VBClasses
         Public Sub New()
             If task.bricks Is Nothing Then task.bricks = New Brick_Basics
             dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
-            desc = "Show where the pointcloud is continuous at the gs resolution"
+            desc = "Show where the pointcloud is continuous at the grid square resolution"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()

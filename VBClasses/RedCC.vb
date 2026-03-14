@@ -44,7 +44,7 @@ Namespace VBClasses
         Public redC2 As New RedCloud_Basics
         Public Sub New()
             If standalone Then task.gOptions.displayDst1.Checked = True
-            labels(1) = "Contours of each RedCloud cell - if missing some, CV_8U is the problem."
+            labels(1) = "Contours of each RedCloud cell."
             desc = "Insert the RedCloud cells into the RedColor_Basics input."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)

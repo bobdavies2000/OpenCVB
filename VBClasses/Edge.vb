@@ -1416,7 +1416,7 @@ Namespace VBClasses
 
 
     Public Class NR_Edge_Stability : Inherits TaskParent
-        Dim gEdges As New Brick_EdgeFlips
+        Dim gEdges As New NR_Brick_EdgeFlips
         Public Sub New()
             desc = "Measure the stability of edges in each grid Rect"
         End Sub
@@ -1666,4 +1666,25 @@ Namespace VBClasses
             labels(2) = "Accumulated edges over " + CStr(task.frameHistoryCount) + " frames."
         End Sub
     End Class
+
+
+
+
+    Public Class Edge_Featureless : Inherits TaskParent
+        Dim fLess As New FeatureLess_Basics
+        Dim edges As New Edge_Canny
+        Public Sub New()
+            desc = "Find the edges in the featureless output"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            fLess.Run(src)
+            dst2 = src.Clone
+            dst2.SetTo(0, fLess.dst2)
+            labels(2) = fLess.labels(2)
+
+            edges.Run(dst2)
+            dst3 = edges.dst2
+        End Sub
+    End Class
+
 End Namespace

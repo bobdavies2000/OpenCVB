@@ -340,7 +340,7 @@ Namespace VBClasses
                 End If
             Next
 
-            labels(3) = CStr(edgeline.classCount) + " segments were found and " + CStr(segmentCount) + " contained gs points"
+            labels(3) = CStr(edgeline.classCount) + " segments were found and " + CStr(segmentCount) + " contained grid square points"
             labels(3) += " " + CStr(brickCount) + " bricks were part of a segment"
 
             classCount = 0

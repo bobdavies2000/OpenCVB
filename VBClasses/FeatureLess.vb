@@ -7,12 +7,14 @@ Namespace VBClasses
             desc = "Identify featureless squares using the gray scale range - see 'Correlation_Basics'."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
+            If src.Channels <> 1 Then src = task.gray
+
             dst3 = src
             dst2.SetTo(0)
             Dim count As Integer
             Dim rangeThreshold As Integer = 30
             For Each gs In task.gSquares
-                Dim mm = GetMinMax(task.gray(gs))
+                Dim mm = GetMinMax(src(gs))
                 If mm.range < rangeThreshold Then
                     dst2(gs).SetTo(255)
                     count += 1
@@ -356,6 +358,26 @@ Namespace VBClasses
                 End If
                 SetTrueText(strOut, 1)
             End If
+        End Sub
+    End Class
+
+
+
+
+
+    Public Class FeatureLess_Not : Inherits TaskParent
+        Dim fLess As New FeatureLess_Basics
+        Dim feat As New Feature_General
+        Public Sub New()
+            desc = "Use the FeatureLess mask to reduce the input to feature searches."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            fLess.Run(src)
+            dst2.SetTo(0)
+            src.CopyTo(dst2, Not fLess.dst2)
+
+            feat.Run(dst2)
+            feat.dst2.CopyTo(dst3)
         End Sub
     End Class
 End Namespace

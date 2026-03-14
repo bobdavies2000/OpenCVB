@@ -35,7 +35,7 @@ Namespace VBClasses
         Public threshold As Single = 150
         Public Sub New()
             If task.bricks Is Nothing Then task.bricks = New Brick_Basics
-            desc = "Identify the highest intensity point in each gs given the input image."
+            desc = "Identify the highest intensity point in each grid square given the input image."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             If standalone Then
@@ -113,9 +113,9 @@ Namespace VBClasses
 
 
     Public Class NR_BrickPoint_MaskRedColor : Inherits TaskParent
-        Dim fLess As New BrickPoint_FeatureLess
+        Dim fLess As New NR_BrickPoint_FeatureLess
         Public Sub New()
-            desc = "Run RedColor with the featureless mask from BrickPoint_FeatureLess"
+            desc = "Run RedColor with the featureless mask from NR_BrickPoint_FeatureLess"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             fLess.Run(task.grayStable)
@@ -220,7 +220,7 @@ Namespace VBClasses
 
 
 
-    Public Class BrickPoint_Best : Inherits TaskParent
+    Public Class NR_BrickPoint_Best : Inherits TaskParent
         Dim bPoint As New BrickPoint_Basics
         Public bestBricks As New List(Of cv.Point)
         Public Sub New()
@@ -285,18 +285,17 @@ Namespace VBClasses
 
 
 
-    Public Class BrickPoint_PopulationSurvey : Inherits TaskParent
+    Public Class NR_BrickPoint_PopulationSurvey : Inherits TaskParent
         Dim bPoint As New BrickPoint_Basics
         Public results(,) As Single
         Public Sub New()
             If task.bricks Is Nothing Then task.bricks = New Brick_Basics
-            labels(2) = "Cursor over each gs to see where the grid points are."
-            task.mouseMovePoint = New cv.Point(0, 0) ' this gs is often the most populated.
-            desc = "Monitor the location of each gs point in a gs."
+            labels(2) = "Cursor over each grid square to see where the grid squares are."
+            task.mouseMovePoint = New cv.Point(0, 0) ' this grid square is often the most populated.
+            desc = "Monitor the location of each grid square point in a grid square."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             bPoint.Run(task.gray)
-
             dst1 = bPoint.dst2
             dst3 = src
 
@@ -344,10 +343,10 @@ Namespace VBClasses
 
 
     Public Class NR_BrickPoint_ContourCompare : Inherits TaskParent
-        Dim fLess As New BrickPoint_FeatureLess
+        Dim fLess As New NR_BrickPoint_FeatureLess
         Dim contours As New Contour_Basics
         Public Sub New()
-            desc = "Compare Contour_Basics to BrickPoint_FeatureLess"
+            desc = "Compare Contour_Basics to NR_BrickPoint_FeatureLess"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             fLess.Run(src)
@@ -365,12 +364,12 @@ Namespace VBClasses
 
 
 
-    Public Class BrickPoint_FeatureLess : Inherits TaskParent
+    Public Class NR_BrickPoint_FeatureLess : Inherits TaskParent
         Public classCount As Integer
         Public contours As New Contour_Basics
         Public Sub New()
             dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)  ' mask for the featureless regions.
-            desc = "Identify each gs as part of a contour or not."
+            desc = "Identify each grid square as part of a contour or not."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             contours.Run(src)
@@ -388,12 +387,12 @@ Namespace VBClasses
 
 
 
-    Public Class BrickPoint_KNN : Inherits TaskParent
+    Public Class NR_BrickPoint_KNN : Inherits TaskParent
         Public bPoint As New BrickPoint_Basics
         Dim knn As New KNN_Basics
         Public lplist As New List(Of lpData)
         Public Sub New()
-            desc = "Join the 2 nearest points to each gs point to help find lines."
+            desc = "Join the 2 nearest points to each grid square point to help find lines."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             bPoint.Run(task.gray)
@@ -423,11 +422,11 @@ Namespace VBClasses
 
 
     Public Class NR_BrickPoint_EndPoints : Inherits TaskParent
-        Dim brickKNN As New BrickPoint_KNN
+        Dim brickKNN As New NR_BrickPoint_KNN
         Public Sub New()
             If standalone Then task.gOptions.displayDst1.Checked = True
             dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_32F, 0)
-            desc = "Use the lp end points to find lines in the gs points"
+            desc = "Use the lp end points to find lines in the grid square points"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             brickKNN.Run(src)
@@ -496,12 +495,12 @@ Namespace VBClasses
 
 
 
-    Public Class BrickPoint_Vertical : Inherits TaskParent
+    Public Class NR_BrickPoint_Vertical : Inherits TaskParent
         Dim vertical As New Edge_SobelVertical
         Public bpCore As New BrickPoint_Core
         Public ptList As New List(Of cv.Point)
         Public Sub New()
-            desc = "Use the vertical Sobel to build gs points"
+            desc = "Use the vertical Sobel to build grid square points"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             vertical.Run(src)
@@ -520,7 +519,7 @@ Namespace VBClasses
         Public bpCore As New BrickPoint_Core
         Public ptList As New List(Of cv.Point)
         Public Sub New()
-            desc = "Use the horizontal Sobel to build gs points"
+            desc = "Use the horizontal Sobel to build grid square points"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             horizontal.Run(src)
@@ -555,6 +554,51 @@ Namespace VBClasses
                 Dim pt = New cv.Point(mm.maxLoc.X + rect.X, mm.maxLoc.Y + rect.Y)
                 If mm.maxVal >= threshold Then DrawRect(dst2, rect)
             Next
+        End Sub
+    End Class
+
+
+
+
+
+
+    Public Class NR_BrickPoint_Features : Inherits TaskParent
+        Public featureBricks As New List(Of cv.Rect)
+        Public Sub New()
+            If task.bricks Is Nothing Then task.bricks = New Brick_Basics
+            task.gOptions.LineWidth.Value = 3
+            If task.feat Is Nothing Then task.feat = New Feature_Basics
+            labels(3) = "Featureless areas"
+            desc = "Identify the cells with features"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            dst2 = task.feat.dst2
+
+            featureBricks.Clear()
+            Dim featList As New List(Of cv.Point)(task.feat.features)
+            For Each pt In featList
+                Dim index As Integer = task.gridMap.Get(Of Integer)(pt.Y, pt.X)
+                featureBricks.Add(task.gSquares(index))
+            Next
+
+            If task.gOptions.DebugCheckBox.Checked Then
+                For Each pt In featList
+                    DrawCircle(dst2, pt, task.DotSize, cv.Scalar.Black)
+                Next
+            End If
+
+            If standaloneTest() Then
+                dst3.SetTo(0)
+                For Each r In featureBricks
+                    dst3.Rectangle(r, white, -1)
+                Next
+                dst3 = Not dst3
+            End If
+
+            If task.heartBeat Then
+                Dim flessCount = task.gSquares.Count - featureBricks.Count
+                labels(2) = CStr(featureBricks.Count) + " cells had features while " + CStr(flessCount) + " had none"
+            End If
         End Sub
     End Class
 End Namespace

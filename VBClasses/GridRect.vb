@@ -389,7 +389,7 @@ Namespace VBClasses
             Next
 
             If corr.Count = 0 Then
-                SetTrueText("No corresponding gs found", 2)
+                SetTrueText("No corresponding grid square found", 2)
             Else
                 Dim maxCorr = corr.Max
                 If maxCorr < task.fCorrThreshold Then
@@ -414,7 +414,8 @@ Namespace VBClasses
                     Dim pt = New cv.Point(rectRight.X, gs.Y + 5)
                     SetTrueText(CStr(offset) + " pixel offset" + vbCrLf + "Larger = Right", pt, 1)
                     SetTrueText(strOut, 1)
-                    labels(3) = "Corresponding gs highlighted in yellow.  Average stdev = " + Format(gather.stdevAverage, fmt3)
+                    labels(3) = "Corresponding grid square highlighted in yellow.  Average stdev = " +
+                                Format(gather.stdevAverage, fmt3)
                 End If
             End If
         End Sub

@@ -615,7 +615,7 @@ Namespace VBClasses
                 strOut += "Hull count = "
                 strOut += If(hull Is Nothing, "0", CStr(hull.Count)) + vbCrLf
                 strOut += "Contour count = "
-                strOut += If(contour Is Nothing, "0", CStr(hull.Count)) + vbCrLf
+                strOut += If(contour Is Nothing Or contour.Count = 0, "0", CStr(contour.Count)) + vbCrLf
                 Return strOut
             End Function
         End Class

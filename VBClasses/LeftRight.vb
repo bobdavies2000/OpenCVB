@@ -281,9 +281,14 @@ Namespace VBClasses
             dst3 = task.leftView
             fLess.Run(dst3)
 
-            dst2 = fLess.dst2
-            redMask.Run(fLess.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
-            dst2 = PaletteFull(redMask.dst2)
+            If fLess.dst2.Channels <> 1 Then
+                redMask.Run(fLess.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
+            Else
+                redMask.Run(fLess.dst2)
+                redMask.dst2.SetTo(0, Not fLess.dst2)
+            End If
+
+            dst2 = PaletteBlackZero(redMask.dst2)
             labels(2) = redMask.labels(2)
         End Sub
     End Class
@@ -304,8 +309,14 @@ Namespace VBClasses
             dst3 = task.leftView
             fLess.Run(dst3)
 
-            redMask.Run(fLess.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
-            dst2 = PaletteFull(redMask.dst2)
+            If fLess.dst2.Channels <> 1 Then
+                redMask.Run(fLess.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
+            Else
+                redMask.Run(fLess.dst2)
+                redMask.dst2.SetTo(0, Not fLess.dst2)
+            End If
+
+            dst2 = PaletteBlackZero(redMask.dst2)
             labels(2) = redMask.labels(2)
         End Sub
     End Class
@@ -331,6 +342,30 @@ Namespace VBClasses
 
             labels(2) = "Left Image brightness/contrast = " + CStr(Options.brightness) + "/" + CStr(Options.contrast)
             labels(3) = "Right Image brightness/contrast = " + CStr(Options.brightness) + "/" + CStr(Options.contrast)
+        End Sub
+    End Class
+
+
+
+
+
+    Public Class LeftRight_Features : Inherits TaskParent
+        Dim fless As New FeatureLess_Basics
+        Public Sub New()
+            desc = "Show the featureless areas of the left and right images."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            fless.Run(task.leftView)
+
+            dst2 = task.leftView.Clone
+            dst2.SetTo(0, fless.dst2)
+            labels(2) = fless.labels(3)
+
+            fless.Run(task.rightView)
+
+            dst3 = task.rightView.Clone
+            dst3.SetTo(0, fless.dst2)
+            labels(3) = fless.labels(3)
         End Sub
     End Class
 End Namespace
