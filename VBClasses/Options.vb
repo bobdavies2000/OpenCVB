@@ -7277,13 +7277,13 @@ Namespace VBClasses
         Public height As Integer = 8
         Public Sub New()
             If sliders.Setup(traceName) Then
-                sliders.setupTrackBar("gs Width", 1, task.cols, width)
-                sliders.setupTrackBar("gs Height", 1, task.rows, height)
+                sliders.setupTrackBar("gSq Width", 1, task.cols, width)
+                sliders.setupTrackBar("gSq Height", 1, task.rows, height)
             End If
         End Sub
         Public Sub Run()
-            Static widthSlider = OptionParent.FindSlider("gs Width")
-            Static heightSlider = OptionParent.FindSlider("gs Height")
+            Static widthSlider = OptionParent.FindSlider("gSq Width")
+            Static heightSlider = OptionParent.FindSlider("gSq Height")
             width = widthSlider.value
             height = heightSlider.value
         End Sub

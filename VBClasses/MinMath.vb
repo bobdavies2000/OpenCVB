@@ -66,7 +66,7 @@ Namespace VBClasses
             dst2 = bPoints.dst2
             labels(2) = bPoints.labels(2)
 
-            For Each gs In task.bricks.brickList
+            For Each gSq In task.bricks.brickList
             Next
         End Sub
     End Class

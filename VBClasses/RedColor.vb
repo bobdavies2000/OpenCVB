@@ -181,7 +181,7 @@ Namespace VBClasses
         Public Sub New()
             If task.bricks Is Nothing Then task.bricks = New Brick_Basics
             If standalone Then task.gOptions.displayDst0.Checked = True
-            desc = "Attach an color8u class to each gs."
+            desc = "Attach an color8u class to each gSq."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             dst0 = task.leftView
@@ -193,10 +193,10 @@ Namespace VBClasses
 
             Dim count As Integer
             dst1.SetTo(0)
-            For Each gs As brickData In task.bricks.brickList
-                If redC.rcMap(gs.lRect).CountNonZero And gs.rRect.Width > 0 Then
-                    dst2(gs.lRect).CopyTo(dst1(gs.rRect))
-                    gs.colorClass = color8u.dst2.Get(Of Integer)
+            For Each gSq As brickData In task.bricks.brickList
+                If redC.rcMap(gSq.lRect).CountNonZero And gSq.rRect.Width > 0 Then
+                    dst2(gSq.lRect).CopyTo(dst1(gSq.rRect))
+                    gSq.colorClass = color8u.dst2.Get(Of Integer)
                     count += 1
                 End If
             Next
@@ -266,14 +266,14 @@ Namespace VBClasses
             rcGridMap.SetTo(0)
             dst3.SetTo(0)
             For i = 0 To task.gSquares.Count - 1
-                Dim gs = task.gSquares(i)
+                Dim gSq = task.gSquares(i)
 
-                Dim center = New cv.Point(CInt(gs.X + gs.Width / 2), CInt(gs.Y + gs.Height / 2))
+                Dim center = New cv.Point(CInt(gSq.X + gSq.Width / 2), CInt(gSq.Y + gSq.Height / 2))
                 Dim index = redC.rcMap.Get(Of Integer)(center.Y, center.X) - 1
                 If index >= redC.rcList.Count Or index < 0 Then Continue For
                 Dim rc = redC.rcList(index)
-                dst3(gs).SetTo(rc.color)
-                rcGridMap(gs).SetTo(rc.index)
+                dst3(gSq).SetTo(rc.color)
+                rcGridMap(gSq).SetTo(rc.index)
             Next
             strOut = RedUtil_Basics.selectCell(redC.rcMap, redC.rcList)
         End Sub

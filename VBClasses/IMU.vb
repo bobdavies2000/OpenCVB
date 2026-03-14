@@ -656,14 +656,14 @@ Namespace VBClasses
             strOut = "ID" + vbTab + "len3D" + vbTab + "Depth" + vbTab + "Arc X" + vbTab + "Arc Y" + vbTab + "Arc Z" + vbTab + "IMU X" + vbTab + "IMU Y" + vbTab + "IMU Z" + vbCrLf
             dst3.SetTo(0)
             For i = 0 To cells.Count - 1
-                Dim gs = cells.ElementAt(i).Value
-                strOut += CStr(i) + vbTab + Format(gs.len3D, fmt1) + "m" + vbTab + Format(gs.tc1.depth, fmt1) + "m" + vbTab +
-                      Format(gs.arcX, fmt1) + vbTab + Format(gs.arcY, fmt1) + vbTab + Format(gs.arcZ, fmt1) + vbTab
+                Dim gSq = cells.ElementAt(i).Value
+                strOut += CStr(i) + vbTab + Format(gSq.len3D, fmt1) + "m" + vbTab + Format(gSq.tc1.depth, fmt1) + "m" + vbTab +
+                      Format(gSq.arcX, fmt1) + vbTab + Format(gSq.arcY, fmt1) + vbTab + Format(gSq.arcZ, fmt1) + vbTab
                 strOut += Format(task.accRadians.X * 57.2958, fmt1) + vbTab + Format(task.accRadians.Y * 57.2958, fmt1) + vbTab + Format(task.accRadians.Z * 57.2958, fmt1) + vbTab + vbCrLf
-                SetTrueText(CStr(i), gs.tc1.center, 2)
-                SetTrueText(CStr(i), gs.tc1.center, 3)
-                vbc.DrawLine(dst2, gs.tc1.center, gs.tc2.center, task.highlight)
-                vbc.DrawLine(dst3, gs.tc1.center, gs.tc2.center, white)
+                SetTrueText(CStr(i), gSq.tc1.center, 2)
+                SetTrueText(CStr(i), gSq.tc1.center, 3)
+                vbc.DrawLine(dst2, gSq.tc1.center, gSq.tc2.center, task.highlight)
+                vbc.DrawLine(dst3, gSq.tc1.center, gSq.tc2.center, white)
             Next
             SetTrueText(strOut, 3)
         End Sub
@@ -1249,27 +1249,27 @@ Namespace VBClasses
             dst3.SetTo(0)
             Dim index As Integer
             For i = brickCells.Count - 1 To 0 Step -1
-                Dim gs = brickCells(i)
-                If gs.arcY > options.angleThreshold Then
+                Dim gSq = brickCells(i)
+                If gSq.arcY > options.angleThreshold Then
                     index = brickCells.Count - i
-                    Dim p1 = gs.tc1.center
-                    Dim p2 = gs.tc2.center
+                    Dim p1 = gSq.tc1.center
+                    Dim p2 = gSq.tc2.center
                     Dim xOffset = p1.X - p2.X
                     If p1.Y < p2.Y Then xOffset = p2.X - p1.X
                     Dim hypot = p1.DistanceTo(p2)
-                    gs.imageAngle = -Math.Asin(xOffset / hypot) * 57.2958
+                    gSq.imageAngle = -Math.Asin(xOffset / hypot) * 57.2958
 
-                    strOut += CStr(index) + vbTab + Format(gs.len3D, fmt1) + "m" + vbTab +
-                                                Format(gs.tc1.depth, fmt1) + "m" + vbTab +
-                                                Format(gs.arcY, fmt1) + vbTab +
-                                                Format(gs.imageAngle, fmt1) + vbTab
+                    strOut += CStr(index) + vbTab + Format(gSq.len3D, fmt1) + "m" + vbTab +
+                                                Format(gSq.tc1.depth, fmt1) + "m" + vbTab +
+                                                Format(gSq.arcY, fmt1) + vbTab +
+                                                Format(gSq.imageAngle, fmt1) + vbTab
                     strOut += Format(task.accRadians.Y * 57.2958, fmt1) + vbCrLf
 
-                    SetTrueText(CStr(index), gs.tc1.center, 2)
-                    SetTrueText(CStr(index), gs.tc1.center, 3)
-                    vbc.DrawLine(dst2, gs.tc1.center, gs.tc2.center, task.highlight)
-                    vbc.DrawLine(dst3, gs.tc1.center, gs.tc2.center, white)
-                    brickCells(i) = gs
+                    SetTrueText(CStr(index), gSq.tc1.center, 2)
+                    SetTrueText(CStr(index), gSq.tc1.center, 3)
+                    vbc.DrawLine(dst2, gSq.tc1.center, gSq.tc2.center, task.highlight)
+                    vbc.DrawLine(dst3, gSq.tc1.center, gSq.tc2.center, white)
+                    brickCells(i) = gSq
                 Else
                     brickCells.RemoveAt(i)
                 End If

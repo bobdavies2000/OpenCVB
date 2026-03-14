@@ -1446,11 +1446,11 @@ Namespace VBClasses
 
                     Dim maxVal = histData.ToList.Max
                     For i = 0 To task.gSquares.Count - 1
-                        Dim gs = task.gSquares(i)
+                        Dim gSq = task.gSquares(i)
                         If i >= histData.Length Then
-                            dst2(gs).SetTo(0)
+                            dst2(gSq).SetTo(0)
                         Else
-                            dst2(gs).SetTo(255 * histData(i) / maxVal)
+                            dst2(gSq).SetTo(255 * histData(i) / maxVal)
                         End If
                     Next
                     labels(2) = "2D plot of the resulting 3D histogram."

@@ -286,9 +286,9 @@ Namespace VBClasses
             task.grid.Run(src)
 
             For i = 0 To task.gSquares.Count - 1
-                Dim gs = task.gSquares(i)
-                dst2(gs).SetTo(task.scalarColors(i Mod 256))
-                dst3(gs).SetTo(task.vecColors(i Mod 256))
+                Dim gSq = task.gSquares(i)
+                dst2(gSq).SetTo(task.scalarColors(i Mod 256))
+                dst3(gSq).SetTo(task.vecColors(i Mod 256))
             Next
         End Sub
     End Class

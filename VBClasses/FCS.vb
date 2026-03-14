@@ -210,7 +210,7 @@ Namespace VBClasses
                 fp.index = i
 
                 Dim brickIndex = task.gridMap.Get(Of Integer)(fp.pt.Y, fp.pt.X)
-                Dim gs = task.bricks.brickList(brickIndex)
+                Dim gSq = task.bricks.brickList(brickIndex)
                 Dim fpIndex = task.fpFromGridCellLast.IndexOf(brickIndex)
                 If fpIndex >= 0 Then
                     Dim fpLast = task.fpLastList(fpIndex)
@@ -234,7 +234,7 @@ Namespace VBClasses
 
                 If minX < 0 Or minY < 0 Or maxX >= dst2.Width Or maxY >= dst2.Height Then fp.periph = True
 
-                fp.depth = gs.depth
+                fp.depth = gSq.depth
 
                 task.fpList.Add(fp)
 
@@ -633,9 +633,9 @@ Namespace VBClasses
             strOut += "ClickPoint = " + task.ClickPoint.ToString + vbCrLf + vbCrLf
 
             strOut += "brickIndex = " + CStr(fp.brickIndex) + vbCrLf
-            Dim gs = task.bricks.brickList(fp.brickIndex)
-            strOut += CStr(gs.age) + vbTab + "Age" + vbTab + vbCrLf
-            strOut += Format(gs.correlation, fmt3) + vbTab + "Correlation to right image" + vbCrLf
+            Dim gSq = task.bricks.brickList(fp.brickIndex)
+            strOut += CStr(gSq.age) + vbTab + "Age" + vbTab + vbCrLf
+            strOut += Format(gSq.correlation, fmt3) + vbTab + "Correlation to right image" + vbCrLf
 
             strOut += "Depth = " + Format(fp.depth, fmt1)
             strOut += vbCrLf

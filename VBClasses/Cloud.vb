@@ -412,7 +412,7 @@ Namespace VBClasses
             If task.bricks Is Nothing Then task.bricks = New Brick_Basics
             dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
             task.mouseMovePoint.X = dst2.Width / 2
-            desc = "Inspect x, y, and z values by gs"
+            desc = "Inspect x, y, and z values by gSq"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             Dim cLine = task.mouseMovePoint.X
@@ -425,7 +425,7 @@ Namespace VBClasses
             dst2 = task.depthRGB
             dst2.Line(topPt, botPt, 255, task.lineWidth, task.lineWidth)
 
-            SetTrueText("Values show gs.pt3d values at the blue line.", New cv.Point(dst2.Width / 2, 0), 3)
+            SetTrueText("Values show gSq.pt3d values at the blue line.", New cv.Point(dst2.Width / 2, 0), 3)
             For i = 0 To dst2.Height - 1 Step task.brickSize
                 Dim pt = New cv.Point2f(cLine, i)
                 Dim index = task.gridMap.Get(Of Integer)(pt.Y, pt.X)
@@ -654,15 +654,15 @@ Namespace VBClasses
             dst2.SetTo(0)
             dst3.SetTo(0)
             Dim gcPrev = task.bricks.brickList(0)
-            For Each gs In task.bricks.brickList
-                If gs.rect.X > 0 Then
-                    If Math.Abs(gs.depth - gcPrev.depth) <= task.depthDiffMeters Then
-                        dst2(gs.rect).SetTo(255)
+            For Each gSq In task.bricks.brickList
+                If gSq.rect.X > 0 Then
+                    If Math.Abs(gSq.depth - gcPrev.depth) <= task.depthDiffMeters Then
+                        dst2(gSq.rect).SetTo(255)
                     Else
-                        dst3(gs.rect).SetTo(255)
+                        dst3(gSq.rect).SetTo(255)
                     End If
                 End If
-                gcPrev = gs
+                gcPrev = gSq
             Next
 
             labels(2) = "White pixels: Z-values within " + CStr(task.depthDiffMeters) + " meters of neighbor in X direction"
@@ -691,17 +691,17 @@ Namespace VBClasses
             dst2.SetTo(0)
             Dim gcPrev = task.bricks.brickList(0)
             Dim cellMat As New cv.Mat(task.brickSize, task.brickSize, cv.MatType.CV_8U, cv.Scalar.All(127))
-            For Each gs In task.bricks.brickList
-                Dim gcAbove = task.bricks.brickList(CInt(gs.index Mod task.bricksPerRow))
-                If gs.correlation > task.fCorrThreshold Then
-                    If gs.rect.Y = 0 Or gs.rect.X = 0 Then Continue For
-                    If Math.Abs(gs.depth - gcPrev.depth) <= task.depthDiffMeters Then dst2(gs.rect).SetTo(128)
-                    If Math.Abs(gs.depth - gcAbove.depth) <= task.depthDiffMeters And
-                gs.rect.Width = cellMat.Width And gs.rect.Height = cellMat.Height Then
-                        cv.Cv2.Add(dst2(gs.rect), cellMat, dst2(gs.rect))
+            For Each gSq In task.bricks.brickList
+                Dim gcAbove = task.bricks.brickList(CInt(gSq.index Mod task.bricksPerRow))
+                If gSq.correlation > task.fCorrThreshold Then
+                    If gSq.rect.Y = 0 Or gSq.rect.X = 0 Then Continue For
+                    If Math.Abs(gSq.depth - gcPrev.depth) <= task.depthDiffMeters Then dst2(gSq.rect).SetTo(128)
+                    If Math.Abs(gSq.depth - gcAbove.depth) <= task.depthDiffMeters And
+                gSq.rect.Width = cellMat.Width And gSq.rect.Height = cellMat.Height Then
+                        cv.Cv2.Add(dst2(gSq.rect), cellMat, dst2(gSq.rect))
                     End If
                 End If
-                gcPrev = gs
+                gcPrev = gSq
             Next
 
             labels(2) = "White pixels: Z-values within " + CStr(task.depthDiffMeters) + " meters of neighbor in X and Y direction"

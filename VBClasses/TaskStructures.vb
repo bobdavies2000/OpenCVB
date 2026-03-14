@@ -255,7 +255,7 @@ Namespace VBClasses
 
         Public Class brickData
             Public age As Integer = 1
-            Public center As cv.Point ' center of the gs
+            Public center As cv.Point ' center of the gSq
             Public color As cv.Scalar
             Public colorClass As Integer
             Public corners As New List(Of cv.Point3f)

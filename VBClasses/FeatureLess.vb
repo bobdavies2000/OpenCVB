@@ -13,12 +13,12 @@ Namespace VBClasses
             dst2.SetTo(0)
             Dim count As Integer
             Dim rangeThreshold As Integer = 30
-            For Each gs In task.gSquares
-                Dim mm = GetMinMax(src(gs))
+            For Each gSq In task.gSquares
+                Dim mm = GetMinMax(src(gSq))
                 If mm.range < rangeThreshold Then
-                    dst2(gs).SetTo(255)
+                    dst2(gSq).SetTo(255)
                     count += 1
-                    dst3.Rectangle(gs, white, task.lineWidth)
+                    dst3.Rectangle(gSq, white, task.lineWidth)
                 End If
             Next
             labels(3) = CStr(count) + " grid squares were found to be featureless (range < " + CStr(rangeThreshold) + ")"
@@ -41,10 +41,10 @@ Namespace VBClasses
 
             dst2.SetTo(0)
             For i = 0 To corr.cList.Count - 1
-                Dim gs = task.gSquares(i)
+                Dim gSq = task.gSquares(i)
                 If corr.cList(i) < corr.corrThreshold Then
-                    dst2(gs).SetTo(255)
-                    If standaloneTest() Then src.Rectangle(gs, white, task.lineWidth)
+                    dst2(gSq).SetTo(255)
+                    If standaloneTest() Then src.Rectangle(gSq, white, task.lineWidth)
                 End If
             Next
         End Sub
@@ -70,9 +70,9 @@ Namespace VBClasses
             For i = 0 To corr.cList.Count - 1
                 Dim correlation = corr.cList(i)
                 If correlation < corr.corrThreshold Then
-                    Dim gs = task.gSquares(i)
-                    Dim val = fLess.dst2.Get(Of Byte)(gs.TopLeft.Y, gs.TopLeft.X)
-                    If val = 0 Then dst3.Rectangle(gs, red, -1)
+                    Dim gSq = task.gSquares(i)
+                    Dim val = fLess.dst2.Get(Of Byte)(gSq.TopLeft.Y, gSq.TopLeft.X)
+                    If val = 0 Then dst3.Rectangle(gSq, red, -1)
                 End If
             Next
         End Sub

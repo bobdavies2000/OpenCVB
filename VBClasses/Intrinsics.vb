@@ -44,8 +44,8 @@ Namespace VBClasses
             If standalone Then
                 dst2 = task.leftView.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
                 Dim vec = New cv.Vec3b(0, 255, 255) ' yellow
-                For Each gs In task.bricks.brickList
-                    If gs.depth > 0 Then DrawCircle(dst2, gs.rect.TopLeft)
+                For Each gSq In task.bricks.brickList
+                    If gSq.depth > 0 Then DrawCircle(dst2, gSq.rect.TopLeft)
                 Next
             End If
         End Sub

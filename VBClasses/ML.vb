@@ -321,18 +321,18 @@ Namespace VBClasses
             Dim predictList As New List(Of mlColor)
             Dim grPredict As New List(Of cv.Rect)
             For i = 0 To task.gSquares.Count - 1
-                Dim gs = task.gSquares(i)
+                Dim gSq = task.gSquares(i)
                 Dim mls As mlColor
-                mls.colorIndex = color8U.dst2.Get(Of Byte)(gs.Y, gs.X)
-                mls.x = gs.X
-                mls.y = gs.Y
+                mls.colorIndex = color8U.dst2.Get(Of Byte)(gSq.Y, gSq.X)
+                mls.x = gSq.X
+                mls.y = gSq.Y
 
-                If task.noDepthMask(gs).CountNonZero > 0 Then
-                    grPredict.Add(gs)
+                If task.noDepthMask(gSq).CountNonZero > 0 Then
+                    grPredict.Add(gSq)
                     predictList.Add(mls)
                 Else
                     mlInput.Add(mls)
-                    mResponse.Add(task.pcSplit(2)(gs).Mean())
+                    mResponse.Add(task.pcSplit(2)(gSq).Mean())
                 End If
             Next
 
@@ -352,9 +352,9 @@ Namespace VBClasses
             dst3 = task.pcSplit(2).Clone
             For i = 0 To predictList.Count - 1
                 Dim mls = predictList(i)
-                Dim gs = grPredict(i)
+                Dim gSq = grPredict(i)
                 Dim depth = output.Get(Of Single)(i, 0)
-                dst3(gs).SetTo(depth, task.noDepthMask(gs))
+                dst3(gSq).SetTo(depth, task.noDepthMask(gSq))
             Next
 
         End Sub
@@ -396,18 +396,18 @@ Namespace VBClasses
             Dim predictList As New List(Of mlColorInTier)
             Dim grPredict As New List(Of cv.Rect)
             For i = 0 To task.gSquares.Count - 1
-                Dim gs = task.gSquares(i)
+                Dim gSq = task.gSquares(i)
                 Dim mls As mlColorInTier
-                mls.colorIndex = color8U.dst2.Get(Of Byte)(gs.Y, gs.X)
-                mls.x = gs.X
-                mls.y = gs.Y
+                mls.colorIndex = color8U.dst2.Get(Of Byte)(gSq.Y, gSq.X)
+                mls.x = gSq.X
+                mls.y = gSq.Y
 
-                If task.noDepthMask(gs).CountNonZero > 0 Then
-                    grPredict.Add(gs)
+                If task.noDepthMask(gSq).CountNonZero > 0 Then
+                    grPredict.Add(gSq)
                     predictList.Add(mls)
                 Else
                     mlInput.Add(mls)
-                    mResponse.Add(task.pcSplit(2)(gs).Mean())
+                    mResponse.Add(task.pcSplit(2)(gSq).Mean())
                 End If
             Next
 
@@ -427,9 +427,9 @@ Namespace VBClasses
             dst3 = task.pcSplit(2).Clone
             For i = 0 To predictList.Count - 1
                 Dim mls = predictList(i)
-                Dim gs = grPredict(i)
+                Dim gSq = grPredict(i)
                 Dim depth = output.Get(Of Single)(i, 0)
-                dst3(gs).SetTo(depth, task.noDepthMask(gs))
+                dst3(gSq).SetTo(depth, task.noDepthMask(gSq))
             Next
         End Sub
         Protected Overrides Sub Finalize()

@@ -821,8 +821,8 @@ Namespace VBClasses
 
             Parallel.For(0, task.gSquares.Count,
             Sub(i)
-                Dim gs = task.gSquares(i)
-                Dim mm As mmData = GetMinMax(task.pcSplit(2)(gs), task.depthmask(gs))
+                Dim gSq = task.gSquares(i)
+                Dim mm As mmData = GetMinMax(task.pcSplit(2)(gSq), task.depthmask(gSq))
                 If mm.minLoc.X < 0 Or mm.minLoc.Y < 0 Then mm.minLoc = New cv.Point2f(0, 0)
                 task.kalman.kInput(i * 4) = mm.minLoc.X
                 task.kalman.kInput(i * 4 + 1) = mm.minLoc.Y
@@ -908,16 +908,16 @@ Namespace VBClasses
                 dst3.SetTo(0)
                 dst2 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
                 Dim count As Integer
-                For Each gs In task.bricks.brickList
-                    cv.Cv2.MeanStdDev(dst2(gs.rect), grayMean, grayStdev)
-                    cv.Cv2.MeanStdDev(task.color(gs.rect), ColorMean, colorStdev)
+                For Each gSq In task.bricks.brickList
+                    cv.Cv2.MeanStdDev(dst2(gSq.rect), grayMean, grayStdev)
+                    cv.Cv2.MeanStdDev(task.color(gSq.rect), ColorMean, colorStdev)
                     Dim nextColorStdev = (colorStdev(0) + colorStdev(1) + colorStdev(2)) / 3
                     Dim diff = Math.Abs(grayStdev(0) - nextColorStdev)
                     If diff > threshold Then
-                        dst2.Rectangle(gs.rect, 255, task.lineWidth)
-                        SetTrueText(Format(grayStdev(0), fmt1) + " " + Format(colorStdev, fmt1), gs.rect.TopLeft, 2)
-                        dst3.Rectangle(gs.rect, task.highlight, task.lineWidth)
-                        SetTrueText(Format(diff, fmt1), gs.rect.TopLeft, 3)
+                        dst2.Rectangle(gSq.rect, 255, task.lineWidth)
+                        SetTrueText(Format(grayStdev(0), fmt1) + " " + Format(colorStdev, fmt1), gSq.rect.TopLeft, 2)
+                        dst3.Rectangle(gSq.rect, task.highlight, task.lineWidth)
+                        SetTrueText(Format(diff, fmt1), gSq.rect.TopLeft, 3)
                         count += 1
                     End If
                 Next
@@ -2062,35 +2062,35 @@ Namespace VBClasses
 
             task.bricks.brickList.Clear()
             For i = 0 To task.gSquares.Count - 1
-                Dim gs As New brickData
-                gs.rect = task.gSquares(i)
-                gs.rect = gs.rect
-                gs.lRect = gs.rect ' for some cameras the color image and the left image are the same but not all, i.e. Intel Realsense.
-                gs.center = New cv.Point(gs.rect.X + gs.rect.Width / 2, gs.rect.Y + gs.rect.Height / 2)
-                If task.depthMask(gs.rect).CountNonZero Then
-                    cv.Cv2.MeanStdDev(task.pcSplit(2)(gs.rect), mean, stdev, task.depthMask(gs.rect))
-                    gs.depth = mean(0)
+                Dim gSq As New brickData
+                gSq.rect = task.gSquares(i)
+                gSq.rect = gSq.rect
+                gSq.lRect = gSq.rect ' for some cameras the color image and the left image are the same but not all, i.e. Intel Realsense.
+                gSq.center = New cv.Point(gSq.rect.X + gSq.rect.Width / 2, gSq.rect.Y + gSq.rect.Height / 2)
+                If task.depthMask(gSq.rect).CountNonZero Then
+                    cv.Cv2.MeanStdDev(task.pcSplit(2)(gSq.rect), mean, stdev, task.depthMask(gSq.rect))
+                    gSq.depth = mean(0)
                 End If
 
-                If gs.depth = 0 Then
-                    gs.correlation = 0
-                    gs.rRect = emptyRect
+                If gSq.depth = 0 Then
+                    gSq.correlation = 0
+                    gSq.rRect = emptyRect
                 Else
-                    gs.mm = GetMinMax(task.pcSplit(2)(gs.rect), task.depthMask(gs.rect))
-                    gs.lRect = gs.rect
-                    gs.rRect = gs.lRect
-                    gs.rRect.X -= task.calibData.baseline * task.calibData.leftIntrinsics.fx / gs.depth
-                    gs.rRect = ValidateRect(gs.rRect)
-                    cv.Cv2.MatchTemplate(LRMeanSub.dst2(gs.lRect), LRMeanSub.dst3(gs.rRect), correlationMat,
+                    gSq.mm = GetMinMax(task.pcSplit(2)(gSq.rect), task.depthMask(gSq.rect))
+                    gSq.lRect = gSq.rect
+                    gSq.rRect = gSq.lRect
+                    gSq.rRect.X -= task.calibData.baseline * task.calibData.leftIntrinsics.fx / gSq.depth
+                    gSq.rRect = ValidateRect(gSq.rRect)
+                    cv.Cv2.MatchTemplate(LRMeanSub.dst2(gSq.lRect), LRMeanSub.dst3(gSq.rRect), correlationMat,
                                                      cv.TemplateMatchModes.CCoeffNormed)
 
-                    gs.correlation = correlationMat.Get(Of Single)(0, 0)
+                    gSq.correlation = correlationMat.Get(Of Single)(0, 0)
                 End If
 
-                lastCorrelation(i) = gs.correlation
-                gs.index = task.bricks.brickList.Count
-                task.gridMap(gs.rect).SetTo(i)
-                task.bricks.brickList.Add(gs)
+                lastCorrelation(i) = gSq.correlation
+                gSq.index = task.bricks.brickList.Count
+                task.gridMap(gSq.rect).SetTo(i)
+                task.bricks.brickList.Add(gSq)
             Next
 
             ' quad.Run(src)
@@ -2456,18 +2456,18 @@ Namespace VBClasses
             Dim lastMeanZ As Single
             For y = 0 To task.bricksPerCol - 1
                 For x = 0 To task.bricksPerRow - 1
-                    Dim gs = task.gSquares(y * task.bricksPerRow + x)
-                    Dim mean = task.pointCloud(gs).Mean(task.depthmask(gs))
+                    Dim gSq = task.gSquares(y * task.bricksPerRow + x)
+                    Dim mean = task.pointCloud(gSq).Mean(task.depthmask(gSq))
                     If Single.IsNaN(mean(0)) Then Continue For
                     If Single.IsNaN(mean(1)) Then Continue For
                     If Single.IsInfinity(mean(2)) Then Continue For
-                    Dim depthPresent = task.depthmask(gs).CountNonZero > gs.Width * gs.Height / 2
+                    Dim depthPresent = task.depthmask(gSq).CountNonZero > gSq.Width * gSq.Height / 2
                     If (depthPresent And mean(2) > 0 And Math.Abs(lastMeanZ - mean(2)) < 0.2 And
                     mean(2) < task.MaxZmeters) Or (lastMeanZ = 0 And mean(2) > 0) Then
 
                         pcPoints.Set(Of cv.Point3f)(y, x, New cv.Point3f(mean(0), mean(1), mean(2)))
                         actualCount += 1
-                        DrawCircle(dst2, New cv.Point(gs.X, gs.Y), task.DotSize * Math.Max(mean(2), 1), white)
+                        DrawCircle(dst2, New cv.Point(gSq.X, gSq.Y), task.DotSize * Math.Max(mean(2), 1), white)
                     End If
                     lastMeanZ = mean(2)
                 Next
@@ -2494,9 +2494,9 @@ Namespace VBClasses
 
             pcPoints.Clear()
             dst2 = src
-            For Each gs In task.gSquares
-                Dim pt = New cv.Point(gs.X + rw, gs.Y + rh)
-                Dim mean = task.pointCloud(gs).Mean(task.depthmask(gs))
+            For Each gSq In task.gSquares
+                Dim pt = New cv.Point(gSq.X + rw, gSq.Y + rh)
+                Dim mean = task.pointCloud(gSq).Mean(task.depthmask(gSq))
 
                 If mean(2) > 0 Then
                     pcPoints.Add(Choose(pt.Y Mod 3 + 1, red32, blue32, white32))
@@ -2755,8 +2755,8 @@ Namespace VBClasses
 
             For Each tup In connect.hTuples
                 If tup.Item2 - tup.Item1 = 0 Then
-                    Dim gs = task.bricks.brickList(tup.Item1)
-                    dst2(gs.rect).SetTo(0)
+                    Dim gSq = task.bricks.brickList(tup.Item1)
+                    dst2(gSq.rect).SetTo(0)
                 End If
             Next
 
@@ -2824,7 +2824,7 @@ Namespace VBClasses
                 DrawTour(dst1, facets, 255, task.lineWidth)
                 DrawTour(task.fpMap, facets, i)
                 Dim center = New cv.Point(CInt((lp.p1.X + lp.p2.X) / 2), CInt((lp.p1.Y + lp.p2.Y) / 2))
-                Dim gs = task.bricks.brickList(task.gridMap.Get(Of Integer)(center.Y, center.X))
+                Dim gSq = task.bricks.brickList(task.gridMap.Get(Of Integer)(center.Y, center.X))
                 task.lines.lpList(i) = lp
             Next
 
@@ -3081,10 +3081,10 @@ Namespace VBClasses
             labels(3) = "All vertical lines.  The numbers: index and Arc-Y for the longest X vertical lines."
             desc = "Find all the vertical lines and then track the longest one with a lightweight KNN."
         End Sub
-        Private Function testLastPair(lastPair As lpData, gs As gravityLine) As Boolean
+        Private Function testLastPair(lastPair As lpData, gSq As gravityLine) As Boolean
             Dim distance1 = lastPair.p1.DistanceTo(lastPair.p2)
-            Dim p1 = gs.tc1.center
-            Dim p2 = gs.tc2.center
+            Dim p1 = gSq.tc1.center
+            Dim p2 = gSq.tc2.center
             If distance1 < 0.75 * p1.DistanceTo(p2) Then Return True ' it the longest vertical * 0.75 > current lastPair, then use the longest vertical...
             Return False
         End Function
@@ -3099,14 +3099,14 @@ Namespace VBClasses
             Dim index As Integer
 
             If testLastPair(longest.knn.lastPair, gLines.sortedVerticals.ElementAt(0).Value) Then longest.knn.lastPair = New lpData
-            For Each gs In gLines.sortedVerticals.Values
+            For Each gSq In gLines.sortedVerticals.Values
                 If index >= 10 Then Exit For
 
-                Dim p1 = gs.tc1.center
-                Dim p2 = gs.tc2.center
+                Dim p1 = gSq.tc1.center
+                Dim p2 = gSq.tc2.center
                 If longest.knn.lastPair.compare(New lpData) Then longest.knn.lastPair = New lpData(p1, p2)
                 Dim pt = New cv.Point((p1.X + p2.X) / 2, (p1.Y + p2.Y) / 2)
-                SetTrueText(CStr(index) + vbCrLf + Format(gs.arcY, fmt1), pt, 3)
+                SetTrueText(CStr(index) + vbCrLf + Format(gSq.arcY, fmt1), pt, 3)
                 index += 1
 
                 vbc.DrawLine(dst3, p1, p2, task.highlight)
@@ -3805,12 +3805,12 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             dst2 = New cv.Mat(dst3.Size(), cv.MatType.CV_32FC3, 0)
-            For Each gs In task.gSquares
-                Dim d = task.pointCloud(gs).Mean(task.depthmask(gs))
+            For Each gSq In task.gSquares
+                Dim d = task.pointCloud(gSq).Mean(task.depthmask(gSq))
                 Dim depth = New cv.Vec3f(d.Val0, d.Val1, d.Val2)
-                Dim pt = New cv.Point(gs.X + gs.Width / 2, gs.Y + gs.Height / 2)
+                Dim pt = New cv.Point(gSq.X + gSq.Width / 2, gSq.Y + gSq.Height / 2)
                 Dim vec = task.pointCloud.Get(Of cv.Vec3f)(pt.Y, pt.X)
-                If vec(2) > 0 Then dst2(gs).SetTo(depth)
+                If vec(2) > 0 Then dst2(gSq).SetTo(depth)
             Next
 
             labels(2) = traceName + " with " + CStr(task.gSquares.Count) + " regions was created"
@@ -3837,14 +3837,14 @@ Namespace VBClasses
 
             dst3.SetTo(0)
             oglData.Clear()
-            For Each gs In task.gSquares
-                Dim c = dst2.Get(Of cv.Vec3b)(gs.Y, gs.X)
+            For Each gSq In task.gSquares
+                Dim c = dst2.Get(Of cv.Vec3b)(gSq.Y, gSq.X)
                 If c = black Then Continue For
                 oglData.Add(New cv.Vec3f(c(2) / 255, c(1) / 255, c(0) / 255))
 
-                Dim v = task.pointCloud(gs).Mean(task.depthmask(gs))
+                Dim v = task.pointCloud(gSq).Mean(task.depthmask(gSq))
                 oglData.Add(New cv.Vec3f(v.Val0, v.Val1, v.Val2))
-                dst3(gs).SetTo(c)
+                dst3(gSq).SetTo(c)
             Next
             labels(2) = traceName + " with " + CStr(task.gSquares.Count) + " regions was created"
         End Sub
@@ -4624,9 +4624,9 @@ Namespace VBClasses
             Dim stdValues(task.gSquares.Count - 1) As Single
             Parallel.For(0, task.gSquares.Count,
         Sub(i)
-            Dim gs = task.gSquares(i)
+            Dim gSq = task.gSquares(i)
             Dim mean As cv.Scalar, stdev As cv.Scalar
-            cv.Cv2.MeanStdDev(task.pcSplit(2)(gs), mean, stdev, task.depthmask(gs))
+            cv.Cv2.MeanStdDev(task.pcSplit(2)(gSq), mean, stdev, task.depthmask(gSq))
             meanSeries.Set(Of Single)(i, index, mean)
             If task.frameCount >= task.frameHistoryCount - 1 Then
                 cv.Cv2.MeanStdDev(meanSeries.Row(i), mean, stdev)
@@ -4648,12 +4648,12 @@ Namespace VBClasses
 
                 Parallel.For(0, task.gSquares.Count,
             Sub(i)
-                Dim gs = task.gSquares(i)
-                dst3(gs).SetTo(255 * stdevs.Get(Of Single)(i, 0) / maxStdevVal)
-                dst3(gs).SetTo(0, task.noDepthMask(gs))
+                Dim gSq = task.gSquares(i)
+                dst3(gSq).SetTo(255 * stdevs.Get(Of Single)(i, 0) / maxStdevVal)
+                dst3(gSq).SetTo(0, task.noDepthMask(gSq))
 
-                dst2(gs).SetTo(255 * means.Get(Of Single)(i, 0) / maxMeanVal)
-                dst2(gs).SetTo(0, task.noDepthMask(gs))
+                dst2(gSq).SetTo(255 * means.Get(Of Single)(i, 0) / maxMeanVal)
+                dst2(gSq).SetTo(0, task.noDepthMask(gSq))
             End Sub)
 
                 If task.heartBeat Then
@@ -4663,15 +4663,15 @@ Namespace VBClasses
 
                 If standaloneTest() Then
                     For i = 0 To task.gSquares.Count - 1
-                        Dim gs = task.gSquares(i)
+                        Dim gSq = task.gSquares(i)
                         SetTrueText(Format(meanValues(i), fmt3) + vbCrLf +
-                                Format(stdValues(i), fmt3), gs.Location, 3)
+                                Format(stdValues(i), fmt3), gSq.Location, 3)
                     Next
                 End If
 
                 dst3 = dst3 Or task.gridMask
                 labels(2) = "The regions where the depth is volatile are brighter.  Stdev min " + Format(mmStd.minVal, fmt3) + " Stdev Max " + Format(mmStd.maxVal, fmt3)
-                labels(3) = "Mean/stdev for each gs: Min " + Format(mm.minVal, fmt3) + " Max " + Format(mm.maxVal, fmt3)
+                labels(3) = "Mean/stdev for each gSq: Min " + Format(mm.minVal, fmt3) + " Max " + Format(mm.maxVal, fmt3)
             End If
         End Sub
     End Class
@@ -5368,8 +5368,8 @@ Namespace VBClasses
             dst3.SetTo(0)
             Dim histarray(task.redList.oldrclist.Count - 1) As Single
             Dim histogram As New cv.Mat
-            For Each gs In task.bricks.brickList
-                cv.Cv2.CalcHist({task.redList.rcMap(gs.rect)}, {0}, emptyMat, histogram, 1, {task.redList.oldrclist.Count},
+            For Each gSq In task.bricks.brickList
+                cv.Cv2.CalcHist({task.redList.rcMap(gSq.rect)}, {0}, emptyMat, histogram, 1, {task.redList.oldrclist.Count},
                              New cv.Rangef() {New cv.Rangef(1, task.redList.oldrclist.Count)})
 
                 histogram.GetArray(Of Single)(histarray)
@@ -5378,8 +5378,8 @@ Namespace VBClasses
                 For j = 1 To histarray.Count - 1
                     If histarray(j) > 0 Then
                         Dim rc = task.redList.oldrclist(j)
-                        dst3(gs.rect).SetTo(rc.color)
-                        ' dst3(gs.rect).SetTo(0, Not dst1(gs.rect))
+                        dst3(gSq.rect).SetTo(rc.color)
+                        ' dst3(gSq.rect).SetTo(0, Not dst1(gSq.rect))
                         count += 1
                         Exit For
                     End If
@@ -15083,32 +15083,32 @@ Namespace VBClasses
             labels(2) = "XO_Line_GCloud - Blue are vertical lines using the angle thresholds."
             desc = "Find all the vertical lines using the point cloud rectified with the IMU vector for gravity."
         End Sub
-        Public Function updateGLine(src As cv.Mat, gs As gravityLine, p1 As cv.Point, p2 As cv.Point) As gravityLine
-            gs.tc1.center = p1
-            gs.tc2.center = p2
-            gs.tc1 = match.createCell(src, gs.tc1.correlation, p1)
-            gs.tc2 = match.createCell(src, gs.tc2.correlation, p2)
-            gs.tc1.strOut = Format(gs.tc1.correlation, fmt2) + vbCrLf + Format(gs.tc1.depth, fmt2) + "m"
-            gs.tc2.strOut = Format(gs.tc2.correlation, fmt2) + vbCrLf + Format(gs.tc2.depth, fmt2) + "m"
+        Public Function updateGLine(src As cv.Mat, gSq As gravityLine, p1 As cv.Point, p2 As cv.Point) As gravityLine
+            gSq.tc1.center = p1
+            gSq.tc2.center = p2
+            gSq.tc1 = match.createCell(src, gSq.tc1.correlation, p1)
+            gSq.tc2 = match.createCell(src, gSq.tc2.correlation, p2)
+            gSq.tc1.strOut = Format(gSq.tc1.correlation, fmt2) + vbCrLf + Format(gSq.tc1.depth, fmt2) + "m"
+            gSq.tc2.strOut = Format(gSq.tc2.correlation, fmt2) + vbCrLf + Format(gSq.tc2.depth, fmt2) + "m"
 
-            Dim mean = task.pointCloud(gs.tc1.rect).Mean(task.depthmask(gs.tc1.rect))
-            gs.pt1 = New cv.Point3f(mean(0), mean(1), mean(2))
-            gs.tc1.depth = gs.pt1.Z
-            mean = task.pointCloud(gs.tc2.rect).Mean(task.depthmask(gs.tc2.rect))
-            gs.pt2 = New cv.Point3f(mean(0), mean(1), mean(2))
-            gs.tc2.depth = gs.pt2.Z
+            Dim mean = task.pointCloud(gSq.tc1.rect).Mean(task.depthmask(gSq.tc1.rect))
+            gSq.pt1 = New cv.Point3f(mean(0), mean(1), mean(2))
+            gSq.tc1.depth = gSq.pt1.Z
+            mean = task.pointCloud(gSq.tc2.rect).Mean(task.depthmask(gSq.tc2.rect))
+            gSq.pt2 = New cv.Point3f(mean(0), mean(1), mean(2))
+            gSq.tc2.depth = gSq.pt2.Z
 
-            gs.len3D = Distance_Basics.distance3D(gs.pt1, gs.pt2)
-            If gs.pt1 = New cv.Point3f Or gs.pt2 = New cv.Point3f Then
-                gs.len3D = 0
+            gSq.len3D = Distance_Basics.distance3D(gSq.pt1, gSq.pt2)
+            If gSq.pt1 = New cv.Point3f Or gSq.pt2 = New cv.Point3f Then
+                gSq.len3D = 0
             Else
-                gs.arcX = Math.Asin((gs.pt1.X - gs.pt2.X) / gs.len3D) * 57.2958
-                gs.arcY = Math.Abs(Math.Asin((gs.pt1.Y - gs.pt2.Y) / gs.len3D) * 57.2958)
-                If gs.arcY > 90 Then gs.arcY -= 90
-                gs.arcZ = Math.Asin((gs.pt1.Z - gs.pt2.Z) / gs.len3D) * 57.2958
+                gSq.arcX = Math.Asin((gSq.pt1.X - gSq.pt2.X) / gSq.len3D) * 57.2958
+                gSq.arcY = Math.Abs(Math.Asin((gSq.pt1.Y - gSq.pt2.Y) / gSq.len3D) * 57.2958)
+                If gSq.arcY > 90 Then gSq.arcY -= 90
+                gSq.arcZ = Math.Asin((gSq.pt1.Z - gSq.pt2.Z) / gSq.len3D) * 57.2958
             End If
 
-            Return gs
+            Return gSq
         End Function
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
@@ -15122,15 +15122,15 @@ Namespace VBClasses
             sortedVerticals.Clear()
             sortedHorizontals.Clear()
             For Each lp In lplist
-                Dim gs As New gravityLine
-                gs = updateGLine(src, gs, lp.p1, lp.p2)
-                allLines.Add(lp.p1.DistanceTo(lp.p2), gs)
-                If Math.Abs(90 - gs.arcY) < maxAngle And gs.tc1.depth > 0 And gs.tc2.depth > 0 Then
-                    sortedVerticals.Add(lp.p1.DistanceTo(lp.p2), gs)
+                Dim gSq As New gravityLine
+                gSq = updateGLine(src, gSq, lp.p1, lp.p2)
+                allLines.Add(lp.p1.DistanceTo(lp.p2), gSq)
+                If Math.Abs(90 - gSq.arcY) < maxAngle And gSq.tc1.depth > 0 And gSq.tc2.depth > 0 Then
+                    sortedVerticals.Add(lp.p1.DistanceTo(lp.p2), gSq)
                     vbc.DrawLine(dst2, lp.p1, lp.p2, cv.Scalar.Blue)
                 End If
-                If Math.Abs(gs.arcY) <= maxAngle And gs.tc1.depth > 0 And gs.tc2.depth > 0 Then
-                    sortedHorizontals.Add(lp.p1.DistanceTo(lp.p2), gs)
+                If Math.Abs(gSq.arcY) <= maxAngle And gSq.tc1.depth > 0 And gSq.tc2.depth > 0 Then
+                    sortedHorizontals.Add(lp.p1.DistanceTo(lp.p2), gSq)
                     vbc.DrawLine(dst2, lp.p1, lp.p2, cv.Scalar.Yellow)
                 End If
             Next
@@ -15846,9 +15846,9 @@ Namespace VBClasses
 
             motionMaskRight.SetTo(0)
             For Each index In task.motionRGB.motionList
-                Dim gs = task.bricks.brickList(index)
-                motionMaskRight.Rectangle(gs.rRect, 255, -1)
-                dst1.Rectangle(gs.rRect, 255, task.lineWidth)
+                Dim gSq = task.bricks.brickList(index)
+                motionMaskRight.Rectangle(gSq.rRect, 255, -1)
+                dst1.Rectangle(gSq.rRect, 255, task.lineWidth)
             Next
             dst3 = motionMaskRight.Clone
         End Sub
@@ -16823,7 +16823,7 @@ Namespace VBClasses
         Public Sub New()
             If task.bricks Is Nothing Then task.bricks = New Brick_Basics
             dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_32FC3, 0)
-            desc = "Use RGB motion bricks to determine if depth has changed in any gs."
+            desc = "Use RGB motion bricks to determine if depth has changed in any gSq."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             If task.heartBeatLT Or task.frameCount < 3 Then task.pointCloud.CopyTo(dst2)
@@ -16836,22 +16836,22 @@ Namespace VBClasses
             cv.Cv2.ExtractChannel(dst2, dst1, 2)
             dst1 = dst1.Threshold(0, 255, cv.ThresholdTypes.BinaryInv).ConvertScaleAbs
 
-            For Each gs In task.bricks.brickList
-                If gs.depth > 0 Then
-                    If gs.age = 1 Then
-                        task.pointCloud(gs.rect).CopyTo(dst2(gs.rect))
+            For Each gSq In task.bricks.brickList
+                If gSq.depth > 0 Then
+                    If gSq.age = 1 Then
+                        task.pointCloud(gSq.rect).CopyTo(dst2(gSq.rect))
                         Continue For
                     End If
                     If task.depthmask.CountNonZero = 0 Then Continue For
-                    'If gs.mm.range >= 1 Then
-                    '    dst2(gs.rect).SetTo(0) ' an 8x8 block spread over a meter?  Can't be real data...
+                    'If gSq.mm.range >= 1 Then
+                    '    dst2(gSq.rect).SetTo(0) ' an 8x8 block spread over a meter?  Can't be real data...
                     '    Continue For
                     'End If
 
                     ' check for any new depth pixels (not updates to existing as those come only with motion (age = 1)
-                    Dim mask As cv.Mat = dst1(gs.rect) And task.depthmask(gs.rect)
+                    Dim mask As cv.Mat = dst1(gSq.rect) And task.depthmask(gSq.rect)
                     If mask.CountNonZero = 0 Then Continue For ' nothing to update.
-                    task.pointCloud(gs.rect).CopyTo(dst2(gs.rect), mask) ' update any newly arrived depth data.
+                    task.pointCloud(gSq.rect).CopyTo(dst2(gSq.rect), mask) ' update any newly arrived depth data.
                     updateCount += 1
                 End If
             Next

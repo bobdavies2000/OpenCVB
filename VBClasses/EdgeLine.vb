@@ -299,7 +299,7 @@ Namespace VBClasses
             dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
             If standalone Then task.gOptions.displayDst1.Checked = True
             labels(1) = "EdgeLine segments displayed one for each frame starting with the longest."
-            desc = "Find lines using the gs points"
+            desc = "Find lines using the gSq points"
         End Sub
         Public Sub showSegment(dst As cv.Mat)
             If task.quarterBeat Then

@@ -12,7 +12,7 @@ Namespace VBClasses
             For i = 0 To diff.Count - 1
                 diff(i) = New Diff_Basics
             Next
-            labels = {"", "Quartiles for selected gs.  Click in dst1 to see different gs.", "4 brightness levels - darkest to lightest",
+            labels = {"", "Quartiles for selected gSq.  Click in dst1 to see different gSq.", "4 brightness levels - darkest to lightest",
                           "Quartiles for the selected grid element, darkest to lightest"}
             desc = "Highlight the contours for each grid element with stats for each."
         End Sub
@@ -50,16 +50,16 @@ Namespace VBClasses
             Dim allContours As cv.Point()() = Nothing
             For i = 0 To counts.GetUpperBound(0)
                 For j = 0 To task.gSquares.Count - 1
-                    Dim gs = task.gSquares(j)
-                    Dim tmp = matList(i)(gs)
+                    Dim gSq = task.gSquares(j)
+                    Dim tmp = matList(i)(gSq)
                     cv.Cv2.FindContours(tmp, allContours, Nothing, cv.RetrievalModes.External, cv.ContourApproximationModes.ApproxSimple)
                     If i = 0 Then
                         contourCounts.Add(New List(Of Integer))
                         means.Add(New List(Of Single))
                     End If
                     contourCounts(j).Add(allContours.Count)
-                    means(j).Add(task.gray(gs).Mean(tmp)(0))
-                    If i = quadrant Then SetTrueText(CStr(allContours.Count), gs.TopLeft, 1)
+                    means(j).Add(task.gray(gSq).Mean(tmp)(0))
+                    If i = quadrant Then SetTrueText(CStr(allContours.Count), gSq.TopLeft, 1)
                     counts(i, j) = allContours.Count
                 Next
             Next
