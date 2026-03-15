@@ -62,6 +62,7 @@ Namespace VBClasses
         Public fCorrThreshold As Single
         Public FeatureSampleSize As Integer
         Public clickPoint As New cv.Point ' last place where mouse was clicked.
+        Public fLessThreshold As Integer
 
         Public testAllRunning As Boolean
         Public main_hwnd As IntPtr

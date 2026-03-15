@@ -32,6 +32,7 @@ Public Class OptionsGlobal
         task.brickSize = 8
         task.DotSize = 1
         task.lineWidth = 1
+        task.fLessThreshold = 30
         Select Case task.workRes.Width
             Case 1920
                 task.cvFontSize = 3.5

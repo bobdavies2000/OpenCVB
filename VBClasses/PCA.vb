@@ -861,7 +861,7 @@ Namespace VBClasses
     Public Class PCA_NColor_CPP : Inherits TaskParent
         Implements IDisposable
         Dim custom As New Palette_CustomColorMap
-        Dim palettize As New PCA_Palettize
+        Dim pcaPalette As New PCA_Palettize
         Public rgb(dst1.Total * dst1.ElemSize - 1) As Byte
         Public classCount As Integer
         Public Sub New()
@@ -878,18 +878,18 @@ Namespace VBClasses
                 Exit Sub
             End If
 
-            If task.heartBeat Then palettize.Run(src) ' get the palette in VB.Net
+            If task.heartBeat Then pcaPalette.Run(src) ' get the palette in VB.Net
             Marshal.Copy(src.Data, rgb, 0, rgb.Length)
-            classCount = palettize.options.desiredNcolors
+            classCount = pcaPalette.options.desiredNcolors
 
             Dim handleSrc = GCHandle.Alloc(rgb, GCHandleType.Pinned)
-            Dim handlePalette = GCHandle.Alloc(palettize.palette, GCHandleType.Pinned)
+            Dim handlePalette = GCHandle.Alloc(pcaPalette.palette, GCHandleType.Pinned)
             Dim imagePtr = PCA_NColor_RunCPP(cPtr, handleSrc.AddrOfPinnedObject(), handlePalette.AddrOfPinnedObject(), src.Rows, src.Cols, classCount)
             handlePalette.Free()
             handleSrc.Free()
 
             dst2 = cv.Mat.FromPixelData(dst2.Height, dst2.Width, cv.MatType.CV_8U, imagePtr)
-            custom.colorMap = cv.Mat.FromPixelData(256, 1, cv.MatType.CV_8UC3, palettize.palette)
+            custom.colorMap = cv.Mat.FromPixelData(256, 1, cv.MatType.CV_8UC3, pcaPalette.palette)
 
             custom.Run(dst2)
 
@@ -913,7 +913,7 @@ Namespace VBClasses
     ' https://www.codeproject.com/Tips/5384047/Implementing-Principal-Component-Analysis-Image-Se
     Public Class NR_PCA_NColorPalettize : Inherits TaskParent
         Dim custom As New Palette_CustomColorMap
-        Dim palettize As New PCA_Palettize
+        Dim pcaPalette As New PCA_Palettize
         Dim answer(dst2.Width * dst2.Height - 1) As Byte
         Dim nColor As New PCA_NColor
         Dim rgb(dst1.Total * dst1.ElemSize - 1) As Byte
@@ -922,15 +922,15 @@ Namespace VBClasses
             desc = "Create a faster version of the PCA_NColor algorithm."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If task.heartBeat Then palettize.Run(src) ' get the palette in VB.Net which is very fast.
+            If task.heartBeat Then pcaPalette.Run(src) ' get the palette in VB.Net which is very fast.
 
             Marshal.Copy(src.Data, rgb, 0, rgb.Length)
-            Dim paletteImage = nColor.RgbToIndex(rgb, dst1.Width, dst1.Height, palettize.palette, palettize.options.desiredNcolors)
+            Dim paletteImage = nColor.RgbToIndex(rgb, dst1.Width, dst1.Height, pcaPalette.palette, pcaPalette.options.desiredNcolors)
 
             Dim img8u = New cv.Mat(dst2.Size, cv.MatType.CV_8U, cv.Scalar.All(0))
             Marshal.Copy(paletteImage, 0, img8u.Data, paletteImage.Length)
 
-            custom.colorMap = cv.Mat.FromPixelData(256, 1, cv.MatType.CV_8UC3, palettize.palette)
+            custom.colorMap = cv.Mat.FromPixelData(256, 1, cv.MatType.CV_8UC3, pcaPalette.palette)
 
             custom.Run(img8u)
             dst2 = custom.dst2

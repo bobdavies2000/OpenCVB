@@ -13,18 +13,17 @@ Namespace VBClasses
             dst3 = src
             dst2.SetTo(0)
             Dim count As Integer
-            Dim rangeThreshold As Integer = 30
             rectList.Clear()
             For Each gSq In task.gSquares
                 Dim mm = GetMinMax(src(gSq))
-                If mm.range < rangeThreshold Then
+                If mm.range < task.fLessThreshold Then
                     dst2(gSq).SetTo(255)
                     count += 1
                     dst3.Rectangle(gSq, white, task.lineWidth)
                     rectList.Add(gSq)
                 End If
             Next
-            labels(3) = CStr(count) + " grid squares were found to be featureless (range < " + CStr(rangeThreshold) + ")"
+            labels(3) = CStr(count) + " grid squares were found to be featureless (range < " + CStr(task.fLessThreshold) + ")"
         End Sub
     End Class
 
