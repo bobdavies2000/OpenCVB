@@ -2,7 +2,7 @@ Imports System.Security.Cryptography
 Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Class Region_Basics : Inherits TaskParent
-        Dim bricks As New Brick_BasicsNew
+        Dim bricks As New Brick_Basics
         Dim regions As New Region_Core
         Public hRects As New List(Of cv.Rect)
         Public vRects As New List(Of cv.Rect)

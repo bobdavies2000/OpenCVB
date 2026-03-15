@@ -470,7 +470,7 @@ Namespace VBClasses
 
 
     Public Class GridRect_Canny : Inherits TaskParent
-        Dim bricks As New Brick_BasicsNew
+        Dim bricks As New Brick_Basics
         Dim edges As New Edge_Basics
         Public Sub New()
             task.gOptions.GridSlider.Value = dst2.Width \ 40 ' arbitrary but the goal is to get a reasonable (< 500) number of roi's.

@@ -1,7 +1,7 @@
 Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Class FCS_Basics : Inherits TaskParent
-        Dim bricks As New Brick_BasicsNew
+        Dim bricks As New Brick_Basics
         Public basics As New FCS_StablePoints
         Public genSorted As New SortedList(Of Integer, Integer)(New compareAllowIdenticalIntegerInverted)
         Public Sub New()
@@ -615,7 +615,7 @@ Namespace VBClasses
 
 
     Public Class FCS_Info : Inherits TaskParent
-        Dim bricks As New Brick_BasicsNew
+        Dim bricks As New Brick_Basics
         Public Sub New()
             desc = "Display the contents of the Feature Coordinate System (FCS) cell."
         End Sub

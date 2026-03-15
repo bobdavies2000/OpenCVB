@@ -1,7 +1,7 @@
 Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Class LineRect_Basics : Inherits TaskParent
-        Dim bricks As New Brick_BasicsNew
+        Dim bricks As New Brick_Basics
         Public lpInput1 As lpData
         Public lpInput2 As lpData
         Public rotatedRect As cv.RotatedRect
@@ -44,7 +44,7 @@ Namespace VBClasses
 
 
     Public Class NR_LineRect_CenterNeighbor : Inherits TaskParent
-        Dim bricks As New Brick_BasicsNew
+        Dim bricks As New Brick_Basics
         Public options As New Options_LineRect
         Public Sub New()
             desc = "Remove lines which have similar depth in bricks on either side of a line."

@@ -54,7 +54,6 @@ BlurMotion_Basics
 Boundary_Basics
 Boundary_Rectangles
 Brick_Basics
-Brick_BasicsNew
 Brick_Features
 Brick_LeftRight
 Brick_LeftRightMouse

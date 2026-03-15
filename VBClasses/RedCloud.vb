@@ -247,7 +247,7 @@ Namespace VBClasses
 
 
     Public Class RedCloud_LeftRight : Inherits TaskParent
-        Dim bricks As New Brick_BasicsNew
+        Dim bricks As New Brick_Basics
         Dim redC As New RedCloud_Basics
         Public Sub New()
             desc = "Map the RedCloud output into the right view."

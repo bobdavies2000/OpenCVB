@@ -2,7 +2,7 @@ Imports cv = OpenCvSharp
 'https://security.stackexchange.com/questions/42428/Is-generating-random-numbers-using-a-smartphone-camera-a-good-idea
 Namespace VBClasses
     Public Class Photon_Basics : Inherits TaskParent
-        Dim bricks As New Brick_BasicsNew
+        Dim bricks As New Brick_Basics
         Dim hist As New Histogram_Basics
         Public Sub New()
             labels = {"", "", "Points where B, G, or R differ from the previous image", "Histogram showing distribution of absolute value of differences"}

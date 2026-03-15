@@ -3,7 +3,7 @@ Imports OpenCvSharp
 Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Class Intrinsics_Basics : Inherits TaskParent
-        Dim bricks As New Brick_BasicsNew
+        Dim bricks As New Brick_Basics
         Public Sub New()
             If standalone Then task.gOptions.gravityPointCloud.Checked = False
             desc = "Some cameras don't provide aligned color and left images.  This algorithm tries to align the left and color image."
@@ -254,7 +254,7 @@ Namespace VBClasses
 
 
     Public Class Intrinsics_MapLeftToRight : Inherits TaskParent
-        Dim bricks As New Brick_BasicsNew
+        Dim bricks As New Brick_Basics
         Public Sub New()
             desc = "Map a point from the left image to the right image"
         End Sub

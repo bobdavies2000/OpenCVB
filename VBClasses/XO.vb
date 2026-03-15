@@ -890,7 +890,7 @@ Namespace VBClasses
 
 
     Public Class XO_Brick_GrayScaleTest : Inherits TaskParent
-        Dim bricks As New Brick_BasicsNew
+        Dim bricks As New Brick_Basics
         Dim options As New Options_Stdev
         Public Sub New()
             labels(3) = "bricks where grayscale stdev and average of the 3 color stdev's"
@@ -2040,7 +2040,7 @@ Namespace VBClasses
 
 
     Public Class XO_Brick_Basics : Inherits TaskParent
-        Dim bricks As New Brick_BasicsNew
+        Dim bricks As New Brick_Basics
         Public options As New Options_GridCells
         Public thresholdRangeZ As Single
         Public instantUpdate As Boolean = True
@@ -2623,7 +2623,7 @@ Namespace VBClasses
 
 
     Public Class XO_Region_RectsH : Inherits TaskParent
-        Dim bricks As New Brick_BasicsNew
+        Dim bricks As New Brick_Basics
         Public hRects As New List(Of cv.Rect)
         Dim connect As New Region_Core
         Public Sub New()
@@ -2663,7 +2663,7 @@ Namespace VBClasses
 
 
     Public Class XO_Region_RectsV : Inherits TaskParent
-        Dim bricks As New Brick_BasicsNew
+        Dim bricks As New Brick_Basics
         Public vRects As New List(Of cv.Rect)
         Dim connect As New Region_Core
         Public Sub New()
@@ -2701,7 +2701,7 @@ Namespace VBClasses
 
 
     Public Class XO_Region_Rects : Inherits TaskParent
-        Dim bricks As New Brick_BasicsNew
+        Dim bricks As New Brick_Basics
         Dim hConn As New XO_Region_RectsH
         Dim vConn As New XO_Region_RectsV
         Public Sub New()
@@ -2725,7 +2725,7 @@ Namespace VBClasses
 
 
     Public Class XO_Region_RedColor : Inherits TaskParent
-        Dim bricks As New Brick_BasicsNew
+        Dim bricks As New Brick_Basics
         Dim connect As New Region_Contours
         Public Sub New()
             desc = "Color each redCell with the color of the nearest grid square region."
@@ -2782,7 +2782,7 @@ Namespace VBClasses
 
 
     Public Class XO_Brick_FeatureGaps : Inherits TaskParent
-        Dim bricks As New Brick_BasicsNew
+        Dim bricks As New Brick_Basics
         Dim feat As New NR_BrickPoint_Features
         Dim gaps As New XO_Region_Gaps
         Public Sub New()
@@ -3862,7 +3862,7 @@ Namespace VBClasses
 
 
     Public Class XO_LineRect_CenterDepth : Inherits TaskParent
-        Dim bricks As New Brick_BasicsNew
+        Dim bricks As New Brick_Basics
         Public options As New Options_LineRect
         Public Sub New()
             desc = "Remove lines which have similar depth in bricks on either side of a line."
@@ -4590,7 +4590,7 @@ Namespace VBClasses
 
 
     Public Class XO_Brick_FitLeftInColor : Inherits TaskParent
-        Dim bricks As New Brick_BasicsNew
+        Dim bricks As New Brick_Basics
         Public Sub New()
             task.drawRect = New cv.Rect(10, 10, 50, 50)
             labels(3) = "Draw a rectangle to update."
@@ -5360,7 +5360,7 @@ Namespace VBClasses
 
 
     Public Class XO_TrackLine_Map : Inherits TaskParent
-        Dim bricks As New Brick_BasicsNew
+        Dim bricks As New Brick_Basics
         Dim lTrack As New XO_TrackLine_Basics
         Public Sub New()
             task.gOptions.CrossHairs.Checked = False
@@ -14630,7 +14630,7 @@ Namespace VBClasses
 
 
     Public Class XO_DepthLine_Basics : Inherits TaskParent
-        Dim bricks As New Brick_BasicsNew
+        Dim bricks As New Brick_Basics
         Public Sub New()
             dst0 = New cv.Mat(dst0.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
             desc = "Find the longest line in BGR and use it to measure the average depth for the line"
@@ -15839,7 +15839,7 @@ Namespace VBClasses
 
 
     Public Class XO_Motion_RightMask : Inherits TaskParent
-        Dim bricks As New Brick_BasicsNew
+        Dim bricks As New Brick_Basics
         Public motionMaskRight As New cv.Mat
         Public Sub New()
             If standalone Then task.gOptions.showMotionMask.Checked = True
@@ -16830,7 +16830,7 @@ Namespace VBClasses
 
 
     Public Class XO_Brick_Cloud : Inherits TaskParent
-        Dim bricks As New Brick_BasicsNew
+        Dim bricks As New Brick_Basics
         Dim template As New Math_Intrinsics
         Public Sub New()
             dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_32FC3, 0)

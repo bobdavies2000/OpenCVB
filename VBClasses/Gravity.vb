@@ -240,7 +240,7 @@ Namespace VBClasses
 
 
     Public Class NR_Gravity_BrickRotate : Inherits TaskParent
-        Dim bricks As New Brick_BasicsNew
+        Dim bricks As New Brick_Basics
         Dim survey As New NR_BrickPoint_PopulationSurvey
         Public Sub New()
             desc = "Rotate the grid point using the offset from gravity."

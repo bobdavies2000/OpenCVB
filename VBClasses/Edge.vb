@@ -1513,7 +1513,7 @@ Namespace VBClasses
 
 
     Public Class NR_Edge_LeftRightBrick : Inherits TaskParent
-        Dim bricks As New Brick_BasicsNew
+        Dim bricks As New Brick_Basics
         Dim edgesLR As New Edge_LeftRight
         Public means As New List(Of Single)
         Public Sub New()

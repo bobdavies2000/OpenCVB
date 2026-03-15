@@ -6,24 +6,23 @@ Namespace VBClasses
         Public brickList As New List(Of brickData)
         Public options As New Options_Features
         Public Sub New()
-            task.bricks = Me
             labels(3) = "Right camera image.  Highlighted rectangle matches the dst2 (left) rectangle."
             desc = "Create the grid of bricks that reduce depth volatility"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
 
-            If task.optionsChanged Then task.bricks.brickList.Clear()
+            If task.optionsChanged Then brickList.Clear()
 
             Dim correlationMat As New cv.Mat
             Dim maxPixels = task.brickSize * task.brickSize
-            task.bricks.brickList.Clear()
+            brickList.Clear()
             Dim depthCount As Integer
             brickDepthCount = 0
             Dim colorstdev As cv.Scalar
             For i = 0 To task.gSquares.Count - 1
                 Dim gSq As New brickData
-                gSq.index = task.bricks.brickList.Count
+                gSq.index = brickList.Count
 
                 gSq.rect = task.gSquares(gSq.index)
                 gSq.lRect = gSq.rect
@@ -61,7 +60,7 @@ Namespace VBClasses
                 End If
 
                 If gSq.depth > 0 Then depthCount += 1
-                task.bricks.brickList.Add(gSq)
+                brickList.Add(gSq)
             Next
 
             If standaloneTest() Then
@@ -71,99 +70,14 @@ Namespace VBClasses
                 dst3 = edgesLR.dst3.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
 
                 Dim index = task.gridMap.Get(Of Integer)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
-                Dim br = task.bricks.brickList(index)
+                Dim br = brickList(index)
                 dst2.Rectangle(br.lRect, task.highlight, task.lineWidth + 1)
                 task.color.Rectangle(br.lRect, task.highlight, task.lineWidth + 1)
                 dst3.Rectangle(br.rRect, task.highlight, task.lineWidth + 1)
             End If
 
             If task.heartBeat Then
-                labels(2) = CStr(task.bricks.brickList.Count) + " bricks and " +
-                    CStr(brickDepthCount) + " had depth.  Left camera image is below."
-            End If
-        End Sub
-    End Class
-
-
-
-    Public Class Brick_BasicsNew : Inherits TaskParent
-        Public instantUpdate As Boolean
-        Public brickDepthCount As Integer
-        Public brickList As New List(Of brickData)
-        Public options As New Options_Features
-        Public Sub New()
-            labels(3) = "Right camera image.  Highlighted rectangle matches the dst2 (left) rectangle."
-            desc = "Create the grid of bricks that reduce depth volatility"
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            options.Run()
-
-            If task.optionsChanged Then task.bricks.brickList.Clear()
-
-            Dim correlationMat As New cv.Mat
-            Dim maxPixels = task.brickSize * task.brickSize
-            task.bricks.brickList.Clear()
-            Dim depthCount As Integer
-            brickDepthCount = 0
-            Dim colorstdev As cv.Scalar
-            For i = 0 To task.gSquares.Count - 1
-                Dim gSq As New brickData
-                gSq.index = task.bricks.brickList.Count
-
-                gSq.rect = task.gSquares(gSq.index)
-                gSq.lRect = gSq.rect
-
-                gSq.depth = task.pcSplit(2)(gSq.rect).Mean(task.depthmask(gSq.rect))
-                gSq.mmDepth = GetMinMax(task.pcSplit(2)(gSq.rect), task.depthmask(gSq.rect))
-                If gSq.depth > Single.MaxValue Or gSq.depth < Single.MinValue Then gSq.depth = 0
-
-                cv.Cv2.MeanStdDev(src(gSq.rect), gSq.color, colorstdev)
-                gSq.center = New cv.Point(gSq.rect.X + gSq.rect.Width / 2, gSq.rect.Y + gSq.rect.Height / 2)
-
-                If gSq.depth > 0 Then
-                    gSq.mm = GetMinMax(task.pcSplit(2)(gSq.rect), task.depthmask(gSq.rect))
-                    brickDepthCount += 1
-                    gSq.rRect = gSq.rect
-                    gSq.rRect.X -= task.calibData.baseline * task.calibData.leftIntrinsics.fx / gSq.depth
-                    If gSq.rRect.X < 0 Or gSq.rRect.X + gSq.rRect.Width >= dst2.Width Then
-                        gSq.rRect.Width = 0 ' off the image
-                    End If
-
-                    If gSq.lRect.Width = gSq.rRect.Width Then
-                        cv.Cv2.MatchTemplate(task.leftView(gSq.lRect), task.rightView(gSq.rRect),
-                                                     correlationMat, cv.TemplateMatchModes.CCoeffNormed)
-                        gSq.correlation = correlationMat.Get(Of Single)(0, 0)
-
-                        Dim p0 = Cloud_Basics.worldCoordinates(gSq.rect.TopLeft, gSq.depth)
-                        Dim p1 = Cloud_Basics.worldCoordinates(gSq.rect.BottomRight, gSq.depth)
-
-                        ' clockwise around starting in upper left.
-                        gSq.corners.Add(New cv.Point3f(p0.X, p0.Y, gSq.depth))
-                        gSq.corners.Add(New cv.Point3f(p1.X, p0.Y, gSq.depth))
-                        gSq.corners.Add(New cv.Point3f(p1.X, p1.Y, gSq.depth))
-                        gSq.corners.Add(New cv.Point3f(p0.X, p1.Y, gSq.depth))
-                    End If
-                End If
-
-                If gSq.depth > 0 Then depthCount += 1
-                task.bricks.brickList.Add(gSq)
-            Next
-
-            If standaloneTest() Then
-                Static edgesLR As New Edge_LeftRight
-                edgesLR.Run(emptyMat)
-                dst2 = edgesLR.dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-                dst3 = edgesLR.dst3.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-
-                Dim index = task.gridMap.Get(Of Integer)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
-                Dim br = task.bricks.brickList(index)
-                dst2.Rectangle(br.lRect, task.highlight, task.lineWidth + 1)
-                task.color.Rectangle(br.lRect, task.highlight, task.lineWidth + 1)
-                dst3.Rectangle(br.rRect, task.highlight, task.lineWidth + 1)
-            End If
-
-            If task.heartBeat Then
-                labels(2) = CStr(task.bricks.brickList.Count) + " bricks and " +
+                labels(2) = CStr(brickList.Count) + " bricks and " +
                     CStr(brickDepthCount) + " had depth.  Left camera image is below."
             End If
         End Sub
@@ -174,7 +88,7 @@ Namespace VBClasses
 
 
     Public Class NR_Brick_FullDepth : Inherits TaskParent
-        Dim bricks As New Brick_BasicsNew
+        Dim bricks As New Brick_Basics
         Public Sub New()
             labels(2) = "Left image bricks - no overlap.  Click in any column to highlight that column."
             labels(3) = "Right image: corresponding bricks.  Overlap indicates uncertainty about depth."
@@ -190,7 +104,7 @@ Namespace VBClasses
             If task.mouseClickFlag Then
                 whiteCol = Math.Round(bricksPerRow * (task.clickPoint.X - task.brickSize / 2) / dst2.Width)
             End If
-            For Each gSq In task.bricks.brickList
+            For Each gSq In bricks.brickList
                 If gSq.depth > 0 Then
                     Dim color = If(col = whiteCol, cv.Scalar.Black, task.scalarColors(255 * (col / bricksPerRow)))
                     dst2.Rectangle(gSq.rect, color, task.lineWidth)
@@ -210,20 +124,20 @@ Namespace VBClasses
 
 
     Public Class NR_Brick_InstantUpdate : Inherits TaskParent
-        Dim bricks As New Brick_BasicsNew
+        Dim bricks As New Brick_Basics
         Public Sub New()
-            task.bricks.instantUpdate = True
+            bricks.instantUpdate = True
             labels(3) = "Pointcloud image for cells with good visibility"
             desc = "Create the grid of bricks with good visibility"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             bricks.Run(src)
-            labels(2) = CStr(task.bricks.brickDepthCount) + " bricks have reasonable depth."
+            labels(2) = CStr(bricks.brickDepthCount) + " bricks have reasonable depth."
 
-            dst2 = task.bricks.dst2
-            dst3 = task.bricks.dst3
+            dst2 = bricks.dst2
+            dst3 = bricks.dst3
 
-            labels(2) = task.bricks.labels(2)
+            labels(2) = bricks.labels(2)
         End Sub
     End Class
 
@@ -311,7 +225,7 @@ Namespace VBClasses
 
 
     Public Class NR_Brick_EdgeDraw : Inherits TaskParent
-        Dim bricks As New Brick_BasicsNew
+        Dim bricks As New Brick_Basics
         Dim regions As New Region_Contours
         Dim edgeline As New EdgeLine_Basics
         Public Sub New()
@@ -339,7 +253,7 @@ Namespace VBClasses
 
 
     Public Class NR_Brick_CorrelationInput : Inherits TaskParent
-        Dim bricks As New Brick_BasicsNew
+        Dim bricks As New Brick_Basics
         Dim LRMeanSub As New MeanSubtraction_LeftRight
         Public Sub New()
             desc = "Given a left image cell, find it's match in the right image, and display their correlation."
@@ -353,8 +267,8 @@ Namespace VBClasses
             dst3 = LRMeanSub.dst3
 
             Dim index As Integer = task.gridMap.Get(Of Integer)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
-            If index < 0 Or index > task.bricks.brickList.Count Then Exit Sub
-            task.brickD = task.bricks.brickList(index)
+            If index < 0 Or index > bricks.brickList.Count Then Exit Sub
+            task.brickD = bricks.brickList(index)
 
             Dim corr = task.brickD.correlation
             DrawCircle(dst2, task.brickD.lRect.TopLeft, task.DotSize, 255)
@@ -373,18 +287,18 @@ Namespace VBClasses
 
 
     Public Class NR_Brick_Info : Inherits TaskParent
-        Dim bricks As New Brick_BasicsNew
+        Dim bricks As New Brick_Basics
         Public Sub New()
             task.clickPoint = New cv.Point(dst2.Width / 2, dst2.Height / 2)
             desc = "Display the info about the select grid square."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             bricks.Run(src)
-            labels(2) = task.bricks.labels(2)
+            labels(2) = bricks.labels(2)
 
             Dim index As Integer = task.gridMap.Get(Of Integer)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
 
-            Dim gSq As brickData = task.bricks.brickList(index)
+            Dim gSq As brickData = bricks.brickList(index)
             dst2 = src
 
             strOut = labels(2) + vbCrLf + vbCrLf
@@ -410,7 +324,7 @@ Namespace VBClasses
 
 
     Public Class NR_Brick_LeftToColor : Inherits TaskParent
-        Dim bricks As New Brick_BasicsNew
+        Dim bricks As New Brick_Basics
         Public Sub New()
             If task.Settings.cameraName.StartsWith("Intel(R) RealSense(TM) Depth Camera") Then task.gOptions.gravityPointCloud.Checked = False
             desc = "Align grid square left rectangles in color with the left image.  StereoLabs and Orbbec already match."
@@ -420,7 +334,7 @@ Namespace VBClasses
             dst2 = task.leftView.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
             dst3.SetTo(0)
             Dim count As Integer
-            For Each gSq In task.bricks.brickList
+            For Each gSq In bricks.brickList
                 If gSq.depth > 0 Then
                     count += 1
                     DrawCircle(task.color, gSq.rect.TopLeft)
@@ -437,7 +351,7 @@ Namespace VBClasses
 
 
     Public Class Brick_LeftRightMouse : Inherits TaskParent
-        Dim bricks As New Brick_BasicsNew
+        Dim bricks As New Brick_Basics
         Public means As New List(Of Single)
         Dim myBricks As New List(Of Integer)
         Public Sub New()
@@ -464,7 +378,7 @@ Namespace VBClasses
             End If
 
             For Each index In myBricks
-                Dim gSq = task.bricks.brickList(index)
+                Dim gSq = bricks.brickList(index)
                 dst0.Rectangle(gSq.rect, task.highlight, task.lineWidth)
                 dst2.Rectangle(gSq.lRect, task.highlight, task.lineWidth)
                 dst3.Rectangle(gSq.rRect, task.highlight, task.lineWidth)
@@ -479,7 +393,7 @@ Namespace VBClasses
 
 
     Public Class NR_Brick_RGBtoLeft : Inherits TaskParent
-        Dim bricks As New Brick_BasicsNew
+        Dim bricks As New Brick_Basics
         Public Sub New()
             labels(3) = "Right camera image..."
             If task.Settings.cameraName.StartsWith("Intel(R) RealSense(TM) Depth Camera") Then
@@ -492,10 +406,10 @@ Namespace VBClasses
             Dim camInfo = task.calibData, correlationMat As New cv.Mat
             Dim index As Integer = task.gridMap.Get(Of Integer)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
             Dim gSq As brickData
-            If index > 0 And index < task.bricks.brickList.Count Then
-                gSq = task.bricks.brickList(index)
+            If index > 0 And index < bricks.brickList.Count Then
+                gSq = bricks.brickList(index)
             Else
-                gSq = task.bricks.brickList(task.bricks.brickList.Count / 2)
+                gSq = bricks.brickList(bricks.brickList.Count / 2)
             End If
 
             Dim irPt As cv.Point = New cv.Point(dst2.Width / 2, dst2.Height / 2)
@@ -521,7 +435,7 @@ Namespace VBClasses
 
 
     Public Class NR_Brick_RegionLines : Inherits TaskParent
-        Dim bricks As New Brick_BasicsNew
+        Dim bricks As New Brick_Basics
         Dim regions As New Region_Contours
         Public Sub New()
             desc = "Lines can mean cells are connected."
@@ -551,7 +465,7 @@ Namespace VBClasses
 
 
     Public Class NR_Brick_CloudMaxVal : Inherits TaskParent
-        Dim bricks As New Brick_BasicsNew
+        Dim bricks As New Brick_Basics
         Dim template As New Math_Intrinsics
         Public Sub New()
             dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_32FC3, 0)
@@ -562,7 +476,7 @@ Namespace VBClasses
             If task.heartBeatLT Or task.frameCount < 3 Then task.pointCloud.CopyTo(dst2)
 
             Dim splitCount As Integer
-            For Each gSq In task.bricks.brickList
+            For Each gSq In bricks.brickList
                 If gSq.depth > 0 Then
                     If gSq.age < 10 Then
                         Dim split() As cv.Mat = task.pointCloud(gSq.rect).Split
@@ -591,7 +505,7 @@ Namespace VBClasses
 
 
     Public Class NR_Brick_CloudMean : Inherits TaskParent
-        Dim bricks As New Brick_BasicsNew
+        Dim bricks As New Brick_Basics
         Dim template As New Math_Intrinsics
         Public Sub New()
             dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_32FC3, 0)
@@ -602,7 +516,7 @@ Namespace VBClasses
             If task.heartBeatLT Or task.frameCount < 3 Then task.pointCloud.CopyTo(dst2)
 
             Dim splitCount As Integer
-            For Each gSq In task.bricks.brickList
+            For Each gSq In bricks.brickList
                 If gSq.depth > 0 Then
                     Dim split() As cv.Mat = task.pointCloud(gSq.rect).Split
                     split(2).SetTo(gSq.depth, task.depthmask(gSq.rect))
@@ -629,7 +543,7 @@ Namespace VBClasses
 
 
     Public Class NR_Brick_CloudRange : Inherits TaskParent
-        Dim bricks As New Brick_BasicsNew
+        Dim bricks As New Brick_Basics
         Dim template As New Math_Intrinsics
         Public Sub New()
             dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_32FC3, 0)
@@ -641,7 +555,7 @@ Namespace VBClasses
 
             Dim splitCount As Integer
             Dim newRange As Single = 0.1F
-            For Each gSq In task.bricks.brickList
+            For Each gSq In bricks.brickList
                 If gSq.depth > 0 And gSq.age = 1 Then
                     If gSq.mm.range > newRange Then ' if the range within a grid square is > 10 cm's, fit it within 10 cm's.
                         Dim split() As cv.Mat = task.pointCloud(gSq.rect).Split
@@ -674,7 +588,7 @@ Namespace VBClasses
 
 
     Public Class NR_Brick_FeaturesAndEdges : Inherits TaskParent
-        Dim bricks As New Brick_BasicsNew
+        Dim bricks As New Brick_Basics
         Public feat As New NR_Brick_EdgeFlips
         Public boundaryCells As New List(Of List(Of Integer))
         Public Sub New()
@@ -726,7 +640,7 @@ Namespace VBClasses
 
 
     Public Class NR_Brick_MLColor : Inherits TaskParent
-        Dim bricks As New Brick_BasicsNew
+        Dim bricks As New Brick_Basics
         Dim ml As New ML_Basics
         Dim bounds As New NR_Brick_FeaturesAndEdges
         Public Sub New()
@@ -801,7 +715,7 @@ Namespace VBClasses
 
 
     Public Class NR_Brick_CorrelationMap : Inherits TaskParent
-        Dim bricks As New Brick_BasicsNew
+        Dim bricks As New Brick_Basics
         Public Sub New()
             labels(3) = "The map to identify each gSq's depth."
             dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
@@ -816,7 +730,7 @@ Namespace VBClasses
             bricks.Run(src)
             dst1.SetTo(0)
             task.depthAndDepthRange = ""
-            For Each gSq In task.bricks.brickList
+            For Each gSq In bricks.brickList
                 dst1(gSq.rect).SetTo((gSq.correlation + 1) * 255 / 2)
             Next
 
@@ -826,7 +740,7 @@ Namespace VBClasses
             Dim pt = task.mouseMovePoint, w = task.workRes.Width, h = task.workRes.Height
             If pt.X >= 0 And pt.X < w And pt.Y >= 0 And pt.Y < h Then
                 Dim index As Integer = task.gridMap.Get(Of Integer)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
-                task.brickD = task.bricks.brickList(index)
+                task.brickD = bricks.brickList(index)
                 task.depthAndDepthRange = "depth = " + Format(task.brickD.depth, fmt3) + "m ID=" +
                                       CStr(task.brickD.index) + vbCrLf + " range " +
                                       Format(task.brickD.mm.minVal, fmt1) + "-" +
@@ -844,7 +758,7 @@ Namespace VBClasses
                 SetTrueText(task.depthAndDepthRange, ptTextLoc, 2)
                 SetTrueText(task.depthAndDepthRange, 3)
             End If
-            labels(2) = task.bricks.labels(2)
+            labels(2) = bricks.labels(2)
         End Sub
     End Class
 
@@ -854,7 +768,7 @@ Namespace VBClasses
 
 
     Public Class Brick_LeftRight : Inherits TaskParent
-        Dim bricks As New Brick_BasicsNew
+        Dim bricks As New Brick_Basics
         Public means As New List(Of Single)
         Public Sub New()
             labels(2) = "Only every other colum is shown to make it clear which bricks are being translated (can get crowded otherwise.)"
@@ -870,7 +784,7 @@ Namespace VBClasses
             For i = 0 To task.bricksPerRow - 1 Step 2
                 colorIndex = 0
                 For j = i To task.gSquares.Count - task.bricksPerRow - 1 Step task.bricksPerRow
-                    Dim gSq = task.bricks.brickList(j)
+                    Dim gSq = bricks.brickList(j)
                     Dim color = task.scalarColors(colorIndex)
                     If gSq.depth > 0 Then
                         dst2.Rectangle(gSq.lRect, color, task.lineWidth)
@@ -889,7 +803,7 @@ Namespace VBClasses
 
 
     Public Class NR_Brick_EdgeFlips : Inherits TaskParent
-        Dim bricks As New Brick_BasicsNew
+        Dim bricks As New Brick_Basics
         Public edges As New Edge_Basics
         Public featureRects As New List(Of cv.Rect)
         Public featureMask As New cv.Mat
@@ -968,7 +882,7 @@ Namespace VBClasses
 
 
     Public Class NR_Brick_Edges : Inherits TaskParent
-        Dim bricks As New Brick_BasicsNew
+        Dim bricks As New Brick_Basics
         Dim options As New Options_LeftRightCorrelation
         Public edges As New Edge_Basics
         Public Sub New()
@@ -984,13 +898,13 @@ Namespace VBClasses
 
             Dim count As Integer
             dst3.SetTo(0)
-            For Each gSq As brickData In task.bricks.brickList
+            For Each gSq As brickData In bricks.brickList
                 If dst2(gSq.lRect).CountNonZero And gSq.rRect.Width > 0 And gSq.correlation > options.correlation Then
                     task.rightView(gSq.rRect).CopyTo(dst3(gSq.rRect))
                     count += 1
                 End If
             Next
-            labels(3) = CStr(count) + " of " + CStr(task.bricks.brickList.Count) + " rects were identified in dst3"
+            labels(3) = CStr(count) + " of " + CStr(bricks.brickList.Count) + " rects were identified in dst3"
         End Sub
     End Class
 
@@ -998,7 +912,7 @@ Namespace VBClasses
 
 
     Public Class NR_Brick_Lines : Inherits TaskParent
-        Dim bricks As New Brick_BasicsNew
+        Dim bricks As New Brick_Basics
         Dim lines As New Line_Basics
         Dim options As New Options_LeftRightCorrelation
         Dim motionLeft As New Motion_Basics
@@ -1019,7 +933,7 @@ Namespace VBClasses
 
             Dim count As Integer
             dst3.SetTo(0)
-            For Each gSq As brickData In task.bricks.brickList
+            For Each gSq As brickData In bricks.brickList
                 If dst2(gSq.lRect).CountNonZero And gSq.rRect.Width > 0 And
                     gSq.correlation > options.correlation Then
 
@@ -1027,7 +941,7 @@ Namespace VBClasses
                     count += 1
                 End If
             Next
-            labels(3) = CStr(count) + " of " + CStr(task.bricks.brickList.Count) +
+            labels(3) = CStr(count) + " of " + CStr(bricks.brickList.Count) +
                         " rects had an edge and a range for depth > X cm's"
         End Sub
     End Class
@@ -1036,7 +950,7 @@ Namespace VBClasses
 
 
     Public Class NR_Brick_HighRange : Inherits TaskParent
-        Dim bricks As New Brick_BasicsNew
+        Dim bricks As New Brick_Basics
         Dim lines As New Line_Basics
         Dim options As New Options_LeftRightCorrelation
         Public Sub New()
@@ -1051,13 +965,13 @@ Namespace VBClasses
 
             Dim count As Integer
             dst3.SetTo(0)
-            For Each gSq As brickData In task.bricks.brickList
+            For Each gSq As brickData In bricks.brickList
                 If gSq.mm.maxVal - gSq.mm.minVal > options.mmRange Then
                     dst2(gSq.lRect).CopyTo(dst3(gSq.lRect))
                     count += 1
                 End If
             Next
-            labels(3) = CStr(count) + " of " + CStr(task.bricks.brickList.Count) +
+            labels(3) = CStr(count) + " of " + CStr(bricks.brickList.Count) +
                         " rects had a range for depth > " + CStr(options.mmRange) + " mm's"
         End Sub
     End Class
@@ -1067,7 +981,7 @@ Namespace VBClasses
 
 
     Public Class Brick_Plot : Inherits TaskParent
-        Dim bricks As New Brick_BasicsNew
+        Dim bricks As New Brick_Basics
         Dim plotHist As New Plot_Histogram
         Public Sub New()
             plotHist.createHistogram = True
@@ -1081,14 +995,14 @@ Namespace VBClasses
             dst2 = task.leftView
 
             Dim index As Integer = task.gridMap.Get(Of Integer)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
-            If task.bricks.brickList.Count = 0 Or task.optionsChanged Then Exit Sub
+            If bricks.brickList.Count = 0 Or task.optionsChanged Then Exit Sub
 
             Dim gSq As brickData
-            If index < 0 Or index >= task.bricks.brickList.Count Then
-                gSq = task.bricks.brickList(task.bricks.brickList.Count / 2)
+            If index < 0 Or index >= bricks.brickList.Count Then
+                gSq = bricks.brickList(bricks.brickList.Count / 2)
                 task.mouseMovePoint = New cv.Point(gSq.rect.X + gSq.rect.Width / 2, gSq.rect.Y + gSq.rect.Height / 2)
             Else
-                gSq = task.bricks.brickList(index)
+                gSq = bricks.brickList(index)
             End If
 
             Dim split() = task.pointCloud(gSq.rect).Split()
@@ -1114,7 +1028,7 @@ Namespace VBClasses
 
 
     Public Class NR_Brick_NoDepthLines : Inherits TaskParent
-        Dim bricks As New Brick_BasicsNew
+        Dim bricks As New Brick_Basics
         Dim lines As New Line_Basics
         Dim options As New Options_LeftRightCorrelation
         Dim motionLeft As New Motion_Basics
@@ -1137,7 +1051,7 @@ Namespace VBClasses
 
             Dim count As Integer
             dst3.SetTo(0)
-            For Each gSq In task.bricks.brickList
+            For Each gSq In bricks.brickList
                 If dst2(gSq.lRect).CountNonZero And task.noDepthMask(gSq.rect).CountNonZero Then
                     If gSq.mm.maxVal - gSq.mm.minVal > options.mmRange Then
                         task.leftView(gSq.lRect).CopyTo(dst3(gSq.lRect))
@@ -1145,7 +1059,7 @@ Namespace VBClasses
                     End If
                 End If
             Next
-            labels(3) = CStr(count) + " of " + CStr(task.bricks.brickList.Count) +
+            labels(3) = CStr(count) + " of " + CStr(bricks.brickList.Count) +
                         " rects had an edge and pixels with zero depth"
         End Sub
     End Class
@@ -1155,7 +1069,7 @@ Namespace VBClasses
 
 
     Public Class Brick_Variability : Inherits TaskParent
-        Dim bricks As New Brick_BasicsNew
+        Dim bricks As New Brick_Basics
         Dim depthList As New List(Of Single)
         Dim options As New Options_DiffDepth
         Public depthJumpers As New List(Of Integer)
@@ -1214,7 +1128,7 @@ Namespace VBClasses
 
 
     Public Class Brick_Ranges : Inherits TaskParent
-        Dim bricks As New Brick_BasicsNew
+        Dim bricks As New Brick_Basics
         Dim options As New Options_DiffDepth
         Public rangeJumpers As New List(Of Integer)
         Dim fLess As New FeatureLess_Basics
@@ -1260,7 +1174,7 @@ Namespace VBClasses
 
     Public Class Brick_Features : Inherits TaskParent
         Dim fLess As New FeatureLess_Basics
-        Dim bricks As New Brick_BasicsNew
+        Dim bricks As New Brick_Basics
         Public Sub New()
             desc = "Use FeatureLess_Basics to identify bricks with good contrast."
         End Sub

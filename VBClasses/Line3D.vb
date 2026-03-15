@@ -60,7 +60,7 @@ Namespace VBClasses
 
 
     Public Class NR_Line3D_Longest : Inherits TaskParent
-        Dim bricks As New Brick_BasicsNew
+        Dim bricks As New Brick_Basics
         Public Sub New()
             dst0 = New cv.Mat(dst0.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
             desc = "Find the longest line in BGR and use it to measure the average depth for the line"

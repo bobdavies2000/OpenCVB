@@ -56,7 +56,7 @@ Namespace VBClasses
 
 
     Public Class NR_MinMath_Neighbors : Inherits TaskParent
-        Dim bricks As New Brick_BasicsNew
+        Dim bricks As New Brick_Basics
         Dim bPoints As New BrickPoint_Basics
         Public Sub New()
             desc = "Connect each grid square to its neighbors"

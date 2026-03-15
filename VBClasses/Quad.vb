@@ -294,7 +294,7 @@ Namespace VBClasses
 
 
     Public Class NR_Quad_Boundaries : Inherits TaskParent
-        Dim bricks As New Brick_BasicsNew
+        Dim bricks As New Brick_Basics
         Dim options As New Options_Features
         Public Sub New()
             labels(2) = "Depth differences large enough to label them boundaries"

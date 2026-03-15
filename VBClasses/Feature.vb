@@ -507,7 +507,7 @@ Namespace VBClasses
 
 
     Public Class NR_Feature_WithDepth : Inherits TaskParent
-        Dim bricks As New Brick_BasicsNew
+        Dim bricks As New Brick_Basics
         Dim feat As New Feature_General
         Public Sub New()
             desc = "Show the feature points that have depth."

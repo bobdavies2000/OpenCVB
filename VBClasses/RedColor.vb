@@ -175,7 +175,7 @@ Namespace VBClasses
 
 
     Public Class RedColor_Bricks : Inherits TaskParent
-        Dim bricks As New Brick_BasicsNew
+        Dim bricks As New Brick_Basics
         Dim color8u As New Color8U_Basics
         Public brickList As New List(Of brickData)
         Dim redC As New RedColor_Basics

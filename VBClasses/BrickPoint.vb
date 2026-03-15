@@ -1,7 +1,7 @@
 Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Class BrickPoint_Basics : Inherits TaskParent
-        Dim bricks As New Brick_BasicsNew
+        Dim bricks As New Brick_Basics
         Public sobel As New Edge_Sobel
         Public bpCore As New BrickPoint_Core
         Public ptList As New List(Of cv.Point)
@@ -33,7 +33,7 @@ Namespace VBClasses
 
 
     Public Class BrickPoint_Core : Inherits TaskParent
-        Dim bricks As New Brick_BasicsNew
+        Dim bricks As New Brick_Basics
         Public ptList As New List(Of cv.Point)
         Public threshold As Single = 150
         Public Sub New()
@@ -73,7 +73,7 @@ Namespace VBClasses
 
 
     Public Class NR_BrickPoint_Plot : Inherits TaskParent
-        Dim bricks As New Brick_BasicsNew
+        Dim bricks As New Brick_Basics
         Dim plotHist As New Plot_Histogram
         Dim bPoint As New BrickPoint_Basics
         Public Sub New()
@@ -134,7 +134,7 @@ Namespace VBClasses
 
 
     Public Class NR_BrickPoint_TopRow : Inherits TaskParent
-        Dim bricks As New Brick_BasicsNew
+        Dim bricks As New Brick_Basics
         Dim bPoint As New BrickPoint_Basics
         Public Sub New()
             labels(3) = "BrickPoint_Basics output of intensity = 255 - not necessarily in the top row of the gSq."
@@ -168,7 +168,7 @@ Namespace VBClasses
 
 
     Public Class NR_BrickPoint_DistanceAbove : Inherits TaskParent
-        Dim bricks As New Brick_BasicsNew
+        Dim bricks As New Brick_Basics
         Dim plotHist As New Plot_Histogram
         Public Sub New()
             plotHist.createHistogram = True
@@ -254,7 +254,7 @@ Namespace VBClasses
 
 
     Public Class NR_BrickPoint_Busiest : Inherits TaskParent
-        Dim bricks As New Brick_BasicsNew
+        Dim bricks As New Brick_Basics
         Dim bPoint As New BrickPoint_Basics
         Public bestBricks As New List(Of cv.Point)
         Public sortedBricks As New SortedList(Of Integer, cv.Rect)(New compareAllowIdenticalIntegerInverted)
@@ -293,7 +293,7 @@ Namespace VBClasses
 
 
     Public Class NR_BrickPoint_PopulationSurvey : Inherits TaskParent
-        Dim bricks As New Brick_BasicsNew
+        Dim bricks As New Brick_Basics
         Dim bPoint As New BrickPoint_Basics
         Public results(,) As Single
         Public Sub New()
@@ -571,7 +571,7 @@ Namespace VBClasses
 
 
     Public Class NR_BrickPoint_Features : Inherits TaskParent
-        Dim bricks As New Brick_BasicsNew
+        Dim bricks As New Brick_Basics
         Public featureBricks As New List(Of cv.Rect)
         Public Sub New()
             task.gOptions.LineWidth.Value = 3

@@ -491,7 +491,7 @@ Namespace VBClasses
 
 
     Public Class NR_Distance_DepthBricks : Inherits TaskParent
-        Dim bricks As New Brick_BasicsNew
+        Dim bricks As New Brick_Basics
         Dim dist As New Distance_Depth
         Public Sub New()
             task.gOptions.DebugSlider.Value = 20

@@ -1258,7 +1258,7 @@ Namespace VBClasses
 
 
     Public Class NR_Depth_ErrorEstimate : Inherits TaskParent
-        Dim bricks As New Brick_BasicsNew
+        Dim bricks As New Brick_Basics
         Public Sub New()
             dst1 = New cv.Mat(dst2.Size, cv.MatType.CV_32F)
             labels(2) = "Colorized depth error estimate for the current image"
@@ -1293,7 +1293,7 @@ Namespace VBClasses
 
 
     Public Class NR_Depth_MinMaxToVoronoi : Inherits TaskParent
-        Dim bricks As New Brick_BasicsNew
+        Dim bricks As New Brick_Basics
         Public Sub New()
             task.kalman = New Kalman_Basics
             ReDim task.kalman.kInput(task.gSquares.Count * 4 - 1)
@@ -1343,7 +1343,7 @@ Namespace VBClasses
 
 
     Public Class NR_Depth_WorldXYMT : Inherits TaskParent
-        Dim bricks As New Brick_BasicsNew
+        Dim bricks As New Brick_Basics
         Public depthUnitsMeters = False
         Public Sub New()
             labels(3) = "dst3 = pointcloud"
