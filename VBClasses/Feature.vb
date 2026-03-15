@@ -507,12 +507,13 @@ Namespace VBClasses
 
 
     Public Class NR_Feature_WithDepth : Inherits TaskParent
+        Dim bricks As New Brick_BasicsNew
         Dim feat As New Feature_General
         Public Sub New()
-            If task.bricks Is Nothing Then task.bricks = New Brick_Basics
             desc = "Show the feature points that have depth."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
+            bricks.Run(src)
             feat.Run(task.grayStable)
 
             dst2 = src

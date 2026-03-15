@@ -54,6 +54,7 @@ BlurMotion_Basics
 Boundary_Basics
 Boundary_Rectangles
 Brick_Basics
+Brick_BasicsNew
 Brick_Features
 Brick_LeftRight
 Brick_LeftRightMouse
@@ -275,6 +276,7 @@ Gif_OpenCVB
 GL_Basics
 GL_BasicsLineMap
 GL_DisplayPC
+GL_Featureless
 GL_LogicalLines
 GL_LogicalLines1
 GL_PlotHist

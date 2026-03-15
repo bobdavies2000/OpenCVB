@@ -56,12 +56,13 @@ Namespace VBClasses
 
 
     Public Class NR_MinMath_Neighbors : Inherits TaskParent
+        Dim bricks As New Brick_BasicsNew
         Dim bPoints As New BrickPoint_Basics
         Public Sub New()
-            If task.bricks Is Nothing Then task.bricks = New Brick_Basics
             desc = "Connect each grid square to its neighbors"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
+            bricks.Run(src)
             bPoints.Run(src)
             dst2 = bPoints.dst2
             labels(2) = bPoints.labels(2)

@@ -1,6 +1,7 @@
 Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Class FCS_Basics : Inherits TaskParent
+        Dim bricks As New Brick_BasicsNew
         Public basics As New FCS_StablePoints
         Public genSorted As New SortedList(Of Integer, Integer)(New compareAllowIdenticalIntegerInverted)
         Public Sub New()
@@ -22,6 +23,7 @@ Namespace VBClasses
             Next
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
+            bricks.Run(src)
             basics.Run(src)
             dst3 = basics.dst3
             labels(3) = basics.labels(3)
@@ -185,7 +187,6 @@ Namespace VBClasses
         Dim subdiv As New cv.Subdiv2D
         Dim feat As New Feature_General
         Public Sub New()
-            If task.bricks Is Nothing Then task.bricks = New Brick_Basics
             dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
             task.fpMap = New cv.Mat(dst2.Size(), cv.MatType.CV_32F, 0)
             labels(3) = "CV_8U map of Delaunay cells."
@@ -614,11 +615,12 @@ Namespace VBClasses
 
 
     Public Class FCS_Info : Inherits TaskParent
+        Dim bricks As New Brick_BasicsNew
         Public Sub New()
-            If task.bricks Is Nothing Then task.bricks = New Brick_Basics
             desc = "Display the contents of the Feature Coordinate System (FCS) cell."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
+            bricks.Run(src)
             If standalone Then
                 Static fcs As New FCS_CreateList
                 fcs.Run(task.grayStable)

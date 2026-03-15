@@ -2,12 +2,14 @@ Imports cv = OpenCvSharp
 'https://security.stackexchange.com/questions/42428/Is-generating-random-numbers-using-a-smartphone-camera-a-good-idea
 Namespace VBClasses
     Public Class Photon_Basics : Inherits TaskParent
+        Dim bricks As New Brick_BasicsNew
         Dim hist As New Histogram_Basics
         Public Sub New()
             labels = {"", "", "Points where B, G, or R differ from the previous image", "Histogram showing distribution of absolute value of differences"}
             desc = "With no motion the camera values will show the random photon differences.  Are they random?"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
+            bricks.Run(src)
             Static lastImage As cv.Mat = src
             cv.Cv2.Absdiff(src, lastImage, dst1)
 
@@ -119,7 +121,6 @@ Namespace VBClasses
         Dim hist As New Histogram_Basics
         Dim distances As New List(Of Single)
         Public Sub New()
-            If task.bricks Is Nothing Then task.bricks = New Brick_Basics
             hist.plotHist.removeZeroEntry = False
             task.gOptions.setHistogramBins(10)
             task.gOptions.UseMotionMask.Checked = False

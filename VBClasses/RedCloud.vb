@@ -247,12 +247,13 @@ Namespace VBClasses
 
 
     Public Class RedCloud_LeftRight : Inherits TaskParent
+        Dim bricks As New Brick_BasicsNew
         Dim redC As New RedCloud_Basics
         Public Sub New()
-            If task.bricks Is Nothing Then task.bricks = New Brick_Basics
             desc = "Map the RedCloud output into the right view."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
+            bricks.Run(src)
             redC.Run(src)
             dst2 = redC.dst2
             labels(2) = redC.labels(2)

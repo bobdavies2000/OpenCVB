@@ -409,14 +409,15 @@ Namespace VBClasses
 
 
     Public Class Color8U_Bricks : Inherits TaskParent
+        Dim bricks As New Brick_BasicsNew
         Dim color8u As New Color8U_Basics
         Public brickList As New List(Of brickData)
         Public Sub New()
-            If task.bricks Is Nothing Then task.bricks = New Brick_Basics
             If standalone Then task.gOptions.displayDst0.Checked = True
             desc = "Attach a color8u class to each gSq."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
+            bricks.Run(src)
             dst0 = task.leftView
             color8u.Run(task.leftView)
             dst2 = color8u.dst3

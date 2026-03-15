@@ -491,13 +491,14 @@ Namespace VBClasses
 
 
     Public Class NR_Distance_DepthBricks : Inherits TaskParent
+        Dim bricks As New Brick_BasicsNew
         Dim dist As New Distance_Depth
         Public Sub New()
-            If task.bricks Is Nothing Then task.bricks = New Brick_Basics
             task.gOptions.DebugSlider.Value = 20
             desc = "Threshold the maxDist in each grid square to highlight centers for key objects.  Use the 'DebugSlider' to provide the value."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
+            bricks.Run(src)
             dist.Run(src)
             dst2 = dist.dst2
             dst3 = src.Clone

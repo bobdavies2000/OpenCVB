@@ -1,6 +1,7 @@
 Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Class LineRect_Basics : Inherits TaskParent
+        Dim bricks As New Brick_BasicsNew
         Public lpInput1 As lpData
         Public lpInput2 As lpData
         Public rotatedRect As cv.RotatedRect
@@ -8,6 +9,7 @@ Namespace VBClasses
             desc = "Create a rectangle from 2 lines"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
+            bricks.Run(src)
             If standalone Then
                 Dim p1 = New cv.Point2f(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height))
                 Dim p2 = New cv.Point2f(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height))
@@ -42,12 +44,13 @@ Namespace VBClasses
 
 
     Public Class NR_LineRect_CenterNeighbor : Inherits TaskParent
+        Dim bricks As New Brick_BasicsNew
         Public options As New Options_LineRect
         Public Sub New()
-            If task.bricks Is Nothing Then task.bricks = New Brick_Basics
             desc = "Remove lines which have similar depth in bricks on either side of a line."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
+            bricks.Run(src)
             options.Run()
 
             dst2 = src.Clone
@@ -99,7 +102,6 @@ Namespace VBClasses
     Public Class NR_LineRect_CenterRange : Inherits TaskParent
         Public options As New Options_LineRect
         Public Sub New()
-            If task.bricks Is Nothing Then task.bricks = New Brick_Basics
             desc = "Remove lines which have similar depth in bricks on either side of a line."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)

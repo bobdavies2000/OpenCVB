@@ -240,12 +240,13 @@ Namespace VBClasses
 
 
     Public Class NR_Gravity_BrickRotate : Inherits TaskParent
+        Dim bricks As New Brick_BasicsNew
         Dim survey As New NR_BrickPoint_PopulationSurvey
         Public Sub New()
-            If task.bricks Is Nothing Then task.bricks = New Brick_Basics
             desc = "Rotate the grid point using the offset from gravity."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
+            bricks.Run(src)
             Dim angle = Math.Abs(task.verticalizeAngle)
             Static rotateAngle As Double = -angle
             Static rotateCenter As cv.Point2f = New cv.Point2f(dst2.Width / 2, dst2.Height / 2)

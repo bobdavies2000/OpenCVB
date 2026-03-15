@@ -890,13 +890,14 @@ Namespace VBClasses
 
 
     Public Class XO_Brick_GrayScaleTest : Inherits TaskParent
+        Dim bricks As New Brick_BasicsNew
         Dim options As New Options_Stdev
         Public Sub New()
-            If task.bricks Is Nothing Then task.bricks = New Brick_Basics
             labels(3) = "bricks where grayscale stdev and average of the 3 color stdev's"
             desc = "Is the average of the color stdev's the same as the stdev of the grayscale?"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
+            bricks.Run(src)
             options.Run()
             Dim threshold = options.stdevThreshold
 
@@ -2039,6 +2040,7 @@ Namespace VBClasses
 
 
     Public Class XO_Brick_Basics : Inherits TaskParent
+        Dim bricks As New Brick_BasicsNew
         Public options As New Options_GridCells
         Public thresholdRangeZ As Single
         Public instantUpdate As Boolean = True
@@ -2046,10 +2048,10 @@ Namespace VBClasses
         ' Public quad As New XO_Quad_Basics
         Dim LRMeanSub As New MeanSubtraction_LeftRight
         Public Sub New()
-            If task.bricks Is Nothing Then task.bricks = New Brick_Basics
             desc = "Create the grid of bricks that reduce depth volatility"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
+            bricks.Run(src)
             options.Run()
             If task.optionsChanged Then
                 ReDim lastCorrelation(task.gSquares.Count - 1)
@@ -2621,14 +2623,15 @@ Namespace VBClasses
 
 
     Public Class XO_Region_RectsH : Inherits TaskParent
+        Dim bricks As New Brick_BasicsNew
         Public hRects As New List(Of cv.Rect)
         Dim connect As New Region_Core
         Public Sub New()
-            If task.bricks Is Nothing Then task.bricks = New Brick_Basics
             dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
             desc = "Connect bricks with similar depth - horizontally scanning."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
+            bricks.Run(src)
             connect.Run(src)
 
             dst2.SetTo(0)
@@ -2660,10 +2663,10 @@ Namespace VBClasses
 
 
     Public Class XO_Region_RectsV : Inherits TaskParent
+        Dim bricks As New Brick_BasicsNew
         Public vRects As New List(Of cv.Rect)
         Dim connect As New Region_Core
         Public Sub New()
-            If task.bricks Is Nothing Then task.bricks = New Brick_Basics
             dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
             desc = "Connect bricks with similar depth - vertically scanning."
         End Sub
@@ -2698,13 +2701,14 @@ Namespace VBClasses
 
 
     Public Class XO_Region_Rects : Inherits TaskParent
+        Dim bricks As New Brick_BasicsNew
         Dim hConn As New XO_Region_RectsH
         Dim vConn As New XO_Region_RectsV
         Public Sub New()
-            If task.bricks Is Nothing Then task.bricks = New Brick_Basics
             desc = "Isolate the connected depth bricks both vertically and horizontally."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
+            bricks.Run(src)
             hConn.Run(src)
             vConn.Run(src)
 
@@ -2721,11 +2725,13 @@ Namespace VBClasses
 
 
     Public Class XO_Region_RedColor : Inherits TaskParent
+        Dim bricks As New Brick_BasicsNew
         Dim connect As New Region_Contours
         Public Sub New()
             desc = "Color each redCell with the color of the nearest grid square region."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
+            bricks.Run(src)
             connect.Run(src)
 
             dst3 = runRedList(src, labels(3))
@@ -2743,7 +2749,6 @@ Namespace VBClasses
     Public Class XO_Region_Gaps : Inherits TaskParent
         Dim connect As New Region_Core
         Public Sub New()
-            If task.bricks Is Nothing Then task.bricks = New Brick_Basics
             labels(2) = "bricks with single cells removed for both vertical and horizontal connected cells."
             labels(3) = "Vertical cells with single cells removed."
             desc = "Use the horizontal/vertical connected cells to find gaps in depth and the like featureless regions."
@@ -2777,6 +2782,7 @@ Namespace VBClasses
 
 
     Public Class XO_Brick_FeatureGaps : Inherits TaskParent
+        Dim bricks As New Brick_BasicsNew
         Dim feat As New NR_BrickPoint_Features
         Dim gaps As New XO_Region_Gaps
         Public Sub New()
@@ -2784,6 +2790,7 @@ Namespace VBClasses
             desc = "Overlay the features on the image of the gaps"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
+            bricks.Run(src)
             feat.Run(src)
             gaps.Run(src)
             dst2 = ShowAddweighted(feat.dst2, gaps.dst2, labels(3))
@@ -2796,7 +2803,6 @@ Namespace VBClasses
     Public Class XO_FCSLine_Basics : Inherits TaskParent
         Dim delaunay As New Delaunay_Basics
         Public Sub New()
-            If task.bricks Is Nothing Then task.bricks = New Brick_Basics
             dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
             desc = "Build a feature coordinate system (FCS) based on lines, not features."
         End Sub
@@ -3856,12 +3862,13 @@ Namespace VBClasses
 
 
     Public Class XO_LineRect_CenterDepth : Inherits TaskParent
+        Dim bricks As New Brick_BasicsNew
         Public options As New Options_LineRect
         Public Sub New()
-            If task.bricks Is Nothing Then task.bricks = New Brick_Basics
             desc = "Remove lines which have similar depth in bricks on either side of a line."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
+            bricks.Run(src)
             options.Run()
 
             dst2 = src.Clone
@@ -4583,13 +4590,14 @@ Namespace VBClasses
 
 
     Public Class XO_Brick_FitLeftInColor : Inherits TaskParent
+        Dim bricks As New Brick_BasicsNew
         Public Sub New()
-            If task.bricks Is Nothing Then task.bricks = New Brick_Basics
             task.drawRect = New cv.Rect(10, 10, 50, 50)
             labels(3) = "Draw a rectangle to update."
             desc = "Translate the left image into the same coordinates as the color image."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
+            bricks.Run(src)
             Dim correlationMat As New cv.Mat
 
             Dim p1 = task.bricks.brickList(0).lRect.TopLeft
@@ -5352,13 +5360,14 @@ Namespace VBClasses
 
 
     Public Class XO_TrackLine_Map : Inherits TaskParent
+        Dim bricks As New Brick_BasicsNew
         Dim lTrack As New XO_TrackLine_Basics
         Public Sub New()
-            If task.bricks Is Nothing Then task.bricks = New Brick_Basics
             task.gOptions.CrossHairs.Checked = False
             desc = "Show the gridMap and fpMap (features points) "
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
+            bricks.Run(src)
             lTrack.Run(src)
             dst2 = lTrack.dst2
             dst1 = lTrack.dst2.Threshold(0, 255, cv.ThresholdTypes.Binary)
@@ -14621,12 +14630,13 @@ Namespace VBClasses
 
 
     Public Class XO_DepthLine_Basics : Inherits TaskParent
+        Dim bricks As New Brick_BasicsNew
         Public Sub New()
-            If task.bricks Is Nothing Then task.bricks = New Brick_Basics
             dst0 = New cv.Mat(dst0.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
             desc = "Find the longest line in BGR and use it to measure the average depth for the line"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
+            bricks.Run(src)
             If task.lines.lpList.Count <= 1 Then Exit Sub
             Dim lp = task.lines.lpList(0)
             dst2 = src
@@ -15829,9 +15839,9 @@ Namespace VBClasses
 
 
     Public Class XO_Motion_RightMask : Inherits TaskParent
+        Dim bricks As New Brick_BasicsNew
         Public motionMaskRight As New cv.Mat
         Public Sub New()
-            If task.bricks Is Nothing Then task.bricks = New Brick_Basics
             If standalone Then task.gOptions.showMotionMask.Checked = True
             motionMaskRight = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
             labels = {"", "Right View", "Motion Mask for the left view", "Motion Mask for the right view."}
@@ -15840,6 +15850,7 @@ Namespace VBClasses
                "motion.  The result is sloppy and should not be used."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
+            bricks.Run(src)
             task.bricks.Run(task.grayStable)
             dst2 = task.motionRGB.motionMask
             dst1 = task.rightView
@@ -16819,13 +16830,14 @@ Namespace VBClasses
 
 
     Public Class XO_Brick_Cloud : Inherits TaskParent
+        Dim bricks As New Brick_BasicsNew
         Dim template As New Math_Intrinsics
         Public Sub New()
-            If task.bricks Is Nothing Then task.bricks = New Brick_Basics
             dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_32FC3, 0)
             desc = "Use RGB motion bricks to determine if depth has changed in any gSq."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
+            bricks.Run(src)
             If task.heartBeatLT Or task.frameCount < 3 Then task.pointCloud.CopyTo(dst2)
             If task.motionRGB.motionList.Count = 0 Then Exit Sub ' no change...
 

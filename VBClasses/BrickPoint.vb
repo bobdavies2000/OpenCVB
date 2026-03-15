@@ -1,6 +1,7 @@
 Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Class BrickPoint_Basics : Inherits TaskParent
+        Dim bricks As New Brick_BasicsNew
         Public sobel As New Edge_Sobel
         Public bpCore As New BrickPoint_Core
         Public ptList As New List(Of cv.Point)
@@ -9,6 +10,7 @@ Namespace VBClasses
             desc = "Find the max Sobel point in each gSq"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
+            bricks.Run(src)
             dst2 = src
 
             sobel.Run(src)
@@ -31,13 +33,14 @@ Namespace VBClasses
 
 
     Public Class BrickPoint_Core : Inherits TaskParent
+        Dim bricks As New Brick_BasicsNew
         Public ptList As New List(Of cv.Point)
         Public threshold As Single = 150
         Public Sub New()
-            If task.bricks Is Nothing Then task.bricks = New Brick_Basics
             desc = "Identify the highest intensity point in each grid square given the input image."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
+            bricks.Run(src)
             If standalone Then
                 Static sobel As New Edge_Sobel
                 sobel.Run(src)
@@ -70,10 +73,10 @@ Namespace VBClasses
 
 
     Public Class NR_BrickPoint_Plot : Inherits TaskParent
+        Dim bricks As New Brick_BasicsNew
         Dim plotHist As New Plot_Histogram
         Dim bPoint As New BrickPoint_Basics
         Public Sub New()
-            If task.bricks Is Nothing Then task.bricks = New Brick_Basics
             task.gOptions.setHistogramBins(3)
             plotHist.maxRange = 255
             plotHist.minRange = 0
@@ -82,6 +85,7 @@ Namespace VBClasses
             desc = "Plot the distribution of Sobel values for each ptBrick cell."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
+            bricks.Run(src)
             bPoint.Run(task.gray)
 
             Dim sobelValues As New List(Of Byte)
@@ -130,13 +134,14 @@ Namespace VBClasses
 
 
     Public Class NR_BrickPoint_TopRow : Inherits TaskParent
+        Dim bricks As New Brick_BasicsNew
         Dim bPoint As New BrickPoint_Basics
         Public Sub New()
-            If task.bricks Is Nothing Then task.bricks = New Brick_Basics
             labels(3) = "BrickPoint_Basics output of intensity = 255 - not necessarily in the top row of the gSq."
             desc = "BackProject the top row of the survey results into the RGB image - might help identify vertical lines (see dst3)."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
+            bricks.Run(src)
             bPoint.Run(src)
             dst3 = src.Clone
             dst2 = src.Clone
@@ -163,14 +168,15 @@ Namespace VBClasses
 
 
     Public Class NR_BrickPoint_DistanceAbove : Inherits TaskParent
+        Dim bricks As New Brick_BasicsNew
         Dim plotHist As New Plot_Histogram
         Public Sub New()
-            If task.bricks Is Nothing Then task.bricks = New Brick_Basics
             plotHist.createHistogram = True
             plotHist.removeZeroEntry = False
             desc = "Show grid points based on their distance to the grid point above."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
+            bricks.Run(src)
             Dim lpList As New List(Of lpData)
 
             Dim lpZero As New lpData(New cv.Point, New cv.Point)
@@ -248,14 +254,15 @@ Namespace VBClasses
 
 
     Public Class NR_BrickPoint_Busiest : Inherits TaskParent
+        Dim bricks As New Brick_BasicsNew
         Dim bPoint As New BrickPoint_Basics
         Public bestBricks As New List(Of cv.Point)
         Public sortedBricks As New SortedList(Of Integer, cv.Rect)(New compareAllowIdenticalIntegerInverted)
         Public Sub New()
-            If task.bricks Is Nothing Then task.bricks = New Brick_Basics
             desc = "Identify the bricks with the best edge counts - indicating the quality of the gSq."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
+            bricks.Run(src)
             bPoint.Run(task.gray)
 
             dst2 = src.Clone
@@ -286,15 +293,16 @@ Namespace VBClasses
 
 
     Public Class NR_BrickPoint_PopulationSurvey : Inherits TaskParent
+        Dim bricks As New Brick_BasicsNew
         Dim bPoint As New BrickPoint_Basics
         Public results(,) As Single
         Public Sub New()
-            If task.bricks Is Nothing Then task.bricks = New Brick_Basics
             labels(2) = "Cursor over each grid square to see where the grid squares are."
             task.mouseMovePoint = New cv.Point(0, 0) ' this grid square is often the most populated.
             desc = "Monitor the location of each grid square point in a grid square."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
+            bricks.Run(src)
             bPoint.Run(task.gray)
             dst1 = bPoint.dst2
             dst3 = src
@@ -563,15 +571,16 @@ Namespace VBClasses
 
 
     Public Class NR_BrickPoint_Features : Inherits TaskParent
+        Dim bricks As New Brick_BasicsNew
         Public featureBricks As New List(Of cv.Rect)
         Public Sub New()
-            If task.bricks Is Nothing Then task.bricks = New Brick_Basics
             task.gOptions.LineWidth.Value = 3
             If task.feat Is Nothing Then task.feat = New Feature_Basics
             labels(3) = "Featureless areas"
             desc = "Identify the cells with features"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
+            bricks.Run(src)
             dst2 = task.feat.dst2
 
             featureBricks.Clear()

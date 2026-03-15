@@ -29,7 +29,6 @@ Namespace VBClasses
         colorTriangles
         imageTriangles
     End Enum
-
     Public Class GL_Basics : Inherits TaskParent
         Public Sub New()
             desc = "Display the pointcloud"
@@ -697,6 +696,45 @@ Namespace VBClasses
             dst3.SetTo(0)
             labels = logLines.labels
             task.sharpGL.RunLines(drawRequest, logLines.lpList)
+        End Sub
+    End Class
+
+
+
+
+    Public Class GL_Featureless : Inherits TaskParent
+        Dim fLess As New FeatureLess_Basics
+        Public Sub New()
+            dst0 = New cv.Mat(dst0.Size, cv.MatType.CV_8U, 0)
+            desc = "Display the pointcloud"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            fLess.Run(src)
+            dst2 = fLess.dst2
+            labels(2) = fLess.labels(2)
+
+            dst3.SetTo(0)
+            src.CopyTo(dst3, dst2)
+
+            dst1 = task.pointCloud
+            dst1.SetTo(0, Not dst2)
+
+            Static ages(task.gSquares.Count - 1) As Integer
+            If task.optionsChanged Then ReDim ages(task.gSquares.Count - 1)
+
+            dst0.SetTo(0)
+            For i = 0 To task.gSquares.Count - 1
+                Dim r = task.gSquares(i)
+                Dim depth = task.pcSplit(2)(r).Mean(task.depthmask(r))(0)
+                If depth > 0 Then ages(i) += 1 Else ages(i) = 1
+                If ages(i) < 10 Then dst0(r).SetTo(255)
+            Next
+
+            dst1.SetTo(0, dst0)
+            dst3.SetTo(0, dst0)
+
+            strOut = task.sharpGL.RunSharp(oCase.drawPointCloudRGB, dst1, dst3)
+            SetTrueText(strOut, 2)
         End Sub
     End Class
 End Namespace

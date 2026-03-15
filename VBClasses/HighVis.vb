@@ -1,9 +1,9 @@
 Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Class HighVis_Basics : Inherits TaskParent
+        Dim bricks As New Brick_BasicsNew
         Dim info As New NR_Brick_Info
         Public Sub New()
-            If task.bricks Is Nothing Then task.bricks = New Brick_Basics
             dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
             desc = "Display all the bricks that have good visibility"
         End Sub
@@ -14,6 +14,7 @@ Namespace VBClasses
             Return output
         End Function
         Public Overrides Sub RunAlg(src As cv.Mat)
+            bricks.Run(src)
             dst1.SetTo(0)
             For Each gSq In task.bricks.brickList
                 dst1(gSq.rect).SetTo((gSq.correlation + 1) * 127)

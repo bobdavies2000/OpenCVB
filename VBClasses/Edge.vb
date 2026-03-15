@@ -1513,14 +1513,15 @@ Namespace VBClasses
 
 
     Public Class NR_Edge_LeftRightBrick : Inherits TaskParent
+        Dim bricks As New Brick_BasicsNew
         Dim edgesLR As New Edge_LeftRight
         Public means As New List(Of Single)
         Public Sub New()
-            If task.bricks Is Nothing Then task.bricks = New Brick_Basics
             If standalone Then task.gOptions.displayDst1.Checked = True
             desc = "Translate bricks with edges and depth from the left to the right view."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
+            bricks.Run(src)
             edgesLR.Run(emptyMat)
             dst2 = edgesLR.dst2
             dst3 = edgesLR.dst3

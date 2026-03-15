@@ -3,8 +3,8 @@ Imports OpenCvSharp
 Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Class Intrinsics_Basics : Inherits TaskParent
+        Dim bricks As New Brick_BasicsNew
         Public Sub New()
-            If task.bricks Is Nothing Then task.bricks = New Brick_Basics
             If standalone Then task.gOptions.gravityPointCloud.Checked = False
             desc = "Some cameras don't provide aligned color and left images.  This algorithm tries to align the left and color image."
         End Sub
@@ -41,6 +41,7 @@ Namespace VBClasses
             Return ptTranslated
         End Function
         Public Overrides Sub RunAlg(src As cv.Mat)
+            bricks.Run(src)
             If standalone Then
                 dst2 = task.leftView.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
                 Dim vec = New cv.Vec3b(0, 255, 255) ' yellow
@@ -253,11 +254,12 @@ Namespace VBClasses
 
 
     Public Class Intrinsics_MapLeftToRight : Inherits TaskParent
+        Dim bricks As New Brick_BasicsNew
         Public Sub New()
-            If task.bricks Is Nothing Then task.bricks = New Brick_Basics
             desc = "Map a point from the left image to the right image"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
+            bricks.Run(src)
             dst2 = src
             dst3 = task.rightView.CvtColor(cv.ColorConversionCodes.GRAY2BGR) ' so we can show the red line...
             Dim count As Integer
