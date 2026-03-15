@@ -123,7 +123,7 @@ Namespace VBClasses
             dst3 = color8u.dst3
 
             redC.rcMap.ConvertTo(dst1, cv.MatType.CV_8U)
-            dst2 = PaletteFull(color8u.dst2 + dst1)
+            dst2 = Palettize(color8u.dst2 + dst1)
 
             strOut = RedUtil_Basics.selectCell(redC.rcMap, redC.rcList)
             SetTrueText(strOut, 1)

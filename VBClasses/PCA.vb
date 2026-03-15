@@ -844,7 +844,7 @@ Namespace VBClasses
             Dim paletteCount = tmp.CvtColor(cv.ColorConversionCodes.BGR2GRAY).CountNonZero()
 
             If standaloneTest() Then
-                dst3 = PaletteFull(img8u)
+                dst3 = Palettize(img8u)
                 labels(3) = "dst2 is palettized using global palette option: " + task.gOptions.Palettes.Text
             End If
 

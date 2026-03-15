@@ -119,7 +119,7 @@ Namespace VBClasses
             If task.contours Is Nothing Then task.contours = New Contour_Basics_List
             desc = "Create the reference map for FCS. "
         End Sub
-        Public Function ShowPaletteFullColor(input As cv.Mat) As cv.Mat
+        Public Function ShowPalettizeColor(input As cv.Mat) As cv.Mat
             If task.paletteRandom Is Nothing Then task.paletteRandom = New Palette_RandomColors
             Return task.paletteRandom.useColorMapFull(input)
         End Function
@@ -138,7 +138,7 @@ Namespace VBClasses
 
             fcs.Run(emptyMat)
 
-            dst2 = ShowPaletteFullColor(fcs.fcsMap)
+            dst2 = ShowPalettizeColor(fcs.fcsMap)
             dst3 = task.contours.dst2
             labels(2) = fcs.labels(2)
             labels(3) = task.contours.labels(2)
@@ -172,7 +172,7 @@ Namespace VBClasses
                 fcsMap.FillConvexPoly(facetList, i, cv.LineTypes.Link8)
             Next
 
-            If standaloneTest() Then dst2 = PaletteFull(fcsMap)
+            If standaloneTest() Then dst2 = Palettize(fcsMap)
 
             labels(2) = traceName + ": " + CStr(inputFeatures.Count) + " cells found."
         End Sub
@@ -254,7 +254,7 @@ Namespace VBClasses
                 Next
             End If
 
-            dst2 = PaletteFull(dst1)
+            dst2 = Palettize(dst1)
             For Each fp In task.fpList
                 If fp.depth > 0 Then DrawCircle(dst2, fp.pt, task.DotSize, task.highlight)
             Next
@@ -635,7 +635,7 @@ Namespace VBClasses
             strOut += "index = " + CStr(fp.index) + vbCrLf
             strOut += "age (in frames) = " + CStr(fp.age) + vbCrLf
             strOut += "Facet count = " + CStr(fp.facets.Count) + " facets" + vbCrLf
-            strOut += "ClickPoint = " + task.ClickPoint.ToString + vbCrLf + vbCrLf
+            strOut += "ClickPoint = " + task.clickPoint.ToString + vbCrLf + vbCrLf
 
             strOut += "brickIndex = " + CStr(fp.brickIndex) + vbCrLf
             Dim gSq = bricks.brickList(fp.brickIndex)
@@ -791,7 +791,7 @@ Namespace VBClasses
                 SetTrueText(Format(fp.age, fmt0), fp.pt, 0)
                 FCS_Basics.fpCellContour(fp, task.color, 0)
             Next
-            dst3 = PaletteFull(palInput)
+            dst3 = Palettize(palInput)
             dst3.SetTo(0, palInput.Threshold(0, 255, cv.ThresholdTypes.BinaryInv))
 
 

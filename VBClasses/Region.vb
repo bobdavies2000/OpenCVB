@@ -237,7 +237,7 @@ Namespace VBClasses
                 dst1(md.rect).SetTo(md.index, md.mask)
             Next
 
-            dst2 = PaletteFull(dst1)
+            dst2 = Palettize(dst1)
             dst2.SetTo(0, connect.dst2)
             dst3 = ShowAddweighted(src, dst2, labels(3))
             labels(2) = "There were " + CStr(redM.mdList.Count) + " connected contours found."

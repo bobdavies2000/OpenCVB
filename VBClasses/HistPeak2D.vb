@@ -36,7 +36,7 @@ Namespace VBClasses
 
             Dim backProjection As New cv.Mat
             cv.Cv2.CalcBackProject({src}, task.channels, histogram, backProjection, ranges)
-            dst2 = PaletteFull(backProjection)
+            dst2 = Palettize(backProjection)
         End Sub
     End Class
 
@@ -69,7 +69,7 @@ Namespace VBClasses
             End If
             peak.Run(task.pointCloud)
             dst1 = peak.dst2
-            dst2 = PaletteFull(dst1)
+            dst2 = Palettize(dst1)
         End Sub
     End Class
 

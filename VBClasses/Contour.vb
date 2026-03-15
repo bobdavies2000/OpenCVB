@@ -116,7 +116,7 @@ Namespace VBClasses
                 areaList.Add(ele.Key)
                 DrawTour(dst0, allContours(ele.Value).ToList, contourList.Count, -1, cv.LineTypes.Link8)
             Next
-            dst2 = PaletteFull(dst0)
+            dst2 = Palettize(dst0)
             labels(2) = $"Top {contourList.Count} contours in contourList from the " + CStr(sortedList.Count) + " found."
         End Sub
     End Class
@@ -734,7 +734,7 @@ Namespace VBClasses
                 dst1(contour.rect).SetTo(index + 1, contour.mask)
             Next
 
-            dst3 = PaletteFull(dst1)
+            dst3 = Palettize(dst1)
 
             For Each contour In contours.contourList
                 DrawCircle(dst3, contour.maxDist)
@@ -777,7 +777,7 @@ Namespace VBClasses
                 contourList.Add(tour)
             Next
 
-            dst3 = PaletteFull(contourMap)
+            dst3 = Palettize(contourMap)
             labels(3) = CStr(contourList.Count) + " hulls"
         End Sub
     End Class
@@ -915,7 +915,7 @@ Namespace VBClasses
                 DrawTour(dst1, contours(tuple.Item2).ToList, (i Mod 254) + 1, task.lineWidth, cv.LineTypes.Link4)
             Next
 
-            dst3 = PaletteBlackZero(dst1)
+            dst3 = Palettize(dst1, 0)
             labels(2) = "There were " + CStr(sortedTours.Count) + " contours found with width and height greater than " + CStr(options.minSize)
         End Sub
     End Class
@@ -933,8 +933,8 @@ Namespace VBClasses
         End Sub
         Public Shared Function contourDesc(contourMap As cv.Mat, contourList As List(Of contourData)) As String
             Dim tour As New contourData
-            Static pt = task.ClickPoint
-            If task.mouseClickFlag Then pt = task.ClickPoint
+            Static pt = task.clickPoint
+            If task.mouseClickFlag Then pt = task.clickPoint
             Dim id = contourMap.Get(Of Integer)(pt.Y, pt.X)
             Dim idFound As Boolean
             For Each tour In contourList
@@ -1020,7 +1020,7 @@ Namespace VBClasses
                 Dim listOfPoints = New List(Of List(Of cv.Point))({ptArray.ToList})
                 cv.Cv2.DrawContours(tourMat, listOfPoints, 0, New cv.Scalar(sortedList.Count), -1, cv.LineTypes.Link8)
                 tour.mask = tourMat(tour.rect).Threshold(0, 255, cv.ThresholdTypes.Binary)
-                tour.depth = task.pcSplit(2)(tour.rect).Mean(task.depthMask(tour.rect))(0)
+                tour.depth = task.pcSplit(2)(tour.rect).Mean(task.depthmask(tour.rect))(0)
                 tour.mm = GetMinMax(task.pcSplit(2)(tour.rect), tour.mask)
                 tour.maxDist = GetMaxDistContour(tour)
                 tour.ID = task.gridMap.Get(Of Integer)(tour.maxDist.Y, tour.maxDist.X)
@@ -1051,7 +1051,7 @@ Namespace VBClasses
                 dst1(tour.rect).SetTo(tour.ID Mod 255, tour.mask)
             Next
 
-            dst2 = PaletteBlackZero(dst1)
+            dst2 = Palettize(dst1, 0)
             Dim matched As Integer
             For Each tour In contourList
                 If tour.age > 1 Then matched += 1
@@ -1113,7 +1113,7 @@ Namespace VBClasses
                 Dim listOfPoints = New List(Of List(Of cv.Point))({ptArray.ToList})
                 cv.Cv2.DrawContours(tourMat, listOfPoints, 0, New cv.Scalar(sortedList.Count), -1, cv.LineTypes.Link8)
                 tour.mask = tourMat(tour.rect).Threshold(0, 255, cv.ThresholdTypes.Binary)
-                tour.depth = task.pcSplit(2)(tour.rect).Mean(task.depthMask(tour.rect))(0)
+                tour.depth = task.pcSplit(2)(tour.rect).Mean(task.depthmask(tour.rect))(0)
                 tour.mm = GetMinMax(task.pcSplit(2)(tour.rect), tour.mask)
                 tour.maxDist = GetMaxDistContour(tour)
                 tour.ID = task.gridMap.Get(Of Integer)(tour.maxDist.Y, tour.maxDist.X)
@@ -1144,7 +1144,7 @@ Namespace VBClasses
                 dst1(tour.rect).SetTo(tour.ID Mod 255, tour.mask)
             Next
 
-            dst2 = PaletteBlackZero(dst1)
+            dst2 = Palettize(dst1, 0)
             Dim matched As Integer
             For Each tour In rcList
                 If tour.age > 1 Then matched += 1

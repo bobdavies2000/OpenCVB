@@ -117,7 +117,7 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             frames.Run(src)
-            dst2 = PaletteFull(frames.dst2)
+            dst2 = Palettize(frames.dst2)
 
             diff.Run(frames.dst2)
             dst3 = diff.dst2

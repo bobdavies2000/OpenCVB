@@ -19,7 +19,7 @@ Namespace VBClasses
                 src = contour.dst1.Clone
             End If
 
-            dst2 = PaletteBlackZero(src)
+            dst2 = Palettize(src, 0)
             dst3 = dst2.Clone
 
             Dim mm = GetMinMax(src)

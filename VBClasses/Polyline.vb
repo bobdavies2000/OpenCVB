@@ -10,7 +10,7 @@ Namespace VBClasses
             dst2 = edgeline.dst2
             labels(2) = edgeline.labels(2)
 
-            If standaloneTest() Then dst3 = PaletteBlackZero(dst2)
+            If standaloneTest() Then dst3 = Palettize(dst2, 0)
         End Sub
     End Class
 

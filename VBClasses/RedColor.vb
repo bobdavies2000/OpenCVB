@@ -138,13 +138,13 @@ Namespace VBClasses
             reduction.Run(task.leftView)
 
             redLeft.Run(reduction.dst2)
-            dst2 = PaletteFull(redLeft.dst2)
+            dst2 = Palettize(redLeft.dst2)
             labels(2) = redLeft.labels(2) + " in the left image"
 
             reduction.Run(task.rightView)
 
             redRight.Run(reduction.dst2)
-            dst3 = PaletteFull(redRight.dst2)
+            dst3 = Palettize(redRight.dst2)
             labels(3) = redRight.labels(2) + " in the right image"
         End Sub
     End Class
@@ -242,7 +242,7 @@ Namespace VBClasses
                     rclist.Add(rc)
                 End If
             Next
-            dst3 = PaletteFull(rcMap)
+            dst3 = Palettize(rcMap)
             labels(3) = CStr(rclist.Count) + " hulls identified below.  " + CStr(defectCount) +
                     " hulls failed to build the defect list."
         End Sub

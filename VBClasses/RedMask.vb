@@ -49,7 +49,7 @@ Namespace VBClasses
 
             classCount = mdList.Count
 
-            dst3 = PaletteBlackZero(dst2)
+            dst3 = Palettize(dst2, 0)
 
             labels(2) = "CV_8U result with " + CStr(classCount) + " regions."
             labels(3) = "Palette version of the data in dst2 with " + CStr(classCount) + " regions."

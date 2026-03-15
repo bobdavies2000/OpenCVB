@@ -27,7 +27,7 @@ Namespace VBClasses
                 dst1.SetTo(i + 1, tmp)
             Next
 
-            dst3 = PaletteFull(dst1)
+            dst3 = Palettize(dst1)
 
             If standalone Then
                 redC.Run(dst1)

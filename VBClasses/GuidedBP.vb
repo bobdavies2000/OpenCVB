@@ -213,7 +213,7 @@ Namespace VBClasses
             dst2.ConvertTo(dst2, cv.MatType.CV_8U)
 
             labels(3) = "Use task.gOptions.PointCloudReduction to select different cloud combinations."
-            If standaloneTest() Then dst3 = PaletteFull(dst2 + 1)
+            If standaloneTest() Then dst3 = Palettize(dst2 + 1)
 
             Dim depthCount = task.depthmask.CountNonZero
             dst3.SetTo(0, task.noDepthMask)
@@ -266,11 +266,11 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             histTop.Run(src.Clone)
             topRects = hotPoints(histTop.dst3)
-            dst2 = PaletteBlackZero(histTop.dst3)
+            dst2 = Palettize(histTop.dst3, 0)
 
             histSide.Run(src)
             sideRects = hotPoints(histSide.dst3)
-            dst3 = PaletteBlackZero(histSide.dst3)
+            dst3 = Palettize(histSide.dst3, 0)
 
             labels(2) = "Top " + CStr(topRects.Count) + " objects identified in the top view."
             labels(3) = "Top " + CStr(sideRects.Count) + " objects identified in the side view."
@@ -309,7 +309,7 @@ Namespace VBClasses
             Next
             cv.Cv2.CalcBackProject({task.pointCloud}, task.channelsTop, histTop.histogram, dst0, task.rangesTop)
             Dim mm = GetMinMax(dst0)
-            dst2 = PaletteFull(dst0)
+            dst2 = Palettize(dst0)
             labels(2) = "The nonzero horizontal slices produced " + CStr(classCount) + " classes"
 
             histSide.Run(src.Clone)
@@ -324,7 +324,7 @@ Namespace VBClasses
                 End If
             Next
             cv.Cv2.CalcBackProject({task.pointCloud}, task.channelsSide, histSide.histogram, dst1, task.rangesSide)
-            dst3 = PaletteFull(dst1)
+            dst3 = Palettize(dst1)
             labels(3) = "The nonzero vertical slices produced " + CStr(classCount) + " classes"
         End Sub
     End Class
@@ -355,12 +355,12 @@ Namespace VBClasses
             topRects = New List(Of cv.Rect)(hotPoints.ptHot.topRects)
             sideRects = New List(Of cv.Rect)(hotPoints.ptHot.sideRects)
 
-            dst2 = PaletteFull(backP)
+            dst2 = Palettize(backP)
 
             hotPoints.ptHot.histSide.dst3.ConvertTo(histogramSide, cv.MatType.CV_32F)
             cv.Cv2.CalcBackProject({task.pointCloud}, task.channelsSide, histogramSide, dst3, task.rangesSide)
 
-            dst3 = PaletteFull(dst3)
+            dst3 = Palettize(dst3)
 
             classCount = topRects.Count + sideRects.Count
 
@@ -418,7 +418,7 @@ Namespace VBClasses
 
             topRects = New List(Of cv.Rect)(hotPoints.ptHot.topRects)
 
-            dst2 = PaletteFull(backP)
+            dst2 = Palettize(backP)
             classCount = topRects.Count
 
             labels(2) = CStr(topRects.Count) + " objects were identified in the top view."

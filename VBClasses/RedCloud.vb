@@ -191,7 +191,7 @@ Namespace VBClasses
             For Each rc In rcList
                 dst2(rc.rect).SetTo(rc.index Mod 254, rc.mask)
             Next
-            dst3 = PaletteBlackZero(dst2)
+            dst3 = Palettize(dst2, 0)
             labels(2) = "RedCloud cells identified: " + CStr(rcList.Count)
         End Sub
     End Class

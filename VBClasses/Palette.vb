@@ -102,7 +102,7 @@ Namespace VBClasses
             reduction.Run(src)
             dst3 = reduction.dst2
 
-            dst2 = PaletteFull(dst3)
+            dst2 = Palettize(dst3)
         End Sub
     End Class
 
@@ -116,7 +116,7 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             draw.Run(src)
-            dst2 = PaletteFull(draw.dst2)
+            dst2 = Palettize(draw.dst2)
         End Sub
     End Class
 
@@ -268,8 +268,8 @@ Namespace VBClasses
             desc = "Use a palette with the left and right images."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            dst2 = PaletteFull(task.leftView.ConvertScaleAbs)
-            dst3 = PaletteFull(task.rightView.ConvertScaleAbs)
+            dst2 = Palettize(task.leftView.ConvertScaleAbs)
+            dst3 = Palettize(task.rightView.ConvertScaleAbs)
         End Sub
     End Class
     Public Class NR_Palette_TaskColors : Inherits TaskParent
@@ -535,7 +535,7 @@ Namespace VBClasses
             dst2 += tiers.dst2
             classCount = tiers.classCount + 4
 
-            dst3 = PaletteFull(dst2)
+            dst3 = Palettize(dst2)
         End Sub
     End Class
 

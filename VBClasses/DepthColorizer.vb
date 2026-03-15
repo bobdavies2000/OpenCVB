@@ -41,9 +41,6 @@ Namespace VBClasses
 
             task.colorMap = cv.Mat.FromPixelData(256, 1, cv.MatType.CV_8UC3, task.vecColors.ToArray)
 
-            task.vecColors(0) = New cv.Vec3b ' first color is black...
-            task.colorMapZeroIsBlack = cv.Mat.FromPixelData(256, 1, cv.MatType.CV_8UC3, task.vecColors.ToArray)
-
             Dim color3 = cv.Scalar.Black, color4 = cv.Scalar.Red
             Dim corrColors = New List(Of cv.Vec3b)
             f = 1.0

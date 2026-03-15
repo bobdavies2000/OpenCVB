@@ -2549,7 +2549,7 @@ Namespace VBClasses
                     End If
                 End If
             Next
-            mats.mat(0) = PaletteFull(dst1)
+            mats.mat(0) = Palettize(dst1)
 
             mats.mat(1) = ShowAddweighted(src, mats.mat(0), labels(3))
 
@@ -2576,7 +2576,7 @@ Namespace VBClasses
                     End If
                 End If
             Next
-            mats.mat(2) = PaletteFull(dst1)
+            mats.mat(2) = Palettize(dst1)
 
             mats.mat(3) = ShowAddweighted(src, mats.mat(2), labels(3))
             labels(2) = CStr(indexV + indexH) + " regions were found that were connected in depth."
@@ -4242,7 +4242,7 @@ Namespace VBClasses
                 src = reduction.dst2
             End If
             dst2 = src.Clone
-            dst3 = PaletteFull(dst2)
+            dst3 = Palettize(dst2)
 
             contours.Run(dst2)
 
@@ -5274,7 +5274,7 @@ Namespace VBClasses
             histogram = cv.Mat.FromPixelData(histogram.Rows, 1, cv.MatType.CV_32F, histArray)
             cv.Cv2.CalcBackProject({dst0}, {0}, histogram, dst1, ranges)
             dst1.ConvertTo(dst2, cv.MatType.CV_8U)
-            dst3 = PaletteFull(dst2)
+            dst3 = Palettize(dst2)
             dst3.SetTo(0, task.noDepthMask)
 
             labels(2) = "Pointcloud data backprojection to " + CStr(task.histogramBins) + " classes."
@@ -5329,7 +5329,7 @@ Namespace VBClasses
                 trueData = New List(Of TrueText)(saveTrueData)
             End If
 
-            dst3 = PaletteFull(dst2)
+            dst3 = Palettize(dst2)
             labels(2) = "CV_8U format of the " + CStr(depthContourList.Count) + " depth contours"
         End Sub
     End Class
@@ -5590,7 +5590,7 @@ Namespace VBClasses
             End If
 
             Dim lpRectMap = XO_Line_CoreNew.createMap()
-            dst1 = PaletteBlackZero(lpRectMap)
+            dst1 = Palettize(lpRectMap, 0)
             dst1.Circle(lp.ptCenter, task.DotSize, task.highlight, task.lineWidth, task.lineType)
 
             labels(2) = "Selected line has a correlation of " + Format(match.correlation, fmt3) + " with the previous frame."
@@ -8098,7 +8098,7 @@ Namespace VBClasses
                 If lpList.Count >= task.FeatureSampleSize Then Exit For
             Next
 
-            If standaloneTest() Then dst1 = PaletteFull(lpRectMap)
+            If standaloneTest() Then dst1 = Palettize(lpRectMap)
             labels(2) = "Of the " + CStr(rawLines.lpList.Count) + " raw lines found, shown below are the " + CStr(lpList.Count) + " longest."
         End Sub
     End Class
@@ -8398,7 +8398,7 @@ Namespace VBClasses
             labels(3) = task.lines.labels(3)
 
             Dim lpRectMap = XO_Line_CoreNew.createMap()
-            dst1 = PaletteBlackZero(lpRectMap)
+            dst1 = Palettize(lpRectMap, 0)
         End Sub
     End Class
 
@@ -8427,7 +8427,7 @@ Namespace VBClasses
             End If
 
             Dim lpRectMap = XO_Line_CoreNew.createMap()
-            dst1 = PaletteBlackZero(lpRectMap)
+            dst1 = Palettize(lpRectMap, 0)
             DrawCircle(dst1, lp.ptCenter)
 
             Dim index = lpRectMap.Get(Of Byte)(lp.ptCenter.Y, lp.ptCenter.X)
@@ -9754,7 +9754,7 @@ Namespace VBClasses
                 histogram = cv.Mat.FromPixelData(histogram.Rows, 1, cv.MatType.CV_32F, histArray)
                 cv.Cv2.CalcBackProject({dst0}, {0}, histogram, dst0, ranges)
                 dst0.ConvertTo(dst1, cv.MatType.CV_8U)
-                mats.mat(i) = PaletteFull(dst1)
+                mats.mat(i) = Palettize(dst1)
                 mats.mat(i).SetTo(0, task.noDepthMask)
             Next
 
@@ -9904,7 +9904,7 @@ Namespace VBClasses
             ' dst2.SetTo(0, task.noDepthMask)
             dst2.ConvertTo(dst2, cv.MatType.CV_8U)
             Dim mm = GetMinMax(dst2)
-            dst3 = PaletteFull(dst2)
+            dst3 = Palettize(dst2)
             Swarm_Flood.oldSelectCell()
 
             labels(2) = CStr(mm.maxVal + 1) + " regions were mapped in the depth data - region 0 (black) has no depth."
@@ -10084,7 +10084,7 @@ Namespace VBClasses
                 dst1(rc.rect).SetTo(rc.index Mod 255, rc.mask)
                 SetTrueText(CStr(rc.index), New cv.Point(rc.rect.X, rc.rect.Y))
             Next
-            dst2 = PaletteBlackZero(dst1)
+            dst2 = Palettize(dst1, 0)
 
             Dim clickIndex = dst1.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X)
             If clickIndex > 0 And clickIndex < rcList.Count Then
@@ -10138,7 +10138,7 @@ Namespace VBClasses
                 Next
             Next
 
-            dst3 = PaletteBlackZero(dst0)
+            dst3 = Palettize(dst0, 0)
             labels(2) = CStr(index) + " regions were identified"
         End Sub
     End Class
@@ -10640,7 +10640,7 @@ Namespace VBClasses
             rectData.GetArray(Of cv.Rect)(rects)
 
             rectList = rects.ToList
-            If standalone Then dst3 = PaletteFull(dst2)
+            If standalone Then dst3 = Palettize(dst2)
 
             labels(2) = "CV_8U result With " + CStr(classCount) + " regions."
             labels(3) = "Palette version Of the data In dst2 With " + CStr(classCount) + " regions."
@@ -11276,7 +11276,7 @@ Namespace VBClasses
             color8U.Run(src)
             dst1 = color8U.dst2 + 1
             dst1.SetTo(0, outline.dst2)
-            dst3 = PaletteFull(dst1)
+            dst3 = Palettize(dst1)
 
             dst2 = runRedList(dst1, labels(2))
         End Sub
@@ -11621,7 +11621,7 @@ Namespace VBClasses
             imagePtr = RedCloudLined_Run(cPtr, handleInput.AddrOfPinnedObject(), dst1.Rows, dst1.Cols)
             handleInput.Free()
             dst2 = cv.Mat.FromPixelData(dst1.Rows, dst1.Cols, cv.MatType.CV_8U, imagePtr).Clone
-            dst3 = PaletteFull(dst2)
+            dst3 = Palettize(dst2)
 
             classCount = RedCloudLined_Count(cPtr)
             labels(2) = "CV_8U version with " + CStr(classCount) + " cells."
@@ -12376,7 +12376,7 @@ Namespace VBClasses
             rectData.GetArray(Of cv.Rect)(rects)
 
             rectList = rects.ToList
-            If standalone Then dst3 = PaletteFull(dst2)
+            If standalone Then dst3 = Palettize(dst2)
 
             labels(2) = "CV_8U result With " + CStr(classCount) + " regions."
             labels(3) = "Palette version Of the data In dst2 With " + CStr(classCount) + " regions."
@@ -12577,7 +12577,7 @@ Namespace VBClasses
                     End If
                 Next
 
-                dst2 = PaletteBlackZero(rcMap)
+                dst2 = Palettize(rcMap, 0)
                 labels(2) = CStr(rcList.Count) + " regions were identified "
             End If
 
@@ -13183,7 +13183,7 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             cAccum.Run(src)
             dst2 = cAccum.dst2
-            dst3 = PaletteFull(dst2)
+            dst3 = Palettize(dst2)
         End Sub
     End Class
 
@@ -13854,7 +13854,7 @@ Namespace VBClasses
             imagePtr = RedCloudLined_Run(cPtr, handleInput.AddrOfPinnedObject(), dst1.Rows, dst1.Cols)
             handleInput.Free()
             dst3 = cv.Mat.FromPixelData(dst1.Rows, dst1.Cols, cv.MatType.CV_8U, imagePtr).Clone
-            dst2 = PaletteFull(dst3)
+            dst2 = Palettize(dst3)
 
             classCount = RedCloudLined_Count(cPtr)
             labels(3) = "CV_8U version with " + CStr(classCount) + " cells."
@@ -13986,7 +13986,7 @@ Namespace VBClasses
                     End If
                 Next
 
-                dst2 = PaletteBlackZero(rcMap)
+                dst2 = Palettize(rcMap, 0)
                 labels(2) = CStr(rcList.Count) + " regions were identified "
             End If
 
@@ -14086,7 +14086,7 @@ Namespace VBClasses
                 Next
             Next
 
-            dst2 = PaletteBlackZero(rcMap)
+            dst2 = Palettize(rcMap, 0)
 
             If standaloneTest() Then
                 For Each rc In rcList
@@ -16448,7 +16448,7 @@ Namespace VBClasses
 
             color8u.Run(src)
             classCount = color8u.classCount
-            dst2 = PaletteFull(color8u.dst2)
+            dst2 = Palettize(color8u.dst2)
 
             strOut = "Current color source = " + task.fOptions.Color8USource.Text
             SetTrueText(strOut, 2)
@@ -16893,13 +16893,13 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             backP.Run(src)
             backP.dst2.ConvertTo(dst2, cv.MatType.CV_8U)
-            dst2 = PaletteFull(dst2)
+            dst2 = Palettize(dst2)
 
             equalize.Run(task.grayStable)
             backP.Run(equalize.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
 
             backP.dst2.ConvertTo(dst3, cv.MatType.CV_8U)
-            dst3 = PaletteFull(dst3)
+            dst3 = Palettize(dst3)
         End Sub
     End Class
 
@@ -17233,7 +17233,7 @@ Namespace VBClasses
                     dst1.Line(lp.p1, lp.p2, lp.index + 1, options.lineTrackerWidth, cv.LineTypes.Link8)
                 End If
             Next
-            dst2 = PaletteBlackZero(dst1)
+            dst2 = Palettize(dst1, 0)
         End Sub
     End Class
 
@@ -17760,8 +17760,8 @@ Namespace VBClasses
             rcMapX = redCold.rcMapX.Threshold(options.cellCount - 1, 255, cv.ThresholdTypes.TozeroInv)
             rcMapY = redCold.rcMapY.Threshold(options.cellCount - 1, 255, cv.ThresholdTypes.TozeroInv)
             If standaloneTest() Then
-                dst0 = PaletteFull(rcMapX)
-                dst1 = PaletteFull(rcMapY)
+                dst0 = Palettize(rcMapX)
+                dst1 = Palettize(rcMapY)
             End If
 
             mats.mat(0) = redCold.dst2
@@ -18094,7 +18094,7 @@ Namespace VBClasses
                     oldrclist.Add(rc)
                 End If
             Next
-            dst3 = PaletteFull(rcMap)
+            dst3 = Palettize(rcMap)
             labels(3) = CStr(oldrclist.Count) + " hulls identified below.  " + CStr(defectCount) +
                     " hulls failed to build the defect list."
         End Sub
@@ -18300,7 +18300,7 @@ Namespace VBClasses
             labels(3) = CStr(task.redList.oldrclist.Count) + " cells were identified."
             labels(2) = task.redList.labels(3) + " " + CStr(unmatched) + " cells were not matched to previous frame."
 
-            If task.redList.oldrclist.Count > 0 Then dst2 = PaletteFull(lastMap)
+            If task.redList.oldrclist.Count > 0 Then dst2 = Palettize(lastMap)
         End Sub
     End Class
 
@@ -18686,7 +18686,7 @@ Namespace VBClasses
                 End If
             Next
 
-            dst3 = PaletteBlackZero(wcMap)
+            dst3 = Palettize(wcMap, 0)
             dst3.SetTo(0, task.noDepthMask)
         End Sub
     End Class

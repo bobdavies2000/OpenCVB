@@ -93,7 +93,7 @@ Namespace VBClasses
 
             dst1.SetTo(0)
             DrawTour(dst1, contour.hull, (contour.ID) Mod 255, -1)
-            dst3 = PaletteBlackZero(dst1)
+            dst3 = Palettize(dst1, 0)
         End Sub
     End Class
 End Namespace

@@ -49,8 +49,8 @@ Namespace VBClasses
             dst2 = classifier.dst2.clone
             classCount = classifier.classCount
 
-            dst3 = PaletteFull(dst2)
-            labels(3) = "dst3 = PaletteFull(dst2) - " + task.fOptions.Color8USource.Text
+            dst3 = Palettize(dst2)
+            labels(3) = "dst3 = Palettize(dst2) - " + task.fOptions.Color8USource.Text
             labels(2) = "Color8U_Basics: method = " + classifier.tracename + " produced " + CStr(classCount) +
                         " pixel classifications"
         End Sub

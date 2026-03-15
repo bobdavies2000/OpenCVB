@@ -14,7 +14,7 @@ Namespace VBClasses
             dst2 = src / task.reduction
             labels(2) = "Reduced image - factor = " + CStr(task.reduction)
 
-            If standaloneTest() Or alwaysDisplay Then dst3 = PaletteBlackZero(dst2)
+            If standaloneTest() Or alwaysDisplay Then dst3 = Palettize(dst2)
             labels(2) = CStr(classCount) + " colors after reduction - 8uC1 below"
         End Sub
     End Class
@@ -31,7 +31,7 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             reduction.Run(src)
-            dst2 = PaletteFull(reduction.dst2)
+            dst2 = Palettize(reduction.dst2)
             dst3 = runRedList(reduction.dst2, labels(3))
         End Sub
     End Class
@@ -174,7 +174,7 @@ Namespace VBClasses
             For i = 0 To 2
                 reduction.Run(split(i))
                 If standaloneTest() Then
-                    mats.mat(i) = PaletteFull(reduction.dst2)
+                    mats.mat(i) = Palettize(reduction.dst2)
                 End If
             Next
 
@@ -236,7 +236,7 @@ Namespace VBClasses
             reduction.dst2.ConvertTo(dst2, cv.MatType.CV_32F)
 
             dst2.ConvertTo(dst2, cv.MatType.CV_8U)
-            dst3 = PaletteFull(dst2 + 1)
+            dst3 = Palettize(dst2 + 1)
         End Sub
     End Class
 

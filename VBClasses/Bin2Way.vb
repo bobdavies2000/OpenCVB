@@ -93,7 +93,7 @@ Namespace VBClasses
                 dst1(rc.rect).SetTo(rc.index, rc.mask)
             Next
 
-            dst2 = PaletteFull(dst1)
+            dst2 = Palettize(dst1)
         End Sub
     End Class
 
@@ -138,7 +138,7 @@ Namespace VBClasses
                 dst3.SetTo(index, mats(i))
             Next
 
-            dst2 = PaletteFull(dst3)
+            dst2 = Palettize(dst3)
         End Sub
     End Class
 
@@ -285,7 +285,7 @@ Namespace VBClasses
                 rcMap(rc.rect).setto(rc.index, rc.mask)
             Next
 
-            dst3 = PaletteFull(rcMap)
+            dst3 = Palettize(rcMap)
 
             strOut = RedUtil_Basics.selectCell(rcMap, rclist)
             SetTrueText(strOut, 1)

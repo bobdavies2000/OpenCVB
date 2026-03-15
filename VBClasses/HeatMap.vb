@@ -26,8 +26,8 @@ Namespace VBClasses
             sideframes.Run(histogramSide)
             dst1 = sideframes.dst2
 
-            dst2 = PaletteBlackZero(dst0.ConvertScaleAbs()).Clone
-            dst3 = PaletteBlackZero(dst1.ConvertScaleAbs())
+            dst2 = Palettize(dst0.ConvertScaleAbs(), 0).Clone
+            dst3 = Palettize(dst1.ConvertScaleAbs(), 0)
             labels(2) = "Top view of heat map with the last " + CStr(task.frameHistoryCount) + " frames"
             labels(3) = "Side view of heat map with the last " + CStr(task.frameHistoryCount) + " frames"
         End Sub

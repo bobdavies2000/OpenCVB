@@ -59,7 +59,7 @@ Namespace VBClasses
                             "Min gray = " + Format(mm.minVal, fmt0) + vbCrLf +
                             "Max Gray = " + Format(mm.maxVal, fmt0) + vbCrLf +
                             "Range = " + Format(mm.range, fmt0) + vbCrLf + vbCrLf +
-                            "Surveying then deteriorated correlations:" + vbCrLf +
+                            "Surveying the deteriorated correlations:" + vbCrLf +
                             If(mmRangeTest.Count = 0, "",
                             "Min Range = " + Format(mmRangeTest.Min, fmt1) + vbCrLf +
                             "Max Range = " + Format(mmRangeTest.Max, fmt1)), 1)

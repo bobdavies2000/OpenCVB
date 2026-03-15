@@ -714,7 +714,7 @@ Namespace VBClasses
                 If lpList.Count > 10 Then Exit For
             Next
 
-            dst3 = PaletteBlackZero(dst2)
+            dst3 = Palettize(dst2, 0)
         End Sub
     End Class
 
@@ -880,7 +880,7 @@ Namespace VBClasses
                 If fillTriangle(lp, botleft) Then Continue For
             Next
 
-            dst2 = PaletteBlackZero(dst3)
+            dst2 = Palettize(dst3, 0)
             Dim pcZ = task.pcSplit(2).Clone
             For Each lp In task.lines.lpList
                 Dim mask1 = dst3(lp.rect).Clone
@@ -944,7 +944,7 @@ Namespace VBClasses
             Next
             labels(2) = CStr(task.lines.lpList.Count) + " non-overlapping lines were found."
 
-            dst2 = PaletteBlackZero(dst3)
+            dst2 = Palettize(dst3, 0)
 
             Dim index = dst3.Get(Of Byte)(task.mouseMovePoint.Y, task.mouseMovePoint.X) - 1
             If task.lines.lpList.Count > 0 Then

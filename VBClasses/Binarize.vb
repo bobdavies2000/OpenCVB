@@ -218,7 +218,7 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             binar4.Run(src)
-            dst2 = PaletteFull(binar4.dst2)
+            dst2 = Palettize(binar4.dst2)
 
             Static lastSubD As cv.Mat = binar4.dst2.Clone
             dst3 = lastSubD - binar4.dst2

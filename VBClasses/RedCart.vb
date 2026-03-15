@@ -64,7 +64,7 @@ Namespace VBClasses
                 If val > 0 Then lutList.Add(val)
             Next
             dst1 = prepData.dst2.LUT(lut)
-            dst2 = PaletteBlackZero(dst1)
+            dst2 = Palettize(dst1, 0)
 
             If standalone Then
                 Dim index = Math.Abs(task.gOptions.DebugSlider.Value)
@@ -87,7 +87,7 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             redCart.Run(src)
-            dst2 = PaletteBlackZero(redCart.dst1)
+            dst2 = Palettize(redCart.dst1, 0)
             labels(2) = redCart.labels(2)
         End Sub
     End Class
@@ -102,7 +102,7 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             prepData.Run(emptyMat)
-            dst2 = PaletteBlackZero(prepData.dst2)
+            dst2 = Palettize(prepData.dst2, 0)
             labels(2) = prepData.labels(2)
 
             Dim val = prepData.reduced32f.Get(Of Single)(task.clickPoint.Y, task.clickPoint.X)
@@ -141,7 +141,7 @@ Namespace VBClasses
             Next
             dst1.SetTo(0, task.noDepthMask)
 
-            dst3 = PaletteBlackZero(dst1)
+            dst3 = Palettize(dst1, 0)
         End Sub
     End Class
 

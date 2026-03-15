@@ -299,7 +299,7 @@ Namespace VBClasses
             If task.optionsChanged Then dst2 = dst1.Clone Else dst1.CopyTo(dst2, task.motionRGB.motionMask)
             redCPP.Run(dst2 - 1)
             classCount = redCPP.classCount
-            dst3 = PaletteFull(redCPP.dst2)
+            dst3 = Palettize(redCPP.dst2)
             labels(3) = CStr(classCount) + " featureless regions were found."
         End Sub
     End Class
@@ -390,8 +390,11 @@ Namespace VBClasses
 
     Public Class FeatureLess_Cells : Inherits TaskParent
         Dim fLess As New FeatureLess_Basics
+        Dim saveColorMap As cv.Mat
         Public Sub New()
-            desc = "Create a list of cells with a list of "
+            saveColorMap = task.colorMap.Clone
+            labels(3) = "Region Colors are ordered by size."
+            desc = "Group the featureless grid squares"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             dst1 = fLess.dst2.Clone ' save last map
@@ -405,26 +408,27 @@ Namespace VBClasses
             Dim mask = New cv.Mat(New cv.Size(dst2.Width + 2, dst2.Height + 2), cv.MatType.CV_8U, 0)
             Dim flags As cv.FloodFillFlags = cv.FloodFillFlags.Link4
             Dim minSize = task.brickSize * task.brickSize
-            Dim cellCount As Integer
-            Dim usedList As New List(Of Integer)
+            Dim countList As New SortedList(Of Integer, Integer)(New compareAllowIdenticalIntegerInverted)
             For Each r In fLess.rectList
-                Dim valLast = dst1.Get(Of Byte)(r.TopLeft.Y, r.TopLeft.X)
                 Dim val = dst2.Get(Of Byte)(r.TopLeft.Y, r.TopLeft.X)
                 If val = 255 Then
-                    If valLast <> 0 And usedList.Contains(valLast) = False Then index = valLast
-                    usedList.Add(index)
                     Dim count = cv.Cv2.FloodFill(dst2, mask, r.TopLeft, index, rect, 0, 0, flags)
                     If count > minSize Then
+                        countList.Add(count, index)
                         index += 1
-                        cellCount += 1
                     Else
                         dst2(r).SetTo(0)
                     End If
                 End If
             Next
 
-            dst3 = PaletteBlackZero(dst2)
-            labels(2) = CStr(cellCount - 1) + " featureless regions were found."
+            ' this will color the regions in size order.
+            For i = 0 To countList.Count - 1
+                Dim countIndex = countList.Values.ElementAt(i)
+                task.colorMap.Set(Of cv.Vec3b)(countIndex, 0, saveColorMap.Get(Of cv.Vec3b)(i, 0))
+            Next
+            dst3 = Palettize(dst2, 0)
+            labels(2) = CStr(index - 1) + " featureless regions were found below (8UC1)."
         End Sub
     End Class
 End Namespace

@@ -61,7 +61,7 @@ Namespace VBClasses
                 sortContours.Add(contours(i).Length, New cv.Point(i, maskID))
             Next
 
-            dst1 = PaletteFull(dst2)
+            dst1 = Palettize(dst2)
             dst1.SetTo(0, dst3)
             labels(1) = "There were " + CStr(sortContours.Count) + " contour > 100 points."
         End Sub
@@ -128,7 +128,7 @@ Namespace VBClasses
                 sortContours.Add(contours(i).Length, New cv.Point(i, maskID))
             Next
 
-            dst2 = PaletteFull(reduction.dst2)
+            dst2 = Palettize(reduction.dst2)
             dst2.SetTo(0, dst3)
         End Sub
     End Class

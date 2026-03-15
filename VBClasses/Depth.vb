@@ -225,7 +225,7 @@ Namespace VBClasses
 
             cv.Cv2.ConvertScaleAbs(task.pcSplit(2) * 1000, dst1, options.alpha, options.beta)
             dst1 += 1
-            dst2 = PaletteFull(dst1)
+            dst2 = Palettize(dst1)
             dst2.SetTo(0, task.noDepthMask)
         End Sub
     End Class
@@ -713,7 +713,7 @@ Namespace VBClasses
             dst0 = src.Clone
             dst0.SetTo(white, dst3)
 
-            If standaloneTest() Then dst2 = PaletteFull(dst2)
+            If standaloneTest() Then dst2 = Palettize(dst2)
             labels(2) = Format(classCount, "000") + " regions were found"
         End Sub
     End Class
@@ -746,7 +746,7 @@ Namespace VBClasses
             dst0.ConvertTo(dst2, cv.MatType.CV_8U)
             dst2.SetTo(0, task.noDepthMask)
 
-            If standaloneTest() Then dst3 = PaletteFull(dst2)
+            If standaloneTest() Then dst3 = Palettize(dst2)
             labels(2) = CStr(classCount) + " regions defined in the depth data"
         End Sub
     End Class
@@ -851,7 +851,7 @@ Namespace VBClasses
             desc = "Create and display the task.depthMask output as a contour."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            contour.Run(task.depthMask)
+            contour.Run(task.depthmask)
 
             dst2.SetTo(0)
             For Each tour In contour.contourList
@@ -877,7 +877,7 @@ Namespace VBClasses
             desc = "Provide a line that separates depth from no depth throughout the image."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If standaloneTest() Then src = task.depthMask
+            If standaloneTest() Then src = task.depthmask
             contour.Run(src)
 
             dst2.SetTo(0)
@@ -1017,7 +1017,7 @@ Namespace VBClasses
                 End If
             End If
 
-            dst3 = PaletteFull(dst2)
+            dst3 = Palettize(dst2)
             labels(2) = $"{classCount} regions found."
         End Sub
     End Class
@@ -1277,7 +1277,7 @@ Namespace VBClasses
             Next
 
             Dim mm = GetMinMax(dst1)
-            dst2 = PaletteFull(dst1)
+            dst2 = Palettize(dst1)
             ' dst2.SetTo(0, task.noDepthMask)
             labels(3) = "Error estimates vary from " + Format(mm.minVal, fmt3) + " to " + Format(mm.maxVal, fmt3)
             If task.brickD Is Nothing Then Exit Sub

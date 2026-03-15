@@ -33,7 +33,7 @@ Namespace VBClasses
             dst2 = src.LUT(myLut) * classCount / 255
             dst2 += 1 ' stay away from zero...
 
-            If standaloneTest() Then dst3 = PaletteFull(dst2)
+            If standaloneTest() Then dst3 = Palettize(dst2)
             labels(2) = "Image segmented into " + CStr(classCount + 1) + " divisions (0-" + CStr(classCount) + ")"
         End Sub
     End Class

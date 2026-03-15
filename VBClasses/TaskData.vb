@@ -71,7 +71,6 @@ Namespace VBClasses
         Public vecColors(255) As cv.Vec3b
         Public depthColorMap As cv.Mat
         Public colorMap As cv.Mat
-        Public colorMapZeroIsBlack As cv.Mat
         Public correlationColorMap As cv.Mat
 
         ' task algorithms - operate on every frame regardless of which algorithm is being run.

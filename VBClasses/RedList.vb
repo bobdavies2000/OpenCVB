@@ -76,7 +76,7 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             binar4.Run(src)
-            dst3 = PaletteFull(binar4.dst2)
+            dst3 = Palettize(binar4.dst2)
 
             dst2 = runRedList(binar4.dst2, labels(2))
         End Sub
@@ -230,7 +230,7 @@ Namespace VBClasses
             rectData.GetArray(Of cv.Rect)(rects)
 
             rectList = rects.ToList
-            If standaloneTest() Then dst3 = PaletteFull(dst2)
+            If standaloneTest() Then dst3 = Palettize(dst2)
 
             labels(2) = "CV_8U result With " + CStr(classCount) + " regions."
             labels(3) = "Palette version of the data In dst2 With " + CStr(classCount) + " regions."

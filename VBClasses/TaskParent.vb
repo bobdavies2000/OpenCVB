@@ -115,28 +115,18 @@ Namespace VBClasses
         Public Sub DrawCircle(dst As cv.Mat, pt As cv.Point2f, color As cv.Scalar)
             dst.Circle(pt, task.DotSize, color, -1, task.lineType)
         End Sub
-        Public Shared Function PaletteFull(input As cv.Mat) As cv.Mat
-            Dim output As New cv.Mat
-            If input.Type <> cv.MatType.CV_8U Then
-                Dim input8u As New cv.Mat
-                input.ConvertTo(input8u, cv.MatType.CV_8U)
-                cv.Cv2.ApplyColorMap(input8u, output, task.colorMap)
+        Public Shared Function Palettize(input As cv.Mat, Optional first As Byte = 1) As cv.Mat
+            If first <> 0 Then
+                task.colorMap.Set(Of cv.Vec3b)(0, 0, task.vecColors(0))
             Else
-                cv.Cv2.ApplyColorMap(input, output, task.colorMap)
+                task.colorMap.Set(Of cv.Vec3b)(0, 0, New cv.Vec3b(0, 0, 0))
             End If
-
-            Return output
-        End Function
-        Public Shared Function PaletteBlackZero(input As cv.Mat) As cv.Mat
             Dim output As New cv.Mat
-            If input.Type <> cv.MatType.CV_8U Then
-                Dim input8u As New cv.Mat
-                input.ConvertTo(input8u, cv.MatType.CV_8U)
-                cv.Cv2.ApplyColorMap(input8u, output, task.colorMapZeroIsBlack)
-            Else
-                cv.Cv2.ApplyColorMap(input, output, task.colorMapZeroIsBlack)
-            End If
-
+            'If input.Type <> cv.MatType.CV_8U Then
+            '    Dim input8u As New cv.Mat
+            '    input.ConvertTo(input, cv.MatType.CV_8U)
+            'End If
+            cv.Cv2.ApplyColorMap(input, output, task.colorMap)
             Return output
         End Function
         Public Function ShowAddweighted(src1 As cv.Mat, src2 As cv.Mat, ByRef label As String) As cv.Mat

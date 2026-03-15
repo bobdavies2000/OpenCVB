@@ -48,8 +48,8 @@ Namespace VBClasses
             labels(3) = "Right Image"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            dst2 = PaletteFull(task.leftView)
-            dst3 = PaletteFull(task.rightView)
+            dst2 = Palettize(task.leftView)
+            dst3 = Palettize(task.rightView)
         End Sub
     End Class
 
@@ -115,7 +115,7 @@ Namespace VBClasses
             color8u.Run(task.rightView)
             redMask.Run(color8u.dst2)
             dst2 = redMask.dst2.Clone
-            dst3 = PaletteFull(dst2)
+            dst3 = Palettize(dst2)
             labels = redMask.labels
         End Sub
     End Class
@@ -134,7 +134,7 @@ Namespace VBClasses
             color8u.Run(task.leftView)
             redMask.Run(color8u.dst2)
             dst2 = redMask.dst2.Clone
-            dst3 = PaletteFull(dst2)
+            dst3 = Palettize(dst2)
             labels = redMask.labels
         End Sub
     End Class
@@ -288,7 +288,7 @@ Namespace VBClasses
                 redMask.dst2.SetTo(0, Not fLess.dst2)
             End If
 
-            dst2 = PaletteBlackZero(redMask.dst2)
+            dst2 = Palettize(redMask.dst2, 0)
             labels(2) = redMask.labels(2)
         End Sub
     End Class
@@ -316,7 +316,7 @@ Namespace VBClasses
                 redMask.dst2.SetTo(0, Not fLess.dst2)
             End If
 
-            dst2 = PaletteBlackZero(redMask.dst2)
+            dst2 = Palettize(redMask.dst2, 0)
             labels(2) = redMask.labels(2)
         End Sub
     End Class

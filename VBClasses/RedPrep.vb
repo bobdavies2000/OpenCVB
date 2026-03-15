@@ -101,7 +101,7 @@ Namespace VBClasses
             dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, cv.MatType.CV_8U, imagePtr).Clone
             dst2.SetTo(0, task.noDepthMask)
 
-            dst3 = PaletteBlackZero(dst2)
+            dst3 = Palettize(dst2, 0)
         End Sub
         Protected Overrides Sub Finalize()
             If cPtr <> 0 Then cPtr = PrepXY_Close(cPtr)
@@ -197,7 +197,7 @@ Namespace VBClasses
             tiers.Run(src)
             dst1 += tiers.dst3.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
-            dst2 = PaletteFull(dst1)
+            dst2 = Palettize(dst1)
         End Sub
     End Class
 
@@ -424,7 +424,7 @@ Namespace VBClasses
                 If histogram.Sum <> task.depthmask.CountNonZero Then Throw New Exception("can't happen.")
             End If
 
-            dst3 = PaletteBlackZero(dst2)
+            dst3 = Palettize(dst2, 0)
         End Sub
     End Class
 
@@ -481,7 +481,7 @@ Namespace VBClasses
             dst2 = cv.Cv2.Abs(dst0 + dst1) + 1
             dst2.SetTo(0, task.noDepthMask)
 
-            dst3 = PaletteBlackZero(dst2)
+            dst3 = Palettize(dst2, 0)
         End Sub
     End Class
 End Namespace

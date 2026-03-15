@@ -117,7 +117,7 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             backP.Run(src)
-            dst2 = PaletteFull(backP.dst2 + 1)
+            dst2 = Palettize(backP.dst2 + 1)
             labels(2) = backP.labels(2)
         End Sub
     End Class
@@ -157,7 +157,7 @@ Namespace VBClasses
             dst2 += 1 ' get away from zeros...
             labels(2) = "CV_8U backprojection of the " + CStr(classCount) + " histogram bins."
             If standaloneTest() Then
-                dst3 = PaletteFull(dst2)
+                dst3 = Palettize(dst2)
                 labels(3) = "Class " + CStr(index) + " had " + CStr(plotHist.histArray(index)) + " pixels after backprojection."
             End If
         End Sub
@@ -178,7 +178,7 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             backP.Run(src)
-            dst2 = PaletteFull(backP.dst2)
+            dst2 = Palettize(backP.dst2)
 
             diff.Run(dst2)
             dst3 = diff.dst2
@@ -223,7 +223,7 @@ Namespace VBClasses
             cv.Cv2.CalcBackProject({task.pointCloud}, task.channelsTop, histTop.histogram, dst1, task.rangesTop)
             dst1 = dst1.ConvertScaleAbs()
             dst1.ConvertTo(dst1, cv.MatType.CV_8U)
-            dst3 = PaletteFull(dst1)
+            dst3 = Palettize(dst1)
         End Sub
     End Class
 
@@ -404,7 +404,7 @@ Namespace VBClasses
             cv.Cv2.CalcBackProject({task.pcSplit(2)}, {0}, histogram, dst2, ranges)
 
             dst2.SetTo(0, task.noDepthMask)
-            dst3 = PaletteFull(dst2.ConvertScaleAbs)
+            dst3 = Palettize(dst2.ConvertScaleAbs)
             labels(2) = "CV_8U backprojection up to " + CStr(task.histogramBins) + " meters."
         End Sub
     End Class
@@ -426,7 +426,7 @@ Namespace VBClasses
             hue.Run(src)
             classCount = hue.classCount
             dst2 = hue.dst2
-            dst3 = PaletteFull(dst2)
+            dst3 = Palettize(dst2)
         End Sub
     End Class
 
@@ -592,7 +592,7 @@ Namespace VBClasses
 
             cv.Cv2.CalcBackProject({src}, {0}, histogram, dst2, ranges)
             dst2.ConvertTo(dst2, cv.MatType.CV_8U)
-            If standaloneTest() Then dst3 = PaletteFull(dst2)
+            If standaloneTest() Then dst3 = Palettize(dst2)
         End Sub
     End Class
 
@@ -671,7 +671,7 @@ Namespace VBClasses
             Next
             SetTrueText(strOut)
 
-            dst3 = PaletteFull(dst2)
+            dst3 = Palettize(dst2)
             labels(3) = "Below are the " + CStr(task.histogramBins) + " classes of depth data."
         End Sub
     End Class
@@ -735,7 +735,7 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             bpDepth.Run(src)
-            dst2 = PaletteFull(bpDepth.dst2)
+            dst2 = Palettize(bpDepth.dst2)
             dst2.SetTo(0, task.noDepthMask)
             labels(2) = bpDepth.labels(2)
         End Sub
@@ -755,7 +755,7 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             bpDepth.Run(src)
-            dst2 = PaletteFull(bpDepth.dst2)
+            dst2 = Palettize(bpDepth.dst2)
             dst2.SetTo(0, task.noDepthMask)
             labels(2) = bpDepth.labels(2)
 

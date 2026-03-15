@@ -358,7 +358,7 @@ Namespace VBClasses
             '    dst1.ConvertTo(dst1, cv.MatType.CV_8U)
             'End If
 
-            dst3 = PaletteFull(dst1)
+            dst3 = Palettize(dst1)
             labels(3) = CStr(auto.valleyOrder.Count + 1) + " colors in the back projection"
         End Sub
     End Class
@@ -488,7 +488,7 @@ Namespace VBClasses
             Next
             dst2.SetTo(marks.Count, task.pcSplit(2).InRange(marks(marks.Count - 1), 100))
 
-            dst3 = PaletteFull(dst2)
+            dst3 = Palettize(dst2)
         End Sub
     End Class
 

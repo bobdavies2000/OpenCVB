@@ -17,7 +17,7 @@ Namespace VBClasses
             If maxVal = 0 Then maxVal = mm.maxVal ' symmetric around 0 except for Z where all values are above 0
             classCount = maxVal \ task.reduction
 
-            dst3 = PaletteFull(dst2)
+            dst3 = Palettize(dst2)
             mm = GetMinMax(dst2, task.depthmask)
             dst2 *= 255 / mm.maxVal
         End Sub
