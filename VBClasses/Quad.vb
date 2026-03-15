@@ -301,28 +301,28 @@ Namespace VBClasses
             desc = "Find large differences in depth between cells that could provide boundaries."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            bricks.Run(src)
+            bricks.run(src)
             options.Run()
 
-            dst2 = task.bricks.dst2.Clone
+            dst2 = bricks.dst2.Clone
             Dim width = dst2.Width / task.brickSize
             Dim height = dst2.Height / task.brickSize
-            For i = 0 To task.bricks.brickList.Count - width Step width
+            For i = 0 To bricks.brickList.Count - width Step width
                 For j = i + 1 To i + width - 1
-                    Dim d1 = task.bricks.brickList(j).depth
-                    Dim d2 = task.bricks.brickList(j - 1).depth
+                    Dim d1 = bricks.brickList(j).depth
+                    Dim d2 = bricks.brickList(j - 1).depth
                     If Math.Abs(d1 - d2) > task.depthDiffMeters Then
-                        dst2.Rectangle(task.bricks.brickList(j).rect, task.highlight, -1)
+                        dst2.Rectangle(bricks.brickList(j).rect, task.highlight, -1)
                     End If
                 Next
             Next
 
             For i = 0 To width - 1
                 For j = 1 To height - 1
-                    Dim d1 = task.bricks.brickList(j * width).depth
-                    Dim d2 = task.bricks.brickList((j - 1) * width).depth
+                    Dim d1 = bricks.brickList(j * width).depth
+                    Dim d2 = bricks.brickList((j - 1) * width).depth
                     If Math.Abs(d1 - d2) > task.depthDiffMeters Then
-                        dst2.Rectangle(task.bricks.brickList(j).rect, task.highlight, -1)
+                        dst2.Rectangle(bricks.brickList(j).rect, task.highlight, -1)
                     End If
                 Next
             Next

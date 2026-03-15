@@ -41,11 +41,11 @@ Namespace VBClasses
             Return ptTranslated
         End Function
         Public Overrides Sub RunAlg(src As cv.Mat)
-            bricks.Run(src)
+            bricks.run(src)
             If standalone Then
                 dst2 = task.leftView.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
                 Dim vec = New cv.Vec3b(0, 255, 255) ' yellow
-                For Each gSq In task.bricks.brickList
+                For Each gSq In bricks.brickList
                     If gSq.depth > 0 Then DrawCircle(dst2, gSq.rect.TopLeft)
                 Next
             End If
@@ -259,14 +259,14 @@ Namespace VBClasses
             desc = "Map a point from the left image to the right image"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            bricks.Run(src)
+            bricks.run(src)
             dst2 = src
             dst3 = task.rightView.CvtColor(cv.ColorConversionCodes.GRAY2BGR) ' so we can show the red line...
             Dim count As Integer
             If task.Settings.cameraName.StartsWith("StereoLabs") Then
                 For Each lp In task.lines.lpList
-                    Dim brick1 = task.bricks.brickList(lp.p1GridIndex)
-                    Dim brick2 = task.bricks.brickList(lp.p2GridIndex)
+                    Dim brick1 = bricks.brickList(lp.p1GridIndex)
+                    Dim brick2 = bricks.brickList(lp.p2GridIndex)
                     Dim p1 = lp.p1 ' avoid updating list of lines.
                     Dim p2 = lp.p2
                     If brick1.depth > 0 And brick2.depth > 0 Then

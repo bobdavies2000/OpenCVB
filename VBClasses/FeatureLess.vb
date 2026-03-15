@@ -2,6 +2,7 @@ Imports System.Windows.Documents
 Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Class FeatureLess_Basics : Inherits TaskParent
+        Public rectList As New List(Of cv.Rect)
         Public Sub New()
             dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
             desc = "Identify featureless squares using the gray scale range - see 'Correlation_Basics'."
@@ -13,12 +14,14 @@ Namespace VBClasses
             dst2.SetTo(0)
             Dim count As Integer
             Dim rangeThreshold As Integer = 30
+            rectList.Clear()
             For Each gSq In task.gSquares
                 Dim mm = GetMinMax(src(gSq))
                 If mm.range < rangeThreshold Then
                     dst2(gSq).SetTo(255)
                     count += 1
                     dst3.Rectangle(gSq, white, task.lineWidth)
+                    rectList.Add(gSq)
                 End If
             Next
             labels(3) = CStr(count) + " grid squares were found to be featureless (range < " + CStr(rangeThreshold) + ")"
@@ -378,6 +381,50 @@ Namespace VBClasses
 
             feat.Run(dst2)
             feat.dst2.CopyTo(dst3)
+        End Sub
+    End Class
+
+
+
+
+
+    Public Class FeatureLess_Cells : Inherits TaskParent
+        Dim fLess As New FeatureLess_Basics
+        Public Sub New()
+            desc = "Create a list of cells with a list of "
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            dst1 = fLess.dst2.Clone ' save last map
+
+            fLess.Run(src)
+            dst2 = fLess.dst2
+            labels(2) = fLess.labels(2)
+
+            Dim index = 1
+            Dim rect As cv.Rect
+            Dim mask = New cv.Mat(New cv.Size(dst2.Width + 2, dst2.Height + 2), cv.MatType.CV_8U, 0)
+            Dim flags As cv.FloodFillFlags = cv.FloodFillFlags.Link4
+            Dim minSize = task.brickSize * task.brickSize
+            Dim cellCount As Integer
+            Dim usedList As New List(Of Integer)
+            For Each r In fLess.rectList
+                Dim valLast = dst1.Get(Of Byte)(r.TopLeft.Y, r.TopLeft.X)
+                Dim val = dst2.Get(Of Byte)(r.TopLeft.Y, r.TopLeft.X)
+                If val = 255 Then
+                    If valLast <> 0 And usedList.Contains(valLast) = False Then index = valLast
+                    usedList.Add(index)
+                    Dim count = cv.Cv2.FloodFill(dst2, mask, r.TopLeft, index, rect, 0, 0, flags)
+                    If count > minSize Then
+                        index += 1
+                        cellCount += 1
+                    Else
+                        dst2(r).SetTo(0)
+                    End If
+                End If
+            Next
+
+            dst3 = PaletteBlackZero(dst2)
+            labels(2) = CStr(cellCount - 1) + " featureless regions were found."
         End Sub
     End Class
 End Namespace

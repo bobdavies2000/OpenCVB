@@ -410,12 +410,15 @@ Namespace VBClasses
 
 
     Public Class NR_Cloud_GridInspector : Inherits TaskParent
+        Dim bricks As New Brick_Basics
         Public Sub New()
             dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
             task.mouseMovePoint.X = dst2.Width / 2
             desc = "Inspect x, y, and z values by gSq"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
+            bricks.Run(src)
+
             Dim cLine = task.mouseMovePoint.X
 
             Dim input = src
@@ -430,7 +433,7 @@ Namespace VBClasses
             For i = 0 To dst2.Height - 1 Step task.brickSize
                 Dim pt = New cv.Point2f(cLine, i)
                 Dim index = task.gridMap.Get(Of Integer)(pt.Y, pt.X)
-                Dim center = task.bricks.brickList(index).center
+                Dim center = bricks.brickList(index).center
                 Dim xyz = task.pointCloud.Get(Of cv.Vec3f)(center.Y, center.X)
                 SetTrueText("Row " + Format(i, "00") + vbTab + vbTab + Format(xyz(0), fmt2) + vbTab +
                                  Format(xyz(1), fmt2) + vbTab + Format(xyz(2), fmt2), New cv.Point(5, pt.Y), 3)
@@ -640,6 +643,7 @@ Namespace VBClasses
 
     Public Class NR_Cloud_Continuous_GridX : Inherits TaskParent
         Dim options As New Options_Features
+        Dim bricks As New Brick_Basics
         Public Sub New()
             dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
             dst3 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
@@ -647,14 +651,15 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
+            bricks.Run(src)
 
             Dim input = src
             If input.Type <> cv.MatType.CV_32F Then input = task.pcSplit(2)
 
             dst2.SetTo(0)
             dst3.SetTo(0)
-            Dim gcPrev = task.bricks.brickList(0)
-            For Each gSq In task.bricks.brickList
+            Dim gcPrev = bricks.brickList(0)
+            For Each gSq In bricks.brickList
                 If gSq.rect.X > 0 Then
                     If Math.Abs(gSq.depth - gcPrev.depth) <= task.depthDiffMeters Then
                         dst2(gSq.rect).SetTo(255)
@@ -677,21 +682,23 @@ Namespace VBClasses
 
     Public Class NR_Cloud_Continuous_GridXY : Inherits TaskParent
         Dim options As New Options_Features
+        Dim bricks As New Brick_Basics
         Public Sub New()
             dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
             desc = "Show where the pointcloud is continuous at the grid square resolution"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
+            bricks.Run(src)
 
             Dim input = src
             If input.Type <> cv.MatType.CV_32F Then input = task.pcSplit(2)
 
             dst2.SetTo(0)
-            Dim gcPrev = task.bricks.brickList(0)
+            Dim gcPrev = bricks.brickList(0)
             Dim cellMat As New cv.Mat(task.brickSize, task.brickSize, cv.MatType.CV_8U, cv.Scalar.All(127))
-            For Each gSq In task.bricks.brickList
-                Dim gcAbove = task.bricks.brickList(CInt(gSq.index Mod task.bricksPerRow))
+            For Each gSq In bricks.brickList
+                Dim gcAbove = bricks.brickList(CInt(gSq.index Mod task.bricksPerRow))
                 If gSq.correlation > task.fCorrThreshold Then
                     If gSq.rect.Y = 0 Or gSq.rect.X = 0 Then Continue For
                     If Math.Abs(gSq.depth - gcPrev.depth) <= task.depthDiffMeters Then dst2(gSq.rect).SetTo(128)

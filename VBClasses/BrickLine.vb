@@ -28,7 +28,7 @@ Namespace VBClasses
                 featList.Add(New List(Of Integer))
             Next
 
-            For Each gSq In task.bricks.brickList
+            For Each gSq In bricks.brickList
                 hist.Run(src(gSq.rect))
                 For i = 1 To hist.histarray.Count - 1
                     If hist.histarray(i) > 0 Then
@@ -50,7 +50,7 @@ Namespace VBClasses
             Dim edgeIndex = Math.Abs(task.gOptions.DebugSlider.Value)
             If edgeIndex <> 0 And edgeIndex < task.featList.Count Then
                 For Each index In task.featList(edgeIndex)
-                    Dim gSq = task.bricks.brickList(index)
+                    Dim gSq = bricks.brickList(index)
                     dst2.Rectangle(gSq.rect, task.highlight, task.lineWidth)
                 Next
             End If
@@ -59,14 +59,14 @@ Namespace VBClasses
                 If i <> Math.Abs(task.gOptions.DebugSlider.Value) Then Continue For
                 Dim depthSorted As New SortedList(Of Single, Integer)(New compareAllowIdenticalSingle)
                 For Each index In task.featList(i)
-                    Dim gSq = task.bricks.brickList(index)
+                    Dim gSq = bricks.brickList(index)
                     depthSorted.Add(gSq.depth, index)
                 Next
 
                 Dim lastDepth = depthSorted.ElementAt(0).Key
                 For Each ele In depthSorted
                     If Math.Abs(ele.Key - lastDepth) > task.depthDiffMeters Then
-                        Dim gSq = task.bricks.brickList(ele.Value)
+                        Dim gSq = bricks.brickList(ele.Value)
                         dst2.Rectangle(gSq.rect, red, task.lineWidth + 1)
                     End If
                     lastDepth = ele.Key
@@ -105,11 +105,13 @@ Namespace VBClasses
 
     Public Class BrickLine_DepthGap : Inherits TaskParent
         Dim findCells As New BrickLine_Basics
+        Dim bricks As New Brick_Basics
         Public Sub New()
             labels(2) = "Cells highlighted below have a significant gap in depth from their neighbors."
             desc = "Find cells mapping the edges/lines which are not near any other cell - they are neighboring edges/lines but not in depth."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
+            bricks.Run(src)
             If standalone Then
                 findCells.edgeRequest = True
                 findCells.Run(task.grayStable)
@@ -122,13 +124,13 @@ Namespace VBClasses
                 If task.featList(i).Count = 0 Then Exit For
                 Dim depthSorted As New SortedList(Of Single, Integer)(New compareAllowIdenticalSingle)
                 For Each index In task.featList(i)
-                    Dim gSq = task.bricks.brickList(index)
+                    Dim gSq = bricks.brickList(index)
                     depthSorted.Add(gSq.depth, index)
                 Next
 
                 Dim lastDepth = depthSorted.ElementAt(0).Key
                 For Each ele In depthSorted
-                    If Math.Abs(ele.Key - lastDepth) > task.depthDiffMeters Then gapCells.Add(task.bricks.brickList(ele.Value).index)
+                    If Math.Abs(ele.Key - lastDepth) > task.depthDiffMeters Then gapCells.Add(bricks.brickList(ele.Value).index)
                     lastDepth = ele.Key
                 Next
             Next
@@ -138,7 +140,7 @@ Namespace VBClasses
                 Dim debugMode = task.gOptions.DebugSlider.Value <> 0
                 For i = 0 To gapCells.Count - 1
                     If debugMode Then If i <> Math.Abs(task.gOptions.DebugSlider.Value) Then Continue For
-                    Dim gSq = task.bricks.brickList(gapCells(i))
+                    Dim gSq = bricks.brickList(gapCells(i))
                     dst2.Rectangle(gSq.rect, task.highlight, task.lineWidth)
                     If i = Math.Abs(task.gOptions.DebugSlider.Value) Then
                         SetTrueText(Format(gSq.depth, fmt1), gSq.rect.BottomRight)

@@ -477,12 +477,12 @@ Namespace VBClasses
             desc = "Find all the GridCells with edges in them."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            bricks.Run(src)
+            bricks.run(src)
             edges.Run(src)
             dst3 = edges.dst2
 
             dst2.SetTo(0)
-            For Each gSq In task.bricks.brickList
+            For Each gSq In bricks.brickList
                 If dst3(gSq.rect).CountNonZero Then src(gSq.rect).CopyTo(dst2(gSq.rect))
             Next
         End Sub

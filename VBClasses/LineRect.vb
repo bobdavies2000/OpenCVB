@@ -64,10 +64,10 @@ Namespace VBClasses
                 Dim nabeList = task.grid.gridNeighbors(index)
                 Dim foundObjectLine As Boolean = False
                 For i = 1 To nabeList.Count - 1
-                    Dim brick1 = task.bricks.brickList(nabeList(i))
+                    Dim brick1 = bricks.brickList(nabeList(i))
                     If brick1.depth = 0 Then Continue For
                     For j = i + 1 To nabeList.Count - 1
-                        Dim brick2 = task.bricks.brickList(nabeList(j))
+                        Dim brick2 = bricks.brickList(nabeList(j))
                         If brick2.depth = 0 Then Continue For
                         If Math.Abs(brick1.depth - brick2.depth) > depthThreshold Then
                             foundObjectLine = True
@@ -101,11 +101,13 @@ Namespace VBClasses
 
     Public Class NR_LineRect_CenterRange : Inherits TaskParent
         Public options As New Options_LineRect
+        Dim bricks As New Brick_Basics
         Public Sub New()
             desc = "Remove lines which have similar depth in bricks on either side of a line."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
+            bricks.Run(src)
 
             dst2 = src.Clone
             dst3 = src.Clone
@@ -115,7 +117,7 @@ Namespace VBClasses
             For Each lp In task.lines.lpList
                 Dim center = New cv.Point((lp.p1.X + lp.p2.X) \ 2, (lp.p1.Y + lp.p2.Y) \ 2)
                 Dim index As Integer = task.gridMap.Get(Of Integer)(center.Y, center.X)
-                Dim gSq = task.bricks.brickList(index)
+                Dim gSq = bricks.brickList(index)
                 If gSq.mm.maxVal - gSq.mm.minVal > depthThreshold Then
                     dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, cv.LineTypes.Link4)
                     depthLines += 1

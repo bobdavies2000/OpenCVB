@@ -240,6 +240,7 @@ FeatureFlow_LeftRight
 FeatureFlow_LeftRightHist
 FeatureFlow_LucasKanade
 FeatureLess_Basics
+FeatureLess_Cells
 FeatureLess_Compare
 FeatureLess_Correlations
 FeatureLess_Not

@@ -498,13 +498,13 @@ Namespace VBClasses
             desc = "Threshold the maxDist in each grid square to highlight centers for key objects.  Use the 'DebugSlider' to provide the value."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            bricks.Run(src)
+            bricks.run(src)
             dist.Run(src)
             dst2 = dist.dst2
             dst3 = src.Clone
 
             Dim threshold = Math.Abs(task.gOptions.DebugSlider.Value)
-            For Each gSq In task.bricks.brickList
+            For Each gSq In bricks.brickList
                 Dim mm = GetMinMax(dst2(gSq.rect))
                 If mm.maxVal >= threshold Then
                     Dim pt = New cv.Point(mm.maxLoc.X + gSq.rect.X, mm.maxLoc.Y + gSq.rect.Y)

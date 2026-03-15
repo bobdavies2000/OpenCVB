@@ -417,14 +417,14 @@ Namespace VBClasses
             desc = "Attach a color8u class to each gSq."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            bricks.Run(src)
+            bricks.run(src)
             dst0 = task.leftView
             color8u.Run(task.leftView)
             dst2 = color8u.dst3
 
             Dim count As Integer
             dst1.SetTo(0)
-            For Each gSq As brickData In task.bricks.brickList
+            For Each gSq As brickData In bricks.brickList
                 If gSq.rRect.Width > 0 Then
                     dst2(gSq.lRect).CopyTo(dst1(gSq.rRect))
                     gSq.colorClass = color8u.dst2.Get(Of Byte)

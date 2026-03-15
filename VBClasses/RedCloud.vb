@@ -253,14 +253,14 @@ Namespace VBClasses
             desc = "Map the RedCloud output into the right view."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            bricks.Run(src)
+            bricks.run(src)
             redC.Run(src)
             dst2 = redC.dst2
             labels(2) = redC.labels(2)
 
             Dim count As Integer
             dst1.SetTo(0)
-            For Each gSq As brickData In task.bricks.brickList
+            For Each gSq As brickData In bricks.brickList
                 If redC.rcMap(gSq.lRect).CountNonZero And gSq.rRect.Width > 0 Then
                     dst2(gSq.lRect).CopyTo(dst1(gSq.rRect))
                     count += 1

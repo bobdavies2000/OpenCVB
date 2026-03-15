@@ -186,6 +186,7 @@ Namespace VBClasses
     Public Class FCS_CreateList : Inherits TaskParent
         Dim subdiv As New cv.Subdiv2D
         Dim feat As New Feature_General
+        Dim bricks As New Brick_Basics
         Public Sub New()
             dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
             task.fpMap = New cv.Mat(dst2.Size(), cv.MatType.CV_32F, 0)
@@ -193,6 +194,8 @@ Namespace VBClasses
             desc = "Subdivide an image based on the points provided."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
+            bricks.Run(src)
+
             feat.Run(task.grayStable)
 
             subdiv.InitDelaunay(New cv.Rect(0, 0, dst1.Width, dst1.Height))
@@ -211,7 +214,7 @@ Namespace VBClasses
                 fp.index = i
 
                 Dim brickIndex = task.gridMap.Get(Of Integer)(fp.pt.Y, fp.pt.X)
-                Dim gSq = task.bricks.brickList(brickIndex)
+                Dim gSq = bricks.brickList(brickIndex)
                 Dim fpIndex = task.fpFromGridCellLast.IndexOf(brickIndex)
                 If fpIndex >= 0 Then
                     Dim fpLast = task.fpLastList(fpIndex)
@@ -635,7 +638,7 @@ Namespace VBClasses
             strOut += "ClickPoint = " + task.ClickPoint.ToString + vbCrLf + vbCrLf
 
             strOut += "brickIndex = " + CStr(fp.brickIndex) + vbCrLf
-            Dim gSq = task.bricks.brickList(fp.brickIndex)
+            Dim gSq = bricks.brickList(fp.brickIndex)
             strOut += CStr(gSq.age) + vbTab + "Age" + vbTab + vbCrLf
             strOut += Format(gSq.correlation, fmt3) + vbTab + "Correlation to right image" + vbCrLf
 

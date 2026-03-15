@@ -246,7 +246,7 @@ Namespace VBClasses
             desc = "Rotate the grid point using the offset from gravity."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            bricks.Run(src)
+            bricks.run(src)
             Dim angle = Math.Abs(task.verticalizeAngle)
             Static rotateAngle As Double = -angle
             Static rotateCenter As cv.Point2f = New cv.Point2f(dst2.Width / 2, dst2.Height / 2)
@@ -255,7 +255,7 @@ Namespace VBClasses
             If rotateAngle >= angle Then rotateAngle = -angle
 
             dst1 = src
-            For Each gSq In task.bricks.brickList
+            For Each gSq In bricks.brickList
                 Dim pt = New cv.Point(gSq.mm.maxLoc.X + gSq.rect.X, gSq.mm.maxLoc.Y + gSq.rect.Y)
                 If pt.Y = gSq.rect.Y Then
                     DrawCircle(dst1, pt)

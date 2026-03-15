@@ -129,7 +129,6 @@ Namespace VBClasses
 
             motionCloud.Run(emptyMat) '******* this may rotate for gravity if selected *******
             colorizer.Run(src)
-            If bricks IsNot Nothing Then bricks.Run(src)
 
             If feat IsNot Nothing Then feat.Run(src)
 

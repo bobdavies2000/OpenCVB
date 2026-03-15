@@ -1521,13 +1521,13 @@ Namespace VBClasses
             desc = "Translate bricks with edges and depth from the left to the right view."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            bricks.Run(src)
+            bricks.run(src)
             edgesLR.Run(emptyMat)
             dst2 = edgesLR.dst2
             dst3 = edgesLR.dst3
 
             Dim count As Integer
-            For Each gSq In task.bricks.brickList
+            For Each gSq In bricks.brickList
                 If gSq.depth = 0 Then Continue For
                 If gSq.rRect.X < 0 Or gSq.rRect.X + gSq.rRect.Width >= dst2.Width Then Continue For
                 If gSq.rRect.Width = 0 Or gSq.rRect.Height = 0 Then Continue For
@@ -1542,13 +1542,13 @@ Namespace VBClasses
             dst3 = dst3.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
 
             Dim index = task.gridMap.Get(Of Integer)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
-            Dim br = task.bricks.brickList(index)
+            Dim br = bricks.brickList(index)
             SetTrueText(br.displayCell, 1)
             dst2.Rectangle(br.lRect, task.highlight, task.lineWidth + 1)
             dst3.Rectangle(br.rRect, task.highlight, task.lineWidth + 1)
             task.color.Rectangle(br.lRect, task.highlight, task.lineWidth)
 
-            labels(2) = CStr(count) + " (of " + CStr(task.bricks.brickList.Count) +
+            labels(2) = CStr(count) + " (of " + CStr(bricks.brickList.Count) +
                     ") bricks had edges and depth in the left image.  " +
                     "Move the mouse around to highlight partners.  Below right is right view."
         End Sub

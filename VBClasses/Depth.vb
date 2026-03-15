@@ -1271,7 +1271,7 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             bricks.Run(src)
             dst1.SetTo(0)
-            For Each gSq In task.bricks.brickList
+            For Each gSq In bricks.brickList
                 Dim testError = ErrorEstimate(gSq.depth)
                 dst1(gSq.rect).SetTo(testError)
             Next
@@ -1306,7 +1306,7 @@ Namespace VBClasses
 
             dst1 = src.Clone()
             dst1.SetTo(white, task.gridMask)
-            For Each gSq In task.bricks.brickList
+            For Each gSq In bricks.brickList
                 Dim pt = gSq.mm.minLoc
                 subdiv.Insert(New cv.Point(pt.X + gSq.rect.X, pt.Y + gSq.rect.Y))
                 DrawCircle(dst1(gSq.rect), gSq.mm.minLoc, task.DotSize, cv.Scalar.Red)
@@ -1443,10 +1443,13 @@ Namespace VBClasses
 
     Public Class Depth_ReliableLines : Inherits TaskParent
         Dim rightPoints As New List(Of cv.Point)
+        Dim bricks As New Brick_Basics
         Public Sub New()
             desc = "Find the lines that are consistent in both the left and right images."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
+            bricks.Run(src)
+
             If task.Settings.cameraName.StartsWith("StereoLabs") = False Then
                 SetTrueText("The " + traceName + " algorithm is currently only working for StereoLabs cameras.")
                 Exit Sub
@@ -1458,8 +1461,8 @@ Namespace VBClasses
             Dim lastPoints As New List(Of cv.Point)(rightPoints)
             rightPoints.Clear()
             For Each lp In task.lines.lpList
-                Dim brick1 = task.bricks.brickList(lp.p1GridIndex)
-                Dim brick2 = task.bricks.brickList(lp.p2GridIndex)
+                Dim brick1 = bricks.brickList(lp.p1GridIndex)
+                Dim brick2 = bricks.brickList(lp.p2GridIndex)
                 dst2.Line(lp.p1, lp.p2, lp.color, task.lineWidth + 1, task.lineType)
 
                 Dim p1 = lp.p1 ' avoid updating list of lines.

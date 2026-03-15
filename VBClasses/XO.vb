@@ -897,7 +897,7 @@ Namespace VBClasses
             desc = "Is the average of the color stdev's the same as the stdev of the grayscale?"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            bricks.Run(src)
+            bricks.run(src)
             options.Run()
             Dim threshold = options.stdevThreshold
 
@@ -909,7 +909,7 @@ Namespace VBClasses
                 dst3.SetTo(0)
                 dst2 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
                 Dim count As Integer
-                For Each gSq In task.bricks.brickList
+                For Each gSq In bricks.brickList
                     cv.Cv2.MeanStdDev(dst2(gSq.rect), grayMean, grayStdev)
                     cv.Cv2.MeanStdDev(task.color(gSq.rect), ColorMean, colorStdev)
                     Dim nextColorStdev = (colorStdev(0) + colorStdev(1) + colorStdev(2)) / 3
@@ -2051,7 +2051,7 @@ Namespace VBClasses
             desc = "Create the grid of bricks that reduce depth volatility"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            bricks.Run(src)
+            bricks.run(src)
             options.Run()
             If task.optionsChanged Then
                 ReDim lastCorrelation(task.gSquares.Count - 1)
@@ -2062,7 +2062,7 @@ Namespace VBClasses
             Dim stdev As cv.Scalar, mean As cv.Scalar
             Dim correlationMat As New cv.Mat
 
-            task.bricks.brickList.Clear()
+            bricks.brickList.Clear()
             For i = 0 To task.gSquares.Count - 1
                 Dim gSq As New brickData
                 gSq.rect = task.gSquares(i)
@@ -2090,14 +2090,14 @@ Namespace VBClasses
                 End If
 
                 lastCorrelation(i) = gSq.correlation
-                gSq.index = task.bricks.brickList.Count
+                gSq.index = bricks.brickList.Count
                 task.gridMap(gSq.rect).SetTo(i)
-                task.bricks.brickList.Add(gSq)
+                bricks.brickList.Add(gSq)
             Next
 
             ' quad.Run(src)
 
-            labels(2) = CStr(task.bricks.brickList.Count) + " bricks have the useful depth values."
+            labels(2) = CStr(bricks.brickList.Count) + " bricks have the useful depth values."
         End Sub
     End Class
 
@@ -2631,7 +2631,7 @@ Namespace VBClasses
             desc = "Connect bricks with similar depth - horizontally scanning."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            bricks.Run(src)
+            bricks.run(src)
             connect.Run(src)
 
             dst2.SetTo(0)
@@ -2640,8 +2640,8 @@ Namespace VBClasses
             Dim index As Integer
             For Each tup In connect.hTuples
                 If tup.Item1 = tup.Item2 Then Continue For
-                Dim brick1 = task.bricks.brickList(tup.Item1)
-                Dim brick2 = task.bricks.brickList(tup.Item2)
+                Dim brick1 = bricks.brickList(tup.Item1)
+                Dim brick2 = bricks.brickList(tup.Item2)
 
                 Dim w = brick2.rect.BottomRight.X - brick1.rect.X
                 Dim h = brick1.rect.Height
@@ -2679,8 +2679,8 @@ Namespace VBClasses
             Dim index As Integer
             For Each tup In connect.vTuples
                 If tup.Item1 = tup.Item2 Then Continue For
-                Dim brick1 = task.bricks.brickList(tup.Item1)
-                Dim brick2 = task.bricks.brickList(tup.Item2)
+                Dim brick1 = bricks.brickList(tup.Item1)
+                Dim brick2 = bricks.brickList(tup.Item2)
 
                 Dim w = brick1.rect.Width
                 Dim h = brick2.rect.BottomRight.Y - brick1.rect.Y
@@ -2708,7 +2708,7 @@ Namespace VBClasses
             desc = "Isolate the connected depth bricks both vertically and horizontally."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            bricks.Run(src)
+            bricks.run(src)
             hConn.Run(src)
             vConn.Run(src)
 
@@ -2731,7 +2731,7 @@ Namespace VBClasses
             desc = "Color each redCell with the color of the nearest grid square region."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            bricks.Run(src)
+            bricks.run(src)
             connect.Run(src)
 
             dst3 = runRedList(src, labels(3))
@@ -2748,26 +2748,29 @@ Namespace VBClasses
 
     Public Class XO_Region_Gaps : Inherits TaskParent
         Dim connect As New Region_Core
+        Dim bricks As New Brick_Basics
         Public Sub New()
             labels(2) = "bricks with single cells removed for both vertical and horizontal connected cells."
             labels(3) = "Vertical cells with single cells removed."
             desc = "Use the horizontal/vertical connected cells to find gaps in depth and the like featureless regions."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
+            bricks.Run(src)
+
             connect.Run(src)
             dst2 = connect.dst2
             dst3 = connect.dst3
 
             For Each tup In connect.hTuples
                 If tup.Item2 - tup.Item1 = 0 Then
-                    Dim gSq = task.bricks.brickList(tup.Item1)
+                    Dim gSq = bricks.brickList(tup.Item1)
                     dst2(gSq.rect).SetTo(0)
                 End If
             Next
 
             For Each tup In connect.vTuples
-                Dim brick1 = task.bricks.brickList(tup.Item1)
-                Dim brick2 = task.bricks.brickList(tup.Item2)
+                Dim brick1 = bricks.brickList(tup.Item1)
+                Dim brick2 = bricks.brickList(tup.Item2)
                 If brick2.rect.Y - brick1.rect.Y = 0 Then
                     dst2(brick1.rect).SetTo(0)
                     dst3(brick1.rect).SetTo(0)
@@ -2790,7 +2793,7 @@ Namespace VBClasses
             desc = "Overlay the features on the image of the gaps"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            bricks.Run(src)
+            bricks.run(src)
             feat.Run(src)
             gaps.Run(src)
             dst2 = ShowAddweighted(feat.dst2, gaps.dst2, labels(3))
@@ -2802,11 +2805,14 @@ Namespace VBClasses
 
     Public Class XO_FCSLine_Basics : Inherits TaskParent
         Dim delaunay As New Delaunay_Basics
+        Dim bricks As New Brick_Basics
         Public Sub New()
             dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
             desc = "Build a feature coordinate system (FCS) based on lines, not features."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
+            bricks.Run(src)
+
             Dim lastMap = task.fpMap.Clone
             Dim lastCount = task.lines.lpList.Count
 
@@ -2830,11 +2836,11 @@ Namespace VBClasses
                 DrawTour(dst1, facets, 255, task.lineWidth)
                 DrawTour(task.fpMap, facets, i)
                 Dim center = New cv.Point(CInt((lp.p1.X + lp.p2.X) / 2), CInt((lp.p1.Y + lp.p2.Y) / 2))
-                Dim gSq = task.bricks.brickList(task.gridMap.Get(Of Integer)(center.Y, center.X))
+                Dim gSq = bricks.brickList(task.gridMap.Get(Of Integer)(center.Y, center.X))
                 task.lines.lpList(i) = lp
             Next
 
-            Dim index = task.fpMap.Get(Of Single)(task.ClickPoint.Y, task.ClickPoint.X)
+            Dim index = task.fpMap.Get(Of Single)(task.clickPoint.Y, task.clickPoint.X)
             task.lpD = task.lines.lpList(index)
             Dim facetsD = delaunay.facetList(task.lpD.index)
             DrawTour(dst2, facetsD, white, task.lineWidth)
@@ -3868,7 +3874,7 @@ Namespace VBClasses
             desc = "Remove lines which have similar depth in bricks on either side of a line."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            bricks.Run(src)
+            bricks.run(src)
             options.Run()
 
             dst2 = src.Clone
@@ -3882,8 +3888,8 @@ Namespace VBClasses
                 Dim lpPerp = lp.perpendicularPoints(center)
                 Dim index1 As Integer = task.gridMap.Get(Of Integer)(lpPerp.p1.Y, lpPerp.p1.X)
                 Dim index2 As Integer = task.gridMap.Get(Of Integer)(lpPerp.p2.Y, lpPerp.p2.X)
-                Dim brick1 = task.bricks.brickList(index1)
-                Dim brick2 = task.bricks.brickList(index2)
+                Dim brick1 = bricks.brickList(index1)
+                Dim brick2 = bricks.brickList(index2)
                 If Math.Abs(brick1.depth - brick2.depth) > depthThreshold Then
                     dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, cv.LineTypes.Link4)
                     depthLines += 1
@@ -4597,11 +4603,11 @@ Namespace VBClasses
             desc = "Translate the left image into the same coordinates as the color image."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            bricks.Run(src)
+            bricks.run(src)
             Dim correlationMat As New cv.Mat
 
-            Dim p1 = task.bricks.brickList(0).lRect.TopLeft
-            Dim p2 = task.bricks.brickList(task.bricks.brickList.Count - 1).lRect.BottomRight
+            Dim p1 = bricks.brickList(0).lRect.TopLeft
+            Dim p2 = bricks.brickList(bricks.brickList.Count - 1).lRect.BottomRight
 
             ' Dim rect = ValidateRect(New cv.Rect(p1.X - task.brickSize, p1.Y - task.brickSize, task.brickSize * 2, task.brickSize * 2))
             cv.Cv2.MatchTemplate(task.gray(task.drawRect), task.leftView, dst2, cv.TemplateMatchModes.CCoeffNormed)
@@ -5367,7 +5373,7 @@ Namespace VBClasses
             desc = "Show the gridMap and fpMap (features points) "
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            bricks.Run(src)
+            bricks.run(src)
             lTrack.Run(src)
             dst2 = lTrack.dst2
             dst1 = lTrack.dst2.Threshold(0, 255, cv.ThresholdTypes.Binary)
@@ -5377,7 +5383,7 @@ Namespace VBClasses
             dst3.SetTo(0)
             Dim histarray(task.redList.oldrclist.Count - 1) As Single
             Dim histogram As New cv.Mat
-            For Each gSq In task.bricks.brickList
+            For Each gSq In bricks.brickList
                 cv.Cv2.CalcHist({task.redList.rcMap(gSq.rect)}, {0}, emptyMat, histogram, 1, {task.redList.oldrclist.Count},
                              New cv.Rangef() {New cv.Rangef(1, task.redList.oldrclist.Count)})
 
@@ -14636,15 +14642,15 @@ Namespace VBClasses
             desc = "Find the longest line in BGR and use it to measure the average depth for the line"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            bricks.Run(src)
+            bricks.run(src)
             If task.lines.lpList.Count <= 1 Then Exit Sub
             Dim lp = task.lines.lpList(0)
             dst2 = src
 
             dst2.Line(lp.p1, lp.p2, cv.Scalar.Yellow, task.lineWidth + 3, task.lineType)
 
-            Dim gcMin = task.bricks.brickList(task.gridMap.Get(Of Single)(lp.p1.Y, lp.p1.X))
-            Dim gcMax = task.bricks.brickList(task.gridMap.Get(Of Single)(lp.p2.Y, lp.p2.X))
+            Dim gcMin = bricks.brickList(task.gridMap.Get(Of Single)(lp.p1.Y, lp.p1.X))
+            Dim gcMax = bricks.brickList(task.gridMap.Get(Of Single)(lp.p2.Y, lp.p2.X))
 
             dst0.SetTo(0)
             dst0.Line(lp.p1, lp.p2, 255, 3, task.lineType)
@@ -15850,14 +15856,14 @@ Namespace VBClasses
                "motion.  The result is sloppy and should not be used."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            bricks.Run(src)
-            task.bricks.Run(task.grayStable)
+            bricks.run(src)
+            bricks.run(task.grayStable)
             dst2 = task.motionRGB.motionMask
             dst1 = task.rightView
 
             motionMaskRight.SetTo(0)
             For Each index In task.motionRGB.motionList
-                Dim gSq = task.bricks.brickList(index)
+                Dim gSq = bricks.brickList(index)
                 motionMaskRight.Rectangle(gSq.rRect, 255, -1)
                 dst1.Rectangle(gSq.rRect, 255, task.lineWidth)
             Next
@@ -16837,7 +16843,7 @@ Namespace VBClasses
             desc = "Use RGB motion bricks to determine if depth has changed in any gSq."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            bricks.Run(src)
+            bricks.run(src)
             If task.heartBeatLT Or task.frameCount < 3 Then task.pointCloud.CopyTo(dst2)
             If task.motionRGB.motionList.Count = 0 Then Exit Sub ' no change...
 
@@ -16848,7 +16854,7 @@ Namespace VBClasses
             cv.Cv2.ExtractChannel(dst2, dst1, 2)
             dst1 = dst1.Threshold(0, 255, cv.ThresholdTypes.BinaryInv).ConvertScaleAbs
 
-            For Each gSq In task.bricks.brickList
+            For Each gSq In bricks.brickList
                 If gSq.depth > 0 Then
                     If gSq.age = 1 Then
                         task.pointCloud(gSq.rect).CopyTo(dst2(gSq.rect))

@@ -66,15 +66,15 @@ Namespace VBClasses
             desc = "Find the longest line in BGR and use it to measure the average depth for the line"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            bricks.Run(src)
+            bricks.run(src)
             If task.lines.lpList.Count <= 1 Then Exit Sub
             Dim lp = task.lines.lpList(0)
             dst2 = src
 
             dst2.Line(lp.p1, lp.p2, cv.Scalar.Yellow, task.lineWidth + 3, task.lineType)
 
-            Dim gcMin = task.bricks.brickList(task.gridMap.Get(Of Integer)(lp.p1.Y, lp.p1.X))
-            Dim gcMax = task.bricks.brickList(task.gridMap.Get(Of Integer)(lp.p2.Y, lp.p2.X))
+            Dim gcMin = bricks.brickList(task.gridMap.Get(Of Integer)(lp.p1.Y, lp.p1.X))
+            Dim gcMax = bricks.brickList(task.gridMap.Get(Of Integer)(lp.p2.Y, lp.p2.X))
 
             dst0.SetTo(0)
             dst0.Line(lp.p1, lp.p2, 255, 3, task.lineType)

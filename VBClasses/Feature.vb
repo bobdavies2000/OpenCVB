@@ -513,14 +513,14 @@ Namespace VBClasses
             desc = "Show the feature points that have depth."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            bricks.Run(src)
+            bricks.run(src)
             feat.Run(task.grayStable)
 
             dst2 = src
             Dim depthCount As Integer
             For Each pt In task.featurePoints
                 Dim index = task.gridMap.Get(Of Integer)(pt.Y, pt.X)
-                If task.bricks.brickList(index).depth > 0 Then
+                If bricks.brickList(index).depth > 0 Then
                     DrawCircle(dst2, pt, task.DotSize, task.highlight)
                     depthCount += 1
                 End If

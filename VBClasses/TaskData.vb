@@ -103,12 +103,9 @@ Namespace VBClasses
         Public motionLinkType As Integer = 8
 
         Public feat As Feature_Basics
-        Public bricks As Brick_Basics
 
         Public fpList As New List(Of fpData)
         Public featList As New List(Of List(Of Integer))
-        Public fLess As New List(Of List(Of Integer))
-
         Public fpMap As New cv.Mat ' feature map
 
         Public brickD As brickData ' the currently selected gSq
