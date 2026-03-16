@@ -56,15 +56,13 @@ Namespace VBClasses
 
 
     Public Class FeatureLess_Compare : Inherits TaskParent
-        Dim fLess As New FeatureLess_Basics
         Dim corr As New Correlation_Basics
         Public Sub New()
             labels(3) = "The red squares below are differences from the correlation calculation"
             desc = "Compare the correlation results with the range threshold results."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            fLess.Run(src)
-            dst2 = fLess.dst3
+            dst2 = task.motionRGB.fLess.dst3
 
             corr.Run(src)
             dst3 = corr.dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
@@ -73,7 +71,7 @@ Namespace VBClasses
                 Dim correlation = corr.cList(i)
                 If correlation < corr.corrThreshold Then
                     Dim gSq = task.gSquares(i)
-                    Dim val = fLess.dst2.Get(Of Byte)(gSq.TopLeft.Y, gSq.TopLeft.X)
+                    Dim val = task.motionRGB.fLess.dst2.Get(Of Byte)(gSq.TopLeft.Y, gSq.TopLeft.X)
                     If val = 0 Then dst3.Rectangle(gSq, red, -1)
                 End If
             Next
@@ -174,16 +172,16 @@ Namespace VBClasses
 
 
     Public Class NR_FeatureLess_Unique3Pixels : Inherits TaskParent
-        Dim fless As New Hough_FeatureLessTopX
+        Dim fLessTopX As New Hough_FeatureLessTopX
         Dim sort3 As New Sort_3Channel
         Public Sub New()
             desc = "Find the unique 3-channel pixels for the featureless regions"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            fless.Run(src)
-            dst2 = fless.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+            fLessTopX.Run(src)
+            dst2 = fLessTopX.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
-            sort3.Run(fless.dst2)
+            sort3.Run(fLessTopX.dst2)
             dst3 = sort3.dst2
         End Sub
     End Class
@@ -263,14 +261,12 @@ Namespace VBClasses
 
 
     Public Class NR_FeatureLess_History : Inherits TaskParent
-        Dim fLess As New FeatureLess_Basics
         Dim frames As New History_Basics
         Public Sub New()
             desc = "Accumulate the edges over a span of X images."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            fLess.Run(src)
-            dst2 = fLess.dst2.Threshold(0, 255, cv.ThresholdTypes.Binary)
+            dst2 = task.motionRGB.fLess.dst2.Threshold(0, 255, cv.ThresholdTypes.Binary)
 
             frames.Run(dst2)
             dst3 = frames.dst2
@@ -285,15 +281,13 @@ Namespace VBClasses
 
     Public Class NR_FeatureLess_Groups : Inherits TaskParent
         Dim redCPP As New RedList_CPP
-        Dim fless As New FeatureLess_Basics
         Public classCount As Integer
         Public Sub New()
             desc = "Group RedCloud cells by the value of their featureless maxDist"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            fless.Run(src)
-            dst1 = fless.dst2.Threshold(0, 255, cv.ThresholdTypes.Binary)
-            labels(2) = fless.labels(2)
+            dst1 = task.motionRGB.fLess.dst2.Threshold(0, 255, cv.ThresholdTypes.Binary)
+            labels(2) = task.motionRGB.fLess.labels(2)
 
             If task.optionsChanged Then dst2 = dst1.Clone Else dst1.CopyTo(dst2, task.motionRGB.motionMask)
             redCPP.Run(dst2 - 1)
@@ -317,14 +311,14 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             If task.toggleOn Then
+                dst2 = task.leftView
+                dst3 = task.rightView
+            Else
                 fLess.Run(task.leftView)
                 dst2 = fLess.dst2.Clone
 
                 fLess.Run(task.rightView)
                 dst3 = fLess.dst2.Clone
-            Else
-                dst2 = task.leftView
-                dst3 = task.rightView
             End If
         End Sub
     End Class
@@ -334,16 +328,14 @@ Namespace VBClasses
 
 
     Public Class FeatureLess_RedColor : Inherits TaskParent
-        Dim fLess As New FeatureLess_Basics
         Dim redC As New RedColor_Basics
         Public Sub New()
             If standalone Then task.gOptions.displayDst1.Checked = True
             desc = "Use the featureLess_Basics output as input to RedColor_Basics"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            fLess.Run(src)
-            dst2 = fLess.dst2
-            labels(2) = fLess.labels(3)
+            dst2 = task.motionRGB.fLess.dst2
+            labels(2) = task.motionRGB.fLess.labels(3)
 
             redC.Run(dst2)
             dst3 = redC.dst2
@@ -368,15 +360,13 @@ Namespace VBClasses
 
 
     Public Class FeatureLess_Not : Inherits TaskParent
-        Dim fLess As New FeatureLess_Basics
         Dim feat As New Feature_General
         Public Sub New()
             desc = "Use the FeatureLess mask to reduce the input to feature searches."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            fLess.Run(src)
             dst2.SetTo(0)
-            src.CopyTo(dst2, Not fLess.dst2)
+            src.CopyTo(dst2, Not task.motionRGB.fLess.dst2)
 
             feat.Run(dst2)
             feat.dst2.CopyTo(dst3)
@@ -388,7 +378,6 @@ Namespace VBClasses
 
 
     Public Class FeatureLess_Cells : Inherits TaskParent
-        Dim fLess As New FeatureLess_Basics
         Dim saveColorMap As cv.Mat
         Public Sub New()
             saveColorMap = task.colorMap.Clone
@@ -396,11 +385,8 @@ Namespace VBClasses
             desc = "Group the featureless grid squares"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            dst1 = fLess.dst2.Clone ' save last map
-
-            fLess.Run(src)
-            dst2 = fLess.dst2
-            labels(2) = fLess.labels(2)
+            dst2 = task.motionRGB.fLess.dst2
+            labels(2) = task.motionRGB.fLess.labels(2)
 
             Dim index = 1
             Dim rect As cv.Rect
@@ -408,7 +394,7 @@ Namespace VBClasses
             Dim flags As cv.FloodFillFlags = cv.FloodFillFlags.Link4
             Dim minSize = task.brickSize * task.brickSize
             Dim countList As New SortedList(Of Integer, Integer)(New compareAllowIdenticalIntegerInverted)
-            For Each r In fLess.rectList
+            For Each r In task.motionRGB.fLess.rectList
                 Dim val = dst2.Get(Of Byte)(r.TopLeft.Y, r.TopLeft.X)
                 If val = 255 Then
                     Dim count = cv.Cv2.FloodFill(dst2, mask, r.TopLeft, index, rect, 0, 0, flags)

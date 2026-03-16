@@ -1293,7 +1293,7 @@ Namespace VBClasses
 
 
     Public Class NR_Histogram_ToggleFeatureLess : Inherits TaskParent
-        Dim fLess As New NR_BrickPoint_FeatureLess
+        Dim fLessBrick As New NR_BrickPoint_FeatureLess
         Dim plotHist As New Plot_Histogram
         Public Sub New()
             plotHist.maxRange = 255
@@ -1304,15 +1304,15 @@ Namespace VBClasses
             desc = "Toggle between a histogram of the entire image and one of the featureless regions found with grid points."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            fLess.Run(src)
-            dst3 = fLess.dst2
-            labels(3) = fLess.labels(2)
+            fLessBrick.Run(src)
+            dst3 = fLessBrick.dst2
+            labels(3) = fLessBrick.labels(2)
 
             If task.toggleOn Then
                 plotHist.histMask = New cv.Mat
                 labels(2) = "Histogram of the whole image."
             Else
-                plotHist.histMask = fLess.dst1.Clone
+                plotHist.histMask = fLessBrick.dst1.Clone
                 labels(2) = "Histogram of just the featureless regions."
             End If
             plotHist.Run(task.grayStable)

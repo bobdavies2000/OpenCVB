@@ -16,7 +16,7 @@ Namespace VBClasses
             If src.Channels <> 1 Then src = task.gray
             If task.optionsChanged Then dst2 = src.Clone
 
-            fLess.Run(src)
+            fLess.Run(src.Clone)
 
             diff.lastFrame = dst2
             diff.Run(src)

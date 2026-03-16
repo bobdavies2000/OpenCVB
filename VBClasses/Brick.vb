@@ -1014,7 +1014,6 @@ Namespace VBClasses
         Dim depthList As New List(Of Single)
         Dim options As New Options_DiffDepth
         Public depthJumpers As New List(Of Integer)
-        Dim fLess As New FeatureLess_Basics
         Public Sub New()
             OptionParent.FindSlider("Depth varies more than X mm's").Value = 30
             dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
@@ -1024,10 +1023,10 @@ Namespace VBClasses
             bricks.Run(src)
             options.Run()
 
-            fLess.Run(task.leftView)
+            task.motionRGB.fLess.Run(task.leftView)
             dst2 = src.Clone
-            dst2.SetTo(0, fLess.dst2)
-            labels(2) = fLess.labels(2)
+            dst2.SetTo(0, task.motionRGB.fLess.dst2)
+            labels(2) = task.motionRGB.fLess.labels(2)
 
             depthList.Clear()
             For i = 0 To task.gSquares.Count - 1
@@ -1049,7 +1048,7 @@ Namespace VBClasses
                 depthJumpers.Clear()
                 For i = 0 To depthList.Count - 1
                     Dim r = task.gSquares(i)
-                    Dim val = fLess.dst2.Get(Of Byte)(r.TopLeft.Y, r.TopLeft.X)
+                    Dim val = task.motionRGB.fLess.dst2.Get(Of Byte)(r.TopLeft.Y, r.TopLeft.X)
                     If val = 0 And depthList(i) <> 0 And lastDepthList(i) <> 0 Then
                         Dim diff = Math.Abs(depthList(i) - lastDepthList(i))
                         If diff > options.meters Then
@@ -1072,7 +1071,6 @@ Namespace VBClasses
         Dim bricks As New Brick_Basics
         Dim options As New Options_DiffDepth
         Public rangeJumpers As New List(Of Integer)
-        Dim fLess As New FeatureLess_Basics
         Public Sub New()
             OptionParent.FindSlider("Depth varies more than X mm's").Value = 300
             dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
@@ -1082,10 +1080,9 @@ Namespace VBClasses
             bricks.Run(src)
             options.Run()
 
-            fLess.Run(task.gray)
             dst2 = src.Clone
-            dst2.SetTo(0, fLess.dst2)
-            labels(2) = fLess.labels(2)
+            dst2.SetTo(0, task.motionRGB.fLess.dst2)
+            labels(2) = task.motionRGB.fLess.labels(2)
 
             If standaloneTest() Then
                 Static edges As New Edge_Canny
@@ -1114,8 +1111,8 @@ Namespace VBClasses
 
 
     Public Class Brick_Features : Inherits TaskParent
-        Dim fLess As New FeatureLess_Basics
         Dim bricks As New Brick_Basics
+        Dim fLess As New FeatureLess_Basics
         Public Sub New()
             desc = "Use FeatureLess_Basics to identify bricks with good contrast."
         End Sub

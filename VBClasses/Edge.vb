@@ -1672,16 +1672,14 @@ Namespace VBClasses
 
 
     Public Class Edge_Featureless : Inherits TaskParent
-        Dim fLess As New FeatureLess_Basics
         Dim edges As New Edge_Canny
         Public Sub New()
             desc = "Find the edges in the featureless output"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            fLess.Run(src)
             dst2 = src.Clone
-            dst2.SetTo(0, fLess.dst2)
-            labels(2) = fLess.labels(2)
+            dst2.SetTo(0, task.motionRGB.fLess.dst2)
+            labels(2) = task.motionRGB.fLess.labels(2)
 
             edges.Run(dst2)
             dst3 = edges.dst2
