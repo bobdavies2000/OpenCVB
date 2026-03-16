@@ -217,7 +217,7 @@ Namespace VBClasses
 
     Public Class Region_Depth : Inherits TaskParent
         Public redM As New RedMask_Basics
-        Public connect As New XO_Region_Rects
+        Public connect As New Region_Rects
         Public mdLargest As New List(Of maskData)
         Dim bricks As New Brick_Basics
         Public Sub New()
@@ -258,6 +258,110 @@ Namespace VBClasses
         End Sub
     End Class
 
+
+
+
+
+
+
+    Public Class Region_RectsH : Inherits TaskParent
+        Dim bricks As New Brick_Basics
+        Public hRects As New List(Of cv.Rect)
+        Dim connect As New Region_Core
+        Public Sub New()
+            dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+            desc = "Connect bricks with similar depth - horizontally scanning."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            bricks.Run(src)
+            connect.Run(src)
+
+            dst2.SetTo(0)
+            dst3.SetTo(0)
+            hRects.Clear()
+            Dim index As Integer
+            For Each tup In connect.hTuples
+                If tup.Item1 = tup.Item2 Then Continue For
+                Dim brick1 = bricks.brickList(tup.Item1)
+                Dim brick2 = bricks.brickList(tup.Item2)
+
+                Dim w = brick2.rect.BottomRight.X - brick1.rect.X
+                Dim h = brick1.rect.Height
+
+                Dim r = New cv.Rect(brick1.rect.X + 1, brick1.rect.Y, w - 1, h)
+
+                hRects.Add(r)
+                dst2(r).SetTo(255)
+
+                index += 1
+                dst3(r).SetTo(task.scalarColors(index Mod 256))
+            Next
+        End Sub
+    End Class
+
+
+
+
+
+
+    Public Class Region_RectsV : Inherits TaskParent
+        Dim bricks As New Brick_Basics
+        Public vRects As New List(Of cv.Rect)
+        Dim connect As New Region_Core
+        Public Sub New()
+            dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+            desc = "Connect bricks with similar depth - vertically scanning."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            bricks.Run(src)
+
+            connect.Run(src)
+
+            dst2.SetTo(0)
+            dst3.SetTo(0)
+            vRects.Clear()
+            Dim index As Integer
+            For Each tup In connect.vTuples
+                If tup.Item1 = tup.Item2 Then Continue For
+                Dim brick1 = bricks.brickList(tup.Item1)
+                Dim brick2 = bricks.brickList(tup.Item2)
+
+                Dim w = brick1.rect.Width
+                Dim h = brick2.rect.BottomRight.Y - brick1.rect.Y
+
+                Dim r = New cv.Rect(brick1.rect.X, brick1.rect.Y + 1, w, h - 1)
+                vRects.Add(r)
+                dst2(r).SetTo(255)
+
+                index += 1
+                dst3(r).SetTo(task.scalarColors(index Mod 256))
+            Next
+        End Sub
+    End Class
+
+
+
+
+
+
+    Public Class Region_Rects : Inherits TaskParent
+        Dim bricks As New Brick_Basics
+        Dim hConn As New Region_RectsH
+        Dim vConn As New Region_RectsV
+        Public Sub New()
+            desc = "Isolate the connected depth bricks both vertically and horizontally."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            bricks.Run(src)
+            hConn.Run(src)
+            vConn.Run(src)
+
+            dst2 = (Not vConn.dst2).ToMat Or (Not hConn.dst2).ToMat
+
+            dst3 = src
+            dst3.SetTo(0, dst2)
+        End Sub
+    End Class
 
 
 

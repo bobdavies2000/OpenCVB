@@ -1557,6 +1557,9 @@ Region_Basics
 Region_Core
 Region_Depth
 Region_DepthCorrelation
+Region_Rects
+Region_RectsH
+Region_RectsV
 Remap_Basics
 Remap_Flip
 Resize_Basics
