@@ -2,6 +2,39 @@ Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Class FeatureLess_Basics : Inherits TaskParent
         Public rectList As New List(Of cv.Rect)
+        Public Sub New()
+            dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+            desc = "Identify featureless squares using the gray scale range - see 'Correlation_Basics'."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            If src.Channels <> 1 Then src = task.gray
+
+            dst2.SetTo(0)
+            rectList.Clear()
+            For Each gSq In task.gSquares
+                Dim mm = GetMinMax(src(gSq))
+                If mm.range < task.fLessThreshold Then
+                    dst2(gSq).SetTo(255)
+                    rectList.Add(gSq)
+                End If
+            Next
+
+            If standaloneTest() Then
+                dst3 = src
+                For Each r In rectList
+                    dst3.Rectangle(r, white, task.lineWidth)
+                Next
+            End If
+            labels(3) = CStr(rectList.Count) + " grid squares were found to be featureless (range < " + CStr(task.fLessThreshold) + ")"
+        End Sub
+    End Class
+
+
+
+
+
+    Public Class NR_FeatureLess_Basics : Inherits TaskParent
+        Public rectList As New List(Of cv.Rect)
         Dim smallGrid As New Grid_SquaresOnly
         Public Sub New()
             If standalone Then task.gOptions.displayDst1.Checked = True
@@ -28,10 +61,7 @@ Namespace VBClasses
             Dim motionIndex As Integer
             rectList.Clear()
             For Each r In task.gSquares
-                If dst2.Get(Of Byte)(r.TopLeft.Y, r.TopLeft.X) Then
-
-                    rectList.Add(r)
-                End If
+                If dst2.Get(Of Byte)(r.TopLeft.Y, r.TopLeft.X) Then rectList.Add(r)
             Next
 
             If standaloneTest() Then
@@ -54,35 +84,6 @@ Namespace VBClasses
         End Sub
     End Class
 
-
-
-
-
-    Public Class NR_FeatureLess_Basics : Inherits TaskParent
-        Public rectList As New List(Of cv.Rect)
-        Public Sub New()
-            dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-            desc = "Identify featureless squares using the gray scale range - see 'Correlation_Basics'."
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            If src.Channels <> 1 Then src = task.gray
-
-            dst3 = src
-            dst2.SetTo(0)
-            Dim count As Integer
-            rectList.Clear()
-            For Each gSq In task.gSquares
-                Dim mm = GetMinMax(src(gSq))
-                If mm.range < task.fLessThreshold Then
-                    dst2(gSq).SetTo(255)
-                    count += 1
-                    dst3.Rectangle(gSq, white, task.lineWidth)
-                    rectList.Add(gSq)
-                End If
-            Next
-            labels(3) = CStr(count) + " grid squares were found to be featureless (range < " + CStr(task.fLessThreshold) + ")"
-        End Sub
-    End Class
 
 
 
