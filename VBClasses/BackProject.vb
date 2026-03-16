@@ -3,7 +3,6 @@ Imports cv = OpenCvSharp
 ' https://docs.opencvb.org/3.4/dc/df6/tutorial_py_Histogram_backprojection.html
 Namespace VBClasses
     Public Class BackProject_Basics : Inherits TaskParent
-        Implements IDisposable
         Public hist As New Histogram_Basics
         Public minRange As cv.Scalar, maxRange As cv.Scalar
         Public incr As Single
@@ -39,9 +38,6 @@ Namespace VBClasses
             Dim histMax As mmData = GetMinMax(hist.histogram)
             labels(3) = $"Highlight pixels {CInt(minRange(0))}-{CInt(maxRange(0))} with {CInt(count)} of {totalPixels}"
             dst2.Rectangle(New cv.Rect(CInt(histIndex) * colWidth, 0, colWidth, dst2.Height), cv.Scalar.Yellow, task.lineWidth)
-        End Sub
-        Protected Overrides Sub Finalize()
-            hist.Dispose()
         End Sub
     End Class
 

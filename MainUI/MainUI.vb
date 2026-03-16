@@ -203,7 +203,7 @@ Namespace MainApp
                 Dim input As New cv.Mat
                 input = cvext.BitmapConverter.ToMat(pics(vbc.task.mouseMagnifyPicTag).Image)
                 r = validateRect(r, input.Width, input.Height)
-                If r.Width = 0 Or r.Height = 0 Then Exit Sub
+                If r.Width < 5 Or r.Height < 5 Then Exit Sub
                 Dim img = input(r).Resize(New cv.Size(vbc.task.drawRect.Width * 5, vbc.task.drawRect.Height * 5))
                 cv.Cv2.ImShow("Magnifier", img)
                 vbc.task.mouseMagnifyEndPoint = New cv.Point

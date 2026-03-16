@@ -245,7 +245,7 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             labels(2) = "Grayscale histogram - yellow line shows trend"
-            hist.plotHist.backColor = cv.Scalar.Red
+            hist.plotHist.backgroundColor = cv.Scalar.Red
             hist.Run(src)
             dst2 = hist.dst2
 

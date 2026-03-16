@@ -510,7 +510,7 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             If task.heartBeat Then splitIndex = (splitIndex + 1) Mod 3
             src = src.ExtractChannel(splitIndex)
-            hist.hist.plotHist.backColor = Choose(splitIndex + 1, cv.Scalar.Blue,
+            hist.hist.plotHist.backgroundColor = Choose(splitIndex + 1, cv.Scalar.Blue,
                                           cv.Scalar.Green, cv.Scalar.Red)
             hist.Run(src)
             dst2 = hist.dst2

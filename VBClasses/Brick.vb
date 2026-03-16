@@ -224,34 +224,6 @@ Namespace VBClasses
 
 
 
-    Public Class NR_Brick_EdgeDraw : Inherits TaskParent
-        Dim bricks As New Brick_Basics
-        Dim regions As New Region_Contours
-        Dim edgeline As New EdgeLine_Basics
-        Public Sub New()
-            desc = "Lines can mean cells are connected."
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            bricks.Run(src)
-            regions.Run(src)
-            dst2 = regions.dst3
-            labels(2) = regions.labels(2)
-
-            edgeline.Run(task.grayStable)
-            dst2.SetTo(cv.Scalar.White, edgeline.dst2)
-        End Sub
-    End Class
-
-
-
-
-
-
-
-
-
-
-
     Public Class NR_Brick_CorrelationInput : Inherits TaskParent
         Dim bricks As New Brick_Basics
         Dim LRMeanSub As New MeanSubtraction_LeftRight
@@ -425,37 +397,6 @@ Namespace VBClasses
 
             dst2.Rectangle(New cv.Rect(irPt.X, irPt.Y, gSq.rect.Width, gSq.rect.Height), task.highlight, task.lineWidth)
             dst3.Rectangle(gSq.rRect, task.highlight, task.lineWidth)
-        End Sub
-    End Class
-
-
-
-
-
-
-
-    Public Class NR_Brick_RegionLines : Inherits TaskParent
-        Dim bricks As New Brick_Basics
-        Dim regions As New Region_Contours
-        Public Sub New()
-            desc = "Lines can mean cells are connected."
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            bricks.Run(src)
-            regions.Run(src)
-            dst2 = regions.dst2
-            dst3 = regions.dst3
-            labels = regions.labels
-
-            For Each lp In task.lines.lpList
-                Dim c1 = dst2.Get(Of cv.Vec3b)(lp.p1.Y, lp.p1.X)
-                Dim c2 = dst2.Get(Of cv.Vec3b)(lp.p2.Y, lp.p2.X)
-                If c1 <> c2 Then
-                    dst3.Line(lp.p1, lp.p2, white, task.lineWidth, task.lineWidth)
-                Else
-                    dst2.Line(lp.p1, lp.p2, white, task.lineWidth, task.lineWidth)
-                End If
-            Next
         End Sub
     End Class
 

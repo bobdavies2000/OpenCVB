@@ -4,6 +4,7 @@ Namespace VBClasses
         Public motionList As New List(Of Integer)
         Dim diff As New Diff_Basics
         Public motionMask As cv.Mat = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 255)
+        Public fLess As New FeatureLess_Basics
         Public Sub New()
             If standalone Then task.gOptions.showMotionMask.Checked = True
             dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
@@ -15,12 +16,17 @@ Namespace VBClasses
             If src.Channels <> 1 Then src = task.gray
             If task.optionsChanged Then dst2 = src.Clone
 
+            fLess.Run(src)
+
             diff.lastFrame = dst2
             diff.Run(src)
 
             motionList.Clear()
             For i = 0 To task.gSquares.Count - 1
-                Dim diffCount = diff.dst2(task.gSquares(i)).CountNonZero
+                Dim r = task.gSquares(i)
+                Dim val = fLess.dst2.Get(Of Byte)(r.TopLeft.Y, r.TopLeft.X)
+                If val Then Continue For ' no sense checking for motion if there aren't even features.
+                Dim diffCount = diff.dst2(r).CountNonZero
                 If diffCount >= task.motionThreshold Then
                     For Each index In task.grid.gridNeighbors(i)
                         If motionList.Contains(index) = False Then motionList.Add(index)

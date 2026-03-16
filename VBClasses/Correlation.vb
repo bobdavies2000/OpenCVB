@@ -3,6 +3,7 @@ Namespace VBClasses
     Public Class Correlation_Basics : Inherits TaskParent
         Public cList As New List(Of Single)
         Public corrThreshold As Single
+        Public mmRanges As New List(Of Double)
         Dim plotHist As New Plot_Histogram
         Public Sub New()
             plotHist.createHistogram = True
@@ -19,7 +20,7 @@ Namespace VBClasses
             cList.Clear()
             dst3 = src
             Dim mmList As New List(Of mmData)
-            Dim mmRanges As New List(Of Double)
+            mmRanges.Clear()
             For i = 0 To task.gSquares.Count - 1
                 Dim r = task.gSquares(i)
                 cv.Cv2.MatchTemplate(task.gray(r), lastsrc(r), correlationMat, cv.TemplateMatchModes.CCoeffNormed)

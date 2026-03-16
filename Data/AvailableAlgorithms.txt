@@ -587,7 +587,6 @@ NR_Brick_CloudMean
 NR_Brick_CloudRange
 NR_Brick_CorrelationInput
 NR_Brick_CorrelationMap
-NR_Brick_EdgeDraw
 NR_Brick_EdgeFlips
 NR_Brick_Edges
 NR_Brick_FeaturesAndEdges
@@ -600,7 +599,6 @@ NR_Brick_Lines
 NR_Brick_MLColor
 NR_Brick_MLColorDepth
 NR_Brick_NoDepthLines
-NR_Brick_RegionLines
 NR_Brick_RGBtoLeft
 NR_BrickLine_DepthGaps
 NR_BrickLine_Lines
@@ -1471,6 +1469,7 @@ Plot_Depth
 Plot_Histogram
 Plot_Histogram2D
 Plot_HistogramCoreRange
+Plot_Interactive
 Plot_OverTime
 Plot_OverTimeFixedScale
 Plot_OverTimeScalar
@@ -1555,7 +1554,6 @@ RedUtil_Basics
 RedWGrid_Basics
 RedWGrid_Click
 Region_Basics
-Region_Contours
 Region_Core
 Region_Depth
 Region_DepthCorrelation

@@ -215,40 +215,6 @@ Namespace VBClasses
 
 
 
-
-
-
-
-    Public Class Region_Contours : Inherits TaskParent
-        Public redM As New RedMask_Basics
-        Public connect As New XO_Region_Rects
-        Public Sub New()
-            dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
-            task.gOptions.TruncateDepth.Checked = True
-            desc = "Find the main regions connected in depth and build a contour for each."
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            connect.Run(src.Clone)
-            redM.Run(Not connect.dst2)
-
-            dst1.SetTo(0)
-            For Each md In redM.mdList
-                md.contour = ContourBuild(md.mask)
-                dst1(md.rect).SetTo(md.index, md.mask)
-            Next
-
-            dst2 = Palettize(dst1)
-            dst2.SetTo(0, connect.dst2)
-            dst3 = ShowAddweighted(src, dst2, labels(3))
-            labels(2) = "There were " + CStr(redM.mdList.Count) + " connected contours found."
-        End Sub
-    End Class
-
-
-
-
-
-
     Public Class Region_Depth : Inherits TaskParent
         Public redM As New RedMask_Basics
         Public connect As New XO_Region_Rects

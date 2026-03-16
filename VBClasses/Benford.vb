@@ -71,7 +71,7 @@ Namespace VBClasses
             End If
 
             Dim hist = cv.Mat.FromPixelData(counts.Length, 1, cv.MatType.CV_32F, counts)
-            plotHist.backColor = cv.Scalar.Blue
+            plotHist.backgroundColor = cv.Scalar.Blue
             plotHist.Run(hist)
             dst3 = plotHist.dst2.Clone
             For i = 0 To counts.Count - 1
@@ -79,7 +79,7 @@ Namespace VBClasses
             Next
 
             hist = cv.Mat.FromPixelData(counts.Length, 1, cv.MatType.CV_32F, counts)
-            plotHist.backColor = cv.Scalar.Gray
+            plotHist.backgroundColor = cv.Scalar.Gray
             plotHist.Run(hist)
 
             dst2 = ShowAddweighted(Not plotHist.dst2, dst3, labels(2))

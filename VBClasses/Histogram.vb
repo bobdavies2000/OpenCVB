@@ -25,7 +25,7 @@ Namespace VBClasses
             If standalone Then
                 If task.heartBeat Then splitIndex = (splitIndex + 1) Mod 3
                 mm = GetMinMax(src.ExtractChannel(splitIndex))
-                plotHist.backColor = Choose(splitIndex + 1, cv.Scalar.LightBlue, cv.Scalar.Green, cv.Scalar.LightPink)
+                plotHist.backgroundColor = Choose(splitIndex + 1, cv.Scalar.LightBlue, cv.Scalar.Green, cv.Scalar.LightPink)
             Else
                 If src.Channels() <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
                 mm = GetMinMax(src)
@@ -214,7 +214,7 @@ Namespace VBClasses
             split(4 - 1) = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY) ' add a 4th image - the grayscale image to the R G and B images.
             For i = 0 To split.Length - 1
                 Dim histSrc = split(i)
-                histogram.plotHist.backColor = Choose(i + 1, cv.Scalar.Blue, cv.Scalar.Green, cv.Scalar.Red, cv.Scalar.PowderBlue)
+                histogram.plotHist.backgroundColor = Choose(i + 1, cv.Scalar.Blue, cv.Scalar.Green, cv.Scalar.Red, cv.Scalar.PowderBlue)
                 histogram.Run(histSrc)
                 mats.mat(i) = histogram.plotHist.dst2.Clone
             Next
@@ -435,7 +435,7 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             Dim split = src.Split()
             For i = 0 To 3 - 1
-                peaks(i).hist.plotHist.backColor = Choose(i + 1, cv.Scalar.Blue, cv.Scalar.Green, cv.Scalar.Red)
+                peaks(i).hist.plotHist.backgroundColor = Choose(i + 1, cv.Scalar.Blue, cv.Scalar.Green, cv.Scalar.Red)
                 peaks(i).hist.plotHist.addLabels = False
                 peaks(i).Run(split(i))
                 mats.mat(i) = peaks(i).dst2.Clone
@@ -531,7 +531,7 @@ Namespace VBClasses
             histogram = cv.Mat.FromPixelData(task.kalman.kOutput.Length, 1, cv.MatType.CV_32FC1, task.kalman.kOutput)
 
             Dim splitColors() = {cv.Scalar.Blue, cv.Scalar.Green, cv.Scalar.Red}
-            If standaloneTest() Then plotHist.backColor = splitColors(splitIndex)
+            If standaloneTest() Then plotHist.backgroundColor = splitColors(splitIndex)
             plotHist.Run(histogram)
             dst2 = plotHist.dst2
 
@@ -573,7 +573,7 @@ Namespace VBClasses
 
             If standaloneTest() Or displayHist Then
                 cv.Cv2.Split(task.color, rgb) ' equalizehist alters the input...
-                kalman.plotHist.backColor = cv.Scalar.Red
+                kalman.plotHist.backgroundColor = cv.Scalar.Red
                 kalman.Run(rgb(channel).Clone())
                 mats.mat(0) = kalman.dst2.Clone()
 

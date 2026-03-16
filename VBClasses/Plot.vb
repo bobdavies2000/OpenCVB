@@ -525,90 +525,6 @@ Namespace VBClasses
 
 
 
-    Public Class Plot_Histogram : Inherits TaskParent
-        Public histogram As New cv.Mat
-        Public histArray() As Single
-        Public minRange As Single
-        Public maxRange As Single
-        Public ranges() As cv.Rangef
-        Public backColor As cv.Scalar = cv.Scalar.Red
-        Public plotCenter As Single
-        Public barWidth As Single
-        Public addLabels As Boolean = True
-        Public removeZeroEntry As Boolean = True
-        Public createHistogram As Boolean = False
-        Public shadeValues As Boolean = True
-        Public histMask As New cv.Mat
-        Public mm As mmData
-        Public Sub New()
-            desc = "Plot histogram data with a stable scale at the left of the image."
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            Dim min = minRange
-            Dim max = maxRange
-            If standaloneTest() Or createHistogram Then
-                If src.Channels() <> 1 Then src = task.grayStable.Clone
-                If minRange = 0 And maxRange = 0 Then
-                    Dim mm = GetMinMax(src)
-                    min = mm.minVal
-                    max = mm.maxVal
-                    If min = 0 And max = 0 Then
-                        If src.Type = cv.MatType.CV_32F Then
-                            max = task.MaxZmeters
-                        Else
-                            max = 255
-                        End If
-                    End If
-                End If
-                If Single.IsNaN(min) Or Single.IsInfinity(min) Then min = Single.MinValue
-                If Single.IsNaN(max) Or Single.IsInfinity(max) Then max = Single.MaxValue
-                ranges = {New cv.Rangef(min, max)}
-                cv.Cv2.CalcHist({src}, {0}, histMask, histogram, 1, {task.histogramBins}, ranges)
-            Else
-                histogram = src
-            End If
-
-            If removeZeroEntry Then histogram.Set(Of Single)(0, 0, 0) ' let's not plot the values at zero...i.e. Depth at 0, for instance, needs to be removed.
-            ReDim histArray(histogram.Rows - 1)
-            histogram.GetArray(Of Single)(histArray)
-
-            dst2.SetTo(backColor)
-            barWidth = dst2.Width / histogram.Rows
-            plotCenter = barWidth * histogram.Rows / 2 + barWidth / 2
-
-            mm = GetMinMax(histogram)
-
-            ' somewacky values for the stereolabs devices.
-            If mm.minVal > -100000000 And mm.maxVal < 100000000 Then
-                If Math.Abs(mm.maxVal - mm.minVal) > 0 And histogram.Rows > 0 Then
-                    Dim incr = 255 / histogram.Rows
-                    Dim color As cv.Scalar
-                    For i = 0 To histArray.Count - 1
-                        If Single.IsNaN(histArray(i)) Then histArray(i) = 0
-                        If histArray(i) > 0 Then
-                            Dim h As Single = histArray(i) * dst2.Height / mm.maxVal
-                            If shadeValues Then
-                                Dim sIncr = (i Mod 256) * incr
-                                color = New cv.Scalar(sIncr, sIncr, sIncr)
-                                If histogram.Rows > 255 Then color = cv.Scalar.Black
-                            Else
-                                color = cv.Scalar.Black
-                            End If
-                            cv.Cv2.Rectangle(dst2, New cv.Rect(i * barWidth, dst2.Height - h,
-                                                               Math.Max(1, barWidth), h), color, -1)
-                            End If
-                    Next
-                    If addLabels Then Plot_Basics.AddPlotScale(dst2, mm.minVal, mm.maxVal)
-                End If
-                labels(2) = CStr(CInt(mm.maxVal)) + " max value " + CStr(CInt(mm.minVal)) + " min value"
-            End If
-
-        End Sub
-    End Class
-
-
-
-
 
     Public Class Plot_HistogramCoreRange : Inherits TaskParent
         Public redCore As New RedPrep_Core
@@ -661,4 +577,133 @@ Namespace VBClasses
         End Sub
     End Class
 
+
+
+
+
+    Public Class Plot_Histogram : Inherits TaskParent
+        Public histogram As New cv.Mat
+        Public histArray() As Single
+        Public minRange As Single
+        Public maxRange As Single
+        Public ranges() As cv.Rangef
+        Public backgroundColor As cv.Scalar = cv.Scalar.Red
+        Public plotCenter As Single
+        Public barWidth As Single
+        Public addLabels As Boolean = True
+        Public removeZeroEntry As Boolean = True
+        Public createHistogram As Boolean = False
+        Public shadeValues As Boolean = True
+        Public histMask As New cv.Mat
+        Public mm As mmData
+        Public Sub New()
+            desc = "Plot histogram data with a stable scale at the left of the image."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            Dim min = minRange
+            Dim max = maxRange
+            If standaloneTest() Or createHistogram Then
+                If src.Channels() <> 1 Then src = task.grayStable.Clone
+                If minRange = 0 And maxRange = 0 Then
+                    Dim mm = GetMinMax(src)
+                    min = mm.minVal
+                    max = mm.maxVal
+                    If min = 0 And max = 0 Then
+                        If src.Type = cv.MatType.CV_32F Then
+                            max = task.MaxZmeters
+                        Else
+                            max = 255
+                        End If
+                    End If
+                End If
+                If Single.IsNaN(min) Or Single.IsInfinity(min) Then min = Single.MinValue
+                If Single.IsNaN(max) Or Single.IsInfinity(max) Then max = Single.MaxValue
+                ranges = {New cv.Rangef(min, max)}
+                cv.Cv2.CalcHist({src}, {0}, histMask, histogram, 1, {task.histogramBins}, ranges)
+            Else
+                histogram = src
+            End If
+
+            If removeZeroEntry Then histogram.Set(Of Single)(0, 0, 0) ' let's not plot the values at zero...i.e. Depth at 0, for instance, needs to be removed.
+            ReDim histArray(histogram.Rows - 1)
+            histogram.GetArray(Of Single)(histArray)
+
+            dst2.SetTo(backgroundColor)
+            barWidth = dst2.Width / histogram.Rows
+            plotCenter = barWidth * histogram.Rows / 2 + barWidth / 2
+
+            mm = GetMinMax(histogram)
+
+            ' somewacky values for the stereolabs devices.
+            If mm.minVal > -100000000 And mm.maxVal < 100000000 Then
+                If Math.Abs(mm.maxVal - mm.minVal) > 0 And histogram.Rows > 0 Then
+                    Dim incr = 255 / histogram.Rows
+                    Dim color As cv.Scalar
+                    For i = 0 To histArray.Count - 1
+                        If Single.IsNaN(histArray(i)) Then histArray(i) = 0
+                        If histArray(i) > 0 Then
+                            Dim h As Single = histArray(i) * dst2.Height / mm.maxVal
+                            If shadeValues Then
+                                Dim sIncr = (i Mod 256) * incr
+                                color = New cv.Scalar(sIncr, sIncr, sIncr)
+                                If histogram.Rows > 255 Then color = cv.Scalar.Black
+                            Else
+                                color = cv.Scalar.Black
+                            End If
+                            cv.Cv2.Rectangle(dst2, New cv.Rect(i * barWidth, dst2.Height - h,
+                                                               Math.Max(1, barWidth), h), color, -1)
+                        End If
+                    Next
+                    If addLabels Then Plot_Basics.AddPlotScale(dst2, mm.minVal, mm.maxVal)
+                End If
+                labels(2) = CStr(CInt(mm.maxVal)) + " max value " + CStr(CInt(mm.minVal)) + " min value"
+            End If
+        End Sub
+    End Class
+
+
+
+    Public Class Plot_Interactive : Inherits TaskParent
+        Public plotHist As New Plot_Histogram
+        Dim corr As New Correlation_Basics
+        Public Sub New()
+            dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
+            plotHist.minRange = 0
+            plotHist.maxRange = 2
+            plotHist.createHistogram = False
+            plotHist.shadeValues = False
+            labels(2) = "Move mouse to identify grid squares in the image."
+            desc = "Mouse over any bin to see the grid squares in the selected range."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            corr.Run(src)
+
+            Dim histogram(task.histogramBins - 1) As Single
+            Dim incr = 2 / task.histogramBins
+            dst1.SetTo(0)
+            For i = 0 To corr.cList.Count - 1
+                Dim bin = CInt(corr.cList(i) / incr) - 1
+                If bin > 0 Then
+                    Dim r = task.gSquares(i)
+                    dst1(r).SetTo(bin)
+                    histogram(bin) += 1
+                End If
+            Next
+
+            Dim histInput As cv.Mat = cv.Mat.FromPixelData(histogram.Count, 1, cv.MatType.CV_32F, histogram)
+            plotHist.Run(histInput)
+            dst2 = plotHist.dst2
+            labels(3) = plotHist.labels(2)
+
+            Dim totalPixels = dst2.Total ' assume we are including zeros.
+            Dim colWidth = dst2.Width / task.histogramBins
+            Dim histIndex = Math.Floor(task.mouseMovePoint.X / colWidth)
+            dst0 = dst1.InRange(histIndex, histIndex)
+
+            Dim actualCount = dst0.CountNonZero
+            dst3 = task.color.Clone
+            dst3.SetTo(cv.Scalar.Yellow, dst0)
+            dst2.Rectangle(New cv.Rect(CInt(histIndex) * colWidth, 0, colWidth, dst2.Height), cv.Scalar.Yellow, task.lineWidth)
+        End Sub
+    End Class
 End Namespace

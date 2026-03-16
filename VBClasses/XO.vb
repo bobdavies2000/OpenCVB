@@ -2726,7 +2726,7 @@ Namespace VBClasses
 
     Public Class XO_Region_RedColor : Inherits TaskParent
         Dim bricks As New Brick_Basics
-        Dim connect As New Region_Contours
+        Dim connect As New XO_Region_Contours
         Public Sub New()
             desc = "Color each redCell with the color of the nearest grid square region."
         End Sub
@@ -11045,7 +11045,7 @@ Namespace VBClasses
 
 
     Public Class XO_RedList_GridCellsOld : Inherits TaskParent
-        Dim regions As New Region_Contours
+        Dim regions As New XO_Region_Contours
         Public Sub New()
             If standalone Then task.gOptions.displayDst1.Checked = True
             desc = "Use the brickData regions to build task.redList.oldrclist"
@@ -11095,7 +11095,7 @@ Namespace VBClasses
 
 
     Public Class XO_RedList_GridCells : Inherits TaskParent
-        Dim regions As New Region_Contours
+        Dim regions As New XO_Region_Contours
         Public Sub New()
             task.gOptions.TruncateDepth.Checked = True
             If standalone Then task.gOptions.displayDst1.Checked = True
@@ -11142,7 +11142,7 @@ Namespace VBClasses
 
 
     Public Class XO_RedList_GridCellsHist : Inherits TaskParent
-        Dim regions As New Region_Contours
+        Dim regions As New XO_Region_Contours
         Public Sub New()
             task.gOptions.TruncateDepth.Checked = True
             desc = "For each redCell find the highest population region it covers."
@@ -19122,6 +19122,91 @@ Namespace VBClasses
 
             labels(2) = "Of the " + CStr(task.features.Count) + " input points, " + CStr(mPoints.ptx.Count) +
                     " points were tracked with correlation above " + Format(task.fCorrThreshold, fmt2)
+        End Sub
+    End Class
+
+
+
+
+
+
+
+    Public Class XO_Brick_EdgeDraw : Inherits TaskParent
+        Dim bricks As New Brick_Basics
+        Dim regions As New XO_Region_Contours
+        Dim edgeline As New EdgeLine_Basics
+        Public Sub New()
+            desc = "Lines can mean cells are connected."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            bricks.Run(src)
+            regions.Run(src)
+            dst2 = regions.dst3
+            labels(2) = regions.labels(2)
+
+            edgeline.Run(task.grayStable)
+            dst2.SetTo(cv.Scalar.White, edgeline.dst2)
+        End Sub
+    End Class
+
+
+
+
+
+
+
+    Public Class XO_Region_Contours : Inherits TaskParent
+        Public redM As New RedMask_Basics
+        Public connect As New XO_Region_Rects
+        Public Sub New()
+            dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
+            task.gOptions.TruncateDepth.Checked = True
+            desc = "Find the main regions connected in depth and build a contour for each."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            connect.Run(src.Clone)
+            redM.Run(Not connect.dst2)
+
+            dst1.SetTo(0)
+            For Each md In redM.mdList
+                md.contour = ContourBuild(md.mask)
+                dst1(md.rect).SetTo(md.index, md.mask)
+            Next
+
+            dst2 = Palettize(dst1)
+            dst2.SetTo(0, connect.dst2)
+            dst3 = ShowAddweighted(src, dst2, labels(3))
+            labels(2) = "There were " + CStr(redM.mdList.Count) + " connected contours found."
+        End Sub
+    End Class
+
+
+
+
+
+
+    Public Class XO_Brick_RegionLines : Inherits TaskParent
+        Dim bricks As New Brick_Basics
+        Dim regions As New XO_Region_Contours
+        Public Sub New()
+            desc = "Lines can mean cells are connected."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            bricks.Run(src)
+            regions.Run(src)
+            dst2 = regions.dst2
+            dst3 = regions.dst3
+            labels = regions.labels
+
+            For Each lp In task.lines.lpList
+                Dim c1 = dst2.Get(Of cv.Vec3b)(lp.p1.Y, lp.p1.X)
+                Dim c2 = dst2.Get(Of cv.Vec3b)(lp.p2.Y, lp.p2.X)
+                If c1 <> c2 Then
+                    dst3.Line(lp.p1, lp.p2, white, task.lineWidth, task.lineWidth)
+                Else
+                    dst2.Line(lp.p1, lp.p2, white, task.lineWidth, task.lineWidth)
+                End If
+            Next
         End Sub
     End Class
 End Namespace

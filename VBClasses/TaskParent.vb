@@ -122,10 +122,10 @@ Namespace VBClasses
                 task.colorMap.Set(Of cv.Vec3b)(0, 0, New cv.Vec3b(0, 0, 0))
             End If
             Dim output As New cv.Mat
-            'If input.Type <> cv.MatType.CV_8U Then
-            '    Dim input8u As New cv.Mat
-            '    input.ConvertTo(input, cv.MatType.CV_8U)
-            'End If
+            If input.Type <> cv.MatType.CV_8U Then
+                Dim input8u As New cv.Mat
+                input.ConvertTo(input, cv.MatType.CV_8U)
+            End If
             cv.Cv2.ApplyColorMap(input, output, task.colorMap)
             Return output
         End Function
