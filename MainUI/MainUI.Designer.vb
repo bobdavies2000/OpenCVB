@@ -136,7 +136,7 @@ Namespace MainApp
             AlgDescription.MaxLength = 200
             AlgDescription.Name = "AlgDescription"
             AlgDescription.Size = New Size(499, 37)
-            AlgDescription.Text = "Description of algorithm"
+            AlgDescription.Text = "Description - hover if the description is too long to fit."
             AlgDescription.ToolTipText = "Description"
             ' 
             ' labelRGB

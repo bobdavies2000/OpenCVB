@@ -116,6 +116,7 @@ Corners_HarrisDetector_CPP
 Corners_RedPrepData
 Corners_ShiTomasi_CPP
 Correlation_Basics
+Correlation_Interactive
 Covariance_Basics
 Covariance_Images
 DCT_Basics
@@ -290,6 +291,7 @@ Gravity_CloudMethod
 Grid_Basics
 Grid_FPS
 Grid_Rectangles
+Grid_SquaresOnly
 GridRect_Basics
 GridRect_Canny
 GridRect_LowStdev
@@ -870,6 +872,7 @@ NR_FeatureFlow_Basics
 NR_FeatureFlow_LeftRight1
 NR_FeatureLess_Basics
 NR_FeatureLess_Canny
+NR_FeatureLess_Contours
 NR_FeatureLess_DCT
 NR_FeatureLess_Groups
 NR_FeatureLess_Histogram

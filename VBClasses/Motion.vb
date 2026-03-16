@@ -16,12 +16,10 @@ Namespace VBClasses
             If src.Channels <> 1 Then src = task.gray
             If task.optionsChanged Then dst2 = src.Clone
 
-            fLess.Run(src.Clone)
-
             diff.lastFrame = dst2
             diff.Run(src)
 
-            motionList.Clear()
+            Dim gridList As New SortedList(Of Integer, Integer)
             For i = 0 To task.gSquares.Count - 1
                 Dim r = task.gSquares(i)
                 Dim val = fLess.dst2.Get(Of Byte)(r.TopLeft.Y, r.TopLeft.X)
@@ -29,11 +27,12 @@ Namespace VBClasses
                 Dim diffCount = diff.dst2(r).CountNonZero
                 If diffCount >= task.motionThreshold Then
                     For Each index In task.grid.gridNeighbors(i)
-                        If motionList.Contains(index) = False Then motionList.Add(index)
+                        If gridList.Keys.Contains(index) = False Then gridList.Add(index, index)
                     Next
                 End If
             Next
 
+            motionList = New List(Of Integer)(gridList.Keys)
             motionMask.SetTo(0)
             dst3.SetTo(0)
             For Each index In motionList
@@ -42,6 +41,8 @@ Namespace VBClasses
                 dst3(rect).SetTo(255)
                 motionMask(rect).SetTo(255)
             Next
+
+            fLess.Run(src.Clone)
 
             labels(2) = "Grid rects with motion: " + CStr(motionList.Count)
         End Sub
@@ -63,7 +64,7 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             If src.Channels <> 1 Then dst1 = task.gray.Clone Else dst1 = src.Clone
-            dst2 = task.motionRGB.dst2.Clone()
+            dst2 = task.motion.dst2.Clone()
 
             diff.lastFrame = dst2
             diff.Run(dst1)
@@ -71,7 +72,7 @@ Namespace VBClasses
 
             SetTrueText("Pixels different from camera image: " + CStr(diff.dst2.CountNonZero) + vbCrLf +
                     "Grid rects with more than " + CStr(task.motionThreshold) +
-                    " pixels different: " + CStr(task.motionRGB.motionList.Count), 3)
+                    " pixels different: " + CStr(task.motion.motionList.Count), 3)
         End Sub
     End Class
 
@@ -318,7 +319,7 @@ Namespace VBClasses
             cList.Clear()
             dst3 = src
             Dim count As Integer
-            For Each index In task.motionRGB.motionList
+            For Each index In task.motion.motionList
                 Dim r = task.gSquares(index)
                 dst2.Rectangle(r, white, task.lineWidth)
                 cv.Cv2.MatchTemplate(dst2(r), lastsrc(r), correlationMat, cv.TemplateMatchModes.CCoeffNormed)

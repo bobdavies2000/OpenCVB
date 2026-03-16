@@ -146,82 +146,6 @@ Namespace VBClasses
 
 
 
-    Public Class NR_Brick_MLColorDepth : Inherits TaskParent
-        Dim ml As New ML_Basics
-        Dim bounds As New NR_Brick_FeaturesAndEdges
-        Public Sub New()
-            If standalone Then task.gOptions.displayDst1.Checked = True
-            ml.buildEveryPass = True
-            dst1 = New cv.Mat(dst2.Size, cv.MatType.CV_8U)
-            desc = "Train an ML tree to predict each pixel of the boundary cells using color and depth from boundary neighbors."
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            bounds.Run(src)
-            Dim edgeMask = bounds.feat.edges.dst2
-
-            Dim rgb32f As New cv.Mat, tmp As New cv.Mat
-            src.ConvertTo(rgb32f, cv.MatType.CV_32FC3)
-
-            dst1 = bounds.feat.fLessMask
-            Dim trainRGB As cv.Mat, trainDepth As cv.Mat
-            For i = 0 To bounds.boundaryCells.Count - 1
-                Dim nList = bounds.boundaryCells(i)
-
-                ' the first grid square is the center one and the only grid square with edges.  The rest are featureless.
-                Dim gSq = task.gSquares(nList(0))
-                Dim edgePixels = edgeMask(gSq).FindNonZero()
-
-                ' mark the edge pixels as class 2 - others will be updated next
-                ml.trainResponse = New cv.Mat(nList.Count + edgePixels.Rows - 1, 1,
-                                           cv.MatType.CV_32F, New cv.Scalar(2))
-                trainRGB = New cv.Mat(ml.trainResponse.Rows, 1, cv.MatType.CV_32FC3)
-                trainDepth = New cv.Mat(ml.trainResponse.Rows, 1, cv.MatType.CV_32F)
-
-                For j = 1 To nList.Count - 1
-                    Dim grA = task.gSquares(nList(j))
-                    Dim x As Integer = Math.Floor(grA.X * task.bricksPerRow / task.cols)
-                    Dim y As Integer = Math.Floor(grA.Y * task.bricksPerCol / task.rows)
-                    Dim val = task.lowResColor.Get(Of cv.Vec3f)(y, x)
-                    trainRGB.Set(Of cv.Vec3f)(j - 1, 0, val)
-                    trainDepth.Set(Of Single)(j - 1, 0, task.lowResDepth.Get(Of Single)(y, x))
-                    ml.trainResponse.Set(Of Single)(j - 1, 0, 1)
-                Next
-
-                ' next, add the edge pixels in the target cell - they are the feature identifiers.
-                Dim index = nList.Count - 1
-                For j = 0 To edgePixels.Rows - 1
-                    Dim pt = edgePixels.Get(Of cv.Point)(j, 0)
-                    Dim val = rgb32f(gSq).Get(Of cv.Vec3f)(pt.Y, pt.X)
-                    trainRGB.Set(Of cv.Vec3f)(index + j, 0, val) ' ml.trainResponse already set to 2
-                    Dim depth = task.pcSplit(2)(gSq).Get(Of Single)(pt.Y, pt.X)
-                    trainDepth.Set(Of Single)(index + j, 0, depth)
-                Next
-
-                ml.trainMats = {trainRGB, trainDepth}
-
-                Dim grB = task.gSquares(nList(0))
-                ml.testMats = {rgb32f(grB), task.pcSplit(2)(grB)}
-                ml.Run(src)
-
-                dst1(grB) = ml.predictions.Threshold(1.5, 255, cv.ThresholdTypes.BinaryInv).
-                                        ConvertScaleAbs.Reshape(1, grB.Height)
-            Next
-
-            dst2.SetTo(0)
-            src.CopyTo(dst2, dst1)
-
-            dst3.SetTo(0)
-            src.CopyTo(dst3, Not dst1)
-
-            labels = {"Src image with edges.", "Src featureless regions", ml.options.ML_Name +
-                  " found FeatureLess Regions", ml.options.ML_Name + " found these regions had features"}
-        End Sub
-    End Class
-
-
-
-
-
 
 
     Public Class NR_Brick_CorrelationInput : Inherits TaskParent
@@ -1023,10 +947,10 @@ Namespace VBClasses
             bricks.Run(src)
             options.Run()
 
-            task.motionRGB.fLess.Run(task.leftView)
+            task.motion.fLess.Run(task.leftView)
             dst2 = src.Clone
-            dst2.SetTo(0, task.motionRGB.fLess.dst2)
-            labels(2) = task.motionRGB.fLess.labels(2)
+            dst2.SetTo(0, task.motion.fLess.dst2)
+            labels(2) = task.motion.fLess.labels(2)
 
             depthList.Clear()
             For i = 0 To task.gSquares.Count - 1
@@ -1048,7 +972,7 @@ Namespace VBClasses
                 depthJumpers.Clear()
                 For i = 0 To depthList.Count - 1
                     Dim r = task.gSquares(i)
-                    Dim val = task.motionRGB.fLess.dst2.Get(Of Byte)(r.TopLeft.Y, r.TopLeft.X)
+                    Dim val = task.motion.fLess.dst2.Get(Of Byte)(r.TopLeft.Y, r.TopLeft.X)
                     If val = 0 And depthList(i) <> 0 And lastDepthList(i) <> 0 Then
                         Dim diff = Math.Abs(depthList(i) - lastDepthList(i))
                         If diff > options.meters Then
@@ -1081,8 +1005,8 @@ Namespace VBClasses
             options.Run()
 
             dst2 = src.Clone
-            dst2.SetTo(0, task.motionRGB.fLess.dst2)
-            labels(2) = task.motionRGB.fLess.labels(2)
+            dst2.SetTo(0, task.motion.fLess.dst2)
+            labels(2) = task.motion.fLess.labels(2)
 
             If standaloneTest() Then
                 Static edges As New Edge_Canny

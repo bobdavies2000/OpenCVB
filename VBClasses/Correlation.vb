@@ -8,12 +8,19 @@ Namespace VBClasses
         Public Sub New()
             plotHist.createHistogram = True
             plotHist.shadeValues = False
+            plotHist.minRange = -1
+            plotHist.maxRange = 1
             task.gOptions.HistBinBar.Value = task.gOptions.HistBinBar.Maximum
             If standalone Then task.gOptions.displayDst1.Checked = True
             labels(1) = "Click on a rectangle to see the correlation of the current to last image."
             desc = "Measure the correlation of all grid squares."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
+            'If task.heartBeat = False Then
+            '    SetTrueText(strOut, 1)
+            '    Exit Sub
+            'End If
+
             Static lastsrc As cv.Mat = task.gray.Clone
             dst2 = task.gray.Clone
             Dim correlationMat As New cv.Mat
@@ -35,7 +42,7 @@ Namespace VBClasses
             lastsrc = task.gray.Clone
 
             If cList.Count > 0 Then
-                Dim inputAdjusted = cv.Mat.FromPixelData(cList.Count, 1, cv.MatType.CV_32F, cList.ToArray)
+                Dim inputAdjusted = cv.Mat.FromPixelData(cList.Count, 1, cv.MatType.CV_32F, cList.ToArray) - 1
                 plotHist.Run(inputAdjusted)
                 dst3 = plotHist.dst2
 
@@ -56,14 +63,15 @@ Namespace VBClasses
 
                 Dim index = task.gridMap.Get(Of Integer)(task.clickPoint.Y, task.clickPoint.X)
                 Dim mm = mmList(index)
-                SetTrueText("Click on any grid rect to see its grayscale range." + vbCrLf +
-                            "Min gray = " + Format(mm.minVal, fmt0) + vbCrLf +
-                            "Max Gray = " + Format(mm.maxVal, fmt0) + vbCrLf +
-                            "Range = " + Format(mm.range, fmt0) + vbCrLf + vbCrLf +
-                            "Surveying the deteriorated correlations:" + vbCrLf +
-                            If(mmRangeTest.Count = 0, "",
-                            "Min Range = " + Format(mmRangeTest.Min, fmt1) + vbCrLf +
-                            "Max Range = " + Format(mmRangeTest.Max, fmt1)), 1)
+                strOut = "Click on any grid rect to see its grayscale range." + vbCrLf +
+                         "Min gray = " + Format(mm.minVal, fmt0) + vbCrLf +
+                         "Max Gray = " + Format(mm.maxVal, fmt0) + vbCrLf +
+                         "Range = " + Format(mm.range, fmt0) + vbCrLf + vbCrLf +
+                         "Surveying the deteriorated correlations:" + vbCrLf +
+                         If(mmRangeTest.Count = 0, "",
+                         "Min Range = " + Format(mmRangeTest.Min, fmt1) + vbCrLf +
+                         "Max Range = " + Format(mmRangeTest.Max, fmt1))
+                SetTrueText(strOut, 1)
             End If
         End Sub
     End Class
@@ -135,4 +143,22 @@ Namespace VBClasses
             End If
         End Sub
     End Class
+
+
+
+
+    Public Class Correlation_Interactive : Inherits TaskParent
+        Dim plot As New Plot_Interactive
+        Public Sub New()
+            desc = "Plot the range of correlations and display their source - duplicate of Plot_Interactive"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            plot.Run(src)
+            dst2 = plot.dst2
+            dst3 = plot.dst3
+            labels(2) = plot.labels(2)
+            labels(3) = plot.labels(3)
+        End Sub
+    End Class
+
 End Namespace

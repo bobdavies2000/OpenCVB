@@ -42,7 +42,7 @@ Namespace VBClasses
             Return ld.Detect(src)
         End Function
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If standalone Then motionMask = task.motionRGB.motionMask
+            If standalone Then motionMask = task.motion.motionMask
 
             If src.Channels <> 1 Or src.Type <> cv.MatType.CV_8U Then src = task.gray.Clone
             If lpList.Count <= 1 Then
@@ -110,7 +110,7 @@ Namespace VBClasses
             desc = "Line_Basics is a task algorithm so this is the better way to test it."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            lines.motionMask = task.motionRGB.motionMask
+            lines.motionMask = task.motion.motionMask
             lines.Run(task.gray)
             dst2.SetTo(0)
             For Each lp In lines.lpList

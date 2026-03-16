@@ -1280,7 +1280,7 @@ Namespace VBClasses
 
             canny.Run(LRMeanSub.dst2)
 
-            If task.optionsChanged Then dst2 = canny.dst2.Clone Else canny.dst2.CopyTo(dst2, task.motionRGB.motionMask)
+            If task.optionsChanged Then dst2 = canny.dst2.Clone Else canny.dst2.CopyTo(dst2, task.motion.motionMask)
         End Sub
     End Class
 
@@ -1678,8 +1678,8 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             dst2 = src.Clone
-            dst2.SetTo(0, task.motionRGB.fLess.dst2)
-            labels(2) = task.motionRGB.fLess.labels(2)
+            dst2.SetTo(0, task.motion.fLess.dst2)
+            labels(2) = task.motion.fLess.labels(2)
 
             edges.Run(dst2)
             dst3 = edges.dst2

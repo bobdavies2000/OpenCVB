@@ -380,6 +380,7 @@ Namespace MainApp
             vbc.task.lowResColor = New cv.Mat(vbc.task.workRes, cv.MatType.CV_32F)
             vbc.task.MainUI_Algorithm = createAlgorithm(settings.algorithm)
             AlgDescription.Text = vbc.task.MainUI_Algorithm.desc
+            AlgDescription.ToolTipText = vbc.task.MainUI_Algorithm.desc
             vbc.task.resolutionDetails = resolutionDetails
 
             If vbc.task.calibData IsNot Nothing Then vbc.task.calibData = camera.calibData

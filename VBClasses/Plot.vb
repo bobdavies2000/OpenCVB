@@ -679,6 +679,7 @@ Namespace VBClasses
             corr.Run(src)
 
             Dim histogram(task.histogramBins - 1) As Single
+            Dim ranges(task.histogramBins - 1) As List(Of Single)
             Dim incr = 2 / task.histogramBins
             dst1.SetTo(0)
             For i = 0 To corr.cList.Count - 1
@@ -687,6 +688,8 @@ Namespace VBClasses
                     Dim r = task.gSquares(i)
                     dst1(r).SetTo(bin)
                     histogram(bin) += 1
+                    If ranges(bin) Is Nothing Then ranges(bin) = New List(Of Single)
+                    ranges(bin).Add(corr.mmRanges(i))
                 End If
             Next
 
@@ -699,6 +702,11 @@ Namespace VBClasses
             Dim colWidth = dst2.Width / task.histogramBins
             Dim histIndex = Math.Floor(task.mouseMovePoint.X / colWidth)
             dst0 = dst1.InRange(histIndex, histIndex)
+            If ranges(histIndex) IsNot Nothing Then
+                labels(2) = "For bin " + CStr(histIndex) + " " + Format(ranges(histIndex).Average, fmt1) +
+                            " average range and min/max " + Format(ranges(histIndex).Min, fmt1) + "/" +
+                            Format(ranges(histIndex).Max, fmt1)
+            End If
 
             Dim actualCount = dst0.CountNonZero
             dst3 = task.color.Clone

@@ -2,7 +2,6 @@ Imports cv = OpenCvSharp
 Imports System.Threading
 Namespace VBClasses
     Public Class Grid_Basics : Inherits TaskParent
-        Public brickList As New List(Of brickData)
         Public gridNeighbors As New List(Of List(Of Integer))
         Public Sub New()
             task.gridMap = New cv.Mat(dst2.Size, cv.MatType.CV_32S, 0)
@@ -20,7 +19,6 @@ Namespace VBClasses
                 gridNeighbors.Clear()
 
                 task.gSquares.Clear()
-                Dim index As Integer
                 For y = 0 To dst2.Height - 1 Step task.brickSize
                     For x = 0 To dst2.Width - 1 Step task.brickSize
                         Dim roi = ValidateRect(New cv.Rect(x, y, task.brickSize, task.brickSize))
@@ -32,7 +30,6 @@ Namespace VBClasses
                             If x = 0 Then bricksPerCol += 1
                             If y = 0 Then bricksPerRow += 1
                             task.gSquares.Add(roi)
-                            index += 1
                         End If
                     Next
                 Next
@@ -407,6 +404,43 @@ Namespace VBClasses
                 labels(2) = "Grid_Basics " + CStr(gSquares.Count) + " (" + CStr(bricksPerCol) + "X" + CStr(bricksPerRow) + ") " +
                           CStr(gridWidth) + "X" + CStr(gridHeight) + " regions"
             End If
+        End Sub
+    End Class
+
+
+
+
+
+    Public Class Grid_SquaresOnly : Inherits TaskParent
+        Public gSquares As New List(Of cv.Rect)
+        Public Sub New()
+            desc = "Create the brickList for a smallRes resolution."
+        End Sub
+        Public Function smallValidateRect(ByVal r As cv.Rect, Optional ratio As Integer = 1) As cv.Rect
+            If r.X < 0 Then r.X = 0
+            If r.Y < 0 Then r.Y = 0
+            If r.X + r.Width >= task.smallRes.Width * ratio Then r.Width = task.smallRes.Width * ratio - r.X - 1
+            If r.Y + r.Height >= task.smallRes.Height * ratio Then r.Height = task.smallRes.Height * ratio - r.Y - 1
+            If r.X >= task.smallRes.Width * ratio Then r.X = task.smallRes.Width - 1
+            If r.Y >= task.smallRes.Height * ratio Then r.Y = task.smallRes.Height - 1
+            If r.Width <= 0 Then r.Width = 1
+            If r.Height <= 0 Then r.Height = 1
+            Return r
+        End Function
+
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            gSquares.Clear()
+            Dim input As New cv.Mat(task.smallRes, cv.MatType.CV_8U, 0)
+            For y = 0 To input.Height - 1 Step task.smallBrick
+                For x = 0 To input.Width - 1 Step task.smallBrick
+                    Dim roi = smallValidateRect(New cv.Rect(x, y, task.smallBrick, task.smallBrick))
+
+                    'If roi.Bottom = input.Height - 1 Then roi.Height += 1
+                    'If roi.BottomRight.X = input.Width - 1 Then roi.Width += 1
+
+                    If roi.Width > 0 And roi.Height > 0 Then gSquares.Add(roi)
+                Next
+            Next
         End Sub
     End Class
 End Namespace

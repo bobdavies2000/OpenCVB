@@ -1,7 +1,64 @@
-Imports System.Windows.Documents
 Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Class FeatureLess_Basics : Inherits TaskParent
+        Public rectList As New List(Of cv.Rect)
+        Dim smallGrid As New Grid_SquaresOnly
+        Public Sub New()
+            If standalone Then task.gOptions.displayDst1.Checked = True
+            dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+            desc = "Identify featureless squares using the gray scale range - see 'Correlation_Basics'."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            ' couldn't put this in the constructor because motion is a task algorithm.
+            If task.firstPass Then smallGrid.Run(src) ' create the grid squares for the small resolution.
+            Dim input As cv.Mat
+            If src.Channels <> 1 Then input = task.gray Else input = src
+
+            ' why do this resize?  Because the flessThreshold works at smallRes but not larger resolutions.
+            If task.workRes.Height > 270 Then input = input.Resize(task.smallRes, 0, 0, cv.InterpolationFlags.Nearest)
+
+            Dim mask As New cv.Mat(input.Size, cv.MatType.CV_8U, 0)
+            For Each r In smallGrid.gSquares
+                Dim mm = GetMinMax(input(r))
+                If mm.range < task.fLessThreshold Then mask(r).SetTo(255)
+            Next
+
+            dst2 = mask.Resize(src.Size, 0, 0, cv.InterpolationFlags.Nearest)
+
+            Dim motionIndex As Integer
+            rectList.Clear()
+            For Each r In task.gSquares
+                If dst2.Get(Of Byte)(r.TopLeft.Y, r.TopLeft.X) Then
+
+                    rectList.Add(r)
+                End If
+            Next
+
+            If standaloneTest() Then
+                dst3 = task.gray.Clone
+                For Each r In rectList
+                    dst3.Rectangle(r, white, task.lineWidth)
+                Next
+
+                Dim index = task.gridMap.Get(Of Integer)(task.clickPoint.Y, task.clickPoint.X)
+                Dim mm = GetMinMax(task.gray(task.gSquares(index)))
+                SetTrueText("Click on any grid rect to see its grayscale range." + vbCrLf +
+                            "Min gray = " + Format(mm.minVal, fmt0) + vbCrLf +
+                            "Max Gray = " + Format(mm.maxVal, fmt0) + vbCrLf +
+                            "Range = " + Format(mm.range, fmt0) + vbCrLf + vbCrLf, 1)
+            End If
+
+            labels(3) = CStr(rectList.Count) + " grid squares were found to be featureless (range < " +
+                        CStr(task.fLessThreshold) + ")"
+
+        End Sub
+    End Class
+
+
+
+
+
+    Public Class NR_FeatureLess_Basics : Inherits TaskParent
         Public rectList As New List(Of cv.Rect)
         Public Sub New()
             dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
@@ -26,7 +83,6 @@ Namespace VBClasses
             labels(3) = CStr(count) + " grid squares were found to be featureless (range < " + CStr(task.fLessThreshold) + ")"
         End Sub
     End Class
-
 
 
 
@@ -62,7 +118,7 @@ Namespace VBClasses
             desc = "Compare the correlation results with the range threshold results."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            dst2 = task.motionRGB.fLess.dst3
+            dst2 = task.motion.fLess.dst3
 
             corr.Run(src)
             dst3 = corr.dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
@@ -71,7 +127,7 @@ Namespace VBClasses
                 Dim correlation = corr.cList(i)
                 If correlation < corr.corrThreshold Then
                     Dim gSq = task.gSquares(i)
-                    Dim val = task.motionRGB.fLess.dst2.Get(Of Byte)(gSq.TopLeft.Y, gSq.TopLeft.X)
+                    Dim val = task.motion.fLess.dst2.Get(Of Byte)(gSq.TopLeft.Y, gSq.TopLeft.X)
                     If val = 0 Then dst3.Rectangle(gSq, red, -1)
                 End If
             Next
@@ -82,7 +138,7 @@ Namespace VBClasses
 
 
 
-    Public Class NR_FeatureLess_Basics : Inherits TaskParent
+    Public Class NR_FeatureLess_Contours : Inherits TaskParent
         Dim edgeline As New EdgeLine_Basics
         Public Sub New()
             If task.contours Is Nothing Then task.contours = New Contour_Basics_List
@@ -266,7 +322,7 @@ Namespace VBClasses
             desc = "Accumulate the edges over a span of X images."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            dst2 = task.motionRGB.fLess.dst2.Threshold(0, 255, cv.ThresholdTypes.Binary)
+            dst2 = task.motion.fLess.dst2.Threshold(0, 255, cv.ThresholdTypes.Binary)
 
             frames.Run(dst2)
             dst3 = frames.dst2
@@ -286,10 +342,10 @@ Namespace VBClasses
             desc = "Group RedCloud cells by the value of their featureless maxDist"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            dst1 = task.motionRGB.fLess.dst2.Threshold(0, 255, cv.ThresholdTypes.Binary)
-            labels(2) = task.motionRGB.fLess.labels(2)
+            dst1 = task.motion.fLess.dst2.Threshold(0, 255, cv.ThresholdTypes.Binary)
+            labels(2) = task.motion.fLess.labels(2)
 
-            If task.optionsChanged Then dst2 = dst1.Clone Else dst1.CopyTo(dst2, task.motionRGB.motionMask)
+            If task.optionsChanged Then dst2 = dst1.Clone Else dst1.CopyTo(dst2, task.motion.motionMask)
             redCPP.Run(dst2 - 1)
             classCount = redCPP.classCount
             dst3 = Palettize(redCPP.dst2)
@@ -334,8 +390,8 @@ Namespace VBClasses
             desc = "Use the featureLess_Basics output as input to RedColor_Basics"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            dst2 = task.motionRGB.fLess.dst2
-            labels(2) = task.motionRGB.fLess.labels(3)
+            dst2 = task.motion.fLess.dst2
+            labels(2) = task.motion.fLess.labels(3)
 
             redC.Run(dst2)
             dst3 = redC.dst2
@@ -366,7 +422,7 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             dst2.SetTo(0)
-            src.CopyTo(dst2, Not task.motionRGB.fLess.dst2)
+            src.CopyTo(dst2, Not task.motion.fLess.dst2)
 
             feat.Run(dst2)
             feat.dst2.CopyTo(dst3)
@@ -385,8 +441,8 @@ Namespace VBClasses
             desc = "Group the featureless grid squares"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            dst2 = task.motionRGB.fLess.dst2
-            labels(2) = task.motionRGB.fLess.labels(2)
+            dst2 = task.motion.fLess.dst2
+            labels(2) = task.motion.fLess.labels(2)
 
             Dim index = 1
             Dim rect As cv.Rect
@@ -394,7 +450,7 @@ Namespace VBClasses
             Dim flags As cv.FloodFillFlags = cv.FloodFillFlags.Link4
             Dim minSize = task.brickSize * task.brickSize
             Dim countList As New SortedList(Of Integer, Integer)(New compareAllowIdenticalIntegerInverted)
-            For Each r In task.motionRGB.fLess.rectList
+            For Each r In task.motion.fLess.rectList
                 Dim val = dst2.Get(Of Byte)(r.TopLeft.Y, r.TopLeft.X)
                 If val = 255 Then
                     Dim count = cv.Cv2.FloodFill(dst2, mask, r.TopLeft, index, rect, 0, 0, flags)

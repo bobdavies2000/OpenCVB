@@ -56,7 +56,7 @@ Namespace VBClasses
             Dim ptNew As New List(Of cv.Point2f)
             If task.optionsChanged = False Then
                 For Each pt In task.features
-                    Dim val = task.motionRGB.motionMask.Get(Of Byte)(pt.Y, pt.X)
+                    Dim val = task.motion.motionMask.Get(Of Byte)(pt.Y, pt.X)
                     If val = 0 Then ptNew.Add(pt)
                 Next
             End If
@@ -124,7 +124,7 @@ Namespace VBClasses
                 Next
             Else
                 For Each pt In ptLatest
-                    Dim val = task.motionRGB.motionMask.Get(Of Byte)(pt.Y, pt.X)
+                    Dim val = task.motion.motionMask.Get(Of Byte)(pt.Y, pt.X)
                     If val = 255 Then ptNew.Add(pt)
                 Next
             End If
@@ -548,7 +548,7 @@ Namespace VBClasses
             Dim matched As New List(Of cv.Point)
             motionPoints.Clear()
             For Each pt In features
-                Dim val = task.motionRGB.motionMask.Get(Of Byte)(pt.Y, pt.X)
+                Dim val = task.motion.motionMask.Get(Of Byte)(pt.Y, pt.X)
                 If val = 0 Then
                     Dim index As Integer = task.gridMap.Get(Of Integer)(pt.Y, pt.X)
                     Dim r = task.gSquares(index)
@@ -713,12 +713,12 @@ Namespace VBClasses
 
             Dim newList As New List(Of cv.Point2f)
             For Each pt In stablePoints
-                Dim val = task.motionRGB.motionMask.Get(Of Byte)(pt.Y, pt.X)
+                Dim val = task.motion.motionMask.Get(Of Byte)(pt.Y, pt.X)
                 If val = 0 Then newList.Add(pt)
             Next
 
             For Each pt In currPoints
-                Dim val = task.motionRGB.motionMask.Get(Of Byte)(pt.Y, pt.X)
+                Dim val = task.motion.motionMask.Get(Of Byte)(pt.Y, pt.X)
                 If val <> 0 Then newList.Add(pt)
             Next
 

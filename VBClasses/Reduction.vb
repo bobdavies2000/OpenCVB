@@ -207,7 +207,7 @@ Namespace VBClasses
             If task.optionsChanged Then
                 dst3 = dst2
             Else
-                dst2.CopyTo(dst3, task.motionRGB.motionMask)
+                dst2.CopyTo(dst3, task.motion.motionMask)
 
                 diff.lastFrame = dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
                 diff.Run(dst3)

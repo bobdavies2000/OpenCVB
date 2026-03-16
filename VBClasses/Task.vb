@@ -39,7 +39,7 @@ Namespace VBClasses
             gravityMatrix = New IMU_GMatrix
             gravityBasics = New Gravity_Basics
             imuBasics = New IMU_Basics
-            motionRGB = New Motion_Basics
+            motion = New Motion_Basics
             motionCloud = New Motion_Cloud
             grid = New Grid_Basics
             lines = New Line_Basics
@@ -113,18 +113,18 @@ Namespace VBClasses
             rightView = leftRightBrightness.dst3.Clone
 
             If gOptions.UseMotionMask.Checked And firstPass = False Then
-                motionRGB.Run(gray)
+                motion.Run(gray)
 
                 If optionsChanged Or task.frameCount < 5 Then
                     grayStable = gray.Clone
                 Else
-                    If motionRGB.motionList.Count > 0 Then gray.CopyTo(grayStable, motionRGB.motionMask)
+                    If motion.motionList.Count > 0 Then gray.CopyTo(grayStable, motion.motionMask)
                 End If
             Else
-                motionRGB.motionMask.SetTo(255)
-                motionRGB.motionList.Clear()
+                motion.motionMask.SetTo(255)
+                motion.motionList.Clear()
                 grayStable = gray
-                motionRGB.Run(gray)
+                motion.Run(gray)
             End If
 
             motionCloud.Run(emptyMat) '******* this may rotate for gravity if selected *******
@@ -169,7 +169,7 @@ Namespace VBClasses
             End If
 
             gravityBasics.Run(src.Clone)
-            lines.motionMask = motionRGB.motionMask
+            lines.motionMask = motion.motionMask
             lines.Run(grayStable)
             histBinList = {histogramBins, histogramBins, histogramBins}
 
@@ -219,7 +219,7 @@ Namespace VBClasses
 
             If gOptions.ShowGrid.Checked Then dstList(2).SetTo(cv.Scalar.White, gridMask)
             If gOptions.showMotionMask.Checked Then
-                For Each mIndex In motionRGB.motionList
+                For Each mIndex In motion.motionList
                     dstList(0).Rectangle(gSquares(mIndex), cv.Scalar.White, lineWidth)
                 Next
             End If

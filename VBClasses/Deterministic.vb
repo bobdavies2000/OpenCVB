@@ -45,7 +45,7 @@ Namespace VBClasses
 
             Static lastFrame As cv.Mat = task.color.Clone
             Dim dst1 = lastFrame.Clone
-            src.CopyTo(dst1, task.motionRGB.motionMask)
+            src.CopyTo(dst1, task.motion.motionMask)
             deter.Run(dst1)
 
             If deter.dst2.Channels <> 1 Then

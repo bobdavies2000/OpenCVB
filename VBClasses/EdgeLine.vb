@@ -81,13 +81,13 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             Dim histogram As New cv.Mat
             Dim histarray(edgeLine.rcList.Count - 1) As Single
-            If task.motionRGB.motionList.Count = 0 Then Exit Sub ' no change!
+            If task.motion.motionList.Count = 0 Then Exit Sub ' no change!
 
             Dim newList As New List(Of rcData)
             dst2.SetTo(0)
             If edgeLine.rcList.Count Then
                 Dim ranges1 = New cv.Rangef() {New cv.Rangef(0, edgeLine.rcList.Count)}
-                cv.Cv2.CalcHist({dst2}, {0}, task.motionRGB.motionMask, histogram,
+                cv.Cv2.CalcHist({dst2}, {0}, task.motion.motionMask, histogram,
                             1, {edgeLine.rcList.Count}, ranges1)
                 histogram.GetArray(Of Single)(histarray)
 
@@ -108,7 +108,7 @@ Namespace VBClasses
             ReDim histarray(edgeLine.classCount - 1)
 
             Dim ranges2 = New cv.Rangef() {New cv.Rangef(0, edgeLine.classCount)}
-            cv.Cv2.CalcHist({edgeLine.dst2}, {0}, task.motionRGB.motionMask, histogram,
+            cv.Cv2.CalcHist({edgeLine.dst2}, {0}, task.motion.motionMask, histogram,
                         1, {edgeLine.classCount}, ranges2)
             histogram.GetArray(Of Single)(histarray)
 
@@ -265,8 +265,8 @@ Namespace VBClasses
             input.GetArray(Of Byte)(cppData)
             Dim handleSrc = GCHandle.Alloc(cppData, GCHandleType.Pinned)
 
-            Dim maskData(task.motionRGB.motionMask.Total - 1) As Byte
-            task.motionRGB.motionMask.GetArray(Of Byte)(maskData)
+            Dim maskData(task.motion.motionMask.Total - 1) As Byte
+            task.motion.motionMask.GetArray(Of Byte)(maskData)
             Dim handleMask = GCHandle.Alloc(maskData, GCHandleType.Pinned)
 
             Dim imagePtr = EdgeLine_RunCPP(cPtr, handleSrc.AddrOfPinnedObject(), handleMask.AddrOfPinnedObject(), input.Rows, input.Cols,

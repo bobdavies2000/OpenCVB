@@ -42,6 +42,8 @@ Namespace VBClasses
         Public edgeMethod As String
 
         Public workRes As cv.Size
+        Public smallRes As cv.Size ' the recommended small resolution for this capture size.
+        Public smallBrick As Integer ' brick size for smallRes resolution.
         Public rows As Integer
         Public cols As Integer
         Public captureRes As cv.Size
@@ -87,7 +89,7 @@ Namespace VBClasses
         Public filterBasics As Filter_Basics
         Public gravityBasics As Gravity_Basics
         Public imuBasics As IMU_Basics
-        Public motionRGB As Motion_Basics
+        Public motion As Motion_Basics
         Public motionCloud As Motion_Cloud
         Public motionFeatures As cv.Point2f
         Public leftRightBrightness As LeftRight_Brightness
