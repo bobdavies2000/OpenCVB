@@ -19,9 +19,9 @@ Namespace VBClasses
                 gridNeighbors.Clear()
 
                 task.gSquares.Clear()
-                For y = 0 To dst2.Height - 1 Step task.brickSize
-                    For x = 0 To dst2.Width - 1 Step task.brickSize
-                        Dim roi = ValidateRect(New cv.Rect(x, y, task.brickSize, task.brickSize))
+                For y = 0 To dst2.Height - 1 Step task.squareSize
+                    For x = 0 To dst2.Width - 1 Step task.squareSize
+                        Dim roi = ValidateRect(New cv.Rect(x, y, task.squareSize, task.squareSize))
 
                         If roi.Bottom = dst2.Height - 1 Then roi.Height += 1
                         If roi.BottomRight.X = dst2.Width - 1 Then roi.Width += 1
@@ -35,11 +35,11 @@ Namespace VBClasses
                 Next
 
                 task.gridMask.SetTo(0)
-                For x = task.brickSize To dst2.Width - 1 Step task.brickSize
+                For x = task.squareSize To dst2.Width - 1 Step task.squareSize
                     Dim p1 = New cv.Point(x, 0), p2 = New cv.Point(x, dst2.Height)
                     task.gridMask.Line(p1, p2, 255, 1)
                 Next
-                For y = task.brickSize To dst2.Height - 1 Step task.brickSize
+                For y = task.squareSize To dst2.Height - 1 Step task.squareSize
                     Dim p1 = New cv.Point(0, y), p2 = New cv.Point(dst2.Width, y)
                     task.gridMask.Line(p1, p2, 255, 1)
                 Next
@@ -88,20 +88,20 @@ Namespace VBClasses
                         yList.Add(gSq.BottomRight.Y)
                     Next
                     Dim r = New cv.Rect(xList.Min, yList.Min, xList.Max - xList.Min, yList.Max - yList.Min)
-                    If r.Width < task.brickSize * 3 Then
-                        If r.X + r.Width >= dst2.Width Then r.X = dst2.Width - task.brickSize * 3
-                        r.Width = task.brickSize * 3
+                    If r.Width < task.squareSize * 3 Then
+                        If r.X + r.Width >= dst2.Width Then r.X = dst2.Width - task.squareSize * 3
+                        r.Width = task.squareSize * 3
                     End If
-                    If r.Height < task.brickSize * 3 Then
-                        If r.Y + r.Height >= dst2.Height Then r.Y = dst2.Height - task.brickSize * 3
-                        r.Height = task.brickSize * 3
+                    If r.Height < task.squareSize * 3 Then
+                        If r.Y + r.Height >= dst2.Height Then r.Y = dst2.Height - task.squareSize * 3
+                        r.Height = task.squareSize * 3
                     End If
-                    If r.Width <> task.brickSize * 3 Then r.Width = task.brickSize * 3
-                    If r.Height <> task.brickSize * 3 Then r.Height = task.brickSize * 3
+                    If r.Width <> task.squareSize * 3 Then r.Width = task.squareSize * 3
+                    If r.Height <> task.squareSize * 3 Then r.Height = task.squareSize * 3
                     task.gridNabeRects.Add(r)
                 Next
 
-                task.brickSize = task.brickSize
+                task.squareSize = task.squareSize
                 task.bricksPerCol = bricksPerCol
                 task.bricksPerRow = bricksPerRow
             End If
@@ -110,7 +110,7 @@ Namespace VBClasses
                 task.color.CopyTo(dst2)
                 dst2.SetTo(white, task.gridMask)
                 labels(2) = "Grid_Basics " + CStr(task.gSquares.Count) + " (" + CStr(task.bricksPerCol) + "X" + CStr(task.bricksPerRow) + ") " +
-                                             CStr(task.brickSize) + "X" + CStr(task.brickSize) + " regions"
+                                             CStr(task.squareSize) + "X" + CStr(task.squareSize) + " regions"
             End If
         End Sub
     End Class
@@ -310,8 +310,8 @@ Namespace VBClasses
                 center = New cv.Point(gSq.X + gSq.Width / 2, gSq.Y + gSq.Height / 2)
             End If
 
-            Dim pad = task.brickSize / 2
-            Dim searchRect = ValidateRect(New cv.Rect(center.X - pad, center.Y - pad, task.brickSize, task.brickSize))
+            Dim pad = task.squareSize / 2
+            Dim searchRect = ValidateRect(New cv.Rect(center.X - pad, center.Y - pad, task.squareSize, task.squareSize))
             match.Run(src(searchRect))
             center = match.newCenter
 

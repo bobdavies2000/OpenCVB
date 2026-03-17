@@ -305,8 +305,8 @@ Namespace VBClasses
             options.Run()
 
             dst2 = bricks.dst2.Clone
-            Dim width = dst2.Width / task.brickSize
-            Dim height = dst2.Height / task.brickSize
+            Dim width = dst2.Width / task.squareSize
+            Dim height = dst2.Height / task.squareSize
             For i = 0 To bricks.brickList.Count - width Step width
                 For j = i + 1 To i + width - 1
                     Dim d1 = bricks.brickList(j).depth

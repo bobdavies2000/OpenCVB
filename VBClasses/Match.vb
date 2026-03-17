@@ -404,20 +404,20 @@ Namespace VBClasses
             desc = "Use MatchTemplate to find the new location of the template and update the point provided."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            Dim radius = task.brickSize / 2
+            Dim radius = task.squareSize / 2
 
             Dim rect As cv.Rect
 
             If target(0) IsNot Nothing And correlation(0) < task.fCorrThreshold Then target(0) = Nothing
             If task.mouseClickFlag Then
                 ptx(0) = task.ClickPoint
-                ptx(1) = New cv.Point2f(msRNG.Next(task.brickSize, dst2.Width - 2 * task.brickSize),
-                                    msRNG.Next(task.brickSize, dst2.Height - 2 * task.brickSize))
+                ptx(1) = New cv.Point2f(msRNG.Next(task.squareSize, dst2.Width - 2 * task.squareSize),
+                                    msRNG.Next(task.squareSize, dst2.Height - 2 * task.squareSize))
 
-                rect = ValidateRect(New cv.Rect(ptx(0).X - radius, ptx(0).Y - radius, task.brickSize, task.brickSize))
+                rect = ValidateRect(New cv.Rect(ptx(0).X - radius, ptx(0).Y - radius, task.squareSize, task.squareSize))
                 target(0) = src(rect)
 
-                rect = ValidateRect(New cv.Rect(ptx(1).X - radius, ptx(1).Y - radius, task.brickSize, task.brickSize))
+                rect = ValidateRect(New cv.Rect(ptx(1).X - radius, ptx(1).Y - radius, task.squareSize, task.squareSize))
                 target(1) = src(rect)
             End If
 
@@ -431,9 +431,9 @@ Namespace VBClasses
             dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_32FC1, 0)
 
             For i = 0 To ptx.Count - 1
-                rect = ValidateRect(New cv.Rect(ptx(i).X - radius, ptx(i).Y - radius, task.brickSize, task.brickSize))
-                Dim searchRect = ValidateRect(New cv.Rect(rect.X - task.brickSize, rect.Y - task.brickSize,
-                                                      task.brickSize * 3, task.brickSize * 3))
+                rect = ValidateRect(New cv.Rect(ptx(i).X - radius, ptx(i).Y - radius, task.squareSize, task.squareSize))
+                Dim searchRect = ValidateRect(New cv.Rect(rect.X - task.squareSize, rect.Y - task.squareSize,
+                                                      task.squareSize * 3, task.squareSize * 3))
                 cv.Cv2.MatchTemplate(target(i), src(searchRect), dst0, cv.TemplateMatchModes.CCoeffNormed)
                 Dim mmData = GetMinMax(dst0)
                 correlation(i) = mmData.maxVal
@@ -444,7 +444,7 @@ Namespace VBClasses
                 ptx(i) = New cv.Point2f(mmData.maxLoc.X + searchRect.X + radius, mmData.maxLoc.Y + searchRect.Y + radius)
                 DrawCircle(dst3, ptx(i), task.DotSize, task.highlight)
                 dst3.Rectangle(searchRect, cv.Scalar.Yellow, 1)
-                rect = ValidateRect(New cv.Rect(ptx(i).X - radius, ptx(i).Y - radius, task.brickSize, task.brickSize))
+                rect = ValidateRect(New cv.Rect(ptx(i).X - radius, ptx(i).Y - radius, task.squareSize, task.squareSize))
                 target(i) = task.color(rect)
             Next
 
@@ -524,11 +524,11 @@ Namespace VBClasses
                 Exit Sub
             End If
 
-            Dim radius = task.brickSize / 2
+            Dim radius = task.squareSize / 2
 
-            Dim rect = ValidateRect(New cv.Rect(pt.X - radius, pt.Y - radius, task.brickSize, task.brickSize))
-            searchRect = ValidateRect(New cv.Rect(rect.X - task.brickSize, rect.Y - task.brickSize,
-                                              task.brickSize * 3, task.brickSize * 3))
+            Dim rect = ValidateRect(New cv.Rect(pt.X - radius, pt.Y - radius, task.squareSize, task.squareSize))
+            searchRect = ValidateRect(New cv.Rect(rect.X - task.squareSize, rect.Y - task.squareSize,
+                                              task.squareSize * 3, task.squareSize * 3))
             cv.Cv2.MatchTemplate(target(rect), src(searchRect), dst0, cv.TemplateMatchModes.CCoeffNormed)
             Dim mmData = GetMinMax(dst0)
             correlation = mmData.maxVal

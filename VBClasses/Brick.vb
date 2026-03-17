@@ -15,7 +15,7 @@ Namespace VBClasses
             If task.optionsChanged Then brickList.Clear()
 
             Dim correlationMat As New cv.Mat
-            Dim maxPixels = task.brickSize * task.brickSize
+            Dim maxPixels = task.squareSize * task.squareSize
             brickList.Clear()
             Dim depthCount As Integer
             brickDepthCount = 0
@@ -102,7 +102,7 @@ Namespace VBClasses
             Dim col As Integer, bricksPerRow = task.bricksPerRow
             Static whiteCol As Integer = bricksPerRow / 2
             If task.mouseClickFlag Then
-                whiteCol = Math.Round(bricksPerRow * (task.clickPoint.X - task.brickSize / 2) / dst2.Width)
+                whiteCol = Math.Round(bricksPerRow * (task.clickPoint.X - task.squareSize / 2) / dst2.Width)
             End If
             For Each gSq In bricks.brickList
                 If gSq.depth > 0 Then
@@ -728,8 +728,8 @@ Namespace VBClasses
             Next
 
             For Each r In fLessRects
-                Dim x = CInt(r.X / task.brickSize)
-                Dim y = CInt(r.Y / task.brickSize)
+                Dim x = CInt(r.X / task.squareSize)
+                Dim y = CInt(r.Y / task.squareSize)
                 task.lowResDepth.Set(Of Single)(y, x, lastDepth.Get(Of Single)(y, x))
             Next
             lastDepth = task.lowResDepth.Clone

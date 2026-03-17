@@ -876,7 +876,6 @@ NR_FeatureLess_Canny
 NR_FeatureLess_Contours
 NR_FeatureLess_Correlations
 NR_FeatureLess_DCT
-NR_FeatureLess_Groups
 NR_FeatureLess_Histogram
 NR_FeatureLess_History
 NR_FeatureLess_LeftRight

@@ -1437,8 +1437,8 @@ Namespace VBClasses
                     If histData.Count < 128 And task.histogramBins < task.gOptions.HistBinBar.Maximum Then
                         task.histogramBins += 1
                     End If
-                    If task.gSquares.Count < histData.Length And task.brickSize > 2 Then
-                        task.brickSize -= 1
+                    If task.gSquares.Count < histData.Length And task.squareSize > 2 Then
+                        task.squareSize -= 1
                         grid.Run(src)
                         dst2.SetTo(0)
                     End If

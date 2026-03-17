@@ -18,7 +18,7 @@ Namespace VBClasses
             Dim inputROI As New List(Of cv.Rect)
             For j = 0 To task.gSquares.Count - 1
                 Dim gSq = task.gSquares(j)
-                If gSq.Width = task.brickSize And gSq.Height = task.brickSize Then inputROI.Add(task.gSquares(j))
+                If gSq.Width = task.squareSize And gSq.Height = task.squareSize Then inputROI.Add(task.gSquares(j))
             Next
 
             scrambled = Shuffle(inputROI)
@@ -28,8 +28,8 @@ Namespace VBClasses
             For i = 0 To scrambled.Count - 1
                 Dim gSq = task.gSquares(i)
                 Dim gr2 = scrambled(i)
-                If gSq.Width = task.brickSize And gSq.Height = task.brickSize And
-                   gr2.Width = task.brickSize And gr2.Height = task.brickSize Then dst2(gr2) = src(gSq)
+                If gSq.Width = task.squareSize And gSq.Height = task.squareSize And
+                   gr2.Width = task.squareSize And gr2.Height = task.squareSize Then dst2(gr2) = src(gSq)
             Next
         End Sub
     End Class

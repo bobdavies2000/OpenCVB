@@ -72,10 +72,10 @@ Namespace VBClasses
     '        hist2d.Run(colorFmt.dst2)
     '        dst2 = hist2d.dst2
 
-    '        minX = bpRow * xRange / task.brickSize
-    '        maxX = (bpRow + 1) * xRange / task.brickSize
-    '        minY = bpCol * yRange / task.brickSize
-    '        maxY = (bpCol + 1) * yRange / task.brickSize
+    '        minX = bpRow * xRange / task.squareSize
+    '        maxX = (bpRow + 1) * xRange / task.squareSize
+    '        minY = bpCol * yRange / task.squareSize
+    '        maxY = (bpCol + 1) * yRange / task.squareSize
 
     '        Dim ranges() = New cv.Rangef() {New cv.Rangef(minX, maxX), New cv.Rangef(minY, maxY)}
     '        cv.Cv2.CalcBackProject({src}, task.gOptions.channels, hist2d.histogram, dst0, ranges)

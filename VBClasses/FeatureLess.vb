@@ -323,34 +323,12 @@ Namespace VBClasses
 
             Dim countCurr = dst2.CountNonZero
             Dim countAll = dst3.CountNonZero
-            Dim squareSize = task.grid.
-            labels(2) = "Current frame: " + Format(countCurr / ())
+            Dim sqSize = task.squareSize * task.squareSize
+            labels(2) = "Current frame: " + Format(countCurr / sqSize, fmt0) + " grid squares and " +
+                        Format(countAll / sqSize, fmt0) + " of all grid squares."
         End Sub
     End Class
 
-
-
-
-
-
-
-    Public Class NR_FeatureLess_Groups : Inherits TaskParent
-        Dim redCPP As New RedList_CPP
-        Public classCount As Integer
-        Public Sub New()
-            desc = "Group RedCloud cells by the value of their featureless maxDist"
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            dst1 = task.motion.corr.dst2.Threshold(0, 255, cv.ThresholdTypes.Binary)
-            labels(2) = task.motion.corr.labels(2)
-
-            If task.optionsChanged Then dst2 = dst1.Clone Else dst1.CopyTo(dst2, task.motion.motionMask)
-            redCPP.Run(dst2 - 1)
-            classCount = redCPP.classCount
-            dst3 = Palettize(redCPP.dst2)
-            labels(3) = CStr(classCount) + " featureless regions were found."
-        End Sub
-    End Class
 
 
 
@@ -421,6 +399,8 @@ Namespace VBClasses
 
             feat.Run(dst2)
             feat.dst2.CopyTo(dst3)
+            Dim count = task.gSquares.Count - task.motion.corr.rectList.Count
+            labels(2) = "Current frame: " + CStr(count) + " grid squares had features"
         End Sub
     End Class
 
@@ -443,7 +423,7 @@ Namespace VBClasses
             Dim rect As cv.Rect
             Dim mask = New cv.Mat(New cv.Size(dst2.Width + 2, dst2.Height + 2), cv.MatType.CV_8U, 0)
             Dim flags As cv.FloodFillFlags = cv.FloodFillFlags.Link4
-            Dim minSize = task.brickSize * task.brickSize
+            Dim minSize = task.squareSize * task.squareSize
             Dim countList As New SortedList(Of Integer, Integer)(New compareAllowIdenticalIntegerInverted)
             For Each r In task.motion.corr.rectList
                 Dim val = dst2.Get(Of Byte)(r.TopLeft.Y, r.TopLeft.X)

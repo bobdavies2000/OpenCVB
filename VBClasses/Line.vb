@@ -371,7 +371,7 @@ Namespace VBClasses
 
                 Dim minVal = deltaX.Min
                 Dim index = deltaX.IndexOf(minVal)
-                If minVal < task.brickSize Then
+                If minVal < task.squareSize Then
                     Dim lp = New lpData(p1, ptList(index))
                     If lp.indexVTop < 0 Or lp.indexVBot < 0 Then Continue For
                     lp.index = lpList.Count

@@ -1442,7 +1442,7 @@ Namespace VBClasses
                          " and max = " + CStr(popMax) + ".  Circled cell has max features."
 
             Dim index = pops.IndexOf(pops.Max)
-            Dim gSize = task.brickSize
+            Dim gSize = task.squareSize
             Dim pt = New cv.Point(gEdges.featureRects(index).X + gSize / 2, gEdges.featureRects(index).Y + gSize / 2)
             dst2.Circle(pt, gSize * 1.5, 255, task.lineWidth * 2)
 
@@ -1683,6 +1683,8 @@ Namespace VBClasses
 
             edges.Run(dst2)
             dst3 = edges.dst2
+            Dim count = task.gSquares.Count - task.motion.corr.rectList.Count
+            labels(2) = "Current frame: " + CStr(count) + " grid squares had features"
         End Sub
     End Class
 

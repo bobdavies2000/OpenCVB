@@ -23,7 +23,7 @@ Namespace VBClasses
                 Dim brick1 = bricks.brickList(tuple.Item1)
                 Dim brick2 = bricks.brickList(tuple.Item2)
                 If brick1.depth = 0 Or brick2.depth = 0 Then Continue For
-                If brick1.center.DistanceTo(brick2.center) > task.brickSize Then
+                If brick1.center.DistanceTo(brick2.center) > task.squareSize Then
                     Dim r = brick1.rect
                     For i = brick1.index + 1 To brick2.index - 1
                         r = r.Union(bricks.brickList(i).rect)
@@ -43,7 +43,7 @@ Namespace VBClasses
                 Dim brick1 = bricks.brickList(tuple.Item1)
                 Dim brick2 = bricks.brickList(tuple.Item2)
                 If brick1.depth = 0 Or brick2.depth = 0 Then Continue For
-                If brick1.center.DistanceTo(brick2.center) > task.brickSize Then
+                If brick1.center.DistanceTo(brick2.center) > task.squareSize Then
                     Dim r = brick1.rect
                     For i = brick1.index + task.bricksPerRow To brick2.index - 1 Step task.bricksPerRow
                         r = r.Union(bricks.brickList(i).rect)
@@ -172,10 +172,10 @@ Namespace VBClasses
             dst2.SetTo(0)
             dst3.SetTo(0)
 
-            width = dst2.Width / task.brickSize
-            If width * task.brickSize <> dst2.Width Then width += 1
-            height = Math.Floor(dst2.Height / task.brickSize)
-            If height * task.brickSize <> dst2.Height Then height += 1
+            width = dst2.Width / task.squareSize
+            If width * task.squareSize <> dst2.Width Then width += 1
+            height = Math.Floor(dst2.Height / task.squareSize)
+            If height * task.squareSize <> dst2.Height Then height += 1
             hTuples.Clear()
             colorIndex = 0
             For i = 0 To height - 1

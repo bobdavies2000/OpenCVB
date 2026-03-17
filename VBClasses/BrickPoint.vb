@@ -198,7 +198,7 @@ Namespace VBClasses
             Next
 
             Dim minLen = lengths.Min, maxLen = lengths.Max
-            If maxLen = task.brickSize And minLen = task.brickSize Then Exit Sub
+            If maxLen = task.squareSize And minLen = task.squareSize Then Exit Sub
 
             plotHist.Run(cv.Mat.FromPixelData(lengths.Count, 1, cv.MatType.CV_32F, lengths.ToArray))
             dst2 = plotHist.dst2
@@ -307,19 +307,19 @@ Namespace VBClasses
             dst1 = bPoint.dst2
             dst3 = src
 
-            ReDim results(task.brickSize - 1, task.brickSize - 1)
+            ReDim results(task.squareSize - 1, task.squareSize - 1)
             For Each pt In bPoint.ptList
                 Dim index = task.gridMap.Get(Of Integer)(pt.Y, pt.X)
                 Dim gSq = bricks.brickList(index)
                 results(gSq.mm.maxLoc.X, gSq.mm.maxLoc.Y) += 1
             Next
 
-            Dim incrX = dst1.Width / task.brickSize
-            Dim incrY = dst1.Height / task.brickSize
+            Dim incrX = dst1.Width / task.squareSize
+            Dim incrY = dst1.Height / task.squareSize
             Dim row = Math.Floor(task.mouseMovePoint.Y / incrY)
             Dim col = Math.Floor(task.mouseMovePoint.X / incrX)
 
-            dst2 = cv.Mat.FromPixelData(task.brickSize, task.brickSize, cv.MatType.CV_32F, results)
+            dst2 = cv.Mat.FromPixelData(task.squareSize, task.squareSize, cv.MatType.CV_32F, results)
 
             For Each gSq In bricks.brickList
                 If gSq.mm.maxLoc.X = col And gSq.mm.maxLoc.Y = row Then
@@ -328,8 +328,8 @@ Namespace VBClasses
                 End If
             Next
 
-            For y = 0 To task.brickSize - 1
-                For x = 0 To task.brickSize - 1
+            For y = 0 To task.squareSize - 1
+                For x = 0 To task.squareSize - 1
                     SetTrueText(CStr(results(x, y)), New cv.Point(x * incrX, y * incrY), 2)
                 Next
             Next

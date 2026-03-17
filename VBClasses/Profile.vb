@@ -78,7 +78,7 @@ Namespace VBClasses
 
             If task.heartBeat Then
                 strOut = "X     " + vbTab + "Y     " + vbTab + "Z " + vbTab + "units=meters" + vbCrLf
-                Dim w = task.brickSize
+                Dim w = task.squareSize
                 For i = 0 To corners.Count - 1
                     strOut += point3fToString(corners3D(i)) + vbTab + cornerNames(i) + vbCrLf
                 Next

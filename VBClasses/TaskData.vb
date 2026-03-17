@@ -52,7 +52,7 @@ Namespace VBClasses
         Public DotSize As Integer
         Public lineWidth As Integer
         Public cvFontThickness As Integer
-        Public brickSize As Integer
+        Public squareSize As Integer
         Public cvFontSize As Single
         Public lineType As cv.LineTypes
         Public histogramBins As Integer
