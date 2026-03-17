@@ -116,8 +116,9 @@ Corners_HarrisDetector_CPP
 Corners_RedPrepData
 Corners_ShiTomasi_CPP
 Correlation_Basics
-Correlation_BasicsNew
+Correlation_BasicsPlot
 Correlation_Interactive
+Correlation_Validate
 Covariance_Basics
 Covariance_Images
 DCT_Basics
@@ -247,6 +248,7 @@ FeatureLess_Compare
 FeatureLess_Correlations
 FeatureLess_Not
 FeatureLess_RedColor
+FeatureLess_Threshold
 Filter_Basics
 Filter_BasicsGray
 FindMinRect_Basics

@@ -1,6 +1,89 @@
 Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Class Correlation_Basics : Inherits TaskParent
+        Public Sub New()
+            task.gOptions.HistBinBar.Value = task.gOptions.HistBinBar.Maximum
+            desc = "Measure the correlation of all grid squares except where there is motion."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            If src.Channels <> 1 Then src = task.gray
+
+            Static lastsrc As cv.Mat = src.Clone
+            dst2 = src.Clone
+            Dim correlationMat As New cv.Mat
+            Dim corrThreshold = 2.0 - 2.0 / task.histogramBins
+            Dim motionIndex As Integer
+            Dim motionList As New List(Of Integer)(task.motion.motionSort)
+            Dim maxIndex = task.motion.motionSort.Count - 1
+            If maxIndex < 0 Then motionList.Add(-1) ' add a dummy value to avoid errors when there is no motion
+            For i = 0 To task.gSquares.Count - 1
+                If i <> motionList(motionIndex) Then
+                    Dim r = task.gSquares(i)
+                    cv.Cv2.MatchTemplate(src(r), lastsrc(r), correlationMat, cv.TemplateMatchModes.CCoeffNormed)
+                    Dim corr = correlationMat.Get(Of Single)(0, 0) + 1
+                    If corr < corrThreshold Then
+                        dst2.Rectangle(r, white, task.lineWidth)
+                    End If
+                Else
+                    If motionIndex < maxIndex Then motionIndex += 1
+                End If
+            Next
+
+            lastsrc = src.Clone
+        End Sub
+    End Class
+
+
+
+
+    Public Class Correlation_Validate : Inherits TaskParent
+        Public fLessList As New List(Of Integer)
+        Public Sub New()
+            task.gOptions.HistBinBar.Value = task.gOptions.HistBinBar.Maximum
+            desc = "Measure the correlation of all grid squares except where there is motion."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            If src.Channels <> 1 Then src = task.gray
+
+            Static lastsrc As cv.Mat = src.Clone
+            dst2 = src.Clone
+            Dim correlationMat As New cv.Mat
+            Dim corrThreshold = 2.0 - 2.0 / task.histogramBins
+            Dim motionIndex As Integer
+            Dim motionList As New List(Of Integer)(task.motion.motionSort)
+            Dim maxIndex = task.motion.motionSort.Count - 1
+            If maxIndex < 0 Then motionList.Add(-1) ' add a dummy value to avoid errors when there is no motion
+            fLessList.Clear()
+            For i = 0 To task.gSquares.Count - 1
+                If i <> motionList(motionIndex) Then
+                    Dim r = task.gSquares(i)
+                    cv.Cv2.MatchTemplate(src(r), lastsrc(r), correlationMat, cv.TemplateMatchModes.CCoeffNormed)
+                    Dim corr = correlationMat.Get(Of Single)(0, 0) + 1
+                    If corr < corrThreshold Then
+                        dst2.Rectangle(r, white, task.lineWidth)
+                        fLessList.Add(i)
+                    End If
+                Else
+                    If motionIndex < maxIndex Then motionIndex += 1
+                End If
+            Next
+
+            If standalone Then
+                dst3 = src
+                For Each index In fLessList
+                    If task.motion.motionSort.Contains(index) Then
+                        dst3.Rectangle(task.gSquares(index), white, task.lineWidth)
+                    End If
+                Next
+            End If
+            lastsrc = src.Clone
+        End Sub
+    End Class
+
+
+
+
+    Public Class Correlation_BasicsPlot : Inherits TaskParent
         Public cList As New List(Of Single)
         Public corrThreshold As Single
         Public mmRanges As New List(Of Double)
@@ -16,11 +99,6 @@ Namespace VBClasses
             desc = "Measure the correlation of all grid squares."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            'If task.heartBeat = False Then
-            '    SetTrueText(strOut, 1)
-            '    Exit Sub
-            'End If
-
             Static lastsrc As cv.Mat = task.gray.Clone
             dst2 = task.gray.Clone
             Dim correlationMat As New cv.Mat
@@ -77,44 +155,6 @@ Namespace VBClasses
     End Class
 
 
-
-
-
-
-    Public Class Correlation_BasicsNew : Inherits TaskParent
-        Dim smallGrid As New Grid_SquaresOnly
-        Public Sub New()
-            desc = "Compute correlation at smallRes resolution to build the featureLess map."
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            ' couldn't put this in the constructor because motion is a task algorithm.
-            If task.firstPass Then smallGrid.Run(src) ' create the grid squares for the small resolution.
-            Dim input As cv.Mat
-            If src.Channels <> 1 Then input = task.gray Else input = src
-
-            ' why do this resize?  Because the flessThreshold works at smallRes but not larger resolutions.
-            If task.workRes.Height > 270 Then input = input.Resize(task.smallRes, 0, 0, cv.InterpolationFlags.Nearest)
-
-            'Static lastsrc As cv.Mat = task.gray.Clone
-            'dst2 = task.gray.Clone
-            'Dim correlationMat As New cv.Mat
-            'cList.Clear()
-            'dst3 = src
-            'Dim mmList As New List(Of mmData)
-            'mmRanges.Clear()
-            'For i = 0 To task.gSquares.Count - 1
-            '    Dim r = task.gSquares(i)
-            '    cv.Cv2.MatchTemplate(task.gray(r), lastsrc(r), correlationMat, cv.TemplateMatchModes.CCoeffNormed)
-
-            '    Dim corr = correlationMat.Get(Of Single)(0, 0) + 1
-            '    cList.Add(corr)
-            '    Dim mm = GetMinMax(task.gray(r))
-            '    mmList.Add(mm)
-            '    mmRanges.Add(mm.range)
-            'Next
-
-        End Sub
-    End Class
 
 
 

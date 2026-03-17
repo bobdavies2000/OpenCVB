@@ -2898,9 +2898,6 @@ Namespace VBClasses
                 Case 1920
                     maxArea = 350000
                     minArea = 6000
-                Case 960
-                    maxArea = 100000
-                    minArea = 3000
                 Case 480
                     maxArea = 25000
                     minArea = 1500

@@ -99,6 +99,11 @@ Namespace VBClasses
             desc = "Simplify the prep for ML data train and test data and run with ML algorithms."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
+            If standalone Then
+                SetTrueText("ML_BasicsRTree has no output when run standalone." + vbCrLf + "Use LowResOld_Depth to test.")
+                Exit Sub
+            End If
+
             options.Run()
             labels(2) = "ML algorithm selected is " + options.ML_Name
 

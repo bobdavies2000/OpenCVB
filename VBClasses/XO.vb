@@ -838,7 +838,7 @@ Namespace VBClasses
                 ReDim minList(task.gSquares.Count - 1)
                 ReDim maxList(task.gSquares.Count - 1)
             End If
-            For Each index In task.motion.motionList
+            For Each index In task.motion.motionSort
                 Dim rect = task.gSquares(index)
                 Dim ptmin = New cv.Point2f(task.kalman.kOutput(index * 4) + rect.X,
                                        task.kalman.kOutput(index * 4 + 1) + rect.Y)
@@ -11455,7 +11455,7 @@ Namespace VBClasses
 
             Dim colorstdev As cv.Scalar, colorMean As cv.Scalar
             ReDim motionFlags(task.gSquares.Count - 1)
-            Dim motionList As New List(Of Integer)
+            Dim motionSort As New List(Of Integer)
             For i = 0 To task.gSquares.Count - 1
                 cv.Cv2.MeanStdDev(src(task.gSquares(i)), colorMean, colorstdev)
                 Dim colorVec = New cv.Vec3f(colorMean(0), colorMean(1), colorMean(2))
@@ -11463,21 +11463,21 @@ Namespace VBClasses
                 If colorChange > task.motionThreshold Then
                     lastColor(i) = colorVec
                     For Each index In task.grid.gridNeighbors(i)
-                        If motionList.Contains(index) = False Then
+                        If motionSort.Contains(index) = False Then
                             motionFlags(index) = True
-                            motionList.Add(index)
+                            motionSort.Add(index)
                         End If
                     Next
                 End If
             Next
 
             dst1.SetTo(0)
-            For Each i In motionList
+            For Each i In motionSort
                 dst1(task.gSquares(i)).SetTo(255)
                 motionFlags(i) = True
             Next
 
-            labels(2) = Format(motionList.Count / task.gSquares.Count, "00%") + " Of bricks had motion."
+            labels(2) = Format(motionSort.Count / task.gSquares.Count, "00%") + " Of bricks had motion."
 
             If task.gOptions.UseMotionMask.Checked = False Then dst1.SetTo(255)
 
@@ -11558,7 +11558,7 @@ Namespace VBClasses
         End Sub
         Public Shared Function getMotionRect() As cv.Rect
             Dim motionRect As cv.Rect
-            For Each index In task.motion.motionList
+            For Each index In task.motion.motionSort
                 motionRect = motionRect.Union(task.gSquares(index))
             Next
             Return motionRect
@@ -11739,7 +11739,7 @@ Namespace VBClasses
 
 
     Public Class XO_Motion_BasicsHistory : Inherits TaskParent
-        Public motionList As New List(Of Integer)
+        Public motionSort As New List(Of Integer)
         Dim diff As New Diff_Basics
         Public Sub New()
             dst3 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
@@ -11754,21 +11754,21 @@ Namespace VBClasses
 
             diff.Run(src)
 
-            motionList.Clear()
+            motionSort.Clear()
             dst3.SetTo(0)
             For i = 0 To task.gSquares.Count - 1
                 Dim diffCount = diff.dst2(task.gSquares(i)).CountNonZero
                 If diffCount >= task.motionThreshold Then
                     For Each index In task.grid.gridNeighbors(i)
-                        If motionList.Contains(index) = False Then
-                            motionList.Add(index)
+                        If motionSort.Contains(index) = False Then
+                            motionSort.Add(index)
                         End If
                     Next
                 End If
             Next
 
             Static cellList As New List(Of List(Of Integer))
-            cellList.Add(motionList)
+            cellList.Add(motionSort)
             dst3.SetTo(0)
             For Each lst In cellList
                 For Each index In lst
@@ -11780,8 +11780,8 @@ Namespace VBClasses
             src.CopyTo(dst2, dst3)
             task.motion.motionMask = dst3.Clone
 
-            labels(2) = CStr(motionList.Count) + " grid rect's or " +
-                    Format(motionList.Count / task.gSquares.Count, "0.0%") +
+            labels(2) = CStr(motionSort.Count) + " grid rect's or " +
+                    Format(motionSort.Count / task.gSquares.Count, "0.0%") +
                     " of bricks had motion."
         End Sub
     End Class
@@ -13095,7 +13095,7 @@ Namespace VBClasses
             If standalone Then task.gOptions.showMotionMask.Checked = True
             dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U)
             labels(3) = "Updated task.motionRect"
-            desc = "Use the motionlist of rects to create one motion rectangle."
+            desc = "Use the motionSort of rects to create one motion rectangle."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             mCore.Run(src)
@@ -13104,14 +13104,14 @@ Namespace VBClasses
 
             dst3.SetTo(0)
             Dim motionRect As cv.Rect
-            If mCore.motionList.Count > 0 Then
+            If mCore.motionSort.Count > 0 Then
                 motionRect = XO_Motion_RectHistory.getMotionRect()
                 dst3(motionRect).SetTo(255)
                 task.gray(motionRect).CopyTo(dst2(motionRect))
             End If
 
-            labels(2) = CStr(mCore.motionList.Count) + " grid rect's or " +
-                    Format(mCore.motionList.Count / task.gSquares.Count, "0.0%") +
+            labels(2) = CStr(mCore.motionSort.Count) + " grid rect's or " +
+                    Format(mCore.motionSort.Count / task.gSquares.Count, "0.0%") +
                     " of bricks had motion."
         End Sub
     End Class
@@ -13121,7 +13121,7 @@ Namespace VBClasses
 
 
     Public Class XO_Motion_CoreOld : Inherits TaskParent
-        Public motionList As New List(Of Integer)
+        Public motionSort As New List(Of Integer)
         Dim diff As New Diff_Basics
         Public Sub New()
             If standalone Then task.gOptions.showMotionMask.Checked = True
@@ -13136,25 +13136,25 @@ Namespace VBClasses
 
             diff.Run(src)
 
-            motionList.Clear()
+            motionSort.Clear()
             For i = 0 To task.gSquares.Count - 1
                 Dim diffCount = diff.dst2(task.gSquares(i)).CountNonZero
                 If diffCount >= task.motionThreshold Then
                     For Each index In task.grid.gridNeighbors(i)
-                        If motionList.Contains(index) = False Then motionList.Add(index)
+                        If motionSort.Contains(index) = False Then motionSort.Add(index)
                     Next
                 End If
             Next
 
             dst3.SetTo(0)
-            For Each index In motionList
+            For Each index In motionSort
                 Dim rect = task.gSquares(index)
                 src(rect).CopyTo(dst2(rect))
                 dst3(rect).SetTo(255)
             Next
 
             task.motion.motionMask = dst3.Clone
-            labels(2) = CStr(motionList.Count) + " grid rects had motion."
+            labels(2) = CStr(motionSort.Count) + " grid rects had motion."
         End Sub
     End Class
 
@@ -13426,7 +13426,7 @@ Namespace VBClasses
 
 
     Public Class XO_Motion_CoreAccum : Inherits TaskParent
-        Public motionList As New List(Of Integer)
+        Public motionSort As New List(Of Integer)
         Dim diff As New Diff_Basics
         Dim motionLists As New List(Of List(Of Integer))
         Public Sub New()
@@ -13442,21 +13442,21 @@ Namespace VBClasses
 
             diff.Run(src)
 
-            motionList.Clear()
+            motionSort.Clear()
             For i = 0 To task.gSquares.Count - 1
                 Dim diffCount = diff.dst2(task.gSquares(i)).CountNonZero
                 If diffCount >= task.motionThreshold Then
                     For Each index In task.grid.gridNeighbors(i)
-                        If motionList.Contains(index) = False Then motionList.Add(index)
+                        If motionSort.Contains(index) = False Then motionSort.Add(index)
                     Next
                 End If
             Next
 
-            motionLists.Add(motionList)
+            motionLists.Add(motionSort)
 
             dst3.SetTo(0)
             For Each mList In motionLists
-                For Each index In motionList
+                For Each index In motionSort
                     Dim rect = task.gSquares(index)
                     src(rect).CopyTo(dst2(rect))
                     dst3(rect).SetTo(255)
@@ -13466,7 +13466,7 @@ Namespace VBClasses
             If motionLists.Count > 10 Then motionLists.RemoveAt(0)
 
             task.motion.motionMask = dst3.Clone
-            labels(2) = CStr(motionList.Count) + " grid rects had motion."
+            labels(2) = CStr(motionSort.Count) + " grid rects had motion."
         End Sub
     End Class
 
@@ -13479,7 +13479,7 @@ Namespace VBClasses
             If standalone Then task.gOptions.showMotionMask.Checked = True
             dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U)
             labels(3) = "Updated task.motionRect"
-            desc = "Use the motionlist of rects to create one motion rectangle."
+            desc = "Use the motionSort of rects to create one motion rectangle."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             mCore.Run(src)
@@ -13488,13 +13488,13 @@ Namespace VBClasses
 
             dst3.SetTo(0)
             Dim motionRect = XO_Motion_RectHistory.getMotionRect()
-            If mCore.motionList.Count > 0 Then
+            If mCore.motionSort.Count > 0 Then
                 dst3(motionRect).SetTo(255)
                 task.gray(motionRect).CopyTo(dst2(motionRect))
             End If
 
-            labels(2) = CStr(mCore.motionList.Count) + " grid rect's or " +
-                    Format(mCore.motionList.Count / task.gSquares.Count, "0.0%") +
+            labels(2) = CStr(mCore.motionSort.Count) + " grid rect's or " +
+                    Format(mCore.motionSort.Count / task.gSquares.Count, "0.0%") +
                     " of bricks had motion."
         End Sub
     End Class
@@ -15760,7 +15760,7 @@ Namespace VBClasses
             dst1 = task.rightView
 
             motionMaskRight.SetTo(0)
-            For Each index In task.motion.motionList
+            For Each index In task.motion.motionSort
                 Dim gSq = bricks.brickList(index)
                 motionMaskRight.Rectangle(gSq.rRect, 255, -1)
                 dst1.Rectangle(gSq.rRect, 255, task.lineWidth)
@@ -16693,8 +16693,6 @@ Namespace VBClasses
                     minRes = New cv.Size(320, 180)
                 Case "640x480", "320x240", "160x120"
                     minRes = New cv.Size(160, 120)
-                Case "960x600", "480x300", "240x150"
-                    minRes = New cv.Size(240, 150)
                 Case "672x376", "336x188", "168x94"
                     minRes = New cv.Size(168, 94)
             End Select
@@ -16743,7 +16741,7 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             bricks.run(src)
             If task.heartBeatLT Or task.frameCount < 3 Then task.pointCloud.CopyTo(dst2)
-            If task.motion.motionList.Count = 0 Then Exit Sub ' no change...
+            If task.motion.motionSort.Count = 0 Then Exit Sub ' no change...
 
             Dim updateCount As Integer
             Dim newRange As Single = 0.01F
@@ -18075,7 +18073,7 @@ Namespace VBClasses
             desc = "If a RedCloud cell has no motion, it is preserved."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If task.motion.motionList.Count = 0 Then Exit Sub ' full image stable means nothing needs to be done...
+            If task.motion.motionSort.Count = 0 Then Exit Sub ' full image stable means nothing needs to be done...
             runRedList(src, labels(2))
             If task.redList.oldrclist.Count = 0 Then Exit Sub
 

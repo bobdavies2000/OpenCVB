@@ -1,7 +1,7 @@
 Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Class Motion_Basics : Inherits TaskParent
-        Public motionList As New List(Of Integer)
+        Public motionSort As New List(Of Integer)
         Dim diff As New Diff_Basics
         Public motionMask As cv.Mat = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 255)
         Public fLess As New FeatureLess_Basics
@@ -22,8 +22,6 @@ Namespace VBClasses
             Dim gridList As New SortedList(Of Integer, Integer)
             For i = 0 To task.gSquares.Count - 1
                 Dim r = task.gSquares(i)
-                Dim val = fLess.dst2.Get(Of Byte)(r.TopLeft.Y, r.TopLeft.X)
-                If val Then Continue For ' no sense checking for motion if there aren't even features.
                 Dim diffCount = diff.dst2(r).CountNonZero
                 If diffCount >= task.motionThreshold Then
                     For Each index In task.grid.gridNeighbors(i)
@@ -32,10 +30,10 @@ Namespace VBClasses
                 End If
             Next
 
-            motionList = New List(Of Integer)(gridList.Keys)
+            motionSort = New List(Of Integer)(gridList.Keys)
             motionMask.SetTo(0)
             dst3.SetTo(0)
-            For Each index In motionList
+            For Each index In motionSort
                 Dim rect = task.gSquares(index)
                 src(rect).CopyTo(dst2(rect))
                 dst3(rect).SetTo(255)
@@ -44,7 +42,7 @@ Namespace VBClasses
 
             fLess.Run(src.Clone)
 
-            labels(2) = "Grid rects with motion: " + CStr(motionList.Count)
+            labels(2) = "Grid rects with motion: " + CStr(motionSort.Count)
         End Sub
     End Class
 
@@ -72,7 +70,7 @@ Namespace VBClasses
 
             SetTrueText("Pixels different from camera image: " + CStr(diff.dst2.CountNonZero) + vbCrLf +
                     "Grid rects with more than " + CStr(task.motionThreshold) +
-                    " pixels different: " + CStr(task.motion.motionList.Count), 3)
+                    " pixels different: " + CStr(task.motion.motionSort.Count), 3)
         End Sub
     End Class
 
@@ -103,9 +101,9 @@ Namespace VBClasses
 
             SetTrueText("Pixels different from camera image: " + CStr(diff.dst2.CountNonZero) + vbCrLf +
                     "Grid rects with more than " + CStr(task.motionThreshold) +
-                    " pixels different: " + CStr(motionRight.motion.motionList.Count), 3)
+                    " pixels different: " + CStr(motionRight.motion.motionSort.Count), 3)
 
-            For Each index In motionRight.motion.motionList
+            For Each index In motionRight.motion.motionSort
                 dst1.Rectangle(task.gSquares(index), 255, task.lineWidth)
             Next
         End Sub
@@ -132,7 +130,7 @@ Namespace VBClasses
             dst2 = motionLeft.dst3
             dst3 = motionLeft.motion.dst2
 
-            labels(2) = CStr(motionLeft.motion.motionList.Count) + " bricks were copied to dst3"
+            labels(2) = CStr(motionLeft.motion.motionSort.Count) + " bricks were copied to dst3"
 
             cv.Cv2.Absdiff(dst3, task.leftView, dst1)
             dst1 = dst1.Threshold(0, 255, cv.ThresholdTypes.Binary)
@@ -182,7 +180,7 @@ Namespace VBClasses
 
     Public Class Motion_Cloud : Inherits TaskParent
         Public originalPointcloud As cv.Mat
-        Public motionList As New List(Of Integer)
+        Public motionSort As New List(Of Integer)
         Dim diff As New Diff_Depth32f
         Public motionMask As cv.Mat = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 255)
         Public Sub New()
@@ -277,25 +275,25 @@ Namespace VBClasses
             diff.lastFrame = dst2
             diff.Run(task.pcSplit(2))
 
-            motionList.Clear()
+            motionSort.Clear()
             For i = 0 To task.gSquares.Count - 1
                 Dim diffCount = diff.dst2(task.gSquares(i)).CountNonZero
                 If diffCount >= task.motionThreshold Then
                     For Each index In task.grid.gridNeighbors(i)
-                        If motionList.Contains(index) = False Then motionList.Add(index)
+                        If motionSort.Contains(index) = False Then motionSort.Add(index)
                     Next
                 End If
             Next
 
             motionMask.SetTo(0)
-            For Each index In motionList
+            For Each index In motionSort
                 motionMask(task.gSquares(index)).SetTo(255)
             Next
 
             task.pcSplit(2).CopyTo(dst2, motionMask)
             If standaloneTest() Then dst3 = motionMask
 
-            labels(2) = "Grid rects with motion: " + CStr(motionList.Count)
+            labels(2) = "Grid rects with motion: " + CStr(motionSort.Count)
         End Sub
     End Class
 
@@ -319,7 +317,7 @@ Namespace VBClasses
             cList.Clear()
             dst3 = src
             Dim count As Integer
-            For Each index In task.motion.motionList
+            For Each index In task.motion.motionSort
                 Dim r = task.gSquares(index)
                 dst2.Rectangle(r, white, task.lineWidth)
                 cv.Cv2.MatchTemplate(dst2(r), lastsrc(r), correlationMat, cv.TemplateMatchModes.CCoeffNormed)

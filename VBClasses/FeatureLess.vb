@@ -2,6 +2,25 @@ Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Class FeatureLess_Basics : Inherits TaskParent
         Public rectList As New List(Of cv.Rect)
+        Dim corr As New Correlation_Basics
+        Public Sub New()
+            desc = "Measure the correlation of all grid squares except where there is motion."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            If src.Channels <> 1 Then src = task.gray
+
+            corr.Run(src)
+            dst2 = corr.dst2
+            dst3 = corr.dst3
+            labels(3) = corr.labels(3)
+        End Sub
+    End Class
+
+
+
+
+    Public Class FeatureLess_Threshold : Inherits TaskParent
+        Public rectList As New List(Of cv.Rect)
         Public Sub New()
             dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
             desc = "Identify featureless squares using the gray scale range - see 'Correlation_Basics'."
@@ -11,11 +30,11 @@ Namespace VBClasses
 
             dst2.SetTo(0)
             rectList.Clear()
-            For Each gSq In task.gSquares
-                Dim mm = GetMinMax(src(gSq))
+            For Each r In task.gSquares
+                Dim mm = GetMinMax(src(r))
                 If mm.range < task.fLessThreshold Then
-                    dst2(gSq).SetTo(255)
-                    rectList.Add(gSq)
+                    dst2(r).SetTo(255)
+                    rectList.Add(r)
                 End If
             Next
 
@@ -87,7 +106,7 @@ Namespace VBClasses
 
 
     Public Class FeatureLess_Correlations : Inherits TaskParent
-        Dim corr As New Correlation_Basics
+        Dim corr As New Correlation_BasicsPlot
         Public Sub New()
             dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
             desc = "Identify featureless squares using the gray scale range - see 'Correlation_Basics'."
@@ -112,7 +131,7 @@ Namespace VBClasses
 
 
     Public Class FeatureLess_Compare : Inherits TaskParent
-        Dim corr As New Correlation_Basics
+        Dim corr As New Correlation_BasicsPlot
         Public Sub New()
             labels(3) = "The red squares below are differences from the correlation calculation"
             desc = "Compare the correlation results with the range threshold results."
@@ -396,10 +415,6 @@ Namespace VBClasses
             redC.Run(dst2)
             dst3 = redC.dst2
             labels(3) = redC.labels(2)
-
-            For Each rc In redC.rcList
-                dst3.Circle(rc.maxDist, task.DotSize, task.highlight, -1)
-            Next
 
             If standaloneTest() Then
                 strOut = RedUtil_Basics.selectCell(redC.rcMap, redC.rcList)

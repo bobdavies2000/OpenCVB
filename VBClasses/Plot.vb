@@ -665,7 +665,7 @@ Namespace VBClasses
 
     Public Class Plot_Interactive : Inherits TaskParent
         Public plotHist As New Plot_Histogram
-        Dim corr As New Correlation_Basics
+        Dim corr As New Correlation_BasicsPlot
         Public Sub New()
             dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
             plotHist.minRange = 0

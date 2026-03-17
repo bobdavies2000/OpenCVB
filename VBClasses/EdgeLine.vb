@@ -81,7 +81,7 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             Dim histogram As New cv.Mat
             Dim histarray(edgeLine.rcList.Count - 1) As Single
-            If task.motion.motionList.Count = 0 Then Exit Sub ' no change!
+            If task.motion.motionSort.Count = 0 Then Exit Sub ' no change!
 
             Dim newList As New List(Of rcData)
             dst2.SetTo(0)

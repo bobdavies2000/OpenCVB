@@ -7,7 +7,6 @@ Public Class Options
         {"1920x1080 - Full resolution", "960x540 - Quarter resolution", "480x270 - Small resolution",
          "1280x720 - Full resolution", "640x360 - Quarter resolution", "320x180 - Small resolution",
          "640x480 - Full resolution", "320x240 - Quarter resolution", "160x120 - Small resolution",
-         "960x600 - Full resolution", "480x300 - Quarter resolution", "240x150 - Small resolution  ",
          "672x376 - Full resolution", "336x188 - Quarter resolution", "168x94 - Small resolution    "})
     Dim formLoadComplete As Boolean
     Private Sub OKButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles OKButton.Click
@@ -31,25 +30,21 @@ Public Class Options
                 settings.resolutionsSupported = New List(Of Boolean)({True, True, True,
                                                                       True, True, True,
                                                                       False, False, False,
-                                                                      False, False, False,
                                                                       True, True, True})
             Case "Intel(R) RealSense(TM) Depth Camera 435i", "Intel(R) RealSense(TM) Depth Camera 455"
                 settings.resolutionsSupported = New List(Of Boolean)({False, False, False,
                                                                       True, True, True,
-                                                                      False, False, False,
                                                                       False, False, False,
                                                                       False, False, False})
             Case "Oak-3D camera", "Oak-4D camera"
                 settings.resolutionsSupported = New List(Of Boolean)({False, False, False,
                                                                       True, True, True,
                                                                       True, True, True,
-                                                                      False, False, False,
                                                                       False, False, False})
             Case "Orbbec Gemini 335L", "Orbbec Gemini 336L", "Orbbec Gemini 335"
                 settings.resolutionsSupported = New List(Of Boolean)({False, False, False,
                                                                       True, True, True,
                                                                       True, True, True,
-                                                                      False, False, False,
                                                                       False, False, False})
         End Select
     End Sub

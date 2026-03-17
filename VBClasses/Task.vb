@@ -118,11 +118,11 @@ Namespace VBClasses
                 If optionsChanged Or task.frameCount < 5 Then
                     grayStable = gray.Clone
                 Else
-                    If motion.motionList.Count > 0 Then gray.CopyTo(grayStable, motion.motionMask)
+                    If motion.motionSort.Count > 0 Then gray.CopyTo(grayStable, motion.motionMask)
                 End If
             Else
                 motion.motionMask.SetTo(255)
-                motion.motionList.Clear()
+                motion.motionSort.Clear()
                 grayStable = gray
                 motion.Run(gray)
             End If
@@ -219,7 +219,7 @@ Namespace VBClasses
 
             If gOptions.ShowGrid.Checked Then dstList(2).SetTo(cv.Scalar.White, gridMask)
             If gOptions.showMotionMask.Checked Then
-                For Each mIndex In motion.motionList
+                For Each mIndex In motion.motionSort
                     dstList(0).Rectangle(gSquares(mIndex), cv.Scalar.White, lineWidth)
                 Next
             End If
