@@ -1678,8 +1678,8 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             dst2 = src.Clone
-            dst2.SetTo(0, task.motion.fLess.dst2)
-            labels(2) = task.motion.fLess.labels(2)
+            dst2.SetTo(0, task.motion.corr.dst2)
+            labels(2) = task.motion.corr.labels(2)
 
             edges.Run(dst2)
             dst3 = edges.dst2

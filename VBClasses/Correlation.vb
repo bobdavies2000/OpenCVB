@@ -1,6 +1,7 @@
 Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Class Correlation_Basics : Inherits TaskParent
+        Public rectList As New List(Of cv.Rect)
         Public Sub New()
             task.gOptions.HistBinBar.Value = task.gOptions.HistBinBar.Maximum
             desc = "Measure the correlation of all grid squares except where there is motion."
@@ -11,18 +12,20 @@ Namespace VBClasses
             Static lastsrc As cv.Mat = src.Clone
             dst2 = src.Clone
             Dim correlationMat As New cv.Mat
-            Dim corrThreshold = 2.0 - 2.0 / task.histogramBins
+            Dim maxCorrelation = 2.0 - 2.0 / task.histogramBins
             Dim motionIndex As Integer
             Dim motionList As New List(Of Integer)(task.motion.motionSort)
             Dim maxIndex = task.motion.motionSort.Count - 1
             If maxIndex < 0 Then motionList.Add(-1) ' add a dummy value to avoid errors when there is no motion
+            rectList.Clear()
             For i = 0 To task.gSquares.Count - 1
                 If i <> motionList(motionIndex) Then
                     Dim r = task.gSquares(i)
                     cv.Cv2.MatchTemplate(src(r), lastsrc(r), correlationMat, cv.TemplateMatchModes.CCoeffNormed)
                     Dim corr = correlationMat.Get(Of Single)(0, 0) + 1
-                    If corr < corrThreshold Then
+                    If corr < maxCorrelation Then
                         dst2.Rectangle(r, white, task.lineWidth)
+                        rectList.Add(r)
                     End If
                 Else
                     If motionIndex < maxIndex Then motionIndex += 1

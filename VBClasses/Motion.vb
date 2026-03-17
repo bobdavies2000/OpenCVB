@@ -4,7 +4,7 @@ Namespace VBClasses
         Public motionSort As New List(Of Integer)
         Dim diff As New Diff_Basics
         Public motionMask As cv.Mat = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 255)
-        Public fLess As New FeatureLess_Basics
+        Public corr As New Correlation_Basics
         Public Sub New()
             If standalone Then task.gOptions.showMotionMask.Checked = True
             dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
@@ -40,7 +40,7 @@ Namespace VBClasses
                 motionMask(rect).SetTo(255)
             Next
 
-            fLess.Run(src.Clone)
+            corr.Run(src.Clone)
 
             labels(2) = "Grid rects with motion: " + CStr(motionSort.Count)
         End Sub
