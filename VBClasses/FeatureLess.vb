@@ -104,21 +104,21 @@ Namespace VBClasses
 
 
 
-    Public Class FeatureLess_Correlations : Inherits TaskParent
+    Public Class NR_FeatureLess_Correlations : Inherits TaskParent
         Dim corr As New Correlation_BasicsPlot
         Public Sub New()
             dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
             desc = "Identify featureless squares using the gray scale range - see 'Correlation_Basics'."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If standaloneTest() Then dst3 = src
             corr.Run(src)
+            dst3 = corr.dst3
             labels(3) = corr.labels(3)
 
             dst2.SetTo(0)
             For i = 0 To corr.cList.Count - 1
                 Dim gSq = task.gSquares(i)
-                If corr.cList(i) < corr.corrThreshold Then
+                If corr.cList(i) < corr.maxCorrelation Then
                     dst2(gSq).SetTo(255)
                     If standaloneTest() Then src.Rectangle(gSq, white, task.lineWidth)
                 End If
@@ -126,31 +126,6 @@ Namespace VBClasses
         End Sub
     End Class
 
-
-
-
-    Public Class FeatureLess_Compare : Inherits TaskParent
-        Dim corr As New Correlation_BasicsPlot
-        Public Sub New()
-            labels(3) = "The red squares below are differences from the correlation calculation"
-            desc = "Compare the correlation results with the range threshold results."
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            dst2 = task.motion.corr.dst3
-
-            corr.Run(src)
-            dst3 = corr.dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-
-            For i = 0 To corr.cList.Count - 1
-                Dim correlation = corr.cList(i)
-                If correlation < corr.corrThreshold Then
-                    Dim r = task.gSquares(i)
-                    Dim val = task.motion.corr.dst2.Get(Of Byte)(r.TopLeft.Y, r.TopLeft.X)
-                    If val = 0 Then dst3.Rectangle(r, red, -1)
-                End If
-            Next
-        End Sub
-    End Class
 
 
 
@@ -337,6 +312,7 @@ Namespace VBClasses
     Public Class NR_FeatureLess_History : Inherits TaskParent
         Dim frames As New History_Basics
         Public Sub New()
+            labels(3) = "The brighter the grid square, the more recent appearance."
             desc = "Accumulate the edges over a span of X images."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -344,6 +320,11 @@ Namespace VBClasses
 
             frames.Run(dst2)
             dst3 = frames.dst2
+
+            Dim countCurr = dst2.CountNonZero
+            Dim countAll = dst3.CountNonZero
+            Dim squareSize = task.grid.
+            labels(2) = "Current frame: " + Format(countCurr / ())
         End Sub
     End Class
 

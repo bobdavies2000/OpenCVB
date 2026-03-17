@@ -19105,4 +19105,29 @@ Namespace VBClasses
             Next
         End Sub
     End Class
+
+
+
+
+    Public Class XO_FeatureLess_Compare : Inherits TaskParent
+        Dim corr As New Correlation_BasicsPlot
+        Public Sub New()
+            labels(3) = "The red squares below are differences from the correlation calculation"
+            desc = "Compare the correlation results with the range threshold results."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            corr.Run(task.gray)
+            dst2 = corr.dst2
+            dst3 = dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+
+            For i = 0 To corr.cList.Count - 1
+                Dim correlation = corr.cList(i)
+                If correlation < corr.maxCorrelation Then
+                    Dim r = task.gSquares(i)
+                    Dim val = dst2.Get(Of Byte)(r.TopLeft.Y, r.TopLeft.X)
+                    If val = 0 Then dst3.Rectangle(r, red, -1)
+                End If
+            Next
+        End Sub
+    End Class
 End Namespace

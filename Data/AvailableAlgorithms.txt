@@ -244,8 +244,6 @@ FeatureFlow_LeftRightHist
 FeatureFlow_LucasKanade
 FeatureLess_Basics
 FeatureLess_Cells
-FeatureLess_Compare
-FeatureLess_Correlations
 FeatureLess_Not
 FeatureLess_RedColor
 FeatureLess_Threshold
@@ -876,6 +874,7 @@ NR_FeatureFlow_LeftRight1
 NR_FeatureLess_Basics
 NR_FeatureLess_Canny
 NR_FeatureLess_Contours
+NR_FeatureLess_Correlations
 NR_FeatureLess_DCT
 NR_FeatureLess_Groups
 NR_FeatureLess_Histogram

@@ -2,7 +2,9 @@ Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Class Correlation_Basics : Inherits TaskParent
         Public rectList As New List(Of cv.Rect)
+        Public maxCorrelation As Single
         Public Sub New()
+            dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
             task.gOptions.HistBinBar.Value = task.gOptions.HistBinBar.Maximum
             desc = "Measure the correlation of all grid squares except where there is motion."
         End Sub
@@ -10,9 +12,9 @@ Namespace VBClasses
             If src.Channels <> 1 Then src = task.gray
 
             Static lastsrc As cv.Mat = src.Clone
-            dst2 = src.Clone
+            dst2.SetTo(0)
             Dim correlationMat As New cv.Mat
-            Dim maxCorrelation = 2.0 - 2.0 / task.histogramBins
+            maxCorrelation = 2.0 - 2.0 / task.histogramBins
             Dim motionIndex As Integer
             Dim motionList As New List(Of Integer)(task.motion.motionSort)
             Dim maxIndex = task.motion.motionSort.Count - 1
@@ -22,9 +24,9 @@ Namespace VBClasses
                 If i <> motionList(motionIndex) Then
                     Dim r = task.gSquares(i)
                     cv.Cv2.MatchTemplate(src(r), lastsrc(r), correlationMat, cv.TemplateMatchModes.CCoeffNormed)
-                    Dim corr = correlationMat.Get(Of Single)(0, 0) + 1
-                    If corr < maxCorrelation Then
-                        dst2.Rectangle(r, white, task.lineWidth)
+                    Dim correlation = correlationMat.Get(Of Single)(0, 0) + 1
+                    If correlation < maxCorrelation Then
+                        dst2.Rectangle(r, white, -1)
                         rectList.Add(r)
                     End If
                 Else
@@ -88,7 +90,7 @@ Namespace VBClasses
 
     Public Class Correlation_BasicsPlot : Inherits TaskParent
         Public cList As New List(Of Single)
-        Public corrThreshold As Single
+        Public maxCorrelation As Single
         Public mmRanges As New List(Of Double)
         Dim plotHist As New Plot_Histogram
         Public Sub New()
@@ -130,13 +132,13 @@ Namespace VBClasses
                 Dim lastEntry = plotHist.histArray.Last
                 labels(2) = "Correlation Min = " + Format(cList.Min - 1, fmt1) + ", Max = " + Format(cList.Max - 1, fmt1)
                 labels(3) = CStr(lastEntry) + " (" + Format(lastEntry / task.gSquares.Count, "0%") +
-                            ") had correlation >= " + Format(corrThreshold - 1, fmt2) + "  Plot below ranges from -1 to 1"
+                            ") had correlation >= " + Format(maxCorrelation - 1, fmt2) + "  Plot below ranges from -1 to 1"
 
-                corrThreshold = 2.0 - 2.0 / task.histogramBins
+                maxCorrelation = 2.0 - 2.0 / task.histogramBins
                 Dim mmRangeTest As New List(Of Double)
                 For i = 0 To task.gSquares.Count - 1
                     Dim r = task.gSquares(i)
-                    If cList(i) < corrThreshold Then
+                    If cList(i) < maxCorrelation Then
                         dst2.Rectangle(r, white, task.lineWidth)
                         mmRangeTest.Add(mmRanges(i))
                     End If

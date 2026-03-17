@@ -2,10 +2,13 @@ Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Class History_Basics : Inherits TaskParent
         Public saveFrames As New List(Of cv.Mat)
+        Dim options As New Options_History
         Public Sub New()
             desc = "Create a frame history to sum the last X frames"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
+            options.Run()
+
             If task.frameHistoryCount = 1 Then
                 dst2 = src
                 Exit Sub
