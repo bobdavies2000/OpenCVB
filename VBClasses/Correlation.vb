@@ -81,6 +81,45 @@ Namespace VBClasses
 
 
 
+    Public Class Correlation_BasicsNew : Inherits TaskParent
+        Dim smallGrid As New Grid_SquaresOnly
+        Public Sub New()
+            desc = "Compute correlation at smallRes resolution to build the featureLess map."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            ' couldn't put this in the constructor because motion is a task algorithm.
+            If task.firstPass Then smallGrid.Run(src) ' create the grid squares for the small resolution.
+            Dim input As cv.Mat
+            If src.Channels <> 1 Then input = task.gray Else input = src
+
+            ' why do this resize?  Because the flessThreshold works at smallRes but not larger resolutions.
+            If task.workRes.Height > 270 Then input = input.Resize(task.smallRes, 0, 0, cv.InterpolationFlags.Nearest)
+
+            'Static lastsrc As cv.Mat = task.gray.Clone
+            'dst2 = task.gray.Clone
+            'Dim correlationMat As New cv.Mat
+            'cList.Clear()
+            'dst3 = src
+            'Dim mmList As New List(Of mmData)
+            'mmRanges.Clear()
+            'For i = 0 To task.gSquares.Count - 1
+            '    Dim r = task.gSquares(i)
+            '    cv.Cv2.MatchTemplate(task.gray(r), lastsrc(r), correlationMat, cv.TemplateMatchModes.CCoeffNormed)
+
+            '    Dim corr = correlationMat.Get(Of Single)(0, 0) + 1
+            '    cList.Add(corr)
+            '    Dim mm = GetMinMax(task.gray(r))
+            '    mmList.Add(mm)
+            '    mmRanges.Add(mm.range)
+            'Next
+
+        End Sub
+    End Class
+
+
+
+
+
     Public Class NR_Correlation_Basics : Inherits TaskParent
         Dim kFlood As New KMeans_Edges
         Dim options As New Options_FeatureMatch
@@ -160,5 +199,4 @@ Namespace VBClasses
             labels(3) = plot.labels(3)
         End Sub
     End Class
-
 End Namespace

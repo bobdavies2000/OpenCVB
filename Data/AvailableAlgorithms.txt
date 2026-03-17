@@ -116,6 +116,7 @@ Corners_HarrisDetector_CPP
 Corners_RedPrepData
 Corners_ShiTomasi_CPP
 Correlation_Basics
+Correlation_BasicsNew
 Correlation_Interactive
 Covariance_Basics
 Covariance_Images

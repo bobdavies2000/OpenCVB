@@ -31,7 +31,7 @@ Public Class Options
                 settings.resolutionsSupported = New List(Of Boolean)({True, True, True,
                                                                       True, True, True,
                                                                       False, False, False,
-                                                                      True, True, True,
+                                                                      False, False, False,
                                                                       True, True, True})
             Case "Intel(R) RealSense(TM) Depth Camera 435i", "Intel(R) RealSense(TM) Depth Camera 455"
                 settings.resolutionsSupported = New List(Of Boolean)({False, False, False,

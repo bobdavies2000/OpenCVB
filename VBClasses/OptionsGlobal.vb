@@ -81,9 +81,11 @@ Public Class OptionsGlobal
             Case 168
                 task.cvFontSize = 0.5
                 task.smallRes = New cv.Size(168, 94)
+                task.brickSize = 5
             Case 160
                 task.cvFontSize = 1.0
                 task.smallRes = New cv.Size(160, 120)
+                task.brickSize = 5
         End Select
 
         GridSlider.Value = task.brickSize

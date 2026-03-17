@@ -58,7 +58,6 @@ Namespace VBClasses
 
             dst2 = mask.Resize(src.Size, 0, 0, cv.InterpolationFlags.Nearest)
 
-            Dim motionIndex As Integer
             rectList.Clear()
             For Each r In task.gSquares
                 If dst2.Get(Of Byte)(r.TopLeft.Y, r.TopLeft.X) Then rectList.Add(r)
