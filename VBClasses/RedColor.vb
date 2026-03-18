@@ -137,14 +137,14 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             reduction.Run(task.leftView)
 
-            redLeft.Run(reduction.dst2)
-            dst2 = Palettize(redLeft.dst2)
+            redLeft.Run(reduction.dst2 + 1)
+            dst2 = Palettize(redLeft.dst2, 0)
             labels(2) = redLeft.labels(2) + " in the left image"
 
             reduction.Run(task.rightView)
 
-            redRight.Run(reduction.dst2)
-            dst3 = Palettize(redRight.dst2)
+            redRight.Run(reduction.dst2 + 1)
+            dst3 = Palettize(redRight.dst2, 0)
             labels(3) = redRight.labels(2) + " in the right image"
         End Sub
     End Class
@@ -287,7 +287,7 @@ Namespace VBClasses
 
     Public Class RedColor_List : Inherits TaskParent
         Public inputRemoved As cv.Mat
-        Public cellGen As New XO_RedCell_Color
+        Public cellGen As New RedMask_Cells
         Public redMask As New RedMask_Basics
         Public rclist As New List(Of rcData)
         Public rcMap As cv.Mat ' redColor map 
@@ -309,7 +309,7 @@ Namespace VBClasses
             End If
 
             If inputRemoved IsNot Nothing Then dst1.SetTo(0, inputRemoved)
-            redMask.Run(dst1)
+            redMask.Run(dst1 + 1)
 
             If redMask.mdList.Count = 0 Then Exit Sub ' no data to process.
             cellGen.mdList = redMask.mdList
@@ -324,9 +324,6 @@ Namespace VBClasses
                 rclist.Add(rc)
             Next
 
-            For Each rc In rclist
-                DrawCircle(dst2, rc.maxDist)
-            Next
             labels(2) = cellGen.labels(2)
             labels(3) = ""
             SetTrueText("", newPoint, 1)

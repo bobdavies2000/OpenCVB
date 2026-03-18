@@ -117,7 +117,7 @@ Namespace VBClasses
 
     Public Class Classifier_BayesianTest : Inherits TaskParent
         Implements IDisposable
-        Dim nabs As New Neighbor_Precise
+        'Dim nabs As New Neighbor_Precise
         Public Sub New()
             dst1 = New cv.Mat(dst1.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
             labels = {"", "Mask of the neighbors to the selected cell", "RedList_Basics output", "Classifier_Bayesian output"}

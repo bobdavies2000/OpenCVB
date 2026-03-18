@@ -3,7 +3,7 @@ Imports System.Runtime.InteropServices
 Namespace VBClasses
     Public Class RedList_Basics : Inherits TaskParent
         Public inputRemoved As cv.Mat
-        Public cellGen As New XO_RedCell_Color
+        Public cellGen As New RedMask_Cells
         Public redMask As New RedMask_Basics
         Public rclist As New List(Of rcData)
         Public contours As New Contour_Basics

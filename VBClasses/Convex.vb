@@ -55,7 +55,7 @@ Namespace VBClasses
         Dim convex As New Convex_Basics
         Public Sub New()
             labels = {"", "", "Selected contour - line shows hull with white is contour.  Click to select another contour.", "RedCloud cells"}
-            desc = "Get lots of odd shapes from the RedList_Basics output and use ConvexHull to simplify them."
+            desc = "Get lots of odd shapes from the Convex_Basics output and use ConvexHull to simplify them."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             dst2 = runRedList(src, labels(2))
