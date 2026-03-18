@@ -35,6 +35,7 @@ Namespace VBClasses
             Next
 
             lastsrc = src.Clone
+            task.fLessMask = dst2.Clone
         End Sub
     End Class
 

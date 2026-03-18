@@ -708,7 +708,7 @@ Namespace VBClasses
             desc = "Display the pointcloud"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            dst2 = task.motion.corr.dst2
+            dst2 = task.fLessMask.Clone
             labels(2) = task.motion.corr.labels(2)
 
             dst3.SetTo(0)

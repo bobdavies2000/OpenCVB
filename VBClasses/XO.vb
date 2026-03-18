@@ -19142,7 +19142,7 @@ Namespace VBClasses
             desc = "Group RedCloud cells by the value of their featureless maxDist"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            dst1 = task.motion.corr.dst2.Threshold(0, 255, cv.ThresholdTypes.Binary)
+            dst1 = task.fLessMask.Threshold(0, 255, cv.ThresholdTypes.Binary)
             labels(2) = task.motion.corr.labels(2)
 
             If task.optionsChanged Then dst2 = dst1.Clone Else dst1.CopyTo(dst2, task.motion.motionMask)

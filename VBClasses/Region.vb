@@ -134,7 +134,6 @@ Namespace VBClasses
     Public Class Region_Core : Inherits TaskParent
         Public hTuples As New List(Of Tuple(Of Integer, Integer))
         Public vTuples As New List(Of Tuple(Of Integer, Integer))
-        Public width As Integer, height As Integer
         Dim colStart As Integer, colEnd As Integer, colorIndex As Integer
         Dim rowStart As Integer, bottomRight As cv.Point, topLeft As cv.Point
         Dim options As New Options_Features
@@ -172,19 +171,17 @@ Namespace VBClasses
             dst2.SetTo(0)
             dst3.SetTo(0)
 
-            width = dst2.Width / task.squareSize
-            If width * task.squareSize <> dst2.Width Then width += 1
-            height = Math.Floor(dst2.Height / task.squareSize)
-            If height * task.squareSize <> dst2.Height Then height += 1
             hTuples.Clear()
             colorIndex = 0
-            For i = 0 To height - 1
-                colStart = i * width
+            For i = 0 To task.bricksPerCol - 1
+                colStart = i * task.bricksPerRow
                 colEnd = colStart
-                For j = 0 To width - 2
-                    hTestRect(bricks.brickList(i * width + j), bricks.brickList(i * width + j + 1), i * width + j + 1)
+                For j = 0 To task.bricksPerRow - 2
+                    hTestRect(bricks.brickList(i * task.bricksPerRow + j),
+                              bricks.brickList(i * task.bricksPerRow + j + 1), i * task.bricksPerRow + j + 1)
                 Next
-                hTestRect(bricks.brickList(i * width + height - 1), bricks.brickList(i * width + height - 1), -1)
+                hTestRect(bricks.brickList(i * task.bricksPerRow + task.bricksPerCol - 1),
+                          bricks.brickList(i * task.bricksPerRow + task.bricksPerCol - 1), -1)
             Next
             labels(2) = CStr(colorIndex) + " horizontal slices were connected because cell depth difference < " +
                     CStr(task.depthDiffMeters) + " meters"
@@ -192,16 +189,17 @@ Namespace VBClasses
             vTuples.Clear()
             Dim index As Integer
             colorIndex = 0
-            For i = 0 To width - 1
+            For i = 0 To task.bricksPerRow - 1
                 rowStart = i
                 topLeft = bricks.brickList(i).rect.TopLeft
-                bottomRight = bricks.brickList(i + width).rect.TopLeft
-                For j = 0 To height - 2
-                    index = i + (j + 1) * width
+                bottomRight = bricks.brickList(i + task.bricksPerRow).rect.TopLeft
+                For j = 0 To task.bricksPerCol - 2
+                    index = i + (j + 1) * task.bricksPerRow
                     If index >= bricks.brickList.Count Then index = bricks.brickList.Count - 1
-                    vTestRect(bricks.brickList(i + j * width), bricks.brickList(index), i + j * width, index)
+                    vTestRect(bricks.brickList(i + j * task.bricksPerRow),
+                              bricks.brickList(index), i + j * task.bricksPerRow, index)
                 Next
-                Dim brickNext = i + (height - 1) * width
+                Dim brickNext = i + (task.bricksPerCol - 1) * task.bricksPerRow
                 If brickNext >= bricks.brickList.Count Then brickNext = bricks.brickList.Count - 1
                 vTestRect(bricks.brickList(brickNext), bricks.brickList(index), brickNext, -1)
             Next

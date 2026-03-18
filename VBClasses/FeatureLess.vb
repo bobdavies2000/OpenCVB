@@ -12,6 +12,8 @@ Namespace VBClasses
             dst2 = corr.dst2
             dst3 = corr.dst3
             labels(3) = corr.labels(3)
+
+            task.fLessMask = dst2
         End Sub
     End Class
 
@@ -316,7 +318,7 @@ Namespace VBClasses
             desc = "Accumulate the edges over a span of X images."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            dst2 = task.motion.corr.dst2.Threshold(0, 255, cv.ThresholdTypes.Binary)
+            dst2 = task.fLessMask.Threshold(0, 255, cv.ThresholdTypes.Binary)
 
             frames.Run(dst2)
             dst3 = frames.dst2
@@ -367,7 +369,7 @@ Namespace VBClasses
             desc = "Use the featureLess_Basics output as input to RedColor_Basics"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            dst2 = task.motion.corr.dst2
+            dst2 = task.fLessMask.Clone
             labels(2) = task.motion.corr.labels(3)
 
             redC.Run(dst2)
@@ -395,7 +397,7 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             dst2.SetTo(0)
-            src.CopyTo(dst2, Not task.motion.corr.dst2)
+            src.CopyTo(dst2, Not task.fLessMask)
 
             feat.Run(dst2)
             feat.dst2.CopyTo(dst3)
@@ -416,7 +418,7 @@ Namespace VBClasses
             desc = "Group the featureless grid squares"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            dst2 = task.motion.corr.dst2
+            dst2 = task.fLessMask.Clone
             labels(2) = task.motion.corr.labels(2)
 
             Dim index = 1

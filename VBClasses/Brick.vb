@@ -15,7 +15,6 @@ Namespace VBClasses
             If task.optionsChanged Then brickList.Clear()
 
             Dim correlationMat As New cv.Mat
-            Dim maxPixels = task.squareSize * task.squareSize
             brickList.Clear()
             Dim depthCount As Integer
             brickDepthCount = 0
@@ -1006,7 +1005,7 @@ Namespace VBClasses
             options.Run()
 
             dst2 = src.Clone
-            dst2.SetTo(0, task.motion.corr.dst2)
+            dst2.SetTo(0, task.fLessMask)
             labels(2) = task.motion.corr.labels(2)
 
             If standaloneTest() Then
@@ -1045,7 +1044,7 @@ Namespace VBClasses
             bricks.Run(src)
 
             dst2 = src.Clone
-            dst2.SetTo(0, task.motion.corr.dst2)
+            dst2.SetTo(0, task.fLessMask)
             labels(2) = task.motion.corr.labels(2)
 
             dst3 = task.rightView.CvtColor(cv.ColorConversionCodes.GRAY2BGR)

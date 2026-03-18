@@ -24,9 +24,11 @@ Namespace VBClasses
         Public sharpDepth As cv.Mat
         Public sharpRGB As cv.Mat
         Public pcSplit() As cv.Mat
+        Public depthRGB As cv.Mat
+
         Public depthmask As cv.Mat
         Public noDepthMask As cv.Mat
-        Public depthRGB As cv.Mat
+        Public fLessMask As cv.Mat
 
         Public gSquares As List(Of cv.Rect)
         Public firstPass As Boolean = True
