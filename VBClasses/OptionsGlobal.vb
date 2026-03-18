@@ -96,6 +96,7 @@ Public Class OptionsGlobal
         Me.Left = 0
         Me.Top = 30
         maxCount.Text = CStr(MaxDepthBar.Value)
+        GridSizeLabel.Text = CStr(GridSlider.Value)
     End Sub
     Private Sub LineType_SelectedIndexChanged(sender As Object, e As EventArgs) Handles LineType.SelectedIndexChanged
         task.optionsChanged = True

@@ -62,8 +62,6 @@ Namespace VBClasses
 
 
 
-
-
     Public Class NR_RedMask_Redraw : Inherits TaskParent
         Public redMask As New RedMask_Basics
         Public Sub New()

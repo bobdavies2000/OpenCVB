@@ -104,40 +104,65 @@ Namespace VBClasses
 
 
 
-
     Public Class LeftRight_RedRightGray : Inherits TaskParent
         Dim color8u As New Color8U_Basics
-        Public redMask As New RedMask_Basics
+        Public redC As New RedColor_Basics
         Public Sub New()
-            desc = "Segment the right view image with RedMask_Basics"
+            desc = "Segment the left view image with RedColor_Basics"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             color8u.Run(task.rightView)
-            redMask.Run(color8u.dst2)
-            dst2 = redMask.dst2.Clone
-            dst3 = Palettize(dst2)
-            labels = redMask.labels
+            redC.Run(color8u.dst2 + 1)
+            dst2 = redC.dst2
+            labels = redC.labels
+
+            strOut = RedUtil_Basics.selectCell(redC.rcMap, redC.rcList)
+            SetTrueText(strOut, 3)
         End Sub
     End Class
-
 
 
 
 
     Public Class LeftRight_RedLeftGray : Inherits TaskParent
         Dim color8u As New Color8U_Basics
-        Public redMask As New RedMask_Basics
+        Public redC As New RedColor_Basics
         Public Sub New()
-            desc = "Segment the left view image with RedMask_Basics"
+            desc = "Segment the left view image with RedColor_Basics"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             color8u.Run(task.leftView)
-            redMask.Run(color8u.dst2)
-            dst2 = redMask.dst2.Clone
-            dst3 = Palettize(dst2)
-            labels = redMask.labels
+            redC.Run(color8u.dst2 + 1)
+            dst2 = redC.dst2
+            labels = redC.labels
+
+            strOut = RedUtil_Basics.selectCell(redC.rcMap, redC.rcList)
+            SetTrueText(strOut, 3)
         End Sub
     End Class
+
+
+
+
+
+    Public Class LeftRight_RedCompare : Inherits TaskParent
+        Dim left As New LeftRight_RedLeftGray
+        Dim right As New LeftRight_RedRightGray
+        Public Sub New()
+            desc = "Compare the left and right RedColor_Basics output"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            left.Run(task.leftView)
+            dst2 = left.dst2
+            labels(2) = left.labels(2)
+
+            right.Run(task.rightView)
+            dst3 = right.dst2
+            labels(3) = right.labels(2)
+        End Sub
+    End Class
+
+
 
 
 
@@ -240,26 +265,26 @@ Namespace VBClasses
 
 
 
-    Public Class LeftRight_RedMask : Inherits TaskParent
-        Dim redLeft As New LeftRight_RedLeft
-        Dim redRight As New LeftRight_RedRight
+    Public Class LeftRight_FLessRedCompare : Inherits TaskParent
+        Dim redLeft As New LeftRight_FLessRedLeft
+        Dim redRight As New LeftRight_FLessRedRight
         Public Sub New()
-            desc = "Display the RedMask_Basics output for both the left and right images."
+            desc = "Display the RedColor_Basics output for both the left and right images."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             redLeft.Run(task.leftView)
             dst2 = redLeft.dst2.Clone
             If standaloneTest() Then
-                For Each md In redLeft.redMask.mdList
-                    DrawCircle(dst2, md.maxDist, task.DotSize, task.highlight)
+                For Each rc In redLeft.redC.rcList
+                    DrawCircle(dst2, rc.maxDist, task.DotSize, task.highlight)
                 Next
             End If
 
             redRight.Run(task.rightView)
             dst3 = redRight.dst2.Clone
             If standaloneTest() Then
-                For Each md In redRight.redMask.mdList
-                    DrawCircle(dst3, md.maxDist, task.DotSize, task.highlight)
+                For Each rc In redRight.redC.rcList
+                    DrawCircle(dst3, rc.maxDist, task.DotSize, task.highlight)
                 Next
             End If
             labels(2) = redLeft.labels(2)
@@ -271,25 +296,20 @@ Namespace VBClasses
 
 
 
-    Public Class LeftRight_RedRight : Inherits TaskParent
+    Public Class LeftRight_FLessRedRight : Inherits TaskParent
         Dim fLess As New FeatureLess_Basics
-        Public redMask As New RedMask_Basics
+        Public redC As New RedColor_Basics
         Public Sub New()
-            desc = "Segment the right view image with RedMask_Basics"
+            desc = "Segment the right view image with RedColor_Basics"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            dst3 = task.leftView
+            dst3 = task.rightView
             fLess.Run(dst3)
 
-            If fLess.dst2.Channels <> 1 Then
-                redMask.Run(fLess.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
-            Else
-                redMask.Run(fLess.dst2)
-                redMask.dst2.SetTo(0, Not fLess.dst2)
-            End If
+            redC.Run(fLess.dst2)
 
-            dst2 = Palettize(redMask.dst2, 0)
-            labels(2) = redMask.labels(2)
+            dst2 = Palettize(redC.dst2, 0)
+            labels(2) = redC.labels(2)
         End Sub
     End Class
 
@@ -297,29 +317,23 @@ Namespace VBClasses
 
 
 
-
-
-    Public Class LeftRight_RedLeft : Inherits TaskParent
+    Public Class LeftRight_FLessRedLeft : Inherits TaskParent
         Dim fLess As New FeatureLess_Basics
-        Public redMask As New RedMask_Basics
+        Public redC As New RedColor_Basics
         Public Sub New()
-            desc = "Segment the left view image with RedMask_Basics"
+            desc = "Segment the left view image with RedColor_Basics"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             dst3 = task.leftView
             fLess.Run(dst3)
 
-            If fLess.dst2.Channels <> 1 Then
-                redMask.Run(fLess.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
-            Else
-                redMask.Run(fLess.dst2)
-                redMask.dst2.SetTo(0, Not fLess.dst2)
-            End If
+            redC.Run(fLess.dst2)
 
-            dst2 = Palettize(redMask.dst2, 0)
-            labels(2) = redMask.labels(2)
+            dst2 = Palettize(redC.dst2, 0)
+            labels(2) = redC.labels(2)
         End Sub
     End Class
+
 
 
 

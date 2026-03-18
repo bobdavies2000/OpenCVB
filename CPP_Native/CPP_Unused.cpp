@@ -206,7 +206,7 @@ public:
         static Ptr<AgastFeatureDetector> agastFD = AgastFeatureDetector::create(threshold, true, AgastFeatureDetector::OAST_9_16);
         agastFD->detect(src, keypoints);
         points.clear();
-        for (KeyPoint kpt : keypoints)
+        for (const KeyPoint& kpt : keypoints)
         {
             points.push_back(Point2f(round(kpt.pt.x), round(kpt.pt.y)));
         }

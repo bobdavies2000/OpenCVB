@@ -420,10 +420,11 @@ Laplacian_PyramidFilter
 LeftRight_Basics
 LeftRight_Brightness
 LeftRight_Features
-LeftRight_RedLeft
+LeftRight_FLessRedCompare
+LeftRight_FLessRedLeft
+LeftRight_FLessRedRight
+LeftRight_RedCompare
 LeftRight_RedLeftGray
-LeftRight_RedMask
-LeftRight_RedRight
 LeftRight_RedRightGray
 LeftRight_Reduction
 Line_Basics

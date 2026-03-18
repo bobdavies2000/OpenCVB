@@ -11144,7 +11144,7 @@ Namespace VBClasses
 
 
     Public Class XO_RedList_LeftRight : Inherits TaskParent
-        Dim redLR As New LeftRight_RedMask
+        Dim redLR As New LeftRight_FLessRedCompare
         Public Sub New()
             desc = "Run RedCloud on the left and right images.  Duplicate of LeftRight_RedCloudBoth"
         End Sub
