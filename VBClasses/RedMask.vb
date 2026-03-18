@@ -223,10 +223,10 @@ Namespace VBClasses
         Dim cellGen As New RedMask_Cells
         Dim redMask As New RedMask_Basics
         Dim rclist As New List(Of rcData)
-        Dim rcMap As cv.Mat ' redColor map 
+        Dim rcMap As New cv.Mat ' redColor map 
         Dim contours As New Contour_Basics
         Public Sub New()
-            rcMap = New cv.Mat(New cv.Size(dst2.Width, dst2.Height), cv.MatType.CV_8U, cv.Scalar.All(0))
+            If standalone Then task.gOptions.displayDst1.Checked = True
             desc = "Find cells and then match them to the previous generation with minimum boundary"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -247,8 +247,6 @@ Namespace VBClasses
             cellGen.mdList = redMask.mdList
             cellGen.Run(redMask.dst2)
 
-            dst2 = cellGen.dst2
-
             rclist.Clear()
             For Each md In redMask.mdList
                 Dim rc = New rcData(md.mask, md.rect, rclist.Count + 1)
@@ -256,10 +254,14 @@ Namespace VBClasses
                 rclist.Add(rc)
             Next
 
-            labels(2) = cellGen.labels(2)
-            labels(3) = ""
-            SetTrueText("", newPoint, 1)
+            dst2 = redMask.dst2
+            dst3 = Palettize(dst2)
+            labels(2) = redMask.labels(2)
+            labels(3) = CStr(rclist.Count) + " loosely defined cells found"
+
+            dst2.ConvertTo(rcMap, cv.MatType.CV_32S)
             strOut = RedUtil_Basics.selectCell(rcMap, rclist)
+            SetTrueText(strOut, 1)
         End Sub
     End Class
 End Namespace
