@@ -304,19 +304,19 @@ Namespace VBClasses
             dst3 = dst2.InRange(0, 0)
             If pixels.pixelVector.Count = 0 Then Exit Sub
             dst1.SetTo(0)
-            For Each gSq In task.gridRects
-                If dst3(gSq).CountNonZero Then
+            For Each gRect In task.gridRects
+                If dst3(gRect).CountNonZero Then
                     Dim candidates As New List(Of Integer)
-                    For y = 0 To gSq.Height - 1
-                        For x = 0 To gSq.Width - 1
-                            Dim val = dst0(gSq).Get(Of Integer)(y, x)
+                    For y = 0 To gRect.Height - 1
+                        For x = 0 To gRect.Width - 1
+                            Dim val = dst0(gRect).Get(Of Integer)(y, x)
                             If val = 0 Then Continue For
                             If candidates.Contains(val) = False Then candidates.Add(val)
                         Next
                     Next
                     If candidates.Count > 1 Then
-                        hVector.inputMask = dst3(gSq)
-                        hVector.Run(src(gSq))
+                        hVector.inputMask = dst3(gRect)
+                        hVector.Run(src(gRect))
                         Dim distances As New List(Of Double)
                         For Each index In candidates
                             If index >= 0 And index < pixels.pixelVector.Count Then
@@ -328,14 +328,14 @@ Namespace VBClasses
                             Dim index1 = candidates(distances.IndexOf(distances.Min)) - 1
                             If index1 < pixels.rclist.Count Then
                                 Dim cell = pixels.rclist(index1)
-                                dst1(gSq).SetTo(cell.color, dst3(gSq))
+                                dst1(gRect).SetTo(cell.color, dst3(gRect))
                             End If
                         End If
                     ElseIf candidates.Count = 1 Then
                         Dim index = candidates(0) - 1
                         If index < pixels.rclist.Count Then
                             Dim cell = pixels.rclist(candidates(0) - 1)
-                            dst1(gSq).SetTo(cell.color, dst3(gSq))
+                            dst1(gRect).SetTo(cell.color, dst3(gRect))
                         End If
                     End If
                 End If

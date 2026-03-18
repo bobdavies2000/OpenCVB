@@ -286,9 +286,9 @@ Namespace VBClasses
             task.grid.Run(src)
 
             For i = 0 To task.gridRects.Count - 1
-                Dim gSq = task.gridRects(i)
-                dst2(gSq).SetTo(task.scalarColors(i Mod 256))
-                dst3(gSq).SetTo(task.vecColors(i Mod 256))
+                Dim gRect = task.gridRects(i)
+                dst2(gRect).SetTo(task.scalarColors(i Mod 256))
+                dst3(gRect).SetTo(task.vecColors(i Mod 256))
             Next
         End Sub
     End Class

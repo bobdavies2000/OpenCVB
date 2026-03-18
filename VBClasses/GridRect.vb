@@ -6,17 +6,17 @@ Namespace VBClasses
         Public stdevList As New List(Of Single)
         Public stdevAverage As Single
         Public Sub New()
-            task.gOptions.GridSlider.Value = dst2.Width \ 40 ' arbitrary but the goal is to get a reasonable (< 500) number of gSq's.
+            task.gOptions.GridSlider.Value = dst2.Width \ 40 ' arbitrary but the goal is to get a reasonable (< 500) number of gRect's.
             dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
-            desc = "Compute the stdev for each gSq.  If small (<10), mark as featureLess."
+            desc = "Compute the stdev for each gRect.  If small (<10), mark as featureLess."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             dst1 = If(src.Channels() <> 1, src.CvtColor(cv.ColorConversionCodes.BGR2GRAY), src.Clone)
             stdevList.Clear()
             meanList.Clear()
             Dim mean As cv.Scalar, stdev As cv.Scalar
-            For Each gSq In task.gridRects
-                cv.Cv2.MeanStdDev(dst1(gSq), mean, stdev)
+            For Each gRect In task.gridRects
+                cv.Cv2.MeanStdDev(dst1(gRect), mean, stdev)
                 stdevList.Add(stdev(0))
                 meanList.Add(mean(0))
             Next
@@ -25,16 +25,16 @@ Namespace VBClasses
             dst3.SetTo(0)
             rects.Clear()
             For i = 0 To stdevList.Count - 1
-                Dim gSq = task.gridRects(i)
-                Dim depthCheck = task.noDepthMask(gSq)
+                Dim gRect = task.gridRects(i)
+                Dim depthCheck = task.noDepthMask(gRect)
                 If stdevList(i) < stdevAverage Or depthCheck.CountNonZero / depthCheck.Total > 0.5 Then
-                    dst3.Rectangle(gSq, white, -1)
+                    dst3.Rectangle(gRect, white, -1)
                 Else
-                    rects.Add(gSq)
+                    rects.Add(gRect)
                 End If
             Next
             If task.heartBeat Then
-                labels(2) = CStr(rects.Count) + " of " + CStr(task.gridRects.Count) + " gSq's had above average standard deviation (average = " +
+                labels(2) = CStr(rects.Count) + " of " + CStr(task.gridRects.Count) + " gRect's had above average standard deviation (average = " +
                             Format(stdevList.Average, fmt1) + ")"
             End If
 
@@ -51,17 +51,17 @@ Namespace VBClasses
 
     Public Class NR_GridRect_Color : Inherits TaskParent
         Public Sub New()
-            task.gOptions.GridSlider.Value = dst2.Width \ 40 ' arbitrary but the goal is to get a reasonable (< 500) number of gSq's.
+            task.gOptions.GridSlider.Value = dst2.Width \ 40 ' arbitrary but the goal is to get a reasonable (< 500) number of gRect's.
             dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
-            desc = "Compute the stdev for each gSq.  If small (<10), mark as featureLess."
+            desc = "Compute the stdev for each gRect.  If small (<10), mark as featureLess."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             Dim stdevList0 As New List(Of Single)
             Dim stdevList1 As New List(Of Single)
             Dim stdevList2 As New List(Of Single)
             Dim mean As cv.Scalar, stdev As cv.Scalar
-            For Each gSq In task.gridRects
-                cv.Cv2.MeanStdDev(src(gSq), mean, stdev)
+            For Each gRect In task.gridRects
+                cv.Cv2.MeanStdDev(src(gRect), mean, stdev)
                 stdevList0.Add(stdev(0))
                 stdevList1.Add(stdev(1))
                 stdevList2.Add(stdev(2))
@@ -72,9 +72,9 @@ Namespace VBClasses
             Dim avg2 = stdevList2.Average
             dst3.SetTo(0)
             For i = 0 To stdevList0.Count - 1
-                Dim gSq = task.gridRects(i)
+                Dim gRect = task.gridRects(i)
                 If stdevList0(i) < avg0 And stdevList1(i) < avg1 And stdevList2(i) < avg2 Then
-                    dst3.Rectangle(gSq, white, -1)
+                    dst3.Rectangle(gRect, white, -1)
                 End If
             Next
             labels(3) = "Stdev average X/Y/Z = " + CInt(stdevList0.Average).ToString + ", " + CInt(stdevList1.Average).ToString + ", " + CInt(stdevList2.Average).ToString
@@ -98,10 +98,10 @@ Namespace VBClasses
         Public maskVal As Integer = 255
         Public Sub New()
             dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
-            task.gOptions.GridSlider.Value = dst2.Width \ 40 ' arbitrary but the goal is to get a reasonable (< 500) number of gSq's.
+            task.gOptions.GridSlider.Value = dst2.Width \ 40 ' arbitrary but the goal is to get a reasonable (< 500) number of gRect's.
             If standalone = False Then maskVal = 1
             labels(2) = "Use the AddWeighted slider to observe where stdev is above average."
-            desc = "Sort the gSq's by the sum of their bgr stdev's to find the least volatile regions"
+            desc = "Sort the gRect's by the sum of their bgr stdev's to find the least volatile regions"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
@@ -111,9 +111,9 @@ Namespace VBClasses
             bgrList.Clear()
             grList.Clear()
             ReDim categories(9)
-            For Each gSq In task.gridRects
-                cv.Cv2.MeanStdDev(src(gSq), meanS, stdev)
-                sortedStd.Add(stdev(0) + stdev(1) + stdev(2), gSq)
+            For Each gRect In task.gridRects
+                cv.Cv2.MeanStdDev(src(gRect), meanS, stdev)
+                sortedStd.Add(stdev(0) + stdev(1) + stdev(2), gRect)
                 Dim colorIndex As Integer = 1
                 Dim mean As cv.Vec3i = New cv.Vec3i(CInt(meanS(0)), CInt(meanS(1)), CInt(meanS(2)))
                 If mean(0) < options.minThreshold And mean(1) < options.minThreshold And mean(2) < options.minThreshold Then
@@ -141,7 +141,7 @@ Namespace VBClasses
                                             blue.ToVec3b, green.ToVec3b, red.ToVec3b)
                 categories(colorIndex) += 1
                 bgrList.Add(color)
-                grList.Add(gSq)
+                grList.Add(gRect)
             Next
             Dim avg = sortedStd.Keys.Average
 
@@ -220,11 +220,11 @@ Namespace VBClasses
             Dim correlationMat As New cv.Mat
             Dim motionCount As Integer
             For i = 0 To gather.stdevList.Count - 1
-                Dim gSq = task.gridRects(i)
+                Dim gRect = task.gridRects(i)
                 If gather.stdevList(i) >= gather.stdevAverage Then
-                    cv.Cv2.MatchTemplate(dst1(gSq), lastImage(gSq), correlationMat, cv.TemplateMatchModes.CCoeffNormed)
+                    cv.Cv2.MatchTemplate(dst1(gRect), lastImage(gRect), correlationMat, cv.TemplateMatchModes.CCoeffNormed)
                     Dim corr = correlationMat.Get(Of Single)(0, 0)
-                    If corr < task.fCorrThreshold Then SetTrueText(Format(corr, fmt1), gSq.TopLeft)
+                    If corr < task.fCorrThreshold Then SetTrueText(Format(corr, fmt1), gRect.TopLeft)
                     If corr < task.fCorrThreshold Then motionCount += 1
                 End If
             Next
@@ -234,7 +234,7 @@ Namespace VBClasses
             plot.Run(src)
             dst3 = plot.dst2
 
-            labels(2) = CStr(gather.rects.Count) + " of " + CStr(task.gridRects.Count) + " gSq's had above average standard deviation."
+            labels(2) = CStr(gather.rects.Count) + " of " + CStr(task.gridRects.Count) + " gRect's had above average standard deviation."
             lastImage = dst1.Clone
         End Sub
     End Class
@@ -248,7 +248,7 @@ Namespace VBClasses
         Public rects As New List(Of cv.Rect)
         Dim gather As New GridRect_Basics
         Public Sub New()
-            desc = "Isolate the gSq's with low stdev"
+            desc = "Isolate the gRect's with low stdev"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             dst1 = If(src.Channels() <> 1, src.CvtColor(cv.ColorConversionCodes.BGR2GRAY), src.Clone)
@@ -257,13 +257,13 @@ Namespace VBClasses
 
             rects.Clear()
             For i = 0 To gather.stdevList.Count - 1
-                Dim gSq = task.gridRects(i)
+                Dim gRect = task.gridRects(i)
                 If gather.stdevList(i) < gather.stdevAverage Then
-                    rects.Add(gSq)
-                    SetTrueText(Format(gather.stdevList(i), fmt1), gSq.TopLeft, 3)
+                    rects.Add(gRect)
+                    SetTrueText(Format(gather.stdevList(i), fmt1), gRect.TopLeft, 3)
                 End If
             Next
-            labels = {"", "", CStr(task.gridRects.Count - gather.rects.Count) + " gSq's had low standard deviation",
+            labels = {"", "", CStr(task.gridRects.Count - gather.rects.Count) + " gRect's had low standard deviation",
                                          "Stdev average = " + Format(gather.stdevList.Average, fmt1)}
         End Sub
     End Class
@@ -278,7 +278,7 @@ Namespace VBClasses
         Dim options As New Options_Features
         Dim saveStdev As New List(Of Single)
         Public Sub New()
-            desc = "Display the correlation coefficients for gSq's with low standard deviation."
+            desc = "Display the correlation coefficients for gRect's with low standard deviation."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
@@ -377,14 +377,14 @@ Namespace VBClasses
             If task.mouseClickFlag Then setClickPoint(task.clickPoint, task.mousePicTag)
             If ClickPoint = newPoint Then setClickPoint(gather.rects(gather.rects.Count / 2).TopLeft, 2)
             Dim gridIndex As Integer = task.gridMap.Get(Of Integer)(ClickPoint.Y, ClickPoint.X)
-            Dim gSq = task.gridRects(gridIndex)
-            dst2.Rectangle(gSq, white, task.lineWidth)
+            Dim gRect = task.gridRects(gridIndex)
+            dst2.Rectangle(gRect, white, task.lineWidth)
 
             Dim correlationMat As New cv.Mat
             Dim corr As New List(Of Single)
-            For j = 0 To gSq.X - 1
-                Dim r = New cv.Rect(j, gSq.Y, gSq.Width, gSq.Height)
-                cv.Cv2.MatchTemplate(src(gSq), task.rightView(r), correlationMat, cv.TemplateMatchModes.CCoeffNormed)
+            For j = 0 To gRect.X - 1
+                Dim r = New cv.Rect(j, gRect.Y, gRect.Width, gRect.Height)
+                cv.Cv2.MatchTemplate(src(gRect), task.rightView(r), correlationMat, cv.TemplateMatchModes.CCoeffNormed)
                 corr.Add(correlationMat.Get(Of Single)(0, 0))
             Next
 
@@ -396,8 +396,8 @@ Namespace VBClasses
                     SetTrueText("Correlation " + Format(maxCorr, fmt3) + " is less than " + Format(task.fCorrThreshold, fmt1), 1)
                 Else
                     Dim index = corr.IndexOf(maxCorr)
-                    Dim rectRight = New cv.Rect(index, gSq.Y, gSq.Width, gSq.Height)
-                    Dim offset = gSq.TopLeft.X - rectRight.TopLeft.X
+                    Dim rectRight = New cv.Rect(index, gRect.Y, gRect.Width, gRect.Height)
+                    Dim offset = gRect.TopLeft.X - rectRight.TopLeft.X
                     If task.heartBeat Then
                         strOut = "CoeffNormed max correlation = " + Format(maxCorr, fmt3) + vbCrLf
                         strOut += "Left Mean = " + Format(gather.meanList(gridIndex), fmt3) + " Left stdev = " + Format(gather.stdevList(gridIndex), fmt3) + vbCrLf
@@ -407,11 +407,11 @@ Namespace VBClasses
                         strOut += "Right rectangle is offset " + CStr(offset) + " pixels from the left image rectangle"
                     End If
                     dst3.Rectangle(rectRight, task.highlight, task.lineWidth)
-                    dst0.Rectangle(gSq, task.highlight, task.lineWidth)
+                    dst0.Rectangle(gRect, task.highlight, task.lineWidth)
                     dst1.SetTo(0)
-                    DrawCircle(dst1, gSq.TopLeft, task.DotSize, task.highlight)
+                    DrawCircle(dst1, gRect.TopLeft, task.DotSize, task.highlight)
                     DrawCircle(dst1, rectRight.TopLeft, task.DotSize + 2, task.highlight)
-                    Dim pt = New cv.Point(rectRight.X, gSq.Y + 5)
+                    Dim pt = New cv.Point(rectRight.X, gRect.Y + 5)
                     SetTrueText(CStr(offset) + " pixel offset" + vbCrLf + "Larger = Right", pt, 1)
                     SetTrueText(strOut, 1)
                     labels(3) = "Corresponding grid square highlighted in yellow.  Average stdev = " +
@@ -482,8 +482,8 @@ Namespace VBClasses
             dst3 = edges.dst2
 
             dst2.SetTo(0)
-            For Each gSq In bricks.brickList
-                If dst3(gSq.rect).CountNonZero Then src(gSq.rect).CopyTo(dst2(gSq.rect))
+            For Each gRect In bricks.brickList
+                If dst3(gRect.rect).CountNonZero Then src(gRect.rect).CopyTo(dst2(gRect.rect))
             Next
         End Sub
     End Class

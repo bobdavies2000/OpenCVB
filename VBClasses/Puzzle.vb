@@ -17,8 +17,8 @@ Namespace VBClasses
             unscrambled.Clear()
             Dim inputROI As New List(Of cv.Rect)
             For j = 0 To task.gridRects.Count - 1
-                Dim gSq = task.gridRects(j)
-                If gSq.Width = task.brickEdgeLen And gSq.Height = task.brickEdgeLen Then inputROI.Add(task.gridRects(j))
+                Dim gRect = task.gridRects(j)
+                If gRect.Width = task.brickEdgeLen And gRect.Height = task.brickEdgeLen Then inputROI.Add(task.gridRects(j))
             Next
 
             scrambled = Shuffle(inputROI)
@@ -26,10 +26,10 @@ Namespace VBClasses
 
             ' display image with shuffled roi's
             For i = 0 To scrambled.Count - 1
-                Dim gSq = task.gridRects(i)
+                Dim gRect = task.gridRects(i)
                 Dim gr2 = scrambled(i)
-                If gSq.Width = task.brickEdgeLen And gSq.Height = task.brickEdgeLen And
-                   gr2.Width = task.brickEdgeLen And gr2.Height = task.brickEdgeLen Then dst2(gr2) = src(gSq)
+                If gRect.Width = task.brickEdgeLen And gRect.Height = task.brickEdgeLen And
+                   gr2.Width = task.brickEdgeLen And gr2.Height = task.brickEdgeLen Then dst2(gr2) = src(gRect)
             Next
         End Sub
     End Class

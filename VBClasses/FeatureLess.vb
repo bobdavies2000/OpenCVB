@@ -119,10 +119,10 @@ Namespace VBClasses
 
             dst2.SetTo(0)
             For i = 0 To corr.cList.Count - 1
-                Dim gSq = task.gridRects(i)
+                Dim gRect = task.gridRects(i)
                 If corr.cList(i) < corr.maxCorrelation Then
-                    dst2(gSq).SetTo(255)
-                    If standaloneTest() Then src.Rectangle(gSq, white, task.lineWidth)
+                    dst2(gRect).SetTo(255)
+                    If standaloneTest() Then src.Rectangle(gRect, white, task.lineWidth)
                 End If
             Next
         End Sub

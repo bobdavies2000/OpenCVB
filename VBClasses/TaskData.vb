@@ -112,7 +112,7 @@ Namespace VBClasses
         Public featList As New List(Of List(Of Integer))
         Public fpMap As New cv.Mat ' feature map
 
-        Public brickD As brickData ' the currently selected gSq
+        Public brickD As brickData ' the currently selected gRect
         Public rcD As New rcData ' the currently selected redCloud Cell
         Public oldrcD As New oldrcData ' the currently selected redColor Cell
         Public lpD As New lpData ' the currently selected line pair
