@@ -1,3 +1,4 @@
+Imports System.Windows.Documents
 Imports cv = OpenCvSharp
 ' https://answers.opencvb.org/question/200080/parameters-of-cvsvdecomp/
 Namespace VBClasses
@@ -44,13 +45,26 @@ Namespace VBClasses
     ' https://www.programcreek.com/python/example/89344/cv2.SVDecomp
     ' https://github.com/mzucker/page_dewarp/blob/master/page_dewarp.py
     Public Class NR_SVD_Example2 : Inherits TaskParent
+        Dim redC As New RedCloud_Basics
         Public Sub New()
+            If standalone Then task.gOptions.displayDst1.Checked = True
             desc = "Compute the mean and tangent of a RedCloud Cell"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            dst2 = runRedList(src, labels(2))
+            redC.Run(src)
+            dst2 = redC.dst2
+            labels(2) = redC.labels(2)
 
-            Dim rc = task.oldrcD
+            Static saveCellInfo As String
+            saveCellInfo = RedUtil_Basics.selectCell(redC.rcMap, redC.rcList)
+
+            Dim rc = task.rcD
+            If redC.rcList.Count = 0 Then Exit Sub
+            If rc Is Nothing Then
+                rc = redC.rcList(0)
+                saveCellInfo = RedUtil_Basics.selectCell(redC.rcMap, redC.rcList)
+            End If
+            SetTrueText(saveCellInfo, 1)
 
             If task.heartBeat Then
                 Dim m = cv.Cv2.Moments(rc.mask, True)
