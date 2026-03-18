@@ -558,16 +558,16 @@ Namespace VBClasses
 
     Public Class NR_MSER_RedCloud : Inherits TaskParent
         Dim mser As New MSER_Basics
+        Dim redC As New RedColor_Basics
         Public Sub New()
-            task.redList = New XO_RedList_Basics
             desc = "Use the MSER_Basics output as input to RedMask_List"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             mser.Run(src)
 
-            task.redList.Run(mser.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
-            dst2 = task.redList.dst2
-            labels(2) = task.redList.labels(2)
+            redC.Run(mser.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
+            dst2 = redC.dst2
+            labels(2) = redC.labels(2)
         End Sub
     End Class
 

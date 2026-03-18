@@ -2975,7 +2975,6 @@ Namespace VBClasses
         Public gapGray As Integer = 1
         Public sampleThreshold As Integer = 10
         Public Sub New()
-            task.redList = New XO_RedList_Basics
             If sliders.Setup(traceName) Then
                 sliders.setupTrackBar("Gap in depth spectrum (cm's)", 1, 50, gapDepth)
                 sliders.setupTrackBar("Gap in gray spectrum", 1, 50, gapGray)
@@ -3130,7 +3129,6 @@ Namespace VBClasses
             Return ranges
         End Function
         Public Sub Run()
-            If task.firstPass Then task.redList.Run(task.color)
             Static frmSliders = FindFrm("Options_Spectrum Sliders")
             Static gapDSlider = OptionParent.FindSlider("Gap in depth spectrum (cm's)")
             Static gapGSlider = OptionParent.FindSlider("Gap in gray spectrum")
