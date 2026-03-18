@@ -85,7 +85,7 @@ Namespace VBClasses
     Public Class NR_Triangle_Cell : Inherits TaskParent
         Public triangles As New List(Of cv.Point3f)
         Public Sub New()
-            labels = {"", "", "RedList_Basics output", "Selected contour - each pixel has depth"}
+            labels = {"", "", "RedMask_List output", "Selected contour - each pixel has depth"}
             desc = "Given a contour, convert that contour to a series of triangles"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -138,7 +138,7 @@ Namespace VBClasses
     Public Class NR_Triangle_Mask : Inherits TaskParent
         Public triangles As New List(Of cv.Point3f)
         Public Sub New()
-            labels = {"", "", "RedList_Basics output", "Selected rc.mask - each pixel has depth. Red dot is maxDist."}
+            labels = {"", "", "RedMask_List output", "Selected rc.mask - each pixel has depth. Red dot is maxDist."}
             desc = "Given a RedCloud cell, resize it and show the points with depth."
         End Sub
 

@@ -168,7 +168,7 @@ Namespace VBClasses
         Dim redC As New RedColor_Basics
         Public Sub New()
             OptionParent.FindSlider("Match Threshold %").Value = 3
-            labels = {"", "", "Output of RedList_Basics", "All RedCloud cells that matched the selected cell with the current settings are below."}
+            labels = {"", "", "Output of RedMask_List", "All RedCloud cells that matched the selected cell with the current settings are below."}
             desc = "Find all RedCloud contours similar to the one selected.  Use sliders and radio buttons to see impact."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)

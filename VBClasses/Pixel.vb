@@ -665,7 +665,7 @@ Namespace VBClasses
         Public Sub New()
             If standalone Then task.gOptions.displayDst1.Checked = True
             OptionParent.FindSlider("Histogram 3D Bins").Value = 3
-            labels = {"", "RedList_Basics output", "3D Histogram counts for each of the cells at left", ""}
+            labels = {"", "RedMask_List output", "3D Histogram counts for each of the cells at left", ""}
             desc = "Identify RedCloud cells and create a vector for each cell's 3D histogram."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -712,7 +712,7 @@ Namespace VBClasses
         Public rclist As New List(Of rcData)
         Public redC As New RedColor_Basics
         Public Sub New()
-            labels = {"", "", "RedList_Basics output", ""}
+            labels = {"", "", "RedMask_List output", ""}
             desc = "Create a vector for each cell's 3D histogram."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)

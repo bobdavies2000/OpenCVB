@@ -1236,7 +1236,7 @@ Namespace VBClasses
         Public lpList As New List(Of lpData)
         Dim lines As New XO_Line_RawSorted
         Public Sub New()
-            desc = "Identify all lines in the RedList_Basics cell boundaries"
+            desc = "Identify all lines in the RedMask_List cell boundaries"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             dst2 = runRedList(src, labels(2))
@@ -4194,7 +4194,7 @@ Namespace VBClasses
     Public Class XO_Sides_Corner : Inherits TaskParent
         Dim sides As New XO_Contour_RedCloudCorners
         Public Sub New()
-            labels = {"", "", "RedList_Basics output", ""}
+            labels = {"", "", "RedMask_List output", ""}
             desc = "Find the 4 points farthest from the center in each quadrant of the selected RedCloud cell"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -4291,7 +4291,7 @@ Namespace VBClasses
     Public Class XO_Sides_Profile : Inherits TaskParent
         Dim sides As New Contour_SidePoints
         Public Sub New()
-            labels = {"", "", "RedList_Basics Output", "Selected Cell"}
+            labels = {"", "", "RedMask_List Output", "Selected Cell"}
             desc = "Find the 6 corners - left/right, top/bottom, front/back - of a RedCloud cell"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -10555,7 +10555,7 @@ Namespace VBClasses
     Public Class XO_RedList_BProject3D : Inherits TaskParent
         Dim hcloud As New Hist3Dcloud_Basics
         Public Sub New()
-            desc = "Run RedList_Basics on the output of the RGB 3D backprojection"
+            desc = "Run RedMask_List on the output of the RGB 3D backprojection"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             hcloud.Run(src)
@@ -10686,7 +10686,7 @@ Namespace VBClasses
 
     Public Class XO_RedList_Contour : Inherits TaskParent
         Public Sub New()
-            desc = "Add the contour to the cell mask in the RedList_Basics output"
+            desc = "Add the contour to the cell mask in the RedMask_List output"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             dst3 = runRedList(src, labels(2))
@@ -10851,7 +10851,7 @@ Namespace VBClasses
     Public Class XO_RedList_NoDepth : Inherits TaskParent
         Public Sub New()
             task.fOptions.Color8USource.SelectedItem = "Reduction_Basics"
-            desc = "Run RedList_Basics on just the regions with no depth."
+            desc = "Run RedMask_List on just the regions with no depth."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             dst2 = runRedList(src, labels(2))
@@ -10886,7 +10886,7 @@ Namespace VBClasses
         Dim frames As New History_Basics
         Public Sub New()
             dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
-            desc = "Find the gaps that are different in the RedList_Basics sharedResults.images.."
+            desc = "Find the gaps that are different in the RedMask_List sharedResults.images.."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             dst2 = runRedList(src, labels(2))
@@ -11096,7 +11096,7 @@ Namespace VBClasses
     Public Class XO_RedList_KMeans : Inherits TaskParent
         Dim km As New KMeans_MultiChannel
         Public Sub New()
-            labels = {"", "", "KMeans_MultiChannel output", "RedList_Basics output"}
+            labels = {"", "", "KMeans_MultiChannel output", "RedMask_List output"}
             desc = "Use RedCloud to identify the regions created by kMeans"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -11165,8 +11165,8 @@ Namespace VBClasses
         Dim outline As New Depth_Outline
         Dim color8U As New Color8U_Basics
         Public Sub New()
-            labels(3) = "Color input to RedList_Basics with depth boundary blocking color connections."
-            desc = "Use the depth outline as input to RedList_Basics"
+            labels(3) = "Color input to RedMask_List with depth boundary blocking color connections."
+            desc = "Use the depth outline as input to RedMask_List"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             outline.Run(task.depthmask)
@@ -11188,7 +11188,7 @@ Namespace VBClasses
         Dim tiers As New Depth_Tiers
         Dim binar4 As New Bin4Way_Regions
         Public Sub New()
-            desc = "Add the depth tiers to the input for RedList_Basics."
+            desc = "Add the depth tiers to the input for RedMask_List."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             tiers.Run(src)
@@ -18043,7 +18043,7 @@ Namespace VBClasses
     Public Class XO_RedList_OnlyColorHist3D : Inherits TaskParent
         Dim hColor As New Hist3Dcolor_Basics
         Public Sub New()
-            desc = "Use the backprojection of the 3D RGB histogram as input to RedList_Basics."
+            desc = "Use the backprojection of the 3D RGB histogram as input to RedMask_List."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             runRedList(src, labels(3))

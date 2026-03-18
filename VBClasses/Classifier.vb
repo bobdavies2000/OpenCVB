@@ -120,7 +120,7 @@ Namespace VBClasses
         'Dim nabs As New Neighbor_Precise
         Public Sub New()
             dst1 = New cv.Mat(dst1.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
-            labels = {"", "Mask of the neighbors to the selected cell", "RedList_Basics output", "Classifier_Bayesian output"}
+            labels = {"", "Mask of the neighbors to the selected cell", "RedMask_List output", "Classifier_Bayesian output"}
             If standalone Then task.gOptions.displaydst1.checked = True
             cPtr = Classifier_Bayesian_Open()
             desc = "Classify the neighbor cells to be similar to the selected cell or not."

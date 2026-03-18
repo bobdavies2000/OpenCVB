@@ -22,7 +22,7 @@ Namespace VBClasses
         Dim reduction As New Reduction_Basics
         Dim pyr As New PyrFilter_Basics
         Public Sub New()
-            labels = {"", "", "RedList_Basics output", "PyrFilter output before reduction"}
+            labels = {"", "", "RedMask_List output", "PyrFilter output before reduction"}
             desc = "Use RedColor to segment the output of PyrFilter"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)

@@ -93,7 +93,7 @@ Namespace VBClasses
     Public Class NR_Hist3D_RedCloud : Inherits TaskParent
         Dim hist3D As New Hist3D_Basics
         Public Sub New()
-            desc = "Run RedList_Basics on the combined Hist3D color/cloud output."
+            desc = "Run RedMask_List on the combined Hist3D color/cloud output."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             hist3D.Run(src)
@@ -115,7 +115,7 @@ Namespace VBClasses
         Dim hColor As New Hist3Dcolor_Basics
         Dim redC As New RedColor_Basics
         Public Sub New()
-            desc = "Use the Hist3D color classes to segment the image with RedList_Basics"
+            desc = "Use the Hist3D color classes to segment the image with RedMask_List"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             hColor.Run(src)
@@ -237,7 +237,7 @@ Namespace VBClasses
     Public Class NR_Hist3D_PixelClassify : Inherits TaskParent
         Dim pixel As New Hist3D_Pixel
         Public Sub New()
-            desc = "Classify each pixel with a 3D histogram backprojection and run RedList_Basics on the output."
+            desc = "Classify each pixel with a 3D histogram backprojection and run RedMask_List on the output."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             pixel.Run(src)

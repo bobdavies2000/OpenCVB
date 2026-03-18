@@ -560,7 +560,7 @@ Namespace VBClasses
         Dim mser As New MSER_Basics
         Public Sub New()
             task.redList = New XO_RedList_Basics
-            desc = "Use the MSER_Basics output as input to RedList_Basics"
+            desc = "Use the MSER_Basics output as input to RedMask_List"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             mser.Run(src)

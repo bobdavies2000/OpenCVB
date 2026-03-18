@@ -1542,10 +1542,11 @@ RedColor_GridRects
 RedColor_Hulls
 RedColor_LeftRight
 RedColor_List
-RedList_Basics
+RedList_Color
 RedList_CPP
 RedMask_Basics
 RedMask_Cells
+RedMask_List
 RedPrep_Basics
 RedPrep_Core
 RedPrep_Depth
