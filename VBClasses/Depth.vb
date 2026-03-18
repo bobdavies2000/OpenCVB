@@ -185,15 +185,15 @@ Namespace VBClasses
                 dst2.SetTo(white, task.gridMask)
             End If
 
-            If minPoint.Length <> task.gSquares.Count Then
-                ReDim minPoint(task.gSquares.Count - 1)
-                ReDim maxPoint(task.gSquares.Count - 1)
+            If minPoint.Length <> task.gridRects.Count Then
+                ReDim minPoint(task.gridRects.Count - 1)
+                ReDim maxPoint(task.gridRects.Count - 1)
             End If
 
             If task.heartBeat Then dst3.SetTo(0)
-            Parallel.For(0, task.gSquares.Count,
+            Parallel.For(0, task.gridRects.Count,
         Sub(i)
-            Dim gSq = task.gSquares(i)
+            Dim gSq = task.gridRects(i)
             Dim mm As mmData = GetMinMax(task.pcSplit(2)(gSq), task.depthmask(gSq))
             If mm.minLoc.X < 0 Or mm.minLoc.Y < 0 Then mm.minLoc = New cv.Point2f(0, 0)
             minPoint(i) = New cv.Point(mm.minLoc.X + gSq.X, mm.minLoc.Y + gSq.Y)
@@ -1296,7 +1296,7 @@ Namespace VBClasses
         Dim bricks As New Brick_Basics
         Public Sub New()
             task.kalman = New Kalman_Basics
-            ReDim task.kalman.kInput(task.gSquares.Count * 4 - 1)
+            ReDim task.kalman.kInput(task.gridRects.Count * 4 - 1)
             labels = {"", "", "Red is min distance, blue is max distance", "Voronoi representation of min point (only) for each cell."}
             desc = "Find min and max depth in each roi and create a voronoi representation using the min and max points."
         End Sub
@@ -1357,7 +1357,7 @@ Namespace VBClasses
             If depthUnitsMeters = False Then src = (src * 0.001).ToMat
             Dim multX = task.pointCloud.Width / src.Width
             Dim multY = task.pointCloud.Height / src.Height
-            Parallel.ForEach(task.gSquares,
+            Parallel.ForEach(task.gridRects,
               Sub(roi)
                   Dim xy As New cv.Point3f
                   For y = roi.Y To roi.Y + roi.Height - 1

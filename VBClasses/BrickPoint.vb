@@ -60,7 +60,7 @@ Namespace VBClasses
                 DrawCircle(dst2, pt)
             Next
 
-            labels(2) = "Of the " + CStr(task.gSquares.Count) + " candidates, " + CStr(ptList.Count) +
+            labels(2) = "Of the " + CStr(task.gridRects.Count) + " candidates, " + CStr(ptList.Count) +
                     " had brickpoint intensity >= " + CStr(threshold)
         End Sub
     End Class
@@ -485,7 +485,7 @@ Namespace VBClasses
             dst3 = sobel.dst2
 
             features.Clear()
-            For Each rect In task.gSquares
+            For Each rect In task.gridRects
                 Dim mm = GetMinMax(sobel.dst2(rect))
                 If mm.maxVal >= sobel.options.sobelThreshold Then
                     Dim pt = New cv.Point(mm.maxLoc.X + rect.X, mm.maxLoc.Y + rect.Y)
@@ -494,7 +494,7 @@ Namespace VBClasses
                 End If
             Next
 
-            labels(2) = "Of the " + CStr(task.gSquares.Count) + " candidates, " + CStr(features.Count) +
+            labels(2) = "Of the " + CStr(task.gridRects.Count) + " candidates, " + CStr(features.Count) +
                     " had brickpoint intensity >= " + CStr(sobel.options.sobelThreshold)
         End Sub
     End Class
@@ -557,7 +557,7 @@ Namespace VBClasses
             End If
 
             dst2 = task.color.Clone
-            For Each rect In task.gSquares
+            For Each rect In task.gridRects
                 Dim mm = GetMinMax(src(rect))
                 Dim pt = New cv.Point(mm.maxLoc.X + rect.X, mm.maxLoc.Y + rect.Y)
                 If mm.maxVal >= threshold Then DrawRect(dst2, rect)
@@ -587,7 +587,7 @@ Namespace VBClasses
             Dim featList As New List(Of cv.Point)(task.feat.features)
             For Each pt In featList
                 Dim index As Integer = task.gridMap.Get(Of Integer)(pt.Y, pt.X)
-                featureBricks.Add(task.gSquares(index))
+                featureBricks.Add(task.gridRects(index))
             Next
 
             If task.gOptions.DebugCheckBox.Checked Then
@@ -605,7 +605,7 @@ Namespace VBClasses
             End If
 
             If task.heartBeat Then
-                Dim flessCount = task.gSquares.Count - featureBricks.Count
+                Dim flessCount = task.gridRects.Count - featureBricks.Count
                 labels(2) = CStr(featureBricks.Count) + " cells had features while " + CStr(flessCount) + " had none"
             End If
         End Sub

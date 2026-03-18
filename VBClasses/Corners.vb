@@ -224,9 +224,9 @@ Namespace VBClasses
             dst2 = src.Clone
 
             fast.Run(src)
-            ReDim fastCenters(task.gSquares.Count - 1)
-            For i = 0 To task.gSquares.Count - 1
-                Dim gSq = task.gSquares(i)
+            ReDim fastCenters(task.gridRects.Count - 1)
+            For i = 0 To task.gridRects.Count - 1
+                Dim gSq = task.gridRects(i)
                 Dim tmp = fast.dst3(gSq).FindNonZero()
                 If tmp.Rows > 0 Then
                     Dim mean = tmp.Mean()

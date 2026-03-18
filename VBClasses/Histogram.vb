@@ -1437,7 +1437,7 @@ Namespace VBClasses
                     If histData.Count < 128 And task.histogramBins < task.gOptions.HistBinBar.Maximum Then
                         task.histogramBins += 1
                     End If
-                    If task.gSquares.Count < histData.Length And task.brickEdgeLen > 2 Then
+                    If task.gridRects.Count < histData.Length And task.brickEdgeLen > 2 Then
                         task.brickEdgeLen -= 1
                         grid.Run(src)
                         dst2.SetTo(0)
@@ -1445,8 +1445,8 @@ Namespace VBClasses
                     histData(0) = 0 ' count of zero pixels - distorts sharedResults.images...
 
                     Dim maxVal = histData.ToList.Max
-                    For i = 0 To task.gSquares.Count - 1
-                        Dim gSq = task.gSquares(i)
+                    For i = 0 To task.gridRects.Count - 1
+                        Dim gSq = task.gridRects(i)
                         If i >= histData.Length Then
                             dst2(gSq).SetTo(0)
                         Else

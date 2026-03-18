@@ -20,9 +20,9 @@ Namespace VBClasses
             Dim maxIndex = task.motion.motionSort.Count - 1
             If maxIndex < 0 Then motionList.Add(-1) ' add a dummy value to avoid errors when there is no motion
             rectList.Clear()
-            For i = 0 To task.gSquares.Count - 1
+            For i = 0 To task.gridRects.Count - 1
                 If i <> motionList(motionIndex) Then
-                    Dim r = task.gSquares(i)
+                    Dim r = task.gridRects(i)
                     cv.Cv2.MatchTemplate(src(r), lastsrc(r), correlationMat, cv.TemplateMatchModes.CCoeffNormed)
                     Dim correlation = correlationMat.Get(Of Single)(0, 0) + 1
                     If correlation < maxCorrelation Then
@@ -60,9 +60,9 @@ Namespace VBClasses
             Dim maxIndex = task.motion.motionSort.Count - 1
             If maxIndex < 0 Then motionList.Add(-1) ' add a dummy value to avoid errors when there is no motion
             fLessList.Clear()
-            For i = 0 To task.gSquares.Count - 1
+            For i = 0 To task.gridRects.Count - 1
                 If i <> motionList(motionIndex) Then
-                    Dim r = task.gSquares(i)
+                    Dim r = task.gridRects(i)
                     cv.Cv2.MatchTemplate(src(r), lastsrc(r), correlationMat, cv.TemplateMatchModes.CCoeffNormed)
                     Dim corr = correlationMat.Get(Of Single)(0, 0) + 1
                     If corr < corrThreshold Then
@@ -78,7 +78,7 @@ Namespace VBClasses
                 dst3 = src
                 For Each index In fLessList
                     If task.motion.motionSort.Contains(index) Then
-                        dst3.Rectangle(task.gSquares(index), white, task.lineWidth)
+                        dst3.Rectangle(task.gridRects(index), white, task.lineWidth)
                     End If
                 Next
             End If
@@ -112,8 +112,8 @@ Namespace VBClasses
             dst3 = src
             Dim mmList As New List(Of mmData)
             mmRanges.Clear()
-            For i = 0 To task.gSquares.Count - 1
-                Dim r = task.gSquares(i)
+            For i = 0 To task.gridRects.Count - 1
+                Dim r = task.gridRects(i)
                 cv.Cv2.MatchTemplate(task.gray(r), lastsrc(r), correlationMat, cv.TemplateMatchModes.CCoeffNormed)
 
                 Dim corr = correlationMat.Get(Of Single)(0, 0) + 1
@@ -132,13 +132,13 @@ Namespace VBClasses
 
                 Dim lastEntry = plotHist.histArray.Last
                 labels(2) = "Correlation Min = " + Format(cList.Min - 1, fmt1) + ", Max = " + Format(cList.Max - 1, fmt1)
-                labels(3) = CStr(lastEntry) + " (" + Format(lastEntry / task.gSquares.Count, "0%") +
+                labels(3) = CStr(lastEntry) + " (" + Format(lastEntry / task.gridRects.Count, "0%") +
                             ") had correlation >= " + Format(maxCorrelation - 1, fmt2) + "  Plot below ranges from -1 to 1"
 
                 maxCorrelation = 2.0 - 2.0 / task.histogramBins
                 Dim mmRangeTest As New List(Of Double)
-                For i = 0 To task.gSquares.Count - 1
-                    Dim r = task.gSquares(i)
+                For i = 0 To task.gridRects.Count - 1
+                    Dim r = task.gridRects(i)
                     If cList(i) < maxCorrelation Then
                         dst2.Rectangle(r, white, task.lineWidth)
                         mmRangeTest.Add(mmRanges(i))

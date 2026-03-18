@@ -811,17 +811,17 @@ Namespace VBClasses
     Public Class XO_Depth_MinMaxToVoronoi : Inherits TaskParent
         Public Sub New()
             task.kalman = New Kalman_Basics
-            ReDim task.kalman.kInput(task.gSquares.Count * 4 - 1)
+            ReDim task.kalman.kInput(task.gridRects.Count * 4 - 1)
 
             labels = {"", "", "Red is min distance, blue is max distance", "Voronoi representation of min point (only) for each cell."}
             desc = "Find min and max depth in each grid square and create a voronoi representation using the min and max points."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If task.optionsChanged Then ReDim task.kalman.kInput(task.gSquares.Count * 4 - 1)
+            If task.optionsChanged Then ReDim task.kalman.kInput(task.gridRects.Count * 4 - 1)
 
-            Parallel.For(0, task.gSquares.Count,
+            Parallel.For(0, task.gridRects.Count,
             Sub(i)
-                Dim gSq = task.gSquares(i)
+                Dim gSq = task.gridRects(i)
                 Dim mm As mmData = GetMinMax(task.pcSplit(2)(gSq), task.depthmask(gSq))
                 If mm.minLoc.X < 0 Or mm.minLoc.Y < 0 Then mm.minLoc = New cv.Point2f(0, 0)
                 task.kalman.kInput(i * 4) = mm.minLoc.X
@@ -832,14 +832,14 @@ Namespace VBClasses
 
             task.kalman.Run(emptyMat)
 
-            Static minList(task.gSquares.Count - 1) As cv.Point2f
-            Static maxList(task.gSquares.Count - 1) As cv.Point2f
+            Static minList(task.gridRects.Count - 1) As cv.Point2f
+            Static maxList(task.gridRects.Count - 1) As cv.Point2f
             If task.optionsChanged Then
-                ReDim minList(task.gSquares.Count - 1)
-                ReDim maxList(task.gSquares.Count - 1)
+                ReDim minList(task.gridRects.Count - 1)
+                ReDim maxList(task.gridRects.Count - 1)
             End If
             For Each index In task.motion.motionSort
-                Dim rect = task.gSquares(index)
+                Dim rect = task.gridRects(index)
                 Dim ptmin = New cv.Point2f(task.kalman.kOutput(index * 4) + rect.X,
                                        task.kalman.kOutput(index * 4 + 1) + rect.Y)
                 Dim ptmax = New cv.Point2f(task.kalman.kOutput(index * 4 + 2) + rect.X,
@@ -2001,7 +2001,7 @@ Namespace VBClasses
 
             Dim lines As New List(Of cv.Line3D)
             Dim nullLine = New cv.Line3D(0, 0, 0, 0, 0, 0)
-            Parallel.ForEach(task.gSquares,
+            Parallel.ForEach(task.gridRects,
         Sub(roi)
             Dim depth = task.pcSplit(2)(roi)
             Dim fMask = mask(roi)
@@ -2031,8 +2031,8 @@ Namespace VBClasses
             End SyncLock
         End Sub)
             ' putting this in the parallel for above causes a memory leak - could not find it...
-            For i = 0 To task.gSquares.Count - 1
-                houghShowLines3D(dst2(task.gSquares(i)), lines.ElementAt(i))
+            For i = 0 To task.gridRects.Count - 1
+                houghShowLines3D(dst2(task.gridRects(i)), lines.ElementAt(i))
             Next
         End Sub
     End Class
@@ -2054,7 +2054,7 @@ Namespace VBClasses
             bricks.run(src)
             options.Run()
             If task.optionsChanged Then
-                ReDim lastCorrelation(task.gSquares.Count - 1)
+                ReDim lastCorrelation(task.gridRects.Count - 1)
             End If
 
             LRMeanSub.Run(src)
@@ -2063,9 +2063,9 @@ Namespace VBClasses
             Dim correlationMat As New cv.Mat
 
             bricks.brickList.Clear()
-            For i = 0 To task.gSquares.Count - 1
+            For i = 0 To task.gridRects.Count - 1
                 Dim gSq As New brickData
-                gSq.rect = task.gSquares(i)
+                gSq.rect = task.gridRects(i)
                 gSq.rect = gSq.rect
                 gSq.lRect = gSq.rect ' for some cameras the color image and the left image are the same but not all, i.e. Intel Realsense.
                 gSq.center = New cv.Point(gSq.rect.X + gSq.rect.Width / 2, gSq.rect.Y + gSq.rect.Height / 2)
@@ -2149,10 +2149,10 @@ Namespace VBClasses
         Public Function findHorizontalPoints(ByRef xyList As List(Of List(Of cv.Point))) As List(Of List(Of cv.Point3f))
             Dim ptlist As New List(Of List(Of cv.Point3f))
             Dim lastVec = New cv.Point3f
-            For y = 0 To task.pointCloud.Height - 1 Step task.gSquares(0).Height - 1
+            For y = 0 To task.pointCloud.Height - 1 Step task.gridRects(0).Height - 1
                 Dim vecList As New List(Of cv.Point3f)
                 Dim xyVec As New List(Of cv.Point)
-                For x = 0 To task.pointCloud.Width - 1 Step task.gSquares(0).Width - 1
+                For x = 0 To task.pointCloud.Width - 1 Step task.gridRects(0).Width - 1
                     Dim vec = task.pointCloud.Get(Of cv.Point3f)(y, x)
                     Dim jumpZ As Boolean = False
                     If vec.Z > 0 Then
@@ -2181,10 +2181,10 @@ Namespace VBClasses
         Public Function findVerticalPoints(ByRef xyList As List(Of List(Of cv.Point))) As List(Of List(Of cv.Point3f))
             Dim ptlist As New List(Of List(Of cv.Point3f))
             Dim lastVec = New cv.Point3f
-            For x = 0 To task.pointCloud.Width - 1 Step task.gSquares(0).Width - 1
+            For x = 0 To task.pointCloud.Width - 1 Step task.gridRects(0).Width - 1
                 Dim vecList As New List(Of cv.Point3f)
                 Dim xyVec As New List(Of cv.Point)
-                For y = 0 To task.pointCloud.Height - 1 Step task.gSquares(0).Height - 1
+                For y = 0 To task.pointCloud.Height - 1 Step task.gridRects(0).Height - 1
                     Dim vec = task.pointCloud.Get(Of cv.Point3f)(y, x)
                     Dim jumpZ As Boolean = False
                     If vec.Z > 0 Then
@@ -2414,7 +2414,7 @@ Namespace VBClasses
             dst2 = src.EmptyClone.SetTo(white)
             dst3 = dst2.Clone()
             Dim black = New cv.Vec3b(0, 0, 0)
-            Parallel.ForEach(task.gSquares,
+            Parallel.ForEach(task.gridRects,
              Sub(roi)
                  For y = roi.Y To roi.Y + roi.Height - 1
                      For x = roi.X To roi.X + roi.Width - 1
@@ -2458,7 +2458,7 @@ Namespace VBClasses
             Dim lastMeanZ As Single
             For y = 0 To task.bricksPerCol - 1
                 For x = 0 To task.bricksPerRow - 1
-                    Dim gSq = task.gSquares(y * task.bricksPerRow + x)
+                    Dim gSq = task.gridRects(y * task.bricksPerRow + x)
                     Dim mean = task.pointCloud(gSq).Mean(task.depthmask(gSq))
                     If Single.IsNaN(mean(0)) Then Continue For
                     If Single.IsNaN(mean(1)) Then Continue For
@@ -2490,13 +2490,13 @@ Namespace VBClasses
             desc = "Reduce the point cloud to a manageable number points in 3D using the mean value"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            Dim rw = task.gSquares(0).Width / 2, rh = task.gSquares(0).Height / 2
+            Dim rw = task.gridRects(0).Width / 2, rh = task.gridRects(0).Height / 2
             Dim red32 = New cv.Point3f(0, 0, 1), blue32 = New cv.Point3f(1, 0, 0), white32 = New cv.Point3f(1, 1, 1)
             Dim red = cv.Scalar.Red, blue = cv.Scalar.Blue
 
             pcPoints.Clear()
             dst2 = src
-            For Each gSq In task.gSquares
+            For Each gSq In task.gridRects
                 Dim pt = New cv.Point(gSq.X + rw, gSq.Y + rh)
                 Dim mean = task.pointCloud(gSq).Mean(task.depthmask(gSq))
 
@@ -3715,7 +3715,7 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             dst2 = New cv.Mat(dst3.Size(), cv.MatType.CV_32FC3, 0)
-            For Each gSq In task.gSquares
+            For Each gSq In task.gridRects
                 Dim d = task.pointCloud(gSq).Mean(task.depthmask(gSq))
                 Dim depth = New cv.Vec3f(d.Val0, d.Val1, d.Val2)
                 Dim pt = New cv.Point(gSq.X + gSq.Width / 2, gSq.Y + gSq.Height / 2)
@@ -3723,7 +3723,7 @@ Namespace VBClasses
                 If vec(2) > 0 Then dst2(gSq).SetTo(depth)
             Next
 
-            labels(2) = traceName + " with " + CStr(task.gSquares.Count) + " regions was created"
+            labels(2) = traceName + " with " + CStr(task.gridRects.Count) + " regions was created"
         End Sub
     End Class
 
@@ -3747,7 +3747,7 @@ Namespace VBClasses
 
             dst3.SetTo(0)
             oglData.Clear()
-            For Each gSq In task.gSquares
+            For Each gSq In task.gridRects
                 Dim c = dst2.Get(Of cv.Vec3b)(gSq.Y, gSq.X)
                 If c = black Then Continue For
                 oglData.Add(New cv.Vec3f(c(2) / 255, c(1) / 255, c(0) / 255))
@@ -3756,7 +3756,7 @@ Namespace VBClasses
                 oglData.Add(New cv.Vec3f(v.Val0, v.Val1, v.Val2))
                 dst3(gSq).SetTo(c)
             Next
-            labels(2) = traceName + " with " + CStr(task.gSquares.Count) + " regions was created"
+            labels(2) = traceName + " with " + CStr(task.gridRects.Count) + " regions was created"
         End Sub
     End Class
 
@@ -4529,14 +4529,14 @@ Namespace VBClasses
             desc = "Collect a time series of depth mean and stdev to highlight where depth is unstable."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If task.optionsChanged Then meanSeries = New cv.Mat(task.gSquares.Count, task.frameHistoryCount, cv.MatType.CV_32F, cv.Scalar.All(0))
+            If task.optionsChanged Then meanSeries = New cv.Mat(task.gridRects.Count, task.frameHistoryCount, cv.MatType.CV_32F, cv.Scalar.All(0))
 
             Dim index = task.frameCount Mod task.frameHistoryCount
-            Dim meanValues(task.gSquares.Count - 1) As Single
-            Dim stdValues(task.gSquares.Count - 1) As Single
-            Parallel.For(0, task.gSquares.Count,
+            Dim meanValues(task.gridRects.Count - 1) As Single
+            Dim stdValues(task.gridRects.Count - 1) As Single
+            Parallel.For(0, task.gridRects.Count,
         Sub(i)
-            Dim gSq = task.gSquares(i)
+            Dim gSq = task.gridRects(i)
             Dim mean As cv.Scalar, stdev As cv.Scalar
             cv.Cv2.MeanStdDev(task.pcSplit(2)(gSq), mean, stdev, task.depthmask(gSq))
             meanSeries.Set(Of Single)(i, index, mean)
@@ -4548,8 +4548,8 @@ Namespace VBClasses
         End Sub)
 
             If task.frameCount >= task.frameHistoryCount Then
-                Dim means As cv.Mat = cv.Mat.FromPixelData(task.gSquares.Count, 1, cv.MatType.CV_32F, meanValues.ToArray)
-                Dim stdevs As cv.Mat = cv.Mat.FromPixelData(task.gSquares.Count, 1, cv.MatType.CV_32F, stdValues.ToArray)
+                Dim means As cv.Mat = cv.Mat.FromPixelData(task.gridRects.Count, 1, cv.MatType.CV_32F, meanValues.ToArray)
+                Dim stdevs As cv.Mat = cv.Mat.FromPixelData(task.gridRects.Count, 1, cv.MatType.CV_32F, stdValues.ToArray)
                 Dim meanmask = means.Threshold(1, task.MaxZmeters, cv.ThresholdTypes.Binary).ConvertScaleAbs()
                 Dim mm As mmData = GetMinMax(means, meanmask)
                 Dim stdMask = stdevs.Threshold(0.001, task.MaxZmeters, cv.ThresholdTypes.Binary).ConvertScaleAbs() ' volatile region is x cm stdev.
@@ -4558,9 +4558,9 @@ Namespace VBClasses
                 maxMeanVal = Math.Max(maxMeanVal, mm.maxVal)
                 maxStdevVal = Math.Max(maxStdevVal, mmStd.maxVal)
 
-                Parallel.For(0, task.gSquares.Count,
+                Parallel.For(0, task.gridRects.Count,
             Sub(i)
-                Dim gSq = task.gSquares(i)
+                Dim gSq = task.gridRects(i)
                 dst3(gSq).SetTo(255 * stdevs.Get(Of Single)(i, 0) / maxStdevVal)
                 dst3(gSq).SetTo(0, task.noDepthMask(gSq))
 
@@ -4574,8 +4574,8 @@ Namespace VBClasses
                 End If
 
                 If standaloneTest() Then
-                    For i = 0 To task.gSquares.Count - 1
-                        Dim gSq = task.gSquares(i)
+                    For i = 0 To task.gridRects.Count - 1
+                        Dim gSq = task.gridRects(i)
                         SetTrueText(Format(meanValues(i), fmt3) + vbCrLf +
                                 Format(stdValues(i), fmt3), gSq.Location, 3)
                     Next
@@ -4657,7 +4657,7 @@ Namespace VBClasses
         End Function
         Public Overrides Sub RunAlg(src As cv.Mat)
             Dim minLearnCount = 5
-            Parallel.ForEach(task.gSquares,
+            Parallel.ForEach(task.gridRects,
             Sub(roi)
                 task.pcSplit(2)(roi) = detectAndFillShadow(task.noDepthMask(roi), shadow.dst3(roi),
                                                            task.pcSplit(2)(roi), src(roi), minLearnCount)
@@ -5512,7 +5512,7 @@ Namespace VBClasses
 
             bPoint.Run(src.Clone)
 
-            Dim pointsPerLine(task.gSquares.Count) As List(Of Integer)
+            Dim pointsPerLine(task.gridRects.Count) As List(Of Integer)
             Dim lpRectMap = XO_Line_CoreNew.createMap()
             For Each pt In bPoint.ptList
                 Dim index = lpRectMap.Get(Of Byte)(pt.Y, pt.X)
@@ -9022,13 +9022,13 @@ Namespace VBClasses
             desc = "Predict depth from color to fill in the depth shadow areas"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            Dim noDepthCount(task.gSquares.Count - 1) As Integer
-            Dim roiColor(task.gSquares.Count - 1) As cv.Vec3b
+            Dim noDepthCount(task.gridRects.Count - 1) As Integer
+            Dim roiColor(task.gridRects.Count - 1) As cv.Vec3b
 
             dst2.SetTo(0)
-            Parallel.For(0, task.gSquares.Count,
+            Parallel.For(0, task.gridRects.Count,
         Sub(i)
-            Dim roi = task.gSquares(i)
+            Dim roi = task.gridRects(i)
             roiColor(i) = src(roi).Get(Of cv.Vec3b)(roi.Height / 2, roi.Width / 2)
             dst2(roi).SetTo(roiColor(i), task.depthmask(roi))
             noDepthCount(i) = task.noDepthMask(roi).CountNonZero
@@ -9037,10 +9037,10 @@ Namespace VBClasses
             If rtree Is Nothing Then rtree = cv.ML.RTrees.Create()
             Dim mlInput As New List(Of mlData)
             Dim mResponse As New List(Of Single)
-            For i = 0 To task.gSquares.Count - 1
+            For i = 0 To task.gridRects.Count - 1
                 If noDepthCount(i) = 0 Then Continue For
                 Dim ml As mlData
-                Dim roi = task.gSquares(i)
+                Dim roi = task.gridRects(i)
                 ml.row = roi.Y + roi.Height / 2
                 ml.col = roi.X + roi.Width / 2
                 Dim c = roiColor(i)
@@ -9066,9 +9066,9 @@ Namespace VBClasses
             Dim colors As New List(Of cv.Vec3b)
             Dim saveRoi As New List(Of cv.Rect)
             Dim depthMask As New List(Of cv.Mat)
-            For i = 0 To task.gSquares.Count - 1
+            For i = 0 To task.gridRects.Count - 1
                 If noDepthCount(i) = 0 Then Continue For
-                Dim roi = task.gSquares(i)
+                Dim roi = task.gridRects(i)
                 depthMask.Add(task.noDepthMask(roi))
                 Dim ml As mlData
                 ml.row = roi.Y + roi.Height / 2
@@ -9095,7 +9095,7 @@ Namespace VBClasses
                 dst3(roi).SetTo(colors(i), depthMask(i))
             Next
 
-            labels(2) = CStr(task.gSquares.Count) + " regions with " + CStr(mlInput.Count) + " used for learning and " + CStr(predictList.Count) + " were predicted"
+            labels(2) = CStr(task.gridRects.Count) + " regions with " + CStr(mlInput.Count) + " used for learning and " + CStr(predictList.Count) + " were predicted"
         End Sub
         Protected Overrides Sub Finalize()
             If rtree IsNot Nothing Then rtree.Dispose()
@@ -11448,16 +11448,16 @@ Namespace VBClasses
             desc = "Isolate all motion In the scene"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If lastColor.Count <> task.gSquares.Count Then
-                ReDim lastColor(task.gSquares.Count - 1)
-                ReDim cellAge(task.gSquares.Count - 1)
+            If lastColor.Count <> task.gridRects.Count Then
+                ReDim lastColor(task.gridRects.Count - 1)
+                ReDim cellAge(task.gridRects.Count - 1)
             End If
 
             Dim colorstdev As cv.Scalar, colorMean As cv.Scalar
-            ReDim motionFlags(task.gSquares.Count - 1)
+            ReDim motionFlags(task.gridRects.Count - 1)
             Dim motionSort As New List(Of Integer)
-            For i = 0 To task.gSquares.Count - 1
-                cv.Cv2.MeanStdDev(src(task.gSquares(i)), colorMean, colorstdev)
+            For i = 0 To task.gridRects.Count - 1
+                cv.Cv2.MeanStdDev(src(task.gridRects(i)), colorMean, colorstdev)
                 Dim colorVec = New cv.Vec3f(colorMean(0), colorMean(1), colorMean(2))
                 Dim colorChange = Distance_Basics.distance3D(colorVec, lastColor(i))
                 If colorChange > task.motionThreshold Then
@@ -11473,11 +11473,11 @@ Namespace VBClasses
 
             dst1.SetTo(0)
             For Each i In motionSort
-                dst1(task.gSquares(i)).SetTo(255)
+                dst1(task.gridRects(i)).SetTo(255)
                 motionFlags(i) = True
             Next
 
-            labels(2) = Format(motionSort.Count / task.gSquares.Count, "00%") + " Of bricks had motion."
+            labels(2) = Format(motionSort.Count / task.gridRects.Count, "00%") + " Of bricks had motion."
 
             If task.gOptions.UseMotionMask.Checked = False Then dst1.SetTo(255)
 
@@ -11559,7 +11559,7 @@ Namespace VBClasses
         Public Shared Function getMotionRect() As cv.Rect
             Dim motionRect As cv.Rect
             For Each index In task.motion.motionSort
-                motionRect = motionRect.Union(task.gSquares(index))
+                motionRect = motionRect.Union(task.gridRects(index))
             Next
             Return motionRect
         End Function
@@ -11615,9 +11615,9 @@ Namespace VBClasses
 
             Static lastFrame As cv.Mat = input.Clone
             dst3.SetTo(0)
-            Parallel.For(0, task.gSquares.Count,
+            Parallel.For(0, task.gridRects.Count,
         Sub(i)
-            Dim roi = task.gSquares(i)
+            Dim roi = task.gridRects(i)
             Dim correlation As New cv.Mat
             Dim mean As Single, stdev As Single
             cv.Cv2.MeanStdDev(input(roi), mean, stdev)
@@ -11625,15 +11625,15 @@ Namespace VBClasses
                 cv.Cv2.MatchTemplate(lastFrame(roi), input(roi), correlation, cv.TemplateMatchModes.CCoeffNormed)
                 Dim mm As mmData = GetMinMax(correlation)
                 If mm.maxVal < ccThreshold / 1000 Then
-                    If (i Mod task.bricksPerCol) <> 0 Then dst3(task.gSquares(i - 1)).SetTo(255)
-                    If (i Mod task.bricksPerCol) < task.bricksPerCol And i < task.gSquares.Count - 1 Then dst3(task.gSquares(i + 1)).SetTo(255)
+                    If (i Mod task.bricksPerCol) <> 0 Then dst3(task.gridRects(i - 1)).SetTo(255)
+                    If (i Mod task.bricksPerCol) < task.bricksPerCol And i < task.gridRects.Count - 1 Then dst3(task.gridRects(i + 1)).SetTo(255)
                     If i > task.bricksPerCol Then
-                        dst3(task.gSquares(i - task.bricksPerCol)).SetTo(255)
-                        dst3(task.gSquares(i - task.bricksPerCol + 1)).SetTo(255)
+                        dst3(task.gridRects(i - task.bricksPerCol)).SetTo(255)
+                        dst3(task.gridRects(i - task.bricksPerCol + 1)).SetTo(255)
                     End If
-                    If i < (task.gSquares.Count - task.bricksPerCol - 1) Then
-                        dst3(task.gSquares(i + task.bricksPerCol)).SetTo(255)
-                        dst3(task.gSquares(i + task.bricksPerCol + 1)).SetTo(255)
+                    If i < (task.gridRects.Count - task.bricksPerCol - 1) Then
+                        dst3(task.gridRects(i + task.bricksPerCol)).SetTo(255)
+                        dst3(task.gridRects(i + task.bricksPerCol + 1)).SetTo(255)
                     End If
                     dst3(roi).SetTo(255)
                 End If
@@ -11756,8 +11756,8 @@ Namespace VBClasses
 
             motionSort.Clear()
             dst3.SetTo(0)
-            For i = 0 To task.gSquares.Count - 1
-                Dim diffCount = diff.dst2(task.gSquares(i)).CountNonZero
+            For i = 0 To task.gridRects.Count - 1
+                Dim diffCount = diff.dst2(task.gridRects(i)).CountNonZero
                 If diffCount >= task.motionThreshold Then
                     For Each index In task.grid.gridNeighbors(i)
                         If motionSort.Contains(index) = False Then
@@ -11772,7 +11772,7 @@ Namespace VBClasses
             dst3.SetTo(0)
             For Each lst In cellList
                 For Each index In lst
-                    dst3(task.gSquares(index)).SetTo(255)
+                    dst3(task.gridRects(index)).SetTo(255)
                 Next
             Next
 
@@ -11781,7 +11781,7 @@ Namespace VBClasses
             task.motion.motionMask = dst3.Clone
 
             labels(2) = CStr(motionSort.Count) + " grid rect's or " +
-                    Format(motionSort.Count / task.gSquares.Count, "0.0%") +
+                    Format(motionSort.Count / task.gridRects.Count, "0.0%") +
                     " of bricks had motion."
         End Sub
     End Class
@@ -11806,7 +11806,7 @@ Namespace VBClasses
             dst3 = lastGray.clone
             For Each index In brickLine.bestBricks
                 Dim nabeRect = task.gridNabeRects(index)
-                match.template = lastGray(task.gSquares(index))
+                match.template = lastGray(task.gridRects(index))
                 match.Run(task.gray(nabeRect))
 
                 Dim x = match.newCenter.X - nabeRect.Width / 2
@@ -12718,11 +12718,11 @@ Namespace VBClasses
             src.SetTo(0, task.noDepthMask)
 
             Dim threshold = task.brickEdgeLen * task.brickEdgeLen / 2
-            Dim activeList(task.gSquares.Count - 1) As Boolean
+            Dim activeList(task.gridRects.Count - 1) As Boolean
             dst3.SetTo(0)
-            Parallel.For(0, task.gSquares.Count,
+            Parallel.For(0, task.gridRects.Count,
              Sub(i)
-                 Dim roi = task.gSquares(i)
+                 Dim roi = task.gridRects(i)
                  Dim count = src(roi).CountNonZero
                  If count > threshold Then
                      dst3(roi).SetTo(white)
@@ -12734,7 +12734,7 @@ Namespace VBClasses
 
             For i = 0 To activeList.Count - 1
                 If activeList(i) Then
-                    Dim roi = task.gSquares(i)
+                    Dim roi = task.gridRects(i)
                     pointList.Add(New cv.Point(roi.X + roi.Width / 2, roi.Y + roi.Height / 2))
                 End If
             Next
@@ -13111,7 +13111,7 @@ Namespace VBClasses
             End If
 
             labels(2) = CStr(mCore.motionSort.Count) + " grid rect's or " +
-                    Format(mCore.motionSort.Count / task.gSquares.Count, "0.0%") +
+                    Format(mCore.motionSort.Count / task.gridRects.Count, "0.0%") +
                     " of bricks had motion."
         End Sub
     End Class
@@ -13137,8 +13137,8 @@ Namespace VBClasses
             diff.Run(src)
 
             motionSort.Clear()
-            For i = 0 To task.gSquares.Count - 1
-                Dim diffCount = diff.dst2(task.gSquares(i)).CountNonZero
+            For i = 0 To task.gridRects.Count - 1
+                Dim diffCount = diff.dst2(task.gridRects(i)).CountNonZero
                 If diffCount >= task.motionThreshold Then
                     For Each index In task.grid.gridNeighbors(i)
                         If motionSort.Contains(index) = False Then motionSort.Add(index)
@@ -13148,7 +13148,7 @@ Namespace VBClasses
 
             dst3.SetTo(0)
             For Each index In motionSort
-                Dim rect = task.gSquares(index)
+                Dim rect = task.gridRects(index)
                 src(rect).CopyTo(dst2(rect))
                 dst3(rect).SetTo(255)
             Next
@@ -13443,8 +13443,8 @@ Namespace VBClasses
             diff.Run(src)
 
             motionSort.Clear()
-            For i = 0 To task.gSquares.Count - 1
-                Dim diffCount = diff.dst2(task.gSquares(i)).CountNonZero
+            For i = 0 To task.gridRects.Count - 1
+                Dim diffCount = diff.dst2(task.gridRects(i)).CountNonZero
                 If diffCount >= task.motionThreshold Then
                     For Each index In task.grid.gridNeighbors(i)
                         If motionSort.Contains(index) = False Then motionSort.Add(index)
@@ -13457,7 +13457,7 @@ Namespace VBClasses
             dst3.SetTo(0)
             For Each mList In motionLists
                 For Each index In motionSort
-                    Dim rect = task.gSquares(index)
+                    Dim rect = task.gridRects(index)
                     src(rect).CopyTo(dst2(rect))
                     dst3(rect).SetTo(255)
                 Next
@@ -13494,7 +13494,7 @@ Namespace VBClasses
             End If
 
             labels(2) = CStr(mCore.motionSort.Count) + " grid rect's or " +
-                    Format(mCore.motionSort.Count / task.gSquares.Count, "0.0%") +
+                    Format(mCore.motionSort.Count / task.gridRects.Count, "0.0%") +
                     " of bricks had motion."
         End Sub
     End Class
@@ -13517,7 +13517,7 @@ Namespace VBClasses
             dst2 = src
 
             Dim updateCount As Integer
-            Parallel.ForEach(Of cv.Rect)(task.gSquares,
+            Parallel.ForEach(Of cv.Rect)(task.gridRects,
             Sub(roi)
                 Dim correlation As New cv.Mat
                 cv.Cv2.MatchTemplate(src(roi), dst3(roi), correlation, cv.TemplateMatchModes.CCoeffNormed)
@@ -13527,8 +13527,8 @@ Namespace VBClasses
                     dst2.Rectangle(roi, white, task.lineWidth)
                 End If
             End Sub)
-            labels(2) = "Motion added to dst3 for " + CStr(updateCount) + " segments out of " + CStr(task.gSquares.Count)
-            labels(3) = CStr(task.gSquares.Count - updateCount) + " segments out of " + CStr(task.gSquares.Count) + " had > " +
+            labels(2) = "Motion added to dst3 for " + CStr(updateCount) + " segments out of " + CStr(task.gridRects.Count)
+            labels(3) = CStr(task.gridRects.Count - updateCount) + " segments out of " + CStr(task.gridRects.Count) + " had > " +
                          Format(correlationSlider.Value / 1000, "0.0%") + " correlation. "
         End Sub
     End Class
@@ -13549,7 +13549,7 @@ Namespace VBClasses
             If task.heartBeat Then dst3 = src.Clone
 
             Dim roiMotion As New List(Of cv.Rect)
-            For Each roi In task.gSquares
+            For Each roi In task.gridRects
                 Dim correlation As New cv.Mat
                 cv.Cv2.MatchTemplate(src(roi), dst3(roi), correlation, cv.TemplateMatchModes.CCoeffNormed)
                 If correlation.Get(Of Single)(0, 0) < CCthreshold Then
@@ -13561,8 +13561,8 @@ Namespace VBClasses
             For Each roi In roiMotion
                 dst2.Rectangle(roi, white, task.lineWidth)
             Next
-            labels(2) = "Motion added to dst3 for " + CStr(roiMotion.Count) + " segments out of " + CStr(task.gSquares.Count)
-            labels(3) = CStr(task.gSquares.Count - roiMotion.Count) + " segments out of " + CStr(task.gSquares.Count) + " had > " +
+            labels(2) = "Motion added to dst3 for " + CStr(roiMotion.Count) + " segments out of " + CStr(task.gridRects.Count)
+            labels(3) = CStr(task.gridRects.Count - roiMotion.Count) + " segments out of " + CStr(task.gridRects.Count) + " had > " +
                          Format(correlationSlider.Value / 1000, "0.0%") + " correlation. "
         End Sub
     End Class
@@ -14713,9 +14713,9 @@ Namespace VBClasses
             dst2 = lrLines.dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
             dst3 = lrLines.dst3.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
 
-            Dim r1 = task.gSquares(task.gridMap.Get(Of Integer)(lp.p1.Y, lp.p1.X))
-            Dim r2 = task.gSquares(task.gridMap.Get(Of Integer)(lp.ptCenter.Y, lp.ptCenter.X))
-            Dim r3 = task.gSquares(task.gridMap.Get(Of Integer)(lp.p2.Y, lp.p2.X))
+            Dim r1 = task.gridRects(task.gridMap.Get(Of Integer)(lp.p1.Y, lp.p1.X))
+            Dim r2 = task.gridRects(task.gridMap.Get(Of Integer)(lp.ptCenter.Y, lp.ptCenter.X))
+            Dim r3 = task.gridRects(task.gridMap.Get(Of Integer)(lp.p2.Y, lp.p2.X))
             Dim depth1 = task.pcSplit(2)(r1).Mean().Val0
             Dim depth2 = task.pcSplit(2)(r2).Mean().Val0
             Dim depth3 = task.pcSplit(2)(r3).Mean().Val0
@@ -14755,9 +14755,9 @@ Namespace VBClasses
             lpOutput.Clear()
             For i = 0 To lplist.Count - 1
                 lp = lplist(i)
-                Dim r1 = task.gSquares(task.gridMap.Get(Of Integer)(lp.p1.Y, lp.p1.X))
-                Dim r2 = task.gSquares(task.gridMap.Get(Of Integer)(lp.ptCenter.Y, lp.ptCenter.X))
-                Dim r3 = task.gSquares(task.gridMap.Get(Of Integer)(lp.p2.Y, lp.p2.X))
+                Dim r1 = task.gridRects(task.gridMap.Get(Of Integer)(lp.p1.Y, lp.p1.X))
+                Dim r2 = task.gridRects(task.gridMap.Get(Of Integer)(lp.ptCenter.Y, lp.ptCenter.X))
+                Dim r3 = task.gridRects(task.gridMap.Get(Of Integer)(lp.p2.Y, lp.p2.X))
 
                 Dim depth1 = task.pcSplit(2)(r1).Mean().Val0
                 Dim depth2 = task.pcSplit(2)(r2).Mean().Val0
@@ -16770,7 +16770,7 @@ Namespace VBClasses
                 End If
             Next
 
-            labels(2) = CStr(updateCount) + " bricks of " + CStr(task.gSquares.Count) + " were reviewed for changes."
+            labels(2) = CStr(updateCount) + " bricks of " + CStr(task.gridRects.Count) + " were reviewed for changes."
         End Sub
     End Class
 
@@ -18221,7 +18221,7 @@ Namespace VBClasses
                 dst3.Set(Of Byte)(pt.Y, pt.X, 255)
             Next
 
-            For Each roi In task.gSquares
+            For Each roi In task.gridRects
                 Dim test = dst3(roi).FindNonZero()
                 SetTrueText(CStr(test.Rows), roi.TopLeft, 3)
             Next
@@ -19123,7 +19123,7 @@ Namespace VBClasses
             For i = 0 To corr.cList.Count - 1
                 Dim correlation = corr.cList(i)
                 If correlation < corr.maxCorrelation Then
-                    Dim r = task.gSquares(i)
+                    Dim r = task.gridRects(i)
                     Dim val = dst2.Get(Of Byte)(r.TopLeft.Y, r.TopLeft.X)
                     If val = 0 Then dst3.Rectangle(r, red, -1)
                 End If

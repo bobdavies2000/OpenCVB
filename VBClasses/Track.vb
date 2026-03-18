@@ -115,7 +115,7 @@ Namespace VBClasses
             Static searchRect As cv.Rect, originalRect As cv.Rect
             If searchRect.Width = 0 Or searchRect.Height = 0 Then
                 Dim gridIndex = task.gridMap.Get(Of Integer)(lpList(0).p1.Y, lpList(0).p1.X)
-                originalRect = task.gSquares(gridIndex)
+                originalRect = task.gridRects(gridIndex)
                 searchRect = task.gridNabeRects(gridIndex)
                 Dim x = originalRect.X - searchRect.X
                 Dim y = originalRect.Y - searchRect.Y

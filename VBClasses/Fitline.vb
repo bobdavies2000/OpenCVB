@@ -229,7 +229,7 @@ Namespace VBClasses
             dst2 = edges.dst2
 
             dst3.SetTo(0)
-            For Each rect In task.gSquares
+            For Each rect In task.gridRects
                 If dst2(rect).CountNonZero >= 5 Then
                     nZero.Run(dst2(rect))
 

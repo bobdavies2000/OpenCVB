@@ -30,7 +30,7 @@ Namespace VBClasses
         Public noDepthMask As cv.Mat
         Public fLessMask As cv.Mat
 
-        Public gSquares As List(Of cv.Rect)
+        Public gridRects As List(Of cv.Rect)
         Public firstPass As Boolean = True
 
         ' treeview data

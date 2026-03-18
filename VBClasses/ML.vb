@@ -24,7 +24,7 @@ Namespace VBClasses
                 Dim nList = bounds.boundaryCells(i)
 
                 ' the first grid square is the center one and the only grid square with edges.  The rest are featureless.
-                Dim gSq = task.gSquares(nList(0))
+                Dim gSq = task.gridRects(nList(0))
                 Dim edgePixels = edgeMask(gSq).FindNonZero()
 
                 ' mark the edge pixels as class 2 - others will be updated next
@@ -34,7 +34,7 @@ Namespace VBClasses
                 trainDepth = New cv.Mat(ml.trainResponse.Rows, 1, cv.MatType.CV_32F)
 
                 For j = 1 To nList.Count - 1
-                    Dim grA = task.gSquares(nList(j))
+                    Dim grA = task.gridRects(nList(j))
                     Dim x As Integer = Math.Floor(grA.X * task.bricksPerRow / task.cols)
                     Dim y As Integer = Math.Floor(grA.Y * task.bricksPerCol / task.rows)
                     Dim val = task.lowResColor.Get(Of cv.Vec3f)(y, x)
@@ -55,7 +55,7 @@ Namespace VBClasses
 
                 ml.trainMats = {trainRGB, trainDepth}
 
-                Dim grB = task.gSquares(nList(0))
+                Dim grB = task.gridRects(nList(0))
                 ml.testMats = {rgb32f(grB), task.pcSplit(2)(grB)}
                 ml.Run(src)
 
@@ -396,8 +396,8 @@ Namespace VBClasses
             Dim mResponse As New List(Of Single)
             Dim predictList As New List(Of mlColor)
             Dim grPredict As New List(Of cv.Rect)
-            For i = 0 To task.gSquares.Count - 1
-                Dim gSq = task.gSquares(i)
+            For i = 0 To task.gridRects.Count - 1
+                Dim gSq = task.gridRects(i)
                 Dim mls As mlColor
                 mls.colorIndex = color8U.dst2.Get(Of Byte)(gSq.Y, gSq.X)
                 mls.x = gSq.X
@@ -471,8 +471,8 @@ Namespace VBClasses
             Dim mResponse As New List(Of Single)
             Dim predictList As New List(Of mlColorInTier)
             Dim grPredict As New List(Of cv.Rect)
-            For i = 0 To task.gSquares.Count - 1
-                Dim gSq = task.gSquares(i)
+            For i = 0 To task.gridRects.Count - 1
+                Dim gSq = task.gridRects(i)
                 Dim mls As mlColorInTier
                 mls.colorIndex = color8U.dst2.Get(Of Byte)(gSq.Y, gSq.X)
                 mls.x = gSq.X

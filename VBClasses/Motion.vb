@@ -20,8 +20,8 @@ Namespace VBClasses
             diff.Run(src)
 
             Dim gridList As New SortedList(Of Integer, Integer)
-            For i = 0 To task.gSquares.Count - 1
-                Dim r = task.gSquares(i)
+            For i = 0 To task.gridRects.Count - 1
+                Dim r = task.gridRects(i)
                 Dim diffCount = diff.dst2(r).CountNonZero
                 If diffCount >= task.motionThreshold Then
                     For Each index In task.grid.gridNeighbors(i)
@@ -34,7 +34,7 @@ Namespace VBClasses
             motionMask.SetTo(0)
             dst3.SetTo(0)
             For Each index In motionSort
-                Dim rect = task.gSquares(index)
+                Dim rect = task.gridRects(index)
                 src(rect).CopyTo(dst2(rect))
                 dst3(rect).SetTo(255)
                 motionMask(rect).SetTo(255)
@@ -104,7 +104,7 @@ Namespace VBClasses
                     " pixels different: " + CStr(motionRight.motion.motionSort.Count), 3)
 
             For Each index In motionRight.motion.motionSort
-                dst1.Rectangle(task.gSquares(index), 255, task.lineWidth)
+                dst1.Rectangle(task.gridRects(index), 255, task.lineWidth)
             Next
         End Sub
     End Class
@@ -276,8 +276,8 @@ Namespace VBClasses
             diff.Run(task.pcSplit(2))
 
             motionSort.Clear()
-            For i = 0 To task.gSquares.Count - 1
-                Dim diffCount = diff.dst2(task.gSquares(i)).CountNonZero
+            For i = 0 To task.gridRects.Count - 1
+                Dim diffCount = diff.dst2(task.gridRects(i)).CountNonZero
                 If diffCount >= task.motionThreshold Then
                     For Each index In task.grid.gridNeighbors(i)
                         If motionSort.Contains(index) = False Then motionSort.Add(index)
@@ -287,7 +287,7 @@ Namespace VBClasses
 
             motionMask.SetTo(0)
             For Each index In motionSort
-                motionMask(task.gSquares(index)).SetTo(255)
+                motionMask(task.gridRects(index)).SetTo(255)
             Next
 
             task.pcSplit(2).CopyTo(dst2, motionMask)
@@ -318,7 +318,7 @@ Namespace VBClasses
             dst3 = src
             Dim count As Integer
             For Each index In task.motion.motionSort
-                Dim r = task.gSquares(index)
+                Dim r = task.gridRects(index)
                 dst2.Rectangle(r, white, task.lineWidth)
                 cv.Cv2.MatchTemplate(dst2(r), lastsrc(r), correlationMat, cv.TemplateMatchModes.CCoeffNormed)
 

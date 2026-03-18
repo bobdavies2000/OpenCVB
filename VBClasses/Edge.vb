@@ -409,10 +409,10 @@ Namespace VBClasses
             dst2 = task.leftView
             dst3 = task.rightView
 
-            Dim maxLocs(task.gSquares.Count - 1) As Integer
+            Dim maxLocs(task.gridRects.Count - 1) As Integer
             Dim highlights As New List(Of Integer)
-            For i = 0 To task.gSquares.Count - 1
-                Dim gSq = task.gSquares(i)
+            For i = 0 To task.gridRects.Count - 1
+                Dim gSq = task.gridRects(i)
                 Dim width = If(gSq.X + gSq.Width + options.searchDepth < dst2.Width,
                                       gSq.Width + options.searchDepth, dst2.Width - gSq.X - 1)
                 Dim searchgr = New cv.Rect(gSq.X, gSq.Y, width, gSq.Height)
@@ -436,7 +436,7 @@ Namespace VBClasses
             If options.highlightChecked Then
                 labels(2) = "Matched grid segments in dst3 with disparity"
                 For Each i In highlights
-                    Dim gSq = task.gSquares(i)
+                    Dim gSq = task.gridRects(i)
                     dst3.Rectangle(gSq, cv.Scalar.Red, 2)
                     gSq.X += maxLocs(i)
                     dst2.Rectangle(gSq, cv.Scalar.Red, 2)
@@ -452,7 +452,7 @@ Namespace VBClasses
                 If task.gridROIclicked Then
                     If redRects.Contains(task.gridROIclicked) = False Then redRects.Add(task.gridROIclicked)
                     For Each i In redRects
-                        Dim gSq = task.gSquares(i)
+                        Dim gSq = task.gridRects(i)
                         dst3.Rectangle(gSq, cv.Scalar.Red, 2)
                         gSq.X += maxLocs(i)
                         dst2.Rectangle(gSq, cv.Scalar.Red, 2)
@@ -1521,7 +1521,7 @@ Namespace VBClasses
             desc = "Translate bricks with edges and depth from the left to the right view."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            bricks.run(src)
+            bricks.Run(src)
             edgesLR.Run(emptyMat)
             dst2 = edgesLR.dst2
             dst3 = edgesLR.dst3
@@ -1683,7 +1683,7 @@ Namespace VBClasses
 
             edges.Run(dst2)
             dst3 = edges.dst2
-            Dim count = task.gSquares.Count - task.motion.corr.rectList.Count
+            Dim count = task.gridRects.Count - task.motion.corr.rectList.Count
             labels(2) = "Current frame: " + CStr(count) + " grid squares had features"
         End Sub
     End Class

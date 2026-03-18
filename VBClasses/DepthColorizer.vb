@@ -69,7 +69,7 @@ Namespace VBClasses
 
                 Dim depth = task.pcSplit(2).Get(Of Single)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
                 Dim gridIndex = task.gridMap.Get(Of Integer)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
-                Dim r = task.gSquares(gridIndex)
+                Dim r = task.gridRects(gridIndex)
                 Dim depthGrid = task.pcSplit(2)(r)
                 Dim brickDepth = depthGrid.Mean(task.depthmask(r))(0)
                 Dim mm = GetMinMax(depthGrid, task.depthmask(r))

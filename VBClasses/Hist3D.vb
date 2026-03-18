@@ -304,7 +304,7 @@ Namespace VBClasses
             dst3 = dst2.InRange(0, 0)
             If pixels.pixelVector.Count = 0 Then Exit Sub
             dst1.SetTo(0)
-            For Each gSq In task.gSquares
+            For Each gSq In task.gridRects
                 If dst3(gSq).CountNonZero Then
                     Dim candidates As New List(Of Integer)
                     For y = 0 To gSq.Height - 1

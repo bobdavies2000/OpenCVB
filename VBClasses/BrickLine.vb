@@ -218,8 +218,8 @@ Namespace VBClasses
             dst3 = src.Clone
             edges.Clear()
             noEdges.Clear()
-            For i = 0 To task.gSquares.Count - 1
-                Dim r = task.gSquares(i)
+            For i = 0 To task.gridRects.Count - 1
+                Dim r = task.gridRects(i)
                 If r.X = 0 Then Continue For
                 If r.X + r.Width = dst2.Width Then Continue For
                 If r.Y = 0 Then Continue For
@@ -229,10 +229,10 @@ Namespace VBClasses
 
             If standaloneTest() Then
                 For Each index In edges
-                    DrawRect(dst2, task.gSquares(index), white)
+                    DrawRect(dst2, task.gridRects(index), white)
                 Next
                 For Each index In noEdges
-                    DrawRect(dst3, task.gSquares(index), white)
+                    DrawRect(dst3, task.gridRects(index), white)
                 Next
             End If
 
@@ -266,7 +266,7 @@ Namespace VBClasses
             mats.mat(2) = fLess.dst2.Clone
             Dim leftEdges As New List(Of Integer)(fLess.edges)
             For Each index In leftEdges
-                DrawRect(mats.mat(2), task.gSquares(index), white)
+                DrawRect(mats.mat(2), task.gridRects(index), white)
             Next
 
             edgeline.Run(edges.dst3)
@@ -274,7 +274,7 @@ Namespace VBClasses
             mats.mat(3) = fLess.dst2.Clone
             Dim rightEdges As New List(Of Integer)(fLess.edges)
             For Each index In rightEdges
-                DrawRect(mats.mat(3), task.gSquares(index), white)
+                DrawRect(mats.mat(3), task.gridRects(index), white)
             Next
 
             '  mats.Run(emptyMat)
@@ -285,7 +285,7 @@ Namespace VBClasses
             bestBricks.Clear()
             For Each index In leftEdges
                 Dim gSq As New brickData
-                gSq.rect = task.gSquares(index)
+                gSq.rect = task.gridRects(index)
 
                 ' too close to the edges of the image
                 If task.gridNabeRects(index).Width + gSq.rect.X + task.brickEdgeLen * 2 > dst2.Width Then Continue For
@@ -311,7 +311,7 @@ Namespace VBClasses
             Next
 
             labels(3) = CStr(bestBricks.Count) + " bricks had lines and correlation >" + Format(task.fCorrThreshold, fmt2) + ") or " +
-                  Format(bestBricks.Count / task.gSquares.Count, "00%") + " of all the bricks"
+                  Format(bestBricks.Count / task.gridRects.Count, "00%") + " of all the bricks"
         End Sub
     End Class
 End Namespace

@@ -160,19 +160,19 @@ Namespace VBClasses
 
             ' find the most featureless roi
             Dim maxIndex As Integer
-            Dim grCounts(task.gSquares.Count - 1)
-            For i = 0 To task.gSquares.Count - 1
-                grCounts(i) = mask(task.gSquares(i)).CountNonZero
+            Dim grCounts(task.gridRects.Count - 1)
+            For i = 0 To task.gridRects.Count - 1
+                grCounts(i) = mask(task.gridRects(i)).CountNonZero
                 If grCounts(i) > grCounts(maxIndex) Then maxIndex = i
             Next
 
             mats.mat(3) = New cv.Mat(src.Size(), cv.MatType.CV_8UC3, cv.Scalar.All(0))
-            src(task.gSquares(maxIndex)).CopyTo(mats.mat(3)(task.gSquares(maxIndex)), mask(task.gSquares(maxIndex)))
+            src(task.gridRects(maxIndex)).CopyTo(mats.mat(3)(task.gridRects(maxIndex)), mask(task.gridRects(maxIndex)))
             mats.Run(emptyMat)
             dst3 = mats.dst2
             ' this is where the debug comes in.  We just want to look at one region which hopefully is a single plane.
-            Dim gSq = task.gSquares(maxIndex)
-            If gSq.X = task.gSquares(maxIndex).X And gSq.Y = task.gSquares(maxIndex).Y Then
+            Dim gSq = task.gridRects(maxIndex)
+            If gSq.X = task.gridRects(maxIndex).X And gSq.Y = task.gridRects(maxIndex).Y Then
                 If grCounts(maxIndex) > gSq.Width * gSq.Height / 4 Then
                     Dim fitPoints As New List(Of cv.Point3f)
                     Dim minDepth = Single.MaxValue, maxDepth = Single.MinValue

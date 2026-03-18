@@ -7,7 +7,7 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             Dim colorStdev As cv.Scalar, colorMean As cv.Scalar
-            For Each rect In task.gSquares
+            For Each rect In task.gridRects
                 cv.Cv2.MeanStdDev(task.rightView(rect), colorMean, colorStdev)
                 dst2(rect).SetTo(colorMean)
             Next
@@ -40,7 +40,7 @@ Namespace VBClasses
             If task.optionsChanged Then
                 depthList1 = New List(Of List(Of Single))
                 depthList2 = New List(Of List(Of Single))
-                For i = 0 To task.gSquares.Count
+                For i = 0 To task.gridRects.Count
                     depthList1.Add(New List(Of Single))
                     depthList2.Add(New List(Of Single))
                     colorList.Add(black)
@@ -52,8 +52,8 @@ Namespace VBClasses
 
             Dim depth32f As cv.Mat = task.pcSplit(2) * 1000, depth32s As New cv.Mat
             depth32f.ConvertTo(depth32s, cv.MatType.CV_32S)
-            For i = 0 To task.gSquares.Count - 1
-                Dim gSq = task.gSquares(i)
+            For i = 0 To task.gridRects.Count - 1
+                Dim gSq = task.gridRects(i)
 
                 Dim center = New cv.Point(CInt(gSq.X + gSq.Width / 2), CInt(gSq.Y + gSq.Height / 2))
                 Dim index = task.redList.rcMap.Get(Of Byte)(center.Y, center.X)
@@ -132,7 +132,7 @@ Namespace VBClasses
 
             If task.optionsChanged Then
                 depthList = New List(Of List(Of Single))
-                For i = 0 To task.gSquares.Count
+                For i = 0 To task.gridRects.Count
                     depthList.Add(New List(Of Single))
                     colorList.Add(black)
                 Next
@@ -141,8 +141,8 @@ Namespace VBClasses
             quadData.Clear()
             dst3.SetTo(0)
 
-            For i = 0 To task.gSquares.Count - 1
-                Dim gSq = task.gSquares(i)
+            For i = 0 To task.gridRects.Count - 1
+                Dim gSq = task.gridRects(i)
 
                 Dim center = New cv.Point(CInt(gSq.X + gSq.Width / 2), CInt(gSq.Y + gSq.Height / 2))
                 Dim index = hulls.rcMap.Get(Of Byte)(center.Y, center.X)
@@ -207,7 +207,7 @@ Namespace VBClasses
             If task.optionsChanged Then
                 depthMinList.Clear()
                 depthMaxList.Clear()
-                For i = 0 To task.gSquares.Count - 1
+                For i = 0 To task.gridRects.Count - 1
                     depthMinList.Add(New List(Of Single))
                     depthMaxList.Add(New List(Of Single))
                 Next
@@ -222,8 +222,8 @@ Namespace VBClasses
 
             Dim min(4 - 1) As cv.Point3f, max(4 - 1) As cv.Point3f
             depths.Clear()
-            For i = 0 To task.gSquares.Count - 1
-                Dim gSq = task.gSquares(i)
+            For i = 0 To task.gridRects.Count - 1
+                Dim gSq = task.gridRects(i)
                 Dim center = New cv.Point(gSq.X + gSq.Width / 2, gSq.Y + gSq.Height / 2)
                 Dim index = task.redList.rcMap.Get(Of Byte)(center.Y, center.X)
                 Dim depthMin As Single = 0, depthMax As Single = 0, minLoc As cv.Point, maxLoc As cv.Point
@@ -283,7 +283,7 @@ Namespace VBClasses
                     depths.Add(depthMax)
                 End If
             Next
-            labels(2) = traceName + " completed: " + Format(task.gSquares.Count, fmt0) + " gSq's produced " +
+            labels(2) = traceName + " completed: " + Format(task.gridRects.Count, fmt0) + " gSq's produced " +
                                 Format(quadData.Count / 25, fmt0) + " six sided bricks with color"
             SetTrueText("There should be no 0.0 values in the list of min and max depths in the dst2 image.", 3)
         End Sub

@@ -31,7 +31,7 @@ Namespace VBClasses
 
             dst2.SetTo(0)
             rectList.Clear()
-            For Each r In task.gSquares
+            For Each r In task.gridRects
                 Dim mm = GetMinMax(src(r))
                 If mm.range < task.fLessThreshold Then
                     dst2(r).SetTo(255)
@@ -71,7 +71,7 @@ Namespace VBClasses
             If task.workRes.Height > 270 Then input = input.Resize(task.smallRes, 0, 0, cv.InterpolationFlags.Nearest)
 
             Dim mask As New cv.Mat(input.Size, cv.MatType.CV_8U, 0)
-            For Each r In smallGrid.gSquares
+            For Each r In smallGrid.gridRects
                 Dim mm = GetMinMax(input(r))
                 If mm.range < task.fLessThreshold Then mask(r).SetTo(255)
             Next
@@ -79,7 +79,7 @@ Namespace VBClasses
             dst2 = mask.Resize(src.Size, 0, 0, cv.InterpolationFlags.Nearest)
 
             rectList.Clear()
-            For Each r In task.gSquares
+            For Each r In task.gridRects
                 If dst2.Get(Of Byte)(r.TopLeft.Y, r.TopLeft.X) Then rectList.Add(r)
             Next
 
@@ -90,7 +90,7 @@ Namespace VBClasses
                 Next
 
                 Dim index = task.gridMap.Get(Of Integer)(task.clickPoint.Y, task.clickPoint.X)
-                Dim mm = GetMinMax(task.gray(task.gSquares(index)))
+                Dim mm = GetMinMax(task.gray(task.gridRects(index)))
                 SetTrueText("Click on any grid rect to see its grayscale range." + vbCrLf +
                             "Min gray = " + Format(mm.minVal, fmt0) + vbCrLf +
                             "Max Gray = " + Format(mm.maxVal, fmt0) + vbCrLf +
@@ -119,7 +119,7 @@ Namespace VBClasses
 
             dst2.SetTo(0)
             For i = 0 To corr.cList.Count - 1
-                Dim gSq = task.gSquares(i)
+                Dim gSq = task.gridRects(i)
                 If corr.cList(i) < corr.maxCorrelation Then
                     dst2(gSq).SetTo(255)
                     If standaloneTest() Then src.Rectangle(gSq, white, task.lineWidth)
@@ -401,7 +401,7 @@ Namespace VBClasses
 
             feat.Run(dst2)
             feat.dst2.CopyTo(dst3)
-            Dim count = task.gSquares.Count - task.motion.corr.rectList.Count
+            Dim count = task.gridRects.Count - task.motion.corr.rectList.Count
             labels(2) = "Current frame: " + CStr(count) + " grid squares had features"
         End Sub
     End Class

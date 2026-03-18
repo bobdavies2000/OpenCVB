@@ -256,7 +256,7 @@ Namespace VBClasses
         Dim redC As New RedColor_Basics
         Public rcGridMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0) ' map of rc data to grid map
         Public Sub New()
-            labels(3) = "RedColor output mapped into the gSquares."
+            labels(3) = "RedColor output mapped into the gridRects."
             desc = "Create a triangle representation of the point cloud with RedCloud data"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -266,8 +266,8 @@ Namespace VBClasses
 
             rcGridMap.SetTo(0)
             dst3.SetTo(0)
-            For i = 0 To task.gSquares.Count - 1
-                Dim gSq = task.gSquares(i)
+            For i = 0 To task.gridRects.Count - 1
+                Dim gSq = task.gridRects(i)
 
                 Dim center = New cv.Point(CInt(gSq.X + gSq.Width / 2), CInt(gSq.Y + gSq.Height / 2))
                 Dim index = redC.rcMap.Get(Of Integer)(center.Y, center.X) - 1

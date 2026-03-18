@@ -131,7 +131,7 @@ Namespace VBClasses
             bricks.Run(src)
 
             Dim currColors As New List(Of cv.Vec3b)
-            For Each roi In task.gSquares
+            For Each roi In task.gridRects
                 currColors.Add(bricks.dst2.Get(Of cv.Vec3b)(roi.Y, roi.X))
             Next
 

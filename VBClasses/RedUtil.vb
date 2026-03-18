@@ -138,8 +138,8 @@ Namespace VBClasses
                     'Else
                     '    strOut = "RedCloud cell is too small to identify."
                     '    Dim gridIndex = vbc.task.gridMap.Get(Of Integer)(vbc.task.clickPoint.Y, vbc.task.clickPoint.X)
-                    '    task.color(vbc.task.gSquares(gridIndex)).SetTo(white)
-                    '    task.color.Rectangle(vbc.task.gSquares(gridIndex), vbc.task.highlight, vbc.task.lineWidth)
+                    '    task.color(vbc.task.gridRects(gridIndex)).SetTo(white)
+                    '    task.color.Rectangle(vbc.task.gridRects(gridIndex), vbc.task.highlight, vbc.task.lineWidth)
                     'End If
                 Else
                     vbc.task.rcD = Nothing

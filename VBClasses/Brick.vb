@@ -19,11 +19,11 @@ Namespace VBClasses
             Dim depthCount As Integer
             brickDepthCount = 0
             Dim colorstdev As cv.Scalar
-            For i = 0 To task.gSquares.Count - 1
+            For i = 0 To task.gridRects.Count - 1
                 Dim gSq As New brickData
                 gSq.index = brickList.Count
 
-                gSq.rect = task.gSquares(gSq.index)
+                gSq.rect = task.gridRects(gSq.index)
                 gSq.lRect = gSq.rect
 
                 gSq.depth = task.pcSplit(2)(gSq.rect).Mean(task.depthmask(gSq.rect))
@@ -358,7 +358,7 @@ Namespace VBClasses
                 End If
             Next
 
-            labels(2) = CStr(splitCount) + " bricks of " + CStr(task.gSquares.Count) + " were modified."
+            labels(2) = CStr(splitCount) + " bricks of " + CStr(task.gridRects.Count) + " were modified."
             If standaloneTest() Then dst3 = task.pointCloud
         End Sub
     End Class
@@ -396,7 +396,7 @@ Namespace VBClasses
                 End If
             Next
 
-            labels(2) = CStr(splitCount) + " bricks of " + CStr(task.gSquares.Count) + " were modified."
+            labels(2) = CStr(splitCount) + " bricks of " + CStr(task.gridRects.Count) + " were modified."
             If standaloneTest() Then dst3 = task.pointCloud
         End Sub
     End Class
@@ -440,7 +440,7 @@ Namespace VBClasses
                 End If
             Next
 
-            labels(2) = CStr(splitCount) + " bricks of " + CStr(task.gSquares.Count) + " were modified."
+            labels(2) = CStr(splitCount) + " bricks of " + CStr(task.gridRects.Count) + " were modified."
             If standaloneTest() Then dst3 = task.pointCloud
         End Sub
     End Class
@@ -467,13 +467,13 @@ Namespace VBClasses
 
             boundaryCells.Clear()
             For Each nabeList In task.grid.gridNeighbors
-                Dim grA = task.gSquares(nabeList(0))
+                Dim grA = task.gridRects(nabeList(0))
                 Dim centerType = feat.featureMask.Get(Of Byte)(grA.Y, grA.X)
                 If centerType <> 0 Then
                     Dim boundList = New List(Of Integer)
                     Dim addFirst As Boolean = True
                     For i = 1 To nabeList.Count - 1
-                        Dim grB = task.gSquares(nabeList(i))
+                        Dim grB = task.gridRects(nabeList(i))
                         Dim val = feat.featureMask.Get(Of Byte)(grB.Y, grB.X)
                         If centerType <> val Then
                             If addFirst Then boundList.Add(nabeList(0)) ' first element is the center point (has features)
@@ -489,10 +489,10 @@ Namespace VBClasses
             For Each nlist In boundaryCells
                 For Each n In nlist
                     Dim mytoggle As Integer
-                    Dim gSq = task.gSquares(n)
+                    Dim gSq = task.gridRects(n)
                     Dim val = feat.featureMask.Get(Of Byte)(gSq.Y, gSq.X)
                     If val > 0 Then mytoggle = 255 Else mytoggle = 128
-                    dst2(task.gSquares(n)).SetTo(mytoggle)
+                    dst2(task.gridRects(n)).SetTo(mytoggle)
                 Next
             Next
         End Sub
@@ -527,7 +527,7 @@ Namespace VBClasses
                 Dim nList = bounds.boundaryCells(i)
 
                 ' the first gSq is the center one and the only gSq with edges.  The rest are featureless.
-                Dim gSq = task.gSquares(nList(0))
+                Dim gSq = task.gridRects(nList(0))
                 Dim edgePixels = edgeMask(gSq).FindNonZero()
 
                 ' mark the edge pixels as class 2 - others will be updated next
@@ -536,7 +536,7 @@ Namespace VBClasses
                 trainRGB = New cv.Mat(ml.trainResponse.Rows, 1, cv.MatType.CV_32FC3)
 
                 For j = 1 To nList.Count - 1
-                    Dim grA = task.gSquares(nList(j))
+                    Dim grA = task.gridRects(nList(j))
                     Dim x As Integer = Math.Floor(grA.X * task.bricksPerRow / task.cols)
                     Dim y As Integer = Math.Floor(grA.Y * task.bricksPerCol / task.rows)
                     Dim val = task.lowResColor.Get(Of cv.Vec3f)(y, x)
@@ -554,7 +554,7 @@ Namespace VBClasses
 
                 ml.trainMats = {trainRGB}
 
-                Dim grB = task.gSquares(nList(0))
+                Dim grB = task.gridRects(nList(0))
                 ml.testMats = {rgb32f(grB)}
                 ml.Run(src)
 
@@ -647,7 +647,7 @@ Namespace VBClasses
             Dim colorIndex As Integer
             For i = 0 To task.bricksPerRow - 1 Step 2
                 colorIndex = 0
-                For j = i To task.gSquares.Count - task.bricksPerRow - 1 Step task.bricksPerRow
+                For j = i To task.gridRects.Count - task.bricksPerRow - 1 Step task.bricksPerRow
                     Dim gSq = bricks.brickList(j)
                     Dim color = task.scalarColors(colorIndex)
                     If gSq.depth > 0 Then
@@ -691,7 +691,7 @@ Namespace VBClasses
             featureMask.SetTo(0)
             fLessMask.SetTo(0)
             Dim flist As New List(Of Single)
-            For Each r In task.gSquares
+            For Each r In task.gridRects
                 flist.Add(If(edges.dst2(r).CountNonZero <= 1, 1, 2))
             Next
 
@@ -703,9 +703,9 @@ Namespace VBClasses
             End If
 
             Dim flipRects As New List(Of cv.Rect)
-            For i = 0 To task.gSquares.Count - 1
+            For i = 0 To task.gridRects.Count - 1
                 stateList(i) = (stateList(i) + flist(i)) / 2
-                Dim r = task.gSquares(i)
+                Dim r = task.gridRects(i)
                 If stateList(i) >= 1.95 Then
                     featureRects.Add(r)
                     featureMask(r).SetTo(255)
@@ -953,8 +953,8 @@ Namespace VBClasses
             labels(2) = fLess.labels(2)
 
             depthList.Clear()
-            For i = 0 To task.gSquares.Count - 1
-                Dim r = task.gSquares(i)
+            For i = 0 To task.gridRects.Count - 1
+                Dim r = task.gridRects(i)
                 Dim depth = task.pcSplit(2)(r).Mean(task.depthmask(r))(0)
                 depthList.Add(depth)
             Next
@@ -971,12 +971,12 @@ Namespace VBClasses
                 Static lastDepthList = New List(Of Single)(depthList)
                 depthJumpers.Clear()
                 For i = 0 To depthList.Count - 1
-                    Dim r = task.gSquares(i)
+                    Dim r = task.gridRects(i)
                     Dim val = fLess.dst2.Get(Of Byte)(r.TopLeft.Y, r.TopLeft.X)
                     If val = 0 And depthList(i) <> 0 And lastDepthList(i) <> 0 Then
                         Dim diff = Math.Abs(depthList(i) - lastDepthList(i))
                         If diff > options.meters Then
-                            dst3(task.gSquares(i)).SetTo(255)
+                            dst3(task.gridRects(i)).SetTo(255)
                             depthJumpers.Add(i)
                         End If
                     End If
@@ -1017,12 +1017,12 @@ Namespace VBClasses
             End If
 
             rangeJumpers.Clear()
-            For i = 0 To task.gSquares.Count - 1
-                Dim r = task.gSquares(i)
+            For i = 0 To task.gridRects.Count - 1
+                Dim r = task.gridRects(i)
                 Dim mm = GetMinMax(task.pcSplit(2)(r), task.depthmask(r))
                 If mm.range >= options.meters Then
                     rangeJumpers.Add(i)
-                    dst3(task.gSquares(i)).SetTo(255)
+                    dst3(task.gridRects(i)).SetTo(255)
                 End If
             Next
 

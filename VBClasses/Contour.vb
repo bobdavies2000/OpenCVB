@@ -157,7 +157,7 @@ Namespace VBClasses
             For Each pt In task.feat.features
                 DrawCircle(dst2, pt)
                 DrawCircle(dst3, pt)
-                Dim rect = task.gSquares(task.gridMap.Get(Of Integer)(pt.Y, pt.X))
+                Dim rect = task.gridRects(task.gridMap.Get(Of Integer)(pt.Y, pt.X))
                 Dim correlation = getCorrelation(rect)
                 SetTrueText(Format(correlation, fmt1), pt, 3)
             Next

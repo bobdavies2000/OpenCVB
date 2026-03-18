@@ -19,7 +19,7 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             Static index As Integer = task.gridMap.Get(Of Integer)(task.clickPoint.Y, task.clickPoint.X)
             index = task.gridMap.Get(Of Integer)(task.clickPoint.Y, task.clickPoint.X)
-            Dim grSave = If(index < task.gSquares.Count, task.gSquares(index), New cv.Rect)
+            Dim grSave = If(index < task.gridRects.Count, task.gridRects(index), New cv.Rect)
 
             If task.optionsChanged Then index = 0
 
@@ -43,14 +43,14 @@ Namespace VBClasses
                 dst0 = dst0 Or diff(i).dst2
             Next
 
-            Dim counts(3, task.gSquares.Count) As Integer
+            Dim counts(3, task.gridRects.Count) As Integer
             Dim contourCounts As New List(Of List(Of Integer))
             Dim means As New List(Of List(Of Single))
 
             Dim allContours As cv.Point()() = Nothing
             For i = 0 To counts.GetUpperBound(0)
-                For j = 0 To task.gSquares.Count - 1
-                    Dim gSq = task.gSquares(j)
+                For j = 0 To task.gridRects.Count - 1
+                    Dim gSq = task.gridRects(j)
                     Dim tmp = matList(i)(gSq)
                     cv.Cv2.FindContours(tmp, allContours, Nothing, cv.RetrievalModes.External, cv.ContourApproximationModes.ApproxSimple)
                     If i = 0 Then
@@ -65,7 +65,7 @@ Namespace VBClasses
             Next
 
             Dim bump = 3
-            Dim ratio = dst2.Height / task.gSquares(0).Height
+            Dim ratio = dst2.Height / task.gridRects(0).Height
             For i = 0 To matList.Count - 1
                 Dim tmp As cv.Mat = matList(i)(grSave) * 0.5
                 Dim nextCount = tmp.CountNonZero

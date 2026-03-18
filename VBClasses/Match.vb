@@ -228,7 +228,7 @@ Namespace VBClasses
             Dim updateCount As Integer
             mask.SetTo(0)
 
-            For Each roi In task.gSquares
+            For Each roi In task.gridRects
                 Dim correlation As New cv.Mat, mean As Single, stdev As Single
                 cv.Cv2.MeanStdDev(dst2(roi), mean, stdev)
                 If stdev > optionsMatch.stdevThreshold Then
@@ -252,9 +252,9 @@ Namespace VBClasses
             lastFrame = saveFrame
             Dim corrPercent = Format(task.fCorrThreshold, "0.0%") + " correlation"
             labels(2) = "Correlation value for each cell is shown. " + CStr(updateCount) + " of " +
-                     CStr(task.gSquares.Count) + " with < " + corrPercent + " or stdev < " +
+                     CStr(task.gridRects.Count) + " with < " + corrPercent + " or stdev < " +
                      Format(optionsMatch.stdevThreshold, fmt0)
-            labels(3) = CStr(task.gSquares.Count - updateCount) + " segments out of " + CStr(task.gSquares.Count) + " had > " + corrPercent
+            labels(3) = CStr(task.gridRects.Count - updateCount) + " segments out of " + CStr(task.gridRects.Count) + " had > " + corrPercent
         End Sub
     End Class
 
@@ -558,7 +558,7 @@ Namespace VBClasses
             If standalone Then gridIndex = task.lines.lpList(0).p1GridIndex
             Static lastImage As cv.Mat = task.gray.Clone
 
-            Dim rect = task.gSquares(gridIndex)
+            Dim rect = task.gridRects(gridIndex)
             match.template = task.gray(rect)
             Dim searchrect = task.gridNabeRects(gridIndex)
 

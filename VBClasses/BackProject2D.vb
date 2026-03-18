@@ -11,7 +11,7 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             Dim index As Integer = task.gridMap.Get(Of Integer)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
-            Dim gSq = task.gSquares(index)
+            Dim gSq = task.gridRects(index)
 
             colorFmt.Run(task.color)
             hist2d.Run(colorFmt.dst2)
@@ -329,7 +329,7 @@ Namespace VBClasses
             backp.Run(task.color)
             dst2 = Mat_Convert.Mat_32f_To_8UC3(backp.dst2) * 255
 
-            Dim gSq = task.gSquares(task.gridMap.Get(Of Integer)(task.mouseMovePoint.Y,
+            Dim gSq = task.gridRects(task.gridMap.Get(Of Integer)(task.mouseMovePoint.Y,
                                                                  task.mouseMovePoint.X))
             Dim rect As cv.Rect
             If options.backProjectRow Then

@@ -19,7 +19,7 @@ Namespace VBClasses
                 saveCorrelations.Clear()
                 saveIndex = index
             End If
-            rect = task.gSquares(index)
+            rect = task.gridRects(index)
 
             match.template = task.leftView(rect)
             Dim maxDisparity As Integer = 128
@@ -209,7 +209,7 @@ Namespace VBClasses
             dst1.Rectangle(disparity.matchRect, 255, task.lineWidth)
 
             Dim index As Integer = task.gridMap.Get(Of Integer)(task.ClickPoint.Y, task.ClickPoint.X)
-            Dim rect = task.gSquares(index)
+            Dim rect = task.gridRects(index)
             dst2.Rectangle(rect, 255, task.lineWidth)
         End Sub
     End Class

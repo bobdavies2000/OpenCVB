@@ -15,7 +15,7 @@ Namespace VBClasses
             stdevList.Clear()
             meanList.Clear()
             Dim mean As cv.Scalar, stdev As cv.Scalar
-            For Each gSq In task.gSquares
+            For Each gSq In task.gridRects
                 cv.Cv2.MeanStdDev(dst1(gSq), mean, stdev)
                 stdevList.Add(stdev(0))
                 meanList.Add(mean(0))
@@ -25,7 +25,7 @@ Namespace VBClasses
             dst3.SetTo(0)
             rects.Clear()
             For i = 0 To stdevList.Count - 1
-                Dim gSq = task.gSquares(i)
+                Dim gSq = task.gridRects(i)
                 Dim depthCheck = task.noDepthMask(gSq)
                 If stdevList(i) < stdevAverage Or depthCheck.CountNonZero / depthCheck.Total > 0.5 Then
                     dst3.Rectangle(gSq, white, -1)
@@ -34,7 +34,7 @@ Namespace VBClasses
                 End If
             Next
             If task.heartBeat Then
-                labels(2) = CStr(rects.Count) + " of " + CStr(task.gSquares.Count) + " gSq's had above average standard deviation (average = " +
+                labels(2) = CStr(rects.Count) + " of " + CStr(task.gridRects.Count) + " gSq's had above average standard deviation (average = " +
                             Format(stdevList.Average, fmt1) + ")"
             End If
 
@@ -60,7 +60,7 @@ Namespace VBClasses
             Dim stdevList1 As New List(Of Single)
             Dim stdevList2 As New List(Of Single)
             Dim mean As cv.Scalar, stdev As cv.Scalar
-            For Each gSq In task.gSquares
+            For Each gSq In task.gridRects
                 cv.Cv2.MeanStdDev(src(gSq), mean, stdev)
                 stdevList0.Add(stdev(0))
                 stdevList1.Add(stdev(1))
@@ -72,7 +72,7 @@ Namespace VBClasses
             Dim avg2 = stdevList2.Average
             dst3.SetTo(0)
             For i = 0 To stdevList0.Count - 1
-                Dim gSq = task.gSquares(i)
+                Dim gSq = task.gridRects(i)
                 If stdevList0(i) < avg0 And stdevList1(i) < avg1 And stdevList2(i) < avg2 Then
                     dst3.Rectangle(gSq, white, -1)
                 End If
@@ -111,7 +111,7 @@ Namespace VBClasses
             bgrList.Clear()
             grList.Clear()
             ReDim categories(9)
-            For Each gSq In task.gSquares
+            For Each gSq In task.gridRects
                 cv.Cv2.MeanStdDev(src(gSq), meanS, stdev)
                 sortedStd.Add(stdev(0) + stdev(1) + stdev(2), gSq)
                 Dim colorIndex As Integer = 1
@@ -220,7 +220,7 @@ Namespace VBClasses
             Dim correlationMat As New cv.Mat
             Dim motionCount As Integer
             For i = 0 To gather.stdevList.Count - 1
-                Dim gSq = task.gSquares(i)
+                Dim gSq = task.gridRects(i)
                 If gather.stdevList(i) >= gather.stdevAverage Then
                     cv.Cv2.MatchTemplate(dst1(gSq), lastImage(gSq), correlationMat, cv.TemplateMatchModes.CCoeffNormed)
                     Dim corr = correlationMat.Get(Of Single)(0, 0)
@@ -234,7 +234,7 @@ Namespace VBClasses
             plot.Run(src)
             dst3 = plot.dst2
 
-            labels(2) = CStr(gather.rects.Count) + " of " + CStr(task.gSquares.Count) + " gSq's had above average standard deviation."
+            labels(2) = CStr(gather.rects.Count) + " of " + CStr(task.gridRects.Count) + " gSq's had above average standard deviation."
             lastImage = dst1.Clone
         End Sub
     End Class
@@ -257,13 +257,13 @@ Namespace VBClasses
 
             rects.Clear()
             For i = 0 To gather.stdevList.Count - 1
-                Dim gSq = task.gSquares(i)
+                Dim gSq = task.gridRects(i)
                 If gather.stdevList(i) < gather.stdevAverage Then
                     rects.Add(gSq)
                     SetTrueText(Format(gather.stdevList(i), fmt1), gSq.TopLeft, 3)
                 End If
             Next
-            labels = {"", "", CStr(task.gSquares.Count - gather.rects.Count) + " gSq's had low standard deviation",
+            labels = {"", "", CStr(task.gridRects.Count - gather.rects.Count) + " gSq's had low standard deviation",
                                          "Stdev average = " + Format(gather.stdevList.Average, fmt1)}
         End Sub
     End Class
@@ -377,7 +377,7 @@ Namespace VBClasses
             If task.mouseClickFlag Then setClickPoint(task.clickPoint, task.mousePicTag)
             If ClickPoint = newPoint Then setClickPoint(gather.rects(gather.rects.Count / 2).TopLeft, 2)
             Dim gridIndex As Integer = task.gridMap.Get(Of Integer)(ClickPoint.Y, ClickPoint.X)
-            Dim gSq = task.gSquares(gridIndex)
+            Dim gSq = task.gridRects(gridIndex)
             dst2.Rectangle(gSq, white, task.lineWidth)
 
             Dim correlationMat As New cv.Mat

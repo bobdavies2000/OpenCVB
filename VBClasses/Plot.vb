@@ -685,7 +685,7 @@ Namespace VBClasses
             For i = 0 To corr.cList.Count - 1
                 Dim bin = CInt(corr.cList(i) / incr) - 1
                 If bin > 0 Then
-                    Dim r = task.gSquares(i)
+                    Dim r = task.gridRects(i)
                     dst1(r).SetTo(bin)
                     histogram(bin) += 1
                     If ranges(bin) Is Nothing Then ranges(bin) = New List(Of Single)

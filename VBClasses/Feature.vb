@@ -551,7 +551,7 @@ Namespace VBClasses
                 Dim val = task.motion.motionMask.Get(Of Byte)(pt.Y, pt.X)
                 If val = 0 Then
                     Dim index As Integer = task.gridMap.Get(Of Integer)(pt.Y, pt.X)
-                    Dim r = task.gSquares(index)
+                    Dim r = task.gridRects(index)
                     match.template = fpLastSrc(r)
                     match.Run(src(r))
                     If match.correlation > task.fCorrThreshold Then matched.Add(pt)
@@ -610,7 +610,7 @@ Namespace VBClasses
             features.Clear()
             For Each pt In ptList
                 Dim index As Integer = task.gridMap.Get(Of Integer)(pt.Y, pt.X)
-                Dim r = task.gSquares(index)
+                Dim r = task.gridRects(index)
                 cv.Cv2.MatchTemplate(src(r), lastSrc(r), correlationMat, mode)
                 If correlationMat.Get(Of Single)(0, 0) >= task.fCorrThreshold Then
                     features.Add(pt)

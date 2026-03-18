@@ -220,7 +220,7 @@ Namespace VBClasses
             If gOptions.ShowGrid.Checked Then dstList(2).SetTo(cv.Scalar.White, gridMask)
             If gOptions.showMotionMask.Checked Then
                 For Each mIndex In motion.motionSort
-                    dstList(0).Rectangle(gSquares(mIndex), cv.Scalar.White, lineWidth)
+                    dstList(0).Rectangle(gridRects(mIndex), cv.Scalar.White, lineWidth)
                 Next
             End If
 
@@ -264,7 +264,7 @@ Namespace VBClasses
         End Sub
         Public Sub New()
             Randomize() ' just in case anyone uses VB.Net's Rnd
-            gSquares = New List(Of cv.Rect)
+            gridRects = New List(Of cv.Rect)
             optionsChanged = True
             firstPass = True
             useXYRange = True ' Most projections of pointcloud data can use the xRange and yRange to improve task.results..

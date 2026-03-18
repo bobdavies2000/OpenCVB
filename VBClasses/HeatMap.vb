@@ -58,7 +58,7 @@ Namespace VBClasses
             dst3.SetTo(0)
             Dim maxCount1 As Integer, maxCount2 As Integer
             Dim sync1 As New Object, sync2 As New Object
-            For Each roi In task.gSquares
+            For Each roi In task.gridRects
                 Dim count1 = heat.histogramTop(roi).CountNonZero
                 dst2(roi).SetTo(count1)
                 If count1 > maxCount1 Then maxCount1 = count1

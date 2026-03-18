@@ -121,7 +121,7 @@ Namespace VBClasses
             dst2 = edges.dst2
 
             Dim depth8uC3 = task.depthRGB
-            Parallel.ForEach(task.gSquares,
+            Parallel.ForEach(task.gridRects,
         Sub(roi)
             Dim segments() = cv.Cv2.HoughLines(dst2(roi), options.rho, options.theta, options.threshold)
             If segments.Count = 0 Then
@@ -163,10 +163,10 @@ Namespace VBClasses
 
             dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
             Dim regionCount As Integer
-            ReDim noDepthCount(task.gSquares.Count - 1)
-            ReDim roiColor(task.gSquares.Count - 1)
+            ReDim noDepthCount(task.gridRects.Count - 1)
+            ReDim roiColor(task.gridRects.Count - 1)
 
-            For Each roi In task.gSquares
+            For Each roi In task.gridRects
                 Dim segments() = cv.Cv2.HoughLines(edges.dst2(roi), options.rho, options.theta, options.threshold)
                 If edges.dst2(roi).CountNonZero = 0 Then
                     regionCount += 1
@@ -177,7 +177,7 @@ Namespace VBClasses
             dst3.SetTo(0)
             src.CopyTo(dst3, dst2)
             labels(2) = "FeatureLess Regions = " + CStr(regionCount)
-            labels(3) = "Of the " + CStr(task.gSquares.Count) + " grid elements, " + CStr(regionCount) + " had no edge or hough features present"
+            labels(3) = "Of the " + CStr(task.gridRects.Count) + " grid elements, " + CStr(regionCount) + " had no edge or hough features present"
         End Sub
     End Class
 
@@ -213,7 +213,7 @@ Namespace VBClasses
             src.CopyTo(dst2)
             maskFless.SetTo(0)
             maskFeat.SetTo(0)
-            Parallel.ForEach(task.gSquares,
+            Parallel.ForEach(task.gridRects,
         Sub(roi)
             Dim segments() = cv.Cv2.HoughLines(edges.dst2(roi), options.rho, options.theta, options.threshold)
             If segments.Count = 0 Then maskFless(roi).SetTo(255)
@@ -308,7 +308,7 @@ Namespace VBClasses
             dst2 = edges.dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
 
             dst3.SetTo(0)
-            For Each roi In task.gSquares
+            For Each roi In task.gridRects
                 Dim segments = cv.Cv2.HoughLines(edges.dst2(roi), options.rho, options.theta, options.threshold)
                 If segments.Count = 0 Then Continue For
                 Hough_Basics.houghShowLines(dst2(roi), segments, 2)

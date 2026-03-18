@@ -231,7 +231,7 @@ Namespace VBClasses
 
             Dim maxList As New List(Of Double)
             Dim ptList As New List(Of cv.Point)
-            For Each rect In task.gSquares
+            For Each rect In task.gridRects
                 Dim mm = GetMinMax(distance32f(rect))
                 maxList.Add(mm.maxVal)
                 If mm.maxVal > 0 Then ptList.Add(New cv.Point(mm.maxLoc.X + rect.X, mm.maxLoc.Y + rect.Y))
@@ -248,8 +248,8 @@ Namespace VBClasses
 
             Dim max = maxList.Max
             dst2.SetTo(0)
-            For i = 0 To task.gSquares.Count - 1
-                Dim rect = task.gSquares(i)
+            For i = 0 To task.gridRects.Count - 1
+                Dim rect = task.gridRects(i)
                 dst2(rect).SetTo(255 * maxList(i) / max)
             Next
         End Sub
@@ -272,7 +272,7 @@ Namespace VBClasses
 
             Dim maxList As New List(Of Double)
             Dim ptList As New List(Of cv.Point)
-            For Each rect In task.gSquares
+            For Each rect In task.gridRects
                 Dim mm = GetMinMax(distance32f(rect))
                 maxList.Add(mm.maxVal)
                 If mm.maxVal > 0 Then ptList.Add(New cv.Point(mm.maxLoc.X + rect.X, mm.maxLoc.Y + rect.Y))
@@ -288,8 +288,8 @@ Namespace VBClasses
 
             Dim max = maxList.Max
             dst2.SetTo(0)
-            For i = 0 To task.gSquares.Count - 1
-                Dim rect = task.gSquares(i)
+            For i = 0 To task.gridRects.Count - 1
+                Dim rect = task.gridRects(i)
                 dst2(rect).SetTo(255 * maxList(i) / max)
             Next
         End Sub

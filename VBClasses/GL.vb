@@ -717,12 +717,12 @@ Namespace VBClasses
             dst1 = task.pointCloud
             dst1.SetTo(0, Not dst2)
 
-            Static ages(task.gSquares.Count - 1) As Integer
-            If task.optionsChanged Then ReDim ages(task.gSquares.Count - 1)
+            Static ages(task.gridRects.Count - 1) As Integer
+            If task.optionsChanged Then ReDim ages(task.gridRects.Count - 1)
 
             dst0.SetTo(0)
-            For i = 0 To task.gSquares.Count - 1
-                Dim r = task.gSquares(i)
+            For i = 0 To task.gridRects.Count - 1
+                Dim r = task.gridRects(i)
                 Dim depth = task.pcSplit(2)(r).Mean(task.depthmask(r))(0)
                 If depth > 0 Then ages(i) += 1 Else ages(i) = 1
                 If ages(i) < 10 Then dst0(r).SetTo(255)
