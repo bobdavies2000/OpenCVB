@@ -52,14 +52,19 @@ Namespace VBClasses
 
     Public Class Resize_Proportional : Inherits TaskParent
         Dim options As New Options_Spectrum
+        Dim redC As New RedColor_Basics
         Public Sub New()
             desc = "Resize the input but keep the results proportional to the original."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             If standaloneTest() Then
                 options.Run()
-                dst2 = runRedList(src, labels(2))
-                src = src(task.oldrcD.rect)
+                redC.Run(src)
+                dst2 = redC.dst2
+                labels(2) = redC.labels(2)
+                RedUtil_Basics.selectCell(redC.rcMap, redC.rcList)
+                If task.rcD Is Nothing Then task.rcD = redC.rcList(0)
+                src = src(task.rcD.rect)
             End If
 
             Dim newSize As cv.Size
