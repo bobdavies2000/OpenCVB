@@ -13,13 +13,13 @@ Namespace VBClasses
             Dim correlationmat As New cv.Mat
             lpList.Clear()
             mpCorrelation.Clear()
-            Dim pad = task.squareSize / 2
+            Dim pad = task.brickEdgeLen / 2
             For Each p1 In prevFeatures
-                Dim rect = ValidateRect(New cv.Rect(p1.X - pad, p1.Y - pad, task.squareSize, task.squareSize))
+                Dim rect = ValidateRect(New cv.Rect(p1.X - pad, p1.Y - pad, task.brickEdgeLen, task.brickEdgeLen))
                 Dim correlations As New List(Of Single)
                 For Each p2 In currFeatures
-                    Dim r = ValidateRect(New cv.Rect(p2.X - pad, p2.Y - pad, Math.Min(rect.Width, task.squareSize),
-                                                                             Math.Min(task.squareSize, rect.Height)))
+                    Dim r = ValidateRect(New cv.Rect(p2.X - pad, p2.Y - pad, Math.Min(rect.Width, task.brickEdgeLen),
+                                                                             Math.Min(task.brickEdgeLen, rect.Height)))
                     cv.Cv2.MatchTemplate(dst2(rect), dst3(r), correlationmat, cv.TemplateMatchModes.CCoeffNormed)
                     correlations.Add(correlationmat.Get(Of Single)(0, 0))
                 Next

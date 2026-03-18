@@ -18,7 +18,7 @@ Namespace VBClasses
             If src.Channels() = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
             dst2 = src
             Dim claheObj = cv.Cv2.CreateCLAHE()
-            claheObj.TilesGridSize() = New cv.Size(CInt(task.squareSize), CInt(task.squareSize))
+            claheObj.TilesGridSize() = New cv.Size(CInt(task.brickEdgeLen), CInt(task.brickEdgeLen))
             claheObj.ClipLimit = clipSlider.Value
             claheObj.Apply(src, dst3)
             claheObj.Dispose()

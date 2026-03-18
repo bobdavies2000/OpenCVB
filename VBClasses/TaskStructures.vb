@@ -367,8 +367,8 @@ Namespace VBClasses
             Public Function perpendicularPoints(pt As cv.Point2f) As lpData
                 Dim perpSlope = -1 / slope
                 Dim angleRadians As Double = Math.Atan(perpSlope)
-                Dim xShift = task.squareSize * Math.Cos(angleRadians)
-                Dim yShift = task.squareSize * Math.Sin(angleRadians)
+                Dim xShift = task.brickEdgeLen * Math.Cos(angleRadians)
+                Dim yShift = task.brickEdgeLen * Math.Sin(angleRadians)
                 Dim p1 = New cv.Point(pt.X + xShift, pt.Y + yShift)
                 Dim p2 = New cv.Point(pt.X - xShift, pt.Y - yShift)
                 If p1.X < 0 Then p1.X = 0

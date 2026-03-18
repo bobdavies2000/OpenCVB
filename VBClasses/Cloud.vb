@@ -430,7 +430,7 @@ Namespace VBClasses
             dst2.Line(topPt, botPt, 255, task.lineWidth, task.lineWidth)
 
             SetTrueText("Values show gSq.pt3d values at the blue line.", New cv.Point(dst2.Width / 2, 0), 3)
-            For i = 0 To dst2.Height - 1 Step task.squareSize
+            For i = 0 To dst2.Height - 1 Step task.brickEdgeLen
                 Dim pt = New cv.Point2f(cLine, i)
                 Dim index = task.gridMap.Get(Of Integer)(pt.Y, pt.X)
                 Dim center = bricks.brickList(index).center
@@ -696,7 +696,7 @@ Namespace VBClasses
 
             dst2.SetTo(0)
             Dim gcPrev = bricks.brickList(0)
-            Dim cellMat As New cv.Mat(task.squareSize, task.squareSize, cv.MatType.CV_8U, cv.Scalar.All(127))
+            Dim cellMat As New cv.Mat(task.brickEdgeLen, task.brickEdgeLen, cv.MatType.CV_8U, cv.Scalar.All(127))
             For Each gSq In bricks.brickList
                 Dim gcAbove = bricks.brickList(CInt(gSq.index Mod task.bricksPerRow))
                 If gSq.correlation > task.fCorrThreshold Then

@@ -23,7 +23,7 @@ Namespace VBClasses
                 Dim brick1 = bricks.brickList(tuple.Item1)
                 Dim brick2 = bricks.brickList(tuple.Item2)
                 If brick1.depth = 0 Or brick2.depth = 0 Then Continue For
-                If brick1.center.DistanceTo(brick2.center) > task.squareSize Then
+                If brick1.center.DistanceTo(brick2.center) > task.brickEdgeLen Then
                     Dim r = brick1.rect
                     For i = brick1.index + 1 To brick2.index - 1
                         r = r.Union(bricks.brickList(i).rect)
@@ -43,7 +43,7 @@ Namespace VBClasses
                 Dim brick1 = bricks.brickList(tuple.Item1)
                 Dim brick2 = bricks.brickList(tuple.Item2)
                 If brick1.depth = 0 Or brick2.depth = 0 Then Continue For
-                If brick1.center.DistanceTo(brick2.center) > task.squareSize Then
+                If brick1.center.DistanceTo(brick2.center) > task.brickEdgeLen Then
                     Dim r = brick1.rect
                     For i = brick1.index + task.bricksPerRow To brick2.index - 1 Step task.bricksPerRow
                         r = r.Union(bricks.brickList(i).rect)

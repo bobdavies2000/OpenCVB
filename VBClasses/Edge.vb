@@ -1442,7 +1442,7 @@ Namespace VBClasses
                          " and max = " + CStr(popMax) + ".  Circled cell has max features."
 
             Dim index = pops.IndexOf(pops.Max)
-            Dim gSize = task.squareSize
+            Dim gSize = task.brickEdgeLen
             Dim pt = New cv.Point(gEdges.featureRects(index).X + gSize / 2, gEdges.featureRects(index).Y + gSize / 2)
             dst2.Circle(pt, gSize * 1.5, 255, task.lineWidth * 2)
 

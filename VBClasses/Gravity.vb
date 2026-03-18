@@ -224,10 +224,10 @@ Namespace VBClasses
             survey.Run(dst3)
             dst2 = survey.dst2
 
-            Dim incrX = dst1.Width / task.squareSize
-            Dim incrY = dst1.Height / task.squareSize
-            For y = 0 To task.squareSize - 1
-                For x = 0 To task.squareSize - 1
+            Dim incrX = dst1.Width / task.brickEdgeLen
+            Dim incrY = dst1.Height / task.brickEdgeLen
+            For y = 0 To task.brickEdgeLen - 1
+                For x = 0 To task.brickEdgeLen - 1
                     SetTrueText(CStr(survey.results(x, y)), New cv.Point(x * incrX, y * incrY), 2)
                 Next
             Next
@@ -268,10 +268,10 @@ Namespace VBClasses
             survey.Run(dst3)
             dst2 = survey.dst2
 
-            Dim incrX = dst1.Width / task.squareSize
-            Dim incrY = dst1.Height / task.squareSize
-            For y = 0 To task.squareSize - 1
-                For x = 0 To task.squareSize - 1
+            Dim incrX = dst1.Width / task.brickEdgeLen
+            Dim incrY = dst1.Height / task.brickEdgeLen
+            For y = 0 To task.brickEdgeLen - 1
+                For x = 0 To task.brickEdgeLen - 1
                     SetTrueText(CStr(survey.results(x, y)), New cv.Point(x * incrX, y * incrY), 2)
                 Next
             Next

@@ -288,8 +288,8 @@ Namespace VBClasses
                 gSq.rect = task.gSquares(index)
 
                 ' too close to the edges of the image
-                If task.gridNabeRects(index).Width + gSq.rect.X + task.squareSize * 2 > dst2.Width Then Continue For
-                If task.gridNabeRects(index).Height + gSq.rect.Y + task.squareSize * 2 > dst2.Height Then Continue For
+                If task.gridNabeRects(index).Width + gSq.rect.X + task.brickEdgeLen * 2 > dst2.Width Then Continue For
+                If task.gridNabeRects(index).Height + gSq.rect.Y + task.brickEdgeLen * 2 > dst2.Height Then Continue For
 
                 gSq.lRect = gSq.rect
                 gSq.depth = task.pcSplit(2)(gSq.rect).Mean()(0)

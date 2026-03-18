@@ -29,7 +29,7 @@ Public Class OptionsGlobal
 
         task.DotSize = 1
         task.cvFontThickness = 1
-        task.squareSize = 8
+        task.brickEdgeLen = 8
         task.smallBrick = 8
         task.DotSize = 1
         task.lineWidth = 1
@@ -41,25 +41,25 @@ Public Class OptionsGlobal
                 task.cvFontThickness = 4
                 task.DotSize = 5
                 task.lineWidth = 5
-                task.squareSize = 48
+                task.brickEdgeLen = 48
                 task.smallRes = New cv.Size(240, 135)
             Case 1280
                 task.cvFontSize = 2.5
                 task.cvFontThickness = 2
                 task.DotSize = 5
                 task.lineWidth = 4
-                task.squareSize = 36
+                task.brickEdgeLen = 36
             Case 672
                 task.cvFontSize = 1.5
                 task.DotSize = 2
                 task.lineWidth = 2
-                task.squareSize = 16
+                task.brickEdgeLen = 16
                 task.smallRes = New cv.Size(336, 188)
             Case 640
                 task.cvFontSize = 1.5
                 task.lineWidth = 2
                 task.DotSize = 2
-                task.squareSize = 16
+                task.brickEdgeLen = 16
             Case 480
                 task.cvFontSize = 1.2
                 task.smallRes = New cv.Size(480, 270)
@@ -74,14 +74,14 @@ Public Class OptionsGlobal
             Case 168
                 task.cvFontSize = 0.5
                 task.smallRes = New cv.Size(168, 94)
-                task.squareSize = 5
+                task.brickEdgeLen = 5
             Case 160
                 task.cvFontSize = 1.0
                 task.smallRes = New cv.Size(160, 120)
-                task.squareSize = 5
+                task.brickEdgeLen = 5
         End Select
 
-        GridSlider.Value = task.squareSize
+        GridSlider.Value = task.brickEdgeLen
         DotSizeSlider.Value = task.DotSize
         DotSizeLabel.Text = CStr(DotSizeSlider.Value)
         LineWidth.Value = task.lineWidth
@@ -135,7 +135,7 @@ Public Class OptionsGlobal
     End Sub
     Private Sub GridSlider_ValueChanged(sender As Object, e As EventArgs) Handles GridSlider.ValueChanged
         GridSizeLabel.Text = CStr(GridSlider.Value)
-        task.squareSize = GridSlider.Value
+        task.brickEdgeLen = GridSlider.Value
         task.optionsChanged = True
     End Sub
     Private Sub HistBinBar_ValueChanged(sender As Object, e As EventArgs) Handles HistBinBar.ValueChanged

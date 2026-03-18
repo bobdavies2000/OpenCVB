@@ -325,9 +325,9 @@ Namespace VBClasses
 
             Dim countCurr = dst2.CountNonZero
             Dim countAll = dst3.CountNonZero
-            Dim sqSize = task.squareSize * task.squareSize
-            labels(2) = "Current frame: " + Format(countCurr / sqSize, fmt0) + " grid squares and " +
-                        Format(countAll / sqSize, fmt0) + " of all grid squares."
+            Dim sqPixels = task.brickEdgeLen * task.brickEdgeLen
+            labels(2) = "Current frame: " + Format(countCurr / sqPixels, fmt0) + " grid squares and " +
+                        Format(countAll / sqPixels, fmt0) + " of all grid squares."
         End Sub
     End Class
 
@@ -425,7 +425,7 @@ Namespace VBClasses
             Dim rect As cv.Rect
             Dim mask = New cv.Mat(New cv.Size(dst2.Width + 2, dst2.Height + 2), cv.MatType.CV_8U, 0)
             Dim flags As cv.FloodFillFlags = cv.FloodFillFlags.Link4
-            Dim minSize = task.squareSize * task.squareSize
+            Dim minSize = task.brickEdgeLen * task.brickEdgeLen
             Dim countList As New SortedList(Of Integer, Integer)(New compareAllowIdenticalIntegerInverted)
             For Each r In task.motion.corr.rectList
                 Dim val = dst2.Get(Of Byte)(r.TopLeft.Y, r.TopLeft.X)
