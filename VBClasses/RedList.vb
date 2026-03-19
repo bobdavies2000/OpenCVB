@@ -55,6 +55,7 @@ Namespace VBClasses
 
     Public Class NR_RedList_Hue : Inherits TaskParent
         Dim hue As New Color8U_Hue
+        Dim redMask As New RedMask_Basics
         Public Sub New()
             labels(3) = "Mask of the areas with Hue"
             desc = "Run RedCloud on just the red hue regions."
@@ -63,7 +64,11 @@ Namespace VBClasses
             hue.Run(src)
             dst3 = hue.dst2
 
-            dst2 = runRedList(src, labels(2), Not dst3)
+            redMask.input
+            src.SetTo(0, Not dst3)
+            redC.Run(src)
+            dst2 = redC.dst2
+            labels(2) = redC.labels(2)
         End Sub
     End Class
 
@@ -77,17 +82,20 @@ Namespace VBClasses
 
 
     Public Class NR_RedList_Consistent : Inherits TaskParent
+        Dim redC As New RedColor_Basics
         Public Sub New()
             dst1 = New cv.Mat(dst1.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
             task.fOptions.ColorDiffSlider.Value = 1
             desc = "Remove RedColor results that are inconsistent with the previous frame."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            dst2 = runRedList(src, labels(2))
+            redC.Run(src)
+            dst2 = redC.dst2
+            labels(2) = redC.labels(2)
 
             dst3.SetTo(0)
             Dim count As Integer
-            For Each rc In task.redList.oldrclist
+            For Each rc In redC.rcList
                 If rc.age > 1 Then
                     dst3(rc.rect).SetTo(rc.color, rc.mask)
                     count += 1

@@ -325,19 +325,19 @@ Namespace VBClasses
 
 
 
-    Public Class NR_Corners_RedCloud : Inherits TaskParent
+    Public Class Corners_RedCloud : Inherits TaskParent
+        Dim redC As New RedCloud_Basics
         Dim corners As New Neighbor_Intersects
         Public Sub New()
             labels = {"", "", "Grayscale", "Highlighted points show where more than 2 cells intersect."}
             desc = "Find the corners for each RedCloud cell."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            dst2 = runRedList(src, labels(2))
+            redC.Run(src)
+            dst2 = redC.dst2
+            labels(2) = redC.labels(2)
 
-            Dim input As New cv.Mat
-            task.redList.rcMap.ConvertTo(input, cv.MatType.CV_32S)
-
-            corners.Run(input)
+            corners.Run(redC.rcMap)
 
             dst3 = task.color.Clone
             For Each pt In corners.nPoints
@@ -346,6 +346,7 @@ Namespace VBClasses
             Next
         End Sub
     End Class
+
 
 
 

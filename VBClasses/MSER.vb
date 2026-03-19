@@ -6,7 +6,7 @@ Namespace VBClasses
         Dim detect As New MSER_CPP
         Public mserCells As New List(Of rcData)
         Public floodPoints As New List(Of cv.Point)
-        Dim redC As New RedColor_Basics
+        Public redC As New RedColor_Basics
         Public Sub New()
             desc = "Create cells for each region in MSER (Maximally Stable Extremal Region) output"
         End Sub
@@ -20,7 +20,6 @@ Namespace VBClasses
             Return dst
         End Function
         Public Overrides Sub RunAlg(src As cv.Mat)
-            dst3 = runRedList(src, labels(3))
             redC.Run(src)
             dst3 = redC.dst2
             labels(3) = redC.labels(2)
@@ -50,7 +49,7 @@ Namespace VBClasses
                 rc.contour = ContourBuild(rc.mask)
                 DrawTour(rc.mask, rc.contour, 255, -1)
 
-                rc.indexLast = task.redList.rcMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
+                rc.indexLast = redC.rcMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
                 If rc.indexLast <> 0 And rc.indexLast < redC.rcList.Count Then
                     Dim lrc = redC.rcList(rc.indexLast)
                     rc.color = lrc.color
@@ -337,6 +336,7 @@ Namespace VBClasses
         Dim options As New Options_MSER
         Dim mser As New MSER_Basics
         Public Sub New()
+            labels(3) = "Hulls derived from the rc.contour for each cell."
             desc = "Use MSER (Maximally Stable Extremal Region) but show the contours of each region."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -347,15 +347,14 @@ Namespace VBClasses
 
             Dim pixels As Integer
             dst3.SetTo(0)
-            For Each rc In task.redList.oldrclist
+            For Each rc In mser.redC.rcList
                 rc.hull = cv.Cv2.ConvexHull(rc.contour.ToArray, True).ToList
                 pixels += rc.pixels
                 DrawTour(dst3(rc.rect), rc.hull, rc.color, -1)
             Next
 
-            labels(2) = CStr(task.redList.oldrclist.Count) + " Regions with average size " +
-                                           If(task.redList.oldrclist.Count > 0,
-                                           CStr(CInt(pixels / task.redList.oldrclist.Count)), "0")
+            labels(2) = CStr(mser.redC.rcList.Count) + " Regions with average size " +
+                        If(mser.redC.rcList.Count > 0, CStr(CInt(pixels / mser.redC.rcList.Count)), "0")
         End Sub
     End Class
 

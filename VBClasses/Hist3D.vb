@@ -204,48 +204,21 @@ Namespace VBClasses
 
 
 
-
-
-    Public Class NR_Hist3D_PixelCells : Inherits TaskParent
-        Dim pixel As New Hist3D_Pixel
-        Dim flood As New Flood_Basics
-        Public Sub New()
-            dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
-            labels = {"", "", "Cell-by-cell backprojection of the Hist3D_Pixel algorithm", "Palette version of dst2"}
-            desc = "After classifying each pixel, backproject each redCell using the same 3D histogram."
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            flood.Run(src)
-
-            pixel.Run(src)
-
-            For Each rc In task.redList.oldrclist
-                cv.Cv2.CalcBackProject({src(rc.rect)}, {0, 1, 2}, pixel.histogram, dst2(rc.rect), task.rangesBGR)
-            Next
-
-            dst3 = Palettize(dst2)
-        End Sub
-    End Class
-
-
-
-
-
-
-
-
     Public Class NR_Hist3D_PixelClassify : Inherits TaskParent
         Dim pixel As New Hist3D_Pixel
+        Dim redC As New RedColor_Basics
         Public Sub New()
             desc = "Classify each pixel with a 3D histogram backprojection and run RedMask_List on the output."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             pixel.Run(src)
 
-            dst2 = runRedList(pixel.dst2, labels(2))
+            redC.Run(pixel.dst2)
+            dst2 = redC.dst2
+            labels(2) = redC.labels(2)
 
-            If task.redList.oldrclist.Count > 0 Then
-                dst2(task.oldrcD.rect).SetTo(white, task.oldrcD.mask)
+            If redC.rcList.Count > 0 Then
+                dst2(task.rcD.rect).SetTo(white, task.rcD.mask)
             End If
         End Sub
     End Class

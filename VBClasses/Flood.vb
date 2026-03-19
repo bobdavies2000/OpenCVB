@@ -1,18 +1,18 @@
+Imports System.Windows.Documents
 Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Class Flood_Basics : Inherits TaskParent
-        Dim redMask As New RedMask_Color
+        Public redC As New RedColor_Basics
         Public Sub New()
             desc = "Build the RedCloud cells with the grayscale input."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If src.Channels = 1 Then redMask.inputRemoved = src
-            redMask.Run(src)
-            dst2 = redMask.dst3
-            labels(2) = redMask.labels(2)
+            redC.Run(src)
+            dst2 = redC.dst2
+            labels(2) = redC.labels(2)
 
-            dst1 = redMask.dst1
-            SetTrueText(redMask.strOut, 3)
+            strOut = RedUtil_Basics.selectCell(redC.rcMap, redC.rcList)
+            SetTrueText(strOut, 3)
         End Sub
     End Class
 
@@ -28,45 +28,6 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             dst2 = runRedList(src, labels(2))
             SetTrueText(task.redList.strOut, 3)
-        End Sub
-    End Class
-
-
-
-
-
-
-
-
-    Public Class Flood_ContainedCells : Inherits TaskParent
-        Public Sub New()
-            desc = "Find cells that have only one neighbor.  They are likely to be contained in another cell."
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            If standalone Then dst2 = runRedList(src, labels(2))
-
-            Dim removeCells As New List(Of Integer)
-            For i = task.redList.oldrclist.Count - 1 To 0 Step -1
-                Dim rc = task.redList.oldrclist(i)
-                Dim nabs As New List(Of Integer)
-                Dim contains As New List(Of Integer)
-                For j = 0 To task.redList.oldrclist.Count - 1
-                    Dim rcBig = task.redList.oldrclist(j)
-                    If rcBig.rect.IntersectsWith(rc.rect) Then nabs.Add(rcBig.index)
-                    If rcBig.rect.Contains(rc.rect) Then contains.Add(rcBig.index)
-                Next
-                If contains.Count = 1 Then removeCells.Add(rc.index)
-            Next
-
-            dst3.SetTo(0)
-            For Each index In removeCells
-                Dim rc = task.redList.oldrclist(index)
-                dst3(rc.rect).SetTo(rc.color, rc.mask)
-            Next
-
-            If task.heartBeat Then
-                labels(3) = CStr(removeCells.Count) + " cells were completely contained in another cell's rect"
-            End If
         End Sub
     End Class
 

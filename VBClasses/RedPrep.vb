@@ -5,6 +5,7 @@ Namespace VBClasses
         Dim prepEdges As New RedPrep_Edges_CPP
         Public options As New Options_RedPrep
         Public Sub New()
+            dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
             dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
             desc = "Reduction transform for the point cloud"
         End Sub
@@ -34,28 +35,24 @@ Namespace VBClasses
             Dim split = pc32S.Split()
 
             dst2.SetTo(0)
-            Dim saveNoDepth As cv.Mat = Nothing
-            If src.Size <> task.workRes Then
-                saveNoDepth = task.noDepthMask.Clone
-                task.noDepthMask = task.noDepthMask.Resize(src.Size)
-            End If
+            dst1.SetTo(0)
+
             If options.PrepX Then
                 prepEdges.Run(reduceChan(split(0), task.noDepthMask))
-                If dst2.Size <> src.Size Then
-                    dst2 = dst2.Resize(src.Size)
-                    dst2 = dst2 Or prepEdges.dst3
-                Else
-                    dst2 = dst2 Or prepEdges.dst3
-                End If
+                dst1 += prepEdges.dst2
+                dst2 = dst2 Or prepEdges.dst3
             End If
 
             If options.PrepY Then
                 prepEdges.Run(reduceChan(split(1), task.noDepthMask))
+                dst1 += prepEdges.dst2.Normalize(0, 255, cv.NormTypes.MinMax)
+                dst1 = dst1.Normalize(0, 255, cv.NormTypes.MinMax)
                 dst2 = dst2 Or prepEdges.dst3
             End If
 
             If options.PrepZ Then
                 prepEdges.Run(reduceChan(split(2), task.noDepthMask))
+                dst1 += prepEdges.dst2
                 dst2 = dst2 Or prepEdges.dst3
             End If
 
@@ -66,7 +63,6 @@ Namespace VBClasses
             ' this rectangle prevents bleeds at the image edges.  It is necessary.  Test without it to see the impact.
             dst2.Rectangle(New cv.Rect(0, 0, dst2.Width, dst2.Height), 255, 2)
 
-            If src.Size <> task.workRes Then task.noDepthMask = saveNoDepth.Clone
             labels(2) = "Using reduction factor = " + CStr(task.reduction)
         End Sub
     End Class

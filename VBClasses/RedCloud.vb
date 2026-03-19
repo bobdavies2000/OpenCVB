@@ -63,6 +63,64 @@ Namespace VBClasses
 
 
 
+
+    Public Class RedCloud_Core : Inherits TaskParent
+        Public prepEdges As New RedPrep_Basics
+        Public rcList As New List(Of rcData)
+        Public Sub New()
+            dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+            desc = "Find the biggest chunks of consistent depth data "
+        End Sub
+        Public Shared Function sweepImage(input As cv.Mat) As List(Of rcData)
+            Dim index As Integer = 1
+            Dim rect As New cv.Rect
+            Dim mask = New cv.Mat(New cv.Size(input.Width + 2, input.Height + 2), cv.MatType.CV_8U, 0)
+            '  Or cv.FloodFillFlags.MaskOnly - maskonly is expensive but why?
+            Dim flags As cv.FloodFillFlags = cv.FloodFillFlags.Link4
+            Dim minSize As Integer = input.Total * 0.0001
+            Dim rc As rcData = Nothing
+            Dim newList As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
+            For y = 0 To input.Height - 1
+                For x = 0 To input.Width - 1
+                    Dim pt = New cv.Point(x, y)
+                    ' skip the regions with no depth or those that were already floodfilled.
+                    If input.Get(Of Byte)(pt.Y, pt.X) = 0 Then
+                        Dim count = cv.Cv2.FloodFill(input, mask, pt, index, rect, 0, 0, flags)
+                        If rect.Width > 0 And rect.Height > 0 Then
+                            If count >= minSize Then
+                                rc = New rcData(input(rect), rect, index)
+                                If rc.index < 0 Then Continue For
+                                newList.Add(rc.pixels, rc)
+                                index += 1
+                                rc.index = newList.Count
+                            End If
+                        End If
+                    End If
+                    If index = 254 Then index = 1
+                Next
+            Next
+            Return New List(Of rcData)(newList.Values)
+        End Function
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            If src.Channels <> 1 Then
+                prepEdges.Run(src)
+                src = prepEdges.dst2.Clone
+            End If
+
+            rcList = sweepImage(src)
+
+            dst2.SetTo(0)
+            For Each rc In rcList
+                dst2(rc.rect).SetTo(rc.index Mod 254, rc.mask)
+            Next
+            dst3 = Palettize(dst2, 0)
+            labels(2) = "RedCloud cells identified: " + CStr(rcList.Count)
+        End Sub
+    End Class
+
+
+
+
     Public Class RedCloud_BasicsFlood : Inherits TaskParent
         Dim prepXY As New RedPrep_XY_Add
         Public redC As New RedCloud_Flood_CPP
@@ -137,64 +195,6 @@ Namespace VBClasses
         End Sub
     End Class
 
-
-
-
-
-
-    Public Class RedCloud_Core : Inherits TaskParent
-        Public prepEdges As New RedPrep_Basics
-        Public rcList As New List(Of rcData)
-        Public Sub New()
-            dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-            desc = "Find the biggest chunks of consistent depth data "
-        End Sub
-        Public Shared Function sweepImage(input As cv.Mat) As List(Of rcData)
-            Dim index As Integer = 1
-            Dim rect As New cv.Rect
-            Dim mask = New cv.Mat(New cv.Size(input.Width + 2, input.Height + 2), cv.MatType.CV_8U, 0)
-            '  Or cv.FloodFillFlags.MaskOnly - maskonly is expensive but why?
-            Dim flags As cv.FloodFillFlags = cv.FloodFillFlags.Link4
-            Dim minSize As Integer = input.Total * 0.0001
-            Dim rc As rcData = Nothing
-            Dim newList As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
-            For y = 0 To input.Height - 1
-                For x = 0 To input.Width - 1
-                    Dim pt = New cv.Point(x, y)
-                    ' skip the regions with no depth or those that were already floodfilled.
-                    If input.Get(Of Byte)(pt.Y, pt.X) = 0 Then
-                        Dim count = cv.Cv2.FloodFill(input, mask, pt, index, rect, 0, 0, flags)
-                        If rect.Width > 0 And rect.Height > 0 Then
-                            If count >= minSize Then
-                                rc = New rcData(input(rect), rect, index)
-                                If rc.index < 0 Then Continue For
-                                newList.Add(rc.pixels, rc)
-                                index += 1
-                                rc.index = newList.Count
-                            End If
-                        End If
-                    End If
-                    If index = 254 Then index = 1
-                Next
-            Next
-            Return New List(Of rcData)(newList.Values)
-        End Function
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            If src.Channels <> 1 Then
-                prepEdges.Run(src)
-                src = prepEdges.dst2.Clone
-            End If
-
-            rcList = sweepImage(src)
-
-            dst2.SetTo(0)
-            For Each rc In rcList
-                dst2(rc.rect).SetTo(rc.index Mod 254, rc.mask)
-            Next
-            dst3 = Palettize(dst2, 0)
-            labels(2) = "RedCloud cells identified: " + CStr(rcList.Count)
-        End Sub
-    End Class
 
 
 
@@ -463,9 +463,12 @@ Namespace VBClasses
             options.Run()
 
             If src.Channels <> 1 Then
-                Static prepData As New RedPrep_Core
+                'Static prepEdges As New RedPrep_Basics
+                'prepEdges.Run(src)
+                'src = prepEdges.dst2.Clone
+                Static prepData As New RedPrep_Basics
                 prepData.Run(src)
-                dst1 = prepData.dst2
+                dst1 = prepData.dst1
             Else
                 dst1 = src
             End If
@@ -501,11 +504,11 @@ Namespace VBClasses
             Next
 
             rcList.Clear()
-            dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8UC3, 0)
             Dim changed As Integer
             Dim matchCount As Integer
             Dim unMatched As Integer
             Dim matchAverage As Single
+            dst2.SetTo(0)
             dst3.SetTo(0)
             For Each rc In newList.Values
                 Dim maxDist = rc.maxDist

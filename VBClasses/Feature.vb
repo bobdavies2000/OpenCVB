@@ -632,61 +632,6 @@ Namespace VBClasses
 
 
 
-
-    Public Class NR_Feature_FacetPoints : Inherits TaskParent
-        Dim delaunay As New Delaunay_Basics
-        Dim feat As New Feature_General
-        Public Sub New()
-            desc = "Assign each delaunay point to a RedCell"
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            feat.Run(src)
-            dst2 = runRedList(src, labels(2))
-
-            delaunay.inputPoints = task.features
-            delaunay.Run(src)
-
-            Dim ptList As New List(Of cv.Point)
-            For Each facets In delaunay.facetList
-                For Each pt In facets
-                    If pt.X >= 0 And pt.X < dst2.Width And pt.Y >= 0 And pt.Y < dst2.Height Then
-                        ptList.Add(New cv.Point(pt.X, pt.Y))
-                    End If
-                Next
-            Next
-
-            For Each pt In ptList
-                Dim index = task.redList.rcMap.Get(Of Byte)(pt.Y, pt.X)
-                If index = 0 Then Continue For
-                Dim rc = task.redList.oldrclist(index)
-                Dim val = task.pcSplit(2).Get(Of Single)(pt.Y, pt.X)
-                If val <> 0 Then
-                    rc.ptFacets.Add(pt)
-                    task.redList.oldrclist(index) = rc
-                End If
-            Next
-
-            For Each rc In task.redList.oldrclist
-                For Each pt In rc.ptFacets
-                    DrawCircle(dst2, pt, task.DotSize, task.highlight)
-                Next
-            Next
-
-            If standalone And task.redList.oldrclist.Count > 0 Then
-                task.color.Rectangle(task.oldrcD.rect, task.highlight, task.lineWidth)
-                For Each pt In task.oldrcD.ptFacets
-                    DrawCircle(task.color, pt, task.DotSize, task.highlight)
-                Next
-            End If
-        End Sub
-    End Class
-
-
-
-
-
-
-
     Public Class NR_Feature_Agast : Inherits TaskParent
         Implements IDisposable
         Dim agastFD As cv.AgastFeatureDetector

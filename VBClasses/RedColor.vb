@@ -14,12 +14,15 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
 
-            redFlood.Run(Mat_Basics.srcMustBe8U(src))
+            redFlood.Run(Mat_Basics.srcMustBe8U(src) + 1)
             dst2 = redFlood.dst2
             labels(2) = redFlood.labels(2)
 
             rcMap = redFlood.rcMap.Clone
             rcList = New List(Of rcData)(redFlood.rcList)
+
+            strOut = RedUtil_Basics.selectCell(rcMap, rcList)
+            SetTrueText(strOut, 3)
         End Sub
     End Class
 

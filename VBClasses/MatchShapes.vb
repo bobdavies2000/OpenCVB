@@ -174,15 +174,15 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
 
-            dst2 = runRedList(src, labels(2))
             redC.Run(src)
             dst2 = redC.dst2
             labels(2) = redC.labels(2)
+
             If task.heartBeat Then dst3.SetTo(0)
 
             Dim rcX = task.rcD
 
-            For Each rc In task.redList.oldrclist
+            For Each rc In redC.rcList
                 If rc.contour Is Nothing Then Continue For
                 Dim matchVal = cv.Cv2.MatchShapes(rcX.contour, rc.contour, options.matchOption)
                 If matchVal < options.matchThreshold Then DrawTour(dst3(rc.rect), rc.contour, white, -1)

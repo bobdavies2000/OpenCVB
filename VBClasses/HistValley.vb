@@ -635,11 +635,11 @@ Namespace VBClasses
     Public Class HistValley_Count : Inherits TaskParent
         Public classCount As Integer
         Dim plot As New Plot_Histogram
-        Public standaloneFlag As Boolean
+        Public standaloneFlag As Boolean = True
         Public Sub New()
             plot.addLabels = False
             plot.removeZeroEntry = False
-            task.gOptions.setHistogramBins(10)
+            task.gOptions.setHistogramBins(32)
             labels(2) = "Horizontal line in the plot is the valley threshold X% of the mean value"
             desc = "Count the number of peaks and valleys in the depth data provided."
         End Sub

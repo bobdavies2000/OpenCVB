@@ -114,6 +114,7 @@ Corners_Basics
 Corners_Core
 Corners_Harris
 Corners_HarrisDetector_CPP
+Corners_RedCloud
 Corners_RedPrepData
 Corners_ShiTomasi_CPP
 Correlation_Basics
@@ -259,7 +260,6 @@ FitLine_Basics
 FitLine_Conventional
 Flood_Basics
 Flood_BasicsMask
-Flood_ContainedCells
 Font_Basics
 Font_FlowText
 Foreground_Basics
@@ -693,7 +693,6 @@ NR_Corners_BasicsCentroid
 NR_Corners_BasicsCentroids
 NR_Corners_Harris_CPP
 NR_Corners_PreCornerDetect
-NR_Corners_RedCloud
 NR_Corners_SubPix
 NR_Correlation_Basics
 NR_Covariance_Test
@@ -857,7 +856,6 @@ NR_FCS_WithAge
 NR_Feature_Agast
 NR_Feature_AKaze
 NR_Feature_BrickLine
-NR_Feature_FacetPoints
 NR_Feature_Generations
 NR_Feature_History
 NR_Feature_LucasKanade
@@ -976,7 +974,6 @@ NR_Hist2D_Depth
 NR_Hist2D_PlotHistogram1D
 NR_Hist2D_Zoom
 NR_Hist3D_DepthWithMask
-NR_Hist3D_PixelCells
 NR_Hist3D_PixelClassify
 NR_Hist3D_PixelDiffMask
 NR_Hist3D_RedCloud
@@ -1143,6 +1140,7 @@ NR_Match_LinesKNN
 NR_Match_Motion
 NR_Match_RandomTest
 NR_Match_TraceRedC
+NR_Match_TraceRedC1
 NR_MatchShapes_Contours
 NR_MatchShapes_Hulls
 NR_MatchShapes_NearbyHull

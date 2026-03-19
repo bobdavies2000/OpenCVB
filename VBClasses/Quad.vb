@@ -27,11 +27,15 @@ Namespace VBClasses
         Public colorList As New List(Of cv.Scalar)
         Public oglOptions As New Options_OpenGLFunctions
         Const depthListMaxCount As Integer = 10
+        Dim redc As New RedColor_Basics
         Public Sub New()
+            labels(3) = "Values indicate the depth of the brick at that location."
             desc = "Create a representation of the point cloud with RedCloud data"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            dst2 = runRedList(src, labels(2))
+            redc.Run(src)
+            dst2 = redc.dst2
+            labels(2) = redc.labels(2)
 
             oglOptions.Run()
             Dim ptM = oglOptions.moveAmount
@@ -56,17 +60,16 @@ Namespace VBClasses
                 Dim gRect = task.gridRects(i)
 
                 Dim center = New cv.Point(CInt(gRect.X + gRect.Width / 2), CInt(gRect.Y + gRect.Height / 2))
-                Dim index = task.redList.rcMap.Get(Of Byte)(center.Y, center.X)
+                Dim index = redc.rcMap.Get(Of Byte)(center.Y, center.X)
 
-                If index <= 0 Or index >= task.redList.oldrclist.Count Then
+                If index <= 0 Or index >= redc.rcList.Count Then
                     depthList1(i).Clear()
                     depthList2(i).Clear()
                     colorList(i) = black
                     Continue For
                 End If
 
-                Dim rc = task.redList.oldrclist(index)
-                If rc.depth = 0 Then Continue For
+                Dim rc = redc.rcList(index)
 
                 If colorList(i) <> rc.color Then
                     depthList1(i).Clear()
@@ -95,13 +98,24 @@ Namespace VBClasses
                     quadData.Add(New cv.Point3f(botRight.X + shift.X, botRight.Y + shift.Y, depth + shift.Z))
                     quadData.Add(New cv.Point3f(topLeft.X + shift.X, botRight.Y + shift.Y, depth + shift.Z))
                 Next
-                SetTrueText(Format(d1, fmt1) + vbCrLf + Format(d2, fmt1), New cv.Point(gRect.X, gRect.Y), 3)
+
+                Dim showBrickDepth As Boolean = False
+                Dim br = task.bricksPerRow
+                For j = 0 To br Step 5
+                    If i Mod br = j Then
+                        showBrickDepth = True
+                        Exit For
+                    End If
+                Next
+                If showBrickDepth Then
+                    SetTrueText(Format(d1, fmt1) + vbCrLf + Format(d2, fmt1), New cv.Point(gRect.X, gRect.Y), 3)
+                End If
 
                 If depthList1(i).Count >= depthListMaxCount Then depthList1(i).RemoveAt(0)
                 If depthList2(i).Count >= depthListMaxCount Then depthList2(i).RemoveAt(0)
             Next
             labels(2) = traceName + " completed with " + Format(quadData.Count / 5, fmt0) +
-                                " quad sets (with a 5th element for color)"
+                                    " quad sets (with a 5th element for color)"
         End Sub
     End Class
 
@@ -198,11 +212,14 @@ Namespace VBClasses
         Dim depthMinList As New List(Of List(Of Single))
         Dim depthMaxList As New List(Of List(Of Single))
         Dim myListMax = 10
+        Dim redC As New RedColor_Basics
         Public Sub New()
             desc = "Create triangles from each gRect in point cloud"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            dst2 = runRedList(src, labels(2))
+            redC.Run(src)
+            dst2 = redC.dst2
+            labels(2) = redC.labels(2)
 
             If task.optionsChanged Then
                 depthMinList.Clear()
@@ -218,19 +235,18 @@ Namespace VBClasses
             Dim shift As New cv.Point3f(ptM(0), ptM(1), ptM(2))
 
             quadData.Clear()
-            dst2 = runRedList(src, labels(2))
 
             Dim min(4 - 1) As cv.Point3f, max(4 - 1) As cv.Point3f
             depths.Clear()
             For i = 0 To task.gridRects.Count - 1
                 Dim gRect = task.gridRects(i)
                 Dim center = New cv.Point(gRect.X + gRect.Width / 2, gRect.Y + gRect.Height / 2)
-                Dim index = task.redList.rcMap.Get(Of Byte)(center.Y, center.X)
+                Dim index = redC.rcMap.Get(Of Byte)(center.Y, center.X)
                 Dim depthMin As Single = 0, depthMax As Single = 0, minLoc As cv.Point, maxLoc As cv.Point
-                If index >= 0 And task.redList.oldrclist.Count > 0 Then
+                If index > 0 And index < redC.rcList.Count Then
                     task.pcSplit(2)(gRect).MinMaxLoc(depthMin, depthMax, minLoc, maxLoc, task.depthmask(gRect))
-                    Dim rc = task.redList.oldrclist(index)
-                    depthMin = If(depthMax > rc.depth, rc.depth, depthMin)
+                    Dim rc = redC.rcList(index - 1)
+                    depthMin = If(depthMax > rc.wcMean(2), rc.wcMean(2), depthMin)
 
                     If depthMin > 0 And depthMax > 0 And depthMax < task.MaxZmeters Then
                         depthMinList(i).Add(depthMin)
@@ -275,7 +291,18 @@ Namespace VBClasses
                         quadData.Add(min(3))
                         quadData.Add(max(3))
 
-                        SetTrueText(Format(depthMin, fmt1) + vbCrLf + Format(depthMax, fmt1), New cv.Point(gRect.X, gRect.Y))
+
+                        Dim showBrickDepth As Boolean = False
+                        Dim br = task.bricksPerRow
+                        For j = 0 To br Step 5
+                            If i Mod br = j Then
+                                showBrickDepth = True
+                                Exit For
+                            End If
+                        Next
+                        If showBrickDepth Then
+                            SetTrueText(Format(depthMin, fmt1) + " " + Format(depthMax, fmt1), New cv.Point(gRect.X, gRect.Y))
+                        End If
                         If depthMinList(i).Count >= myListMax Then depthMinList(i).RemoveAt(0)
                         If depthMaxList(i).Count >= myListMax Then depthMaxList(i).RemoveAt(0)
                     End If
@@ -284,8 +311,8 @@ Namespace VBClasses
                 End If
             Next
             labels(2) = traceName + " completed: " + Format(task.gridRects.Count, fmt0) + " gRect's produced " +
-                                Format(quadData.Count / 25, fmt0) + " six sided bricks with color"
-            SetTrueText("There should be no 0.0 values in the list of min and max depths in the dst2 image.", 3)
+                                Format(quadData.Count / 25, fmt0) + " 3D bricks with color.  " +
+                                "The number below are the min and max depth for each cell. "
         End Sub
     End Class
 

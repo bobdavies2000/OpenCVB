@@ -1,5 +1,6 @@
-Imports System.IO
 Imports System.Drawing
+Imports System.IO
+Imports OpenCvSharp.LineIterator
 Imports cv = OpenCvSharp
 ' https://www.kaggle.com/datasets/balraj98/berkeley-segmentation-dataset-500-bsds500
 Namespace VBClasses
@@ -61,7 +62,10 @@ Namespace VBClasses
 
     Public Class Image_RedCloudColor : Inherits TaskParent
         Public images As New Image_Series
+        Dim redC As New RedColor_Basics
+        Dim reduction As New Reduction_Basics
         Public Sub New()
+            task.fOptions.ReductionSlider.Value = 50
             If standalone Then task.gOptions.displayDst1.Checked = True
             desc = "Use RedCloud on a photo instead of the video stream."
         End Sub
@@ -70,10 +74,13 @@ Namespace VBClasses
             dst0 = images.dst2.Clone
             dst1 = images.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
-            dst2 = runRedList(src, labels(2))
+            reduction.Run(dst1)
 
-            Dim mask = task.redList.rcMap.InRange(0, 0)
-            dst2.SetTo(cv.Scalar.Black, mask)
+            redC.Run(reduction.dst2)
+            dst2 = redC.dst2
+            labels(2) = redC.labels(2)
+
+            dst2.SetTo(0, dst1.InRange(0, 0))
         End Sub
     End Class
 

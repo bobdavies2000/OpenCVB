@@ -10915,7 +10915,7 @@ Namespace VBClasses
 
     Public Class XO_RedList_GenCellContains : Inherits TaskParent
         Dim flood As New Flood_Basics
-        Dim contains As New Flood_ContainedCells
+        Dim contains As New XO_Flood_ContainedCells
         Public Sub New()
             desc = "Merge cells contained in the top X cells and remove all other cells."
         End Sub
@@ -19218,6 +19218,75 @@ Namespace VBClasses
             Next
 
             labels(3) = $"{task.redList.oldrclist.Count} cells were found."
+        End Sub
+    End Class
+
+
+
+
+
+
+    Public Class XO_Corners_RedCloud : Inherits TaskParent
+        Dim corners As New Neighbor_Intersects
+        Public Sub New()
+            labels = {"", "", "Grayscale", "Highlighted points show where more than 2 cells intersect."}
+            desc = "Find the corners for each RedCloud cell."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            dst2 = runRedList(src, labels(2))
+
+            Dim input As New cv.Mat
+            task.redList.rcMap.ConvertTo(input, cv.MatType.CV_32S)
+
+            corners.Run(input)
+
+            dst3 = task.color.Clone
+            For Each pt In corners.nPoints
+                DrawCircle(dst2, pt, task.DotSize, task.highlight)
+                DrawCircle(dst3, pt, task.DotSize, cv.Scalar.Yellow)
+            Next
+        End Sub
+    End Class
+
+
+
+
+
+
+
+
+    Public Class XO_Flood_ContainedCells : Inherits TaskParent
+        Dim redC As New RedColor_Basics
+        Public Sub New()
+            desc = "Find cells that have only one neighbor.  They are likely to be contained in another cell."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            redC.Run(src)
+            dst2 = redC.dst2
+            labels(2) = redC.labels(2)
+
+            Dim removeCells As New List(Of Integer)
+            For i = task.redList.oldrclist.Count - 1 To 0 Step -1
+                Dim rc = task.redList.oldrclist(i)
+                Dim nabs As New List(Of Integer)
+                Dim contains As New List(Of Integer)
+                For j = 0 To task.redList.oldrclist.Count - 1
+                    Dim rcBig = task.redList.oldrclist(j)
+                    If rcBig.rect.IntersectsWith(rc.rect) Then nabs.Add(rcBig.index)
+                    If rcBig.rect.Contains(rc.rect) Then contains.Add(rcBig.index)
+                Next
+                If contains.Count = 1 Then removeCells.Add(rc.index)
+            Next
+
+            dst3.SetTo(0)
+            For Each index In removeCells
+                Dim rc = task.redList.oldrclist(index)
+                dst3(rc.rect).SetTo(rc.color, rc.mask)
+            Next
+
+            If task.heartBeat Then
+                labels(3) = CStr(removeCells.Count) + " cells were completely contained in another cell's rect"
+            End If
         End Sub
     End Class
 End Namespace
