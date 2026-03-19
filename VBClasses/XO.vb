@@ -9839,7 +9839,7 @@ Namespace VBClasses
     Public Class XO_RedCloud_PrepEdgesXY : Inherits TaskParent
         Dim prep As New RedPrep_Depth
         Dim redMask As New RedMask_Basics
-        Dim cellGen As New RedMask_Cells
+        Dim cellGen As New RedMask_ToRedColor
         Public Sub New()
             dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
             desc = "Run the reduced pointcloud output through the RedList_CPP algorithm."
@@ -9911,7 +9911,7 @@ Namespace VBClasses
 
     Public Class XO_RedCloud_PrepEdges_CPP : Inherits TaskParent
         Dim prep As New RedPrep_Basics
-        Dim stats As New RedMask_Cells
+        Dim stats As New RedMask_ToRedColor
         Dim redC As New RedCloud_Basics
         Public Sub New()
             OptionParent.findRadio("XY Reduction").Checked = True
@@ -12598,7 +12598,7 @@ Namespace VBClasses
 
     Public Class XO_Flood_BasicsMaskOld : Inherits TaskParent
         Public inputRemoved As cv.Mat
-        Public cellGen As New RedMask_Cells
+        Public cellGen As New RedMask_ToRedColor
         Dim redMask As New RedMask_Basics
         Public buildinputRemoved As Boolean
         Public showSelected As Boolean = True
@@ -15866,7 +15866,7 @@ Namespace VBClasses
 
     Public Class XO_RedList_BasicsNew : Inherits TaskParent
         Public inputRemoved As cv.Mat
-        Public cellGen As New RedMask_Cells
+        Public cellGen As New RedMask_ToRedColor
         Public redMask As New RedMask_Basics
         Public rclist As New List(Of rcData)
         Public rcMap As cv.Mat ' redColor map 
@@ -17140,7 +17140,7 @@ Namespace VBClasses
 
     Public Class XO_RedList_Basics : Inherits TaskParent
         Public inputRemoved As cv.Mat
-        Public cellGen As New RedMask_Cells
+        Public cellGen As New RedMask_ToRedColor
         Public redMask As New RedMask_Basics
         Public oldrclist As New List(Of oldrcData)
         Public rcMap As cv.Mat ' redColor map 
@@ -19193,6 +19193,31 @@ Namespace VBClasses
                         CStr(mostlyColor) + " cells were mostly color and " + CStr(task.redList.oldrclist.Count - mostlyColor) + " had depth."
                 changedCellCounts.Clear()
             End If
+        End Sub
+    End Class
+
+
+
+
+
+
+    Public Class XO_Boundary_RedColor : Inherits TaskParent
+        Dim prep As New RedPrep_Basics
+        Public Sub New()
+            dst3 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
+            desc = "Find the RedCloud cell contours"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            prep.Run(src)
+            dst2 = runRedList(prep.dst2, labels(2))
+
+            dst3.SetTo(0)
+            For i = 1 To task.redList.oldrclist.Count - 1
+                Dim rc = task.redList.oldrclist(i)
+                DrawTour(dst3(rc.rect), rc.contour, 255, task.lineWidth)
+            Next
+
+            labels(3) = $"{task.redList.oldrclist.Count} cells were found."
         End Sub
     End Class
 End Namespace

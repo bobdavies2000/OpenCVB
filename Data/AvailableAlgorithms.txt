@@ -53,6 +53,7 @@ Blur_Bilateral
 BlurMotion_Basics
 Boundary_Basics
 Boundary_Rectangles
+Boundary_RedColor
 Brick_Basics
 Brick_Features
 Brick_LeftRight
@@ -584,7 +585,6 @@ NR_Blur_PlusHistogram
 NR_Blur_TopoMap
 NR_BlurMotion_Deblur
 NR_Boundary_GuidedBP
-NR_Boundary_RedColor
 NR_Boundary_RemovedRects
 NR_Brick_CloudMaxVal
 NR_Brick_CloudMean
@@ -1543,9 +1543,9 @@ RedColor_LeftRight
 RedList_Color
 RedList_CPP
 RedMask_Basics
-RedMask_Cells
 RedMask_Color
 RedMask_List
+RedMask_ToRedColor
 RedPrep_Basics
 RedPrep_Core
 RedPrep_Depth

@@ -88,14 +88,14 @@ Namespace VBClasses
 
 
     Public Class Plot_Histogram2D : Inherits TaskParent
-        Public colorFmt As New Color_Basics
         Public Sub New()
             labels = {"", "", "2D Histogram", ""}
             desc = "Plot a 2D histgram from the input Mat"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             Dim histogram = src.Clone
-            If standaloneTest() Then
+            If standalone Then
+                Static colorFmt As New Color_Basics
                 colorFmt.Run(src)
                 src = colorFmt.dst2
                 Dim bins = task.histogramBins

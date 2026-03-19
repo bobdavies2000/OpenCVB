@@ -131,16 +131,14 @@ Namespace VBClasses
                 clickIndex = rcMap.Get(Of Integer)(vbc.task.clickPoint.Y, vbc.task.clickPoint.X)
                 If clickIndex > 0 And clickIndex < rcList.Count Then
                     vbc.task.rcD = rcList(clickIndex - 1)
+                Else
+                    If rcList.Count > 0 Then clickIndex = 1 Else vbc.task.rcD = Nothing
+                End If
+                If vbc.task.rcD IsNot Nothing Then
+                    vbc.task.rcD = rcList(clickIndex - 1)
                     vbc.task.color(vbc.task.rcD.rect).SetTo(white, vbc.task.rcD.mask)
                     vbc.task.color.Rectangle(vbc.task.rcD.rect, vbc.task.highlight, vbc.task.lineWidth)
                     strOut = vbc.task.rcD.displayCell()
-                Else
-                    If rcList.Count > 0 Then
-                        vbc.task.rcD = rcList(0)
-                        strOut = vbc.task.rcD.displayCell()
-                    Else
-                        vbc.task.rcD = Nothing
-                    End If
                 End If
             End If
             Return strOut

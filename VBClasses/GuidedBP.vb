@@ -179,7 +179,6 @@ Namespace VBClasses
         Public hist As New Histogram_PointCloud
         Public classCount As Integer
         Public Sub New()
-            task.gOptions.setHistogramBins(16)
             desc = "Backproject the 2D histogram of depth for selected channels to categorize the depth data."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
