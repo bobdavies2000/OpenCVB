@@ -216,11 +216,6 @@ Namespace VBClasses
             dst2 = redC.dst2
             labels(2) = redC.labels(2)
 
-            If task.rcD Is Nothing Then
-                task.rcD = redC.rcList(0)
-                task.clickPoint = task.rcD.maxDist
-            End If
-
             strOut = RedUtil_Basics.selectCell(redC.rcMap, redC.rcList)
             SetTrueText(strOut, 1)
 

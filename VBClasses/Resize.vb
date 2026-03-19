@@ -62,8 +62,8 @@ Namespace VBClasses
                 redC.Run(src)
                 dst2 = redC.dst2
                 labels(2) = redC.labels(2)
-                RedUtil_Basics.selectCell(redC.rcMap, redC.rcList)
-                If task.rcD Is Nothing Then task.rcD = redC.rcList(0)
+                strOut = RedUtil_Basics.selectCell(redC.rcMap, redC.rcList)
+                SetTrueText(strOut, 3)
                 src = src(task.rcD.rect)
             End If
 

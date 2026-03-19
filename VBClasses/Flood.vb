@@ -1,17 +1,18 @@
 Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Class Flood_Basics : Inherits TaskParent
+        Dim redMask As New RedMask_Color
         Public Sub New()
             desc = "Build the RedCloud cells with the grayscale input."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If src.Channels = 1 Then
-                dst2 = runRedList(src, labels(2), src)
-            Else
-                dst2 = runRedList(src, labels(2))
-            End If
-            dst1 = task.redList.dst1
-            SetTrueText(task.redList.strOut, 3)
+            If src.Channels = 1 Then redMask.inputRemoved = src
+            redMask.Run(src)
+            dst2 = redMask.dst3
+            labels(2) = redMask.labels(2)
+
+            dst1 = redMask.dst1
+            SetTrueText(redMask.strOut, 3)
         End Sub
     End Class
 

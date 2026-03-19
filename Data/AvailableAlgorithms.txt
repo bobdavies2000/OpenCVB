@@ -1316,7 +1316,6 @@ NR_RedPrep_DepthTiers
 NR_RedPrep_EdgesX
 NR_RedPrep_EdgesY
 NR_RedPrep_VB
-NR_RedTrack_Features
 NR_RedTrack_FeaturesKNN
 NR_RedTrack_GoodCellInput
 NR_RedTrack_Lines

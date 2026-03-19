@@ -60,10 +60,6 @@ Namespace VBClasses
 
             Dim rc = task.rcD
             If redC.rcList.Count = 0 Then Exit Sub
-            If rc Is Nothing Then
-                rc = redC.rcList(0)
-                saveCellInfo = RedUtil_Basics.selectCell(redC.rcMap, redC.rcList)
-            End If
             SetTrueText(saveCellInfo, 1)
 
             If task.heartBeat Then

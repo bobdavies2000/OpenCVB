@@ -118,12 +118,17 @@ Namespace VBClasses
 
     Public Class NR_BrickPoint_MaskRedColor : Inherits TaskParent
         Dim fLess As New NR_BrickPoint_FeatureLess
+        Dim redMask As New RedMask_Color
         Public Sub New()
             desc = "Run RedColor with the featureless mask from NR_BrickPoint_FeatureLess"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            fLess.Run(task.grayStable)
-            dst2 = runRedList(src, labels(2), fLess.dst1)
+            fLess.Run(src)
+
+            redMask.inputRemoved = fLess.dst1
+            redMask.Run(src)
+            dst2 = redMask.dst3
+            labels(2) = redMask.labels(2)
         End Sub
     End Class
 

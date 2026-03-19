@@ -72,7 +72,6 @@ Namespace VBClasses
             End If
 
             strOut = RedUtil_Basics.selectCell(hulls.rcMap, hulls.rclist)
-            rc = If(task.rcD Is Nothing, hulls.rclist(0), task.rcD)
         End Sub
     End Class
 

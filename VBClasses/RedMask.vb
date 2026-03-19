@@ -222,9 +222,10 @@ Namespace VBClasses
     Public Class RedMask_Color : Inherits TaskParent
         Dim cellGen As New RedMask_Cells
         Dim redMask As New RedMask_Basics
-        Dim rclist As New List(Of rcData)
-        Dim rcMap As New cv.Mat ' redColor map 
+        Public rclist As New List(Of rcData)
+        public rcMap As New cv.Mat ' redColor map 
         Dim contours As New Contour_Basics
+        Public inputRemoved As cv.Mat
         Public Sub New()
             If standalone Then task.gOptions.displayDst1.Checked = True
             desc = "Find cells and then match them to the previous generation with minimum boundary"
@@ -241,6 +242,7 @@ Namespace VBClasses
                 dst1 = src
             End If
 
+            If inputRemoved IsNot Nothing Then dst1.SetTo(0, inputRemoved)
             redMask.Run(dst1 + 1)
 
             If redMask.mdList.Count = 0 Then Exit Sub ' no data to process.

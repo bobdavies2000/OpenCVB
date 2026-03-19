@@ -614,8 +614,10 @@ Namespace VBClasses
                 strOut += "Multi-Mask flag = " + CStr(multiMask) + vbCrLf
                 strOut += "Hull count = "
                 strOut += If(hull Is Nothing, "0", CStr(hull.Count)) + vbCrLf
-                strOut += "Contour count = "
-                strOut += If(contour Is Nothing Or contour.Count = 0, "0", CStr(contour.Count)) + vbCrLf
+                If contour IsNot Nothing Then
+                    strOut += "Contour count = "
+                    strOut += CStr(contour.Count) + vbCrLf
+                End If
                 Return strOut
             End Function
         End Class

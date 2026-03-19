@@ -122,6 +122,7 @@ Namespace VBClasses
 
     Public Class NR_Duster_RedCloud : Inherits TaskParent
         Dim duster As New Duster_Basics
+        Dim redMask As New RedMask_Color
         Public Sub New()
             desc = "Run Bin3Way_RedCloud on the largest regions identified in Duster_Basics"
         End Sub
@@ -132,8 +133,10 @@ Namespace VBClasses
             dst3.SetTo(0)
             src.CopyTo(dst3, dst1)
 
-            dst2 = runRedList(src, labels(2), Not dst1)
+            redMask.inputRemoved = Not dst1
+            redMask.Run(src)
+            dst2 = redMask.dst3
+            labels(2) = redMask.labels(2)
         End Sub
     End Class
-
 End Namespace
