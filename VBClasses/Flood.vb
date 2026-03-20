@@ -20,20 +20,6 @@ Namespace VBClasses
 
 
 
-    Public Class NR_Flood_CellStatsPlot : Inherits TaskParent
-        Public Sub New()
-            task.gOptions.setHistogramBins(1000)
-            desc = "Provide cell stats on the flood_basics cells.  Identical to RedCell_FloodFill"
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            dst2 = runRedList(src, labels(2))
-            SetTrueText(task.redList.strOut, 3)
-        End Sub
-    End Class
-
-
-
-
 
 
     Public Class NR_Flood_Tiers : Inherits TaskParent
@@ -74,7 +60,7 @@ Namespace VBClasses
 
 
     Public Class NR_Flood_Minimal : Inherits TaskParent
-        Dim prep As New RedPrep_Core
+        Dim prep As New RedPrep_Basics
         Public Sub New()
             dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
             labels(2) = "Output is from RedPrep_Core. Click any region to floodfill it."
@@ -83,7 +69,7 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             prep.Run(src)
-            dst2 = prep.dst2
+            dst2 = prep.dst1
 
             If task.mouseClickFlag Then
                 Dim rect As New cv.Rect

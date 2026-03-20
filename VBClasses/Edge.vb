@@ -882,6 +882,7 @@ Namespace VBClasses
     Public Class NR_Edge_RedCloud : Inherits TaskParent
         Dim canny As New Edge_Basics
         Public mats As New Mat_4Click
+        Dim redC As New RedCloud_Basics
         Public Sub New()
             labels(2) = "Canny Edges (0), RedCloud output (1), RedCloud Edges(2), 0 And'd with 2"
             labels(3) = "Cell boundaries that are also real edges."
@@ -891,9 +892,11 @@ Namespace VBClasses
             canny.Run(src)
             mats.mat(0) = canny.dst2
 
-            mats.mat(1) = runRedList(src, labels(3))
+            redC.Run(src)
+            mats.mat(1) = redC.dst2
+            labels(3) = redC.labels(2)
 
-            canny.Run(task.redList.dst2)
+            canny.Run(redC.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
             mats.mat(2) = canny.dst2
 
             mats.mat(3) = mats.mat(2).SetTo(0, Not mats.mat(0))
