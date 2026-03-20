@@ -14,15 +14,12 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
 
-            redFlood.Run(Mat_Basics.srcMustBe8U(src) + 1)
+            redFlood.Run(Mat_Basics.srcMustBe8U(src))
             dst2 = redFlood.dst2
             labels(2) = redFlood.labels(2)
 
             rcMap = redFlood.rcMap.Clone
             rcList = New List(Of rcData)(redFlood.rcList)
-
-            strOut = RedUtil_Basics.selectCell(rcMap, rcList)
-            SetTrueText(strOut, 3)
         End Sub
     End Class
 
@@ -140,14 +137,14 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             reduction.Run(task.leftView)
 
-            redLeft.Run(reduction.dst2 + 1)
-            dst2 = Palettize(redLeft.dst2, 0)
+            redLeft.Run(reduction.dst2)
+            dst2 = Palettize(redLeft.dst2)
             labels(2) = redLeft.labels(2) + " in the left image"
 
             reduction.Run(task.rightView)
 
-            redRight.Run(reduction.dst2 + 1)
-            dst3 = Palettize(redRight.dst2, 0)
+            redRight.Run(reduction.dst2)
+            dst3 = Palettize(redRight.dst2)
             labels(3) = redRight.labels(2) + " in the right image"
         End Sub
     End Class
@@ -184,7 +181,7 @@ Namespace VBClasses
         Dim redC As New RedColor_Basics
         Public Sub New()
             If standalone Then task.gOptions.displayDst0.Checked = True
-            desc = "Attach an color8u class to each gRect."
+            desc = "Attach an color8u class to each gSq."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             bricks.run(src)
@@ -197,10 +194,10 @@ Namespace VBClasses
 
             Dim count As Integer
             dst1.SetTo(0)
-            For Each gRect As brickData In bricks.brickList
-                If redC.rcMap(gRect.lRect).CountNonZero And gRect.rRect.Width > 0 Then
-                    dst2(gRect.lRect).CopyTo(dst1(gRect.rRect))
-                    gRect.colorClass = color8u.dst2.Get(Of Integer)
+            For Each gSq As brickData In bricks.brickList
+                If redC.rcMap(gSq.lRect).CountNonZero And gSq.rRect.Width > 0 Then
+                    dst2(gSq.lRect).CopyTo(dst1(gSq.rRect))
+                    gSq.colorClass = color8u.dst2.Get(Of Integer)
                     count += 1
                 End If
             Next
@@ -270,16 +267,70 @@ Namespace VBClasses
             rcGridMap.SetTo(0)
             dst3.SetTo(0)
             For i = 0 To task.gridRects.Count - 1
-                Dim gRect = task.gridRects(i)
+                Dim gSq = task.gridRects(i)
 
-                Dim center = New cv.Point(CInt(gRect.X + gRect.Width / 2), CInt(gRect.Y + gRect.Height / 2))
+                Dim center = New cv.Point(CInt(gSq.X + gSq.Width / 2), CInt(gSq.Y + gSq.Height / 2))
                 Dim index = redC.rcMap.Get(Of Integer)(center.Y, center.X) - 1
                 If index >= redC.rcList.Count Or index < 0 Then Continue For
                 Dim rc = redC.rcList(index)
-                dst3(gRect).SetTo(rc.color)
-                rcGridMap(gRect).SetTo(rc.index)
+                dst3(gSq).SetTo(rc.color)
+                rcGridMap(gSq).SetTo(rc.index)
             Next
             strOut = RedUtil_Basics.selectCell(redC.rcMap, redC.rcList)
+        End Sub
+    End Class
+
+
+
+
+
+
+    Public Class RedColor_List : Inherits TaskParent
+        Public inputRemoved As cv.Mat
+        Public cellGen As New RedMask_ToRedColor
+        Public redMask As New RedMask_Basics
+        Public rclist As New List(Of rcData)
+        Public rcMap As cv.Mat ' redColor map 
+        Public contours As New Contour_Basics
+        Public Sub New()
+            rcMap = New cv.Mat(New cv.Size(dst2.Width, dst2.Height), cv.MatType.CV_8U, cv.Scalar.All(0))
+            desc = "Find cells and then match them to the previous generation with minimum boundary"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            contours.Run(src)
+            If src.Type <> cv.MatType.CV_8U Then
+                If standalone And task.fOptions.Color8USource.SelectedItem = "EdgeLine_Basics" Then
+                    dst1 = contours.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+                Else
+                    dst1 = Mat_Basics.srcMustBe8U(src)
+                End If
+            Else
+                dst1 = src
+            End If
+
+            If inputRemoved IsNot Nothing Then dst1.SetTo(0, inputRemoved)
+            redMask.Run(dst1)
+
+            If redMask.mdList.Count = 0 Then Exit Sub ' no data to process.
+            cellGen.mdList = redMask.mdList
+            cellGen.Run(redMask.dst2)
+
+            dst2 = cellGen.dst2
+
+            rclist.Clear()
+            For Each md In redMask.mdList
+                Dim rc = New rcData(md.mask, md.rect, rclist.Count + 1)
+                rc.buildMaxDist()
+                rclist.Add(rc)
+            Next
+
+            For Each rc In rclist
+                DrawCircle(dst2, rc.maxDist)
+            Next
+            labels(2) = cellGen.labels(2)
+            labels(3) = ""
+            SetTrueText("", newPoint, 1)
+            strOut = RedUtil_Basics.selectCell(rcMap, rclist)
         End Sub
     End Class
 End Namespace

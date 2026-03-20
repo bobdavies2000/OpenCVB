@@ -226,11 +226,11 @@ Namespace VBClasses
             fast.Run(src)
             ReDim fastCenters(task.gridRects.Count - 1)
             For i = 0 To task.gridRects.Count - 1
-                Dim gRect = task.gridRects(i)
-                Dim tmp = fast.dst3(gRect).FindNonZero()
+                Dim gSq = task.gridRects(i)
+                Dim tmp = fast.dst3(gSq).FindNonZero()
                 If tmp.Rows > 0 Then
                     Dim mean = tmp.Mean()
-                    fastCenters(i) = New cv.Point2f(gRect.X + mean(0), gRect.Y + mean(1))
+                    fastCenters(i) = New cv.Point2f(gSq.X + mean(0), gSq.Y + mean(1))
                 End If
             Next
 
@@ -325,19 +325,19 @@ Namespace VBClasses
 
 
 
-    Public Class Corners_RedCloud : Inherits TaskParent
-        Dim redC As New RedCloud_Basics
+    Public Class NR_Corners_RedCloud : Inherits TaskParent
         Dim corners As New Neighbor_Intersects
         Public Sub New()
             labels = {"", "", "Grayscale", "Highlighted points show where more than 2 cells intersect."}
             desc = "Find the corners for each RedCloud cell."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            redC.Run(src)
-            dst2 = redC.dst2
-            labels(2) = redC.labels(2)
+            dst2 = runRedList(src, labels(2))
 
-            corners.Run(redC.rcMap)
+            Dim input As New cv.Mat
+            task.redList.rcMap.ConvertTo(input, cv.MatType.CV_32S)
+
+            corners.Run(input)
 
             dst3 = task.color.Clone
             For Each pt In corners.nPoints
@@ -346,7 +346,6 @@ Namespace VBClasses
             Next
         End Sub
     End Class
-
 
 
 

@@ -282,9 +282,9 @@ Namespace VBClasses
                 If ptGrid.Contains(index) = False Then
                     If motionLeft.dst3.Get(Of Byte)(pt.Y, pt.X) > 0 Then
                         ptList.Add(pt)
-                        Dim gRect = task.gridRects(index)
-                        dst1(gRect).SetTo(0)
-                        ptDepth.Add(task.pcSplit(2)(gRect).Mean(task.depthmask(gRect))(0))
+                        Dim gSq = task.gridRects(index)
+                        dst1(gSq).SetTo(0)
+                        ptDepth.Add(task.pcSplit(2)(gSq).Mean(task.depthmask(gSq))(0))
                         ptGrid.Add(index)
                     End If
                 End If

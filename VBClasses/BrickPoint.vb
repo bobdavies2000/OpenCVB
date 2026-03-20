@@ -7,7 +7,7 @@ Namespace VBClasses
         Public ptList As New List(Of cv.Point)
         Public Sub New()
             labels(3) = "Sobel input to BrickPoint_Basics"
-            desc = "Find the max Sobel point in each gRect"
+            desc = "Find the max Sobel point in each gSq"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             bricks.Run(src)
@@ -50,10 +50,10 @@ Namespace VBClasses
 
             dst2 = task.color.Clone
             ptList.Clear()
-            For Each gRect In bricks.brickList
-                Dim mm = GetMinMax(src(gRect.rect))
-                Dim pt = New cv.Point(mm.maxLoc.X + gRect.rect.X, mm.maxLoc.Y + gRect.rect.Y)
-                If mm.maxVal >= threshold Then ptList.Add(New cv.Point(mm.maxLoc.X + gRect.rect.X, mm.maxLoc.Y + gRect.rect.Y))
+            For Each gSq In bricks.brickList
+                Dim mm = GetMinMax(src(gSq.rect))
+                Dim pt = New cv.Point(mm.maxLoc.X + gSq.rect.X, mm.maxLoc.Y + gSq.rect.Y)
+                If mm.maxVal >= threshold Then ptList.Add(New cv.Point(mm.maxLoc.X + gSq.rect.X, mm.maxLoc.Y + gSq.rect.Y))
             Next
 
             For Each pt In ptList
@@ -89,8 +89,8 @@ Namespace VBClasses
             bPoint.Run(task.gray)
 
             Dim sobelValues As New List(Of Byte)
-            For Each gRect In bricks.brickList
-                sobelValues.Add(gRect.mm.maxVal)
+            For Each gSq In bricks.brickList
+                sobelValues.Add(gSq.mm.maxVal)
             Next
             plotHist.Run(cv.Mat.FromPixelData(sobelValues.Count, 1, cv.MatType.CV_8U, sobelValues.ToArray))
             dst2 = plotHist.dst2
@@ -102,9 +102,9 @@ Namespace VBClasses
             labels(3) = "Sobel peak values from " + CStr(minVal) + " to " + CStr(maxVal)
 
             dst3 = src
-            For Each gRect In bricks.brickList
-                If gRect.mm.maxVal <= maxVal And gRect.mm.maxVal >= minVal Then
-                    DrawCircle(dst3, New cv.Point(gRect.mm.maxLoc.X + gRect.rect.X, gRect.mm.maxLoc.Y + gRect.rect.Y))
+            For Each gSq In bricks.brickList
+                If gSq.mm.maxVal <= maxVal And gSq.mm.maxVal >= minVal Then
+                    DrawCircle(dst3, New cv.Point(gSq.mm.maxLoc.X + gSq.rect.X, gSq.mm.maxLoc.Y + gSq.rect.Y))
                 End If
             Next
             labels(2) = "There were " + CStr(sobelValues.Count) + " points found.  Cursor over each bar to see where they originated from"
@@ -118,17 +118,12 @@ Namespace VBClasses
 
     Public Class NR_BrickPoint_MaskRedColor : Inherits TaskParent
         Dim fLess As New NR_BrickPoint_FeatureLess
-        Dim redMask As New RedMask_Color
         Public Sub New()
             desc = "Run RedColor with the featureless mask from NR_BrickPoint_FeatureLess"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            fLess.Run(src)
-
-            redMask.inputRemoved = fLess.dst1
-            redMask.Run(src)
-            dst2 = redMask.dst3
-            labels(2) = redMask.labels(2)
+            fLess.Run(task.grayStable)
+            dst2 = runRedList(src, labels(2), fLess.dst1)
         End Sub
     End Class
 
@@ -142,7 +137,7 @@ Namespace VBClasses
         Dim bricks As New Brick_Basics
         Dim bPoint As New BrickPoint_Basics
         Public Sub New()
-            labels(3) = "BrickPoint_Basics output of intensity = 255 - not necessarily in the top row of the gRect."
+            labels(3) = "BrickPoint_Basics output of intensity = 255 - not necessarily in the top row of the gSq."
             desc = "BackProject the top row of the survey results into the RGB image - might help identify vertical lines (see dst3)."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -152,18 +147,18 @@ Namespace VBClasses
             dst2 = src.Clone
 
             Dim count As Integer
-            For Each gRect In bricks.brickList
-                If gRect.mm.maxLoc = newPoint Then Continue For
-                If gRect.mm.maxVal <> 255 Then Continue For
-                If gRect.mm.maxLoc.Y = gRect.rect.Y Then
-                    DrawCircle(dst2, gRect.mm.maxLoc)
-                    DrawCircle(dst3, gRect.rect.TopLeft)
+            For Each gSq In bricks.brickList
+                If gSq.mm.maxLoc = newPoint Then Continue For
+                If gSq.mm.maxVal <> 255 Then Continue For
+                If gSq.mm.maxLoc.Y = gSq.rect.Y Then
+                    DrawCircle(dst2, gSq.mm.maxLoc)
+                    DrawCircle(dst3, gSq.rect.TopLeft)
                     count += 1
                 End If
             Next
 
             labels(2) = "Of the " + CStr(bPoint.ptList.Count) + " max intensity bricks " + CStr(count) +
-                    " had max intensity in the top row of the gRect."
+                    " had max intensity in the top row of the gSq."
         End Sub
     End Class
 
@@ -185,12 +180,12 @@ Namespace VBClasses
             Dim lpList As New List(Of lpData)
 
             Dim lpZero As New lpData(New cv.Point, New cv.Point)
-            For Each gRect In bricks.brickList
-                If gRect.rect.Y = 0 Then
+            For Each gSq In bricks.brickList
+                If gSq.rect.Y = 0 Then
                     lpList.Add(lpZero)
                 Else
-                    Dim gc1 = bricks.brickList(gRect.index - task.bricksPerRow)
-                    Dim pt = New cv.Point(gRect.mm.maxLoc.X + gRect.rect.X, gRect.mm.maxLoc.Y + gRect.rect.Y)
+                    Dim gc1 = bricks.brickList(gSq.index - task.bricksPerRow)
+                    Dim pt = New cv.Point(gSq.mm.maxLoc.X + gSq.rect.X, gSq.mm.maxLoc.Y + gSq.rect.Y)
                     Dim ptGc1 = New cv.Point(gc1.mm.maxLoc.X + gc1.rect.X, gc1.mm.maxLoc.Y + gc1.rect.Y)
                     Dim lp = New lpData(pt, ptGc1)
                     lpList.Add(lp)
@@ -217,8 +212,8 @@ Namespace VBClasses
             Dim max = Math.Max(CInt((histindex + 1) * brickRange), CInt((histindex1 + 1) * brickRange))
 
             dst3 = src
-            For Each gRect In bricks.brickList
-                Dim lp = lpList(gRect.index)
+            For Each gSq In bricks.brickList
+                Dim lp = lpList(gSq.index)
                 If lp.length < min Or lp.length > max Then Continue For
                 dst3.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineWidth)
             Next
@@ -264,7 +259,7 @@ Namespace VBClasses
         Public bestBricks As New List(Of cv.Point)
         Public sortedBricks As New SortedList(Of Integer, cv.Rect)(New compareAllowIdenticalIntegerInverted)
         Public Sub New()
-            desc = "Identify the bricks with the best edge counts - indicating the quality of the gRect."
+            desc = "Identify the bricks with the best edge counts - indicating the quality of the gSq."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             bricks.Run(src)
@@ -276,8 +271,8 @@ Namespace VBClasses
             sortedBricks.Clear()
             For Each pt In bPoint.ptList
                 Dim index = task.gridMap.Get(Of Integer)(pt.Y, pt.X)
-                Dim gRect = bricks.brickList(index)
-                If gRect.correlation > 0.9 And gRect.depth < task.MaxZmeters Then sortedBricks.Add(bPoint.sobel.dst2(gRect.rect).CountNonZero, gRect.rect)
+                Dim gSq = bricks.brickList(index)
+                If gSq.correlation > 0.9 And gSq.depth < task.MaxZmeters Then sortedBricks.Add(bPoint.sobel.dst2(gSq.rect).CountNonZero, gSq.rect)
             Next
 
             dst3 = bPoint.sobel.dst2
@@ -315,8 +310,8 @@ Namespace VBClasses
             ReDim results(task.brickEdgeLen - 1, task.brickEdgeLen - 1)
             For Each pt In bPoint.ptList
                 Dim index = task.gridMap.Get(Of Integer)(pt.Y, pt.X)
-                Dim gRect = bricks.brickList(index)
-                results(gRect.mm.maxLoc.X, gRect.mm.maxLoc.Y) += 1
+                Dim gSq = bricks.brickList(index)
+                results(gSq.mm.maxLoc.X, gSq.mm.maxLoc.Y) += 1
             Next
 
             Dim incrX = dst1.Width / task.brickEdgeLen
@@ -326,9 +321,9 @@ Namespace VBClasses
 
             dst2 = cv.Mat.FromPixelData(task.brickEdgeLen, task.brickEdgeLen, cv.MatType.CV_32F, results)
 
-            For Each gRect In bricks.brickList
-                If gRect.mm.maxLoc.X = col And gRect.mm.maxLoc.Y = row Then
-                    Dim ptfeat = New cv.Point(gRect.mm.maxLoc.X + gRect.rect.X, gRect.mm.maxLoc.Y + gRect.rect.Y)
+            For Each gSq In bricks.brickList
+                If gSq.mm.maxLoc.X = col And gSq.mm.maxLoc.Y = row Then
+                    Dim ptfeat = New cv.Point(gSq.mm.maxLoc.X + gSq.rect.X, gSq.mm.maxLoc.Y + gSq.rect.Y)
                     DrawCircle(dst3, ptfeat)
                 End If
             Next
@@ -482,7 +477,7 @@ Namespace VBClasses
         Public features As New List(Of cv.Point)
         Public Sub New()
             labels(3) = "Sobel input to BrickPoint_Basics"
-            desc = "Find the max Sobel point in each gRect"
+            desc = "Find the max Sobel point in each gSq"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             dst2 = src

@@ -34,7 +34,7 @@ Namespace VBClasses
         Public smallContours As New List(Of List(Of cv.Point))
         Dim options As New Options_BoundaryRect
         Public Sub New()
-            desc = "Build the boundaries for oldrclist and remove interior rectangles"
+            desc = "Build the boundaries for rcList and remove interior rectangles"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
@@ -94,7 +94,7 @@ Namespace VBClasses
         Public bRects As New Boundary_Rectangles
         Public Sub New()
             If standalone Then task.gOptions.displayDst1.Checked = True
-            desc = "Build the boundaries for oldrclist and remove interior rectangles"
+            desc = "Build the boundaries for rcList and remove interior rectangles"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             bRects.Run(src)

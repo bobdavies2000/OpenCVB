@@ -214,7 +214,7 @@ Namespace VBClasses
                 fp.index = i
 
                 Dim brickIndex = task.gridMap.Get(Of Integer)(fp.pt.Y, fp.pt.X)
-                Dim gRect = bricks.brickList(brickIndex)
+                Dim gSq = bricks.brickList(brickIndex)
                 Dim fpIndex = task.fpFromGridCellLast.IndexOf(brickIndex)
                 If fpIndex >= 0 Then
                     Dim fpLast = task.fpLastList(fpIndex)
@@ -238,7 +238,7 @@ Namespace VBClasses
 
                 If minX < 0 Or minY < 0 Or maxX >= dst2.Width Or maxY >= dst2.Height Then fp.periph = True
 
-                fp.depth = gRect.depth
+                fp.depth = gSq.depth
 
                 task.fpList.Add(fp)
 
@@ -638,9 +638,9 @@ Namespace VBClasses
             strOut += "ClickPoint = " + task.clickPoint.ToString + vbCrLf + vbCrLf
 
             strOut += "brickIndex = " + CStr(fp.brickIndex) + vbCrLf
-            Dim gRect = bricks.brickList(fp.brickIndex)
-            strOut += CStr(gRect.age) + vbTab + "Age" + vbTab + vbCrLf
-            strOut += Format(gRect.correlation, fmt3) + vbTab + "Correlation to right image" + vbCrLf
+            Dim gSq = bricks.brickList(fp.brickIndex)
+            strOut += CStr(gSq.age) + vbTab + "Age" + vbTab + vbCrLf
+            strOut += Format(gSq.correlation, fmt3) + vbTab + "Correlation to right image" + vbCrLf
 
             strOut += "Depth = " + Format(fp.depth, fmt1)
             strOut += vbCrLf
@@ -652,6 +652,42 @@ Namespace VBClasses
             If standalone Then SetTrueText(strOut, 3)
         End Sub
     End Class
+
+
+
+
+
+
+
+
+    'Public Class FCS_RedCloud : Inherits TaskParent
+    '    Dim redCombo As New RedList_Basics
+    '    Dim fcs As New FCS_CreateList
+    '    Dim knnMin As New KNN_MinDistance
+    '    Public Sub New()
+    '        desc = "Use the RedCloud maxDist points as feature points in an FCS display."
+    '    End Sub
+    '    Public Overrides Sub RunAlg(src As cv.Mat)
+    '        redCombo.Run(src)
+    '        dst3 = redCombo.dst2
+    '        labels(2) = redCombo.labels(2)
+
+    '        knnMin.inputPoints.Clear()
+    '        For Each rc In task.redList.rcList
+    '            knnMin.inputPoints.Add(rc.maxDist)
+    '        Next
+    '        knnMin.Run(src)
+
+    '        task.features = New List(Of cv.Point2f)(knnMin.outputPoints2f)
+    '        fcs.Run(src)
+    '        dst2 = task.feat.fcs.dst2
+    '        FCS_Basics.fpDSet()
+    '        labels(3) = fcs.labels(2)
+    '    End Sub
+    'End Class
+
+
+
 
 
 

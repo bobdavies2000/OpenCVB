@@ -171,18 +171,18 @@ Namespace VBClasses
             mats.Run(emptyMat)
             dst3 = mats.dst2
             ' this is where the debug comes in.  We just want to look at one region which hopefully is a single plane.
-            Dim gRect = task.gridRects(maxIndex)
-            If gRect.X = task.gridRects(maxIndex).X And gRect.Y = task.gridRects(maxIndex).Y Then
-                If grCounts(maxIndex) > gRect.Width * gRect.Height / 4 Then
+            Dim gSq = task.gridRects(maxIndex)
+            If gSq.X = task.gridRects(maxIndex).X And gSq.Y = task.gridRects(maxIndex).Y Then
+                If grCounts(maxIndex) > gSq.Width * gSq.Height / 4 Then
                     Dim fitPoints As New List(Of cv.Point3f)
                     Dim minDepth = Single.MaxValue, maxDepth = Single.MinValue
-                    For j = 0 To gRect.Height - 1
-                        For i = 0 To gRect.Width - 1
-                            Dim nextD = task.pcSplit(2)(gRect).Get(Of Single)(j, i)
+                    For j = 0 To gSq.Height - 1
+                        For i = 0 To gSq.Width - 1
+                            Dim nextD = task.pcSplit(2)(gSq).Get(Of Single)(j, i)
                             If nextD <> 0 Then
                                 If minDepth > nextD Then minDepth = nextD
                                 If maxDepth < nextD Then maxDepth = nextD
-                                Dim wpt = New cv.Point3f(gRect.X + i, gRect.Y + j, nextD)
+                                Dim wpt = New cv.Point3f(gSq.X + i, gSq.Y + j, nextD)
                                 fitPoints.Add(Cloud_Basics.worldCoordinates(wpt))
                             End If
                         Next
@@ -191,8 +191,8 @@ Namespace VBClasses
                         Dim eq = Plane_Basics.fitDepthPlane(fitPoints)
                         If Single.IsNaN(eq(0)) = False Then
                             flow.nextMsg = "a=" + Format(eq(0), fmt2) + " b=" + Format(eq(1), fmt2) + " c=" + Format(Math.Abs(eq(2)), fmt2) +
-                              vbTab + "depth=" + Format(-eq(3), fmt2) + "m " + "gRect(x,y) = " + Format(gRect.X, "000") + "," +
-                              Format(gRect.Y, "000") + vbTab + "Min=" + Format(minDepth, fmt1) + "m " + " Max=" + Format(maxDepth, fmt1) + "m"
+                              vbTab + "depth=" + Format(-eq(3), fmt2) + "m " + "gSq(x,y) = " + Format(gSq.X, "000") + "," +
+                              Format(gSq.Y, "000") + vbTab + "Min=" + Format(minDepth, fmt1) + "m " + " Max=" + Format(maxDepth, fmt1) + "m"
                         End If
                     End If
                 End If

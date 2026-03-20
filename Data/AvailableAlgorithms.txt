@@ -114,7 +114,6 @@ Corners_Basics
 Corners_Core
 Corners_Harris
 Corners_HarrisDetector_CPP
-Corners_RedCloud
 Corners_RedPrepData
 Corners_ShiTomasi_CPP
 Correlation_Basics
@@ -692,6 +691,7 @@ NR_Corners_BasicsCentroid
 NR_Corners_BasicsCentroids
 NR_Corners_Harris_CPP
 NR_Corners_PreCornerDetect
+NR_Corners_RedCloud
 NR_Corners_SubPix
 NR_Correlation_Basics
 NR_Covariance_Test
@@ -1537,7 +1537,7 @@ RedColor_Bricks
 RedColor_GridRects
 RedColor_Hulls
 RedColor_LeftRight
-RedList_Color
+RedColor_List
 RedList_CPP
 RedMask_Basics
 RedMask_Color

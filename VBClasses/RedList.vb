@@ -1,11 +1,6 @@
 Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 Namespace VBClasses
-
-
-
-
-
     Public Class NR_RedList_CellStatsPlot : Inherits TaskParent
         Dim cells As New XO_RedCell_BasicsPlot
         Public Sub New()
@@ -33,7 +28,6 @@ Namespace VBClasses
 
     Public Class NR_RedList_FourColor : Inherits TaskParent
         Dim binar4 As New Bin4Way_Regions
-        Dim redC As New RedColor_Basics
         Public Sub New()
             labels(3) = "A 4-way split of the input grayscale image based on brightness"
             desc = "Use RedCloud on a 4-way split based on light to dark in the image."
@@ -42,9 +36,7 @@ Namespace VBClasses
             binar4.Run(src)
             dst3 = Palettize(binar4.dst2)
 
-            redC.Run(binar4.dst2)
-            dst2 = redC.dst2
-            labels(2) = redC.labels(2)
+            dst2 = runRedList(binar4.dst2, labels(2))
         End Sub
     End Class
 
@@ -58,7 +50,6 @@ Namespace VBClasses
 
     Public Class NR_RedList_Hue : Inherits TaskParent
         Dim hue As New Color8U_Hue
-        Dim redC As New RedColor_Basics
         Public Sub New()
             labels(3) = "Mask of the areas with Hue"
             desc = "Run RedCloud on just the red hue regions."
@@ -67,10 +58,7 @@ Namespace VBClasses
             hue.Run(src)
             dst3 = hue.dst2
 
-            src.SetTo(0, Not dst3)
-            redC.Run(src)
-            dst2 = redC.dst2
-            labels(2) = redC.labels(2)
+            dst2 = runRedList(src, labels(2), Not dst3)
         End Sub
     End Class
 
@@ -84,20 +72,17 @@ Namespace VBClasses
 
 
     Public Class NR_RedList_Consistent : Inherits TaskParent
-        Dim redC As New RedColor_Basics
         Public Sub New()
             dst1 = New cv.Mat(dst1.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
             task.fOptions.ColorDiffSlider.Value = 1
             desc = "Remove RedColor results that are inconsistent with the previous frame."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            redC.Run(src)
-            dst2 = redC.dst2
-            labels(2) = redC.labels(2)
+            dst2 = runRedList(src, labels(2))
 
             dst3.SetTo(0)
             Dim count As Integer
-            For Each rc In redC.rcList
+            For Each rc In task.redList.rclist
                 If rc.age > 1 Then
                     dst3(rc.rect).SetTo(rc.color, rc.mask)
                     count += 1
@@ -145,7 +130,7 @@ Namespace VBClasses
                     labels(3) = "maxDist Is at (" + CStr(pt.X) + ", " + CStr(pt.Y) + ")"
                 Case 1
                     dst3(rc.rect).SetTo(vbNearFar((rc.wcMean(2)) / task.MaxZmeters), rc.mask)
-                    labels(3) = "rc.depth Is highlighted in dst2"
+                    labels(3) = "rc.wcMean(2) Is highlighted in dst2"
                     labels(3) = "Mean depth for the cell Is " + Format(rc.wcMean(2), fmt3)
                 Case 2
                     cv.Cv2.MatchTemplate(task.pcSplit(0)(rc.rect), task.pcSplit(2)(rc.rect), correlationMat, cv.TemplateMatchModes.CCoeffNormed, rc.mask)
@@ -163,60 +148,6 @@ Namespace VBClasses
             DrawTour(dst0(rc.rect), rc.contour, cv.Scalar.Yellow)
             SetTrueText(labels(3), 3)
             labels(2) = "Highlighted feature = " + options.labelName
-        End Sub
-    End Class
-
-
-
-
-
-
-
-
-    Public Class NR_RedList_CellDepthHistogram : Inherits TaskParent
-        Dim plot As New Plot_Histogram
-        Public Sub New()
-            task.gOptions.setHistogramBins(100)
-            plot.createHistogram = True
-            desc = "Display the histogram of a selected RedColor cell."
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            dst2 = runRedList(src, labels(2))
-            If task.heartBeat Then
-                Dim depth As cv.Mat = task.pcSplit(2)(task.rcD.rect)
-                depth.SetTo(0, task.noDepthMask(task.rcD.rect))
-                plot.minRange = 0
-                plot.maxRange = task.MaxZmeters
-                plot.Run(depth)
-                labels(3) = "0 meters to " + Format(task.MaxZmeters, fmt0) + " meters - vertical lines every meter"
-
-                Dim incr = dst2.Width / task.MaxZmeters
-                For i = 1 To CInt(task.MaxZmeters - 1)
-                    Dim x = incr * i
-                    vbc.DrawLine(dst3, New cv.Point(x, 0), New cv.Point(x, dst2.Height), cv.Scalar.White)
-                Next
-            End If
-            dst3 = plot.dst2
-        End Sub
-    End Class
-
-
-
-
-
-
-    Public Class NR_RedList_EdgesZ : Inherits TaskParent
-        Dim reduction As New Reduction_Basics
-        Dim edgesZ As New RedPrep_EdgesZ
-        Public Sub New()
-            desc = "Add the depth edges in Z to the color image."
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            reduction.Run(src)
-
-            edgesZ.Run(reduction.dst3)
-
-            dst2 = runRedList(edgesZ.dst2, labels(2))
         End Sub
     End Class
 
@@ -273,44 +204,50 @@ Namespace VBClasses
 
 
 
-
-
-    Public Class RedList_Color : Inherits TaskParent
-        Implements IDisposable
-        Public classCount As Integer
-        Public rectList As New List(Of cv.Rect)
-        Public identifyCount As Integer = 255
+    Public Class NR_RedList_CellDepthHistogram : Inherits TaskParent
+        Dim plot As New Plot_Histogram
         Public Sub New()
-            cPtr = RedCloudFill_Open()
-            desc = "Run the C++ RedCloud Interface With Or without a mask"
+            task.gOptions.setHistogramBins(100)
+            plot.createHistogram = True
+            desc = "Display the histogram of a selected RedColor cell."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            dst1 = Mat_Basics.srcMustBe8U(src)
+            dst2 = runRedList(src, labels(2))
+            If task.heartBeat Then
+                Dim depth As cv.Mat = task.pcSplit(2)(task.rcD.rect)
+                depth.SetTo(0, task.noDepthMask(task.rcD.rect))
+                plot.minRange = 0
+                plot.maxRange = task.MaxZmeters
+                plot.Run(depth)
+                labels(3) = "0 meters to " + Format(task.MaxZmeters, fmt0) + " meters - vertical lines every meter"
 
-            Dim inputData(dst1.Total - 1) As Byte
-            dst1.GetArray(Of Byte)(inputData)
-            Dim handleInput = GCHandle.Alloc(inputData, GCHandleType.Pinned)
-
-            Dim imagePtr = RedCloudFill_Run(cPtr, handleInput.AddrOfPinnedObject(), dst1.Rows, dst1.Cols)
-            handleInput.Free()
-            dst2 = cv.Mat.FromPixelData(dst1.Rows + 2, dst1.Cols + 2, cv.MatType.CV_8U, imagePtr).Clone
-            dst2 = dst2(New cv.Rect(1, 1, dst2.Width - 2, dst2.Height - 2))
-
-            classCount = Math.Min(RedCloudFill_Count(cPtr), identifyCount * 2)
-            If classCount = 0 Then Exit Sub ' no data to process.
-
-            Dim rectData = cv.Mat.FromPixelData(classCount, 1, cv.MatType.CV_32SC4, RedCloudFill_Rects(cPtr))
-            Dim rects(classCount - 1) As cv.Rect
-            rectData.GetArray(Of cv.Rect)(rects)
-
-            rectList = rects.ToList
-            If standaloneTest() Then dst3 = Palettize(dst2)
-
-            labels(2) = "CV_8U result With " + CStr(classCount) + " regions."
-            labels(3) = "Palette version of the data In dst2 With " + CStr(classCount) + " regions."
+                Dim incr = dst2.Width / task.MaxZmeters
+                For i = 1 To CInt(task.MaxZmeters - 1)
+                    Dim x = incr * i
+                    vbc.DrawLine(dst3, New cv.Point(x, 0), New cv.Point(x, dst2.Height), cv.Scalar.White)
+                Next
+            End If
+            dst3 = plot.dst2
         End Sub
-        Protected Overrides Sub Finalize()
-            If cPtr <> 0 Then cPtr = RedCloudFill_Close(cPtr)
+    End Class
+
+
+
+
+
+
+    Public Class NR_RedList_EdgesZ : Inherits TaskParent
+        Dim reduction As New Reduction_Basics
+        Dim edgesZ As New RedPrep_EdgesZ
+        Public Sub New()
+            desc = "Add the depth edges in Z to the color image."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            reduction.Run(src)
+
+            edgesZ.Run(reduction.dst3)
+
+            dst2 = runRedList(edgesZ.dst2, labels(2))
         End Sub
     End Class
 End Namespace

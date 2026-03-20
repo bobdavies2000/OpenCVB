@@ -24,8 +24,8 @@ Namespace VBClasses
                 Dim nList = bounds.boundaryCells(i)
 
                 ' the first grid square is the center one and the only grid square with edges.  The rest are featureless.
-                Dim gRect = task.gridRects(nList(0))
-                Dim edgePixels = edgeMask(gRect).FindNonZero()
+                Dim gSq = task.gridRects(nList(0))
+                Dim edgePixels = edgeMask(gSq).FindNonZero()
 
                 ' mark the edge pixels as class 2 - others will be updated next
                 ml.trainResponse = New cv.Mat(nList.Count + edgePixels.Rows - 1, 1,
@@ -47,9 +47,9 @@ Namespace VBClasses
                 Dim index = nList.Count - 1
                 For j = 0 To edgePixels.Rows - 1
                     Dim pt = edgePixels.Get(Of cv.Point)(j, 0)
-                    Dim val = rgb32f(gRect).Get(Of cv.Vec3f)(pt.Y, pt.X)
+                    Dim val = rgb32f(gSq).Get(Of cv.Vec3f)(pt.Y, pt.X)
                     trainRGB.Set(Of cv.Vec3f)(index + j, 0, val) ' ml.trainResponse already set to 2
-                    Dim depth = task.pcSplit(2)(gRect).Get(Of Single)(pt.Y, pt.X)
+                    Dim depth = task.pcSplit(2)(gSq).Get(Of Single)(pt.Y, pt.X)
                     trainDepth.Set(Of Single)(index + j, 0, depth)
                 Next
 
@@ -397,18 +397,18 @@ Namespace VBClasses
             Dim predictList As New List(Of mlColor)
             Dim grPredict As New List(Of cv.Rect)
             For i = 0 To task.gridRects.Count - 1
-                Dim gRect = task.gridRects(i)
+                Dim gSq = task.gridRects(i)
                 Dim mls As mlColor
-                mls.colorIndex = color8U.dst2.Get(Of Byte)(gRect.Y, gRect.X)
-                mls.x = gRect.X
-                mls.y = gRect.Y
+                mls.colorIndex = color8U.dst2.Get(Of Byte)(gSq.Y, gSq.X)
+                mls.x = gSq.X
+                mls.y = gSq.Y
 
-                If task.noDepthMask(gRect).CountNonZero > 0 Then
-                    grPredict.Add(gRect)
+                If task.noDepthMask(gSq).CountNonZero > 0 Then
+                    grPredict.Add(gSq)
                     predictList.Add(mls)
                 Else
                     mlInput.Add(mls)
-                    mResponse.Add(task.pcSplit(2)(gRect).Mean())
+                    mResponse.Add(task.pcSplit(2)(gSq).Mean())
                 End If
             Next
 
@@ -428,9 +428,9 @@ Namespace VBClasses
             dst3 = task.pcSplit(2).Clone
             For i = 0 To predictList.Count - 1
                 Dim mls = predictList(i)
-                Dim gRect = grPredict(i)
+                Dim gSq = grPredict(i)
                 Dim depth = output.Get(Of Single)(i, 0)
-                dst3(gRect).SetTo(depth, task.noDepthMask(gRect))
+                dst3(gSq).SetTo(depth, task.noDepthMask(gSq))
             Next
 
         End Sub
@@ -472,18 +472,18 @@ Namespace VBClasses
             Dim predictList As New List(Of mlColorInTier)
             Dim grPredict As New List(Of cv.Rect)
             For i = 0 To task.gridRects.Count - 1
-                Dim gRect = task.gridRects(i)
+                Dim gSq = task.gridRects(i)
                 Dim mls As mlColorInTier
-                mls.colorIndex = color8U.dst2.Get(Of Byte)(gRect.Y, gRect.X)
-                mls.x = gRect.X
-                mls.y = gRect.Y
+                mls.colorIndex = color8U.dst2.Get(Of Byte)(gSq.Y, gSq.X)
+                mls.x = gSq.X
+                mls.y = gSq.Y
 
-                If task.noDepthMask(gRect).CountNonZero > 0 Then
-                    grPredict.Add(gRect)
+                If task.noDepthMask(gSq).CountNonZero > 0 Then
+                    grPredict.Add(gSq)
                     predictList.Add(mls)
                 Else
                     mlInput.Add(mls)
-                    mResponse.Add(task.pcSplit(2)(gRect).Mean())
+                    mResponse.Add(task.pcSplit(2)(gSq).Mean())
                 End If
             Next
 
@@ -503,9 +503,9 @@ Namespace VBClasses
             dst3 = task.pcSplit(2).Clone
             For i = 0 To predictList.Count - 1
                 Dim mls = predictList(i)
-                Dim gRect = grPredict(i)
+                Dim gSq = grPredict(i)
                 Dim depth = output.Get(Of Single)(i, 0)
-                dst3(gRect).SetTo(depth, task.noDepthMask(gRect))
+                dst3(gSq).SetTo(depth, task.noDepthMask(gSq))
             Next
         End Sub
         Protected Overrides Sub Finalize()

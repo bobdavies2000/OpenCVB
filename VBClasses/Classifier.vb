@@ -129,7 +129,7 @@ Namespace VBClasses
             dst2 = runRedList(src, labels(2))
 
             SetTrueText("Review the Neighbor_Precise algorithm")
-            'nabs.oldrclist = task.redList.rcList
+            'nabs.rcList = task.redList.rcList
             'nabs.Run(task.redList.rcMap)
 
             'Dim trainList As New List(Of cv.Scalar)

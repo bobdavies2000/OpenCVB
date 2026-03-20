@@ -1,4 +1,3 @@
-Imports System.Windows.Documents
 Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Class Profile_Basics : Inherits TaskParent
@@ -10,22 +9,14 @@ Namespace VBClasses
         Public corners3D As New List(Of cv.Point3f)
         Public corners As New List(Of cv.Point)
         Public cornersRaw As New List(Of cv.Point)
-        Dim redC As New RedCloud_Basics
         Public Sub New()
-            If standalone Then task.gOptions.displayDst1.Checked = True
             desc = "Find the left/right, top/bottom, and near/far sides of a cell"
         End Sub
         Private Function point3fToString(v As cv.Point3f) As String
             Return Format(v.X, fmt3) + vbTab + Format(v.Y, fmt3) + vbTab + Format(v.Z, fmt3)
         End Function
         Public Overrides Sub RunAlg(src As cv.Mat)
-            redC.Run(src)
-            dst2 = redC.dst2
-            labels(2) = redC.labels(2)
-
-            Dim cellinfo = RedUtil_Basics.selectCell(redC.rcMap, redC.rcList)
-            SetTrueText(cellinfo, 1)
-
+            dst2 = runRedList(src, labels(2))
             Dim rc = task.rcD
             Dim depthPixels = task.depthmask(rc.rect).CountNonZero
             If depthPixels = 0 Then
@@ -146,7 +137,7 @@ Namespace VBClasses
         Public sides As New Profile_Basics
         Dim saveTrueText As New List(Of TrueText)
         Public Sub New()
-            If standalone Then task.gOptions.displaydst1.checked = True
+            If standalone Then task.gOptions.displayDst1.Checked = True
             labels = {"", "", "Select a cell to analyze its contour", "Selected cell:  yellow = closer, blue = farther, white = no depth"}
             desc = "Visualize the derivative of X, Y, and Z in the contour of a RedCloud cell"
         End Sub
@@ -214,7 +205,7 @@ Namespace VBClasses
     Public Class NR_Profile_ConcentrationSide : Inherits TaskParent
         Dim profile As New Profile_ConcentrationTop
         Public Sub New()
-            OptionParent.findCheckBox("Top View (Unchecked Side View)").Checked = False
+            OptionParent.FindCheckBox("Top View (Unchecked Side View)").Checked = False
             labels = {"", "The outline of the selected RedCloud cell", traceName + " - click any RedCloud cell to visualize it's side view in the upper right image.", ""}
             desc = "Rotate around Y-axis to find peaks - this algorithm fails to find the optimal rotation to find walls"
         End Sub

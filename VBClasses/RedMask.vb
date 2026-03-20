@@ -278,8 +278,6 @@ Namespace VBClasses
                 rcMap(rc.rect).SetTo(rc.index, rc.mask)
             Next
 
-            dst3 = Palettize(rcMap)
-
             strOut = RedUtil_Basics.selectCell(rcMap, rclist)
             SetTrueText(strOut, 1)
         End Sub

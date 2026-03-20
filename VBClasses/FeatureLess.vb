@@ -119,10 +119,10 @@ Namespace VBClasses
 
             dst2.SetTo(0)
             For i = 0 To corr.cList.Count - 1
-                Dim gRect = task.gridRects(i)
+                Dim gSq = task.gridRects(i)
                 If corr.cList(i) < corr.maxCorrelation Then
-                    dst2(gRect).SetTo(255)
-                    If standaloneTest() Then src.Rectangle(gRect, white, task.lineWidth)
+                    dst2(gSq).SetTo(255)
+                    If standaloneTest() Then src.Rectangle(gSq, white, task.lineWidth)
                 End If
             Next
         End Sub
@@ -378,6 +378,9 @@ Namespace VBClasses
 
             If standaloneTest() Then
                 strOut = RedUtil_Basics.selectCell(redC.rcMap, redC.rcList)
+                If redC.rcList.Count > 0 And task.rcD Is Nothing Then
+                    task.clickPoint = redC.rcList(0).maxDist
+                End If
                 SetTrueText(strOut, 1)
             End If
         End Sub

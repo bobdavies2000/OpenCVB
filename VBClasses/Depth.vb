@@ -193,17 +193,17 @@ Namespace VBClasses
             If task.heartBeat Then dst3.SetTo(0)
             Parallel.For(0, task.gridRects.Count,
         Sub(i)
-            Dim gRect = task.gridRects(i)
-            Dim mm As mmData = GetMinMax(task.pcSplit(2)(gRect), task.depthmask(gRect))
+            Dim gSq = task.gridRects(i)
+            Dim mm As mmData = GetMinMax(task.pcSplit(2)(gSq), task.depthmask(gSq))
             If mm.minLoc.X < 0 Or mm.minLoc.Y < 0 Then mm.minLoc = New cv.Point2f(0, 0)
-            minPoint(i) = New cv.Point(mm.minLoc.X + gRect.X, mm.minLoc.Y + gRect.Y)
-            maxPoint(i) = New cv.Point(mm.maxLoc.X + gRect.X, mm.maxLoc.Y + gRect.Y)
+            minPoint(i) = New cv.Point(mm.minLoc.X + gSq.X, mm.minLoc.Y + gSq.Y)
+            maxPoint(i) = New cv.Point(mm.maxLoc.X + gSq.X, mm.maxLoc.Y + gSq.Y)
 
-            DrawCircle(dst2(gRect), mm.minLoc, task.DotSize, task.highlight)
-            DrawCircle(dst2(gRect), mm.maxLoc, task.DotSize, cv.Scalar.Red)
+            DrawCircle(dst2(gSq), mm.minLoc, task.DotSize, task.highlight)
+            DrawCircle(dst2(gSq), mm.maxLoc, task.DotSize, cv.Scalar.Red)
 
-            Dim p1 = New cv.Point(mm.minLoc.X + gRect.X, mm.minLoc.Y + gRect.Y)
-            Dim p2 = New cv.Point(mm.maxLoc.X + gRect.X, mm.maxLoc.Y + gRect.Y)
+            Dim p1 = New cv.Point(mm.minLoc.X + gSq.X, mm.minLoc.Y + gSq.Y)
+            Dim p2 = New cv.Point(mm.maxLoc.X + gSq.X, mm.maxLoc.Y + gSq.Y)
             DrawCircle(dst3, p1, task.DotSize, task.highlight)
             DrawCircle(dst3, p2, task.DotSize, cv.Scalar.Red)
         End Sub)
@@ -1225,18 +1225,15 @@ Namespace VBClasses
 
     Public Class NR_Depth_CellTiers : Inherits TaskParent
         Public valley As New HistValley_Count
-        Dim redC As New RedColor_Basics
         Public Sub New()
             desc = "Find the number of valleys (tiers) in a RedCloud cell."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            redC.Run(src)
-            dst2 = redC.dst2
-            labels(2) = redC.labels(2)
+            dst2 = runRedList(src, labels(2))
 
             valley.standaloneFlag = standalone
-            For i = 1 To Math.Min(10, redC.rcList.Count - 1)
-                Dim rc = redC.rcList(i)
+            For i = 1 To Math.Min(10, task.redList.rclist.Count - 1)
+                Dim rc = task.redList.rclist(i)
                 Dim depthData = task.pcSplit(2)(rc.rect).Clone
                 depthData.SetTo(0, Not rc.mask)
 
@@ -1247,7 +1244,7 @@ Namespace VBClasses
                     task.clickPoint = rc.maxDist
                     Swarm_Flood.oldSelectCell()
                 End If
-                If task.heartBeat Then SetTrueText(CStr(valley.classCount) + " class", rc.maxDist)
+                If task.heartBeat Then SetTrueText(CStr(valley.classCount) + " classes", rc.maxDist)
             Next
 
             Static saveTrueText As New List(Of TrueText)
@@ -1274,9 +1271,9 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             bricks.Run(src)
             dst1.SetTo(0)
-            For Each gRect In bricks.brickList
-                Dim testError = ErrorEstimate(gRect.depth)
-                dst1(gRect.rect).SetTo(testError)
+            For Each gSq In bricks.brickList
+                Dim testError = ErrorEstimate(gSq.depth)
+                dst1(gSq.rect).SetTo(testError)
             Next
 
             Dim mm = GetMinMax(dst1)
@@ -1309,11 +1306,11 @@ Namespace VBClasses
 
             dst1 = src.Clone()
             dst1.SetTo(white, task.gridMask)
-            For Each gRect In bricks.brickList
-                Dim pt = gRect.mm.minLoc
-                subdiv.Insert(New cv.Point(pt.X + gRect.rect.X, pt.Y + gRect.rect.Y))
-                DrawCircle(dst1(gRect.rect), gRect.mm.minLoc, task.DotSize, cv.Scalar.Red)
-                DrawCircle(dst1(gRect.rect), gRect.mm.maxLoc, task.DotSize, cv.Scalar.Blue)
+            For Each gSq In bricks.brickList
+                Dim pt = gSq.mm.minLoc
+                subdiv.Insert(New cv.Point(pt.X + gSq.rect.X, pt.Y + gSq.rect.Y))
+                DrawCircle(dst1(gSq.rect), gSq.mm.minLoc, task.DotSize, cv.Scalar.Red)
+                DrawCircle(dst1(gSq.rect), gSq.mm.maxLoc, task.DotSize, cv.Scalar.Blue)
             Next
 
             If task.optionsChanged Then dst2 = dst1.Clone Else dst1.CopyTo(dst2, task.motion.motionMask)
