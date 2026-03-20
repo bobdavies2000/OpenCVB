@@ -72,17 +72,20 @@ Namespace VBClasses
 
 
     Public Class NR_RedList_Consistent : Inherits TaskParent
+        Dim redC As New RedCloud_Basics
         Public Sub New()
             dst1 = New cv.Mat(dst1.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
             task.fOptions.ColorDiffSlider.Value = 1
             desc = "Remove RedColor results that are inconsistent with the previous frame."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            dst2 = runRedList(src, labels(2))
+            redC.Run(src)
+            dst2 = redC.dst2
+            labels(2) = redC.labels(2)
 
             dst3.SetTo(0)
             Dim count As Integer
-            For Each rc In task.redList.rclist
+            For Each rc In redC.rcList
                 If rc.age > 1 Then
                     dst3(rc.rect).SetTo(rc.color, rc.mask)
                     count += 1

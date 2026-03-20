@@ -1,3 +1,4 @@
+Imports System.Windows.Documents
 Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Class Swarm_Basics : Inherits TaskParent
@@ -176,22 +177,6 @@ Namespace VBClasses
         Public Sub New()
             desc = "Floodfill the color image using the swarm outline as a mask"
         End Sub
-        Public Shared Sub oldSelectCell()
-            If task.redList Is Nothing Then Exit Sub
-            If task.redList.rclist.Count = 0 Then Exit Sub
-            If task.clickPoint = newPoint And task.redList.rclist.Count > 1 Then
-                task.clickPoint = task.redList.rclist(1).maxDist
-            End If
-            Dim index = task.redList.rcMap.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X)
-            If index = 0 Then Exit Sub
-            If index > 0 And index < task.redList.rclist.Count Then
-                task.rcD = task.redList.rclist(index)
-                task.color(task.rcD.rect).SetTo(cv.Scalar.White, task.rcD.mask)
-            Else
-                ' the 0th cell is always the upper left corner with just 1 pixel.
-                If task.redList.rclist.Count > 1 Then task.rcD = task.redList.rclist(1)
-            End If
-        End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             swarm.Run(src)
 
@@ -201,8 +186,8 @@ Namespace VBClasses
             flood.Run(color8U.dst2)
             dst2 = flood.dst2
 
-            oldSelectCell()
-            ' labels(2) = flood.cellGen.labels(2)
+            strOut = RedUtil_Basics.selectCell(flood.redC.rcMap, flood.redC.rcList)
+            SetTrueText(strOut, 3)
         End Sub
     End Class
 

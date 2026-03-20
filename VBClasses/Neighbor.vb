@@ -5,7 +5,7 @@ Namespace VBClasses
         Dim knn As New KNN_Basics
         Public runRedCflag As Boolean = False
         Public options As New Options_Neighbors
-        Dim redC As New RedColor_Basics
+        Dim redC As New RedCloud_Basics
         Public nabs As New List(Of Integer)
         Public Sub New()
             desc = "Find all the neighbors with KNN"
@@ -34,7 +34,8 @@ Namespace VBClasses
             Next
 
             If standalone Then
-                Swarm_Flood.oldSelectCell()
+                strOut = RedUtil_Basics.selectCell(redC.rcMap, redC.rcList)
+                SetTrueText(strOut, 3)
                 dst3.SetTo(0)
                 For Each index In task.rcD.nabs
                     If index < redC.rcList.Count Then

@@ -9747,6 +9747,21 @@ Namespace VBClasses
         Public Sub New()
             desc = "Simpler transforms for the point cloud using CalcHist instead of reduction."
         End Sub
+        Public Shared Sub oldSelectCell()
+            If task.redList.rclist.Count = 0 Then Exit Sub
+            If task.clickPoint = newPoint And task.redList.rclist.Count > 1 Then
+                task.clickPoint = task.redList.rclist(1).maxDist
+            End If
+            Dim index = task.redList.rcMap.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X)
+            If index = 0 Then Exit Sub
+            If index > 0 And index < task.redList.rclist.Count Then
+                task.rcD = task.redList.rclist(index)
+                task.color(task.rcD.rect).SetTo(cv.Scalar.White, task.rcD.mask)
+            Else
+                ' the 0th cell is always the upper left corner with just 1 pixel.
+                If task.redList.rclist.Count > 1 Then task.rcD = task.redList.rclist(1)
+            End If
+        End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             prep.Run(src)
             dst2 = prep.dst2
@@ -9755,7 +9770,7 @@ Namespace VBClasses
             dst2.ConvertTo(dst2, cv.MatType.CV_8U)
             Dim mm = GetMinMax(dst2)
             dst3 = Palettize(dst2)
-            Swarm_Flood.oldSelectCell()
+            oldSelectCell()
 
             labels(2) = CStr(mm.maxVal + 1) + " regions were mapped in the depth data - region 0 (black) has no depth."
         End Sub
@@ -12578,7 +12593,7 @@ Namespace VBClasses
 
             labels(2) = $"{task.redList.rclist.Count} cells identified"
 
-            If showSelected Then Swarm_Flood.oldSelectCell()
+            If showSelected Then XO_RedPrep_BasicsShow.oldSelectCell()
         End Sub
     End Class
 
@@ -15808,7 +15823,7 @@ Namespace VBClasses
             labels(2) = cellGen.labels(2)
             labels(3) = ""
             SetTrueText("", newPoint, 1)
-            Swarm_Flood.oldSelectCell()
+            XO_RedPrep_BasicsShow.oldSelectCell()
         End Sub
     End Class
 
@@ -17127,7 +17142,7 @@ Namespace VBClasses
             labels(2) = cellGen.labels(2)
             labels(3) = ""
             SetTrueText("", newPoint, 1)
-            ' oldSelectCell()
+            ' XO_RedPrep_BasicsShow.oldSelectCell()
         End Sub
     End Class
 
@@ -17938,7 +17953,7 @@ Namespace VBClasses
             Next
 
             dst2 = XO_RedList_MaxDist.RebuildRCMap(task.redList.rclist.ToList)
-            Swarm_Flood.oldSelectCell()
+            XO_RedPrep_BasicsShow.oldSelectCell()
         End Sub
     End Class
 

@@ -1245,7 +1245,8 @@ Namespace VBClasses
                     dst3 = valley.dst2.Clone
                     labels(3) = valley.strOut
                     task.clickPoint = rc.maxDist
-                    Swarm_Flood.oldSelectCell()
+                    strOut = RedUtil_Basics.selectCell(redC.rcMap, redC.rcList)
+                    SetTrueText(strOut, 3)
                 End If
                 If task.heartBeat Then SetTrueText(CStr(valley.classCount) + " classes", rc.maxDist)
             Next
