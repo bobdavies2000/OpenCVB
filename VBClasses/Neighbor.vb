@@ -57,7 +57,7 @@ Namespace VBClasses
             desc = "Find the corner points where multiple cells intersect."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If standaloneTest() Or src.Type <> cv.MatType.CV_8U Then
+            If standaloneTest() Or src.Type <> cv.MatType.CV_32S Then
                 Static redC As New RedColor_Basics
                 redC.Run(src)
                 dst2 = redC.dst2
@@ -70,7 +70,7 @@ Namespace VBClasses
 
             Dim w = dst2.Width
             nPoints.Clear()
-            Dim kSize As Integer = 2
+            Dim kSize As Integer = 3
             For y = 0 To dst1.Height - kSize
                 For x = 0 To dst1.Width - kSize
                     Dim nabs As New SortedList(Of Integer, Integer)
