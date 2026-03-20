@@ -223,6 +223,7 @@ Namespace VBClasses
         Dim edges As New Edge_Basics
         Public km As New KMeans_Image
         Public classCount As Integer
+        Dim redC As New RedCloud_Basics
         Public Sub New()
             labels(3) = "KMeans with edges output"
             desc = "Use edges to isolate regions in the KMeans output - not much different from KMeans_Basics."
@@ -235,7 +236,9 @@ Namespace VBClasses
             dst3 = km.dst2 + 1
             classCount = km.classCount
 
-            dst2 = runRedList(src, labels(2))
+            redC.Run(src)
+            dst2 = redC.dst2
+            labels(2) = redC.labels(2)
         End Sub
     End Class
 

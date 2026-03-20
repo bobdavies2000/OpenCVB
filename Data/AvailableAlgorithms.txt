@@ -1300,7 +1300,6 @@ NR_RedColor_NWay
 NR_RedList_CellDepthHistogram
 NR_RedList_CellStatsPlot
 NR_RedList_Consistent
-NR_RedList_EdgesZ
 NR_RedList_Features
 NR_RedList_FourColor
 NR_RedList_Hue
@@ -1539,7 +1538,6 @@ RedColor_List
 RedList_CPP
 RedMask_Basics
 RedMask_Color
-RedMask_Flippers
 RedMask_List
 RedMask_ToRedColor
 RedPrep_Basics

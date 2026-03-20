@@ -224,12 +224,22 @@ Namespace VBClasses
 
     Public Class NR_LUT_RedCloud : Inherits TaskParent
         Dim sort3 As New Sort_3Channel
+        Dim redC As New RedCloud_Basics
         Public Sub New()
             If standalone Then task.gOptions.displayDst1.Checked = True
             desc = "Use LUT on the grayscale image after masking with rc.mask"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            dst2 = runRedList(src, labels(2)).Clone
+            redC.Run(src)
+            dst2 = redC.dst2
+            labels(2) = redC.labels(2)
+
+            strOut = RedUtil_Basics.selectCell(redC.rcMap, redC.rcList)
+            SetTrueText(strOut, 3)
+            If task.rcD Is Nothing Then
+                SetTrueText("Select any cell", 3)
+                Exit Sub
+            End If
 
             dst3.SetTo(0)
             Dim rc = task.rcD

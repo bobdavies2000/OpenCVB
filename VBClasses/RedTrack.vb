@@ -26,6 +26,7 @@ Namespace VBClasses
 
 
     Public Class NR_RedTrack_Lines : Inherits TaskParent
+        Dim redC As New RedCloud_Basics
         Public Sub New()
             dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, 0)
             desc = "Identify and track the lines in an image as RedCloud Cells"
@@ -39,7 +40,12 @@ Namespace VBClasses
                 If index > 10 Then Exit For
             Next
 
-            dst2 = runRedList(dst3, labels(2))
+            redC.Run(src)
+            dst2 = redC.dst2
+            labels(2) = redC.labels(2)
+
+            strOut = RedUtil_Basics.selectCell(redC.rcMap, redC.rcList)
+            SetTrueText(strOut, 3)
         End Sub
     End Class
 

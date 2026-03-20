@@ -3,12 +3,22 @@ Namespace VBClasses
     Public Class Volume_Basics : Inherits TaskParent
         Public rc As New rcData
         Public volume As Single
+        Dim redC As New RedCloud_Basics
         Public Sub New()
             desc = "Build a box containing all the 3D points of a RedCloud cell"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             If standaloneTest() Then
-                dst2 = runRedList(src, labels(2))
+                redC.Run(src)
+                dst2 = redC.dst2
+                labels(2) = redC.labels(2)
+
+                strOut = RedUtil_Basics.selectCell(redC.rcMap, redC.rcList)
+                SetTrueText(strOut, 3)
+                If task.rcD Is Nothing Then
+                    SetTrueText("Select any cell", 3)
+                    Exit Sub
+                End If
                 rc = task.rcD
             End If
 

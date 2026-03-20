@@ -1,3 +1,4 @@
+Imports System.Dynamic
 Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Class Spectrum_Basics : Inherits TaskParent
@@ -29,13 +30,26 @@ Namespace VBClasses
 
     Public Class Spectrum_X : Inherits TaskParent
         Public options As New Options_Spectrum
+        Dim redC As New RedColor_Basics
         Public Sub New()
+            If standalone Then task.gOptions.displayDst1.Checked = True
             desc = "Given a RedCloud cell, create a spectrum that contains the depth ranges."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
 
-            If standaloneTest() Then dst2 = runRedList(src, labels(2))
+            If standaloneTest() Then
+                redC.Run(src)
+                dst2 = redC.dst2
+                labels(2) = redC.labels(2)
+
+                Dim cellinfo = RedUtil_Basics.selectCell(redC.rcMap, redC.rcList)
+                SetTrueText(cellinfo, 1)
+                If task.rcD Is Nothing Then
+                    SetTrueText("Select any cell", 1)
+                    Exit Sub
+                End If
+            End If
 
             If task.heartBeat And task.rcD.index > 0 Then
                 Dim ranges = options.buildDepthRanges(task.pcSplit(0)(task.rcD.rect).Clone, " pointcloud X ")
@@ -53,13 +67,26 @@ Namespace VBClasses
 
     Public Class Spectrum_Y : Inherits TaskParent
         Public options As New Options_Spectrum
+        Dim redC As New RedColor_Basics
         Public Sub New()
+            If standalone Then task.gOptions.displayDst1.Checked = True
             desc = "Given a RedCloud cell, create a spectrum that contains the depth ranges."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
 
-            If standaloneTest() Then dst2 = runRedList(src, labels(2))
+            If standaloneTest() Then
+                redC.Run(src)
+                dst2 = redC.dst2
+                labels(2) = redC.labels(2)
+
+                Dim cellinfo = RedUtil_Basics.selectCell(redC.rcMap, redC.rcList)
+                SetTrueText(cellinfo, 1)
+                If task.rcD Is Nothing Then
+                    SetTrueText("Select any cell", 1)
+                    Exit Sub
+                End If
+            End If
 
             If task.heartBeat And task.rcD.index > 0 Then
                 Dim ranges = options.buildDepthRanges(task.pcSplit(1)(task.rcD.rect).Clone, " pointcloud Y ")
@@ -77,12 +104,25 @@ Namespace VBClasses
 
     Public Class Spectrum_Z : Inherits TaskParent
         Public options As New Options_Spectrum
+        Dim redC As New RedColor_Basics
         Public Sub New()
+            If standalone Then task.gOptions.displayDst1.Checked = True
             desc = "Given a RedCloud cell, create a spectrum that contains the depth ranges."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
-            If standaloneTest() Then dst2 = runRedList(src, labels(2))
+            If standaloneTest() Then
+                redC.Run(src)
+                dst2 = redC.dst2
+                labels(2) = redC.labels(2)
+
+                Dim cellinfo = RedUtil_Basics.selectCell(redC.rcMap, redC.rcList)
+                SetTrueText(cellinfo, 1)
+                If task.rcD Is Nothing Then
+                    SetTrueText("Select any cell", 1)
+                    Exit Sub
+                End If
+            End If
 
             If task.heartBeat And task.rcD.index > 0 Then
                 Dim ranges = options.buildDepthRanges(task.pcSplit(2)(task.rcD.rect).Clone, " pointcloud Z ")
@@ -105,13 +145,26 @@ Namespace VBClasses
         Dim specX As New Spectrum_X
         Dim specY As New Spectrum_Y
         Dim specZ As New Spectrum_Z
+        Dim redC As New RedColor_Basics
         Public Sub New()
+            If standalone Then task.gOptions.displayDst1.Checked = True
             desc = "Given a RedCloud cell, create a spectrum that contains the ranges for X, Y, and Z in the point cloud."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
 
-            If standaloneTest() Then dst2 = runRedList(src, labels(2))
+            If standaloneTest() Then
+                redC.Run(src)
+                dst2 = redC.dst2
+                labels(2) = redC.labels(2)
+
+                Dim cellinfo = RedUtil_Basics.selectCell(redC.rcMap, redC.rcList)
+                SetTrueText(cellinfo, 1)
+                If task.rcD Is Nothing Then
+                    SetTrueText("Select any cell", 1)
+                    Exit Sub
+                End If
+            End If
 
             If task.heartBeat Then
                 specX.Run(src)
@@ -136,13 +189,26 @@ Namespace VBClasses
         Dim options As New Options_Spectrum
         Dim gSpec As New Spectrum_Gray
         Dim sCloud As New Spectrum_Cloud
+        Dim redC As New RedColor_Basics
         Public Sub New()
+            If standalone Then task.gOptions.displayDst1.Checked = True
             desc = "Given a RedCloud cell, create a spectrum that contains the ranges for X, Y, and Z in the point cloud."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
 
-            If standaloneTest() Then dst2 = runRedList(src, labels(2))
+            If standaloneTest() Then
+                redC.Run(src)
+                dst2 = redC.dst2
+                labels(2) = redC.labels(2)
+
+                Dim cellinfo = RedUtil_Basics.selectCell(redC.rcMap, redC.rcList)
+                SetTrueText(cellinfo, 1)
+                If task.rcD Is Nothing Then
+                    SetTrueText("Select any cell", 1)
+                    Exit Sub
+                End If
+            End If
 
             If task.heartBeat Then
                 sCloud.Run(src)
@@ -163,13 +229,26 @@ Namespace VBClasses
     Public Class NR_Spectrum_RGB : Inherits TaskParent
         Dim options As New Options_Spectrum
         Dim gSpec As New Spectrum_Gray
+        Dim redC As New RedColor_Basics
         Public Sub New()
+            If standalone Then task.gOptions.displayDst1.Checked = True
             desc = "Create a spectrum of the RGB values for a given RedCloud cell."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
 
-            If standaloneTest() Then dst2 = runRedList(src, labels(2))
+            If standaloneTest() Then
+                redC.Run(src)
+                dst2 = redC.dst2
+                labels(2) = redC.labels(2)
+
+                Dim cellinfo = RedUtil_Basics.selectCell(redC.rcMap, redC.rcList)
+                SetTrueText(cellinfo, 1)
+                If task.rcD Is Nothing Then
+                    SetTrueText("Select any cell", 1)
+                    Exit Sub
+                End If
+            End If
 
             Dim split = src.Split()
             gSpec.typeSpec = " blue "
@@ -197,7 +276,9 @@ Namespace VBClasses
     Public Class NR_Spectrum_CellZoom : Inherits TaskParent
         Dim proportion As New Resize_Proportional
         Dim breakdown As New Spectrum_Breakdown
+        Dim redC As New RedCloud_Basics
         Public Sub New()
+            If standalone Then task.gOptions.displayDst1.Checked = True
             labels = {"", "Cell trimming information", "", "White is after trimming, gray is before trim, black is outside the cell mask."}
             If standaloneTest() Then task.gOptions.displayDst1.Checked = True
             desc = "Zoom in on the selected RedCloud cell before and after Spectrum filtering."
@@ -205,7 +286,14 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             breakdown.options.Run()
 
-            dst2 = runRedList(src, labels(2))
+            redC.Run(src)
+            dst2 = redC.dst2
+            labels(2) = redC.labels(2)
+            RedUtil_Basics.selectCell(redC.rcMap, redC.rcList)
+            If task.rcD Is Nothing Then
+                SetTrueText("Select any cell", 1)
+                Exit Sub
+            End If
 
             If task.heartBeat Then
                 breakdown.Run(src)
@@ -231,13 +319,21 @@ Namespace VBClasses
         Public options As New Options_Spectrum
         Public buildMaskOnly As Boolean
         Dim proportion As New Resize_Proportional
+        Dim redC As New RedCloud_Basics
         Public Sub New()
             desc = "Breakdown a cell if possible."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
+            options.Run()
             If standaloneTest() Then
-                options.Run()
-                dst2 = runRedList(src, labels(2))
+                redC.Run(src)
+                dst2 = redC.dst2
+                labels(2) = redC.labels(2)
+                RedUtil_Basics.selectCell(redC.rcMap, redC.rcList)
+                If task.rcD Is Nothing Then
+                    SetTrueText("Select any cell", 1)
+                    Exit Sub
+                End If
             End If
 
             Dim rc = task.rcD
@@ -349,13 +445,24 @@ Namespace VBClasses
     Public Class Spectrum_Gray : Inherits TaskParent
         Dim options As New Options_Spectrum
         Public typeSpec As String = "GrayScale"
+        Dim redC As New RedColor_Basics
         Public Sub New()
+            If standalone Then task.gOptions.displayDst1.Checked = True
             desc = "Given a RedCloud cell, create a spectrum that contains the color ranges."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
 
-            dst2 = runRedList(src, labels(2))
+            redC.Run(src)
+            dst2 = redC.dst2
+            labels(2) = redC.labels(2)
+
+            strOut = RedUtil_Basics.selectCell(redC.rcMap, redC.rcList)
+            SetTrueText(strOut, 1)
+            If task.rcD Is Nothing Then
+                SetTrueText("Select any cell", 1)
+                Exit Sub
+            End If
 
             Dim input = src(task.rcD.rect)
             If input.Type <> cv.MatType.CV_8U Then input = input.CvtColor(cv.ColorConversionCodes.BGR2GRAY)

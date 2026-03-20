@@ -28,7 +28,9 @@ Namespace VBClasses
 
     Public Class NR_RedList_FourColor : Inherits TaskParent
         Dim binar4 As New Bin4Way_Regions
+        Dim redC As New RedColor_Basics
         Public Sub New()
+            If standalone Then task.gOptions.displayDst1.Checked = True
             labels(3) = "A 4-way split of the input grayscale image based on brightness"
             desc = "Use RedCloud on a 4-way split based on light to dark in the image."
         End Sub
@@ -36,7 +38,12 @@ Namespace VBClasses
             binar4.Run(src)
             dst3 = Palettize(binar4.dst2)
 
-            dst2 = runRedList(binar4.dst2, labels(2))
+            redC.Run(binar4.dst2)
+            dst2 = redC.dst2
+            labels(2) = redC.labels(2)
+
+            strOut = RedUtil_Basics.selectCell(redC.rcMap, redC.rcList)
+            SetTrueText(strOut, 1)
         End Sub
     End Class
 
@@ -50,7 +57,9 @@ Namespace VBClasses
 
     Public Class NR_RedList_Hue : Inherits TaskParent
         Dim hue As New Color8U_Hue
+        Dim redMask As New RedMask_Color
         Public Sub New()
+            If standalone Then task.gOptions.displayDst1.Checked = True
             labels(3) = "Mask of the areas with Hue"
             desc = "Run RedCloud on just the red hue regions."
         End Sub
@@ -58,7 +67,13 @@ Namespace VBClasses
             hue.Run(src)
             dst3 = hue.dst2
 
-            dst2 = runRedList(src, labels(2), Not dst3)
+            redMask.inputRemoved = Not dst3
+            redMask.Run(src)
+            dst2 = redMask.dst3
+            labels(2) = redMask.labels(2)
+
+            strOut = RedUtil_Basics.selectCell(redMask.rcMap, redMask.rclist)
+            SetTrueText(strOut, 1)
         End Sub
     End Class
 
@@ -103,7 +118,9 @@ Namespace VBClasses
 
     Public Class NR_RedList_Features : Inherits TaskParent
         Dim options As New Options_RedCloudFeatures
+        Dim redC As New RedCloud_Basics
         Public Sub New()
+            If standalone Then task.gOptions.displayDst1.Checked = True
             desc = "Display And validate the keyPoints for each RedCloud cell"
         End Sub
         Private Function vbNearFar(factor As Single) As cv.Vec3b
@@ -120,6 +137,16 @@ Namespace VBClasses
             options.Run()
 
             dst2 = runRedList(src, labels(2))
+            redC.Run(src)
+            dst2 = redC.dst2
+            labels(2) = redC.labels(2)
+
+            strOut = RedUtil_Basics.selectCell(redC.rcMap, redC.rcList)
+            SetTrueText(strOut, 1)
+            If task.rcD Is Nothing Then
+                SetTrueText("Select any cell", 1)
+                Exit Sub
+            End If
 
             Dim rc = task.rcD
 
@@ -146,7 +173,8 @@ Namespace VBClasses
             End Select
             If options.selection = 2 Or options.selection = 3 Then
                 dst3(rc.rect).SetTo(vbNearFar(If(options.selection = 2, correlationXtoZ, correlationYtoZ) + 1), rc.mask)
-                SetTrueText("(" + Format(correlationXtoZ, fmt3) + ", " + Format(correlationYtoZ, fmt3) + ")", New cv.Point(rc.rect.X, rc.rect.Y), 3)
+                SetTrueText("(" + Format(correlationXtoZ, fmt3) + ", " + Format(correlationYtoZ, fmt3) + ")",
+                            rc.rect.TopLeft, 3)
             End If
             DrawTour(dst0(rc.rect), rc.contour, cv.Scalar.Yellow)
             SetTrueText(labels(3), 3)
@@ -209,13 +237,24 @@ Namespace VBClasses
 
     Public Class NR_RedList_CellDepthHistogram : Inherits TaskParent
         Dim plot As New Plot_Histogram
+        Dim redC As New RedCloud_Basics
         Public Sub New()
+            If standalone Then task.gOptions.displayDst1.Checked = True
             task.gOptions.setHistogramBins(100)
             plot.createHistogram = True
             desc = "Display the histogram of a selected RedColor cell."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            dst2 = runRedList(src, labels(2))
+            redC.Run(src)
+            dst2 = redC.dst2
+            labels(2) = redC.labels(2)
+
+            strOut = RedUtil_Basics.selectCell(redC.rcMap, redC.rcList)
+            SetTrueText(strOut, 1)
+            If task.rcD Is Nothing Then
+                SetTrueText("Select any cell", 1)
+                Exit Sub
+            End If
             If task.heartBeat Then
                 Dim depth As cv.Mat = task.pcSplit(2)(task.rcD.rect)
                 depth.SetTo(0, task.noDepthMask(task.rcD.rect))
@@ -231,26 +270,6 @@ Namespace VBClasses
                 Next
             End If
             dst3 = plot.dst2
-        End Sub
-    End Class
-
-
-
-
-
-
-    Public Class NR_RedList_EdgesZ : Inherits TaskParent
-        Dim reduction As New Reduction_Basics
-        Dim edgesZ As New RedPrep_EdgesZ
-        Public Sub New()
-            desc = "Add the depth edges in Z to the color image."
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            reduction.Run(src)
-
-            edgesZ.Run(reduction.dst3)
-
-            dst2 = runRedList(edgesZ.dst2, labels(2))
         End Sub
     End Class
 End Namespace

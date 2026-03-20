@@ -181,56 +181,6 @@ Namespace VBClasses
 
 
 
-    Public Class RedMask_Flippers : Inherits TaskParent
-        Public flipCells As New List(Of rcData)
-        Public nonFlipCells As New List(Of rcData)
-        Dim redMask As New RedMask_Basics
-        Public Sub New()
-            labels(3) = "Highlighted below are the cells which flipped in color from the previous frame."
-            desc = "Identify the cells that are changing color because they were split or lost."
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            dst3 = runRedList(src, labels(3))
-            redMask.Run(src)
-            dst3 = redMask.dst2
-            labels(3) = redMask.labels(2)
-
-            Static lastMap As cv.Mat = RedMask_List.DisplayCells(redMask.mdList)
-
-            Dim unMatched As Integer
-            Dim unMatchedPixels As Integer
-            flipCells.Clear()
-            nonFlipCells.Clear()
-            dst2.SetTo(0)
-            Dim currMap = XO_RedList_Basics.DisplayCells()
-            For Each md In redMask.mdList
-                Dim rc = New rcData(md.mask, md.rect, md.index)
-
-                Dim lastColor = lastMap.Get(Of cv.Vec3b)(rc.maxDist.Y, rc.maxDist.X)
-                Dim currColor = currMap.Get(Of cv.Vec3b)(rc.maxDist.Y, rc.maxDist.X)
-                If lastColor <> currColor Then
-                    unMatched += 1
-                    unMatchedPixels += rc.pixels
-                    flipCells.Add(rc)
-                    dst2(rc.rect).SetTo(rc.color, rc.mask)
-                Else
-                    nonFlipCells.Add(rc)
-                End If
-            Next
-
-            lastMap = currMap.Clone
-
-            If task.heartBeat Then
-                labels(2) = CStr(unMatched) + " of " + CStr(redMask.mdList.Count) + " cells changed " +
-                        " tracking color, totaling " + CStr(unMatchedPixels) + " pixels."
-            End If
-        End Sub
-    End Class
-
-
-
-
-
     Public Class RedMask_List : Inherits TaskParent
         Public inputRemoved As cv.Mat
         Public cellGen As New RedMask_ToRedColor

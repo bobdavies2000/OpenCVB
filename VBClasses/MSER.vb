@@ -580,6 +580,7 @@ Namespace VBClasses
         Implements IDisposable
         Dim options As New Options_MSER
         Public classCount As Integer
+        Dim redC As New RedColor_Basics
         Public Sub New()
             OptionParent.FindCheckBox("Use grayscale input").Checked = False
             options.Run()
@@ -611,7 +612,9 @@ Namespace VBClasses
             labels(3) = CStr(classCount) + " regions identified"
 
             src.SetTo(white, dst3)
-            dst2 = runRedList(src, labels(2))
+            redC.Run(src)
+            dst2 = redC.dst2
+            labels(2) = redC.labels(2)
         End Sub
         Protected Overrides Sub Finalize()
             MSER_Close(cPtr)

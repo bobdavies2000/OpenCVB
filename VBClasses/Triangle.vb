@@ -86,13 +86,24 @@ Namespace VBClasses
 
     Public Class NR_Triangle_Cell : Inherits TaskParent
         Public triangles As New List(Of cv.Point3f)
+        Dim redC As New RedCloud_Basics
         Public Sub New()
+            If standalone Then task.gOptions.displayDst1.Checked = True
             labels = {"", "", "RedMask_List output", "Selected contour - each pixel has depth"}
             desc = "Given a contour, convert that contour to a series of triangles"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            dst2 = runRedList(src, labels(2))
-            If task.redList.rclist.Count <= 1 Then Exit Sub
+            redC.Run(src)
+            dst2 = redC.dst2
+            labels(2) = redC.labels(2)
+
+            strOut = RedUtil_Basics.selectCell(redC.rcMap, redC.rcList)
+            SetTrueText(strOut, 1)
+            If task.rcD Is Nothing Then
+                SetTrueText("Select any cell", 1)
+                Exit Sub
+            End If
+
             Dim rc = task.rcD
             If rc.index = 0 Then Exit Sub
 
@@ -139,14 +150,25 @@ Namespace VBClasses
 
     Public Class NR_Triangle_Mask : Inherits TaskParent
         Public triangles As New List(Of cv.Point3f)
+        Dim redC As New RedCloud_Basics
         Public Sub New()
+            If standalone Then task.gOptions.displayDst1.Checked = True
             labels = {"", "", "RedMask_List output", "Selected rc.mask - each pixel has depth. Red dot is maxDist."}
             desc = "Given a RedCloud cell, resize it and show the points with depth."
         End Sub
 
         Public Overrides Sub RunAlg(src As cv.Mat)
-            dst2 = runRedList(src, labels(2))
-            If task.redList.rclist.Count <= 1 Then Exit Sub
+            redC.Run(src)
+            dst2 = redC.dst2
+            labels(2) = redC.labels(2)
+
+            strOut = RedUtil_Basics.selectCell(redC.rcMap, redC.rcList)
+            SetTrueText(strOut, 1)
+            If task.rcD Is Nothing Then
+                SetTrueText("Select any cell", 1)
+                Exit Sub
+            End If
+
             Dim rc = task.rcD
             If rc.index = 0 Then Exit Sub
 
@@ -179,7 +201,6 @@ Namespace VBClasses
             Dim newMaxDist = New cv.Point2f(xFactor * (rc.maxDist.X - rc.rect.X) / rc.rect.Width,
                                       yFactor * (rc.maxDist.Y - rc.rect.Y) / rc.rect.Height)
             DrawCircle(dst3, newMaxDist, task.DotSize + 2, cv.Scalar.Red)
-            labels(2) = task.redList.labels(2)
         End Sub
     End Class
 

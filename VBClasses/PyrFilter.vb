@@ -21,7 +21,9 @@ Namespace VBClasses
     Public Class NR_PyrFilter_RedCloud : Inherits TaskParent
         Dim reduction As New Reduction_Basics
         Dim pyr As New PyrFilter_Basics
+        Dim redC As New RedCloud_Basics
         Public Sub New()
+            If standalone Then task.gOptions.displayDst1.Checked = True
             labels = {"", "", "RedMask_List output", "PyrFilter output before reduction"}
             desc = "Use RedColor to segment the output of PyrFilter"
         End Sub
@@ -31,7 +33,12 @@ Namespace VBClasses
 
             reduction.Run(dst3)
 
-            dst2 = runRedList(reduction.dst2, labels(2))
+            redC.Run(reduction.dst2)
+            dst2 = redC.dst2
+            labels(2) = redC.labels(2)
+
+            strOut = RedUtil_Basics.selectCell(redC.rcMap, redC.rcList)
+            SetTrueText(strOut, 1)
         End Sub
     End Class
 End Namespace
