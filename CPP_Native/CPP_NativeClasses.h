@@ -400,7 +400,7 @@ public:
         result = Mat(src.rows + 2, src.cols + 2, CV_8U);
         result.setTo(0);
 
-        multimap<int, Point, greater<int>> sizeSorted;
+        multimap<int, Point, less_equal<int>> sizeSorted;
         int floodFlag = 4 | FLOODFILL_MASK_ONLY | FLOODFILL_FIXED_RANGE;
         Point pt;
         for (int y = 0; y < src.rows; y++)

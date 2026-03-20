@@ -129,25 +129,25 @@ Namespace VBClasses
             dst2 = runRedList(src, labels(2))
 
             SetTrueText("Review the Neighbor_Precise algorithm")
-            'nabs.oldrclist = task.redList.oldrclist
+            'nabs.oldrclist = task.redList.rcList
             'nabs.Run(task.redList.rcMap)
 
             'Dim trainList As New List(Of cv.Scalar)
             'Dim responseList As New List(Of Integer)
-            'For Each rc In task.redList.oldrclist
+            'For Each rc In task.redList.rcList
             '    trainList.Add(rc.depth)
             '    responseList.Add(0)
             'Next
 
             'dst1.SetTo(0)
-            'For Each index In nabs.nabList(task.oldrcD.index)
-            '    Dim rc = task.redList.oldrclist(index)
+            'For Each index In nabs.nabList(task.rcD.index)
+            '    Dim rc = task.redList.rcList(index)
             '    dst1(rc.rect).SetTo(255, rc.mask)
             '    strOut += CStr(index) + ","
             '    responseList(index) = -1
             'Next
 
-            'responseList(task.oldrcD.index) = 1
+            'responseList(task.rcD.index) = 1
 
             'Dim queryList As New List(Of cv.Scalar)
             'Dim maskList As New List(Of Integer)
@@ -181,7 +181,7 @@ Namespace VBClasses
             'Dim zeroOutput As Boolean = True
             'For i = 0 To maskList.Count - 1
             '    If results(i) > 0 Then
-            '        Dim rc = task.redList.oldrclist(maskList(i))
+            '        Dim rc = task.redList.rcList(maskList(i))
             '        dst3(rc.rect).SetTo(rc.color, rc.mask)
             '        zeroOutput = False
             '    End If

@@ -36,7 +36,7 @@ Namespace VBClasses
             If standalone Then
                 Swarm_Flood.oldSelectCell()
                 dst3.SetTo(0)
-                For Each index In task.oldrcD.nabs
+                For Each index In task.rcD.nabs
                     If index < redC.rcList.Count Then
                         DrawCircle(dst2, redC.rcList(index).maxDist, task.DotSize, task.highlight)
                     End If

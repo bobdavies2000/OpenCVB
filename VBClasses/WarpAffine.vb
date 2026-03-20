@@ -153,7 +153,7 @@ Namespace VBClasses
 
     ' https://docs.opencvb.org/3.0-beta/doc/py_tutorials/py_imgproc/py_geometric_transformations/py_geometric_transformations.html
     Public Class NR_WarpAffine_3Points : Inherits TaskParent
-        Dim triangle As New FindTriangle_Basics
+        Dim triangle As New Triangle_Find
         Dim M As New cv.Mat
         Public Sub New()
             desc = "Use 3 non-colinear points to build an affine transform and apply it to the color image."

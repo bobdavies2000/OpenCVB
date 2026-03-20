@@ -12,7 +12,7 @@ Namespace VBClasses
             dSpec.Run(src)
             gSpec.Run(src)
 
-            If task.heartBeat And task.oldrcD.index > 0 Then
+            If task.heartBeat And task.rcD.index > 0 Then
                 strOut = dSpec.strOut + vbCrLf + vbCrLf
                 strOut += gSpec.strOut
             End If
@@ -37,8 +37,8 @@ Namespace VBClasses
 
             If standaloneTest() Then dst2 = runRedList(src, labels(2))
 
-            If task.heartBeat And task.oldrcD.index > 0 Then
-                Dim ranges = options.buildDepthRanges(task.pcSplit(0)(task.oldrcD.rect).Clone, " pointcloud X ")
+            If task.heartBeat And task.rcD.index > 0 Then
+                Dim ranges = options.buildDepthRanges(task.pcSplit(0)(task.rcD.rect).Clone, " pointcloud X ")
                 strOut = options.strOut
             End If
             SetTrueText(strOut, 3)
@@ -61,8 +61,8 @@ Namespace VBClasses
 
             If standaloneTest() Then dst2 = runRedList(src, labels(2))
 
-            If task.heartBeat And task.oldrcD.index > 0 Then
-                Dim ranges = options.buildDepthRanges(task.pcSplit(1)(task.oldrcD.rect).Clone, " pointcloud Y ")
+            If task.heartBeat And task.rcD.index > 0 Then
+                Dim ranges = options.buildDepthRanges(task.pcSplit(1)(task.rcD.rect).Clone, " pointcloud Y ")
                 strOut = options.strOut
             End If
             SetTrueText(strOut, 3)
@@ -84,8 +84,8 @@ Namespace VBClasses
             options.Run()
             If standaloneTest() Then dst2 = runRedList(src, labels(2))
 
-            If task.heartBeat And task.oldrcD.index > 0 Then
-                Dim ranges = options.buildDepthRanges(task.pcSplit(2)(task.oldrcD.rect).Clone, " pointcloud Z ")
+            If task.heartBeat And task.rcD.index > 0 Then
+                Dim ranges = options.buildDepthRanges(task.pcSplit(2)(task.rcD.rect).Clone, " pointcloud Z ")
                 strOut = options.strOut
             End If
             SetTrueText(strOut, 3)
@@ -199,7 +199,7 @@ Namespace VBClasses
         Dim breakdown As New Spectrum_Breakdown
         Public Sub New()
             labels = {"", "Cell trimming information", "", "White is after trimming, gray is before trim, black is outside the cell mask."}
-            If standaloneTest() Then task.gOptions.displaydst1.checked = True
+            If standaloneTest() Then task.gOptions.displayDst1.Checked = True
             desc = "Zoom in on the selected RedCloud cell before and after Spectrum filtering."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -240,9 +240,10 @@ Namespace VBClasses
                 dst2 = runRedList(src, labels(2))
             End If
 
-            Dim rc = task.oldrcD
+            Dim rc = task.rcD
             Dim ranges As List(Of rangeData), input As cv.Mat
-            If rc.depthPixels / rc.pixels < 0.5 Then
+            Dim depthPixels = task.depthmask(rc.rect).CountNonZero
+            If depthPixels / rc.pixels < 0.5 Then
                 input = New cv.Mat(rc.mask.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
                 src(rc.rect).CopyTo(input, rc.mask)
                 input = input.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
@@ -285,7 +286,7 @@ Namespace VBClasses
             End If
 
             rc.mask = rc.mask.Threshold(0, 255, cv.ThresholdTypes.Binary)
-            task.oldrcD = rc
+            task.rcD = rc
         End Sub
     End Class
 
@@ -298,21 +299,22 @@ Namespace VBClasses
 
     Public Class NR_Spectrum_RedCloud : Inherits TaskParent
         Dim breakdown As New Spectrum_Breakdown
+        Dim redC As New RedColor_Basics
         Public Sub New()
-            desc = "Breakdown each cell in oldrclist."
+            desc = "Breakdown each cell in rclist."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             breakdown.options.Run()
-            dst2 = runRedList(src, labels(2))
+
+            redC.Run(src)
+            dst2 = redC.dst2
+            labels(2) = redC.labels(2)
 
             dst3.SetTo(0)
-            For i = 0 To task.redList.oldrclist.Count - 1
-                task.oldrcD = task.redList.oldrclist(i)
+            For Each task.rcD In redC.rcList
                 breakdown.Run(src)
-                task.redList.oldrclist(i) = task.oldrcD
-                dst3(task.oldrcD.rect).SetTo(task.oldrcD.color, task.oldrcD.mask)
+                dst3(task.rcD.rect).SetTo(task.rcD.color, task.rcD.mask)
             Next
-            breakdown.Run(src)
         End Sub
     End Class
 
@@ -355,7 +357,7 @@ Namespace VBClasses
 
             dst2 = runRedList(src, labels(2))
 
-            Dim input = src(task.oldrcD.rect)
+            Dim input = src(task.rcD.rect)
             If input.Type <> cv.MatType.CV_8U Then input = input.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
             Dim ranges = options.buildColorRanges(input, typeSpec)
             strOut = options.strOut

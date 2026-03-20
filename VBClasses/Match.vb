@@ -366,10 +366,10 @@ Namespace VBClasses
             dst0.SetTo(0)
             Dim points As New List(Of cv.Point)
 
-            For Each rc In task.redList.oldrclist
+            For Each rc In task.redList.rclist
                 dst0.Set(Of Byte)(rc.maxDist.Y, rc.maxDist.X, 1)
             Next
-            labels(2) = CStr(task.redList.oldrclist.Count) + " cells added"
+            labels(2) = CStr(task.redList.rclist.Count) + " cells added"
 
             frameList.Add(dst0.Clone)
             If frameList.Count >= task.frameHistoryCount Then

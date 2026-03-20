@@ -21,7 +21,7 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
 
-            Dim hullList = task.oldrcD.contour
+            Dim hullList = task.rcD.contour
             If standaloneTest() Then
                 If Not task.heartBeat Then Exit Sub
                 hullList = buildRandomHullPoints()
@@ -59,12 +59,12 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             dst2 = runRedList(src, labels(2))
-            If task.oldrcD.contour IsNot Nothing Then
+            If task.rcD.contour IsNot Nothing Then
                 convex.Run(src)
 
                 dst3.SetTo(0)
-                dst3(task.oldrcD.rect) = convex.dst2(New cv.Rect(0, 0, task.oldrcD.rect.Width, task.oldrcD.rect.Height))
-                DrawCircle(dst3, task.oldrcD.maxDist, task.DotSize, white)
+                dst3(task.rcD.rect) = convex.dst2(New cv.Rect(0, 0, task.rcD.rect.Width, task.rcD.rect.Height))
+                DrawCircle(dst3, task.rcD.maxDist, task.DotSize, white)
             End If
         End Sub
     End Class
@@ -143,7 +143,7 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             dst1 = runRedList(src, labels(1))
 
-            Dim rc = task.oldrcD
+            Dim rc = task.rcD
             If rc.mask Is Nothing Then Exit Sub
 
             Dim sz = New cv.Size(dst2.Height * rc.mask.Width / rc.mask.Height, dst2.Height)

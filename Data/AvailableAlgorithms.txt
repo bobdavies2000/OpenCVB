@@ -254,7 +254,6 @@ Filter_BasicsGray
 FindMinRect_Basics
 FindNonZero_Basics
 FindNonZero_Line3D
-FindTriangle_Basics
 FitEllipse_Basics
 FitLine_Basics
 FitLine_Conventional
@@ -1542,6 +1541,7 @@ RedList_Color
 RedList_CPP
 RedMask_Basics
 RedMask_Color
+RedMask_Flippers
 RedMask_List
 RedMask_ToRedColor
 RedPrep_Basics
@@ -1623,6 +1623,7 @@ Threshold_Definitions
 Track_Basics
 Track_BasicsQT
 Triangle_Basics
+Triangle_Find
 Triangle_HullContour
 Video_Basics
 Video_MinRect

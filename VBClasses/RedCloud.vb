@@ -463,9 +463,6 @@ Namespace VBClasses
             options.Run()
 
             If src.Channels <> 1 Then
-                'Static prepEdges As New RedPrep_Basics
-                'prepEdges.Run(src)
-                'src = prepEdges.dst2.Clone
                 Static prepData As New RedPrep_Basics
                 prepData.Run(src)
                 dst1 = prepData.dst1

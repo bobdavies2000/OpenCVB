@@ -77,7 +77,7 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             If standaloneTest() Or runRedCflag Then dst2 = runRedList(src, labels(2))
 
-            Dim rc = task.oldrcD
+            Dim rc = task.rcD
             Dim inputPoints As New List(Of cv.Point3f)
             For Each pt In rc.contour
                 Dim vec = task.pointCloud(rc.rect).Get(Of cv.Point3f)(pt.Y, pt.X)
@@ -116,8 +116,9 @@ Namespace VBClasses
             dst2 = pca.dst2
             labels(2) = pca.labels(2)
 
-            Dim rc = task.oldrcD
-            If rc.mmZ.maxVal > 0 Then
+            Dim rc = task.rcD
+            Dim mmZ = GetMinMax(task.pcSplit(2)(rc.rect), rc.mask)
+            If mmZ.maxVal > 0 Then
                 pcaPrep.Run(task.pointCloud(rc.rect).Clone)
 
                 If pcaPrep.inputData.Rows > 0 Then

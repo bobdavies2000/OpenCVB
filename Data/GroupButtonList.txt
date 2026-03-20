@@ -68,7 +68,6 @@ FeatureLess
 Filter
 FindMinRect
 FindNonZero
-FindTriangle
 FitEllipse
 FitLine
 Flood

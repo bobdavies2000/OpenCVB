@@ -354,7 +354,7 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             sides.Run(src)
             dst2 = sides.dst2
-            Dim rc = task.oldrcD
+            Dim rc = task.rcD
 
             If sides.corners.Count > 0 And task.heartBeat Then
                 ptLeft = sides.corners(1)
@@ -482,14 +482,14 @@ Namespace VBClasses
 
             dst2 = runRedList(src, labels(2))
 
-            Dim tmp = task.oldrcD.mask.Clone
+            Dim tmp = task.rcD.mask.Clone
 
             Dim allContours As cv.Point()() = Nothing
             If options.retrievalMode = cv.RetrievalModes.FloodFill Then tmp.ConvertTo(tmp, cv.MatType.CV_32SC1)
             cv.Cv2.FindContours(tmp, allContours, Nothing, options.retrievalMode, options.ApproximationMode)
 
             dst3.SetTo(0)
-            cv.Cv2.DrawContours(dst3(task.oldrcD.rect), allContours, -1, cv.Scalar.Yellow)
+            cv.Cv2.DrawContours(dst3(task.rcD.rect), allContours, -1, cv.Scalar.Yellow)
         End Sub
     End Class
 
@@ -508,7 +508,7 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             dst2 = runRedList(src, labels(2))
 
-            Dim rc = task.oldrcD
+            Dim rc = task.rcD
 
             dst1.SetTo(0)
             dst3.SetTo(0)

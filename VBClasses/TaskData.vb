@@ -80,7 +80,7 @@ Namespace VBClasses
 
         ' task algorithms - operate on every frame regardless of which algorithm is being run.
         Public colorizer As DepthColorizer_Basics
-        Public redList As XO_RedList_Basics
+        Public redList As RedMask_List
         Public redListNew As RedMask_List
         Public gravityMatrix As IMU_GMatrix
         Public lines As Line_Basics
@@ -113,8 +113,7 @@ Namespace VBClasses
         Public fpMap As New cv.Mat ' feature map
 
         Public brickD As brickData ' the currently selected gRect
-        Public rcD As New rcData ' the currently selected redCloud Cell
-        Public oldrcD As New oldrcData ' the currently selected redColor Cell
+        Public rcD As New rcData ' the currently selected redColor Cell
         Public lpD As New lpData ' the currently selected line pair
         Public fpD As New fpData ' the currently selected feature point.
         Public contourD As New contourData ' the currently selected contour

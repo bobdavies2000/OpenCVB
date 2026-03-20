@@ -534,21 +534,23 @@ Namespace VBClasses
         Public Class rcData
             Public age As Integer = 1
             Public color As cv.Scalar
+            Public colorChange As Integer ' 0 no change, 1 , 
             Public contour As List(Of cv.Point)
-            Public wcMean As cv.Scalar
+            Public contour3D As New List(Of cv.Point3f) ' here for compatibility.
             Public depthDelta As Single
+            Public eq As cv.Vec4f ' only here for compatibility
+            Public gridIndex As Integer
             Public hull As List(Of cv.Point)
             Public index As Integer
             Public indexLast As Integer ' only here for compatibility
-            Public gridIndex As Integer
             Public mask As cv.Mat
             Public maxDist As cv.Point
             Public multiMask As Boolean ' indicates if RedWGrid found duplicate wGrid points in the rclist.
+            Public nabs As New List(Of Integer) ' here for compatibility.
             Public pixels As Integer
             Public rect As cv.Rect
             Public wGrid As cv.Point3d
-            Public colorChange As Integer ' 0 no change, 1 , 
-            Public eq As cv.Vec4f ' only here for compatibility
+            Public wcMean As cv.Scalar
             Public Sub New()
             End Sub
             Public Sub New(_mask As cv.Mat, _rect As cv.Rect, _index As Integer,

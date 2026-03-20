@@ -33,6 +33,7 @@ Namespace VBClasses
 
     Public Class NR_RedList_FourColor : Inherits TaskParent
         Dim binar4 As New Bin4Way_Regions
+        Dim redC As New RedColor_Basics
         Public Sub New()
             labels(3) = "A 4-way split of the input grayscale image based on brightness"
             desc = "Use RedCloud on a 4-way split based on light to dark in the image."
@@ -41,7 +42,9 @@ Namespace VBClasses
             binar4.Run(src)
             dst3 = Palettize(binar4.dst2)
 
-            dst2 = runRedList(binar4.dst2, labels(2))
+            redC.Run(binar4.dst2)
+            dst2 = redC.dst2
+            labels(2) = redC.labels(2)
         End Sub
     End Class
 
@@ -55,7 +58,7 @@ Namespace VBClasses
 
     Public Class NR_RedList_Hue : Inherits TaskParent
         Dim hue As New Color8U_Hue
-        Dim redMask As New RedMask_Basics
+        Dim redC As New RedColor_Basics
         Public Sub New()
             labels(3) = "Mask of the areas with Hue"
             desc = "Run RedCloud on just the red hue regions."
@@ -64,7 +67,6 @@ Namespace VBClasses
             hue.Run(src)
             dst3 = hue.dst2
 
-            redMask.input
             src.SetTo(0, Not dst3)
             redC.Run(src)
             dst2 = redC.dst2
@@ -131,7 +133,7 @@ Namespace VBClasses
 
             dst2 = runRedList(src, labels(2))
 
-            Dim rc = task.oldrcD
+            Dim rc = task.rcD
 
             dst0 = task.color
             Dim correlationMat As New cv.Mat, correlationXtoZ As Single, correlationYtoZ As Single
@@ -142,9 +144,9 @@ Namespace VBClasses
                     dst2.Circle(pt, task.DotSize, task.highlight, -1, cv.LineTypes.AntiAlias)
                     labels(3) = "maxDist Is at (" + CStr(pt.X) + ", " + CStr(pt.Y) + ")"
                 Case 1
-                    dst3(rc.rect).SetTo(vbNearFar((rc.depth) / task.MaxZmeters), rc.mask)
+                    dst3(rc.rect).SetTo(vbNearFar((rc.wcMean(2)) / task.MaxZmeters), rc.mask)
                     labels(3) = "rc.depth Is highlighted in dst2"
-                    labels(3) = "Mean depth for the cell Is " + Format(rc.depth, fmt3)
+                    labels(3) = "Mean depth for the cell Is " + Format(rc.wcMean(2), fmt3)
                 Case 2
                     cv.Cv2.MatchTemplate(task.pcSplit(0)(rc.rect), task.pcSplit(2)(rc.rect), correlationMat, cv.TemplateMatchModes.CCoeffNormed, rc.mask)
                     correlationXtoZ = correlationMat.Get(Of Single)(0, 0)
@@ -181,8 +183,8 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             dst2 = runRedList(src, labels(2))
             If task.heartBeat Then
-                Dim depth As cv.Mat = task.pcSplit(2)(task.oldrcD.rect)
-                depth.SetTo(0, task.noDepthMask(task.oldrcD.rect))
+                Dim depth As cv.Mat = task.pcSplit(2)(task.rcD.rect)
+                depth.SetTo(0, task.noDepthMask(task.rcD.rect))
                 plot.minRange = 0
                 plot.maxRange = task.MaxZmeters
                 plot.Run(depth)

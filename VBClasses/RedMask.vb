@@ -16,8 +16,8 @@ Namespace VBClasses
             dst1.GetArray(Of Byte)(inputData)
             Dim handleInput = GCHandle.Alloc(inputData, GCHandleType.Pinned)
 
-            Dim imagePtr = RedMask_Run(cPtr, handleInput.AddrOfPinnedObject(), dst1.Rows, dst1.Cols,
-                                       dst2.Total * 0.001)
+            Dim minSize As Integer = dst2.Total * 0.001
+            Dim imagePtr = RedMask_Run(cPtr, handleInput.AddrOfPinnedObject(), dst1.Rows, dst1.Cols, minSize)
             handleInput.Free()
             dst2 = cv.Mat.FromPixelData(dst1.Rows + 2, dst1.Cols + 2, cv.MatType.CV_8U, imagePtr).Clone
             dst2 = dst2(New cv.Rect(1, 1, dst2.Width - 2, dst2.Height - 2))
@@ -36,13 +36,12 @@ Namespace VBClasses
                 Dim md As New maskData
                 md.rect = rectlist(i)
                 If md.rect.Size = dst2.Size Then Continue For
-                If md.rect.Width * md.rect.Height < dst2.Total * 0.001 Then Continue For
                 md.mask = dst2(md.rect).InRange(i + 1, i + 1)
                 md.contour = ContourBuild(md.mask)
                 DrawTour(md.mask, md.contour, 255, -1)
                 md.pixels = md.mask.CountNonZero
                 md.maxDist = Distance_Basics.GetMaxDist(md)
-                md.mm = vbc.GetMinMax(task.pcSplit(2)(md.rect), task.depthmask(md.rect))
+                md.mm = GetMinMax(task.pcSplit(2)(md.rect), task.depthmask(md.rect))
                 md.index = mdList.Count
                 mdList.Add(md)
             Next
@@ -80,46 +79,6 @@ Namespace VBClasses
                 dst2(md.rect).SetTo(color, md.mask)
             Next
             labels(2) = redMask.labels(2)
-        End Sub
-    End Class
-
-
-
-
-    Public Class RedMask_List : Inherits TaskParent
-        Public inputRemoved As cv.Mat
-        Public cellGen As New RedMask_ToRedColor
-        Public redMask As New RedMask_Basics
-        Public contours As New Contour_Basics
-        Public Sub New()
-            desc = "Find cells and then match them to the previous generation with minimum boundary"
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            contours.Run(src)
-            If src.Type <> cv.MatType.CV_8U Then
-                If standalone And task.fOptions.Color8USource.SelectedItem = "EdgeLine_Basics" Then
-                    dst1 = contours.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-                Else
-                    dst1 = Mat_Basics.srcMustBe8U(src)
-                End If
-            Else
-                dst1 = src
-            End If
-
-            If inputRemoved IsNot Nothing Then dst1.SetTo(0, inputRemoved)
-            redMask.Run(dst1)
-
-            If redMask.mdList.Count = 0 Then Exit Sub ' no data to process.
-            cellGen.mdList = redMask.mdList
-            cellGen.Run(redMask.dst2)
-
-            dst2 = redMask.dst3
-
-            For Each md In cellGen.mdList
-                dst2.Circle(md.maxDist, task.DotSize, task.highlight, -1)
-            Next
-
-            labels(2) = cellGen.labels(2)
         End Sub
     End Class
 
@@ -214,6 +173,115 @@ Namespace VBClasses
                 strOut = RedUtil_Basics.selectCell(rcMap, rcList)
                 SetTrueText(strOut, 3)
             End If
+        End Sub
+    End Class
+
+
+
+
+
+
+    Public Class RedMask_Flippers : Inherits TaskParent
+        Public flipCells As New List(Of rcData)
+        Public nonFlipCells As New List(Of rcData)
+        Dim redMask As New RedMask_Basics
+        Public Sub New()
+            labels(3) = "Highlighted below are the cells which flipped in color from the previous frame."
+            desc = "Identify the cells that are changing color because they were split or lost."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            dst3 = runRedList(src, labels(3))
+            redMask.Run(src)
+            dst3 = redMask.dst2
+            labels(3) = redMask.labels(2)
+
+            Static lastMap As cv.Mat = RedMask_List.DisplayCells(redMask.mdList)
+
+            Dim unMatched As Integer
+            Dim unMatchedPixels As Integer
+            flipCells.Clear()
+            nonFlipCells.Clear()
+            dst2.SetTo(0)
+            Dim currMap = XO_RedList_Basics.DisplayCells()
+            For Each md In redMask.mdList
+                Dim rc = New rcData(md.mask, md.rect, md.index)
+
+                Dim lastColor = lastMap.Get(Of cv.Vec3b)(rc.maxDist.Y, rc.maxDist.X)
+                Dim currColor = currMap.Get(Of cv.Vec3b)(rc.maxDist.Y, rc.maxDist.X)
+                If lastColor <> currColor Then
+                    unMatched += 1
+                    unMatchedPixels += rc.pixels
+                    flipCells.Add(rc)
+                    dst2(rc.rect).SetTo(rc.color, rc.mask)
+                Else
+                    nonFlipCells.Add(rc)
+                End If
+            Next
+
+            lastMap = currMap.Clone
+
+            If task.heartBeat Then
+                labels(2) = CStr(unMatched) + " of " + CStr(redMask.mdList.Count) + " cells changed " +
+                        " tracking color, totaling " + CStr(unMatchedPixels) + " pixels."
+            End If
+        End Sub
+    End Class
+
+
+
+
+
+    Public Class RedMask_List : Inherits TaskParent
+        Public inputRemoved As cv.Mat
+        Public cellGen As New RedMask_ToRedColor
+        Public redMask As New RedMask_Basics
+        Public contours As New Contour_Basics
+        Public rcMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        Public rclist As New List(Of rcData)
+        Public Sub New()
+            task.gOptions.displayDst1.Checked = True
+            desc = "Find cells and then match them to the previous generation with minimum boundary"
+        End Sub
+        Public Shared Function DisplayCells(mdList As List(Of maskData)) As cv.Mat
+            Dim dst As New cv.Mat(task.workRes, cv.MatType.CV_8UC3, 0)
+
+            For Each md In mdList
+                dst(md.rect).SetTo(task.scalarColors(md.index Mod 255), md.mask)
+            Next
+
+            Return dst
+        End Function
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            contours.Run(src)
+            If src.Type <> cv.MatType.CV_8U Then
+                If standalone And task.fOptions.Color8USource.SelectedItem = "EdgeLine_Basics" Then
+                    dst1 = contours.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+                Else
+                    dst1 = Mat_Basics.srcMustBe8U(src)
+                End If
+            Else
+                dst1 = src
+            End If
+
+            If inputRemoved IsNot Nothing Then dst1.SetTo(0, inputRemoved)
+            redMask.Run(dst1)
+            dst2 = redMask.dst3
+            labels(2) = redMask.labels(3)
+
+            If redMask.mdList.Count = 0 Then Exit Sub ' no data to process.
+            rcMap.SetTo(0)
+            rclist.Clear()
+            For Each md In redMask.mdList
+                Dim rc = New rcData(md.mask, md.rect, md.index)
+                rc.index = rclist.Count + 1
+                rclist.Add(rc)
+                rcMap(rc.rect).SetTo(rc.index, rc.mask)
+            Next
+
+            dst3 = Palettize(rcMap)
+
+            strOut = RedUtil_Basics.selectCell(rcMap, rclist)
+            SetTrueText(strOut, 1)
         End Sub
     End Class
 End Namespace

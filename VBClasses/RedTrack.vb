@@ -14,7 +14,7 @@ Namespace VBClasses
             dst2.SetTo(0)
             For Each rc As rcData In redC.rcList
                 DrawTour(dst2(rc.rect), rc.contour, rc.color, -1)
-                If rc.index = task.oldrcD.index Then DrawTour(dst2(rc.rect), rc.contour, white, -1)
+                If rc.index = task.rcD.index Then DrawTour(dst2(rc.rect), rc.contour, white, -1)
             Next
         End Sub
     End Class

@@ -1,3 +1,4 @@
+Imports System.Windows.Documents
 Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Class Profile_Basics : Inherits TaskParent
@@ -9,16 +10,25 @@ Namespace VBClasses
         Public corners3D As New List(Of cv.Point3f)
         Public corners As New List(Of cv.Point)
         Public cornersRaw As New List(Of cv.Point)
+        Dim redC As New RedCloud_Basics
         Public Sub New()
+            If standalone Then task.gOptions.displayDst1.Checked = True
             desc = "Find the left/right, top/bottom, and near/far sides of a cell"
         End Sub
         Private Function point3fToString(v As cv.Point3f) As String
             Return Format(v.X, fmt3) + vbTab + Format(v.Y, fmt3) + vbTab + Format(v.Z, fmt3)
         End Function
         Public Overrides Sub RunAlg(src As cv.Mat)
-            dst2 = runRedList(src, labels(2))
-            Dim rc = task.oldrcD
-            If rc.depthPixels = 0 Then
+            redC.Run(src)
+            dst2 = redC.dst2
+            labels(2) = redC.labels(2)
+
+            Dim cellinfo = RedUtil_Basics.selectCell(redC.rcMap, redC.rcList)
+            SetTrueText(cellinfo, 1)
+
+            Dim rc = task.rcD
+            Dim depthPixels = task.depthmask(rc.rect).CountNonZero
+            If depthPixels = 0 Then
                 strOut = "There is no depth data for that cell."
                 Exit Sub
             End If
@@ -143,7 +153,7 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             sides.Run(src)
             dst2 = sides.dst2
-            Dim rc = task.oldrcD
+            Dim rc = task.rcD
 
             Dim offset As Integer = 30
             Dim rsizeX = (dst2.Width - offset * 2) / rc.rect.Width
@@ -158,7 +168,8 @@ Namespace VBClasses
                     Dim pt = rc.contour(i)
                     Dim vec = task.pointCloud(rc.rect).Get(Of cv.Point3f)(pt.Y, pt.X)
                     pt = New cv.Point(pt.X * rsizeX + offset, pt.Y * rsizeY + offset)
-                    Dim t = If(rc.mmZ.maxVal = 0, 0, (vec.Z - rc.mmZ.minVal) / (rc.mmZ.maxVal - rc.mmZ.minVal))
+                    Dim mmZ = GetMinMax(task.pcSplit(2)(rc.rect), rc.mask)
+                    Dim t = If(mmZ.maxVal = 0, 0, (vec.Z - mmZ.minVal) / (mmZ.maxVal - mmZ.minVal))
                     If vec.Z > 0 And t > 0 Then
                         Dim b = ((1 - t) * near(0) + t * far(0))
                         Dim g = ((1 - t) * near(1) + t * far(1))
@@ -243,7 +254,7 @@ Namespace VBClasses
 
             sides.Run(src)
             dst2 = sides.dst2
-            Dim rc = task.oldrcD
+            Dim rc = task.rcD
             If rc.contour3D.Count = 0 Then
                 SetTrueText("The selected cell has no 3D data.  The 3D data can only be computed from cells with depth data.", 1)
                 Exit Sub
@@ -303,7 +314,7 @@ Namespace VBClasses
             sides.Run(src)
             dst1 = sides.dst2
             dst2 = sides.dst3
-            Dim rc = task.oldrcD
+            Dim rc = task.rcD
 
             If task.kalman.kInput.Count <> sides.corners.Count * 2 Then ReDim task.kalman.kInput(sides.corners.Count * 2 - 1)
             For i = 0 To sides.corners.Count - 1
