@@ -162,6 +162,7 @@ Namespace VBClasses
 
     ' https://github.com/brian-xu/FractalDimension/blob/master/FractalDimension.py
     Public Class NR_Fractal_Dimension : Inherits TaskParent
+        Dim redC As New RedCloud_Basics
         Public Sub New()
             dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
             labels = {"", "", "RedMask_List output - select any region.", "The selected region (as a square)"}
@@ -206,7 +207,17 @@ Namespace VBClasses
             Return d
         End Function
         Public Overrides Sub RunAlg(src As cv.Mat)
-            dst2 = runRedList(src, labels(2))
+            redC.Run(src)
+            dst2 = redC.dst2
+            labels(2) = redC.labels(2)
+
+            strOut = RedUtil_Basics.selectCell(redC.rcMap, redC.rcList)
+            SetTrueText(strOut, 3)
+            If task.rcD Is Nothing Then
+                SetTrueText("Select any cell", 3)
+                Exit Sub
+            End If
+
             dst3.SetTo(0)
 
             Static rect = New cv.Rect(0, 0, task.rcD.rect.Width, task.rcD.rect.Height)

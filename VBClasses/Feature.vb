@@ -487,13 +487,16 @@ Namespace VBClasses
 
     Public Class NR_Feature_RedCloud : Inherits TaskParent
         Dim feat As New Feature_General
+        Dim redC As New RedCloud_Basics
         Public Sub New()
             desc = "Show the feature points in the RedCloud output."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             feat.Run(src)
 
-            dst2 = runRedList(src, labels(2))
+            redC.Run(src)
+            dst2 = redC.dst2
+            labels(2) = redC.labels(2)
 
             For Each pt In task.featurePoints
                 DrawCircle(dst2, pt, task.DotSize, task.highlight)

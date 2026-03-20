@@ -614,7 +614,6 @@ NR_BrickPoint_FeatureLess
 NR_BrickPoint_Features
 NR_BrickPoint_Horizontal
 NR_BrickPoint_KNN
-NR_BrickPoint_MaskRedColor
 NR_BrickPoint_Plot
 NR_BrickPoint_PopulationSurvey
 NR_BrickPoint_TopRow

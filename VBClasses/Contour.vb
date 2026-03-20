@@ -474,13 +474,24 @@ Namespace VBClasses
 
     Public Class NR_Contour_Compare : Inherits TaskParent
         Public options As New Options_Contours
+        Dim redC As New RedCloud_Basics
         Public Sub New()
             desc = "Compare findContours options - ApproxSimple, ApproxNone, etc."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
 
-            dst2 = runRedList(src, labels(2))
+            redC.Run(src)
+            dst2 = redC.dst2
+            labels(2) = redC.labels(2)
+
+            strOut = RedUtil_Basics.selectCell(redC.rcMap, redC.rcList)
+            SetTrueText(strOut, 3)
+
+            If task.rcD Is Nothing Then
+                SetTrueText("Select any cell", 3)
+                Exit Sub
+            End If
 
             Dim tmp = task.rcD.mask.Clone
 
@@ -501,12 +512,22 @@ Namespace VBClasses
 
     Public Class NR_Contour_Smoothing : Inherits TaskParent
         Dim options As New Options_Contours2
+        Dim redC As New RedCloud_Basics
         Public Sub New()
             labels(3) = "The white outline is the truest contour while the red is the selected approximation."
             desc = "Compare contours of the selected cell. Cells are offset to help comparison."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            dst2 = runRedList(src, labels(2))
+            redC.Run(src)
+            dst2 = redC.dst2
+            labels(2) = redC.labels(2)
+            strOut = RedUtil_Basics.selectCell(redC.rcMap, redC.rcList)
+            SetTrueText(strOut, 3)
+
+            If task.rcD Is Nothing Then
+                SetTrueText("Select any cell", 3)
+                Exit Sub
+            End If
 
             Dim rc = task.rcD
 

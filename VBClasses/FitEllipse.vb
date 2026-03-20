@@ -132,12 +132,25 @@ Namespace VBClasses
 
     Public Class NR_FitEllipse_RedCloud : Inherits TaskParent
         Dim fitE As New FitEllipse_Basics
+        Dim redC As New RedCloud_Basics
         Public Sub New()
             desc = "Create an ellipse from a contour"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
+            SetTrueText(strOut, 3)
+
             If Not task.heartBeat Then Exit Sub
-            dst2 = runRedList(src, labels(2))
+
+            redC.Run(src)
+            dst2 = redC.dst2
+            labels(2) = redC.labels(2)
+
+            strOut = RedUtil_Basics.selectCell(redC.rcMap, redC.rcList)
+            SetTrueText(strOut, 3)
+            If task.rcD Is Nothing Then
+                SetTrueText("Select any cell", 3)
+                Exit Sub
+            End If
 
             If task.rcD.contour Is Nothing Then Exit Sub
             fitE.inputPoints.Clear()

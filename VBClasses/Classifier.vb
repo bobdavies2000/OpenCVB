@@ -118,15 +118,19 @@ Namespace VBClasses
     Public Class Classifier_BayesianTest : Inherits TaskParent
         Implements IDisposable
         'Dim nabs As New Neighbor_Precise
+        Dim redC As New RedCloud_Basics
         Public Sub New()
             dst1 = New cv.Mat(dst1.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
             labels = {"", "Mask of the neighbors to the selected cell", "RedMask_List output", "Classifier_Bayesian output"}
-            If standalone Then task.gOptions.displaydst1.checked = True
+            If standalone Then task.gOptions.displayDst1.Checked = True
             cPtr = Classifier_Bayesian_Open()
             desc = "Classify the neighbor cells to be similar to the selected cell or not."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            dst2 = runRedList(src, labels(2))
+            redC.Run(src)
+            dst2 = redC.dst2
+            labels(2) = redC.labels(2)
+
 
             SetTrueText("Review the Neighbor_Precise algorithm")
             'nabs.rcList = task.redList.rcList

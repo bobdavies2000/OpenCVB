@@ -92,7 +92,9 @@ Namespace VBClasses
 
     Public Class NR_Hist3D_RedCloud : Inherits TaskParent
         Dim hist3D As New Hist3D_Basics
+        Dim redC As New RedColor_Basics
         Public Sub New()
+            If standalone Then task.gOptions.displayDst1.Checked = True
             desc = "Run RedMask_List on the combined Hist3D color/cloud output."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -100,7 +102,12 @@ Namespace VBClasses
             dst2 = hist3D.dst3
             labels(2) = hist3D.labels(3)
 
-            dst3 = runRedList(hist3D.dst2, labels(3))
+            redC.Run(hist3D.dst2)
+            dst3 = redC.dst2
+            labels(3) = redC.labels(2)
+
+            strOut = RedUtil_Basics.selectCell(redC.rcMap, redC.rcList)
+            SetTrueText(strOut, 1)
         End Sub
     End Class
 

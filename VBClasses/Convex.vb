@@ -53,12 +53,23 @@ Namespace VBClasses
 
     Public Class NR_Convex_RedColor : Inherits TaskParent
         Dim convex As New Convex_Basics
+        Dim redC As New RedCloud_Basics
         Public Sub New()
             labels = {"", "", "Selected contour - line shows hull with white is contour.  Click to select another contour.", "RedCloud cells"}
             desc = "Get lots of odd shapes from the Convex_Basics output and use ConvexHull to simplify them."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            dst2 = runRedList(src, labels(2))
+            redC.Run(src)
+            dst2 = redC.dst2
+            labels(2) = redC.labels(2)
+
+            strOut = RedUtil_Basics.selectCell(redC.rcMap, redC.rcList)
+            SetTrueText(strOut, 3)
+            If task.rcD Is Nothing Then
+                SetTrueText("Select any cell", 3)
+                Exit Sub
+            End If
+
             If task.rcD.contour IsNot Nothing Then
                 convex.Run(src)
 
@@ -110,6 +121,7 @@ Namespace VBClasses
 
     Public Class Convex_RedColorDefects : Inherits TaskParent
         Dim contours As New Contour_Largest
+        Dim redC As New RedCloud_Basics
         Public Sub New()
             If standalone Then task.gOptions.displayDst1.Checked = True
             labels(2) = "Hull outline in yellow, red is hull with defects removed.  Select any cell in the upper right..."
@@ -141,7 +153,15 @@ Namespace VBClasses
             Return newC
         End Function
         Public Overrides Sub RunAlg(src As cv.Mat)
-            dst1 = runRedList(src, labels(1))
+            redC.Run(src)
+            dst1 = redC.dst2
+            labels(2) = redC.labels(2)
+
+            RedUtil_Basics.selectCell(redC.rcMap, redC.rcList)
+            If task.rcD Is Nothing Then
+                SetTrueText("Select any cell", 3)
+                Exit Sub
+            End If
 
             Dim rc = task.rcD
             If rc.mask Is Nothing Then Exit Sub

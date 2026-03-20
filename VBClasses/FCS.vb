@@ -450,13 +450,16 @@ Namespace VBClasses
 
     Public Class NR_FCS_RedCloud1 : Inherits TaskParent
         Dim fcs As New FCS_CreateList
+        Dim redC As New RedCloud_Basics
         Public Sub New()
             If standalone Then task.gOptions.displayDst1.Checked = True
             labels(1) = "Output of FCS_CreateList."
             desc = "Isolate FCS cells for each redCell."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            dst2 = runRedList(src, labels(2))
+            redC.Run(src)
+            dst2 = redC.dst2
+            labels(2) = redC.labels(2)
 
             fcs.Run(src)
             dst1 = fcs.dst2
