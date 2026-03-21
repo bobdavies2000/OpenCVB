@@ -27,9 +27,11 @@ Namespace VBClasses
                 hullList = buildRandomHullPoints()
             End If
 
-            If hullList.Count = 0 Then
-                SetTrueText("No points were provided.  Update hullList before running.")
-                Exit Sub
+            If hullList IsNot Nothing Then
+                If hullList.Count = 0 Then
+                    SetTrueText("No points were provided.  Update hullList before running.")
+                    Exit Sub
+                End If
             End If
 
             hull = cv.Cv2.ConvexHull(hullList.ToArray, True)
