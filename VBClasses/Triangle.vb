@@ -13,8 +13,6 @@ Namespace VBClasses
             dst2 = redC.dst2
             labels(2) = redC.labels(2)
 
-            strOut = RedUtil_Basics.selectCell(redC.rcMap, redC.rcList)
-
             dst3.SetTo(0)
             Dim pt3D As New List(Of cv.Point3f)
             For Each pt In task.rcD.contour
@@ -73,8 +71,6 @@ Namespace VBClasses
                     DrawCircle(dst1, pt, task.DotSize, cv.Scalar.Yellow)
                 Next
             End If
-
-            strOut = RedUtil_Basics.selectCell(hulls.rcMap, hulls.rclist)
         End Sub
     End Class
 
@@ -97,8 +93,7 @@ Namespace VBClasses
             dst2 = redC.dst2
             labels(2) = redC.labels(2)
 
-            strOut = RedUtil_Basics.selectCell(redC.rcMap, redC.rcList)
-            SetTrueText(strOut, 1)
+            SetTrueText(redC.strOut, 1)
             If task.rcD Is Nothing Then
                 SetTrueText("Select any cell", 1)
                 Exit Sub
@@ -162,8 +157,7 @@ Namespace VBClasses
             dst2 = redC.dst2
             labels(2) = redC.labels(2)
 
-            strOut = RedUtil_Basics.selectCell(redC.rcMap, redC.rcList)
-            SetTrueText(strOut, 1)
+            SetTrueText(redC.strOut, 1)
             If task.rcD Is Nothing Then
                 SetTrueText("Select any cell", 1)
                 Exit Sub

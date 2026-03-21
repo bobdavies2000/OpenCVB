@@ -167,6 +167,7 @@ Namespace VBClasses
         Dim options As New Options_MatchShapes
         Dim redC As New RedColor_Basics
         Public Sub New()
+            If standalone Then task.gOptions.displayDst1.Checked = True
             OptionParent.FindSlider("Match Threshold %").Value = 3
             labels = {"", "", "Output of RedMask_List", "All RedCloud cells that matched the selected cell with the current settings are below."}
             desc = "Find all RedCloud contours similar to the one selected.  Use sliders and radio buttons to see impact."
@@ -179,6 +180,11 @@ Namespace VBClasses
             labels(2) = redC.labels(2)
 
             If task.heartBeat Then dst3.SetTo(0)
+            SetTrueText(redC.strOut, 1)
+            If task.rcD Is Nothing Then
+                SetTrueText("Select any cell", 1)
+                Exit Sub
+            End If
 
             Dim rcX = task.rcD
 

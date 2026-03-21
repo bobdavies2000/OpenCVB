@@ -14,12 +14,19 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
 
-            redFlood.Run(Mat_Basics.srcMustBe8U(src))
+            redFlood.Run(Mat_Basics.srcMustBe8U(src) + 1)
             dst2 = redFlood.dst2
             labels(2) = redFlood.labels(2)
 
             rcMap = redFlood.rcMap.Clone
             rcList = New List(Of rcData)(redFlood.rcList)
+
+            strOut = RedUtil_Basics.selectCell(rcMap, rcList)
+            SetTrueText(strOut, 3)
+            If task.rcD Is Nothing Then
+                SetTrueText("Select any cell", 3)
+                Exit Sub
+            End If
         End Sub
     End Class
 
@@ -330,7 +337,6 @@ Namespace VBClasses
             labels(2) = cellGen.labels(2)
             labels(3) = ""
             SetTrueText("", newPoint, 1)
-            strOut = RedUtil_Basics.selectCell(rcMap, rclist)
         End Sub
     End Class
 End Namespace

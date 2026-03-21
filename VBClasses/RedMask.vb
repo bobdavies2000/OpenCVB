@@ -169,10 +169,7 @@ Namespace VBClasses
             rcList = New List(Of rcData)(sortedCells.Values)
             labels(2) = CStr(rcList.Count) + " total cells "
 
-            If standalone Then
-                strOut = RedUtil_Basics.selectCell(rcMap, rcList)
-                SetTrueText(strOut, 3)
-            End If
+            SetTrueText(redMask.strOut, 3)
         End Sub
     End Class
 

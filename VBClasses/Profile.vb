@@ -22,8 +22,7 @@ Namespace VBClasses
             dst2 = redC.dst2
             labels(2) = redC.labels(2)
 
-            Dim cellInfo = RedUtil_Basics.selectCell(redC.rcMap, redC.rcList)
-            SetTrueText(cellInfo, 1)
+            SetTrueText(redC.strOut, 1)
             If task.rcD Is Nothing Then
                 SetTrueText("Select any cell", 1)
                 Exit Sub

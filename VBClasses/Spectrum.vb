@@ -43,8 +43,7 @@ Namespace VBClasses
                 dst2 = redC.dst2
                 labels(2) = redC.labels(2)
 
-                Dim cellinfo = RedUtil_Basics.selectCell(redC.rcMap, redC.rcList)
-                SetTrueText(cellinfo, 1)
+                SetTrueText(redC.strOut, 1)
                 If task.rcD Is Nothing Then
                     SetTrueText("Select any cell", 1)
                     Exit Sub
@@ -80,8 +79,7 @@ Namespace VBClasses
                 dst2 = redC.dst2
                 labels(2) = redC.labels(2)
 
-                Dim cellinfo = RedUtil_Basics.selectCell(redC.rcMap, redC.rcList)
-                SetTrueText(cellinfo, 1)
+                SetTrueText(redC.strOut, 1)
                 If task.rcD Is Nothing Then
                     SetTrueText("Select any cell", 1)
                     Exit Sub
@@ -116,8 +114,7 @@ Namespace VBClasses
                 dst2 = redC.dst2
                 labels(2) = redC.labels(2)
 
-                Dim cellinfo = RedUtil_Basics.selectCell(redC.rcMap, redC.rcList)
-                SetTrueText(cellinfo, 1)
+                SetTrueText(redC.strOut, 1)
                 If task.rcD Is Nothing Then
                     SetTrueText("Select any cell", 1)
                     Exit Sub
@@ -158,8 +155,7 @@ Namespace VBClasses
                 dst2 = redC.dst2
                 labels(2) = redC.labels(2)
 
-                Dim cellinfo = RedUtil_Basics.selectCell(redC.rcMap, redC.rcList)
-                SetTrueText(cellinfo, 1)
+                SetTrueText(redC.strOut, 1)
                 If task.rcD Is Nothing Then
                     SetTrueText("Select any cell", 1)
                     Exit Sub
@@ -202,8 +198,7 @@ Namespace VBClasses
                 dst2 = redC.dst2
                 labels(2) = redC.labels(2)
 
-                Dim cellinfo = RedUtil_Basics.selectCell(redC.rcMap, redC.rcList)
-                SetTrueText(cellinfo, 1)
+                SetTrueText(redC.strOut, 1)
                 If task.rcD Is Nothing Then
                     SetTrueText("Select any cell", 1)
                     Exit Sub
@@ -242,8 +237,7 @@ Namespace VBClasses
                 dst2 = redC.dst2
                 labels(2) = redC.labels(2)
 
-                Dim cellinfo = RedUtil_Basics.selectCell(redC.rcMap, redC.rcList)
-                SetTrueText(cellinfo, 1)
+                SetTrueText(redC.strOut, 1)
                 If task.rcD Is Nothing Then
                     SetTrueText("Select any cell", 1)
                     Exit Sub
@@ -289,7 +283,6 @@ Namespace VBClasses
             redC.Run(src)
             dst2 = redC.dst2
             labels(2) = redC.labels(2)
-            RedUtil_Basics.selectCell(redC.rcMap, redC.rcList)
             If task.rcD Is Nothing Then
                 SetTrueText("Select any cell", 1)
                 Exit Sub
@@ -304,7 +297,7 @@ Namespace VBClasses
                 strOut = breakdown.options.strOut
             End If
 
-            SetTrueText(strOut, 1)
+            SetTrueText(redC.strOut, 1)
         End Sub
     End Class
 
@@ -329,7 +322,6 @@ Namespace VBClasses
                 redC.Run(src)
                 dst2 = redC.dst2
                 labels(2) = redC.labels(2)
-                RedUtil_Basics.selectCell(redC.rcMap, redC.rcList)
                 If task.rcD Is Nothing Then
                     SetTrueText("Select any cell", 1)
                     Exit Sub
@@ -457,8 +449,7 @@ Namespace VBClasses
             dst2 = redC.dst2
             labels(2) = redC.labels(2)
 
-            strOut = RedUtil_Basics.selectCell(redC.rcMap, redC.rcList)
-            SetTrueText(strOut, 1)
+            SetTrueText(redC.strOut, 1)
             If task.rcD Is Nothing Then
                 SetTrueText("Select any cell", 1)
                 Exit Sub

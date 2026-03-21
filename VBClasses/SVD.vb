@@ -55,12 +55,9 @@ Namespace VBClasses
             dst2 = redC.dst2
             labels(2) = redC.labels(2)
 
-            Static saveCellInfo As String
-            saveCellInfo = RedUtil_Basics.selectCell(redC.rcMap, redC.rcList)
-
             Dim rc = task.rcD
             If redC.rcList.Count = 0 Then Exit Sub
-            SetTrueText(saveCellInfo, 1)
+            SetTrueText(redC.strOut, 1)
 
             If task.heartBeat Then
                 Dim m = cv.Cv2.Moments(rc.mask, True)

@@ -194,7 +194,6 @@ Namespace VBClasses
             Next
             labels(2) = traceName + " completed with " + Format(quadData.Count / 5, fmt0) +
                                 " quad sets (with a 5th element for color)"
-            strOut = RedUtil_Basics.selectCell(hulls.rcMap, hulls.rclist)
         End Sub
     End Class
 

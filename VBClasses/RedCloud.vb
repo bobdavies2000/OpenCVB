@@ -48,10 +48,8 @@ Namespace VBClasses
                 dst2(rc.rect).SetTo(rc.color, rc.mask)
             Next
 
-            If standaloneTest() Then
-                strOut = RedUtil_Basics.selectCell(rcMap, rcList)
-                SetTrueText(strOut, 3)
-            End If
+            strOut = RedUtil_Basics.selectCell(rcMap, rcList)
+            SetTrueText(strOut, 3)
 
             labels(2) = CStr(unMatched) + " were new cells and " + CStr(matchCount) + " were matched, " +
                             "average age: " + Format(matchAverage / rcList.Count, fmt1)
@@ -80,9 +78,8 @@ Namespace VBClasses
             dst2 = redC.dst2
             labels(2) = redC.labels(2)
 
-            strOut = RedUtil_Basics.selectCell(redC.rcMap, redC.rcList)
             If task.rcD IsNot Nothing Then dst2.Rectangle(task.rcD.rect, task.highlight, task.lineWidth)
-            If strOut <> "" Then SetTrueText(strOut, 3) Else SetTrueText("Click on any cell", 3)
+            If strOut <> "" Then SetTrueText(redC.strOut, 3) Else SetTrueText("Click on any cell", 3)
 
             Dim causeLabel = RedUtil_Basics.findCause(redC.rcMap, redC.rcList)
             If task.mouseClickFlag Then
@@ -117,9 +114,8 @@ Namespace VBClasses
             dst2 = redC.dst2
             labels(2) = redC.labels(2)
 
-            strOut = RedUtil_Basics.selectCell(redC.rcMap, redC.rcList)
             If task.rcD IsNot Nothing Then dst2.Rectangle(task.rcD.rect, task.highlight, task.lineWidth)
-            If strOut <> "" Then SetTrueText(strOut, 3) Else SetTrueText("Click on any cell", 3)
+            If strOut <> "" Then SetTrueText(redC.strOut, 3) Else SetTrueText("Click on any cell", 3)
 
             Dim causeLabel = RedUtil_Basics.findCause(redC.rcMap, redC.rcList)
             If task.mouseClickFlag Then
@@ -221,8 +217,7 @@ Namespace VBClasses
                 task.clickPoint = task.rcD.maxDist
             End If
 
-            strOut = RedUtil_Basics.selectCell(redC.rcMap, redC.rcList)
-            SetTrueText(strOut, 1)
+            SetTrueText(redC.strOut, 1)
 
             labels(3) = "Select a RedCloud cell to see the histogram"
 
@@ -359,9 +354,8 @@ Namespace VBClasses
                 End If
             Next
 
-            strOut = RedUtil_Basics.selectCell(redC.rcMap, redC.rcList)
             If task.rcD IsNot Nothing Then dst2.Rectangle(task.rcD.rect, task.highlight, task.lineWidth)
-            SetTrueText(strOut, 3)
+            SetTrueText(redC.strOut, 3)
             labels(3) = CStr(rcList.Count) + " matched cells below with > " + CStr(redC.options.ageThreshold) + " age"
         End Sub
     End Class
@@ -394,9 +388,8 @@ Namespace VBClasses
                 End If
             Next
 
-            strOut = RedUtil_Basics.selectCell(redC.rcMap, redC.rcList)
             If task.rcD IsNot Nothing Then dst2.Rectangle(task.rcD.rect, task.highlight, task.lineWidth)
-            SetTrueText(strOut, 1)
+            SetTrueText(redC.strOut, 1)
             labels(3) = CStr(rcList.Count) + " matched cells below with > " + CStr(redC.options.ageThreshold) + " age"
         End Sub
     End Class

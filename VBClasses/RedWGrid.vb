@@ -78,10 +78,8 @@ Namespace VBClasses
                 End If
             Next
 
-            If standaloneTest() Then
-                strOut = RedUtil_Basics.selectCell(rcMap, rcList)
-                SetTrueText(strOut, 3)
-            End If
+            strOut = RedUtil_Basics.selectCell(rcMap, rcList)
+            SetTrueText(strOut, 3)
 
             labels(2) = CStr(rcList.Count) + " cells remain after merging masks for " + CStr(count) + " wGrid points."
             labels(3) = CStr(count) + " multi-mask cells found"
@@ -122,8 +120,7 @@ Namespace VBClasses
                 End If
             Next
 
-            strOut = RedUtil_Basics.selectCell(redC.rcMap, redC.rcList)
-            SetTrueText(strOut, 1)
+            SetTrueText(redC.strOut, 1)
 
             labels(3) = CStr(count) + " unstable cells = not matched since the last heartbeatLT"
         End Sub
@@ -146,13 +143,12 @@ Namespace VBClasses
             dst2 = dups.dst2
             labels(2) = dups.labels(2)
 
-            strOut = RedUtil_Basics.selectCell(dups.rcMap, dups.rcList)
             If task.rcD Is Nothing Then
                 SetTrueText("Click on any cell present in dst2", 3)
                 Exit Sub
             End If
 
-            SetTrueText(strOut, 3)
+            SetTrueText(dups.strOut, 3)
 
             Select Case options.clickName
                 Case "Identify Row"

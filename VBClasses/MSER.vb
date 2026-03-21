@@ -86,7 +86,6 @@ Namespace VBClasses
             redC.Run(src)
             dst2 = redC.dst2
             labels(2) = redC.labels(2)
-            strOut = RedUtil_Basics.selectCell(redC.rcMap, redC.rcList)
         End Sub
     End Class
 

@@ -34,8 +34,7 @@ Namespace VBClasses
             Next
 
             If standalone Then
-                strOut = RedUtil_Basics.selectCell(redC.rcMap, redC.rcList)
-                SetTrueText(strOut, 3)
+                SetTrueText(redC.strOut, 3)
                 dst3.SetTo(0)
                 For Each index In task.rcD.nabs
                     If index < redC.rcList.Count Then

@@ -106,8 +106,7 @@ Namespace VBClasses
             dst3 = redC.dst2
             labels(3) = redC.labels(2)
 
-            strOut = RedUtil_Basics.selectCell(redC.rcMap, redC.rcList)
-            SetTrueText(strOut, 1)
+            SetTrueText(redC.strOut, 1)
         End Sub
     End Class
 
@@ -223,10 +222,13 @@ Namespace VBClasses
             redC.Run(pixel.dst2)
             dst2 = redC.dst2
             labels(2) = redC.labels(2)
-
-            If redC.rcList.Count > 0 Then
-                dst2(task.rcD.rect).SetTo(white, task.rcD.mask)
+            SetTrueText(redC.strOut, 3)
+            If task.rcD Is Nothing Then
+                SetTrueText("Select any cell", 3)
+                Exit Sub
             End If
+
+            dst2(task.rcD.rect).SetTo(white, task.rcD.mask)
         End Sub
     End Class
 

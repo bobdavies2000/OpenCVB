@@ -40,8 +40,7 @@ Namespace VBClasses
             dst3 = redC.dst2
             labels(3) = redC.labels(2)
 
-            strOut = RedUtil_Basics.selectCell(redC.rcMap, redC.rcList)
-            SetTrueText(strOut, 1)
+            SetTrueText(redC.strOut, 1)
         End Sub
     End Class
 

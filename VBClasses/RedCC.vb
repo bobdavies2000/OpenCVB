@@ -23,13 +23,7 @@ Namespace VBClasses
 
             Static picTag As Integer = task.mousePicTag
             If task.mouseClickFlag Then picTag = task.mousePicTag
-            If picTag = 2 Then
-                strOut = RedUtil_Basics.selectCell(redC2.rcMap, redC2.rcList)
-            Else
-                strOut = RedUtil_Basics.selectCell(redC1.rcMap, redC1.rcList)
-            End If
-
-            SetTrueText(strOut, 1)
+            If picTag = 2 Then SetTrueText(redC2.strOut, 1) Else SetTrueText(redC1.strOut, 1)
         End Sub
     End Class
 
@@ -70,8 +64,7 @@ Namespace VBClasses
             dst2 = redC1.dst2
 
             rcList = New List(Of rcData)(redC1.rcList)
-            strOut = RedUtil_Basics.selectCell(redC1.rcMap, rcList)
-            SetTrueText(strOut, 3)
+            SetTrueText(redC1.strOut, 3)
         End Sub
     End Class
 
@@ -125,8 +118,7 @@ Namespace VBClasses
             redC.rcMap.ConvertTo(dst1, cv.MatType.CV_8U)
             dst2 = Palettize(color8u.dst2 + dst1)
 
-            strOut = RedUtil_Basics.selectCell(redC.rcMap, redC.rcList)
-            SetTrueText(strOut, 1)
+            SetTrueText(redC.strOut, 1)
 
             If task.rcD IsNot Nothing Then
                 If task.rcD.pixels > 0 Then

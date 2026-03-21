@@ -42,8 +42,7 @@ Namespace VBClasses
             dst2 = redC.dst2
             labels(2) = redC.labels(2)
 
-            strOut = RedUtil_Basics.selectCell(redC.rcMap, redC.rcList)
-            SetTrueText(strOut, 1)
+            SetTrueText(redC.strOut, 1)
         End Sub
     End Class
 
@@ -72,8 +71,7 @@ Namespace VBClasses
             dst2 = redMask.dst3
             labels(2) = redMask.labels(2)
 
-            strOut = RedUtil_Basics.selectCell(redMask.rcMap, redMask.rclist)
-            SetTrueText(strOut, 1)
+            SetTrueText(redMask.strOut, 1)
         End Sub
     End Class
 
@@ -141,8 +139,7 @@ Namespace VBClasses
             dst2 = redC.dst2
             labels(2) = redC.labels(2)
 
-            strOut = RedUtil_Basics.selectCell(redC.rcMap, redC.rcList)
-            SetTrueText(strOut, 1)
+            SetTrueText(redC.strOut, 1)
             If task.rcD Is Nothing Then
                 SetTrueText("Select any cell", 1)
                 Exit Sub
@@ -249,8 +246,7 @@ Namespace VBClasses
             dst2 = redC.dst2
             labels(2) = redC.labels(2)
 
-            strOut = RedUtil_Basics.selectCell(redC.rcMap, redC.rcList)
-            SetTrueText(strOut, 1)
+            SetTrueText(redC.strOut, 1)
             If task.rcD Is Nothing Then
                 SetTrueText("Select any cell", 1)
                 Exit Sub

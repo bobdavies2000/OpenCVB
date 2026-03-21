@@ -377,11 +377,10 @@ Namespace VBClasses
             labels(3) = redC.labels(2)
 
             If standaloneTest() Then
-                strOut = RedUtil_Basics.selectCell(redC.rcMap, redC.rcList)
                 If redC.rcList.Count > 0 And task.rcD Is Nothing Then
                     task.clickPoint = redC.rcList(0).maxDist
                 End If
-                SetTrueText(strOut, 1)
+                SetTrueText(redC.strOut, 1)
             End If
         End Sub
     End Class

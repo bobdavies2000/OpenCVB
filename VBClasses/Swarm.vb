@@ -186,8 +186,7 @@ Namespace VBClasses
             flood.Run(color8U.dst2)
             dst2 = flood.dst2
 
-            strOut = RedUtil_Basics.selectCell(flood.redC.rcMap, flood.redC.rcList)
-            SetTrueText(strOut, 3)
+            SetTrueText(flood.redC.strOut, 3)
         End Sub
     End Class
 

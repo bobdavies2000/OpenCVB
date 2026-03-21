@@ -11,8 +11,7 @@ Namespace VBClasses
             dst2 = redC.dst2
             labels(2) = redC.labels(2)
 
-            strOut = RedUtil_Basics.selectCell(redC.rcMap, redC.rcList)
-            SetTrueText(strOut, 3)
+            SetTrueText(redC.strOut, 3)
         End Sub
     End Class
 
@@ -52,8 +51,7 @@ Namespace VBClasses
             dst2 = flood.dst2
             dst3 = flood.dst3
 
-            strOut = RedUtil_Basics.selectCell(flood.redC.rcMap, flood.redC.rcList)
-            SetTrueText(strOut, 1)
+            SetTrueText(flood.redC.strOut, 1)
         End Sub
     End Class
 
@@ -116,10 +114,7 @@ Namespace VBClasses
 
             labels(2) = $"{redC.rcList.Count} cells identified"
 
-            If showSelected Then
-                strOut = RedUtil_Basics.selectCell(redC.rcMap, redC.rcList)
-                SetTrueText(strOut, 1)
-            End If
+            If showSelected Then SetTrueText(redC.strOut, 1)
         End Sub
     End Class
 End Namespace
