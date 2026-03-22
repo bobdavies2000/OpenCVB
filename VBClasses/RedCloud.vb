@@ -45,7 +45,8 @@ Namespace VBClasses
 
                 rcList.Add(rc)
 
-                dst2(rc.rect).SetTo(rc.color, rc.mask)
+                Dim color = task.contours.dst2.Get(Of cv.Vec3b)(rc.maxDist.Y, rc.maxDist.X)
+                dst2(rc.rect).SetTo(color, rc.mask)
             Next
 
             strOut = RedUtil_Basics.selectCell(rcMap, rcList)

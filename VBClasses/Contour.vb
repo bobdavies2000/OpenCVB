@@ -1092,6 +1092,89 @@ Namespace VBClasses
 
 
 
+    Public Class Contour_Basics_List : Inherits TaskParent
+        Public contourList As New List(Of contourData)
+        Public contourMap As New cv.Mat(dst2.Size, cv.MatType.CV_32F, 0)
+        Public sortContours As New Contour_SortNew
+        Public options As New Options_Contours
+        Dim edgeline As New EdgeLine_Basics
+        Public Sub New()
+            labels(3) = "Details for the selected contour."
+            task.fOptions.Color8USource.SelectedItem = "EdgeLine_Basics"
+            desc = "List retrieval mode contour finder"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            options.Run()
+
+            If src.Channels <> 1 Then edgeline.Run(task.grayStable) Else edgeline.Run(src)
+            dst3 = edgeline.dst2
+
+            sortContours.allContours = Contour_Basics.buildContours(dst3)
+            sortContours.Run(src)
+
+            contourList = sortContours.rcList
+            contourMap = sortContours.rcMap
+            labels(2) = sortContours.labels(2)
+            dst2 = sortContours.dst2
+            strOut = sortContours.strOut
+        End Sub
+    End Class
+
+
+
+
+    Public Class Contour_Test : Inherits TaskParent
+        Implements IDisposable
+        Public classCount As Integer
+        Public contourList As New List(Of contourData)
+        Public contourMap As New cv.Mat(task.workRes, cv.MatType.CV_32F, 0)
+        Dim color8u As New Color8U_Basics
+        Public Sub New()
+            labels(3) = "Input to OpenCV's FindContours"
+            desc = "General purpose contour finder"
+        End Sub
+        Public Function selectContour() As contourData
+            Dim tour As New contourData
+            Dim id = contourMap.Get(Of Integer)(task.clickPoint.Y, task.clickPoint.X)
+            For Each task.contourD In contourList
+                If id = task.contourD.ID Then Exit For
+            Next
+
+            For Each tour In contourList
+                If tour.ID = id Then Exit For
+            Next
+            task.color(tour.rect).SetTo(cv.Scalar.White, tour.mask)
+            Return task.contourD
+        End Function
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            If src.Type = cv.MatType.CV_8U Then
+                dst3 = src
+            Else
+                color8u.Run(task.grayStable)
+                dst3 = color8u.dst2
+            End If
+
+            Dim allContours = Contour_Basics.buildContours(dst3)
+            'If sortContours.allContours.Count <= 1 Then Exit Sub
+
+            'sortContours.Run(src)
+
+            'contourList = sortContours.contourList
+            'contourMap = sortContours.contourMap
+            'labels(2) = sortContours.labels(2)
+            'dst2 = sortContours.dst2
+
+            classCount = contourList.Count
+
+            labels(2) = CStr(contourList.Count) + " contours were found"
+        End Sub
+    End Class
+
+
+
+
+
+
     Public Class Contour_SortNew : Inherits TaskParent
         Public allContours As cv.Point()()
         Public rcList As New List(Of contourData)
@@ -1177,88 +1260,6 @@ Namespace VBClasses
             If task.heartBeat Then
                 labels(2) = "Matched " + CStr(matched) + "/" + CStr(rcList.Count) + " contours to the previous generation"
             End If
-        End Sub
-    End Class
-
-
-
-
-
-    Public Class Contour_Basics_List : Inherits TaskParent
-        Public contourList As New List(Of contourData)
-        Public contourMap As New cv.Mat(dst2.Size, cv.MatType.CV_32F, 0)
-        Public sortContours As New Contour_SortNew
-        Public options As New Options_Contours
-        Dim edgeline As New EdgeLine_Basics
-        Public Sub New()
-            labels(3) = "Details for the selected contour."
-            task.fOptions.Color8USource.SelectedItem = "EdgeLine_Basics"
-            desc = "List retrieval mode contour finder"
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            options.Run()
-
-            If src.Channels <> 1 Then edgeline.Run(task.grayStable) Else edgeline.Run(src)
-            dst3 = edgeline.dst2
-
-            sortContours.allContours = Contour_Basics.buildContours(dst3)
-            sortContours.Run(src)
-
-            contourList = sortContours.rcList
-            contourMap = sortContours.rcMap
-            labels(2) = sortContours.labels(2)
-            dst2 = sortContours.dst2
-            strOut = sortContours.strOut
-        End Sub
-    End Class
-
-
-
-
-    Public Class Contour_Test : Inherits TaskParent
-        Implements IDisposable
-        Public classCount As Integer
-        Public contourList As New List(Of contourData)
-        Public contourMap As New cv.Mat(task.workRes, cv.MatType.CV_32F, 0)
-        Dim color8u As New Color8U_Basics
-        Public Sub New()
-            labels(3) = "Input to OpenCV's FindContours"
-            desc = "General purpose contour finder"
-        End Sub
-        Public Function selectContour() As contourData
-            Dim tour As New contourData
-            Dim id = contourMap.Get(Of Integer)(task.clickPoint.Y, task.clickPoint.X)
-            For Each task.contourD In contourList
-                If id = task.contourD.ID Then Exit For
-            Next
-
-            For Each tour In contourList
-                If tour.ID = id Then Exit For
-            Next
-            task.color(tour.rect).SetTo(cv.Scalar.White, tour.mask)
-            Return task.contourD
-        End Function
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            If src.Type = cv.MatType.CV_8U Then
-                dst3 = src
-            Else
-                color8u.Run(task.grayStable)
-                dst3 = color8u.dst2
-            End If
-
-            Dim allContours = Contour_Basics.buildContours(dst3)
-            'If sortContours.allContours.Count <= 1 Then Exit Sub
-
-            'sortContours.Run(src)
-
-            'contourList = sortContours.contourList
-            'contourMap = sortContours.contourMap
-            'labels(2) = sortContours.labels(2)
-            'dst2 = sortContours.dst2
-
-            classCount = contourList.Count
-
-            labels(2) = CStr(contourList.Count) + " contours were found"
         End Sub
     End Class
 End Namespace

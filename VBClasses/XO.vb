@@ -12869,7 +12869,7 @@ Namespace VBClasses
     Public Class XO_Contour_Basics_List : Inherits TaskParent
         Public contourList As New List(Of contourData)
         Public contourMap As New cv.Mat(dst2.Size, cv.MatType.CV_32F, 0)
-        Public sortContours As New Contour_SortNew
+        Public sortContours As New Contour_Sort
         Public options As New Options_Contours
         Public Sub New()
             labels(3) = "Details for the selected contour."
@@ -12884,8 +12884,8 @@ Namespace VBClasses
             sortContours.allContours = Contour_Basics.buildContours(dst3)
             sortContours.Run(src)
 
-            contourList = sortContours.rcList
-            contourMap = sortContours.rcMap
+            contourList = sortContours.contourList
+            contourMap = sortContours.contourMap
             labels(2) = sortContours.labels(2)
             dst2 = sortContours.dst2
             strOut = sortContours.strOut
