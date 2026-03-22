@@ -1,3 +1,4 @@
+Imports System.Windows.Forms.Design.AxImporter
 Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Class Contour_Basics : Inherits TaskParent
@@ -1095,7 +1096,7 @@ Namespace VBClasses
     Public Class Contour_Basics_List : Inherits TaskParent
         Public contourList As New List(Of contourData)
         Public contourMap As New cv.Mat(dst2.Size, cv.MatType.CV_32F, 0)
-        Public sortContours As New Contour_SortNew
+        Public sortContours As New Contour_SortTmp
         Public options As New Options_Contours
         Dim edgeline As New EdgeLine_Basics
         Public Sub New()
@@ -1175,7 +1176,7 @@ Namespace VBClasses
 
 
 
-    Public Class Contour_SortNew : Inherits TaskParent
+    Public Class Contour_SortTmp : Inherits TaskParent
         Public allContours As cv.Point()()
         Public rcList As New List(Of contourData)
         Public rcMap As New cv.Mat(task.workRes, cv.MatType.CV_32S, 0)
@@ -1260,6 +1261,65 @@ Namespace VBClasses
             If task.heartBeat Then
                 labels(2) = "Matched " + CStr(matched) + "/" + CStr(rcList.Count) + " contours to the previous generation"
             End If
+        End Sub
+    End Class
+
+
+
+
+
+    Public Class Contour_KeyDataTest : Inherits TaskParent
+        Public keyList As New List(Of keyData)
+        Public keyMap As New cv.Mat(task.workRes, cv.MatType.CV_8U, 0)
+        Dim edgeline As New EdgeLine_Basics
+        Dim options As New Options_Contours
+        Public Sub New()
+            dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
+            desc = "Sort the contours by size and prepare the contour map"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            options.Run()
+
+            Dim lastResult = dst2.Clone
+
+            edgeline.Run(task.grayStable)
+            Dim allContours As cv.Point()() = Nothing
+
+            Dim mode = options.options2.ApproximationMode
+            If options.retrievalMode = cv.RetrievalModes.FloodFill Then
+                Dim dst As New cv.Mat(task.workRes, cv.MatType.CV_8U, 0)
+                edgeline.dst2.ConvertTo(dst, cv.MatType.CV_32SC1)
+                cv.Cv2.FindContours(dst, allContours, Nothing, cv.RetrievalModes.FloodFill, mode)
+            Else
+                cv.Cv2.FindContours(edgeline.dst2, allContours, Nothing, options.retrievalMode, mode)
+            End If
+
+            Dim sortedList As New SortedList(Of Integer, keyData)(New compareAllowIdenticalIntegerInverted)
+            Dim tourMat As New cv.Mat(task.workRes, cv.MatType.CV_8U, 0)
+            Dim minSize = src.Total * 0.01 ' we are only interested in contours with more than 1% of the pixels.
+            For Each ptArray In allContours
+                Dim tour = New keyData
+                tour.rect = tour.buildRect(ptArray)
+                If tour.rect.Width = 0 Or tour.rect.Height = 0 Then Continue For
+
+                tourMat(tour.rect).SetTo(0)
+                Dim listOfPoints = New List(Of List(Of cv.Point))({ptArray.ToList})
+                cv.Cv2.DrawContours(tourMat, listOfPoints, 0, New cv.Scalar(sortedList.Count), -1, cv.LineTypes.Link8)
+                tour.mask = tourMat(tour.rect).Threshold(0, 255, cv.ThresholdTypes.Binary)
+                tour.maxDist = tour.GetMaxDistContour(tour)
+                tour.pixels = cv.Cv2.ContourArea(ptArray)
+                If tour.pixels >= minSize Then sortedList.Add(tour.pixels, tour)
+            Next
+
+            keyMap.SetTo(0)
+            keyList.Clear()
+            For i = 1 To sortedList.Values.Count - 1
+                Dim tour = sortedList.Values(i)
+                keyMap(tour.rect).SetTo(i, tour.mask)
+                keyList.Add(tour)
+            Next
+
+            dst2 = Palettize(keyMap, 0)
         End Sub
     End Class
 End Namespace

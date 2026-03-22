@@ -101,12 +101,13 @@ Color8U_LeftRight
 Contour_Basics
 Contour_Basics_List
 Contour_Hulls
+Contour_KeyDataTest
 Contour_Largest
 Contour_Regions
 Contour_RotateRect
 Contour_SidePoints
 Contour_Sort
-Contour_SortNew
+Contour_SortTmp
 Contour_Test
 Convex_Basics
 Convex_RedColorDefects

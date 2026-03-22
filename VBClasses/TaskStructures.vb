@@ -329,6 +329,35 @@ Namespace VBClasses
 
 
 
+        Public Class keyData
+            Public mask As cv.Mat
+            Public maxDist As cv.Point
+            Public rect As New cv.Rect(0, 0, 1, 1)
+            Public index As Integer
+            Public pixels As Integer
+            Public Function buildRect(tour As cv.Point()) As cv.Rect
+                Dim minX As Single = tour.Min(Function(p) p.X)
+                Dim maxX As Single = tour.Max(Function(p) p.X)
+                Dim minY As Single = tour.Min(Function(p) p.Y)
+                Dim maxY As Single = tour.Max(Function(p) p.Y)
+                Return ValidateRect(New cv.Rect(minX, minY, maxX - minX, maxY - minY))
+            End Function
+            Public Function GetMaxDistContour(ByRef contour As keyData) As cv.Point
+                Dim mask = contour.mask.Clone
+                mask.Rectangle(New cv.Rect(0, 0, mask.Width, mask.Height), 0, 1)
+                Dim distance32f = mask.DistanceTransform(cv.DistanceTypes.L1, 0)
+                Dim mm As mmData = GetMinMax(distance32f)
+                mm.maxLoc.X += contour.rect.X
+                mm.maxLoc.Y += contour.rect.Y
+                Return mm.maxLoc
+            End Function
+            Public Sub New()
+            End Sub
+        End Class
+
+
+
+
 
         Public Class lpData
             Public age As Integer = 1
