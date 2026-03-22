@@ -74,24 +74,24 @@ Namespace VBClasses
         ' color maps
         Public scalarColors(255) As cv.Scalar
         Public vecColors(255) As cv.Vec3b
-        Public depthColorMap As cv.Mat
+        Public colorMapDepth As cv.Mat
         Public colorMap As cv.Mat
-        Public correlationColorMap As cv.Mat
+        Public colorMapBricks As cv.Mat
 
         ' task algorithms - operate on every frame regardless of which algorithm is being run.
         Public colorizer As DepthColorizer_Basics
         Public contours As Contour_Basics_List
-        Public gravityMatrix As IMU_GMatrix
-        Public lines As Line_Basics
-        Public grid As Grid_Basics
-        Public palette As Palette_LoadColorMap
         Public filterBasics As Filter_Basics
         Public gravityBasics As Gravity_Basics
+        Public gravityMatrix As IMU_GMatrix
+        Public grid As Grid_Basics
         Public imuBasics As IMU_Basics
         Public leftRightBrightness As LeftRight_Brightness
+        Public lines As Line_Basics
         Public motion As Motion_Basics
         Public motionCloud As Motion_Cloud
         Public motionFeatures As cv.Point2f
+        Public palette As Palette_LoadColorMap
         Public PixelViewer As Pixel_Viewer
         Public pixelViewerOn As Boolean
         Public redList As RedMask_List ' only referenced by XO algorithms so not really used.

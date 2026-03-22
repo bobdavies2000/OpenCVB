@@ -26,17 +26,17 @@ Namespace VBClasses
                     f -= 1 / gradientWidth
                 Next
                 colorList(0) = New cv.Vec3b ' black for the first color...
-                task.depthColorMap = cv.Mat.FromPixelData(256, 1, cv.MatType.CV_8UC3, colorList.ToArray)
+                task.colorMapDepth = cv.Mat.FromPixelData(256, 1, cv.MatType.CV_8UC3, colorList.ToArray)
 
                 saveVecColors = task.vecColors
                 saveScalarColors = task.scalarColors
-                saveDepthColorMap = task.depthColorMap
+                saveDepthColorMap = task.colorMapDepth
             Else
                 ' why do this?  To preserve the same colors regardless of which algorithm is invoked.
                 ' Colors will be different when OpenCVB is restarted.  
                 task.vecColors = saveVecColors
                 task.scalarColors = saveScalarColors
-                task.depthColorMap = saveDepthColorMap
+                task.colorMapDepth = saveDepthColorMap
             End If
 
             task.colorMap = cv.Mat.FromPixelData(256, 1, cv.MatType.CV_8UC3, task.vecColors.ToArray)
@@ -51,7 +51,7 @@ Namespace VBClasses
                 corrColors.Add(New cv.Vec3b(v1, v2, v3))
                 f -= 1 / gradientWidth
             Next
-            task.correlationColorMap = cv.Mat.FromPixelData(256, 1, cv.MatType.CV_8UC3, corrColors.ToArray)
+            task.colorMapBricks = cv.Mat.FromPixelData(256, 1, cv.MatType.CV_8UC3, corrColors.ToArray)
 
             dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
             desc = "Create a traditional depth color scheme."

@@ -587,7 +587,7 @@ Namespace VBClasses
         End Sub
         Public Function ShowPaletteCorrelation(input As cv.Mat) As cv.Mat
             Dim output As New cv.Mat
-            cv.Cv2.ApplyColorMap(input, output, task.correlationColorMap)
+            cv.Cv2.ApplyColorMap(input, output, task.colorMapBricks)
             Return output
         End Function
         Public Overrides Sub RunAlg(src As cv.Mat)

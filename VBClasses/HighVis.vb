@@ -9,7 +9,7 @@ Namespace VBClasses
         End Sub
         Public Function ShowPaletteDepth(input As cv.Mat) As cv.Mat
             Dim output As New cv.Mat
-            cv.Cv2.ApplyColorMap(input, output, task.depthColorMap)
+            cv.Cv2.ApplyColorMap(input, output, task.colorMapDepth)
             output.SetTo(0, task.noDepthMask)
             Return output
         End Function
