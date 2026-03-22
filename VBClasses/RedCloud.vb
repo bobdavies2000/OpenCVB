@@ -18,6 +18,7 @@ Namespace VBClasses
         Public rcMap As cv.Mat = New cv.Mat(dst2.Size, cv.MatType.CV_32S, 0)
         Public options As New Options_RedCloud
         Public Sub New()
+            If standalone Then task.gOptions.displayDst1.Checked = True
             desc = "Build contours for each cell"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -47,7 +48,7 @@ Namespace VBClasses
                 rcList.Add(rc)
 
                 If task.heartBeat Then
-                    Dim color = task.contours.dst2.Get(Of cv.Vec3b)(rc.maxDist.Y, rc.maxDist.X)
+                    Dim color = task.keyColors.dst2.Get(Of cv.Vec3b)(rc.maxDist.Y, rc.maxDist.X)
                     If color <> blackVec Then rc.color = color
                 End If
                 dst2(rc.rect).SetTo(rc.color, rc.mask)
@@ -55,6 +56,8 @@ Namespace VBClasses
 
             strOut = RedUtil_Basics.selectCell(rcMap, rcList)
             SetTrueText(strOut, 3)
+
+            If standaloneTest() Then dst1 = task.keyColors.dst2
 
             labels(2) = CStr(unMatched) + " were new cells and " + CStr(matchCount) + " were matched, " +
                             "average age: " + Format(matchAverage / rcList.Count, fmt1)
@@ -522,7 +525,7 @@ Namespace VBClasses
                 rc.index = rcList.Count + 1
 
                 If task.heartBeat Then
-                    Dim color = task.contours.dst2.Get(Of cv.Vec3b)(rc.maxDist.Y, rc.maxDist.X)
+                    Dim color = task.keyColors.dst2.Get(Of cv.Vec3b)(rc.maxDist.Y, rc.maxDist.X)
                     If color <> blackVec Then rc.color = color
                 End If
 

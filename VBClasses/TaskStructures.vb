@@ -335,6 +335,7 @@ Namespace VBClasses
             Public rect As New cv.Rect(0, 0, 1, 1)
             Public index As Integer
             Public pixels As Integer
+            Public contour As List(Of cv.Point)
             Public Function buildRect(tour As cv.Point()) As cv.Rect
                 Dim minX As Single = tour.Min(Function(p) p.X)
                 Dim maxX As Single = tour.Max(Function(p) p.X)
@@ -585,10 +586,14 @@ Namespace VBClasses
             Public Sub New(_mask As cv.Mat, _rect As cv.Rect, _index As Integer,
                            Optional combinedMask As Boolean = False)
                 rect = _rect
-                mask = _mask.InRange(_index, _index)
+                If _index >= 0 Then
+                    mask = _mask.InRange(_index, _index)
+                    index = _index
+                Else
+                    mask = _mask.Clone
+                End If
                 contour = ContourBuild(mask)
-                index = _index
-                If contour IsNot Nothing Then
+                If contour IsNot Nothing And _index >= 0 Then
                     If contour.Count >= 3 And combinedMask = False Then ' need at least 3 points for a contour.
                         Dim listOfPoints = New List(Of List(Of cv.Point))({contour})
                         mask = New cv.Mat(mask.Size, cv.MatType.CV_8U, 0)
@@ -601,7 +606,7 @@ Namespace VBClasses
                 buildMaxDist()
 
                 gridIndex = task.gridMap.Get(Of Integer)(maxDist.Y, maxDist.X)
-                color = task.vecColors(index Mod 255)
+                If _index >= 0 Then color = task.vecColors(index Mod 255)
                 pixels = mask.CountNonZero
                 wcMean = task.pointCloud(rect).Mean(task.depthmask(rect))
                 Dim x = Math.Round(wcMean(0) * 1000 / task.reduction)

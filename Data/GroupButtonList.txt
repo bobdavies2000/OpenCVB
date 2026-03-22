@@ -112,6 +112,7 @@ Interpolate
 Intrinsics
 Kalman
 Keyboard
+KeyColor
 KLT
 KMeans
 KNN

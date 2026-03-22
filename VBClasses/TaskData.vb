@@ -80,7 +80,7 @@ Namespace VBClasses
 
         ' task algorithms - operate on every frame regardless of which algorithm is being run.
         Public colorizer As DepthColorizer_Basics
-        Public contours As Contour_KeyDataTest
+        Public keyColors As KeyColor_Basics
         Public filterBasics As Filter_Basics
         Public gravityBasics As Gravity_Basics
         Public gravityMatrix As IMU_GMatrix

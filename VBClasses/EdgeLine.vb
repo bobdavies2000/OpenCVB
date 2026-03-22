@@ -428,4 +428,57 @@ Namespace VBClasses
         End Sub
     End Class
 
+
+
+
+    Public Class EdgeLine_KeyColorOnly : Inherits TaskParent
+        Implements IDisposable
+        Public keyList As New List(Of keyData)
+        Public Sub New()
+            cPtr = EdgeLineRaw_Open()
+            labels(3) = "Palette version of dst2"
+            desc = "Use EdgeLines to get a mask and rect for each region."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            If src.Channels <> 1 Then src = task.grayStable
+
+            Dim cppData(src.Total - 1) As Byte
+            src.GetArray(Of Byte)(cppData)
+            Dim handlesrc = GCHandle.Alloc(cppData, GCHandleType.Pinned)
+            Dim imagePtr = EdgeLineRaw_RunCPP(cPtr, handlesrc.AddrOfPinnedObject(), src.Rows, src.Cols,
+                                              task.lineWidth)
+            handlesrc.Free()
+            Dim rcMap = cv.Mat.FromPixelData(src.Rows, src.Cols, cv.MatType.CV_32S, imagePtr)
+            rcMap.ConvertTo(dst2, cv.MatType.CV_8U)
+
+            Dim imageEdgeWidth = If(dst2.Width >= 1280, 4, 2)
+            ' prevent leaks at the image boundary...
+            dst2.Rectangle(New cv.Rect(0, 0, dst2.Width - 1, dst2.Height - 1), 255, imageEdgeWidth)
+
+            Dim rectPtr = EdgeLineRaw_Rects(cPtr)
+            If rectPtr = IntPtr.Zero Then Exit Sub ' no rects
+
+            Dim classCount = Math.Min(EdgeLineRaw_GetSegCount(cPtr), 255)
+            If classCount = 0 Then Exit Sub ' nothing to work with....
+
+            Dim rects(classCount - 1) As cv.Rect
+            Dim rectData = cv.Mat.FromPixelData(classCount, 1, cv.MatType.CV_32SC4, rectPtr)
+            rectData.GetArray(Of cv.Rect)(rects)
+
+            dst3.SetTo(0)
+            keyList.Clear()
+            For i = 0 To classCount - 1
+                Dim key As New keyData
+                key.rect = rects(i)
+                key.mask = rcMap(rects(i))
+                keyList.Add(key)
+            Next
+
+            labels(2) = CStr(classCount) + " line segments were found with motion threshold of " +
+                        CStr(task.motionThreshold) + " pixels changed in a grid rect."
+        End Sub
+        Protected Overrides Sub Finalize()
+            EdgeLineRaw_Close(cPtr)
+        End Sub
+    End Class
 End Namespace
