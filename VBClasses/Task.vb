@@ -45,7 +45,7 @@ Namespace VBClasses
             lines = New Line_Basics
             filterBasics = New Filter_Basics
             leftRightBrightness = New LeftRight_Brightness
-            contours = New Contour_Basics
+            contours = New Contour_KeyDataTest
 
             ' all the algorithms in the list are task algorithms that are children of the algorithm.
             For i = 1 To cpu.callTrace.Count - 1

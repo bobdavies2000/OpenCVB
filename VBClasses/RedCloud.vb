@@ -35,6 +35,7 @@ Namespace VBClasses
             Dim matchCount As Integer
             Dim unMatched As Integer
             Dim matchAverage As Single
+            Dim blackVec As New cv.Vec3b
             For Each rc In redCore.rcList
                 rc = RedUtil_Basics.rcDataMatch(rc, rcListLast, rcMapLast)
 
@@ -45,8 +46,11 @@ Namespace VBClasses
 
                 rcList.Add(rc)
 
-                Dim color = task.contours.dst2.Get(Of cv.Vec3b)(rc.maxDist.Y, rc.maxDist.X)
-                dst2(rc.rect).SetTo(color, rc.mask)
+                If task.heartBeat Then
+                    Dim color = task.contours.dst2.Get(Of cv.Vec3b)(rc.maxDist.Y, rc.maxDist.X)
+                    If color <> blackVec Then rc.color = color
+                End If
+                dst2(rc.rect).SetTo(rc.color, rc.mask)
             Next
 
             strOut = RedUtil_Basics.selectCell(rcMap, rcList)
@@ -464,7 +468,8 @@ Namespace VBClasses
             If src.Channels <> 1 Then
                 Static prepData As New RedPrep_Core
                 prepData.Run(src)
-                dst1 = prepData.dst2
+                dst1 = prepData.reduced32f.Normalize(255, 0, cv.NormTypes.MinMax)
+                dst1.ConvertTo(dst1, cv.MatType.CV_8U)
             Else
                 dst1 = src
             End If
@@ -501,11 +506,11 @@ Namespace VBClasses
 
             rcList.Clear()
             dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8UC3, 0)
-            Dim changed As Integer
             Dim matchCount As Integer
             Dim unMatched As Integer
             Dim matchAverage As Single
             dst3.SetTo(0)
+            Dim blackVec As New cv.Vec3b
             For Each rc In newList.Values
                 Dim maxDist = rc.maxDist
                 If maxDist = New cv.Point(315, 19) Then Dim k = 0
@@ -516,12 +521,10 @@ Namespace VBClasses
 
                 rc.index = rcList.Count + 1
 
-                ' The first cell often contains other cells completely within it.
-                ' These often causes the maxdist to move around.
-                ' So just fix the color here and create a stable image.
-                ' The cells within the largest cell will switch colors but many cells are stable.
-                If rc.index = 1 Then rc.color = blue
-                If maxDist <> rc.maxDist Then changed += 1
+                If task.heartBeat Then
+                    Dim color = task.contours.dst2.Get(Of cv.Vec3b)(rc.maxDist.Y, rc.maxDist.X)
+                    If color <> blackVec Then rc.color = color
+                End If
 
                 rcList.Add(rc)
 

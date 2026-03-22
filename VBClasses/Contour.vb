@@ -1319,6 +1319,7 @@ Namespace VBClasses
                 keyList.Add(tour)
             Next
 
+
             dst2 = Palettize(keyMap, 0)
         End Sub
     End Class
