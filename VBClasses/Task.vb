@@ -45,6 +45,7 @@ Namespace VBClasses
             lines = New Line_Basics
             filterBasics = New Filter_Basics
             leftRightBrightness = New LeftRight_Brightness
+            contours = New Contour_Basics
 
             ' all the algorithms in the list are task algorithms that are children of the algorithm.
             For i = 1 To cpu.callTrace.Count - 1
@@ -181,7 +182,7 @@ Namespace VBClasses
                 If PixelViewer IsNot Nothing Then PixelViewer.viewerForm.Activate()
                 activateTaskForms = False
             End If
-
+            If task.heartBeat Then contours.Run(src)
 
 
 
