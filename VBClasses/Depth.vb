@@ -193,17 +193,17 @@ Namespace VBClasses
             If task.heartBeat Then dst3.SetTo(0)
             Parallel.For(0, task.gridRects.Count,
         Sub(i)
-            Dim gSq = task.gridRects(i)
-            Dim mm As mmData = GetMinMax(task.pcSplit(2)(gSq), task.depthmask(gSq))
+            Dim r = task.gridRects(i)
+            Dim mm As mmData = GetMinMax(task.pcSplit(2)(r), task.depthmask(r))
             If mm.minLoc.X < 0 Or mm.minLoc.Y < 0 Then mm.minLoc = New cv.Point2f(0, 0)
-            minPoint(i) = New cv.Point(mm.minLoc.X + gSq.X, mm.minLoc.Y + gSq.Y)
-            maxPoint(i) = New cv.Point(mm.maxLoc.X + gSq.X, mm.maxLoc.Y + gSq.Y)
+            minPoint(i) = New cv.Point(mm.minLoc.X + r.X, mm.minLoc.Y + r.Y)
+            maxPoint(i) = New cv.Point(mm.maxLoc.X + r.X, mm.maxLoc.Y + r.Y)
 
-            DrawCircle(dst2(gSq), mm.minLoc, task.DotSize, task.highlight)
-            DrawCircle(dst2(gSq), mm.maxLoc, task.DotSize, cv.Scalar.Red)
+            DrawCircle(dst2(r), mm.minLoc, task.DotSize, task.highlight)
+            DrawCircle(dst2(r), mm.maxLoc, task.DotSize, cv.Scalar.Red)
 
-            Dim p1 = New cv.Point(mm.minLoc.X + gSq.X, mm.minLoc.Y + gSq.Y)
-            Dim p2 = New cv.Point(mm.maxLoc.X + gSq.X, mm.maxLoc.Y + gSq.Y)
+            Dim p1 = New cv.Point(mm.minLoc.X + r.X, mm.minLoc.Y + r.Y)
+            Dim p2 = New cv.Point(mm.maxLoc.X + r.X, mm.maxLoc.Y + r.Y)
             DrawCircle(dst3, p1, task.DotSize, task.highlight)
             DrawCircle(dst3, p2, task.DotSize, cv.Scalar.Red)
         End Sub)
@@ -1274,9 +1274,9 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             bricks.Run(src)
             dst1.SetTo(0)
-            For Each gSq In bricks.brickList
-                Dim testError = ErrorEstimate(gSq.depth)
-                dst1(gSq.rect).SetTo(testError)
+            For Each r In bricks.brickList
+                Dim testError = ErrorEstimate(r.depth)
+                dst1(r.rect).SetTo(testError)
             Next
 
             Dim mm = GetMinMax(dst1)
@@ -1309,11 +1309,11 @@ Namespace VBClasses
 
             dst1 = src.Clone()
             dst1.SetTo(white, task.gridMask)
-            For Each gSq In bricks.brickList
-                Dim pt = gSq.mm.minLoc
-                subdiv.Insert(New cv.Point(pt.X + gSq.rect.X, pt.Y + gSq.rect.Y))
-                DrawCircle(dst1(gSq.rect), gSq.mm.minLoc, task.DotSize, cv.Scalar.Red)
-                DrawCircle(dst1(gSq.rect), gSq.mm.maxLoc, task.DotSize, cv.Scalar.Blue)
+            For Each r In bricks.brickList
+                Dim pt = r.mm.minLoc
+                subdiv.Insert(New cv.Point(pt.X + r.rect.X, pt.Y + r.rect.Y))
+                DrawCircle(dst1(r.rect), r.mm.minLoc, task.DotSize, cv.Scalar.Red)
+                DrawCircle(dst1(r.rect), r.mm.maxLoc, task.DotSize, cv.Scalar.Blue)
             Next
 
             If task.optionsChanged Then dst2 = dst1.Clone Else dst1.CopyTo(dst2, task.motion.motionMask)

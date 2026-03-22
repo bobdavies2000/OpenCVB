@@ -504,10 +504,10 @@ Namespace VBClasses
             dst3 = src.Clone
 
             Dim threshold = Math.Abs(task.gOptions.DebugSlider.Value)
-            For Each gSq In bricks.brickList
-                Dim mm = GetMinMax(dst2(gSq.rect))
+            For Each r In bricks.brickList
+                Dim mm = GetMinMax(dst2(r.rect))
                 If mm.maxVal >= threshold Then
-                    Dim pt = New cv.Point(mm.maxLoc.X + gSq.rect.X, mm.maxLoc.Y + gSq.rect.Y)
+                    Dim pt = New cv.Point(mm.maxLoc.X + r.rect.X, mm.maxLoc.Y + r.rect.Y)
                     DrawCircle(dst3, pt)
                 End If
             Next

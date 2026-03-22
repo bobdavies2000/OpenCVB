@@ -245,7 +245,7 @@ Namespace VBClasses
         Public rectList As New List(Of cv.Rect)
         Public Sub New()
             dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-            desc = "Use range to find featureless-ness."
+            desc = "Use range to find featureless-ness rather than correlation."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             If src.Channels <> 1 Then src = task.gray

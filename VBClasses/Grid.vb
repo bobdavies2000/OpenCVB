@@ -81,11 +81,11 @@ Namespace VBClasses
                 For Each nabeList In gridNeighbors
                     Dim xList As New List(Of Integer), yList As New List(Of Integer)
                     For Each index In nabeList
-                        Dim gSq = task.gridRects(index)
-                        xList.Add(gSq.X)
-                        yList.Add(gSq.Y)
-                        xList.Add(gSq.BottomRight.X)
-                        yList.Add(gSq.BottomRight.Y)
+                        Dim rect = task.gridRects(index)
+                        xList.Add(rect.X)
+                        yList.Add(rect.Y)
+                        xList.Add(rect.BottomRight.X)
+                        yList.Add(rect.BottomRight.Y)
                     Next
                     Dim r = New cv.Rect(xList.Min, yList.Min, xList.Max - xList.Min, yList.Max - yList.Min)
                     If r.Width < task.brickEdgeLen * 3 Then
@@ -124,7 +124,7 @@ Namespace VBClasses
     Public Class NR_Grid_BasicsTest : Inherits TaskParent
         Public Sub New()
             If standalone Then task.gOptions.GridSlider.Value = 16
-            labels = {"", "", "Each grid element is assigned a value below", "The line is the diagonal for each gSq.  Bottom might be a shortened gSq."}
+            labels = {"", "", "Each grid element is assigned a value below", "The line is the diagonal for each r.  Bottom might be a shortened r."}
             If standalone Then desc = "Validation test for Grid_Basics algorithm"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -132,18 +132,18 @@ Namespace VBClasses
 
             dst2.SetTo(0)
             For i = 0 To task.gridRects.Count - 1
-                Dim gSq = task.gridRects(i)
-                cv.Cv2.Subtract(mean, src(gSq), dst2(gSq))
-                SetTrueText(CStr(i), New cv.Point(gSq.X, gSq.Y))
+                Dim r = task.gridRects(i)
+                cv.Cv2.Subtract(mean, src(r), dst2(r))
+                SetTrueText(CStr(i), New cv.Point(r.X, r.Y))
             Next
             dst2.SetTo(white, task.gridMask)
 
             dst3.SetTo(0)
             Parallel.For(0, task.gridRects.Count,
          Sub(i)
-             Dim gSq = task.gridRects(i)
-             cv.Cv2.Subtract(mean, src(gSq), dst3(gSq))
-             vbc.DrawLine(dst3(gSq), New cv.Point(0, 0), New cv.Point(gSq.Width, gSq.Height), white)
+             Dim r = task.gridRects(i)
+             cv.Cv2.Subtract(mean, src(r), dst3(r))
+             vbc.DrawLine(dst3(r), New cv.Point(0, 0), New cv.Point(r.Width, r.Height), white)
          End Sub)
         End Sub
     End Class
@@ -244,9 +244,9 @@ Namespace VBClasses
             End If
             dst3.SetTo(0)
             For Each index In task.grid.gridNeighbors(grIndex)
-                Dim gSq = task.gridRects(index)
-                dst2.Rectangle(gSq, white, task.lineWidth)
-                dst3.Rectangle(gSq, 255, task.lineWidth)
+                Dim r = task.gridRects(index)
+                dst2.Rectangle(r, white, task.lineWidth)
+                dst3.Rectangle(r, 255, task.lineWidth)
             Next
         End Sub
     End Class
@@ -263,15 +263,15 @@ Namespace VBClasses
         Public minMaxVals(0) As cv.Vec2f
         Public Sub New()
             task.gOptions.GridSlider.Value = 8
-            desc = "Find the min and max depth within each grid gSq."
+            desc = "Find the min and max depth within each grid r."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             If minMaxLocs.Count <> task.gridRects.Count Then ReDim minMaxLocs(task.gridRects.Count - 1)
             If minMaxVals.Count <> task.gridRects.Count Then ReDim minMaxVals(task.gridRects.Count - 1)
             Dim mm As mmData
             For i = 0 To minMaxLocs.Count - 1
-                Dim gSq = task.gridRects(i)
-                task.pcSplit(2)(gSq).MinMaxLoc(mm.minVal, mm.maxVal, mm.minLoc, mm.maxLoc, task.depthmask(gSq))
+                Dim r = task.gridRects(i)
+                task.pcSplit(2)(r).MinMaxLoc(mm.minVal, mm.maxVal, mm.minLoc, mm.maxLoc, task.depthmask(r))
                 minMaxLocs(i) = New lpData(mm.minLoc, mm.maxLoc)
                 minMaxVals(i) = New cv.Vec2f(mm.minVal, mm.maxVal)
             Next
@@ -305,9 +305,9 @@ Namespace VBClasses
             If match.correlation < task.fCorrThreshold Or task.gOptions.DebugCheckBox.Checked Then
                 task.gOptions.DebugCheckBox.Checked = False
                 Dim index As Integer = task.gridMap.Get(Of Integer)(dst2.Height / 2, dst2.Width / 2)
-                Dim gSq = task.gridRects(index)
-                match.template = src(gSq).Clone
-                center = New cv.Point(gSq.X + gSq.Width / 2, gSq.Y + gSq.Height / 2)
+                Dim r = task.gridRects(index)
+                match.template = src(r).Clone
+                center = New cv.Point(r.X + r.Width / 2, r.Y + r.Height / 2)
             End If
 
             Dim pad = task.brickEdgeLen / 2
