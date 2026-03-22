@@ -126,19 +126,25 @@ Namespace VBClasses
             Return rc
         End Function
         Public Shared Function selectCell(rcMap As cv.Mat, rcList As List(Of rcData)) As String
-            Dim clickIndex As Integer = 0, strOut As String = ""
+            Dim clickIndex As Integer = 0, strOut As String = "", resetClickPoint As Boolean
             If rcList.Count > 0 Then
-                clickIndex = rcMap.Get(Of Integer)(vbc.task.clickPoint.Y, vbc.task.clickPoint.X)
+                clickIndex = rcMap.Get(Of Integer)(task.clickPoint.Y, task.clickPoint.X)
                 If clickIndex > 0 And clickIndex < rcList.Count Then
-                    vbc.task.rcD = rcList(clickIndex - 1)
+                    task.rcD = rcList(clickIndex - 1)
                 Else
-                    If rcList.Count > 0 Then clickIndex = 1 Else vbc.task.rcD = Nothing
+                    If rcList.Count > 0 Then
+                        clickIndex = 1
+                        resetClickPoint = True
+                    Else
+                        task.rcD = Nothing
+                    End If
                 End If
-                If vbc.task.rcD IsNot Nothing Then
-                    vbc.task.rcD = rcList(clickIndex - 1)
-                    vbc.task.color(vbc.task.rcD.rect).SetTo(white, vbc.task.rcD.mask)
-                    vbc.task.color.Rectangle(vbc.task.rcD.rect, vbc.task.highlight, vbc.task.lineWidth)
-                    strOut = vbc.task.rcD.displayCell()
+                If task.rcD IsNot Nothing Then
+                    task.rcD = rcList(clickIndex - 1)
+                    task.color(task.rcD.rect).SetTo(white, task.rcD.mask)
+                    task.color.Rectangle(task.rcD.rect, task.highlight, task.lineWidth)
+                    If resetClickPoint Then task.clickPoint = task.rcD.maxDist
+                    strOut = task.rcD.displayCell()
                 End If
             End If
             Return strOut
@@ -148,8 +154,7 @@ Namespace VBClasses
             dst2 = redC.dst2
             labels(2) = redC.labels(2)
 
-            selectCell(redC.rcMap, redC.rcList)
-            SetTrueText(strOut, 3)
+            SetTrueText(redC.strOut, 3)
         End Sub
     End Class
 End Namespace

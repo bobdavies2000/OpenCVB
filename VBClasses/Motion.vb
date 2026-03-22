@@ -40,7 +40,7 @@ Namespace VBClasses
                 motionMask(rect).SetTo(255)
             Next
 
-            corr.Run(src.Clone)
+            ' corr.Run(src.Clone)
 
             labels(2) = "Grid rects with motion: " + CStr(motionSort.Count)
         End Sub

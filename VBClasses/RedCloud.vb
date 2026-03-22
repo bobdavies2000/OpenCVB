@@ -255,9 +255,9 @@ Namespace VBClasses
 
             Dim count As Integer
             dst1.SetTo(0)
-            For Each gSq As brickData In bricks.brickList
-                If redC.rcMap(gSq.lRect).CountNonZero And gSq.rRect.Width > 0 Then
-                    dst2(gSq.lRect).CopyTo(dst1(gSq.rRect))
+            For Each r As brickData In bricks.brickList
+                If redC.rcMap(r.lRect).CountNonZero And r.rRect.Width > 0 Then
+                    dst2(r.lRect).CopyTo(dst1(r.rRect))
                     count += 1
                 End If
             Next

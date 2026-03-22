@@ -142,7 +142,7 @@ Namespace VBClasses
         Public redMask As New RedMask_Basics
         Public mdList As New List(Of maskData)
         Public rcList As New List(Of rcData)
-        Dim rcMap As New cv.Mat(dst2.Size, cv.MatType.CV_32S, 0)
+        Public rcMap As New cv.Mat(dst2.Size, cv.MatType.CV_32S, 0)
         Public Sub New()
             desc = "Generate the RedColor cells from the rects, mask, and pixel counts."
         End Sub
@@ -156,11 +156,13 @@ Namespace VBClasses
             Dim sortedCells As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
             rcMap.SetTo(0)
             For i = 0 To redMask.mdList.Count - 1
-                Dim rc = New rcData(redMask.mdList(i).mask, redMask.mdList(i).rect, sortedCells.Count + 1)
+                Dim rc = New rcData(redMask.mdList(i).mask, redMask.mdList(i).rect, sortedCells.Count)
+                rc.mask = redMask.mdList(i).mask
                 If rc.rect.Size = dst2.Size Then Continue For ' RedMask_List can find a cell this big.  
-                DrawTour(rc.mask, rc.contour, 255, -1)
+                ' DrawTour(rc.mask, rc.contour, 255, -1)
                 rc.pixels = redMask.mdList(i).mask.CountNonZero
                 rc.age = 1
+                rc.index = sortedCells.Count + 1
                 sortedCells.Add(rc.pixels, rc)
 
                 rcMap(rc.rect).SetTo(rc.index, rc.mask)

@@ -119,6 +119,7 @@ Corners_ShiTomasi_CPP
 Correlation_Basics
 Correlation_BasicsPlot
 Correlation_Interactive
+Correlation_Range
 Correlation_Validate
 Covariance_Basics
 Covariance_Images
@@ -1531,6 +1532,8 @@ RedCloud_Reliable
 RedCloud_RGB
 RedColor_Basics
 RedColor_Bricks
+RedColor_Contours
+RedColor_FeatureLess
 RedColor_GridRects
 RedColor_Hulls
 RedColor_LeftRight

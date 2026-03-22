@@ -33,12 +33,35 @@ Namespace VBClasses
         End Function
         Public Overrides Sub RunAlg(src As cv.Mat)
             prepData.Run(emptyMat)
-            redC.Run(src)
+
+            dst3 = prepData.reduced32s.Normalize(255, 0, cv.NormTypes.MinMax)
+            dst3.SetTo(0, task.noDepthMask)
+
+            redC.Run(dst3)
             dst2 = redC.dst2
             labels(2) = redC.labels(2)
         End Sub
     End Class
 
+
+
+
+    Public Class NR_RedCart_PrepData : Inherits TaskParent
+        Dim prepData As New RedPrep_Core
+        Public Sub New()
+            desc = "Prepare the grid of point cloud data."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            prepData.Run(emptyMat)
+            dst3 = prepData.reduced32s.Normalize(255, 0, cv.NormTypes.MinMax)
+            dst3.SetTo(0, task.noDepthMask)
+            dst2 = Palettize(dst3, 0)
+            labels(2) = prepData.labels(2)
+
+            Dim val = prepData.reduced32f.Get(Of Single)(task.clickPoint.Y, task.clickPoint.X)
+            SetTrueText("Depth = " + Format(val, fmt3), 3)
+        End Sub
+    End Class
 
 
 
@@ -92,23 +115,6 @@ Namespace VBClasses
         End Sub
     End Class
 
-
-
-
-    Public Class NR_RedCart_PrepData : Inherits TaskParent
-        Dim prepData As New RedPrep_Core
-        Public Sub New()
-            desc = "Prepare the grid of point cloud data."
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            prepData.Run(emptyMat)
-            dst2 = Palettize(prepData.dst2, 0)
-            labels(2) = prepData.labels(2)
-
-            Dim val = prepData.reduced32f.Get(Of Single)(task.clickPoint.Y, task.clickPoint.X)
-            SetTrueText("Depth = " + Format(val, fmt3), 3)
-        End Sub
-    End Class
 
 
 
@@ -173,14 +179,14 @@ Namespace VBClasses
 
     Public Class NR_RedCart_CPP : Inherits TaskParent
         Implements IDisposable
-        Dim prep As New RedPrep_Core
+        Dim prep As New RedPrep_Basics
         Public Sub New()
             cPtr = RedCart_CPP_Open()
             desc = "Hit the locations where floodfill slips up by placeing a dot in the intersection."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             prep.Run(src)
-            dst2 = prep.dst2
+            dst2 = prep.dst1
             labels(2) = prep.labels(2)
 
             Dim cppData(dst2.Total - 1) As Byte

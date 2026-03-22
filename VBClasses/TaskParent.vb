@@ -124,7 +124,9 @@ Namespace VBClasses
             Dim output As New cv.Mat
             If input.Type <> cv.MatType.CV_8U Then
                 Dim input8u As New cv.Mat
-                input.ConvertTo(input, cv.MatType.CV_8U)
+                input.ConvertTo(input8u, cv.MatType.CV_8U)
+                cv.Cv2.ApplyColorMap(input8u, output, task.colorMap)
+                Return output
             End If
             cv.Cv2.ApplyColorMap(input, output, task.colorMap)
             Return output

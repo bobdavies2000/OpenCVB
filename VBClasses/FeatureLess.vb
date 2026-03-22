@@ -1,3 +1,4 @@
+Imports System.Windows.Documents
 Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Class FeatureLess_Basics : Inherits TaskParent
@@ -119,10 +120,10 @@ Namespace VBClasses
 
             dst2.SetTo(0)
             For i = 0 To corr.cList.Count - 1
-                Dim gSq = task.gridRects(i)
+                Dim r = task.gridRects(i)
                 If corr.cList(i) < corr.maxCorrelation Then
-                    dst2(gSq).SetTo(255)
-                    If standaloneTest() Then src.Rectangle(gSq, white, task.lineWidth)
+                    dst2(r).SetTo(255)
+                    If standaloneTest() Then src.Rectangle(r, white, task.lineWidth)
                 End If
             Next
         End Sub
@@ -376,12 +377,8 @@ Namespace VBClasses
             dst3 = redC.dst2
             labels(3) = redC.labels(2)
 
-            If standaloneTest() Then
-                If redC.rcList.Count > 0 And task.rcD Is Nothing Then
-                    task.clickPoint = redC.rcList(0).maxDist
-                End If
-                SetTrueText(redC.strOut, 1)
-            End If
+            strOut = RedUtil_Basics.selectCell(redC.rcMap, redC.rcList)
+            SetTrueText(strOut, 1)
         End Sub
     End Class
 

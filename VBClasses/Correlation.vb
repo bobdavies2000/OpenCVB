@@ -15,22 +15,14 @@ Namespace VBClasses
             dst2.SetTo(0)
             Dim correlationMat As New cv.Mat
             maxCorrelation = 2.0 - 2.0 / task.histogramBins
-            Dim motionIndex As Integer
-            Dim motionList As New List(Of Integer)(task.motion.motionSort)
-            Dim maxIndex = task.motion.motionSort.Count - 1
-            If maxIndex < 0 Then motionList.Add(-1) ' add a dummy value to avoid errors when there is no motion
             rectList.Clear()
             For i = 0 To task.gridRects.Count - 1
-                If i <> motionList(motionIndex) Then
-                    Dim r = task.gridRects(i)
-                    cv.Cv2.MatchTemplate(src(r), lastsrc(r), correlationMat, cv.TemplateMatchModes.CCoeffNormed)
-                    Dim correlation = correlationMat.Get(Of Single)(0, 0) + 1
-                    If correlation < maxCorrelation Then
-                        dst2.Rectangle(r, white, -1)
-                        rectList.Add(r)
-                    End If
-                Else
-                    If motionIndex < maxIndex Then motionIndex += 1
+                Dim r = task.gridRects(i)
+                cv.Cv2.MatchTemplate(src(r), lastsrc(r), correlationMat, cv.TemplateMatchModes.CCoeffNormed)
+                Dim correlation = correlationMat.Get(Of Single)(0, 0) + 1
+                If correlation < maxCorrelation Then
+                    dst2.Rectangle(r, white, -1)
+                    rectList.Add(r)
                 End If
             Next
 
@@ -243,6 +235,35 @@ Namespace VBClasses
             dst3 = plot.dst3
             labels(2) = plot.labels(2)
             labels(3) = plot.labels(3)
+        End Sub
+    End Class
+
+
+
+
+    Public Class Correlation_Range : Inherits TaskParent
+        Public rectList As New List(Of cv.Rect)
+        Public Sub New()
+            dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+            desc = "Use range to find featureless-ness."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            If src.Channels <> 1 Then src = task.gray
+
+            Static lastsrc As cv.Mat = src.Clone
+            dst2.SetTo(0)
+            Dim correlationMat As New cv.Mat
+            rectList.Clear()
+            For Each r In task.gridRects
+                Dim mm = GetMinMax(src(r))
+                If mm.range < 30 Then
+                    dst2.Rectangle(r, white, -1)
+                    rectList.Add(r)
+                End If
+            Next
+
+            dst3 = Not dst2
+            lastsrc = src.Clone
         End Sub
     End Class
 End Namespace
