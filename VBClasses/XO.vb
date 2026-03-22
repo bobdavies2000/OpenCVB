@@ -9550,18 +9550,18 @@ Namespace VBClasses
 
     Public Class XO_RedCloud_Contours : Inherits TaskParent
         Dim prep As New RedPrep_Depth
+        Dim contours As New Contour_Basics
         Public Sub New()
-            If task.contours Is Nothing Then task.contours = New Contour_Basics_List
             dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
             desc = "Run the reduced pointcloud output through the RedList_CPP algorithm."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            task.contours.Run(src)
+            contours.Run(src)
             prep.Run(src)
             dst3 = prep.dst3
 
-            dst2 = task.contours.dst2
-            labels(2) = task.contours.labels(2)
+            dst2 = contours.dst2
+            labels(2) = contours.labels(2)
         End Sub
     End Class
 
@@ -9719,15 +9719,15 @@ Namespace VBClasses
         Public contourList As New List(Of contourData)
         Public contourMap As New cv.Mat(task.workRes, cv.MatType.CV_32F, 0)
         Public contourIDs As New List(Of Integer)
+        Dim contours As New Contour_Basics
         Public Sub New()
-            If task.contours Is Nothing Then task.contours = New Contour_Basics_List
             desc = "Use the RedPrep_Basics as input to contours_basics."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
-            task.contours.Run(src)
-            dst2 = task.contours.dst2
-            labels(2) = task.contours.labels(2)
+            contours.Run(src)
+            dst2 = contours.dst2
+            labels(2) = contours.labels(2)
 
             prep.Run(src)
             prep.dst2.ConvertTo(dst1, cv.MatType.CV_8U)
@@ -13023,15 +13023,15 @@ Namespace VBClasses
 
 
     Public Class XO_Contour_SortTest : Inherits TaskParent
+        Dim contours As New Contour_Basics
         Public Sub New()
-            If task.contours Is Nothing Then task.contours = New Contour_Basics_List
             desc = "Test the contour sort (by size) algorithm nearby. Contour_Sort standalone does nothing."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            task.contours.Run(src)
-            dst2 = task.contours.dst2
-            labels = task.contours.labels
-            SetTrueText(task.contours.strOut, 3)
+            contours.Run(src)
+            dst2 = contours.dst2
+            labels = contours.labels
+            SetTrueText(contours.strOut, 3)
         End Sub
     End Class
 

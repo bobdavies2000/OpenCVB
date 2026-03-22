@@ -114,9 +114,9 @@ Namespace VBClasses
 
     Public Class NR_FCS_BasicsOld : Inherits TaskParent
         Dim fcs As New FCS_Core
+        Dim contours As New Contour_Basics
         Public desiredMapCount As Integer = 5
         Public Sub New()
-            If task.contours Is Nothing Then task.contours = New Contour_Basics_List
             desc = "Create the reference map for FCS. "
         End Sub
         Public Function ShowPalettizeColor(input As cv.Mat) As cv.Mat
@@ -124,13 +124,13 @@ Namespace VBClasses
             Return task.paletteRandom.useColorMapFull(input)
         End Function
         Public Overrides Sub RunAlg(src As cv.Mat)
-            task.contours.Run(src)
+            contours.Run(src)
             Static restartRequest As Boolean
             fcs.inputFeatures.Clear()
-            For Each contour In task.contours.contourList
+            For Each contour In contours.contourList
                 fcs.inputFeatures.Add(Distance_Basics.GetMaxDist(contour.mask, contour.rect))
             Next
-            If task.contours.contourList.Count <= 1 Then ' when the camera is starting up the image may be too dark to process... Restart if so.
+            If contours.contourList.Count <= 1 Then ' when the camera is starting up the image may be too dark to process... Restart if so.
                 restartRequest = True
                 Exit Sub
             End If
@@ -139,9 +139,9 @@ Namespace VBClasses
             fcs.Run(emptyMat)
 
             dst2 = ShowPalettizeColor(fcs.fcsMap)
-            dst3 = task.contours.dst2
+            dst3 = contours.dst2
             labels(2) = fcs.labels(2)
-            labels(3) = task.contours.labels(2)
+            labels(3) = contours.labels(2)
         End Sub
     End Class
 

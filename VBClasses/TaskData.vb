@@ -80,22 +80,21 @@ Namespace VBClasses
 
         ' task algorithms - operate on every frame regardless of which algorithm is being run.
         Public colorizer As DepthColorizer_Basics
-        Public redList As RedMask_List
-        Public redListNew As RedMask_List
+        Public contours As Contour_Basics_List
         Public gravityMatrix As IMU_GMatrix
         Public lines As Line_Basics
         Public grid As Grid_Basics
         Public palette As Palette_LoadColorMap
-        Public PixelViewer As Pixel_Viewer
-        Public pixelViewerOn As Boolean
         Public filterBasics As Filter_Basics
         Public gravityBasics As Gravity_Basics
         Public imuBasics As IMU_Basics
+        Public leftRightBrightness As LeftRight_Brightness
         Public motion As Motion_Basics
         Public motionCloud As Motion_Cloud
         Public motionFeatures As cv.Point2f
-        Public leftRightBrightness As LeftRight_Brightness
-        Public contours As Contour_Basics_List
+        Public PixelViewer As Pixel_Viewer
+        Public pixelViewerOn As Boolean
+        Public redList As RedMask_List ' only referenced by XO algorithms so not really used.
 
         Public GLRequest As Integer
         Public GLcloud As cv.Mat

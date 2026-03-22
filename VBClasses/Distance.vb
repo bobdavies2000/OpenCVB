@@ -522,8 +522,8 @@ Namespace VBClasses
 
     Public Class NR_Distance_Contour : Inherits TaskParent
         Dim options As New Options_Distance
+        Dim contours As New Contour_Basics
         Public Sub New()
-            If task.contours Is Nothing Then task.contours = New Contour_Basics_List
             If standalone Then task.gOptions.displayDst0.Checked = True
             If standalone Then task.gOptions.displayDst1.Checked = True
             dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
@@ -531,10 +531,10 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
-            task.contours.Run(src)
+            contours.Run(src)
 
-            dst2 = task.contours.dst2
-            labels(2) = task.contours.labels(2)
+            dst2 = contours.dst2
+            labels(2) = contours.labels(2)
 
             dst3 = src.Clone
             dst3(task.contourD.rect).SetTo(white, task.contourD.mask)

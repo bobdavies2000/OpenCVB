@@ -136,20 +136,20 @@ Namespace VBClasses
 
     Public Class NR_FeatureLess_Contours : Inherits TaskParent
         Dim edgeline As New EdgeLine_Basics
+        Dim contours As New Contour_Basics
         Public Sub New()
-            If task.contours Is Nothing Then task.contours = New Contour_Basics_List
             desc = "Use Contour_Basics to get the contour data for the top contours by size."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             If src.Channels = 1 Then edgeline.Run(src) Else edgeline.Run(task.grayStable)
             If src.Type <> cv.MatType.CV_8U Then
-                task.contours.Run(edgeline.dst2)
-                dst2 = task.contours.dst2
-                labels = task.contours.labels
+                contours.Run(edgeline.dst2)
+                dst2 = contours.dst2
+                labels = contours.labels
             Else
-                task.contours.Run(src)
-                dst2 = task.contours.dst2
-                labels = task.contours.labels
+                contours.Run(src)
+                dst2 = contours.dst2
+                labels = contours.labels
             End If
         End Sub
     End Class
