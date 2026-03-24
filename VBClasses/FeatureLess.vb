@@ -470,7 +470,7 @@ Namespace VBClasses
         Dim fLess As New FeatureLess_Threshold
         Dim diff As New Diff_Simple
         Public Sub New()
-            desc = "Double-check that any differences from the previous fLess output occurred with motion."
+            desc = "Double-check that any differences from the previous fLess output occurred because of motion."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             fLess.Run(src)

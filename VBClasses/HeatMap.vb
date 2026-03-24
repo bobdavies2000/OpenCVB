@@ -104,11 +104,11 @@ Namespace VBClasses
 
 
 
-    Public Class NR_HeatMap_Cell : Inherits TaskParent
+    Public Class HeatMap_Cell : Inherits TaskParent
         Dim flood As New Flood_Basics
         Dim heat As New HeatMap_Hot
         Public Sub New()
-            If standalone Then task.gOptions.displaydst1.checked = True
+            If standalone Then task.gOptions.displayDst1.Checked = True
             desc = "Display the heat map for the selected cell"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -125,6 +125,7 @@ Namespace VBClasses
 
             labels(1) = heat.labels(2)
             labels(3) = heat.labels(3)
+            SetTrueText("Click on any cell in dst2 to see the top and side view of the cell.", 3)
         End Sub
     End Class
 

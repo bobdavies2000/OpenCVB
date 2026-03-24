@@ -333,7 +333,7 @@ Namespace VBClasses
         Dim flood As New Flood_Basics
         Dim edges As New Edge_Canny
         Public Sub New()
-            If standalone Then task.gOptions.displayDst1.Checked = True
+            labels(3) = "Edge_Canny output"
             desc = "Use color to connect FCS cells - visualize the data mostly."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -345,14 +345,7 @@ Namespace VBClasses
             edges.Run(src)
             dst3 = edges.dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
 
-            For i = 0 To task.fpList.Count - 1
-                Dim fp = task.fpList(i)
-                DrawCircle(dst1, fp.pt, task.DotSize, task.highlight)
-                DrawCircle(dst2, fp.pt, task.DotSize, task.highlight)
-
-                task.fpList(i) = fp
-                DrawCircle(dst3, fp.pt, task.DotSize, task.highlight)
-            Next
+            dst2.SetTo(white, dst3)
         End Sub
     End Class
 

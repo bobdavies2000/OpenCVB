@@ -1,10 +1,97 @@
-Imports System.Windows.Documents
+Imports System.Runtime.InteropServices
 Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Class Flood_Basics : Inherits TaskParent
+        Implements IDisposable
+        Public classCount As Integer
+        Public rcList As New List(Of rcData)
+        Public rcMap As cv.Mat = New cv.Mat(dst2.Size, cv.MatType.CV_32S, 0)
+        Public wGridList As New List(Of cv.Point3d)
+        Public options As New Options_RedCloud
+        Dim myColors(255) As cv.Vec3b
+        Dim fLess As New FeatureLess_Stabilized
+        Public Sub New()
+            myColors = task.vecColors
+            cPtr = RedCloudFill_Open()
+            desc = "This is before matching to previous generation."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            options.Run()
+
+            fLess.Run(task.gray)
+            src = fLess.dst2
+
+            Dim imagePtr As IntPtr
+            Dim inputData(src.Total - 1) As Byte
+            src.GetArray(Of Byte)(inputData)
+            Dim handleInput = GCHandle.Alloc(inputData, GCHandleType.Pinned)
+
+            imagePtr = RedCloudFill_Run(cPtr, handleInput.AddrOfPinnedObject(), src.Rows, src.Cols)
+            handleInput.Free()
+
+            Dim rMask = New cv.Rect(1, 1, src.Width, src.Height)
+            Dim mask = cv.Mat.FromPixelData(src.Rows + 2, src.Cols + 2, cv.MatType.CV_8U, imagePtr)
+            dst0 = mask(rMask).Clone
+
+            classCount = RedCloudFill_Count(cPtr)
+            If classCount = 0 Then Exit Sub ' no data to process.
+
+            Dim rectData = cv.Mat.FromPixelData(classCount, 1, cv.MatType.CV_32SC4, RedCloudFill_Rects(cPtr))
+            Dim rects(classCount - 1) As cv.Rect
+            rectData.GetArray(Of cv.Rect)(rects)
+
+            Dim rcMapLast = rcMap.Clone
+            Dim rcLastList = New List(Of rcData)(rcList)
+
+            rcList.Clear()
+            rcMap.SetTo(0)
+            Dim count As Integer
+            Dim ages As New List(Of Integer)
+            For Each r In rects
+                Dim rc = New rcData(dst0(r), r, rcList.Count + 1)
+                Dim val = rcMapLast.Get(Of Integer)(rc.maxDist.Y, rc.maxDist.X)
+                If val <> 0 Then
+                    Dim nextColor = dst2.Get(Of cv.Vec3b)(rc.maxDist.Y, rc.maxDist.X)
+                    If nextColor = myColors(val) Then
+                        If val < rcLastList.Count Then
+                            rc.age = rcLastList(val).age + 1
+                            count += 1
+                        End If
+                    Else
+                        myColors(val) = nextColor
+                    End If
+                Else
+                    Dim k = 0
+                End If
+
+                ages.Add(rc.age)
+                rcList.Add(rc)
+
+                rcMap(r).SetTo(rcList.Count, rc.mask)
+            Next
+
+            task.colorMap = cv.Mat.FromPixelData(256, 1, cv.MatType.CV_8UC3, myColors)
+            dst2 = Palettize(rcMap, 0)
+
+            strOut = RedUtil_Basics.selectCell(rcMap, rcList)
+            SetTrueText(strOut, 3)
+
+            labels(2) = CStr(count) + " of " + CStr(rcList.Count) + " cells matched their previous color. "
+            labels(3) = "Average age = " + Format(ages.Average, fmt1)
+        End Sub
+        Protected Overrides Sub Finalize()
+            If cPtr <> 0 Then cPtr = RedCloudFill_Close(cPtr)
+        End Sub
+    End Class
+
+
+
+
+
+    Public Class NR_Flood_SimpleRedColor : Inherits TaskParent
         Public redC As New RedColor_Basics
         Public Sub New()
-            desc = "Build the RedCloud cells with the grayscale input."
+            desc = "Build the RedColor cells with the grayscale input."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             redC.Run(src)

@@ -307,6 +307,7 @@ GuidedBP_MultiSlice
 GuidedBP_Top
 GuidedBP_TopView
 HeatMap_Basics
+HeatMap_Cell
 HeatMap_Hot
 HighVis_Basics
 Hist2D_Basics
@@ -914,6 +915,7 @@ NR_FitLine_Simple3D
 NR_FLANN_Basics
 NR_FLANN_Test
 NR_Flood_Minimal
+NR_Flood_SimpleRedColor
 NR_Flood_Tiers
 NR_Font_FlowMsgs
 NR_Fractal_Dimension
@@ -972,7 +974,6 @@ NR_GuidedBP_HotPointsKNN
 NR_GuidedBP_Lookup
 NR_GuidedBP_PlanesPlot
 NR_GuidedBP_Points
-NR_HeatMap_Cell
 NR_HeatMap_Grid
 NR_HeatMap_GuidedBP
 NR_Hist2D_Depth
@@ -1540,7 +1541,6 @@ RedColor_GridRects
 RedColor_Hulls
 RedColor_LeftRight
 RedColor_List
-RedColor_NoMatching
 RedColor_StableRegions
 RedMask_Basics
 RedMask_Color
