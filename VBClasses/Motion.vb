@@ -15,8 +15,13 @@ Namespace VBClasses
             If src.Channels <> 1 Then src = task.gray
             If task.optionsChanged Then dst2 = src.Clone
 
-            diff.lastFrame = dst2
-            diff.Run(src)
+            If task.heartBeat Or task.optionsChanged Then
+                diff.lastFrame = src
+                diff.dst2.SetTo(0)
+            Else
+                diff.lastFrame = dst2
+                diff.Run(src)
+            End If
 
             Dim gridList As New SortedList(Of Integer, Integer)
             For i = 0 To task.gridRects.Count - 1

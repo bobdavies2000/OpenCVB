@@ -593,7 +593,7 @@ Namespace VBClasses
                     mask = _mask.Clone
                 End If
                 contour = ContourBuild(mask)
-                If contour IsNot Nothing And _index >= 0 Then
+                If _index >= 0 Then
                     If contour.Count >= 3 And combinedMask = False Then ' need at least 3 points for a contour.
                         Dim listOfPoints = New List(Of List(Of cv.Point))({contour})
                         mask = New cv.Mat(mask.Size, cv.MatType.CV_8U, 0)
