@@ -8,10 +8,8 @@ Namespace VBClasses
         Public rcMap As cv.Mat = New cv.Mat(dst2.Size, cv.MatType.CV_32S, 0)
         Public wGridList As New List(Of cv.Point3d)
         Public options As New Options_RedCloud
-        Dim myColors(255) As cv.Vec3b
         Dim fLess As New FeatureLess_Stabilized
         Public Sub New()
-            myColors = task.vecColors
             cPtr = RedCloudFill_Open()
             desc = "This is before matching to previous generation."
         End Sub
@@ -45,39 +43,21 @@ Namespace VBClasses
 
             rcList.Clear()
             rcMap.SetTo(0)
-            Dim count As Integer
-            Dim ages As New List(Of Integer)
+            dst2.SetTo(0)
             For Each r In rects
-                Dim rc = New rcData(dst0(r), r, rcList.Count + 1)
-                Dim val = rcMapLast.Get(Of Integer)(rc.maxDist.Y, rc.maxDist.X)
-                If val <> 0 Then
-                    Dim nextColor = dst2.Get(Of cv.Vec3b)(rc.maxDist.Y, rc.maxDist.X)
-                    If nextColor = myColors(val) Then
-                        If val < rcLastList.Count Then
-                            rc.age = rcLastList(val).age + 1
-                            count += 1
-                        End If
-                    Else
-                        myColors(val) = nextColor
-                    End If
-                Else
-                    Dim k = 0
+                If r.Size <> task.gridRects(0).Size Then
+                    Dim rc = New rcData(dst0(r), r, rcList.Count + 1)
+                    rc.color = vecToScalar(task.vecColors(rc.index))
+                    rcList.Add(rc)
+                    dst2(rc.rect).SetTo(rc.color, rc.mask)
+                    rcMap(rc.rect).SetTo(rc.index, rc.mask)
                 End If
-
-                ages.Add(rc.age)
-                rcList.Add(rc)
-
-                rcMap(r).SetTo(rcList.Count, rc.mask)
             Next
-
-            task.colorMap = cv.Mat.FromPixelData(256, 1, cv.MatType.CV_8UC3, myColors)
-            dst2 = Palettize(rcMap, 0)
 
             strOut = RedUtil_Basics.selectCell(rcMap, rcList)
             SetTrueText(strOut, 3)
 
-            labels(2) = CStr(count) + " of " + CStr(rcList.Count) + " cells matched their previous color. "
-            labels(3) = "Average age = " + Format(ages.Average, fmt1)
+            labels(2) = CStr(rcList.Count) + " cells found. "
         End Sub
         Protected Overrides Sub Finalize()
             If cPtr <> 0 Then cPtr = RedCloudFill_Close(cPtr)
