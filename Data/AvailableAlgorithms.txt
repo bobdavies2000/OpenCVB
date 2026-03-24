@@ -1541,7 +1541,6 @@ RedColor_GridRects
 RedColor_Hulls
 RedColor_LeftRight
 RedColor_List
-RedColor_StableRegions
 RedMask_Basics
 RedMask_Color
 RedMask_CPP

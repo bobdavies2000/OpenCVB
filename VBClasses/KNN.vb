@@ -58,7 +58,6 @@ Namespace VBClasses
 
 
 
-
     Public Class KNN_N2Basics : Inherits TaskParent
         Implements IDisposable
         Public knn As cv.ML.KNearest

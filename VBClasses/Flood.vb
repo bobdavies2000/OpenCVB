@@ -9,9 +9,10 @@ Namespace VBClasses
         Public wGridList As New List(Of cv.Point3d)
         Public options As New Options_RedCloud
         Dim fLess As New FeatureLess_Stabilized
+        Dim lastCenters As New List(Of cv.Rect)
         Public Sub New()
             cPtr = RedCloudFill_Open()
-            desc = "This is before matching to previous generation."
+            desc = "Match the previous featureLess regions as best as possible."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
@@ -38,20 +39,36 @@ Namespace VBClasses
             Dim rects(classCount - 1) As cv.Rect
             rectData.GetArray(Of cv.Rect)(rects)
 
-            Dim rcMapLast = rcMap.Clone
             Dim rcLastList = New List(Of rcData)(rcList)
 
             rcList.Clear()
             rcMap.SetTo(0)
             dst2.SetTo(0)
             For Each r In rects
+                ' skip the cells that are just one gridRect.
                 If r.Size <> task.gridRects(0).Size Then
                     Dim rc = New rcData(dst0(r), r, rcList.Count + 1)
-                    rc.color = vecToScalar(task.vecColors(rc.index))
-                    rcList.Add(rc)
-                    dst2(rc.rect).SetTo(rc.color, rc.mask)
-                    rcMap(rc.rect).SetTo(rc.index, rc.mask)
+                    If rc.pixels > 0 Then
+                        For i = 0 To lastCenters.Count - 1
+                            Dim rect = lastCenters(i)
+                            If rect.Contains(rc.maxDist) Then
+                                rc.age = rcLastList(i).age + 1
+                                rc.color = rcLastList(i).color
+                                Exit For
+                            End If
+                        Next
+                        If rc.age = 1 Then rc.color = task.scalarColors(rc.index)
+                        rcList.Add(rc)
+                        dst2(rc.rect).SetTo(rc.color, rc.mask)
+                        rcMap(rc.rect).SetTo(rc.index, rc.mask)
+                    End If
                 End If
+            Next
+
+            lastCenters.Clear()
+            For Each rc In rcList
+                lastCenters.Add(task.gridNabeRects(rc.gridIndex))
+                'dst2.Rectangle(task.gridNabeRects(rc.gridIndex), task.highlight, task.lineWidth)
             Next
 
             strOut = RedUtil_Basics.selectCell(rcMap, rcList)
