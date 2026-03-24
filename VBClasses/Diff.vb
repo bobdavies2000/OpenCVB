@@ -198,4 +198,27 @@ Namespace VBClasses
         End Sub
     End Class
 
+
+
+
+
+    Public Class Diff_Simple : Inherits TaskParent
+        Public changedPixels As Integer
+        Public lastFrame As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 255)
+        Public Sub New()
+            desc = "Simple diff of lastFrame and current src."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            If src.Channels() <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+
+            If task.firstPass Then lastFrame.SetTo(0)
+
+            cv.Cv2.Absdiff(src, lastFrame, dst2)
+            changedPixels = dst2.CountNonZero
+            If changedPixels > 0 Then
+                lastFrame = src.Clone
+                strOut = CStr(changedPixels) + " pixels changed."
+            End If
+        End Sub
+    End Class
 End Namespace

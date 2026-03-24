@@ -174,6 +174,7 @@ Diff_Color
 Diff_Depth32f
 Diff_RGB
 Diff_RGBAccum
+Diff_Simple
 Diff_UnstableDepthAndColor
 Dilate_Basics
 Disparity_Basics
@@ -249,6 +250,7 @@ FeatureLess_Basics
 FeatureLess_Cells
 FeatureLess_Not
 FeatureLess_RedColor
+FeatureLess_Stabilized
 FeatureLess_Threshold
 Filter_Basics_Gray
 Filter_Basics_TA

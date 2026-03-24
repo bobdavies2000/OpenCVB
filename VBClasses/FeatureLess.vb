@@ -462,4 +462,36 @@ Namespace VBClasses
             SetTrueText(strOut, 1)
         End Sub
     End Class
+
+
+
+
+    Public Class FeatureLess_Stabilized : Inherits TaskParent
+        Dim fLess As New FeatureLess_Threshold
+        Dim diff As New Diff_Simple
+        Public Sub New()
+            desc = "Double-check that any differences from the previous fLess output occurred with motion."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            fLess.Run(src)
+            dst2 = fLess.dst2
+
+            Static fLessLast = dst2.Clone
+
+            diff.lastFrame = fLessLast
+            diff.Run(dst2)
+
+            For Each r In task.gridRects
+                Dim val = diff.dst2.Get(Of Byte)(r.TopLeft.Y, r.TopLeft.X)
+                If val > 0 Then
+                    Dim gridIndex = task.gridMap.Get(Of Integer)(r.TopLeft.Y, r.TopLeft.X)
+                    If task.motion.motionMask.Get(Of Byte)(r.TopLeft.Y, r.TopLeft.X) = 0 Then
+                        dst2(task.gridRects(gridIndex)).SetTo(0)
+                    End If
+                End If
+            Next
+
+            fLessLast = dst2.Clone
+        End Sub
+    End Class
 End Namespace
