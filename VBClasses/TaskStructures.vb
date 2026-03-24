@@ -634,27 +634,26 @@ Namespace VBClasses
                 maxDist.Y = mm.maxLoc.Y + rect.Y
             End Sub
             Public Function displayCell() As String
-                Dim strOut = "rcList index = " + CStr(index) + vbCrLf
-                strOut += "Age = " + CStr(age) + vbCrLf
-                strOut += "Rect: X = " + CStr(rect.X) + ", Y = " + CStr(rect.Y) + ", "
-                strOut += "width = " + CStr(rect.Width) + ", height = " + CStr(rect.Height) + vbCrLf
-                strOut += "MaxDist = " + CStr(maxDist.X) + "," + CStr(maxDist.Y) + vbCrLf
-                strOut += "World Coordinates = " + Format(wcMean(0), fmt3) + " " +
+                Dim strout = "Age = " + CStr(age) + vbCrLf
+                strout += "Color = " + color.ToString + vbCrLf
+                If contour IsNot Nothing Then
+                    strout += "Contour count = " + CStr(contour.Count) + vbCrLf
+                End If
+                strout += "DepthDelta (mm's) = " + Format(CInt(depthDelta * 1000), "00") + vbCrLf
+                strout += "Hull count = " + If(hull Is Nothing, "0", CStr(hull.Count)) + vbCrLf
+                strout += "index = " + CStr(index) + vbCrLf
+                strout += "MaxDist = " + CStr(maxDist.X) + "," + CStr(maxDist.Y) + vbCrLf
+                strout += "Multi-Mask flag = " + CStr(multiMask) + vbCrLf
+                strout += "Pixel count = " + CStr(pixels) + vbCrLf
+                strout += "Rect: X = " + CStr(rect.X) + ", Y = " + CStr(rect.Y) + ", "
+                strout += "width = " + CStr(rect.Width) + ", height = " + CStr(rect.Height) + vbCrLf
+                strout += "World Coordinates = " + Format(wcMean(0), fmt3) + " " +
                                                    Format(wcMean(1), fmt3) + " " +
                                                    Format(wcMean(2), fmt3) + vbCrLf
-                strOut += "DepthDelta (mm's) = " + Format(CInt(depthDelta * 1000), "00") + vbCrLf
-                strOut += "Color = " + color.ToString + vbCrLf
-                strOut += "Pixel count = " + CStr(pixels) + vbCrLf
-                strOut += "World Grid coordinates = " + CStr(wGrid.X) + ", " + CStr(wGrid.Y) + ", " +
+                strout += "World Grid coordinates = " + CStr(wGrid.X) + ", " + CStr(wGrid.Y) + ", " +
                                                         CStr(wGrid.Z) + vbCrLf
-                strOut += "Multi-Mask flag = " + CStr(multiMask) + vbCrLf
-                strOut += "Hull count = "
-                strOut += If(hull Is Nothing, "0", CStr(hull.Count)) + vbCrLf
-                If contour IsNot Nothing Then
-                    strOut += "Contour count = "
-                    strOut += CStr(contour.Count) + vbCrLf
-                End If
-                Return strOut
+
+                Return strout
             End Function
         End Class
     End Module

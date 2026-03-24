@@ -58,6 +58,16 @@ Namespace VBClasses
                             End If
                         Next
                         If rc.age = 1 Then rc.color = task.scalarColors(rc.index)
+
+
+                        For Each rcTest In rcList
+                            If rc.color = rcTest.color Then
+                                rc.color = task.scalarColors(rc.index)
+                                Exit For
+                            End If
+                        Next
+
+
                         rcList.Add(rc)
                         dst2(rc.rect).SetTo(rc.color, rc.mask)
                         rcMap(rc.rect).SetTo(rc.index, rc.mask)
@@ -68,7 +78,6 @@ Namespace VBClasses
             lastCenters.Clear()
             For Each rc In rcList
                 lastCenters.Add(task.gridNabeRects(rc.gridIndex))
-                'dst2.Rectangle(task.gridNabeRects(rc.gridIndex), task.highlight, task.lineWidth)
             Next
 
             strOut = RedUtil_Basics.selectCell(rcMap, rcList)

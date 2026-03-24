@@ -45,8 +45,8 @@ Namespace VBClasses
                     If rc1.wGrid.X = -2 And rc1.wGrid.Y = 0 Then Dim k = 0
                 Else
                     If rc1.multiMask Then
-                        rc1.contour = Nothing
-                        rc1.hull = Nothing
+                        rc1.contour = New List(Of cv.Point)
+                        rc1.hull = New List(Of cv.Point)
                         rc1.pixels = rc1.mask.CountNonZero
                     End If
                     newList.Add(rc1)
@@ -55,8 +55,8 @@ Namespace VBClasses
             Next
 
             If rc1 IsNot Nothing Then
-                rc1.contour = Nothing
-                rc1.hull = Nothing
+                rc1.contour = New List(Of cv.Point)
+                rc1.hull = New List(Of cv.Point)
                 rc1.pixels = rc1.mask.CountNonZero
                 newList.Add(rc1)
             Else
