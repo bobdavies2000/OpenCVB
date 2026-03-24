@@ -1,7 +1,7 @@
 Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 Namespace VBClasses
-    Public Class EdgeLine_Basics : Inherits TaskParent
+    Public Class EdgeLine_Basics_TA : Inherits TaskParent
         Implements IDisposable
         Public rcList As New List(Of rcData)
         Public rcMap As New cv.Mat
@@ -62,7 +62,7 @@ Namespace VBClasses
 
 
     Public Class NR_EdgeLine_Motion : Inherits TaskParent
-        Dim edgeLine As New EdgeLine_Basics
+        Dim edgeLine As New EdgeLine_Basics_TA
         Public rcList As New List(Of rcData)
         Public classCount As Integer
         Public Sub New()
@@ -185,7 +185,7 @@ Namespace VBClasses
 
     Public Class NR_EdgeLine_SplitMean : Inherits TaskParent
         Dim binary As New Bin4Way_SplitMean
-        Dim edges As New EdgeLine_Basics
+        Dim edges As New EdgeLine_Basics_TA
         Public Sub New()
             dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
             desc = "find the edges in a 4-way color split of the image."
@@ -294,7 +294,7 @@ Namespace VBClasses
     Public Class NR_EdgeLine_BrickPoints : Inherits TaskParent
         Dim bPoint As New BrickPoint_Basics
         Public classCount As Integer
-        Dim edgeline As New EdgeLine_Basics
+        Dim edgeline As New EdgeLine_Basics_TA
         Public Sub New()
             dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
             If standalone Then task.gOptions.displayDst1.Checked = True
@@ -365,7 +365,7 @@ Namespace VBClasses
 
     Public Class NR_EdgeLine_DepthSegments : Inherits TaskParent
         Public segments As New List(Of List(Of cv.Point))
-        Dim edgeline As New EdgeLine_Basics
+        Dim edgeline As New EdgeLine_Basics_TA
         Public Sub New()
             labels(3) = "Highlighting the individual line segments one by one."
             desc = "Break up any edgeline segments that cross depth boundaries."
@@ -414,7 +414,7 @@ Namespace VBClasses
 
 
     Public Class EdgeLine_LeftRight : Inherits TaskParent
-        Dim edges As New EdgeLine_Basics
+        Dim edges As New EdgeLine_Basics_TA
         Public Sub New()
             labels(3) = "Right View: Note it is updated on every frame - it cannot use the motion mask."
             desc = "Build the left and right edge lines."

@@ -18,7 +18,10 @@ Namespace VBClasses
         Public rcMap As cv.Mat = New cv.Mat(dst2.Size, cv.MatType.CV_32S, 0)
         Public options As New Options_RedCloud
         Public Sub New()
-            If standalone Then task.gOptions.displayDst1.Checked = True
+            If standalone Then
+                task.gOptions.displayDst1.Checked = True
+                labels(1) = "The key colors used to set colors in the RedCloud output."
+            End If
             desc = "Build contours for each cell"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -57,7 +60,7 @@ Namespace VBClasses
             strOut = RedUtil_Basics.selectCell(rcMap, rcList)
             SetTrueText(strOut, 3)
 
-            If standaloneTest() Then dst1 = task.keyColors.dst2
+            dst1 = task.keyColors.dst2
 
             labels(2) = CStr(unMatched) + " were new cells and " + CStr(matchCount) + " were matched, " +
                             "average age: " + Format(matchAverage / rcList.Count, fmt1)
@@ -65,6 +68,64 @@ Namespace VBClasses
         End Sub
     End Class
 
+
+
+
+
+
+    Public Class RedCloud_Core : Inherits TaskParent
+        Public prepEdges As New RedPrep_Basics
+        Public rcList As New List(Of rcData)
+        Public Sub New()
+            dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+            desc = "Find the biggest chunks of consistent depth data "
+        End Sub
+        Public Shared Function sweepImage(input As cv.Mat) As List(Of rcData)
+            Dim index As Integer = 1
+            Dim rect As New cv.Rect
+            Dim mask = New cv.Mat(New cv.Size(input.Width + 2, input.Height + 2), cv.MatType.CV_8U, 0)
+            '  Or cv.FloodFillFlags.MaskOnly - maskonly is expensive but why?
+            Dim flags As cv.FloodFillFlags = cv.FloodFillFlags.Link4
+            Dim minSize As Integer = input.Total * 0.0001
+            Dim rc As rcData = Nothing
+            Dim newList As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
+            For y = 0 To input.Height - 1
+                For x = 0 To input.Width - 1
+                    Dim pt = New cv.Point(x, y)
+                    ' skip the regions with no depth or those that were already floodfilled.
+                    If input.Get(Of Byte)(pt.Y, pt.X) = 0 Then
+                        Dim count = cv.Cv2.FloodFill(input, mask, pt, index, rect, 0, 0, flags)
+                        If rect.Width > 0 And rect.Height > 0 Then
+                            If count >= minSize Then
+                                rc = New rcData(input(rect), rect, index)
+                                If rc.index < 0 Then Continue For
+                                newList.Add(rc.pixels, rc)
+                                index += 1
+                                rc.index = newList.Count
+                            End If
+                        End If
+                    End If
+                    If index = 254 Then index = 1
+                Next
+            Next
+            Return New List(Of rcData)(newList.Values)
+        End Function
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            If src.Channels <> 1 Then
+                prepEdges.Run(src)
+                src = prepEdges.dst2.Clone
+            End If
+
+            rcList = sweepImage(src)
+
+            dst2.SetTo(0)
+            For Each rc In rcList
+                dst2(rc.rect).SetTo(rc.index Mod 254, rc.mask)
+            Next
+            dst3 = Palettize(dst2, 0)
+            labels(2) = "RedCloud cells identified: " + CStr(rcList.Count)
+        End Sub
+    End Class
 
 
 
@@ -141,64 +202,6 @@ Namespace VBClasses
         End Sub
     End Class
 
-
-
-
-
-
-    Public Class RedCloud_Core : Inherits TaskParent
-        Public prepEdges As New RedPrep_Basics
-        Public rcList As New List(Of rcData)
-        Public Sub New()
-            dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-            desc = "Find the biggest chunks of consistent depth data "
-        End Sub
-        Public Shared Function sweepImage(input As cv.Mat) As List(Of rcData)
-            Dim index As Integer = 1
-            Dim rect As New cv.Rect
-            Dim mask = New cv.Mat(New cv.Size(input.Width + 2, input.Height + 2), cv.MatType.CV_8U, 0)
-            '  Or cv.FloodFillFlags.MaskOnly - maskonly is expensive but why?
-            Dim flags As cv.FloodFillFlags = cv.FloodFillFlags.Link4
-            Dim minSize As Integer = input.Total * 0.0001
-            Dim rc As rcData = Nothing
-            Dim newList As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
-            For y = 0 To input.Height - 1
-                For x = 0 To input.Width - 1
-                    Dim pt = New cv.Point(x, y)
-                    ' skip the regions with no depth or those that were already floodfilled.
-                    If input.Get(Of Byte)(pt.Y, pt.X) = 0 Then
-                        Dim count = cv.Cv2.FloodFill(input, mask, pt, index, rect, 0, 0, flags)
-                        If rect.Width > 0 And rect.Height > 0 Then
-                            If count >= minSize Then
-                                rc = New rcData(input(rect), rect, index)
-                                If rc.index < 0 Then Continue For
-                                newList.Add(rc.pixels, rc)
-                                index += 1
-                                rc.index = newList.Count
-                            End If
-                        End If
-                    End If
-                    If index = 254 Then index = 1
-                Next
-            Next
-            Return New List(Of rcData)(newList.Values)
-        End Function
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            If src.Channels <> 1 Then
-                prepEdges.Run(src)
-                src = prepEdges.dst2.Clone
-            End If
-
-            rcList = sweepImage(src)
-
-            dst2.SetTo(0)
-            For Each rc In rcList
-                dst2(rc.rect).SetTo(rc.index Mod 254, rc.mask)
-            Next
-            dst3 = Palettize(dst2, 0)
-            labels(2) = "RedCloud cells identified: " + CStr(rcList.Count)
-        End Sub
-    End Class
 
 
 
@@ -558,4 +561,5 @@ Namespace VBClasses
             If cPtr <> 0 Then cPtr = RedCloudFill_Close(cPtr)
         End Sub
     End Class
+
 End Namespace

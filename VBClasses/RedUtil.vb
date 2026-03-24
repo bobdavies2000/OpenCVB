@@ -126,7 +126,7 @@ Namespace VBClasses
             Return rc
         End Function
         Public Shared Function selectCell(rcMap As cv.Mat, rcList As List(Of rcData)) As String
-            Dim clickIndex As Integer = 0, strOut As String = "", resetClickPoint As Boolean
+            Dim clickIndex As Integer = 0, strOut As String = ""
             If rcList.Count > 0 Then
                 clickIndex = rcMap.Get(Of Integer)(task.clickPoint.Y, task.clickPoint.X)
                 If clickIndex > 0 And clickIndex < rcList.Count Then
@@ -134,7 +134,8 @@ Namespace VBClasses
                 Else
                     If rcList.Count > 0 Then
                         clickIndex = 1
-                        resetClickPoint = True
+                        task.rcD = rcList(0)
+                        task.clickPoint = task.rcD.maxDist
                     Else
                         task.rcD = Nothing
                     End If
@@ -143,7 +144,6 @@ Namespace VBClasses
                     task.rcD = rcList(clickIndex - 1)
                     task.color(task.rcD.rect).SetTo(white, task.rcD.mask)
                     task.color.Rectangle(task.rcD.rect, task.highlight, task.lineWidth)
-                    If resetClickPoint Then task.clickPoint = task.rcD.maxDist
                     strOut = task.rcD.displayCell()
                 End If
             End If

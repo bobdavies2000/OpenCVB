@@ -373,4 +373,230 @@ Namespace VBClasses
             SetTrueText(redC.strOut, 1)
         End Sub
     End Class
+
+
+
+
+
+
+
+    Public Class RedColor_NoMatching : Inherits TaskParent
+        Implements IDisposable
+        Public classCount As Integer
+        Public rcList As New List(Of rcData)
+        Public rcMap As cv.Mat = New cv.Mat(dst2.Size, cv.MatType.CV_32S, 0)
+        Public wGridList As New List(Of cv.Point3d)
+        Public options As New Options_RedCloud
+        Dim myColors(255) As cv.Vec3b
+        Public Sub New()
+            myColors = task.vecColors
+            cPtr = RedCloudFill_Open()
+            desc = "This is before matching to previous generation."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            options.Run()
+
+            If standalone Then
+                Static fLess As New FeatureLess_Threshold
+                fLess.Run(task.gray)
+                src = fLess.dst2
+            End If
+
+            Dim imagePtr As IntPtr
+            Dim inputData(src.Total - 1) As Byte
+            src.GetArray(Of Byte)(inputData)
+            Dim handleInput = GCHandle.Alloc(inputData, GCHandleType.Pinned)
+
+            imagePtr = RedCloudFill_Run(cPtr, handleInput.AddrOfPinnedObject(), src.Rows, src.Cols)
+            handleInput.Free()
+
+            Dim rMask = New cv.Rect(1, 1, src.Width, src.Height)
+            Dim mask = cv.Mat.FromPixelData(src.Rows + 2, src.Cols + 2, cv.MatType.CV_8U, imagePtr)
+            dst0 = mask(rMask).Clone
+
+            classCount = RedCloudFill_Count(cPtr)
+            If classCount = 0 Then Exit Sub ' no data to process.
+
+            Dim rectData = cv.Mat.FromPixelData(classCount, 1, cv.MatType.CV_32SC4, RedCloudFill_Rects(cPtr))
+            Dim rects(classCount - 1) As cv.Rect
+            rectData.GetArray(Of cv.Rect)(rects)
+
+            Dim rcMapLast = rcMap.Clone
+            Dim rcLastList = New List(Of rcData)(rcList)
+
+            rcList.Clear()
+            rcMap.SetTo(0)
+            Dim count As Integer
+            Dim ages As New List(Of Integer)
+            For Each r In rects
+                Dim rc = New rcData(dst0(r), r, rcList.Count + 1)
+                Dim val = rcMapLast.Get(Of Integer)(rc.maxDist.Y, rc.maxDist.X)
+                If val <> 0 Then
+                    Dim nextColor = dst2.Get(Of cv.Vec3b)(rc.maxDist.Y, rc.maxDist.X)
+                    If nextColor = myColors(val) Then
+                        count += 1
+                        If val < rcLastList.Count Then rc.age = rcLastList(val).age + 1
+                    Else
+                        myColors(val) = nextColor
+                    End If
+                End If
+                ages.Add(rc.age)
+                rcList.Add(rc)
+                rcMap(r).SetTo(rcList.Count, rc.mask)
+            Next
+
+            task.colorMap = cv.Mat.FromPixelData(256, 1, cv.MatType.CV_8UC3, myColors)
+            dst2 = Palettize(rcMap, 0)
+
+            strOut = RedUtil_Basics.selectCell(rcMap, rcList)
+            SetTrueText(strOut, 3)
+
+            labels(2) = CStr(rcList.Count) + " cells found and " + CStr(count) + " matched their previous color. "
+            labels(3) = "Average age = " + Format(ages.Average, fmt1)
+        End Sub
+        Protected Overrides Sub Finalize()
+            If cPtr <> 0 Then cPtr = RedCloudFill_Close(cPtr)
+        End Sub
+    End Class
+
+
+
+
+    Public Class RedColor_StableRegions : Inherits TaskParent
+        Public noMatch As New RedColor_NoMatching
+        Public trackedMap As cv.Mat = New cv.Mat(dst2.Size, cv.MatType.CV_32S, 0)
+        Dim previousRegions As New List(Of RegionTrack)
+        Dim colorIndex As Integer
+        Dim fLess As New FeatureLess_Threshold
+        Private Class RegionTrack
+            Public rect As cv.Rect
+            Public centroid As cv.Point2f
+            Public color As cv.Scalar
+            Public age As Integer
+        End Class
+
+
+        Public Sub New()
+            labels(3) = "Input from RedColor_NoMatching."
+            desc = "Track connected regions from RedColor_NoMatching and keep stable colors while regions persist."
+        End Sub
+
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            fLess.Run(task.gray)
+
+            noMatch.Run(fLess.dst2)
+            dst3 = noMatch.dst2
+
+            If dst3.Empty Then
+                dst2.SetTo(0)
+                trackedMap.SetTo(0)
+                previousRegions.Clear()
+                labels(2) = "No regions found."
+                Exit Sub
+            End If
+
+            Dim gray As cv.Mat
+            If dst3.Channels() = 1 Then
+                gray = dst3
+            Else
+                gray = dst3.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+            End If
+            Dim binary = gray.Threshold(1, 255, cv.ThresholdTypes.Binary)
+
+            Dim ccLabels As New cv.Mat
+            Dim stats As New cv.Mat
+            Dim centroids As New cv.Mat
+            Dim ccCount = cv.Cv2.ConnectedComponentsWithStats(binary, ccLabels, stats, centroids)
+
+            trackedMap.SetTo(0)
+            dst2.SetTo(0)
+            Dim currentRegions As New List(Of RegionTrack)
+            Dim usedPrevious As New HashSet(Of Integer)
+            Dim matchedCount As Integer
+            Dim minPixels = CInt(dst2.Total * 0.001)
+            If minPixels < 25 Then minPixels = 25
+
+            For ccIndex = 1 To ccCount - 1
+                Dim x = stats.Get(Of Integer)(ccIndex, 0)
+                Dim y = stats.Get(Of Integer)(ccIndex, 1)
+                Dim w = stats.Get(Of Integer)(ccIndex, 2)
+                Dim h = stats.Get(Of Integer)(ccIndex, 3)
+                Dim area = stats.Get(Of Integer)(ccIndex, 4)
+                If area < minPixels Or w <= 0 Or h <= 0 Then Continue For
+
+                Dim rect = New cv.Rect(x, y, w, h)
+                Dim cx = CSng(centroids.Get(Of Double)(ccIndex, 0))
+                Dim cy = CSng(centroids.Get(Of Double)(ccIndex, 1))
+                Dim region As New RegionTrack With {
+                    .rect = rect,
+                    .centroid = New cv.Point2f(cx, cy),
+                    .age = 1
+                }
+
+                Dim bestMatch = FindBestPrevious(region, usedPrevious)
+                If bestMatch >= 0 Then
+                    region.color = previousRegions(bestMatch).color
+                    region.age = previousRegions(bestMatch).age + 1
+                    usedPrevious.Add(bestMatch)
+                    matchedCount += 1
+                Else
+                    region.color = NextStableColor()
+                End If
+
+                currentRegions.Add(region)
+
+                Dim roiLabels = ccLabels(rect)
+                Dim roiMask = roiLabels.InRange(ccIndex, ccIndex)
+                trackedMap(rect).SetTo(currentRegions.Count, roiMask)
+                dst2(rect).SetTo(region.color, roiMask)
+                SetTrueText(CStr(region.age), New cv.Point(CInt(region.centroid.X), CInt(region.centroid.Y)))
+            Next
+
+            previousRegions = currentRegions
+
+            labels(2) = CStr(currentRegions.Count) + " stable regions found. " + CStr(matchedCount) + " matched to previous frame."
+            labels(3) = "Input from RedColor_NoMatching (" + CStr(noMatch.rcList.Count) + " regions)."
+        End Sub
+
+        Private Function FindBestPrevious(curr As RegionTrack, usedPrevious As HashSet(Of Integer)) As Integer
+            Dim bestIndex = -1
+            Dim bestScore As Double = 0
+            For i = 0 To previousRegions.Count - 1
+                If usedPrevious.Contains(i) Then Continue For
+                Dim prev = previousRegions(i)
+                Dim overlap = RectOverlapScore(curr.rect, prev.rect)
+                Dim d = Distance(curr.centroid, prev.centroid)
+                Dim distThreshold = Math.Max(curr.rect.Width, curr.rect.Height) * 1.25
+                Dim score = overlap
+                If d <= distThreshold Then score += 0.5 * (1.0 - d / Math.Max(1, distThreshold))
+                If score > bestScore Then
+                    bestScore = score
+                    bestIndex = i
+                End If
+            Next
+            If bestScore < 0.15 Then Return -1
+            Return bestIndex
+        End Function
+
+        Private Function RectOverlapScore(a As cv.Rect, b As cv.Rect) As Double
+            Dim inter = a.Intersect(b)
+            If inter.Width <= 0 Or inter.Height <= 0 Then Return 0
+            Dim interArea = CDbl(inter.Width) * inter.Height
+            Dim unionArea = CDbl(a.Width) * a.Height + CDbl(b.Width) * b.Height - interArea
+            If unionArea <= 0 Then Return 0
+            Return interArea / unionArea
+        End Function
+
+        Private Function Distance(a As cv.Point2f, b As cv.Point2f) As Double
+            Dim dx = a.X - b.X
+            Dim dy = a.Y - b.Y
+            Return Math.Sqrt(dx * dx + dy * dy)
+        End Function
+
+        Private Function NextStableColor() As cv.Scalar
+            Dim vec = task.vecColors(colorIndex Mod task.vecColors.Length)
+            colorIndex += 1
+            Return New cv.Scalar(vec.Item0, vec.Item1, vec.Item2)
+        End Function
+    End Class
 End Namespace

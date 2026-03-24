@@ -2745,7 +2745,7 @@ Namespace VBClasses
                 sliders.setupTrackBar("Rotate pointcloud around X-axis (degrees)", -90, 90, rotateX)
                 sliders.setupTrackBar("Rotate pointcloud around Y-axis (degrees)", -90, 90, rotateY)
                 sliders.setupTrackBar("Rotate pointcloud around Z-axis (degrees)", -90, 90, rotateZ)
-                sliders.setupTrackBar("IMU_Basics: Alpha X100", 0, 100, task.IMU_AlphaFilter * 100)
+                sliders.setupTrackBar("IMU_Basics_TA: Alpha X100", 0, 100, task.IMU_AlphaFilter * 100)
                 sliders.setupTrackBar("IMU Stability Threshold (radians) X100", 0, 100, stableThreshold * 100)
             End If
         End Sub
@@ -2753,7 +2753,7 @@ Namespace VBClasses
             Static xRotateSlider = OptionParent.FindSlider("Rotate pointcloud around X-axis (degrees)")
             Static yRotateSlider = OptionParent.FindSlider("Rotate pointcloud around Y-axis (degrees)")
             Static zRotateSlider = OptionParent.FindSlider("Rotate pointcloud around Z-axis (degrees)")
-            Static alphaSlider = OptionParent.FindSlider("IMU_Basics: Alpha X100")
+            Static alphaSlider = OptionParent.FindSlider("IMU_Basics_TA: Alpha X100")
             Static stabilitySlider = OptionParent.FindSlider("IMU Stability Threshold (radians) X100")
             rotateX = xRotateSlider.value
             rotateY = yRotateSlider.value

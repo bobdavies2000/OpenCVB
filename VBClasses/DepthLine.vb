@@ -1,15 +1,15 @@
 Imports OpenCvSharp.ML.DTrees
 Imports cv = OpenCvSharp
 Namespace VBClasses
-    Public Class DepthLine_Basics : Inherits TaskParent
+    Public Class DepthLine_Basics_TA : Inherits TaskParent
         Public prepEdges As New RedPrep_EdgeMask
-        Dim lines As New Line_Basics
-        Public motionLeft As New Motion_Basics
+        Dim lines As New Line_Basics_TA
+        Public motionLeft As New Motion_Basics_TA
         Public lpList As New List(Of lpData)
         Public Sub New()
             If standalone Then task.gOptions.displayDst0.Checked = True
             labels(0) = "LeftView after brightness/contrast transform."
-            labels(3) = "Input to Line_Basics"
+            labels(3) = "Input to Line_Basics_TA"
             desc = "Find lines in reduced the depth data."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -39,7 +39,7 @@ Namespace VBClasses
 
 
     Public Class NR_DepthLine_XY : Inherits TaskParent
-        Dim lineD As New DepthLine_Basics
+        Dim lineD As New DepthLine_Basics_TA
         Public lpList As New List(Of lpData)
         Public Sub New()
             If standalone Then task.gOptions.displayDst0.Checked = True
@@ -61,7 +61,7 @@ Namespace VBClasses
 
 
     Public Class DepthLine_V : Inherits TaskParent
-        Dim lineD As New DepthLine_Basics
+        Dim lineD As New DepthLine_Basics_TA
         Public lpList As New List(Of lpData)
         Public Sub New()
             If standalone Then task.gOptions.displayDst0.Checked = True
@@ -83,7 +83,7 @@ Namespace VBClasses
 
 
     Public Class DepthLine_H : Inherits TaskParent
-        Dim lineD As New DepthLine_Basics
+        Dim lineD As New DepthLine_Basics_TA
         Public lpList As New List(Of lpData)
         Public Sub New()
             If standalone Then task.gOptions.displayDst0.Checked = True
@@ -185,14 +185,14 @@ Namespace VBClasses
         Dim lineX As New RedPrep_EdgeMask
         Dim lineY As New RedPrep_EdgeMask
         Public lpList As New List(Of lpData)
-        Dim lines As New Line_Basics
-        Public motionLeft As New Motion_Basics
+        Dim lines As New Line_Basics_TA
+        Public motionLeft As New Motion_Basics_TA
         Public Sub New()
             lineX.reductionName = "X Reduction"
             lineY.reductionName = "Y Reduction"
             task.fOptions.ReductionSlider.Value = 200
             If standalone Then task.gOptions.displayDst0.Checked = True
-            labels(3) = "Input to Line_Basics"
+            labels(3) = "Input to Line_Basics_TA"
             desc = "Find horizontal and vertical lines in the reduced depth data."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -231,7 +231,7 @@ Namespace VBClasses
         Public ptList As New List(Of cv.Point)
         Public ptDepth As New List(Of Single)
         Public ptGrid As New List(Of Integer)
-        Public motionLeft As New Motion_Basics
+        Public motionLeft As New Motion_Basics_TA
         Public Sub New()
             lineX.reductionName = "X Reduction"
             lineY.reductionName = "Y Reduction"

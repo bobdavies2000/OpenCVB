@@ -336,7 +336,7 @@ Namespace VBClasses
 
 
 
-    Public Class LeftRight_Brightness : Inherits TaskParent
+    Public Class LeftRight_Brightness_TA : Inherits TaskParent
         Dim Options As New Options_BrightnessContrast
         Public Sub New()
             OptionParent.FindSlider("Alpha (contrast)").Value = 650

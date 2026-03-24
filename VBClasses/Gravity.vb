@@ -1,7 +1,7 @@
 Imports cv = OpenCvSharp
 Namespace VBClasses
     ''' <summary>Compute the gravity vector using the complementary filter: fuse gyro (fast, drifts) with accelerometer (slow, stable).</summary>
-    Public Class Gravity_Basics : Inherits TaskParent
+    Public Class Gravity_Basics_TA : Inherits TaskParent
         Dim lastTimeStamp As Double
         Dim optionsIMU As New Options_IMU
         ''' <summary>Unit gravity vector in body/sensor frame (points down).</summary>
@@ -57,7 +57,7 @@ Namespace VBClasses
             Return (p1, p2)
         End Function
 
-        ''' <summary>Unit gravity in body frame from tilt angles (same convention as IMU_GMatrix: roll=X, pitch=Y, yaw=Z).</summary>
+        ''' <summary>Unit gravity in body frame from tilt angles (same convention as IMU_GMatrix_TA: roll=X, pitch=Y, yaw=Z).</summary>
         Public Function AnglesToGravityVector(accRadians As cv.Point3f) As cv.Point3f
             Dim cx = CSng(Math.Cos(accRadians.X))
             Dim sx = CSng(Math.Sin(accRadians.X))
@@ -282,7 +282,7 @@ Namespace VBClasses
 
 
 
-    Public Class NR_Gravity_BasicsOld : Inherits TaskParent
+    Public Class NR_Gravity_Basics_TAOld : Inherits TaskParent
         Public points As New List(Of cv.Point2f)
         Public autoDisplay As Boolean
         Public Sub New()
@@ -348,7 +348,7 @@ Namespace VBClasses
 
 
 
-    Public Class NR_Gravity_BasicsOriginal : Inherits TaskParent
+    Public Class NR_Gravity_Basics_TAOriginal : Inherits TaskParent
         Public vec As New lpData
         Dim options As New Options_History
         Public Sub New()

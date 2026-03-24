@@ -1,7 +1,7 @@
 Imports cv = OpenCvSharp
 Imports System.Windows.Forms
 Namespace VBClasses
-    Public Class BlurMotion_Basics : Inherits TaskParent
+    Public Class BlurMotion_Basics_TA : Inherits TaskParent
         Public kernel As cv.Mat
         Public options As New Options_MotionBlur
         Dim blurSlider As TrackBar
@@ -34,7 +34,7 @@ Namespace VBClasses
 
     ' https://docs.opencvb.org/trunk/d1/dfd/tutorial_motion_deblur_filter.html
     Public Class NR_BlurMotion_Deblur : Inherits TaskParent
-        Dim mblur As New BlurMotion_Basics
+        Dim mblur As New BlurMotion_Basics_TA
         Private Function calcPSF(filterSize As cv.Size, len As Integer, theta As Double) As cv.Mat
             Dim h As New cv.Mat(filterSize, cv.MatType.CV_32F, cv.Scalar.All(0))
             Dim pt = New cv.Point(filterSize.Width / 2, filterSize.Height / 2)

@@ -413,7 +413,7 @@ Namespace VBClasses
 
 
 
-    Public Class XO_Gravity_Basics : Inherits TaskParent
+    Public Class XO_Gravity_Basics_TA : Inherits TaskParent
         Public points As New List(Of cv.Point2f)
         Public Sub New()
             dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
@@ -477,7 +477,7 @@ Namespace VBClasses
 
 
 
-    Public Class XO_CameraMotion_Basics : Inherits TaskParent
+    Public Class XO_CameraMotion_Basics_TA : Inherits TaskParent
         Public translationX As Integer
         Public translationY As Integer
         Public secondOpinion As Boolean
@@ -711,7 +711,7 @@ Namespace VBClasses
 
 
 
-    Public Class XO_Gravity_BasicsOriginal : Inherits TaskParent
+    Public Class XO_Gravity_Basics_TAOriginal : Inherits TaskParent
         Public vec As New lpData
         Public Sub New()
             dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
@@ -936,7 +936,7 @@ Namespace VBClasses
 
 
 
-    Public Class XO_Line_BasicsRawOld : Inherits TaskParent
+    Public Class XO_Line_Basics_TARawOld : Inherits TaskParent
         Implements IDisposable
         Dim ld As cv.XImgProc.FastLineDetector
         Public lpList As New List(Of lpData)
@@ -1212,7 +1212,7 @@ Namespace VBClasses
         Public lpList As New List(Of lpData)
         Dim lines As New XO_Line_RawSorted
         Public Sub New()
-            labels(3) = "Input to Line_Basics"
+            labels(3) = "Input to Line_Basics_TA"
             OptionParent.FindSlider("Canny Aperture").Value = 7
             OptionParent.FindSlider("Min Line Length").Value = 30
             desc = "Find lines in the Canny output"
@@ -1445,7 +1445,7 @@ Namespace VBClasses
             dst2 = lines.dst2
             dst3 = lines.dst2
 
-            labels(1) = "Input to Line_Basics"
+            labels(1) = "Input to Line_Basics_TA"
             labels(2) = "Lines found in the " + color8U.classifier.traceName + " output"
         End Sub
     End Class
@@ -1668,7 +1668,7 @@ Namespace VBClasses
 
 
 
-    Public Class XO_Line_Basics : Inherits TaskParent
+    Public Class XO_Line_Basics_TA : Inherits TaskParent
         Public lpRectMap As New cv.Mat(dst2.Size, cv.MatType.CV_32S, 0)
         Public lpList As New List(Of lpData)
         Dim lineCore As New XO_Line_Core
@@ -2653,7 +2653,7 @@ Namespace VBClasses
 
 
 
-    Public Class XO_FCSLine_Basics : Inherits TaskParent
+    Public Class XO_FCSLine_Basics_TA : Inherits TaskParent
         Dim delaunay As New Delaunay_Basics
         Dim bricks As New Brick_Basics
         Public Sub New()
@@ -3270,7 +3270,7 @@ Namespace VBClasses
 
 
 
-    Public Class XO_FeatureLine_BasicsRaw : Inherits TaskParent
+    Public Class XO_FeatureLine_Basics_TARaw : Inherits TaskParent
         Dim lines As New XO_Line_RawSubset
         Dim lineDisp As New XO_Line_DisplayInfoOld
         Dim options As New Options_Features
@@ -4283,10 +4283,10 @@ Namespace VBClasses
 
 
     Public Class XO_Contour_RedCloudEdges : Inherits TaskParent
-        Dim edgeline As New EdgeLine_Basics
+        Dim edgeline As New EdgeLine_Basics_TA
         Public Sub New()
             dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
-            labels = {"", "EdgeLine_Basics output", "", "Pixels below are both cell boundaries and edges."}
+            labels = {"", "EdgeLine_Basics_TA output", "", "Pixels below are both cell boundaries and edges."}
             desc = "Intersect the cell contours and the edges in the image."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -4426,7 +4426,7 @@ Namespace VBClasses
 
     Public Class XO_Color8U_Edges : Inherits TaskParent
         Dim edges As New Edge_Canny
-        Dim edgeline As New EdgeLine_Basics
+        Dim edgeline As New EdgeLine_Basics_TA
         Public Sub New()
             desc = "Find edges in the Color8U_Basics output"
         End Sub
@@ -4625,7 +4625,7 @@ Namespace VBClasses
 
 
 
-    Public Class XO_Line_BasicsAlternative : Inherits TaskParent
+    Public Class XO_Line_Basics_TAAlternative : Inherits TaskParent
         Public lines As New XO_Line_RawSorted
         Public Sub New()
             dst1 = New cv.Mat(dst2.Size, cv.MatType.CV_32F, 0) ' can't use 32S because calcHist won't use it...
@@ -4696,7 +4696,7 @@ Namespace VBClasses
 
 
 
-    Public Class XO_FeatureLine_Basics : Inherits TaskParent
+    Public Class XO_FeatureLine_Basics_TA : Inherits TaskParent
         Dim match As New Match_Basics
         Public cameraMotionProxy As New lpData
         Public gravityRGB As lpData
@@ -5188,7 +5188,7 @@ Namespace VBClasses
 
 
 
-    Public Class XO_TrackLine_Basics : Inherits TaskParent
+    Public Class XO_TrackLine_Basics_TA : Inherits TaskParent
         Public Sub New()
             dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
             desc = "Track the line regions with RedCloud"
@@ -5217,7 +5217,7 @@ Namespace VBClasses
 
     Public Class XO_TrackLine_Map : Inherits TaskParent
         Dim bricks As New Brick_Basics
-        Dim lTrack As New XO_TrackLine_Basics
+        Dim lTrack As New XO_TrackLine_Basics_TA
         Public Sub New()
             task.gOptions.CrossHairs.Checked = False
             desc = "Show the gridMap and fpMap (features points) "
@@ -5259,7 +5259,7 @@ Namespace VBClasses
 
 
 
-    Public Class XO_TrackLine_BasicsSimple : Inherits TaskParent
+    Public Class XO_TrackLine_Basics_TASimple : Inherits TaskParent
         Dim lp As New lpData
         Dim match As New Match_Basics
         Dim matchRect As cv.Rect
@@ -5290,7 +5290,7 @@ Namespace VBClasses
             End If
 
             Dim vecArray = task.lines.getRawVecs(src)
-            Dim lpListRaw = Line_Basics.getRawLines(vecArray)
+            Dim lpListRaw = Line_Basics_TA.getRawLines(vecArray)
             If lpListRaw.Count > 0 Then lp = lpListRaw(0)
             dst2(matchRect).Line(lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
         End Sub
@@ -5300,7 +5300,7 @@ Namespace VBClasses
 
 
 
-    Public Class XO_TrackLine_BasicsOld : Inherits TaskParent
+    Public Class XO_TrackLine_Basics_TAOld : Inherits TaskParent
         Public lpInput As lpData
         Public foundLine As Boolean
         Dim match As New LineEnds_Correlation
@@ -5342,7 +5342,7 @@ Namespace VBClasses
             Else
                 dst3(subsetrect).SetTo(0)
                 Dim vecArray = task.lines.getRawVecs(src(subsetrect))
-                Dim lpListRaw = Line_Basics.getRawLines(vecArray)
+                Dim lpListRaw = Line_Basics_TA.getRawLines(vecArray)
                 For Each lp In lplist
                     dst3.Line(lp.p1, lp.p2, 255, task.lineWidth, task.lineType)
                 Next
@@ -5373,7 +5373,7 @@ Namespace VBClasses
 
 
 
-    Public Class XO_TrackLine_BasicsSave : Inherits TaskParent
+    Public Class XO_TrackLine_Basics_TASave : Inherits TaskParent
         Dim match As New Match_Basics
         Dim matchRect As cv.Rect
         Public rawLines As New NR_Line_Core
@@ -5493,9 +5493,9 @@ Namespace VBClasses
 
 
 
-    Public Class XO_Gravity_Basics1 : Inherits TaskParent
+    Public Class XO_Gravity_Basics_TA1 : Inherits TaskParent
         Public options As New Options_Features
-        Dim gravityRaw As New Gravity_Basics
+        Dim gravityRaw As New Gravity_Basics_TA
         Public gravityMatch As New XO_Line_MatchGravity
         Public gravityRGB As lpData
         Dim nearest As New XO_Line_FindNearest
@@ -7911,7 +7911,7 @@ Namespace VBClasses
 
 
 
-    Public Class XO_Line_BasicsNoAging : Inherits TaskParent
+    Public Class XO_Line_Basics_TANoAging : Inherits TaskParent
         Public lpList As New List(Of lpData)
         Public lpRectMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         Public rawLines As New NR_Line_Core
@@ -7958,7 +7958,7 @@ Namespace VBClasses
 
 
     Public Class XO_Line_ViewLeftRight : Inherits TaskParent
-        Dim lines As New Line_Basics
+        Dim lines As New Line_Basics_TA
         Dim rawLines As New NR_Line_Core
         Public Sub New()
             dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U)
@@ -9063,7 +9063,7 @@ Namespace VBClasses
         Public lines3DList As New List(Of List(Of cv.Vec3f))
         Public pointcloud As New cv.Mat(dst2.Size, cv.MatType.CV_32FC3, 0)
         Public Sub New()
-            desc = "Build the 3D lines found in Line_Basics if there has been motion at their endpoints"
+            desc = "Build the 3D lines found in Line_Basics_TA if there has been motion at their endpoints"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             Static totalPixels As Integer
@@ -9111,7 +9111,7 @@ Namespace VBClasses
         Public findLine3D As New FindNonZero_Line3D
         Public lines3DList As New List(Of List(Of cv.Vec3f))
         Public Sub New()
-            desc = "Build the 3D lines found in Line_Basics if there is 3D info at both end points."
+            desc = "Build the 3D lines found in Line_Basics_TA if there is 3D info at both end points."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             task.FeatureSampleSize = 1000 ' use as many lines as are available.
@@ -9220,7 +9220,7 @@ Namespace VBClasses
 
     Public Class XO_Cloud_Spin : Inherits TaskParent
         Dim options As New Options_IMU
-        Dim gravityMatrix As New IMU_GMatrixWithOptions
+        Dim gravityMatrix As New IMU_GMatrix_TAWithOptions
         Dim xBump = 1, yBump = 1, zBump = 1
         Public Sub New()
             If OptionParent.FindFrm(traceName + " CheckBoxes") Is Nothing Then
@@ -9553,7 +9553,7 @@ Namespace VBClasses
         Dim contours As New Contour_Basics
         Public Sub New()
             dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
-            desc = "Run the reduced pointcloud output through the RedList_CPP algorithm."
+            desc = "Run the reduced pointcloud output through the RedMask_CPP algorithm."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             contours.Run(src)
@@ -9809,7 +9809,7 @@ Namespace VBClasses
         Dim cellGen As New RedMask_ToRedColor
         Public Sub New()
             dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
-            desc = "Run the reduced pointcloud output through the RedList_CPP algorithm."
+            desc = "Run the reduced pointcloud output through the RedMask_CPP algorithm."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             prep.Run(src)
@@ -9883,7 +9883,7 @@ Namespace VBClasses
         Public Sub New()
             OptionParent.findRadio("XY Reduction").Checked = True
             If standalone Then task.gOptions.displayDst1.Checked = True
-            desc = "Run the reduced pointcloud output through the RedList_CPP algorithm."
+            desc = "Run the reduced pointcloud output through the RedMask_CPP algorithm."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             redC.Run(src)
@@ -10960,46 +10960,44 @@ Namespace VBClasses
 
 
 
-        Public Class XO_RedList_GridCells : Inherits TaskParent
-            Dim regions As New XO_Region_Contours
-            Public Sub New()
-                task.gOptions.TruncateDepth.Checked = True
-                If standalone Then task.gOptions.displayDst1.Checked = True
-                desc = "Use the brickData regions to build task.redList.rcList"
-            End Sub
-            Public Overrides Sub RunAlg(src As cv.Mat)
-                regions.Run(src)
-                dst1 = regions.dst2
+    Public Class XO_RedList_GridCells : Inherits TaskParent
+        Dim regions As New XO_Region_Contours
+        Public Sub New()
+            task.gOptions.TruncateDepth.Checked = True
+            If standalone Then task.gOptions.displayDst1.Checked = True
+            desc = "Use the brickData regions to build task.redList.rcList"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            regions.Run(src)
+            dst1 = regions.dst2
 
-                runRedList(src, labels(2))
-                Dim lastList As New List(Of rcData)(task.redList.rclist)
+            runRedList(src, labels(2))
+            Dim lastList As New List(Of rcData)(task.redList.rclist)
 
-                dst2.SetTo(0)
+            dst2.SetTo(0)
 
-                Dim rclist As New List(Of rcData)
-                For Each rc In task.redList.rclist
-                    If task.motion.motionMask(rc.rect).CountNonZero = 0 Then
-                        If rc.indexLast > 0 And rc.indexLast < lastList.Count Then rc = lastList(rc.indexLast)
-                    End If
-                    Dim index = rclist.Count
-                    Dim cTest = dst2.Get(Of cv.Vec3b)(rc.maxDist.Y, rc.maxDist.X)
-                    If cTest <> black Then Continue For
-                    Dim c = dst1.Get(Of cv.Vec3b)(rc.maxDist.Y, rc.maxDist.X)
-                    Dim color = New cv.Scalar(c(0), c(1), c(2))
-                    If color = black Then color = yellow
-                    rc.index = rclist.Count
-                    rc.color = color
-                    dst2(rc.rect).SetTo(rc.color, rc.mask)
-                    DrawCircle(dst2, rc.maxDist)
-                    rclist.Add(rc)
-                Next
+            Dim rclist As New List(Of rcData)
+            For Each rc In task.redList.rclist
+                If task.motion.motionMask(rc.rect).CountNonZero = 0 Then
+                    If rc.indexLast > 0 And rc.indexLast < lastList.Count Then rc = lastList(rc.indexLast)
+                End If
+                Dim index = rclist.Count
+                Dim cTest = dst2.Get(Of cv.Vec3b)(rc.maxDist.Y, rc.maxDist.X)
+                If cTest <> black Then Continue For
+                Dim c = dst1.Get(Of cv.Vec3b)(rc.maxDist.Y, rc.maxDist.X)
+                Dim color = New cv.Scalar(c(0), c(1), c(2))
+                If color = black Then color = yellow
+                rc.index = rclist.Count
+                rc.color = color
+                dst2(rc.rect).SetTo(rc.color, rc.mask)
+                DrawCircle(dst2, rc.maxDist)
+                rclist.Add(rc)
+            Next
 
-                task.redList.rclist = New List(Of rcData)(rclist)
-                labels(3) = CStr(rclist.Count) + " redCloud cells were found"
-            End Sub
-        End Class
-
-
+            task.redList.rclist = New List(Of rcData)(rclist)
+            labels(3) = CStr(rclist.Count) + " redCloud cells were found"
+        End Sub
+    End Class
 
 
 
@@ -11007,7 +11005,9 @@ Namespace VBClasses
 
 
 
-        Public Class XO_RedList_GridCellsHist : Inherits TaskParent
+
+
+    Public Class XO_RedList_GridCellsHist : Inherits TaskParent
         Dim regions As New XO_Region_Contours
         Public Sub New()
             task.gOptions.TruncateDepth.Checked = True
@@ -11091,8 +11091,8 @@ Namespace VBClasses
             If task.redList.rclist.Count = 0 Then Exit Sub ' next frame please...
 
             Dim rc = task.redList.rclist(1)
-                Static rcSave As rcData = rc, stableCount As Integer
-                If rc.maxDist <> rcSave.maxDist Then
+            Static rcSave As rcData = rc, stableCount As Integer
+            If rc.maxDist <> rcSave.maxDist Then
                 rcSave = rc
                 stableCount = 1
             Else
@@ -11405,7 +11405,7 @@ Namespace VBClasses
 
 
 
-    Public Class XO_Motion_Basics : Inherits TaskParent
+    Public Class XO_Motion_Basics_TA : Inherits TaskParent
         Public lastColor(0) As cv.Vec3f
         Public cellAge(0) As Integer
         Public motionFlags(0) As Boolean
@@ -11706,7 +11706,7 @@ Namespace VBClasses
 
 
 
-    Public Class XO_Motion_BasicsHistory : Inherits TaskParent
+    Public Class XO_Motion_Basics_TAHistory : Inherits TaskParent
         Public motionSort As New List(Of Integer)
         Dim diff As New Diff_Basics
         Public Sub New()
@@ -12742,7 +12742,7 @@ Namespace VBClasses
 
 
 
-    Public Class XO_EdgeLine_BasicsNoMotion : Inherits TaskParent
+    Public Class XO_EdgeLine_Basics_TANoMotion : Inherits TaskParent
         Implements IDisposable
         Public segments As New List(Of List(Of cv.Point))
         Public rectList As New List(Of cv.Rect)
@@ -12804,7 +12804,7 @@ Namespace VBClasses
 
 
 
-    Public Class XO_EdgeLine_Basics : Inherits TaskParent
+    Public Class XO_EdgeLine_Basics_TA : Inherits TaskParent
         Implements IDisposable
         Public segments As New List(Of List(Of cv.Point))
         Public classCount As Integer
@@ -12873,7 +12873,7 @@ Namespace VBClasses
         Public options As New Options_Contours
         Public Sub New()
             labels(3) = "Details for the selected contour."
-            task.fOptions.Color8USource.SelectedItem = "EdgeLine_Basics"
+            task.fOptions.Color8USource.SelectedItem = "EdgeLine_Basics_TA"
             desc = "List retrieval mode contour finder"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -12904,7 +12904,7 @@ Namespace VBClasses
         Dim sortContours As New Contour_Sort
         Public Sub New()
             OptionParent.findRadio("CComp").Checked = True
-            task.fOptions.Color8USource.SelectedItem = "EdgeLine_Basics"
+            task.fOptions.Color8USource.SelectedItem = "EdgeLine_Basics_TA"
             desc = "CComp retrieval mode contour finder"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -13057,7 +13057,7 @@ Namespace VBClasses
 
 
 
-    Public Class XO_Motion_BasicsOld : Inherits TaskParent
+    Public Class XO_Motion_Basics_TAOld : Inherits TaskParent
         Public mCore As New XO_Motion_CoreOld
         Public Sub New()
             If standalone Then task.gOptions.showMotionMask.Checked = True
@@ -13277,7 +13277,7 @@ Namespace VBClasses
 
 
 
-    Public Class Motion_Cloud_MotionRect : Inherits TaskParent
+    Public Class Motion_Cloud_TA_MotionRect : Inherits TaskParent
         Public originalPointcloud As cv.Mat
         Public Sub New()
             labels = {"", "", "Pointcloud updated only with motion Rect",
@@ -13441,7 +13441,7 @@ Namespace VBClasses
 
 
 
-    Public Class XO_Motion_BasicsAccum : Inherits TaskParent
+    Public Class XO_Motion_Basics_TAAccum : Inherits TaskParent
         Public mCore As New XO_Motion_CoreAccum
         Public Sub New()
             If standalone Then task.gOptions.showMotionMask.Checked = True
@@ -14063,7 +14063,7 @@ Namespace VBClasses
         Public lpList As New List(Of lpData)
         Public rawLines As New NR_Line_Core
         Public Sub New()
-            desc = "The core algorithm to find lines.  Line_Basics is a task algorithm that exits when run as a normal algorithm."
+            desc = "The core algorithm to find lines.  Line_Basics_TA is a task algorithm that exits when run as a normal algorithm."
         End Sub
         Private Function lpMotion(lp As lpData) As Boolean
             ' return true if either line endpoint was in the motion mask.
@@ -14284,7 +14284,7 @@ Namespace VBClasses
             End If
         End Sub
     End Class
-    Public Class XO_KNNLine_Basics : Inherits TaskParent
+    Public Class XO_KNNLine_Basics_TA : Inherits TaskParent
         Dim knn As New KNN_Basics
         Public results(,) As Integer
         Public Sub New()
@@ -14320,7 +14320,7 @@ Namespace VBClasses
 
 
     Public Class XO_KNNLine_Query : Inherits TaskParent
-        Dim knnLine As New XO_KNNLine_Basics
+        Dim knnLine As New XO_KNNLine_Basics_TA
         Public Sub New()
             desc = "Query the KNN results for the nearest line to the mouse."
         End Sub
@@ -14340,7 +14340,7 @@ Namespace VBClasses
 
 
     Public Class XO_KNNLine_Connect : Inherits TaskParent
-        Dim knnLine As New XO_KNNLine_Basics
+        Dim knnLine As New XO_KNNLine_Basics_TA
         Public Sub New()
             desc = "Connect each line to its likely predecessor."
         End Sub
@@ -14501,7 +14501,7 @@ Namespace VBClasses
 
 
 
-    Public Class XO_DepthLine_Basics : Inherits TaskParent
+    Public Class XO_DepthLine_Basics_TA : Inherits TaskParent
         Dim bricks As New Brick_Basics
         Public Sub New()
             dst0 = New cv.Mat(dst0.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
@@ -14764,7 +14764,7 @@ Namespace VBClasses
         Public deltaX As Single, deltaY As Single
         Dim lp As New lpData
         Public Sub New()
-            desc = "Identify the longest line in the output of line_basics."
+            desc = "Identify the longest line in the output of Line_Basics_TA."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             Dim lplist = task.lines.lpList
@@ -14817,9 +14817,9 @@ Namespace VBClasses
 
 
 
-    Public Class XO_Gravity_Basics2 : Inherits TaskParent
+    Public Class XO_Gravity_Basics_TA2 : Inherits TaskParent
         Public options As New Options_Features
-        Dim gravityRaw As New Gravity_Basics
+        Dim gravityRaw As New Gravity_Basics_TA
         Dim longLine As New XO_Line_Longest
         Public Sub New()
             desc = "Use the slope of the longest RGB line to figure out if camera moved enough to obtain the IMU gravity vector."
@@ -14860,9 +14860,9 @@ Namespace VBClasses
 
 
 
-    Public Class XO_Gravity_BasicsKalman : Inherits TaskParent
+    Public Class XO_Gravity_Basics_TAKalman : Inherits TaskParent
         Dim kalman As New Kalman_Basics
-        Dim gravity As New Gravity_Basics
+        Dim gravity As New Gravity_Basics_TA
         Public Sub New()
             desc = "Use kalman to smooth gravity and horizon vectors."
         End Sub
@@ -14999,7 +14999,7 @@ Namespace VBClasses
 
             dst2 = src.Clone
             Dim vecArray = task.lines.getRawVecs(src.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
-            Dim lplist = Line_Basics.getRawLines(vecArray)
+            Dim lplist = Line_Basics_TA.getRawLines(vecArray)
 
             sortedVerticals.Clear()
             sortedHorizontals.Clear()
@@ -15151,7 +15151,7 @@ Namespace VBClasses
 
 
 
-    Public Class XO_MatchLine_BasicsOriginal : Inherits TaskParent
+    Public Class XO_MatchLine_Basics_TAOriginal : Inherits TaskParent
         Public match As New Match_Basics
         Public lpInput As New lpData
         Public lpOutput As lpData
@@ -15221,7 +15221,7 @@ Namespace VBClasses
 
     Public Class XO_MatchLine_Longest : Inherits TaskParent
         Public knn As New XO_KNN_ClosestTracker
-        Public matchLine As New XO_MatchLine_BasicsOriginal
+        Public matchLine As New XO_MatchLine_Basics_TAOriginal
         Public Sub New()
             desc = "Find and track the longest line in the BGR image with a lightweight KNN."
         End Sub
@@ -15244,7 +15244,7 @@ Namespace VBClasses
 
 
     Public Class XO_MatchLine_Horizon : Inherits TaskParent
-        Dim matchLine As New XO_MatchLine_BasicsOriginal
+        Dim matchLine As New XO_MatchLine_Basics_TAOriginal
         Public Sub New()
             desc = "Verify the horizon using MatchTemplate."
         End Sub
@@ -15263,7 +15263,7 @@ Namespace VBClasses
 
 
     Public Class XO_MatchLine_Gravity : Inherits TaskParent
-        Dim matchLine As New XO_MatchLine_BasicsOriginal
+        Dim matchLine As New XO_MatchLine_Basics_TAOriginal
         Public Sub New()
             desc = "Verify the gravity vector using MatchTemplate."
         End Sub
@@ -15850,7 +15850,7 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             contours.Run(src)
             If src.Type <> cv.MatType.CV_8U Then
-                If standalone And task.fOptions.Color8USource.SelectedItem = "EdgeLine_Basics" Then
+                If standalone And task.fOptions.Color8USource.SelectedItem = "EdgeLine_Basics_TA" Then
                     dst1 = contours.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
                 Else
                     dst1 = Mat_Basics.srcMustBe8U(src)
@@ -16574,7 +16574,7 @@ Namespace VBClasses
 
 
 
-    'Public Class ParticleFilter_Basics : Inherits TaskParent
+    'Public Class ParticleFilter_Basics_TA : Inherits TaskParent
     '    Dim trace As New Swarm_Basics
     '    Dim plot1D As New Plot_Histogram2D
     '    Dim histogram As New cv.Mat
@@ -16779,7 +16779,7 @@ Namespace VBClasses
         Public contourList As New List(Of contourData)
         Public contourMap As New cv.Mat(task.workRes, cv.MatType.CV_32F, 0)
         Dim sortContours As New Contour_Sort
-        Dim edgeline As New EdgeLine_Basics
+        Dim edgeline As New EdgeLine_Basics_TA
         Public Sub New()
             labels(3) = "Input to OpenCV's FindContours"
             desc = "General purpose contour finder"
@@ -16840,10 +16840,10 @@ Namespace VBClasses
 
 
     Public Class XO_Line_LeftRight1 : Inherits TaskParent
-        Public linesLeft As New Line_Basics
-        Public linesRight As New Line_Basics
-        Dim motionLeft As New Motion_Basics
-        Dim motionRight As New Motion_Basics
+        Public linesLeft As New Line_Basics_TA
+        Public linesRight As New Line_Basics_TA
+        Dim motionLeft As New Motion_Basics_TA
+        Dim motionRight As New Motion_Basics_TA
         Public Sub New()
             labels = {"", "", "Left image lines", "Right image lines"}
             desc = "Find the lines in the Left and Right images."
@@ -16880,7 +16880,7 @@ Namespace VBClasses
 
 
 
-    Public Class XO_Motion_Cloud : Inherits TaskParent
+    Public Class XO_Motion_Cloud_TA : Inherits TaskParent
         Public originalPointcloud As cv.Mat
         Public Sub New()
             labels(1) = "The difference between the latest pointcloud and the motion-adjusted point cloud."
@@ -16959,7 +16959,7 @@ Namespace VBClasses
 
 
 
-    Public Class XO_Line_BasicsCore : Inherits TaskParent
+    Public Class XO_Line_Basics_TACore : Inherits TaskParent
         Public lpList As New List(Of lpData)
         Public motionMask As cv.Mat = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 255)
         Public Sub New()
@@ -16979,7 +16979,7 @@ Namespace VBClasses
             If lpList.Count <= 1 Then
                 motionMask.SetTo(255)
                 Dim vecArray1 = task.lines.getRawVecs(src)
-                lpList = Line_Basics.getRawLines(vecArray1)
+                lpList = Line_Basics_TA.getRawLines(vecArray1)
             End If
 
             Dim sortlines As New SortedList(Of Single, lpData)(New compareAllowIdenticalSingleInverted)
@@ -16993,7 +16993,7 @@ Namespace VBClasses
             Next
 
             Dim vecArray = task.lines.getRawVecs(src)
-            Dim lpListRaw = Line_Basics.getRawLines(vecArray)
+            Dim lpListRaw = Line_Basics_TA.getRawLines(vecArray)
 
 
             For Each lp In lpListRaw
@@ -17075,10 +17075,10 @@ Namespace VBClasses
 
 
     Public Class XO_Line_Map : Inherits TaskParent
-        Dim lines As New Line_Basics
+        Dim lines As New Line_Basics_TA
         Public lpList As New List(Of lpData)
         Dim options As New Options_LeftRightCorrelation
-        Dim motionLeft As New Motion_Basics
+        Dim motionLeft As New Motion_Basics_TA
         Public Sub New()
             If standalone Then task.gOptions.displayDst0.Checked = True
             dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
@@ -17169,7 +17169,7 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             contours.Run(src)
             If src.Type <> cv.MatType.CV_8U Then
-                If standalone And task.fOptions.Color8USource.SelectedItem = "EdgeLine_Basics" Then
+                If standalone And task.fOptions.Color8USource.SelectedItem = "EdgeLine_Basics_TA" Then
                     dst1 = contours.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
                 Else
                     dst1 = Mat_Basics.srcMustBe8U(src)
@@ -18910,7 +18910,7 @@ Namespace VBClasses
     Public Class XO_Brick_EdgeDraw : Inherits TaskParent
         Dim bricks As New Brick_Basics
         Dim regions As New XO_Region_Contours
-        Dim edgeline As New EdgeLine_Basics
+        Dim edgeline As New EdgeLine_Basics_TA
         Public Sub New()
             desc = "Lines can mean cells are connected."
         End Sub
@@ -19016,14 +19016,17 @@ Namespace VBClasses
 
 
     Public Class XO_FeatureLess_Groups : Inherits TaskParent
-        Dim redCPP As New RedList_CPP
+        Dim redCPP As New RedMask_CPP
         Public classCount As Integer
+        Dim fLess As New FeatureLess_Basics
         Public Sub New()
             desc = "Group RedCloud cells by the value of their featureless maxDist"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            dst1 = task.fLessMask.Threshold(0, 255, cv.ThresholdTypes.Binary)
-            labels(2) = task.motion.corr.labels(2)
+            fLess.Run(task.gray)
+
+            dst1 = fLess.dst2.Threshold(0, 255, cv.ThresholdTypes.Binary)
+            labels(2) = fLess.labels(2)
 
             If task.optionsChanged Then dst2 = dst1.Clone Else dst1.CopyTo(dst2, task.motion.motionMask)
             redCPP.Run(dst2 - 1)
@@ -19261,6 +19264,26 @@ Namespace VBClasses
             If task.heartBeat Then
                 labels(3) = CStr(removeCells.Count) + " cells were completely contained in another cell's rect"
             End If
+        End Sub
+    End Class
+
+
+
+
+    Public Class XO_RedList_CellStatsPlot : Inherits TaskParent
+        Dim cells As New XO_RedCell_BasicsPlot
+        Public Sub New()
+            If standaloneTest() Then task.gOptions.displayDst1.Checked = True
+            cells.runRedCflag = True
+            desc = "Display the stats for the selected cell"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            cells.Run(src)
+            dst1 = cells.dst3
+            dst2 = cells.dst2
+            labels(2) = cells.labels(2)
+
+            SetTrueText(cells.strOut, 3)
         End Sub
     End Class
 End Namespace

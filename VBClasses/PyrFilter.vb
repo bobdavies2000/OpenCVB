@@ -1,7 +1,7 @@
 Imports cv = OpenCvSharp
 'http://study.marearts.com/2014/12/opencv-meanshiftfiltering-example.html
 Namespace VBClasses
-    Public Class PyrFilter_Basics : Inherits TaskParent
+    Public Class PyrFilter_Basics_TA : Inherits TaskParent
         Dim options As New Options_PyrFilter
         Public Sub New()
             desc = "Use PyrMeanShiftFiltering to segment an image."
@@ -20,7 +20,7 @@ Namespace VBClasses
 
     Public Class NR_PyrFilter_RedCloud : Inherits TaskParent
         Dim reduction As New Reduction_Basics
-        Dim pyr As New PyrFilter_Basics
+        Dim pyr As New PyrFilter_Basics_TA
         Dim redC As New RedCloud_Basics
         Public Sub New()
             If standalone Then task.gOptions.displayDst1.Checked = True

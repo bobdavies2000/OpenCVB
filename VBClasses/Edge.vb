@@ -941,7 +941,7 @@ Namespace VBClasses
                             Case 2
                                 colorMethods(i) = New NR_Binarize_DepthTiers
                             Case 3
-                                colorMethods(i) = New EdgeLine_Basics
+                                colorMethods(i) = New EdgeLine_Basics_TA
                             Case 4
                                 colorMethods(i) = New Hist3Dcolor_Basics
                             Case 5
@@ -965,7 +965,7 @@ Namespace VBClasses
             For i = 0 To colorMethods.Count - 1
                 If options.check.Box(i).Checked Then
                     colorMethods(i).run(src)
-                    If options.check.Box(i).Text = "EdgeLine_Basics" Then
+                    If options.check.Box(i).Text = "EdgeLine_Basics_TA" Then
                         canny.dst2 = colorMethods(i).dst2
                     Else
                         canny.Run(colorMethods(i).dst3)
@@ -1375,7 +1375,7 @@ Namespace VBClasses
 
 
     Public Class NR_Edge_NoDepth : Inherits TaskParent
-        Dim edgeline As New EdgeLine_Basics
+        Dim edgeline As New EdgeLine_Basics_TA
         Public Sub New()
             If standalone Then task.gOptions.displayDst1.Checked = True
             labels = {"", "", "All edges available", "Below - edges without depth, Above - edges with depth (color from contour.)"}
@@ -1676,17 +1676,20 @@ Namespace VBClasses
 
     Public Class Edge_Featureless : Inherits TaskParent
         Dim edges As New Edge_Canny
+        Dim fLess As New FeatureLess_Basics
         Public Sub New()
             desc = "Find the edges in the featureless output"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
+            fLess.Run(task.gray)
+
             dst2 = src.Clone
-            dst2.SetTo(0, task.fLessMask)
-            labels(2) = task.motion.corr.labels(2)
+            dst2.SetTo(0, fless.dst2)
+            labels(2) = fLess.labels(2)
 
             edges.Run(dst2)
             dst3 = edges.dst2
-            Dim count = task.gridRects.Count - task.motion.corr.rectList.Count
+            Dim count = task.gridRects.Count - fLess.rectList.Count
             labels(2) = "Current frame: " + CStr(count) + " grid squares had features"
         End Sub
     End Class

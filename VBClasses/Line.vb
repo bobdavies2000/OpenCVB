@@ -1,6 +1,6 @@
 Imports cv = OpenCvSharp
 Namespace VBClasses
-    Public Class Line_Basics : Inherits TaskParent
+    Public Class Line_Basics_TA : Inherits TaskParent
         Implements IDisposable
         Public lpList As New List(Of lpData)
         Public motionMask As cv.Mat = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 255)
@@ -104,10 +104,10 @@ Namespace VBClasses
 
 
 
-    Public Class NR_Line_BasicsTest : Inherits TaskParent
-        Dim lines As New Line_Basics
+    Public Class NR_Line_Basics_TATest : Inherits TaskParent
+        Dim lines As New Line_Basics_TA
         Public Sub New()
-            desc = "Line_Basics is a task algorithm so this is the better way to test it."
+            desc = "Line_Basics_TA is a task algorithm so this is the better way to test it."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             lines.motionMask = task.motion.motionMask
@@ -138,7 +138,7 @@ Namespace VBClasses
             If src.Type <> cv.MatType.CV_8U Then src.ConvertTo(src, cv.MatType.CV_8U)
 
             Dim vecArray = task.lines.getRawVecs(src)
-            lpList = Line_Basics.getRawLines(vecArray)
+            lpList = Line_Basics_TA.getRawLines(vecArray)
 
             dst2.SetTo(0)
             For Each lp In lpList
@@ -499,10 +499,10 @@ Namespace VBClasses
 
 
     Public Class Line_LeftRight : Inherits TaskParent
-        Public linesLeft As New Line_Basics
-        Public linesRight As New Line_Basics
-        Dim motionLeft As New Motion_Basics
-        Dim motionRight As New Motion_Basics
+        Public linesLeft As New Line_Basics_TA
+        Public linesRight As New Line_Basics_TA
+        Dim motionLeft As New Motion_Basics_TA
+        Dim motionRight As New Motion_Basics_TA
         Public Sub New()
             labels = {"", "", "Left image lines", "Right image lines"}
             desc = "Find the lines in the Left and Right images."
@@ -583,9 +583,9 @@ Namespace VBClasses
         Const lenRatioThresh As Single = 0.45F
 
         Public lpList As New List(Of lpData)
-        Dim lines As New Line_Basics
+        Dim lines As New Line_Basics_TA
         Dim options As New Options_LeftRightCorrelation
-        Dim motionLeft As New Motion_Basics
+        Dim motionLeft As New Motion_Basics_TA
         Public Sub New()
             If standalone Then task.gOptions.displayDst0.Checked = True
             labels = {"", "", "Left image: detected lines with stable track IDs", ""}
@@ -688,10 +688,10 @@ Namespace VBClasses
 
 
     Public Class Line_Tracker : Inherits TaskParent
-        Dim lines As New Line_Basics
+        Dim lines As New Line_Basics_TA
         Dim options As New Options_LeftRightCorrelation
         Dim lpList As New List(Of lpData)
-        Dim motionLeft As New Motion_Basics
+        Dim motionLeft As New Motion_Basics_TA
         Public Sub New()
             If standalone Then task.gOptions.displayDst0.Checked = True
             dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)

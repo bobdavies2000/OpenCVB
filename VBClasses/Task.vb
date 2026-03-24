@@ -35,17 +35,17 @@ Namespace VBClasses
             noDepthMask = New cv.Mat(workRes, cv.MatType.CV_8U, 0)
             depthmask = New cv.Mat(workRes, cv.MatType.CV_8U, 0)
 
-            colorizer = New DepthColorizer_Basics
-            gravityMatrix = New IMU_GMatrix
-            gravityBasics = New Gravity_Basics
-            imuBasics = New IMU_Basics
-            motion = New Motion_Basics
-            motionCloud = New Motion_Cloud
-            grid = New Grid_Basics
-            lines = New Line_Basics
-            filterBasics = New Filter_Basics
-            leftRightBrightness = New LeftRight_Brightness
-            keyColors = New KeyColor_Basics
+            colorizer = New DepthColorizer_Basics_TA
+            gravityMatrix = New IMU_GMatrix_TA
+            gravityBasics = New Gravity_Basics_TA
+            imuBasics = New IMU_Basics_TA
+            motion = New Motion_Basics_TA
+            motionCloud = New Motion_Cloud_TA
+            grid = New Grid_Basics_TA
+            lines = New Line_Basics_TA
+            filterBasics = New Filter_Basics_TA
+            leftRightBrightness = New LeftRight_Brightness_TA
+            keyColors = New KeyColor_Basics_TA
 
             ' all the algorithms in the list are task algorithms that are children of the algorithm.
             For i = 1 To cpu.callTrace.Count - 1
@@ -226,7 +226,7 @@ Namespace VBClasses
             End If
 
             If gOptions.CrossHairs.Checked Then
-                Gravity_Basics.showVectors(dstList(0))
+                Gravity_Basics_TA.showVectors(dstList(0))
                 Dim lp = If(lpGravity IsNot Nothing, lpGravity, lines.lpList(0))
                 Dim pt = New cv.Point2f((lp.pE1.X + lp.pE2.X) / 2 + 5, (lp.pE1.Y + lp.pE2.Y) / 2)
             End If

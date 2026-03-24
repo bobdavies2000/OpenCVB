@@ -777,9 +777,9 @@ Namespace VBClasses
 
     Public Class NR_Brick_Lines : Inherits TaskParent
         Dim bricks As New Brick_Basics
-        Dim lines As New Line_Basics
+        Dim lines As New Line_Basics_TA
         Dim options As New Options_LeftRightCorrelation
-        Dim motionLeft As New Motion_Basics
+        Dim motionLeft As New Motion_Basics_TA
         Public Sub New()
             labels(2) = "The lines are for the left image."
             dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
@@ -815,7 +815,7 @@ Namespace VBClasses
 
     Public Class NR_Brick_HighRange : Inherits TaskParent
         Dim bricks As New Brick_Basics
-        Dim lines As New Line_Basics
+        Dim lines As New Line_Basics_TA
         Dim options As New Options_LeftRightCorrelation
         Public Sub New()
             dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
@@ -893,9 +893,9 @@ Namespace VBClasses
 
     Public Class NR_Brick_NoDepthLines : Inherits TaskParent
         Dim bricks As New Brick_Basics
-        Dim lines As New Line_Basics
+        Dim lines As New Line_Basics_TA
         Dim options As New Options_LeftRightCorrelation
-        Dim motionLeft As New Motion_Basics
+        Dim motionLeft As New Motion_Basics_TA
         Public Sub New()
             If standalone Then task.gOptions.displayDst0.Checked = True
             labels(2) = "The lines are for the left image."
@@ -995,18 +995,21 @@ Namespace VBClasses
         Dim bricks As New Brick_Basics
         Dim options As New Options_DiffDepth
         Public rangeJumpers As New List(Of Integer)
+        Dim fLess As New FeatureLess_Basics
         Public Sub New()
             OptionParent.FindSlider("Depth varies more than X mm's").Value = 300
             dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
             desc = "Visualize where bricks have highly variable depth range."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
+            fLess.Run(task.gray)
+
             bricks.Run(src)
             options.Run()
 
             dst2 = src.Clone
-            dst2.SetTo(0, task.fLessMask)
-            labels(2) = task.motion.corr.labels(2)
+            dst2.SetTo(0, fLess.dst2)
+            labels(2) = fLess.labels(2)
 
             If standaloneTest() Then
                 Static edges As New Edge_Canny
@@ -1036,16 +1039,19 @@ Namespace VBClasses
 
     Public Class Brick_Features : Inherits TaskParent
         Dim bricks As New Brick_Basics
+        Dim fLess As New FeatureLess_Basics
         Public Sub New()
             desc = "Use FeatureLess_Basics to identify bricks with good contrast."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             If src.Channels <> 1 Then src = task.gray
+            fLess.Run(task.gray)
+
             bricks.Run(src)
 
             dst2 = src.Clone
-            dst2.SetTo(0, task.fLessMask)
-            labels(2) = task.motion.corr.labels(2)
+            dst2.SetTo(0, fless.dst2)
+            labels(2) = fLess.labels(2)
 
             dst3 = task.rightView.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
             Dim index = task.gridMap.Get(Of Integer)(task.mouseMovePoint.Y, task.mouseMovePoint.X)

@@ -3,6 +3,7 @@ Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Class FeatureLess_Basics : Inherits TaskParent
         Dim corr As New Correlation_Basics
+        Public rectList As New List(Of cv.Rect)
         Public Sub New()
             desc = "Measure the correlation of all grid squares except where there is motion."
         End Sub
@@ -12,9 +13,9 @@ Namespace VBClasses
             corr.Run(src)
             dst2 = corr.dst2
             dst3 = corr.dst3
-            labels(3) = corr.labels(3)
+            rectList = New List(Of cv.Rect)(corr.rectList)
 
-            task.fLessMask = dst2
+            labels(3) = corr.labels(3)
         End Sub
     End Class
 
@@ -135,7 +136,7 @@ Namespace VBClasses
 
 
     Public Class NR_FeatureLess_Contours : Inherits TaskParent
-        Dim edgeline As New EdgeLine_Basics
+        Dim edgeline As New EdgeLine_Basics_TA
         Dim contours As New Contour_Basics
         Public Sub New()
             desc = "Use Contour_Basics to get the contour data for the top contours by size."
@@ -314,12 +315,15 @@ Namespace VBClasses
 
     Public Class NR_FeatureLess_History : Inherits TaskParent
         Dim frames As New History_Basics
+        Dim fLess As New FeatureLess_Basics
         Public Sub New()
             labels(3) = "The brighter the grid square, the more recent appearance."
             desc = "Accumulate the edges over a span of X images."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            dst2 = task.fLessMask.Threshold(0, 255, cv.ThresholdTypes.Binary)
+            fLess.Run(task.gray)
+
+            dst2 = fLess.dst2.Threshold(0, 255, cv.ThresholdTypes.Binary)
 
             frames.Run(dst2)
             dst3 = frames.dst2
@@ -363,41 +367,22 @@ Namespace VBClasses
 
 
 
-    Public Class FeatureLess_RedColor : Inherits TaskParent
-        Dim redC As New RedColor_Basics
-        Public Sub New()
-            If standalone Then task.gOptions.displayDst1.Checked = True
-            desc = "Use the featureLess_Basics output as input to RedColor_Basics"
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            dst2 = task.fLessMask.Clone
-            labels(2) = task.motion.corr.labels(3)
-
-            redC.Run(dst2)
-            dst3 = redC.dst2
-            labels(3) = redC.labels(2)
-
-            strOut = RedUtil_Basics.selectCell(redC.rcMap, redC.rcList)
-            SetTrueText(strOut, 1)
-        End Sub
-    End Class
-
-
-
-
 
     Public Class FeatureLess_Not : Inherits TaskParent
         Dim feat As New Feature_General
+        Dim fLess As New FeatureLess_Basics
         Public Sub New()
             desc = "Use the FeatureLess mask to reduce the input to feature searches."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
+            fLess.Run(task.gray)
+
             dst2.SetTo(0)
-            src.CopyTo(dst2, Not task.fLessMask)
+            src.CopyTo(dst2, Not fless.dst2)
 
             feat.Run(dst2)
             feat.dst2.CopyTo(dst3)
-            Dim count = task.gridRects.Count - task.motion.corr.rectList.Count
+            Dim count = task.gridRects.Count - fLess.rectList.Count
             labels(2) = "Current frame: " + CStr(count) + " grid squares had features"
         End Sub
     End Class
@@ -408,14 +393,17 @@ Namespace VBClasses
 
     Public Class FeatureLess_Cells : Inherits TaskParent
         Dim saveColorMap As cv.Mat
+        Dim fLess As New FeatureLess_Basics
         Public Sub New()
             saveColorMap = task.colorMap.Clone
             labels(3) = "Region Colors are ordered by size."
             desc = "Group the featureless grid squares"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            dst2 = task.fLessMask.Clone
-            labels(2) = task.motion.corr.labels(2)
+            fLess.Run(task.gray)
+
+            dst2 = fLess.dst2.Clone
+            labels(2) = fLess.labels(2)
 
             Dim index = 1
             Dim rect As cv.Rect
@@ -423,7 +411,7 @@ Namespace VBClasses
             Dim flags As cv.FloodFillFlags = cv.FloodFillFlags.Link4
             Dim minSize = task.brickEdgeLen * task.brickEdgeLen
             Dim countList As New SortedList(Of Integer, Integer)(New compareAllowIdenticalIntegerInverted)
-            For Each r In task.motion.corr.rectList
+            For Each r In fLess.rectList
                 Dim val = dst2.Get(Of Byte)(r.TopLeft.Y, r.TopLeft.X)
                 If val = 255 Then
                     Dim count = cv.Cv2.FloodFill(dst2, mask, r.TopLeft, index, rect, 0, 0, flags)
@@ -443,6 +431,35 @@ Namespace VBClasses
             Next
             dst3 = Palettize(dst2, 0)
             labels(2) = CStr(index - 1) + " featureless regions were found below (8UC1)."
+        End Sub
+    End Class
+
+
+
+
+
+    Public Class FeatureLess_RedColor : Inherits TaskParent
+        Dim redC As New RedColor_Basics
+        Dim fLess As New FeatureLess_Threshold
+        Public Sub New()
+            task.gOptions.GridSlider.Value = 4
+            If standalone Then task.gOptions.displayDst1.Checked = True
+            desc = "Use the featureLess_Basics output as input to RedColor_Basics"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            fLess.Run(task.gray)
+
+            dst2 = fLess.dst2.Clone
+            dst1 = dst2.InRange(0, 0)
+            labels(2) = fLess.labels(3)
+
+            redC.Run(dst2)
+            dst3 = redC.dst2
+            dst3.SetTo(0, dst1)
+            labels(3) = redC.labels(2)
+
+            strOut = RedUtil_Basics.selectCell(redC.rcMap, redC.rcList)
+            SetTrueText(strOut, 1)
         End Sub
     End Class
 End Namespace

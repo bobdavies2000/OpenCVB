@@ -1402,7 +1402,7 @@ Namespace VBClasses
 
 
     Public Class Histogram_PointCloud : Inherits TaskParent
-        Dim grid As New Grid_Basics
+        Dim grid As New Grid_Basics_TA
         Public histogram As New cv.Mat
         Public histArray() As Single
         Dim options As New Options_PrepData

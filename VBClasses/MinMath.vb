@@ -29,7 +29,7 @@ Namespace VBClasses
 
     Public Class NR_MinMath_EdgeLine : Inherits TaskParent
         Dim bPoints As New BrickPoint_Basics
-        Dim edgeline As New EdgeLine_Basics
+        Dim edgeline As New EdgeLine_Basics_TA
         Public Sub New()
             desc = "Use brickpoints to find edgeLines"
         End Sub

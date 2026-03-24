@@ -245,7 +245,7 @@ Namespace VBClasses
         Dim prepEdges As New RedPrep_Edges_CPP
         Public options As New Options_RedPrep
         Dim redSimple As New RedColor_Basics
-        Dim edges As New EdgeLine_Basics
+        Dim edges As New EdgeLine_Basics_TA
         Public Sub New()
             dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
             desc = "Reduction transform for the point cloud"

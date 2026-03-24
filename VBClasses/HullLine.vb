@@ -1,6 +1,6 @@
 Imports cv = OpenCvSharp
 Namespace VBClasses
-    Public Class HullLine_Basics : Inherits TaskParent
+    Public Class HullLine_Basics_TA : Inherits TaskParent
         Public hulls As New Contour_Hulls
         Public minDistance As Integer = dst2.Width * 0.02
         Public lpList As New List(Of lpData)
@@ -41,7 +41,7 @@ Namespace VBClasses
 
 
     Public Class HullLine_EdgePoints : Inherits TaskParent
-        Dim hullLines As New HullLine_Basics
+        Dim hullLines As New HullLine_Basics_TA
         Public Sub New()
             desc = "Find the edge points for the current and last frm for the hull lines."
         End Sub
@@ -77,7 +77,7 @@ Namespace VBClasses
 
 
     Public Class NR_HullLine_SelectHull : Inherits TaskParent
-        Dim hullLines As New HullLine_Basics
+        Dim hullLines As New HullLine_Basics_TA
         Public Sub New()
             dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
             labels(3) = "Click on any hull to see it below with its edge points."

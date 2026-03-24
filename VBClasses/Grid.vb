@@ -1,7 +1,7 @@
 Imports cv = OpenCvSharp
 Imports System.Threading
 Namespace VBClasses
-    Public Class Grid_Basics : Inherits TaskParent
+    Public Class Grid_Basics_TA : Inherits TaskParent
         Public gridNeighbors As New List(Of List(Of Integer))
         Public Sub New()
             task.gridMap = New cv.Mat(dst2.Size, cv.MatType.CV_32S, 0)
@@ -109,7 +109,7 @@ Namespace VBClasses
                 dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U)
                 task.color.CopyTo(dst2)
                 dst2.SetTo(white, task.gridMask)
-                labels(2) = "Grid_Basics " + CStr(task.gridRects.Count) + " (" + CStr(task.bricksPerCol) + "X" + CStr(task.bricksPerRow) + ") " +
+                labels(2) = "Grid_Basics_TA " + CStr(task.gridRects.Count) + " (" + CStr(task.bricksPerCol) + "X" + CStr(task.bricksPerRow) + ") " +
                                              CStr(task.brickEdgeLen) + "X" + CStr(task.brickEdgeLen) + " regions"
             End If
         End Sub
@@ -121,11 +121,11 @@ Namespace VBClasses
 
 
 
-    Public Class NR_Grid_BasicsTest : Inherits TaskParent
+    Public Class NR_Grid_Basics_TATest : Inherits TaskParent
         Public Sub New()
             If standalone Then task.gOptions.GridSlider.Value = 16
             labels = {"", "", "Each grid element is assigned a value below", "The line is the diagonal for each r.  Bottom might be a shortened r."}
-            If standalone Then desc = "Validation test for Grid_Basics algorithm"
+            If standalone Then desc = "Validation test for Grid_Basics_TA algorithm"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             Dim mean = cv.Cv2.Mean(src)
@@ -401,7 +401,7 @@ Namespace VBClasses
             If standaloneTest() Then
                 task.color.CopyTo(dst2)
                 dst2.SetTo(white, gridMask)
-                labels(2) = "Grid_Basics " + CStr(gridRects.Count) + " (" + CStr(bricksPerCol) + "X" + CStr(bricksPerRow) + ") " +
+                labels(2) = "Grid_Basics_TA " + CStr(gridRects.Count) + " (" + CStr(bricksPerCol) + "X" + CStr(bricksPerRow) + ") " +
                           CStr(gridWidth) + "X" + CStr(gridHeight) + " regions"
             End If
         End Sub

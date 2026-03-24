@@ -3,7 +3,7 @@ Namespace VBClasses
     Public Class Structured_Basics : Inherits TaskParent
         Public lpListX As New List(Of lpData)
         Public lpListY As New List(Of lpData)
-        Public lines As New Line_Basics
+        Public lines As New Line_Basics_TA
         Dim struct As New Structured_Core
         Public Sub New()
             task.gOptions.highlight.SelectedItem = "Red"
@@ -90,7 +90,7 @@ Namespace VBClasses
             dst3 = multi.dst3
 
             Dim vecArray = task.lines.getRawVecs(dst3.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
-            Dim lpList = Line_Basics.getRawLines(vecArray)
+            Dim lpList = Line_Basics_TA.getRawLines(vecArray)
 
             dst2.SetTo(0)
             For Each lp In lpList

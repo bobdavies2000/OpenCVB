@@ -1,10 +1,9 @@
 Imports cv = OpenCvSharp
 Namespace VBClasses
-    Public Class Motion_Basics : Inherits TaskParent
+    Public Class Motion_Basics_TA : Inherits TaskParent
         Public motionSort As New List(Of Integer)
         Dim diff As New Diff_Basics
         Public motionMask As cv.Mat = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 255)
-        Public corr As New Correlation_Basics
         Public Sub New()
             If standalone Then task.gOptions.showMotionMask.Checked = True
             dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
@@ -40,8 +39,6 @@ Namespace VBClasses
                 motionMask(rect).SetTo(255)
             Next
 
-            ' corr.Run(src.Clone)
-
             labels(2) = "Grid rects with motion: " + CStr(motionSort.Count)
         End Sub
     End Class
@@ -58,7 +55,7 @@ Namespace VBClasses
             labels(1) = "Current grayscale image"
             labels(2) = "Grayscale image constructed from previous images + motion updates."
             labels(3) = "Highlighted difference of task.gray and the one built with the motion data.  "
-            desc = "Compare task.gray to constructed images to verify Motion_Basics is working"
+            desc = "Compare task.gray to constructed images to verify Motion_Basics_TA is working"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             If src.Channels <> 1 Then dst1 = task.gray.Clone Else dst1 = src.Clone
@@ -145,7 +142,7 @@ Namespace VBClasses
 
 
     Public Class Motion_Right : Inherits TaskParent
-        Public motion As New Motion_Basics
+        Public motion As New Motion_Basics_TA
         Public Sub New()
             desc = "Build the MotionMask for the right camera."
         End Sub
@@ -162,7 +159,7 @@ Namespace VBClasses
 
 
     Public Class Motion_Left : Inherits TaskParent
-        Public motion As New Motion_Basics
+        Public motion As New Motion_Basics_TA
         Public Sub New()
             desc = "Build the MotionMask for the left camera."
         End Sub
@@ -178,7 +175,7 @@ Namespace VBClasses
 
 
 
-    Public Class Motion_Cloud : Inherits TaskParent
+    Public Class Motion_Cloud_TA : Inherits TaskParent
         Public originalPointcloud As cv.Mat
         Public motionSort As New List(Of Integer)
         Dim diff As New Diff_Depth32f

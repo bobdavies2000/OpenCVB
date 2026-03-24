@@ -1,7 +1,7 @@
 Imports System.Runtime.InteropServices
 Imports cv = OpenCvSharp
 Namespace VBClasses
-    Public Class DepthColorizer_Basics : Inherits TaskParent
+    Public Class DepthColorizer_Basics_TA : Inherits TaskParent
         Implements IDisposable
         Public Sub New()
             Dim gradientWidth = Math.Min(dst2.Width, 256)

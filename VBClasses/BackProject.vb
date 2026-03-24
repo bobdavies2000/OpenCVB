@@ -451,7 +451,7 @@ Namespace VBClasses
             If masks.histIndex <> saveHistIndex Then dst1.SetTo(0)
 
             Dim vecArray = task.lines.getRawVecs(masks.mask)
-            Dim lpList = Line_Basics.getRawLines(vecArray)
+            Dim lpList = Line_Basics_TA.getRawLines(vecArray)
 
             For Each lp In lpList
                 Dim val = masks.dst3.Get(Of Byte)(lp.p1.Y, lp.p1.X)

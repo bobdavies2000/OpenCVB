@@ -126,7 +126,7 @@ Namespace VBClasses
         Public selectLine As New Delaunay_LineSelect
         Public pointcloud As New cv.Mat(dst2.Size, cv.MatType.CV_32FC3, 0)
         Public Sub New()
-            desc = "Build the 3D lines found in Line_Basics"
+            desc = "Build the 3D lines found in Line_Basics_TA"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             selectLine.Run(src)

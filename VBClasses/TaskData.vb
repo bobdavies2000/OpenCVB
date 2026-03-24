@@ -79,17 +79,18 @@ Namespace VBClasses
         Public colorMapBricks As cv.Mat
 
         ' task algorithms - operate on every frame regardless of which algorithm is being run.
-        Public colorizer As DepthColorizer_Basics
-        Public keyColors As KeyColor_Basics
-        Public filterBasics As Filter_Basics
-        Public gravityBasics As Gravity_Basics
-        Public gravityMatrix As IMU_GMatrix
-        Public grid As Grid_Basics
-        Public imuBasics As IMU_Basics
-        Public leftRightBrightness As LeftRight_Brightness
-        Public lines As Line_Basics
-        Public motion As Motion_Basics
-        Public motionCloud As Motion_Cloud
+        Public colorizer As DepthColorizer_Basics_TA
+        Public keyColors As KeyColor_Basics_TA
+        Public filterBasics As Filter_Basics_TA
+        Public gravityBasics As Gravity_Basics_TA
+        Public gravityMatrix As IMU_GMatrix_TA
+        Public grid As Grid_Basics_TA
+        Public imuBasics As IMU_Basics_TA
+        Public leftRightBrightness As LeftRight_Brightness_TA
+        Public lines As Line_Basics_TA
+        Public motion As Motion_Basics_TA
+        Public motionCloud As Motion_Cloud_TA
+
         Public motionFeatures As cv.Point2f
         Public palette As Palette_LoadColorMap
         Public PixelViewer As Pixel_Viewer

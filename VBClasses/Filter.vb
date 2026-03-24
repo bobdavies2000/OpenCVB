@@ -1,9 +1,9 @@
 Imports cv = OpenCvSharp
 Namespace VBClasses
-    Public Class Filter_Basics : Inherits TaskParent
+    Public Class Filter_Basics_TA : Inherits TaskParent
         Public filterList As String() = {"Original", "PhotoShop_HSV", "PhotoShop_SharpenDetail", "PhotoShop_WhiteBalance"}
         Dim filters(filterList.Count - 1) As Object
-        Public grayFilter As New Filter_BasicsGray
+        Public grayFilter As New Filter_Basics_Gray
         Public Sub New()
             desc = "Filter the input for algorithm or set the defaults."
         End Sub
@@ -43,7 +43,7 @@ Namespace VBClasses
 
 
 
-    Public Class Filter_BasicsGray : Inherits TaskParent
+    Public Class Filter_Basics_Gray : Inherits TaskParent
         Public filterIndex As Integer = -1
         Public filterList As String() = {"Original", "Blur_Basics", "Dilate_Basics", "Erode_Basics",
                                          "NR_Filter_Equalize", "NR_Filter_Laplacian", "MeanSubtraction_Gray", "PhotoShop_Gamma"}
@@ -81,7 +81,7 @@ Namespace VBClasses
                 filters(filterIndex).run(dst2)
                 dst2 = filters(filterIndex).dst2
                 If dst2.Channels <> 1 Then
-                    MessageBox.Show("Filter_BasicsGray failure - " + filterList(filterIndex) + " needs to return " + vbCrLf +
+                    MessageBox.Show("Filter_Basics_Gray failure - " + filterList(filterIndex) + " needs to return " + vbCrLf +
                        "an 8UC1 image, not 8UC3.  Reevaluate any new filters added above!")
                     Dim k = 0 ' if you set a breakpoint here when you get this message, you can debug it more easily.
                 End If

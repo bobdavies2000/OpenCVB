@@ -67,12 +67,12 @@ Namespace VBClasses
             heat.Run(src)
 
             Dim vecArray = task.lines.getRawVecs(heat.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
-            Dim lplist = Line_Basics.getRawLines(vecArray)
+            Dim lplist = Line_Basics_TA.getRawLines(vecArray)
             setupTop.Run(heat.dst2)
             dst2 = setupTop.dst2
 
             vecArray = task.lines.getRawVecs(heat.dst3.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
-            lplist = Line_Basics.getRawLines(vecArray)
+            lplist = Line_Basics_TA.getRawLines(vecArray)
             setupSide.Run(heat.dst3)
             dst3 = setupSide.dst2
         End Sub

@@ -88,7 +88,7 @@ Namespace VBClasses
                 Dim nextBMP As Bitmap = Nothing
                 Select Case task.gifCaptureIndex
                     Case gifTypes.gifdst0
-                        If task.gOptions.CrossHairs.Checked Then Gravity_Basics.showVectors(task.color)
+                        If task.gOptions.CrossHairs.Checked Then Gravity_Basics_TA.showVectors(task.color)
                         Dim dst = If(task.gOptions.displayDst0.Checked, dst0, task.color)
                         If dst.Channels() = 1 Then
                             dst = dst.CvtColor(cv.ColorConversionCodes.GRAY2BGR)

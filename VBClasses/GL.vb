@@ -703,13 +703,16 @@ Namespace VBClasses
 
 
     Public Class GL_Featureless : Inherits TaskParent
+        Dim fLess As New FeatureLess_Basics
         Public Sub New()
             dst0 = New cv.Mat(dst0.Size, cv.MatType.CV_8U, 0)
             desc = "Display the pointcloud"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            dst2 = task.fLessMask.Clone
-            labels(2) = task.motion.corr.labels(2)
+            fLess.Run(task.gray)
+
+            dst2 = fLess.dst2.Clone
+            labels(2) = fLess.labels(2)
 
             dst3.SetTo(0)
             src.CopyTo(dst3, dst2)

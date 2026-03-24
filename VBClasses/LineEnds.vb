@@ -5,7 +5,7 @@ Namespace VBClasses
         Public correlations As New List(Of Single)
         Public Sub New()
             task.fOptions.MatchCorrSlider.Value = 90
-            desc = "Track each of the lines found in Line_Basics"
+            desc = "Track each of the lines found in Line_Basics_TA"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             dst2 = src.Clone

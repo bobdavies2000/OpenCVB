@@ -1,6 +1,6 @@
 ﻿Imports cv = OpenCvSharp
 Namespace VBClasses
-    Public Class KeyColor_Basics : Inherits TaskParent
+    Public Class KeyColor_Basics_TA : Inherits TaskParent
         Public keyList As New List(Of keyData)
         Public keyMap As New cv.Mat(task.workRes, cv.MatType.CV_8U, 0)
         Dim edgeline As New EdgeLine_KeyColorOnly
@@ -65,7 +65,7 @@ Namespace VBClasses
         Dim redC As New RedCloud_Basics
         Public Sub New()
             dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
-            desc = "Overlay the KeyColor_Basics cells on the reduced depth results."
+            desc = "Overlay the KeyColor_Basics_TA cells on the reduced depth results."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             redC.Run(src)
@@ -94,7 +94,7 @@ Namespace VBClasses
         Dim redC As New RedColor_Basics
         Public Sub New()
             dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
-            desc = "Overlay the KeyColor_Basics cells on the reduced color results."
+            desc = "Overlay the KeyColor_Basics_TA cells on the reduced color results."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             redC.Run(task.keyColors.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY))

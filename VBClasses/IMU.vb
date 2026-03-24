@@ -2,14 +2,14 @@ Imports cv = OpenCvSharp
 Imports System.Windows.Forms
 ' https://github.com/IntelRealSense/librealsense/tree/master/examples/motion
 Namespace VBClasses
-    Public Class IMU_Basics : Inherits TaskParent
+    Public Class IMU_Basics_TA : Inherits TaskParent
         Dim lastTimeStamp As Double
         Public Sub New()
             desc = "Read and display the IMU data"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             If standaloneTest() Then
-                labels(2) = "IMU_Basics gets the IMU data on every iteration."
+                labels(2) = "IMU_Basics_TA gets the IMU data on every iteration."
             End If
 
             Dim gyroAngle As cv.Point3f
@@ -121,7 +121,7 @@ Namespace VBClasses
             Return (p1, p2)
         End Function
 
-        ''' <summary>Unit gravity in body frame from tilt angles (same convention as IMU_GMatrix: roll=X, pitch=Y, yaw=Z).</summary>
+        ''' <summary>Unit gravity in body frame from tilt angles (same convention as IMU_GMatrix_TA: roll=X, pitch=Y, yaw=Z).</summary>
         Public Shared Function AnglesToGravityVector(accRadians As cv.Point3f) As cv.Point3f
             Dim cx = CSng(Math.Cos(accRadians.X))
             Dim sx = CSng(Math.Sin(accRadians.X))
@@ -192,7 +192,7 @@ Namespace VBClasses
 
 
     ' https://github.com/IntelRealSense/librealsense/tree/master/examples/motion
-    Public Class NR_IMU_BasicsKalman : Inherits TaskParent
+    Public Class NR_IMU_Basics_TAKalman : Inherits TaskParent
         Dim lastTimeStamp As Double
         Public Sub New()
             task.kalman = New Kalman_Basics
@@ -244,7 +244,7 @@ Namespace VBClasses
 
 
     ' https://github.com/IntelRealSense/librealsense/tree/master/examples/motion
-    Public Class NR_IMU_BasicsWithOptions : Inherits TaskParent
+    Public Class NR_IMU_Basics_TAWithOptions : Inherits TaskParent
         Dim lastTimeStamp As Double
         Dim options As New Options_IMU
         Public Sub New()
@@ -359,7 +359,7 @@ Namespace VBClasses
 
 
     ' https://www.codeproject.com/Articles/1247960/3D-graphics-engine-with-basic-math-on-CPU
-    Public Class IMU_GMatrix : Inherits TaskParent
+    Public Class IMU_GMatrix_TA : Inherits TaskParent
         Public cx As Single = 1, sx As Single = 0, cy As Single = 1, sy As Single = 0, cz As Single = 1, sz As Single = 0
         Public gMatrix As cv.Mat
         Public Sub New()
@@ -397,7 +397,7 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             If standaloneTest() Then
-                labels(2) = "IMU_GMatrix builds the gMatrix (gravity matrix) on every iteration."
+                labels(2) = "IMU_GMatrix_TA builds the gMatrix (gravity matrix) on every iteration."
             End If
 
             '[cos(a) -sin(a)    0]
@@ -911,7 +911,7 @@ Namespace VBClasses
 
 
     Public Class IMU_Methods : Inherits TaskParent
-        Dim basics As New IMU_Basics
+        Dim basics As New IMU_Basics_TA
         Dim imuAvg As New IMU_Average
         Dim kalman As New IMU_Kalman
         Public Sub New()
@@ -1127,7 +1127,7 @@ Namespace VBClasses
 
 
     ' https://www.codeproject.com/Articles/1247960/3D-graphics-engine-with-basic-math-on-CPU
-    Public Class IMU_GMatrixWithOptions : Inherits TaskParent
+    Public Class IMU_GMatrix_TAWithOptions : Inherits TaskParent
         Public cx As Single = 1, sx As Single = 0, cy As Single = 1, sy As Single = 0, cz As Single = 1, sz As Single = 0
         Public gMatrix As cv.Mat
         Dim xSlider As TrackBar
@@ -1209,11 +1209,11 @@ Namespace VBClasses
                           "Should be close to the earth's gravitational constant of 9.807 (or the camera was moving.)"
 
                 Dim tmpGMat1 = buildGmatrix()
-                strOut += vbCrLf + "Gravity-oriented gMatrix - move camera to test this:" + vbCrLf + IMU_GMatrix.gMatrixToStr(tmpGMat1)
+                strOut += vbCrLf + "Gravity-oriented gMatrix - move camera to test this:" + vbCrLf + IMU_GMatrix_TA.gMatrixToStr(tmpGMat1)
 
                 getSliderValues()
                 Dim tmpGMat2 = buildGmatrix()
-                strOut += vbCrLf + "gMatrix with slider input - use Options_IMU Sliders to change this:" + vbCrLf + IMU_GMatrix.gMatrixToStr(tmpGMat2)
+                strOut += vbCrLf + "gMatrix with slider input - use Options_IMU Sliders to change this:" + vbCrLf + IMU_GMatrix_TA.gMatrixToStr(tmpGMat2)
             End If
             SetTrueText(strOut)
             task.gMatrix = gMatrix
