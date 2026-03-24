@@ -474,11 +474,9 @@ Namespace VBClasses
             Public color As cv.Scalar
             Public age As Integer
         End Class
-
-
         Public Sub New()
             labels(3) = "Input from RedColor_NoMatching."
-            desc = "Track connected regions from RedColor_NoMatching and keep stable colors while regions persist."
+            desc = "Cursor: Track connected regions from RedColor_NoMatching and keep stable colors while regions persist."
         End Sub
 
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -487,26 +485,10 @@ Namespace VBClasses
             noMatch.Run(fLess.dst2)
             dst3 = noMatch.dst2
 
-            If dst3.Empty Then
-                dst2.SetTo(0)
-                trackedMap.SetTo(0)
-                previousRegions.Clear()
-                labels(2) = "No regions found."
-                Exit Sub
-            End If
-
-            Dim gray As cv.Mat
-            If dst3.Channels() = 1 Then
-                gray = dst3
-            Else
-                gray = dst3.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-            End If
-            Dim binary = gray.Threshold(1, 255, cv.ThresholdTypes.Binary)
-
             Dim ccLabels As New cv.Mat
             Dim stats As New cv.Mat
             Dim centroids As New cv.Mat
-            Dim ccCount = cv.Cv2.ConnectedComponentsWithStats(binary, ccLabels, stats, centroids)
+            Dim ccCount = cv.Cv2.ConnectedComponentsWithStats(fLess.dst2, ccLabels, stats, centroids)
 
             trackedMap.SetTo(0)
             dst2.SetTo(0)
@@ -516,7 +498,7 @@ Namespace VBClasses
             Dim minPixels = CInt(dst2.Total * 0.001)
             If minPixels < 25 Then minPixels = 25
 
-            For ccIndex = 1 To ccCount - 1
+            For ccIndex = 0 To ccCount - 1
                 Dim x = stats.Get(Of Integer)(ccIndex, 0)
                 Dim y = stats.Get(Of Integer)(ccIndex, 1)
                 Dim w = stats.Get(Of Integer)(ccIndex, 2)
@@ -565,7 +547,7 @@ Namespace VBClasses
                 If usedPrevious.Contains(i) Then Continue For
                 Dim prev = previousRegions(i)
                 Dim overlap = RectOverlapScore(curr.rect, prev.rect)
-                Dim d = Distance(curr.centroid, prev.centroid)
+                Dim d = curr.centroid.DistanceTo(prev.centroid)
                 Dim distThreshold = Math.Max(curr.rect.Width, curr.rect.Height) * 1.25
                 Dim score = overlap
                 If d <= distThreshold Then score += 0.5 * (1.0 - d / Math.Max(1, distThreshold))
