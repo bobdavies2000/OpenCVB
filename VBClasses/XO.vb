@@ -11112,7 +11112,7 @@ Namespace VBClasses
 
 
     Public Class XO_RedList_LeftRight : Inherits TaskParent
-        Dim redLR As New LeftRight_FLessRedCompare
+        Dim redLR As New XO_LeftRight_FLessRedCompare
         Public Sub New()
             desc = "Run RedCloud on the left and right images.  Duplicate of LeftRight_RedCloudBoth"
         End Sub
@@ -19403,5 +19403,201 @@ Namespace VBClasses
             colorIndex += 1
             Return New cv.Scalar(vec.Item0, vec.Item1, vec.Item2)
         End Function
+    End Class
+
+
+
+
+
+
+    Public Class XO_LeftRight_RedRightGray : Inherits TaskParent
+        Dim color8u As New Color8U_Basics
+        Public redC As New RedColor_Basics
+        Public Sub New()
+            desc = "Segment the left view image with RedColor_Basics"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            color8u.Run(task.rightView)
+            redC.Run(color8u.dst2 + 1)
+            dst2 = redC.dst2
+            labels = redC.labels
+
+            SetTrueText(redC.strOut, 3)
+        End Sub
+    End Class
+
+
+
+
+    Public Class XO_LeftRight_RedLeftGray : Inherits TaskParent
+        Dim color8u As New Color8U_Basics
+        Public redC As New RedColor_Basics
+        Public Sub New()
+            desc = "Segment the left view image with RedColor_Basics"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            color8u.Run(task.leftView)
+            redC.Run(color8u.dst2 + 1)
+            dst2 = redC.dst2
+            labels = redC.labels
+
+            SetTrueText(redC.strOut, 3)
+        End Sub
+    End Class
+
+
+
+
+
+    Public Class XO_LeftRight_RedCompare : Inherits TaskParent
+        Dim left As New XO_LeftRight_RedLeftGray
+        Dim right As New XO_LeftRight_RedRightGray
+        Public Sub New()
+            desc = "Compare the left and right RedColor_Basics output"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            left.Run(task.leftView)
+            dst2 = left.dst2
+            labels(2) = left.labels(2)
+
+            right.Run(task.rightView)
+            dst3 = right.dst2
+            labels(3) = right.labels(2)
+        End Sub
+    End Class
+
+
+
+
+
+
+
+    Public Class XO_Disparity_RedMask : Inherits TaskParent
+        Dim disparity As New Disparity_Basics
+        Dim leftCells As New XO_LeftRight_RedLeftGray
+        Dim rightCells As New XO_LeftRight_RedRightGray
+        Public Sub New()
+            If standalone Then task.gOptions.displayDst1.Checked = True
+            dst1 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+            desc = "To validate Disparity_Basics, just shift the left image right.  Should always match."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            dst1 = task.rightView
+            leftCells.Run(src)
+            rightCells.Run(src)
+
+            disparity.rightView = rightCells.dst2
+            disparity.Run(leftCells.dst2)
+            dst2 = disparity.dst2
+            dst3 = disparity.dst3
+            labels = disparity.labels
+
+            task.color.Rectangle(disparity.rect, 255, task.lineWidth)
+            dst1.Rectangle(disparity.matchRect, 255, task.lineWidth)
+        End Sub
+    End Class
+
+
+
+
+
+    Public Class XO_LeftRight_FLessRedCompare : Inherits TaskParent
+        Dim redLeft As New XO_LeftRight_FLessRedLeft
+        Dim redRight As New XO_LeftRight_FLessRedRight
+        Public Sub New()
+            desc = "Display the RedColor_Basics output for both the left and right images."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            redLeft.Run(task.leftView)
+            dst2 = redLeft.dst2.Clone
+            If standaloneTest() Then
+                For Each rc In redLeft.redC.rcList
+                    DrawCircle(dst2, rc.maxDist, task.DotSize, task.highlight)
+                Next
+            End If
+
+            redRight.Run(task.rightView)
+            dst3 = redRight.dst2.Clone
+            If standaloneTest() Then
+                For Each rc In redRight.redC.rcList
+                    DrawCircle(dst3, rc.maxDist, task.DotSize, task.highlight)
+                Next
+            End If
+            labels(2) = redLeft.labels(2)
+            labels(3) = redRight.labels(2)
+        End Sub
+    End Class
+
+
+
+
+
+    Public Class XO_LeftRight_FLessRedRight : Inherits TaskParent
+        Dim fLess As New FeatureLess_Basics
+        Public redC As New RedColor_Basics
+        Public Sub New()
+            desc = "Segment the right view image with RedColor_Basics"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            dst3 = task.rightView
+            fLess.Run(dst3)
+
+            redC.Run(fLess.dst2)
+
+            dst2 = Palettize(redC.dst2, 0)
+            labels(2) = redC.labels(2)
+        End Sub
+    End Class
+
+
+
+
+
+    Public Class XO_LeftRight_FLessRedLeft : Inherits TaskParent
+        Dim fLess As New FeatureLess_Basics
+        Public redC As New RedColor_Basics
+        Public Sub New()
+            desc = "Segment the left view image with RedColor_Basics"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            dst3 = task.leftView
+            fLess.Run(dst3)
+
+            redC.Run(fLess.dst2)
+
+            dst2 = Palettize(redC.dst2, 0)
+            labels(2) = redC.labels(2)
+        End Sub
+    End Class
+
+
+
+
+
+    Public Class XO_Motion_LeftTest : Inherits TaskParent
+        Dim motionLeft As New Motion_Left
+        Public Sub New()
+            dst0 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+            dst1 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+            If standalone Then task.gOptions.displayDst0.Checked = True
+            If standalone Then task.gOptions.displayDst1.Checked = True
+            task.fOptions.ColorDiffSlider.Value = 6
+            desc = "Emphasize differences between the accumulated left view and the left view."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            If task.firstPass Then dst3 = task.leftView
+
+            motionLeft.Run(Nothing)
+            dst2 = motionLeft.dst3
+            dst3 = motionLeft.motion.dst2
+
+            labels(2) = CStr(motionLeft.motion.motionSort.Count) + " bricks were copied to dst3"
+
+            cv.Cv2.Absdiff(dst3, task.leftView, dst1)
+            dst1 = dst1.Threshold(0, 255, cv.ThresholdTypes.Binary)
+
+            dst0 = dst3 - task.leftView
+            dst0 = dst0.Threshold(0, 255, cv.ThresholdTypes.Binary)
+        End Sub
     End Class
 End Namespace

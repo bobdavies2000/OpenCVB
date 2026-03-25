@@ -115,70 +115,6 @@ Namespace VBClasses
 
 
 
-    Public Class Motion_LeftTest : Inherits TaskParent
-        Dim motionLeft As New Motion_Left
-        Public Sub New()
-            dst0 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-            dst1 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-            If standalone Then task.gOptions.displayDst0.Checked = True
-            If standalone Then task.gOptions.displayDst1.Checked = True
-            task.fOptions.ColorDiffSlider.Value = 6
-            desc = "Emphasize differences between the accumulated left view and the left view."
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            If task.firstPass Then dst3 = task.leftView
-
-            motionLeft.Run(Nothing)
-            dst2 = motionLeft.dst3
-            dst3 = motionLeft.motion.dst2
-
-            labels(2) = CStr(motionLeft.motion.motionSort.Count) + " bricks were copied to dst3"
-
-            cv.Cv2.Absdiff(dst3, task.leftView, dst1)
-            dst1 = dst1.Threshold(0, 255, cv.ThresholdTypes.Binary)
-
-            dst0 = dst3 - task.leftView
-            dst0 = dst0.Threshold(0, 255, cv.ThresholdTypes.Binary)
-        End Sub
-    End Class
-
-
-
-
-
-    Public Class Motion_Right : Inherits TaskParent
-        Public motion As New Motion_Basics_TA
-        Public Sub New()
-            desc = "Build the MotionMask for the right camera."
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            motion.Run(task.rightView)
-            dst2 = motion.dst2
-            dst3 = motion.motionMask.Clone
-            labels(2) = motion.labels(2)
-            labels(3) = "The motion mask for the right image"
-        End Sub
-    End Class
-
-
-
-
-    Public Class Motion_Left : Inherits TaskParent
-        Public motion As New Motion_Basics_TA
-        Public Sub New()
-            desc = "Build the MotionMask for the left camera."
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            motion.Run(task.leftView)
-            dst2 = motion.dst2
-            dst3 = motion.motionMask.Clone
-            labels(2) = motion.labels(2)
-            labels(3) = "The motion mask for the left image "
-        End Sub
-    End Class
-
-
-
 
     Public Class Motion_Cloud_TA : Inherits TaskParent
         Public originalPointcloud As cv.Mat
@@ -307,7 +243,12 @@ Namespace VBClasses
         Dim cList As New List(Of Single)
         Dim plotHist As New Plot_Histogram
         Public Sub New()
+            If standalone Then task.gOptions.displayDst1.Checked = True
             plotHist.createHistogram = True
+            plotHist.minRange = -1
+            plotHist.maxRange = 1
+            plotHist.shadeValues = False
+            task.gOptions.HistBinBar.Value = task.gOptions.HistBinBar.Maximum
             desc = "Measure the correlation of grid elements that appear to have changed."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -329,22 +270,59 @@ Namespace VBClasses
 
                 If corr < testCorrelation Then
                     dst3.Rectangle(r, white, task.lineWidth)
+                    count += 1
                 Else
                     dst3.Rectangle(r, task.highlight, task.lineWidth)
                 End If
 
-                If corr >= 0.98 Then count += 1
             Next
 
             lastsrc = src.Clone
 
             If cList.Count > 0 Then
                 plotHist.Run(cv.Mat.FromPixelData(cList.Count, 1, cv.MatType.CV_32F, cList.ToArray))
-                dst3 = plotHist.dst2
+                dst1 = plotHist.dst2
 
                 labels(2) = "Min = " + Format(cList.Min, fmt1) + ", Max = " + Format(cList.Max, fmt1)
-                labels(3) = CStr(count) + " had a correlation of 0.98 (" + Format(count / cList.Count, "0%") + ")"
+                labels(3) = CStr(count) + " had a correlation < " + Format(testCorrelation, fmt1) + " (" +
+                            Format(count / cList.Count, "0%") + ")" +
+                            " The yellow squares have low correlation."
             End If
+        End Sub
+    End Class
+
+
+
+
+
+    Public Class Motion_Right : Inherits TaskParent
+        Public motion As New Motion_Basics_TA
+        Public Sub New()
+            desc = "Build the MotionMask for the right camera."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            motion.Run(task.rightView)
+            dst2 = motion.dst2
+            dst3 = motion.motionMask.Clone
+            labels(2) = motion.labels(2)
+            labels(3) = "The motion mask for the right image"
+        End Sub
+    End Class
+
+
+
+
+    Public Class Motion_Left : Inherits TaskParent
+        Public motion As New Motion_Basics_TA
+        Public Sub New()
+            desc = "Build the MotionMask for the left camera."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            motion.Run(task.leftView)
+            dst2 = motion.dst2
+            dst3 = motion.motionMask.Clone
+            labels(2) = motion.labels(2)
+            labels(3) = "The motion mask for the left image "
         End Sub
     End Class
 End Namespace

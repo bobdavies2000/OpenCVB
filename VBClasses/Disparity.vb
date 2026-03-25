@@ -111,36 +111,6 @@ Namespace VBClasses
 
 
 
-
-    Public Class NR_Disparity_RedMask : Inherits TaskParent
-        Dim disparity As New Disparity_Basics
-        Dim leftCells As New LeftRight_RedLeftGray
-        Dim rightCells As New LeftRight_RedRightGray
-        Public Sub New()
-            If standalone Then task.gOptions.displayDst1.Checked = True
-            dst1 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-            desc = "To validate Disparity_Basics, just shift the left image right.  Should always match."
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            dst1 = task.rightView
-            leftCells.Run(src)
-            rightCells.Run(src)
-
-            disparity.rightView = rightCells.dst2
-            disparity.Run(leftCells.dst2)
-            dst2 = disparity.dst2
-            dst3 = disparity.dst3
-            labels = disparity.labels
-
-            task.color.Rectangle(disparity.rect, 255, task.lineWidth)
-            dst1.Rectangle(disparity.matchRect, 255, task.lineWidth)
-        End Sub
-    End Class
-
-
-
-
-
     'Z = B * f / disparity  - we are using here: disparity = B * f / Z
     'where:
 

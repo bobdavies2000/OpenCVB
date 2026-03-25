@@ -429,13 +429,8 @@ Laplacian_Basics
 Laplacian_PyramidFilter
 LeftRight_Basics
 LeftRight_Brightness_TA
+LeftRight_FeatureLess
 LeftRight_Features
-LeftRight_FLessRedCompare
-LeftRight_FLessRedLeft
-LeftRight_FLessRedRight
-LeftRight_RedCompare
-LeftRight_RedLeftGray
-LeftRight_RedRightGray
 LeftRight_Reduction
 Line_Basics_TA
 Line_BrickList
@@ -497,7 +492,6 @@ Motion_Basics_TA
 Motion_Cloud_TA
 Motion_Correlation
 Motion_Left
-Motion_LeftTest
 Motion_Right
 Mouse_Basics
 MSER_Basics
@@ -761,7 +755,6 @@ NR_Dilate_OpenClose
 NR_Disparity_Color8u
 NR_Disparity_Edges
 NR_Disparity_Inverse
-NR_Disparity_RedMask
 NR_Disparity_Validate
 NR_Distance_Background
 NR_Distance_BinaryImage
@@ -1101,7 +1094,6 @@ NR_LeftRight_BRISK
 NR_LeftRight_ContourLeft
 NR_LeftRight_Edges
 NR_LeftRight_EdgesColor
-NR_LeftRight_Palettized
 NR_LeftRight_RawLeft
 NR_LeftRight_RGBAlignLeft
 NR_Line_Basics_TATest

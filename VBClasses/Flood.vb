@@ -75,8 +75,10 @@ Namespace VBClasses
                 lastCenters.Add(task.gridNabeRects(rc.gridIndex))
             Next
 
-            strOut = RedUtil_Basics.selectCell(rcMap, rcList)
-            SetTrueText(strOut, 3)
+            If standalone Then
+                strOut = RedUtil_Basics.selectCell(rcMap, rcList)
+                SetTrueText(strOut, 3)
+            End If
 
             labels(2) = CStr(rcList.Count) + " cells found. "
         End Sub

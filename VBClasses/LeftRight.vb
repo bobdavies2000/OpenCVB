@@ -41,25 +41,6 @@ Namespace VBClasses
 
 
 
-    Public Class NR_LeftRight_Palettized : Inherits TaskParent
-        Public Sub New()
-            desc = "Add color to the 8-bit infrared images."
-            labels(2) = "Left Image"
-            labels(3) = "Right Image"
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            dst2 = Palettize(task.leftView)
-            dst3 = Palettize(task.rightView)
-        End Sub
-    End Class
-
-
-
-
-
-
-
-
     Public Class NR_LeftRight_BRISK : Inherits TaskParent
         Dim brisk As New BRISK_Basics
         Dim options As New Options_Features
@@ -79,86 +60,6 @@ Namespace VBClasses
         End Sub
     End Class
 
-
-
-
-
-
-
-    Public Class LeftRight_Reduction : Inherits TaskParent
-        Public reduction As New Reduction_Basics
-        Public Sub New()
-            labels = {"", "", "Reduced Left Image", "Reduced Right Image"}
-            desc = "Reduce both the left and right color images"
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            reduction.Run(task.leftView)
-            dst2 = reduction.dst2.Clone
-
-            reduction.Run(task.rightView)
-            dst3 = reduction.dst2.Clone
-        End Sub
-    End Class
-
-
-
-
-
-    Public Class LeftRight_RedRightGray : Inherits TaskParent
-        Dim color8u As New Color8U_Basics
-        Public redC As New RedColor_Basics
-        Public Sub New()
-            desc = "Segment the left view image with RedColor_Basics"
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            color8u.Run(task.rightView)
-            redC.Run(color8u.dst2 + 1)
-            dst2 = redC.dst2
-            labels = redC.labels
-
-            SetTrueText(redC.strOut, 3)
-        End Sub
-    End Class
-
-
-
-
-    Public Class LeftRight_RedLeftGray : Inherits TaskParent
-        Dim color8u As New Color8U_Basics
-        Public redC As New RedColor_Basics
-        Public Sub New()
-            desc = "Segment the left view image with RedColor_Basics"
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            color8u.Run(task.leftView)
-            redC.Run(color8u.dst2 + 1)
-            dst2 = redC.dst2
-            labels = redC.labels
-
-            SetTrueText(redC.strOut, 3)
-        End Sub
-    End Class
-
-
-
-
-
-    Public Class LeftRight_RedCompare : Inherits TaskParent
-        Dim left As New LeftRight_RedLeftGray
-        Dim right As New LeftRight_RedRightGray
-        Public Sub New()
-            desc = "Compare the left and right RedColor_Basics output"
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            left.Run(task.leftView)
-            dst2 = left.dst2
-            labels(2) = left.labels(2)
-
-            right.Run(task.rightView)
-            dst3 = right.dst2
-            labels(3) = right.labels(2)
-        End Sub
-    End Class
 
 
 
@@ -263,78 +164,6 @@ Namespace VBClasses
 
 
 
-    Public Class LeftRight_FLessRedCompare : Inherits TaskParent
-        Dim redLeft As New LeftRight_FLessRedLeft
-        Dim redRight As New LeftRight_FLessRedRight
-        Public Sub New()
-            desc = "Display the RedColor_Basics output for both the left and right images."
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            redLeft.Run(task.leftView)
-            dst2 = redLeft.dst2.Clone
-            If standaloneTest() Then
-                For Each rc In redLeft.redC.rcList
-                    DrawCircle(dst2, rc.maxDist, task.DotSize, task.highlight)
-                Next
-            End If
-
-            redRight.Run(task.rightView)
-            dst3 = redRight.dst2.Clone
-            If standaloneTest() Then
-                For Each rc In redRight.redC.rcList
-                    DrawCircle(dst3, rc.maxDist, task.DotSize, task.highlight)
-                Next
-            End If
-            labels(2) = redLeft.labels(2)
-            labels(3) = redRight.labels(2)
-        End Sub
-    End Class
-
-
-
-
-
-    Public Class LeftRight_FLessRedRight : Inherits TaskParent
-        Dim fLess As New FeatureLess_Basics
-        Public redC As New RedColor_Basics
-        Public Sub New()
-            desc = "Segment the right view image with RedColor_Basics"
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            dst3 = task.rightView
-            fLess.Run(dst3)
-
-            redC.Run(fLess.dst2)
-
-            dst2 = Palettize(redC.dst2, 0)
-            labels(2) = redC.labels(2)
-        End Sub
-    End Class
-
-
-
-
-
-    Public Class LeftRight_FLessRedLeft : Inherits TaskParent
-        Dim fLess As New FeatureLess_Basics
-        Public redC As New RedColor_Basics
-        Public Sub New()
-            desc = "Segment the left view image with RedColor_Basics"
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            dst3 = task.leftView
-            fLess.Run(dst3)
-
-            redC.Run(fLess.dst2)
-
-            dst2 = Palettize(redC.dst2, 0)
-            labels(2) = redC.labels(2)
-        End Sub
-    End Class
-
-
-
-
 
     Public Class LeftRight_Brightness_TA : Inherits TaskParent
         Dim Options As New Options_BrightnessContrast
@@ -378,6 +207,50 @@ Namespace VBClasses
             dst3 = task.rightView.Clone
             dst3.SetTo(0, fless.dst2)
             labels(3) = fless.labels(3)
+        End Sub
+    End Class
+
+
+
+
+
+    Public Class LeftRight_Reduction : Inherits TaskParent
+        Public reduction As New Reduction_Basics
+        Public Sub New()
+            desc = "Add color to the 8-bit infrared images."
+            labels(2) = "Left Image"
+            labels(3) = "Right Image"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            Dim saveReductionFactor = task.reduction
+            task.reduction = 50
+
+            reduction.Run(task.leftView)
+            dst2 = Palettize(reduction.dst2.Clone)
+
+            reduction.Run(task.rightView)
+            dst3 = Palettize(reduction.dst2.Clone)
+
+            task.reduction = saveReductionFactor
+        End Sub
+    End Class
+
+
+
+
+
+    Public Class LeftRight_FeatureLess : Inherits TaskParent
+        Public fLess As New FeatureLess_Threshold
+        Public Sub New()
+            labels = {"", "", "Reduced Left Image", "Reduced Right Image"}
+            desc = "Reduce both the left and right color images"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            fLess.Run(task.leftView)
+            dst2 = fLess.dst2.Clone
+
+            fLess.Run(task.rightView)
+            dst3 = fLess.dst2.Clone
         End Sub
     End Class
 End Namespace

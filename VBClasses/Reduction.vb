@@ -2,7 +2,6 @@ Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Class Reduction_Basics : Inherits TaskParent
         Public classCount As Integer
-        Public alwaysDisplay As Boolean
         Public Sub New()
             desc = "Reduction: a simpler way to KMeans by reducing color resolution"
         End Sub
@@ -14,7 +13,7 @@ Namespace VBClasses
             dst2 = src / task.reduction
             labels(2) = "Reduced image - factor = " + CStr(task.reduction)
 
-            If standaloneTest() Or alwaysDisplay Then dst3 = Palettize(dst2)
+            dst3 = Palettize(dst2 + 1, 0)
             labels(2) = CStr(classCount) + " colors after reduction - 8uC1 below"
         End Sub
     End Class
@@ -204,7 +203,6 @@ Namespace VBClasses
         Dim reduction As New Reduction_Basics
         Dim diff As New Diff_Basics
         Public Sub New()
-            reduction.alwaysDisplay = True
             If standalone Then task.gOptions.displayDst1.Checked = True
             desc = "Compare reduction with and without motion."
         End Sub

@@ -4,7 +4,6 @@ Namespace VBClasses
         Dim reduction As New Reduction_Basics
         Dim flood As New Flood_Basics
         Public Sub New()
-            reduction.alwaysDisplay = True
             dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
             desc = "Identify the key colors using contours"
         End Sub
