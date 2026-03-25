@@ -13277,7 +13277,7 @@ Namespace VBClasses
 
 
 
-    Public Class Motion_Cloud_TA_MotionRect : Inherits TaskParent
+    Public Class XO_Motion_Cloud_MotionRect : Inherits TaskParent
         Public originalPointcloud As cv.Mat
         Public Sub New()
             labels = {"", "", "Pointcloud updated only with motion Rect",
