@@ -45,7 +45,7 @@ Namespace VBClasses
             lines = New Line_Basics_TA
             filterBasics = New Filter_Basics_TA
             leftRightBrightness = New LeftRight_Brightness_TA
-            keyColors = New KeyColor_Basics_TA
+            keyColors = New KeyColor_Reduction_TA
 
             ' all the algorithms in the list are task algorithms that are children of the algorithm.
             For i = 1 To cpu.callTrace.Count - 1

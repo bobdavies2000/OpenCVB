@@ -3,20 +3,15 @@ Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Class Flood_Basics : Inherits TaskParent
         Implements IDisposable
-        Public classCount As Integer
         Public rcList As New List(Of rcData)
         Public rcMap As cv.Mat = New cv.Mat(dst2.Size, cv.MatType.CV_32S, 0)
-        Public wGridList As New List(Of cv.Point3d)
-        Public options As New Options_RedCloud
-        Dim fLess As New FeatureLess_Stabilized
+        Public fLess As New FeatureLess_Stabilized
         Dim lastCenters As New List(Of cv.Rect)
         Public Sub New()
             cPtr = RedCloudFill_Open()
             desc = "Match the previous featureLess regions as best as possible."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            options.Run()
-
             fLess.Run(task.gray)
             src = fLess.dst2
 
@@ -32,7 +27,7 @@ Namespace VBClasses
             Dim mask = cv.Mat.FromPixelData(src.Rows + 2, src.Cols + 2, cv.MatType.CV_8U, imagePtr)
             dst0 = mask(rMask).Clone
 
-            classCount = RedCloudFill_Count(cPtr)
+            Dim classCount = RedCloudFill_Count(cPtr)
             If classCount = 0 Then Exit Sub ' no data to process.
 
             Dim rectData = cv.Mat.FromPixelData(classCount, 1, cv.MatType.CV_32SC4, RedCloudFill_Rects(cPtr))

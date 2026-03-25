@@ -399,9 +399,11 @@ Kalman_Single
 Kalman_VB
 Kalman_VB_Basics
 Keyboard_Basics
-KeyColor_Basics_TA
+KeyColor_Basics
+KeyColor_Contours
 KeyColor_OverColor
 KeyColor_OverDepth
+KeyColor_Reduction_TA
 KeyColor_Straight
 KLT_Basics
 KMeans_Basics
