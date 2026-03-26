@@ -15,13 +15,8 @@ Namespace VBClasses
             If src.Channels <> 1 Then src = task.gray
             If task.optionsChanged Then dst2 = src.Clone
 
-            If task.heartBeat Or task.optionsChanged Then
-                diff.lastFrame = src
-                diff.dst2.SetTo(0)
-            Else
-                diff.lastFrame = dst2
-                diff.Run(src)
-            End If
+            diff.lastFrame = dst2
+            diff.Run(src)
 
             Dim gridList As New SortedList(Of Integer, Integer)
             For i = 0 To task.gridRects.Count - 1
@@ -239,7 +234,7 @@ Namespace VBClasses
 
 
 
-    Public Class Motion_Correlation : Inherits TaskParent
+    Public Class Motion_CorrelationToLast : Inherits TaskParent
         Dim cList As New List(Of Single)
         Dim plotHist As New Plot_Histogram
         Public Sub New()
@@ -252,14 +247,16 @@ Namespace VBClasses
             desc = "Measure the correlation of grid elements that appear to have changed."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
+            If src.Channels <> 1 Then src = task.color.Clone
+
             Static lastsrc As cv.Mat = src.Clone
             dst2 = src.Clone
-            Dim correlationMat As New cv.Mat
-            Dim testCorrelation As Single = 0
-            If cList.Count > 0 Then testCorrelation = cList.Max * 0.8
-            cList.Clear()
-            dst3 = src
+            Dim maxCorrelation As Single = task.fOptions.MatchCorrSlider.Value / 100
+
             Dim count As Integer
+            Dim correlationMat As New cv.Mat
+            dst3 = src
+            cList.Clear()
             For Each index In task.motion.motionSort
                 Dim r = task.gridRects(index)
                 dst2.Rectangle(r, white, task.lineWidth)
@@ -268,7 +265,7 @@ Namespace VBClasses
                 Dim corr = correlationMat.Get(Of Single)(0, 0)
                 cList.Add(corr)
 
-                If corr < testCorrelation Then
+                If corr < maxCorrelation Then
                     dst3.Rectangle(r, white, task.lineWidth)
                     count += 1
                 Else
@@ -279,14 +276,14 @@ Namespace VBClasses
 
             lastsrc = src.Clone
 
-            If cList.Count > 0 Then
+            If cList.Count > 0 And task.almostHeartBeat Then
                 plotHist.Run(cv.Mat.FromPixelData(cList.Count, 1, cv.MatType.CV_32F, cList.ToArray))
                 dst1 = plotHist.dst2
 
                 labels(2) = "Min = " + Format(cList.Min, fmt1) + ", Max = " + Format(cList.Max, fmt1)
-                labels(3) = CStr(count) + " had a correlation < " + Format(testCorrelation, fmt1) + " (" +
+                labels(3) = CStr(count) + " had a correlation < " + Format(maxCorrelation, fmt2) + " (" +
                             Format(count / cList.Count, "0%") + ")" +
-                            " The yellow squares have low correlation."
+                            " The yellow squares have high correlation."
             End If
         End Sub
     End Class

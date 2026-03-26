@@ -1,3 +1,4 @@
+Imports System.Windows.Documents
 Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Class HeatMap_Basics : Inherits TaskParent
@@ -115,6 +116,8 @@ Namespace VBClasses
             flood.Run(src)
             dst2 = flood.dst2
             labels(2) = flood.labels(2)
+
+            strOut = RedUtil_Basics.selectCell(flood.rcMap, flood.rcList)
 
             dst0 = New cv.Mat(dst2.Size(), cv.MatType.CV_32FC3, 0)
             task.pointCloud(task.rcD.rect).CopyTo(dst0(task.rcD.rect), task.rcD.mask)
