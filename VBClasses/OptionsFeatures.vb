@@ -76,7 +76,7 @@ Public Class OptionsFeatures
                 MotionPixelSlider.Value = 100
             Case 672
                 ColorDiffSlider.Value = 20
-                MotionPixelSlider.Value = 100
+                MotionPixelSlider.Value = 32
             Case 640
                 ColorDiffSlider.Value = 20
                 MotionPixelSlider.Value = 20

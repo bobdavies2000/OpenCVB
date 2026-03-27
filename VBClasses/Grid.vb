@@ -48,6 +48,7 @@ Namespace VBClasses
                     task.gridMap.Rectangle(task.gridRects(i), i, -1)
                 Next
 
+
                 ' This determines which grid rects are replaced when motion is detected.
                 ' linkType = 1 means that only the grid rect is copied (the first entry)
                 ' linkType = 4 means link4 gridRects and the original rect are copied (first 5 entries)

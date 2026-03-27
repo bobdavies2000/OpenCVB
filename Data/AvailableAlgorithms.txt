@@ -493,6 +493,8 @@ Motion_Cloud_TA
 Motion_CorrelationToLast
 Motion_Left
 Motion_Right
+Motion_Throttle_TA
+Motion_Validate
 Mouse_Basics
 MSER_Basics
 MSER_Basics1
@@ -1161,7 +1163,6 @@ NR_ML_ColorInTier2Depth
 NR_ML_DepthFromColor
 NR_ML_DepthFromXYColor
 NR_Moments_CentroidKalman
-NR_Motion_Validate
 NR_Motion_ValidateRight
 NR_Mouse_ClickPointUsage
 NR_Mouse_LeftClickZoom

@@ -40,6 +40,7 @@ Namespace VBClasses
             gravityBasics = New Gravity_Basics_TA
             imuBasics = New IMU_Basics_TA
             motion = New Motion_Basics_TA
+            motionThrottle = New Motion_Throttle_TA
             motionCloud = New Motion_Cloud_TA
             grid = New Grid_Basics_TA
             lines = New Line_Basics_TA
@@ -108,7 +109,7 @@ Namespace VBClasses
             frameHistoryCount = 3 ' default value.  Use Options_History to update this value.
 
             filterBasics.Run(color)
-            task.gray = filterBasics.dst3
+            task.gray = filterBasics.dst3.Clone
             leftRightBrightness.Run(Nothing)
             leftView = leftRightBrightness.dst2.Clone
             rightView = leftRightBrightness.dst3.Clone
@@ -128,6 +129,7 @@ Namespace VBClasses
                 motion.Run(gray)
             End If
 
+            motionThrottle.Run(task.gray)
             motionCloud.Run(emptyMat) '******* this may rotate for gravity if selected *******
             colorizer.Run(src)
 
@@ -213,8 +215,8 @@ Namespace VBClasses
 
             pixelViewerOrGIFProcessing(src, displayObject.dst1, displayObject.dst2, displayObject.dst3)
 
-            dstList(0) = If(gOptions.displayDst0.Checked, Mat_Convert.Mat_Check8UC3(displayObject.dst0), color).Clone
-            dstList(1) = If(gOptions.displayDst1.Checked, Mat_Convert.Mat_Check8UC3(displayObject.dst1), depthRGB).Clone
+            dstList(0) = If(gOptions.displayDst0.Checked, Mat_Convert.Mat_Check8UC3(displayObject.dst0), color.Clone)
+            dstList(1) = If(gOptions.displayDst1.Checked, Mat_Convert.Mat_Check8UC3(displayObject.dst1), depthRGB.Clone)
             dstList(2) = Mat_Convert.Mat_Check8UC3(displayObject.dst2)
             dstList(3) = Mat_Convert.Mat_Check8UC3(displayObject.dst3)
 

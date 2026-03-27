@@ -88,6 +88,7 @@ Namespace VBClasses
         Public leftRightBrightness As LeftRight_Brightness_TA
         Public lines As Line_Basics_TA
         Public motion As Motion_Basics_TA
+        Public motionThrottle As Motion_Throttle_TA
         Public motionCloud As Motion_Cloud_TA
 
         Public motionFeatures As cv.Point2f
@@ -128,7 +129,6 @@ Namespace VBClasses
         Public depthDiffMeters As Single ' bricks > than this value are depth edges - in meters
         Public gridRatioX As Single ' translate from display width to workres to find grid element.
         Public gridRatioY As Single ' translate from display height to workres to find grid element.
-
 
         Public features As New List(Of cv.Point2f)
         Public fpFromGridCell As New List(Of Integer)
@@ -272,5 +272,6 @@ Namespace VBClasses
         Public resolutionDetails As String = ""
         Public sharpGL As SharpGLForm
         Public readyForCameraInput As Boolean
+        Public maxTrueTextLines As Integer = 18
     End Class
 End Namespace
