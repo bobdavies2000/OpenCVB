@@ -31,23 +31,19 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             If src.Channels <> 1 Then src = task.gray
 
-            dst2.SetTo(0)
             rectList.Clear()
+            dst2 = src
+            ' Currently task.fLessThreshold is just a fixed number.  It works but must be tested further.
             For Each r In task.gridRects
                 Dim mm = GetMinMax(src(r))
                 If mm.range < task.fLessThreshold Then
-                    dst2(r).SetTo(255)
                     rectList.Add(r)
+                    dst2.Rectangle(r, 255, task.lineWidth)
                 End If
             Next
 
-            If standaloneTest() Then
-                dst3 = src
-                For Each r In rectList
-                    dst3.Rectangle(r, white, task.lineWidth)
-                Next
-            End If
-            labels(3) = CStr(rectList.Count) + " grid squares were found to be featureless (range < " + CStr(task.fLessThreshold) + ")"
+            labels(2) = CStr(rectList.Count) + " grid squares were found to be featureless (gridRects(i).mm.range < " +
+                        CStr(task.fLessThreshold) + ")"
         End Sub
     End Class
 

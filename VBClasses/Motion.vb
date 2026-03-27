@@ -63,9 +63,11 @@ Namespace VBClasses
             diff.Run(dst1.Clone)
             dst3 = diff.dst3.Threshold(task.colorDiffThreshold, 255, cv.ThresholdTypes.Binary)
 
-            SetTrueText("Pixels different from camera image: " + CStr(diff.dst3.CountNonZero) + vbCrLf +
-                            "Grid rects with more than " + CStr(task.motionThreshold) +
-                            " pixels different: " + CStr(task.motion.motionSort.Count), 3)
+            Dim count = diff.dst3.CountNonZero
+            SetTrueText("Pixels different from camera image: " + CStr(count) + " (" +
+                        Format(count / src.Total, "0%") + ")" + vbCrLf +
+                        "Grid rects with more than " + CStr(task.motionThreshold) +
+                        " pixels different: " + CStr(task.motion.motionSort.Count), 3)
         End Sub
     End Class
 
@@ -325,7 +327,7 @@ Namespace VBClasses
                             task.fOptions.MotionPixelSlider.Value -= incr
                             decreasing = True
                             If task.frameCount > 10 Then hitDecreasing = True
-                        ElseIf identicalRatio > 0.01 And currThreshold < task.fOptions.MotionPixelSlider.Maximum Then
+                        ElseIf identicalRatio > 0.01 And currThreshold < (task.fOptions.MotionPixelSlider.Maximum - incr) Then
                             task.fOptions.MotionPixelSlider.Value += incr
                             increasing = True
                         End If
@@ -381,11 +383,10 @@ Namespace VBClasses
 
             Dim count As Integer
             Dim correlationMat As New cv.Mat
-            dst3 = src
+            dst3 = src.Clone
             cList.Clear()
             For Each index In task.motion.motionSort
                 Dim r = task.gridRects(index)
-                dst2.Rectangle(r, white, task.lineWidth)
                 cv.Cv2.MatchTemplate(dst2(r), lastFrame(r), correlationMat, cv.TemplateMatchModes.CCoeffNormed)
 
                 Dim corr = correlationMat.Get(Of Single)(0, 0)
@@ -439,7 +440,7 @@ Namespace VBClasses
 
             Dim count As Integer
             Dim correlationMat As New cv.Mat
-            dst3 = src
+            dst3 = src.Clone
             cList.Clear()
             For Each r In task.gridRects
                 cv.Cv2.MatchTemplate(dst2(r), lastFrame(r), correlationMat, cv.TemplateMatchModes.CCoeffNormed)
@@ -450,23 +451,18 @@ Namespace VBClasses
                 If corr < maxCorrelation Then
                     dst3.Rectangle(r, white, task.lineWidth)
                     count += 1
-                Else
-                    dst3.Rectangle(r, black, task.lineWidth)
                 End If
             Next
 
             lastFrame = src.Clone
 
-            If cList.Count > 0 Then
-                plotHist.Run(cv.Mat.FromPixelData(cList.Count, 1, cv.MatType.CV_32F, cList.ToArray))
-                dst1 = plotHist.dst2
+            plotHist.Run(cv.Mat.FromPixelData(cList.Count, 1, cv.MatType.CV_32F, cList.ToArray))
+            dst1 = plotHist.dst2
 
-                labels(2) = "Min = " + Format(cList.Min, fmt1) + ", Max = " + Format(cList.Max, fmt1)
-                labels(3) = CStr(count) + " had a correlation < " + Format(maxCorrelation, fmt2) + " (" +
-                            Format(count / cList.Count, "0%") + ")" +
-                            " The black squares have high correlation."
-            End If
+            labels(2) = "Min = " + Format(cList.Min, fmt1) + ", Max = " + Format(cList.Max, fmt1)
+            labels(3) = CStr(count) + " had a correlation < " + Format(maxCorrelation, fmt2) + " (" +
+                        Format(count / cList.Count, "0%") + ")"
+
         End Sub
     End Class
-
 End Namespace
