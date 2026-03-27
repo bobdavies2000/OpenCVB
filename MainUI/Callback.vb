@@ -113,7 +113,7 @@ Namespace MainApp
                                            If msSinceLastPaint > 1000 / selection Then runPaint = True
                                    End Select
 
-                                   If runPaint Then
+                                   If runPaint And Me.WindowState <> FormWindowState.Minimized Then
                                        lastPaintTime = vbc.task.cpu.algorithmTimes(1)
                                        Dim tmp As cv.Mat
                                        For i = 0 To pics.Count - 1

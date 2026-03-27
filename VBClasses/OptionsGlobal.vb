@@ -49,6 +49,12 @@ Public Class OptionsGlobal
                 task.DotSize = 5
                 task.lineWidth = 4
                 task.brickEdgeLen = 36
+            Case 960
+                task.cvFontSize = 1.5
+                task.DotSize = 2
+                task.lineWidth = 2
+                task.brickEdgeLen = 24
+                task.smallRes = New cv.Size(336, 188)
             Case 672
                 task.cvFontSize = 1.5
                 task.DotSize = 2

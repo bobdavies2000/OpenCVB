@@ -129,7 +129,7 @@ Namespace VBClasses
                 motion.Run(gray)
             End If
 
-            motionThrottle.Run(task.gray)
+            ' motionThrottle.Run(task.gray)
             motionCloud.Run(emptyMat) '******* this may rotate for gravity if selected *******
             colorizer.Run(src)
 

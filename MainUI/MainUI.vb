@@ -297,6 +297,7 @@ Namespace MainApp
 
             StatusLabel.Location = New Point(offset, pics(2).Top + h)
             StatusLabel.Width = w * 2
+            Me.Refresh()
         End Sub
         Private Sub TestAllButton_Click(sender As Object, e As EventArgs) Handles TestAllButton.Click
             TestAllTimer.Enabled = Not TestAllTimer.Enabled

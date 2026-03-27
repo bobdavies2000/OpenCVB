@@ -12,7 +12,7 @@ Namespace VBClasses
             desc = "Match the previous featureLess regions as best as possible."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            fLess.Run(task.gray)
+            fLess.Run(task.gray.Clone)
             src = fLess.dst2
 
             Dim imagePtr As IntPtr
