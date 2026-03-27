@@ -108,11 +108,11 @@ Namespace VBClasses
 
             frameHistoryCount = 3 ' default value.  Use Options_History to update this value.
 
-            filterBasics.Run(color)
+            filterBasics.Run(color.Clone)
             task.gray = filterBasics.dst3.Clone
             leftRightBrightness.Run(Nothing)
-            leftView = leftRightBrightness.dst2.Clone
-            rightView = leftRightBrightness.dst3.Clone
+            leftView = leftRightBrightness.dst2
+            rightView = leftRightBrightness.dst3
 
             If gOptions.UseMotionMask.Checked And firstPass = False Then
                 motion.Run(gray)

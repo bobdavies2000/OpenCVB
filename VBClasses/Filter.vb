@@ -13,7 +13,7 @@ Namespace VBClasses
                 If cb.Checked Then
                     Select Case cb.Text
                         Case "Original"
-                            dst2 = task.color
+                            dst2 = task.color.Clone
                         Case "PhotoShop_WhiteBalance"
                             If filters(cb.Tag) Is Nothing Then filters(cb.Tag) = New PhotoShop_WhiteBalance
                         Case "PhotoShop_SharpenDetail"

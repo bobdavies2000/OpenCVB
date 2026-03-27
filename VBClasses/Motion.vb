@@ -284,7 +284,7 @@ Namespace VBClasses
 
             If task.optionsChanged Then lastFrame = src.Clone
 
-            dst2 = src.Clone
+            dst2 = src
             Dim maxCorrelation As Single = task.fOptions.MatchCorrSlider.Value / 100
 
             Dim count As Integer
@@ -333,7 +333,6 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             Dim nextMsg As String = ""
-            Static lastFrame As cv.Mat = task.gray.Clone
             Static saveHeartBeat As Boolean
             If task.heartBeat Then saveHeartBeat = True
             ' When there is a lot of motion - more than X% ...
@@ -342,8 +341,7 @@ Namespace VBClasses
                 If saveHeartBeat Then
                     saveHeartBeat = False
 
-                    'motionPlot.lastFrame = lastFrame
-                    motionPlot.Run(task.gray)
+                    motionPlot.Run(task.gray.Clone)
 
                     Dim histArray = motionPlot.plotHist.histArray
                     Dim identicals = histArray(histArray.Length - 1)
@@ -382,7 +380,6 @@ Namespace VBClasses
                 For Each nextStr In strList
                     strOut += nextStr + vbCrLf
                 Next
-                lastFrame = task.gray.Clone
             End If
             SetTrueText(strOut, 2)
         End Sub
