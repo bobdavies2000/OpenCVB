@@ -57,15 +57,32 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             dst1 = task.gray.Clone
-            dst2 = task.motion.dst2.Clone()
+            dst2 = task.motion.dst2.Clone
 
-            diff.lastFrame = dst2
-            diff.Run(dst1)
-            dst3 = diff.dst3.Threshold(task.motionThreshold, 255, cv.ThresholdTypes.Binary)
+            diff.lastFrame = dst2.Clone
+            diff.Run(dst1.Clone)
+            dst3 = diff.dst3.Threshold(task.colorDiffThreshold, 255, cv.ThresholdTypes.Binary)
 
-            SetTrueText("Pixels different from camera image: " + CStr(diff.dst2.CountNonZero) + vbCrLf +
-                        "Grid rects with more than " + CStr(task.motionThreshold) +
-                        " pixels different: " + CStr(task.motion.motionSort.Count), 3)
+            SetTrueText("Pixels different from camera image: " + CStr(diff.dst3.CountNonZero) + vbCrLf +
+                            "Grid rects with more than " + CStr(task.motionThreshold) +
+                            " pixels different: " + CStr(task.motion.motionSort.Count), 3)
+        End Sub
+    End Class
+
+
+
+
+
+    Public Class Motion_ValidateColor : Inherits TaskParent
+        Public Sub New()
+            If standalone Then task.gOptions.showMotionMask.Checked = True
+            labels(2) = "Current color image."
+            labels(3) = "Accumulated color image."
+            desc = "Compare visually task.color to the constructed images to verify motion mask."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            dst2 = task.color
+            If task.firstPass Then dst3 = task.color.Clone Else task.color.CopyTo(dst3, task.motion.motionMask)
         End Sub
     End Class
 
@@ -266,6 +283,81 @@ Namespace VBClasses
 
 
 
+
+
+    Public Class Motion_Throttle_TA : Inherits TaskParent
+        Dim motionPlot As New Motion_CorrelationToLast
+        Public strList As New List(Of String)
+        Public Sub New()
+            task.gOptions.showMotionMask.Checked = True
+            desc = "Adjust the motion threshold based on the histogram of high-motion images."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            Static saveHeartBeat As Boolean
+            Static hitDecreasing As Boolean
+            Static incr As Integer = 5
+            If hitDecreasing Then incr = 1
+
+            If task.heartBeat Then saveHeartBeat = True
+            ' When there is a lot of motion - more than X% ...
+            If task.motion.motionSort.Count / task.gridRects.Count > 0.1 And task.firstPass = False Then
+                ' if running as the selected algorithm, just use the strlist from the task algorithm...
+                If src.Channels = 3 Then
+                    strList = New List(Of String)(task.motionThrottle.strList)
+                Else
+                    Dim nextMsg As String = ""
+                    ' only check no more than once a heartbeat...
+                    If saveHeartBeat Then
+                        saveHeartBeat = False
+
+                        motionPlot.Run(task.gray.Clone)
+
+                        Dim histArray = motionPlot.plotHist.histArray
+                        Dim identicals = histArray(histArray.Length - 1)
+
+                        dst3 = motionPlot.dst1
+
+                        Dim currThreshold = task.fOptions.MotionPixelSlider.Value
+                        Dim identicalRatio = identicals / task.motion.motionSort.Count
+                        Dim increasing As Boolean
+                        Dim decreasing As Boolean
+                        If identicalRatio < 0.05 And currThreshold > incr Then
+                            task.fOptions.MotionPixelSlider.Value -= incr
+                            decreasing = True
+                            If task.frameCount > 10 Then hitDecreasing = True
+                        ElseIf identicalRatio > 0.01 And currThreshold < task.fOptions.MotionPixelSlider.Maximum Then
+                            task.fOptions.MotionPixelSlider.Value += incr
+                            increasing = True
+                        End If
+
+                        nextMsg = CStr(task.motion.motionSort.Count) + vbTab + vbTab + Format(1 - identicalRatio, "0%") +
+                                vbTab + vbTab + Format(identicalRatio, "0%")
+                        If increasing Then
+                            nextMsg += vbTab + vbTab + "Increasing to " + CStr(currThreshold + incr)
+                        ElseIf decreasing Then
+                            nextMsg += vbTab + vbTab + "Decreasing to " + CStr(currThreshold - incr)
+                        Else
+                            nextMsg += vbTab + vbTab + "Stable at " + CStr(currThreshold)
+                        End If
+                    End If
+
+                    If nextMsg.Trim.Length > 0 Then strList.Add(nextMsg)
+
+                    If strList.Count > task.maxTrueTextLines Then strList.RemoveAt(0)
+                End If
+
+                strOut = "Motion Cells" + vbTab + "%Motion" + vbTab + "%Identical" + vbTab + "Increase/Decrease" + vbCrLf
+                For Each nextStr In strList
+                    strOut += nextStr + vbCrLf
+                Next
+            End If
+            SetTrueText(strOut, 2)
+        End Sub
+    End Class
+
+
+
+
     Public Class Motion_CorrelationToLast : Inherits TaskParent
         Public cList As New List(Of Single)
         Public plotHist As New Plot_Histogram
@@ -324,64 +416,56 @@ Namespace VBClasses
 
 
 
-
-    Public Class Motion_Throttle_TA : Inherits TaskParent
-        Dim motionPlot As New Motion_CorrelationToLast
+    Public Class Motion_Correlation : Inherits TaskParent
+        Public cList As New List(Of Single)
+        Public plotHist As New Plot_Histogram
+        Public lastFrame As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         Public Sub New()
-            task.gOptions.showMotionMask.Checked = True
-            desc = "Adjust the motion threshold based on the histogram of high-motion images."
+            If standalone Then task.gOptions.displayDst1.Checked = True
+            plotHist.createHistogram = True
+            plotHist.minRange = -1.01
+            plotHist.maxRange = 1.01
+            plotHist.shadeValues = False
+            task.gOptions.HistBinBar.Value = task.gOptions.HistBinBar.Maximum
+            desc = "Use correlation to determine differences at the grid level."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            Dim nextMsg As String = ""
-            Static saveHeartBeat As Boolean
-            If task.heartBeat Then saveHeartBeat = True
-            ' When there is a lot of motion - more than X% ...
-            If task.motion.motionSort.Count / task.gridRects.Count > 0.1 And task.firstPass = False Then
-                ' only check no more than once a heartbeat...
-                If saveHeartBeat Then
-                    saveHeartBeat = False
+            If src.Channels <> 1 Then src = task.gray.Clone
 
-                    motionPlot.Run(task.gray.Clone)
+            If task.optionsChanged Then lastFrame = src.Clone
 
-                    Dim histArray = motionPlot.plotHist.histArray
-                    Dim identicals = histArray(histArray.Length - 1)
+            dst2 = src
+            Dim maxCorrelation As Single = task.fOptions.MatchCorrSlider.Value / 100
 
-                    dst3 = motionPlot.dst1
+            Dim count As Integer
+            Dim correlationMat As New cv.Mat
+            dst3 = src
+            cList.Clear()
+            For Each r In task.gridRects
+                cv.Cv2.MatchTemplate(dst2(r), lastFrame(r), correlationMat, cv.TemplateMatchModes.CCoeffNormed)
 
-                    Dim currThreshold = task.fOptions.MotionPixelSlider.Value
-                    Dim identicalRatio = identicals / task.motion.motionSort.Count
-                    Dim increasing As Boolean
-                    Dim decreasing As Boolean
-                    If identicalRatio < 0.05 And currThreshold > 1 Then
-                        task.fOptions.MotionPixelSlider.Value -= 1
-                        decreasing = True
-                    ElseIf identicalRatio > 0.01 And currThreshold < task.fOptions.MotionPixelSlider.Maximum Then
-                        task.fOptions.MotionPixelSlider.Value += 1
-                        increasing = True
-                    End If
+                Dim corr = correlationMat.Get(Of Single)(0, 0)
+                cList.Add(corr)
 
-                    nextMsg = CStr(task.motion.motionSort.Count) + vbTab + vbTab + Format(1 - identicalRatio, "0%") +
-                                vbTab + vbTab + Format(identicalRatio, "0%")
-                    If increasing Then
-                        nextMsg += vbTab + vbTab + "Increasing to " + CStr(currThreshold + 1)
-                    ElseIf decreasing Then
-                        nextMsg += vbTab + vbTab + "Decreasing to " + CStr(currThreshold - 1)
-                    Else
-                        nextMsg += vbTab + vbTab + "Stable at " + CStr(currThreshold)
-                    End If
+                If corr < maxCorrelation Then
+                    dst3.Rectangle(r, white, task.lineWidth)
+                    count += 1
+                Else
+                    dst3.Rectangle(r, black, task.lineWidth)
                 End If
+            Next
 
-                Static strList As New List(Of String)
-                If nextMsg.Trim.Length > 0 Then strList.Add(nextMsg)
+            lastFrame = src.Clone
 
-                If strList.Count > task.maxTrueTextLines Then strList.RemoveAt(0)
+            If cList.Count > 0 Then
+                plotHist.Run(cv.Mat.FromPixelData(cList.Count, 1, cv.MatType.CV_32F, cList.ToArray))
+                dst1 = plotHist.dst2
 
-                strOut = "Motion Cells" + vbTab + "%Motion" + vbTab + "%Identical" + vbTab + "Increase/Decrease" + vbCrLf
-                For Each nextStr In strList
-                    strOut += nextStr + vbCrLf
-                Next
+                labels(2) = "Min = " + Format(cList.Min, fmt1) + ", Max = " + Format(cList.Max, fmt1)
+                labels(3) = CStr(count) + " had a correlation < " + Format(maxCorrelation, fmt2) + " (" +
+                            Format(count / cList.Count, "0%") + ")" +
+                            " The black squares have high correlation."
             End If
-            SetTrueText(strOut, 2)
         End Sub
     End Class
 

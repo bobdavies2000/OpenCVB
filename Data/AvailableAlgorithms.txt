@@ -490,11 +490,13 @@ ML_RemoveDups_CPP
 Moments_Basics
 Motion_Basics_TA
 Motion_Cloud_TA
+Motion_Correlation
 Motion_CorrelationToLast
 Motion_Left
 Motion_Right
 Motion_Throttle_TA
 Motion_Validate
+Motion_ValidateColor
 Mouse_Basics
 MSER_Basics
 MSER_Basics1

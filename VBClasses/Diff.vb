@@ -205,7 +205,7 @@ Namespace VBClasses
 
     Public Class Diff_Simple : Inherits TaskParent
         Public changedPixels As Integer
-        Public lastFrame As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 255)
+        Public lastFrame As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         Public Sub New()
             desc = "Simple diff of lastFrame and current src."
         End Sub
@@ -214,8 +214,9 @@ Namespace VBClasses
 
             If task.firstPass Then lastFrame.SetTo(0)
 
-            cv.Cv2.Absdiff(src, lastFrame, dst2)
-            changedPixels = dst2.CountNonZero
+            cv.Cv2.Absdiff(src, lastFrame, dst3)
+
+            changedPixels = dst3.CountNonZero
             If changedPixels > 0 Then
                 lastFrame = src.Clone
                 strOut = CStr(changedPixels) + " pixels changed."

@@ -67,25 +67,25 @@ Public Class OptionsFeatures
         Color8USource.SelectedItem = "Reduction_Basics"
         ReductionSlider.Value = 200
 
+        ColorDiffSlider.Value = 5
+        MotionPixelSlider.Maximum = 32
         Select Case task.workRes.Width
             Case 1920
+                MotionPixelSlider.Maximum = 800
                 MotionPixelSlider.Value = 400
-                task.colorDiffThreshold = 50
+                ColorDiffSlider.Value = 10
             Case 1280
-                ColorDiffSlider.Value = 40
-                MotionPixelSlider.Value = 100
+                MotionPixelSlider.Maximum = 400
+                MotionPixelSlider.Value = 200
+                ColorDiffSlider.Value = 10
             Case 672
-                ColorDiffSlider.Value = 20
                 MotionPixelSlider.Value = 32
             Case 640
-                ColorDiffSlider.Value = 20
                 MotionPixelSlider.Value = 20
             Case 240, 320, 160
-                MotionPixelSlider.Value = 5
-                ColorDiffSlider.Value = 26
+                MotionPixelSlider.Value = 15
             Case 336, 168
-                MotionPixelSlider.Value = 5
-                ColorDiffSlider.Value = 5
+                MotionPixelSlider.Value = 10
         End Select
     End Sub
 
