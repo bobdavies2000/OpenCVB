@@ -68,6 +68,7 @@ Public Class OptionsGlobal
             Case 480
                 task.cvFontSize = 1.2
                 task.smallRes = New cv.Size(480, 270)
+                task.brickEdgeLen = 12
             Case 240
                 task.cvFontSize = 1.2
                 task.smallRes = New cv.Size(240, 150)

@@ -8201,6 +8201,10 @@ Namespace VBClasses
     Public Class Options_FeatureLess : Inherits OptionParent
         Public fLessThreshold As Integer = 30
         Public Sub New()
+            Select Case task.workRes.Width
+                Case 960
+                    fLessThreshold = 50
+            End Select
             If sliders.Setup(traceName) Then sliders.setupTrackBar("Grid Range Threshold", 0, 255, fLessThreshold)
         End Sub
         Public Sub Run()
