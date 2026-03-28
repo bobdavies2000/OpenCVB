@@ -24,27 +24,21 @@ Namespace VBClasses
             Next
 
             motionMask.SetTo(0)
-            ' The following loop add the list4Neighbors - it is an alternative way to reduce artifacts.
-            'Dim nabeList As New List(Of Integer)
-            'For Each index In motionSort
-            '    For Each nabeIndex In task.grid.gridNeighbors(index)
-            '        If nabeList.Contains(nabeIndex) = False Then
-            '            nabeList.Add(nabeIndex)
-            '            Dim rect = task.gridRects(nabeIndex)
-            '            src(rect).CopyTo(dst2(rect))
-            '            motionMask(rect).SetTo(255)
-            '        End If
-            '    Next
-            'Next
-
+            ' The following loop adds the list4 Neighbors - it is an alternative way to reduce artifacts.
+            Dim nabeList As New List(Of Integer)
             For Each index In motionSort
-                Dim rect = task.gridRects(index)
-                src(rect).CopyTo(dst2(rect))
-                motionMask(rect).SetTo(255)
+                For Each nabeIndex In task.grid.gridNeighbors(index)
+                    If nabeList.Contains(nabeIndex) = False Then
+                        nabeList.Add(nabeIndex)
+                        Dim rect = task.gridRects(nabeIndex)
+                        src(rect).CopyTo(dst2(rect))
+                        motionMask(rect).SetTo(255)
+                    End If
+                Next
             Next
 
             dst3 = motionMask
-            labels(2) = "Image below is accumulated using motion mask.  Grid rects with motion: " + CStr(motionSort.Count)
+            labels(2) = "Image below is accumulated using motion mask.  Grid rects with motion: " + CStr(nabeList.Count)
             SetTrueText("Use the Feature Options 'Color Diff Threshold' to adjust accuracy of accumulated image.", 3)
         End Sub
     End Class

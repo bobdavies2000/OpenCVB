@@ -4,6 +4,7 @@ Namespace VBClasses
     Public Class FeatureLess_Basics : Inherits TaskParent
         Public rectList As New List(Of cv.Rect)
         Public options As New Options_FeatureLess
+        Public featureLessMask As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         Dim corr As New Correlation_Basics
         Public Sub New()
             dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
@@ -36,9 +37,12 @@ Namespace VBClasses
                 Next
             End If
 
+            featureLessMask.SetTo(0)
             For Each r In rectList
                 dst2.Rectangle(r, 255, task.lineWidth)
+                featureLessMask(r).SetTo(255)
             Next
+            dst3 = featureLessMask
 
             labels(2) = CStr(rectList.Count) + " grid squares were found to be featureless (<gridRect>.mm.range < " +
                         CStr(options.fLessThreshold) + ")"
@@ -455,21 +459,19 @@ Namespace VBClasses
         Dim redC As New RedColor_Basics
         Dim fLess As New FeatureLess_Basics
         Public Sub New()
-            task.gOptions.GridSlider.Value = 4
             If standalone Then task.gOptions.displayDst1.Checked = True
             desc = "Use the FeatureLess_Basics output as input to RedColor_Basics"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            fLess.Run(task.gray)
+            fLess.Run(task.gray.Clone)
+            dst3 = fLess.featureLessMask
+            labels(3) = fLess.labels(2)
 
-            dst2 = fLess.dst2.Clone
-            dst1 = dst2.InRange(0, 0)
-            labels(2) = fLess.labels(3)
+            redC.Run(fLess.dst3)
 
-            redC.Run(dst2)
-            dst3 = redC.dst2
-            dst3.SetTo(0, dst1)
-            labels(3) = redC.labels(2)
+            dst2.SetTo(0)
+            redC.dst2.CopyTo(dst2, dst3)
+            labels(2) = redC.labels(2)
 
             strOut = RedUtil_Basics.selectCell(redC.rcMap, redC.rcList)
             SetTrueText(strOut, 1)
