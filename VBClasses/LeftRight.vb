@@ -191,7 +191,7 @@ Namespace VBClasses
 
 
     Public Class LeftRight_Features : Inherits TaskParent
-        Dim fless As New FeatureLess_Basics
+        Dim fless As New FeatureLess_Correlation
         Public Sub New()
             desc = "Show the featureless areas of the left and right images."
         End Sub

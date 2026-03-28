@@ -937,7 +937,7 @@ Namespace VBClasses
         Dim depthList As New List(Of Single)
         Dim options As New Options_DiffDepth
         Public depthJumpers As New List(Of Integer)
-        Dim fLess As New FeatureLess_Basics
+        Dim fLess As New FeatureLess_Correlation
         Public Sub New()
             OptionParent.FindSlider("Depth varies more than X mm's").Value = 30
             dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
@@ -995,7 +995,7 @@ Namespace VBClasses
         Dim bricks As New Brick_Basics
         Dim options As New Options_DiffDepth
         Public rangeJumpers As New List(Of Integer)
-        Dim fLess As New FeatureLess_Basics
+        Dim fLess As New FeatureLess_Correlation
         Public Sub New()
             OptionParent.FindSlider("Depth varies more than X mm's").Value = 300
             dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
@@ -1039,9 +1039,9 @@ Namespace VBClasses
 
     Public Class Brick_Features : Inherits TaskParent
         Dim bricks As New Brick_Basics
-        Dim fLess As New FeatureLess_Basics
+        Dim fLess As New FeatureLess_Correlation
         Public Sub New()
-            desc = "Use FeatureLess_Basics to identify bricks with good contrast."
+            desc = "Use FeatureLess_Correlation to identify bricks with good contrast."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             If src.Channels <> 1 Then src = task.gray

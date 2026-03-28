@@ -1676,7 +1676,7 @@ Namespace VBClasses
 
     Public Class Edge_Featureless : Inherits TaskParent
         Dim edges As New Edge_Canny
-        Dim fLess As New FeatureLess_Basics
+        Dim fLess As New FeatureLess_Correlation
         Public Sub New()
             desc = "Find the edges in the featureless output"
         End Sub

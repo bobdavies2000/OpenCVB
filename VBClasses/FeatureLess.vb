@@ -1,7 +1,7 @@
 Imports System.Windows.Documents
 Imports cv = OpenCvSharp
 Namespace VBClasses
-    Public Class FeatureLess_Basics : Inherits TaskParent
+    Public Class FeatureLess_Correlation : Inherits TaskParent
         Dim corr As New Correlation_Basics
         Public rectList As New List(Of cv.Rect)
         Public Sub New()
@@ -57,7 +57,7 @@ Namespace VBClasses
 
 
 
-    Public Class NR_FeatureLess_Basics : Inherits TaskParent
+    Public Class NR_FeatureLess_Correlation : Inherits TaskParent
         Public rectList As New List(Of cv.Rect)
         Dim smallGrid As New Grid_SquaresOnly
         Public Sub New()
@@ -317,7 +317,7 @@ Namespace VBClasses
 
     Public Class NR_FeatureLess_History : Inherits TaskParent
         Dim frames As New History_Basics
-        Dim fLess As New FeatureLess_Basics
+        Dim fLess As New FeatureLess_Correlation
         Public Sub New()
             labels(3) = "The brighter the grid square, the more recent appearance."
             desc = "Accumulate the edges over a span of X images."
@@ -346,7 +346,7 @@ Namespace VBClasses
 
 
     Public Class NR_FeatureLess_LeftRight : Inherits TaskParent
-        Dim fLess As New FeatureLess_Basics
+        Dim fLess As New FeatureLess_Correlation
         Public Sub New()
             labels = {"", "", "FeatureLess Left mask", "FeatureLess Right mask"}
             desc = "Find the featureless regions of the left and right images"
@@ -372,7 +372,7 @@ Namespace VBClasses
 
     Public Class FeatureLess_Not : Inherits TaskParent
         Dim feat As New Feature_General
-        Dim fLess As New FeatureLess_Basics
+        Dim fLess As New FeatureLess_Correlation
         Public Sub New()
             desc = "Use the FeatureLess mask to reduce the input to feature searches."
         End Sub
@@ -380,7 +380,7 @@ Namespace VBClasses
             fLess.Run(task.gray)
 
             dst2.SetTo(0)
-            src.CopyTo(dst2, Not fless.dst2)
+            src.CopyTo(dst2, Not fLess.dst2)
 
             feat.Run(dst2)
             feat.dst2.CopyTo(dst3)
@@ -395,7 +395,7 @@ Namespace VBClasses
 
     Public Class FeatureLess_Cells : Inherits TaskParent
         Dim saveColorMap As cv.Mat
-        Dim fLess As New FeatureLess_Basics
+        Dim fLess As New FeatureLess_Correlation
         Public Sub New()
             saveColorMap = task.colorMap.Clone
             labels(3) = "Region Colors are ordered by size."
@@ -446,7 +446,7 @@ Namespace VBClasses
         Public Sub New()
             task.gOptions.GridSlider.Value = 4
             If standalone Then task.gOptions.displayDst1.Checked = True
-            desc = "Use the featureLess_Basics output as input to RedColor_Basics"
+            desc = "Use the FeatureLess_Correlation output as input to RedColor_Basics"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             fLess.Run(task.gray)

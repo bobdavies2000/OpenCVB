@@ -19018,7 +19018,7 @@ Namespace VBClasses
     Public Class XO_FeatureLess_Groups : Inherits TaskParent
         Dim redCPP As New RedMask_CPP
         Public classCount As Integer
-        Dim fLess As New FeatureLess_Basics
+        Dim fLess As New FeatureLess_Correlation
         Public Sub New()
             desc = "Group RedCloud cells by the value of their featureless maxDist"
         End Sub
@@ -19533,7 +19533,7 @@ Namespace VBClasses
 
 
     Public Class XO_LeftRight_FLessRedRight : Inherits TaskParent
-        Dim fLess As New FeatureLess_Basics
+        Dim fLess As New FeatureLess_Correlation
         Public redC As New RedColor_Basics
         Public Sub New()
             desc = "Segment the right view image with RedColor_Basics"
@@ -19554,7 +19554,7 @@ Namespace VBClasses
 
 
     Public Class XO_LeftRight_FLessRedLeft : Inherits TaskParent
-        Dim fLess As New FeatureLess_Basics
+        Dim fLess As New FeatureLess_Correlation
         Public redC As New RedColor_Basics
         Public Sub New()
             desc = "Segment the left view image with RedColor_Basics"
