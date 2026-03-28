@@ -404,7 +404,7 @@ KeyColor_Basics
 KeyColor_Contours
 KeyColor_OverColor
 KeyColor_OverDepth
-KeyColor_Reduction
+KeyColor_Reduction_TA
 KeyColor_Straight
 KLT_Basics
 KMeans_Basics

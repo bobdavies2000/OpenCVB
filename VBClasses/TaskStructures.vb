@@ -650,8 +650,7 @@ Namespace VBClasses
                 strout += "World Coordinates = " + Format(wcMean(0), fmt3) + " " +
                                                    Format(wcMean(1), fmt3) + " " +
                                                    Format(wcMean(2), fmt3) + vbCrLf
-                strout += "World Grid coordinates = " + CStr(wGrid.X) + ", " + CStr(wGrid.Y) + ", " +
-                                                        CStr(wGrid.Z) + vbCrLf
+                strout += "World Grid coordinates = " + CStr(wGrid.X) + ", " + CStr(wGrid.Y) + vbCrLf
 
                 Return strout
             End Function

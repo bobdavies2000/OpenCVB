@@ -1,6 +1,6 @@
 ﻿Imports cv = OpenCvSharp
 Namespace VBClasses
-    Public Class KeyColor_Reduction : Inherits TaskParent
+    Public Class KeyColor_Reduction_TA : Inherits TaskParent
         Dim reduction As New Reduction_BasicsParmInput
         Public Sub New()
             reduction.reductionFactor = 50
