@@ -495,7 +495,7 @@ Motion_Correlation
 Motion_CorrelationToLast
 Motion_Left
 Motion_Right
-Motion_Throttle_TA
+Motion_Throttle
 Motion_Validate
 Motion_ValidateColor
 Mouse_Basics

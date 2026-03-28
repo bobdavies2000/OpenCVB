@@ -40,7 +40,6 @@ Namespace VBClasses
             gravityBasics = New Gravity_Basics_TA
             imuBasics = New IMU_Basics_TA
             motion = New Motion_Basics_TA
-            motionThrottle = New Motion_Throttle_TA
             motionCloud = New Motion_Cloud_TA
             grid = New Grid_Basics_TA
             lines = New Line_Basics_TA
@@ -128,7 +127,6 @@ Namespace VBClasses
                 motion.Run(gray)
             End If
 
-            ' motionThrottle.Run(task.gray)
             motionCloud.Run(emptyMat) '******* this may rotate for gravity if gravity is selected *******
             colorizer.Run(src)
 

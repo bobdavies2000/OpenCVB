@@ -86,7 +86,6 @@ Namespace VBClasses
         Public leftRightBrightness As LeftRight_Brightness_TA
         Public lines As Line_Basics_TA
         Public motion As Motion_Basics_TA
-        Public motionThrottle As Motion_Throttle_TA
         Public motionCloud As Motion_Cloud_TA
 
         Public motionFeatures As cv.Point2f
