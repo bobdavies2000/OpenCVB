@@ -7,6 +7,59 @@ Namespace VBClasses
         Public Sub New()
             If standalone Then task.gOptions.showMotionMask.Checked = True
             dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+            desc = "Find all the grid rects that had motion since the last frame."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            If src.Channels <> 1 Then src = task.gray.Clone
+            If task.optionsChanged Then dst2 = src.Clone
+
+            diff.lastFrame = dst2
+            diff.Run(src)
+
+            motionSort.Clear()
+            task.motionThreshold = task.fOptions.MotionPixelSlider.Value
+            For i = 0 To task.gridRects.Count - 1
+                Dim diffCount = diff.dst2(task.gridRects(i)).CountNonZero
+                If diffCount >= task.motionThreshold Then motionSort.Add(i)
+            Next
+
+            motionMask.SetTo(0)
+            ' The following loop add the list4Neighbors - it is an alternative way to reduce artifacts.
+            'Dim nabeList As New List(Of Integer)
+            'For Each index In motionSort
+            '    For Each nabeIndex In task.grid.gridNeighbors(index)
+            '        If nabeList.Contains(nabeIndex) = False Then
+            '            nabeList.Add(nabeIndex)
+            '            Dim rect = task.gridRects(nabeIndex)
+            '            src(rect).CopyTo(dst2(rect))
+            '            motionMask(rect).SetTo(255)
+            '        End If
+            '    Next
+            'Next
+
+            For Each index In motionSort
+                Dim rect = task.gridRects(index)
+                src(rect).CopyTo(dst2(rect))
+                motionMask(rect).SetTo(255)
+            Next
+
+            dst3 = motionMask
+            labels(2) = "Image below is accumulated using motion mask.  Grid rects with motion: " + CStr(motionSort.Count)
+            SetTrueText("Use the Feature Options 'Color Diff Threshold' to adjust accuracy of accumulated image.", 3)
+        End Sub
+    End Class
+
+
+
+
+
+    Public Class NR_Motion_Basics : Inherits TaskParent
+        Public motionSort As New List(Of Integer)
+        Public diff As New Diff_Basics
+        Public motionMask As cv.Mat = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 255)
+        Public Sub New()
+            If standalone Then task.gOptions.showMotionMask.Checked = True
+            dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
             labels(3) = "The motion mask"
             desc = "Find all the grid rects that had motion since the last frame."
         End Sub
@@ -36,11 +89,11 @@ Namespace VBClasses
                 src(rect).CopyTo(dst2(rect))
                 motionMask(rect).SetTo(255)
             Next
+            dst3 = motionMask
 
             labels(2) = "Grid rects with motion: " + CStr(motionSort.Count)
         End Sub
     End Class
-
 
 
 
@@ -222,23 +275,23 @@ Namespace VBClasses
 
             preparePointcloud()
 
-            diff.lastFrame = dst2
-            diff.Run(task.pcSplit(2))
+            'diff.lastFrame = dst2
+            'diff.Run(task.pcSplit(2))
 
-            motionSort.Clear()
-            For i = 0 To task.gridRects.Count - 1
-                Dim diffCount = diff.dst2(task.gridRects(i)).CountNonZero
-                If diffCount >= task.motionThreshold Then
-                    For Each index In task.grid.gridNeighbors(i)
-                        If motionSort.Contains(index) = False Then motionSort.Add(index)
-                    Next
-                End If
-            Next
+            'motionSort.Clear()
+            'For i = 0 To task.gridRects.Count - 1
+            '    Dim diffCount = diff.dst2(task.gridRects(i)).CountNonZero
+            '    If diffCount >= task.motionThreshold Then
+            '        For Each index In task.grid.gridNeighbors(i)
+            '            If motionSort.Contains(index) = False Then motionSort.Add(index)
+            '        Next
+            '    End If
+            'Next
 
-            motionMask.SetTo(0)
-            For Each index In motionSort
-                motionMask(task.gridRects(index)).SetTo(255)
-            Next
+            'motionMask.SetTo(0)
+            'For Each index In motionSort
+            '    motionMask(task.gridRects(index)).SetTo(255)
+            'Next
 
             task.pcSplit(2).CopyTo(dst2, motionMask)
             If standaloneTest() Then dst3 = motionMask

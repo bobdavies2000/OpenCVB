@@ -119,7 +119,7 @@ Corners_ShiTomasi_CPP
 Correlation_Basics
 Correlation_BasicsPlot
 Correlation_Interactive
-Correlation_Range
+Correlation_MinMaxRange
 Correlation_Validate
 Covariance_Basics
 Covariance_Images
@@ -403,7 +403,7 @@ KeyColor_Basics
 KeyColor_Contours
 KeyColor_OverColor
 KeyColor_OverDepth
-KeyColor_Reduction_TA
+KeyColor_Reduction
 KeyColor_Straight
 KLT_Basics
 KMeans_Basics
@@ -1165,6 +1165,7 @@ NR_ML_ColorInTier2Depth
 NR_ML_DepthFromColor
 NR_ML_DepthFromXYColor
 NR_Moments_CentroidKalman
+NR_Motion_Basics
 NR_Motion_ValidateRight
 NR_Mouse_ClickPointUsage
 NR_Mouse_LeftClickZoom
@@ -1551,6 +1552,7 @@ RedPrep_EdgesZ
 RedPrep_XY_Add
 RedTrack_Basics
 Reduction_Basics
+Reduction_BasicsParmInput
 Reduction_PointCloud
 RedUtil_Basics
 RedWGrid_Basics_TA

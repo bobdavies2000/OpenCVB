@@ -5,20 +5,19 @@ Namespace VBClasses
         Public maxCorrelation As Single
         Public Sub New()
             dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-            task.gOptions.HistBinBar.Value = task.gOptions.HistBinBar.Maximum
             desc = "Measure the correlation of all grid squares except where there is motion."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             If src.Channels <> 1 Then src = task.gray
 
-            Static lastsrc As cv.Mat = src.Clone
+            Static lastFrame As cv.Mat = src.Clone
             dst2.SetTo(0)
             Dim correlationMat As New cv.Mat
-            maxCorrelation = 2.0 - 2.0 / task.histogramBins
+            maxCorrelation = task.fOptions.MatchCorrSlider.Value / 100.0 + 1
             rectList.Clear()
             For i = 0 To task.gridRects.Count - 1
                 Dim r = task.gridRects(i)
-                cv.Cv2.MatchTemplate(src(r), lastsrc(r), correlationMat, cv.TemplateMatchModes.CCoeffNormed)
+                cv.Cv2.MatchTemplate(src(r), lastFrame(r), correlationMat, cv.TemplateMatchModes.CCoeffNormed)
                 Dim correlation = correlationMat.Get(Of Single)(0, 0) + 1
                 If correlation < maxCorrelation Then
                     dst2.Rectangle(r, white, -1)
@@ -26,7 +25,10 @@ Namespace VBClasses
                 End If
             Next
 
-            lastsrc = src.Clone
+            lastFrame = src.Clone
+            labels(2) = CStr(rectList.Count) + " grid rects were less than " + Format(maxCorrelation / 2, fmt2) +
+                        " correlation, indicating that they were featureless."
+            SetTrueText("Use Feature Options 'Match Correlation Threshold' to shrink/grow.", 3)
         End Sub
     End Class
 
@@ -240,7 +242,7 @@ Namespace VBClasses
 
 
 
-    Public Class Correlation_Range : Inherits TaskParent
+    Public Class Correlation_MinMaxRange : Inherits TaskParent
         Public rectList As New List(Of cv.Rect)
         Public Sub New()
             dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)

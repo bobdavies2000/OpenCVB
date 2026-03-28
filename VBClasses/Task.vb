@@ -46,7 +46,6 @@ Namespace VBClasses
             lines = New Line_Basics_TA
             filterBasics = New Filter_Basics_TA
             leftRightBrightness = New LeftRight_Brightness_TA
-            keyColors = New KeyColor_Reduction_TA
 
             ' all the algorithms in the list are task algorithms that are children of the algorithm.
             For i = 1 To cpu.callTrace.Count - 1
@@ -130,7 +129,7 @@ Namespace VBClasses
             End If
 
             ' motionThrottle.Run(task.gray)
-            motionCloud.Run(emptyMat) '******* this may rotate for gravity if selected *******
+            motionCloud.Run(emptyMat) '******* this may rotate for gravity if gravity is selected *******
             colorizer.Run(src)
 
             If feat IsNot Nothing Then feat.Run(src)
@@ -184,7 +183,6 @@ Namespace VBClasses
                 If PixelViewer IsNot Nothing Then PixelViewer.viewerForm.Activate()
                 activateTaskForms = False
             End If
-            keyColors.Run(src)
 
 
 

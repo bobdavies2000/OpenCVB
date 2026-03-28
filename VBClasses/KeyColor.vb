@@ -1,20 +1,15 @@
 ﻿Imports cv = OpenCvSharp
 Namespace VBClasses
-    Public Class KeyColor_Reduction_TA : Inherits TaskParent
-        Dim reduction As New Reduction_Basics
-        Dim flood As New Flood_Basics
+    Public Class KeyColor_Reduction : Inherits TaskParent
+        Dim reduction As New Reduction_BasicsParmInput
         Public Sub New()
+            reduction.reductionFactor = 50
             dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
             desc = "Identify the key colors using contours"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            Dim lastResult = dst2.Clone
-
             reduction.Run(task.gray)
             dst2 = reduction.dst3
-
-            flood.Run(task.gray)
-            flood.dst2.CopyTo(dst2, flood.fLess.dst2)
         End Sub
     End Class
 

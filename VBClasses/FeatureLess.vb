@@ -15,7 +15,7 @@ Namespace VBClasses
             dst3 = corr.dst3
             rectList = New List(Of cv.Rect)(corr.rectList)
 
-            labels(3) = corr.labels(3)
+            labels(2) = corr.labels(2)
         End Sub
     End Class
 
@@ -33,16 +33,22 @@ Namespace VBClasses
 
             rectList.Clear()
             dst2 = src
-            ' Currently task.fLessThreshold is just a fixed number.  It works but must be tested further.
+            Dim motionList As New List(Of Integer)(task.motion.motionSort)
+            If motionList.Count = 0 Then motionList.Add(0) ' dummy entry so loop below works.
+            Dim index As Integer
             For Each r In task.gridRects
                 Dim mm = GetMinMax(src(r))
                 If mm.range < task.fLessThreshold Then
-                    rectList.Add(r)
-                    dst2.Rectangle(r, 255, task.lineWidth)
+                    If r <> task.gridRects(motionList(index)) Then
+                        rectList.Add(r)
+                        dst2.Rectangle(r, 255, task.lineWidth)
+                    Else
+                        If index + 1 < motionList.Count Then index += 1
+                    End If
                 End If
             Next
 
-            labels(2) = CStr(rectList.Count) + " grid squares were found to be featureless (gridRects(i).mm.range < " +
+            labels(2) = CStr(rectList.Count) + " grid squares were found to be featureless (<gridRect>.mm.range < " +
                         CStr(task.fLessThreshold) + ")"
         End Sub
     End Class

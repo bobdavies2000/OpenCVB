@@ -24,6 +24,7 @@ Namespace VBClasses
 
             strOut = RedUtil_Basics.selectCell(rcMap, rcList)
             SetTrueText(strOut, 3)
+
             If task.rcD Is Nothing Then
                 SetTrueText("Select any cell", 3)
                 Exit Sub
@@ -354,7 +355,7 @@ Namespace VBClasses
 
     Public Class RedColor_FeatureLess : Inherits TaskParent
         Public redC As New RedColor_Basics
-        Dim corrRange As New Correlation_Range
+        Dim corrRange As New Correlation_MinMaxRange
         Public Sub New()
             If standalone Then task.gOptions.displayDst1.Checked = True
             labels(3) = "Contour_Basics output that is input to RedColor_Basics."
@@ -367,10 +368,8 @@ Namespace VBClasses
             dst2 = redC.dst2
             labels(2) = redC.labels(2)
 
-            dst2.SetTo(0, corrRange.dst3)
-            redC.rcMap.SetTo(0, corrRange.dst3)
-
-            SetTrueText(redC.strOut, 1)
+            strOut = RedUtil_Basics.selectCell(redC.rcMap, redC.rcList)
+            SetTrueText(strOut, 1)
         End Sub
     End Class
 End Namespace

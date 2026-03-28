@@ -17,6 +17,7 @@ Namespace VBClasses
         Public rcList As New List(Of rcData)
         Public rcMap As cv.Mat = New cv.Mat(dst2.Size, cv.MatType.CV_32S, 0)
         Public options As New Options_RedCloud
+        Public keyColors As New KeyColor_Reduction
         Public Sub New()
             If standalone Then
                 task.gOptions.displayDst1.Checked = True
@@ -26,6 +27,7 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
+            If task.quarterBeat Then keyColors.Run(task.gray)
 
             redCore.Run(src)
             labels(3) = redCore.labels(3)
@@ -51,7 +53,7 @@ Namespace VBClasses
                 rcList.Add(rc)
 
                 If task.heartBeat Then
-                    Dim color = task.keyColors.dst2.Get(Of cv.Vec3b)(rc.maxDist.Y, rc.maxDist.X)
+                    Dim color = keyColors.dst2.Get(Of cv.Vec3b)(rc.maxDist.Y, rc.maxDist.X)
                     If color <> blackVec Then rc.color = color
                 End If
                 dst2(rc.rect).SetTo(rc.color, rc.mask)
@@ -60,7 +62,7 @@ Namespace VBClasses
             strOut = RedUtil_Basics.selectCell(rcMap, rcList)
             SetTrueText(strOut, 3)
 
-            dst1 = task.keyColors.dst2
+            dst1 = keyColors.dst2
 
             labels(2) = CStr(unMatched) + " were new cells and " + CStr(matchCount) + " were matched, " +
                             "average age: " + Format(matchAverage / rcList.Count, fmt1)
@@ -259,7 +261,7 @@ Namespace VBClasses
             desc = "Map the RedCloud output into the right view."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            bricks.run(src)
+            bricks.Run(src)
             redC.Run(src)
             dst2 = redC.dst2
             labels(2) = redC.labels(2)
@@ -464,12 +466,14 @@ Namespace VBClasses
         Public rcMap As cv.Mat = New cv.Mat(dst2.Size, cv.MatType.CV_32S, 0)
         Public wGridList As New List(Of cv.Point3d)
         Public options As New Options_RedCloud
+        Public keyColors As New KeyColor_Reduction
         Public Sub New()
             cPtr = RedCloudFill_Open()
             desc = "This is before matching to previous generation."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
+            keyColors.Run(emptyMat)
 
             If src.Channels <> 1 Then
                 Static prepData As New RedPrep_Core
@@ -528,7 +532,7 @@ Namespace VBClasses
                 rc.index = rcList.Count + 1
 
                 If task.heartBeat Then
-                    Dim color = task.keyColors.dst2.Get(Of cv.Vec3b)(rc.maxDist.Y, rc.maxDist.X)
+                    Dim color = keyColors.dst2.Get(Of cv.Vec3b)(rc.maxDist.Y, rc.maxDist.X)
                     If color <> blackVec Then rc.color = color
                 End If
 

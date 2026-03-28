@@ -6,12 +6,34 @@ Namespace VBClasses
             desc = "Reduction: a simpler way to KMeans by reducing color resolution"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If src.Channels() <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+            If src.Channels() <> 1 Then src = task.gray
 
             classCount = Math.Ceiling(255 / task.reduction)
 
             dst2 = src / task.reduction
             labels(2) = "Reduced image - factor = " + CStr(task.reduction)
+
+            dst3 = Palettize(dst2 + 1, 0)
+            labels(2) = CStr(classCount) + " colors after reduction - 8uC1 below"
+        End Sub
+    End Class
+
+
+
+
+    Public Class Reduction_BasicsParmInput : Inherits TaskParent
+        Public classCount As Integer
+        Public reductionFactor As Integer = 100
+        Public Sub New()
+            desc = "Reduction: a simpler way to KMeans by reducing color resolution"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            If src.Channels() <> 1 Then src = task.gray
+
+            classCount = Math.Ceiling(255 / reductionFactor)
+
+            dst2 = src / reductionFactor
+            labels(2) = "Reduced image - factor = " + CStr(reductionFactor)
 
             dst3 = Palettize(dst2 + 1, 0)
             labels(2) = CStr(classCount) + " colors after reduction - 8uC1 below"
