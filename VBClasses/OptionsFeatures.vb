@@ -73,6 +73,8 @@ Public Class OptionsFeatures
         Select Case task.workRes.Width
             Case 1920
                 ColorDiffSlider.Value = 25
+                MotionPixelSlider.Maximum = 100
+                MotionPixelSlider.Value = 50
             Case 1280
                 ColorDiffSlider.Value = 20
             Case 960

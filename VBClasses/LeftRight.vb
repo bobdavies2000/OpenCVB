@@ -240,7 +240,7 @@ Namespace VBClasses
 
 
     Public Class LeftRight_FeatureLess : Inherits TaskParent
-        Public fLess As New FeatureLess_Threshold
+        Public fLess As New FeatureLess_Basics
         Public Sub New()
             labels = {"", "", "Reduced Left Image", "Reduced Right Image"}
             desc = "Reduce both the left and right color images"

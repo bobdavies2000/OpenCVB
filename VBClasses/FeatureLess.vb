@@ -1,28 +1,7 @@
 Imports System.Windows.Documents
 Imports cv = OpenCvSharp
 Namespace VBClasses
-    Public Class FeatureLess_Correlation : Inherits TaskParent
-        Dim corr As New Correlation_Basics
-        Public rectList As New List(Of cv.Rect)
-        Public Sub New()
-            desc = "Measure the correlation of all grid squares except where there is motion."
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            If src.Channels <> 1 Then src = task.gray
-
-            corr.Run(src)
-            dst2 = corr.dst2
-            dst3 = corr.dst3
-            rectList = New List(Of cv.Rect)(corr.rectList)
-
-            labels(2) = corr.labels(2)
-        End Sub
-    End Class
-
-
-
-
-    Public Class FeatureLess_Threshold : Inherits TaskParent
+    Public Class FeatureLess_Basics : Inherits TaskParent
         Public rectList As New List(Of cv.Rect)
         Public Sub New()
             dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
@@ -50,6 +29,27 @@ Namespace VBClasses
 
             labels(2) = CStr(rectList.Count) + " grid squares were found to be featureless (<gridRect>.mm.range < " +
                         CStr(task.fLessThreshold) + ")"
+        End Sub
+    End Class
+
+
+
+
+    Public Class FeatureLess_Correlation : Inherits TaskParent
+        Dim corr As New Correlation_Basics
+        Public rectList As New List(Of cv.Rect)
+        Public Sub New()
+            desc = "Measure the correlation of all grid squares except where there is motion."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            If src.Channels <> 1 Then src = task.gray
+
+            corr.Run(src)
+            dst2 = corr.dst2
+            dst3 = corr.dst3
+            rectList = New List(Of cv.Rect)(corr.rectList)
+
+            labels(2) = corr.labels(2)
         End Sub
     End Class
 
@@ -345,23 +345,18 @@ Namespace VBClasses
 
 
 
-    Public Class NR_FeatureLess_LeftRight : Inherits TaskParent
-        Dim fLess As New FeatureLess_Correlation
+    Public Class FeatureLess_LeftRight : Inherits TaskParent
+        Dim fLess As New FeatureLess_Basics
         Public Sub New()
             labels = {"", "", "FeatureLess Left mask", "FeatureLess Right mask"}
             desc = "Find the featureless regions of the left and right images"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If task.toggleOn Then
-                dst2 = task.leftView
-                dst3 = task.rightView
-            Else
-                fLess.Run(task.leftView)
-                dst2 = fLess.dst2.Clone
+            fLess.Run(task.leftView)
+            dst2 = fLess.dst2.Clone
 
-                fLess.Run(task.rightView)
-                dst3 = fLess.dst2.Clone
-            End If
+            fLess.Run(task.rightView)
+            dst3 = fLess.dst2.Clone
         End Sub
     End Class
 
@@ -442,11 +437,11 @@ Namespace VBClasses
 
     Public Class FeatureLess_RedColor : Inherits TaskParent
         Dim redC As New RedColor_Basics
-        Dim fLess As New FeatureLess_Threshold
+        Dim fLess As New FeatureLess_Basics
         Public Sub New()
             task.gOptions.GridSlider.Value = 4
             If standalone Then task.gOptions.displayDst1.Checked = True
-            desc = "Use the FeatureLess_Correlation output as input to RedColor_Basics"
+            desc = "Use the FeatureLess_Basics output as input to RedColor_Basics"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             fLess.Run(task.gray)
@@ -469,7 +464,7 @@ Namespace VBClasses
 
 
     Public Class FeatureLess_Stabilized : Inherits TaskParent
-        Dim fLess As New FeatureLess_Threshold
+        Dim fLess As New FeatureLess_Basics
         Dim diff As New Diff_Simple
         Public Sub New()
             desc = "Double-check that any differences from the previous fLess output occurred because of motion."
