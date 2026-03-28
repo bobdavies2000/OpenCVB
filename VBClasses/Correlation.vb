@@ -15,13 +15,20 @@ Namespace VBClasses
             Dim correlationMat As New cv.Mat
             maxCorrelation = task.fOptions.MatchCorrSlider.Value / 100.0 + 1
             rectList.Clear()
+            Dim motionList As New List(Of Integer)(task.motion.motionSort)
+            If motionList.Count = 0 Then motionList.Add(0) ' dummy entry so loops below works.
+            Dim index As Integer
             For i = 0 To task.gridRects.Count - 1
                 Dim r = task.gridRects(i)
-                cv.Cv2.MatchTemplate(src(r), lastFrame(r), correlationMat, cv.TemplateMatchModes.CCoeffNormed)
-                Dim correlation = correlationMat.Get(Of Single)(0, 0) + 1
-                If correlation < maxCorrelation Then
-                    dst2.Rectangle(r, white, -1)
-                    rectList.Add(r)
+                If r <> task.gridRects(motionList(index)) Then
+                    cv.Cv2.MatchTemplate(src(r), lastFrame(r), correlationMat, cv.TemplateMatchModes.CCoeffNormed)
+                    Dim correlation = correlationMat.Get(Of Single)(0, 0) + 1
+                    If correlation < maxCorrelation Then
+                        dst2.Rectangle(r, white, -1)
+                        rectList.Add(r)
+                    End If
+                Else
+                    If index + 1 < motionList.Count Then index += 1
                 End If
             Next
 

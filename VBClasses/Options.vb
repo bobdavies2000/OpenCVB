@@ -8195,4 +8195,17 @@ Namespace VBClasses
         End Sub
     End Class
 
+
+
+
+    Public Class Options_FeatureLess : Inherits OptionParent
+        Public fLessThreshold As Integer = 30
+        Public Sub New()
+            If sliders.Setup(traceName) Then sliders.setupTrackBar("Grid Range Threshold", 0, 255, fLessThreshold)
+        End Sub
+        Public Sub Run()
+            Static gridSlider = FindSlider("Grid Range Threshold")
+            fLessThreshold = gridSlider.value
+        End Sub
+    End Class
 End Namespace

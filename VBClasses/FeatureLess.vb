@@ -3,32 +3,45 @@ Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Class FeatureLess_Basics : Inherits TaskParent
         Public rectList As New List(Of cv.Rect)
+        Public options As New Options_FeatureLess
+        Dim corr As New Correlation_Basics
         Public Sub New()
             dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
             desc = "Identify featureless squares using the gray scale range - see 'Correlation_Basics'."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
+            options.Run()
+            Dim motionList As New List(Of Integer)(task.motion.motionSort)
+            If motionList.Count = 0 Then motionList.Add(0) ' dummy entry so loops below works.
+            Dim index As Integer
+
             If src.Channels <> 1 Then src = task.gray
 
-            rectList.Clear()
             dst2 = src
-            Dim motionList As New List(Of Integer)(task.motion.motionSort)
-            If motionList.Count = 0 Then motionList.Add(0) ' dummy entry so loop below works.
-            Dim index As Integer
-            For Each r In task.gridRects
-                Dim mm = GetMinMax(src(r))
-                If mm.range < task.fLessThreshold Then
-                    If r <> task.gridRects(motionList(index)) Then
-                        rectList.Add(r)
-                        dst2.Rectangle(r, 255, task.lineWidth)
-                    Else
-                        If index + 1 < motionList.Count Then index += 1
+            rectList.Clear()
+            ' at higher resolutions, the correlation works but the fLessThreshold does not...
+            If task.workRes.Width >= 1280 Then
+                corr.Run(src)
+                rectList = New List(Of cv.Rect)(corr.rectList)
+            Else
+                For Each r In task.gridRects
+                    Dim mm = GetMinMax(src(r))
+                    If mm.range < options.fLessThreshold Then
+                        If r <> task.gridRects(motionList(index)) Then
+                            rectList.Add(r)
+                        Else
+                            If index + 1 < motionList.Count Then index += 1
+                        End If
                     End If
-                End If
+                Next
+            End If
+
+            For Each r In rectList
+                dst2.Rectangle(r, 255, task.lineWidth)
             Next
 
             labels(2) = CStr(rectList.Count) + " grid squares were found to be featureless (<gridRect>.mm.range < " +
-                        CStr(task.fLessThreshold) + ")"
+                        CStr(options.fLessThreshold) + ")"
         End Sub
     End Class
 
@@ -60,24 +73,27 @@ Namespace VBClasses
     Public Class NR_FeatureLess_Correlation : Inherits TaskParent
         Public rectList As New List(Of cv.Rect)
         Dim smallGrid As New Grid_SquaresOnly
+        Public options As New Options_FeatureLess
         Public Sub New()
             If standalone Then task.gOptions.displayDst1.Checked = True
             dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
             desc = "Identify featureless squares using the gray scale range - see 'Correlation_Basics'."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
+            options.Run()
+
             ' couldn't put this in the constructor because motion is a task algorithm.
             If task.firstPass Then smallGrid.Run(src) ' create the grid squares for the small resolution.
             Dim input As cv.Mat
             If src.Channels <> 1 Then input = task.gray Else input = src
 
-            ' why do this resize?  Because the flessThreshold works at smallRes but not larger resolutions.
+            ' why do this resize?  Because the options.flessThreshold works at smallRes but not larger resolutions.
             If task.workRes.Height > 270 Then input = input.Resize(task.smallRes, 0, 0, cv.InterpolationFlags.Nearest)
 
             Dim mask As New cv.Mat(input.Size, cv.MatType.CV_8U, 0)
             For Each r In smallGrid.gridRects
                 Dim mm = GetMinMax(input(r))
-                If mm.range < task.fLessThreshold Then mask(r).SetTo(255)
+                If mm.range < options.fLessThreshold Then mask(r).SetTo(255)
             Next
 
             dst2 = mask.Resize(src.Size, 0, 0, cv.InterpolationFlags.Nearest)
@@ -102,7 +118,7 @@ Namespace VBClasses
             End If
 
             labels(3) = CStr(rectList.Count) + " grid squares were found to be featureless (range < " +
-                        CStr(task.fLessThreshold) + ")"
+                        CStr(options.fLessThreshold) + ")"
 
         End Sub
     End Class

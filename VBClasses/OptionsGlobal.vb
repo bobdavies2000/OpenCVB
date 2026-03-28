@@ -33,7 +33,6 @@ Public Class OptionsGlobal
         task.smallBrick = 8
         task.DotSize = 1
         task.lineWidth = 1
-        task.fLessThreshold = 30
         task.smallRes = New cv.Size(320, 240)
         Select Case task.workRes.Width
             Case 1920
