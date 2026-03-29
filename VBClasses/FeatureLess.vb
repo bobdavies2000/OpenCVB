@@ -473,7 +473,7 @@ Namespace VBClasses
             redC.dst2.CopyTo(dst2, dst3)
             labels(2) = redC.labels(2)
 
-            strOut = RedUtil_Basics.selectCell(redC.rcMap, redC.rcList)
+            strOut = redC.strOut
             SetTrueText(strOut, 1)
         End Sub
     End Class
