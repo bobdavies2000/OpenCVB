@@ -1,4 +1,4 @@
-**March 29, 2026 – FeatureLess, Segmentation, KeyColor, Task Algorithms, FeatureLess, and Motion.**
+**March 29, 2026 – FeatureLess, Segmentation, KeyColor, Task Algorithms, and Motion.**
 
 -   Over 1600 algorithms are included, averaging 36 lines of code per algorithm.
     -   Over 400 additional obsolete algorithms compiled for reference use.
