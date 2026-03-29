@@ -1,7 +1,7 @@
 ﻿Imports System.Runtime.InteropServices
 Imports cv = OpenCvSharp
 Namespace VBClasses
-    Public Class RedWGrid_Basics_TA : Inherits TaskParent
+    Public Class RedWGrid_Basics : Inherits TaskParent
         Public redC As New RedCloud_Basics
         Public rcList As New List(Of rcData)
         Public rcMap As New cv.Mat(dst2.Size, cv.MatType.CV_32S, 0)
@@ -86,7 +86,12 @@ Namespace VBClasses
             labels(3) = CStr(count) + " multi-mask cells found"
         End Sub
     End Class
-    Public Class RedWGrid_Basics_TA2 : Inherits TaskParent
+
+
+
+
+
+    Public Class RedWGrid_Basics2 : Inherits TaskParent
         Public prepData As New RedPrep_Core
         Dim redC As New RedCloud_Basics
         Public Sub New()
@@ -152,7 +157,7 @@ Namespace VBClasses
 
 
 
-    Public Class NR_RedWGrid_Basics_TA1 : Inherits TaskParent
+    Public Class NR_RedWGrid_Basics1 : Inherits TaskParent
         Public prepData As New RedPrep_Core
         Public lut As New cv.Mat
         Public lutList As New List(Of Byte)
@@ -166,7 +171,7 @@ Namespace VBClasses
             prepData.Run(emptyMat)
             labels(2) = prepData.labels(2)
 
-            lut = RedWGrid_Basics_TA2.countClasses(prepData.dst2.Clone, labels(2))
+            lut = RedWGrid_Basics2.countClasses(prepData.dst2.Clone, labels(2))
             lutList.Clear()
             For i = 0 To lut.Cols - 1
                 Dim val = lut.Get(Of Byte)(0, i)
@@ -189,7 +194,7 @@ Namespace VBClasses
 
 
     Public Class RedWGrid_PrepXY : Inherits TaskParent
-        Public RedWGrid As New RedWGrid_Basics_TA2
+        Public RedWGrid As New RedWGrid_Basics2
         Public Sub New()
             OptionParent.findRadio("XY Reduction").Checked = True
             desc = "Prep the XY regions in the reduced depth data."
@@ -251,7 +256,7 @@ Namespace VBClasses
             ' prepData.reductionName = "XY Reduction" ' default
             prepData.Run(src)
 
-            Dim lut = RedWGrid_Basics_TA2.countClasses(prepData.dst2, labels(2))
+            Dim lut = RedWGrid_Basics2.countClasses(prepData.dst2, labels(2))
             dst2 = prepData.dst2.LUT(lut)
 
             edges.Run(dst2)
@@ -305,7 +310,7 @@ Namespace VBClasses
             prepData.Run(src)
             dst2 = prepData.dst3
 
-            Dim lut = RedWGrid_Basics_TA2.countClasses(prepData.dst2, labels(2))
+            Dim lut = RedWGrid_Basics2.countClasses(prepData.dst2, labels(2))
             dst2 = prepData.dst2.LUT(lut)
         End Sub
     End Class
@@ -323,7 +328,7 @@ Namespace VBClasses
             prepData.Run(src)
             dst2 = prepData.dst3
 
-            Dim lut = RedWGrid_Basics_TA2.countClasses(prepData.dst2, labels(2))
+            Dim lut = RedWGrid_Basics2.countClasses(prepData.dst2, labels(2))
             dst2 = prepData.dst2.LUT(lut)
         End Sub
     End Class
@@ -374,7 +379,7 @@ Namespace VBClasses
             prepData.Run(src)
             dst2 = prepData.dst3
 
-            Dim lut = RedWGrid_Basics_TA2.countClasses(prepData.dst2, labels(2))
+            Dim lut = RedWGrid_Basics2.countClasses(prepData.dst2, labels(2))
             dst2 = prepData.dst2.LUT(lut)
         End Sub
     End Class
@@ -384,7 +389,7 @@ Namespace VBClasses
 
 
     Public Class RedWGrid_Debug : Inherits TaskParent
-        Dim RedWGrid As New NR_RedWGrid_Basics_TA1
+        Dim RedWGrid As New NR_RedWGrid_Basics1
         Public classCount As Integer
         Public Sub New()
             If standalone Then task.gOptions.displayDst1.Checked = True
@@ -416,7 +421,7 @@ Namespace VBClasses
 
 
 
-    Public Class NR_RedWGrid_Basics_TA : Inherits TaskParent
+    Public Class NR_RedWGrid_Basics : Inherits TaskParent
         Dim redC As New RedCloud_Basics
         Dim currSet As New List(Of cv.Point3d)
         Public Sub New()
@@ -457,7 +462,7 @@ Namespace VBClasses
 
 
     Public Class RedWGrid_Click : Inherits TaskParent
-        Dim dups As New RedWGrid_Basics_TA
+        Dim dups As New RedWGrid_Basics
         Dim options As New Options_WGrid
         Public Sub New()
             desc = "Click on any RedCloud cell to see similar cells connected by the wGrid point."
@@ -514,6 +519,57 @@ Namespace VBClasses
 
 
 
+    Public Class RedWGrid_Pattern : Inherits TaskParent
+        Dim redC As New RedCloud_Basics
+        Dim points As New List(Of cv.Point)
+        Dim colorIndex As Integer
+        Public Sub New()
+            If standalone Then task.gOptions.displayDst1.Checked = True
+            labels = {"", "", "World Grid X lines", "World Grid Y Lines"}
+            desc = "Highlight the layout pattern of the World Grid."
+        End Sub
+        Private Sub nextLine(x As Integer, y As Integer, dst As cv.Mat)
+            Dim pt = New cv.Point(x, y)
+            Dim index = points.IndexOf(pt)
+            If index >= 0 Then
+                Dim rc = redC.rcList(index)
+                dst(rc.rect).SetTo(task.scalarColors(colorIndex), rc.mask)
+            End If
 
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            redC.Run(src)
+            If task.toggleOn Then
+                dst1 = redC.dst2
+            Else
+                dst1.SetTo(0)
+                SetTrueText(redC.strOut, 1)
+            End If
+            labels(1) = redC.labels(2)
 
+            points.Clear()
+
+            For Each rc In redC.rcList
+                points.Add(New cv.Point(rc.wGrid.X, rc.wGrid.Y))
+            Next
+
+            colorIndex = 0
+            dst2 = dst1.Clone
+            For y = -10 To 10
+                For x = -10 To 10
+                    nextLine(x, y, dst2)
+                Next
+                colorIndex += 1
+            Next
+
+            dst3 = dst1.Clone
+            colorIndex = 0
+            For x = -10 To 10
+                For y = -10 To 10
+                    nextLine(x, y, dst3)
+                Next
+                colorIndex += 1
+            Next
+        End Sub
+    End Class
 End Namespace

@@ -1321,8 +1321,8 @@ NR_Reduction_Histogram
 NR_Reduction_MotionTest
 NR_Reduction_NoDepth
 NR_Reduction_XYZ
-NR_RedWGrid_Basics_TA
-NR_RedWGrid_Basics_TA1
+NR_RedWGrid_Basics
+NR_RedWGrid_Basics1
 NR_RedWGrid_CheckerBoardWall
 NR_RedWGrid_CPP
 NR_RedWGrid_PrepData
@@ -1556,10 +1556,11 @@ Reduction_Basics
 Reduction_BasicsParmInput
 Reduction_PointCloud
 RedUtil_Basics
-RedWGrid_Basics_TA
-RedWGrid_Basics_TA2
+RedWGrid_Basics
+RedWGrid_Basics2
 RedWGrid_Click
 RedWGrid_Debug
+RedWGrid_Pattern
 RedWGrid_PrepXY
 RedWGrid_PrepXYAlt
 Region_Basics
