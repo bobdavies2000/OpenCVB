@@ -456,7 +456,7 @@ Namespace VBClasses
 
 
     Public Class FeatureLess_RedColor : Inherits TaskParent
-        Dim redC As New RedColor_Basics
+        Dim redC As New RedCloud_Flood_CPP
         Dim fLess As New FeatureLess_Basics
         Public Sub New()
             If standalone Then task.gOptions.displayDst1.Checked = True

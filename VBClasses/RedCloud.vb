@@ -548,10 +548,8 @@ Namespace VBClasses
                 End If
             Next
 
-            If standalone Then
-                strOut = RedUtil_Basics.selectCell(rcMap, rcList)
-                SetTrueText(strOut, 3)
-            End If
+            strOut = RedUtil_Basics.selectCell(rcMap, rcList)
+            SetTrueText(strOut, 3)
 
             wGridList.Clear()
             For Each rc In rcList
