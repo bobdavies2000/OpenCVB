@@ -247,9 +247,11 @@ FeatureFlow_LeftRight
 FeatureFlow_LeftRightHist
 FeatureFlow_LucasKanade
 FeatureLess_Basics
+FeatureLess_BasicsRaw
 FeatureLess_Cells
 FeatureLess_Correlation
 FeatureLess_LeftRight
+FeatureLess_Lines
 FeatureLess_Not
 FeatureLess_RedColor
 FeatureLess_Stabilized
@@ -1294,7 +1296,12 @@ NR_RedCloud_Basics
 NR_RedCloud_CellDepthHistogram
 NR_RedCloud_ColorChangeCause
 NR_RedColor_CPP
+NR_RedColor_FeaturesKNN
+NR_RedColor_GoodCellInput
+NR_RedColor_Lines
+NR_RedColor_LineSingle
 NR_RedColor_NWay
+NR_RedColor_Points
 NR_RedMark_Features
 NR_RedMask_CellDepthHistogram
 NR_RedMask_Consistent
@@ -1307,11 +1314,6 @@ NR_RedPrep_DepthTiers
 NR_RedPrep_EdgesX
 NR_RedPrep_EdgesY
 NR_RedPrep_VB
-NR_RedTrack_FeaturesKNN
-NR_RedTrack_GoodCellInput
-NR_RedTrack_Lines
-NR_RedTrack_LineSingle
-NR_RedTrack_Points
 NR_Reduction_BGR
 NR_Reduction_Edges
 NR_Reduction_Floodfill
@@ -1533,8 +1535,10 @@ RedCloud_Reliable
 RedCloud_RGB
 RedColor_Basics
 RedColor_Bricks
+RedColor_Contour
 RedColor_Contours
-RedColor_FeatureLess
+RedColor_FLessCorrelation
+RedColor_FLessMinMaxRange
 RedColor_GridRects
 RedColor_Hulls
 RedColor_LeftRight
@@ -1551,7 +1555,6 @@ RedPrep_EdgeMask
 RedPrep_Edges_CPP
 RedPrep_EdgesZ
 RedPrep_XY_Add
-RedTrack_Basics
 Reduction_Basics
 Reduction_BasicsParmInput
 Reduction_PointCloud

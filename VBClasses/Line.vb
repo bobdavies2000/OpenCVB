@@ -8,7 +8,7 @@ Namespace VBClasses
         Public removeOverlappingLines As Boolean = True
         Public overLappingCount As Integer
         Public Sub New()
-            dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
+            dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
             If standalone Then task.gOptions.showMotionMask.Checked = True
             ld = cv.XImgProc.CvXImgProc.CreateFastLineDetector
             desc = "If line is NOT in motion mask, then keep it.  If line is in motion mask, add it."
@@ -68,32 +68,31 @@ Namespace VBClasses
 
             lpList.Clear()
             overLappingCount = 0
-            dst3.SetTo(0)
+            dst1.SetTo(0)
+            dst2.SetTo(0)
             For Each lp In sortlines.Values
                 lp.index = lpList.Count
                 If removeOverlappingLines Then
                     If lp.rect.Width = 0 Then Continue For
                     If lp.rect.Height = 0 Then Continue For
-                    If dst3(lp.rect).CountNonZero > 0 Then
+                    If dst1(lp.rect).CountNonZero > 0 Then
                         overLappingCount += 1
                         Continue For
                     End If
                 End If
-                dst3.Line(lp.p1, lp.p2, 255, task.lineWidth + 1, cv.LineTypes.Link4)
+                dst1.Line(lp.p1, lp.p2, lp.index + 1, task.lineWidth + 1, cv.LineTypes.Link4)
+                dst2.Line(lp.p1, lp.p2, lp.color, task.lineWidth, task.lineType)
                 lpList.Add(lp)
             Next
 
-            dst2.SetTo(0)
-            For Each lp In lpList
-                dst2.Line(lp.p1, lp.p2, lp.color, task.lineWidth, task.lineType)
-            Next
+            dst3 = dst1.Threshold(0, 255, cv.ThresholdTypes.Binary)
 
             If lpList.Count > 0 Then
                 If task.lpD.rect.Width = 0 Then task.lpD = lpList(0)
             End If
 
             labels(2) = CStr(count) + " lines retained - " + CStr(newCount) + " were new"
-            If removeOverlappingLines Then labels(2) += ". " + CStr(overLappingCount) + " overlaps removed."
+            If removeOverlappingLines Then labels(2) += ". " + CStr(overLappingCount) + " overlap(s) removed."
         End Sub
         Protected Overrides Sub Finalize()
             ld.Dispose()

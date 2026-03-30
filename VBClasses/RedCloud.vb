@@ -571,7 +571,6 @@ Namespace VBClasses
     Public Class RedCloud_FeatureLess : Inherits TaskParent
         Dim redC As New FeatureLess_RedColor
         Public Sub New()
-            If standalone Then task.gOptions.displayDst1.Checked = True
             desc = "Use the FeatureLess_Basics output as input to RedCloud - identical to FeatureLess_RedColor (now)"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -579,7 +578,7 @@ Namespace VBClasses
             dst2 = redC.dst2
             labels(2) = redC.labels(2)
 
-            SetTrueText(redC.strOut, 1)
+            SetTrueText(redC.strOut, 3)
         End Sub
     End Class
 End Namespace

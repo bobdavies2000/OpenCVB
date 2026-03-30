@@ -2,6 +2,51 @@ Imports System.Windows.Documents
 Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Class FeatureLess_Basics : Inherits TaskParent
+        Public fLessRaw As New FeatureLess_BasicsRaw
+        Dim rectList As New List(Of cv.Rect)
+        Dim rectPoints As New List(Of cv.Point)
+        Public Sub New()
+            desc = "Double-check that any differences from the previous fLess output occurred brececause of motion."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            fLessRaw.Run(src)
+            If task.firstPass Then
+                dst2 = fLessRaw.dst3.Clone
+                rectList = New List(Of cv.Rect)(fLessRaw.rectList)
+                rectPoints.Clear()
+                For Each r In fLessRaw.rectList
+                    rectPoints.Add(r.TopLeft)
+                Next
+            End If
+
+            Dim newList As New List(Of cv.Rect)
+            ' remove any grid rects that had motion.
+            For Each r In rectList
+                Dim val = task.motion.motionMask.Get(Of Byte)(r.TopLeft.Y, r.TopLeft.X)
+                If val <> 0 Then dst2(r).SetTo(0) Else newList.Add(r)
+            Next
+
+            For Each r In fLessRaw.rectList
+                Dim val = task.motion.motionMask.Get(Of Byte)(r.TopLeft.Y, r.TopLeft.X)
+                If val = 0 Then
+                    newList.Add(r)
+                    dst2(r).SetTo(255)
+                End If
+            Next
+
+            rectList = New List(Of cv.Rect)(newList)
+            dst2.SetTo(0)
+            For Each r In rectList
+                dst2(r).SetTo(255)
+            Next
+            labels(2) = fLessRaw.labels(2)
+        End Sub
+    End Class
+
+
+
+
+    Public Class FeatureLess_BasicsRaw : Inherits TaskParent
         Public rectList As New List(Of cv.Rect)
         Public options As New Options_FeatureLess
         Public featureLessMask As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
@@ -366,7 +411,7 @@ Namespace VBClasses
 
 
     Public Class FeatureLess_LeftRight : Inherits TaskParent
-        Dim fLess As New FeatureLess_Basics
+        Dim fLess As New FeatureLess_BasicsRaw
         Public Sub New()
             labels = {"", "", "FeatureLess Left mask", "FeatureLess Right mask"}
             desc = "Find the featureless regions of the left and right images"
@@ -464,10 +509,10 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             fLess.Run(task.gray.Clone)
-            dst3 = fLess.featureLessMask
+            dst3 = fLess.dst2
             labels(3) = fLess.labels(2)
 
-            redC.Run(fLess.dst3)
+            redC.Run(dst3)
 
             dst2.SetTo(0)
             redC.dst2.CopyTo(dst2, dst3)
@@ -482,7 +527,7 @@ Namespace VBClasses
 
 
     Public Class FeatureLess_Stabilized : Inherits TaskParent
-        Dim fLess As New FeatureLess_Basics
+        Dim fLess As New FeatureLess_BasicsRaw
         Dim diff As New Diff_Simple
         Public Sub New()
             desc = "Double-check that any differences from the previous fLess output occurred because of motion."
@@ -509,4 +554,46 @@ Namespace VBClasses
             fLessLast = dst2.Clone
         End Sub
     End Class
+
+
+
+
+
+    Public Class FeatureLess_Lines : Inherits TaskParent
+        Dim fLess As New FeatureLess_Basics
+        Dim ranges() As cv.Rangef = New cv.Rangef() {New cv.Rangef(0, 255)}
+        Public lpList As New List(Of lpData)
+        Public Sub New()
+            dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
+            desc = "Find and display lines contained the featureless regions."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            fLess.Run(task.gray)
+            dst2 = fLess.fLessRaw.dst2
+            labels(2) = fLess.labels(2)
+
+            dst1.SetTo(0)
+            task.lines.dst1.CopyTo(dst1, fLess.dst2)
+
+            Dim histogram As New cv.Mat
+            cv.Cv2.CalcHist({dst1}, {0}, New cv.Mat, histogram, 1, {256}, ranges)
+
+            Dim histArray(histogram.Rows - 1) As Single
+            histogram.GetArray(Of Single)(histArray)
+
+            dst3.SetTo(0)
+            lpList.Clear()
+            For i = 1 To task.lines.lpList.Count - 1
+                If histArray(i) > 0 Then
+                    Dim lp = task.lines.lpList(i - 1) ' All the lines were drawn with +1 added to their index.
+                    dst3.Line(lp.p1, lp.p2, lp.color, task.lineWidth, task.lineType)
+                    lpList.Add(lp)
+                End If
+            Next
+
+            labels(2) = fLess.labels(2)
+            labels(3) = CStr(lpList.Count) + " lines were intersected the featureless grid rects."
+        End Sub
+    End Class
+
 End Namespace
