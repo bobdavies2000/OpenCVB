@@ -632,4 +632,95 @@ Namespace VBClasses
             If rtree IsNot Nothing Then rtree.Dispose()
         End Sub
     End Class
+
+
+
+
+    Public Class ML_FeatureLess_Grid : Inherits TaskParent
+        Implements IDisposable
+        Dim fRed As New FeatureLess_RedColor
+        Dim rtree As RTrees
+        Public Sub New()
+            If standalone Then task.gOptions.displayDst1.Checked = True
+            dst1 = New cv.Mat(dst2.Size, cv.MatType.CV_8U)
+            desc = "Cursor: Train mean-BGR per FeatureLess_RedColor cell. FeatureLess rects use known class colors; other neighbors green if RTrees class matches center, red if not."
+        End Sub
+        Private Shared Function MeanBGR(rgb32f As cv.Mat, gr As cv.Rect) As cv.Vec3f
+            Dim m = rgb32f(gr).Mean()
+            Return New cv.Vec3f(CSng(m.Val0), CSng(m.Val1), CSng(m.Val2))
+        End Function
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            fRed.Run(src)
+            dst1 = fRed.dst3.Clone
+            dst3 = fRed.dst2.Clone
+            labels(3) = fRed.labels(3)
+
+            Dim flIndices As New List(Of Integer)
+            For i = 0 To task.gridRects.Count - 1
+                Dim gr = task.gridRects(i)
+                If fRed.dst3.Get(Of Byte)(gr.Y, gr.X) > 0 Then flIndices.Add(i)
+            Next
+
+            labels(2) = CStr(flIndices.Count) + " featureless cells; rectList cells shown as known class; others same/diff vs center."
+
+            If flIndices.Count < 2 Then
+                SetTrueText("ML_FeatureLess_Grid needs at least 2 featureless grid cells.", 2)
+                dst2 = src.Clone
+                Exit Sub
+            End If
+
+            Dim classByGrid As New Dictionary(Of Integer, Integer)
+            For i = 0 To flIndices.Count - 1
+                classByGrid(flIndices(i)) = i
+            Next
+
+            Dim rgb32f As New cv.Mat
+            src.ConvertTo(rgb32f, cv.MatType.CV_32FC3)
+
+            Dim nCells = flIndices.Count
+            Dim learnInput As New cv.Mat(nCells, 3, cv.MatType.CV_32F)
+            Dim response As New cv.Mat(nCells, 1, cv.MatType.CV_32F)
+            For classId = 0 To nCells - 1
+                Dim gr = task.gridRects(flIndices(classId))
+                learnInput.Set(Of cv.Vec3f)(classId, 0, MeanBGR(rgb32f, gr))
+                response.Set(Of Single)(classId, 0, CSng(classId))
+            Next
+
+            If rtree Is Nothing Then
+                rtree = cv.ML.RTrees.Create()
+                rtree.MinSampleCount = 2
+                rtree.MaxDepth = 10
+            End If
+            rtree.Train(learnInput, cv.ML.SampleTypes.RowSample, response)
+
+            dst2.SetTo(0)
+            Dim testRow As New cv.Mat(1, 3, cv.MatType.CV_32F)
+            Dim pred As New cv.Mat
+            Dim green As New cv.Scalar(0, 255, 0)
+            Dim red As New cv.Scalar(0, 0, 255)
+            For classId = 0 To nCells - 1
+                Dim center = flIndices(classId)
+                Dim nabeList = task.grid.gridNeighbors(center)
+                For j = 1 To nabeList.Count - 1
+                    Dim nb = nabeList(j)
+                    Dim gr = task.gridRects(nb)
+                    If classByGrid.ContainsKey(nb) Then
+                        dst2(gr).SetTo(task.scalarColors(classByGrid(nb) Mod 256))
+                    Else
+                        testRow.Set(Of cv.Vec3f)(0, 0, MeanBGR(rgb32f, gr))
+                        rtree.Predict(testRow, pred)
+                        Dim pid = pred.Get(Of Single)(0, 0)
+                        Dim predClass = CInt(Math.Floor(pid + 0.5F))
+                        If predClass < 0 Then predClass = 0
+                        If predClass >= nCells Then predClass = nCells - 1
+                        Dim same = (predClass = classId)
+                        dst2(gr).SetTo(If(same, green, red))
+                    End If
+                Next
+            Next
+        End Sub
+        Protected Overrides Sub Finalize()
+            If rtree IsNot Nothing Then rtree.Dispose()
+        End Sub
+    End Class
 End Namespace
