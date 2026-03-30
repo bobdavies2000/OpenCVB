@@ -411,17 +411,17 @@ Namespace VBClasses
 
 
     Public Class FeatureLess_LeftRight : Inherits TaskParent
-        Dim fLess As New FeatureLess_BasicsRaw
+        Dim fLessRaw As New FeatureLess_BasicsRaw
         Public Sub New()
             labels = {"", "", "FeatureLess Left mask", "FeatureLess Right mask"}
             desc = "Find the featureless regions of the left and right images"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            fLess.Run(task.leftView)
-            dst2 = fLess.dst2.Clone
+            fLessRaw.Run(task.leftView)
+            dst2 = fLessRaw.dst2.Clone
 
-            fLess.Run(task.rightView)
-            dst3 = fLess.dst2.Clone
+            fLessRaw.Run(task.rightView)
+            dst3 = fLessRaw.dst2.Clone
         End Sub
     End Class
 
