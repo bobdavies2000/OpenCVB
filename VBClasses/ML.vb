@@ -516,6 +516,7 @@ Namespace VBClasses
 
 
 
+
     Public Class ML_RemoveDups_CPP : Inherits TaskParent
         Implements IDisposable
         Public Sub New()
@@ -539,6 +540,96 @@ Namespace VBClasses
         End Sub
         Protected Overrides Sub Finalize()
             If cPtr <> 0 Then cPtr = ML_RemoveDups_Close(cPtr)
+        End Sub
+    End Class
+
+
+
+
+    Public Class ML_FeatureLess : Inherits TaskParent
+        Implements IDisposable
+        Dim fRed As New FeatureLess_RedColor
+        Dim rtree As RTrees
+        Public Sub New()
+            If standalone Then task.gOptions.displayDst1.Checked = True
+            dst1 = New cv.Mat(dst2.Size, cv.MatType.CV_8U)
+            desc = "Cursor: Use FeatureLess_RedColor to learn BGR in each featureless grid cell, then RTrees predicts cell-id per pixel in that cell's surrounding grid rects."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            fRed.Run(src)
+            dst1 = fRed.dst3.Clone
+            dst3 = fRed.dst2.Clone
+            labels(3) = fRed.labels(3)
+
+            Dim flIndices As New List(Of Integer)
+            For i = 0 To task.gridRects.Count - 1
+                Dim gr = task.gridRects(i)
+                If fRed.dst3.Get(Of Byte)(gr.Y, gr.X) > 0 Then flIndices.Add(i)
+            Next
+
+            labels(2) = CStr(flIndices.Count) + " featureless cells; neighbor rects colored by predicted cell id."
+
+            If flIndices.Count < 2 Then
+                SetTrueText("ML_FeatureLess needs at least 2 featureless grid cells.", 2)
+                dst2 = src.Clone
+                Exit Sub
+            End If
+
+            Dim rgb32f As New cv.Mat
+            src.ConvertTo(rgb32f, cv.MatType.CV_32FC3)
+
+            Dim learnParts As New List(Of cv.Mat)
+            Dim respParts As New List(Of cv.Mat)
+            For classId = 0 To flIndices.Count - 1
+                Dim gr = task.gridRects(flIndices(classId))
+                Dim patch = rgb32f(gr).Clone()
+                Dim flat = patch.Reshape(1, patch.Rows * patch.Cols)
+                learnParts.Add(flat)
+                respParts.Add(New cv.Mat(flat.Rows, 1, cv.MatType.CV_32F, New cv.Scalar(classId)))
+            Next
+
+            Dim learnInput As New cv.Mat
+            Dim response As New cv.Mat
+            cv.Cv2.VConcat(learnParts.ToArray(), learnInput)
+            cv.Cv2.VConcat(respParts.ToArray(), response)
+
+            If rtree Is Nothing Then
+                rtree = cv.ML.RTrees.Create()
+                rtree.MinSampleCount = 2
+                rtree.MaxDepth = 10
+            End If
+            rtree.Train(learnInput, cv.ML.SampleTypes.RowSample, response)
+
+            dst2.SetTo(0)
+            Dim nCells = flIndices.Count
+            For classId = 0 To flIndices.Count - 1
+                Dim center = flIndices(classId)
+                Dim nabeList = task.grid.gridNeighbors(center)
+                For j = 1 To nabeList.Count - 1
+                    Dim nb = nabeList(j)
+                    Dim gr = task.gridRects(nb)
+                    Dim patch = rgb32f(gr).Clone()
+                    Dim testMat = patch.Reshape(1, patch.Rows * patch.Cols)
+                    Dim pred As New cv.Mat
+                    rtree.Predict(testMat, pred)
+                    Dim predMap = pred.Reshape(1, gr.Height)
+                    Dim cls8u = New cv.Mat(gr.Size, cv.MatType.CV_8U)
+                    For py = 0 To gr.Height - 1
+                        For px = 0 To gr.Width - 1
+                            Dim pid = predMap.Get(Of Single)(py, px)
+                            Dim cid = CInt(Math.Floor(pid + 0.5F))
+                            If cid < 0 Then cid = 0
+                            If cid >= nCells Then cid = nCells - 1
+                            cls8u.Set(Of Byte)(py, px, CByte(Math.Min(255, cid + 1)))
+                        Next
+                    Next
+                    Dim colored = Palettize(cls8u)
+                    colored.CopyTo(dst2(gr))
+                Next
+            Next
+        End Sub
+        Protected Overrides Sub Finalize()
+            If rtree IsNot Nothing Then rtree.Dispose()
         End Sub
     End Class
 End Namespace
