@@ -4,19 +4,14 @@ Namespace VBClasses
     Public Class FeatureLess_Basics : Inherits TaskParent
         Public fLessRaw As New FeatureLess_BasicsRaw
         Dim rectList As New List(Of cv.Rect)
-        Dim rectPoints As New List(Of cv.Point)
         Public Sub New()
-            desc = "Double-check that any differences from the previous fLess output occurred brececause of motion."
+            desc = "A features grid rect cannot change if there has been no motion in that grid rect."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             fLessRaw.Run(src)
             If task.firstPass Then
                 dst2 = fLessRaw.dst3.Clone
                 rectList = New List(Of cv.Rect)(fLessRaw.rectList)
-                rectPoints.Clear()
-                For Each r In fLessRaw.rectList
-                    rectPoints.Add(r.TopLeft)
-                Next
             End If
 
             Dim newList As New List(Of cv.Rect)
@@ -35,10 +30,6 @@ Namespace VBClasses
             Next
 
             rectList = New List(Of cv.Rect)(newList)
-            dst2.SetTo(0)
-            For Each r In rectList
-                dst2(r).SetTo(255)
-            Next
             labels(2) = fLessRaw.labels(2)
         End Sub
     End Class
