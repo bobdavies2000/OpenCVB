@@ -592,7 +592,7 @@ Namespace VBClasses
             Next
 
             labels(2) = fLess.labels(2)
-            labels(3) = CStr(lpList.Count) + " lines were intersected the featureless grid rects."
+            labels(3) = CStr(lpList.Count) + " lines intersected with featureless grid rects."
         End Sub
     End Class
 
