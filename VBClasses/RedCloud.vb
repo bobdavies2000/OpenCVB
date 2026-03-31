@@ -589,18 +589,26 @@ Namespace VBClasses
         Dim redC As New RedCloud_Basics
         Public rcList As New List(Of rcData)
         Public rcMap As New cv.Mat
+        Dim motionCloud As New Motion_Cloud
         Public Sub New()
             dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
             desc = "Filter changes to the RedCloud cells with motion."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
+            motionCloud.Run(emptyMat)
+
+            task.pointCloud.SetTo(0, motionCloud.dst2)
+            task.pcSplit(2).SetTo(0, motionCloud.dst2)
+            task.depthmask.SetTo(0, motionCloud.dst2)
+            task.noDepthMask.SetTo(255, motionCloud.dst2)
+
             redC.Run(src)
             dst2 = redC.dst2
             labels(2) = redC.labels(2)
 
             redC.rcMap.ConvertTo(dst0, cv.MatType.CV_8U)
             dst1.SetTo(0)
-            dst0.CopyTo(dst1, task.motion.motionMask)
+            dst0.CopyTo(dst1, motionCloud.dst2)
 
             Dim histogram As New cv.Mat
             Dim ranges() As cv.Rangef = New cv.Rangef() {New cv.Rangef(0, redC.rcList.Count + 1)}
@@ -626,5 +634,4 @@ Namespace VBClasses
             Next
         End Sub
     End Class
-
 End Namespace
