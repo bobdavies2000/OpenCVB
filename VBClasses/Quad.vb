@@ -100,9 +100,9 @@ Namespace VBClasses
                 Next
 
                 Dim showBrickDepth As Boolean = False
-                Dim br = task.bricksPerRow
-                For j = 0 To br Step 5
-                    If i Mod br = j Then
+                Dim brRow = task.bricksPerRow
+                For j = 0 To brRow Step 5
+                    If i Mod brRow = j Then
                         showBrickDepth = True
                         Exit For
                     End If
@@ -292,9 +292,9 @@ Namespace VBClasses
 
 
                         Dim showBrickDepth As Boolean = False
-                        Dim br = task.bricksPerRow
-                        For j = 0 To br Step 5
-                            If i Mod br = j Then
+                        Dim brRow = task.bricksPerRow
+                        For j = 0 To brRow Step 5
+                            If i Mod brRow = j Then
                                 showBrickDepth = True
                                 Exit For
                             End If

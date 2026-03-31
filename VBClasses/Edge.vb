@@ -1530,6 +1530,7 @@ Namespace VBClasses
             dst3 = edgesLR.dst3
 
             Dim count As Integer
+            Dim brick As brickData
             For Each brick In bricks.brickList
                 If brick.depth = 0 Then Continue For
                 If brick.rRect.X < 0 Or brick.rRect.X + brick.rRect.Width >= dst2.Width Then Continue For
@@ -1545,15 +1546,15 @@ Namespace VBClasses
             dst3 = dst3.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
 
             Dim index = task.gridMap.Get(Of Integer)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
-            Dim br = bricks.brickList(index)
-            SetTrueText(br.displayCell, 1)
-            dst2.Rectangle(br.lRect, task.highlight, task.lineWidth + 1)
-            dst3.Rectangle(br.rRect, task.highlight, task.lineWidth + 1)
-            task.color.Rectangle(br.lRect, task.highlight, task.lineWidth)
+            brick = bricks.brickList(index)
+            SetTrueText(brick.displayCell, 1)
+            dst2.Rectangle(brick.lRect, task.highlight, task.lineWidth + 1)
+            dst3.Rectangle(brick.rRect, task.highlight, task.lineWidth + 1)
+            task.color.Rectangle(brick.lRect, task.highlight, task.lineWidth)
 
             labels(2) = CStr(count) + " (of " + CStr(bricks.brickList.Count) +
-                    ") bricks had edges and depth in the left image.  " +
-                    "Move the mouse around to highlight partners.  Below right is right view."
+                        ") bricks had edges and depth in the left image.  " +
+                        "Move the mouse around to highlight partners.  Below right is right view."
         End Sub
     End Class
 

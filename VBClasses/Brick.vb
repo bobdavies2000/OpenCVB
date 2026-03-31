@@ -69,10 +69,10 @@ Namespace VBClasses
                 dst3 = edgesLR.dst3.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
 
                 Dim index = task.gridMap.Get(Of Integer)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
-                Dim br = brickList(index)
-                dst2.Rectangle(br.lRect, task.highlight, task.lineWidth + 1)
-                task.color.Rectangle(br.lRect, task.highlight, task.lineWidth + 1)
-                dst3.Rectangle(br.rRect, task.highlight, task.lineWidth + 1)
+                Dim brick = brickList(index)
+                dst2.Rectangle(brick.lRect, task.highlight, task.lineWidth + 1)
+                task.color.Rectangle(brick.lRect, task.highlight, task.lineWidth + 1)
+                dst3.Rectangle(brick.rRect, task.highlight, task.lineWidth + 1)
             End If
 
             If task.heartBeat Then
@@ -1055,10 +1055,10 @@ Namespace VBClasses
 
             dst3 = task.rightView.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
             Dim index = task.gridMap.Get(Of Integer)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
-            Dim br = bricks.brickList(index)
-            dst2.Rectangle(br.lRect, task.highlight, task.lineWidth)
-            task.color.Rectangle(br.lRect, task.highlight, task.lineWidth)
-            dst3.Rectangle(br.rRect, task.highlight, task.lineWidth)
+            Dim brick = bricks.brickList(index)
+            dst2.Rectangle(brick.lRect, task.highlight, task.lineWidth)
+            task.color.Rectangle(brick.lRect, task.highlight, task.lineWidth)
+            dst3.Rectangle(brick.rRect, task.highlight, task.lineWidth)
         End Sub
     End Class
 End Namespace
