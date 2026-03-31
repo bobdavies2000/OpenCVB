@@ -221,10 +221,17 @@ Namespace VBClasses
 
             If gOptions.ShowGrid.Checked Then dstList(2).SetTo(cv.Scalar.White, gridMask)
             If gOptions.showMotionMask.Checked Then
-                For Each mIndex In motion.motionSort
-                    dstList(0).Rectangle(gridRects(mIndex), cv.Scalar.White, lineWidth)
-                Next
+                If task.motionCloud IsNot Nothing Then ' motion cloud contains all the RGB motion as well.
+                    For Each mIndex In task.motionCloud.motionSort
+                        dstList(0).Rectangle(gridRects(mIndex), cv.Scalar.White, lineWidth)
+                    Next
+                Else
+                    For Each mIndex In motion.motionSort
+                        dstList(0).Rectangle(gridRects(mIndex), cv.Scalar.White, lineWidth)
+                    Next
+                End If
             End If
+
 
             If gOptions.CrossHairs.Checked Then
                 Gravity_Basics_TA.showVectors(dstList(0))

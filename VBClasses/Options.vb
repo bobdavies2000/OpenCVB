@@ -8206,4 +8206,19 @@ Namespace VBClasses
             meters = millimeters / 1000
         End Sub
     End Class
+
+
+
+
+    Public Class Options_MotionCloud : Inherits OptionParent
+        Public pixelError As Double
+        Public Sub New()
+            If sliders.Setup(traceName) Then sliders.setupTrackBar("Pixel Error (X100)", 0, 100, 75)
+        End Sub
+        Public Sub Run()
+            Static pixelSlider = FindSlider("Pixel Error (X100)")
+            pixelError = pixelSlider.value / 100
+        End Sub
+    End Class
+
 End Namespace

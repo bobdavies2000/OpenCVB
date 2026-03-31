@@ -383,12 +383,20 @@ Namespace VBClasses
 
     Public Class Motion_Cloud : Inherits TaskParent
         Public motionSort As New List(Of Integer)
+        Dim options As New Options_MotionCloud
         Public Sub New()
             If standalone Then task.gOptions.showMotionMask.Checked = True
+
+            task.motionCloud = Me
             dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 255)
             desc = "Find all the grid rects that had motion since the last frame."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
+            options.Run()
+
+            ' assume the disparity can be off by 0.25 pixels
+            Dim disparityCoefficient = options.pixelError / (task.calibData.baseline * task.calibData.leftIntrinsics.fx)
+
             Static lastDepth As cv.Mat = task.pcSplit(2).Clone
             Static lastMask As cv.Mat = task.depthmask.Clone
             motionSort.Clear()
@@ -407,7 +415,7 @@ Namespace VBClasses
                 End If
                 Dim depth = task.pcSplit(2)(r).Mean(task.depthmask(r)).Val0
                 If depth > 0 Then
-                    Dim depthError = task.disparityCoefficient * depth * depth
+                    Dim depthError = disparityCoefficient * depth * depth
                     Dim depthLast = lastDepth(r).Mean(lastMask(r)).Val0
                     If Math.Abs(depth - depthLast) > depthError Then
                         dst2(r).SetTo(255)
