@@ -383,38 +383,48 @@ Namespace VBClasses
 
     Public Class Motion_Cloud : Inherits TaskParent
         Public motionSort As New List(Of Integer)
-        Dim diff As New Diff_Depth32f
-        Public motionCloud As cv.Mat = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 255)
         Public Sub New()
             If standalone Then task.gOptions.showMotionMask.Checked = True
-            dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_32F, 0)
-            dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_32F, 0)
-            labels(3) = "The motion mask"
+            dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 255)
             desc = "Find all the grid rects that had motion since the last frame."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            'diff.lastFrame = dst2
-            'diff.Run(task.pcSplit(2))
+            Static lastDepth As cv.Mat = task.pcSplit(2).Clone
+            Static lastMask As cv.Mat = task.depthmask.Clone
+            motionSort.Clear()
+            dst2.SetTo(0)
+            Dim index As Integer
+            Dim motionRGB As New List(Of Integer)(task.motion.motionSort)
+            If motionRGB.Count = 0 Then motionRGB.Add(-1)
+            For i = 0 To task.gridRects.Count - 1
+                Dim r = task.gridRects(i)
+                ' make sure the RGB motion is present as well
+                If i = motionRGB(index) Then
+                    motionSort.Add(i)
+                    dst2(r).SetTo(255)
+                    If index < motionRGB.Count - 1 Then index += 1
+                    Continue For
+                End If
+                Dim depth = task.pcSplit(2)(r).Mean(task.depthmask(r)).Val0
+                If depth > 0 Then
+                    Dim depthError = task.disparityCoefficient * depth * depth
+                    Dim depthLast = lastDepth(r).Mean(lastMask(r)).Val0
+                    If Math.Abs(depth - depthLast) > depthError Then
+                        dst2(r).SetTo(255)
+                        motionSort.Add(i)
+                    End If
+                End If
+            Next
 
-            'motionSort.Clear()
-            'For i = 0 To task.gridRects.Count - 1
-            '    Dim diffCount = diff.dst2(task.gridRects(i)).CountNonZero
-            '    If diffCount >= diff.options.depthDiffCount Then
-            '        For Each index In task.grid.gridNeighbors(i)
-            '            If motionSort.Contains(index) = False Then motionSort.Add(index)
-            '        Next
-            '    End If
-            'Next
+            For Each index In task.motion.motionSort
+                If motionSort.Contains(index) = False Then
+                    motionSort.Add(index)
+                End If
+            Next
 
-            'motionCloud.SetTo(0)
-            'For Each index In motionSort
-            '    motionCloud(task.gridRects(index)).SetTo(255)
-            'Next
-
-            'task.pcSplit(2).CopyTo(dst2, motionCloud)
-            'If standaloneTest() Then dst3 = motionCloud
-
-            'labels(2) = "Grid rects with motion: " + CStr(motionSort.Count)
+            lastDepth = task.pcSplit(2).Clone
+            lastMask = task.depthmask.Clone
+            labels(2) = "PointCloud grid rects with motion: " + CStr(motionSort.Count)
         End Sub
     End Class
 End Namespace
