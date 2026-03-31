@@ -454,7 +454,11 @@ Namespace VBClasses
                     nextFacet.Add(New cv.Point(facets(i)(j).X, facets(i)(j).Y))
                 Next
 
-                dst3.FillConvexPoly(nextFacet, inputColors(i), cv.LineTypes.Link4)
+                If inputColors.Count = 0 Then
+                    dst3.FillConvexPoly(nextFacet, i, cv.LineTypes.Link4)
+                Else
+                    dst3.FillConvexPoly(nextFacet, inputColors(i), cv.LineTypes.Link4)
+                End If
                 facetList.Add(nextFacet)
             Next
 
