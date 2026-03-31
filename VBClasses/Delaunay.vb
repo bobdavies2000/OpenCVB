@@ -421,4 +421,74 @@ Namespace VBClasses
             labels(2) = traceName + ": " + Format(bPoint.ptList.Count, "000") + " cells were present."
         End Sub
     End Class
+
+
+
+
+    Public Class Delaunay_Color : Inherits TaskParent
+        Public inputPoints As New List(Of cv.Point2f)
+        Public inputColors As New List(Of Integer)
+        Public facetList As New List(Of List(Of cv.Point))
+        Dim subdiv As New cv.Subdiv2D
+        Public Sub New()
+            dst3 = New cv.Mat(dst2.Size(), cv.MatType.CV_32SC1, 0)
+            desc = "Subdivide an image based on the points provided."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            If task.heartBeat And standalone Then
+                Static random As New Random_Basics
+                random.Run(src)
+                inputPoints = New List(Of cv.Point2f)(random.PointList)
+            End If
+
+            subdiv.InitDelaunay(New cv.Rect(0, 0, dst2.Width, dst2.Height))
+            subdiv.Insert(inputPoints)
+
+            Dim facets = New cv.Point2f()() {Nothing}
+            subdiv.GetVoronoiFacetList(New List(Of Integer)(), facets, Nothing)
+
+            facetList.Clear()
+            For i = 0 To facets.Length - 1
+                Dim nextFacet As New List(Of cv.Point)
+                For j = 0 To facets(i).Length - 1
+                    nextFacet.Add(New cv.Point(facets(i)(j).X, facets(i)(j).Y))
+                Next
+
+                dst3.FillConvexPoly(nextFacet, inputColors(i), cv.LineTypes.Link4)
+                facetList.Add(nextFacet)
+            Next
+
+            dst2 = Palettize(dst3)
+
+            labels(2) = traceName + ": " + Format(inputPoints.Count, "000") + " cells were present."
+        End Sub
+    End Class
+
+
+
+
+    Public Class Delaunay_FeatureLess : Inherits TaskParent
+        Dim fLessColor As New FeatureLess_RedColor
+        Dim delaunay As New Delaunay_Color
+        Public Sub New()
+            labels(3) = "Delaunay cells cover the image completely and roughly match featureless regions."
+            desc = "Segment the image based on the featureless regions."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            fLessColor.Run(src)
+            dst2 = fLessColor.dst2
+            labels(2) = fLessColor.labels(2)
+
+            delaunay.inputPoints.Clear()
+            delaunay.inputcolors.clear
+            For Each r In fLessColor.fLess.rectList
+                Dim pt = r.TopLeft
+                Dim val = fLessColor.redC.rcMap.Get(Of Integer)(pt.Y, pt.X)
+                delaunay.inputPoints.Add(New cv.Point2f(pt.X, pt.Y))
+                delaunay.inputColors.Add(val - 1)
+            Next
+            delaunay.Run(dst2)
+            dst3 = delaunay.dst2
+        End Sub
+    End Class
 End Namespace

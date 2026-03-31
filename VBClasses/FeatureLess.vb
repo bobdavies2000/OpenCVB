@@ -1,31 +1,39 @@
-Imports System.Windows.Documents
 Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Class FeatureLess_Basics : Inherits TaskParent
         Public fLessRaw As New FeatureLess_BasicsRaw
-        Dim rectList As New List(Of cv.Rect)
+        Public rectList As New List(Of cv.Rect)
+        Public ptList As New List(Of cv.Point)
         Public Sub New()
             desc = "A features grid rect cannot change if there has been no motion in that grid rect."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             fLessRaw.Run(src)
-            If task.firstPass Then
+            If task.optionsChanged Then
                 dst2 = fLessRaw.dst3.Clone
                 rectList = New List(Of cv.Rect)(fLessRaw.rectList)
             End If
 
+            ptList.Clear()
             Dim newList As New List(Of cv.Rect)
             ' remove any grid rects that had motion.
             For Each r In rectList
                 Dim val = task.motion.motionMask.Get(Of Byte)(r.TopLeft.Y, r.TopLeft.X)
-                If val <> 0 Then dst2(r).SetTo(0) Else newList.Add(r)
+                If val <> 0 Then
+                    dst2(r).SetTo(0)
+                Else
+                    newList.Add(r)
+                End If
+                ptList.Add(r.TopLeft)
             Next
 
             For Each r In fLessRaw.rectList
                 Dim val = task.motion.motionMask.Get(Of Byte)(r.TopLeft.Y, r.TopLeft.X)
                 If val = 0 Then
-                    newList.Add(r)
-                    dst2(r).SetTo(255)
+                    If ptList.Contains(r.TopLeft) = False Then
+                        newList.Add(r)
+                        dst2(r).SetTo(255)
+                    End If
                 End If
             Next
 
@@ -55,12 +63,12 @@ Namespace VBClasses
             If src.Channels <> 1 Then src = task.gray
 
             dst2 = src
-            rectList.Clear()
             ' at higher resolutions, the correlation works but the fLessThreshold does not...
             If task.workRes.Width >= 1280 Then
                 corr.Run(src)
                 rectList = New List(Of cv.Rect)(corr.rectList)
             Else
+                rectList.Clear()
                 For Each r In task.gridRects
                     Dim mm = GetMinMax(src(r))
                     If mm.range < options.fLessThreshold Then
@@ -492,8 +500,8 @@ Namespace VBClasses
 
 
     Public Class FeatureLess_RedColor : Inherits TaskParent
-        Dim redC As New RedCloud_Flood_CPP
-        Dim fLess As New FeatureLess_Basics
+        Public redC As New RedCloud_Flood_CPP
+        Public fLess As New FeatureLess_Basics
         Public Sub New()
             If standalone Then task.gOptions.displayDst1.Checked = True
             desc = "Use the FeatureLess_Basics output as input to RedColor_Basics"

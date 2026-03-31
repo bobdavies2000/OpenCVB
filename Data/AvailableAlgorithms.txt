@@ -127,8 +127,10 @@ Covariance_Images
 DCT_Basics
 DCT_FeatureLess
 Delaunay_Basics
+Delaunay_Color
 Delaunay_ConsistentColor
 Delaunay_Contours
+Delaunay_FeatureLess
 Delaunay_Generations
 Delaunay_LineSelect
 Depth_Aligned
