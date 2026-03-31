@@ -184,4 +184,35 @@ Namespace VBClasses
         End Sub
     End Class
 
+
+
+
+    Public Class Disparity_PlotError : Inherits TaskParent
+        Dim plot As New Plot_Basics_CPP
+        Public Sub New()
+            desc = "Plot the error as a function of distance."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            plot.srcX.Clear()
+            plot.srcY.Clear()
+
+            Dim x As Double
+            Dim y As Double
+            Dim maxDepth = 20 ' meters * 4 = 5 meters
+            For i = 0 To maxDepth - 1
+                x = x + 0.25
+                y = task.disparityCoefficient * x * x
+                plot.srcX.Add(x)
+                plot.srcY.Add(y)
+            Next
+
+            plot.Run(src)
+            dst2 = plot.dst2
+            labels(2) = "Depth (x) varies from 0 to " + Format(x, fmt1) + " meters while error (y) varies from 0 to " +
+                         Format(plot.srcY.Last * 100, fmt1) + " cm's"
+
+            SetTrueText("Error = " + Format(task.disparityCoefficient, "0.000000") + " * depth * depth", 3)
+        End Sub
+    End Class
+
 End Namespace

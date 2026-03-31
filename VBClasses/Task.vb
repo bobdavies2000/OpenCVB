@@ -67,6 +67,9 @@ Namespace VBClasses
             readyForCameraInput = True
             task.clickPoint = New cv.Point(CInt(workRes.Width / 2), CInt(workRes.Height / 2))
 
+            ' assume the disparity can be off by 0.25 pixels
+            task.disparityCoefficient = 0.25 / (task.calibData.baseline * task.calibData.leftIntrinsics.fx)
+
             task.gOptions.PaintFreqSlider.Value = paintFreq
             Options_PointCloud.setupCalcHist()
             Debug.WriteLine(vbCrLf + vbCrLf + vbCrLf + "Starting algorithm " + settings.algorithm)

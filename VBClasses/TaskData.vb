@@ -270,5 +270,6 @@ Namespace VBClasses
         Public sharpGL As SharpGLForm
         Public readyForCameraInput As Boolean
         Public maxTrueTextLines As Integer = 18
+        Public disparityCoefficient As Double
     End Class
 End Namespace

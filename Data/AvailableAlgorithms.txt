@@ -182,6 +182,7 @@ Diff_Simple
 Diff_UnstableDepthAndColor
 Dilate_Basics
 Disparity_Basics
+Disparity_PlotError
 Distance_Basics
 Distance_Depth
 Distance_Foreground
