@@ -414,7 +414,7 @@ Namespace VBClasses
         Public Sub New()
             dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
             task.mouseMovePoint.X = dst2.Width / 2
-            desc = "Inspect x, y, and z values by r"
+            desc = "Inspect x, y, and z values by brick"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             bricks.Run(src)
@@ -658,16 +658,16 @@ Namespace VBClasses
 
             dst2.SetTo(0)
             dst3.SetTo(0)
-            Dim gcPrev = bricks.brickList(0)
-            For Each r In bricks.brickList
-                If r.rect.X > 0 Then
-                    If Math.Abs(r.depth - gcPrev.depth) <= task.depthDiffMeters Then
-                        dst2(r.rect).SetTo(255)
+            Dim brickPrev = bricks.brickList(0)
+            For Each brick In bricks.brickList
+                If brick.rect.X > 0 Then
+                    If Math.Abs(brick.depth - brickPrev.depth) <= task.depthDiffMeters Then
+                        dst2(brick.rect).SetTo(255)
                     Else
-                        dst3(r.rect).SetTo(255)
+                        dst3(brick.rect).SetTo(255)
                     End If
                 End If
-                gcPrev = r
+                brickPrev = brick
             Next
 
             labels(2) = "White pixels: Z-values within " + CStr(task.depthDiffMeters) + " meters of neighbor in X direction"
@@ -695,19 +695,19 @@ Namespace VBClasses
             If input.Type <> cv.MatType.CV_32F Then input = task.pcSplit(2)
 
             dst2.SetTo(0)
-            Dim gcPrev = bricks.brickList(0)
+            Dim brickPrev = bricks.brickList(0)
             Dim cellMat As New cv.Mat(task.brickEdgeLen, task.brickEdgeLen, cv.MatType.CV_8U, cv.Scalar.All(127))
-            For Each r In bricks.brickList
-                Dim gcAbove = bricks.brickList(CInt(r.index Mod task.bricksPerRow))
-                If r.correlation > task.fCorrThreshold Then
-                    If r.rect.Y = 0 Or r.rect.X = 0 Then Continue For
-                    If Math.Abs(r.depth - gcPrev.depth) <= task.depthDiffMeters Then dst2(r.rect).SetTo(128)
-                    If Math.Abs(r.depth - gcAbove.depth) <= task.depthDiffMeters And
-                r.rect.Width = cellMat.Width And r.rect.Height = cellMat.Height Then
-                        cv.Cv2.Add(dst2(r.rect), cellMat, dst2(r.rect))
+            For Each brick In bricks.brickList
+                Dim brickAbove = bricks.brickList(CInt(brick.index Mod task.bricksPerRow))
+                If brick.correlation > task.fCorrThreshold Then
+                    If brick.rect.Y = 0 Or brick.rect.X = 0 Then Continue For
+                    If Math.Abs(brick.depth - brickPrev.depth) <= task.depthDiffMeters Then dst2(brick.rect).SetTo(128)
+                    If Math.Abs(brick.depth - brickAbove.depth) <= task.depthDiffMeters And
+                brick.rect.Width = cellMat.Width And brick.rect.Height = cellMat.Height Then
+                        cv.Cv2.Add(dst2(brick.rect), cellMat, dst2(brick.rect))
                     End If
                 End If
-                gcPrev = r
+                brickPrev = brick
             Next
 
             labels(2) = "White pixels: Z-values within " + CStr(task.depthDiffMeters) + " meters of neighbor in X and Y direction"
@@ -765,4 +765,86 @@ Namespace VBClasses
             cv.Cv2.Merge({worldX, worldY, src}, dst2)
         End Sub
     End Class
+
+
+
+
+
+    Public Class Cloud_Gravity_TA : Inherits TaskParent
+        Public originalPointcloud As cv.Mat
+        Public Sub New()
+            desc = "Rebuild the point cloud with knowledge of gravity (if the option is requested.)"
+        End Sub
+        Public Shared Function checkNanInf(pc As cv.Mat) As cv.Mat
+            Dim count As Integer
+            Dim vec As New cv.Vec3f(0, 0, 0)
+            ' The stereolabs camera has some weird -inf and inf values in the Y-plane 
+            ' with and without gravity transform.  Probably my fault but just fix it here.
+            For y = 0 To pc.Rows - 1
+                For x = 0 To pc.Cols - 1
+                    Dim val = pc.Get(Of cv.Vec3f)(y, x)
+                    If Single.IsNaN(val(0)) Or Single.IsInfinity(val(0)) Then
+                        pc.Set(Of cv.Vec3f)(y, x, vec)
+                        count += 1
+                    End If
+                Next
+            Next
+
+            Return pc
+        End Function
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            originalPointcloud = task.pointCloud.Clone
+
+            If task.optionsChanged Then
+                If task.rangesCloud Is Nothing Then
+                    Dim rx = New cv.Vec2f(-task.xRangeDefault, task.xRangeDefault)
+                    Dim ry = New cv.Vec2f(-task.yRangeDefault, task.yRangeDefault)
+                    Dim rz = New cv.Vec2f(0, task.MaxZmeters)
+                    task.rangesCloud = New cv.Rangef() {New cv.Rangef(rx.Item0, rx.Item1),
+                                                        New cv.Rangef(ry.Item0, ry.Item1),
+                                                        New cv.Rangef(rz.Item0, rz.Item1)}
+                End If
+            End If
+
+            If task.gOptions.gravityPointCloud.Checked Then
+                '******* this is the gravity rotation (" * task.gMatrix") *******
+                task.gravityCloud = (task.pointCloud.Reshape(1,
+                                    task.rows * task.cols) * task.gMatrix).ToMat.Reshape(3, task.rows)
+                task.pointCloud = task.gravityCloud
+            End If
+
+            ' The stereolabs camera has some weird -inf and inf values in the Y-plane 
+            ' with and without gravity transform.  Probably my fault but just fix it here.
+            If task.Settings.cameraName = "StereoLabs ZED 2/2i" Then
+                task.pointCloud = checkNanInf(task.pointCloud)
+            End If
+
+            task.pcSplit = task.pointCloud.Split
+
+            If task.optionsChanged Then
+                task.maxDepthMask = New cv.Mat(task.pcSplit(2).Size, cv.MatType.CV_8U, 0)
+            End If
+
+            If task.gOptions.TruncateDepth.Checked Then
+                task.pcSplit(2) = task.pcSplit(2).Threshold(task.MaxZmeters,
+                                                          task.MaxZmeters, cv.ThresholdTypes.Trunc)
+                task.maxDepthMask = task.pcSplit(2).InRange(task.MaxZmeters,
+                                                          task.MaxZmeters).ConvertScaleAbs()
+                cv.Cv2.Merge(task.pcSplit, task.pointCloud)
+            End If
+
+            task.depthmask = task.pcSplit(2).Threshold(0, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs
+            task.noDepthMask = Not task.depthmask
+
+            If task.xRange <> task.xRangeDefault Or task.yRange <> task.yRangeDefault Then
+                Dim xRatio = task.xRangeDefault / task.xRange
+                Dim yRatio = task.yRangeDefault / task.yRange
+                task.pcSplit(0) *= xRatio
+                task.pcSplit(1) *= yRatio
+
+                cv.Cv2.Merge(task.pcSplit, task.pointCloud)
+            End If
+        End Sub
+    End Class
+
 End Namespace

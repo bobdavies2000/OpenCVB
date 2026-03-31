@@ -85,6 +85,7 @@ Classifier_BayesianTest
 Clone_Basics
 Cloud_Basics
 Cloud_DepthToWorld
+Cloud_Gravity_TA
 Cloud_ReduceSplit2
 Cloud_SetupSide
 Cloud_SetupTop
@@ -172,6 +173,7 @@ DFT_ButterworthFilter_MT
 Diff_Basics
 Diff_Color
 Diff_Depth32f
+Diff_DepthGrid
 Diff_RGB
 Diff_RGBAccum
 Diff_Simple
@@ -494,7 +496,7 @@ ML_FeatureLess_Grid
 ML_RemoveDups_CPP
 Moments_Basics
 Motion_Basics_TA
-Motion_Cloud_TA
+Motion_Cloud
 Motion_Correlation
 Motion_CorrelationToLast
 Motion_Left
@@ -1163,7 +1165,6 @@ NR_Mesh_Features
 NR_MinMath_EdgeLine
 NR_MinMath_Edges
 NR_MinMath_KNN
-NR_MinMath_Neighbors
 NR_ML_Color2Depth
 NR_ML_ColorInTier2Depth
 NR_ML_DepthFromColor
@@ -1533,6 +1534,7 @@ RedCloud_KNN
 RedCloud_LeftRight
 RedCloud_Matched
 RedCloud_Matches
+RedCloud_MotionFilter
 RedCloud_Reliable
 RedCloud_RGB
 RedColor_Basics

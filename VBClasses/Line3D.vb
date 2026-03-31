@@ -73,24 +73,24 @@ Namespace VBClasses
 
             dst2.Line(lp.p1, lp.p2, cv.Scalar.Yellow, task.lineWidth + 3, task.lineType)
 
-            Dim gcMin = bricks.brickList(task.gridMap.Get(Of Integer)(lp.p1.Y, lp.p1.X))
-            Dim gcMax = bricks.brickList(task.gridMap.Get(Of Integer)(lp.p2.Y, lp.p2.X))
+            Dim brickMin = bricks.brickList(task.gridMap.Get(Of Integer)(lp.p1.Y, lp.p1.X))
+            Dim brickMax = bricks.brickList(task.gridMap.Get(Of Integer)(lp.p2.Y, lp.p2.X))
 
             dst0.SetTo(0)
             dst0.Line(lp.p1, lp.p2, 255, 3, task.lineType)
             dst0.SetTo(0, task.noDepthMask)
 
             Dim mm = GetMinMax(task.pcSplit(2), dst0)
-            Dim ptMin = New cv.Point(gcMin.mm.minLoc.X + gcMin.rect.X, gcMin.mm.minLoc.Y + gcMin.rect.Y)
-            Dim ptMax = New cv.Point(gcMin.mm.maxLoc.X + gcMin.rect.X, gcMin.mm.maxLoc.Y + gcMin.rect.Y)
+            Dim ptMin = New cv.Point(brickMin.mm.minLoc.X + brickMin.rect.X, brickMin.mm.minLoc.Y + brickMin.rect.Y)
+            Dim ptMax = New cv.Point(brickMin.mm.maxLoc.X + brickMin.rect.X, brickMin.mm.maxLoc.Y + brickMin.rect.Y)
             If ptMin.DistanceTo(mm.minLoc) > ptMax.DistanceTo(mm.maxLoc) Then
-                Dim tmp = gcMin
-                gcMin = gcMax
-                gcMax = tmp
+                Dim tmp = brickMin
+                brickMin = brickMax
+                brickMax = tmp
             End If
 
-            Dim depthMin = If(gcMin.depth > 0, gcMin.depth, mm.minVal)
-            Dim depthMax = If(gcMax.depth > 0, gcMax.depth, mm.maxVal)
+            Dim depthMin = If(brickMin.depth > 0, brickMin.depth, mm.minVal)
+            Dim depthMax = If(brickMax.depth > 0, brickMax.depth, mm.maxVal)
 
             Dim depthMean = task.pcSplit(2).Mean(dst0)(0)
             DrawCircle(dst2, lp.p1, task.DotSize + 4, cv.Scalar.Red)

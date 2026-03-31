@@ -483,8 +483,8 @@ Namespace VBClasses
             dst3 = edges.dst2
 
             dst2.SetTo(0)
-            For Each r In bricks.brickList
-                If dst3(r.rect).CountNonZero Then src(r.rect).CopyTo(dst2(r.rect))
+            For Each brick In bricks.brickList
+                If dst3(brick.rect).CountNonZero Then src(brick.rect).CopyTo(dst2(brick.rect))
             Next
         End Sub
     End Class

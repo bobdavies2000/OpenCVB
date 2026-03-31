@@ -268,9 +268,9 @@ Namespace VBClasses
 
             Dim count As Integer
             dst1.SetTo(0)
-            For Each r As brickData In bricks.brickList
-                If redC.rcMap(r.lRect).CountNonZero And r.rRect.Width > 0 Then
-                    dst2(r.lRect).CopyTo(dst1(r.rRect))
+            For Each brick As brickData In bricks.brickList
+                If redC.rcMap(brick.lRect).CountNonZero And brick.rRect.Width > 0 Then
+                    dst2(brick.lRect).CopyTo(dst1(brick.rRect))
                     count += 1
                 End If
             Next
@@ -581,4 +581,50 @@ Namespace VBClasses
             SetTrueText(fRed.strOut, 3)
         End Sub
     End Class
+
+
+
+
+    Public Class RedCloud_MotionFilter : Inherits TaskParent
+        Dim redC As New RedCloud_Basics
+        Public rcList As New List(Of rcData)
+        Public rcMap As New cv.Mat
+        Public Sub New()
+            dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
+            desc = "Filter changes to the RedCloud cells with motion."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            redC.Run(src)
+            dst2 = redC.dst2
+            labels(2) = redC.labels(2)
+
+            redC.rcMap.ConvertTo(dst0, cv.MatType.CV_8U)
+            dst1.SetTo(0)
+            dst0.CopyTo(dst1, task.motion.motionMask)
+
+            Dim histogram As New cv.Mat
+            Dim ranges() As cv.Rangef = New cv.Rangef() {New cv.Rangef(0, redC.rcList.Count + 1)}
+            cv.Cv2.CalcHist({dst1}, {0}, New cv.Mat, histogram, 1, {redC.rcList.Count}, ranges)
+            histogram.Set(Of Single)(0, 0, 0) ' remove the count for cell 0 - no cell information.
+
+            Dim count = histogram.CountNonZero()
+            SetTrueText(CStr(count) + " cells had motion.", 3)
+
+            Dim histArray(histogram.Rows - 1) As Single
+            histogram.GetArray(Of Single)(histArray)
+
+            If task.heartBeat Then
+                dst3 = redC.dst2.Clone
+                rcMap = redC.rcMap.Clone
+            End If
+            For i = 1 To histArray.Count - 1
+                If histArray(i) > 0 Then
+                    Dim rc = redC.rcList(i - 1)
+                    dst3(rc.rect).SetTo(rc.color, rc.mask)
+                    rcMap(rc.rect).SetTo(rc.index, rc.mask)
+                End If
+            Next
+        End Sub
+    End Class
+
 End Namespace

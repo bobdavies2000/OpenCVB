@@ -28,11 +28,11 @@ Namespace VBClasses
                 featList.Add(New List(Of Integer))
             Next
 
-            For Each r In bricks.brickList
-                hist.Run(src(r.rect))
+            For Each brick In bricks.brickList
+                hist.Run(src(brick.rect))
                 For i = 1 To hist.histarray.Count - 1
                     If hist.histarray(i) > 0 Then
-                        featList(i).Add(r.index)
+                        featList(i).Add(brick.index)
                     End If
                 Next
             Next
@@ -50,8 +50,8 @@ Namespace VBClasses
             Dim edgeIndex = Math.Abs(task.gOptions.DebugSlider.Value)
             If edgeIndex <> 0 And edgeIndex < task.featList.Count Then
                 For Each index In task.featList(edgeIndex)
-                    Dim r = bricks.brickList(index)
-                    dst2.Rectangle(r.rect, task.highlight, task.lineWidth)
+                    Dim brick = bricks.brickList(index)
+                    dst2.Rectangle(brick.rect, task.highlight, task.lineWidth)
                 Next
             End If
 
@@ -59,15 +59,15 @@ Namespace VBClasses
                 If i <> Math.Abs(task.gOptions.DebugSlider.Value) Then Continue For
                 Dim depthSorted As New SortedList(Of Single, Integer)(New compareAllowIdenticalSingle)
                 For Each index In task.featList(i)
-                    Dim r = bricks.brickList(index)
-                    depthSorted.Add(r.depth, index)
+                    Dim brick = bricks.brickList(index)
+                    depthSorted.Add(brick.depth, index)
                 Next
 
                 Dim lastDepth = depthSorted.ElementAt(0).Key
                 For Each ele In depthSorted
                     If Math.Abs(ele.Key - lastDepth) > task.depthDiffMeters Then
-                        Dim r = bricks.brickList(ele.Value)
-                        dst2.Rectangle(r.rect, red, task.lineWidth + 1)
+                        Dim brick = bricks.brickList(ele.Value)
+                        dst2.Rectangle(brick.rect, red, task.lineWidth + 1)
                     End If
                     lastDepth = ele.Key
                 Next
@@ -124,8 +124,8 @@ Namespace VBClasses
                 If task.featList(i).Count = 0 Then Exit For
                 Dim depthSorted As New SortedList(Of Single, Integer)(New compareAllowIdenticalSingle)
                 For Each index In task.featList(i)
-                    Dim r = bricks.brickList(index)
-                    depthSorted.Add(r.depth, index)
+                    Dim brick = bricks.brickList(index)
+                    depthSorted.Add(brick.depth, index)
                 Next
 
                 Dim lastDepth = depthSorted.ElementAt(0).Key
@@ -140,10 +140,10 @@ Namespace VBClasses
                 Dim debugMode = task.gOptions.DebugSlider.Value <> 0
                 For i = 0 To gapCells.Count - 1
                     If debugMode Then If i <> Math.Abs(task.gOptions.DebugSlider.Value) Then Continue For
-                    Dim r = bricks.brickList(gapCells(i))
-                    dst2.Rectangle(r.rect, task.highlight, task.lineWidth)
+                    Dim brick = bricks.brickList(gapCells(i))
+                    dst2.Rectangle(brick.rect, task.highlight, task.lineWidth)
                     If i = Math.Abs(task.gOptions.DebugSlider.Value) Then
-                        SetTrueText(Format(r.depth, fmt1), r.rect.BottomRight)
+                        SetTrueText(Format(brick.depth, fmt1), brick.rect.BottomRight)
                     End If
                 Next
             End If

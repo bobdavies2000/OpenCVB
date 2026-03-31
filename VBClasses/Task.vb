@@ -40,7 +40,7 @@ Namespace VBClasses
             gravityBasics = New Gravity_Basics_TA
             imuBasics = New IMU_Basics_TA
             motion = New Motion_Basics_TA
-            motionCloud = New Motion_Cloud_TA
+            cloudGravity = New Cloud_Gravity_TA
             grid = New Grid_Basics_TA
             lines = New Line_Basics_TA
             filterBasics = New Filter_Basics_TA
@@ -127,7 +127,7 @@ Namespace VBClasses
                 motion.Run(gray)
             End If
 
-            motionCloud.Run(emptyMat) '******* this may rotate for gravity if gravity is selected *******
+            cloudGravity.Run(emptyMat) '******* this may rotate for gravity if gravity is selected *******
             colorizer.Run(src)
 
             If feat IsNot Nothing Then feat.Run(src)

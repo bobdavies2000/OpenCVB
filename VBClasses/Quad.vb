@@ -335,9 +335,9 @@ Namespace VBClasses
             Dim height = dst2.Height / task.brickEdgeLen
             For i = 0 To bricks.brickList.Count - width Step width
                 For j = i + 1 To i + width - 1
-                    Dim d1 = bricks.brickList(j).depth
-                    Dim d2 = bricks.brickList(j - 1).depth
-                    If Math.Abs(d1 - d2) > task.depthDiffMeters Then
+                    Dim brick1 = bricks.brickList(j).depth
+                    Dim brick2 = bricks.brickList(j - 1).depth
+                    If Math.Abs(brick1 - brick2) > task.depthDiffMeters Then
                         dst2.Rectangle(bricks.brickList(j).rect, task.highlight, -1)
                     End If
                 Next
@@ -345,9 +345,9 @@ Namespace VBClasses
 
             For i = 0 To width - 1
                 For j = 1 To height - 1
-                    Dim d1 = bricks.brickList(j * width).depth
-                    Dim d2 = bricks.brickList((j - 1) * width).depth
-                    If Math.Abs(d1 - d2) > task.depthDiffMeters Then
+                    Dim brick1 = bricks.brickList(j * width).depth
+                    Dim brick2 = bricks.brickList((j - 1) * width).depth
+                    If Math.Abs(brick1 - brick2) > task.depthDiffMeters Then
                         dst2.Rectangle(bricks.brickList(j).rect, task.highlight, -1)
                     End If
                 Next

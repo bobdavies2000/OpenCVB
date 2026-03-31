@@ -861,16 +861,16 @@ Namespace VBClasses
                 dst3.SetTo(0)
                 dst2 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
                 Dim count As Integer
-                For Each gRect In bricks.brickList
-                    cv.Cv2.MeanStdDev(dst2(gRect.rect), grayMean, grayStdev)
-                    cv.Cv2.MeanStdDev(task.color(gRect.rect), ColorMean, colorStdev)
+                For Each brick In bricks.brickList
+                    cv.Cv2.MeanStdDev(dst2(brick.rect), grayMean, grayStdev)
+                    cv.Cv2.MeanStdDev(task.color(brick.rect), ColorMean, colorStdev)
                     Dim nextColorStdev = (colorStdev(0) + colorStdev(1) + colorStdev(2)) / 3
                     Dim diff = Math.Abs(grayStdev(0) - nextColorStdev)
                     If diff > threshold Then
-                        dst2.Rectangle(gRect.rect, 255, task.lineWidth)
-                        SetTrueText(Format(grayStdev(0), fmt1) + " " + Format(colorStdev, fmt1), gRect.rect.TopLeft, 2)
-                        dst3.Rectangle(gRect.rect, task.highlight, task.lineWidth)
-                        SetTrueText(Format(diff, fmt1), gRect.rect.TopLeft, 3)
+                        dst2.Rectangle(brick.rect, 255, task.lineWidth)
+                        SetTrueText(Format(grayStdev(0), fmt1) + " " + Format(colorStdev, fmt1), brick.rect.TopLeft, 2)
+                        dst3.Rectangle(brick.rect, task.highlight, task.lineWidth)
+                        SetTrueText(Format(diff, fmt1), brick.rect.TopLeft, 3)
                         count += 1
                     End If
                 Next
@@ -2016,35 +2016,35 @@ Namespace VBClasses
 
             bricks.brickList.Clear()
             For i = 0 To task.gridRects.Count - 1
-                Dim gRect As New brickData
-                gRect.rect = task.gridRects(i)
-                gRect.rect = gRect.rect
-                gRect.lRect = gRect.rect ' for some cameras the color image and the left image are the same but not all, i.e. Intel Realsense.
-                gRect.center = New cv.Point(gRect.rect.X + gRect.rect.Width / 2, gRect.rect.Y + gRect.rect.Height / 2)
-                If task.depthMask(gRect.rect).CountNonZero Then
-                    cv.Cv2.MeanStdDev(task.pcSplit(2)(gRect.rect), mean, stdev, task.depthMask(gRect.rect))
-                    gRect.depth = mean(0)
+                Dim brick As New brickData
+                brick.rect = task.gridRects(i)
+                brick.rect = brick.rect
+                brick.lRect = brick.rect ' for some cameras the color image and the left image are the same but not all, i.e. Intel Realsense.
+                brick.center = New cv.Point(brick.rect.X + brick.rect.Width / 2, brick.rect.Y + brick.rect.Height / 2)
+                If task.depthmask(brick.rect).CountNonZero Then
+                    cv.Cv2.MeanStdDev(task.pcSplit(2)(brick.rect), mean, stdev, task.depthmask(brick.rect))
+                    brick.depth = mean(0)
                 End If
 
-                If gRect.depth = 0 Then
-                    gRect.correlation = 0
-                    gRect.rRect = emptyRect
+                If brick.depth = 0 Then
+                    brick.correlation = 0
+                    brick.rRect = emptyRect
                 Else
-                    gRect.mm = GetMinMax(task.pcSplit(2)(gRect.rect), task.depthMask(gRect.rect))
-                    gRect.lRect = gRect.rect
-                    gRect.rRect = gRect.lRect
-                    gRect.rRect.X -= task.calibData.baseline * task.calibData.leftIntrinsics.fx / gRect.depth
-                    gRect.rRect = ValidateRect(gRect.rRect)
-                    cv.Cv2.MatchTemplate(LRMeanSub.dst2(gRect.lRect), LRMeanSub.dst3(gRect.rRect), correlationMat,
+                    brick.mm = GetMinMax(task.pcSplit(2)(brick.rect), task.depthmask(brick.rect))
+                    brick.lRect = brick.rect
+                    brick.rRect = brick.lRect
+                    brick.rRect.X -= task.calibData.baseline * task.calibData.leftIntrinsics.fx / brick.depth
+                    brick.rRect = ValidateRect(brick.rRect)
+                    cv.Cv2.MatchTemplate(LRMeanSub.dst2(brick.lRect), LRMeanSub.dst3(brick.rRect), correlationMat,
                                                      cv.TemplateMatchModes.CCoeffNormed)
 
-                    gRect.correlation = correlationMat.Get(Of Single)(0, 0)
+                    brick.correlation = correlationMat.Get(Of Single)(0, 0)
                 End If
 
-                lastCorrelation(i) = gRect.correlation
-                gRect.index = bricks.brickList.Count
-                task.gridMap(gRect.rect).SetTo(i)
-                bricks.brickList.Add(gRect)
+                lastCorrelation(i) = brick.correlation
+                brick.index = bricks.brickList.Count
+                task.gridMap(brick.rect).SetTo(i)
+                bricks.brickList.Add(brick)
             Next
 
             ' quad.Run(src)
@@ -14515,23 +14515,23 @@ Namespace VBClasses
 
             dst2.Line(lp.p1, lp.p2, cv.Scalar.Yellow, task.lineWidth + 3, task.lineType)
 
-            Dim gcMin = bricks.brickList(task.gridMap.Get(Of Single)(lp.p1.Y, lp.p1.X))
-            Dim gcMax = bricks.brickList(task.gridMap.Get(Of Single)(lp.p2.Y, lp.p2.X))
+            Dim brickMin = bricks.brickList(task.gridMap.Get(Of Single)(lp.p1.Y, lp.p1.X))
+            Dim brickMax = bricks.brickList(task.gridMap.Get(Of Single)(lp.p2.Y, lp.p2.X))
 
             dst0.SetTo(0)
             dst0.Line(lp.p1, lp.p2, 255, 3, task.lineType)
             dst0.SetTo(0, task.noDepthMask)
 
             Dim mm = GetMinMax(task.pcSplit(2), dst0)
-            Dim ptMin = New cv.Point(gcMin.mm.minLoc.X + gcMin.rect.X, gcMin.mm.minLoc.Y + gcMin.rect.Y)
+            Dim ptMin = New cv.Point(brickMin.mm.minLoc.X + brickMin.rect.X, brickMin.mm.minLoc.Y + brickMin.rect.Y)
             If ptMin.DistanceTo(mm.minLoc) > ptMin.DistanceTo(mm.maxLoc) Then
-                Dim tmp = gcMin
-                gcMin = gcMax
-                gcMax = tmp
+                Dim tmp = brickMin
+                brickMin = brickMax
+                brickMax = tmp
             End If
 
-            Dim depthMin = If(gcMin.depth > 0, gcMin.depth, mm.minVal)
-            Dim depthMax = If(gcMax.depth > 0, gcMax.depth, mm.maxVal)
+            Dim depthMin = If(brickMin.depth > 0, brickMin.depth, mm.minVal)
+            Dim depthMax = If(brickMax.depth > 0, brickMax.depth, mm.maxVal)
 
             Dim depthMean = task.pcSplit(2).Mean(dst0)(0)
             DrawCircle(dst2, lp.p1, task.DotSize + 4, cv.Scalar.Red)

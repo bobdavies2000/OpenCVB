@@ -238,14 +238,14 @@ Namespace VBClasses
             Dim minSize As Integer = src.Total / 25
             dst2.SetTo(0)
             mdLargest.Clear()
-            For Each r In bricks.brickList
-                Dim index = dst1.Get(Of Byte)(r.center.Y, r.center.X)
+            For Each brick In bricks.brickList
+                Dim index = dst1.Get(Of Byte)(brick.center.Y, brick.center.X)
                 Dim md = redM.mdList(index)
                 If index = 0 Then
-                    dst2(r.rect).SetTo(black)
+                    dst2(brick.rect).SetTo(black)
                 Else
                     If md.pixels > minSize Then
-                        dst2(r.rect).SetTo(task.scalarColors(index))
+                        dst2(brick.rect).SetTo(task.scalarColors(index))
                         mdLargest.Add(md)
                     End If
                 End If
@@ -378,10 +378,10 @@ Namespace VBClasses
             dst0.SetTo(0)
             dst1.SetTo(0)
             Dim count As Integer
-            For Each r In bricks.brickList
-                If r.correlation > task.fCorrThreshold Then
-                    dst0.Rectangle(r.rRect, 255, -1)
-                    dst1.Rectangle(r.rect, 255, -1)
+            For Each brick In bricks.brickList
+                If brick.correlation > task.fCorrThreshold Then
+                    dst0.Rectangle(brick.rRect, 255, -1)
+                    dst1.Rectangle(brick.rect, 255, -1)
                     count += 1
                 End If
             Next

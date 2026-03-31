@@ -103,42 +103,6 @@ Namespace VBClasses
 
 
 
-
-
-
-    Public Class Diff_Depth32f : Inherits TaskParent
-        Public lastFrame As cv.Mat
-        Dim options As New Options_DiffDepth
-        Public Sub New()
-            desc = "Where is the depth difference between frames greater than X centimeters."
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            options.Run()
-
-            If src.Type <> cv.MatType.CV_32F Then src = task.pcSplit(2).Clone
-
-            If task.optionsChanged Or lastFrame Is Nothing Then lastFrame = task.pcSplit(2).Clone
-
-            cv.Cv2.Absdiff(src, lastFrame, dst1)
-
-            dst2 = dst1.Threshold(options.millimeters, 255, cv.ThresholdTypes.Binary)
-
-            lastFrame = src.Clone
-            If task.heartBeat Then
-                labels(2) = "Depth difference from accumulated frame is > " + CStr(options.millimeters) + " mm's"
-                Dim count = dst2.CountNonZero()
-                labels(3) = CStr(count) + " pixels (" + Format(count / task.depthmask.CountNonZero, "0%") +
-                        " of all depth pixels) were different by more than " + CStr(options.millimeters) + " mm's"
-            End If
-        End Sub
-    End Class
-
-
-
-
-
-
-
     Public Class NR_Diff_Identical : Inherits TaskParent
         Dim diffColor As New Diff_Color
         Dim noMotionFrames As Integer
@@ -221,6 +185,77 @@ Namespace VBClasses
                 lastFrame = src.Clone
                 strOut = CStr(changedPixels) + " pixels changed."
             End If
+        End Sub
+    End Class
+
+
+
+
+    Public Class Diff_Depth32f : Inherits TaskParent
+        Public lastFrame As cv.Mat
+        Public options As New Options_DiffDepth
+        Public Sub New()
+            desc = "Where is the depth difference between frames greater than X centimeters."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            options.Run()
+
+            If src.Type <> cv.MatType.CV_32F Then src = task.pcSplit(2).Clone
+
+            If task.optionsChanged Then lastFrame = src.Clone
+
+            cv.Cv2.Absdiff(src, lastFrame, dst1)
+
+            dst2 = dst1.Threshold(options.meters, 255, cv.ThresholdTypes.Binary)
+
+            lastFrame = src.Clone
+            If task.heartBeat Then
+                labels(2) = "Depth difference from accumulated frame is > " + CStr(options.millimeters) + " mm's"
+                Dim count = dst2.CountNonZero()
+                labels(3) = CStr(count) + " pixels (" + Format(count / task.depthmask.CountNonZero, "0%") +
+                        " of all depth pixels) were different by more than " + CStr(options.millimeters) + " mm's"
+            End If
+        End Sub
+    End Class
+
+
+
+
+
+    Public Class Diff_DepthGrid : Inherits TaskParent
+        Public lastFrame As cv.Mat
+        Public options As New Options_DiffDepth
+        Dim depthList(task.gridRects.Count - 1) As Single
+        Dim motionSort As New List(Of cv.Rect)
+        Public Sub New()
+            dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+            desc = "Where is the depth difference between frames greater than X centimeters."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            options.Run()
+
+            If task.optionsChanged Then ReDim depthList(task.gridRects.Count - 1)
+            If src.Type <> cv.MatType.CV_32F Then src = task.pcSplit(2).Clone
+
+            Dim nextList(task.gridRects.Count - 1) As Single
+            For i = 0 To task.gridRects.Count - 1
+                Dim r = task.gridRects(i)
+                nextList(i) = src(r).Mean(task.depthmask(r)).Val0
+            Next
+
+            dst2.SetTo(0)
+            motionSort.Clear()
+            For i = 0 To task.gridRects.Count - 1
+                If Math.Abs(nextList(i) - depthList(i)) > options.meters Then
+                    Dim r = task.gridRects(i)
+                    dst2(r).SetTo(255, task.depthmask(r))
+                    motionSort.Add(r)
+                    depthList(i) = nextList(i)
+                End If
+            Next
+
+            labels(2) = "Depth difference from accumulated brick data > " + CStr(options.millimeters) + " mm's"
+            labels(3) = CStr(motionSort.Count) + " bricks different by more than " + CStr(options.millimeters) + " mm's"
         End Sub
     End Class
 End Namespace

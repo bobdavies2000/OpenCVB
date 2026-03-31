@@ -45,8 +45,8 @@ Namespace VBClasses
             If standalone Then
                 dst2 = task.leftView.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
                 Dim vec = New cv.Vec3b(0, 255, 255) ' yellow
-                For Each r In bricks.brickList
-                    If r.depth > 0 Then DrawCircle(dst2, r.rect.TopLeft)
+                For Each brick In bricks.brickList
+                    If brick.depth > 0 Then DrawCircle(dst2, brick.rect.TopLeft)
                 Next
             End If
         End Sub
@@ -270,8 +270,8 @@ Namespace VBClasses
                     Dim p1 = lp.p1 ' avoid updating list of lines.
                     Dim p2 = lp.p2
                     If brick1.depth > 0 And brick2.depth > 0 Then
-                        p1.X -= task.calibData.baseline * task.calibData.leftIntrinsics.fx / brick1.mmDepth.minVal
-                        p2.X -= task.calibData.baseline * task.calibData.leftIntrinsics.fx / brick2.mmDepth.minVal
+                        p1.X -= task.calibData.baseline * task.calibData.leftIntrinsics.fx / brick1.mm.minVal
+                        p2.X -= task.calibData.baseline * task.calibData.leftIntrinsics.fx / brick2.mm.minVal
                         dst2.Line(lp.p1, lp.p2, lp.color, task.lineWidth + 1, task.lineType)
                         dst3.Line(p1, p2, lp.color, task.lineWidth + 1, task.lineType)
                     Else

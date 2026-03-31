@@ -203,10 +203,10 @@ Namespace VBClasses
 
             Dim count As Integer
             dst1.SetTo(0)
-            For Each r As brickData In bricks.brickList
-                If redC.rcMap(r.lRect).CountNonZero And r.rRect.Width > 0 Then
-                    dst2(r.lRect).CopyTo(dst1(r.rRect))
-                    r.colorClass = color8u.dst2.Get(Of Integer)
+            For Each brick As brickData In bricks.brickList
+                If redC.rcMap(brick.lRect).CountNonZero And brick.rRect.Width > 0 Then
+                    dst2(brick.lRect).CopyTo(dst1(brick.rRect))
+                    brick.colorClass = color8u.dst2.Get(Of Integer)
                     count += 1
                 End If
             Next

@@ -6944,26 +6944,6 @@ Namespace VBClasses
 
 
 
-
-    Public Class Options_DiffDepth : Inherits OptionParent
-        Public millimeters As Integer
-        Public meters As Double
-        Public Sub New()
-            If sliders.Setup(traceName) Then sliders.setupTrackBar("Depth varies more than X mm's", 1, 2000, 1000)
-        End Sub
-        Public Sub Run()
-            Static mmSlider = OptionParent.FindSlider("Depth varies more than X mm's")
-            millimeters = mmSlider.value
-            meters = millimeters / 1000
-        End Sub
-    End Class
-
-
-
-
-
-
-
     Public Class Options_Outliers : Inherits OptionParent
         Public cutoffPercent As Single
         Public Sub New()
@@ -8201,15 +8181,29 @@ Namespace VBClasses
     Public Class Options_FeatureLess : Inherits OptionParent
         Public fLessThreshold As Integer = 30
         Public Sub New()
-            Select Case task.workRes.Width
-                Case 960
-                    fLessThreshold = 50
-            End Select
+            ' high resolution cameras need a higher threshold (but real high will use correlation.)
+            If task.workRes.Width >= 960 Then fLessThreshold = 50
             If sliders.Setup(traceName) Then sliders.setupTrackBar("Grid Range Threshold", 0, 255, fLessThreshold)
         End Sub
         Public Sub Run()
             Static gridSlider = FindSlider("Grid Range Threshold")
             fLessThreshold = gridSlider.value
+        End Sub
+    End Class
+
+
+
+
+    Public Class Options_DiffDepth : Inherits OptionParent
+        Public millimeters As Integer
+        Public meters As Double
+        Public Sub New()
+            If sliders.Setup(traceName) Then sliders.setupTrackBar("Depth varies more than X mm's", 1, 2000, 1000)
+        End Sub
+        Public Sub Run()
+            Static mmSlider = OptionParent.FindSlider("Depth varies more than X mm's")
+            millimeters = mmSlider.value
+            meters = millimeters / 1000
         End Sub
     End Class
 End Namespace

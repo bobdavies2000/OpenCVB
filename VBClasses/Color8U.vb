@@ -414,7 +414,7 @@ Namespace VBClasses
         Public brickList As New List(Of brickData)
         Public Sub New()
             If standalone Then task.gOptions.displayDst0.Checked = True
-            desc = "Attach a color8u class to each r."
+            desc = "Attach a color8u class to each brick."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             bricks.run(src)
@@ -424,10 +424,10 @@ Namespace VBClasses
 
             Dim count As Integer
             dst1.SetTo(0)
-            For Each r As brickData In bricks.brickList
-                If r.rRect.Width > 0 Then
-                    dst2(r.lRect).CopyTo(dst1(r.rRect))
-                    r.colorClass = color8u.dst2.Get(Of Byte)
+            For Each brick As brickData In bricks.brickList
+                If brick.rRect.Width > 0 Then
+                    dst2(brick.lRect).CopyTo(dst1(brick.rRect))
+                    brick.colorClass = color8u.dst2.Get(Of Byte)
                     count += 1
                 End If
             Next

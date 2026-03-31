@@ -16,8 +16,8 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             bricks.run(src)
             dst1.SetTo(0)
-            For Each r In bricks.brickList
-                dst1(r.rect).SetTo((r.correlation + 1) * 127)
+            For Each brick In bricks.brickList
+                dst1(brick.rect).SetTo((brick.correlation + 1) * 127)
             Next
 
             dst0 = dst1.Threshold(0, 255, cv.ThresholdTypes.Binary)

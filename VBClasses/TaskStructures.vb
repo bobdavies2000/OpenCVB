@@ -266,8 +266,8 @@ Namespace VBClasses
             Public lRect As New cv.Rect ' Intel RealSense camera use this. They don't align left and color automatically.
             Public rRect As New cv.Rect ' The rect in the right image matching the left image rect.
 
-            Public mm As mmData ' min and max values of the depth data.
-            Public mmDepth As mmData
+            Public mm As mmData ' min and max values of the grayscale data.
+            Public mmDepth As mmData ' min and max values of the depth data.
 
             Public rect As cv.Rect ' rectange under the cursor in the color image.
             Public Function displayCell() As String
@@ -639,18 +639,22 @@ Namespace VBClasses
                 If contour IsNot Nothing Then
                     strout += "Contour count = " + CStr(contour.Count) + vbCrLf
                 End If
-                strout += "DepthDelta (mm's) = " + Format(CInt(depthDelta * 1000), "00") + vbCrLf
-                strout += "Hull count = " + If(hull Is Nothing, "0", CStr(hull.Count)) + vbCrLf
-                strout += "index = " + CStr(index) + vbCrLf
-                strout += "MaxDist = " + CStr(maxDist.X) + "," + CStr(maxDist.Y) + vbCrLf
-                strout += "Multi-Mask flag = " + CStr(multiMask) + vbCrLf
-                strout += "Pixel count = " + CStr(pixels) + vbCrLf
-                strout += "Rect: X = " + CStr(rect.X) + ", Y = " + CStr(rect.Y) + ", "
-                strout += "width = " + CStr(rect.Width) + ", height = " + CStr(rect.Height) + vbCrLf
-                strout += "World Coordinates = " + Format(wcMean(0), fmt3) + " " +
-                                                   Format(wcMean(1), fmt3) + " " +
-                                                   Format(wcMean(2), fmt3) + vbCrLf
-                strout += "World Grid coordinates = " + CStr(wGrid.X) + ", " + CStr(wGrid.Y) + vbCrLf
+                If Single.IsNaN(depthDelta) = False Then
+                    strout += "DepthDelta (mm's) = " + Format(CInt(depthDelta * 1000), "00") + vbCrLf
+                    strout += "Hull count = " + If(hull Is Nothing, "0", CStr(hull.Count)) + vbCrLf
+                    strout += "index = " + CStr(index) + vbCrLf
+                    strout += "MaxDist = " + CStr(maxDist.X) + "," + CStr(maxDist.Y) + vbCrLf
+                    strout += "Multi-Mask flag = " + CStr(multiMask) + vbCrLf
+                    strout += "Pixel count = " + CStr(pixels) + vbCrLf
+                    strout += "Rect: X = " + CStr(rect.X) + ", Y = " + CStr(rect.Y) + ", "
+                    strout += "width = " + CStr(rect.Width) + ", height = " + CStr(rect.Height) + vbCrLf
+                    strout += "World Coordinates = " + Format(wcMean(0), fmt3) + " " +
+                                                       Format(wcMean(1), fmt3) + " " +
+                                                       Format(wcMean(2), fmt3) + vbCrLf
+                    strout += "World Grid coordinates = " + CStr(wGrid.X) + ", " + CStr(wGrid.Y) + vbCrLf
+                Else
+                    strout = "The depth data for this cell is NaN. StereoLabs specific problem."
+                End If
 
                 Return strout
             End Function

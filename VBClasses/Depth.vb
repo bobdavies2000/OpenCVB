@@ -1274,9 +1274,9 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             bricks.Run(src)
             dst1.SetTo(0)
-            For Each r In bricks.brickList
-                Dim testError = ErrorEstimate(r.depth)
-                dst1(r.rect).SetTo(testError)
+            For Each brick In bricks.brickList
+                Dim testError = ErrorEstimate(brick.depth)
+                dst1(brick.rect).SetTo(testError)
             Next
 
             Dim mm = GetMinMax(dst1)
@@ -1309,11 +1309,11 @@ Namespace VBClasses
 
             dst1 = src.Clone()
             dst1.SetTo(white, task.gridMask)
-            For Each r In bricks.brickList
-                Dim pt = r.mm.minLoc
-                subdiv.Insert(New cv.Point(pt.X + r.rect.X, pt.Y + r.rect.Y))
-                DrawCircle(dst1(r.rect), r.mm.minLoc, task.DotSize, cv.Scalar.Red)
-                DrawCircle(dst1(r.rect), r.mm.maxLoc, task.DotSize, cv.Scalar.Blue)
+            For Each brick In bricks.brickList
+                Dim pt = brick.mm.minLoc
+                subdiv.Insert(New cv.Point(pt.X + brick.rect.X, pt.Y + brick.rect.Y))
+                DrawCircle(dst1(brick.rect), brick.mm.minLoc, task.DotSize, cv.Scalar.Red)
+                DrawCircle(dst1(brick.rect), brick.mm.maxLoc, task.DotSize, cv.Scalar.Blue)
             Next
 
             If task.optionsChanged Then dst2 = dst1.Clone Else dst1.CopyTo(dst2, task.motion.motionMask)

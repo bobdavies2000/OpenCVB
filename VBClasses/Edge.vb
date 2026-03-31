@@ -1530,13 +1530,13 @@ Namespace VBClasses
             dst3 = edgesLR.dst3
 
             Dim count As Integer
-            For Each r In bricks.brickList
-                If r.depth = 0 Then Continue For
-                If r.rRect.X < 0 Or r.rRect.X + r.rRect.Width >= dst2.Width Then Continue For
-                If r.rRect.Width = 0 Or r.rRect.Height = 0 Then Continue For
-                If dst2(r.lRect).CountNonZero And dst3(r.rRect).CountNonZero Then
-                    dst2.Rectangle(r.lRect, white, task.lineWidth)
-                    dst3.Rectangle(r.rRect, white, task.lineWidth)
+            For Each brick In bricks.brickList
+                If brick.depth = 0 Then Continue For
+                If brick.rRect.X < 0 Or brick.rRect.X + brick.rRect.Width >= dst2.Width Then Continue For
+                If brick.rRect.Width = 0 Or brick.rRect.Height = 0 Then Continue For
+                If dst2(brick.lRect).CountNonZero And dst3(brick.rRect).CountNonZero Then
+                    dst2.Rectangle(brick.lRect, white, task.lineWidth)
+                    dst3.Rectangle(brick.rRect, white, task.lineWidth)
                     count += 1
                 End If
             Next
