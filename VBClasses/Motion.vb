@@ -381,7 +381,7 @@ Namespace VBClasses
 
 
 
-    Public Class Motion_Cloud : Inherits TaskParent
+    Public Class Motion_CloudGrid : Inherits TaskParent
         Public motionSort As New List(Of Integer)
         Dim options As New Options_MotionCloud
         Public Sub New()
@@ -394,7 +394,7 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
 
-            ' assume the disparity can be off by 0.25 pixels
+            ' assume the disparity can be off by options.pixelError pixels
             Dim disparityCoefficient = options.pixelError / (task.calibData.baseline * task.calibData.leftIntrinsics.fx)
 
             Static lastDepth As cv.Mat = task.pcSplit(2).Clone
@@ -435,4 +435,43 @@ Namespace VBClasses
             labels(2) = "PointCloud grid rects with motion: " + CStr(motionSort.Count)
         End Sub
     End Class
+
+
+
+
+
+    Public Class Motion_CloudPixel : Inherits TaskParent
+        Dim options As New Options_MotionCloud
+        Dim optionsAccum As New Options_AddWeighted
+        Public Sub New()
+            dst0 = New cv.Mat(dst0.Size, cv.MatType.CV_32F, 0)
+            desc = "Find pixels whose variability exceeds the error estimate."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            options.Run()
+
+            Static lastDepth As cv.Mat = task.pcSplit(2).Clone
+
+            ' assume the disparity can be off by options.pixelError pixels
+            Dim disparityCoefficient As Single = options.pixelError / (task.calibData.baseline * task.calibData.leftIntrinsics.fx)
+
+            Dim errorMat As New cv.Mat
+            cv.Cv2.Multiply(task.pcSplit(2), task.pcSplit(2), errorMat)
+            errorMat *= disparityCoefficient
+
+            Dim depthDelta As New cv.Mat
+            cv.Cv2.Absdiff(task.pcSplit(2), lastDepth, depthDelta)
+
+            Dim errorMask As New cv.Mat
+            cv.Cv2.Subtract(depthDelta, errorMat, errorMask)
+            dst1 = errorMask.Threshold(0, 255, cv.ThresholdTypes.Binary)
+
+            cv.Cv2.AccumulateWeighted(dst1, dst0, optionsAccum.accumWeighted, New cv.Mat)
+            dst0.ConvertTo(dst2, cv.MatType.CV_8U)
+            dst2 = dst2.Threshold(0, 255, cv.ThresholdTypes.Binary)
+
+            lastDepth = task.pcSplit(2).Clone
+        End Sub
+    End Class
+
 End Namespace

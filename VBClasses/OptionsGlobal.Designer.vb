@@ -48,6 +48,7 @@ Partial Class OptionsGlobal
         DebugSliderLabel = New Label()
         DebugCheckBox = New CheckBox()
         GroupBox2 = New GroupBox()
+        UsePointCloudMotion = New CheckBox()
         UseMotionMask = New CheckBox()
         TruncateDepth = New CheckBox()
         gravityPointCloud = New CheckBox()
@@ -334,6 +335,7 @@ Partial Class OptionsGlobal
         ' 
         ' GroupBox2
         ' 
+        GroupBox2.Controls.Add(UsePointCloudMotion)
         GroupBox2.Controls.Add(UseMotionMask)
         GroupBox2.Controls.Add(TruncateDepth)
         GroupBox2.Controls.Add(gravityPointCloud)
@@ -349,6 +351,17 @@ Partial Class OptionsGlobal
         GroupBox2.TabIndex = 2
         GroupBox2.TabStop = False
         GroupBox2.Text = "Miscellaneous Globals"
+        ' 
+        ' UsePointCloudMotion
+        ' 
+        UsePointCloudMotion.AutoSize = True
+        UsePointCloudMotion.Location = New Point(15, 227)
+        UsePointCloudMotion.Margin = New Padding(3, 4, 3, 4)
+        UsePointCloudMotion.Name = "UsePointCloudMotion"
+        UsePointCloudMotion.Size = New Size(301, 34)
+        UsePointCloudMotion.TabIndex = 10
+        UsePointCloudMotion.Text = "Remove Pointcloud Motion"
+        UsePointCloudMotion.UseVisualStyleBackColor = True
         ' 
         ' UseMotionMask
         ' 
@@ -366,13 +379,14 @@ Partial Class OptionsGlobal
         ' TruncateDepth
         ' 
         TruncateDepth.AutoSize = True
-        TruncateDepth.Location = New Point(15, 230)
+        TruncateDepth.Location = New Point(295, 302)
         TruncateDepth.Margin = New Padding(3, 4, 3, 4)
         TruncateDepth.Name = "TruncateDepth"
         TruncateDepth.Size = New Size(314, 34)
         TruncateDepth.TabIndex = 9
         TruncateDepth.Text = "Truncate depth at MaxDepth"
         TruncateDepth.UseVisualStyleBackColor = True
+        TruncateDepth.Visible = False
         ' 
         ' gravityPointCloud
         ' 
@@ -625,4 +639,5 @@ Partial Class OptionsGlobal
     Friend WithEvents PaintFrequencyLabel As Label
     Friend WithEvents Label9 As Label
     Friend WithEvents ShowSplash As CheckBox
+    Friend WithEvents UsePointCloudMotion As CheckBox
 End Class

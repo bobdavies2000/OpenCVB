@@ -772,6 +772,7 @@ Namespace VBClasses
 
     Public Class Cloud_Gravity_TA : Inherits TaskParent
         Public originalPointcloud As cv.Mat
+        Public motionCloud As New Motion_CloudGrid
         Public Sub New()
             desc = "Rebuild the point cloud with knowledge of gravity (if the option is requested.)"
         End Sub
@@ -794,6 +795,15 @@ Namespace VBClasses
         End Function
         Public Overrides Sub RunAlg(src As cv.Mat)
             originalPointcloud = task.pointCloud.Clone
+
+            If task.gOptions.UsePointCloudMotion.Checked Then
+                motionCloud.Run(src)
+
+                task.pointCloud.SetTo(0, motionCloud.dst2)
+                task.pcSplit(2).SetTo(0, motionCloud.dst2)
+                task.depthmask.SetTo(0, motionCloud.dst2)
+                task.noDepthMask.SetTo(255, motionCloud.dst2)
+            End If
 
             If task.optionsChanged Then
                 If task.rangesCloud Is Nothing Then

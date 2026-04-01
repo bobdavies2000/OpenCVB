@@ -154,6 +154,7 @@ Depth_Tiers
 Depth_World
 Depth_WorldXYZ
 DepthColorizer_Basics_TA
+DepthColorizer_CloudPixels
 DepthColorizer_CPP
 DepthColorizer_Mean
 DepthLine_Basics_TA
@@ -499,7 +500,8 @@ ML_FeatureLess_Grid
 ML_RemoveDups_CPP
 Moments_Basics
 Motion_Basics_TA
-Motion_Cloud
+Motion_CloudGrid
+Motion_CloudPixel
 Motion_Correlation
 Motion_CorrelationToLast
 Motion_Left

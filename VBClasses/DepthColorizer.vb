@@ -4,6 +4,7 @@ Namespace VBClasses
     Public Class DepthColorizer_Basics_TA : Inherits TaskParent
         Implements IDisposable
         Public Sub New()
+            cPtr = Depth_Colorizer_Open()
             Dim gradientWidth = Math.Min(dst2.Width, 256)
             Dim f As Double = 1.0
             If saveVecColors.Count = 1 Then
@@ -58,7 +59,6 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             If task.gOptions.displayDst1.Checked = False Or standaloneTest() Then
-                If cPtr = 0 Then cPtr = Depth_Colorizer_Open()
                 Dim depthData(task.pcSplit(2).Total - 1) As Single
                 task.pcSplit(2).GetArray(Of Single)(depthData)
                 Dim handleSrc = GCHandle.Alloc(depthData, GCHandleType.Pinned)
@@ -132,6 +132,36 @@ Namespace VBClasses
             dst3 = avg.dst2
             colorize.Run(dst3)
             dst2 = colorize.dst2
+        End Sub
+    End Class
+
+
+
+
+    Public Class DepthColorizer_CloudPixels : Inherits TaskParent
+        Dim motionCloud As New Motion_CloudPixel
+        Public Sub New()
+            cPtr = Depth_Colorizer_Open()
+            labels = {"", "", "Mask of unstable cloud pixels", "Colorized depth after removing unstable pixels."}
+            desc = "Show the depth colorizer output after removing the unstable pixels."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            motionCloud.Run(emptyMat)
+            dst2 = motionCloud.dst2
+
+            dst1 = task.pcSplit(2)
+            dst1.SetTo(0, dst2)
+
+            Dim depthData(task.pcSplit(2).Total - 1) As Single
+            task.pcSplit(2).GetArray(Of Single)(depthData)
+            Dim handleSrc = GCHandle.Alloc(depthData, GCHandleType.Pinned)
+            Dim imagePtr = Depth_Colorizer_Run(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, task.MaxZmeters)
+            handleSrc.Free()
+
+            If imagePtr <> 0 Then dst3 = cv.Mat.FromPixelData(src.Rows, src.Cols, cv.MatType.CV_8UC3, imagePtr)
+        End Sub
+        Protected Overrides Sub Finalize()
+            If cPtr <> 0 Then cPtr = Depth_Colorizer_Close(cPtr)
         End Sub
     End Class
 End Namespace

@@ -8213,7 +8213,7 @@ Namespace VBClasses
     Public Class Options_MotionCloud : Inherits OptionParent
         Public pixelError As Double
         Public Sub New()
-            If sliders.Setup(traceName) Then sliders.setupTrackBar("Pixel Error (X100)", 0, 100, 75)
+            If sliders.Setup(traceName) Then sliders.setupTrackBar("Pixel Error (X100)", 0, 200, 100)
         End Sub
         Public Sub Run()
             Static pixelSlider = FindSlider("Pixel Error (X100)")

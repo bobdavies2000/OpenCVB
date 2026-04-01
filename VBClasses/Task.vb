@@ -67,9 +67,6 @@ Namespace VBClasses
             readyForCameraInput = True
             task.clickPoint = New cv.Point(CInt(workRes.Width / 2), CInt(workRes.Height / 2))
 
-            ' assume the disparity can be off by 0.25 pixels
-            task.disparityCoefficient = 0.25 / (task.calibData.baseline * task.calibData.leftIntrinsics.fx)
-
             task.gOptions.PaintFreqSlider.Value = paintFreq
             Options_PointCloud.setupCalcHist()
             Debug.WriteLine(vbCrLf + vbCrLf + vbCrLf + "Starting algorithm " + settings.algorithm)
@@ -130,9 +127,6 @@ Namespace VBClasses
                 motion.Run(gray)
             End If
 
-            cloudGravity.Run(emptyMat) '******* this may rotate for gravity if gravity is selected *******
-            colorizer.Run(src)
-
             If feat IsNot Nothing Then feat.Run(src)
 
             If vbc.task.pixelViewerOn Then
@@ -170,6 +164,9 @@ Namespace VBClasses
                     End If
                 End If
             End If
+
+            cloudGravity.Run(emptyMat) '******* this may rotate for gravity if gravity is selected *******
+            colorizer.Run(src)
 
             gravityBasics.Run(src.Clone)
             lines.motionMask = motion.motionMask
@@ -230,6 +227,8 @@ Namespace VBClasses
                         dstList(0).Rectangle(gridRects(mIndex), cv.Scalar.White, lineWidth)
                     Next
                 End If
+            Else
+                task.motionCloud = Nothing
             End If
 
 
