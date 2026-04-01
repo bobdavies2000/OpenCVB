@@ -387,7 +387,6 @@ Namespace VBClasses
         Public Sub New()
             If standalone Then task.gOptions.showMotionMask.Checked = True
 
-            task.motionCloud = Me
             dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 255)
             desc = "Find all the grid rects that had motion since the last frame."
         End Sub
@@ -440,15 +439,17 @@ Namespace VBClasses
 
 
 
-    Public Class Motion_CloudPixel : Inherits TaskParent
+    Public Class Motion_CloudPixel_TA : Inherits TaskParent
         Dim options As New Options_MotionCloud
         Dim optionsAccum As New Options_AddWeighted
         Public Sub New()
             dst0 = New cv.Mat(dst0.Size, cv.MatType.CV_32F, 0)
+            OptionParent.FindSlider("Accumulation weight of each image X100").Value = 50
             desc = "Find pixels whose variability exceeds the error estimate."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
+            optionsAccum.Run()
 
             Static lastDepth As cv.Mat = task.pcSplit(2).Clone
 
@@ -462,11 +463,11 @@ Namespace VBClasses
             Dim depthDelta As New cv.Mat
             cv.Cv2.Absdiff(task.pcSplit(2), lastDepth, depthDelta)
 
-            Dim errorMask As New cv.Mat
-            cv.Cv2.Subtract(depthDelta, errorMat, errorMask)
-            dst1 = errorMask.Threshold(0, 255, cv.ThresholdTypes.Binary)
+            cv.Cv2.Subtract(depthDelta, errorMat, dst2)
+            dst2 = dst2.Threshold(0, 255, cv.ThresholdTypes.Binary)
+            ' dst2.ConvertTo(dst2, cv.MatType.CV_8U)
 
-            cv.Cv2.AccumulateWeighted(dst1, dst0, optionsAccum.accumWeighted, New cv.Mat)
+            cv.Cv2.AccumulateWeighted(dst2, dst0, optionsAccum.accumWeighted, New cv.Mat)
             dst0.ConvertTo(dst2, cv.MatType.CV_8U)
             dst2 = dst2.Threshold(0, 255, cv.ThresholdTypes.Binary)
 

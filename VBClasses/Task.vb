@@ -40,6 +40,7 @@ Namespace VBClasses
             gravityBasics = New Gravity_Basics_TA
             imuBasics = New IMU_Basics_TA
             motion = New Motion_Basics_TA
+            motionCloud = New Motion_CloudPixel_TA
             cloudGravity = New Cloud_Gravity_TA
             grid = New Grid_Basics_TA
             lines = New Line_Basics_TA
@@ -166,6 +167,14 @@ Namespace VBClasses
             End If
 
             cloudGravity.Run(emptyMat) '******* this may rotate for gravity if gravity is selected *******
+            If gOptions.RemovePointCloudMotion.Checked Then
+                motionCloud.Run(src)
+
+                pointCloud.SetTo(0, motionCloud.dst2)
+                pcSplit = pointCloud.Split()
+                depthmask.SetTo(0, motionCloud.dst2)
+                noDepthMask = Not depthmask
+            End If
             colorizer.Run(src)
 
             gravityBasics.Run(src.Clone)
@@ -218,17 +227,10 @@ Namespace VBClasses
 
             If gOptions.ShowGrid.Checked Then dstList(2).SetTo(cv.Scalar.White, gridMask)
             If gOptions.showMotionMask.Checked Then
-                If task.motionCloud IsNot Nothing Then ' motion cloud contains all the RGB motion as well.
-                    For Each mIndex In task.motionCloud.motionSort
-                        dstList(0).Rectangle(gridRects(mIndex), cv.Scalar.White, lineWidth)
-                    Next
-                Else
-                    For Each mIndex In motion.motionSort
-                        dstList(0).Rectangle(gridRects(mIndex), cv.Scalar.White, lineWidth)
-                    Next
-                End If
-            Else
-                task.motionCloud = Nothing
+                ' motion cloud contains all the RGB motion as well.
+                For Each mIndex In motion.motionSort
+                    dstList(0).Rectangle(gridRects(mIndex), cv.Scalar.White, lineWidth)
+                Next
             End If
 
 

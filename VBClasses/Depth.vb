@@ -899,7 +899,7 @@ Namespace VBClasses
 
     Public Class NR_Depth_StableAverage : Inherits TaskParent
         Dim dAvg As New DepthColorizer_Mean
-        Dim extrema As New Depth_StableMinMax
+        Dim extrema As New NR_Depth_StableMinMax
         Public Sub New()
             OptionParent.findRadio("Use farthest distance").Checked = True
             desc = "Use Depth_StableMax to remove the artifacts from the depth averaging"
@@ -924,41 +924,7 @@ Namespace VBClasses
 
 
 
-
-
-    Public Class Depth_StableMin : Inherits TaskParent
-        Public stableMin As cv.Mat
-        Dim colorize As New DepthColorizer_CPP
-        Public Sub New()
-            labels = {"", "", "InRange depth with low quality depth removed.", "Motion in the BGR image. Depth updated in rectangle."}
-            desc = "To reduce z-Jitter, use the closest depth value at each pixel as long as the camera is stable"
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            If src.Type <> cv.MatType.CV_32FC1 Then src = task.pcSplit(2)
-
-            If task.heartBeat Then
-                stableMin = src.Clone
-                dst3.SetTo(0)
-            Else
-                src.CopyTo(stableMin, task.motion.motionMask)
-                If src.Type <> stableMin.Type Then src.ConvertTo(src, stableMin.Type)
-                stableMin.CopyTo(src, task.noDepthMask)
-                cv.Cv2.Min(src, stableMin, stableMin)
-            End If
-
-            colorize.Run(stableMin)
-            dst2 = colorize.dst2
-        End Sub
-    End Class
-
-
-
-
-
-
-
-
-    Public Class Depth_StableMinMax : Inherits TaskParent
+    Public Class NR_Depth_StableMinMax : Inherits TaskParent
         Dim colorize As New DepthColorizer_CPP
         Public dMin As New Depth_StableMin
         Public dMax As New Depth_StableMax
@@ -1045,35 +1011,6 @@ Namespace VBClasses
         End Sub
     End Class
 
-
-
-
-
-
-
-    Public Class Depth_StableMax : Inherits TaskParent
-        Public stableMax As cv.Mat
-        Dim colorize As New DepthColorizer_CPP
-        Public Sub New()
-            labels = {"", "", "InRange depth with low quality depth removed.", ""}
-            desc = "To reduce z-Jitter, use the farthest depth value at each pixel as long as the camera is stable"
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            If src.Type <> cv.MatType.CV_32FC1 Then src = task.pcSplit(2)
-
-            If task.heartBeat Then
-                stableMax = src.Clone
-            Else
-                src.CopyTo(stableMax, task.motion.motionMask)
-                If src.Type <> stableMax.Type Then src.ConvertTo(src, stableMax.Type)
-                stableMax.CopyTo(src, task.noDepthMask)
-                cv.Cv2.Min(src, stableMax, stableMax)
-            End If
-
-            colorize.Run(stableMax)
-            dst2 = colorize.dst2
-        End Sub
-    End Class
 
 
 
@@ -1502,4 +1439,117 @@ Namespace VBClasses
         End Sub
     End Class
 
+
+
+
+
+
+
+    Public Class Depth_StableMax : Inherits TaskParent
+        Public stableMax As cv.Mat
+        Dim colorize As New DepthColorizer_CPP
+        Public Sub New()
+            labels = {"", "", "InRange depth with low quality depth removed.", ""}
+            desc = "To reduce z-Jitter, use the farthest depth value at each pixel as long as the camera is stable"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            If src.Type <> cv.MatType.CV_32FC1 Then src = task.pcSplit(2)
+
+            If task.heartBeat Then
+                stableMax = src.Clone
+            Else
+                src.CopyTo(stableMax, task.motion.motionMask)
+                If src.Type <> stableMax.Type Then src.ConvertTo(src, stableMax.Type)
+                stableMax.CopyTo(src, task.noDepthMask)
+                cv.Cv2.Min(src, stableMax, stableMax)
+            End If
+
+            colorize.Run(stableMax)
+            dst2 = colorize.dst2
+        End Sub
+    End Class
+
+
+
+
+
+
+    Public Class Depth_StableMin : Inherits TaskParent
+        Public stableMin As cv.Mat
+        Dim colorize As New DepthColorizer_CPP
+        Public Sub New()
+            labels = {"", "", "InRange depth with low quality depth removed.", "Motion in the BGR image. Depth updated in rectangle."}
+            desc = "To reduce z-Jitter, use the closest depth value at each pixel as long as the camera is stable"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            If src.Type <> cv.MatType.CV_32FC1 Then src = task.pcSplit(2)
+
+            If task.heartBeat Then
+                stableMin = src.Clone
+                dst3.SetTo(0)
+            Else
+                src.CopyTo(stableMin, task.motion.motionMask)
+                If src.Type <> stableMin.Type Then src.ConvertTo(src, stableMin.Type)
+                stableMin.CopyTo(src, task.noDepthMask)
+                cv.Cv2.Min(src, stableMin, stableMin)
+            End If
+
+            colorize.Run(stableMin)
+            dst2 = colorize.dst2
+        End Sub
+    End Class
+
+
+
+
+
+    Public Class Depth_StableMaxAccum : Inherits TaskParent
+        Public stableMax As cv.Mat
+        Dim colorize As New DepthColorizer_CPP
+        Public Sub New()
+            task.gOptions.RemovePointCloudMotion.Checked = True
+            labels = {"", "", "InRange depth with low quality depth removed.", "Motion in the BGR image. Depth updated in rectangle."}
+            desc = "Accumulate the farthest depth value at each pixel"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            If task.optionsChanged Then stableMax = task.pcSplit(2).Clone
+
+            task.pcSplit(2).CopyTo(stableMax, task.motionCloud.dst2)
+            cv.Cv2.Max(task.pcSplit(2), stableMax, stableMax)
+
+            colorize.Run(stableMax)
+            dst2 = colorize.dst2
+        End Sub
+    End Class
+
+
+
+
+
+    Public Class Depth_StableMinAccum : Inherits TaskParent
+        Public stableMin As cv.Mat
+        Dim colorize As New DepthColorizer_CPP
+        Public Sub New()
+            task.gOptions.RemovePointCloudMotion.Checked = True
+            labels = {"", "", "InRange depth with low quality depth removed.", "Motion in the BGR image. Depth updated in rectangle."}
+            desc = "Accumulate the farthest depth value at each pixel"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            If task.optionsChanged Then
+                stableMin = task.pcSplit(2).Clone
+                dst1 = stableMin.Clone
+            End If
+
+            Static lastDepthMask As cv.Mat = task.noDepthMask.Clone
+            task.pcSplit(2).CopyTo(stableMin, lastDepthMask) ' preserve that depth where there was no depth last frame.
+            task.pcSplit(2).CopyTo(stableMin, task.motionCloud.dst2)
+
+            cv.Cv2.Min(task.pcSplit(2), stableMin, stableMin)
+
+            colorize.Run(stableMin)
+            dst2 = colorize.dst2
+
+            lastDepthMask = task.noDepthMask.Clone
+        End Sub
+    End Class
 End Namespace

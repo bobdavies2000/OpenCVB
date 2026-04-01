@@ -125,4 +125,16 @@ Namespace VBClasses
             dst2 = ShowAddweighted(task.rightView, task.leftView, labels(2))
         End Sub
     End Class
+
+
+
+
+    Public Class AddWeighted_MaxDepth : Inherits TaskParent
+        Public Sub New()
+            desc = "Accumulate the maximum depth value at each pixel."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+        End Sub
+    End Class
+
 End Namespace

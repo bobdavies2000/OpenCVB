@@ -139,15 +139,14 @@ Namespace VBClasses
 
 
     Public Class DepthColorizer_CloudPixels : Inherits TaskParent
-        Dim motionCloud As New Motion_CloudPixel
         Public Sub New()
             cPtr = Depth_Colorizer_Open()
             labels = {"", "", "Mask of unstable cloud pixels", "Colorized depth after removing unstable pixels."}
             desc = "Show the depth colorizer output after removing the unstable pixels."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            motionCloud.Run(emptyMat)
-            dst2 = motionCloud.dst2
+            If task.gOptions.RemovePointCloudMotion.Checked = False Then task.motionCloud.Run(src)
+            dst2 = task.motionCloud.dst2
 
             dst1 = task.pcSplit(2)
             dst1.SetTo(0, dst2)

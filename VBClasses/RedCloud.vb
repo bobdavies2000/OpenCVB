@@ -588,14 +588,14 @@ Namespace VBClasses
     Public Class RedCloud_MotionFilter : Inherits TaskParent
         Dim redC As New RedCloud_Basics
         Public rcList As New List(Of rcData)
-        Public rcMap As New cv.Mat
-        Dim motionCloud As New Motion_CloudGrid
+        Public rcMap As New cv.Mat(dst2.Size, cv.MatType.CV_32S, 0)
         Public Sub New()
+            task.gOptions.RemovePointCloudMotion.Checked = True
             dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
             desc = "Filter changes to the RedCloud cells with motion."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            motionCloud.Run(emptyMat)
+            task.gOptions.RemovePointCloudMotion.Checked = True
 
             redC.Run(src)
             dst2 = redC.dst2
@@ -603,7 +603,7 @@ Namespace VBClasses
 
             redC.rcMap.ConvertTo(dst0, cv.MatType.CV_8U)
             dst1.SetTo(0)
-            dst0.CopyTo(dst1, motionCloud.dst2)
+            dst0.CopyTo(dst1, task.motionCloud.dst2)
 
             Dim histogram As New cv.Mat
             Dim ranges() As cv.Rangef = New cv.Rangef() {New cv.Rangef(0, redC.rcList.Count + 1)}
@@ -616,15 +616,22 @@ Namespace VBClasses
             Dim histArray(histogram.Rows - 1) As Single
             histogram.GetArray(Of Single)(histArray)
 
-            If task.heartBeat Then
-                dst3 = redC.dst2.Clone
-                rcMap = redC.rcMap.Clone
-            End If
+            Dim rcMotionCells As New List(Of Integer)
             For i = 1 To histArray.Count - 1
-                If histArray(i) > 0 Then
-                    Dim rc = redC.rcList(i - 1)
-                    dst3(rc.rect).SetTo(rc.color, rc.mask)
-                    rcMap(rc.rect).SetTo(rc.index, rc.mask)
+                Dim rc = redC.rcList(i - 1)
+                If histArray(i) > rc.pixels / 10 Then rcMotionCells.Add(i)
+            Next
+
+            dst3.SetTo(0)
+            rcMap.SetTo(0)
+            rcList.Clear()
+            For Each rc In redC.rcList
+                If rc.age > 1 Then
+                    If rcMotionCells.Contains(rc.index) = False Then
+                        dst3(rc.rect).SetTo(rc.color, rc.mask)
+                        rcMap(rc.rect).SetTo(rc.index, rc.mask)
+                        rcList.Add(rc)
+                    End If
                 End If
             Next
         End Sub

@@ -1,5 +1,6 @@
 AddWeighted_Accumulate
 AddWeighted_Basics
+AddWeighted_MaxDepth
 Annealing_Basics_CPP
 ApproxPoly_Basics
 AsciiArt_Basics
@@ -147,8 +148,9 @@ Depth_ReliableLines
 Depth_Smoothing
 Depth_SmoothingMat
 Depth_StableMax
+Depth_StableMaxAccum
 Depth_StableMin
-Depth_StableMinMax
+Depth_StableMinAccum
 Depth_TierCount
 Depth_Tiers
 Depth_World
@@ -501,7 +503,7 @@ ML_RemoveDups_CPP
 Moments_Basics
 Motion_Basics_TA
 Motion_CloudGrid
-Motion_CloudPixel
+Motion_CloudPixel_TA
 Motion_Correlation
 Motion_CorrelationToLast
 Motion_Left
@@ -746,6 +748,7 @@ NR_Depth_PunchIncreasing
 NR_Depth_Regions
 NR_Depth_RGBShadow
 NR_Depth_StableAverage
+NR_Depth_StableMinMax
 NR_Depth_Uncertainty
 NR_Depth_WorldXYMT
 NR_DepthLine_Common
