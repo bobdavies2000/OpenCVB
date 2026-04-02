@@ -480,4 +480,28 @@ Namespace VBClasses
             dst3 = Palettize(dst2, 0)
         End Sub
     End Class
+
+
+
+
+    Public Class RedPrep_Motion : Inherits TaskParent
+        Dim prep As New RedPrep_Basics
+        Public Sub New()
+            If standalone Then task.gOptions.displayDst1.Checked = True
+            task.gOptions.BuildPointCloudMotion.Checked = True
+            desc = "Compare the RedPrep_Basics output and the motion cloud mask."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            prep.Run(src)
+            dst2 = prep.dst2
+            labels(2) = prep.labels(2)
+
+            dst3 = task.motionCloud.dst2
+
+            dst1 = dst2.Clone
+            dst1.SetTo(0, dst3)
+
+            dst0 = dst3 And dst2
+        End Sub
+    End Class
 End Namespace

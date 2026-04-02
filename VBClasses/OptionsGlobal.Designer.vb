@@ -48,7 +48,7 @@ Partial Class OptionsGlobal
         DebugSliderLabel = New Label()
         DebugCheckBox = New CheckBox()
         GroupBox2 = New GroupBox()
-        RemovePointCloudMotion = New CheckBox()
+        BuildPointCloudMotion = New CheckBox()
         UseMotionMask = New CheckBox()
         TruncateDepth = New CheckBox()
         gravityPointCloud = New CheckBox()
@@ -335,7 +335,7 @@ Partial Class OptionsGlobal
         ' 
         ' GroupBox2
         ' 
-        GroupBox2.Controls.Add(RemovePointCloudMotion)
+        GroupBox2.Controls.Add(BuildPointCloudMotion)
         GroupBox2.Controls.Add(UseMotionMask)
         GroupBox2.Controls.Add(TruncateDepth)
         GroupBox2.Controls.Add(gravityPointCloud)
@@ -352,16 +352,16 @@ Partial Class OptionsGlobal
         GroupBox2.TabStop = False
         GroupBox2.Text = "Miscellaneous Globals"
         ' 
-        ' RemovePointCloudMotion
+        ' BuildPointCloudMotion
         ' 
-        RemovePointCloudMotion.AutoSize = True
-        RemovePointCloudMotion.Location = New Point(15, 227)
-        RemovePointCloudMotion.Margin = New Padding(3, 4, 3, 4)
-        RemovePointCloudMotion.Name = "RemovePointCloudMotion"
-        RemovePointCloudMotion.Size = New Size(301, 34)
-        RemovePointCloudMotion.TabIndex = 10
-        RemovePointCloudMotion.Text = "Remove Pointcloud Motion"
-        RemovePointCloudMotion.UseVisualStyleBackColor = True
+        BuildPointCloudMotion.AutoSize = True
+        BuildPointCloudMotion.Location = New Point(15, 227)
+        BuildPointCloudMotion.Margin = New Padding(3, 4, 3, 4)
+        BuildPointCloudMotion.Name = "BuildPointCloudMotion"
+        BuildPointCloudMotion.Size = New Size(270, 34)
+        BuildPointCloudMotion.TabIndex = 10
+        BuildPointCloudMotion.Text = "Build Pointcloud Motion"
+        BuildPointCloudMotion.UseVisualStyleBackColor = True
         ' 
         ' UseMotionMask
         ' 
@@ -639,5 +639,5 @@ Partial Class OptionsGlobal
     Friend WithEvents PaintFrequencyLabel As Label
     Friend WithEvents Label9 As Label
     Friend WithEvents ShowSplash As CheckBox
-    Friend WithEvents RemovePointCloudMotion As CheckBox
+    Friend WithEvents BuildPointCloudMotion As CheckBox
 End Class

@@ -590,12 +590,12 @@ Namespace VBClasses
         Public rcList As New List(Of rcData)
         Public rcMap As New cv.Mat(dst2.Size, cv.MatType.CV_32S, 0)
         Public Sub New()
-            task.gOptions.RemovePointCloudMotion.Checked = True
+            task.gOptions.BuildPointCloudMotion.Checked = True
             dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
             desc = "Filter changes to the RedCloud cells with motion."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            task.gOptions.RemovePointCloudMotion.Checked = True
+            task.gOptions.BuildPointCloudMotion.Checked = True
 
             redC.Run(src)
             dst2 = redC.dst2
@@ -636,4 +636,43 @@ Namespace VBClasses
             Next
         End Sub
     End Class
+
+
+
+
+
+    Public Class RedCloud_Motion : Inherits TaskParent
+        Dim redC As New RedCloud_Basics
+        Dim addw As New AddWeighted_Basics
+        Public Sub New()
+            If standalone Then task.gOptions.displayDst1.Checked = True
+            labels(3) = "Pixels with changes in depth that are larger than the expected error at that distance."
+            task.gOptions.BuildPointCloudMotion.Checked = True
+            desc = "Mix the cloud motion and RedCloud output with AddWeighted."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            redC.Run(src)
+            dst1 = redC.dst2
+            labels(1) = redC.labels(2)
+
+            dst3 = task.motionCloud.dst2
+
+            addw.src2 = dst1
+            addw.Run(dst3)
+            dst2 = addw.dst2
+        End Sub
+    End Class
+
+
+
+
+    Public Class RedCloud_MotionFlood : Inherits TaskParent
+
+        Public Sub New()
+            desc = "Isolate the main cells in the cloud motion mask"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+        End Sub
+    End Class
+
 End Namespace

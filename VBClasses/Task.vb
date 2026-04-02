@@ -167,7 +167,7 @@ Namespace VBClasses
             End If
 
             cloudGravity.Run(emptyMat) '******* this may rotate for gravity if gravity is selected *******
-            If gOptions.RemovePointCloudMotion.Checked Then
+            If gOptions.BuildPointCloudMotion.Checked Then
                 motionCloud.Run(src)
 
                 pointCloud.SetTo(0, motionCloud.dst2)
@@ -238,12 +238,6 @@ Namespace VBClasses
                 Gravity_Basics_TA.showVectors(dstList(0))
                 Dim lp = If(lpGravity IsNot Nothing, lpGravity, lines.lpList(0))
                 Dim pt = New cv.Point2f((lp.pE1.X + lp.pE2.X) / 2 + 5, (lp.pE1.Y + lp.pE2.Y) / 2)
-            End If
-
-            If task.drawRect.Width > 0 And task.drawRect.Height > 0 Then
-                For Each dst In dstList
-                    dst.Rectangle(task.drawRect, cv.Scalar.White, 1)
-                Next
             End If
 
             trueData.Clear()

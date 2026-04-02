@@ -1449,23 +1449,23 @@ Namespace VBClasses
         Public stableMax As cv.Mat
         Dim colorize As New DepthColorizer_CPP
         Public Sub New()
-            labels = {"", "", "InRange depth with low quality depth removed.", ""}
-            desc = "To reduce z-Jitter, use the farthest depth value at each pixel as long as the camera is stable"
+            labels(2) = "Collected maximum values at each depth pixel.  Updated using RGB motion."
+            desc = "Stabilize the depth data by updating the depth with the maximum value."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If src.Type <> cv.MatType.CV_32FC1 Then src = task.pcSplit(2)
-
-            If task.heartBeat Then
-                stableMax = src.Clone
+            Static maxDepth As cv.Mat = task.pcSplit(2).Clone
+            If task.midHeartBeat Then
+                maxDepth = task.pcSplit(2).Clone
             Else
-                src.CopyTo(stableMax, task.motion.motionMask)
-                If src.Type <> stableMax.Type Then src.ConvertTo(src, stableMax.Type)
-                stableMax.CopyTo(src, task.noDepthMask)
-                cv.Cv2.Min(src, stableMax, stableMax)
+                task.pcSplit(2).CopyTo(maxDepth, task.motion.motionMask)
+                maxDepth.CopyTo(task.pcSplit(2), task.noDepthMask)
+                cv.Cv2.Min(task.pcSplit(2), maxDepth, maxDepth)
             End If
 
-            colorize.Run(stableMax)
+            colorize.Run(maxDepth)
             dst2 = colorize.dst2
+
+            stableMax = maxDepth
         End Sub
     End Class
 
@@ -1478,24 +1478,23 @@ Namespace VBClasses
         Public stableMin As cv.Mat
         Dim colorize As New DepthColorizer_CPP
         Public Sub New()
-            labels = {"", "", "InRange depth with low quality depth removed.", "Motion in the BGR image. Depth updated in rectangle."}
-            desc = "To reduce z-Jitter, use the closest depth value at each pixel as long as the camera is stable"
+            labels(2) = "Collected minimum values at each depth pixel.  Updated using RGB motion."
+            desc = "Stabilize the depth data by updating the depth with the minimum value."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If src.Type <> cv.MatType.CV_32FC1 Then src = task.pcSplit(2)
-
-            If task.heartBeat Then
-                stableMin = src.Clone
-                dst3.SetTo(0)
+            Static minDepth As cv.Mat = task.pcSplit(2).Clone
+            If task.midHeartBeat Then
+                minDepth = task.pcSplit(2).Clone
             Else
-                src.CopyTo(stableMin, task.motion.motionMask)
-                If src.Type <> stableMin.Type Then src.ConvertTo(src, stableMin.Type)
-                stableMin.CopyTo(src, task.noDepthMask)
-                cv.Cv2.Min(src, stableMin, stableMin)
+                task.pcSplit(2).CopyTo(minDepth, task.motion.motionMask)
+                minDepth.CopyTo(task.pcSplit(2), task.noDepthMask)
+                cv.Cv2.Min(task.pcSplit(2), minDepth, minDepth)
             End If
 
-            colorize.Run(stableMin)
+            colorize.Run(minDepth)
             dst2 = colorize.dst2
+
+            stableMin = minDepth
         End Sub
     End Class
 
@@ -1507,8 +1506,7 @@ Namespace VBClasses
         Public stableMax As cv.Mat
         Dim colorize As New DepthColorizer_CPP
         Public Sub New()
-            task.gOptions.RemovePointCloudMotion.Checked = True
-            labels = {"", "", "InRange depth with low quality depth removed.", "Motion in the BGR image. Depth updated in rectangle."}
+            task.gOptions.BuildPointCloudMotion.Checked = True
             desc = "Accumulate the farthest depth value at each pixel"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -1530,7 +1528,7 @@ Namespace VBClasses
         Public stableMin As cv.Mat
         Dim colorize As New DepthColorizer_CPP
         Public Sub New()
-            task.gOptions.RemovePointCloudMotion.Checked = True
+            task.gOptions.BuildPointCloudMotion.Checked = True
             labels = {"", "", "InRange depth with low quality depth removed.", "Motion in the BGR image. Depth updated in rectangle."}
             desc = "Accumulate the farthest depth value at each pixel"
         End Sub

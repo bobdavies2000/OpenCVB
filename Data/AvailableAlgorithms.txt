@@ -95,6 +95,7 @@ Cloud_SurfaceH
 Cluster_Basics
 Coherence_Basics
 Color_Basics
+Color_Measure
 Color8U_Basics
 Color8U_Bricks
 Color8U_Complementary
@@ -1542,7 +1543,9 @@ RedCloud_KNN
 RedCloud_LeftRight
 RedCloud_Matched
 RedCloud_Matches
+RedCloud_Motion
 RedCloud_MotionFilter
+RedCloud_MotionFlood
 RedCloud_Reliable
 RedCloud_RGB
 RedColor_Basics
@@ -1566,6 +1569,7 @@ RedPrep_Depth
 RedPrep_EdgeMask
 RedPrep_Edges_CPP
 RedPrep_EdgesZ
+RedPrep_Motion
 RedPrep_XY_Add
 Reduction_Basics
 Reduction_BasicsParmInput

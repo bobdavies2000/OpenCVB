@@ -145,7 +145,7 @@ Namespace VBClasses
             desc = "Show the depth colorizer output after removing the unstable pixels."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If task.gOptions.RemovePointCloudMotion.Checked = False Then task.motionCloud.Run(src)
+            If task.gOptions.BuildPointCloudMotion.Checked = False Then task.motionCloud.Run(src)
             dst2 = task.motionCloud.dst2
 
             dst1 = task.pcSplit(2)
