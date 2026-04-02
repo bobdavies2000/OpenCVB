@@ -148,9 +148,9 @@ Depth_ReliableLines
 Depth_Smoothing
 Depth_SmoothingMat
 Depth_StableMax
-Depth_StableMaxAccum
+Depth_StableMaxMotion
 Depth_StableMin
-Depth_StableMinAccum
+Depth_StableMinMotion
 Depth_TierCount
 Depth_Tiers
 Depth_World

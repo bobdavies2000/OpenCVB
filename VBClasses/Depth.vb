@@ -1503,7 +1503,7 @@ Namespace VBClasses
 
 
 
-    Public Class Depth_StableMaxAccum : Inherits TaskParent
+    Public Class Depth_StableMaxMotion : Inherits TaskParent
         Public stableMax As cv.Mat
         Dim colorize As New DepthColorizer_CPP
         Public Sub New()
@@ -1526,7 +1526,7 @@ Namespace VBClasses
 
 
 
-    Public Class Depth_StableMinAccum : Inherits TaskParent
+    Public Class Depth_StableMinMotion : Inherits TaskParent
         Public stableMin As cv.Mat
         Dim colorize As New DepthColorizer_CPP
         Public Sub New()
