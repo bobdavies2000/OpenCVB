@@ -58,6 +58,7 @@ Namespace VBClasses
                 End If
             Next
             If task.heartBeat Then ReDim task.quarter(4)
+            If task.heartBeat Then task.heartbeatFrame = task.frameCount
 
             If task.frameCount = 1 Then task.heartBeat = True
 

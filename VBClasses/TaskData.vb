@@ -87,7 +87,7 @@ Namespace VBClasses
         Public lines As Line_Basics_TA
         Public motion As Motion_Basics_TA
         Public motionCloud As Motion_CloudPixel_TA
-        Public stabilizeDepth As Depth_StableMin
+        Public stabilizeDepth As Depth_StableMax
         Public cloudGravity As Cloud_Gravity_TA
 
         Public motionFeatures As cv.Point2f
@@ -166,6 +166,7 @@ Namespace VBClasses
         Public quarter(3) As Boolean
         Public midHeartBeat As Boolean
         Public almostHeartBeat As Boolean
+        Public heartbeatFrame As Integer
         Public afterHeartBeatLT As Boolean
         Public msWatch As Integer
         Public msLast As Integer

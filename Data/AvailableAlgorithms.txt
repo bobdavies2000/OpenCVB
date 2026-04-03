@@ -85,6 +85,7 @@ Classifier_Basics_CPP
 Classifier_BayesianTest
 Clone_Basics
 Cloud_Basics
+Cloud_Consistency
 Cloud_DepthToWorld
 Cloud_Gravity_TA
 Cloud_ReduceSplit2

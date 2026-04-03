@@ -64,6 +64,11 @@ Namespace VBClasses
             labels(2) = CStr(unMatched) + " were new cells and " + CStr(matchCount) + " were matched, " +
                             "average age: " + Format(matchAverage / rcList.Count, fmt1)
             labels(3) = redCore.labels(3)
+
+
+            'If task.heartbeatFrame + task.gOptions.DebugSlider.Value = task.frameCount Then
+            '    dst3 = dst2.Clone
+            'End If
         End Sub
     End Class
 

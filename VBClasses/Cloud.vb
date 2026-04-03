@@ -847,4 +847,33 @@ Namespace VBClasses
         End Sub
     End Class
 
+
+
+
+
+    Public Class Cloud_Consistency : Inherits TaskParent
+        Public pointcloud As New cv.Mat(dst2.Size, cv.MatType.CV_32FC3, 0)
+        Public pcSplit(2) As cv.Mat
+        Public Sub New()
+            desc = "A cloud pixel is only real if it is present in 2 consecutive frames."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            ' If task.toggleOn Then
+            Static lastDepth As cv.Mat = task.pcSplit(2).Abs()
+                Dim lastMask = lastDepth.Threshold(0.001, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs
+
+                Dim mask = lastMask And task.depthmask
+                task.pointCloud.CopyTo(pointcloud, mask)
+                pcSplit = pointcloud.Split()
+
+                dst2 = pointcloud
+
+                lastDepth = pcSplit(2).Abs()
+            'Else
+            '    pointcloud = task.pointCloud.Clone
+            '    pcSplit = task.pcSplit
+            'End If
+        End Sub
+    End Class
+
 End Namespace

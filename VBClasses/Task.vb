@@ -41,7 +41,7 @@ Namespace VBClasses
             imuBasics = New IMU_Basics_TA
             motion = New Motion_Basics_TA
             motionCloud = New Motion_CloudPixel_TA
-            stabilizeDepth = New Depth_StableMin
+            stabilizeDepth = New Depth_StableMax
             cloudGravity = New Cloud_Gravity_TA
             grid = New Grid_Basics_TA
             lines = New Line_Basics_TA

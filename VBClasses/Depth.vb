@@ -1561,12 +1561,11 @@ Namespace VBClasses
         Public pointcloud As cv.Mat
         Public pcSplit(2) As cv.Mat
         Public Sub New()
-            pcSplit(2) = New cv.Mat(dst2.Size, cv.MatType.CV_32F, 0)
             labels(2) = "Collected minimum values at each depth pixel.  Updated using RGB motion."
             desc = "Stabilize X, Y, and Z of the point cloud using the minimum depth encountered."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            Static lastDepth As cv.Mat = pcSplit(2).Clone
+            Static lastDepth As cv.Mat = task.pcSplit(2).Clone
             Dim myHeartbeat = task.heartBeat Or task.optionsChanged
             If myHeartbeat Then
                 pointcloud = task.pointCloud.Clone
@@ -1607,12 +1606,11 @@ Namespace VBClasses
         Public pointcloud As New cv.Mat
         Public pcSplit(2) As cv.Mat
         Public Sub New()
-            pcSplit(2) = New cv.Mat(dst2.Size, cv.MatType.CV_32F, 0)
             labels(2) = "Collected minimum values at each depth pixel.  Updated using RGB motion."
             desc = "Stabilize X, Y, and Z of the point cloud using the maximum depth encountered."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            Static lastDepth As cv.Mat = pcSplit(2).Clone
+            Static lastDepth As cv.Mat = task.pcSplit(2).Clone
             Dim myHeartbeat = task.heartBeat Or task.optionsChanged
             If myHeartbeat Then
                 pointcloud = task.pointCloud.Clone
@@ -1639,6 +1637,18 @@ Namespace VBClasses
 
             stableDepth = minDepth
             lastDepth = pcSplit(2).Clone
+
+            'Static savePointCloud As cv.Mat = task.pointCloud
+            'Static saveSplit() As cv.Mat = task.pcSplit
+            'If task.heartbeatFrame + task.gOptions.DebugSlider.Value < task.frameCount Then
+            '    pointcloud = savePointCloud.Clone
+            '    pcSplit = saveSplit
+            'Else
+            '    savePointCloud = pointcloud.Clone
+            '    saveSplit = pcSplit
+            'End If
+
+            'cv.Cv2.ImShow("savepointcloud", savePointCloud)
         End Sub
     End Class
 End Namespace
