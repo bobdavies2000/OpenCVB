@@ -4,6 +4,7 @@ Namespace VBClasses
     Public Class Gravity_Basics_TA : Inherits TaskParent
         Dim lastTimeStamp As Double
         Dim optionsIMU As New Options_IMU
+        Dim options As New Options_History
         ''' <summary>Unit gravity vector in body/sensor frame (points down).</summary>
         Public GravityVector As New cv.Point3f(0, 0, -1)
         Public Sub New()
@@ -74,6 +75,7 @@ Namespace VBClasses
 
         Public Overrides Sub RunAlg(src As cv.Mat)
             optionsIMU.Run()
+            options.Run() ' set the task.framehistoryCount
 
             Dim gyro = task.IMU_AngularVelocity
             If task.optionsChanged Then
@@ -348,7 +350,7 @@ Namespace VBClasses
 
 
 
-    Public Class NR_Gravity_Basics_TAOriginal : Inherits TaskParent
+    Public Class NR_Gravity_Basics_Original : Inherits TaskParent
         Public vec As New lpData
         Dim options As New Options_History
         Public Sub New()

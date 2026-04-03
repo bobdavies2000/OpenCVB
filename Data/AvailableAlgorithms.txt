@@ -149,9 +149,7 @@ Depth_ReliableLines
 Depth_Smoothing
 Depth_SmoothingMat
 Depth_StableMax
-Depth_StableMaxMotion
 Depth_StableMin
-Depth_StableMinMotion
 Depth_TierCount
 Depth_Tiers
 Depth_World
@@ -749,7 +747,11 @@ NR_Depth_PunchIncreasing
 NR_Depth_Regions
 NR_Depth_RGBShadow
 NR_Depth_StableAverage
+NR_Depth_StableMax
+NR_Depth_StableMaxMotion
+NR_Depth_StableMin
 NR_Depth_StableMinMax
+NR_Depth_StableMinMotion
 NR_Depth_Uncertainty
 NR_Depth_WorldXYMT
 NR_DepthLine_Common
@@ -964,8 +966,8 @@ NR_GL_StructuredLines
 NR_GrabCut_FineTune
 NR_GrabCut_ImageMask
 NR_GrabCut_ImageRect
+NR_Gravity_Basics_Original
 NR_Gravity_Basics_TAOld
-NR_Gravity_Basics_TAOriginal
 NR_Gravity_BrickRotate
 NR_Gravity_RGB
 NR_Grid_Basics_TATest
@@ -1061,8 +1063,8 @@ NR_Image_MSER
 NR_ImageOffset_Cloud
 NR_ImageOffset_SliceH
 NR_ImageOffset_SliceV
-NR_IMU_Basics_TAKalman
-NR_IMU_Basics_TAWithOptions
+NR_IMU_Basics_Kalman
+NR_IMU_Basics_WithOptions
 NR_IMU_IscameraStable
 NR_IMU_Lines
 NR_IMU_PlotAcceleration
@@ -1545,7 +1547,6 @@ RedCloud_Matched
 RedCloud_Matches
 RedCloud_Motion
 RedCloud_MotionFilter
-RedCloud_MotionFlood
 RedCloud_Reliable
 RedCloud_RGB
 RedColor_Basics

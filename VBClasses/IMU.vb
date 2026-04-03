@@ -192,7 +192,7 @@ Namespace VBClasses
 
 
     ' https://github.com/IntelRealSense/librealsense/tree/master/examples/motion
-    Public Class NR_IMU_Basics_TAKalman : Inherits TaskParent
+    Public Class NR_IMU_Basics_Kalman : Inherits TaskParent
         Dim lastTimeStamp As Double
         Public Sub New()
             task.kalman = New Kalman_Basics
@@ -244,7 +244,7 @@ Namespace VBClasses
 
 
     ' https://github.com/IntelRealSense/librealsense/tree/master/examples/motion
-    Public Class NR_IMU_Basics_TAWithOptions : Inherits TaskParent
+    Public Class NR_IMU_Basics_WithOptions : Inherits TaskParent
         Dim lastTimeStamp As Double
         Dim options As New Options_IMU
         Public Sub New()

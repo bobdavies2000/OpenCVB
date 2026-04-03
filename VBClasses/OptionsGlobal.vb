@@ -96,7 +96,7 @@ Public Class OptionsGlobal
 
         DebugSliderLabel.Text = CStr(DebugSlider.Value)
 
-		ShowSplash.Checked = CBool(GetSetting("OpenCVB", "ShowSplash", "ShowSplash", True))
+        ShowSplash.Checked = CBool(GetSetting("OpenCVB", "ShowSplash", "ShowSplash", True))
         PaintFrequencyLabel.Text = task.Settings.paintFrequency
 
         Me.Left = 0
@@ -176,9 +176,6 @@ Public Class OptionsGlobal
     End Sub
     Private Sub DebugSliderSlider_ValueChanged(sender As Object, e As EventArgs) Handles DebugSlider.ValueChanged
         DebugSliderLabel.Text = CStr(DebugSlider.Value)
-    End Sub
-    Private Sub useCloudHistory_CheckedChanged(sender As Object, e As EventArgs)
-        task.optionsChanged = True
     End Sub
 
 
@@ -264,5 +261,9 @@ Public Class OptionsGlobal
     End Sub
     Private Sub ShowSplash_CheckedChanged(sender As Object, e As EventArgs) Handles ShowSplash.CheckedChanged
         SaveSetting("OpenCVB", "ShowSplash", "ShowSplash", ShowSplash.Checked)
+    End Sub
+
+    Private Sub stabilizeDepth_CheckedChanged(sender As Object, e As EventArgs) Handles stabilizeDepth.CheckedChanged
+        task.optionsChanged = True
     End Sub
 End Class

@@ -41,6 +41,7 @@ Namespace VBClasses
             imuBasics = New IMU_Basics_TA
             motion = New Motion_Basics_TA
             motionCloud = New Motion_CloudPixel_TA
+            stabilizeDepth = New Depth_StableMin
             cloudGravity = New Cloud_Gravity_TA
             grid = New Grid_Basics_TA
             lines = New Line_Basics_TA
@@ -175,6 +176,16 @@ Namespace VBClasses
                 depthmask.SetTo(0, motionCloud.dst2)
                 noDepthMask = Not depthmask
             End If
+
+            If gOptions.stabilizeDepth.Checked Then
+                stabilizeDepth.Run(emptyMat)
+
+                pcSplit = stabilizeDepth.pcSplit
+                pointCloud = stabilizeDepth.pointcloud.Clone
+                depthmask = pcSplit(2).Threshold(0, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs
+                noDepthMask = Not depthmask
+            End If
+
             colorizer.Run(src)
 
             gravityBasics.Run(src.Clone)

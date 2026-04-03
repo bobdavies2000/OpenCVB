@@ -19600,4 +19600,45 @@ Namespace VBClasses
             dst0 = dst0.Threshold(0, 255, cv.ThresholdTypes.Binary)
         End Sub
     End Class
+
+
+
+
+
+
+    Public Class XO_Depth_StableMinHistory : Inherits TaskParent
+        Public stableDepth As cv.Mat
+        Dim colorize As New DepthColorizer_CPP
+        Public Sub New()
+            If standalone Then task.gOptions.showMotionMask.Checked = True
+            labels(2) = "Collected minimum values at each depth pixel.  Updated using RGB motion."
+            desc = "Stabilize the depth data by updating the depth with the minimum value."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            Static nextDepth As New cv.Mat(dst2.Size, cv.MatType.CV_32F, 0)
+            Static lastImages As New List(Of cv.Mat)
+            If task.optionsChanged Then
+                lastImages.Clear()
+                nextDepth.SetTo(0)
+            End If
+
+            lastImages.Add(task.pcSplit(2).Clone)
+            For i = 0 To lastImages.Count - 1
+                nextDepth = nextDepth + lastImages(i)
+            Next
+            nextDepth /= lastImages.Count
+
+            If lastImages.Count >= task.frameHistoryCount Then lastImages.RemoveAt(0)
+
+            Static minDepth As New cv.Mat(dst2.Size, cv.MatType.CV_32F, 0)
+            nextDepth.CopyTo(minDepth, task.motion.motionMask)
+            minDepth.CopyTo(nextDepth, task.noDepthMask)
+            cv.Cv2.Min(nextDepth, minDepth, minDepth)
+
+            colorize.Run(minDepth)
+            dst2 = colorize.dst2
+
+            stableDepth = minDepth
+        End Sub
+    End Class
 End Namespace

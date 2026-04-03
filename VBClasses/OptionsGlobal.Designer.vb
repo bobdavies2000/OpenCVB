@@ -48,6 +48,7 @@ Partial Class OptionsGlobal
         DebugSliderLabel = New Label()
         DebugCheckBox = New CheckBox()
         GroupBox2 = New GroupBox()
+        stabilizeDepth = New CheckBox()
         BuildPointCloudMotion = New CheckBox()
         UseMotionMask = New CheckBox()
         TruncateDepth = New CheckBox()
@@ -335,6 +336,7 @@ Partial Class OptionsGlobal
         ' 
         ' GroupBox2
         ' 
+        GroupBox2.Controls.Add(stabilizeDepth)
         GroupBox2.Controls.Add(BuildPointCloudMotion)
         GroupBox2.Controls.Add(UseMotionMask)
         GroupBox2.Controls.Add(TruncateDepth)
@@ -352,6 +354,17 @@ Partial Class OptionsGlobal
         GroupBox2.TabStop = False
         GroupBox2.Text = "Miscellaneous Globals"
         ' 
+        ' stabilizeDepth
+        ' 
+        stabilizeDepth.AutoSize = True
+        stabilizeDepth.Location = New Point(16, 262)
+        stabilizeDepth.Margin = New Padding(3, 4, 3, 4)
+        stabilizeDepth.Name = "stabilizeDepth"
+        stabilizeDepth.Size = New Size(183, 34)
+        stabilizeDepth.TabIndex = 11
+        stabilizeDepth.Text = "Stabilize Depth"
+        stabilizeDepth.UseVisualStyleBackColor = True
+        ' 
         ' BuildPointCloudMotion
         ' 
         BuildPointCloudMotion.AutoSize = True
@@ -368,7 +381,7 @@ Partial Class OptionsGlobal
         UseMotionMask.AutoSize = True
         UseMotionMask.Checked = True
         UseMotionMask.CheckState = CheckState.Checked
-        UseMotionMask.Location = New Point(15, 266)
+        UseMotionMask.Location = New Point(15, 298)
         UseMotionMask.Margin = New Padding(3, 4, 3, 4)
         UseMotionMask.Name = "UseMotionMask"
         UseMotionMask.Size = New Size(208, 34)
@@ -640,4 +653,5 @@ Partial Class OptionsGlobal
     Friend WithEvents Label9 As Label
     Friend WithEvents ShowSplash As CheckBox
     Friend WithEvents BuildPointCloudMotion As CheckBox
+    Friend WithEvents stabilizeDepth As CheckBox
 End Class

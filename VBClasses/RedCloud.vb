@@ -19,10 +19,7 @@ Namespace VBClasses
         Public options As New Options_RedCloud
         Public keyColors As New KeyColor_Reduction_TA
         Public Sub New()
-            If standalone Then
-                task.gOptions.displayDst1.Checked = True
-                labels(1) = "The key colors used to set colors in the RedCloud output."
-            End If
+            task.gOptions.stabilizeDepth.Checked = True
             desc = "Build contours for each cell"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -662,17 +659,4 @@ Namespace VBClasses
             dst2 = addw.dst2
         End Sub
     End Class
-
-
-
-
-    Public Class RedCloud_MotionFlood : Inherits TaskParent
-
-        Public Sub New()
-            desc = "Isolate the main cells in the cloud motion mask"
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-        End Sub
-    End Class
-
 End Namespace

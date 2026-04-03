@@ -942,11 +942,11 @@ Namespace VBClasses
 
             If options.useMax Then
                 dMax.Run(src)
-                dst3 = dMax.stableMax
+                dst3 = dMax.stableDepth
                 dst2 = dMax.dst2
             ElseIf options.useMin Then
                 dMin.Run(src)
-                dst3 = dMin.stableMin
+                dst3 = dMin.stableDepth
                 dst2 = dMin.dst2
             ElseIf options.useNone Then
                 dst3 = task.pcSplit(2)
@@ -1443,66 +1443,7 @@ Namespace VBClasses
 
 
 
-
-
-    Public Class Depth_StableMax : Inherits TaskParent
-        Public stableMax As cv.Mat
-        Dim colorize As New DepthColorizer_CPP
-        Public Sub New()
-            labels(2) = "Collected maximum values at each depth pixel.  Updated using RGB motion."
-            desc = "Stabilize the depth data by updating the depth with the maximum value."
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            Static maxDepth As cv.Mat = task.pcSplit(2).Clone
-            If task.midHeartBeat Then
-                maxDepth = task.pcSplit(2).Clone
-            Else
-                task.pcSplit(2).CopyTo(maxDepth, task.motion.motionMask)
-                maxDepth.CopyTo(task.pcSplit(2), task.noDepthMask)
-                cv.Cv2.Min(task.pcSplit(2), maxDepth, maxDepth)
-            End If
-
-            colorize.Run(maxDepth)
-            dst2 = colorize.dst2
-
-            stableMax = maxDepth
-        End Sub
-    End Class
-
-
-
-
-
-
-    Public Class Depth_StableMin : Inherits TaskParent
-        Public stableMin As cv.Mat
-        Dim colorize As New DepthColorizer_CPP
-        Public Sub New()
-            labels(2) = "Collected minimum values at each depth pixel.  Updated using RGB motion."
-            desc = "Stabilize the depth data by updating the depth with the minimum value."
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            Static minDepth As cv.Mat = task.pcSplit(2).Clone
-            If task.midHeartBeat Then
-                minDepth = task.pcSplit(2).Clone
-            Else
-                task.pcSplit(2).CopyTo(minDepth, task.motion.motionMask)
-                minDepth.CopyTo(task.pcSplit(2), task.noDepthMask)
-                cv.Cv2.Min(task.pcSplit(2), minDepth, minDepth)
-            End If
-
-            colorize.Run(minDepth)
-            dst2 = colorize.dst2
-
-            stableMin = minDepth
-        End Sub
-    End Class
-
-
-
-
-
-    Public Class Depth_StableMaxMotion : Inherits TaskParent
+    Public Class NR_Depth_StableMaxMotion : Inherits TaskParent
         Public stableMax As cv.Mat
         Dim colorize As New DepthColorizer_CPP
         Public Sub New()
@@ -1524,7 +1465,7 @@ Namespace VBClasses
 
 
 
-    Public Class Depth_StableMinMotion : Inherits TaskParent
+    Public Class NR_Depth_StableMinMotion : Inherits TaskParent
         Public stableMin As cv.Mat
         Dim colorize As New DepthColorizer_CPP
         Public Sub New()
@@ -1539,7 +1480,7 @@ Namespace VBClasses
             End If
 
             Static lastDepthMask As cv.Mat = task.noDepthMask.Clone
-            task.pcSplit(2).CopyTo(stableMin, lastDepthMask) ' preserve that depth where there was no depth last frame.
+            task.pcSplit(2).CopyTo(stableMin, lastDepthMask) ' preserve depth where there was no depth last frame.
             task.pcSplit(2).CopyTo(stableMin, task.motionCloud.dst2)
 
             cv.Cv2.Min(task.pcSplit(2), stableMin, stableMin)
@@ -1548,6 +1489,156 @@ Namespace VBClasses
             dst2 = colorize.dst2
 
             lastDepthMask = task.noDepthMask.Clone
+        End Sub
+    End Class
+
+
+
+
+
+
+    Public Class NR_Depth_StableMax : Inherits TaskParent
+        Public stableDepth As cv.Mat
+        Dim colorize As New DepthColorizer_CPP
+        Public Sub New()
+            labels(2) = "Collected maximum values at each depth pixel.  Updated using RGB motion."
+            desc = "Stabilize the depth data by updating the depth with the maximum value."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            Static maxDepth As cv.Mat = task.pcSplit(2).Clone
+            If task.heartBeat Then
+                maxDepth = task.pcSplit(2).Clone
+            Else
+                task.pcSplit(2).CopyTo(maxDepth, task.motion.motionMask)
+                maxDepth.CopyTo(task.pcSplit(2), task.noDepthMask)
+                cv.Cv2.Min(task.pcSplit(2), maxDepth, maxDepth)
+            End If
+
+            colorize.Run(maxDepth)
+            dst2 = colorize.dst2
+
+            stableDepth = maxDepth
+        End Sub
+    End Class
+
+
+
+
+
+
+    Public Class NR_Depth_StableMin : Inherits TaskParent
+        Public stableDepth As cv.Mat
+        Dim colorize As New DepthColorizer_CPP
+        Public Sub New()
+            labels(2) = "Collected minimum values at each depth pixel.  Updated using RGB motion."
+            desc = "Stabilize the depth data by updating the depth with the minimum value."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            Static minDepth As cv.Mat = task.pcSplit(2).Clone
+            If task.heartBeat Then
+                minDepth = task.pcSplit(2).Clone
+            Else
+                task.pcSplit(2).CopyTo(minDepth, task.motion.motionMask)
+                minDepth.CopyTo(task.pcSplit(2), task.noDepthMask)
+                cv.Cv2.Min(task.pcSplit(2), minDepth, minDepth)
+            End If
+
+            colorize.Run(minDepth)
+            dst2 = colorize.dst2
+
+            stableDepth = minDepth
+        End Sub
+    End Class
+
+
+
+
+
+
+    Public Class Depth_StableMin : Inherits TaskParent
+        Public stableDepth As cv.Mat
+        Dim colorize As New DepthColorizer_CPP
+        Public pointcloud As cv.Mat
+        Public pcSplit(2) As cv.Mat
+        Public Sub New()
+            pcSplit(2) = New cv.Mat(dst2.Size, cv.MatType.CV_32F, 0)
+            labels(2) = "Collected minimum values at each depth pixel.  Updated using RGB motion."
+            desc = "Stabilize X, Y, and Z of the point cloud using the minimum depth encountered."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            Static lastDepth As cv.Mat = pcSplit(2).Clone
+            Dim myHeartbeat = task.heartBeat Or task.optionsChanged
+            If myHeartbeat Then
+                pointcloud = task.pointCloud.Clone
+            Else
+                task.pointCloud.CopyTo(pointcloud, task.motion.motionMask)
+                task.pointCloud.CopyTo(pointcloud, task.noDepthMask)
+            End If
+
+            pcSplit = pointcloud.Split()
+            Dim minDepth As New cv.Mat
+            cv.Cv2.Min(pcSplit(2), lastDepth, minDepth)
+
+            If myHeartbeat = False Then
+                Dim diffDepth As New cv.Mat
+                cv.Cv2.Absdiff(minDepth, lastDepth, diffDepth)
+                Dim mask = diffDepth.Threshold(0, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs()
+                mask.SetTo(0, task.motion.motionMask)
+                dst3 = mask.Clone
+                task.pointCloud.CopyTo(pointcloud, mask)
+            End If
+
+            colorize.Run(minDepth)
+            dst2 = colorize.dst2
+
+            stableDepth = minDepth
+            lastDepth = pcSplit(2).Clone
+        End Sub
+    End Class
+
+
+
+
+
+
+    Public Class Depth_StableMax : Inherits TaskParent
+        Public stableDepth As cv.Mat
+        Dim colorize As New DepthColorizer_CPP
+        Public pointcloud As New cv.Mat
+        Public pcSplit(2) As cv.Mat
+        Public Sub New()
+            pcSplit(2) = New cv.Mat(dst2.Size, cv.MatType.CV_32F, 0)
+            labels(2) = "Collected minimum values at each depth pixel.  Updated using RGB motion."
+            desc = "Stabilize X, Y, and Z of the point cloud using the maximum depth encountered."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            Static lastDepth As cv.Mat = pcSplit(2).Clone
+            Dim myHeartbeat = task.heartBeat Or task.optionsChanged
+            If myHeartbeat Then
+                pointcloud = task.pointCloud.Clone
+            Else
+                task.pointCloud.CopyTo(pointcloud, task.motion.motionMask)
+                task.pointCloud.CopyTo(pointcloud, task.noDepthMask)
+            End If
+
+            pcSplit = pointcloud.Split()
+            Dim minDepth As New cv.Mat
+            cv.Cv2.Max(pcSplit(2), lastDepth, minDepth)
+
+            If myHeartbeat = False Then
+                Dim diffDepth As New cv.Mat
+                cv.Cv2.Absdiff(minDepth, lastDepth, diffDepth)
+                Dim mask = diffDepth.Threshold(0, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs()
+                mask.SetTo(0, task.motion.motionMask)
+                dst3 = mask.Clone
+                task.pointCloud.CopyTo(pointcloud, mask)
+            End If
+
+            colorize.Run(minDepth)
+            dst2 = colorize.dst2
+
+            stableDepth = minDepth
+            lastDepth = pcSplit(2).Clone
         End Sub
     End Class
 End Namespace
