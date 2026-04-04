@@ -1,6 +1,6 @@
 Imports cv = OpenCvSharp
 Imports System.IO
-Namespace VBClasses
+Imports VBClasses
     Public Class NR_CSV_Basics : Inherits TaskParent
         Public inputFile As String
         Public array(,) As String
@@ -34,4 +34,3 @@ Namespace VBClasses
             ReDim array(0, 0)
         End Sub
     End Class
-End Namespace

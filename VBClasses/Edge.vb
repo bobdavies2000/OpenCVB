@@ -1,7 +1,7 @@
 Imports System.IO
 Imports System.Runtime.InteropServices
 Imports cv = OpenCvSharp
-Namespace VBClasses
+Imports VBClasses
     Public Class Edge_Basics : Inherits TaskParent
         Dim canny As Edge_Canny
         Dim scharr As NR_Edge_Scharr
@@ -1695,4 +1695,3 @@ Namespace VBClasses
         End Sub
     End Class
 
-End Namespace

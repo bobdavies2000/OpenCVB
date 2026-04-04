@@ -2,7 +2,7 @@ Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 Imports System.IO
 ' https://stackoverflow.com/questions/47706339/car-counting-and-classification-using-emgucv-and-vb-net
-Namespace VBClasses
+Imports VBClasses
     Public Class Video_Basics : Inherits TaskParent
         Public captureVideo As New cv.VideoCapture
         Public options As New Options_Video
@@ -163,4 +163,3 @@ Namespace VBClasses
     End Class
 
 
-End Namespace

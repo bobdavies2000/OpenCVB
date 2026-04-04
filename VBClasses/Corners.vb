@@ -2,7 +2,7 @@ Imports System.Runtime.InteropServices
 Imports System.Security.Cryptography
 Imports OpenCvSharp
 Imports cv = OpenCvSharp
-Namespace VBClasses
+Imports VBClasses
     Public Class Corners_Basics : Inherits TaskParent
         Public fast As New Corners_Core
         Public features As New List(Of cv.Point2f)
@@ -394,4 +394,3 @@ Namespace VBClasses
             labels(3) = fast.labels(2)
         End Sub
     End Class
-End Namespace

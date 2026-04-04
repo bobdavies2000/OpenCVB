@@ -1,8 +1,8 @@
 Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 Imports System.Text.RegularExpressions
-Namespace VBClasses
-    Public Class Plot_Basics : Inherits TaskParent
+Imports VBClasses
+Public Class Plot_Basics : Inherits TaskParent
         Dim plot As New Plot_Basics_CPP
         Dim hist As New Histogram_Graph
         Public plotCount As Integer = 3
@@ -689,4 +689,3 @@ Namespace VBClasses
         End Sub
     End Class
 
-End Namespace

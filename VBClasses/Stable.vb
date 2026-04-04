@@ -1,5 +1,5 @@
 Imports cv = OpenCvSharp
-Namespace VBClasses
+Imports VBClasses
     Public Class Stable_Basics : Inherits TaskParent
         Public lp As lpData
         Public lpLast As lpData
@@ -172,4 +172,3 @@ Namespace VBClasses
         End Sub
     End Class
 
-End Namespace

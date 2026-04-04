@@ -1,7 +1,7 @@
 Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 'https://github.com/omidsakhi/cv-hmm
-Namespace VBClasses
+Imports VBClasses
     Public Class NR_HMM_Example_CPP : Inherits TaskParent
         Implements IDisposable
         Public Sub New()
@@ -27,4 +27,3 @@ Namespace VBClasses
             If cPtr <> 0 Then cPtr = HMM_Close(cPtr)
         End Sub
     End Class
-End Namespace

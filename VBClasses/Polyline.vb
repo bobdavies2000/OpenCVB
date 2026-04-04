@@ -1,5 +1,5 @@
 Imports cv = OpenCvSharp
-Namespace VBClasses
+Imports VBClasses
     Public Class PolyLine_Basics_TA : Inherits TaskParent
         Dim edgeline As New EdgeLine_Basics_TA
         Public Sub New()
@@ -75,4 +75,3 @@ Namespace VBClasses
             dst3 = zoom.dst2
         End Sub
     End Class
-End Namespace

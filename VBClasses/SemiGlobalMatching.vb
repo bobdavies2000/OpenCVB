@@ -1,7 +1,7 @@
 Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 ' https://github.com/epiception/SGM-Census
-Namespace VBClasses
+Imports VBClasses
     Public Class NR_SemiGlobalMatching_CPP : Inherits TaskParent
         Implements IDisposable
         Dim leftData(0) As Byte
@@ -36,4 +36,3 @@ Namespace VBClasses
             If cPtr <> 0 Then cPtr = SemiGlobalMatching_Close(cPtr)
         End Sub
     End Class
-End Namespace

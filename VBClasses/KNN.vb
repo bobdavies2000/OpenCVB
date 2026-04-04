@@ -1,6 +1,6 @@
 Imports System.Runtime.InteropServices
 Imports cv = OpenCvSharp
-Namespace VBClasses
+Imports VBClasses
     Public Class KNN_Basics : Inherits TaskParent
         Public knn2 As New KNN_N2Basics
         Public ptListTrain As New List(Of cv.Point)
@@ -993,4 +993,3 @@ Namespace VBClasses
         End Sub
     End Class
 
-End Namespace

@@ -1,5 +1,5 @@
 Imports cv = OpenCvSharp
-Namespace VBClasses
+Imports VBClasses
     Public Class NR_Transform_Resize : Inherits TaskParent
         Dim options As New Options_Transform
         Public Sub New()
@@ -107,4 +107,3 @@ Namespace VBClasses
             DrawCircle(dst2, imageCenter, task.DotSize, cv.Scalar.Blue)
         End Sub
     End Class
-End Namespace

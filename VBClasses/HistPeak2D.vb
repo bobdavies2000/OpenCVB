@@ -1,5 +1,5 @@
 Imports cv = OpenCvSharp
-Namespace VBClasses
+Imports VBClasses
     Public Class HistPeak2D_Basics : Inherits TaskParent
         Public auto As New OpAuto_Peaks2DGrid
         Dim bgr As New Hist2D_BGR
@@ -255,4 +255,3 @@ Namespace VBClasses
             dst2.SetTo(0, task.noDepthMask)
         End Sub
     End Class
-End Namespace

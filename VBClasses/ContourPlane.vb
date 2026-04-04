@@ -1,5 +1,5 @@
 Imports cv = OpenCvSharp
-Namespace VBClasses
+Imports VBClasses
     Public Class NR_ContourPlane_Basics : Inherits TaskParent
         Dim contours As New Contour_Basics
         Public Sub New()
@@ -113,4 +113,3 @@ Namespace VBClasses
             Next
         End Sub
     End Class
-End Namespace

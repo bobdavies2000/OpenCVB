@@ -1,6 +1,6 @@
 Imports cv = OpenCvSharp
 ' https://www.codeproject.com/Articles/1093960/D-Polyline-Vertex-Smoothing
-Namespace VBClasses
+Imports VBClasses
     Public Class NR_Smoothing_Exterior : Inherits TaskParent
         Dim hull As New Convex_Basics
         Public inputPoints As List(Of cv.Point)
@@ -154,4 +154,3 @@ Namespace VBClasses
             If smoothPoints.Count > 0 Then NR_Smoothing_Exterior.DrawPoly(dst2, smoothPoints, plotColor)
         End Sub
     End Class
-End Namespace

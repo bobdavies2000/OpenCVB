@@ -1,7 +1,7 @@
 Imports cv = OpenCvSharp
 Imports  System.IO
 Imports System.Runtime.InteropServices
-Namespace VBClasses
+Imports VBClasses
     Public Class Vignetting_Basics : Inherits TaskParent
         Implements IDisposable
         Public removeVig As Boolean
@@ -117,4 +117,3 @@ Namespace VBClasses
             dst3 = devignet.dst3
         End Sub
     End Class
-End Namespace

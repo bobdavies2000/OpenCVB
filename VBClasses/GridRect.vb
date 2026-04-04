@@ -1,5 +1,5 @@
 Imports cv = OpenCvSharp
-Namespace VBClasses
+Imports VBClasses
     Public Class GridRect_Basics : Inherits TaskParent
         Public rects As New List(Of cv.Rect)
         Public meanList As New List(Of Single)
@@ -509,4 +509,3 @@ Namespace VBClasses
             dst3 = sobel.dst2
         End Sub
     End Class
-End Namespace

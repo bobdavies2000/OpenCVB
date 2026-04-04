@@ -1,6 +1,6 @@
 Imports cv = OpenCvSharp
 'http://opencvexamples.blogspot.com/2014/01/kalman-filter-implementation-tracking.html
-Namespace VBClasses
+Imports VBClasses
     Public Class Kalman_Basics : Inherits TaskParent
         Dim kalman() As Kalman_Simple
         Public kInput(4 - 1) As Single
@@ -588,4 +588,3 @@ Namespace VBClasses
             labels(3) = "Move the camera around to see the impact of the Kalman filter."
         End Sub
     End Class
-End Namespace

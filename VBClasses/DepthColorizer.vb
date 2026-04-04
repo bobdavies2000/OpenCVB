@@ -1,6 +1,6 @@
 Imports System.Runtime.InteropServices
 Imports cv = OpenCvSharp
-Namespace VBClasses
+Imports VBClasses
     Public Class DepthColorizer_Basics_TA : Inherits TaskParent
         Implements IDisposable
         Public Sub New()
@@ -163,4 +163,3 @@ Namespace VBClasses
             If cPtr <> 0 Then cPtr = Depth_Colorizer_Close(cPtr)
         End Sub
     End Class
-End Namespace

@@ -1,6 +1,6 @@
 Imports cv = OpenCvSharp
 Imports System.Drawing
-Namespace VBClasses
+Imports VBClasses
     Public Class Draw_Noise : Inherits TaskParent
         Public addRandomColor As Boolean
         Public noiseMask As cv.Mat
@@ -454,4 +454,3 @@ Namespace VBClasses
             Next
         End Sub
     End Class
-End Namespace

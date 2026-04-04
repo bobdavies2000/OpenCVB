@@ -1,7 +1,7 @@
 Imports cv = OpenCvSharp
 Imports  System.IO
 ' https://github.com/anopara/genetic-drawing
-Namespace VBClasses
+Imports VBClasses
     Public Class GeneticDrawing_Basics : Inherits TaskParent
         Public minBrushRange = New cv.Rangef(0.1, 0.3)
         Public maxBrushRange = New cv.Rangef(0.3, 0.7)
@@ -286,4 +286,3 @@ Namespace VBClasses
             labels(3) = gDraw.labels(3)
         End Sub
     End Class
-End Namespace

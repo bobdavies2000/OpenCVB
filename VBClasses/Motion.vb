@@ -1,5 +1,5 @@
 Imports cv = OpenCvSharp
-Namespace VBClasses
+Imports VBClasses
     Public Class Motion_Basics_TA : Inherits TaskParent
         Public motionSort As New List(Of Integer)
         Public diff As New Diff_Basics
@@ -475,4 +475,3 @@ Namespace VBClasses
         End Sub
     End Class
 
-End Namespace

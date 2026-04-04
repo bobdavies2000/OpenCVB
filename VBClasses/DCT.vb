@@ -1,5 +1,5 @@
 Imports cv = OpenCvSharp
-Namespace VBClasses
+Imports VBClasses
     Public Class DCT_Basics : Inherits TaskParent
         Public options As New Options_DCT
         Public Sub New()
@@ -200,4 +200,3 @@ Namespace VBClasses
             flow.Run(src)
         End Sub
     End Class
-End Namespace

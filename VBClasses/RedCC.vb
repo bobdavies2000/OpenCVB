@@ -1,5 +1,5 @@
 Imports cv = OpenCvSharp
-Namespace VBClasses
+Imports VBClasses
     Public Class RedCC_Basics : Inherits TaskParent
         Dim reduction As New Reduction_Basics
         Public rcList As List(Of rcData)
@@ -170,4 +170,3 @@ Namespace VBClasses
             dst3 = plot.dst2
         End Sub
     End Class
-End Namespace

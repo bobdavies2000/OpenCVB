@@ -1,5 +1,5 @@
 Imports cv = OpenCvSharp
-Namespace VBClasses
+Imports VBClasses
     Public Class TextureFlow_Basics : Inherits TaskParent
         Dim options As New Options_Texture
         Public Sub New()
@@ -114,4 +114,3 @@ Namespace VBClasses
             dst2 = flow.dst2
         End Sub
     End Class
-End Namespace

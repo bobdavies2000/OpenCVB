@@ -1,6 +1,6 @@
 Imports cv = OpenCvSharp
 ' https://github.com/shimat/opencvsharp_2410/blob/master/sample/CStyleSamplesCS/Samples/MDS.cs
-Namespace VBClasses
+Imports VBClasses
     Public Class MDScaling_Cities : Inherits TaskParent
         Dim CityDistance() As Double = { ' 10x10 array of distances for 10 cities
             0, 587, 1212, 701, 1936, 604, 748, 2139, 2182, 543,       ' Atlanta
@@ -85,4 +85,3 @@ Namespace VBClasses
             Next
         End Sub
     End Class
-End Namespace

@@ -2,7 +2,7 @@ Imports System.IO
 Imports System.Runtime.InteropServices
 Imports cv = OpenCvSharp
 ' all examples in this file are from https://github.com/opencv/opencv/tree/4.x/samples
-Namespace VBClasses
+Imports VBClasses
     Public Class OEX_CalcBackProject_Demo1 : Inherits TaskParent
         Public histogram As New cv.Mat
         Public classCount As Integer
@@ -629,4 +629,3 @@ Namespace VBClasses
     End Module
 
 
-End Namespace

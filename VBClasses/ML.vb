@@ -1,7 +1,7 @@
 Imports System.Runtime.InteropServices
 Imports OpenCvSharp.ML
 Imports cv = OpenCvSharp
-Namespace VBClasses
+Imports VBClasses
     Public Class NR_Brick_MLColorDepth : Inherits TaskParent
         Dim ml As New ML_Basics
         Dim bounds As New NR_Brick_FeaturesAndEdges
@@ -723,4 +723,3 @@ Namespace VBClasses
             If rtree IsNot Nothing Then rtree.Dispose()
         End Sub
     End Class
-End Namespace

@@ -1,6 +1,6 @@
 Imports cv = OpenCvSharp
-Namespace VBClasses
-    Public Class Delaunay_Basics : Inherits TaskParent
+Imports VBClasses
+Public Class Delaunay_Basics : Inherits TaskParent
         Public inputPoints As New List(Of cv.Point2f)
         Public facetList As New List(Of List(Of cv.Point))
         Dim subdiv As New cv.Subdiv2D
@@ -495,4 +495,3 @@ Namespace VBClasses
             dst3 = delaunay.dst2
         End Sub
     End Class
-End Namespace

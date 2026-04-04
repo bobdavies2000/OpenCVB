@@ -1,7 +1,7 @@
 Imports cv = OpenCvSharp
 'https://gist.github.com/kendricktan/93f0da88d0b25087d751ed2244cf770c
 'https://medium.com/@anuj_shah/through-the-eyes-of-gabor-filter-17d1fdb3ac97
-Namespace VBClasses
+Imports VBClasses
     Public Class Gabor_Basics : Inherits TaskParent
         Public options As New Options_Gabor
         Public Sub New()
@@ -16,4 +16,3 @@ Namespace VBClasses
 
 
 
-End Namespace

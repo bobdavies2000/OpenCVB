@@ -1,6 +1,6 @@
 Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
-Namespace VBClasses
+Imports VBClasses
     Module dft_Module
         Public Function inverseDFT(complexImage As cv.Mat) As cv.Mat
             Dim invDFT As New cv.Mat
@@ -241,4 +241,3 @@ Namespace VBClasses
             dst0 = inverseDFT(dft.complexImage)
         End Sub
     End Class
-End Namespace

@@ -1,6 +1,6 @@
 Imports OpenCvSharp
 Imports cv = OpenCvSharp
-Namespace VBClasses
+Imports VBClasses
     Public Class Distance_Basics : Inherits TaskParent
         Dim distance As New Distance_Instant
         Public Sub New()
@@ -545,4 +545,3 @@ Namespace VBClasses
             dst0 = dst1.DistanceTransform(options.distanceType, 0)
         End Sub
     End Class
-End Namespace

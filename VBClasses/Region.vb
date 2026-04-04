@@ -1,6 +1,6 @@
 Imports System.Security.Cryptography
 Imports cv = OpenCvSharp
-Namespace VBClasses
+Imports VBClasses
     Public Class Region_Basics : Inherits TaskParent
         Dim bricks As New Brick_Basics
         Dim regions As New Region_Core
@@ -396,4 +396,3 @@ Namespace VBClasses
                     Format(task.fCorrThreshold, "0.0%") + " or better"
         End Sub
     End Class
-End Namespace

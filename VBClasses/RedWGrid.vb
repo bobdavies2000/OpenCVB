@@ -1,6 +1,6 @@
 ﻿Imports System.Runtime.InteropServices
 Imports cv = OpenCvSharp
-Namespace VBClasses
+Imports VBClasses
     Public Class RedWGrid_Basics : Inherits TaskParent
         Public redC As New RedCloud_Basics
         Public rcList As New List(Of rcData)
@@ -572,4 +572,3 @@ Namespace VBClasses
             Next
         End Sub
     End Class
-End Namespace

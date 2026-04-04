@@ -1,7 +1,7 @@
 Imports System.Runtime.InteropServices
 Imports cv = OpenCvSharp
 ' https://github.com/opencv/opencv/blob/master/samples/cpp/detect_mser.cpp
-Namespace VBClasses
+Imports VBClasses
     Public Class MSER_Basics : Inherits TaskParent
         Dim detect As New MSER_CPP
         Public mserCells As New List(Of rcData)
@@ -716,4 +716,3 @@ Namespace VBClasses
             MSER_Close(cPtr)
         End Sub
     End Class
-End Namespace

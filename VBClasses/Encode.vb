@@ -1,6 +1,6 @@
 Imports cv = OpenCvSharp
 ' https://www.programcreek.com/python/example/70396/cv2.imencode
-Namespace VBClasses
+Imports VBClasses
     Public Class NR_Encode_Basics : Inherits TaskParent
         Dim options As New Options_Encode
         Public Sub New()
@@ -52,4 +52,3 @@ Namespace VBClasses
             Dim compressionRatio = buf.Length / (src.Rows * src.Cols * src.ElemSize)
         End Sub
     End Class
-End Namespace

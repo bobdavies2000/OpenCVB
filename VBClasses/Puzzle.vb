@@ -1,7 +1,7 @@
 Imports cv = OpenCvSharp
 Imports System.Threading
 ' https://github.com/nemanja-m/gaps
-Namespace VBClasses
+Imports VBClasses
     Public Class Puzzle_Basics : Inherits TaskParent
         Public scrambled As New List(Of cv.Rect) ' this is every roi regardless of size.
         Public unscrambled As New List(Of cv.Rect) ' this is every roi regardless of size.
@@ -99,4 +99,3 @@ Namespace VBClasses
             dst3 = puzzle.dst3
         End Sub
     End Class
-End Namespace

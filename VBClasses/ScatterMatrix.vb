@@ -1,6 +1,6 @@
 Imports cv = OpenCvSharp
 ' https://en.wikipedia.org/wiki/Scatter_matrix
-Namespace VBClasses
+Imports VBClasses
     Public Class NR_ScatterMatrix_Example : Inherits TaskParent
         Dim data(,) As Double
         Dim meanVector As Double()
@@ -84,4 +84,3 @@ Namespace VBClasses
             PrintMatrix(scatterMatrix)
         End Sub
     End Class
-End Namespace

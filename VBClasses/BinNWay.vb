@@ -1,5 +1,5 @@
 ﻿Imports cv = OpenCvSharp
-Namespace VBClasses
+Imports VBClasses
     Public Class BinNWay_Basics : Inherits TaskParent
         Dim options As New Options_BinNWay
         Dim binSplit(0) As Integer
@@ -39,4 +39,3 @@ Namespace VBClasses
             labels(3) = CStr(options.gradations) + " of the motion-adjusted gray image."
         End Sub
     End Class
-End Namespace

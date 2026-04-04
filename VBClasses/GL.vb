@@ -1,5 +1,5 @@
 Imports cv = OpenCvSharp
-Namespace VBClasses
+Imports VBClasses
     Public Enum oCase
         drawPointCloudRGB
         drawLineAndCloud
@@ -738,4 +738,3 @@ Namespace VBClasses
             SetTrueText(strOut, 2)
         End Sub
     End Class
-End Namespace

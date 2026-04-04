@@ -1,6 +1,6 @@
 Imports System.Runtime.InteropServices
 Imports cv = OpenCvSharp
-Namespace VBClasses
+Imports VBClasses
     Public Class OpAuto_Valley : Inherits TaskParent
         Public valleyOrder As New SortedList(Of Integer, Integer)(New compareAllowIdenticalInteger)
         Public options As New Options_Boundary
@@ -149,4 +149,3 @@ Namespace VBClasses
             labels(3) = CStr(pointPop.Count) + " grid samples trimmed to " + CStr(clusterPoints.Count)
         End Sub
     End Class
-End Namespace

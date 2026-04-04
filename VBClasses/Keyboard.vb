@@ -1,5 +1,5 @@
 Imports cv = OpenCvSharp
-Namespace VBClasses
+Imports VBClasses
     Public Class Keyboard_Basics : Inherits TaskParent
         Public keyInput As New List(Of String)
         Dim flow As New Font_FlowText
@@ -20,4 +20,3 @@ Namespace VBClasses
             checkKeys.inputText.Clear()
         End Sub
     End Class
-End Namespace

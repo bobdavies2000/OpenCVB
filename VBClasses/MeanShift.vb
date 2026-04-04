@@ -1,6 +1,6 @@
 Imports cv = OpenCvSharp
 ' http://answers.opencvb.org/question/175486/meanshift-sample-code-in-c/
-Namespace VBClasses
+Imports VBClasses
     Public Class MeanShift_Basics : Inherits TaskParent
         Public rectangleEdgeWidth As Integer = 2
         Public trackbox As New cv.Rect
@@ -48,4 +48,3 @@ Namespace VBClasses
             dst3 = meanShift.dst1
         End Sub
     End Class
-End Namespace

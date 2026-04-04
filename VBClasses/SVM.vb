@@ -1,5 +1,5 @@
 Imports cv = OpenCvSharp
-Namespace VBClasses
+Imports VBClasses
     Public Class SVM_Basics : Inherits TaskParent
         Implements IDisposable
         Public options As New Options_SVM
@@ -279,4 +279,3 @@ Namespace VBClasses
             End If
         End Sub
     End Class
-End Namespace

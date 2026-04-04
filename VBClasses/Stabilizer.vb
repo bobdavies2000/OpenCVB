@@ -1,6 +1,6 @@
 Imports System.Windows.Forms.Design.AxImporter
 Imports cv = OpenCvSharp
-Namespace VBClasses
+Imports VBClasses
     Public Class Stabilizer_Basics : Inherits TaskParent
         Public Sub New()
             desc = "Use task.lines.lplist(0) to find the angle needed to stabilize the image."
@@ -60,4 +60,3 @@ Namespace VBClasses
             End If
         End Sub
     End Class
-End Namespace

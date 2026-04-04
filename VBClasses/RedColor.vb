@@ -1,7 +1,7 @@
 Imports System.Runtime.InteropServices
 Imports System.Windows.Documents
 Imports cv = OpenCvSharp
-Namespace VBClasses
+Imports VBClasses
     Public Class RedColor_Basics : Inherits TaskParent
         Implements IDisposable
         Public classCount As Integer
@@ -604,4 +604,3 @@ Namespace VBClasses
             SetTrueText(redC.strOut, 1)
         End Sub
     End Class
-End Namespace

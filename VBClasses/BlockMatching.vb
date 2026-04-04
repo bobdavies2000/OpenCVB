@@ -1,6 +1,6 @@
 Imports cv = OpenCvSharp
 'https://github.com/opencv/opencv/blob/master/samples/cpp/stereo_match.cpp
-Namespace VBClasses
+Imports VBClasses
     Public Class BlockMatching_Basics : Inherits TaskParent
         Implements IDisposable
         Dim colorizer As New DepthColorizer_CPP
@@ -46,4 +46,3 @@ Namespace VBClasses
             If blockMatch IsNot Nothing Then blockMatch.Dispose()
         End Sub
     End Class
-End Namespace

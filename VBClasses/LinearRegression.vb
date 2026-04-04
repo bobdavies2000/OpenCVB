@@ -1,5 +1,5 @@
 Imports cv = OpenCvSharp
-Namespace VBClasses
+Imports VBClasses
     Public Class LinearRegression_Basics : Inherits TaskParent
         Public x As New List(Of Single)
         Public y As New List(Of Single)
@@ -90,4 +90,3 @@ Namespace VBClasses
             dst2 = regress.dst2
         End Sub
     End Class
-End Namespace

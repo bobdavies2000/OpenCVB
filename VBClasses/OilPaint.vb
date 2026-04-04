@@ -2,7 +2,7 @@ Imports cv = OpenCvSharp
 Imports System.Windows.Forms
 
 ' Source: https://hackernoon.com/https-medium-com-matteoronchetti-pointillism-with-python-and-opencv-f4274e6bbb7b
-Namespace VBClasses
+Imports VBClasses
     Public Class NR_OilPaint_Pointilism : Inherits TaskParent
         Dim randomMask As cv.Mat
         Dim myRNG As New cv.RNG
@@ -122,4 +122,3 @@ Namespace VBClasses
             result1.CopyTo(dst2(roi))
         End Sub
     End Class
-End Namespace

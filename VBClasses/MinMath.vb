@@ -1,5 +1,5 @@
 Imports cv = OpenCvSharp
-Namespace VBClasses
+Imports VBClasses
     Public Class NR_MinMath_Edges : Inherits TaskParent
         Dim bPoints As New BrickPoint_Basics
         Dim edges As New Edge_Basics
@@ -84,4 +84,3 @@ Namespace VBClasses
         End Sub
     End Class
 
-End Namespace

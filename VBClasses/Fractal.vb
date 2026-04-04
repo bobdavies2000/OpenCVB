@@ -1,7 +1,7 @@
 Imports System.Numerics
 Imports cv = OpenCvSharp
 ' https://medium.com/farouk-ounanes-home-on-the-internet/mandelbrot-set-in-c-from-scratch-c7ad6a1bf2d9
-Namespace VBClasses
+Imports VBClasses
     Public Class Fractal_Mandelbrot : Inherits TaskParent
         Public startX As Single = -2
         Public endX As Single = 2
@@ -230,4 +230,3 @@ Namespace VBClasses
             DrawRect(dst3, rect, white)
         End Sub
     End Class
-End Namespace

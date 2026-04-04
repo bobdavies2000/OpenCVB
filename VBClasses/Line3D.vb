@@ -1,6 +1,6 @@
 Imports System.Runtime.InteropServices
 Imports cv = OpenCvSharp
-Namespace VBClasses
+Imports VBClasses
     Public Class Line3D_Basics : Inherits TaskParent
         Public lines3D As New List(Of cv.Point3f)
         Public lines3DMat As New cv.Mat
@@ -415,4 +415,3 @@ Namespace VBClasses
             SetTrueText(CStr(count) + " new lines were found and there were " + CStr(lpList.Count - count) + " total lines.", 3)
         End Sub
     End Class
-End Namespace

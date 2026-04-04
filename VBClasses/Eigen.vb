@@ -1,5 +1,5 @@
 Imports cv = OpenCvSharp
-Namespace VBClasses
+Imports VBClasses
     Public Class NR_Eigen_Basics : Inherits TaskParent
         Public inputData() As Double
         Public Sub New()
@@ -209,4 +209,3 @@ Namespace VBClasses
             Next
         End Sub
     End Class
-End Namespace

@@ -1,6 +1,6 @@
 Imports cv = OpenCvSharp
 Imports System.Threading
-Namespace VBClasses
+Imports VBClasses
     Public Class Grid_Basics_TA : Inherits TaskParent
         Public gridNeighbors As New List(Of List(Of Integer))
         Public Sub New()
@@ -444,4 +444,3 @@ Namespace VBClasses
             Next
         End Sub
     End Class
-End Namespace

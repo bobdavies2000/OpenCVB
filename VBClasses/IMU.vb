@@ -1,7 +1,7 @@
 Imports cv = OpenCvSharp
 Imports System.Windows.Forms
 ' https://github.com/IntelRealSense/librealsense/tree/master/examples/motion
-Namespace VBClasses
+Imports VBClasses
     Public Class IMU_Basics_TA : Inherits TaskParent
         Dim lastTimeStamp As Double
         Public Sub New()
@@ -1316,4 +1316,3 @@ Namespace VBClasses
             labels(2) = "When run standaloneTest(), the default is to plot the angular velocity for X, Y, and Z"
         End Sub
     End Class
-End Namespace

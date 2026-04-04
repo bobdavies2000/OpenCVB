@@ -1,5 +1,5 @@
 Imports cv = OpenCvSharp
-Namespace VBClasses
+Imports VBClasses
     Public Class Filter_Basics_TA : Inherits TaskParent
         Public filterList As String() = {"Original", "PhotoShop_HSV", "PhotoShop_SharpenDetail", "PhotoShop_WhiteBalance"}
         Dim filters(filterList.Count - 1) As Object
@@ -283,4 +283,3 @@ Namespace VBClasses
             If src.Channels = 1 Then cv.Cv2.EqualizeHist(src, dst2) Else cv.Cv2.EqualizeHist(task.grayStable, dst2)
         End Sub
     End Class
-End Namespace

@@ -1,6 +1,6 @@
 Imports cv = OpenCvSharp
 ' http://www.mia.uni-saarland.de/Publications/weickert-dagm03.pdf
-Namespace VBClasses
+Imports VBClasses
     Public Class Coherence_Basics : Inherits TaskParent
         Dim options As New Options_Coherence
         Public Sub New()
@@ -86,4 +86,3 @@ Namespace VBClasses
             dst2 = coherent.dst2
         End Sub
     End Class
-End Namespace

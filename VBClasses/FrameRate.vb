@@ -1,5 +1,5 @@
 Imports cv = OpenCvSharp
-Namespace VBClasses
+Imports VBClasses
     Public Class FrameRate_Basics : Inherits TaskParent
         Dim mats As New Mat_4to1
         Dim frameCounts(4 - 1) As Integer
@@ -73,4 +73,3 @@ Namespace VBClasses
             lastImages = {task.color.Clone, task.leftview.Clone, task.rightview.Clone, task.depthRGB.Clone}
         End Sub
     End Class
-End Namespace

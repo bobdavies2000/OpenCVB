@@ -1,6 +1,6 @@
 Imports cv = OpenCvSharp
 Imports System.Windows.Forms
-Namespace VBClasses
+Imports VBClasses
     Public Class BlurMotion_Basics_TA : Inherits TaskParent
         Public kernel As cv.Mat
         Public options As New Options_MotionBlur
@@ -151,4 +151,3 @@ Namespace VBClasses
 
 
 
-End Namespace

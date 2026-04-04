@@ -1,7 +1,7 @@
 Imports System.Windows.Forms.VisualStyles.VisualStyleElement.TrackBar
 Imports OpenCvSharp
 Imports cv = OpenCvSharp
-Namespace VBClasses
+Imports VBClasses
     Public Class Intrinsics_Basics : Inherits TaskParent
         Dim bricks As New Brick_Basics
         Public Sub New()
@@ -296,4 +296,3 @@ Namespace VBClasses
         End Sub
     End Class
 
-End Namespace

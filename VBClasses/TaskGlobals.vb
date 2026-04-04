@@ -1,6 +1,6 @@
 ﻿Imports System.Threading
 Imports cv = OpenCvSharp
-Namespace VBClasses
+Imports VBClasses
     Public Module vbc
         Public task As AlgorithmTask
         Public AlgorithmTestAllCount As Integer = 1
@@ -186,4 +186,3 @@ Namespace VBClasses
             Return r
         End Function
     End Module
-End Namespace

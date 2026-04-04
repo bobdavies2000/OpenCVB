@@ -1,5 +1,5 @@
 Imports cv = OpenCvSharp
-Namespace VBClasses
+Imports VBClasses
     Public Class Remap_Basics : Inherits TaskParent
         Public direction As Integer = 3 ' default to remap horizontally and vertically
         Dim mapx1 As cv.Mat, mapx2 As cv.Mat, mapx3 As cv.Mat
@@ -73,4 +73,3 @@ Namespace VBClasses
             End If
         End Sub
     End Class
-End Namespace

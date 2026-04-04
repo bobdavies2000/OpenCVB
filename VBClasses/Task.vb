@@ -2,7 +2,7 @@ Imports System.IO
 Imports PixelViewer
 Imports cv = OpenCvSharp
 Imports jsonShared
-Namespace VBClasses
+Imports VBClasses
     Public Class AlgorithmTask : Implements IDisposable
         Public Sub Initialize(settings As jsonShared.Settings)
             task.Settings = settings
@@ -294,4 +294,3 @@ Namespace VBClasses
             GC.Collect()
         End Sub
     End Class
-End Namespace

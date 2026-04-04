@@ -2,7 +2,7 @@ Imports System.Runtime.InteropServices
 Imports OpenCvSharp
 Imports SharpGL.SceneGraph.Raytracing
 Imports cv = OpenCvSharp
-Namespace VBClasses
+Imports VBClasses
     Public Class Histogram_Basics : Inherits TaskParent
         Implements IDisposable
         Public histogram As New cv.Mat
@@ -1620,4 +1620,3 @@ Namespace VBClasses
             labels(2) = "Histogram Depth to " + Format(task.MaxZmeters, "0.0") + " m"
         End Sub
     End Class
-End Namespace

@@ -1,7 +1,7 @@
 Imports cv = OpenCvSharp
 ' https://github.com/vnglst/pong-wars
 ' https://twitter.com/nicolasdnl/status/1749715070928433161
-Namespace VBClasses
+Imports VBClasses
     Public Class PongWars_Basics : Inherits TaskParent
         Dim sqWidth As Integer = 25
         Dim sqHeight As Integer = 25 * task.workRes.Height / task.workRes.Width
@@ -136,4 +136,3 @@ Namespace VBClasses
             labels(3) = pong2.labels(2)
         End Sub
     End Class
-End Namespace

@@ -1,5 +1,5 @@
 Imports cv = OpenCvSharp
-Namespace VBClasses
+Imports VBClasses
     Public Class Magnify_Basics : Inherits TaskParent
         Public Sub New()
             task.drawRect = New cv.Rect(10, 10, 50, 50)
@@ -31,4 +31,3 @@ Namespace VBClasses
             dst3 = zoom.dst3
         End Sub
     End Class
-End Namespace

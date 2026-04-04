@@ -1,6 +1,6 @@
 Imports cv = OpenCvSharp
 ' https://github.com/opencv/opencv/blob/master/samples/cpp/cloning_demo.cpp
-Namespace VBClasses
+Imports VBClasses
     Public Class Clone_Basics : Inherits TaskParent
         Public colorChangeValues As cv.Vec3f
         Public illuminationChangeValues As cv.Vec2f
@@ -179,4 +179,3 @@ Namespace VBClasses
     End Class
 
 
-End Namespace

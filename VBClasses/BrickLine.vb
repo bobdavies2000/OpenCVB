@@ -1,5 +1,5 @@
 Imports cv = OpenCvSharp
-Namespace VBClasses
+Imports VBClasses
     Public Class BrickLine_Basics_TA : Inherits TaskParent
         Dim bricks As New Brick_Basics
         Dim hist As New Histogram_GridCell
@@ -314,4 +314,3 @@ Namespace VBClasses
                   Format(bestBricks.Count / task.gridRects.Count, "00%") + " of all the bricks"
         End Sub
     End Class
-End Namespace

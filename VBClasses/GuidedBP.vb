@@ -1,6 +1,6 @@
 Imports System.Runtime.InteropServices
 Imports cv = OpenCvSharp
-Namespace VBClasses
+Imports VBClasses
     Public Class GuidedBP_Basics : Inherits TaskParent
         Public ptHot As New GuidedBP_HotPoints
         Dim topMap As New cv.Mat
@@ -423,4 +423,3 @@ Namespace VBClasses
             labels(2) = CStr(topRects.Count) + " objects were identified in the top view."
         End Sub
     End Class
-End Namespace

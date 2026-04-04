@@ -1,7 +1,7 @@
 ﻿Imports cv = OpenCvSharp
 ' https://stackoverflow.com/questions/22132510/opencv-approxpolydp-for-edge-maps-Not-contours
 ' https://docs.opencvb.org/4.x/js_contour_features_approxPolyDP.html
-Namespace VBClasses
+Imports VBClasses
     Public Class ApproxPoly_Basics : Inherits TaskParent
         Dim contour As New Contour_Largest
         Dim rotatedRect As New Rectangle_Rotated
@@ -92,4 +92,3 @@ Namespace VBClasses
         End Sub
     End Class
 
-End Namespace

@@ -1,5 +1,5 @@
 Imports cv = OpenCvSharp
-Namespace VBClasses
+Imports VBClasses
     Public Class Color8U_Basics : Inherits TaskParent
         Public classCount As Integer
         Public classifier As Object
@@ -436,4 +436,3 @@ Namespace VBClasses
             labels(3) += " " + CStr(count) + " bricks mapped into the right image."
         End Sub
     End Class
-End Namespace

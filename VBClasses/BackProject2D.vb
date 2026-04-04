@@ -1,6 +1,6 @@
 ﻿Imports cv = OpenCvSharp
 ' https://docs.opencvb.org/3.4/dc/df6/tutorial_py_Histogram_backprojection.html
-Namespace VBClasses
+Imports VBClasses
     Public Class BackProject2D_Basics : Inherits TaskParent
         Public hist2d As New Hist2D_Basics
         Public colorFmt As New Color_Basics
@@ -361,4 +361,3 @@ Namespace VBClasses
             SetTrueText(strOut, 1)
         End Sub
     End Class
-End Namespace

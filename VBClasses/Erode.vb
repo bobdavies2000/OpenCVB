@@ -1,5 +1,5 @@
 Imports cv = OpenCvSharp
-Namespace VBClasses
+Imports VBClasses
     Public Class Erode_Basics : Inherits TaskParent
         Public options As New Options_Erode
         Public Sub New()
@@ -99,4 +99,3 @@ Namespace VBClasses
     End Class
 
 
-End Namespace

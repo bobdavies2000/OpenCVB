@@ -1,6 +1,6 @@
 Imports System.Windows.Documents
 Imports cv = OpenCvSharp
-Namespace VBClasses
+Imports VBClasses
     Public Class HeatMap_Basics : Inherits TaskParent
         Public topframes As New History_Basics
         Public sideframes As New History_Basics
@@ -151,4 +151,3 @@ Namespace VBClasses
             labels = guided.labels
         End Sub
     End Class
-End Namespace

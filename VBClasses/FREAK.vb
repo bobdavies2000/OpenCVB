@@ -1,7 +1,7 @@
 Imports cv = OpenCvSharp
 Imports OpenCvSharp.XFeatures2D
 'https://github.com/shimat/opencvsharp/wiki/ORB-and-FREAK
-Namespace VBClasses
+Imports VBClasses
     Public Class FREAK_Basics : Inherits TaskParent
         Implements IDisposable
         Dim orb As New ORB_Basics
@@ -35,4 +35,3 @@ Namespace VBClasses
             If freak IsNot Nothing Then freak.Dispose()
         End Sub
     End Class
-End Namespace

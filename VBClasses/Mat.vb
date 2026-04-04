@@ -1,6 +1,6 @@
 Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
-Namespace VBClasses
+Imports VBClasses
     Public Class Mat_Basics : Inherits TaskParent
         Public Sub New()
             desc = "Use the repeat method to replicate data."
@@ -512,4 +512,3 @@ Namespace VBClasses
     End Class
 
 
-End Namespace

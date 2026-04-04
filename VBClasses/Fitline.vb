@@ -1,5 +1,5 @@
 Imports cv = OpenCvSharp
-Namespace VBClasses
+Imports VBClasses
     Public Class FitLine_Basics_TA : Inherits TaskParent
         Public ptList As New List(Of cv.Point2f)
         Public lp As New lpData
@@ -289,4 +289,3 @@ Namespace VBClasses
             SetTrueText($"Line equation: y = {slope:F2}x + {intercept:F2}")
         End Sub
     End Class
-End Namespace

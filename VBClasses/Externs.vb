@@ -1,7 +1,7 @@
 ﻿Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 Imports System.Text
-Namespace VBClasses
+Imports VBClasses
     Module Externs
         <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)>
         Public Function SemiGlobalMatching_Open(rows As Integer, cols As Integer, disparityRange As Integer) As IntPtr
@@ -1384,4 +1384,3 @@ Namespace VBClasses
         Public Function RedCart_CPP_RunCPP(cPtr As IntPtr, dataPtr As IntPtr, rows As Integer, cols As Integer) As IntPtr
         End Function
     End Module
-End Namespace

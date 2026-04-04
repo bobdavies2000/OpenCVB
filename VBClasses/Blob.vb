@@ -1,5 +1,5 @@
 Imports cv = OpenCvSharp
-Namespace VBClasses
+Imports VBClasses
     Public Class Blob_Basics : Inherits TaskParent
         Implements IDisposable
         Dim options As Options_Blob
@@ -116,4 +116,3 @@ Namespace VBClasses
         End Sub
     End Class
 
-End Namespace

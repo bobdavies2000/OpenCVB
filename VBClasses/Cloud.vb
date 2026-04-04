@@ -1,6 +1,6 @@
 Imports System.Security.Cryptography
 Imports cv = OpenCvSharp
-Namespace VBClasses
+Imports VBClasses
     Public Class Cloud_Basics : Inherits TaskParent
         Dim bricks As New Brick_Basics
         Public Shared ppx = task.calibData.leftIntrinsics.ppx
@@ -876,4 +876,3 @@ Namespace VBClasses
         End Sub
     End Class
 
-End Namespace

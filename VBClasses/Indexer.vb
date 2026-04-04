@@ -1,5 +1,5 @@
 ﻿Imports cv = OpenCvSharp
-Namespace VBClasses
+Imports VBClasses
     Public Class Indexer_Basics : Inherits TaskParent
         Public prep As New RedPrep_Core
         Public Sub New()
@@ -96,4 +96,3 @@ Namespace VBClasses
             labels(3) = CStr(count) + " corners found"
         End Sub
     End Class
-End Namespace

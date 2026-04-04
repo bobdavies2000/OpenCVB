@@ -2,7 +2,7 @@ Imports System.IO
 Imports System.Runtime.InteropServices
 Imports cv = OpenCvSharp
 ' https://github.com/opencv/opencv_contrib/blob/master/modules/bgsegm/samples/bgfg.cpp
-Namespace VBClasses
+Imports VBClasses
     Public Class BGSubtract_Basics : Inherits TaskParent
         Implements IDisposable
         Public options As New Options_BGSubtract
@@ -370,4 +370,3 @@ Namespace VBClasses
         End Sub
     End Class
 
-End Namespace

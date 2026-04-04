@@ -1,6 +1,6 @@
 Imports cv = OpenCvSharp
 ' https://docs.opencvb.org/2.4/doc/tutorials/objdetect/cascade_classifier/cascade_classifier.html
-Namespace VBClasses
+Imports VBClasses
     Public Class NR_Face_Haar_LBP : Inherits TaskParent
         Dim haarCascade As cv.CascadeClassifier
         Dim lbpCascade As cv.CascadeClassifier
@@ -42,4 +42,3 @@ Namespace VBClasses
             NR_Face_Haar_LBP.DetectFace(dst2, haarCascade)
         End Sub
     End Class
-End Namespace

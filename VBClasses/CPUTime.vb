@@ -1,6 +1,6 @@
 ﻿Imports jsonShared
 
-Namespace VBClasses
+Imports VBClasses
     Public Class CPUTime
         ' TreeView and trace Data.
         Public callTrace As List(Of String)
@@ -139,4 +139,4 @@ Namespace VBClasses
             Return percentTime
         End Function
     End Class
-End Namespace
+

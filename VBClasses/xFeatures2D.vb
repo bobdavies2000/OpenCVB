@@ -1,7 +1,7 @@
 Imports OpenCvSharp.XFeatures2D
 Imports cv = OpenCvSharp
 ' https://github.com/JiphuTzu/opencvsharp/blob/master/sample/SamplesVB/Samples/StarDetectorSample.vb
-Namespace VBClasses
+Imports VBClasses
     Public Class XFeatures2D_StarDetector : Inherits TaskParent
         Implements IDisposable
         Dim detector As StarDetector
@@ -27,4 +27,3 @@ Namespace VBClasses
             If detector IsNot Nothing Then detector.Dispose()
         End Sub
     End Class
-End Namespace

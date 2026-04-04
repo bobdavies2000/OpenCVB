@@ -1,5 +1,5 @@
 ﻿Imports cv = OpenCvSharp
-Namespace VBClasses
+Imports VBClasses
     Public Class Brightness_Basics : Inherits TaskParent
         Dim Options As New Options_BrightnessContrast
         Public Sub New()
@@ -81,4 +81,3 @@ Namespace VBClasses
             End If
         End Sub
     End Class
-End Namespace

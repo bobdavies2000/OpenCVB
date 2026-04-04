@@ -1,6 +1,6 @@
 Imports cv = OpenCvSharp
 'https://www.pyimagesearch.com/2017/11/06/deep-learning-opencvs-blobfromimage-works/
-Namespace VBClasses
+Imports VBClasses
     Public Class MeanSubtraction_Basics : Inherits TaskParent
         Public scaleValue As Single = 16
         Public Sub New()
@@ -70,4 +70,3 @@ Namespace VBClasses
             dst2 *= 100 / scaleValue
         End Sub
     End Class
-End Namespace

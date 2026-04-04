@@ -1,6 +1,6 @@
 Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
-Namespace VBClasses
+Imports VBClasses
     Public Class HistValley_Basics : Inherits TaskParent
         Dim hist As New Histogram_Basics
         Dim options As New Options_Boundary
@@ -693,4 +693,3 @@ Namespace VBClasses
         End Sub
     End Class
 
-End Namespace

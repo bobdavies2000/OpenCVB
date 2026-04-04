@@ -1,5 +1,5 @@
 ﻿Imports System.Windows.Forms
-Namespace VBClasses
+Imports VBClasses
     Public Class OptionParent
         Public check As New OptionsCheckbox
         Public combo As New OptionsCombo
@@ -62,4 +62,3 @@ Namespace VBClasses
             traceName = Me.GetType.Name
         End Sub
     End Class
-End Namespace

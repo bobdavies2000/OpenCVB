@@ -1,6 +1,6 @@
 Imports cv = OpenCvSharp
 Imports  System.IO
-Namespace VBClasses
+Imports VBClasses
     Public Class QRcode_Basics : Inherits TaskParent
         Dim qrDecoder As New cv.QRCodeDetector
         Dim qrInput1 As New cv.Mat
@@ -45,4 +45,3 @@ Namespace VBClasses
 
 
 
-End Namespace

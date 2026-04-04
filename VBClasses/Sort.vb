@@ -1,6 +1,6 @@
 Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
-Namespace VBClasses
+Imports VBClasses
     Public Class Sort_Basics : Inherits TaskParent
         Dim options As New Options_Sort
         Public Sub New()
@@ -297,4 +297,3 @@ Namespace VBClasses
             dst2 = plot.dst2
         End Sub
     End Class
-End Namespace

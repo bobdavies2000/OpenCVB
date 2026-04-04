@@ -1,6 +1,6 @@
 Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
-Namespace VBClasses
+Imports VBClasses
     Public Class EdgeLine_Basics_TA : Inherits TaskParent
         Implements IDisposable
         Public rcList As New List(Of rcData)
@@ -481,4 +481,3 @@ Namespace VBClasses
             EdgeLineRaw_Close(cPtr)
         End Sub
     End Class
-End Namespace

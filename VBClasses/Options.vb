@@ -3,7 +3,7 @@ Imports System.Numerics
 Imports System.Windows.Forms.Design.AxImporter
 Imports OpenCvSharp.ML
 Imports cv = OpenCvSharp
-Namespace VBClasses
+Imports VBClasses
     Public Class Options_SharpGL : Inherits OptionParent
         Public perspective As Single
         Public zNear As Single
@@ -8221,4 +8221,3 @@ Namespace VBClasses
         End Sub
     End Class
 
-End Namespace

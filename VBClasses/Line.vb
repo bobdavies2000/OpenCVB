@@ -1,5 +1,5 @@
 Imports cv = OpenCvSharp
-Namespace VBClasses
+Imports VBClasses
     Public Class Line_Basics_TA : Inherits TaskParent
         Implements IDisposable
         Public lpList As New List(Of lpData)
@@ -956,4 +956,3 @@ Namespace VBClasses
             End If
         End Sub
     End Class
-End Namespace

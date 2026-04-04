@@ -2,7 +2,7 @@ Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 Imports System.Windows
 ' https://learnopencvb.com/object-tracking-using-opencv-cpp-python/
-Namespace VBClasses
+Imports VBClasses
     Public Class Track_Basics : Inherits TaskParent
         Implements IDisposable
         Public outputRect As cv.Rect
@@ -162,4 +162,3 @@ Namespace VBClasses
         End Sub
     End Class
 
-End Namespace

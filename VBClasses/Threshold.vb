@@ -1,6 +1,6 @@
 Imports cv = OpenCvSharp
 ' https://opencv24-python-tutorials.readthedocs.io/en/latest/py_tutorials/py_imgproc/py_thresholding/py_thresholding.html
-Namespace VBClasses
+Imports VBClasses
     Public Class Threshold_Basics : Inherits TaskParent
         Public options As New Options_Threshold
         Public Sub New()
@@ -160,4 +160,3 @@ Namespace VBClasses
             labels = byChan.labels
         End Sub
     End Class
-End Namespace

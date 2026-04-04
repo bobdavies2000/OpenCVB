@@ -1,5 +1,5 @@
 Imports cv = OpenCvSharp
-Namespace VBClasses
+Imports VBClasses
     Public Class LeftRight_Basics : Inherits TaskParent
         Public meanLeft As Double
         Public meanRight As Double
@@ -253,4 +253,4 @@ Namespace VBClasses
             dst3 = fLessRaw.dst2.Clone
         End Sub
     End Class
-End Namespace
+

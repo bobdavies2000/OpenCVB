@@ -1,6 +1,6 @@
 Imports cv = OpenCvSharp
 'https://github.com/oreillymedia/Learning-OpenCV-3_examples/blob/master/example_14-03.cpp
-Namespace VBClasses
+Imports VBClasses
     Public Class CComp_Basics : Inherits TaskParent
         Public connectedComponents As cv.ConnectedComponents
         Public rects As New List(Of cv.Rect)
@@ -199,4 +199,3 @@ Namespace VBClasses
             labels(3) = CStr(masks.Count) + " Connected Components"
         End Sub
     End Class
-End Namespace

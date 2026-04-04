@@ -12,7 +12,7 @@ Imports System.Text.RegularExpressions
 ' This impact is likely the result of how JPEG compression truncates values as insignificant - a definite manipulation of the data.
 
 ' https://www.codeproject.com/Articles/215620/Detecting-Manipulations-in-Data-with-Benford-s-Law
-Namespace VBClasses
+Imports VBClasses
     Public Class Benford_Basics : Inherits TaskParent
         Public expectedDistribution(10 - 1) As Single
         Public counts(expectedDistribution.Count - 1) As Single
@@ -252,4 +252,3 @@ Namespace VBClasses
             dst2 = benford.dst2
         End Sub
     End Class
-End Namespace

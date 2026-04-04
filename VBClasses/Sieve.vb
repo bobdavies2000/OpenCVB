@@ -1,7 +1,7 @@
 Imports cv = OpenCvSharp
 Imports System.Numerics
 ' https://github.com/TheAlgorithms/C-Sharp/blob/master/Algorithms/Other/SieveOfEratosthenes.cs'
-Namespace VBClasses
+Imports VBClasses
     Public Class Sieve_BasicsVB : Inherits TaskParent
         Public primes As New List(Of Integer)
         Public Sub New()
@@ -88,4 +88,3 @@ Namespace VBClasses
             dst3 = zoom.dst2
         End Sub
     End Class
-End Namespace

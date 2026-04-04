@@ -2,7 +2,7 @@ Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 Imports System.Runtime.Remoting
 ' https://docs.opencvb.org/3.4.2/de/dc7/fitellipse_8cpp-example.html
-Namespace VBClasses
+Imports VBClasses
     Public Class FitEllipse_Basics : Inherits TaskParent
         Dim options As New Options_MinArea
         Public inputPoints As New List(Of cv.Point2f)
@@ -196,4 +196,3 @@ Namespace VBClasses
         End Sub
     End Class
 
-End Namespace

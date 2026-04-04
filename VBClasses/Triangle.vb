@@ -1,6 +1,6 @@
 Imports System.Runtime.InteropServices
 Imports cv = OpenCvSharp
-Namespace VBClasses
+Imports VBClasses
     Public Class Triangle_Basics : Inherits TaskParent
         Public triangles As New List(Of cv.Point3f)
         Dim redC As New RedColor_Basics
@@ -242,4 +242,3 @@ Namespace VBClasses
             Next
         End Sub
     End Class
-End Namespace

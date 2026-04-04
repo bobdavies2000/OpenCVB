@@ -243,5 +243,4 @@ Namespace VBClasses
             labels(2) = fLess.labels(2)
         End Sub
     End Class
-
 End Namespace

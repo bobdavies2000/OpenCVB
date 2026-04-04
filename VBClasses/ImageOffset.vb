@@ -1,5 +1,5 @@
 Imports cv = OpenCvSharp
-Namespace VBClasses
+Imports VBClasses
     Public Class ImageOffset_Basics : Inherits TaskParent
         Public options As New Options_ImageOffset
         Dim options1 As New Options_Diff
@@ -188,4 +188,3 @@ Namespace VBClasses
         End Sub
     End Class
 
-End Namespace

@@ -1,6 +1,6 @@
 ﻿Imports cv = OpenCvSharp
 Imports System.Drawing.Imaging
-Namespace VBClasses
+Imports VBClasses
     Public Class TrueText
         Declare Sub CopyClassToManagedCpp Lib "ManagedCppLibrary.dll" (dataPtr As IntPtr)
         Public text As String
@@ -179,4 +179,3 @@ Namespace VBClasses
         Public Sub Dispose() Implements IDisposable.Dispose
         End Sub
     End Class
-End Namespace

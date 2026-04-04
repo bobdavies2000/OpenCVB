@@ -1,7 +1,7 @@
 Imports System.Runtime.InteropServices
 Imports cv = OpenCvSharp
-Namespace VBClasses
-    Public Enum causes
+Imports VBClasses
+Public Enum causes
         lastCellFound
         indexLastGood
         indexLastBelowZero
@@ -664,4 +664,4 @@ Namespace VBClasses
             dst2 = addw.dst2
         End Sub
     End Class
-End Namespace
+

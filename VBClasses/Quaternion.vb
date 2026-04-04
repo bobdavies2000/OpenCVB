@@ -1,6 +1,6 @@
 Imports cv = OpenCvSharp
 Imports System.Numerics
-Namespace VBClasses
+Imports VBClasses
     Public Class Quaternion_Basics : Inherits TaskParent
         Dim options As New Options_Quaternion
         Public Sub New()
@@ -82,4 +82,3 @@ Namespace VBClasses
                                  Format(diffq.Z, fmt3) + vbTab)
         End Sub
     End Class
-End Namespace

@@ -1,6 +1,6 @@
 Imports cv = OpenCvSharp
 ' https://docs.opencvb.org/master/df/d3d/tutorial_py_inpainting.html#gsc.tab=0
-Namespace VBClasses
+Imports VBClasses
     Public Class InPaint_Basics : Inherits TaskParent
         Dim options As New Options_InPaint
         Public Sub New()
@@ -110,4 +110,3 @@ Namespace VBClasses
         End Sub
     End Class
 
-End Namespace

@@ -1,5 +1,5 @@
 Imports cv = OpenCvSharp
-Namespace VBClasses
+Imports VBClasses
     Public Class Font_Basics : Inherits TaskParent
         Public msg As String
         Public size As Single
@@ -110,4 +110,3 @@ Namespace VBClasses
             If standalone = False Then parentData.trueData = trueData
         End Sub
     End Class
-End Namespace

@@ -1,6 +1,6 @@
 Imports cv = OpenCvSharp
 Imports System.IO
-Namespace VBClasses
+Imports VBClasses
     Public Class SLR_Basics : Inherits TaskParent
         Public slrCore As New SLR_Core
         Public plot As New Plot_Points
@@ -869,4 +869,3 @@ Namespace VBClasses
             Return True
         End Function
     End Class
-End Namespace

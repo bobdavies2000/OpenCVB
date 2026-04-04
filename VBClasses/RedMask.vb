@@ -1,6 +1,6 @@
 Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
-Namespace VBClasses
+Imports VBClasses
     Public Class RedMask_Basics : Inherits TaskParent
         Implements IDisposable
         Public mdList As New List(Of maskData)
@@ -458,4 +458,3 @@ Namespace VBClasses
             SetTrueText(strOut, 1)
         End Sub
     End Class
-End Namespace

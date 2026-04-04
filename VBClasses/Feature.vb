@@ -1,6 +1,6 @@
 Imports System.Runtime.InteropServices
 Imports cv = OpenCvSharp
-Namespace VBClasses
+Imports VBClasses
     Public Class Feature_Basics : Inherits TaskParent
         Public features As New List(Of cv.Point)
         Public feature2f As New List(Of cv.Point2f)
@@ -901,4 +901,3 @@ Namespace VBClasses
             Next
         End Sub
     End Class
-End Namespace

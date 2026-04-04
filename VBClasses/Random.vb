@@ -1,7 +1,7 @@
 Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 Imports System.Windows.Forms
-Namespace VBClasses
+Imports VBClasses
     Public Class Random_Basics : Inherits TaskParent
         Public PointList As New List(Of cv.Point2f)
         Public range As cv.Rect
@@ -667,4 +667,3 @@ Namespace VBClasses
             Next
         End Sub
     End Class
-End Namespace

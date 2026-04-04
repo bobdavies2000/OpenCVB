@@ -2,7 +2,7 @@ Imports cv = OpenCvSharp
 ' https://docs.opencvb.org/3.4/d3/dc0/group__imgproc__shape.html
 ' https://docs.opencvb.org/3.4/d5/d45/tutorial_py_contours_more_functions.html
 ' https://stackoverflow.com/questions/55529371/opencv-shape-matching-between-two-similar-shapes
-Namespace VBClasses
+Imports VBClasses
     Public Class MatchShapes_Basics : Inherits TaskParent
         Public hull1 As cv.Point()()
         Public hull2 As cv.Point()()
@@ -247,4 +247,3 @@ Namespace VBClasses
             If similarCells.Count = 0 Then SetTrueText("No matches with match value < " + Format(options.matchThreshold, fmt2), New cv.Point(5, 5), 3)
         End Sub
     End Class
-End Namespace

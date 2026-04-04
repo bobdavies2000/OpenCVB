@@ -1,6 +1,6 @@
 Imports cv = OpenCvSharp
 'https://github.com/shimat/opencvsharp/wiki/ORB-and-FREAK
-Namespace VBClasses
+Imports VBClasses
     Public Class ORB_Basics : Inherits TaskParent
         Implements IDisposable
         Public keypoints() As cv.KeyPoint
@@ -27,4 +27,3 @@ Namespace VBClasses
     End Class
 
 
-End Namespace

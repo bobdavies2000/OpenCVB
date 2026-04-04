@@ -3,7 +3,7 @@ Imports Microsoft.VisualBasic.Logging
 Imports cv = OpenCvSharp
 ' https://docs.opencvb.org/3.0-beta/modules/ml/doc/expectation_maximization.html
 ' https://github.com/opencv/opencv/blob/master/samples/cpp/em.cpp
-Namespace VBClasses
+Imports VBClasses
     Public Class EMax_Basics : Inherits TaskParent
         Implements IDisposable
         Public emaxInput As New EMax_InputClusters
@@ -279,4 +279,3 @@ Namespace VBClasses
             dst2 = emax.dst2
         End Sub
     End Class
-End Namespace

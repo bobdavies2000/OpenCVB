@@ -1,6 +1,6 @@
 Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
-Namespace VBClasses
+Imports VBClasses
     Public Class Interpolate_Basics : Inherits TaskParent
         Public options As New Options_Resize
         Public iOptions As New Options_Interpolate
@@ -209,4 +209,3 @@ Namespace VBClasses
                     " processedFPS = " + Format(processedFPS, "00.0")
         End Sub
     End Class
-End Namespace

@@ -1,7 +1,7 @@
 Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 Imports System.Windows.Forms
-Namespace VBClasses
+Imports VBClasses
     Public Class Fuzzy_Basics : Inherits TaskParent
         Implements IDisposable
         Dim reduction As New Reduction_Basics
@@ -281,4 +281,3 @@ Namespace VBClasses
             labels(2) = CStr(tracker.fuzzy.sortContours.Count) + " regions were found in the image."
         End Sub
     End Class
-End Namespace

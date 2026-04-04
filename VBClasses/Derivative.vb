@@ -1,5 +1,5 @@
 Imports cv = OpenCvSharp
-Namespace VBClasses
+Imports VBClasses
     Public Class Derivative_Basics : Inherits TaskParent
         Dim subD As New Derivative_Subtract
         Dim plotHist As New Plot_Histogram
@@ -239,4 +239,3 @@ Namespace VBClasses
             labels(3) = $"Backprojection of Y dimension of task.pcSplit({deriv.options.channel})"
         End Sub
     End Class
-End Namespace

@@ -1,6 +1,6 @@
 Imports cv = OpenCvSharp
 ' https://stackoverflow.com/questions/6606891/opencv-virtually-camera-rotating-translating-for-birds-eye-view/6667784#6667784
-Namespace VBClasses
+Imports VBClasses
     Public Class NR_WarpPerspective_Basics : Inherits TaskParent
         Public options As New Options_Warp
         Public Sub New()
@@ -41,4 +41,3 @@ Namespace VBClasses
             cv.Cv2.WarpAffine(dst2, dst3, rotationMatrix, src.Size(), cv.InterpolationFlags.Nearest)
         End Sub
     End Class
-End Namespace

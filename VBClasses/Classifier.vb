@@ -1,6 +1,6 @@
 ﻿Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
-Namespace VBClasses
+Imports VBClasses
     Public Class Classifier_Basics_CPP : Inherits TaskParent
         Implements IDisposable
         Dim options As New Options_Classifier
@@ -197,4 +197,3 @@ Namespace VBClasses
         End Sub
     End Class
 
-End Namespace

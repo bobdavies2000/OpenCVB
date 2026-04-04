@@ -1,5 +1,5 @@
 Imports cv = OpenCvSharp
-Namespace VBClasses
+Imports VBClasses
     Public Class HighVis_Basics : Inherits TaskParent
         Dim bricks As New Brick_Basics
         Dim info As New NR_Brick_Info
@@ -29,4 +29,3 @@ Namespace VBClasses
             SetTrueText(info.strOut, 3)
         End Sub
     End Class
-End Namespace

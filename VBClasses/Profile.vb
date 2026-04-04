@@ -1,5 +1,5 @@
 Imports cv = OpenCvSharp
-Namespace VBClasses
+Imports VBClasses
     Public Class Profile_Basics : Inherits TaskParent
         Public ptLeft As cv.Point3f, ptRight As cv.Point3f, ptTop As cv.Point3f, ptBot As cv.Point3f, ptFront As cv.Point3f, ptBack As cv.Point3f
         Public cornerNames As New List(Of String)({"   First (white)", "   Left (light blue)", "   Right (red)", "   Top (green)",
@@ -338,4 +338,3 @@ Namespace VBClasses
             SetTrueText("Select a cell in the upper right image", 2)
         End Sub
     End Class
-End Namespace

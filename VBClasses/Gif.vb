@@ -6,7 +6,7 @@ Imports cvext = OpenCvSharp.Extensions
 ' https://stackoverflow.com/questions/1196322/how-to-create-an-animated-gif-in-net
 ' https://stackoverflow.com/questions/18719302/net-creating-a-looping-gif-using-gifbitmapencoder
 ' https://ezgif.com/optimize
-Namespace VBClasses
+Imports VBClasses
     Public Class Gif_Basics : Inherits TaskParent
         Public options As New Options_Gif
         Public Sub New()
@@ -151,4 +151,3 @@ Namespace VBClasses
                     task.homeDir + "/temp/myGIF.gif'"
         End Sub
     End Class
-End Namespace

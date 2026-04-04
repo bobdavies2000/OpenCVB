@@ -1,6 +1,6 @@
 Imports System.Runtime.InteropServices
 Imports cv = OpenCvSharp
-Namespace VBClasses
+Imports VBClasses
     Public Class FindNonZero_Basics : Inherits TaskParent
         Public ptMat As cv.Mat
         Public Sub New()
@@ -164,4 +164,3 @@ Namespace VBClasses
             vecMat = cv.Mat.FromPixelData(veclist.Count, 3, cv.MatType.CV_32F, veclist.ToArray)
         End Sub
     End Class
-End Namespace

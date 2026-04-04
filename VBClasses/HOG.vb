@@ -1,6 +1,6 @@
 Imports cv = OpenCvSharp
 ' https://github.com/JiphuTzu/opencvsharp/blob/master/sample/SamplesVB/Samples/HOGSample.vb
-Namespace VBClasses
+Imports VBClasses
     Public Class HOG_Basics : Inherits TaskParent
         Dim Image As cv.Mat
         Dim ImageProcessed As Boolean
@@ -60,4 +60,3 @@ Namespace VBClasses
 
 
 
-End Namespace

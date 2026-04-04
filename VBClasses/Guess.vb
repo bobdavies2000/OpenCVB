@@ -1,6 +1,6 @@
 Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
-Namespace VBClasses
+Imports VBClasses
     Public Class NR_Guess_Depth_CPP : Inherits TaskParent
         Implements IDisposable
         Public Sub New()
@@ -58,4 +58,3 @@ Namespace VBClasses
             Guess_ImageEdges_Close(cPtr)
         End Sub
     End Class
-End Namespace

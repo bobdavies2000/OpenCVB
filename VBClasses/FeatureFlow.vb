@@ -1,5 +1,5 @@
 Imports cv = OpenCvSharp
-Namespace VBClasses
+Imports VBClasses
     Public Class NR_FeatureFlow_Basics : Inherits TaskParent
         Public lpList As New List(Of lpData)
         Public mpCorrelation As New List(Of Single)
@@ -325,4 +325,3 @@ Namespace VBClasses
         End Sub
     End Class
 
-End Namespace

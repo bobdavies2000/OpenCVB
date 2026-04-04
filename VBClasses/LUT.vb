@@ -2,7 +2,7 @@ Imports System.Runtime.InteropServices
 Imports cv = OpenCvSharp
 ' https://github.com/opencv/opencv/blob/master/samples/cpp/falsecolor.cpp
 ' https://docs.opencvb.org/2.4/modules/core/doc/operations_on_arrays.html
-Namespace VBClasses
+Imports VBClasses
     Public Class LUT_Basics : Inherits TaskParent
         Public classCount As Integer
         Dim options As New Options_LUT
@@ -300,4 +300,3 @@ Namespace VBClasses
             dst3 = dst2.LUT(myLut)
         End Sub
     End Class
-End Namespace

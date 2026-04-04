@@ -1,7 +1,7 @@
 Imports System.IO
 Imports cv = OpenCvSharp
 ' https://docs.opencvb.org/3.3.1/de/dd0/grabcut_8cpp-example.html
-Namespace VBClasses
+Imports VBClasses
     Public Class GrabCut_Basics : Inherits TaskParent
         Public fgFineTune As cv.Mat
         Public bgFineTune As cv.Mat
@@ -169,4 +169,3 @@ Namespace VBClasses
             dst2.CopyTo(dst3, dst1 + 1)
         End Sub
     End Class
-End Namespace

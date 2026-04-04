@@ -1,5 +1,5 @@
 Imports cv = OpenCvSharp
-Namespace VBClasses
+Imports VBClasses
     Public Class Diff_Basics : Inherits TaskParent
         Public changedPixels As Integer
         Public lastFrame As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 255)
@@ -258,4 +258,3 @@ Namespace VBClasses
             labels(3) = CStr(motionSort.Count) + " bricks different by more than " + CStr(options.millimeters) + " mm's"
         End Sub
     End Class
-End Namespace

@@ -1,5 +1,5 @@
 Imports cv = OpenCvSharp
-Namespace VBClasses
+Imports VBClasses
     Public Class Stripes_Basics : Inherits TaskParent
         Public classCount As Integer
         Public Sub New()
@@ -114,4 +114,3 @@ Namespace VBClasses
             dst3 = stripes.dst3.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         End Sub
     End Class
-End Namespace

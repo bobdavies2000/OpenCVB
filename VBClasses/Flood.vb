@@ -1,6 +1,6 @@
 Imports System.Runtime.InteropServices
 Imports cv = OpenCvSharp
-Namespace VBClasses
+Imports VBClasses
     Public Class Flood_Basics : Inherits TaskParent
         Implements IDisposable
         Public rcList As New List(Of rcData)
@@ -207,4 +207,3 @@ Namespace VBClasses
             If showSelected Then SetTrueText(redC.strOut, 1)
         End Sub
     End Class
-End Namespace

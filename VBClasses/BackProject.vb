@@ -1,7 +1,7 @@
 Imports System.Runtime.InteropServices
 Imports cv = OpenCvSharp
 ' https://docs.opencvb.org/3.4/dc/df6/tutorial_py_Histogram_backprojection.html
-Namespace VBClasses
+Imports VBClasses
     Public Class BackProject_Basics : Inherits TaskParent
         Public hist As New Histogram_Basics
         Public minRange As cv.Scalar, maxRange As cv.Scalar
@@ -809,4 +809,3 @@ Namespace VBClasses
         End Sub
     End Class
 
-End Namespace

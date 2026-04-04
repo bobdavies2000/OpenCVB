@@ -1,5 +1,5 @@
 Imports cv = OpenCvSharp
-Namespace VBClasses
+Imports VBClasses
     Public Class LineEnds_Basics : Inherits TaskParent
         Dim match As New LineEnds_Correlation
         Public correlations As New List(Of Single)
@@ -114,4 +114,3 @@ Namespace VBClasses
                     "rect for p2 has " + Format(p2Correlation, fmt3)
         End Sub
     End Class
-End Namespace

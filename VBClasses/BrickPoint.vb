@@ -1,5 +1,5 @@
 Imports cv = OpenCvSharp
-Namespace VBClasses
+Imports VBClasses
     Public Class BrickPoint_Basics : Inherits TaskParent
         Dim bricks As New Brick_Basics
         Public sobel As New Edge_Sobel
@@ -593,4 +593,3 @@ Namespace VBClasses
             End If
         End Sub
     End Class
-End Namespace

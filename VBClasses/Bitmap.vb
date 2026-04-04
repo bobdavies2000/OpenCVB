@@ -1,7 +1,7 @@
 Imports System.Drawing
 Imports cv = OpenCvSharp
 ' https://www.csharpcodi.com/csharp-examples/OpenCvSharp.Extensions.BitmapConverter.ToBitmap(OpenCvSharp.Mat)/
-Namespace VBClasses
+Imports VBClasses
     Public Class Bitmap_ToMat : Inherits TaskParent
         Public Sub New()
             labels(2) = "Convert color bitmap to Mat"
@@ -17,4 +17,3 @@ Namespace VBClasses
             dst3 = cv.Extensions.BitmapConverter.ToMat(bitmap)
         End Sub
     End Class
-End Namespace

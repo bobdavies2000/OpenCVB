@@ -1,5 +1,5 @@
 Imports cv = OpenCvSharp
-Namespace VBClasses
+Imports VBClasses
     Public Class Projection_Basics : Inherits TaskParent
         Public redCellInput As New List(Of rcData)
         Public rclist As New List(Of rcData)
@@ -409,4 +409,3 @@ Namespace VBClasses
             dst3 = histogram.Threshold(task.projectionThreshold, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs
         End Sub
     End Class
-End Namespace

@@ -1,7 +1,7 @@
 Imports cv = OpenCvSharp
 Imports System.IO
 ' https://github.com/opencv/opencv/blob/3.2.0/samples/gpu/super_resolution.cpp
-Namespace VBClasses
+Imports VBClasses
     Public Class SuperRes_Basics : Inherits TaskParent
         Implements IDisposable
         Dim video As New SuperRes_Input
@@ -109,4 +109,3 @@ Namespace VBClasses
             labels = zoom.labels
         End Sub
     End Class
-End Namespace

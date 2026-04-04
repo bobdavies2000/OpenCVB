@@ -2,7 +2,7 @@ Imports cv = OpenCvSharp
 Imports System.Windows.Forms
 Imports System.Threading
 ' https://answers.opencvb.org/question/122331/how-to-subtract-a-constant-from-a-3-channel-mat/
-Namespace VBClasses
+Imports VBClasses
     Public Class NR_Math_Subtract : Inherits TaskParent
         Dim options As New Options_Colors
         Public Sub New()
@@ -377,4 +377,3 @@ Namespace VBClasses
             labels(3) = CStr(task.gridRects.Count - updateCount) + " out of " + CStr(task.gridRects.Count) + " had stdev > " + Format(stdevSlider.Value, "0.0")
         End Sub
     End Class
-End Namespace

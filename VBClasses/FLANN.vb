@@ -1,7 +1,7 @@
 Imports cv = OpenCvSharp
 ' https://docs.opencvb.org/2.4/modules/flann/doc/flann_fast_approximate_nearest_Neighbor_search.html#
 ' https://github.com/JiphuTzu/opencvsharp/blob/master/sample/SamplesVB/Samples/FlannSample.vb
-Namespace VBClasses
+Imports VBClasses
     Public Class NR_FLANN_Test : Inherits TaskParent
         Public Sub New()
             desc = "Test basics of FLANN - Fast Library for Approximate Nearest Neighbor. "
@@ -109,4 +109,3 @@ Namespace VBClasses
             SetTrueText(output, New cv.Point(10, 50), 3)
         End Sub
     End Class
-End Namespace

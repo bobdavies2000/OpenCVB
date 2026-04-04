@@ -1,5 +1,5 @@
 Imports cv = OpenCvSharp
-Namespace VBClasses
+Imports VBClasses
     Public Class Texture_Basics : Inherits TaskParent
         Dim ellipse As New Draw_Ellipses
         Public texture As New cv.Mat
@@ -40,4 +40,3 @@ Namespace VBClasses
             If standaloneTest() Then dst3.Rectangle(tRect, white, 2)
         End Sub
     End Class
-End Namespace

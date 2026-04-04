@@ -1,6 +1,6 @@
 Imports cv = OpenCvSharp
 ' https://github.com/opencv/opencv/blob/master/samples/cpp/lkdemo.cpp
-Namespace VBClasses
+Imports VBClasses
     Public Class KLT_Basics : Inherits TaskParent
         Public status As New cv.Mat
         Public outputMat As New cv.Mat
@@ -85,4 +85,3 @@ Namespace VBClasses
             lastpoints = klt.ptInput
         End Sub
     End Class
-End Namespace

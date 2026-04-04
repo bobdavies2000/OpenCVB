@@ -1,5 +1,5 @@
 ﻿Imports cv = OpenCvSharp
-Namespace VBClasses
+Imports VBClasses
     Public Class Homography_Basics : Inherits TaskParent
         Public corners1 As New List(Of cv.Point2d)
         Public corners2 As New List(Of cv.Point2d)
@@ -27,4 +27,3 @@ Namespace VBClasses
     End Class
 
 
-End Namespace

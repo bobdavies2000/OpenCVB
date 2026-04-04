@@ -1,6 +1,6 @@
 Imports cv = OpenCvSharp
-Namespace VBClasses
-    Public Class Contour_Basics : Inherits TaskParent
+Imports VBClasses
+Public Class Contour_Basics : Inherits TaskParent
         Implements IDisposable
         Public classCount As Integer
         Public contourList As New List(Of contourData)
@@ -1261,5 +1261,4 @@ Namespace VBClasses
                 labels(2) = "Matched " + CStr(matched) + "/" + CStr(rcList.Count) + " contours to the previous generation"
             End If
         End Sub
-    End Class
-End Namespace
+End Class

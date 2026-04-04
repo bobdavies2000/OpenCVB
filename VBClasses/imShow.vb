@@ -1,5 +1,5 @@
 Imports cv = OpenCvSharp
-Namespace VBClasses
+Imports VBClasses
     Public Class ImShow_Basics : Inherits TaskParent
         Implements IDisposable
         Public Sub New()
@@ -32,4 +32,3 @@ Namespace VBClasses
             cv.Cv2.DestroyWindow("Point cloud")
         End Sub
     End Class
-End Namespace

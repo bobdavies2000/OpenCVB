@@ -1,5 +1,5 @@
 ﻿Imports cv = OpenCvSharp
-Namespace VBClasses
+Imports VBClasses
     Public Class Boundary_Basics : Inherits TaskParent
         Public redC As New RedColor_Basics
         Dim color8U As New Color8U_Basics
@@ -157,4 +157,3 @@ Namespace VBClasses
             labels(2) = prep.labels(2)
         End Sub
     End Class
-End Namespace

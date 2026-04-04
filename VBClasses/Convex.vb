@@ -1,5 +1,5 @@
 Imports cv = OpenCvSharp
-Namespace VBClasses
+Imports VBClasses
     Public Class Convex_Basics : Inherits TaskParent
         Public hull() As cv.Point
         Dim options As New Options_Convex
@@ -189,4 +189,3 @@ Namespace VBClasses
             DrawTour(dst2, rc.contour, cv.Scalar.Red)
         End Sub
     End Class
-End Namespace

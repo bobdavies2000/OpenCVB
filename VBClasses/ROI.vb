@@ -1,5 +1,5 @@
 Imports cv = OpenCvSharp
-Namespace VBClasses
+Imports VBClasses
     Public Class ROI_Basics : Inherits TaskParent
         Public diff As New Diff_Basics
         Public aoiRect As cv.Rect
@@ -165,4 +165,3 @@ Namespace VBClasses
             task.color.Rectangle(roiRect, task.highlight, task.lineWidth)
         End Sub
     End Class
-End Namespace

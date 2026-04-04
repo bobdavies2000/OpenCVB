@@ -1,6 +1,6 @@
 Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
-Namespace VBClasses
+Imports VBClasses
     Public Class SuperPixel_Basics : Inherits TaskParent
         Dim redC As New RedColor_Basics
         Public Sub New()
@@ -144,4 +144,3 @@ Namespace VBClasses
             labels(3) = task.lines.labels(2)
         End Sub
     End Class
-End Namespace

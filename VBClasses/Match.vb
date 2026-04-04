@@ -1,7 +1,7 @@
 Imports cv = OpenCvSharp
 Imports System.Threading
 Imports System.Windows.Forms
-Namespace VBClasses
+Imports VBClasses
     Public Class Match_Basics : Inherits TaskParent
         Public template As New cv.Mat ' caller provides this!
         Public correlation As Single
@@ -701,4 +701,3 @@ Namespace VBClasses
             Next
         End Sub
     End Class
-End Namespace

@@ -1,5 +1,5 @@
 Imports cv = OpenCvSharp
-Namespace VBClasses
+Imports VBClasses
     Public Class NR_Quad_RightView : Inherits TaskParent
         Public Sub New()
             dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
@@ -354,4 +354,3 @@ Namespace VBClasses
             Next
         End Sub
     End Class
-End Namespace

@@ -1,6 +1,6 @@
 Imports cv = OpenCvSharp
 ' https://github.com/shimat/opencvsharp/blob/master/test/OpenCvSharp.Tests/stitching/StitchingTest.cs
-Namespace VBClasses
+Imports VBClasses
     Public Class Stitch_Basics : Inherits TaskParent
         Implements IDisposable
         Dim options As New Options_Stitch
@@ -43,4 +43,3 @@ Namespace VBClasses
             If sticherObj IsNot Nothing Then sticherObj.Dispose()
         End Sub
     End Class
-End Namespace

@@ -4,7 +4,7 @@ Imports cv = OpenCvSharp
 ' https://docs.opencvb.org/3.4/d7/d4d/tutorial_py_thresholding.html
 ' https://www.learnopencvb.com/otsu-thresholding-with-opencv/?ck_subscriber_id=785741175
 ' https://github.com/spmallick/learnopencv/tree/master/otsu-method?ck_subscriber_id=785741175
-Namespace VBClasses
+Imports VBClasses
     Public Class Binarize_Basics : Inherits TaskParent
         Public thresholdType = cv.ThresholdTypes.Otsu
         Public histogram As New cv.Mat
@@ -227,4 +227,3 @@ Namespace VBClasses
         End Sub
     End Class
 
-End Namespace

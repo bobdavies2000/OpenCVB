@@ -1,5 +1,5 @@
 Imports cv = OpenCvSharp
-Namespace VBClasses
+Imports VBClasses
     Public Class Cluster_Basics : Inherits TaskParent
         Dim knn As New KNN_Basics
         Public ptInput As New List(Of cv.Point)
@@ -118,4 +118,3 @@ Namespace VBClasses
             labels(3) = bPoint.labels(2)
         End Sub
     End Class
-End Namespace

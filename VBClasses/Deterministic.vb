@@ -1,5 +1,5 @@
 Imports cv = OpenCvSharp
-Namespace VBClasses
+Imports VBClasses
     Public Class NR_Deterministic_Basics : Inherits TaskParent
         Dim deter As New Edge_Canny
         Dim diff As New Diff_Basics
@@ -139,4 +139,3 @@ Namespace VBClasses
     End Class
 
 
-End Namespace

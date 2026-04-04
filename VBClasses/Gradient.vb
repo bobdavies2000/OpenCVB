@@ -1,5 +1,5 @@
 Imports cv = OpenCvSharp
-Namespace VBClasses
+Imports VBClasses
     Public Class Gradient_Basics : Inherits TaskParent
         Public sobel As New Edge_Sobel
         Public Sub New()
@@ -98,4 +98,3 @@ Namespace VBClasses
             dst2 = gradient.Resize(dst2.Size)
         End Sub
     End Class
-End Namespace

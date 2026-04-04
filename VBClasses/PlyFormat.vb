@@ -1,6 +1,6 @@
 Imports System.IO
 Imports cv = OpenCvSharp
-Namespace VBClasses
+Imports VBClasses
     Public Class PlyFormat_Basics : Inherits TaskParent
         Public options As New Options_PlyFormat
         Dim saveFileName As String
@@ -83,4 +83,3 @@ Namespace VBClasses
         End Sub
     End Class
 
-End Namespace

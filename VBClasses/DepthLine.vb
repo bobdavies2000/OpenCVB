@@ -1,6 +1,6 @@
 Imports OpenCvSharp.ML.DTrees
 Imports cv = OpenCvSharp
-Namespace VBClasses
+Imports VBClasses
     Public Class DepthLine_Basics_TA : Inherits TaskParent
         Public prepEdges As New RedPrep_EdgeMask
         Dim lines As New Line_Basics_TA
@@ -321,4 +321,4 @@ Namespace VBClasses
         End Sub
     End Class
 
-End Namespace
+

@@ -1,6 +1,6 @@
 Imports cv = OpenCvSharp
 ' https://github.com/shimat/opencvsharp/wiki/Solve-Equation
-Namespace VBClasses
+Imports VBClasses
     Public Class NR_Solve_ByMat : Inherits TaskParent
         Public Sub New()
             desc = "Solve a set of equations with OpenCV's Solve API."
@@ -42,4 +42,3 @@ Namespace VBClasses
     End Class
 
 
-End Namespace

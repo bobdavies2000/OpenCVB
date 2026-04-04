@@ -1,5 +1,5 @@
 ﻿Imports cv = OpenCvSharp
-Namespace VBClasses
+Imports VBClasses
     Public Class Color_Basics : Inherits TaskParent
         Public options As New Options_Color
         Public Sub New()
@@ -65,4 +65,3 @@ Namespace VBClasses
             labels(3) = "At " + " color diff threshold " + CStr(threshold) + ", differences: " + CStr(count)
         End Sub
     End Class
-End Namespace

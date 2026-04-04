@@ -1,7 +1,7 @@
 Imports cv = OpenCvSharp
 Imports OpenCvSharp.XPhoto
 Imports System.Runtime.InteropServices
-Namespace VBClasses
+Imports VBClasses
     Public Class NR_ExPhoto_Bm3dDenoise : Inherits TaskParent
         Public Sub New()
             desc = "Denoise image with block matching and filtering."
@@ -139,4 +139,3 @@ Namespace VBClasses
             If cPtr <> 0 Then cPtr = ExPhoto_Inpaint_Close(cPtr)
         End Sub
     End Class
-End Namespace

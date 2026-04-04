@@ -1,6 +1,6 @@
 Imports System.Windows.Forms.Design.AxImporter
 Imports cv = OpenCvSharp
-Namespace VBClasses
+Imports VBClasses
     Public Class Disparity_Basics : Inherits TaskParent
         Dim match As New Match_Basics
         Public rightView As cv.Mat
@@ -222,4 +222,3 @@ Namespace VBClasses
         End Sub
     End Class
 
-End Namespace

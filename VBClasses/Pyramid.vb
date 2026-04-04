@@ -1,6 +1,6 @@
 Imports cv = OpenCvSharp
 ' https://docs.opencvb.org/3.3.1/d6/d73/Pyramids_8cpp-example.html
-Namespace VBClasses
+Imports VBClasses
     Public Class Pyramid_Basics : Inherits TaskParent
         Dim options As New Options_Pyramid
         Public Sub New()
@@ -43,4 +43,3 @@ Namespace VBClasses
 
 
 
-End Namespace

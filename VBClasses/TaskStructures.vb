@@ -1,7 +1,7 @@
 ﻿Imports Newtonsoft.Json.Linq
 Imports OpenCvSharp
 Imports cv = OpenCvSharp
-Namespace VBClasses
+Imports VBClasses
     Public Module Structures
         Public Enum pointStyle
             unFiltered = 0
@@ -660,4 +660,3 @@ Namespace VBClasses
             End Function
         End Class
     End Module
-End Namespace

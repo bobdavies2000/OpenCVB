@@ -1,6 +1,6 @@
 Imports System.Dynamic
 Imports cv = OpenCvSharp
-Namespace VBClasses
+Imports VBClasses
     Public Class Spectrum_Basics : Inherits TaskParent
         Dim dSpec As New Spectrum_Z
         Dim gSpec As New Spectrum_Gray
@@ -462,4 +462,3 @@ Namespace VBClasses
             SetTrueText(strOut, 3)
         End Sub
     End Class
-End Namespace

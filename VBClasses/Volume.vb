@@ -1,5 +1,5 @@
 ﻿Imports cv = OpenCvSharp
-Namespace VBClasses
+Imports VBClasses
     Public Class Volume_Basics : Inherits TaskParent
         Public rc As New rcData
         Public volume As Single
@@ -57,4 +57,3 @@ Namespace VBClasses
             SetTrueText(strOut, 3)
         End Sub
     End Class
-End Namespace

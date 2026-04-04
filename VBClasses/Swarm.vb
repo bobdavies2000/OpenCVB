@@ -1,6 +1,6 @@
 Imports System.Windows.Documents
 Imports cv = OpenCvSharp
-Namespace VBClasses
+Imports VBClasses
     Public Class Swarm_Basics : Inherits TaskParent
         Public knn As New KNN_Basics
         Public lpList As New List(Of lpData)
@@ -233,4 +233,3 @@ Namespace VBClasses
     '        ' labels(2) = flood.cellGen.labels(2)
     '    End Sub
     'End Class
-End Namespace

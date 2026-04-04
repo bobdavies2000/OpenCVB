@@ -1,7 +1,7 @@
 Imports cv = OpenCvSharp
 ' https://github.com/opencv/opencv/blob/master/samples/cpp/phase_corr.cpp
 ' https://docs.opencvb.org/master/d7/df3/group__imgproc__motion.html
-Namespace VBClasses
+Imports VBClasses
     Public Class PhaseCorrelate_Basics : Inherits TaskParent
         Dim hanning As New cv.Mat
         Public stableRect As cv.Rect
@@ -199,4 +199,3 @@ Namespace VBClasses
         End Sub
     End Class
 
-End Namespace

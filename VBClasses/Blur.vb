@@ -1,6 +1,6 @@
 Imports System.Windows.Forms
 Imports cv = OpenCvSharp
-Namespace VBClasses
+Imports VBClasses
     Public Class Blur_Basics : Inherits TaskParent
         Public Options As New Options_Blur
         Public Sub New()
@@ -240,4 +240,3 @@ Namespace VBClasses
             End If
         End Sub
     End Class
-End Namespace

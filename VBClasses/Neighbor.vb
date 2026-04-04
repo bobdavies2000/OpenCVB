@@ -1,6 +1,6 @@
 Imports System.Runtime.InteropServices
 Imports cv = OpenCvSharp
-Namespace VBClasses
+Imports VBClasses
     Public Class Neighbor_Basics : Inherits TaskParent
         Dim knn As New KNN_Basics
         Public runRedCflag As Boolean = False
@@ -207,4 +207,3 @@ Namespace VBClasses
             Neighbor_Close(cPtr)
         End Sub
     End Class
-End Namespace

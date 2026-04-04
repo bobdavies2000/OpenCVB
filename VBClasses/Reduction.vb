@@ -1,5 +1,5 @@
 Imports cv = OpenCvSharp
-Namespace VBClasses
+Imports VBClasses
     Public Class Reduction_Basics : Inherits TaskParent
         Public classCount As Integer
         Public Sub New()
@@ -304,4 +304,3 @@ Namespace VBClasses
             dst2 = reduction.dst3
         End Sub
     End Class
-End Namespace

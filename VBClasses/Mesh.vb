@@ -1,5 +1,5 @@
 Imports cv = OpenCvSharp
-Namespace VBClasses
+Imports VBClasses
     Public Class Mesh_Basics : Inherits TaskParent
         Dim knn As New KNN_Basics
         Public ptList As New List(Of cv.Point2f)
@@ -77,4 +77,3 @@ Namespace VBClasses
             labels(3) = CStr(depthMiss) + " of " + CStr(mesh.ptList.Count) + " features had no depth at that location.  Depth is an average around it for those missing depth."
         End Sub
     End Class
-End Namespace

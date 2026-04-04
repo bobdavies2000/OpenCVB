@@ -1,6 +1,6 @@
 Imports System.Windows.Forms
 Imports cv = OpenCvSharp
-Namespace VBClasses
+Imports VBClasses
     Public Class Foreground_Basics : Inherits TaskParent
         Dim simK As New KMeans_Depth
         Public fgDepth As Single
@@ -106,4 +106,3 @@ Namespace VBClasses
             dst3 = Not dst2
         End Sub
     End Class
-End Namespace

@@ -1,5 +1,5 @@
 Imports cv = OpenCvSharp
-Namespace VBClasses
+Imports VBClasses
     Public Class Covariance_Basics : Inherits TaskParent
         Dim random As New Random_Basics
         Public mean As New cv.Mat
@@ -93,4 +93,3 @@ Namespace VBClasses
             covariance = covar.covariance
         End Sub
     End Class
-End Namespace

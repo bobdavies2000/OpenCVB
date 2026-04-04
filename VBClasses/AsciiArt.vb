@@ -1,6 +1,6 @@
 ﻿Imports cv = OpenCvSharp
 ' https://github.com/ncosentino/DevLeader/tree/master/AsciiArtGenerator
-Namespace VBClasses
+Imports VBClasses
     Public Class AsciiArt_Basics : Inherits TaskParent
         Dim asciiChars As String() = {"@", "%", "#", "*", "+", "=", "-", ":", ",", ".", " "}
         Dim options As New Options_AsciiArt
@@ -72,4 +72,3 @@ Namespace VBClasses
         End Sub
     End Class
 
-End Namespace

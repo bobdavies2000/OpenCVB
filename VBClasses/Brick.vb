@@ -1,5 +1,5 @@
 Imports cv = OpenCvSharp
-Namespace VBClasses
+Imports VBClasses
     Public Class Brick_Basics : Inherits TaskParent
         Public instantUpdate As Boolean
         Public brickDepthCount As Integer
@@ -1061,4 +1061,3 @@ Namespace VBClasses
             dst3.Rectangle(brick.rRect, task.highlight, task.lineWidth)
         End Sub
     End Class
-End Namespace

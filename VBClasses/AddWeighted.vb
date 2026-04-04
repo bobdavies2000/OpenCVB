@@ -1,5 +1,5 @@
 Imports cv = OpenCvSharp
-Namespace VBClasses
+Imports VBClasses
     Public Class AddWeighted_Accumulate : Inherits TaskParent
         Dim options As New Options_AddWeighted
         Public Sub New()
@@ -137,4 +137,3 @@ Namespace VBClasses
         End Sub
     End Class
 
-End Namespace

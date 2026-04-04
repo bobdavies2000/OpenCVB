@@ -1,7 +1,7 @@
 Imports System.Runtime.InteropServices
 Imports cv = OpenCvSharp
 ' https://docs.opencvb.org/2.4/modules/imgproc/doc/histograms.html
-Namespace VBClasses
+Imports VBClasses
     Public Class Hist2D_Basics : Inherits TaskParent
         Public histRowsCols() As Integer
         Public ranges() As cv.Rangef
@@ -198,4 +198,3 @@ Namespace VBClasses
             dst3 = plotHist.dst2
         End Sub
     End Class
-End Namespace

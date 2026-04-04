@@ -1,6 +1,6 @@
 Imports System.Runtime.InteropServices
 Imports cv = OpenCvSharp
-Namespace VBClasses
+Imports VBClasses
     Public Class LineMatch_Basics : Inherits TaskParent
         Public lpListLast As List(Of lpData) = New List(Of lpData)(task.lines.lpList)
         Public lpList As New List(Of lpData)
@@ -202,4 +202,3 @@ Namespace VBClasses
         End Sub
     End Class
 
-End Namespace

@@ -1,5 +1,5 @@
 Imports cv = OpenCvSharp
-Namespace VBClasses
+Imports VBClasses
     Public Class NR_Concat_Basics : Inherits TaskParent
         Public Sub New()
             labels(2) = "Horizontal concatenation"
@@ -43,4 +43,3 @@ Namespace VBClasses
     End Class
 
 
-End Namespace

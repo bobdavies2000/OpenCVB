@@ -1,6 +1,6 @@
 Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
-Namespace VBClasses
+Imports VBClasses
     Public Class KMeans_Basics : Inherits TaskParent
         Public options As New Options_KMeans
         Public colors As New cv.Mat
@@ -545,4 +545,3 @@ Namespace VBClasses
             labels(2) = simK.labels(2) + " with " + CStr(binSlider.value) + " histogram bins"
         End Sub
     End Class
-End Namespace

@@ -1,6 +1,6 @@
 Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
-Namespace VBClasses
+Imports VBClasses
     Public Class Salience_Basics_CPP : Inherits TaskParent
         Implements IDisposable
         Dim grayData(0) As Byte
@@ -60,4 +60,3 @@ Namespace VBClasses
 
 
 
-End Namespace

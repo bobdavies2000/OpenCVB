@@ -1,6 +1,6 @@
 ﻿Imports cv = OpenCvSharp
 'https://github.com/DinoZ1729/Double-Pendulum/blob/main/pendulum_with_trace.cpp
-Namespace VBClasses
+Imports VBClasses
     Public Class Pendulum_Basics : Inherits TaskParent
         Dim l1 As Single = 150, l2 As Single = 150, m1 As Single = 10, m2 As Single = 10
         Dim o1 As Single = CSng(2 * cv.Cv2.PI / 2), o2 As Single = CSng(2 * cv.Cv2.PI / 3)
@@ -56,4 +56,3 @@ Namespace VBClasses
             DrawCircle(dst3, p2, task.DotSize, task.scalarColors(task.frameCount Mod 255))
         End Sub
     End Class
-End Namespace

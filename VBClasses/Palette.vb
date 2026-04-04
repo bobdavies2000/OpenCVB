@@ -1,7 +1,7 @@
 Imports cv = OpenCvSharp
 Imports System.IO
 Imports System.Drawing.Imaging
-Namespace VBClasses
+Imports VBClasses
     Public Class Palette_Basics : Inherits TaskParent
         Public whitebackground As Boolean
         Public Sub New()
@@ -648,4 +648,3 @@ Namespace VBClasses
             If standalone Then dst3 = colorMap.Resize(dst3.Size)
         End Sub
     End Class
-End Namespace

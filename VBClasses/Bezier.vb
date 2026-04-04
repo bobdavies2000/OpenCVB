@@ -1,5 +1,5 @@
 ﻿Imports cv = OpenCvSharp
-Namespace VBClasses
+Imports VBClasses
     Public Class Bezier_Basics : Inherits TaskParent
         Public points() As cv.Point
         Public Sub New()
@@ -67,4 +67,3 @@ Namespace VBClasses
             dst2.Line(points(2), points(3), white, task.lineWidth, task.lineWidth)
         End Sub
     End Class
-End Namespace

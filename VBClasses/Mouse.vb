@@ -1,5 +1,5 @@
 Imports cv = OpenCvSharp
-Namespace VBClasses
+Imports VBClasses
     Public Class Mouse_Basics : Inherits TaskParent
         Dim lastPoint = New cv.Point
         Dim colorIndex As Integer
@@ -82,4 +82,3 @@ Namespace VBClasses
         End Sub
     End Class
 
-End Namespace

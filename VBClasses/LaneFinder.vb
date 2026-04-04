@@ -1,6 +1,6 @@
 Imports cv = OpenCvSharp
 Imports System.IO
-Namespace VBClasses
+Imports VBClasses
     Public Class LaneFinder_Basics : Inherits TaskParent
         Dim lane As New LaneFinder_SlopeIntercept
         Public Sub New()
@@ -203,4 +203,3 @@ Namespace VBClasses
             dst2.CopyTo(dst3, dst2)
         End Sub
     End Class
-End Namespace

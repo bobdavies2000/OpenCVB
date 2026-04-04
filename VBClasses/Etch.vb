@@ -1,5 +1,5 @@
 Imports cv = OpenCvSharp
-Namespace VBClasses
+Imports VBClasses
     Public Class NR_Etch_ASketch : Inherits TaskParent
         Dim keys As Keyboard_Basics
         Dim slateColor = New cv.Scalar(122, 122, 122)
@@ -60,4 +60,3 @@ Namespace VBClasses
             If options.demoMode Then lastCursor = cursor
         End Sub
     End Class
-End Namespace

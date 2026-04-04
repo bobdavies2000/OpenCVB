@@ -1,5 +1,5 @@
 Imports cv = OpenCvSharp
-Namespace VBClasses
+Imports VBClasses
     Public Class Hull_Basics : Inherits TaskParent
         Dim random As New Random_Basics
         Public inputPoints As New List(Of cv.Point2f)
@@ -121,4 +121,3 @@ Namespace VBClasses
             End If
         End Sub
     End Class
-End Namespace

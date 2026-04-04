@@ -1,6 +1,6 @@
 Imports cv = OpenCvSharp
 ' http://opencvexamples.blogspot.com/
-Namespace VBClasses
+Imports VBClasses
     Public Class WarpAffine_Basics : Inherits TaskParent
         Public options As New Options_Resize
         Public optionsWarp As New Options_WarpAffine
@@ -383,4 +383,3 @@ Namespace VBClasses
             Next
         End Sub
     End Class
-End Namespace

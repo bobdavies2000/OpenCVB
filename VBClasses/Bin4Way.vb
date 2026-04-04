@@ -1,6 +1,6 @@
 ﻿Imports System.Runtime.InteropServices
 Imports cv = OpenCvSharp
-Namespace VBClasses
+Imports VBClasses
     Public Class Bin4Way_Basics : Inherits TaskParent
         Dim mats As New Mat_4to1
         Dim binary As New Bin4Way_SplitMean
@@ -623,4 +623,3 @@ Namespace VBClasses
             labels(3) = mats.labels(3)
         End Sub
     End Class
-End Namespace

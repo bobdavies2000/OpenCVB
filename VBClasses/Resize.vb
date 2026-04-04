@@ -1,5 +1,5 @@
 Imports cv = OpenCvSharp
-Namespace VBClasses
+Imports VBClasses
     Public Class Resize_Basics : Inherits TaskParent
         Public newSize As cv.Size
         Public options As New Options_Resize
@@ -78,4 +78,3 @@ Namespace VBClasses
             src.CopyTo(dst3(newRect))
         End Sub
     End Class
-End Namespace

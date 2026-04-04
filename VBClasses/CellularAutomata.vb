@@ -1,6 +1,6 @@
 Imports cv = OpenCvSharp
 ' https://mathworld.wolfram.com/ElementaryCellularAutomaton.html
-Namespace VBClasses
+Imports VBClasses
     Public Class CellularAutomata_Basics : Inherits TaskParent
         Public i18 As New List(Of String)({"00011110 Rule 30 (chaotic)", "00110110 Rule 54", "00111100 Rule 60", "00111110 Rule 62",
                                            "01011010 Rule 90", "01011110 Rule 94", "01100110 Rule 102", "01101110 Rule 110",
@@ -273,4 +273,3 @@ Namespace VBClasses
     End Class
 
 
-End Namespace

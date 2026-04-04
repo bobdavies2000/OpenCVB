@@ -3,7 +3,7 @@ Imports OpenCvSharp.Dnn
 Imports System.IO
 Imports OpenCvSharp.DnnSuperres
 ' https://github.com/twMr7/rscvdnn
-Namespace VBClasses
+Imports VBClasses
     Public Class NR_DNN_Basics : Inherits TaskParent
         Dim net As Net
         Dim dnnPrepared As Boolean
@@ -224,4 +224,3 @@ Namespace VBClasses
     '                    Format(mm.maxVal, "#0.00%"), New cv.Point(40, 200))
     '    End Sub
     'End Class
-End Namespace

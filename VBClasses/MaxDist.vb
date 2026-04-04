@@ -1,5 +1,5 @@
 Imports cv = OpenCvSharp
-Namespace VBClasses
+Imports VBClasses
     Public Class MaxDist_Basics : Inherits TaskParent
         Dim redC As New RedCloud_Basics
         Public Sub New()
@@ -83,4 +83,3 @@ Namespace VBClasses
             Next
         End Sub
     End Class
-End Namespace

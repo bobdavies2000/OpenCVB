@@ -1,6 +1,6 @@
 Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
-Namespace VBClasses
+Imports VBClasses
     ' You can find the main direction of a series of points using principal component analysis �(PCA).
     ' PCA is a statistical technique that can be used to find the directions of greatest variance in a dataset.
     ' The main direction of a series of points is the direction of greatest variance in the dataset.
@@ -1015,4 +1015,3 @@ Namespace VBClasses
         End Sub
     End Class
 
-End Namespace

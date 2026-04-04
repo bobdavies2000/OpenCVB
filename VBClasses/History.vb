@@ -1,5 +1,5 @@
 Imports cv = OpenCvSharp
-Namespace VBClasses
+Imports VBClasses
     Public Class History_Basics : Inherits TaskParent
         Public saveFrames As New List(Of cv.Mat)
         Dim options As New Options_History
@@ -208,4 +208,3 @@ Namespace VBClasses
             task.depthRGB.CopyTo(dst3, dst2)
         End Sub
     End Class
-End Namespace

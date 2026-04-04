@@ -1,6 +1,6 @@
 Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
-Namespace VBClasses
+Imports VBClasses
     Public Class Hist3D_Basics : Inherits TaskParent
         Dim hColor As New Hist3Dcolor_Basics
         Dim hCloud As New Hist3Dcloud_Basics
@@ -324,4 +324,3 @@ Namespace VBClasses
             Next
         End Sub
     End Class
-End Namespace

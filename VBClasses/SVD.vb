@@ -1,7 +1,7 @@
 Imports System.Windows.Documents
 Imports cv = OpenCvSharp
 ' https://answers.opencvb.org/question/200080/parameters-of-cvsvdecomp/
-Namespace VBClasses
+Imports VBClasses
     Public Class NR_SVD_Example : Inherits TaskParent
         Public Sub New()
             desc = "SVD example"
@@ -153,4 +153,3 @@ Namespace VBClasses
             SetTrueText(strOut, 3)
         End Sub
     End Class
-End Namespace

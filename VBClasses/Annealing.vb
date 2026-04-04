@@ -1,7 +1,7 @@
 Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 Imports System.Text.RegularExpressions
-Namespace VBClasses
+Imports VBClasses
     Public Class Annealing_Basics_CPP : Inherits TaskParent
         Implements IDisposable
         Public numberOfCities As Integer = 25
@@ -160,4 +160,3 @@ Namespace VBClasses
             If successCounter >= options.successCount Then setup()
         End Sub
     End Class
-End Namespace

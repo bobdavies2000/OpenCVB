@@ -1,6 +1,6 @@
 Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
-Namespace VBClasses
+Imports VBClasses
     Public Class Hist3Dcolor_Basics : Inherits TaskParent
         Public histogram As New cv.Mat
         Public histogram1D As New cv.Mat
@@ -333,4 +333,3 @@ Namespace VBClasses
             If standaloneTest() Then SetTrueText("Vector prepared in histArray")
         End Sub
     End Class
-End Namespace

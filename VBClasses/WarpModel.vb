@@ -2,7 +2,7 @@ Imports cv = OpenCvSharp
 Imports  System.IO
 Imports System.Runtime.InteropServices
 ' https://www.learnopencvb.com/image-alignment-ecc-in-opencv-c-python/
-Namespace VBClasses
+Imports VBClasses
     Public Class WarpModel_Basics : Inherits TaskParent
         Dim ecc As New WarpModel_ECC
         Dim options As New Options_WarpModel
@@ -180,4 +180,3 @@ Namespace VBClasses
             dst3(r(0)) = merged
         End Sub
     End Class
-End Namespace

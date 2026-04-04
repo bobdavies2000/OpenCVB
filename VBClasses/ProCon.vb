@@ -2,7 +2,7 @@ Imports cv = OpenCvSharp
 Imports System.Threading
 Imports System.Windows.Forms
 ' https://www.codeproject.com/Articles/5280034/Generation-of-Infinite-Sequences-in-Csharp-and-Unm
-Namespace VBClasses
+Imports VBClasses
     Public Class ProCon_Basics : Inherits TaskParent
         Implements IDisposable
         Public mutex = New Mutex(True, "BufferMutex")
@@ -121,4 +121,3 @@ Namespace VBClasses
 
 
 
-End Namespace

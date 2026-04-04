@@ -1,6 +1,6 @@
 Imports cv = OpenCvSharp
 ' http://www.ilikebigbits.com/blog/2015/3/2/plane-from-points
-Namespace VBClasses
+Imports VBClasses
     Public Class Plane_Basics : Inherits TaskParent
         Dim frames As New History_Basics
         Public Sub New()
@@ -706,4 +706,3 @@ Namespace VBClasses
             dst1.Line(New cv.Point(0, rect.Y), New cv.Point(dst2.Width, rect.Y), cv.Scalar.Yellow, slice.options.sliceSize, task.lineType)
         End Sub
     End Class
-End Namespace

@@ -1,5 +1,5 @@
 ﻿Imports cv = OpenCvSharp
-Namespace VBClasses
+Imports VBClasses
     Public Class RedUtil_Basics : Inherits TaskParent
         Dim redC As New RedCloud_Basics
         Public Sub New()
@@ -157,4 +157,3 @@ Namespace VBClasses
             SetTrueText(redC.strOut, 3)
         End Sub
     End Class
-End Namespace

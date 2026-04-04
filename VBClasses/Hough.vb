@@ -1,7 +1,7 @@
 Imports cv = OpenCvSharp
 ' https://docs.opencvb.org/3.1.0/d6/d10/tutorial_py_houghlines.html
 ' https://github.com/JiphuTzu/opencvsharp/blob/master/sample/SamplesVB/Samples/HoughLinesSample.vb
-Namespace VBClasses
+Imports VBClasses
     Public Class Hough_Basics : Inherits TaskParent
         Dim edges As New Edge_Basics
         Public segments() As cv.LineSegmentPolar
@@ -378,4 +378,3 @@ Namespace VBClasses
             End If
         End Sub
     End Class
-End Namespace

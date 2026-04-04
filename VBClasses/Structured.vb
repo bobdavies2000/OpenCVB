@@ -1,5 +1,5 @@
 Imports cv = OpenCvSharp
-Namespace VBClasses
+Imports VBClasses
     Public Class Structured_Basics : Inherits TaskParent
         Public lpListX As New List(Of lpData)
         Public lpListY As New List(Of lpData)
@@ -954,4 +954,3 @@ Namespace VBClasses
         End Sub
     End Class
 
-End Namespace

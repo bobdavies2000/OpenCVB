@@ -1,5 +1,5 @@
 Imports cv = OpenCvSharp
-Namespace VBClasses
+Imports VBClasses
     Public Class LineRect_Basics : Inherits TaskParent
         Dim bricks As New Brick_Basics
         Public lpInput1 As lpData
@@ -133,4 +133,3 @@ Namespace VBClasses
             End If
         End Sub
     End Class
-End Namespace

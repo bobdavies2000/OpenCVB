@@ -1,7 +1,7 @@
 Imports System.Runtime.InteropServices
 Imports cv = OpenCvSharp
-Namespace VBClasses
-    Public Class RedPrep_Basics : Inherits TaskParent
+Imports VBClasses
+Public Class RedPrep_Basics : Inherits TaskParent
         Dim prepEdges As New RedPrep_Edges_CPP
         Public options As New Options_RedPrep
         Public Sub New()
@@ -536,4 +536,3 @@ Namespace VBClasses
             If cPtr <> 0 Then cPtr = PrepXY_Close(cPtr)
         End Sub
     End Class
-End Namespace

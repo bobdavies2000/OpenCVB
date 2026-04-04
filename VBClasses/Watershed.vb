@@ -1,5 +1,5 @@
 Imports cv = OpenCvSharp
-Namespace VBClasses
+Imports VBClasses
     Public Class Watershed_Basics : Inherits TaskParent
         Dim rects As New List(Of cv.Rect)
         Public UseCorners As Boolean
@@ -93,4 +93,3 @@ Namespace VBClasses
             labels(2) = watershed.labels(2)
         End Sub
     End Class
-End Namespace

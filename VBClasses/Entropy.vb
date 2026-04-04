@@ -1,6 +1,6 @@
 Imports cv = OpenCvSharp
 ' http://areshopencvb.blogspot.com/2011/12/computing-entropy-of-image.html
-Namespace VBClasses
+Imports VBClasses
     Public Class Entropy_Basics : Inherits TaskParent
         Dim entropy As New Entropy_Rectangle
         Public Sub New()
@@ -273,4 +273,3 @@ Namespace VBClasses
             SetTrueText(entropy.strOut, 3)
         End Sub
     End Class
-End Namespace

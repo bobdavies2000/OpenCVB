@@ -1,5 +1,5 @@
 Imports cv = OpenCvSharp
-Namespace VBClasses
+Imports VBClasses
     Public Class Rectangle_Basics : Inherits TaskParent
         Public rectangles As New List(Of cv.Rect)
         Public rotatedRectangles As New List(Of cv.RotatedRect)
@@ -359,4 +359,3 @@ Namespace VBClasses
             dst2(New cv.Rect(0, 0, sz.Width, sz.Height)) = dst0.Clone
         End Sub
     End Class
-End Namespace

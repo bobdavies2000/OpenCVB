@@ -1,6 +1,6 @@
 Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
-Namespace VBClasses
+Imports VBClasses
     Public Class NR_DepthLinear_Basics : Inherits TaskParent
         Dim inputX As New DepthLinear_InputX
         Dim inputY As New DepthLinear_InputY
@@ -372,4 +372,3 @@ Namespace VBClasses
             dst3.SetTo(0, task.noDepthMask)
         End Sub
     End Class
-End Namespace

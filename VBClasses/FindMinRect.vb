@@ -1,5 +1,5 @@
 Imports cv = OpenCvSharp
-Namespace VBClasses
+Imports VBClasses
     Public Class FindMinRect_Basics : Inherits TaskParent
         Public minRect As cv.RotatedRect
         Dim options As New Options_MinArea
@@ -63,4 +63,3 @@ Namespace VBClasses
             SetTrueText("Wave at the camera to see algorithm working...", 3)
         End Sub
     End Class
-End Namespace

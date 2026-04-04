@@ -1,5 +1,5 @@
 Imports cv = OpenCvSharp
-Namespace VBClasses
+Imports VBClasses
     Public Class Dilate_Basics : Inherits TaskParent
         Public options As New Options_Dilate
         Public Sub New()
@@ -57,4 +57,3 @@ Namespace VBClasses
             cv.Cv2.MorphologyEx(dst2, dst2, cv.MorphTypes.Close, options.element)
         End Sub
     End Class
-End Namespace

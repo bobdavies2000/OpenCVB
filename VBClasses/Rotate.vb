@@ -1,6 +1,6 @@
 Imports cv = OpenCvSharp
 ' https://www.programcreek.com/python/example/89459/cv2.getRotationMatrix2D
-Namespace VBClasses
+Imports VBClasses
     Public Class Rotate_Basics : Inherits TaskParent
         Public M As cv.Mat
         Public Mflip As cv.Mat
@@ -132,4 +132,3 @@ Namespace VBClasses
             SetTrueText("Angle offset from gravity = " + Format(angleSlider.Value / 100, fmt2), 3)
         End Sub
     End Class
-End Namespace

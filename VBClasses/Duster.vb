@@ -1,6 +1,6 @@
 Imports System.Runtime.InteropServices
 Imports cv = OpenCvSharp
-Namespace VBClasses
+Imports VBClasses
     Public Class Duster_Basics : Inherits TaskParent
         Public dust As New Duster_MaskZ
         Public Sub New()
@@ -139,4 +139,3 @@ Namespace VBClasses
             labels(2) = redMask.labels(2)
         End Sub
     End Class
-End Namespace

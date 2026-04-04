@@ -1,5 +1,5 @@
 Imports cv = OpenCvSharp
-Namespace VBClasses
+Imports VBClasses
     Public Class FCS_Basics : Inherits TaskParent
         Dim bricks As New Brick_Basics
         Public basics As New FCS_StablePoints
@@ -916,4 +916,3 @@ Namespace VBClasses
                     " generations."
         End Sub
     End Class
-End Namespace

@@ -1,6 +1,6 @@
 Imports cv = OpenCvSharp
 'https://security.stackexchange.com/questions/42428/Is-generating-random-numbers-using-a-smartphone-camera-a-good-idea
-Namespace VBClasses
+Imports VBClasses
     Public Class Photon_Basics : Inherits TaskParent
         Dim bricks As New Brick_Basics
         Dim hist As New Histogram_Basics
@@ -163,4 +163,3 @@ Namespace VBClasses
             SetTrueText(hist.strOut, 3)
         End Sub
     End Class
-End Namespace

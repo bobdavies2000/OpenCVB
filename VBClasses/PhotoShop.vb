@@ -1,6 +1,6 @@
 Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
-Namespace VBClasses
+Imports VBClasses
     Public Class NR_PhotoShop_Clahe : Inherits TaskParent
         ' Contrast Limited Adaptive Histogram Equalization (CLAHE) : Inherits TaskParent
         Public Sub New()
@@ -589,4 +589,3 @@ Namespace VBClasses
             If cPtr <> 0 Then cPtr = WhiteBalance_Close(cPtr)
         End Sub
     End Class
-End Namespace

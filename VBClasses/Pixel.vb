@@ -185,12 +185,8 @@ End Namespace
 
 
 
-
-
-
 ' https://github.com/shimat/opencvsharp_samples/blob/cba08badef1d5ab3c81ab158a64828a918c73df5/SamplesCS/Samples/PixelAccess.cs
-Namespace VBClasses
-    Public Class NR_Pixel_GetSet : Inherits TaskParent
+Public Class NR_Pixel_GetSet : Inherits TaskParent
         Dim mats As New Mat_4Click
         Public Sub New()
             labels(2) = "Time to copy using get/set,Generic Index, Marshal Copy"
@@ -1019,5 +1015,3 @@ Namespace VBClasses
             End If
         End Sub
     End Class
-
-End Namespace

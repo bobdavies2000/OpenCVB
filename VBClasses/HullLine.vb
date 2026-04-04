@@ -1,5 +1,5 @@
 Imports cv = OpenCvSharp
-Namespace VBClasses
+Imports VBClasses
     Public Class HullLine_Basics_TA : Inherits TaskParent
         Public hulls As New Contour_Hulls
         Public minDistance As Integer = dst2.Width * 0.02
@@ -96,4 +96,3 @@ Namespace VBClasses
             dst3 = Palettize(dst1, 0)
         End Sub
     End Class
-End Namespace

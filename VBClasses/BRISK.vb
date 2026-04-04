@@ -1,5 +1,5 @@
 Imports cv = OpenCvSharp
-Namespace VBClasses
+Imports VBClasses
     Public Class BRISK_Basics : Inherits TaskParent
         Implements IDisposable
         Dim brisk As cv.BRISK
@@ -29,4 +29,3 @@ Namespace VBClasses
             brisk.Dispose()
         End Sub
     End Class
-End Namespace

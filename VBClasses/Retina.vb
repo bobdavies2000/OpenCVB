@@ -2,7 +2,7 @@ Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 Imports System.IO
 'https://docs.opencvb.org/3.4/d3/d86/tutorial_bioinspired_retina_model.html
-Namespace VBClasses
+Imports VBClasses
     Public Class Retina_Basics_CPP : Inherits TaskParent
         Implements IDisposable
         Dim magnoData(0) As Byte
@@ -85,4 +85,3 @@ Namespace VBClasses
             lastMotion = retina.dst3
         End Sub
     End Class
-End Namespace

@@ -1,6 +1,6 @@
 Imports cv = OpenCvSharp
 ' https://docs.opencvb.org/2.4/doc/tutorials/imgproc/imgtrans/laplace_operator/laplace_operator.html
-Namespace VBClasses
+Imports VBClasses
     Public Class Laplacian_Basics : Inherits TaskParent
         Dim options As New Options_Laplacian
         Dim erode As New Erode_Basics
@@ -69,4 +69,3 @@ Namespace VBClasses
             options.img.ConvertTo(dst2, cv.MatType.CV_8UC3)
         End Sub
     End Class
-End Namespace

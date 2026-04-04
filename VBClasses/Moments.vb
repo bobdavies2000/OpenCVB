@@ -1,5 +1,5 @@
 Imports cv = OpenCvSharp
-Namespace VBClasses
+Imports VBClasses
     Public Class Moments_Basics : Inherits TaskParent
         Public centroid As cv.Point2f
         Dim fore As New Foreground_KMeans
@@ -61,4 +61,3 @@ Namespace VBClasses
     End Class
 
 
-End Namespace

@@ -3,7 +3,7 @@ Imports System.IO
 Imports OpenCvSharp.LineIterator
 Imports cv = OpenCvSharp
 ' https://www.kaggle.com/datasets/balraj98/berkeley-segmentation-dataset-500-bsds500
-Namespace VBClasses
+Imports VBClasses
     Public Class Image_Basics : Inherits TaskParent
         Public inputFileName As String
         Public options As New Options_Images
@@ -138,4 +138,3 @@ Namespace VBClasses
         End Sub
     End Class
 
-End Namespace

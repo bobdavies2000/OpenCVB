@@ -1,7 +1,7 @@
 Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 ' https://www.codeproject.com/Articles/5259216/Dither-Ordered-and-Floyd-Steinberg-Monochrome-Colo
-Namespace VBClasses
+Imports VBClasses
     Public Class NR_Dither_Basics : Inherits TaskParent
         Dim options As New Options_Dither
         Public Sub New()
@@ -80,4 +80,3 @@ Namespace VBClasses
     End Class
 
 
-End Namespace
