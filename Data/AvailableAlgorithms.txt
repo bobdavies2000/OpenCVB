@@ -148,8 +148,8 @@ Depth_PunchDecreasing
 Depth_ReliableLines
 Depth_Smoothing
 Depth_SmoothingMat
-Depth_StableMax
-Depth_StableMin
+Depth_StableMax_TA
+Depth_StableMin_TA
 Depth_TierCount
 Depth_Tiers
 Depth_World
@@ -499,7 +499,7 @@ ML_RemoveDups_CPP
 Moments_Basics
 Motion_Basics_TA
 Motion_CloudGrid
-Motion_CloudPixel_TA
+Motion_CloudPixel
 Motion_Correlation
 Motion_CorrelationToLast
 Motion_Left
@@ -1489,13 +1489,14 @@ Plot_Depth
 Plot_Histogram
 Plot_Histogram2D
 Plot_HistogramCoreRange
-Plot_Interactive
 Plot_OverTime
 Plot_OverTimeFixedScale
 Plot_OverTimeScalar
 Plot_OverTimeSingle
 Plot_Points
 Plot_RedPrepData
+PlotInteractive_Basics
+PlotInteractive_Correlation
 PlyFormat_Basics
 PolyLine_Basics_TA
 PongWars_Basics
