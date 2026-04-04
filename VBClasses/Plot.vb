@@ -597,7 +597,7 @@ Namespace VBClasses
         Public histMask As New cv.Mat
         Public mm As mmData
         Public Sub New()
-            desc = "Plot histogram data with a stable scale at the left of the image."
+            desc = "Plot the default gray scale data with a stable Y values at the left of the image."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             Dim min = minRange
@@ -656,62 +656,37 @@ Namespace VBClasses
                     Next
                     If addLabels Then Plot_Basics.AddPlotScale(dst2, mm.minVal, mm.maxVal)
                 End If
-                labels(2) = CStr(CInt(mm.maxVal)) + " max value " + CStr(CInt(mm.minVal)) + " min value"
+                labels(2) = "Min/Max values " + Format(mm.minVal, fmt2) + "/" + Format(mm.maxVal, fmt2)
             End If
         End Sub
     End Class
 
 
 
-    Public Class Plot_Interactive : Inherits TaskParent
-        Public plotHist As New Plot_Histogram
-        Dim corr As New Correlation_BasicsPlot
+
+
+
+
+
+    Public Class Plot_RedPrepData : Inherits TaskParent
+        Dim prep As New RedPrep_Depth
+        Dim plot As New Plot_Histogram
         Public Sub New()
-            dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
-            plotHist.minRange = 0
-            plotHist.maxRange = 2
-            plotHist.createHistogram = False
-            plotHist.shadeValues = False
-            labels(2) = "Move mouse to identify grid squares in the image."
-            desc = "Mouse over any bin to see the grid squares in the selected range."
+            plot.createHistogram = True
+            desc = "Plot the RedCloud prep data to see if any patterns emerge."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            corr.Run(src)
+            prep.Run(task.pcSplit(2))
+            dst2 = prep.dst3
+            labels(2) = prep.labels(2) + "  (task.histogramBins = " + CStr(task.histogramBins) + ")"
 
-            Dim histogram(task.histogramBins - 1) As Single
-            Dim ranges(task.histogramBins - 1) As List(Of Single)
-            Dim incr = 2 / task.histogramBins
-            dst1.SetTo(0)
-            For i = 0 To corr.cList.Count - 1
-                Dim bin = CInt(corr.cList(i) / incr) - 1
-                If bin > 0 Then
-                    Dim r = task.gridRects(i)
-                    dst1(r).SetTo(bin)
-                    histogram(bin) += 1
-                    If ranges(bin) Is Nothing Then ranges(bin) = New List(Of Single)
-                    ranges(bin).Add(corr.mmRanges(i))
-                End If
-            Next
-
-            Dim histInput As cv.Mat = cv.Mat.FromPixelData(histogram.Count, 1, cv.MatType.CV_32F, histogram)
-            plotHist.Run(histInput)
-            dst2 = plotHist.dst2
-            labels(3) = plotHist.labels(2)
-
-            Dim totalPixels = dst2.Total ' assume we are including zeros.
-            Dim colWidth = dst2.Width / task.histogramBins
-            Dim histIndex = Math.Floor(task.mouseMovePoint.X / colWidth)
-            dst0 = dst1.InRange(histIndex, histIndex)
-            If ranges(histIndex) IsNot Nothing Then
-                labels(2) = "For bin " + CStr(histIndex) + " " + Format(ranges(histIndex).Average, fmt1) +
-                            " average range and min/max " + Format(ranges(histIndex).Min, fmt1) + "/" +
-                            Format(ranges(histIndex).Max, fmt1)
-            End If
-
-            Dim actualCount = dst0.CountNonZero
-            dst3 = task.color.Clone
-            dst3.SetTo(cv.Scalar.Yellow, dst0)
-            dst2.Rectangle(New cv.Rect(CInt(histIndex) * colWidth, 0, colWidth, dst2.Height), cv.Scalar.Yellow, task.lineWidth)
+            plot.minRange = 1
+            plot.maxRange = plot.minRange + task.MaxZmeters * 1000
+            plot.Run(prep.dst2)
+            dst3 = plot.dst2
+            labels(3) = "Min/Max values " + Format(plot.mm.minVal / 1000, fmt2) + "/" +
+                                            Format(plot.mm.maxVal / 1000, fmt2) + " meters"
         End Sub
     End Class
+
 End Namespace

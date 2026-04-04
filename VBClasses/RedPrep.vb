@@ -70,47 +70,6 @@ Namespace VBClasses
 
 
 
-
-
-
-    Public Class RedPrep_Depth : Inherits TaskParent
-        Implements IDisposable
-        Public Sub New()
-            cPtr = PrepXY_Open()
-            desc = "Run the C++ PrepXY to create a list of mask, rect, and other info about image"
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            Dim inputX(task.pcSplit(0).Total - 1) As Single
-            Dim inputY(task.pcSplit(1).Total - 1) As Single
-
-            task.pcSplit(0).GetArray(Of Single)(inputX)
-            task.pcSplit(1).GetArray(Of Single)(inputY)
-
-            Dim handleX = GCHandle.Alloc(inputX, GCHandleType.Pinned)
-            Dim handleY = GCHandle.Alloc(inputY, GCHandleType.Pinned)
-
-            Dim imagePtr = PrepXY_Run(cPtr, handleX.AddrOfPinnedObject(), handleY.AddrOfPinnedObject(), src.Rows, src.Cols,
-                                  task.xRange, task.yRange, task.histogramBins)
-            handleX.Free()
-            handleY.Free()
-
-            dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, cv.MatType.CV_8U, imagePtr).Clone
-            dst2.SetTo(0, task.noDepthMask)
-
-            dst3 = Palettize(dst2, 0)
-        End Sub
-        Protected Overrides Sub Finalize()
-            If cPtr <> 0 Then cPtr = PrepXY_Close(cPtr)
-        End Sub
-    End Class
-
-
-
-
-
-
-
-
     Public Class NR_RedPrep_VB : Inherits TaskParent
         Public Sub New()
             desc = "Simpler transforms for the point cloud using CalcHist instead of reduction."
@@ -502,6 +461,79 @@ Namespace VBClasses
             dst1.SetTo(0, dst3)
 
             dst0 = dst3 And dst2
+        End Sub
+    End Class
+
+
+
+
+
+
+
+    Public Class RedPrep_Depth_CPP : Inherits TaskParent
+        Implements IDisposable
+        Public Sub New()
+            cPtr = PrepXY_Open()
+            desc = "Run the C++ PrepXY to create a list of mask, rect, and other info about image"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            Dim inputX(task.pcSplit(0).Total - 1) As Single
+            Dim inputY(task.pcSplit(1).Total - 1) As Single
+
+            task.pcSplit(0).GetArray(Of Single)(inputX)
+            task.pcSplit(1).GetArray(Of Single)(inputY)
+
+            Dim handleX = GCHandle.Alloc(inputX, GCHandleType.Pinned)
+            Dim handleY = GCHandle.Alloc(inputY, GCHandleType.Pinned)
+
+            Dim imagePtr = PrepXY_Run(cPtr, handleX.AddrOfPinnedObject(), handleY.AddrOfPinnedObject(), src.Rows, src.Cols,
+                                  task.xRange, task.yRange, task.histogramBins)
+            handleX.Free()
+            handleY.Free()
+
+            dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, cv.MatType.CV_8U, imagePtr).Clone
+            dst2.SetTo(0, task.noDepthMask)
+
+            dst3 = Palettize(dst2, 0)
+            labels(2) = "The input has been consolidated into " + CStr(task.histogramBins) + " categories"
+        End Sub
+        Protected Overrides Sub Finalize()
+            If cPtr <> 0 Then cPtr = PrepXY_Close(cPtr)
+        End Sub
+    End Class
+
+
+
+
+    Public Class RedPrep_Depth : Inherits TaskParent
+        Implements IDisposable
+        Public Sub New()
+            cPtr = PrepXY_Open()
+            desc = "Run the C++ PrepXY to create a list of mask, rect, and other info about image"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            Dim inputX(task.pcSplit(0).Total - 1) As Single
+            Dim inputY(task.pcSplit(1).Total - 1) As Single
+
+            task.pcSplit(0).GetArray(Of Single)(inputX)
+            task.pcSplit(1).GetArray(Of Single)(inputY)
+
+            Dim handleX = GCHandle.Alloc(inputX, GCHandleType.Pinned)
+            Dim handleY = GCHandle.Alloc(inputY, GCHandleType.Pinned)
+
+            Dim imagePtr = PrepXY_Run(cPtr, handleX.AddrOfPinnedObject(), handleY.AddrOfPinnedObject(), src.Rows, src.Cols,
+                                  task.xRange, task.yRange, task.histogramBins)
+            handleX.Free()
+            handleY.Free()
+
+            dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, cv.MatType.CV_8U, imagePtr).Clone
+            dst2.SetTo(0, task.noDepthMask)
+
+            dst3 = Palettize(dst2, 0)
+            labels(2) = "The input has been consolidated into " + CStr(task.histogramBins) + " categories"
+        End Sub
+        Protected Overrides Sub Finalize()
+            If cPtr <> 0 Then cPtr = PrepXY_Close(cPtr)
         End Sub
     End Class
 End Namespace

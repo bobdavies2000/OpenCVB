@@ -5,6 +5,7 @@ Namespace VBClasses
         Public maxCorrelation As Single
         Public Sub New()
             dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+            task.fOptions.MatchCorrSlider.Value = 90
             desc = "Measure the correlation of all grid squares except where there is motion."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -33,8 +34,8 @@ Namespace VBClasses
             Next
 
             lastFrame = src.Clone
-            labels(2) = CStr(rectList.Count) + " grid rects were less than " + Format(maxCorrelation / 2, fmt2) +
-                        " correlation, indicating that they were featureless."
+            labels(2) = CStr(rectList.Count) + " rects < " + Format(maxCorrelation - 1, fmt2) +
+                        " correlation to last frame, indicating that they were featureless."
             SetTrueText("Use Feature Options 'Match Correlation Threshold' to shrink/grow.", 3)
         End Sub
     End Class

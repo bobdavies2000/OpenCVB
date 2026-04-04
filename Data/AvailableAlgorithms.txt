@@ -136,7 +136,6 @@ Delaunay_Contours
 Delaunay_FeatureLess
 Delaunay_Generations
 Delaunay_LineSelect
-Depth_Aligned
 Depth_Basics
 Depth_ColorMap
 Depth_Foreground
@@ -1496,6 +1495,7 @@ Plot_OverTimeFixedScale
 Plot_OverTimeScalar
 Plot_OverTimeSingle
 Plot_Points
+Plot_RedPrepData
 PlyFormat_Basics
 PolyLine_Basics_TA
 PongWars_Basics
@@ -1569,6 +1569,7 @@ RedMask_ToRedColor
 RedPrep_Basics
 RedPrep_Core
 RedPrep_Depth
+RedPrep_Depth_CPP
 RedPrep_EdgeMask
 RedPrep_Edges_CPP
 RedPrep_EdgesZ

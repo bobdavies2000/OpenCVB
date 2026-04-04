@@ -20,23 +20,6 @@ Namespace VBClasses
 
 
 
-
-    Public Class Depth_Aligned : Inherits TaskParent
-        Public Sub New()
-            desc = "Align the BGR data into the depth."
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            dst2 = task.depthRGB
-        End Sub
-    End Class
-
-
-
-
-
-
-
-
     Public Class NR_Depth_Display : Inherits TaskParent
         Public Sub New()
             If standalone Then task.gOptions.displayDst1.Checked = True
