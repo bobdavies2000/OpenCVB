@@ -357,6 +357,8 @@ Partial Class OptionsGlobal
         ' stabilizeDepth
         ' 
         stabilizeDepth.AutoSize = True
+        stabilizeDepth.Checked = True
+        stabilizeDepth.CheckState = CheckState.Checked
         stabilizeDepth.Location = New Point(16, 262)
         stabilizeDepth.Margin = New Padding(3, 4, 3, 4)
         stabilizeDepth.Name = "stabilizeDepth"

@@ -17,7 +17,7 @@ Namespace VBClasses
         Public rcList As New List(Of rcData)
         Public rcMap As cv.Mat = New cv.Mat(dst2.Size, cv.MatType.CV_32S, 0)
         Public options As New Options_RedCloud
-        Public keyColors As New KeyColor_Reduction_TA
+        Public keyColors As New KeyColor_Reduction
         Public Sub New()
             task.gOptions.stabilizeDepth.Checked = True
             desc = "Build contours for each cell"
@@ -468,7 +468,7 @@ Namespace VBClasses
         Public rcMap As cv.Mat = New cv.Mat(dst2.Size, cv.MatType.CV_32S, 0)
         Public wGridList As New List(Of cv.Point3d)
         Public options As New Options_RedCloud
-        Public keyColors As New KeyColor_Reduction_TA
+        Public keyColors As New KeyColor_Reduction
         Public Sub New()
             cPtr = RedCloudFill_Open()
             desc = "This is before matching to previous generation."

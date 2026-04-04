@@ -1,21 +1,5 @@
 ﻿Imports cv = OpenCvSharp
 Namespace VBClasses
-    Public Class KeyColor_Reduction_TA : Inherits TaskParent
-        Dim reduction As New Reduction_BasicsParmInput
-        Public Sub New()
-            reduction.reductionFactor = 50
-            dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
-            desc = "Identify the key colors using contours"
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            reduction.Run(task.gray)
-            dst2 = reduction.dst3
-        End Sub
-    End Class
-
-
-
-
     Public Class KeyColor_Basics : Inherits TaskParent
         Dim keyList As New List(Of keyData)
         Dim keyMap As New cv.Mat(task.workRes, cv.MatType.CV_8U, 0)
@@ -77,7 +61,22 @@ Namespace VBClasses
 
 
 
-    Public Class KeyColor_Contours : Inherits TaskParent
+    Public Class KeyColor_Reduction : Inherits TaskParent
+        Dim reduction As New Reduction_BasicsParmInput
+        Public Sub New()
+            reduction.reductionFactor = 50
+            dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
+            desc = "Identify the key colors using contours"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            reduction.Run(task.gray)
+            dst2 = reduction.dst3
+        End Sub
+    End Class
+
+
+
+    Public Class NR_KeyColor_Contours : Inherits TaskParent
         Public keyList As New List(Of keyData)
         Public keyMap As New cv.Mat(task.workRes, cv.MatType.CV_8U, 0)
         Dim edgeline As New EdgeLine_KeyColorOnly
@@ -138,12 +137,12 @@ Namespace VBClasses
 
 
 
-    Public Class KeyColor_OverDepth : Inherits TaskParent
+    Public Class NR_KeyColor_OverDepth : Inherits TaskParent
         Dim redC As New RedCloud_Basics
-        Dim keyColors As New KeyColor_Contours
+        Dim keyColors As New NR_KeyColor_Contours
         Public Sub New()
             dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
-            desc = "Overlay the KeyColor_Basics_TA cells on the reduced depth results."
+            desc = "Overlay the KeyColor_Contours cells on the reduced depth results."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             redC.Run(src)
@@ -170,12 +169,12 @@ Namespace VBClasses
 
 
 
-    Public Class KeyColor_OverColor : Inherits TaskParent
+    Public Class NR_KeyColor_OverColor : Inherits TaskParent
         Dim redC As New RedColor_Basics
-        Dim keyColors As New KeyColor_Contours
+        Dim keyColors As New NR_KeyColor_Contours
         Public Sub New()
             dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
-            desc = "Overlay the KeyColor_Basics_TA cells on the reduced color results."
+            desc = "Overlay the KeyColor_Contours cells on the reduced color results."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             redC.Run(keyColors.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
@@ -202,10 +201,10 @@ Namespace VBClasses
 
 
 
-    Public Class KeyColor_Straight : Inherits TaskParent
+    Public Class NR_KeyColor_Straight : Inherits TaskParent
         Public rcList As New List(Of rcData)
         Public rcMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-        Dim keyColors As New KeyColor_Contours
+        Dim keyColors As New NR_KeyColor_Contours
         Public Sub New()
             dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
             desc = "Convert the keyList into an rcList"
@@ -230,5 +229,19 @@ Namespace VBClasses
         End Sub
     End Class
 
+
+
+
+    Public Class KeyColor_Delaunay : Inherits TaskParent
+        Dim fLess As New FeatureLess_Cells
+        Public Sub New()
+            desc = "Use the key color maxDist points as input to delaunay."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            fLess.Run(src)
+            dst2 = fLess.dst2
+            labels(2) = fLess.labels(2)
+        End Sub
+    End Class
 
 End Namespace

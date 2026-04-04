@@ -452,52 +452,6 @@ Namespace VBClasses
 
 
 
-    Public Class FeatureLess_Cells : Inherits TaskParent
-        Dim saveColorMap As cv.Mat
-        Dim fLess As New FeatureLess_Correlation
-        Public Sub New()
-            saveColorMap = task.colorMap.Clone
-            labels(3) = "Region Colors are ordered by size."
-            desc = "Group the featureless grid squares"
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            fLess.Run(task.gray)
-
-            dst2 = fLess.dst2.Clone
-            labels(2) = fLess.labels(2)
-
-            Dim index = 1
-            Dim rect As cv.Rect
-            Dim mask = New cv.Mat(New cv.Size(dst2.Width + 2, dst2.Height + 2), cv.MatType.CV_8U, 0)
-            Dim flags As cv.FloodFillFlags = cv.FloodFillFlags.Link4
-            Dim minSize = task.brickEdgeLen * task.brickEdgeLen
-            Dim countList As New SortedList(Of Integer, Integer)(New compareAllowIdenticalIntegerInverted)
-            For Each r In fLess.rectList
-                Dim val = dst2.Get(Of Byte)(r.TopLeft.Y, r.TopLeft.X)
-                If val = 255 Then
-                    Dim count = cv.Cv2.FloodFill(dst2, mask, r.TopLeft, index, rect, 0, 0, flags)
-                    If count > minSize Then
-                        countList.Add(count, index)
-                        index += 1
-                    Else
-                        dst2(r).SetTo(0)
-                    End If
-                End If
-            Next
-
-            ' this will color the regions in size order.
-            For i = 0 To countList.Count - 1
-                Dim countIndex = countList.Values.ElementAt(i)
-                task.colorMap.Set(Of cv.Vec3b)(countIndex, 0, saveColorMap.Get(Of cv.Vec3b)(i, 0))
-            Next
-            dst3 = Palettize(dst2, 0)
-            labels(2) = CStr(index - 1) + " featureless regions were found below (8UC1)."
-        End Sub
-    End Class
-
-
-
-
 
     Public Class FeatureLess_RedColor : Inherits TaskParent
         Public redC As New RedCloud_Flood_CPP
@@ -595,4 +549,50 @@ Namespace VBClasses
         End Sub
     End Class
 
+
+
+
+
+    Public Class FeatureLess_Cells : Inherits TaskParent
+        Dim saveColorMap As cv.Mat
+        Dim fLess As New FeatureLess_Correlation
+        Public Sub New()
+            saveColorMap = task.colorMap.Clone
+            labels(3) = "Region Colors are ordered by size."
+            desc = "Group the featureless grid squares"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            fLess.Run(task.gray)
+
+            dst2 = fLess.dst2.Clone
+            labels(2) = fLess.labels(2)
+
+            Dim index = 1
+            Dim rect As cv.Rect
+            Dim mask = New cv.Mat(New cv.Size(dst2.Width + 2, dst2.Height + 2), cv.MatType.CV_8U, 0)
+            Dim flags As cv.FloodFillFlags = cv.FloodFillFlags.Link4
+            Dim minSize = task.brickEdgeLen * task.brickEdgeLen
+            Dim countList As New SortedList(Of Integer, Integer)(New compareAllowIdenticalIntegerInverted)
+            For Each r In fLess.rectList
+                Dim val = dst2.Get(Of Byte)(r.TopLeft.Y, r.TopLeft.X)
+                If val = 255 Then
+                    Dim count = cv.Cv2.FloodFill(dst2, mask, r.TopLeft, index, rect, 0, 0, flags)
+                    If count > minSize Then
+                        countList.Add(count, index)
+                        index += 1
+                    Else
+                        dst2(r).SetTo(0)
+                    End If
+                End If
+            Next
+
+            ' this will color the regions in size order.
+            For i = 0 To countList.Count - 1
+                Dim countIndex = countList.Values.ElementAt(i)
+                task.colorMap.Set(Of cv.Vec3b)(countIndex, 0, saveColorMap.Get(Of cv.Vec3b)(i, 0))
+            Next
+            dst3 = Palettize(dst2, 0)
+            labels(2) = CStr(index - 1) + " featureless regions were found below (8UC1)."
+        End Sub
+    End Class
 End Namespace

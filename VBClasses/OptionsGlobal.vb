@@ -125,9 +125,6 @@ Public Class OptionsGlobal
         DotSizeLabel.Text = CStr(task.DotSize)
         task.optionsChanged = True
     End Sub
-    Private Sub UseKalman_CheckedChanged(sender As Object, e As EventArgs)
-        task.optionsChanged = True
-    End Sub
     Private Sub displayDst0_CheckedChanged(sender As Object, e As EventArgs) Handles displayDst0.CheckedChanged
         task.optionsChanged = True
     End Sub
@@ -165,12 +162,6 @@ Public Class OptionsGlobal
     Private Sub DebugCheckBox_CheckedChanged(sender As Object, e As EventArgs) Handles DebugCheckBox.CheckedChanged
         task.optionsChanged = True
     End Sub
-    Private Sub OpenGLCapture_Click(sender As Object, e As EventArgs)
-        task.optionsChanged = True
-    End Sub
-    Private Sub useMotion_CheckedChanged(sender As Object, e As EventArgs)
-        task.optionsChanged = True
-    End Sub
     Private Sub ShowAllByDefault_CheckedChanged(sender As Object, e As EventArgs) Handles ShowAllOptions.CheckedChanged
         task.Settings.ShowAllOptions = ShowAllOptions.Checked
     End Sub
@@ -180,27 +171,6 @@ Public Class OptionsGlobal
 
 
 
-    Private Sub unFiltered_CheckedChanged(sender As Object, e As EventArgs)
-        task.optionsChanged = True
-    End Sub
-    Private Sub MotionFilteredCloudOnly_CheckedChanged(sender As Object, e As EventArgs)
-        task.optionsChanged = True
-    End Sub
-    Private Sub MotionFilteredColorOnly_CheckedChanged(sender As Object, e As EventArgs)
-        task.optionsChanged = True
-    End Sub
-    Private Sub MotionFilteredColorAndCloud_CheckedChanged(sender As Object, e As EventArgs)
-        task.optionsChanged = True
-    End Sub
-    Private Sub UseHistoryCloud_CheckedChanged(sender As Object, e As EventArgs)
-        task.optionsChanged = True
-    End Sub
-    Private Sub DustFree_CheckedChanged(sender As Object, e As EventArgs)
-        task.optionsChanged = True
-    End Sub
-    Private Sub useFilter_CheckedChanged(sender As Object, e As EventArgs)
-        task.optionsChanged = True
-    End Sub
     Private Sub highlight_SelectedIndexChanged(sender As Object, e As EventArgs) Handles highlight.SelectedIndexChanged
         Select Case highlight.Text
             Case "Yellow"
@@ -240,9 +210,6 @@ Public Class OptionsGlobal
     End Sub
     Public Sub setLineWidth(val As Integer)
         LineWidth.Value = val
-    End Sub
-    Public Sub SetDotSize(val As Integer)
-        DotSizeSlider.Value = val
     End Sub
     Private Sub TruncateDepth_CheckedChanged(sender As Object, e As EventArgs) Handles TruncateDepth.CheckedChanged
         task.optionsChanged = True

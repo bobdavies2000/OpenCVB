@@ -411,11 +411,8 @@ Kalman_VB
 Kalman_VB_Basics
 Keyboard_Basics
 KeyColor_Basics
-KeyColor_Contours
-KeyColor_OverColor
-KeyColor_OverDepth
-KeyColor_Reduction_TA
-KeyColor_Straight
+KeyColor_Delaunay
+KeyColor_Reduction
 KLT_Basics
 KMeans_Basics
 KMeans_Depth
@@ -1089,6 +1086,10 @@ NR_Kalman_Depth32f
 NR_Kalman_DepthSmall
 NR_Kalman_MousePredict
 NR_Kalman_RotatingPoint
+NR_KeyColor_Contours
+NR_KeyColor_OverColor
+NR_KeyColor_OverDepth
+NR_KeyColor_Straight
 NR_KLT_OpticalFlow
 NR_KMeans_CompareMulti
 NR_KMeans_CustomData
