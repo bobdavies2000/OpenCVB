@@ -1,3 +1,35 @@
+**April 5, 2026 – FeatureLess, Cloud Motion, DrawRect, Plots, Stable Depth and Point Clouds.**
+
+-   Over 1600 algorithms are included, averaging 36 lines of code per algorithm.
+    -   Over 400 additional obsolete algorithms compiled for reference use.
+-   The featureless mask is more stable when using motion mask updates.
+    -   If there is no motion, the featureless mask does not change.
+-   Point cloud motion is highlighted using the disparity error.
+    -   Distance error for your camera is estimated in Disparity_PlotError.
+    -   When distance varies more than the expected error, it is point cloud motion.
+        -   RGB motion will also trigger point cloud motion.
+-   Point cloud motion can also be defined using pixel-by-pixel error values.
+    -   Motion_CloudPixel will build a mask of motion in the point cloud.
+    -   Motion_CloudGrid builds a mask in grid rects for point cloud motion.
+-   The “drawRect” now uses color and is set with the “highlight” color.
+    -   The drawrect appears in all 4 images when drawn on any image.
+    -   Using the highlight color guarantee the drawRect will always be visible.
+-   Plots can be interactive – mousing over bar charts backprojects the bar values.
+    -   Plot_Histogram creates bar charts for use with PlotInteractive_Basics.
+-   Depth and point cloud now reflect the minimum values for each location.
+    -   Depth will now pulse with heartbeat as intermittent depth disappears.
+    -   The purpose for this “pulsing” is to stabilize depth.
+    -   Depth is retained if it is the minimum value at that pixel.
+    -   Stabilization is apparent in the DepthRGB image in each frame.
+    -   Stabilization updates X, Y, and Z as well when depth is at a minimum.
+    -   Zero depth values cover some lost valid data – see image below.
+        -   Missing depth is accumulated until the next heartbeat.
+    -   To double-check the impact, toggle ‘Stabilize Depth’ flag in global options.
+
+![](media/9aa17fe74f96e3293abac8af21ee1e19.gif)
+
+**Depth_StableMin_TA:** *The task algorithm Depth_StableMin_TA is run on every frame to stabilize depth and remove transient depth values. The point cloud is also updated when depth is at a minimum. This ensures that the X, Y, and Z values in the point cloud will be consistent and accurate. The GIF shows the depth shadow behind the arm is present longer than it should be – until the next heartbeat restores it. Some valid depth data is lost but it is replaced with zeros. If this is a problem, turn off the ‘Stabilize Depth’ global option. The lower right image shows the pixels removed to stabilize and clean up the current image. A companion algorithm “Depth_StableMax_TA” may also be used. The difference between the 2 algorithms is that the minimum values are accumulated (the default) instead of the maximum. The maximum values may be accumulated as well. The point cloud and depth are updated immediately where there is RGB motion.*
+
 **March 29, 2026 – FeatureLess, Segmentation, KeyColor, Task Algorithms, and Motion.**
 
 -   Over 1600 algorithms are included, averaging 36 lines of code per algorithm.
