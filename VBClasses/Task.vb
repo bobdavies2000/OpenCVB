@@ -171,13 +171,13 @@ Public Class AlgorithmTask : Implements IDisposable
         If gOptions.stabilizeDepth.Checked Then
             stabilizeDepth.Run(emptyMat)
 
-            pcSplit = stabilizeDepth.pcSplit
             pointCloud = stabilizeDepth.pointcloud.Clone
+            If stabilizeDepth.pcSplit(0) IsNot Nothing Then pcSplit = stabilizeDepth.pcSplit
             depthmask = pcSplit(2).Threshold(0, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs
             noDepthMask = Not depthmask
         End If
 
-        colorizer.Run(src)
+            colorizer.Run(src)
 
         gravityBasics.Run(src.Clone)
         lines.motionMask = motion.motionMask

@@ -512,13 +512,7 @@ End Class
 
 
 Public Class RedPrep_Depth : Inherits TaskParent
-    Implements IDisposable
-    Dim rangeArrayX() As Rangef
-    Dim rangeArrayY() As Rangef
-
     Public Sub New()
-        rangeArrayX = {New Rangef(-task.xRange, task.xRange)}
-        rangeArrayY = {New Rangef(-task.yRange, task.yRange)}
         desc = "Run the C++ PrepXY to create a list of mask, rect, and other info about image"
     End Sub
     Private Function histAndBack(input As cv.Mat, ranges() As Rangef) As cv.Mat
@@ -534,6 +528,8 @@ Public Class RedPrep_Depth : Inherits TaskParent
         Return dst
     End Function
     Public Overrides Sub RunAlg(src As cv.Mat)
+        Dim rangeArrayX = {New Rangef(-task.xRange, task.xRange)}
+        Dim rangeArrayY = {New Rangef(-task.yRange, task.yRange)}
 
         dst0 = histAndBack(task.pcSplit(0), rangeArrayX)
         dst1 = histAndBack(task.pcSplit(1), rangeArrayY)

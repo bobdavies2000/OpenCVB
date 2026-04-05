@@ -1546,12 +1546,13 @@ Namespace VBClasses
         Public pointcloud As cv.Mat
         Public pcSplit(2) As cv.Mat
         Public Sub New()
-            labels(2) = "Collected minimum values at each depth pixel.  Updated using RGB motion."
+            labels(2) = "Accumulated minimum values at each depth pixel.  Updated using RGB motion."
+            labels(3) = "Pixels that were updated on the current frame."
             desc = "Stabilize X, Y, and Z of the point cloud using the minimum depth encountered."
         End Sub
-        Public Shared Function updateXY(lastDepth As cv.Mat, minDepth As cv.Mat) As cv.Mat
+        Public Shared Function updateXY(lastDepth As cv.Mat, accumDepth As cv.Mat) As cv.Mat
             Dim diffDepth As New cv.Mat
-            cv.Cv2.Absdiff(minDepth, lastDepth, diffDepth)
+            cv.Cv2.Absdiff(lastDepth, accumDepth, diffDepth)
             Dim mask = diffDepth.Threshold(0, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs()
             mask.SetTo(0, task.motion.motionMask)
             Return mask
@@ -1566,19 +1567,21 @@ Namespace VBClasses
                 task.pointCloud.CopyTo(pointcloud, task.noDepthMask)
             End If
 
-            pcSplit = pointcloud.Split()
-            Dim minDepth As New cv.Mat
-            cv.Cv2.Min(pcSplit(2), lastDepth, minDepth)
+            Dim pcSplit = pointcloud.Split()
+            Dim accumDepth As New cv.Mat
+            cv.Cv2.Min(pcSplit(2), lastDepth, accumDepth)
 
             If myHeartbeat = False Then
-                dst3 = updateXY(lastDepth, minDepth)
+                dst3 = updateXY(lastDepth, accumDepth)
                 task.pointCloud.CopyTo(pointcloud, dst3)
             End If
 
-            colorize.Run(minDepth)
+            colorize.Run(accumDepth)
             dst2 = colorize.dst2
 
-            stableDepth = minDepth
+            stableDepth = accumDepth
+
+            pcSplit = pointcloud.Split()
             lastDepth = pcSplit(2).Clone
         End Sub
     End Class
@@ -1592,9 +1595,10 @@ Namespace VBClasses
         Public stableDepth As cv.Mat
         Dim colorize As New DepthColorizer_CPP
         Public pointcloud As New cv.Mat
-        Public pcSplit(2) As cv.Mat
+        Public pcsplit(2) As cv.Mat
         Public Sub New()
-            labels(2) = "Collected minimum values at each depth pixel.  Updated using RGB motion."
+            labels(2) = "Accumulated minimum values at each depth pixel.  Updated using RGB motion."
+            labels(3) = "Pixels that were updated on the current frame."
             desc = "Stabilize X, Y, and Z of the point cloud using the maximum depth encountered."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -1607,19 +1611,24 @@ Namespace VBClasses
                 task.pointCloud.CopyTo(pointcloud, task.noDepthMask)
             End If
 
-            pcSplit = pointcloud.Split()
-            Dim minDepth As New cv.Mat
-            cv.Cv2.Max(pcSplit(2), lastDepth, minDepth)
+            Dim pcSplit = pointcloud.Split()
+            Dim accumDepth As New cv.Mat
+            cv.Cv2.Max(pcSplit(2), lastDepth, accumDepth)
+
+            Dim diffdepth As New cv.Mat
+            cv.Cv2.Absdiff(lastDepth, accumDepth, diffDepth)
 
             If myHeartbeat = False Then
-                dst3 = Depth_StableMin_TA.updateXY(lastDepth, minDepth)
+                dst3 = Depth_StableMin_TA.updateXY(lastDepth, accumDepth)
                 task.pointCloud.CopyTo(pointcloud, dst3)
             End If
 
-            colorize.Run(minDepth)
+            colorize.Run(accumDepth)
             dst2 = colorize.dst2
 
-            stableDepth = minDepth
+            stableDepth = accumDepth
+
+            pcSplit = pointcloud.Split()
             lastDepth = pcSplit(2).Clone
         End Sub
     End Class
