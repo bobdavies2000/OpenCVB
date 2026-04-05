@@ -41,6 +41,7 @@ Public Class AlgorithmTask : Implements IDisposable
         imuBasics = New IMU_Basics_TA
         motion = New Motion_Basics_TA
         stabilizeDepth = New Depth_StableMin_TA
+        stabilizeDepth.TA_Active = True
         cloudGravity = New Cloud_Gravity_TA
         grid = New Grid_Basics_TA
         lines = New Line_Basics_TA
@@ -168,16 +169,9 @@ Public Class AlgorithmTask : Implements IDisposable
 
         cloudGravity.Run(emptyMat) '******* this may rotate for gravity if gravity is selected *******
 
-        If gOptions.stabilizeDepth.Checked Then
-            stabilizeDepth.Run(emptyMat)
+        If gOptions.stabilizeDepth.Checked Then stabilizeDepth.Run(emptyMat)
 
-            pointCloud = stabilizeDepth.pointcloud.Clone
-            If stabilizeDepth.pcSplit(0) IsNot Nothing Then pcSplit = stabilizeDepth.pcSplit
-            depthmask = pcSplit(2).Threshold(0, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs
-            noDepthMask = Not depthmask
-        End If
-
-            colorizer.Run(src)
+        colorizer.Run(src)
 
         gravityBasics.Run(src.Clone)
         lines.motionMask = motion.motionMask

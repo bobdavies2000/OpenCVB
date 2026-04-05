@@ -908,7 +908,6 @@ Namespace VBClasses
 
 
     Public Class NR_Depth_StableMinMax : Inherits TaskParent
-        Dim colorize As New DepthColorizer_CPP
         Public dMin As New Depth_StableMin_TA
         Public dMax As New Depth_StableMax_TA
         Public options As New Options_MinMaxNone
@@ -925,11 +924,11 @@ Namespace VBClasses
 
             If options.useMax Then
                 dMax.Run(src)
-                dst3 = dMax.stableDepth
+                dst3 = dMax.pcsplit(2)
                 dst2 = dMax.dst2
             ElseIf options.useMin Then
                 dMin.Run(src)
-                dst3 = dMin.stableDepth
+                dst3 = dMin.pcSplit(2)
                 dst2 = dMin.dst2
             ElseIf options.useNone Then
                 dst3 = task.pcSplit(2)
@@ -1541,10 +1540,10 @@ Namespace VBClasses
 
 
     Public Class Depth_StableMin_TA : Inherits TaskParent
-        Public stableDepth As cv.Mat
         Dim colorize As New DepthColorizer_CPP
         Public pointcloud As cv.Mat
         Public pcSplit(2) As cv.Mat
+        Public TA_Active As Boolean = False
         Public Sub New()
             labels(2) = "Accumulated minimum values at each depth pixel.  Updated using RGB motion."
             labels(3) = "Pixels that were updated on the current frame."
@@ -1579,10 +1578,15 @@ Namespace VBClasses
             colorize.Run(accumDepth)
             dst2 = colorize.dst2
 
-            stableDepth = accumDepth
-
             pcSplit = pointcloud.Split()
             lastDepth = pcSplit(2).Clone
+
+            If TA_Active Then
+                task.pointCloud = pointcloud.Clone
+                task.pcSplit = pcSplit
+                task.depthmask = pcSplit(2).Threshold(0, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs
+                task.noDepthMask = Not task.depthmask
+            End If
         End Sub
     End Class
 
@@ -1592,10 +1596,10 @@ Namespace VBClasses
 
 
     Public Class Depth_StableMax_TA : Inherits TaskParent
-        Public stableDepth As cv.Mat
         Dim colorize As New DepthColorizer_CPP
         Public pointcloud As New cv.Mat
         Public pcsplit(2) As cv.Mat
+        Public TA_Active As Boolean = False
         Public Sub New()
             labels(2) = "Accumulated minimum values at each depth pixel.  Updated using RGB motion."
             labels(3) = "Pixels that were updated on the current frame."
@@ -1612,24 +1616,27 @@ Namespace VBClasses
             End If
 
             Dim pcSplit = pointcloud.Split()
+
             Dim accumDepth As New cv.Mat
             cv.Cv2.Max(pcSplit(2), lastDepth, accumDepth)
 
-            Dim diffdepth As New cv.Mat
-            cv.Cv2.Absdiff(lastDepth, accumDepth, diffDepth)
-
             If myHeartbeat = False Then
-                dst3 = Depth_StableMin_TA.updateXY(lastDepth, accumDepth)
+                dst3 = Depth_StableMin_TA.updateXY(pcSplit(2), accumDepth)
                 task.pointCloud.CopyTo(pointcloud, dst3)
             End If
 
             colorize.Run(accumDepth)
             dst2 = colorize.dst2
 
-            stableDepth = accumDepth
-
             pcSplit = pointcloud.Split()
             lastDepth = pcSplit(2).Clone
+
+            If TA_Active Then
+                task.pointCloud = pointcloud.Clone
+                task.pcSplit = pcSplit
+                task.depthmask = pcSplit(2).Threshold(0, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs
+                task.noDepthMask = Not task.depthmask
+            End If
         End Sub
     End Class
 End Namespace
