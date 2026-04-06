@@ -72,7 +72,7 @@ Public Class PlotBars_Basics : Inherits TaskParent
                                                                Math.Max(1, barWidth), h), color, -1)
                     End If
                 Next
-                If addLabels Then Plot_Basics.AddPlotScale(dst2, mm.minVal, mm.maxVal)
+                If addLabels Then PlotOpenCV_Basics.AddPlotScale(dst2, mm.minVal, mm.maxVal)
             End If
             labels(2) = "Min/Max values " + Format(mm.minVal, fmt2) + "/" + Format(mm.maxVal, fmt2)
         End If

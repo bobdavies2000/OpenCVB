@@ -321,7 +321,7 @@ Imports VBClasses
 
     Public Class NR_Cloud_SurfaceH_CPP : Inherits TaskParent
         Public heat As New HeatMap_Basics
-        Public plot As New Plot_Basics_CPP
+        Public plot As New PlotOpenCV_Basics_CPP
         Public topRow As Integer
         Public botRow As Integer
         Public peakRow As Integer

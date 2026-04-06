@@ -83,7 +83,7 @@ Public Class PlotTime_Basics : Inherits TaskParent
         If standaloneTest() Then labels(2) = "RGB Means: blue = " + Format(plotData(0), fmt1) + " green = " + Format(plotData(1), fmt1) + " red = " + Format(plotData(2), fmt1)
         Dim lineCount = CInt(maxScale - minScale - 1)
         If lineCount > 3 Or lineCount < 0 Then lineCount = 3
-        Plot_Basics.AddPlotScale(dst2, minScale, maxScale, lineCount)
+        PlotOpenCV_Basics.AddPlotScale(dst2, minScale, maxScale, lineCount)
     End Sub
 End Class
 
@@ -269,6 +269,6 @@ Public Class PlotTime_FixedScale : Inherits TaskParent
         SetTrueText(strOut, 3)
         Dim lineCount = CInt(maxScale - minScale - 1)
         If lineCount > 3 Or lineCount < 0 Then lineCount = 3
-        If showScale Then Plot_Basics.AddPlotScale(dst2, minScale, maxScale, lineCount)
+        If showScale Then PlotOpenCV_Basics.AddPlotScale(dst2, minScale, maxScale, lineCount)
     End Sub
 End Class

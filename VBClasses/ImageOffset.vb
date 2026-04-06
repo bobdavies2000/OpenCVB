@@ -61,7 +61,7 @@ Imports VBClasses
 
     Public Class NR_ImageOffset_SliceH : Inherits TaskParent
         Dim iOff As New ImageOffset_Basics
-        Dim plot As New Plot_Points
+        Dim plot As New PlotOpenCV_Points
         Dim options As New Options_SLR
         Dim slr As New SLR
         Dim mats As New Mat_4to1
@@ -123,7 +123,7 @@ Imports VBClasses
 
     Public Class NR_ImageOffset_SliceV : Inherits TaskParent
         Dim iOff As New ImageOffset_Basics
-        Dim plot As New Plot_Points
+        Dim plot As New PlotOpenCV_Points
         Dim options As New Options_SLR
         Dim slr As New SLR
         Dim mats As New Mat_4to1

@@ -136,7 +136,7 @@ Public Class Histogram_Graph : Inherits TaskParent
 
         If standaloneTest() Or plotRequested Then
             plotMaxValue = Math.Round(mm.maxVal / 1000, 0) * 1000 + 1000 ' smooth things out a little for the scale below
-            Plot_Basics.AddPlotScale(dst2, 0, plotMaxValue)
+            PlotOpenCV_Basics.AddPlotScale(dst2, 0, plotMaxValue)
             labels(2) = "Histogram for src image (default color) - " + CStr(task.histogramBins) + " bins"
         End If
     End Sub
@@ -668,7 +668,7 @@ Public Class NR_Histogram_ComparePlot : Inherits TaskParent
             dst3 = comp.histK.hist.plotHist.dst2.Clone
 
             Dim mm As mmData = GetMinMax(histX)
-            Plot_Basics.AddPlotScale(dst2, 0, mm.maxVal)
+            PlotOpenCV_Basics.AddPlotScale(dst2, 0, mm.maxVal)
         End If
         trueData = New List(Of TrueText)(ttLabels)
     End Sub

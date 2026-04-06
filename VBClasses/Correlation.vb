@@ -236,7 +236,7 @@ Namespace VBClasses
     Public Class Correlation_Interactive : Inherits TaskParent
         Dim plot As New PlotInteractive_Correlation
         Public Sub New()
-            desc = "Plot the range of correlations and display their source - duplicate of Plot_Interactive"
+            desc = "Plot the range of correlations and display their source - duplicate of PlotOpenCV_Interactive"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             plot.Run(src)

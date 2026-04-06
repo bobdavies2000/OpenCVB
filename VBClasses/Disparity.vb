@@ -189,7 +189,7 @@ Imports VBClasses
 
 
     Public Class Disparity_PlotError : Inherits TaskParent
-        Dim plot As New Plot_Basics_CPP
+        Dim plot As New PlotOpenCV_Basics_CPP
         Dim options As New Options_MotionCloud
         Public Sub New()
             desc = "Plot the error as a function of distance."

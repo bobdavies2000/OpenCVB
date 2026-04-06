@@ -155,9 +155,9 @@ Photon
 PhotoShop
 Pixel
 Plane
-Plot
 PlotBars
 PlotInteractive
+PlotOpenCV
 PlotTime
 PlyFormat
 PolyLine
