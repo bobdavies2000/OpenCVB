@@ -682,8 +682,8 @@ Imports VBClasses
 
     Public Class NR_Histogram_CompareNumber : Inherits TaskParent
         Dim comp As New Histogram_CompareGray
-        Dim plot As New Plot_OverTimeScalar
-        Public Sub New()
+    Dim plot As New PlotTime_Scalar
+    Public Sub New()
             If standaloneTest() Then task.gOptions.displayDst1.Checked = True
             plot.plotCount = 2
 

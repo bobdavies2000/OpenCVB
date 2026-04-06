@@ -237,7 +237,7 @@ Imports VBClasses
 
 
     Public Class Profile_ConcentrationTop : Inherits TaskParent
-        Dim plot As New Plot_OverTimeSingle
+        Dim plot As New PlotTime_Single
         Dim rotate As New Profile_Rotation
         Public sides As New Profile_Basics
         Dim heat As New HeatMap_Basics

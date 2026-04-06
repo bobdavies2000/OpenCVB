@@ -159,7 +159,7 @@ Imports VBClasses
 
     Public Class NR_Line3D_DrawArbitrary : Inherits TaskParent
         Public p1 As cv.Point, p2 As cv.Point
-        Dim plot As New Plot_OverTimeScalar
+        Dim plot As New PlotTime_Scalar
         Dim toggleFirstSecond As Boolean
         Public Sub New()
             If standalone Then task.gOptions.displayDst1.Checked = True

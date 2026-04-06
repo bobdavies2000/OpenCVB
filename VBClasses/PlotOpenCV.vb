@@ -112,8 +112,8 @@ Public Class Plot_Depth : Inherits TaskParent
 
 
 Public Class NR_Plot_Beats : Inherits TaskParent
-        Dim plot As New Plot_OverTimeFixedScale
-        Public Sub New()
+    Dim plot As New PlotTime_FixedScale
+    Public Sub New()
             plot.plotCount = 4
             plot.showScale = False
             plot.fixedScale = True

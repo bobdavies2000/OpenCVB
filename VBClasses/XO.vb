@@ -4857,7 +4857,7 @@ Namespace VBClasses
     Public Class XO_MiniCloud_RotateAngle : Inherits TaskParent
         Dim peak As New XO_MiniCloud_Rotate
         Dim mats As New Mat_4to1
-        Public plot As New Plot_OverTimeSingle
+        Public plot As New PlotTime_Single
         Dim resetCheck As System.Windows.Forms.CheckBox
         Public Sub New()
             task.accRadians.Y = -cv.Cv2.PI / 2
@@ -8880,7 +8880,7 @@ Namespace VBClasses
 
 
     Public Class XO_MotionCam_Plot : Inherits TaskParent
-        Dim plot As New Plot_OverTime
+        Dim plot As New PlotTime_Basics
         Dim measure As New XO_MotionCam_Measure
         Public Sub New()
             plot.minScale = -10
@@ -15581,7 +15581,7 @@ Namespace VBClasses
                 labels(2) = CStr(lpInput.Count * 2) + " edge points found.  Peak distance at " + CStr(maxIndex) + " pixels"
 
                 If standalone Then
-                    Static plot As New Plot_OverTimeSingle
+                    Static plot As New PlotTime_Single
                     plot.plotData = maxIndex
                     plot.Run(src)
                     dst3 = plot.dst2

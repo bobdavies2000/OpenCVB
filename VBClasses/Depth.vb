@@ -106,8 +106,8 @@ Namespace VBClasses
 
 
     Public Class NR_Depth_MeanStdevPlot : Inherits TaskParent
-        Dim plot1 As New Plot_OverTimeSingle
-        Dim plot2 As New Plot_OverTimeSingle
+        Dim plot1 As New PlotTime_Single
+        Dim plot2 As New PlotTime_Single
         Public Sub New()
             desc = "Plot the mean and stdev of the depth image"
         End Sub

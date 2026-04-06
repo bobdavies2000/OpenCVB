@@ -495,7 +495,7 @@ Imports VBClasses
 
     Public Class FCS_Motion : Inherits TaskParent
         Dim fcs As New FCS_CreateList
-        Dim plot As New Plot_OverTime
+        Dim plot As New PlotTime_Basics
         Public xDist As New List(Of Single), yDist As New List(Of Single)
         Public motionPercent As Single
         Public Sub New()

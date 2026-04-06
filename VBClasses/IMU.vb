@@ -483,7 +483,7 @@ Imports VBClasses
 
 
     Public Class IMU_PlotIMUFrameTime : Inherits TaskParent
-        Public plot As New Plot_OverTime
+        Public plot As New PlotTime_Basics
         Public CPUInterval As Double
         Public IMUtoCaptureEstimate As Double
         Dim options As New Options_IMUFrameTime
@@ -575,7 +575,7 @@ Imports VBClasses
     Public Class NR_IMU_PlotTotalDelay : Inherits TaskParent
         Dim host As New IMU_PlotHostFrameTimes
         Dim imu As New IMU_PlotIMUFrameTime
-        Dim plot As New Plot_OverTime
+        Dim plot As New PlotTime_Basics
         Dim kalman As New Kalman_Single
         Public Sub New()
             plot.dst2 = dst3
@@ -677,7 +677,7 @@ Imports VBClasses
 
 
     Public Class NR_IMU_PlotGravityAngles : Inherits TaskParent
-        Dim plot As New Plot_OverTimeScalar
+        Dim plot As New PlotTime_Scalar
         Public Sub New()
             If standalone Then task.gOptions.displayDst1.Checked = True
             desc = "Plot the motion of the camera based on the IMU data in degrees"
@@ -704,7 +704,7 @@ Imports VBClasses
 
 
     Public Class NR_IMU_PlotAngularVelocity : Inherits TaskParent
-        Dim plot As New Plot_OverTimeScalar
+        Dim plot As New PlotTime_Scalar
         Public Sub New()
             If standalone Then task.gOptions.displayDst1.Checked = True
             desc = "Plot the IMU Velocity over time."
@@ -785,7 +785,7 @@ Imports VBClasses
 
 
     Public Class NR_IMU_PlotAcceleration : Inherits TaskParent
-        Dim plot As New Plot_OverTimeScalar
+        Dim plot As New PlotTime_Scalar
         Public Sub New()
             If standalone Then task.gOptions.displayDst1.Checked = True
             desc = "Plot the IMU Acceleration in m/Sec^2 over time."
@@ -833,14 +833,14 @@ Imports VBClasses
 
 
     Public Class NR_IMU_PlotCompareIMU : Inherits TaskParent
-        Dim plot(3 - 1) As Plot_OverTimeScalar
+        Dim plot(3 - 1) As PlotTime_Scalar
         Dim imuAll As New IMU_Methods
         Public Sub New()
             If standalone Then task.gOptions.displayDst1.Checked = True
             If standalone Then task.gOptions.displayDst1.Checked = True
 
             For i = 0 To plot.Count - 1
-                plot(i) = New Plot_OverTimeScalar
+                plot(i) = New PlotTime_Scalar
                 plot(i).plotCount = 4
             Next
 
@@ -993,7 +993,7 @@ Imports VBClasses
 
 
     Public Class IMU_PlotHostFrameTimes : Inherits TaskParent
-        Public plot As New Plot_OverTime
+        Public plot As New PlotTime_Basics
         Public CPUInterval As Double
         Public HostInterruptDelayEstimate As Double
         Dim options As New Options_IMUFrameTime
@@ -1075,7 +1075,7 @@ Imports VBClasses
 
 
     Public Class NR_IMU_PlotHostFrameScalar : Inherits TaskParent
-        Public plot As New Plot_OverTimeScalar
+        Public plot As New PlotTime_Scalar
         Public CPUInterval As Double
         Public HostInterruptDelayEstimate As Double
         Dim options As New Options_IMUFrameTime
@@ -1287,7 +1287,7 @@ Imports VBClasses
 
 
     Public Class IMU_Plot : Inherits TaskParent
-        Dim plot As New Plot_OverTimeScalar
+        Dim plot As New PlotTime_Scalar
         Public blueA As Single, greenA As Single, redA As Single
         Dim options As New Options_IMUPlot
         Public Sub New()

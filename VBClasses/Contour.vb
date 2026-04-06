@@ -806,7 +806,7 @@ Public Class Contour_Basics : Inherits TaskParent
 
 
     Public Class NR_Contour_EdgePoints : Inherits TaskParent
-        Dim plot As New Plot_OverTimeSingle
+        Dim plot As New PlotTime_Single
         Dim rangeVal As Integer = 3
         Dim contours As New Contour_Basics
         Public Sub New()

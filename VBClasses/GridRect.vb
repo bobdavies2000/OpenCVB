@@ -203,7 +203,7 @@ Imports VBClasses
 
     Public Class NR_GridRect_CorrelationMotion : Inherits TaskParent
         Public gather As New GridRect_Basics
-        Dim plot As New Plot_OverTimeSingle
+        Dim plot As New PlotTime_Single
         Dim options As New Options_Features
         Public Sub New()
             desc = "Use the grid-based correlations with the previous image to determine if there was camera motion"

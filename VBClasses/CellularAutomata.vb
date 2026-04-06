@@ -191,8 +191,8 @@ Imports VBClasses
 
     ' http://ptgmedia.pearsoncmg.com/images/0672320665/downloads/The%20Game%20of%20Life.html
     Public Class NR_CellularAutomata_LifePopulation : Inherits TaskParent
-        Dim plot As New Plot_OverTimeSingle
-        Dim game As New CellularAutomata_Life
+    Dim plot As New PlotTime_Single
+    Dim game As New CellularAutomata_Life
         Public Sub New()
             desc = "Show Game of Life display with plot of population"
         End Sub

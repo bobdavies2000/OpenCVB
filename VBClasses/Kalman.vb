@@ -56,8 +56,8 @@ Imports VBClasses
     ' http://opencvexamples.blogspot.com/2014/01/kalman-filter-implementation-tracking.html
     Public Class NR_Kalman_Compare : Inherits TaskParent
         Dim kalman() As Kalman_Single
-        Public plot As New Plot_OverTimeScalar
-        Public kPlot As New Plot_OverTimeScalar
+        Public plot As New PlotTime_Scalar
+        Public kPlot As New PlotTime_Scalar
         Public Sub New()
             plot.plotCount = 3
             kPlot.plotCount = 3
@@ -344,7 +344,7 @@ Imports VBClasses
 
 
     Public Class Kalman_Single : Inherits TaskParent
-        Dim plot As New Plot_OverTimeScalar
+        Dim plot As New PlotTime_Scalar
         Dim kf As New cv.KalmanFilter(2, 1, 0)
         Dim processNoise As New cv.Mat(2, 1, cv.MatType.CV_32F)
         Public measurement As New cv.Mat(1, 1, cv.MatType.CV_32F, cv.Scalar.All(0))
@@ -513,7 +513,7 @@ Imports VBClasses
         Dim outputError As Single = 0.002F
         Dim processCovar As Single = 0.001F 'This is the process covarience matrix. It's how much we trust the accelerometer
         Dim matrix As New List(Of Single)
-        Dim plot As New Plot_OverTimeScalar
+        Dim plot As New PlotTime_Scalar
         Dim saveAvgCount As Integer
         Dim options As New Options_Kalman
         Public Sub New()

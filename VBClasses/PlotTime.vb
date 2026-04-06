@@ -1,5 +1,5 @@
 ﻿Imports cv = OpenCvSharp
-Public Class Plot_OverTime : Inherits TaskParent
+Public Class PlotTime_Basics : Inherits TaskParent
     Public plotData As cv.Scalar
     Public plotCount As Integer = 3
     Public plotColors() As cv.Scalar = {cv.Scalar.Blue, cv.Scalar.LawnGreen, cv.Scalar.Red, white}
@@ -92,7 +92,7 @@ End Class
 
 
 
-Public Class Plot_OverTimeSingle : Inherits TaskParent
+Public Class PlotTime_Single : Inherits TaskParent
     Public plotData As Single
     Public backColor = cv.Scalar.DarkGray
     Public max As Single, min As Single, avg, fmt As String
@@ -100,7 +100,7 @@ Public Class Plot_OverTimeSingle : Inherits TaskParent
     Public plotColor = cv.Scalar.Blue
     Dim inputList As New List(Of Single)
     Public Sub New()
-        labels(2) = "Plot_OverTime "
+        labels(2) = "PlotTime_Basics "
         desc = "Plot an input variable over time"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -153,14 +153,14 @@ End Class
 
 
 
-Public Class Plot_OverTimeScalar : Inherits TaskParent
+Public Class PlotTime_Scalar : Inherits TaskParent
     Public plotData As cv.Scalar
     Public plotCount As Integer = 3
-    Public plotList As New List(Of Plot_OverTimeSingle)
+    Public plotList As New List(Of PlotTime_Single)
     Dim mats As New Mat_4Click
     Public Sub New()
         For i = 0 To 3
-            plotList.Add(New Plot_OverTimeSingle)
+            plotList.Add(New PlotTime_Single)
             plotList(i).plotColor = Choose(i + 1, cv.Scalar.Blue, cv.Scalar.Green, cv.Scalar.Red, cv.Scalar.Yellow)
         Next
         desc = "Plot the requested number of entries in the cv.scalar input"
@@ -185,7 +185,7 @@ End Class
 
 
 
-Public Class Plot_OverTimeFixedScale : Inherits TaskParent
+Public Class PlotTime_FixedScale : Inherits TaskParent
     Public plotData As cv.Scalar
     Public plotCount As Integer = 3
     Public plotColors() As cv.Scalar = {cv.Scalar.Blue, cv.Scalar.Green, cv.Scalar.Red, white}
