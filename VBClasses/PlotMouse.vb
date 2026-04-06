@@ -1,6 +1,6 @@
 ﻿Imports cv = OpenCvSharp
 Imports VBClasses
-Public Class PlotInteractive_Basics : Inherits TaskParent
+Public Class plotMouse_Basics : Inherits TaskParent
     Public plotHist As New PlotBars_Basics
     Dim corr As New Correlation_BasicsPlot
     Public Sub New()
@@ -55,7 +55,7 @@ End Class
 
 
 
-Public Class PlotInteractive_Correlation : Inherits TaskParent
+Public Class plotMouse_Correlation : Inherits TaskParent
     Public plotHist As New PlotBars_Basics
     Dim corr As New Correlation_BasicsPlot
     Public Sub New()

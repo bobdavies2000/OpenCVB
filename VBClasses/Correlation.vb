@@ -234,7 +234,7 @@ Namespace VBClasses
 
 
     Public Class Correlation_Interactive : Inherits TaskParent
-        Dim plot As New PlotInteractive_Correlation
+        Dim plot As New plotMouse_Correlation
         Public Sub New()
             desc = "Plot the range of correlations and display their source - duplicate of PlotOpenCV_Interactive"
         End Sub

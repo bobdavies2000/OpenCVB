@@ -6867,7 +6867,7 @@ Namespace VBClasses
 
 
     Public Class XO_FPoly_TopFeatures : Inherits TaskParent
-        Public stable As New Stable_BasicsCount
+        Public stable As New StableLine_BasicsCount
         Public options As New Options_FPoly
         Dim feat As New Feature_General
         Public topFeatures As New List(Of cv.Point2f)
@@ -7452,7 +7452,7 @@ Namespace VBClasses
 
 
     Public Class XO_Stabilizer_CornerPoints : Inherits TaskParent
-        Public basics As New Stable_Basics
+        Public basics As New StableLine_Basics
         Public features As New List(Of cv.Point2f)
         Dim options As New Options_FAST
         Dim ul As cv.Rect, ur As cv.Rect, ll As cv.Rect, lr As cv.Rect
@@ -13245,7 +13245,7 @@ Namespace VBClasses
 
     Public Class XO_Line_Stabilize : Inherits TaskParent
         Dim knnLine As New XO_Line_Generations
-        Dim stable As New Stable_Basics
+        Dim stable As New StableLine_Basics
         Public Sub New()
             desc = "Stabilize the image by identifying a line in both the current frame and the previous."
         End Sub

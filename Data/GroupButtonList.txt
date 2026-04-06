@@ -157,7 +157,7 @@ Pixel
 Plane
 PlotBars
 PlotDots
-PlotInteractive
+plotMouse
 PlotOpenCV
 PlotTime
 PlyFormat
@@ -195,7 +195,9 @@ SLR
 Sort
 Spectrum
 Stabilizer
-Stable
+StableDepth
+StableLine
+StableRGB
 Stitch
 Stripes
 Structured
