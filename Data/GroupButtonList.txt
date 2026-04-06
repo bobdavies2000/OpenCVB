@@ -158,6 +158,7 @@ Plane
 PlotBars
 PlotDots
 plotMouse
+PlotMouse
 PlotOpenCV
 PlotTime
 PlyFormat

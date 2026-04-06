@@ -760,7 +760,7 @@ End Class
 
 
 Public Class NR_Histogram_Peaks : Inherits TaskParent
-    Dim masks As New BackProject_Masks
+    Dim masks As New PlotMouse_BackProjectMasks
     Public Sub New()
         desc = "Interactive Histogram"
     End Sub
@@ -858,7 +858,7 @@ End Class
 
 
 Public Class NR_Histogram_FlatSurfaces : Inherits TaskParent
-    Dim masks As New BackProject_Masks
+    Dim masks As New PlotMouse_BackProjectMasks
     Public Sub New()
         desc = "Find flat surfaces with the histogram"
     End Sub

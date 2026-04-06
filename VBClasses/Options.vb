@@ -8221,3 +8221,19 @@ Imports VBClasses
         End Sub
     End Class
 
+
+
+
+
+Public Class Options_BrickPoint : Inherits OptionParent
+    Public threshold As Integer
+    Public Sub New()
+        If sliders.Setup(traceName) Then
+            sliders.setupTrackBar("BrickPoint Threshold", 0, 255, 150)
+        End If
+    End Sub
+    Public Sub Run()
+        Static bpSlider = FindSlider("BrickPoint Threshold")
+        threshold = bpSlider.value
+    End Sub
+End Class

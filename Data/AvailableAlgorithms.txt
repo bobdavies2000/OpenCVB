@@ -12,7 +12,6 @@ BackProject_FeatureLess
 BackProject_Full
 BackProject_FullDepth
 BackProject_Image
-BackProject_Masks
 BackProject_Side
 BackProject_SoloSide
 BackProject_SoloTop
@@ -1484,6 +1483,7 @@ PlotBars_HistCoreRange
 PlotBars_Histogram2D
 PlotDots_Basics
 PlotDots_Heartbeats
+PlotMouse_BackProjectMasks
 plotMouse_Basics
 plotMouse_Correlation
 PlotOpenCV_Basics

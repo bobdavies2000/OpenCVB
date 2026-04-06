@@ -434,7 +434,7 @@ End Class
 
 
 Public Class NR_BackProject_MaskLines : Inherits TaskParent
-    Dim masks As New BackProject_Masks
+    Dim masks As New PlotMouse_BackProjectMasks
     Public Sub New()
         If standalone Then task.gOptions.displayDst1.Checked = True
         dst1 = New cv.Mat(dst1.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
@@ -462,51 +462,6 @@ Public Class NR_BackProject_MaskLines : Inherits TaskParent
     End Sub
 End Class
 
-
-
-
-
-
-
-Public Class BackProject_Masks : Inherits TaskParent
-    Public hist As New Histogram_Basics
-    Public histIndex As Integer
-    Public mask As New cv.Mat
-    Public Sub New()
-        labels(2) = "Histogram for the gray scale image.  Move mouse to see backprojection of each grayscale mask."
-        desc = "Create all the backprojection masks from a grayscale histogram"
-    End Sub
-    Public Function maskDetect(gray As cv.Mat, histIndex As Integer) As cv.Mat
-        Dim brickWidth = dst2.Width / hist.histogram.Rows
-        Dim brickRange = 255 / hist.histogram.Rows
-
-        Dim minRange = If(histIndex = hist.histogram.Rows - 1, 255 - brickRange, histIndex * brickRange)
-        Dim maxRange = If(histIndex = hist.histogram.Rows - 1, 255, (histIndex + 1) * brickRange)
-        If Single.IsNaN(minRange) Or Single.IsInfinity(minRange) Or
-           Single.IsNaN(maxRange) Or Single.IsInfinity(maxRange) Then
-            SetTrueText("Input data has no values - exit " + traceName)
-            Return New cv.Mat
-        End If
-
-        Dim ranges() = New cv.Rangef() {New cv.Rangef(minRange, maxRange)}
-
-        cv.Cv2.CalcBackProject({gray}, {0}, hist.histogram, mask, ranges)
-        Return mask
-    End Function
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        hist.Run(src)
-        dst2 = hist.dst2
-
-        Dim brickWidth = dst2.Width / task.histogramBins
-        histIndex = Math.Floor(task.mouseMovePoint.X / brickWidth)
-
-        dst3 = task.color.Clone
-        dst1 = maskDetect(task.gray, histIndex)
-        If dst1.Width = 0 Then Exit Sub
-        dst3.SetTo(white, dst1)
-        dst2.Rectangle(New cv.Rect(CInt(histIndex * brickWidth), 0, brickWidth, dst2.Height), cv.Scalar.Yellow, task.lineWidth)
-    End Sub
-End Class
 
 
 
