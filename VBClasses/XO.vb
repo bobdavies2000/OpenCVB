@@ -16408,7 +16408,7 @@ Namespace VBClasses
 
     ' https://www.codeproject.com/Articles/5373108/Understanding-Time-Complexity-on-Simple-Examples
     Public Class XO_Complexity_PlotOpenCV : Inherits TaskParent
-        Public plot As New PlotOpenCV_Basics_CPP
+        Public plot As New PlotOpenCV_CPP
         Public maxFrameCount As Integer
         Public sortData As New SortedList(Of Integer, Integer)(New compareAllowIdenticalInteger)
         Public options As New Options_Complexity

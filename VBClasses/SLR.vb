@@ -72,7 +72,7 @@ Imports VBClasses
 
 
     Public Class SLR_Plot : Inherits TaskParent
-        Dim plot As New PlotOpenCV_Basics_CPP()
+        Dim plot As New PlotOpenCV_CPP()
         Dim slr As New SLR()
         Dim options As New Options_SLR()
         Public dataX As New List(Of Double)
@@ -123,7 +123,7 @@ Imports VBClasses
 
     ' https://www.codeproject.com/Articles/5282014/Segmented-Linear-Regression
     Public Class SLR_PlotTest : Inherits TaskParent
-        Dim plot As New PlotOpenCV_Basics_CPP
+        Dim plot As New PlotOpenCV_CPP
         Public dataX As New List(Of Double)
         Public dataY As New List(Of Double)
         Public Sub New()

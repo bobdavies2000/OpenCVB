@@ -1489,7 +1489,7 @@ PlotDots_Heartbeats
 PlotInteractive_Basics
 PlotInteractive_Correlation
 PlotOpenCV_Basics
-PlotOpenCV_Basics_CPP
+PlotOpenCV_CPP
 PlotOpenCV_Depth
 PlotOpenCV_Points
 PlotOpenCV_RedPrepData
