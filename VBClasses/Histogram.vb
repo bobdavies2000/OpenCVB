@@ -3,10 +3,10 @@ Imports OpenCvSharp
 Imports SharpGL.SceneGraph.Raytracing
 Imports cv = OpenCvSharp
 Imports VBClasses
-    Public Class Histogram_Basics : Inherits TaskParent
-        Implements IDisposable
-        Public histogram As New cv.Mat
-        Public mm As mmData
+Public Class Histogram_Basics : Inherits TaskParent
+    Implements IDisposable
+    Public histogram As New cv.Mat
+    Public mm As mmData
     Public plotHist As New PlotBars_Basics
     Public ranges() As cv.Rangef
 
@@ -48,12 +48,12 @@ Imports VBClasses
 
         If task.heartBeatLT Then
             strOut = "Distance" + vbTab + "Value" + vbTab + "Count" + vbTab + "min val: " +
-                         vbTab + Format(mm.minVal, fmt1) + vbTab + "max val:" + vbTab +
-                         Format(mm.maxVal, fmt1) + vbCrLf
+                             vbTab + Format(mm.minVal, fmt1) + vbTab + "max val:" + vbTab +
+                             Format(mm.maxVal, fmt1) + vbCrLf
             Dim incr As Single = (mm.maxVal - mm.minVal) / task.histogramBins
             For i = 0 To histArray.Count - 1
                 strOut += CStr(i) + ":" + vbTab + Format(i * incr, fmt1) + vbTab +
-                              Format(histArray(i) / 1000, fmt3) + "k" + vbCrLf
+                                  Format(histArray(i) / 1000, fmt3) + "k" + vbCrLf
             Next
         End If
         SetTrueText(strOut, 3)
@@ -64,8 +64,8 @@ Imports VBClasses
 
         If standalone Then
             labels(2) = Choose(splitIndex + 1, "Blue", "Green", "Red") + " histogram, bins = " +
-                                   CStr(task.histogramBins) + ", X ranges from " + Format(mm.minVal, "0.0") + " to " +
-                                   Format(mm.maxVal, "0.0") + ", y is sample count"
+                                       CStr(task.histogramBins) + ", X ranges from " + Format(mm.minVal, "0.0") + " to " +
+                                       Format(mm.maxVal, "0.0") + ", y is sample count"
         Else
             labels(2) = "Range = " + Format(ranges(0).Start, fmt3) + " To " + Format(ranges(0).End, fmt3)
         End If
@@ -181,7 +181,7 @@ Public Class Histogram_Simple : Inherits TaskParent
         Dim ranges() = New cv.Rangef() {New cv.Rangef(plotHist.minRange, plotHist.maxRange)}
         If plotHist.minRange = plotHist.maxRange Then
             SetTrueText("The data is just one value - " + Format(plotHist.minRange, fmt1) + vbCrLf +
-                        "A histogram is not necessary.", 3)
+                            "A histogram is not necessary.", 3)
             Exit Sub
         End If
 
@@ -245,11 +245,11 @@ Public Class NR_Histogram_Frustrum : Inherits TaskParent
         dst3 = heat.dst3
 
         SetTrueText("This algorithm was created to tune the frustrum and camera locations." + vbCrLf +
-                    "Without these tuning parameters the side and top views will look correct." + vbCrLf +
-                    "To see how these adjustments work or to add a new camera, " + vbCrLf +
-                    "use the HeatMap_Basics algorithm." + vbCrLf +
-                    "For new cameras, make the adjustments needed, note the value, and update " + vbCrLf +
-                    "the Select statement in the constructor for Options_CameraDetails.", New cv.Point(10, 80), 1)
+                        "Without these tuning parameters the side and top views will look correct." + vbCrLf +
+                        "To see how these adjustments work or to add a new camera, " + vbCrLf +
+                        "use the HeatMap_Basics algorithm." + vbCrLf +
+                        "For new cameras, make the adjustments needed, note the value, and update " + vbCrLf +
+                        "the Select statement in the constructor for Options_CameraDetails.", New cv.Point(10, 80), 1)
     End Sub
 End Class
 
@@ -387,7 +387,7 @@ Public Class Histogram_PeakFinder : Inherits TaskParent
         End If
         If Math.Abs(maxList.Average - maxIndex) > saveHistBins / 10 Then saveHistBins = 0
         labels(2) = "There were " + CStr(peakCount) + " depth peaks (highlighted) up to " + CStr(CInt(task.MaxZmeters)) + " meters.  " +
-                    "Use global option Histogram Bins to set the number of bins."
+                        "Use global option Histogram Bins to set the number of bins."
     End Sub
 End Class
 
@@ -536,7 +536,7 @@ Public Class Histogram_KalmanAuto : Inherits TaskParent
         dst2 = plotHist.dst2
 
         labels(2) = colorName + " histogram, bins = " + CStr(task.histogramBins) + ", X ranges from " +
-                    Format(mm.minVal, "0.0") + " to " + Format(mm.maxVal, "0.0") + ", y is occurances"
+                        Format(mm.minVal, "0.0") + " to " + Format(mm.maxVal, "0.0") + ", y is occurances"
     End Sub
 End Class
 
@@ -846,7 +846,7 @@ Public Class NR_Histogram_PointCloudXYZ : Inherits TaskParent
                     dst3 = plotHist.dst2.Clone
             End Select
             labels(i + 1) = "Histogram " + Choose(i + 1, "X", "Y", "Z") + " ranges from " +
-                                   Format(plotHist.minRange, "0.0") + "m to " + Format(plotHist.maxRange, "0.0") + "m"
+                                       Format(plotHist.minRange, "0.0") + "m to " + Format(plotHist.maxRange, "0.0") + "m"
         Next
     End Sub
 End Class
@@ -912,12 +912,12 @@ Public Class NR_Histogram_Gotcha2D : Inherits TaskParent
 
         If task.heartBeat Then
             strOut = "Expected sample count:" + vbTab + CStr(expected) + vbCrLf +
-                     "Actual sample count:" + vbTab + CStr(actual) + vbCrLf +
-                     "The number of samples input is the expected value." + vbCrLf +
-                     "The number of entries in the histogram is the 'actual' number of samples." + vbCrLf +
-                     "How can the values not be equal?  The ranges of the histogram are exclusive." + vbCrLf +
-                     "Another way that samples may be lost: X or Y range.  Use Y-Range slider to show impact." +
-                     "A third way samples may not match: max depth can toss samples as well."
+                         "Actual sample count:" + vbTab + CStr(actual) + vbCrLf +
+                         "The number of samples input is the expected value." + vbCrLf +
+                         "The number of entries in the histogram is the 'actual' number of samples." + vbCrLf +
+                         "How can the values not be equal?  The ranges of the histogram are exclusive." + vbCrLf +
+                         "Another way that samples may be lost: X or Y range.  Use Y-Range slider to show impact." +
+                         "A third way samples may not match: max depth can toss samples as well."
         End If
         SetTrueText(strOut, 3)
         dst2 = histogram.Threshold(0, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs
@@ -947,11 +947,11 @@ Public Class NR_Histogram_Gotcha : Inherits TaskParent
 
         If task.heartBeat Then
             strOut = "Expected sample count:" + vbTab + CStr(expected) + vbCrLf +
-                     "Actual sample count:" + vbTab + CStr(actual) + vbCrLf +
-                     "Difference:" + vbTab + vbTab + CStr(Math.Abs(actual - expected)) + vbCrLf +
-                     "The number of samples input is the expected value." + vbCrLf +
-                     "The number of entries in the histogram is the 'actual' number of samples." + vbCrLf +
-                     "How can the values not be equal?  The ranges in the histogram are exclusive!"
+                         "Actual sample count:" + vbTab + CStr(actual) + vbCrLf +
+                         "Difference:" + vbTab + vbTab + CStr(Math.Abs(actual - expected)) + vbCrLf +
+                         "The number of samples input is the expected value." + vbCrLf +
+                         "The number of entries in the histogram is the 'actual' number of samples." + vbCrLf +
+                         "How can the values not be equal?  The ranges in the histogram are exclusive!"
         End If
         SetTrueText(strOut, 2)
     End Sub
@@ -979,11 +979,11 @@ Public Class NR_Histogram_GotchaFixed_CPP : Inherits TaskParent
         If task.heartBeat Then
             Dim actual = CInt(Histogram_1D_Sum(cPtr))
             strOut = "Expected sample count:" + vbTab + CStr(dst2.Total) + vbCrLf +
-                     "Actual sample count:" + vbTab + CStr(actual) + vbCrLf +
-                     "Difference:" + vbTab + vbTab + CStr(Math.Abs(actual - dst2.Total)) + vbCrLf +
-                     "The number of samples input is the expected value." + vbCrLf +
-                     "The number of entries in the histogram is the 'actual' number of samples." + vbCrLf +
-                     "How can the values not be equal?  The ranges in the histogram are exclusive!"
+                         "Actual sample count:" + vbTab + CStr(actual) + vbCrLf +
+                         "Difference:" + vbTab + vbTab + CStr(Math.Abs(actual - dst2.Total)) + vbCrLf +
+                         "The number of samples input is the expected value." + vbCrLf +
+                         "The number of entries in the histogram is the 'actual' number of samples." + vbCrLf +
+                         "How can the values not be equal?  The ranges in the histogram are exclusive!"
         End If
         SetTrueText(strOut, 2)
     End Sub
@@ -1417,7 +1417,7 @@ Public Class Histogram_PointCloud : Inherits TaskParent
         Select Case task.reductionName
             Case "X Reduction", "Y Reduction", "Z Reduction"
                 cv.Cv2.CalcHist({task.pointCloud}, task.channels, New cv.Mat(), histogram,
-                                 task.channelCount, task.histBinList, task.ranges)
+                                     task.channelCount, task.histBinList, task.ranges)
 
                 Static plot As New PlotBars_Basics
                 plot.Run(histogram)
@@ -1425,7 +1425,7 @@ Public Class Histogram_PointCloud : Inherits TaskParent
                 labels(2) = "2D plot of 1D histogram."
             Case "XY Reduction", "XZ Reduction", "YZ Reduction"
                 cv.Cv2.CalcHist({task.pointCloud}, task.channels, New cv.Mat(), histogram,
-                                 task.channelCount, task.histBinList, task.ranges)
+                                     task.channelCount, task.histBinList, task.ranges)
 
                 Static plot2D As New PlotBars_Histogram2D
                 plot2D.Run(histogram)
@@ -1570,53 +1570,53 @@ End Class
 Public Class Histogram_Depth : Inherits TaskParent
     Public plotHist As New PlotBars_Basics
     Public rc As rcData
-        Public mm As mmData
-        Public histogram As New cv.Mat
-        Public Sub New()
-            plotHist.minRange = 0.1
-            plotHist.removeZeroEntry = True
-            task.gOptions.MaxDepthBar.Value = 10
-            task.gOptions.HistBinBar.Value = 10
-            desc = "Show depth data as a histogram."
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            If src.Rows <= 0 Then Exit Sub
-            plotHist.minRange = 0
-            plotHist.maxRange = task.MaxZmeters
-            If rc IsNot Nothing Then
-                If rc.index = 0 Then Exit Sub
-                src = task.pcSplit(2)(rc.rect).Clone
-            Else
-                If src.Type <> cv.MatType.CV_32F Then src = task.pcSplit(2)
-                mm = GetMinMax(src)
-                If mm.minVal >= mm.maxVal Then Exit Sub
-                plotHist.minRange = mm.minVal ' because OpenCV's histogram makes the ranges exclusive.
-                plotHist.maxRange = mm.maxVal
-            End If
+    Public mm As mmData
+    Public histogram As New cv.Mat
+    Public Sub New()
+        plotHist.minRange = 0.1
+        plotHist.removeZeroEntry = True
+        task.gOptions.MaxDepthBar.Value = 10
+        task.gOptions.HistBinBar.Value = 10
+        desc = "Show depth data as a histogram."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        If src.Rows <= 0 Then Exit Sub
+        plotHist.minRange = 0
+        plotHist.maxRange = task.MaxZmeters
+        If rc IsNot Nothing Then
+            If rc.index = 0 Then Exit Sub
+            src = task.pcSplit(2)(rc.rect).Clone
+        Else
+            If src.Type <> cv.MatType.CV_32F Then src = task.pcSplit(2)
+            mm = GetMinMax(src)
+            If mm.minVal >= mm.maxVal Then Exit Sub
+            plotHist.minRange = mm.minVal ' because OpenCV's histogram makes the ranges exclusive.
+            plotHist.maxRange = mm.maxVal
+        End If
 
-            If plotHist.minRange >= plotHist.maxRange Then Exit Sub ' at startup some cameras have no depth...
-            cv.Cv2.CalcHist({src}, {0}, New cv.Mat, histogram, 1, {task.histogramBins},
-                            {New cv.Rangef(plotHist.minRange, plotHist.maxRange)})
+        If plotHist.minRange >= plotHist.maxRange Then Exit Sub ' at startup some cameras have no depth...
+        cv.Cv2.CalcHist({src}, {0}, New cv.Mat, histogram, 1, {task.histogramBins},
+                                {New cv.Rangef(plotHist.minRange, plotHist.maxRange)})
 
-            plotHist.histogram = histogram
-            plotHist.maxRange = task.MaxZmeters
-            plotHist.Run(plotHist.histogram)
-            dst2 = plotHist.dst2
+        plotHist.histogram = histogram
+        plotHist.maxRange = task.MaxZmeters
+        plotHist.Run(plotHist.histogram)
+        dst2 = plotHist.dst2
 
-            Dim stepsize = dst2.Width / task.MaxZmeters
-            For i = 1 To CInt(task.MaxZmeters) - 1
-                dst2.Line(New cv.Point(stepsize * i, 0), New cv.Point(stepsize * i, dst2.Height), white, task.cvFontThickness)
-            Next
+        Dim stepsize = dst2.Width / task.MaxZmeters
+        For i = 1 To CInt(task.MaxZmeters) - 1
+            dst2.Line(New cv.Point(stepsize * i, 0), New cv.Point(stepsize * i, dst2.Height), white, task.cvFontThickness)
+        Next
 
-            If standaloneTest() Then
-                Dim expected = src.CountNonZero
-                Dim actual = CInt(plotHist.histogram.Sum(0))
-                strOut = "Expected sample count (non-zero task.pcSplit(2) entries):" + vbTab + CStr(expected) + vbCrLf
-                strOut += "Histogram sum (ranges can reduce):" + vbTab + vbTab + vbTab + CStr(actual) + vbCrLf
-                strOut += "Difference:" + vbTab + vbTab + vbTab + vbTab + vbTab + vbTab + CStr(Math.Abs(actual - expected)) + vbCrLf
-                'strOut += "Count nonzero entries in task.maxDepthMask: " + vbTab + vbTab + CStr(task.maxDepthMask.CountNonZero)
-            End If
-            SetTrueText(strOut, 3)
-            labels(2) = "Histogram Depth to " + Format(task.MaxZmeters, "0.0") + " m"
-        End Sub
-    End Class
+        If standaloneTest() Then
+            Dim expected = src.CountNonZero
+            Dim actual = CInt(plotHist.histogram.Sum(0))
+            strOut = "Expected sample count (non-zero task.pcSplit(2) entries):" + vbTab + CStr(expected) + vbCrLf
+            strOut += "Histogram sum (ranges can reduce):" + vbTab + vbTab + vbTab + CStr(actual) + vbCrLf
+            strOut += "Difference:" + vbTab + vbTab + vbTab + vbTab + vbTab + vbTab + CStr(Math.Abs(actual - expected)) + vbCrLf
+            'strOut += "Count nonzero entries in task.maxDepthMask: " + vbTab + vbTab + CStr(task.maxDepthMask.CountNonZero)
+        End If
+        SetTrueText(strOut, 3)
+        labels(2) = "Histogram Depth to " + Format(task.MaxZmeters, "0.0") + " m"
+    End Sub
+End Class

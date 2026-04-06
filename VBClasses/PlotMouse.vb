@@ -159,3 +159,20 @@ Public Class PlotMouse_BackProjectMasks : Inherits TaskParent
         dst2.Rectangle(New cv.Rect(CInt(histIndex * brickWidth), 0, brickWidth, dst2.Height), cv.Scalar.Yellow, task.lineWidth)
     End Sub
 End Class
+
+
+
+
+
+Public Class PlotMouse_SobelDerivative : Inherits TaskParent
+    Dim deriv As New Derivative_Sobel
+    Public Sub New()
+        desc = "Plot of derivative in depth in X, Y, or Z."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        deriv.Run(task.pcSplit(2))
+        dst2 = deriv.dst2
+        dst3 = deriv.dst3
+        labels = deriv.labels
+    End Sub
+End Class

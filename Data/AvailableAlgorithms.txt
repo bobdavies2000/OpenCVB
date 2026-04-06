@@ -69,6 +69,7 @@ BrickLine_LeftRight
 BrickPoint_Basics
 BrickPoint_Core
 BrickPoint_Minimum
+BrickPoint_Plot
 Brightness_Basics
 Brightness_Grid
 BRISK_Basics
@@ -623,7 +624,6 @@ NR_BrickPoint_FeatureLess
 NR_BrickPoint_Features
 NR_BrickPoint_Horizontal
 NR_BrickPoint_KNN
-NR_BrickPoint_Plot
 NR_BrickPoint_PopulationSurvey
 NR_BrickPoint_TopRow
 NR_BrickPoint_Vertical
@@ -1486,6 +1486,7 @@ PlotDots_Heartbeats
 PlotMouse_BackProjectMasks
 plotMouse_Basics
 plotMouse_Correlation
+PlotMouse_SobelDerivative
 PlotOpenCV_Basics
 PlotOpenCV_CPP
 PlotOpenCV_Depth

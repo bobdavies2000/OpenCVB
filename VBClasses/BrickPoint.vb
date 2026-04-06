@@ -71,7 +71,7 @@ End Class
 
 
 
-Public Class NR_BrickPoint_Plot : Inherits TaskParent
+Public Class BrickPoint_Plot : Inherits TaskParent
     Dim plotHist As New PlotBars_Basics
     Dim bPoint As New BrickPoint_Basics
     Public Sub New()
