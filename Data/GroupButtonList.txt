@@ -157,7 +157,6 @@ Pixel
 Plane
 PlotBars
 PlotDots
-plotMouse
 PlotMouse
 PlotOpenCV
 PlotTime

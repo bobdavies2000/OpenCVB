@@ -1484,8 +1484,9 @@ PlotBars_Histogram2D
 PlotDots_Basics
 PlotDots_Heartbeats
 PlotMouse_BackProjectMasks
-plotMouse_Basics
-plotMouse_Correlation
+PlotMouse_Basics
+PlotMouse_Correlation
+PlotMouse_Depth
 PlotMouse_SobelDerivative
 PlotOpenCV_Basics
 PlotOpenCV_CPP
