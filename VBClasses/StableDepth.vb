@@ -26,7 +26,7 @@ Public Class StableDepth_Basics : Inherits TaskParent
             task.pointCloud.CopyTo(pointcloud, task.noDepthMask)
         End If
 
-        Dim pcSplit = pointcloud.Split()
+        pcSplit = pointcloud.Split()
         Dim accumDepth As New cv.Mat
         cv.Cv2.Min(pcSplit(2), lastDepth, accumDepth)
 
@@ -75,8 +75,7 @@ Public Class StableDepth_Max_TA : Inherits TaskParent
             task.pointCloud.CopyTo(pointcloud, task.noDepthMask)
         End If
 
-        Dim pcSplit = pointcloud.Split()
-
+        pcsplit = pointcloud.Split()
         Dim accumDepth As New cv.Mat
         cv.Cv2.Max(pcSplit(2), lastDepth, accumDepth)
 

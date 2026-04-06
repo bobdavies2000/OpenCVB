@@ -878,6 +878,33 @@ End Class
 
 
 
+Public Class NR_Depth_StableAverage : Inherits TaskParent
+    Dim dAvg As New DepthColorizer_Mean
+    Dim extrema As New NR_Depth_StableMinMax
+    Public Sub New()
+        OptionParent.findRadio("Use farthest distance").Checked = True
+        desc = "Use Depth_StableMax_TA to remove the artifacts from the depth averaging"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        Static unchangedRadio = OptionParent.findRadio("Use unchanged depth input")
+        If src.Type <> cv.MatType.CV_32F Then src = task.pcSplit(2)
+        extrema.Run(src)
+
+        If unchangedRadio.checked Then
+            dst2 = extrema.dst2
+            dst3 = extrema.dst3
+        Else
+            dAvg.Run(extrema.dst3)
+            dst2 = dAvg.dst2
+            dst3 = dAvg.dst3
+        End If
+    End Sub
+End Class
+
+
+
+
+
 Public Class NR_Depth_StableMinMax : Inherits TaskParent
     Public dMin As New StableDepth_Basics
     Public dMax As New StableDepth_Max_TA

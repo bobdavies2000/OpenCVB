@@ -741,6 +741,7 @@ NR_Depth_Regions
 NR_Depth_RGBShadow
 NR_Depth_Smoothing
 NR_Depth_SmoothingMat
+NR_Depth_StableAverage
 NR_Depth_StableMax
 NR_Depth_StableMaxMotion
 NR_Depth_StableMin
