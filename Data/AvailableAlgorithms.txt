@@ -1269,8 +1269,6 @@ NR_Plane_FloorStudy
 NR_Plane_Histogram
 NR_Plane_Horizontals
 NR_Plane_Verticals
-NR_Plot_Beats
-NR_Plot_Dots
 NR_PlyFormat_PlusRGB
 NR_PolyLine_IEnumerableExample
 NR_PolyLine_Random
@@ -1486,6 +1484,8 @@ Plane_Points
 PlotBars_Basics
 PlotBars_HistCoreRange
 PlotBars_Histogram2D
+PlotDots_Basics
+PlotDots_Heartbeats
 PlotInteractive_Basics
 PlotInteractive_Correlation
 PlotOpenCV_Basics
