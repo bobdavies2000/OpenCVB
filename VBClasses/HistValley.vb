@@ -634,7 +634,7 @@ Imports VBClasses
 
     Public Class HistValley_Count : Inherits TaskParent
         Public classCount As Integer
-        Dim plot As New Plot_Histogram
+        Dim plot As New PlotBars_Basics
         Public standaloneFlag As Boolean = True
         Public Sub New()
             plot.addLabels = False

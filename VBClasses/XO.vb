@@ -2547,7 +2547,7 @@ Namespace VBClasses
     Public Class XO_Sort_FeatureLess : Inherits TaskParent
         Public connect As New XO_Region_Palette
         Public sort As New Sort_Basics
-        Dim plot As New Plot_Histogram
+        Dim plot As New PlotBars_Basics
         Public Sub New()
             plot.createHistogram = True
             task.gOptions.setHistogramBins(255)
@@ -5944,7 +5944,7 @@ Namespace VBClasses
 
     Public Class XO_FPoly_Plot : Inherits TaskParent
         Public fGrid As New XO_FPoly_Core
-        Dim plotHist As New Plot_Histogram
+        Dim plotHist As New PlotBars_Basics
         Public hist() As Single
         Public distDiff As New List(Of Single)
         Public Sub New()
@@ -6000,7 +6000,7 @@ Namespace VBClasses
 
     Public Class XO_FPoly_PlotWeighted : Inherits TaskParent
         Public fPlot As New XO_FPoly_Plot
-        Dim plotHist As New Plot_Histogram
+        Dim plotHist As New PlotBars_Basics
         Public Sub New()
             task.kalman = New Kalman_Basics
             plotHist.minRange = 0
@@ -15281,7 +15281,7 @@ Namespace VBClasses
 
 
     Public Class XO_KNN_TrackMean : Inherits TaskParent
-        Dim plot As New Plot_Histogram
+        Dim plot As New PlotBars_Basics
         Dim knn As New KNN_OneToOne
         Const maxDistance As Integer = 50
         Public shiftX As Single
@@ -16011,7 +16011,7 @@ Namespace VBClasses
 
 
     Public Class XO_RedList_CellsAtDepth : Inherits TaskParent
-        Dim plot As New Plot_Histogram
+        Dim plot As New PlotBars_Basics
         Public Sub New()
             task.kalman = New Kalman_Basics
             plot.removeZeroEntry = False
@@ -16576,7 +16576,7 @@ Namespace VBClasses
 
     'Public Class ParticleFilter_Basics_TA : Inherits TaskParent
     '    Dim trace As New Swarm_Basics
-    '    Dim plot1D As New Plot_Histogram2D
+    '    Dim plot1D As New PlotBars_Histogram2D
     '    Dim histogram As New cv.Mat
     '    Public Sub New()
     '        If standaloneTest() Then task.gOptions.displaydst1.checked = true

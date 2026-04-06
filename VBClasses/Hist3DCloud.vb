@@ -205,7 +205,7 @@ Imports VBClasses
 
     Public Class Hist3Dcloud_PlotHist1D : Inherits TaskParent
         Dim hcloud As New Hist3Dcloud_Basics
-        Dim plot As New Plot_Histogram
+        Dim plot As New PlotBars_Basics
         Public histogram As cv.Mat
         Public histArray() As Single
         Dim simK As New Hist3D_BuildHistogram

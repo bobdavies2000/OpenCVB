@@ -209,7 +209,7 @@ Imports VBClasses
 
     Public Class Motion_CorrelationToLast : Inherits TaskParent
         Public cList As New List(Of Single)
-        Public plotHist As New Plot_Histogram
+        Public plotHist As New PlotBars_Basics
         Public lastFrame As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         Public Sub New()
             If standalone Then task.gOptions.displayDst1.Checked = True
@@ -266,7 +266,7 @@ Imports VBClasses
 
     Public Class Motion_Correlation : Inherits TaskParent
         Public cList As New List(Of Single)
-        Public plotHist As New Plot_Histogram
+        Public plotHist As New PlotBars_Basics
         Public lastFrame As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         Public Sub New()
             If standalone Then task.gOptions.displayDst1.Checked = True

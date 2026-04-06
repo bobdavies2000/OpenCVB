@@ -1486,11 +1486,11 @@ Plane_Points
 Plot_Basics
 Plot_Basics_CPP
 Plot_Depth
-Plot_Histogram
-Plot_Histogram2D
-Plot_HistogramCoreRange
 Plot_Points
 Plot_RedPrepData
+PlotBars_Basics
+PlotBars_HistCoreRange
+PlotBars_Histogram2D
 PlotInteractive_Basics
 PlotInteractive_Correlation
 PlotTime_Basics

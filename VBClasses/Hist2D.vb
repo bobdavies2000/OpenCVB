@@ -42,7 +42,7 @@ Imports VBClasses
 
 
     Public Class Hist2D_Cloud : Inherits TaskParent
-        Dim plot1D As New Plot_Histogram2D
+        Dim plot1D As New PlotBars_Histogram2D
         Dim channels() As Integer
         Public ranges() As cv.Rangef
         Public histogram As New cv.Mat
@@ -183,10 +183,10 @@ Imports VBClasses
 
     Public Class NR_Hist2D_PlotHistogram1D : Inherits TaskParent
         Dim histogram As New cv.Mat
-        Dim plotHist As New Plot_Histogram
+        Dim plotHist As New PlotBars_Basics
         Public Sub New()
             plotHist.removeZeroEntry = False
-            labels(2) = "NR_Hist2D_PlotHistogram1D output shown with plot_histogram"
+            labels(2) = "NR_Hist2D_PlotHistogram1D output shown with PlotBars_Basics"
             desc = "Create a 2D histogram for blue to red and blue to green."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)

@@ -423,7 +423,7 @@ Imports VBClasses
 
     Public Class Line_DepthHistogram : Inherits TaskParent
         Dim lineVert As New Line_Vertical
-        Dim plotHist As New Plot_Histogram
+        Dim plotHist As New PlotBars_Basics
         Public Sub New()
             plotHist.createHistogram = True
             plotHist.removeZeroEntry = True

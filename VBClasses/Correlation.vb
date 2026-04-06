@@ -94,7 +94,7 @@ Namespace VBClasses
         Public cList As New List(Of Single)
         Public maxCorrelation As Single
         Public mmRanges As New List(Of Double)
-        Dim plotHist As New Plot_Histogram
+        Dim plotHist As New PlotBars_Basics
         Public Sub New()
             plotHist.createHistogram = True
             plotHist.shadeValues = False

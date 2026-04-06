@@ -156,6 +156,7 @@ PhotoShop
 Pixel
 Plane
 Plot
+PlotBars
 PlotInteractive
 PlotTime
 PlyFormat

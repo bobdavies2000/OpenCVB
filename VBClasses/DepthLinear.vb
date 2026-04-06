@@ -53,7 +53,7 @@ Imports VBClasses
 
 
     Public Class NR_DepthLinear_Visualize : Inherits TaskParent
-        Public plotHist As New Plot_Histogram
+        Public plotHist As New PlotBars_Basics
         Public roi As New cv.Rect(0, 0, dst2.Width, dst2.Height)
         Public pc As cv.Mat
         Public options As New Options_LinearInput
@@ -121,7 +121,7 @@ Imports VBClasses
 
 
     Public Class DepthLinear_Input : Inherits TaskParent
-        Public plotHist As New Plot_Histogram
+        Public plotHist As New PlotBars_Basics
         Public roi As New cv.Rect(0, 0, dst2.Width, dst2.Height)
         Public pc As cv.Mat
         Public options As New Options_LinearInput

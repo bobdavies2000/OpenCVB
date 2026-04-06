@@ -846,7 +846,7 @@ Imports VBClasses
 
     Public Class Brick_Plot : Inherits TaskParent
         Dim bricks As New Brick_Basics
-        Dim plotHist As New Plot_Histogram
+        Dim plotHist As New PlotBars_Basics
         Public Sub New()
             plotHist.createHistogram = True
             plotHist.addLabels = False

@@ -214,7 +214,7 @@ End Class
 
 
 Public Class NR_RedCloud_CellDepthHistogram : Inherits TaskParent
-    Dim plot As New Plot_Histogram
+    Dim plot As New PlotBars_Basics
     Dim redC As New RedCloud_Basics
     Public Sub New()
         task.gOptions.setHistogramBins(100)

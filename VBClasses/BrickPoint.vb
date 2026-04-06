@@ -74,7 +74,7 @@ Imports VBClasses
 
     Public Class NR_BrickPoint_Plot : Inherits TaskParent
         Dim bricks As New Brick_Basics
-        Dim plotHist As New Plot_Histogram
+        Dim plotHist As New PlotBars_Basics
         Dim bPoint As New BrickPoint_Basics
         Public Sub New()
             task.gOptions.setHistogramBins(3)
@@ -152,7 +152,7 @@ Imports VBClasses
 
     Public Class NR_BrickPoint_DistanceAbove : Inherits TaskParent
         Dim bricks As New Brick_Basics
-        Dim plotHist As New Plot_Histogram
+        Dim plotHist As New PlotBars_Basics
         Public Sub New()
             plotHist.createHistogram = True
             plotHist.removeZeroEntry = False

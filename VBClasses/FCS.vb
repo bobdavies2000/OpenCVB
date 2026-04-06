@@ -555,7 +555,7 @@ Imports VBClasses
 
     Public Class NR_FCS_MotionDirection : Inherits TaskParent
         Dim fcsM As New FCS_Motion
-        Dim plothist As New Plot_Histogram
+        Dim plothist As New PlotBars_Basics
         Dim mats As New Mat_4Click
         Dim range As Integer, rangeText As String
         Public Sub New()
@@ -722,7 +722,7 @@ Imports VBClasses
 
 
     Public Class NR_FCS_ByDepth : Inherits TaskParent
-        Dim plotHist As New Plot_Histogram
+        Dim plotHist As New PlotBars_Basics
         Dim fcs As New FCS_CreateList
         Dim palInput As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         Public Sub New()

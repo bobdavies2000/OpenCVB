@@ -361,7 +361,7 @@ Imports VBClasses
 
     Public Class Cloud_SurfaceH : Inherits TaskParent
         Public heat As New HeatMap_Basics
-        Public plot As New Plot_Histogram
+        Public plot As New PlotBars_Basics
         Public topRow As Integer
         Public botRow As Integer
         Public peakRow As Integer

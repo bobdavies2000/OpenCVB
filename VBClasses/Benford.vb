@@ -16,7 +16,7 @@ Imports VBClasses
     Public Class Benford_Basics : Inherits TaskParent
         Public expectedDistribution(10 - 1) As Single
         Public counts(expectedDistribution.Count - 1) As Single
-        Dim plotHist As New Plot_Histogram
+        Dim plotHist As New PlotBars_Basics
         Dim use99 As Boolean
         Public Sub New()
             For i = 1 To expectedDistribution.Count - 1

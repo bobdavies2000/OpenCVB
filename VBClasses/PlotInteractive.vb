@@ -1,7 +1,7 @@
 ﻿Imports cv = OpenCvSharp
 Imports VBClasses
 Public Class PlotInteractive_Basics : Inherits TaskParent
-    Public plotHist As New Plot_Histogram
+    Public plotHist As New PlotBars_Basics
     Dim corr As New Correlation_BasicsPlot
     Public Sub New()
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
@@ -56,7 +56,7 @@ End Class
 
 
 Public Class PlotInteractive_Correlation : Inherits TaskParent
-    Public plotHist As New Plot_Histogram
+    Public plotHist As New PlotBars_Basics
     Dim corr As New Correlation_BasicsPlot
     Public Sub New()
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
