@@ -1,5 +1,5 @@
 ﻿Imports cv = OpenCvSharp
-Public Class StableRGB_Basics : Inherits TaskParent
+Public Class StableGray_BasicsMin : Inherits TaskParent
     Public Sub New()
         labels(3) = "Mask of pixels that are different between last image and current after processing."
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
@@ -25,7 +25,8 @@ End Class
 
 
 
-Public Class StableRGB_Max : Inherits TaskParent
+
+Public Class StableGray_BasicsMax : Inherits TaskParent
     Public Sub New()
         labels(3) = "Mask of pixels that are different between last image and current after processing."
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
@@ -52,9 +53,9 @@ End Class
 
 
 
-Public Class StableRGB_Compare : Inherits TaskParent
-    Dim minRGB As New StableRGB_Basics
-    Dim maxRGB As New StableRGB_Max
+Public Class StableGray_Compare : Inherits TaskParent
+    Dim minRGB As New StableGray_BasicsMin
+    Dim maxRGB As New StableGray_BasicsMax
     Public Sub New()
         If standalone Then task.gOptions.displayDst1.Checked = True
         desc = "Compare the difference between the min and max accumulated images."
@@ -81,10 +82,31 @@ End Class
 
 
 
+Public Class StableGray_CompareColor : Inherits TaskParent
+    Dim minRGB As New StableGray_RGBMin
+    Dim maxRGB As New StableGray_RGBMax
+    Public Sub New()
+        desc = "Compare the difference between the min and max accumulated images."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        minRGB.Run(src)
+        dst2 = minRGB.dst2
+        labels(2) = "Min RGB image"
 
-Public Class StableRGB_MinMaxRange : Inherits TaskParent
-    Dim compare As New StableRGB_Compare
-    Dim plot As New plotMouse_Basics
+        maxRGB.Run(src)
+        dst3 = maxRGB.dst2
+        labels(3) = "Max RGB image - should be a little lighter."
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class StableGray_MinMaxRange : Inherits TaskParent
+    Dim compare As New StableGray_Compare
+    Dim plot As New PlotMouse_Basics
     Public Sub New()
         If standalone Then task.gOptions.displayDst1.Checked = True
         desc = "Show the absDiff(min, max)"
@@ -98,5 +120,61 @@ Public Class StableRGB_MinMaxRange : Inherits TaskParent
         dst2 = plot.dst2
 
         dst3 = compare.dst3.Clone
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class StableGray_RGBMin : Inherits TaskParent
+    Dim stableB As New StableGray_BasicsMin
+    Dim stableG As New StableGray_BasicsMin
+    Dim stableR As New StableGray_BasicsMin
+    Public Sub New()
+        desc = "Build a StableRGB by running StableGray_BasicsMin with all 3 channels."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        Dim split = task.color.Split()
+
+        stableB.Run(split(0))
+        split(0) = stableB.dst2.Clone
+
+        stableG.Run(split(1))
+        split(1) = stableG.dst2.Clone
+
+        stableR.Run(split(2))
+        split(2) = stableR.dst2.Clone
+
+        cv.Cv2.Merge(split, dst2)
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class StableGray_RGBMax : Inherits TaskParent
+    Dim stableB As New StableGray_BasicsMax
+    Dim stableG As New StableGray_BasicsMax
+    Dim stableR As New StableGray_BasicsMax
+    Public Sub New()
+        desc = "Build a StableRGB by running StableGray_BasicsMin with all 3 channels."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        Dim split = task.color.Split()
+
+        stableB.Run(split(0))
+        split(0) = stableB.dst2.Clone
+
+        stableG.Run(split(1))
+        split(1) = stableG.dst2.Clone
+
+        stableR.Run(split(2))
+        split(2) = stableR.dst2.Clone
+
+        cv.Cv2.Merge(split, dst2)
     End Sub
 End Class

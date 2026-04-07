@@ -67,6 +67,7 @@ Partial Class OptionsGlobal
         Label14 = New Label()
         DepthGroupBox = New GroupBox()
         ShowSplash = New CheckBox()
+        StabilizeRGB = New CheckBox()
         GroupBox1.SuspendLayout()
         CType(PaintFreqSlider, ComponentModel.ISupportInitialize).BeginInit()
         CType(DotSizeSlider, ComponentModel.ISupportInitialize).BeginInit()
@@ -335,6 +336,7 @@ Partial Class OptionsGlobal
         ' 
         ' GroupBox2
         ' 
+        GroupBox2.Controls.Add(StabilizeRGB)
         GroupBox2.Controls.Add(stabilizeDepth)
         GroupBox2.Controls.Add(UseMotionMask)
         GroupBox2.Controls.Add(TruncateDepth)
@@ -370,7 +372,7 @@ Partial Class OptionsGlobal
         UseMotionMask.AutoSize = True
         UseMotionMask.Checked = True
         UseMotionMask.CheckState = CheckState.Checked
-        UseMotionMask.Location = New Point(15, 264)
+        UseMotionMask.Location = New Point(16, 298)
         UseMotionMask.Margin = New Padding(3, 4, 3, 4)
         UseMotionMask.Name = "UseMotionMask"
         UseMotionMask.Size = New Size(208, 34)
@@ -558,6 +560,19 @@ Partial Class OptionsGlobal
         ShowSplash.Text = "Show Splash Screen"
         ShowSplash.UseVisualStyleBackColor = True
         ' 
+        ' StabilizeRGB
+        ' 
+        StabilizeRGB.AutoSize = True
+        StabilizeRGB.Checked = True
+        StabilizeRGB.CheckState = CheckState.Checked
+        StabilizeRGB.Location = New Point(17, 263)
+        StabilizeRGB.Margin = New Padding(3, 4, 3, 4)
+        StabilizeRGB.Name = "StabilizeRGB"
+        StabilizeRGB.Size = New Size(165, 34)
+        StabilizeRGB.TabIndex = 12
+        StabilizeRGB.Text = "Stabilize RGB"
+        StabilizeRGB.UseVisualStyleBackColor = True
+        ' 
         ' OptionsGlobal
         ' 
         AutoScaleDimensions = New SizeF(12F, 30F)
@@ -642,4 +657,5 @@ Partial Class OptionsGlobal
     Friend WithEvents Label9 As Label
     Friend WithEvents ShowSplash As CheckBox
     Friend WithEvents stabilizeDepth As CheckBox
+    Friend WithEvents StabilizeRGB As CheckBox
 End Class

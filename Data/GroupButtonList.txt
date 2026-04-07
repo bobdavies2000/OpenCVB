@@ -196,8 +196,8 @@ Sort
 Spectrum
 Stabilizer
 StableDepth
+StableGray
 StableLine
-StableRGB
 Stitch
 Stripes
 Structured

@@ -1,7 +1,5 @@
-Imports System.Runtime.InteropServices
 Imports cv = OpenCvSharp
 ' https://docs.opencvb.org/3.4/dc/df6/tutorial_py_Histogram_backprojection.html
-Imports VBClasses
 Public Class BackProject_Basics : Inherits TaskParent
     Public hist As New Histogram_Basics
     Public minRange As cv.Scalar, maxRange As cv.Scalar
@@ -12,7 +10,7 @@ Public Class BackProject_Basics : Inherits TaskParent
         desc = "Mouse over any bin to see the histogram backprojected."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If src.Channels <> 1 Then src = task.grayStable
+        If src.Channels <> 1 Then src = task.gray
         hist.Run(src)
         If hist.mm.minVal = hist.mm.maxVal Then
             SetTrueText("The input image is empty - mm.minVal and mm.maxVal are both zero...")
