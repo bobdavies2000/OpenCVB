@@ -206,16 +206,19 @@ End Class
 
 
 Public Class PlotMouse_StableGray : Inherits TaskParent
-    Dim stableGray As New StableGray_BasicsMin
     Dim plot As New PlotMouse_Basics
     Public Sub New()
         If standalone Then task.gOptions.displayDst0.Checked = True
         desc = "Plot the stable grayscale image."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        stableGray.Run(task.gray)
-        dst0 = stableGray.dst2
-        labels(0) = stableGray.labels(2)
+        If task.gOptions.StabilizeRGB.Checked Then
+            dst0 = task.stabilizeGray.dst2
+            labels(0) = task.stabilizeGray.labels(2)
+        Else
+            dst0 = task.gray
+            labels(0) = "Original task.gray - unchanged."
+        End If
 
         plot.Run(dst0)
         dst2 = plot.dst2

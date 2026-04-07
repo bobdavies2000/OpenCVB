@@ -196,7 +196,7 @@ Public Class FCS_CreateList : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         bricks.Run(src)
 
-        feat.Run(task.stableGray)
+        feat.Run(task.gray)
 
         subdiv.InitDelaunay(New cv.Rect(0, 0, dst1.Width, dst1.Height))
         subdiv.Insert(task.features)
@@ -390,7 +390,7 @@ Public Class NR_FCS_WithAge : Inherits TaskParent
         desc = "Display the age of each cell."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        fcs.Run(task.stableGray)
+        fcs.Run(task.gray)
         dst2 = fcs.dst2
         labels(2) = fcs.labels(2)
 
@@ -414,7 +414,7 @@ Public Class NR_FCS_BestAge : Inherits TaskParent
         desc = "Display the top X oldest (best) cells."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        fcs.Run(task.stableGray)
+        fcs.Run(task.gray)
         dst2 = fcs.dst2
         labels(2) = fcs.labels(2)
 
@@ -507,7 +507,7 @@ Public Class FCS_Motion : Inherits TaskParent
         desc = "Highlight the motion of each feature identified in the current and previous frame"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        fcs.Run(task.stableGray)
+        fcs.Run(task.gray)
         dst2 = fcs.dst2
 
         For Each fp In task.fpList
@@ -622,7 +622,7 @@ Public Class FCS_Info : Inherits TaskParent
         bricks.Run(src)
         If standalone Then
             Static fcs As New FCS_CreateList
-            fcs.Run(task.stableGray)
+            fcs.Run(task.gray)
             dst2 = fcs.dst2
         End If
 
@@ -701,7 +701,7 @@ Public Class NR_FCS_Lines : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
 
-        fcs.Run(task.stableGray)
+        fcs.Run(task.gray)
         dst2 = fcs.dst2
 
         For Each fp In task.fpList
@@ -815,7 +815,7 @@ Public Class FCS_Periphery : Inherits TaskParent
         desc = "Display the cells which are on the periphery of the image"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        fcs.Run(task.stableGray)
+        fcs.Run(task.gray)
         dst2 = fcs.dst2
 
         dst3 = dst2.Clone
@@ -847,7 +847,7 @@ Public Class NR_FCS_PeripheryNot : Inherits TaskParent
         desc = "Create a mask for the cells which are not on the periphery of the image - the interior region that is fully visible and connected."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        perif.Run(task.stableGray)
+        perif.Run(task.gray)
         dst2 = perif.dst3
 
         dst3.SetTo(0)

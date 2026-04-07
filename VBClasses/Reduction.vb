@@ -298,7 +298,7 @@ Imports VBClasses
             desc = "Reduce the grayscale image where there is no depth."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            dst3 = task.stableGray
+            dst3 = task.gray
             dst3.SetTo(0, task.depthMask)
             reduction.Run(dst3)
             dst2 = reduction.dst3

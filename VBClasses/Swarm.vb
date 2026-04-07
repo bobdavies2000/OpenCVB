@@ -38,7 +38,7 @@ Imports VBClasses
         End Function
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
-            feat.Run(task.stableGray)
+            feat.Run(task.gray)
 
             dst3 = feat.dst2
 

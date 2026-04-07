@@ -32,7 +32,7 @@ Imports VBClasses
             Next
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            feat.Run(task.stableGray)
+            feat.Run(task.gray)
             labels = feat.labels
 
             dst3 = If(task.firstPass, src.Clone, dst2.Clone)
@@ -66,13 +66,13 @@ Imports VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
 
-            feat.Run(task.stableGray)
+            feat.Run(task.gray)
 
             dst2 = src.Clone()
             dst3 = src.Clone()
 
-            If src.Channels() = 3 Then src = task.stableGray
-            Static lastGray As cv.Mat = task.stableGray.Clone
+            If src.Channels() = 3 Then src = task.gray
+            Static lastGray As cv.Mat = task.gray.Clone
             features = task.features
             Dim features1 = cv.Mat.FromPixelData(features.Count, 1, cv.MatType.CV_32FC2, features.ToArray)
             Dim features2 = New cv.Mat

@@ -44,7 +44,7 @@ Imports VBClasses
                 End Select
             End If
 
-            If src.Channels <> 1 Then src = task.stableGray
+            If src.Channels <> 1 Then src = task.gray
 
             edges.run(src)
             If edges.dst2.Channels <> 1 Then edges.dst2 = edges.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
@@ -1298,9 +1298,9 @@ Imports VBClasses
             desc = "Show Sobel vertical and horizontal edge detection no options."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            dst0 = task.stableGray.Sobel(cv.MatType.CV_32F, 1, 0, 3)
-            dst1 = task.stableGray.Sobel(cv.MatType.CV_32F, 0, 1, 3)
-            Dim diagonal = task.stableGray.Sobel(cv.MatType.CV_32F, 1, 1, 3)
+            dst0 = task.gray.Sobel(cv.MatType.CV_32F, 1, 0, 3)
+            dst1 = task.gray.Sobel(cv.MatType.CV_32F, 0, 1, 3)
+            Dim diagonal = task.gray.Sobel(cv.MatType.CV_32F, 1, 1, 3)
             dst2 = (dst1 + dst0 + diagonal).ToMat.ConvertScaleAbs()
         End Sub
     End Class
@@ -1382,7 +1382,7 @@ Imports VBClasses
             desc = "Find the edges where there is depth and no depth."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            edgeline.Run(task.stableGray)
+            edgeline.Run(task.gray)
             dst2 = edgeline.dst2
 
             dst3.SetTo(0)

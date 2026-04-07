@@ -191,11 +191,11 @@ Imports VBClasses
             desc = "Compound algorithms Blur and Histogram"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            myhist.Run(task.stableGray)
+            myhist.Run(task.gray)
 
             mat2to1.mat(0) = myhist.dst2.Clone
 
-            blur.Run(task.stableGray)
+            blur.Run(task.gray)
             dst3 = blur.dst2.Clone
 
             myhist.Run(blur.dst2)
@@ -222,7 +222,7 @@ Imports VBClasses
             desc = "Visualize the impact of blurring with the histogram.  Draw a rectangle anywhere to test a section of the image."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If task.drawRect <> New cv.Rect Then src = task.stableGray(task.drawRect) Else src = task.stableGray
+            If task.drawRect <> New cv.Rect Then src = task.gray(task.drawRect) Else src = task.gray
             Static kernelSlider = OptionParent.FindSlider("Blur Kernel Size")
 
             myhist.Run(src)

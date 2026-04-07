@@ -6,7 +6,7 @@ Imports VBClasses
             desc = "Hook to Polyline usage in EdgeLine_Motion"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            edgeline.Run(task.stableGray)
+            edgeline.Run(task.gray)
             dst2 = edgeline.dst2
             labels(2) = edgeline.labels(2)
 

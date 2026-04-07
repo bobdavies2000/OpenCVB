@@ -946,7 +946,7 @@ Imports VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
-            feat.Run(task.stableGray)
+            feat.Run(task.gray)
             labels = feat.labels
 
             If task.features.Count = 0 Then Exit Sub

@@ -476,11 +476,11 @@ Imports VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
 
-            dst1 = task.stableGray.InRange(0, 0)
+            dst1 = task.gray.InRange(0, 0)
 
-            task.stableGray.SetTo(255, dst1)
-            task.stableGray.Set(Of Byte)(task.ClickPoint.Y, task.ClickPoint.X, 0)
-            dst2 = task.stableGray.DistanceTransform(options.distanceType, 0)
+            task.gray.SetTo(255, dst1)
+            task.gray.Set(Of Byte)(task.ClickPoint.Y, task.ClickPoint.X, 0)
+            dst2 = task.gray.DistanceTransform(options.distanceType, 0)
             dst3 = 255 - dst2
         End Sub
     End Class

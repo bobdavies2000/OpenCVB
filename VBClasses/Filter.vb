@@ -280,6 +280,6 @@ Imports VBClasses
             desc = "Create an equalized image of the grayscale input."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If src.Channels = 1 Then cv.Cv2.EqualizeHist(src, dst2) Else cv.Cv2.EqualizeHist(task.stableGray, dst2)
+            If src.Channels = 1 Then cv.Cv2.EqualizeHist(src, dst2) Else cv.Cv2.EqualizeHist(task.gray, dst2)
         End Sub
     End Class

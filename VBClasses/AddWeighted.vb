@@ -3,12 +3,12 @@ Public Class AddWeighted_Accumulate : Inherits TaskParent
     Dim options As New Options_AddWeighted
     Public Sub New()
         dst1 = New cv.Mat(dst2.Size, cv.MatType.CV_32F, 0)
-        labels(3) = "Current task.stableGray image"
+        labels(3) = "Current task.gray image"
         desc = "Update a running average of the image"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
-        If src.Channels <> 1 Then src = task.stableGray
+        If src.Channels <> 1 Then src = task.gray
         If src.Type <> cv.MatType.CV_32F Then src.ConvertTo(dst3, cv.MatType.CV_32F) Else dst3 = src
         cv.Cv2.AccumulateWeighted(dst3, dst1, options.accumWeighted, New cv.Mat)
         dst1.ConvertTo(dst2, cv.MatType.CV_8U)

@@ -120,19 +120,10 @@ Public Class AlgorithmTask : Implements IDisposable
         If gOptions.UseMotionMask.Checked Then
             motion.Run(gray)
 
-            If optionsChanged Or task.frameCount < 5 Then
-                stableGray = gray.Clone
-            Else
-                ' If motion.motionSort.Count > 0 Then gray.CopyTo(stableGray, motion.motionMask)
-                If gOptions.StabilizeRGB.Checked Then
-                    stabilizeGray.Run(task.gray)
-                    stableGray = stabilizeGray.dst2
-                End If
-            End If
+            If gOptions.StabilizeRGB.Checked Then stabilizeGray.Run(task.gray)
         Else
             motion.motionMask.SetTo(255)
             motion.motionSort.Clear()
-            If gOptions.StabilizeRGB.Checked Then stabilizeGray.Run(task.gray) Else stableGray = gray
             motion.Run(gray)
         End If
 
@@ -182,7 +173,7 @@ Public Class AlgorithmTask : Implements IDisposable
 
         gravityBasics.Run(src.Clone)
         lines.motionMask = motion.motionMask
-        lines.Run(stableGray)
+        lines.Run(gray)
         histBinList = {histogramBins, histogramBins, histogramBins}
 
         Dim saveOptionsChanged = optionsChanged

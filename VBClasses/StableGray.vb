@@ -42,6 +42,8 @@ Public Class StableGray_Basics_TA : Inherits TaskParent
         src.CopyTo(dst2, task.motion.motionMask)
 
         lastGray = dst2.Clone
+
+        task.gray = dst2.Clone
     End Sub
 End Class
 
