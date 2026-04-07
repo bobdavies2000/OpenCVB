@@ -15,7 +15,7 @@ Imports VBClasses
 
             If standalone Or edgeRequest Then
                 Static contour As New Contour_RotateRect
-                contour.Run(task.grayStable)
+                contour.Run(task.stableGray)
                 src = contour.dst1.Clone
             End If
 
@@ -90,7 +90,7 @@ Imports VBClasses
             desc = "Find the cells containing edges."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            findCells.Run(task.grayStable)
+            findCells.Run(task.stableGray)
             dst2 = findCells.dst2
             dst3 = findCells.dst3
         End Sub
@@ -114,7 +114,7 @@ Imports VBClasses
             bricks.Run(src)
             If standalone Then
                 findCells.edgeRequest = True
-                findCells.Run(task.grayStable)
+                findCells.Run(task.stableGray)
             Else
                 findCells.Run(src)
             End If
@@ -213,7 +213,7 @@ Imports VBClasses
             desc = "Define each grid square according to whether it has edges or not.  Ignore peripheral bricks..."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            edgeline.Run(task.grayStable)
+            edgeline.Run(task.stableGray)
             dst2 = src.Clone
             dst3 = src.Clone
             edges.Clear()

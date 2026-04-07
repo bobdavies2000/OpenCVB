@@ -13,7 +13,7 @@ Imports VBClasses
             desc = "Use EdgeLines to find edges/lines but without using motionMask directly"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If src.Channels <> 1 Then src = task.grayStable
+            If src.Channels <> 1 Then src = task.stableGray
 
             Dim cppData(src.Total - 1) As Byte
             src.GetArray(Of Byte)(cppData)
@@ -259,7 +259,7 @@ Imports VBClasses
             desc = "Native C++ version to find edges/lines using motion."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            Dim input = If(src.Channels() = 1, src.Clone, task.grayStable.Clone)
+            Dim input = If(src.Channels() = 1, src.Clone, task.stableGray.Clone)
 
             Dim cppData(input.Total - 1) As Byte
             input.GetArray(Of Byte)(cppData)
@@ -305,7 +305,7 @@ Imports VBClasses
             If task.quarterBeat Then
                 Static debugSegment = 0
                 debugSegment += 1
-                edgeline.Run(task.grayStable)
+                edgeline.Run(task.stableGray)
                 If debugSegment >= edgeline.classCount Then
                     debugSegment = 0
                     dst.SetTo(0)
@@ -319,7 +319,7 @@ Imports VBClasses
             End If
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            edgeline.Run(task.grayStable)
+            edgeline.Run(task.stableGray)
             bPoint.Run(src)
             labels(2) = bPoint.labels(2)
 
@@ -371,7 +371,7 @@ Imports VBClasses
             desc = "Break up any edgeline segments that cross depth boundaries."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            edgeline.Run(task.grayStable)
+            edgeline.Run(task.stableGray)
             dst2 = edgeline.dst2
 
             segments.Clear()
@@ -440,7 +440,7 @@ Imports VBClasses
             desc = "Use EdgeLines to get a mask and rect for each region."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If src.Channels <> 1 Then src = task.grayStable
+            If src.Channels <> 1 Then src = task.stableGray
 
             Dim cppData(src.Total - 1) As Byte
             src.GetArray(Of Byte)(cppData)

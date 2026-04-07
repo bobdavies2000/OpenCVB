@@ -95,7 +95,7 @@ Imports VBClasses
             desc = "Use the grid points as input to the texture flow algorithm"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            bPoint.Run(task.grayStable)
+            bPoint.Run(task.stableGray)
             dst3 = bPoint.dst3
 
             knn.trainInput.Clear()

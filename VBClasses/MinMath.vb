@@ -34,7 +34,7 @@ Imports VBClasses
             desc = "Use brickpoints to find edgeLines"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            edgeline.Run(task.grayStable)
+            edgeline.Run(task.stableGray)
             bPoints.Run(src)
             dst2 = bPoints.dst2
             labels(2) = bPoints.labels(2)

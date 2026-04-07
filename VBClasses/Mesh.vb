@@ -11,7 +11,7 @@ Imports VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
 
-            feat.Run(task.grayStable)
+            feat.Run(task.stableGray)
 
             dst2 = src
             If task.heartBeat And standaloneTest() Then ptList = task.features
@@ -53,7 +53,7 @@ Imports VBClasses
             desc = "Build triangles from feature points"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            feat.Run(task.grayStable)
+            feat.Run(task.stableGray)
 
             If task.features.Count < 3 Then Exit Sub
             mesh.ptList = task.features

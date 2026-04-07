@@ -21,7 +21,7 @@ Public Class PlotBars_Basics : Inherits TaskParent
         Dim min = minRange
         Dim max = maxRange
         If standaloneTest() Or createHistogram Then
-            If src.Channels() <> 1 Then src = task.grayStable.Clone
+            If src.Channels() <> 1 Then src = task.stableGray.Clone
             If minRange = 0 And maxRange = 0 Then
                 Dim mm = GetMinMax(src)
                 min = mm.minVal

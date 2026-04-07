@@ -4290,7 +4290,7 @@ Namespace VBClasses
             desc = "Intersect the cell contours and the edges in the image."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            edgeline.Run(task.grayStable)
+            edgeline.Run(task.stableGray)
             runRedList(src, labels(3))
             labels(2) = task.redList.labels(2) + " - Contours only.  Click anywhere to select a cell"
 
@@ -4431,7 +4431,7 @@ Namespace VBClasses
             desc = "Find edges in the Color8U_Basics output"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            edgeline.Run(task.grayStable)
+            edgeline.Run(task.stableGray)
             dst2 = edgeline.dst2
 
             edges.Run(dst2)
@@ -4657,7 +4657,7 @@ Namespace VBClasses
                 If histArray(i) = 0 Then newList.Add(lines.lpList(i))
             Next
 
-            If src.Channels = 1 Then lines.Run(src) Else lines.Run(task.grayStable.Clone)
+            If src.Channels = 1 Then lines.Run(src) Else lines.Run(task.stableGray.Clone)
 
             histArray = getLineCounts(task.lines.lpList)
             For i = histArray.Count - 1 To 1 Step -1
@@ -6876,7 +6876,7 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
-            feat.Run(task.grayStable)
+            feat.Run(task.stableGray)
 
             stable.Run(src)
             dst2 = stable.dst2
@@ -12814,7 +12814,7 @@ Namespace VBClasses
             desc = "Use EdgeLines to find edges/lines but without using motionMask"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If src.Channels <> 1 Then src = task.grayStable
+            If src.Channels <> 1 Then src = task.stableGray
 
             Dim cppData(src.Total - 1) As Byte
             src.GetArray(Of Byte)(cppData)
@@ -15327,7 +15327,7 @@ Namespace VBClasses
         End Function
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
-            feat.Run(task.grayStable)
+            feat.Run(task.stableGray)
 
             If task.firstPass Then lastImage = src.Clone
             Dim multiplier = dotSlider.Value
@@ -15723,7 +15723,7 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             bricks.run(src)
-            bricks.run(task.grayStable)
+            bricks.run(task.stableGray)
             dst2 = task.motion.motionMask
             dst1 = task.rightView
 
@@ -16763,7 +16763,7 @@ Namespace VBClasses
             backP.dst2.ConvertTo(dst2, cv.MatType.CV_8U)
             dst2 = Palettize(dst2)
 
-            equalize.Run(task.grayStable)
+            equalize.Run(task.stableGray)
             backP.Run(equalize.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
 
             backP.dst2.ConvertTo(dst3, cv.MatType.CV_8U)
@@ -16817,7 +16817,7 @@ Namespace VBClasses
             Return allContours
         End Function
         Public Overrides Sub RunAlg(src As cv.Mat)
-            edgeline.Run(task.grayStable)
+            edgeline.Run(task.stableGray)
             If src.Type = cv.MatType.CV_8U Then dst3 = src Else dst3 = edgeline.dst2
 
             sortContours.allContours = buildContours(dst3)
@@ -18093,7 +18093,7 @@ Namespace VBClasses
             desc = "Find the feature population for each cell."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            feat.Run(task.grayStable)
+            feat.Run(task.stableGray)
             labels(2) = feat.labels(2)
 
             dst3.SetTo(0)
@@ -18920,7 +18920,7 @@ Namespace VBClasses
             dst2 = regions.dst3
             labels(2) = regions.labels(2)
 
-            edgeline.Run(task.grayStable)
+            edgeline.Run(task.stableGray)
             dst2.SetTo(cv.Scalar.White, edgeline.dst2)
         End Sub
     End Class

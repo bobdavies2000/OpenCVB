@@ -400,7 +400,7 @@ Imports VBClasses
             desc = "Remove edge color in RGB before HistValley_FromPeaks"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            edgeline.Run(task.grayStable)
+            edgeline.Run(task.stableGray)
             dst3 = src
             dst3.SetTo(cv.Scalar.Black, edgeline.dst2)
 

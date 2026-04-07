@@ -47,7 +47,7 @@ Public Class Contour_Basics : Inherits TaskParent
             If src.Type = cv.MatType.CV_8U Then
                 dst3 = src
             Else
-                edgeline.Run(task.grayStable)
+                edgeline.Run(task.stableGray)
                 dst3 = edgeline.dst2
             End If
 
@@ -86,7 +86,7 @@ Public Class Contour_Basics : Inherits TaskParent
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
 
-            edgeline.Run(task.grayStable)
+            edgeline.Run(task.stableGray)
             dst3 = edgeline.dst2
 
             Dim allContours As cv.Point()() = Nothing
@@ -181,7 +181,7 @@ Public Class Contour_Basics : Inherits TaskParent
         Public Overrides Sub RunAlg(src As cv.Mat)
             contours.Run(src)
             dst2 = contours.dst2.Clone
-            bPoint.Run(task.grayStable)
+            bPoint.Run(task.stableGray)
 
             For Each pt In bPoint.ptList
                 DrawCircle(dst2, pt)
@@ -643,7 +643,7 @@ Public Class Contour_Basics : Inherits TaskParent
                 dst2 = rotatedRect.dst2
                 dst2 = dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
             Else
-                If src.Type = cv.MatType.CV_8U Then dst2 = src Else dst2 = task.grayStable
+                If src.Type = cv.MatType.CV_8U Then dst2 = src Else dst2 = task.stableGray
             End If
 
             If dst2.Type = cv.MatType.CV_8U Then
@@ -910,7 +910,7 @@ Public Class Contour_Basics : Inherits TaskParent
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
 
-            edges.Run(task.grayStable)
+            edges.Run(task.stableGray)
 
             Dim contours = cv.Cv2.FindContoursAsArray(edges.dst2, cv.RetrievalModes.Tree, cv.ContourApproximationModes.ApproxSimple)
             Dim sortedTours As New SortedList(Of Integer, Tuple(Of cv.RotatedRect, Integer))(New compareAllowIdenticalInteger)
@@ -1106,7 +1106,7 @@ Public Class Contour_Basics : Inherits TaskParent
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
 
-            If src.Channels <> 1 Then edgeline.Run(task.grayStable) Else edgeline.Run(src)
+            If src.Channels <> 1 Then edgeline.Run(task.stableGray) Else edgeline.Run(src)
             dst3 = edgeline.dst2
 
             sortContours.allContours = Contour_Basics.buildContours(dst3)
@@ -1150,7 +1150,7 @@ Public Class Contour_Basics : Inherits TaskParent
             If src.Type = cv.MatType.CV_8U Then
                 dst3 = src
             Else
-                color8u.Run(task.grayStable)
+                color8u.Run(task.stableGray)
                 dst3 = color8u.dst2
             End If
 
@@ -1194,7 +1194,7 @@ Public Class Contour_Basics : Inherits TaskParent
             Return mm.maxLoc
         End Function
         Public Overrides Sub RunAlg(src As cv.Mat)
-            edgeline.Run(task.grayStable)
+            edgeline.Run(task.stableGray)
             If standalone Then
                 allContours = Contour_Basics.buildContours(edgeline.dst2)
             End If

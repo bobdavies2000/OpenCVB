@@ -208,7 +208,7 @@ Namespace VBClasses
             desc = "Use Contour_Basics to get the contour data for the top contours by size."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If src.Channels = 1 Then edgeline.Run(src) Else edgeline.Run(task.grayStable)
+            If src.Channels = 1 Then edgeline.Run(src) Else edgeline.Run(task.stableGray)
             If src.Type <> cv.MatType.CV_8U Then
                 contours.Run(edgeline.dst2)
                 dst2 = contours.dst2

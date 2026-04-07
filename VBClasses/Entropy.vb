@@ -223,7 +223,7 @@ Imports VBClasses
                 eROI(i).Clear()
             Next
 
-            dst1 = task.grayStable.Clone
+            dst1 = task.stableGray.Clone
             Dim dimensions() = New Integer() {task.histogramBins}
             Dim ranges() = New cv.Rangef() {New cv.Rangef(0, 255)}
             Dim hist As New cv.Mat

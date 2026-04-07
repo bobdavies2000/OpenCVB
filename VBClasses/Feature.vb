@@ -272,7 +272,7 @@ Imports VBClasses
             desc = "Use the sorted list of Delaunay regions to find the top X points to track."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            feat.Run(task.grayStable)
+            feat.Run(task.stableGray)
 
             If task.heartBeat Then dst2.SetTo(0)
 
@@ -365,7 +365,7 @@ Imports VBClasses
             desc = "Find feature age maximum and average."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            feat.Run(task.grayStable)
+            feat.Run(task.stableGray)
 
             Dim newfeatures As New SortedList(Of Integer, cv.Point)(New compareAllowIdenticalIntegerInverted)
             For Each pt In task.featurePoints
@@ -407,7 +407,7 @@ Imports VBClasses
             desc = "Find good features across multiple frames."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            feat.Run(task.grayStable)
+            feat.Run(task.stableGray)
 
             dst2 = src.Clone
 
@@ -517,7 +517,7 @@ Imports VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             bricks.run(src)
-            feat.Run(task.grayStable)
+            feat.Run(task.stableGray)
 
             dst2 = src
             Dim depthCount As Integer
@@ -597,7 +597,7 @@ Imports VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
 
-            feat.Run(task.grayStable)
+            feat.Run(task.stableGray)
 
             Static features As New List(Of cv.Point)(task.featurePoints)
             Static lastSrc As cv.Mat = src.Clone
@@ -783,7 +783,7 @@ Imports VBClasses
             desc = "Find good features to track in the image but use the same point if closer than a threshold"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            feat.Run(task.grayStable)
+            feat.Run(task.stableGray)
 
             If task.features.Count = 0 Then
                 featurePoints.Clear()
@@ -832,7 +832,7 @@ Imports VBClasses
             desc = "Find good features to track in a BGR image using the motion mask+"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            feat.Run(task.grayStable)
+            feat.Run(task.stableGray)
             dst2 = src.Clone
 
             dst3.SetTo(0)

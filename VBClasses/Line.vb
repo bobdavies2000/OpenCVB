@@ -820,7 +820,7 @@ Imports VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             brickLines.lp = task.lines.lpList(0)
-            brickLines.Run(task.grayStable)
+            brickLines.Run(task.stableGray)
             'For Each r In brickLines.brickList
             '    DrawRect(dst3, r, white)
             'Next

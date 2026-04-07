@@ -136,7 +136,7 @@ Public Class BackProject_Full : Inherits TaskParent
         desc = "Create a histogram for the grayscale image, uniquely identify each bin, and backproject it."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If src.Channels <> 1 Then src = task.grayStable
+        If src.Channels <> 1 Then src = task.stableGray
         classCount = task.histogramBins
         plotHist.Run(src)
         dst1 = plotHist.dst2
@@ -308,7 +308,7 @@ Public Class BackProject_Image : Inherits TaskParent
         desc = "Explore Backprojection of each element of a grayscale histogram."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        hist.Run(task.grayStable)
+        hist.Run(task.stableGray)
         If hist.mm.minVal = hist.mm.maxVal Then
             SetTrueText("The input image is empty - mm.minval and mm.maxVal are both zero...")
             Exit Sub ' the input image is empty...
@@ -337,14 +337,14 @@ Public Class BackProject_Image : Inherits TaskParent
         End If
         If useInrange Then
             If histIndex = 0 And hist.plotHist.removeZeroEntry Then
-                mask = New cv.Mat(task.grayStable.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
+                mask = New cv.Mat(task.stableGray.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
             Else
-                mask = task.grayStable.InRange(minRange, maxRange)
+                mask = task.stableGray.InRange(minRange, maxRange)
             End If
         Else
             Dim bRange = New cv.Rangef(minRange(0), maxRange(0))
             Dim ranges() = New cv.Rangef() {bRange}
-            cv.Cv2.CalcBackProject({task.grayStable}, {0}, hist.histogram, mask, ranges)
+            cv.Cv2.CalcBackProject({task.stableGray}, {0}, hist.histogram, mask, ranges)
         End If
         dst3 = src
         If mask.Type <> cv.MatType.CV_8U Then mask.ConvertTo(mask, cv.MatType.CV_8U)
@@ -536,7 +536,7 @@ Public Class NR_BackProject_FullOld : Inherits TaskParent
         classCount = task.histogramBins
 
         Dim histogram As New cv.Mat
-        cv.Cv2.CalcHist({task.grayStable}, {0}, New cv.Mat, histogram, 1, {classCount}, ranges)
+        cv.Cv2.CalcHist({task.stableGray}, {0}, New cv.Mat, histogram, 1, {classCount}, ranges)
         histogram = histogram.Normalize(0, classCount, cv.NormTypes.MinMax)
 
         cv.Cv2.CalcBackProject({src}, {0}, histogram, dst2, ranges)

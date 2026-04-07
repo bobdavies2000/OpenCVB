@@ -1278,7 +1278,7 @@ Public Class Histogram_GridCell : Inherits TaskParent
         desc = "Build a histogram of the cell contents"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If standalone And src.Channels = 3 Then src = task.grayStable
+        If standalone And src.Channels = 3 Then src = task.stableGray
         Dim mm = GetMinMax(src)
         ReDim histarray(mm.maxVal)
         If mm.maxVal > 0 Then
@@ -1326,7 +1326,7 @@ Public Class NR_Histogram_ToggleFeatureLess : Inherits TaskParent
             plotHist.histMask = fLessBrick.dst1.Clone
             labels(2) = "Histogram of just the featureless regions."
         End If
-        plotHist.Run(task.grayStable)
+        plotHist.Run(task.stableGray)
         dst2 = plotHist.dst2
     End Sub
 End Class
@@ -1351,9 +1351,9 @@ Public Class Histogram_EqualizeGray : Inherits TaskParent
         desc = "Create an equalized histogram of the grayscale image."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If src.Channels <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY) Else src = task.grayStable
+        If src.Channels <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY) Else src = task.stableGray
         histogram.Run(src)
-        cv.Cv2.EqualizeHist(task.grayStable, dst2)
+        cv.Cv2.EqualizeHist(task.stableGray, dst2)
         histogramEQ.Run(dst2)
         mats.mat(0) = histogram.dst2.Clone
         mats.mat(1) = histogramEQ.dst2

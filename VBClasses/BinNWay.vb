@@ -22,7 +22,7 @@ Imports VBClasses
             End If
 
             For i = 0 To options.gradations - 1
-                Dim tmp = task.grayStable.InRange(binSplit(i), binSplit(i + 1))
+                Dim tmp = task.stableGray.InRange(binSplit(i), binSplit(i + 1))
                 tmp = tmp.Threshold(0, 255, cv.ThresholdTypes.Binary)
                 dst1.SetTo(i + 1, tmp)
             Next

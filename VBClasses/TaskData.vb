@@ -15,7 +15,7 @@ Partial Public Class AlgorithmTask
 
     Public color As New cv.Mat
     Public gray As New cv.Mat
-    Public grayStable As New cv.Mat
+    Public stableGray As New cv.Mat
     Public leftView As New cv.Mat
     Public rightView As New cv.Mat
     Public pointCloud As New cv.Mat

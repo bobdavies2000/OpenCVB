@@ -91,7 +91,7 @@ Imports VBClasses
             desc = "Create hulls for each cluster of feature points found in Cluster_Basics"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            bPoint.Run(task.grayStable)
+            bPoint.Run(task.stableGray)
 
             cluster.ptInput = task.featurePoints
             cluster.Run(src)
