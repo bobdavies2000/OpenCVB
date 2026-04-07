@@ -10,7 +10,7 @@ Public Class StableGray_BasicsMin : Inherits TaskParent
         If src.Channels <> 1 Then src = task.gray
         Static lastGray As cv.Mat = src.Clone
 
-        If task.heartBeat Then lastGray = src.Clone
+        ' If task.heartBeat Then lastGray = src.Clone
 
         cv.Cv2.Min(src, lastGray, dst2)
         src.CopyTo(dst2, task.motion.motionMask)
@@ -26,6 +26,26 @@ End Class
 
 
 
+Public Class StableGray_Basics_TA : Inherits TaskParent
+    Public Sub New()
+        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        labels(2) = "Accumulated pixels were updated with new min/max pixels."
+        desc = "Accumulate Min values where there is no motion and don't compute difference in dst3."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        If src.Channels <> 1 Then src = task.gray
+        Static lastGray As cv.Mat = src.Clone
+
+        ' If task.heartBeat Then lastGray = src.Clone
+
+        cv.Cv2.Max(src, lastGray, dst2)
+        src.CopyTo(dst2, task.motion.motionMask)
+
+        lastGray = dst2.Clone
+    End Sub
+End Class
+
+
 
 
 Public Class StableGray_BasicsMax : Inherits TaskParent
@@ -39,7 +59,7 @@ Public Class StableGray_BasicsMax : Inherits TaskParent
         If src.Channels <> 1 Then src = task.gray
         Static lastGray As cv.Mat = src.Clone
 
-        If task.heartBeat Then lastGray = src.Clone
+        'If task.heartBeat Then lastGray = src.Clone
 
         cv.Cv2.Max(src, lastGray, dst2)
         src.CopyTo(dst2, task.motion.motionMask)

@@ -521,7 +521,7 @@ Namespace VBClasses
             desc = "Find and display lines contained the featureless regions."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            fLess.Run(task.gray)
+            fLess.Run(task.stableGray)
             dst2 = fLess.fLessRaw.dst2
             labels(2) = fLess.labels(2)
 
@@ -562,7 +562,7 @@ Namespace VBClasses
             desc = "Group the featureless grid squares"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            fLess.Run(task.gray)
+            fLess.Run(task.stableGray)
 
             dst2 = fLess.dst2.Clone
             labels(2) = fLess.labels(2)

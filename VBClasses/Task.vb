@@ -40,8 +40,11 @@ Public Class AlgorithmTask : Implements IDisposable
         gravityBasics = New Gravity_Basics_TA
         imuBasics = New IMU_Basics_TA
         motion = New Motion_Basics_TA
+
         stabilizeDepth = New StableDepth_Basics
         stabilizeDepth.TA_Active = True
+        stabilizeGray = New StableGray_Basics_TA
+
         cloudGravity = New Cloud_Gravity_TA
         grid = New Grid_Basics_TA
         lines = New Line_Basics_TA
@@ -114,18 +117,22 @@ Public Class AlgorithmTask : Implements IDisposable
         leftView = leftRightBrightness.dst2
         rightView = leftRightBrightness.dst3
 
-        If gOptions.UseMotionMask.Checked And firstPass = False Then
+        If gOptions.UseMotionMask.Checked Then
             motion.Run(gray)
 
             If optionsChanged Or task.frameCount < 5 Then
                 stableGray = gray.Clone
             Else
-                If motion.motionSort.Count > 0 Then gray.CopyTo(stableGray, motion.motionMask)
+                ' If motion.motionSort.Count > 0 Then gray.CopyTo(stableGray, motion.motionMask)
+                If gOptions.StabilizeRGB.Checked Then
+                    stabilizeGray.Run(task.gray)
+                    stableGray = stabilizeGray.dst2
+                End If
             End If
         Else
             motion.motionMask.SetTo(255)
             motion.motionSort.Clear()
-            stableGray = gray
+            If gOptions.StabilizeRGB.Checked Then stabilizeGray.Run(task.gray) Else stableGray = gray
             motion.Run(gray)
         End If
 
