@@ -10,6 +10,8 @@ Public Class StableGray_BasicsMin : Inherits TaskParent
         If src.Channels <> 1 Then src = task.gray
         Static lastGray As cv.Mat = src.Clone
 
+        If task.heartBeat Then lastGray = src.Clone
+
         cv.Cv2.Min(src, lastGray, dst2)
         src.CopyTo(dst2, task.motion.motionMask)
 
@@ -37,6 +39,8 @@ Public Class StableGray_BasicsMax : Inherits TaskParent
         If src.Channels <> 1 Then src = task.gray
         Static lastGray As cv.Mat = src.Clone
 
+        If task.heartBeat Then lastGray = src.Clone
+
         cv.Cv2.Max(src, lastGray, dst2)
         src.CopyTo(dst2, task.motion.motionMask)
 
@@ -45,7 +49,7 @@ Public Class StableGray_BasicsMax : Inherits TaskParent
 
         lastGray = dst2.Clone
 
-        labels(2) = CStr(dst3.CountNonZero) + " pixels were updated with new minimums."
+        labels(2) = CStr(dst3.CountNonZero) + " pixels were updated with new maximums."
     End Sub
 End Class
 
@@ -53,7 +57,7 @@ End Class
 
 
 
-Public Class StableGray_Compare : Inherits TaskParent
+Public Class StableGray_MinMaxCompare : Inherits TaskParent
     Dim minRGB As New StableGray_BasicsMin
     Dim maxRGB As New StableGray_BasicsMax
     Public Sub New()
@@ -82,7 +86,7 @@ End Class
 
 
 
-Public Class StableGray_CompareColor : Inherits TaskParent
+Public Class StableGray_RGBMinMaxCompare : Inherits TaskParent
     Dim minRGB As New StableGray_RGBMin
     Dim maxRGB As New StableGray_RGBMax
     Public Sub New()
@@ -105,7 +109,7 @@ End Class
 
 
 Public Class StableGray_MinMaxRange : Inherits TaskParent
-    Dim compare As New StableGray_Compare
+    Dim compare As New StableGray_MinMaxCompare
     Dim plot As New PlotMouse_Basics
     Public Sub New()
         If standalone Then task.gOptions.displayDst1.Checked = True
@@ -113,13 +117,12 @@ Public Class StableGray_MinMaxRange : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         compare.Run(task.gray)
-        dst1 = compare.dst0
+        dst1 = compare.dst3
         labels(1) = "Min gray image"
 
         plot.Run(dst1)
         dst2 = plot.dst2
-
-        dst3 = compare.dst3.Clone
+        dst3 = plot.dst3
     End Sub
 End Class
 

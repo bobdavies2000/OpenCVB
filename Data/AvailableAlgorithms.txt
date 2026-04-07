@@ -431,6 +431,7 @@ LeftRight_Brightness_TA
 LeftRight_FeatureLess
 LeftRight_Features
 LeftRight_Reduction
+LeftRight_Stable
 Line_Basics_TA
 Line_BrickList
 Line_BrickListTest
@@ -1627,11 +1628,11 @@ StableDepth_Basics
 StableDepth_Max_TA
 StableGray_BasicsMax
 StableGray_BasicsMin
-StableGray_Compare
-StableGray_CompareColor
+StableGray_MinMaxCompare
 StableGray_MinMaxRange
 StableGray_RGBMax
 StableGray_RGBMin
+StableGray_RGBMinMaxCompare
 StableLine_Basics
 StableLine_BasicsCount
 Stitch_Basics
