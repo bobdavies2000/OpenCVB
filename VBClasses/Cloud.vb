@@ -361,7 +361,7 @@ End Class
 
 Public Class Cloud_SurfaceH : Inherits TaskParent
     Public heat As New HeatMap_Basics
-    Public plot As New PlotBar_Basics
+    Public plotHist As New PlotBar_Basics
     Public topRow As Integer
     Public botRow As Integer
     Public peakRow As Integer
@@ -390,12 +390,12 @@ Public Class Cloud_SurfaceH : Inherits TaskParent
             If topRow = 0 And indexer(i) > 10 Then topRow = i
         Next
 
-        plot.maxRange = (Math.Floor(peakVal / 100) + 1) * 100
+        plotHist.maxRange = (Math.Floor(peakVal / 100) + 1) * 100
         For i = hist.Rows - 1 To 0 Step -1
             If botRow = 0 And indexer(i) > 10 Then botRow = i
         Next
-        plot.Run(hist)
-        dst3 = plot.dst2.Transpose()
+        plotHist.Run(hist)
+        dst3 = plotHist.dst2.Transpose()
         dst3 = dst3.Flip(cv.FlipMode.Y)(New cv.Rect(0, 0, dst0.Height, dst0.Height)).Resize(dst0.Size)
         labels(2) = "Top row = " + CStr(topRow) + " peak row = " + CStr(peakRow) + " bottom row = " + CStr(botRow)
 

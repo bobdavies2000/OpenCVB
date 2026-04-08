@@ -38,7 +38,8 @@ Public Class StableGray_Basics_TA : Inherits TaskParent
 
         ' If task.heartBeat Then lastGray = src.Clone
 
-        cv.Cv2.Max(src, lastGray, dst2)
+        ' the following statement can be min as well as max.
+        cv.Cv2.Min(src, lastGray, dst2)
         src.CopyTo(dst2, task.motion.motionMask)
 
         lastGray = dst2.Clone

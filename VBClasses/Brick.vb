@@ -1069,7 +1069,7 @@ End Class
 
 Public Class Brick_Plot : Inherits TaskParent
     Dim bricks As New Brick_Basics
-    Dim myPlot As New PlotBar_Basics
+    Dim plotHist As New PlotBar_Basics
     Public Sub New()
         labels(2) = "Click anywhere In the image To the histogram Of that the depth In that cell."
         desc = "Select any cell To plot a histogram Of that cell's depth"
@@ -1097,16 +1097,16 @@ Public Class Brick_Plot : Inherits TaskParent
         If lastMouse <> task.mouseMovePoint Then
             lastMouse = task.mouseMovePoint
             If Math.Abs(mmDepth.maxVal - mmDepth.minVal) > 0 Then
-                myPlot.minRange = mmDepth.minVal
-                myPlot.maxRange = mmDepth.maxVal
-                myPlot.Run(split(2))
+                plotHist.minRange = mmDepth.minVal
+                plotHist.maxRange = mmDepth.maxVal
+                plotHist.Run(split(2))
 
                 Dim brickIndex = task.gridMap.Get(Of Integer)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
                 task.drawRect = task.gridRects(brickIndex)
 
-                dst3 = myPlot.dst2
-                labels(3) = "Depth values vary from " + Format(myPlot.minRange, fmt3) +
-                                    " to " + Format(myPlot.maxRange, fmt3)
+                dst3 = plotHist.dst2
+                labels(3) = "Depth values vary from " + Format(plotHist.minRange, fmt3) +
+                                    " to " + Format(plotHist.maxRange, fmt3)
             End If
         End If
     End Sub
