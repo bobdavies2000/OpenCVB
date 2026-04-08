@@ -13,6 +13,9 @@ Public Class AlgorithmTask : Implements IDisposable
         workRes = settings.workRes
         captureRes = settings.captureRes
 
+        ' StereoLabs does not need the left and right images to be adjusted for brightness.
+        If settings.cameraName.Contains("StereoLabs") Then task.leftRightBrightnessAdjust = False
+
         allOptions = New OptionsContainer
         allOptions.Show()
         allOptions.Location = New System.Drawing.Point(task.Settings.allOptionsLeft, task.Settings.allOptionsTop)
@@ -49,7 +52,7 @@ Public Class AlgorithmTask : Implements IDisposable
         grid = New Grid_Basics_TA
         lines = New Line_Basics_TA
         filterBasics = New Filter_Basics_TA
-        leftRightBrightness = New LeftRight_Brightness_TA
+        If task.leftRightBrightnessAdjust Then leftRightBrightness = New LeftRight_Brightness_TA
 
         ' all the algorithms in the list are task algorithms that are children of the algorithm.
         For i = 1 To cpu.callTrace.Count - 1
@@ -113,9 +116,11 @@ Public Class AlgorithmTask : Implements IDisposable
 
         filterBasics.Run(color.Clone)
         task.gray = filterBasics.dst3.Clone
-        leftRightBrightness.Run(Nothing)
-        leftView = leftRightBrightness.dst2
-        rightView = leftRightBrightness.dst3
+        If task.leftRightBrightnessAdjust Then
+            leftRightBrightness.Run(emptyMat)
+            leftView = leftRightBrightness.dst2
+            rightView = leftRightBrightness.dst3
+        End If
 
         If gOptions.stabilizeDepthRGB.Checked Then
             motion.Run(gray)
@@ -183,6 +188,7 @@ Public Class AlgorithmTask : Implements IDisposable
             If PixelViewer IsNot Nothing Then PixelViewer.viewerForm.Activate()
             activateTaskForms = False
         End If
+
 
 
 

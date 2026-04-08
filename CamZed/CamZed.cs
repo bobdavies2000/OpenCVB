@@ -142,12 +142,16 @@ public class CamZed
 
         zed.RetrieveImage(colorSL, sl.VIEW.LEFT);
         color = Cv.Mat.FromPixelData(captureRows, captureCols, Cv.MatType.CV_8UC4, colorSL.GetPtr());
+        //Cv.Cv2.ImShow("color", color);
         color = color.CvtColor(Cv.ColorConversionCodes.BGRA2BGR);
         leftView = color.CvtColor(Cv.ColorConversionCodes.BGR2GRAY);
+
 
         zed.RetrieveImage(rightSL, sl.VIEW.RIGHT);
         rightView = Cv.Mat.FromPixelData(captureRows, captureCols, Cv.MatType.CV_8UC4, rightSL.GetPtr());
         rightView = rightView.CvtColor(Cv.ColorConversionCodes.BGRA2BGR);
+        //Cv.Cv2.ImShow("rightView", rightView);
+        //Cv.Cv2.WaitKey(1);
         rightView = rightView.CvtColor(Cv.ColorConversionCodes.BGR2GRAY);
 
         zed.RetrieveMeasure(pointCloudSL, sl.MEASURE.XYZBGRA);

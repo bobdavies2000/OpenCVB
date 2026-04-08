@@ -162,18 +162,22 @@ Public Class StableGray_RGBMin : Inherits TaskParent
         desc = "Build a StableRGB by running StableGray_BasicsMin with all 3 channels."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        Dim split = task.color.Split()
+        If task.gOptions.stabilizeDepthRGB.Checked Then
+            Dim split = task.color.Split()
 
-        stableB.Run(split(0))
-        split(0) = stableB.dst2.Clone
+            stableB.Run(split(0))
+            split(0) = stableB.dst2.Clone
 
-        stableG.Run(split(1))
-        split(1) = stableG.dst2.Clone
+            stableG.Run(split(1))
+            split(1) = stableG.dst2.Clone
 
-        stableR.Run(split(2))
-        split(2) = stableR.dst2.Clone
+            stableR.Run(split(2))
+            split(2) = stableR.dst2.Clone
 
-        cv.Cv2.Merge(split, dst2)
+            cv.Cv2.Merge(split, dst2)
+        Else
+            dst2 = task.color.Clone
+        End If
     End Sub
 End Class
 
@@ -190,17 +194,48 @@ Public Class StableGray_RGBMax : Inherits TaskParent
         desc = "Build a StableRGB by running StableGray_BasicsMin with all 3 channels."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        Dim split = task.color.Split()
+        If task.gOptions.stabilizeDepthRGB.Checked Then
+            Dim split = task.color.Split()
 
-        stableB.Run(split(0))
-        split(0) = stableB.dst2.Clone
+            stableB.Run(split(0))
+            split(0) = stableB.dst2.Clone
 
-        stableG.Run(split(1))
-        split(1) = stableG.dst2.Clone
+            stableG.Run(split(1))
+            split(1) = stableG.dst2.Clone
 
-        stableR.Run(split(2))
-        split(2) = stableR.dst2.Clone
+            stableR.Run(split(2))
+            split(2) = stableR.dst2.Clone
 
-        cv.Cv2.Merge(split, dst2)
+            cv.Cv2.Merge(split, dst2)
+        Else
+            dst2 = task.color.Clone
+        End If
+    End Sub
+End Class
+
+
+
+
+
+Public Class StableGray_LeftRight : Inherits TaskParent
+    Dim stableLeft As New StableGray_BasicsMin
+    Dim stableRight As New StableGray_BasicsMin
+    Public Sub New()
+        labels = {"", "", "Stable gray left image", "Stable gray right image"}
+        desc = "Create the stable gray left and right images."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        If task.gOptions.stabilizeDepthRGB.Checked Then
+            stableLeft.Run(task.leftView)
+            dst2 = stableLeft.dst2
+            If task.heartBeat Then labels(2) = stableLeft.labels(2)
+
+            stableRight.Run(task.rightView)
+            dst3 = stableRight.dst2
+            If task.heartBeat Then labels(3) = stableRight.labels(2)
+        Else
+            dst2 = task.leftView
+            dst3 = task.rightView
+        End If
     End Sub
 End Class

@@ -9,15 +9,20 @@ Public Class LeftRight_Basics : Inherits TaskParent
         desc = "Display the left and right views as they came from the camera."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        brightness.run(task.leftView)
-        Dim tmpLeft As cv.Mat = brightness.dst2 ' input array conflict
-        task.leftView = tmpLeft.Normalize(100, 150, cv.NormTypes.MinMax)
-        If standaloneTest() Then dst2 = task.leftView
+        If task.leftRightBrightnessAdjust Then
+            brightness.run(task.leftView)
+            Dim tmpLeft As cv.Mat = brightness.dst2 ' input array conflict
+            task.leftView = tmpLeft.Normalize(100, 150, cv.NormTypes.MinMax)
+            If standaloneTest() Then dst2 = task.leftView
 
-        brightness.run(task.rightView)
-        Dim tmpRight As cv.Mat = brightness.dst2 ' inputarray conflict
-        task.rightView = tmpRight.Normalize(100, 150, cv.NormTypes.MinMax)
-        If standaloneTest() Then dst3 = task.rightView
+            brightness.run(task.rightView)
+            Dim tmpRight As cv.Mat = brightness.dst2 ' inputarray conflict
+            task.rightView = tmpRight.Normalize(100, 150, cv.NormTypes.MinMax)
+            If standaloneTest() Then dst3 = task.rightView
+        Else
+            dst2 = task.leftView.Clone
+            dst3 = task.rightView.Clone
+        End If
     End Sub
 End Class
 

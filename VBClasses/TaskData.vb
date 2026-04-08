@@ -15,6 +15,7 @@ Partial Public Class AlgorithmTask
 
     Public color As New cv.Mat
     Public gray As New cv.Mat
+    Public leftRightBrightnessAdjust As Boolean = True ' except for Stereolabs.
     Public leftView As New cv.Mat
     Public rightView As New cv.Mat
     Public pointCloud As New cv.Mat

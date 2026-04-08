@@ -217,6 +217,7 @@ Edge_SobelCustomH
 Edge_SobelCustomV
 Edge_SobelHorizontal
 Edge_SobelVertical
+Edge_StableLeftRight
 EdgeLine_Basics_TA
 EdgeLine_KeyColorOnly
 EdgeLine_LeftRight
@@ -1630,6 +1631,7 @@ StableDepth_Max_TA
 StableGray_Basics_TA
 StableGray_BasicsMax
 StableGray_BasicsMin
+StableGray_LeftRight
 StableGray_MinMaxCompare
 StableGray_MinMaxRange
 StableGray_RGBMax

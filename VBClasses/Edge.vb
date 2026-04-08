@@ -1695,3 +1695,25 @@ Public Class Edge_Featureless : Inherits TaskParent
     End Sub
 End Class
 
+
+
+
+
+Public Class Edge_StableLeftRight : Inherits TaskParent
+    Dim stableLR As New StableGray_LeftRight
+    Dim edges As New Edge_Basics
+    Public Sub New()
+        desc = "Show the edges of the stableLeft/Right images."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        stableLR.Run(emptyMat)
+
+        edges.run(stableLR.dst2)
+        dst2 = edges.dst2.clone
+        labels(2) = edges.labels(2)
+
+        edges.run(stableLR.dst3)
+        dst3 = edges.dst2.clone
+        labels(3) = edges.labels(2)
+    End Sub
+End Class
