@@ -7,7 +7,7 @@ Public Class Histogram_Basics : Inherits TaskParent
     Implements IDisposable
     Public histogram As New cv.Mat
     Public mm As mmData
-    Public plotHist As New PlotBars_Basics
+    Public plotHist As New PlotBar_Basics
     Public ranges() As cv.Rangef
 
     Public histArray() As Single
@@ -170,7 +170,7 @@ End Class
 
 
 Public Class Histogram_Simple : Inherits TaskParent
-    Public plotHist As New PlotBars_Basics
+    Public plotHist As New PlotBar_Basics
     Public Sub New()
         labels(2) = "Histogram of the grayscale video stream"
         desc = "Build a simple and reusable histogram for grayscale images."
@@ -461,7 +461,7 @@ End Class
 
 Public Class NR_Histogram_Color : Inherits TaskParent
     Public histogram As New cv.Mat
-    Public plotHist As New PlotBars_Basics
+    Public plotHist As New PlotBar_Basics
     Public ranges() As cv.Rangef
     Public Sub New()
         desc = "Create a histogram of green and red."
@@ -493,7 +493,7 @@ End Class
 
 Public Class Histogram_KalmanAuto : Inherits TaskParent
     Public histogram As New cv.Mat
-    Public plotHist As New PlotBars_Basics
+    Public plotHist As New PlotBar_Basics
     Dim mm As mmData
     Public ranges() As cv.Rangef
     Dim splitIndex = 0
@@ -808,7 +808,7 @@ End Class
 
 
 Public Class NR_Histogram_PointCloudXYZ : Inherits TaskParent
-    Public plotHist As New PlotBars_Basics
+    Public plotHist As New PlotBar_Basics
     Public Sub New()
         plotHist.createHistogram = True
         If standalone Then task.gOptions.displayDst1.Checked = True
@@ -997,7 +997,7 @@ End Class
 
 Public Class NR_Histogram_Byte_CPP : Inherits TaskParent
     Implements IDisposable
-    Public plotHist As New PlotBars_Basics
+    Public plotHist As New PlotBar_Basics
     Public Sub New()
         cPtr = Histogram_1D_Open()
         desc = "For Byte histograms, the C++ code works but the .Net interface doesn't honor exclusive ranges."
@@ -1143,7 +1143,7 @@ Public Class Histogram_DepthSimple : Inherits TaskParent
     Public histList As New List(Of Single)
     Public histArray() As Single
     Public histogram As New cv.Mat
-    Dim plotHist As New PlotBars_Basics
+    Dim plotHist As New PlotBar_Basics
     Dim mm As mmData
     Public inputOnlyMask As New cv.Mat
     Public ranges() As cv.Rangef
@@ -1179,7 +1179,7 @@ End Class
 
 
 Public Class Histogram_CloudSegments : Inherits TaskParent
-    Dim plot As New PlotBars_Basics
+    Dim plot As New PlotBar_Basics
     Public trimHist As New cv.Mat
     Dim options As New Options_Outliers
     Dim index As Integer = 2
@@ -1288,7 +1288,7 @@ Public Class Histogram_GridCell : Inherits TaskParent
             End If
         End If
         If standalone And histarray.Count > 1 Then
-            Static plotHist As New PlotBars_Basics
+            Static plotHist As New PlotBar_Basics
             plotHist.Run(histogram)
             dst2 = plotHist.dst2
         End If
@@ -1305,7 +1305,7 @@ End Class
 
 Public Class NR_Histogram_ToggleFeatureLess : Inherits TaskParent
     Dim fLessBrick As New NR_BrickPoint_FeatureLess
-    Dim plotHist As New PlotBars_Basics
+    Dim plotHist As New PlotBar_Basics
     Public Sub New()
         plotHist.maxRange = 255
         plotHist.minRange = 0
@@ -1419,7 +1419,7 @@ Public Class Histogram_PointCloud : Inherits TaskParent
                 cv.Cv2.CalcHist({task.pointCloud}, task.channels, New cv.Mat(), histogram,
                                      task.channelCount, task.histBinList, task.ranges)
 
-                Static plot As New PlotBars_Basics
+                Static plot As New PlotBar_Basics
                 plot.Run(histogram)
                 dst2 = plot.histogram
                 labels(2) = "2D plot of 1D histogram."
@@ -1427,7 +1427,7 @@ Public Class Histogram_PointCloud : Inherits TaskParent
                 cv.Cv2.CalcHist({task.pointCloud}, task.channels, New cv.Mat(), histogram,
                                      task.channelCount, task.histBinList, task.ranges)
 
-                Static plot2D As New PlotBars_Histogram2D
+                Static plot2D As New PlotBar_Histogram2D
                 plot2D.Run(histogram)
                 dst2 = plot2D.dst2
                 labels(2) = "2D plot of 2D histogram."
@@ -1568,7 +1568,7 @@ End Class
 
 
 Public Class Histogram_Depth : Inherits TaskParent
-    Public plotHist As New PlotBars_Basics
+    Public plotHist As New PlotBar_Basics
     Public rc As rcData
     Public mm As mmData
     Public histogram As New cv.Mat

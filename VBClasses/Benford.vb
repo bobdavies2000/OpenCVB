@@ -16,8 +16,8 @@ Imports VBClasses
     Public Class Benford_Basics : Inherits TaskParent
         Public expectedDistribution(10 - 1) As Single
         Public counts(expectedDistribution.Count - 1) As Single
-        Dim plotHist As New PlotBars_Basics
-        Dim use99 As Boolean
+    Dim plotHist As New PlotBar_Basics
+    Dim use99 As Boolean
         Public Sub New()
             For i = 1 To expectedDistribution.Count - 1
                 expectedDistribution(i) = Math.Log10(1 + 1 / i) ' get the precise expected values.

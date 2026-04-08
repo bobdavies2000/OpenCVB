@@ -827,8 +827,8 @@ Imports VBClasses
     Public Class Feature_NoMotion : Inherits TaskParent
         Dim feat As New Feature_General
         Public Sub New()
-            task.gOptions.UseMotionMask.Checked = False
-            dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
+        task.gOptions.stabilizeDepthRGB.Checked = False
+        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
             desc = "Find good features to track in a BGR image using the motion mask+"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)

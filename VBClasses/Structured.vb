@@ -108,7 +108,7 @@ Imports VBClasses
 
     Public Class NR_Structured_CountTop : Inherits TaskParent
         Dim slice As New Structured_SliceV
-        Dim plot As New PlotBars_Basics
+        Dim plot As New PlotBar_Basics
         Dim counts As New List(Of Single)
         Public Sub New()
             If standalone Then task.gOptions.displayDst1.Checked = True
@@ -434,7 +434,7 @@ Imports VBClasses
 
     Public Class NR_Structured_CountSide : Inherits TaskParent
         Dim slice As New Structured_SliceH
-        Dim plot As New PlotBars_Basics
+        Dim plot As New PlotBar_Basics
         Dim rotate As New Rotate_Basics
         Public counts As New List(Of Single)
         Public maxCountIndex As Integer

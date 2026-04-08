@@ -169,7 +169,7 @@ Imports VBClasses
 
     Public Class NR_Reduction_Histogram : Inherits TaskParent
         Dim reduction As New Reduction_Basics
-        Dim plot As New PlotBars_Basics
+        Dim plot As New PlotBar_Basics
         Public Sub New()
             plot.createHistogram = True
             plot.removeZeroEntry = False

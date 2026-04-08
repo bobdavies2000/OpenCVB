@@ -1,5 +1,5 @@
 ﻿Imports cv = OpenCvSharp
-Public Class PlotBars_Basics : Inherits TaskParent
+Public Class PlotBar_Basics : Inherits TaskParent
     Public histogram As New cv.Mat
     Public histArray() As Single
     Public minRange As Single
@@ -83,7 +83,7 @@ End Class
 
 
 
-Public Class PlotBars_Histogram2D : Inherits TaskParent
+Public Class PlotBar_Histogram2D : Inherits TaskParent
     Public Sub New()
         labels = {"", "", "2D Histogram", ""}
         desc = "Plot a 2D histgram from the input Mat"
@@ -108,12 +108,12 @@ End Class
 
 
 
-Public Class PlotBars_HistCoreRange : Inherits TaskParent
+Public Class PlotBar_HistCoreRange : Inherits TaskParent
     Public redCore As New RedPrep_Core
     Public minRange As Single
     Public maxRange As Single
-    Public plotHist As New PlotBars_Basics
-    Dim plotHistNew As New PlotBars_Basics
+    Public plotHist As New PlotBar_Basics
+    Dim plotHistNew As New PlotBar_Basics
     Public Sub New()
         OptionParent.findRadio("Y Reduction").Checked = True
         plotHistNew.createHistogram = True

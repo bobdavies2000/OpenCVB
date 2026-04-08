@@ -211,10 +211,10 @@ Public Class OptionsGlobal
     Public Sub setLineWidth(val As Integer)
         LineWidth.Value = val
     End Sub
-    Private Sub TruncateDepth_CheckedChanged(sender As Object, e As EventArgs) Handles TruncateDepth.CheckedChanged
+    Private Sub TruncateDepth_CheckedChanged(sender As Object, e As EventArgs)
         task.optionsChanged = True
     End Sub
-    Private Sub UseMotionMask_CheckedChanged(sender As Object, e As EventArgs) Handles UseMotionMask.CheckedChanged
+    Private Sub UseMotionMask_CheckedChanged(sender As Object, e As EventArgs)
         task.optionsChanged = True
     End Sub
     Private Sub showMotionMask_CheckedChanged(sender As Object, e As EventArgs) Handles showMotionMask.CheckedChanged
@@ -223,10 +223,7 @@ Public Class OptionsGlobal
     Private Sub ShowSplash_CheckedChanged(sender As Object, e As EventArgs) Handles ShowSplash.CheckedChanged
         SaveSetting("OpenCVB", "ShowSplash", "ShowSplash", ShowSplash.Checked)
     End Sub
-    Private Sub stabilizeDepth_CheckedChanged(sender As Object, e As EventArgs) Handles stabilizeDepth.CheckedChanged
-        task.optionsChanged = True
-    End Sub
-    Private Sub stabilizeRGB_CheckedChanged(sender As Object, e As EventArgs) Handles StabilizeRGB.CheckedChanged
+    Private Sub stabilizeDepthRGB_CheckedChanged(sender As Object, e As EventArgs) Handles stabilizeDepthRGB.CheckedChanged
         task.optionsChanged = True
     End Sub
 End Class

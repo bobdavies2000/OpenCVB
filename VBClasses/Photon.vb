@@ -124,8 +124,8 @@ Imports VBClasses
         Public Sub New()
             hist.plotHist.removeZeroEntry = False
             task.gOptions.setHistogramBins(10)
-            task.gOptions.UseMotionMask.Checked = False
-            desc = "Plot a histogram of the 3D distance of each picture from the previous image."
+        task.gOptions.stabilizeDepthRGB.Checked = False
+        desc = "Plot a histogram of the 3D distance of each picture from the previous image."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             bricks.Run(src)

@@ -48,9 +48,7 @@ Partial Class OptionsGlobal
         DebugSliderLabel = New Label()
         DebugCheckBox = New CheckBox()
         GroupBox2 = New GroupBox()
-        stabilizeDepth = New CheckBox()
-        UseMotionMask = New CheckBox()
-        TruncateDepth = New CheckBox()
+        stabilizeDepthRGB = New CheckBox()
         gravityPointCloud = New CheckBox()
         CreateGif = New CheckBox()
         ShowAllOptions = New CheckBox()
@@ -67,7 +65,6 @@ Partial Class OptionsGlobal
         Label14 = New Label()
         DepthGroupBox = New GroupBox()
         ShowSplash = New CheckBox()
-        StabilizeRGB = New CheckBox()
         GroupBox1.SuspendLayout()
         CType(PaintFreqSlider, ComponentModel.ISupportInitialize).BeginInit()
         CType(DotSizeSlider, ComponentModel.ISupportInitialize).BeginInit()
@@ -336,10 +333,7 @@ Partial Class OptionsGlobal
         ' 
         ' GroupBox2
         ' 
-        GroupBox2.Controls.Add(StabilizeRGB)
-        GroupBox2.Controls.Add(stabilizeDepth)
-        GroupBox2.Controls.Add(UseMotionMask)
-        GroupBox2.Controls.Add(TruncateDepth)
+        GroupBox2.Controls.Add(stabilizeDepthRGB)
         GroupBox2.Controls.Add(gravityPointCloud)
         GroupBox2.Controls.Add(CreateGif)
         GroupBox2.Controls.Add(ShowAllOptions)
@@ -354,43 +348,18 @@ Partial Class OptionsGlobal
         GroupBox2.TabStop = False
         GroupBox2.Text = "Miscellaneous Globals"
         ' 
-        ' stabilizeDepth
+        ' stabilizeDepthRGB
         ' 
-        stabilizeDepth.AutoSize = True
-        stabilizeDepth.Checked = True
-        stabilizeDepth.CheckState = CheckState.Checked
-        stabilizeDepth.Location = New Point(16, 228)
-        stabilizeDepth.Margin = New Padding(3, 4, 3, 4)
-        stabilizeDepth.Name = "stabilizeDepth"
-        stabilizeDepth.Size = New Size(183, 34)
-        stabilizeDepth.TabIndex = 11
-        stabilizeDepth.Text = "Stabilize Depth"
-        stabilizeDepth.UseVisualStyleBackColor = True
-        ' 
-        ' UseMotionMask
-        ' 
-        UseMotionMask.AutoSize = True
-        UseMotionMask.Checked = True
-        UseMotionMask.CheckState = CheckState.Checked
-        UseMotionMask.Location = New Point(16, 298)
-        UseMotionMask.Margin = New Padding(3, 4, 3, 4)
-        UseMotionMask.Name = "UseMotionMask"
-        UseMotionMask.Size = New Size(208, 34)
-        UseMotionMask.TabIndex = 1
-        UseMotionMask.Text = "Use Motion Mask"
-        UseMotionMask.UseVisualStyleBackColor = True
-        ' 
-        ' TruncateDepth
-        ' 
-        TruncateDepth.AutoSize = True
-        TruncateDepth.Location = New Point(295, 302)
-        TruncateDepth.Margin = New Padding(3, 4, 3, 4)
-        TruncateDepth.Name = "TruncateDepth"
-        TruncateDepth.Size = New Size(314, 34)
-        TruncateDepth.TabIndex = 9
-        TruncateDepth.Text = "Truncate depth at MaxDepth"
-        TruncateDepth.UseVisualStyleBackColor = True
-        TruncateDepth.Visible = False
+        stabilizeDepthRGB.AutoSize = True
+        stabilizeDepthRGB.Checked = True
+        stabilizeDepthRGB.CheckState = CheckState.Checked
+        stabilizeDepthRGB.Location = New Point(16, 228)
+        stabilizeDepthRGB.Margin = New Padding(3, 4, 3, 4)
+        stabilizeDepthRGB.Name = "stabilizeDepthRGB"
+        stabilizeDepthRGB.Size = New Size(366, 34)
+        stabilizeDepthRGB.TabIndex = 11
+        stabilizeDepthRGB.Text = "Stabilize Depth/RGB using Motion"
+        stabilizeDepthRGB.UseVisualStyleBackColor = True
         ' 
         ' gravityPointCloud
         ' 
@@ -560,19 +529,6 @@ Partial Class OptionsGlobal
         ShowSplash.Text = "Show Splash Screen"
         ShowSplash.UseVisualStyleBackColor = True
         ' 
-        ' StabilizeRGB
-        ' 
-        StabilizeRGB.AutoSize = True
-        StabilizeRGB.Checked = True
-        StabilizeRGB.CheckState = CheckState.Checked
-        StabilizeRGB.Location = New Point(17, 263)
-        StabilizeRGB.Margin = New Padding(3, 4, 3, 4)
-        StabilizeRGB.Name = "StabilizeRGB"
-        StabilizeRGB.Size = New Size(165, 34)
-        StabilizeRGB.TabIndex = 12
-        StabilizeRGB.Text = "Stabilize RGB"
-        StabilizeRGB.UseVisualStyleBackColor = True
-        ' 
         ' OptionsGlobal
         ' 
         AutoScaleDimensions = New SizeF(12F, 30F)
@@ -632,12 +588,10 @@ Partial Class OptionsGlobal
     Friend WithEvents ShowAllOptions As CheckBox
     Friend WithEvents displayDst1 As CheckBox
     Friend WithEvents displayDst0 As CheckBox
-    Friend WithEvents TruncateDepth As CheckBox
     Friend WithEvents gravityPointCloud As CheckBox
     Friend WithEvents CrossHairs As CheckBox
     Friend WithEvents CreateGif As CheckBox
     Friend WithEvents showMotionMask As CheckBox
-    Friend WithEvents UseMotionMask As CheckBox
     Friend WithEvents LineWidth As TrackBar
     Friend WithEvents LineThicknessAmount As Label
     Friend WithEvents Label5 As Label
@@ -656,6 +610,5 @@ Partial Class OptionsGlobal
     Friend WithEvents PaintFrequencyLabel As Label
     Friend WithEvents Label9 As Label
     Friend WithEvents ShowSplash As CheckBox
-    Friend WithEvents stabilizeDepth As CheckBox
-    Friend WithEvents StabilizeRGB As CheckBox
+    Friend WithEvents stabilizeDepthRGB As CheckBox
 End Class

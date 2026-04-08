@@ -140,7 +140,7 @@ Imports VBClasses
 
 
     Public Class NR_RedMask_CellDepthHistogram : Inherits TaskParent
-        Dim plot As New PlotBars_Basics
+        Dim plot As New PlotBar_Basics
         Dim redC As New RedCloud_Basics
         Public Sub New()
             If standalone Then task.gOptions.displayDst1.Checked = True

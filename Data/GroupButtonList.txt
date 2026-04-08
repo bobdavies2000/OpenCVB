@@ -155,7 +155,7 @@ Photon
 PhotoShop
 Pixel
 Plane
-PlotBars
+PlotBar
 PlotDots
 PlotMouse
 PlotOpenCV

@@ -2547,7 +2547,7 @@ Namespace VBClasses
     Public Class XO_Sort_FeatureLess : Inherits TaskParent
         Public connect As New XO_Region_Palette
         Public sort As New Sort_Basics
-        Dim plot As New PlotBars_Basics
+        Dim plot As New PlotBar_Basics
         Public Sub New()
             plot.createHistogram = True
             task.gOptions.setHistogramBins(255)
@@ -5944,7 +5944,7 @@ Namespace VBClasses
 
     Public Class XO_FPoly_Plot : Inherits TaskParent
         Public fGrid As New XO_FPoly_Core
-        Dim plotHist As New PlotBars_Basics
+        Dim plotHist As New PlotBar_Basics
         Public hist() As Single
         Public distDiff As New List(Of Single)
         Public Sub New()
@@ -6000,7 +6000,7 @@ Namespace VBClasses
 
     Public Class XO_FPoly_PlotWeighted : Inherits TaskParent
         Public fPlot As New XO_FPoly_Plot
-        Dim plotHist As New PlotBars_Basics
+        Dim plotHist As New PlotBar_Basics
         Public Sub New()
             task.kalman = New Kalman_Basics
             plotHist.minRange = 0
@@ -10963,7 +10963,6 @@ Namespace VBClasses
     Public Class XO_RedList_GridCells : Inherits TaskParent
         Dim regions As New XO_Region_Contours
         Public Sub New()
-            task.gOptions.TruncateDepth.Checked = True
             If standalone Then task.gOptions.displayDst1.Checked = True
             desc = "Use the brickData regions to build task.redList.rcList"
         End Sub
@@ -11010,7 +11009,6 @@ Namespace VBClasses
     Public Class XO_RedList_GridCellsHist : Inherits TaskParent
         Dim regions As New XO_Region_Contours
         Public Sub New()
-            task.gOptions.TruncateDepth.Checked = True
             desc = "For each redCell find the highest population region it covers."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -11267,7 +11265,7 @@ Namespace VBClasses
         Dim redC As New RedCloud_Basics
         Dim reduction As New Reduction_Basics
         Public Sub New()
-            task.gOptions.UseMotionMask.Checked = False
+            task.gOptions.stabilizeDepthRGB.Checked = False
             desc = "Use RedColor for regions with no depth to add cells to RedCloud"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -11447,10 +11445,10 @@ Namespace VBClasses
 
             labels(2) = Format(motionSort.Count / task.gridRects.Count, "00%") + " Of bricks had motion."
 
-            If task.gOptions.UseMotionMask.Checked = False Then dst1.SetTo(255)
+            If task.gOptions.stabilizeDepthRGB.Checked = False Then dst1.SetTo(255)
 
             If standaloneTest() Then
-                If task.gOptions.UseMotionMask.Checked Then src.CopyTo(dst2, dst3)
+                If task.gOptions.stabilizeDepthRGB.Checked Then src.CopyTo(dst2, dst3)
                 Static diff As New Diff_Basics
                 diff.lastFrame = dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
                 diff.Run(src)
@@ -11706,7 +11704,7 @@ Namespace VBClasses
 
 
 
-    Public Class XO_Motion_Basics_TAHistory : Inherits TaskParent
+    Public Class XO_Motion_Basics_History : Inherits TaskParent
         Public motionSort As New List(Of Integer)
         Dim diff As New Diff_Basics
         Public Sub New()
@@ -11715,7 +11713,7 @@ Namespace VBClasses
             desc = "Isolate all motion in the scene"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If task.gOptions.UseMotionMask.Checked = False Then Exit Sub
+            If task.gOptions.stabilizeDepthRGB.Checked = False Then Exit Sub
 
             If src.Channels <> 1 Then src = task.gray
             If task.heartBeat Then dst2 = src.Clone
@@ -13323,13 +13321,13 @@ Namespace VBClasses
             If task.optionsChanged Then
                 task.maxDepthMask = New cv.Mat(task.pcSplit(2).Size, cv.MatType.CV_8U, 0)
             End If
-            If task.gOptions.TruncateDepth.Checked Then
-                task.pcSplit(2) = task.pcSplit(2).Threshold(task.MaxZmeters,
-                                                        task.MaxZmeters, cv.ThresholdTypes.Trunc)
-                task.maxDepthMask = task.pcSplit(2).InRange(task.MaxZmeters,
-                                                        task.MaxZmeters).ConvertScaleAbs()
-                cv.Cv2.Merge(task.pcSplit, task.pointCloud)
-            End If
+            'If task.gOptions.TruncateDepth.Checked Then
+            '    task.pcSplit(2) = task.pcSplit(2).Threshold(task.MaxZmeters,
+            '                                            task.MaxZmeters, cv.ThresholdTypes.Trunc)
+            '    task.maxDepthMask = task.pcSplit(2).InRange(task.MaxZmeters,
+            '                                            task.MaxZmeters).ConvertScaleAbs()
+            '    cv.Cv2.Merge(task.pcSplit, task.pointCloud)
+            'End If
 
             task.depthmask = task.pcSplit(2).Threshold(0, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs
             task.noDepthMask = Not task.depthmask
@@ -13363,7 +13361,7 @@ Namespace VBClasses
             End If
 
             Dim motionRect = XO_Motion_RectHistory.getMotionRect()
-            If task.gOptions.UseMotionMask.Checked Then
+            If task.gOptions.stabilizeDepthRGB.Checked Then
                 If task.heartBeatLT Or task.frameCount < 5 Or task.optionsChanged Then
                     dst2 = task.pointCloud.Clone
                 End If
@@ -15281,7 +15279,7 @@ Namespace VBClasses
 
 
     Public Class XO_KNN_TrackMean : Inherits TaskParent
-        Dim plot As New PlotBars_Basics
+        Dim plot As New PlotBar_Basics
         Dim knn As New KNN_OneToOne
         Const maxDistance As Integer = 50
         Public shiftX As Single
@@ -16011,7 +16009,7 @@ Namespace VBClasses
 
 
     Public Class XO_RedList_CellsAtDepth : Inherits TaskParent
-        Dim plot As New PlotBars_Basics
+        Dim plot As New PlotBar_Basics
         Public Sub New()
             task.kalman = New Kalman_Basics
             plot.removeZeroEntry = False
@@ -16576,7 +16574,7 @@ Namespace VBClasses
 
     'Public Class ParticleFilter_Basics_TA : Inherits TaskParent
     '    Dim trace As New Swarm_Basics
-    '    Dim plot1D As New PlotBars_Histogram2D
+    '    Dim plot1D As New PlotBar_Histogram2D
     '    Dim histogram As New cv.Mat
     '    Public Sub New()
     '        If standaloneTest() Then task.gOptions.displaydst1.checked = true
@@ -16901,13 +16899,13 @@ Namespace VBClasses
             If task.optionsChanged Then
                 task.maxDepthMask = New cv.Mat(task.pcSplit(2).Size, cv.MatType.CV_8U, 0)
             End If
-            If task.gOptions.TruncateDepth.Checked Then
-                task.pcSplit(2) = task.pcSplit(2).Threshold(task.MaxZmeters,
-                                                            task.MaxZmeters, cv.ThresholdTypes.Trunc)
-                task.maxDepthMask = task.pcSplit(2).InRange(task.MaxZmeters,
-                                                            task.MaxZmeters).ConvertScaleAbs()
-                cv.Cv2.Merge(task.pcSplit, task.pointCloud)
-            End If
+            'If task.gOptions.TruncateDepth.Checked Then
+            '    task.pcSplit(2) = task.pcSplit(2).Threshold(task.MaxZmeters,
+            '                                                task.MaxZmeters, cv.ThresholdTypes.Trunc)
+            '    task.maxDepthMask = task.pcSplit(2).InRange(task.MaxZmeters,
+            '                                                task.MaxZmeters).ConvertScaleAbs()
+            '    cv.Cv2.Merge(task.pcSplit, task.pointCloud)
+            'End If
 
             task.depthmask = task.pcSplit(2).Threshold(0, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs
             task.noDepthMask = Not task.depthmask
@@ -18241,13 +18239,13 @@ Namespace VBClasses
                 task.maxDepthMask = New cv.Mat(task.pcSplit(2).Size, cv.MatType.CV_8U, 0)
             End If
 
-            If task.gOptions.TruncateDepth.Checked Then
-                task.pcSplit(2) = task.pcSplit(2).Threshold(task.MaxZmeters,
-                                                          task.MaxZmeters, cv.ThresholdTypes.Trunc)
-                task.maxDepthMask = task.pcSplit(2).InRange(task.MaxZmeters,
-                                                          task.MaxZmeters).ConvertScaleAbs()
-                cv.Cv2.Merge(task.pcSplit, task.pointCloud)
-            End If
+            'If task.gOptions.TruncateDepth.Checked Then
+            '    task.pcSplit(2) = task.pcSplit(2).Threshold(task.MaxZmeters,
+            '                                              task.MaxZmeters, cv.ThresholdTypes.Trunc)
+            '    task.maxDepthMask = task.pcSplit(2).InRange(task.MaxZmeters,
+            '                                              task.MaxZmeters).ConvertScaleAbs()
+            '    cv.Cv2.Merge(task.pcSplit, task.pointCloud)
+            'End If
 
             task.depthmask = task.pcSplit(2).Threshold(0, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs
             task.noDepthMask = Not task.depthmask
@@ -18936,7 +18934,6 @@ Namespace VBClasses
         Public connect As New Region_Rects
         Public Sub New()
             dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
-            task.gOptions.TruncateDepth.Checked = True
             desc = "Find the main regions connected in depth and build a contour for each."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)

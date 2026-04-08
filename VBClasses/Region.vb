@@ -220,9 +220,8 @@ Imports VBClasses
         Dim bricks As New Brick_Basics
         Public Sub New()
             dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
-            task.gOptions.TruncateDepth.Checked = True
-            desc = "Find the main regions connected in depth and build a contour for each."
-        End Sub
+        desc = "Find the main regions connected in depth and build a contour for each."
+    End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             bricks.Run(src)
 

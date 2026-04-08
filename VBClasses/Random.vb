@@ -340,7 +340,7 @@ Imports VBClasses
         Public inputCDF As New cv.Mat ' place a cumulative distribution function here (or just put the histogram that reflects the desired random number distribution)
         Public outputRandom = New cv.Mat(10000, 1, cv.MatType.CV_32S, cv.Scalar.All(0)) ' allocate the desired number of random numbers - size can be just one to get the next random value
         Public outputHistogram As cv.Mat
-        Public plot As New PlotBars_Basics
+        Public plot As New PlotBar_Basics
         Public Sub New()
             Dim loadedDice() As Single = {1, 3, 0.5, 0.5, 0.75, 0.25}
             inputCDF = cv.Mat.FromPixelData(loadedDice.Length, 1, cv.MatType.CV_32F, loadedDice)
@@ -383,7 +383,7 @@ Imports VBClasses
 
     ' https://www.khanacademy.org/computing/computer-programming/programming-natural-simulations/programming-randomness/a/custom-distribution-of-random-numbers
     Public Class NR_Random_MonteCarlo : Inherits TaskParent
-        Public plot As New PlotBars_Basics
+        Public plot As New PlotBar_Basics
         Dim options As New Options_MonteCarlo
         Public outputRandom = New cv.Mat(New cv.Size(1, 4000), cv.MatType.CV_32S, 0) ' allocate the desired number of random numbers - size can be just one to get the next random value
         Public Sub New()

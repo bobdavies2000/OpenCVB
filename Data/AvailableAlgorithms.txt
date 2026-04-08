@@ -612,6 +612,7 @@ NR_Brick_Lines
 NR_Brick_MLColor
 NR_Brick_MLColorDepth
 NR_Brick_NoDepthLines
+NR_Brick_Plot
 NR_Brick_RGBtoLeft
 NR_BrickLine_DepthGaps
 NR_BrickLine_Lines
@@ -1479,9 +1480,9 @@ Plane_Equation
 Plane_From3Points
 Plane_OnlyPlanes
 Plane_Points
-PlotBars_Basics
-PlotBars_HistCoreRange
-PlotBars_Histogram2D
+PlotBar_Basics
+PlotBar_HistCoreRange
+PlotBar_Histogram2D
 PlotDots_Basics
 PlotDots_Heartbeats
 PlotMouse_BackProjectMasks

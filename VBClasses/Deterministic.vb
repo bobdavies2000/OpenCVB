@@ -71,8 +71,8 @@ Imports VBClasses
 
     Public Class NR_Deterministic_Histogram : Inherits TaskParent
         Dim deter As New Deterministic_MotionMask
-        Dim plothist As New PlotBars_Basics
-        Public Sub New()
+    Dim plothist As New PlotBar_Basics
+    Public Sub New()
             plothist.removeZeroEntry = False
             plothist.minRange = 0
             plothist.maxRange = 255

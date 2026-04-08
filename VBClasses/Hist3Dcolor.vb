@@ -179,7 +179,7 @@ Imports VBClasses
 
     Public Class Hist3Dcolor_PlotHist1D : Inherits TaskParent
         Dim hColor As New Hist3Dcolor_Basics
-        Dim plot As New PlotBars_Basics
+        Dim plot As New PlotBar_Basics
         Public histogram1D As cv.Mat
         Public histogram As cv.Mat
         Public histArray() As Single

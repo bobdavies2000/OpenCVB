@@ -2,7 +2,7 @@ Imports cv = OpenCvSharp
 Imports VBClasses
 Public Class Derivative_Basics : Inherits TaskParent
     Dim subD As New Derivative_Subtract
-    Dim plotHist As New PlotBars_Basics
+    Dim plotHist As New PlotBar_Basics
     Public Sub New()
         plotHist.removeZeroEntry = False
         If standalone Then task.gOptions.displayDst1.Checked = True
@@ -99,7 +99,7 @@ End Class
 
 Public Class Derivative_Sobel : Inherits TaskParent
     Public options As New Options_Derivative
-    Public plotHist As New PlotBars_Basics
+    Public plotHist As New PlotBar_Basics
     Public Sub New()
         desc = "Display a first or second derivative of the selected depth dimension and direction."
     End Sub

@@ -117,10 +117,9 @@ Public Class AlgorithmTask : Implements IDisposable
         leftView = leftRightBrightness.dst2
         rightView = leftRightBrightness.dst3
 
-        If gOptions.UseMotionMask.Checked Then
+        If gOptions.stabilizeDepthRGB.Checked Then
             motion.Run(gray)
-
-            If gOptions.StabilizeRGB.Checked Then stabilizeGray.Run(task.gray)
+            stabilizeGray.Run(task.gray)
         Else
             motion.motionMask.SetTo(255)
             motion.motionSort.Clear()
@@ -167,7 +166,7 @@ Public Class AlgorithmTask : Implements IDisposable
 
         cloudGravity.Run(emptyMat) '******* this may rotate for gravity if gravity is selected *******
 
-        If gOptions.stabilizeDepth.Checked Then stabilizeDepth.Run(emptyMat)
+        If gOptions.stabilizeDepthRGB.Checked Then stabilizeDepth.Run(emptyMat)
 
         colorizer.Run(src)
 

@@ -53,76 +53,76 @@ Imports VBClasses
 
 
     Public Class NR_DepthLinear_Visualize : Inherits TaskParent
-        Public plotHist As New PlotBars_Basics
-        Public roi As New cv.Rect(0, 0, dst2.Width, dst2.Height)
-        Public pc As cv.Mat
-        Public options As New Options_LinearInput
-        Dim mats As New Mat_4to1
-        Dim matPlots As New Mat_4to1
-        Public Sub New()
-            plotHist.createHistogram = True
-            plotHist.removeZeroEntry = True
+    Public plotHist As New PlotBar_Basics
+    Public roi As New cv.Rect(0, 0, dst2.Width, dst2.Height)
+    Public pc As cv.Mat
+    Public options As New Options_LinearInput
+    Dim mats As New Mat_4to1
+    Dim matPlots As New Mat_4to1
+    Public Sub New()
+        plotHist.createHistogram = True
+        plotHist.removeZeroEntry = True
 
-            'If standalone Then task.gOptions.displaydst1.checked = true
-            'labels(1) = "Mask of differences > deltaZ (only last shown)"
-            labels(3) = "Histograms showing the range of pointcloud differences for X, Y, and Z"
-            desc = "Provide a mask for pixels that are within x mm depth of its neighbor"
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            options.Run()
-            Dim r1 As cv.Rect, r2 As cv.Rect
+        'If standalone Then task.gOptions.displaydst1.checked = true
+        'labels(1) = "Mask of differences > deltaZ (only last shown)"
+        labels(3) = "Histograms showing the range of pointcloud differences for X, Y, and Z"
+        desc = "Provide a mask for pixels that are within x mm depth of its neighbor"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        options.Run()
+        Dim r1 As cv.Rect, r2 As cv.Rect
 
-            For i = 0 To task.pcSplit.Count - 1
-                pc = task.pcSplit(i)(roi)
+        For i = 0 To task.pcSplit.Count - 1
+            pc = task.pcSplit(i)(roi)
 
-                ' toggle between the pixel to the right or below
-                If task.toggleOn Then
-                    r1 = New cv.Rect(0, 0, task.cols - 1, task.rows)
-                    r2 = New cv.Rect(1, 0, r1.Width, r1.Height)
-                Else
-                    r1 = New cv.Rect(0, 0, task.cols, task.rows - 1)
-                    r2 = New cv.Rect(0, 1, r1.Width, r1.Height)
-                End If
+            ' toggle between the pixel to the right or below
+            If task.toggleOn Then
+                r1 = New cv.Rect(0, 0, task.cols - 1, task.rows)
+                r2 = New cv.Rect(1, 0, r1.Width, r1.Height)
+            Else
+                r1 = New cv.Rect(0, 0, task.cols, task.rows - 1)
+                r2 = New cv.Rect(0, 1, r1.Width, r1.Height)
+            End If
 
-                cv.Cv2.Absdiff(pc(r2), pc(r1), dst0)
+            cv.Cv2.Absdiff(pc(r2), pc(r1), dst0)
 
-                mats.mat(i) = dst0.Resize(roi.Size, 0, 0, cv.InterpolationFlags.Nearest)
-                dst1 = mats.mat(i).Threshold(options.delta, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs
+            mats.mat(i) = dst0.Resize(roi.Size, 0, 0, cv.InterpolationFlags.Nearest)
+            dst1 = mats.mat(i).Threshold(options.delta, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs
 
-                mats.mat(i).SetTo(0, dst1)
+            mats.mat(i).SetTo(0, dst1)
 
-                If task.optionsChanged Then
-                    plotHist.minRange = 0
-                    plotHist.maxRange = options.delta
-                End If
-                labels(2) = "Pointcloud data where neighbors are less than " +
+            If task.optionsChanged Then
+                plotHist.minRange = 0
+                plotHist.maxRange = options.delta
+            End If
+            labels(2) = "Pointcloud data where neighbors are less than " +
                         CStr(CInt(options.delta * 1000)) + " mm's apart in the X, Y, or Z direction"
-                plotHist.Run(mats.mat(i))
-                matPlots.mat(i) = plotHist.dst2.Clone
-                If i = 2 Then mats.mat(2) = mats.mat(2).Threshold(0, 255, cv.ThresholdTypes.Binary)
-                mats.mat(i) = mats.mat(i).Normalize(0, 255, cv.NormTypes.MinMax).ConvertScaleAbs
-            Next
+            plotHist.Run(mats.mat(i))
+            matPlots.mat(i) = plotHist.dst2.Clone
+            If i = 2 Then mats.mat(2) = mats.mat(2).Threshold(0, 255, cv.ThresholdTypes.Binary)
+            mats.mat(i) = mats.mat(i).Normalize(0, 255, cv.NormTypes.MinMax).ConvertScaleAbs
+        Next
 
-            mats.Run(emptyMat)
-            dst2 = mats.dst2
+        mats.Run(emptyMat)
+        dst2 = mats.dst2
 
-            matPlots.Run(src)
-            dst3 = matPlots.dst2
+        matPlots.Run(src)
+        dst3 = matPlots.dst2
 
-            SetTrueText("Lower left is a mask showing where depth is" + vbCrLf + "within " +
+        SetTrueText("Lower left is a mask showing where depth is" + vbCrLf + "within " +
                      Str(CInt(options.delta * 1000)) + " mm's of its neighbor" + vbCrLf + vbCrLf +
                      "Toggle is between using the pixel to the right " + vbCrLf + "or below",
                      New cv.Point(task.cols / 2 + 5, task.rows / 2 + 5))
-        End Sub
-    End Class
+    End Sub
+End Class
 
 
 
 
 
-    Public Class DepthLinear_Input : Inherits TaskParent
-        Public plotHist As New PlotBars_Basics
-        Public roi As New cv.Rect(0, 0, dst2.Width, dst2.Height)
+Public Class DepthLinear_Input : Inherits TaskParent
+    Public plotHist As New PlotBar_Basics
+    Public roi As New cv.Rect(0, 0, dst2.Width, dst2.Height)
         Public pc As cv.Mat
         Public options As New Options_LinearInput
         Public Sub New()

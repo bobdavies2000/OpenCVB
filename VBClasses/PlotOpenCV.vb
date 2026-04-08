@@ -164,7 +164,7 @@ End Class
 
 Public Class PlotOpenCV_RedPrepData : Inherits TaskParent
     Dim prep As New RedPrep_Depth
-    Dim plot As New PlotBars_Basics
+    Dim plot As New PlotBar_Basics
     Public Sub New()
         plot.createHistogram = True
         desc = "Plot the RedCloud prep data to see if any patterns emerge."

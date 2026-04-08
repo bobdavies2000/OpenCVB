@@ -126,7 +126,7 @@ End Class
 ' https://docs.opencvb.org/3.4/da/d7f/tutorial_back_projection.html
 Public Class BackProject_Full : Inherits TaskParent
     Public classCount As Integer
-    Dim plotHist As New PlotBars_Basics
+    Dim plotHist As New PlotBar_Basics
     Dim index As Integer
     Public Sub New()
         task.gOptions.setHistogramBins(10)
@@ -469,7 +469,7 @@ Public Class NR_BackProject_MaskList : Inherits TaskParent
     Public histogramList As New List(Of cv.Mat)
     Dim inputMatList As New List(Of cv.Mat)
     Dim histS As New Histogram_DepthSimple
-    Dim plotHist As New PlotBars_Basics
+    Dim plotHist As New PlotBar_Basics
     Public Sub New()
         plotHist.addLabels = False
         plotHist.removeZeroEntry = True
@@ -634,7 +634,7 @@ End Class
 
 Public Class BackProject_FullDepth : Inherits TaskParent
     Public classCount As Integer
-    Dim plotHist As New PlotBars_Basics
+    Dim plotHist As New PlotBar_Basics
     Public Sub New()
         task.gOptions.setHistogramBins(20)
         plotHist.createHistogram = True

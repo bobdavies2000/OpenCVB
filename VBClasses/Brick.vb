@@ -844,53 +844,6 @@ End Class
 
 
 
-Public Class Brick_Plot : Inherits TaskParent
-    Dim bricks As New Brick_Basics
-    Dim plotHist As New PlotBars_Basics
-    Public Sub New()
-        plotHist.createHistogram = True
-        plotHist.addLabels = False
-        plotHist.removeZeroEntry = False
-        labels(2) = "Click anywhere In the image To the histogram Of that the depth In that cell."
-        desc = "Select any cell To plot a histogram Of that cell's depth"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        bricks.Run(src)
-        dst2 = task.leftView
-
-        Dim index As Integer = task.gridMap.Get(Of Integer)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
-        If bricks.brickList.Count = 0 Or task.optionsChanged Then Exit Sub
-
-        Dim brick As brickData
-        If index < 0 Or index >= bricks.brickList.Count Then
-            brick = bricks.brickList(bricks.brickList.Count / 2)
-            task.mouseMovePoint = New cv.Point(brick.rect.X + brick.rect.Width / 2, brick.rect.Y + brick.rect.Height / 2)
-        Else
-            brick = bricks.brickList(index)
-        End If
-
-        Dim split() = task.pointCloud(brick.rect).Split()
-        Dim mmDepth = GetMinMax(split(2))
-        If Single.IsInfinity(mmDepth.maxVal) Then Exit Sub
-
-        Static lastMouse As cv.Point = task.mouseMovePoint
-        If task.heartBeat Or lastMouse <> task.mouseMovePoint Then
-            lastMouse = task.mouseMovePoint
-            If Math.Abs(mmDepth.maxVal - mmDepth.minVal) > 0 Then
-                plotHist.minRange = mmDepth.minVal
-                plotHist.maxRange = mmDepth.maxVal
-                plotHist.Run(split(2))
-                dst3 = plotHist.dst2
-                labels(3) = "Depth values vary from " + Format(plotHist.minRange, fmt3) +
-                                    " to " + Format(plotHist.maxRange, fmt3)
-            End If
-        End If
-    End Sub
-End Class
-
-
-
-
 Public Class NR_Brick_NoDepthLines : Inherits TaskParent
     Dim bricks As New Brick_Basics
     Dim lines As New Line_Basics_TA
@@ -1059,5 +1012,102 @@ Public Class Brick_Features : Inherits TaskParent
         dst2.Rectangle(brick.lRect, task.highlight, task.lineWidth)
         task.color.Rectangle(brick.lRect, task.highlight, task.lineWidth)
         dst3.Rectangle(brick.rRect, task.highlight, task.lineWidth)
+    End Sub
+End Class
+
+
+
+
+
+Public Class NR_Brick_Plot : Inherits TaskParent
+    Dim bricks As New Brick_Basics
+    Dim plotHist As New PlotBar_Basics
+    Public Sub New()
+        plotHist.createHistogram = True
+        plotHist.addLabels = False
+        plotHist.removeZeroEntry = False
+        labels(2) = "Click anywhere In the image To the histogram Of that the depth In that cell."
+        desc = "Select any cell To plot a histogram Of that cell's depth"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        bricks.Run(src)
+        dst2 = task.leftView
+
+        Dim index As Integer = task.gridMap.Get(Of Integer)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
+        If bricks.brickList.Count = 0 Or task.optionsChanged Then Exit Sub
+
+        Dim brick As brickData
+        If index < 0 Or index >= bricks.brickList.Count Then
+            brick = bricks.brickList(bricks.brickList.Count / 2)
+            task.mouseMovePoint = New cv.Point(brick.rect.X + brick.rect.Width / 2, brick.rect.Y + brick.rect.Height / 2)
+        Else
+            brick = bricks.brickList(index)
+        End If
+
+        Dim split() = task.pointCloud(brick.rect).Split()
+        Dim mmDepth = GetMinMax(split(2))
+        If Single.IsInfinity(mmDepth.maxVal) Then Exit Sub
+
+        Static lastMouse As cv.Point = task.mouseMovePoint
+        If task.heartBeat Or lastMouse <> task.mouseMovePoint Then
+            lastMouse = task.mouseMovePoint
+            If Math.Abs(mmDepth.maxVal - mmDepth.minVal) > 0 Then
+                plotHist.minRange = mmDepth.minVal
+                plotHist.maxRange = mmDepth.maxVal
+                plotHist.Run(split(2))
+                dst3 = plotHist.dst2
+                labels(3) = "Depth values vary from " + Format(plotHist.minRange, fmt3) +
+                                    " to " + Format(plotHist.maxRange, fmt3)
+            End If
+        End If
+    End Sub
+End Class
+
+
+
+
+
+Public Class Brick_Plot : Inherits TaskParent
+    Dim bricks As New Brick_Basics
+    Dim myPlot As New PlotBar_Basics
+    Public Sub New()
+        labels(2) = "Click anywhere In the image To the histogram Of that the depth In that cell."
+        desc = "Select any cell To plot a histogram Of that cell's depth"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        bricks.Run(src)
+        dst2 = task.leftView
+
+        Dim index As Integer = task.gridMap.Get(Of Integer)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
+        If bricks.brickList.Count = 0 Or task.optionsChanged Then Exit Sub
+
+        Dim brick As brickData
+        If index < 0 Or index >= bricks.brickList.Count Then
+            brick = bricks.brickList(bricks.brickList.Count / 2)
+            task.mouseMovePoint = New cv.Point(brick.rect.X + brick.rect.Width / 2, brick.rect.Y + brick.rect.Height / 2)
+        Else
+            brick = bricks.brickList(index)
+        End If
+
+        Dim split() = task.pointCloud(brick.rect).Split()
+        Dim mmDepth = GetMinMax(split(2))
+        If Single.IsInfinity(mmDepth.maxVal) Then Exit Sub
+
+        Static lastMouse As New cv.Point(0, 0)
+        If lastMouse <> task.mouseMovePoint Then
+            lastMouse = task.mouseMovePoint
+            If Math.Abs(mmDepth.maxVal - mmDepth.minVal) > 0 Then
+                myPlot.minRange = mmDepth.minVal
+                myPlot.maxRange = mmDepth.maxVal
+                myPlot.Run(split(2))
+
+                Dim brickIndex = task.gridMap.Get(Of Integer)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
+                task.drawRect = task.gridRects(brickIndex)
+
+                dst3 = myPlot.dst2
+                labels(3) = "Depth values vary from " + Format(myPlot.minRange, fmt3) +
+                                    " to " + Format(myPlot.maxRange, fmt3)
+            End If
+        End If
     End Sub
 End Class

@@ -1,7 +1,7 @@
 ﻿Imports VBClasses
 Imports cv = OpenCvSharp
 Public Class PlotMouse_Basics : Inherits TaskParent
-    Public plotHist As New PlotBars_Basics
+    Public plotHist As New PlotBar_Basics
     Public histogram As New cv.Mat
     Public mask As New cv.Mat
     Public Sub New()
@@ -28,10 +28,11 @@ Public Class PlotMouse_Basics : Inherits TaskParent
         cv.Cv2.CalcBackProject({src}, {0}, histogram, mask, bpRanges)
         mask.ConvertTo(mask, cv.MatType.CV_8U)
 
-        dst3.SetTo(task.highlight, mask)
+        If mask.Size = dst3.Size Then dst3.SetTo(task.highlight, mask)
         labels(3) = "BackProjected pixel (% of image) = " + Format(mask.CountNonZero / src.Total, "0%")
 
         labels(2) = "Histogram Depth to " + Format(task.MaxZmeters, "0.0") + " m"
+        dst2.Rectangle(New cv.Rect(CInt(histIndex) * barWidth, 0, barWidth, dst2.Height), cv.Scalar.Yellow, task.lineWidth)
     End Sub
 End Class
 
@@ -39,7 +40,7 @@ End Class
 
 
 Public Class PlotMouse_Basics32F : Inherits TaskParent
-    Public plotHist As New PlotBars_Basics
+    Public plotHist As New PlotBar_Basics
     Public histogram As New cv.Mat
     Dim ranges() As cv.Rangef
     Public mask As New cv.Mat
@@ -67,6 +68,7 @@ Public Class PlotMouse_Basics32F : Inherits TaskParent
             dst2.Line(New cv.Point(stepsize * i, 0), New cv.Point(stepsize * i, dst2.Height), white, task.cvFontThickness)
         Next
 
+
         Dim barWidth = dst2.Width / task.histogramBins
         Dim histIndex = Math.Floor(task.mouseMovePoint.X / barWidth)
 
@@ -76,10 +78,12 @@ Public Class PlotMouse_Basics32F : Inherits TaskParent
         cv.Cv2.CalcBackProject({src}, {0}, histogram, mask, bpRanges)
         mask.ConvertTo(mask, cv.MatType.CV_8U)
 
-        dst3.SetTo(task.highlight, mask)
-        labels(3) = "BackProjected pixel (% of image) = " + Format(mask.CountNonZero / src.Total, "0%")
+        Dim maskCount = mask.CountNonZero
+        If mask.Size = dst3.Size Then dst3.SetTo(task.highlight, mask)
+        labels(3) = "BackProjected pixel (% of image) = " + Format(maskCount / src.Total, "0%")
 
         labels(2) = "Histogram Depth to " + Format(task.MaxZmeters, "0.0") + " m"
+        dst2.Rectangle(New cv.Rect(CInt(histIndex) * barWidth, 0, barWidth, dst2.Height), cv.Scalar.Yellow, task.lineWidth)
     End Sub
 End Class
 
@@ -87,7 +91,7 @@ End Class
 
 
 Public Class PlotMouse_Correlation : Inherits TaskParent
-    Public plotHist As New PlotBars_Basics
+    Public plotHist As New PlotBar_Basics
     Dim corr As New Correlation_BasicsPlot
     Public Sub New()
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
@@ -122,8 +126,8 @@ Public Class PlotMouse_Correlation : Inherits TaskParent
         labels(3) = plotHist.labels(2)
 
         Dim totalPixels = dst2.Total ' assume we are including zeros.
-        Dim colWidth = dst2.Width / task.histogramBins
-        Dim histIndex = Math.Floor(task.mouseMovePoint.X / colWidth)
+        Dim barWidth = dst2.Width / task.histogramBins
+        Dim histIndex = Math.Floor(task.mouseMovePoint.X / barWidth)
         dst0 = dst1.InRange(histIndex, histIndex)
         If ranges(histIndex) IsNot Nothing Then
             labels(2) = "For bin " + CStr(histIndex) + " " + Format(ranges(histIndex).Average, fmt1) +
@@ -134,7 +138,7 @@ Public Class PlotMouse_Correlation : Inherits TaskParent
         Dim actualCount = dst0.CountNonZero
         dst3 = task.color.Clone
         dst3.SetTo(cv.Scalar.Yellow, dst0)
-        dst2.Rectangle(New cv.Rect(CInt(histIndex) * colWidth, 0, colWidth, dst2.Height), cv.Scalar.Yellow, task.lineWidth)
+        dst2.Rectangle(New cv.Rect(CInt(histIndex) * barWidth, 0, barWidth, dst2.Height), cv.Scalar.Yellow, task.lineWidth)
     End Sub
 End Class
 
@@ -212,7 +216,7 @@ Public Class PlotMouse_StableGray : Inherits TaskParent
         desc = "Plot the stable grayscale image."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If task.gOptions.StabilizeRGB.Checked Then
+        If task.gOptions.stabilizeDepthRGB.Checked Then
             dst0 = task.stabilizeGray.dst2
             labels(0) = task.stabilizeGray.labels(2)
         Else

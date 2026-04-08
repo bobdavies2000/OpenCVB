@@ -361,7 +361,7 @@ End Class
 
 Public Class Cloud_SurfaceH : Inherits TaskParent
     Public heat As New HeatMap_Basics
-    Public plot As New PlotBars_Basics
+    Public plot As New PlotBar_Basics
     Public topRow As Integer
     Public botRow As Integer
     Public peakRow As Integer
@@ -825,13 +825,13 @@ Public Class Cloud_Gravity_TA : Inherits TaskParent
             task.maxDepthMask = New cv.Mat(task.pcSplit(2).Size, cv.MatType.CV_8U, 0)
         End If
 
-        If task.gOptions.TruncateDepth.Checked Then
-            task.pcSplit(2) = task.pcSplit(2).Threshold(task.MaxZmeters,
-                                                              task.MaxZmeters, cv.ThresholdTypes.Trunc)
-            task.maxDepthMask = task.pcSplit(2).InRange(task.MaxZmeters,
-                                                              task.MaxZmeters).ConvertScaleAbs()
-            cv.Cv2.Merge(task.pcSplit, task.pointCloud)
-        End If
+        'If task.gOptions.TruncateDepth.Checked Then
+        '    task.pcSplit(2) = task.pcSplit(2).Threshold(task.MaxZmeters,
+        '                                                      task.MaxZmeters, cv.ThresholdTypes.Trunc)
+        '    task.maxDepthMask = task.pcSplit(2).InRange(task.MaxZmeters,
+        '                                                      task.MaxZmeters).ConvertScaleAbs()
+        '    cv.Cv2.Merge(task.pcSplit, task.pointCloud)
+        'End If
 
         task.depthmask = task.pcSplit(2).Threshold(0, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs
         task.noDepthMask = Not task.depthmask

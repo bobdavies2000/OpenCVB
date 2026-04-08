@@ -19,7 +19,7 @@ Public Class RedCloud_Basics : Inherits TaskParent
     Public options As New Options_RedCloud
     Public keyColors As New KeyColor_Reduction
     Public Sub New()
-        task.gOptions.stabilizeDepth.Checked = True
+        task.gOptions.stabilizeDepthRGB.Checked = True
         desc = "Build contours for each cell"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -214,7 +214,7 @@ End Class
 
 
 Public Class NR_RedCloud_CellDepthHistogram : Inherits TaskParent
-    Dim plot As New PlotBars_Basics
+    Dim plot As New PlotBar_Basics
     Dim redC As New RedCloud_Basics
     Public Sub New()
         task.gOptions.setHistogramBins(100)

@@ -324,7 +324,7 @@ Imports VBClasses
 
 
     Public Class GL_PlotHist : Inherits TaskParent
-        Dim plotHist As New PlotBars_Basics
+        Dim plotHist As New PlotBar_Basics
         Dim displayPC As New GL_DisplayPC
         Public Sub New()
             task.gOptions.MaxDepthBar.Value = 10
@@ -364,7 +364,7 @@ Imports VBClasses
         Dim displayPC As New GL_DisplayPC
         Public Sub New()
             dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_32F, 0)
-            labels(3) = "The values returned by ReadPointCloud range from 0 to 1 and should have the same profile as PlotBars_Basics."
+            labels(3) = "The values returned by ReadPointCloud range from 0 to 1 and should have the same profile as PlotBar_Basics."
             desc = "Read the point cloud from a rendered geometry"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)

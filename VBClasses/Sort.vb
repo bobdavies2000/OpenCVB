@@ -272,7 +272,7 @@ Imports VBClasses
 
 
     Public Class NR_Sort_GrayScale : Inherits TaskParent
-        Dim plot As New PlotBars_Basics
+        Dim plot As New PlotBar_Basics
         Dim pixels(2)() As Byte
         Public Sub New()
             desc = "Sort the grayscale image but keep the 8uc3 pixels with each gray entry."

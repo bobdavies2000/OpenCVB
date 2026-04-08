@@ -209,65 +209,65 @@ Imports VBClasses
 
     Public Class Motion_CorrelationToLast : Inherits TaskParent
         Public cList As New List(Of Single)
-        Public plotHist As New PlotBars_Basics
-        Public lastFrame As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-        Public Sub New()
-            If standalone Then task.gOptions.displayDst1.Checked = True
-            plotHist.createHistogram = True
-            plotHist.minRange = -1.01
-            plotHist.maxRange = 1.01
-            plotHist.shadeValues = False
-            task.gOptions.HistBinBar.Value = task.gOptions.HistBinBar.Maximum
-            desc = "Measure the correlation of grid elements that appear to have changed."
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            If src.Channels <> 1 Then src = task.gray.Clone
+    Public plotHist As New PlotBar_Basics
+    Public lastFrame As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+    Public Sub New()
+        If standalone Then task.gOptions.displayDst1.Checked = True
+        plotHist.createHistogram = True
+        plotHist.minRange = -1.01
+        plotHist.maxRange = 1.01
+        plotHist.shadeValues = False
+        task.gOptions.HistBinBar.Value = task.gOptions.HistBinBar.Maximum
+        desc = "Measure the correlation of grid elements that appear to have changed."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        If src.Channels <> 1 Then src = task.gray.Clone
 
-            If task.optionsChanged Then lastFrame = src.Clone
+        If task.optionsChanged Then lastFrame = src.Clone
 
-            dst2 = src
-            Dim maxCorrelation As Single = task.fOptions.MatchCorrSlider.Value / 100
+        dst2 = src
+        Dim maxCorrelation As Single = task.fOptions.MatchCorrSlider.Value / 100
 
-            Dim count As Integer
-            Dim correlationMat As New cv.Mat
-            dst3 = src.Clone
-            cList.Clear()
-            For Each index In task.motion.motionSort
-                Dim r = task.gridRects(index)
-                cv.Cv2.MatchTemplate(dst2(r), lastFrame(r), correlationMat, cv.TemplateMatchModes.CCoeffNormed)
+        Dim count As Integer
+        Dim correlationMat As New cv.Mat
+        dst3 = src.Clone
+        cList.Clear()
+        For Each index In task.motion.motionSort
+            Dim r = task.gridRects(index)
+            cv.Cv2.MatchTemplate(dst2(r), lastFrame(r), correlationMat, cv.TemplateMatchModes.CCoeffNormed)
 
-                Dim corr = correlationMat.Get(Of Single)(0, 0)
-                cList.Add(corr)
+            Dim corr = correlationMat.Get(Of Single)(0, 0)
+            cList.Add(corr)
 
-                If corr < maxCorrelation Then
-                    dst3.Rectangle(r, white, task.lineWidth)
-                    count += 1
-                Else
-                    dst3.Rectangle(r, black, task.lineWidth)
-                End If
-            Next
+            If corr < maxCorrelation Then
+                dst3.Rectangle(r, white, task.lineWidth)
+                count += 1
+            Else
+                dst3.Rectangle(r, black, task.lineWidth)
+            End If
+        Next
 
-            lastFrame = src.Clone
+        lastFrame = src.Clone
 
-            If cList.Count > 0 Then
-                plotHist.Run(cv.Mat.FromPixelData(cList.Count, 1, cv.MatType.CV_32F, cList.ToArray))
-                dst1 = plotHist.dst2
+        If cList.Count > 0 Then
+            plotHist.Run(cv.Mat.FromPixelData(cList.Count, 1, cv.MatType.CV_32F, cList.ToArray))
+            dst1 = plotHist.dst2
 
-                labels(2) = "Min = " + Format(cList.Min, fmt1) + ", Max = " + Format(cList.Max, fmt1)
-                labels(3) = CStr(count) + " had a correlation < " + Format(maxCorrelation, fmt2) + " (" +
+            labels(2) = "Min = " + Format(cList.Min, fmt1) + ", Max = " + Format(cList.Max, fmt1)
+            labels(3) = CStr(count) + " had a correlation < " + Format(maxCorrelation, fmt2) + " (" +
                             Format(count / cList.Count, "0%") + ")" +
                             " The black squares have high correlation."
-            End If
-        End Sub
-    End Class
+        End If
+    End Sub
+End Class
 
 
 
 
-    Public Class Motion_Correlation : Inherits TaskParent
-        Public cList As New List(Of Single)
-        Public plotHist As New PlotBars_Basics
-        Public lastFrame As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+Public Class Motion_Correlation : Inherits TaskParent
+    Public cList As New List(Of Single)
+    Public plotHist As New PlotBar_Basics
+    Public lastFrame As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         Public Sub New()
             If standalone Then task.gOptions.displayDst1.Checked = True
             plotHist.createHistogram = True

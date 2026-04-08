@@ -133,7 +133,7 @@ Imports VBClasses
 
 
     Public Class NR_RedCC_CellHistogram : Inherits TaskParent
-        Dim plot As New PlotBars_Basics
+        Dim plot As New PlotBar_Basics
         Dim redCC As New RedCC_Basics
         Public Sub New()
             task.gOptions.setHistogramBins(100)
