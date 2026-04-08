@@ -1,662 +1,659 @@
-﻿Imports Newtonsoft.Json.Linq
-Imports OpenCvSharp
-Imports cv = OpenCvSharp
-Imports VBClasses
-    Public Module Structures
-        Public Enum pointStyle
-            unFiltered = 0
-            filtered = 1
-            flattened = 2
-            flattenedAndFiltered = 3
-        End Enum
+﻿Imports cv = OpenCvSharp
+Public Module Structures
+    Public Enum pointStyle
+        unFiltered = 0
+        filtered = 1
+        flattened = 2
+        flattenedAndFiltered = 3
+    End Enum
 
 
 
 
-        Public Structure mmData
-            Dim minVal As Double
-            Dim maxVal As Double
-            Dim minLoc As cv.Point
-            Dim maxLoc As cv.Point
-            Dim range As Double
-        End Structure
+    Public Structure mmData
+        Dim minVal As Double
+        Dim maxVal As Double
+        Dim minLoc As cv.Point
+        Dim maxLoc As cv.Point
+        Dim range As Double
+    End Structure
 
 
 
 
 
-        Public Class tCell
-            Public template As cv.Mat
-            Public searchRect As cv.Rect
-            Public rect As cv.Rect
-            Public center As cv.Point2f
-            Public correlation As Single
-            Public depth As Single
-            Public strOut As String
-            Public Sub New()
-                strOut = ""
-            End Sub
-        End Class
+    Public Class tCell
+        Public template As cv.Mat
+        Public searchRect As cv.Rect
+        Public rect As cv.Rect
+        Public center As cv.Point2f
+        Public correlation As Single
+        Public depth As Single
+        Public strOut As String
+        Public Sub New()
+            strOut = ""
+        End Sub
+    End Class
 
 
 
 
 
-        Public Class gravityLine
-            Public pt1 As cv.Point3f
-            Public pt2 As cv.Point3f
-            Public len3D As Single
-            Public imageAngle As Single
-            Public arcX As Single
-            Public arcY As Single
-            Public arcZ As Single
-            Public tc1 As tCell
-            Public tc2 As tCell
-            Public Sub New()
-                tc1 = New tCell
-                tc2 = New tCell
-            End Sub
-        End Class
+    Public Class gravityLine
+        Public pt1 As cv.Point3f
+        Public pt2 As cv.Point3f
+        Public len3D As Single
+        Public imageAngle As Single
+        Public arcX As Single
+        Public arcY As Single
+        Public arcZ As Single
+        Public tc1 As tCell
+        Public tc2 As tCell
+        Public Sub New()
+            tc1 = New tCell
+            tc2 = New tCell
+        End Sub
+    End Class
 
 
 
 
 
-        Public Structure DNAentry
-            Dim color As Byte
-            Dim pt As cv.Point
-            Dim size As Single
-            Dim rotation As Single
-            Dim brushNumber As Integer
-        End Structure
+    Public Structure DNAentry
+        Dim color As Byte
+        Dim pt As cv.Point
+        Dim size As Single
+        Dim rotation As Single
+        Dim brushNumber As Integer
+    End Structure
 
 
 
 
 
 
-        Public Structure coinPoints
-            Dim p1 As cv.Point
-            Dim p2 As cv.Point
-            Dim p3 As cv.Point
-            Dim p4 As cv.Point
-        End Structure
+    Public Structure coinPoints
+        Dim p1 As cv.Point
+        Dim p2 As cv.Point
+        Dim p3 As cv.Point
+        Dim p4 As cv.Point
+    End Structure
 
 
 
 
 
 
-        Public Structure matchRect
-            Dim p1 As cv.Point
-            Dim p2 As cv.Point
-            Dim p1Correlation As Single
-            Dim p2Correlation As Single
-        End Structure
+    Public Structure matchRect
+        Dim p1 As cv.Point
+        Dim p2 As cv.Point
+        Dim p1Correlation As Single
+        Dim p2Correlation As Single
+    End Structure
 
 
 
 
-        Public Structure mlData
-            Dim row As Single
-            Dim col As Single
-            Dim red As Single
-            Dim green As Single
-            Dim blue As Single
-        End Structure
-
-
-
-
-
-
-        Public Class roiData
-            Public depth As Single
-            Public color As cv.Vec3b
-        End Class
+    Public Structure mlData
+        Dim row As Single
+        Dim col As Single
+        Dim red As Single
+        Dim green As Single
+        Dim blue As Single
+    End Structure
+
+
+
+
+
 
+    Public Class roiData
+        Public depth As Single
+        Public color As cv.Vec3b
+    End Class
 
 
 
 
-        Public Class fPolyData
-            Public prevPoly As New List(Of cv.Point2f)
-            Public lengthPrevious As New List(Of Single)
-            Public polyPrevSideIndex As Integer
 
-            Public rotateCenter As cv.Point2f
-            Public rotateAngle As Single
-            Public centerShift As cv.Point2f
-            Public currPoly As New List(Of cv.Point2f)
-            Public currLength As New List(Of Single)
-            Dim jitterCheck As cv.Mat
-            Dim lastJitterPixels As Integer
-            Public featureLineChanged As Boolean
-            Sub New()
-                prevPoly = New List(Of cv.Point2f)
-                currPoly = New List(Of cv.Point2f)
-                polyPrevSideIndex = 0
-            End Sub
-            Sub New(_currPoly As List(Of cv.Point2f))
-                prevPoly = New List(Of cv.Point2f)(_currPoly)
-                currPoly = New List(Of cv.Point2f)(_currPoly)
-                polyPrevSideIndex = 0
-            End Sub
-            Public Function computeCurrLengths() As Single
-                currLength = New List(Of Single)
-                Dim polymp = currmp()
-                Dim d = polymp.p1.DistanceTo(polymp.p2)
-                For i = 0 To currPoly.Count - 1
-                    d = currPoly(i).DistanceTo(currPoly((i + 1) Mod task.polyCount))
-                    currLength.Add(d)
-                Next
-                If lengthPrevious Is Nothing Then lengthPrevious = New List(Of Single)(currLength)
-                Return d
-            End Function
-            Public Function computeFLineLength() As Single
-                Return Math.Abs(currLength(polyPrevSideIndex) - lengthPrevious(polyPrevSideIndex))
-            End Function
-            Public Sub resync()
-                lengthPrevious = New List(Of Single)(currLength)
-                polyPrevSideIndex = lengthPrevious.IndexOf(lengthPrevious.Max)
-                prevPoly = New List(Of cv.Point2f)(currPoly)
-                jitterCheck.SetTo(0)
-            End Sub
-            Public Function prevmp() As lpData
-                Return New lpData(prevPoly(polyPrevSideIndex), prevPoly((polyPrevSideIndex + 1) Mod task.polyCount))
-            End Function
-            Public Function currmp() As lpData
-                If polyPrevSideIndex >= currPoly.Count - 1 Then polyPrevSideIndex = 0
-                Return New lpData(currPoly(polyPrevSideIndex), currPoly((polyPrevSideIndex + 1) Mod task.polyCount))
-            End Function
-            Public Sub jitterTest(dst As cv.Mat, parent As Object) ' return true if there is nothing to change
-                If jitterCheck Is Nothing Then jitterCheck = New cv.Mat(dst.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
-                Dim polymp = currmp()
-                parent.DrawLine(jitterCheck, polymp.p1, polymp.p2, 255, task.lineWidth)
-                Dim jitterPixels = jitterCheck.CountNonZero
-                If jitterPixels = lastJitterPixels Then featureLineChanged = True Else featureLineChanged = False
-                lastJitterPixels = jitterPixels
-            End Sub
-        End Class
+    Public Class fPolyData
+        Public prevPoly As New List(Of cv.Point2f)
+        Public lengthPrevious As New List(Of Single)
+        Public polyPrevSideIndex As Integer
 
+        Public rotateCenter As cv.Point2f
+        Public rotateAngle As Single
+        Public centerShift As cv.Point2f
+        Public currPoly As New List(Of cv.Point2f)
+        Public currLength As New List(Of Single)
+        Dim jitterCheck As cv.Mat
+        Dim lastJitterPixels As Integer
+        Public featureLineChanged As Boolean
+        Sub New()
+            prevPoly = New List(Of cv.Point2f)
+            currPoly = New List(Of cv.Point2f)
+            polyPrevSideIndex = 0
+        End Sub
+        Sub New(_currPoly As List(Of cv.Point2f))
+            prevPoly = New List(Of cv.Point2f)(_currPoly)
+            currPoly = New List(Of cv.Point2f)(_currPoly)
+            polyPrevSideIndex = 0
+        End Sub
+        Public Function computeCurrLengths() As Single
+            currLength = New List(Of Single)
+            Dim polymp = currmp()
+            Dim d = polymp.p1.DistanceTo(polymp.p2)
+            For i = 0 To currPoly.Count - 1
+                d = currPoly(i).DistanceTo(currPoly((i + 1) Mod task.polyCount))
+                currLength.Add(d)
+            Next
+            If lengthPrevious Is Nothing Then lengthPrevious = New List(Of Single)(currLength)
+            Return d
+        End Function
+        Public Function computeFLineLength() As Single
+            Return Math.Abs(currLength(polyPrevSideIndex) - lengthPrevious(polyPrevSideIndex))
+        End Function
+        Public Sub resync()
+            lengthPrevious = New List(Of Single)(currLength)
+            polyPrevSideIndex = lengthPrevious.IndexOf(lengthPrevious.Max)
+            prevPoly = New List(Of cv.Point2f)(currPoly)
+            jitterCheck.SetTo(0)
+        End Sub
+        Public Function prevmp() As lpData
+            Return New lpData(prevPoly(polyPrevSideIndex), prevPoly((polyPrevSideIndex + 1) Mod task.polyCount))
+        End Function
+        Public Function currmp() As lpData
+            If polyPrevSideIndex >= currPoly.Count - 1 Then polyPrevSideIndex = 0
+            Return New lpData(currPoly(polyPrevSideIndex), currPoly((polyPrevSideIndex + 1) Mod task.polyCount))
+        End Function
+        Public Sub jitterTest(dst As cv.Mat, parent As Object) ' return true if there is nothing to change
+            If jitterCheck Is Nothing Then jitterCheck = New cv.Mat(dst.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
+            Dim polymp = currmp()
+            parent.DrawLine(jitterCheck, polymp.p1, polymp.p2, 255, task.lineWidth)
+            Dim jitterPixels = jitterCheck.CountNonZero
+            If jitterPixels = lastJitterPixels Then featureLineChanged = True Else featureLineChanged = False
+            lastJitterPixels = jitterPixels
+        End Sub
+    End Class
 
 
 
 
 
-        Public Class triangleData
-            Public color As cv.Point3f
-            Public facets(3) As cv.Point3f
-        End Class
 
+    Public Class triangleData
+        Public color As cv.Point3f
+        Public facets(3) As cv.Point3f
+    End Class
 
 
 
 
-        Public Class rangeData
-            Public index As Integer
-            Public pixels As Integer
-            Public start As Integer
-            Public ending As Integer
-            Public Sub New(_index As Integer, _start As Integer, _ending As Integer, _pixels As Integer)
-                index = _index
-                pixels = _pixels
-                start = _start
-                ending = _ending
-            End Sub
-        End Class
 
+    Public Class rangeData
+        Public index As Integer
+        Public pixels As Integer
+        Public start As Integer
+        Public ending As Integer
+        Public Sub New(_index As Integer, _start As Integer, _ending As Integer, _pixels As Integer)
+            index = _index
+            pixels = _pixels
+            start = _start
+            ending = _ending
+        End Sub
+    End Class
 
 
 
 
 
 
-        Public Enum gifTypes
-            gifdst0 = 0
-            gifdst1 = 1
-            gifdst2 = 2
-            gifdst3 = 3
-            openCVBwindow = 4
-            openGLwindow = 5
-            EntireScreen = 6
-        End Enum
 
+    Public Enum gifTypes
+        gifdst0 = 0
+        gifdst1 = 1
+        gifdst2 = 2
+        gifdst3 = 3
+        openCVBwindow = 4
+        openGLwindow = 5
+        EntireScreen = 6
+    End Enum
 
-
-
-
 
 
-        Public Class fpData ' feature point -  excessive - trim this to fcsData...
-            Public index As Integer
-            Public age As Integer = 1
-            Public ID As Single
-            Public travelDistance As Single
-            Public periph As Boolean
-            Public facets As List(Of cv.Point)
-            Public pt As cv.Point
-            Public ptLast As cv.Point
-            Public ptHistory As List(Of cv.Point)
-            Public depth As Single
-            Public brickIndex As Integer
-            Sub New()
-                facets = New List(Of cv.Point)
-                ptHistory = New List(Of cv.Point)
-            End Sub
-        End Class
-
-
-
-
-
-
-
-
-        Public Class brickData
-            Public age As Integer = 1
-            Public center As cv.Point ' center of the gRect
-            Public color As cv.Scalar
-            Public colorClass As Integer
-            Public corners As New List(Of cv.Point3f)
-            Public correlation As Single
-            Public depth As Single
-            Public index As Integer
-
-            Public lRect As New cv.Rect ' Intel RealSense camera use this. They don't align left and color automatically.
-            Public rRect As New cv.Rect ' The rect in the right image matching the left image rect.
-
-            Public mm As mmData ' min and max values of the grayscale data.
-            Public mmDepth As mmData ' min and max values of the depth data.
-
-            Public rect As cv.Rect ' rectange under the cursor in the color image.
-            Public Function displayCell() As String
-                Dim strOut = "rcList index = " + CStr(index) + vbCrLf
-                strOut += "Age = " + CStr(age) + vbCrLf
-                strOut += "Rect: X = " + CStr(rect.X) + ", Y = " + CStr(rect.Y) + ", "
-                strOut += ", width = " + CStr(rect.Width) + ", height = " + CStr(rect.Height) + vbCrLf
-                strOut += "Depth = " + Format(depth, fmt1) + vbCrLf
-                strOut += "Correlation = " + Format(correlation, fmt1) + vbCrLf
-                Return strOut
-            End Function
-            Sub New()
-            End Sub
-        End Class
 
-
-
 
-        Public Class maskData
-            Public rect As cv.Rect
-            Public mask As cv.Mat
-            Public contour As New List(Of cv.Point)
-            Public index As Integer
-            Public maxDist As cv.Point
-            Public pixels As Integer
-            Public depthMean As Single
-            Public mm As mmData
-            Public Sub New()
-                mask = New cv.Mat(1, 1, cv.MatType.CV_8U)
-                rect = New cv.Rect(0, 0, 1, 1)
-            End Sub
-        End Class
-
-
-
-
-        Public Class contourData
-            Public age As Integer
-            Public depth As Single
-            Public hull As List(Of cv.Point)
-            Public ID As Integer
-            Public mask As cv.Mat
-            Public maxDist As cv.Point
-            Public mm As mmData
-            Public pixels As Integer
-            Public points As New List(Of cv.Point)
-            Public rect As New cv.Rect(0, 0, 1, 1)
-            Public Function buildRect(tour As cv.Point()) As cv.Rect
-                Dim minX As Single = tour.Min(Function(p) p.X)
-                Dim maxX As Single = tour.Max(Function(p) p.X)
-                Dim minY As Single = tour.Min(Function(p) p.Y)
-                Dim maxY As Single = tour.Max(Function(p) p.Y)
-                Return ValidateRect(New cv.Rect(minX, minY, maxX - minX, maxY - minY))
-            End Function
-            Public Sub New()
-            End Sub
-        End Class
-
-
-
-
-        Public Class keyData
-            Public mask As cv.Mat
-            Public maxDist As cv.Point
-            Public rect As New cv.Rect(0, 0, 1, 1)
-            Public index As Integer
-            Public pixels As Integer
-            Public contour As List(Of cv.Point)
-            Public Function buildRect(tour As cv.Point()) As cv.Rect
-                Dim minX As Single = tour.Min(Function(p) p.X)
-                Dim maxX As Single = tour.Max(Function(p) p.X)
-                Dim minY As Single = tour.Min(Function(p) p.Y)
-                Dim maxY As Single = tour.Max(Function(p) p.Y)
-                Return ValidateRect(New cv.Rect(minX, minY, maxX - minX, maxY - minY))
-            End Function
-            Public Function GetMaxDistContour(ByRef contour As keyData) As cv.Point
-                Dim mask = contour.mask.Clone
-                mask.Rectangle(New cv.Rect(0, 0, mask.Width, mask.Height), 0, 1)
-                Dim distance32f = mask.DistanceTransform(cv.DistanceTypes.L1, 0)
-                Dim mm As mmData = GetMinMax(distance32f)
-                mm.maxLoc.X += contour.rect.X
-                mm.maxLoc.Y += contour.rect.Y
-                Return mm.maxLoc
-            End Function
-            Public Sub New()
-            End Sub
-        End Class
-
-
-
-
-
-        Public Class lpData
-            Public age As Integer = 1
-            Public angle As Single ' varies from -90 to 90 degrees
-
-            Public color As cv.Scalar
-
-            Public depth1 As Single ' this value may not be pVec1(2) which is preferred.  See Line3D_Basics.getDepth.
-            Public depth2 As Single ' this value may not be pVec2(2) which is preferred.  See Line3D_Basics.getDepth.
-            Public mmDepth As mmData
-
-            Public index As Integer
-            Public trackID As Integer
-            Public indexVTop As Integer = -1
-            Public indexVBot As Integer = -1
-            Public indexHLeft As Integer = -1
-            Public indexHRight As Integer = -1
-
-            Public length As Single
-
-            Public p1 As cv.Point2f
-            Public p2 As cv.Point2f
-
-            Public p1GridIndex As Integer
-            Public p2GridIndex As Integer
-
-            Public pVec1 As cv.Vec3f
-            Public pVec2 As cv.Vec3f
-            Public pE1 As cv.Point2f ' end points - goes to the edge of the image.
-            Public pE2 As cv.Point2f ' end points - goes to the edge of the image.
-            Public ptCenter As cv.Point2f
-
-            Public rect As cv.Rect
-            Public slope As Single
-            Public Const maxSlope As Integer = 100000
-            Public Function perpendicularPoints(pt As cv.Point2f) As lpData
-                Dim perpSlope = -1 / slope
-                Dim angleRadians As Double = Math.Atan(perpSlope)
-                Dim xShift = task.brickEdgeLen * Math.Cos(angleRadians)
-                Dim yShift = task.brickEdgeLen * Math.Sin(angleRadians)
-                Dim p1 = New cv.Point(pt.X + xShift, pt.Y + yShift)
-                Dim p2 = New cv.Point(pt.X - xShift, pt.Y - yShift)
-                If p1.X < 0 Then p1.X = 0
-                If p1.X >= task.color.Width Then p1.X = task.color.Width - 1
-                If p1.Y < 0 Then p1.Y = 0
-                If p1.Y >= task.color.Height Then p1.Y = task.color.Height - 1
-                If p2.X < 0 Then p2.X = 0
-                If p2.X >= task.color.Width Then p2.X = task.color.Width - 1
-                If p2.Y < 0 Then p2.Y = 0
-                If p2.Y >= task.color.Height Then p2.Y = task.color.Height - 1
-                Return New lpData(p1, p2)
-            End Function
-            Public Sub computeAngleDegrees()
-                If p2.X = p1.X Then
-                    angle = 90
-                    Exit Sub
-                End If
-
-                Dim angleRadians As Double = Math.Atan2((p2.Y - p1.Y), (p2.X - p1.X))
-                angle = CType(angleRadians * (180.0 / Math.PI), Single)
-                If angle >= 90.0 Then angle -= 180.0
-                If angle < -90.0 Then angle += 180.0
-            End Sub
-            Public Shared Function validatePoint(pt As cv.Point2f) As cv.Point2f
-                If CInt(pt.X) < 0 Then pt.X = 0
-                If CInt(pt.X) >= task.color.Width Then pt.X = task.color.Width - 1
-                If CInt(pt.Y) < 0 Then pt.Y = 0
-                If CInt(pt.Y) >= task.color.Height Then pt.Y = task.color.Height - 1
-
-                Return pt
-            End Function
-            Sub New(_p1 As cv.Point2f, _p2 As cv.Point2f)
-                p1 = validatePoint(_p1)
-                p2 = validatePoint(_p2)
-
-                ' trying a simple convention: p1 is leftmost point
-                If p1.X > p2.X Then
-                    Dim ptTemp = p1
-                    p1 = p2
-                    p2 = ptTemp
-                End If
-
-                If p1.X = p2.X Then
-                    slope = (p1.Y - p2.Y) / (p1.X + 0.001 - p2.X)
+
+
+    Public Class fpData ' feature point -  excessive - trim this to fcsData...
+        Public index As Integer
+        Public age As Integer = 1
+        Public ID As Single
+        Public travelDistance As Single
+        Public periph As Boolean
+        Public facets As List(Of cv.Point)
+        Public pt As cv.Point
+        Public ptLast As cv.Point
+        Public ptHistory As List(Of cv.Point)
+        Public depth As Single
+        Public brickIndex As Integer
+        Sub New()
+            facets = New List(Of cv.Point)
+            ptHistory = New List(Of cv.Point)
+        End Sub
+    End Class
+
+
+
+
+
+
+
+
+    Public Class brickData
+        Public age As Integer = 1
+        Public center As cv.Point ' center of the gRect
+        Public color As cv.Scalar
+        Public colorClass As Integer
+        Public corners As New List(Of cv.Point3f)
+        Public correlation As Single
+        Public depth As Single
+        Public index As Integer
+
+        Public lRect As New cv.Rect ' Intel RealSense camera use this. They don't align left and color automatically.
+        Public rRect As New cv.Rect ' The rect in the right image matching the left image rect.
+
+        Public mm As mmData ' min and max values of the grayscale data.
+        Public mmDepth As mmData ' min and max values of the depth data.
+
+        Public rect As cv.Rect ' rectange under the cursor in the color image.
+        Public Function displayCell() As String
+            Dim strOut = "rcList index = " + CStr(index) + vbCrLf
+            strOut += "Age = " + CStr(age) + vbCrLf
+            strOut += "Rect: X = " + CStr(rect.X) + ", Y = " + CStr(rect.Y) + ", "
+            strOut += ", width = " + CStr(rect.Width) + ", height = " + CStr(rect.Height) + vbCrLf
+            strOut += "Depth = " + Format(depth, fmt1) + vbCrLf
+            strOut += "Correlation = " + Format(correlation, fmt1) + vbCrLf
+            Return strOut
+        End Function
+        Sub New()
+        End Sub
+    End Class
+
+
+
+
+    Public Class maskData
+        Public rect As cv.Rect
+        Public mask As cv.Mat
+        Public contour As New List(Of cv.Point)
+        Public index As Integer
+        Public maxDist As cv.Point
+        Public pixels As Integer
+        Public depthMean As Single
+        Public mm As mmData
+        Public Sub New()
+            mask = New cv.Mat(1, 1, cv.MatType.CV_8U)
+            rect = New cv.Rect(0, 0, 1, 1)
+        End Sub
+    End Class
+
+
+
+
+    Public Class contourData
+        Public age As Integer
+        Public depth As Single
+        Public hull As List(Of cv.Point)
+        Public ID As Integer
+        Public mask As cv.Mat
+        Public maxDist As cv.Point
+        Public mm As mmData
+        Public pixels As Integer
+        Public points As New List(Of cv.Point)
+        Public rect As New cv.Rect(0, 0, 1, 1)
+        Public Function buildRect(tour As cv.Point()) As cv.Rect
+            Dim minX As Single = tour.Min(Function(p) p.X)
+            Dim maxX As Single = tour.Max(Function(p) p.X)
+            Dim minY As Single = tour.Min(Function(p) p.Y)
+            Dim maxY As Single = tour.Max(Function(p) p.Y)
+            Return ValidateRect(New cv.Rect(minX, minY, maxX - minX, maxY - minY))
+        End Function
+        Public Sub New()
+        End Sub
+    End Class
+
+
+
+
+    Public Class keyData
+        Public mask As cv.Mat
+        Public maxDist As cv.Point
+        Public rect As New cv.Rect(0, 0, 1, 1)
+        Public index As Integer
+        Public pixels As Integer
+        Public contour As List(Of cv.Point)
+        Public Function buildRect(tour As cv.Point()) As cv.Rect
+            Dim minX As Single = tour.Min(Function(p) p.X)
+            Dim maxX As Single = tour.Max(Function(p) p.X)
+            Dim minY As Single = tour.Min(Function(p) p.Y)
+            Dim maxY As Single = tour.Max(Function(p) p.Y)
+            Return ValidateRect(New cv.Rect(minX, minY, maxX - minX, maxY - minY))
+        End Function
+        Public Function GetMaxDistContour(ByRef contour As keyData) As cv.Point
+            Dim mask = contour.mask.Clone
+            mask.Rectangle(New cv.Rect(0, 0, mask.Width, mask.Height), 0, 1)
+            Dim distance32f = mask.DistanceTransform(cv.DistanceTypes.L1, 0)
+            Dim mm As mmData = GetMinMax(distance32f)
+            mm.maxLoc.X += contour.rect.X
+            mm.maxLoc.Y += contour.rect.Y
+            Return mm.maxLoc
+        End Function
+        Public Sub New()
+        End Sub
+    End Class
+
+
+
+
+
+    Public Class lpData
+        Public age As Integer = 1
+        Public angle As Single ' varies from -90 to 90 degrees
+
+        Public color As cv.Scalar
+
+        Public depth1 As Single ' this value may not be pVec1(2) which is preferred.  See Line3D_Basics.getDepth.
+        Public depth2 As Single ' this value may not be pVec2(2) which is preferred.  See Line3D_Basics.getDepth.
+        Public mmDepth As mmData
+
+        Public index As Integer
+        Public trackID As Integer
+        Public indexVTop As Integer = -1
+        Public indexVBot As Integer = -1
+        Public indexHLeft As Integer = -1
+        Public indexHRight As Integer = -1
+
+        Public length As Single
+
+        Public p1 As cv.Point2f
+        Public p2 As cv.Point2f
+
+        Public p1GridIndex As Integer
+        Public p2GridIndex As Integer
+
+        Public pVec1 As cv.Vec3f
+        Public pVec2 As cv.Vec3f
+        Public pE1 As cv.Point2f ' end points - goes to the edge of the image.
+        Public pE2 As cv.Point2f ' end points - goes to the edge of the image.
+        Public ptCenter As cv.Point2f
+
+        Public rect As cv.Rect
+        Public slope As Single
+        Public Const maxSlope As Integer = 100000
+        Public Function perpendicularPoints(pt As cv.Point2f) As lpData
+            Dim perpSlope = -1 / slope
+            Dim angleRadians As Double = Math.Atan(perpSlope)
+            Dim xShift = task.brickEdgeLen * Math.Cos(angleRadians)
+            Dim yShift = task.brickEdgeLen * Math.Sin(angleRadians)
+            Dim p1 = New cv.Point(pt.X + xShift, pt.Y + yShift)
+            Dim p2 = New cv.Point(pt.X - xShift, pt.Y - yShift)
+            If p1.X < 0 Then p1.X = 0
+            If p1.X >= task.color.Width Then p1.X = task.color.Width - 1
+            If p1.Y < 0 Then p1.Y = 0
+            If p1.Y >= task.color.Height Then p1.Y = task.color.Height - 1
+            If p2.X < 0 Then p2.X = 0
+            If p2.X >= task.color.Width Then p2.X = task.color.Width - 1
+            If p2.Y < 0 Then p2.Y = 0
+            If p2.Y >= task.color.Height Then p2.Y = task.color.Height - 1
+            Return New lpData(p1, p2)
+        End Function
+        Public Sub computeAngleDegrees()
+            If p2.X = p1.X Then
+                angle = 90
+                Exit Sub
+            End If
+
+            Dim angleRadians As Double = Math.Atan2((p2.Y - p1.Y), (p2.X - p1.X))
+            angle = CType(angleRadians * (180.0 / Math.PI), Single)
+            If angle >= 90.0 Then angle -= 180.0
+            If angle < -90.0 Then angle += 180.0
+        End Sub
+        Public Shared Function validatePoint(pt As cv.Point2f) As cv.Point2f
+            If CInt(pt.X) < 0 Then pt.X = 0
+            If CInt(pt.X) >= task.color.Width Then pt.X = task.color.Width - 1
+            If CInt(pt.Y) < 0 Then pt.Y = 0
+            If CInt(pt.Y) >= task.color.Height Then pt.Y = task.color.Height - 1
+
+            Return pt
+        End Function
+        Sub New(_p1 As cv.Point2f, _p2 As cv.Point2f)
+            p1 = validatePoint(_p1)
+            p2 = validatePoint(_p2)
+
+            ' trying a simple convention: p1 is leftmost point
+            If p1.X > p2.X Then
+                Dim ptTemp = p1
+                p1 = p2
+                p2 = ptTemp
+            End If
+
+            If p1.X = p2.X Then
+                slope = (p1.Y - p2.Y) / (p1.X + 0.001 - p2.X)
+            Else
+                slope = (p1.Y - p2.Y) / (p1.X - p2.X)
+            End If
+
+            length = p1.DistanceTo(p2)
+
+            p1GridIndex = task.gridMap.Get(Of Integer)(p1.Y, p1.X)
+            p2GridIndex = task.gridMap.Get(Of Integer)(p2.Y, p2.X)
+            color = task.scalarColors(p1GridIndex Mod 255)
+
+            pVec1 = task.pointCloud.Get(Of cv.Vec3f)(p1.Y, p1.X)
+            If Single.IsNaN(pVec1(0)) Or pVec1(2) = 0 Then
+                Dim r = task.gridRects(p1GridIndex)
+                pVec1 = New cv.Vec3f(0, 0, task.pcSplit(2)(r).Mean(task.depthmask(r)).Item(0))
+            End If
+
+            pVec2 = task.pointCloud.Get(Of cv.Vec3f)(p2.Y, p2.X)
+            If Single.IsNaN(pVec2(0)) Or pVec2(2) = 0 Then
+                Dim r = task.gridRects(p2GridIndex)
+                pVec2 = New cv.Vec3f(0, 0, task.pcSplit(2)(r).Mean(task.depthmask(r)).Item(0))
+            End If
+
+            If p1.X <> p2.X Then
+                Dim b = p1.Y - p1.X * slope
+                If p1.Y = p2.Y Then
+                    pE1 = New cv.Point2f(0, p1.Y)
+                    pE2 = New cv.Point2f(task.workRes.Width - 1, p1.Y)
                 Else
-                    slope = (p1.Y - p2.Y) / (p1.X - p2.X)
-                End If
+                    Dim x1 = -b / slope
+                    Dim x2 = (task.workRes.Height - b) / slope
+                    Dim y1 = b
+                    Dim y2 = slope * task.workRes.Width + b
 
-                length = p1.DistanceTo(p2)
-
-                p1GridIndex = task.gridMap.Get(Of Integer)(p1.Y, p1.X)
-                p2GridIndex = task.gridMap.Get(Of Integer)(p2.Y, p2.X)
-                color = task.scalarColors(p1GridIndex Mod 255)
-
-                pVec1 = task.pointCloud.Get(Of cv.Vec3f)(p1.Y, p1.X)
-                If Single.IsNaN(pVec1(0)) Or pVec1(2) = 0 Then
-                    Dim r = task.gridRects(p1GridIndex)
-                    pVec1 = New cv.Vec3f(0, 0, task.pcSplit(2)(r).Mean(task.depthmask(r)).Item(0))
-                End If
-
-                pVec2 = task.pointCloud.Get(Of cv.Vec3f)(p2.Y, p2.X)
-                If Single.IsNaN(pVec2(0)) Or pVec2(2) = 0 Then
-                    Dim r = task.gridRects(p2GridIndex)
-                    pVec2 = New cv.Vec3f(0, 0, task.pcSplit(2)(r).Mean(task.depthmask(r)).Item(0))
-                End If
-
-                If p1.X <> p2.X Then
-                    Dim b = p1.Y - p1.X * slope
-                    If p1.Y = p2.Y Then
-                        pE1 = New cv.Point2f(0, p1.Y)
-                        pE2 = New cv.Point2f(task.workRes.Width - 1, p1.Y)
-                    Else
-                        Dim x1 = -b / slope
-                        Dim x2 = (task.workRes.Height - b) / slope
-                        Dim y1 = b
-                        Dim y2 = slope * task.workRes.Width + b
-
-                        Dim pts As New List(Of cv.Point2f)
-                        If x1 >= 0 And x1 <= task.workRes.Width Then pts.Add(New cv.Point2f(x1, 0))
-                        If x2 >= 0 And x2 <= task.workRes.Width Then pts.Add(New cv.Point2f(x2, task.workRes.Height - 1))
-                        If y1 >= 0 And y1 <= task.workRes.Height Then pts.Add(New cv.Point2f(0, y1))
-                        If y2 >= 0 And y2 <= task.workRes.Height Then pts.Add(New cv.Point2f(task.workRes.Width - 1, y2))
-                        pE1 = pts(0)
-                        If pts.Count < 2 Then
-                            If CInt(x2) >= task.workRes.Width Then pts.Add(New cv.Point2f(CInt(x2), task.workRes.Height - 1))
-                            If CInt(y2) >= task.workRes.Height Then pts.Add(New cv.Point2f(task.workRes.Width - 1, CInt(y2)))
-                        End If
-                        pE2 = pts(1)
+                    Dim pts As New List(Of cv.Point2f)
+                    If x1 >= 0 And x1 <= task.workRes.Width Then pts.Add(New cv.Point2f(x1, 0))
+                    If x2 >= 0 And x2 <= task.workRes.Width Then pts.Add(New cv.Point2f(x2, task.workRes.Height - 1))
+                    If y1 >= 0 And y1 <= task.workRes.Height Then pts.Add(New cv.Point2f(0, y1))
+                    If y2 >= 0 And y2 <= task.workRes.Height Then pts.Add(New cv.Point2f(task.workRes.Width - 1, y2))
+                    pE1 = pts(0)
+                    If pts.Count < 2 Then
+                        If CInt(x2) >= task.workRes.Width Then pts.Add(New cv.Point2f(CInt(x2), task.workRes.Height - 1))
+                        If CInt(y2) >= task.workRes.Height Then pts.Add(New cv.Point2f(task.workRes.Width - 1, CInt(y2)))
                     End If
-                Else
-                    pE1 = New cv.Point2f(p1.X, 0)
-                    pE2 = New cv.Point2f(p1.X, task.workRes.Height - 1)
+                    pE2 = pts(1)
                 End If
-                ptCenter = New cv.Point2f((p1.X + p2.X) / 2, (p1.Y + p2.Y) / 2)
+            Else
+                pE1 = New cv.Point2f(p1.X, 0)
+                pE2 = New cv.Point2f(p1.X, task.workRes.Height - 1)
+            End If
+            ptCenter = New cv.Point2f((p1.X + p2.X) / 2, (p1.Y + p2.Y) / 2)
 
-                Dim bpRow = task.bricksPerRow - 1
-                Dim bpCol = task.bricksPerCol - 1
-                If pE1.Y = 0 Then indexVTop = pE1.X / task.workRes.Width * bpRow
-                If pE1.Y = task.workRes.Height - 1 Then indexVBot = pE1.X / task.workRes.Width * bpRow
+            Dim bpRow = task.bricksPerRow - 1
+            Dim bpCol = task.bricksPerCol - 1
+            If pE1.Y = 0 Then indexVTop = pE1.X / task.workRes.Width * bpRow
+            If pE1.Y = task.workRes.Height - 1 Then indexVBot = pE1.X / task.workRes.Width * bpRow
 
-                If pE2.Y = 0 Then indexVTop = pE2.X / task.workRes.Width * bpRow
-                If pE2.Y = task.workRes.Height - 1 Then indexVBot = pE2.X / task.workRes.Width * bpRow
+            If pE2.Y = 0 Then indexVTop = pE2.X / task.workRes.Width * bpRow
+            If pE2.Y = task.workRes.Height - 1 Then indexVBot = pE2.X / task.workRes.Width * bpRow
 
-                If pE1.X = 0 Then indexHLeft = pE1.Y / task.workRes.Height * bpCol
-                If pE1.X = task.workRes.Width - 1 Then indexHRight = pE1.Y / task.workRes.Height * bpCol
+            If pE1.X = 0 Then indexHLeft = pE1.Y / task.workRes.Height * bpCol
+            If pE1.X = task.workRes.Width - 1 Then indexHRight = pE1.Y / task.workRes.Height * bpCol
 
-                If pE2.X = 0 Then indexHLeft = pE2.Y / task.workRes.Height * bpCol
-                If pE2.X = task.workRes.Width - 1 Then indexHRight = pE2.Y / task.workRes.Height * bpCol
+            If pE2.X = 0 Then indexHLeft = pE2.Y / task.workRes.Height * bpCol
+            If pE2.X = task.workRes.Width - 1 Then indexHRight = pE2.Y / task.workRes.Height * bpCol
 
-                computeAngleDegrees()
+            computeAngleDegrees()
 
-                Dim w = Math.Abs(p1.X - p2.X)
-                Dim h = Math.Abs(p1.Y - p2.Y)
-                Dim pad As Integer = 5
-                ' p1 is always leftmost point.
-                If Math.Abs(angle) > 45 Then
-                    rect = New cv.Rect(p1.X - pad, Math.Min(p1.Y, p2.Y),
+            Dim w = Math.Abs(p1.X - p2.X)
+            Dim h = Math.Abs(p1.Y - p2.Y)
+            Dim pad As Integer = 5
+            ' p1 is always leftmost point.
+            If Math.Abs(angle) > 45 Then
+                rect = New cv.Rect(p1.X - pad, Math.Min(p1.Y, p2.Y),
+                                           Math.Max(pad * 2, w), Math.Max(pad * 2, h))
+            Else
+                rect = New cv.Rect(p1.X, Math.Min(p1.Y, p2.Y) - pad,
                                        Math.Max(pad * 2, w), Math.Max(pad * 2, h))
-                Else
-                    rect = New cv.Rect(p1.X, Math.Min(p1.Y, p2.Y) - pad,
-                                   Math.Max(pad * 2, w), Math.Max(pad * 2, h))
+            End If
+
+            rect = ValidateRect(rect)
+        End Sub
+        Sub New()
+            p1 = New cv.Point2f()
+            p2 = New cv.Point2f()
+        End Sub
+        Public Function compare(lp As lpData) As Boolean
+            If lp.p1.X = p1.X And lp.p1.Y = p1.Y And lp.p2.X = p2.X And p2.Y = p2.Y Then Return True
+            Return False
+        End Function
+        Public Function displayCell(ByRef dst As cv.Mat) As String
+            dst.SetTo(0)
+            For Each lp In task.lines.lpList
+                dst.Line(lp.p1, lp.
+                                 p2, white, task.lineWidth, cv.LineTypes.Link8)
+                dst.Circle(lp.ptCenter, task.DotSize, task.highlight, -1)
+            Next
+
+            dst.Line(task.lpD.p1, task.lpD.p2, task.highlight, task.lineWidth + 1, task.lineType)
+
+            Dim strOut = "rcList index = " + CStr(index) + vbCrLf
+            strOut = "Line ID = " + CStr(task.lpD.p1GridIndex) + " Age = " + CStr(task.lpD.age) + vbCrLf
+            strOut += "Length (pixels) = " + Format(task.lpD.length, fmt1) + " index = " + CStr(task.lpD.index) + vbCrLf
+            strOut += "p1GridIndex = " + CStr(task.lpD.p1GridIndex) + " p2GridIndex = " + CStr(task.lpD.p2GridIndex) + vbCrLf
+
+            strOut += "p1 = " + task.lpD.p1.ToString + ", p2 = " + task.lpD.p2.ToString + vbCrLf
+            strOut += "pE1 = " + task.lpD.pE1.ToString + ", pE2 = " + task.lpD.pE2.ToString + vbCrLf + vbCrLf
+            strOut += "RGB Angle = " + CStr(task.lpD.angle) + vbCrLf
+            strOut += "RGB Slope = " + Format(task.lpD.slope, fmt3) + vbCrLf
+            strOut += vbCrLf + "NOTE: the Y-Axis is inverted - Y increases down so slopes are inverted." + vbCrLf + vbCrLf
+            Return strOut
+        End Function
+
+    End Class
+
+
+
+
+
+    Public Class rcData
+        Public age As Integer = 1
+        Public color As cv.Scalar
+        Public colorChange As Integer ' 0 no change, 1 , 
+        Public contour As List(Of cv.Point)
+        Public contour3D As New List(Of cv.Point3f) ' here for compatibility.
+        Public depthDelta As Single
+        Public eq As cv.Vec4f ' only here for compatibility
+        Public gridIndex As Integer
+        Public hull As List(Of cv.Point)
+        Public index As Integer
+        Public indexLast As Integer ' only here for compatibility
+        Public mask As cv.Mat
+        Public maxDist As cv.Point
+        Public multiMask As Boolean ' indicates if RedWGrid found duplicate wGrid points in the rclist.
+        Public nabs As New List(Of Integer) ' here for compatibility.
+        Public pixels As Integer
+        Public rect As cv.Rect
+        Public wGrid As cv.Point3d
+        Public wcMean As cv.Scalar
+        Public Sub New()
+        End Sub
+        Public Sub New(_mask As cv.Mat, _rect As cv.Rect, _index As Integer,
+                               Optional combinedMask As Boolean = False)
+            rect = _rect
+            If _index >= 0 Then
+                mask = _mask.InRange(_index, _index)
+                index = _index
+            Else
+                mask = _mask.Clone
+            End If
+            contour = ContourBuild(mask)
+            If _index >= 0 Then
+                If contour.Count >= 3 And combinedMask = False Then ' need at least 3 points for a contour.
+                    Dim listOfPoints = New List(Of List(Of cv.Point))({contour})
+                    mask = New cv.Mat(mask.Size, cv.MatType.CV_8U, 0)
+                    cv.Cv2.DrawContours(mask, listOfPoints, 0, cv.Scalar.All(index), -1, cv.LineTypes.Link4)
+
+                    ' keep the hull points around (there aren't many of them.)
+                    hull = cv.Cv2.ConvexHull(contour.ToArray, True).ToList
                 End If
+            End If
+            buildMaxDist()
 
-                rect = ValidateRect(rect)
-            End Sub
-            Sub New()
-                p1 = New cv.Point2f()
-                p2 = New cv.Point2f()
-            End Sub
-            Public Function compare(lp As lpData) As Boolean
-                If lp.p1.X = p1.X And lp.p1.Y = p1.Y And lp.p2.X = p2.X And p2.Y = p2.Y Then Return True
-                Return False
-            End Function
-            Public Function displayCell(ByRef dst As cv.Mat) As String
-                dst.SetTo(0)
-                For Each lp In task.lines.lpList
-                    dst.Line(lp.p1, lp.
-                             p2, white, task.lineWidth, cv.LineTypes.Link8)
-                    dst.Circle(lp.ptCenter, task.DotSize, task.highlight, -1)
-                Next
+            gridIndex = task.gridMap.Get(Of Integer)(maxDist.Y, maxDist.X)
+            If _index >= 0 Then color = task.vecColors(index Mod 255)
+            pixels = mask.CountNonZero
+            wcMean = task.pointCloud(rect).Mean(task.depthmask(rect))
+            Dim x = Math.Round(wcMean(0) * 1000 / task.reduction)
+            Dim y = Math.Round(wcMean(1) * 1000 / task.reduction)
+            Dim z = Math.Round(wcMean(2) * 1000 / task.reduction)
+            If Math.Abs(x) < 0.000000000001 Then x = 0
+            If Math.Abs(y) < 0.000000000001 Then y = 0
+            If Math.Abs(z) < 0.000000000001 Then z = 0
+            wGrid = New cv.Point3d(x, y, z)
+            If Single.IsInfinity(wcMean(2)) Then depthDelta = 0
+        End Sub
+        Public Shared Function getHullMask(hull As List(Of cv.Point), mask As cv.Mat) As cv.Mat
+            Dim hullMask = New cv.Mat(mask.Size, cv.MatType.CV_8U, 0)
+            Dim listOfPoints = New List(Of List(Of cv.Point))({hull})
+            cv.Cv2.DrawContours(hullMask, listOfPoints, 0, cv.Scalar.All(255), -1, cv.LineTypes.Link8)
+            Return hullMask
+        End Function
+        Public Sub buildMaxDist()
+            Dim tmp As cv.Mat = mask.Clone
+            ' Rectangle is definitely needed.  Test it again with MaxDist_NoRectangle.
+            tmp.Rectangle(New cv.Rect(0, 0, mask.Width, mask.Height), 0, 1)
+            Dim distance32f = tmp.DistanceTransform(cv.DistanceTypes.L1, 0)
+            Dim mm As mmData = GetMinMax(distance32f)
+            maxDist.X = mm.maxLoc.X + rect.X
+            maxDist.Y = mm.maxLoc.Y + rect.Y
+        End Sub
+        Public Function displayCell() As String
+            Dim strout = "Age = " + CStr(age) + vbCrLf
+            strout += "Color = " + color.ToString + vbCrLf
+            If contour IsNot Nothing Then
+                strout += "Contour count = " + CStr(contour.Count) + vbCrLf
+            End If
+            If Single.IsNaN(depthDelta) = False Then
+                strout += "DepthDelta (mm's) = " + Format(CInt(depthDelta * 1000), "00") + vbCrLf
+                strout += "Hull count = " + If(hull Is Nothing, "0", CStr(hull.Count)) + vbCrLf
+                strout += "index = " + CStr(index) + vbCrLf
+                strout += "MaxDist = " + CStr(maxDist.X) + "," + CStr(maxDist.Y) + vbCrLf
+                strout += "Multi-Mask flag = " + CStr(multiMask) + vbCrLf
+                strout += "Pixel count = " + CStr(pixels) + vbCrLf
+                strout += "Rect: X = " + CStr(rect.X) + ", Y = " + CStr(rect.Y) + ", "
+                strout += "width = " + CStr(rect.Width) + ", height = " + CStr(rect.Height) + vbCrLf
+                strout += "World Coordinates = " + Format(wcMean(0), fmt3) + " " +
+                                                           Format(wcMean(1), fmt3) + " " +
+                                                           Format(wcMean(2), fmt3) + vbCrLf
+                strout += "World Grid coordinates = " + CStr(wGrid.X) + ", " + CStr(wGrid.Y) + vbCrLf
+            Else
+                strout = "The depth data for this cell is NaN. StereoLabs specific problem."
+            End If
 
-                dst.Line(task.lpD.p1, task.lpD.p2, task.highlight, task.lineWidth + 1, task.lineType)
-
-                Dim strOut = "rcList index = " + CStr(index) + vbCrLf
-                strOut = "Line ID = " + CStr(task.lpD.p1GridIndex) + " Age = " + CStr(task.lpD.age) + vbCrLf
-                strOut += "Length (pixels) = " + Format(task.lpD.length, fmt1) + " index = " + CStr(task.lpD.index) + vbCrLf
-                strOut += "p1GridIndex = " + CStr(task.lpD.p1GridIndex) + " p2GridIndex = " + CStr(task.lpD.p2GridIndex) + vbCrLf
-
-                strOut += "p1 = " + task.lpD.p1.ToString + ", p2 = " + task.lpD.p2.ToString + vbCrLf
-                strOut += "pE1 = " + task.lpD.pE1.ToString + ", pE2 = " + task.lpD.pE2.ToString + vbCrLf + vbCrLf
-                strOut += "RGB Angle = " + CStr(task.lpD.angle) + vbCrLf
-                strOut += "RGB Slope = " + Format(task.lpD.slope, fmt3) + vbCrLf
-                strOut += vbCrLf + "NOTE: the Y-Axis is inverted - Y increases down so slopes are inverted." + vbCrLf + vbCrLf
-                Return strOut
-            End Function
-
-        End Class
-
-
-
-
-
-        Public Class rcData
-            Public age As Integer = 1
-            Public color As cv.Scalar
-            Public colorChange As Integer ' 0 no change, 1 , 
-            Public contour As List(Of cv.Point)
-            Public contour3D As New List(Of cv.Point3f) ' here for compatibility.
-            Public depthDelta As Single
-            Public eq As cv.Vec4f ' only here for compatibility
-            Public gridIndex As Integer
-            Public hull As List(Of cv.Point)
-            Public index As Integer
-            Public indexLast As Integer ' only here for compatibility
-            Public mask As cv.Mat
-            Public maxDist As cv.Point
-            Public multiMask As Boolean ' indicates if RedWGrid found duplicate wGrid points in the rclist.
-            Public nabs As New List(Of Integer) ' here for compatibility.
-            Public pixels As Integer
-            Public rect As cv.Rect
-            Public wGrid As cv.Point3d
-            Public wcMean As cv.Scalar
-            Public Sub New()
-            End Sub
-            Public Sub New(_mask As cv.Mat, _rect As cv.Rect, _index As Integer,
-                           Optional combinedMask As Boolean = False)
-                rect = _rect
-                If _index >= 0 Then
-                    mask = _mask.InRange(_index, _index)
-                    index = _index
-                Else
-                    mask = _mask.Clone
-                End If
-                contour = ContourBuild(mask)
-                If _index >= 0 Then
-                    If contour.Count >= 3 And combinedMask = False Then ' need at least 3 points for a contour.
-                        Dim listOfPoints = New List(Of List(Of cv.Point))({contour})
-                        mask = New cv.Mat(mask.Size, cv.MatType.CV_8U, 0)
-                        cv.Cv2.DrawContours(mask, listOfPoints, 0, cv.Scalar.All(index), -1, cv.LineTypes.Link4)
-
-                        ' keep the hull points around (there aren't many of them.)
-                        hull = cv.Cv2.ConvexHull(contour.ToArray, True).ToList
-                    End If
-                End If
-                buildMaxDist()
-
-                gridIndex = task.gridMap.Get(Of Integer)(maxDist.Y, maxDist.X)
-                If _index >= 0 Then color = task.vecColors(index Mod 255)
-                pixels = mask.CountNonZero
-                wcMean = task.pointCloud(rect).Mean(task.depthmask(rect))
-                Dim x = Math.Round(wcMean(0) * 1000 / task.reduction)
-                Dim y = Math.Round(wcMean(1) * 1000 / task.reduction)
-                Dim z = Math.Round(wcMean(2) * 1000 / task.reduction)
-                If Math.Abs(x) < 0.000000000001 Then x = 0
-                If Math.Abs(y) < 0.000000000001 Then y = 0
-                If Math.Abs(z) < 0.000000000001 Then z = 0
-                wGrid = New cv.Point3d(x, y, z)
-                If Single.IsInfinity(wcMean(2)) Then depthDelta = 0
-            End Sub
-            Public Shared Function getHullMask(hull As List(Of cv.Point), mask As cv.Mat) As cv.Mat
-                Dim hullMask = New cv.Mat(mask.Size, cv.MatType.CV_8U, 0)
-                Dim listOfPoints = New List(Of List(Of cv.Point))({hull})
-                cv.Cv2.DrawContours(hullMask, listOfPoints, 0, cv.Scalar.All(255), -1, cv.LineTypes.Link8)
-                Return hullMask
-            End Function
-            Public Sub buildMaxDist()
-                Dim tmp As cv.Mat = mask.Clone
-                ' Rectangle is definitely needed.  Test it again with MaxDist_NoRectangle.
-                tmp.Rectangle(New cv.Rect(0, 0, mask.Width, mask.Height), 0, 1)
-                Dim distance32f = tmp.DistanceTransform(cv.DistanceTypes.L1, 0)
-                Dim mm As mmData = GetMinMax(distance32f)
-                maxDist.X = mm.maxLoc.X + rect.X
-                maxDist.Y = mm.maxLoc.Y + rect.Y
-            End Sub
-            Public Function displayCell() As String
-                Dim strout = "Age = " + CStr(age) + vbCrLf
-                strout += "Color = " + color.ToString + vbCrLf
-                If contour IsNot Nothing Then
-                    strout += "Contour count = " + CStr(contour.Count) + vbCrLf
-                End If
-                If Single.IsNaN(depthDelta) = False Then
-                    strout += "DepthDelta (mm's) = " + Format(CInt(depthDelta * 1000), "00") + vbCrLf
-                    strout += "Hull count = " + If(hull Is Nothing, "0", CStr(hull.Count)) + vbCrLf
-                    strout += "index = " + CStr(index) + vbCrLf
-                    strout += "MaxDist = " + CStr(maxDist.X) + "," + CStr(maxDist.Y) + vbCrLf
-                    strout += "Multi-Mask flag = " + CStr(multiMask) + vbCrLf
-                    strout += "Pixel count = " + CStr(pixels) + vbCrLf
-                    strout += "Rect: X = " + CStr(rect.X) + ", Y = " + CStr(rect.Y) + ", "
-                    strout += "width = " + CStr(rect.Width) + ", height = " + CStr(rect.Height) + vbCrLf
-                    strout += "World Coordinates = " + Format(wcMean(0), fmt3) + " " +
-                                                       Format(wcMean(1), fmt3) + " " +
-                                                       Format(wcMean(2), fmt3) + vbCrLf
-                    strout += "World Grid coordinates = " + CStr(wGrid.X) + ", " + CStr(wGrid.Y) + vbCrLf
-                Else
-                    strout = "The depth data for this cell is NaN. StereoLabs specific problem."
-                End If
-
-                Return strout
-            End Function
-        End Class
-    End Module
+            Return strout
+        End Function
+    End Class
+End Module

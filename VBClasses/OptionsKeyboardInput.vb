@@ -1,5 +1,4 @@
-﻿Imports VBClasses
-Public Class OptionsKeyboardInput
+﻿Public Class OptionsKeyboardInput
     Public inputText As New List(Of String)
     Dim keyboardLastInput As String
     Public Sub Setup(traceName As String)

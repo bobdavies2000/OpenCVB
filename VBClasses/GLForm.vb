@@ -1,7 +1,6 @@
 ﻿Imports SharpGL
 Imports cv = OpenCvSharp
 Imports OpenCvSharp.Extensions
-Imports VBClasses
 Public Class SharpGLForm
     Dim gl As OpenGL
     Dim isDragging As Boolean = False
@@ -32,8 +31,8 @@ Public Class SharpGLForm
         options1 = New Options_GL
         options2 = New Options_SharpGL2
 
-        Me.Location = New Point(task.settings.sharpGLLeft, task.settings.sharpGLTop)
-        Me.Size = New Size(task.settings.sharpGLWidth, task.settings.sharpGLHeight)
+        Me.Location = New Point(task.Settings.sharpGLLeft, task.Settings.sharpGLTop)
+        Me.Size = New Size(task.Settings.sharpGLWidth, task.Settings.sharpGLHeight)
 
         gl = GLControl.OpenGL
     End Sub
@@ -183,7 +182,7 @@ Public Class SharpGLForm
     Private Sub readPointCloud()
         task.sharpDepth = New cv.Mat(New cv.Size(GLControl.Width, GLControl.Height), cv.MatType.CV_32F, 0)
         gl.ReadPixels(0, 0, GLControl.Width, GLControl.Height, OpenGL.GL_DEPTH_COMPONENT,
-                      OpenGL.GL_FLOAT, task.sharpDepth.Data)
+                          OpenGL.GL_FLOAT, task.sharpDepth.Data)
         task.sharpDepth = task.sharpDepth.Resize(task.workRes)
         task.sharpDepth = task.sharpDepth.Flip(cv.FlipMode.X)
     End Sub
@@ -326,9 +325,9 @@ Public Class SharpGLForm
                 gl.TexParameter(OpenGL.GL_TEXTURE_2D, OpenGL.GL_TEXTURE_MAG_FILTER, OpenGL.GL_LINEAR)
 
                 gl.TexImage2D(OpenGL.GL_TEXTURE_2D, 0, OpenGL.GL_RGBA,
-                              bitmap.Width, bitmap.Height, 0,
-                              OpenGL.GL_RGBA, OpenGL.GL_UNSIGNED_BYTE,
-                              rgba.Data)
+                                  bitmap.Width, bitmap.Height, 0,
+                                  OpenGL.GL_RGBA, OpenGL.GL_UNSIGNED_BYTE,
+                                  rgba.Data)
 
                 gl.Enable(OpenGL.GL_TEXTURE_2D)
                 gl.BindTexture(OpenGL.GL_TEXTURE_2D, textureID(0))

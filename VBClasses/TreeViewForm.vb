@@ -1,5 +1,3 @@
-Imports System.ComponentModel
-Imports VBClasses
 Public Class TreeviewForm
     Dim botDistance As Integer
     Dim treeData As New List(Of String) ' treedata is used to trigger a rebuild of the tree nodes.

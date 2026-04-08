@@ -1,58 +1,56 @@
 Imports cv = OpenCvSharp
-Imports System.Runtime.InteropServices
-Imports VBClasses
-    Public Class NR_DepthLinear_Basics : Inherits TaskParent
-        Dim inputX As New DepthLinear_InputX
-        Dim inputY As New DepthLinear_InputY
-        Dim inputZ As New DepthLinear_InputZ
-        Public options As New Options_LinearInput
-        Public cloud As New cv.Mat
-        Public Sub New()
-            desc = "Confine derivatives to linear values"
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            options.Run()
+Public Class NR_DepthLinear_Basics : Inherits TaskParent
+    Dim inputX As New DepthLinear_InputX
+    Dim inputY As New DepthLinear_InputY
+    Dim inputZ As New DepthLinear_InputZ
+    Public options As New Options_LinearInput
+    Public cloud As New cv.Mat
+    Public Sub New()
+        desc = "Confine derivatives to linear values"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        options.Run()
 
-            inputZ.Run(src)
-            Dim mask As cv.Mat = inputZ.dst2
+        inputZ.Run(src)
+        Dim mask As cv.Mat = inputZ.dst2
 
-            inputX.Run(src)
-            dst2 = inputX.dst2.Clone
-            dst0 = task.pcSplit(0).Clone
-            Dim fixCount As Integer
-            For y = 0 To mask.Height - 1
-                For x = 0 To mask.Width - 1
-                    Dim val = dst0.Get(Of Single)(y, x)
-                    Dim mVal = mask.Get(Of Byte)(y, x)
-                    If mVal Then
-                        Dim i = x + 1
-                        Dim vNext As Single
-                        For i = i To mask.Width - 1
-                            vNext = dst0.Get(Of Single)(y, i)
-                            If vNext > val And vNext <> 0 Then Exit For Else fixCount += 1
-                        Next
+        inputX.Run(src)
+        dst2 = inputX.dst2.Clone
+        dst0 = task.pcSplit(0).Clone
+        Dim fixCount As Integer
+        For y = 0 To mask.Height - 1
+            For x = 0 To mask.Width - 1
+                Dim val = dst0.Get(Of Single)(y, x)
+                Dim mVal = mask.Get(Of Byte)(y, x)
+                If mVal Then
+                    Dim i = x + 1
+                    Dim vNext As Single
+                    For i = i To mask.Width - 1
+                        vNext = dst0.Get(Of Single)(y, i)
+                        If vNext > val And vNext <> 0 Then Exit For Else fixCount += 1
+                    Next
 
-                        Dim incr = (vNext - val) / (i - x)
-                        For j = x + 1 To i
-                            dst0.Set(Of Single)(y, j, val + incr)
-                            incr += incr
-                        Next
-                        x = i
-                    End If
-                Next
+                    Dim incr = (vNext - val) / (i - x)
+                    For j = x + 1 To i
+                        dst0.Set(Of Single)(y, j, val + incr)
+                        incr += incr
+                    Next
+                    x = i
+                End If
             Next
+        Next
 
-            inputY.Run(src)
-            dst3 = inputY.dst2.Clone
-            cv.Cv2.Merge({dst2, dst3, task.pcSplit(2)}, cloud)
-        End Sub
-    End Class
-
-
-
+        inputY.Run(src)
+        dst3 = inputY.dst2.Clone
+        cv.Cv2.Merge({dst2, dst3, task.pcSplit(2)}, cloud)
+    End Sub
+End Class
 
 
-    Public Class NR_DepthLinear_Visualize : Inherits TaskParent
+
+
+
+Public Class NR_DepthLinear_Visualize : Inherits TaskParent
     Public plotHist As New PlotBar_Basics
     Public roi As New cv.Rect(0, 0, dst2.Width, dst2.Height)
     Public pc As cv.Mat

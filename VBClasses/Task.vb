@@ -1,8 +1,6 @@
 Imports System.IO
-Imports PixelViewer
 Imports cv = OpenCvSharp
 Imports jsonShared
-Imports VBClasses
 Public Class AlgorithmTask : Implements IDisposable
     Public Sub Initialize(settings As jsonShared.Settings)
         task.Settings = settings

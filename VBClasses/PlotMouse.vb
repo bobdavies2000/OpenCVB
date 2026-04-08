@@ -1,5 +1,4 @@
-﻿Imports VBClasses
-Imports cv = OpenCvSharp
+﻿Imports cv = OpenCvSharp
 Public Class PlotMouse_Basics : Inherits TaskParent
     Public plotHist As New PlotBar_Basics
     Public histogram As New cv.Mat

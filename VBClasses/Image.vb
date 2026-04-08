@@ -1,32 +1,29 @@
-Imports System.Drawing
 Imports System.IO
-Imports OpenCvSharp.LineIterator
 Imports cv = OpenCvSharp
 ' https://www.kaggle.com/datasets/balraj98/berkeley-segmentation-dataset-500-bsds500
-Imports VBClasses
-    Public Class Image_Basics : Inherits TaskParent
-        Public inputFileName As String
-        Public options As New Options_Images
-        Public Sub New()
-            desc = "Load an image into OpenCVB"
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            options.Run()
+Public Class Image_Basics : Inherits TaskParent
+    Public inputFileName As String
+    Public options As New Options_Images
+    Public Sub New()
+        desc = "Load an image into OpenCVB"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        options.Run()
 
-            src = options.fullsizeImage
+        src = options.fullsizeImage
 
-            If src.Width <> dst2.Width Or src.Height <> dst2.Height Then
-                Dim newSize = New cv.Size(dst2.Height * src.Width / src.Height, dst2.Height)
-                If newSize.Width > dst2.Width Then
-                    newSize = New cv.Size(dst2.Width, dst2.Width * src.Height / src.Width)
-                End If
-                dst2.SetTo(0)
-                dst2(New cv.Rect(0, 0, newSize.Width, newSize.Height)) = src.Resize(newSize)
-            Else
-                dst2 = src
+        If src.Width <> dst2.Width Or src.Height <> dst2.Height Then
+            Dim newSize = New cv.Size(dst2.Height * src.Width / src.Height, dst2.Height)
+            If newSize.Width > dst2.Width Then
+                newSize = New cv.Size(dst2.Width, dst2.Width * src.Height / src.Width)
             End If
-        End Sub
-    End Class
+            dst2.SetTo(0)
+            dst2(New cv.Rect(0, 0, newSize.Width, newSize.Height)) = src.Resize(newSize)
+        Else
+            dst2 = src
+        End If
+    End Sub
+End Class
 
 
 
@@ -37,19 +34,19 @@ Imports VBClasses
 
 
 
-    Public Class Image_Series : Inherits TaskParent
-        Public images As New Image_Basics
-        Public Sub New()
-            images.options.imageSeries = True
-            desc = "Display a new image from the directory every heartbeat"
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            ' to work on a specific file, specify it here.
-            ' options.fileInputName = new fileinfo(task.homeDir + "Images/train/103041.jpg")
-            images.Run(images.options.fullsizeImage)
-            dst2 = images.dst2
-        End Sub
-    End Class
+Public Class Image_Series : Inherits TaskParent
+    Public images As New Image_Basics
+    Public Sub New()
+        images.options.imageSeries = True
+        desc = "Display a new image from the directory every heartbeat"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        ' to work on a specific file, specify it here.
+        ' options.fileInputName = new fileinfo(task.homeDir + "Images/train/103041.jpg")
+        images.Run(images.options.fullsizeImage)
+        dst2 = images.dst2
+    End Sub
+End Class
 
 
 
@@ -60,56 +57,29 @@ Imports VBClasses
 
 
 
-    Public Class Image_RedCloudColor : Inherits TaskParent
-        Public images As New Image_Series
-        Dim redC As New RedColor_Basics
-        Dim reduction As New Reduction_Basics
-        Public Sub New()
-            task.fOptions.ReductionSlider.Value = 50
-            If standalone Then task.gOptions.displayDst1.Checked = True
-            desc = "Use RedCloud on a photo instead of the video stream."
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            images.Run(src)
-            dst0 = images.dst2.Clone
-            dst1 = images.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+Public Class Image_RedCloudColor : Inherits TaskParent
+    Public images As New Image_Series
+    Dim redC As New RedColor_Basics
+    Dim reduction As New Reduction_Basics
+    Public Sub New()
+        task.fOptions.ReductionSlider.Value = 50
+        If standalone Then task.gOptions.displayDst1.Checked = True
+        desc = "Use RedCloud on a photo instead of the video stream."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        images.Run(src)
+        dst0 = images.dst2.Clone
+        dst1 = images.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
-            reduction.Run(dst1)
+        reduction.Run(dst1)
 
-            redC.Run(reduction.dst2)
-            dst2 = redC.dst2
-            labels(2) = redC.labels(2)
+        redC.Run(reduction.dst2)
+        dst2 = redC.dst2
+        labels(2) = redC.labels(2)
 
-            dst2.SetTo(0, dst1.InRange(0, 0))
-        End Sub
-    End Class
-
-
-
-
-
-
-
-
-    Public Class NR_Image_MSER : Inherits TaskParent
-        Public images As New Image_Series
-        Dim core As New MSER_Detect
-        Dim options As New Options_Images
-        Public Sub New()
-            If standalone Then task.gOptions.displaydst1.checked = True
-            OptionParent.FindSlider("MSER Min Area").Value = 15
-            OptionParent.FindSlider("MSER Max Area").Value = 200000
-            desc = "Find the MSER (Maximally Stable Extermal Regions) in the still image."
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            options.Run()
-
-            images.Run(options.fullsizeImage)
-            dst1 = images.dst2
-            core.Run(dst1)
-            dst2 = core.dst2
-        End Sub
-    End Class
+        dst2.SetTo(0, dst1.InRange(0, 0))
+    End Sub
+End Class
 
 
 
@@ -118,23 +88,50 @@ Imports VBClasses
 
 
 
-    Public Class NR_Image_Icon : Inherits TaskParent
-        Dim inputImage As Bitmap
-        Public Sub New()
-            Dim filePath As String = task.homeDir + "/MainUI/Data/Magnify.png"
-            inputImage = New Bitmap(filePath)
-            desc = "Create an icon from an image"
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            If inputImage Is Nothing Then Exit Sub
-            Dim iconHandle As IntPtr = inputImage.GetHicon()
-            Dim icon As Icon = Icon.FromHandle(iconHandle)
+Public Class NR_Image_MSER : Inherits TaskParent
+    Public images As New Image_Series
+    Dim core As New MSER_Detect
+    Dim options As New Options_Images
+    Public Sub New()
+        If standalone Then task.gOptions.displayDst1.Checked = True
+        OptionParent.FindSlider("MSER Min Area").Value = 15
+        OptionParent.FindSlider("MSER Max Area").Value = 200000
+        desc = "Find the MSER (Maximally Stable Extermal Regions) in the still image."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        options.Run()
 
-            ' Save the icon to a file
-            Using fs As New FileStream(task.homeDir + "/MainUI/Data/test.ico", FileMode.OpenOrCreate)
-                icon.Save(fs)
-            End Using
-            inputImage = Nothing
-        End Sub
-    End Class
+        images.Run(options.fullsizeImage)
+        dst1 = images.dst2
+        core.Run(dst1)
+        dst2 = core.dst2
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+Public Class NR_Image_Icon : Inherits TaskParent
+    Dim inputImage As Bitmap
+    Public Sub New()
+        Dim filePath As String = task.homeDir + "/MainUI/Data/Magnify.png"
+        inputImage = New Bitmap(filePath)
+        desc = "Create an icon from an image"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        If inputImage Is Nothing Then Exit Sub
+        Dim iconHandle As IntPtr = inputImage.GetHicon()
+        Dim icon As Icon = Icon.FromHandle(iconHandle)
+
+        ' Save the icon to a file
+        Using fs As New FileStream(task.homeDir + "/MainUI/Data/test.ico", FileMode.OpenOrCreate)
+            icon.Save(fs)
+        End Using
+        inputImage = Nothing
+    End Sub
+End Class
 

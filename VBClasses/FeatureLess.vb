@@ -89,7 +89,7 @@ Namespace VBClasses
             dst3 = featureLessMask
 
             labels(2) = CStr(rectList.Count) + " grid squares were found to be featureless (<gridRect>.mm.range < " +
-                        CStr(options.fLessThreshold) + ")"
+                            CStr(options.fLessThreshold) + ")"
         End Sub
     End Class
 
@@ -160,13 +160,13 @@ Namespace VBClasses
                 Dim index = task.gridMap.Get(Of Integer)(task.clickPoint.Y, task.clickPoint.X)
                 Dim mm = GetMinMax(task.gray(task.gridRects(index)))
                 SetTrueText("Click on any grid rect to see its grayscale range." + vbCrLf +
-                            "Min gray = " + Format(mm.minVal, fmt0) + vbCrLf +
-                            "Max Gray = " + Format(mm.maxVal, fmt0) + vbCrLf +
-                            "Range = " + Format(mm.range, fmt0) + vbCrLf + vbCrLf, 1)
+                                "Min gray = " + Format(mm.minVal, fmt0) + vbCrLf +
+                                "Max Gray = " + Format(mm.maxVal, fmt0) + vbCrLf +
+                                "Range = " + Format(mm.range, fmt0) + vbCrLf + vbCrLf, 1)
             End If
 
             labels(3) = CStr(rectList.Count) + " grid squares were found to be featureless (range < " +
-                        CStr(options.fLessThreshold) + ")"
+                            CStr(options.fLessThreshold) + ")"
 
         End Sub
     End Class
@@ -398,7 +398,7 @@ Namespace VBClasses
             Dim countAll = dst3.CountNonZero
             Dim sqPixels = task.brickEdgeLen * task.brickEdgeLen
             labels(2) = "Current frame: " + Format(countCurr / sqPixels, fmt0) + " grid squares and " +
-                        Format(countAll / sqPixels, fmt0) + " of all grid squares."
+                            Format(countAll / sqPixels, fmt0) + " of all grid squares."
         End Sub
     End Class
 

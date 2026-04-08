@@ -1,11 +1,10 @@
-﻿Imports VBClasses
-Public Class OptionsFeatures
+﻿Public Class OptionsFeatures
     Public grayCheckbox() As RadioButton
     Public colorCheckbox() As RadioButton
     Public colorMethods() As String = {"BackProject_Full", "Bin4Way_Regions",
-                                       "Binarize_DepthTiers", "EdgeLine_Basics_TA", "Hist3DColor_Basics",
-                                       "KMeans_Basics", "LUT_Basics", "Reduction_Basics",
-                                       "PCA_NColor_CPP", "MeanSubtraction_Gray"}
+                                           "Binarize_DepthTiers", "EdgeLine_Basics_TA", "Hist3DColor_Basics",
+                                           "KMeans_Basics", "LUT_Basics", "Reduction_Basics",
+                                           "PCA_NColor_CPP", "MeanSubtraction_Gray"}
     Private Sub OptionsFeatures_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         Me.MdiParent = task.allOptions
         Me.Left = 0

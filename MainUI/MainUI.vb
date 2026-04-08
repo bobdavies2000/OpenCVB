@@ -1,6 +1,5 @@
 Imports System.IO
 Imports System.Text.RegularExpressions
-Imports VBClasses
 Imports cv = OpenCvSharp
 Imports cvext = OpenCvSharp.Extensions
 Namespace MainApp

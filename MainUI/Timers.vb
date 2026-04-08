@@ -1,5 +1,4 @@
-﻿Imports VBClasses
-Namespace MainApp
+﻿Namespace MainApp
     Partial Public Class MainUI
         Dim fpsWriteCount As Integer
         Dim totalBytesOfMemoryUsed As Integer

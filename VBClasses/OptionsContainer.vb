@@ -1,5 +1,4 @@
 ﻿Imports cv = OpenCvSharp
-Imports VBClasses
 Public Class OptionsContainer
     Dim optionsTitle As New List(Of String)
     Public hiddenOptions As New List(Of String)

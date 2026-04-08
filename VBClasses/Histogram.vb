@@ -1,8 +1,5 @@
 Imports System.Runtime.InteropServices
-Imports OpenCvSharp
-Imports SharpGL.SceneGraph.Raytracing
 Imports cv = OpenCvSharp
-Imports VBClasses
 Public Class Histogram_Basics : Inherits TaskParent
     Implements IDisposable
     Public histogram As New cv.Mat

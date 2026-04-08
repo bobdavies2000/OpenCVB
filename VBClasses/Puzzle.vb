@@ -1,81 +1,36 @@
 Imports cv = OpenCvSharp
-Imports System.Threading
 ' https://github.com/nemanja-m/gaps
-Imports VBClasses
-    Public Class Puzzle_Basics : Inherits TaskParent
-        Public scrambled As New List(Of cv.Rect) ' this is every roi regardless of size.
-        Public unscrambled As New List(Of cv.Rect) ' this is every roi regardless of size.
-        Public image As New cv.Mat
-        Public Sub New()
-            desc = "Create the puzzle pieces to solve with correlation."
-        End Sub
-        Function Shuffle(Of T)(collection As IEnumerable(Of T)) As List(Of T)
-            Dim r As Random = New Random()
-            Shuffle = collection.OrderBy(Function(a) r.Next()).ToList()
-        End Function
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            unscrambled.Clear()
-            Dim inputROI As New List(Of cv.Rect)
-            For j = 0 To task.gridRects.Count - 1
-                Dim gRect = task.gridRects(j)
-                If gRect.Width = task.brickEdgeLen And gRect.Height = task.brickEdgeLen Then inputROI.Add(task.gridRects(j))
-            Next
+Public Class Puzzle_Basics : Inherits TaskParent
+    Public scrambled As New List(Of cv.Rect) ' this is every roi regardless of size.
+    Public unscrambled As New List(Of cv.Rect) ' this is every roi regardless of size.
+    Public image As New cv.Mat
+    Public Sub New()
+        desc = "Create the puzzle pieces to solve with correlation."
+    End Sub
+    Function Shuffle(Of T)(collection As IEnumerable(Of T)) As List(Of T)
+        Dim r As Random = New Random()
+        Shuffle = collection.OrderBy(Function(a) r.Next()).ToList()
+    End Function
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        unscrambled.Clear()
+        Dim inputROI As New List(Of cv.Rect)
+        For j = 0 To task.gridRects.Count - 1
+            Dim gRect = task.gridRects(j)
+            If gRect.Width = task.brickEdgeLen And gRect.Height = task.brickEdgeLen Then inputROI.Add(task.gridRects(j))
+        Next
 
-            scrambled = Shuffle(inputROI)
-            image = src.Clone
+        scrambled = Shuffle(inputROI)
+        image = src.Clone
 
-            ' display image with shuffled roi's
-            For i = 0 To scrambled.Count - 1
-                Dim gRect = task.gridRects(i)
-                Dim gr2 = scrambled(i)
-                If gRect.Width = task.brickEdgeLen And gRect.Height = task.brickEdgeLen And
-                   gr2.Width = task.brickEdgeLen And gr2.Height = task.brickEdgeLen Then dst2(gr2) = src(gRect)
-            Next
-        End Sub
-    End Class
-
-
-
-
-
-
-
-
-    Public Class Puzzle_Solver : Inherits TaskParent
-        Public puzzle As New Puzzle_Basics
-        Dim solution As New List(Of cv.Rect)
-        Dim match As New Match_Basics
-        Public grayMat As cv.Mat
-        Dim puzzleIndex As Integer
-        Dim options As New Options_Puzzle
-        Public Sub New()
-            If standalone Then task.gOptions.GridSlider.Value = 8
-            labels = {"", "", "Puzzle Input", "Puzzle Solver Output - missing pieces can result from identical cells (usually bright white)"}
-            desc = "Solve the puzzle using matchTemplate"
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            options.Run()
-
-            If task.optionsChanged Or options.startPuzzle Then
-                puzzle.Run(src)
-                dst2 = puzzle.dst2
-                dst3.SetTo(0)
-                grayMat = puzzle.image.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-                puzzleIndex = 0
-            End If
-
-            If puzzle.scrambled.Count > puzzle.unscrambled.Count Then
-                ' find one piece of the puzzle on each iteration.
-                Dim rect = puzzle.scrambled(puzzleIndex)
-                match.template = grayMat(rect)
-                match.Run(grayMat)
-                Dim bestRect = ValidateRect(New cv.Rect(match.newCenter.X, match.newCenter.Y, rect.Width, rect.Height))
-                puzzle.unscrambled.Add(bestRect)
-                puzzleIndex += 1
-                dst3(bestRect) = puzzle.image(bestRect)
-            End If
-        End Sub
-    End Class
+        ' display image with shuffled roi's
+        For i = 0 To scrambled.Count - 1
+            Dim gRect = task.gridRects(i)
+            Dim gr2 = scrambled(i)
+            If gRect.Width = task.brickEdgeLen And gRect.Height = task.brickEdgeLen And
+                       gr2.Width = task.brickEdgeLen And gr2.Height = task.brickEdgeLen Then dst2(gr2) = src(gRect)
+        Next
+    End Sub
+End Class
 
 
 
@@ -84,18 +39,61 @@ Imports VBClasses
 
 
 
-    Public Class NR_Puzzle_SolverDynamic : Inherits TaskParent
-        Dim puzzle As New Puzzle_Solver
-        Public Sub New()
-            If standalone Then task.gOptions.GridSlider.Value = 8
-            labels = {"", "", "Latest Puzzle input image", "Puzzle Solver Output - missing pieces can occur because of motion or when cells are identical."}
-            desc = "Instead of matching the original image as Puzzle_Solver, match the latest image from the camera."
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            puzzle.puzzle.image = src.Clone
-            puzzle.grayMat = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+Public Class Puzzle_Solver : Inherits TaskParent
+    Public puzzle As New Puzzle_Basics
+    Dim solution As New List(Of cv.Rect)
+    Dim match As New Match_Basics
+    Public grayMat As cv.Mat
+    Dim puzzleIndex As Integer
+    Dim options As New Options_Puzzle
+    Public Sub New()
+        If standalone Then task.gOptions.GridSlider.Value = 8
+        labels = {"", "", "Puzzle Input", "Puzzle Solver Output - missing pieces can result from identical cells (usually bright white)"}
+        desc = "Solve the puzzle using matchTemplate"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        options.Run()
+
+        If task.optionsChanged Or options.startPuzzle Then
             puzzle.Run(src)
             dst2 = puzzle.dst2
-            dst3 = puzzle.dst3
-        End Sub
-    End Class
+            dst3.SetTo(0)
+            grayMat = puzzle.image.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+            puzzleIndex = 0
+        End If
+
+        If puzzle.scrambled.Count > puzzle.unscrambled.Count Then
+            ' find one piece of the puzzle on each iteration.
+            Dim rect = puzzle.scrambled(puzzleIndex)
+            match.template = grayMat(rect)
+            match.Run(grayMat)
+            Dim bestRect = ValidateRect(New cv.Rect(match.newCenter.X, match.newCenter.Y, rect.Width, rect.Height))
+            puzzle.unscrambled.Add(bestRect)
+            puzzleIndex += 1
+            dst3(bestRect) = puzzle.image(bestRect)
+        End If
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+Public Class NR_Puzzle_SolverDynamic : Inherits TaskParent
+    Dim puzzle As New Puzzle_Solver
+    Public Sub New()
+        If standalone Then task.gOptions.GridSlider.Value = 8
+        labels = {"", "", "Latest Puzzle input image", "Puzzle Solver Output - missing pieces can occur because of motion or when cells are identical."}
+        desc = "Instead of matching the original image as Puzzle_Solver, match the latest image from the camera."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        puzzle.puzzle.image = src.Clone
+        puzzle.grayMat = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        puzzle.Run(src)
+        dst2 = puzzle.dst2
+        dst3 = puzzle.dst3
+    End Sub
+End Class

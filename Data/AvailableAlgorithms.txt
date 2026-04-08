@@ -455,7 +455,6 @@ Line3D_Selection
 LinearRegression_Basics
 LineEnds_Basics
 LineEnds_Correlation
-LineEnds_VH
 LineMatch_Basics
 LineMatch_Slices
 LineRect_Basics
@@ -472,6 +471,7 @@ Match_Basics1
 Match_Brick
 Match_DrawRect
 Match_Point
+Match_VH
 MatchShapes_Basics
 MatchShapes_Nearby
 Math_ImageAverage

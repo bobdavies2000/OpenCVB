@@ -1,4 +1,3 @@
-Imports VBClasses
 Imports cv = OpenCvSharp
 Imports cvext = OpenCvSharp.Extensions
 Namespace MainApp

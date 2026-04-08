@@ -1,6 +1,4 @@
 ﻿Imports cv = OpenCvSharp
-Imports System.Drawing.Imaging
-Imports VBClasses
 Public Class TrueText
     Declare Sub CopyClassToManagedCpp Lib "ManagedCppLibrary.dll" (dataPtr As IntPtr)
     Public text As String

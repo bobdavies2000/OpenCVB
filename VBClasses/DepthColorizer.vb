@@ -1,6 +1,5 @@
 Imports System.Runtime.InteropServices
 Imports cv = OpenCvSharp
-Imports VBClasses
 Public Class DepthColorizer_Basics_TA : Inherits TaskParent
     Implements IDisposable
     Public Sub New()
@@ -74,8 +73,8 @@ Public Class DepthColorizer_Basics_TA : Inherits TaskParent
             Dim brickDepth = depthGrid.Mean(task.depthmask(r))(0)
             Dim mm = GetMinMax(depthGrid, task.depthmask(r))
             task.depthAndDepthRange = "Pixel/Brick Depth " + Format(depth, fmt3) + "/" + Format(brickDepth, fmt3) +
-                                              "m grid = " + CStr(gridIndex) + " " + vbCrLf + "Depth range = " +
-                                              Format(mm.maxVal - mm.minVal, fmt3) + "m"
+                                                  "m grid = " + CStr(gridIndex) + " " + vbCrLf + "Depth range = " +
+                                                  Format(mm.maxVal - mm.minVal, fmt3) + "m"
         Else
             task.depthAndDepthRange = ""
         End If

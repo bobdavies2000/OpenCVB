@@ -1,5 +1,4 @@
 Imports cv = OpenCvSharp
-Imports VBClasses
 Public Class Line_Basics_TA : Inherits TaskParent
     Implements IDisposable
     Public lpList As New List(Of lpData)
@@ -23,11 +22,11 @@ Public Class Line_Basics_TA : Inherits TaskParent
         Dim lpList As New List(Of lpData)
         For Each v In lines
             If v(0) >= 0 And v(0) <= task.workRes.Width And v(1) >= 0 And v(1) <= task.workRes.Height And
-                       v(2) >= 0 And v(2) <= task.workRes.Width And v(3) >= 0 And v(3) <= task.workRes.Height Then
+                           v(2) >= 0 And v(2) <= task.workRes.Width And v(3) >= 0 And v(3) <= task.workRes.Height Then
                 Dim p1 = New cv.Point(CInt(v(0)), CInt(v(1)))
                 Dim p2 = New cv.Point(CInt(v(2)), CInt(v(3)))
                 If p1.X >= 0 And p1.X < task.workRes.Width And p1.Y >= 0 And p1.Y < task.workRes.Height And
-                           p2.X >= 0 And p2.X < task.workRes.Width And p2.Y >= 0 And p2.Y < task.workRes.Height Then
+                               p2.X >= 0 And p2.X < task.workRes.Width And p2.Y >= 0 And p2.Y < task.workRes.Height Then
                     p1 = lpData.validatePoint(p1)
                     p2 = lpData.validatePoint(p2)
                     Dim lp = New lpData(p1, p2)
@@ -130,7 +129,7 @@ Public Class NR_Line_Core : Inherits TaskParent
     Public Sub New()
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         desc = "Use FastLineDetector (OpenCV Contrib) to find all the lines in a subset " +
-                   "rectangle (provided externally)"
+                       "rectangle (provided externally)"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If src.Channels() = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
@@ -293,9 +292,9 @@ Public Class Line_Intersection : Inherits TaskParent
         If standalone Then
             If task.heartBeat Then
                 lp1 = New lpData(New cv.Point2f(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height)),
-                                 New cv.Point2f(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height)))
+                                     New cv.Point2f(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height)))
                 lp2 = New lpData(New cv.Point2f(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height)),
-                                 New cv.Point2f(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height)))
+                                     New cv.Point2f(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height)))
             End If
         End If
 
@@ -646,10 +645,10 @@ Public Class Line_LeftTrack : Inherits TaskParent
             If usedRaw.Contains(r) Then Continue For
             If tracked.Count >= maxTracked Then Exit For
             Dim t As New TrackedLine With {
-                        .trackId = nextTrackId,
-                        .lp = r,
-                        .missedCount = 0
-                    }
+                            .trackId = nextTrackId,
+                            .lp = r,
+                            .missedCount = 0
+                        }
             r.color = t.lp.color
             r.index = t.trackId
             nextTrackId += 1

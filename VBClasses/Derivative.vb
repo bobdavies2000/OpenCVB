@@ -1,5 +1,4 @@
 Imports cv = OpenCvSharp
-Imports VBClasses
 Public Class Derivative_Basics : Inherits TaskParent
     Dim subD As New Derivative_Subtract
     Dim plotHist As New PlotBar_Basics

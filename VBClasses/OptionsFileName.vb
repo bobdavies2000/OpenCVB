@@ -1,5 +1,4 @@
-﻿Imports VBClasses
-Public Class OptionsFileName
+﻿Public Class OptionsFileName
     Public fileStarted As Boolean
     Public newFileName As Boolean
     Public Sub PlayButton_Click(sender As Object, e As EventArgs) Handles PlayButton.Click
