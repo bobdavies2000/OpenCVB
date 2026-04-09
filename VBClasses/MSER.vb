@@ -202,7 +202,7 @@ Public Class MSER_Detect : Inherits TaskParent
             mser.Pass2Only = options.pass2Setting
         End If
 
-        If options.graySetting And src.Channels() = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If options.graySetting And src.Channels() = 3 Then src = task.gray
         mser.DetectRegions(src, regions, boxes)
 
         classCount = boxes.Count
@@ -594,7 +594,7 @@ Public Class NR_MSER_Mask_CPP : Inherits TaskParent
                                  options.maxEvolution, options.areaThreshold, options.minMargin, options.edgeBlurSize, options.pass2Setting)
         End If
 
-        If options.graySetting And src.Channels() = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If options.graySetting And src.Channels() = 3 Then src = task.gray
 
         If task.heartBeat Then
             Dim cppData(src.Total - 1) As cv.Vec3b
@@ -667,7 +667,7 @@ Public Class MSER_CPP : Inherits TaskParent
                                  options.maxEvolution, options.areaThreshold, options.minMargin, options.edgeBlurSize, options.pass2Setting)
         End If
 
-        If options.graySetting And src.Channels() = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If options.graySetting And src.Channels() = 3 Then src = task.gray
         Dim cppData(src.Total * src.ElemSize - 1) As Byte
         Marshal.Copy(src.Data, cppData, 0, cppData.Length)
         Dim handleSrc = GCHandle.Alloc(cppData, GCHandleType.Pinned)

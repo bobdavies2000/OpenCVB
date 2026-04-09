@@ -28,7 +28,7 @@ Public Class LUT_Basics : Inherits TaskParent
             Next
             myLut = cv.Mat.FromPixelData(1, 256, cv.MatType.CV_8U, segment)
         End If
-        If src.Channels() <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If src.Channels() <> 1 Then src = task.gray
         dst2 = src.LUT(myLut) * classCount / 255
         dst2 += 1 ' stay away from zero...
 
@@ -294,7 +294,7 @@ Public Class NR_LUT_Create : Inherits TaskParent
             lut(i) = New cv.Vec3b(lutI(i)(0), lutI(i)(1), lutI(i)(2))
         Next
 
-        dst2 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        dst2 = task.gray
         Dim myLut As cv.Mat = cv.Mat.FromPixelData(1, 256, cv.MatType.CV_8U, lut)
         dst3 = dst2.LUT(myLut)
     End Sub

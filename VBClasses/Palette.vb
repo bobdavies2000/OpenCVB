@@ -456,7 +456,7 @@ Public Class Palette_CustomColorMap : Inherits TaskParent
             SetTrueText("With " + traceName + " the colorMap must be provided.  Update the ColorMap Mat and then call Run(src)...")
             Exit Sub
         End If
-        If src.Channels <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If src.Channels <> 1 Then src = task.gray
         If src.Type = cv.MatType.CV_32F Then
             src = Mat_Convert.Mat_32f_To_8UC3(src)
             src.ConvertTo(src, cv.MatType.CV_8U)
@@ -477,7 +477,7 @@ Public Class NR_Palette_GrayToColor : Inherits TaskParent
         desc = "Build a palette for the current image using samples from each gray level.  Everything turns out sepia-like."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        dst2 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        dst2 = task.gray
 
         Dim pixels As New List(Of Byte)
         Dim colors As New SortedList(Of Byte, cv.Vec3b)

@@ -15,7 +15,7 @@ Public Class Sort_Basics : Inherits TaskParent
             src = src.Reshape(1, src.Rows * src.Cols)
             options.sortOption = cv.SortFlags.EveryColumn + cv.SortFlags.Ascending
         End If
-        If src.Channels() = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If src.Channels() <> 1 Then src = task.gray
         dst2 = src.Sort(options.sortOption)
         If options.radio4.Checked Or options.radio5.Checked Then dst2 = dst2.Reshape(1, dst0.Rows)
     End Sub
@@ -37,7 +37,7 @@ Public Class NR_Sort_RectAndMask : Inherits TaskParent
         desc = "Sort the grayscale image portion in a rect while allowing for a mask."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If src.Channels() = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If src.Channels() <> 1 Then src = task.gray
         Dim tmpRect = If(rect = New cv.Rect, task.drawRect, rect)
         dst1 = src(tmpRect).Clone
         If mask IsNot Nothing Then
@@ -64,7 +64,7 @@ Public Class NR_Sort_MLPrepTest_CPP : Inherits TaskParent
         desc = "Prepare the grayscale image and row to predict depth"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If src.Channels() <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If src.Channels() <> 1 Then src = task.gray
 
         reduction.Run(src)
 
@@ -109,7 +109,7 @@ Public Class Sort_1Channel : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         Static thresholdSlider = OptionParent.FindSlider("Threshold for sort input")
 
-        If src.Channels() <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If src.Channels() <> 1 Then src = task.gray
         dst1 = src.Threshold(thresholdSlider.Value, 255, cv.ThresholdTypes.Binary)
 
         dst2.SetTo(0)
@@ -166,7 +166,7 @@ Public Class Sort_3Channel : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         Static thresholdSlider = OptionParent.FindSlider("Threshold for sort input")
-        Dim inputMask = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        Dim inputMask = task.gray
         If standaloneTest() Then inputMask = inputMask.Threshold(thresholdSlider.Value, 255, cv.ThresholdTypes.Binary)
 
         bgra = src.CvtColor(cv.ColorConversionCodes.BGR2BGRA)
@@ -237,7 +237,7 @@ Public Class NR_Sort_GrayScale1 : Inherits TaskParent
         desc = "Sort the grayscale image but keep the 8uc3 pixels with each gray entry."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        dst1 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        dst1 = task.gray
         Dim gray(src.Total - 1) As Byte
         Marshal.Copy(dst1.Data, gray, 0, gray.Length)
 

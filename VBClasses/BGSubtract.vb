@@ -76,7 +76,7 @@ Public Class BGSubtract_MOG2 : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
-        If src.Channels() = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If src.Channels() <> 1 Then src = task.gray
         MOG2.Apply(src, dst2, options.learnRate)
     End Sub
     Protected Overrides Sub Finalize()
@@ -98,7 +98,7 @@ Public Class NR_BGSubtract_MOG2_QT : Inherits TaskParent
         desc = "Subtract background using a mixture of Gaussians - the QT version"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If src.Channels() = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If src.Channels() <> 1 Then src = task.gray
         Dim learnRate = If(dst2.Width >= 1280, 0.5, 0.1) ' learn faster with large images (slower frame rate)
         MOG2.Apply(src, dst2, learnRate)
     End Sub
@@ -164,7 +164,7 @@ Public Class BGSubtract_MOG : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
-        If src.Channels() = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If src.Channels() <> 1 Then src = task.gray
         MOG.Apply(src, dst2, options.learnRate)
     End Sub
     Protected Overrides Sub Finalize()

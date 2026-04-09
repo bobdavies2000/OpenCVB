@@ -196,7 +196,6 @@ End Class
 Public Class PlotMouse_MaskBackProject : Inherits TaskParent
     Public hist As New Histogram_Basics
     Public histIndex As Integer
-    Public mask As New cv.Mat
     Public Sub New()
         hist.plotHist.removeZeroEntry = False
         labels(2) = "Histogram for the gray scale image.  Move mouse to see backprojection of each grayscale mask."
@@ -206,14 +205,14 @@ Public Class PlotMouse_MaskBackProject : Inherits TaskParent
         hist.Run(task.gray)
         dst2 = hist.dst2
 
-        Dim brickWidth = dst2.Width / task.histogramBins
-        histIndex = Math.Floor(task.mouseMovePoint.X / brickWidth)
+        Dim barWidth = dst2.Width / task.histogramBins
+        histIndex = Math.Floor(task.mouseMovePoint.X / barWidth)
 
         dst3 = task.color.Clone
-        Dim brickRange = 255 / hist.histogram.Rows
+        Dim barRange = 255 / hist.histogram.Rows
 
-        Dim minRange = If(histIndex = hist.histogram.Rows - 1, 255 - brickRange, histIndex * brickRange)
-        Dim maxRange = If(histIndex = hist.histogram.Rows - 1, 255, (histIndex + 1) * brickRange)
+        Dim minRange = If(histIndex = hist.histogram.Rows - 1, 255 - barRange, histIndex * barRange)
+        Dim maxRange = If(histIndex = hist.histogram.Rows - 1, 255, (histIndex + 1) * barRange)
         If Single.IsNaN(minRange) Or Single.IsInfinity(minRange) Or
            Single.IsNaN(maxRange) Or Single.IsInfinity(maxRange) Then
             SetTrueText("Input data has no values - exit " + traceName)
@@ -223,8 +222,7 @@ Public Class PlotMouse_MaskBackProject : Inherits TaskParent
         Dim ranges() = New cv.Rangef() {New cv.Rangef(minRange, maxRange)}
 
         cv.Cv2.CalcBackProject({task.gray}, {0}, hist.histogram, dst1, ranges)
-        If dst1.Width = 0 Then Exit Sub
         dst3.SetTo(task.highlight, dst1)
-        dst2.Rectangle(New cv.Rect(CInt(histIndex * brickWidth), 0, brickWidth, dst2.Height), cv.Scalar.Yellow, task.lineWidth)
+        dst2.Rectangle(New cv.Rect(CInt(histIndex * barWidth), 0, barWidth, dst2.Height), cv.Scalar.Yellow, task.lineWidth)
     End Sub
 End Class

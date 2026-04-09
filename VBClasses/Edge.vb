@@ -593,7 +593,7 @@ Public Class Edge_ColorGap_VB : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
 
-        If src.Channels() <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If src.Channels() <> 1 Then src = task.gray
         dst2.SetTo(0)
         Dim half = options.gapDistance / 2
         Dim pix1 As Integer, pix2 As Integer
@@ -679,7 +679,7 @@ Public Class Edge_CannyHistory : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
-        If src.Channels() = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If src.Channels() <> 1 Then src = task.gray
 
         dst2 = src.Canny(options.threshold1, options.threshold2, options.aperture, True)
         Static frameList As New List(Of cv.Mat)
@@ -711,7 +711,7 @@ Public Class Edge_ResizeAdd : Inherits TaskParent
         options1.Run()
 
         Dim gray = src
-        If src.Channels() = 3 Then gray = task.gray
+        If src.Channels() <> 1 Then gray = task.gray
         Dim newFrame = gray(New cv.Range(options.vertPixels, gray.Rows - options.vertPixels),
                                 New cv.Range(options.horizPixels, gray.Cols - options.horizPixels))
         newFrame = newFrame.Resize(gray.Size(), 0, 0, cv.InterpolationFlags.Nearest)
@@ -1179,7 +1179,7 @@ Public Class Edge_Laplacian : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
-        If src.Channels <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If src.Channels <> 1 Then src = task.gray
         dst2 = src.Laplacian(cv.MatType.CV_8U, options.LaplaciankernelSize, 1, 0).ConvertScaleAbs()
         dst2 = dst2.Threshold(options.threshold, 255, cv.ThresholdTypes.Binary)
     End Sub
@@ -1319,7 +1319,7 @@ Public Class Edge_Sobel : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
-        If src.Channels() = 3 Then src = task.gray
+        If src.Channels() <> 1 Then src = task.gray
         dst0.SetTo(0)
         dst1.SetTo(0)
         If options.horizontalDerivative Then dst0 = src.Sobel(cv.MatType.CV_32F, 0, 1, options.kernelSize)

@@ -163,7 +163,7 @@ Public Class PCA_Reconstruct : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         Static retainSlider = OptionParent.FindSlider("Retained Variance")
         Dim index = task.frameCount Mod images.Length
-        images(index) = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        images(index) = task.gray
         Dim gray32f As New cv.Mat
         images(index).ConvertTo(gray32f, cv.MatType.CV_32F)
         gray32f = gray32f.Normalize(0, 255, cv.NormTypes.MinMax)

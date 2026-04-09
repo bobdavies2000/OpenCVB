@@ -21,8 +21,8 @@ Public Class Derivative_Basics : Inherits TaskParent
         Dim proximityCount As Integer = plotHist.histogram.Sum
         Dim proximityPercent = proximityCount / dst2.Total
 
-        Dim brickWidth = dst2.Width / task.histogramBins
-        Dim histIndex = Math.Truncate(task.mouseMovePoint.X / brickWidth)
+        Dim barWidth = dst2.Width / task.histogramBins
+        Dim histIndex = Math.Truncate(task.mouseMovePoint.X / barWidth)
 
         Dim index As Integer = 1
         Dim bars = subD.options.histBars
@@ -53,8 +53,8 @@ Public Class Derivative_Basics : Inherits TaskParent
 
         Dim nonz = dst3.FindNonZero()
 
-        dst2.Rectangle(New cv.Rect(CInt((center - bars) * brickWidth), 0,
-                               brickWidth * (bars * 2 + centerAdjust), dst2.Height),
+        dst2.Rectangle(New cv.Rect(CInt((center - bars) * barWidth), 0,
+                               barWidth * (bars * 2 + centerAdjust), dst2.Height),
                                task.highlight, task.lineWidth)
 
         labels(2) = CStr(proximityCount) + " depth points were within " +
@@ -125,8 +125,8 @@ Public Class Derivative_Sobel : Inherits TaskParent
         Next
         dst1 = cv.Mat.FromPixelData(plotHist.histArray.Count, 1, cv.MatType.CV_32F, plotHist.histArray)
 
-        Dim brickWidth = dst2.Width / task.histogramBins
-        Dim histIndex = Math.Truncate(task.mouseMovePoint.X / brickWidth)
+        Dim barWidth = dst2.Width / task.histogramBins
+        Dim histIndex = Math.Truncate(task.mouseMovePoint.X / barWidth)
 
         Dim mask As New cv.Mat
         cv.Cv2.CalcBackProject({src}, {0}, dst1, mask, ranges)
@@ -137,7 +137,7 @@ Public Class Derivative_Sobel : Inherits TaskParent
         dst3 = task.color.Clone
         dst3.SetTo(white, mask)
         dst3.SetTo(0, task.noDepthMask)
-        dst2.Rectangle(New cv.Rect(CInt(histIndex * brickWidth), 0, brickWidth, dst2.Height), cv.Scalar.Yellow, task.lineWidth)
+        dst2.Rectangle(New cv.Rect(CInt(histIndex * barWidth), 0, barWidth, dst2.Height), cv.Scalar.Yellow, task.lineWidth)
         Dim deriv = Format(options.derivativeRange, fmt2)
         labels(2) = "Histogram of first or second derivatives.  Range -" + deriv + " to " + deriv
         labels(3) = "Backprojection into the image for the selected histogram entry - move mouse over dst2."

@@ -11,8 +11,7 @@ Public Class NR_Face_Haar_LBP : Inherits TaskParent
         labels(3) = "Faces detected with LBP"
     End Sub
     Public Shared Sub DetectFace(ByRef src As cv.Mat, cascade As cv.CascadeClassifier)
-        Dim gray = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        Dim faces() = cascade.DetectMultiScale(gray, 1.08, 3, cv.HaarDetectionTypes.ScaleImage, New cv.Size(30, 30))
+        Dim faces() = cascade.DetectMultiScale(task.gray, 1.08, 3, cv.HaarDetectionTypes.ScaleImage, New cv.Size(30, 30))
         For Each fface In faces
             src.Rectangle(fface, cv.Scalar.Red)
         Next

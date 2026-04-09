@@ -142,7 +142,7 @@ Public Class History_Basics8U : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         If standalone Then
             options.Run()
-            src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+            src = task.gray
             If task.firstPass Then lastFrame = src.Clone
             cv.Cv2.Absdiff(src, lastFrame, dst3)
             lastFrame = src.Clone

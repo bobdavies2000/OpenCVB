@@ -68,7 +68,7 @@ Public Class NR_RedMask_Redraw : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         redMask.Run(src)
 
-        src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        src = task.gray
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         Dim color As cv.Scalar
         Dim emptyVec As New cv.Vec3b

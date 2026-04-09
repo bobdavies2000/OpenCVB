@@ -16,7 +16,7 @@ Public Class KLT_Basics : Inherits TaskParent
         If options.nightMode Then dst2.SetTo(0) Else src.CopyTo(dst2)
         Static lastGray As cv.Mat = src.Clone
 
-        If src.Channels() = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If src.Channels() <> 1 Then src = task.gray
         If options.ptInput Is Nothing Then
             options.ptInput = cv.Cv2.GoodFeaturesToTrack(src, options.maxCorners, options.qualityLevel,
                                                                      options.minDistance, New cv.Mat, options.blockSize, False, 0)

@@ -178,7 +178,7 @@ Public Class NR_SLR_TrendImages : Inherits TaskParent
                 trends.Run(task.pcSplit(2))
                 labels(2) = "NR_SLR_TrendImages - pcSplit(2)"
             Case "Grayscale input"
-                trends.Run(src.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
+                trends.Run(task.gray)
                 labels(2) = "NR_SLR_TrendImages - grayscale"
             Case "Blue input"
                 labels(2) = "NR_SLR_TrendImages - Blue channel"

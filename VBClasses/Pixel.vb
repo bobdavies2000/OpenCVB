@@ -774,7 +774,7 @@ Public Class Pixel_Mapper : Inherits TaskParent
                 colorMap.Set(Of cv.Vec3b)(i, vec)
             Next
         End If
-        cv.Cv2.ApplyColorMap(src.CvtColor(cv.ColorConversionCodes.BGR2GRAY), dst2, colorMap)
+        cv.Cv2.ApplyColorMap(task.gray, dst2, colorMap)
     End Sub
 End Class
 
@@ -885,7 +885,7 @@ Public Class NR_Pixel_Sampler : Inherits TaskParent
         End If
         random.Run(src)
 
-        If src.Channels() <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If src.Channels() <> 1 Then src = task.gray
         Dim index As New List(Of cv.Point)
         Dim pixels As New List(Of Byte)
         Dim counts(random.PointList.Count - 1) As Integer

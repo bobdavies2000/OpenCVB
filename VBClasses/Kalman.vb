@@ -272,7 +272,7 @@ Public Class Kalman_ImageSmall : Inherits TaskParent
         desc = "Resize the image to allow the Kalman filter to process the whole image."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If src.Channels() = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If src.Channels() <> 1 Then src = task.gray
         resize.Run(src)
 
         Dim saveOriginal = resize.dst2.Clone()
@@ -366,7 +366,7 @@ Public Class Kalman_Single : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If standaloneTest() Then
-            dst1 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+            dst1 = task.gray
             inputReal = dst1.Mean()(0)
         End If
 
@@ -555,7 +555,7 @@ Public Class Kalman_VB_Basics : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
 
-        If standaloneTest() Then kInput = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY).Mean()(0)
+        If standaloneTest() Then kInput = task.gray.Mean()(0)
 
         Static avgSlider = OptionParent.FindSlider("Average input count")
         If avgSlider.Value <> saveAvgCount Then

@@ -8,7 +8,7 @@ Public Class Diff_Basics : Inherits TaskParent
         desc = "Capture an image and compare it to previous frame using absDiff and threshold"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If src.Channels() <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If src.Channels() <> 1 Then src = task.gray
 
         If task.firstPass Then lastFrame.SetTo(0)
 
@@ -173,7 +173,7 @@ Public Class Diff_Simple : Inherits TaskParent
         desc = "Simple diff of lastFrame and current src."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If src.Channels() <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If src.Channels() <> 1 Then src = task.gray
 
         If task.firstPass Then lastFrame.SetTo(0)
 

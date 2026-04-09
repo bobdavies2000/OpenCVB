@@ -11,7 +11,7 @@ Public Class ORB_Basics : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
 
-        If src.Channels() = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If src.Channels() <> 1 Then src = task.gray
         orb = cv.ORB.Create(options.desiredCount)
         keypoints = orb.Detect(src)
         dst2 = src.Clone()

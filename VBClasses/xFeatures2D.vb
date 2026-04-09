@@ -9,7 +9,7 @@ Public Class XFeatures2D_StarDetector : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst2 = src.Clone()
-        If src.Channels() = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If src.Channels() <> 1 Then src = task.gray
         If detector Is Nothing Then detector = OpenCvSharp.XFeatures2D.StarDetector.Create()
         Dim keypoints() = detector.Detect(src)
 

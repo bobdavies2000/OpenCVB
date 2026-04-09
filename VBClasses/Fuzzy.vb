@@ -88,7 +88,7 @@ Public Class NR_Fuzzy_Filter : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
 
-        If src.Channels() <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If src.Channels() <> 1 Then src = task.gray
         reduction.Run(src)
 
         Dim src32f As New cv.Mat

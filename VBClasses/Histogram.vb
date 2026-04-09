@@ -24,7 +24,7 @@ Public Class Histogram_Basics : Inherits TaskParent
             mm = GetMinMax(src.ExtractChannel(splitIndex))
             plotHist.backgroundColor = Choose(splitIndex + 1, cv.Scalar.LightBlue, cv.Scalar.Green, cv.Scalar.LightPink)
         Else
-            If src.Channels() <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+            If src.Channels() <> 1 Then src = task.gray
             mm = GetMinMax(src)
         End If
         If fixedRanges Is Nothing Then
@@ -81,7 +81,7 @@ Public Class NR_Histogram_Grayscale : Inherits TaskParent
         desc = "Create a histogram of the grayscale image"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        hist.Run(src.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
+        hist.Run(task.gray)
         dst2 = hist.dst2
         labels = hist.labels
     End Sub
@@ -173,7 +173,7 @@ Public Class Histogram_Simple : Inherits TaskParent
         desc = "Build a simple and reusable histogram for grayscale images."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If src.Channels() = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If src.Channels() <> 1 Then src = task.gray
 
         Dim ranges() = New cv.Rangef() {New cv.Rangef(plotHist.minRange, plotHist.maxRange)}
         If plotHist.minRange = plotHist.maxRange Then
@@ -208,7 +208,7 @@ Public Class NR_Histogram_ColorsAndGray : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         Dim split = src.Split()
         ReDim Preserve split(4 - 1)
-        split(4 - 1) = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY) ' add a 4th image - the grayscale image to the R G and B images.
+        split(4 - 1) = task.gray ' add a 4th image - the grayscale image to the R G and B images.
         For i = 0 To split.Length - 1
             Dim histSrc = split(i)
             histogram.plotHist.backgroundColor = Choose(i + 1, cv.Scalar.Blue, cv.Scalar.Green, cv.Scalar.Red, cv.Scalar.PowderBlue)
@@ -263,6 +263,7 @@ Public Class NR_Histogram_PeakMax : Inherits TaskParent
     Dim options As New Options_Kalman
     Public Sub New()
         OptionParent.FindCheckBox("Use Kalman").Checked = False
+        hist.plotHist.removeZeroEntry = False
         desc = "Create a histogram and back project into the image the grayscale color with the highest occurance."
         labels(3) = "Grayscale Histogram"
     End Sub
@@ -270,16 +271,16 @@ Public Class NR_Histogram_PeakMax : Inherits TaskParent
         options.Run()
         options.useKalman = False
 
-        If src.Channels() <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If src.Channels() <> 1 Then src = task.gray
         hist.Run(src)
         dst3 = hist.dst2
 
         Dim mm As mmData = GetMinMax(hist.histogram)
-        Dim brickWidth = dst2.Width / task.histogramBins
-        Dim brickRange = 255 / task.histogramBins
+        Dim barWidth = dst2.Width / task.histogramBins
+        Dim barRange = 255 / task.histogramBins
         Dim histindex = mm.maxLoc.Y
-        Dim pixelMin = CInt((histindex) * brickRange)
-        Dim pixelMax = CInt((histindex + 1) * brickRange)
+        Dim pixelMin = CInt((histindex) * barRange)
+        Dim pixelMax = CInt((histindex + 1) * barRange)
 
         Dim mask = src.InRange(pixelMin, pixelMax).Threshold(1, 255, cv.ThresholdTypes.Binary)
         Dim tmp = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
@@ -287,7 +288,7 @@ Public Class NR_Histogram_PeakMax : Inherits TaskParent
         dst2 = tmp.Threshold(0, 255, cv.ThresholdTypes.Binary)
 
         labels(2) = "BackProjection of most frequent gray pixel"
-        dst3.Rectangle(New cv.Rect(brickWidth * histindex, 0, brickWidth, dst2.Height), cv.Scalar.Yellow, 1)
+        dst3.Rectangle(New cv.Rect(barWidth * histindex, 0, barWidth, dst2.Height), cv.Scalar.Yellow, 1)
     End Sub
 End Class
 
@@ -369,13 +370,13 @@ Public Class Histogram_PeakFinder : Inherits TaskParent
 
         Dim mm As mmData = GetMinMax(histogram)
         If mm.maxVal = 0 Then Exit Sub ' entries are all zero?  Likely camera trouble.
-        Dim brickWidth = dst2.Width / histogram.Rows
+        Dim barWidth = dst2.Width / histogram.Rows
         histogramPeaks.Clear()
         For i = 0 To Math.Min(sortedPeaks.Count, peakCount) - 1
             Dim index = sortedPeaks.ElementAt(i).Value
             histogramPeaks.Add(index)
             Dim h = CInt(hCount(index) * dst2.Height / mm.maxVal)
-            cv.Cv2.Rectangle(dst2, New cv.Rect(index * brickWidth, dst2.Height - h, brickWidth, h), cv.Scalar.Yellow, task.lineWidth)
+            cv.Cv2.Rectangle(dst2, New cv.Rect(index * barWidth, dst2.Height - h, barWidth, h), cv.Scalar.Yellow, task.lineWidth)
         Next
 
         If allPCounts.Count > 100 Then
@@ -507,7 +508,7 @@ Public Class Histogram_KalmanAuto : Inherits TaskParent
             src = split(splitIndex)
         End If
 
-        If src.Channels() <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If src.Channels() <> 1 Then src = task.gray
 
         mm = GetMinMax(src)
         ranges = New cv.Rangef() {New cv.Rangef(mm.minVal, mm.maxVal)}
@@ -934,7 +935,7 @@ Public Class NR_Histogram_Gotcha : Inherits TaskParent
         desc = "Simple test: input samples should equal histogram samples.  What is wrong?  Exclusive ranges!"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If src.Channels() <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If src.Channels() <> 1 Then src = task.gray
 
         Dim expected = src.Total
 
@@ -965,7 +966,7 @@ Public Class NR_Histogram_GotchaFixed_CPP : Inherits TaskParent
         desc = "Testing the C++ CalcHist to investigate gotcha with sample counts"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If src.Channels() <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If src.Channels() <> 1 Then src = task.gray
 
         Dim cppData(src.Total - 1) As Byte
         src.GetArray(Of Byte)(cppData)
@@ -1000,7 +1001,7 @@ Public Class NR_Histogram_Byte_CPP : Inherits TaskParent
         desc = "For Byte histograms, the C++ code works but the .Net interface doesn't honor exclusive ranges."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If src.Channels() <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If src.Channels() <> 1 Then src = task.gray
 
         Dim cppData(src.Total - 1) As Byte
         src.GetArray(Of Byte)(cppData)
@@ -1348,7 +1349,7 @@ Public Class Histogram_EqualizeGray : Inherits TaskParent
         desc = "Create an equalized histogram of the grayscale image."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If src.Channels <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY) Else src = task.gray
+        If src.Channels <> 1 Then src = task.gray
         histogram.Run(src)
         cv.Cv2.EqualizeHist(task.gray, dst2)
         histogramEQ.Run(dst2)

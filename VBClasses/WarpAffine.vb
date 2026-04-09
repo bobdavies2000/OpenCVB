@@ -290,7 +290,7 @@ Public Class NR_WarpAffine_Repeated : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         Dim rect = New cv.Rect(0, 0, dst2.Height, dst2.Height)
-        dst1 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        dst1 = task.gray
         dst2 = dst1.Clone
         dst3 = dst1.Clone
 

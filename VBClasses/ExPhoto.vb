@@ -8,7 +8,7 @@ Public Class NR_ExPhoto_Bm3dDenoise : Inherits TaskParent
         labels(3) = "Difference from Input"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If src.Channels() = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If src.Channels() <> 1 Then src = task.gray
         cv.Cv2.EqualizeHist(src, src)
         CvXPhoto.Bm3dDenoising(src, dst2)
         cv.Cv2.Subtract(dst2, src, dst3)

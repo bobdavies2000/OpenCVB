@@ -41,7 +41,7 @@ Public Class NR_Threshold_Adaptive : Inherits TaskParent
         options.Run()
         optionsAdaptive.Run()
 
-        If src.Channels() <> 1 Then dst2 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY) Else dst2 = src
+        If src.Channels() <> 1 Then dst2 = task.gray Else dst2 = src
         dst3 = dst2.AdaptiveThreshold(255, optionsAdaptive.method, options.thresholdMethod,
                                           optionsAdaptive.blockSize, optionsAdaptive.constantVal)
     End Sub
@@ -119,7 +119,7 @@ Public Class Threshold_ByChannels : Inherits TaskParent
         If src.Channels = 1 Then
             dst2 = src.Threshold(optionsColor.redS, 255, options.thresholdMethod)
         ElseIf options.inputGray Then
-            src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+            src = task.gray
             dst2 = src.Threshold(optionsColor.redS, 255, options.thresholdMethod)
         Else
             Dim split = src.Split()

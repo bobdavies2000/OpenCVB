@@ -428,7 +428,7 @@ Public Class NR_Random_CustomHistogram : Inherits TaskParent
         desc = "Create a random number distribution that reflects histogram of a grayscale image"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If src.Channels() <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If src.Channels() <> 1 Then src = task.gray
 
         hist.plotHist.maxRange = 0 ' we are sharing the plot with the code below...
         hist.Run(src)
@@ -468,7 +468,7 @@ Public Class Random_StaticTV : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
 
-        dst2 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        dst2 = task.gray
         dst3 = dst2(task.drawRect)
         For y = 0 To dst3.Height - 1
             For x = 0 To dst3.Width - 1
@@ -500,7 +500,7 @@ Public Class NR_Random_StaticTVFaster : Inherits TaskParent
         Static valSlider = OptionParent.FindSlider("Range of noise to apply (from 0 to this value)")
         Static percentSlider = OptionParent.FindSlider("Percentage of pixels to include noise")
 
-        dst2 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        dst2 = task.gray
 
         random.Run(src)
         mats.mat(0) = random.dst2.Threshold(255 - percentSlider.Value * 255 / 100, 255, cv.ThresholdTypes.Binary)
@@ -542,7 +542,7 @@ Public Class NR_Random_StaticTVFastSimple : Inherits TaskParent
         Static valSlider = OptionParent.FindSlider("Range of noise to apply (from 0 to this value)")
         Static percentSlider = OptionParent.FindSlider("Percentage of pixels to include noise")
 
-        dst2 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        dst2 = task.gray
 
         random.Run(src)
         Dim nochangeMask = random.dst2.Threshold(255 - percentSlider.Value * 255 / 100, 255, cv.ThresholdTypes.BinaryInv)

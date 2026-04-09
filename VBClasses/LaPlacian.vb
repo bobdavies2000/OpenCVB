@@ -10,7 +10,7 @@ Public Class Laplacian_Basics : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
         If standaloneTest() Then src = src.GaussianBlur(options.kernel, 0, 0)
-        If src.Channels() = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If src.Channels() <> 1 Then src = task.gray
         dst3 = src.Laplacian(cv.MatType.CV_16S, options.kernel.Width, options.scale, options.delta).ConvertScaleAbs()
 
         erode.Run(dst3.Threshold(options.threshold, 255, cv.ThresholdTypes.Binary))
@@ -46,7 +46,7 @@ Public Class NR_Laplacian_Blur : Inherits TaskParent
             src = src.MedianBlur(options.kernel.Width)
             blurText = "MedianBlur"
         End If
-        If src.Channels() = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If src.Channels() <> 1 Then src = task.gray
         dst2 = src.Laplacian(cv.MatType.CV_16S, options.kernel.Width, options.scale, options.delta).ConvertScaleAbs()
         labels(2) = "Laplacian+" + blurText + " k = " + CStr(options.kernel.Width)
     End Sub

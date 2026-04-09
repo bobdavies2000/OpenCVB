@@ -310,7 +310,7 @@ Public Class Distance_Labels : Inherits TaskParent
         options.Run()
 
         If standalone Then src = task.noDepthMask
-        If src.Channels() = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If src.Channels() <> 1 Then src = task.gray
 
         cv.Cv2.DistanceTransformWithLabels(src, dst0, dst1, options.distanceType, cv.DistanceTransformMasks.Precise)
         dst2 = dst0.Normalize(0, 255, cv.NormTypes.MinMax)
@@ -402,7 +402,7 @@ Public Class Distance_Instant : Inherits TaskParent
         options.Run()
 
         If standaloneTest() Then src = task.depthRGB
-        If src.Channels() = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If src.Channels() <> 1 Then src = task.gray
 
         dst0 = src.DistanceTransform(options.distanceType, 0)
         dst1 = Mat_Convert.Mat_32f_To_8UC3(dst0)

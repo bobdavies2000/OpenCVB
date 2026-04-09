@@ -50,7 +50,7 @@ Public Class Math_Median_CDF : Inherits TaskParent
         desc = "Compute the src image median"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If src.Channels() = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If src.Channels() <> 1 Then src = task.gray
         medianVal = computeMedian(src, New cv.Mat, src.Total, task.histogramBins, rangeMin, rangeMax)
 
         If standaloneTest() Then

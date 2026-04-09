@@ -465,9 +465,7 @@ Public Class NR_Feature_AKaze : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst2 = src.Clone()
-        If src.Channels() <> 1 Then
-            src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        End If
+        If src.Channels() <> 1 Then src = task.gray
         If kaze Is Nothing Then kaze = cv.AKAZE.Create()
         Dim kazeDescriptors As New cv.Mat()
         kaze.DetectAndCompute(src, Nothing, kazeKeyPoints, kazeDescriptors)

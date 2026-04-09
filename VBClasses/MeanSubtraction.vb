@@ -44,7 +44,7 @@ Public Class MeanSubtraction_Gray : Inherits TaskParent
         desc = "Apply mean subtraction of the grayscale image."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If src.Channels <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If src.Channels <> 1 Then src = task.gray
         MeanSub.Run(src)
         dst2 = MeanSub.dst2
         dst2 += 1 ' stay away from zero...

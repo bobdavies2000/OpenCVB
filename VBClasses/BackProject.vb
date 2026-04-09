@@ -50,6 +50,7 @@ Public Class NR_BackProject_Reduction : Inherits TaskParent
     Dim bProject As New BackProject_Basics
     Public Sub New()
         labels(3) = "Backprojection of highlighted histogram bin"
+        task.fOptions.ReductionSlider.Value = 50
         desc = "Use the histogram of a reduced BGR image to isolate featureless portions of an image."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -434,7 +435,6 @@ End Class
 Public Class NR_BackProject_MaskLines : Inherits TaskParent
     Dim masks As New PlotMouse_MaskBackProject
     Public Sub New()
-        If standalone Then task.gOptions.displayDst1.Checked = True
         dst1 = New cv.Mat(dst1.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         labels = {"", "lines detected in the backProjection mask", "Histogram of pixels in a grayscale image.  Move mouse to see lines detected in the backprojection mask",
                   "Yellow is backProjection, lines detected are highlighted"}
@@ -442,21 +442,21 @@ Public Class NR_BackProject_MaskLines : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         masks.Run(src)
+        dst1 = masks.dst1
         dst2 = masks.dst2
-        dst3 = src.Clone
 
         Static saveHistIndex As Integer = masks.histIndex
         If masks.histIndex <> saveHistIndex Then dst1.SetTo(0)
 
-        Dim vecArray = task.lines.getRawVecs(masks.mask)
+        Dim vecArray = task.lines.getRawVecs(dst1)
         Dim lpList = Line_Basics_TA.getRawLines(vecArray)
 
         For Each lp In lpList
             Dim val = masks.dst3.Get(Of Byte)(lp.p1.Y, lp.p1.X)
             If val = 255 Then dst2.Line(lp.p1, lp.p2, white, task.lineWidth, task.lineWidth)
         Next
-        dst3.SetTo(cv.Scalar.Yellow, masks.mask)
-        dst3.SetTo(task.highlight, dst1)
+        dst3 = masks.dst3
+        labels = masks.labels
     End Sub
 End Class
 

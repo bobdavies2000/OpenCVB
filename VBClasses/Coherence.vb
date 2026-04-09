@@ -21,6 +21,7 @@ Public Class Coherence_Basics : Inherits TaskParent
             Case Else
                 side = 50
         End Select
+        If src.Channels <> 1 Then src = task.gray
         Dim xoffset = src.Width / 2 - side / 2
         Dim yoffset = src.Height / 2 - side / 2
         Dim srcRect = New cv.Rect(xoffset, yoffset, side, side)
@@ -29,18 +30,16 @@ Public Class Coherence_Basics : Inherits TaskParent
         dst2 = src.Clone()
         src = src(srcRect)
 
-        ' Dim gray As New cv.Mat
         Dim eigen As New cv.Mat
         Dim split() As cv.Mat
         For i = 0 To 3
-            Dim gray = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-            eigen = gray.CornerEigenValsAndVecs(options.str_sigma, options.eigenkernelsize)
+            eigen = src.CornerEigenValsAndVecs(options.str_sigma, options.eigenkernelsize)
             split = eigen.Split()
             Dim x = split(2), y = split(3)
 
-            Dim gxx = gray.Sobel(cv.MatType.CV_32F, 2, 0, options.sigma)
-            Dim gxy = gray.Sobel(cv.MatType.CV_32F, 1, 1, options.sigma)
-            Dim gyy = gray.Sobel(cv.MatType.CV_32F, 0, 2, options.sigma)
+            Dim gxx = src.Sobel(cv.MatType.CV_32F, 2, 0, options.sigma)
+            Dim gxy = src.Sobel(cv.MatType.CV_32F, 1, 1, options.sigma)
+            Dim gyy = src.Sobel(cv.MatType.CV_32F, 0, 2, options.sigma)
 
             Dim tmpX As New cv.Mat, tmpXY As New cv.Mat, tmpY As New cv.Mat
             cv.Cv2.Multiply(x, x, tmpX)

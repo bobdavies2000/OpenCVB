@@ -10,7 +10,7 @@ Public Class GridRect_Basics : Inherits TaskParent
         desc = "Compute the stdev for each r.  If small (<10), mark as featureLess."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        dst1 = If(src.Channels() <> 1, src.CvtColor(cv.ColorConversionCodes.BGR2GRAY), src.Clone)
+        dst1 = If(src.Channels() <> 1, task.gray, src.Clone)
         stdevList.Clear()
         meanList.Clear()
         Dim mean As cv.Scalar, stdev As cv.Scalar
@@ -210,7 +210,7 @@ Public Class NR_GridRect_CorrelationMotion : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
 
-        dst1 = If(src.Channels() <> 1, src.CvtColor(cv.ColorConversionCodes.BGR2GRAY), src.Clone)
+        dst1 = If(src.Channels() <> 1, task.gray, src.Clone)
         gather.Run(dst1)
         dst2 = gather.dst2
 
@@ -250,7 +250,7 @@ Public Class GridRect_LowStdev : Inherits TaskParent
         desc = "Isolate the r's with low stdev"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        dst1 = If(src.Channels() <> 1, src.CvtColor(cv.ColorConversionCodes.BGR2GRAY), src.Clone)
+        dst1 = If(src.Channels() <> 1, task.gray, src.Clone)
         gather.Run(dst1)
         dst2 = gather.dst2
 
@@ -282,7 +282,7 @@ Public Class NR_GridRect_LowStdevCorrelation : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
 
-        dst1 = If(src.Channels() <> 1, src.CvtColor(cv.ColorConversionCodes.BGR2GRAY), src.Clone)
+        dst1 = If(src.Channels() <> 1, task.gray, src.Clone)
         gather.Run(dst1)
         dst2 = gather.dst2
 
@@ -365,7 +365,7 @@ Public Class NR_GridRect_LRClick : Inherits TaskParent
 
         dst0 = src.Clone
         dst3 = If(task.rightView.Channels() <> 3, task.rightView.CvtColor(cv.ColorConversionCodes.GRAY2BGR), task.rightView.Clone)
-        src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        src = task.gray
         If task.rightView.Channels() <> 1 Then task.rightView = task.rightView.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
         gather.Run(src)
@@ -439,7 +439,7 @@ Public Class NR_GridRect_LRAll : Inherits TaskParent
         options.Run()
 
         dst3 = If(task.rightView.Channels() <> 3, task.rightView.CvtColor(cv.ColorConversionCodes.GRAY2BGR), task.rightView.Clone)
-        src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        src = task.gray
         If task.rightView.Channels() <> 1 Then task.rightView = task.rightView.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
         gather.Run(src)

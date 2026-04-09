@@ -525,7 +525,7 @@ Public Class ML_RemoveDups_CPP : Inherits TaskParent
         desc = "The input is BGR, convert to BGRA, and sorted as an integer.  The output is a sorted BGR Mat file with duplicates removed."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If src.Type = cv.MatType.CV_8U Then dst2 = src.Clone Else dst2 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If src.Type = cv.MatType.CV_8U Then dst2 = src.Clone Else dst2 = task.gray
 
         Dim dataSrc(dst2.Total * dst2.ElemSize) As Byte
         Marshal.Copy(dst2.Data, dataSrc, 0, dataSrc.Length)

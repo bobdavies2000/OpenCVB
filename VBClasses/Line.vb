@@ -132,7 +132,7 @@ Public Class NR_Line_Core : Inherits TaskParent
                        "rectangle (provided externally)"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If src.Channels() = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If src.Channels() <> 1 Then src = task.gray
         If src.Type <> cv.MatType.CV_8U Then src.ConvertTo(src, cv.MatType.CV_8U)
 
         Dim vecArray = task.lines.getRawVecs(src)

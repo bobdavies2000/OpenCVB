@@ -16,7 +16,7 @@ Public Class KMeans_Basics : Inherits TaskParent
                                 "Testing individually hasn't shown problems.  Skip it for now to continue test.")
             Return
         End If
-        If standaloneTest() And src.Channels() <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If standaloneTest() And src.Channels() <> 1 Then src = task.gray
         options.Run()
         classCount = options.kMeansK
         If task.optionsChanged Then
@@ -92,7 +92,7 @@ Public Class NR_KMeans_k2_to_k8 : Inherits TaskParent
         End If
 
         kSlider.Value = Choose(kmIndex + 1, 2, 4, 6, 8)
-        km.Run(src.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
+        km.Run(task.gray)
         Mats.mat(kmIndex) = km.dst2 * 255 / km.classCount
 
         Mats.Run(emptyMat)
@@ -193,7 +193,7 @@ Public Class NR_KMeans_Simple_CPP : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If standaloneTest() Then src = task.pcSplit(2)
-        If src.Channels() <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If src.Channels() <> 1 Then src = task.gray
 
         Dim mm As mmData = GetMinMax(src, task.depthmask)
 
@@ -353,7 +353,7 @@ Public Class NR_KMeans_DepthPlusGray : Inherits TaskParent
         desc = "Cluster the rgb+depth image pixels using kMeans"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        src.CvtColor(cv.ColorConversionCodes.BGR2GRAY).ConvertTo(grayPlus(0), cv.MatType.CV_32F)
+        task.gray.ConvertTo(grayPlus(0), cv.MatType.CV_32F)
         grayPlus(0).SetTo(0, task.noDepthMask)
         grayPlus(1) = task.pcSplit(2)
 
@@ -393,7 +393,7 @@ Public Class KMeans_Dimensions : Inherits TaskParent
                 If src.Channels() = 1 Then
                     src.ConvertTo(merge, cv.MatType.CV_32F)
                 Else
-                    src.CvtColor(cv.ColorConversionCodes.BGR2GRAY).ConvertTo(merge, cv.MatType.CV_32F)
+                    task.gray.ConvertTo(merge, cv.MatType.CV_32F)
                 End If
             Case 2 ' pointcloud x and y
                 cv.Cv2.Merge({task.pcSplit(0), task.pcSplit(1)}, merge)

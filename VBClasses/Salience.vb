@@ -11,7 +11,7 @@ Public Class Salience_Basics_CPP : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
 
-        If src.Channels() = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If src.Channels() <> 1 Then src = task.gray
         If src.Total <> grayData.Length Then ReDim grayData(src.Total - 1)
         Dim grayHandle = GCHandle.Alloc(grayData, GCHandleType.Pinned)
         src.GetArray(Of Byte)(grayData)
@@ -34,7 +34,7 @@ Public Class NR_Salience_Basics_MT : Inherits TaskParent
         desc = "Show results of multi-threaded Salience algorithm when using C++.  NOTE: salience is relative."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If src.Channels() = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If src.Channels() <> 1 Then src = task.gray
         Dim threads = 32
         Dim h = src.Height \ threads
         dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))

@@ -152,7 +152,7 @@ Public Class NR_Interpolate_Difference : Inherits TaskParent
         dst2 = inter.dst3.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         labels(2) = inter.labels(3)
 
-        diff.lastFrame = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        diff.lastFrame = task.gray
         diff.Run(dst2)
         dst3 = diff.dst2
     End Sub
@@ -180,7 +180,7 @@ Public Class NR_Interpolate_QuarterBeat : Inherits TaskParent
             diff.Run(src)
             dst3 = diff.dst2
             If diff.dst2.CountNonZero > 0 Then
-                diff.lastFrame = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+                diff.lastFrame = task.gray
                 dst2 = src
                 updatedFrames += 1
             End If

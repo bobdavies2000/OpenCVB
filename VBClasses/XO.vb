@@ -367,7 +367,7 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             Dim pad = task.brickEdgeLen / 2
 
-            src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+            src = task.gray
             If task.heartBeat Then
                 ptLeft = task.lpGravity.p1
                 ptRight = task.lpGravity.p2
@@ -493,7 +493,7 @@ Namespace VBClasses
             Dim lpGravity = New lpData(task.lpGravity.p1, task.lpGravity.p2)
             Dim lpHorizon = New lpData(task.lpHorizon.p1, task.lpHorizon.p2)
 
-            If src.Channels() <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+            If src.Channels() <> 1 Then src = task.gray
 
             translationX = task.gOptions.DebugSlider.Value ' Math.Round(lpGravity.p1.X - task.lpGravity.p1.X)
             translationY = task.gOptions.DebugSlider.Value ' Math.Round(lpHorizon.p1.Y - task.lpHorizon.p1.Y)
@@ -612,7 +612,7 @@ Namespace VBClasses
                 lpHorizon = task.lpHorizon
             End If
 
-            If src.Channels() <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+            If src.Channels() <> 1 Then src = task.gray
 
             Dim x1 = lpGravity.p1.X - task.lpGravity.p1.X
             Dim x2 = lpGravity.p2.X - task.lpGravity.p2.X
@@ -857,7 +857,7 @@ Namespace VBClasses
             Static saveTrueData As New List(Of TrueText)
             If task.heartBeat Then
                 dst3.SetTo(0)
-                dst2 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+                dst2 = task.gray
                 Dim count As Integer
                 For Each brick In bricks.brickList
                     cv.Cv2.MeanStdDev(dst2(brick.rect), grayMean, grayStdev)
@@ -947,7 +947,7 @@ Namespace VBClasses
                        "rectangle (provided externally)"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If src.Channels() = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+            If src.Channels() <> 1 Then src = task.gray
             If src.Type <> cv.MatType.CV_8U Then src.ConvertTo(src, cv.MatType.CV_8U)
 
             Dim lines = ld.Detect(src(subsetRect))
@@ -2556,7 +2556,7 @@ Namespace VBClasses
             connect.Run(src)
             dst2 = connect.dst3
             labels(2) = connect.labels(2)
-            dst1 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+            dst1 = task.gray
             dst1.SetTo(0, Not connect.dst1.Threshold(0, 255, cv.ThresholdTypes.Binary))
 
             sort.Run(dst1)
@@ -4052,7 +4052,7 @@ Namespace VBClasses
             End If
 
             Dim allContours As cv.Point()() = Nothing
-            If src.Channels() <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+            If src.Channels() <> 1 Then src = task.gray
             cv.Cv2.FindContours(src, allContours, Nothing, cv.RetrievalModes.External, options.ApproximationMode)
             If allContours.Count = 0 Then Exit Sub
 
@@ -7249,7 +7249,7 @@ Namespace VBClasses
             templateRect = New cv.Rect(src.Width / 2 - options.width / 2, src.Height / 2 - options.height / 2,
                                        options.width, options.height)
 
-            If src.Channels() <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+            If src.Channels() <> 1 Then src = task.gray
             If task.firstPass Then lastFrame = src.Clone()
 
             dst2 = src.Clone
@@ -7361,7 +7361,7 @@ Namespace VBClasses
 
             dst2 = src
 
-            If src.Channels() = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+            If src.Channels() <> 1 Then src = task.gray
             inputFeat = New List(Of cv.Point2f)(task.features)
             features1 = cv.Mat.FromPixelData(inputFeat.Count, 1, cv.MatType.CV_32FC2, inputFeat.ToArray)
 
@@ -7474,7 +7474,7 @@ Namespace VBClasses
                 lr = New cv.Rect(dst2.Width - size, dst2.Height - size, size, size)
             End If
 
-            src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+            src = task.gray
             features.Clear()
             getKeyPoints(src, ul)
             getKeyPoints(src, ur)
@@ -8574,7 +8574,7 @@ Namespace VBClasses
                    "rectangle (provided externally)"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If src.Channels() = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+            If src.Channels() <> 1 Then src = task.gray
             If src.Type <> cv.MatType.CV_8U Then src.ConvertTo(src, cv.MatType.CV_8U)
 
             Dim lines = ld.Detect(src)
@@ -8649,7 +8649,7 @@ Namespace VBClasses
                    "rectangle (provided externally)"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If src.Channels() = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+            If src.Channels() <> 1 Then src = task.gray
             If src.Type <> cv.MatType.CV_8U Then src.ConvertTo(src, cv.MatType.CV_8U)
 
             Dim lines = ld.Detect(src)
@@ -10567,7 +10567,7 @@ Namespace VBClasses
             desc = "Identify each Connected component as a RedCloud Cell."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If src.Channels() <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+            If src.Channels() <> 1 Then src = task.gray
             ccomp.Run(src)
             dst3 = ccomp.dst3.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
             labels(3) = ccomp.labels(2)
@@ -12149,7 +12149,7 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
 
-            src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+            src = task.gray
 
             Static lastFrame As cv.Mat = src
             cv.Cv2.Absdiff(src, lastFrame, dst2)
@@ -12721,7 +12721,7 @@ Namespace VBClasses
             options.Run()
             options1.Run()
 
-            If src.Channels() <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+            If src.Channels() <> 1 Then src = task.gray
 
             Static offsetImage As cv.Mat = src.Clone
             Dim rect1 = New cv.Rect(options.xDisp, options.yDisp, dst2.Width - options.xDisp - 1, dst2.Height - options.yDisp - 1)
@@ -12749,7 +12749,7 @@ Namespace VBClasses
             desc = "Use EdgeLines to find edges/lines but without using motionMask"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If src.Channels() <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+            If src.Channels() <> 1 Then src = task.gray
 
             Dim cppData(src.Total - 1) As Byte
             src.GetArray(Of Byte)(cppData)
@@ -13475,7 +13475,7 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             Static correlationSlider = OptionParent.FindSlider("Correlation Threshold")
             Dim CCthreshold = CSng(correlationSlider.Value / correlationSlider.Maximum)
-            If src.Channels() = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+            If src.Channels() <> 1 Then src = task.gray
             If task.heartBeat Then dst3 = src.Clone
 
             dst2 = src
@@ -13509,7 +13509,7 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             Static correlationSlider = OptionParent.FindSlider("Correlation Threshold")
             Dim CCthreshold = CSng(correlationSlider.Value / correlationSlider.Maximum)
-            If src.Channels() = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+            If src.Channels() <> 1 Then src = task.gray
             If task.heartBeat Then dst3 = src.Clone
 
             Dim roiMotion As New List(Of cv.Rect)
@@ -14994,7 +14994,7 @@ Namespace VBClasses
             Dim maxAngle = angleSlider.Value
 
             dst2 = src.Clone
-            Dim vecArray = task.lines.getRawVecs(src.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
+            Dim vecArray = task.lines.getRawVecs(task.gray)
             Dim lplist = Line_Basics_TA.getRawLines(vecArray)
 
             sortedVerticals.Clear()
@@ -15689,7 +15689,7 @@ Namespace VBClasses
             desc = "Access the EdgeDraw algorithm directly rather than through to CPP_Basics interface - more efficient"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If src.Channels() <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+            If src.Channels() <> 1 Then src = task.gray
 
             Dim cppData(src.Total - 1) As Byte
             src.GetArray(Of Byte)(cppData)
@@ -16555,7 +16555,7 @@ Namespace VBClasses
         End Sub
 
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If src.Channels() = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+            If src.Channels() <> 1 Then src = task.gray
             options.Run()
             Static lastGray As cv.Mat = src.Clone
             Dim hsv = opticalFlow_Dense(lastGray, src, options.pyrScale, options.levels, options.winSize, options.iterations, options.polyN,

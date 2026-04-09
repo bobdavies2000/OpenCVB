@@ -19,7 +19,7 @@ Public Class HistValley_Basics : Inherits TaskParent
         Dim vCount = options.desiredBoundaries
         Dim minDistance = options.peakDistance
 
-        If src.Channels() <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If src.Channels() <> 1 Then src = task.gray
 
         hist.Run(src)
         dst2 = hist.dst2
@@ -544,7 +544,7 @@ Public Class NR_HistValley_GrayKalman : Inherits TaskParent
         desc = "Find the histogram valleys for a grayscale image."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        src = task.gray
 
         hist.Run(src)
         dst2 = hist.dst2
@@ -582,7 +582,7 @@ Public Class NR_HistValley_GrayScale1 : Inherits TaskParent
         desc = "Find the histogram valleys for a grayscale image."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        src = task.gray
 
         hist.Run(src)
         dst2 = hist.dst2

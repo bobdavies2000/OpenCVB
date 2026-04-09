@@ -111,7 +111,7 @@ Public Class GeneticDrawing_Basics : Inherits TaskParent
                 src = If(options.snapCheck, src.Clone, cv.Cv2.ImRead(task.homeDir + "Data/GeneticDrawingExample.jpg").Resize(src.Size()))
             End If
 
-            src = If(src.Channels() = 3, src.CvtColor(cv.ColorConversionCodes.BGR2GRAY), src)
+            src = If(src.Channels() = 3, task.gray, src)
             mats.mat(0) = src
             gradient.Run(mats.mat(0))
             mats.mat(2) = gradient.magnitude.ConvertScaleAbs(255)

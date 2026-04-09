@@ -31,11 +31,9 @@ Public Class NR_OilPaint_Pointilism : Inherits TaskParent
             cv.Cv2.RandShuffle(randomMask, 1.0, myRNG) ' the RNG is not optional.
         End If
         Dim rand = randomMask.Resize(img.Size())
-        Dim gray = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-
         Dim fieldx As New cv.Mat, fieldy As New cv.Mat
-        cv.Cv2.Scharr(gray, fieldx, cv.MatType.CV_32FC1, 1, 0, 1 / 15.36)
-        cv.Cv2.Scharr(gray, fieldy, cv.MatType.CV_32FC1, 0, 1, 1 / 15.36)
+        cv.Cv2.Scharr(task.gray, fieldx, cv.MatType.CV_32FC1, 1, 0, 1 / 15.36)
+        cv.Cv2.Scharr(task.gray, fieldy, cv.MatType.CV_32FC1, 0, 1, 1 / 15.36)
 
         cv.Cv2.GaussianBlur(fieldx, fieldx, New cv.Size(options.smoothingRadius, options.smoothingRadius), 0, 0)
         cv.Cv2.GaussianBlur(fieldy, fieldy, New cv.Size(options.smoothingRadius, options.smoothingRadius), 0, 0)

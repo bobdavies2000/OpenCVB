@@ -14,7 +14,7 @@ Public Class NR_PhotoShop_Clahe : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         Static clipSlider = OptionParent.FindSlider("Clip Limit")
-        If src.Channels() = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If src.Channels() <> 1 Then src = task.gray
         dst2 = src
         Dim claheObj = cv.Cv2.CreateCLAHE()
         claheObj.TilesGridSize() = New cv.Size(CInt(task.brickEdgeLen), CInt(task.brickEdgeLen))
@@ -261,7 +261,7 @@ Public Class PhotoShop_Emboss : Inherits TaskParent
             If frm.check(direction).Checked Then Exit For
         Next
 
-        dst2 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        dst2 = task.gray
 
         Select Case direction
             Case 0 ' do nothing!
@@ -303,7 +303,7 @@ Public Class NR_PhotoShop_EmbossAll : Inherits TaskParent
         Static threshSlider = OptionParent.FindSlider("Emboss threshold")
         Dim kernel = emboss.kernelGenerator(sizeSlider.Value)
 
-        dst2 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        dst2 = task.gray
         dst3 = dst2.Filter2D(-1, kernel)
         cv.Cv2.Add(dst3, emboss.gray128, mats.mat(0))
         mats.mat(0) = mats.mat(0).Threshold(threshSlider.Value, 255, cv.ThresholdTypes.Binary)
@@ -493,7 +493,7 @@ Public Class NR_PhotoShop_Pencil_Manual : Inherits TaskParent
         desc = "Break down the process of converting an image to a sketch"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If src.Channels() = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If src.Channels() <> 1 Then src = task.gray
         Dim grayinv As New cv.Mat
         grayinv = Not src
         Static kernelSlider = OptionParent.FindSlider("Blur kernel size")

@@ -70,7 +70,7 @@ Public Class FeatureFlow_LucasKanade : Inherits TaskParent
         dst2 = src.Clone()
         dst3 = src.Clone()
 
-        If src.Channels() = 3 Then src = task.gray
+        If src.Channels() <> 1 Then src = task.gray
         Static lastGray As cv.Mat = task.gray.Clone
         features = task.features
         Dim features1 = cv.Mat.FromPixelData(features.Count, 1, cv.MatType.CV_32FC2, features.ToArray)

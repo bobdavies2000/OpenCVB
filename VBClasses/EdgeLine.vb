@@ -153,7 +153,7 @@ Public Class NR_EdgeLine_Simple : Inherits TaskParent
         desc = "Retain the existing edge/lines and add the edge/lines where motion occurred."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        Dim input = If(src.Channels() = 1, src.Clone, src.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
+        Dim input = If(src.Channels() = 1, src.Clone, task.gray)
 
         Dim cppData(input.Total - 1) As Byte
         input.GetArray(Of Byte)(cppData)
@@ -214,7 +214,7 @@ Public Class NR_EdgeLine_Segments : Inherits TaskParent
         desc = "Get the segments from the EdgeDraw C++ algorithm - the list of points for each line in the output."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If src.Channels() <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If src.Channels() <> 1 Then src = task.gray
 
         Dim cppData(src.Total - 1) As Byte
         src.GetArray(Of Byte)(cppData)

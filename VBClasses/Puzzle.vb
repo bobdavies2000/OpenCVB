@@ -91,7 +91,7 @@ Public Class NR_Puzzle_SolverDynamic : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         puzzle.puzzle.image = src.Clone
-        puzzle.grayMat = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        puzzle.grayMat = task.gray
         puzzle.Run(src)
         dst2 = puzzle.dst2
         dst3 = puzzle.dst3

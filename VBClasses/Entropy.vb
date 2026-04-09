@@ -24,8 +24,8 @@ Public Class Entropy_Basics : Inherits TaskParent
             task.drawRect = validatePreserve(New cv.Rect(task.clickPoint.X, task.clickPoint.Y, stdSize, stdSize))
         End If
         task.drawRect = ValidateRect(task.drawRect)
-        If src.Channels() = 3 Then
-            entropy.Run(src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)(task.drawRect))
+        If src.Channels() <> 1 Then
+            entropy.Run(task.gray(task.drawRect))
         Else
             entropy.Run(src(task.drawRect))
         End If
@@ -61,11 +61,10 @@ Public Class Entropy_Highest : Inherits TaskParent
         Dim minEntropy As Single = Single.MaxValue
         trueData.Clear()
 
-        src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         dst1.SetTo(0)
         For Each roi In task.gridRects
             If roi.Width = roi.Height Then
-                entropy.Run(src(roi))
+                entropy.Run(task.gray(roi))
                 dst1(roi).SetTo(entropy.entropyVal)
 
                 If entropy.entropyVal > maxEntropy Or task.optionsChanged Then
@@ -82,7 +81,7 @@ Public Class Entropy_Highest : Inherits TaskParent
         Next
 
         dst2 = dst1.ConvertScaleAbs(255 / (maxEntropy - minEntropy), minEntropy)
-        dst2 = ShowAddweighted(src, dst2, labels(3))
+        dst2 = ShowAddweighted(task.gray, dst2, labels(3))
 
         If standaloneTest() Then
             dst2.Rectangle(eMaxRect, 255, task.lineWidth)
@@ -134,7 +133,7 @@ Public Class Entropy_Rectangle : Inherits TaskParent
     End Function
     Public Overrides Sub RunAlg(src As cv.Mat)
         Dim dimensions() = New Integer() {task.histogramBins}
-        If src.Channels() <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If src.Channels() <> 1 Then src = task.gray
 
         Dim mm = GetMinMax(src)
         Dim ranges() = New cv.Rangef() {New cv.Rangef(mm.minVal, mm.maxVal)}
