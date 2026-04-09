@@ -412,7 +412,7 @@ End Class
 
 
 
-Public Class EdgeLine_LeftRight : Inherits TaskParent
+Public Class EdgeLine_LeftRightMotion : Inherits TaskParent
     Dim edges As New EdgeLine_Basics_TA
     Public Sub New()
         labels(3) = "Right View: Note it is updated on every frame - it cannot use the motion mask."

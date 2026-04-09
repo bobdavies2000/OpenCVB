@@ -1,4 +1,5 @@
-﻿Imports cv = OpenCvSharp
+﻿Imports SharpGL.SceneGraph.Raytracing
+Imports cv = OpenCvSharp
 Public Class PlotMouse_Basics : Inherits TaskParent
     Public plotHist As New PlotBar_Basics
     Public histogram As New cv.Mat
@@ -66,7 +67,6 @@ Public Class PlotMouse_Basics32F : Inherits TaskParent
         For i = 1 To CInt(task.MaxZmeters) - 1
             dst2.Line(New cv.Point(stepsize * i, 0), New cv.Point(stepsize * i, dst2.Height), white, task.cvFontThickness)
         Next
-
 
         Dim barWidth = dst2.Width / task.histogramBins
         Dim histIndex = Math.Floor(task.mouseMovePoint.X / barWidth)
@@ -146,50 +146,6 @@ End Class
 
 
 
-Public Class PlotMouse_BackProjectMasks : Inherits TaskParent
-    Public hist As New Histogram_Basics
-    Public histIndex As Integer
-    Public mask As New cv.Mat
-    Public Sub New()
-        labels(2) = "Histogram for the gray scale image.  Move mouse to see backprojection of each grayscale mask."
-        desc = "Create all the backprojection masks from a grayscale histogram"
-    End Sub
-    Public Function maskDetect(gray As cv.Mat, histIndex As Integer) As cv.Mat
-        Dim brickWidth = dst2.Width / hist.histogram.Rows
-        Dim brickRange = 255 / hist.histogram.Rows
-
-        Dim minRange = If(histIndex = hist.histogram.Rows - 1, 255 - brickRange, histIndex * brickRange)
-        Dim maxRange = If(histIndex = hist.histogram.Rows - 1, 255, (histIndex + 1) * brickRange)
-        If Single.IsNaN(minRange) Or Single.IsInfinity(minRange) Or
-           Single.IsNaN(maxRange) Or Single.IsInfinity(maxRange) Then
-            SetTrueText("Input data has no values - exit " + traceName)
-            Return New cv.Mat
-        End If
-
-        Dim ranges() = New cv.Rangef() {New cv.Rangef(minRange, maxRange)}
-
-        cv.Cv2.CalcBackProject({gray}, {0}, hist.histogram, mask, ranges)
-        Return mask
-    End Function
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        hist.Run(task.gray)
-        dst2 = hist.dst2
-
-        Dim brickWidth = dst2.Width / task.histogramBins
-        histIndex = Math.Floor(task.mouseMovePoint.X / brickWidth)
-
-        dst3 = task.color.Clone
-        dst1 = maskDetect(task.gray, histIndex)
-        If dst1.Width = 0 Then Exit Sub
-        dst3.SetTo(white, dst1)
-        dst2.Rectangle(New cv.Rect(CInt(histIndex * brickWidth), 0, brickWidth, dst2.Height), cv.Scalar.Yellow, task.lineWidth)
-    End Sub
-End Class
-
-
-
-
-
 Public Class PlotMouse_SobelDerivative : Inherits TaskParent
     Dim deriv As New Derivative_Sobel
     Public Sub New()
@@ -229,5 +185,46 @@ Public Class PlotMouse_StableGray : Inherits TaskParent
 
         dst3 = plot.dst3
         labels(3) = plot.labels(3)
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class PlotMouse_MaskBackProject : Inherits TaskParent
+    Public hist As New Histogram_Basics
+    Public histIndex As Integer
+    Public mask As New cv.Mat
+    Public Sub New()
+        hist.plotHist.removeZeroEntry = False
+        labels(2) = "Histogram for the gray scale image.  Move mouse to see backprojection of each grayscale mask."
+        desc = "Create all the backprojection masks from a grayscale histogram"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        hist.Run(task.gray)
+        dst2 = hist.dst2
+
+        Dim brickWidth = dst2.Width / task.histogramBins
+        histIndex = Math.Floor(task.mouseMovePoint.X / brickWidth)
+
+        dst3 = task.color.Clone
+        Dim brickRange = 255 / hist.histogram.Rows
+
+        Dim minRange = If(histIndex = hist.histogram.Rows - 1, 255 - brickRange, histIndex * brickRange)
+        Dim maxRange = If(histIndex = hist.histogram.Rows - 1, 255, (histIndex + 1) * brickRange)
+        If Single.IsNaN(minRange) Or Single.IsInfinity(minRange) Or
+           Single.IsNaN(maxRange) Or Single.IsInfinity(maxRange) Then
+            SetTrueText("Input data has no values - exit " + traceName)
+            Exit Sub
+        End If
+
+        Dim ranges() = New cv.Rangef() {New cv.Rangef(minRange, maxRange)}
+
+        cv.Cv2.CalcBackProject({task.gray}, {0}, hist.histogram, dst1, ranges)
+        If dst1.Width = 0 Then Exit Sub
+        dst3.SetTo(task.highlight, dst1)
+        dst2.Rectangle(New cv.Rect(CInt(histIndex * brickWidth), 0, brickWidth, dst2.Height), cv.Scalar.Yellow, task.lineWidth)
     End Sub
 End Class

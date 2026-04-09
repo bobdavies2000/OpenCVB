@@ -983,7 +983,7 @@ Namespace VBClasses
 
 
 
-    Public Class XO_Line_LeftRight : Inherits TaskParent
+    Public Class XO_Line_LeftRightMotion : Inherits TaskParent
         Dim lineCore As New XO_Line_Core
         Public Sub New()
             If standalone Then task.gOptions.displayDst1.Checked = True
@@ -11755,7 +11755,7 @@ Namespace VBClasses
 
     Public Class XO_Motion_BestBricks : Inherits TaskParent
         Dim match As New Match_Basics
-        Dim brickLine As New BrickLine_LeftRight
+        Dim brickLine As New BrickLine_LeftRightMotion
         Public Sub New()
             labels(2) = "Best bricks are shown below and their match offsets show in dst3 - X/Y"
             desc = "Identify the motion for each of the 'Best' bricks"
@@ -13132,7 +13132,7 @@ Namespace VBClasses
 
     Public Class XO_Line_Generations : Inherits TaskParent
         Dim knn As New KNN_Basics
-        Dim match3 As New XO_Line_LeftRightMatch3
+        Dim match3 As New XO_Line_LeftRightMotionMatch3
         Public lpOutput As New List(Of lpData)
         Public Sub New()
             desc = "Identify any lines in both the current and the previous frame."
@@ -14663,8 +14663,8 @@ Namespace VBClasses
 
 
 
-    Public Class XO_Line_LeftRightMatch : Inherits TaskParent
-        Dim lrLines As New Line_LeftRight
+    Public Class XO_Line_LeftRightMotionMatch : Inherits TaskParent
+        Dim lrLines As New Line_LeftRightMotion
         Public lp As New lpData
         Public lpOutput As New lpData
         Public Sub New()
@@ -14702,8 +14702,8 @@ Namespace VBClasses
 
 
 
-    Public Class XO_Line_LeftRightMatch3 : Inherits TaskParent
-        Dim lrLines As New Line_LeftRight
+    Public Class XO_Line_LeftRightMotionMatch3 : Inherits TaskParent
+        Dim lrLines As New Line_LeftRightMotion
         Public lp As New lpData
         Public lpOutput As New List(Of lpData)
         Public Sub New()
@@ -16835,7 +16835,7 @@ Namespace VBClasses
 
 
 
-    Public Class XO_Line_LeftRight1 : Inherits TaskParent
+    Public Class XO_Line_LeftRightMotion1 : Inherits TaskParent
         Public linesLeft As New Line_Basics_TA
         Public linesRight As New Line_Basics_TA
         Dim motionLeft As New Motion_Basics_TA

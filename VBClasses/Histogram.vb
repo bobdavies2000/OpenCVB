@@ -145,7 +145,7 @@ End Class
 
 
 Public Class NR_Histogram_NormalizeGray : Inherits TaskParent
-    Public histogram As New Histogram_Basics
+    Public hist As New Histogram_Basics
     Dim options As New Options_Histogram
     Public Sub New()
         labels(2) = "Use sliders to adjust the image and create a histogram of the results"
@@ -155,8 +155,8 @@ Public Class NR_Histogram_NormalizeGray : Inherits TaskParent
         options.Run()
 
         dst3 = src.Normalize(options.minGray, options.maxGray, cv.NormTypes.MinMax) ' only minMax is working...
-        histogram.Run(dst3)
-        dst2 = histogram.dst2
+        hist.Run(dst3)
+        dst2 = hist.dst2
     End Sub
 End Class
 
@@ -757,7 +757,7 @@ End Class
 
 
 Public Class NR_Histogram_Peaks : Inherits TaskParent
-    Dim masks As New PlotMouse_BackProjectMasks
+    Dim masks As New PlotMouse_MaskBackProject
     Public Sub New()
         desc = "Interactive Histogram"
     End Sub
@@ -855,7 +855,7 @@ End Class
 
 
 Public Class NR_Histogram_FlatSurfaces : Inherits TaskParent
-    Dim masks As New PlotMouse_BackProjectMasks
+    Dim masks As New PlotMouse_MaskBackProject
     Public Sub New()
         desc = "Find flat surfaces with the histogram"
     End Sub

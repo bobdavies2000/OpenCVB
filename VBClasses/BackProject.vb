@@ -432,7 +432,7 @@ End Class
 
 
 Public Class NR_BackProject_MaskLines : Inherits TaskParent
-    Dim masks As New PlotMouse_BackProjectMasks
+    Dim masks As New PlotMouse_MaskBackProject
     Public Sub New()
         If standalone Then task.gOptions.displayDst1.Checked = True
         dst1 = New cv.Mat(dst1.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))

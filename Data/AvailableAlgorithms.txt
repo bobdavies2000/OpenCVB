@@ -65,7 +65,7 @@ BrickLine_Basics_TA
 BrickLine_DepthGap
 BrickLine_Edges
 BrickLine_EdgesNoEdges
-BrickLine_LeftRight
+BrickLine_LeftRightMotion
 BrickPoint_Basics
 BrickPoint_Core
 BrickPoint_Minimum
@@ -220,7 +220,7 @@ Edge_SobelVertical
 Edge_StableLeftRight
 EdgeLine_Basics_TA
 EdgeLine_KeyColorOnly
-EdgeLine_LeftRight
+EdgeLine_LeftRightMotion
 Eigen_Input
 Eigen_Input3D
 EMax_Basics
@@ -439,6 +439,7 @@ Line_BrickListTest
 Line_DepthHistogram
 Line_Intersection
 Line_LeftRight
+Line_LeftRightMotion
 Line_LeftTrack
 Line_Map
 Line_MapRects
@@ -1486,10 +1487,10 @@ PlotBar_HistCoreRange
 PlotBar_Histogram2D
 PlotDots_Basics
 PlotDots_Heartbeats
-PlotMouse_BackProjectMasks
 PlotMouse_Basics
 PlotMouse_Basics32F
 PlotMouse_Correlation
+PlotMouse_MaskBackProject
 PlotMouse_SobelDerivative
 PlotMouse_StableGray
 PlotOpenCV_Basics

@@ -461,7 +461,7 @@ End Class
 
 
 Public Class Line_Motion : Inherits TaskParent
-    Dim lrLines As New Line_LeftRight
+    Dim lrLines As New Line_LeftRightMotion
     Public Sub New()
         If standalone Then task.gOptions.showMotionMask.Checked = True
         desc = "Show lines with motion and lines with no motion in the leftView."
@@ -496,7 +496,7 @@ End Class
 
 
 
-Public Class Line_LeftRight : Inherits TaskParent
+Public Class Line_LeftRightMotion : Inherits TaskParent
     Public linesLeft As New Line_Basics_TA
     Public linesRight As New Line_Basics_TA
     Dim motionLeft As New Motion_Basics_TA
@@ -527,7 +527,7 @@ End Class
 
 
 Public Class Line_Vertical : Inherits TaskParent
-    Dim lrLines As New Line_LeftRight
+    Dim lrLines As New Line_LeftRightMotion
     Public lpLeft As New List(Of lpData)
     Public lpRight As New List(Of lpData)
     Public Sub New()
@@ -959,3 +959,12 @@ End Class
 
 
 
+Public Class Line_LeftRight : Inherits TaskParent
+    Dim lines As New Line_Basics_TA
+    Public Sub New()
+        desc = "Find the lines in the left and right images."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        lines.run(task.leftView)
+    End Sub
+End Class

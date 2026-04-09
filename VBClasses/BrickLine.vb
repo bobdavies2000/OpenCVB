@@ -245,8 +245,8 @@ End Class
 
 
 
-Public Class BrickLine_LeftRight : Inherits TaskParent
-    Dim edges As New EdgeLine_LeftRight
+Public Class BrickLine_LeftRightMotion : Inherits TaskParent
+    Dim edges As New EdgeLine_LeftRightMotion
     Dim fLess As New BrickLine_EdgesNoEdges
     Dim mats As New Mat_4Click
     Public bestBricks As New List(Of Integer)
