@@ -218,8 +218,8 @@ End Class
 
 
 Public Class StableGray_LeftRight : Inherits TaskParent
-    Dim stableLeft As New StableGray_BasicsMin
-    Dim stableRight As New StableGray_BasicsMin
+    Dim stableLeft As New StableGray_Basics_TA
+    Dim stableRight As New StableGray_Basics_TA
     Public Sub New()
         labels = {"", "", "Stable gray left image", "Stable gray right image"}
         desc = "Create the stable gray left and right images."

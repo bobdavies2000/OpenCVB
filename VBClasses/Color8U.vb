@@ -1,5 +1,4 @@
 Imports cv = OpenCvSharp
-Imports VBClasses
 Public Class Color8U_Basics : Inherits TaskParent
     Public classCount As Integer
     Public classifier As Object

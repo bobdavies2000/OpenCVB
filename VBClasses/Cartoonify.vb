@@ -1,6 +1,5 @@
 Imports cv = OpenCvSharp
 ' https://github.com/davemk99/Cartoonify-Image/blob/master/main.cpp
-Imports VBClasses
 Public Class Cartoonify_Basics : Inherits TaskParent
     Dim options As New Options_Cartoonify
     Public Sub New()

@@ -434,6 +434,8 @@ LeftRight_Features
 LeftRight_Reduction
 LeftRight_Stable
 Line_Basics_TA
+Line_BasicsNoMotion
+Line_BasicsNoMotion1
 Line_BrickList
 Line_BrickListTest
 Line_DepthHistogram
@@ -446,6 +448,7 @@ Line_MapRects
 Line_Motion
 Line_PerpendicularTest
 Line_Tracker
+Line_TranslatedRightView
 Line_Vertical
 Line3D_Basics
 Line3D_DrawLines

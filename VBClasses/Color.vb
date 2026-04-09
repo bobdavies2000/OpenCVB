@@ -1,5 +1,4 @@
 ﻿Imports cv = OpenCvSharp
-Imports VBClasses
 Public Class Color_Basics : Inherits TaskParent
     Public options As New Options_Color
     Public Sub New()

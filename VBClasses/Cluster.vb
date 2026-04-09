@@ -1,5 +1,4 @@
 Imports cv = OpenCvSharp
-Imports VBClasses
 Public Class Cluster_Basics : Inherits TaskParent
     Dim knn As New KNN_Basics
     Public ptInput As New List(Of cv.Point)

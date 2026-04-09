@@ -44,6 +44,7 @@ Public Class Line_Basics_TA : Inherits TaskParent
         If standalone Then motionMask = task.motion.motionMask
 
         If src.Channels <> 1 Or src.Type <> cv.MatType.CV_8U Then src = task.gray.Clone
+        dst2 = src.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         If lpList.Count <= 1 Then
             motionMask.SetTo(255)
             lpList = getRawLines(ld.Detect(src))
@@ -68,7 +69,6 @@ Public Class Line_Basics_TA : Inherits TaskParent
         lpList.Clear()
         overLappingCount = 0
         dst1.SetTo(0)
-        dst2.SetTo(0)
         For Each lp In sortlines.Values
             lp.index = lpList.Count
             If removeOverlappingLines Then
@@ -80,7 +80,7 @@ Public Class Line_Basics_TA : Inherits TaskParent
                 End If
             End If
             dst1.Line(lp.p1, lp.p2, lp.index + 1, task.lineWidth + 1, cv.LineTypes.Link4)
-            dst2.Line(lp.p1, lp.p2, lp.color, task.lineWidth, task.lineType)
+            dst2.Line(lp.p1, lp.p2, lp.color, task.lineWidth + 1, task.lineType)
             lpList.Add(lp)
         Next
 
@@ -422,17 +422,17 @@ End Class
 
 Public Class Line_DepthHistogram : Inherits TaskParent
     Dim lineVert As New Line_Vertical
-    Dim plotHist As New PlotBar_Basics
+    Dim plot As New PlotMouse_Basics
     Public Sub New()
-        plotHist.createHistogram = True
-        plotHist.removeZeroEntry = True
+        plot.plotHist.createHistogram = True
+        plot.plotHist.removeZeroEntry = True
         If standalone Then task.gOptions.DebugCheckBox.Checked = True
         If standalone Then task.gOptions.displayDst1.Checked = True
         desc = "Show the histogram of the depth data for a line.  Use debug check box to study longest line."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         lineVert.Run(src)
-        dst2 = lineVert.dst2
+        dst3 = lineVert.dst2
         For Each lp In lineVert.lpLeft
             Dim depth = task.pcSplit(2)(lp.rect)
             Dim depthMask As New cv.Mat(lp.rect.Size, cv.MatType.CV_8U, 0)
@@ -440,19 +440,23 @@ Public Class Line_DepthHistogram : Inherits TaskParent
             Dim p2 = New cv.Point2f(lp.p2.X - lp.rect.BottomRight.X, lp.p2.Y - lp.rect.BottomRight.Y)
             depthMask.Line(p1, p2, 255, task.lineWidth, task.lineType)
             Dim mmDepth = GetMinMax(depth, depthMask)
-            plotHist.Run(depth)
-            Dim hist = plotHist.histArray.ToList
+            plot.plotHist.Run(depth)
+            Dim hist = plot.plotHist.histArray.ToList
             Dim bestIndex = hist.IndexOf(hist.Max)
             Dim incr = (mmDepth.maxVal - mmDepth.minVal) / task.gOptions.HistBinBar.Value
-            lp.depth1 = mmDepth.minVal + incr * bestIndex
-            lp.depth2 = lp.depth1
+            Dim depth1 = mmDepth.minVal + incr * bestIndex
             If task.gOptions.DebugCheckBox.Checked Then
-                dst1 = plotHist.dst2
-                dst2.Rectangle(lp.rect, task.highlight, task.lineWidth)
-                SetTrueText("histogram indicates that the depth is likely at " + Format(lp.depth1, fmt1) + "m", 3)
+                dst2 = plot.plotHist.dst2
+                dst3.Rectangle(lp.rect, task.highlight, task.lineWidth)
+                labels(3) = "The histogram at left indicates that the depth is likely at " + Format(depth1, fmt1) + "m" + vbCrLf
+                labels(2) = plot.plotHist.labels(2)
                 Exit For
             End If
         Next
+        strOut = "To view any line, uncheck the debugCheckBox in the global options." + vbCrLf
+        strOut += "With debugCheckBox checked, only the longest line will be displayed." + vbCrLf
+        strOut += "Hover with the mouse over the line whose depth will be plotted." + vbCrLf
+        SetTrueText(strOut, 1)
     End Sub
 End Class
 
@@ -960,11 +964,199 @@ End Class
 
 
 Public Class Line_LeftRight : Inherits TaskParent
-    Dim lines As New Line_Basics_TA
+    Dim linesLeft As New Line_Basics_TA
+    Dim linesRight As New Line_Basics_TA
+    Dim stableLR As New StableGray_LeftRight
     Public Sub New()
         desc = "Find the lines in the left and right images."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        lines.run(task.leftView)
+        stableLR.Run(emptyMat)
+
+        Dim lpList As New List(Of lpData)
+        If task.Settings.cameraName.Contains("StereoLabs") = False Then
+            linesLeft.Run(task.leftView)
+            lpList = linesLeft.lpList
+            dst2 = linesLeft.dst2
+        Else
+            dst2 = task.leftView.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+            lpList = task.lines.lpList
+        End If
+
+        For Each lp In task.lines.lpList
+            dst2.Line(lp.p1, lp.p2, lp.color, task.lineWidth + 1, task.lineType)
+        Next
+        labels(2) = task.lines.labels(2)
+
+        linesRight.Run(stableLR.dst3)
+        dst3 = task.rightView.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        For Each lp In linesRight.lpList
+            dst3.Line(lp.p1, lp.p2, lp.color, task.lineWidth + 1, task.lineType)
+        Next
+        labels(3) = linesRight.labels(2)
+    End Sub
+End Class
+
+
+
+
+Public Class Line_BasicsNoMotion1 : Inherits TaskParent
+    Implements IDisposable
+    Public lpList As New List(Of lpData)
+    Dim ld As cv.XImgProc.FastLineDetector
+    Public removeOverlappingLines As Boolean = True
+    Public overLappingCount As Integer
+    Public Sub New()
+        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
+        If standalone Then task.gOptions.showMotionMask.Checked = True
+        ld = cv.XImgProc.CvXImgProc.CreateFastLineDetector
+        desc = "NOT Working.  The test using dst1 is not reliable."
+    End Sub
+    Public Shared Function getRawLines(lines As cv.Vec4f()) As List(Of lpData)
+        Dim lpList As New List(Of lpData)
+        For Each v In lines
+            If v(0) >= 0 And v(0) <= task.workRes.Width And v(1) >= 0 And v(1) <= task.workRes.Height And
+                           v(2) >= 0 And v(2) <= task.workRes.Width And v(3) >= 0 And v(3) <= task.workRes.Height Then
+                Dim p1 = New cv.Point(CInt(v(0)), CInt(v(1)))
+                Dim p2 = New cv.Point(CInt(v(2)), CInt(v(3)))
+                If p1.X >= 0 And p1.X < task.workRes.Width And p1.Y >= 0 And p1.Y < task.workRes.Height And
+                               p2.X >= 0 And p2.X < task.workRes.Width And p2.Y >= 0 And p2.Y < task.workRes.Height Then
+                    p1 = lpData.validatePoint(p1)
+                    p2 = lpData.validatePoint(p2)
+                    Dim lp = New lpData(p1, p2)
+                    If lp.pVec1(2) > 0 And lp.pVec2(2) > 0 Then lpList.Add(lp)
+                End If
+            End If
+        Next
+        Return lpList
+    End Function
+    Public Function getRawVecs(src As cv.Mat) As cv.Vec4f()
+        ' task.lines is always going to present.  Reuse the stateless lp detector.
+        Return ld.Detect(src)
+    End Function
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        If src.Channels <> 1 Then src = task.gray.Clone
+        dst2 = src.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        If lpList.Count <= 1 Then lpList = getRawLines(ld.Detect(src))
+
+        Static lastLineImage As cv.Mat = dst1.Clone
+        Dim sortlines As New SortedList(Of Single, lpData)(New compareAllowIdenticalSingleInverted)
+        For Each lp In lpList
+            Dim val = lastLineImage.Get(Of Byte)(lp.ptCenter.Y, lp.ptCenter.X)
+            If val = lp.index + 1 Then
+                lp.age += 1
+                sortlines.Add(lp.length, lp)
+            End If
+        Next
+        Dim count As Integer = sortlines.Count
+
+        lpList = getRawLines(ld.Detect(src))
+
+        For Each lp In lpList
+            Dim val = lastLineImage.Get(Of Byte)(lp.ptCenter.Y, lp.ptCenter.X)
+            If val = 0 Then sortlines.Add(lp.length, lp)
+        Next
+        Dim newCount As Integer = sortlines.Count - count
+
+        lpList.Clear()
+        overLappingCount = 0
+        dst1.SetTo(0)
+        For Each lp In sortlines.Values
+            lp.index = lpList.Count
+            If removeOverlappingLines Then
+                If lp.rect.Width = 0 Then Continue For
+                If lp.rect.Height = 0 Then Continue For
+                If dst1(lp.rect).CountNonZero > 0 Then
+                    overLappingCount += 1
+                    Continue For
+                End If
+            End If
+            dst1.Line(lp.p1, lp.p2, lp.index + 1, task.lineWidth, cv.LineTypes.Link4)
+            dst2.Line(lp.p1, lp.p2, lp.color, task.lineWidth + 1, task.lineType)
+            lpList.Add(lp)
+        Next
+
+        dst3 = dst1.Threshold(0, 255, cv.ThresholdTypes.Binary)
+
+        If lpList.Count > 0 Then
+            If task.lpD.rect.Width = 0 Then task.lpD = lpList(0)
+        End If
+
+        lastLineImage = dst1.Clone
+
+        labels(2) = CStr(count) + " lines retained - " + CStr(newCount) + " were new"
+        If removeOverlappingLines Then labels(2) += ". " + CStr(overLappingCount) + " overlap(s) removed."
+    End Sub
+    Protected Overrides Sub Finalize()
+        ld.Dispose()
+    End Sub
+End Class
+
+
+
+
+
+Public Class Line_BasicsNoMotion : Inherits TaskParent
+    Dim lines As New Line_Basics_TA
+    Public Sub New()
+        desc = "Ignore motion when finding the lines."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        If src.Channels <> 1 Then src = task.gray.Clone
+
+        lines.motionMask.SetTo(255) ' every pixel has motion...
+        lines.Run(src)
+        dst2 = lines.dst2
+        labels(2) = lines.labels(2)
+    End Sub
+End Class
+
+
+
+
+
+Public Class Line_TranslatedRightView : Inherits TaskParent
+    Dim lines As New Line_Basics_TA
+    Public lpListRight As New List(Of lpData)
+    Public Sub New()
+        desc = "Translate lines from the color (left for ZED) image to the right image.."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        If src.Channels <> 1 Then src = task.gray.Clone
+        dst2 = task.lines.dst2
+        labels(2) = task.lines.labels(2)
+
+        dst3 = task.rightView.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+
+        lines.Run(src) ' we could use to validate the lines that are translated from the left view.
+
+        lpListRight.Clear()
+        Dim pt1 As cv.Point, pt2 As cv.Point
+        For Each lp In task.lines.lpList
+            Dim depth1 = task.pcSplit(2).Get(Of Single)(lp.p1.Y, lp.p1.X)
+            If depth1 = 0 Then
+                Dim r = task.gridRects(lp.p1GridIndex)
+                depth1 = task.pcSplit(2)(r).Mean(task.depthmask(r))
+            End If
+            Dim depth2 = task.pcSplit(2).Get(Of Single)(lp.p2.Y, lp.p2.X)
+            If depth2 = 0 Then
+                Dim r = task.gridRects(lp.p2GridIndex)
+                depth2 = task.pcSplit(2)(r).Mean(task.depthmask(r))
+            End If
+            If depth1 = 0 Or depth2 = 0 Then Continue For
+
+            pt1 = lp.p1
+            pt1.X -= task.calibData.baseline * task.calibData.leftIntrinsics.fx / depth1
+            If pt1.X < 0 Or pt1.X >= dst2.Width Then Continue For
+
+            pt2 = lp.p2
+            pt2.X -= task.calibData.baseline * task.calibData.leftIntrinsics.fx / depth2
+            If pt2.X < 0 Or pt2.X >= dst2.Width Then Continue For
+
+            Dim lpR As New lpData(pt1, pt2)
+            dst3.Line(lpR.p1, lpR.p2, lp.color, task.lineWidth + 1, task.lineType)
+            lpListRight.Add(lpR)
+        Next
+        labels(3) = CStr(lpListRight.Count) + " lines were translated from the left image to the right image."
     End Sub
 End Class

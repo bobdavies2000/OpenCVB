@@ -113,7 +113,8 @@ Public Class AlgorithmTask : Implements IDisposable
         frameHistoryCount = 3 ' default value.  Use Options_History to update this value.
 
         filterBasics.Run(color.Clone)
-        task.gray = filterBasics.dst3.Clone
+        task.gray = filterBasics.dst3
+        task.grayOriginal = task.gray.Clone
         If task.leftRightBrightnessAdjust Then
             leftRightBrightness.Run(emptyMat)
             leftView = leftRightBrightness.dst2

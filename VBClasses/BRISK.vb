@@ -1,5 +1,4 @@
 Imports cv = OpenCvSharp
-Imports VBClasses
 Public Class BRISK_Basics : Inherits TaskParent
     Implements IDisposable
     Dim brisk As cv.BRISK

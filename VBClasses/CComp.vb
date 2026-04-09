@@ -1,6 +1,5 @@
 Imports cv = OpenCvSharp
 'https://github.com/oreillymedia/Learning-OpenCV-3_examples/blob/master/example_14-03.cpp
-Imports VBClasses
 Public Class CComp_Basics : Inherits TaskParent
     Public connectedComponents As cv.ConnectedComponents
     Public rects As New List(Of cv.Rect)
