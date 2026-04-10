@@ -15,7 +15,6 @@ Public Class PlotMouse_Basics : Inherits TaskParent
 
         If src.Channels <> 1 Then src = task.gray
 
-        plotHist.histogram = histogram
         plotHist.Run(src)
         dst2 = plotHist.dst2
 
@@ -25,7 +24,7 @@ Public Class PlotMouse_Basics : Inherits TaskParent
         Dim minRange = (plotHist.ranges(0).End - plotHist.ranges(0).Start) * histIndex / task.histogramBins
         Dim maxRange = (plotHist.ranges(0).End - plotHist.ranges(0).Start) * (histIndex + 1) / task.histogramBins
         Dim bpRanges = New cv.Rangef() {New cv.Rangef(minRange, maxRange)}
-        cv.Cv2.CalcBackProject({src}, {0}, histogram, mask, bpRanges)
+        cv.Cv2.CalcBackProject({src}, {0}, plotHist.histogram, mask, bpRanges)
         mask.ConvertTo(mask, cv.MatType.CV_8U)
 
         If mask.Size = dst3.Size Then dst3.SetTo(task.highlight, mask)

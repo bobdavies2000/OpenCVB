@@ -1636,6 +1636,7 @@ StableGray_Basics_TA
 StableGray_BasicsMax
 StableGray_BasicsMin
 StableGray_LeftRight
+StableGray_Measure
 StableGray_MinMaxCompare
 StableGray_MinMaxRange
 StableGray_RGBMax

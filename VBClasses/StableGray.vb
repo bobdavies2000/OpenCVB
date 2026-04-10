@@ -239,3 +239,25 @@ Public Class StableGray_LeftRight : Inherits TaskParent
         End If
     End Sub
 End Class
+
+
+
+
+
+Public Class StableGray_Measure : Inherits TaskParent
+    Dim plot As New PlotMouse_Basics
+    Public Sub New()
+        desc = "Measure the amount of variation in the grayscale image."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        cv.Cv2.Absdiff(task.grayOriginal, task.gray, dst0)
+        Dim average = dst0.Mean().Val0
+        labels(3) = Format(average, fmt2) + " average pixel difference between original gray and current stable gray."
+
+        plot.Run(dst0)
+        dst2 = plot.dst2
+        dst3 = plot.dst3
+        labels(2) = plot.labels(2)
+        labels(3) = plot.labels(3)
+    End Sub
+End Class
