@@ -9,7 +9,7 @@ Public Class ImShow_Basics : Inherits TaskParent
         If src.Width > 0 Then cv.Cv2.ImShow("color", src)
     End Sub
     Protected Overrides Sub Finalize()
-        cv.Cv2.DestroyWindow("color")
+        If task.testAllRunning = False Then cv.Cv2.DestroyWindow("color")
     End Sub
 End Class
 

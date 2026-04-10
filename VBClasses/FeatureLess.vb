@@ -140,6 +140,7 @@ Namespace VBClasses
 
             Dim mask As New cv.Mat(input.Size, cv.MatType.CV_8U, 0)
             For Each r In smallGrid.gridRects
+                r = ValidateRect(r)
                 Dim mm = GetMinMax(input(r))
                 If mm.range < options.fLessThreshold Then mask(r).SetTo(255)
             Next
