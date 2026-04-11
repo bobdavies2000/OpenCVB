@@ -441,9 +441,11 @@ Line_BrickListTest
 Line_DepthHistogram
 Line_EdgeLineCompare
 Line_Intersection
+Line_KNNTop
 Line_LeftRight
 Line_LeftRightMotion
 Line_LeftTrack
+Line_Longest
 Line_Map
 Line_MapRects
 Line_Motion
