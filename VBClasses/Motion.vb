@@ -1,14 +1,18 @@
 Imports cv = OpenCvSharp
 Public Class Motion_Basics_TA : Inherits TaskParent
-    Public motionSort As New List(Of Integer)
+    Public motionSort As New List(Of Integer) ' not sorted but in order of grid rect index, so sorted.
     Public diff As New Diff_Basics
     Public motionMask As cv.Mat = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 255)
     Public Sub New()
-        If standalone Then task.gOptions.showMotionMask.Checked = True
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         desc = "Find all the grid rects that had motion since the last frame."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
+        If task.motionStable.motionDecision = False Then
+            motionSort.Clear()
+            motionMask.SetTo(0)
+            Exit Sub ' we don't have any changes.
+        End If
         If src.Channels <> 1 Then src = task.gray.Clone
         If task.optionsChanged Then dst2 = src.Clone
 
@@ -16,7 +20,6 @@ Public Class Motion_Basics_TA : Inherits TaskParent
         diff.Run(src)
 
         motionSort.Clear()
-        task.motionThreshold = task.fOptions.MotionPixelSlider.Value
         For i = 0 To task.gridRects.Count - 1
             Dim diffCount = diff.dst2(task.gridRects(i)).CountNonZero
             If diffCount >= task.motionThreshold Then motionSort.Add(i)
@@ -38,10 +41,42 @@ Public Class Motion_Basics_TA : Inherits TaskParent
 
         dst3 = motionMask
         labels(2) = "Image below is accumulated using motion mask.  Grid rects with motion: " + CStr(nabeList.Count)
+        SetTrueText("Use the Feature Options 'Color Diff Threshold' or " + vbCrLf +
+                    "the Feature Option 'Motion pixel threshold'." + vbCrLf +
+                    " to adjust accuracy of accumulated image.", 3)
         SetTrueText("Use the Feature Options 'Color Diff Threshold' to adjust accuracy of accumulated image.", 3)
     End Sub
 End Class
 
+
+
+
+Public Class Motion_Validate : Inherits TaskParent
+    Dim diff As New Diff_Basics
+    Public Sub New()
+        If standalone Then task.gOptions.showMotionMask.Checked = True
+        If standalone Then task.gOptions.displayDst1.Checked = True
+        labels(1) = "Current grayscale image"
+        labels(2) = "Grayscale image constructed from previous images + motion updates."
+        labels(3) = "Highlighted difference of task.gray and the one built with the motion data.  "
+        desc = "Compare task.gray to constructed images to verify Motion_Basics_TA is working"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        dst1 = task.gray
+        dst2 = task.motion.dst2.Clone
+
+        diff.lastFrame = dst2
+        diff.Run(dst1)
+        dst3 = diff.dst3.Threshold(task.colorDiffThreshold, 255, cv.ThresholdTypes.Binary)
+
+        Dim count = dst3.CountNonZero
+        strOut = "Pixels different from camera image: " + CStr(count) + " (" +
+                  Format(count / src.Total, "0%") + ")" + vbCrLf +
+                 "Grid rects with more than " + CStr(task.motionThreshold) +
+                 " pixels different: " + CStr(task.motion.motionSort.Count)
+        SetTrueText(strOut, 3)
+    End Sub
+End Class
 
 
 
@@ -88,34 +123,6 @@ Public Class NR_Motion_Basics : Inherits TaskParent
     End Sub
 End Class
 
-
-
-
-Public Class Motion_Validate : Inherits TaskParent
-    Dim diff As New Diff_Basics
-    Public Sub New()
-        If standalone Then task.gOptions.showMotionMask.Checked = True
-        If standalone Then task.gOptions.displayDst1.Checked = True
-        labels(1) = "Current grayscale image"
-        labels(2) = "Grayscale image constructed from previous images + motion updates."
-        labels(3) = "Highlighted difference of task.gray and the one built with the motion data.  "
-        desc = "Compare task.gray to constructed images to verify Motion_Basics_TA is working"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        dst1 = task.gray.Clone
-        dst2 = task.motion.dst2.Clone
-
-        diff.lastFrame = dst2.Clone
-        diff.Run(dst1.Clone)
-        dst3 = diff.dst3.Threshold(task.colorDiffThreshold, 255, cv.ThresholdTypes.Binary)
-
-        Dim count = diff.dst3.CountNonZero
-        SetTrueText("Pixels different from camera image: " + CStr(count) + " (" +
-                            Format(count / src.Total, "0%") + ")" + vbCrLf +
-                            "Grid rects with more than " + CStr(task.motionThreshold) +
-                            " pixels different: " + CStr(task.motion.motionSort.Count), 3)
-    End Sub
-End Class
 
 
 

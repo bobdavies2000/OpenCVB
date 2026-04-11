@@ -85,6 +85,7 @@ Partial Public Class AlgorithmTask
     Public leftRightBrightness As LeftRight_Brightness_TA
     Public lines As Line_Basics_TA
     Public motion As Motion_Basics_TA
+    Public motionStable As StableGray_Measure_TA
     Public stabilizeDepth As StableDepth_Basics
     Public stabilizeGray As StableGray_Basics_TA
     Public cloudGravity As Cloud_Gravity_TA

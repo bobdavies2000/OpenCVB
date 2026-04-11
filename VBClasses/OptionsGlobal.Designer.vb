@@ -419,7 +419,7 @@ Partial Class OptionsGlobal
         ' showMotionMask
         ' 
         showMotionMask.AutoSize = True
-        showMotionMask.Location = New Point(9, 106)
+        showMotionMask.Location = New Point(9, 139)
         showMotionMask.Margin = New Padding(3, 4, 3, 4)
         showMotionMask.Name = "showMotionMask"
         showMotionMask.Size = New Size(214, 34)
@@ -521,7 +521,7 @@ Partial Class OptionsGlobal
         ' ShowSplash
         ' 
         ShowSplash.AutoSize = True
-        ShowSplash.Location = New Point(9, 146)
+        ShowSplash.Location = New Point(9, 104)
         ShowSplash.Margin = New Padding(3, 4, 3, 4)
         ShowSplash.Name = "ShowSplash"
         ShowSplash.Size = New Size(232, 34)

@@ -49,7 +49,7 @@ Public Class EdgeLine_Basics_TA : Inherits TaskParent
         Next
 
         labels(2) = CStr(classCount) + " line segments were found with motion threshold of " +
-                            CStr(task.motionThreshold) + " pixels changed in a grid rect."
+                    CStr(task.motionThreshold) + " pixels changed in a grid rect."
     End Sub
     Protected Overrides Sub Finalize()
         EdgeLineRaw_Close(cPtr)

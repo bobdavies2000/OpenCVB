@@ -11,16 +11,15 @@ Public Class PlotOpenCV_Basics : Inherits TaskParent
         desc = "Plot data provided in src Mat"
     End Sub
     Public Shared Sub AddPlotScale(dst As cv.Mat, minVal As Double, maxVal As Double, Optional lineCount As Integer = 3)
-        Dim spacer = dst.Height \ (lineCount + 1)
-        Dim spaceVal = (maxVal - minVal) \ (lineCount + 1)
+        Dim spacer = dst.Height / (lineCount + 1)
+        Dim spaceVal = (maxVal - minVal) / (lineCount + 1)
         If lineCount > 1 Then If spaceVal < 1 Then spaceVal = 1
-        If spaceVal > 10 Then spaceVal += spaceVal Mod 10
         For i = 0 To lineCount
             Dim p1 = New cv.Point(0, spacer * i)
             Dim p2 = New cv.Point(dst.Width, spacer * i)
             dst.Line(p1, p2, white, task.cvFontThickness)
             Dim nextVal = (maxVal - spaceVal * i)
-            Dim nextText = If(maxVal > 1000, Format(nextVal / 1000, "###,##0.0") + "k", Format(nextVal, fmt2))
+            Dim nextText = If(maxVal > 1000, Format(nextVal / 1000, "###,##0.0") + "k", Format(nextVal, fmt1))
             Dim p3 = New cv.Point(0, p1.Y + 12)
             cv.Cv2.PutText(dst, nextText, p3, cv.HersheyFonts.HersheyPlain, task.cvFontSize,
                                 white, task.cvFontThickness, task.lineType)

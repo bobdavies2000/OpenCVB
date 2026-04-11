@@ -30,7 +30,9 @@ Public Class PlotMouse_Basics : Inherits TaskParent
         If mask.Size = dst3.Size Then dst3.SetTo(task.highlight, mask)
         labels(3) = "BackProjected pixel (% of image) = " + Format(mask.CountNonZero / src.Total, "0%")
 
-        labels(2) = "Histogram Depth to " + Format(task.MaxZmeters, "0.0") + " m"
+        Dim barCount = plotHist.histArray(histIndex)
+        labels(2) = "Selection highlighted is " + CStr(histIndex) + " and shows " + CStr(barCount) + " (or " +
+                    Format(barCount / src.Total, "0%") + ") samples"
         dst2.Rectangle(New cv.Rect(CInt(histIndex) * barWidth, 0, barWidth, dst2.Height), cv.Scalar.Yellow, task.lineWidth)
     End Sub
 End Class

@@ -24,8 +24,8 @@ Public Class PlotBar_Basics : Inherits TaskParent
             If src.Channels() <> 1 Then src = task.gray.Clone
             If minRange = 0 And maxRange = 0 Then
                 Dim mm = GetMinMax(src)
-                min = mm.minVal
-                max = mm.maxVal
+                min = mm.minVal - 0.01
+                max = mm.maxVal + 0.01
                 If min = 0 And max = 0 Then
                     If src.Type = cv.MatType.CV_32F Then
                         max = task.MaxZmeters

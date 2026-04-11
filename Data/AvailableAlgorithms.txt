@@ -1636,12 +1636,14 @@ StableGray_Basics_TA
 StableGray_BasicsMax
 StableGray_BasicsMin
 StableGray_LeftRight
-StableGray_Measure
+StableGray_Measure_TA
+StableGray_MeasureOverTime
 StableGray_MinMaxCompare
 StableGray_MinMaxRange
 StableGray_RGBMax
 StableGray_RGBMin
 StableGray_RGBMinMaxCompare
+StableGray_ToggleMinMax
 StableLine_Basics
 StableLine_BasicsCount
 Stitch_Basics

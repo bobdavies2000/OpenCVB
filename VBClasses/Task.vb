@@ -41,6 +41,7 @@ Public Class AlgorithmTask : Implements IDisposable
         gravityBasics = New Gravity_Basics_TA
         imuBasics = New IMU_Basics_TA
         motion = New Motion_Basics_TA
+        motionStable = New StableGray_Measure_TA
 
         stabilizeDepth = New StableDepth_Basics
         stabilizeDepth.TA_Active = True
@@ -78,6 +79,17 @@ Public Class AlgorithmTask : Implements IDisposable
         Debug.WriteLine(vbCrLf + vbCrLf + vbCrLf + "Starting algorithm " + settings.algorithm)
         Debug.WriteLine(vbTab + CStr(AlgorithmTestAllCount) + " algorithms tested")
         AlgorithmTestAllCount += 1
+
+
+        Select Case task.Settings.cameraName
+            Case "StereoLabs ZED 2/2i"
+                task.fOptions.ColorDiffSlider.Value = 10
+            Case "Orbbec Gemini 335L", "Orbbec Gemini 336L", "Orbbec Gemini 335"
+                task.fOptions.ColorDiffSlider.Value = 30
+            Case "Intel(R) RealSense(TM) Depth Camera 435i", "Intel(R) RealSense(TM) Depth Camera 455"
+            Case "Oak-3D camera", "Oak-4D camera"
+
+        End Select
     End Sub
     Public Sub RunAlgorithm()
         If allOptions.titlesAdded Then
@@ -122,6 +134,8 @@ Public Class AlgorithmTask : Implements IDisposable
         End If
 
         If gOptions.stabilizeDepthRGB.Checked Then
+            motionStable.Run(task.gray)
+
             motion.Run(gray)
             stabilizeGray.Run(task.gray)
         Else

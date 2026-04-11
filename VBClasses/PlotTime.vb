@@ -67,12 +67,11 @@ Public Class PlotTime_Basics : Inherits TaskParent
 
         For i = 0 To plotCount - 1
             Dim y = 1 - (plotData(i) - minScale) / (maxScale - minScale)
-            y *= dst2.Height - 1
+            y *= (dst2.Height - 1)
             Dim c As New cv.Point(columnIndex - task.DotSize, y - task.DotSize)
             If c.X < 1 Then c.X = 1
             DrawCircle(dst2, c, task.DotSize, plotColors(i))
         Next
-
 
         If task.heartBeat Then
             dst2.Line(New cv.Point(columnIndex, 0), New cv.Point(columnIndex, dst2.Height), white, 1)

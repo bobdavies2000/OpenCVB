@@ -146,7 +146,7 @@ Public Class OptionsGlobal
         labelBinsCount.Text = CStr(task.histogramBins)
         task.optionsChanged = True
     End Sub
-    Private Sub DisplayFPSSlider_ValueChanged(sender As Object, e As EventArgs) Handles PaintFreqSlider.ValueChanged
+    Private Sub PaintFreqSlider_ValueChanged(sender As Object, e As EventArgs) Handles PaintFreqSlider.ValueChanged
         task.optionsChanged = True
         PaintFrequencyLabel.Text = CStr(PaintFreqSlider.Value)
         task.Settings.paintFrequency = PaintFreqSlider.Value
@@ -162,15 +162,18 @@ Public Class OptionsGlobal
         task.optionsChanged = True
     End Sub
     Private Sub ShowAllByDefault_CheckedChanged(sender As Object, e As EventArgs) Handles ShowAllOptions.CheckedChanged
+        task.optionsChanged = True
         task.Settings.ShowAllOptions = ShowAllOptions.Checked
     End Sub
     Private Sub DebugSliderSlider_ValueChanged(sender As Object, e As EventArgs) Handles DebugSlider.ValueChanged
+        task.optionsChanged = True
         DebugSliderLabel.Text = CStr(DebugSlider.Value)
     End Sub
 
 
 
     Private Sub highlight_SelectedIndexChanged(sender As Object, e As EventArgs) Handles highlight.SelectedIndexChanged
+        task.optionsChanged = True
         Select Case highlight.Text
             Case "Yellow"
                 task.highlight = cv.Scalar.Yellow
@@ -223,6 +226,12 @@ Public Class OptionsGlobal
         SaveSetting("OpenCVB", "ShowSplash", "ShowSplash", ShowSplash.Checked)
     End Sub
     Private Sub stabilizeDepthRGB_CheckedChanged(sender As Object, e As EventArgs) Handles stabilizeDepthRGB.CheckedChanged
+        task.optionsChanged = True
+    End Sub
+    Private Sub CrossHairs_CheckedChanged(sender As Object, e As EventArgs) Handles CrossHairs.CheckedChanged
+        task.optionsChanged = True
+    End Sub
+    Private Sub ShowGrid_CheckedChanged(sender As Object, e As EventArgs) Handles ShowGrid.CheckedChanged
         task.optionsChanged = True
     End Sub
 End Class

@@ -1,4 +1,5 @@
-﻿Imports cv = OpenCvSharp
+﻿Imports System.Diagnostics.Metrics
+Imports cv = OpenCvSharp
 Public Class StableGray_BasicsMin : Inherits TaskParent
     Public Sub New()
         labels(3) = "Mask of pixels that are different between last image and current after processing."
@@ -80,35 +81,6 @@ End Class
 
 
 
-Public Class StableGray_MinMaxCompare : Inherits TaskParent
-    Dim minRGB As New StableGray_BasicsMin
-    Dim maxRGB As New StableGray_BasicsMax
-    Public Sub New()
-        If standalone Then task.gOptions.displayDst1.Checked = True
-        desc = "Compare the difference between the min and max accumulated images."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        minRGB.Run(task.gray)
-        dst1 = minRGB.dst2
-        labels(1) = "Min gray image"
-
-        maxRGB.Run(task.gray)
-        dst3 = maxRGB.dst2
-        labels(3) = "Max gray image - should be a little lighter."
-
-        cv.Cv2.Absdiff(dst1, dst3, dst0)
-        dst2 = dst0.Threshold(0, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs()
-
-        Dim count = dst2.CountNonZero
-        labels(2) = CStr(count) + " pixels or " + Format(count / src.Total, "0.0%") +
-                    " differ between min and max images. (Should be very high)"
-    End Sub
-End Class
-
-
-
-
-
 Public Class StableGray_RGBMinMaxCompare : Inherits TaskParent
     Dim minRGB As New StableGray_RGBMin
     Dim maxRGB As New StableGray_RGBMax
@@ -125,31 +97,6 @@ Public Class StableGray_RGBMinMaxCompare : Inherits TaskParent
         labels(3) = "Max RGB image - should be a little lighter."
     End Sub
 End Class
-
-
-
-
-
-
-Public Class StableGray_MinMaxRange : Inherits TaskParent
-    Dim compare As New StableGray_MinMaxCompare
-    Dim plot As New PlotMouse_Basics
-    Public Sub New()
-        If standalone Then task.gOptions.displayDst1.Checked = True
-        desc = "Show the absDiff(min, max)"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        compare.Run(task.gray)
-        dst1 = compare.dst3
-        labels(1) = "Min gray image"
-
-        plot.Run(dst1)
-        dst2 = plot.dst2
-        dst3 = plot.dst3
-    End Sub
-End Class
-
-
 
 
 
@@ -243,21 +190,152 @@ End Class
 
 
 
-
-Public Class StableGray_Measure : Inherits TaskParent
-    Dim plot As New PlotMouse_Basics
+Public Class StableGray_MinMaxCompare : Inherits TaskParent
+    Dim minRGB As New StableGray_BasicsMin
+    Dim maxRGB As New StableGray_BasicsMax
     Public Sub New()
-        desc = "Measure the amount of variation in the grayscale image."
+        If standalone Then task.gOptions.displayDst1.Checked = True
+        desc = "Compare the difference between the min and max accumulated images."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        cv.Cv2.Absdiff(task.grayOriginal, task.gray, dst0)
+        minRGB.Run(task.gray)
+        dst1 = minRGB.dst2
+        labels(1) = "Min gray image"
+
+        maxRGB.Run(task.gray)
+        dst3 = maxRGB.dst2
+        labels(3) = "Max gray image - should be a little lighter."
+
+        cv.Cv2.Absdiff(dst1, dst3, dst0)
+        dst2 = dst0.Threshold(0, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs()
+
+        Dim count = dst2.CountNonZero
+        labels(2) = CStr(count) + " pixels or " + Format(count / src.Total, "0.0%") +
+                    " differ between min and max images. (Should be very high)"
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class StableGray_MinMaxRange : Inherits TaskParent
+    Dim compare As New StableGray_MinMaxCompare
+    Dim plot As New PlotMouse_Basics
+    Public Sub New()
+        If standalone Then task.gOptions.displayDst1.Checked = True
+        desc = "Show the absDiff(min, max)"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        compare.Run(emptyMat)
+        dst1 = compare.dst3
+        labels(1) = "Min gray image"
+
+        cv.Cv2.Absdiff(compare.dst1, compare.dst3, dst0)
         Dim average = dst0.Mean().Val0
-        labels(3) = Format(average, fmt2) + " average pixel difference between original gray and current stable gray."
+        labels(3) = Format(average, fmt2) + " average pixel difference between min and max stable gray."
 
         plot.Run(dst0)
         dst2 = plot.dst2
         dst3 = plot.dst3
         labels(2) = plot.labels(2)
-        labels(3) = plot.labels(3)
+    End Sub
+End Class
+
+
+
+
+Public Class StableGray_Measure_TA : Inherits TaskParent
+    Dim plot As New PlotMouse_Basics
+    Public percentZero As Single
+    Public averageDiff As Single
+    Public averageMinimum As Single
+    Dim averageHistory As New List(Of Single)
+    Public motionDecision As Boolean
+    Public Sub New()
+        If standalone Then task.gOptions.displayDst1.Checked = True
+        desc = "Measure the amount of variation in the grayscale image."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        Static lastFrame As cv.Mat = task.grayOriginal
+
+        cv.Cv2.Absdiff(task.grayOriginal, lastFrame, dst0)
+        averageDiff = dst0.Mean().Val0
+
+        averageHistory.Add(averageDiff)
+        If averageHistory.Count > 50 Then averageHistory.RemoveAt(0)
+        averageMinimum = averageHistory.Min
+        motionDecision = averageDiff >= averageMinimum + 0.1
+        labels(3) = "Motion decision: " + CStr(motionDecision) + " " + Format(averageDiff, fmt2) +
+                    " average pixel difference gray to stable gray."
+
+        plot.Run(dst0)
+        dst2 = plot.dst2
+        dst3 = plot.dst3
+        labels(2) = plot.labels(2)
+
+        percentZero = 100 * plot.plotHist.histArray(0) / src.Total
+        strOut = "Diff" + vbTab + "Count" + vbCrLf
+        For i = 0 To plot.plotHist.histArray.Count - 1
+            strOut += CStr(i) + vbTab + Format(plot.plotHist.histArray(i), fmt0) + vbCrLf
+        Next
+        SetTrueText(strOut, 1)
+
+        lastFrame = task.grayOriginal.Clone
+    End Sub
+End Class
+
+
+
+
+Public Class StableGray_MeasureOverTime : Inherits TaskParent
+    Dim plotPercent As New PlotTime_Basics
+    Dim plotAverage As New PlotTime_Basics
+    Public Sub New()
+        plotPercent.maxScale = 100
+        plotPercent.minScale = 0
+        plotPercent.plotCount = 1
+        plotAverage.maxScale = 10
+        plotAverage.minScale = 0
+        plotAverage.plotCount = 1
+
+        desc = "Measure % of pixels with zero difference over time."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        plotPercent.plotData = New cv.Scalar(task.motionStable.percentZero, 0, 0)
+        plotPercent.Run(src)
+        dst2 = plotPercent.dst2
+
+        plotAverage.plotData = New cv.Scalar(task.motionStable.averageDiff, 0, 0)
+        plotAverage.Run(src)
+        dst3 = plotAverage.dst2
+
+        labels(2) = "Percent of image identical at the pixel level = " + Format(task.motionStable.percentZero / 100, "0%")
+        labels(3) = task.motionStable.labels(3)
+    End Sub
+End Class
+
+
+
+
+
+Public Class StableGray_ToggleMinMax : Inherits TaskParent
+    Dim minRGB As New StableGray_BasicsMin
+    Dim maxRGB As New StableGray_BasicsMax
+    Public Sub New()
+        desc = "Toggle between the min and max stable gray images."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        If task.toggleOn Then
+            minRGB.Run(task.grayOriginal)
+            dst2 = minRGB.dst2
+            labels(2) = "Min gray image"
+        Else
+            maxRGB.Run(task.grayOriginal)
+            dst2 = maxRGB.dst2
+            labels(2) = "Max gray image - should be a little lighter."
+        End If
     End Sub
 End Class
