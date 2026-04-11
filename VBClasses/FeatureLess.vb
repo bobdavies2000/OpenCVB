@@ -203,7 +203,7 @@ Namespace VBClasses
 
 
     Public Class NR_FeatureLess_Contours : Inherits TaskParent
-        Dim edgeline As New EdgeLine_Basics_TA
+        Dim edgeline As New EdgeLine_Basics
         Dim contours As New Contour_Basics
         Public Sub New()
             desc = "Use Contour_Basics to get the contour data for the top contours by size."

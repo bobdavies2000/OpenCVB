@@ -393,7 +393,7 @@ End Class
 
 Public Class NR_HistValley_EdgeDraw : Inherits TaskParent
     Dim valley As New HistValley_FromPeaks
-    Dim edgeline As New EdgeLine_Basics_TA
+    Dim edgeline As New EdgeLine_Basics
     Public Sub New()
         labels(3) = "Color image overlaid with edge lines."
         desc = "Remove edge color in RGB before HistValley_FromPeaks"

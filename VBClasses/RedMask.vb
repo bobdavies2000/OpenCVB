@@ -100,7 +100,7 @@ Public Class RedMask_Color : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         contours.Run(src)
         If src.Type <> cv.MatType.CV_8U Then
-            If standalone And task.fOptions.Color8USource.SelectedItem = "EdgeLine_Basics_TA" Then
+            If standalone And task.fOptions.Color8USource.SelectedItem = "EdgeLine_Basics" Then
                 dst1 = contours.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
             Else
                 dst1 = Mat_Basics.srcMustBe8U(src)
@@ -429,7 +429,7 @@ Public Class RedMask_List : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         contours.Run(src)
         If src.Type <> cv.MatType.CV_8U Then
-            If standalone And task.fOptions.Color8USource.SelectedItem = "EdgeLine_Basics_TA" Then
+            If standalone And task.fOptions.Color8USource.SelectedItem = "EdgeLine_Basics" Then
                 dst1 = contours.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
             Else
                 dst1 = Mat_Basics.srcMustBe8U(src)

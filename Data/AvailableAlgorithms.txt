@@ -218,7 +218,7 @@ Edge_SobelCustomV
 Edge_SobelHorizontal
 Edge_SobelVertical
 Edge_StableLeftRight
-EdgeLine_Basics_TA
+EdgeLine_Basics
 EdgeLine_KeyColorOnly
 EdgeLine_LeftRightMotion
 Eigen_Input

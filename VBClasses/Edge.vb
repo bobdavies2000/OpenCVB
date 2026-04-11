@@ -941,7 +941,7 @@ Public Class NR_Edge_Color8U : Inherits TaskParent
                         Case 2
                             colorMethods(i) = New NR_Binarize_DepthTiers
                         Case 3
-                            colorMethods(i) = New EdgeLine_Basics_TA
+                            colorMethods(i) = New EdgeLine_Basics
                         Case 4
                             colorMethods(i) = New Hist3Dcolor_Basics
                         Case 5
@@ -965,7 +965,7 @@ Public Class NR_Edge_Color8U : Inherits TaskParent
         For i = 0 To colorMethods.Count - 1
             If options.check.Box(i).Checked Then
                 colorMethods(i).run(src)
-                If options.check.Box(i).Text = "EdgeLine_Basics_TA" Then
+                If options.check.Box(i).Text = "EdgeLine_Basics" Then
                     canny.dst2 = colorMethods(i).dst2
                 Else
                     canny.Run(colorMethods(i).dst3)
@@ -1375,7 +1375,7 @@ End Class
 
 
 Public Class NR_Edge_NoDepth : Inherits TaskParent
-    Dim edgeline As New EdgeLine_Basics_TA
+    Dim edgeline As New EdgeLine_Basics
     Public Sub New()
         If standalone Then task.gOptions.displayDst1.Checked = True
         labels = {"", "", "All edges available", "Below - edges without depth, Above - edges with depth (color from contour.)"}

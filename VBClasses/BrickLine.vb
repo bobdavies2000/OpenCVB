@@ -207,7 +207,7 @@ End Class
 Public Class BrickLine_EdgesNoEdges : Inherits TaskParent
     Public edges As New List(Of Integer)
     Public noEdges As New List(Of Integer)
-    Dim edgeline As New EdgeLine_Basics_TA
+    Dim edgeline As New EdgeLine_Basics
     Public Sub New()
         desc = "Define each grid square according to whether it has edges or not.  Ignore peripheral bricks..."
     End Sub
@@ -250,7 +250,7 @@ Public Class BrickLine_LeftRightMotion : Inherits TaskParent
     Dim fLess As New BrickLine_EdgesNoEdges
     Dim mats As New Mat_4Click
     Public bestBricks As New List(Of Integer)
-    Dim edgeline As New EdgeLine_Basics_TA
+    Dim edgeline As New EdgeLine_Basics
     Public Sub New()
         labels(1) = "Left edges, right edges, bricks with left image edges, bricks with right image edges"
         labels(2) = "The cells below have depth and good correlation left to right"

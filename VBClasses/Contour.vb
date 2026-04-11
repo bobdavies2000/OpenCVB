@@ -6,7 +6,7 @@ Public Class Contour_Basics : Inherits TaskParent
     Public contourList As New List(Of contourData)
     Public contourMap As New cv.Mat(task.workRes, cv.MatType.CV_32F, 0)
     Public sortContours As New Contour_Sort
-    Dim edgeline As New EdgeLine_Basics_TA
+    Dim edgeline As New EdgeLine_Basics
     Public Sub New()
         labels(3) = "Input to OpenCV's FindContours"
         desc = "General purpose contour finder"
@@ -76,7 +76,7 @@ Public Class Contour_Regions : Inherits TaskParent
     Public contourList As New List(Of cv.Point())
     Public areaList As New List(Of Integer) ' point counts for each contour in contourList above.
     Public options As New Options_Contours
-    Dim edgeline As New EdgeLine_Basics_TA
+    Dim edgeline As New EdgeLine_Basics
     Public Sub New()
         dst0 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
         OptionParent.findRadio("FloodFill").Checked = True
@@ -1097,10 +1097,10 @@ Public Class Contour_Basics_List : Inherits TaskParent
     Public contourMap As New cv.Mat(dst2.Size, cv.MatType.CV_32F, 0)
     Public sortContours As New Contour_SortTmp
     Public options As New Options_Contours
-    Dim edgeline As New EdgeLine_Basics_TA
+    Dim edgeline As New EdgeLine_Basics
     Public Sub New()
         labels(3) = "Details for the selected contour."
-        task.fOptions.Color8USource.SelectedItem = "EdgeLine_Basics_TA"
+        task.fOptions.Color8USource.SelectedItem = "EdgeLine_Basics"
         desc = "List retrieval mode contour finder"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -1179,7 +1179,7 @@ Public Class Contour_SortTmp : Inherits TaskParent
     Public allContours As cv.Point()()
     Public rcList As New List(Of contourData)
     Public rcMap As New cv.Mat(task.workRes, cv.MatType.CV_32S, 0)
-    Dim edgeline As New EdgeLine_Basics_TA
+    Dim edgeline As New EdgeLine_Basics
     Public Sub New()
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
         desc = "Sort the contours by size and prepare the contour map"
