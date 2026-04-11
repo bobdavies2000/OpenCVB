@@ -386,6 +386,7 @@ Public Module Structures
 
         Public rect As cv.Rect
         Public slope As Single
+
         Public Const maxSlope As Integer = 100000
         Public Function perpendicularPoints(pt As cv.Point2f) As lpData
             Dim perpSlope = -1 / slope

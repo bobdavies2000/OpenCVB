@@ -593,7 +593,6 @@ Public Class Line_LeftTrack : Inherits TaskParent
         labels = {"", "", "Left image: detected lines with stable track IDs", ""}
         desc = "Cursor.ai: Find all lines in the left image, identify each and track them."
     End Sub
-
     Private Function matchScore(r As lpData, t As TrackedLine) As Single
         Dim ad = Math.Abs(r.angle - t.lp.angle)
         If ad > 90 Then ad = 180 - ad
@@ -605,7 +604,6 @@ Public Class Line_LeftTrack : Inherits TaskParent
         If lr > lenRatioThresh Then Return Single.MaxValue
         Return ad * 2.0F + dist / 20.0F + lr * 20.0F
     End Function
-
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
 
@@ -1160,3 +1158,28 @@ Public Class Line_TranslatedRightView : Inherits TaskParent
         labels(3) = CStr(lpListRight.Count) + " lines were translated from the left image to the right image."
     End Sub
 End Class
+
+
+
+
+
+Public Class Line_EdgeLineCompare : Inherits TaskParent
+    Dim edgeLine As New EdgeLine_Basics
+    Public Sub New()
+        labels(3) = "Lines where edgeline_basics and line_basics_TA agree."
+        desc = "Compare the output of EdgeLine_Basics and Line_Basics_TA"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        edgeLine.Run(src)
+        dst2 = edgeLine.dst2
+        labels(2) = edgeLine.labels(2)
+
+        dst3.SetTo(0)
+        dst2.CopyTo(dst3, task.lines.dst3)
+        dst3 = dst3.Threshold(0, 255, cv.ThresholdTypes.Binary)
+    End Sub
+End Class
+
+
+
+

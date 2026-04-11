@@ -439,6 +439,7 @@ Line_BasicsNoMotion1
 Line_BrickList
 Line_BrickListTest
 Line_DepthHistogram
+Line_EdgeLineCompare
 Line_Intersection
 Line_LeftRight
 Line_LeftRightMotion
