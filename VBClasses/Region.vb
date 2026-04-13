@@ -212,7 +212,7 @@ End Class
 
 
 Public Class Region_Depth : Inherits TaskParent
-    Public redM As New RedMask_Basics
+    Public redMask As New NR_RedMask_Basics
     Public connect As New Region_Rects
     Public mdLargest As New List(Of maskData)
     Dim bricks As New Brick_Basics
@@ -224,11 +224,11 @@ Public Class Region_Depth : Inherits TaskParent
         bricks.Run(src)
 
         connect.Run(src.Clone)
-        redM.Run(Not connect.dst2)
-        If redM.mdList.Count = 0 Then Exit Sub
+        redMask.Run(Not connect.dst2)
+        If redMask.mdList.Count = 0 Then Exit Sub
 
         dst1.SetTo(0)
-        For Each md In redM.mdList
+        For Each md In redMask.mdList
             dst1(md.rect).SetTo(md.index, md.mask)
         Next
 
@@ -237,7 +237,7 @@ Public Class Region_Depth : Inherits TaskParent
         mdLargest.Clear()
         For Each brick In bricks.brickList
             Dim index = dst1.Get(Of Byte)(brick.center.Y, brick.center.X)
-            Dim md = redM.mdList(index)
+            Dim md = redMask.mdList(index)
             If index = 0 Then
                 dst2(brick.rect).SetTo(black)
             Else
@@ -249,7 +249,7 @@ Public Class Region_Depth : Inherits TaskParent
         Next
 
         dst3 = ShowAddweighted(src, dst2, labels(3))
-        labels(2) = "There were " + CStr(redM.mdList.Count) + " connected contours found."
+        labels(2) = "There were " + CStr(redMask.mdList.Count) + " connected contours found."
     End Sub
 End Class
 

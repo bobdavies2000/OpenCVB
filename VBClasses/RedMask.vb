@@ -2,6 +2,70 @@ Imports System.Runtime.InteropServices
 Imports VBClasses
 Imports cv = OpenCvSharp
 Public Class RedMask_Basics : Inherits TaskParent
+    Public rcList As New List(Of rcData)
+    Public rcMap As New cv.Mat(dst2.Size, cv.MatType.CV_32S, 0)
+    Dim redMask As New RedMask_BuildList
+    Dim fLess As New FeatureLess_BasicsRaw
+    Dim knn As New KNN_Basics
+    Public fLessGridRects As New List(Of List(Of Integer))
+    Public Sub New()
+        knn.ptListQuery.Add(New cv.Point2f(0, 0)) ' we only need one entry in the queries.
+        If standalone Then task.gOptions.displayDst1.Checked = True
+        desc = "Use KNN to identify the previous cell for each current cell"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        fLess.Run(src)
+        dst2 = fLess.dst3
+        labels(2) = fLess.labels(2)
+
+        redMask.Run(dst2)
+
+        Dim rcListLast As New List(Of rcData)(redMask.rcList)
+        Dim lastColorMat = dst3.Clone
+
+        knn.ptListTrain.Clear()
+        For Each rc In redMask.rcList
+            knn.ptListTrain.Add(New cv.Point(rc.gridIndex, rc.pixels))
+        Next
+
+        dst3.SetTo(0)
+        For Each rc In redMask.rcList
+            knn.ptListQuery(0) = New cv.Point2f(rc.gridIndex, rc.pixels)
+            knn.Run(emptyMat)
+            Dim rcLast = rcListLast(knn.neighbors(0)(0))
+
+            Dim lastColor = lastColorMat.Get(Of cv.Vec3b)(rc.maxDist.Y, rc.maxDist.X)
+            If lastColor <> black Then
+                If lastColor <> task.vecColors(rc.index) Then rc.color = lastColor
+            Else
+                rc.color = task.scalarColors(rc.index)
+            End If
+
+            dst3(rc.rect).SetTo(rc.color, rc.mask)
+        Next
+
+        strOut = RedUtil_Basics.selectCell(redMask.dst2, redMask.rcList)
+        SetTrueText(strOut, 1)
+        If task.rcD IsNot Nothing Then task.clickPoint = task.rcD.maxDist
+
+        Dim usedColors As New List(Of cv.Scalar)
+        For Each rc In redMask.rcList
+            If usedColors.Contains(rc.color) Then
+                rc.color = New cv.Scalar(msRNG.Next(0, 255), msRNG.Next(0, 255), msRNG.Next(0, 255))
+                dst3(rc.rect).SetTo(rc.color, rc.mask)
+            End If
+            usedColors.Add(rc.color)
+        Next
+
+        labels(3) = CStr(redMask.rcList.Count) + " cells were identified."
+    End Sub
+End Class
+
+
+
+
+
+Public Class NR_RedMask_Basics : Inherits TaskParent
     Implements IDisposable
     Public mdList As New List(Of maskData)
     Public classCount As Integer
@@ -62,7 +126,7 @@ End Class
 
 
 Public Class NR_RedMask_Redraw : Inherits TaskParent
-    Public redMask As New RedMask_Basics
+    Public redMask As New NR_RedMask_Basics
     Public Sub New()
         desc = "Redraw the image using the mean color of each cell."
     End Sub
@@ -89,7 +153,7 @@ End Class
 
 Public Class RedMask_Color : Inherits TaskParent
     Dim cellGen As New RedMask_ToRedColor
-    Dim redMask As New RedMask_Basics
+    Dim redMask As New NR_RedMask_Basics
     Public rclist As New List(Of rcData)
     Public rcMap As New cv.Mat ' redColor map 
     Dim contours As New Contour_Basics
@@ -325,7 +389,7 @@ End Class
 
 
 Public Class RedMask_ToRedColor : Inherits TaskParent
-    Public redMask As New RedMask_Basics
+    Public redMask As New NR_RedMask_Basics
     Public mdList As New List(Of maskData)
     Public rcList As New List(Of rcData)
     Public rcMap As New cv.Mat(dst2.Size, cv.MatType.CV_32S, 0)
@@ -369,7 +433,7 @@ End Class
 Public Class RedMask_List : Inherits TaskParent
     Public inputRemoved As cv.Mat
     Public cellGen As New RedMask_ToRedColor
-    Public redMask As New RedMask_Basics
+    Public redMask As New NR_RedMask_Basics
     Public contours As New Contour_Basics
     Public rcMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
     Public rclist As New List(Of rcData)
@@ -610,7 +674,7 @@ End Class
 
 
 
-Public Class RedMask_BasicsNew : Inherits TaskParent
+Public Class RedMask_BuildList : Inherits TaskParent
     Public rcList As New List(Of rcData)
     Dim redCore As New RedMask_CPP
     Public Sub New()
@@ -641,57 +705,5 @@ Public Class RedMask_BasicsNew : Inherits TaskParent
 
         labels(2) = "CV_8U result with " + CStr(classcount) + " regions."
         labels(3) = "Palette version of the data in dst2 with " + CStr(classcount) + " regions."
-    End Sub
-End Class
-
-
-Public Class RedMask_Test2 : Inherits TaskParent
-    Public rcList As New List(Of rcData)
-    Public rcMap As New cv.Mat(dst2.Size, cv.MatType.CV_32S, 0)
-    Dim redMask As New RedMask_BasicsNew
-    Dim fLess As New FeatureLess_BasicsRaw
-    Dim knn As New KNN_Basics
-    Public fLessGridRects As New List(Of List(Of Integer))
-    Public Sub New()
-        knn.ptListQuery.Add(New cv.Point2f(0, 0)) ' we only need one entry in the queries.
-        If standalone Then task.gOptions.displayDst1.Checked = True
-        desc = "Use KNN to identify the previous cell for each current cell"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        fLess.Run(src)
-        dst2 = fLess.dst3
-        labels(2) = fLess.labels(2)
-
-        redMask.Run(dst2)
-
-        Dim rcListLast As New List(Of rcData)(redMask.rcList)
-        Dim lastColorMat = dst3.Clone
-
-        knn.ptListTrain.Clear()
-        For Each rc In redMask.rcList
-            knn.ptListTrain.Add(New cv.Point(rc.gridIndex, rc.pixels))
-        Next
-
-        dst3.SetTo(0)
-        For Each rc In redMask.rcList
-            knn.ptListQuery(0) = New cv.Point2f(rc.gridIndex, rc.pixels)
-            knn.Run(emptyMat)
-            Dim rcLast = rcListLast(knn.neighbors(0)(0))
-
-            Dim lastColor = lastColorMat.Get(Of cv.Vec3b)(rc.maxDist.Y, rc.maxDist.X)
-            If lastColor <> black Then
-                If lastColor <> task.vecColors(rc.index) Then rc.color = lastColor
-            Else
-                rc.color = task.scalarColors(rc.index)
-            End If
-
-            dst3(rc.rect).SetTo(rc.color, rc.mask)
-        Next
-
-        strOut = RedUtil_Basics.selectCell(redMask.dst2, redMask.rcList)
-        SetTrueText(strOut, 1)
-        If task.rcD IsNot Nothing Then task.clickPoint = task.rcD.maxDist
-
-        labels(3) = CStr(redMask.rcList.Count) + " cells were identified."
     End Sub
 End Class

@@ -577,8 +577,7 @@ Public Module Structures
         Public wcMean As cv.Scalar
         Public Sub New()
         End Sub
-        Public Sub New(_mask As cv.Mat, _rect As cv.Rect, _index As Integer,
-                               Optional combinedMask As Boolean = False)
+        Public Sub New(_mask As cv.Mat, _rect As cv.Rect, _index As Integer)
             rect = _rect
             If _index >= 0 Then
                 mask = _mask.InRange(_index, _index)
@@ -588,7 +587,7 @@ Public Module Structures
             End If
             contour = ContourBuild(mask)
             If _index >= 0 Then
-                If contour.Count >= 3 And combinedMask = False Then ' need at least 3 points for a contour.
+                If contour.Count >= 3 Then ' need at least 3 points for a contour.
                     Dim listOfPoints = New List(Of List(Of cv.Point))({contour})
                     mask = New cv.Mat(mask.Size, cv.MatType.CV_8U, 0)
                     cv.Cv2.DrawContours(mask, listOfPoints, 0, cv.Scalar.All(index), -1, cv.LineTypes.Link4)
@@ -643,8 +642,8 @@ Public Module Structures
                 strout += "Rect: X = " + CStr(rect.X) + ", Y = " + CStr(rect.Y) + ", "
                 strout += "width = " + CStr(rect.Width) + ", height = " + CStr(rect.Height) + vbCrLf
                 strout += "World Coordinates = " + Format(wcMean(0), fmt3) + " " +
-                                                           Format(wcMean(1), fmt3) + " " +
-                                                           Format(wcMean(2), fmt3) + vbCrLf
+                                                   Format(wcMean(1), fmt3) + " " +
+                                                   Format(wcMean(2), fmt3) + vbCrLf
                 strout += "World Grid coordinates = " + CStr(wGrid.X) + ", " + CStr(wGrid.Y) + vbCrLf
                 strout += "ClickPoint = " + CStr(task.clickPoint.X) + ", " + CStr(task.clickPoint.Y) + vbCrLf
             Else

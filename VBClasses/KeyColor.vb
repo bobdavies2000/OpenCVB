@@ -234,7 +234,7 @@ Namespace VBClasses
 
     Public Class KeyColor_Delaunay : Inherits TaskParent
         Dim fLess As New FeatureLess_BasicsRaw
-        Dim redMask As New RedMask_BasicsNew
+        Dim redMask As New RedMask_BuildList
         Public rcList As New List(Of rcData)
         Public rcMap As New cv.Mat(dst2.Size, cv.MatType.CV_32S, 0)
         Public Sub New()

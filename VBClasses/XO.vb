@@ -9803,7 +9803,7 @@ Namespace VBClasses
 
     Public Class XO_RedCloud_PrepEdgesXY : Inherits TaskParent
         Dim prep As New RedPrep_Depth
-        Dim redMask As New RedMask_Basics
+        Dim redMask As New NR_RedMask_Basics
         Dim cellGen As New RedMask_ToRedColor
         Public Sub New()
             dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
@@ -12563,7 +12563,7 @@ Namespace VBClasses
     Public Class XO_Flood_BasicsMaskOld : Inherits TaskParent
         Public inputRemoved As cv.Mat
         Public cellGen As New RedMask_ToRedColor
-        Dim redMask As New RedMask_Basics
+        Dim redMask As New NR_RedMask_Basics
         Public buildinputRemoved As Boolean
         Public showSelected As Boolean = True
         Dim color8U As New Color8U_Basics
@@ -15741,7 +15741,7 @@ Namespace VBClasses
     Public Class XO_RedMask_Flippers : Inherits TaskParent
         Public flipCells As New List(Of rcData)
         Public nonFlipCells As New List(Of rcData)
-        Dim redMask As New RedMask_Basics
+        Dim redMask As New NR_RedMask_Basics
         Public Sub New()
             If standalone Then task.gOptions.displayDst1.Checked = True
             labels(3) = "Highlighted below are the cells which flipped in color from the previous frame."
@@ -15835,7 +15835,7 @@ Namespace VBClasses
     Public Class XO_RedList_BasicsNew : Inherits TaskParent
         Public inputRemoved As cv.Mat
         Public cellGen As New RedMask_ToRedColor
-        Public redMask As New RedMask_Basics
+        Public redMask As New NR_RedMask_Basics
         Public rclist As New List(Of rcData)
         Public rcMap As cv.Mat ' redColor map 
         Public contours As New Contour_Basics
@@ -17109,7 +17109,7 @@ Namespace VBClasses
     Public Class XO_RedList_Basics : Inherits TaskParent
         Public inputRemoved As cv.Mat
         Public cellGen As New RedMask_ToRedColor
-        Public redMask As New RedMask_Basics
+        Public redMask As New NR_RedMask_Basics
         Public rclist As New List(Of rcData)
         Public rcMap As cv.Mat ' redColor map 
         Public contours As New Contour_Basics
@@ -18928,7 +18928,7 @@ Namespace VBClasses
 
 
     Public Class XO_Region_Contours : Inherits TaskParent
-        Public redM As New RedMask_Basics
+        Public redM As New NR_RedMask_Basics
         Public connect As New Region_Rects
         Public Sub New()
             dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
