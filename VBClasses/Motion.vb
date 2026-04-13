@@ -29,7 +29,7 @@ Public Class Motion_Basics_TA : Inherits TaskParent
         ' The following loop adds the list4 Neighbors - it is an alternative way to reduce artifacts.
         Dim nabeList As New List(Of Integer)
         For Each index In motionSort
-            For Each nabeIndex In task.grid.gridNeighbors(index)
+            For Each nabeIndex In task.gridNabes(index)
                 If nabeList.Contains(nabeIndex) = False Then
                     nabeList.Add(nabeIndex)
                     Dim rect = task.gridRects(nabeIndex)
@@ -104,7 +104,7 @@ Public Class NR_Motion_Basics : Inherits TaskParent
             Dim r = task.gridRects(i)
             Dim diffCount = diff.dst2(r).CountNonZero
             If diffCount >= task.motionThreshold Then
-                For Each index In task.grid.gridNeighbors(i)
+                For Each index In task.gridNabes(i)
                     If gridList.Keys.Contains(index) = False Then gridList.Add(index, index)
                 Next
             End If

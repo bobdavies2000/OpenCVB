@@ -122,6 +122,7 @@ Partial Public Class AlgorithmTask
 
     Public gridRects As List(Of cv.Rect)
     Public gridNabeRects As New List(Of cv.Rect) ' The surrounding rect for every gridRect
+    Public gridNabes As New List(Of List(Of Integer))
     Public gridMap As New cv.Mat
     Public gridMask As New cv.Mat
     Public gridROIclicked As Integer

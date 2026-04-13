@@ -1,7 +1,6 @@
 Imports cv = OpenCvSharp
 Imports System.Threading
 Public Class Grid_Basics_TA : Inherits TaskParent
-    Public gridNeighbors As New List(Of List(Of Integer))
     Public Sub New()
         task.gridMap = New cv.Mat(dst2.Size, cv.MatType.CV_32S, 0)
         task.gridMask = New cv.Mat(dst2.Size(), cv.MatType.CV_8U)
@@ -15,7 +14,7 @@ Public Class Grid_Basics_TA : Inherits TaskParent
         If task.optionsChanged Then
             Dim bricksPerCol As Integer, bricksPerRow As Integer
             task.gridNabeRects.Clear()
-            gridNeighbors.Clear()
+            task.gridNabes.Clear()
 
             task.gridRects.Clear()
             For y = 0 To dst2.Height - 1 Step task.brickEdgeLen
@@ -75,10 +74,10 @@ Public Class Grid_Basics_TA : Inherits TaskParent
                         If i + bricksPerRow + 1 < task.gridRects.Count Then nextList.Add(i + bricksPerRow + 1)
                     End If
                 End If
-                gridNeighbors.Add(nextList)
+                task.gridNabes.Add(nextList)
             Next
 
-            For Each nabeList In gridNeighbors
+            For Each nabeList In task.gridNabes
                 Dim xList As New List(Of Integer), yList As New List(Of Integer)
                 For Each index In nabeList
                     Dim rect = task.gridRects(index)
@@ -243,7 +242,7 @@ Public Class NR_Grid_ValidateLocation : Inherits TaskParent
             labels(3) = "Grid index = " + CStr(grIndex) + " does NOT match the grid location." + vbCrLf
         End If
         dst3.SetTo(0)
-        For Each index In task.grid.gridNeighbors(grIndex)
+        For Each index In task.gridNabes(grIndex)
             Dim r = task.gridRects(index)
             dst2.Rectangle(r, white, task.lineWidth)
             dst3.Rectangle(r, 255, task.lineWidth)
@@ -343,7 +342,7 @@ Public Class Grid_Rectangles : Inherits TaskParent
     Public bricksPerCol As Integer
     Public bricksPerRow As Integer
     Public gridMask As cv.Mat
-    Public gridNeighbors As New List(Of List(Of Integer))
+    Public gridNabes As New List(Of List(Of Integer))
     Public Sub New()
         gridMask = New cv.Mat(dst2.Size(), cv.MatType.CV_8U)
         gridMap = New cv.Mat(dst2.Size(), cv.MatType.CV_8U)
@@ -382,9 +381,9 @@ Public Class Grid_Rectangles : Inherits TaskParent
                 gridMap.Rectangle(roi, gridRects.IndexOf(roi), -1)
             Next
 
-            gridNeighbors.Clear()
+            gridNabes.Clear()
             For Each roi In gridRects
-                gridNeighbors.Add(New List(Of Integer))
+                gridNabes.Add(New List(Of Integer))
                 For i = 0 To 8
                     Dim x = Choose(i + 1, roi.X - 1, roi.X, roi.X + roi.Width + 1,
                                               roi.X - 1, roi.X, roi.X + roi.Width + 1,
@@ -392,7 +391,7 @@ Public Class Grid_Rectangles : Inherits TaskParent
                     Dim y = Choose(i + 1, roi.Y - 1, roi.Y - 1, roi.Y - 1, roi.Y, roi.Y, roi.Y,
                                               roi.Y + roi.Height + 1, roi.Y + roi.Height + 1, roi.Y + roi.Height + 1)
                     If x >= 0 And x < dst2.Width And y >= 0 And y < dst2.Height Then
-                        gridNeighbors(gridNeighbors.Count - 1).Add(gridMap.Get(Of Integer)(y, x))
+                        gridNabes(gridNabes.Count - 1).Add(gridMap.Get(Of Integer)(y, x))
                     End If
                 Next
             Next

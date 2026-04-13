@@ -60,7 +60,7 @@ Public Class NR_LineRect_CenterNeighbor : Inherits TaskParent
         For Each lp In task.lines.lpList
             Dim center = New cv.Point((lp.p1.X + lp.p2.X) \ 2, (lp.p1.Y + lp.p2.Y) \ 2)
             Dim index As Integer = task.gridMap.Get(Of Integer)(center.Y, center.X)
-            Dim nabeList = task.grid.gridNeighbors(index)
+            Dim nabeList = task.gridNabes(index)
             Dim foundObjectLine As Boolean = False
             For i = 1 To nabeList.Count - 1
                 Dim brick1 = bricks.brickList(nabeList(i))

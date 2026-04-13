@@ -600,7 +600,7 @@ Public Module Structures
             buildMaxDist()
 
             gridIndex = task.gridMap.Get(Of Integer)(maxDist.Y, maxDist.X)
-            If _index >= 0 Then color = task.vecColors(index Mod 255)
+            If _index >= 0 Then color = task.scalarColors(index Mod 255)
             pixels = mask.CountNonZero
             wcMean = task.pointCloud(rect).Mean(task.depthmask(rect))
             Dim x = Math.Round(wcMean(0) * 1000 / task.reduction)
@@ -646,6 +646,7 @@ Public Module Structures
                                                            Format(wcMean(1), fmt3) + " " +
                                                            Format(wcMean(2), fmt3) + vbCrLf
                 strout += "World Grid coordinates = " + CStr(wGrid.X) + ", " + CStr(wGrid.Y) + vbCrLf
+                strout += "ClickPoint = " + CStr(task.clickPoint.X) + ", " + CStr(task.clickPoint.Y) + vbCrLf
             Else
                 strout = "The depth data for this cell is NaN. StereoLabs specific problem."
             End If

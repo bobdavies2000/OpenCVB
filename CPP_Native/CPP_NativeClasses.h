@@ -37,6 +37,81 @@ using namespace ximgproc;
 using namespace ml;
 
 #include "CPP_Parent.h"
+class RedMask
+{
+private:
+public:
+    Mat src, result;
+    vector<Rect>cellRects;
+
+    RedMask() {}
+    void RunCPP(int minSize) {
+        result = Mat(src.rows + 2, src.cols + 2, CV_8U);
+        result.setTo(0);
+        int maskFill = 255;
+
+        //multimap<int, Point, less_equal<int>> sizeSorted;
+        multimap<int, Point, greater<int>> sizeSorted;
+        int floodFlag = 4 | FLOODFILL_MASK_ONLY | FLOODFILL_FIXED_RANGE;
+        Point pt;
+        for (int y = 0; y < src.rows; y++)
+        {
+            for (int x = 0; x < src.cols; x++)
+            {
+                if (src.at<unsigned char>(y, x) != 0)
+                {
+                    pt = Point(x, y);
+                    int count = floodFill(src, result, pt, 255, nullptr, 0, 0, 4 | floodFlag | (maskFill << 8));
+                    if (count > minSize) sizeSorted.insert(make_pair(count, pt));
+                }
+            }
+        }
+
+        cellRects.clear();
+        maskFill = 1;
+        result.setTo(0);
+        Rect rect;
+        for (auto it = sizeSorted.begin(); it != sizeSorted.end(); it++)
+        {
+            if (floodFill(src, result, it->second, 255, &rect, 0, 0, 4 | floodFlag | (maskFill << 8)) >= 1)
+            {
+                cellRects.push_back(rect);
+
+                if (maskFill >= 255) break; // just taking up to the top X largest objects found.
+                maskFill++;
+            }
+        }
+    }
+};
+
+extern "C" __declspec(dllexport) RedMask* RedMask_Open()
+{
+    return new RedMask();
+}
+
+extern "C" __declspec(dllexport) int RedMask_Count(RedMask* cPtr)
+{
+    return (int)cPtr->cellRects.size();
+}
+
+extern "C" __declspec(dllexport) int* RedMask_Rects(RedMask* cPtr)
+{
+    return (int*)&cPtr->cellRects[0];
+}
+
+extern "C" __declspec(dllexport) int* RedMask_Close(RedMask* cPtr) { delete cPtr; return (int*)0; }
+extern "C" __declspec(dllexport) int*
+RedMask_Run(RedMask* cPtr, int* dataPtr, int rows, int cols, int minSize)
+{
+    cPtr->src = Mat(rows, cols, CV_8U, dataPtr);
+    cPtr->RunCPP(minSize);
+    return (int*)cPtr->result.data;
+}
+
+
+
+
+
 class RedCloudFill
 {
 private:
@@ -297,9 +372,6 @@ public:
                 if (rect.width * rect.height > 0)
                 {
                     cellRects.push_back(rect);
-
-                    if (fill >= 255)
-                        break; // just taking up to the top X largest objects found.
                     fill++;
                 }
             }
@@ -383,81 +455,6 @@ PrepXY_Run(PrepXY* cPtr, int* splitXPtr, int* splitYPtr, int rows, int cols, flo
     return (int*)cPtr->result.data;
 }
 
-
-
-
-
-
-class RedMask
-{
-private:
-public:
-    Mat src, result;
-    vector<Rect>cellRects;
-
-    RedMask() {}
-    void RunCPP(int minSize) {
-        result = Mat(src.rows + 2, src.cols + 2, CV_8U);
-        result.setTo(0);
-
-        multimap<int, Point, less_equal<int>> sizeSorted;
-        int floodFlag = 4 | FLOODFILL_MASK_ONLY | FLOODFILL_FIXED_RANGE;
-        Point pt;
-        for (int y = 0; y < src.rows; y++)
-        {
-            for (int x = 0; x < src.cols; x++)
-            {
-                if (src.at<unsigned char>(y, x) != 0)
-                {
-                    pt = Point(x, y);
-                    int count = floodFill(src, result, pt, 255, nullptr, 0, 0, 4 | floodFlag | (255 << 8));
-                    if (count > minSize) sizeSorted.insert(make_pair(count, pt));
-                }
-            }
-        }
-
-        cellRects.clear();
-        int fill = 1;
-        result.setTo(0);
-        Rect rect;
-        for (auto it = sizeSorted.begin(); it != sizeSorted.end(); it++)
-        {
-            if (floodFill(src, result, it->second, fill, &rect, 0, 0, 4 | floodFlag | (fill << 8)) >= 1)
-            {
-                cellRects.push_back(rect);
-
-                if (fill >= 255) break; // just taking up to the top X largest objects found.
-                fill++;
-            }
-        }
-    }
-};
-
-extern "C" __declspec(dllexport) RedMask* RedMask_Open()
-{
-    return new RedMask();
-}
-
-extern "C" __declspec(dllexport) int RedMask_Count(RedMask* cPtr)
-{
-    return (int)cPtr->cellRects.size();
-}
-
-extern "C" __declspec(dllexport) int* RedMask_Rects(RedMask* cPtr)
-{
-    return (int*)&cPtr->cellRects[0];
-}
-
-extern "C" __declspec(dllexport) int* RedMask_Close(RedMask* cPtr) { delete cPtr; return (int*)0; }
-extern "C" __declspec(dllexport) int*
-RedMask_Run(RedMask* cPtr, int* dataPtr, int rows, int cols, int minSize)
-{
-    cPtr->src = Mat(rows, cols, CV_8U, dataPtr);
-
-    cPtr->RunCPP(minSize);
-
-    return (int*)cPtr->result.data;
-}
 
 
 

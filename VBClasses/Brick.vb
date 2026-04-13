@@ -466,7 +466,7 @@ Public Class NR_Brick_FeaturesAndEdges : Inherits TaskParent
         dst1 = feat.featureMask.Clone
 
         boundaryCells.Clear()
-        For Each nabeList In task.grid.gridNeighbors
+        For Each nabeList In task.gridNabes
             Dim grA = task.gridRects(nabeList(0))
             Dim centerType = feat.featureMask.Get(Of Byte)(grA.Y, grA.X)
             If centerType <> 0 Then

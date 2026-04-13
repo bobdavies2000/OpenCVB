@@ -11426,7 +11426,7 @@ Namespace VBClasses
                 Dim colorChange = Distance_Basics.distance3D(colorVec, lastColor(i))
                 If colorChange > task.motionThreshold Then
                     lastColor(i) = colorVec
-                    For Each index In task.grid.gridNeighbors(i)
+                    For Each index In task.gridNabes(i)
                         If motionSort.Contains(index) = False Then
                             motionFlags(index) = True
                             motionSort.Add(index)
@@ -11723,7 +11723,7 @@ Namespace VBClasses
             For i = 0 To task.gridRects.Count - 1
                 Dim diffCount = diff.dst2(task.gridRects(i)).CountNonZero
                 If diffCount >= task.motionThreshold Then
-                    For Each index In task.grid.gridNeighbors(i)
+                    For Each index In task.gridNabes(i)
                         If motionSort.Contains(index) = False Then
                             motionSort.Add(index)
                         End If
@@ -13104,7 +13104,7 @@ Namespace VBClasses
             For i = 0 To task.gridRects.Count - 1
                 Dim diffCount = diff.dst2(task.gridRects(i)).CountNonZero
                 If diffCount >= task.motionThreshold Then
-                    For Each index In task.grid.gridNeighbors(i)
+                    For Each index In task.gridNabes(i)
                         If motionSort.Contains(index) = False Then motionSort.Add(index)
                     Next
                 End If
@@ -13167,8 +13167,8 @@ Namespace VBClasses
                 If Math.Abs(lplast(index).angle - match3.lpOutput(index).angle) < task.angleThreshold Then
                     Dim index1 = match3.lpOutput(index).p1GridIndex
                     Dim index2 = match3.lpOutput(index).p2GridIndex
-                    If task.grid.gridNeighbors(index1).Contains(lplast(index).p1GridIndex) And
-                        task.grid.gridNeighbors(index2).Contains(lplast(index).p2GridIndex) Then
+                    If task.gridNabes(index1).Contains(lplast(index).p1GridIndex) And
+                        task.gridNabes(index2).Contains(lplast(index).p2GridIndex) Then
                         age = lplast(index).age + 1
                     End If
                 End If
@@ -13410,7 +13410,7 @@ Namespace VBClasses
             For i = 0 To task.gridRects.Count - 1
                 Dim diffCount = diff.dst2(task.gridRects(i)).CountNonZero
                 If diffCount >= task.motionThreshold Then
-                    For Each index In task.grid.gridNeighbors(i)
+                    For Each index In task.gridNabes(i)
                         If motionSort.Contains(index) = False Then motionSort.Add(index)
                     Next
                 End If

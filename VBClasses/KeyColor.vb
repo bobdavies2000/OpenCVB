@@ -233,14 +233,73 @@ Namespace VBClasses
 
 
     Public Class KeyColor_Delaunay : Inherits TaskParent
-        Dim fLess As New FeatureLess_Cells
+        Dim fLess As New FeatureLess_BasicsRaw
+        Dim redMask As New RedMask_BasicsNew
+        Public rcList As New List(Of rcData)
+        Public rcMap As New cv.Mat(dst2.Size, cv.MatType.CV_32S, 0)
         Public Sub New()
+            If standalone Then task.gOptions.displayDst1.Checked = True
             desc = "Use the key color maxDist points as input to delaunay."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             fLess.Run(src)
-            dst2 = fLess.dst2
+            dst2 = fLess.dst3
             labels(2) = fLess.labels(2)
+
+            redMask.Run(dst2)
+
+            Dim lastColorMat = dst3.Clone
+            Dim rcListLast As New List(Of rcData)(rcList)
+            Dim rcMapLast = rcMap.Clone
+
+            dst3.SetTo(0)
+            rcMap.SetTo(0)
+            rcList.Clear()
+            Dim maxPoints As New List(Of cv.Point)
+            For Each rc In redMask.rcList
+                rc = RedUtil_Basics.rcDataMatch(rc, rcListLast, rcMapLast)
+                rc.index = rcList.Count + 1
+                Dim color = lastColorMat.Get(Of cv.Vec3b)(rc.maxDist.Y, rc.maxDist.X)
+                If color <> black Then
+                    rc.color = New cv.Scalar(color(0), color(1), color(2))
+                Else
+                    rc.color = task.scalarColors(rc.index)
+                End If
+                dst3(rc.rect).SetTo(rc.color, rc.mask)
+                rcMap(rc.rect).SetTo(rc.index, rc.mask)
+
+                maxPoints.Add(rc.maxDist)
+                rcList.Add(rc)
+            Next
+
+            For Each rc In rcList
+                dst3.Rectangle(rc.rect, task.highlight, task.lineWidth)
+            Next
+
+            strOut = RedUtil_Basics.selectCell(rcMap, rcList)
+            If strOut = "That cell is no longer present." Then
+                Static knn As New KNN_Basics
+                knn.ptListTrain = New List(Of cv.Point)(maxPoints)
+                Dim clickIndex = rcMapLast.Get(Of Integer)(task.clickPoint.Y, task.clickPoint.X)
+                If clickIndex > 0 Then
+                    Dim rcLast = rcListLast(clickIndex - 1)
+
+                    knn.ptListQuery.Clear()
+                    knn.ptListQuery.Add(rcLast.maxDist)
+                    knn.Run(emptyMat)
+                    Dim index = knn.result(0, 1)
+                    strOut = rcList(index + 1).displayCell
+                    If clickIndex < rcList.Count Then
+                        task.rcD = rcList(clickIndex - 1)
+                        task.color(task.rcD.rect).SetTo(white, task.rcD.mask)
+                    Else strOut = "That cell is no longer present."
+                    End If
+                End If
+            End If
+            SetTrueText(strOut, 1)
+
+            labels(3) = "Starting with " + CStr(redMask.rcList.Count) + " cells, " + CStr(rcList.Count) +
+                        " cells were isolated."
         End Sub
     End Class
 End Namespace

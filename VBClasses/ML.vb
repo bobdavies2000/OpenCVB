@@ -604,7 +604,7 @@ Public Class ML_FeatureLess : Inherits TaskParent
         Dim nCells = flIndices.Count
         For classId = 0 To flIndices.Count - 1
             Dim center = flIndices(classId)
-            Dim nabeList = task.grid.gridNeighbors(center)
+            Dim nabeList = task.gridNabes(center)
             For j = 1 To nabeList.Count - 1
                 Dim nb = nabeList(j)
                 Dim gr = task.gridRects(nb)
@@ -700,7 +700,7 @@ Public Class ML_FeatureLess_Grid : Inherits TaskParent
         Dim red As New cv.Scalar(0, 0, 255)
         For classId = 0 To nCells - 1
             Dim center = flIndices(classId)
-            Dim nabeList = task.grid.gridNeighbors(center)
+            Dim nabeList = task.gridNabes(center)
             For j = 1 To nabeList.Count - 1
                 Dim nb = nabeList(j)
                 Dim gr = task.gridRects(nb)

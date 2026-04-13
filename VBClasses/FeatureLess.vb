@@ -45,56 +45,6 @@ Namespace VBClasses
 
 
 
-    Public Class FeatureLess_BasicsRaw : Inherits TaskParent
-        Public rectList As New List(Of cv.Rect)
-        Public options As New Options_FeatureLess
-        Public featureLessMask As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-        Dim corr As New Correlation_Basics
-        Public Sub New()
-            dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-            desc = "Identify featureless squares using the gray scale range - see 'Correlation_Basics'."
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            options.Run()
-            Dim motionList As New List(Of Integer)(task.motion.motionSort)
-            If motionList.Count = 0 Then motionList.Add(0) ' dummy entry so loops below works.
-            Dim index As Integer
-
-            If src.Channels <> 1 Then src = task.gray
-
-            dst2 = src
-            ' at higher resolutions, the correlation works but the fLessThreshold does not...
-            If task.workRes.Width >= 1280 Then
-                corr.Run(src)
-                rectList = New List(Of cv.Rect)(corr.rectList)
-            Else
-                rectList.Clear()
-                For Each r In task.gridRects
-                    Dim mm = GetMinMax(src(r))
-                    If mm.range < options.fLessThreshold Then
-                        If r <> task.gridRects(motionList(index)) Then
-                            rectList.Add(r)
-                        Else
-                            If index + 1 < motionList.Count Then index += 1
-                        End If
-                    End If
-                Next
-            End If
-
-            featureLessMask.SetTo(0)
-            For Each r In rectList
-                dst2.Rectangle(r, 255, task.lineWidth)
-                featureLessMask(r).SetTo(255)
-            Next
-            dst3 = featureLessMask
-
-            labels(2) = CStr(rectList.Count) + " grid squares were found to be featureless (<gridRect>.mm.range < " +
-                            CStr(options.fLessThreshold) + ")"
-        End Sub
-    End Class
-
-
-
 
     Public Class FeatureLess_Correlation : Inherits TaskParent
         Dim corr As New Correlation_Basics
@@ -594,6 +544,55 @@ Namespace VBClasses
             Next
             dst3 = Palettize(dst2, 0)
             labels(2) = CStr(index - 1) + " featureless regions were found below (8UC1)."
+        End Sub
+    End Class
+
+
+
+
+    Public Class FeatureLess_BasicsRaw : Inherits TaskParent
+        Public rectList As New List(Of cv.Rect)
+        Public options As New Options_FeatureLess
+        Dim corr As New Correlation_Basics
+        Public Sub New()
+            dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+            desc = "Identify featureless squares using the gray scale range - see 'Correlation_Basics'."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            options.Run()
+            Dim motionList As New List(Of Integer)(task.motion.motionSort)
+            If motionList.Count = 0 Then motionList.Add(0) ' dummy entry so loops below works.
+            Dim index As Integer
+
+            If src.Channels <> 1 Then src = task.gray
+
+            dst2 = src
+            ' at higher resolutions, the correlation works but the fLessThreshold does not...
+            If task.workRes.Width >= 1280 Then
+                corr.Run(src)
+                rectList = New List(Of cv.Rect)(corr.rectList)
+            Else
+                rectList.Clear()
+                For Each r In task.gridRects
+                    Dim mm = GetMinMax(src(r))
+                    If mm.range < options.fLessThreshold Then
+                        If r <> task.gridRects(motionList(index)) Then
+                            rectList.Add(r)
+                        Else
+                            If index + 1 < motionList.Count Then index += 1
+                        End If
+                    End If
+                Next
+            End If
+
+            dst3.SetTo(0)
+            For Each r In rectList
+                dst2.Rectangle(r, 255, task.lineWidth)
+                dst3(r).SetTo(255)
+            Next
+
+            labels(2) = CStr(rectList.Count) + " grid squares were found to be featureless (<gridRect>.mm.range < " +
+                            CStr(options.fLessThreshold) + ")"
         End Sub
     End Class
 End Namespace

@@ -128,22 +128,16 @@ Public Class RedUtil_Basics : Inherits TaskParent
         Dim clickIndex As Integer = 0, strOut As String = ""
         If rcList.Count > 0 Then
             clickIndex = rcMap.Get(Of Integer)(task.clickPoint.Y, task.clickPoint.X)
-            If clickIndex > 0 And clickIndex < rcList.Count Then
-                task.rcD = rcList(clickIndex - 1)
-            Else
-                If rcList.Count > 0 Then
-                    clickIndex = 1
-                    task.rcD = rcList(0)
-                    task.clickPoint = task.rcD.maxDist
-                Else
-                    task.rcD = Nothing
-                End If
+            If clickIndex = 0 Then
+                task.rcD = Nothing
+                Return vbCrLf + vbCrLf + "No cell defined there."
             End If
-            If task.rcD IsNot Nothing Then
+            If clickIndex < rcList.Count Then
                 task.rcD = rcList(clickIndex - 1)
                 task.color(task.rcD.rect).SetTo(white, task.rcD.mask)
-                task.color.Rectangle(task.rcD.rect, task.highlight, task.lineWidth)
                 strOut = task.rcD.displayCell()
+            Else
+                Return vbCrLf + vbCrLf + "That cell is no longer present."
             End If
         End If
         Return strOut
