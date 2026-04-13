@@ -397,7 +397,7 @@ Public Class NR_GridRect_LRClick : Inherits TaskParent
             Else
                 Dim index = corr.IndexOf(maxCorr)
                 Dim rectRight = New cv.Rect(index, r.Y, r.Width, r.Height)
-                Dim offset = r.TopLeft.X - rectRight.TopLeft.X
+                Dim offset = r.X - rectRight.X
                 If task.heartBeat Then
                     strOut = "CoeffNormed max correlation = " + Format(maxCorr, fmt3) + vbCrLf
                     strOut += "Left Mean = " + Format(gather.meanList(gridIndex), fmt3) + " Left stdev = " + Format(gather.stdevList(gridIndex), fmt3) + vbCrLf

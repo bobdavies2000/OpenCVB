@@ -841,8 +841,8 @@ Public Class NR_Contour_EdgePoints : Inherits TaskParent
         For Each contour In contours.contourList
             Dim index = contours.contourList.IndexOf(contour)
             If index < 3 Then Continue For
-            ptList.Add(New cv.Point(0, contour.rect.TopLeft.Y))
-            ptList.Add(New cv.Point(contour.rect.TopLeft.X, 0))
+            ptList.Add(New cv.Point(0, contour.rect.Y))
+            ptList.Add(New cv.Point(contour.rect.X, 0))
 
             Dim ptIndex = ptList.Count - 1
             For i = 0 To 1

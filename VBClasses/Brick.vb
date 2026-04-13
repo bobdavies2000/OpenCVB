@@ -167,7 +167,7 @@ Public Class NR_Brick_CorrelationInput : Inherits TaskParent
 
         Dim corr = task.brickD.correlation
         DrawCircle(dst2, task.brickD.lRect.TopLeft, task.DotSize, 255)
-        Dim pt = New cv.Point(task.brickD.rect.TopLeft.X, task.brickD.rect.TopLeft.Y - 10)
+        Dim pt = New cv.Point(task.brickD.rect.X, task.brickD.rect.Y - 10)
         SetTrueText("Corr. " + Format(corr, fmt3) + vbCrLf, pt, 2)
         labels(3) = "Correlation of the left grid square to the right is " + Format(corr, fmt3)
 
@@ -925,7 +925,7 @@ Public Class Brick_Variability : Inherits TaskParent
             depthJumpers.Clear()
             For i = 0 To depthList.Count - 1
                 Dim r = task.gridRects(i)
-                Dim val = fLess.dst2.Get(Of Byte)(r.TopLeft.Y, r.TopLeft.X)
+                Dim val = fLess.dst2.Get(Of Byte)(r.Y, r.X)
                 If val = 0 And depthList(i) <> 0 And lastDepthList(i) <> 0 Then
                     Dim diff = Math.Abs(depthList(i) - lastDepthList(i))
                     If diff > options.meters Then

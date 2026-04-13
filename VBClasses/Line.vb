@@ -436,7 +436,7 @@ Public Class Line_DepthHistogram : Inherits TaskParent
         For Each lp In lineVert.lpLeft
             Dim depth = task.pcSplit(2)(lp.rect)
             Dim depthMask As New cv.Mat(lp.rect.Size, cv.MatType.CV_8U, 0)
-            Dim p1 = New cv.Point2f(lp.p1.X - lp.rect.TopLeft.X, lp.p1.Y - lp.rect.TopLeft.Y)
+            Dim p1 = New cv.Point2f(lp.p1.X - lp.rect.X, lp.p1.Y - lp.rect.Y)
             Dim p2 = New cv.Point2f(lp.p2.X - lp.rect.BottomRight.X, lp.p2.Y - lp.rect.BottomRight.Y)
             depthMask.Line(p1, p2, 255, task.lineWidth, task.lineType)
             Dim mmDepth = GetMinMax(depth, depthMask)
@@ -873,10 +873,10 @@ Public Class Line_MapRects : Inherits TaskParent
             If fillTriangle(lp, lp.rect.TopLeft) Then Continue For
             If fillTriangle(lp, lp.rect.BottomRight) Then Continue For
 
-            Dim topRight As New cv.Point(lp.rect.TopLeft.X + lp.rect.Width, lp.rect.Top)
+            Dim topRight As New cv.Point(lp.rect.X + lp.rect.Width, lp.rect.Top)
             If fillTriangle(lp, topRight) Then Continue For
 
-            Dim botleft As New cv.Point(lp.rect.TopLeft.X, lp.rect.Top + lp.rect.Height)
+            Dim botleft As New cv.Point(lp.rect.X, lp.rect.Top + lp.rect.Height)
             If fillTriangle(lp, botleft) Then Continue For
         Next
 

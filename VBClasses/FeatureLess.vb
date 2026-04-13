@@ -18,7 +18,7 @@ Namespace VBClasses
             Dim newList As New List(Of cv.Rect)
             ' remove any grid rects that had motion.
             For Each r In rectList
-                Dim val = task.motion.motionMask.Get(Of Byte)(r.TopLeft.Y, r.TopLeft.X)
+                Dim val = task.motion.motionMask.Get(Of Byte)(r.Y, r.X)
                 If val <> 0 Then
                     dst2(r).SetTo(0)
                 Else
@@ -99,7 +99,7 @@ Namespace VBClasses
 
             rectList.Clear()
             For Each r In task.gridRects
-                If dst2.Get(Of Byte)(r.TopLeft.Y, r.TopLeft.X) Then rectList.Add(r)
+                If dst2.Get(Of Byte)(r.Y, r.X) Then rectList.Add(r)
             Next
 
             If standaloneTest() Then
@@ -446,10 +446,10 @@ Namespace VBClasses
             diff.Run(dst2)
 
             For Each r In task.gridRects
-                Dim val = diff.dst2.Get(Of Byte)(r.TopLeft.Y, r.TopLeft.X)
+                Dim val = diff.dst2.Get(Of Byte)(r.Y, r.X)
                 If val > 0 Then
-                    Dim gridIndex = task.gridMap.Get(Of Integer)(r.TopLeft.Y, r.TopLeft.X)
-                    If task.motion.motionMask.Get(Of Byte)(r.TopLeft.Y, r.TopLeft.X) = 0 Then
+                    Dim gridIndex = task.gridMap.Get(Of Integer)(r.Y, r.X)
+                    If task.motion.motionMask.Get(Of Byte)(r.Y, r.X) = 0 Then
                         dst2(task.gridRects(gridIndex)).SetTo(0)
                     End If
                 End If
@@ -525,7 +525,7 @@ Namespace VBClasses
             Dim minSize = task.brickEdgeLen * task.brickEdgeLen
             Dim countList As New SortedList(Of Integer, Integer)(New compareAllowIdenticalIntegerInverted)
             For Each r In fLess.rectList
-                Dim val = dst2.Get(Of Byte)(r.TopLeft.Y, r.TopLeft.X)
+                Dim val = dst2.Get(Of Byte)(r.Y, r.X)
                 If val = 255 Then
                     Dim count = cv.Cv2.FloodFill(dst2, mask, r.TopLeft, index, rect, 0, 0, flags)
                     If count > minSize Then

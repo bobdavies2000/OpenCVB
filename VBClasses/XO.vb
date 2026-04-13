@@ -15162,11 +15162,11 @@ Namespace VBClasses
                 Case 0
                     Return r.TopLeft
                 Case 1
-                    Return New cv.Point2f(r.BottomRight.X, r.TopLeft.Y)
+                    Return New cv.Point2f(r.BottomRight.X, r.Y)
                 Case 2
                     Return r.BottomRight
             End Select
-            Return New cv.Point2f(r.TopLeft.X, r.BottomRight.Y)
+            Return New cv.Point2f(r.X, r.BottomRight.Y)
         End Function
         Public Overrides Sub RunAlg(src As cv.Mat)
             dst2 = src.Clone
@@ -18999,7 +18999,7 @@ Namespace VBClasses
                 Dim correlation = corr.cList(i)
                 If correlation < corr.maxCorrelation Then
                     Dim r = task.gridRects(i)
-                    Dim val = dst2.Get(Of Byte)(r.TopLeft.Y, r.TopLeft.X)
+                    Dim val = dst2.Get(Of Byte)(r.Y, r.X)
                     If val = 0 Then dst3.Rectangle(r, red, -1)
                 End If
             Next

@@ -83,7 +83,7 @@ Public Class Indexer_Corners : Inherits TaskParent
         Dim count As Integer
         dst1.SetTo(0)
         For Each r In rectList
-            Dim val = indexer(r.TopLeft.Y, r.TopLeft.X)
+            Dim val = indexer(r.Y, r.X)
             If val <> 0 Then
                 dst1(r).SetTo(255)
                 dst3(r).SetTo(0)
