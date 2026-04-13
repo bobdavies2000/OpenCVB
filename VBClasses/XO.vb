@@ -9551,7 +9551,7 @@ Namespace VBClasses
         Dim contours As New Contour_Basics
         Public Sub New()
             dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
-            desc = "Run the reduced pointcloud output through the RedMask_CPP algorithm."
+            desc = "Run the reduced pointcloud output through the XO_RedMask_CPP algorithm."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             contours.Run(src)
@@ -9807,7 +9807,7 @@ Namespace VBClasses
         Dim cellGen As New RedMask_ToRedColor
         Public Sub New()
             dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
-            desc = "Run the reduced pointcloud output through the RedMask_CPP algorithm."
+            desc = "Run the reduced pointcloud output through the XO_RedMask_CPP algorithm."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             prep.Run(src)
@@ -9881,7 +9881,7 @@ Namespace VBClasses
         Public Sub New()
             OptionParent.findRadio("XY Reduction").Checked = True
             If standalone Then task.gOptions.displayDst1.Checked = True
-            desc = "Run the reduced pointcloud output through the RedMask_CPP algorithm."
+            desc = "Run the reduced pointcloud output through the XO_RedMask_CPP algorithm."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             redC.Run(src)
@@ -19011,7 +19011,7 @@ Namespace VBClasses
 
 
     Public Class XO_FeatureLess_Groups : Inherits TaskParent
-        Dim redCPP As New RedMask_CPP
+        Dim redCPP As New XO_RedMask_CPP
         Public classCount As Integer
         Dim fLess As New FeatureLess_Correlation
         Public Sub New()
@@ -19634,6 +19634,48 @@ Namespace VBClasses
             dst2 = colorize.dst2
 
             stableDepth = minDepth
+        End Sub
+    End Class
+
+
+
+
+    Public Class XO_RedMask_CPP : Inherits TaskParent
+        Implements IDisposable
+        Public classCount As Integer
+        Public rectList As New List(Of cv.Rect)
+        Public identifyCount As Integer = 255
+        Public Sub New()
+            cPtr = RedMask_Open()
+            desc = "Run the C++ RedCloud Interface With Or without a mask"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            dst1 = Mat_Basics.srcMustBe8U(src)
+
+            Dim inputData(dst1.Total - 1) As Byte
+            dst1.GetArray(Of Byte)(inputData)
+            Dim handleInput = GCHandle.Alloc(inputData, GCHandleType.Pinned)
+
+            Dim imagePtr = RedMask_Run(cPtr, handleInput.AddrOfPinnedObject(), dst1.Rows, dst1.Cols, 0)
+            handleInput.Free()
+            dst2 = cv.Mat.FromPixelData(dst1.Rows + 2, dst1.Cols + 2, cv.MatType.CV_8U, imagePtr).Clone
+            dst2 = dst2(New cv.Rect(1, 1, dst2.Width - 2, dst2.Height - 2))
+
+            classCount = Math.Min(RedMask_Count(cPtr), identifyCount * 2)
+            If classCount = 0 Then Exit Sub ' no data to process.
+
+            Dim rectData = cv.Mat.FromPixelData(classCount, 1, cv.MatType.CV_32SC4, RedMask_Rects(cPtr))
+            Dim rects(classCount - 1) As cv.Rect
+            rectData.GetArray(Of cv.Rect)(rects)
+
+            rectList = rects.ToList
+            If standaloneTest() Then dst3 = Palettize(dst2)
+
+            labels(2) = "CV_8U result With " + CStr(classCount) + " regions."
+            labels(3) = "Palette version of the data In dst2 With " + CStr(classCount) + " regions."
+        End Sub
+        Protected Overrides Sub Finalize()
+            If cPtr <> 0 Then cPtr = RedMask_Close(cPtr)
         End Sub
     End Class
 End Namespace

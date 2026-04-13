@@ -179,47 +179,6 @@ End Class
 
 
 
-Public Class RedMask_CPP : Inherits TaskParent
-    Implements IDisposable
-    Public classCount As Integer
-    Public rectList As New List(Of cv.Rect)
-    Public identifyCount As Integer = 255
-    Public Sub New()
-        cPtr = RedMask_Open()
-        desc = "Run the C++ RedCloud Interface With Or without a mask"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        dst1 = Mat_Basics.srcMustBe8U(src)
-
-        Dim inputData(dst1.Total - 1) As Byte
-        dst1.GetArray(Of Byte)(inputData)
-        Dim handleInput = GCHandle.Alloc(inputData, GCHandleType.Pinned)
-
-        Dim imagePtr = RedMask_Run(cPtr, handleInput.AddrOfPinnedObject(), dst1.Rows, dst1.Cols, 0)
-        handleInput.Free()
-        dst2 = cv.Mat.FromPixelData(dst1.Rows + 2, dst1.Cols + 2, cv.MatType.CV_8U, imagePtr).Clone
-        dst2 = dst2(New cv.Rect(1, 1, dst2.Width - 2, dst2.Height - 2))
-
-        classCount = Math.Min(RedMask_Count(cPtr), identifyCount * 2)
-        If classCount = 0 Then Exit Sub ' no data to process.
-
-        Dim rectData = cv.Mat.FromPixelData(classCount, 1, cv.MatType.CV_32SC4, RedMask_Rects(cPtr))
-        Dim rects(classCount - 1) As cv.Rect
-        rectData.GetArray(Of cv.Rect)(rects)
-
-        rectList = rects.ToList
-        If standaloneTest() Then dst3 = Palettize(dst2)
-
-        labels(2) = "CV_8U result With " + CStr(classCount) + " regions."
-        labels(3) = "Palette version of the data In dst2 With " + CStr(classCount) + " regions."
-    End Sub
-    Protected Overrides Sub Finalize()
-        If cPtr <> 0 Then cPtr = RedMask_Close(cPtr)
-    End Sub
-End Class
-
-
-
 
 
 Public Class NR_RedMark_Features : Inherits TaskParent
@@ -461,173 +420,12 @@ End Class
 
 
 
-Public Class RedMask_BasicsNew : Inherits TaskParent
-    Public rcList As New List(Of rcData)
-    Dim redCore As New RedMask_Core
-    Public Sub New()
-        desc = "Run the C++ RedMask to create a list of mask, rect, and other info about image"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        If src.Channels <> 1 Then dst1 = Mat_Basics.srcMustBe8U(src) Else dst1 = src
-
-        redCore.Run(dst1)
-        Dim classcount = redCore.classCount
-        If classcount <= 1 Then Exit Sub ' no data to process.
-
-        dst2.SetTo(0)
-        rcList.Clear()
-        For i = 0 To classcount - 1
-            Dim rc As New rcData
-            rc.rect = redCore.rects(i)
-            rc.mask = redCore.dst2(rc.rect).InRange(i + 1, i + 1)
-            rc = New rcData(rc.mask, rc.rect, -1)
-            rc.index = rcList.Count + 1
-            dst2(rc.rect).SetTo(rc.index, rc.mask)
-            rcList.Add(rc)
-        Next
-
-        dst3 = Palettize(dst2)
-
-        labels(2) = "CV_8U result with " + CStr(classcount) + " regions."
-        labels(3) = "Palette version of the data in dst2 with " + CStr(classCount) + " regions."
-    End Sub
-End Class
-
-
-
-
-
-
-Public Class RedMask_KNN : Inherits TaskParent
-    Public rcList As New List(Of rcData)
-    Public rcMap As New cv.Mat(dst2.Size, cv.MatType.CV_32S, 0)
-    Dim redCore As New RedMask_Core
-    Dim fLess As New FeatureLess_BasicsRaw
-    Dim knn As New KNN_Basics
-    Public fLessGridRects As New List(Of List(Of Integer))
-    Public Sub New()
-        If standalone Then task.gOptions.displayDst1.Checked = True
-        desc = "Use KNN to identify the previous cell for each current cell"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        fLess.Run(src)
-        dst2 = fLess.dst3
-        labels(2) = fLess.labels(2)
-
-        redCore.Run(dst2)
-        Dim classcount = redCore.classCount
-
-        Dim rcListLast As New List(Of rcData)(rcList)
-
-        fLessGridRects.Clear()
-        For i = 0 To classcount
-            fLessGridRects.Add(New List(Of Integer))
-        Next
-        For i = 0 To task.gridRects.Count - 1
-            Dim r = task.gridRects(i)
-            Dim index = redCore.dst2.Get(Of Byte)(r.Y, r.X)
-            If index > 0 Then fLessGridRects(index).Add(i)
-        Next
-
-        knn.trainInput.Clear()
-        For Each rc In rcList
-            knn.trainInput.Add(New cv.Point2f(rc.gridIndex, rc.pixels))
-        Next
-
-        dst3.SetTo(0)
-        rcMap.SetTo(0)
-        rcList.Clear()
-        knn.queries.Clear()
-        knn.queries.Add(New cv.Point2f(0, 0))
-        For i = 0 To classcount - 1
-            Dim r = redCore.rects(i)
-            Dim mask255 = redCore.dst2(r).InRange(i + 1, i + 1)
-            Dim mask As New cv.Mat(mask255.Size, cv.MatType.CV_8U, 0)
-            redCore.dst2(r).CopyTo(mask, mask255)
-            Dim rc As New rcData(mask, r, i + 1)
-            rc.color = task.scalarColors((rcList.Count + 1) Mod 255)
-
-            knn.queries(0) = New cv.Point2f(rc.gridIndex, rc.pixels)
-            knn.Run(emptyMat)
-            If knn.trainInput.Count > 0 Then
-                Dim index = knn.neighbors(0)(0)
-                Dim rcLast = rcListLast(index)
-                If rc.index = 3 Or rc.index = 4 Then Dim k = 0
-                If rcLast.rect.IntersectsWith(task.gridRects(rc.gridIndex)) Then
-                    Dim gridList = task.gridNabes(rcLast.gridIndex)
-                    rc.color = rcLast.color
-                    rc.age = rcLast.age + 1
-                    If rc.age > 1000 Then rc.age = 2
-                End If
-            End If
-
-            rc.index = rcList.Count + 1
-            rcMap(rc.rect).SetTo(rc.index, rc.mask)
-            dst3(rc.rect).SetTo(rc.color, rc.mask)
-            rcList.Add(rc)
-        Next
-
-        strOut = RedUtil_Basics.selectCell(rcMap, rcList)
-        SetTrueText(strOut, 1)
-        If task.rcD IsNot Nothing Then task.clickPoint = task.rcD.maxDist
-
-        For Each rc In rcList
-            dst3.Circle(rc.maxDist, task.DotSize, task.highlight, -1)
-            SetTrueText(CStr(rc.index) + ", " + CStr(rc.age), rc.maxDist, 3)
-        Next
-
-        labels(3) = "Palette version of the data in dst2 with " + CStr(classcount) + " regions."
-    End Sub
-End Class
-
-
-
-Public Class RedMask_Core : Inherits TaskParent
-    Implements IDisposable
-    Public classCount As Integer
-    Public rects() As cv.Rect
-    Public Sub New()
-        cPtr = RedMask_Open()
-        desc = "Run the C++ RedMask to create a list of mask, rect, and other info about image"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        If src.Channels <> 1 Then dst1 = Mat_Basics.srcMustBe8U(src) Else dst1 = src
-
-        Dim inputData(dst1.Total - 1) As Byte
-        dst1.GetArray(Of Byte)(inputData)
-        Dim handleInput = GCHandle.Alloc(inputData, GCHandleType.Pinned)
-
-        Dim minSize As Integer = dst2.Total * 0.001
-        Dim imagePtr = RedMask_Run(cPtr, handleInput.AddrOfPinnedObject(), dst1.Rows, dst1.Cols, minSize)
-        handleInput.Free()
-
-        dst2 = cv.Mat.FromPixelData(dst0.Rows + 2, dst0.Cols + 2, cv.MatType.CV_8U, imagePtr).Clone
-        dst2 = dst2(New cv.Rect(1, 1, dst2.Width - 2, dst2.Height - 2))
-
-        classCount = RedMask_Count(cPtr)
-        If classCount <= 1 Then Exit Sub ' no data to process.
-
-        Dim rectData = cv.Mat.FromPixelData(classCount, 1, cv.MatType.CV_32SC4, RedMask_Rects(cPtr)).Clone
-        ReDim rects(classCount - 1)
-        rectData.GetArray(Of cv.Rect)(rects)
-
-        dst3 = Palettize(dst2)
-
-        labels(2) = "CV_8U result with " + CStr(classCount) + " regions."
-        labels(3) = "Palette version of the data in dst2 with " + CStr(classCount) + " regions."
-    End Sub
-    Protected Overrides Sub Finalize()
-        If cPtr <> 0 Then cPtr = RedMask_Close(cPtr)
-    End Sub
-End Class
-
-
 
 
 Public Class RedMask_Test : Inherits TaskParent
     Public rcList As New List(Of rcData)
     Public rcMap As New cv.Mat(dst2.Size, cv.MatType.CV_32S, 0)
-    Dim redCore As New RedMask_Core
+    Dim redCore As New RedMask_CPP
     Dim fLess As New FeatureLess_BasicsRaw
     Dim knn As New KNN_Basics
     Public fLessGridRects As New List(Of List(Of Integer))
@@ -676,54 +474,224 @@ Public Class RedMask_Test : Inherits TaskParent
 
         dst3 = Palettize(dst1, 0)
         labels(3) = CStr(fLessGridRects.Count) + " cells were found."
+    End Sub
+End Class
 
-        'knn.trainInput.Clear()
-        'For Each rc In rcList
-        '    knn.trainInput.Add(New cv.Point2f(rc.gridIndex, rc.pixels))
-        'Next
 
-        'dst3.SetTo(0)
-        'rcMap.SetTo(0)
-        'rcList.Clear()
-        'knn.queries.Clear()
-        'knn.queries.Add(New cv.Point2f(0, 0))
-        'For i = 0 To classcount - 1
-        '    Dim r = redCore.rects(i)
-        '    Dim mask255 = redCore.dst2(r).InRange(i + 1, i + 1)
-        '    Dim mask As New cv.Mat(mask255.Size, cv.MatType.CV_8U, 0)
-        '    redCore.dst2(r).CopyTo(mask, mask255)
-        '    Dim rc As New rcData(mask, r, i + 1)
-        '    rc.color = task.scalarColors((rcList.Count + 1) Mod 255)
 
-        '    knn.queries(0) = New cv.Point2f(rc.gridIndex, rc.pixels)
-        '    knn.Run(emptyMat)
-        '    If knn.trainInput.Count > 0 Then
-        '        Dim index = knn.neighbors(0)(0)
-        '        Dim rcLast = rcListLast(index)
-        '        If rc.index = 3 Or rc.index = 4 Then Dim k = 0
-        '        If rcLast.rect.IntersectsWith(task.gridRects(rc.gridIndex)) Then
-        '            Dim gridList = task.gridNabes(rcLast.gridIndex)
-        '            rc.color = rcLast.color
-        '            rc.age = rcLast.age + 1
-        '            If rc.age > 1000 Then rc.age = 2
-        '        End If
-        '    End If
 
-        '    rc.index = rcList.Count + 1
-        '    rcMap(rc.rect).SetTo(rc.index, rc.mask)
-        '    dst3(rc.rect).SetTo(rc.color, rc.mask)
-        '    rcList.Add(rc)
-        'Next
 
-        'strOut = RedUtil_Basics.selectCell(rcMap, rcList)
-        'SetTrueText(strOut, 1)
-        'If task.rcD IsNot Nothing Then task.clickPoint = task.rcD.maxDist
 
-        'For Each rc In rcList
-        '    dst3.Circle(rc.maxDist, task.DotSize, task.highlight, -1)
-        '    SetTrueText(CStr(rc.index) + ", " + CStr(rc.age), rc.maxDist, 3)
-        'Next
+Public Class RedMask_KNN : Inherits TaskParent
+    Public rcList As New List(Of rcData)
+    Public rcMap As New cv.Mat(dst2.Size, cv.MatType.CV_32S, 0)
+    Dim redCore As New RedMask_CPP
+    Dim fLess As New FeatureLess_BasicsRaw
+    Dim knn As New KNN_Basics
+    Public fLessGridRects As New List(Of List(Of Integer))
+    Public Sub New()
+        If standalone Then task.gOptions.displayDst1.Checked = True
+        desc = "Use KNN to identify the previous cell for each current cell"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        fLess.Run(src)
+        dst2 = fLess.dst3
+        labels(2) = fLess.labels(2)
 
-        'labels(3) = "Palette version of the data in dst2 with " + CStr(classcount) + " regions."
+        redCore.Run(dst2)
+        Dim classcount = redCore.classCount
+
+        Dim rcListLast As New List(Of rcData)(rcList)
+
+        fLessGridRects.Clear()
+        For i = 0 To classcount
+            fLessGridRects.Add(New List(Of Integer))
+        Next
+        For i = 0 To task.gridRects.Count - 1
+            Dim r = task.gridRects(i)
+            Dim index = redCore.dst2.Get(Of Byte)(r.Y, r.X)
+            If index > 0 Then fLessGridRects(index).Add(i)
+        Next
+
+        knn.trainInput.Clear()
+        For Each rc In rcList
+            knn.trainInput.Add(New cv.Point2f(rc.gridIndex, rc.pixels))
+        Next
+
+        dst3.SetTo(0)
+        rcMap.SetTo(0)
+        rcList.Clear()
+        knn.queries.Clear()
+        For i = 0 To classcount - 1
+            Dim r = redCore.rects(i)
+            Dim mask255 = redCore.dst2(r).InRange(i + 1, i + 1)
+            Dim mask As New cv.Mat(mask255.Size, cv.MatType.CV_8U, 0)
+            redCore.dst2(r).CopyTo(mask, mask255)
+            Dim rc As New rcData(mask, r, i + 1)
+            rc.color = task.scalarColors((rcList.Count + 1) Mod 255)
+
+            knn.queries(0) = New cv.Point2f(rc.gridIndex, rc.pixels)
+            knn.Run(emptyMat)
+            If knn.trainInput.Count > 0 Then
+                Dim index = knn.neighbors(0)(0)
+                Dim rcLast = rcListLast(index)
+                If rc.index = 3 Or rc.index = 4 Then Dim k = 0
+                If rcLast.rect.IntersectsWith(task.gridRects(rc.gridIndex)) Then
+                    Dim gridList = task.gridNabes(rcLast.gridIndex)
+                    rc.color = rcLast.color
+                    rc.age = rcLast.age + 1
+                    If rc.age > 1000 Then rc.age = 2
+                End If
+            End If
+
+            rc.index = rcList.Count + 1
+            rcMap(rc.rect).SetTo(rc.index, rc.mask)
+            dst3(rc.rect).SetTo(rc.color, rc.mask)
+            rcList.Add(rc)
+        Next
+
+        strOut = RedUtil_Basics.selectCell(rcMap, rcList)
+        SetTrueText(strOut, 1)
+        If task.rcD IsNot Nothing Then task.clickPoint = task.rcD.maxDist
+
+        For Each rc In rcList
+            dst3.Circle(rc.maxDist, task.DotSize, task.highlight, -1)
+            SetTrueText(CStr(rc.index) + ", " + CStr(rc.age), rc.maxDist, 3)
+        Next
+
+        labels(3) = "Palette version of the data in dst2 with " + CStr(classcount) + " regions."
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class RedMask_CPP : Inherits TaskParent
+    Implements IDisposable
+    Public classCount As Integer
+    Public rects() As cv.Rect
+    Public Sub New()
+        cPtr = RedMask_Open()
+        desc = "Run the C++ RedMask to create a list of mask, rect, and other info about image"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        If src.Channels <> 1 Then dst1 = Mat_Basics.srcMustBe8U(src) Else dst1 = src
+
+        Dim inputData(dst1.Total - 1) As Byte
+        dst1.GetArray(Of Byte)(inputData)
+        Dim handleInput = GCHandle.Alloc(inputData, GCHandleType.Pinned)
+
+        Dim minSize As Integer = dst2.Total * 0.001
+        Dim imagePtr = RedMask_Run(cPtr, handleInput.AddrOfPinnedObject(), dst1.Rows, dst1.Cols, minSize)
+        handleInput.Free()
+
+        dst2 = cv.Mat.FromPixelData(dst0.Rows + 2, dst0.Cols + 2, cv.MatType.CV_8U, imagePtr).Clone
+        dst2 = dst2(New cv.Rect(1, 1, dst2.Width - 2, dst2.Height - 2))
+
+        classCount = RedMask_Count(cPtr)
+        If classCount <= 1 Then Exit Sub ' no data to process.
+
+        Dim rectData = cv.Mat.FromPixelData(classCount, 1, cv.MatType.CV_32SC4, RedMask_Rects(cPtr)).Clone
+        ReDim rects(classCount - 1)
+        rectData.GetArray(Of cv.Rect)(rects)
+
+        If standaloneTest() Then dst3 = Palettize(dst2)
+
+        labels(2) = "CV_8U result with " + CStr(classCount) + " regions."
+        labels(3) = "Palette version of the data in dst2 with " + CStr(classCount) + " regions."
+    End Sub
+    Protected Overrides Sub Finalize()
+        If cPtr <> 0 Then cPtr = RedMask_Close(cPtr)
+    End Sub
+End Class
+
+
+
+
+Public Class RedMask_BasicsNew : Inherits TaskParent
+    Public rcList As New List(Of rcData)
+    Dim redCore As New RedMask_CPP
+    Public Sub New()
+        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_32S, 0)
+        desc = "Run the C++ RedMask to create a list of mask, rect, and other info about image"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        If src.Channels <> 1 Then dst1 = Mat_Basics.srcMustBe8U(src) Else dst1 = src
+
+        redCore.Run(dst1)
+        Dim classcount = redCore.classCount
+        If classcount <= 1 Then Exit Sub ' no data to process.
+
+        dst2.SetTo(0)
+        rcList.Clear()
+        For i = 0 To classcount - 1
+            Dim rc As New rcData
+            rc.rect = redCore.rects(i)
+            rc.mask = redCore.dst2(rc.rect).InRange(i + 1, i + 1)
+            rc = New rcData(rc.mask, rc.rect, -1)
+            rc.index = rcList.Count + 1
+            rc.color = task.scalarColors(rc.index Mod 255)
+            dst2(rc.rect).SetTo(rc.index, rc.mask)
+            rcList.Add(rc)
+        Next
+
+        If standaloneTest() Then dst3 = Palettize(dst2, 0)
+
+        labels(2) = "CV_8U result with " + CStr(classcount) + " regions."
+        labels(3) = "Palette version of the data in dst2 with " + CStr(classcount) + " regions."
+    End Sub
+End Class
+
+
+Public Class RedMask_Test2 : Inherits TaskParent
+    Public rcList As New List(Of rcData)
+    Public rcMap As New cv.Mat(dst2.Size, cv.MatType.CV_32S, 0)
+    Dim redMask As New RedMask_BasicsNew
+    Dim fLess As New FeatureLess_BasicsRaw
+    Dim knn As New KNN_Basics
+    Public fLessGridRects As New List(Of List(Of Integer))
+    Public Sub New()
+        knn.ptListQuery.Add(New cv.Point2f(0, 0)) ' we only need one entry in the queries.
+        If standalone Then task.gOptions.displayDst1.Checked = True
+        desc = "Use KNN to identify the previous cell for each current cell"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        fLess.Run(src)
+        dst2 = fLess.dst3
+        labels(2) = fLess.labels(2)
+
+        redMask.Run(dst2)
+
+        Dim rcListLast As New List(Of rcData)(redMask.rcList)
+        Dim lastColorMat = dst3.Clone
+
+        knn.ptListTrain.Clear()
+        For Each rc In redMask.rcList
+            knn.ptListTrain.Add(New cv.Point(rc.gridIndex, rc.pixels))
+        Next
+
+        dst3.SetTo(0)
+        For Each rc In redMask.rcList
+            knn.ptListQuery(0) = New cv.Point2f(rc.gridIndex, rc.pixels)
+            knn.Run(emptyMat)
+            Dim rcLast = rcListLast(knn.neighbors(0)(0))
+
+            Dim lastColor = lastColorMat.Get(Of cv.Vec3b)(rc.maxDist.Y, rc.maxDist.X)
+            If lastColor <> black Then
+                If lastColor <> task.vecColors(rc.index) Then rc.color = lastColor
+            Else
+                rc.color = task.scalarColors(rc.index)
+            End If
+
+            dst3(rc.rect).SetTo(rc.color, rc.mask)
+        Next
+
+        strOut = RedUtil_Basics.selectCell(redMask.dst2, redMask.rcList)
+        SetTrueText(strOut, 1)
+        If task.rcD IsNot Nothing Then task.clickPoint = task.rcD.maxDist
+
+        labels(3) = CStr(redMask.rcList.Count) + " cells were identified."
     End Sub
 End Class

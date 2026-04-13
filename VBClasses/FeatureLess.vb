@@ -556,6 +556,7 @@ Namespace VBClasses
         Dim corr As New Correlation_Basics
         Public Sub New()
             dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+            dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
             desc = "Identify featureless squares using the gray scale range - see 'Correlation_Basics'."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)

@@ -1576,11 +1576,11 @@ RedColor_List
 RedMask_Basics
 RedMask_BasicsNew
 RedMask_Color
-RedMask_Core
 RedMask_CPP
 RedMask_KNN
 RedMask_List
 RedMask_Test
+RedMask_Test2
 RedMask_ToRedColor
 RedPrep_Basics
 RedPrep_Core
