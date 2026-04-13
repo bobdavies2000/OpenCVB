@@ -1580,6 +1580,7 @@ RedMask_Core
 RedMask_CPP
 RedMask_KNN
 RedMask_List
+RedMask_Test
 RedMask_ToRedColor
 RedPrep_Basics
 RedPrep_Core
