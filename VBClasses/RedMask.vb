@@ -4,10 +4,9 @@ Imports cv = OpenCvSharp
 Public Class RedMask_Basics : Inherits TaskParent
     Public rcList As New List(Of rcData)
     Public rcMap As New cv.Mat(dst2.Size, cv.MatType.CV_32S, 0)
-    Dim redMask As New RedMask_BuildList
+    Dim redMask As New RedMask_MapAndList
     Dim fLess As New FeatureLess_BasicsRaw
     Dim knn As New KNN_Basics
-    Public fLessGridRects As New List(Of List(Of Integer))
     Public Sub New()
         knn.ptListQuery.Add(New cv.Point2f(0, 0)) ' we only need one entry in the queries.
         If standalone Then task.gOptions.displayDst1.Checked = True
@@ -56,6 +55,9 @@ Public Class RedMask_Basics : Inherits TaskParent
             End If
             usedColors.Add(rc.color)
         Next
+
+        rcList = New List(Of rcData)(redMask.rcList)
+        rcMap = redMask.dst2.Clone
 
         labels(3) = CStr(redMask.rcList.Count) + " cells were identified."
     End Sub
@@ -491,7 +493,6 @@ Public Class RedMask_Test : Inherits TaskParent
     Public rcMap As New cv.Mat(dst2.Size, cv.MatType.CV_32S, 0)
     Dim redCore As New RedMask_CPP
     Dim fLess As New FeatureLess_BasicsRaw
-    Dim knn As New KNN_Basics
     Public fLessGridRects As New List(Of List(Of Integer))
     Public Sub New()
         If standalone Then task.gOptions.displayDst1.Checked = True
@@ -546,7 +547,7 @@ End Class
 
 
 
-Public Class RedMask_KNN : Inherits TaskParent
+Public Class NR_RedMask_KNN : Inherits TaskParent
     Public rcList As New List(Of rcData)
     Public rcMap As New cv.Mat(dst2.Size, cv.MatType.CV_32S, 0)
     Dim redCore As New RedMask_CPP
@@ -554,6 +555,7 @@ Public Class RedMask_KNN : Inherits TaskParent
     Dim knn As New KNN_Basics
     Public fLessGridRects As New List(Of List(Of Integer))
     Public Sub New()
+        knn.ptListQuery.Add(New cv.Point)
         If standalone Then task.gOptions.displayDst1.Checked = True
         desc = "Use KNN to identify the previous cell for each current cell"
     End Sub
@@ -577,15 +579,14 @@ Public Class RedMask_KNN : Inherits TaskParent
             If index > 0 Then fLessGridRects(index).Add(i)
         Next
 
-        knn.trainInput.Clear()
+        knn.ptListTrain.Clear()
         For Each rc In rcList
-            knn.trainInput.Add(New cv.Point2f(rc.gridIndex, rc.pixels))
+            knn.ptListTrain.Add(New cv.Point(rc.gridIndex, rc.pixels))
         Next
 
         dst3.SetTo(0)
         rcMap.SetTo(0)
         rcList.Clear()
-        knn.queries.Clear()
         For i = 0 To classcount - 1
             Dim r = redCore.rects(i)
             Dim mask255 = redCore.dst2(r).InRange(i + 1, i + 1)
@@ -594,9 +595,9 @@ Public Class RedMask_KNN : Inherits TaskParent
             Dim rc As New rcData(mask, r, i + 1)
             rc.color = task.scalarColors((rcList.Count + 1) Mod 255)
 
-            knn.queries(0) = New cv.Point2f(rc.gridIndex, rc.pixels)
+            knn.ptListQuery(0) = New cv.Point(rc.gridIndex, rc.pixels)
             knn.Run(emptyMat)
-            If knn.trainInput.Count > 0 Then
+            If knn.ptListTrain.Count > 0 Then
                 Dim index = knn.neighbors(0)(0)
                 Dim rcLast = rcListLast(index)
                 If rc.index = 3 Or rc.index = 4 Then Dim k = 0
@@ -674,7 +675,7 @@ End Class
 
 
 
-Public Class RedMask_BuildList : Inherits TaskParent
+Public Class RedMask_MapAndList : Inherits TaskParent
     Public rcList As New List(Of rcData)
     Dim redCore As New RedMask_CPP
     Public Sub New()

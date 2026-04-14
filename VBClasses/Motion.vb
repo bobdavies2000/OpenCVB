@@ -337,6 +337,7 @@ Public Class Motion_Throttle : Inherits TaskParent
 
             Dim nextMsg As String = ""
             motionPlot.Run(task.gray.Clone)
+            If motionPlot.plotHist.histArray Is Nothing Then Exit Sub
 
             Dim histArray = motionPlot.plotHist.histArray
             Dim identicals = histArray(histArray.Length - 1)

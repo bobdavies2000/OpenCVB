@@ -1329,6 +1329,7 @@ NR_RedMask_CellDepthHistogram
 NR_RedMask_Consistent
 NR_RedMask_FourColor
 NR_RedMask_Hue
+NR_RedMask_KNN
 NR_RedMask_Redraw
 NR_RedPrep_CloudAndColor
 NR_RedPrep_DepthEdges
@@ -1575,11 +1576,10 @@ RedColor_GridRects
 RedColor_Hulls
 RedColor_LeftRight
 RedMask_Basics
-RedMask_BuildList
 RedMask_Color
 RedMask_CPP
-RedMask_KNN
 RedMask_List
+RedMask_MapAndList
 RedMask_Test
 RedMask_ToRedColor
 RedPrep_Basics
