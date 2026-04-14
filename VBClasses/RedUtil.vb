@@ -125,7 +125,7 @@ Public Class RedUtil_Basics : Inherits TaskParent
         Return rc
     End Function
     Public Shared Function selectCell(rcMap As cv.Mat, rcList As List(Of rcData)) As String
-        Dim clickIndex As Integer = 0, strOut As String = ""
+        Dim clickIndex As Integer = 0, outStr As String = ""
         If rcList.Count > 0 Then
             clickIndex = rcMap.Get(Of Integer)(task.clickPoint.Y, task.clickPoint.X)
             If clickIndex = 0 Then
@@ -135,12 +135,22 @@ Public Class RedUtil_Basics : Inherits TaskParent
             If clickIndex < rcList.Count Then
                 task.rcD = rcList(clickIndex - 1)
                 task.color(task.rcD.rect).SetTo(white, task.rcD.mask)
-                strOut = task.rcD.displayCell()
+                outStr = task.rcD.displayCell()
             Else
                 Return vbCrLf + vbCrLf + "That cell is no longer present."
             End If
         End If
-        Return strOut
+        Return outStr
+    End Function
+    Public Shared Function DelaunaySelect(rcMap As cv.Mat, rcList As List(Of rcData)) As String
+        Dim outStr As String = ""
+        If rcList.Count > 0 Then
+            Dim index = rcMap.Get(Of Integer)(task.clickPoint.Y, task.clickPoint.X)
+            task.rcD = rcList(index - 1)
+            task.color(task.rcD.rect).SetTo(white, task.rcD.mask)
+            outStr = task.rcD.displayCell()
+        End If
+        Return outStr
     End Function
     Public Overrides Sub RunAlg(src As cv.Mat)
         redC.Run(src)

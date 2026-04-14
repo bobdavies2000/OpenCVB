@@ -6,9 +6,9 @@ Public Class RedMask_Basics : Inherits TaskParent
     Public rcMap As New cv.Mat(dst2.Size, cv.MatType.CV_32S, 0)
     Dim redMask As New RedMask_MapAndList
     Dim fLess As New FeatureLess_BasicsRaw
-    Dim knn As New KNN_Basics
+    Dim knn As New KNN_N3Basics
     Public Sub New()
-        knn.ptListQuery.Add(New cv.Point2f(0, 0)) ' we only need one entry in the queries.
+        knn.queries.Add(New cv.Point3f(0, 0, 0)) ' we only need one entry in the queries.
         If standalone Then task.gOptions.displayDst1.Checked = True
         desc = "Use KNN to identify the previous cell for each current cell"
     End Sub
@@ -22,16 +22,16 @@ Public Class RedMask_Basics : Inherits TaskParent
         Dim rcListLast As New List(Of rcData)(redMask.rcList)
         Dim lastColorMat = dst3.Clone
 
-        knn.ptListTrain.Clear()
+        knn.trainInput.Clear()
         For Each rc In redMask.rcList
-            knn.ptListTrain.Add(New cv.Point(rc.gridIndex, rc.pixels))
+            knn.trainInput.Add(New cv.Point3f(rc.maxDist.X, rc.maxDist.Y, rc.pixels))
         Next
 
         dst3.SetTo(0)
         For Each rc In redMask.rcList
-            knn.ptListQuery(0) = New cv.Point2f(rc.gridIndex, rc.pixels)
+            knn.queries(0) = New cv.Point3f(rc.maxDist.X, rc.maxDist.Y, rc.pixels)
             knn.Run(emptyMat)
-            Dim rcLast = rcListLast(knn.neighbors(0)(0))
+            Dim rcLast = rcListLast(knn.result(0, 0))
 
             Dim lastColor = lastColorMat.Get(Of cv.Vec3b)(rc.maxDist.Y, rc.maxDist.X)
             If lastColor <> black Then
@@ -706,5 +706,57 @@ Public Class RedMask_MapAndList : Inherits TaskParent
 
         labels(2) = "CV_8U result with " + CStr(classcount) + " regions."
         labels(3) = "Palette version of the data in dst2 with " + CStr(classcount) + " regions."
+    End Sub
+End Class
+
+
+
+
+
+Public Class RedMask_Delaunay : Inherits TaskParent
+    Dim subdiv As New cv.Subdiv2D
+    Dim redMask As New RedMask_Basics
+    Dim facetList As New List(Of List(Of cv.Point))
+    Dim rcMap As New cv.Mat(dst2.Size, cv.MatType.CV_32S, 0)
+    Public Sub New()
+        If standalone Then task.gOptions.displayDst1.Checked = True
+        rcMap = New cv.Mat(dst2.Size(), cv.MatType.CV_32S, 0)
+        labels(3) = "The colors below match the color of the corresponding featureless region in dst2."
+        desc = "Fill the delaunay map with the index for each cell."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        redMask.Run(src)
+        dst2 = redMask.dst3
+        labels(2) = redMask.labels(3)
+
+        subdiv.InitDelaunay(New cv.Rect(0, 0, dst2.Width, dst2.Height))
+
+        Dim inputPoints As New List(Of cv.Point2f)
+        For Each rc In redMask.rcList
+            inputPoints.Add(rc.maxDist)
+        Next
+        subdiv.Insert(inputPoints)
+
+        Dim facets = New cv.Point2f()() {Nothing}
+        subdiv.GetVoronoiFacetList(New List(Of Integer)(), facets, Nothing)
+
+        facetList.Clear()
+        For i = 0 To facets.Length - 1
+            Dim nextFacet As New List(Of cv.Point)
+            For j = 0 To facets(i).Length - 1
+                nextFacet.Add(New cv.Point(facets(i)(j).X, facets(i)(j).Y))
+            Next
+
+            Dim rc = redMask.rcList(i)
+            rcMap.FillConvexPoly(nextFacet, rc.index, cv.LineTypes.Link4)
+            If standaloneTest() Then dst3.FillConvexPoly(nextFacet, rc.color, cv.LineTypes.Link4)
+            facetList.Add(nextFacet)
+        Next
+
+        'For Each rc In redMask.rcList
+        '    DrawTour(dst3(rc.rect), rc.contour, task.highlight, task.lineWidth)
+        'Next
+        strOut = RedUtil_Basics.DelaunaySelect(rcMap, redMask.rcList)
+        SetTrueText(strOut, 1)
     End Sub
 End Class

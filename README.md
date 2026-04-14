@@ -1,3 +1,39 @@
+**April 14, 2026 – Visual Studio Version, TreeView, Pixel Min/Max,**
+
+-   Over 1600 algorithms are included, averaging 36 lines of code per algorithm.
+    -   Over 400 additional obsolete algorithms compiled for reference use.
+-   Visual Studio Community Edition (free) made changes to callback tracing.
+    -   Be sure to upgrade Visual Studio to the “March 2026 Feature Update”.
+    -   This version is also labeled 18.4.3.
+    -   The symptom will likely be problems with the “TreeView” in OpenCVB.
+    -   TreeView is an essential component of OpenCVB.
+        -   Click on any entry to show the intermediate results.
+        -   Clicking will also display intermediate true text and labels.
+-   A long-standing problem in computer vision is the unreliability of color.
+    -   The color varies slightly with the number of photons that hit the sensor.
+    -   To stabilize the color, OpenCVB takes the min or max value at each pixel.
+    -   Detecting motion is a required input to the min/max calculation.
+    -   Motion pixels are updated immediately while changed pixels are accumulated.
+    -   The GIF below shows the presence of both motion and stable colors.
+-   The min/max test at each grayscale pixel is similar to depth min/max tests.
+    -   But depth has shadow and shadow updates are lost in Depth_StableMin.
+    -   Unlike color, lost depth data needs to be updated at each heartbeat.
+-   The current motion detection (Motion_Basics_TA) finds motion where there is none.
+    -   A simple measure of whether there is motion is in StableGray_Measure.
+    -   StableGray_Measure finds the absolute difference between each gray pixel.
+    -   If there is more than a threshold, motion pixels need to be identified.
+-   Featureless regions are almost always present in an image.
+    -   FeatureLess_Basics finds those regions which have no features.
+    -   Their size allows them to be more easily tracked than other features.
+
+**![](media/d075dc63ed0ab6ea9d60fb0e89b64bab.gif)**
+
+**RedMask_Delaunay :** *In this example, all the featureless regions in the image are tracked. The lower left image shows the identified featureless regions, and the selected region is highlighted (white) in the upper left image. The details describing the selected cell are in the upper right image. The lower right image is a map of the featureless regions. Delaunay translates the center of each featureless region into a “facet” that defines an area surrounding that center. A mouse click in the facet selects the featureless region associated with that facet. Note that the colors of the facets in the lower right match the color of the corresponding featureless region in the lower left. The smaller featureless regions will come and go and will change color as a result.*
+
+**![](media/4dcbe955ae6fe193f13918177148f77b.gif)**
+
+**PlotMouse_StableGray:** *The image below right highlights both motion and stable pixels. The hand is clearly moving and the highlighted pixels below the hand are changing. The highlighted pixels in the rest of the image are stable. The grayscale image in the upper left is the accumulated minimum or maximum values at each pixel.  The bar chart in the lower left allows the mouse to control the backprojection of the pixels into the lower right image. In this example the mouse cursor (not visible) hovers over the tallest bar in the plot. The pixels highlighted in the lower right image are among the darkest in the image but moving the mouse in the bar chart can highlight any pixels and confirm that all the pixels are stable where there is no motion.*
+
 **April 5, 2026 – FeatureLess, Cloud Motion, DrawRect, Plots, Stable Depth and Point Clouds.**
 
 -   Over 1600 algorithms are included, averaging 36 lines of code per algorithm.
@@ -12,8 +48,8 @@
     -   Motion_CloudPixel will build a mask of motion in the point cloud.
     -   Motion_CloudGrid builds a mask in grid rects for point cloud motion.
 -   The “drawRect” now uses color and is set with the “highlight” color.
-    -   The drawrect appears in all 4 images when drawn on any image.
-    -   Using the highlight color guarantee the drawRect will always be visible.
+    -   The drawRect appears in all 4 images when drawn on any image.
+    -   Using the highlight color guarantees the drawRect will always be visible.
 -   Plots can be interactive – mousing over bar charts backprojects the bar values.
     -   Plot_Histogram creates bar charts for use with PlotInteractive_Basics.
 -   Depth and point cloud now reflect the minimum values for each location.

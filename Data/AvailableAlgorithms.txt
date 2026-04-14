@@ -1578,6 +1578,7 @@ RedColor_LeftRight
 RedMask_Basics
 RedMask_Color
 RedMask_CPP
+RedMask_Delaunay
 RedMask_List
 RedMask_MapAndList
 RedMask_Test

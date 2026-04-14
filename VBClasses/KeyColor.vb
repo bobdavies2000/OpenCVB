@@ -1,5 +1,4 @@
-﻿Imports OpenCvSharp
-Imports cv = OpenCvSharp
+﻿Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Class KeyColor_Basics : Inherits TaskParent
         Dim keyList As New List(Of keyData)
@@ -234,46 +233,30 @@ Namespace VBClasses
 
 
     Public Class KeyColor_Delaunay : Inherits TaskParent
-        Public redMask As New RedMask_Basics
+        Public redMask As New RedMask_MapAndList
         Dim delaunay As New Delaunay_Basics
         Public facetList As New List(Of List(Of cv.Point))
-        Dim subdiv As New cv.Subdiv2D
+        Dim fLess As New FeatureLess_BasicsRaw
         Public Sub New()
             If standalone Then task.gOptions.displayDst1.Checked = True
-            desc = "Use the key color maxDist points as input to delaunay."
+            desc = "Use the maxDist points as input to delaunay."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            redMask.Run(dst2)
-            dst2 = redMask.dst3
+            fLess.Run(src)
+            dst1 = fLess.dst3
+            labels(1) = fLess.labels(2)
+
+            redMask.Run(dst1)
+            dst2 = Palettize(redMask.dst2, 0)
             labels(2) = redMask.labels(3)
 
-            strOut = RedUtil_Basics.selectCell(redMask.rcMap, redMask.rcList)
-            SetTrueText(strOut, 1)
-
-            Dim inputPoints As New List(Of cv.Point2f)
-            subdiv.InitDelaunay(New cv.Rect(0, 0, dst2.Width, dst2.Height))
-            subdiv.Insert(inputPoints)
-
-            'For Each rc In redMask.rcList
-            '    inputPoints.Add()
-            'Next
-
-            Dim facets = New cv.Point2f()() {Nothing}
-            subdiv.GetVoronoiFacetList(New List(Of Integer)(), facets, Nothing)
-
-            facetList.Clear()
-            For i = 0 To facets.Length - 1
-                Dim nextFacet As New List(Of cv.Point)
-                For j = 0 To facets(i).Length - 1
-                    nextFacet.Add(New cv.Point(facets(i)(j).X, facets(i)(j).Y))
-                Next
-
-                dst3.FillConvexPoly(nextFacet, i, cv.LineTypes.Link4)
-                facetList.Add(nextFacet)
+            delaunay.inputPoints.Clear()
+            For Each rc In redMask.rcList
+                delaunay.inputPoints.Add(rc.maxDist)
             Next
 
-            dst3.ConvertTo(dst1, cv.MatType.CV_8U)
-            dst2 = Palettize(dst1)
+            delaunay.Run(emptyMat)
+            dst3 = delaunay.dst2.Clone
         End Sub
     End Class
 End Namespace
