@@ -119,9 +119,11 @@ Public Class Spectrum_Z : Inherits TaskParent
             End If
         End If
 
-        If task.heartBeat And task.rcD.index > 0 Then
-            Dim ranges = options.buildDepthRanges(task.pcSplit(2)(task.rcD.rect).Clone, " pointcloud Z ")
-            strOut = options.strOut
+        If task.rcD IsNot Nothing Then
+            If task.heartBeat And task.rcD.index > 0 Then
+                Dim ranges = options.buildDepthRanges(task.pcSplit(2)(task.rcD.rect).Clone, " pointcloud Z ")
+                strOut = options.strOut
+            End If
         End If
         SetTrueText(strOut, 3)
     End Sub
