@@ -59,65 +59,68 @@ End Class
 
 
 Public Class MatchShapes_Nearby : Inherits TaskParent
-    Public rclist As New List(Of rcData)
     Public similarCells As New List(Of rcData)
-    Public bestCell As Integer
     Public rc As New rcData
     Dim options As New Options_MatchShapes
-    Public runStandalone As Boolean = False
-    Dim addTour As New RedColor_Basics
-    Dim redC As New RedColor_Basics
+    Dim redC As New RedCloud_Basics
     Public Sub New()
-        labels = {"Left floodfill image", "Right floodfill image", "Left image of identified cells", "Right image with identified cells"}
-        desc = "MatchShapes: Find matches at similar latitude (controlled with slider)"
+        labels(3) = "All the shapes that match since the last heartbeat."
+        desc = "Find similar shapes in the redCloud cells."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
+        Dim selectMsg = "select any cell to match its shape to other cells"
 
-        Dim myStandalone = standaloneTest() Or runStandalone
-
-        If myStandalone Then
-            redC.Run(task.color)
+        If standalone Then
+            redC.Run(src)
             dst2 = redC.dst2.Clone
             labels(2) = redC.labels(2)
-
-            If redC.rcList.Count = 0 Then Exit Sub
-            addTour.rcList = New List(Of rcData)(redC.rcList)
-            addTour.Run(src)
-            rc = task.rcD
+            If redC.rcList.Count = 0 Or task.rcD Is Nothing Then
+                SetTrueText(selectMsg, 3)
+                Exit Sub
+            End If
+        End If
+        If task.rcD Is Nothing Then
+            SetTrueText(selectMsg, 3)
+            Exit Sub
         End If
 
-        If task.heartBeat And myStandalone Then dst3.SetTo(0)
+        Static rcListLast As List(Of rcData)
+        If task.heartBeat Then
+            rcListLast = New List(Of rcData)(redC.rcList)
+            dst3.SetTo(0)
+        End If
+
         similarCells.Clear()
 
         If task.gOptions.displayDst0.Checked Then
             dst0 = task.color.Clone
-            DrawTour(dst0(rc.rect), rc.contour, task.highlight)
         End If
 
-        Dim minMatch As Single = Single.MaxValue
-        bestCell = -1
-        If rc Is Nothing Or rc.contour Is Nothing Then Exit Sub ' nothing to work on...
-        For i = 0 To addTour.rcList.Count - 1
-            Dim rc2 = addTour.rcList(i)
+        Dim matchVals As New List(Of Single)
+
+        For i = 0 To rcListLast.Count - 1
+            Dim rc2 = rcListLast(i)
             If rc2.contour Is Nothing Then Continue For
-            Dim matchVal = cv.Cv2.MatchShapes(rc.contour, rc2.contour, options.matchOption)
-            If matchVal < options.matchThreshold Then
-                If matchVal < minMatch And matchVal > 0 Then
-                    minMatch = matchVal
-                    bestCell = similarCells.Count
+            If Math.Abs(rc2.pixels - task.rcD.pixels) < 100 Then
+                Dim matchval = cv.Cv2.MatchShapes(task.rcD.contour, rc2.contour, options.matchOption)
+                If matchval < options.matchThreshold Then
+                    dst3(rc2.rect).SetTo(rc2.color, rc2.mask)
+                    similarCells.Add(rc2)
+                    matchVals.Add(matchval)
                 End If
-                DrawTour(dst3(rc2.rect), rc2.contour, rc2.color, -1)
-                similarCells.Add(rc2)
             End If
         Next
 
-        If bestCell >= 0 Then
-            Dim rc = similarCells(bestCell)
+        If matchVals.Count = 0 Then
+            SetTrueText(selectMsg, 3)
+        Else
+            Dim index = matchVals.IndexOf(matchVals.Min)
+            Dim rc = similarCells(index)
             DrawCircle(dst3, rc.maxDist, task.DotSize, white)
-            SetTrueText("Best match", rc.maxDist, 3)
+            If similarCells.Count = 0 Then SetTrueText("No matches with match value < " + Format(options.matchThreshold, fmt2), New cv.Point(5, 5), 3)
         End If
-        If similarCells.Count = 0 Then SetTrueText("No matches with match value < " + Format(options.matchThreshold, fmt2), New cv.Point(5, 5), 3)
+        SetTrueText("Best match", task.rcD.maxDist, 3)
     End Sub
 End Class
 

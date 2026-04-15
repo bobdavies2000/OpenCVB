@@ -7,6 +7,7 @@ Public Class RedColor_Basics : Inherits TaskParent
     Public rcMap As cv.Mat = New cv.Mat(dst2.Size, cv.MatType.CV_32S, 0)
     Public options As New Options_RedCloud
     Public redFlood As New RedCloud_Flood_CPP
+    Public runSelectCell As Boolean = True
     Public Sub New()
         desc = "Run the C++ RedCloud interface without a mask"
     End Sub
@@ -20,8 +21,10 @@ Public Class RedColor_Basics : Inherits TaskParent
         rcMap = redFlood.rcMap.Clone
         rcList = New List(Of rcData)(redFlood.rcList)
 
-        strOut = RedUtil_Basics.selectCell(rcMap, rcList)
-        SetTrueText(strOut, 3)
+        If runSelectCell Then
+            strOut = RedUtil_Basics.selectCell(rcMap, rcList)
+            SetTrueText(strOut, 3)
+        End If
 
         If task.rcD Is Nothing Then
             SetTrueText("Select any cell", 3)
@@ -605,5 +608,30 @@ Public Class RedColor_FLessCorrelation : Inherits TaskParent
         labels(2) = redC.labels(2)
 
         SetTrueText(redC.strOut, 1)
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class RedColor_DelaunayMap : Inherits TaskParent
+    Public dMap As New Delaunay_Map
+    Dim redC As New RedColor_Basics
+    Public Sub New()
+        redC.runSelectCell = False
+        desc = "Run RedColor as usual but use the Delaunay map to select cells."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        redC.Run(src)
+        dst2 = redC.dst2
+        labels(2) = redC.labels(2)
+
+        dMap.rcList = New List(Of rcData)(redC.rcList)
+        dMap.Run(emptyMat)
+
+        strOut = RedUtil_Basics.DelaunaySelect(dMap.rcMap, dMap.rcList)
+        SetTrueText(strOut, 3)
     End Sub
 End Class

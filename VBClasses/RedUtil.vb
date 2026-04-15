@@ -1,4 +1,15 @@
 ﻿Imports cv = OpenCvSharp
+Public Enum causes
+    lastCellFound
+    indexLastGood
+    indexLastBelowZero
+    indexLastAboveCount
+    intersectLastRectFailed
+    optionsChange
+    maxDistOutsideOfLastRect
+    colorSync
+    wGridNotInLastList
+End Enum
 Public Class RedUtil_Basics : Inherits TaskParent
     Dim redC As New RedCloud_Basics
     Public Sub New()

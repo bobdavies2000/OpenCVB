@@ -1,23 +1,13 @@
 Imports System.Runtime.InteropServices
 Imports cv = OpenCvSharp
 Imports VBClasses
-Public Enum causes
-    lastCellFound
-    indexLastGood
-    indexLastBelowZero
-    indexLastAboveCount
-    intersectLastRectFailed
-    optionsChange
-    maxDistOutsideOfLastRect
-    colorSync
-    wGridNotInLastList
-End Enum
 Public Class RedCloud_Basics : Inherits TaskParent
     Public redCore As New RedCloud_Core
     Public rcList As New List(Of rcData)
     Public rcMap As cv.Mat = New cv.Mat(dst2.Size, cv.MatType.CV_32S, 0)
     Public options As New Options_RedCloud
     Public keyColors As New KeyColor_Reduction
+    Public runSelectCell As Boolean = True
     Public Sub New()
         task.gOptions.stabilizeDepthRGB.Checked = True
         desc = "Build contours for each cell"
@@ -56,8 +46,10 @@ Public Class RedCloud_Basics : Inherits TaskParent
             dst2(rc.rect).SetTo(rc.color, rc.mask)
         Next
 
-        strOut = RedUtil_Basics.selectCell(rcMap, rcList)
-        SetTrueText(strOut, 3)
+        If runSelectCell Then
+            strOut = RedUtil_Basics.selectCell(rcMap, rcList)
+            SetTrueText(strOut, 3)
+        End If
 
         dst1 = keyColors.dst2
 
@@ -665,3 +657,25 @@ Public Class RedCloud_Motion : Inherits TaskParent
     End Sub
 End Class
 
+
+
+
+Public Class RedCloud_DelaunayMap : Inherits TaskParent
+    Public dMap As New Delaunay_Map
+    Dim redC As New RedCloud_Basics
+    Public Sub New()
+        redC.runSelectCell = False
+        desc = "Run RedColor as usual but use the Delaunay map to select cells."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        redC.Run(src)
+        dst2 = redC.dst2
+        labels(2) = redC.labels(2)
+
+        dMap.rcList = New List(Of rcData)(redC.rcList)
+        dMap.Run(emptyMat)
+
+        strOut = RedUtil_Basics.DelaunaySelect(dMap.rcMap, dMap.rcList)
+        SetTrueText(strOut, 3)
+    End Sub
+End Class

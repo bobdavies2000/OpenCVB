@@ -130,8 +130,10 @@ Public Class NR_Hist3D_RedColor : Inherits TaskParent
         redC.Run(hColor.dst2)
         dst2 = redC.dst2
         labels(2) = redC.labels(2)
-        If redC.rcList.Count > 0 And task.rcD.pixels > 0 Then
-            dst2(task.rcD.rect).SetTo(white, task.rcD.mask)
+        If redC.rcList.Count > 0 Then
+            If task.rcD IsNot Nothing Then
+                If task.rcD.pixels > 0 Then dst2(task.rcD.rect).SetTo(white, task.rcD.mask)
+            End If
         End If
     End Sub
 End Class

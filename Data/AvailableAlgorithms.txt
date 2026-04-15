@@ -136,6 +136,7 @@ Delaunay_Contours
 Delaunay_FeatureLess
 Delaunay_Generations
 Delaunay_LineSelect
+Delaunay_Map
 Depth_Basics
 Depth_Holes
 Depth_InRange
@@ -1556,6 +1557,7 @@ RedCC_Color8U
 RedCloud_Basics
 RedCloud_BasicsFlood
 RedCloud_Core
+RedCloud_DelaunayMap
 RedCloud_FeatureLess
 RedCloud_Flood_CPP
 RedCloud_KNN
@@ -1570,6 +1572,7 @@ RedColor_Basics
 RedColor_Bricks
 RedColor_Contour
 RedColor_Contours
+RedColor_DelaunayMap
 RedColor_FLessCorrelation
 RedColor_FLessMinMaxRange
 RedColor_GridRects

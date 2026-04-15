@@ -19,7 +19,7 @@ Public Class RedMask_Basics : Inherits TaskParent
 
         redMask.Run(dst2)
 
-        Dim rcListLast As New List(Of rcData)(redMask.rcList)
+        Dim rcListLast As New List(Of rcData)(rcList)
         Dim lastColorMat = dst3.Clone
 
         knn.trainInput.Clear()
@@ -31,7 +31,12 @@ Public Class RedMask_Basics : Inherits TaskParent
         For Each rc In redMask.rcList
             knn.queries(0) = New cv.Point3f(rc.maxDist.X, rc.maxDist.Y, rc.pixels)
             knn.Run(emptyMat)
-            Dim rcLast = rcListLast(knn.result(0, 0))
+            Dim lastIndex = knn.result(0, 0)
+            If rcListLast.Count > 0 And lastIndex < rcListLast.Count Then
+                Dim rcLast = rcListLast(lastIndex)
+                rc.indexLast = rcLast.index
+                rc.maxDStable = rcLast.maxDist
+            End If
 
             Dim lastColor = lastColorMat.Get(Of cv.Vec3b)(rc.maxDist.Y, rc.maxDist.X)
             If lastColor <> black Then
@@ -39,7 +44,6 @@ Public Class RedMask_Basics : Inherits TaskParent
             Else
                 rc.color = task.scalarColors(rc.index)
             End If
-
             dst3(rc.rect).SetTo(rc.color, rc.mask)
         Next
 
@@ -48,15 +52,27 @@ Public Class RedMask_Basics : Inherits TaskParent
         If task.rcD IsNot Nothing Then task.clickPoint = task.rcD.maxDist
 
         Dim usedColors As New List(Of cv.Scalar)
+        rcList.Clear()
         For Each rc In redMask.rcList
+            If rc.indexLast > 0 Then
+                Dim rcLast = rcListLast(rc.indexLast - 1)
+                Dim gridIndex = rc.gridIndex
+                Dim lastGridIndex = rcLast.gridIndex
+                If task.gridNabes(gridIndex).Contains(lastGridIndex) Then
+                    rc.age = rcLast.age + 1
+                    If rc.age > 1000 Then rc.age = 2
+                End If
+            End If
+
             If usedColors.Contains(rc.color) Then
                 rc.color = New cv.Scalar(msRNG.Next(0, 255), msRNG.Next(0, 255), msRNG.Next(0, 255))
                 dst3(rc.rect).SetTo(rc.color, rc.mask)
             End If
             usedColors.Add(rc.color)
+
+            rcList.Add(rc)
         Next
 
-        rcList = New List(Of rcData)(redMask.rcList)
         rcMap = redMask.dst2.Clone
 
         labels(3) = CStr(redMask.rcList.Count) + " cells were identified."
@@ -552,10 +568,10 @@ Public Class NR_RedMask_KNN : Inherits TaskParent
     Public rcMap As New cv.Mat(dst2.Size, cv.MatType.CV_32S, 0)
     Dim redCore As New RedMask_CPP
     Dim fLess As New FeatureLess_BasicsRaw
-    Dim knn As New KNN_Basics
+    Dim knn As New KNN_N3Basics
     Public fLessGridRects As New List(Of List(Of Integer))
     Public Sub New()
-        knn.ptListQuery.Add(New cv.Point)
+        knn.queries.Add(New cv.Point3f)
         If standalone Then task.gOptions.displayDst1.Checked = True
         desc = "Use KNN to identify the previous cell for each current cell"
     End Sub
@@ -579,9 +595,9 @@ Public Class NR_RedMask_KNN : Inherits TaskParent
             If index > 0 Then fLessGridRects(index).Add(i)
         Next
 
-        knn.ptListTrain.Clear()
+        knn.trainInput.Clear()
         For Each rc In rcList
-            knn.ptListTrain.Add(New cv.Point(rc.gridIndex, rc.pixels))
+            knn.trainInput.Add(New cv.Point3f(rc.maxDist.X, rc.maxDist.Y, rc.pixels))
         Next
 
         dst3.SetTo(0)
@@ -595,17 +611,18 @@ Public Class NR_RedMask_KNN : Inherits TaskParent
             Dim rc As New rcData(mask, r, i + 1)
             rc.color = task.scalarColors((rcList.Count + 1) Mod 255)
 
-            knn.ptListQuery(0) = New cv.Point(rc.gridIndex, rc.pixels)
+            knn.queries(0) = New cv.Point3f(rc.maxDist.X, rc.maxDist.Y, rc.pixels)
             knn.Run(emptyMat)
-            If knn.ptListTrain.Count > 0 Then
-                Dim index = knn.neighbors(0)(0)
-                Dim rcLast = rcListLast(index)
-                If rc.index = 3 Or rc.index = 4 Then Dim k = 0
-                If rcLast.rect.IntersectsWith(task.gridRects(rc.gridIndex)) Then
-                    Dim gridList = task.gridNabes(rcLast.gridIndex)
-                    rc.color = rcLast.color
-                    rc.age = rcLast.age + 1
-                    If rc.age > 1000 Then rc.age = 2
+            If knn.trainInput.Count > 0 Then
+                Dim index = knn.result(0, 0)
+                If rcListLast.Count > 0 Then
+                    Dim rcLast = rcListLast(index)
+                    If rcLast.rect.IntersectsWith(task.gridRects(rc.gridIndex)) Then
+                        Dim gridList = task.gridNabes(rcLast.gridIndex)
+                        rc.color = rcLast.color
+                        rc.age = rcLast.age + 1
+                        If rc.age > 1000 Then rc.age = 2
+                    End If
                 End If
             End If
 
@@ -697,6 +714,12 @@ Public Class RedMask_MapAndList : Inherits TaskParent
             rc.mask = redCore.dst2(rc.rect).InRange(i + 1, i + 1)
             rc = New rcData(rc.mask, rc.rect, -1)
             rc.index = rcList.Count + 1
+
+            rc.contour = ContourBuild(rc.mask)
+            Dim listOfPoints = New List(Of List(Of cv.Point))({rc.contour})
+            rc.mask = New cv.Mat(rc.mask.Size, cv.MatType.CV_8U, 0)
+            cv.Cv2.DrawContours(rc.mask, listOfPoints, 0, cv.Scalar.All(rc.index), -1, cv.LineTypes.Link4)
+
             rc.color = task.scalarColors(rc.index Mod 255)
             dst2(rc.rect).SetTo(rc.index, rc.mask)
             rcList.Add(rc)
@@ -720,7 +743,6 @@ Public Class RedMask_Delaunay : Inherits TaskParent
     Dim rcMap As New cv.Mat(dst2.Size, cv.MatType.CV_32S, 0)
     Public Sub New()
         If standalone Then task.gOptions.displayDst1.Checked = True
-        rcMap = New cv.Mat(dst2.Size(), cv.MatType.CV_32S, 0)
         labels(3) = "The colors below match the color of the corresponding featureless region in dst2."
         desc = "Fill the delaunay map with the index for each cell."
     End Sub

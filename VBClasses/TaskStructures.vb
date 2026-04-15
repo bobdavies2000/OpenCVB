@@ -569,6 +569,7 @@ Public Module Structures
         Public indexLast As Integer ' only here for compatibility
         Public mask As cv.Mat
         Public maxDist As cv.Point
+        Public maxDStable As cv.Point
         Public multiMask As Boolean ' indicates if RedWGrid found duplicate wGrid points in the rclist.
         Public nabs As New List(Of Integer) ' here for compatibility.
         Public pixels As Integer

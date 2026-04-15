@@ -496,3 +496,55 @@ Public Class Delaunay_FeatureLess : Inherits TaskParent
         dst3 = delaunay.dst2
     End Sub
 End Class
+
+
+
+
+
+Public Class Delaunay_Map : Inherits TaskParent
+    Dim subdiv As New cv.Subdiv2D
+    Public rcList As List(Of rcData)
+    Public rcMap As New cv.Mat(dst2.Size, cv.MatType.CV_32S, 0)
+    Public Sub New()
+        If standalone Then task.gOptions.displayDst1.Checked = True
+        labels(3) = "Visualization of the rcMap with colors.  The rcMap contains integers."
+        desc = "Create a map using the rcList provided."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        If standalone Then
+            Static redC As New RedCloud_Basics
+            redC.Run(src)
+            dst2 = redC.dst2
+            labels(2) = redC.labels(2)
+            strOut = redC.strOut
+            rcList = New List(Of rcData)(redC.rcList)
+        End If
+
+        subdiv.InitDelaunay(New cv.Rect(0, 0, dst2.Width, dst2.Height))
+
+        Dim inputPoints As New List(Of cv.Point2f)
+        For Each rc In rcList
+            inputPoints.Add(rc.maxDist)
+        Next
+
+        subdiv.Insert(inputPoints)
+
+        Dim facets = New cv.Point2f()() {Nothing}
+        subdiv.GetVoronoiFacetList(New List(Of Integer)(), facets, Nothing)
+
+        Dim facetList As New List(Of List(Of cv.Point))
+        For i = 0 To facets.Length - 1
+            Dim nextFacet As New List(Of cv.Point)
+            For j = 0 To facets(i).Length - 1
+                nextFacet.Add(New cv.Point(facets(i)(j).X, facets(i)(j).Y))
+            Next
+
+            Dim rc = rcList(i)
+            rcMap.FillConvexPoly(nextFacet, rc.index, cv.LineTypes.Link4)
+            dst3.FillConvexPoly(nextFacet, rc.color, cv.LineTypes.Link4)
+            facetList.Add(nextFacet)
+        Next
+
+        SetTrueText(strOut, 1)
+    End Sub
+End Class
