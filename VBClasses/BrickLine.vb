@@ -1,5 +1,5 @@
 Imports cv = OpenCvSharp
-Public Class BrickLine_Basics_TA : Inherits TaskParent
+Public Class BrickLine_Basics : Inherits TaskParent
     Dim bricks As New Brick_Basics
     Dim hist As New Histogram_GridCell
     Public edgeRequest As Boolean
@@ -82,7 +82,7 @@ End Class
 
 
 Public Class BrickLine_Edges : Inherits TaskParent
-    Dim findCells As New BrickLine_Basics_TA
+    Dim findCells As New BrickLine_Basics
     Public Sub New()
         findCells.edgeRequest = True
         labels(3) = "Use the 'Feature' option 'Selected Feature' to highlight different edges."
@@ -103,7 +103,7 @@ End Class
 
 
 Public Class BrickLine_DepthGap : Inherits TaskParent
-    Dim findCells As New BrickLine_Basics_TA
+    Dim findCells As New BrickLine_Basics
     Dim bricks As New Brick_Basics
     Public Sub New()
         labels(2) = "Cells highlighted below have a significant gap in depth from their neighbors."
@@ -181,7 +181,7 @@ End Class
 
 
 Public Class NR_BrickLine_Lines : Inherits TaskParent
-    Dim findCells As New BrickLine_Basics_TA
+    Dim findCells As New BrickLine_Basics
     Public Sub New()
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
         labels(3) = "Use the 'Feature' option 'Selected Feature' to highlight different lines."
@@ -311,5 +311,107 @@ Public Class BrickLine_LeftRightMotion : Inherits TaskParent
 
         labels(3) = CStr(bestBricks.Count) + " bricks had lines and correlation >" + Format(task.fCorrThreshold, fmt2) + ") or " +
                       Format(bestBricks.Count / task.gridRects.Count, "00%") + " of all the bricks"
+    End Sub
+End Class
+
+
+
+
+
+Public Class BrickLine_Find1 : Inherits TaskParent
+    Dim edges As New Edge_Basics
+    Dim side As Integer
+    Dim pixels(side * side) As cv.Point
+    Public Sub New()
+        side = task.gOptions.GridSlider.Value
+        ReDim pixels(side * side)
+        desc = "Find lines within each brick."
+    End Sub
+    Public Shared Function testPixels(pixels() As cv.Point) As lpData
+        Dim testX As Boolean = True
+        Dim testY As Boolean = True
+
+        For j = 1 To pixels.Count - 1
+            If Math.Abs(pixels(j - 1).X - pixels(j).X) > 1 Then
+                testX = False
+                Exit For
+            End If
+        Next
+
+        For j = 1 To pixels.Count - 1
+            If Math.Abs(pixels(j - 1).Y - pixels(j).Y) > 1 Then
+                testX = False
+                Exit For
+            End If
+        Next
+        If testX Or testY Then Return New lpData(pixels(0), pixels(pixels.Count - 1))
+        Return Nothing
+    End Function
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        edges.Run(task.gray)
+        dst2 = edges.dst2
+        labels(2) = edges.labels(2)
+
+        dst3.SetTo(0)
+        For i = 0 To task.gridRects.Count - 1
+            Dim r = task.gridRects(i)
+            If i = 820 Then Dim k = 0
+            If dst2(r).CountNonZero = 0 Then Continue For
+            Dim pixelMat = dst2(r).FindNonZero
+
+            pixelMat.GetArray(Of cv.Point)(pixels)
+
+            Dim lp = testPixels(pixels)
+            If lp IsNot Nothing Then
+                dst3(r).Line(lp.p1, lp.p2, task.highlight, task.lineWidth)
+            End If
+        Next
+    End Sub
+End Class
+
+
+
+
+
+Public Class BrickLine_Find : Inherits TaskParent
+    Dim edges As New Edge_Basics
+    Dim side As Integer
+    Dim pixels(side * side) As cv.Point
+    Public Sub New()
+        side = task.gOptions.GridSlider.Value
+        ReDim pixels(side * side)
+        desc = "Find lines within each brick."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        edges.Run(task.gray)
+        dst2 = edges.dst2
+        labels(2) = edges.labels(2)
+
+        dst3.SetTo(0)
+        Dim p1 As cv.Point, p2 As cv.Point
+        Dim pNothing As New cv.Point(-1, -1)
+        For i = 0 To task.gridRects.Count - 1
+            Dim r = task.gridRects(i)
+            If i = 820 Then Dim k = 0
+            If dst2(r).CountNonZero = 0 Then Continue For
+            Dim pixelMat = dst2(r).FindNonZero
+
+            pixelMat.GetArray(Of cv.Point)(pixels)
+
+            p1 = pNothing
+            p2 = pNothing
+            For j = 1 To pixels.Count - 1
+                If Math.Abs(pixels(j - 1).X - pixels(j).X) > 1 Or Math.Abs(pixels(j - 1).Y - pixels(j).Y) > 1 Then
+                    p2 = pixels(j - 1)
+                    If p1.X >= 0 Then
+                        dst3(r).Line(p1, p2, task.highlight, task.lineWidth, task.lineType)
+                        p1 = pNothing
+                        p2 = pNothing
+                    End If
+                Else
+                    If p1.X < 0 Then p1 = pixels(j - 1)
+                End If
+            Next
+        Next
     End Sub
 End Class

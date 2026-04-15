@@ -61,10 +61,12 @@ Brick_LeftRightMouse
 Brick_Plot
 Brick_Ranges
 Brick_Variability
-BrickLine_Basics_TA
+BrickLine_Basics
 BrickLine_DepthGap
 BrickLine_Edges
 BrickLine_EdgesNoEdges
+BrickLine_Find
+BrickLine_Find1
 BrickLine_LeftRightMotion
 BrickPoint_Basics
 BrickPoint_Core
@@ -365,6 +367,7 @@ Hough_FeatureLessTopX
 Hough_LaneFinder
 Hough_Lines
 Hough_Lines_MT
+Hough_Structural
 Hull_Basics
 Hull_Contour
 HullLine_Basics_TA
@@ -440,6 +443,7 @@ Line_BasicsNoMotion1
 Line_BrickList
 Line_BrickListTest
 Line_DepthHistogram
+Line_EdgeLine
 Line_EdgeLineCompare
 Line_Intersection
 Line_KNNTop

@@ -12,12 +12,6 @@ Public Class Line_Basics_TA : Inherits TaskParent
         ld = cv.XImgProc.CvXImgProc.CreateFastLineDetector
         desc = "If line is NOT in motion mask, then keep it.  If line is in motion mask, add it."
     End Sub
-    Private Function lpMotion(lp As lpData) As Boolean
-        ' return true if either line endpoint was in the motion mask.
-        If motionMask.Get(Of Byte)(lp.p1.Y, lp.p1.X) Then Return True
-        If motionMask.Get(Of Byte)(lp.p2.Y, lp.p2.X) Then Return True
-        Return False
-    End Function
     Public Shared Function getRawLines(lines As cv.Vec4f()) As List(Of lpData)
         Dim lpList As New List(Of lpData)
         For Each v In lines
@@ -26,7 +20,7 @@ Public Class Line_Basics_TA : Inherits TaskParent
                 Dim p1 = New cv.Point(CInt(v(0)), CInt(v(1)))
                 Dim p2 = New cv.Point(CInt(v(2)), CInt(v(3)))
                 If p1.X >= 0 And p1.X < task.workRes.Width And p1.Y >= 0 And p1.Y < task.workRes.Height And
-                               p2.X >= 0 And p2.X < task.workRes.Width And p2.Y >= 0 And p2.Y < task.workRes.Height Then
+                   p2.X >= 0 And p2.X < task.workRes.Width And p2.Y >= 0 And p2.Y < task.workRes.Height Then
                     p1 = lpData.validatePoint(p1)
                     p2 = lpData.validatePoint(p2)
                     Dim lp = New lpData(p1, p2)
@@ -52,7 +46,7 @@ Public Class Line_Basics_TA : Inherits TaskParent
 
         Dim sortlines As New SortedList(Of Single, lpData)(New compareAllowIdenticalSingleInverted)
         For Each lp In lpList
-            If lpMotion(lp) = False Then
+            If Not (motionMask.Get(Of Byte)(lp.p1.Y, lp.p1.X) Or motionMask.Get(Of Byte)(lp.p2.Y, lp.p2.X)) Then
                 lp.age += 1
                 sortlines.Add(lp.length, lp)
             End If
@@ -62,7 +56,9 @@ Public Class Line_Basics_TA : Inherits TaskParent
         lpList = getRawLines(ld.Detect(src))
 
         For Each lp In lpList
-            If lpMotion(lp) Then sortlines.Add(lp.length, lp)
+            If motionMask.Get(Of Byte)(lp.p1.Y, lp.p1.X) Or motionMask.Get(Of Byte)(lp.p2.Y, lp.p2.X) Then
+                sortlines.Add(lp.length, lp)
+            End If
         Next
         Dim newCount As Integer = sortlines.Count - count
 
@@ -1275,5 +1271,34 @@ Public Class Line_KNNTop : Inherits TaskParent
         End If
 
         knn.trainInput = New List(Of cv.Point2f)(knn.queries)
+    End Sub
+End Class
+
+
+
+
+
+Public Class Line_EdgeLine : Inherits TaskParent
+    Dim edgeLine As New EdgeLine_Basics
+    Dim lines As New Line_Basics_TA
+    Public Sub New()
+        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        desc = "Search for lines in the EdgeLine output."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        edgeLine.Run(task.gray)
+
+        Static matList As New List(Of cv.Mat)
+        matList.Add(edgeLine.dst2.Threshold(0, 255, cv.ThresholdTypes.Binary))
+        If matList.Count > 5 Then matList.RemoveAt(0)
+
+        dst2.SetTo(0)
+        For Each mat In matList
+            dst2 = dst2 Or mat
+        Next
+
+        lines.Run(dst2)
+        dst3 = lines.dst2
+        labels(3) = lines.labels(2)
     End Sub
 End Class

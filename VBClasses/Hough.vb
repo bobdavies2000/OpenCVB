@@ -1,3 +1,4 @@
+Imports OpenCvSharp
 Imports cv = OpenCvSharp
 ' https://docs.opencvb.org/3.1.0/d6/d10/tutorial_py_houghlines.html
 ' https://github.com/JiphuTzu/opencvsharp/blob/master/sample/SamplesVB/Samples/HoughLinesSample.vb
@@ -375,5 +376,52 @@ Public Class NR_Hough_Probabilistic : Inherits TaskParent
             Next
             labels(3) = "Probablistic lines = " + CStr(segments.Length)
         End If
+    End Sub
+End Class
+
+
+
+
+
+Public Class Hough_Structural : Inherits TaskParent
+    Dim edges As New Edge_Basics
+    Public options As New Options_Hough
+    Public Sub New()
+        desc = "Gemini generated: find the structural lines (stable, long lines) in the image using Hough"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        options.Run()
+
+        edges.Run(task.gray)
+        dst2 = edges.dst2
+        labels(2) = edges.labels(2)
+
+        ' Standard Hough Line Transform (The "Structural Choice")
+        ' 
+        ' Returns an array of LineSegmentPolar (Rho and Theta)
+        ' Rho: Distance from (0,0) in pixels
+        ' Theta: Angle in radians (Math.PI / 180 = 1 degree resolution)
+        ' Threshold: Minimum "votes" to be considered a line
+        Dim lines As LineSegmentPolar() = Cv2.HoughLines(dst2, 1, Math.PI / 180, 150)
+
+        ' Convert Polar to Cartesian and Draw
+        '
+        ' We project a long line segment based on the detected angle
+        dst3 = src.Clone
+        For i = 0 To lines.Length - 1
+            Dim rho As Single = lines(i).Rho
+            Dim theta As Single = lines(i).Theta
+
+            Dim a As Double = Math.Cos(theta)
+            Dim b As Double = Math.Sin(theta)
+            Dim x0 As Double = a * rho
+            Dim y0 As Double = b * rho
+
+            ' We use 1000 as a large multiplier to ensure the line spans the view
+            Dim pt1 As New Point(CInt(Math.Round(x0 + 1000 * (-b))), CInt(Math.Round(y0 + 1000 * (a))))
+            Dim pt2 As New Point(CInt(Math.Round(x0 - 1000 * (-b))), CInt(Math.Round(y0 - 1000 * (a))))
+
+            dst3.Line(pt1, pt2, task.highlight, task.lineWidth, task.lineType)
+        Next
     End Sub
 End Class
