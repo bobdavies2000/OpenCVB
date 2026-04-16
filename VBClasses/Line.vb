@@ -1302,3 +1302,167 @@ Public Class Line_EdgeLine : Inherits TaskParent
         labels(3) = lines.labels(2)
     End Sub
 End Class
+
+
+
+
+
+
+Public Class Line_FindSimple : Inherits TaskParent
+    Dim edges As New Edge_Basics
+    Dim side As Integer
+    Dim pixels(side * side) As cv.Point
+    Public Sub New()
+        side = task.gOptions.GridSlider.Value
+        ReDim pixels(side * side)
+        desc = "Find lines within each brick."
+    End Sub
+    Public Shared Function testPixels(pixels() As cv.Point) As lpData
+        Dim testX As Boolean = True
+        Dim testY As Boolean = True
+
+        For j = 1 To pixels.Count - 1
+            If Math.Abs(pixels(j - 1).X - pixels(j).X) > 1 Then
+                testX = False
+                Exit For
+            End If
+        Next
+
+        For j = 1 To pixels.Count - 1
+            If Math.Abs(pixels(j - 1).Y - pixels(j).Y) > 1 Then
+                testX = False
+                Exit For
+            End If
+        Next
+        If testX Or testY Then Return New lpData(pixels(0), pixels(pixels.Count - 1))
+        Return Nothing
+    End Function
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        edges.Run(task.gray)
+        dst2 = edges.dst2
+        labels(2) = edges.labels(2)
+
+        dst3.SetTo(0)
+        For i = 0 To task.gridRects.Count - 1
+            Dim r = task.gridRects(i)
+            Dim pixelCount = dst2(r).CountNonZero
+            If pixelCount = 0 Or pixelCount > 20 Then Continue For
+            Dim pixelMat = dst2(r).FindNonZero
+
+            pixelMat.GetArray(Of cv.Point)(pixels)
+            If task.drawRect.Contains(r.TopLeft) Then Dim k = 0
+
+            Dim lp = testPixels(pixels)
+            If lp IsNot Nothing Then
+                dst3(r).Line(lp.p1, lp.p2, task.highlight, task.lineWidth)
+            End If
+        Next
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Line_FinderPlus : Inherits TaskParent
+    Dim find As New Line_Finder
+    Dim lines As New Line_Basics_TA
+    Public Sub New()
+        desc = "Find lines in the brickline_find output"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        find.Run(task.gray)
+        dst2 = find.dst3
+
+        lines.Run(dst2)
+        dst3 = lines.dst2
+        labels(3) = lines.labels(2)
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Line_Finder : Inherits TaskParent
+    Dim edges As New Edge_Basics
+    Dim side As Integer
+    Dim pixels(side * side) As cv.Point
+    Dim pNothing As New cv.Point(-1, -1)
+    Public Sub New()
+        side = task.gOptions.GridSlider.Value
+        ReDim pixels(side * side)
+        desc = "Find lines within each brick."
+    End Sub
+    Public Function findLines(pixels() As cv.Point) As List(Of lpData)
+        Dim lpList As New List(Of lpData)
+        Dim ptList As New List(Of cv.Point)
+        For i = 1 To pixels.Count - 1
+            If pixels(i - 1).X > 0 Or pixels(i).X > 0 Then
+                If ptList.Count = 0 Then
+                    ptList.Add(pixels(i - 1))
+                Else
+                    If Math.Abs(pixels(i).X - ptList.Last.X) <= 1 Then
+                        ptList.Add(pixels(i))
+                    ElseIf Math.Abs(pixels(i - 1).X - ptList.Last.X) <= 1 Then
+                        ptList.Add(pixels(i - 1))
+                    Else
+                        lpList.Add(New lpData(ptList(0), ptList.Last))
+                        ptList.Clear()
+                    End If
+                End If
+            End If
+        Next
+        If ptList.Count Then lpList.Add(New lpData(ptList.First, ptList.Last))
+
+        Return lpList
+    End Function
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        edges.Run(task.gray)
+        dst2 = edges.dst2
+        labels(2) = edges.labels(2)
+
+        dst3.SetTo(0)
+        For i = 0 To task.gridRects.Count - 1
+            Dim r = task.gridRects(i)
+
+            Dim pixelCount = dst2(r).CountNonZero
+            If pixelCount = 0 Or pixelCount > 20 Then Continue For
+            If pixelCount < side Then Continue For
+
+            Dim pixelMat = dst2(r).FindNonZero
+
+            pixelMat.GetArray(Of cv.Point)(pixels)
+
+            ' use this line for debugging...
+            If task.drawRect.Contains(r.TopLeft) Then Dim k = 0
+
+            Dim lpList = findLines(pixels)
+            For Each lp In lpList
+                dst3(r).Line(lp.p1, lp.p2, task.highlight, task.lineWidth)
+            Next
+        Next
+    End Sub
+End Class
+
+
+
+
+Public Class Line_RedFlood : Inherits TaskParent
+    Dim edges As New Edge_Basics
+    Dim redFlood As New NR_Flood_SimpleRedColor
+    Public Sub New()
+        desc = "Use the edges as input to RedFlood."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        edges.Run(task.gray)
+        dst3 = edges.dst2
+        labels(3) = edges.labels(2)
+
+        redFlood.Run(dst2)
+        dst2 = redFlood.dst2
+        labels(2) = redFlood.labels(2)
+    End Sub
+End Class

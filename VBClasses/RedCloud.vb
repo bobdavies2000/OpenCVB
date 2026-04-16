@@ -75,13 +75,12 @@ Public Class RedCloud_Core : Inherits TaskParent
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         desc = "Find the biggest chunks of consistent depth data "
     End Sub
-    Public Shared Function sweepImage(input As cv.Mat) As List(Of rcData)
+    Public Shared Function sweepImage(input As cv.Mat, minSize As Integer) As List(Of rcData)
         Dim index As Integer = 1
         Dim rect As New cv.Rect
         Dim mask = New cv.Mat(New cv.Size(input.Width + 2, input.Height + 2), cv.MatType.CV_8U, 0)
-        '  Or cv.FloodFillFlags.MaskOnly - maskonly is expensive but why?
         Dim flags As cv.FloodFillFlags = cv.FloodFillFlags.Link4
-        Dim minSize As Integer = input.Total * 0.0001
+        '  Or cv.FloodFillFlags.MaskOnly - maskonly is expensive but why?
         Dim rc As rcData = Nothing
         Dim newList As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
         For y = 0 To input.Height - 1
@@ -111,7 +110,7 @@ Public Class RedCloud_Core : Inherits TaskParent
             src = prepEdges.dst2.Clone
         End If
 
-        rcList = sweepImage(src)
+        rcList = sweepImage(src, src.Total * 0.0001)
 
         dst2.SetTo(0)
         For Each rc In rcList

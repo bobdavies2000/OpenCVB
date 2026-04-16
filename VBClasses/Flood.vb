@@ -207,3 +207,38 @@ Public Class Flood_BasicsMask : Inherits TaskParent
         If showSelected Then SetTrueText(redC.strOut, 1)
     End Sub
 End Class
+
+
+
+
+
+Public Class Flood_Edges : Inherits TaskParent
+    Dim edges As New Edge_Canny
+    Public Sub New()
+        If standalone Then task.gOptions.displayDst1.Checked = True
+        desc = "Floodfill the selected segment of the RedPrep image."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        edges.Run(task.gray)
+        dst3 = edges.dst2
+        labels(3) = edges.labels(2)
+
+        Dim rcList = RedCloud_Core.sweepImage(dst3, 0)
+
+        Static rcIndex As Integer
+        dst1.SetTo(0)
+        Dim rc = rcList(rcIndex)
+        dst1(rc.rect).SetTo(rc.color, rc.mask)
+        If task.heartBeatLT Then
+            rcIndex += 1
+            If rcIndex >= rcList.Count Then rcIndex = 0
+        End If
+
+        dst2.SetTo(0)
+        For Each rc In rcList
+            dst2(rc.rect).SetTo(rc.color, rc.mask)
+        Next
+
+        labels(2) = CStr(rcList.Count) + " cells were found."
+    End Sub
+End Class

@@ -65,9 +65,6 @@ BrickLine_Basics
 BrickLine_DepthGap
 BrickLine_Edges
 BrickLine_EdgesNoEdges
-BrickLine_Find
-BrickLine_Find1
-BrickLine_Finder
 BrickLine_LeftRightMotion
 BrickPoint_Basics
 BrickPoint_Core
@@ -269,6 +266,7 @@ FitLine_Basics_TA
 FitLine_Conventional
 Flood_Basics
 Flood_BasicsMask
+Flood_Edges
 Font_Basics
 Font_FlowText
 Foreground_Basics
@@ -446,6 +444,9 @@ Line_BrickListTest
 Line_DepthHistogram
 Line_EdgeLine
 Line_EdgeLineCompare
+Line_Finder
+Line_FinderPlus
+Line_FindSimple
 Line_Intersection
 Line_KNNTop
 Line_LeftRight
@@ -456,6 +457,7 @@ Line_Map
 Line_MapRects
 Line_Motion
 Line_PerpendicularTest
+Line_RedFlood
 Line_Tracker
 Line_TranslatedRightView
 Line_Vertical

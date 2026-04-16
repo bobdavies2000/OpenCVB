@@ -344,9 +344,11 @@ Public Class RedColor_Contour : Inherits TaskParent
         labels(3) = redC.labels(2)
 
         dst2.SetTo(0)
-        For Each rc As rcData In redC.rcList
+        For Each rc In redC.rcList
             DrawTour(dst2(rc.rect), rc.contour, rc.color, -1)
-            If rc.index = task.rcD.index Then DrawTour(dst2(rc.rect), rc.contour, white, -1)
+            If task.rcD IsNot Nothing Then
+                If rc.index = task.rcD.index Then DrawTour(dst2(rc.rect), rc.contour, white, -1)
+            End If
         Next
     End Sub
 End Class
