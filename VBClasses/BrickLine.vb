@@ -355,11 +355,12 @@ Public Class BrickLine_Find1 : Inherits TaskParent
         dst3.SetTo(0)
         For i = 0 To task.gridRects.Count - 1
             Dim r = task.gridRects(i)
-            If i = 820 Then Dim k = 0
-            If dst2(r).CountNonZero = 0 Then Continue For
+            Dim pixelCount = dst2(r).CountNonZero
+            If pixelCount = 0 Or pixelCount > 20 Then Continue For
             Dim pixelMat = dst2(r).FindNonZero
 
             pixelMat.GetArray(Of cv.Point)(pixels)
+            If task.drawRect.Contains(r.TopLeft) Then Dim k = 0
 
             Dim lp = testPixels(pixels)
             If lp IsNot Nothing Then
@@ -373,44 +374,129 @@ End Class
 
 
 
+
+Public Class BrickLine_Finder : Inherits TaskParent
+    Dim find As New BrickLine_Find1
+    Dim lines As New Line_Basics_TA
+    Public Sub New()
+        desc = "Find lines in the brickline_find output"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        find.Run(task.gray)
+        dst2 = find.dst3
+
+        lines.run(dst2)
+        dst3 = lines.dst2
+        labels(3) = lines.labels(2)
+    End Sub
+End Class
+
+
+
+
+
+'Public Class BrickLine_KNN : Inherits TaskParent
+'    Dim knn As KNN_Basics
+'    Dim edges As New Edge_Basics
+'    Dim side As Integer
+'    Dim pixels(side * side) As cv.Point
+'    Public Sub New()
+'        desc = "Use KNN to find lines in each grid rect."
+'    End Sub
+'    Public Overrides Sub RunAlg(src As cv.Mat)
+'        edges.Run(task.gray)
+'        dst2 = edges.dst2
+'        labels(2) = edges.labels(2)
+
+'        dst3.SetTo(0)
+'        For Each r In task.gridRects
+'            Dim pixelCount = dst2(r).CountNonZero
+'            If pixelCount = 0 Or pixelCount > 20 Then Continue For
+'            Dim pixelMat = dst2(r).FindNonZero
+
+'            pixelMat.GetArray(Of cv.Point)(pixels)
+'            If task.drawRect.Contains(r.TopLeft) Then Dim k = 0
+
+'            knn.queries.Clear()
+'            For Each pt In pixels
+'                knn.queries.Add(New cv.Point2f(pt.X, pt.Y))
+'            Next
+'            knn.trainInput = New List(Of cv.Point2f)(knn.queries)
+'            knn.Run(emptyMat)
+
+
+'            For i = 0 To knn.queries.Count - 1
+'                Dim p1 = knn.queries(i)
+'                While 1
+'                    Dim index = knn.result(i, 1)
+'                    Dim p2 = knn.queries(index)
+'                    Dim distance = p1.DistanceTo(p2)
+'                    If distance >= 2 Then Exit While
+
+'                End While
+'                Dim p2 = knn.queries(knn.result)
+'            Next
+'        Next
+'    End Sub
+'End Class
+
+
+
+
+
 Public Class BrickLine_Find : Inherits TaskParent
     Dim edges As New Edge_Basics
     Dim side As Integer
     Dim pixels(side * side) As cv.Point
+    Dim pNothing As New cv.Point(-1, -1)
     Public Sub New()
         side = task.gOptions.GridSlider.Value
         ReDim pixels(side * side)
         desc = "Find lines within each brick."
     End Sub
+    Public Function testPixels(pixels() As cv.Point) As List(Of lpData)
+        Dim lpList As New List(Of lpData)
+        Dim sortX As New SortedList(Of Integer, cv.Point)(New compareAllowIdenticalInteger)
+        For Each pt In pixels
+            sortX.Add(pt.X, pt)
+        Next
+
+        Dim xList As New List(Of cv.Point)(sortX.Values)
+        Dim p1 As cv.Point = pNothing, p2 As cv.Point
+        For i = 1 To xList.Count - 1
+            If p1.X = -1 Or Math.Abs(xList(i).Y - xList(i - 1).Y) > 1 Then
+                p1 = xList(i - 1)
+            Else
+                p2 = xList(i - 1)
+                If Math.Abs(xList(i).X - p2.X) > 1 Or i = xList.Count - 1 Then
+                    lpList.Add(New lpData(p1, p2))
+                    p1 = pNothing
+                End If
+            End If
+        Next
+        Return lpList
+    End Function
     Public Overrides Sub RunAlg(src As cv.Mat)
         edges.Run(task.gray)
         dst2 = edges.dst2
         labels(2) = edges.labels(2)
 
         dst3.SetTo(0)
-        Dim p1 As cv.Point, p2 As cv.Point
-        Dim pNothing As New cv.Point(-1, -1)
         For i = 0 To task.gridRects.Count - 1
             Dim r = task.gridRects(i)
-            If i = 820 Then Dim k = 0
-            If dst2(r).CountNonZero = 0 Then Continue For
+
+            Dim pixelCount = dst2(r).CountNonZero
+            If pixelCount = 0 Or pixelCount > 20 Then Continue For
+            If pixelCount < side Then Continue For
+
             Dim pixelMat = dst2(r).FindNonZero
 
             pixelMat.GetArray(Of cv.Point)(pixels)
+            If task.drawRect.Contains(r.TopLeft) Then Dim k = 0
 
-            p1 = pNothing
-            p2 = pNothing
-            For j = 1 To pixels.Count - 1
-                If Math.Abs(pixels(j - 1).X - pixels(j).X) > 1 Or Math.Abs(pixels(j - 1).Y - pixels(j).Y) > 1 Then
-                    p2 = pixels(j - 1)
-                    If p1.X >= 0 Then
-                        dst3(r).Line(p1, p2, task.highlight, task.lineWidth, task.lineType)
-                        p1 = pNothing
-                        p2 = pNothing
-                    End If
-                Else
-                    If p1.X < 0 Then p1 = pixels(j - 1)
-                End If
+            Dim lpList = testPixels(pixels)
+            For Each lp In lpList
+                dst3(r).Line(lp.p1, lp.p2, task.highlight, task.lineWidth)
             Next
         Next
     End Sub

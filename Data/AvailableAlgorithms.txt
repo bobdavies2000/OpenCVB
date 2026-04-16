@@ -67,6 +67,7 @@ BrickLine_Edges
 BrickLine_EdgesNoEdges
 BrickLine_Find
 BrickLine_Find1
+BrickLine_Finder
 BrickLine_LeftRightMotion
 BrickPoint_Basics
 BrickPoint_Core
