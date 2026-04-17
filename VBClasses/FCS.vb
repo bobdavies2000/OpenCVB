@@ -326,36 +326,6 @@ End Class
 
 
 
-
-
-Public Class NR_FCS_FloodFill : Inherits TaskParent
-    Dim flood As New Flood_Basics
-    Dim edges As New Edge_Canny
-    Public Sub New()
-        labels(3) = "Edge_Canny output"
-        desc = "Use color to connect FCS cells - visualize the data mostly."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        flood.Run(src)
-        dst2 = flood.dst2
-
-        dst1 = src.Clone
-
-        edges.Run(src)
-        dst3 = edges.dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-
-        dst2.SetTo(white, dst3)
-    End Sub
-End Class
-
-
-
-
-
-
-
-
-
 Public Class NR_FCS_Edges : Inherits TaskParent
     Dim fcs As New FCS_CreateList
     Dim edges As New Edge_Canny

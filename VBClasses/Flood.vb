@@ -55,14 +55,12 @@ Public Class Flood_Basics : Inherits TaskParent
                     Next
                     If rc.age = 1 Then rc.color = task.scalarColors(rc.index)
 
-
                     For Each rcTest In rcList
                         If rc.color = rcTest.color Then
                             rc.color = task.scalarColors(rc.index)
                             Exit For
                         End If
                     Next
-
 
                     rcList.Add(rc)
                     dst2(rc.rect).SetTo(rc.color, rc.mask)
@@ -85,6 +83,64 @@ Public Class Flood_Basics : Inherits TaskParent
     End Sub
     Protected Overrides Sub Finalize()
         If cPtr <> 0 Then cPtr = RedFlood_Close(cPtr)
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Flood_BasicsMask : Inherits TaskParent
+    Public inputRemoved As cv.Mat
+    Public showSelected As Boolean = True
+    Public redC As New RedColor_Basics
+    Public Sub New()
+        labels(3) = "The inputRemoved mask is used to limit how much of the image is processed."
+        desc = "Floodfill by color as usual but this is run repeatedly with the different tiers."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        If standalone Then
+            Static color8U As New Color8U_Basics
+            color8U.Run(src)
+            inputRemoved = task.pcSplit(2).InRange(task.MaxZmeters, task.MaxZmeters).ConvertScaleAbs()
+            src = color8U.dst2
+        End If
+
+        dst3 = inputRemoved
+        If inputRemoved IsNot Nothing Then src.SetTo(0, inputRemoved)
+
+        redC.Run(src)
+        labels(2) = redC.labels(2)
+        dst2 = redC.dst2.SetTo(0, inputRemoved)
+
+        labels(2) = $"{redC.rcList.Count} cells identified"
+
+        If showSelected Then SetTrueText(redC.strOut, 3)
+    End Sub
+End Class
+
+
+
+
+
+Public Class Flood_BasicsDemo : Inherits TaskParent
+    Dim flood As New Flood_Basics
+    Dim edges As New Edge_Canny
+    Public Sub New()
+        labels(3) = "Edge_Canny output"
+        desc = "Use color to connect FCS cells - visualize the data mostly."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        flood.Run(src)
+        dst2 = flood.dst2
+
+        dst1 = src.Clone
+
+        edges.Run(src)
+        dst3 = edges.dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+
+        dst2.SetTo(white, dst3)
     End Sub
 End Class
 
@@ -175,39 +231,6 @@ Public Class NR_Flood_Minimal : Inherits TaskParent
     End Sub
 End Class
 
-
-
-
-
-
-Public Class Flood_BasicsMask : Inherits TaskParent
-    Public inputRemoved As cv.Mat
-    Public showSelected As Boolean = True
-    Public redC As New RedColor_Basics
-    Public Sub New()
-        labels(3) = "The inputRemoved mask is used to limit how much of the image is processed."
-        desc = "Floodfill by color as usual but this is run repeatedly with the different tiers."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        If standalone Then
-            Static color8U As New Color8U_Basics
-            color8U.Run(src)
-            inputRemoved = task.pcSplit(2).InRange(task.MaxZmeters, task.MaxZmeters).ConvertScaleAbs()
-            src = color8U.dst2
-        End If
-
-        dst3 = inputRemoved
-        If inputRemoved IsNot Nothing Then src.SetTo(0, inputRemoved)
-
-        redC.Run(src)
-        labels(2) = redC.labels(2)
-        dst2 = redC.dst2.SetTo(0, inputRemoved)
-
-        labels(2) = $"{redC.rcList.Count} cells identified"
-
-        If showSelected Then SetTrueText(redC.strOut, 1)
-    End Sub
-End Class
 
 
 
