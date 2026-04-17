@@ -233,7 +233,7 @@ Namespace VBClasses
 
 
     Public Class KeyColor_Delaunay : Inherits TaskParent
-        Public redMask As New RedMask_MapAndList
+        Public redMask As New RedFlood_MapAndList
         Dim delaunay As New Delaunay_Basics
         Public facetList As New List(Of List(Of cv.Point))
         Dim fLess As New FeatureLess_BasicsRaw

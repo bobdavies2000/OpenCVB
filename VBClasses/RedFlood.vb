@@ -1,10 +1,10 @@
 Imports System.Runtime.InteropServices
 Imports VBClasses
 Imports cv = OpenCvSharp
-Public Class RedMask_Basics : Inherits TaskParent
+Public Class RedFlood_Basics : Inherits TaskParent
     Public rcList As New List(Of rcData)
     Public rcMap As New cv.Mat(dst2.Size, cv.MatType.CV_32S, 0)
-    Dim redMask As New RedMask_MapAndList
+    Dim redMask As New RedFlood_MapAndList
     Dim fLess As New FeatureLess_BasicsRaw
     Dim knn As New KNN_N3Basics
     Public Sub New()
@@ -83,12 +83,12 @@ End Class
 
 
 
-Public Class NR_RedMask_Basics : Inherits TaskParent
+Public Class NR_RedFlood_Basics : Inherits TaskParent
     Implements IDisposable
     Public mdList As New List(Of maskData)
     Public classCount As Integer
     Public Sub New()
-        cPtr = RedMask_Open()
+        cPtr = RedFlood_Open()
         desc = "Run the C++ RedMask to create a list of mask, rect, and other info about image"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -99,15 +99,15 @@ Public Class NR_RedMask_Basics : Inherits TaskParent
         Dim handleInput = GCHandle.Alloc(inputData, GCHandleType.Pinned)
 
         Dim minSize As Integer = dst2.Total * 0.001
-        Dim imagePtr = RedMask_Run(cPtr, handleInput.AddrOfPinnedObject(), dst1.Rows, dst1.Cols, minSize)
+        Dim imagePtr = RedFlood_Run(cPtr, handleInput.AddrOfPinnedObject(), dst1.Rows, dst1.Cols, minSize)
         handleInput.Free()
         dst2 = cv.Mat.FromPixelData(dst1.Rows + 2, dst1.Cols + 2, cv.MatType.CV_8U, imagePtr).Clone
         dst2 = dst2(New cv.Rect(1, 1, dst2.Width - 2, dst2.Height - 2))
 
-        classCount = RedMask_Count(cPtr)
+        classCount = RedFlood_Count(cPtr)
         If classCount <= 1 Then Exit Sub ' no data to process.
 
-        Dim rectData = cv.Mat.FromPixelData(classCount, 1, cv.MatType.CV_32SC4, RedMask_Rects(cPtr))
+        Dim rectData = cv.Mat.FromPixelData(classCount, 1, cv.MatType.CV_32SC4, RedFlood_Rects(cPtr))
         Dim rects(classCount - 1) As cv.Rect
         rectData.GetArray(Of cv.Rect)(rects)
 
@@ -136,15 +136,15 @@ Public Class NR_RedMask_Basics : Inherits TaskParent
         labels(3) = "Palette version of the data in dst2 with " + CStr(classCount) + " regions."
     End Sub
     Protected Overrides Sub Finalize()
-        If cPtr <> 0 Then cPtr = RedMask_Close(cPtr)
+        If cPtr <> 0 Then cPtr = RedFlood_Close(cPtr)
     End Sub
 End Class
 
 
 
 
-Public Class NR_RedMask_Redraw : Inherits TaskParent
-    Public redMask As New NR_RedMask_Basics
+Public Class NR_RedFlood_Redraw : Inherits TaskParent
+    Public redMask As New NR_RedFlood_Basics
     Public Sub New()
         desc = "Redraw the image using the mean color of each cell."
     End Sub
@@ -169,9 +169,9 @@ End Class
 
 
 
-Public Class RedMask_Color : Inherits TaskParent
-    Dim cellGen As New RedMask_ToRedColor
-    Dim redMask As New NR_RedMask_Basics
+Public Class RedFlood_Color : Inherits TaskParent
+    Dim cellGen As New RedFlood_ToRedColor
+    Dim redMask As New NR_RedFlood_Basics
     Public rclist As New List(Of rcData)
     Public rcMap As New cv.Mat ' redColor map 
     Dim contours As New Contour_Basics
@@ -221,7 +221,7 @@ End Class
 
 
 
-Public Class NR_RedMask_CellDepthHistogram : Inherits TaskParent
+Public Class NR_RedFlood_CellDepthHistogram : Inherits TaskParent
     Dim plot As New PlotBar_Basics
     Dim redC As New RedCloud_Basics
     Public Sub New()
@@ -331,7 +331,7 @@ End Class
 
 
 
-Public Class NR_RedMask_Consistent : Inherits TaskParent
+Public Class NR_RedFlood_Consistent : Inherits TaskParent
     Dim redC As New RedCloud_Basics
     Public Sub New()
         dst1 = New cv.Mat(dst1.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
@@ -357,9 +357,9 @@ End Class
 
 
 
-Public Class NR_RedMask_Hue : Inherits TaskParent
+Public Class NR_RedFlood_Hue : Inherits TaskParent
     Dim hue As New Color8U_Hue
-    Dim redMask As New RedMask_Color
+    Dim redMask As New RedFlood_Color
     Public Sub New()
         If standalone Then task.gOptions.displayDst1.Checked = True
         labels(3) = "Mask of the areas with Hue"
@@ -382,7 +382,7 @@ End Class
 
 
 
-Public Class NR_RedMask_FourColor : Inherits TaskParent
+Public Class NR_RedFlood_FourColor : Inherits TaskParent
     Dim binar4 As New Bin4Way_Regions
     Dim redC As New RedColor_Basics
     Public Sub New()
@@ -406,8 +406,8 @@ End Class
 
 
 
-Public Class RedMask_ToRedColor : Inherits TaskParent
-    Public redMask As New NR_RedMask_Basics
+Public Class RedFlood_ToRedColor : Inherits TaskParent
+    Public redMask As New NR_RedFlood_Basics
     Public mdList As New List(Of maskData)
     Public rcList As New List(Of rcData)
     Public rcMap As New cv.Mat(dst2.Size, cv.MatType.CV_32S, 0)
@@ -426,7 +426,7 @@ Public Class RedMask_ToRedColor : Inherits TaskParent
         For i = 0 To redMask.mdList.Count - 1
             Dim rc = New rcData(redMask.mdList(i).mask, redMask.mdList(i).rect, sortedCells.Count)
             rc.mask = redMask.mdList(i).mask
-            If rc.rect.Size = dst2.Size Then Continue For ' RedMask_List can find a cell this big.  
+            If rc.rect.Size = dst2.Size Then Continue For ' RedFlood_List can find a cell this big.  
             ' DrawTour(rc.mask, rc.contour, 255, -1)
             rc.pixels = redMask.mdList(i).mask.CountNonZero
             rc.age = 1
@@ -448,10 +448,10 @@ End Class
 
 
 
-Public Class RedMask_List : Inherits TaskParent
+Public Class RedFlood_List : Inherits TaskParent
     Public inputRemoved As cv.Mat
-    Public cellGen As New RedMask_ToRedColor
-    Public redMask As New NR_RedMask_Basics
+    Public cellGen As New RedFlood_ToRedColor
+    Public redMask As New NR_RedFlood_Basics
     Public contours As New Contour_Basics
     Public rcMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
     Public rclist As New List(Of rcData)
@@ -504,10 +504,10 @@ End Class
 
 
 
-Public Class RedMask_Test : Inherits TaskParent
+Public Class RedFlood_Test : Inherits TaskParent
     Public rcList As New List(Of rcData)
     Public rcMap As New cv.Mat(dst2.Size, cv.MatType.CV_32S, 0)
-    Dim redCore As New RedMask_CPP
+    Dim redCore As New RedFlood_CPP
     Dim fLess As New FeatureLess_BasicsRaw
     Public fLessGridRects As New List(Of List(Of Integer))
     Public Sub New()
@@ -563,10 +563,10 @@ End Class
 
 
 
-Public Class NR_RedMask_KNN : Inherits TaskParent
+Public Class NR_RedFlood_KNN : Inherits TaskParent
     Public rcList As New List(Of rcData)
     Public rcMap As New cv.Mat(dst2.Size, cv.MatType.CV_32S, 0)
-    Dim redCore As New RedMask_CPP
+    Dim redCore As New RedFlood_CPP
     Dim fLess As New FeatureLess_BasicsRaw
     Dim knn As New KNN_N3Basics
     Public fLessGridRects As New List(Of List(Of Integer))
@@ -650,12 +650,12 @@ End Class
 
 
 
-Public Class RedMask_CPP : Inherits TaskParent
+Public Class RedFlood_CPP : Inherits TaskParent
     Implements IDisposable
     Public classCount As Integer
     Public rects() As cv.Rect
     Public Sub New()
-        cPtr = RedMask_Open()
+        cPtr = RedFlood_Open()
         desc = "Run the C++ RedMask to create a list of mask, rect, and other info about image"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -666,16 +666,16 @@ Public Class RedMask_CPP : Inherits TaskParent
         Dim handleInput = GCHandle.Alloc(inputData, GCHandleType.Pinned)
 
         Dim minSize As Integer = dst2.Total * 0.001
-        Dim imagePtr = RedMask_Run(cPtr, handleInput.AddrOfPinnedObject(), dst1.Rows, dst1.Cols, minSize)
+        Dim imagePtr = RedFlood_Run(cPtr, handleInput.AddrOfPinnedObject(), dst1.Rows, dst1.Cols, minSize)
         handleInput.Free()
 
         dst2 = cv.Mat.FromPixelData(dst0.Rows + 2, dst0.Cols + 2, cv.MatType.CV_8U, imagePtr).Clone
         dst2 = dst2(New cv.Rect(1, 1, dst2.Width - 2, dst2.Height - 2))
 
-        classCount = RedMask_Count(cPtr)
+        classCount = RedFlood_Count(cPtr)
         If classCount <= 1 Then Exit Sub ' no data to process.
 
-        Dim rectData = cv.Mat.FromPixelData(classCount, 1, cv.MatType.CV_32SC4, RedMask_Rects(cPtr)).Clone
+        Dim rectData = cv.Mat.FromPixelData(classCount, 1, cv.MatType.CV_32SC4, RedFlood_Rects(cPtr)).Clone
         ReDim rects(classCount - 1)
         rectData.GetArray(Of cv.Rect)(rects)
 
@@ -685,16 +685,16 @@ Public Class RedMask_CPP : Inherits TaskParent
         labels(3) = "Palette version of the data in dst2 with " + CStr(classCount) + " regions."
     End Sub
     Protected Overrides Sub Finalize()
-        If cPtr <> 0 Then cPtr = RedMask_Close(cPtr)
+        If cPtr <> 0 Then cPtr = RedFlood_Close(cPtr)
     End Sub
 End Class
 
 
 
 
-Public Class RedMask_MapAndList : Inherits TaskParent
+Public Class RedFlood_MapAndList : Inherits TaskParent
     Public rcList As New List(Of rcData)
-    Dim redCore As New RedMask_CPP
+    Dim redCore As New RedFlood_CPP
     Public Sub New()
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_32S, 0)
         desc = "Run the C++ RedMask to create a list of mask, rect, and other info about image"
@@ -736,9 +736,9 @@ End Class
 
 
 
-Public Class RedMask_Delaunay : Inherits TaskParent
+Public Class RedFlood_Delaunay : Inherits TaskParent
     Dim subdiv As New cv.Subdiv2D
-    Dim redMask As New RedMask_Basics
+    Dim redMask As New RedFlood_Basics
     Dim facetList As New List(Of List(Of cv.Point))
     Dim rcMap As New cv.Mat(dst2.Size, cv.MatType.CV_32S, 0)
     Public Sub New()

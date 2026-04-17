@@ -212,7 +212,7 @@ End Class
 
 
 Public Class Region_Depth : Inherits TaskParent
-    Public redMask As New NR_RedMask_Basics
+    Public redMask As New NR_RedFlood_Basics
     Public connect As New Region_Rects
     Public mdLargest As New List(Of maskData)
     Dim bricks As New Brick_Basics

@@ -84,7 +84,7 @@ Public Class NR_Triangle_Cell : Inherits TaskParent
     Dim redC As New RedCloud_Basics
     Public Sub New()
         If standalone Then task.gOptions.displayDst1.Checked = True
-        labels = {"", "", "RedMask_List output", "Selected contour - each pixel has depth"}
+        labels = {"", "", "RedFlood_List output", "Selected contour - each pixel has depth"}
         desc = "Given a contour, convert that contour to a series of triangles"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -147,7 +147,7 @@ Public Class NR_Triangle_Mask : Inherits TaskParent
     Dim redC As New RedCloud_Basics
     Public Sub New()
         If standalone Then task.gOptions.displayDst1.Checked = True
-        labels = {"", "", "RedMask_List output", "Selected rc.mask - each pixel has depth. Red dot is maxDist."}
+        labels = {"", "", "RedFlood_List output", "Selected rc.mask - each pixel has depth. Red dot is maxDist."}
         desc = "Given a RedCloud cell, resize it and show the points with depth."
     End Sub
 

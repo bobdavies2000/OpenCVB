@@ -84,24 +84,24 @@ public:
     }
 };
 
-extern "C" __declspec(dllexport) RedMask* RedMask_Open()
+extern "C" __declspec(dllexport) RedMask* RedFlood_Open()
 {
     return new RedMask();
 }
 
-extern "C" __declspec(dllexport) int RedMask_Count(RedMask* cPtr)
+extern "C" __declspec(dllexport) int RedFlood_Count(RedMask* cPtr)
 {
     return (int)cPtr->cellRects.size();
 }
 
-extern "C" __declspec(dllexport) int* RedMask_Rects(RedMask* cPtr)
+extern "C" __declspec(dllexport) int* RedFlood_Rects(RedMask* cPtr)
 {
     return (int*)&cPtr->cellRects[0];
 }
 
-extern "C" __declspec(dllexport) int* RedMask_Close(RedMask* cPtr) { delete cPtr; return (int*)0; }
+extern "C" __declspec(dllexport) int* RedFlood_Close(RedMask* cPtr) { delete cPtr; return (int*)0; }
 extern "C" __declspec(dllexport) int*
-RedMask_Run(RedMask* cPtr, int* dataPtr, int rows, int cols, int minSize)
+RedFlood_Run(RedMask* cPtr, int* dataPtr, int rows, int cols, int minSize)
 {
     cPtr->src = Mat(rows, cols, CV_8U, dataPtr);
     cPtr->RunCPP(minSize);

@@ -23,7 +23,7 @@ Public Class NR_PyrFilter_RedCloud : Inherits TaskParent
     Dim redC As New RedCloud_Basics
     Public Sub New()
         If standalone Then task.gOptions.displayDst1.Checked = True
-        labels = {"", "", "RedMask_List output", "PyrFilter output before reduction"}
+        labels = {"", "", "RedFlood_List output", "PyrFilter output before reduction"}
         desc = "Use RedColor to segment the output of PyrFilter"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)

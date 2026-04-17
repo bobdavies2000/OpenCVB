@@ -557,7 +557,7 @@ Public Class NR_MSER_RedCloud : Inherits TaskParent
     Dim mser As New MSER_Basics
     Dim redC As New RedColor_Basics
     Public Sub New()
-        desc = "Use the MSER_Basics output as input to RedMask_List"
+        desc = "Use the MSER_Basics output as input to RedFlood_List"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         mser.Run(src)

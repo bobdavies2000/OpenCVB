@@ -171,7 +171,7 @@ Public Class NR_MatchShapes_Contours : Inherits TaskParent
     Public Sub New()
         If standalone Then task.gOptions.displayDst1.Checked = True
         OptionParent.FindSlider("Match Threshold %").Value = 3
-        labels = {"", "", "Output of RedMask_List", "All RedCloud cells that matched the selected cell with the current settings are below."}
+        labels = {"", "", "Output of RedFlood_List", "All RedCloud cells that matched the selected cell with the current settings are below."}
         desc = "Find all RedCloud contours similar to the one selected.  Use sliders and radio buttons to see impact."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)

@@ -164,7 +164,7 @@ Public Class NR_Fractal_Dimension : Inherits TaskParent
     Dim redC As New RedCloud_Basics
     Public Sub New()
         dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
-        labels = {"", "", "RedMask_List output - select any region.", "The selected region (as a square)"}
+        labels = {"", "", "RedFlood_List output - select any region.", "The selected region (as a square)"}
         desc = "Compute the fractal dimension of the provided (square) image.  Algorithm is incomplete."
     End Sub
     Public Function dimension(Input As cv.Mat) As Double

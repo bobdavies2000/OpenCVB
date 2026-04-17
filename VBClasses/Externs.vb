@@ -1030,19 +1030,19 @@ Module Externs
 
 
     <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function RedMask_Open() As IntPtr
+    Public Function RedFlood_Open() As IntPtr
     End Function
     <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function RedMask_Close(cPtr As IntPtr) As IntPtr
+    Public Function RedFlood_Close(cPtr As IntPtr) As IntPtr
     End Function
     <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function RedMask_Rects(cPtr As IntPtr) As IntPtr
+    Public Function RedFlood_Rects(cPtr As IntPtr) As IntPtr
     End Function
     <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function RedMask_Count(cPtr As IntPtr) As Integer
+    Public Function RedFlood_Count(cPtr As IntPtr) As Integer
     End Function
     <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function RedMask_Run(cPtr As IntPtr, dataPtr As IntPtr, rows As Integer, cols As Integer,
+    Public Function RedFlood_Run(cPtr As IntPtr, dataPtr As IntPtr, rows As Integer, cols As Integer,
                                            minSize As Integer) As IntPtr
     End Function
 

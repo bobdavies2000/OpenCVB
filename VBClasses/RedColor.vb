@@ -297,8 +297,8 @@ End Class
 
 Public Class NR_RedColor_List : Inherits TaskParent
     Public inputRemoved As cv.Mat
-    Public cellGen As New RedMask_ToRedColor
-    Public redMask As New NR_RedMask_Basics
+    Public cellGen As New RedFlood_ToRedColor
+    Public redMask As New NR_RedFlood_Basics
     Public rclist As New List(Of rcData)
     Public rcMap As New cv.Mat(dst2.Size, cv.MatType.CV_32S, 0)
     Public contours As New Contour_Basics

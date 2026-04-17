@@ -141,14 +141,14 @@ Public Class TaskParent : Implements IDisposable
         Return addw.dst2
     End Function
     Public Function runRedList(src As cv.Mat, ByRef label As String, removeMask As cv.Mat) As cv.Mat
-        If task.redList Is Nothing Then task.redList = New RedMask_List
+        If task.redList Is Nothing Then task.redList = New RedFlood_List
         task.redList.inputRemoved = removeMask
         task.redList.Run(src)
         label = task.redList.labels(2)
         Return task.redList.dst2
     End Function
     Public Function runRedList(src As cv.Mat, ByRef label As String) As cv.Mat
-        If task.redList Is Nothing Then task.redList = New RedMask_List
+        If task.redList Is Nothing Then task.redList = New RedFlood_List
         task.redList.Run(src)
         label = task.redList.labels(2)
         Return task.redList.dst2

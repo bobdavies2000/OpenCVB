@@ -9,7 +9,7 @@ Public Class Flood_Basics : Inherits TaskParent
     Dim lastCenters As New List(Of cv.Rect)
     Public Sub New()
         If standalone Then task.gOptions.displayDst1.Checked = True
-        cPtr = RedMask_Open()
+        cPtr = RedFlood_Open()
         desc = "Match the previous featureLess regions as best as possible."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -21,17 +21,17 @@ Public Class Flood_Basics : Inherits TaskParent
         dst1.GetArray(Of Byte)(inputData)
         Dim handleInput = GCHandle.Alloc(inputData, GCHandleType.Pinned)
 
-        imagePtr = RedMask_Run(cPtr, handleInput.AddrOfPinnedObject(), dst1.Rows, dst1.Cols, 0)
+        imagePtr = RedFlood_Run(cPtr, handleInput.AddrOfPinnedObject(), dst1.Rows, dst1.Cols, 0)
         handleInput.Free()
 
         Dim rMask = New cv.Rect(1, 1, dst1.Width, dst1.Height)
         Dim mask = cv.Mat.FromPixelData(dst1.Rows + 2, dst1.Cols + 2, cv.MatType.CV_8U, imagePtr)
         dst0 = mask(rMask).Clone
 
-        Dim classCount = RedMask_Count(cPtr)
+        Dim classCount = RedFlood_Count(cPtr)
         If classCount = 0 Then Exit Sub ' no data to process.
 
-        Dim rectData = cv.Mat.FromPixelData(classCount, 1, cv.MatType.CV_32SC4, RedMask_Rects(cPtr))
+        Dim rectData = cv.Mat.FromPixelData(classCount, 1, cv.MatType.CV_32SC4, RedFlood_Rects(cPtr))
         Dim rects(classCount - 1) As cv.Rect
         rectData.GetArray(Of cv.Rect)(rects)
 
@@ -84,7 +84,7 @@ Public Class Flood_Basics : Inherits TaskParent
         labels(2) = CStr(rcList.Count) + " cells found. "
     End Sub
     Protected Overrides Sub Finalize()
-        If cPtr <> 0 Then cPtr = RedMask_Close(cPtr)
+        If cPtr <> 0 Then cPtr = RedFlood_Close(cPtr)
     End Sub
 End Class
 

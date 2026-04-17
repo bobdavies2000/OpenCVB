@@ -1186,7 +1186,7 @@ Namespace VBClasses
         Public lpList As New List(Of lpData)
         Dim lines As New XO_Line_RawSorted
         Public Sub New()
-            desc = "Identify all lines in the RedMask_List cell boundaries"
+            desc = "Identify all lines in the RedFlood_List cell boundaries"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             dst2 = runRedList(src, labels(2))
@@ -4144,7 +4144,7 @@ Namespace VBClasses
     Public Class XO_Sides_Corner : Inherits TaskParent
         Dim sides As New XO_Contour_RedCloudCorners
         Public Sub New()
-            labels = {"", "", "RedMask_List output", ""}
+            labels = {"", "", "RedFlood_List output", ""}
             desc = "Find the 4 points farthest from the center in each quadrant of the selected RedCloud cell"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -4241,7 +4241,7 @@ Namespace VBClasses
     Public Class XO_Sides_Profile : Inherits TaskParent
         Dim sides As New Contour_SidePoints
         Public Sub New()
-            labels = {"", "", "RedMask_List Output", "Selected Cell"}
+            labels = {"", "", "RedFlood_List Output", "Selected Cell"}
             desc = "Find the 6 corners - left/right, top/bottom, front/back - of a RedCloud cell"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -9551,7 +9551,7 @@ Namespace VBClasses
         Dim contours As New Contour_Basics
         Public Sub New()
             dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
-            desc = "Run the reduced pointcloud output through the XO_RedMask_CPP algorithm."
+            desc = "Run the reduced pointcloud output through the XO_RedFlood_CPP algorithm."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             contours.Run(src)
@@ -9803,11 +9803,11 @@ Namespace VBClasses
 
     Public Class XO_RedCloud_PrepEdgesXY : Inherits TaskParent
         Dim prep As New RedPrep_Depth
-        Dim redMask As New NR_RedMask_Basics
-        Dim cellGen As New RedMask_ToRedColor
+        Dim redMask As New NR_RedFlood_Basics
+        Dim cellGen As New RedFlood_ToRedColor
         Public Sub New()
             dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
-            desc = "Run the reduced pointcloud output through the XO_RedMask_CPP algorithm."
+            desc = "Run the reduced pointcloud output through the XO_RedFlood_CPP algorithm."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             prep.Run(src)
@@ -9876,12 +9876,12 @@ Namespace VBClasses
 
     Public Class XO_RedCloud_PrepEdges_CPP : Inherits TaskParent
         Dim prep As New RedPrep_Basics
-        Dim stats As New RedMask_ToRedColor
+        Dim stats As New RedFlood_ToRedColor
         Dim redC As New RedCloud_Basics
         Public Sub New()
             OptionParent.findRadio("XY Reduction").Checked = True
             If standalone Then task.gOptions.displayDst1.Checked = True
-            desc = "Run the reduced pointcloud output through the XO_RedMask_CPP algorithm."
+            desc = "Run the reduced pointcloud output through the XO_RedFlood_CPP algorithm."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             redC.Run(src)
@@ -10521,7 +10521,7 @@ Namespace VBClasses
     Public Class XO_RedList_BProject3D : Inherits TaskParent
         Dim hcloud As New Hist3Dcloud_Basics
         Public Sub New()
-            desc = "Run RedMask_List on the output of the RGB 3D backprojection"
+            desc = "Run RedFlood_List on the output of the RGB 3D backprojection"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             hcloud.Run(src)
@@ -10652,7 +10652,7 @@ Namespace VBClasses
 
     Public Class XO_RedList_Contour : Inherits TaskParent
         Public Sub New()
-            desc = "Add the contour to the cell mask in the RedMask_List output"
+            desc = "Add the contour to the cell mask in the RedFlood_List output"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             dst3 = runRedList(src, labels(2))
@@ -10817,7 +10817,7 @@ Namespace VBClasses
     Public Class XO_RedList_NoDepth : Inherits TaskParent
         Public Sub New()
             task.fOptions.Color8USource.SelectedItem = "Reduction_Basics"
-            desc = "Run RedMask_List on just the regions with no depth."
+            desc = "Run RedFlood_List on just the regions with no depth."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             dst2 = runRedList(src, labels(2))
@@ -10852,7 +10852,7 @@ Namespace VBClasses
         Dim frames As New History_Basics
         Public Sub New()
             dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
-            desc = "Find the gaps that are different in the RedMask_List sharedResults.images.."
+            desc = "Find the gaps that are different in the RedFlood_List sharedResults.images.."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             dst2 = runRedList(src, labels(2))
@@ -11060,7 +11060,7 @@ Namespace VBClasses
     Public Class XO_RedList_KMeans : Inherits TaskParent
         Dim km As New KMeans_MultiChannel
         Public Sub New()
-            labels = {"", "", "KMeans_MultiChannel output", "RedMask_List output"}
+            labels = {"", "", "KMeans_MultiChannel output", "RedFlood_List output"}
             desc = "Use RedCloud to identify the regions created by kMeans"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -11129,8 +11129,8 @@ Namespace VBClasses
         Dim outline As New Depth_Outline
         Dim color8U As New Color8U_Basics
         Public Sub New()
-            labels(3) = "Color input to RedMask_List with depth boundary blocking color connections."
-            desc = "Use the depth outline as input to RedMask_List"
+            labels(3) = "Color input to RedFlood_List with depth boundary blocking color connections."
+            desc = "Use the depth outline as input to RedFlood_List"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             outline.Run(task.depthmask)
@@ -11152,7 +11152,7 @@ Namespace VBClasses
         Dim tiers As New Depth_Tiers
         Dim binar4 As New Bin4Way_Regions
         Public Sub New()
-            desc = "Add the depth tiers to the input for RedMask_List."
+            desc = "Add the depth tiers to the input for RedFlood_List."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             tiers.Run(src)
@@ -11663,7 +11663,7 @@ Namespace VBClasses
         Public bgSub As New BGSubtract_MOG2
         Dim rectList As New List(Of cv.Rect)
         Public Sub New()
-            task.redList = New RedMask_List
+            task.redList = New RedFlood_List
             dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
             desc = "The option-free version of Motion_BGSub"
         End Sub
@@ -12562,8 +12562,8 @@ Namespace VBClasses
 
     Public Class XO_Flood_BasicsMaskOld : Inherits TaskParent
         Public inputRemoved As cv.Mat
-        Public cellGen As New RedMask_ToRedColor
-        Dim redMask As New NR_RedMask_Basics
+        Public cellGen As New RedFlood_ToRedColor
+        Dim redMask As New NR_RedFlood_Basics
         Public buildinputRemoved As Boolean
         Public showSelected As Boolean = True
         Dim color8U As New Color8U_Basics
@@ -15738,10 +15738,10 @@ Namespace VBClasses
 
 
 
-    Public Class XO_RedMask_Flippers : Inherits TaskParent
+    Public Class XO_RedFlood_Flippers : Inherits TaskParent
         Public flipCells As New List(Of rcData)
         Public nonFlipCells As New List(Of rcData)
-        Dim redMask As New NR_RedMask_Basics
+        Dim redMask As New NR_RedFlood_Basics
         Public Sub New()
             If standalone Then task.gOptions.displayDst1.Checked = True
             labels(3) = "Highlighted below are the cells which flipped in color from the previous frame."
@@ -15753,7 +15753,7 @@ Namespace VBClasses
             redMask.Run(src)
             labels(3) = redMask.labels(2)
 
-            Static lastMap As cv.Mat = RedMask_List.DisplayCells(redMask.mdList)
+            Static lastMap As cv.Mat = RedFlood_List.DisplayCells(redMask.mdList)
 
             Dim unMatched As Integer
             Dim unMatchedPixels As Integer
@@ -15793,7 +15793,7 @@ Namespace VBClasses
 
 
     Public Class XO_RedList_FlipTest : Inherits TaskParent
-        Dim flipper As New XO_RedMask_Flippers
+        Dim flipper As New XO_RedFlood_Flippers
         Public Sub New()
             desc = "Display nonFlipped cells"
         End Sub
@@ -15834,8 +15834,8 @@ Namespace VBClasses
 
     Public Class XO_RedList_BasicsNew : Inherits TaskParent
         Public inputRemoved As cv.Mat
-        Public cellGen As New RedMask_ToRedColor
-        Public redMask As New NR_RedMask_Basics
+        Public cellGen As New RedFlood_ToRedColor
+        Public redMask As New NR_RedFlood_Basics
         Public rclist As New List(Of rcData)
         Public rcMap As cv.Mat ' redColor map 
         Public contours As New Contour_Basics
@@ -17108,8 +17108,8 @@ Namespace VBClasses
 
     Public Class XO_RedList_Basics : Inherits TaskParent
         Public inputRemoved As cv.Mat
-        Public cellGen As New RedMask_ToRedColor
-        Public redMask As New NR_RedMask_Basics
+        Public cellGen As New RedFlood_ToRedColor
+        Public redMask As New NR_RedFlood_Basics
         Public rclist As New List(Of rcData)
         Public rcMap As cv.Mat ' redColor map 
         Public contours As New Contour_Basics
@@ -17478,14 +17478,14 @@ Namespace VBClasses
 
     Public Class XO_GuidedBP_RedCloud : Inherits TaskParent
         Dim guide As New GuidedBP_MultiSlice
-        Public redCx As New RedMask_List
-        Public redCy As New RedMask_List
+        Public redCx As New RedFlood_List
+        Public redCy As New RedFlood_List
         Public rcListX As New List(Of rcData)
         Public rcListY As New List(Of rcData)
         Public rcMapX As New cv.Mat
         Public rcMapY As New cv.Mat
         Public Sub New()
-            task.redList = New RedMask_List
+            task.redList = New RedFlood_List
             desc = "Identify each segment in the X and Y point cloud data"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -18012,7 +18012,7 @@ Namespace VBClasses
     Public Class XO_RedList_OnlyColorHist3D : Inherits TaskParent
         Dim hColor As New Hist3Dcolor_Basics
         Public Sub New()
-            desc = "Use the backprojection of the 3D RGB histogram as input to RedMask_List."
+            desc = "Use the backprojection of the 3D RGB histogram as input to RedFlood_List."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             runRedList(src, labels(3))
@@ -18928,7 +18928,7 @@ Namespace VBClasses
 
 
     Public Class XO_Region_Contours : Inherits TaskParent
-        Public redM As New NR_RedMask_Basics
+        Public redM As New NR_RedFlood_Basics
         Public connect As New Region_Rects
         Public Sub New()
             dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
@@ -19011,7 +19011,7 @@ Namespace VBClasses
 
 
     Public Class XO_FeatureLess_Groups : Inherits TaskParent
-        Dim redCPP As New XO_RedMask_CPP
+        Dim redCPP As New XO_RedFlood_CPP
         Public classCount As Integer
         Dim fLess As New FeatureLess_Correlation
         Public Sub New()
@@ -19640,13 +19640,13 @@ Namespace VBClasses
 
 
 
-    Public Class XO_RedMask_CPP : Inherits TaskParent
+    Public Class XO_RedFlood_CPP : Inherits TaskParent
         Implements IDisposable
         Public classCount As Integer
         Public rectList As New List(Of cv.Rect)
         Public identifyCount As Integer = 255
         Public Sub New()
-            cPtr = RedMask_Open()
+            cPtr = RedFlood_Open()
             desc = "Run the C++ RedCloud Interface With Or without a mask"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -19656,15 +19656,15 @@ Namespace VBClasses
             dst1.GetArray(Of Byte)(inputData)
             Dim handleInput = GCHandle.Alloc(inputData, GCHandleType.Pinned)
 
-            Dim imagePtr = RedMask_Run(cPtr, handleInput.AddrOfPinnedObject(), dst1.Rows, dst1.Cols, 0)
+            Dim imagePtr = RedFlood_Run(cPtr, handleInput.AddrOfPinnedObject(), dst1.Rows, dst1.Cols, 0)
             handleInput.Free()
             dst2 = cv.Mat.FromPixelData(dst1.Rows + 2, dst1.Cols + 2, cv.MatType.CV_8U, imagePtr).Clone
             dst2 = dst2(New cv.Rect(1, 1, dst2.Width - 2, dst2.Height - 2))
 
-            classCount = Math.Min(RedMask_Count(cPtr), identifyCount * 2)
+            classCount = Math.Min(RedFlood_Count(cPtr), identifyCount * 2)
             If classCount = 0 Then Exit Sub ' no data to process.
 
-            Dim rectData = cv.Mat.FromPixelData(classCount, 1, cv.MatType.CV_32SC4, RedMask_Rects(cPtr))
+            Dim rectData = cv.Mat.FromPixelData(classCount, 1, cv.MatType.CV_32SC4, RedFlood_Rects(cPtr))
             Dim rects(classCount - 1) As cv.Rect
             rectData.GetArray(Of cv.Rect)(rects)
 
@@ -19675,7 +19675,7 @@ Namespace VBClasses
             labels(3) = "Palette version of the data In dst2 With " + CStr(classCount) + " regions."
         End Sub
         Protected Overrides Sub Finalize()
-            If cPtr <> 0 Then cPtr = RedMask_Close(cPtr)
+            If cPtr <> 0 Then cPtr = RedFlood_Close(cPtr)
         End Sub
     End Class
 End Namespace
