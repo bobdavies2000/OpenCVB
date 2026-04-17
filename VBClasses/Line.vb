@@ -1452,17 +1452,19 @@ End Class
 
 Public Class Line_RedFlood : Inherits TaskParent
     Dim edges As New Edge_Basics
-    Dim redFlood As New RedFlood_Basics
+    Dim flood As New Flood_BasicsMask
     Public Sub New()
-        desc = "Use the edges as input to RedFlood."
+        flood.showSelected = False
+        desc = "Use the edges as input to flood."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         edges.Run(task.gray)
         dst3 = edges.dst2
         labels(3) = edges.labels(2)
 
-        redFlood.Run(dst2)
-        dst2 = redFlood.dst2
-        labels(2) = redFlood.labels(2)
+        flood.inputRemoved = Not dst3
+        flood.Run(dst3)
+        dst2 = flood.dst2
+        labels(2) = flood.labels(2)
     End Sub
 End Class
