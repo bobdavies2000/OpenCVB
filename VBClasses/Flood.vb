@@ -8,29 +8,30 @@ Public Class Flood_Basics : Inherits TaskParent
     Public fLess As New FeatureLess_Stabilized
     Dim lastCenters As New List(Of cv.Rect)
     Public Sub New()
-        cPtr = RedCloudFill_Open()
+        If standalone Then task.gOptions.displayDst1.Checked = True
+        cPtr = RedMask_Open()
         desc = "Match the previous featureLess regions as best as possible."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         fLess.Run(task.gray.Clone)
-        src = fLess.dst2
+        dst1 = fLess.dst2
 
         Dim imagePtr As IntPtr
-        Dim inputData(src.Total - 1) As Byte
-        src.GetArray(Of Byte)(inputData)
+        Dim inputData(dst1.Total - 1) As Byte
+        dst1.GetArray(Of Byte)(inputData)
         Dim handleInput = GCHandle.Alloc(inputData, GCHandleType.Pinned)
 
-        imagePtr = RedCloudFill_Run(cPtr, handleInput.AddrOfPinnedObject(), src.Rows, src.Cols)
+        imagePtr = RedMask_Run(cPtr, handleInput.AddrOfPinnedObject(), dst1.Rows, dst1.Cols, 0)
         handleInput.Free()
 
-        Dim rMask = New cv.Rect(1, 1, src.Width, src.Height)
-        Dim mask = cv.Mat.FromPixelData(src.Rows + 2, src.Cols + 2, cv.MatType.CV_8U, imagePtr)
+        Dim rMask = New cv.Rect(1, 1, dst1.Width, dst1.Height)
+        Dim mask = cv.Mat.FromPixelData(dst1.Rows + 2, dst1.Cols + 2, cv.MatType.CV_8U, imagePtr)
         dst0 = mask(rMask).Clone
 
-        Dim classCount = RedCloudFill_Count(cPtr)
+        Dim classCount = RedMask_Count(cPtr)
         If classCount = 0 Then Exit Sub ' no data to process.
 
-        Dim rectData = cv.Mat.FromPixelData(classCount, 1, cv.MatType.CV_32SC4, RedCloudFill_Rects(cPtr))
+        Dim rectData = cv.Mat.FromPixelData(classCount, 1, cv.MatType.CV_32SC4, RedMask_Rects(cPtr))
         Dim rects(classCount - 1) As cv.Rect
         rectData.GetArray(Of cv.Rect)(rects)
 
@@ -83,7 +84,7 @@ Public Class Flood_Basics : Inherits TaskParent
         labels(2) = CStr(rcList.Count) + " cells found. "
     End Sub
     Protected Overrides Sub Finalize()
-        If cPtr <> 0 Then cPtr = RedCloudFill_Close(cPtr)
+        If cPtr <> 0 Then cPtr = RedMask_Close(cPtr)
     End Sub
 End Class
 
@@ -227,6 +228,7 @@ Public Class Flood_Edges : Inherits TaskParent
 
         Static rcIndex As Integer
         dst1.SetTo(0)
+        If rcIndex >= rcList.Count Then rcIndex = 0
         Dim rc = rcList(rcIndex)
         dst1(rc.rect).SetTo(rc.color, rc.mask)
         If task.heartBeatLT Then
