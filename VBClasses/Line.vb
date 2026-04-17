@@ -1452,7 +1452,7 @@ End Class
 
 Public Class Line_RedFlood : Inherits TaskParent
     Dim edges As New Edge_Basics
-    Dim redFlood As New NR_Flood_SimpleRedColor
+    Dim redFlood As New RedFlood_Basics
     Public Sub New()
         desc = "Use the edges as input to RedFlood."
     End Sub

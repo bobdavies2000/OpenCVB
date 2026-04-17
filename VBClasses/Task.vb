@@ -264,16 +264,17 @@ Public Class AlgorithmTask : Implements IDisposable
         If task.gOptions.displayDst1.Checked = False Then labels(1) = task.depthAndDepthRange.Replace(vbCrLf, "")
     End Sub
     Private Sub pixelViewerOrGIFProcessing(src As cv.Mat, dst1 As cv.Mat, dst2 As cv.Mat, dst3 As cv.Mat)
-        If PixelViewer IsNot Nothing Then
-            PixelViewer.viewerForm.Visible = True
-            PixelViewer.viewerForm.Show()
-            PixelViewer.dst0Input = src
-            PixelViewer.dst1Input = dst1
-            PixelViewer.dst2Input = dst2
-            PixelViewer.dst3Input = dst3
-            PixelViewer.Run(src)
+        If vbc.task.pixelViewerOn Then
+            If PixelViewer IsNot Nothing Then
+                PixelViewer.viewerForm.Visible = True
+                PixelViewer.viewerForm.Show()
+                PixelViewer.dst0Input = src
+                PixelViewer.dst1Input = dst1
+                PixelViewer.dst2Input = dst2
+                PixelViewer.dst3Input = dst3
+                PixelViewer.Run(src)
+            End If
         End If
-
         If gifCreator IsNot Nothing Then gifCreator.createNextGifImage()
 
         optionsChanged = False
