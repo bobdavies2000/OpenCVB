@@ -441,12 +441,14 @@ LeftRight_Stable
 Line_Basics_TA
 Line_BasicsNoMotion
 Line_BasicsNoMotion1
+Line_Brick
 Line_BrickList
 Line_BrickListTest
 Line_DepthHistogram
 Line_EdgeLine
 Line_EdgeLineCompare
 Line_Finder
+Line_Finder1
 Line_FinderPlus
 Line_FindSimple
 Line_Intersection

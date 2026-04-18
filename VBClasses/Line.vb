@@ -1385,12 +1385,85 @@ End Class
 
 
 
+Public Class Line_RedFlood : Inherits TaskParent
+    Dim edges As New Edge_Basics
+    Dim flood As New Flood_BasicsMask
+    Public Sub New()
+        flood.showSelected = False
+        desc = "Use the edges as input to flood."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        edges.Run(task.gray)
+        dst3 = edges.dst2
+        labels(3) = edges.labels(2)
 
-Public Class Line_Finder : Inherits TaskParent
+        flood.inputRemoved = Not dst3
+        flood.Run(dst3)
+        dst2 = flood.dst2
+        labels(2) = flood.labels(2)
+    End Sub
+End Class
+
+
+
+
+
+
+'Public Class Line_Basics : Inherits TaskParent
+'    Dim lpList As New List(Of lpData)
+'    Public Sub New()
+'        labels(2) = "The top 10 lines in the latest image."
+'        desc = "Find the top 10 lines and track them until they are lost then run Line_Basics_TA again."
+'    End Sub
+'    Public Overrides Sub RunAlg(src As cv.Mat)
+'        dst2 = src
+
+'        If lpList.Count < 2 Then
+'            For i = 0 To Math.Min(10, task.lines.lpList.Count) - 1
+'                lpList.Add(task.lines.lpList(i))
+'            Next
+'        End If
+
+'        For Each lp In lpList
+'            dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth + 2)
+'        Next
+'    End Sub
+'End Class
+
+
+
+
+
+
+Public Class Line_Brick : Inherits TaskParent
+    Dim lpList As New List(Of lpData)
+    Public Sub New()
+        desc = "Find the bricks that clearly have lines"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        dst2 = src
+
+        If lpList.Count < 2 Then
+            For i = 0 To Math.Min(10, task.lines.lpList.Count) - 1
+                lpList.Add(task.lines.lpList(i))
+            Next
+        End If
+
+        For Each lp In lpList
+            dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth + 2)
+        Next
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Line_Finder1 : Inherits TaskParent
     Dim edges As New Edge_Basics
     Dim side As Integer
     Dim pixels(side * side) As cv.Point
-    Dim pNothing As New cv.Point(-1, -1)
     Public Sub New()
         side = task.gOptions.GridSlider.Value
         ReDim pixels(side * side)
@@ -1450,47 +1523,164 @@ End Class
 
 
 
-Public Class Line_RedFlood : Inherits TaskParent
+
+Public Class Line_Finder : Inherits TaskParent
     Dim edges As New Edge_Basics
-    Dim flood As New Flood_BasicsMask
+    Dim side As Integer
+    Dim pixels(side * side) As cv.Point
+    Dim sortX As New SortedList(Of Integer, cv.Point)(New compareAllowIdenticalInteger)
     Public Sub New()
-        flood.showSelected = False
-        desc = "Use the edges as input to flood."
+        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        side = task.gOptions.GridSlider.Value
+        ReDim pixels(side * side)
+        desc = "Find only the bricks containing what are clearly lines."
     End Sub
+    Public Function findLines1(pixels() As cv.Point) As List(Of cv.Point)
+        Dim ptList As New List(Of cv.Point)
+        Dim ordered As Boolean = True
+        For i = 1 To pixels.Count - 1
+            If Math.Abs(pixels(i).Y - pixels(i - 1).Y) > 1 Then
+                ordered = False
+                Exit For
+            End If
+        Next
+
+        If ordered Then
+            sortX.Clear()
+            For Each pt In pixels
+                sortX.Add(pt.X, pt)
+            Next
+
+            Dim p1 = sortX.Values(0)
+            For i = 1 To sortX.Values.Count - 1
+                Dim p2 = sortX.Values(i)
+                If Math.Abs(p1.X - p2.X) <= 1 Then
+                    ptList.Add(p1)
+                Else
+                    If ptList.Count >= side / 2 Then Exit For
+                End If
+                p1 = sortX.Values(i)
+            Next
+        End If
+
+        Return ptList
+    End Function
+    Public Function findLines2(pixels() As cv.Point) As List(Of cv.Point)
+        Dim ptList As New List(Of cv.Point)
+        Dim ordered As Boolean = True
+        For i = 1 To pixels.Count - 1
+            If Math.Abs(pixels(i).Y - pixels(i - 1).Y) > 1 Then
+                ordered = False
+                Exit For
+            End If
+        Next
+
+        If ordered Then
+            sortX.Clear()
+            For Each pt In pixels
+                sortX.Add(pt.X, pt)
+            Next
+            For i = 1 To sortX.Values.Count - 1
+                If Math.Abs(sortX.Values(i).X - sortX.Values(i - 1).X) <= 1 Then
+                    If ptList.Contains(sortX.Values(i - 1)) = False Then ptList.Add(sortX.Values(i - 1))
+                    ptList.Add(sortX.Values(i))
+                Else
+                    If ptList.Count >= side / 2 Then Exit For
+                End If
+            Next
+        End If
+
+        Return ptList
+    End Function
+    Public Function findLines3(pixels() As cv.Point) As List(Of cv.Point)
+        Dim ptList As New List(Of cv.Point)
+        Dim ordered As Boolean = True
+        Dim minX As Integer, maxX As Integer, minY = pixels(0).Y, maxY = pixels.Last.Y
+        For i = 1 To pixels.Count - 1
+            If Math.Abs(pixels(i).Y - pixels(i - 1).Y) > 1 Then
+                ordered = False
+                Exit For
+            End If
+        Next
+
+        If ordered Then
+            sortX.Clear()
+            For Each pt In pixels
+                sortX.Add(pt.X, pt)
+            Next
+            minX = sortX.Values(0).X
+            maxX = sortX.Values.Last.X
+
+            ptList.Add(sortX.Values(0))
+            For i = 1 To sortX.Values.Count - 1
+                If Math.Abs(sortX.Values(i).X - sortX.Values(i - 1).X) > 1 Then
+                    ordered = False
+                    ptList.Clear()
+                    Exit For
+                Else
+                    ptList.Add(sortX.Values(i))
+                End If
+            Next
+        End If
+
+        Return ptList
+    End Function
+    Public Function findLines(pixels() As cv.Point) As lpData
+        Dim ordered As Boolean = True
+        Dim minX As Integer, maxX As Integer, minY = pixels(0).Y, maxY = pixels.Last.Y
+        For i = 1 To pixels.Count - 1
+            If Math.Abs(pixels(i).Y - pixels(i - 1).Y) > 1 Then
+                ordered = False
+                Exit For
+            End If
+        Next
+
+        If ordered Then
+            sortX.Clear()
+            For Each pt In pixels
+                sortX.Add(pt.X, pt)
+            Next
+            minX = sortX.Values(0).X
+            maxX = sortX.Values.Last.X
+
+            For i = 1 To sortX.Values.Count - 1
+                If Math.Abs(sortX.Values(i).X - sortX.Values(i - 1).X) > 1 Then
+                    ordered = False
+                    Exit For
+                End If
+            Next
+        End If
+
+        If ordered = False Then Return Nothing
+        Return New lpData(New cv.Point(minX, minY), New cv.Point(maxX, maxY))
+    End Function
+
     Public Overrides Sub RunAlg(src As cv.Mat)
         edges.Run(task.gray)
-        dst3 = edges.dst2
-        labels(3) = edges.labels(2)
+        dst1 = edges.dst2
+        labels(2) = edges.labels(2)
 
-        flood.inputRemoved = Not dst3
-        flood.Run(dst3)
-        dst2 = flood.dst2
-        labels(2) = flood.labels(2)
+        dst2.SetTo(0)
+        Dim maxPixels = side * 1.5
+        For i = 0 To task.gridRects.Count - 1
+            Dim r = task.gridRects(i)
+
+            Dim pixelCount = dst1(r).CountNonZero
+            If pixelCount = 0 Or pixelCount > maxPixels Then Continue For
+            If pixelCount < side Then Continue For
+
+            Dim pixelMat = dst1(r).FindNonZero
+
+            pixelMat.GetArray(Of cv.Point)(pixels)
+
+            Dim lp = findLines(pixels)
+
+            ' use this line for debugging...
+            If task.drawRect.Contains(r.TopLeft) Then Dim k = 0
+
+            If lp IsNot Nothing Then
+                dst2(r).Line(lp.p1, lp.p2, 255, task.lineWidth)
+            End If
+        Next
     End Sub
 End Class
-
-
-
-
-
-
-'Public Class Line_Basics : Inherits TaskParent
-'    Dim lpList As New List(Of lpData)
-'    Public Sub New()
-'        labels(2) = "The top 10 lines in the latest image."
-'        desc = "Find the top 10 lines and track them until they are lost then run Line_Basics_TA again."
-'    End Sub
-'    Public Overrides Sub RunAlg(src As cv.Mat)
-'        dst2 = src
-
-'        If lpList.Count < 2 Then
-'            For i = 0 To Math.Min(10, task.lines.lpList.Count) - 1
-'                lpList.Add(task.lines.lpList(i))
-'            Next
-'        End If
-
-'        For Each lp In lpList
-'            dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth + 2)
-'        Next
-'    End Sub
-'End Class
