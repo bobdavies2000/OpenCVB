@@ -1111,3 +1111,48 @@ Public Class Brick_Plot : Inherits TaskParent
         End If
     End Sub
 End Class
+
+
+
+
+
+Public Class Brick_Search : Inherits TaskParent
+    Dim lpList As New List(Of lpData)
+    Public Sub New()
+        task.fOptions.MatchCorrSlider.Value = 0.8
+        desc = "Search the previous image for the endpoints of the top 10 lines."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        Static lastImage As cv.Mat = task.gray.Clone
+        Dim searchArea As cv.Mat
+        Dim mm1 As mmData
+        Dim mm2 As mmData
+        lpList.Clear()
+        dst2 = src.Clone
+        Dim corrThreshold = task.fOptions.MatchCorrSlider.Value
+        For i = 0 To Math.Min(10, task.lines.lpList.Count) - 1
+            Dim lp = task.lines.lpList(i)
+            Dim rect1 = task.gridNabeRects(lp.p1GridIndex)
+            searchArea = lastImage(rect1)
+            cv.Cv2.MatchTemplate(searchArea, task.gray(task.gridRects(lp.p1GridIndex)), dst1,
+                                 cv.TemplateMatchModes.CCoeffNormed)
+            mm1 = GetMinMax(dst1)
+
+            If mm1.maxVal > corrThreshold Then
+                Dim rect2 = task.gridNabeRects(lp.p2GridIndex)
+                searchArea = lastImage(rect2)
+                cv.Cv2.MatchTemplate(searchArea, task.gray(task.gridRects(lp.p2GridIndex)), dst1,
+                                     cv.TemplateMatchModes.CCoeffNormed)
+                mm2 = GetMinMax(dst1)
+
+                If mm2.maxVal > corrThreshold Then
+                    lp = New lpData(mm1.maxLoc, mm2.maxLoc)
+                    lpList.Add(lp)
+                    dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth + 2)
+                End If
+            End If
+        Next
+
+        lastImage = task.gray.Clone
+    End Sub
+End Class

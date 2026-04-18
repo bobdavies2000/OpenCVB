@@ -187,17 +187,3 @@ Public Class LineMatch_Slices : Inherits TaskParent
         lpMapLast = task.lines.dst1.Clone
     End Sub
 End Class
-
-
-
-
-
-
-Public Class NR_LineMatch_Correlation : Inherits TaskParent
-    Public Sub New()
-        desc = "Compute the correlation of the lpData.rect for the current and previous line."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-    End Sub
-End Class
-

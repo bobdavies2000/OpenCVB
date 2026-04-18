@@ -60,6 +60,7 @@ Brick_LeftRight
 Brick_LeftRightMouse
 Brick_Plot
 Brick_Ranges
+Brick_Search
 Brick_Variability
 BrickLine_Basics
 BrickLine_DepthGap
@@ -1143,7 +1144,6 @@ NR_Line3D_Longest
 NR_LinearRegression_Random
 NR_LinearRegression_Test
 NR_LineEnds_Concat
-NR_LineMatch_Correlation
 NR_LineMatch_Tester
 NR_LineMatch_XYOffsets
 NR_LineRect_CenterNeighbor

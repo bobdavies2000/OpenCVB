@@ -1468,3 +1468,29 @@ Public Class Line_RedFlood : Inherits TaskParent
         labels(2) = flood.labels(2)
     End Sub
 End Class
+
+
+
+
+
+
+'Public Class Line_Basics : Inherits TaskParent
+'    Dim lpList As New List(Of lpData)
+'    Public Sub New()
+'        labels(2) = "The top 10 lines in the latest image."
+'        desc = "Find the top 10 lines and track them until they are lost then run Line_Basics_TA again."
+'    End Sub
+'    Public Overrides Sub RunAlg(src As cv.Mat)
+'        dst2 = src
+
+'        If lpList.Count < 2 Then
+'            For i = 0 To Math.Min(10, task.lines.lpList.Count) - 1
+'                lpList.Add(task.lines.lpList(i))
+'            Next
+'        End If
+
+'        For Each lp In lpList
+'            dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth + 2)
+'        Next
+'    End Sub
+'End Class
