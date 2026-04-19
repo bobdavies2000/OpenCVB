@@ -145,8 +145,6 @@ Public Class AlgorithmTask : Implements IDisposable
             motion.Run(gray)
         End If
 
-        If feat IsNot Nothing Then feat.Run(src)
-
         If vbc.task.pixelViewerOn Then
             If vbc.task.PixelViewer Is Nothing Then
                 vbc.task.PixelViewer = New PixelViewer.Pixel_Viewer

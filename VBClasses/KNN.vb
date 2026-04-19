@@ -938,7 +938,7 @@ Public Class KNN_MinDistance : Inherits TaskParent
     Public outputPoints2f As New List(Of cv.Point2f)
     Public outputPoints As New List(Of cv.Point)
     Dim options As New Options_Features
-    Dim feat As New Feature_General
+    Dim feat As New Feature_Basics
     Public Sub New()
         If standalone Then task.fOptions.FeatureMethod.SelectedItem = "AGAST"
         desc = "Enforce a minimum distance to the next feature threshold"

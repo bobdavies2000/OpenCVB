@@ -6867,7 +6867,7 @@ Namespace VBClasses
     Public Class XO_FPoly_TopFeatures : Inherits TaskParent
         Public stable As New StableLine_BasicsCount
         Public options As New Options_FPoly
-        Dim feat As New Feature_General
+        Dim feat As New Feature_Basics
         Public topFeatures As New List(Of cv.Point2f)
         Public Sub New()
             desc = "Get the top features and validate them using Delaunay regions."
@@ -8901,7 +8901,7 @@ Namespace VBClasses
 
 
     Public Class XO_Motion_TopFeatureFail : Inherits TaskParent
-        Dim features As New Feature_General
+        Dim features As New Feature_Basics
         Public featureRects As New List(Of cv.Rect)
         Public searchRects As New List(Of cv.Rect)
         Dim match As New Match_Basics
@@ -14180,8 +14180,6 @@ Namespace VBClasses
     Public Class XO_Line_BrickPoints : Inherits TaskParent
         Public sortLines As New SortedList(Of Integer, Integer)(New compareAllowIdenticalInteger)
         Public Sub New()
-            If task.feat Is Nothing Then task.feat = New Feature_Basics
-            If task.feat Is Nothing Then task.feat = New Feature_Basics
             desc = "Assign grid square points to each of the lines"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -15286,7 +15284,7 @@ Namespace VBClasses
         Dim lastImage As cv.Mat
         Dim dotSlider As TrackBar
         Dim options As New Options_KNN
-        Dim feat As New Feature_General
+        Dim feat As New Feature_Basics
         Public Sub New()
             task.fOptions.FeatureSampleSize.Value = 200
             dotSlider = OptionParent.FindSlider("Average distance multiplier")
@@ -18082,7 +18080,7 @@ Namespace VBClasses
 
 
     Public Class XO_Feature_GridPopulation : Inherits TaskParent
-        Dim feat As New Feature_General
+        Dim feat As New Feature_Basics
         Public Sub New()
             dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
             labels(3) = "Click 'Show grid mask overlay' to see grid boundaries."

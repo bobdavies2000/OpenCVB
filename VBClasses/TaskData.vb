@@ -27,7 +27,7 @@ Partial Public Class AlgorithmTask
 
     Public depthmask As cv.Mat
     Public noDepthMask As cv.Mat
-    Public foregroundMat As cv.Mat
+    Public foregroundMask As cv.Mat
     Public fLessMask As cv.Mat
 
     Public firstPass As Boolean = True
@@ -106,8 +106,6 @@ Partial Public Class AlgorithmTask
     Public colorDiffThreshold As Integer
 
     Public motionLinkType As Integer = 8
-
-    Public feat As Feature_Basics
 
     Public fpList As New List(Of fpData)
     Public featList As New List(Of List(Of Integer))

@@ -381,7 +381,7 @@ Namespace VBClasses
 
 
     Public Class FeatureLess_Not : Inherits TaskParent
-        Dim feat As New Feature_General
+        Dim feat As New Feature_Basics
         Dim fLess As New FeatureLess_Correlation
         Public Sub New()
             desc = "Use the FeatureLess mask to reduce the input to feature searches."

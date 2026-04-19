@@ -184,7 +184,7 @@ End Class
 
 Public Class FCS_CreateList : Inherits TaskParent
     Dim subdiv As New cv.Subdiv2D
-    Dim feat As New Feature_General
+    Dim feat As New Feature_Basics
     Dim bricks As New Brick_Basics
     Public Sub New()
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
@@ -617,41 +617,6 @@ Public Class FCS_Info : Inherits TaskParent
         If standalone Then SetTrueText(strOut, 3)
     End Sub
 End Class
-
-
-
-
-
-
-
-
-'Public Class FCS_RedCloud : Inherits TaskParent
-'    Dim redCombo As New RedList_Basics
-'    Dim fcs As New FCS_CreateList
-'    Dim knnMin As New KNN_MinDistance
-'    Public Sub New()
-'        desc = "Use the RedCloud maxDist points as feature points in an FCS display."
-'    End Sub
-'    Public Overrides Sub RunAlg(src As cv.Mat)
-'        redCombo.Run(src)
-'        dst3 = redCombo.dst2
-'        labels(2) = redCombo.labels(2)
-
-'        knnMin.inputPoints.Clear()
-'        For Each rc In task.redList.rcList
-'            knnMin.inputPoints.Add(rc.maxDist)
-'        Next
-'        knnMin.Run(src)
-
-'        task.features = New List(Of cv.Point2f)(knnMin.outputPoints2f)
-'        fcs.Run(src)
-'        dst2 = task.feat.fcs.dst2
-'        FCS_Basics.fpDSet()
-'        labels(3) = fcs.labels(2)
-'    End Sub
-'End Class
-
-
 
 
 

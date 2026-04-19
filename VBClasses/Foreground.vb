@@ -31,8 +31,8 @@ Public Class Foreground_Basics_TA : Inherits TaskParent
             Next
         End If
 
-        task.foregroundMat = task.pcSplit(2).Threshold(foregroundMaxDepth, 255, cv.ThresholdTypes.BinaryInv)
-        task.foregroundMat.SetTo(0, task.noDepthMask)
+        task.foregroundMask = task.pcSplit(2).Threshold(foregroundMaxDepth, 255, cv.ThresholdTypes.BinaryInv).ConvertScaleAbs
+        task.foregroundMask.SetTo(0, task.noDepthMask)
 
         labels(2) = "Foreground is defined as anything closer that " + Format(foregroundMaxDepth, fmt1) + " meters"
     End Sub

@@ -240,8 +240,8 @@ FCS_Motion
 FCS_Periphery
 FCS_StablePoints
 Feature_Basics
+Feature_Bricks
 Feature_Delaunay
-Feature_General
 Feature_KNN
 Feature_NoMotion
 Feature_Stable

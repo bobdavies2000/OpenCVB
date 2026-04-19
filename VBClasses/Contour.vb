@@ -130,8 +130,8 @@ End Class
 
 Public Class NR_Contour_Features : Inherits TaskParent
     Dim contours As New Contour_Basics
+    Dim feat As New Feature_Bricks
     Public Sub New()
-        If task.feat Is Nothing Then task.feat = New Feature_Basics
         labels(3) = "Each of the feature points with their correlation coefficien"
         desc = "Show contours and features"
     End Sub
@@ -150,11 +150,13 @@ Public Class NR_Contour_Features : Inherits TaskParent
         Return correlationMat.Get(Of Single)(0, 0)
     End Function
     Public Overrides Sub RunAlg(src As cv.Mat)
+        feat.Run(task.gray)
+
         contours.Run(src)
         dst2 = contours.dst2
 
         dst3.SetTo(0)
-        For Each pt In task.feat.features
+        For Each pt In feat.features
             DrawCircle(dst2, pt)
             DrawCircle(dst3, pt)
             Dim rect = task.gridRects(task.gridMap.Get(Of Integer)(pt.Y, pt.X))
@@ -162,7 +164,7 @@ Public Class NR_Contour_Features : Inherits TaskParent
             SetTrueText(Format(correlation, fmt1), pt, 3)
         Next
         labels(2) = "There are " + CStr(contours.contourList.Count) + " contours and " +
-                        CStr(task.feat.features.Count) + " features."
+                        CStr(feat.features.Count) + " features."
     End Sub
 End Class
 

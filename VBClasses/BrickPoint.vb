@@ -551,19 +551,21 @@ End Class
 
 Public Class NR_BrickPoint_Features : Inherits TaskParent
     Dim bricks As New Brick_Basics
+    Dim feat As New Feature_Bricks
     Public featureBricks As New List(Of cv.Rect)
     Public Sub New()
         task.gOptions.LineWidth.Value = 3
-        If task.feat Is Nothing Then task.feat = New Feature_Basics
         labels(3) = "Featureless areas"
         desc = "Identify the cells with features"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
+        feat.Run(src)
+        dst2 = feat.dst2
+
         bricks.Run(src)
-        dst2 = task.feat.dst2
 
         featureBricks.Clear()
-        Dim featList As New List(Of cv.Point)(task.feat.features)
+        Dim featList As New List(Of cv.Point)(feat.features)
         For Each pt In featList
             Dim index As Integer = task.gridMap.Get(Of Integer)(pt.Y, pt.X)
             featureBricks.Add(task.gridRects(index))
