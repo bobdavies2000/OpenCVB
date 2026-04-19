@@ -394,7 +394,7 @@ End Class
 
 
 Public Class NR_Contour_Foreground : Inherits TaskParent
-    Dim km As New Foreground_KMeans
+    Dim km As New NR_Foreground_KMeans
     Dim contour As New Contour_Regions
     Public Sub New()
         dst3 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))

@@ -1579,13 +1579,14 @@ Public Class Histogram_Depth : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If src.Rows <= 0 Then Exit Sub
+        If src.Type <> cv.MatType.CV_32F Then src = task.pcSplit(2)
+
         plotHist.minRange = 0
         plotHist.maxRange = task.MaxZmeters
         If rc IsNot Nothing Then
             If rc.index = 0 Then Exit Sub
-            src = task.pcSplit(2)(rc.rect).Clone
+            src = src(rc.rect).Clone
         Else
-            If src.Type <> cv.MatType.CV_32F Then src = task.pcSplit(2)
             mm = GetMinMax(src)
             If mm.minVal >= mm.maxVal Then Exit Sub
             plotHist.minRange = mm.minVal ' because OpenCV's histogram makes the ranges exclusive.

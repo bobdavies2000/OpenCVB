@@ -27,6 +27,7 @@ Partial Public Class AlgorithmTask
 
     Public depthmask As cv.Mat
     Public noDepthMask As cv.Mat
+    Public foregroundMat As cv.Mat
     Public fLessMask As cv.Mat
 
     Public firstPass As Boolean = True
@@ -78,6 +79,7 @@ Partial Public Class AlgorithmTask
     ' task algorithms - operate on every frame regardless of which algorithm is being run.
     Public colorizer As DepthColorizer_Basics_TA
     Public filterBasics As Filter_Basics_TA
+    Public foreground As Foreground_Basics_TA
     Public gravityBasics As Gravity_Basics_TA
     Public gravityMatrix As IMU_GMatrix_TA
     Public grid As Grid_Basics_TA

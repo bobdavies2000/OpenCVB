@@ -3,7 +3,7 @@ Imports cv = OpenCvSharp
 Public Class Feature_Basics : Inherits TaskParent
     Public features As New List(Of cv.Point)
     Public feature2f As New List(Of cv.Point2f)
-    Dim bPoint As New BrickPoint_Minimum
+    Dim bPoint As New BrickPoint_MaxSobel
     Public Sub New()
         desc = "Gather features from the sobel grid square points and preserve those representing lines."
     End Sub
@@ -11,16 +11,11 @@ Public Class Feature_Basics : Inherits TaskParent
         Dim lastFeatures As New List(Of cv.Point)(bPoint.features)
         bPoint.Run(src)
 
-        Dim count As Integer
         dst2 = src.Clone
         feature2f.Clear()
         For Each pt In bPoint.features
             Dim index = lastFeatures.IndexOf(pt)
-            If index >= 0 Then
-                feature2f.Add(New cv.Point2f(pt.X, pt.Y))
-            Else
-                count += 1
-            End If
+            If index >= 0 Then feature2f.Add(New cv.Point2f(pt.X, pt.Y))
         Next
 
         features.Clear()
@@ -30,7 +25,7 @@ Public Class Feature_Basics : Inherits TaskParent
         Next
 
         strOut = CStr(features.Count) + " features found ('BrickPoints' method). " +
-                         CStr(count) + " dropped."
+                         CStr(bPoint.features.Count - feature2f.Count) + " dropped."
         labels(2) = strOut
     End Sub
 End Class
@@ -106,7 +101,7 @@ Public Class Feature_General : Inherits TaskParent
                     ptLatest.Add(lp.ptCenter)
                 Next
             Case "BrickPoint"
-                Static bPoint As New BrickPoint_Minimum
+                Static bPoint As New BrickPoint_MaxSobel
                 bPoint.Run(src)
                 For Each pt In bPoint.features
                     ptLatest.Add(pt)

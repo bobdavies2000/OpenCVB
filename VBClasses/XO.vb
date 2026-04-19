@@ -17453,7 +17453,7 @@ Namespace VBClasses
 
 
     Public Class XO_Foreground_CellsBack : Inherits TaskParent
-        Dim fore As New Foreground_Hist3D
+        Dim fore As New NR_Foreground_Hist3D
         Public rclist As New List(Of rcData)
         Public Sub New()
             desc = "Get the background cells"
@@ -17812,7 +17812,7 @@ Namespace VBClasses
 
 
     Public Class XO_Foreground_CellsFore : Inherits TaskParent
-        Dim fore As New Foreground_Hist3D
+        Dim fore As New NR_Foreground_Hist3D
         Public rclist As New List(Of rcData)
         Public Sub New()
             desc = "Get the foreground cells"

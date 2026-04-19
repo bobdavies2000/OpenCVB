@@ -451,7 +451,7 @@ End Class
 
 
 
-Public Class BrickPoint_Minimum : Inherits TaskParent
+Public Class BrickPoint_MaxSobel : Inherits TaskParent
     Public sobel As New Edge_Sobel
     Public features As New List(Of cv.Point)
     Public Sub New()

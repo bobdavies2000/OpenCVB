@@ -69,7 +69,7 @@ BrickLine_EdgesNoEdges
 BrickLine_LeftRightMotion
 BrickPoint_Basics
 BrickPoint_Core
-BrickPoint_Minimum
+BrickPoint_MaxSobel
 BrickPoint_Plot
 Brightness_Basics
 Brightness_Grid
@@ -273,9 +273,7 @@ Flood_BasicsMask
 Flood_Edges
 Font_Basics
 Font_FlowText
-Foreground_Basics
-Foreground_Hist3D
-Foreground_KMeans
+Foreground_Basics_TA
 Fractal_Mandelbrot
 Fractal_MandelbrotZoom
 Fractal_MandelbrotZoomColor
@@ -450,7 +448,6 @@ Line_DepthHistogram
 Line_EdgeLine
 Line_EdgeLineCompare
 Line_Finder
-Line_Finder1
 Line_FinderPlus
 Line_FindSimple
 Line_Intersection
@@ -948,6 +945,9 @@ NR_Flood_Minimal
 NR_Flood_SimpleRedColor
 NR_Flood_Tiers
 NR_Font_FlowMsgs
+NR_Foreground_Hist3D
+NR_Foreground_KMeans
+NR_Foreground_KMeansDepth
 NR_Fractal_Dimension
 NR_Fractal_Julia
 NR_FrameRate_BasicsGray
@@ -1138,6 +1138,7 @@ NR_LeftRight_RawLeft
 NR_LeftRight_RGBAlignLeft
 NR_Line_Basics_TATest
 NR_Line_Core
+NR_Line_Finder
 NR_Line_Parallel
 NR_Line_Select
 NR_Line_Vertical

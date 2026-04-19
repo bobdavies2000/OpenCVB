@@ -51,6 +51,7 @@ Public Class AlgorithmTask : Implements IDisposable
         grid = New Grid_Basics_TA
         lines = New Line_Basics_TA
         filterBasics = New Filter_Basics_TA
+        foreground = New Foreground_Basics_TA
         If task.leftRightBrightnessAdjust Then leftRightBrightness = New LeftRight_Brightness_TA
 
         ' all the algorithms in the list are task algorithms that are children of the algorithm.
@@ -192,6 +193,8 @@ Public Class AlgorithmTask : Implements IDisposable
         lines.motionMask = motion.motionMask
         lines.Run(gray)
         histBinList = {histogramBins, histogramBins, histogramBins}
+
+        foreground.Run(emptyMat)
 
         Dim saveOptionsChanged = optionsChanged
         If activateTaskForms Then

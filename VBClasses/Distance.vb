@@ -69,7 +69,7 @@ End Class
 
 Public Class Distance_Foreground : Inherits TaskParent
     Dim dist As New Distance_Basics
-    Dim foreground As New Foreground_KMeans
+    Dim foreground As New NR_Foreground_KMeans
     Public useBackgroundAsInput As Boolean
     Public Sub New()
         labels(2) = "Distance results"

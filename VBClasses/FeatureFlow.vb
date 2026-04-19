@@ -4,9 +4,7 @@ Public Class FeatureFlow_Basics : Inherits TaskParent
     Public mpCorrelation As New List(Of Single)
     Dim feat As New Feature_General
     Public Sub New()
-        task.gOptions.MaxDepthBar.Value = 20
-        labels(1) = "NOTE: matching right point is always to the left of the left point"
-        desc = "Identify which feature in the left image corresponds to the feature in the right image."
+        desc = "Use correlations to confirm that points match the previous frame."
     End Sub
     Public Sub buildCorrelations(prevFeatures As List(Of cv.Point), currFeatures As List(Of cv.Point))
         Dim correlationmat As New cv.Mat
@@ -32,6 +30,7 @@ Public Class FeatureFlow_Basics : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         feat.Run(task.gray)
+
         labels = feat.labels
 
         dst3 = If(task.firstPass, src.Clone, dst2.Clone)

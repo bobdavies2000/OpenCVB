@@ -147,7 +147,7 @@ End Class
 Public Class NR_Hist3D_DepthWithMask : Inherits TaskParent
     Dim hColor As New Hist3Dcolor_Basics
     Public depthMask As New cv.Mat
-    Dim fore As New Foreground_KMeans
+    Dim fore As New NR_Foreground_KMeans
     Public Sub New()
         desc = "Isolate the foreground and no depth in the image and run it through Hist3D_Basics"
     End Sub

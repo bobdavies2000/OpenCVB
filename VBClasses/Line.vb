@@ -1460,7 +1460,7 @@ End Class
 
 
 
-Public Class Line_Finder1 : Inherits TaskParent
+Public Class NR_Line_Finder : Inherits TaskParent
     Dim edges As New Edge_Basics
     Dim side As Integer
     Dim pixels(side * side) As cv.Point

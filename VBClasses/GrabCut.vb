@@ -4,7 +4,7 @@ Imports cv = OpenCvSharp
 Public Class GrabCut_Basics : Inherits TaskParent
     Public fgFineTune As cv.Mat
     Public bgFineTune As cv.Mat
-    Public fore As New Foreground_Basics
+    Public fore As New NR_Foreground_KMeansDepth
     Dim bgModel As cv.Mat = New cv.Mat(1, 65, cv.MatType.CV_64F, cv.Scalar.All(0))
     Dim fgModel As cv.Mat = New cv.Mat(1, 65, cv.MatType.CV_64F, cv.Scalar.All(0))
     Public Sub New()

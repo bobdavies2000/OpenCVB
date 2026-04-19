@@ -1,5 +1,49 @@
 Imports cv = OpenCvSharp
-Public Class Foreground_Basics : Inherits TaskParent
+Public Class Foreground_Basics_TA : Inherits TaskParent
+    Dim hist As New Histogram_Depth
+    Public foregroundMaxDepth As Single
+    Public Sub New()
+        task.gOptions.MaxDepthBar.Value = 5
+        task.gOptions.HistBinBar.Value = task.gOptions.HistBinBar.Maximum
+        desc = "Create a histogram of depth and find foreground as X% of points."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        If task.heartBeat Then
+            dst1 = task.pcSplit(2).Threshold(task.MaxZmeters, 255, cv.ThresholdTypes.BinaryInv).ConvertScaleAbs
+            dst1.SetTo(0, task.noDepthMask)
+            dst0 = task.pcSplit(2).Clone
+            dst0.SetTo(0, Not dst1)
+
+            hist.Run(dst0)
+            dst2 = hist.dst2
+
+            Dim histArray(hist.histogram.Total - 1) As Single
+            hist.histogram.GetArray(Of Single)(histArray)
+
+            Dim totalSamples = task.pcSplit(2).CountNonZero
+            Dim accum As Single = 0
+            Dim incr As Single = task.MaxZmeters / task.histogramBins
+            foregroundMaxDepth = 0
+            For i = 0 To histArray.Length - 1
+                accum += histArray(i)
+                foregroundMaxDepth += incr
+                If accum >= totalSamples * 0.25 Then Exit For
+            Next
+        End If
+
+        task.foregroundMat = task.pcSplit(2).Threshold(foregroundMaxDepth, 255, cv.ThresholdTypes.BinaryInv)
+        task.foregroundMat.SetTo(0, task.noDepthMask)
+
+        labels(2) = "Foreground is defined as anything closer that " + Format(foregroundMaxDepth, fmt1) + " meters"
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class NR_Foreground_KMeansDepth : Inherits TaskParent
     Dim simK As New KMeans_Depth
     Public fgDepth As Single
     Public fg As New cv.Mat, bg As New cv.Mat, classCount As Integer
@@ -50,7 +94,7 @@ End Class
 
 
 
-Public Class Foreground_KMeans : Inherits TaskParent
+Public Class NR_Foreground_KMeans : Inherits TaskParent
     Dim km As New KMeans_Image
     Public Sub New()
         OptionParent.FindSlider("KMeans k").Value = 2
@@ -89,7 +133,7 @@ End Class
 
 
 
-Public Class Foreground_Hist3D : Inherits TaskParent
+Public Class NR_Foreground_Hist3D : Inherits TaskParent
     Dim hcloud As New Hist3Dcloud_Basics
     Public Sub New()
         hcloud.maskInput = task.noDepthMask
