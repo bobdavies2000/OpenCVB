@@ -90,7 +90,7 @@ Partial Public Class AlgorithmTask
     Public motionStable As StableGray_Measure_TA
     Public stabilizeDepth As StableDepth_Basics
     Public stabilizeGray As StableGray_Basics_TA
-    Public cloudGravity As Cloud_Gravity_TA
+    Public cloud_TA As Cloud_Gravity_TA
 
     Public motionFeatures As cv.Point2f
     Public palette As Palette_LoadColorMap

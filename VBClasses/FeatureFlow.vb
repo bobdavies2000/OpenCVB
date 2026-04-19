@@ -29,16 +29,15 @@ Public Class FeatureFlow_Basics : Inherits TaskParent
         Next
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        feat.Run(task.gray)
+        If src.Channels <> 1 Then dst1 = task.gray.Clone Else dst1 = src.Clone
+        feat.Run(dst1)
 
         labels = feat.labels
 
-        dst3 = If(task.firstPass, src.Clone, dst2.Clone)
+        dst2 = task.color.Clone
         Static prevFeatures As New List(Of cv.Point)(task.featurePoints)
         buildCorrelations(prevFeatures, task.featurePoints)
 
-        SetTrueText("Click near any feature to find the corresponding pair of features.", 1)
-        dst2 = src.Clone
         For Each pt In task.featurePoints
             DrawCircle(dst2, pt, task.DotSize, task.highlight)
         Next

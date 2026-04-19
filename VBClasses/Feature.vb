@@ -104,14 +104,11 @@ Public Class Feature_Basics : Inherits TaskParent
         task.fpFromGridCell.Clear()
         For i = 0 To sortByGrid.Values.Count - 1
             Dim pt = sortByGrid.Values(i)
-            Dim val = task.foregroundMask.Get(Of Byte)(pt.Y, pt.X)
-            If val <> 0 Then
-                task.features.Add(pt)
-                task.featurePoints.Add(New cv.Point(pt.X, pt.Y))
+            task.features.Add(pt)
+            task.featurePoints.Add(New cv.Point(pt.X, pt.Y))
 
-                Dim nextIndex = task.gridMap.Get(Of Integer)(pt.Y, pt.X)
-                task.fpFromGridCell.Add(nextIndex)
-            End If
+            Dim nextIndex = task.gridMap.Get(Of Integer)(pt.Y, pt.X)
+            task.fpFromGridCell.Add(nextIndex)
         Next
 
         For Each pt In task.features
