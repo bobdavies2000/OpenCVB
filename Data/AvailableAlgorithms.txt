@@ -245,7 +245,9 @@ Feature_General
 Feature_KNN
 Feature_NoMotion
 Feature_Stable
+FeatureFlow_Basics
 FeatureFlow_LeftRight
+FeatureFlow_LeftRight1
 FeatureFlow_LeftRightHist
 FeatureFlow_LucasKanade
 FeatureLess_Basics
@@ -906,8 +908,6 @@ NR_Feature_StableVisual
 NR_Feature_SteadyCam
 NR_Feature_TraceDelaunay
 NR_Feature_WithDepth
-NR_FeatureFlow_Basics
-NR_FeatureFlow_LeftRight1
 NR_FeatureLess_Canny
 NR_FeatureLess_Contours
 NR_FeatureLess_Correlation

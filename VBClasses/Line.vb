@@ -1525,106 +1525,17 @@ End Class
 
 
 Public Class Line_Finder : Inherits TaskParent
+    Public ptList() As cv.Point
     Dim edges As New Edge_Basics
     Dim side As Integer
     Dim pixels(side * side) As cv.Point
     Dim sortX As New SortedList(Of Integer, cv.Point)(New compareAllowIdenticalInteger)
     Public Sub New()
-        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        dst0 = New cv.Mat(dst0.Size, cv.MatType.CV_8U, 0)
         side = task.gOptions.GridSlider.Value
         ReDim pixels(side * side)
         desc = "Find only the bricks containing what are clearly lines."
     End Sub
-    Public Function findLines1(pixels() As cv.Point) As List(Of cv.Point)
-        Dim ptList As New List(Of cv.Point)
-        Dim ordered As Boolean = True
-        For i = 1 To pixels.Count - 1
-            If Math.Abs(pixels(i).Y - pixels(i - 1).Y) > 1 Then
-                ordered = False
-                Exit For
-            End If
-        Next
-
-        If ordered Then
-            sortX.Clear()
-            For Each pt In pixels
-                sortX.Add(pt.X, pt)
-            Next
-
-            Dim p1 = sortX.Values(0)
-            For i = 1 To sortX.Values.Count - 1
-                Dim p2 = sortX.Values(i)
-                If Math.Abs(p1.X - p2.X) <= 1 Then
-                    ptList.Add(p1)
-                Else
-                    If ptList.Count >= side / 2 Then Exit For
-                End If
-                p1 = sortX.Values(i)
-            Next
-        End If
-
-        Return ptList
-    End Function
-    Public Function findLines2(pixels() As cv.Point) As List(Of cv.Point)
-        Dim ptList As New List(Of cv.Point)
-        Dim ordered As Boolean = True
-        For i = 1 To pixels.Count - 1
-            If Math.Abs(pixels(i).Y - pixels(i - 1).Y) > 1 Then
-                ordered = False
-                Exit For
-            End If
-        Next
-
-        If ordered Then
-            sortX.Clear()
-            For Each pt In pixels
-                sortX.Add(pt.X, pt)
-            Next
-            For i = 1 To sortX.Values.Count - 1
-                If Math.Abs(sortX.Values(i).X - sortX.Values(i - 1).X) <= 1 Then
-                    If ptList.Contains(sortX.Values(i - 1)) = False Then ptList.Add(sortX.Values(i - 1))
-                    ptList.Add(sortX.Values(i))
-                Else
-                    If ptList.Count >= side / 2 Then Exit For
-                End If
-            Next
-        End If
-
-        Return ptList
-    End Function
-    Public Function findLines3(pixels() As cv.Point) As List(Of cv.Point)
-        Dim ptList As New List(Of cv.Point)
-        Dim ordered As Boolean = True
-        Dim minX As Integer, maxX As Integer, minY = pixels(0).Y, maxY = pixels.Last.Y
-        For i = 1 To pixels.Count - 1
-            If Math.Abs(pixels(i).Y - pixels(i - 1).Y) > 1 Then
-                ordered = False
-                Exit For
-            End If
-        Next
-
-        If ordered Then
-            sortX.Clear()
-            For Each pt In pixels
-                sortX.Add(pt.X, pt)
-            Next
-            minX = sortX.Values(0).X
-            maxX = sortX.Values.Last.X
-
-            ptList.Add(sortX.Values(0))
-            For i = 1 To sortX.Values.Count - 1
-                If Math.Abs(sortX.Values(i).X - sortX.Values(i - 1).X) > 1 Then
-                    ordered = False
-                    ptList.Clear()
-                    Exit For
-                Else
-                    ptList.Add(sortX.Values(i))
-                End If
-            Next
-        End If
-
-        Return ptList
-    End Function
     Public Function findLines(pixels() As cv.Point) As lpData
         Dim ordered As Boolean = True
         Dim minX As Integer, maxX As Integer, minY = pixels(0).Y, maxY = pixels.Last.Y
@@ -1652,16 +1563,20 @@ Public Class Line_Finder : Inherits TaskParent
         End If
 
         If ordered = False Then Return Nothing
-        Return New lpData(New cv.Point(minX, minY), New cv.Point(maxX, maxY))
+        Dim lp = New lpData(New cv.Point(minX, minY), New cv.Point(maxX, maxY))
+        If Not pixels.Contains(lp.p1) Or Not pixels.Contains(lp.p2) Then Return Nothing
+        Return lp
     End Function
 
     Public Overrides Sub RunAlg(src As cv.Mat)
+        dst2 = src.Clone
         edges.Run(task.gray)
         dst1 = edges.dst2
         labels(2) = edges.labels(2)
 
-        dst2.SetTo(0)
         Dim maxPixels = side * 1.5
+        dst3.SetTo(0)
+        dst0.SetTo(0)
         For i = 0 To task.gridRects.Count - 1
             Dim r = task.gridRects(i)
 
@@ -1679,8 +1594,17 @@ Public Class Line_Finder : Inherits TaskParent
             If task.drawRect.Contains(r.TopLeft) Then Dim k = 0
 
             If lp IsNot Nothing Then
-                dst2(r).Line(lp.p1, lp.p2, 255, task.lineWidth)
+                dst2(r).Line(lp.p1, lp.p2, task.highlight, task.lineWidth + 1)
+                dst0(r).Set(Of Byte)(lp.p1.Y, lp.p1.X, 255)
+                dst0(r).Set(Of Byte)(lp.p2.Y, lp.p2.X, 255)
             End If
         Next
+
+        Dim pointMat = dst0.FindNonZero()
+        ReDim ptList(pointMat.Rows)
+        pointMat.GetArray(Of cv.Point)(ptList)
+
+        dst3.SetTo(0)
+        dst3.SetTo(task.highlight, dst0)
     End Sub
 End Class
