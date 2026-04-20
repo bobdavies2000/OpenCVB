@@ -7,12 +7,12 @@ Public Class FCS_Basics : Inherits TaskParent
         dst1 = New cv.Mat(dst1.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         desc = "Track the stable good features found in the BGR image."
     End Sub
-    Public Shared Sub fpDSet()
-        If task.fpList.Count = 0 Then Exit Sub
-        Dim brickIndex = task.fpMap.Get(Of Single)(task.clickPoint.Y, task.clickPoint.X)
-        Dim fpIndex = task.fpFromGridCell.IndexOf(brickIndex)
-        If fpIndex >= 0 Then task.fpD = task.fpList(fpIndex)
-    End Sub
+    'Public Shared Sub fpDSet()
+    '    If task.fpList.Count = 0 Then Exit Sub
+    '    Dim brickIndex = task.fpMap.Get(Of Single)(task.clickPoint.Y, task.clickPoint.X)
+    '    Dim fpIndex = task.fpFromGridCell.IndexOf(brickIndex)
+    '    If fpIndex >= 0 Then task.fpD = task.fpList(fpIndex)
+    'End Sub
     Public Shared Sub fpCellContour(fp As fpData, dst As cv.Mat, Optional colorIndex As Integer = 0)
         Dim color = Choose(colorIndex + 1, cv.Scalar.White, cv.Scalar.Black)
         For i = 0 To fp.facets.Count - 1
@@ -182,104 +182,6 @@ End Class
 
 
 
-Public Class FCS_CreateList : Inherits TaskParent
-    Dim subdiv As New cv.Subdiv2D
-    Dim feat As New Feature_Basics
-    Dim bricks As New Brick_Basics
-    Public Sub New()
-        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
-        task.fpMap = New cv.Mat(dst2.Size(), cv.MatType.CV_32F, 0)
-        labels(3) = "CV_8U map of Delaunay cells."
-        desc = "Subdivide an image based on the points provided."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        bricks.Run(src)
-
-        feat.Run(task.gray)
-
-        subdiv.InitDelaunay(New cv.Rect(0, 0, dst1.Width, dst1.Height))
-        subdiv.Insert(task.features)
-
-        Dim facets = New cv.Point2f()() {Nothing}
-        subdiv.GetVoronoiFacetList(New List(Of Integer)(), facets, Nothing)
-
-        task.fpList.Clear()
-        Dim matchCount As Integer
-        dst1.SetTo(0)
-        For i = 0 To Math.Min(task.features.Count, facets.Count) - 1
-            Dim fp As New fpData
-            fp.pt = task.features(i)
-            fp.ptHistory.Add(fp.pt)
-            fp.index = i
-
-            Dim brickIndex = task.gridMap.Get(Of Integer)(fp.pt.Y, fp.pt.X)
-            Dim brick = bricks.brickList(brickIndex)
-            Dim fpIndex = task.fpFromGridCellLast.IndexOf(brickIndex)
-            If fpIndex >= 0 Then
-                Dim fpLast = task.fpLastList(fpIndex)
-                fp.ptLast = fpLast.pt
-                fp.age = fpLast.age + 1
-                matchCount += 1
-            End If
-
-            fp.brickIndex = brickIndex
-
-            fp.facets = New List(Of cv.Point)
-            Dim xlist As New List(Of Integer), ylist As New List(Of Integer)
-            For j = 0 To facets(i).Length - 1
-                Dim pt = New cv.Point(facets(i)(j).X, facets(i)(j).Y)
-                xlist.Add(pt.X)
-                ylist.Add(pt.Y)
-                fp.facets.Add(New cv.Point(facets(i)(j).X, facets(i)(j).Y))
-            Next
-
-            Dim minX = xlist.Min, minY = ylist.Min, maxX = xlist.Max, maxY = ylist.Max
-
-            If minX < 0 Or minY < 0 Or maxX >= dst2.Width Or maxY >= dst2.Height Then fp.periph = True
-
-            fp.depth = brick.depth
-
-            task.fpList.Add(fp)
-
-            task.fpMap.FillConvexPoly(fp.facets, CSng(brickIndex), task.lineType)
-            dst1.FillConvexPoly(fp.facets, i Mod 256, task.lineType)
-        Next
-
-        If task.features.Count <> facets.Length Then
-            task.fpFromGridCell.Clear()
-            For Each fp In task.fpList
-                Dim nextIndex = task.gridMap.Get(Of Integer)(fp.pt.Y, fp.pt.X)
-                task.fpFromGridCell.Add(nextIndex)
-            Next
-        End If
-
-        dst2 = Palettize(dst1)
-        For Each fp In task.fpList
-            If fp.depth > 0 Then DrawCircle(dst2, fp.pt, task.DotSize, task.highlight)
-        Next
-
-        If standalone Then
-            For Each fp In task.fpList
-                SetTrueTextBase(CStr(fp.age), fp.pt, 2)
-            Next
-            FCS_Basics.fpCellContour(task.fpD, task.color)
-        End If
-        FCS_Basics.fpDSet()
-
-        If task.heartBeat Then
-            labels(2) = traceName + ": " + Format(task.features.Count, "000") + " cells found.  Matched = " +
-                            CStr(matchCount) + " of " + CStr(task.features.Count)
-        End If
-    End Sub
-End Class
-
-
-
-
-
-
-
-
 Public Class NR_FCS_ViewLeft : Inherits TaskParent
     Dim fcs As New FCS_CreateList
     Public Sub New()
@@ -293,7 +195,7 @@ Public Class NR_FCS_ViewLeft : Inherits TaskParent
         For Each fp In task.fpList
             SetTrueTextBase(CStr(fp.age), fp.pt, 2)
         Next
-        FCS_Basics.fpDSet()
+        ' FCS_Basics.fpDSet()
         labels(2) = fcs.labels(2)
     End Sub
 End Class
@@ -317,7 +219,7 @@ Public Class NR_FCS_ViewRight : Inherits TaskParent
         For Each fp In task.fpList
             SetTrueTextBase(CStr(fp.age), fp.pt, 2)
         Next
-        FCS_Basics.fpDSet()
+        ' FCS_Basics.fpDSet()
         labels(2) = fcs.labels(2)
     End Sub
 End Class
@@ -344,7 +246,7 @@ Public Class NR_FCS_Edges : Inherits TaskParent
                 DrawCircle(dst3, fp.pt, task.DotSize, task.highlight)
             End If
         Next
-        FCS_Basics.fpDSet()
+        ' FCS_Basics.fpDSet()
     End Sub
 End Class
 
@@ -451,70 +353,7 @@ Public Class NR_FCS_InfoTest : Inherits TaskParent
         info.Run(src)
         SetTrueText(info.strOut, 3)
 
-        FCS_Basics.fpDSet()
-    End Sub
-End Class
-
-
-
-
-
-
-
-
-Public Class FCS_Motion : Inherits TaskParent
-    Dim fcs As New FCS_CreateList
-    Dim plot As New PlotTime_Basics
-    Public xDist As New List(Of Single), yDist As New List(Of Single)
-    Public motionPercent As Single
-    Public Sub New()
-        plot.maxScale = 100
-        plot.minScale = 0
-        plot.plotCount = 1
-        If standalone Then task.gOptions.displayDst1.Checked = True
-        labels(1) = "Plot of % of cells that moved - move camera to see value."
-        desc = "Highlight the motion of each feature identified in the current and previous frame"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        fcs.Run(task.gray)
-        dst2 = fcs.dst2
-
-        For Each fp In task.fpList
-            If fp.depth > 0 Then DrawCircle(dst2, fp.pt, task.DotSize, task.highlight)
-        Next
-
-        Dim motionCount As Integer, linkedCount As Integer
-        xDist.Clear()
-        yDist.Clear()
-        xDist.Add(0)
-        yDist.Add(0)
-        dst3.SetTo(0)
-        For Each fp In task.fpList
-            Dim brickIndex = task.gridMap.Get(Of Integer)(fp.pt.Y, fp.pt.X)
-            Dim fpIndex = task.fpFromGridCellLast.IndexOf(brickIndex)
-            If fpIndex >= 0 Then
-                linkedCount += 1
-                DrawLine(dst3, fp.pt, fp.ptLast)
-            End If
-            If fp.ptLast <> newPoint Then
-                motionCount += 1
-                xDist.Add(fp.ptLast.X - fp.pt.X)
-                yDist.Add(fp.ptLast.Y - fp.pt.Y)
-            End If
-        Next
-        motionPercent = 100 * motionCount / linkedCount
-        If task.heartBeat Then
-            labels(2) = fcs.labels(2)
-            labels(3) = Format(motionPercent, fmt1) + "% of linked cells had motion or " +
-                            CStr(motionCount) + " of " + CStr(linkedCount) + ".  Distance moved X/Y " +
-                            Format(xDist.Average, fmt1) + "/" + Format(yDist.Average, fmt1) +
-                            " pixels."
-        End If
-
-        plot.plotData = New cv.Scalar(motionPercent, 0, 0)
-        plot.Run(src)
-        dst1 = plot.dst2
-        FCS_Basics.fpDSet()
+        ' FCS_Basics.fpDSet()
     End Sub
 End Class
 
@@ -573,7 +412,7 @@ Public Class NR_FCS_MotionDirection : Inherits TaskParent
         SetTrueText("X distances" + rangeText, 2)
         SetTrueText("Y distances " + rangeText, New cv.Point(dst2.Width / 2 + 2, 0), 2)
         labels = fcsM.labels
-        FCS_Basics.fpDSet()
+        ' FCS_Basics.fpDSet()
     End Sub
 End Class
 
@@ -764,7 +603,7 @@ Public Class FCS_Periphery : Inherits TaskParent
                 ptInside.Add(fp.pt)
             End If
         Next
-        FCS_Basics.fpDSet()
+        ' FCS_Basics.fpDSet()
         labels(2) = "There are " + CStr(ptOutside.Count) + " features on the periphery of the image."
         labels(3) = "There are " + CStr(task.fpList.Count - ptOutside.Count) + " features in the interior region of the image."
     End Sub
@@ -788,7 +627,7 @@ Public Class NR_FCS_PeripheryNot : Inherits TaskParent
         For Each fp In task.fpList
             If fp.periph = False Then dst3.FillConvexPoly(fp.facets, 255, task.lineType)
         Next
-        FCS_Basics.fpDSet()
+        ' FCS_Basics.fpDSet()
         labels = perif.labels
     End Sub
 End Class
@@ -848,5 +687,155 @@ Public Class NR_FCS_BrickPoints : Inherits TaskParent
         Next
         labels(2) = CStr(ptList.Count) + " stable points were identified with a max of " + CStr(maxGens) +
                         " generations."
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class FCS_CreateList : Inherits TaskParent
+    Dim subdiv As New cv.Subdiv2D
+    Dim feat As New Feature_Basics
+    Dim bricks As New Brick_Basics
+    Public Sub New()
+        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
+        task.fpMap = New cv.Mat(dst2.Size(), cv.MatType.CV_32F, 0)
+        labels(3) = "CV_8U map of Delaunay cells."
+        desc = "Subdivide an image based on the points provided."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        bricks.Run(src)
+
+        feat.Run(task.gray)
+
+        subdiv.InitDelaunay(New cv.Rect(0, 0, dst1.Width, dst1.Height))
+        subdiv.Insert(task.features)
+
+        Dim facets = New cv.Point2f()() {Nothing}
+        subdiv.GetVoronoiFacetList(New List(Of Integer)(), facets, Nothing)
+
+        task.fpList.Clear()
+        Dim matchCount As Integer
+        dst1.SetTo(0)
+        For i = 0 To Math.Min(task.features.Count, facets.Count) - 1
+            Dim fp As New fpData
+            fp.pt = task.features(i)
+            fp.ptHistory.Add(fp.pt)
+            fp.index = i
+
+            Dim brickIndex = task.gridMap.Get(Of Integer)(fp.pt.Y, fp.pt.X)
+            Dim brick = bricks.brickList(brickIndex)
+            'Dim fpIndex = task.fpFromGridCellLast.IndexOf(brickIndex)
+            'If fpIndex >= 0 Then
+            '    Dim fpLast = task.fpLastList(fpIndex)
+            '    fp.ptLast = fpLast.pt
+            '    fp.age = fpLast.age + 1
+            '    matchCount += 1
+            'End If
+
+            fp.brickIndex = brickIndex
+
+            fp.facets = New List(Of cv.Point)
+            Dim xlist As New List(Of Integer), ylist As New List(Of Integer)
+            For j = 0 To facets(i).Length - 1
+                Dim pt = New cv.Point(facets(i)(j).X, facets(i)(j).Y)
+                xlist.Add(pt.X)
+                ylist.Add(pt.Y)
+                fp.facets.Add(New cv.Point(facets(i)(j).X, facets(i)(j).Y))
+            Next
+
+            Dim minX = xlist.Min, minY = ylist.Min, maxX = xlist.Max, maxY = ylist.Max
+
+            If minX < 0 Or minY < 0 Or maxX >= dst2.Width Or maxY >= dst2.Height Then fp.periph = True
+
+            fp.depth = brick.depth
+
+            task.fpList.Add(fp)
+
+            task.fpMap.FillConvexPoly(fp.facets, CSng(brickIndex), task.lineType)
+            dst1.FillConvexPoly(fp.facets, i Mod 256, task.lineType)
+        Next
+
+        dst2 = Palettize(dst1)
+        For Each fp In task.fpList
+            If fp.depth > 0 Then DrawCircle(dst2, fp.pt, task.DotSize, task.highlight)
+        Next
+
+        If standalone Then
+            For Each fp In task.fpList
+                SetTrueTextBase(CStr(fp.age), fp.pt, 2)
+            Next
+            FCS_Basics.fpCellContour(task.fpD, task.color)
+        End If
+        ' FCS_Basics.fpDSet()
+
+        If task.heartBeat Then
+            labels(2) = traceName + ": " + Format(task.features.Count, "000") + " cells found.  Matched = " +
+                            CStr(matchCount) + " of " + CStr(task.features.Count)
+        End If
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class FCS_Motion : Inherits TaskParent
+    Dim fcs As New FCS_CreateList
+    Dim plot As New PlotTime_Basics
+    Public xDist As New List(Of Single), yDist As New List(Of Single)
+    Public motionPercent As Single
+    Public Sub New()
+        plot.maxScale = 100
+        plot.minScale = 0
+        plot.plotCount = 1
+        If standalone Then task.gOptions.displayDst1.Checked = True
+        labels(1) = "Plot of % of cells that moved - move camera to see value."
+        desc = "Highlight the motion of each feature identified in the current and previous frame"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        fcs.Run(task.gray)
+        dst2 = fcs.dst2
+
+        For Each fp In task.fpList
+            If fp.depth > 0 Then DrawCircle(dst2, fp.pt, task.DotSize, task.highlight)
+        Next
+
+        Dim motionCount As Integer, linkedCount As Integer
+        xDist.Clear()
+        yDist.Clear()
+        xDist.Add(0)
+        yDist.Add(0)
+        dst3.SetTo(0)
+        For Each fp In task.fpList
+            'Dim brickIndex = task.gridMap.Get(Of Integer)(fp.pt.Y, fp.pt.X)
+            'Dim fpIndex = task.fpFromGridCellLast.IndexOf(brickIndex)
+            'If fpIndex >= 0 Then
+            '    linkedCount += 1
+            '    DrawLine(dst3, fp.pt, fp.ptLast)
+            'End If
+            'If fp.ptLast <> newPoint Then
+            '    motionCount += 1
+            '    xDist.Add(fp.ptLast.X - fp.pt.X)
+            '    yDist.Add(fp.ptLast.Y - fp.pt.Y)
+            'End If
+        Next
+        motionPercent = 100 * motionCount / linkedCount
+        If task.heartBeat Then
+            labels(2) = fcs.labels(2)
+            labels(3) = Format(motionPercent, fmt1) + "% of linked cells had motion or " +
+                            CStr(motionCount) + " of " + CStr(linkedCount) + ".  Distance moved X/Y " +
+                            Format(xDist.Average, fmt1) + "/" + Format(yDist.Average, fmt1) +
+                            " pixels."
+        End If
+
+        plot.plotData = New cv.Scalar(motionPercent, 0, 0)
+        plot.Run(src)
+        dst1 = plot.dst2
+        ' FCS_Basics.fpDSet()
     End Sub
 End Class

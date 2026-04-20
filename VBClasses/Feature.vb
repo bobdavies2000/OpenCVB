@@ -4,7 +4,6 @@ Public Class Feature_Basics : Inherits TaskParent
     Implements IDisposable
     Public options As New Options_Features
     Public ptLatest As New List(Of cv.Point2f)
-    Public foregroundOnly As Boolean = True
     Public Sub New()
         desc = "Gather features from a list of sources - GoodFeatures, Agast, Brisk..."
     End Sub
@@ -16,14 +15,7 @@ Public Class Feature_Basics : Inherits TaskParent
         dst2 = task.color.Clone
 
         Dim ptNew As New List(Of cv.Point2f)
-        'If task.optionsChanged = False Then
-        '    Static feat As New Feature_Bricks
-        '    feat.Run(task.gray)
-        '    For Each pt In feat.features
-        '        Dim val = task.motion.motionMask.Get(Of Byte)(pt.Y, pt.X)
-        '        If val = 0 Then ptNew.Add(pt)
-        '    Next
-        'End If
+
 
         strOut = ""
         ptLatest.Clear()
@@ -79,7 +71,6 @@ Public Class Feature_Basics : Inherits TaskParent
                 strOut = bPoint.labels(2)
         End Select
 
-        task.fpFromGridCellLast = New List(Of Integer)(task.fpFromGridCell)
         task.fpLastList = New List(Of fpData)(task.fpList)
 
         If task.optionsChanged Or ptNew.Count = 0 Then
@@ -101,14 +92,10 @@ Public Class Feature_Basics : Inherits TaskParent
 
         task.features.Clear()
         task.featurePoints.Clear()
-        task.fpFromGridCell.Clear()
         For i = 0 To sortByGrid.Values.Count - 1
             Dim pt = sortByGrid.Values(i)
             task.features.Add(pt)
             task.featurePoints.Add(New cv.Point(pt.X, pt.Y))
-
-            Dim nextIndex = task.gridMap.Get(Of Integer)(pt.Y, pt.X)
-            task.fpFromGridCell.Add(nextIndex)
         Next
 
         For Each pt In task.features
@@ -895,5 +882,108 @@ Public Class Feature_Stable : Inherits TaskParent
                 SetTrueText(CStr(fp.age), fp.pt, 3)
             End If
         Next
+    End Sub
+End Class
+
+
+
+
+Public Class Feature_BasicsNew : Inherits TaskParent
+    Implements IDisposable
+    Public options As New Options_Features
+    Public features As New List(Of cv.Point)
+    Public lastFeatures As New List(Of cv.Point)
+    Public Sub New()
+        desc = "Gather features from a list of sources - GoodFeatures, Agast, Brisk..."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        options.Run()
+
+        If src.Channels <> 1 Then src = task.gray
+        dst2 = task.color.Clone
+
+        Dim ptLatest As New List(Of cv.Point2f)
+        Select Case task.fOptions.FeatureMethod.Text
+            Case "AGAST"
+                If cPtr = 0 Then cPtr = Agast_Open()
+                src = task.color.Clone
+                Dim dataSrc(src.Total - 1) As cv.Vec3b
+                src.GetArray(Of cv.Vec3b)(dataSrc)
+
+                Dim handleSrc = GCHandle.Alloc(dataSrc, GCHandleType.Pinned)
+                Dim imagePtr = Agast_Run(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, options.agastThreshold)
+                handleSrc.Free()
+
+                Dim ptMat = cv.Mat.FromPixelData(Agast_Count(cPtr), 1, cv.MatType.CV_32FC2, imagePtr).Clone
+                For i = 0 To ptMat.Rows - 1
+                    Dim pt = ptMat.Get(Of cv.Point2f)(i, 0)
+                    ptLatest.Add(pt)
+                    If standaloneTest() Then DrawCircle(dst2, pt, task.DotSize, white)
+                Next
+
+                strOut = "AGAST produced " + CStr(ptLatest.Count) + " features"
+            Case "BrickPoint"
+                Static bPoint As New BrickPoint_MaxSobel
+                bPoint.Run(src)
+                For Each pt In bPoint.features
+                    ptLatest.Add(pt)
+                Next
+                strOut = bPoint.labels(2)
+            Case "BRISK"
+                Static brisk As New BRISK_Basics
+                brisk.Run(src)
+                ptLatest = brisk.features
+                strOut = "BRISK produced " + CStr(ptLatest.Count) + " features"
+            Case "FAST"
+                Static FAST As New Corners_Basics
+                FAST.Run(src)
+                ptLatest = FAST.features
+                strOut = "FAST produced " + CStr(ptLatest.Count) + " features"
+            Case "GoodFeatures"
+                ptLatest = cv.Cv2.GoodFeaturesToTrack(src, task.fOptions.FeatureSampleSize.Value, options.quality,
+                                                      options.minDistance, New cv.Mat,
+                                                      options.blockSize, True, options.k).ToList
+                strOut = "GoodFeatures produced " + CStr(ptLatest.Count) + " features"
+            Case "Harris"
+                Static harris As New Corners_HarrisDetector_CPP
+                harris.Run(src)
+                ptLatest = harris.features
+                strOut = "Harris Detector produced " + CStr(ptLatest.Count) + " features"
+            Case "LineInput"
+                For Each lp In task.lines.lpList
+                    ptLatest.Add(lp.ptCenter)
+                Next
+        End Select
+
+        lastFeatures = New List(Of cv.Point)(features)
+        Dim ptNext As New List(Of cv.Point)
+        For Each pt In features
+            Dim val = task.motion.motionMask.Get(Of Byte)(pt.Y, pt.X)
+            If val = 0 Then ptNext.Add(pt)
+        Next
+
+        For Each pt In ptLatest
+            Dim val = task.motion.motionMask.Get(Of Byte)(pt.Y, pt.X)
+            If val <> 0 Then ptNext.Add(pt)
+        Next
+
+        If task.optionsChanged Or ptNext.Count <= 3 Then
+            For Each pt In ptLatest
+                ptNext.Add(pt)
+            Next
+        End If
+
+        features = New List(Of cv.Point)(ptNext)
+
+        For Each pt In features
+            If lastFeatures.Contains(pt) Then DrawCircle(dst2, pt, task.DotSize, task.highlight)
+        Next
+
+        If features.Count = 0 Then features = New List(Of cv.Point)(ptNext)
+
+        labels(2) = strOut
+    End Sub
+    Protected Overrides Sub Finalize()
+        If cPtr <> 0 Then cPtr = Agast_Close(cPtr)
     End Sub
 End Class

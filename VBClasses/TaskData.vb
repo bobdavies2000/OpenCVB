@@ -131,8 +131,6 @@ Partial Public Class AlgorithmTask
     Public gridRatioY As Single ' translate from display height to workres to find grid element.
 
     Public features As New List(Of cv.Point2f)
-    Public fpFromGridCell As New List(Of Integer)
-    Public fpFromGridCellLast As New List(Of Integer)
     Public fpLastList As New List(Of fpData)
     Public featurePoints As New List(Of cv.Point)
 
