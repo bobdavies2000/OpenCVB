@@ -48,124 +48,6 @@ End Class
 
 
 
-
-
-
-' https://www.learnopencvb.com/optical-flow-in-opencv/?ck_subscriber_id=785741175
-Public Class FeatureFlow_LucasKanade : Inherits TaskParent
-    Public features As New List(Of cv.Point2f)
-    Public lastFeatures As New List(Of cv.Point2f)
-    Dim options As New Options_OpticalFlowSparse
-    Dim feat As New Feature_Basics
-    Public Sub New()
-        desc = "Show the optical flow of a sparse matrix."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        options.Run()
-
-        feat.Run(task.gray)
-
-        dst2 = src.Clone()
-        dst3 = src.Clone()
-
-        If src.Channels() <> 1 Then src = task.gray
-        Static lastGray As cv.Mat = task.gray.Clone
-        features = task.features
-        Dim features1 = cv.Mat.FromPixelData(features.Count, 1, cv.MatType.CV_32FC2, features.ToArray)
-        Dim features2 = New cv.Mat
-        Dim status As New cv.Mat, err As New cv.Mat, winSize As New cv.Size(3, 3)
-        cv.Cv2.CalcOpticalFlowPyrLK(src, lastGray, features1, features2, status, err, winSize, 3, term, options.OpticalFlowFlag)
-        features = New List(Of cv.Point2f)
-        lastFeatures.Clear()
-        For i = 0 To status.Rows - 1
-            If status.Get(Of Byte)(i, 0) Then
-                Dim pt1 = features1.Get(Of cv.Point2f)(i, 0)
-                Dim pt2 = features2.Get(Of cv.Point2f)(i, 0)
-                Dim length = Math.Sqrt((pt1.X - pt2.X) * (pt1.X - pt2.X) + (pt1.Y - pt2.Y) * (pt1.Y - pt2.Y))
-                If length < 30 Then
-                    features.Add(pt1)
-                    lastFeatures.Add(pt2)
-                    dst2.Line(pt1, pt2, task.highlight, task.lineWidth + task.lineWidth, task.lineType)
-                    DrawCircle(dst3, pt1, task.DotSize + 3, white)
-                    DrawCircle(dst3, pt2, task.DotSize + 1, cv.Scalar.Red)
-                End If
-            End If
-        Next
-        labels(2) = "Matched " + CStr(features.Count) + " points "
-
-        If task.heartBeat Then lastGray = src.Clone()
-        lastGray = src.Clone()
-    End Sub
-End Class
-
-
-
-
-
-
-Public Class FeatureFlow_LeftRight : Inherits TaskParent
-    Dim pyrLeft As New FeatureFlow_LucasKanade
-    Dim pyrRight As New FeatureFlow_LucasKanade
-    Dim ptLeft As New List(Of cv.Point)
-    Dim ptRight As New List(Of cv.Point)
-    Public ptlist As New List(Of cv.Point)
-    Public Sub New()
-        If standalone Then task.gOptions.displayDst1.Checked = True
-        desc = "Find features using optical flow in both the left and right images."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        pyrLeft.Run(task.leftView)
-        pyrRight.Run(task.rightView)
-
-        Dim leftY As New List(Of Integer)
-        ptLeft.Clear()
-        dst2 = task.leftView.Clone
-        For i = 0 To pyrLeft.features.Count - 1
-            Dim pt = pyrLeft.features(i)
-            ptLeft.Add(New cv.Point(pt.X, pt.Y))
-            DrawCircle(dst2, pt, task.DotSize, task.highlight)
-            leftY.Add(pt.Y)
-
-            pt = pyrLeft.lastFeatures(i)
-            ptLeft.Add(New cv.Point(pt.X, pt.Y))
-            DrawCircle(dst2, pt, task.DotSize, task.highlight)
-            leftY.Add(pt.Y)
-        Next
-
-        Dim rightY As New List(Of Integer)
-        ptRight.Clear()
-        dst3 = task.rightView.Clone
-        For i = 0 To pyrRight.features.Count - 1
-            Dim pt = pyrRight.features(i)
-            ptRight.Add(New cv.Point(pt.X, pt.Y))
-            DrawCircle(dst3, pt, task.DotSize, task.highlight)
-            rightY.Add(pt.Y)
-
-            pt = pyrRight.lastFeatures(i)
-            ptRight.Add(New cv.Point(pt.X, pt.Y))
-            DrawCircle(dst3, pt, task.DotSize, task.highlight)
-            rightY.Add(pt.Y)
-        Next
-
-        Dim lpList As New List(Of lpData)
-        ptlist.Clear()
-        For i = 0 To leftY.Count - 1
-            Dim index = rightY.IndexOf(leftY(i))
-            If index >= 0 Then lpList.Add(New lpData(ptLeft(i), ptRight(index)))
-        Next
-
-        If task.heartBeat Then
-            labels(2) = CStr(ptLeft.Count) + " features found in the left image, " + CStr(ptRight.Count) + " features in the right and " +
-                            CStr(ptlist.Count) + " features are matched."
-        End If
-    End Sub
-End Class
-
-
-
-
-
-
 Public Class FeatureFlow_LeftRightHist : Inherits TaskParent
     Dim pyrLeft As New FeatureFlow_LucasKanade
     Dim pyrRight As New FeatureFlow_LucasKanade
@@ -322,3 +204,115 @@ Public Class FeatureFlow_LeftRight1 : Inherits TaskParent
     End Sub
 End Class
 
+
+
+
+
+
+' https://www.learnopencvb.com/optical-flow-in-opencv/?ck_subscriber_id=785741175
+Public Class FeatureFlow_LucasKanade : Inherits TaskParent
+    Public features As New List(Of cv.Point2f)
+    Public lastFeatures As New List(Of cv.Point2f)
+    Dim options As New Options_OpticalFlowSparse
+    Dim feat As New Feature_Basics
+    Public Sub New()
+        desc = "Show the optical flow of a sparse matrix."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        options.Run()
+
+        If src.Channels <> 1 Then src = task.gray
+        feat.Run(src)
+
+        dst2 = src.Clone()
+        dst3 = src.Clone()
+
+        Static lastGray As cv.Mat = task.gray.Clone
+        features = task.features
+        Dim features1 = cv.Mat.FromPixelData(features.Count, 1, cv.MatType.CV_32FC2, features.ToArray)
+        Dim features2 = New cv.Mat
+        Dim status As New cv.Mat, err As New cv.Mat, winSize As New cv.Size(3, 3)
+        cv.Cv2.CalcOpticalFlowPyrLK(src, lastGray, features1, features2, status, err, winSize, 3, term, options.OpticalFlowFlag)
+        features = New List(Of cv.Point2f)
+        lastFeatures.Clear()
+        For i = 0 To status.Rows - 1
+            If status.Get(Of Byte)(i, 0) Then
+                Dim pt1 = features1.Get(Of cv.Point2f)(i, 0)
+                Dim pt2 = features2.Get(Of cv.Point2f)(i, 0)
+                Dim length = Math.Sqrt((pt1.X - pt2.X) * (pt1.X - pt2.X) + (pt1.Y - pt2.Y) * (pt1.Y - pt2.Y))
+                If length < 30 Then
+                    features.Add(pt1)
+                    lastFeatures.Add(pt2)
+                    dst2.Line(pt1, pt2, task.highlight, task.lineWidth + task.lineWidth, task.lineType)
+                    DrawCircle(dst3, pt1, task.DotSize + 3, white)
+                    DrawCircle(dst3, pt2, task.DotSize + 1, cv.Scalar.Red)
+                End If
+            End If
+        Next
+        labels(2) = "Matched " + CStr(features.Count) + " points "
+
+        If task.heartBeat Then lastGray = src.Clone()
+        lastGray = src.Clone()
+    End Sub
+End Class
+
+
+
+
+
+Public Class FeatureFlow_LeftRight : Inherits TaskParent
+    Dim pyrLeft As New FeatureFlow_LucasKanade
+    Dim pyrRight As New FeatureFlow_LucasKanade
+    Dim ptLeft As New List(Of cv.Point)
+    Dim ptRight As New List(Of cv.Point)
+    Public ptlist As New List(Of cv.Point)
+    Public Sub New()
+        desc = "Find features in both the left and right images."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        pyrLeft.Run(task.leftView)
+        pyrRight.Run(task.rightView)
+
+        Dim leftY As New List(Of Integer)
+        ptLeft.Clear()
+        dst2 = task.leftView.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        For i = 0 To pyrLeft.features.Count - 1
+            Dim pt = pyrLeft.features(i)
+            ptLeft.Add(New cv.Point(pt.X, pt.Y))
+            DrawCircle(dst2, pt, task.DotSize, task.highlight)
+            leftY.Add(pt.Y)
+
+            pt = pyrLeft.lastFeatures(i)
+            ptLeft.Add(New cv.Point(pt.X, pt.Y))
+            DrawCircle(dst2, pt, task.DotSize, task.highlight)
+            leftY.Add(pt.Y)
+        Next
+
+        Dim rightY As New List(Of Integer)
+        ptRight.Clear()
+        dst3 = task.rightView.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        For i = 0 To pyrRight.features.Count - 1
+            Dim pt = pyrRight.features(i)
+            ptRight.Add(New cv.Point(pt.X, pt.Y))
+            DrawCircle(dst3, pt, task.DotSize, task.highlight)
+            rightY.Add(pt.Y)
+
+            pt = pyrRight.lastFeatures(i)
+            ptRight.Add(New cv.Point(pt.X, pt.Y))
+            DrawCircle(dst3, pt, task.DotSize, task.highlight)
+            rightY.Add(pt.Y)
+        Next
+
+        Dim lpList As New List(Of lpData)
+        ptlist.Clear()
+        For i = 0 To leftY.Count - 1
+            Dim index = rightY.IndexOf(leftY(i))
+            If index >= 0 Then lpList.Add(New lpData(ptLeft(i), ptRight(index)))
+        Next
+
+        If task.heartBeat Then
+            labels(2) = CStr(ptLeft.Count) + " features found in the left image, " + CStr(ptRight.Count) + " features in the right and " +
+                        CStr(ptlist.Count) + " features are matched."
+        End If
+    End Sub
+End Class
