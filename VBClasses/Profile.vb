@@ -256,6 +256,8 @@ Public Class Profile_ConcentrationTop : Inherits TaskParent
         sides.Run(src)
         dst2 = sides.dst2
         Dim rc = task.rcD
+        If rc Is Nothing Then Exit Sub
+
         If rc.contour3D.Count = 0 Then
             SetTrueText("The selected cell has no 3D data.  The 3D data can only be computed from cells with depth data.", 1)
             Exit Sub

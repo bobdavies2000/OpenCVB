@@ -42,6 +42,7 @@ Bin4Way_UnstableEdges
 Bin4Way_UnstablePixels1
 Binarize_Basics
 Binarize_Simple
+Binarize_SimpleOld
 BinNWay_Basics
 Bitmap_ToMat
 Blob_Basics
@@ -1570,6 +1571,7 @@ RedCloud_Core
 RedCloud_DelaunayMap
 RedCloud_FeatureLess
 RedCloud_Flood_CPP
+RedCloud_Foreground
 RedCloud_KNN
 RedCloud_LeftRight
 RedCloud_Matched

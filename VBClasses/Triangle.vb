@@ -12,6 +12,7 @@ Public Class Triangle_Basics : Inherits TaskParent
         dst2 = redC.dst2
         labels(2) = redC.labels(2)
 
+        If task.rcD Is Nothing Then Exit Sub
         dst3.SetTo(0)
         Dim pt3D As New List(Of cv.Point3f)
         For Each pt In task.rcD.contour

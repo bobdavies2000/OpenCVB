@@ -1585,7 +1585,7 @@ Public Class Histogram_Depth : Inherits TaskParent
         plotHist.maxRange = task.MaxZmeters
         If rc IsNot Nothing Then
             If rc.index = 0 Then Exit Sub
-            src = src(rc.rect).Clone
+            If src.Size <> rc.rect.Size Then src = src(rc.rect).Clone
         Else
             mm = GetMinMax(src)
             If mm.minVal >= mm.maxVal Then Exit Sub

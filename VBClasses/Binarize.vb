@@ -188,28 +188,6 @@ End Class
 
 
 
-
-
-Public Class Binarize_Simple : Inherits TaskParent
-    Public meanScalar As cv.Scalar
-    Public injectVal As Integer = 255
-    Public Sub New()
-        desc = "Binarize an image using Threshold with OTSU."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        meanScalar = cv.Cv2.Mean(task.gray)
-        dst2 = src.Threshold(meanScalar(0), injectVal, cv.ThresholdTypes.Binary)
-    End Sub
-End Class
-
-
-
-
-
-
-
-
-
 Public Class NR_Binarize_FourPixelFlips : Inherits TaskParent
     Dim binar4 As New Bin4Way_Regions
     Public Sub New()
@@ -226,3 +204,36 @@ Public Class NR_Binarize_FourPixelFlips : Inherits TaskParent
     End Sub
 End Class
 
+
+
+
+
+Public Class Binarize_Simple : Inherits TaskParent
+    Public meanScalar As cv.Scalar
+    Public injectVal As Integer = 255
+    Public Sub New()
+        desc = "Binarize an image using Threshold with OTSU."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        meanScalar = cv.Cv2.Mean(task.gray)
+        dst2 = task.gray.Threshold(meanScalar(0), injectVal, cv.ThresholdTypes.Binary)
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class Binarize_SimpleOld : Inherits TaskParent
+    Public meanScalar As cv.Scalar
+    Public injectVal As Integer = 255
+    Public Sub New()
+        desc = "Binarize an image using Threshold with OTSU."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        meanScalar = cv.Cv2.Mean(task.gray)
+        dst2 = src.Threshold(meanScalar(0), injectVal, cv.ThresholdTypes.Binary)
+    End Sub
+End Class

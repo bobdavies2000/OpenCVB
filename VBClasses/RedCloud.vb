@@ -678,3 +678,30 @@ Public Class RedCloud_DelaunayMap : Inherits TaskParent
         SetTrueText(strOut, 3)
     End Sub
 End Class
+
+
+
+
+
+Public Class RedCloud_Foreground : Inherits TaskParent
+    Dim redC As New RedCloud_Basics
+    Public Sub New()
+        desc = "Find and monitor the cells in the foreground"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        redC.Run(src)
+        dst2 = redC.dst2
+        labels(2) = redC.labels(2)
+
+        dst3.SetTo(0)
+        Dim count As Integer
+        Dim maxDepth = task.foreground.foregroundMaxDepth
+        For Each rc In redC.rcList
+            If rc.wcMean(2) < maxDepth Then
+                dst3(rc.rect).SetTo(rc.color, rc.mask)
+                count += 1
+            End If
+        Next
+        labels(3) = CStr(count) + " RedCloud cells were in the foreground (< " + Format(maxDepth, fmt1) + " meters)"
+    End Sub
+End Class

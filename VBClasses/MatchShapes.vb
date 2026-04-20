@@ -145,13 +145,14 @@ Public Class NR_MatchShapes_Hulls : Inherits TaskParent
         dst2 = hulls.dst2
         If task.heartBeat Then dst3.SetTo(0)
 
-        Dim rcX = task.rcD
-
-        For Each rc In hulls.rclist
-            If rc.hull Is Nothing Or rcX.hull Is Nothing Then Continue For
-            Dim matchVal = cv.Cv2.MatchShapes(rcX.hull, rc.hull, options.matchOption)
-            If matchVal < options.matchThreshold Then DrawTour(dst3(rc.rect), rc.hull, white, -1)
-        Next
+        If task.rcD IsNot Nothing Then
+            Dim rcX = task.rcD
+            For Each rc In hulls.rclist
+                If rc.hull Is Nothing Or rcX.hull Is Nothing Then Continue For
+                Dim matchVal = cv.Cv2.MatchShapes(rcX.hull, rc.hull, options.matchOption)
+                If matchVal < options.matchThreshold Then DrawTour(dst3(rc.rect), rc.hull, white, -1)
+            Next
+        End If
     End Sub
 End Class
 
@@ -228,23 +229,25 @@ Public Class NR_MatchShapes_NearbyHull : Inherits TaskParent
             rc = task.rcD
         End If
 
-        dst3.SetTo(0)
-        similarCells.Clear()
+        If task.rcD IsNot Nothing Then
+            dst3.SetTo(0)
+            similarCells.Clear()
 
-        Dim minMatch As Single = Single.MaxValue
-        For Each rc2 In hulls.rclist
-            If rc2.hull Is Nothing Or rc.hull Is Nothing Then Continue For
-            If Math.Abs(rc2.maxDist.Y - rc.maxDist.Y) > options.maxYdelta Then Continue For
-            Dim matchVal = cv.Cv2.MatchShapes(rc.hull, rc2.hull, options.matchOption)
-            If matchVal < options.matchThreshold Then
-                If matchVal < minMatch And matchVal > 0 Then
-                    minMatch = matchVal
-                    bestCell = similarCells.Count
+            Dim minMatch As Single = Single.MaxValue
+            For Each rc2 In hulls.rclist
+                If rc2.hull Is Nothing Or rc.hull Is Nothing Then Continue For
+                If Math.Abs(rc2.maxDist.Y - rc.maxDist.Y) > options.maxYdelta Then Continue For
+                Dim matchVal = cv.Cv2.MatchShapes(rc.hull, rc2.hull, options.matchOption)
+                If matchVal < options.matchThreshold Then
+                    If matchVal < minMatch And matchVal > 0 Then
+                        minMatch = matchVal
+                        bestCell = similarCells.Count
+                    End If
+                    DrawTour(dst3(rc2.rect), rc2.hull, white, -1)
+                    similarCells.Add(rc2)
                 End If
-                DrawTour(dst3(rc2.rect), rc2.hull, white, -1)
-                similarCells.Add(rc2)
-            End If
-        Next
+            Next
+        End If
 
         If similarCells.Count = 0 Then SetTrueText("No matches with match value < " + Format(options.matchThreshold, fmt2), New cv.Point(5, 5), 3)
     End Sub
