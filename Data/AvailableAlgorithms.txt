@@ -245,12 +245,11 @@ Feature_BasicsNew
 Feature_Bricks
 Feature_Delaunay
 Feature_KNN
+Feature_LeftRight
+Feature_LeftRightCorrelation
 Feature_NoMotion
 Feature_Stable
 FeatureFlow_Basics
-FeatureFlow_LeftRight
-FeatureFlow_LeftRight1
-FeatureFlow_LeftRightHist
 FeatureFlow_LucasKanade
 FeatureLess_Basics
 FeatureLess_BasicsRaw

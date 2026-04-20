@@ -967,7 +967,7 @@ Public Class Feature_BasicsNew : Inherits TaskParent
             If val <> 0 Then ptNext.Add(pt)
         Next
 
-        If task.optionsChanged Or ptNext.Count <= 3 Then
+        If ptNext.Count <= 3 Then
             For Each pt In ptLatest
                 ptNext.Add(pt)
             Next
@@ -985,5 +985,118 @@ Public Class Feature_BasicsNew : Inherits TaskParent
     End Sub
     Protected Overrides Sub Finalize()
         If cPtr <> 0 Then cPtr = Agast_Close(cPtr)
+    End Sub
+End Class
+
+
+
+
+
+Public Class Feature_LeftRight : Inherits TaskParent
+    Dim pyrLeft As New Feature_BasicsNew
+    Dim pyrRight As New Feature_BasicsNew
+    Public features As New List(Of cv.Point)
+    Public lastFeatures As New List(Of cv.Point)
+    Public Sub New()
+        desc = "Find features in both the left and right images."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        pyrLeft.Run(task.leftView)
+        pyrRight.Run(task.rightView)
+
+        Dim ptLeft As New List(Of cv.Point)
+        dst2 = task.leftView.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        Dim rightMatches As New List(Of cv.Point)
+        For i = 0 To pyrLeft.features.Count - 1
+            Dim pt = pyrLeft.features(i)
+            Dim depth = task.pcSplit(2).Get(Of Single)(pt.Y, pt.X)
+            If depth > 0 Then
+                ptLeft.Add(New cv.Point(pt.X, pt.Y))
+                DrawCircle(dst2, pt, task.DotSize, task.highlight)
+                Dim ptRight = pt
+                ptRight.X -= task.calibData.baseline * task.calibData.leftIntrinsics.fx / depth
+                rightMatches.Add(ptRight)
+            End If
+        Next
+
+        dst3 = task.rightView.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        lastFeatures = New List(Of cv.Point)(features)
+        Dim newFeatures As New List(Of cv.Point)
+        For Each pt In pyrRight.features
+            Dim index = rightMatches.IndexOf(pt)
+            If index >= 0 Then
+                newFeatures.Add(ptLeft(index))
+                DrawCircle(dst2, ptLeft(index), task.DotSize + 2, task.highlight)
+                DrawCircle(dst3, pt, task.DotSize + 2, task.highlight)
+            End If
+        Next
+
+        If lastFeatures.Count > 0 Then
+            features.Clear()
+            For Each pt In newFeatures
+                If lastFeatures.Contains(pt) = False Then features.Add(pt)
+            Next
+        Else
+            features = New List(Of cv.Point)(newFeatures)
+            lastFeatures = New List(Of cv.Point)(features)
+        End If
+
+        If task.quarterBeat Then
+            labels(2) = CStr(ptLeft.Count) + " features found in the left image."
+            labels(3) = CStr(features.Count) + " were confirmed present for 2 frames in both the left and right images."
+        End If
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Feature_LeftRightCorrelation : Inherits TaskParent
+    Dim feat As New Feature_BasicsNew
+    Public features As New List(Of cv.Point)
+    Public lastFeatures As New List(Of cv.Point)
+    Dim match As New Match_Basics
+    Public Sub New()
+        task.fOptions.MatchCorrSlider.Value = 75
+        desc = "Find features in the left image and verify them with correlation."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        Dim maxCorr = task.fOptions.MatchCorrSlider.Value / 100
+        feat.Run(task.leftView)
+
+        lastFeatures = New List(Of cv.Point)(features)
+        features.Clear()
+        dst2 = task.color.Clone
+        dst3 = task.color.Clone
+        Dim countNoDepth As Integer, countNoCorr As Integer
+        For Each pt In feat.features
+            DrawCircle(dst2, pt, task.DotSize, task.highlight)
+            Dim depth = task.pcSplit(2).Get(Of Single)(pt.Y, pt.X)
+            If depth > 0 Then
+                Dim rect = task.gridRects(task.gridMap.Get(Of Integer)(pt.Y, pt.X))
+                match.template = task.leftView(rect)
+                rect.X -= task.calibData.baseline * task.calibData.leftIntrinsics.fx / depth
+                rect = ValidateRect(rect)
+                match.Run(task.rightView(rect))
+                If match.correlation > maxCorr Then
+                    features.Add(New cv.Point(pt.X, pt.Y))
+                    DrawCircle(dst2, pt, task.DotSize + 2, task.highlight)
+                    DrawCircle(dst3, pt, task.DotSize + 1, task.highlight)
+                Else
+                    countNoCorr += 1
+                End If
+            Else
+                countNoDepth += 1
+            End If
+        Next
+
+        If task.quarterBeat Then
+            labels(2) = CStr(features.Count) + " of " + CStr(feat.features.Count) +
+                        " features had depth and high correlation to the right image."
+            labels(3) = CStr(countNoDepth) + " features had no depth and " +
+                        CStr(countNoCorr) + " missed the correlation threshold of " + Format(maxCorr, fmt2)
+        End If
     End Sub
 End Class

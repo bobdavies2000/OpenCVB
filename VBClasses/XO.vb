@@ -19676,4 +19676,163 @@ Namespace VBClasses
             If cPtr <> 0 Then cPtr = RedFlood_Close(cPtr)
         End Sub
     End Class
+
+
+
+
+
+
+    Public Class XO_FeatureFlow_LeftRight1 : Inherits TaskParent
+        Dim flowHist As New XO_FeatureFlow_LeftRightHist
+        Public leftFeatures As New List(Of List(Of cv.Point))
+        Public rightFeatures As New List(Of List(Of cv.Point))
+        Public Sub New()
+            desc = "Match features in the left and right images"
+        End Sub
+        Public Function displayFeatures(dst As cv.Mat, features As List(Of List(Of cv.Point))) As cv.Mat
+            For Each ptlist In features
+                For Each pt In ptlist
+                    DrawCircle(dst, pt, task.DotSize, task.highlight)
+                Next
+            Next
+            Return dst
+        End Function
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            flowHist.Run(src)
+
+            Dim tmpLeft As New SortedList(Of Integer, List(Of cv.Point))
+            Dim ptlist As List(Of cv.Point)
+            For Each pt In flowHist.leftFeatures
+                If tmpLeft.Keys.Contains(pt.Y) Then
+                    Dim index = tmpLeft.Keys.IndexOf(pt.Y)
+                    ptlist = tmpLeft.ElementAt(index).Value
+                    ptlist.Add(pt)
+                    tmpLeft.RemoveAt(index)
+                Else
+                    ptlist = New List(Of cv.Point)({pt})
+                End If
+                tmpLeft.Add(pt.Y, ptlist)
+            Next
+
+            Dim tmpRight As New SortedList(Of Integer, List(Of cv.Point))
+            For Each pt In flowHist.rightFeatures
+                If tmpRight.Keys.Contains(pt.Y) Then
+                    Dim index = tmpRight.Keys.IndexOf(pt.Y)
+                    ptlist = tmpRight.ElementAt(index).Value
+                    ptlist.Add(pt)
+                    tmpRight.RemoveAt(index)
+                Else
+                    ptlist = New List(Of cv.Point)({pt})
+                End If
+                tmpRight.Add(pt.Y, ptlist)
+            Next
+
+            leftFeatures.Clear()
+            rightFeatures.Clear()
+            For Each ele In tmpLeft
+                Dim index = tmpRight.Keys.IndexOf(ele.Key)
+                If index >= 0 Then
+                    leftFeatures.Add(ele.Value)
+                    rightFeatures.Add(tmpRight.ElementAt(index).Value)
+                End If
+            Next
+
+            dst2 = displayFeatures(task.leftView.Clone, leftFeatures)
+            dst3 = displayFeatures(task.rightView.Clone, rightFeatures)
+
+            If task.heartBeat Then
+                labels(2) = CStr(leftFeatures.Count) + " detected in the left image that match one or more Y-coordinates found in the right image"
+                labels(3) = CStr(rightFeatures.Count) + " detected in the right image that match one or more Y-coordinates found in the left image"
+            End If
+        End Sub
+    End Class
+
+
+
+
+    Public Class XO_FeatureFlow_LeftRightHist : Inherits TaskParent
+        Dim pyrLeft As New FeatureFlow_LucasKanade
+        Dim pyrRight As New FeatureFlow_LucasKanade
+        Public leftFeatures As New List(Of cv.Point)
+        Public rightFeatures As New List(Of cv.Point)
+        Public Sub New()
+            desc = "Keep only the features that have been around for the specified number of frames."
+        End Sub
+        Public Function displayFeatures(dst As cv.Mat, features As List(Of cv.Point)) As cv.Mat
+            For Each pt In features
+                DrawCircle(dst, pt, task.DotSize, task.highlight)
+            Next
+            Return dst
+        End Function
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            pyrLeft.Run(task.leftView)
+            Dim tmpLeft As New List(Of cv.Point)
+            For i = 0 To pyrLeft.features.Count - 1
+                Dim pt = New cv.Point(pyrLeft.features(i).X, pyrLeft.features(i).Y)
+                tmpLeft.Add(New cv.Point(pt.X, pt.Y))
+                pt = New cv.Point(pyrLeft.lastFeatures(i).X, pyrLeft.lastFeatures(i).Y)
+                tmpLeft.Add(New cv.Point(pt.X, pt.Y))
+            Next
+
+            pyrRight.Run(task.rightView)
+            Dim tmpRight As New List(Of cv.Point)
+            For i = 0 To pyrRight.features.Count - 1
+                Dim pt = New cv.Point(pyrRight.features(i).X, pyrRight.features(i).Y)
+                tmpRight.Add(New cv.Point(pt.X, pt.Y))
+                pt = New cv.Point(pyrRight.lastFeatures(i).X, pyrRight.lastFeatures(i).Y)
+                tmpRight.Add(New cv.Point(pt.X, pt.Y))
+            Next
+
+            Static leftHist As New List(Of List(Of cv.Point))({tmpLeft})
+            Static rightHist As New List(Of List(Of cv.Point))({tmpRight})
+
+            If task.optionsChanged Then
+                leftHist = New List(Of List(Of cv.Point))({tmpLeft})
+                rightHist = New List(Of List(Of cv.Point))({tmpRight})
+            End If
+
+            leftFeatures.Clear()
+            For Each pt In tmpLeft
+                Dim count As Integer = 0
+                For Each hist In leftHist
+                    If hist.Contains(pt) Then count += 1 Else Exit For
+                Next
+                If count = leftHist.Count Then leftFeatures.Add(pt)
+            Next
+
+            rightFeatures.Clear()
+            For Each pt In tmpRight
+                Dim count As Integer = 0
+                For Each hist In rightHist
+                    If hist.Contains(pt) Then count += 1 Else Exit For
+                Next
+                If count = rightHist.Count Then rightFeatures.Add(pt)
+            Next
+
+            Dim minPoints = 10 ' just a guess - trying to keep things current.
+            If leftFeatures.Count < minPoints Then
+                leftFeatures = tmpLeft
+                leftHist = New List(Of List(Of cv.Point))({tmpLeft})
+            End If
+            If rightFeatures.Count < minPoints Then
+                rightFeatures = tmpRight
+                rightHist = New List(Of List(Of cv.Point))({tmpRight})
+            End If
+
+            dst2 = displayFeatures(task.leftView.Clone, leftFeatures)
+            dst3 = displayFeatures(task.rightView.Clone, rightFeatures)
+
+            leftHist.Add(tmpLeft)
+            rightHist.Add(tmpRight)
+            Dim threshold = Math.Min(task.frameHistoryCount, leftHist.Count)
+
+            If leftHist.Count >= task.frameHistoryCount Then leftHist.RemoveAt(0)
+            If rightHist.Count >= task.frameHistoryCount Then rightHist.RemoveAt(0)
+
+            If task.heartBeat Then
+                labels(2) = CStr(leftFeatures.Count) + " detected in the left image that have matches in " + CStr(threshold) + " previous left images"
+                labels(3) = CStr(rightFeatures.Count) + " detected in the right image that have matches in " + CStr(threshold) + " previous right images"
+            End If
+        End Sub
+    End Class
 End Namespace
