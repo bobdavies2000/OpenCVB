@@ -64,7 +64,6 @@ Public Class AlgorithmTask : Implements IDisposable
         gOptions.Show()
         treeView.Show()
         centerRect = New cv.Rect(workRes.Width / 4, workRes.Height / 4, workRes.Width / 2, workRes.Height / 2)
-        fpList.Clear()
 
         task.mouseMovePoint = New cv.Point(task.workRes.Width \ 2, task.workRes.Height \ 2)
         task.mainFormLocation = New cv.Rect(task.Settings.MainFormLeft, task.Settings.MainFormTop,

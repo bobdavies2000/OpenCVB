@@ -1,13 +1,11 @@
 Imports cv = OpenCvSharp
 Public Class FeatureFlow_Basics : Inherits TaskParent
-    Public lpList As New List(Of lpData)
-    Dim feat As New Feature_Basics
+    Dim feat As New Feature_BasicsNew
     Public Sub New()
         desc = "Use correlations to confirm that points match the previous frame."
     End Sub
     Public Sub buildCorrelations(prevFeatures As List(Of cv.Point), currFeatures As List(Of cv.Point))
         Dim correlationmat As New cv.Mat
-        lpList.Clear()
         Dim pad = task.brickEdgeLen / 2
         For Each p1 In prevFeatures
             Dim rect = ValidateRect(New cv.Rect(p1.X - pad, p1.Y - pad, task.brickEdgeLen, task.brickEdgeLen))
@@ -21,7 +19,8 @@ Public Class FeatureFlow_Basics : Inherits TaskParent
             Dim maxCorrelation = correlations.Max
             If maxCorrelation >= task.fCorrThreshold Then
                 Dim index = correlations.IndexOf(maxCorrelation)
-                lpList.Add(New lpData(p1, currFeatures(index)))
+                Dim lp = New lpData(p1, currFeatures(index))
+                dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth)
             End If
         Next
     End Sub
@@ -32,13 +31,13 @@ Public Class FeatureFlow_Basics : Inherits TaskParent
         labels = feat.labels
 
         dst2 = task.color.Clone
-        Static prevFeatures As New List(Of cv.Point)(task.featurePoints)
-        buildCorrelations(prevFeatures, task.featurePoints)
+        Static lastFeatures As New List(Of cv.Point)(feat.features)
+        buildCorrelations(lastFeatures, feat.features)
 
-        For Each pt In task.featurePoints
+        For Each pt In feat.features
             DrawCircle(dst2, pt, task.DotSize, task.highlight)
         Next
-        prevFeatures = New List(Of cv.Point)(task.featurePoints)
+        lastFeatures = New List(Of cv.Point)(feat.features)
     End Sub
 End Class
 

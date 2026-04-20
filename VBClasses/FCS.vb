@@ -8,10 +8,10 @@ Public Class FCS_Basics : Inherits TaskParent
         desc = "Track the stable good features found in the BGR image."
     End Sub
     'Public Shared Sub fpDSet()
-    '    If task.fpList.Count = 0 Then Exit Sub
+    '    If fcs.fplist.Count = 0 Then Exit Sub
     '    Dim brickIndex = task.fpMap.Get(Of Single)(task.clickPoint.Y, task.clickPoint.X)
     '    Dim fpIndex = task.fpFromGridCell.IndexOf(brickIndex)
-    '    If fpIndex >= 0 Then task.fpD = task.fpList(fpIndex)
+    '    If fpIndex >= 0 Then task.fpD = fcs.fplist(fpIndex)
     'End Sub
     Public Shared Sub fpCellContour(fp As fpData, dst As cv.Mat, Optional colorIndex As Integer = 0)
         Dim color = Choose(colorIndex + 1, cv.Scalar.White, cv.Scalar.Black)
@@ -192,11 +192,7 @@ Public Class NR_FCS_ViewLeft : Inherits TaskParent
         dst2 = fcs.dst2
         dst3 = fcs.dst3
 
-        For Each fp In task.fpList
-            SetTrueTextBase(CStr(fp.age), fp.pt, 2)
-        Next
-        ' FCS_Basics.fpDSet()
-        labels(2) = fcs.labels(2)
+        labels = fcs.labels
     End Sub
 End Class
 
@@ -216,11 +212,7 @@ Public Class NR_FCS_ViewRight : Inherits TaskParent
         dst2 = fcs.dst2
         dst3 = fcs.dst3
 
-        For Each fp In task.fpList
-            SetTrueTextBase(CStr(fp.age), fp.pt, 2)
-        Next
-        ' FCS_Basics.fpDSet()
-        labels(2) = fcs.labels(2)
+        labels = fcs.labels
     End Sub
 End Class
 
@@ -240,13 +232,13 @@ Public Class NR_FCS_Edges : Inherits TaskParent
 
         edges.Run(src)
         dst3 = edges.dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-        For Each fp In task.fpList
+        For Each fp In fcs.fpList
             If fp.depth Then
                 DrawCircle(dst2, fp.pt, task.DotSize, task.highlight)
                 DrawCircle(dst3, fp.pt, task.DotSize, task.highlight)
             End If
         Next
-        ' FCS_Basics.fpDSet()
+        labels = fcs.labels
     End Sub
 End Class
 
@@ -257,19 +249,17 @@ End Class
 Public Class NR_FCS_WithAge : Inherits TaskParent
     Dim fcs As New FCS_CreateList
     Public Sub New()
-        labels(3) = "Ages are kept below 1000 to make the output more readable..."
         desc = "Display the age of each cell."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         fcs.Run(task.gray)
         dst2 = fcs.dst2
-        labels(2) = fcs.labels(2)
+        labels = fcs.labels
 
         dst3.SetTo(0)
-        For Each fp In task.fpList
+        For Each fp In fcs.fpList
             DrawCircle(dst3, fp.pt, task.DotSize, task.highlight)
-            Dim age = If(fp.age >= 900, fp.age Mod 900 + 100, fp.age)
-            SetTrueText(CStr(age), fp.pt, 3)
+            If fp.age >= 1000 Then fp.age = 2
         Next
     End Sub
 End Class
@@ -290,17 +280,16 @@ Public Class NR_FCS_BestAge : Inherits TaskParent
         labels(2) = fcs.labels(2)
 
         Dim fpSorted As New SortedList(Of Integer, Integer)(New compareAllowIdenticalIntegerInverted)
-        For Each fp In task.fpList
+        For Each fp In fcs.fpList
             fpSorted.Add(fp.age, fp.index)
         Next
 
         dst3.SetTo(0)
         Dim maxIndex As Integer = 0
         For Each index In fpSorted.Values
-            Dim fp = task.fpList(index)
+            Dim fp = fcs.fpList(index)
             DrawCircle(dst3, fp.pt, task.DotSize, task.highlight)
-            Dim age = If(fp.age >= 900, fp.age Mod 900 + 100, fp.age)
-            SetTrueText(CStr(age), fp.pt, 3)
+            If fp.age >= 1000 Then fp.age = 2
             maxIndex += 1
             If maxIndex >= 10 Then Exit For
         Next
@@ -328,7 +317,7 @@ Public Class NR_FCS_RedCloud1 : Inherits TaskParent
         fcs.Run(src)
         dst1 = fcs.dst2
         labels(3) = fcs.labels(2)
-        For Each fp In task.fpList
+        For Each fp In fcs.fpList
             Dim val = dst2.Get(Of cv.Vec3b)(fp.pt.Y, fp.pt.X)
             dst3.FillConvexPoly(fp.facets, val)
         Next
@@ -477,12 +466,8 @@ Public Class NR_FCS_Lines : Inherits TaskParent
         fcs.Run(task.gray)
         dst2 = fcs.dst2
 
-        For Each fp In task.fpList
-            SetTrueTextBase(CStr(fp.age), fp.pt, 2)
-        Next
-
         labels(2) = CStr(task.features.Count) + " lines were used to create " +
-                                               CStr(task.fpList.Count) + " cells"
+                                               CStr(fcs.fpList.Count) + " cells"
     End Sub
 End Class
 
@@ -520,7 +505,7 @@ Public Class NR_FCS_ByDepth : Inherits TaskParent
         labels(2) = fcs.labels(2)
 
         Dim dBricks As New List(Of Single)
-        For Each fp In task.fpList
+        For Each fp In fcs.fpList
             dBricks.Add(fp.depth)
         Next
 
@@ -545,7 +530,7 @@ Public Class NR_FCS_ByDepth : Inherits TaskParent
         End If
         palInput.SetTo(0)
 
-        For Each fp In task.fpList
+        For Each fp In fcs.fpList
             If fp.depth > depthStart And fp.depth < depthEnd Then
                 Dim val = palInput.Get(Of Byte)(fp.pt.Y, fp.pt.X)
                 If val = 0 Then
@@ -557,7 +542,6 @@ Public Class NR_FCS_ByDepth : Inherits TaskParent
 
         For Each ele In fpCells
             Dim fp As fpData = ele.Item1
-            SetTrueText(Format(fp.age, fmt0), fp.pt, 0)
             FCS_Basics.fpCellContour(fp, task.color, 0)
         Next
         dst3 = Palettize(palInput)
@@ -583,7 +567,7 @@ End Class
 Public Class FCS_Periphery : Inherits TaskParent
     Public ptOutside As New List(Of cv.Point2f)
     Public ptInside As New List(Of cv.Point2f)
-    Dim fcs As New FCS_CreateList
+    Public fcs As New FCS_CreateList
     Public Sub New()
         desc = "Display the cells which are on the periphery of the image"
     End Sub
@@ -594,7 +578,7 @@ Public Class FCS_Periphery : Inherits TaskParent
         dst3 = dst2.Clone
         ptOutside.Clear()
         ptInside.Clear()
-        For Each fp In task.fpList
+        For Each fp In fcs.fpList
             If fp.periph Then
                 dst3.FillConvexPoly(fp.facets, cv.Scalar.Gray, task.lineType)
                 DrawCircle(dst3, fp.pt, task.DotSize, task.highlight)
@@ -605,7 +589,7 @@ Public Class FCS_Periphery : Inherits TaskParent
         Next
         ' FCS_Basics.fpDSet()
         labels(2) = "There are " + CStr(ptOutside.Count) + " features on the periphery of the image."
-        labels(3) = "There are " + CStr(task.fpList.Count - ptOutside.Count) + " features in the interior region of the image."
+        labels(3) = "There are " + CStr(fcs.fpList.Count - ptOutside.Count) + " features in the interior region of the image."
     End Sub
 End Class
 
@@ -624,7 +608,7 @@ Public Class NR_FCS_PeripheryNot : Inherits TaskParent
         dst2 = perif.dst3
 
         dst3.SetTo(0)
-        For Each fp In task.fpList
+        For Each fp In perif.fcs.fpList
             If fp.periph = False Then dst3.FillConvexPoly(fp.facets, 255, task.lineType)
         Next
         ' FCS_Basics.fpDSet()
@@ -695,95 +679,6 @@ End Class
 
 
 
-Public Class FCS_CreateList : Inherits TaskParent
-    Dim subdiv As New cv.Subdiv2D
-    Dim feat As New Feature_Basics
-    Dim bricks As New Brick_Basics
-    Public Sub New()
-        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
-        task.fpMap = New cv.Mat(dst2.Size(), cv.MatType.CV_32F, 0)
-        labels(3) = "CV_8U map of Delaunay cells."
-        desc = "Subdivide an image based on the points provided."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        bricks.Run(src)
-
-        feat.Run(task.gray)
-
-        subdiv.InitDelaunay(New cv.Rect(0, 0, dst1.Width, dst1.Height))
-        subdiv.Insert(task.features)
-
-        Dim facets = New cv.Point2f()() {Nothing}
-        subdiv.GetVoronoiFacetList(New List(Of Integer)(), facets, Nothing)
-
-        task.fpList.Clear()
-        Dim matchCount As Integer
-        dst1.SetTo(0)
-        For i = 0 To Math.Min(task.features.Count, facets.Count) - 1
-            Dim fp As New fpData
-            fp.pt = task.features(i)
-            fp.ptHistory.Add(fp.pt)
-            fp.index = i
-
-            Dim brickIndex = task.gridMap.Get(Of Integer)(fp.pt.Y, fp.pt.X)
-            Dim brick = bricks.brickList(brickIndex)
-            'Dim fpIndex = task.fpFromGridCellLast.IndexOf(brickIndex)
-            'If fpIndex >= 0 Then
-            '    Dim fpLast = task.fpLastList(fpIndex)
-            '    fp.ptLast = fpLast.pt
-            '    fp.age = fpLast.age + 1
-            '    matchCount += 1
-            'End If
-
-            fp.brickIndex = brickIndex
-
-            fp.facets = New List(Of cv.Point)
-            Dim xlist As New List(Of Integer), ylist As New List(Of Integer)
-            For j = 0 To facets(i).Length - 1
-                Dim pt = New cv.Point(facets(i)(j).X, facets(i)(j).Y)
-                xlist.Add(pt.X)
-                ylist.Add(pt.Y)
-                fp.facets.Add(New cv.Point(facets(i)(j).X, facets(i)(j).Y))
-            Next
-
-            Dim minX = xlist.Min, minY = ylist.Min, maxX = xlist.Max, maxY = ylist.Max
-
-            If minX < 0 Or minY < 0 Or maxX >= dst2.Width Or maxY >= dst2.Height Then fp.periph = True
-
-            fp.depth = brick.depth
-
-            task.fpList.Add(fp)
-
-            task.fpMap.FillConvexPoly(fp.facets, CSng(brickIndex), task.lineType)
-            dst1.FillConvexPoly(fp.facets, i Mod 256, task.lineType)
-        Next
-
-        dst2 = Palettize(dst1)
-        For Each fp In task.fpList
-            If fp.depth > 0 Then DrawCircle(dst2, fp.pt, task.DotSize, task.highlight)
-        Next
-
-        If standalone Then
-            For Each fp In task.fpList
-                SetTrueTextBase(CStr(fp.age), fp.pt, 2)
-            Next
-            FCS_Basics.fpCellContour(task.fpD, task.color)
-        End If
-        ' FCS_Basics.fpDSet()
-
-        If task.heartBeat Then
-            labels(2) = traceName + ": " + Format(task.features.Count, "000") + " cells found.  Matched = " +
-                            CStr(matchCount) + " of " + CStr(task.features.Count)
-        End If
-    End Sub
-End Class
-
-
-
-
-
-
-
 Public Class FCS_Motion : Inherits TaskParent
     Dim fcs As New FCS_CreateList
     Dim plot As New PlotTime_Basics
@@ -801,7 +696,7 @@ Public Class FCS_Motion : Inherits TaskParent
         fcs.Run(task.gray)
         dst2 = fcs.dst2
 
-        For Each fp In task.fpList
+        For Each fp In fcs.fpList
             If fp.depth > 0 Then DrawCircle(dst2, fp.pt, task.DotSize, task.highlight)
         Next
 
@@ -811,7 +706,7 @@ Public Class FCS_Motion : Inherits TaskParent
         xDist.Add(0)
         yDist.Add(0)
         dst3.SetTo(0)
-        For Each fp In task.fpList
+        For Each fp In fcs.fpList
             'Dim brickIndex = task.gridMap.Get(Of Integer)(fp.pt.Y, fp.pt.X)
             'Dim fpIndex = task.fpFromGridCellLast.IndexOf(brickIndex)
             'If fpIndex >= 0 Then
@@ -837,5 +732,77 @@ Public Class FCS_Motion : Inherits TaskParent
         plot.Run(src)
         dst1 = plot.dst2
         ' FCS_Basics.fpDSet()
+    End Sub
+End Class
+
+
+
+
+
+Public Class FCS_CreateList : Inherits TaskParent
+    Dim subdiv As New cv.Subdiv2D
+    Dim feat As New Feature_BasicsNew
+    Dim bricks As New Brick_Basics
+    Public fpList As New List(Of fpData)
+    Public Sub New()
+        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        labels(3) = "Visualization of the map of feature points."
+        desc = "Subdivide an image based on the points provided."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        bricks.Run(src)
+
+        feat.Run(task.gray)
+
+        subdiv.InitDelaunay(New cv.Rect(0, 0, dst2.Width, dst2.Height))
+        Dim features As New List(Of cv.Point2f)
+        For Each pt In feat.features
+            features.Add(pt)
+        Next
+        subdiv.Insert(features)
+
+        Dim facets = New cv.Point2f()() {Nothing}
+        subdiv.GetVoronoiFacetList(New List(Of Integer)(), facets, Nothing)
+
+        fpList.Clear()
+        dst2.SetTo(0)
+        For i = 0 To Math.Min(feat.features.Count, facets.Count) - 1
+            Dim fp As New fpData
+            fp.pt = feat.features(i)
+            fp.ptHistory.Add(fp.pt)
+            fp.index = i
+
+            Dim brickIndex = task.gridMap.Get(Of Integer)(fp.pt.Y, fp.pt.X)
+            Dim brick = bricks.brickList(brickIndex)
+            fp.brickIndex = brickIndex
+
+            fp.facets = New List(Of cv.Point)
+            Dim xlist As New List(Of Integer), ylist As New List(Of Integer)
+            For j = 0 To facets(i).Length - 1
+                Dim pt = New cv.Point(facets(i)(j).X, facets(i)(j).Y)
+                xlist.Add(pt.X)
+                ylist.Add(pt.Y)
+                fp.facets.Add(New cv.Point(facets(i)(j).X, facets(i)(j).Y))
+            Next
+
+            Dim minX = xlist.Min, minY = ylist.Min, maxX = xlist.Max, maxY = ylist.Max
+
+            If minX < 0 Or minY < 0 Or maxX >= dst2.Width Or maxY >= dst2.Height Then fp.periph = True
+
+            fp.depth = brick.depth
+
+            fpList.Add(fp)
+
+            dst2.FillConvexPoly(fp.facets, i Mod 256, task.lineType)
+        Next
+
+        dst3 = Palettize(dst2)
+        For Each fp In fpList
+            If fp.depth > 0 Then DrawCircle(dst3, fp.pt, task.DotSize, task.highlight)
+        Next
+
+        If standalone Then FCS_Basics.fpCellContour(task.fpD, task.color)
+        If task.heartBeat Then labels(2) = traceName + ": " + Format(feat.features.Count, "000") + " cells found " +
+                                           "using " + task.fOptions.FeatureMethod.Text
     End Sub
 End Class

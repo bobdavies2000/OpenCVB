@@ -107,7 +107,6 @@ Partial Public Class AlgorithmTask
 
     Public motionLinkType As Integer = 8
 
-    Public fpList As New List(Of fpData)
     Public featList As New List(Of List(Of Integer))
     Public fpMap As New cv.Mat ' feature map
 
@@ -131,7 +130,6 @@ Partial Public Class AlgorithmTask
     Public gridRatioY As Single ' translate from display height to workres to find grid element.
 
     Public features As New List(Of cv.Point2f)
-    Public fpLastList As New List(Of fpData)
     Public featurePoints As New List(Of cv.Point)
 
     Public flessBoundary As New cv.Mat

@@ -71,8 +71,6 @@ Public Class Feature_Basics : Inherits TaskParent
                 strOut = bPoint.labels(2)
         End Select
 
-        task.fpLastList = New List(Of fpData)(task.fpList)
-
         If task.optionsChanged Or ptNew.Count = 0 Then
             For Each pt In ptLatest
                 ptNew.Add(pt)

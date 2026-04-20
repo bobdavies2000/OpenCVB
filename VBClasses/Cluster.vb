@@ -6,7 +6,7 @@ Public Class Cluster_Basics : Inherits TaskParent
     Public clusterID As New List(Of Integer)
     Public clusters As New SortedList(Of Integer, List(Of cv.Point))
     Dim options As New Options_Features
-    Dim feat As New Feature_Basics
+    Dim feat As New Feature_BasicsNew
     Public Sub New()
         OptionParent.FindSlider("Min Distance").Value = 10
         desc = "Group feature points based on their proximity to each other."
@@ -17,7 +17,7 @@ Public Class Cluster_Basics : Inherits TaskParent
         If standalone Then
             feat.Run(src)
             ptInput.Clear()
-            For Each pt In feat.ptLatest
+            For Each pt In feat.features
                 ptInput.Add(New cv.Point(CInt(pt.X), CInt(pt.Y)))
             Next
         End If
