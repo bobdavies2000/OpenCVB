@@ -2,7 +2,8 @@ Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Class FeatureLess_Basics : Inherits TaskParent
         Public fLessRaw As New FeatureLess_BasicsRaw
-        Public rectList As New List(Of cv.Rect)
+        Public fLessList As New List(Of cv.Rect)
+        Public fLessNot As New List(Of cv.Rect)
         Public ptList As New List(Of cv.Point)
         Public Sub New()
             desc = "A features grid rect cannot change if there has been no motion in that grid rect."
@@ -11,23 +12,19 @@ Namespace VBClasses
             fLessRaw.Run(src)
             If task.optionsChanged Then
                 dst2 = fLessRaw.dst3.Clone
-                rectList = New List(Of cv.Rect)(fLessRaw.rectList)
+                fLessList = New List(Of cv.Rect)(fLessRaw.fLessList)
             End If
 
             ptList.Clear()
             Dim newList As New List(Of cv.Rect)
             ' remove any grid rects that had motion.
-            For Each r In rectList
+            For Each r In fLessList
                 Dim val = task.motion.motionMask.Get(Of Byte)(r.Y, r.X)
-                If val <> 0 Then
-                    dst2(r).SetTo(0)
-                Else
-                    newList.Add(r)
-                End If
+                If val <> 0 Then dst2(r).SetTo(0) Else newList.Add(r)
                 ptList.Add(r.TopLeft)
             Next
 
-            For Each r In fLessRaw.rectList
+            For Each r In fLessRaw.fLessList
                 Dim val = task.motion.motionMask.Get(Of Byte)(r.TopLeft.Y, r.TopLeft.X)
                 If val = 0 Then
                     If ptList.Contains(r.TopLeft) = False Then
@@ -37,7 +34,14 @@ Namespace VBClasses
                 End If
             Next
 
-            rectList = New List(Of cv.Rect)(newList)
+            fLessNot.Clear()
+            For i = 0 To task.gridRects.Count - 1
+                Dim r = task.gridRects(i)
+                If dst2.Get(Of Byte)(r.TopLeft.Y, r.TopLeft.X) = 0 Then fLessNot.Add(r)
+            Next
+
+            fLessList = New List(Of cv.Rect)(newList)
+
             labels(2) = fLessRaw.labels(2)
         End Sub
     End Class
@@ -45,10 +49,50 @@ Namespace VBClasses
 
 
 
+    Public Class FeatureLess_BasicsRaw : Inherits TaskParent
+        Public fLessList As New List(Of cv.Rect)
+        Public options As New Options_FeatureLess
+        Dim corr As New Correlation_Basics
+        Public Sub New()
+            dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+            dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
+            desc = "Identify featureless squares using the gray scale range - see 'Correlation_Basics'."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            options.Run()
+
+            If src.Channels <> 1 Then src = task.gray
+
+            dst2 = src
+            ' at higher resolutions, the correlation works but the fLessThreshold does not...
+            If task.workRes.Width >= 1280 Then
+                corr.Run(src)
+                fLessList = New List(Of cv.Rect)(corr.fLessList)
+            Else
+                fLessList.Clear()
+                For Each r In task.gridRects
+                    Dim mm = GetMinMax(src(r))
+                    If mm.range < options.fLessThreshold Then fLessList.Add(r)
+                Next
+            End If
+
+            dst3.SetTo(0)
+            For Each r In fLessList
+                dst2.Rectangle(r, 255, task.lineWidth)
+                dst3(r).SetTo(255)
+            Next
+
+            labels(2) = CStr(fLessList.Count) + " grid squares were found to be featureless (<gridRect>.mm.range < " +
+                        CStr(options.fLessThreshold) + ")"
+        End Sub
+    End Class
+
+
+
 
     Public Class FeatureLess_Correlation : Inherits TaskParent
         Dim corr As New Correlation_Basics
-        Public rectList As New List(Of cv.Rect)
+        Public fLessList As New List(Of cv.Rect)
         Public Sub New()
             desc = "Measure the correlation of all grid squares except where there is motion."
         End Sub
@@ -58,7 +102,7 @@ Namespace VBClasses
             corr.Run(src)
             dst2 = corr.dst2
             dst3 = corr.dst3
-            rectList = New List(Of cv.Rect)(corr.rectList)
+            fLessList = New List(Of cv.Rect)(corr.fLessList)
 
             labels(2) = corr.labels(2)
         End Sub
@@ -69,7 +113,7 @@ Namespace VBClasses
 
 
     Public Class NR_FeatureLess_Correlation : Inherits TaskParent
-        Public rectList As New List(Of cv.Rect)
+        Public fLessList As New List(Of cv.Rect)
         Dim smallGrid As New Grid_SquaresOnly
         Public options As New Options_FeatureLess
         Public Sub New()
@@ -97,14 +141,14 @@ Namespace VBClasses
 
             dst2 = mask.Resize(src.Size, 0, 0, cv.InterpolationFlags.Nearest)
 
-            rectList.Clear()
+            fLessList.Clear()
             For Each r In task.gridRects
-                If dst2.Get(Of Byte)(r.Y, r.X) Then rectList.Add(r)
+                If dst2.Get(Of Byte)(r.Y, r.X) Then fLessList.Add(r)
             Next
 
             If standaloneTest() Then
                 dst3 = task.gray.Clone
-                For Each r In rectList
+                For Each r In fLessList
                     dst3.Rectangle(r, white, task.lineWidth)
                 Next
 
@@ -116,7 +160,7 @@ Namespace VBClasses
                                 "Range = " + Format(mm.range, fmt0) + vbCrLf + vbCrLf, 1)
             End If
 
-            labels(3) = CStr(rectList.Count) + " grid squares were found to be featureless (range < " +
+            labels(3) = CStr(fLessList.Count) + " grid squares were found to be featureless (range < " +
                             CStr(options.fLessThreshold) + ")"
 
         End Sub
@@ -380,31 +424,6 @@ Namespace VBClasses
 
 
 
-    Public Class FeatureLess_Not : Inherits TaskParent
-        Dim feat As New Feature_Basics
-        Dim fLess As New FeatureLess_Basics
-        Public Sub New()
-            dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-            desc = "Use the FeatureLess mask to reduce the input to feature searches."
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            fLess.Run(task.gray.Clone)
-
-            dst2.SetTo(0)
-            task.gray.CopyTo(dst2, Not fLess.dst2)
-
-            feat.Run(dst2)
-            feat.dst2.CopyTo(dst3)
-            Dim count = task.gridRects.Count - fLess.rectList.Count
-            labels(2) = "Current frame: " + CStr(count) + " grid squares had features"
-        End Sub
-    End Class
-
-
-
-
-
-
     Public Class FeatureLess_RedColor : Inherits TaskParent
         Public redC As New RedCloud_Flood_CPP
         Public fLess As New FeatureLess_Basics
@@ -525,7 +544,7 @@ Namespace VBClasses
             Dim flags As cv.FloodFillFlags = cv.FloodFillFlags.Link4
             Dim minSize = task.brickEdgeLen * task.brickEdgeLen
             Dim countList As New SortedList(Of Integer, Integer)(New compareAllowIdenticalIntegerInverted)
-            For Each r In fLess.rectList
+            For Each r In fLess.fLessList
                 Dim val = dst2.Get(Of Byte)(r.Y, r.X)
                 If val = 255 Then
                     Dim count = cv.Cv2.FloodFill(dst2, mask, r.TopLeft, index, rect, 0, 0, flags)
@@ -551,50 +570,105 @@ Namespace VBClasses
 
 
 
-    Public Class FeatureLess_BasicsRaw : Inherits TaskParent
-        Public rectList As New List(Of cv.Rect)
-        Public options As New Options_FeatureLess
-        Dim corr As New Correlation_Basics
+
+    Public Class FeatureLess_NotImages : Inherits TaskParent
+        Dim fLess As New FeatureLess_Basics
         Public Sub New()
-            dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-            dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
-            desc = "Identify featureless squares using the gray scale range - see 'Correlation_Basics'."
+            labels(3) = "All regions in the image with features."
+            desc = "Provide masks for both the featureless and non-featureless regions."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            options.Run()
-            Dim motionList As New List(Of Integer)(task.motion.motionSort)
-            If motionList.Count = 0 Then motionList.Add(0) ' dummy entry so loops below works.
-            Dim index As Integer
+            fLess.Run(task.gray)
+            dst0 = fLess.dst2
+            labels(2) = fLess.labels(2)
 
-            If src.Channels <> 1 Then src = task.gray
+            dst1 = Not dst0
 
-            dst2 = src
-            ' at higher resolutions, the correlation works but the fLessThreshold does not...
-            If task.workRes.Width >= 1280 Then
-                corr.Run(src)
-                rectList = New List(Of cv.Rect)(corr.rectList)
-            Else
-                rectList.Clear()
-                For Each r In task.gridRects
-                    Dim mm = GetMinMax(src(r))
-                    If mm.range < options.fLessThreshold Then
-                        If r <> task.gridRects(motionList(index)) Then
-                            rectList.Add(r)
-                        Else
-                            If index + 1 < motionList.Count Then index += 1
-                        End If
-                    End If
-                Next
-            End If
-
+            dst2.SetTo(0)
             dst3.SetTo(0)
-            For Each r In rectList
-                dst2.Rectangle(r, 255, task.lineWidth)
-                dst3(r).SetTo(255)
+
+            src.CopyTo(dst2, dst0)
+            src.CopyTo(dst3, dst1)
+        End Sub
+    End Class
+
+
+
+
+
+
+    Public Class FeatureLess_Features : Inherits TaskParent
+        Dim feat As New Feature_Basics
+        Dim fLess As New FeatureLess_Basics
+        Public Sub New()
+            desc = "Isolate features in the not of the featureless regions."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            fLess.Run(task.gray.Clone)
+
+            dst2.SetTo(0)
+            task.color.CopyTo(dst2, Not fLess.dst2)
+
+            feat.Run(dst2)
+
+            For Each pt In feat.features
+                dst2.Circle(pt, task.DotSize + 2, task.highlight, -1)
             Next
 
-            labels(2) = CStr(rectList.Count) + " grid squares were found to be featureless (<gridRect>.mm.range < " +
-                            CStr(options.fLessThreshold) + ")"
+            For Each lp In task.lines.lpList
+                dst2.Line(lp.p1, lp.p2, black, task.lineWidth)
+            Next
+            Dim count = task.gridRects.Count - fLess.fLessList.Count
+            labels(2) = "Current frame: " + CStr(count) + " grid squares had features"
+        End Sub
+    End Class
+
+
+
+
+
+
+    Public Class FeatureLess_FeatureLines : Inherits TaskParent
+        Dim fLess As New FeatureLess_Basics
+        Public Sub New()
+            desc = "Use lines to further divide featureless from features."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            fLess.Run(task.gray.Clone)
+
+            dst2.SetTo(0)
+            task.color.CopyTo(dst2, Not fLess.dst2)
+
+            For i = 1 To task.gridRects.Count - 1
+                Dim r1 = task.gridRects(i - 1)
+                Dim r2 = task.gridRects(i)
+                Dim p1 = r1.TopLeft
+                Dim p2 = r2.TopLeft
+                cv.Cv2.ImShow("fless.dst2", fLess.dst2.Clone)
+                If p1.X < p2.X Then
+                    Dim val1 = fLess.dst2.Get(Of Byte)(p1.Y, p1.X)
+                    Dim val2 = fLess.dst2.Get(Of Byte)(p2.Y, p2.X)
+                    If val1 > 0 And val2 = 0 Then
+                        ' line present?
+                        If task.lines.dst3(r2).CountNonZero Then
+                            fLess.dst2(r2) = fLess.dst2(r2).InRange(0, 0)
+                        End If
+                    End If
+
+                    If val1 = 0 And val2 > 0 Then
+                        ' line present?
+                        If task.lines.dst3(r1).CountNonZero Then
+                            fLess.dst2(r2) = fLess.dst2(r2).InRange(0, 0)
+                        End If
+                    End If
+                End If
+            Next
+
+            For Each lp In task.lines.lpList
+                dst2.Line(lp.p1, lp.p2, black, task.lineWidth)
+            Next
+            Dim count = task.gridRects.Count - fLess.fLessList.Count
+            labels(2) = "Current frame: " + CStr(count) + " grid squares had features"
         End Sub
     End Class
 End Namespace

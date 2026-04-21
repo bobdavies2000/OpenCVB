@@ -1,6 +1,6 @@
 Imports cv = OpenCvSharp
 Public Class Correlation_Basics : Inherits TaskParent
-    Public rectList As New List(Of cv.Rect)
+    Public fLessList As New List(Of cv.Rect)
     Public maxCorrelation As Single
     Public Sub New()
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
@@ -14,7 +14,7 @@ Public Class Correlation_Basics : Inherits TaskParent
         dst2.SetTo(0)
         Dim correlationMat As New cv.Mat
         maxCorrelation = task.fOptions.MatchCorrSlider.Value / 100.0 + 1
-        rectList.Clear()
+        fLessList.Clear()
         Dim motionList As New List(Of Integer)(task.motion.motionSort)
         If motionList.Count = 0 Then motionList.Add(0) ' dummy entry so loops below works.
         Dim index As Integer
@@ -25,7 +25,7 @@ Public Class Correlation_Basics : Inherits TaskParent
                 Dim correlation = correlationMat.Get(Of Single)(0, 0) + 1
                 If correlation < maxCorrelation Then
                     dst2.Rectangle(r, white, -1)
-                    rectList.Add(r)
+                    fLessList.Add(r)
                 End If
             Else
                 If index + 1 < motionList.Count Then index += 1
@@ -33,7 +33,7 @@ Public Class Correlation_Basics : Inherits TaskParent
         Next
 
         lastFrame = src.Clone
-        labels(2) = CStr(rectList.Count) + " rects < " + Format(maxCorrelation - 1, fmt2) +
+        labels(2) = CStr(fLessList.Count) + " rects < " + Format(maxCorrelation - 1, fmt2) +
                             " correlation to last frame, indicating that they were featureless."
         SetTrueText("Use Feature Options 'Match Correlation Threshold' to shrink/grow.", 3)
     End Sub
@@ -251,7 +251,7 @@ End Class
 
 
 Public Class Correlation_MinMaxRange : Inherits TaskParent
-    Public rectList As New List(Of cv.Rect)
+    Public fLessList As New List(Of cv.Rect)
     Public Sub New()
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         desc = "Use range to find featureless-ness rather than correlation."
@@ -262,12 +262,12 @@ Public Class Correlation_MinMaxRange : Inherits TaskParent
         Static lastsrc As cv.Mat = src.Clone
         dst2.SetTo(0)
         Dim correlationMat As New cv.Mat
-        rectList.Clear()
+        fLessList.Clear()
         For Each r In task.gridRects
             Dim mm = GetMinMax(src(r))
             If mm.range < 30 Then
                 dst2.Rectangle(r, white, -1)
-                rectList.Add(r)
+                fLessList.Add(r)
             End If
         Next
 

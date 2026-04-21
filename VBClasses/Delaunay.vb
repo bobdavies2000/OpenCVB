@@ -486,7 +486,7 @@ Public Class Delaunay_FeatureLess : Inherits TaskParent
         delaunay.inputPoints.Clear()
         delaunay.inputColors.Clear()
 
-        For Each r In fLessColor.fLess.rectList
+        For Each r In fLessColor.fLess.fLessList
             Dim pt = r.TopLeft
             Dim val = fLessColor.redC.rcMap.Get(Of Integer)(pt.Y, pt.X)
             delaunay.inputPoints.Add(New cv.Point2f(pt.X, pt.Y))

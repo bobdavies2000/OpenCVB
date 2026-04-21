@@ -75,7 +75,7 @@ Public Class Line_Basics_TA : Inherits TaskParent
                     Continue For
                 End If
             End If
-            dst1.Line(lp.p1, lp.p2, lp.index + 1, task.lineWidth + 1, cv.LineTypes.Link4)
+            dst1.Line(lp.p1, lp.p2, lp.index + 1, task.lineWidth, cv.LineTypes.Link4)
             dst2.Line(lp.p1, lp.p2, lp.color, task.lineWidth + 1, task.lineType)
             lpList.Add(lp)
         Next

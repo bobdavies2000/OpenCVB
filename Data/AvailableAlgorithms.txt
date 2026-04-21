@@ -247,9 +247,11 @@ FeatureLess_Basics
 FeatureLess_BasicsRaw
 FeatureLess_Cells
 FeatureLess_Correlation
+FeatureLess_FeatureLines
+FeatureLess_Features
 FeatureLess_LeftRight
 FeatureLess_Lines
-FeatureLess_Not
+FeatureLess_NotImages
 FeatureLess_RedColor
 FeatureLess_Stabilized
 FeatureMap_Basics

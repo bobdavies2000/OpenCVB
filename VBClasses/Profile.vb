@@ -319,6 +319,7 @@ Public Class NR_Profile_Kalman : Inherits TaskParent
         dst1 = sides.dst2
         dst2 = sides.dst3
         Dim rc = task.rcD
+        If rc Is Nothing Then rc = sides.redC.rcList(0)
 
         If task.kalman.kInput.Count <> sides.corners.Count * 2 Then ReDim task.kalman.kInput(sides.corners.Count * 2 - 1)
         For i = 0 To sides.corners.Count - 1

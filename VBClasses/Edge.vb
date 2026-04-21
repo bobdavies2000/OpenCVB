@@ -1690,7 +1690,7 @@ Public Class Edge_Featureless : Inherits TaskParent
 
         edges.Run(dst2)
         dst3 = edges.dst2
-        Dim count = task.gridRects.Count - fLess.rectList.Count
+        Dim count = task.gridRects.Count - fLess.fLessList.Count
         labels(2) = "Current frame: " + CStr(count) + " grid squares had features"
     End Sub
 End Class
