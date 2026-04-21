@@ -39,7 +39,7 @@ Imports System.Runtime.InteropServices
 Public Class PCA_Mask : Inherits TaskParent
     Public pca_analysis As New cv.PCA
     Public runRedCflag As Boolean
-    Dim redC As New RedCloud_Basics
+    Public redC As New RedCloud_Basics
     Public Sub New()
         desc = "Find the Principal Component Analysis vector for the 3D points in a RedCloud cell contour."
     End Sub
@@ -128,6 +128,7 @@ Public Class NR_PCA_CellMask : Inherits TaskParent
         labels(2) = pca.labels(2)
 
         Dim rc = task.rcD
+        If rc Is Nothing Then rc = pca.redC.rcList(0)
         Dim mmZ = GetMinMax(task.pcSplit(2)(rc.rect), rc.mask)
         If mmZ.maxVal > 0 Then
             pcaPrep.Run(task.pointCloud(rc.rect).Clone)

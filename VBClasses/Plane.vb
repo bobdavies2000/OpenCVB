@@ -404,7 +404,7 @@ Public Class Plane_Points : Inherits TaskParent
         labels(2) = redC.labels(2)
 
         Dim rc = task.rcD
-        If task.rcD Is Nothing Then Exit Sub
+        If task.rcD Is Nothing Then task.rcD = redC.rcList(0)
 
         Dim pt As cv.Point3f, list2D As New List(Of cv.Point)
         If rc.contour IsNot Nothing Then
@@ -534,7 +534,7 @@ Public Class Plane_Equation : Inherits TaskParent
             If rc Is Nothing Then SetTrueText("Select a cell in the image at left.")
         End If
 
-        If rc Is Nothing Then Exit Sub
+        If rc Is Nothing Then rc = redC.rcList(0)
         If rc.contour Is Nothing Then Exit Sub
 
         Dim offset = rc.contour.Count \ 4 - 1

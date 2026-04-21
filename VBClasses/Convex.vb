@@ -164,7 +164,7 @@ Public Class Convex_RedColorDefects : Inherits TaskParent
         End If
 
         Dim rc = task.rcD
-        If rc.mask Is Nothing Then Exit Sub
+        If rc.mask Is Nothing Then rc = redC.rcList(0)
 
         Dim sz = New cv.Size(dst2.Height * rc.mask.Width / rc.mask.Height, dst2.Height)
         If rc.mask.Width > rc.mask.Height Then

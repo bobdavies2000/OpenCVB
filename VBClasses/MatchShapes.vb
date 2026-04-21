@@ -190,7 +190,7 @@ Public Class NR_MatchShapes_Contours : Inherits TaskParent
         End If
 
         Dim rcX = task.rcD
-
+        If rcX Is Nothing Then rcX = redC.rcList(0)
         For Each rc In redC.rcList
             If rc.contour Is Nothing Then Continue For
             Dim matchVal = cv.Cv2.MatchShapes(rcX.contour, rc.contour, options.matchOption)

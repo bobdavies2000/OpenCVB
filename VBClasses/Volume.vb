@@ -8,20 +8,18 @@ Public Class Volume_Basics : Inherits TaskParent
         desc = "Build a box containing all the 3D points of a RedCloud cell"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If standaloneTest() Then
-            redC.Run(src)
-            dst2 = redC.dst2
-            labels(2) = redC.labels(2)
+        redC.Run(src)
+        dst2 = redC.dst2
+        labels(2) = redC.labels(2)
 
-            SetTrueText(redC.strOut, 1)
-            If task.rcD Is Nothing Then
-                SetTrueText("Select any cell", 1)
-                Exit Sub
-            End If
-            rc = task.rcD
+        SetTrueText(redC.strOut, 1)
+        If task.rcD Is Nothing Then
+            SetTrueText("Select any cell", 1)
+            Exit Sub
         End If
 
-        If rc Is Nothing Then Exit Sub
+        rc = task.rcD
+        If rc Is Nothing Then rc = redC.rcList(0)
         If rc.contour Is Nothing Then Exit Sub
 
         Dim xList As New List(Of Single)

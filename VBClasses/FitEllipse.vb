@@ -149,7 +149,7 @@ Public Class NR_FitEllipse_RedCloud : Inherits TaskParent
             Exit Sub
         End If
 
-        If task.rcD.contour Is Nothing Then Exit Sub
+        If task.rcD.contour Is Nothing Then task.rcD = redC.rcList(0)
         fitE.inputPoints.Clear()
         For Each pt In task.rcD.contour
             fitE.inputPoints.Add(New cv.Point2f(pt.X, pt.Y))

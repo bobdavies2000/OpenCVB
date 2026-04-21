@@ -8,7 +8,7 @@ Public Class Profile_Basics : Inherits TaskParent
     Public corners3D As New List(Of cv.Point3f)
     Public corners As New List(Of cv.Point)
     Public cornersRaw As New List(Of cv.Point)
-    Dim redC As New RedCloud_Basics
+    Public redC As New RedCloud_Basics
     Public Sub New()
         If standalone Then task.gOptions.displayDst1.Checked = True
         desc = "Find the left/right, top/bottom, and near/far sides of a cell"
@@ -155,6 +155,7 @@ Public Class NR_Profile_Derivative : Inherits TaskParent
         sides.Run(src)
         dst2 = sides.dst2
         Dim rc = task.rcD
+        If rc Is Nothing Then rc = sides.redC.rcList(0)
 
         Dim offset As Integer = 30
         Dim rsizeX = (dst2.Width - offset * 2) / rc.rect.Width
@@ -256,7 +257,7 @@ Public Class Profile_ConcentrationTop : Inherits TaskParent
         sides.Run(src)
         dst2 = sides.dst2
         Dim rc = task.rcD
-        If rc Is Nothing Then Exit Sub
+        If rc Is Nothing Then rc = sides.redC.rcList(0)
 
         If rc.contour3D.Count = 0 Then
             SetTrueText("The selected cell has no 3D data.  The 3D data can only be computed from cells with depth data.", 1)
