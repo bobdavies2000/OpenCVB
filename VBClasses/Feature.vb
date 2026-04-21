@@ -291,7 +291,7 @@ Public Class NR_Feature_TraceDelaunay : Inherits TaskParent
                 DrawCircle(dst2, pt, task.DotSize + 1, c)
             Next
         Next
-        labels(2) = CStr(task.features.Count) + " features were identified in the image."
+        labels(2) = CStr(ptList.Count) + " features were identified in the image."
     End Sub
 End Class
 
@@ -760,7 +760,7 @@ Public Class Feature_KNN : Inherits TaskParent
         feat.Run(task.gray)
 
         knn.ptListQuery = New List(Of cv.Point)(feat.features)
-        If knn.trainInput.Count = 0 Or task.gOptions.DebugCheckBox.Checked Then
+        If knn.ptListTrain.Count = 0 Or task.gOptions.DebugCheckBox.Checked Then
             knn.ptListTrain = New List(Of cv.Point)(knn.ptListQuery)
             task.gOptions.DebugCheckBox.Checked = False
         End If
@@ -771,7 +771,7 @@ Public Class Feature_KNN : Inherits TaskParent
             Dim trainIndex = knn.neighbors(i)(0) ' index of the matched train input
             Dim pt = knn.ptListTrain(trainIndex)
             Dim qPt = feat.features(i)
-            If pt.DistanceTo(qPt) > 2 Then knn.trainInput(trainIndex) = feat.features(i)
+            If pt.DistanceTo(qPt) > 2 Then knn.ptListTrain(trainIndex) = feat.features(i)
         Next
 
         src.CopyTo(dst2)

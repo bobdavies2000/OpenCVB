@@ -6867,7 +6867,7 @@ Namespace VBClasses
     Public Class XO_FPoly_TopFeatures : Inherits TaskParent
         Public stable As New StableLine_BasicsCount
         Public options As New Options_FPoly
-        Dim feat As New Feature_Basics
+        Public feat As New Feature_Basics
         Public topFeatures As New List(Of cv.Point)
         Public Sub New()
             desc = "Get the top features and validate them using Delaunay regions."
@@ -6910,9 +6910,9 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             bPoint.Run(src)
 
-            task.features.Clear()
+            feat.feat.features.Clear()
             For Each pt In bPoint.ptList
-                task.features.Add(New cv.Point2f(pt.X, pt.Y))
+                feat.feat.features.Add(pt)
             Next
 
             feat.Run(src)
@@ -6920,7 +6920,7 @@ Namespace VBClasses
             Dim pts = feat.topFeatures
             Dim distances As New List(Of Single)
             For i = 0 To pts.Count - 2
-                vbc.DrawLine(dst2, pts(i), pts(i + 1), task.highlight)
+                DrawLine(dst2, pts(i), pts(i + 1), task.highlight)
                 distances.Add(pts(i).DistanceTo(pts(i + 1)))
             Next
 
@@ -6978,9 +6978,9 @@ Namespace VBClasses
             If standalone Then
                 Static bPoint As New BrickPoint_Basics
                 bPoint.Run(src)
-                task.features.Clear()
+                feat.feat.features.Clear()
                 For Each pt In bPoint.ptList
-                    task.features.Add(New cv.Point2f(pt.X, pt.Y))
+                    feat.feat.features.Add(New cv.Point2f(pt.X, pt.Y))
                 Next
             End If
             Static ptSlider = OptionParent.FindSlider("Points to use in Feature Poly")
@@ -7346,6 +7346,7 @@ Namespace VBClasses
         Public borderCrop = 30
         Dim sumScale As cv.Mat, sScale As cv.Mat, features1 As cv.Mat
         Dim errScale As cv.Mat, qScale As cv.Mat, rScale As cv.Mat
+        Dim feat As New Feature_Basics
         Public Sub New()
             desc = "Stabilize video with a Kalman filter.  Shake camera to see image edges appear.  This is not really working!"
             labels(2) = "Stabilized Image"
@@ -7363,7 +7364,12 @@ Namespace VBClasses
             dst2 = src
 
             If src.Channels() <> 1 Then src = task.gray
-            inputFeat = New List(Of cv.Point2f)(task.features)
+            feat.Run(src)
+
+            inputFeat.Clear()
+            For Each pt In feat.features
+                inputFeat.Add(pt)
+            Next
             features1 = cv.Mat.FromPixelData(inputFeat.Count, 1, cv.MatType.CV_32FC2, inputFeat.ToArray)
 
             Static lastFrame As cv.Mat = src.Clone()
@@ -7601,6 +7607,7 @@ Namespace VBClasses
         Public ptx As New List(Of cv.Point2f)
         Public correlation As New List(Of Single)
         Public mPoint As New Match_Point
+        Dim feat As New Feature_Basics
         Public Sub New()
             labels(2) = "Rectangle shown is the search rectangle."
             desc = "Track the selected points"
@@ -7613,7 +7620,11 @@ Namespace VBClasses
             If task.firstPass Then mPoint.target = src.Clone
 
             If standaloneTest() Then
-                ptx = New List(Of cv.Point2f)(task.features)
+                feat.Run(task.gray)
+                ptx.Clear()
+                For Each pt In feat.features
+                    ptx.Add(pt)
+                Next
                 SetTrueText("Move camera around to watch the point being tracked", 3)
             End If
 
@@ -14180,15 +14191,18 @@ Namespace VBClasses
 
     Public Class XO_Line_BrickPoints : Inherits TaskParent
         Public sortLines As New SortedList(Of Integer, Integer)(New compareAllowIdenticalInteger)
+        Dim feat As New Feature_Basics
         Public Sub New()
             desc = "Assign grid square points to each of the lines"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
+            feat.Run(task.gray)
+
             dst2 = task.lines.dst2
 
             sortLines.Clear()
             dst3.SetTo(0)
-            For Each pt In task.features
+            For Each pt In feat.features
                 Dim lineIndex = task.lines.dst1.Get(Of Byte)(pt.Y, pt.X)
                 If lineIndex = 0 Then Continue For
                 Dim color = vecToScalar(task.lines.dst2.Get(Of cv.Vec3b)(pt.Y, pt.X))
@@ -15382,6 +15396,7 @@ Namespace VBClasses
         Dim knn As New KNN_OneToOne
         Dim trackAll As New List(Of List(Of lpData))
         Public options As New Options_Features
+        Dim feat As New Feature_Basics
         Public Sub New()
             desc = "Track each good feature with KNN and match the features from frame to frame"
         End Sub
@@ -15391,7 +15406,11 @@ Namespace VBClasses
             ' if there was no motion, use minDistance to eliminate the unstable points.
             If task.optionsChanged = False Then minDistance = 2
 
-            knn.queries = New List(Of cv.Point2f)(task.features)
+            feat.Run(task.gray)
+            knn.queries.Clear()
+            For Each pt In feat.features
+                knn.queries.Add(pt)
+            Next
             knn.Run(src)
 
             Dim tracker As New List(Of lpData)
@@ -15411,7 +15430,7 @@ Namespace VBClasses
                 Next
             Next
 
-            labels(2) = CStr(task.features.Count) + " good features were tracked across " + CStr(task.frameHistoryCount) + " frames."
+            labels(2) = CStr(feat.features.Count) + " good features were tracked across " + CStr(task.frameHistoryCount) + " frames."
             SetTrueText(labels(2) + vbCrLf + "The highlighted dots are the feature points", 3)
 
             If trackAll.Count > task.frameHistoryCount Then trackAll.RemoveAt(0)
@@ -18861,6 +18880,7 @@ Namespace VBClasses
     Public Class XO_Feature_PointTracker : Inherits TaskParent
         Dim flow As New Font_FlowText
         Dim mPoints As New XO_Match_Points
+        Dim feat As New Feature_Basics
         Public Sub New()
             flow.parentData = Me
             flow.dst = 3
@@ -18868,11 +18888,13 @@ Namespace VBClasses
             desc = "Use the top X goodFeatures and then use matchTemplate to find track them."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
+            feat.Run(task.gray)
+
             Dim pad = task.brickEdgeLen / 2
             strOut = ""
             If mPoints.ptx.Count <= 3 Then
                 mPoints.ptx.Clear()
-                For Each pt In task.features
+                For Each pt In feat.features
                     mPoints.ptx.Add(pt)
                     Dim rect = ValidateRect(New cv.Rect(pt.X - pad, pt.Y - pad, task.brickEdgeLen, task.brickEdgeLen))
                 Next
@@ -18894,7 +18916,7 @@ Namespace VBClasses
                 flow.Run(src)
             End If
 
-            labels(2) = "Of the " + CStr(task.features.Count) + " input points, " + CStr(mPoints.ptx.Count) +
+            labels(2) = "Of the " + CStr(feat.features.Count) + " input points, " + CStr(mPoints.ptx.Count) +
                         " points were tracked with correlation above " + Format(task.fCorrThreshold, fmt2)
         End Sub
     End Class

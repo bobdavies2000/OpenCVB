@@ -522,6 +522,7 @@ Motion_Throttle
 Motion_Validate
 Motion_ValidateColor
 Mouse_Basics
+Mouse_ClickPointUsage
 MSER_Basics
 MSER_Basics1
 MSER_Basics2
@@ -1202,7 +1203,6 @@ NR_ML_DepthFromXYColor
 NR_Moments_CentroidKalman
 NR_Motion_Basics
 NR_Motion_ValidateRight
-NR_Mouse_ClickPointUsage
 NR_Mouse_LeftClickZoom
 NR_Mouse_ValidateLocation
 NR_MSER_Binarize

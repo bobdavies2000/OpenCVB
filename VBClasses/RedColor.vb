@@ -460,26 +460,32 @@ End Class
 
 Public Class NR_RedColor_FeaturesKNN : Inherits TaskParent
     Public knn As New KNN_Basics
+    Dim feat As New Feature_Basics
     Public Sub New()
         labels = {"", "", "Output of Feature_Stable", "Grid of points to measure motion."}
         desc = "Use KNN with the good features in the image to create a grid of points"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        knn.queries = New List(Of cv.Point2f)(task.features)
+        feat.Run(task.gray)
+        dst2 = feat.dst2
+        labels(2) = feat.labels(2)
+
+        knn.ptListQuery = New List(Of cv.Point)(feat.features)
         knn.Run(src)
+
 
         dst3 = src.Clone
         For i = 0 To knn.neighbors.Count - 1
-            Dim p1 = knn.queries(i)
+            Dim p1 = knn.ptListQuery(i)
             Dim index = knn.neighbors(i)(knn.neighbors(i).Count - 1)
-            If index >= 0 And index < knn.trainInput.Count Then
-                Dim p2 = knn.trainInput(index)
+            If index >= 0 And index < knn.ptListTrain.Count Then
+                Dim p2 = knn.ptListTrain(index)
                 DrawCircle(dst3, p1, task.DotSize, cv.Scalar.Yellow)
                 DrawCircle(dst3, p2, task.DotSize, cv.Scalar.Yellow)
                 vbc.DrawLine(dst3, p1, p2, white)
             End If
         Next
-        knn.trainInput = New List(Of cv.Point2f)(knn.queries)
+        knn.ptListTrain = New List(Of cv.Point)(knn.ptListQuery)
     End Sub
 End Class
 
@@ -492,15 +498,20 @@ End Class
 Public Class NR_RedColor_GoodCellInput : Inherits TaskParent
     Public knn As New KNN_Basics
     Public featureList As New List(Of cv.Point2f)
+    Dim feat As New Feature_Basics
     Public Sub New()
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Max feature travel distance", 0, 100, 10)
         desc = "Use KNN to find good features to track"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
+        feat.Run(task.gray)
+        dst2 = feat.dst2
+        labels(2) = feat.labels(2)
+
         Static distSlider = OptionParent.FindSlider("Max feature travel distance")
         Dim maxDistance = distSlider.Value
 
-        knn.queries = New List(Of cv.Point2f)(task.features)
+        knn.ptListQuery = New List(Of cv.Point)(feat.features)
         knn.Run(src)
 
         featureList.Clear()

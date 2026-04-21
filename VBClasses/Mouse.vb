@@ -42,18 +42,27 @@ End Class
 
 
 
-Public Class NR_Mouse_ClickPointUsage : Inherits TaskParent
+Public Class Mouse_ClickPointUsage : Inherits TaskParent
+    Dim fcs As New FCS_CreateList
     Public Sub New()
         desc = "This algorithm shows how to use task.ClickPoint to dynamically identify what to break on."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
+        fcs.Run(task.gray)
+        dst2 = fcs.dst3
+        labels(2) = fcs.labels(2)
+
+        For Each pt In fcs.feat.features
+            dst2.Circle(pt, task.DotSize, task.highlight, -1)
+        Next
+
         SetTrueText("Click on one of the feature points (carefully) to hit the breakpoint below.")
 
-        For Each pt In task.features
-            If pt = task.clickPoint Then
-                Debug.WriteLine("Hit the point you selected.")
-            End If
-        Next
+        Dim val = fcs.dst2.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X)
+        SetTrueText("Hit the point you selected.", 3)
+        dst1 = fcs.dst2.InRange(val, val)
+        dst3.SetTo(0)
+        fcs.dst3.CopyTo(dst3, dst1)
     End Sub
 End Class
 

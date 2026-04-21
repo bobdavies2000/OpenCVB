@@ -675,7 +675,7 @@ Public Class NR_KNN_MaxDistance : Inherits TaskParent
 
         perif.Run(src)
         dst3 = perif.dst3
-        If task.features.Count = 0 Then Exit Sub
+        If perif.fcs.feat.features.Count = 0 Then Exit Sub
 
         knn.queries = perif.ptOutside
         knn.trainInput = knn.queries
@@ -684,11 +684,12 @@ Public Class NR_KNN_MaxDistance : Inherits TaskParent
         dst2 = src
         For i = 0 To knn.result.GetUpperBound(0)
             Dim lp = New lpData(knn.queries(knn.result(i, knn.queries.Count - 1)),
-                                    knn.queries(knn.result(i, 0)))
+                                knn.queries(knn.result(i, 0)))
             dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth)
         Next
 
-        labels(2) = "There were " + CStr(task.features.Count) + " features and " + CStr(knn.queries.Count) + " were on the periphery."
+        labels(2) = "There were " + CStr(perif.fcs.feat.features.Count) + " features and " +
+                                    CStr(knn.queries.Count) + " were on the periphery."
     End Sub
 End Class
 

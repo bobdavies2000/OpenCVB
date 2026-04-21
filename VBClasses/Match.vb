@@ -505,6 +505,7 @@ End Class
 Public Class NR_Match_GoodFeatureKNN : Inherits TaskParent
     Public knn As New KNN_OneToOne
     Dim frameList As New List(Of cv.Mat)
+    Dim feat As New Feature_Basics
     Public Sub New()
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Maximum travel distance per frame", 1, 20, 5)
         dst0 = New cv.Mat(dst2.Size(), cv.MatType.CV_8UC1, 0)
@@ -513,10 +514,15 @@ Public Class NR_Match_GoodFeatureKNN : Inherits TaskParent
         desc = "Track the GoodFeatures with KNN"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
+        feat.Run(task.gray)
+
         Static distSlider = OptionParent.FindSlider("Maximum travel distance per frame")
         Dim maxDistance = distSlider.Value
 
-        knn.queries = New List(Of cv.Point2f)(task.features)
+        knn.queries.Clear()
+        For Each pt In feat.features
+            knn.queries.Add(pt)
+        Next
         knn.Run(src)
 
         If task.optionsChanged Then
