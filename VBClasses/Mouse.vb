@@ -43,7 +43,7 @@ End Class
 
 
 Public Class Mouse_ClickPointUsage : Inherits TaskParent
-    Dim fcs As New FCS_CreateList
+    Dim fcs As New FeatureMap_CreateList
     Public Sub New()
         desc = "This algorithm shows how to use task.ClickPoint to dynamically identify what to break on."
     End Sub

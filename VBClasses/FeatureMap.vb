@@ -1,7 +1,7 @@
 Imports cv = OpenCvSharp
-Public Class FCS_Basics : Inherits TaskParent
+Public Class FeatureMap_Basics : Inherits TaskParent
     Dim bricks As New Brick_Basics
-    Public basics As New FCS_StablePoints
+    Public basics As New FeatureMap_StablePoints
     Public genSorted As New SortedList(Of Integer, Integer)(New compareAllowIdenticalIntegerInverted)
     Public Sub New()
         dst1 = New cv.Mat(dst1.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
@@ -54,7 +54,7 @@ End Class
 
 
 
-Public Class FCS_StablePoints : Inherits TaskParent
+Public Class FeatureMap_StablePoints : Inherits TaskParent
     Public facetGen As New Delaunay_Generations
     Public ptList As New List(Of cv.Point2f)
     Public anchorPoint As cv.Point2f
@@ -114,8 +114,8 @@ End Class
 
 
 
-Public Class NR_FCS_BasicsOld : Inherits TaskParent
-    Dim fcs As New FCS_Core
+Public Class NR_FeatureMap_BasicsOld : Inherits TaskParent
+    Dim fcs As New FeatureMap_Core
     Dim contours As New Contour_Basics
     Public desiredMapCount As Integer = 5
     Public Sub New()
@@ -152,7 +152,7 @@ End Class
 
 
 
-Public Class FCS_Core : Inherits TaskParent
+Public Class FeatureMap_Core : Inherits TaskParent
     Dim subdiv As New cv.Subdiv2D
     Public inputFeatures As New List(Of cv.Point2f)
     Public fcsMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
@@ -185,8 +185,8 @@ End Class
 
 
 
-Public Class NR_FCS_ViewLeft : Inherits TaskParent
-    Dim fcs As New FCS_CreateList
+Public Class NR_FeatureMap_ViewLeft : Inherits TaskParent
+    Dim fcs As New FeatureMap_CreateList
     Public Sub New()
         desc = "Build an FCS for left view."
     End Sub
@@ -205,8 +205,8 @@ End Class
 
 
 
-Public Class NR_FCS_ViewRight : Inherits TaskParent
-    Dim fcs As New FCS_CreateList
+Public Class NR_FeatureMap_ViewRight : Inherits TaskParent
+    Dim fcs As New FeatureMap_CreateList
     Public Sub New()
         desc = "Build an FCS for right view."
     End Sub
@@ -223,8 +223,8 @@ End Class
 
 
 
-Public Class NR_FCS_Edges : Inherits TaskParent
-    Dim fcs As New FCS_CreateList
+Public Class NR_FeatureMap_Edges : Inherits TaskParent
+    Dim fcs As New FeatureMap_CreateList
     Dim edges As New Edge_Canny
     Public Sub New()
         desc = "Use edges to connect feature points to their neighbors."
@@ -249,8 +249,8 @@ End Class
 
 
 
-Public Class NR_FCS_WithAge : Inherits TaskParent
-    Dim fcs As New FCS_CreateList
+Public Class NR_FeatureMap_WithAge : Inherits TaskParent
+    Dim fcs As New FeatureMap_CreateList
     Public Sub New()
         desc = "Display the age of each cell."
     End Sub
@@ -271,8 +271,8 @@ End Class
 
 
 
-Public Class NR_FCS_BestAge : Inherits TaskParent
-    Dim fcs As New FCS_CreateList
+Public Class NR_FeatureMap_BestAge : Inherits TaskParent
+    Dim fcs As New FeatureMap_CreateList
     Public Sub New()
         labels(3) = "Ages are kept below 1000 to make the output more readable..."
         desc = "Display the top X oldest (best) cells."
@@ -304,12 +304,12 @@ End Class
 
 
 
-Public Class NR_FCS_RedCloud1 : Inherits TaskParent
-    Dim fcs As New FCS_CreateList
+Public Class NR_FeatureMap_RedCloud1 : Inherits TaskParent
+    Dim fcs As New FeatureMap_CreateList
     Dim redC As New RedCloud_Basics
     Public Sub New()
         If standalone Then task.gOptions.displayDst1.Checked = True
-        labels(1) = "Output of FCS_CreateList."
+        labels(1) = "Output of FeatureMap_CreateList."
         desc = "Isolate FCS cells for each redCell."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -332,11 +332,11 @@ End Class
 
 
 
-Public Class NR_FCS_InfoTest : Inherits TaskParent
-    Dim fcs As New FCS_CreateList
-    Dim info As New FCS_Info
+Public Class NR_FeatureMap_InfoTest : Inherits TaskParent
+    Dim fcs As New FeatureMap_CreateList
+    Dim info As New FeatureMap_Info
     Public Sub New()
-        desc = "Invoke FCS_CreateList and display the contents of the selected feature point cell"
+        desc = "Invoke FeatureMap_CreateList and display the contents of the selected feature point cell"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         fcs.Run(src)
@@ -345,7 +345,7 @@ Public Class NR_FCS_InfoTest : Inherits TaskParent
         info.Run(src)
         SetTrueText(info.strOut, 3)
 
-        ' FCS_Basics.fpDSet()
+        ' FeatureMap_Basics.fpDSet()
     End Sub
 End Class
 
@@ -353,8 +353,8 @@ End Class
 
 
 
-Public Class NR_FCS_MotionDirection : Inherits TaskParent
-    Dim fcsM As New FCS_Motion
+Public Class NR_FeatureMap_MotionDirection : Inherits TaskParent
+    Dim fcsM As New FeatureMap_Motion
     Dim plothist As New PlotBar_Basics
     Dim mats As New Mat_4Click
     Dim range As Integer, rangeText As String
@@ -404,7 +404,7 @@ Public Class NR_FCS_MotionDirection : Inherits TaskParent
         SetTrueText("X distances" + rangeText, 2)
         SetTrueText("Y distances " + rangeText, New cv.Point(dst2.Width / 2 + 2, 0), 2)
         labels = fcsM.labels
-        ' FCS_Basics.fpDSet()
+        ' FeatureMap_Basics.fpDSet()
     End Sub
 End Class
 
@@ -413,7 +413,7 @@ End Class
 
 
 
-Public Class FCS_Info : Inherits TaskParent
+Public Class FeatureMap_Info : Inherits TaskParent
     Dim bricks As New Brick_Basics
     Public Sub New()
         desc = "Display the contents of the Feature Coordinate System (FCS) cell."
@@ -421,7 +421,7 @@ Public Class FCS_Info : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         bricks.Run(src)
         If standalone Then
-            Static fcs As New FCS_CreateList
+            Static fcs As New FeatureMap_CreateList
             fcs.Run(task.gray)
             dst2 = fcs.dst2
         End If
@@ -454,8 +454,8 @@ End Class
 
 
 
-Public Class NR_FCS_Lines : Inherits TaskParent
-    Dim fcs As New FCS_CreateList
+Public Class NR_FeatureMap_Lines : Inherits TaskParent
+    Dim fcs As New FeatureMap_CreateList
     Dim options As New Options_Features
     Public Sub New()
         OptionParent.FindSlider("Min Distance").Value = 60
@@ -482,9 +482,9 @@ End Class
 
 
 
-Public Class NR_FCS_ByDepth : Inherits TaskParent
+Public Class NR_FeatureMap_ByDepth : Inherits TaskParent
     Dim plotHist As New PlotBar_Basics
-    Dim fcs As New FCS_CreateList
+    Dim fcs As New FeatureMap_CreateList
     Dim palInput As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
     Dim bPoint As New BrickPoint_Basics
     Public Sub New()
@@ -541,7 +541,7 @@ Public Class NR_FCS_ByDepth : Inherits TaskParent
 
         For Each ele In fpCells
             Dim fp As fpData = ele.Item1
-            FCS_Basics.fpCellContour(fp, task.color, 0)
+            FeatureMap_Basics.fpCellContour(fp, task.color, 0)
         Next
         dst3 = Palettize(palInput)
         dst3.SetTo(0, palInput.Threshold(0, 255, cv.ThresholdTypes.BinaryInv))
@@ -563,10 +563,10 @@ End Class
 
 
 
-Public Class FCS_Periphery : Inherits TaskParent
+Public Class FeatureMap_Periphery : Inherits TaskParent
     Public ptOutside As New List(Of cv.Point2f)
     Public ptInside As New List(Of cv.Point2f)
-    Public fcs As New FCS_CreateList
+    Public fcs As New FeatureMap_CreateList
     Public Sub New()
         desc = "Display the cells which are on the periphery of the image"
     End Sub
@@ -586,7 +586,7 @@ Public Class FCS_Periphery : Inherits TaskParent
                 ptInside.Add(fp.pt)
             End If
         Next
-        ' FCS_Basics.fpDSet()
+        ' FeatureMap_Basics.fpDSet()
         labels(2) = "There are " + CStr(ptOutside.Count) + " features on the periphery of the image."
         labels(3) = "There are " + CStr(fcs.fpList.Count - ptOutside.Count) + " features in the interior region of the image."
     End Sub
@@ -596,8 +596,8 @@ End Class
 
 
 
-Public Class NR_FCS_PeripheryNot : Inherits TaskParent
-    Dim perif As New FCS_Periphery
+Public Class NR_FeatureMap_PeripheryNot : Inherits TaskParent
+    Dim perif As New FeatureMap_Periphery
     Public Sub New()
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
         desc = "Create a mask for the cells which are not on the periphery of the image - the interior region that is fully visible and connected."
@@ -610,7 +610,7 @@ Public Class NR_FCS_PeripheryNot : Inherits TaskParent
         For Each fp In perif.fcs.fpList
             If fp.periph = False Then dst3.FillConvexPoly(fp.facets, 255, task.lineType)
         Next
-        ' FCS_Basics.fpDSet()
+        ' FeatureMap_Basics.fpDSet()
         labels = perif.labels
     End Sub
 End Class
@@ -620,7 +620,7 @@ End Class
 
 
 
-Public Class NR_FCS_BrickPoints : Inherits TaskParent
+Public Class NR_FeatureMap_BrickPoints : Inherits TaskParent
     Public facetGen As New Delaunay_Generations
     Public ptList As New List(Of cv.Point2f)
     Public anchorPoint As cv.Point2f
@@ -680,8 +680,8 @@ End Class
 
 
 
-Public Class FCS_Motion : Inherits TaskParent
-    Dim fcs As New FCS_CreateList
+Public Class FeatureMap_Motion : Inherits TaskParent
+    Dim fcs As New FeatureMap_CreateList
     Dim plot As New PlotTime_Basics
     Public xDist As New List(Of Single), yDist As New List(Of Single)
     Public motionPercent As Single
@@ -732,7 +732,7 @@ Public Class FCS_Motion : Inherits TaskParent
         plot.plotData = New cv.Scalar(motionPercent, 0, 0)
         plot.Run(src)
         dst1 = plot.dst2
-        ' FCS_Basics.fpDSet()
+        ' FeatureMap_Basics.fpDSet()
     End Sub
 End Class
 
@@ -740,7 +740,7 @@ End Class
 
 
 
-Public Class FCS_CreateList : Inherits TaskParent
+Public Class FeatureMap_CreateList : Inherits TaskParent
     Dim subdiv As New cv.Subdiv2D
     Public feat As New Feature_Basics
     Dim bricks As New Brick_Basics
@@ -802,7 +802,7 @@ Public Class FCS_CreateList : Inherits TaskParent
             If fp.depth > 0 Then DrawCircle(dst3, fp.pt, task.DotSize, task.highlight)
         Next
 
-        If standalone Then FCS_Basics.fpCellContour(task.fpD, task.color)
+        If standalone Then FeatureMap_Basics.fpCellContour(task.fpD, task.color)
         If task.heartBeat Then labels(2) = traceName + ": " + Format(feat.features.Count, "000") + " cells found " +
                                            "using " + task.fOptions.FeatureMethod.Text
     End Sub

@@ -69,7 +69,7 @@ End Class
 
 
 Public Class StableLine_BasicsCount : Inherits TaskParent
-    Public basics As New FCS_StablePoints
+    Public basics As New FeatureMap_StablePoints
     Public goodCounts As New SortedList(Of Integer, Integer)(New compareAllowIdenticalIntegerInverted)
     Dim bPoint As New BrickPoint_Basics
     Public features As New List(Of cv.Point)
@@ -111,7 +111,7 @@ End Class
 
 
 Public Class NR_StableLine_Lines : Inherits TaskParent
-    Public basics As New FCS_StablePoints
+    Public basics As New FeatureMap_StablePoints
     Public Sub New()
         If standalone Then task.gOptions.displayDst1.Checked = True
         desc = "Track the line end points found in the BGR image and keep those that are stable."
@@ -147,7 +147,7 @@ End Class
 
 
 Public Class NR_StableLine_FAST : Inherits TaskParent
-    Public basics As New FCS_StablePoints
+    Public basics As New FeatureMap_StablePoints
     Dim fast As New Corner_Basics
     Public Sub New()
         desc = "Track the FAST feature points found in the BGR image and track those that appear stable."

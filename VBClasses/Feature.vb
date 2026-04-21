@@ -1,5 +1,110 @@
 Imports System.Runtime.InteropServices
 Imports cv = OpenCvSharp
+Public Class Feature_Basics : Inherits TaskParent
+    Implements IDisposable
+    Public options As New Options_Features
+    Public features As New List(Of cv.Point)
+    Public lastFeatures As New List(Of cv.Point)
+    Public Sub New()
+        desc = "Gather features from a list of sources - GoodFeatures, Agast, Brisk..."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        options.Run()
+
+        If src.Channels <> 1 Then src = task.gray
+        dst2 = task.color.Clone
+
+        Dim ptLatest As New List(Of cv.Point2f)
+        Select Case task.fOptions.FeatureMethod.Text
+            Case "AGAST"
+                If cPtr = 0 Then cPtr = Agast_Open()
+                src = task.color.Clone
+                Dim dataSrc(src.Total - 1) As cv.Vec3b
+                src.GetArray(Of cv.Vec3b)(dataSrc)
+
+                Dim handleSrc = GCHandle.Alloc(dataSrc, GCHandleType.Pinned)
+                Dim imagePtr = Agast_Run(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, options.agastThreshold)
+                handleSrc.Free()
+
+                Dim ptMat = cv.Mat.FromPixelData(Agast_Count(cPtr), 1, cv.MatType.CV_32FC2, imagePtr).Clone
+                For i = 0 To ptMat.Rows - 1
+                    Dim pt = ptMat.Get(Of cv.Point2f)(i, 0)
+                    ptLatest.Add(pt)
+                    If standaloneTest() Then DrawCircle(dst2, pt, task.DotSize, white)
+                Next
+
+                strOut = "AGAST produced " + CStr(ptLatest.Count) + " features"
+            Case "BrickPoint"
+                Static bPoint As New BrickPoint_MaxSobel
+                bPoint.Run(src)
+                For Each pt In bPoint.features
+                    ptLatest.Add(pt)
+                Next
+                strOut = bPoint.labels(2)
+            Case "BRISK"
+                Static brisk As New BRISK_Basics
+                brisk.Run(src)
+                ptLatest = brisk.features
+                strOut = "BRISK produced " + CStr(ptLatest.Count) + " features"
+            Case "FAST"
+                Static FAST As New Corner_Basics
+                FAST.Run(src)
+                ptLatest = FAST.features
+                strOut = "FAST produced " + CStr(ptLatest.Count) + " features"
+            Case "GoodFeatures"
+                ptLatest = cv.Cv2.GoodFeaturesToTrack(src, task.fOptions.FeatureSampleSize.Value, options.quality,
+                                                      options.minDistance, New cv.Mat,
+                                                      options.blockSize, True, options.k).ToList
+                strOut = "GoodFeatures produced " + CStr(ptLatest.Count) + " features"
+            Case "Harris"
+                Static harris As New Corner_HarrisDetector_CPP
+                harris.Run(src)
+                ptLatest = harris.features
+                strOut = "Harris Detector produced " + CStr(ptLatest.Count) + " features"
+            Case "LineInput"
+                For Each lp In task.lines.lpList
+                    ptLatest.Add(lp.ptCenter)
+                Next
+        End Select
+
+        lastFeatures = New List(Of cv.Point)(features)
+        Dim ptNext As New List(Of cv.Point)
+        For Each pt In features
+            Dim val = task.motion.motionMask.Get(Of Byte)(pt.Y, pt.X)
+            If val = 0 Then ptNext.Add(pt)
+        Next
+
+        For Each pt In ptLatest
+            Dim val = task.motion.motionMask.Get(Of Byte)(pt.Y, pt.X)
+            If val <> 0 Then ptNext.Add(pt)
+        Next
+
+        If ptNext.Count <= 3 Then
+            For Each pt In ptLatest
+                ptNext.Add(pt)
+            Next
+        End If
+
+        features = New List(Of cv.Point)(ptNext)
+
+        For Each pt In features
+            If lastFeatures.Contains(pt) Then DrawCircle(dst2, pt, task.DotSize, task.highlight)
+        Next
+
+        If features.Count = 0 Then features = New List(Of cv.Point)(ptNext)
+
+        labels(2) = strOut
+    End Sub
+    Protected Overrides Sub Finalize()
+        If cPtr <> 0 Then cPtr = Agast_Close(cPtr)
+    End Sub
+End Class
+
+
+
+
+
+
 Public Class NR_Feature_Basics : Inherits TaskParent
     Implements IDisposable
     Public options As New Options_Features
@@ -234,28 +339,6 @@ Public Class NR_Feature_LucasKanade : Inherits TaskParent
     End Sub
 End Class
 
-
-
-
-
-
-Public Class Feature_Points : Inherits TaskParent
-    Dim feat As New Feature_Basics
-    Public Sub New()
-        labels(3) = "Features found in the image"
-        desc = "Use the sorted list of Delaunay regions to find the top X points to track."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        feat.Run(task.gray)
-
-        If task.heartBeat Then dst2.SetTo(0)
-
-        For Each pt In feat.features
-            DrawCircle(dst2, pt, task.DotSize, task.highlight)
-        Next
-        labels(2) = CStr(feat.features.Count) + " targets were present with " + CStr(task.FeatureSampleSize) + " requested."
-    End Sub
-End Class
 
 
 
@@ -790,110 +873,6 @@ End Class
 
 
 
-Public Class Feature_Basics : Inherits TaskParent
-    Implements IDisposable
-    Public options As New Options_Features
-    Public features As New List(Of cv.Point)
-    Public lastFeatures As New List(Of cv.Point)
-    Public Sub New()
-        desc = "Gather features from a list of sources - GoodFeatures, Agast, Brisk..."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        options.Run()
-
-        If src.Channels <> 1 Then src = task.gray
-        dst2 = task.color.Clone
-
-        Dim ptLatest As New List(Of cv.Point2f)
-        Select Case task.fOptions.FeatureMethod.Text
-            Case "AGAST"
-                If cPtr = 0 Then cPtr = Agast_Open()
-                src = task.color.Clone
-                Dim dataSrc(src.Total - 1) As cv.Vec3b
-                src.GetArray(Of cv.Vec3b)(dataSrc)
-
-                Dim handleSrc = GCHandle.Alloc(dataSrc, GCHandleType.Pinned)
-                Dim imagePtr = Agast_Run(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, options.agastThreshold)
-                handleSrc.Free()
-
-                Dim ptMat = cv.Mat.FromPixelData(Agast_Count(cPtr), 1, cv.MatType.CV_32FC2, imagePtr).Clone
-                For i = 0 To ptMat.Rows - 1
-                    Dim pt = ptMat.Get(Of cv.Point2f)(i, 0)
-                    ptLatest.Add(pt)
-                    If standaloneTest() Then DrawCircle(dst2, pt, task.DotSize, white)
-                Next
-
-                strOut = "AGAST produced " + CStr(ptLatest.Count) + " features"
-            Case "BrickPoint"
-                Static bPoint As New BrickPoint_MaxSobel
-                bPoint.Run(src)
-                For Each pt In bPoint.features
-                    ptLatest.Add(pt)
-                Next
-                strOut = bPoint.labels(2)
-            Case "BRISK"
-                Static brisk As New BRISK_Basics
-                brisk.Run(src)
-                ptLatest = brisk.features
-                strOut = "BRISK produced " + CStr(ptLatest.Count) + " features"
-            Case "FAST"
-                Static FAST As New Corner_Basics
-                FAST.Run(src)
-                ptLatest = FAST.features
-                strOut = "FAST produced " + CStr(ptLatest.Count) + " features"
-            Case "GoodFeatures"
-                ptLatest = cv.Cv2.GoodFeaturesToTrack(src, task.fOptions.FeatureSampleSize.Value, options.quality,
-                                                      options.minDistance, New cv.Mat,
-                                                      options.blockSize, True, options.k).ToList
-                strOut = "GoodFeatures produced " + CStr(ptLatest.Count) + " features"
-            Case "Harris"
-                Static harris As New Corner_HarrisDetector_CPP
-                harris.Run(src)
-                ptLatest = harris.features
-                strOut = "Harris Detector produced " + CStr(ptLatest.Count) + " features"
-            Case "LineInput"
-                For Each lp In task.lines.lpList
-                    ptLatest.Add(lp.ptCenter)
-                Next
-        End Select
-
-        lastFeatures = New List(Of cv.Point)(features)
-        Dim ptNext As New List(Of cv.Point)
-        For Each pt In features
-            Dim val = task.motion.motionMask.Get(Of Byte)(pt.Y, pt.X)
-            If val = 0 Then ptNext.Add(pt)
-        Next
-
-        For Each pt In ptLatest
-            Dim val = task.motion.motionMask.Get(Of Byte)(pt.Y, pt.X)
-            If val <> 0 Then ptNext.Add(pt)
-        Next
-
-        If ptNext.Count <= 3 Then
-            For Each pt In ptLatest
-                ptNext.Add(pt)
-            Next
-        End If
-
-        features = New List(Of cv.Point)(ptNext)
-
-        For Each pt In features
-            If lastFeatures.Contains(pt) Then DrawCircle(dst2, pt, task.DotSize, task.highlight)
-        Next
-
-        If features.Count = 0 Then features = New List(Of cv.Point)(ptNext)
-
-        labels(2) = strOut
-    End Sub
-    Protected Overrides Sub Finalize()
-        If cPtr <> 0 Then cPtr = Agast_Close(cPtr)
-    End Sub
-End Class
-
-
-
-
-
 Public Class Feature_LeftRight : Inherits TaskParent
     Dim pyrLeft As New Feature_Basics
     Dim pyrRight As New Feature_Basics
@@ -1000,5 +979,28 @@ Public Class Feature_LeftRightCorrelation : Inherits TaskParent
             labels(3) = CStr(countNoDepth) + " features had no depth and " +
                         CStr(countNoCorr) + " missed the correlation threshold of " + Format(maxCorr, fmt2)
         End If
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Feature_Points : Inherits TaskParent
+    Dim feat As New Feature_Basics
+    Public Sub New()
+        labels(3) = "Features found in the image"
+        desc = "Use the sorted list of Delaunay regions to find the top X points to track."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        feat.Run(task.gray)
+
+        If task.heartBeat Then dst2.SetTo(0)
+
+        For Each pt In feat.features
+            DrawCircle(dst2, pt, task.DotSize, task.highlight)
+        Next
+        labels(2) = CStr(feat.features.Count) + " targets were present with " + CStr(task.FeatureSampleSize) + " requested."
     End Sub
 End Class

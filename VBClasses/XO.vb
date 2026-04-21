@@ -6803,7 +6803,7 @@ Namespace VBClasses
 
 
     Public Class XO_FPoly_Core : Inherits TaskParent
-        Public stable As New FCS_Basics
+        Public stable As New FeatureMap_Basics
         Public anchor As cv.Point2f
         Public startAnchor As cv.Point2f
         Public goodPoints As New List(Of cv.Point2f)

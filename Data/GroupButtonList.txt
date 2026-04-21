@@ -61,10 +61,10 @@ EMax
 Entropy
 Erode
 ExPhoto
-FCS
 Feature
 FeatureFlow
 FeatureLess
+FeatureMap
 Filter
 FindMinRect
 FindNonZero

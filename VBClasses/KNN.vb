@@ -24,7 +24,7 @@ Public Class KNN_Basics : Inherits TaskParent
             queries = trainInput
         End If
 
-        If ptListTrain.Count > 0 Then
+        If ptListQuery.Count > 0 Then
             trainInput.Clear()
             For Each pt In ptListTrain
                 trainInput.Add(New cv.Point2f(pt.X, pt.Y))
@@ -664,7 +664,7 @@ Public Class NR_KNN_MaxDistance : Inherits TaskParent
     Dim knn As New KNN_Basics
     Public outputPoints As New List(Of (cv.Point2f, cv.Point2f))
     Public options As New Options_KNN
-    Dim perif As New FCS_Periphery
+    Dim perif As New FeatureMap_Periphery
     Public Sub New()
         desc = "Use the feature points on the periphery and find the points farthest from each."
     End Sub
