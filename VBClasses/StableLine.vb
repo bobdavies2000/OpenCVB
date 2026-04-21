@@ -148,7 +148,7 @@ End Class
 
 Public Class NR_StableLine_FAST : Inherits TaskParent
     Public basics As New FCS_StablePoints
-    Dim fast As New Corners_Basics
+    Dim fast As New Corner_Basics
     Public Sub New()
         desc = "Track the FAST feature points found in the BGR image and track those that appear stable."
     End Sub

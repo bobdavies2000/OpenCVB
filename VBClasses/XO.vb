@@ -19200,7 +19200,7 @@ Namespace VBClasses
 
 
 
-    Public Class XO_Corners_RedCloud : Inherits TaskParent
+    Public Class XO_Corner_RedCloud : Inherits TaskParent
         Dim corners As New Neighbor_Intersects
         Public Sub New()
             labels = {"", "", "Grayscale", "Highlighted points show where more than 2 cells intersect."}
@@ -19846,7 +19846,7 @@ Namespace VBClasses
 
 
     Public Class XO_Feature_NoMotion : Inherits TaskParent
-        Dim feat As New Feature_Basics
+        Public feat As New Feature_Basics
         Public Sub New()
             task.gOptions.stabilizeDepthRGB.Checked = False
             dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
@@ -19877,13 +19877,13 @@ Namespace VBClasses
             desc = "Identify features that consistently present in the image - with motion ignored."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            Dim lastFeatures As New List(Of cv.Point)(task.featurePoints)
+            Dim lastFeatures As New List(Of cv.Point)(noMotion.feat.features)
 
             noMotion.Run(src)
 
             dst2 = src
             Dim stable As New List(Of cv.Point)
-            For Each pt In task.featurePoints
+            For Each pt In noMotion.feat.features
                 If lastFeatures.Contains(pt) Then
                     DrawCircle(dst2, pt, task.DotSize, task.highlight)
                     stable.Add(pt)

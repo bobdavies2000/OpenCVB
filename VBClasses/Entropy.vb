@@ -98,10 +98,10 @@ End Class
 
 
 Public Class NR_Entropy_FAST : Inherits TaskParent
-    Dim fast As New Corners_Basics
+    Dim fast As New Corner_Basics
     Dim entropy As New Entropy_Highest
     Public Sub New()
-        labels = {"", "", "Output of Corners_FAST, input to entropy calculation", "Lighter color is higher entropy, highlight shows highest"}
+        labels = {"", "", "Output of Corner_FAST, input to entropy calculation", "Lighter color is higher entropy, highlight shows highest"}
         desc = "Use FAST markings to add to entropy"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)

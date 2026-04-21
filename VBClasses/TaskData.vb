@@ -130,7 +130,6 @@ Partial Public Class AlgorithmTask
     Public gridRatioY As Single ' translate from display height to workres to find grid element.
 
     Public features As New List(Of cv.Point2f)
-    Public featurePoints As New List(Of cv.Point)
 
     Public flessBoundary As New cv.Mat
     Public lowResColor As New cv.Mat

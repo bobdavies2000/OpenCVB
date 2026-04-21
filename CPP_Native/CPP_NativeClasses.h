@@ -3731,7 +3731,7 @@ int* BGSubtract_Synthetic_Run(BGSubtract_Synthetic* cPtr)
 
 
 extern "C" __declspec(dllexport)
-int* Corners_ShiTomasi(int* grayPtr, int rows, int cols, int blockSize, int apertureSize)
+int* Corner_ShiTomasi(int* grayPtr, int rows, int cols, int blockSize, int apertureSize)
 {
     static Mat dst;
     Mat gray = Mat(rows, cols, CV_8UC1, grayPtr);

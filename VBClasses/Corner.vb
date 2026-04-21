@@ -1,7 +1,7 @@
 Imports System.Runtime.InteropServices
 Imports cv = OpenCvSharp
-Public Class Corners_Basics : Inherits TaskParent
-    Public fast As New Corners_Core
+Public Class Corner_Basics : Inherits TaskParent
+    Public fast As New Corner_Core
     Public features As New List(Of cv.Point2f)
     Public Sub New()
         labels = {"", "", "", "FAST stable points without context"}
@@ -9,28 +9,32 @@ Public Class Corners_Basics : Inherits TaskParent
         desc = "Find and save only the stable points in the FAST output"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        Dim featurePoints = New List(Of cv.Point)(task.featurePoints)
+        Dim lastFeatures = New List(Of cv.Point2f)(fast.features)
         fast.Run(src)
 
-        Dim threshold = task.featurePoints.Count / 10
+        Dim threshold = fast.features.Count / 10
 
         dst2 = src
         dst3.SetTo(0)
         Dim newPts As New List(Of cv.Point)
-        Dim new2f As New List(Of cv.Point2f)
-        For i = 0 To task.featurePoints.Count - 1
-            Dim pt = task.featurePoints(i)
-            If featurePoints.Contains(pt) Then
+        For i = 0 To fast.features.Count - 1
+            Dim pt = fast.features(i)
+            If lastFeatures.Contains(pt) Then
                 DrawCircle(dst2, pt, task.DotSize, cv.Scalar.Yellow)
                 newPts.Add(pt)
-                new2f.Add(fast.features(i))
                 dst3.Set(Of Byte)(pt.Y, pt.X, 255)
             End If
         Next
 
-        task.featurePoints = If(newPts.Count <= threshold, task.featurePoints, New List(Of cv.Point)(newPts))
-        features = If(new2f.Count <= threshold, fast.features, New List(Of cv.Point2f)(new2f))
-        labels(2) = Format(task.featurePoints.Count, "000") + " identified FAST stable points - slider adjusts threshold"
+        If newPts.Count < threshold Then
+            features = New List(Of cv.Point2f)(fast.features)
+        Else
+            features.Clear()
+            For Each pt In newPts
+                features.Add(pt)
+            Next
+        End If
+        labels(2) = Format(features.Count, "000") + " identified FAST stable points - slider adjusts threshold"
     End Sub
 End Class
 
@@ -40,7 +44,7 @@ End Class
 
 
 ' https://github.com/JiphuTzu/opencvsharp/blob/master/sample/SamplesVB/Samples/FASTSample.vb
-Public Class Corners_Core : Inherits TaskParent
+Public Class Corner_Core : Inherits TaskParent
     Dim options As New Options_FAST
     Public features As New List(Of cv.Point2f)
     Public Sub New()
@@ -54,9 +58,7 @@ Public Class Corners_Core : Inherits TaskParent
         Dim kpoints() As cv.KeyPoint = cv.Cv2.FAST(task.gray, options.FASTthreshold, options.useNonMax)
 
         features.Clear()
-        task.featurePoints.Clear()
         For Each kp As cv.KeyPoint In kpoints
-            task.featurePoints.Add(New cv.Point(kp.Pt.X, kp.Pt.Y))
             features.Add(kp.Pt)
         Next
 
@@ -77,7 +79,7 @@ End Class
 
 
 ' https://docs.opencvb.org/2.4/doc/tutorials/features2d/trackingmotion/generic_corner_detector/generic_corner_detector.html
-Public Class Corners_Harris : Inherits TaskParent
+Public Class Corner_Harris : Inherits TaskParent
     Dim options As New Options_HarrisCorners
     Dim gray As New cv.Mat
     Dim mc As New cv.Mat, mm As mmData
@@ -114,7 +116,7 @@ Public Class Corners_Harris : Inherits TaskParent
             Next
         Next
 
-        labels(2) = "Corners_Harris found " + CStr(count) + " corners in the image."
+        labels(2) = "Corner_Harris found " + CStr(count) + " corners in the image."
 
         Dim McNormal As New cv.Mat
         cv.Cv2.Normalize(mc, McNormal, 127, 255, cv.NormTypes.MinMax)
@@ -127,7 +129,7 @@ End Class
 
 
 
-Public Class NR_Corners_PreCornerDetect : Inherits TaskParent
+Public Class NR_Corner_PreCornerDetect : Inherits TaskParent
     Dim median As New Math_Median_CDF
     Dim options As New Options_PreCorners
     Public Sub New()
@@ -152,7 +154,7 @@ End Class
 
 
 ' https://docs.opencvb.org/2.4/doc/tutorials/features2d/trackingmotion/generic_corner_detector/generic_corner_detector.html
-Public Class Corners_ShiTomasi_CPP : Inherits TaskParent
+Public Class Corner_ShiTomasi_CPP : Inherits TaskParent
     Dim options As New Options_ShiTomasi
     Public Sub New()
         desc = "Find corners using Eigen values and vectors"
@@ -164,7 +166,7 @@ Public Class Corners_ShiTomasi_CPP : Inherits TaskParent
         Dim data(task.gray.Total - 1) As Byte
         Dim handle = GCHandle.Alloc(data, GCHandleType.Pinned)
         task.gray.GetArray(Of Byte)(data)
-        Dim imagePtr = Corners_ShiTomasi(handle.AddrOfPinnedObject, src.Rows, src.Cols,
+        Dim imagePtr = Corner_ShiTomasi(handle.AddrOfPinnedObject, src.Rows, src.Cols,
                                              options.blocksize, options.aperture)
         handle.Free()
 
@@ -179,8 +181,8 @@ End Class
 
 
 
-Public Class NR_Corners_BasicsCentroid : Inherits TaskParent
-    Dim fast As New Corners_Basics
+Public Class NR_Corner_BasicsCentroid : Inherits TaskParent
+    Dim fast As New Corner_Basics
     Public Sub New()
         task.kalman = New Kalman_Basics
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
@@ -211,8 +213,8 @@ End Class
 
 
 
-Public Class NR_Corners_BasicsCentroids : Inherits TaskParent
-    Dim fast As New Corners_Basics
+Public Class NR_Corner_BasicsCentroids : Inherits TaskParent
+    Dim fast As New Corner_Basics
     Dim fastCenters() As cv.Point2f
     Public Sub New()
         desc = "Use a thread grid to find the centroids in each grid element"
@@ -247,7 +249,7 @@ End Class
 
 
 ' https://github.com/PacktPublishing/OpenCV3-Computer-Vision-Application-Programming-Cookbook-Third-Edition/blob/master/Chapter08/harrisDetector.h
-Public Class NR_Corners_Harris_CPP : Inherits TaskParent
+Public Class NR_Corner_Harris_CPP : Inherits TaskParent
     Implements IDisposable
     Dim options As New Options_Harris
     Public Sub New()
@@ -281,7 +283,7 @@ End Class
 
 
 ' https://github.com/PacktPublishing/OpenCV3-Computer-Vision-Application-Programming-Cookbook-Third-Edition/blob/master/Chapter08/harrisDetector.h
-Public Class Corners_HarrisDetector_CPP : Inherits TaskParent
+Public Class Corner_HarrisDetector_CPP : Inherits TaskParent
     Implements IDisposable
     Public features As New List(Of cv.Point2f)
     Dim options As New Options_Features
@@ -322,7 +324,7 @@ End Class
 
 
 
-Public Class NR_Corners_RedCloud : Inherits TaskParent
+Public Class NR_Corner_RedCloud : Inherits TaskParent
     Dim corners As New Neighbor_Intersects
     Dim redC As New RedCloud_Basics
     Public Sub New()
@@ -347,8 +349,8 @@ End Class
 
 
 
-Public Class NR_Corners_SubPix : Inherits TaskParent
-    Dim fast As New Corners_Basics
+Public Class NR_Corner_SubPix : Inherits TaskParent
+    Dim fast As New Corner_Basics
     Dim options As New Options_PreCorners
     Public Sub New()
         labels(2) = "Output of PreCornerDetect"
@@ -374,9 +376,9 @@ End Class
 
 
 
-Public Class Corners_RedPrepData : Inherits TaskParent
+Public Class Corner_RedPrepData : Inherits TaskParent
     Dim prep As New RedPrep_Basics
-    Dim fast As New Corners_Basics
+    Dim fast As New Corner_Basics
     Public Sub New()
         desc = "Find the corners in the RedPrep XY data."
     End Sub

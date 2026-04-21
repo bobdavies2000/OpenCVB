@@ -3,7 +3,7 @@ Imports cv = OpenCvSharp
 Public Class NR_Feature_Basics : Inherits TaskParent
     Implements IDisposable
     Public options As New Options_Features
-    Public ptLatest As New List(Of cv.Point2f)
+    Public features As New List(Of cv.Point2f)
     Public Sub New()
         desc = "Gather features from a list of sources - GoodFeatures, Agast, Brisk..."
     End Sub
@@ -18,7 +18,7 @@ Public Class NR_Feature_Basics : Inherits TaskParent
 
 
         strOut = ""
-        ptLatest.Clear()
+        Dim ptLatest As New List(Of cv.Point2f)
         Select Case task.fOptions.FeatureMethod.Text
             Case "GoodFeatures"
                 ptLatest = cv.Cv2.GoodFeaturesToTrack(src, task.fOptions.FeatureSampleSize.Value, options.quality,
@@ -49,12 +49,12 @@ Public Class NR_Feature_Basics : Inherits TaskParent
                 ptLatest = brisk.features
                 strOut = "GoodFeatures produced " + CStr(ptLatest.Count) + " features"
             Case "Harris"
-                Static harris As New Corners_HarrisDetector_CPP
+                Static harris As New Corner_HarrisDetector_CPP
                 harris.Run(src)
                 ptLatest = harris.features
                 strOut = "Harris Detector produced " + CStr(ptLatest.Count) + " features"
             Case "FAST"
-                Static FAST As New Corners_Basics
+                Static FAST As New Corner_Basics
                 FAST.Run(src)
                 ptLatest = FAST.features
                 strOut = "FAST produced " + CStr(ptLatest.Count) + " features"
@@ -88,15 +88,9 @@ Public Class NR_Feature_Basics : Inherits TaskParent
             sortByGrid.Add(index, pt)
         Next
 
-        task.features.Clear()
-        task.featurePoints.Clear()
-        For i = 0 To sortByGrid.Values.Count - 1
-            Dim pt = sortByGrid.Values(i)
-            task.features.Add(pt)
-            task.featurePoints.Add(New cv.Point(pt.X, pt.Y))
-        Next
+        features = New List(Of cv.Point2f)(sortByGrid.Values)
 
-        For Each pt In task.features
+        For Each pt In features
             DrawCircle(dst2, pt, task.DotSize, task.highlight)
         Next
 
@@ -149,7 +143,7 @@ End Class
 
 Public Class Feature_Delaunay : Inherits TaskParent
     Dim delaunay As New Delaunay_Contours
-    Dim feat As New Feature_Bricks
+    Public feat As New Feature_Bricks
     Dim options As New Options_Features
     Public Sub New()
         OptionParent.FindSlider("Min Distance").Value = 10
@@ -273,7 +267,7 @@ End Class
 
 Public Class NR_Feature_TraceDelaunay : Inherits TaskParent
     Dim features As New Feature_Delaunay
-    Public goodList As New List(Of List(Of cv.Point2f)) ' stable points only
+    Public goodLists As New List(Of List(Of cv.Point2f)) ' stable points only
     Public Sub New()
         labels = {"Stable points highlighted", "", "", "Delaunay map of regions defined by the feature points"}
         desc = "Trace the GoodFeatures points using only Delaunay - no KNN or RedCloud or Matching."
@@ -282,15 +276,18 @@ Public Class NR_Feature_TraceDelaunay : Inherits TaskParent
         features.Run(src)
         dst3 = features.dst3
 
-        If task.optionsChanged Then goodList.Clear()
+        If task.optionsChanged Then goodLists.Clear()
 
-        Dim ptList As New List(Of cv.Point2f)(task.features)
-        goodList.Add(ptList)
+        Dim ptList As New List(Of cv.Point2f)
+        For Each pt In features.feat.features
+            ptList.Add(pt)
+        Next
+        goodLists.Add(ptList)
 
-        If goodList.Count >= task.frameHistoryCount Then goodList.RemoveAt(0)
+        If goodLists.Count >= task.frameHistoryCount Then goodLists.RemoveAt(0)
 
         dst2.SetTo(0)
-        For Each ptList In goodList
+        For Each ptList In goodLists
             For Each pt In ptList
                 DrawCircle(task.color, pt, task.DotSize, task.highlight)
                 Dim c = dst3.Get(Of cv.Vec3b)(pt.Y, pt.X)
@@ -307,8 +304,8 @@ End Class
 
 
 Public Class NR_Feature_ShiTomasi : Inherits TaskParent
-    Dim harris As New Corners_HarrisDetector_CPP
-    Dim shiTomasi As New Corners_ShiTomasi_CPP
+    Dim harris As New Corner_HarrisDetector_CPP
+    Dim shiTomasi As New Corner_ShiTomasi_CPP
     Dim options As New Options_ShiTomasi
     Public Sub New()
         OptionParent.FindSlider("Corner normalize threshold").Value = 15
@@ -843,7 +840,7 @@ Public Class Feature_Basics : Inherits TaskParent
                 ptLatest = brisk.features
                 strOut = "BRISK produced " + CStr(ptLatest.Count) + " features"
             Case "FAST"
-                Static FAST As New Corners_Basics
+                Static FAST As New Corner_Basics
                 FAST.Run(src)
                 ptLatest = FAST.features
                 strOut = "FAST produced " + CStr(ptLatest.Count) + " features"
@@ -853,7 +850,7 @@ Public Class Feature_Basics : Inherits TaskParent
                                                       options.blockSize, True, options.k).ToList
                 strOut = "GoodFeatures produced " + CStr(ptLatest.Count) + " features"
             Case "Harris"
-                Static harris As New Corners_HarrisDetector_CPP
+                Static harris As New Corner_HarrisDetector_CPP
                 harris.Run(src)
                 ptLatest = harris.features
                 strOut = "Harris Detector produced " + CStr(ptLatest.Count) + " features"
