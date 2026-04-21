@@ -934,32 +934,30 @@ End Class
 
 Public Class KNN_MinDistance : Inherits TaskParent
     Dim knn As New KNN_Basics
-    Public inputPoints As New List(Of cv.Point2f)
     Public outputPoints2f As New List(Of cv.Point2f)
     Public outputPoints As New List(Of cv.Point)
     Dim options As New Options_Features
     Dim feat As New Feature_Basics
     Public Sub New()
         If standalone Then task.fOptions.FeatureMethod.SelectedItem = "AGAST"
-        desc = "Enforce a minimum distance to the next feature threshold"
+        desc = "Enforce a minimum distance to the next feature."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
         feat.Run(task.gray)
         labels = feat.labels
 
-        If task.features.Count = 0 Then Exit Sub
-        If standalone Then inputPoints = task.features
+        If feat.features.Count = 0 Then Exit Sub
 
-        knn.queries = New List(Of cv.Point2f)(inputPoints)
-        knn.trainInput = knn.queries
+        knn.ptListQuery = New List(Of cv.Point)(feat.features)
+        knn.ptListTrain = knn.ptListQuery
         knn.Run(src)
 
         dst3.SetTo(0)
-        For Each pt In inputPoints
+        For Each pt In feat.features
             DrawCircle(dst3, pt, task.DotSize, cv.Scalar.White)
         Next
-        labels(3) = "There were " + CStr(inputPoints.Count) + " points in the input"
+        labels(3) = "There were " + CStr(feat.features.Count) + " points in the input"
 
         Dim tooClose As New List(Of (cv.Point2f, cv.Point2f))
         For i = 0 To knn.result.GetUpperBound(0)

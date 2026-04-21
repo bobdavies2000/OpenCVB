@@ -6868,7 +6868,7 @@ Namespace VBClasses
         Public stable As New StableLine_BasicsCount
         Public options As New Options_FPoly
         Dim feat As New Feature_Basics
-        Public topFeatures As New List(Of cv.Point2f)
+        Public topFeatures As New List(Of cv.Point)
         Public Sub New()
             desc = "Get the top features and validate them using Delaunay regions."
         End Sub
@@ -6876,6 +6876,7 @@ Namespace VBClasses
             options.Run()
             feat.Run(task.gray)
 
+            stable.features = feat.features
             stable.Run(src)
             dst2 = stable.dst2
             topFeatures.Clear()
@@ -8901,7 +8902,7 @@ Namespace VBClasses
 
 
     Public Class XO_Motion_TopFeatureFail : Inherits TaskParent
-        Dim features As New Feature_Basics
+        Dim feat As New Feature_Basics
         Public featureRects As New List(Of cv.Rect)
         Public searchRects As New List(Of cv.Rect)
         Dim match As New Match_Basics
@@ -8914,11 +8915,11 @@ Namespace VBClasses
             Dim half As Integer = CInt(task.brickEdgeLen / 2)
             Dim pt As cv.Point
             If task.heartBeatLT Then
-                features.Run(src)
+                feat.Run(src)
                 searchRects.Clear()
                 featureRects.Clear()
                 saveMat = src.Clone
-                For Each pt In task.features
+                For Each pt In feat.features
                     Dim index As Integer = task.gridMap.Get(Of Integer)(pt.Y, pt.X)
                     Dim roi = New cv.Rect(pt.X - half, pt.Y - half, task.brickEdgeLen, task.brickEdgeLen)
                     roi = ValidateRect(roi) ' stub bricks are fixed here 
@@ -8927,7 +8928,7 @@ Namespace VBClasses
                 Next
 
                 dst2 = saveMat.Clone
-                For Each pt In task.features
+                For Each pt In feat.features
                     Dim index As Integer = task.gridMap.Get(Of Integer)(pt.Y, pt.X)
                     Dim roi = New cv.Rect(pt.X - half, pt.Y - half, task.brickEdgeLen, task.brickEdgeLen)
                     roi = ValidateRect(roi) ' stub bricks are fixed here 
@@ -15326,7 +15327,10 @@ Namespace VBClasses
             If task.firstPass Then lastImage = src.Clone
             Dim multiplier = dotSlider.Value
 
-            knn.queries = New List(Of cv.Point2f)(task.features)
+            knn.queries.Clear()
+            For Each pt In feat.features
+                knn.queries.Add(pt)
+            Next
             knn.Run(src)
 
             Dim diffX As New List(Of Integer)
@@ -18091,7 +18095,7 @@ Namespace VBClasses
             labels(2) = feat.labels(2)
 
             dst3.SetTo(0)
-            For Each pt In task.featurePoints
+            For Each pt In feat.features
                 dst3.Set(Of Byte)(pt.Y, pt.X, 255)
             Next
 
@@ -19833,6 +19837,89 @@ Namespace VBClasses
                 labels(2) = CStr(leftFeatures.Count) + " detected in the left image that have matches in " + CStr(threshold) + " previous left images"
                 labels(3) = CStr(rightFeatures.Count) + " detected in the right image that have matches in " + CStr(threshold) + " previous right images"
             End If
+        End Sub
+    End Class
+
+
+
+
+
+
+    Public Class XO_Feature_NoMotion : Inherits TaskParent
+        Dim feat As New Feature_Basics
+        Public Sub New()
+            task.gOptions.stabilizeDepthRGB.Checked = False
+            dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
+            desc = "Find good features to track in a BGR image using the motion mask+"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            feat.Run(task.gray)
+            dst2 = src.Clone
+
+            dst3.SetTo(0)
+            For Each pt In feat.features
+                DrawCircle(dst2, pt, task.DotSize, task.highlight)
+                dst3.Set(Of Byte)(pt.Y, pt.X, 255)
+            Next
+
+            labels(2) = feat.labels(2)
+        End Sub
+    End Class
+
+
+
+
+    Public Class XO_Feature_Stable : Inherits TaskParent
+        Dim noMotion As New XO_Feature_NoMotion
+        Public fpStable As New List(Of fpData)
+        Public ptStable As New List(Of cv.Point)
+        Public Sub New()
+            desc = "Identify features that consistently present in the image - with motion ignored."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            Dim lastFeatures As New List(Of cv.Point)(task.featurePoints)
+
+            noMotion.Run(src)
+
+            dst2 = src
+            Dim stable As New List(Of cv.Point)
+            For Each pt In task.featurePoints
+                If lastFeatures.Contains(pt) Then
+                    DrawCircle(dst2, pt, task.DotSize, task.highlight)
+                    stable.Add(pt)
+                End If
+            Next
+            lastFeatures = New List(Of cv.Point)(stable)
+            labels(2) = noMotion.labels(2) + " and " + CStr(stable.Count) + " appeared on earlier frames "
+
+            Dim fpNew As New List(Of fpData)
+            Dim ptNew As New List(Of cv.Point)
+            For Each pt In stable
+                Dim fp As New fpData
+                If ptStable.Contains(pt) Then
+                    Dim index = ptStable.IndexOf(pt)
+                    fp = fpStable(index)
+                    fp.age += 1
+                Else
+                    fp.age = 1
+                    fp.pt = pt
+                End If
+
+                fp.index = fpNew.Count
+                fpNew.Add(fp)
+                ptNew.Add(pt)
+            Next
+
+            fpStable = New List(Of fpData)(fpNew)
+            ptStable = New List(Of cv.Point)(ptNew)
+
+            dst3.SetTo(0)
+            For Each fp In fpStable
+                If fp.age > 2 Then
+                    DrawCircle(dst3, fp.pt, task.DotSize, task.highlight)
+                    SetTrueText(CStr(fp.age), fp.pt, 3)
+                End If
+            Next
         End Sub
     End Class
 End Namespace

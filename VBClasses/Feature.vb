@@ -1,6 +1,6 @@
 Imports System.Runtime.InteropServices
 Imports cv = OpenCvSharp
-Public Class Feature_Basics : Inherits TaskParent
+Public Class NR_Feature_Basics : Inherits TaskParent
     Implements IDisposable
     Public options As New Options_Features
     Public ptLatest As New List(Of cv.Point2f)
@@ -184,7 +184,7 @@ End Class
 ' https://docs.opencv.org/3.4/d7/d8b/tutorial_py_lucas_kanade.html
 Public Class NR_Feature_NoMotionTest : Inherits TaskParent
     Public options As New Options_Features
-    Dim method As New Feature_Basics
+    Dim feat As New Feature_Basics
     Public Sub New()
         desc = "Find good features to track in a BGR image without using correlation coefficients which produce more consistent sharedResults.images.."
     End Sub
@@ -192,13 +192,13 @@ Public Class NR_Feature_NoMotionTest : Inherits TaskParent
         options.Run()
         dst2 = src.Clone
 
-        method.Run(src)
+        feat.Run(src)
 
-        For Each pt In task.features
+        For Each pt In feat.features
             DrawCircle(dst2, pt, task.DotSize, task.highlight)
         Next
 
-        labels(2) = method.labels(2)
+        labels(2) = feat.labels(2)
     End Sub
 End Class
 
@@ -248,7 +248,7 @@ End Class
 
 
 
-Public Class NR_Feature_Points : Inherits TaskParent
+Public Class Feature_Points : Inherits TaskParent
     Dim feat As New Feature_Basics
     Public Sub New()
         labels(3) = "Features found in the image"
@@ -259,10 +259,10 @@ Public Class NR_Feature_Points : Inherits TaskParent
 
         If task.heartBeat Then dst2.SetTo(0)
 
-        For Each pt In task.features
+        For Each pt In feat.features
             DrawCircle(dst2, pt, task.DotSize, task.highlight)
         Next
-        labels(2) = CStr(task.features.Count) + " targets were present with " + CStr(task.FeatureSampleSize) + " requested."
+        labels(2) = CStr(feat.features.Count) + " targets were present with " + CStr(task.FeatureSampleSize) + " requested."
     End Sub
 End Class
 
@@ -351,7 +351,7 @@ Public Class NR_Feature_Generations : Inherits TaskParent
         feat.Run(task.gray)
 
         Dim newfeatures As New SortedList(Of Integer, cv.Point)(New compareAllowIdenticalIntegerInverted)
-        For Each pt In task.featurePoints
+        For Each pt In feat.features
             Dim index = features.IndexOf(pt)
             If index >= 0 Then newfeatures.Add(gens(index) + 1, pt) Else newfeatures.Add(1, pt)
         Next
@@ -394,7 +394,7 @@ Public Class NR_Feature_History : Inherits TaskParent
 
         dst2 = src.Clone
 
-        featureHistory.Add(New List(Of cv.Point)(task.featurePoints))
+        featureHistory.Add(New List(Of cv.Point)(feat.features))
 
         Dim newFeatures As New List(Of cv.Point)
         gens.Clear()
@@ -479,7 +479,7 @@ Public Class NR_Feature_RedCloud : Inherits TaskParent
         dst2 = redC.dst2
         labels(2) = redC.labels(2)
 
-        For Each pt In task.featurePoints
+        For Each pt In feat.features
             DrawCircle(dst2, pt, task.DotSize, task.highlight)
         Next
     End Sub
@@ -502,14 +502,14 @@ Public Class NR_Feature_WithDepth : Inherits TaskParent
 
         dst2 = src
         Dim depthCount As Integer
-        For Each pt In task.featurePoints
+        For Each pt In feat.features
             Dim index = task.gridMap.Get(Of Integer)(pt.Y, pt.X)
             If bricks.brickList(index).depth > 0 Then
                 DrawCircle(dst2, pt, task.DotSize, task.highlight)
                 depthCount += 1
             End If
         Next
-        labels(2) = CStr(depthCount) + " features had depth or " + Format(depthCount / task.features.Count, "0%")
+        labels(2) = CStr(depthCount) + " features had depth or " + Format(depthCount / feat.features.Count, "0%")
     End Sub
 End Class
 
@@ -517,7 +517,7 @@ End Class
 
 
 
-Public Class NR_Feature_Matching : Inherits TaskParent
+Public Class Feature_Matching : Inherits TaskParent
     Public features As New List(Of cv.Point)
     Public motionPoints As New List(Of cv.Point)
     Dim match As New Match_Basics
@@ -549,7 +549,7 @@ Public Class NR_Feature_Matching : Inherits TaskParent
 
         If matched.Count < task.FeatureSampleSize / 2 Then
             feat.Run(src)
-            features = task.featurePoints
+            features = feat.features
         Else
             features = New List(Of cv.Point)(matched)
         End If
@@ -580,12 +580,12 @@ Public Class NR_Feature_SteadyCam : Inherits TaskParent
 
         feat.Run(task.gray)
 
-        Static features As New List(Of cv.Point)(task.featurePoints)
+        Static features As New List(Of cv.Point)(feat.features)
         Static lastSrc As cv.Mat = src.Clone
 
-        Dim resync = features.Count / task.features.Count < options.resyncThreshold
+        Dim resync = features.Count / feat.features.Count < options.resyncThreshold
         If task.heartBeat Or task.optionsChanged Or resync Then
-            features = New List(Of cv.Point)(task.featurePoints)
+            features = New List(Of cv.Point)(feat.features)
         End If
 
         Dim ptList = New List(Of cv.Point)(features)
@@ -718,28 +718,28 @@ End Class
 
 
 Public Class NR_Feature_StableVisual : Inherits TaskParent
-    Dim noMotion As New Feature_Basics
+    Dim feat As New Feature_Basics
     Public fpStable As New List(Of fpData)
     Public ptStable As New List(Of cv.Point)
     Public Sub New()
         desc = "Show only features present on this and the previous frame."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        Dim lastFeatures As New List(Of cv.Point)(task.featurePoints)
+        Dim lastFeatures As New List(Of cv.Point)(feat.features)
 
-        noMotion.Run(src)
-        dst3 = noMotion.dst2
+        feat.Run(src)
+        dst3 = feat.dst2
 
         dst2.SetTo(0)
         Dim stable As New List(Of cv.Point)
-        For Each pt In task.featurePoints
+        For Each pt In feat.features
             If lastFeatures.Contains(pt) Then
                 DrawCircle(dst2, pt, task.DotSize, task.highlight)
                 stable.Add(pt)
             End If
         Next
         lastFeatures = New List(Of cv.Point)(stable)
-        labels(2) = noMotion.labels(2) + " and " + CStr(stable.Count) + " appeared on earlier frames "
+        labels(2) = feat.labels(2) + " and " + CStr(stable.Count) + " appeared on earlier frames "
 
         dst2 = src.Clone
         For Each pt In stable
@@ -757,8 +757,7 @@ End Class
 ' https://docs.opencv.org/3.4/d7/d8b/tutorial_py_lucas_kanade.html
 Public Class Feature_KNN : Inherits TaskParent
     Dim knn As New KNN_Basics
-    Public featurePoints As New List(Of cv.Point2f)
-    Dim feat As New Feature_Basics
+    Public feat As New Feature_Basics
     Public Sub New()
         dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         desc = "Find good features to track in the image but use the same point if closer than a threshold"
@@ -766,14 +765,9 @@ Public Class Feature_KNN : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         feat.Run(task.gray)
 
-        If task.features.Count = 0 Then
-            featurePoints.Clear()
-            Exit Sub
-        End If
-
-        knn.queries = New List(Of cv.Point2f)(task.features)
+        knn.ptListQuery = New List(Of cv.Point)(feat.features)
         If knn.trainInput.Count = 0 Or task.gOptions.DebugCheckBox.Checked Then
-            knn.trainInput = New List(Of cv.Point2f)(knn.queries)
+            knn.ptListTrain = New List(Of cv.Point)(knn.ptListQuery)
             task.gOptions.DebugCheckBox.Checked = False
         End If
 
@@ -781,16 +775,14 @@ Public Class Feature_KNN : Inherits TaskParent
 
         For i = 0 To knn.neighbors.Count - 1
             Dim trainIndex = knn.neighbors(i)(0) ' index of the matched train input
-            Dim pt = knn.trainInput(trainIndex)
-            Dim qPt = task.features(i)
-            If pt.DistanceTo(qPt) > 2 Then knn.trainInput(trainIndex) = task.features(i)
+            Dim pt = knn.ptListTrain(trainIndex)
+            Dim qPt = feat.features(i)
+            If pt.DistanceTo(qPt) > 2 Then knn.trainInput(trainIndex) = feat.features(i)
         Next
-
-        featurePoints = New List(Of cv.Point2f)(knn.trainInput)
 
         src.CopyTo(dst2)
         dst3.SetTo(0)
-        For Each pt In featurePoints
+        For Each pt In feat.features
             DrawCircle(dst2, pt, task.DotSize + 2, white)
             DrawCircle(dst3, pt, task.DotSize + 2, white)
         Next
@@ -804,89 +796,7 @@ End Class
 
 
 
-
-Public Class Feature_NoMotion : Inherits TaskParent
-    Dim feat As New Feature_Basics
-    Public Sub New()
-        task.gOptions.stabilizeDepthRGB.Checked = False
-        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
-        desc = "Find good features to track in a BGR image using the motion mask+"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        feat.Run(task.gray)
-        dst2 = src.Clone
-
-        dst3.SetTo(0)
-        For Each pt In task.featurePoints
-            DrawCircle(dst2, pt, task.DotSize, task.highlight)
-            dst3.Set(Of Byte)(pt.Y, pt.X, 255)
-        Next
-
-        labels(2) = feat.labels(2)
-    End Sub
-End Class
-
-
-
-
-Public Class Feature_Stable : Inherits TaskParent
-    Dim noMotion As New Feature_NoMotion
-    Public fpStable As New List(Of fpData)
-    Public ptStable As New List(Of cv.Point)
-    Public Sub New()
-        desc = "Identify features that consistently present in the image - with motion ignored."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        Dim lastFeatures As New List(Of cv.Point)(task.featurePoints)
-
-        noMotion.Run(src)
-
-        dst2 = src
-        Dim stable As New List(Of cv.Point)
-        For Each pt In task.featurePoints
-            If lastFeatures.Contains(pt) Then
-                DrawCircle(dst2, pt, task.DotSize, task.highlight)
-                stable.Add(pt)
-            End If
-        Next
-        lastFeatures = New List(Of cv.Point)(stable)
-        labels(2) = noMotion.labels(2) + " and " + CStr(stable.Count) + " appeared on earlier frames "
-
-        Dim fpNew As New List(Of fpData)
-        Dim ptNew As New List(Of cv.Point)
-        For Each pt In stable
-            Dim fp As New fpData
-            If ptStable.Contains(pt) Then
-                Dim index = ptStable.IndexOf(pt)
-                fp = fpStable(index)
-                fp.age += 1
-            Else
-                fp.age = 1
-                fp.pt = pt
-            End If
-
-            fp.index = fpNew.Count
-            fpNew.Add(fp)
-            ptNew.Add(pt)
-        Next
-
-        fpStable = New List(Of fpData)(fpNew)
-        ptStable = New List(Of cv.Point)(ptNew)
-
-        dst3.SetTo(0)
-        For Each fp In fpStable
-            If fp.age > 2 Then
-                DrawCircle(dst3, fp.pt, task.DotSize, task.highlight)
-                SetTrueText(CStr(fp.age), fp.pt, 3)
-            End If
-        Next
-    End Sub
-End Class
-
-
-
-
-Public Class Feature_BasicsNew : Inherits TaskParent
+Public Class Feature_Basics : Inherits TaskParent
     Implements IDisposable
     Public options As New Options_Features
     Public features As New List(Of cv.Point)
@@ -991,8 +901,8 @@ End Class
 
 
 Public Class Feature_LeftRight : Inherits TaskParent
-    Dim pyrLeft As New Feature_BasicsNew
-    Dim pyrRight As New Feature_BasicsNew
+    Dim pyrLeft As New Feature_Basics
+    Dim pyrRight As New Feature_Basics
     Public features As New List(Of cv.Point)
     Public lastFeatures As New List(Of cv.Point)
     Public Sub New()
@@ -1052,7 +962,7 @@ End Class
 
 
 Public Class Feature_LeftRightCorrelation : Inherits TaskParent
-    Dim feat As New Feature_BasicsNew
+    Dim feat As New Feature_Basics
     Public features As New List(Of cv.Point)
     Public lastFeatures As New List(Of cv.Point)
     Dim match As New Match_Basics

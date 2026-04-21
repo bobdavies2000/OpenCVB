@@ -7,7 +7,7 @@ Public Class Swarm_Basics : Inherits TaskParent
     Public distanceMax As Single
     Public options As New Options_Swarm
     Public optionsEx As New Options_Features
-    Dim cornerHistory As New List(Of List(Of cv.Point2f))
+    Dim cornerHistory As New List(Of List(Of cv.Point))
     Dim feat As New Feature_Basics
     Public Sub New()
         task.fOptions.FeatureSampleSize.Value = task.fOptions.FeatureSampleSize.Maximum
@@ -43,11 +43,11 @@ Public Class Swarm_Basics : Inherits TaskParent
         If task.optionsChanged Then cornerHistory.Clear()
 
         Dim histCount = task.frameHistoryCount
-        cornerHistory.Add(New List(Of cv.Point2f)(task.features))
+        cornerHistory.Add(feat.features)
 
         Dim lastIndex = cornerHistory.Count - 1
-        knn.trainInput = New List(Of cv.Point2f)(cornerHistory.ElementAt(0))
-        knn.queries = New List(Of cv.Point2f)(cornerHistory.ElementAt(lastIndex))
+        knn.ptListTrain = New List(Of cv.Point)(cornerHistory.ElementAt(0))
+        knn.ptListQuery = New List(Of cv.Point)(cornerHistory.ElementAt(lastIndex))
         knn.Run(src)
 
         dst2.SetTo(0)

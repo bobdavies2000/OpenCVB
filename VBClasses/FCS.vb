@@ -64,7 +64,10 @@ Public Class FCS_StablePoints : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         good.Run(src)
-        facetGen.inputPoints = New List(Of cv.Point2f)(good.featurePoints)
+        facetGen.inputPoints.Clear()
+        For Each pt In good.feat.features
+            facetGen.inputPoints.Add(pt)
+        Next
 
         facetGen.Run(src)
         If facetGen.inputPoints.Count = 0 Then
@@ -466,7 +469,7 @@ Public Class NR_FCS_Lines : Inherits TaskParent
         fcs.Run(task.gray)
         dst2 = fcs.dst2
 
-        labels(2) = CStr(task.features.Count) + " lines were used to create " +
+        labels(2) = CStr(fcs.feat.features.Count) + " lines were used to create " +
                                                CStr(fcs.fpList.Count) + " cells"
     End Sub
 End Class
@@ -631,7 +634,9 @@ Public Class NR_FCS_BrickPoints : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         good.Run(src)
-        facetGen.inputPoints = New List(Of cv.Point2f)(good.featurePoints)
+        For Each pt In good.feat.features
+            facetGen.inputPoints.Add(pt)
+        Next
 
         facetGen.Run(src)
         If facetGen.inputPoints.Count = 0 Then
@@ -741,7 +746,7 @@ End Class
 
 Public Class FCS_CreateList : Inherits TaskParent
     Dim subdiv As New cv.Subdiv2D
-    Dim feat As New Feature_BasicsNew
+    Public feat As New Feature_Basics
     Dim bricks As New Brick_Basics
     Public fpList As New List(Of fpData)
     Public Sub New()

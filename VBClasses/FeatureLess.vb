@@ -382,15 +382,16 @@ Namespace VBClasses
 
     Public Class FeatureLess_Not : Inherits TaskParent
         Dim feat As New Feature_Basics
-        Dim fLess As New FeatureLess_Correlation
+        Dim fLess As New FeatureLess_Basics
         Public Sub New()
+            dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
             desc = "Use the FeatureLess mask to reduce the input to feature searches."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            fLess.Run(task.gray)
+            fLess.Run(task.gray.Clone)
 
             dst2.SetTo(0)
-            src.CopyTo(dst2, Not fLess.dst2)
+            task.gray.CopyTo(dst2, Not fLess.dst2)
 
             feat.Run(dst2)
             feat.dst2.CopyTo(dst3)

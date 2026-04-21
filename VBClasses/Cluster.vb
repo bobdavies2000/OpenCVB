@@ -6,7 +6,7 @@ Public Class Cluster_Basics : Inherits TaskParent
     Public clusterID As New List(Of Integer)
     Public clusters As New SortedList(Of Integer, List(Of cv.Point))
     Dim options As New Options_Features
-    Dim feat As New Feature_BasicsNew
+    Public feat As New Feature_Basics
     Public Sub New()
         OptionParent.FindSlider("Min Distance").Value = 10
         desc = "Group feature points based on their proximity to each other."
@@ -14,13 +14,11 @@ Public Class Cluster_Basics : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
 
-        If standalone Then
-            feat.Run(src)
-            ptInput.Clear()
-            For Each pt In feat.features
-                ptInput.Add(New cv.Point(CInt(pt.X), CInt(pt.Y)))
-            Next
-        End If
+        feat.Run(src)
+        ptInput.Clear()
+        For Each pt In feat.features
+            ptInput.Add(New cv.Point(CInt(pt.X), CInt(pt.Y)))
+        Next
 
         If ptInput.Count <= 3 Then Exit Sub
 
@@ -90,9 +88,9 @@ Public Class NR_Cluster_Hulls : Inherits TaskParent
         desc = "Create hulls for each cluster of feature points found in Cluster_Basics"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        bPoint.Run(task.gray)
+        If src.Channels <> 1 Then src = task.gray.Clone
+        bPoint.Run(src)
 
-        cluster.ptInput = task.featurePoints
         cluster.Run(src)
         dst2 = cluster.dst2
         dst3 = cluster.dst3

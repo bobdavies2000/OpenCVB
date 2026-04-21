@@ -241,14 +241,13 @@ FCS_Motion
 FCS_Periphery
 FCS_StablePoints
 Feature_Basics
-Feature_BasicsNew
 Feature_Bricks
 Feature_Delaunay
 Feature_KNN
 Feature_LeftRight
 Feature_LeftRightCorrelation
-Feature_NoMotion
-Feature_Stable
+Feature_Matching
+Feature_Points
 FeatureFlow_Basics
 FeatureFlow_LucasKanade
 FeatureLess_Basics
@@ -505,6 +504,7 @@ MeanSubtraction_Gray
 MeanSubtraction_Left
 MeanSubtraction_LeftRight
 Mesh_Basics
+Mesh_BasicsInput
 ML_Basics
 ML_FeatureLess
 ML_FeatureLess_Grid
@@ -893,13 +893,12 @@ NR_FCS_ViewRight
 NR_FCS_WithAge
 NR_Feature_Agast
 NR_Feature_AKaze
+NR_Feature_Basics
 NR_Feature_BrickLine
 NR_Feature_Generations
 NR_Feature_History
 NR_Feature_LucasKanade
-NR_Feature_Matching
 NR_Feature_NoMotionTest
-NR_Feature_Points
 NR_Feature_RedCloud
 NR_Feature_ShiTomasi
 NR_Feature_StableVisual
@@ -1192,7 +1191,6 @@ NR_Math_StdevBoundary
 NR_Math_Subtract
 NR_MaxDist_NoRectangle
 NR_MeanShift_Depth
-NR_Mesh_Features
 NR_MinMath_EdgeLine
 NR_MinMath_Edges
 NR_MinMath_KNN

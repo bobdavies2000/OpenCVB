@@ -1,5 +1,45 @@
 Imports cv = OpenCvSharp
 Public Class Mesh_Basics : Inherits TaskParent
+    Dim mesh As New Mesh_BasicsInput
+    Dim feat As New Feature_Basics
+    Public Sub New()
+        labels(2) = "Triangles built with each feature point and the specified number of nearest neighbors."
+        desc = "Build triangles from feature points"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        feat.Run(task.gray)
+
+        If feat.features.Count < 3 Then Exit Sub
+        mesh.ptList.Clear()
+
+        For Each pt In feat.features
+            mesh.ptList.Add(pt)
+        Next
+        mesh.Run(src)
+        dst2 = mesh.dst2
+        dst3 = mesh.dst3
+
+        Dim pad = task.brickEdgeLen / 2
+        Dim depthMiss As Integer
+        For Each pt In feat.features
+            Dim depth = task.pcSplit(2).Get(Of Single)(pt.Y, pt.X)
+            If depth = 0 Then
+                Dim r = ValidateRect(New cv.Rect(pt.X - pad, pt.Y - pad, task.brickEdgeLen, task.brickEdgeLen))
+                depth = task.pcSplit(2)(r).Mean(task.depthmask(r))(0)
+                depthMiss += 1
+            End If
+        Next
+
+        labels(2) = mesh.labels(2)
+        labels(3) = CStr(depthMiss) + " of " + CStr(mesh.ptList.Count) + " features had no depth at that location.  Depth is an average around it for those missing depth."
+    End Sub
+End Class
+
+
+
+
+
+Public Class Mesh_BasicsInput : Inherits TaskParent
     Dim knn As New KNN_Basics
     Public ptList As New List(Of cv.Point2f)
     Dim options As New Options_Mesh
@@ -13,7 +53,12 @@ Public Class Mesh_Basics : Inherits TaskParent
         feat.Run(task.gray)
 
         dst2 = src
-        If task.heartBeat And standaloneTest() Then ptList = task.features
+        If task.heartBeat And standaloneTest() Then
+            ptList.Clear()
+            For Each pt In feat.features
+                ptList.Add(pt)
+            Next
+        End If
 
         If ptList.Count <= 3 Then Exit Sub
 
@@ -36,43 +81,5 @@ Public Class Mesh_Basics : Inherits TaskParent
             DrawCircle(dst3, knn.queries(i), task.DotSize, task.highlight)
         Next
         labels(2) = "Triangles built each input point and its " + CStr(options.nabeCount) + " nearest neighbors."
-    End Sub
-End Class
-
-
-
-
-
-
-Public Class NR_Mesh_Features : Inherits TaskParent
-    Dim mesh As New Mesh_Basics
-    Dim feat As New Feature_Basics
-    Public Sub New()
-        labels(2) = "Triangles built with each feature point and the specified number of nearest neighbors."
-        desc = "Build triangles from feature points"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        feat.Run(task.gray)
-
-        If task.features.Count < 3 Then Exit Sub
-        mesh.ptList = task.features
-        mesh.Run(src)
-        dst2 = mesh.dst2
-        dst3 = mesh.dst3
-
-        Dim pad = task.brickEdgeLen / 2
-        Dim depthMiss As Integer
-        For Each pt In task.features
-            Dim depth = task.pcSplit(2).Get(Of Single)(pt.Y, pt.X)
-            If depth = 0 Then
-                Dim r = ValidateRect(New cv.Rect(pt.X - pad, pt.Y - pad, task.brickEdgeLen, task.brickEdgeLen))
-                depth = task.pcSplit(2)(r).Mean(task.depthmask(r))(0)
-                depthMiss += 1
-            End If
-            ' SetTrueText(Format(depth, fmt1) + "m ", pt)
-        Next
-
-        labels(2) = mesh.labels(2)
-        labels(3) = CStr(depthMiss) + " of " + CStr(mesh.ptList.Count) + " features had no depth at that location.  Depth is an average around it for those missing depth."
     End Sub
 End Class
