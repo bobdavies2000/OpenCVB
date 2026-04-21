@@ -239,9 +239,6 @@ End Class
 
 
 
-
-
-
 Public Class Feature_Points : Inherits TaskParent
     Dim feat As New Feature_Basics
     Public Sub New()
@@ -267,7 +264,7 @@ End Class
 
 Public Class NR_Feature_TraceDelaunay : Inherits TaskParent
     Dim features As New Feature_Delaunay
-    Public goodLists As New List(Of List(Of cv.Point2f)) ' stable points only
+    Public goodList As New List(Of List(Of cv.Point2f)) ' stable points only
     Public Sub New()
         labels = {"Stable points highlighted", "", "", "Delaunay map of regions defined by the feature points"}
         desc = "Trace the GoodFeatures points using only Delaunay - no KNN or RedCloud or Matching."
@@ -276,18 +273,18 @@ Public Class NR_Feature_TraceDelaunay : Inherits TaskParent
         features.Run(src)
         dst3 = features.dst3
 
-        If task.optionsChanged Then goodLists.Clear()
+        If task.optionsChanged Then goodList.Clear()
 
         Dim ptList As New List(Of cv.Point2f)
         For Each pt In features.feat.features
             ptList.Add(pt)
         Next
-        goodLists.Add(ptList)
+        goodList.Add(ptList)
 
-        If goodLists.Count >= task.frameHistoryCount Then goodLists.RemoveAt(0)
+        If goodList.Count >= task.frameHistoryCount Then goodList.RemoveAt(0)
 
         dst2.SetTo(0)
-        For Each ptList In goodLists
+        For Each ptList In goodList
             For Each pt In ptList
                 DrawCircle(task.color, pt, task.DotSize, task.highlight)
                 Dim c = dst3.Get(Of cv.Vec3b)(pt.Y, pt.X)

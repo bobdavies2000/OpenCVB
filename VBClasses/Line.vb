@@ -1608,3 +1608,25 @@ Public Class Line_Finder : Inherits TaskParent
         dst3.SetTo(task.highlight, dst0)
     End Sub
 End Class
+
+
+
+
+Public Class Line_Sobel : Inherits TaskParent
+    Dim edges As New Edge_Sobel
+    Dim lines As New Line_Basics_TA
+    Public Sub New()
+        desc = "Find lines in the Sobel output"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        edges.Run(task.gray)
+        dst2 = edges.dst1
+
+        lines.Run(dst2)
+
+        dst3.SetTo(0)
+        For Each lp In lines.lpList
+            dst3.Line(lp.p1, lp.p2, task.highlight, task.lineWidth)
+        Next
+    End Sub
+End Class

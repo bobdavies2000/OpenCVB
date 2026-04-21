@@ -486,6 +486,7 @@ Public Class NR_FCS_ByDepth : Inherits TaskParent
     Dim plotHist As New PlotBar_Basics
     Dim fcs As New FCS_CreateList
     Dim palInput As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+    Dim bPoint As New BrickPoint_Basics
     Public Sub New()
         plotHist.addLabels = False
         plotHist.removeZeroEntry = True
@@ -495,14 +496,9 @@ Public Class NR_FCS_ByDepth : Inherits TaskParent
         desc = "Use cell depth to break down the layers in an image."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If standalone Then
-            Static bPoint As New BrickPoint_Basics
-            bPoint.Run(src)
-            task.features.Clear()
-            For Each pt In bPoint.ptList
-                task.features.Add(New cv.Point2f(pt.X, pt.Y))
-            Next
-        End If
+        bPoint.Run(src)
+        fcs.feat.features = New List(Of cv.Point)(bPoint.ptList)
+
         fcs.Run(src)
         dst2 = fcs.dst2
         labels(2) = fcs.labels(2)

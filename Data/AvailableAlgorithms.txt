@@ -461,6 +461,7 @@ Line_MapRects
 Line_Motion
 Line_PerpendicularTest
 Line_RedFlood
+Line_Sobel
 Line_Tracker
 Line_TranslatedRightView
 Line_Vertical
