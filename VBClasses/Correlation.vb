@@ -8,7 +8,7 @@ Public Class Correlation_Basics : Inherits TaskParent
         desc = "Measure the correlation of all grid squares except where there is motion."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If src.Channels <> 1 Then src = task.gray
+        If src.Channels <> 1 Then src = task.grayOriginal.Clone
 
         Static lastFrame As cv.Mat = src.Clone
         dst2.SetTo(0)
@@ -49,7 +49,7 @@ Public Class Correlation_Validate : Inherits TaskParent
         desc = "Measure the correlation of all grid squares except where there is motion."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If src.Channels <> 1 Then src = task.gray
+        If src.Channels <> 1 Then src = task.grayOriginal.Clone
 
         Static lastsrc As cv.Mat = src.Clone
         dst2 = src.Clone
@@ -105,7 +105,8 @@ Public Class Correlation_BasicsPlot : Inherits TaskParent
         desc = "Measure the correlation of all grid squares."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        Static lastsrc As cv.Mat = task.gray.Clone
+        Static lastsrc As cv.Mat = task.grayOriginal.Clone
+        If src.Channels <> 1 Then src = task.grayOriginal.Clone
         dst2 = task.gray.Clone
         Dim correlationMat As New cv.Mat
         cList.Clear()
@@ -254,10 +255,11 @@ Public Class Correlation_MinMaxRange : Inherits TaskParent
     Public fLessList As New List(Of cv.Rect)
     Public Sub New()
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        labels = {"", "", "FeatureLess regions", "Not Featureless Regions."}
         desc = "Use range to find featureless-ness rather than correlation."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If src.Channels <> 1 Then src = task.gray
+        If src.Channels <> 1 Then src = task.grayOriginal.Clone
 
         Static lastsrc As cv.Mat = src.Clone
         dst2.SetTo(0)
