@@ -19042,7 +19042,7 @@ Namespace VBClasses
             desc = "Group RedCloud cells by the value of their featureless maxDist"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            fLess.Run(task.gray)
+            fLess.Run(task.grayOriginal)
 
             dst1 = fLess.dst2.Threshold(0, 255, cv.ThresholdTypes.Binary)
             labels(2) = fLess.labels(2)
@@ -19326,7 +19326,7 @@ Namespace VBClasses
             desc = "Cursor: Track connected regions from RedColor_NoMatching and keep stable colors while regions persist."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            fLess.Run(task.gray)
+            fLess.Run(task.grayOriginal)
 
             flood.Run(fLess.dst2)
             dst3 = flood.dst2

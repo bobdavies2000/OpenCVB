@@ -1677,12 +1677,12 @@ End Class
 
 Public Class Edge_Featureless : Inherits TaskParent
     Dim edges As New Edge_Canny
-    Dim fLess As New FeatureLess_Correlation
+    Dim fLess As New FeatureLess_Basics
     Public Sub New()
         desc = "Find the edges in the featureless output"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        fLess.Run(task.gray)
+        fLess.Run(task.grayOriginal)
 
         dst2 = src.Clone
         dst2.SetTo(0, fLess.dst2)

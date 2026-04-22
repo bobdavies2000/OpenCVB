@@ -709,7 +709,7 @@ Public Class GL_Featureless : Inherits TaskParent
         desc = "Display the pointcloud"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        fLess.Run(task.gray)
+        fLess.Run(task.grayOriginal)
 
         dst2 = fLess.dst2.Clone
         labels(2) = fLess.labels(2)

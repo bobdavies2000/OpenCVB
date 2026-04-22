@@ -955,7 +955,7 @@ Public Class Brick_Ranges : Inherits TaskParent
         desc = "Visualize where bricks have highly variable depth range."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        fLess.Run(task.gray)
+        fLess.Run(task.grayOriginal)
 
         bricks.Run(src)
         options.Run()
@@ -997,8 +997,8 @@ Public Class Brick_Features : Inherits TaskParent
         desc = "Use FeatureLess_Basics to identify bricks with good contrast."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If src.Channels <> 1 Then src = task.gray
-        fLess.Run(task.gray)
+        If src.Channels <> 1 Then src = task.grayOriginal
+        fLess.Run(src)
 
         bricks.Run(src)
 

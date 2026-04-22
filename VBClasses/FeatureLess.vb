@@ -382,7 +382,7 @@ Namespace VBClasses
             desc = "Accumulate the edges over a span of X images."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            fLess.Run(task.gray)
+            fLess.Run(task.grayOriginal)
 
             dst2 = fLess.dst2.Threshold(0, 255, cv.ThresholdTypes.Binary)
 
@@ -489,10 +489,10 @@ Namespace VBClasses
         Public lpList As New List(Of lpData)
         Public Sub New()
             dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
-            desc = "Find and display lines contained the featureless regions."
+            desc = "Find and display lines contained in the featureless regions."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            fLess.Run(task.gray)
+            fLess.Run(task.grayOriginal)
             dst2 = fLess.fLessRaw.dst2
             labels(2) = fLess.labels(2)
 
@@ -507,9 +507,9 @@ Namespace VBClasses
 
             dst3.SetTo(0)
             lpList.Clear()
-            For i = 1 To task.lines.lpList.Count - 1
+            For i = 1 To Math.Min(task.lines.lpList.Count, histArray.Count) - 1
                 If histArray(i) > 0 Then
-                    Dim lp = task.lines.lpList(i - 1) ' All the lines were drawn with +1 added to their index.
+                    Dim lp = task.lines.lpList(i)
                     dst3.Line(lp.p1, lp.p2, lp.color, task.lineWidth, task.lineType)
                     lpList.Add(lp)
                 End If
@@ -533,7 +533,7 @@ Namespace VBClasses
             desc = "Group the featureless grid squares"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            fLess.Run(task.gray)
+            fLess.Run(task.grayOriginal)
 
             dst2 = fLess.dst2.Clone
             labels(2) = fLess.labels(2)
@@ -578,7 +578,7 @@ Namespace VBClasses
             desc = "Provide masks for both the featureless and non-featureless regions."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            fLess.Run(task.gray)
+            fLess.Run(task.grayOriginal)
             dst0 = fLess.dst2
             labels(2) = fLess.labels(2)
 
