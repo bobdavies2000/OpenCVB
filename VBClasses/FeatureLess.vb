@@ -1,6 +1,6 @@
 Imports cv = OpenCvSharp
 Namespace VBClasses
-    Public Class FeatureLess_Basics : Inherits TaskParent
+    Public Class FeatureLess_BasicsMotion : Inherits TaskParent
         Public fLessRaw As New FeatureLess_BasicsRaw
         Public fLessList As New List(Of cv.Rect)
         Public fLessNot As New List(Of cv.Rect)
@@ -40,7 +40,7 @@ Namespace VBClasses
                 If dst2.Get(Of Byte)(r.TopLeft.Y, r.TopLeft.X) = 0 Then fLessNot.Add(r)
             Next
 
-            fLessList = New List(Of cv.Rect)(newList)
+            If newList.Count > 0 Then fLessList = New List(Of cv.Rect)(newList)
 
             labels(2) = fLessRaw.labels(2)
         End Sub

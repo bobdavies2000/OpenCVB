@@ -1677,21 +1677,34 @@ End Class
 
 Public Class Edge_Featureless : Inherits TaskParent
     Dim edges As New Edge_Canny
-    Dim fLess As New FeatureLess_Basics
+    Public fLess As New FeatureLess_Basics
+    Dim histArray(0) As Integer
+    Dim histList As New List(Of Integer)
+    Public sceneMotionDetected As Boolean
+    Public rectCountThreshold As Integer
     Public Sub New()
         desc = "Find the edges in the featureless output"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         fLess.Run(task.grayOriginal)
 
+        'If task.heartBeat Then
+        '    If task.firstPass = False Then rectCountThreshold = histList.IndexOf(histList.Max)
+        '    ReDim histArray(task.gridRects.Count - 1)
+        '    histList = histArray.ToList
+        'End If
+
+        'histList(fLess.fLessList.Count) += 1
+        'sceneMotionDetected = fLess.fLessList.Count < rectCountThreshold
+
         dst2 = src.Clone
         dst2.SetTo(0, fLess.dst2)
         labels(2) = fLess.labels(2)
 
-        edges.Run(dst2)
-        dst3 = edges.dst2
-        Dim count = task.gridRects.Count - fLess.fLessList.Count
-        labels(2) = "Current frame: " + CStr(count) + " grid squares had features"
+        'edges.Run(dst2.Clone)
+        'dst3 = edges.dst2
+        'Dim count = task.gridRects.Count - fLess.fLessList.Count
+        'labels(2) = "Current frame: " + CStr(count) + " grid squares had features"
     End Sub
 End Class
 

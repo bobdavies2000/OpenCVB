@@ -124,6 +124,7 @@ Partial Public Class AlgorithmTask
     Public gridNabes As New List(Of List(Of Integer))
     Public gridMap As New cv.Mat
     Public gridMask As New cv.Mat
+    Public gridWH As Integer ' grid width/height.
     Public gridROIclicked As Integer
     Public depthDiffMeters As Single ' bricks > than this value are depth edges - in meters
     Public gridRatioX As Single ' translate from display width to workres to find grid element.

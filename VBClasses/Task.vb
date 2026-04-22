@@ -67,8 +67,7 @@ Public Class AlgorithmTask : Implements IDisposable
 
         task.mouseMovePoint = New cv.Point(task.workRes.Width \ 2, task.workRes.Height \ 2)
         task.mainFormLocation = New cv.Rect(task.Settings.MainFormLeft, task.Settings.MainFormTop,
-                                                    task.Settings.MainFormWidth, task.Settings.MainFormHeight)
-
+                                            task.Settings.MainFormWidth, task.Settings.MainFormHeight)
         myStopWatch = Stopwatch.StartNew()
         optionsChanged = True
         readyForCameraInput = True
@@ -79,7 +78,6 @@ Public Class AlgorithmTask : Implements IDisposable
         Debug.WriteLine(vbCrLf + vbCrLf + vbCrLf + "Starting algorithm " + settings.algorithm)
         Debug.WriteLine(vbTab + CStr(AlgorithmTestAllCount) + " algorithms tested")
         AlgorithmTestAllCount += 1
-
 
         Select Case task.Settings.cameraName
             Case "StereoLabs ZED 2/2i"
@@ -106,12 +104,11 @@ Public Class AlgorithmTask : Implements IDisposable
 
         bins2D = {task.workRes.Height, task.workRes.Width}
 
-        ' run any universal algorithms here
         IMU_Acceleration = IMU_Acceleration
         IMU_AngularVelocity = IMU_AngularVelocity
-        IMU_FrameTime =
-                IMU_AlphaFilter = 0.5 '  gOptions.imu_Alpha
+        IMU_FrameTime = IMU_AlphaFilter = 0.5
 
+        ' run any task algorithms here
         grid.Run(task.color)
         imuBasics.Run(emptyMat)
         gravityMatrix.Run(emptyMat)

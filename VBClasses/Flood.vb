@@ -5,7 +5,7 @@ Public Class Flood_Basics : Inherits TaskParent
     Implements IDisposable
     Public rcList As New List(Of rcData)
     Public rcMap As cv.Mat = New cv.Mat(dst2.Size, cv.MatType.CV_32S, 0)
-    Public fLess As New FeatureLess_Stabilized
+    Public fLess As New FeatureLess_Basics
     Dim lastCenters As New List(Of cv.Rect)
     Public Sub New()
         If standalone Then task.gOptions.displayDst1.Checked = True
@@ -13,19 +13,20 @@ Public Class Flood_Basics : Inherits TaskParent
         desc = "Match the previous featureLess regions as best as possible."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        fLess.Run(task.gray.Clone)
+        fLess.Run(task.grayOriginal.Clone)
         dst1 = fLess.dst2
 
         Dim imagePtr As IntPtr
-        Dim inputData(dst1.Total - 1) As Byte
+        Dim inputData(src.Total - 1) As Byte
         dst1.GetArray(Of Byte)(inputData)
         Dim handleInput = GCHandle.Alloc(inputData, GCHandleType.Pinned)
 
-        imagePtr = RedFlood_Run(cPtr, handleInput.AddrOfPinnedObject(), dst1.Rows, dst1.Cols, 0)
+        Dim minSize = task.gridWH * task.gridWH
+        imagePtr = RedFlood_Run(cPtr, handleInput.AddrOfPinnedObject(), dst2.Rows, dst2.Cols, minSize)
         handleInput.Free()
 
-        Dim rMask = New cv.Rect(1, 1, dst1.Width, dst1.Height)
-        Dim mask = cv.Mat.FromPixelData(dst1.Rows + 2, dst1.Cols + 2, cv.MatType.CV_8U, imagePtr)
+        Dim rMask = New cv.Rect(1, 1, dst2.Width, dst2.Height)
+        Dim mask = cv.Mat.FromPixelData(dst2.Rows + 2, dst2.Cols + 2, cv.MatType.CV_8U, imagePtr)
         dst0 = mask(rMask).Clone
 
         Dim classCount = RedFlood_Count(cPtr)

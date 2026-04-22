@@ -518,6 +518,7 @@ Motion_CloudGrid
 Motion_CloudPixel
 Motion_Correlation
 Motion_CorrelationToLast
+Motion_Featureless
 Motion_Left
 Motion_Right
 Motion_Throttle

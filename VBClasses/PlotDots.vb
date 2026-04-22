@@ -6,10 +6,12 @@ Public Class PlotDots_Basics : Inherits TaskParent
     Public plotColor = cv.Scalar.Yellow
     Public wipeSlate As Boolean = True
     Public Sub New()
-        For i = 0 To 50 ' something to plot if standaloneTest().
-            srcX.Add(i)
-            srcY.Add(i * i * i)
-        Next
+        If standalone Then
+            For i = 0 To 50 ' something to plot if standaloneTest().
+                srcX.Add(i)
+                srcY.Add(i * i * i)
+            Next
+        End If
         desc = "Plot the requested points..."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)

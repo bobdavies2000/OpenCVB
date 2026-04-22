@@ -482,3 +482,34 @@ Public Class Motion_CloudPixel : Inherits TaskParent
     End Sub
 End Class
 
+
+
+
+
+Public Class Motion_Featureless : Inherits TaskParent
+    Dim edges As New Edge_Featureless
+    Dim plotdots As New PlotTime_FixedScale
+    Public Sub New()
+        plotdots.plotCount = 1
+        plotdots.showScale = False
+        plotdots.fixedScale = True
+        plotdots.minScale = 0
+
+        desc = "The count of featureless cells is used to determine if the camera has moved."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        edges.Run(task.grayOriginal)
+        dst2 = edges.dst2
+        labels(2) = edges.labels(2)
+
+        plotdots.maxScale = task.gridRects.Count
+        plotdots.plotData(0) = edges.fLess.fLessList.Count
+        plotdots.Run(src)
+        dst3 = plotdots.dst2
+        labels(3) = plotdots.labels(2)
+
+        SetTrueText("Scene motion = " + CStr(edges.sceneMotionDetected) + vbCrLf +
+                    "Camera motion threshold = " + CStr(edges.rectCountThreshold) + vbCrLf +
+                    "Current gridrect count = " + CStr(edges.fLess.fLessList.Count), 3)
+    End Sub
+End Class
