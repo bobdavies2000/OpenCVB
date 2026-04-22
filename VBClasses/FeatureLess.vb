@@ -1,7 +1,49 @@
 Imports cv = OpenCvSharp
 Namespace VBClasses
+    Public Class FeatureLess_Basics : Inherits TaskParent
+        Public fLessList As New List(Of cv.Rect)
+        Public options As New Options_FeatureLess
+        Public Sub New()
+            dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+            dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
+            desc = "Identify featureless squares using the gray scale range - see 'Correlation_Basics'."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            options.Run()
+
+            If src.Channels <> 1 Then src = task.grayOriginal
+
+            dst3 = src
+            ' at higher resolutions, the correlation works but the fLessThreshold does not...
+            If task.workRes.Width >= 1280 Then
+                Static corr As New Correlation_Basics
+                corr.Run(src)
+                fLessList = New List(Of cv.Rect)(corr.fLessList)
+            Else
+                fLessList.Clear()
+                For Each r In task.gridRects
+                    Dim mm = GetMinMax(src(r))
+                    If mm.range < options.fLessThreshold Then fLessList.Add(r)
+                Next
+            End If
+
+            dst2.SetTo(0)
+            For Each r In fLessList
+                dst2(r).SetTo(255)
+                dst3.Rectangle(r, 255, task.lineWidth)
+            Next
+
+            labels(2) = CStr(fLessList.Count) + " grid squares were found to be featureless (<gridRect>.mm.range < " +
+                        CStr(options.fLessThreshold) + ")"
+        End Sub
+    End Class
+
+
+
+
+
     Public Class FeatureLess_BasicsMotion : Inherits TaskParent
-        Public fLessRaw As New FeatureLess_BasicsRaw
+        Public fLessRaw As New FeatureLess_Basics
         Public fLessList As New List(Of cv.Rect)
         Public fLessNot As New List(Of cv.Rect)
         Public ptList As New List(Of cv.Point)
@@ -43,47 +85,6 @@ Namespace VBClasses
             If newList.Count > 0 Then fLessList = New List(Of cv.Rect)(newList)
 
             labels(2) = fLessRaw.labels(2)
-        End Sub
-    End Class
-
-
-
-
-    Public Class FeatureLess_BasicsRaw : Inherits TaskParent
-        Public fLessList As New List(Of cv.Rect)
-        Public options As New Options_FeatureLess
-        Public Sub New()
-            dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-            dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
-            desc = "Identify featureless squares using the gray scale range - see 'Correlation_Basics'."
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            options.Run()
-
-            If src.Channels <> 1 Then src = task.gray
-
-            dst2 = src
-            ' at higher resolutions, the correlation works but the fLessThreshold does not...
-            If task.workRes.Width >= 1280 Then
-                Static corr As New Correlation_Basics
-                corr.Run(src)
-                fLessList = New List(Of cv.Rect)(corr.fLessList)
-            Else
-                fLessList.Clear()
-                For Each r In task.gridRects
-                    Dim mm = GetMinMax(src(r))
-                    If mm.range < options.fLessThreshold Then fLessList.Add(r)
-                Next
-            End If
-
-            dst3.SetTo(0)
-            For Each r In fLessList
-                dst2.Rectangle(r, 255, task.lineWidth)
-                dst3(r).SetTo(255)
-            Next
-
-            labels(2) = CStr(fLessList.Count) + " grid squares were found to be featureless (<gridRect>.mm.range < " +
-                        CStr(options.fLessThreshold) + ")"
         End Sub
     End Class
 
@@ -405,7 +406,7 @@ Namespace VBClasses
 
 
     Public Class FeatureLess_LeftRight : Inherits TaskParent
-        Dim fLessRaw As New FeatureLess_BasicsRaw
+        Dim fLessRaw As New FeatureLess_Basics
         Public Sub New()
             labels = {"", "", "FeatureLess Left mask", "FeatureLess Right mask"}
             desc = "Find the featureless regions of the left and right images"
@@ -451,7 +452,7 @@ Namespace VBClasses
 
 
     Public Class FeatureLess_Stabilized : Inherits TaskParent
-        Dim fLess As New FeatureLess_BasicsRaw
+        Dim fLess As New FeatureLess_Basics
         Dim diff As New Diff_Simple
         Public Sub New()
             desc = "Double-check that any differences from the previous fLess output occurred because of motion."
@@ -489,11 +490,11 @@ Namespace VBClasses
         Public lpList As New List(Of lpData)
         Public Sub New()
             dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
-            desc = "Find and display lines contained in the featureless regions."
+            desc = "Find and display lines that are between featureless regions."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             fLess.Run(task.grayOriginal)
-            dst2 = fLess.fLessRaw.dst2
+            dst2 = fLess.dst2
             labels(2) = fLess.labels(2)
 
             dst1.SetTo(0)
@@ -629,7 +630,7 @@ Namespace VBClasses
 
 
     Public Class FeatureLess_FeatureLines : Inherits TaskParent
-        Dim fLess As New FeatureLess_BasicsRaw
+        Dim fLess As New FeatureLess_Basics
         Public Sub New()
             task.gOptions.displayDst1.Checked = True
             desc = "Use lines to further divide featureless from features."

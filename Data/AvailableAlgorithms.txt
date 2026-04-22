@@ -244,7 +244,7 @@ Feature_Points
 FeatureFlow_Basics
 FeatureFlow_LucasKanade
 FeatureLess_Basics
-FeatureLess_BasicsRaw
+FeatureLess_BasicsMotion
 FeatureLess_Cells
 FeatureLess_Correlation
 FeatureLess_FeatureLines

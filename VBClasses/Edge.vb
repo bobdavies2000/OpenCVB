@@ -1705,6 +1705,12 @@ Public Class Edge_Featureless : Inherits TaskParent
         'dst3 = edges.dst2
         'Dim count = task.gridRects.Count - fLess.fLessList.Count
         'labels(2) = "Current frame: " + CStr(count) + " grid squares had features"
+
+        strOut = "Scene motion = " + CStr(sceneMotionDetected) + vbCrLf +
+                 "Camera motion threshold = " + CStr(rectCountThreshold) + vbCrLf +
+                 "Current gridrect count = " + CStr(fLess.fLessList.Count)
+
+        SetTrueText(strOut, 3)
     End Sub
 End Class
 
@@ -1726,7 +1732,7 @@ Public Class Edge_StableLeftRight : Inherits TaskParent
         labels(2) = edges.labels(2)
 
         edges.run(stableLR.dst3)
-        dst3 = edges.dst2.clone
+        dst3 = edges.dst2.Clone
         labels(3) = edges.labels(2)
     End Sub
 End Class

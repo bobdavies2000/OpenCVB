@@ -236,7 +236,7 @@ Namespace VBClasses
         Public redMask As New RedFlood_MapAndList
         Dim delaunay As New Delaunay_Basics
         Public facetList As New List(Of List(Of cv.Point))
-        Dim fLess As New FeatureLess_BasicsRaw
+        Dim fLess As New FeatureLess_Basics
         Public Sub New()
             If standalone Then task.gOptions.displayDst1.Checked = True
             desc = "Use the maxDist points as input to delaunay."

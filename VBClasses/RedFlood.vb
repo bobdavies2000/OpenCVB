@@ -5,7 +5,7 @@ Public Class RedFlood_Basics : Inherits TaskParent
     Public rcList As New List(Of rcData)
     Public rcMap As New cv.Mat(dst2.Size, cv.MatType.CV_32S, 0)
     Dim redMask As New RedFlood_MapAndList
-    Dim fLess As New FeatureLess_BasicsRaw
+    Dim fLess As New FeatureLess_Basics
     Dim knn As New KNN_N3Basics
     Public Sub New()
         knn.queries.Add(New cv.Point3f(0, 0, 0)) ' we only need one entry in the queries.
@@ -508,7 +508,7 @@ Public Class RedFlood_Test : Inherits TaskParent
     Public rcList As New List(Of rcData)
     Public rcMap As New cv.Mat(dst2.Size, cv.MatType.CV_32S, 0)
     Dim redCore As New RedFlood_CPP
-    Dim fLess As New FeatureLess_BasicsRaw
+    Dim fLess As New FeatureLess_Basics
     Public fLessGridRects As New List(Of List(Of Integer))
     Public Sub New()
         If standalone Then task.gOptions.displayDst1.Checked = True
@@ -567,7 +567,7 @@ Public Class NR_RedFlood_KNN : Inherits TaskParent
     Public rcList As New List(Of rcData)
     Public rcMap As New cv.Mat(dst2.Size, cv.MatType.CV_32S, 0)
     Dim redCore As New RedFlood_CPP
-    Dim fLess As New FeatureLess_BasicsRaw
+    Dim fLess As New FeatureLess_Basics
     Dim knn As New KNN_N3Basics
     Public fLessGridRects As New List(Of List(Of Integer))
     Public Sub New()

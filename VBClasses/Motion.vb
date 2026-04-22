@@ -508,8 +508,6 @@ Public Class Motion_Featureless : Inherits TaskParent
         dst3 = plotdots.dst2
         labels(3) = plotdots.labels(2)
 
-        SetTrueText("Scene motion = " + CStr(edges.sceneMotionDetected) + vbCrLf +
-                    "Camera motion threshold = " + CStr(edges.rectCountThreshold) + vbCrLf +
-                    "Current gridrect count = " + CStr(edges.fLess.fLessList.Count), 3)
+        SetTrueText(edges.strOut, 3)
     End Sub
 End Class
