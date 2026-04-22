@@ -7,6 +7,7 @@ Public Class Line_Basics_TA : Inherits TaskParent
     Public removeOverlappingLines As Boolean = True
     Public overLappingCount As Integer
     Public Sub New()
+        dst0 = New cv.Mat(dst0.Size, cv.MatType.CV_8U, 0)
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
         If standalone Then task.gOptions.showMotionMask.Checked = True
         ld = cv.XImgProc.CvXImgProc.CreateFastLineDetector
@@ -64,6 +65,7 @@ Public Class Line_Basics_TA : Inherits TaskParent
 
         lpList.Clear()
         overLappingCount = 0
+        dst0.SetTo(0)
         dst1.SetTo(0)
         For Each lp In sortlines.Values
             lp.index = lpList.Count
@@ -75,6 +77,7 @@ Public Class Line_Basics_TA : Inherits TaskParent
                     Continue For
                 End If
             End If
+            dst0.Line(lp.pE1, lp.pE2, lp.index + 1, task.lineWidth + 1, cv.LineTypes.Link4)
             dst1.Line(lp.p1, lp.p2, lp.index + 1, task.lineWidth, cv.LineTypes.Link4)
             dst2.Line(lp.p1, lp.p2, lp.color, task.lineWidth + 1, task.lineType)
             lpList.Add(lp)

@@ -1588,6 +1588,7 @@ RedColor_Contours
 RedColor_DelaunayMap
 RedColor_FLessCorrelation
 RedColor_FLessMinMaxRange
+RedColor_FLessMinMaxRange1
 RedColor_GridRects
 RedColor_Hulls
 RedColor_LeftRight

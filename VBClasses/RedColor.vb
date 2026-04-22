@@ -1,4 +1,5 @@
 Imports System.Runtime.InteropServices
+Imports VBClasses
 Imports cv = OpenCvSharp
 Public Class RedColor_Basics : Inherits TaskParent
     Implements IDisposable
@@ -580,30 +581,6 @@ End Class
 
 
 
-Public Class RedColor_FLessMinMaxRange : Inherits TaskParent
-    Public redC As New RedCloud_Flood_CPP
-    Dim corrRange As New Correlation_MinMaxRange
-    Public Sub New()
-        If standalone Then task.gOptions.displayDst1.Checked = True
-        labels(3) = "Contour_Basics output that is input to RedColor_Basics."
-        desc = "Use the output of the Correlation_Basics as input the RedColor_Basics."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        corrRange.Run(src)
-        dst3 = corrRange.dst2
-
-        redC.Run(dst3)
-        dst2 = redC.dst2
-        labels(2) = redC.labels(2)
-
-        SetTrueText(redC.strOut, 1)
-    End Sub
-End Class
-
-
-
-
-
 Public Class RedColor_FLessCorrelation : Inherits TaskParent
     Public redC As New RedCloud_Flood_CPP
     Dim corr As New Correlation_Basics
@@ -646,5 +623,54 @@ Public Class RedColor_DelaunayMap : Inherits TaskParent
 
         strOut = RedUtil_Basics.DelaunaySelect(dMap.rcMap, dMap.rcList)
         SetTrueText(strOut, 3)
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class RedColor_FLessMinMaxRange : Inherits TaskParent
+    Public redC As New RedCloud_Flood_CPP
+    Dim corrRange As New Correlation_MinMaxRange
+    Public Sub New()
+        If standalone Then task.gOptions.displayDst1.Checked = True
+        labels(3) = "Contour_Basics output that is input to RedColor_Basics."
+        desc = "Use the output of the Correlation_Basics as input the RedColor_Basics."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        corrRange.Run(src)
+        dst3 = corrRange.dst2
+
+        redC.Run(dst3)
+        dst2 = redC.dst2
+        labels(2) = redC.labels(2)
+
+        SetTrueText(redC.strOut, 1)
+    End Sub
+End Class
+
+
+
+
+
+Public Class RedColor_FLessMinMaxRange1 : Inherits TaskParent
+    Public redC As New RedCloud_Flood_CPP
+    Dim fLines As New FeatureLess_FeatureLines
+    Public Sub New()
+        If standalone Then task.gOptions.displayDst1.Checked = True
+        labels(3) = "Contour_Basics output that is input to RedColor_Basics."
+        desc = "Use the output of the Correlation_Basics as input the RedColor_Basics."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        fLines.Run(src)
+        dst3 = fLines.dst3
+
+        redC.Run(dst3)
+        dst2 = redC.dst2
+        labels(2) = redC.labels(2)
+
+        SetTrueText(redC.strOut, 1)
     End Sub
 End Class

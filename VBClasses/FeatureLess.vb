@@ -52,7 +52,6 @@ Namespace VBClasses
     Public Class FeatureLess_BasicsRaw : Inherits TaskParent
         Public fLessList As New List(Of cv.Rect)
         Public options As New Options_FeatureLess
-        Dim corr As New Correlation_Basics
         Public Sub New()
             dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
             dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
@@ -66,6 +65,7 @@ Namespace VBClasses
             dst2 = src
             ' at higher resolutions, the correlation works but the fLessThreshold does not...
             If task.workRes.Width >= 1280 Then
+                Static corr As New Correlation_Basics
                 corr.Run(src)
                 fLessList = New List(Of cv.Rect)(corr.fLessList)
             Else
@@ -629,38 +629,52 @@ Namespace VBClasses
 
 
     Public Class FeatureLess_FeatureLines : Inherits TaskParent
-        Dim fLess As New FeatureLess_Basics
+        Dim fLess As New FeatureLess_BasicsRaw
         Public Sub New()
+            task.gOptions.displayDst1.Checked = True
             desc = "Use lines to further divide featureless from features."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             fLess.Run(task.gray.Clone)
+            dst1 = fLess.dst3.Clone
+            dst3 = fLess.dst3.Clone
 
             dst2.SetTo(0)
-            task.color.CopyTo(dst2, Not fLess.dst2)
+            task.color.CopyTo(dst2, Not dst1)
 
             For i = 1 To task.gridRects.Count - 1
+                If i = 9 Then Dim k = 0
                 Dim r1 = task.gridRects(i - 1)
                 Dim r2 = task.gridRects(i)
                 Dim p1 = r1.TopLeft
                 Dim p2 = r2.TopLeft
-                cv.Cv2.ImShow("fless.dst2", fLess.dst2.Clone)
                 If p1.X < p2.X Then
-                    Dim val1 = fLess.dst2.Get(Of Byte)(p1.Y, p1.X)
-                    Dim val2 = fLess.dst2.Get(Of Byte)(p2.Y, p2.X)
-                    If val1 > 0 And val2 = 0 Then
+                    Dim val1 = dst1.Get(Of Byte)(p1.Y, p1.X)
+                    Dim val2 = dst1.Get(Of Byte)(p2.Y, p2.X)
+                    If val1 = 255 And val2 = 0 Then
                         ' line present?
                         If task.lines.dst3(r2).CountNonZero Then
-                            fLess.dst2(r2) = fLess.dst2(r2).InRange(0, 0)
+                            task.lines.dst0(r2).CopyTo(dst1(r2))
+                            dst3(r2) = dst3(r2).InRange(0, 0)
+                            dst3(r2).SetTo(0, task.lines.dst3(r2))
                         End If
                     End If
 
-                    If val1 = 0 And val2 > 0 Then
+                    If val1 = 0 And val2 = 255 Then
                         ' line present?
                         If task.lines.dst3(r1).CountNonZero Then
-                            fLess.dst2(r2) = fLess.dst2(r2).InRange(0, 0)
+                            task.lines.dst0(r1).CopyTo(dst1(r1))
+                            dst3(r1) = dst3(r1).InRange(0, 0)
+                            dst3(r1).SetTo(0, task.lines.dst3(r1))
                         End If
                     End If
+
+                    'If val1 = 0 And val2 > 0 Then
+                    '    ' line present?
+                    '    If task.lines.dst3(r1).CountNonZero Then
+                    '        dst1(r2) = dst1(r2).InRange(0, 0)
+                    '    End If
+                    'End If
                 End If
             Next
 
