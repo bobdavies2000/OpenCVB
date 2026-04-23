@@ -433,14 +433,14 @@ Namespace VBClasses
             desc = "Use the FeatureLess_Basics output as input to RedColor_Basics"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            fLess.Run(task.gray.Clone)
+            fLess.Run(task.grayOriginal.Clone)
             dst3 = fLess.dst2
             labels(3) = fLess.labels(2)
 
             redC.Run(dst3)
 
             dst2.SetTo(0)
-            redC.dst2.CopyTo(dst2, dst3)
+            dst2 = redC.dst2
             labels(2) = redC.labels(2)
 
             strOut = redC.strOut

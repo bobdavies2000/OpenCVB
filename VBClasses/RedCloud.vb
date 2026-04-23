@@ -1,6 +1,7 @@
 Imports System.Runtime.InteropServices
-Imports cv = OpenCvSharp
+Imports System.Windows.Documents
 Imports VBClasses
+Imports cv = OpenCvSharp
 Public Class RedCloud_Basics : Inherits TaskParent
     Public redCore As New RedCloud_Core
     Public rcList As New List(Of rcData)
@@ -513,9 +514,10 @@ Public Class RedCloud_Flood_CPP : Inherits TaskParent
         Dim matchAverage As Single
         dst3.SetTo(0)
         Dim blackVec As New cv.Vec3b
-        For Each rc In newList.Values
+        rcMap.SetTo(0)
+        For i = 0 To newList.Values.Count - 1
+            Dim rc = newList.Values(i)
             Dim maxDist = rc.maxDist
-            If maxDist = New cv.Point(315, 19) Then Dim k = 0
             rc = RedUtil_Basics.rcMatch(rc, rcListLast, wGridList, rcMapLast)
 
             If rc.age = 1 Then unMatched += 1 Else matchCount += 1
@@ -528,17 +530,28 @@ Public Class RedCloud_Flood_CPP : Inherits TaskParent
                 If color <> blackVec Then rc.color = color
             End If
 
+            Dim testIfClaimed = rcMap.Get(Of Integer)(rc.maxDist.Y, rc.maxDist.X)
+            If testIfClaimed <> 0 Then Continue For
+
+            '' when the cell is very small, buildcontours can fail and there won't be a mask.
+            'If rc.contour.Count <= 1 Then Dim k = 0
+            'If rc.pixels >= 5 Then
             rcList.Add(rc)
 
-            If rc.pixels < 5 Then
-                ' when the cell is very small, pixels can be zero - buildcontours failed.  No mask.
-                dst2(rc.rect).SetTo(rc.color)
-                rcMap(rc.rect).SetTo(rc.index)
-            Else
-                dst2(rc.rect).SetTo(rc.color, rc.mask)
-                rcMap(rc.rect).SetTo(rc.index, rc.mask)
-            End If
+            dst2(rc.rect).SetTo(rc.color, rc.mask)
+            rcMap(rc.rect).SetTo(rc.index, rc.mask)
+            'End If
         Next
+
+
+
+        'For Each rc In rcList
+        '    Dim test = rcMap.Get(Of Integer)(rc.maxDist.Y, rc.maxDist.X)
+        '    If rc.index <> test Then Dim k = 0
+        'Next
+
+
+
 
         strOut = RedUtil_Basics.selectCell(rcMap, rcList)
         SetTrueText(strOut, 3)
@@ -556,23 +569,6 @@ Public Class RedCloud_Flood_CPP : Inherits TaskParent
     End Sub
 End Class
 
-
-
-
-
-Public Class RedCloud_FeatureLess : Inherits TaskParent
-    Dim fRed As New FeatureLess_RedColor
-    Public Sub New()
-        desc = "Use the FeatureLess_Basics output as input to RedCloud - identical to FeatureLess_RedColor (now)"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        fRed.Run(task.gray)
-        dst2 = fRed.dst2
-        labels(2) = fRed.labels(2)
-
-        SetTrueText(fRed.strOut, 3)
-    End Sub
-End Class
 
 
 
@@ -703,5 +699,24 @@ Public Class RedCloud_Foreground : Inherits TaskParent
             End If
         Next
         labels(3) = CStr(count) + " RedCloud cells were in the foreground (< " + Format(maxDepth, fmt1) + " meters)"
+    End Sub
+End Class
+
+
+
+
+
+Public Class RedCloud_FeatureLess : Inherits TaskParent
+    Dim fRed As New FeatureLess_RedColor
+    Public Sub New()
+        desc = "Use the FeatureLess_Basics output as input to RedCloud - identical to FeatureLess_RedColor (now)"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        fRed.Run(task.gray)
+        dst2 = fRed.dst2
+        labels(2) = fRed.labels(2)
+
+        ' If task.rcD IsNot Nothing Then task.clickPoint = task.rcD.maxDist
+        SetTrueText(fRed.strOut, 3)
     End Sub
 End Class

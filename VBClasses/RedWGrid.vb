@@ -67,14 +67,16 @@ Public Class RedWGrid_Basics : Inherits TaskParent
         dst2.SetTo(0)
         Dim count As Integer
         For Each rc In newList
-            If rc.multiMask Then count += 1
-            rc.index = rcList.Count + 1
-            rcMap(rc.rect).SetTo(rc.index, rc.mask)
-            rcList.Add(rc)
-            dst2(rc.rect).SetTo(rc.color, rc.mask)
+            If rc IsNot Nothing Then
+                If rc.multiMask Then count += 1
+                rc.index = rcList.Count + 1
+                rcMap(rc.rect).SetTo(rc.index, rc.mask)
+                rcList.Add(rc)
+                dst2(rc.rect).SetTo(rc.color, rc.mask)
 
-            If task.gOptions.DebugCheckBox.Checked And rc.multiMask Then
-                dst2(rc.rect).SetTo(task.highlight, rc.mask)
+                If task.gOptions.DebugCheckBox.Checked And rc.multiMask Then
+                    dst2(rc.rect).SetTo(task.highlight, rc.mask)
+                End If
             End If
         Next
 

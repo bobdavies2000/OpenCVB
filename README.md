@@ -1,3 +1,26 @@
+**April 23, 2026 – Delaunay Map, Stable Depth, Foreground**
+
+-   Over 1700 algorithms are included, averaging 36 lines of code per algorithm.
+    -   Over 400 additional obsolete algorithms compiled for reference use.
+-   RedCloud algorithms have gaps where there is no depth data.
+    -   Delaunay can create facets using each cell’s center (maxDist).
+    -   This guarantees that clicking on the image will find the nearest cell.
+-   What is lost when depth is stabilized using minimums and motion?
+    -   The demo below shows that some non-zero depth data can be lost.
+    -   The lost data is restored at the next heartbeat.
+    -   The pixels that are lost are always zero – not false depth data.
+    -   Foreground objects create shadows that linger until a heartbeat.
+    -   The options for depth stabilization can be removed for all algorithms.
+        -   See the global option ‘Stabilize Depth/RGB using Motion’.
+        -   The value of stable depth data outweighs the lost data.
+-   Foreground is defined as the first 25% of the depth data.
+    -   The foreground in the depth data is found for every frame.
+    -   The variable task.foregroundMat contains depth data for the foreground.
+
+**![](media/cba84a4fc8285097d6220fb352bc238e.gif)**
+
+**All Algorithms:** *Depth is typically shown in OpenCVB’s upper right image. Depth stabilization accumulates the depth minimum when there is no RGB motion. Where there is RGB motion, it accumulates the latest depth. The depth shadow is often far from the RGB motion and does not always reflect that motion.*
+
 **April 14, 2026 – Visual Studio Version, TreeView, Pixel Min/Max,**
 
 -   Over 1600 algorithms are included, averaging 36 lines of code per algorithm.
@@ -32,7 +55,7 @@
 
 **![](media/4dcbe955ae6fe193f13918177148f77b.gif)**
 
-**PlotMouse_StableGray:** *The image below right highlights both motion and stable pixels. The hand is clearly moving and the highlighted pixels below the hand are changing. The highlighted pixels in the rest of the image are stable. The grayscale image in the upper left is the accumulated minimum or maximum values at each pixel.  The bar chart in the lower left allows the mouse to control the backprojection of the pixels into the lower right image. In this example the mouse cursor (not visible) hovers over the tallest bar in the plot. The pixels highlighted in the lower right image are among the darkest in the image but moving the mouse in the bar chart can highlight any pixels and confirm that all the pixels are stable where there is no motion.*
+**PlotMouse_StableGray:** *The image below right highlights both motion and stable pixels. The hand is clearly moving and the highlighted pixels below the hand are changing. The highlighted pixels in the rest of the image are stable. The grayscale image in the upper left is the accumulated minimum or maximum values at each pixel. The bar chart in the lower left allows the mouse to control the backprojection of the pixels into the lower right image. In this example the mouse cursor (not visible) hovers over the tallest bar in the plot. The pixels highlighted in the lower right image are among the darkest in the image but moving the mouse in the bar chart can highlight any pixels and confirm that all the pixels are stable where there is no motion.*
 
 **April 5, 2026 – FeatureLess, Cloud Motion, DrawRect, Plots, Stable Depth and Point Clouds.**
 
@@ -182,7 +205,7 @@
     -   World grid elements at the left side of the image are negative.
     -   World grid elements in the top half of the image are also negative.
     -   World grid elements correspond to world coordinates – just reduced.
--   Support for the Pixel Viewer in the main form (![](media/e407cd0499d360be6b74c77841842e2d.png)) has been restored.
+-   Support for the Pixel Viewer in the main form (![](media/c312570f33130367ab11b0f961a16c02.png)) has been restored.
 
 **![](media/79fd9b5635a46cd75f1940a451c47e10.gif)**
 

@@ -357,6 +357,7 @@ Public Class Contour_SidePoints : Inherits TaskParent
         sides.Run(src)
         dst2 = sides.dst2
         Dim rc = task.rcD
+        If rc Is Nothing Then Exit Sub
 
         If sides.corners.Count > 0 And task.heartBeat Then
             ptLeft = sides.corners(1)
