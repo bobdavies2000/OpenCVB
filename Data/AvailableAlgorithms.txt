@@ -1657,7 +1657,7 @@ Spectrum_Z
 Stabilizer_Basics
 Stabilizer_BasicsFail
 StableDepth_Basics
-StableDepth_Max_TA
+StableDepth_Max
 StableGray_Basics_TA
 StableGray_BasicsMax
 StableGray_BasicsMin

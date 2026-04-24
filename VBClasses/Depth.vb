@@ -907,7 +907,7 @@ End Class
 
 Public Class NR_Depth_StableMinMax : Inherits TaskParent
     Public dMin As New StableDepth_Basics
-    Public dMax As New StableDepth_Max_TA
+    Public dMax As New StableDepth_Max
     Public options As New Options_MinMaxNone
     Public Sub New()
         labels(2) = "Depth map colorized"

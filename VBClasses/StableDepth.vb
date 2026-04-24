@@ -55,7 +55,7 @@ End Class
 
 
 
-Public Class StableDepth_Max_TA : Inherits TaskParent
+Public Class StableDepth_Max : Inherits TaskParent
     Dim colorize As New DepthColorizer_CPP
     Public pointcloud As New cv.Mat
     Public pcsplit(2) As cv.Mat
@@ -77,23 +77,23 @@ Public Class StableDepth_Max_TA : Inherits TaskParent
 
         pcsplit = pointcloud.Split()
         Dim accumDepth As New cv.Mat
-        cv.Cv2.Max(pcSplit(2), lastDepth, accumDepth)
+        cv.Cv2.Max(pcsplit(2), lastDepth, accumDepth)
 
         If myHeartbeat = False Then
-            dst3 = StableDepth_Basics.updateXY(pcSplit(2), accumDepth)
+            dst3 = StableDepth_Basics.updateXY(pcsplit(2), accumDepth)
             task.pointCloud.CopyTo(pointcloud, dst3)
         End If
 
         colorize.Run(accumDepth)
         dst2 = colorize.dst2
 
-        pcSplit = pointcloud.Split()
-        lastDepth = pcSplit(2).Clone
+        pcsplit = pointcloud.Split()
+        lastDepth = pcsplit(2).Clone
 
         If TA_Active Then
             task.pointCloud = pointcloud.Clone
-            task.pcSplit = pcSplit
-            task.depthmask = pcSplit(2).Threshold(0, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs
+            task.pcSplit = pcsplit
+            task.depthmask = pcsplit(2).Threshold(0, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs
             task.noDepthMask = Not task.depthmask
         End If
     End Sub

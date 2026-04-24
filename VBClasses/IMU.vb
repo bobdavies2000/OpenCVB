@@ -980,10 +980,10 @@ Public Class NR_IMU_IscameraStable : Inherits TaskParent
         task.roll = task.IMU_AngularVelocity.Z
         If task.heartBeat Then
             strOut = "Pitch X1000 (blue): " + vbTab + Format(task.pitch * 1000, fmt1) + vbCrLf +
-                         "Yaw X1000 (green): " + vbTab + Format(task.yaw * 1000, fmt1) + vbCrLf +
-                         "Roll X1000 (red): " + vbTab + Format(task.roll * 1000, fmt1)
+                     "Yaw X1000 (green): " + vbTab + Format(task.yaw * 1000, fmt1) + vbCrLf +
+                     "Roll X1000 (red): " + vbTab + Format(task.roll * 1000, fmt1)
         End If
-        SetTrueText(strOut, 3)
+        SetTrueText(strOut, 2)
     End Sub
 End Class
 

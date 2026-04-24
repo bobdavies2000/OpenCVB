@@ -285,6 +285,6 @@ Public Class LeftRight_Stable : Inherits TaskParent
 
         lastRight = dst3.Clone
 
-        labels(3) = "RightView accumulated pixels after update for minimums and motion."
+        labels(3) = "RightView accumulated pixels after update for maximums and motion."
     End Sub
 End Class
