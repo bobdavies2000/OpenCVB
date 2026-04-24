@@ -533,14 +533,10 @@ Public Class RedCloud_Flood_CPP : Inherits TaskParent
             Dim testIfClaimed = rcMap.Get(Of Integer)(rc.maxDist.Y, rc.maxDist.X)
             If testIfClaimed <> 0 Then Continue For
 
-            '' when the cell is very small, buildcontours can fail and there won't be a mask.
-            'If rc.contour.Count <= 1 Then Dim k = 0
-            'If rc.pixels >= 5 Then
             rcList.Add(rc)
 
             dst2(rc.rect).SetTo(rc.color, rc.mask)
             rcMap(rc.rect).SetTo(rc.index, rc.mask)
-            'End If
         Next
 
 

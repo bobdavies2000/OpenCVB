@@ -1204,7 +1204,6 @@ Public Class Line_Longest : Inherits TaskParent
             distance2 = lp.pE2.X - lpLast.pE2.X
         End If
         ' Debug.WriteLine("distance1 = " + Format(distance1, fmt2) + " distance2 = " + Format(distance2, fmt2))
-        If distance1 <> 0 Or distance2 <> 0 Then Dim k = 0
         lpLast = task.lines.lpList(0)
     End Sub
 End Class
@@ -1353,7 +1352,6 @@ Public Class Line_FindSimple : Inherits TaskParent
             Dim pixelMat = dst2(r).FindNonZero
 
             pixelMat.GetArray(Of cv.Point)(pixels)
-            If task.drawRect.Contains(r.TopLeft) Then Dim k = 0
 
             Dim lp = testPixels(pixels)
             If lp IsNot Nothing Then

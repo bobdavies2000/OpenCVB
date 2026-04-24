@@ -650,27 +650,3 @@ Public Class RedColor_FLessMinMaxRange : Inherits TaskParent
         SetTrueText(redC.strOut, 1)
     End Sub
 End Class
-
-
-
-
-
-Public Class RedColor_FLessMinMaxRange1 : Inherits TaskParent
-    Public redC As New RedCloud_Flood_CPP
-    Dim fLines As New FeatureLess_FeatureLines
-    Public Sub New()
-        If standalone Then task.gOptions.displayDst1.Checked = True
-        labels(3) = "Contour_Basics output that is input to RedColor_Basics."
-        desc = "Use the output of the Correlation_Basics as input the RedColor_Basics."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        fLines.Run(src)
-        dst3 = fLines.dst3
-
-        redC.Run(dst3)
-        dst2 = redC.dst2
-        labels(2) = redC.labels(2)
-
-        SetTrueText(redC.strOut, 1)
-    End Sub
-End Class
