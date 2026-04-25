@@ -63,6 +63,7 @@ Public Class StableDepth_Max : Inherits TaskParent
     Public Sub New()
         labels(2) = "Accumulated minimum values at each depth pixel.  Updated using RGB motion."
         labels(3) = "Pixels that were updated on the current frame."
+        If standalone Then task.gOptions.displayDst1.Checked = True
         desc = "Stabilize X, Y, and Z of the point cloud using the maximum depth encountered."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)

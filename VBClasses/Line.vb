@@ -9,6 +9,7 @@ Public Class Line_Basics_TA : Inherits TaskParent
     Public Sub New()
         dst0 = New cv.Mat(dst0.Size, cv.MatType.CV_8U, 0)
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
+        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
         If standalone Then task.gOptions.showMotionMask.Checked = True
         ld = cv.XImgProc.CvXImgProc.CreateFastLineDetector
         desc = "If line is NOT in motion mask, then keep it.  If line is in motion mask, add it."
@@ -1629,5 +1630,49 @@ Public Class Line_Sobel : Inherits TaskParent
         For Each lp In lines.lpList
             dst3.Line(lp.p1, lp.p2, task.highlight, task.lineWidth)
         Next
+    End Sub
+End Class
+
+
+
+
+
+Public Class Line_HeartBeats : Inherits TaskParent
+    Public lastList As New List(Of lpData)
+    Public lpList As New List(Of lpData)
+    Dim knn As New KNN_N4Basics
+    Public Sub New()
+        desc = "Maintain a list of lines from one heartbeat to the next."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        If task.heartBeatLT Then
+            lastList = New List(Of lpData)(lpList)
+            lpList = task.lines.lpList
+
+            knn.trainInput.Clear()
+            For Each lp In lastList
+
+                knn.trainInput.Add(New cv.Vec4f(lp.pE1.X, lp.pE1.Y, lp.pE2.X, lp.pE2.Y))
+            Next
+
+            knn.queries.Clear()
+            For Each lp In lpList
+                knn.queries.Add(New cv.Vec4f(lp.pE1.X, lp.pE1.Y, lp.pE2.X, lp.pE2.Y))
+            Next
+
+            knn.Run(emptyMat)
+
+            Dim newList As New List(Of lpData)
+            dst2.SetTo(0)
+            For i = 0 To lpList.Count - 1
+                Dim lp = lpList(i)
+                dst2.Line(lp.pE1, lp.pE2, task.scalarColors(i), task.lineWidth, cv.LineTypes.Link4)
+                Dim index = knn.result(i, 0)
+                Dim vec = knn.trainInput(index)
+                lp = New lpData(New cv.Point2f(vec(0), vec(1)), New cv.Point2f(vec(2), vec(3)))
+                dst2.Line(lp.pE1, lp.pE2, task.scalarColors(i), task.lineWidth, cv.LineTypes.Link4)
+                If i >= 2 Then Exit For
+            Next
+        End If
     End Sub
 End Class

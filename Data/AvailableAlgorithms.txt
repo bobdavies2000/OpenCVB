@@ -452,6 +452,7 @@ Line_EdgeLineCompare
 Line_Finder
 Line_FinderPlus
 Line_FindSimple
+Line_HeartBeats
 Line_Intersection
 Line_KNNTop
 Line_LeftRight
