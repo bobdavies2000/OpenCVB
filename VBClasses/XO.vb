@@ -7663,7 +7663,8 @@ Namespace VBClasses
                 task.lineLongestChanged = True
             End If
 
-            matchBrick.gridIndex = lp.p1GridIndex
+            Dim p1GridIndex = task.gridMap.Get(Of Integer)(lp.p1.Y, lp.p1.X)
+            matchBrick.gridIndex = p1GridIndex
             matchBrick.Run(emptyMat)
             Dim p1Correlation = matchBrick.correlation
             Dim p1 = New cv.Point(lp.p1.X + matchBrick.deltaX, lp.p1.Y + matchBrick.deltaY)
@@ -7671,7 +7672,8 @@ Namespace VBClasses
             strOut = matchBrick.labels(2) + vbCrLf
             labels(2) = matchBrick.labels(2) + vbTab
 
-            matchBrick.gridIndex = lp.p2GridIndex
+            Dim p2GridIndex = task.gridMap.Get(Of Integer)(lp.p2.Y, lp.p2.X)
+            matchBrick.gridIndex = p2GridIndex
             matchBrick.Run(emptyMat)
             Dim p2Correlation = matchBrick.correlation
             Dim p2 = New cv.Point(lp.p2.X + matchBrick.deltaX, lp.p2.Y + matchBrick.deltaY)
@@ -13160,7 +13162,9 @@ Namespace VBClasses
 
             knn.queries.Clear()
             For Each lp In match3.lpOutput
-                Dim pt As New cv.Point(lp.p1GridIndex, lp.p2GridIndex)
+                Dim p1GridIndex = task.gridMap.Get(Of Integer)(lp.p1.Y, lp.p1.X)
+                Dim p2GridIndex = task.gridMap.Get(Of Integer)(lp.p2.Y, lp.p2.X)
+                Dim pt As New cv.Point(p1GridIndex, p2GridIndex)
                 knn.queries.Add(pt)
             Next
 
@@ -13177,10 +13181,12 @@ Namespace VBClasses
                 If index >= lplast.Count And lplast.Count > 0 Then Continue For
                 Dim age As Integer = 1
                 If Math.Abs(lplast(index).angle - match3.lpOutput(index).angle) < task.angleThreshold Then
-                    Dim index1 = match3.lpOutput(index).p1GridIndex
-                    Dim index2 = match3.lpOutput(index).p2GridIndex
-                    If task.gridNabes(index1).Contains(lplast(index).p1GridIndex) And
-                        task.gridNabes(index2).Contains(lplast(index).p2GridIndex) Then
+                    Dim p1GridIndex = task.gridMap.Get(Of Integer)(match3.lpOutput(index).p1.Y, match3.lpOutput(index).p1.X)
+                    Dim p2GridIndex = task.gridMap.Get(Of Integer)(match3.lpOutput(index).p2.Y, match3.lpOutput(index).p2.X)
+                    Dim p1GridIndexLast = task.gridMap.Get(Of Integer)(lplast(index).p1.Y, lplast(index).p1.X)
+                    Dim p2GridIndexLast = task.gridMap.Get(Of Integer)(lplast(index).p2.Y, lplast(index).p2.X)
+                    If task.gridNabes(p1GridIndex).Contains(p1GridIndexLast) And
+                        task.gridNabes(p2GridIndex).Contains(p2GridIndexLast) Then
                         age = lplast(index).age + 1
                     End If
                 End If
@@ -14617,9 +14623,8 @@ Namespace VBClasses
 
             dst2.Line(task.lpD.p1, task.lpD.p2, task.highlight, task.lineWidth + 1, task.lineType)
 
-            strOut = "Line ID = " + CStr(task.lpD.p1GridIndex) + " Age = " + CStr(task.lpD.age) + vbCrLf
+            strOut = "Age = " + CStr(task.lpD.age) + vbCrLf
             strOut += "Length (pixels) = " + Format(task.lpD.length, fmt1) + " index = " + CStr(task.lpD.index) + vbCrLf
-            strOut += "p1GridIndex = " + CStr(task.lpD.p1GridIndex) + " p2GridIndex = " + CStr(task.lpD.p2GridIndex) + vbCrLf
 
             strOut += "p1 = " + task.lpD.p1.ToString + ", p2 = " + task.lpD.p2.ToString + vbCrLf
             strOut += "pE1 = " + task.lpD.pE1.ToString + ", pE2 = " + task.lpD.pE2.ToString + vbCrLf + vbCrLf

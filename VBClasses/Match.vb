@@ -260,56 +260,6 @@ End Class
 
 
 
-
-
-
-
-
-
-
-Public Class NR_Match_LinesKNN : Inherits TaskParent
-    Dim knn As New KNN_N4Basics
-    Public Sub New()
-        labels(2) = "This is not matching lines from the previous frame because lines often disappear and nearby lines are selected."
-        desc = "Use the 2 points from a line as input to a 4-dimension KNN"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        Dim lplist = task.lines.lpList
-
-        dst2 = dst2
-        Static lastPt As New List(Of lpData)(lplist)
-
-        knn.queries.Clear()
-        For Each lp In lplist
-            knn.queries.Add(New cv.Vec4f(lp.p1.X, lp.p1.Y, lp.p2.X, lp.p2.Y))
-        Next
-        If task.optionsChanged Then knn.trainInput = New List(Of cv.Vec4f)(knn.queries)
-        knn.Run(src)
-
-        If knn.queries.Count = 0 Then Exit Sub
-
-        For Each i In knn.result
-            If i >= lplist.Count Then Continue For
-            Dim lp = lplist(i)
-
-            Dim index = knn.result(i, 0)
-            If index >= 0 And index < lastPt.Count Then
-                Dim lastMP = lastPt(index)
-                vbc.DrawLine(dst2, lp.p1, lastMP.p2, cv.Scalar.Red)
-            End If
-        Next
-
-        knn.trainInput = New List(Of cv.Vec4f)(knn.queries)
-        lastPt = New List(Of lpData)(lplist)
-    End Sub
-End Class
-
-
-
-
-
-
-
 Public Class NR_Match_TraceRedC : Inherits TaskParent
     Dim frameList As New List(Of cv.Mat)
     Dim redC As New RedColor_Basics
@@ -438,70 +388,6 @@ End Class
 
 
 
-Public Class NR_Match_LinePairTest : Inherits TaskParent
-    Public ptx(2 - 1) As cv.Point2f
-    Public target(ptx.Count - 1) As cv.Mat
-    Public correlation(ptx.Count - 1)
-    Public Sub New()
-        desc = "Use MatchTemplate to find the new location of the template and update the point provided."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        Dim radius = task.brickEdgeLen / 2
-
-        Dim rect As cv.Rect
-
-        If target(0) IsNot Nothing And correlation(0) < task.fCorrThreshold Then target(0) = Nothing
-        If task.mouseClickFlag Then
-            ptx(0) = task.clickPoint
-            ptx(1) = New cv.Point2f(msRNG.Next(task.brickEdgeLen, dst2.Width - 2 * task.brickEdgeLen),
-                                        msRNG.Next(task.brickEdgeLen, dst2.Height - 2 * task.brickEdgeLen))
-
-            rect = ValidateRect(New cv.Rect(ptx(0).X - radius, ptx(0).Y - radius, task.brickEdgeLen, task.brickEdgeLen))
-            target(0) = src(rect)
-
-            rect = ValidateRect(New cv.Rect(ptx(1).X - radius, ptx(1).Y - radius, task.brickEdgeLen, task.brickEdgeLen))
-            target(1) = src(rect)
-        End If
-
-        If target(0) Is Nothing Or target(1) Is Nothing Then
-            dst3 = src
-            SetTrueText("Click anywhere in the image to start the algorithm.")
-            Exit Sub
-        End If
-
-        dst3 = src.Clone
-        dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_32FC1, 0)
-
-        For i = 0 To ptx.Count - 1
-            rect = ValidateRect(New cv.Rect(ptx(i).X - radius, ptx(i).Y - radius, task.brickEdgeLen, task.brickEdgeLen))
-            Dim searchRect = ValidateRect(New cv.Rect(rect.X - task.brickEdgeLen, rect.Y - task.brickEdgeLen,
-                                                          task.brickEdgeLen * 3, task.brickEdgeLen * 3))
-            cv.Cv2.MatchTemplate(target(i), src(searchRect), dst0, cv.TemplateMatchModes.CCoeffNormed)
-            Dim mmData = GetMinMax(dst0)
-            correlation(i) = mmData.maxVal
-            If i = 0 Then
-                dst0.CopyTo(dst2(New cv.Rect(0, 0, dst0.Width, dst0.Height)))
-                dst2 = dst2.Threshold(task.fCorrThreshold, 255, cv.ThresholdTypes.Binary)
-            End If
-            ptx(i) = New cv.Point2f(mmData.maxLoc.X + searchRect.X + radius, mmData.maxLoc.Y + searchRect.Y + radius)
-            DrawCircle(dst3, ptx(i), task.DotSize, task.highlight)
-            dst3.Rectangle(searchRect, cv.Scalar.Yellow, 1)
-            rect = ValidateRect(New cv.Rect(ptx(i).X - radius, ptx(i).Y - radius, task.brickEdgeLen, task.brickEdgeLen))
-            target(i) = task.color(rect)
-        Next
-
-        labels(3) = "p1 = " + CStr(ptx(0).X) + "," + CStr(ptx(0).Y) + " p2 = " + CStr(ptx(1).X) + "," + CStr(ptx(1).Y)
-        labels(2) = "Correlation = " + Format(correlation(0), fmt3) + " Search result is " + CStr(dst0.Width) + "X" + CStr(dst0.Height)
-    End Sub
-End Class
-
-
-
-
-
-
-
-
 Public Class NR_Match_GoodFeatureKNN : Inherits TaskParent
     Public knn As New KNN_OneToOne
     Dim frameList As New List(Of cv.Mat)
@@ -603,7 +489,9 @@ Public Class Match_Brick : Inherits TaskParent
         desc = "Match a gRect's movement from the previous frame."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If standalone Then gridIndex = task.lines.lpList(0).p1GridIndex
+        If standalone Then
+            gridIndex = task.gridMap.Get(Of Integer)(task.lines.lpList(0).p1.Y, task.lines.lpList(0).p1.X)
+        End If
         Static lastImage As cv.Mat = task.gray.Clone
 
         Dim rect = task.gridRects(gridIndex)
@@ -704,5 +592,109 @@ Public Class Match_VH : Inherits TaskParent
             vbc.DrawLine(dst2, p1, p2, task.highlight)
             vbc.DrawLine(dst3, p1, p2, task.highlight)
         Next
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class NR_Match_LinePairTest : Inherits TaskParent
+    Public ptx(2 - 1) As cv.Point2f
+    Public target(ptx.Count - 1) As cv.Mat
+    Public correlation(ptx.Count - 1)
+    Public Sub New()
+        desc = "Use MatchTemplate to find the new location of the template and update the point provided."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        Dim radius = task.brickEdgeLen / 2
+
+        Dim rect As cv.Rect
+
+        If target(0) IsNot Nothing And correlation(0) < task.fCorrThreshold Then target(0) = Nothing
+        If task.mouseClickFlag Then
+            ptx(0) = task.clickPoint
+            ptx(1) = New cv.Point2f(msRNG.Next(task.brickEdgeLen, dst2.Width - 2 * task.brickEdgeLen),
+                                        msRNG.Next(task.brickEdgeLen, dst2.Height - 2 * task.brickEdgeLen))
+
+            rect = ValidateRect(New cv.Rect(ptx(0).X - radius, ptx(0).Y - radius, task.brickEdgeLen, task.brickEdgeLen))
+            target(0) = src(rect)
+
+            rect = ValidateRect(New cv.Rect(ptx(1).X - radius, ptx(1).Y - radius, task.brickEdgeLen, task.brickEdgeLen))
+            target(1) = src(rect)
+        End If
+
+        If target(0) Is Nothing Or target(1) Is Nothing Then
+            dst3 = src
+            SetTrueText("Click anywhere in the image to start the algorithm.")
+            Exit Sub
+        End If
+
+        dst3 = src.Clone
+        dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_32FC1, 0)
+
+        For i = 0 To ptx.Count - 1
+            rect = ValidateRect(New cv.Rect(ptx(i).X - radius, ptx(i).Y - radius, task.brickEdgeLen, task.brickEdgeLen))
+            Dim searchRect = ValidateRect(New cv.Rect(rect.X - task.brickEdgeLen, rect.Y - task.brickEdgeLen,
+                                                          task.brickEdgeLen * 3, task.brickEdgeLen * 3))
+            cv.Cv2.MatchTemplate(target(i), src(searchRect), dst0, cv.TemplateMatchModes.CCoeffNormed)
+            Dim mmData = GetMinMax(dst0)
+            correlation(i) = mmData.maxVal
+            If i = 0 Then
+                dst0.CopyTo(dst2(New cv.Rect(0, 0, dst0.Width, dst0.Height)))
+                dst2 = dst2.Threshold(task.fCorrThreshold, 255, cv.ThresholdTypes.Binary)
+            End If
+            ptx(i) = New cv.Point2f(mmData.maxLoc.X + searchRect.X + radius, mmData.maxLoc.Y + searchRect.Y + radius)
+            DrawCircle(dst3, ptx(i), task.DotSize, task.highlight)
+            dst3.Rectangle(searchRect, cv.Scalar.Yellow, 1)
+            rect = ValidateRect(New cv.Rect(ptx(i).X - radius, ptx(i).Y - radius, task.brickEdgeLen, task.brickEdgeLen))
+            target(i) = task.color(rect)
+        Next
+
+        labels(3) = "p1 = " + CStr(ptx(0).X) + "," + CStr(ptx(0).Y) + " p2 = " + CStr(ptx(1).X) + "," + CStr(ptx(1).Y)
+        labels(2) = "Correlation = " + Format(correlation(0), fmt3) + " Search result is " + CStr(dst0.Width) + "X" + CStr(dst0.Height)
+    End Sub
+End Class
+
+
+
+
+
+Public Class Match_LinesKNN : Inherits TaskParent
+    Dim knn As New KNN_N4Basics
+    Public Sub New()
+        labels(2) = "Match lines on the heartbeat using the line extended to the image edges."
+        desc = "Use the 2 points from a line as input to a 4-dimension KNN"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        Dim lplist = task.lines.lpList
+
+        dst2 = dst2
+        Static lastPt As New List(Of lpData)(lplist)
+
+        knn.queries.Clear()
+        For Each lp In lplist
+            knn.queries.Add(New cv.Vec4f(lp.p1.X, lp.p1.Y, lp.p2.X, lp.p2.Y))
+        Next
+        If task.optionsChanged Then knn.trainInput = New List(Of cv.Vec4f)(knn.queries)
+        knn.Run(src)
+
+        If knn.queries.Count = 0 Then Exit Sub
+
+        For Each i In knn.result
+            If i >= lplist.Count Then Continue For
+            Dim lp = lplist(i)
+
+            Dim index = knn.result(i, 0)
+            If index >= 0 And index < lastPt.Count Then
+                Dim lastMP = lastPt(index)
+                vbc.DrawLine(dst2, lp.p1, lastMP.p2, cv.Scalar.Red)
+            End If
+        Next
+
+        knn.trainInput = New List(Of cv.Vec4f)(knn.queries)
+        lastPt = New List(Of lpData)(lplist)
     End Sub
 End Class

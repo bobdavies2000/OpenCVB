@@ -262,8 +262,10 @@ Public Class Intrinsics_MapLeftToRight : Inherits TaskParent
         Dim count As Integer
         If task.Settings.cameraName.StartsWith("StereoLabs") Then
             For Each lp In task.lines.lpList
-                Dim brick1 = bricks.brickList(lp.p1GridIndex)
-                Dim brick2 = bricks.brickList(lp.p2GridIndex)
+                Dim p1GridIndex = task.gridMap.Get(Of Integer)(lp.p1.Y, lp.p1.X)
+                Dim p2GridIndex = task.gridMap.Get(Of Integer)(lp.p2.Y, lp.p2.X)
+                Dim brick1 = bricks.brickList(p1GridIndex)
+                Dim brick2 = bricks.brickList(p2GridIndex)
                 Dim p1 = lp.p1 ' avoid updating list of lines.
                 Dim p2 = lp.p2
                 If brick1.depth > 0 And brick2.depth > 0 Then

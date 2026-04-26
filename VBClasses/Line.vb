@@ -340,84 +340,6 @@ End Class
 
 
 
-Public Class NR_Line_Vertical : Inherits TaskParent
-    Dim vbPoints As New NR_BrickPoint_Vertical
-    Dim knn As New KNN_Basics
-    Public Sub New()
-        desc = "Match points to the nearest line that is also vertical"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        vbPoints.Run(src)
-        dst2 = vbPoints.dst2
-
-        knn.ptListTrain = New List(Of cv.Point)(vbPoints.ptList)
-        knn.ptListQuery = New List(Of cv.Point)(vbPoints.ptList)
-        knn.Run(dst2)
-        labels(3) = "There are " + CStr(knn.result.GetUpperBound(0)) + " input points to KNN."
-
-        Dim lpList As New List(Of lpData)
-        For i = 0 To knn.result.GetUpperBound(0) - 1
-            Dim deltaX As New List(Of Single)
-            Dim ptList As New List(Of cv.Point)
-            Dim p1 = vbPoints.ptList(knn.result(i, 0))
-            For j = 1 To Math.Min(knn.result.Length - 1, 6) - 1
-                Dim p2 = vbPoints.ptList(knn.result(i, j))
-                Dim delta = Math.Abs(p1.X - p2.X)
-                deltaX.Add(delta)
-                ptList.Add(p2)
-            Next
-
-            Dim minVal = deltaX.Min
-            Dim index = deltaX.IndexOf(minVal)
-            If minVal < task.brickEdgeLen Then
-                Dim lp = New lpData(p1, ptList(index))
-                If lp.indexVTop < 0 Or lp.indexVBot < 0 Then Continue For
-                lp.index = lpList.Count
-                lpList.Add(lp)
-                dst2.Line(p1, ptList(index), task.highlight, task.lineWidth, task.lineType)
-            End If
-        Next
-
-        Dim topGroups(task.bricksPerRow - 1) As List(Of Integer)
-        For Each lp In lpList
-            If topGroups(lp.indexVTop) Is Nothing Then topGroups(lp.indexVTop) = New List(Of Integer)
-            topGroups(lp.indexVTop).Add(lp.index)
-        Next
-
-        Dim indexVTop = Math.Abs(task.gOptions.DebugSlider.Value)
-        dst3.SetTo(0)
-        If indexVTop < topGroups.Count Then
-            If topGroups(indexVTop) IsNot Nothing Then
-                Dim botGroups(task.bricksPerRow - 1) As List(Of Integer)
-                For Each index In topGroups(indexVTop)
-                    Dim lp = lpList(index)
-                    If botGroups(lp.indexVBot) Is Nothing Then botGroups(lp.indexVBot) = New List(Of Integer)
-                    botGroups(lp.indexVBot).Add(lp.index)
-                Next
-
-                Dim maxIndex As Integer
-                Dim maxCount As Integer
-                For i = 0 To botGroups.Count - 1
-                    If botGroups(i) Is Nothing Then Continue For
-                    If maxCount < botGroups(i).Count Then
-                        maxCount = botGroups.Count
-                        maxIndex = i
-                    End If
-                Next
-                For Each index In botGroups(maxIndex)
-                    Dim lp = lpList(index)
-                    vbc.DrawLine(dst3, lp)
-                Next
-            End If
-        End If
-
-        labels(2) = "There were " + CStr(lpList.Count) + " neighbors that formed good lines."
-    End Sub
-End Class
-
-
-
-
 
 
 Public Class Line_DepthHistogram : Inherits TaskParent
@@ -628,7 +550,6 @@ Public Class Line_LeftTrack : Inherits TaskParent
             Next
             If bestT IsNot Nothing Then
                 bestT.lp = r
-                bestT.lp.trackID = bestT.trackId
                 bestT.missedCount = 0
                 usedRaw.Add(r)
                 usedTracked.Add(bestT)
@@ -1133,12 +1054,14 @@ Public Class Line_TranslatedRightView : Inherits TaskParent
         For Each lp In task.lines.lpList
             Dim depth1 = task.pcSplit(2).Get(Of Single)(lp.p1.Y, lp.p1.X)
             If depth1 = 0 Then
-                Dim r = task.gridRects(lp.p1GridIndex)
+                Dim p1GridIndex = task.gridMap.Get(Of Integer)(lp.p1.Y, lp.p1.X)
+                Dim r = task.gridRects(p1GridIndex)
                 depth1 = task.pcSplit(2)(r).Mean(task.depthmask(r))
             End If
             Dim depth2 = task.pcSplit(2).Get(Of Single)(lp.p2.Y, lp.p2.X)
             If depth2 = 0 Then
-                Dim r = task.gridRects(lp.p2GridIndex)
+                Dim p2GridIndex = task.gridMap.Get(Of Integer)(lp.p2.Y, lp.p2.X)
+                Dim r = task.gridRects(p2GridIndex)
                 depth2 = task.pcSplit(2)(r).Mean(task.depthmask(r))
             End If
             If depth1 = 0 Or depth2 = 0 Then Continue For
@@ -1637,40 +1560,51 @@ End Class
 
 
 
-Public Class Line_HeartBeats : Inherits TaskParent
-    Public lastList As New List(Of lpData)
-    Public lpList As New List(Of lpData)
+Public Class Line_TrackV : Inherits TaskParent
+    Public lastV As New List(Of lpData)
+    Public lpVList As New List(Of lpData)
     Dim knn As New KNN_N4Basics
     Public Sub New()
-        desc = "Maintain a list of lines from one heartbeat to the next."
+        desc = "Track the vertical lines on the heartbeat."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
+        Dim verticals As New List(Of lpData)
+        For Each lp In task.lines.lpList
+            If lp.pE1.Y = 0 Then verticals.Add(lp)
+            If lp.pE2.Y = 0 Then verticals.Add(New lpData(lp.pE2, lp.pE1))
+        Next
+
+        If task.heartBeatLT Then dst3.SetTo(0)
+        For Each lp In verticals
+            dst3.Line(lp.pE1, lp.pE2, lp.color, task.lineWidth, cv.LineTypes.Link4)
+            If lp.index >= 2 Then Exit For
+        Next
+
         If task.heartBeatLT Then
-            lastList = New List(Of lpData)(lpList)
-            lpList = task.lines.lpList
-
+            lastV = New List(Of lpData)(lpVList)
             knn.trainInput.Clear()
-            For Each lp In lastList
-
+            For Each lp In lastV
                 knn.trainInput.Add(New cv.Vec4f(lp.pE1.X, lp.pE1.Y, lp.pE2.X, lp.pE2.Y))
             Next
 
             knn.queries.Clear()
-            For Each lp In lpList
+            For Each lp In verticals
                 knn.queries.Add(New cv.Vec4f(lp.pE1.X, lp.pE1.Y, lp.pE2.X, lp.pE2.Y))
             Next
 
             knn.Run(emptyMat)
 
-            Dim newList As New List(Of lpData)
+            lpVList.Clear()
             dst2.SetTo(0)
-            For i = 0 To lpList.Count - 1
-                Dim lp = lpList(i)
+            For i = 0 To verticals.Count - 1
+                Dim lp = verticals(i)
                 dst2.Line(lp.pE1, lp.pE2, task.scalarColors(i), task.lineWidth, cv.LineTypes.Link4)
                 Dim index = knn.result(i, 0)
                 Dim vec = knn.trainInput(index)
                 lp = New lpData(New cv.Point2f(vec(0), vec(1)), New cv.Point2f(vec(2), vec(3)))
                 dst2.Line(lp.pE1, lp.pE2, task.scalarColors(i), task.lineWidth, cv.LineTypes.Link4)
+
+                lpVList.Add(lp)
                 If i >= 2 Then Exit For
             Next
         End If

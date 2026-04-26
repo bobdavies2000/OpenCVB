@@ -1132,16 +1132,18 @@ Public Class Brick_Search : Inherits TaskParent
         Dim corrThreshold = task.fOptions.MatchCorrSlider.Value
         For i = 0 To Math.Min(10, task.lines.lpList.Count) - 1
             Dim lp = task.lines.lpList(i)
-            Dim rect1 = task.gridNabeRects(lp.p1GridIndex)
+            Dim p1GridIndex = task.gridMap.Get(Of Integer)(lp.p1.Y, lp.p1.X)
+            Dim rect1 = task.gridNabeRects(p1GridIndex)
             searchArea = lastImage(rect1)
-            cv.Cv2.MatchTemplate(searchArea, task.gray(task.gridRects(lp.p1GridIndex)), dst1,
+            cv.Cv2.MatchTemplate(searchArea, task.gray(task.gridRects(p1GridIndex)), dst1,
                                  cv.TemplateMatchModes.CCoeffNormed)
             mm1 = GetMinMax(dst1)
 
             If mm1.maxVal > corrThreshold Then
-                Dim rect2 = task.gridNabeRects(lp.p2GridIndex)
+                Dim p2GridIndex = task.gridMap.Get(Of Integer)(lp.p1.Y, lp.p1.X)
+                Dim rect2 = task.gridNabeRects(p2GridIndex)
                 searchArea = lastImage(rect2)
-                cv.Cv2.MatchTemplate(searchArea, task.gray(task.gridRects(lp.p2GridIndex)), dst1,
+                cv.Cv2.MatchTemplate(searchArea, task.gray(task.gridRects(p2GridIndex)), dst1,
                                      cv.TemplateMatchModes.CCoeffNormed)
                 mm2 = GetMinMax(dst1)
 

@@ -360,23 +360,11 @@ Public Module Structures
     Public Class lpData
         Public age As Integer = 1
         Public angle As Single ' varies from -90 to 90 degrees
-
         Public color As cv.Scalar
-
         Public index As Integer
-        Public trackID As Integer
-        Public indexVTop As Integer = -1
-        Public indexVBot As Integer = -1
-        Public indexHLeft As Integer = -1
-        Public indexHRight As Integer = -1
-
         Public length As Single
-
         Public p1 As cv.Point2f
         Public p2 As cv.Point2f
-
-        Public p1GridIndex As Integer
-        Public p2GridIndex As Integer
 
         Public pVec1 As cv.Vec3f
         Public pVec2 As cv.Vec3f
@@ -443,8 +431,7 @@ Public Module Structures
 
             length = p1.DistanceTo(p2)
 
-            p1GridIndex = task.gridMap.Get(Of Integer)(p1.Y, p1.X)
-            p2GridIndex = task.gridMap.Get(Of Integer)(p2.Y, p2.X)
+            Dim p1GridIndex = task.gridMap.Get(Of Integer)(p1.Y, p1.X)
             color = task.scalarColors(p1GridIndex Mod 255)
 
             pVec1 = task.pointCloud.Get(Of cv.Vec3f)(p1.Y, p1.X)
@@ -455,6 +442,7 @@ Public Module Structures
 
             pVec2 = task.pointCloud.Get(Of cv.Vec3f)(p2.Y, p2.X)
             If Single.IsNaN(pVec2(0)) Or pVec2(2) = 0 Then
+                Dim p2GridIndex = task.gridMap.Get(Of Integer)(p2.Y, p2.X)
                 Dim r = task.gridRects(p2GridIndex)
                 pVec2 = New cv.Vec3f(0, 0, task.pcSplit(2)(r).Mean(task.depthmask(r)).Item(0))
             End If
@@ -487,20 +475,6 @@ Public Module Structures
                 pE2 = New cv.Point2f(p1.X, task.workRes.Height - 1)
             End If
             ptCenter = New cv.Point2f((p1.X + p2.X) / 2, (p1.Y + p2.Y) / 2)
-
-            Dim bpRow = task.bricksPerRow - 1
-            Dim bpCol = task.bricksPerCol - 1
-            If pE1.Y = 0 Then indexVTop = pE1.X / task.workRes.Width * bpRow
-            If pE1.Y = task.workRes.Height - 1 Then indexVBot = pE1.X / task.workRes.Width * bpRow
-
-            If pE2.Y = 0 Then indexVTop = pE2.X / task.workRes.Width * bpRow
-            If pE2.Y = task.workRes.Height - 1 Then indexVBot = pE2.X / task.workRes.Width * bpRow
-
-            If pE1.X = 0 Then indexHLeft = pE1.Y / task.workRes.Height * bpCol
-            If pE1.X = task.workRes.Width - 1 Then indexHRight = pE1.Y / task.workRes.Height * bpCol
-
-            If pE2.X = 0 Then indexHLeft = pE2.Y / task.workRes.Height * bpCol
-            If pE2.X = task.workRes.Width - 1 Then indexHRight = pE2.Y / task.workRes.Height * bpCol
 
             computeAngleDegrees()
 
@@ -537,9 +511,8 @@ Public Module Structures
             dst.Line(task.lpD.p1, task.lpD.p2, task.highlight, task.lineWidth + 1, task.lineType)
 
             Dim strOut = "rcList index = " + CStr(index) + vbCrLf
-            strOut = "Line ID = " + CStr(task.lpD.p1GridIndex) + " Age = " + CStr(task.lpD.age) + vbCrLf
+            strOut = "Age = " + CStr(task.lpD.age) + vbCrLf
             strOut += "Length (pixels) = " + Format(task.lpD.length, fmt1) + " index = " + CStr(task.lpD.index) + vbCrLf
-            strOut += "p1GridIndex = " + CStr(task.lpD.p1GridIndex) + " p2GridIndex = " + CStr(task.lpD.p2GridIndex) + vbCrLf
 
             strOut += "p1 = " + task.lpD.p1.ToString + ", p2 = " + task.lpD.p2.ToString + vbCrLf
             strOut += "pE1 = " + task.lpD.pE1.ToString + ", pE2 = " + task.lpD.pE2.ToString + vbCrLf + vbCrLf

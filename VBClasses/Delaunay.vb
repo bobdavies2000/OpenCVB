@@ -348,9 +348,10 @@ Public Class Delaunay_LineSelect : Inherits TaskParent
         If facetIndex = -1 Then Exit Sub
         task.lpD = task.lines.lpList(ptList(facetIndex))
 
-        Static saveID As Integer = task.lpD.p1GridIndex
-        If task.lpD.p1GridIndex <> saveID Then
-            saveID = task.lpD.p1GridIndex
+        Dim p1GridIndex = task.gridMap.Get(Of Integer)(task.lpD.p1.Y, task.lpD.p1.X)
+        Static saveID As Integer = p1GridIndex
+        If p1GridIndex <> saveID Then
+            saveID = p1GridIndex
             task.optionsChanged = True
         End If
 

@@ -92,14 +92,16 @@ Public Class LineEnds_Correlation : Inherits TaskParent
         If standalone Then lpInput = task.lines.lpList(0)
         Static lastImage = task.gray.Clone
 
-        Dim rect = task.gridRects(lpInput.p1GridIndex)
+        Dim p1GridIndex = task.gridMap.Get(Of Integer)(lpInput.p1.Y, lpInput.p1.X)
+        Dim rect = task.gridRects(p1GridIndex)
         match.template = task.gray(rect)
-        match.Run(lastImage(task.gridNabeRects(lpInput.p1GridIndex)))
+        match.Run(lastImage(task.gridNabeRects(p1GridIndex)))
         p1Correlation = match.correlation
 
-        rect = task.gridRects(lpInput.p2GridIndex)
+        Dim p2GridIndex = task.gridMap.Get(Of Integer)(lpInput.p2.Y, lpInput.p2.X)
+        rect = task.gridRects(p2GridIndex)
         match.template = task.gray(rect)
-        match.Run(lastImage(task.gridNabeRects(lpInput.p2GridIndex)))
+        match.Run(lastImage(task.gridNabeRects(p2GridIndex)))
         p2Correlation = match.correlation
 
         lastImage = task.gray.Clone

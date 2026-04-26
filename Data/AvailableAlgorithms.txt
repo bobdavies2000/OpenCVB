@@ -452,7 +452,6 @@ Line_EdgeLineCompare
 Line_Finder
 Line_FinderPlus
 Line_FindSimple
-Line_HeartBeats
 Line_Intersection
 Line_KNNTop
 Line_LeftRight
@@ -466,6 +465,7 @@ Line_PerpendicularTest
 Line_RedFlood
 Line_Sobel
 Line_Tracker
+Line_TrackV
 Line_TranslatedRightView
 Line_Vertical
 Line3D_Basics
@@ -492,6 +492,7 @@ Match_Basics
 Match_Basics1
 Match_Brick
 Match_DrawRect
+Match_LinesKNN
 Match_Point
 Match_VH
 MatchShapes_Basics
@@ -1147,7 +1148,6 @@ NR_Line_Core
 NR_Line_Finder
 NR_Line_Parallel
 NR_Line_Select
-NR_Line_Vertical
 NR_Line3D_DrawArbitrary
 NR_Line3D_Longest
 NR_LinearRegression_Random
@@ -1181,7 +1181,6 @@ NR_Match_BestEntropy
 NR_Match_Duplicate
 NR_Match_GoodFeatureKNN
 NR_Match_LinePairTest
-NR_Match_LinesKNN
 NR_Match_Motion
 NR_Match_RandomTest
 NR_Match_TraceRedC
