@@ -1569,21 +1569,26 @@ Public Class Line_TrackV : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         Dim verticals As New List(Of lpData)
-        For Each lp In task.lines.lpList
-            If lp.pE1.Y = 0 Then verticals.Add(lp)
-            If lp.pE2.Y = 0 Then verticals.Add(New lpData(lp.pE2, lp.pE1))
+        Dim index As Integer
+        For i = 0 To task.lines.lpList.Count - 1
+            Dim lp = task.lines.lpList(i)
+            If lp.pE1.Y <> 0 And lp.pE2.Y <> 0 Then Continue For
+            If lp.pE1.Y = 0 Then lp = New lpData(lp.pE1, lp.pE2) Else lp = New lpData(lp.pE2, lp.pE1)
+            lp.index = index
+            index += 1
+            verticals.Add(lp)
         Next
 
         If task.heartBeatLT Then dst3.SetTo(0)
+        dst3.SetTo(0)
         For Each lp In verticals
             dst3.Line(lp.pE1, lp.pE2, lp.color, task.lineWidth, cv.LineTypes.Link4)
             If lp.index >= 2 Then Exit For
         Next
 
         If task.heartBeatLT Then
-            lastV = New List(Of lpData)(lpVList)
             knn.trainInput.Clear()
-            For Each lp In lastV
+            For Each lp In lpVList
                 knn.trainInput.Add(New cv.Vec4f(lp.pE1.X, lp.pE1.Y, lp.pE2.X, lp.pE2.Y))
             Next
 
@@ -1597,15 +1602,15 @@ Public Class Line_TrackV : Inherits TaskParent
             lpVList.Clear()
             dst2.SetTo(0)
             For i = 0 To verticals.Count - 1
-                Dim lp = verticals(i)
-                dst2.Line(lp.pE1, lp.pE2, task.scalarColors(i), task.lineWidth, cv.LineTypes.Link4)
-                Dim index = knn.result(i, 0)
-                Dim vec = knn.trainInput(index)
-                lp = New lpData(New cv.Point2f(vec(0), vec(1)), New cv.Point2f(vec(2), vec(3)))
-                dst2.Line(lp.pE1, lp.pE2, task.scalarColors(i), task.lineWidth, cv.LineTypes.Link4)
+                Dim lp1 = verticals(i)
+                Dim vec = knn.trainInput(knn.result(i, 0))
+                Dim lp2 = New lpData(New cv.Point2f(vec(0), vec(1)), New cv.Point2f(vec(2), vec(3)))
+
+                dst2.Line(lp.p1, lp.p2, task.scalarColors(i), task.lineWidth, cv.LineTypes.Link4)
+                dst2.Line(lp1.p1, lp1.p2, task.scalarColors(i), task.lineWidth, cv.LineTypes.Link4)
 
                 lpVList.Add(lp)
-                If i >= 2 Then Exit For
+                If lpVList.Count >= 2 Then Exit For
             Next
         End If
     End Sub
