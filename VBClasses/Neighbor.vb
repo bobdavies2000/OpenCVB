@@ -35,11 +35,13 @@ Public Class Neighbor_Basics : Inherits TaskParent
         If standalone Then
             SetTrueText(redC.strOut, 3)
             dst3.SetTo(0)
-            For Each index In task.rcD.nabs
-                If index < redC.rcList.Count Then
-                    DrawCircle(dst2, redC.rcList(index).maxDist, task.DotSize, task.highlight)
-                End If
-            Next
+            If task.rcD IsNot Nothing Then
+                For Each index In task.rcD.nabs
+                    If index < redC.rcList.Count Then
+                        DrawCircle(dst2, redC.rcList(index).maxDist, task.DotSize, task.highlight)
+                    End If
+                Next
+            End If
         End If
     End Sub
 End Class
