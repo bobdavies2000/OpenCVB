@@ -3,7 +3,6 @@ Imports cv = OpenCvSharp
 Public Class Gravity_Basics_TA : Inherits TaskParent
     Dim lastTimeStamp As Double
     Dim optionsIMU As New Options_IMU
-    Dim options As New Options_History
     ''' <summary>Unit gravity vector in body/sensor frame (points down).</summary>
     Public GravityVector As New cv.Point3f(0, 0, -1)
     Public Sub New()
@@ -74,7 +73,6 @@ Public Class Gravity_Basics_TA : Inherits TaskParent
 
     Public Overrides Sub RunAlg(src As cv.Mat)
         optionsIMU.Run()
-        options.Run() ' set the task.framehistoryCount
 
         Dim gyro = task.IMU_AngularVelocity
         If task.optionsChanged Then
@@ -351,7 +349,6 @@ End Class
 
 Public Class NR_Gravity_Basics_Original : Inherits TaskParent
     Public vec As New lpData
-    Dim options As New Options_History
     Public Sub New()
         dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         desc = "Search for the transition from positive to negative to find the gravity vector."
@@ -386,8 +383,6 @@ Public Class NR_Gravity_Basics_Original : Inherits TaskParent
         Return New cv.Point
     End Function
     Public Overrides Sub RunAlg(src As cv.Mat)
-        options.Run()
-
         If src.Type <> cv.MatType.CV_32F Then dst0 = task.pcSplit(0) Else dst0 = src
 
         Dim p1 = findTransition(0, dst0.Height - 1, 1)

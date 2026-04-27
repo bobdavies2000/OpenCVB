@@ -1564,16 +1564,19 @@ Public Class Line_TrackV : Inherits TaskParent
     Public lastV As New List(Of lpData)
     Public lpVList As New List(Of lpData)
     Dim knn As New KNN_N4Basics
+    Dim match As New Match_Basics
+    Dim lastImage As cv.Mat
     Public Sub New()
         desc = "Track the vertical lines on the heartbeat."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
+        If task.firstPass Then lastImage = src.Clone
         Dim verticals As New List(Of lpData)
         Dim index As Integer
         For i = 0 To task.lines.lpList.Count - 1
             Dim lp = task.lines.lpList(i)
             If lp.pE1.Y <> 0 And lp.pE2.Y <> 0 Then Continue For
-            If lp.pE1.Y = 0 Then lp = New lpData(lp.pE1, lp.pE2) Else lp = New lpData(lp.pE2, lp.pE1)
+            If lp.pE1.Y = 0 Then lp = New lpData(lp.p1, lp.p2) Else lp = New lpData(lp.p2, lp.p1)
             lp.index = index
             index += 1
             verticals.Add(lp)
@@ -1606,12 +1609,33 @@ Public Class Line_TrackV : Inherits TaskParent
                 Dim vec = knn.trainInput(knn.result(i, 0))
                 Dim lp2 = New lpData(New cv.Point2f(vec(0), vec(1)), New cv.Point2f(vec(2), vec(3)))
 
-                dst2.Line(lp.p1, lp.p2, task.scalarColors(i), task.lineWidth, cv.LineTypes.Link4)
-                dst2.Line(lp1.p1, lp1.p2, task.scalarColors(i), task.lineWidth, cv.LineTypes.Link4)
+                Dim gridIndex = task.gridMap.Get(Of Integer)(lp1.ptCenter.Y, lp1.ptCenter.X)
+                Dim rect1 = task.gridNabeRects(gridIndex)
+                gridIndex = task.gridMap.Get(Of Integer)(lp2.ptCenter.Y, lp2.ptCenter.X)
+                Dim rect2 = task.gridNabeRects(gridIndex)
 
-                lpVList.Add(lp)
-                If lpVList.Count >= 2 Then Exit For
+                If rect1.IntersectsWith(rect2) Then
+                    If Math.Abs(lp1.angle - lp2.angle) < 2 Then
+                        match.template = lastImage(rect1)
+                        match.Run(src(rect2))
+                        If match.correlation > 0.95 Then
+                            dst2.Line(lp1.pE1, lp1.pE2, task.scalarColors(i), task.lineWidth, cv.LineTypes.Link4)
+                            dst2.Line(lp2.pE1, lp2.pE2, task.scalarColors(i), task.lineWidth, cv.LineTypes.Link4)
+
+                            lpVList.Add(lp1)
+                            lpVList.Add(lp2)
+                        Else
+                            Dim k = 0
+                        End If
+                    Else
+                        Dim k = 0
+                    End If
+                Else
+                    Dim k = 0
+                End If
             Next
+
+            lastImage = src.Clone
         End If
     End Sub
 End Class

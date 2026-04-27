@@ -126,7 +126,7 @@ Public Class NR_Math_RGBCorrelation : Inherits TaskParent
 
         flow.nextMsg = blueGreenCorrelation + " " + redGreenCorrelation + " " + redBlueCorrelation
         flow.Run(src)
-        labels(2) = "Log of " + options.matchText
+        labels(2) = "Log of correlations"
     End Sub
 End Class
 

@@ -129,8 +129,8 @@ Public Class NR_Match_RandomTest : Inherits TaskParent
     Public correlationMat As New cv.Mat
     Public correlation As Single
     Public mm As mmData
-    Public minCorrelation = Single.MaxValue
-    Public maxCorrelation = Single.MinValue
+    Public minCorrelation As Single
+    Public maxCorrelation As Single
     Public options As New Options_Features
     Public Sub New()
         flow.parentData = Me
@@ -139,9 +139,7 @@ Public Class NR_Match_RandomTest : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
         If standaloneTest() Then
-            Static saveSampleCount = task.FeatureSampleSize
-            If saveSampleCount <> task.FeatureSampleSize Then
-                saveSampleCount = task.FeatureSampleSize
+            If task.optionsChanged Then
                 maxCorrelation = Single.MinValue
                 minCorrelation = Single.MaxValue
             End If
@@ -157,16 +155,17 @@ Public Class NR_Match_RandomTest : Inherits TaskParent
         correlation = mm.maxVal
         If correlation < minCorrelation Then minCorrelation = correlation
         If correlation > maxCorrelation Then maxCorrelation = correlation
-        labels(2) = "Correlation = " + Format(correlation, "#,##0.000")
         If standaloneTest() Then
             dst2.SetTo(0)
-            labels(2) = options.matchText + " for " + CStr(template.Cols) + " random test samples = " + Format(correlation, "#,##0.00")
-            flow.nextMsg = options.matchText + " = " + Format(correlation, "#,##0.00")
+            If task.heartBeat Then
+                labels(2) = "For " + CStr(template.Cols) + " test samples correlation = " + Format(correlation, fmt2)
+            End If
+            flow.nextMsg = "Correlation = " + Format(correlation, "#,##0.00")
             flow.Run(src)
             SetTrueText("The expectation is that the " + CStr(template.Cols) + " random test samples should produce" + vbCrLf +
                             " a correlation coefficient near zero" + vbCrLf +
                             "The larger the sample size, the closer to zero the correlation will be. " + vbCrLf +
-                            "See the Feature option 'Feature Sample Size' slider." + vbCrLf +
+                            "Adjust task.featureSampleSize to test further." + vbCrLf +
                             "There should also be symmetry in the min and max around zero." + vbCrLf + vbCrLf +
                             "Min Correlation = " + Format(minCorrelation, fmt3) + vbCrLf +
                             "Max Correlation = " + Format(maxCorrelation, fmt3), 3)

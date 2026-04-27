@@ -63,7 +63,7 @@ Partial Public Class AlgorithmTask
     Public closeRequest As Boolean
     Public paletteIndex As Integer
     Public fCorrThreshold As Single
-    Public FeatureSampleSize As Integer
+    Public FeatureSampleSize As Integer = 100
     Public clickPoint As New cv.Point ' last place where mouse was clicked.
 
     Public testAllRunning As Boolean

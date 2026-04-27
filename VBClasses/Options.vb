@@ -7737,7 +7737,6 @@ End Class
 Public Class Options_Features : Inherits OptionParent
     Public quality As Double = 0.01
     Public matchOption As cv.TemplateMatchModes = cv.TemplateMatchModes.CCoeffNormed
-    Public matchText As String = ""
     Public k As Double = 0.04
     Public blockSize As Integer = 3
 
