@@ -376,34 +376,6 @@ Public Module Structures
         Public slope As Single
 
         Public Const maxSlope As Integer = 100000
-        Public Function perpendicularPoints(pt As cv.Point2f) As lpData
-            Dim perpSlope = -1 / slope
-            Dim angleRadians As Double = Math.Atan(perpSlope)
-            Dim xShift = task.brickEdgeLen * Math.Cos(angleRadians)
-            Dim yShift = task.brickEdgeLen * Math.Sin(angleRadians)
-            Dim p1 = New cv.Point(pt.X + xShift, pt.Y + yShift)
-            Dim p2 = New cv.Point(pt.X - xShift, pt.Y - yShift)
-            If p1.X < 0 Then p1.X = 0
-            If p1.X >= task.color.Width Then p1.X = task.color.Width - 1
-            If p1.Y < 0 Then p1.Y = 0
-            If p1.Y >= task.color.Height Then p1.Y = task.color.Height - 1
-            If p2.X < 0 Then p2.X = 0
-            If p2.X >= task.color.Width Then p2.X = task.color.Width - 1
-            If p2.Y < 0 Then p2.Y = 0
-            If p2.Y >= task.color.Height Then p2.Y = task.color.Height - 1
-            Return New lpData(p1, p2)
-        End Function
-        Public Sub computeAngleDegrees()
-            If p2.X = p1.X Then
-                angle = 90
-                Exit Sub
-            End If
-
-            Dim angleRadians As Double = Math.Atan2((p2.Y - p1.Y), (p2.X - p1.X))
-            angle = CType(angleRadians * (180.0 / Math.PI), Single)
-            If angle >= 90.0 Then angle -= 180.0
-            If angle < -90.0 Then angle += 180.0
-        End Sub
         Public Shared Function validatePoint(pt As cv.Point2f) As cv.Point2f
             If CInt(pt.X) < 0 Then pt.X = 0
             If CInt(pt.X) >= task.color.Width Then pt.X = task.color.Width - 1
@@ -476,7 +448,15 @@ Public Module Structures
             End If
             ptCenter = New cv.Point2f((p1.X + p2.X) / 2, (p1.Y + p2.Y) / 2)
 
-            computeAngleDegrees()
+            If p2.X = p1.X Then
+                angle = 90
+                Exit Sub
+            End If
+
+            Dim angleRadians As Double = Math.Atan2((p2.Y - p1.Y), (p2.X - p1.X))
+            angle = CType(angleRadians * (180.0 / Math.PI), Single)
+            If angle >= 90.0 Then angle -= 180.0
+            If angle < -90.0 Then angle += 180.0
 
             Dim w = Math.Abs(p1.X - p2.X)
             Dim h = Math.Abs(p1.Y - p2.Y)
@@ -496,11 +476,7 @@ Public Module Structures
             p1 = New cv.Point2f()
             p2 = New cv.Point2f()
         End Sub
-        Public Function compare(lp As lpData) As Boolean
-            If lp.p1.X = p1.X And lp.p1.Y = p1.Y And lp.p2.X = p2.X And p2.Y = p2.Y Then Return True
-            Return False
-        End Function
-        Public Function displayCell(ByRef dst As cv.Mat) As String
+        Public Function lpDisplay(ByRef dst As cv.Mat) As String
             dst.SetTo(0)
             For Each lp In task.lines.lpList
                 dst.Line(lp.p1, lp.
@@ -521,7 +497,6 @@ Public Module Structures
             strOut += vbCrLf + "NOTE: the Y-Axis is inverted - Y increases down so slopes are inverted." + vbCrLf + vbCrLf
             Return strOut
         End Function
-
     End Class
 
 

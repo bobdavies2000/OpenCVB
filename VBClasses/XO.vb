@@ -2711,6 +2711,23 @@ Namespace VBClasses
         Public Sub New()
             desc = "Find all verticle lines and combine them if they are 'close'."
         End Sub
+        Public Shared Function perpendicularPoints(pt As cv.Point2f, slope As Single) As lpData
+            Dim perpSlope = -1 / slope
+            Dim angleRadians As Double = Math.Atan(perpSlope)
+            Dim xShift = task.brickEdgeLen * Math.Cos(angleRadians)
+            Dim yShift = task.brickEdgeLen * Math.Sin(angleRadians)
+            Dim p1 = New cv.Point(pt.X + xShift, pt.Y + yShift)
+            Dim p2 = New cv.Point(pt.X - xShift, pt.Y - yShift)
+            If p1.X < 0 Then p1.X = 0
+            If p1.X >= task.color.Width Then p1.X = task.color.Width - 1
+            If p1.Y < 0 Then p1.Y = 0
+            If p1.Y >= task.color.Height Then p1.Y = task.color.Height - 1
+            If p2.X < 0 Then p2.X = 0
+            If p2.X >= task.color.Width Then p2.X = task.color.Width - 1
+            If p2.Y < 0 Then p2.Y = 0
+            If p2.Y >= task.color.Height Then p2.Y = task.color.Height - 1
+            Return New lpData(p1, p2)
+        End Function
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
 
@@ -2723,7 +2740,7 @@ Namespace VBClasses
                 For j = i + 1 To verts.vertList.Count - 1
                     Dim lp2 = verts.vertList(j)
                     Dim center = New cv.Point(CInt((lp1.p1.X + lp1.p2.X) / 2), CInt((lp1.p1.Y + lp1.p2.Y) / 2))
-                    Dim lpPerp = lp1.perpendicularPoints(center)
+                    Dim lpPerp = perpendicularPoints(center, lp1.slope)
                     Dim intersectionPoint = Line_Intersection.IntersectTest(lp1, lpPerp)
                     Dim distance = intersectionPoint.DistanceTo(center)
                     If distance <= options.proximity Then
@@ -2941,6 +2958,12 @@ Namespace VBClasses
             labels(3) = "All vertical lines.  The numbers: index and Arc-Y for the longest X vertical lines."
             desc = "Find all the vertical lines and then track the longest one with a lightweight KNN."
         End Sub
+        Public Shared Function compare(lp1 As lpData, lp2 As lpData) As Boolean
+            If lp1.p1.X = lp2.p1.X And lp1.p1.Y = lp2.p1.Y And lp1.p2.X = lp2.p2.X And lp1.p2.Y = lp2.p2.Y Then
+                Return True
+            End If
+            Return False
+        End Function
         Private Function testLastPair(lastPair As lpData, gRect As gravityLine) As Boolean
             Dim distance1 = lastPair.p1.DistanceTo(lastPair.p2)
             Dim p1 = gRect.tc1.center
@@ -2964,7 +2987,7 @@ Namespace VBClasses
 
                 Dim p1 = gRect.tc1.center
                 Dim p2 = gRect.tc2.center
-                If longest.knn.lastPair.compare(New lpData) Then longest.knn.lastPair = New lpData(p1, p2)
+                If compare(New lpData, longest.knn.lastPair) Then longest.knn.lastPair = New lpData(p1, p2)
                 Dim pt = New cv.Point((p1.X + p2.X) / 2, (p1.Y + p2.Y) / 2)
                 SetTrueText(CStr(index) + vbCrLf + Format(gRect.arcY, fmt1), pt, 3)
                 index += 1
@@ -3733,7 +3756,7 @@ Namespace VBClasses
             For Each lp In task.lines.lpList
                 dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, cv.LineTypes.Link4)
                 Dim center = New cv.Point(CInt((lp.p1.X + lp.p2.X) / 2), CInt((lp.p1.Y + lp.p2.Y) / 2))
-                Dim lpPerp = lp.perpendicularPoints(center)
+                Dim lpPerp = XO_FCSLine_Vertical.perpendicularPoints(center, lp.slope)
                 Dim index1 As Integer = task.gridMap.Get(Of Integer)(lpPerp.p1.Y, lpPerp.p1.X)
                 Dim index2 As Integer = task.gridMap.Get(Of Integer)(lpPerp.p2.Y, lpPerp.p2.X)
                 Dim brick1 = bricks.brickList(index1)
@@ -15077,7 +15100,7 @@ Namespace VBClasses
                 Exit Sub
             End If
 
-            If lastPair.compare(New lpData) Then lastPair = New lpData(p1, p2)
+            If XO_FeatureLine_LongestVerticalKNN.compare(New lpData, lastPair) Then lastPair = New lpData(p1, p2)
             Dim distances As New List(Of Single)
             For i = 0 To trainInput.Count - 1 Step 2
                 Dim pt1 = trainInput(i)

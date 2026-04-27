@@ -331,7 +331,7 @@ Public Class NR_Line_Select : Inherits TaskParent
         delaunay.Run(src)
         dst2 = delaunay.dst1
         labels(2) = delaunay.labels(2)
-        strOut = task.lpD.displayCell(dst3)
+        strOut = task.lpD.lpDisplay(dst3)
         SetTrueText(strOut, 1) ' the line info is already prepped in strout in delaunay.
     End Sub
 End Class
@@ -831,7 +831,7 @@ Public Class Line_MapRects : Inherits TaskParent
             Else
                 task.lpD = task.lines.lpList(index)
             End If
-            task.lpD.displayCell(dst1)
+            task.lpD.lpDisplay(dst1)
         End If
     End Sub
 End Class
@@ -874,7 +874,7 @@ Public Class Line_Map : Inherits TaskParent
             Else
                 task.lpD = task.lines.lpList(index)
             End If
-            task.lpD.displayCell(dst1)
+            task.lpD.lpDisplay(dst1)
         End If
     End Sub
 End Class

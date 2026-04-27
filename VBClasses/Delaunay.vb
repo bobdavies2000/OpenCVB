@@ -367,7 +367,7 @@ Public Class Delaunay_LineSelect : Inherits TaskParent
         dst3.Line(task.lpD.p1, task.lpD.p2, cv.Scalar.Green, task.lineWidth, task.lineWidth)
 
         If task.lpD Is Nothing Then task.lpD = task.lines.lpList(0)
-        strOut = task.lpD.displayCell(dst2)
+        strOut = task.lpD.lpDisplay(dst2)
         SetTrueText(strOut, 3)
 
         For Each lp In task.lines.lpList
