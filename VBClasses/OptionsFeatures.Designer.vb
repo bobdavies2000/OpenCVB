@@ -28,7 +28,7 @@ Partial Class OptionsFeatures
         Label1 = New Label()
         Label2 = New Label()
         FeatureSampleSizeLabel = New Label()
-        FeatureSampleSize = New TrackBar()
+        FrameHistoryCount = New TrackBar()
         Label5 = New Label()
         FeatureCorrelationLabel = New Label()
         MatchCorrSlider = New TrackBar()
@@ -46,7 +46,7 @@ Partial Class OptionsFeatures
         ReductionSlider = New TrackBar()
         Label8 = New Label()
         Lab1 = New Label()
-        CType(FeatureSampleSize, ComponentModel.ISupportInitialize).BeginInit()
+        CType(FrameHistoryCount, ComponentModel.ISupportInitialize).BeginInit()
         CType(MatchCorrSlider, ComponentModel.ISupportInitialize).BeginInit()
         CType(ColorDiffSlider, ComponentModel.ISupportInitialize).BeginInit()
         CType(MotionPixelSlider, ComponentModel.ISupportInitialize).BeginInit()
@@ -101,16 +101,16 @@ Partial Class OptionsFeatures
         FeatureSampleSizeLabel.TabIndex = 9
         FeatureSampleSizeLabel.Text = "lab2"
         ' 
-        ' FeatureSampleSize
+        ' FrameHistoryCount
         ' 
-        FeatureSampleSize.Location = New Point(235, 218)
-        FeatureSampleSize.Margin = New Padding(4)
-        FeatureSampleSize.Maximum = 400
-        FeatureSampleSize.Minimum = 1
-        FeatureSampleSize.Name = "FeatureSampleSize"
-        FeatureSampleSize.Size = New Size(550, 69)
-        FeatureSampleSize.TabIndex = 8
-        FeatureSampleSize.Value = 100
+        FrameHistoryCount.Location = New Point(235, 218)
+        FrameHistoryCount.Margin = New Padding(4)
+        FrameHistoryCount.Maximum = 30
+        FrameHistoryCount.Minimum = 1
+        FrameHistoryCount.Name = "FrameHistoryCount"
+        FrameHistoryCount.Size = New Size(550, 69)
+        FrameHistoryCount.TabIndex = 8
+        FrameHistoryCount.Value = 3
         ' 
         ' Label5
         ' 
@@ -119,7 +119,7 @@ Partial Class OptionsFeatures
         Label5.Name = "Label5"
         Label5.Size = New Size(209, 30)
         Label5.TabIndex = 7
-        Label5.Text = "Feature Sample Size"
+        Label5.Text = "Frame History"
         ' 
         ' FeatureCorrelationLabel
         ' 
@@ -302,7 +302,7 @@ Partial Class OptionsFeatures
         Controls.Add(MatchCorrSlider)
         Controls.Add(Label9)
         Controls.Add(FeatureSampleSizeLabel)
-        Controls.Add(FeatureSampleSize)
+        Controls.Add(FrameHistoryCount)
         Controls.Add(Label5)
         Controls.Add(Label2)
         Controls.Add(Label1)
@@ -312,7 +312,7 @@ Partial Class OptionsFeatures
         Margin = New Padding(4)
         Name = "OptionsFeatures"
         Text = "Important Options for Color, Features, Edges, Lines, and Masks"
-        CType(FeatureSampleSize, ComponentModel.ISupportInitialize).EndInit()
+        CType(FrameHistoryCount, ComponentModel.ISupportInitialize).EndInit()
         CType(MatchCorrSlider, ComponentModel.ISupportInitialize).EndInit()
         CType(ColorDiffSlider, ComponentModel.ISupportInitialize).EndInit()
         CType(MotionPixelSlider, ComponentModel.ISupportInitialize).EndInit()
@@ -326,7 +326,7 @@ Partial Class OptionsFeatures
     Friend WithEvents Label1 As Label
     Friend WithEvents Label2 As Label
     Friend WithEvents FeatureSampleSizeLabel As Label
-    Friend WithEvents FeatureSampleSize As TrackBar
+    Friend WithEvents FrameHistoryCount As TrackBar
     Friend WithEvents Label5 As Label
     Friend WithEvents FeatureCorrelationLabel As Label
     Friend WithEvents MatchCorrSlider As TrackBar

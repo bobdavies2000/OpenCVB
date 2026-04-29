@@ -458,9 +458,9 @@ Public Module Structures
             If angle >= 90.0 Then angle -= 180.0
             If angle < -90.0 Then angle += 180.0
 
-            Dim w = Math.Abs(p1.X - p2.X)
-            Dim h = Math.Abs(p1.Y - p2.Y)
             Dim pad As Integer = 5
+            Dim w = Math.Abs(p1.X - p2.X) + pad * 2
+            Dim h = Math.Abs(p1.Y - p2.Y) + pad
             ' p1 is always leftmost point.
             If Math.Abs(angle) > 45 Then
                 rect = New cv.Rect(p1.X - pad, Math.Min(p1.Y, p2.Y),

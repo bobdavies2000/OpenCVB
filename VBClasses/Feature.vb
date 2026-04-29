@@ -52,7 +52,7 @@ Public Class Feature_Basics : Inherits TaskParent
                 ptLatest = FAST.features
                 strOut = "FAST produced " + CStr(ptLatest.Count) + " features"
             Case "GoodFeatures"
-                ptLatest = cv.Cv2.GoodFeaturesToTrack(src, task.fOptions.FeatureSampleSize.Value, options.quality,
+                ptLatest = cv.Cv2.GoodFeaturesToTrack(src, task.fOptions.FrameHistoryCount.Value, options.quality,
                                                       options.minDistance, New cv.Mat,
                                                       options.blockSize, True, options.k).ToList
                 strOut = "GoodFeatures produced " + CStr(ptLatest.Count) + " features"
@@ -126,7 +126,7 @@ Public Class NR_Feature_Basics : Inherits TaskParent
         Dim ptLatest As New List(Of cv.Point2f)
         Select Case task.fOptions.FeatureMethod.Text
             Case "GoodFeatures"
-                ptLatest = cv.Cv2.GoodFeaturesToTrack(src, task.fOptions.FeatureSampleSize.Value, options.quality,
+                ptLatest = cv.Cv2.GoodFeaturesToTrack(src, task.fOptions.FrameHistoryCount.Value, options.quality,
                                                       options.minDistance, New cv.Mat,
                                                       options.blockSize, True, options.k).ToList
                 strOut = "GoodFeatures produced " + CStr(ptLatest.Count) + " features"
@@ -600,7 +600,7 @@ Public Class Feature_Matching : Inherits TaskParent
     Dim match As New Match_Basics
     Dim feat As New Feature_Basics
     Public Sub New()
-        task.fOptions.FeatureSampleSize.Value = 150
+        task.FeatureSampleSize = 150
         desc = "Use correlation coefficient to keep features from frame to frame."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)

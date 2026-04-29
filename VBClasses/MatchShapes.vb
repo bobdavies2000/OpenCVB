@@ -85,7 +85,7 @@ Public Class MatchShapes_Nearby : Inherits TaskParent
             Exit Sub
         End If
 
-        Static rcListLast As List(Of rcData)
+        Static rcListLast As New List(Of rcData)
         If task.heartBeat Then
             rcListLast = New List(Of rcData)(redC.rcList)
             dst3.SetTo(0)

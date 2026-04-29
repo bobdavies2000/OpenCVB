@@ -10,7 +10,7 @@ Public Class Swarm_Basics : Inherits TaskParent
     Dim cornerHistory As New List(Of List(Of cv.Point))
     Dim feat As New Feature_Basics
     Public Sub New()
-        task.fOptions.FeatureSampleSize.Value = task.fOptions.FeatureSampleSize.Maximum
+        task.fOptions.FrameHistoryCount.Value = task.fOptions.FrameHistoryCount.Maximum
         dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         dst3 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         desc = "Track the GoodFeatures across a frame history and connect the first and last good.corners in the history."

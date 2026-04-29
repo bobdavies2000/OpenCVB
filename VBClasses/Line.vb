@@ -1562,80 +1562,85 @@ End Class
 
 Public Class Line_TrackV : Inherits TaskParent
     Public lastV As New List(Of lpData)
-    Public lpVList As New List(Of lpData)
+    Public matchList As New List(Of lpData)
     Dim knn As New KNN_N4Basics
     Dim match As New Match_Basics
     Dim lastImage As cv.Mat
+    Dim verticalLast As New List(Of lpData)
     Public Sub New()
+        labels(3) = "The vertical lines found in the previous heartbeat image."
         desc = "Track the vertical lines on the heartbeat."
     End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        If task.firstPass Then lastImage = src.Clone
+    Private Function getVerticals(lpList As List(Of lpData)) As List(Of lpData)
         Dim verticals As New List(Of lpData)
-        Dim index As Integer
-        For i = 0 To task.lines.lpList.Count - 1
-            Dim lp = task.lines.lpList(i)
+        For Each lp In lpList
             If lp.pE1.Y <> 0 And lp.pE2.Y <> 0 Then Continue For
-            If lp.pE1.Y = 0 Then lp = New lpData(lp.p1, lp.p2) Else lp = New lpData(lp.p2, lp.p1)
-            lp.index = index
-            index += 1
+            If lp.pE1.Y <> 0 Then lp = New lpData(lp.p2, lp.p1)
+            lp.index = verticals.Count + 1
             verticals.Add(lp)
         Next
+        Return verticals
+    End Function
 
-        If task.heartBeatLT Then dst3.SetTo(0)
-        dst3.SetTo(0)
-        For Each lp In verticals
-            dst3.Line(lp.pE1, lp.pE2, lp.color, task.lineWidth, cv.LineTypes.Link4)
-            If lp.index >= 2 Then Exit For
-        Next
-
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        If task.firstPass Then
+            lastImage = src.Clone
+            verticalLast = getVerticals(task.lines.lpList)
+        End If
         If task.heartBeatLT Then
+            dst3.SetTo(0)
+            For Each lp In verticalLast
+                dst3.Line(lp.pE1, lp.pE2, lp.color, task.lineWidth, cv.LineTypes.Link4)
+            Next
+
             knn.trainInput.Clear()
-            For Each lp In lpVList
+            For Each lp In verticalLast
                 knn.trainInput.Add(New cv.Vec4f(lp.pE1.X, lp.pE1.Y, lp.pE2.X, lp.pE2.Y))
             Next
 
+            Dim verticalsCurr = getVerticals(task.lines.lpList)
             knn.queries.Clear()
-            For Each lp In verticals
+            For Each lp In verticalsCurr
                 knn.queries.Add(New cv.Vec4f(lp.pE1.X, lp.pE1.Y, lp.pE2.X, lp.pE2.Y))
             Next
 
             knn.Run(emptyMat)
 
-            lpVList.Clear()
+            matchList.Clear()
             dst2.SetTo(0)
-            For i = 0 To verticals.Count - 1
-                Dim lp1 = verticals(i)
+            Dim correlationCount As Integer
+            Dim angleCount As Integer
+            Dim intersectCount As Integer
+            For i = 0 To verticalsCurr.Count - 1
+                Dim lp = verticalsCurr(i)
                 Dim vec = knn.trainInput(knn.result(i, 0))
-                Dim lp2 = New lpData(New cv.Point2f(vec(0), vec(1)), New cv.Point2f(vec(2), vec(3)))
+                Dim lpPrev = New lpData(New cv.Point2f(vec(0), vec(1)), New cv.Point2f(vec(2), vec(3)))
 
-                Dim gridIndex = task.gridMap.Get(Of Integer)(lp1.ptCenter.Y, lp1.ptCenter.X)
-                Dim rect1 = task.gridNabeRects(gridIndex)
-                gridIndex = task.gridMap.Get(Of Integer)(lp2.ptCenter.Y, lp2.ptCenter.X)
-                Dim rect2 = task.gridNabeRects(gridIndex)
+                If lp.rect.IntersectsWith(lpPrev.rect) Then
+                    match.template = lastImage(lpPrev.rect)
+                    match.Run(src(lp.rect))
+                    If match.correlation > task.fCorrThreshold Then
+                        dst2.Line(lp.pE1, lp.pE2, task.scalarColors(i), task.lineWidth, cv.LineTypes.Link4)
+                        dst2.Line(lpPrev.pE1, lpPrev.pE2, task.scalarColors(i), task.lineWidth, cv.LineTypes.Link4)
 
-                If rect1.IntersectsWith(rect2) Then
-                    If Math.Abs(lp1.angle - lp2.angle) < 2 Then
-                        match.template = lastImage(rect1)
-                        match.Run(src(rect2))
-                        If match.correlation > 0.95 Then
-                            dst2.Line(lp1.pE1, lp1.pE2, task.scalarColors(i), task.lineWidth, cv.LineTypes.Link4)
-                            dst2.Line(lp2.pE1, lp2.pE2, task.scalarColors(i), task.lineWidth, cv.LineTypes.Link4)
-
-                            lpVList.Add(lp1)
-                            lpVList.Add(lp2)
-                        Else
-                            Dim k = 0
-                        End If
+                        matchList.Add(lp)
+                        matchList.Add(lpPrev)
                     Else
-                        Dim k = 0
+                        correlationCount += 1
+                        Continue For
                     End If
                 Else
-                    Dim k = 0
+                    intersectCount += 1
+                    Continue For
                 End If
+                Exit For
             Next
 
+            labels(2) = CStr(matchList.Count / 2) + " matches found" + ".  Match failures: Correlation = " +
+                        CStr(correlationCount) + " Angle = " + CStr(angleCount) + " intersection = " +
+                        CStr(intersectCount)
             lastImage = src.Clone
+            verticalLast = New List(Of lpData)(verticalsCurr)
         End If
     End Sub
 End Class

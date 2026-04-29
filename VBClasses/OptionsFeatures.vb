@@ -121,8 +121,8 @@
         task.optionsChanged = True
         FeatureCorrelationLabel.Text = Format(task.fCorrThreshold, fmt2)
     End Sub
-    Private Sub FeatureSampleSize_ValueChanged(sender As Object, e As EventArgs) Handles FeatureSampleSize.ValueChanged
-        task.FeatureSampleSize = FeatureSampleSize.Value
+    Private Sub FeatureSampleSize_ValueChanged(sender As Object, e As EventArgs) Handles FrameHistoryCount.ValueChanged
+        task.FeatureSampleSize = FrameHistoryCount.Value
         task.optionsChanged = True
         FeatureSampleSizeLabel.Text = CStr(task.FeatureSampleSize)
     End Sub

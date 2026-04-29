@@ -2706,7 +2706,7 @@ Namespace VBClasses
 
     Public Class XO_FCSLine_Vertical : Inherits TaskParent
         Dim verts As New XO_Line_TrigVertical
-        Dim minRect As New LineRect_Basics
+        Dim minRect As New LineTrack_Rect
         Dim options As New Options_FCSLine
         Public Sub New()
             desc = "Find all verticle lines and combine them if they are 'close'."
@@ -3738,7 +3738,7 @@ Namespace VBClasses
 
 
 
-    Public Class XO_LineRect_CenterDepth : Inherits TaskParent
+    Public Class XO_LineTrack_CenterDepth : Inherits TaskParent
         Dim bricks As New Brick_Basics
         Public options As New Options_LineRect
         Public Sub New()
@@ -5324,7 +5324,7 @@ Namespace VBClasses
     Public Class XO_TrackLine_Basics_TAOld : Inherits TaskParent
         Public lpInput As lpData
         Public foundLine As Boolean
-        Dim match As New LineEnds_Correlation
+        Dim match As New LineTrack_Correlation
         Dim options As New Options_Features
         Public Sub New()
             desc = "Track an individual line as best as possible."
@@ -5594,7 +5594,7 @@ Namespace VBClasses
         Public sides As New XO_FPoly_Sides
         Dim options As New Options_Features
         Public Sub New()
-            task.fOptions.FeatureSampleSize.Value = 30
+            task.FeatureSampleSize = 30
             If dst2.Width >= 640 Then OptionParent.FindSlider("Resync if feature moves > X pixels").Value = 15
             If standalone Then task.gOptions.displayDst1.Checked = True
             labels = {"", "Feature Polygon with perpendicular lines for center of rotation.", "Feature polygon created by highest generation counts",
@@ -5850,7 +5850,7 @@ Namespace VBClasses
         Dim optionsEx As New Options_Features
         Public Sub New()
             center = New XO_FPoly_Center
-            task.fOptions.FeatureSampleSize.Value = 30
+            task.FeatureSampleSize = 30
             If dst2.Width >= 640 Then OptionParent.FindSlider("Resync if feature moves > X pixels").Value = 15
             If standalone Then task.gOptions.displayDst1.Checked = True
             labels = {"", "Feature Polygon with perpendicular lines for center of rotation.",
@@ -6837,7 +6837,7 @@ Namespace VBClasses
         Dim optionsEx As New Options_Features
         Public Sub New()
             dst0 = New cv.Mat(dst0.Size(), cv.MatType.CV_32F, cv.Scalar.All(0))
-            task.fOptions.FeatureSampleSize.Value = 20
+            task.FeatureSampleSize = 20
             labels(3) = "Feature points with anchor"
             desc = "Feature Grid: compute distances between good features from frame to frame"
         End Sub
@@ -7582,7 +7582,7 @@ Namespace VBClasses
 
     Public Class XO_MatchLine_Test : Inherits TaskParent
         Public cameraMotionProxy As New lpData
-        Dim match As New LineEnds_Correlation
+        Dim match As New LineTrack_Correlation
         Public Sub New()
             desc = "Find and track the longest line by matching line bricks."
         End Sub
@@ -8403,7 +8403,7 @@ Namespace VBClasses
 
     Public Class XO_Line_GravityToLongest : Inherits TaskParent
         Dim kalman As New Kalman_Basics
-        Dim matchLine As New LineEnds_Correlation
+        Dim matchLine As New LineTrack_Correlation
         Public Sub New()
             desc = "Highlight both vertical and horizontal lines"
         End Sub
@@ -9190,7 +9190,7 @@ Namespace VBClasses
     Public Class XO_GL_Draw3DLinesAndCloud : Inherits TaskParent
         Dim line3D As New XO_Line3D_ReconstructLines
         Public Sub New()
-            task.fOptions.FeatureSampleSize.Value = task.fOptions.FeatureSampleSize.Maximum
+            task.FeatureSampleSize = 400
             desc = "Draw the RGB lines in SharpGL and include the line points."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -11120,6 +11120,8 @@ Namespace VBClasses
             desc = "Identify the largest redCloud cells and accumulate them by size - largest to smallest"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
+            options.Run()
+
             dst2 = runRedList(src, labels(2))
             If task.redList.rclist.Count = 0 Then Exit Sub ' next frame please...
 
@@ -15329,7 +15331,7 @@ Namespace VBClasses
         Dim options As New Options_KNN
         Dim feat As New Feature_Basics
         Public Sub New()
-            task.fOptions.FeatureSampleSize.Value = 200
+            task.FeatureSampleSize = 200
             dotSlider = OptionParent.FindSlider("Average distance multiplier")
             If standalone Then task.gOptions.displayDst1.Checked = True
             labels = {"", "Histogram of Y-Axis camera motion", "Yellow points are good features and the white trail in the center estimates camera motion.", "Histogram of X-Axis camera motion"}

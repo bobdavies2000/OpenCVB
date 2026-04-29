@@ -122,9 +122,7 @@ LeftRight
 Line
 Line3D
 LinearRegression
-LineEnds
-LineMatch
-LineRect
+LineTrack
 LUT
 Magnify
 Mat
