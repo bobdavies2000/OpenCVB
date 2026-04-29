@@ -429,25 +429,39 @@ Public Class NR_LineTrack_CenterNeighbor : Inherits TaskParent
 
 Public Class LineTrack_Repeat : Inherits TaskParent
     Public lp As New lpData
-    Dim ld As cv.XImgProc.FastLineDetector
     Public Sub New()
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
-        ld = cv.XImgProc.CvXImgProc.CreateFastLineDetector
-        desc = "Repeat the search for the longest line in the previous frame."
+        desc = "Cursor.ai: Repeat the search for the longest line in the previous frame."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
+        dst2 = src.Clone
+
         If task.lines.lpList.Count = 0 Then Exit Sub
 
-        If task.firstPass Then lp = task.lines.lpList(0) ' track the longest line in the image
+        ' Always start by using every line already found by task.lines.
+        Dim candidates As List(Of lpData) = task.lines.lpList
+
+        lp = task.lines.lpList(0)
+        Dim bestIndex As Integer = -1
+        Dim bestScore As Single = Single.MaxValue
+        For i = 0 To candidates.Count - 1
+            Dim candidate = candidates(i)
+            Dim centerScore = lp.ptCenter.DistanceTo(candidate.ptCenter)
+            Dim sameEndpointOrder = lp.p1.DistanceTo(candidate.p1) + lp.p2.DistanceTo(candidate.p2)
+            Dim swappedEndpointOrder = lp.p1.DistanceTo(candidate.p2) + lp.p2.DistanceTo(candidate.p1)
+            Dim endpointScore = Math.Min(sameEndpointOrder, swappedEndpointOrder)
+            Dim angleScore = Math.Abs(lp.angle - candidate.angle) * 5.0F
+            Dim totalScore = centerScore + endpointScore + angleScore
+            If totalScore < bestScore Then
+                bestScore = totalScore
+                bestIndex = i
+            End If
+        Next
+        If bestIndex >= 0 Then lp = candidates(bestIndex)
+
         If src.Channels <> 1 Or src.Type <> cv.MatType.CV_8U Then src = task.gray.Clone
 
-        dst1.SetTo(0)
-        Dim lpList = Line_Basics_TA.getRawLines(ld.Detect(src))
-        For Each lp In lpList
-        Next
-
-    End Sub
-    Protected Overrides Sub Finalize()
-        ld.Dispose()
+        DrawLine(dst2, lp.p1, lp.p2, task.highlight, task.lineWidth + 1)
+        labels(2) = "Tracking line length = " + Format(lp.length, fmt1) + " angle = " + Format(lp.angle, fmt1)
     End Sub
 End Class

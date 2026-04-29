@@ -553,7 +553,7 @@ Public Class ML_FeatureLess : Inherits TaskParent
     Public Sub New()
         If standalone Then task.gOptions.displayDst1.Checked = True
         dst1 = New cv.Mat(dst2.Size, cv.MatType.CV_8U)
-        desc = "Cursor: Use FeatureLess_RedColor to learn BGR in each featureless grid cell, then RTrees predicts cell-id per pixel in that cell's surrounding grid rects."
+        desc = "Cursor.ai: Use FeatureLess_RedColor to learn BGR in each featureless grid cell, then RTrees predicts cell-id per pixel in that cell's surrounding grid rects."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         fRed.Run(src)
@@ -643,7 +643,7 @@ Public Class ML_FeatureLess_Grid : Inherits TaskParent
     Public Sub New()
         If standalone Then task.gOptions.displayDst1.Checked = True
         dst1 = New cv.Mat(dst2.Size, cv.MatType.CV_8U)
-        desc = "Cursor: Train mean-BGR per FeatureLess_RedColor cell. FeatureLess rects use known class colors; other neighbors green if RTrees class matches center, red if not."
+        desc = "Cursor.ai: Train mean-BGR per FeatureLess_RedColor cell. FeatureLess rects use known class colors; other neighbors green if RTrees class matches center, red if not."
     End Sub
     Private Shared Function MeanBGR(rgb32f As cv.Mat, gr As cv.Rect) As cv.Vec3f
         Dim m = rgb32f(gr).Mean()

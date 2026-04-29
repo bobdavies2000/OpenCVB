@@ -19353,7 +19353,7 @@ Namespace VBClasses
         End Class
         Public Sub New()
             labels(3) = "Input from RedColor_NoMatching."
-            desc = "Cursor: Track connected regions from RedColor_NoMatching and keep stable colors while regions persist."
+            desc = "Cursor.ai: Track connected regions from RedColor_NoMatching and keep stable colors while regions persist."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             fLess.Run(task.grayOriginal)
