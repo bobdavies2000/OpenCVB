@@ -277,3 +277,30 @@ Public Class Correlation_MinMaxRange : Inherits TaskParent
         lastsrc = src.Clone
     End Sub
 End Class
+
+
+
+
+
+Public Class Correlation_LinesSimple : Inherits TaskParent
+    Dim correlation As Single = 0
+    Public Sub New()
+        desc = "Test the correlation of the current line image to the previous."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        SetTrueText("Correlation = " + Format(correlation, fmt2), 3)
+        If task.heartBeatLT = False Then Exit Sub
+
+        Static lastImage As cv.Mat = task.lines.dst3.Clone
+
+        dst2 = task.lines.dst3.Clone
+
+        Dim correlationMat As New cv.Mat
+        cv.Cv2.MatchTemplate(task.lines.dst3, lastImage, correlationMat, cv.TemplateMatchModes.CCoeffNormed)
+
+        correlation = correlationMat.Get(Of Single)(0, 0)
+
+        dst2.SetTo(128, lastImage)
+        lastImage = task.lines.dst3.Clone
+    End Sub
+End Class

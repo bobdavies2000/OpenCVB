@@ -121,7 +121,7 @@ End Class
 
 
 
-Public Class LineTrack_Correlation : Inherits TaskParent
+Public Class LineTrack_CorrelationNabe : Inherits TaskParent
     Public lpInput As lpData
     Dim match As New Match_Basics
     Public p1Correlation As Single
@@ -130,22 +130,22 @@ Public Class LineTrack_Correlation : Inherits TaskParent
         desc = "Compare area around end points of a line to the previous image."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If standalone Then lpInput = task.lines.lpList(0)
+        If standalone And task.heartBeat Then lpInput = task.lines.lpList(0)
         Static lastImage = task.gray.Clone
 
         Dim p1GridIndex = task.gridMap.Get(Of Integer)(lpInput.p1.Y, lpInput.p1.X)
         Dim rect = task.gridRects(p1GridIndex)
-        match.template = task.gray(rect)
-        match.Run(lastImage(task.gridNabeRects(p1GridIndex)))
+        Dim rectNabe = task.gridNabeRects(p1GridIndex)
+        match.template = task.gray(rectNabe)
+        match.Run(lastImage(rectNabe))
         p1Correlation = match.correlation
 
         Dim p2GridIndex = task.gridMap.Get(Of Integer)(lpInput.p2.Y, lpInput.p2.X)
         rect = task.gridRects(p2GridIndex)
-        match.template = task.gray(rect)
-        match.Run(lastImage(task.gridNabeRects(p2GridIndex)))
+        rectNabe = task.gridNabeRects(p2GridIndex)
+        match.template = task.gray(rectNabe)
+        match.Run(lastImage(rectNabe))
         p2Correlation = match.correlation
-
-        lastImage = task.gray.Clone
 
         If standaloneTest() Then
             dst2 = src.Clone
@@ -154,6 +154,8 @@ Public Class LineTrack_Correlation : Inherits TaskParent
         labels(2) = "Rect for p1 has correlation " + Format(p1Correlation, fmt3) +
                         " to the previous image while " +
                         "rect for p2 has " + Format(p2Correlation, fmt3)
+
+        lastImage = task.gray.Clone
     End Sub
 End Class
 
@@ -608,5 +610,65 @@ Public Class LineTrack_Changes : Inherits TaskParent
         dst3 = task.lines.dst2
 
         lastImage = task.lines.dst3.Clone
+    End Sub
+End Class
+
+
+
+
+
+Public Class LineTrack_Correlation : Inherits TaskParent
+    Public lpInput As lpData
+    Dim match As New Match_Basics
+    Public p1Correlation As Single
+    Public p2Correlation As Single
+    Public Sub New()
+        desc = "Compare area around end points of a line to the previous image."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        SetTrueText(strOut, 3)
+
+        If standalone And task.afterHeartBeatLT Then lpInput = task.lines.lpList(0)
+        If task.heartBeatLT = False Then Exit Sub
+        Static lastImage = task.gray.Clone
+
+        Dim p1GridIndex = task.gridMap.Get(Of Integer)(lpInput.p1.Y, lpInput.p1.X)
+        Dim rect = task.gridRects(p1GridIndex)
+        Dim deltaX As Integer, deltaY As Integer, p1 As cv.Point, p2 As cv.Point
+        match.template = task.gray(rect)
+        match.Run(lastImage(task.gridNabeRects(p1GridIndex)))
+        p1Correlation = match.correlation
+
+        deltaX = task.gridWH - match.mm.maxLoc.X
+        deltaY = task.gridWH - match.mm.maxLoc.X
+        p1 = New cv.Point(lpInput.p1.X + deltaX, lpInput.p1.Y + deltaY)
+
+        strOut = "P1.x moved " + CStr(deltaX) + ", P1.y moved " + CStr(deltaY) + " pixels" + vbCrLf
+
+        Dim p2GridIndex = task.gridMap.Get(Of Integer)(lpInput.p2.Y, lpInput.p2.X)
+        rect = task.gridRects(p2GridIndex)
+        match.template = task.gray(rect)
+        match.Run(lastImage(task.gridNabeRects(p2GridIndex)))
+        p2Correlation = match.correlation
+
+        deltaX = task.gridWH - match.mm.maxLoc.X
+        deltaY = task.gridWH - match.mm.maxLoc.X
+        p2 = New cv.Point(lpInput.p2.X + deltaX, lpInput.p2.Y + deltaY)
+
+        strOut += "P2.x moved " + CStr(deltaX) + ", P2.y moved " + CStr(deltaY) + " pixels" + vbCrLf
+
+        lastImage = task.gray.Clone
+        Dim lp = New lpData(p1, p2)
+
+        dst2 = src.Clone
+        dst2.Line(lpInput.p1, lpInput.p2, task.highlight, task.lineWidth)
+        dst2.Line(lp.p1, lp.p2, white, task.lineWidth)
+
+        lpInput = lp
+
+        labels(2) = "Rect for p1 has correlation " + Format(p1Correlation, fmt3) +
+                    " to the previous image while " +
+                    "rect for p2 has " + Format(p2Correlation, fmt3)
+
     End Sub
 End Class

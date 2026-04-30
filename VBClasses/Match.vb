@@ -6,6 +6,7 @@ Public Class Match_Basics : Inherits TaskParent
     Public correlation As Single
     Public newCenter As cv.Point
     Public newRect As New cv.Rect
+    Public mm As mmData
     Public Sub New()
         desc = "Find the requested template in an image.  Managing template is responsibility of caller " +
                        "(allows multiple targets per image.)"
@@ -17,7 +18,7 @@ Public Class Match_Basics : Inherits TaskParent
         End If
 
         cv.Cv2.MatchTemplate(template, src, dst0, cv.TemplateMatchModes.CCoeffNormed)
-        Dim mm = GetMinMax(dst0)
+        mm = GetMinMax(dst0)
 
         correlation = mm.maxVal
         labels(2) = "Template (at right) has " + Format(correlation, fmt3) + " Correlation to the src input"

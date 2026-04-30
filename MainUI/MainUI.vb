@@ -368,8 +368,6 @@ Namespace MainApp
             vbc.task.pointCloud = New cv.Mat(settings.workRes, cv.MatType.CV_32FC3, 0)
             vbc.task.leftView = New cv.Mat(settings.workRes, cv.MatType.CV_8U, 0)
             vbc.task.rightView = New cv.Mat(settings.workRes, cv.MatType.CV_8U, 0)
-            vbc.task.gridRatioX = pics(0).Width / settings.workRes.Width
-            vbc.task.gridRatioY = pics(0).Height / settings.workRes.Height
             vbc.task.homeDir = homeDir
             vbc.task.calibData = camera.calibData
 

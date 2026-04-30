@@ -60,10 +60,6 @@ Public Module vbc
 
         If task.frameCount = 1 Then task.heartBeat = True
 
-        Static lastHeartBeatLT As Boolean = task.heartBeatLT
-        task.afterHeartBeatLT = If(lastHeartBeatLT, True, False)
-        lastHeartBeatLT = task.heartBeatLT
-
         If task.heartBeat Then
             task.heartBeatCount += 1
             If task.heartBeatCount Mod 5 = 0 Then task.heartBeatLT = True
@@ -74,6 +70,14 @@ Public Module vbc
 
         If (task.msWatch - task.msLast) > 1000 Then task.msLast = task.msWatch
         If task.heartBeatLT Then task.toggleOn = Not task.toggleOn
+
+        Static lastHeartBeatLT As Boolean = False
+        If lastHeartBeatLT Then
+            task.afterHeartBeatLT = True
+        Else
+            task.afterHeartBeatLT = False
+        End If
+        lastHeartBeatLT = task.heartBeatLT
 
         task.metersPerPixel = task.MaxZmeters / task.workRes.Height ' meters per pixel in projections - side and top.
     End Sub

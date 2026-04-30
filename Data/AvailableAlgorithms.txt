@@ -125,6 +125,7 @@ Corner_ShiTomasi_CPP
 Correlation_Basics
 Correlation_BasicsPlot
 Correlation_Interactive
+Correlation_LinesSimple
 Correlation_MinMaxRange
 Correlation_Validate
 Covariance_Basics
@@ -477,10 +478,11 @@ Line3D_Selection
 LinearRegression_Basics
 LineTrack_Basics
 LineTrack_Changes
-LineTrack_Confirm
 LineTrack_Correlation
+LineTrack_CorrelationNabe
 LineTrack_Match
 LineTrack_Rect
+LineTrack_SearchX
 LineTrack_Slices
 LineTrack_Top3
 LineTrack_TrackCorrelation
