@@ -261,7 +261,6 @@ Partial Public Class AlgorithmTask
     Public metersPerPixel As Single
     Public OpenGL_Left As Integer
     Public OpenGL_Top As Integer
-    Public displayDst1 As Boolean
     Public depthAndDepthRange As String = ""
     Public resolutionDetails As String = ""
     Public sharpGL As SharpGLForm

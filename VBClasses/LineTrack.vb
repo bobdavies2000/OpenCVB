@@ -1,8 +1,54 @@
 Imports System.Runtime.InteropServices
+Imports System.Windows.Forms.Design.AxImporter
 Imports cv = OpenCvSharp
 Public Class LineTrack_Basics : Inherits TaskParent
+    Public lp As lpData
+    Public lpNew As lpData
+    Public diffX As Integer
+    Public diffY As Integer
+    Public Sub New()
+        desc = "Search for the requested line in the previous frames."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        dst2 = src.Clone
+
+        If task.lines.lpList.Count = 0 Then Exit Sub
+
+        If standalone And task.heartBeatLT Then lp = task.lines.lpList(0)
+        Dim scores As New List(Of Single)
+        For Each candidate In task.lines.lpList
+            Dim centerScore = lp.ptCenter.DistanceTo(candidate.ptCenter)
+            Dim sameEndpointOrder = lp.p1.DistanceTo(candidate.p1) + lp.p2.DistanceTo(candidate.p2)
+            Dim swappedEndpointOrder = lp.p1.DistanceTo(candidate.p2) + lp.p2.DistanceTo(candidate.p1)
+            Dim endpointScore = Math.Min(sameEndpointOrder, swappedEndpointOrder)
+            Dim angleScore = Math.Abs(lp.angle - candidate.angle) * 5.0F
+            Dim totalScore = centerScore + endpointScore + angleScore
+            scores.Add(totalScore)
+        Next
+
+        Dim bestindex = scores.IndexOf(scores.Min)
+        lpNew = task.lines.lpList(bestindex)
+
+        If Math.Abs(lpNew.length - lp.length) > lp.length / 4 Then
+            lpNew = Nothing
+            Exit Sub
+        End If
+        If Math.Abs(lpNew.angle - lp.angle) > 3 Then lpNew = Nothing
+
+        DrawLine(dst2, lp.p1, lp.p2, task.highlight, task.lineWidth + 1)
+        labels(2) = "Tracking line length = " + Format(lp.length, fmt1) + " angle = " + Format(lp.angle, fmt1)
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class LineTrack_TrackCorrelation : Inherits TaskParent
     Dim match As New LineTrack_Correlation
-    Public correlations As New List(Of Single)
+    Public correlation As New Single
+    Public lp As lpData
     Public Sub New()
         task.fOptions.MatchCorrSlider.Value = 90
         desc = "Track each of the lines found in Line_Basics_TA"
@@ -10,19 +56,13 @@ Public Class LineTrack_Basics : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst2 = src.Clone
         dst3 = task.rightView
-        correlations.Clear()
-        For Each lp In task.lines.lpList
-            match.lpInput = lp
-            match.Run(src)
-            correlations.Add(match.p1Correlation)
-            correlations.Add(match.p2Correlation)
-            If match.p1Correlation > task.fCorrThreshold And match.p2Correlation > task.fCorrThreshold Then
-                DrawLine(dst2, lp.p1, lp.p2)
-            End If
-            dst2.Rectangle(lp.rect, white, task.lineWidth)
+        match.lpInput = lp
+        match.Run(src)
+        If match.p1Correlation > task.fCorrThreshold And match.p2Correlation > task.fCorrThreshold Then
             DrawLine(dst2, lp.p1, lp.p2)
-            Exit For ' only evaluating the longest line for now...
-        Next
+        End If
+        dst2.Rectangle(lp.rect, white, task.lineWidth)
+        DrawLine(dst2, lp.p1, lp.p2)
 
         labels(2) = match.labels(2)
         dst3 = task.lines.dst3
@@ -333,53 +373,53 @@ End Class
 
 
 Public Class NR_LineTrack_CenterNeighbor : Inherits TaskParent
-        Dim bricks As New Brick_Basics
-        Public options As New Options_LineRect
-        Public Sub New()
-            desc = "Remove lines which have similar depth in bricks on either side of a line."
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            bricks.Run(src)
-            options.Run()
+    Dim bricks As New Brick_Basics
+    Public options As New Options_LineRect
+    Public Sub New()
+        desc = "Remove lines which have similar depth in bricks on either side of a line."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        bricks.Run(src)
+        options.Run()
 
-            dst2 = src.Clone
-            dst3 = src.Clone
+        dst2 = src.Clone
+        dst3 = src.Clone
 
-            Dim depthThreshold = options.depthThreshold
-            Dim depthLines As Integer, colorLines As Integer
-            For Each lp In task.lines.lpList
-                Dim center = New cv.Point((lp.p1.X + lp.p2.X) \ 2, (lp.p1.Y + lp.p2.Y) \ 2)
-                Dim index As Integer = task.gridMap.Get(Of Integer)(center.Y, center.X)
-                Dim nabeList = task.gridNabes(index)
-                Dim foundObjectLine As Boolean = False
-                For i = 1 To nabeList.Count - 1
-                    Dim brick1 = bricks.brickList(nabeList(i))
-                    If brick1.depth = 0 Then Continue For
-                    For j = i + 1 To nabeList.Count - 1
-                        Dim brick2 = bricks.brickList(nabeList(j))
-                        If brick2.depth = 0 Then Continue For
-                        If Math.Abs(brick1.depth - brick2.depth) > depthThreshold Then
-                            foundObjectLine = True
-                            Exit For
-                        End If
-                    Next
-                    If foundObjectLine Then Exit For
+        Dim depthThreshold = options.depthThreshold
+        Dim depthLines As Integer, colorLines As Integer
+        For Each lp In task.lines.lpList
+            Dim center = New cv.Point((lp.p1.X + lp.p2.X) \ 2, (lp.p1.Y + lp.p2.Y) \ 2)
+            Dim index As Integer = task.gridMap.Get(Of Integer)(center.Y, center.X)
+            Dim nabeList = task.gridNabes(index)
+            Dim foundObjectLine As Boolean = False
+            For i = 1 To nabeList.Count - 1
+                Dim brick1 = bricks.brickList(nabeList(i))
+                If brick1.depth = 0 Then Continue For
+                For j = i + 1 To nabeList.Count - 1
+                    Dim brick2 = bricks.brickList(nabeList(j))
+                    If brick2.depth = 0 Then Continue For
+                    If Math.Abs(brick1.depth - brick2.depth) > depthThreshold Then
+                        foundObjectLine = True
+                        Exit For
+                    End If
                 Next
-                If foundObjectLine Then
-                    dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, cv.LineTypes.Link4)
-                    depthLines += 1
-                Else
-                    dst3.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, cv.LineTypes.Link4)
-                    colorLines += 1
-                End If
+                If foundObjectLine Then Exit For
             Next
-
-            If task.heartBeat Then
-                labels(2) = CStr(depthLines) + " lines were found between objects (External Lines)"
-                labels(3) = CStr(colorLines) + " internal lines were indentified and are not likely important"
+            If foundObjectLine Then
+                dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, cv.LineTypes.Link4)
+                depthLines += 1
+            Else
+                dst3.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, cv.LineTypes.Link4)
+                colorLines += 1
             End If
-        End Sub
-    End Class
+        Next
+
+        If task.heartBeat Then
+            labels(2) = CStr(depthLines) + " lines were found between objects (External Lines)"
+            labels(3) = CStr(colorLines) + " internal lines were indentified and are not likely important"
+        End If
+    End Sub
+End Class
 
 
 
@@ -387,8 +427,7 @@ Public Class NR_LineTrack_CenterNeighbor : Inherits TaskParent
 
 
 
-
-    Public Class NR_LineTrack_CenterRange : Inherits TaskParent
+Public Class NR_LineTrack_CenterRange : Inherits TaskParent
         Public options As New Options_LineRect
         Dim bricks As New Brick_Basics
         Public Sub New()
@@ -427,41 +466,147 @@ Public Class NR_LineTrack_CenterNeighbor : Inherits TaskParent
 
 
 
-Public Class LineTrack_Repeat : Inherits TaskParent
-    Public lp As New lpData
+Public Class LineTrack_Top3 : Inherits TaskParent
+    Dim lineT As New LineTrack_Basics
+    Dim lpList As New List(Of lpData)
+    Dim match As New Match_Basics
     Public Sub New()
-        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
-        desc = "Cursor.ai: Repeat the search for the longest line in the previous frame."
+        labels(2) = "Longest = yellow, second is white, third is red"
+        desc = "Track the top 3 lines across frames."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst2 = src.Clone
+        If src.Channels <> 1 Then src = task.gray.Clone
 
-        If task.lines.lpList.Count = 0 Then Exit Sub
+        Static lastImage = task.gray.Clone
 
-        ' Always start by using every line already found by task.lines.
-        Dim candidates As List(Of lpData) = task.lines.lpList
+        If task.heartBeat Then
+            lpList.Clear()
+            For i = 0 To 2
+                lpList.Add(task.lines.lpList(i))
+            Next
+            dst3.SetTo(0)
+            strOut = ""
+        End If
 
-        lp = task.lines.lpList(0)
-        Dim bestIndex As Integer = -1
-        Dim bestScore As Single = Single.MaxValue
-        For i = 0 To candidates.Count - 1
-            Dim candidate = candidates(i)
-            Dim centerScore = lp.ptCenter.DistanceTo(candidate.ptCenter)
-            Dim sameEndpointOrder = lp.p1.DistanceTo(candidate.p1) + lp.p2.DistanceTo(candidate.p2)
-            Dim swappedEndpointOrder = lp.p1.DistanceTo(candidate.p2) + lp.p2.DistanceTo(candidate.p1)
-            Dim endpointScore = Math.Min(sameEndpointOrder, swappedEndpointOrder)
-            Dim angleScore = Math.Abs(lp.angle - candidate.angle) * 5.0F
-            Dim totalScore = centerScore + endpointScore + angleScore
-            If totalScore < bestScore Then
-                bestScore = totalScore
-                bestIndex = i
+        Dim newList As New List(Of lpData)
+        For i = 0 To lpList.Count - 1
+            lineT.lp = lpList(i)
+            lineT.Run(src)
+            Select Case i
+                Case 0
+                    dst2.Line(lineT.lp.p1, lineT.lp.p2, yellow, task.lineWidth, task.lineType)
+                    dst3.Line(lineT.lp.p1, lineT.lp.p2, yellow, task.lineWidth, task.lineType)
+                Case 1
+                    dst2.Line(lineT.lp.p1, lineT.lp.p2, white, task.lineWidth, task.lineType)
+                    dst3.Line(lineT.lp.p1, lineT.lp.p2, white, task.lineWidth, task.lineType)
+                Case 2
+                    dst2.Line(lineT.lp.p1, lineT.lp.p2, red, task.lineWidth, task.lineType)
+                    dst3.Line(lineT.lp.p1, lineT.lp.p2, red, task.lineWidth, task.lineType)
+            End Select
+
+            match.template = src(lineT.lp.rect)
+            match.Run(lastImage(lineT.lp.rect))
+            If match.correlation > task.fCorrThreshold Then
+                newList.Add(lineT.lp)
+            Else
+                strOut += "Lost line " + CStr(i) + " because correlation was " +
+                           Format(match.correlation, fmt2) + vbCrLf
             End If
         Next
-        If bestIndex >= 0 Then lp = candidates(bestIndex)
 
-        If src.Channels <> 1 Or src.Type <> cv.MatType.CV_8U Then src = task.gray.Clone
+        SetTrueText(strOut, 3)
+        lpList = New List(Of lpData)(newList)
+        lastImage = task.gray.Clone
+    End Sub
+End Class
 
-        DrawLine(dst2, lp.p1, lp.p2, task.highlight, task.lineWidth + 1)
-        labels(2) = "Tracking line length = " + Format(lp.length, fmt1) + " angle = " + Format(lp.angle, fmt1)
+
+
+
+
+
+Public Class LineTrack_SearchX : Inherits TaskParent
+    Dim lastImage As cv.Mat
+    Dim searchCount As Integer = 9
+    Dim addw As New AddWeighted_Basics
+    Public Sub New()
+        If standalone Then task.gOptions.displayDst1.Checked = True
+        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
+        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        desc = "Confirm any camera motion using the task.lines output.  Needs work!"
+    End Sub
+    Private Function testOffset(compareIndex As Integer, i As Integer) As Integer
+        Dim r1 = New cv.Rect(compareIndex, 0, dst1.Width - searchCount, dst1.Height)
+        Dim r2 = New cv.Rect(i, 0, dst1.Width - searchCount, dst1.Height)
+
+        dst1 = task.lines.dst3.Clone
+        dst1(r1).SetTo(0, lastImage(r2))
+
+        Return dst1.CountNonZero
+    End Function
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        SetTrueText(strOut, 2)
+        If task.heartBeatLT = False Then Exit Sub
+        If task.firstPass Then lastImage = task.lines.dst3.Clone
+
+        dst3 = task.lines.dst3
+
+        Dim countList As New List(Of (count As Integer, index As Integer))
+        strOut = ""
+        For i = 0 To searchCount
+            Dim count = testOffset(0, i)
+            strOut += CStr(count) + " for offset " + CStr(i) + vbCrLf
+            countList.Add((count, -i))
+        Next
+
+        For i = 1 To searchCount
+            Dim count = testOffset(searchCount, searchCount - i)
+            strOut += CStr(count) + " for offset " + CStr(-i) + vbCrLf
+            countList.Add((count, i))
+        Next
+
+        Dim bestCount = countList.MinBy(Function(x) x.count)
+        strOut += CStr(bestCount.index) + " is the index with the best count" + vbCrLf
+
+        Dim rect As cv.Rect
+        If bestCount.index < 0 Then
+            rect = New cv.Rect(searchCount + bestCount.index, 0, dst2.Width - searchCount + bestCount.index,
+                               dst2.Height)
+        ElseIf bestCount.index > 0 Then
+            rect = New cv.Rect(searchCount - bestCount.index, 0, dst2.Width - searchCount - bestCount.index,
+                               dst2.Height)
+        Else
+            rect = New cv.Rect(0, 0, dst2.Width, dst2.Height)
+        End If
+
+        If task.firstPass Or bestCount.index = 0 Then
+            dst2 = lastImage(rect)
+        Else
+            cv.Cv2.AddWeighted(lastImage(rect), 0.75, dst1(New cv.Rect(0, 0, rect.Width, dst2.Height)),
+                                                0.25, 0, dst2)
+        End If
+
+        lastImage = task.lines.dst3.Clone
+    End Sub
+End Class
+
+
+
+
+
+Public Class LineTrack_Changes : Inherits TaskParent
+    Public Sub New()
+        labels(2) = "Move camera or wave at camera to see the impact on the lines."
+        labels(3) = "Current lines.  dst2 is the difference between lines in current vs. previous image."
+        desc = "Track the changes in the lines."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        Static lastImage = task.lines.dst3
+        dst2 = lastImage.setto(0, task.lines.dst3)
+
+        dst3 = task.lines.dst2
+
+        lastImage = task.lines.dst3.Clone
     End Sub
 End Class

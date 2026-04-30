@@ -476,11 +476,14 @@ Line3D_ReconstructLine
 Line3D_Selection
 LinearRegression_Basics
 LineTrack_Basics
+LineTrack_Changes
+LineTrack_Confirm
 LineTrack_Correlation
 LineTrack_Match
 LineTrack_Rect
-LineTrack_Repeat
 LineTrack_Slices
+LineTrack_Top3
+LineTrack_TrackCorrelation
 LUT_Basics
 LUT_Equalized
 Magnify_Basics
