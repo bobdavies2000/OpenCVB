@@ -476,6 +476,8 @@ Line3D_LogicalLines
 Line3D_ReconstructLine
 Line3D_Selection
 LinearRegression_Basics
+LineSeg_Basics
+LineSeg_BasicsNew
 LineTrack_Basics
 LineTrack_Changes
 LineTrack_Correlation

@@ -6,7 +6,7 @@ Public Class Flood_Basics : Inherits TaskParent
     Public rcList As New List(Of rcData)
     Public rcMap As cv.Mat = New cv.Mat(dst2.Size, cv.MatType.CV_32S, 0)
     Public fLess As New FeatureLess_Basics
-    Dim lastCenters As New List(Of cv.Rect)
+    Dim lastCenters As New HashSet(Of cv.Rect)
     Public Sub New()
         If standalone Then task.gOptions.displayDst1.Checked = True
         cPtr = RedFlood_Open()

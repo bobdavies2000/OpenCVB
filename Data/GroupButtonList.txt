@@ -122,6 +122,7 @@ LeftRight
 Line
 Line3D
 LinearRegression
+LineSeg
 LineTrack
 LUT
 Magnify

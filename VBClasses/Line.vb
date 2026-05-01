@@ -151,7 +151,6 @@ End Class
 
 
 
-
 Public Class Line_PerpendicularTest : Inherits TaskParent
     Public input As lpData
     Public output As lpData
@@ -688,10 +687,7 @@ Public Class Line_BrickList : Inherits TaskParent
 
         ptList.Clear()
         Dim angles As New List(Of Single)
-        Dim epListX1 As New List(Of Single)
-        Dim epListY1 As New List(Of Single)
-        Dim epListX2 As New List(Of Single)
-        Dim epListY2 As New List(Of Single)
+        Dim epList As New List(Of Tuple(Of Single, Single, Single, Single))
         For i = 0 To allPoints.Count - 1
             Dim pt = allPoints(i)
             For j = i + 1 To allPoints.Count - 1
@@ -700,10 +696,8 @@ Public Class Line_BrickList : Inherits TaskParent
                 angles.Add(lpTest.angle)
                 ptList.Add(pt)
                 ptList.Add(allPoints(j))
-                epListX1.Add(lpTest.pE1.X)
-                epListY1.Add(lpTest.pE1.Y)
-                epListX2.Add(lpTest.pE2.X)
-                epListY2.Add(lpTest.pE2.Y)
+                epList.Add(New Tuple(Of Single, Single, Single, Single)(lpTest.pE1.X,
+                           lpTest.pE1.Y, lpTest.pE2.X, lpTest.pE2.Y))
                 'End If
             Next
         Next
@@ -718,10 +712,10 @@ Public Class Line_BrickList : Inherits TaskParent
             DrawCircle(dst2, pt)
         Next
 
-        Dim x1 = epListX1.Average
-        Dim y1 = epListY1.Average
-        Dim x2 = epListX2.Average
-        Dim y2 = epListY2.Average
+        Dim x1 = epList.Average(Function(x) x.Item1)
+        Dim y1 = epList.Average(Function(x) x.Item2)
+        Dim x2 = epList.Average(Function(x) x.Item3)
+        Dim y2 = epList.Average(Function(x) x.Item4)
         lpOutput = New lpData(New cv.Point2f(x1, y1), New cv.Point2f(x2, y2))
         vbc.DrawLine(dst2, lpOutput)
 

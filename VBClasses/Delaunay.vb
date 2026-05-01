@@ -157,7 +157,8 @@ Public Class NR_Delaunay_GenerationsNoKNN : Inherits TaskParent
     Public Sub New()
         OptionParent.FindSlider("Random Pixel Count").Value = 10
         dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_32S, 0)
-        labels = {"", "Mask of unmatched regions - generation set to 0", "Facet Image with index of each region", "Generation counts for each region."}
+        labels = {"", "Mask of unmatched regions - generation set to 0",
+                  "Facet Image with age of each region", "Generation counts for each region."}
         desc = "Create a region in an image for each point provided without using KNN."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -172,7 +173,7 @@ Public Class NR_Delaunay_GenerationsNoKNN : Inherits TaskParent
 
         Dim generationMap = dst3.Clone
         dst3.SetTo(0)
-        Dim usedG As New List(Of Integer), g As Integer
+        Dim usedG As New HashSet(Of Integer), g As Integer
         For Each pt In inputPoints
             Dim index = facet.dst3.Get(Of Integer)(pt.Y, pt.X)
             If index >= facet.facetList.Count Then Continue For

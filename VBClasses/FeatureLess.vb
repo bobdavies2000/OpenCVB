@@ -46,7 +46,7 @@ Namespace VBClasses
         Public fLessRaw As New FeatureLess_Basics
         Public fLessList As New List(Of cv.Rect)
         Public fLessNot As New List(Of cv.Rect)
-        Public ptList As New List(Of cv.Point)
+        Public ptList As New HashSet(Of cv.Point)
         Public Sub New()
             desc = "A features grid rect cannot change if there has been no motion in that grid rect."
         End Sub
