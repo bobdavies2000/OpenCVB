@@ -45,35 +45,6 @@ End Class
 
 
 
-Public Class LineTrack_TrackCorrelation : Inherits TaskParent
-    Dim match As New LineTrack_Correlation
-    Public correlation As New Single
-    Public lp As lpData
-    Public Sub New()
-        task.fOptions.MatchCorrSlider.Value = 90
-        desc = "Track each of the lines found in Line_Basics_TA"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        dst2 = src.Clone
-        dst3 = task.rightView
-        match.lpInput = lp
-        match.Run(src)
-        If match.p1Correlation > task.fCorrThreshold And match.p2Correlation > task.fCorrThreshold Then
-            DrawLine(dst2, lp.p1, lp.p2)
-        End If
-        dst2.Rectangle(lp.rect, white, task.lineWidth)
-        DrawLine(dst2, lp.p1, lp.p2)
-
-        labels(2) = match.labels(2)
-        dst3 = task.lines.dst3
-        labels(3) = task.lines.labels(3)
-    End Sub
-End Class
-
-
-
-
-
 Public Class NR_LineTrack_Concat : Inherits TaskParent
     Public lpInput As lpData
     Dim match As New Match_Basics
@@ -224,8 +195,6 @@ Public Class LineTrack_Match : Inherits TaskParent
         lpListLast = New List(Of lpData)(task.lines.lpList)
     End Sub
 End Class
-
-
 
 
 
@@ -617,47 +586,90 @@ End Class
 
 
 
+
+Public Class LineTrack_CorrelationTrack : Inherits TaskParent
+    Dim lineT As New LineTrack_Correlation
+    Dim lpList As New List(Of lpData)
+    Public lp As lpData
+    Public Sub New()
+        task.fOptions.MatchCorrSlider.Value = 90
+        desc = "Track each of the lines found in Line_Basics_TA"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        If src.Channels <> 1 Then src = task.gray.Clone
+        If task.heartBeatLT Then
+            lpList = New List(Of lpData)(task.lines.lpList)
+        End If
+        dst2 = task.color.Clone
+
+        Dim lineCount As Integer
+        Dim newList As New List(Of lpData)
+        For Each lp In lpList
+            lineT.lpInput = lp
+            lineT.Run(task.gray)
+            dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth + 2)
+            dst2.Line(lineT.lpInput.p1, lineT.lpInput.p2, black, task.lineWidth)
+            lineCount += 1
+            Dim p1GridIndex = task.gridMap.Get(Of Integer)(lp.p1.Y, lp.p1.X)
+            dst2.Rectangle(task.gridNabeRects(p1GridIndex), white, task.lineWidth)
+            Dim p2GridIndex = task.gridMap.Get(Of Integer)(lp.p2.Y, lp.p2.X)
+            dst2.Rectangle(task.gridNabeRects(p2GridIndex), white, task.lineWidth)
+            newList.Add(lineT.lpInput)
+            If lineCount > 0 Then Exit For
+        Next
+
+        SetTrueText(lineT.strOut, 3)
+        lpList = New List(Of lpData)(newList)
+    End Sub
+End Class
+
+
+
+
 Public Class LineTrack_Correlation : Inherits TaskParent
     Public lpInput As lpData
-    Dim match As New Match_Basics
-    Public p1Correlation As Single
-    Public p2Correlation As Single
+    Dim match1 As New Match_Basics
+    Dim match2 As New Match_Basics
     Public Sub New()
         desc = "Compare area around end points of a line to the previous image."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         SetTrueText(strOut, 3)
 
-        If standalone And task.afterHeartBeatLT Then lpInput = task.lines.lpList(0)
-        If task.heartBeatLT = False Then Exit Sub
-        Static lastImage = task.gray.Clone
+        If standalone Then
+            If task.afterHeartBeatLT Then lpInput = task.lines.lpList(0)
+            If task.heartBeatLT = False Then Exit Sub
+        End If
+
+        If src.Channels <> 1 Then src = task.gray.Clone
+        Static lastImage = src.Clone
 
         Dim p1GridIndex = task.gridMap.Get(Of Integer)(lpInput.p1.Y, lpInput.p1.X)
         Dim rect = task.gridRects(p1GridIndex)
-        Dim deltaX As Integer, deltaY As Integer, p1 As cv.Point, p2 As cv.Point
-        match.template = task.gray(rect)
-        match.Run(lastImage(task.gridNabeRects(p1GridIndex)))
-        p1Correlation = match.correlation
+        match1.template = src(rect)
+        match1.Run(lastImage(task.gridNabeRects(p1GridIndex)))
+        Dim p1Correlation = match1.correlation
 
-        deltaX = task.gridWH - match.mm.maxLoc.X
-        deltaY = task.gridWH - match.mm.maxLoc.X
-        p1 = New cv.Point(lpInput.p1.X + deltaX, lpInput.p1.Y + deltaY)
+        Dim deltaX1 = task.gridWH - match1.mm.maxLoc.X
+        Dim deltaY1 = task.gridWH - match1.mm.maxLoc.X
+        Dim p1 = New cv.Point(lpInput.p1.X + deltaX1, lpInput.p1.Y + deltaY1)
 
-        strOut = "P1.x moved " + CStr(deltaX) + ", P1.y moved " + CStr(deltaY) + " pixels" + vbCrLf
+        strOut = "P1.x moved " + CStr(deltaX1) + ", P1.y moved " + CStr(deltaY1) + " pixels" + vbCrLf
 
         Dim p2GridIndex = task.gridMap.Get(Of Integer)(lpInput.p2.Y, lpInput.p2.X)
         rect = task.gridRects(p2GridIndex)
-        match.template = task.gray(rect)
-        match.Run(lastImage(task.gridNabeRects(p2GridIndex)))
-        p2Correlation = match.correlation
+        match2.template = src(rect)
+        match2.Run(lastImage(task.gridNabeRects(p2GridIndex)))
+        Dim p2Correlation = match2.correlation
 
-        deltaX = task.gridWH - match.mm.maxLoc.X
-        deltaY = task.gridWH - match.mm.maxLoc.X
-        p2 = New cv.Point(lpInput.p2.X + deltaX, lpInput.p2.Y + deltaY)
+        Dim deltaX2 = task.gridWH - match2.mm.maxLoc.X
+        Dim deltaY2 = task.gridWH - match2.mm.maxLoc.X
+        Dim p2 = New cv.Point(lpInput.p2.X + deltaX2, lpInput.p2.Y + deltaY2)
 
-        strOut += "P2.x moved " + CStr(deltaX) + ", P2.y moved " + CStr(deltaY) + " pixels" + vbCrLf
+        strOut += "P2.x moved " + CStr(deltaX2) + ", P2.y moved " + CStr(deltaY2) + " pixels" + vbCrLf
 
-        lastImage = task.gray.Clone
+        If deltaX1 = -deltaX2 And deltaX1 <> 0 Then Dim k = 0
+        lastImage = src.Clone
         Dim lp = New lpData(p1, p2)
 
         dst2 = src.Clone
@@ -670,5 +682,84 @@ Public Class LineTrack_Correlation : Inherits TaskParent
                     " to the previous image while " +
                     "rect for p2 has " + Format(p2Correlation, fmt3)
 
+    End Sub
+End Class
+
+
+
+
+
+Public Class LineTrack_MatchLines : Inherits TaskParent
+    Public lpList As New List(Of lpData)
+    Dim lpListLast As New List(Of lpData)
+    Public Sub New()
+        desc = "Cursor.ai: Match lines between frames; lpList holds confirmed current matches."
+    End Sub
+    Private Shared Function MatchScore(curr As lpData, prev As lpData) As Single
+        Dim centerScore = curr.ptCenter.DistanceTo(prev.ptCenter)
+        Dim sameEndpointOrder = curr.p1.DistanceTo(prev.p1) + curr.p2.DistanceTo(prev.p2)
+        Dim swappedEndpointOrder = curr.p1.DistanceTo(prev.p2) + curr.p2.DistanceTo(prev.p1)
+        Dim endpointScore = Math.Min(sameEndpointOrder, swappedEndpointOrder)
+        Dim angleScore = Math.Abs(curr.angle - prev.angle) * 5.0F
+        Return centerScore + endpointScore + angleScore
+    End Function
+    Private Shared Function CanConfirm(curr As lpData, prev As lpData) As Boolean
+        If prev.length <= 0 Then Return False
+        If Math.Abs(curr.length - prev.length) > prev.length / 4.0F Then Return False
+        If Math.Abs(curr.angle - prev.angle) > 3.0F Then Return False
+        Return True
+    End Function
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        If task.quarterBeat = False Then Exit Sub
+        lpList.Clear()
+        dst2 = src.Clone
+
+        If task.lines.lpList.Count = 0 Then
+            lpListLast.Clear()
+            Exit Sub
+        End If
+
+        If lpListLast.Count = 0 Then
+            lpListLast = New List(Of lpData)(task.lines.lpList)
+            If task.heartBeatLT Then labels(2) = "No previous frame; matching starts next frame."
+            Exit Sub
+        End If
+
+        Dim pairScores As New List(Of Tuple(Of Single, Integer, Integer))
+        For i = 0 To task.lines.lpList.Count - 1
+            Dim curr = task.lines.lpList(i)
+            For j = 0 To lpListLast.Count - 1
+                Dim prev = lpListLast(j)
+                If Not CanConfirm(curr, prev) Then Continue For
+                pairScores.Add(New Tuple(Of Single, Integer, Integer)(MatchScore(curr, prev), i, j))
+            Next
+        Next
+
+        pairScores = pairScores.OrderBy(Function(t) t.Item1).ToList()
+        Dim usedCurr As New HashSet(Of Integer)
+        Dim usedLast As New HashSet(Of Integer)
+        dst3.SetTo(0)
+        For Each t In pairScores
+            Dim i = t.Item2
+            Dim j = t.Item3
+            If usedCurr.Contains(i) Or usedLast.Contains(j) Then Continue For
+            usedCurr.Add(i)
+            usedLast.Add(j)
+            Dim curr = task.lines.lpList(i)
+            curr.age = lpListLast(j).age + 1
+            If curr.age > 999 Then curr.age = 10
+            lpList.Add(curr)
+            DrawLine(dst2, curr.p1, curr.p2, task.scalarColors(curr.index + 1), task.lineWidth + 1)
+            dst3.Line(curr.p1, curr.p2, white, task.lineWidth)
+            DrawLine(dst2, curr.p1, curr.p2, task.scalarColors(curr.index + 1), task.lineWidth + 1)
+        Next
+
+        If task.quarterBeat Then
+            labels(2) = CStr(lpList.Count) + " of " + CStr(task.lines.lpList.Count) +
+                        " lines matched to the previous frame."
+            labels(3) = CStr(pairScores.Count) + " candidate pair(s) passed length/angle checks."
+        End If
+
+        lpListLast = New List(Of lpData)(task.lines.lpList)
     End Sub
 End Class

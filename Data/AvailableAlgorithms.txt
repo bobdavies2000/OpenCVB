@@ -480,12 +480,13 @@ LineTrack_Basics
 LineTrack_Changes
 LineTrack_Correlation
 LineTrack_CorrelationNabe
+LineTrack_CorrelationTrack
 LineTrack_Match
+LineTrack_MatchLines
 LineTrack_Rect
 LineTrack_SearchX
 LineTrack_Slices
 LineTrack_Top3
-LineTrack_TrackCorrelation
 LUT_Basics
 LUT_Equalized
 Magnify_Basics

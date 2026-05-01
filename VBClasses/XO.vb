@@ -5324,7 +5324,7 @@ Namespace VBClasses
     Public Class XO_TrackLine_Basics_TAOld : Inherits TaskParent
         Public lpInput As lpData
         Public foundLine As Boolean
-        Dim match As New LineTrack_Correlation
+        Dim match As New XO_LineTrack_Correlation
         Dim options As New Options_Features
         Public Sub New()
             desc = "Track an individual line as best as possible."
@@ -7582,7 +7582,7 @@ Namespace VBClasses
 
     Public Class XO_MatchLine_Test : Inherits TaskParent
         Public cameraMotionProxy As New lpData
-        Dim match As New LineTrack_Correlation
+        Dim match As New XO_LineTrack_Correlation
         Public Sub New()
             desc = "Find and track the longest line by matching line bricks."
         End Sub
@@ -19972,6 +19972,46 @@ Namespace VBClasses
                     SetTrueText(CStr(fp.age), fp.pt, 3)
                 End If
             Next
+        End Sub
+    End Class
+
+
+
+
+
+    Public Class XO_LineTrack_Correlation : Inherits TaskParent
+        Public lpInput As lpData
+        Dim match As New Match_Basics
+        Public p1Correlation As Single
+        Public p2Correlation As Single
+        Public Sub New()
+            desc = "Compare area around end points of a line to the previous image."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            If standalone Then lpInput = task.lines.lpList(0)
+            Static lastImage = task.gray.Clone
+
+            Dim p1GridIndex = task.gridMap.Get(Of Integer)(lpInput.p1.Y, lpInput.p1.X)
+            Dim rect = task.gridRects(p1GridIndex)
+            match.template = task.gray(rect)
+            match.Run(lastImage(task.gridNabeRects(p1GridIndex)))
+            p1Correlation = match.correlation
+
+            Dim p2GridIndex = task.gridMap.Get(Of Integer)(lpInput.p2.Y, lpInput.p2.X)
+            rect = task.gridRects(p2GridIndex)
+            match.template = task.gray(rect)
+            match.Run(lastImage(task.gridNabeRects(p2GridIndex)))
+            p2Correlation = match.correlation
+
+            lastImage = task.gray.Clone
+
+            If standaloneTest() Then
+                dst2 = src.Clone
+                DrawLine(dst2, lpInput, task.highlight)
+            End If
+            labels(2) = "Rect for p1 has correlation " + Format(p1Correlation, fmt3) +
+                            " to the previous image while " +
+                            "rect for p2 has " + Format(p2Correlation, fmt3)
         End Sub
     End Class
 End Namespace

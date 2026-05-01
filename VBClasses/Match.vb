@@ -20,6 +20,8 @@ Public Class Match_Basics : Inherits TaskParent
         cv.Cv2.MatchTemplate(template, src, dst0, cv.TemplateMatchModes.CCoeffNormed)
         mm = GetMinMax(dst0)
 
+        Debug.WriteLine("max loc.x = " + Format(mm.maxLoc.X, fmt2))
+
         correlation = mm.maxVal
         labels(2) = "Template (at right) has " + Format(correlation, fmt3) + " Correlation to the src input"
         Dim w = template.Width, h = template.Height
