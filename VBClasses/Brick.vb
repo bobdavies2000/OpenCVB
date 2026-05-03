@@ -815,7 +815,6 @@ End Class
 
 Public Class NR_Brick_HighRange : Inherits TaskParent
     Dim bricks As New Brick_Basics
-    Dim lines As New Line_Basics_TA
     Dim options As New Options_LeftRightCorrelation
     Public Sub New()
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)

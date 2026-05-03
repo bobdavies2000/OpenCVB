@@ -444,12 +444,14 @@ LeftRight_Features
 LeftRight_Reduction
 LeftRight_Stable
 Line_Basics_TA
+Line_BasicsEmboss
 Line_BasicsNoMotion
 Line_BasicsNoMotion1
-Line_BasicsSobel
+Line_BasicsOld
 Line_Brick
 Line_BrickList
 Line_BrickListTest
+Line_Core
 Line_DepthHistogram
 Line_EdgeLine
 Line_EdgeLineCompare
@@ -1160,7 +1162,6 @@ NR_LeftRight_EdgesColor
 NR_LeftRight_RawLeft
 NR_LeftRight_RGBAlignLeft
 NR_Line_Basics_TATest
-NR_Line_Core
 NR_Line_Finder
 NR_Line_Parallel
 NR_Line_Select

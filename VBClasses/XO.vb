@@ -5361,7 +5361,7 @@ Namespace VBClasses
                 End If
             Else
                 dst3(subsetrect).SetTo(0)
-                Dim vecArray = task.lines.getRawVecs(src(subsetrect))
+                Dim vecArray = task.lines.ld.Detect(src(subsetrect))
                 Dim lpListRaw = Line_Basics_TA.getRawLines(vecArray)
                 For Each lp In lplist
                     dst3.Line(lp.p1, lp.p2, 255, task.lineWidth, task.lineType)
@@ -5396,7 +5396,7 @@ Namespace VBClasses
     Public Class XO_TrackLine_Basics_TASave : Inherits TaskParent
         Dim match As New Match_Basics
         Dim matchRect As cv.Rect
-        Public rawLines As New NR_Line_Core
+        Public rawLines As New Line_Core
         Dim lplist As List(Of lpData)
         Dim knn As New KNN_NNBasics
         Public Sub New()
@@ -7948,7 +7948,7 @@ Namespace VBClasses
     Public Class XO_Line_Basics_TANoAging : Inherits TaskParent
         Public lpList As New List(Of lpData)
         Public lpRectMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-        Public rawLines As New NR_Line_Core
+        Public rawLines As New Line_Core
         Public Sub New()
             desc = "Retain line from earlier image if not in motion mask.  If new line is in motion mask, add it."
         End Sub
@@ -7993,7 +7993,7 @@ Namespace VBClasses
 
     Public Class XO_Line_ViewLeftRight : Inherits TaskParent
         Dim lines As New Line_Basics_TA
-        Dim rawLines As New NR_Line_Core
+        Dim rawLines As New Line_Core
         Public Sub New()
             dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U)
             desc = "Find lines in the left and right images."
@@ -8085,7 +8085,7 @@ Namespace VBClasses
     Public Class XO_Line_RawSubset : Inherits TaskParent
         Public lpList As New List(Of lpData)
         Public subsetRect As cv.Rect = New cv.Rect(0, 0, dst2.Width, dst2.Height)
-        Public rawLines As New NR_Line_Core
+        Public rawLines As New Line_Core
         Public Sub New()
             task.drawRect = New cv.Rect(25, 25, 25, 25)
             dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
@@ -8294,7 +8294,7 @@ Namespace VBClasses
 
     Public Class XO_KNN_BoundingRect : Inherits TaskParent
         Public lp As lpData
-        Dim rawlines As New NR_Line_Core
+        Dim rawlines As New Line_Core
         Public Sub New()
             If standalone Then task.gOptions.displayDst1.Checked = True
             desc = "Find the line with the largest bounding rectangle."
@@ -8373,7 +8373,7 @@ Namespace VBClasses
 
     Public Class XO_Line_Grid : Inherits TaskParent
         Public lpList As New List(Of lpData)
-        Public rawLines As New NR_Line_Core
+        Public rawLines As New Line_Core
         Public Sub New()
             dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
             desc = "find the lines in each grid rectangle"
@@ -14099,7 +14099,7 @@ Namespace VBClasses
 
     Public Class XO_Line_CoreNew : Inherits TaskParent
         Public lpList As New List(Of lpData)
-        Public rawLines As New NR_Line_Core
+        Public rawLines As New Line_Core
         Public Sub New()
             desc = "The core algorithm to find lines.  Line_Basics_TA is a task algorithm that exits when run as a normal algorithm."
         End Sub
@@ -14193,7 +14193,7 @@ Namespace VBClasses
 
     Public Class XO_Line_Backprojection : Inherits TaskParent
         Dim backP As New BackProject_DisplayColor
-        Dim rawLines As New NR_Line_Core
+        Dim rawLines As New Line_Core
         Public Sub New()
             dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U)
             labels = {"", "", "Lines found in the back projection", "Backprojection results"}
@@ -15036,7 +15036,7 @@ Namespace VBClasses
             Dim maxAngle = angleSlider.Value
 
             dst2 = src.Clone
-            Dim vecArray = task.lines.getRawVecs(task.gray)
+            Dim vecArray = task.lines.ld.Detect(task.gray)
             Dim lplist = Line_Basics_TA.getRawLines(vecArray)
 
             sortedVerticals.Clear()
@@ -17024,7 +17024,7 @@ Namespace VBClasses
             If src.Channels <> 1 Or src.Type <> cv.MatType.CV_8U Then src = task.gray.Clone
             If lpList.Count <= 1 Then
                 motionMask.SetTo(255)
-                Dim vecArray1 = task.lines.getRawVecs(src)
+                Dim vecArray1 = task.lines.ld.Detect(src)
                 lpList = Line_Basics_TA.getRawLines(vecArray1)
             End If
 
@@ -17038,7 +17038,7 @@ Namespace VBClasses
                 End If
             Next
 
-            Dim vecArray = task.lines.getRawVecs(src)
+            Dim vecArray = task.lines.ld.Detect(src)
             Dim lpListRaw = Line_Basics_TA.getRawLines(vecArray)
 
 
