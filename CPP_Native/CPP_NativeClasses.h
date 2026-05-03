@@ -2408,7 +2408,7 @@ int* WhiteBalance_Run(WhiteBalance* cPtr, int* rgb, int rows, int cols, float th
     cPtr->output = Mat(rows, cols, CV_8UC3);
     cPtr->src = Mat(rows, cols, CV_8UC3, rgb);
     cPtr->Run(thresholdVal);
-    return (int*)cPtr->output.data;
+    return (int*)cPtr->src.data;
 }
 
 

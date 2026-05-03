@@ -3,7 +3,7 @@ Public Class Line_Basics_TA : Inherits TaskParent
     Implements IDisposable
     Public lpList As New List(Of lpData)
     Public motionMask As cv.Mat = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 255)
-    Dim ld As cv.XImgProc.FastLineDetector
+    Public ld As cv.XImgProc.FastLineDetector
     Public removeOverlappingLines As Boolean = True
     Public overLappingCount As Integer
     Public Sub New()
@@ -943,10 +943,6 @@ Public Class Line_BasicsNoMotion1 : Inherits TaskParent
         Next
         Return lpList
     End Function
-    Public Function getRawVecs(src As cv.Mat) As cv.Vec4f()
-        ' task.lines is always going to present.  Reuse the stateless lp detector.
-        Return ld.Detect(src)
-    End Function
     Public Overrides Sub RunAlg(src As cv.Mat)
         If src.Channels <> 1 Then src = task.gray.Clone
         dst2 = src.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
@@ -1636,5 +1632,88 @@ Public Class Line_TrackV : Inherits TaskParent
             lastImage = src.Clone
             verticalLast = New List(Of lpData)(verticalsCurr)
         End If
+    End Sub
+End Class
+
+
+
+
+Public Class Line_BasicsSobel : Inherits TaskParent
+    Implements IDisposable
+    Public lpList As New List(Of lpData)
+    Public motionMask As cv.Mat = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 255)
+    Dim ld As cv.XImgProc.FastLineDetector
+    Public removeOverlappingLines As Boolean = True
+    Public overLappingCount As Integer
+    Public Sub New()
+        dst0 = New cv.Mat(dst0.Size, cv.MatType.CV_8U, 0)
+        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
+        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
+        ld = cv.XImgProc.CvXImgProc.CreateFastLineDetector
+        desc = "Run FLD with sobel input."
+    End Sub
+    Public Function getRawVecs(src As cv.Mat) As cv.Vec4f()
+        ' task.lines is always going to present.  Reuse the stateless lp detector.
+        Return ld.Detect(src)
+    End Function
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        If standalone Then motionMask = task.motion.motionMask
+
+        If src.Channels <> 1 Or src.Type <> cv.MatType.CV_8U Then src = task.gray.Clone
+        dst2 = src.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        If lpList.Count <= 1 Then
+            motionMask.SetTo(255)
+            lpList = Line_Basics_TA.getRawLines(ld.Detect(src))
+        End If
+
+        Dim sortlines As New SortedList(Of Single, lpData)(New compareAllowIdenticalSingleInverted)
+        For Each lp In lpList
+            If Not (motionMask.Get(Of Byte)(lp.p1.Y, lp.p1.X) Or motionMask.Get(Of Byte)(lp.p2.Y, lp.p2.X)) Then
+                lp.age += 1
+                sortlines.Add(lp.length, lp)
+            End If
+        Next
+        Dim count As Integer = sortlines.Count
+
+        lpList = Line_Basics_TA.getRawLines(ld.Detect(src))
+
+        For Each lp In lpList
+            If motionMask.Get(Of Byte)(lp.p1.Y, lp.p1.X) Or motionMask.Get(Of Byte)(lp.p2.Y, lp.p2.X) Then
+                sortlines.Add(lp.length, lp)
+            End If
+        Next
+        Dim newCount As Integer = sortlines.Count - count
+
+        lpList.Clear()
+        overLappingCount = 0
+        dst0.SetTo(0)
+        dst1.SetTo(0)
+        For Each lp In sortlines.Values
+            lp.index = lpList.Count
+            If removeOverlappingLines Then
+                If lp.rect.Width = 0 Then Continue For
+                If lp.rect.Height = 0 Then Continue For
+                If dst1(lp.rect).CountNonZero > 0 Then
+                    overLappingCount += 1
+                    Continue For
+                End If
+            End If
+            dst0.Line(lp.pE1, lp.pE2, lp.index + 1, task.lineWidth + 1, cv.LineTypes.Link4)
+            dst1.Line(lp.p1, lp.p2, lp.index + 1, task.lineWidth, cv.LineTypes.Link4)
+            dst2.Line(lp.p1, lp.p2, lp.color, task.lineWidth + 1, task.lineType)
+            lpList.Add(lp)
+        Next
+
+        dst3 = dst1.Threshold(0, 255, cv.ThresholdTypes.Binary)
+
+        If lpList.Count > 0 Then
+            If task.lpD.rect.Width = 0 Then task.lpD = lpList(0)
+        End If
+
+        labels(2) = CStr(count) + " lines retained - " + CStr(newCount) + " were new"
+        If removeOverlappingLines Then labels(2) += ". " + CStr(overLappingCount) + " overlap(s) removed."
+    End Sub
+    Protected Overrides Sub Finalize()
+        ld.Dispose()
     End Sub
 End Class

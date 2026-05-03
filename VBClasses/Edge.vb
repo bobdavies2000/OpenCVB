@@ -1325,6 +1325,7 @@ Public Class Edge_Sobel : Inherits TaskParent
         If options.horizontalDerivative Then dst0 = src.Sobel(cv.MatType.CV_32F, 0, 1, options.kernelSize)
         If options.verticalDerivative Then dst1 = src.Sobel(cv.MatType.CV_32F, 1, 0, options.kernelSize)
         dst2 = (dst1 + dst0).ToMat.ConvertScaleAbs()
+        dst3 = dst2.Threshold(100, 255, cv.ThresholdTypes.Binary)
     End Sub
 End Class
 

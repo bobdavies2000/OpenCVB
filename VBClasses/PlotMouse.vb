@@ -205,15 +205,15 @@ Public Class PlotMouse_MaskBackProject : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         hist.Run(task.gray)
         dst2 = hist.dst2
+        dst3 = task.color.Clone
 
         Dim barWidth = dst2.Width / task.histogramBins
-        histIndex = Math.Floor(task.mouseMovePoint.X / barWidth)
+        Dim histIndex = Math.Floor(task.mouseMovePoint.X / barWidth)
 
-        dst3 = task.color.Clone
-        Dim barRange = 255 / hist.histogram.Rows
+        Dim minRange = (hist.ranges(0).End - hist.ranges(0).Start) * histIndex / task.histogramBins
+        Dim maxRange = (hist.ranges(0).End - hist.ranges(0).Start) * (histIndex + 1) / task.histogramBins
+        Dim bpRanges = New cv.Rangef() {New cv.Rangef(minRange, maxRange)}
 
-        Dim minRange = If(histIndex = hist.histogram.Rows - 1, 255 - barRange, histIndex * barRange)
-        Dim maxRange = If(histIndex = hist.histogram.Rows - 1, 255, (histIndex + 1) * barRange)
         If Single.IsNaN(minRange) Or Single.IsInfinity(minRange) Or
            Single.IsNaN(maxRange) Or Single.IsInfinity(maxRange) Then
             SetTrueText("Input data has no values - exit " + traceName)
@@ -225,5 +225,6 @@ Public Class PlotMouse_MaskBackProject : Inherits TaskParent
         cv.Cv2.CalcBackProject({task.gray}, {0}, hist.histogram, dst1, ranges)
         dst3.SetTo(task.highlight, dst1)
         dst2.Rectangle(New cv.Rect(CInt(histIndex * barWidth), 0, barWidth, dst2.Height), cv.Scalar.Yellow, task.lineWidth)
+        labels(3) = CStr(dst1.CountNonZero) + " pixels in the back projection."
     End Sub
 End Class

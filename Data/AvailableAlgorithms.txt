@@ -446,6 +446,7 @@ LeftRight_Stable
 Line_Basics_TA
 Line_BasicsNoMotion
 Line_BasicsNoMotion1
+Line_BasicsSobel
 Line_Brick
 Line_BrickList
 Line_BrickListTest

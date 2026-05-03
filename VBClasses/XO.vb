@@ -5310,8 +5310,7 @@ Namespace VBClasses
                 SetTrueText(Format(match.correlation, fmt3), match.newCenter)
             End If
 
-            Dim vecArray = task.lines.getRawVecs(src)
-            Dim lpListRaw = Line_Basics_TA.getRawLines(vecArray)
+            Dim lpListRaw = Line_Basics_TA.getRawLines(task.lines.ld.Detect(src))
             If lpListRaw.Count > 0 Then lp = lpListRaw(0)
             dst2(matchRect).Line(lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
         End Sub

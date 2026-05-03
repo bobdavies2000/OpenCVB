@@ -225,10 +225,7 @@ End Class
 Public Class PhotoShop_Emboss : Inherits TaskParent
     Public gray128 As cv.Mat
     Public Sub New()
-
-        If sliders.Setup(traceName) Then
-            sliders.setupTrackBar("Emboss Kernel Size", 2, 10, 2)
-        End If
+        If sliders.Setup(traceName) Then sliders.setupTrackBar("Emboss Kernel Size", 2, 10, 2)
 
         If radio.Setup(traceName) Then
             radio.addRadio("Bottom Left")
@@ -261,7 +258,7 @@ Public Class PhotoShop_Emboss : Inherits TaskParent
             If frm.check(direction).Checked Then Exit For
         Next
 
-        dst2 = task.gray
+        dst2 = task.gray.Clone
 
         Select Case direction
             Case 0 ' do nothing!
@@ -272,9 +269,9 @@ Public Class PhotoShop_Emboss : Inherits TaskParent
             Case 3 ' flip horizontally and vertically
                 cv.Cv2.Flip(kernel, kernel, cv.FlipMode.XY)
         End Select
+        dst1 = dst2.Filter2D(-1, kernel)
 
-        dst3 = dst2.Filter2D(-1, kernel)
-        cv.Cv2.Add(dst3, gray128, dst3)
+        dst3 = dst1.Threshold(25, 255, cv.ThresholdTypes.Binary)
     End Sub
 End Class
 
@@ -570,9 +567,9 @@ Public Class PhotoShop_WhiteBalance : Inherits TaskParent
         Dim thresholdVal As Single = thresholdSlider.Value / 100
 
         If src.Channels <> 3 Then src = task.color.Clone
-        Dim rgbData(src.Total - 1) As cv.Vec3b
+        Dim rgbData(src.Total * 3 - 1) As Byte
         Dim handleSrc = GCHandle.Alloc(rgbData, GCHandleType.Pinned) ' pin it for the duration...
-        src.GetArray(Of cv.Vec3b)(rgbData)
+        Marshal.Copy(src.Data, rgbData, 0, rgbData.Length)
 
         Dim imagePtr = WhiteBalance_Run(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, thresholdVal)
         handleSrc.Free()
