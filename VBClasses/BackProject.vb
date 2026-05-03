@@ -435,26 +435,25 @@ End Class
 Public Class NR_BackProject_MaskLines : Inherits TaskParent
     Dim masks As New PlotMouse_MaskBackProject
     Public Sub New()
+        If standalone Then task.gOptions.displayDst1.Checked = True
         dst1 = New cv.Mat(dst1.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         labels(2) = "Move mouse to see lines detected in the backprojection mask"
         desc = "Inspect the lines from individual backprojection masks from a histogram"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         masks.Run(src)
-        dst1 = masks.dst1
         dst2 = masks.dst2
 
-        Static saveHistIndex As Integer = masks.histIndex
-        If masks.histIndex <> saveHistIndex Then dst1.SetTo(0)
+        Dim lpList = Line_Basics_TA.getRawLines(task.lines.ld.Detect(masks.dst1))
 
-        Dim lpList = Line_Basics_TA.getRawLines(task.lines.ld.Detect(dst1))
-
+        dst1.SetTo(0)
         For Each lp In lpList
             Dim val = masks.dst3.Get(Of Byte)(lp.p1.Y, lp.p1.X)
             If val = 255 Then dst2.Line(lp.p1, lp.p2, white, task.lineWidth, task.lineWidth)
+            dst1.Line(lp.p1, lp.p2, white, task.lineWidth, task.lineWidth)
         Next
         dst3 = masks.dst3
-        labels(3) = masks.labels(3)
+        labels(3) = masks.labels(3) + " and " + CStr(lpList.Count) + " lines were found in the backprojection"
     End Sub
 End Class
 

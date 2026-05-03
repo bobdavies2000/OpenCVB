@@ -1,3 +1,4 @@
+Imports System.Threading
 Imports cv = OpenCvSharp
 Public Class Line_Basics_TA : Inherits TaskParent
     Implements IDisposable
@@ -25,8 +26,7 @@ Public Class Line_Basics_TA : Inherits TaskParent
                    p2.X >= 0 And p2.X < task.workRes.Width And p2.Y >= 0 And p2.Y < task.workRes.Height Then
                     p1 = lpData.validatePoint(p1)
                     p2 = lpData.validatePoint(p2)
-                    Dim lp = New lpData(p1, p2)
-                    If lp.pVec1(2) > 0 And lp.pVec2(2) > 0 Then lpList.Add(lp)
+                    lpList.Add(New lpData(p1, p2))
                 End If
             End If
         Next
@@ -127,20 +127,34 @@ Public Class NR_Line_Core : Inherits TaskParent
     Implements IDisposable
     Public lpList As New List(Of lpData)
     Public Sub New()
+        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-        desc = "Use FastLineDetector (OpenCV Contrib) to find all the lines in a subset " +
-                       "rectangle (provided externally)"
+        desc = "Use FastLineDetector (OpenCV Contrib) to find all the lines inside drawRect"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If src.Channels() <> 1 Then src = task.gray
         If src.Type <> cv.MatType.CV_8U Then src.ConvertTo(src, cv.MatType.CV_8U)
 
-        Dim vecArray = task.lines.getRawVecs(src)
+        Dim vecArray() As cv.Vec4f
+        Dim drawing As Boolean = False
+        If task.drawRectFinal.Width > 0 And task.drawRectFinal.Height > 0 Then
+            dst1.SetTo(0)
+            src(task.drawRectFinal).CopyTo(dst1)
+            drawing = True
+            vecArray = task.lines.ld.Detect(dst1)
+        Else
+            vecArray = task.lines.ld.Detect(src)
+        End If
+
         lpList = Line_Basics_TA.getRawLines(vecArray)
 
         dst2.SetTo(0)
         For Each lp In lpList
-            dst2.Line(lp.p1, lp.p2, 255, task.lineWidth, task.lineType)
+            If drawing Then
+                dst2(task.drawRectFinal).Line(lp.p1, lp.p2, 255, task.lineWidth, task.lineType)
+            Else
+                dst2.Line(lp.p1, lp.p2, 255, task.lineWidth, task.lineType)
+            End If
         Next
 
         labels(2) = CStr(lpList.Count) + " lines were detected."

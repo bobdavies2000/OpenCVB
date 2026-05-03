@@ -14,6 +14,7 @@ Namespace MainApp
             Dim x As Integer = e.X * settings.workRes.Width / pics(0).Width
             Dim y As Integer = e.Y * settings.workRes.Height / pics(0).Height
             vbc.task.mouseMagnifyEndPoint = New cv.Point(e.X, e.Y)
+            vbc.task.drawRectFinal = vbc.task.drawRect
         End Sub
         Private Sub CamPic_MouseDown(ByVal sender As Object, ByVal e As System.Windows.Forms.MouseEventArgs)
             If vbc.task Is Nothing Then Exit Sub
