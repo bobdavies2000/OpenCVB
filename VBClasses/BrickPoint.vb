@@ -421,7 +421,7 @@ Public Class NR_BrickPoint_EndPoints : Inherits TaskParent
         Dim lplist = brickKNN.lplist
 
         dst1.SetTo(0)
-        Dim lineList As New List(Of Single)
+        Dim lineList As New HashSet(Of Single)
         For Each lp In lplist
             Dim p1 = lpData.validatePoint(New cv.Point(CInt(lp.pE1.Y), CInt(lp.pE1.X)))
             Dim p2 = lpData.validatePoint(New cv.Point(CInt(lp.pE2.Y), CInt(lp.pE2.X)))

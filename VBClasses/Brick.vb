@@ -248,7 +248,7 @@ End Class
 Public Class Brick_LeftRightMouse : Inherits TaskParent
     Dim bricks As New Brick_Basics
     Public means As New List(Of Single)
-    Dim myBricks As New List(Of Integer)
+    Dim myBricks As New HashSet(Of Integer)
     Public Sub New()
         labels(2) = "Move the mouse in the color image to see the matches in left and right images. Click to clear the rectangles."
         labels(3) = "Right view with the translated trace of bricks under the mouse."

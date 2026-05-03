@@ -264,6 +264,8 @@ FeatureMap_Periphery
 FeatureMap_StablePoints
 Filter_Basics_Gray
 Filter_Basics_TA
+Filter_Equalize
+Filter_Laplacian
 FindMinRect_Basics
 FindNonZero_Basics
 FindNonZero_Line3D
@@ -479,6 +481,8 @@ LinearRegression_Basics
 LineSeg_Basics
 LineSeg_BasicsFail
 LineSeg_Core
+LineSeg_Detector
+LineSeg_FLD
 LineSeg_LBD
 LineSeg_Match
 LineSeg_Top3
@@ -937,8 +941,6 @@ NR_FeatureMap_ViewRight
 NR_FeatureMap_WithAge
 NR_Fibonacci_Basics
 NR_Fibonacci_Yield
-NR_Filter_Equalize
-NR_Filter_Laplacian
 NR_Filter_Maximum
 NR_Filter_Mean
 NR_Filter_Median

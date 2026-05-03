@@ -243,7 +243,7 @@ Public Class NR_Bin4Way_UnstablePixels : Inherits TaskParent
         Dim pts(points.Rows * 2 - 1) As Integer
         Marshal.Copy(points.Data, pts, 0, pts.Length)
 
-        Dim pixels As New List(Of Byte)
+        Dim pixels As New HashSet(Of Byte)
         Dim pixelSort As New SortedList(Of Byte, Integer)(New compareByte)
         For i = 0 To pts.Count - 1 Step 2
             Dim val = task.gray.Get(Of Byte)(pts(i + 1), pts(i))
@@ -341,7 +341,7 @@ Public Class Bin4Way_UnstablePixels1 : Inherits TaskParent
         Dim pts(points.Rows * 2 - 1) As Integer
         Marshal.Copy(points.Data, pts, 0, pts.Length)
 
-        Dim pixels As New List(Of Byte)
+        Dim pixels As New HashSet(Of Byte)
         Dim pixelSort As New SortedList(Of Byte, Integer)(New compareByte)
         For i = 0 To pts.Count - 1 Step 2
             Dim val = task.gray.Get(Of Byte)(pts(i + 1), pts(i))

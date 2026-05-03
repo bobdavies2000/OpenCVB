@@ -62,7 +62,7 @@ Public Class Resize_Proportional : Inherits TaskParent
             dst2 = redC.dst2
             labels(2) = redC.labels(2)
             SetTrueText(redC.strOut, 3)
-            src = src(task.rcD.rect)
+            If task.rcD IsNot Nothing Then src = src(task.rcD.rect)
         End If
 
         Dim newSize As cv.Size

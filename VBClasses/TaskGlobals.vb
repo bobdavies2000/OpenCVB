@@ -134,6 +134,10 @@ Public Module vbc
         mm.range = mm.maxVal - mm.minVal
         Return mm
     End Function
+    Public Function getMinMaxDrawRect(mat As cv.Mat) As mmData
+        If task.drawRect.Width > 0 And task.drawRect.Height > 0 Then mat = mat(task.drawRect)
+        Return GetMinMax(mat)
+    End Function
     ' alternative optional parameter: ApproxTC89L1 or ApproxNone
     Public Function ContourBuild(mask As cv.Mat, Optional approxMode As cv.ContourApproximationModes = cv.ContourApproximationModes.ApproxNone) As List(Of cv.Point)
         Dim allContours As cv.Point()() = Nothing

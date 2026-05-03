@@ -43,9 +43,9 @@ End Class
 
 
 Public Class Filter_Basics_Gray : Inherits TaskParent
-    Public filterIndex As Integer = -1
+    Public filterIndex As Integer
     Public filterList As String() = {"Original", "Blur_Basics", "Dilate_Basics", "Erode_Basics",
-                                             "NR_Filter_Equalize", "NR_Filter_Laplacian", "MeanSubtraction_Gray", "PhotoShop_Gamma"}
+                                     "Filter_Equalize", "Filter_Laplacian", "MeanSubtraction_Gray", "PhotoShop_Gamma"}
     Dim filters(filterList.Count - 1) As Object
     Public Sub New()
         desc = "Demo the RGB Filters selected in 'fOptions'.  If none selected, just the input is displayed."
@@ -62,28 +62,31 @@ Public Class Filter_Basics_Gray : Inherits TaskParent
                         If filters(cb.Tag) Is Nothing Then filters(cb.Tag) = New Dilate_Basics
                     Case "Erode_Basics"
                         If filters(cb.Tag) Is Nothing Then filters(cb.Tag) = New Erode_Basics
-                    Case "NR_Filter_Equalize"
-                        If filters(cb.Tag) Is Nothing Then filters(cb.Tag) = New NR_Filter_Equalize
-                    Case "NR_Filter_Laplacian"
-                        If filters(cb.Tag) Is Nothing Then filters(cb.Tag) = New NR_Filter_Laplacian
+                    Case "Filter_Equalize"
+                        If filters(cb.Tag) Is Nothing Then filters(cb.Tag) = New Filter_Equalize
+                    Case "Filter_Equalize"
+                        If filters(cb.Tag) Is Nothing Then filters(cb.Tag) = New Filter_Laplacian
                     Case "MeanSubtraction_Gray"
                         If filters(cb.Tag) Is Nothing Then filters(cb.Tag) = New MeanSubtraction_Gray
                     Case "PhotoShop_Gamma"
                         If filters(cb.Tag) Is Nothing Then filters(cb.Tag) = New PhotoShop_Gamma
                 End Select
                 filterIndex = cb.Tag
+                Exit For
             End If
         Next
 
         labels(2) = "Grayscale input to all algorithms - " + task.fOptions.grayCheckbox(filterIndex).Text
         If filterIndex > 0 Then
-            filters(filterIndex).run(dst2)
+            filters(filterIndex).Run(dst2)
             dst2 = filters(filterIndex).dst2
             If dst2.Channels <> 1 Then
                 MessageBox.Show("Filter_Basics_Gray failure - " + filterList(filterIndex) + " needs to return " + vbCrLf +
                            "an 8UC1 image, not 8UC3.  Reevaluate any new filters added above!")
                 Dim k = 0 ' if you set a breakpoint here when you get this message, you can debug it more easily.
             End If
+        Else
+            dst2 = src
         End If
     End Sub
 End Class
@@ -93,7 +96,7 @@ End Class
 
 
 ' https://docs.opencvb.org/2.4/doc/tutorials/imgproc/imgtrans/laplace_operator/laplace_operator.html
-Public Class NR_Filter_Laplacian : Inherits TaskParent
+Public Class Filter_Laplacian : Inherits TaskParent
     Public Sub New()
         labels(2) = "Sharpened image using Filter2D output"
         labels(3) = "Output of Filter2D (approximated Laplacian)"
@@ -273,7 +276,7 @@ End Class
 
 
 'https://docs.opencvb.org/master/d1/db7/tutorial_py_Histogram_begins.html
-Public Class NR_Filter_Equalize : Inherits TaskParent
+Public Class Filter_Equalize : Inherits TaskParent
     Public Sub New()
         labels(2) = "Equalized image"
         desc = "Create an equalized image of the grayscale input."

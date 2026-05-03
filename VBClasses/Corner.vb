@@ -9,7 +9,7 @@ Public Class Corner_Basics : Inherits TaskParent
         desc = "Find and save only the stable points in the FAST output"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        Dim lastFeatures = New List(Of cv.Point2f)(fast.features)
+        Dim lastFeatures = New HashSet(Of cv.Point2f)(fast.features)
         fast.Run(src)
 
         Dim threshold = fast.features.Count / 10

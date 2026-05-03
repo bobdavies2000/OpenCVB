@@ -1,5 +1,4 @@
-﻿Imports System.Linq
-Imports cv = OpenCvSharp
+﻿Imports cv = OpenCvSharp
 Public Class LineSeg_Basics : Inherits TaskParent
     Public lpList As New List(Of lpData)
     Dim lSeg As New LineSeg_Core
@@ -31,6 +30,15 @@ Public Class LineSeg_Basics : Inherits TaskParent
         Next
         Return False
     End Function
+    Public Shared Function lineHistogram(input As cv.Mat, nMax As Integer) As Single()
+        Dim histogram As New cv.Mat
+        cv.Cv2.CalcHist({input}, {0}, emptyMat, histogram, 1, {nMax},
+                         New cv.Rangef() {New cv.Rangef(-1, nMax + 1)})
+
+        Dim histArray(histogram.Total - 1) As Single
+        histogram.GetArray(Of Single)(histArray)
+        Return histArray
+    End Function
     Public Overrides Sub RunAlg(src As cv.Mat)
         If task.optionsChanged Then lpList.Clear()
 
@@ -50,12 +58,7 @@ Public Class LineSeg_Basics : Inherits TaskParent
             lSeg.dst1.CopyTo(masked, task.motion.motionMask)
             masked.CopyTo(dst1)
 
-            Dim histogram As New cv.Mat
-            cv.Cv2.CalcHist({dst1}, {0}, emptyMat, histogram, 1, {n},
-                             New cv.Rangef() {New cv.Rangef(1, n + 1)})
-
-            Dim histArray(histogram.Total - 1) As Single
-            histogram.GetArray(Of Single)(histArray)
+            Dim histArray = lineHistogram(dst1, n)
 
             For i = 0 To n - 1
                 If histArray(i) > 0 Then outList.Add(detected(i))
@@ -611,5 +614,75 @@ Public Class LineSeg_Top3 : Inherits TaskParent
 
         labels(2) = CStr(lpList.Count) + " LineSeg_LBD line(s) tracked (heartBeatLT re-picks top 3 by length)."
         labels(3) = CStr(nLines) + " LBD lines; heartBeatLT = " + CStr(task.heartBeatLT) + "."
+    End Sub
+End Class
+
+
+
+
+Public Class LineSeg_FLD : Inherits TaskParent
+    Dim lSeg As New LineSeg_Core
+    Public lpList As New List(Of lpData)
+    Public Sub New()
+        dst0 = New cv.Mat(dst0.Size, cv.MatType.CV_8U, 0)
+        If standalone Then task.gOptions.displayDst1.Checked = True
+        desc = "Merge the results of Line Segment Descriptor and Fast Line Detector."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        lSeg.Run(task.gray)
+        dst2 = lSeg.dst3
+        labels(2) = lSeg.labels(2)
+
+        dst1 = task.lines.dst3
+        labels(1) = task.lines.labels(2)
+
+        dst3 = dst1 And dst2
+
+        dst0.SetTo(0)
+        lSeg.dst1.CopyTo(dst0, dst3)
+
+        Dim histArray = LineSeg_Basics.lineHistogram(dst0, Math.Max(task.lines.lpList.Count, lSeg.lpList.Count))
+
+        dst3.SetTo(0)
+        For i = 0 To histArray.Count - 1
+            If histArray(i) > 5 Then
+                dst3.Line(lSeg.lpList(i).p1, lSeg.lpList(i).p2, 255, task.lineWidth, task.lineType)
+            End If
+        Next
+    End Sub
+End Class
+
+
+
+
+Public Class LineSeg_Detector : Inherits TaskParent
+    Dim lSeg As New LineSeg_Core
+    Public lpList As New List(Of lpData)
+    Public Sub New()
+        dst0 = New cv.Mat(dst0.Size, cv.MatType.CV_8U, 0)
+        If standalone Then task.gOptions.displayDst1.Checked = True
+        desc = "Compare the results of the line segment detector and fast line detector."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        lSeg.Run(task.gray)
+        dst2 = lSeg.dst3
+        labels(2) = lSeg.labels(2)
+
+        dst1 = task.lines.dst3
+        labels(1) = task.lines.labels(2)
+
+        dst3 = dst1 And dst2
+
+        dst0.SetTo(0)
+        lSeg.dst1.CopyTo(dst0, dst3)
+
+        Dim histArray = LineSeg_Basics.lineHistogram(dst0, Math.Max(task.lines.lpList.Count, lSeg.lpList.Count))
+
+        dst3.SetTo(0)
+        For i = 0 To histArray.Count - 1
+            If histArray(i) > 5 Then
+                dst3.Line(lSeg.lpList(i).p1, lSeg.lpList(i).p2, 255, task.lineWidth, task.lineType)
+            End If
+        Next
     End Sub
 End Class
