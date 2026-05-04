@@ -629,52 +629,8 @@ End Class
 
 
 
-Public Class BackProject_FullDepth : Inherits TaskParent
-    Public classCount As Integer
-    Dim plotHist As New PlotBar_Basics
-    Public Sub New()
-        task.gOptions.setHistogramBins(20)
-        plotHist.createHistogram = True
-        plotHist.removeZeroEntry = False
-        If standalone Then task.gOptions.displayDst1.Checked = True
-        desc = "Create a histogram for the depth image, uniquely identify each bin, and backproject it."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        If src.Type <> cv.MatType.CV_32F Then src = task.pcSplit(2).Clone
-        classCount = task.histogramBins
-
-        src.SetTo(task.MaxZmeters, task.maxDepthMask)
-        plotHist.Run(src)
-        dst1 = plotHist.dst2
-
-        For i = 0 To classCount - 1
-            plotHist.histogram.Set(Of Single)(i, 0, i + 1)
-        Next
-
-        Dim histArray(plotHist.histogram.Rows - 1) As Single
-        plotHist.histogram.GetArray(Of Single)(histArray)
-
-        cv.Cv2.CalcBackProject({src}, {0}, plotHist.histogram, dst2, plotHist.ranges)
-        dst2.ConvertTo(dst2, cv.MatType.CV_8U)
-        labels(2) = "CV_8U backprojection of the " + CStr(classCount) + " histogram bins."
-        If standaloneTest() Then
-            Static index As Integer
-            If task.heartBeatLT Then index += 1
-            If index >= classCount Then index = 0
-            dst3 = dst2.InRange(index, index)
-            labels(3) = "Class " + CStr(index) + " had " + CStr(plotHist.histArray(index)) + " pixels after backprojection."
-        End If
-    End Sub
-End Class
-
-
-
-
-
-
-
 Public Class NR_BackProject_Basics_Depth : Inherits TaskParent
-    Public bpDepth As New BackProject_FullDepth
+    Public bpDepth As New BackProject_Depth
     Public Sub New()
         task.gOptions.setHistogramBins(20)
         desc = "Create a histogram for the depth image, uniquely identify each bin, and backproject it."
@@ -694,7 +650,7 @@ End Class
 
 
 Public Class NR_BackProject_DepthSlider : Inherits TaskParent
-    Public bpDepth As New BackProject_FullDepth
+    Public bpDepth As New BackProject_Depth
     Public Sub New()
         task.gOptions.setHistogramBins(20)
         desc = "Create a histogram for the depth image, uniquely identify each bin, and backproject it."
@@ -752,10 +708,52 @@ Public Class BackProject_DepthMouse : Inherits TaskParent
         desc = "Create a histogram of depth regions"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        bProject.Run(task.pcSplit(2)) ' calcHist doesn't support 32S
+        bProject.Run(task.pcSplit(2))
         dst2 = bProject.dst2
         dst3 = bProject.dst3
         labels(2) = bProject.labels(3)
     End Sub
 End Class
 
+
+
+
+
+
+
+
+Public Class BackProject_Depth : Inherits TaskParent
+    Public classCount As Integer
+    Dim plotHist As New PlotBar_Basics
+    Public Sub New()
+        task.gOptions.setHistogramBins(32)
+        plotHist.minRange = 0.01
+        plotHist.maxRange = task.MaxZmeters
+        plotHist.createHistogram = True
+        plotHist.removeZeroEntry = False
+        If standalone Then task.gOptions.displayDst1.Checked = True
+        desc = "Create a histogram for the depth image, uniquely identify each bin, and backproject it."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        If src.Type <> cv.MatType.CV_32F Then src = task.pcSplit(2)
+        classCount = task.histogramBins
+
+        plotHist.Run(src)
+        dst1 = plotHist.dst2
+
+        For i = 0 To classCount - 1
+            plotHist.histogram.Set(Of Single)(i, 0, i + 1)
+        Next
+
+        Dim histArray(plotHist.histogram.Rows - 1) As Single
+        plotHist.histogram.GetArray(Of Single)(histArray)
+
+        cv.Cv2.CalcBackProject({src}, {0}, plotHist.histogram, dst2, plotHist.ranges)
+        dst2.ConvertTo(dst2, cv.MatType.CV_8U)
+        labels(2) = "CV_8U backprojection of the " + CStr(classCount) + " histogram bins."
+
+        dst3 = Palettize(dst2)
+        dst3.SetTo(0, task.noDepthMask)
+        labels(3) = "Palettized version of the data in dst2 showing " + CStr(classCount) + " tiers"
+    End Sub
+End Class

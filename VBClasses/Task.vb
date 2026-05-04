@@ -47,7 +47,7 @@ Public Class AlgorithmTask : Implements IDisposable
         stabilizeDepth.TA_Active = True
         stabilizeGray = New StableGray_Basics_TA
 
-        cloud_TA = New Cloud_Gravity_TA
+        prepCloud = New Cloud_Gravity_TA
         grid = New Grid_Basics_TA
         lines = New Line_Basics_TA
         filterBasics = New Filter_Basics_TA
@@ -177,7 +177,7 @@ Public Class AlgorithmTask : Implements IDisposable
             End If
         End If
 
-        cloud_TA.Run(emptyMat) '******* this may rotate for gravity if gravity is selected *******
+        prepCloud.Run(emptyMat) '******* this may rotate for gravity if gravity is selected *******
 
         If gOptions.stabilizeDepthRGB.Checked Then stabilizeDepth.Run(emptyMat)
 

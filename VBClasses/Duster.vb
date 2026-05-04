@@ -40,7 +40,6 @@ Public Class Duster_MaskZ : Inherits TaskParent
         hist.bins = options.bins
 
         Dim src32f = task.pcSplit(2)
-        task.maxDepthMask = src32f.InRange(task.MaxZmeters, task.MaxZmeters).ConvertScaleAbs()
         src32f.SetTo(task.MaxZmeters, task.maxDepthMask)
 
         hist.fixedRanges = {New cv.Rangef(0.001, task.MaxZmeters)}

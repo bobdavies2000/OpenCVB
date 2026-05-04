@@ -792,6 +792,7 @@ Public Class Cloud_Gravity_TA : Inherits TaskParent
     End Function
     Public Overrides Sub RunAlg(src As cv.Mat)
         originalPointcloud = task.pointCloud.Clone
+        task.maxDepthMask = originalPointcloud.InRange(task.MaxZmeters, 10000).ConvertScaleAbs()
 
         If task.optionsChanged Then
             If task.rangesCloud Is Nothing Then
@@ -799,8 +800,8 @@ Public Class Cloud_Gravity_TA : Inherits TaskParent
                 Dim ry = New cv.Vec2f(-task.yRangeDefault, task.yRangeDefault)
                 Dim rz = New cv.Vec2f(0, task.MaxZmeters)
                 task.rangesCloud = New cv.Rangef() {New cv.Rangef(rx.Item0, rx.Item1),
-                                                            New cv.Rangef(ry.Item0, ry.Item1),
-                                                            New cv.Rangef(rz.Item0, rz.Item1)}
+                                                    New cv.Rangef(ry.Item0, ry.Item1),
+                                                    New cv.Rangef(rz.Item0, rz.Item1)}
             End If
         End If
 
@@ -818,18 +819,6 @@ Public Class Cloud_Gravity_TA : Inherits TaskParent
         End If
 
         task.pcSplit = task.pointCloud.Split
-
-        If task.optionsChanged Then
-            task.maxDepthMask = New cv.Mat(task.pcSplit(2).Size, cv.MatType.CV_8U, 0)
-        End If
-
-        'If task.gOptions.TruncateDepth.Checked Then
-        '    task.pcSplit(2) = task.pcSplit(2).Threshold(task.MaxZmeters,
-        '                                                      task.MaxZmeters, cv.ThresholdTypes.Trunc)
-        '    task.maxDepthMask = task.pcSplit(2).InRange(task.MaxZmeters,
-        '                                                      task.MaxZmeters).ConvertScaleAbs()
-        '    cv.Cv2.Merge(task.pcSplit, task.pointCloud)
-        'End If
 
         task.depthmask = task.pcSplit(2).Threshold(0, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs
         task.noDepthMask = Not task.depthmask

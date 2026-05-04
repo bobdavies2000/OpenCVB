@@ -6,11 +6,11 @@ ApproxPoly_Basics
 AsciiArt_Basics
 AsciiArt_Color
 BackProject_Basics
+BackProject_Depth
 BackProject_DepthMouse
 BackProject_DisplayColor
 BackProject_FeatureLess
 BackProject_Full
-BackProject_FullDepth
 BackProject_Image
 BackProject_Side
 BackProject_SoloSide
@@ -148,6 +148,7 @@ Depth_Outline
 Depth_ReliableLines
 Depth_TierCount
 Depth_Tiers
+Depth_TiersOld
 Depth_World
 Depth_WorldXYZ
 DepthColorizer_Basics_TA
