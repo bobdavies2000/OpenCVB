@@ -646,15 +646,13 @@ End Class
 
 
 Public Class NR_Edge_Regions : Inherits TaskParent
-    Dim tiers As New Depth_Tiers
     Dim edge As New Edge_Basics
     Public Sub New()
         labels = {"", "", "Edge_Canny output for the depth regions", "Identified regions "}
         desc = "Find the edges for the depth tiers."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        tiers.Run(src)
-        dst3 = tiers.dst3
+        dst3 = task.depthTiers.dst3
 
         edge.Run(dst3.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
         dst2 = edge.dst2

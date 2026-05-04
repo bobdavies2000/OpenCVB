@@ -7,7 +7,6 @@ AsciiArt_Basics
 AsciiArt_Color
 BackProject_Basics
 BackProject_Depth
-BackProject_Depth_TA
 BackProject_DepthMouse
 BackProject_DisplayColor
 BackProject_FeatureLess
@@ -148,7 +147,8 @@ Depth_NotMissing
 Depth_Outline
 Depth_ReliableLines
 Depth_TierCount
-Depth_Tiers
+Depth_Tiers_TA
+Depth_TiersOld
 Depth_World
 Depth_WorldXYZ
 DepthColorizer_Basics_TA
@@ -446,9 +446,9 @@ LeftRight_Reduction
 LeftRight_Stable
 Line_Basics_TA
 Line_BasicsEmboss
-Line_BasicsNew
 Line_BasicsNoMotion
 Line_BasicsNoMotion1
+Line_BasicsOld
 Line_Brick
 Line_BrickList
 Line_BrickListTest

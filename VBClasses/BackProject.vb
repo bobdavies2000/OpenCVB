@@ -756,33 +756,3 @@ Public Class BackProject_Depth : Inherits TaskParent
         labels(3) = "Palettized version of the data in dst2 showing " + CStr(task.histogramBins) + " tiers"
     End Sub
 End Class
-
-
-
-
-
-
-Public Class BackProject_Depth_TA : Inherits TaskParent
-    Dim histogram As cv.Mat
-    Public classCount As Integer = 100
-    Dim ranges() As cv.Rangef = {New cv.Rangef(0.1, task.MaxZmeters)}
-    Public Sub New()
-        task.gOptions.setHistogramBins(classCount)
-        histogram = New cv.Mat(New cv.Size(1, classCount), cv.MatType.CV_32F, 0)
-        For i = 1 To classCount - 1
-            histogram.Set(Of Single)(0, i, i)
-        Next
-        labels(2) = "CV_8U backprojection with " + CStr(classCount) + " bins"
-        desc = "Trim the depth to increase the size of each bin."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        If src.Type <> cv.MatType.CV_32F Then src = task.pcSplit(2)
-
-        If task.heartBeat Then
-            cv.Cv2.CalcBackProject({src}, {0}, histogram, dst1, ranges)
-            dst1.ConvertTo(dst2, cv.MatType.CV_8U)
-            dst3 = Palettize(dst2)
-            labels(3) = "Depth range: 0.1 to " + Format(task.MaxZmeters, fmt3)
-        End If
-    End Sub
-End Class

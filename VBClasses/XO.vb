@@ -11187,15 +11187,13 @@ Namespace VBClasses
 
 
     Public Class XO_RedList_PlusTiers : Inherits TaskParent
-        Dim tiers As New Depth_Tiers
         Dim binar4 As New Bin4Way_Regions
         Public Sub New()
             desc = "Add the depth tiers to the input for RedFlood_List."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            tiers.Run(src)
             binar4.Run(src)
-            dst2 = runRedList(binar4.dst2 + tiers.dst2, labels(2))
+            dst2 = runRedList(binar4.dst2 + task.depthTiers.dst2, labels(2))
         End Sub
     End Class
 
@@ -19090,7 +19088,6 @@ Namespace VBClasses
 
 
     Public Class XO_RedList_Tiers : Inherits TaskParent
-        Dim tiers As New Depth_Tiers
         Dim binar4 As New Bin4Way_Regions
         Public Sub New()
             desc = "Use the Depth_TierZ algorithm to create a color-based RedCloud"
@@ -19099,12 +19096,11 @@ Namespace VBClasses
             binar4.Run(src)
             dst1 = Palettize(binar4.dst2)
 
-            tiers.Run(src)
-            dst3 = tiers.dst3
+            dst3 = task.depthTiers.dst3
 
-            dst0 = tiers.dst2 + binar4.dst2
+            dst0 = task.depthTiers.dst2 + binar4.dst2
             dst2 = runRedList(dst0, labels(2))
-            labels(3) = tiers.labels(2)
+            labels(3) = task.depthTiers.labels(2)
         End Sub
     End Class
 
@@ -19112,7 +19108,6 @@ Namespace VBClasses
 
 
     Public Class XO_RedList_TiersBinarize : Inherits TaskParent
-        Dim tiers As New Depth_Tiers
         Dim binar4 As New Bin4Way_Regions
         Public Sub New()
             desc = "Use the Depth_TierZ with Bin4Way_Regions algorithm to create a color-based RedCloud"
@@ -19120,8 +19115,7 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             binar4.Run(src)
 
-            tiers.Run(src)
-            dst2 = tiers.dst2 + binar4.dst2
+            dst2 = task.depthTiers.dst2 + binar4.dst2
 
             dst2 = runRedList(dst2, labels(2))
         End Sub

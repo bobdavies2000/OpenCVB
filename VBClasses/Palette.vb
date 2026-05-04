@@ -514,7 +514,6 @@ End Class
 
 Public Class NR_Palette_Bin4Way : Inherits TaskParent
     Dim binary As New Bin4Way_SplitMean
-    Dim tiers As New Depth_Tiers
     Public classCount As Integer
     Public Sub New()
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
@@ -529,9 +528,8 @@ Public Class NR_Palette_Bin4Way : Inherits TaskParent
             dst2.SetTo(i, binary.mats.mat(i))
         Next
 
-        tiers.Run(src)
-        dst2 += tiers.dst2
-        classCount = tiers.classCount + 4
+        dst2 += task.depthTiers.dst2
+        classCount = task.depthTiers.classCount + 4
 
         dst3 = Palettize(dst2)
     End Sub

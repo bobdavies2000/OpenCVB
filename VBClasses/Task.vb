@@ -48,7 +48,7 @@ Public Class AlgorithmTask : Implements IDisposable
         stabilizeGray = New StableGray_Basics_TA
 
         prepCloud = New Cloud_Gravity_TA
-        depthTiers = New BackProject_Depth_TA
+        depthTiers = New Depth_Tiers_TA
         grid = New Grid_Basics_TA
         lines = New Line_Basics_TA
         filterBasics = New Filter_Basics_TA

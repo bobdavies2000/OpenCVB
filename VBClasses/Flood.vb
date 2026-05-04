@@ -171,7 +171,6 @@ End Class
 
 Public Class NR_Flood_Tiers : Inherits TaskParent
     Dim flood As New Flood_BasicsMask
-    Dim tiers As New Depth_Tiers
     Dim color8U As New Color8U_Basics
     Public Sub New()
         task.gOptions.displayDst1.Checked = True
@@ -180,16 +179,15 @@ Public Class NR_Flood_Tiers : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         Dim tier = task.gOptions.DebugSlider.Value
 
-        tiers.Run(src)
-        If tier >= tiers.classCount Then tier = 0
+        If tier >= task.depthTiers.classCount Then tier = 0
 
         If tier = 0 Then
-            dst0 = Not tiers.dst2.InRange(0, 1)
+            dst0 = Not task.depthTiers.dst2.InRange(0, 1)
         Else
-            dst0 = Not tiers.dst2.InRange(tier, tier)
+            dst0 = Not task.depthTiers.dst2.InRange(tier, tier)
         End If
 
-        labels(2) = tiers.labels(2) + " in tier " + CStr(tier) + ".  Use the global options 'DebugSlider' to select different tiers."
+        labels(2) = task.depthTiers.labels(2) + " in tier " + CStr(tier) + ".  Use the global options 'DebugSlider' to select different tiers."
 
         color8U.Run(src)
 

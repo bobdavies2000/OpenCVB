@@ -1,5 +1,5 @@
 Imports cv = OpenCvSharp
-Public Class Line_BasicsNew : Inherits TaskParent
+Public Class Line_Basics_TA : Inherits TaskParent
     Implements IDisposable
     Public lpList As New List(Of lpData)
     Public ld As cv.XImgProc.FastLineDetector
@@ -11,68 +11,6 @@ Public Class Line_BasicsNew : Inherits TaskParent
         labels(2) = "Edges_Basics output"
         ld = cv.XImgProc.CvXImgProc.CreateFastLineDetector
         desc = "Run FLD with sobel input."
-    End Sub
-    'Public Shared Function getRawLines(lines As cv.Vec4f()) As List(Of lpData)
-    '    Dim lpList As New List(Of lpData)
-    '    For Each v In lines
-    '        If v(0) >= 0 And v(0) <= task.workRes.Width And v(1) >= 0 And v(1) <= task.workRes.Height And
-    '                       v(2) >= 0 And v(2) <= task.workRes.Width And v(3) >= 0 And v(3) <= task.workRes.Height Then
-    '            Dim p1 = New cv.Point(CInt(v(0)), CInt(v(1)))
-    '            Dim p2 = New cv.Point(CInt(v(2)), CInt(v(3)))
-    '            If p1.X >= 0 And p1.X < task.workRes.Width And p1.Y >= 0 And p1.Y < task.workRes.Height And
-    '               p2.X >= 0 And p2.X < task.workRes.Width And p2.Y >= 0 And p2.Y < task.workRes.Height Then
-    '                p1 = lpData.validatePoint(p1)
-    '                p2 = lpData.validatePoint(p2)
-    '                lpList.Add(New lpData(p1, p2))
-    '            End If
-    '        End If
-    '    Next
-    '    Return lpList
-    'End Function
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        If src.Channels <> 1 Or src.Type <> cv.MatType.CV_8U Then src = task.gray.Clone
-
-        edges.Run(src)
-        dst2 = edges.dst2.Threshold(100, 255, cv.ThresholdTypes.Binary)
-        labels(2) = edges.labels(2)
-
-        lpList = Line_Basics_TA.getRawLines(ld.Detect(dst2))
-
-        dst1.SetTo(0)
-        Dim index As Integer
-        For Each lp In lpList
-            index += 1
-            lp.index = index
-            dst1.Line(lp.p1, lp.p2, lp.index, task.lineWidth, cv.LineTypes.Link4)
-        Next
-
-        dst3 = dst1.Threshold(0, 255, cv.ThresholdTypes.Binary)
-
-        labels(3) = CStr(lpList.Count) + " lines found"
-    End Sub
-    Protected Overrides Sub Finalize()
-        ld.Dispose()
-    End Sub
-End Class
-
-
-
-
-
-Public Class Line_Basics_TA : Inherits TaskParent
-    Implements IDisposable
-    Public lpList As New List(Of lpData)
-    Public motionMask As cv.Mat = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 255)
-    Public ld As cv.XImgProc.FastLineDetector
-    Public removeOverlappingLines As Boolean = True
-    Public overLappingCount As Integer
-    Public Sub New()
-        dst0 = New cv.Mat(dst0.Size, cv.MatType.CV_8U, 0)
-        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
-        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
-        If standalone Then task.gOptions.showMotionMask.Checked = True
-        ld = cv.XImgProc.CvXImgProc.CreateFastLineDetector
-        desc = "If line is NOT in motion mask, then keep it.  If line is in motion mask, add it."
     End Sub
     Public Shared Function getRawLines(lines As cv.Vec4f()) As List(Of lpData)
         Dim lpList As New List(Of lpData)
@@ -91,6 +29,54 @@ Public Class Line_Basics_TA : Inherits TaskParent
         Next
         Return lpList
     End Function
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        dst2 = task.color.Clone
+        If src.Channels <> 1 Or src.Type <> cv.MatType.CV_8U Then src = task.gray.Clone
+
+        edges.Run(src)
+        dst0 = edges.dst2.Threshold(100, 255, cv.ThresholdTypes.Binary)
+        labels(2) = edges.labels(2)
+
+        lpList = Line_Basics_TA.getRawLines(ld.Detect(dst0))
+
+        dst1.SetTo(0)
+        Dim index As Integer
+        For Each lp In lpList
+            index += 1
+            lp.index = index
+            dst1.Line(lp.p1, lp.p2, lp.index, task.lineWidth, cv.LineTypes.Link4)
+            Dim tierIndex = task.depthTiers.dst2.Get(Of Byte)(lp.p1.Y, lp.p1.X)
+            dst2.Line(lp.p1, lp.p2, task.scalarColors(tierIndex), task.lineWidth, cv.LineTypes.Link4)
+        Next
+
+        dst3 = dst1.Threshold(0, 255, cv.ThresholdTypes.Binary)
+
+        labels(3) = CStr(lpList.Count) + " lines found"
+    End Sub
+    Protected Overrides Sub Finalize()
+        ld.Dispose()
+    End Sub
+End Class
+
+
+
+
+
+Public Class Line_BasicsOld : Inherits TaskParent
+    Implements IDisposable
+    Public lpList As New List(Of lpData)
+    Public motionMask As cv.Mat = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 255)
+    Public ld As cv.XImgProc.FastLineDetector
+    Public removeOverlappingLines As Boolean = True
+    Public overLappingCount As Integer
+    Public Sub New()
+        dst0 = New cv.Mat(dst0.Size, cv.MatType.CV_8U, 0)
+        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
+        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
+        If standalone Then task.gOptions.showMotionMask.Checked = True
+        ld = cv.XImgProc.CvXImgProc.CreateFastLineDetector
+        desc = "If line is NOT in motion mask, then keep it.  If line is in motion mask, add it."
+    End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If standalone Then motionMask = task.motion.motionMask
 
