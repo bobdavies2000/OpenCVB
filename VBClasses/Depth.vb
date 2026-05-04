@@ -1502,7 +1502,7 @@ End Class
 
 
 
-Public Class Depth_TiersOld : Inherits TaskParent
+Public Class Depth_Tiers : Inherits TaskParent
     Public classCount As Integer
     Dim options As New Options_DepthTiers
     Public Sub New()
@@ -1524,34 +1524,5 @@ Public Class Depth_TiersOld : Inherits TaskParent
 
         dst3 = Palettize(dst2)
         labels(2) = $"{classCount} regions found."
-    End Sub
-End Class
-
-
-
-
-Public Class Depth_Tiers : Inherits TaskParent
-    Public classCount As Integer
-    Dim options As New Options_DepthTiers
-    Public Sub New()
-        desc = "Create a reduced image of the depth data to define tiers of similar values"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        options.Run()
-
-        'If src.Type <> cv.MatType.CV_32F Then src = pcSplit(2)
-        'Dim maxMask = src.Threshold(task.MaxZmeters, 255, cv.ThresholdTypes.Binary)
-        'maxMask.ConvertTo(dst1, cv.MatType.CV_8U)
-
-
-        'Dim mm = GetMinMax(src)
-        'If Not Single.IsInfinity(mm.minVal) And Not Single.IsInfinity(mm.maxVal) Then
-        '    If mm.maxVal < 1000 And mm.minVal < 1000 Then
-        '        classCount = (mm.maxVal - mm.minVal) * 100 / options.cmPerTier + 1
-        '    End If
-        'End If
-
-        'dst3 = Palettize(dst2, 0)
-        'labels(2) = $"{classCount} regions found."
     End Sub
 End Class

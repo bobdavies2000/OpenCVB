@@ -331,6 +331,8 @@ Public Class Delaunay_LineSelect : Inherits TaskParent
         Next
 
         delaunay.Run(src)
+        dst2 = delaunay.dst2
+        labels(2) = delaunay.labels(2)
 
         Dim facetList As New List(Of Integer)
         Dim ptList As New List(Of Integer)
@@ -346,7 +348,9 @@ Public Class Delaunay_LineSelect : Inherits TaskParent
 
         Dim facet = delaunay.dst1.Get(Of Byte)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
         Dim facetIndex = facetList.IndexOf(facet)
-        If facetIndex = -1 Then Exit Sub
+        If facetIndex = -1 Or facetIndex >= ptList.Count Then Exit Sub
+        Dim lineIndex = ptList(facetIndex)
+        If lineIndex >= task.lines.lpList.Count Then Exit Sub
         task.lpD = task.lines.lpList(ptList(facetIndex))
 
         Dim p1GridIndex = task.gridMap.Get(Of Integer)(task.lpD.p1.Y, task.lpD.p1.X)
