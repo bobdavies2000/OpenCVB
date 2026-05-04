@@ -1,3 +1,4 @@
+Imports System.Diagnostics.Metrics
 Imports cv = OpenCvSharp
 ' https://docs.opencvb.org/3.4/dc/df6/tutorial_py_Histogram_backprojection.html
 Public Class BackProject_Basics : Inherits TaskParent
@@ -662,7 +663,7 @@ Public Class NR_BackProject_DepthSlider : Inherits TaskParent
         labels(2) = bpDepth.labels(2)
 
         Dim index = Math.Abs(task.gOptions.DebugSlider.Value)
-        If index >= bpDepth.classCount Then index = bpDepth.classCount - 1
+        If index >= task.histogramBins Then index = task.histogramBins - 1
         dst3 = bpDepth.dst2.InRange(index, index)
         Dim count = dst3.CountNonZero
         labels(3) = "Class " + CStr(index) + " had " + CStr(count) + " pixels after backprojection."
@@ -723,7 +724,6 @@ End Class
 
 
 Public Class BackProject_Depth : Inherits TaskParent
-    Public classCount As Integer
     Dim plotHist As New PlotBar_Basics
     Public Sub New()
         task.gOptions.setHistogramBins(32)
@@ -736,12 +736,11 @@ Public Class BackProject_Depth : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If src.Type <> cv.MatType.CV_32F Then src = task.pcSplit(2)
-        classCount = task.histogramBins
 
         plotHist.Run(src)
         dst1 = plotHist.dst2
 
-        For i = 0 To classCount - 1
+        For i = 0 To task.histogramBins - 1
             plotHist.histogram.Set(Of Single)(i, 0, i + 1)
         Next
 
@@ -750,10 +749,40 @@ Public Class BackProject_Depth : Inherits TaskParent
 
         cv.Cv2.CalcBackProject({src}, {0}, plotHist.histogram, dst2, plotHist.ranges)
         dst2.ConvertTo(dst2, cv.MatType.CV_8U)
-        labels(2) = "CV_8U backprojection of the " + CStr(classCount) + " histogram bins."
+        labels(2) = "CV_8U backprojection of the " + CStr(task.histogramBins) + " histogram bins."
 
         dst3 = Palettize(dst2)
         dst3.SetTo(0, task.noDepthMask)
-        labels(3) = "Palettized version of the data in dst2 showing " + CStr(classCount) + " tiers"
+        labels(3) = "Palettized version of the data in dst2 showing " + CStr(task.histogramBins) + " tiers"
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class BackProject_Depth_TA : Inherits TaskParent
+    Dim histogram As cv.Mat
+    Public classCount As Integer = 100
+    Dim ranges() As cv.Rangef = {New cv.Rangef(0.1, task.MaxZmeters)}
+    Public Sub New()
+        task.gOptions.setHistogramBins(classCount)
+        histogram = New cv.Mat(New cv.Size(1, classCount), cv.MatType.CV_32F, 0)
+        For i = 1 To classCount - 1
+            histogram.Set(Of Single)(0, i, i)
+        Next
+        labels(2) = "CV_8U backprojection with " + CStr(classCount) + " bins"
+        desc = "Trim the depth to increase the size of each bin."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        If src.Type <> cv.MatType.CV_32F Then src = task.pcSplit(2)
+
+        If task.heartBeat Then
+            cv.Cv2.CalcBackProject({src}, {0}, histogram, dst1, ranges)
+            dst1.ConvertTo(dst2, cv.MatType.CV_8U)
+            dst3 = Palettize(dst2)
+            labels(3) = "Depth range: 0.1 to " + Format(task.MaxZmeters, fmt3)
+        End If
     End Sub
 End Class

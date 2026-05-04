@@ -91,6 +91,7 @@ Partial Public Class AlgorithmTask
     Public stabilizeDepth As StableDepth_Basics
     Public stabilizeGray As StableGray_Basics_TA
     Public prepCloud As Cloud_Gravity_TA
+    Public depthTiers As BackProject_Depth_TA
 
     Public motionFeatures As cv.Point2f
     Public palette As Palette_LoadColorMap
@@ -160,6 +161,7 @@ Partial Public Class AlgorithmTask
     Public almostHeartBeat As Boolean
     Public heartbeatFrame As Integer
     Public afterHeartBeatLT As Boolean
+    Public afterHeartBeat As Boolean
     Public msWatch As Integer
     Public msLast As Integer
 

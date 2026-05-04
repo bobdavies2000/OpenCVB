@@ -7,6 +7,7 @@ AsciiArt_Basics
 AsciiArt_Color
 BackProject_Basics
 BackProject_Depth
+BackProject_Depth_TA
 BackProject_DepthMouse
 BackProject_DisplayColor
 BackProject_FeatureLess

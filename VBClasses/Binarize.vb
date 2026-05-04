@@ -165,7 +165,6 @@ End Class
 
 
 Public Class NR_Binarize_DepthTiers : Inherits TaskParent
-    Dim tiers As New Depth_Tiers
     Dim binar4 As New Bin4Way_Regions
     Public classCount = 200 ' 4-way split with 50 depth levels at 10 cm's each.
     Public Sub New()
@@ -173,13 +172,11 @@ Public Class NR_Binarize_DepthTiers : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         binar4.Run(src)
-        tiers.Run(src)
+        dst2 = task.depthTiers.dst2 + binar4.dst2
 
-        dst2 = tiers.dst2 + binar4.dst2
+        If standaloneTest() Then dst3 = task.depthTiers.dst3
 
-        If standaloneTest() Then dst3 = tiers.dst3
-
-        classCount = binar4.classCount + tiers.classCount
+        classCount = binar4.classCount + task.depthTiers.classCount
     End Sub
 End Class
 
