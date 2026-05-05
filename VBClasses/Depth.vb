@@ -1504,7 +1504,7 @@ End Class
 
 Public Class Depth_Tiers_TA : Inherits TaskParent
     Dim histogram As cv.Mat
-    Public classCount As Integer = 100 ' can be set externally as well.
+    Public classCount As Integer = 10 ' can be set externally as well.
     Dim ranges() As cv.Rangef = {New cv.Rangef(0.1, task.MaxZmeters)}
     Public Sub New()
         desc = "Trim the depth to increase the size of each bin."

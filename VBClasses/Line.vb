@@ -4,13 +4,13 @@ Public Class Line_Basics_TA : Inherits TaskParent
     Public lpList As New List(Of lpData)
     Public ld As cv.XImgProc.FastLineDetector
     Public motionMask As cv.Mat = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 255)
-    Dim edges As New Edge_Canny
+    Dim edges As New Edge_SobelHV
     Public Sub New()
         dst1 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
         labels(2) = "Edges_Basics output"
         ld = cv.XImgProc.CvXImgProc.CreateFastLineDetector
-        desc = "Run FLD with sobel input."
+        desc = "Run FLD (Fast Line Detector) with sobel input."
     End Sub
     Public Shared Function getRawLines(lines As cv.Vec4f()) As List(Of lpData)
         Dim lpList As New List(Of lpData)
@@ -36,10 +36,10 @@ Public Class Line_Basics_TA : Inherits TaskParent
         If src.Channels <> 1 Or src.Type <> cv.MatType.CV_8U Then src = task.gray.Clone
 
         edges.Run(src)
-        dst0 = edges.dst2.Threshold(100, 255, cv.ThresholdTypes.Binary)
+        dst0 = edges.dst2
         labels(2) = edges.labels(2)
 
-        lpList = Line_Basics_TA.getRawLines(ld.Detect(dst0))
+        lpList = Line_Basics_TA.getRawLines(ld.Detect(edges.dst2))
 
         dst1.SetTo(0)
         Dim index As Integer
@@ -48,7 +48,7 @@ Public Class Line_Basics_TA : Inherits TaskParent
             lp.index = index
             dst1.Line(lp.p1, lp.p2, lp.index, task.lineWidth, cv.LineTypes.Link4)
             Dim tierIndex = task.depthTiers.dst2.Get(Of Byte)(lp.p1.Y, lp.p1.X)
-            dst2.Line(lp.p1, lp.p2, task.scalarColors(tierIndex), task.lineWidth, cv.LineTypes.Link4)
+            dst2.Line(lp.p1, lp.p2, task.scalarColors(tierIndex), task.lineWidth + 1, cv.LineTypes.Link4)
         Next
 
         dst3 = dst1.Threshold(0, 255, cv.ThresholdTypes.Binary)
@@ -64,7 +64,7 @@ End Class
 
 
 
-Public Class Line_BasicsOld : Inherits TaskParent
+Public Class Line_WithAging : Inherits TaskParent
     Implements IDisposable
     Public lpList As New List(Of lpData)
     Public motionMask As cv.Mat = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 255)
@@ -1587,27 +1587,6 @@ End Class
 
 
 
-Public Class Line_Sobel : Inherits TaskParent
-    Dim edges As New Edge_Sobel
-    Dim lines As New Line_Basics_TA
-    Public Sub New()
-        desc = "Find lines in the Sobel output"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        edges.Run(task.gray)
-        dst2 = edges.dst1
-
-        lines.Run(dst2)
-
-        dst3.SetTo(0)
-        For Each lp In lines.lpList
-            dst3.Line(lp.p1, lp.p2, task.highlight, task.lineWidth)
-        Next
-    End Sub
-End Class
-
-
-
 
 
 Public Class Line_TrackV : Inherits TaskParent
@@ -1729,5 +1708,26 @@ Public Class Line_BasicsEmboss : Inherits TaskParent
     End Sub
     Protected Overrides Sub Finalize()
         ld.Dispose()
+    End Sub
+End Class
+
+
+
+Public Class Line_Sobel : Inherits TaskParent
+    Dim edges As New Edge_Sobel
+    Dim lines As New Line_Basics_TA
+    Public Sub New()
+        desc = "Find lines in the Sobel output"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        edges.Run(task.gray)
+        dst2 = edges.dst1
+
+        lines.Run(dst2)
+
+        dst3.SetTo(0)
+        For Each lp In lines.lpList
+            dst3.Line(lp.p1, lp.p2, task.highlight, task.lineWidth)
+        Next
     End Sub
 End Class

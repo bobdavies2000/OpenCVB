@@ -220,7 +220,10 @@ Edge_Sobel
 Edge_SobelCustom
 Edge_SobelCustomH
 Edge_SobelCustomV
+Edge_SobelH
 Edge_SobelHorizontal
+Edge_SobelHV
+Edge_SobelV
 Edge_SobelVertical
 Edge_StableLeftRight
 EdgeLine_Basics

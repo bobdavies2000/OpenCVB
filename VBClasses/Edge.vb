@@ -1,7 +1,8 @@
 Imports System.IO
 Imports System.Runtime.InteropServices
-Imports cv = OpenCvSharp
+Imports System.Windows.Forms.Design.AxImporter
 Imports VBClasses
+Imports cv = OpenCvSharp
 Public Class Edge_Basics : Inherits TaskParent
     Dim canny As Edge_Canny
     Dim scharr As NR_Edge_Scharr
@@ -512,31 +513,6 @@ Public Class NR_Edge_HSV : Inherits TaskParent
         dst2 = edges.dst2
     End Sub
 End Class
-
-
-
-
-
-
-
-
-Public Class NR_Edge_SobelLR : Inherits TaskParent
-    Dim sobel As New Edge_Sobel
-    Public Sub New()
-        OptionParent.FindSlider("Sobel kernel Size").Value = 3
-        desc = "Find the edges in the LeftViewimages."
-        labels = {"", "", "Edges in Left Image", "Edges in Right Image (except on Kinect 4 Azure)"}
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        sobel.Run(task.rightView)
-        dst3 = sobel.dst2.Clone()
-
-        sobel.Run(task.leftView)
-        dst2 = sobel.dst2
-    End Sub
-End Class
-
-
 
 
 
@@ -1307,72 +1283,6 @@ End Class
 
 
 
-'https://docs.opencvb.org/2.4/doc/tutorials/imgproc/imgtrans/sobel_derivatives/sobel_derivatives.html
-Public Class Edge_Sobel : Inherits TaskParent
-    Public options As New Options_Sobel
-    Public Sub New()
-        dst0 = New cv.Mat(dst0.Size, cv.MatType.CV_32F, 0)
-        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_32F, 0)
-        desc = "Show Sobel edge detection with varying kernel sizes"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        options.Run()
-        If src.Channels() <> 1 Then src = task.gray
-        dst0.SetTo(0)
-        dst1.SetTo(0)
-        If options.horizontalDerivative Then dst0 = src.Sobel(cv.MatType.CV_32F, 0, 1, options.kernelSize)
-        If options.verticalDerivative Then dst1 = src.Sobel(cv.MatType.CV_32F, 1, 0, options.kernelSize)
-        dst2 = (dst1 + dst0).ToMat.ConvertScaleAbs()
-        dst3 = dst2.Threshold(100, 255, cv.ThresholdTypes.Binary)
-    End Sub
-End Class
-
-
-
-
-
-
-
-'https://docs.opencvb.org/2.4/doc/tutorials/imgproc/imgtrans/sobel_derivatives/sobel_derivatives.html
-Public Class Edge_SobelHorizontal : Inherits TaskParent
-    Dim edges As New Edge_Sobel
-    Public Sub New()
-        OptionParent.FindCheckBox("Vertical Derivative").Checked = False
-        desc = "Find edges with Sobel only in the horizontal direction"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        Static thresholdSlider = OptionParent.FindSlider("Sobel Intensity Threshold")
-        edges.Run(src)
-
-        dst2 = edges.dst2.Threshold(thresholdSlider.Value, 255, cv.ThresholdTypes.Binary)
-    End Sub
-End Class
-
-
-
-
-
-
-
-'https://docs.opencvb.org/2.4/doc/tutorials/imgproc/imgtrans/sobel_derivatives/sobel_derivatives.html
-Public Class Edge_SobelVertical : Inherits TaskParent
-    Dim edges As New Edge_Sobel
-    Public Sub New()
-        OptionParent.FindCheckBox("Horizontal Derivative").Checked = False
-        desc = "Find edges with Sobel only in the horizontal direction"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        Static thresholdSlider = OptionParent.FindSlider("Sobel Intensity Threshold")
-        edges.Run(src)
-
-        dst2 = edges.dst2.Threshold(thresholdSlider.Value, 255, cv.ThresholdTypes.Binary)
-    End Sub
-End Class
-
-
-
-
-
 Public Class NR_Edge_NoDepth : Inherits TaskParent
     Dim edgeline As New EdgeLine_Basics
     Public Sub New()
@@ -1732,5 +1642,134 @@ Public Class Edge_Canny : Inherits TaskParent
             dst3.SetTo(0)
             src.CopyTo(dst3, dst2)
         End If
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class NR_Edge_SobelLR : Inherits TaskParent
+    Dim sobel As New Edge_Sobel
+    Public Sub New()
+        OptionParent.FindSlider("Sobel kernel Size").Value = 3
+        desc = "Find the edges in the LeftViewimages."
+        labels = {"", "", "Edges in Left Image", "Edges in Right Image (except on Kinect 4 Azure)"}
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        sobel.Run(task.rightView)
+        dst3 = sobel.dst2.Clone()
+
+        sobel.Run(task.leftView)
+        dst2 = sobel.dst2
+    End Sub
+End Class
+
+
+
+
+
+'https://docs.opencvb.org/2.4/doc/tutorials/imgproc/imgtrans/sobel_derivatives/sobel_derivatives.html
+Public Class Edge_Sobel : Inherits TaskParent
+    Public options As New Options_Sobel
+    Public Sub New()
+        dst0 = New cv.Mat(dst0.Size, cv.MatType.CV_32F, 0)
+        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_32F, 0)
+        desc = "Show Sobel edge detection with varying kernel sizes"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        options.Run()
+        If src.Channels() <> 1 Then src = task.gray
+        dst0.SetTo(0)
+        dst1.SetTo(0)
+        If options.horizontalDerivative Then dst0 = src.Sobel(cv.MatType.CV_32F, 0, 1, options.kernelSize)
+        If options.verticalDerivative Then dst1 = src.Sobel(cv.MatType.CV_32F, 1, 0, options.kernelSize)
+        dst2 = (dst1 + dst0).ToMat.ConvertScaleAbs()
+        dst3 = dst2.Threshold(100, 255, cv.ThresholdTypes.Binary)
+    End Sub
+End Class
+
+
+
+
+
+'https://docs.opencvb.org/2.4/doc/tutorials/imgproc/imgtrans/sobel_derivatives/sobel_derivatives.html
+Public Class Edge_SobelHorizontal : Inherits TaskParent
+    Dim edges As New Edge_Sobel
+    Public Sub New()
+        OptionParent.FindCheckBox("Vertical Derivative").Checked = False
+        desc = "Find edges with Sobel only in the horizontal direction"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        Static thresholdSlider = OptionParent.FindSlider("Sobel Intensity Threshold")
+        edges.Run(src)
+
+        dst2 = edges.dst2.Threshold(thresholdSlider.Value, 255, cv.ThresholdTypes.Binary)
+    End Sub
+End Class
+
+
+
+'https://docs.opencvb.org/2.4/doc/tutorials/imgproc/imgtrans/sobel_derivatives/sobel_derivatives.html
+Public Class Edge_SobelVertical : Inherits TaskParent
+    Dim edges As New Edge_Sobel
+    Public Sub New()
+        OptionParent.FindCheckBox("Horizontal Derivative").Checked = False
+        desc = "Find edges with Sobel only in the horizontal direction"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        Static thresholdSlider = OptionParent.FindSlider("Sobel Intensity Threshold")
+        edges.Run(src)
+
+        dst2 = edges.dst2.Threshold(thresholdSlider.Value, 255, cv.ThresholdTypes.Binary)
+    End Sub
+End Class
+
+
+
+
+
+'https://docs.opencvb.org/2.4/doc/tutorials/imgproc/imgtrans/sobel_derivatives/sobel_derivatives.html
+Public Class Edge_SobelH : Inherits TaskParent
+    Public Sub New()
+        desc = "Find edges with Sobel only in the horizontal direction"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        If src.Channels() <> 1 Then src = task.gray
+        dst2 = src.Sobel(cv.MatType.CV_32F, 0, 1, 3).ConvertScaleAbs()
+        dst3 = dst2.Threshold(100, 255, cv.ThresholdTypes.Binary)
+    End Sub
+End Class
+
+
+
+'https://docs.opencvb.org/2.4/doc/tutorials/imgproc/imgtrans/sobel_derivatives/sobel_derivatives.html
+Public Class Edge_SobelV : Inherits TaskParent
+    Public Sub New()
+        desc = "Find edges with Sobel only in the vertical direction"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        If src.Channels() <> 1 Then src = task.gray
+        dst2 = src.Sobel(cv.MatType.CV_32F, 1, 0, 3).ConvertScaleAbs()
+        dst3 = dst2.Threshold(100, 255, cv.ThresholdTypes.Binary)
+    End Sub
+End Class
+
+
+
+
+Public Class Edge_SobelHV : Inherits TaskParent
+    Public Sub New()
+        desc = "Combine the horizontal and vertical directions"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        If src.Channels() <> 1 Then src = task.gray
+        dst0 = src.Sobel(cv.MatType.CV_32F, 1, 0, 3).ConvertScaleAbs()
+        dst2 = dst0.Threshold(100, 255, cv.ThresholdTypes.Binary)
+
+        dst0 = src.Sobel(cv.MatType.CV_32F, 0, 1, 3).ConvertScaleAbs()
+        dst2 = dst2 Or dst0.Threshold(100, 255, cv.ThresholdTypes.Binary)
     End Sub
 End Class
