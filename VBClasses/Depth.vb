@@ -1075,34 +1075,6 @@ End Class
 
 
 
-
-Public Class Depth_TierCount : Inherits TaskParent
-    Public valley As New HistValley_Depth1
-    Public classCount As Integer
-    Dim kValues As New List(Of Integer)
-    Public Sub New()
-        labels = {"", "Histogram of the depth data with instantaneous valley lines", "", ""}
-        desc = "Determine the 'K' value for the best number of clusters for the depth"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        valley.Run(src)
-        dst2 = valley.dst2
-
-        kValues.Add(valley.valleyOrder.Count)
-
-        classCount = CInt(kValues.Average)
-        If kValues.Count > task.frameHistoryCount * 10 Then kValues.RemoveAt(0)
-
-        SetTrueText("'K' value = " + CStr(classCount) + " after averaging.  Instanteous value = " +
-                        CStr(valley.valleyOrder.Count), 3)
-        labels(2) = "There are " + CStr(classCount)
-    End Sub
-End Class
-
-
-
-
-
 Public Class NR_Depth_CellTiers : Inherits TaskParent
     Public valley As New HistValley_Count
     Dim redC As New RedCloud_Basics
@@ -1554,5 +1526,33 @@ Public Class Depth_Tiers_TA : Inherits TaskParent
             dst3 = Palettize(dst2)
             labels(3) = "Depth range: 0.1 to " + Format(task.MaxZmeters, fmt3)
         End If
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Depth_TierCount : Inherits TaskParent
+    Public valley As New HistValley_Depth1
+    Public classCount As Integer
+    Dim kValues As New List(Of Integer)
+    Public Sub New()
+        labels = {"", "Histogram of the depth data with instantaneous valley lines", "", ""}
+        desc = "Determine the 'K' value for the best number of clusters for the depth"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        valley.Run(src)
+        dst2 = valley.dst2
+
+        kValues.Add(valley.valleyOrder.Count)
+
+        classCount = CInt(kValues.Average)
+        If kValues.Count > task.frameHistoryCount * 10 Then kValues.RemoveAt(0)
+
+        SetTrueText("'K' value = " + CStr(classCount) + " after averaging.  Instanteous value = " +
+                        CStr(valley.valleyOrder.Count), 3)
+        labels(2) = "There are " + CStr(classCount)
     End Sub
 End Class

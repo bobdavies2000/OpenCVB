@@ -45,7 +45,7 @@ Public Class OpAuto_Valley : Inherits TaskParent
             lastEntry = valleys(i)
         Next
         If valleys(desiredBoundaries - 1) <> histList.Count - 1 Then
-            valleyOrder.Add(valleys(desiredBoundaries - 1), 256)
+            valleyOrder.Add(valleys(desiredBoundaries - 1), 255)
         End If
 
         If standaloneTest() Then

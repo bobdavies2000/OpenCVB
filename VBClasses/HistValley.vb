@@ -341,7 +341,7 @@ Public Class HistValley_OptionsAuto : Inherits TaskParent
                 Dim entry = auto.valleyOrder.ElementAt(i)
                 Dim cClass = CSng(255 \ (i + 1))
                 Dim index = If(i Mod 2, cClass, 255 - cClass)
-                For j = entry.Key To entry.Value
+                For j = entry.Key To Math.Min(histogram.Rows, entry.Value) - 1
                     histogram.Set(Of Single)(j, 0, index)
                 Next
                 Dim col = dst2.Width * entry.Value / task.histogramBins
@@ -352,10 +352,6 @@ Public Class HistValley_OptionsAuto : Inherits TaskParent
         If src.Type = cv.MatType.CV_32F Then histogram += 1
 
         cv.Cv2.CalcBackProject({src}, {0}, histogram, dst1, kalman.hist.ranges)
-        'If dst1.Type <> cv.MatType.CV_8U Then
-        '    dst1.SetTo(0, task.noDepthMask)
-        '    dst1.ConvertTo(dst1, cv.MatType.CV_8U)
-        'End If
 
         dst3 = Palettize(dst1)
         labels(3) = CStr(auto.valleyOrder.Count + 1) + " colors in the back projection"
