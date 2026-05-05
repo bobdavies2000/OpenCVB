@@ -1581,31 +1581,6 @@ End Class
 
 
 
-'https://docs.opencvb.org/3.1.0/da/d22/tutorial_py_canny.html
-Public Class Edge_Canny : Inherits TaskParent
-    Dim options As New Options_Canny
-    Public Sub New()
-        labels = {"", "", "Canny using L1 Norm", "Canny using L2 Norm"}
-        desc = "Show canny edge detection with varying thresholds"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        options.Run()
-        If src.Channels() <> 1 Then src = task.gray
-        If src.Type() <> cv.MatType.CV_8UC1 Then src.ConvertTo(src, cv.MatType.CV_8U)
-        dst2 = src.Canny(options.threshold1, options.threshold2, options.aperture, True)
-
-        If standaloneTest() Then
-            dst3.SetTo(0)
-            src.CopyTo(dst3, dst2)
-        End If
-    End Sub
-End Class
-
-
-
-
-
-
 Public Class NR_Edge_CannyLeftRight : Inherits TaskParent
     Dim canny As New Edge_Canny
     Public Sub New()
@@ -1733,5 +1708,29 @@ Public Class Edge_StableLeftRight : Inherits TaskParent
         edges.run(stableLR.dst3)
         dst3 = edges.dst2.Clone
         labels(3) = edges.labels(2)
+    End Sub
+End Class
+
+
+
+
+
+'https://docs.opencvb.org/3.1.0/da/d22/tutorial_py_canny.html
+Public Class Edge_Canny : Inherits TaskParent
+    Dim options As New Options_Canny
+    Public Sub New()
+        labels = {"", "", "Canny using L1 Norm", "Canny using L2 Norm"}
+        desc = "Show canny edge detection with varying thresholds"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        options.Run()
+        If src.Channels() <> 1 Then src = task.gray
+        If src.Type() <> cv.MatType.CV_8UC1 Then src.ConvertTo(src, cv.MatType.CV_8U)
+        dst2 = src.Canny(options.threshold1, options.threshold2, options.aperture, True)
+
+        If standaloneTest() Then
+            dst3.SetTo(0)
+            src.CopyTo(dst3, dst2)
+        End If
     End Sub
 End Class

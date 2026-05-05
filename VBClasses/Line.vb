@@ -4,7 +4,7 @@ Public Class Line_Basics_TA : Inherits TaskParent
     Public lpList As New List(Of lpData)
     Public ld As cv.XImgProc.FastLineDetector
     Public motionMask As cv.Mat = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 255)
-    Dim edges As New Edge_Basics
+    Dim edges As New Edge_Canny
     Public Sub New()
         dst1 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
@@ -23,6 +23,8 @@ Public Class Line_Basics_TA : Inherits TaskParent
                    p2.X >= 0 And p2.X < task.workRes.Width And p2.Y >= 0 And p2.Y < task.workRes.Height Then
                     p1 = lpData.validatePoint(p1)
                     p2 = lpData.validatePoint(p2)
+                    Dim lp = New lpData(p1, p2)
+                    If lp.rect.Width = 0 Then Continue For
                     lpList.Add(New lpData(p1, p2))
                 End If
             End If

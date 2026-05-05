@@ -373,15 +373,11 @@ Public Class Bin4Way_UnstablePixels1 : Inherits TaskParent
 
         gapValues.Clear()
         For i = 1 To boundaries.Count - 1
-            Dim minVal = Byte.MaxValue
-            Dim minIndex = 0
-            For j = boundaries(i - 1) To boundaries(i) - 1
-                If hist.histArray(j) < minVal Then
-                    minVal = hist.histArray(j)
-                    minIndex = j
-                End If
+            Dim histValues As New List(Of Single)
+            For j = boundaries(i - 1) To Math.Min(boundaries(i), hist.histArray.Count) - 1
+                histValues.Add(hist.histArray(j))
             Next
-            gapValues.Add(minIndex)
+            If histValues.Count > 0 Then gapValues.Add(histValues.IndexOf(histValues.Min))
         Next
         strOut += vbCrLf + vbCrLf + "The best thresholds for this image to avoid fuzziness are: " + vbCrLf
         For Each index In gapValues
