@@ -245,7 +245,7 @@ Namespace VBClasses
 
 
     Public Class NR_FeatureLess_Sobel : Inherits TaskParent
-        Dim edges As New Edge_Sobel
+        Dim edges As New Edge_SobelHV
         Dim options As New Options_Sobel()
         Public Sub New()
             desc = "Use Sobel edges to define featureless regions."

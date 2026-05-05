@@ -8,7 +8,7 @@ Public Class Edge_Basics : Inherits TaskParent
     Dim scharr As NR_Edge_Scharr
     Dim binRed As NR_Edge_BinarizedReduction
     Dim binSobel As Bin4Way_Sobel
-    Dim sobel As Edge_Sobel
+    Dim sobel As Edge_SobelHV
     Dim colorGap As NR_Edge_ColorGap_CPP
     Dim deriche As Edge_Deriche_CPP
     Dim Laplacian As Edge_Laplacian
@@ -41,7 +41,7 @@ Public Class Edge_Basics : Inherits TaskParent
                 Case "Scharr"
                     edges = New NR_Edge_Scharr
                 Case "Sobel"
-                    edges = New Edge_Sobel
+                    edges = New Edge_SobelHV
             End Select
         End If
 
@@ -474,7 +474,7 @@ End Class
 
 ' https://scikit-image.org/docs/dev/auto_examples/color_exposure/plot_adapt_rgb.html#sphx-glr-auto-examples-color-exposure-plot-adapt-rgb-py
 Public Class Edge_RGB : Inherits TaskParent
-    Dim sobel As New Edge_Sobel
+    Dim sobel As New Edge_SobelHV
     Public Sub New()
         desc = "Combine the edges from all 3 channels"
     End Sub
@@ -982,7 +982,7 @@ End Class
 
 Public Class NR_Edge_CloudSegments : Inherits TaskParent
     Dim segments As New Histogram_CloudSegments
-    Dim edges As New Edge_Sobel
+    Dim edges As New Edge_SobelHV
     Public Sub New()
         desc = "Build edges from the point cloud segments from Histogram_Cloud - simplistic approach"
     End Sub
@@ -1000,7 +1000,6 @@ End Class
 Public Class Edge_DiffX_CPP : Inherits TaskParent
     Implements IDisposable
     Public segments As New Histogram_CloudSegments
-    Dim edges As New Edge_Sobel
     Public Sub New()
         cPtr = Edge_DiffX_Open()
         desc = "Ignore edges with zero - in C++ because it needs to be optimized."
@@ -1030,7 +1029,6 @@ End Class
 Public Class Edge_DiffY_CPP : Inherits TaskParent
     Implements IDisposable
     Public segments As New Histogram_CloudSegments
-    Dim edges As New Edge_Sobel
     Public Sub New()
         cPtr = Edge_DiffY_Open()
         desc = "Ignore edges with zero - in C++ because it needs to be optimized."
@@ -1060,7 +1058,6 @@ End Class
 Public Class Edge_DiffZ_CPP : Inherits TaskParent
     Implements IDisposable
     Public segments As New Histogram_CloudSegments
-    Dim edges As New Edge_Sobel
     Public Sub New()
         cPtr = Edge_DiffY_Open()
         desc = "Ignore edges with zero - in C++ because it needs to be optimized."
@@ -1761,15 +1758,16 @@ End Class
 
 
 Public Class Edge_SobelHV : Inherits TaskParent
+    Public kernelSize As Integer = 3
     Public Sub New()
-        desc = "Combine the horizontal and vertical directions"
+        desc = "Combine the horizontal and vertical Sobel outputs"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If src.Channels() <> 1 Then src = task.gray
-        dst0 = src.Sobel(cv.MatType.CV_32F, 1, 0, 3).ConvertScaleAbs()
+        dst0 = src.Sobel(cv.MatType.CV_32F, 1, 0, kernelSize).ConvertScaleAbs()
         dst2 = dst0.Threshold(100, 255, cv.ThresholdTypes.Binary)
 
-        dst0 = src.Sobel(cv.MatType.CV_32F, 0, 1, 3).ConvertScaleAbs()
+        dst0 = src.Sobel(cv.MatType.CV_32F, 0, 1, kernelSize).ConvertScaleAbs()
         dst2 = dst2 Or dst0.Threshold(100, 255, cv.ThresholdTypes.Binary)
     End Sub
 End Class

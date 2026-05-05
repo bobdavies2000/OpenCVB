@@ -706,7 +706,7 @@ End Class
 Public Class Line_BrickList : Inherits TaskParent
     Public lp As lpData ' set this input
     Public lpOutput As lpData ' this is the result lp
-    Public sobel As New Edge_Sobel
+    Public sobel As New Edge_SobelHV
     Public ptList As New List(Of cv.Point)
     Dim options As New Options_LeftRightCorrelation
     Public Sub New()
@@ -1714,14 +1714,14 @@ End Class
 
 
 Public Class Line_Sobel : Inherits TaskParent
-    Dim edges As New Edge_Sobel
+    Dim edges As New Edge_SobelHV
     Dim lines As New Line_Basics_TA
     Public Sub New()
         desc = "Find lines in the Sobel output"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         edges.Run(task.gray)
-        dst2 = edges.dst1
+        dst2 = edges.dst2
 
         lines.Run(dst2)
 

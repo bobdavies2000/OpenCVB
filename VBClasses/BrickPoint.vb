@@ -1,6 +1,6 @@
 Imports cv = OpenCvSharp
 Public Class BrickPoint_Basics : Inherits TaskParent
-    Public sobel As New Edge_Sobel
+    Public sobel As New Edge_SobelHV
     Public bpCore As New BrickPoint_Core
     Public ptList As New List(Of cv.Point)
     Public Sub New()
@@ -41,7 +41,7 @@ Public Class BrickPoint_Core : Inherits TaskParent
 
         bricks.Run(src)
         If standalone Then
-            Static sobel As New Edge_Sobel
+            Static sobel As New Edge_SobelHV
             sobel.Run(src)
             src = sobel.dst2
         End If
@@ -452,13 +452,15 @@ End Class
 
 
 Public Class BrickPoint_MaxSobel : Inherits TaskParent
-    Public sobel As New Edge_Sobel
+    Public sobel As New Edge_SobelHV
     Public features As New List(Of cv.Point)
+    Public options As New Options_Sobel
     Public Sub New()
         labels(3) = "Sobel input to BrickPoint_Basics"
         desc = "Find the max Sobel point in each brick"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
+        ' options.run() ' no need to run options because we just want the default threshold value.
         dst2 = src
         sobel.Run(task.gray)
         dst3 = sobel.dst2
@@ -466,7 +468,7 @@ Public Class BrickPoint_MaxSobel : Inherits TaskParent
         features.Clear()
         For Each rect In task.gridRects
             Dim mm = GetMinMax(sobel.dst2(rect))
-            If mm.maxVal >= sobel.options.sobelThreshold Then
+            If mm.maxVal >= options.sobelThreshold Then
                 Dim pt = New cv.Point(mm.maxLoc.X + rect.X, mm.maxLoc.Y + rect.Y)
                 features.Add(pt)
                 DrawCircle(dst2, pt)
@@ -474,7 +476,7 @@ Public Class BrickPoint_MaxSobel : Inherits TaskParent
         Next
 
         labels(2) = "Of the " + CStr(task.gridRects.Count) + " candidates, " + CStr(features.Count) +
-                            " had brickpoint intensity >= " + CStr(sobel.options.sobelThreshold)
+                            " had brickpoint intensity >= " + CStr(options.sobelThreshold)
     End Sub
 End Class
 
@@ -522,24 +524,23 @@ End Class
 
 
 Public Class NR_BrickPoint_Blocks : Inherits TaskParent
-    Public threshold As Single
+    Dim options As New Options_Sobel
     Public Sub New()
         desc = "Use the bricks to portray the brickpoints"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If standalone Then
-            Static sobel As New Edge_Sobel
+            Static sobel As New Edge_SobelHV
             sobel.Run(src)
             src = sobel.dst2
-            Static thresholdSlider = OptionParent.FindSlider("Sobel Intensity Threshold")
-            threshold = thresholdSlider.value
+            ' options.run() ' no need to run options because we just want the default threshold value.
         End If
 
         dst2 = task.color.Clone
         For Each rect In task.gridRects
             Dim mm = GetMinMax(src(rect))
             Dim pt = New cv.Point(mm.maxLoc.X + rect.X, mm.maxLoc.Y + rect.Y)
-            If mm.maxVal >= threshold Then DrawRect(dst2, rect)
+            If mm.maxVal >= options.sobelThreshold Then DrawRect(dst2, rect)
         Next
     End Sub
 End Class

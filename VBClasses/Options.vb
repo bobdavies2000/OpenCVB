@@ -7652,7 +7652,7 @@ End Class
 
 Public Class Options_Sobel : Inherits OptionParent
     Public kernelSize As Integer = 3
-    Public sobelThreshold As Integer = 150
+    Public sobelThreshold As Integer = 100
     Public distanceThreshold As Integer = 10
     Public derivativeRange As Double = 0.1
     Public horizontalDerivative As Boolean = True

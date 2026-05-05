@@ -143,11 +143,11 @@ End Class
 
 
 Public Class Bin4Way_Sobel : Inherits TaskParent
-    Dim edges As New Edge_Sobel
+    Dim edges As New Edge_SobelHV
     Dim binary As New Bin4Way_SplitMean
     Public mats As New Mat_4to1
     Public Sub New()
-        OptionParent.FindSlider("Sobel kernel Size").Value = 5
+        edges.kernelSize = 5
         labels(2) = "Edges between halves, lightest, darkest, and the combo"
         labels(3) = "Click any quadrant in dst2 to view it in dst3"
         desc = "Collect Sobel edges from binarized images"
