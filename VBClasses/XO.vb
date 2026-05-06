@@ -8402,7 +8402,7 @@ Namespace VBClasses
 
     Public Class XO_Line_GravityToLongest : Inherits TaskParent
         Dim kalman As New Kalman_Basics
-        Dim matchLine As New LineTrack_Correlation
+        Dim matchLine As New NR_LineTrack_Correlation
         Public Sub New()
             desc = "Highlight both vertical and horizontal lines"
         End Sub

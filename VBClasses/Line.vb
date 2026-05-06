@@ -49,9 +49,20 @@ Public Class Line_Basics_TA : Inherits TaskParent
 
         Dim index As Integer
         lpList.Clear()
+        Dim edgeMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        Dim edgeDropCount As Integer
         For index = 0 To lpSorted.Values.Count - 1
             Dim lp = newList(lpSorted.Values.ElementAt(index))
             lp.index = index + 1
+            Dim val1 = edgeMap.Get(Of Byte)(lp.pE1.Y, lp.pE1.X)
+            Dim val2 = edgeMap.Get(Of Byte)(lp.pE1.Y, lp.pE1.X)
+            If val1 > 0 Or val2 > 0 Then
+                edgeDropCount += 1
+                Continue For
+            End If
+
+            Dim gridIndex = task.gridMap.Get(Of Integer)(Math.Floor(lp.pE1.Y), Math.Floor(lp.pE1.X))
+            edgeMap(task.gridNabeRects(gridIndex)).SetTo(lp.index)
             lpList.Add(lp)
 
             dst1.Line(lp.p1, lp.p2, lp.index, task.lineWidth, cv.LineTypes.Link4)
@@ -61,7 +72,7 @@ Public Class Line_Basics_TA : Inherits TaskParent
 
         dst3 = dst1.Threshold(0, 255, cv.ThresholdTypes.Binary)
 
-        labels(3) = CStr(lpList.Count) + " lines found"
+        labels(3) = CStr(lpList.Count) + " lines found and " + CStr(edgeDropCount) + " overlaps dropped."
     End Sub
     Protected Overrides Sub Finalize()
         ld.Dispose()
@@ -1262,7 +1273,7 @@ Public Class Line_KNNTop : Inherits TaskParent
         Dim lpList As New List(Of lpData)
         For Each lp In task.lines.lpList
             If lp.pE1.Y = 0 And lp.pE2.Y = dst2.Height - 1 Then
-                knn.queries.Add(New cv.Point2f(lp.p1.X, lp.p2.X))
+                knn.queries.Add(lp.p1)
                 lpList.Add(lp)
                 If lpList.Count > 3 Then Exit For
             End If
@@ -1792,36 +1803,120 @@ End Class
 
 
 Public Class Line_LongestTest : Inherits TaskParent
-    Dim lp As New lpData
+    Dim lpLast As New lpData
     Public Sub New()
+        If standalone Then task.gOptions.displayDst1.Checked = True
         desc = "Check to see that the longest line is always present."
     End Sub
+    Public Shared Function compareLines(lpCurr As lpData, lpLast As lpData) As Boolean
+        Dim distThreshold = task.gridWH
+        If (lpCurr.pE1.DistanceTo(lpLast.pE1) < distThreshold And
+           lpCurr.pE2.DistanceTo(lpLast.pE2) < distThreshold) Or
+           (lpCurr.pE2.DistanceTo(lpLast.pE1) < distThreshold And
+           lpCurr.pE1.DistanceTo(lpLast.pE2) < distThreshold) Then
+            Return True
+        End If
+        Return False
+    End Function
     Public Overrides Sub RunAlg(src As cv.Mat)
         Static presentCount As Integer
         Static lostLongest As Integer
-        If task.lines.lpList.Count = 0 Or task.heartBeatLT Then
+        If task.lines.lpList.Count = 0 Then
             dst2.SetTo(0)
-            presentCount = 0
         Else
-            Dim lpNext = task.lines.lpList(0)
-            If lpNext.ptCenter.DistanceTo(lp.ptCenter) < task.gridWH Then
-                dst2.Line(lpNext.p1, lpNext.p2, task.highlight, task.lineWidth)
+            Dim lpCurr = task.lines.lpList(0)
+            dst1 = task.color.Clone
+            dst1.Line(lpCurr.pE1, lpCurr.pE2, task.highlight, task.lineWidth)
+            If compareLines(lpCurr, lpLast) Then
+                dst2.Line(lpCurr.pE1, lpCurr.pE2, task.highlight, task.lineWidth)
                 presentCount += 1
+                If presentCount > 1000 Then presentCount = 100
             Else
                 dst2.SetTo(0)
                 lostLongest = 15
+                presentCount = 0
             End If
-            lp = lpNext
+            lpLast = lpCurr
         End If
 
-        If presentCount = 0 Then
-            labels(2) = "The longest line has beem restarted by heartBeatLT"
-        ElseIf lostLongest > 0 Then
-            labels(2) = "The longest line was lost! "
+        If lostLongest > 0 Then
+            SetTrueText("The longest line was lost! ", 2)
             lostLongest -= 1
         Else
             labels(2) = "The longest line has been present " + CStr(presentCount) + " times."
         End If
+
+        SetTrueText("If the camera is moved, the longest line (task.lines.lpList(0) should produce a solid." + vbCrLf +
+                    "If that line disappears or its center moves a log, dst2 is set to 0 and it starts over." + vbCrLf +
+                    "It should not disappear unless the movement makes another line the lpList(0)", 3)
+    End Sub
+End Class
+
+
+
+
+Public Class Line_LongestTestKNN : Inherits TaskParent
+    Dim lpLast As lpData
+    Dim lpCurr As New lpData
+    Dim knn As New KNN_N4Basics
+    Public Sub New()
+        knn.queries.Add(New cv.Vec4f)
+        If standalone Then task.gOptions.displayDst0.Checked = True
+        If standalone Then task.gOptions.displayDst1.Checked = True
+        desc = "Check to see that the longest line is always present."
+    End Sub
+    Public Shared Function compareLines(lpCurr As lpData, lpLast As lpData) As Boolean
+        Dim distThreshold = task.gridWH
+        If (lpCurr.pE1.DistanceTo(lpLast.pE1) < distThreshold And
+           lpCurr.pE2.DistanceTo(lpLast.pE2) < distThreshold) Or
+           (lpCurr.pE2.DistanceTo(lpLast.pE1) < distThreshold And
+           lpCurr.pE1.DistanceTo(lpLast.pE2) < distThreshold) Then
+            Return True
+        End If
+        Return False
+    End Function
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        Static presentCount As Integer
+        Static lostLongest As Integer
+        dst0 = task.lines.dst2
+        If task.lines.lpList.Count = 0 Then
+            dst2.SetTo(0)
+        Else
+            If lpLast Is Nothing Then
+                lpCurr = task.lines.lpList(0)
+                lpLast = task.lines.lpList(0)
+            End If
+
+            knn.trainInput.Clear()
+            For Each lp In task.lines.lpList
+                knn.trainInput.Add(New cv.Vec4f(lp.pE1.X, lp.pE1.Y, lp.pE2.X, lp.pE2.Y))
+            Next
+
+            knn.queries(0) = New cv.Vec4f(lpCurr.pE1.X, lpCurr.pE1.Y, lpCurr.pE2.X, lpCurr.pE2.Y)
+            knn.Run(emptyMat)
+
+            lpCurr = task.lines.lpList(knn.result(0, 0))
+
+            dst1 = task.color.Clone
+            dst1.Line(lpCurr.pE1, lpCurr.pE2, task.highlight, task.lineWidth)
+            If compareLines(lpCurr, lpLast) Then
+                dst2.Line(lpCurr.pE1, lpCurr.pE2, task.highlight, task.lineWidth)
+                presentCount += 1
+                If presentCount > 1000 Then presentCount = 100
+                lpLast = lpCurr
+            Else
+                dst2.SetTo(0)
+                lostLongest = 15
+                presentCount = 0
+                lpLast = Nothing
+            End If
+        End If
+
+        If lostLongest > 0 Then
+            SetTrueText("The longest line was lost! ", 2)
+            lostLongest -= 1
+        End If
+        labels(2) = "The longest line has been present " + CStr(presentCount) + " times."
 
         SetTrueText("If the camera is moved, the longest line (task.lines.lpList(0) should produce a solid." + vbCrLf +
                     "If that line disappears or its center moves a log, dst2 is set to 0 and it starts over." + vbCrLf +

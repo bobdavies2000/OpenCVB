@@ -1,7 +1,79 @@
 Imports System.Runtime.InteropServices
-Imports System.Windows.Forms.Design.AxImporter
 Imports cv = OpenCvSharp
 Public Class LineTrack_Basics : Inherits TaskParent
+    Dim lpLast As lpData
+    Dim lpCurr As New lpData
+    Dim knn As New KNN_N4Basics
+    Public Sub New()
+        knn.queries.Add(New cv.Vec4f)
+        If standalone Then task.gOptions.displayDst0.Checked = True
+        If standalone Then task.gOptions.displayDst1.Checked = True
+        desc = "Track the longest line and flag when it is lost."
+    End Sub
+    Public Shared Function compareLines(lpCurr As lpData, lpLast As lpData) As Boolean
+        Dim distThreshold = task.gridWH
+        If (lpCurr.pE1.DistanceTo(lpLast.pE1) < distThreshold And
+           lpCurr.pE2.DistanceTo(lpLast.pE2) < distThreshold) Or
+           (lpCurr.pE2.DistanceTo(lpLast.pE1) < distThreshold And
+           lpCurr.pE1.DistanceTo(lpLast.pE2) < distThreshold) Then
+            Return True
+        End If
+        Return False
+    End Function
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        Static presentCount As Integer
+        Static lostLongest As Integer
+        dst0 = task.lines.dst2
+        If task.lines.lpList.Count = 0 Then
+            dst2.SetTo(0)
+        Else
+            If lpLast Is Nothing Then
+                lpCurr = task.lines.lpList(0)
+                lpLast = task.lines.lpList(0)
+            End If
+
+            knn.trainInput.Clear()
+            For Each lp In task.lines.lpList
+                knn.trainInput.Add(New cv.Vec4f(lp.pE1.X, lp.pE1.Y, lp.pE2.X, lp.pE2.Y))
+            Next
+
+            knn.queries(0) = New cv.Vec4f(lpCurr.pE1.X, lpCurr.pE1.Y, lpCurr.pE2.X, lpCurr.pE2.Y)
+            knn.Run(emptyMat)
+
+            lpCurr = task.lines.lpList(knn.result(0, 0))
+
+            dst1 = task.color.Clone
+            dst1.Line(lpCurr.pE1, lpCurr.pE2, task.highlight, task.lineWidth)
+            If compareLines(lpCurr, lpLast) Then
+                dst2.Line(lpCurr.pE1, lpCurr.pE2, task.highlight, task.lineWidth)
+                presentCount += 1
+                If presentCount > 1000 Then presentCount = 100
+                lpLast = lpCurr
+            Else
+                dst2.SetTo(0)
+                lostLongest = 15
+                presentCount = 0
+                lpLast = Nothing
+            End If
+        End If
+
+        If lostLongest > 0 Then
+            SetTrueText("The longest line was lost! ", 2)
+            lostLongest -= 1
+        End If
+        labels(2) = "The longest line has been present " + CStr(presentCount) + " times."
+
+        SetTrueText("If the camera is moved, the longest line (task.lines.lpList(0) should produce a solid." + vbCrLf +
+                    "If that line disappears or its center moves a log, dst2 is set to 0 and it starts over." + vbCrLf +
+                    "It should not disappear unless the movement makes another line the lpList(0)", 3)
+    End Sub
+End Class
+
+
+
+
+
+Public Class NR_LineTrack_Basics : Inherits TaskParent
     Public lp As lpData
     Public lpNew As lpData
     Public diffX As Integer
@@ -92,7 +164,7 @@ End Class
 
 
 
-Public Class LineTrack_CorrelationNabe : Inherits TaskParent
+Public Class NR_LineTrack_CorrelationNabe : Inherits TaskParent
     Public lpInput As lpData
     Dim match As New Match_Basics
     Public p1Correlation As Single
@@ -437,8 +509,8 @@ Public Class NR_LineTrack_CenterRange : Inherits TaskParent
 
 
 
-Public Class LineTrack_Top3 : Inherits TaskParent
-    Dim lineT As New LineTrack_Basics
+Public Class NR_LineTrack_Top3 : Inherits TaskParent
+    Dim lineT As New NR_LineTrack_Basics
     Dim lpList As New List(Of lpData)
     Dim match As New Match_Basics
     Public Sub New()
@@ -497,7 +569,7 @@ End Class
 
 
 
-Public Class LineTrack_SearchX : Inherits TaskParent
+Public Class NR_LineTrack_SearchX : Inherits TaskParent
     Dim lastImage As cv.Mat
     Dim searchCount As Integer = 9
     Dim addw As New AddWeighted_Basics
@@ -566,7 +638,7 @@ End Class
 
 
 
-Public Class LineTrack_Changes : Inherits TaskParent
+Public Class NR_LineTrack_Changes : Inherits TaskParent
     Public Sub New()
         labels(2) = "Move camera or wave at camera to see the impact on the lines."
         labels(3) = "Current lines.  dst2 is the difference between lines in current vs. previous image."
@@ -587,8 +659,8 @@ End Class
 
 
 
-Public Class LineTrack_CorrelationTrack : Inherits TaskParent
-    Dim lineT As New LineTrack_Correlation
+Public Class NR_LineTrack_CorrelationTrack : Inherits TaskParent
+    Dim lineT As New NR_LineTrack_Correlation
     Dim lpList As New List(Of lpData)
     Public lp As lpData
     Public Sub New()
@@ -626,7 +698,7 @@ End Class
 
 
 
-Public Class LineTrack_Correlation : Inherits TaskParent
+Public Class NR_LineTrack_Correlation : Inherits TaskParent
     Public lpInput As lpData
     Dim match1 As New Match_Basics
     Dim match2 As New Match_Basics

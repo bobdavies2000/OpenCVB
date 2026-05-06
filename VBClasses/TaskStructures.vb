@@ -356,153 +356,6 @@ Public Module Structures
 
 
 
-
-    Public Class lpData
-        Public age As Integer = 1
-        Public angle As Single ' varies from -90 to 90 degrees
-        Public color As cv.Scalar
-        Public index As Integer
-        Public length As Single
-        Public p1 As cv.Point2f
-        Public p2 As cv.Point2f
-
-        Public pVec1 As cv.Vec3f
-        Public pVec2 As cv.Vec3f
-        Public pE1 As cv.Point2f ' end points - goes to the edge of the image.
-        Public pE2 As cv.Point2f ' end points - goes to the edge of the image.
-        Public ptCenter As cv.Point2f
-
-        Public rect As cv.Rect
-        Public slope As Single
-
-        Public Const maxSlope As Integer = 100000
-        Public Shared Function validatePoint(pt As cv.Point2f) As cv.Point2f
-            If CInt(pt.X) < 0 Then pt.X = 0
-            If CInt(pt.X) >= task.color.Width Then pt.X = task.color.Width - 1
-            If CInt(pt.Y) < 0 Then pt.Y = 0
-            If CInt(pt.Y) >= task.color.Height Then pt.Y = task.color.Height - 1
-
-            Return pt
-        End Function
-        Sub New(_p1 As cv.Point2f, _p2 As cv.Point2f)
-            p1 = validatePoint(_p1)
-            p2 = validatePoint(_p2)
-
-            ' trying a simple convention: p1 is leftmost point
-            If p1.X > p2.X Then
-                Dim ptTemp = p1
-                p1 = p2
-                p2 = ptTemp
-            End If
-
-            If p1.X = p2.X Then
-                slope = (p1.Y - p2.Y) / (p1.X + 0.001 - p2.X)
-            Else
-                slope = (p1.Y - p2.Y) / (p1.X - p2.X)
-            End If
-
-            length = p1.DistanceTo(p2)
-
-            Dim p1GridIndex = task.gridMap.Get(Of Integer)(p1.Y, p1.X)
-            color = task.scalarColors(p1GridIndex Mod 255)
-
-            pVec1 = task.pointCloud.Get(Of cv.Vec3f)(p1.Y, p1.X)
-            If Single.IsNaN(pVec1(0)) Or pVec1(2) = 0 Then
-                Dim r = task.gridRects(p1GridIndex)
-                pVec1 = New cv.Vec3f(0, 0, task.pcSplit(2)(r).Mean(task.depthmask(r)).Item(0))
-            End If
-
-            pVec2 = task.pointCloud.Get(Of cv.Vec3f)(p2.Y, p2.X)
-            If Single.IsNaN(pVec2(0)) Or pVec2(2) = 0 Then
-                Dim p2GridIndex = task.gridMap.Get(Of Integer)(p2.Y, p2.X)
-                Dim r = task.gridRects(p2GridIndex)
-                pVec2 = New cv.Vec3f(0, 0, task.pcSplit(2)(r).Mean(task.depthmask(r)).Item(0))
-            End If
-
-            If p1.X <> p2.X Then
-                Dim b = p1.Y - p1.X * slope
-                If p1.Y = p2.Y Then
-                    pE1 = New cv.Point2f(0, p1.Y)
-                    pE2 = New cv.Point2f(task.workRes.Width - 1, p1.Y)
-                Else
-                    Dim x1 = -b / slope
-                    Dim x2 = (task.workRes.Height - b) / slope
-                    Dim y1 = b
-                    Dim y2 = slope * task.workRes.Width + b
-
-                    Dim pts As New List(Of cv.Point2f)
-                    If x1 >= 0 And x1 <= task.workRes.Width Then pts.Add(New cv.Point2f(x1, 0))
-                    If x2 >= 0 And x2 <= task.workRes.Width Then pts.Add(New cv.Point2f(x2, task.workRes.Height - 1))
-                    If y1 >= 0 And y1 <= task.workRes.Height Then pts.Add(New cv.Point2f(0, y1))
-                    If y2 >= 0 And y2 <= task.workRes.Height Then pts.Add(New cv.Point2f(task.workRes.Width - 1, y2))
-                    pE1 = pts(0)
-                    If pts.Count < 2 Then
-                        If CInt(x2) >= task.workRes.Width Then pts.Add(New cv.Point2f(CInt(x2), task.workRes.Height - 1))
-                        If CInt(y2) >= task.workRes.Height Then pts.Add(New cv.Point2f(task.workRes.Width - 1, CInt(y2)))
-                    End If
-                    pE2 = pts(1)
-                End If
-            Else
-                pE1 = New cv.Point2f(p1.X, 0)
-                pE2 = New cv.Point2f(p1.X, task.workRes.Height - 1)
-            End If
-            ptCenter = New cv.Point2f((p1.X + p2.X) / 2, (p1.Y + p2.Y) / 2)
-
-            If p2.X = p1.X Then
-                angle = 90
-                Exit Sub
-            End If
-
-            Dim angleRadians As Double = Math.Atan2((p2.Y - p1.Y), (p2.X - p1.X))
-            angle = CType(angleRadians * (180.0 / Math.PI), Single)
-            If angle >= 90.0 Then angle -= 180.0
-            If angle < -90.0 Then angle += 180.0
-
-            Dim pad As Integer = 5
-            Dim w = Math.Abs(p1.X - p2.X) + pad * 2
-            Dim h = Math.Abs(p1.Y - p2.Y) + pad
-            ' p1 is always leftmost point.
-            If Math.Abs(angle) > 45 Then
-                rect = New cv.Rect(p1.X - pad, Math.Min(p1.Y, p2.Y),
-                                           Math.Max(pad * 2, w), Math.Max(pad * 2, h))
-            Else
-                rect = New cv.Rect(p1.X, Math.Min(p1.Y, p2.Y) - pad,
-                                       Math.Max(pad * 2, w), Math.Max(pad * 2, h))
-            End If
-
-            rect = ValidateRect(rect)
-        End Sub
-        Sub New()
-            p1 = New cv.Point2f()
-            p2 = New cv.Point2f()
-        End Sub
-        Public Function lpDisplay(ByRef dst As cv.Mat) As String
-            dst.SetTo(0)
-            For Each lp In task.lines.lpList
-                dst.Line(lp.p1, lp.
-                                 p2, white, task.lineWidth, cv.LineTypes.Link8)
-                dst.Circle(lp.ptCenter, task.DotSize, task.highlight, -1)
-            Next
-
-            dst.Line(task.lpD.p1, task.lpD.p2, task.highlight, task.lineWidth + 1, task.lineType)
-
-            Dim strOut = "rcList index = " + CStr(index) + vbCrLf
-            strOut = "Age = " + CStr(task.lpD.age) + vbCrLf
-            strOut += "Length (pixels) = " + Format(task.lpD.length, fmt1) + " index = " + CStr(task.lpD.index) + vbCrLf
-
-            strOut += "p1 = " + task.lpD.p1.ToString + ", p2 = " + task.lpD.p2.ToString + vbCrLf
-            strOut += "pE1 = " + task.lpD.pE1.ToString + ", pE2 = " + task.lpD.pE2.ToString + vbCrLf + vbCrLf
-            strOut += "RGB Angle = " + CStr(task.lpD.angle) + vbCrLf
-            strOut += "RGB Slope = " + Format(task.lpD.slope, fmt3) + vbCrLf
-            strOut += vbCrLf + "NOTE: the Y-Axis is inverted - Y increases down so slopes are inverted." + vbCrLf + vbCrLf
-            Return strOut
-        End Function
-    End Class
-
-
-
-
-
     Public Class rcData
         Public age As Integer = 1
         Public color As cv.Scalar
@@ -600,6 +453,156 @@ Public Module Structures
             End If
 
             Return strout
+        End Function
+    End Class
+
+
+
+
+
+    Public Class lpData
+        Public age As Integer = 1
+        Public angle As Single ' varies from -90 to 90 degrees
+        Public color As cv.Scalar
+        Public index As Integer
+        Public length As Single
+        Public p1 As cv.Point2f
+        Public p2 As cv.Point2f
+
+        Public pVec1 As cv.Vec3f
+        Public pVec2 As cv.Vec3f
+        Public pE1 As cv.Point2f ' end points - goes to the edge of the image.
+        Public pE2 As cv.Point2f ' end points - goes to the edge of the image.
+        Public ptCenter As cv.Point2f
+
+        Public rect As cv.Rect
+        Public slope As Single
+
+        Public Const maxSlope As Integer = 100000
+        Public Shared Function validatePoint(pt As cv.Point2f) As cv.Point2f
+            If CInt(pt.X) < 0 Then pt.X = 0
+            If CInt(pt.X) >= task.color.Width Then pt.X = task.color.Width - 1
+            If CInt(pt.Y) < 0 Then pt.Y = 0
+            If CInt(pt.Y) >= task.color.Height Then pt.Y = task.color.Height - 1
+
+            Return pt
+        End Function
+        Sub New(_p1 As cv.Point2f, _p2 As cv.Point2f)
+            p1 = validatePoint(_p1)
+            p2 = validatePoint(_p2)
+
+            ' trying a simple convention: p1 is leftmost point
+            If p1.X > p2.X Then
+                Dim ptTemp = p1
+                p1 = p2
+                p2 = ptTemp
+            End If
+
+            If p1.X = p2.X Then
+                slope = (p1.Y - p2.Y) / (p1.X + 0.001 - p2.X)
+            Else
+                slope = (p1.Y - p2.Y) / (p1.X - p2.X)
+            End If
+
+            length = p1.DistanceTo(p2)
+
+            Dim p1GridIndex = task.gridMap.Get(Of Integer)(p1.Y, p1.X)
+            color = task.scalarColors(p1GridIndex Mod 255)
+
+            pVec1 = task.pointCloud.Get(Of cv.Vec3f)(p1.Y, p1.X)
+            If Single.IsNaN(pVec1(0)) Or pVec1(2) = 0 Then
+                Dim r = task.gridRects(p1GridIndex)
+                pVec1 = New cv.Vec3f(0, 0, task.pcSplit(2)(r).Mean(task.depthmask(r)).Item(0))
+            End If
+
+            pVec2 = task.pointCloud.Get(Of cv.Vec3f)(p2.Y, p2.X)
+            If Single.IsNaN(pVec2(0)) Or pVec2(2) = 0 Then
+                Dim p2GridIndex = task.gridMap.Get(Of Integer)(p2.Y, p2.X)
+                Dim r = task.gridRects(p2GridIndex)
+                pVec2 = New cv.Vec3f(0, 0, task.pcSplit(2)(r).Mean(task.depthmask(r)).Item(0))
+            End If
+
+            If p1.X <> p2.X Then
+                Dim b = p1.Y - p1.X * slope
+                If p1.Y = p2.Y Then
+                    pE1 = New cv.Point2f(0, p1.Y)
+                    pE2 = New cv.Point2f(task.workRes.Width - 1, p1.Y)
+                Else
+                    Dim x1 = -b / slope
+                    Dim x2 = (task.workRes.Height - b) / slope
+                    Dim y1 = b
+                    Dim y2 = slope * task.workRes.Width + b
+
+                    Dim pts As New List(Of cv.Point2f)
+                    If x1 >= 0 And x1 <= task.workRes.Width Then pts.Add(New cv.Point2f(x1, 0))
+                    If x2 >= 0 And x2 <= task.workRes.Width Then pts.Add(New cv.Point2f(x2, task.workRes.Height - 1))
+                    If y1 >= 0 And y1 <= task.workRes.Height Then pts.Add(New cv.Point2f(0, y1))
+                    If y2 >= 0 And y2 <= task.workRes.Height Then pts.Add(New cv.Point2f(task.workRes.Width - 1, y2))
+                    pE1 = pts(0)
+                    If pts.Count < 2 Then
+                        If CInt(x2) >= task.workRes.Width Then pts.Add(New cv.Point2f(CInt(x2), task.workRes.Height - 1))
+                        If CInt(y2) >= task.workRes.Height Then pts.Add(New cv.Point2f(task.workRes.Width - 1, CInt(y2)))
+                    End If
+                    pE2 = pts(1)
+                End If
+            Else
+                pE1 = New cv.Point2f(p1.X, 0)
+                pE2 = New cv.Point2f(p1.X, task.workRes.Height - 1)
+            End If
+            If pE1.X >= task.workRes.Width Then pE1.X = task.workRes.Width - 1
+            If pE2.X >= task.workRes.Width Then pE2.X = task.workRes.Width - 1
+            If pE1.Y >= task.workRes.Height Then pE1.Y = task.workRes.Height - 1
+            If pE2.Y >= task.workRes.Height Then pE2.Y = task.workRes.Height - 1
+            ptCenter = New cv.Point2f((p1.X + p2.X) / 2, (p1.Y + p2.Y) / 2)
+
+            If p2.X = p1.X Then
+                angle = 90
+                Exit Sub
+            End If
+
+            Dim angleRadians As Double = Math.Atan2((p2.Y - p1.Y), (p2.X - p1.X))
+            angle = CType(angleRadians * (180.0 / Math.PI), Single)
+            If angle >= 90.0 Then angle -= 180.0
+            If angle < -90.0 Then angle += 180.0
+
+            Dim pad As Integer = 5
+            Dim w = Math.Abs(p1.X - p2.X) + pad * 2
+            Dim h = Math.Abs(p1.Y - p2.Y) + pad
+            ' p1 is always leftmost point.
+            If Math.Abs(angle) > 45 Then
+                rect = New cv.Rect(p1.X - pad, Math.Min(p1.Y, p2.Y),
+                                           Math.Max(pad * 2, w), Math.Max(pad * 2, h))
+            Else
+                rect = New cv.Rect(p1.X, Math.Min(p1.Y, p2.Y) - pad,
+                                       Math.Max(pad * 2, w), Math.Max(pad * 2, h))
+            End If
+
+            rect = ValidateRect(rect)
+        End Sub
+        Sub New()
+            p1 = New cv.Point2f()
+            p2 = New cv.Point2f()
+        End Sub
+        Public Function lpDisplay(ByRef dst As cv.Mat) As String
+            dst.SetTo(0)
+            For Each lp In task.lines.lpList
+                dst.Line(lp.p1, lp.
+                                 p2, white, task.lineWidth, cv.LineTypes.Link8)
+                dst.Circle(lp.ptCenter, task.DotSize, task.highlight, -1)
+            Next
+
+            dst.Line(task.lpD.p1, task.lpD.p2, task.highlight, task.lineWidth + 1, task.lineType)
+
+            Dim strOut = "rcList index = " + CStr(index) + vbCrLf
+            strOut = "Age = " + CStr(task.lpD.age) + vbCrLf
+            strOut += "Length (pixels) = " + Format(task.lpD.length, fmt1) + " index = " + CStr(task.lpD.index) + vbCrLf
+
+            strOut += "p1 = " + task.lpD.p1.ToString + ", p2 = " + task.lpD.p2.ToString + vbCrLf
+            strOut += "pE1 = " + task.lpD.pE1.ToString + ", pE2 = " + task.lpD.pE2.ToString + vbCrLf + vbCrLf
+            strOut += "RGB Angle = " + CStr(task.lpD.angle) + vbCrLf
+            strOut += "RGB Slope = " + Format(task.lpD.slope, fmt3) + vbCrLf
+            strOut += vbCrLf + "NOTE: the Y-Axis is inverted - Y increases down so slopes are inverted." + vbCrLf + vbCrLf
+            Return strOut
         End Function
     End Class
 End Module

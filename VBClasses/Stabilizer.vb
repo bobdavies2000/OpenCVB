@@ -89,3 +89,54 @@ Public Class Stabilizer_Basics : Inherits TaskParent
         End If
     End Sub
 End Class
+
+Public Class Stabilizer_IMU : Inherits TaskParent
+    Private Const RadToDeg As Double = 57.29577951308232
+    Private Const PixelsPerRad As Single = 60.0F
+    Private Const MaxShift As Single = 30.0F
+
+    Private accum As New AddWeighted_Accumulate
+    Private baselineRoll As Single
+    Private baselinePitch As Single
+    Private baselineSet As Boolean
+
+    Public Sub New()
+        desc = "Use IMU tilt deltas to stabilize grayscale, then accumulate with AddWeighted_Accumulate (~10-frame history)."
+        labels(2) = "IMU-stabilized grayscale accumulated (~last 10 frames)"
+        labels(3) = "Current IMU-stabilized grayscale frame"
+    End Sub
+
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        Dim graySrc = If(src.Channels = 1, src, task.gray)
+        If graySrc.Empty Then Exit Sub
+
+        If task.optionsChanged Or task.firstPass Or baselineSet = False Then
+            baselineRoll = task.accRadians.Z
+            baselinePitch = task.accRadians.X
+            baselineSet = True
+            accum = New AddWeighted_Accumulate
+        End If
+
+        Dim rollDelta = task.accRadians.Z - baselineRoll
+        Dim pitchDelta = task.accRadians.X - baselinePitch
+
+        Dim angleDeg = -rollDelta * RadToDeg
+        Dim dx = CSng(-pitchDelta * PixelsPerRad - task.IMU_AngularVelocity.Y * 4.0F)
+        Dim dy = CSng(task.IMU_AngularVelocity.X * 4.0F)
+        dx = Math.Max(-MaxShift, Math.Min(MaxShift, dx))
+        dy = Math.Max(-MaxShift, Math.Min(MaxShift, dy))
+
+        Dim center = New cv.Point2f(graySrc.Cols / 2.0F, graySrc.Rows / 2.0F)
+        Dim M = cv.Cv2.GetRotationMatrix2D(center, angleDeg, 1.0)
+        M.Set(Of Double)(0, 2, M.Get(Of Double)(0, 2) + dx)
+        M.Set(Of Double)(1, 2, M.Get(Of Double)(1, 2) + dy)
+
+        dst3 = graySrc.WarpAffine(M, graySrc.Size, cv.InterpolationFlags.Linear, cv.BorderTypes.Reflect101)
+
+        accum.Run(dst3)
+        dst2 = accum.dst2.Clone
+
+        labels(2) = "IMU stabilize + AddWeighted_Accumulate (weight 0.1 ~= last 10 frames)."
+        labels(3) = "Angle=" + Format(angleDeg, fmt2) + " deg, dx=" + Format(dx, fmt2) + ", dy=" + Format(dy, fmt2)
+    End Sub
+End Class
