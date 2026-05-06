@@ -155,7 +155,7 @@ DepthColorizer_Basics_TA
 DepthColorizer_CloudPixels
 DepthColorizer_CPP
 DepthColorizer_Mean
-DepthLine_Basics_TA
+DepthLine_Basics
 DepthLine_H
 DepthLine_HV
 DepthLine_Points
@@ -222,7 +222,7 @@ Edge_SobelCustomH
 Edge_SobelCustomV
 Edge_SobelH
 Edge_SobelHorizontal
-Edge_SobelHV
+Edge_SobelNaive
 Edge_SobelV
 Edge_SobelVertical
 Edge_StableLeftRight
@@ -449,6 +449,7 @@ LeftRight_Reduction
 LeftRight_Stable
 Line_Basics_TA
 Line_BasicsEmboss
+Line_BasicsLSD
 Line_BasicsNoMotion
 Line_BasicsNoMotion1
 Line_Brick
@@ -467,6 +468,7 @@ Line_LeftRight
 Line_LeftRightMotion
 Line_LeftTrack
 Line_Longest
+Line_LongestCheck
 Line_Map
 Line_MapRects
 Line_Motion

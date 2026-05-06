@@ -495,7 +495,7 @@ End Class
 
 Public Class NR_GridRect_Sobel : Inherits TaskParent
     Dim edges As New GridRect_Canny
-    Dim sobel As New Edge_SobelHV
+    Dim sobel As New Edge_Sobel
     Public Sub New()
         task.gOptions.GridSlider.Value = dst2.Width \ 40 ' arbitrary but the goal is to get a reasonable (< 500) number of roi's.
         desc = "Find all the GridCells with edges in them."

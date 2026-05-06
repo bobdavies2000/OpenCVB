@@ -1,6 +1,6 @@
 Imports cv = OpenCvSharp
 Public Class BrickPoint_Basics : Inherits TaskParent
-    Public sobel As New Edge_SobelHV
+    Public sobel As New Edge_Sobel
     Public bpCore As New BrickPoint_Core
     Public ptList As New List(Of cv.Point)
     Public Sub New()
@@ -41,7 +41,7 @@ Public Class BrickPoint_Core : Inherits TaskParent
 
         bricks.Run(src)
         If standalone Then
-            Static sobel As New Edge_SobelHV
+            Static sobel As New Edge_Sobel
             sobel.Run(src)
             src = sobel.dst2
         End If
@@ -452,7 +452,7 @@ End Class
 
 
 Public Class BrickPoint_MaxSobel : Inherits TaskParent
-    Public sobel As New Edge_SobelHV
+    Public sobel As New Edge_Sobel
     Public features As New List(Of cv.Point)
     Public options As New Options_Sobel
     Public Sub New()
@@ -530,7 +530,7 @@ Public Class NR_BrickPoint_Blocks : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If standalone Then
-            Static sobel As New Edge_SobelHV
+            Static sobel As New Edge_Sobel
             sobel.Run(src)
             src = sobel.dst2
             ' options.run() ' no need to run options because we just want the default threshold value.

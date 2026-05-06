@@ -8,6 +8,10 @@ Public Class Motion_Basics_TA : Inherits TaskParent
         desc = "Find all the grid rects that had motion since the last frame."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
+        SetTrueText("Use the Feature Options 'Color Diff Threshold' or " + vbCrLf +
+                    "the Feature Option 'Motion pixel threshold'." + vbCrLf +
+                    " to adjust accuracy of accumulated image.", 3)
+
         If task.motionStable.motionDecision = False Then
             motionSort.Clear()
             motionMask.SetTo(0)
@@ -41,10 +45,6 @@ Public Class Motion_Basics_TA : Inherits TaskParent
 
         dst3 = motionMask
         labels(2) = "Image below is accumulated using motion mask.  Grid rects with motion: " + CStr(nabeList.Count)
-        SetTrueText("Use the Feature Options 'Color Diff Threshold' or " + vbCrLf +
-                    "the Feature Option 'Motion pixel threshold'." + vbCrLf +
-                    " to adjust accuracy of accumulated image.", 3)
-        SetTrueText("Use the Feature Options 'Color Diff Threshold' to adjust accuracy of accumulated image.", 3)
     End Sub
 End Class
 

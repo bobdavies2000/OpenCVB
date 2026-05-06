@@ -1,5 +1,5 @@
 Imports cv = OpenCvSharp
-Public Class DepthLine_Basics_TA : Inherits TaskParent
+Public Class DepthLine_Basics : Inherits TaskParent
     Public prepEdges As New RedPrep_EdgeMask
     Dim lines As New Line_Basics_TA
     Public motionLeft As New Motion_Basics_TA
@@ -37,7 +37,7 @@ End Class
 
 
 Public Class NR_DepthLine_XY : Inherits TaskParent
-    Dim lineD As New DepthLine_Basics_TA
+    Dim lineD As New DepthLine_Basics
     Public lpList As New List(Of lpData)
     Public Sub New()
         If standalone Then task.gOptions.displayDst0.Checked = True
@@ -59,7 +59,7 @@ End Class
 
 
 Public Class DepthLine_V : Inherits TaskParent
-    Dim lineD As New DepthLine_Basics_TA
+    Dim lineD As New DepthLine_Basics
     Public lpList As New List(Of lpData)
     Public Sub New()
         If standalone Then task.gOptions.displayDst0.Checked = True
@@ -81,7 +81,7 @@ End Class
 
 
 Public Class DepthLine_H : Inherits TaskParent
-    Dim lineD As New DepthLine_Basics_TA
+    Dim lineD As New DepthLine_Basics
     Public lpList As New List(Of lpData)
     Public Sub New()
         If standalone Then task.gOptions.displayDst0.Checked = True

@@ -41,10 +41,10 @@ Public Class AlgorithmTask : Implements IDisposable
         gravityBasics = New Gravity_Basics_TA
         imuBasics = New IMU_Basics_TA
         motion = New Motion_Basics_TA
+        motion.standalone = False
         motionStable = New StableGray_Measure_TA
 
         stabilizeDepth = New StableDepth_Basics
-        stabilizeDepth.TA_Active = True
         stabilizeGray = New StableGray_Basics_TA
 
         prepCloud = New Cloud_Gravity_TA

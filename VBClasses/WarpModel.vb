@@ -138,7 +138,7 @@ End Class
 Public Class WarpModel_Input : Inherits TaskParent
     Public rgb(3 - 1) As cv.Mat
     Public gradient(3 - 1) As cv.Mat
-    Dim sobel As New Edge_Sobel
+    Dim sobel As New Edge_SobelNaive
     Dim options As New Options_WarpModel
     Public Sub New()
         If standalone Then task.gOptions.displayDst1.Checked = True

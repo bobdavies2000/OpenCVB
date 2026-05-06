@@ -3,7 +3,6 @@ Public Class StableDepth_Basics : Inherits TaskParent
     Dim colorize As New DepthColorizer_CPP
     Public pointcloud As cv.Mat
     Public pcSplit(2) As cv.Mat
-    Public TA_Active As Boolean = False
     Public Sub New()
         labels(2) = "Accumulated minimum values at each depth pixel.  Updated using RGB motion."
         labels(3) = "Pixels that were updated on the current frame."
@@ -41,12 +40,10 @@ Public Class StableDepth_Basics : Inherits TaskParent
         pcSplit = pointcloud.Split()
         lastDepth = pcSplit(2).Clone
 
-        If TA_Active Then
-            task.pointCloud = pointcloud.Clone
-            task.pcSplit = pcSplit
-            task.depthmask = pcSplit(2).Threshold(0, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs
-            task.noDepthMask = Not task.depthmask
-        End If
+        task.pointCloud = pointcloud.Clone
+        task.pcSplit = pcSplit
+        task.depthmask = pcSplit(2).Threshold(0, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs
+        task.noDepthMask = Not task.depthmask
     End Sub
 End Class
 

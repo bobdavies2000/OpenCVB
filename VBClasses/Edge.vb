@@ -8,7 +8,7 @@ Public Class Edge_Basics : Inherits TaskParent
     Dim scharr As NR_Edge_Scharr
     Dim binRed As NR_Edge_BinarizedReduction
     Dim binSobel As Bin4Way_Sobel
-    Dim sobel As Edge_SobelHV
+    Dim sobel As Edge_Sobel
     Dim colorGap As NR_Edge_ColorGap_CPP
     Dim deriche As Edge_Deriche_CPP
     Dim Laplacian As Edge_Laplacian
@@ -41,7 +41,7 @@ Public Class Edge_Basics : Inherits TaskParent
                 Case "Scharr"
                     edges = New NR_Edge_Scharr
                 Case "Sobel"
-                    edges = New Edge_SobelHV
+                    edges = New Edge_Sobel
             End Select
         End If
 
@@ -64,7 +64,7 @@ Public Class NR_Edge_MotionFree : Inherits TaskParent
     Dim scharr As NR_Edge_Scharr
     Dim binRed As NR_Edge_BinarizedReduction
     Dim binSobel As Bin4Way_Sobel
-    Dim sobel As Edge_Sobel
+    Dim sobel As Edge_SobelNaive
     Dim colorGap As NR_Edge_ColorGap_CPP
     Dim deriche As Edge_Deriche_CPP
     Dim Laplacian As Edge_Laplacian
@@ -88,7 +88,7 @@ Public Class NR_Edge_MotionFree : Inherits TaskParent
                 Case "Binarized Sobel"
                     edges = New Bin4Way_Sobel
                 Case "Sobel"
-                    edges = New Edge_Sobel
+                    edges = New Edge_SobelNaive
                 Case "Color Gap"
                     edges = New NR_Edge_ColorGap_CPP
                 Case "Deriche"
@@ -474,7 +474,7 @@ End Class
 
 ' https://scikit-image.org/docs/dev/auto_examples/color_exposure/plot_adapt_rgb.html#sphx-glr-auto-examples-color-exposure-plot-adapt-rgb-py
 Public Class Edge_RGB : Inherits TaskParent
-    Dim sobel As New Edge_SobelHV
+    Dim sobel As New Edge_Sobel
     Public Sub New()
         desc = "Combine the edges from all 3 channels"
     End Sub
@@ -982,7 +982,7 @@ End Class
 
 Public Class NR_Edge_CloudSegments : Inherits TaskParent
     Dim segments As New Histogram_CloudSegments
-    Dim edges As New Edge_SobelHV
+    Dim edges As New Edge_Sobel
     Public Sub New()
         desc = "Build edges from the point cloud segments from Histogram_Cloud - simplistic approach"
     End Sub
@@ -1608,11 +1608,11 @@ Public Class Edge_StableLeftRight : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         stableLR.Run(emptyMat)
 
-        edges.run(stableLR.dst2)
-        dst2 = edges.dst2.clone
+        edges.Run(stableLR.dst2)
+        dst2 = edges.dst2.Clone
         labels(2) = edges.labels(2)
 
-        edges.run(stableLR.dst3)
+        edges.Run(stableLR.dst3)
         dst3 = edges.dst2.Clone
         labels(3) = edges.labels(2)
     End Sub
@@ -1649,7 +1649,7 @@ End Class
 
 
 Public Class NR_Edge_SobelLR : Inherits TaskParent
-    Dim sobel As New Edge_Sobel
+    Dim sobel As New Edge_SobelNaive
     Public Sub New()
         OptionParent.FindSlider("Sobel kernel Size").Value = 3
         desc = "Find the edges in the LeftViewimages."
@@ -1669,7 +1669,7 @@ End Class
 
 
 'https://docs.opencvb.org/2.4/doc/tutorials/imgproc/imgtrans/sobel_derivatives/sobel_derivatives.html
-Public Class Edge_Sobel : Inherits TaskParent
+Public Class Edge_SobelNaive : Inherits TaskParent
     Public options As New Options_Sobel
     Public Sub New()
         dst0 = New cv.Mat(dst0.Size, cv.MatType.CV_32F, 0)
@@ -1684,7 +1684,7 @@ Public Class Edge_Sobel : Inherits TaskParent
         If options.horizontalDerivative Then dst0 = src.Sobel(cv.MatType.CV_32F, 0, 1, options.kernelSize)
         If options.verticalDerivative Then dst1 = src.Sobel(cv.MatType.CV_32F, 1, 0, options.kernelSize)
         dst2 = (dst1 + dst0).ToMat.ConvertScaleAbs()
-        dst3 = dst2.Threshold(100, 255, cv.ThresholdTypes.Binary)
+        dst3 = dst2.Threshold(50, 255, cv.ThresholdTypes.Binary)
     End Sub
 End Class
 
@@ -1694,7 +1694,7 @@ End Class
 
 'https://docs.opencvb.org/2.4/doc/tutorials/imgproc/imgtrans/sobel_derivatives/sobel_derivatives.html
 Public Class Edge_SobelHorizontal : Inherits TaskParent
-    Dim edges As New Edge_Sobel
+    Dim edges As New Edge_SobelNaive
     Public Sub New()
         OptionParent.FindCheckBox("Vertical Derivative").Checked = False
         desc = "Find edges with Sobel only in the horizontal direction"
@@ -1711,7 +1711,7 @@ End Class
 
 'https://docs.opencvb.org/2.4/doc/tutorials/imgproc/imgtrans/sobel_derivatives/sobel_derivatives.html
 Public Class Edge_SobelVertical : Inherits TaskParent
-    Dim edges As New Edge_Sobel
+    Dim edges As New Edge_SobelNaive
     Public Sub New()
         OptionParent.FindCheckBox("Horizontal Derivative").Checked = False
         desc = "Find edges with Sobel only in the horizontal direction"
@@ -1736,7 +1736,7 @@ Public Class Edge_SobelH : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         If src.Channels() <> 1 Then src = task.gray
         dst2 = src.Sobel(cv.MatType.CV_32F, 0, 1, 3).ConvertScaleAbs()
-        dst3 = dst2.Threshold(100, 255, cv.ThresholdTypes.Binary)
+        dst3 = dst2.Threshold(50, 255, cv.ThresholdTypes.Binary)
     End Sub
 End Class
 
@@ -1750,14 +1750,14 @@ Public Class Edge_SobelV : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         If src.Channels() <> 1 Then src = task.gray
         dst2 = src.Sobel(cv.MatType.CV_32F, 1, 0, 3).ConvertScaleAbs()
-        dst3 = dst2.Threshold(100, 255, cv.ThresholdTypes.Binary)
+        dst3 = dst2.Threshold(50, 255, cv.ThresholdTypes.Binary)
     End Sub
 End Class
 
 
 
 
-Public Class Edge_SobelHV : Inherits TaskParent
+Public Class Edge_Sobel : Inherits TaskParent
     Public kernelSize As Integer = 3
     Public Sub New()
         desc = "Combine the horizontal and vertical Sobel outputs"
@@ -1765,9 +1765,9 @@ Public Class Edge_SobelHV : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         If src.Channels() <> 1 Then src = task.gray
         dst0 = src.Sobel(cv.MatType.CV_32F, 1, 0, kernelSize).ConvertScaleAbs()
-        dst2 = dst0.Threshold(100, 255, cv.ThresholdTypes.Binary)
+        dst2 = dst0.Threshold(50, 255, cv.ThresholdTypes.Binary)
 
         dst0 = src.Sobel(cv.MatType.CV_32F, 0, 1, kernelSize).ConvertScaleAbs()
-        dst2 = dst2 Or dst0.Threshold(100, 255, cv.ThresholdTypes.Binary)
+        dst2 = dst2 Or dst0.Threshold(50, 255, cv.ThresholdTypes.Binary)
     End Sub
 End Class

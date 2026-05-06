@@ -117,7 +117,7 @@ Public Class LineSeg_Core : Inherits TaskParent
         lsd = cv.LineSegmentDetector.Create()
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If src.Channels <> 1 Or src.Type <> cv.MatType.CV_8U Then src = task.gray.Clone
+        If src.Channels <> 1 Then src = task.gray.Clone
 
         Dim vecMat As New cv.Mat
         lsd.Detect(src, vecMat)

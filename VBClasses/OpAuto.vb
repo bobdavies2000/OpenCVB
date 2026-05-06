@@ -27,7 +27,7 @@ Public Class OpAuto_Valley : Inherits TaskParent
         Dim incr = histList.Count / desiredBoundaries
         For i = 0 To desiredBoundaries - 1
             Dim nextList As New List(Of Single)
-            For j = i * incr To (i + 1) * incr - 1
+            For j = Math.Floor(i * incr) To Math.Ceiling((i + 1) * incr) - 1
                 If i = 0 And j < 5 Then
                     nextList.Add(dst2.Total) ' there are typically some gaps near zero.
                 Else

@@ -4,7 +4,7 @@ Public Class Line_Basics_TA : Inherits TaskParent
     Public lpList As New List(Of lpData)
     Public ld As cv.XImgProc.FastLineDetector
     Public motionMask As cv.Mat = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 255)
-    Dim edges As New Edge_SobelHV
+    Dim edges As New Edge_Sobel
     Public Sub New()
         dst1 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
@@ -36,10 +36,66 @@ Public Class Line_Basics_TA : Inherits TaskParent
         If src.Channels <> 1 Or src.Type <> cv.MatType.CV_8U Then src = task.gray.Clone
 
         edges.Run(src)
-        dst0 = edges.dst2
         labels(2) = edges.labels(2)
 
-        lpList = Line_Basics_TA.getRawLines(ld.Detect(edges.dst2))
+        Dim newList = Line_Basics_TA.getRawLines(ld.Detect(edges.dst2))
+
+        dst1.SetTo(0)
+        Dim lpSorted As New SortedList(Of Single, Integer)(New compareAllowIdenticalSingleInverted)
+        For i = 0 To newList.Count - 1
+            Dim lp = newList(i)
+            lpSorted.Add(lp.length, i)
+        Next
+
+        Dim index As Integer
+        lpList.Clear()
+        For index = 0 To lpSorted.Values.Count - 1
+            Dim lp = newList(lpSorted.Values.ElementAt(index))
+            lp.index = index + 1
+            lpList.Add(lp)
+
+            dst1.Line(lp.p1, lp.p2, lp.index, task.lineWidth, cv.LineTypes.Link4)
+            Dim tierIndex = task.depthTiers.dst2.Get(Of Byte)(lp.p1.Y, lp.p1.X)
+            dst2.Line(lp.p1, lp.p2, task.scalarColors(tierIndex), task.lineWidth + 1, cv.LineTypes.Link4)
+        Next
+
+        dst3 = dst1.Threshold(0, 255, cv.ThresholdTypes.Binary)
+
+        labels(3) = CStr(lpList.Count) + " lines found"
+    End Sub
+    Protected Overrides Sub Finalize()
+        ld.Dispose()
+    End Sub
+End Class
+
+
+
+
+
+Public Class Line_BasicsLSD : Inherits TaskParent
+    Implements IDisposable
+    Public lpList As New List(Of lpData)
+    Dim lsd As cv.LineSegmentDetector
+    Dim edges As New Edge_Sobel
+    Public Sub New()
+        dst1 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
+        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
+        labels(2) = "Edges_Basics output"
+        lsd = cv.LineSegmentDetector.Create()
+        desc = "Run FLD (Fast Line Detector) with sobel input."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        dst2 = task.color.Clone
+        If src.Channels <> 1 Or src.Type <> cv.MatType.CV_8U Then src = task.gray.Clone
+
+        edges.Run(src)
+        labels(2) = edges.labels(2)
+
+        Dim vecMat As New cv.Mat
+        lsd.Detect(src, vecMat)
+        Dim vecArray() As cv.Vec4f = Nothing
+        vecMat.GetArray(Of cv.Vec4f)(vecArray)
+        lpList = Line_Basics_TA.getRawLines(vecArray)
 
         dst1.SetTo(0)
         Dim index As Integer
@@ -56,7 +112,7 @@ Public Class Line_Basics_TA : Inherits TaskParent
         labels(3) = CStr(lpList.Count) + " lines found"
     End Sub
     Protected Overrides Sub Finalize()
-        ld.Dispose()
+        lsd.Dispose()
     End Sub
 End Class
 
@@ -706,7 +762,7 @@ End Class
 Public Class Line_BrickList : Inherits TaskParent
     Public lp As lpData ' set this input
     Public lpOutput As lpData ' this is the result lp
-    Public sobel As New Edge_SobelHV
+    Public sobel As New Edge_Sobel
     Public ptList As New List(Of cv.Point)
     Dim options As New Options_LeftRightCorrelation
     Public Sub New()
@@ -1714,7 +1770,7 @@ End Class
 
 
 Public Class Line_Sobel : Inherits TaskParent
-    Dim edges As New Edge_SobelHV
+    Dim edges As New Edge_Sobel
     Dim lines As New Line_Basics_TA
     Public Sub New()
         desc = "Find lines in the Sobel output"
@@ -1729,5 +1785,31 @@ Public Class Line_Sobel : Inherits TaskParent
         For Each lp In lines.lpList
             dst3.Line(lp.p1, lp.p2, task.highlight, task.lineWidth)
         Next
+    End Sub
+End Class
+
+
+
+
+Public Class Line_LongestCheck : Inherits TaskParent
+    Dim lp As New lpData
+    Public Sub New()
+        desc = "Check to see that the longest line is always present."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        If task.lines.lpList.Count = 0 Or task.heartBeatLT Then
+            dst2.SetTo(0)
+        Else
+            Dim lpNext = task.lines.lpList(0)
+            If lpNext.ptCenter.DistanceTo(lp.ptCenter) < task.gridWH Then
+                dst2.Line(lpNext.p1, lpNext.p2, task.highlight, task.lineWidth)
+            Else
+                dst2.SetTo(0)
+            End If
+            lp = lpNext
+        End If
+        SetTrueText("If the camera is moved, the longest line (task.lines.lpList(0) should produce a solid." + vbCrLf +
+                    "If that line disappears or its center moves a log, dst2 is set to 0 and it starts over." + vbCrLf +
+                    "It should not disappear unless the movement makes another line the lpList(0)", 3)
     End Sub
 End Class

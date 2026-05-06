@@ -143,7 +143,7 @@ End Class
 
 
 Public Class Bin4Way_Sobel : Inherits TaskParent
-    Dim edges As New Edge_SobelHV
+    Dim edges As New Edge_Sobel
     Dim binary As New Bin4Way_SplitMean
     Public mats As New Mat_4to1
     Public Sub New()
