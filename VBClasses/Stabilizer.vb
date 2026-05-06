@@ -116,11 +116,11 @@ Public Class Stabilizer_IMU : Inherits TaskParent
         Dim graySrc = If(src.Channels = 1, src, task.gray)
         If graySrc.Empty Then Exit Sub
 
-        If task.optionsChanged Or task.firstPass Or baselineSet = False Then
+        If task.optionsChanged Or baselineSet = False Then
             baselineRoll = task.accRadians.Z
             baselinePitch = task.accRadians.X
             baselineSet = True
-            accum = New AddWeighted_Accumulate
+            accum.dst3.SetTo(0)
         End If
 
         Dim rollDelta = task.accRadians.Z - baselineRoll

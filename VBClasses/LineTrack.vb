@@ -10,7 +10,7 @@ Public Class LineTrack_Basics_TA : Inherits TaskParent
         desc = "Track the longest line and flag when it is lost."
     End Sub
     Public Shared Function compareLines(lpCurr As lpData, lpLast As lpData) As Boolean
-        Dim distThreshold = task.gridWH
+        Dim distThreshold = If(task.workRes.Width > 640, task.gridWH * 2, task.gridWH)
         If (lpCurr.pE1.DistanceTo(lpLast.pE1) < distThreshold And
            lpCurr.pE2.DistanceTo(lpLast.pE2) < distThreshold) Or
            (lpCurr.pE2.DistanceTo(lpLast.pE1) < distThreshold And
@@ -19,17 +19,18 @@ Public Class LineTrack_Basics_TA : Inherits TaskParent
         End If
         Return False
     End Function
+    Private Sub reset()
+        lpCurr = task.lines.lpList(0)
+        lpLast = task.lines.lpList(0)
+        resetCurr = False
+    End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         Static presentCount As Integer
         Static lostLongest As Integer
         If task.lines.lpList.Count = 0 Then
             dst2.SetTo(0)
         Else
-            If resetCurr Then
-                lpCurr = task.lines.lpList(0)
-                lpLast = task.lines.lpList(0)
-                resetCurr = False
-            End If
+            If resetCurr Then reset()
 
             knn.trainInput.Clear()
             For Each lp In task.lines.lpList
@@ -50,6 +51,7 @@ Public Class LineTrack_Basics_TA : Inherits TaskParent
             Else
                 lostLongest = 15
                 presentCount = 0
+                reset()
                 resetCurr = True
             End If
         End If
