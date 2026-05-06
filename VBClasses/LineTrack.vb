@@ -1,13 +1,12 @@
 Imports System.Runtime.InteropServices
 Imports cv = OpenCvSharp
-Public Class LineTrack_Basics : Inherits TaskParent
-    Dim lpLast As lpData
-    Dim lpCurr As New lpData
+Public Class LineTrack_Basics_TA : Inherits TaskParent
+    Public lpLast As New lpData
+    Public lpCurr As New lpData
+    Public resetCurr As Boolean = True ' if true, the longest line was lost.
     Dim knn As New KNN_N4Basics
     Public Sub New()
         knn.queries.Add(New cv.Vec4f)
-        If standalone Then task.gOptions.displayDst0.Checked = True
-        If standalone Then task.gOptions.displayDst1.Checked = True
         desc = "Track the longest line and flag when it is lost."
     End Sub
     Public Shared Function compareLines(lpCurr As lpData, lpLast As lpData) As Boolean
@@ -23,13 +22,13 @@ Public Class LineTrack_Basics : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         Static presentCount As Integer
         Static lostLongest As Integer
-        dst0 = task.lines.dst2
         If task.lines.lpList.Count = 0 Then
             dst2.SetTo(0)
         Else
-            If lpLast Is Nothing Then
+            If resetCurr Then
                 lpCurr = task.lines.lpList(0)
                 lpLast = task.lines.lpList(0)
+                resetCurr = False
             End If
 
             knn.trainInput.Clear()
@@ -42,18 +41,16 @@ Public Class LineTrack_Basics : Inherits TaskParent
 
             lpCurr = task.lines.lpList(knn.result(0, 0))
 
-            dst1 = task.color.Clone
-            dst1.Line(lpCurr.pE1, lpCurr.pE2, task.highlight, task.lineWidth)
+            dst2 = task.color.Clone
+            dst2.Line(lpCurr.pE1, lpCurr.pE2, task.highlight, task.lineWidth)
             If compareLines(lpCurr, lpLast) Then
-                dst2.Line(lpCurr.pE1, lpCurr.pE2, task.highlight, task.lineWidth)
                 presentCount += 1
                 If presentCount > 1000 Then presentCount = 100
                 lpLast = lpCurr
             Else
-                dst2.SetTo(0)
                 lostLongest = 15
                 presentCount = 0
-                lpLast = Nothing
+                resetCurr = True
             End If
         End If
 
