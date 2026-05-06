@@ -1791,23 +1791,38 @@ End Class
 
 
 
-Public Class Line_LongestCheck : Inherits TaskParent
+Public Class Line_LongestTest : Inherits TaskParent
     Dim lp As New lpData
     Public Sub New()
         desc = "Check to see that the longest line is always present."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
+        Static presentCount As Integer
+        Static lostLongest As Integer
         If task.lines.lpList.Count = 0 Or task.heartBeatLT Then
             dst2.SetTo(0)
+            presentCount = 0
         Else
             Dim lpNext = task.lines.lpList(0)
             If lpNext.ptCenter.DistanceTo(lp.ptCenter) < task.gridWH Then
                 dst2.Line(lpNext.p1, lpNext.p2, task.highlight, task.lineWidth)
+                presentCount += 1
             Else
                 dst2.SetTo(0)
+                lostLongest = 15
             End If
             lp = lpNext
         End If
+
+        If presentCount = 0 Then
+            labels(2) = "The longest line has beem restarted by heartBeatLT"
+        ElseIf lostLongest > 0 Then
+            labels(2) = "The longest line was lost! "
+            lostLongest -= 1
+        Else
+            labels(2) = "The longest line has been present " + CStr(presentCount) + " times."
+        End If
+
         SetTrueText("If the camera is moved, the longest line (task.lines.lpList(0) should produce a solid." + vbCrLf +
                     "If that line disappears or its center moves a log, dst2 is set to 0 and it starts over." + vbCrLf +
                     "It should not disappear unless the movement makes another line the lpList(0)", 3)

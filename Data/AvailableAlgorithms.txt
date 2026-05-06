@@ -468,7 +468,7 @@ Line_LeftRight
 Line_LeftRightMotion
 Line_LeftTrack
 Line_Longest
-Line_LongestCheck
+Line_LongestTest
 Line_Map
 Line_MapRects
 Line_Motion
