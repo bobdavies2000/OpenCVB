@@ -260,7 +260,7 @@ Public Class LineTrack_Match : Inherits TaskParent
 
                 If angleDelta.Count > 0 Then
                     Dim minAngleDelta = angleDelta.Min
-                    If minAngleDelta < 5 Then ' within 5 degrees of the original line's angle
+                    If minAngleDelta < task.angleThreshold Then ' within x degrees of the original line's angle
                         Dim index = lineIndex(angleDelta.IndexOf(minAngleDelta))
                         lpMatch = lpListLast(index)
                         dst2.Line(lp.p1, lp.p2, color, task.lineWidth + 2, task.lineType)
@@ -867,12 +867,14 @@ Public Class LineTrack_Horizontal : Inherits TaskParent
         ' if no horizontal lines are available, then pick the second longest vertical
         ' line and track the perpendicular.
 
+        Static lpSave As lpData
         If lineTrack.reSyncImage Then
             Dim foundHoriz As Boolean = False
             For Each lp In task.lines.lpList
                 If lp.index = 1 Then Continue For ' longest is already being tracked.
                 If lp.ptE1.X = 0 Then
-                    lineTrack.lpInput = lp
+                    lpSave = lp
+                    lineTrack.lpInput = lpSave
                     foundHoriz = True
                     Exit For
                 End If
@@ -881,8 +883,9 @@ Public Class LineTrack_Horizontal : Inherits TaskParent
             If foundHoriz = False Then
                 For Each lp In task.lines.lpList
                     If lp.index = 1 Then Continue For ' longest is already being tracked.
-                    If lp.ptE1.Y = 0 Then
-                        lineTrack.lpInput = lp
+                    If lp.ptE1.Y = 0 Or lp.ptE2.Y = 0 Then
+                        lpSave = lp
+                        lineTrack.lpInput = Line_Perpendicular.computePerp(lpSave)
                         foundHoriz = True
                         Exit For
                     End If
@@ -894,9 +897,12 @@ Public Class LineTrack_Horizontal : Inherits TaskParent
 
         lpCurr = lineTrack.lpCurr
 
-        If standaloneTest() Then dst2 = lineTrack.dst2.Clone
+        If standaloneTest() Then
+            dst2 = lineTrack.dst2.Clone
+            dst2.Line(lpSave.p1, lpSave.p2, white, task.lineWidth)
+        End If
 
-        SetTrueText("The longest line (task.lines.lpList(0) is tracked until it is lost." + vbCrLf +
+        SetTrueText("The longest horizontal line is tracked until it is lost." + vbCrLf +
                     "When that line is lost, the longest line is found and tracked.", 3)
 
     End Sub

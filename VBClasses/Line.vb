@@ -47,19 +47,19 @@ Public Class Line_Basics_TA : Inherits TaskParent
             lpSorted.Add(lp.length, i)
         Next
 
-        Dim index As Integer
         lpList.Clear()
         Dim edgeMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         Dim edgeDropCount As Integer
         For index = 0 To lpSorted.Values.Count - 1
             Dim lp = newList(lpSorted.Values.ElementAt(index))
-            lp.index = index + 1
             Dim val1 = edgeMap.Get(Of Byte)(lp.ptE1.Y, lp.ptE1.X)
             Dim val2 = edgeMap.Get(Of Byte)(lp.ptE1.Y, lp.ptE1.X)
             If val1 > 0 Or val2 > 0 Then
                 edgeDropCount += 1
                 Continue For
             End If
+
+            lp.index = lpList.Count + 1
 
             Dim gridIndex = task.gridMap.Get(Of Integer)(Math.Floor(lp.ptE1.Y), Math.Floor(lp.ptE1.X))
             edgeMap(task.gridNabeRects(gridIndex)).SetTo(lp.index)
@@ -340,9 +340,9 @@ Public Class NR_Line_Parallel : Inherits TaskParent
         Dim index As Integer, j As Integer
         unParallel.Clear()
         For i = 0 To parallels.Count - 1
-            Dim lp1 = task.lines.lpList(parallels.ElementAt(i).Value)
+            Dim lp1 = task.lines.lpList(parallels.ElementAt(i).Value - 1)
             For j = i + 1 To parallels.Count - 1
-                Dim lp2 = task.lines.lpList(parallels.ElementAt(j).Value)
+                Dim lp2 = task.lines.lpList(parallels.ElementAt(j).Value - 1)
                 If Math.Abs(lp1.angle - lp2.angle) < task.angleThreshold Then
                     If classes(index) Is Nothing Then classes(index) = New List(Of Integer)({lp1.index})
                     classes(index).Add(lp2.index)
@@ -360,7 +360,7 @@ Public Class NR_Line_Parallel : Inherits TaskParent
         For i = 0 To classes.Count - 1
             If classes(i) Is Nothing Then Exit For
             For j = 0 To classes(i).Count - 1
-                Dim lp = task.lines.lpList(classes(i).ElementAt(j))
+                Dim lp = task.lines.lpList(classes(i).ElementAt(j) - 1)
                 dst2.Line(lp.p1, lp.p2, lp.color, task.lineWidth * 2, task.lineType)
                 SetTrueText(CStr(colorIndex), lp.ptCenter)
             Next
@@ -368,7 +368,7 @@ Public Class NR_Line_Parallel : Inherits TaskParent
         Next
 
         For Each index In unParallel
-            Dim lp = task.lines.lpList(index)
+            Dim lp = task.lines.lpList(index - 1)
             dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
             SetTrueText("0", lp.ptCenter)
         Next
@@ -894,6 +894,8 @@ Public Class Line_MapRects : Inherits TaskParent
         Return False
     End Function
     Public Overrides Sub RunAlg(src As cv.Mat)
+        If task.lines.lpList.Count = 0 Then Exit Sub ' nothing to work on.
+
         Dim mmList As New List(Of mmData)
         Dim pad = 5
         dst3.SetTo(0)
@@ -945,14 +947,12 @@ Public Class Line_MapRects : Inherits TaskParent
         cv.Cv2.Merge({task.pcSplit(0), task.pcSplit(1), pcZ}, pointCloud)
 
         Dim index = dst0.Get(Of Byte)(task.mouseMovePoint.Y, task.mouseMovePoint.X) - 1
-        If task.lines.lpList.Count > 0 Then
-            If index <= 0 Then
-                If task.lpD Is Nothing Then task.lpD = task.lines.lpList(0)
-            Else
-                task.lpD = task.lines.lpList(index)
-            End If
-            task.lpD.lpDisplay(dst1)
+        If index >= 0 And index < task.lines.lpList.Count Then
+            task.lpD = task.lines.lpList(index)
+        Else
+            If task.lpD Is Nothing Then task.lpD = task.lines.lpList(0)
         End If
+        task.lpD.lpDisplay(dst1)
     End Sub
 End Class
 
