@@ -1680,6 +1680,7 @@ Spectrum_Y
 Spectrum_Z
 Stabilizer_Basics
 Stabilizer_BasicsFail
+Stabilizer_BasicsOld
 Stabilizer_IMU
 StableDepth_Basics
 StableDepth_Max

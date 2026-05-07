@@ -289,9 +289,12 @@ Public Class NR_HistValley_Test : Inherits TaskParent
                     If histList(j) = 0 Then nextList.Add(dst2.Total) Else nextList.Add(histList(j))
                 End If
             Next
+            If nextList.Count = 0 Then Continue For
             Dim index = nextList.IndexOf(nextList.Min())
             valleys.Add(index + i * incr)
         Next
+
+        If valleys.Count = 0 Then Exit Sub
 
         valleyOrder.Clear()
         Dim lastEntry As Integer
@@ -306,7 +309,7 @@ Public Class NR_HistValley_Test : Inherits TaskParent
         If standaloneTest() Then
             For Each entry In valleyOrder
                 Dim col = entry.Value * dst2.Width / task.histogramBins
-                vbc.DrawLine(dst2, New cv.Point(col, 0), New cv.Point(col, dst2.Height), white)
+                dst2.Line(New cv.Point(col, 0), New cv.Point(col, dst2.Height), white, task.lineWidth)
             Next
             SetTrueText(CStr(valleys.Count) + " valleys in histogram", 3)
         End If
@@ -553,16 +556,16 @@ Public Class NR_HistValley_GrayKalman : Inherits TaskParent
         Next
         task.kalman.Run(emptyMat)
 
-        Dim lastEntry As Integer
-        For i = 0 To task.kalman.kOutput.Count - 1
-            Dim entry = auto.valleyOrder.ElementAt(i).Value
-            For j = lastEntry To entry
-                hist.hist.histogram.Set(Of Single)(j, 0, i)
-            Next
-            Dim col = dst2.Width * entry / task.histogramBins
-            vbc.DrawLine(dst2, New cv.Point(col, 0), New cv.Point(col, dst2.Height), white)
-            lastEntry = entry
-        Next
+        'Dim lastEntry As Integer
+        'For i = 0 To task.kalman.kOutput.Count - 1
+        '    Dim entry = auto.valleyOrder.ElementAt(i).Value
+        '    For j = lastEntry To entry - 1
+        '        hist.hist.histogram.Set(Of Single)(j, 0, i)
+        '    Next
+        '    Dim col = dst2.Width * entry / task.histogramBins
+        '    dst2.Line(New cv.Point(col, 0), New cv.Point(col, dst2.Height), white, task.lineWidth)
+        '    lastEntry = entry
+        'Next
     End Sub
 End Class
 

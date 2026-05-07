@@ -28,6 +28,35 @@ End Class
 
 
 
+Public Class Stabilizer_BasicsOld : Inherits TaskParent
+    Dim feat As New Feature_Basics
+    Dim knn As New KNN_Basics
+    Public Sub New()
+        desc = "Reset the image on every heartbeat"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        If task.heartBeat Then
+            feat.Run(task.gray)
+            dst2 = feat.dst2
+            labels(2) = feat.labels(2)
+
+            knn.ptListQuery = feat.features
+            knn.ptListTrain = feat.lastFeatures
+            knn.Run(emptyMat)
+
+            dst3.SetTo(0)
+            For i = 0 To Math.Min(knn.ptListTrain.Count, knn.ptListQuery.Count) - 1
+                Dim p1 = knn.ptListQuery(i)
+                Dim p2 = knn.ptListTrain(knn.result(i, 0))
+                dst3.Line(p1, p2, task.highlight, task.lineWidth)
+            Next
+        End If
+    End Sub
+End Class
+
+
+
+
 
 Public Class Stabilizer_BasicsFail : Inherits TaskParent
     Public Sub New()
