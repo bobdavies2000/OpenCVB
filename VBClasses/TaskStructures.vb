@@ -471,8 +471,8 @@ Public Module Structures
 
         Public pVec1 As cv.Vec3f
         Public pVec2 As cv.Vec3f
-        Public pE1 As cv.Point2f ' end points - goes to the edge of the image.
-        Public pE2 As cv.Point2f ' end points - goes to the edge of the image.
+        Public ptE1 As cv.Point2f ' end points - goes to the edge of the image.
+        Public ptE2 As cv.Point2f ' end points - goes to the edge of the image.
         Public ptCenter As cv.Point2f
 
         Public rect As cv.Rect
@@ -525,8 +525,8 @@ Public Module Structures
             If p1.X <> p2.X Then
                 Dim b = p1.Y - p1.X * slope
                 If p1.Y = p2.Y Then
-                    pE1 = New cv.Point2f(0, p1.Y)
-                    pE2 = New cv.Point2f(task.workRes.Width - 1, p1.Y)
+                    ptE1 = New cv.Point2f(0, p1.Y)
+                    ptE2 = New cv.Point2f(task.workRes.Width - 1, p1.Y)
                 Else
                     Dim x1 = -b / slope
                     Dim x2 = (task.workRes.Height - b) / slope
@@ -538,21 +538,21 @@ Public Module Structures
                     If x2 >= 0 And x2 <= task.workRes.Width Then pts.Add(New cv.Point2f(x2, task.workRes.Height - 1))
                     If y1 >= 0 And y1 <= task.workRes.Height Then pts.Add(New cv.Point2f(0, y1))
                     If y2 >= 0 And y2 <= task.workRes.Height Then pts.Add(New cv.Point2f(task.workRes.Width - 1, y2))
-                    pE1 = pts(0)
+                    ptE1 = pts(0)
                     If pts.Count < 2 Then
                         If CInt(x2) >= task.workRes.Width Then pts.Add(New cv.Point2f(CInt(x2), task.workRes.Height - 1))
                         If CInt(y2) >= task.workRes.Height Then pts.Add(New cv.Point2f(task.workRes.Width - 1, CInt(y2)))
                     End If
-                    pE2 = pts(1)
+                    ptE2 = pts(1)
                 End If
             Else
-                pE1 = New cv.Point2f(p1.X, 0)
-                pE2 = New cv.Point2f(p1.X, task.workRes.Height - 1)
+                ptE1 = New cv.Point2f(p1.X, 0)
+                ptE2 = New cv.Point2f(p1.X, task.workRes.Height - 1)
             End If
-            If pE1.X >= task.workRes.Width Then pE1.X = task.workRes.Width - 1
-            If pE2.X >= task.workRes.Width Then pE2.X = task.workRes.Width - 1
-            If pE1.Y >= task.workRes.Height Then pE1.Y = task.workRes.Height - 1
-            If pE2.Y >= task.workRes.Height Then pE2.Y = task.workRes.Height - 1
+            If ptE1.X >= task.workRes.Width Then ptE1.X = task.workRes.Width - 1
+            If ptE2.X >= task.workRes.Width Then ptE2.X = task.workRes.Width - 1
+            If ptE1.Y >= task.workRes.Height Then ptE1.Y = task.workRes.Height - 1
+            If ptE2.Y >= task.workRes.Height Then ptE2.Y = task.workRes.Height - 1
             ptCenter = New cv.Point2f((p1.X + p2.X) / 2, (p1.Y + p2.Y) / 2)
 
             If p2.X = p1.X Then
@@ -598,7 +598,7 @@ Public Module Structures
             strOut += "Length (pixels) = " + Format(task.lpD.length, fmt1) + " index = " + CStr(task.lpD.index) + vbCrLf
 
             strOut += "p1 = " + task.lpD.p1.ToString + ", p2 = " + task.lpD.p2.ToString + vbCrLf
-            strOut += "pE1 = " + task.lpD.pE1.ToString + ", pE2 = " + task.lpD.pE2.ToString + vbCrLf + vbCrLf
+            strOut += "ptE1 = " + task.lpD.ptE1.ToString + ", ptE2 = " + task.lpD.ptE2.ToString + vbCrLf + vbCrLf
             strOut += "RGB Angle = " + CStr(task.lpD.angle) + vbCrLf
             strOut += "RGB Slope = " + Format(task.lpD.slope, fmt3) + vbCrLf
             strOut += vbCrLf + "NOTE: the Y-Axis is inverted - Y increases down so slopes are inverted." + vbCrLf + vbCrLf

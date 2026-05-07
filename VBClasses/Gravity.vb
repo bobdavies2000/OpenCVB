@@ -11,8 +11,8 @@ Public Class Gravity_Basics_TA : Inherits TaskParent
         labels(2) = "Complementary-filter gravity: angles and unit gravity vector"
     End Sub
     Public Shared Sub showVectors(dst As cv.Mat)
-        dst.Line(task.lpGravity.pE1, task.lpGravity.pE2, white, task.lineWidth, task.lineType)
-        dst.Line(task.lpHorizon.pE1, task.lpHorizon.pE2, white, task.lineWidth, task.lineType)
+        dst.Line(task.lpGravity.ptE1, task.lpGravity.ptE2, white, task.lineWidth, task.lineType)
+        dst.Line(task.lpHorizon.ptE1, task.lpHorizon.ptE2, white, task.lineWidth, task.lineType)
     End Sub
     ''' <summary>Compute two image points for the line through (cx,cy) in direction of gravity projection (gx,gy), extended to rect [0,w] x [0,h].</summary>
     Public Function GravityVectorToLineEndpoints(gravityVec As cv.Point3f, width As Integer, height As Integer) As (p1 As cv.Point2f, p2 As cv.Point2f)
@@ -142,11 +142,11 @@ Public Class Gravity_CloudMethod : Inherits TaskParent
         desc = "Method to find gravity and horizon vectors from the IMU"
     End Sub
     Public Shared Sub showVectors(dst As cv.Mat)
-        dst.Line(task.lpGravity.pE1, task.lpGravity.pE2, white, task.lineWidth, task.lineType)
-        dst.Line(task.lpHorizon.pE1, task.lpHorizon.pE2, white, task.lineWidth, task.lineType)
+        dst.Line(task.lpGravity.ptE1, task.lpGravity.ptE2, white, task.lineWidth, task.lineType)
+        dst.Line(task.lpHorizon.ptE1, task.lpHorizon.ptE2, white, task.lineWidth, task.lineType)
         'If task.lpGravity Is Nothing Then
         '    dst.Line(task.lines.lpList(0).p1, task.lines.lpList(0).p2, task.highlight, task.lineWidth * 2, task.lineType)
-        '    dst.Line(task.lines.lpList(0).pE1, task.lines.lpList(0).pE2, white, task.lineWidth, task.lineType)
+        '    dst.Line(task.lines.lpList(0).ptE1, task.lines.lpList(0).ptE2, white, task.lineWidth, task.lineType)
         'End If
     End Sub
     Private Function findFirst(points As cv.Mat) As Single
@@ -334,7 +334,7 @@ Public Class NR_Gravity_Basics_TAOld : Inherits TaskParent
             strOut += "Using the previous value for the gravity vector."
         Else
             Dim lp = New lpData(p1, p2)
-            task.lpGravity = New lpData(lp.pE1, lp.pE2)
+            task.lpGravity = New lpData(lp.ptE1, lp.ptE2)
             If standaloneTest() Or autoDisplay Then displayResults(p1, p2)
         End If
 
@@ -388,7 +388,7 @@ Public Class NR_Gravity_Basics_Original : Inherits TaskParent
         Dim p1 = findTransition(0, dst0.Height - 1, 1)
         Dim p2 = findTransition(dst0.Height - 1, 0, -1)
         Dim lp = New lpData(p1, p2)
-        vec = New lpData(lp.pE1, lp.pE2)
+        vec = New lpData(lp.ptE1, lp.ptE2)
 
         If p1.X >= 1 Then
             strOut = "p1 = " + p1.ToString + vbCrLf + "p2 = " + p2.ToString + vbCrLf + "      val =  " +

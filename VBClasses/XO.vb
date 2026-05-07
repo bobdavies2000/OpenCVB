@@ -4781,7 +4781,7 @@ Namespace VBClasses
             dst2.Rectangle(firstRect, task.highlight, task.lineWidth)
             dst2.Rectangle(lastRect, task.highlight, task.lineWidth)
             dst2.Line(cameraMotionProxy.p1, cameraMotionProxy.p2, task.highlight, task.lineWidth, task.lineType)
-            dst2.Line(task.lpGravity.pE1, task.lpGravity.pE2, task.highlight, task.lineWidth, task.lineType)
+            dst2.Line(task.lpGravity.ptE1, task.lpGravity.ptE2, task.highlight, task.lineWidth, task.lineType)
         End Sub
     End Class
 
@@ -5375,8 +5375,8 @@ Namespace VBClasses
                     lpInput = lplist(0)
                 End If
 
-                Dim deltaX1 = Math.Abs(task.lpGravity.pE1.X - lpInput.pE1.X)
-                Dim deltaX2 = Math.Abs(task.lpGravity.pE2.X - lpInput.pE2.X)
+                Dim deltaX1 = Math.Abs(task.lpGravity.ptE1.X - lpInput.ptE1.X)
+                Dim deltaX2 = Math.Abs(task.lpGravity.ptE2.X - lpInput.ptE2.X)
                 If Math.Abs(deltaX1 - deltaX2) > options.pixelThreshold Then
                     lpInput = task.lines.lpList(0)
                 End If
@@ -5557,8 +5557,8 @@ Namespace VBClasses
                 nearest.lpInput = RGBcandidate
                 nearest.Run(src)
                 RGBcandidate = nearest.lpOutput
-                Dim deltaX1 = Math.Abs(task.lpGravity.pE1.X - RGBcandidate.pE1.X)
-                Dim deltaX2 = Math.Abs(task.lpGravity.pE2.X - RGBcandidate.pE2.X)
+                Dim deltaX1 = Math.Abs(task.lpGravity.ptE1.X - RGBcandidate.ptE1.X)
+                Dim deltaX2 = Math.Abs(task.lpGravity.ptE2.X - RGBcandidate.ptE2.X)
                 If Math.Abs(deltaX1 - deltaX2) > options.pixelThreshold Then
                     RGBcandidate = New lpData
                     If gravityMatch.gLines.Count > 0 Then RGBcandidate = gravityMatch.gLines(0)
@@ -7840,7 +7840,7 @@ Namespace VBClasses
 
                 Dim lp = New lpData(p1, p2)
                 dst2 = src
-                dst2.Line(lp.pE1, lp.pE2, task.highlight, task.lineWidth, task.lineType)
+                dst2.Line(lp.ptE1, lp.ptE2, task.highlight, task.lineWidth, task.lineType)
                 dst2.Circle(p1, task.DotSize + 2, cv.Scalar.Red, -1, task.lineType)
                 dst2.Circle(p2, task.DotSize + 2, cv.Scalar.Red, -1, task.lineType)
             End If
@@ -7862,8 +7862,8 @@ Namespace VBClasses
             dst3 = src.Clone
             lpList.Clear()
             For Each lp In task.lines.lpList
-                dst3.Line(lp.pE1, lp.pE2, task.highlight, task.lineWidth, task.lineType)
-                lpList.Add(New lpData(lp.pE1, lp.pE2))
+                dst3.Line(lp.ptE1, lp.ptE2, task.highlight, task.lineWidth, task.lineType)
+                lpList.Add(New lpData(lp.ptE1, lp.ptE2))
             Next
         End Sub
     End Class
@@ -7918,15 +7918,15 @@ Namespace VBClasses
 
                 Dim saveP1 = lp.p1, saveP2 = lp.p2
 
-                If lp.pE1.X = 0 Then leftIntercepts.Add(saveP1.Y, index)
-                If lp.pE1.Y = 0 Then topIntercepts.Add(saveP1.X, index)
-                If lp.pE1.X = dst2.Width Then rightIntercepts.Add(saveP1.Y, index)
-                If lp.pE1.Y = dst2.Height Then botIntercepts.Add(saveP1.X, index)
+                If lp.ptE1.X = 0 Then leftIntercepts.Add(saveP1.Y, index)
+                If lp.ptE1.Y = 0 Then topIntercepts.Add(saveP1.X, index)
+                If lp.ptE1.X = dst2.Width Then rightIntercepts.Add(saveP1.Y, index)
+                If lp.ptE1.Y = dst2.Height Then botIntercepts.Add(saveP1.X, index)
 
-                If lp.pE2.X = 0 Then leftIntercepts.Add(saveP2.Y, index)
-                If lp.pE2.Y = 0 Then topIntercepts.Add(saveP2.X, index)
-                If lp.pE2.X = dst2.Width Then rightIntercepts.Add(saveP2.Y, index)
-                If lp.pE2.Y = dst2.Height Then botIntercepts.Add(saveP2.X, index)
+                If lp.ptE2.X = 0 Then leftIntercepts.Add(saveP2.Y, index)
+                If lp.ptE2.Y = 0 Then topIntercepts.Add(saveP2.X, index)
+                If lp.ptE2.X = dst2.Width Then rightIntercepts.Add(saveP2.Y, index)
+                If lp.ptE2.Y = dst2.Height Then botIntercepts.Add(saveP2.X, index)
                 index += 1
             Next
 
@@ -8407,7 +8407,7 @@ Namespace VBClasses
             desc = "Highlight both vertical and horizontal lines"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            Dim gravityDelta As Single = task.lpGravity.pE1.X - task.lpGravity.pE2.X
+            Dim gravityDelta As Single = task.lpGravity.ptE1.X - task.lpGravity.ptE2.X
 
             kalman.kInput = {gravityDelta}
             kalman.Run(emptyMat)
@@ -8446,7 +8446,7 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
 
-            Dim gravityDelta As Single = task.lpGravity.pE1.X - task.lpGravity.pE2.X
+            Dim gravityDelta As Single = task.lpGravity.ptE1.X - task.lpGravity.ptE2.X
 
             dst2 = src
             If standalone Then dst3 = task.lines.dst2
@@ -8454,11 +8454,11 @@ Namespace VBClasses
             vertList.Clear()
             For Each lp In task.lines.lpList
                 If Math.Abs(lp.angle) > 45 And Math.Sign(task.lpGravity.slope) = Math.Sign(lp.slope) Then
-                    Dim delta = lp.pE1.X - lp.pE2.X
+                    Dim delta = lp.ptE1.X - lp.ptE2.X
                     If Math.Abs(gravityDelta - delta) < options.pixelThreshold Then
                         deltaList.Add(delta)
                         vertList.Add(lp)
-                        dst2.Line(lp.pE1, lp.pE2, task.highlight, task.lineWidth, task.lineType)
+                        dst2.Line(lp.ptE1, lp.ptE2, task.highlight, task.lineWidth, task.lineType)
                         If standalone Then dst3.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
                     End If
                 End If
@@ -8635,22 +8635,22 @@ Namespace VBClasses
 
             Dim removeList As New List(Of Integer)
             For Each lp In tmplist
-                Dim x1 = CInt(lp.pE1.X)
-                Dim y1 = CInt(lp.pE1.Y)
-                Dim x2 = CInt(lp.pE2.X)
-                Dim y2 = CInt(lp.pE2.Y)
+                Dim x1 = CInt(lp.ptE1.X)
+                Dim y1 = CInt(lp.ptE1.Y)
+                Dim x2 = CInt(lp.ptE2.X)
+                Dim y2 = CInt(lp.ptE2.Y)
                 For j = lp.index + 1 To tmplist.Count - 1
-                    If CInt(tmplist(j).pE1.X) <> x1 Then Continue For
-                    If CInt(tmplist(j).pE1.Y) <> y1 Then Continue For
-                    If CInt(tmplist(j).pE2.X) <> x2 Then Continue For
-                    If CInt(tmplist(j).pE2.Y) <> y2 Then Continue For
+                    If CInt(tmplist(j).ptE1.X) <> x1 Then Continue For
+                    If CInt(tmplist(j).ptE1.Y) <> y1 Then Continue For
+                    If CInt(tmplist(j).ptE2.X) <> x2 Then Continue For
+                    If CInt(tmplist(j).ptE2.Y) <> y2 Then Continue For
                     If removeList.Contains(tmplist(j).index) = False Then removeList.Add(tmplist(j).index)
                 Next
             Next
 
             lpList.Clear()
             For Each lp In tmplist
-                If removeList.Contains(lp.index) = False Then lpList.Add(New lpData(lp.pE1, lp.pE2))
+                If removeList.Contains(lp.index) = False Then lpList.Add(New lpData(lp.ptE1, lp.ptE2))
             Next
 
             dst2.SetTo(0)
@@ -8745,15 +8745,15 @@ Namespace VBClasses
 
             For Each lpIn In task.lines.lpList
                 Dim lp = HullLine_EdgePoints.EdgePointOffset(lpIn, 1)
-                dst2.Circle(New cv.Point(CInt(lp.pE1.X), CInt(lp.pE1.Y)), task.DotSize, task.highlight, -1, task.lineType)
-                dst2.Circle(New cv.Point(CInt(lp.pE2.X), CInt(lp.pE2.Y)), task.DotSize, task.highlight, -1, task.lineType)
+                dst2.Circle(New cv.Point(CInt(lp.ptE1.X), CInt(lp.ptE1.Y)), task.DotSize, task.highlight, -1, task.lineType)
+                dst2.Circle(New cv.Point(CInt(lp.ptE2.X), CInt(lp.ptE2.Y)), task.DotSize, task.highlight, -1, task.lineType)
             Next
 
             Static lpLast As New List(Of lpData)(task.lines.lpList)
             For Each lpIn In lpLast
                 Dim lp = HullLine_EdgePoints.EdgePointOffset(lpIn, 5)
-                dst2.Circle(New cv.Point(CInt(lp.pE1.X), CInt(lp.pE1.Y)), task.DotSize, white, -1, task.lineType)
-                dst2.Circle(New cv.Point(CInt(lp.pE2.X), CInt(lp.pE2.Y)), task.DotSize, white, -1, task.lineType)
+                dst2.Circle(New cv.Point(CInt(lp.ptE1.X), CInt(lp.ptE1.Y)), task.DotSize, white, -1, task.lineType)
+                dst2.Circle(New cv.Point(CInt(lp.ptE2.X), CInt(lp.ptE2.Y)), task.DotSize, white, -1, task.lineType)
             Next
 
             lpLast = New List(Of lpData)(task.lines.lpList)
@@ -8847,15 +8847,15 @@ Namespace VBClasses
 
             Dim lpList = task.lines.lpList
             For Each lp In lpList
-                If lp.pE1.X = 0 Then left.Add(lp.pE1.Y, lp.index)
-                If lp.pE1.Y = 0 Then top.Add(lp.pE1.X, lp.index)
-                If lp.pE2.X = 0 Then left.Add(lp.pE2.Y, lp.index)
-                If lp.pE2.Y = 0 Then top.Add(lp.pE2.X, lp.index)
+                If lp.ptE1.X = 0 Then left.Add(lp.ptE1.Y, lp.index)
+                If lp.ptE1.Y = 0 Then top.Add(lp.ptE1.X, lp.index)
+                If lp.ptE2.X = 0 Then left.Add(lp.ptE2.Y, lp.index)
+                If lp.ptE2.Y = 0 Then top.Add(lp.ptE2.X, lp.index)
 
-                If lp.pE1.X = dst2.Width Then right.Add(lp.pE1.X, lp.index)
-                If lp.pE1.Y = dst2.Height Then bottom.Add(lp.pE1.X, lp.index)
-                If lp.pE2.X = dst2.Width Then right.Add(lp.pE2.Y, lp.index)
-                If lp.pE2.Y = dst2.Height Then bottom.Add(lp.pE2.X, lp.index)
+                If lp.ptE1.X = dst2.Width Then right.Add(lp.ptE1.X, lp.index)
+                If lp.ptE1.Y = dst2.Height Then bottom.Add(lp.ptE1.X, lp.index)
+                If lp.ptE2.X = dst2.Width Then right.Add(lp.ptE2.Y, lp.index)
+                If lp.ptE2.Y = dst2.Height Then bottom.Add(lp.ptE2.X, lp.index)
             Next
 
             edgeList.Clear()
@@ -8886,11 +8886,11 @@ Namespace VBClasses
             Static vecLast = task.lines.lpList(0)
             Dim vec = task.lines.lpList(0)
 
-            deltaX1 = vec.pE1.X - vecLast.pE1.x
-            deltaY1 = vec.pE1.Y - vecLast.pE1.Y
+            deltaX1 = vec.ptE1.X - vecLast.ptE1.x
+            deltaY1 = vec.ptE1.Y - vecLast.ptE1.Y
 
-            deltaX2 = vec.pE2.X - vecLast.pE2.x
-            deltaY2 = vec.pE2.Y - vecLast.pE2.Y
+            deltaX2 = vec.ptE2.X - vecLast.ptE2.x
+            deltaY2 = vec.ptE2.Y - vecLast.ptE2.Y
 
             Static strList As New List(Of String)
             strList.Add(Format(deltaX1, fmt1) + " " + Format(deltaX2, fmt1) + " " +
@@ -12165,7 +12165,7 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             dst2 = task.gray
 
-            Dim lp = New lpData(task.lines.lpList(0).pE1, task.lines.lpList(0).pE2)
+            Dim lp = New lpData(task.lines.lpList(0).ptE1, task.lines.lpList(0).ptE2)
             dst2.Line(lp.p1, lp.p2, white, task.lineWidth, task.lineType)
         End Sub
     End Class
@@ -14649,7 +14649,7 @@ Namespace VBClasses
             strOut += "Length (pixels) = " + Format(task.lpD.length, fmt1) + " index = " + CStr(task.lpD.index) + vbCrLf
 
             strOut += "p1 = " + task.lpD.p1.ToString + ", p2 = " + task.lpD.p2.ToString + vbCrLf
-            strOut += "pE1 = " + task.lpD.pE1.ToString + ", pE2 = " + task.lpD.pE2.ToString + vbCrLf + vbCrLf
+            strOut += "ptE1 = " + task.lpD.ptE1.ToString + ", ptE2 = " + task.lpD.ptE2.ToString + vbCrLf + vbCrLf
             strOut += "RGB Angle = " + CStr(task.lpD.angle) + vbCrLf
             strOut += "RGB Slope = " + Format(task.lpD.slope, fmt3) + vbCrLf
             strOut += vbCrLf + "NOTE: the Y-Axis is inverted - Y increases down so slopes are inverted." + vbCrLf + vbCrLf
@@ -14861,11 +14861,11 @@ Namespace VBClasses
             desc = "Use the slope of the longest RGB line to figure out if camera moved enough to obtain the IMU gravity vector."
         End Sub
         Public Shared Sub showVectors(dst As cv.Mat)
-            dst.Line(task.lpGravity.pE1, task.lpGravity.pE2, white, task.lineWidth, task.lineType)
-            dst.Line(task.lpHorizon.pE1, task.lpHorizon.pE2, white, task.lineWidth, task.lineType)
+            dst.Line(task.lpGravity.ptE1, task.lpGravity.ptE2, white, task.lineWidth, task.lineType)
+            dst.Line(task.lpHorizon.ptE1, task.lpHorizon.ptE2, white, task.lineWidth, task.lineType)
             If task.lines.lpList(0) IsNot Nothing Then
                 dst.Line(task.lines.lpList(0).p1, task.lines.lpList(0).p2, task.highlight, task.lineWidth * 2, task.lineType)
-                dst.Line(task.lines.lpList(0).pE1, task.lines.lpList(0).pE2, white, task.lineWidth, task.lineType)
+                dst.Line(task.lines.lpList(0).ptE1, task.lines.lpList(0).ptE2, white, task.lineWidth, task.lineType)
             End If
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -14905,7 +14905,7 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             gravity.Run(src)
 
-            kalman.kInput = {task.lpGravity.pE1.X, task.lpGravity.pE1.Y, task.lpGravity.pE2.X, task.lpGravity.pE2.Y}
+            kalman.kInput = {task.lpGravity.ptE1.X, task.lpGravity.ptE1.Y, task.lpGravity.ptE2.X, task.lpGravity.ptE2.Y}
             kalman.Run(emptyMat)
             task.lpGravity = New lpData(New cv.Point2f(kalman.kOutput(0), kalman.kOutput(1)),
                                          New cv.Point2f(kalman.kOutput(2), kalman.kOutput(3)))
@@ -14965,7 +14965,7 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             Dim lplist = task.lines.lpList
 
-            Static lpLast = New lpData(task.lines.lpList(0).pE1, task.lines.lpList(0).pE2)
+            Static lpLast = New lpData(task.lines.lpList(0).ptE1, task.lines.lpList(0).ptE2)
             Dim linePerp = Line_Perpendicular.computePerp(task.lines.lpList(0))
 
             dst2 = src
@@ -14981,7 +14981,7 @@ Namespace VBClasses
             dst3.Circle(trackPoint, task.DotSize, task.highlight, -1, task.lineType)
             dst3.Circle(trackPoint, task.DotSize, task.highlight, -1, task.lineType)
 
-            lpLast = New lpData(task.lines.lpList(0).pE1, task.lines.lpList(0).pE2)
+            lpLast = New lpData(task.lines.lpList(0).ptE1, task.lines.lpList(0).ptE2)
         End Sub
     End Class
 
@@ -15594,14 +15594,14 @@ Namespace VBClasses
             dst2 = src.Clone
             For Each lp In task.lines.lpList
                 HullLine_EdgePoints.EdgePointOffset(lp, 1)
-                dst2.Circle(New cv.Point(CInt(lp.pE1.X), CInt(lp.pE1.Y)), task.DotSize, task.highlight, -1, task.lineType)
-                dst2.Circle(New cv.Point(CInt(lp.pE2.X), CInt(lp.pE2.Y)), task.DotSize, task.highlight, -1, task.lineType)
+                dst2.Circle(New cv.Point(CInt(lp.ptE1.X), CInt(lp.ptE1.Y)), task.DotSize, task.highlight, -1, task.lineType)
+                dst2.Circle(New cv.Point(CInt(lp.ptE2.X), CInt(lp.ptE2.Y)), task.DotSize, task.highlight, -1, task.lineType)
             Next
 
             knn.queries.Clear()
             For Each lp In lpInput
-                knn.queries.Add(lp.pE1)
-                knn.queries.Add(lp.pE2)
+                knn.queries.Add(lp.ptE1)
+                knn.queries.Add(lp.ptE2)
             Next
 
             knn.Run(emptyMat)
@@ -20057,7 +20057,7 @@ Namespace VBClasses
             Static lpLast As lpData = task.lines.lpList(0)
 
             Dim lp = task.lines.lpList(0)
-            If lp.pE1 = lpLast.pE1 And lp.pE2 = lpLast.pE2 Or task.lineLongestChanged Then
+            If lp.ptE1 = lpLast.ptE1 And lp.ptE2 = lpLast.ptE2 Or task.lineLongestChanged Then
                 dst2 = src
                 If task.lineLongestChanged Then lpLast = task.lines.lpList(0)
             Else

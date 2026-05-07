@@ -19,8 +19,8 @@ Public Class Stabilizer_Basics : Inherits TaskParent
         End If
 
         Dim angleDelta = lpCurr.angle - refLine.angle
-        Dim tx = refLine.pE1.X - lpCurr.pE1.X
-        Dim ty = 0 ' lpPerpRef.pE1.Y - lpPerpCurr.pE1.Y
+        Dim tx = refLine.ptE1.X - lpCurr.ptE1.X
+        Dim ty = 0 ' lpPerpRef.ptE1.Y - lpPerpCurr.ptE1.Y
 
         Dim M = cv.Cv2.GetRotationMatrix2D(lpCurr.ptCenter, -angleDelta, 1.0)
         M.Set(Of Double)(0, 2, M.Get(Of Double)(0, 2) + tx)
@@ -28,8 +28,8 @@ Public Class Stabilizer_Basics : Inherits TaskParent
 
         dst2 = src.WarpAffine(M, src.Size, cv.InterpolationFlags.Linear, cv.BorderTypes.Constant)
         dst3 = dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-        dst3.Line(refLine.pE1, refLine.pE2, cv.Scalar.Yellow, task.lineWidth + 1, task.lineType)
-        dst3.Line(lpCurr.pE1, lpCurr.pE2, cv.Scalar.Red, task.lineWidth + 1, task.lineType)
+        dst3.Line(refLine.ptE1, refLine.ptE2, cv.Scalar.Yellow, task.lineWidth + 1, task.lineType)
+        dst3.Line(lpCurr.ptE1, lpCurr.ptE2, cv.Scalar.Red, task.lineWidth + 1, task.lineType)
 
         labels(3) = "Delta Angle=" + Format(angleDelta, fmt2) + " deg, tx=" + Format(tx, fmt2) + ", ty=" + Format(ty, fmt2)
     End Sub

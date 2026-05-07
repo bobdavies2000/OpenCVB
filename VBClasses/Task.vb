@@ -248,7 +248,7 @@ Public Class AlgorithmTask : Implements IDisposable
         If gOptions.CrossHairs.Checked Then
             Gravity_Basics_TA.showVectors(dstList(0))
             Dim lp = If(lpGravity IsNot Nothing, lpGravity, lines.lpList(0))
-            Dim pt = New cv.Point2f((lp.pE1.X + lp.pE2.X) / 2 + 5, (lp.pE1.Y + lp.pE2.Y) / 2)
+            Dim pt = New cv.Point2f((lp.ptE1.X + lp.ptE2.X) / 2 + 5, (lp.ptE1.Y + lp.ptE2.Y) / 2)
         End If
 
         trueData.Clear()

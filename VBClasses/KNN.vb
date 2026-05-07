@@ -1004,10 +1004,10 @@ Public Class KNN_FindLine : Inherits TaskParent
 
         knn.trainInput.Clear()
         For Each lp In task.lines.lpList
-            knn.trainInput.Add(New cv.Vec4f(lp.pE1.X, lp.pE1.Y, lp.pE2.X, lp.pE2.Y))
+            knn.trainInput.Add(New cv.Vec4f(lp.ptE1.X, lp.ptE1.Y, lp.ptE2.X, lp.ptE2.Y))
         Next
 
-        knn.queries(0) = New cv.Vec4f(inputLine.pE1.X, inputLine.pE1.Y, inputLine.pE2.X, inputLine.pE2.Y)
+        knn.queries(0) = New cv.Vec4f(inputLine.ptE1.X, inputLine.ptE1.Y, inputLine.ptE2.X, inputLine.ptE2.Y)
         knn.Run(emptyMat)
 
         closestLine = task.lines.lpList(knn.result(0, 0))

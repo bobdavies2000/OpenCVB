@@ -54,14 +54,14 @@ Public Class Line_Basics_TA : Inherits TaskParent
         For index = 0 To lpSorted.Values.Count - 1
             Dim lp = newList(lpSorted.Values.ElementAt(index))
             lp.index = index + 1
-            Dim val1 = edgeMap.Get(Of Byte)(lp.pE1.Y, lp.pE1.X)
-            Dim val2 = edgeMap.Get(Of Byte)(lp.pE1.Y, lp.pE1.X)
+            Dim val1 = edgeMap.Get(Of Byte)(lp.ptE1.Y, lp.ptE1.X)
+            Dim val2 = edgeMap.Get(Of Byte)(lp.ptE1.Y, lp.ptE1.X)
             If val1 > 0 Or val2 > 0 Then
                 edgeDropCount += 1
                 Continue For
             End If
 
-            Dim gridIndex = task.gridMap.Get(Of Integer)(Math.Floor(lp.pE1.Y), Math.Floor(lp.pE1.X))
+            Dim gridIndex = task.gridMap.Get(Of Integer)(Math.Floor(lp.ptE1.Y), Math.Floor(lp.ptE1.X))
             edgeMap(task.gridNabeRects(gridIndex)).SetTo(lp.index)
             lpList.Add(lp)
 
@@ -188,7 +188,7 @@ Public Class Line_WithAging : Inherits TaskParent
                     Continue For
                 End If
             End If
-            dst0.Line(lp.pE1, lp.pE2, lp.index + 1, task.lineWidth + 1, cv.LineTypes.Link4)
+            dst0.Line(lp.ptE1, lp.ptE2, lp.index + 1, task.lineWidth + 1, cv.LineTypes.Link4)
             dst1.Line(lp.p1, lp.p2, lp.index + 1, task.lineWidth, cv.LineTypes.Link4)
             dst2.Line(lp.p1, lp.p2, lp.color, task.lineWidth + 1, task.lineType)
             lpList.Add(lp)
@@ -822,8 +822,8 @@ Public Class Line_BrickList : Inherits TaskParent
                 angles.Add(lpTest.angle)
                 ptList.Add(pt)
                 ptList.Add(allPoints(j))
-                epList.Add(New Tuple(Of Single, Single, Single, Single)(lpTest.pE1.X,
-                           lpTest.pE1.Y, lpTest.pE2.X, lpTest.pE2.Y))
+                epList.Add(New Tuple(Of Single, Single, Single, Single)(lpTest.ptE1.X,
+                           lpTest.ptE1.Y, lpTest.ptE2.X, lpTest.ptE2.Y))
                 'End If
             Next
         Next
@@ -1232,16 +1232,16 @@ Public Class Line_Longest : Inherits TaskParent
         dst2 = task.color.Clone
 
         Dim lp = task.lines.lpList(0)
-        dst2.Line(lp.pE1, lp.pE2, task.highlight, task.lineWidth + 3)
+        dst2.Line(lp.ptE1, lp.ptE2, task.highlight, task.lineWidth + 3)
 
         Dim distance1 As Single, distance2 As Single
-        If lp.pE1.Y = 0 Then
-            distance1 = lp.pE1.X - lpLast.pE1.X
-            distance2 = lp.pE2.X - lpLast.pE2.X
+        If lp.ptE1.Y = 0 Then
+            distance1 = lp.ptE1.X - lpLast.ptE1.X
+            distance2 = lp.ptE2.X - lpLast.ptE2.X
         End If
-        If lp.pE1.Y = 0 Then
-            distance1 = lp.pE1.X - lpLast.pE1.X
-            distance2 = lp.pE2.X - lpLast.pE2.X
+        If lp.ptE1.Y = 0 Then
+            distance1 = lp.ptE1.X - lpLast.ptE1.X
+            distance2 = lp.ptE2.X - lpLast.ptE2.X
         End If
         ' Debug.WriteLine("distance1 = " + Format(distance1, fmt2) + " distance2 = " + Format(distance2, fmt2))
         lpLast = task.lines.lpList(0)
@@ -1271,7 +1271,7 @@ Public Class Line_KNNTop : Inherits TaskParent
         knn.queries.Clear()
         Dim lpList As New List(Of lpData)
         For Each lp In task.lines.lpList
-            If lp.pE1.Y = 0 And lp.pE2.Y = dst2.Height - 1 Then
+            If lp.ptE1.Y = 0 And lp.ptE2.Y = dst2.Height - 1 Then
                 knn.queries.Add(lp.p1)
                 lpList.Add(lp)
                 If lpList.Count > 3 Then Exit For
@@ -1669,8 +1669,8 @@ Public Class Line_TrackV : Inherits TaskParent
     Private Function getVerticals(lpList As List(Of lpData)) As List(Of lpData)
         Dim verticals As New List(Of lpData)
         For Each lp In lpList
-            If lp.pE1.Y <> 0 And lp.pE2.Y <> 0 Then Continue For
-            If lp.pE1.Y <> 0 Then lp = New lpData(lp.p2, lp.p1)
+            If lp.ptE1.Y <> 0 And lp.ptE2.Y <> 0 Then Continue For
+            If lp.ptE1.Y <> 0 Then lp = New lpData(lp.p2, lp.p1)
             lp.index = verticals.Count + 1
             verticals.Add(lp)
         Next
@@ -1685,18 +1685,18 @@ Public Class Line_TrackV : Inherits TaskParent
         If task.heartBeatLT Then
             dst3.SetTo(0)
             For Each lp In verticalLast
-                dst3.Line(lp.pE1, lp.pE2, lp.color, task.lineWidth, cv.LineTypes.Link4)
+                dst3.Line(lp.ptE1, lp.ptE2, lp.color, task.lineWidth, cv.LineTypes.Link4)
             Next
 
             knn.trainInput.Clear()
             For Each lp In verticalLast
-                knn.trainInput.Add(New cv.Vec4f(lp.pE1.X, lp.pE1.Y, lp.pE2.X, lp.pE2.Y))
+                knn.trainInput.Add(New cv.Vec4f(lp.ptE1.X, lp.ptE1.Y, lp.ptE2.X, lp.ptE2.Y))
             Next
 
             Dim verticalsCurr = getVerticals(task.lines.lpList)
             knn.queries.Clear()
             For Each lp In verticalsCurr
-                knn.queries.Add(New cv.Vec4f(lp.pE1.X, lp.pE1.Y, lp.pE2.X, lp.pE2.Y))
+                knn.queries.Add(New cv.Vec4f(lp.ptE1.X, lp.ptE1.Y, lp.ptE2.X, lp.ptE2.Y))
             Next
 
             knn.Run(emptyMat)
@@ -1715,8 +1715,8 @@ Public Class Line_TrackV : Inherits TaskParent
                     match.template = lastImage(lpPrev.rect)
                     match.Run(src(lp.rect))
                     If match.correlation > task.fCorrThreshold Then
-                        dst2.Line(lp.pE1, lp.pE2, task.scalarColors(i), task.lineWidth, cv.LineTypes.Link4)
-                        dst2.Line(lpPrev.pE1, lpPrev.pE2, task.scalarColors(i), task.lineWidth, cv.LineTypes.Link4)
+                        dst2.Line(lp.ptE1, lp.ptE2, task.scalarColors(i), task.lineWidth, cv.LineTypes.Link4)
+                        dst2.Line(lpPrev.ptE1, lpPrev.ptE2, task.scalarColors(i), task.lineWidth, cv.LineTypes.Link4)
 
                         matchList.Add(lp)
                         matchList.Add(lpPrev)
@@ -1809,10 +1809,10 @@ Public Class Line_LongestTest : Inherits TaskParent
     End Sub
     Public Shared Function compareLines(lpCurr As lpData, lpLast As lpData) As Boolean
         Dim distThreshold = task.gridWH
-        If (lpCurr.pE1.DistanceTo(lpLast.pE1) < distThreshold And
-           lpCurr.pE2.DistanceTo(lpLast.pE2) < distThreshold) Or
-           (lpCurr.pE2.DistanceTo(lpLast.pE1) < distThreshold And
-           lpCurr.pE1.DistanceTo(lpLast.pE2) < distThreshold) Then
+        If (lpCurr.ptE1.DistanceTo(lpLast.ptE1) < distThreshold And
+           lpCurr.ptE2.DistanceTo(lpLast.ptE2) < distThreshold) Or
+           (lpCurr.ptE2.DistanceTo(lpLast.ptE1) < distThreshold And
+           lpCurr.ptE1.DistanceTo(lpLast.ptE2) < distThreshold) Then
             Return True
         End If
         Return False
@@ -1825,9 +1825,9 @@ Public Class Line_LongestTest : Inherits TaskParent
         Else
             Dim lpCurr = task.lines.lpList(0)
             dst1 = task.color.Clone
-            dst1.Line(lpCurr.pE1, lpCurr.pE2, task.highlight, task.lineWidth)
+            dst1.Line(lpCurr.ptE1, lpCurr.ptE2, task.highlight, task.lineWidth)
             If compareLines(lpCurr, lpLast) Then
-                dst2.Line(lpCurr.pE1, lpCurr.pE2, task.highlight, task.lineWidth)
+                dst2.Line(lpCurr.ptE1, lpCurr.ptE2, task.highlight, task.lineWidth)
                 presentCount += 1
                 If presentCount > 1000 Then presentCount = 100
             Else
@@ -1866,10 +1866,10 @@ Public Class Line_LongestTestKNN : Inherits TaskParent
     End Sub
     Public Shared Function compareLines(lpCurr As lpData, lpLast As lpData) As Boolean
         Dim distThreshold = task.gridWH
-        If (lpCurr.pE1.DistanceTo(lpLast.pE1) < distThreshold And
-           lpCurr.pE2.DistanceTo(lpLast.pE2) < distThreshold) Or
-           (lpCurr.pE2.DistanceTo(lpLast.pE1) < distThreshold And
-           lpCurr.pE1.DistanceTo(lpLast.pE2) < distThreshold) Then
+        If (lpCurr.ptE1.DistanceTo(lpLast.ptE1) < distThreshold And
+           lpCurr.ptE2.DistanceTo(lpLast.ptE2) < distThreshold) Or
+           (lpCurr.ptE2.DistanceTo(lpLast.ptE1) < distThreshold And
+           lpCurr.ptE1.DistanceTo(lpLast.ptE2) < distThreshold) Then
             Return True
         End If
         Return False
@@ -1888,18 +1888,18 @@ Public Class Line_LongestTestKNN : Inherits TaskParent
 
             knn.trainInput.Clear()
             For Each lp In task.lines.lpList
-                knn.trainInput.Add(New cv.Vec4f(lp.pE1.X, lp.pE1.Y, lp.pE2.X, lp.pE2.Y))
+                knn.trainInput.Add(New cv.Vec4f(lp.ptE1.X, lp.ptE1.Y, lp.ptE2.X, lp.ptE2.Y))
             Next
 
-            knn.queries(0) = New cv.Vec4f(lpCurr.pE1.X, lpCurr.pE1.Y, lpCurr.pE2.X, lpCurr.pE2.Y)
+            knn.queries(0) = New cv.Vec4f(lpCurr.ptE1.X, lpCurr.ptE1.Y, lpCurr.ptE2.X, lpCurr.ptE2.Y)
             knn.Run(emptyMat)
 
             lpCurr = task.lines.lpList(knn.result(0, 0))
 
             dst1 = task.color.Clone
-            dst1.Line(lpCurr.pE1, lpCurr.pE2, task.highlight, task.lineWidth)
+            dst1.Line(lpCurr.ptE1, lpCurr.ptE2, task.highlight, task.lineWidth)
             If compareLines(lpCurr, lpLast) Then
-                dst2.Line(lpCurr.pE1, lpCurr.pE2, task.highlight, task.lineWidth)
+                dst2.Line(lpCurr.ptE1, lpCurr.ptE2, task.highlight, task.lineWidth)
                 presentCount += 1
                 If presentCount > 1000 Then presentCount = 100
                 lpLast = lpCurr

@@ -46,14 +46,14 @@ Public Class HullLine_EdgePoints : Inherits TaskParent
     End Sub
     Public Shared Function EdgePointOffset(lpIn As lpData, offset As Integer) As lpData
         Dim lp = New lpData(lpIn.p1, lpIn.p2)
-        If lp.pE1.X <= 1 Then lp.pE1.X += offset
-        If lp.pE1.Y <= 1 Then lp.pE1.Y += offset
-        If lp.pE2.X <= 1 Then lp.pE2.X += offset
-        If lp.pE2.Y <= 1 Then lp.pE2.Y += offset
-        If lp.pE1.X >= task.workRes.Width - 1 Then lp.pE1.X -= offset
-        If lp.pE1.Y >= task.workRes.Height - 1 Then lp.pE1.Y -= offset
-        If lp.pE2.X >= task.workRes.Width - 1 Then lp.pE2.X -= offset
-        If lp.pE2.Y >= task.workRes.Height - 1 Then lp.pE2.Y -= offset
+        If lp.ptE1.X <= 1 Then lp.ptE1.X += offset
+        If lp.ptE1.Y <= 1 Then lp.ptE1.Y += offset
+        If lp.ptE2.X <= 1 Then lp.ptE2.X += offset
+        If lp.ptE2.Y <= 1 Then lp.ptE2.Y += offset
+        If lp.ptE1.X >= task.workRes.Width - 1 Then lp.ptE1.X -= offset
+        If lp.ptE1.Y >= task.workRes.Height - 1 Then lp.ptE1.Y -= offset
+        If lp.ptE2.X >= task.workRes.Width - 1 Then lp.ptE2.X -= offset
+        If lp.ptE2.Y >= task.workRes.Height - 1 Then lp.ptE2.Y -= offset
         Return lp
     End Function
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -64,8 +64,8 @@ Public Class HullLine_EdgePoints : Inherits TaskParent
         dst2 = src.Clone
         For Each lpIn In hullLines.lpList
             Dim lp = EdgePointOffset(lpIn, 1)
-            dst2.Circle(New cv.Point(CInt(lp.pE1.X), CInt(lp.pE1.Y)), task.DotSize, task.highlight, -1, task.lineType)
-            dst2.Circle(New cv.Point(CInt(lp.pE2.X), CInt(lp.pE2.Y)), task.DotSize, task.highlight, -1, task.lineType)
+            dst2.Circle(New cv.Point(CInt(lp.ptE1.X), CInt(lp.ptE1.Y)), task.DotSize, task.highlight, -1, task.lineType)
+            dst2.Circle(New cv.Point(CInt(lp.ptE2.X), CInt(lp.ptE2.Y)), task.DotSize, task.highlight, -1, task.lineType)
         Next
         labels(2) = hullLines.labels(2)
     End Sub
