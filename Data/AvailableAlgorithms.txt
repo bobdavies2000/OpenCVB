@@ -428,6 +428,7 @@ KMeans_Image
 KMeans_MultiChannel
 KMeans_TierCount
 KNN_Basics
+KNN_FindLine
 KNN_MinDistance
 KNN_N2Basics
 KNN_N3Basics
@@ -473,7 +474,7 @@ Line_LongestTestKNN
 Line_Map
 Line_MapRects
 Line_Motion
-Line_PerpendicularTest
+Line_Perpendicular
 Line_RedFlood
 Line_Sobel
 Line_Tracker
@@ -496,7 +497,9 @@ LineSeg_FLD
 LineSeg_LBD
 LineSeg_Match
 LineSeg_Top3
+LineTrack_Basics
 LineTrack_Basics_TA
+LineTrack_Horizontal
 LineTrack_Match
 LineTrack_MatchLines
 LineTrack_Rect
@@ -1420,6 +1423,7 @@ NR_Spectrum_GrayAndCloud
 NR_Spectrum_Mask
 NR_Spectrum_RedCloud
 NR_Spectrum_RGB
+NR_Stabilizer_Basics
 NR_StableLine_FAST
 NR_StableLine_Lines
 NR_Stripes_Histogram
@@ -1679,8 +1683,6 @@ Spectrum_X
 Spectrum_Y
 Spectrum_Z
 Stabilizer_Basics
-Stabilizer_BasicsFail
-Stabilizer_BasicsOld
 Stabilizer_IMU
 StableDepth_Basics
 StableDepth_Max

@@ -116,7 +116,7 @@ Public Class Gravity_Basics_TA : Inherits TaskParent
         ' Line through image center in gravity direction (lpData extends to image edges)
         Dim endpoints = GravityVectorToLineEndpoints(GravityVector, task.workRes.Width, task.workRes.Height)
         task.lpHorizon = New lpData(endpoints.p1, endpoints.p2)
-        task.lpGravity = Line_PerpendicularTest.computePerp(task.lpHorizon)
+        task.lpGravity = Line_Perpendicular.computePerp(task.lpHorizon)
 
         If standaloneTest() Then
             strOut = "Complementary filter gravity" + vbCrLf +
@@ -196,7 +196,7 @@ Public Class Gravity_CloudMethod : Inherits TaskParent
             dst2 = task.color
             dst2.Line(task.lpGravity.p1, task.lpGravity.p2, task.highlight, task.lineWidth, task.lineType)
         End If
-        task.lpHorizon = Line_PerpendicularTest.computePerp(task.lpGravity)
+        task.lpHorizon = Line_Perpendicular.computePerp(task.lpGravity)
     End Sub
 End Class
 
@@ -338,7 +338,7 @@ Public Class NR_Gravity_Basics_TAOld : Inherits TaskParent
             If standaloneTest() Or autoDisplay Then displayResults(p1, p2)
         End If
 
-        task.lpHorizon = Line_PerpendicularTest.computePerp(task.lpGravity)
+        task.lpHorizon = Line_Perpendicular.computePerp(task.lpGravity)
         SetTrueText(strOut, 3)
     End Sub
 End Class

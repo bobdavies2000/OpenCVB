@@ -986,3 +986,30 @@ Public Class KNN_MinDistance : Inherits TaskParent
     End Sub
 End Class
 
+
+
+
+
+
+Public Class KNN_FindLine : Inherits TaskParent
+    Public inputLine As lpData
+    Public closestLine As lpData
+    Dim knn As New KNN_N4Basics
+    Public Sub New()
+        knn.queries.Add(New cv.Vec4f)
+        desc = "Find the line in task.lines.lpList closest to the requested line"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        If standalone Then inputLine = task.lpGravity
+
+        knn.trainInput.Clear()
+        For Each lp In task.lines.lpList
+            knn.trainInput.Add(New cv.Vec4f(lp.pE1.X, lp.pE1.Y, lp.pE2.X, lp.pE2.Y))
+        Next
+
+        knn.queries(0) = New cv.Vec4f(inputLine.pE1.X, inputLine.pE1.Y, inputLine.pE2.X, inputLine.pE2.Y)
+        knn.Run(emptyMat)
+
+        closestLine = task.lines.lpList(knn.result(0, 0))
+    End Sub
+End Class

@@ -234,7 +234,7 @@ Namespace VBClasses
 
 
     Public Class XO_Horizon_Perpendicular : Inherits TaskParent
-        Dim perp As New Line_PerpendicularTest
+        Dim perp As New Line_Perpendicular
         Public Sub New()
             labels(2) = "Yellow line is the perpendicular to the horizon.  White is gravity vector from the IMU."
             desc = "Find the gravity vector using the perpendicular to the horizon."
@@ -467,7 +467,7 @@ Namespace VBClasses
                 If standaloneTest() Then displayResults(p1, p2)
             End If
 
-            task.lpHorizon = Line_PerpendicularTest.computePerp(task.lpGravity)
+            task.lpHorizon = Line_Perpendicular.computePerp(task.lpGravity)
             SetTrueText(strOut, 3)
         End Sub
     End Class
@@ -5568,7 +5568,7 @@ Namespace VBClasses
                 If gravityMatch.gLines.Count > 0 Then RGBcandidate = gravityMatch.gLines(0)
             End If
 
-            task.lpHorizon = Line_PerpendicularTest.computePerp(task.lpGravity)
+            task.lpHorizon = Line_Perpendicular.computePerp(task.lpGravity)
 
             gravityRGB = RGBcandidate
 
@@ -6387,8 +6387,8 @@ Namespace VBClasses
                 Exit Sub
             End If
 
-            Static perp1 As New Line_PerpendicularTest
-            Static perp2 As New Line_PerpendicularTest
+            Static perp1 As New Line_Perpendicular
+            Static perp2 As New Line_Perpendicular
 
             dst2.SetTo(0)
             perp1.input = New lpData(fPD.currPoly(fPD.polyPrevSideIndex),
@@ -14876,7 +14876,7 @@ Namespace VBClasses
             Static lastLongest = task.lines.lpList(0)
             If task.lines.lpList(0).length <> lastLongest.length Or task.lpGravity.length = 0 Or
                    task.frameCount < 5 Then
-                task.lpHorizon = Line_PerpendicularTest.computePerp(task.lpGravity)
+                task.lpHorizon = Line_Perpendicular.computePerp(task.lpGravity)
                 lastLongest = task.lines.lpList(0)
             End If
             If standaloneTest() Then
@@ -14910,7 +14910,7 @@ Namespace VBClasses
             task.lpGravity = New lpData(New cv.Point2f(kalman.kOutput(0), kalman.kOutput(1)),
                                          New cv.Point2f(kalman.kOutput(2), kalman.kOutput(3)))
 
-            task.lpHorizon = Line_PerpendicularTest.computePerp(task.lpGravity)
+            task.lpHorizon = Line_Perpendicular.computePerp(task.lpGravity)
 
             If standaloneTest() Then
                 dst2.SetTo(0)
@@ -14966,7 +14966,7 @@ Namespace VBClasses
             Dim lplist = task.lines.lpList
 
             Static lpLast = New lpData(task.lines.lpList(0).pE1, task.lines.lpList(0).pE2)
-            Dim linePerp = Line_PerpendicularTest.computePerp(task.lines.lpList(0))
+            Dim linePerp = Line_Perpendicular.computePerp(task.lines.lpList(0))
 
             dst2 = src
             dst2.Line(lpLast.p1, lpLast.p2, white, task.lineWidth, task.lineType)
@@ -20005,6 +20005,70 @@ Namespace VBClasses
             labels(2) = "Rect for p1 has correlation " + Format(p1Correlation, fmt3) +
                             " to the previous image while " +
                             "rect for p2 has " + Format(p2Correlation, fmt3)
+        End Sub
+    End Class
+
+
+
+
+
+    Public Class XO_Stabilizer_BasicsFail : Inherits TaskParent
+        Public Sub New()
+            desc = "Cursor.ai: Use task.lines.lplist(0) to find the angle needed to stabilize the image."
+        End Sub
+        Public Function GetAngleBetweenLinesBySlopes(ByVal slope1 As Double, ByVal slope2 As Double) As Double
+            Const EPSILON As Double = 0.000000001
+
+            ' --- Handle Vertical Lines (Infinite Slope) ---
+            Dim isSlope1Vertical As Boolean = Double.IsInfinity(slope1)
+            Dim isSlope2Vertical As Boolean = Double.IsInfinity(slope2)
+
+            If isSlope1Vertical AndAlso isSlope2Vertical Then
+                ' Both lines are vertical, so they are parallel.
+                Return 0.0 ' Angle is 0 degrees
+            ElseIf isSlope1Vertical Then
+                ' Line 1 is vertical (angle 90 degrees).
+                ' Angle of line 2 is Atan(slope2).
+                Dim angle2Degrees As Double = Math.Atan(slope2) * 180 / cv.Cv2.PI
+                Dim angleDiff As Double = Math.Abs(90.0 - angle2Degrees)
+                Return angleDiff
+            ElseIf isSlope2Vertical Then
+                ' Line 2 is vertical (angle 90 degrees).
+                ' Angle of line 1 is Atan(slope1).
+                Dim angle1Degrees As Double = Math.Atan(slope1) * 180 / cv.Cv2.PI
+                Dim angleDiff As Double = Math.Abs(90.0 - angle1Degrees)
+                Return angleDiff
+            End If
+
+            ' --- Handle Perpendicular Lines (Product of slopes is -1) ---
+            ' Check if 1 + m1*m2 is very close to zero, indicating perpendicularity.
+            If Math.Abs(1 + slope1 * slope2) < EPSILON Then
+                Return 90.0 ' Lines are perpendicular (90 degrees)
+            End If
+
+            ' --- General Case: Use the tangent formula ---
+            Dim tanTheta As Double = (slope2 - slope1) / (1 + slope1 * slope2)
+            Dim angleRadians As Double = Math.Atan(tanTheta) ' Result is in (-PI/2, PI/2)
+            Dim angleDegrees As Double = angleRadians * 180 / cv.Cv2.PI
+
+            Return angleDegrees
+        End Function
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            Static lpLast As lpData = task.lines.lpList(0)
+
+            Dim lp = task.lines.lpList(0)
+            If lp.pE1 = lpLast.pE1 And lp.pE2 = lpLast.pE2 Or task.lineLongestChanged Then
+                dst2 = src
+                If task.lineLongestChanged Then lpLast = task.lines.lpList(0)
+            Else
+                Dim rotateAngle = GetAngleBetweenLinesBySlopes(lp.slope, lpLast.slope)
+
+                Dim rotateCenter = Line_Intersection.IntersectTest(lp, lpLast)
+                Dim M = cv.Cv2.GetRotationMatrix2D(rotateCenter, -rotateAngle, 1)
+                dst2 = src.WarpAffine(M, src.Size(), cv.InterpolationFlags.Cubic)
+
+                labels(2) = "Image after rotation by " + Format(rotateAngle, fmt3) + " degrees"
+            End If
         End Sub
     End Class
 End Namespace

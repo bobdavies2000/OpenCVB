@@ -1,5 +1,44 @@
 Imports cv = OpenCvSharp
 Public Class Stabilizer_Basics : Inherits TaskParent
+    Private refLine As lpData
+    Public Sub New()
+        desc = "Cursor.ai: Use lpCurr to stabilize the grayscale image (rotation + translation to a reference line)."
+        labels(2) = "Stabilized grayscale image from tracked line (lpCurr)"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        If src.Channels <> 1 Then src = task.grayOriginal
+
+        If task.lineTrack.reSyncImage Then
+            dst2 = src.Clone
+            Exit Sub
+        End If
+
+        Dim lpCurr = task.lineTrack.lpCurr
+        If task.heartBeatLT Or task.optionsChanged Then
+            refLine = New lpData(lpCurr.p1, lpCurr.p2)
+        End If
+
+        Dim angleDelta = lpCurr.angle - refLine.angle
+        Dim tx = refLine.pE1.X - lpCurr.pE1.X
+        Dim ty = 0 ' lpPerpRef.pE1.Y - lpPerpCurr.pE1.Y
+
+        Dim M = cv.Cv2.GetRotationMatrix2D(lpCurr.ptCenter, -angleDelta, 1.0)
+        M.Set(Of Double)(0, 2, M.Get(Of Double)(0, 2) + tx)
+        M.Set(Of Double)(1, 2, M.Get(Of Double)(1, 2) + ty)
+
+        dst2 = src.WarpAffine(M, src.Size, cv.InterpolationFlags.Linear, cv.BorderTypes.Constant)
+        dst3 = dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        dst3.Line(refLine.pE1, refLine.pE2, cv.Scalar.Yellow, task.lineWidth + 1, task.lineType)
+        dst3.Line(lpCurr.pE1, lpCurr.pE2, cv.Scalar.Red, task.lineWidth + 1, task.lineType)
+
+        labels(3) = "Delta Angle=" + Format(angleDelta, fmt2) + " deg, tx=" + Format(tx, fmt2) + ", ty=" + Format(ty, fmt2)
+    End Sub
+End Class
+
+
+
+
+Public Class NR_Stabilizer_Basics : Inherits TaskParent
     Dim feat As New Feature_Basics
     Dim knn As New KNN_Basics
     Public Sub New()
@@ -24,102 +63,6 @@ Public Class Stabilizer_Basics : Inherits TaskParent
         End If
     End Sub
 End Class
-
-
-
-
-Public Class Stabilizer_BasicsOld : Inherits TaskParent
-    Dim feat As New Feature_Basics
-    Dim knn As New KNN_Basics
-    Public Sub New()
-        desc = "Reset the image on every heartbeat"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        If task.heartBeat Then
-            feat.Run(task.gray)
-            dst2 = feat.dst2
-            labels(2) = feat.labels(2)
-
-            knn.ptListQuery = feat.features
-            knn.ptListTrain = feat.lastFeatures
-            knn.Run(emptyMat)
-
-            dst3.SetTo(0)
-            For i = 0 To Math.Min(knn.ptListTrain.Count, knn.ptListQuery.Count) - 1
-                Dim p1 = knn.ptListQuery(i)
-                Dim p2 = knn.ptListTrain(knn.result(i, 0))
-                dst3.Line(p1, p2, task.highlight, task.lineWidth)
-            Next
-        End If
-    End Sub
-End Class
-
-
-
-
-
-Public Class Stabilizer_BasicsFail : Inherits TaskParent
-    Public Sub New()
-        desc = "Use task.lines.lplist(0) to find the angle needed to stabilize the image."
-    End Sub
-    Public Function GetAngleBetweenLinesBySlopes(ByVal slope1 As Double, ByVal slope2 As Double) As Double
-        Const EPSILON As Double = 0.000000001
-
-        ' --- Handle Vertical Lines (Infinite Slope) ---
-        Dim isSlope1Vertical As Boolean = Double.IsInfinity(slope1)
-        Dim isSlope2Vertical As Boolean = Double.IsInfinity(slope2)
-
-        If isSlope1Vertical AndAlso isSlope2Vertical Then
-            ' Both lines are vertical, so they are parallel.
-            Return 0.0 ' Angle is 0 degrees
-        ElseIf isSlope1Vertical Then
-            ' Line 1 is vertical (angle 90 degrees).
-            ' Angle of line 2 is Atan(slope2).
-            Dim angle2Degrees As Double = Math.Atan(slope2) * 180 / cv.Cv2.PI
-            Dim angleDiff As Double = Math.Abs(90.0 - angle2Degrees)
-            Return angleDiff
-        ElseIf isSlope2Vertical Then
-            ' Line 2 is vertical (angle 90 degrees).
-            ' Angle of line 1 is Atan(slope1).
-            Dim angle1Degrees As Double = Math.Atan(slope1) * 180 / cv.Cv2.PI
-            Dim angleDiff As Double = Math.Abs(90.0 - angle1Degrees)
-            Return angleDiff
-        End If
-
-        ' --- Handle Perpendicular Lines (Product of slopes is -1) ---
-        ' Check if 1 + m1*m2 is very close to zero, indicating perpendicularity.
-        If Math.Abs(1 + slope1 * slope2) < EPSILON Then
-            Return 90.0 ' Lines are perpendicular (90 degrees)
-        End If
-
-        ' --- General Case: Use the tangent formula ---
-        Dim tanTheta As Double = (slope2 - slope1) / (1 + slope1 * slope2)
-        Dim angleRadians As Double = Math.Atan(tanTheta) ' Result is in (-PI/2, PI/2)
-        Dim angleDegrees As Double = angleRadians * 180 / cv.Cv2.PI
-
-        Return angleDegrees
-    End Function
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        Static lpLast As lpData = task.lines.lpList(0)
-
-        Dim lp = task.lines.lpList(0)
-        If lp.pE1 = lpLast.pE1 And lp.pE2 = lpLast.pE2 Or task.lineLongestChanged Then
-            dst2 = src
-            If task.lineLongestChanged Then lpLast = task.lines.lpList(0)
-        Else
-            Dim rotateAngle = GetAngleBetweenLinesBySlopes(lp.slope, lpLast.slope)
-
-            Dim rotateCenter = Line_Intersection.IntersectTest(lp, lpLast)
-            Dim M = cv.Cv2.GetRotationMatrix2D(rotateCenter, -rotateAngle, 1)
-            dst2 = src.WarpAffine(M, src.Size(), cv.InterpolationFlags.Cubic)
-
-            labels(2) = "Image after rotation by " + Format(rotateAngle, fmt3) + " degrees"
-        End If
-    End Sub
-End Class
-
-
-
 
 
 

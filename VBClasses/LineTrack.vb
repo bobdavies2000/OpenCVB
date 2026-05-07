@@ -1,12 +1,75 @@
 Imports System.Runtime.InteropServices
 Imports cv = OpenCvSharp
+Public Class LineTrack_Basics : Inherits TaskParent
+    Public lpLast As New lpData
+    Public lpCurr As New lpData
+    Public lpInput As New lpData
+    Public reSyncImage As Boolean = True ' if true, the longest line was lost.
+    Dim knn As New KNN_FindLine
+    Public Sub New()
+        desc = "Track the longest line and flag when it is lost."
+    End Sub
+    Public Shared Function compareLines(lpCurr As lpData, lpLast As lpData) As Boolean
+        Dim distThreshold = If(task.workRes.Width > 640, task.gridWH * 2, task.gridWH)
+        If (lpCurr.pE1.DistanceTo(lpLast.pE1) < distThreshold And
+           lpCurr.pE2.DistanceTo(lpLast.pE2) < distThreshold) Or
+           (lpCurr.pE2.DistanceTo(lpLast.pE1) < distThreshold And
+           lpCurr.pE1.DistanceTo(lpLast.pE2) < distThreshold) Then
+            Return True
+        End If
+        Return False
+    End Function
+    Private Sub reset()
+        lpCurr = If(standalone, task.lines.lpList(0), lpInput)
+        lpLast = lpCurr
+        reSyncImage = False
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        Static presentCount As Integer
+        Static lostLongest As Integer
+        If task.lines.lpList.Count = 0 Then
+            dst2.SetTo(0)
+        Else
+            If reSyncImage Then reset()
+
+            knn.inputLine = lpCurr
+            knn.Run(emptyMat)
+            lpCurr = knn.closestLine
+
+            dst2 = task.color.Clone
+            dst2.Line(lpCurr.pE1, lpCurr.pE2, task.highlight, task.lineWidth)
+            If compareLines(lpCurr, lpLast) Then
+                presentCount += 1
+                If presentCount > 1000 Then presentCount = 100
+                lpLast = lpCurr
+            Else
+                lostLongest = 15
+                presentCount = 0
+                reset()
+                reSyncImage = True
+            End If
+        End If
+
+        If lostLongest > 0 Then
+            SetTrueText("The longest line was lost! ", 2)
+            lostLongest -= 1
+        End If
+        labels(2) = "The longest line has been present " + CStr(presentCount) + " times."
+
+        SetTrueText("The longest line (task.lines.lpList(0) is tracked until it is lost." + vbCrLf +
+                    "When the tracked line is lost, the longest line is found and tracked.", 3)
+    End Sub
+End Class
+
+
+
+
 Public Class LineTrack_Basics_TA : Inherits TaskParent
     Public lpLast As New lpData
     Public lpCurr As New lpData
-    Public resetCurr As Boolean = True ' if true, the longest line was lost.
-    Dim knn As New KNN_N4Basics
+    Public reSyncImage As Boolean = True ' if true, the longest line was lost.
+    Dim knn As New KNN_FindLine
     Public Sub New()
-        knn.queries.Add(New cv.Vec4f)
         desc = "Track the longest line and flag when it is lost."
     End Sub
     Public Shared Function compareLines(lpCurr As lpData, lpLast As lpData) As Boolean
@@ -22,7 +85,7 @@ Public Class LineTrack_Basics_TA : Inherits TaskParent
     Private Sub reset()
         lpCurr = task.lines.lpList(0)
         lpLast = task.lines.lpList(0)
-        resetCurr = False
+        reSyncImage = False
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         Static presentCount As Integer
@@ -30,17 +93,11 @@ Public Class LineTrack_Basics_TA : Inherits TaskParent
         If task.lines.lpList.Count = 0 Then
             dst2.SetTo(0)
         Else
-            If resetCurr Then reset()
+            If reSyncImage Then reset()
 
-            knn.trainInput.Clear()
-            For Each lp In task.lines.lpList
-                knn.trainInput.Add(New cv.Vec4f(lp.pE1.X, lp.pE1.Y, lp.pE2.X, lp.pE2.Y))
-            Next
-
-            knn.queries(0) = New cv.Vec4f(lpCurr.pE1.X, lpCurr.pE1.Y, lpCurr.pE2.X, lpCurr.pE2.Y)
+            knn.inputLine = lpCurr
             knn.Run(emptyMat)
-
-            lpCurr = task.lines.lpList(knn.result(0, 0))
+            lpCurr = knn.closestLine
 
             dst2 = task.color.Clone
             dst2.Line(lpCurr.pE1, lpCurr.pE2, task.highlight, task.lineWidth)
@@ -52,7 +109,7 @@ Public Class LineTrack_Basics_TA : Inherits TaskParent
                 lostLongest = 15
                 presentCount = 0
                 reset()
-                resetCurr = True
+                reSyncImage = True
             End If
         End If
 
@@ -831,5 +888,18 @@ Public Class LineTrack_MatchLines : Inherits TaskParent
         End If
 
         lpListLast = New List(Of lpData)(task.lines.lpList)
+    End Sub
+End Class
+
+
+
+
+
+Public Class LineTrack_Horizontal : Inherits TaskParent
+    Public Sub New()
+        desc = "Track the longest horizontal line"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        dst2 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
     End Sub
 End Class

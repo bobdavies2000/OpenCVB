@@ -275,10 +275,9 @@ End Class
 
 
 
-Public Class Line_PerpendicularTest : Inherits TaskParent
+Public Class Line_Perpendicular : Inherits TaskParent
     Public input As lpData
     Public output As lpData
-    Dim midPoint As cv.Point2f
     Public Sub New()
         labels = {"", "", "White is the line selected for display and yellow is perpendicular line", ""}
         desc = "Find the line perpendicular to the line created by the points provided."
@@ -306,7 +305,7 @@ Public Class Line_PerpendicularTest : Inherits TaskParent
         Return New lpData(p1, p2)
     End Function
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If standaloneTest() Then input = task.lpGravity
+        If standaloneTest() Then input = task.lineTrack.lpCurr
         dst2.SetTo(0)
         dst2.Line(input.p1, input.p2, white, task.lineWidth, task.lineType)
 
