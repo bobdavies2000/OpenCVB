@@ -261,11 +261,6 @@ Public Class KNN_N4Basics : Inherits TaskParent
         desc = "Use knn with the input 4D points in the image.  Find the nearest neighbors."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If standaloneTest() Then
-            SetTrueText("There is no output for the " + traceName + " algorithm when run standaloneTest().  Use the " + traceName + "Test algorithm")
-            Exit Sub
-        End If
-
         Dim KNNdimension = 4
         Dim queryMat = cv.Mat.FromPixelData(queries.Count, KNNdimension, cv.MatType.CV_32F, queries.ToArray)
         If queryMat.Rows = 0 Then

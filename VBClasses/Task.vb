@@ -205,7 +205,6 @@ Public Class AlgorithmTask : Implements IDisposable
 
 
 
-
         MainUI_Algorithm.Run(src.Clone) ' <<<<<<<< This is where the VB algorithm runs...
 
 

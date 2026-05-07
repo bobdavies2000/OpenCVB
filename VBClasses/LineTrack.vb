@@ -62,9 +62,8 @@ Public Class LineTrack_Basics_TA : Inherits TaskParent
         End If
         labels(2) = "The longest line has been present " + CStr(presentCount) + " times."
 
-        SetTrueText("If the camera is moved, the longest line (task.lines.lpList(0) should produce a solid." + vbCrLf +
-                    "If that line disappears or its center moves a log, dst2 is set to 0 and it starts over." + vbCrLf +
-                    "It should not disappear unless the movement makes another line the lpList(0)", 3)
+        SetTrueText("The longest line (task.lines.lpList(0) is tracked until it is lost." + vbCrLf +
+                    "When the tracked line is lost, the longest line is found and tracked.", 3)
     End Sub
 End Class
 
