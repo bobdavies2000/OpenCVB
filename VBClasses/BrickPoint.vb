@@ -18,7 +18,7 @@ Public Class BrickPoint_Basics : Inherits TaskParent
         ptList = New List(Of cv.Point)(bpCore.ptList)
 
         For Each pt In ptList
-            DrawCircle(dst3, pt, 255)
+            dst3.Circle(pt, task.DotSize, 255, -1, task.lineType)
         Next
         labels(2) = bpCore.labels(2)
     End Sub
@@ -55,7 +55,7 @@ Public Class BrickPoint_Core : Inherits TaskParent
         Next
 
         For Each pt In ptList
-            DrawCircle(dst2, pt)
+            dst2.Circle(pt, task.DotSize, task.highlight, -1, task.lineType)
         Next
 
         labels(2) = "Of the " + CStr(task.gridRects.Count) + " candidates, " + CStr(ptList.Count) +
@@ -100,7 +100,7 @@ Public Class BrickPoint_Plot : Inherits TaskParent
         dst3 = src
         For Each brick In bPoint.bpCore.bricks.brickList
             If brick.mm.maxVal <= maxVal And brick.mm.maxVal >= minVal Then
-                DrawCircle(dst3, New cv.Point(brick.mm.maxLoc.X + brick.rect.X, brick.mm.maxLoc.Y + brick.rect.Y))
+                dst3.Circle(New cv.Point(brick.mm.maxLoc.X + brick.rect.X, brick.mm.maxLoc.Y + brick.rect.Y), task.DotSize, task.highlight, -1, task.lineType)
             End If
         Next
         labels(2) = "There were " + CStr(sobelValues.Count) + " points found.  Cursor over each bar to see where they originated from"
@@ -130,8 +130,8 @@ Public Class NR_BrickPoint_TopRow : Inherits TaskParent
             If brick.mm.maxLoc = newPoint Then Continue For
             If brick.mm.maxVal <> 255 Then Continue For
             If brick.mm.maxLoc.Y = brick.rect.Y Then
-                DrawCircle(dst2, brick.mm.maxLoc)
-                DrawCircle(dst3, brick.rect.TopLeft)
+                dst2.Circle(brick.mm.maxLoc, task.DotSize, task.highlight, -1, task.lineType)
+                dst3.Circle(brick.rect.TopLeft, task.DotSize, task.highlight, -1, task.lineType)
                 count += 1
             End If
         Next
@@ -221,8 +221,8 @@ Public Class NR_BrickPoint_Best : Inherits TaskParent
         bestBricks.Clear()
         For Each pt In bPoint.ptList
             bestBricks.Add(pt)
-            DrawCircle(dst2, pt)
-            DrawCircle(dst3, pt, 255)
+            dst2.Circle(pt, task.DotSize, task.highlight, -1, task.lineType)
+            dst3.Circle(pt, task.DotSize, 255, -1, task.lineType)
         Next
     End Sub
 End Class
@@ -303,7 +303,7 @@ Public Class NR_BrickPoint_PopulationSurvey : Inherits TaskParent
         For Each brick In bricks.brickList
             If brick.mm.maxLoc.X = col And brick.mm.maxLoc.Y = row Then
                 Dim ptfeat = New cv.Point(brick.mm.maxLoc.X + brick.rect.X, brick.mm.maxLoc.Y + brick.rect.Y)
-                DrawCircle(dst3, ptfeat)
+                dst3.Circle(ptfeat, task.DotSize, task.highlight, -1, task.lineType)
             End If
         Next
 
@@ -471,7 +471,7 @@ Public Class BrickPoint_MaxSobel : Inherits TaskParent
             If mm.maxVal >= options.sobelThreshold Then
                 Dim pt = New cv.Point(mm.maxLoc.X + rect.X, mm.maxLoc.Y + rect.Y)
                 features.Add(pt)
-                DrawCircle(dst2, pt)
+                dst2.Circle(pt, task.DotSize, task.highlight, -1, task.lineType)
             End If
         Next
 
@@ -574,7 +574,7 @@ Public Class NR_BrickPoint_Features : Inherits TaskParent
 
         If task.gOptions.DebugCheckBox.Checked Then
             For Each pt In featList
-                DrawCircle(dst2, pt, task.DotSize, cv.Scalar.Black)
+                dst2.Circle(pt, task.DotSize, cv.Scalar.Black, -1, task.lineType)
             Next
         End If
 

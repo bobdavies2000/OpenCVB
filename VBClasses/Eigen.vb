@@ -151,7 +151,7 @@ Public Class Eigen_Input : Inherits TaskParent
         For Each pt In eigen3D.PointList
             Dim p1 = New cv.Point2f(pt.X, pt.Y)
             PointList.Add(p1)
-            DrawCircle(dst2, p1, 255)
+            dst2.Circle(p1, task.DotSize, 255, -1, task.lineType)
         Next
     End Sub
 End Class
@@ -204,7 +204,7 @@ Public Class Eigen_Input3D : Inherits TaskParent
             Dim pt = New cv.Point3f(startx + i * incr + noiseOffsetX,
                                         Math.Max(0, Math.Min(m * (startx + i * incr) + bb + noiseOffsetY, height)), Rnd() * depth)
             PointList.Add(pt)
-            DrawCircle(dst2, New cv.Point2f(pt.X, pt.Y), task.DotSize + 1, highLight)
+            dst2.Circle(New cv.Point2f(pt.X, pt.Y), task.DotSize + 1, highLight, -1, task.lineType)
         Next
     End Sub
 End Class

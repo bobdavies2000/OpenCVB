@@ -36,13 +36,13 @@ Public Class FeatureMap_Basics : Inherits TaskParent
         genSorted.Clear()
         For i = 0 To basics.ptList.Count - 1
             Dim pt = basics.ptList(i)
-            If standaloneTest() Then DrawCircle(dst2, pt, task.DotSize + 1, cv.Scalar.Yellow)
+            If standaloneTest() Then dst2.Circle(pt, task.DotSize + 1, cv.Scalar.Yellow, -1, task.lineType)
             dst1.Set(Of Byte)(pt.Y, pt.X, 255)
 
             Dim g = basics.facetGen.dst0.Get(Of Integer)(pt.Y, pt.X)
             genSorted.Add(g, i)
             SetTrueText(CStr(g), pt)
-            DrawCircle(dst2, pt, task.DotSize, task.highlight)
+            dst2.Circle(pt, task.DotSize, task.highlight, -1, task.lineType)
         Next
         labels(2) = basics.labels(2)
         labels(3) = CStr(basics.ptList.Count) + " stable good features were found"
@@ -102,8 +102,8 @@ Public Class FeatureMap_StablePoints : Inherits TaskParent
         dst3 = src.Clone
         For i = 0 To ptList.Count - 1
             Dim pt = ptList(i)
-            DrawCircle(dst2, pt, task.DotSize, task.highlight)
-            DrawCircle(dst3, pt, task.DotSize, task.highlight)
+            dst2.Circle(pt, task.DotSize, task.highlight, -1, task.lineType)
+            dst3.Circle(pt, task.DotSize, task.highlight, -1, task.lineType)
         Next
         labels(2) = CStr(ptList.Count) + " stable points were identified with a max of " + CStr(maxGens) +
                         " generations."
@@ -237,8 +237,8 @@ Public Class NR_FeatureMap_Edges : Inherits TaskParent
         dst3 = edges.dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         For Each fp In fcs.fpList
             If fp.depth Then
-                DrawCircle(dst2, fp.pt, task.DotSize, task.highlight)
-                DrawCircle(dst3, fp.pt, task.DotSize, task.highlight)
+                dst2.Circle(fp.pt, task.DotSize, task.highlight, -1, task.lineType)
+                dst3.Circle(fp.pt, task.DotSize, task.highlight, -1, task.lineType)
             End If
         Next
         labels = fcs.labels
@@ -261,7 +261,7 @@ Public Class NR_FeatureMap_WithAge : Inherits TaskParent
 
         dst3.SetTo(0)
         For Each fp In fcs.fpList
-            DrawCircle(dst3, fp.pt, task.DotSize, task.highlight)
+            dst3.Circle(fp.pt, task.DotSize, task.highlight, -1, task.lineType)
             If fp.age >= 1000 Then fp.age = 2
         Next
     End Sub
@@ -291,7 +291,7 @@ Public Class NR_FeatureMap_BestAge : Inherits TaskParent
         Dim maxIndex As Integer = 0
         For Each index In fpSorted.Values
             Dim fp = fcs.fpList(index)
-            DrawCircle(dst3, fp.pt, task.DotSize, task.highlight)
+            dst3.Circle(fp.pt, task.DotSize, task.highlight, -1, task.lineType)
             If fp.age >= 1000 Then fp.age = 2
             maxIndex += 1
             If maxIndex >= 10 Then Exit For
@@ -580,7 +580,7 @@ Public Class FeatureMap_Periphery : Inherits TaskParent
         For Each fp In fcs.fpList
             If fp.periph Then
                 dst3.FillConvexPoly(fp.facets, cv.Scalar.Gray, task.lineType)
-                DrawCircle(dst3, fp.pt, task.DotSize, task.highlight)
+                dst3.Circle(fp.pt, task.DotSize, task.highlight, -1, task.lineType)
                 ptOutside.Add(fp.pt)
             Else
                 ptInside.Add(fp.pt)
@@ -667,8 +667,8 @@ Public Class NR_FeatureMap_BrickPoints : Inherits TaskParent
         dst3 = src.Clone
         For i = 0 To ptList.Count - 1
             Dim pt = ptList(i)
-            DrawCircle(dst2, pt, task.DotSize, task.highlight)
-            DrawCircle(dst3, pt, task.DotSize, task.highlight)
+            dst2.Circle(pt, task.DotSize, task.highlight, -1, task.lineType)
+            dst3.Circle(pt, task.DotSize, task.highlight, -1, task.lineType)
         Next
         labels(2) = CStr(ptList.Count) + " stable points were identified with a max of " + CStr(maxGens) +
                         " generations."
@@ -698,7 +698,7 @@ Public Class FeatureMap_Motion : Inherits TaskParent
         dst2 = fcs.dst2
 
         For Each fp In fcs.fpList
-            If fp.depth > 0 Then DrawCircle(dst2, fp.pt, task.DotSize, task.highlight)
+            If fp.depth > 0 Then dst2.Circle(fp.pt, task.DotSize, task.highlight, -1, task.lineType)
         Next
 
         Dim motionCount As Integer, linkedCount As Integer
@@ -712,7 +712,7 @@ Public Class FeatureMap_Motion : Inherits TaskParent
             'Dim fpIndex = task.fpFromGridCellLast.IndexOf(brickIndex)
             'If fpIndex >= 0 Then
             '    linkedCount += 1
-            '    DrawLine(dst3, fp.pt, fp.ptLast)
+            '    dst3.Line(fp.pt, fp.ptLast, task.highlight, task.lineWidth, task.lineType)
             'End If
             'If fp.ptLast <> newPoint Then
             '    motionCount += 1
@@ -799,7 +799,7 @@ Public Class FeatureMap_CreateList : Inherits TaskParent
 
         dst3 = Palettize(dst2)
         For Each fp In fpList
-            If fp.depth > 0 Then DrawCircle(dst3, fp.pt, task.DotSize, task.highlight)
+            If fp.depth > 0 Then dst3.Circle(fp.pt, task.DotSize, task.highlight, -1, task.lineType)
         Next
 
         If standalone Then FeatureMap_Basics.fpCellContour(task.fpD, task.color)

@@ -153,23 +153,6 @@ Public Module vbc
         End If
         Return New List(Of cv.Point)
     End Function
-    Public Sub DrawLine(ByRef dst As cv.Mat, p1 As cv.Point2f, p2 As cv.Point2f, color As cv.Scalar)
-        Dim pt1 = New cv.Point(p1.X, p1.Y)
-        Dim pt2 = New cv.Point(p2.X, p2.Y)
-        dst.Line(pt1, pt2, color, task.lineWidth, task.lineType)
-    End Sub
-    Public Sub DrawLine(dst As cv.Mat, p1 As cv.Point2f, p2 As cv.Point2f, color As cv.Scalar, lineWidth As Integer)
-        dst.Line(p1, p2, color, lineWidth, task.lineType)
-    End Sub
-    Public Sub DrawLine(dst As cv.Mat, lp As lpData, color As cv.Scalar)
-        dst.Line(lp.p1, lp.p2, color, task.lineWidth, task.lineType)
-    End Sub
-    Public Sub DrawLine(dst As cv.Mat, lp As lpData)
-        dst.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
-    End Sub
-    Public Sub DrawLine(dst As cv.Mat, p1 As cv.Point2f, p2 As cv.Point2f)
-        dst.Line(p1, p2, task.highlight, task.lineWidth, task.lineType)
-    End Sub
     Public Function ValidateRect(ByVal r As cv.Rect, Optional ratio As Integer = 1) As cv.Rect
         If r.X < 0 Then r.X = 0
         If r.Y < 0 Then r.Y = 0

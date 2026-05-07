@@ -73,7 +73,7 @@ Public Class PlotOpenCV_Depth : Inherits TaskParent
             Dim meterDepth = src.Width \ lineCount
             For i = 1 To lineCount
                 Dim x = i * meterDepth
-                vbc.DrawLine(dst2, New cv.Point(x, 0), New cv.Point(x, src.Height), white)
+                dst2.Line(New cv.Point(x, 0), New cv.Point(x, src.Height), white, task.lineWidth, task.lineType)
                 SetTrueText(Format(i, "0") + "m", New cv.Point(x + 4, src.Height - 10))
             Next
         End If
@@ -141,7 +141,7 @@ Public Class PlotOpenCV_Points : Inherits TaskParent
             Dim pt = New cv.Point(dst2.Width * (input(i).X - minX) \ (maxX - minX),
                                       dst2.Height - dst2.Height * (y - minY) \ (maxY - minY))
             If pt.Y <> dst2.Height / 2 Then
-                DrawCircle(dst2, pt, task.DotSize, task.highlight)
+                dst2.Circle(pt, task.DotSize, task.highlight, -1, task.lineType)
                 output.Add(pt)
             Else
                 output.Add(newPoint)

@@ -70,7 +70,7 @@ Public Class PlotTime_Basics : Inherits TaskParent
             y *= (dst2.Height - 1)
             Dim c As New cv.Point(columnIndex - task.DotSize, y - task.DotSize)
             If c.X < 1 Then c.X = 1
-            DrawCircle(dst2, c, task.DotSize, plotColors(i))
+            dst2.Circle(c, task.DotSize, plotColors(i), -1, task.lineType)
         Next
 
         If task.heartBeat Then
@@ -253,7 +253,7 @@ Public Class PlotTime_FixedScale : Inherits TaskParent
                 y *= dst2.Height - 1
                 Dim c As New cv.Point(columnIndex - task.DotSize, y - task.DotSize)
                 If c.X < 1 Then c.X = 1
-                DrawCircle(dst2, c, task.DotSize, plotColors(i))
+                dst2.Circle(c, task.DotSize, plotColors(i), -1, task.lineType)
             End If
         Next
 

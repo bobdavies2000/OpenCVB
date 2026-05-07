@@ -21,7 +21,7 @@ Public Class Triangle_Basics : Inherits TaskParent
             If vec.Z = 0 Then
                 vec = Cloud_Basics.worldCoordinates(New cv.Point3f(pt.X, pt.Y, task.rcD.wcMean(2)))
             End If
-            DrawCircle(dst3, pt, task.DotSize, cv.Scalar.Yellow)
+            dst3.Circle(pt, task.DotSize, cv.Scalar.Yellow, -1, task.lineType)
             pt3D.Add(vec)
         Next
 
@@ -61,14 +61,14 @@ Public Class Triangle_HullContour : Inherits TaskParent
         dst3.SetTo(0)
         For Each pt In rc.contour
             pt = New cv.Point(pt.X + rc.rect.X, pt.Y + rc.rect.Y)
-            DrawCircle(dst3, pt, task.DotSize, cv.Scalar.Yellow)
+            dst3.Circle(pt, task.DotSize, cv.Scalar.Yellow, -1, task.lineType)
         Next
 
         dst1.SetTo(0)
         If rc.hull IsNot Nothing Then
             For Each pt In rc.hull
                 pt = New cv.Point(pt.X + rc.rect.X, pt.Y + rc.rect.Y)
-                DrawCircle(dst1, pt, task.DotSize, cv.Scalar.Yellow)
+                dst1.Circle(pt, task.DotSize, cv.Scalar.Yellow, -1, task.lineType)
             Next
         End If
     End Sub
@@ -120,7 +120,7 @@ Public Class NR_Triangle_Cell : Inherits TaskParent
         For Each pt In rc.contour
             Dim vec = task.pointCloud(rc.rect).Get(Of cv.Point3f)(pt.Y, pt.X)
             pt = New cv.Point(xFactor * pt.X / rc.rect.Width, yFactor * pt.Y / rc.rect.Height)
-            DrawCircle(dst3, pt, task.DotSize, cv.Scalar.Yellow)
+            dst3.Circle(pt, task.DotSize, cv.Scalar.Yellow, -1, task.lineType)
             pt3D.Add(vec)
         Next
 
@@ -187,14 +187,14 @@ Public Class NR_Triangle_Mask : Inherits TaskParent
                 If rc.mask.Get(Of Byte)(y, x) = 0 Then Continue For
                 Dim vec = task.pointCloud(rc.rect).Get(Of cv.Point3f)(y, x)
                 Dim pt = New cv.Point2f(xFactor * x / rc.rect.Width, yFactor * y / rc.rect.Height)
-                DrawCircle(dst3, pt, task.DotSize, cv.Scalar.Yellow)
+                dst3.Circle(pt, task.DotSize, cv.Scalar.Yellow, -1, task.lineType)
                 pt3D.Add(vec)
             Next
         Next
 
         Dim newMaxDist = New cv.Point2f(xFactor * (rc.maxDist.X - rc.rect.X) / rc.rect.Width,
                                           yFactor * (rc.maxDist.Y - rc.rect.Y) / rc.rect.Height)
-        DrawCircle(dst3, newMaxDist, task.DotSize + 2, cv.Scalar.Red)
+        dst3.Circle(newMaxDist, task.DotSize + 2, cv.Scalar.Red, -1, task.lineType)
     End Sub
 End Class
 
@@ -234,11 +234,11 @@ Public Class Triangle_Find : Inherits TaskParent
             Dim p1 = New cv.Point(pt.X, pt.Y)
             pt = triangle.Get(Of cv.Point2f)((i + 1) Mod 3)
             Dim p2 = New cv.Point(pt.X, pt.Y)
-            vbc.DrawLine(dst2, p1, p2, cv.Scalar.Black)
+            dst2.Line(p1, p2, cv.Scalar.Black, task.lineWidth, task.lineType)
         Next
 
         For Each pt In srcPoints
-            DrawCircle(dst2, pt, task.DotSize + 1, cv.Scalar.Red)
+            dst2.Circle(pt, task.DotSize + 1, cv.Scalar.Red, -1, task.lineType)
         Next
     End Sub
 End Class

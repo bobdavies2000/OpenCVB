@@ -113,8 +113,8 @@ Public Class NR_Kalman_RotatingPoint : Inherits TaskParent
     End Function
     Private Sub drawCross(dst2 As cv.Mat, center As cv.Point, color As cv.Scalar)
         Dim d = 3
-        vbc.DrawLine(dst2, New cv.Point(center.X - d, center.Y - d), New cv.Point(center.X + d, center.Y + d), color)
-        vbc.DrawLine(dst2, New cv.Point(center.X + d, center.Y - d), New cv.Point(center.X - d, center.Y + d), color)
+        dst2.Line(New cv.Point(center.X - d, center.Y - d), New cv.Point(center.X + d, center.Y + d), color, task.lineWidth, task.lineType)
+        dst2.Line(New cv.Point(center.X + d, center.Y - d), New cv.Point(center.X - d, center.Y + d), color, task.lineWidth, task.lineType)
     End Sub
     Public Sub New()
         labels(2) = "Estimate Yellow < Real Red (if working)"
@@ -182,7 +182,7 @@ Public Class NR_Kalman_MousePredict : Inherits TaskParent
         Static lastRealMouse As cv.Point = task.mouseMovePoint
         task.kalman.kInput = {task.mouseMovePoint.X, task.mouseMovePoint.Y}
         task.kalman.Run(emptyMat)
-        vbc.DrawLine(dst2, New cv.Point(task.kalman.kOutput(0), task.kalman.kOutput(1)), lastStateResult, white)
+        dst2.Line(New cv.Point(task.kalman.kOutput(0), task.kalman.kOutput(1)), lastStateResult, white, task.lineWidth, task.lineType)
         dst2.Line(task.mouseMovePoint, lastRealMouse, cv.Scalar.Red)
         lastRealMouse = task.mouseMovePoint
     End Sub

@@ -213,7 +213,7 @@ Public Class NR_HistPeak2D_HotSide : Inherits TaskParent
 
         For i = 0 To peak.auto.clusterPoints.Count - 1
             Dim pt = peak.auto.clusterPoints(i)
-            DrawCircle(dst3, pt, task.DotSize * 3, white)
+            dst3.Circle(pt, task.DotSize * 3, white, -1, task.lineType)
         Next
 
         peak.histogram = histSide.histogram
@@ -243,7 +243,7 @@ Public Class NR_HistPeak2D_HotTop : Inherits TaskParent
 
         For i = 0 To peak.auto.clusterPoints.Count - 1
             Dim pt = peak.auto.clusterPoints(i)
-            DrawCircle(dst3, pt, task.DotSize * 3, white)
+            dst3.Circle(pt, task.DotSize * 3, white, -1, task.lineType)
         Next
 
         peak.histogram = histTop.histogram

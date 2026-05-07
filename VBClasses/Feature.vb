@@ -30,7 +30,7 @@ Public Class Feature_Basics : Inherits TaskParent
                 For i = 0 To ptMat.Rows - 1
                     Dim pt = ptMat.Get(Of cv.Point2f)(i, 0)
                     ptLatest.Add(pt)
-                    If standaloneTest() Then DrawCircle(dst2, pt, task.DotSize, white)
+                    If standaloneTest() Then dst2.Circle(pt, task.DotSize, white, -1, task.lineType)
                 Next
 
                 strOut = "AGAST produced " + CStr(ptLatest.Count) + " features"
@@ -88,7 +88,7 @@ Public Class Feature_Basics : Inherits TaskParent
         features = New List(Of cv.Point)(ptNext)
 
         For Each pt In features
-            If lastFeatures.Contains(pt) Then DrawCircle(dst2, pt, task.DotSize, task.highlight)
+            If lastFeatures.Contains(pt) Then dst2.Circle(pt, task.DotSize, task.highlight, -1, task.lineType)
         Next
 
         If features.Count = 0 Then features = New List(Of cv.Point)(ptNext)
@@ -144,7 +144,7 @@ Public Class NR_Feature_Basics : Inherits TaskParent
                 For i = 0 To ptMat.Rows - 1
                     Dim pt = ptMat.Get(Of cv.Point2f)(i, 0)
                     ptLatest.Add(pt)
-                    If standaloneTest() Then DrawCircle(dst2, pt, task.DotSize, white)
+                    If standaloneTest() Then dst2.Circle(pt, task.DotSize, white, -1, task.lineType)
                 Next
 
                 strOut = "GoodFeatures produced " + CStr(ptLatest.Count) + " features"
@@ -196,7 +196,7 @@ Public Class NR_Feature_Basics : Inherits TaskParent
         features = New List(Of cv.Point2f)(sortByGrid.Values)
 
         For Each pt In features
-            DrawCircle(dst2, pt, task.DotSize, task.highlight)
+            dst2.Circle(pt, task.DotSize, task.highlight, -1, task.lineType)
         Next
 
         labels(2) = strOut
@@ -232,7 +232,7 @@ Public Class Feature_Bricks : Inherits TaskParent
         features.Clear()
         For Each pt In feature2f
             features.Add(New cv.Point(CInt(pt.X), CInt(pt.Y)))
-            DrawCircle(dst2, pt)
+            dst2.Circle(pt, task.DotSize, task.highlight, -1, task.lineType)
         Next
 
         strOut = CStr(features.Count) + " features found ('BrickPoints' method). " +
@@ -262,14 +262,14 @@ Public Class Feature_Delaunay : Inherits TaskParent
 
         dst2 = src
         For Each pt In feat.features
-            DrawCircle(dst2, pt)
+            dst2.Circle(pt, task.DotSize, task.highlight, -1, task.lineType)
         Next
 
         delaunay.bPoint.ptList = New List(Of cv.Point)(feat.features)
         delaunay.Run(src)
         dst3 = delaunay.dst2
         For Each pt In delaunay.bPoint.ptList
-            DrawCircle(dst3, pt, task.DotSize, white)
+            dst3.Circle(pt, task.DotSize, white, -1, task.lineType)
         Next
         labels(3) = "There were " + CStr(feat.features.Count) + " Delaunay contours"
     End Sub
@@ -294,7 +294,7 @@ Public Class NR_Feature_NoMotionTest : Inherits TaskParent
         feat.Run(src)
 
         For Each pt In feat.features
-            DrawCircle(dst2, pt, task.DotSize, task.highlight)
+            dst2.Circle(pt, task.DotSize, task.highlight, -1, task.lineType)
         Next
 
         labels(2) = feat.labels(2)
@@ -326,10 +326,10 @@ Public Class NR_Feature_LucasKanade : Inherits TaskParent
             Dim pt = New cv.Point(pyr.features(i).X, pyr.features(i).Y)
             ptList.Add(pt)
             If ptLast.Contains(pt) Then
-                DrawCircle(dst3, pt, task.DotSize, task.highlight)
+                dst3.Circle(pt, task.DotSize, task.highlight, -1, task.lineType)
                 stationary += 1
             Else
-                vbc.DrawLine(dst3, pyr.lastFeatures(i), pyr.features(i), white)
+                dst3.Line(pyr.lastFeatures(i), pyr.features(i), white, task.lineWidth, task.lineType)
                 motion += 1
             End If
         Next
@@ -369,9 +369,9 @@ Public Class NR_Feature_TraceDelaunay : Inherits TaskParent
         dst2.SetTo(0)
         For Each ptList In goodList
             For Each pt In ptList
-                DrawCircle(task.color, pt, task.DotSize, task.highlight)
+                task.color.Circle(pt, task.DotSize, task.highlight, -1, task.lineType)
                 Dim c = dst3.Get(Of cv.Vec3b)(pt.Y, pt.X)
-                DrawCircle(dst2, pt, task.DotSize + 1, c)
+                dst2.Circle(pt, task.DotSize + 1, c, -1, task.lineType)
             Next
         Next
         labels(2) = CStr(ptList.Count) + " features were identified in the image."
@@ -445,7 +445,7 @@ Public Class NR_Feature_Generations : Inherits TaskParent
         For i = 0 To features.Count - 1
             If gens(i) = 1 Then Exit For
             Dim pt = features(i)
-            DrawCircle(dst2, pt, task.DotSize, white)
+            dst2.Circle(pt, task.DotSize, white, -1, task.lineType)
         Next
 
         If task.heartBeat And gens.Count > 0 Then
@@ -495,10 +495,10 @@ Public Class NR_Feature_History : Inherits TaskParent
                 Dim pt = newFeatures(i)
                 features.Add(pt)
                 If gens(i) < task.frameHistoryCount Then
-                    DrawCircle(dst2, pt, task.DotSize + 2, cv.Scalar.Red)
+                    dst2.Circle(pt, task.DotSize + 2, cv.Scalar.Red, -1, task.lineType)
                 Else
                     whiteCount += 1
-                    DrawCircle(dst2, pt, task.DotSize, task.highlight)
+                    dst2.Circle(pt, task.DotSize, task.highlight, -1, task.lineType)
                 End If
             End If
         Next
@@ -531,7 +531,7 @@ Public Class NR_Feature_AKaze : Inherits TaskParent
         Dim kazeDescriptors As New cv.Mat()
         kaze.DetectAndCompute(src, Nothing, kazeKeyPoints, kazeDescriptors)
         For i As Integer = 0 To kazeKeyPoints.Length - 1
-            DrawCircle(dst2, kazeKeyPoints(i).Pt, task.DotSize, task.highlight)
+            dst2.Circle(kazeKeyPoints(i).Pt, task.DotSize, task.highlight, -1, task.lineType)
         Next
     End Sub
     Protected Overrides Sub Finalize()
@@ -557,7 +557,7 @@ Public Class NR_Feature_RedCloud : Inherits TaskParent
         labels(2) = redC.labels(2)
 
         For Each pt In feat.features
-            DrawCircle(dst2, pt, task.DotSize, task.highlight)
+            dst2.Circle(pt, task.DotSize, task.highlight, -1, task.lineType)
         Next
     End Sub
 End Class
@@ -582,7 +582,7 @@ Public Class NR_Feature_WithDepth : Inherits TaskParent
         For Each pt In feat.features
             Dim index = task.gridMap.Get(Of Integer)(pt.Y, pt.X)
             If bricks.brickList(index).depth > 0 Then
-                DrawCircle(dst2, pt, task.DotSize, task.highlight)
+                dst2.Circle(pt, task.DotSize, task.highlight, -1, task.lineType)
                 depthCount += 1
             End If
         Next
@@ -633,7 +633,7 @@ Public Class Feature_Matching : Inherits TaskParent
 
         dst2 = src.Clone
         For Each pt In features
-            DrawCircle(dst2, pt, task.DotSize, task.highlight)
+            dst2.Circle(pt, task.DotSize, task.highlight, -1, task.lineType)
         Next
 
         fpLastSrc = src.Clone
@@ -680,7 +680,7 @@ Public Class NR_Feature_SteadyCam : Inherits TaskParent
 
         dst2 = src
         For Each pt In features
-            DrawCircle(dst2, pt, task.DotSize, task.highlight)
+            dst2.Circle(pt, task.DotSize, task.highlight, -1, task.lineType)
         Next
 
         lastSrc = src.Clone
@@ -731,7 +731,7 @@ Public Class NR_Feature_Agast : Inherits TaskParent
         stablePoints = New List(Of cv.Point2f)(newList)
         dst2 = src
         For Each pt In stablePoints
-            DrawCircle(dst2, pt, task.DotSize, task.highlight)
+            dst2.Circle(pt, task.DotSize, task.highlight, -1, task.lineType)
         Next
         labels(2) = $"Found {keypoints.Length} features with agast"
     End Sub
@@ -782,9 +782,9 @@ Public Class NR_Feature_BrickLine : Inherits TaskParent
             Dim pt = brickLines(i)(0)
             If pt = brickLines(i).Last Then Continue For
             Dim color = vecToScalar(task.lines.dst2.Get(Of cv.Vec3b)(pt.Y, pt.X))
-            DrawCircle(dst3, pt, color)
-            vbc.DrawLine(dst2, pt, brickLines(i).Last, color)
-            vbc.DrawLine(dst3, pt, brickLines(i).Last, color)
+            dst3.Circle(pt, task.DotSize, color, -1, task.lineType)
+            dst2.Line(pt, brickLines(i).Last, color, task.lineWidth, task.lineType)
+            dst3.Line(pt, brickLines(i).Last, color, task.lineWidth, task.lineType)
         Next
     End Sub
 End Class
@@ -811,7 +811,7 @@ Public Class NR_Feature_StableVisual : Inherits TaskParent
         Dim stable As New List(Of cv.Point)
         For Each pt In feat.features
             If lastFeatures.Contains(pt) Then
-                DrawCircle(dst2, pt, task.DotSize, task.highlight)
+                dst2.Circle(pt, task.DotSize, task.highlight, -1, task.lineType)
                 stable.Add(pt)
             End If
         Next
@@ -820,7 +820,7 @@ Public Class NR_Feature_StableVisual : Inherits TaskParent
 
         dst2 = src.Clone
         For Each pt In stable
-            DrawCircle(dst2, pt, task.DotSize, task.highlight)
+            dst2.Circle(pt, task.DotSize, task.highlight, -1, task.lineType)
         Next
         labels(3) = "The " + CStr(stable.Count) + " points are present for more than one frame."
     End Sub
@@ -860,8 +860,8 @@ Public Class Feature_KNN : Inherits TaskParent
         src.CopyTo(dst2)
         dst3.SetTo(0)
         For Each pt In feat.features
-            DrawCircle(dst2, pt, task.DotSize + 2, white)
-            DrawCircle(dst3, pt, task.DotSize + 2, white)
+            dst2.Circle(pt, task.DotSize + 2, white, -1, task.lineType)
+            dst3.Circle(pt, task.DotSize + 2, white, -1, task.lineType)
         Next
 
         labels(2) = feat.labels(2)
@@ -893,7 +893,7 @@ Public Class Feature_LeftRight : Inherits TaskParent
             Dim depth = task.pcSplit(2).Get(Of Single)(pt.Y, pt.X)
             If depth > 0 Then
                 ptLeft.Add(New cv.Point(pt.X, pt.Y))
-                DrawCircle(dst2, pt, task.DotSize, task.highlight)
+                dst2.Circle(pt, task.DotSize, task.highlight, -1, task.lineType)
                 Dim ptRight = pt
                 ptRight.X -= task.calibData.baseline * task.calibData.leftIntrinsics.fx / depth
                 rightMatches.Add(ptRight)
@@ -907,8 +907,8 @@ Public Class Feature_LeftRight : Inherits TaskParent
             Dim index = rightMatches.IndexOf(pt)
             If index >= 0 Then
                 newFeatures.Add(ptLeft(index))
-                DrawCircle(dst2, ptLeft(index), task.DotSize + 2, task.highlight)
-                DrawCircle(dst3, pt, task.DotSize + 2, task.highlight)
+                dst2.Circle(ptLeft(index), task.DotSize + 2, task.highlight, -1, task.lineType)
+                dst3.Circle(pt, task.DotSize + 2, task.highlight, -1, task.lineType)
             End If
         Next
 
@@ -953,7 +953,7 @@ Public Class Feature_LeftRightCorrelation : Inherits TaskParent
         dst3 = task.color.Clone
         Dim countNoDepth As Integer, countNoCorr As Integer
         For Each pt In feat.features
-            DrawCircle(dst2, pt, task.DotSize, task.highlight)
+            dst2.Circle(pt, task.DotSize, task.highlight, -1, task.lineType)
             Dim depth = task.pcSplit(2).Get(Of Single)(pt.Y, pt.X)
             If depth > 0 Then
                 Dim rect = task.gridRects(task.gridMap.Get(Of Integer)(pt.Y, pt.X))
@@ -963,8 +963,8 @@ Public Class Feature_LeftRightCorrelation : Inherits TaskParent
                 match.Run(task.rightView(rect))
                 If match.correlation > maxCorr Then
                     features.Add(New cv.Point(pt.X, pt.Y))
-                    DrawCircle(dst2, pt, task.DotSize + 2, task.highlight)
-                    DrawCircle(dst3, pt, task.DotSize + 1, task.highlight)
+                    dst2.Circle(pt, task.DotSize + 2, task.highlight, -1, task.lineType)
+                    dst3.Circle(pt, task.DotSize + 1, task.highlight, -1, task.lineType)
                 Else
                     countNoCorr += 1
                 End If
@@ -999,7 +999,7 @@ Public Class Feature_Points : Inherits TaskParent
         If task.heartBeat Then dst2.SetTo(0)
 
         For Each pt In feat.features
-            DrawCircle(dst2, pt, task.DotSize, task.highlight)
+            dst2.Circle(pt, task.DotSize, task.highlight, -1, task.lineType)
         Next
         labels(2) = CStr(feat.features.Count) + " targets were present with " + CStr(task.FeatureSampleSize) + " requested."
     End Sub

@@ -105,16 +105,6 @@ Public Class TaskParent : Implements IDisposable
     Public Sub DrawRect(dst As cv.Mat, rect As cv.Rect)
         dst.Rectangle(rect, task.highlight, task.lineWidth, task.lineType)
     End Sub
-    Public Sub DrawCircle(dst As cv.Mat, pt As cv.Point2f, radius As Integer, color As cv.Scalar,
-                              Optional fillFlag As Integer = -1)
-        dst.Circle(pt, radius, color, fillFlag, task.lineType)
-    End Sub
-    Public Sub DrawCircle(dst As cv.Mat, pt As cv.Point2f)
-        dst.Circle(pt, task.DotSize, task.highlight, -1, task.lineType)
-    End Sub
-    Public Sub DrawCircle(dst As cv.Mat, pt As cv.Point2f, color As cv.Scalar)
-        dst.Circle(pt, task.DotSize, color, -1, task.lineType)
-    End Sub
     Public Shared Function Palettize(input As cv.Mat, Optional first As Byte = 1) As cv.Mat
         If first <> 0 Then
             task.colorMap.Set(Of cv.Vec3b)(0, 0, task.vecColors(0))

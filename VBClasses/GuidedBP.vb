@@ -121,7 +121,7 @@ Public Class NR_GuidedBP_PlanesPlot : Inherits TaskParent
         For i = 0 To dst2.Rows - 1
             Dim x = dst2.Row(i).CountNonZero
             sumList.Add(x)
-            vbc.DrawLine(dst3, New cv.Point(0, i), New cv.Point(x, i), white)
+            dst3.Line(New cv.Point(0, i), New cv.Point(x, i), white, task.lineWidth, task.lineType)
         Next
 
         Dim flatSurfacesInRow As New List(Of Integer)

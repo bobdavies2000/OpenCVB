@@ -69,7 +69,7 @@ Public Class NR_Delaunay_SubDiv : Inherits TaskParent
         Next
 
         For Each pt In random.PointList
-            DrawCircle(dst2, pt, task.DotSize + 1, cv.Scalar.Red)
+            dst2.Circle(pt, task.DotSize + 1, cv.Scalar.Red, -1, task.lineType)
         Next
 
         Dim facets = New cv.Point2f()() {Nothing}
@@ -112,7 +112,7 @@ Public Class NR_Delaunay_Subdiv2D : Inherits TaskParent
                 End Function).ToArray()
 
         For Each p In points
-            DrawCircle(dst2, p, task.DotSize + 1, cv.Scalar.Red)
+            dst2.Circle(p, task.DotSize + 1, cv.Scalar.Red, -1, task.lineType)
         Next
         dst3 = dst2.Clone()
 

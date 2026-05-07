@@ -59,7 +59,7 @@ Public Class NR_Bezier_Example : Inherits TaskParent
         Next
 
         For i = 0 To points.Count - 1
-            DrawCircle(dst2, points(i), task.DotSize + 2, white)
+            dst2.Circle(points(i), task.DotSize + 2, white, -1, task.lineType)
         Next
 
         dst2.Line(points(0), points(1), white, task.lineWidth, task.lineWidth)

@@ -12,7 +12,7 @@ Public Class Mouse_Basics : Inherits TaskParent
         lastPoint = task.mouseMovePoint
         Dim nextColor = task.scalarColors(colorIndex)
         Dim nextPt = task.mouseMovePoint
-        DrawCircle(dst2, nextPt, task.DotSize + 3, nextColor)
+        dst2.Circle(nextPt, task.DotSize + 3, nextColor, -1, task.lineType)
         colorIndex += 1
         If colorIndex >= task.scalarColors.Count Then colorIndex = 0
     End Sub

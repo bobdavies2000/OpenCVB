@@ -18,7 +18,7 @@ Public Class Structured_Basics : Inherits TaskParent
         dst2 = task.leftView.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         lpListX = New List(Of lpData)(lines.lpList)
         For Each lp In lines.lpList
-            DrawLine(dst2, lp)
+            dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
         Next
         labels(2) = struct.labels(2)
 
@@ -26,7 +26,7 @@ Public Class Structured_Basics : Inherits TaskParent
         dst3 = task.leftView.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         lpListY = New List(Of lpData)(lines.lpList)
         For Each lp In lines.lpList
-            DrawLine(dst3, lp)
+            dst3.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
         Next
         labels(3) = struct.labels(3)
     End Sub
@@ -215,7 +215,7 @@ Public Class NR_Structured_SliceXPlot : Inherits TaskParent
                                    options.sliceSize), dst3.Height - 1)
         Dim mm As mmData = GetMinMax(multi.heat.topframes.dst2(rect))
 
-        DrawCircle(dst3, New cv.Point(col, mm.maxLoc.Y), task.DotSize + 3, cv.Scalar.Yellow)
+        dst3.Circle(New cv.Point(col, mm.maxLoc.Y), task.DotSize + 3, cv.Scalar.Yellow, -1, task.lineType)
 
         dst2 = task.color.Clone
         Dim filterZ = (dst3.Height - mm.maxLoc.Y) / dst3.Height * task.MaxZmeters
@@ -254,7 +254,7 @@ Public Class NR_Structured_SliceYPlot : Inherits TaskParent
         Dim mm As mmData = GetMinMax(multi.heat.sideframes.dst2(rect))
 
         If mm.maxVal > 0 Then
-            DrawCircle(dst3, New cv.Point(mm.maxLoc.X, row), task.DotSize + 3, cv.Scalar.Yellow)
+            dst3.Circle(New cv.Point(mm.maxLoc.X, row), task.DotSize + 3, cv.Scalar.Yellow, -1, task.lineType)
             ' dst3.Line(New cv.Point(mm.maxLoc.X, 0), New cv.Point(mm.maxLoc.X, dst3.Height), task.highlight, task.lineWidth, task.lineType)
             Dim filterZ = mm.maxLoc.X / dst3.Width * task.MaxZmeters
 
@@ -313,8 +313,7 @@ Public Class Structured_SliceEither : Inherits TaskParent
         labels(3) = heat.labels(3)
 
         dst3 = heat.dst3
-        DrawCircle(dst3, New cv.Point(task.topCameraPoint.X, dst3.Height), task.DotSize,
-                        cv.Scalar.Yellow)
+        dst3.Circle(New cv.Point(task.topCameraPoint.X, dst3.Height), task.DotSize, cv.Scalar.Yellow, -1, task.lineType)
         If topView Then
             dst3.Line(New cv.Point(sliceVal, 0), New cv.Point(sliceVal, dst3.Height),
                           cv.Scalar.Yellow, task.lineWidth)
@@ -511,7 +510,7 @@ Public Class NR_Structured_CountSideSum : Inherits TaskParent
         Dim surfaces As New List(Of Single)
         For i = 0 To counts.Count - 1
             If counts(i) >= max / 2 Then
-                vbc.DrawLine(dst2, New cv.Point(0, i), New cv.Point(dst2.Width, i), white)
+                dst2.Line(New cv.Point(0, i), New cv.Point(dst2.Width, i), white, task.lineWidth, task.lineType)
                 surfaces.Add(yValues(i))
             End If
         Next
@@ -572,7 +571,7 @@ Public Class Structured_SliceV : Inherits TaskParent
         labels(3) = heat.labels(3)
 
         dst3 = heat.dst2
-        DrawCircle(dst3, New cv.Point(task.topCameraPoint.X, 0), task.DotSize, task.highlight)
+        dst3.Circle(New cv.Point(task.topCameraPoint.X, 0), task.DotSize, task.highlight, -1, task.lineType)
         dst3.Line(New cv.Point(xCoordinate, 0), New cv.Point(xCoordinate, dst3.Height), task.highlight, options.sliceSize)
         If standaloneTest() Then
             dst2 = src
@@ -617,7 +616,7 @@ Public Class Structured_SliceH : Inherits TaskParent
 
         dst3 = heat.dst3
         Dim yPlaneOffset = If(ycoordinate < dst3.Height - options.sliceSize, CInt(ycoordinate), dst3.Height - options.sliceSize - 1)
-        DrawCircle(dst3, New cv.Point(0, task.sideCameraPoint.Y), task.DotSize, task.highlight)
+        dst3.Circle(New cv.Point(0, task.sideCameraPoint.Y), task.DotSize, task.highlight, -1, task.lineType)
         dst3.Line(New cv.Point(0, yPlaneOffset), New cv.Point(dst3.Width, yPlaneOffset), task.highlight, options.sliceSize)
         If standaloneTest() Then
             dst2 = src

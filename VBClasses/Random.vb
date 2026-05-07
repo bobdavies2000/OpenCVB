@@ -19,7 +19,7 @@ Public Class Random_Basics : Inherits TaskParent
         If standaloneTest() Then
             dst2.SetTo(0)
             For Each pt In PointList
-                DrawCircle(dst2, pt, task.DotSize, cv.Scalar.Yellow)
+                dst2.Circle(pt, task.DotSize, cv.Scalar.Yellow, -1, task.lineType)
             Next
         End If
     End Sub
@@ -47,7 +47,7 @@ Public Class Random_Point2d : Inherits TaskParent
         If standaloneTest() Then
             dst2.SetTo(0)
             For Each pt In PointList
-                DrawCircle(dst2, New cv.Point2f(pt.X, pt.Y))
+                dst2.Circle(New cv.Point2f(pt.X, pt.Y), task.DotSize, task.highlight, -1, task.lineType)
             Next
         End If
     End Sub
@@ -74,7 +74,7 @@ Public Class Random_Enumerable : Inherits TaskParent
                 End Function).ToArray
         dst2.SetTo(0)
         For Each pt In points
-            DrawCircle(dst2, pt, task.DotSize, cv.Scalar.Yellow)
+            dst2.Circle(pt, task.DotSize, cv.Scalar.Yellow, -1, task.lineType)
         Next
     End Sub
 End Class
@@ -103,7 +103,7 @@ Public Class Random_Basics3D : Inherits TaskParent
         If standaloneTest() Then
             dst2.SetTo(0)
             For Each pt In PointList
-                DrawCircle(dst2, New cv.Point2f(pt.X, pt.Y), task.DotSize, cv.Scalar.Yellow)
+                dst2.Circle(New cv.Point2f(pt.X, pt.Y), task.DotSize, cv.Scalar.Yellow, -1, task.lineType)
             Next
         End If
         Points3f = PointList.ToArray
@@ -135,7 +135,7 @@ Public Class Random_Basics4D : Inherits TaskParent
         If standaloneTest() Then
             dst2.SetTo(0)
             For Each v In PointList
-                DrawCircle(dst2, New cv.Point2f(v(0), v(1)), task.DotSize, cv.Scalar.Yellow)
+                dst2.Circle(New cv.Point2f(v(0), v(1)), task.DotSize, cv.Scalar.Yellow, -1, task.lineType)
             Next
         End If
         vec4f = PointList.ToArray
@@ -603,8 +603,8 @@ Public Class NR_Random_KalmanPoints : Inherits TaskParent
 
         dst2.SetTo(0)
         For i = 0 To currSet.Count - 1
-            DrawCircle(dst2, currSet(i), task.DotSize + 2, cv.Scalar.Yellow)
-            DrawCircle(dst2, targetSet(i), task.DotSize + 2, cv.Scalar.Red)
+            dst2.Circle(currSet(i), task.DotSize + 2, cv.Scalar.Yellow, -1, task.lineType)
+            dst2.Circle(targetSet(i), task.DotSize + 2, cv.Scalar.Red, -1, task.lineType)
         Next
 
         Dim noChanges As Boolean = True
@@ -654,7 +654,7 @@ Public Class Random_Clusters : Inherits TaskParent
                 If pt.X >= dst2.Width Then pt.X = dst2.Width - 1
                 If pt.Y < 0 Then pt.Y = 0
                 If pt.Y >= dst2.Height Then pt.Y = dst2.Height - 1
-                DrawCircle(dst2, pt, task.DotSize, task.scalarColors(i Mod 256))
+                dst2.Circle(pt, task.DotSize, task.scalarColors(i Mod 256), -1, task.lineType)
 
                 cList.Add(pt)
                 labelList.Add(i)

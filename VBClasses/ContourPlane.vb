@@ -36,9 +36,9 @@ Public Class NR_ContourPlane_MaxDist : Inherits TaskParent
         dst2 = contours.dst2
         For Each contour In contours.contourList
             Dim maxDist = Distance_Basics.GetMaxDistDepth(contour.mask, contour.rect)
-            DrawCircle(dst2, maxDist)
+            dst2.Circle(maxDist, task.DotSize, task.highlight, -1, task.lineType)
             maxDist = Distance_Basics.GetMaxDist(contour.mask, contour.rect)
-            DrawCircle(dst2, maxDist, blue)
+            dst2.Circle(maxDist, task.DotSize, blue, -1, task.lineType)
         Next
     End Sub
 End Class
@@ -84,7 +84,7 @@ Public Class NR_ContourPlane_RectX : Inherits TaskParent
                     Dim depth = task.pcSplit(2)(rRight).Mean(maskRight)
                     labels(3) = "Showing the right rectangle of the largest contour with depth = " + Format(depth(0), fmt3)
                 End If
-                DrawCircle(dst2, maxDist)
+                dst2.Circle(maxDist, task.DotSize, task.highlight, -1, task.lineType)
             End If
         Next
     End Sub

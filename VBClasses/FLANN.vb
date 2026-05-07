@@ -67,7 +67,7 @@ Public Class NR_FLANN_Basics : Inherits TaskParent
         dst2.SetTo(white)
         For i = 0 To features.Rows - 1
             Dim pt = random.PointList(i)
-            DrawCircle(dst2, pt, task.DotSize, cv.Scalar.Blue)
+            dst2.Circle(pt, task.DotSize, cv.Scalar.Blue, -1, task.lineType)
         Next
 
         If options.reuseData = False Or task.optionsChanged Or task.mouseClickFlag Then
@@ -90,10 +90,10 @@ Public Class NR_FLANN_Basics : Inherits TaskParent
                     Dim index = indices(j)
                     If index >= 0 And index < random.PointList.Count Then
                         Dim pt2 = random.PointList(index)
-                        vbc.DrawLine(dst2, pt1, pt2, cv.Scalar.Red)
+                        dst2.Line(pt1, pt2, cv.Scalar.Red, task.lineWidth, task.lineType)
                     End If
                 Next
-                DrawCircle(dst2, pt1, task.DotSize, cv.Scalar.Red)
+                dst2.Circle(pt1, task.DotSize, cv.Scalar.Red, -1, task.lineType)
             Next
         End Using
 

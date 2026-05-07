@@ -136,7 +136,7 @@ Public Class Distance_Point3D : Inherits TaskParent
             dst2.SetTo(0)
             Dim p1 = New cv.Point(inPoint1.X, inPoint1.Y)
             Dim p2 = New cv.Point(inPoint2.X, inPoint2.Y)
-            vbc.DrawLine(dst2, p1, p2, task.highlight)
+            dst2.Line(p1, p2, task.highlight, task.lineWidth, task.lineType)
 
             Dim vec1 = task.pointCloud.Get(Of cv.Point3f)(p1.Y, p1.X)
             Dim vec2 = task.pointCloud.Get(Of cv.Point3f)(p2.Y, p2.X)
@@ -239,7 +239,7 @@ Public Class NR_Distance_PeakDepth : Inherits TaskParent
         If standalone Then
             dst3 = src.Clone
             For Each pt In ptList
-                DrawCircle(dst3, pt, task.DotSize, task.highlight)
+                dst3.Circle(pt, task.DotSize, task.highlight, -1, task.lineType)
             Next
             labels(3) = CStr(ptList.Count) + " points selected"
         End If
@@ -279,7 +279,7 @@ Public Class NR_Distance_PeakNoDepth : Inherits TaskParent
         If standalone Then
             dst3 = src.Clone
             For Each pt In ptList
-                DrawCircle(dst3, pt, task.DotSize, task.highlight)
+                dst3.Circle(pt, task.DotSize, task.highlight, -1, task.lineType)
             Next
             labels(3) = CStr(ptList.Count) + " points selected"
         End If
@@ -506,7 +506,7 @@ Public Class NR_Distance_DepthBricks : Inherits TaskParent
             Dim mm = GetMinMax(dst2(brick.rect))
             If mm.maxVal >= threshold Then
                 Dim pt = New cv.Point(mm.maxLoc.X + brick.rect.X, mm.maxLoc.Y + brick.rect.Y)
-                DrawCircle(dst3, pt)
+                dst3.Circle(pt, task.DotSize, task.highlight, -1, task.lineType)
             End If
         Next
     End Sub

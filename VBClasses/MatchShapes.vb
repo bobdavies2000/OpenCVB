@@ -25,7 +25,7 @@ Public Class MatchShapes_Basics : Inherits TaskParent
         Next
 
         For Each p In hull(maxIndex)
-            DrawCircle(dst, p, task.DotSize, cv.Scalar.Yellow)
+            dst.Circle(p, task.DotSize, cv.Scalar.Yellow, -1, task.lineType)
         Next
         Return maxIndex
     End Function
@@ -117,7 +117,7 @@ Public Class MatchShapes_Nearby : Inherits TaskParent
         Else
             Dim index = matchVals.IndexOf(matchVals.Min)
             Dim rc = similarCells(index)
-            DrawCircle(dst3, rc.maxDist, task.DotSize, white)
+            dst3.Circle(rc.maxDist, task.DotSize, white, -1, task.lineType)
             If similarCells.Count = 0 Then SetTrueText("No matches with match value < " + Format(options.matchThreshold, fmt2), New cv.Point(5, 5), 3)
         End If
         SetTrueText("Best match", task.rcD.maxDist, 3)

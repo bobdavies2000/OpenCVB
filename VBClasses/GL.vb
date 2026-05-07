@@ -290,7 +290,7 @@ Public Class NR_GL_LinePointsAll : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst2.SetTo(0)
         For Each lp In task.lines.lpList
-            DrawLine(dst2, lp, lp.color)
+            dst2.Line(lp.p1, lp.p2, lp.color, task.lineWidth, task.lineType)
         Next
 
         strOut = task.sharpGL.RunSharp(oCase.line3D, task.pointCloud, dst2)
@@ -458,8 +458,8 @@ Public Class NR_GL_ReadLines : Inherits TaskParent
 
         dst3 = task.color.Clone
         For Each lp In task.lines.lpList
-            'DrawLine(dst3, lp, lp.color)
-            DrawLine(dst3, lp, white)
+            'dst3.Line(lp.p1, lp.p2, lp.color, task.lineWidth, task.lineType)
+            dst3.Line(lp.p1, lp.p2, white, task.lineWidth, task.lineType)
         Next
 
         strOut = task.sharpGL.RunSharp(oCase.readLines, task.pointCloud, dst3)

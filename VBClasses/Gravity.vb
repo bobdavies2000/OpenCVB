@@ -194,7 +194,7 @@ Public Class Gravity_CloudMethod : Inherits TaskParent
         task.lpGravity = New lpData(New cv.Point2f(xTop, 0), New cv.Point2f(xBot, dst2.Height))
         If standaloneTest() Then
             dst2 = task.color
-            vbc.DrawLine(dst2, task.lpGravity.p1, task.lpGravity.p2, task.highlight)
+            dst2.Line(task.lpGravity.p1, task.lpGravity.p2, task.highlight, task.lineWidth, task.lineType)
         End If
         task.lpHorizon = Line_PerpendicularTest.computePerp(task.lpGravity)
     End Sub
@@ -257,7 +257,7 @@ Public Class NR_Gravity_BrickRotate : Inherits TaskParent
         For Each brick In bricks.brickList
             Dim pt = New cv.Point(brick.mm.maxLoc.X + brick.rect.X, brick.mm.maxLoc.Y + brick.rect.Y)
             If pt.Y = brick.rect.Y Then
-                DrawCircle(dst1, pt)
+                dst1.Circle(pt, task.DotSize, task.highlight, -1, task.lineType)
             End If
         Next
 
@@ -296,11 +296,11 @@ Public Class NR_Gravity_Basics_TAOld : Inherits TaskParent
         dst2.SetTo(0)
         dst3.SetTo(0)
         For Each pt In points
-            DrawCircle(dst2, pt, task.DotSize, white)
+            dst2.Circle(pt, task.DotSize, white, -1, task.lineType)
         Next
 
-        vbc.DrawLine(dst2, task.lpGravity.p1, task.lpGravity.p2, white)
-        vbc.DrawLine(dst3, task.lpGravity.p1, task.lpGravity.p2, white)
+        dst2.Line(task.lpGravity.p1, task.lpGravity.p2, white, task.lineWidth, task.lineType)
+        dst3.Line(task.lpGravity.p1, task.lpGravity.p2, white, task.lineWidth, task.lineType)
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If src.Type <> cv.MatType.CV_32F Then dst0 = task.pcSplit(0) Else dst0 = src
@@ -398,7 +398,7 @@ Public Class NR_Gravity_Basics_Original : Inherits TaskParent
 
         If standaloneTest() Then
             dst2.SetTo(0)
-            vbc.DrawLine(dst2, vec.p1, vec.p2, 255)
+            dst2.Line(vec.p1, vec.p2, 255, task.lineWidth, task.lineType)
         End If
     End Sub
 End Class

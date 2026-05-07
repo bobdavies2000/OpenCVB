@@ -166,7 +166,7 @@ Public Class NR_Brick_CorrelationInput : Inherits TaskParent
         task.brickD = bricks.brickList(index)
 
         Dim corr = task.brickD.correlation
-        DrawCircle(dst2, task.brickD.lRect.TopLeft, task.DotSize, 255)
+        dst2.Circle(task.brickD.lRect.TopLeft, task.DotSize, 255, -1, task.lineType)
         Dim pt = New cv.Point(task.brickD.rect.X, task.brickD.rect.Y - 10)
         SetTrueText("Corr. " + Format(corr, fmt3) + vbCrLf, pt, 2)
         labels(3) = "Correlation of the left grid square to the right is " + Format(corr, fmt3)
@@ -232,8 +232,8 @@ Public Class NR_Brick_LeftToColor : Inherits TaskParent
         For Each brick In bricks.brickList
             If brick.depth > 0 Then
                 count += 1
-                DrawCircle(task.color, brick.rect.TopLeft)
-                DrawCircle(dst2, brick.lRect.TopLeft)
+                task.color.Circle(brick.rect.TopLeft, task.DotSize, task.highlight, -1, task.lineType)
+                dst2.Circle(brick.lRect.TopLeft, task.DotSize, task.highlight, -1, task.lineType)
             End If
         Next
         labels(2) = CStr(count) + " bricks have depth and therefore an equivalent in the left and right views."

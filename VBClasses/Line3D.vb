@@ -79,8 +79,8 @@ Public Class NR_Line3D_Longest : Inherits TaskParent
         Dim depthMax = If(brickMax.depth > 0, brickMax.depth, mm.maxVal)
 
         Dim depthMean = task.pcSplit(2).Mean(dst0)(0)
-        DrawCircle(dst2, lp.p1, task.DotSize + 4, cv.Scalar.Red)
-        DrawCircle(dst2, lp.p2, task.DotSize + 4, cv.Scalar.Blue)
+        dst2.Circle(lp.p1, task.DotSize + 4, cv.Scalar.Red, -1, task.lineType)
+        dst2.Circle(lp.p2, task.DotSize + 4, cv.Scalar.Blue, -1, task.lineType)
 
         If lp.p1.DistanceTo(mm.minLoc) < lp.p2.DistanceTo(mm.maxLoc) Then
             mm.minLoc = lp.p1
@@ -179,9 +179,9 @@ Public Class NR_Line3D_DrawArbitrary : Inherits TaskParent
         If toggleFirstSecond Then Exit Sub ' wait until the second point is selected...
 
         dst1 = src
-        vbc.DrawLine(dst1, p1, p2, task.highlight)
+        dst1.Line(p1, p2, task.highlight, task.lineWidth, task.lineType)
         dst0.SetTo(0)
-        vbc.DrawLine(dst0, p1, p2, 255)
+        dst0.Line(p1, p2, 255, task.lineWidth, task.lineType)
         dst1.SetTo(0)
         task.pcSplit(0).CopyTo(dst1, dst0)
         Dim points = dst1.FindNonZero()

@@ -166,14 +166,14 @@ Public Class NR_Clone_Seamless : Inherits TaskParent
         Dim radius = 100
         If task.drawRect = New cv.Rect Then
             dst3.SetTo(0)
-            DrawCircle(dst3, center, radius, white)
+            dst3.Circle(center, radius, white, -1, task.lineType)
         Else
             cv.Cv2.Rectangle(dst3, task.drawRect, cv.Scalar.White, -1)
         End If
 
         dst2 = src.Clone()
         cv.Cv2.SeamlessClone(task.depthRGB, src, dst3, center, dst2, options.cloneFlag)
-        DrawCircle(dst2, center, radius, white)
+        dst2.Circle(center, radius, white, -1, task.lineType)
     End Sub
 End Class
 

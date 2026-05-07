@@ -30,7 +30,7 @@ Public Class Match_Basics : Inherits TaskParent
         If standaloneTest() Then
             dst2 = task.gray.Clone
             dst2.Rectangle(newRect, white, task.lineWidth)
-            vbc.DrawLine(dst2, task.lines.lpList(0).p1, task.lines.lpList(0).p2, white)
+            dst2.Line(task.lines.lpList(0).p1, task.lines.lpList(0).p2, white, task.lineWidth, task.lineType)
         End If
     End Sub
 End Class
@@ -62,7 +62,7 @@ Public Class Match_Basics1 : Inherits TaskParent
         If standaloneTest() Then
             dst2 = task.gray.Clone
             dst2.Rectangle(newRect, white, task.lineWidth)
-            vbc.DrawLine(dst2, task.lines.lpList(0).p1, task.lines.lpList(0).p2, white)
+            dst2.Line(task.lines.lpList(0).p1, task.lines.lpList(0).p2, white, task.lineWidth, task.lineType)
         End If
     End Sub
 End Class
@@ -111,7 +111,7 @@ Public Class NR_Match_BasicsTest : Inherits TaskParent
 
         If standaloneTest() Then
             dst2 = src
-            DrawCircle(dst2, match.newCenter, task.DotSize, white)
+            dst2.Circle(match.newCenter, task.DotSize, white, -1, task.lineType)
             dst2.Rectangle(matchRect, task.highlight, task.lineWidth)
             dst3 = match.dst0.Normalize(0, 255, cv.NormTypes.MinMax)
             SetTrueText(Format(match.correlation, fmt3), match.newCenter)
@@ -377,7 +377,7 @@ Public Class Match_DrawRect : Inherits TaskParent
         SetTrueText("maxLoc = " + CStr(match.newCenter.X) + ", " + CStr(match.newCenter.Y), New cv.Point(1, 1), 3)
 
         If standaloneTest() Then
-            DrawCircle(dst2, match.newCenter, task.DotSize, cv.Scalar.Red)
+            dst2.Circle(match.newCenter, task.DotSize, cv.Scalar.Red, -1, task.lineType)
             SetTrueText(Format(match.correlation, fmt3), match.newCenter, 2)
         End If
         lastImage = src
@@ -469,7 +469,7 @@ Public Class Match_Point : Inherits TaskParent
         Dim mmData = GetMinMax(dst0)
         correlation = mmData.maxVal
         pt = New cv.Point2f(mmData.maxLoc.X + searchRect.X + radius, mmData.maxLoc.Y + searchRect.Y + radius)
-        DrawCircle(src, pt, task.DotSize, white)
+        src.Circle(pt, task.DotSize, white, -1, task.lineType)
         src.Rectangle(searchRect, cv.Scalar.Yellow, 1)
     End Sub
 End Class
@@ -591,8 +591,8 @@ Public Class Match_VH : Inherits TaskParent
             SetTrueText(CStr(i) + vbCrLf + tc.strOut + vbCrLf + Format(gRect.arcY, fmt1), gRect.tc1.center, 2)
             SetTrueText(CStr(i) + vbCrLf + tc.strOut + vbCrLf + Format(gRect.arcY, fmt1), gRect.tc1.center, 3)
 
-            vbc.DrawLine(dst2, p1, p2, task.highlight)
-            vbc.DrawLine(dst3, p1, p2, task.highlight)
+            dst2.Line(p1, p2, task.highlight, task.lineWidth, task.lineType)
+            dst3.Line(p1, p2, task.highlight, task.lineWidth, task.lineType)
         Next
     End Sub
 End Class
@@ -649,7 +649,7 @@ Public Class NR_Match_LinePairTest : Inherits TaskParent
                 dst2 = dst2.Threshold(task.fCorrThreshold, 255, cv.ThresholdTypes.Binary)
             End If
             ptx(i) = New cv.Point2f(mmData.maxLoc.X + searchRect.X + radius, mmData.maxLoc.Y + searchRect.Y + radius)
-            DrawCircle(dst3, ptx(i), task.DotSize, task.highlight)
+            dst3.Circle(ptx(i), task.DotSize, task.highlight, -1, task.lineType)
             dst3.Rectangle(searchRect, cv.Scalar.Yellow, 1)
             rect = ValidateRect(New cv.Rect(ptx(i).X - radius, ptx(i).Y - radius, task.brickEdgeLen, task.brickEdgeLen))
             target(i) = task.color(rect)
@@ -692,7 +692,7 @@ Public Class Match_LinesKNN : Inherits TaskParent
             Dim index = knn.result(i, 0)
             If index >= 0 And index < lastPt.Count Then
                 Dim lastMP = lastPt(index)
-                vbc.DrawLine(dst2, lp.p1, lastMP.p2, cv.Scalar.Red)
+                dst2.Line(lp.p1, lastMP.p2, cv.Scalar.Red, task.lineWidth, task.lineType)
             End If
         Next
 

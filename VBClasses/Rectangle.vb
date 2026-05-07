@@ -319,7 +319,7 @@ Public Class Rectangle_EnclosingPoints : Inherits TaskParent
             pointList = quickRandomPoints(20)
             dst2.SetTo(0)
             For Each pt In pointList
-                DrawCircle(dst2, pt, task.DotSize, task.highlight)
+                dst2.Circle(pt, task.DotSize, task.highlight, -1, task.lineType)
             Next
         End If
 

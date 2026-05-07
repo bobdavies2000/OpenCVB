@@ -235,8 +235,8 @@ Public Class Fuzzy_TrackerDepth : Inherits TaskParent
                 rects.Add(rect)
                 layoutColor.Add(vec(1))
                 If options.displayRect Then
-                    DrawCircle(dst2, centroid, task.DotSize + 3, cv.Scalar.Yellow)
-                    DrawCircle(dst2, centroid, task.DotSize, cv.Scalar.Red)
+                    dst2.Circle(centroid, task.DotSize + 3, cv.Scalar.Yellow, -1, task.lineType)
+                    dst2.Circle(centroid, task.DotSize, cv.Scalar.Red, -1, task.lineType)
                     dst2.Rectangle(rect, cv.Scalar.Yellow, 2)
                 End If
             End If

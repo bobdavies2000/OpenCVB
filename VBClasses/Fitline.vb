@@ -51,7 +51,7 @@ Public Class FitLine_Conventional : Inherits TaskParent
         lp = New lpData(New cv.Point(0, leftY), New cv.Point(src.Cols - 1, rightY))
         If standaloneTest() Then
             dst2.SetTo(0)
-            vbc.DrawLine(dst2, lp.p1, lp.p2, cv.Scalar.Red)
+            dst2.Line(lp.p1, lp.p2, cv.Scalar.Red, task.lineWidth, task.lineType)
         End If
     End Sub
 End Class
@@ -99,7 +99,7 @@ Public Class NR_FitLine_Lines : Inherits TaskParent
                 lines.Add(p1)
                 lines.Add(p2)
             End If
-            vbc.DrawLine(dst2, p1, p2, cv.Scalar.Red)
+            dst2.Line(p1, p2, cv.Scalar.Red, task.lineWidth, task.lineType)
         Next
     End Sub
 End Class
@@ -128,7 +128,7 @@ Public Class NR_FitLine_Simple3D : Inherits TaskParent
             dst2.SetTo(0)
             ptList.Clear()
             For Each pt In random.PointList
-                DrawCircle(dst2, New cv.Point2f(pt.X, pt.Y), task.DotSize, cv.Scalar.Yellow)
+                dst2.Circle(New cv.Point2f(pt.X, pt.Y), task.DotSize, cv.Scalar.Yellow, -1, task.lineType)
                 ptList.Add(pt)
             Next
         End If
@@ -140,7 +140,7 @@ Public Class NR_FitLine_Simple3D : Inherits TaskParent
         Dim p2 = New cv.Point(dst2.Width, -dst2.Width * line.Vy / line.Vx + center.Y)
         Dim lp = New lpData(center, p2)
         lpResult = findEdgePoints(lp)
-        DrawLine(dst2, lpResult.p1, lpResult.p2)
+        dst2.Line(lpResult.p1, lpResult.p2, task.highlight, task.lineWidth, task.lineType)
         dst2.Circle(center, task.DotSize + 2, cv.Scalar.Blue, -1)
     End Sub
 End Class
@@ -167,7 +167,7 @@ Public Class NR_FitLine_Example2D : Inherits TaskParent
         Next
         fitLine.Run(src)
 
-        DrawLine(dst2, fitLine.lp.p1, fitLine.lp.p2)
+        dst2.Line(fitLine.lp.p1, fitLine.lp.p2, task.highlight, task.lineWidth, task.lineType)
         dst2.Circle(fitLine.center, task.DotSize + 2, cv.Scalar.Blue, -1)
     End Sub
 End Class
@@ -192,7 +192,7 @@ Public Class NR_FitLine_Basics_TA3D : Inherits TaskParent
             dst2.SetTo(0)
             ptList.Clear()
             For Each pt In noisyLine.PointList
-                DrawCircle(dst2, New cv.Point2f(pt.X, pt.Y), task.DotSize, task.highlight)
+                dst2.Circle(New cv.Point2f(pt.X, pt.Y), task.DotSize, task.highlight, -1, task.lineType)
                 ptList.Add(pt)
             Next
         End If
@@ -205,7 +205,7 @@ Public Class NR_FitLine_Basics_TA3D : Inherits TaskParent
         Dim p2 = New cv.Point(src.Width, line.Vy / line.Vx * src.Width + bb)
 
         lp = findEdgePoints(New lpData(p1, p2))
-        DrawLine(dst2, lp.p1, lp.p2)
+        dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
         dst2.Circle(New cv.Point2f(line.X1, line.Y1), task.DotSize + 2, cv.Scalar.Blue, -1)
     End Sub
 End Class

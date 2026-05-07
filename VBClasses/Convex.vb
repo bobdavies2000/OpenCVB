@@ -75,7 +75,7 @@ Public Class NR_Convex_RedColor : Inherits TaskParent
 
             dst3.SetTo(0)
             dst3(task.rcD.rect) = convex.dst2(New cv.Rect(0, 0, task.rcD.rect.Width, task.rcD.rect.Height))
-            DrawCircle(dst3, task.rcD.maxDist, task.DotSize, white)
+            dst3.Circle(task.rcD.maxDist, task.DotSize, white, -1, task.lineType)
         End If
     End Sub
 End Class
@@ -109,7 +109,7 @@ Public Class NR_Convex_Defects : Inherits TaskParent
         For Each v In defects
             dst3.Line(c(v(0)), c(v(2)), cv.Scalar.Red, task.lineWidth + 1, task.lineType)
             dst3.Line(c(v(1)), c(v(2)), cv.Scalar.Red, task.lineWidth + 1, task.lineType)
-            DrawCircle(dst3, c(v(2)), task.DotSize + 2, task.highlight)
+            dst3.Circle(c(v(2)), task.DotSize + 2, task.highlight, -1, task.lineType)
         Next
     End Sub
 End Class

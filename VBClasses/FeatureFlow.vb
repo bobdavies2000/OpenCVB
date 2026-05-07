@@ -35,7 +35,7 @@ Public Class FeatureFlow_Basics : Inherits TaskParent
         buildCorrelations(lastFeatures, feat.features)
 
         For Each pt In feat.features
-            DrawCircle(dst2, pt, task.DotSize, task.highlight)
+            dst2.Circle(pt, task.DotSize, task.highlight, -1, task.lineType)
         Next
         lastFeatures = New List(Of cv.Point)(feat.features)
     End Sub
@@ -83,8 +83,8 @@ Public Class FeatureFlow_LucasKanade : Inherits TaskParent
                     features.Add(pt1)
                     lastFeatures.Add(pt2)
                     dst2.Line(pt1, pt2, task.highlight, task.lineWidth + task.lineWidth, task.lineType)
-                    DrawCircle(dst3, pt1, task.DotSize + 3, white)
-                    DrawCircle(dst3, pt2, task.DotSize + 1, cv.Scalar.Red)
+                    dst3.Circle(pt1, task.DotSize + 3, white, -1, task.lineType)
+                    dst3.Circle(pt2, task.DotSize + 1, cv.Scalar.Red, -1, task.lineType)
                 End If
             End If
         Next

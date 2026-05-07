@@ -47,7 +47,7 @@ Public Class SVM_Basics : Inherits TaskParent
             For x = 1 To src.Height - 1
                 Dim y1 = CInt(sampleData.inputFunction(x - 1))
                 Dim y2 = CInt(sampleData.inputFunction(x))
-                vbc.DrawLine(dst3, New cv.Point2f(x - 1, y1), New cv.Point2f(x, y2), white)
+                dst3.Line(New cv.Point2f(x - 1, y1), New cv.Point2f(x, y2), white, task.lineWidth, task.lineType)
             Next
         End If
     End Sub
@@ -84,10 +84,10 @@ Public Class SVM_SampleData : Inherits TaskParent
             points.Add(New cv.Point2f(x, y))
             If y > inputFunction(x) Then
                 responses.Add(1)
-                DrawCircle(dst2, New cv.Point(x, y), 2, cv.Scalar.Red)
+                dst2.Circle(New cv.Point(x, y), 2, cv.Scalar.Red, -1, task.lineType)
             Else
                 responses.Add(-1)
-                DrawCircle(dst2, New cv.Point(x, y), 3, cv.Scalar.GreenYellow)
+                dst2.Circle(New cv.Point(x, y), 3, cv.Scalar.GreenYellow, -1, task.lineType)
             End If
         Next
     End Sub
@@ -145,15 +145,15 @@ Public Class NR_SVM_TestCase : Inherits TaskParent
                 sampleMat.Set(Of Single)(0, 1, y / src.Height)
                 Dim response = svm.Predict(sampleMat)
                 Dim color = If(response >= 0, cv.Scalar.Blue, cv.Scalar.Red)
-                DrawCircle(dst3, New cv.Point(CInt(x), CInt(y)), task.DotSize + 1, color)
+                dst3.Circle(New cv.Point(CInt(x), CInt(y)), task.DotSize + 1, color, -1, task.lineType)
             Next
         Next
 
         For i = 0 To trainMat.Rows - 1
             Dim color = If(labelsMat.Get(Of Integer)(i) = 1, cv.Scalar.Blue, cv.Scalar.Red)
             Dim pt = New cv.Point(trainMat.Get(Of Single)(i, 0), trainMat.Get(Of Single)(i, 1))
-            DrawCircle(dst2, pt, task.DotSize + 2, color)
-            DrawCircle(dst3, pt, task.DotSize + 2, color)
+            dst2.Circle(pt, task.DotSize + 2, color, -1, task.lineType)
+            dst3.Circle(pt, task.DotSize + 2, color, -1, task.lineType)
         Next
     End Sub
     Protected Overrides Sub Finalize()
@@ -207,8 +207,8 @@ Public Class NR_SVM_ReuseBasics : Inherits TaskParent
         dst2.SetTo(white)
         For i = 0 To svm.points.Count - 1
             Dim color = If(svm.response(i) = 1, cv.Scalar.Blue, cv.Scalar.Red)
-            DrawCircle(dst2, svm.points(i), task.DotSize, color)
-            DrawCircle(dst3, svm.points(i), task.DotSize, color)
+            dst2.Circle(svm.points(i), task.DotSize, color, -1, task.lineType)
+            dst3.Circle(svm.points(i), task.DotSize, color, -1, task.lineType)
         Next
     End Sub
 End Class
@@ -264,7 +264,7 @@ Public Class NR_SVM_ReuseRandom : Inherits TaskParent
 
                 svm.response.Add(res)
                 If res > 0 Then blueCount += 1
-                DrawCircle(dst2, pt, task.DotSize, If(res = 1, cv.Scalar.Blue, cv.Scalar.Green))
+                dst2.Circle(pt, task.DotSize, If(res = 1, cv.Scalar.Blue, cv.Scalar.Green), -1, task.lineType)
             Next
 
             svm.Run(src)

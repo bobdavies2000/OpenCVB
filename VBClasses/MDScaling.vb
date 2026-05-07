@@ -76,7 +76,7 @@ Public Class MDScaling_Cities : Inherits TaskParent
             Dim y = at(1, c)
             x = w * 0.1 + 0.7 * w * (x - minX) / (maxX - minX)
             y = h * 0.1 + 0.7 * h * (y - minY) / (maxY - minY)
-            DrawCircle(dst2, New cv.Point(x, y), task.DotSize + 3, cv.Scalar.Red)
+            dst2.Circle(New cv.Point(x, y), task.DotSize + 3, cv.Scalar.Red, -1, task.lineType)
             Dim textPos = New cv.Point(x + 5, y + 10)
             Dim cityName = Choose(c + 1, "Atlanta", "Chicago", "Denver", "Houston", "Los Angeles", "Miami", "New York", "San Francisco",
                                                  "Seattle", "Washington D.C.")

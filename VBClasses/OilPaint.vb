@@ -55,7 +55,7 @@ Public Class NR_OilPaint_Pointilism : Inherits TaskParent
                 If options.useElliptical Then
                     dst2(saveDrawRect).Ellipse(rotatedRect, nextColor)
                 Else
-                    DrawCircle(dst2(saveDrawRect), nPoint, slen / 4, nextColor)
+                    dst2(saveDrawRect).Circle(nPoint, slen / 4, nextColor, -1, task.lineType)
                 End If
             Next
         Next

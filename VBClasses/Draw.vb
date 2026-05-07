@@ -18,8 +18,8 @@ Public Class Draw_Noise : Inherits TaskParent
             Dim c = New cv.Scalar(msRNG.Next(0, 255), msRNG.Next(0, 255), msRNG.Next(0, 255))
             If addRandomColor = False Then c = cv.Scalar.Black
             Dim noiseWidth = msRNG.Next(1, options.noiseWidth)
-            DrawCircle(dst2, center, noiseWidth, c)
-            DrawCircle(noiseMask, center, noiseWidth, white)
+            dst2.Circle(center, noiseWidth, c, -1, task.lineType)
+            noiseMask.Circle(center, noiseWidth, white, -1, task.lineType)
         Next
     End Sub
 End Class
@@ -170,7 +170,7 @@ Public Class Draw_Shapes : Inherits TaskParent
                 Case 0 ' circle
                     Dim center = New cv.Point(msRNG.Next(offsetX, dst2.Cols - offsetX), msRNG.Next(offsetY + lineLength, dst2.Rows - offsetY))
                     Dim radius = msRNG.Next(1, Math.Min(offsetX, offsetY))
-                    DrawCircle(dst2, center, radius, color)
+                    dst2.Circle(center, radius, color, -1, task.lineType)
                 Case 1 ' Rectangle
                     Dim center = New cv.Point(msRNG.Next(offsetX, dst2.Cols - offsetX), msRNG.Next(offsetY + lineLength, dst2.Rows - offsetY))
                     Dim width = msRNG.Next(1, Math.Min(offsetX, offsetY))
@@ -251,7 +251,7 @@ Public Class Draw_Arc : Inherits TaskParent
         For i = 1 To pts.Length
             Dim index = i Mod pts.Length
             Dim pt = New cv.Point(CInt(pts(index).X), CInt(pts(index).Y))
-            vbc.DrawLine(dst2, pt, lastPt, task.highlight)
+            dst2.Line(pt, lastPt, task.highlight, task.lineWidth, task.lineType)
             lastPt = pt
         Next
     End Sub
@@ -371,9 +371,9 @@ Public Class Draw_Line : Inherits TaskParent
         If task.clickPoint <> New cv.Point Or externalUse Then
             If p1 = New cv.Point Then p1 = task.clickPoint Else p2 = task.clickPoint
         End If
-        If p1 <> newPoint And p2 = newPoint Then DrawCircle(dst2, p1, task.DotSize, task.highlight)
+        If p1 <> newPoint And p2 = newPoint Then dst2.Circle(p1, task.DotSize, task.highlight, -1, task.lineType)
         If p1 <> newPoint And p2 <> newPoint Then
-            vbc.DrawLine(dst2, p1, p2, task.highlight)
+            dst2.Line(p1, p2, task.highlight, task.lineWidth, task.lineType)
         End If
         SetTrueText("Click twice in the image to provide the points below and they will be connected with a line" + vbCrLf +
                         "P1 = " + p1.ToString + vbCrLf + "P2 = " + p2.ToString, 3)

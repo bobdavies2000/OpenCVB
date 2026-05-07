@@ -222,7 +222,7 @@ Public Class NR_Correlation_Basics : Inherits TaskParent
             For i = 0 To plotX.Count - 1
                 Dim x = dst3.Width * (plotX(i) - minx) / (maxx - minx)
                 Dim y = dst3.Height * (plotZ(i) - minZ) / (maxZ - minZ)
-                DrawCircle(dst3, New cv.Point(x, y), task.DotSize, cv.Scalar.Yellow)
+                dst3.Circle(New cv.Point(x, y), task.DotSize, cv.Scalar.Yellow, -1, task.lineType)
             Next
             SetTrueText("Z-min " + Format(minZ, fmt2), New cv.Point(10, 5), 3)
             SetTrueText("Z-max " + Format(maxZ, fmt2) + vbCrLf + vbTab + "X-min " + Format(minx, fmt2), New cv.Point(0, dst3.Height - 20), 3)

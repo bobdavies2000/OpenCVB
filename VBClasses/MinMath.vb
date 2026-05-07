@@ -15,7 +15,7 @@ Public Class NR_MinMath_Edges : Inherits TaskParent
         labels(3) = edges.labels(2)
 
         For Each bp In bPoints.ptList
-            DrawCircle(dst3, bp)
+            dst3.Circle(bp, task.DotSize, task.highlight, -1, task.lineType)
         Next
     End Sub
 End Class
@@ -44,7 +44,7 @@ Public Class NR_MinMath_EdgeLine : Inherits TaskParent
         For Each bp In bPoints.ptList
             Dim val = dst3.Get(Of Byte)(bp.Y, bp.X)
             If val = 0 Then Continue For
-            DrawCircle(dst3, bp, 255)
+            dst3.Circle(bp, task.DotSize, 255, -1, task.lineType)
         Next
     End Sub
 End Class
@@ -76,9 +76,9 @@ Public Class NR_MinMath_KNN : Inherits TaskParent
         For i = 0 To knn.neighbors.Count - 1
             Dim p1 = knn.queries(i)
             Dim p2 = knn.queries(knn.neighbors(i)(1))
-            DrawLine(dst2, p1, p2)
+            dst2.Line(p1, p2, task.highlight, task.lineWidth, task.lineType)
             Dim p3 = knn.queries(knn.neighbors(i)(2))
-            DrawLine(dst3, p1, p2)
+            dst3.Line(p1, p2, task.highlight, task.lineWidth, task.lineType)
         Next
     End Sub
 End Class

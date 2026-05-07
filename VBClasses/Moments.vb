@@ -29,7 +29,7 @@ Public Class Moments_Basics : Inherits TaskParent
         Else
             center = New cv.Point2f(m.M10 / m.M00, m.M01 / m.M00)
         End If
-        If standaloneTest() Then DrawCircle(dst2, center, task.DotSize + 5, cv.Scalar.Red)
+        If standaloneTest() Then dst2.Circle(center, task.DotSize + 5, cv.Scalar.Red, -1, task.lineType)
         centroid = New cv.Point2f(scaleFactor * (offsetPt.X + center.X), scaleFactor * (offsetPt.Y + center.Y))
     End Sub
 End Class
@@ -54,7 +54,7 @@ Public Class NR_Moments_CentroidKalman : Inherits TaskParent
             task.kalman.kInput(0) = m.M10 / m.M00
             task.kalman.kInput(1) = m.M01 / m.M00
             task.kalman.Run(emptyMat)
-            DrawCircle(dst2, New cv.Point(task.kalman.kOutput(0), task.kalman.kOutput(1)), task.DotSize + 5, cv.Scalar.Red)
+            dst2.Circle(New cv.Point(task.kalman.kOutput(0), task.kalman.kOutput(1)), task.DotSize + 5, cv.Scalar.Red, -1, task.lineType)
         End If
     End Sub
 End Class

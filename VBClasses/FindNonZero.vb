@@ -23,7 +23,7 @@ Public Class FindNonZero_Basics : Inherits TaskParent
             dst3 = New cv.Mat(src.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
             ' mark the points so they are visible...
             For i = 0 To ptMat.Rows - 1
-                DrawCircle(dst3, ptMat.Get(Of cv.Point)(0, i), task.DotSize, white)
+                dst3.Circle(ptMat.Get(Of cv.Point)(0, i), task.DotSize, white, -1, task.lineType)
             Next
 
             Dim outstr As String = "Coordinates of the non-zero points (ordered by row - top to bottom): " + vbCrLf + vbCrLf

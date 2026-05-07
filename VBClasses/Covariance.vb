@@ -12,7 +12,7 @@ Public Class Covariance_Basics : Inherits TaskParent
             random.Run(src)
             src = cv.Mat.FromPixelData(random.PointList.Count, 2, cv.MatType.CV_32F, random.PointList.ToArray)
             For i = 0 To random.PointList.Count - 1
-                DrawCircle(dst3, random.PointList(i), 3, white)
+                dst3.Circle(random.PointList(i), 3, white, -1, task.lineType)
             Next
         End If
         Dim samples2 = src.Reshape(2)
@@ -33,7 +33,7 @@ Public Class Covariance_Basics : Inherits TaskParent
 
         If standaloneTest() Then
             Static lastCenter As cv.Point2f = center
-            DrawCircle(dst3, center, 5, cv.Scalar.Red)
+            dst3.Circle(center, 5, cv.Scalar.Red, -1, task.lineType)
             dst3.Circle(lastCenter, 5, task.highlight, task.lineWidth + 1, task.lineType)
             dst3.Line(center, lastCenter, cv.Scalar.Red, task.lineWidth + 1, task.lineType)
             lastCenter = center

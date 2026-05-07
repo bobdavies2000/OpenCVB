@@ -183,7 +183,7 @@ Public Class HistValley_Peaks : Inherits TaskParent
         For Each index In sortPeaks.Keys
             Dim col = dst2.Width * index / task.histogramBins
             peaks.Add(index)
-            vbc.DrawLine(dst2, New cv.Point(col, 0), New cv.Point(col, dst2.Height / 10), white)
+            dst2.Line(New cv.Point(col, 0), New cv.Point(col, dst2.Height / 10), white, task.lineWidth, task.lineType)
         Next
         labels(2) = CStr(peaks.Count - 2) + " peaks (marked at top) were found in the histogram"
     End Sub
@@ -348,7 +348,7 @@ Public Class HistValley_OptionsAuto : Inherits TaskParent
                     histogram.Set(Of Single)(j, 0, index)
                 Next
                 Dim col = dst2.Width * entry.Value / task.histogramBins
-                vbc.DrawLine(dst2, New cv.Point(col, 0), New cv.Point(col, dst2.Height), white)
+                dst2.Line(New cv.Point(col, 0), New cv.Point(col, dst2.Height), white, task.lineWidth, task.lineType)
             Next
         End If
 
@@ -453,7 +453,7 @@ Public Class NR_HistValley_Simple : Inherits TaskParent
         Dim lastPoint As cv.Point = trends.resultingPoints(0)
         For i = 1 To trends.resultingPoints.Count - 1
             Dim p1 = trends.resultingPoints(i)
-            vbc.DrawLine(dst2, lastPoint, p1, cv.Scalar.Yellow)
+            dst2.Line(lastPoint, p1, cv.Scalar.Yellow, task.lineWidth, task.lineType)
             lastPoint = p1
         Next
         labels(2) = "Depth regions between 0 and " + CStr(CInt(task.MaxZmeters + 1)) + " meters"
@@ -523,7 +523,7 @@ Public Class NR_HistValley_Colors : Inherits TaskParent
                 hist.hist.histogram.Set(Of Single)(j, 0, index)
             Next
             Dim col = dst2.Width * entry.Value / task.histogramBins
-            vbc.DrawLine(dst2, New cv.Point(col, 0), New cv.Point(col, dst2.Height), white)
+            dst2.Line(New cv.Point(col, 0), New cv.Point(col, dst2.Height), white, task.lineWidth, task.lineType)
         Next
     End Sub
 End Class

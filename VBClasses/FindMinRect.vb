@@ -22,7 +22,7 @@ Public Class FindMinRect_Basics : Inherits TaskParent
         If standaloneTest() Then
             dst2.SetTo(0)
             For Each pt In inputPoints
-                DrawCircle(dst2, pt, task.DotSize + 2, cv.Scalar.Red)
+                dst2.Circle(pt, task.DotSize + 2, cv.Scalar.Red, -1, task.lineType)
             Next
             Draw_Arc.DrawRotatedOutline(minRect, dst2, cv.Scalar.Yellow)
         End If

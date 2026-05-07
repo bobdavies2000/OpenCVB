@@ -152,7 +152,7 @@ Public Class Cloud_SetupSide : Inherits TaskParent
         If src.Channels() <> 3 Then src = src.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
 
         If standaloneTest() Then dst2.SetTo(0) Else src.CopyTo(dst2)
-        DrawCircle(dst2, task.sideCameraPoint, task.DotSize, cv.Scalar.BlueViolet)
+        dst2.Circle(task.sideCameraPoint, task.DotSize, cv.Scalar.BlueViolet, -1, task.lineType)
         For i = 1 To task.MaxZmeters
             Dim xmeter = CInt(dst2.Width * i / task.MaxZmeters * distanceRatio)
             dst2.Line(New cv.Point(xmeter, 0), New cv.Point(xmeter, dst2.Height), cv.Scalar.AliceBlue, 1)
@@ -185,8 +185,8 @@ Public Class Cloud_SetupSide : Inherits TaskParent
                                                    (markerRight.Y - cam.Y) * Math.Cos(task.accRadians.Z) + (markerRight.X - cam.X) * Math.Sin(task.accRadians.Z) + cam.Y)
         End If
         If standaloneTest() = False Then
-            DrawCircle(dst2, markerLeft, task.DotSize, cv.Scalar.Red)
-            DrawCircle(dst2, markerRight, task.DotSize, cv.Scalar.Red)
+            dst2.Circle(markerLeft, task.DotSize, cv.Scalar.Red, -1, task.lineType)
+            dst2.Circle(markerRight, task.DotSize, cv.Scalar.Red, -1, task.lineType)
         End If
 
         ' draw the arc enclosing the camera FOV
@@ -199,8 +199,8 @@ Public Class Cloud_SetupSide : Inherits TaskParent
         dst2.Line(cam, fovTop, white, 1, task.lineType)
         dst2.Line(cam, fovBot, white, 1, task.lineType)
 
-        DrawCircle(dst2, markerLeft, task.DotSize + 3, cv.Scalar.Red)
-        DrawCircle(dst2, markerRight, task.DotSize + 3, cv.Scalar.Red)
+        dst2.Circle(markerLeft, task.DotSize + 3, cv.Scalar.Red, -1, task.lineType)
+        dst2.Circle(markerRight, task.DotSize + 3, cv.Scalar.Red, -1, task.lineType)
         dst2.Line(cam, markerLeft, cv.Scalar.Red, 1, task.lineType)
         dst2.Line(cam, markerRight, cv.Scalar.Red, 1, task.lineType)
 
@@ -226,7 +226,7 @@ Public Class Cloud_SetupTop : Inherits TaskParent
         If src.Channels() <> 3 Then src = src.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
 
         If standaloneTest() Then dst2.SetTo(0) Else src.CopyTo(dst2)
-        DrawCircle(dst2, task.topCameraPoint, task.DotSize, cv.Scalar.BlueViolet)
+        dst2.Circle(task.topCameraPoint, task.DotSize, cv.Scalar.BlueViolet, -1, task.lineType)
         For i = 1 To task.MaxZmeters
             Dim ymeter = CInt(dst2.Height - dst2.Height * i / (task.MaxZmeters * distanceRatio))
             dst2.Line(New cv.Point(0, ymeter), New cv.Point(dst2.Width, ymeter), cv.Scalar.AliceBlue, 1)
@@ -260,8 +260,8 @@ Public Class Cloud_SetupTop : Inherits TaskParent
 
         dst2.Line(task.topCameraPoint, fovLeft, white, 1, task.lineType)
 
-        DrawCircle(dst2, markerLeft, task.DotSize + 3, cv.Scalar.Red)
-        DrawCircle(dst2, markerRight, task.DotSize + 3, cv.Scalar.Red)
+        dst2.Circle(markerLeft, task.DotSize + 3, cv.Scalar.Red, -1, task.lineType)
+        dst2.Circle(markerRight, task.DotSize + 3, cv.Scalar.Red, -1, task.lineType)
         dst2.Line(cam, markerLeft, cv.Scalar.Red, 1, task.lineType)
         dst2.Line(cam, markerRight, cv.Scalar.Red, 1, task.lineType)
 

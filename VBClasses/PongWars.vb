@@ -105,10 +105,10 @@ Public Class PongWars_Basics : Inherits TaskParent
         Next
 
         Dim pt = New cv.Point(CInt(p1.x - sqWidth / 2), CInt(p1.y - sqHeight / 2))
-        DrawCircle(dst2, pt, task.DotSize + 5, task.scalarColors(DAY_BALL_COLOR))
+        dst2.Circle(pt, task.DotSize + 5, task.scalarColors(DAY_BALL_COLOR), -1, task.lineType)
 
         pt = New cv.Point(CInt(p2.x - sqWidth / 2), CInt(p2.y - sqHeight / 2))
-        DrawCircle(dst2, pt, task.DotSize + 5, task.scalarColors(NIGHT_BALL_COLOR))
+        dst2.Circle(pt, task.DotSize + 5, task.scalarColors(NIGHT_BALL_COLOR), -1, task.lineType)
     End Sub
 End Class
 

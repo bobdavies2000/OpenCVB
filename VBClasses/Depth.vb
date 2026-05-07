@@ -43,10 +43,10 @@ Public Class NR_Depth_FirstLastDistance : Inherits TaskParent
         desc = "Monitor the first and last depth distances"
     End Sub
     Private Sub identifyMinMax(pt As cv.Point, text As String)
-        DrawCircle(dst2, pt, task.DotSize, task.highlight)
+        dst2.Circle(pt, task.DotSize, task.highlight, -1, task.lineType)
         SetTrueText(text, pt, 2)
 
-        DrawCircle(dst3, pt, task.DotSize, task.highlight)
+        dst3.Circle(pt, task.DotSize, task.highlight, -1, task.lineType)
         SetTrueText(text, pt, 3)
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -179,13 +179,13 @@ Public Class NR_Depth_LocalMinMax_MT : Inherits TaskParent
                 minPoint(i) = New cv.Point(mm.minLoc.X + r.X, mm.minLoc.Y + r.Y)
                 maxPoint(i) = New cv.Point(mm.maxLoc.X + r.X, mm.maxLoc.Y + r.Y)
 
-                DrawCircle(dst2(r), mm.minLoc, task.DotSize, task.highlight)
-                DrawCircle(dst2(r), mm.maxLoc, task.DotSize, cv.Scalar.Red)
+                dst2(r).Circle(mm.minLoc, task.DotSize, task.highlight, -1, task.lineType)
+                dst2(r).Circle(mm.maxLoc, task.DotSize, cv.Scalar.Red, -1, task.lineType)
 
                 Dim p1 = New cv.Point(mm.minLoc.X + r.X, mm.minLoc.Y + r.Y)
                 Dim p2 = New cv.Point(mm.maxLoc.X + r.X, mm.maxLoc.Y + r.Y)
-                DrawCircle(dst3, p1, task.DotSize, task.highlight)
-                DrawCircle(dst3, p2, task.DotSize, cv.Scalar.Red)
+                dst3.Circle(p1, task.DotSize, task.highlight, -1, task.lineType)
+                dst3.Circle(p2, task.DotSize, cv.Scalar.Red, -1, task.lineType)
             End Sub)
     End Sub
 End Class
@@ -1164,8 +1164,8 @@ Public Class NR_Depth_MinMaxToVoronoi : Inherits TaskParent
         For Each brick In bricks.brickList
             Dim pt = brick.mm.minLoc
             subdiv.Insert(New cv.Point(pt.X + brick.rect.X, pt.Y + brick.rect.Y))
-            DrawCircle(dst1(brick.rect), brick.mm.minLoc, task.DotSize, cv.Scalar.Red)
-            DrawCircle(dst1(brick.rect), brick.mm.maxLoc, task.DotSize, cv.Scalar.Blue)
+            dst1(brick.rect).Circle(brick.mm.minLoc, task.DotSize, cv.Scalar.Red, -1, task.lineType)
+            dst1(brick.rect).Circle(brick.mm.maxLoc, task.DotSize, cv.Scalar.Blue, -1, task.lineType)
         Next
 
         If task.optionsChanged Then dst2 = dst1.Clone Else dst1.CopyTo(dst2, task.motion.motionMask)

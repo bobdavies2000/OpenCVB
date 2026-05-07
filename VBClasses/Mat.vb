@@ -37,7 +37,7 @@ Public Class NR_Mat_PointToMat : Inherits TaskParent
         random.Run(src)
         dst2.SetTo(0)
         For Each pt In random.PointList
-            DrawCircle(dst2, pt, task.DotSize, cv.Scalar.Yellow)
+            dst2.Circle(pt, task.DotSize, cv.Scalar.Yellow, -1, task.lineType)
         Next
 
         Dim rows = random.PointList.Count

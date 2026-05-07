@@ -70,15 +70,15 @@ Public Class Mesh_BasicsInput : Inherits TaskParent
             Dim ptLast = knn.queries(i)
             For j = 1 To options.nabeCount - 1
                 Dim pt = knn.queries(knn.result(i, j))
-                vbc.DrawLine(dst2, ptLast, pt, white)
+                dst2.Line(ptLast, pt, white, task.lineWidth, task.lineType)
                 ptLast = pt
             Next
         Next
 
         dst3.SetTo(0)
         For i = 0 To knn.queries.Count - 1
-            DrawCircle(dst2, knn.queries(i), task.DotSize, cv.Scalar.Red)
-            DrawCircle(dst3, knn.queries(i), task.DotSize, task.highlight)
+            dst2.Circle(knn.queries(i), task.DotSize, cv.Scalar.Red, -1, task.lineType)
+            dst3.Circle(knn.queries(i), task.DotSize, task.highlight, -1, task.lineType)
         Next
         labels(2) = "Triangles built each input point and its " + CStr(options.nabeCount) + " nearest neighbors."
     End Sub

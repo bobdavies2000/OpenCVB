@@ -203,16 +203,16 @@ Public Class NR_Entropy_SubDivisions : Inherits TaskParent
 
             Dim p1 = New cv.Point(0, dst2.Height / 3)
             Dim p2 = New cv.Point(dst2.Width, dst2.Height / 3)
-            vbc.DrawLine(dst0, p1, p2, white)
+            dst0.Line(p1, p2, white, task.lineWidth, task.lineType)
             p1 = New cv.Point(0, dst2.Height * 2 / 3)
             p2 = New cv.Point(dst2.Width, dst2.Height * 2 / 3)
-            vbc.DrawLine(dst0, p1, p2, white)
+            dst0.Line(p1, p2, white, task.lineWidth, task.lineType)
             p1 = New cv.Point(dst2.Width / 3, 0)
             p2 = New cv.Point(dst2.Width / 3, dst2.Height)
-            vbc.DrawLine(dst0, p1, p2, white)
+            dst0.Line(p1, p2, white, task.lineWidth, task.lineType)
             p1 = New cv.Point(dst2.Width * 2 / 3, 0)
             p2 = New cv.Point(dst2.Width * 2 / 3, dst2.Height)
-            vbc.DrawLine(dst0, p1, p2, white)
+            dst0.Line(p1, p2, white, task.lineWidth, task.lineType)
         End If
 
         dst2 = task.color.Clone

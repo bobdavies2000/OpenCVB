@@ -46,7 +46,7 @@ Public Class KLT_Basics : Inherits TaskParent
             Dim pt = outputMat.Get(Of cv.Point2f)(i)
             If pt.X >= 0 And pt.X <= src.Cols And pt.Y >= 0 And pt.Y <= src.Rows Then
                 If status.Get(Of Byte)(i) Then
-                    DrawCircle(dst2, pt, task.DotSize + 1, circleColor)
+                    dst2.Circle(pt, task.DotSize + 1, circleColor, -1, task.lineType)
                 End If
             Else
                 status.Set(Of Byte)(i, 0) ' this point is not visible!

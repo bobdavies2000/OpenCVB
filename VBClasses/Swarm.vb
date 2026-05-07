@@ -25,11 +25,11 @@ Public Class Swarm_Basics : Inherits TaskParent
             Dim pt = queries(i)
             For j = 0 To Math.Min(nabList.Count, options.ptCount) - 1
                 Dim ptNew = trainInput(nabList(j))
-                vbc.DrawLine(dst, pt, ptNew, white, task.lineWidth)
-                If ptNew.X < options.border Then vbc.DrawLine(dst, New cv.Point2f(0, ptNew.Y), ptNew, white, task.lineWidth)
-                If ptNew.Y < options.border Then vbc.DrawLine(dst, New cv.Point2f(ptNew.X, 0), ptNew, white, task.lineWidth)
-                If ptNew.X > dst.Width - options.border Then vbc.DrawLine(dst, New cv.Point2f(dst.Width, ptNew.Y), ptNew, white, task.lineWidth)
-                If ptNew.Y > dst.Height - options.border Then vbc.DrawLine(dst, New cv.Point2f(ptNew.X, dst.Height), ptNew, white, task.lineWidth)
+                dst.Line(pt, ptNew, white, task.lineWidth, task.lineType)
+                If ptNew.X < options.border Then dst.Line(New cv.Point2f(0, ptNew.Y), ptNew, white, task.lineWidth, task.lineType)
+                If ptNew.Y < options.border Then dst.Line(New cv.Point2f(ptNew.X, 0), ptNew, white, task.lineWidth, task.lineType)
+                If ptNew.X > dst.Width - options.border Then dst.Line(New cv.Point2f(dst.Width, ptNew.Y), ptNew, white, task.lineWidth, task.lineType)
+                If ptNew.Y > dst.Height - options.border Then dst.Line(New cv.Point2f(ptNew.X, dst.Height), ptNew, white, task.lineWidth, task.lineType)
             Next
         Next
         Return dst
@@ -60,7 +60,7 @@ Public Class Swarm_Basics : Inherits TaskParent
             Dim pt = knn.queries(i)
             Dim ptNew = knn.trainInput(trainIndex)
             Dim nextDist = pt.DistanceTo(ptNew)
-            vbc.DrawLine(dst2, pt, ptNew, white)
+            dst2.Line(pt, ptNew, white, task.lineWidth, task.lineType)
             disList.Add(nextDist)
             lpList.Add(New lpData(pt, ptNew))
             If nextDist > 0 Then

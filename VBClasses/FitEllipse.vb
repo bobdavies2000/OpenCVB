@@ -18,7 +18,7 @@ Public Class FitEllipse_Basics : Inherits TaskParent
 
         dst2.SetTo(0)
         For Each pt In inputPoints
-            DrawCircle(dst2, pt, task.DotSize, white)
+            dst2.Circle(pt, task.DotSize, white, -1, task.lineType)
         Next
 
         If inputPoints.Count > 4 Then
@@ -27,7 +27,7 @@ Public Class FitEllipse_Basics : Inherits TaskParent
             If standaloneTest() Then
                 For i = 0 To vertices.Count - 1
                     If Single.IsNaN(vertices(i).X) Or Single.IsNaN(vertices(i).Y) Then Exit Sub ' can't draw the result...
-                    vbc.DrawLine(dst2, vertices(i), vertices((i + 1) Mod 4), cv.Scalar.Green)
+                    dst2.Line(vertices(i), vertices((i + 1) Mod 4), cv.Scalar.Green, task.lineWidth, task.lineType)
                 Next
                 dst2.Ellipse(box, cv.Scalar.Green, task.lineWidth, task.lineType)
             End If
@@ -55,7 +55,7 @@ Public Class NR_FitEllipse_AMS_CPP : Inherits TaskParent
         End If
         dst2.SetTo(0)
         For Each pt In inputPoints
-            DrawCircle(dst2, pt, task.DotSize, white)
+            dst2.Circle(pt, task.DotSize, white, -1, task.lineType)
         Next
 
         Dim input As cv.Mat = cv.Mat.FromPixelData(inputPoints.Count, 1, cv.MatType.CV_32FC2, inputPoints.ToArray)
@@ -99,7 +99,7 @@ Public Class NR_FitEllipse_Direct_CPP : Inherits TaskParent
 
         dst2.SetTo(0)
         For Each pt In options.srcPoints
-            DrawCircle(dst2, pt, task.DotSize, white)
+            dst2.Circle(pt, task.DotSize, white, -1, task.lineType)
         Next
 
         Dim input As cv.Mat = cv.Mat.FromPixelData(options.srcPoints.Count, 1, cv.MatType.CV_32FC2, options.srcPoints.ToArray)
@@ -189,7 +189,7 @@ Public Class NR_FitEllipse_Rectangle : Inherits TaskParent
         rect = cv.Cv2.FitEllipse(ptList)
         vertices = rect.Points()
         For i = 0 To vertices.Count - 1
-            vbc.DrawLine(dst2, vertices(i), vertices((i + 1) Mod 4), 255)
+            dst2.Line(vertices(i), vertices((i + 1) Mod 4), 255, task.lineWidth, task.lineType)
         Next
     End Sub
 End Class

@@ -102,7 +102,7 @@ Public Class NR_Transform_Rotate : Inherits TaskParent
         imageCenter = New cv.Point2f(options.centerX, options.centerY)
         Dim rotationMat = cv.Cv2.GetRotationMatrix2D(imageCenter, options.angle, options.scale)
         cv.Cv2.WarpAffine(src, dst2, rotationMat, New cv.Size())
-        DrawCircle(dst2, imageCenter, task.DotSize * 2, cv.Scalar.Yellow)
-        DrawCircle(dst2, imageCenter, task.DotSize, cv.Scalar.Blue)
+        dst2.Circle(imageCenter, task.DotSize * 2, cv.Scalar.Yellow, -1, task.lineType)
+        dst2.Circle(imageCenter, task.DotSize, cv.Scalar.Blue, -1, task.lineType)
     End Sub
 End Class

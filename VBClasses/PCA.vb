@@ -253,7 +253,7 @@ Public Class NR_PCA_DrawImage : Inherits TaskParent
                 eigen_val(j) = pca_analysis.Eigenvalues.Get(Of Double)(0, j)
             Next
 
-            DrawCircle(dst3, cntr, task.DotSize + 1, cv.Scalar.BlueViolet)
+            dst3.Circle(cntr, task.DotSize + 1, cv.Scalar.BlueViolet, -1, task.lineType)
             Dim factor As Single = 0.02F ' scaling factor for the lines depicting the principal components.
             Dim ept1 = New cv.Point(cntr.X + factor * eigen_vecs(0).X * eigen_val(0), cntr.Y + factor * eigen_vecs(0).Y * eigen_val(0))
             Dim ept2 = New cv.Point(cntr.X - factor * eigen_vecs(1).X * eigen_val(1), cntr.Y - factor * eigen_vecs(1).Y * eigen_val(1))
@@ -1006,7 +1006,7 @@ Public Class PCA_LineMask : Inherits TaskParent
             pca.pca_analysis = New cv.PCA(findLine3D.vecMat, New cv.Mat, cv.PCA.Flags.DataAsRow)
             strOut = pca.displayResults() + vbCrLf
             strOut += "Anchor point " + lp.ptCenter.ToString + vbCrLf
-            DrawCircle(dst3, lp.ptCenter, 255)
+            dst3.Circle(lp.ptCenter, task.DotSize, 255, -1, task.lineType)
             dst3.Circle(lp.ptCenter, task.DotSize * 2, 255, -1, task.lineType)
         End If
 

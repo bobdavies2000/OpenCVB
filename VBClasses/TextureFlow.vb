@@ -17,7 +17,7 @@ Public Class TextureFlow_Basics : Inherits TaskParent
                 Dim delta = New cv.Point2f(split(4).Get(Of Single)(y, x), split(5).Get(Of Single)(y, x)) * options.TFdelta
                 Dim p1 = New cv.Point(CInt(x - delta.X), CInt(y - delta.Y))
                 Dim p2 = New cv.Point(CInt(x + delta.X), CInt(y + delta.Y))
-                vbc.DrawLine(dst2, p1, p2, white)
+                dst2.Line(p1, p2, white, task.lineWidth, task.lineType)
             Next
         Next
     End Sub

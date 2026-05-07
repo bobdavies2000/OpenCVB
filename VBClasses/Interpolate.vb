@@ -129,7 +129,7 @@ Public Class NR_Interpolate_Lines : Inherits TaskParent
         dst3 = src
 
         For Each lp In task.lines.lpList
-            vbc.DrawLine(dst3, lp.p1, lp.p2, cv.Scalar.Yellow)
+            dst3.Line(lp.p1, lp.p2, cv.Scalar.Yellow, task.lineWidth, task.lineType)
         Next
         labels(3) = "There were " + CStr(task.lines.lpList.Count) + " lines found"
         labels(2) = inter.labels(2)

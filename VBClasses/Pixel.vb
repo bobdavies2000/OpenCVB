@@ -318,7 +318,7 @@ Public Class NR_Pixel_SampleColor : Inherits TaskParent
             dst2 = src
             dst2.Rectangle(random.range, white, 1)
             For Each pt In random.PointList
-                DrawCircle(dst2, pt, task.DotSize, white)
+                dst2.Circle(pt, task.DotSize, white, -1, task.lineType)
             Next
             labels(2) = "Dominant color value = " + CStr(maskColor(0)) + ", " + CStr(maskColor(1)) + ", " + CStr(maskColor(2))
             SetTrueText("Draw in the image to select a region for testing.", New cv.Point(10, 200), 3)
@@ -471,7 +471,7 @@ Public Class NR_Pixel_NeighborsHorizontal : Inherits TaskParent
 
         dst2 = task.color.Clone
         For i = 0 To pt1.Count - 1
-            vbc.DrawLine(dst2, pt1(i), pt2(i), cv.Scalar.Yellow)
+            dst2.Line(pt1(i), pt2(i), cv.Scalar.Yellow, task.lineWidth, task.lineType)
         Next
         labels(2) = CStr(pt1.Count) + " z-values within " + Format(options.threshold * 1000, fmt0) + " mm's with X pixel offset " + CStr(options.pixels)
     End Sub
@@ -513,7 +513,7 @@ Public Class NR_Pixel_NeighborsVertical : Inherits TaskParent
 
         dst2 = task.color.Clone
         For i = 0 To pt1.Count - 1
-            vbc.DrawLine(dst2, pt1(i), pt2(i), cv.Scalar.Yellow)
+            dst2.Line(pt1(i), pt2(i), cv.Scalar.Yellow, task.lineWidth, task.lineType)
         Next
         labels(2) = CStr(pt1.Count) + " z-values within " + Format(options.threshold * 1000, fmt0) + " mm's with Y pixel offset " + CStr(options.pixels)
     End Sub
@@ -917,7 +917,7 @@ Public Class NR_Pixel_Sampler : Inherits TaskParent
             dst2 = src
             dst2.Rectangle(random.range, white, 1)
             For Each pt In random.PointList
-                DrawCircle(dst2, pt, task.DotSize, white)
+                dst2.Circle(pt, task.DotSize, white, -1, task.lineType)
             Next
             labels(2) = "Dominant gray value = " + CStr(dominantGray)
             SetTrueText("Draw in the image to select a region for testing.", New cv.Point(10, 200), 3)

@@ -142,7 +142,7 @@ Public Class NR_Grid_Basics_TATest : Inherits TaskParent
              Sub(i)
                  Dim r = task.gridRects(i)
                  cv.Cv2.Subtract(mean, src(r), dst3(r))
-                 vbc.DrawLine(dst3(r), New cv.Point(0, 0), New cv.Point(r.Width, r.Height), white)
+                 dst3(r).Line(New cv.Point(0, 0), New cv.Point(r.Width, r.Height), white, task.lineWidth, task.lineType)
              End Sub)
     End Sub
 End Class
@@ -279,8 +279,8 @@ Public Class NR_Grid_MinMaxDepth : Inherits TaskParent
             dst2.SetTo(0)
             For i = 0 To minMaxLocs.Count - 1
                 Dim lp = minMaxLocs(i)
-                DrawCircle(dst2(task.gridRects(i)), lp.p2, task.DotSize, cv.Scalar.Red)
-                DrawCircle(dst2(task.gridRects(i)), lp.p1, task.DotSize, white)
+                dst2(task.gridRects(i)).Circle(lp.p2, task.DotSize, cv.Scalar.Red, -1, task.lineType)
+                dst2(task.gridRects(i)).Circle(lp.p1, task.DotSize, white, -1, task.lineType)
             Next
             dst2.SetTo(white, task.gridMask)
         End If
@@ -317,10 +317,10 @@ Public Class NR_Grid_TrackCenter : Inherits TaskParent
         If standaloneTest() Then
             dst2 = src
             dst2.Rectangle(match.newRect, task.highlight, task.lineWidth + 1, task.lineType)
-            DrawCircle(dst2, center, task.DotSize, white)
+            dst2.Circle(center, task.DotSize, white, -1, task.lineType)
 
             If task.heartBeat Then dst3.SetTo(0)
-            DrawCircle(dst3, center, task.DotSize, task.highlight)
+            dst3.Circle(center, task.DotSize, task.highlight, -1, task.lineType)
             SetTrueText(Format(match.correlation, fmt3), center, 3)
 
             labels(3) = "Match correlation = " + Format(match.correlation, fmt3)

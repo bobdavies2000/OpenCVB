@@ -661,8 +661,8 @@ Public Class NR_IMU_VerticalAngles : Inherits TaskParent
             strOut += Format(task.accRadians.X * 57.2958, fmt1) + vbTab + Format(task.accRadians.Y * 57.2958, fmt1) + vbTab + Format(task.accRadians.Z * 57.2958, fmt1) + vbTab + vbCrLf
             SetTrueText(CStr(i), r.tc1.center, 2)
             SetTrueText(CStr(i), r.tc1.center, 3)
-            vbc.DrawLine(dst2, r.tc1.center, r.tc2.center, task.highlight)
-            vbc.DrawLine(dst3, r.tc1.center, r.tc2.center, white)
+            dst2.Line(r.tc1.center, r.tc2.center, task.highlight, task.lineWidth, task.lineType)
+            dst3.Line(r.tc1.center, r.tc2.center, white, task.lineWidth, task.lineType)
         Next
         SetTrueText(strOut, 3)
     End Sub
@@ -758,11 +758,11 @@ Public Class NR_IMU_Lines : Inherits TaskParent
 
             p1 = New cv.Point(task.kalman.kOutput(0), task.kalman.kOutput(1))
             p2 = New cv.Point(task.kalman.kOutput(2), task.kalman.kOutput(3))
-            DrawCircle(dst2, p1, task.DotSize, task.highlight)
-            DrawCircle(dst2, p2, task.DotSize, task.highlight)
-            DrawCircle(dst3, p1, task.DotSize, white)
+            dst2.Circle(p1, task.DotSize, task.highlight, -1, task.lineType)
+            dst2.Circle(p2, task.DotSize, task.highlight, -1, task.lineType)
+            dst3.Circle(p1, task.DotSize, white, -1, task.lineType)
 
-            DrawCircle(dst3, p2, task.DotSize, white)
+            dst3.Circle(p2, task.DotSize, white, -1, task.lineType)
             lastGcell = gcell
             strOut += CStr(0) + vbTab + Format(gcell.len3D, fmt1) + "m" + vbTab +
                                                     Format(gcell.tc1.depth, fmt1) + "m" + vbTab +
@@ -1266,8 +1266,8 @@ Public Class IMU_VerticalVerify : Inherits TaskParent
 
                 SetTrueText(CStr(index), r.tc1.center, 2)
                 SetTrueText(CStr(index), r.tc1.center, 3)
-                vbc.DrawLine(dst2, r.tc1.center, r.tc2.center, task.highlight)
-                vbc.DrawLine(dst3, r.tc1.center, r.tc2.center, white)
+                dst2.Line(r.tc1.center, r.tc2.center, task.highlight, task.lineWidth, task.lineType)
+                dst3.Line(r.tc1.center, r.tc2.center, white, task.lineWidth, task.lineType)
                 brickCells(i) = r
             Else
                 brickCells.RemoveAt(i)

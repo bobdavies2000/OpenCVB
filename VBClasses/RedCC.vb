@@ -164,7 +164,7 @@ Public Class NR_RedCC_CellHistogram : Inherits TaskParent
         Dim incr = dst2.Width / task.MaxZmeters
         For i = 1 To CInt(task.MaxZmeters - 1)
             Dim x = incr * i
-            vbc.DrawLine(dst3, New cv.Point(x, 0), New cv.Point(x, dst2.Height), cv.Scalar.White)
+            dst3.Line(New cv.Point(x, 0), New cv.Point(x, dst2.Height), cv.Scalar.White, task.lineWidth, task.lineType)
         Next
         dst3 = plot.dst2
     End Sub

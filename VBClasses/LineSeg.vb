@@ -93,7 +93,7 @@ Public Class LineSeg_Basics : Inherits TaskParent
         For i = 0 To lpList.Count - 1
             Dim lp = lpList(i)
             dst3.Line(lp.p1, lp.p2, 255, task.lineWidth, cv.LineTypes.Link4)
-            DrawLine(dst2, lp.p1, lp.p2, lp.color, task.lineWidth + 1)
+            dst2.Line(lp.p1, lp.p2, lp.color, task.lineWidth + 1, task.lineType)
         Next
 
         labels(2) = CStr(retainedPrior) + " prior line(s) kept (no motion), " +
@@ -132,7 +132,7 @@ Public Class LineSeg_Core : Inherits TaskParent
             Dim lp = lpList(i)
             lp.index = i
             dst1.Line(lp.p1, lp.p2, lp.index + 1, task.lineWidth, cv.LineTypes.Link4)
-            DrawLine(dst2, lp.p1, lp.p2, lp.color, task.lineWidth + 1)
+            dst2.Line(lp.p1, lp.p2, lp.color, task.lineWidth + 1, task.lineType)
         Next
         dst3 = dst1.Threshold(0, 255, cv.ThresholdTypes.Binary)
         labels(2) = CStr(lpList.Count) + " LSD line segments were detected."
@@ -219,7 +219,7 @@ Public Class LineSeg_BasicsFail : Inherits TaskParent
             Dim lp = lpList(i)
             lp.index = i
             dst3.Line(lp.p1, lp.p2, 255, task.lineWidth, cv.LineTypes.Link4)
-            DrawLine(dst2, lp.p1, lp.p2, lp.color, task.lineWidth + 1)
+            dst2.Line(lp.p1, lp.p2, lp.color, task.lineWidth + 1, task.lineType)
         Next
         labels(2) = CStr(lpList.Count) + " lines (retained when motion; updated from LSD when stable)."
         labels(3) = CStr(detected.Count) + " lines detected this frame from LineSeg_Basics."
@@ -338,7 +338,7 @@ Public Class LineSeg_LBD : Inherits TaskParent
         For i = 0 To lpList.Count - 1
             Dim lp = lpList(i)
             Dim color = task.scalarColors((lp.index + 1) Mod 255)
-            DrawLine(dst2, lp.p1, lp.p2, color, task.lineWidth + 1)
+            dst2.Line(lp.p1, lp.p2, color, task.lineWidth + 1, task.lineType)
         Next
 
         labels(2) = CStr(lpList.Count) + " LineSeg_Basics lines, " + CStr(DescriptorBytes) + " bytes LBD-style descriptor per line."
@@ -447,8 +447,8 @@ Public Class LineSeg_Match : Inherits TaskParent
 
         For k = 0 To lpList.Count - 1
             Dim c = task.scalarColors((k + 1) Mod 255)
-            DrawLine(dst2, lpList(k).p1, lpList(k).p2, c, task.lineWidth + 2)
-            DrawLine(dst3, lpPrevMatched(k).p1, lpPrevMatched(k).p2, c, task.lineWidth + 2)
+            dst2.Line(lpList(k).p1, lpList(k).p2, c, task.lineWidth + 2, task.lineType)
+            dst3.Line(lpPrevMatched(k).p1, lpPrevMatched(k).p2, c, task.lineWidth + 2, task.lineType)
         Next
 
         currDesc.CopyTo(descPrev)
@@ -609,7 +609,7 @@ Public Class LineSeg_Top3 : Inherits TaskParent
             Dim lp = currLp(li)
             lp.color = task.scalarColors(i)
             lpList.Add(lp)
-            DrawLine(dst2, lp.p1, lp.p2, lp.color, task.lineWidth + 2)
+            dst2.Line(lp.p1, lp.p2, lp.color, task.lineWidth + 2, task.lineType)
         Next
 
         labels(2) = CStr(lpList.Count) + " LineSeg_LBD line(s) tracked (heartBeatLT re-picks top 3 by length)."

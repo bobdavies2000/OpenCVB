@@ -370,7 +370,7 @@ Public Class NR_RedColor_Lines : Inherits TaskParent
         If task.heartBeat Then dst3.SetTo(0)
         Dim index As Integer
         For Each lp In task.lines.lpList
-            vbc.DrawLine(dst3, lp.p1, lp.p2, 255)
+            dst3.Line(lp.p1, lp.p2, 255, task.lineWidth, task.lineType)
             index += 1
             If index > 10 Then Exit For
         Next
@@ -447,7 +447,7 @@ Public Class NR_RedColor_LineSingle : Inherits TaskParent
             leftCenter = track.redC.rcList(leftMost).maxDist
             rightCenter = track.redC.rcList(rightmost).maxDist
 
-            vbc.DrawLine(dst2, leftCenter, rightCenter, white)
+            dst2.Line(leftCenter, rightCenter, white, task.lineWidth, task.lineType)
         End If
         labels(2) = track.redC.labels(2)
     End Sub
@@ -481,9 +481,9 @@ Public Class NR_RedColor_FeaturesKNN : Inherits TaskParent
             Dim index = knn.neighbors(i)(knn.neighbors(i).Count - 1)
             If index >= 0 And index < knn.ptListTrain.Count Then
                 Dim p2 = knn.ptListTrain(index)
-                DrawCircle(dst3, p1, task.DotSize, cv.Scalar.Yellow)
-                DrawCircle(dst3, p2, task.DotSize, cv.Scalar.Yellow)
-                vbc.DrawLine(dst3, p1, p2, white)
+                dst3.Circle(p1, task.DotSize, cv.Scalar.Yellow, -1, task.lineType)
+                dst3.Circle(p2, task.DotSize, cv.Scalar.Yellow, -1, task.lineType)
+                dst3.Line(p1, p2, white, task.lineWidth, task.lineType)
             End If
         Next
         knn.ptListTrain = New List(Of cv.Point)(knn.ptListQuery)
@@ -545,8 +545,8 @@ Public Class NR_RedColor_Points : Inherits TaskParent
         dst3.SetTo(0)
         Dim index As Integer
         For Each lp In task.lines.lpList
-            DrawCircle(dst3, lp.p1, task.DotSize, 255)
-            DrawCircle(dst3, lp.p2, task.DotSize, 255)
+            dst3.Circle(lp.p1, task.DotSize, 255, -1, task.lineType)
+            dst3.Circle(lp.p2, task.DotSize, 255, -1, task.lineType)
             index += 1
             If index >= 10 Then Exit For
         Next

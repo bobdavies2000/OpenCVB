@@ -153,8 +153,8 @@ Namespace VBClasses
                 lpGravity = New lpData(New cv.Point(xTop, 0), New cv.Point(xBot, dst2.Height))
 
                 dst2.SetTo(0)
-                vbc.DrawLine(dst2, lpGravity.p1, lpGravity.p2, task.highlight)
-                vbc.DrawLine(dst2, lpHorizon.p1, lpHorizon.p2, cv.Scalar.Red)
+                dst2.Line(lpGravity.p1, lpGravity.p2, task.highlight, task.lineWidth, task.lineType)
+                dst2.Line(lpHorizon.p1, lpHorizon.p2, cv.Scalar.Red, task.lineWidth, task.lineType)
             End If
         End Sub
     End Class
@@ -199,7 +199,7 @@ Namespace VBClasses
 
                 Dim lp = findEdgePoints(New lpData(p1, p2))
                 task.lpHorizon = New lpData(lp.p1, lp.p2)
-                vbc.DrawLine(dst2, task.lpHorizon.p1, task.lpHorizon.p2, 255)
+                dst2.Line(task.lpHorizon.p1, task.lpHorizon.p2, 255, task.lineWidth, task.lineType)
             End If
 
             dst3 = split(0).InRange(-0.01, 0.01)
@@ -222,7 +222,7 @@ Namespace VBClasses
                     Dim lp = findEdgePoints(New lpData(p1, p2))
                     task.lpGravity = New lpData(lp.p1, lp.p2)
                 End If
-                vbc.DrawLine(dst2, task.lpGravity.p1, task.lpGravity.p2, 255)
+                dst2.Line(task.lpGravity.p1, task.lpGravity.p2, 255, task.lineWidth, task.lineType)
             End If
         End Sub
     End Class
@@ -241,16 +241,16 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             dst2 = src
-            vbc.DrawLine(dst2, task.lpHorizon.p1, task.lpHorizon.p2, white)
+            dst2.Line(task.lpHorizon.p1, task.lpHorizon.p2, white, task.lineWidth, task.lineType)
 
             perp.input = task.lpHorizon
             perp.Run(src)
-            vbc.DrawLine(dst2, perp.output.p1, perp.output.p2, cv.Scalar.Yellow)
+            dst2.Line(perp.output.p1, perp.output.p2, cv.Scalar.Yellow, task.lineWidth, task.lineType)
 
             Dim gVec = task.lpGravity
             gVec.p1.X += 10
             gVec.p2.X += 10
-            vbc.DrawLine(dst2, gVec.p1, gVec.p2, white)
+            dst2.Line(gVec.p1, gVec.p2, white, task.lineWidth, task.lineType)
         End Sub
     End Class
 
@@ -301,10 +301,10 @@ Namespace VBClasses
             dst2.SetTo(0)
             For Each pt In points
                 pt = New cv.Point(pt.X * resizeRatio, pt.Y * resizeRatio)
-                DrawCircle(dst2, pt, task.DotSize, white)
+                dst2.Circle(pt, task.DotSize, white, -1, task.lineType)
             Next
 
-            vbc.DrawLine(dst2, vec.p1, vec.p2, 255)
+            dst2.Line(vec.p1, vec.p2, 255, task.lineWidth, task.lineType)
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             If src.Type <> cv.MatType.CV_32F Then dst0 = task.pcSplit(1) Else dst0 = src
@@ -425,11 +425,11 @@ Namespace VBClasses
             dst2.SetTo(0)
             dst3.SetTo(0)
             For Each pt In points
-                DrawCircle(dst2, pt, task.DotSize, white)
+                dst2.Circle(pt, task.DotSize, white, -1, task.lineType)
             Next
 
-            vbc.DrawLine(dst2, task.lpGravity.p1, task.lpGravity.p2, white)
-            vbc.DrawLine(dst3, task.lpGravity.p1, task.lpGravity.p2, white)
+            dst2.Line(task.lpGravity.p1, task.lpGravity.p2, white, task.lineWidth, task.lineType)
+            dst3.Line(task.lpGravity.p1, task.lpGravity.p2, white, task.lineWidth, task.lineType)
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             If src.Type <> cv.MatType.CV_32F Then dst0 = task.pcSplit(0) Else dst0 = src
@@ -688,8 +688,8 @@ Namespace VBClasses
             lpHorizon.p1 = RotatePoint(task.lpHorizon.p1, rotate.rotateCenter, -rotate.rotateAngle)
             lpHorizon.p2 = RotatePoint(task.lpHorizon.p2, rotate.rotateCenter, -rotate.rotateAngle)
 
-            vbc.DrawLine(dst2, lpHorizon.p1, lpHorizon.p2, task.highlight)
-            vbc.DrawLine(dst2, task.lpHorizon.p1, task.lpHorizon.p2, white)
+            dst2.Line(lpHorizon.p1, lpHorizon.p2, task.highlight, task.lineWidth, task.lineType)
+            dst2.Line(task.lpHorizon.p1, task.lpHorizon.p2, white, task.lineWidth, task.lineType)
 
             Dim y1 = lpHorizon.p1.Y - task.lpHorizon.p1.Y
             Dim y2 = lpHorizon.p2.Y - task.lpHorizon.p2.Y
@@ -750,7 +750,7 @@ Namespace VBClasses
 
             If standaloneTest() Then
                 dst2.SetTo(0)
-                vbc.DrawLine(dst2, vec.p1, vec.p2, 255)
+                dst2.Line(vec.p1, vec.p2, 255, task.lineWidth, task.lineType)
             End If
         End Sub
     End Class
@@ -806,8 +806,8 @@ Namespace VBClasses
             For i = 0 To minList.Count - 1
                 Dim ptMin = minList(i)
                 subdiv.Insert(ptMin)
-                DrawCircle(dst1, ptMin, task.DotSize, cv.Scalar.Red)
-                DrawCircle(dst1, maxList(i), task.DotSize, cv.Scalar.Blue)
+                dst1.Circle(ptMin, task.DotSize, cv.Scalar.Red, -1, task.lineType)
+                dst1.Circle(maxList(i), task.DotSize, cv.Scalar.Blue, -1, task.lineType)
             Next
 
             If task.optionsChanged Then dst2 = dst1.Clone Else dst1.CopyTo(dst2, task.motion.motionMask)
@@ -917,7 +917,7 @@ Namespace VBClasses
                 Dim p1 As New cv.Point2f(CSng(Math.Round(pt.Pt.X * resizeFactor)), CSng(Math.Round(pt.Pt.Y * resizeFactor)))
                 If lastPoints.Contains(p1) Then
                     stablePoints.Add(p1)
-                    DrawCircle(dst2, p1, task.DotSize, New cv.Scalar(0, 0, 255))
+                    dst2.Circle(p1, task.DotSize, New cv.Scalar(0, 0, 255), -1, task.lineType)
                 End If
             Next
             lastPoints = New List(Of cv.Point2f)(stablePoints)
@@ -1061,7 +1061,7 @@ Namespace VBClasses
                         Dim lpNew = combine2Lines(lp, mp)
                         If lpNew IsNot Nothing Then
                             addList.Add(lpNew)
-                            vbc.DrawLine(dst2, lpNew.p1, lpNew.p2, task.highlight)
+                            dst2.Line(lpNew.p1, lpNew.p2, task.highlight, task.lineWidth, task.lineType)
                             If removeList.Values.Contains(j) = False Then removeList.Add(j, j)
                             lpRemove = True
                             combineCount += 1
@@ -1155,7 +1155,7 @@ Namespace VBClasses
             dst1.SetTo(0)
             Dim p1 = tcells(0).center
             Dim p2 = tcells(1).center
-            vbc.DrawLine(dst1, p1, p2, 255)
+            dst1.Line(p1, p2, 255, task.lineWidth, task.lineType)
 
             dst3.SetTo(0)
             blur.dst2.Threshold(1, 255, cv.ThresholdTypes.Binary).CopyTo(dst3, dst1)
@@ -1169,7 +1169,7 @@ Namespace VBClasses
             Next
 
             strOut = "Mask count = " + CStr(maskCount) + ", Expected count = " + CStr(distance) + " or " + Format(maskCount / distance, "0%") + vbCrLf
-            vbc.DrawLine(dst2, p1, p2, task.highlight)
+            dst2.Line(p1, p2, task.highlight, task.lineWidth, task.lineType)
 
             strOut += "Color changes when correlation falls below threshold and new line is detected." + vbCrLf +
                           "Correlation coefficient is shown with the depth in meters."
@@ -1374,9 +1374,9 @@ Namespace VBClasses
             If onTheLine = False Then nearPoint = If(distance1 < distance2, lp.p1, lp.p2)
             If standaloneTest() Then
                 dst2.SetTo(0)
-                vbc.DrawLine(dst2, lp.p1, lp.p2, cv.Scalar.Yellow)
-                vbc.DrawLine(dst2, pt, nearPoint, white)
-                DrawCircle(dst2, pt, task.DotSize, white)
+                dst2.Line(lp.p1, lp.p2, cv.Scalar.Yellow, task.lineWidth, task.lineType)
+                dst2.Line(pt, nearPoint, white, task.lineWidth, task.lineType)
+                dst2.Circle(pt, task.DotSize, white, -1, task.lineType)
             End If
             distance = Math.Sqrt(Math.Pow(pt.X - nearPoint.X, 2) + Math.Pow(pt.Y - nearPoint.Y, 2))
         End Sub
@@ -1409,8 +1409,8 @@ Namespace VBClasses
             For i = 0 To frameList.Count - 1
                 lineTotal += frameList(i).Count
                 For Each lp In frameList(i)
-                    vbc.DrawLine(dst2, lp.p1, lp.p2, cv.Scalar.Yellow)
-                    vbc.DrawLine(dst3, lp.p1, lp.p2, white)
+                    dst2.Line(lp.p1, lp.p2, cv.Scalar.Yellow, task.lineWidth, task.lineType)
+                    dst3.Line(lp.p1, lp.p2, white, task.lineWidth, task.lineType)
                     lpList.Add(lp)
                 Next
             Next
@@ -1468,7 +1468,7 @@ Namespace VBClasses
 
             dst3.SetTo(0)
             For Each lp In lines.lpList
-                vbc.DrawLine(dst3, lp.p1, lp.p2, white)
+                dst3.Line(lp.p1, lp.p2, white, task.lineWidth, task.lineType)
             Next
         End Sub
     End Class
@@ -1540,7 +1540,7 @@ Namespace VBClasses
                 p2 = New cv.Point(task.kalman.kOutput(2), task.kalman.kOutput(3))
             End If
             frameCount += 1
-            vbc.DrawLine(dst2, p1, p2, gradientColors(frameCount Mod gradientColors.Count))
+            dst2.Line(p1, p2, gradientColors(frameCount Mod gradientColors.Count), task.lineWidth, task.lineType)
         End Sub
     End Class
 
@@ -1590,7 +1590,7 @@ Namespace VBClasses
                         lp.p2 = New cv.Point(mmY.maxLoc.X + rect.X, mmY.maxLoc.Y + rect.Y)
                     End If
                     If lp.p1.DistanceTo(lp.p2) > 1 Then
-                        vbc.DrawLine(dst3, lp.p1, lp.p2, cv.Scalar.Yellow)
+                        dst3.Line(lp.p1, lp.p2, cv.Scalar.Yellow, task.lineWidth, task.lineType)
                         p1List.Add(lp.p1)
                         p2List.Add(lp.p2)
                         z1List.Add(task.pointCloud.Get(Of cv.Point3f)(lp.p1.Y, lp.p1.X))
@@ -1863,9 +1863,9 @@ Namespace VBClasses
                 If color(0) = 1 Then p2 = New cv.Point((dst3.Height - b) / m, dst3.Height) ' green
                 If color(0) = 2 Then p2 = New cv.Point(dst3.Width, dst3.Width * m + b) ' yellow
                 If color(0) = 254 Then p2 = New cv.Point(0, b) ' blue
-                vbc.DrawLine(dst3, center, p2, cv.Scalar.Black)
+                dst3.Line(center, p2, cv.Scalar.Black, task.lineWidth, task.lineType)
             End If
-            DrawCircle(dst3, center, task.DotSize, white)
+            dst3.Circle(center, task.DotSize, white, -1, task.lineType)
             If color(0) = 0 Then redRadio.Checked = True
             If color(0) = 1 Then greenRadio.Checked = True
             If color(0) = 2 Then yellowRadio.Checked = True
@@ -2108,7 +2108,7 @@ Namespace VBClasses
                     If vec.Z > 0 Then
                         If (Math.Abs(lastVec.Z - vec.Z) < options.deltaThreshold And lastVec.X < vec.X) Or lastVec.Z = 0 Then
                             actualCount += 1
-                            DrawCircle(dst2, New cv.Point(x, y), task.DotSize, white)
+                            dst2.Circle(New cv.Point(x, y), task.DotSize, white, -1, task.lineType)
                             vecList.Add(vec)
                             xyVec.Add(New cv.Point(x, y))
                         Else
@@ -2140,7 +2140,7 @@ Namespace VBClasses
                     If vec.Z > 0 Then
                         If (Math.Abs(lastVec.Z - vec.Z) < options.deltaThreshold And lastVec.Y < vec.Y) Or lastVec.Z = 0 Then
                             actualCount += 1
-                            DrawCircle(dst2, New cv.Point(x, y), task.DotSize, white)
+                            dst2.Circle(New cv.Point(x, y), task.DotSize, white, -1, task.lineType)
                             vecList.Add(vec)
                             xyVec.Add(New cv.Point(x, y))
                         Else
@@ -2218,7 +2218,7 @@ Namespace VBClasses
             For Each ptlist In xyList
                 Dim p1 = ptlist(0)
                 Dim p2 = ptlist(ptlist.Count - 1)
-                vbc.DrawLine(dst2, p1, p2, white)
+                dst2.Line(p1, p2, white, task.lineWidth, task.lineType)
             Next
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -2419,7 +2419,7 @@ Namespace VBClasses
 
                         pcPoints.Set(Of cv.Point3f)(y, x, New cv.Point3f(mean(0), mean(1), mean(2)))
                         actualCount += 1
-                        DrawCircle(dst2, New cv.Point(gRect.X, gRect.Y), task.DotSize * Math.Max(mean(2), 1), white)
+                        dst2.Circle(New cv.Point(gRect.X, gRect.Y), task.DotSize * Math.Max(mean(2), 1), white, -1, task.lineType)
                     End If
                     lastMeanZ = mean(2)
                 Next
@@ -2453,7 +2453,7 @@ Namespace VBClasses
                 If mean(2) > 0 Then
                     pcPoints.Add(Choose(pt.Y Mod 3 + 1, red32, blue32, white32))
                     pcPoints.Add(New cv.Point3f(mean(0), mean(1), mean(2)))
-                    DrawCircle(dst2, pt, task.DotSize, Choose(CInt(pt.Y) Mod 3 + 1, red, blue, cv.Scalar.White))
+                    dst2.Circle(pt, task.DotSize, Choose(CInt(pt.Y) Mod 3 + 1, red, blue, cv.Scalar.White), -1, task.lineType)
                 End If
             Next
             labels(2) = "PointCloud Point Points found = " + CStr(pcPoints.Count / 2)
@@ -2838,7 +2838,7 @@ Namespace VBClasses
                     Dim len3D = Distance_Basics.distance3D(pt1, pt2)
                     Dim arcY = Math.Abs(Math.Asin((pt1.Y - pt2.Y) / len3D) * 57.2958)
                     If Math.Abs(arcY - 90) < options.tolerance Then
-                        vbc.DrawLine(dst3, raw2D(i).p1, raw2D(i).p2, cv.Scalar.Blue)
+                        dst3.Line(raw2D(i).p1, raw2D(i).p2, cv.Scalar.Blue, task.lineWidth, task.lineType)
                         sortedVerticals.Add(len3D, lines3D.Count)
                         sorted2DV.Add(raw2D(i).p1.DistanceTo(raw2D(i).p2), lines2D.Count)
                         If pt1.Y > pt2.Y Then
@@ -2854,7 +2854,7 @@ Namespace VBClasses
                         End If
                     End If
                     If Math.Abs(arcY) < options.tolerance Then
-                        vbc.DrawLine(dst3, raw2D(i).p1, raw2D(i).p2, cv.Scalar.Yellow)
+                        dst3.Line(raw2D(i).p1, raw2D(i).p2, cv.Scalar.Yellow, task.lineWidth, task.lineType)
                         sortedHorizontals.Add(len3D, lines3D.Count)
                         If pt1.X < pt2.X Then
                             lines3D.Add(pt1)
@@ -2992,7 +2992,7 @@ Namespace VBClasses
                 SetTrueText(CStr(index) + vbCrLf + Format(gRect.arcY, fmt1), pt, 3)
                 index += 1
 
-                vbc.DrawLine(dst3, p1, p2, task.highlight)
+                dst3.Line(p1, p2, task.highlight, task.lineWidth, task.lineType)
                 longest.knn.trainInput.Add(p1)
                 longest.knn.trainInput.Add(p2)
             Next
@@ -3026,9 +3026,9 @@ Namespace VBClasses
             Dim index = lines.sortedVerticals.ElementAt(0).Value
             Dim p1 = lines.lines2D(index)
             Dim p2 = lines.lines2D(index + 1)
-            vbc.DrawLine(dst2, p1, p2, task.highlight)
+            dst2.Line(p1, p2, task.highlight, task.lineWidth, task.lineType)
             dst3.SetTo(0)
-            vbc.DrawLine(dst3, p1, p2, task.highlight)
+            dst3.Line(p1, p2, task.highlight, task.lineWidth, task.lineType)
         End Sub
     End Class
 
@@ -3077,9 +3077,9 @@ Namespace VBClasses
             Dim p2 = New cv.Point2f(knn.trainInput(index)(2), knn.trainInput(index)(3))
             pt1 = match3D(index * 2)
             pt2 = match3D(index * 2 + 1)
-            vbc.DrawLine(dst2, p1, p2, task.highlight)
+            dst2.Line(p1, p2, task.highlight, task.lineWidth, task.lineType)
             dst3.SetTo(0)
-            vbc.DrawLine(dst3, p1, p2, task.highlight)
+            dst3.Line(p1, p2, task.highlight, task.lineWidth, task.lineType)
 
             Static lastLength = lines.sorted2DV.ElementAt(0).Key
             Dim bestLength = lines.sorted2DV.ElementAt(0).Key
@@ -3121,9 +3121,9 @@ Namespace VBClasses
             Dim index = lines.sortedVerticals.ElementAt(0).Value
             Dim p1 = lines.lines2D(index)
             Dim p2 = lines.lines2D(index + 1)
-            vbc.DrawLine(dst2, p1, p2, task.highlight)
+            dst2.Line(p1, p2, task.highlight, task.lineWidth, task.lineType)
             dst3.SetTo(0)
-            vbc.DrawLine(dst3, p1, p2, task.highlight)
+            dst3.Line(p1, p2, task.highlight, task.lineWidth, task.lineType)
             Dim pt1 = lines.lines3D(index)
             Dim pt2 = lines.lines3D(index + 1)
             Dim len3D = Distance_Basics.distance3D(pt1, pt2)
@@ -3180,7 +3180,7 @@ Namespace VBClasses
             pt2 = lines.lines3D(knn.lastIndex + 1)
 
             dst3 = lines.dst3
-            vbc.DrawLine(dst2, knn.lastP1, knn.lastP2, task.highlight)
+            dst2.Line(knn.lastP1, knn.lastP2, task.highlight, task.lineWidth, task.lineType)
         End Sub
     End Class
 
@@ -3210,12 +3210,12 @@ Namespace VBClasses
             For i = 0 To lines.sortedHorizontals.Count - 1
                 Dim index = lines.sortedHorizontals.ElementAt(i).Value
                 Dim p1 = lines.lines2D(index), p2 = lines.lines2D(index + 1)
-                vbc.DrawLine(dst3, p1, p2, cv.Scalar.Yellow)
+                dst3.Line(p1, p2, cv.Scalar.Yellow, task.lineWidth, task.lineType)
             Next
             For i = 0 To lines.sortedVerticals.Count - 1
                 Dim index = lines.sortedVerticals.ElementAt(i).Value
                 Dim p1 = lines.lines2D(index), p2 = lines.lines2D(index + 1)
-                vbc.DrawLine(dst3, p1, p2, cv.Scalar.Blue)
+                dst3.Line(p1, p2, cv.Scalar.Blue, task.lineWidth, task.lineType)
             Next
             labels(3) = CStr(lines.sortedVerticals.Count) + " vertical and " + CStr(lines.sortedHorizontals.Count) + " horizontal lines identified in the RedCloud output"
         End Sub
@@ -3243,7 +3243,7 @@ Namespace VBClasses
             If standaloneTest() Then dst3 = task.lines.dst2
 
             nearest.lp = task.lpGravity
-            vbc.DrawLine(dst2, task.lpGravity.p1, task.lpGravity.p2, white)
+            dst2.Line(task.lpGravity.p1, task.lpGravity.p2, white, task.lineWidth, task.lineType)
             For Each lp In task.lines.lpList
                 Dim ptInter = Line_Intersection.IntersectTest(lp.p1, lp.p2, task.lpGravity.p1, task.lpGravity.p2)
                 If ptInter.X >= 0 And ptInter.X < dst2.Width And ptInter.Y >= 0 And ptInter.Y < dst2.Height Then
@@ -3259,11 +3259,11 @@ Namespace VBClasses
                 Dim d2 = nearest.distance
 
                 If Math.Abs(d1 - d2) <= pixelDiff Then
-                    vbc.DrawLine(dst2, lp.p1, lp.p2, task.highlight)
+                    dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
                 End If
             Next
 
-            vbc.DrawLine(dst2, task.lpHorizon.p1, task.lpHorizon.p2, white)
+            dst2.Line(task.lpHorizon.p1, task.lpHorizon.p2, white, task.lineWidth, task.lineType)
             nearest.lp = task.lpHorizon
             For Each lp In task.lines.lpList
                 Dim ptInter = Line_Intersection.IntersectTest(lp.p1, lp.p2, task.lpHorizon.p1, task.lpHorizon.p2)
@@ -3278,7 +3278,7 @@ Namespace VBClasses
                 Dim d2 = nearest.distance
 
                 If Math.Abs(d1 - d2) <= pixelDiff Then
-                    vbc.DrawLine(dst2, lp.p1, lp.p2, cv.Scalar.Red)
+                    dst2.Line(lp.p1, lp.p2, cv.Scalar.Red, task.lineWidth, task.lineType)
                 End If
             Next
             labels(2) = "Slope for gravity is " + Format(task.lpGravity.slope, fmt1) + ".  Slope for horizon is " +
@@ -3375,9 +3375,9 @@ Namespace VBClasses
                     Dim index = lines.sortedVerticals.ElementAt(i).Value
                     Dim p1 = lines.lines2D(index)
                     Dim p2 = lines.lines2D(index + 1)
-                    vbc.DrawLine(dst2, p1, p2, task.highlight)
+                    dst2.Line(p1, p2, task.highlight, task.lineWidth, task.lineType)
                     SetTrueText(CStr(i), If(i Mod 2, p1, p2), 2)
-                    vbc.DrawLine(dst3, p1, p2, task.highlight)
+                    dst3.Line(p1, p2, task.highlight, task.lineWidth, task.lineType)
 
                     Dim pt1 = lines.lines3D(index)
                     Dim pt2 = lines.lines3D(index + 1)
@@ -3442,9 +3442,9 @@ Namespace VBClasses
             match.Run(src)
             If match.correlation >= task.fCorrThreshold Then
                 dst3 = match.dst0.Resize(dst3.Size)
-                vbc.DrawLine(dst2, p1, p2, task.highlight)
-                DrawCircle(dst2, p1, task.DotSize, task.highlight)
-                DrawCircle(dst2, p2, task.DotSize, task.highlight)
+                dst2.Line(p1, p2, task.highlight, task.lineWidth, task.lineType)
+                dst2.Circle(p1, task.DotSize, task.highlight, -1, task.lineType)
+                dst2.Circle(p2, task.DotSize, task.highlight, -1, task.lineType)
                 rect = ValidateRect(New cv.Rect(Math.Min(p1.X, p2.X), Math.Min(p1.Y, p2.Y), Math.Abs(p1.X - p2.X) + 2, Math.Abs(p1.Y - p2.Y)))
                 match.template = src(rect).Clone
             Else
@@ -3495,9 +3495,9 @@ Namespace VBClasses
             p2 = match2.newCenter
 
             gline = glines.updateGLine(src, gline, p1, p2)
-            vbc.DrawLine(dst2, p1, p2, task.highlight)
-            DrawCircle(dst2, p1, task.DotSize, task.highlight)
-            DrawCircle(dst2, p2, task.DotSize, task.highlight)
+            dst2.Line(p1, p2, task.highlight, task.lineWidth, task.lineType)
+            dst2.Circle(p1, task.DotSize, task.highlight, -1, task.lineType)
+            dst2.Circle(p2, task.DotSize, task.highlight, -1, task.lineType)
             SetTrueText(Format(match1.correlation, fmt3), p1)
             SetTrueText(Format(match2.correlation, fmt3), p2)
         End Sub
@@ -3902,7 +3902,7 @@ Namespace VBClasses
             labels(2) = "Current slice is at row =" + CStr(task.mouseMovePoint.Y)
             labels(3) = "Ceiling is at row =" + CStr(CInt(task.kalman.kOutput(1))) + " floor at y=" + CStr(CInt(task.kalman.kOutput(0)))
 
-            vbc.DrawLine(dst2, New cv.Point(0, floorY), New cv.Point(dst2.Width, floorY), cv.Scalar.Yellow)
+            dst2.Line(New cv.Point(0, floorY), New cv.Point(dst2.Width, floorY), cv.Scalar.Yellow, task.lineWidth, task.lineType)
             SetTrueText("floor", New cv.Point(10, floorY + task.DotSize), 3)
 
             Dim rect = New cv.Rect(0, Math.Max(ceilingY - 5, 0), dst2.Width, 10)
@@ -3910,7 +3910,7 @@ Namespace VBClasses
             Dim mean As cv.Scalar, stdev As cv.Scalar
             cv.Cv2.MeanStdDev(mask, mean, stdev)
             If mean(0) < mean(2) Then
-                vbc.DrawLine(dst2, New cv.Point(0, ceilingY), New cv.Point(dst2.Width, ceilingY), cv.Scalar.Yellow)
+                dst2.Line(New cv.Point(0, ceilingY), New cv.Point(dst2.Width, ceilingY), cv.Scalar.Yellow, task.lineWidth, task.lineType)
                 SetTrueText("ceiling", New cv.Point(10, ceilingY + task.DotSize), 3)
             Else
                 SetTrueText("Ceiling does not appear to be present", 3)
@@ -4038,7 +4038,7 @@ Namespace VBClasses
 
                 'Dim topPt = topsList(tops.IndexOf(tops.Min))
                 'Dim botPt = botsList(bots.IndexOf(bots.Max))
-                'DrawCircle(dst3,New cv.Point2f((topPt.X + botPt.X) / 2, (topPt.Y + botPt.Y) / 2), task.DotSize + 5, cv.Scalar.Red)
+                'dst3.Circle(New cv.Point2f((topPt.X + botPt.X) / 2, (topPt.Y + botPt.Y) / 2), task.DotSize + 5, cv.Scalar.Red, -1, task.lineType)
                 'dst3.Line(topPt, botPt, cv.Scalar.Red, task.lineWidth, task.lineType)
                 'DrawLine(dst2,topPt, botPt, task.highlight, task.lineWidth + 2, task.lineType)
             End If
@@ -4203,7 +4203,7 @@ Namespace VBClasses
             For i = 0 To corners.Count - 1
                 Dim nextColor = sides.cornerColors(i)
                 Dim nextLabel = sides.cornerNames(i)
-                vbc.DrawLine(dst3, task.rcD.maxDist, corners(i), white)
+                dst3.Line(task.rcD.maxDist, corners(i), white, task.lineWidth, task.lineType)
                 SetTrueText(nextLabel, New cv.Point(corners(i).X, corners(i).Y), 3)
             Next
 
@@ -4230,7 +4230,7 @@ Namespace VBClasses
             End If
 
             dst3.SetTo(0)
-            DrawCircle(dst3, rc.maxDist, task.DotSize, white)
+            dst3.Circle(rc.maxDist, task.DotSize, white, -1, task.lineType)
             Dim center As New cv.Point(rc.maxDist.X - rc.rect.X, rc.maxDist.Y - rc.rect.Y)
             Dim maxDistance(4 - 1) As Single
             For i = 0 To corners.Length - 1
@@ -4252,7 +4252,7 @@ Namespace VBClasses
 
             DrawTour(dst3(rc.rect), rc.contour, white)
             For i = 0 To corners.Count - 1
-                vbc.DrawLine(dst3(rc.rect), center, corners(i), white)
+                dst3(rc.rect).Line(center, corners(i), white, task.lineWidth, task.lineType)
             Next
         End Sub
     End Class
@@ -5224,9 +5224,9 @@ Namespace VBClasses
 
             dst3.SetTo(0)
             For Each lp In task.lines.lpList
-                vbc.DrawLine(dst3, lp.p1, lp.p2, white, task.lineWidth)
+                dst3.Line(lp.p1, lp.p2, white, task.lineWidth, task.lineType)
                 Dim center = New cv.Point(CInt((lp.p1.X + lp.p2.X) / 2), CInt((lp.p1.Y + lp.p2.Y) / 2))
-                DrawCircle(dst3, center, task.DotSize, task.highlight, -1)
+                dst3.Circle(center, task.DotSize, task.highlight, -1, task.lineType)
             Next
         End Sub
     End Class
@@ -5304,7 +5304,7 @@ Namespace VBClasses
 
             If standaloneTest() Then
                 dst2 = src
-                DrawCircle(dst2, match.newCenter, task.DotSize, white)
+                dst2.Circle(match.newCenter, task.DotSize, white, -1, task.lineType)
                 dst2.Rectangle(matchRect, task.highlight, task.lineWidth)
                 dst3 = match.dst0.Normalize(0, 255, cv.NormTypes.MinMax)
                 SetTrueText(Format(match.correlation, fmt3), match.newCenter)
@@ -5450,7 +5450,7 @@ Namespace VBClasses
 
             If standaloneTest() Then
                 dst2 = src.Clone
-                DrawCircle(dst2, match.newCenter, task.DotSize, white)
+                dst2.Circle(match.newCenter, task.DotSize, white, -1, task.lineType)
                 dst2.Rectangle(lp.rect, task.highlight, task.lineWidth)
                 dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
                 dst3 = match.dst0.Normalize(0, 255, cv.NormTypes.MinMax)
@@ -5603,7 +5603,7 @@ Namespace VBClasses
         Public Shared Sub DrawFPoly(ByRef dst As cv.Mat, poly As List(Of cv.Point2f), color As cv.Scalar)
             Dim minMod = Math.Min(poly.Count, task.polyCount)
             For i = 0 To minMod - 1
-                vbc.DrawLine(dst, poly(i), poly((i + 1) Mod minMod), color)
+                dst.Line(poly(i), poly((i + 1) Mod minMod), color, task.lineWidth, task.lineType)
             Next
         End Sub
         Public Shared Sub DrawPolys(dst As cv.Mat, poly As fPolyData)
@@ -5629,7 +5629,7 @@ Namespace VBClasses
 
             For i = 0 To sides.currPoly.Count - 1
                 SetTrueText(CStr(i), sides.currPoly(i), 3)
-                vbc.DrawLine(dst2, sides.currPoly(i), sides.currPoly((i + 1) Mod sides.currPoly.Count))
+                dst2.Line(sides.currPoly(i), sides.currPoly((i + 1) Mod sides.currPoly.Count), task.highlight, task.lineWidth, task.lineType)
             Next
 
             Dim causes As String = ""
@@ -5990,7 +5990,7 @@ Namespace VBClasses
                 If absDiff >= hist.Length Then absDiff = hist.Length - 1
                 If absDiff < fGrid.threshold Then
                     hist(CInt(absDiff)) += 1
-                    vbc.DrawLine(dst3, fGrid.anchor, pt, task.highlight)
+                    dst3.Line(fGrid.anchor, pt, task.highlight, task.lineWidth, task.lineType)
                     distDiff.Add(absDiff)
                 Else
                     hist(fGrid.threshold) += 1
@@ -6149,8 +6149,8 @@ Namespace VBClasses
 
             ' dst3.SetTo(0)
             For Each lp In lpList
-                If lp.p1.DistanceTo(lp.p2) <= maxShift Then vbc.DrawLine(dst1, lp.p1, lp.p2, cv.Scalar.Yellow)
-                DrawCircle(dst1, lp.p1, task.DotSize, cv.Scalar.Yellow)
+                If lp.p1.DistanceTo(lp.p2) <= maxShift Then dst1.Line(lp.p1, lp.p2, cv.Scalar.Yellow, task.lineWidth, task.lineType)
+                dst1.Circle(lp.p1, task.DotSize, cv.Scalar.Yellow, -1, task.lineType)
             Next
             dst1.Line(fGrid.anchor, fGrid.startAnchor, white, task.lineWidth + 1, task.lineType)
         End Sub
@@ -6374,7 +6374,7 @@ Namespace VBClasses
             near.lp = New lpData(p1, p2)
             near.pt = pt
             near.Run(emptyMat)
-            vbc.DrawLine(dst2, pt, near.nearPoint, cv.Scalar.Red)
+            dst2.Line(pt, near.nearPoint, cv.Scalar.Red, task.lineWidth, task.lineType)
             Dim d1 = fPD.rotateCenter.DistanceTo(pt)
             Dim d2 = fPD.rotateCenter.DistanceTo(near.nearPoint)
             Dim angle = Math.Asin(near.nearPoint.DistanceTo(pt) / If(d1 > d2, d1, d2))
@@ -6395,18 +6395,18 @@ Namespace VBClasses
                                         fPD.currPoly((fPD.polyPrevSideIndex + 1) Mod task.polyCount))
             perp1.Run(src)
 
-            vbc.DrawLine(dst2, perp1.output.p1, perp1.output.p2, cv.Scalar.Yellow)
+            dst2.Line(perp1.output.p1, perp1.output.p2, cv.Scalar.Yellow, task.lineWidth, task.lineType)
 
             perp2.input = New lpData(fPD.prevPoly(fPD.polyPrevSideIndex),
                                        fPD.prevPoly((fPD.polyPrevSideIndex + 1) Mod task.polyCount))
             perp2.Run(src)
-            vbc.DrawLine(dst2, perp2.output.p1, perp2.output.p2, white)
+            dst2.Line(perp2.output.p1, perp2.output.p2, white, task.lineWidth, task.lineType)
 
             fPD.rotateCenter = Line_Intersection.IntersectTest(perp2.output.p1, perp2.output.p2, perp1.output.p1, perp1.output.p2)
             If fPD.rotateCenter = New cv.Point2f Then
                 fPD.rotateAngle = 0
             Else
-                DrawCircle(dst2, fPD.rotateCenter, task.DotSize + 2, cv.Scalar.Red)
+                dst2.Circle(fPD.rotateCenter, task.DotSize + 2, cv.Scalar.Red, -1, task.lineType)
                 fPD.rotateAngle = findrotateAngle(perp2.output.p1, perp2.output.p2, perp1.output.p1)
             End If
             If fPD.rotateAngle = 0 Then fPD.rotateCenter = New cv.Point2f
@@ -6587,7 +6587,7 @@ Namespace VBClasses
             If fPoly.fPD.currPoly.Count < 2 Then Exit Sub ' polygon not found...
 
             Dim polymp = fPoly.fPD.currmp()
-            vbc.DrawLine(dst3, polymp.p1, polymp.p2, 255)
+            dst3.Line(polymp.p1, polymp.p2, 255, task.lineWidth, task.lineType)
 
             Dim pixelCount = dst3.CountNonZero
             SetTrueText(Format(Math.Abs(lastPixelCount - pixelCount)) + " pixels ", 3)
@@ -6868,7 +6868,7 @@ Namespace VBClasses
                     goodPoints.Add(pt)
                     goodFacets.Add(facet)
                     SetTrueText(Format(absDiff, fmt1), pt, 2)
-                    vbc.DrawLine(dst3, anchor, pt, task.highlight)
+                    dst3.Line(anchor, pt, task.highlight, task.lineWidth, task.lineType)
                     dst2.Set(Of cv.Vec3b)(pt.Y, pt.X, white.ToVec3b)
                 End If
             Next
@@ -6911,7 +6911,7 @@ Namespace VBClasses
             Next
 
             For i = 0 To topFeatures.Count - 2
-                vbc.DrawLine(dst2, topFeatures(i), topFeatures(i + 1), white)
+                dst2.Line(topFeatures(i), topFeatures(i + 1), white, task.lineWidth, task.lineType)
             Next
         End Sub
     End Class
@@ -6942,7 +6942,7 @@ Namespace VBClasses
             Dim pts = feat.topFeatures
             Dim distances As New List(Of Single)
             For i = 0 To pts.Count - 2
-                DrawLine(dst2, pts(i), pts(i + 1), task.highlight)
+                dst2.Line(pts(i), pts(i + 1), task.highlight, task.lineWidth, task.lineType)
                 distances.Add(pts(i).DistanceTo(pts(i + 1)))
             Next
 
@@ -6950,7 +6950,7 @@ Namespace VBClasses
                 Dim index = distances.IndexOf(distances.Max)
                 lp = New lpData(pts(index), pts(index + 1))
                 dst3 = src
-                vbc.DrawLine(dst3, lp.p1, lp.p2, task.highlight)
+                dst3.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
             End If
         End Sub
     End Class
@@ -6975,7 +6975,7 @@ Namespace VBClasses
             lpRect = rotatedRect.BoundingRect
 
             dst2 = src
-            vbc.DrawLine(dst2, lp.p1, lp.p2, task.highlight)
+            dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
             dst2.Rectangle(lpRect, task.highlight, task.lineWidth)
         End Sub
     End Class
@@ -7165,7 +7165,7 @@ Namespace VBClasses
         Private Sub drawPolygon(dst As cv.Mat, color As cv.Scalar)
             Dim minMod = Math.Min(poly.Count, task.polyCount)
             For i = 0 To minMod - 1
-                vbc.DrawLine(dst, poly(i), poly((i + 1) Mod minMod), color)
+                dst.Line(poly(i), poly((i + 1) Mod minMod), color, task.lineWidth, task.lineType)
             Next
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -7242,7 +7242,7 @@ Namespace VBClasses
             rotateQT.Run(src)
             dst2 = rotateQT.dst3
 
-            DrawCircle(dst2, rotateQT.rotateCenter, task.DotSize + 2, cv.Scalar.Yellow)
+            dst2.Circle(rotateQT.rotateCenter, task.DotSize + 2, cv.Scalar.Yellow, -1, task.lineType)
             SetTrueText("center of rotation", rotateQT.rotateCenter)
             labels(3) = rotateQT.labels(3)
         End Sub
@@ -7461,8 +7461,8 @@ Namespace VBClasses
                 dst3 = smoothedFrame.Resize(src.Size())
 
                 For i = 0 To commonPoints.Count - 1
-                    DrawCircle(dst2, commonPoints.ElementAt(i), task.DotSize + 3, cv.Scalar.Red)
-                    DrawCircle(dst2, lastFeatures.ElementAt(i), task.DotSize + 1, cv.Scalar.Blue)
+                    dst2.Circle(commonPoints.ElementAt(i), task.DotSize + 3, cv.Scalar.Red, -1, task.lineType)
+                    dst2.Circle(lastFeatures.ElementAt(i), task.DotSize + 1, cv.Scalar.Blue, -1, task.lineType)
                 Next
             End If
             inputFeat = Nothing ' show that we consumed the current set of features.
@@ -7512,7 +7512,7 @@ Namespace VBClasses
 
             dst2.SetTo(0)
             For Each pt In features
-                DrawCircle(dst2, pt, task.DotSize, cv.Scalar.Yellow)
+                dst2.Circle(pt, task.DotSize, cv.Scalar.Yellow, -1, task.lineType)
             Next
             labels(2) = "There were " + CStr(features.Count) + " key points detected"
         End Sub
@@ -7712,7 +7712,7 @@ Namespace VBClasses
 
             If standaloneTest() Then
                 dst2 = src
-                vbc.DrawLine(dst2, lp)
+                dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
                 DrawRect(dst2, lp.rect)
                 dst3 = task.lines.dst2
             End If
@@ -7815,7 +7815,7 @@ Namespace VBClasses
             If standaloneTest() Then
                 dst2 = src
                 dst2.Rectangle(lp.rect, task.highlight, task.lineWidth)
-                vbc.DrawLine(dst2, lp.p1, lp.p2)
+                dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
             End If
 
             labels(2) = "Selected line has a correlation of " + Format(match.correlation, fmt3) + " with the previous frame."
@@ -7840,9 +7840,9 @@ Namespace VBClasses
 
                 Dim lp = New lpData(p1, p2)
                 dst2 = src
-                vbc.DrawLine(dst2, lp.pE1, lp.pE2, task.highlight)
-                DrawCircle(dst2, p1, task.DotSize + 2, cv.Scalar.Red)
-                DrawCircle(dst2, p2, task.DotSize + 2, cv.Scalar.Red)
+                dst2.Line(lp.pE1, lp.pE2, task.highlight, task.lineWidth, task.lineType)
+                dst2.Circle(p1, task.DotSize + 2, cv.Scalar.Red, -1, task.lineType)
+                dst2.Circle(p2, task.DotSize + 2, cv.Scalar.Red, -1, task.lineType)
             End If
         End Sub
     End Class
@@ -7862,7 +7862,7 @@ Namespace VBClasses
             dst3 = src.Clone
             lpList.Clear()
             For Each lp In task.lines.lpList
-                vbc.DrawLine(dst3, lp.pE1, lp.pE2, task.highlight)
+                dst3.Line(lp.pE1, lp.pE2, task.highlight, task.lineWidth, task.lineType)
                 lpList.Add(New lpData(lp.pE1, lp.pE2))
             Next
         End Sub
@@ -7914,7 +7914,7 @@ Namespace VBClasses
 
                 p1List.Add(lp.p1)
                 p2List.Add(lp.p2)
-                vbc.DrawLine(dst2, lp.p1, lp.p2, cv.Scalar.Yellow)
+                dst2.Line(lp.p1, lp.p2, cv.Scalar.Yellow, task.lineWidth, task.lineType)
 
                 Dim saveP1 = lp.p1, saveP2 = lp.p2
 
@@ -7933,7 +7933,7 @@ Namespace VBClasses
             If standaloneTest() Then
                 For Each inter In intercept
                     If Math.Abs(options.mouseMovePoint - inter.Key) < options.interceptRange Then
-                        vbc.DrawLine(dst2, p1List(inter.Value), p2List(inter.Value), cv.Scalar.Blue)
+                        dst2.Line(p1List(inter.Value), p2List(inter.Value), cv.Scalar.Blue, task.lineWidth, task.lineType)
                     End If
                 Next
             End If
@@ -7973,7 +7973,7 @@ Namespace VBClasses
             lpRectMap.SetTo(0)
             For Each lp In sortlines.Values
                 lpList.Add(lp)
-                vbc.DrawLine(dst2, lp.p1, lp.p2)
+                dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
                 lpRectMap.Line(lp.p1, lp.p2, sortlines.Values.IndexOf(lp) + 1, task.lineWidth * 3, cv.LineTypes.Link8)
 
                 If standaloneTest() Then
@@ -8033,7 +8033,7 @@ Namespace VBClasses
             For Each lp In task.lines.lpList
                 swarm.knn.queries.Add(lp.p1)
                 swarm.knn.queries.Add(lp.p2)
-                vbc.DrawLine(dst3, lp.p1, lp.p2, 255)
+                dst3.Line(lp.p1, lp.p2, 255, task.lineWidth, task.lineType)
             Next
             swarm.knn.trainInput = New List(Of cv.Point2f)(swarm.knn.queries)
             swarm.knn.Run(src)
@@ -8125,7 +8125,7 @@ Namespace VBClasses
             horizList.Clear()
             For Each lp In task.lines.lpList
                 If Math.Abs(task.lpHorizon.angle - lp.angle) < task.angleThreshold Then
-                    vbc.DrawLine(dst2, lp.p1, lp.p2)
+                    dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
                     horizList.Add(lp)
                 End If
             Next
@@ -8152,7 +8152,7 @@ Namespace VBClasses
             vertList.Clear()
             For Each lp In task.lines.lpList
                 If Math.Abs(task.lpGravity.angle - lp.angle) < task.angleThreshold Then
-                    vbc.DrawLine(dst2, lp.p1, lp.p2)
+                    dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
                     vertList.Add(lp)
                 End If
             Next
@@ -8187,14 +8187,14 @@ Namespace VBClasses
             dst3.SetTo(0)
             For Each lp In verts.vertList
                 vList.Add(lp.length, lp)
-                vbc.DrawLine(dst2, lp.p1, lp.p2, task.highlight)
-                vbc.DrawLine(dst3, lp.p1, lp.p2, task.highlight)
+                dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
+                dst3.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
             Next
 
             For Each lp In horiz.horizList
                 hList.Add(lp.length, lp)
-                vbc.DrawLine(dst2, lp.p1, lp.p2, cv.Scalar.Red)
-                vbc.DrawLine(dst3, lp.p1, lp.p2, cv.Scalar.Red)
+                dst2.Line(lp.p1, lp.p2, cv.Scalar.Red, task.lineWidth, task.lineType)
+                dst3.Line(lp.p1, lp.p2, cv.Scalar.Red, task.lineWidth, task.lineType)
             Next
 
             vertList = New List(Of lpData)(vList.Values)
@@ -8229,7 +8229,7 @@ Namespace VBClasses
 
             If standaloneTest() Then
                 dst2 = src
-                vbc.DrawLine(dst2, lpOutput.p1, lpOutput.p2)
+                dst2.Line(lpOutput.p1, lpOutput.p2, task.highlight, task.lineWidth, task.lineType)
                 labels(2) = "Distance = " + Format(sortDistance.ElementAt(0).Key, fmt1)
             End If
         End Sub
@@ -8312,7 +8312,7 @@ Namespace VBClasses
 
             Dim lpRectMap = XO_Line_CoreNew.createMap()
             dst1 = Palettize(lpRectMap, 0)
-            DrawCircle(dst1, lp.ptCenter)
+            dst1.Circle(lp.ptCenter, task.DotSize, task.highlight, -1, task.lineType)
 
             Dim index = lpRectMap.Get(Of Byte)(lp.ptCenter.Y, lp.ptCenter.X)
             If index > 0 Then lp = lplist(index - 1)
@@ -8353,7 +8353,7 @@ Namespace VBClasses
             dst2.Line(p1, p2, cv.Scalar.Yellow, task.lineWidth, task.lineType)
             dst2.Line(p3, p4, cv.Scalar.Yellow, task.lineWidth, task.lineType)
             If intersectionPoint <> New cv.Point2f Then
-                DrawCircle(dst2, intersectionPoint, task.DotSize + 4, white)
+                dst2.Circle(intersectionPoint, task.DotSize + 4, white, -1, task.lineType)
                 labels(2) = "Intersection point = " + CStr(CInt(intersectionPoint.X)) + " x " + CStr(CInt(intersectionPoint.Y))
             Else
                 labels(2) = "Parallel!!!"
@@ -8385,7 +8385,7 @@ Namespace VBClasses
                 rawLines.Run(src(rect))
                 For Each lp In rawLines.lpList
                     dst2(rect).Line(lp.p1, lp.p2, 255, task.lineWidth, task.lineType)
-                    vbc.DrawLine(dst3, lp.p1, lp.p2)
+                    dst3.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
                     lpList.Add(lp)
                 Next
             Next
@@ -8458,8 +8458,8 @@ Namespace VBClasses
                     If Math.Abs(gravityDelta - delta) < options.pixelThreshold Then
                         deltaList.Add(delta)
                         vertList.Add(lp)
-                        vbc.DrawLine(dst2, lp.pE1, lp.pE2)
-                        If standalone Then vbc.DrawLine(dst3, lp.p1, lp.p2, task.highlight)
+                        dst2.Line(lp.pE1, lp.pE2, task.highlight, task.lineWidth, task.lineType)
+                        If standalone Then dst3.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
                     End If
                 End If
             Next
@@ -8536,8 +8536,8 @@ Namespace VBClasses
                             If (cp.p1 = cp.p3 Or cp.p1 = cp.p4) And (cp.p2 = cp.p3 Or cp.p2 = cp.p4) Then
                                 ' duplicate points...
                             Else
-                                vbc.DrawLine(dst2, cp.p1, cp.p2, task.highlight)
-                                vbc.DrawLine(dst2, cp.p3, cp.p4, cv.Scalar.Red)
+                                dst2.Line(cp.p1, cp.p2, task.highlight, task.lineWidth, task.lineType)
+                                dst2.Line(cp.p3, cp.p4, cv.Scalar.Red, task.lineWidth, task.lineType)
                                 parList.Add(cp)
                                 checkList.Add(cp.p1)
                                 checkList.Add(cp.p2)
@@ -8628,7 +8628,7 @@ Namespace VBClasses
                         Dim lp = New lpData(p1, p2)
                         lp.index = tmplist.Count
                         tmplist.Add(lp)
-                        vbc.DrawLine(dst3, lp, white)
+                        dst3.Line(lp.p1, lp.p2, white, task.lineWidth, task.lineType)
                     End If
                 End If
             Next
@@ -8745,15 +8745,15 @@ Namespace VBClasses
 
             For Each lpIn In task.lines.lpList
                 Dim lp = HullLine_EdgePoints.EdgePointOffset(lpIn, 1)
-                DrawCircle(dst2, New cv.Point(CInt(lp.pE1.X), CInt(lp.pE1.Y)))
-                DrawCircle(dst2, New cv.Point(CInt(lp.pE2.X), CInt(lp.pE2.Y)))
+                dst2.Circle(New cv.Point(CInt(lp.pE1.X), CInt(lp.pE1.Y)), task.DotSize, task.highlight, -1, task.lineType)
+                dst2.Circle(New cv.Point(CInt(lp.pE2.X), CInt(lp.pE2.Y)), task.DotSize, task.highlight, -1, task.lineType)
             Next
 
             Static lpLast As New List(Of lpData)(task.lines.lpList)
             For Each lpIn In lpLast
                 Dim lp = HullLine_EdgePoints.EdgePointOffset(lpIn, 5)
-                DrawCircle(dst2, New cv.Point(CInt(lp.pE1.X), CInt(lp.pE1.Y)), white)
-                DrawCircle(dst2, New cv.Point(CInt(lp.pE2.X), CInt(lp.pE2.Y)), white)
+                dst2.Circle(New cv.Point(CInt(lp.pE1.X), CInt(lp.pE1.Y)), task.DotSize, white, -1, task.lineType)
+                dst2.Circle(New cv.Point(CInt(lp.pE2.X), CInt(lp.pE2.Y)), task.DotSize, white, -1, task.lineType)
             Next
 
             lpLast = New List(Of lpData)(task.lines.lpList)
@@ -8830,7 +8830,7 @@ Namespace VBClasses
                             pt = New cv.Point2f(ele.Key, dst2.Height - 10 - offset1)
                     End Select
 
-                    DrawCircle(dst2, pt, color)
+                    dst2.Circle(pt, task.DotSize, color, -1, task.lineType)
                     ptIndex += 1
                 Next
                 index += 1
@@ -10782,7 +10782,7 @@ Namespace VBClasses
             dst2 = runRedList(src, labels(2))
 
             For Each rc In task.redList.rclist
-                DrawCircle(dst2, rc.maxDist, task.DotSize, task.highlight)
+                dst2.Circle(rc.maxDist, task.DotSize, task.highlight, -1, task.lineType)
             Next
 
             addTour.rclist = task.redList.rclist
@@ -10792,7 +10792,7 @@ Namespace VBClasses
             For i = 1 To addTour.rclist.Count - 1
                 Dim rc = addTour.rclist(i)
                 rc.maxDist = GetMaxDist(rc)
-                DrawCircle(dst3, rc.maxDist, task.DotSize, task.highlight)
+                dst3.Circle(rc.maxDist, task.DotSize, task.highlight, -1, task.lineType)
             Next
         End Sub
     End Class
@@ -11023,7 +11023,7 @@ Namespace VBClasses
                 rc.index = rclist.Count
                 rc.color = color
                 dst2(rc.rect).SetTo(rc.color, rc.mask)
-                DrawCircle(dst2, rc.maxDist)
+                dst2.Circle(rc.maxDist, task.DotSize, task.highlight, -1, task.lineType)
                 rclist.Add(rc)
             Next
 
@@ -11136,7 +11136,7 @@ Namespace VBClasses
             dst3.SetTo(0)
             dst3(rc.rect).SetTo(rc.color, rc.mask)
             dst3.Circle(rc.maxDist, task.DotSize + 2, cv.Scalar.Black)
-            DrawCircle(dst3, rc.maxDist)
+            dst3.Circle(rc.maxDist, task.DotSize, task.highlight, -1, task.lineType)
             labels(3) = "MaxDStable was the same for " + CStr(stableCount) + " frames"
         End Sub
     End Class
@@ -11376,7 +11376,7 @@ Namespace VBClasses
             lineHistory.Add(task.lines.lpList)
             For Each lplist In lineHistory
                 For Each lp In lplist
-                    vbc.DrawLine(dst3, lp.p1, lp.p2)
+                    dst3.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
                 Next
             Next
             If lineHistory.Count > task.frameHistoryCount Then lineHistory.RemoveAt(0)
@@ -11420,10 +11420,10 @@ Namespace VBClasses
                 If ptList(i) Is Nothing Then Continue For
                 Dim p1 = ptList(i)(0)
                 Dim p2 = ptList(i)(ptList(i).Count - 1)
-                vbc.DrawLine(dst2, p1, p2)
+                dst2.Line(p1, p2, task.highlight, task.lineWidth, task.lineType)
                 Dim lp = New lpData(p1, p2)
                 lpList.Add(lp)
-                vbc.DrawLine(dst3, p1, p2)
+                dst3.Line(p1, p2, task.highlight, task.lineWidth, task.lineType)
             Next
 
             For Each index In linesFound
@@ -11916,7 +11916,7 @@ Namespace VBClasses
             dst2.Rectangle(matchRect, task.highlight, task.lineWidth)
 
             dst3 = dst3.Normalize(0, 255, cv.NormTypes.MinMax).Resize(dst2.Size)
-            DrawCircle(dst3, matchCenter, task.DotSize, cv.Scalar.Black)
+            dst3.Circle(matchCenter, task.DotSize, cv.Scalar.Black, -1, task.lineType)
 
             Dim smp = New lpData(gravitySnap.p1, gravitySnap.p2)
             dst2.Line(smp.p1, smp.p2, task.highlight, task.lineWidth + 2, task.lineType)
@@ -12166,7 +12166,7 @@ Namespace VBClasses
             dst2 = task.gray
 
             Dim lp = New lpData(task.lines.lpList(0).pE1, task.lines.lpList(0).pE2)
-            vbc.DrawLine(dst2, lp, white)
+            dst2.Line(lp.p1, lp.p2, white, task.lineWidth, task.lineType)
         End Sub
     End Class
 
@@ -13301,7 +13301,7 @@ Namespace VBClasses
 
             stable.Run(src)
             dst2 = stable.dst2
-            vbc.DrawLine(dst2, stable.lp)
+            dst2.Line(stable.lp.p1, stable.lp.p2, task.highlight, task.lineWidth, task.lineType)
             SetTrueText("Age = " + CStr(stable.lp.age), stable.lp.ptCenter)
 
             stable.lpLast = stable.lp
@@ -14148,7 +14148,7 @@ Namespace VBClasses
             Next
 
             For Each lp In lpList
-                vbc.DrawLine(dst2, lp, lp.color)
+                dst2.Line(lp.p1, lp.p2, lp.color, task.lineWidth, task.lineType)
             Next
 
             labels(2) = CStr(lpList.Count) + " lines - " + CStr(lpList.Count - count) + " were new"
@@ -14237,7 +14237,7 @@ Namespace VBClasses
                 Dim index As Integer = sortLines.Keys.Contains(lineIndex)
                 Dim gridindex = task.gridMap.Get(Of Integer)(pt.Y, pt.X)
                 sortLines.Add(lineIndex, gridindex)
-                DrawCircle(dst3, pt, color)
+                dst3.Circle(pt, task.DotSize, color, -1, task.lineType)
             Next
         End Sub
     End Class
@@ -14571,8 +14571,8 @@ Namespace VBClasses
             Dim depthMax = If(brickMax.depth > 0, brickMax.depth, mm.maxVal)
 
             Dim depthMean = task.pcSplit(2).Mean(dst0)(0)
-            DrawCircle(dst2, lp.p1, task.DotSize + 4, cv.Scalar.Red)
-            DrawCircle(dst2, lp.p2, task.DotSize + 4, cv.Scalar.Blue)
+            dst2.Circle(lp.p1, task.DotSize + 4, cv.Scalar.Red, -1, task.lineType)
+            dst2.Circle(lp.p2, task.DotSize + 4, cv.Scalar.Blue, -1, task.lineType)
 
             If lp.p1.DistanceTo(mm.minLoc) < lp.p2.DistanceTo(mm.maxLoc) Then
                 mm.minLoc = lp.p1
@@ -14609,10 +14609,10 @@ Namespace VBClasses
             Dim count As Integer
             For Each lp In task.lines.lpList
                 If Math.Abs(lp.angle - degrees) < task.angleThreshold Then
-                    vbc.DrawLine(dst2, lp.p1, lp.p2, task.highlight, task.lineWidth * 2)
+                    dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth * 2, task.lineType)
                     count += 1
                 Else
-                    vbc.DrawLine(dst2, lp, task.highlight)
+                    dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
                 End If
             Next
 
@@ -14640,7 +14640,7 @@ Namespace VBClasses
             dst2.SetTo(0)
             For Each lp In task.lines.lpList
                 dst2.Line(lp.p1, lp.p2, white, task.lineWidth, cv.LineTypes.Link8)
-                DrawCircle(dst2, lp.p1, task.DotSize, task.highlight)
+                dst2.Circle(lp.p1, task.DotSize, task.highlight, -1, task.lineType)
             Next
 
             dst2.Line(task.lpD.p1, task.lpD.p2, task.highlight, task.lineWidth + 1, task.lineType)
@@ -14691,8 +14691,8 @@ Namespace VBClasses
             dst2 = src
             If dst3.CountNonZero > task.FeatureSampleSize * 10 Then dst3.SetTo(0)
             For Each pt In intersects
-                DrawCircle(dst2, pt, task.highlight)
-                DrawCircle(dst3, pt, white)
+                dst2.Circle(pt, task.DotSize, task.highlight, -1, task.lineType)
+                dst3.Circle(pt, task.DotSize, white, -1, task.lineType)
             Next
         End Sub
     End Class
@@ -14731,8 +14731,8 @@ Namespace VBClasses
                                  New cv.Point2f(lp.ptCenter.X - disp2, lp.ptCenter.Y))
             Dim lp2 = New lpData(New cv.Point2f(lp.p1.X - disp1, lp.p1.Y), New cv.Point2f(lp.p2.X - disp3, lp.p2.Y))
             If Math.Abs(lp1.angle - lp2.angle) < task.angleThreshold Then lpOutput = lp2
-            vbc.DrawLine(dst3, lpOutput.p1, lpOutput.p2, task.highlight, task.lineWidth + 1)
-            vbc.DrawLine(dst2, lp.p1, lp.p2, task.highlight, task.lineWidth + 1)
+            dst3.Line(lpOutput.p1, lpOutput.p2, task.highlight, task.lineWidth + 1, task.lineType)
+            dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth + 1, task.lineType)
         End Sub
     End Class
 
@@ -14784,8 +14784,8 @@ Namespace VBClasses
                 Dim lpOut = lp2
                 lp.index = lpOutput.Count
                 lpOutput.Add(lp)
-                vbc.DrawLine(dst3, lpOut.p1, lpOut.p2, task.highlight, task.lineWidth + 1)
-                vbc.DrawLine(dst2, lp.p1, lp.p2, task.highlight, task.lineWidth + 1)
+                dst3.Line(lpOut.p1, lpOut.p2, task.highlight, task.lineWidth + 1, task.lineType)
+                dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth + 1, task.lineType)
             Next
             labels(2) = CStr(lpOutput.Count) + " left image lines were matched in the right image and confirmed with the center point."
         End Sub
@@ -14842,7 +14842,7 @@ Namespace VBClasses
 
             If standaloneTest() Then
                 dst2 = src
-                vbc.DrawLine(dst2, lp)
+                dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
                 DrawRect(dst2, lp.rect)
                 dst3 = task.lines.dst2
             End If
@@ -14865,7 +14865,7 @@ Namespace VBClasses
             dst.Line(task.lpHorizon.pE1, task.lpHorizon.pE2, white, task.lineWidth, task.lineType)
             If task.lines.lpList(0) IsNot Nothing Then
                 dst.Line(task.lines.lpList(0).p1, task.lines.lpList(0).p2, task.highlight, task.lineWidth * 2, task.lineType)
-                vbc.DrawLine(dst, task.lines.lpList(0).pE1, task.lines.lpList(0).pE2, white)
+                dst.Line(task.lines.lpList(0).pE1, task.lines.lpList(0).pE2, white, task.lineWidth, task.lineType)
             End If
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -14884,7 +14884,7 @@ Namespace VBClasses
                 showVectors(dst2)
                 dst3.SetTo(0)
                 For Each lp In task.lines.lpList
-                    If Math.Abs(task.lpGravity.angle - lp.angle) < task.angleThreshold Then vbc.DrawLine(dst3, lp, white)
+                    If Math.Abs(task.lpGravity.angle - lp.angle) < task.angleThreshold Then dst3.Line(lp.p1, lp.p2, white, task.lineWidth, task.lineType)
                 Next
                 labels(3) = task.lines.labels(3)
             End If
@@ -14914,8 +14914,8 @@ Namespace VBClasses
 
             If standaloneTest() Then
                 dst2.SetTo(0)
-                vbc.DrawLine(dst2, task.lpGravity.p1, task.lpGravity.p2, task.highlight)
-                vbc.DrawLine(dst2, task.lpHorizon.p1, task.lpHorizon.p2, cv.Scalar.Red)
+                dst2.Line(task.lpGravity.p1, task.lpGravity.p2, task.highlight, task.lineWidth, task.lineType)
+                dst2.Line(task.lpHorizon.p1, task.lpHorizon.p2, cv.Scalar.Red, task.lineWidth, task.lineType)
             End If
         End Sub
     End Class
@@ -14932,7 +14932,7 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             If task.heartBeat Then dst2.SetTo(0)
-            vbc.DrawLine(dst2, task.lines.lpList(0), task.highlight)
+            dst2.Line(task.lines.lpList(0).p1, task.lines.lpList(0).p2, task.highlight, task.lineWidth, task.lineType)
             labels(2) = "Longest line is " + Format(task.lines.lpList(0).length, fmt1) + " pixels, slope = " +
                          Format(task.lines.lpList(0).slope, fmt1)
 
@@ -14969,8 +14969,8 @@ Namespace VBClasses
             Dim linePerp = Line_PerpendicularTest.computePerp(task.lines.lpList(0))
 
             dst2 = src
-            vbc.DrawLine(dst2, lpLast, white)
-            vbc.DrawLine(dst2, linePerp, task.highlight)
+            dst2.Line(lpLast.p1, lpLast.p2, white, task.lineWidth, task.lineType)
+            dst2.Line(linePerp.p1, linePerp.p2, task.highlight, task.lineWidth, task.lineType)
 
             intersect.lp1 = lpLast
             intersect.lp2 = linePerp
@@ -14978,8 +14978,8 @@ Namespace VBClasses
 
             If task.heartBeatLT Then dst3.SetTo(0)
             trackPoint = intersect.intersectionPoint
-            DrawCircle(dst3, trackPoint)
-            DrawCircle(dst3, trackPoint)
+            dst3.Circle(trackPoint, task.DotSize, task.highlight, -1, task.lineType)
+            dst3.Circle(trackPoint, task.DotSize, task.highlight, -1, task.lineType)
 
             lpLast = New lpData(task.lines.lpList(0).pE1, task.lines.lpList(0).pE2)
         End Sub
@@ -15045,11 +15045,11 @@ Namespace VBClasses
                 allLines.Add(lp.p1.DistanceTo(lp.p2), gRect)
                 If Math.Abs(90 - gRect.arcY) < maxAngle And gRect.tc1.depth > 0 And gRect.tc2.depth > 0 Then
                     sortedVerticals.Add(lp.p1.DistanceTo(lp.p2), gRect)
-                    vbc.DrawLine(dst2, lp.p1, lp.p2, cv.Scalar.Blue)
+                    dst2.Line(lp.p1, lp.p2, cv.Scalar.Blue, task.lineWidth, task.lineType)
                 End If
                 If Math.Abs(gRect.arcY) <= maxAngle And gRect.tc1.depth > 0 And gRect.tc2.depth > 0 Then
                     sortedHorizontals.Add(lp.p1.DistanceTo(lp.p2), gRect)
-                    vbc.DrawLine(dst2, lp.p1, lp.p2, cv.Scalar.Yellow)
+                    dst2.Line(lp.p1, lp.p2, cv.Scalar.Yellow, task.lineWidth, task.lineType)
                 End If
             Next
 
@@ -15126,7 +15126,7 @@ Namespace VBClasses
             If minDist > 0 Then minDistances.Add(minDist)
             If minDistances.Count > 100 Then minDistances.RemoveAt(0)
 
-            vbc.DrawLine(dst2, p1, p2, task.highlight)
+            dst2.Line(p1, p2, task.highlight, task.lineWidth, task.lineType)
             trainInput.Clear()
         End Sub
     End Class
@@ -15178,7 +15178,7 @@ Namespace VBClasses
             If minDist > 0 Then minDistances.Add(minDist)
             If minDistances.Count > 100 Then minDistances.RemoveAt(0)
 
-            vbc.DrawLine(dst2, lastP1, lastP2, task.highlight)
+            dst2.Line(lastP1, lastP2, task.highlight, task.lineWidth, task.lineType)
             trainInput.Clear()
         End Sub
     End Class
@@ -15267,7 +15267,7 @@ Namespace VBClasses
 
             matchLine.Run(src)
             dst2 = matchLine.dst2
-            vbc.DrawLine(dst2, matchLine.lpOutput.p1, matchLine.lpOutput.p2, cv.Scalar.Red)
+            dst2.Line(matchLine.lpOutput.p1, matchLine.lpOutput.p2, cv.Scalar.Red, task.lineWidth, task.lineType)
 
             labels(2) = "Longest line end points had correlation of " + Format(matchLine.match.correlation, fmt3) +
                         " with the original longest line."
@@ -15289,7 +15289,7 @@ Namespace VBClasses
             If task.quarterBeat Then matchLine.lpInput = task.lpHorizon
             matchLine.Run(src)
             dst2 = matchLine.dst2
-            vbc.DrawLine(dst2, task.lpHorizon.p1, task.lpHorizon.p2, cv.Scalar.Red)
+            dst2.Line(task.lpHorizon.p1, task.lpHorizon.p2, cv.Scalar.Red, task.lineWidth, task.lineType)
             labels(2) = "MatchLine correlation = " + Format(matchLine.match.correlation, fmt3) + " - Red = current horizon, yellow is matchLine output"
         End Sub
     End Class
@@ -15307,7 +15307,7 @@ Namespace VBClasses
             matchLine.lpInput = task.lpGravity
             matchLine.Run(src)
             dst2 = matchLine.dst2
-            vbc.DrawLine(dst2, task.lpGravity.p1, task.lpGravity.p2, cv.Scalar.Red)
+            dst2.Line(task.lpGravity.p1, task.lpGravity.p2, cv.Scalar.Red, task.lineWidth, task.lineType)
             labels(2) = "MatchLine correlation = " + Format(matchLine.match.correlation, fmt3) +
                         " - Red = current gravity vector, yellow is matchLine output"
         End Sub
@@ -15384,7 +15384,7 @@ Namespace VBClasses
                 Dim prevRect = ValidateRect(New cv.Rect(mps.p2.X - sz, mps.p2.Y - sz, currRect.Width, currRect.Height))
                 cv.Cv2.MatchTemplate(lastImage(prevRect), src(currRect), correlationMat, feat.options.matchOption)
                 Dim corrNext = correlationMat.Get(Of Single)(0, 0)
-                DrawCircle(dst2, mps.p1, task.DotSize, task.highlight)
+                dst2.Circle(mps.p1, task.DotSize, task.highlight, -1, task.lineType)
                 diffX.Add(mps.p1.X - mps.p2.X)
                 diffY.Add(mps.p1.Y - mps.p2.Y)
             Next
@@ -15406,7 +15406,7 @@ Namespace VBClasses
             If motionTrack.Count > task.fpsAlgorithm Then motionTrack.RemoveAt(0)
             Dim lastpt = motionTrack(0)
             For Each pt In motionTrack
-                vbc.DrawLine(dst2, pt, lastpt, white)
+                dst2.Line(pt, lastpt, white, task.lineWidth, task.lineType)
                 lastpt = pt
             Next
             SetTrueText(yLabel, 1)
@@ -15451,9 +15451,9 @@ Namespace VBClasses
             For i = 0 To trackAll.Count - 1 Step 2
                 Dim t1 = trackAll(i)
                 For Each lp In t1
-                    DrawCircle(dst2, lp.p1, task.DotSize, task.highlight)
-                    DrawCircle(dst2, lp.p2, task.DotSize, task.highlight)
-                    vbc.DrawLine(dst2, lp.p1, lp.p2, cv.Scalar.Red)
+                    dst2.Circle(lp.p1, task.DotSize, task.highlight, -1, task.lineType)
+                    dst2.Circle(lp.p2, task.DotSize, task.highlight, -1, task.lineType)
+                    dst2.Line(lp.p1, lp.p2, cv.Scalar.Red, task.lineWidth, task.lineType)
                 Next
             Next
 
@@ -15594,8 +15594,8 @@ Namespace VBClasses
             dst2 = src.Clone
             For Each lp In task.lines.lpList
                 HullLine_EdgePoints.EdgePointOffset(lp, 1)
-                DrawCircle(dst2, New cv.Point(CInt(lp.pE1.X), CInt(lp.pE1.Y)))
-                DrawCircle(dst2, New cv.Point(CInt(lp.pE2.X), CInt(lp.pE2.Y)))
+                dst2.Circle(New cv.Point(CInt(lp.pE1.X), CInt(lp.pE1.Y)), task.DotSize, task.highlight, -1, task.lineType)
+                dst2.Circle(New cv.Point(CInt(lp.pE2.X), CInt(lp.pE2.Y)), task.DotSize, task.highlight, -1, task.lineType)
             Next
 
             knn.queries.Clear()
@@ -15913,7 +15913,7 @@ Namespace VBClasses
             dst2 = cellGen.dst2
 
             For Each rc In rclist
-                DrawCircle(dst2, rc.maxDist)
+                dst2.Circle(rc.maxDist, task.DotSize, task.highlight, -1, task.lineType)
             Next
             labels(2) = cellGen.labels(2)
             labels(3) = ""
@@ -16575,7 +16575,7 @@ Namespace VBClasses
             For i = 0 To sortData.Count - 1
                 Dim pt = New cv.Point(dst2.Width * sortData.ElementAt(i).Key / maxX,
                                       dst2.Height - dst2.Height * sortData.ElementAt(i).Value / maxTime)
-                DrawCircle(dst2, pt, task.DotSize, plotColor)
+                dst2.Circle(pt, task.DotSize, plotColor, -1, task.lineType)
                 pointSet.Add(pt)
             Next
 
@@ -17232,7 +17232,7 @@ Namespace VBClasses
             dst2 = cellGen.dst2
 
             For Each rc In task.redList.rclist
-                DrawCircle(dst2, rc.maxDist)
+                dst2.Circle(rc.maxDist, task.DotSize, task.highlight, -1, task.lineType)
             Next
             labels(2) = cellGen.labels(2)
             labels(3) = ""
@@ -17359,7 +17359,7 @@ Namespace VBClasses
                     Dim pct = ptList.Count / rc.contour.Count
                     If pct > 0.1 And pct < 0.9 Then
                         selfInt = True
-                        DrawCircle(dst3, pt, task.DotSize, cv.Scalar.Red)
+                        dst3.Circle(pt, task.DotSize, cv.Scalar.Red, -1, task.lineType)
                     End If
                 End If
                 ptList.Add(ptStr)
@@ -17837,10 +17837,10 @@ Namespace VBClasses
                 '    corners(i) = New cv.Point(rc.rect.X + pt.X, rc.rect.Y + pt.Y)
                 'Next
                 'Dim center = New cv.Point(rc.rect.X + rc.rect.Width / 2, rc.rect.Y + rc.rect.Height / 2)
-                'vbc.DrawLine(dst2, corners(0), center, white)
-                'vbc.DrawLine(dst2, corners(1), center, white)
-                'vbc.DrawLine(dst2, corners(2), center, white)
-                'vbc.DrawLine(dst2, corners(3), center, white)
+                'dst2.Line(corners(0), center, white, task.lineWidth, task.lineType)
+                'dst2.Line(corners(1), center, white, task.lineWidth, task.lineType)
+                'dst2.Line(corners(2), center, white, task.lineWidth, task.lineType)
+                'dst2.Line(corners(3), center, white, task.lineWidth, task.lineType)
 
                 'listOfPoints.Add(addTriangle(corners(0), corners(3), center, rc, shift))
                 'listOfPoints.Add(addTriangle(corners(1), corners(0), center, rc, shift))
@@ -18932,7 +18932,7 @@ Namespace VBClasses
             dst2 = src.Clone
             For i = mPoints.ptx.Count - 1 To 0 Step -1
                 If mPoints.correlation(i) > task.fCorrThreshold Then
-                    DrawCircle(dst2, mPoints.ptx(i), task.DotSize, task.highlight)
+                    dst2.Circle(mPoints.ptx(i), task.DotSize, task.highlight, -1, task.lineType)
                     strOut += Format(mPoints.correlation(i), fmt3) + ", "
                 Else
                     mPoints.ptx.RemoveAt(i)
@@ -19148,7 +19148,7 @@ Namespace VBClasses
                     Dim index = task.redList.rcMap.Get(Of Byte)(pt.Y, pt.X)
                     Dim rc = task.redList.rclist(index)
                     dst2(rc.rect).SetTo(rc.color, rc.mask)
-                    DrawCircle(dst2, rc.maxDist, task.DotSize, task.highlight)
+                    dst2.Circle(rc.maxDist, task.DotSize, task.highlight, -1, task.lineType)
                     maxList.Add(rc.maxDist)
                 Next
                 topXcells = New List(Of cv.Point)(maxList)
@@ -19261,8 +19261,8 @@ Namespace VBClasses
 
             dst3 = task.color.Clone
             For Each pt In corners.nPoints
-                DrawCircle(dst2, pt, task.DotSize, task.highlight)
-                DrawCircle(dst3, pt, task.DotSize, cv.Scalar.Yellow)
+                dst2.Circle(pt, task.DotSize, task.highlight, -1, task.lineType)
+                dst3.Circle(pt, task.DotSize, cv.Scalar.Yellow, -1, task.lineType)
             Next
         End Sub
     End Class
@@ -19554,7 +19554,7 @@ Namespace VBClasses
             dst2 = redLeft.dst2.Clone
             If standaloneTest() Then
                 For Each rc In redLeft.redC.rcList
-                    DrawCircle(dst2, rc.maxDist, task.DotSize, task.highlight)
+                    dst2.Circle(rc.maxDist, task.DotSize, task.highlight, -1, task.lineType)
                 Next
             End If
 
@@ -19562,7 +19562,7 @@ Namespace VBClasses
             dst3 = redRight.dst2.Clone
             If standaloneTest() Then
                 For Each rc In redRight.redC.rcList
-                    DrawCircle(dst3, rc.maxDist, task.DotSize, task.highlight)
+                    dst3.Circle(rc.maxDist, task.DotSize, task.highlight, -1, task.lineType)
                 Next
             End If
             labels(2) = redLeft.labels(2)
@@ -19741,7 +19741,7 @@ Namespace VBClasses
         Public Function displayFeatures(dst As cv.Mat, features As List(Of List(Of cv.Point))) As cv.Mat
             For Each ptlist In features
                 For Each pt In ptlist
-                    DrawCircle(dst, pt, task.DotSize, task.highlight)
+                    dst.Circle(pt, task.DotSize, task.highlight, -1, task.lineType)
                 Next
             Next
             Return dst
@@ -19809,7 +19809,7 @@ Namespace VBClasses
         End Sub
         Public Function displayFeatures(dst As cv.Mat, features As List(Of cv.Point)) As cv.Mat
             For Each pt In features
-                DrawCircle(dst, pt, task.DotSize, task.highlight)
+                dst.Circle(pt, task.DotSize, task.highlight, -1, task.lineType)
             Next
             Return dst
         End Function
@@ -19903,7 +19903,7 @@ Namespace VBClasses
 
             dst3.SetTo(0)
             For Each pt In feat.features
-                DrawCircle(dst2, pt, task.DotSize, task.highlight)
+                dst2.Circle(pt, task.DotSize, task.highlight, -1, task.lineType)
                 dst3.Set(Of Byte)(pt.Y, pt.X, 255)
             Next
 
@@ -19930,7 +19930,7 @@ Namespace VBClasses
             Dim stable As New List(Of cv.Point)
             For Each pt In noMotion.feat.features
                 If lastFeatures.Contains(pt) Then
-                    DrawCircle(dst2, pt, task.DotSize, task.highlight)
+                    dst2.Circle(pt, task.DotSize, task.highlight, -1, task.lineType)
                     stable.Add(pt)
                 End If
             Next
@@ -19961,7 +19961,7 @@ Namespace VBClasses
             dst3.SetTo(0)
             For Each fp In fpStable
                 If fp.age > 2 Then
-                    DrawCircle(dst3, fp.pt, task.DotSize, task.highlight)
+                    dst3.Circle(fp.pt, task.DotSize, task.highlight, -1, task.lineType)
                     SetTrueText(CStr(fp.age), fp.pt, 3)
                 End If
             Next
@@ -20000,7 +20000,7 @@ Namespace VBClasses
 
             If standaloneTest() Then
                 dst2 = src.Clone
-                DrawLine(dst2, lpInput, task.highlight)
+                dst2.Line(lpInput.p1, lpInput.p2, task.highlight, task.lineWidth, task.lineType)
             End If
             labels(2) = "Rect for p1 has correlation " + Format(p1Correlation, fmt3) +
                             " to the previous image while " +

@@ -20,7 +20,7 @@ Public Class Corner_Basics : Inherits TaskParent
         For i = 0 To fast.features.Count - 1
             Dim pt = fast.features(i)
             If lastFeatures.Contains(pt) Then
-                DrawCircle(dst2, pt, task.DotSize, cv.Scalar.Yellow)
+                dst2.Circle(pt, task.DotSize, cv.Scalar.Yellow, -1, task.lineType)
                 newPts.Add(pt)
                 dst3.Set(Of Byte)(pt.Y, pt.X, 255)
             End If
@@ -65,7 +65,7 @@ Public Class Corner_Core : Inherits TaskParent
         If standaloneTest() Then
             dst3.SetTo(0)
             For Each kp As cv.KeyPoint In kpoints
-                DrawCircle(dst2, kp.Pt, task.DotSize, cv.Scalar.Yellow)
+                dst2.Circle(kp.Pt, task.DotSize, cv.Scalar.Yellow, -1, task.lineType)
                 dst3.Set(Of Byte)(kp.Pt.Y, kp.Pt.X, 255)
             Next
         End If
@@ -110,7 +110,7 @@ Public Class Corner_Harris : Inherits TaskParent
         For y = 0 To task.gray.Rows - 1
             For x = 0 To task.gray.Cols - 1
                 If mc.Get(Of Single)(y, x) > mm.minVal + (mm.maxVal - mm.minVal) * options.quality / options.qualityMax Then
-                    DrawCircle(dst2, New cv.Point(x, y), task.DotSize, task.highlight)
+                    dst2.Circle(New cv.Point(x, y), task.DotSize, task.highlight, -1, task.lineType)
                     count += 1
                 End If
             Next
@@ -194,14 +194,14 @@ Public Class NR_Corner_BasicsCentroid : Inherits TaskParent
         dst2 = fast.dst2
         dst3.SetTo(0)
         For Each pt In fast.features
-            DrawCircle(dst3, pt, task.DotSize + 2, white)
+            dst3.Circle(pt, task.DotSize + 2, white, -1, task.lineType)
         Next
         Dim m = cv.Cv2.Moments(dst3, True)
         If m.M00 > 500 Then ' if more than x pixels are present (avoiding a zero area!)
             task.kalman.kInput(0) = m.M10 / m.M00
             task.kalman.kInput(1) = m.M01 / m.M00
             task.kalman.Run(emptyMat)
-            DrawCircle(dst2, New cv.Point(task.kalman.kOutput(0), task.kalman.kOutput(1)), 10, cv.Scalar.Red)
+            dst2.Circle(New cv.Point(task.kalman.kOutput(0), task.kalman.kOutput(1)), 10, cv.Scalar.Red, -1, task.lineType)
         End If
     End Sub
 End Class
@@ -234,7 +234,7 @@ Public Class NR_Corner_BasicsCentroids : Inherits TaskParent
         Next
 
         For i = 0 To fastCenters.Count - 1
-            DrawCircle(dst2, fastCenters(i), task.DotSize, cv.Scalar.Yellow)
+            dst2.Circle(fastCenters(i), task.DotSize, cv.Scalar.Yellow, -1, task.lineType)
         Next
         ' dst2.SetTo(white, task.gridMask)
     End Sub
@@ -308,7 +308,7 @@ Public Class Corner_HarrisDetector_CPP : Inherits TaskParent
             features.Clear()
             For i = 0 To ptCount - 1
                 features.Add(New cv.Point2f(ptMat.Get(Of Integer)(i, 0), ptMat.Get(Of Integer)(i, 1)))
-                DrawCircle(dst2, features(i), task.DotSize, cv.Scalar.Yellow)
+                dst2.Circle(features(i), task.DotSize, cv.Scalar.Yellow, -1, task.lineType)
             Next
         End If
     End Sub
@@ -340,8 +340,8 @@ Public Class NR_Corner_RedCloud : Inherits TaskParent
 
         dst3 = task.color.Clone
         For Each pt In corners.nPoints
-            DrawCircle(dst2, pt, task.DotSize, task.highlight)
-            DrawCircle(dst3, pt, task.DotSize, cv.Scalar.Yellow)
+            dst2.Circle(pt, task.DotSize, task.highlight, -1, task.lineType)
+            dst3.Circle(pt, task.DotSize, cv.Scalar.Yellow, -1, task.lineType)
         Next
     End Sub
 End Class
@@ -367,7 +367,7 @@ Public Class NR_Corner_SubPix : Inherits TaskParent
 
         dst2 = src
         For Each pt In fast.features
-            DrawCircle(dst2, pt, task.DotSize, task.highlight)
+            dst2.Circle(pt, task.DotSize, task.highlight, -1, task.lineType)
         Next
     End Sub
 End Class

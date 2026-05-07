@@ -67,8 +67,8 @@ Public Class Cluster_Basics : Inherits TaskParent
         Next
         dst3 = src
         For i = 0 To knn.queries.Count - 1
-            DrawCircle(dst2, knn.queries(i), task.DotSize, cv.Scalar.Red)
-            DrawCircle(dst3, knn.queries(i), task.DotSize, task.highlight)
+            dst2.Circle(knn.queries(i), task.DotSize, cv.Scalar.Red, -1, task.lineType)
+            dst3.Circle(knn.queries(i), task.DotSize, task.highlight, -1, task.lineType)
         Next
         labels(2) = CStr(clusters.Count) + " groups built from " + CStr(ptInput.Count) + " by combining each input point and its nearest neighbor."
         labels(3) = CStr(ptInput.Count) + " input features found."
@@ -106,7 +106,7 @@ Public Class NR_Cluster_Hulls : Inherits TaskParent
             ElseIf hullPoints.Count = 2 Then
                 dst3.Line(hullPoints(0), hullPoints(1), white, task.lineWidth, task.lineWidth)
             Else
-                DrawCircle(dst3, hullPoints(0), task.DotSize, task.highlight)
+                dst3.Circle(hullPoints(0), task.DotSize, task.highlight, -1, task.lineType)
             End If
 
             hulls.Add(hull)

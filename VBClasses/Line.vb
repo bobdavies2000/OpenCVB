@@ -311,7 +311,7 @@ Public Class Line_PerpendicularTest : Inherits TaskParent
         dst2.Line(input.p1, input.p2, white, task.lineWidth, task.lineType)
 
         output = computePerp(input)
-        DrawCircle(dst2, input.ptCenter, task.DotSize + 2, cv.Scalar.Red)
+        dst2.Circle(input.ptCenter, task.DotSize + 2, cv.Scalar.Red, -1, task.lineType)
         dst2.Line(output.p1, output.p2, yellow, task.lineWidth, task.lineType)
 
         If standaloneTest() Then SetTrueText("The line displayed at left is the gravity vector.", 3)
@@ -370,7 +370,7 @@ Public Class NR_Line_Parallel : Inherits TaskParent
 
         For Each index In unParallel
             Dim lp = task.lines.lpList(index)
-            vbc.DrawLine(dst2, lp)
+            dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
             SetTrueText("0", lp.ptCenter)
         Next
 
@@ -428,7 +428,7 @@ Public Class Line_Intersection : Inherits TaskParent
             dst2.Line(lp1.p1, lp1.p2, cv.Scalar.Yellow, task.lineWidth, task.lineType)
             dst2.Line(lp2.p1, lp2.p2, cv.Scalar.Yellow, task.lineWidth, task.lineType)
             If intersectionPoint <> New cv.Point2f Then
-                DrawCircle(dst2, intersectionPoint, task.DotSize + 4, white)
+                dst2.Circle(intersectionPoint, task.DotSize + 4, white, -1, task.lineType)
                 labels(2) = "Intersection point = " + CStr(CInt(intersectionPoint.X)) + " x " + CStr(CInt(intersectionPoint.Y))
             Else
                 labels(2) = "Parallel!!!"
@@ -836,7 +836,7 @@ Public Class Line_BrickList : Inherits TaskParent
         End If
         dst2 = src
         For Each pt In ptList
-            DrawCircle(dst2, pt)
+            dst2.Circle(pt, task.DotSize, task.highlight, -1, task.lineType)
         Next
 
         Dim x1 = epList.Average(Function(x) x.Item1)
@@ -844,7 +844,7 @@ Public Class Line_BrickList : Inherits TaskParent
         Dim x2 = epList.Average(Function(x) x.Item3)
         Dim y2 = epList.Average(Function(x) x.Item4)
         lpOutput = New lpData(New cv.Point2f(x1, y1), New cv.Point2f(x2, y2))
-        vbc.DrawLine(dst2, lpOutput)
+        dst2.Line(lpOutput.p1, lpOutput.p2, task.highlight, task.lineWidth, task.lineType)
 
         If standalone Then lp = lpOutput
 

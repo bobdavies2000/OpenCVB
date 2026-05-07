@@ -214,7 +214,7 @@ Public Class NR_OEX_delaunay2 : Inherits TaskParent
             Loop While e <> e0
         End If
 
-        DrawCircle(img, pt, task.DotSize, activeColor)
+        img.Circle(pt, task.DotSize, activeColor, -1, task.lineType)
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If task.quarterBeat Then
@@ -232,9 +232,9 @@ Public Class NR_OEX_delaunay2 : Inherits TaskParent
                     pts(0) = New cv.Point(Math.Round(t(0)), Math.Round(t(1)))
                     pts(1) = New cv.Point(Math.Round(t(2)), Math.Round(t(3)))
                     pts(2) = New cv.Point(Math.Round(t(4)), Math.Round(t(5)))
-                    vbc.DrawLine(dst2, pts(0), pts(1), delaunay_color)
-                    vbc.DrawLine(dst2, pts(1), pts(2), delaunay_color)
-                    vbc.DrawLine(dst2, pts(2), pts(0), delaunay_color)
+                    dst2.Line(pts(0), pts(1), delaunay_color, task.lineWidth, task.lineType)
+                    dst2.Line(pts(1), pts(2), delaunay_color, task.lineWidth, task.lineType)
+                    dst2.Line(pts(2), pts(0), delaunay_color, task.lineWidth, task.lineType)
                 Next
             Else
                 dst1 = dst2.Clone
@@ -255,7 +255,7 @@ Public Class NR_OEX_delaunay2 : Inherits TaskParent
 
                     ifacets(0) = ifacet
                     cv.Cv2.Polylines(dst3, ifacets, True, New cv.Vec3b, task.lineWidth, task.lineType)
-                    DrawCircle(dst3, centers(i), 3, New cv.Vec3b)
+                    dst3.Circle(centers(i), 3, New cv.Vec3b, -1, task.lineType)
                 Next
 
                 points.Clear()
@@ -372,7 +372,7 @@ Public Class NR_OEX_PointPolygon_demo : Inherits TaskParent
 
         dst2.SetTo(0)
         For i As Integer = 0 To vert.Count - 1
-            vbc.DrawLine(dst2, vert(i), vert((i + 1) Mod 6), white)
+            dst2.Line(vert(i), vert((i + 1) Mod 6), white, task.lineWidth, task.lineType)
         Next
 
         pointPoly.Run(dst2)

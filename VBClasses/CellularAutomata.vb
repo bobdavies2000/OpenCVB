@@ -127,7 +127,7 @@ Public Class CellularAutomata_Life : Inherits TaskParent
                 End If
                 If nextgrid.Get(Of Byte)(y, x) Then
                     Dim pt = New cv.Point(x, y) * factor
-                    DrawCircle(dst2, pt, factor / 2, nodeColor)
+                    dst2.Circle(pt, factor / 2, nodeColor, -1, task.lineType)
                     population += 1
                 End If
             Next
