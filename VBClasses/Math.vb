@@ -242,7 +242,7 @@ Public Class Math_ImageAverage : Inherits TaskParent
         End If
         cv.Cv2.Multiply(dst3, cv.Scalar.All(1 / (images.Count + 1)), dst3)
         images.Add(dst3.Clone)
-        If images.Count > task.frameHistoryCount Then images.RemoveAt(0)
+        If images.Count > task.fOptions.FrameHistoryCount.Value  Then images.RemoveAt(0)
 
         dst3.SetTo(0)
         For Each img In images
@@ -250,7 +250,7 @@ Public Class Math_ImageAverage : Inherits TaskParent
         Next
         If dst3.Type <> src.Type Then dst3.ConvertTo(dst2, src.Type) Else dst2 = dst3.Clone
         dst3 = Mat_Convert.Mat_32f_To_8UC3(dst3)
-        labels(2) = "Average image over previous " + CStr(task.frameHistoryCount) + " images"
+        labels(2) = "Average image over previous " + CStr(task.fOptions.FrameHistoryCount.Value ) + " images"
     End Sub
 End Class
 
@@ -269,16 +269,16 @@ Public Class NR_Math_ImageMaskedAverage : Inherits TaskParent
         If task.optionsChanged Then images.Clear()
         Dim nextImage As New cv.Mat
         If src.Type <> cv.MatType.CV_32F Then src.ConvertTo(nextImage, cv.MatType.CV_32F) Else nextImage = src
-        cv.Cv2.Multiply(nextImage, cv.Scalar.All(1 / task.frameHistoryCount), nextImage)
+        cv.Cv2.Multiply(nextImage, cv.Scalar.All(1 / task.fOptions.FrameHistoryCount.Value ), nextImage)
         images.Add(nextImage.Clone())
-        If images.Count > task.frameHistoryCount Then images.RemoveAt(0)
+        If images.Count > task.fOptions.FrameHistoryCount.Value  Then images.RemoveAt(0)
 
         nextImage.SetTo(0)
         For Each img In images
             nextImage += img
         Next
         If nextImage.Type <> src.Type Then nextImage.ConvertTo(dst2, src.Type) Else dst2 = nextImage
-        labels(2) = "Average image over previous " + CStr(task.frameHistoryCount) + " images"
+        labels(2) = "Average image over previous " + CStr(task.fOptions.FrameHistoryCount.Value ) + " images"
     End Sub
 End Class
 

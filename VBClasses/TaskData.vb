@@ -251,7 +251,6 @@ Partial Public Class AlgorithmTask
     Public channelsTop() As Integer
     Public channelsSide() As Integer
     Public bins2D() As Integer
-    Public frameHistoryCount As Integer ' count of how much history to use for the point cloud.
 
     Public projectionThreshold As Integer ' In heatmap views, this defines what is hot in a heatmap.
 

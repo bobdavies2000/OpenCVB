@@ -33,7 +33,7 @@ Namespace VBClasses
             Dim floorY = rect.Y
             floorList.Add(nextY)
             task.pcFloor = floorList.Average()
-            If floorList.Count > task.frameHistoryCount Then floorList.RemoveAt(0)
+            If floorList.Count > task.fOptions.FrameHistoryCount.Value Then floorList.RemoveAt(0)
             labels(2) = "Y = " + Format(task.pcFloor, fmt3) + " separates the floor.  Total pixels below floor level = " + Format(totalPixels, fmt0)
 
             For y = 0 To dst2.Height - 1
@@ -50,7 +50,7 @@ Namespace VBClasses
             Dim ceilingY = rect.Y
             ceilingList.Add(nextY)
             task.pcCeiling = ceilingList.Average()
-            If ceilingList.Count > task.frameHistoryCount Then ceilingList.RemoveAt(0)
+            If ceilingList.Count > task.fOptions.FrameHistoryCount.Value Then ceilingList.RemoveAt(0)
             labels(3) = "Y = " + Format(task.pcCeiling, fmt3) + " separates the ceiling.  Total pixels above ceiling level = " + Format(totalPixels, fmt0)
 
             If standaloneTest() Then
@@ -728,7 +728,7 @@ Namespace VBClasses
                         Dim pt = New cv.Point2f(x + Math.Abs(val) / Math.Abs(val - lastVal), y)
                         ptX.Add(pt.X)
                         ptY.Add(pt.Y)
-                        If ptX.Count >= task.frameHistoryCount Then Return New cv.Point2f(ptX.Average, ptY.Average)
+                        If ptX.Count >= task.fOptions.FrameHistoryCount.Value Then Return New cv.Point2f(ptX.Average, ptY.Average)
                     End If
                 Next
             Next
@@ -1415,7 +1415,7 @@ Namespace VBClasses
                 Next
             Next
 
-            If frameList.Count >= task.frameHistoryCount Then frameList.RemoveAt(0)
+            If frameList.Count >= task.fOptions.FrameHistoryCount.Value Then frameList.RemoveAt(0)
             pixelcount = dst3.CountNonZero
             labels(3) = "There were " + CStr(lineTotal) + " lines detected using " + Format(pixelcount / 1000, "#.0") + "k pixels"
         End Sub
@@ -4502,9 +4502,9 @@ Namespace VBClasses
             desc = "Collect a time series of depth mean and stdev to highlight where depth is unstable."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If task.optionsChanged Then meanSeries = New cv.Mat(task.gridRects.Count, task.frameHistoryCount, cv.MatType.CV_32F, cv.Scalar.All(0))
+            If task.optionsChanged Then meanSeries = New cv.Mat(task.gridRects.Count, task.fOptions.FrameHistoryCount.Value, cv.MatType.CV_32F, cv.Scalar.All(0))
 
-            Dim index = task.frameCount Mod task.frameHistoryCount
+            Dim index = task.frameCount Mod task.fOptions.FrameHistoryCount.Value
             Dim meanValues(task.gridRects.Count - 1) As Single
             Dim stdValues(task.gridRects.Count - 1) As Single
             Parallel.For(0, task.gridRects.Count,
@@ -4513,14 +4513,14 @@ Namespace VBClasses
                 Dim mean As cv.Scalar, stdev As cv.Scalar
                 cv.Cv2.MeanStdDev(task.pcSplit(2)(gRect), mean, stdev, task.depthmask(gRect))
                 meanSeries.Set(Of Single)(i, index, mean)
-                If task.frameCount >= task.frameHistoryCount - 1 Then
+                If task.frameCount >= task.fOptions.FrameHistoryCount.Value - 1 Then
                     cv.Cv2.MeanStdDev(meanSeries.Row(i), mean, stdev)
                     meanValues(i) = mean
                     stdValues(i) = stdev
                 End If
             End Sub)
 
-            If task.frameCount >= task.frameHistoryCount Then
+            If task.frameCount >= task.fOptions.FrameHistoryCount.Value Then
                 Dim means As cv.Mat = cv.Mat.FromPixelData(task.gridRects.Count, 1, cv.MatType.CV_32F, meanValues.ToArray)
                 Dim stdevs As cv.Mat = cv.Mat.FromPixelData(task.gridRects.Count, 1, cv.MatType.CV_32F, stdValues.ToArray)
                 Dim meanmask = means.Threshold(1, task.MaxZmeters, cv.ThresholdTypes.Binary).ConvertScaleAbs()
@@ -10673,7 +10673,7 @@ Namespace VBClasses
                 dst2.SetTo(0, mat)
             Next
 
-            If cellmaps.Count > task.frameHistoryCount Then
+            If cellmaps.Count > task.fOptions.FrameHistoryCount.Value Then
                 cellmaps.RemoveAt(0)
                 cellLists.RemoveAt(0)
                 diffs.RemoveAt(0)
@@ -11379,7 +11379,7 @@ Namespace VBClasses
                     dst3.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
                 Next
             Next
-            If lineHistory.Count > task.frameHistoryCount Then lineHistory.RemoveAt(0)
+            If lineHistory.Count > task.fOptions.FrameHistoryCount.Value Then lineHistory.RemoveAt(0)
 
             labels(2) = CStr(task.lines.lpList.Count) + " lines were found in the diff output"
         End Sub
@@ -11575,7 +11575,7 @@ Namespace VBClasses
                 Next
                 dst2 = task.motion.dst2
                 lastRects.Add(r)
-                If lastRects.Count > task.frameHistoryCount Then lastRects.RemoveAt(0)
+                If lastRects.Count > task.fOptions.FrameHistoryCount.Value Then lastRects.RemoveAt(0)
             End If
 
             If standaloneTest() Then
@@ -11776,7 +11776,7 @@ Namespace VBClasses
                 Next
             Next
 
-            If cellList.Count >= task.frameHistoryCount Then cellList.RemoveAt(0)
+            If cellList.Count >= task.fOptions.FrameHistoryCount.Value Then cellList.RemoveAt(0)
             src.CopyTo(dst2, dst3)
             task.motion.motionMask = dst3.Clone
 
@@ -14179,7 +14179,7 @@ Namespace VBClasses
                     dst3.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
                 Next
             Next
-            If lineHistory.Count >= task.frameHistoryCount Then lineHistory.RemoveAt(0)
+            If lineHistory.Count >= task.fOptions.FrameHistoryCount.Value Then lineHistory.RemoveAt(0)
 
             labels(2) = CStr(task.lines.lpList.Count) + " lines were found in the diff output"
         End Sub
@@ -15457,10 +15457,10 @@ Namespace VBClasses
                 Next
             Next
 
-            labels(2) = CStr(feat.features.Count) + " good features were tracked across " + CStr(task.frameHistoryCount) + " frames."
+            labels(2) = CStr(feat.features.Count) + " good features were tracked across " + CStr(task.fOptions.FrameHistoryCount.Value) + " frames."
             SetTrueText(labels(2) + vbCrLf + "The highlighted dots are the feature points", 3)
 
-            If trackAll.Count > task.frameHistoryCount Then trackAll.RemoveAt(0)
+            If trackAll.Count > task.fOptions.FrameHistoryCount.Value Then trackAll.RemoveAt(0)
         End Sub
     End Class
 
@@ -19670,7 +19670,7 @@ Namespace VBClasses
             Next
             nextDepth /= lastImages.Count
 
-            If lastImages.Count >= task.frameHistoryCount Then lastImages.RemoveAt(0)
+            If lastImages.Count >= task.fOptions.FrameHistoryCount.Value Then lastImages.RemoveAt(0)
 
             Static minDepth As New cv.Mat(dst2.Size, cv.MatType.CV_32F, 0)
             nextDepth.CopyTo(minDepth, task.motion.motionMask)
@@ -19873,10 +19873,10 @@ Namespace VBClasses
 
             leftHist.Add(tmpLeft)
             rightHist.Add(tmpRight)
-            Dim threshold = Math.Min(task.frameHistoryCount, leftHist.Count)
+            Dim threshold = Math.Min(task.fOptions.FrameHistoryCount.Value, leftHist.Count)
 
-            If leftHist.Count >= task.frameHistoryCount Then leftHist.RemoveAt(0)
-            If rightHist.Count >= task.frameHistoryCount Then rightHist.RemoveAt(0)
+            If leftHist.Count >= task.fOptions.FrameHistoryCount.Value Then leftHist.RemoveAt(0)
+            If rightHist.Count >= task.fOptions.FrameHistoryCount.Value Then rightHist.RemoveAt(0)
 
             If task.heartBeat Then
                 labels(2) = CStr(leftFeatures.Count) + " detected in the left image that have matches in " + CStr(threshold) + " previous left images"

@@ -89,7 +89,7 @@ Public Class Diff_RGBAccum : Inherits TaskParent
 
         diff.Run(src)
         history.Add(diff.dst2)
-        If history.Count > task.frameHistoryCount Then history.RemoveAt(0)
+        If history.Count > task.fOptions.FrameHistoryCount.Value  Then history.RemoveAt(0)
 
         dst2.SetTo(0)
         For Each m In history

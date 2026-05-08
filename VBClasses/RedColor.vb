@@ -336,7 +336,7 @@ End Class
 Public Class RedColor_Contour : Inherits TaskParent
     Public redC As New RedColor_Basics
     Public Sub New()
-        If New cv.Size(task.workRes.Width, task.workRes.Height) <> New cv.Size(168, 94) Then task.frameHistoryCount = 1
+        If New cv.Size(task.workRes.Width, task.workRes.Height) <> New cv.Size(168, 94) Then task.fOptions.FrameHistoryCount.Value  = 1
         desc = "Get stats on each RedCloud cell."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)

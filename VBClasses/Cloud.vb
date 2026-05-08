@@ -125,7 +125,7 @@ Public Class NR_Cloud_Display : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         pcHistory.Add(task.pointCloud)
-        If pcHistory.Count >= task.frameHistoryCount Then pcHistory.RemoveAt(0)
+        If pcHistory.Count >= task.fOptions.FrameHistoryCount.Value  Then pcHistory.RemoveAt(0)
 
         dst2.SetTo(0)
         For Each m In pcHistory
@@ -286,8 +286,8 @@ Public Class Cloud_Solo : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         heat.Run(src)
-        dst2 = heat.dst0.InRange(task.frameHistoryCount, task.frameHistoryCount).ConvertScaleAbs
-        dst3 = heat.dst1.InRange(task.frameHistoryCount, task.frameHistoryCount).ConvertScaleAbs
+        dst2 = heat.dst0.InRange(task.fOptions.FrameHistoryCount.Value , task.fOptions.FrameHistoryCount.Value ).ConvertScaleAbs
+        dst3 = heat.dst1.InRange(task.fOptions.FrameHistoryCount.Value , task.fOptions.FrameHistoryCount.Value ).ConvertScaleAbs
     End Sub
 End Class
 

@@ -8,7 +8,7 @@ Public Class History_Basics : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
 
-        If task.frameHistoryCount = 1 Then
+        If task.fOptions.FrameHistoryCount.Value  = 1 Then
             dst2 = src
             Exit Sub
         End If
@@ -21,7 +21,7 @@ Public Class History_Basics : Inherits TaskParent
             saveFrames.Clear()
         End If
 
-        If saveFrames.Count >= task.frameHistoryCount Then saveFrames.RemoveAt(0)
+        If saveFrames.Count >= task.fOptions.FrameHistoryCount.Value  Then saveFrames.RemoveAt(0)
         saveFrames.Add(input.Clone)
 
         For Each m In saveFrames
@@ -56,7 +56,7 @@ Public Class NR_History_Cloud : Inherits TaskParent
             dst3 = New cv.Mat(dst2.Size(), cv.MatType.CV_32FC3, 0)
         End If
 
-        If saveFrames.Count >= task.frameHistoryCount Then
+        If saveFrames.Count >= task.fOptions.FrameHistoryCount.Value  Then
             dst3 = dst3.Subtract(saveFrames.ElementAt(0))
             saveFrames.RemoveAt(0)
         End If
@@ -91,7 +91,7 @@ Public Class History_BasicsNoSaturation : Inherits TaskParent
             dst3.SetTo(0)
         End If
 
-        If saveFrames.Count >= task.frameHistoryCount Then
+        If saveFrames.Count >= task.fOptions.FrameHistoryCount.Value  Then
             dst3 = dst3.Subtract(saveFrames.ElementAt(0))
             saveFrames.RemoveAt(0)
         End If
@@ -149,12 +149,12 @@ Public Class History_Basics8U : Inherits TaskParent
             src = dst3.Threshold(options.pixelDiffThreshold, 255, cv.ThresholdTypes.Binary)
         End If
 
-        If task.frameHistoryCount = 1 Then
+        If task.fOptions.FrameHistoryCount.Value  = 1 Then
             dst2 = src
             Exit Sub
         End If
 
-        If saveFrames.Count > task.frameHistoryCount Then saveFrames.RemoveAt(0)
+        If saveFrames.Count > task.fOptions.FrameHistoryCount.Value  Then saveFrames.RemoveAt(0)
         saveFrames.Add(src.Clone)
 
         dst2.SetTo(0)
@@ -188,14 +188,14 @@ Public Class History_ReliableDepth : Inherits TaskParent
 
         If standalone Then src = task.noDepthMask
 
-        If task.frameHistoryCount = 1 Then
+        If task.fOptions.FrameHistoryCount.Value  = 1 Then
             dst2 = task.depthmask
             Exit Sub
         End If
 
         If task.optionsChanged Then saveFrames.Clear()
 
-        If saveFrames.Count > task.frameHistoryCount Then saveFrames.RemoveAt(0)
+        If saveFrames.Count > task.fOptions.FrameHistoryCount.Value  Then saveFrames.RemoveAt(0)
         saveFrames.Add(src.Clone)
 
         dst2 = saveFrames(0)

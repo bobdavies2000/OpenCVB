@@ -358,7 +358,7 @@ Public Class NR_Pixel_Unstable : Inherits TaskParent
         dst3 = dst3.Threshold(options.pixelDiffThreshold, 255, cv.ThresholdTypes.Binary)
 
         unstable.Add(dst3)
-        If unstable.Count > task.frameHistoryCount Then unstable.RemoveAt(0)
+        If unstable.Count > task.fOptions.FrameHistoryCount.Value  Then unstable.RemoveAt(0)
 
         unstablePixels = unstable(0)
         For i = 1 To unstable.Count - 1

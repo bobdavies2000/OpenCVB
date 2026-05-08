@@ -43,12 +43,14 @@ Public Class Pendulum_Basics : Inherits TaskParent
 
         accumulator += dt
 
-        Dim p1 = New cv.Point2f((dst2.Width / 2 + Math.Sin(o1) * l1 + dw * 0.5F) / dw, dst2.Height - (Math.Cos(o1) * l1 + dh * 0.5F) / dh + dst2.Height / dh / 2)
+        Dim p1 = New cv.Point((dst2.Width / 2 + Math.Sin(o1) * l1 + dw * 0.5F) / dw, dst2.Height - (Math.Cos(o1) * l1 + dh * 0.5F) / dh + dst2.Height / dh / 2)
         ' adjust to fit in the image better
-        p1 = New cv.Point2f(p1.X * 2, p1.Y * 0.5F)
-        Dim p2 = New cv.Point2f(p1.X + (Math.Sin(o2) * l2 + dw * 0.5F) / dw, p1.Y - (Math.Cos(o2) * l2 + dh * 0.5F) / dh)
+        p1 = New cv.Point(CInt(p1.X * 2), CInt(p1.Y * 0.5F))
+        Dim p2 = New cv.Point(p1.X + (Math.Sin(o2) * l2 + dw * 0.5F) / dw, p1.Y - (Math.Cos(o2) * l2 + dh * 0.5F) / dh)
 
-        dst2.Line(center, p1, task.scalarColors(task.frameCount Mod 255), task.lineWidth, task.lineType)
+
+        Dim lineCenter = New cv.Point(CInt(center.x), CInt(center.y))
+        dst2.Line(lineCenter, p1, task.scalarColors(task.frameCount Mod 255), task.lineWidth, task.lineType)
         dst2.Line(p1, p2, task.scalarColors(task.frameCount Mod 255), task.lineWidth, task.lineType)
 
         dst3.Circle(p1, task.DotSize, task.scalarColors(task.frameCount Mod 255), -1, task.lineType)

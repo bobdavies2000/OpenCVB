@@ -352,7 +352,7 @@ Public Class NR_Depth_HolesOverTime : Inherits TaskParent
         dst2 = dst0.Threshold(0, 255, cv.ThresholdTypes.Binary)
 
         labels(2) = "Depth holes integrated over the past " + CStr(images.Count) + " images"
-        If images.Count >= task.frameHistoryCount Then
+        If images.Count >= task.fOptions.FrameHistoryCount.Value  Then
             dst0 -= images(0)
             images.RemoveAt(0)
         End If
@@ -533,8 +533,8 @@ Public Class NR_Depth_ForegroundOverTime : Inherits TaskParent
         labels = {"", "", "Foreground objects", "Edges for the Foreground Objects"}
         dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
-        task.frameHistoryCount = 5
-        desc = "Create a fused foreground mask over x number of frames (task.frameHistoryCount)"
+        task.fOptions.FrameHistoryCount.Value  = 5
+        desc = "Create a fused foreground mask over x number of frames (task.fOptions.FrameHistoryCount.Value )"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
@@ -547,7 +547,7 @@ Public Class NR_Depth_ForegroundOverTime : Inherits TaskParent
         For Each m In lastFrames
             dst2 += m
         Next
-        If lastFrames.Count >= task.frameHistoryCount Then lastFrames.RemoveAt(0)
+        If lastFrames.Count >= task.fOptions.FrameHistoryCount.Value  Then lastFrames.RemoveAt(0)
 
         contours.Run(dst2)
         dst2.SetTo(0)
@@ -1549,7 +1549,7 @@ Public Class Depth_TierCount : Inherits TaskParent
         kValues.Add(valley.valleyOrder.Count)
 
         classCount = CInt(kValues.Average)
-        If kValues.Count > task.frameHistoryCount * 10 Then kValues.RemoveAt(0)
+        If kValues.Count > task.fOptions.FrameHistoryCount.Value  * 10 Then kValues.RemoveAt(0)
 
         SetTrueText("'K' value = " + CStr(classCount) + " after averaging.  Instanteous value = " +
                         CStr(valley.valleyOrder.Count), 3)

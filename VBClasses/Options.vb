@@ -7812,7 +7812,7 @@ Public Class Options_History : Inherits OptionParent
     End Sub
     Public Sub Run()
         Static histSlider = FindSlider("Frame History")
-        task.frameHistoryCount = histSlider.value
+        task.fOptions.FrameHistoryCount.Value  = histSlider.value
     End Sub
 End Class
 

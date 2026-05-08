@@ -27,8 +27,8 @@ Public Class HeatMap_Basics : Inherits TaskParent
 
         dst2 = Palettize(dst0.ConvertScaleAbs(), 0).Clone
         dst3 = Palettize(dst1.ConvertScaleAbs(), 0)
-        labels(2) = "Top view of heat map with the last " + CStr(task.frameHistoryCount) + " frames"
-        labels(3) = "Side view of heat map with the last " + CStr(task.frameHistoryCount) + " frames"
+        labels(2) = "Top view of heat map with the last " + CStr(task.fOptions.FrameHistoryCount.Value ) + " frames"
+        labels(3) = "Side view of heat map with the last " + CStr(task.fOptions.FrameHistoryCount.Value ) + " frames"
     End Sub
 End Class
 

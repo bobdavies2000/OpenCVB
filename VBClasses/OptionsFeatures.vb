@@ -87,6 +87,7 @@
             Case 336, 168 '
                 ColorDiffSlider.Value = 10
         End Select
+        FrameHistoryCount.Value = 3
     End Sub
 
 

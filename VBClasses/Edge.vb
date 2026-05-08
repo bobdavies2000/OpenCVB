@@ -307,7 +307,7 @@ Public Class NR_Edge_Consistent : Inherits TaskParent
 
         Dim tmp = If(edges.dst2.Channels() = 1, edges.dst2.Clone, edges.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
         saveFrames.Add(tmp)
-        If saveFrames.Count > task.frameHistoryCount Then saveFrames.RemoveAt(0)
+        If saveFrames.Count > task.fOptions.FrameHistoryCount.Value  Then saveFrames.RemoveAt(0)
 
         dst2 = saveFrames(0)
         For i = 1 To saveFrames.Count - 1
@@ -663,7 +663,7 @@ Public Class Edge_CannyHistory : Inherits TaskParent
         For Each m In frameList
             dst3 = dst3 Or m
         Next
-        If frameList.Count >= task.frameHistoryCount Then frameList.RemoveAt(0)
+        If frameList.Count >= task.fOptions.FrameHistoryCount.Value  Then frameList.RemoveAt(0)
     End Sub
 End Class
 
@@ -1549,7 +1549,7 @@ Public Class NR_Edge_MotionFrames : Inherits TaskParent
         diff.Run(dst1)
         diff.dst2.ConvertTo(dst3, cv.MatType.CV_8U)
 
-        labels(2) = "Accumulated edges over " + CStr(task.frameHistoryCount) + " frames."
+        labels(2) = "Accumulated edges over " + CStr(task.fOptions.FrameHistoryCount.Value ) + " frames."
     End Sub
 End Class
 

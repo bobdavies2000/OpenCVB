@@ -347,8 +347,8 @@ Public Class IMU_Vertical : Inherits TaskParent
         lastAngleX = avgX
         lastAngleY = avgY
 
-        If angleXValue.Count >= task.frameHistoryCount Then angleXValue.RemoveAt(0)
-        If angleYValue.Count >= task.frameHistoryCount Then angleYValue.RemoveAt(0)
+        If angleXValue.Count >= task.fOptions.FrameHistoryCount.Value  Then angleXValue.RemoveAt(0)
+        If angleYValue.Count >= task.fOptions.FrameHistoryCount.Value  Then angleYValue.RemoveAt(0)
     End Sub
 End Class
 
@@ -819,7 +819,7 @@ Public Class IMU_Average : Inherits TaskParent
         Dim accMat = cv.Mat.FromPixelData(accList.Count, 1, cv.MatType.CV_64FC4, accList.ToArray)
         Dim imuMean = accMat.Mean()
         task.IMU_AverageAcceleration = New cv.Point3f(imuMean(0), imuMean(1), imuMean(2))
-        If accList.Count >= task.frameHistoryCount Then accList.RemoveAt(0)
+        If accList.Count >= task.fOptions.FrameHistoryCount.Value  Then accList.RemoveAt(0)
         strOut = "Average IMU acceleration: " + vbCrLf + Format(task.IMU_AverageAcceleration.X, fmt3) + vbTab + Format(task.IMU_AverageAcceleration.Y, fmt3) + vbTab +
                       Format(task.IMU_AverageAcceleration.Z, fmt3) + vbCrLf
         SetTrueText(strOut)

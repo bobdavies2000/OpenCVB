@@ -364,7 +364,7 @@ Public Class NR_Feature_TraceDelaunay : Inherits TaskParent
         Next
         goodList.Add(ptList)
 
-        If goodList.Count >= task.frameHistoryCount Then goodList.RemoveAt(0)
+        If goodList.Count >= task.fOptions.FrameHistoryCount.Value  Then goodList.RemoveAt(0)
 
         dst2.SetTo(0)
         For Each ptList In goodList
@@ -487,14 +487,14 @@ Public Class NR_Feature_History : Inherits TaskParent
             Next
         Next
 
-        Dim threshold = If(task.frameHistoryCount = 1, 0, 1)
+        Dim threshold = If(task.fOptions.FrameHistoryCount.Value  = 1, 0, 1)
         features.Clear()
         Dim whiteCount As Integer
         For i = 0 To newFeatures.Count - 1
             If gens(i) > threshold Then
                 Dim pt = newFeatures(i)
                 features.Add(pt)
-                If gens(i) < task.frameHistoryCount Then
+                If gens(i) < task.fOptions.FrameHistoryCount.Value  Then
                     dst2.Circle(pt, task.DotSize + 2, cv.Scalar.Red, -1, task.lineType)
                 Else
                     whiteCount += 1
@@ -503,11 +503,11 @@ Public Class NR_Feature_History : Inherits TaskParent
             End If
         Next
 
-        If featureHistory.Count > task.frameHistoryCount Then featureHistory.RemoveAt(0)
+        If featureHistory.Count > task.fOptions.FrameHistoryCount.Value  Then featureHistory.RemoveAt(0)
         If task.heartBeat Then
             labels(2) = CStr(features.Count) + "/" + CStr(whiteCount) + " present/present on every frame" +
                             " Red is a recent addition, yellow is present on previous " +
-                            CStr(task.frameHistoryCount) + " frames"
+                            CStr(task.fOptions.FrameHistoryCount.Value ) + " frames"
         End If
     End Sub
 End Class

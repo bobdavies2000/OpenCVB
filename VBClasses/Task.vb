@@ -121,8 +121,6 @@ Public Class AlgorithmTask : Implements IDisposable
             heartBeat = heartBeat Or optionsChanged Or mouseClickFlag
         End If
 
-        frameHistoryCount = 3 ' default value.  Use Options_History to update this value.
-
         filterBasics.Run(color.Clone)
         task.gray = filterBasics.dst3
         task.grayOriginal = task.gray.Clone

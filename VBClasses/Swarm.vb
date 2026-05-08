@@ -42,7 +42,7 @@ Public Class Swarm_Basics : Inherits TaskParent
 
         If task.optionsChanged Then cornerHistory.Clear()
 
-        Dim histCount = task.frameHistoryCount
+        Dim histCount = task.fOptions.FrameHistoryCount.Value 
         cornerHistory.Add(feat.features)
 
         Dim lastIndex = cornerHistory.Count - 1

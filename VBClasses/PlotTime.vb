@@ -116,7 +116,7 @@ Public Class PlotTime_Single : Inherits TaskParent
         Dim y As Single
         For i = 0 To inputList.Count - 1
             y = 1 - (inputList(i) - min) / (max - min)
-            y *= dst2.Height - 1
+            y = y * dst2.Height - 1
             Dim c As New cv.Point2f(i, y)
             If c.X < 1 Then c.X = 1
             dst2.Circle(c, task.DotSize, blue, -1, task.lineType)
@@ -130,7 +130,7 @@ Public Class PlotTime_Single : Inherits TaskParent
                 If useFixedRange Then
                     nextText = Choose(i + 1, CStr(max), CStr((max + min) \ 2), CStr(min))
                 Else
-                    nextText = Format(Choose(i + 1, max, inputList.Average, min), fmt)
+                    nextText = Format(Choose(i + 1, max, (min + max) / 2, min), fmt)
                 End If
                 Dim pt = Choose(i + 1, New cv.Point(0, 10), New cv.Point(0, dst2.Height \ 2 - 5),
                             New cv.Point(0, dst2.Height - 3))

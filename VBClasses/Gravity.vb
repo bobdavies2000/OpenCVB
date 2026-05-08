@@ -130,6 +130,60 @@ End Class
 
 
 
+Public Class Gravity_JitterDelta : Inherits TaskParent
+    Dim plot As New PlotTime_Single
+    Dim jitterHistory As New List(Of Single)
+    Dim lastGravity As lpData
+    Dim lastHorizon As lpData
+    Public Sub New()
+        If standalone Then task.gOptions.displayDst1.Checked = True
+        task.fOptions.FrameHistoryCount.Value = task.fOptions.FrameHistoryCount.Maximum
+        task.gOptions.CrossHairs.Checked = True
+        desc = "Cursor.ai: Measure gravity-vector jitter over time and plot it. Control jitter with IMU alpha filtering and stable mounting."
+        labels(3) = "Jitter over time plot"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        If task.firstPass Then
+            lastGravity = task.lpGravity
+            lastHorizon = task.lpHorizon
+        End If
+        task.gOptions.CrossHairs.Checked = True
+
+        dst2 = task.color.Clone
+
+        Dim jitterNow As Single
+        Dim angleDelta As Single
+        Dim xDelta As Single
+        Dim yDelta As Single
+        angleDelta = Math.Abs(task.lpGravity.angle - lastGravity.angle)
+        xDelta = task.lpGravity.ptE1.DistanceTo(lastGravity.ptE1)
+        yDelta = task.lpHorizon.ptE1.DistanceTo(lastHorizon.ptE1)
+        jitterNow = angleDelta + 0.1F * xDelta
+
+        jitterHistory.Add(jitterNow)
+        Dim histCount = task.fOptions.FrameHistoryCount.Value
+        If jitterHistory.Count > histCount Then jitterHistory.RemoveAt(0)
+        Dim jitterAvg = If(jitterHistory.Count > 0, jitterHistory.Average(), 0)
+
+        Dim jitterMat = cv.Mat.FromPixelData(jitterHistory.Count, 1, cv.MatType.CV_32F, jitterHistory.ToArray)
+        Dim mean = jitterMat.Mean()(0)
+
+        plot.plotData = jitterNow
+        plot.Run(src)
+        dst3 = plot.dst2.Clone
+
+        labels(2) = "Jitter now=" + Format(jitterNow, fmt3) + ", avg(" + CStr(histCount) + ")=" +
+                    Format(jitterAvg, fmt3) + "  angleDelta=" + Format(angleDelta, fmt3) + " mean = " + Format(mean, fmt3)
+        SetTrueText("Control jitter: increase IMU alpha, reduce vibration, improve camera mounting, and avoid sudden motion.", 1)
+
+        lastGravity = task.lpGravity
+        lastHorizon = task.lpHorizon
+    End Sub
+End Class
+
+
+
+
 Public Class Gravity_CloudMethod : Inherits TaskParent
     Public options As New Options_Features
     Public xTop As Single, xBot As Single
@@ -200,6 +254,117 @@ Public Class Gravity_CloudMethod : Inherits TaskParent
     End Sub
 End Class
 
+
+
+
+
+
+Public Class Gravity_LineTrackStabilize : Inherits TaskParent
+    Private Const LineAngleWeight As Single = 0.6F
+    Private Const GravityAngleWeight As Single = 0.4F
+    Private Const LineShiftWeight As Single = 0.8F
+    Private Const GravityShiftWeight As Single = 0.2F
+
+    Private refLine As lpData
+    Private refGravity As lpData
+    Private refReady As Boolean
+
+    Private frameHistory As New Queue(Of cv.Mat)
+    Private maskHistory As New Queue(Of cv.Mat)
+
+    Public Sub New()
+        desc = "Cursor.ai: Fuse gravity vector and LineTrack_Basics_TA.lpCurr to stabilize grayscale."
+    End Sub
+
+    Private Shared Function WarpPoint(pt As cv.Point2f, M As cv.Mat) As cv.Point2f
+        Dim x = pt.X
+        Dim y = pt.Y
+        Dim xOut = M.Get(Of Double)(0, 0) * x + M.Get(Of Double)(0, 1) * y + M.Get(Of Double)(0, 2)
+        Dim yOut = M.Get(Of Double)(1, 0) * x + M.Get(Of Double)(1, 1) * y + M.Get(Of Double)(1, 2)
+        Return New cv.Point2f(CSng(xOut), CSng(yOut))
+    End Function
+
+    Private Sub ResetState()
+        refReady = False
+        frameHistory.Clear()
+        maskHistory.Clear()
+    End Sub
+
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        Dim graySrc = If(src.Channels = 1, src, task.gray)
+        If graySrc.Empty Then Exit Sub
+        If task.optionsChanged Or task.firstPass Then ResetState()
+
+        Dim lpCurr = task.lineTrack.lpCurr
+        Dim lpGravity = task.lpGravity
+
+        If Not refReady Then
+            refLine = lpCurr
+            refGravity = lpGravity
+            refReady = True
+        End If
+
+        Dim dAngleLine = lpCurr.angle - refLine.angle
+        Dim dAngleGravity = lpGravity.angle - refGravity.angle
+        Dim fusedAngle = LineAngleWeight * dAngleLine + GravityAngleWeight * dAngleGravity
+
+        Dim dxLine = refLine.ptE1.X - lpCurr.ptE1.X
+        Dim dyLine = refLine.ptE1.Y - lpCurr.ptE1.Y
+        Dim dxGravity = refGravity.ptE1.X - lpGravity.ptE1.X
+        Dim dyGravity = refGravity.ptE1.Y - lpGravity.ptE1.Y
+        Dim tx = LineShiftWeight * dxLine + GravityShiftWeight * dxGravity
+        Dim ty = LineShiftWeight * dyLine + GravityShiftWeight * dyGravity
+
+        Dim M = cv.Cv2.GetRotationMatrix2D(lpCurr.ptCenter, -fusedAngle, 1.0)
+        M.Set(Of Double)(0, 2, M.Get(Of Double)(0, 2) + tx)
+        M.Set(Of Double)(1, 2, M.Get(Of Double)(1, 2) + ty)
+
+        Dim stabilized = graySrc.WarpAffine(M, graySrc.Size, cv.InterpolationFlags.Linear, cv.BorderTypes.Constant, cv.Scalar.Black)
+        Dim srcMask As New cv.Mat(graySrc.Size, cv.MatType.CV_8U, 255)
+        Dim validMask = srcMask.WarpAffine(M, graySrc.Size, cv.InterpolationFlags.Nearest, cv.BorderTypes.Constant, cv.Scalar.Black)
+
+        frameHistory.Enqueue(stabilized)
+        maskHistory.Enqueue(validMask)
+        While frameHistory.Count > task.fOptions.FrameHistoryCount.Value
+            frameHistory.Dequeue()
+            maskHistory.Dequeue()
+        End While
+
+        Dim sumImg As New cv.Mat(graySrc.Size, cv.MatType.CV_32F, 0)
+        Dim sumCnt As New cv.Mat(graySrc.Size, cv.MatType.CV_32F, 0)
+        Dim frames = frameHistory.ToArray()
+        Dim masks = maskHistory.ToArray()
+        For i = 0 To frames.Length - 1
+            Dim f32 As New cv.Mat
+            Dim m32 As New cv.Mat
+            frames(i).ConvertTo(f32, cv.MatType.CV_32F)
+            masks(i).ConvertTo(m32, cv.MatType.CV_32F, 1.0 / 255.0)
+            cv.Cv2.Accumulate(f32, sumImg, masks(i))
+            cv.Cv2.Add(sumCnt, m32, sumCnt)
+        Next
+
+        Dim denom As New cv.Mat
+        cv.Cv2.Max(sumCnt, 1.0, denom)
+        Dim avg32 As New cv.Mat
+        cv.Cv2.Divide(sumImg, denom, avg32)
+        avg32.ConvertTo(dst2, cv.MatType.CV_8U)
+
+        Dim hasData = sumCnt.Threshold(0.5, 255, cv.ThresholdTypes.Binary)
+        hasData.ConvertTo(hasData, cv.MatType.CV_8U)
+        dst2.SetTo(0, Not hasData)
+
+        dst3 = dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        Dim currP1 = WarpPoint(lpCurr.p1, M)
+        Dim currP2 = WarpPoint(lpCurr.p2, M)
+        Dim gravP1 = WarpPoint(lpGravity.p1, M)
+        Dim gravP2 = WarpPoint(lpGravity.p2, M)
+        dst3.Line(currP1, currP2, cv.Scalar.Red, task.lineWidth + 1, task.lineType)
+        dst3.Line(gravP1, gravP2, cv.Scalar.Yellow, task.lineWidth + 1, task.lineType)
+
+        labels(2) = "Stabilized accumulation of last " + CStr(frameHistory.Count) + " frames."
+        labels(3) = "fusedAngle=" + Format(fusedAngle, fmt2) + " deg tx=" + Format(tx, fmt2) + " ty=" + Format(ty, fmt2)
+    End Sub
+End Class
 
 
 
@@ -374,7 +539,7 @@ Public Class NR_Gravity_Basics_Original : Inherits TaskParent
                     Dim pt = New cv.Point2f(x + Math.Abs(val) / Math.Abs(val - lastVal), y)
                     ptX.Add(pt.X)
                     ptY.Add(pt.Y)
-                    If ptX.Count >= task.frameHistoryCount Then
+                    If ptX.Count >= task.fOptions.FrameHistoryCount.Value Then
                         Return New cv.Point2f(ptX.Average, ptY.Average)
                     End If
                 End If

@@ -611,7 +611,7 @@ Public Class NR_Plane_Verticals : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         solo.Run(src)
-        dst3 = solo.heat.topframes.dst2.InRange(task.projectionThreshold * task.frameHistoryCount, dst2.Total)
+        dst3 = solo.heat.topframes.dst2.InRange(task.projectionThreshold * task.fOptions.FrameHistoryCount.Value , dst2.Total)
 
         dst1 = New cv.Mat(dst1.Size(), cv.MatType.CV_32FC1, 0)
         solo.heat.dst0.CopyTo(dst1, dst3)
@@ -645,7 +645,7 @@ Public Class NR_Plane_Horizontals : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         solo.Run(src)
-        dst3 = solo.heat.sideframes.dst2.InRange(task.projectionThreshold * task.frameHistoryCount, dst2.Total)
+        dst3 = solo.heat.sideframes.dst2.InRange(task.projectionThreshold * task.fOptions.FrameHistoryCount.Value , dst2.Total)
 
         dst1 = New cv.Mat(dst1.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         solo.heat.dst1.CopyTo(dst1, dst3)

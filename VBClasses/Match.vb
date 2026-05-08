@@ -288,7 +288,7 @@ Public Class NR_Match_TraceRedC : Inherits TaskParent
         labels(2) = CStr(redC.rcList.Count) + " cells added"
 
         frameList.Add(dst0.Clone)
-        If frameList.Count >= task.frameHistoryCount Then
+        If frameList.Count >= task.fOptions.FrameHistoryCount.Value  Then
             dst1 = dst1.Subtract(frameList(0))
             frameList.RemoveAt(0)
         End If
@@ -327,7 +327,7 @@ Public Class NR_Match_TraceRedC1 : Inherits TaskParent
         labels(2) = CStr(redC.rcList.Count) + " cells added"
 
         frameList.Add(dst0.Clone)
-        If frameList.Count >= task.frameHistoryCount Then
+        If frameList.Count >= task.fOptions.FrameHistoryCount.Value  Then
             dst1 = dst1.Subtract(frameList(0))
             frameList.RemoveAt(0)
         End If
@@ -423,7 +423,7 @@ Public Class NR_Match_GoodFeatureKNN : Inherits TaskParent
             If lp.p1.DistanceTo(lp.p2) <= maxDistance Then dst0.Line(lp.p1, lp.p2, 255, task.lineWidth + 2, cv.LineTypes.Link4)
         Next
         frameList.Add(dst0.Clone)
-        If frameList.Count >= task.frameHistoryCount Then
+        If frameList.Count >= task.fOptions.FrameHistoryCount.Value  Then
             dst1 = dst1.Subtract(frameList(0))
             frameList.RemoveAt(0)
         End If

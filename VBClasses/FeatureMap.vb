@@ -547,7 +547,7 @@ Public Class NR_FeatureMap_ByDepth : Inherits TaskParent
         dst3.SetTo(0, palInput.Threshold(0, 255, cv.ThresholdTypes.BinaryInv))
 
 
-        Dim removeFrame As Integer = If(task.frameCount > task.frameHistoryCount, task.frameCount - task.frameHistoryCount, -1)
+        Dim removeFrame As Integer = If(task.frameCount > task.fOptions.FrameHistoryCount.Value , task.frameCount - task.fOptions.FrameHistoryCount.Value , -1)
         For i = fpCells.Count - 1 To 0 Step -1
             Dim frame = fpCells(i).Item2
             If frame = removeFrame Then fpCells.RemoveAt(i)
