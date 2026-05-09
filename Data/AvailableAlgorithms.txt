@@ -308,7 +308,7 @@ Gradient_Color
 Gradient_PhaseDepth
 Gravity_Basics_TA
 Gravity_CloudMethod
-Gravity_JitterDelta
+Gravity_Jitter
 Gravity_LineTrackStabilize
 Grid_Basics_TA
 Grid_FPS

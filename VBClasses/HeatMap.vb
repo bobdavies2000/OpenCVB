@@ -114,6 +114,7 @@ Public Class HeatMap_Cell : Inherits TaskParent
         flood.Run(src)
         dst2 = flood.dst2
         labels(2) = flood.labels(2)
+        If flood.rcList.Count = 0 Then Exit Sub ' nothing to work on!
 
         strOut = RedUtil_Basics.selectCell(flood.rcMap, flood.rcList)
 
