@@ -1,3 +1,33 @@
+**May 1, 2026 – Heartbeat, ChatBots, OpenCVSharp Version, HashSet,**
+
+**Depth Tiers, LineTrack**
+
+-   Over 1700 algorithms are included, averaging 36 lines of code per algorithm.
+    -   Over 400 additional obsolete algorithms compiled for reference use.
+-   The flag that triggers an event right after a long-term heartbeat is now working.
+    -   The “afterHeartBeatLT” is true during the frame after “heartbeatLT”.
+-   AI-generated algorithms will have the vendor name in the description.
+    -   For example, if cursor.ai was used, “Cursor.ai” will be in the description.
+    -   Each algorithm is manually improved (often significantly) but largely intact.
+-   The StereoLabs package fails when OpenCVB is updated to the 4/27 OpenCVSharp.
+    -   Other cameras work fine but StereoLabs needs to update their library.
+    -   For the time being, use the 3/30 version of OpenCVSharp.
+-   There is better performance with “HashSet” when using the “Contains” method.
+    -   All lists using the “contains” method are defined as hashsets.
+-   Depth_Tiers_TA is a task algorithm that creates 10 depth tiers (default).
+    -   It assigns a color to every pixel that reflects the depth value at that pixel.
+    -   A depth tier image is produced after each heartbeat.
+    -   In the TreeView, click on “Depth_Tiers_TA” to see the current image.
+    -   Note that colors are consistently appearing in the same region.
+-   The task algorithm “LineTrack_Basics_TA” finds and tracks the longest line.
+    -   If the tracked line is lost, the longest line for the current image is tracked.
+    -   LineTrack_Basics_TA is a task algorithm that runs on every frame.
+    -   Accuracy and reliability will be subjected to further testing and review.
+
+**![](media/97d4c0defb419eedb236245084c6fd00.gif)**
+
+**LineTrack_Basics_TA:** *The longest line detected is tracked on every frame. If the tracking detects that the line is not present, a flag is set and the current longest line becomes the line to be tracked in future frames. The algorithm is a task algorithm that runs on every frame. The line is always extended to the edge of the image.*
+
 **April 23, 2026 – Delaunay Map, Stable Depth, Foreground**
 
 -   Over 1700 algorithms are included, averaging 36 lines of code per algorithm.
@@ -1654,7 +1684,7 @@
 
 ![A colorful pattern with dots Description automatically generated with medium confidence](media/db52b0115273726a6ff2d1aa986c0817.gif)
 
-**RedCloud_Basics:**  *What’s different? The latest version of the image segmentation algorithm is similar to the previous version below but has classified* **ALL** *of the pixels. Small cells were tossed in the example below yielding holes (represented as black segments below) while here the small cells are consolidated using a grid that covers the entire image. As before, if a cell’s color is consistent, it has been matched with a cell from the previous frame.*
+**RedCloud_Basics:** *What’s different? The latest version of the image segmentation algorithm is similar to the previous version below but has classified* **ALL** *of the pixels. Small cells were tossed in the example below yielding holes (represented as black segments below) while here the small cells are consolidated using a grid that covers the entire image. As before, if a cell’s color is consistent, it has been matched with a cell from the previous frame.*
 
 ![A colorful squares and lines Description automatically generated with medium confidence](media/c4eed0d963820c627ec5b94291a36c4d.gif)
 
