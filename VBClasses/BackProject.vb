@@ -445,7 +445,7 @@ Public Class NR_BackProject_MaskLines : Inherits TaskParent
         masks.Run(src)
         dst2 = masks.dst2
 
-        Dim lpList = Line_Basics_TA.getRawLines(task.lines.ld.Detect(masks.dst1))
+        Dim lpList = Line_Basics.getRawLines(task.lines.basics.ld.Detect(masks.dst1))
 
         dst1.SetTo(0)
         For Each lp In lpList

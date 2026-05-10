@@ -6,6 +6,8 @@ Public Module vbc
     Public wcMinVal As Single = -1000
     Public wcMaxVal As Single = 1000
 
+    Public Const PixelsPerRad As Single = 60.0F
+    Public Const RadToDeg As Double = 57.295779513082323
     Public Const fmt0 = "0"
     Public Const fmt1 = "0.0"
     Public Const fmt2 = "0.00"

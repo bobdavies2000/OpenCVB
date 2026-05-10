@@ -108,7 +108,7 @@ Public Class Gravity_Basics_TA : Inherits TaskParent
 
         Dim y1 = task.accRadians.Y - cv.Cv2.PI
         If task.accRadians.X < 0 Then y1 *= -1
-        task.verticalizeAngle = y1 * 58.2958
+        task.verticalizeAngle = y1 * RadToDeg
 
         ' Unit gravity vector in body frame (points down)
         GravityVector = AnglesToGravityVector(task.accRadians)

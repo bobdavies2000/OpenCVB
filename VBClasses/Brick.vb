@@ -20,46 +20,46 @@ Public Class Brick_Basics : Inherits TaskParent
         brickDepthCount = 0
         Dim colorstdev As cv.Scalar
         For i = 0 To task.gridRects.Count - 1
-            Dim r As New brickData
-            r.index = brickList.Count
+            Dim brick As New brickData
+            brick.index = brickList.Count
 
-            r.rect = task.gridRects(r.index)
-            r.lRect = r.rect
+            brick.rect = task.gridRects(brick.index)
+            brick.lRect = brick.rect
 
-            r.depth = task.pcSplit(2)(r.rect).Mean(task.depthmask(r.rect))
-            r.mmDepth = GetMinMax(task.pcSplit(2)(r.rect), task.depthmask(r.rect))
-            If r.depth > Single.MaxValue Or r.depth < Single.MinValue Then r.depth = 0
+            brick.depth = task.pcSplit(2)(brick.rect).Mean(task.depthmask(brick.rect))
+            brick.mmDepth = GetMinMax(task.pcSplit(2)(brick.rect), task.depthmask(brick.rect))
+            If brick.depth > Single.MaxValue Or brick.depth < Single.MinValue Then brick.depth = 0
 
-            cv.Cv2.MeanStdDev(src(r.rect), r.color, colorstdev)
-            r.center = New cv.Point(r.rect.X + r.rect.Width / 2, r.rect.Y + r.rect.Height / 2)
+            cv.Cv2.MeanStdDev(src(brick.rect), brick.color, colorstdev)
+            brick.center = New cv.Point(brick.rect.X + brick.rect.Width / 2, brick.rect.Y + brick.rect.Height / 2)
 
-            If r.depth > 0 Then
-                r.mmDepth = GetMinMax(task.pcSplit(2)(r.rect), task.depthmask(r.rect))
+            If brick.depth > 0 Then
+                brick.mmDepth = GetMinMax(task.pcSplit(2)(brick.rect), task.depthmask(brick.rect))
                 brickDepthCount += 1
-                r.rRect = r.rect
-                r.rRect.X -= task.calibData.baseline * task.calibData.leftIntrinsics.fx / r.depth
-                If r.rRect.X < 0 Or r.rRect.X + r.rRect.Width >= dst2.Width Then
-                    r.rRect.Width = 0 ' off the image
+                brick.rRect = brick.rect
+                brick.rRect.X -= task.calibData.baseline * task.calibData.leftIntrinsics.fx / brick.depth
+                If brick.rRect.X < 0 Or brick.rRect.X + brick.rRect.Width >= dst2.Width Then
+                    brick.rRect.Width = 0 ' off the image
                 End If
 
-                If r.lRect.Width = r.rRect.Width Then
-                    cv.Cv2.MatchTemplate(task.leftView(r.lRect), task.rightView(r.rRect),
+                If brick.lRect.Width = brick.rRect.Width Then
+                    cv.Cv2.MatchTemplate(task.leftView(brick.lRect), task.rightView(brick.rRect),
                                                          correlationMat, cv.TemplateMatchModes.CCoeffNormed)
-                    r.correlation = correlationMat.Get(Of Single)(0, 0)
+                    brick.correlation = correlationMat.Get(Of Single)(0, 0)
 
-                    Dim p0 = Cloud_Basics.worldCoordinates(r.rect.TopLeft, r.depth)
-                    Dim p1 = Cloud_Basics.worldCoordinates(r.rect.BottomRight, r.depth)
+                    Dim p0 = Cloud_Basics.worldCoordinates(brick.rect.TopLeft, brick.depth)
+                    Dim p1 = Cloud_Basics.worldCoordinates(brick.rect.BottomRight, brick.depth)
 
                     ' clockwise around starting in upper left.
-                    r.corners.Add(New cv.Point3f(p0.X, p0.Y, r.depth))
-                    r.corners.Add(New cv.Point3f(p1.X, p0.Y, r.depth))
-                    r.corners.Add(New cv.Point3f(p1.X, p1.Y, r.depth))
-                    r.corners.Add(New cv.Point3f(p0.X, p1.Y, r.depth))
+                    brick.corners.Add(New cv.Point3f(p0.X, p0.Y, brick.depth))
+                    brick.corners.Add(New cv.Point3f(p1.X, p0.Y, brick.depth))
+                    brick.corners.Add(New cv.Point3f(p1.X, p1.Y, brick.depth))
+                    brick.corners.Add(New cv.Point3f(p0.X, p1.Y, brick.depth))
                 End If
             End If
 
-            If r.depth > 0 Then depthCount += 1
-            brickList.Add(r)
+            If brick.depth > 0 Then depthCount += 1
+            brickList.Add(brick)
         Next
 
         If standaloneTest() Then
@@ -193,20 +193,20 @@ Public Class NR_Brick_Info : Inherits TaskParent
 
         Dim index As Integer = task.gridMap.Get(Of Integer)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
 
-        Dim r As brickData = bricks.brickList(index)
+        Dim brick As brickData = bricks.brickList(index)
         dst2 = src
 
         strOut = labels(2) + vbCrLf + vbCrLf
 
-        dst2.Rectangle(r.rect, task.highlight, task.lineWidth)
+        dst2.Rectangle(brick.rect, task.highlight, task.lineWidth)
 
         strOut += CStr(index) + vbTab + "Grid ID" + vbCrLf
-        strOut += CStr(r.age) + vbTab + "Age" + vbTab + vbCrLf
-        strOut += Format(r.correlation, fmt3) + vbTab + "Correlation of the left image to right image" + vbCrLf
-        strOut += Format(r.depth, fmt3) + vbTab + "Depth" + vbCrLf
-        strOut += Format(r.mm.minVal, fmt3) + vbTab + "Depth mm.minval" + vbCrLf
-        strOut += Format(r.mm.maxVal, fmt3) + vbTab + "Depth mm.maxval" + vbCrLf
-        strOut += Format(r.mm.range, fmt3) + vbTab + "Depth mm.range" + vbCrLf
+        strOut += CStr(brick.age) + vbTab + "Age" + vbTab + vbCrLf
+        strOut += Format(brick.correlation, fmt3) + vbTab + "Correlation of the left image to right image" + vbCrLf
+        strOut += Format(brick.depth, fmt3) + vbTab + "Depth" + vbCrLf
+        strOut += Format(brick.mm.minVal, fmt3) + vbTab + "Depth mm.minval" + vbCrLf
+        strOut += Format(brick.mm.maxVal, fmt3) + vbTab + "Depth mm.maxval" + vbCrLf
+        strOut += Format(brick.mm.range, fmt3) + vbTab + "Depth mm.range" + vbCrLf
 
         SetTrueText(strOut, 3)
     End Sub
@@ -777,7 +777,7 @@ End Class
 
 Public Class NR_Brick_Lines : Inherits TaskParent
     Dim bricks As New Brick_Basics
-    Dim lines As New Line_Basics_TA
+    Dim lines As New Line_Basics
     Dim options As New Options_LeftRightCorrelation
     Dim motionLeft As New Motion_Basics_TA
     Public Sub New()
@@ -845,7 +845,7 @@ End Class
 
 Public Class NR_Brick_NoDepthLines : Inherits TaskParent
     Dim bricks As New Brick_Basics
-    Dim lines As New Line_Basics_TA
+    Dim lines As New Line_Basics
     Dim options As New Options_LeftRightCorrelation
     Dim motionLeft As New Motion_Basics_TA
     Public Sub New()

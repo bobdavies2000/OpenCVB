@@ -1,7 +1,7 @@
 Imports cv = OpenCvSharp
 Public Class DepthLine_Basics : Inherits TaskParent
     Public prepEdges As New RedPrep_EdgeMask
-    Dim lines As New Line_Basics_TA
+    Dim lines As New Line_Basics
     Public motionLeft As New Motion_Basics_TA
     Public lpList As New List(Of lpData)
     Public Sub New()
@@ -183,7 +183,7 @@ Public Class NR_DepthLine_HV2 : Inherits TaskParent
     Dim lineX As New RedPrep_EdgeMask
     Dim lineY As New RedPrep_EdgeMask
     Public lpList As New List(Of lpData)
-    Dim lines As New Line_Basics_TA
+    Dim lines As New Line_Basics
     Public motionLeft As New Motion_Basics_TA
     Public Sub New()
         lineX.reductionName = "X Reduction"

@@ -1,5 +1,27 @@
 Imports cv = OpenCvSharp
 Public Class Line_Basics_TA : Inherits TaskParent
+    Public lpList As New List(Of lpData)
+    Public motionMask As cv.Mat = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 255)
+    Public basics As New Line_Basics
+    Public Sub New()
+        labels(2) = "Line_Basics output"
+        desc = "Run FLD (Fast Line Detector) with sobel input."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        If src.Channels <> 1 Or src.Type <> cv.MatType.CV_8U Then src = task.gray.Clone
+
+        basics.Run(src)
+        dst2 = basics.dst2
+        dst3 = basics.dst3
+        labels = basics.labels
+        lpList = New List(Of lpData)(basics.lpList)
+    End Sub
+End Class
+
+
+
+
+Public Class Line_Basics : Inherits TaskParent
     Implements IDisposable
     Public lpList As New List(Of lpData)
     Public ld As cv.XImgProc.FastLineDetector
@@ -8,7 +30,7 @@ Public Class Line_Basics_TA : Inherits TaskParent
     Public Sub New()
         dst1 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
-        labels(2) = "Edges_Basics output"
+        labels(2) = "Line_Basics output"
         ld = cv.XImgProc.CvXImgProc.CreateFastLineDetector
         desc = "Run FLD (Fast Line Detector) with sobel input."
     End Sub
@@ -38,7 +60,7 @@ Public Class Line_Basics_TA : Inherits TaskParent
         edges.Run(src)
         labels(2) = edges.labels(2)
 
-        Dim newList = Line_Basics_TA.getRawLines(ld.Detect(edges.dst2))
+        Dim newList = Line_Basics.getRawLines(ld.Detect(edges.dst2))
 
         dst1.SetTo(0)
         Dim lpSorted As New SortedList(Of Single, Integer)(New compareAllowIdenticalSingleInverted)
@@ -106,7 +128,7 @@ Public Class Line_BasicsLSD : Inherits TaskParent
         lsd.Detect(src, vecMat)
         Dim vecArray() As cv.Vec4f = Nothing
         vecMat.GetArray(Of cv.Vec4f)(vecArray)
-        lpList = Line_Basics_TA.getRawLines(vecArray)
+        lpList = Line_Basics.getRawLines(vecArray)
 
         dst1.SetTo(0)
         Dim index As Integer
@@ -153,7 +175,7 @@ Public Class Line_WithAging : Inherits TaskParent
         dst2 = src.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         If lpList.Count <= 1 Then
             motionMask.SetTo(255)
-            lpList = Line_Basics_TA.getRawLines(ld.Detect(src))
+            lpList = Line_Basics.getRawLines(ld.Detect(src))
         End If
 
         Dim sortlines As New SortedList(Of Single, lpData)(New compareAllowIdenticalSingleInverted)
@@ -165,7 +187,7 @@ Public Class Line_WithAging : Inherits TaskParent
         Next
         Dim count As Integer = sortlines.Count
 
-        lpList = Line_Basics_TA.getRawLines(ld.Detect(src))
+        lpList = Line_Basics.getRawLines(ld.Detect(src))
 
         For Each lp In lpList
             If motionMask.Get(Of Byte)(lp.p1.Y, lp.p1.X) Or motionMask.Get(Of Byte)(lp.p2.Y, lp.p2.X) Then
@@ -213,7 +235,7 @@ End Class
 
 
 Public Class NR_Line_Basics_TATest : Inherits TaskParent
-    Dim lines As New Line_Basics_TA
+    Dim lines As New Line_Basics
     Public Sub New()
         desc = "Line_Basics_TA is a task algorithm so this is the better way to test it."
     End Sub
@@ -251,12 +273,12 @@ Public Class Line_Core : Inherits TaskParent
             dst1.SetTo(0)
             src(task.drawRectFinal).CopyTo(dst1)
             drawing = True
-            vecArray = task.lines.ld.Detect(dst1)
+            vecArray = task.lines.basics.ld.Detect(dst1)
         Else
-            vecArray = task.lines.ld.Detect(src)
+            vecArray = task.lines.basics.ld.Detect(src)
         End If
 
-        lpList = Line_Basics_TA.getRawLines(vecArray)
+        lpList = Line_Basics.getRawLines(vecArray)
 
         dst2.SetTo(0)
         For Each lp In lpList
@@ -516,8 +538,8 @@ Public Class Line_Motion : Inherits TaskParent
     End Sub
     Private Function lpMotion(lp As lpData) As Boolean
         ' return true if either line endpoint was in the motion mask.
-        If task.lines.motionMask.Get(Of Byte)(lp.p1.Y, lp.p1.X) Then Return True
-        If task.lines.motionMask.Get(Of Byte)(lp.p2.Y, lp.p2.X) Then Return True
+        If lrLines.linesLeft.motionMask.Get(Of Byte)(lp.p1.Y, lp.p1.X) Then Return True
+        If lrLines.linesRight.motionMask.Get(Of Byte)(lp.p2.Y, lp.p2.X) Then Return True
         Return False
     End Function
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -545,8 +567,8 @@ End Class
 
 
 Public Class Line_LeftRightMotion : Inherits TaskParent
-    Public linesLeft As New Line_Basics_TA
-    Public linesRight As New Line_Basics_TA
+    Public linesLeft As New Line_Basics
+    Public linesRight As New Line_Basics
     Dim motionLeft As New Motion_Basics_TA
     Dim motionRight As New Motion_Basics_TA
     Public Sub New()
@@ -632,7 +654,7 @@ Public Class Line_LeftTrack : Inherits TaskParent
     Const lenRatioThresh As Single = 0.45F
 
     Public lpList As New List(Of lpData)
-    Dim lines As New Line_Basics_TA
+    Dim lines As New Line_Basics
     Dim options As New Options_LeftRightCorrelation
     Dim motionLeft As New Motion_Basics_TA
     Public Sub New()
@@ -734,7 +756,7 @@ End Class
 
 
 Public Class Line_Tracker : Inherits TaskParent
-    Dim lines As New Line_Basics_TA
+    Dim lines As New Line_Basics
     Dim options As New Options_LeftRightCorrelation
     Dim lpList As New List(Of lpData)
     Dim motionLeft As New Motion_Basics_TA
@@ -1132,7 +1154,7 @@ End Class
 
 
 Public Class Line_BasicsNoMotion : Inherits TaskParent
-    Dim lines As New Line_Basics_TA
+    Dim lines As New Line_Basics
     Public Sub New()
         desc = "Ignore motion when finding the lines."
     End Sub
@@ -1760,7 +1782,7 @@ Public Class Line_BasicsEmboss : Inherits TaskParent
         emboss.Run(src)
         dst2 = emboss.dst3
 
-        lpList = Line_Basics_TA.getRawLines(ld.Detect(dst2))
+        lpList = Line_Basics.getRawLines(ld.Detect(dst2))
 
         dst1.SetTo(0)
         For Each lp In lpList
@@ -1920,5 +1942,99 @@ Public Class Line_LongestTestKNN : Inherits TaskParent
         SetTrueText("If the camera is moved, the longest line (task.lines.lpList(0) should produce a solid." + vbCrLf +
                     "If that line disappears or its center moves a log, dst2 is set to 0 and it starts over." + vbCrLf +
                     "It should not disappear unless the movement makes another line the lpList(0)", 3)
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Line_EdgePoints : Inherits TaskParent
+    Dim knn As New KNN_Basics
+    Public xMatches As New List(Of Single)
+    Public yMatches As New List(Of Single)
+    Public Sub New()
+        If standalone Then task.gOptions.displayDst1.Checked = True
+        labels(2) = "The accumulated image after WarpAffine."
+        labels(3) = "The lines below had non-zero X or Y displacement"
+        desc = "Use KNN to match edge points of the current and previous frames."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        If task.lines.lpList.Count = 0 Then Exit Sub
+
+        knn.queries.Clear()
+        For Each lp In task.lines.lpList
+            knn.queries.Add(lp.ptE1)
+            knn.queries.Add(lp.ptE2)
+        Next
+
+        If task.firstPass Then knn.trainInput = New List(Of cv.Point2f)(knn.queries)
+
+        knn.Run(emptyMat)
+
+        If task.heartBeat Then dst3 = src.Clone
+
+        xMatches.Clear()
+        yMatches.Clear()
+        Dim vectors As New List(Of lpData)
+        Dim outLiers As New List(Of lpData)
+        Dim zeroVectors As New List(Of lpData)
+        For i = 0 To knn.queries.Count - 1
+            Dim p1 = knn.queries(i)
+            Dim index = knn.result(i, 0)
+            Dim p2 = knn.trainInput(index)
+            Dim distance = p1.DistanceTo(p2)
+            Dim lp = task.lines.lpList(Math.Floor(i / 2))
+            If distance > task.gridWH Then
+                outLiers.Add(lp)
+                Continue For
+            End If
+            If distance = 0 Then
+                zeroVectors.Add(lp)
+                Continue For
+            End If
+
+            If distance < 0.5 Then vectors.Add(lp)
+            xMatches.Add(p1.X - p2.X)
+            yMatches.Add(p1.Y - p2.Y)
+        Next
+
+        knn.trainInput = New List(Of cv.Point2f)(knn.queries)
+
+        If xMatches.Count > 0 Then
+            strOut = "There were " + CStr(xMatches.Count) + " useful edge points after filtering." + vbCrLf
+            strOut += "Average X offset = " + Format(xMatches.Average, fmt2) + vbCrLf
+            strOut += "Average Y offset = " + Format(yMatches.Average, fmt2) + vbCrLf
+            strOut += "There were " + CStr(task.lines.lpList.Count) + " lines in the current image" + vbCrLf
+            strOut += "There were " + CStr(task.lines.lpList.Count * 2) + " edge points in the current image" + vbCrLf
+            strOut += "There were " + CStr(vectors.Count)
+            strOut += " with delta < 0.5 indicating direction of motion." + vbCrLf
+            strOut += "There were " + CStr(outLiers.Count) + " outliers implying new or lost lines " + vbCrLf
+            strOut += "There were " + CStr(zeroVectors.Count) + " implying identical lines" + vbCrLf
+
+            If xMatches.Count >= knn.queries.Count / 2 Then
+                For Each lp In vectors
+                    dst3.Line(lp.p1, lp.p2, task.highlight, task.lineWidth)
+                Next
+            End If
+        End If
+        SetTrueText(strOut, 1)
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+
+Public Class Stabilizer_EdgePointHistogram : Inherits TaskParent
+    Public Sub New()
+        desc = "Treat the edge points as fixed point integers instead of floats and create histogram."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
     End Sub
 End Class

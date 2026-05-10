@@ -573,7 +573,7 @@ Namespace VBClasses
             desc = "Merge with previous image using rotation AND translation of the camera motion - not as good as translation alone."
         End Sub
         Public Sub translateRotateX(x1 As Integer, x2 As Integer)
-            rotationX = Math.Atan(Math.Abs((x1 - x2)) / dst2.Height) * 57.2958
+            rotationX = Math.Atan(Math.Abs((x1 - x2)) / dst2.Height) * RadToDeg
             centerX = New cv.Point2f((task.lpGravity.p1.X + task.lpGravity.p2.X) / 2, (task.lpGravity.p1.Y + task.lpGravity.p2.Y) / 2)
             If x1 >= 0 And x2 > 0 Then
                 translationX = If(x1 > x2, x1 - x2, x2 - x1)
@@ -589,7 +589,7 @@ Namespace VBClasses
             End If
         End Sub
         Public Sub translateRotateY(y1 As Integer, y2 As Integer)
-            rotationY = Math.Atan(Math.Abs((y1 - y2)) / dst2.Width) * 57.2958
+            rotationY = Math.Atan(Math.Abs((y1 - y2)) / dst2.Width) * RadToDeg
             centerY = New cv.Point2f((task.lpHorizon.p1.X + task.lpHorizon.p2.X) / 2, (task.lpHorizon.p1.Y + task.lpHorizon.p2.Y) / 2)
             If y1 > 0 And y2 > 0 Then
                 translationY = If(y1 > y2, y1 - y2, y2 - y1)
@@ -2836,7 +2836,7 @@ Namespace VBClasses
                     Dim pt1 = matLines3D.Get(Of cv.Point3f)(i, 0)
                     Dim pt2 = matLines3D.Get(Of cv.Point3f)(i + 1, 0)
                     Dim len3D = Distance_Basics.distance3D(pt1, pt2)
-                    Dim arcY = Math.Abs(Math.Asin((pt1.Y - pt2.Y) / len3D) * 57.2958)
+                    Dim arcY = Math.Abs(Math.Asin((pt1.Y - pt2.Y) / len3D) * RadToDeg)
                     If Math.Abs(arcY - 90) < options.tolerance Then
                         dst3.Line(raw2D(i).p1, raw2D(i).p2, cv.Scalar.Blue, task.lineWidth, task.lineType)
                         sortedVerticals.Add(len3D, lines3D.Count)
@@ -3127,7 +3127,7 @@ Namespace VBClasses
             Dim pt1 = lines.lines3D(index)
             Dim pt2 = lines.lines3D(index + 1)
             Dim len3D = Distance_Basics.distance3D(pt1, pt2)
-            Dim arcY = Math.Abs(Math.Asin((pt1.Y - pt2.Y) / len3D) * 57.2958)
+            Dim arcY = Math.Abs(Math.Asin((pt1.Y - pt2.Y) / len3D) * RadToDeg)
             SetTrueText(Format(arcY, fmt3) + vbCrLf + Format(len3D, fmt3) + "m len" + vbCrLf + Format(pt1.Z, fmt1) + "m dist", p1)
             SetTrueText(Format(arcY, fmt3) + vbCrLf + Format(len3D, fmt3) + "m len" + vbCrLf + Format(pt1.Z, fmt1) + "m distant", p1, 3)
         End Sub
@@ -3383,7 +3383,7 @@ Namespace VBClasses
                     Dim pt2 = lines.lines3D(index + 1)
                     Dim len3D = Distance_Basics.distance3D(pt1, pt2)
                     If len3D > 0 Then
-                        Dim arcY = Math.Abs(Math.Asin((pt1.Y - pt2.Y) / len3D) * 57.2958)
+                        Dim arcY = Math.Abs(Math.Asin((pt1.Y - pt2.Y) / len3D) * RadToDeg)
                         arcList.Add(arcY)
                         flow.nextMsg += Format(arcY, fmt3) + " degrees" + vbTab + Format(len3D, fmt3) + "m " + vbTab + Format(pt1.Z, fmt1) + "m"
                     End If
@@ -5310,7 +5310,7 @@ Namespace VBClasses
                 SetTrueText(Format(match.correlation, fmt3), match.newCenter)
             End If
 
-            Dim lpListRaw = Line_Basics_TA.getRawLines(task.lines.ld.Detect(src))
+            Dim lpListRaw = Line_Basics.getRawLines(task.lines.basics.ld.Detect(src))
             If lpListRaw.Count > 0 Then lp = lpListRaw(0)
             dst2(matchRect).Line(lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
         End Sub
@@ -5361,8 +5361,8 @@ Namespace VBClasses
                 End If
             Else
                 dst3(subsetrect).SetTo(0)
-                Dim vecArray = task.lines.ld.Detect(src(subsetrect))
-                Dim lpListRaw = Line_Basics_TA.getRawLines(vecArray)
+                Dim vecArray = task.lines.basics.ld.Detect(src(subsetrect))
+                Dim lpListRaw = Line_Basics.getRawLines(vecArray)
                 For Each lp In lplist
                     dst3.Line(lp.p1, lp.p2, 255, task.lineWidth, task.lineType)
                 Next
@@ -5633,7 +5633,7 @@ Namespace VBClasses
             Next
 
             Dim causes As String = ""
-            If Math.Abs(sides.rotateAngle * 57.2958) > 10 Then
+            If Math.Abs(sides.rotateAngle * RadToDeg) > 10 Then
                 resync = True
                 causes += " - Rotation angle exceeded threshold."
                 sides.rotateAngle = 0
@@ -5674,7 +5674,7 @@ Namespace VBClasses
             End If
             resyncFrames += 1
 
-            strOut = "Rotation: " + Format(sides.rotateAngle * 57.2958, fmt1) + " degrees" + vbCrLf
+            strOut = "Rotation: " + Format(sides.rotateAngle * RadToDeg, fmt1) + " degrees" + vbCrLf
             strOut += "Translation: " + CStr(CInt(sides.centerShift.X)) + ", " + CStr(CInt(sides.centerShift.Y)) + vbCrLf
             strOut += "Frames since last resync: " + Format(resyncFrames, "000") + vbCrLf + vbCrLf
             strOut += "Resync last caused by: " + vbCrLf + resyncCause
@@ -5799,7 +5799,7 @@ Namespace VBClasses
                     Dim hypotenuse = rotateCenter.DistanceTo(near.pt)
                     rotateAngle = -Math.Asin(near.nearPoint.DistanceTo(near.pt) / hypotenuse)
                     If Single.IsNaN(rotateAngle) Then rotateAngle = 0
-                    strOut = "Angle is " + Format(rotateAngle * 57.2958, fmt1) + " degrees" + vbCrLf
+                    strOut = "Angle is " + Format(rotateAngle * RadToDeg, fmt1) + " degrees" + vbCrLf
                 End If
             End If
             strOut += "Translation (shift) is " + Format(-centerShift.X, fmt0) + ", " + Format(-centerShift.Y, fmt0)
@@ -5885,7 +5885,7 @@ Namespace VBClasses
             fPD.jitterTest(dst2, Me) ' the feature line has not really moved.
 
             Dim causes As String = ""
-            If Math.Abs(fPD.rotateAngle * 57.2958) > 10 Then
+            If Math.Abs(fPD.rotateAngle * RadToDeg) > 10 Then
                 resync = True
                 causes += " - Rotation angle exceeded threshold."
                 fPD.rotateAngle = 0
@@ -5937,7 +5937,7 @@ Namespace VBClasses
                 SetTrueText(CStr(i), fPD.currPoly(i), 1)
             Next
 
-            strOut = "Rotation: " + Format(fPD.rotateAngle * 57.2958, fmt1) + " degrees" + vbCrLf
+            strOut = "Rotation: " + Format(fPD.rotateAngle * RadToDeg, fmt1) + " degrees" + vbCrLf
             strOut += "Translation: " + CStr(CInt(fPD.centerShift.X)) + ", " + CStr(CInt(fPD.centerShift.Y)) + vbCrLf
             strOut += "Frames since last resync: " + Format(resyncFrames, "000") + vbCrLf
             strOut += "Last resync cause(s): " + vbCrLf + resyncCause
@@ -6665,7 +6665,7 @@ Namespace VBClasses
                     Dim hypotenuse = fPD.rotateCenter.DistanceTo(near.pt)
                     fPD.rotateAngle = -Math.Asin(near.nearPoint.DistanceTo(near.pt) / hypotenuse)
                     If Single.IsNaN(fPD.rotateAngle) Then fPD.rotateAngle = 0
-                    strOut = "Angle is " + Format(fPD.rotateAngle * 57.2958, fmt1) + " degrees" + vbCrLf
+                    strOut = "Angle is " + Format(fPD.rotateAngle * RadToDeg, fmt1) + " degrees" + vbCrLf
                 End If
             End If
             strOut += "Translation (shift) is " + Format(-fPD.centerShift.X, fmt0) + ", " + Format(-fPD.centerShift.Y, fmt0)
@@ -7181,7 +7181,7 @@ Namespace VBClasses
                 Exit Sub
             End If
 
-            labels(3) = "White is the original polygon, yellow has been rotated " + Format(rotateAngle * 57.2958) + " degrees"
+            labels(3) = "White is the original polygon, yellow has been rotated " + Format(rotateAngle * RadToDeg) + " degrees"
 
             ' translate so the center of rotation is 0,0
             Dim translated As New List(Of cv.Point2f)
@@ -8120,7 +8120,7 @@ Namespace VBClasses
             Dim p1 = task.lpHorizon.p1, p2 = task.lpHorizon.p2
             Dim sideOpposite = p2.Y - p1.Y
             If p1.X = 0 Then sideOpposite = p1.Y - p2.Y
-            Dim hAngle = Math.Atan(sideOpposite / dst2.Width) * 57.2958
+            Dim hAngle = Math.Atan(sideOpposite / dst2.Width) * RadToDeg
 
             horizList.Clear()
             For Each lp In task.lines.lpList
@@ -8147,7 +8147,7 @@ Namespace VBClasses
             Dim p1 = task.lpGravity.p1, p2 = task.lpGravity.p2
             Dim sideOpposite = p2.X - p1.X
             If p1.Y = 0 Then sideOpposite = p1.X - p2.X
-            Dim gAngle = Math.Atan(sideOpposite / dst2.Height) * 57.2958
+            Dim gAngle = Math.Atan(sideOpposite / dst2.Height) * RadToDeg
 
             vertList.Clear()
             For Each lp In task.lines.lpList
@@ -15020,10 +15020,10 @@ Namespace VBClasses
             If gRect.pt1 = New cv.Point3f Or gRect.pt2 = New cv.Point3f Then
                 gRect.len3D = 0
             Else
-                gRect.arcX = Math.Asin((gRect.pt1.X - gRect.pt2.X) / gRect.len3D) * 57.2958
-                gRect.arcY = Math.Abs(Math.Asin((gRect.pt1.Y - gRect.pt2.Y) / gRect.len3D) * 57.2958)
+                gRect.arcX = Math.Asin((gRect.pt1.X - gRect.pt2.X) / gRect.len3D) * RadToDeg
+                gRect.arcY = Math.Abs(Math.Asin((gRect.pt1.Y - gRect.pt2.Y) / gRect.len3D) * RadToDeg)
                 If gRect.arcY > 90 Then gRect.arcY -= 90
-                gRect.arcZ = Math.Asin((gRect.pt1.Z - gRect.pt2.Z) / gRect.len3D) * 57.2958
+                gRect.arcZ = Math.Asin((gRect.pt1.Z - gRect.pt2.Z) / gRect.len3D) * RadToDeg
             End If
 
             Return gRect
@@ -15034,8 +15034,8 @@ Namespace VBClasses
             Dim maxAngle = angleSlider.Value
 
             dst2 = src.Clone
-            Dim vecArray = task.lines.ld.Detect(task.gray)
-            Dim lplist = Line_Basics_TA.getRawLines(vecArray)
+            Dim vecArray = task.lines.basics.ld.Detect(task.gray)
+            Dim lplist = Line_Basics.getRawLines(vecArray)
 
             sortedVerticals.Clear()
             sortedHorizontals.Clear()
@@ -16884,8 +16884,8 @@ Namespace VBClasses
 
 
     Public Class XO_Line_LeftRightMotion1 : Inherits TaskParent
-        Public linesLeft As New Line_Basics_TA
-        Public linesRight As New Line_Basics_TA
+        Public linesLeft As New Line_Basics
+        Public linesRight As New Line_Basics
         Dim motionLeft As New Motion_Basics_TA
         Dim motionRight As New Motion_Basics_TA
         Public Sub New()
@@ -17022,8 +17022,8 @@ Namespace VBClasses
             If src.Channels <> 1 Or src.Type <> cv.MatType.CV_8U Then src = task.gray.Clone
             If lpList.Count <= 1 Then
                 motionMask.SetTo(255)
-                Dim vecArray1 = task.lines.ld.Detect(src)
-                lpList = Line_Basics_TA.getRawLines(vecArray1)
+                Dim vecArray1 = task.lines.basics.ld.Detect(src)
+                lpList = Line_Basics.getRawLines(vecArray1)
             End If
 
             Dim sortlines As New SortedList(Of Single, lpData)(New compareAllowIdenticalSingleInverted)
@@ -17036,8 +17036,8 @@ Namespace VBClasses
                 End If
             Next
 
-            Dim vecArray = task.lines.ld.Detect(src)
-            Dim lpListRaw = Line_Basics_TA.getRawLines(vecArray)
+            Dim vecArray = task.lines.basics.ld.Detect(src)
+            Dim lpListRaw = Line_Basics.getRawLines(vecArray)
 
 
             For Each lp In lpListRaw
@@ -17119,7 +17119,7 @@ Namespace VBClasses
 
 
     Public Class XO_Line_Map : Inherits TaskParent
-        Dim lines As New Line_Basics_TA
+        Dim lines As New Line_Basics
         Public lpList As New List(Of lpData)
         Dim options As New Options_LeftRightCorrelation
         Dim motionLeft As New Motion_Basics_TA

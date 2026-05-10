@@ -1,6 +1,6 @@
 Imports cv = OpenCvSharp
 Public Class AddWeighted_Accumulate : Inherits TaskParent
-    Dim options As New Options_AddWeighted
+    Public options As New Options_AddWeighted
     Public Sub New()
         dst1 = New cv.Mat(dst2.Size, cv.MatType.CV_32F, 0)
         labels(3) = "Current task.gray image"

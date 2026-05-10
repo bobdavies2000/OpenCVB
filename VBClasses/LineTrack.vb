@@ -72,6 +72,7 @@ Public Class LineTrack_Basics_TA : Inherits TaskParent
         desc = "Track the longest line and flag it (reSyncImage) when it is lost."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
+        If task.lines.lpList.Count = 0 Then Exit Sub ' nothing yet.
         If lineTrack.reSyncImage Then lineTrack.lpInput = task.lines.lpList(0)
         lineTrack.Run(emptyMat)
         labels(2) = lineTrack.labels(2)

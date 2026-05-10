@@ -89,8 +89,8 @@ Public Class NR_Structured_MultiSliceLines : Inherits TaskParent
         multi.Run(src)
         dst3 = multi.dst3
 
-        Dim vecArray = task.lines.ld.Detect(dst3.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
-        Dim lpList = Line_Basics_TA.getRawLines(vecArray)
+        Dim vecArray = task.lines.basics.ld.Detect(dst3.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
+        Dim lpList = Line_Basics.getRawLines(vecArray)
 
         dst2.SetTo(0)
         For Each lp In lpList

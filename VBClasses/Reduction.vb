@@ -86,13 +86,13 @@ Public Class NR_Reduction_HeatMapLines1 : Inherits TaskParent
         reduction.Run(src)
         heat.Run(src)
 
-        Dim vecArray = task.lines.ld.Detect(heat.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
-        Dim lplist = Line_Basics_TA.getRawLines(vecArray)
+        Dim vecArray = task.lines.basics.ld.Detect(heat.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
+        Dim lplist = Line_Basics.getRawLines(vecArray)
         setupTop.Run(heat.dst2)
         dst2 = setupTop.dst2
 
-        vecArray = task.lines.ld.Detect(heat.dst3.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
-        lplist = Line_Basics_TA.getRawLines(vecArray)
+        vecArray = task.lines.basics.ld.Detect(heat.dst3.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
+        lplist = Line_Basics.getRawLines(vecArray)
         setupSide.Run(heat.dst3)
         dst3 = setupSide.dst2
     End Sub

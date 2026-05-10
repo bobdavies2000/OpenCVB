@@ -214,5 +214,6 @@ Vignetting
 Volume
 WarpAffine
 WarpModel
+WarpPerspective
 Watershed
 XFeatures2D

@@ -1,9 +1,11 @@
 Imports cv = OpenCvSharp
 Public Class Motion_Basics_TA : Inherits TaskParent
-    Public motionSort As New List(Of Integer) ' not sorted but in order of grid rect index, so sorted.
+    Public motionSort As New List(Of Integer) ' sorted in order of grid rect index (without actually sorting.)
     Public diff As New Diff_Basics
     Public motionMask As cv.Mat = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 255)
+    Public motionRightMask As cv.Mat = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 255) ' motion in the right image.
     Public Sub New()
+        If standalone Then task.gOptions.displayDst1.Checked = True
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         desc = "Find all the grid rects that had motion since the last frame."
     End Sub
@@ -17,6 +19,7 @@ Public Class Motion_Basics_TA : Inherits TaskParent
             motionMask.SetTo(0)
             Exit Sub ' we don't have any changes.
         End If
+
         If src.Channels <> 1 Then src = task.gray.Clone
         If task.optionsChanged Then dst2 = src.Clone
 
@@ -31,7 +34,7 @@ Public Class Motion_Basics_TA : Inherits TaskParent
 
         motionMask.SetTo(0)
         ' The following loop adds the list4 Neighbors - it is an alternative way to reduce artifacts.
-        Dim nabeList As New List(Of Integer)
+        Dim nabeList As New HashSet(Of Integer)
         For Each index In motionSort
             For Each nabeIndex In task.gridNabes(index)
                 If nabeList.Contains(nabeIndex) = False Then
@@ -44,6 +47,33 @@ Public Class Motion_Basics_TA : Inherits TaskParent
         Next
 
         dst3 = motionMask
+
+        dst1 = task.rightView.Clone
+
+        'motionRight.Run(task.rightView)
+        'motionRightMask = motionRight.dst3
+        'dst1.SetTo(255, motionRightMask)
+
+        'motionRight.SetTo(0)
+        'nabeList.Clear()
+        'For Each index In motionSort
+        '    For Each nabeIndex In task.gridNabes(index)
+        '        If nabeList.Contains(nabeIndex) = False Then
+        '            Dim rect = task.gridRects(nabeIndex)
+        '            Dim depth = task.pcSplit(2)(rect).Mean(task.depthmask(rect))(0)
+        '            If depth = 0 Then
+        '                ' must handle the case where there is no depth data...
+        '                Continue For
+        '            End If
+        '            rect.X -= task.calibData.baseline * task.calibData.leftIntrinsics.fx / depth
+        '            If rect.X >= 0 And rect.X + rect.Width < dst2.Width Then
+        '                motionRight(rect).SetTo(255)
+        '            End If
+        '            nabeList.Add(nabeIndex)
+        '        End If
+        '    Next
+        'Next
+        'dst1.SetTo(255, motionRight)
         labels(2) = "Image below is accumulated using motion mask.  Grid rects with motion: " + CStr(nabeList.Count)
     End Sub
 End Class

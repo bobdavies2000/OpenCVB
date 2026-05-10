@@ -450,6 +450,7 @@ LeftRight_FeatureLess
 LeftRight_Features
 LeftRight_Reduction
 LeftRight_Stable
+Line_Basics
 Line_Basics_TA
 Line_BasicsEmboss
 Line_BasicsLSD
@@ -462,6 +463,7 @@ Line_Core
 Line_DepthHistogram
 Line_EdgeLine
 Line_EdgeLineCompare
+Line_EdgePoints
 Line_Finder
 Line_FinderPlus
 Line_FindSimple
@@ -1476,13 +1478,9 @@ NR_Video_CarCounting
 NR_Video_MinCircle
 NR_Vignetting_Devignetting
 NR_Vignetting_VB
-NR_WarpAffine_3Points
-NR_WarpAffine_4Points
 NR_WarpAffine_Captcha
 NR_WarpAffine_Repeated
 NR_WarpAffine_RepeatedExample8
-NR_WarpPerspective_Basics
-NR_WarpPerspective_WidthHeight
 NR_Watershed_DepthAuto
 NR_Watershed_DepthReduction
 OEX_CalcBackProject_Demo1
@@ -1685,6 +1683,7 @@ Spectrum_X
 Spectrum_Y
 Spectrum_Z
 Stabilizer_Basics
+Stabilizer_EdgePointHistogram
 Stabilizer_IMU
 StableDepth_Basics
 StableDepth_Max
@@ -1740,8 +1739,13 @@ Vignetting_Removal
 Volume_Basics
 WarpAffine_Basics
 WarpAffine_BasicsQT
+WarpAffine_Rotation
+WarpAffine_Vec3f
+WarpAffine_Vec4f
 WarpModel_Basics
 WarpModel_ECC
 WarpModel_Input
+WarpPerspective_Basics
+WarpPerspective_WidthHeight
 Watershed_Basics
 XFeatures2D_StarDetector

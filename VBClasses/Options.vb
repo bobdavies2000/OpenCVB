@@ -7599,10 +7599,12 @@ End Class
 
 Public Class Options_MinArea : Inherits OptionParent
     Public srcPoints As New List(Of cv.Point2f)
-    Public minSize As Integer = 10
+    Public minSize As Integer = task.workRes.Width / 8
     Public numPoints As Integer = 5
     Public Sub New()
-        If sliders.Setup(traceName) Then sliders.setupTrackBar("Area Number of Points", 1, 30, numPoints)
+        If sliders.Setup(traceName) Then
+            sliders.setupTrackBar("Area Number of Points", 1, 30, numPoints)
+        End If
     End Sub
     Public Sub Run()
         Static numSlider = OptionParent.FindSlider("Area Number of Points")

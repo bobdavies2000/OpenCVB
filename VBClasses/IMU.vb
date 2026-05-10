@@ -40,15 +40,15 @@ Public Class IMU_Basics_TA : Inherits TaskParent
             task.theta.Z = task.theta.Z * task.IMU_AlphaFilter + task.accRadians.Z * (1 - task.IMU_AlphaFilter)
         End If
 
-        Dim x1 = -(90 + task.accRadians.X * 57.2958)
-        Dim x2 = -(90 + task.theta.X * 57.2958)
+        Dim x1 = -(90 + task.accRadians.X * RadToDeg)
+        Dim x2 = -(90 + task.theta.X * RadToDeg)
         Dim y1 = task.accRadians.Y - cv.Cv2.PI
         If task.accRadians.X < 0 Then y1 *= -1
-        task.verticalizeAngle = y1 * 58.2958
+        task.verticalizeAngle = y1 * RadToDeg
         strOut = "Angles in degree to gravity (before velocity filter)" + vbCrLf +
-                         Format(x1, fmt1) + vbTab + Format(y1 * 57.2958, fmt1) + vbTab + Format(task.accRadians.Z * 57.2958, fmt1) + vbCrLf +
+                         Format(x1, fmt1) + vbTab + Format(y1 * RadToDeg, fmt1) + vbTab + Format(task.accRadians.Z * RadToDeg, fmt1) + vbCrLf +
                          "Velocity-Filtered Angles to gravity in degrees" + vbCrLf +
-                         Format(x2, fmt1) + vbTab + Format(y1 * 57.2958, fmt1) + vbTab + Format(task.theta.Z * 57.2958, fmt1) + vbCrLf
+                         Format(x2, fmt1) + vbTab + Format(y1 * RadToDeg, fmt1) + vbTab + Format(task.theta.Z * RadToDeg, fmt1) + vbCrLf
         strOut += "cx = " + Format(task.gravityMatrix.cx, fmt3) + " sx = " + Format(task.gravityMatrix.sx, fmt3) + vbCrLf +
                           "cy = " + Format(task.gravityMatrix.cy, fmt3) + " sy = " + Format(task.gravityMatrix.sy, fmt3) + vbCrLf +
                           "cz = " + Format(task.gravityMatrix.cz, fmt3) + " sz = " + Format(task.gravityMatrix.sz, fmt3)
@@ -172,7 +172,7 @@ Public Class IMU_GravityComplementary : Inherits TaskParent
 
         Dim y1 = task.accRadians.Y - cv.Cv2.PI
         If task.accRadians.X < 0 Then y1 *= -1
-        task.verticalizeAngle = y1 * 58.2958
+        task.verticalizeAngle = y1 * RadToDeg
 
         ' Unit gravity vector in body frame (points down)
         GravityVector = AnglesToGravityVector(task.accRadians)
@@ -221,11 +221,11 @@ Public Class NR_IMU_Basics_Kalman : Inherits TaskParent
 
         task.accRadians = New cv.Point3f(task.kalman.kOutput(0), task.kalman.kOutput(1), task.kalman.kOutput(2))
 
-        Dim x1 = -(90 + task.accRadians.X * 57.2958)
+        Dim x1 = -(90 + task.accRadians.X * RadToDeg)
         Dim y1 = task.accRadians.Y - cv.Cv2.PI
         If task.accRadians.X < 0 Then y1 *= -1
         strOut = "Angles in degree to gravity (before velocity filter)" + vbCrLf +
-                     Format(x1, fmt1) + vbTab + Format(y1 * 57.2958, fmt1) + vbTab + Format(task.accRadians.Z * 57.2958, fmt1) + vbCrLf
+                     Format(x1, fmt1) + vbTab + Format(y1 * RadToDeg, fmt1) + vbTab + Format(task.accRadians.Z * RadToDeg, fmt1) + vbCrLf
         strOut += "cx = " + Format(task.gravityMatrix.cx, fmt3) + " sx = " + Format(task.gravityMatrix.sx, fmt3) + vbCrLf +
                       "cy = " + Format(task.gravityMatrix.cy, fmt3) + " sy = " + Format(task.gravityMatrix.sy, fmt3) + vbCrLf +
                       "cz = " + Format(task.gravityMatrix.cz, fmt3) + " sz = " + Format(task.gravityMatrix.sz, fmt3)
@@ -282,14 +282,14 @@ Public Class NR_IMU_Basics_WithOptions : Inherits TaskParent
             task.theta.Z = task.theta.Z * task.IMU_AlphaFilter + task.accRadians.Z * (1 - task.IMU_AlphaFilter)
         End If
 
-        Dim x1 = -(90 + task.accRadians.X * 57.2958)
-        Dim x2 = -(90 + task.theta.X * 57.2958)
+        Dim x1 = -(90 + task.accRadians.X * RadToDeg)
+        Dim x2 = -(90 + task.theta.X * RadToDeg)
         Dim y1 = task.accRadians.Y - cv.Cv2.PI
         If task.accRadians.X < 0 Then y1 *= -1
         strOut = "Angles in degree to gravity (before velocity filter)" + vbCrLf +
-                     Format(x1, fmt1) + vbTab + Format(y1 * 57.2958, fmt1) + vbTab + Format(task.accRadians.Z * 57.2958, fmt1) + vbCrLf +
+                     Format(x1, fmt1) + vbTab + Format(y1 * RadToDeg, fmt1) + vbTab + Format(task.accRadians.Z * RadToDeg, fmt1) + vbCrLf +
                      "Velocity-Filtered Angles to gravity in degrees" + vbCrLf +
-                     Format(x2, fmt1) + vbTab + Format(y1 * 57.2958, fmt1) + vbTab + Format(task.theta.Z * 57.2958, fmt1) + vbCrLf
+                     Format(x2, fmt1) + vbTab + Format(y1 * RadToDeg, fmt1) + vbTab + Format(task.theta.Z * RadToDeg, fmt1) + vbCrLf
         SetTrueText(strOut)
 
         task.accRadians = task.theta
@@ -320,8 +320,8 @@ Public Class IMU_Vertical : Inherits TaskParent
         angleYValue.Add(task.accRadians.Y)
 
         strOut = "IMU X" + vbTab + "IMU Y" + vbTab + "IMU Z" + vbCrLf
-        strOut += Format(task.accRadians.X * 57.2958, fmt3) + vbTab + Format(task.accRadians.Y * 57.2958, fmt3) + vbTab +
-                      Format(task.accRadians.Z * 57.2958, fmt3) + vbCrLf
+        strOut += Format(task.accRadians.X * RadToDeg, fmt3) + vbTab + Format(task.accRadians.Y * RadToDeg, fmt3) + vbTab +
+                      Format(task.accRadians.Z * RadToDeg, fmt3) + vbCrLf
         Dim avgX = angleXValue.Average
         Dim avgY = angleYValue.Average
         If task.firstPass Then
@@ -331,7 +331,7 @@ Public Class IMU_Vertical : Inherits TaskParent
         strOut += "Angle X" + vbTab + "Angle Y" + vbCrLf
         strOut += Format(avgX, fmt3) + vbTab + Format(avgY, fmt3) + vbCrLf
 
-        Dim angle = 90 - avgY * 57.2958
+        Dim angle = 90 - avgY * RadToDeg
         If avgX < 0 Then angle *= -1
         labels(2) = "stabilizer_Vertical Angle = " + Format(angle, fmt1)
 
@@ -347,8 +347,8 @@ Public Class IMU_Vertical : Inherits TaskParent
         lastAngleX = avgX
         lastAngleY = avgY
 
-        If angleXValue.Count >= task.fOptions.FrameHistoryCount.Value  Then angleXValue.RemoveAt(0)
-        If angleYValue.Count >= task.fOptions.FrameHistoryCount.Value  Then angleYValue.RemoveAt(0)
+        If angleXValue.Count >= task.fOptions.FrameHistoryCount.Value Then angleXValue.RemoveAt(0)
+        If angleYValue.Count >= task.fOptions.FrameHistoryCount.Value Then angleYValue.RemoveAt(0)
     End Sub
 End Class
 
@@ -658,7 +658,7 @@ Public Class NR_IMU_VerticalAngles : Inherits TaskParent
             Dim r = cells.ElementAt(i).Value
             strOut += CStr(i) + vbTab + Format(r.len3D, fmt1) + "m" + vbTab + Format(r.tc1.depth, fmt1) + "m" + vbTab +
                           Format(r.arcX, fmt1) + vbTab + Format(r.arcY, fmt1) + vbTab + Format(r.arcZ, fmt1) + vbTab
-            strOut += Format(task.accRadians.X * 57.2958, fmt1) + vbTab + Format(task.accRadians.Y * 57.2958, fmt1) + vbTab + Format(task.accRadians.Z * 57.2958, fmt1) + vbTab + vbCrLf
+            strOut += Format(task.accRadians.X * RadToDeg, fmt1) + vbTab + Format(task.accRadians.Y * RadToDeg, fmt1) + vbTab + Format(task.accRadians.Z * RadToDeg, fmt1) + vbTab + vbCrLf
             SetTrueText(CStr(i), r.tc1.center, 2)
             SetTrueText(CStr(i), r.tc1.center, 3)
             dst2.Line(r.tc1.center, r.tc2.center, task.highlight, task.lineWidth, task.lineType)
@@ -682,12 +682,12 @@ Public Class NR_IMU_PlotGravityAngles : Inherits TaskParent
         desc = "Plot the motion of the camera based on the IMU data in degrees"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        SetTrueText("ts = " + Format(task.IMU_TimeStamp, fmt2) + vbCrLf + "X degrees = " + Format(task.accRadians.X * 57.2958, fmt3) + vbCrLf +
-                        "Y degrees = " + Format(Math.Abs(task.accRadians.Y * 57.2958), fmt3) + vbCrLf + "Z degrees = " + Format(task.accRadians.Z * 57.2958, fmt2) + vbCrLf + vbCrLf +
+        SetTrueText("ts = " + Format(task.IMU_TimeStamp, fmt2) + vbCrLf + "X degrees = " + Format(task.accRadians.X * RadToDeg, fmt3) + vbCrLf +
+                        "Y degrees = " + Format(Math.Abs(task.accRadians.Y * RadToDeg), fmt3) + vbCrLf + "Z degrees = " + Format(task.accRadians.Z * RadToDeg, fmt2) + vbCrLf + vbCrLf +
                         "Motion (radians/sec) " + vbCrLf + "pitch = " + Format(task.IMU_AngularVelocity.X, fmt2) + vbCrLf +
                         "Yaw = " + Format(task.IMU_AngularVelocity.Y, fmt2) + vbCrLf + " Roll = " + Format(task.IMU_AngularVelocity.Z, fmt2), 1)
 
-        plot.plotData = New cv.Scalar(task.accRadians.X * 57.2958, task.accRadians.Y * 57.2958, task.accRadians.Z * 57.2958)
+        plot.plotData = New cv.Scalar(task.accRadians.X * RadToDeg, task.accRadians.Y * RadToDeg, task.accRadians.Z * RadToDeg)
         plot.Run(src)
         dst2 = plot.dst2
         dst3 = plot.dst3
@@ -768,7 +768,7 @@ Public Class NR_IMU_Lines : Inherits TaskParent
                                                     Format(gcell.tc1.depth, fmt1) + "m" + vbTab +
                                                     Format(gcell.arcY, fmt1) + vbTab +
                                                     Format(gcell.imageAngle, fmt1) + vbTab
-            strOut += Format(task.accRadians.Y * 57.2958, fmt1) + vbCrLf
+            strOut += Format(task.accRadians.Y * RadToDeg, fmt1) + vbCrLf
 
             SetTrueText(strOut, 3)
             labels(2) = vert.labels(3)
@@ -819,7 +819,7 @@ Public Class IMU_Average : Inherits TaskParent
         Dim accMat = cv.Mat.FromPixelData(accList.Count, 1, cv.MatType.CV_64FC4, accList.ToArray)
         Dim imuMean = accMat.Mean()
         task.IMU_AverageAcceleration = New cv.Point3f(imuMean(0), imuMean(1), imuMean(2))
-        If accList.Count >= task.fOptions.FrameHistoryCount.Value  Then accList.RemoveAt(0)
+        If accList.Count >= task.fOptions.FrameHistoryCount.Value Then accList.RemoveAt(0)
         strOut = "Average IMU acceleration: " + vbCrLf + Format(task.IMU_AverageAcceleration.X, fmt3) + vbTab + Format(task.IMU_AverageAcceleration.Y, fmt3) + vbTab +
                       Format(task.IMU_AverageAcceleration.Z, fmt3) + vbCrLf
         SetTrueText(strOut)
@@ -1256,13 +1256,13 @@ Public Class IMU_VerticalVerify : Inherits TaskParent
                 Dim xOffset = p1.X - p2.X
                 If p1.Y < p2.Y Then xOffset = p2.X - p1.X
                 Dim hypot = p1.DistanceTo(p2)
-                r.imageAngle = -Math.Asin(xOffset / hypot) * 57.2958
+                r.imageAngle = -Math.Asin(xOffset / hypot) * RadToDeg
 
                 strOut += CStr(index) + vbTab + Format(r.len3D, fmt1) + "m" + vbTab +
                                                     Format(r.tc1.depth, fmt1) + "m" + vbTab +
                                                     Format(r.arcY, fmt1) + vbTab +
                                                     Format(r.imageAngle, fmt1) + vbTab
-                strOut += Format(task.accRadians.Y * 57.2958, fmt1) + vbCrLf
+                strOut += Format(task.accRadians.Y * RadToDeg, fmt1) + vbCrLf
 
                 SetTrueText(CStr(index), r.tc1.center, 2)
                 SetTrueText(CStr(index), r.tc1.center, 3)

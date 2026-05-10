@@ -1,6 +1,50 @@
 Imports cv = OpenCvSharp
-' http://opencvexamples.blogspot.com/
 Public Class WarpAffine_Basics : Inherits TaskParent
+    Dim accum As New AddWeighted_Accumulate
+    Public baselineRoll As Single
+    Public baselinePitch As Single
+    Public Sub New()
+        If standalone Then task.gOptions.displayDst1.Checked = True
+        desc = "Given a delta X and delta Y, use WarpAffine to reorient the image to the previous frame."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        If standalone Then
+            SetTrueText("When standalone, no baseline roll/pitch has been provided.", 1)
+        End If
+        Dim graySrc = If(src.Channels = 1, src, task.gray)
+
+        Dim rollDelta = task.accRadians.Z - baselineRoll
+        Dim pitchDelta = task.accRadians.X - baselinePitch
+
+        Dim maxShift = task.gridWH
+        Dim angleDeg = -rollDelta * RadToDeg
+        Dim dx = CSng(-pitchDelta * PixelsPerRad - task.IMU_AngularVelocity.Y * 4.0F)
+        Dim dy = CSng(task.IMU_AngularVelocity.X * 4.0F)
+        dx = Math.Max(-maxShift, Math.Min(maxShift, dx))
+        dy = Math.Max(-maxShift, Math.Min(maxShift, dy))
+
+        Dim center = New cv.Point2f(graySrc.Cols / 2.0F, graySrc.Rows / 2.0F)
+        Dim M = cv.Cv2.GetRotationMatrix2D(center, angleDeg, 1.0)
+        M.Set(Of Double)(0, 2, M.Get(Of Double)(0, 2) + dx)
+        M.Set(Of Double)(1, 2, M.Get(Of Double)(1, 2) + dy)
+
+        dst3 = graySrc.WarpAffine(M, graySrc.Size, cv.InterpolationFlags.Linear, cv.BorderTypes.Reflect101)
+
+        accum.Run(dst3)
+        dst2 = accum.dst2.Clone
+
+        labels(2) = "IMU stabilize + AddWeighted_Accumulate with weight = " + Format(accum.options.accumWeighted, fmt1)
+        labels(3) = "Angle=" + Format(angleDeg, fmt2) + " deg, dx=" + Format(dx, fmt2) + ", dy=" + Format(dy, fmt2)
+    End Sub
+End Class
+
+
+
+
+
+
+' http://opencvexamples.blogspot.com/
+Public Class WarpAffine_Rotation : Inherits TaskParent
     Public options As New Options_Resize
     Public optionsWarp As New Options_WarpAffine
     Public rotateCenter As cv.Point2f
@@ -151,7 +195,7 @@ End Class
 
 
 ' https://docs.opencvb.org/3.0-beta/doc/py_tutorials/py_imgproc/py_geometric_transformations/py_geometric_transformations.html
-Public Class NR_WarpAffine_3Points : Inherits TaskParent
+Public Class WarpAffine_Vec3f : Inherits TaskParent
     Dim triangle As New Triangle_Find
     Dim M As New cv.Mat
     Public Sub New()
@@ -205,12 +249,12 @@ Public Class NR_WarpAffine_3Points : Inherits TaskParent
             Next
         End If
         SetTrueText("M defined as: " + vbCrLf +
-                          Format(M.Get(Of Double)(0, 0), fmt2) + vbTab +
-                          Format(M.Get(Of Double)(0, 1), fmt2) + vbTab +
-                          Format(M.Get(Of Double)(0, 2), fmt2) + vbCrLf +
-                          Format(M.Get(Of Double)(1, 0), fmt2) + vbTab +
-                          Format(M.Get(Of Double)(1, 1), fmt2) + vbTab +
-                          Format(M.Get(Of Double)(1, 2), fmt2))
+                     Format(M.Get(Of Double)(0, 0), fmt2) + vbTab +
+                     Format(M.Get(Of Double)(0, 1), fmt2) + vbTab +
+                     Format(M.Get(Of Double)(0, 2), fmt2) + vbCrLf +
+                     Format(M.Get(Of Double)(1, 0), fmt2) + vbTab +
+                     Format(M.Get(Of Double)(1, 1), fmt2) + vbTab +
+                     Format(M.Get(Of Double)(1, 2), fmt2))
     End Sub
 End Class
 
@@ -219,7 +263,7 @@ End Class
 
 
 ' https://docs.opencvb.org/3.0-beta/doc/py_tutorials/py_imgproc/py_geometric_transformations/py_geometric_transformations.html
-Public Class NR_WarpAffine_4Points : Inherits TaskParent
+Public Class WarpAffine_Vec4f : Inherits TaskParent
     Dim mRect As New FindMinRect_Basics
     Dim options As New Options_MinArea
     Dim M As New cv.Mat
@@ -261,15 +305,15 @@ Public Class NR_WarpAffine_4Points : Inherits TaskParent
         End If
 
         SetTrueText("M defined as: " + vbCrLf +
-                          Format(M.Get(Of Double)(0, 0), fmt2) + vbTab +
-                          Format(M.Get(Of Double)(0, 1), fmt2) + vbTab +
-                          Format(M.Get(Of Double)(0, 2), fmt2) + vbCrLf +
-                          Format(M.Get(Of Double)(1, 0), fmt2) + vbTab +
-                          Format(M.Get(Of Double)(1, 1), fmt2) + vbTab +
-                          Format(M.Get(Of Double)(1, 2), fmt2) + vbCrLf +
-                          Format(M.Get(Of Double)(2, 0), fmt2) + vbTab +
-                          Format(M.Get(Of Double)(2, 1), fmt2) + vbTab +
-                          Format(M.Get(Of Double)(2, 2), fmt2) + vbCrLf)
+                     Format(M.Get(Of Double)(0, 0), fmt2) + vbTab +
+                     Format(M.Get(Of Double)(0, 1), fmt2) + vbTab +
+                     Format(M.Get(Of Double)(0, 2), fmt2) + vbCrLf +
+                     Format(M.Get(Of Double)(1, 0), fmt2) + vbTab +
+                     Format(M.Get(Of Double)(1, 1), fmt2) + vbTab +
+                     Format(M.Get(Of Double)(1, 2), fmt2) + vbCrLf +
+                     Format(M.Get(Of Double)(2, 0), fmt2) + vbTab +
+                     Format(M.Get(Of Double)(2, 1), fmt2) + vbTab +
+                     Format(M.Get(Of Double)(2, 2), fmt2) + vbCrLf)
         Dim center As New cv.Point2f(M.Get(Of Double)(0, 2), M.Get(Of Double)(1, 2))
         dst2.Circle(center, task.DotSize + 5, cv.Scalar.Yellow, -1, task.lineType)
         center = New cv.Point2f(50, src.Height / 2)

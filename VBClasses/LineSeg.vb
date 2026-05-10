@@ -123,7 +123,7 @@ Public Class LineSeg_Core : Inherits TaskParent
         lsd.Detect(src, vecMat)
         Dim vecArray() As cv.Vec4f = Nothing
         vecMat.GetArray(Of cv.Vec4f)(vecArray)
-        lpList = Line_Basics_TA.getRawLines(vecArray)
+        lpList = Line_Basics.getRawLines(vecArray)
 
         dst1.SetTo(0)
         dst3.SetTo(0)
