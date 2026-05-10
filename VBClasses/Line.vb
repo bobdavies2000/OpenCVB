@@ -27,6 +27,7 @@ Public Class Line_Basics : Inherits TaskParent
     Public ld As cv.XImgProc.FastLineDetector
     Public motionMask As cv.Mat = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 255)
     Dim edges As New Edge_Sobel
+    Public edgeDuplicates As New List(Of lpData) ' lines that are dropped to help LineTrack algorithms.
     Public Sub New()
         dst1 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
@@ -70,14 +71,14 @@ Public Class Line_Basics : Inherits TaskParent
         Next
 
         lpList.Clear()
+        edgeDuplicates.Clear()
         Dim edgeMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-        Dim edgeDropCount As Integer
         For index = 0 To lpSorted.Values.Count - 1
             Dim lp = newList(lpSorted.Values.ElementAt(index))
             Dim val1 = edgeMap.Get(Of Byte)(lp.ptE1.Y, lp.ptE1.X)
             Dim val2 = edgeMap.Get(Of Byte)(lp.ptE1.Y, lp.ptE1.X)
             If val1 > 0 Or val2 > 0 Then
-                edgeDropCount += 1
+                edgeDuplicates.Add(lp)
                 Continue For
             End If
 
@@ -94,7 +95,7 @@ Public Class Line_Basics : Inherits TaskParent
 
         dst3 = dst1.Threshold(0, 255, cv.ThresholdTypes.Binary)
 
-        labels(3) = CStr(lpList.Count) + " lines found and " + CStr(edgeDropCount) + " overlaps dropped."
+        labels(3) = CStr(lpList.Count) + " lines found and " + CStr(edgeDuplicates.Count) + " edge duplicates."
     End Sub
     Protected Overrides Sub Finalize()
         ld.Dispose()
@@ -306,7 +307,7 @@ Public Class Line_Perpendicular : Inherits TaskParent
     End Sub
     Public Shared Function computePerp(lp As lpData) As lpData
         Dim midPoint = New cv.Point2f((lp.p1.X + lp.p2.X) / 2, (lp.p1.Y + lp.p2.Y) / 2)
-        Dim m = If(lp.slope = 0, lpData.maxSlope, -1 / lp.slope)
+        Dim m = If(lp.slope = 0, maxSlope, -1 / lp.slope)
         Dim b = midPoint.Y - m * midPoint.X
         Dim p1 = New cv.Point2f(-b / m, 0)
         Dim p2 = New cv.Point2f((task.workRes.Height - b) / m, task.workRes.Height)
@@ -1962,11 +1963,17 @@ Public Class Line_EdgePoints : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If task.lines.lpList.Count = 0 Then Exit Sub
-
+        Dim lpList As New List(Of lpData)(task.lines.lpList)
         knn.queries.Clear()
-        For Each lp In task.lines.lpList
+        For Each lp In lpList
             knn.queries.Add(lp.ptE1)
             knn.queries.Add(lp.ptE2)
+        Next
+
+        For Each lp In task.lines.basics.edgeDuplicates
+            knn.queries.Add(lp.ptE1)
+            knn.queries.Add(lp.ptE2)
+            lpList.Add(lp)
         Next
 
         If task.firstPass Then knn.trainInput = New List(Of cv.Point2f)(knn.queries)
@@ -1980,19 +1987,28 @@ Public Class Line_EdgePoints : Inherits TaskParent
         Dim vectors As New List(Of lpData)
         Dim outLiers As New List(Of lpData)
         Dim zeroVectors As New List(Of lpData)
+        Dim xPerp As New List(Of lpData)
+        Dim yPerp As New List(Of lpData)
         For i = 0 To knn.queries.Count - 1
             Dim p1 = knn.queries(i)
             Dim index = knn.result(i, 0)
             Dim p2 = knn.trainInput(index)
             Dim distance = p1.DistanceTo(p2)
-            Dim lp = task.lines.lpList(Math.Floor(i / 2))
+            Dim lp = lpList(Math.Floor(i / 2))
+
             If distance > task.gridWH Then
                 outLiers.Add(lp)
                 Continue For
             End If
+
             If distance = 0 Then
                 zeroVectors.Add(lp)
                 Continue For
+            End If
+
+            If i Mod 2 = 0 Then
+                If Math.Abs(lp.angle) > 85 Then xPerp.Add(lp)
+                If Math.Abs(lp.angle) < 5 Then yPerp.Add(lp)
             End If
 
             If distance < 0.5 Then vectors.Add(lp)
@@ -2006,13 +2022,14 @@ Public Class Line_EdgePoints : Inherits TaskParent
             strOut = "There were " + CStr(xMatches.Count) + " useful edge points after filtering." + vbCrLf
             strOut += "Average X offset = " + Format(xMatches.Average, fmt2) + vbCrLf
             strOut += "Average Y offset = " + Format(yMatches.Average, fmt2) + vbCrLf
-            strOut += "There were " + CStr(task.lines.lpList.Count) + " lines in the current image" + vbCrLf
-            strOut += "There were " + CStr(task.lines.lpList.Count * 2) + " edge points in the current image" + vbCrLf
+            strOut += "There were " + CStr(lpList.Count) + " lines in the current image" + vbCrLf
+            strOut += "There were " + CStr(lpList.Count * 2) + " edge points in the current image" + vbCrLf
             strOut += "There were " + CStr(vectors.Count)
             strOut += " with delta < 0.5 indicating direction of motion." + vbCrLf
             strOut += "There were " + CStr(outLiers.Count) + " outliers implying new or lost lines " + vbCrLf
             strOut += "There were " + CStr(zeroVectors.Count) + " implying identical lines" + vbCrLf
 
+            ' if we have enough lines show the vectors that are closest.
             If xMatches.Count >= knn.queries.Count / 2 Then
                 For Each lp In vectors
                     dst3.Line(lp.p1, lp.p2, task.highlight, task.lineWidth)
@@ -2020,21 +2037,5 @@ Public Class Line_EdgePoints : Inherits TaskParent
             End If
         End If
         SetTrueText(strOut, 1)
-    End Sub
-End Class
-
-
-
-
-
-
-
-
-
-Public Class Stabilizer_EdgePointHistogram : Inherits TaskParent
-    Public Sub New()
-        desc = "Treat the edge points as fixed point integers instead of floats and create histogram."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
     End Sub
 End Class

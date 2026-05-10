@@ -1683,7 +1683,6 @@ Spectrum_X
 Spectrum_Y
 Spectrum_Z
 Stabilizer_Basics
-Stabilizer_EdgePointHistogram
 Stabilizer_IMU
 StableDepth_Basics
 StableDepth_Max

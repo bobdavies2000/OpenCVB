@@ -478,7 +478,6 @@ Public Module Structures
         Public rect As cv.Rect
         Public slope As Single
 
-        Public Const maxSlope As Integer = 100000
         Public Shared Function validatePoint(pt As cv.Point2f) As cv.Point2f
             If CInt(pt.X) < 0 Then pt.X = 0
             If CInt(pt.X) >= task.color.Width Then pt.X = task.color.Width - 1
