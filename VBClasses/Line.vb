@@ -1415,12 +1415,13 @@ Public Class Line_FindSimple : Inherits TaskParent
             Dim pixelMat = dst2(r).FindNonZero
 
             pixelMat.GetArray(Of cv.Point)(pixels)
-
             Dim lp = testPixels(pixels)
             If lp IsNot Nothing Then
                 dst3(r).Line(lp.p1, lp.p2, task.highlight, task.lineWidth)
             End If
         Next
+        dst2 = dst2.Threshold(0, 255, cv.ThresholdTypes.Binary)
+        dst3 = dst3.Threshold(0, 255, cv.ThresholdTypes.Binary)
     End Sub
 End Class
 

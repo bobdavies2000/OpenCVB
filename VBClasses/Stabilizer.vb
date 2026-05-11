@@ -69,8 +69,6 @@ End Class
 
 
 Public Class Stabilizer_IMU : Inherits TaskParent
-    Public baselineRoll As Single
-    Public baselinePitch As Single
     Dim warper As New WarpAffine_Basics
     Public Sub New()
         desc = "Use IMU tilt deltas to stabilize grayscale, then use AddWeighted_Accumulate."
@@ -82,12 +80,10 @@ Public Class Stabilizer_IMU : Inherits TaskParent
         Dim graySrc = If(src.Channels = 1, src, task.gray)
 
         If task.optionsChanged Or task.heartBeat Then
-            baselineRoll = task.accRadians.Z
-            baselinePitch = task.accRadians.X
+            warper.baselineRoll = task.accRadians.Z
+            warper.baselinePitch = task.accRadians.X
         End If
 
-        warper.baselineRoll = baselineRoll
-        warper.baselinePitch = baselinePitch
         warper.Run(task.gray)
         dst2 = warper.dst2
         dst3 = warper.dst3

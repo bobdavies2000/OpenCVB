@@ -91,6 +91,7 @@ Public Class NR_FindNonZero_Line3DWorld : Inherits TaskParent
         cv.Cv2.FindNonZero(dst2(lp.rect), tmp)
         If tmp.Rows = 0 Then Exit Sub ' nothing to work on...
 
+        ' line end points guaranteed to have depth (line is tossed if not.)  LastDepth can be 0 on first pass.
         Dim points(tmp.Rows - 1) As cv.Point
         tmp.GetArray(Of cv.Point)(points)
 
@@ -99,7 +100,6 @@ Public Class NR_FindNonZero_Line3DWorld : Inherits TaskParent
         For i = 0 To points.Count - 1
             ptList.Add(points(i))
         Next
-        If ptList.Count = 0 Then Exit Sub
 
         Dim incr = (lp.pVec1(2) - lp.pVec2(2)) / ptList.Count
         veclist.Clear()

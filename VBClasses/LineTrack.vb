@@ -915,8 +915,13 @@ End Class
 
 
 
-Public Class LineTrack_Motion : Inherits TaskParent
+Public Class LineTrack_Triangle : Inherits TaskParent
     Dim intersect As New Line_Intersection
+    Public pitch As Single
+    Public roll As Single
+    Public p1 As cv.Point2f
+    Public p2 As cv.Point2f
+    Public p3 As cv.Point2f
     Public Sub New()
         desc = "Measure the camera motion using LineTrack_Basics_TA results"
     End Sub
@@ -928,14 +933,14 @@ Public Class LineTrack_Motion : Inherits TaskParent
         Dim lpPerp = Line_Perpendicular.computePerp(lp)
         dst2.Line(lpPerp.p1, lpPerp.p2, task.highlight, task.lineWidth)
 
-        Dim p1 As cv.Point2f = lpPerp.p1
-        Dim p2 As cv.Point2f = If(lp.p1.Y > lp.p2.Y, lp.p2, lp.p1)
+        p1 = lpPerp.p1
+        p2 = If(lp.p1.Y > lp.p2.Y, lp.p2, lp.p1)
         dst2.Line(p1, p2, task.highlight, task.lineWidth)
 
         intersect.lp1 = lp
         intersect.lp2 = lpPerp
         intersect.Run(emptyMat)
-        Dim p3 = intersect.intersectionPoint
+        p3 = intersect.intersectionPoint
 
         SetTrueText("p1 " + CStr(CInt(p1.X)) + ", " + CStr(CInt(p1.Y)), p1, 2)
         SetTrueText("p2 " + CStr(CInt(p2.X)) + ", " + CStr(CInt(p2.Y)), p2, 2)
@@ -963,6 +968,35 @@ Public Class LineTrack_Motion : Inherits TaskParent
                   " radians" + vbCrLf
         strOut += "Angle at p3 = " + Format(angleP3, fmt2) + " degrees or " + Format(angleP3 / RadToDeg, fmt2) +
                   " radians" + vbCrLf
+        strOut += Format(d3 / d2, fmt2) + " Opposite / Adjacent = " + "Tan(angle at p1) = " +
+                  " = " + Format(Math.Tan(angleP1 / RadToDeg), fmt2) + vbCrLf
+
+        pitch = p3.X
+        roll = p1.Y
         SetTrueText(strOut, 3)
     End Sub
 End Class
+
+
+
+
+
+
+Public Class LineTrack_PitchRoll : Inherits TaskParent
+    Dim triangle As New LineTrack_Triangle
+    Public Sub New()
+        If standalone Then task.gOptions.displayDst1.Checked = True
+        desc = "Compute the pitch and roll and use it to accumulate pixels."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        triangle.Run(src)
+        dst3 = triangle.dst2
+
+        SetTrueText(triangle.strOut, 1)
+
+        SetTrueText("p1 " + CStr(CInt(triangle.p1.X)) + ", " + CStr(CInt(triangle.p1.Y)), triangle.p1, 3)
+        SetTrueText("p2 " + CStr(CInt(triangle.p2.X)) + ", " + CStr(CInt(triangle.p2.Y)), triangle.p2, 3)
+        SetTrueText("p3 " + CStr(CInt(triangle.p3.X)) + ", " + CStr(CInt(triangle.p3.Y)), triangle.p3, 3)
+    End Sub
+End Class
+

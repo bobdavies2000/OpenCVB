@@ -506,9 +506,10 @@ LineTrack_Basics_TA
 LineTrack_Horizontal
 LineTrack_Match
 LineTrack_MatchLines
-LineTrack_Motion
+LineTrack_PitchRoll
 LineTrack_Rect
 LineTrack_Slices
+LineTrack_Triangle
 LUT_Basics
 LUT_Equalized
 Magnify_Basics
