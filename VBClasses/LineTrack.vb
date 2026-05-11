@@ -34,10 +34,12 @@ Public Class LineTrack_Basics : Inherits TaskParent
 
             knn.inputLine = lpCurr
             knn.Run(emptyMat)
-            lpCurr = knn.closestLine
+            Dim lpTmp = knn.closestLine
+
+            lpCurr = New lpData(lpTmp.ptE1, lpTmp.ptE2)
 
             dst2 = task.color.Clone
-            dst2.Line(lpCurr.ptE1, lpCurr.ptE2, task.highlight, task.lineWidth)
+            dst2.Line(lpCurr.p1, lpCurr.p2, task.highlight, task.lineWidth)
             If compareLines(lpCurr, lpLast) Then
                 presentCount += 1
                 If presentCount > 1000 Then presentCount = 100
@@ -906,5 +908,61 @@ Public Class LineTrack_Horizontal : Inherits TaskParent
         SetTrueText("The longest horizontal line is tracked until it is lost." + vbCrLf +
                     "When that line is lost, the longest line is found and tracked.", 3)
 
+    End Sub
+End Class
+
+
+
+
+
+Public Class LineTrack_Motion : Inherits TaskParent
+    Dim intersect As New Line_Intersection
+    Public Sub New()
+        desc = "Measure the camera motion using LineTrack_Basics_TA results"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        dst2 = src.Clone
+        Dim lp = task.lineTrack.lpCurr
+        dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth)
+
+        Dim lpPerp = Line_Perpendicular.computePerp(lp)
+        dst2.Line(lpPerp.p1, lpPerp.p2, task.highlight, task.lineWidth)
+
+        Dim p1 As cv.Point2f = lpPerp.p1
+        Dim p2 As cv.Point2f = If(lp.p1.Y > lp.p2.Y, lp.p2, lp.p1)
+        dst2.Line(p1, p2, task.highlight, task.lineWidth)
+
+        intersect.lp1 = lp
+        intersect.lp2 = lpPerp
+        intersect.Run(emptyMat)
+        Dim p3 = intersect.intersectionPoint
+
+        SetTrueText("p1 " + CStr(CInt(p1.X)) + ", " + CStr(CInt(p1.Y)), p1, 2)
+        SetTrueText("p2 " + CStr(CInt(p2.X)) + ", " + CStr(CInt(p2.Y)), p2, 2)
+        SetTrueText("p3 " + CStr(CInt(p3.X)) + ", " + CStr(CInt(p3.Y)), p3, 2)
+
+        Dim d1 = p1.DistanceTo(p2)
+        Dim d2 = p1.DistanceTo(p3)
+        Dim d3 = p2.DistanceTo(p3)
+
+        strOut = "P1 to P2 distance (hypotenuse) = " + Format(d1, fmt3) + vbCrLf
+        strOut += "P1 to P3 distance (adjacent side) = " + Format(d2, fmt3) + vbCrLf
+        strOut += "P2 to P3 distance (opposite side) = " + Format(d3, fmt3) + vbCrLf + vbCrLf
+
+        Dim atanP1 = Math.Atan(d3 / d2)
+        strOut += "opposite / adjacent = " + Format(d3 / d2, fmt2) + vbCrLf
+        strOut += "ArcTan " + Format(d3 / d2, fmt2) + " = " + Format(atanP1, fmt2) + " radians or " +
+                   Format(atanP1 * RadToDeg, fmt2) + " degrees " + vbCrLf + vbCrLf
+
+        Dim angleP1 As Double = lpData.AngleAtPoint(p1, p2, p3)
+        Dim angleP2 As Double = lpData.AngleAtPoint(p2, p1, p3)
+        Dim angleP3 As Double = lpData.AngleAtPoint(p3, p1, p2)
+        strOut += "Angle at p1 = " + Format(angleP1, fmt2) + " degrees or " + Format(angleP1 / RadToDeg, fmt2) +
+                  " radians" + vbCrLf
+        strOut += "Angle at p2 = " + Format(angleP2, fmt2) + " degrees or " + Format(angleP2 / RadToDeg, fmt2) +
+                  " radians" + vbCrLf
+        strOut += "Angle at p3 = " + Format(angleP3, fmt2) + " degrees or " + Format(angleP3 / RadToDeg, fmt2) +
+                  " radians" + vbCrLf
+        SetTrueText(strOut, 3)
     End Sub
 End Class

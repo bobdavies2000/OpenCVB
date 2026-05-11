@@ -1,4 +1,5 @@
-﻿Imports cv = OpenCvSharp
+﻿Imports OpenCvSharp
+Imports cv = OpenCvSharp
 Public Module Structures
     Public Enum pointStyle
         unFiltered = 0
@@ -486,6 +487,38 @@ Public Module Structures
 
             Return pt
         End Function
+        Public Shared Function computeAngle(p1 As cv.Point2f, p2 As cv.Point2f) As Single
+            Dim angleRadians As Double = Math.Atan2(p2.Y - p1.Y, p2.X - p1.X)
+            Dim angle = CType(angleRadians * RadToDeg, Single)
+            If angle >= 90.0 Then angle -= 180.0
+            If angle < -90.0 Then angle += 180.0
+            Return angle
+        End Function
+        Public Shared Function AngleAtPoint(pVertex As Point2f, p1 As Point2f, p2 As Point2f) As Double
+            ' Build the two vectors that meet at the vertex
+            Dim v1 As New Point2f(p1.X - pVertex.X, p1.Y - pVertex.Y)
+            Dim v2 As New Point2f(p2.X - pVertex.X, p2.Y - pVertex.Y)
+
+            ' Dot product
+            Dim dot As Double = v1.X * v2.X + v1.Y * v2.Y
+
+            ' Magnitudes
+            Dim mag1 As Double = Math.Sqrt(v1.X * v1.X + v1.Y * v1.Y)
+            Dim mag2 As Double = Math.Sqrt(v2.X * v2.X + v2.Y * v2.Y)
+
+            ' Protect against division by zero
+            If mag1 = 0 OrElse mag2 = 0 Then Return 0
+
+            ' Compute cosine of the angle
+            Dim cosTheta As Double = dot / (mag1 * mag2)
+
+            ' Clamp due to floating‑point noise
+            If cosTheta > 1 Then cosTheta = 1
+            If cosTheta < -1 Then cosTheta = -1
+
+            ' Convert to degrees
+            Return Math.Acos(cosTheta) * (180.0 / Math.PI)
+        End Function
         Sub New(_p1 As cv.Point2f, _p2 As cv.Point2f)
             p1 = validatePoint(_p1)
             p2 = validatePoint(_p2)
@@ -559,10 +592,7 @@ Public Module Structures
                 Exit Sub
             End If
 
-            Dim angleRadians As Double = Math.Atan2((p2.Y - p1.Y), (p2.X - p1.X))
-            angle = CType(angleRadians * (180.0 / Math.PI), Single)
-            If angle >= 90.0 Then angle -= 180.0
-            If angle < -90.0 Then angle += 180.0
+            angle = computeAngle(p1, p2)
 
             Dim pad As Integer = 5
             Dim w = Math.Abs(p1.X - p2.X) + pad * 2
