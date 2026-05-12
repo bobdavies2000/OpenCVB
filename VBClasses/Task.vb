@@ -77,7 +77,7 @@ Public Class AlgorithmTask : Implements IDisposable
 
         task.gOptions.PaintFreqSlider.Value = paintFreq
         Options_PointCloud.setupCalcHist()
-        Debug.WriteLine(vbCrLf + vbCrLf + vbCrLf + "Starting algorithm " + settings.algorithm)
+        Debug.WriteLine(vbCrLf + vbCrLf + vbCrLf + "Starting algorithm " + settings.algorithm + " at " + CStr(Now))
         Debug.WriteLine(vbTab + CStr(AlgorithmTestAllCount) + " algorithms tested")
         AlgorithmTestAllCount += 1
 
@@ -114,7 +114,7 @@ Public Class AlgorithmTask : Implements IDisposable
         grid.Run(task.color)
         imuBasics.Run(emptyMat)
         gravityMatrix.Run(emptyMat)
-
+        ma
         If gOptions.CreateGif.Checked Then
             optionsChanged = False
         Else
