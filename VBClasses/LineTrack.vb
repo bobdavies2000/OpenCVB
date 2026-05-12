@@ -2,12 +2,11 @@ Imports System.Runtime.InteropServices
 Imports cv = OpenCvSharp
 Public Class LineTrack_Basics : Inherits TaskParent
     Dim lpLast As New lpData
-    Public lpCurr As New lpData
     Public lpInput As New lpData
     Public reSyncImage As Boolean = True ' if true, the longest line was lost.
     Dim knn As New KNN_FindLine
     Public Sub New()
-        desc = "Track the longest line and flag when it is lost."
+        desc = "Track the longest line even if it is no longer the longest and flag when it is lost."
     End Sub
     Public Shared Function compareLines(lpCurr As lpData, lpLast As lpData) As Boolean
         Dim distThreshold = If(task.workRes.Width > 640, task.gridWH * 2, task.gridWH)
@@ -20,8 +19,8 @@ Public Class LineTrack_Basics : Inherits TaskParent
         Return False
     End Function
     Private Sub reset()
-        lpCurr = If(standalone, task.lines.lpList(0), lpInput)
-        lpLast = lpCurr
+        task.longestLine = If(standalone, task.lines.lpList(0), lpInput)
+        lpLast = task.longestLine
         reSyncImage = False
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -32,18 +31,18 @@ Public Class LineTrack_Basics : Inherits TaskParent
         Else
             If reSyncImage Then reset()
 
-            knn.inputLine = lpCurr
+            knn.inputLine = task.longestLine
             knn.Run(emptyMat)
             Dim lpTmp = knn.closestLine
 
-            lpCurr = New lpData(lpTmp.ptE1, lpTmp.ptE2)
+            task.longestLine = New lpData(lpTmp.ptE1, lpTmp.ptE2)
 
             dst2 = task.color.Clone
-            dst2.Line(lpCurr.p1, lpCurr.p2, task.highlight, task.lineWidth)
-            If compareLines(lpCurr, lpLast) Then
+            dst2.Line(task.longestLine.p1, task.longestLine.p2, task.highlight, task.lineWidth)
+            If compareLines(task.longestLine, lpLast) Then
                 presentCount += 1
                 If presentCount > 1000 Then presentCount = 100
-                lpLast = lpCurr
+                lpLast = task.longestLine
             Else
                 lostLongest = 15
                 presentCount = 0
@@ -79,7 +78,7 @@ Public Class LineTrack_Basics_TA : Inherits TaskParent
         lineTrack.Run(emptyMat)
         labels(2) = lineTrack.labels(2)
 
-        lpCurr = lineTrack.lpCurr
+        lpCurr = task.longestLine
         reSyncImage = lineTrack.reSyncImage
 
         If standaloneTest() Then dst2 = lineTrack.dst2.Clone
@@ -263,7 +262,7 @@ Public Class LineTrack_Match : Inherits TaskParent
 
                 If angleDelta.Count > 0 Then
                     Dim minAngleDelta = angleDelta.Min
-                    If minAngleDelta < task.angleThreshold Then ' within x degrees of the original line's angle
+                    If minAngleDelta < AngleThreshold Then ' within x degrees of the original line's angle
                         Dim index = lineIndex(angleDelta.IndexOf(minAngleDelta))
                         lpMatch = lpListLast(index)
                         dst2.Line(lp.p1, lp.p2, color, task.lineWidth + 2, task.lineType)
@@ -898,7 +897,7 @@ Public Class LineTrack_Horizontal : Inherits TaskParent
         lineTrack.Run(emptyMat)
         labels(2) = lineTrack.labels(2)
 
-        lpCurr = lineTrack.lpCurr
+        lpCurr = task.longestLine
 
         If standaloneTest() Then
             dst2 = lineTrack.dst2.Clone
@@ -919,9 +918,7 @@ Public Class LineTrack_Triangle : Inherits TaskParent
     Dim intersect As New Line_Intersection
     Public pitch As Single
     Public roll As Single
-    Public p1 As cv.Point2f
-    Public p2 As cv.Point2f
-    Public p3 As cv.Point2f
+    Public yaw As Single
     Public Sub New()
         desc = "Measure the camera motion using LineTrack_Basics_TA results"
     End Sub
@@ -933,14 +930,14 @@ Public Class LineTrack_Triangle : Inherits TaskParent
         Dim lpPerp = Line_Perpendicular.computePerp(lp)
         dst2.Line(lpPerp.p1, lpPerp.p2, task.highlight, task.lineWidth)
 
-        p1 = lpPerp.p1
-        p2 = If(lp.p1.Y > lp.p2.Y, lp.p2, lp.p1)
+        Dim p1 = lpPerp.p1
+        Dim p2 = If(lp.p1.Y > lp.p2.Y, lp.p2, lp.p1)
         dst2.Line(p1, p2, task.highlight, task.lineWidth)
 
         intersect.lp1 = lp
         intersect.lp2 = lpPerp
         intersect.Run(emptyMat)
-        p3 = intersect.intersectionPoint
+        Dim p3 = intersect.intersectionPoint
 
         SetTrueText("p1 " + CStr(CInt(p1.X)) + ", " + CStr(CInt(p1.Y)), p1, 2)
         SetTrueText("p2 " + CStr(CInt(p2.X)) + ", " + CStr(CInt(p2.Y)), p2, 2)
@@ -950,9 +947,9 @@ Public Class LineTrack_Triangle : Inherits TaskParent
         Dim d2 = p1.DistanceTo(p3)
         Dim d3 = p2.DistanceTo(p3)
 
-        strOut = "P1 to P2 distance (hypotenuse) = " + Format(d1, fmt3) + vbCrLf
-        strOut += "P1 to P3 distance (adjacent side) = " + Format(d2, fmt3) + vbCrLf
-        strOut += "P2 to P3 distance (opposite side) = " + Format(d3, fmt3) + vbCrLf + vbCrLf
+        strOut = "P1 to P2 distance (hypotenuse) = " + Format(d1, fmt3) + " pixels" + vbCrLf
+        strOut += "P1 to P3 distance (adjacent side) = " + Format(d2, fmt3) + " pixels" + vbCrLf
+        strOut += "P2 to P3 distance (opposite side) = " + Format(d3, fmt3) + " pixels" + vbCrLf + vbCrLf
 
         Dim atanP1 = Math.Atan(d3 / d2)
         strOut += "opposite / adjacent = " + Format(d3 / d2, fmt2) + vbCrLf
@@ -968,11 +965,15 @@ Public Class LineTrack_Triangle : Inherits TaskParent
                   " radians" + vbCrLf
         strOut += "Angle at p3 = " + Format(angleP3, fmt2) + " degrees or " + Format(angleP3 / RadToDeg, fmt2) +
                   " radians" + vbCrLf
-        strOut += Format(d3 / d2, fmt2) + " Opposite / Adjacent = " + "Tan(angle at p1) = " +
-                  " = " + Format(Math.Tan(angleP1 / RadToDeg), fmt2) + vbCrLf
 
-        pitch = p3.X
-        roll = p1.Y
+        Dim w = dst2.Width - 1, h = dst2.Height - 1
+        If p1.Y = 0 Then yaw = p1.X Else If p2.Y = 0 Then yaw = p2.X Else If p3.Y = 0 Then yaw = p3.X
+        If p1.Y = h Then yaw = p1.X Else If p2.Y = h Then yaw = p2.X Else If p3.Y = h Then yaw = p3.X
+        If p1.X = 0 Then pitch = p1.Y Else If p2.Y = 0 Then pitch = p2.Y Else If p3.Y = 0 Then pitch = p3.Y
+        If p1.X = w Then pitch = p1.Y Else If p2.Y = w Then pitch = p2.Y Else If p3.Y = w Then pitch = p3.Y
+
+        strOut += "pitch = " + Format(pitch, fmt2) + " pixels"  + vbCrLf
+        strOut += "yaw = " + Format(yaw, fmt2) + " pixels" + vbCrLf
         SetTrueText(strOut, 3)
     End Sub
 End Class
@@ -984,19 +985,21 @@ End Class
 
 Public Class LineTrack_PitchRoll : Inherits TaskParent
     Dim triangle As New LineTrack_Triangle
+    Dim warper As New WarpAffine_Basics
     Public Sub New()
         If standalone Then task.gOptions.displayDst1.Checked = True
         desc = "Compute the pitch and roll and use it to accumulate pixels."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         triangle.Run(src)
+
+        If task.heartBeat Or task.optionsChanged Then
+            warper.baselineRoll = task.accRadians.Z
+            warper.baselinePitch = task.accRadians.X
+        End If
         dst3 = triangle.dst2
 
         SetTrueText(triangle.strOut, 1)
-
-        SetTrueText("p1 " + CStr(CInt(triangle.p1.X)) + ", " + CStr(CInt(triangle.p1.Y)), triangle.p1, 3)
-        SetTrueText("p2 " + CStr(CInt(triangle.p2.X)) + ", " + CStr(CInt(triangle.p2.Y)), triangle.p2, 3)
-        SetTrueText("p3 " + CStr(CInt(triangle.p3.X)) + ", " + CStr(CInt(triangle.p3.Y)), triangle.p3, 3)
     End Sub
 End Class
 

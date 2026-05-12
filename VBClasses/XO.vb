@@ -5406,7 +5406,7 @@ Namespace VBClasses
         End Sub
         Private Function restartLine(src As cv.Mat) As lpData
             For Each lpTemp In lplist
-                If Math.Abs(task.lpGravity.angle - lpTemp.angle) < task.angleThreshold Then
+                If Math.Abs(task.lpGravity.angle - lpTemp.angle) < AngleThreshold Then
                     matchRect = lpTemp.rect
                     match.template = src(matchRect).Clone
                     Return lpTemp
@@ -7671,6 +7671,7 @@ Namespace VBClasses
     Public Class XO_Line_LongestTest : Inherits TaskParent
         Public matchBrick As New Match_Brick
         Dim lp As New lpData
+        Public lineLongestChanged As Boolean
         Public Sub New()
             desc = "Identify a line by matching each of the points to the previous image."
         End Sub
@@ -7678,11 +7679,11 @@ Namespace VBClasses
             Dim threshold = task.fCorrThreshold
             Dim lplist = task.lines.lpList
 
-            task.lineLongestChanged = False
+            lineLongestChanged = False
             ' camera is often warming up for the first few images.
             If task.frameCount < 10 Or task.heartBeat Then
                 lp = lplist(0)
-                task.lineLongestChanged = True
+                lineLongestChanged = True
             End If
 
             Dim p1GridIndex = task.gridMap.Get(Of Integer)(lp.p1.Y, lp.p1.X)
@@ -7705,9 +7706,9 @@ Namespace VBClasses
 
             If p1Correlation >= threshold And p2Correlation >= threshold Then
                 lp = New lpData(p1, p2)
-                task.lineLongestChanged = False
+                lineLongestChanged = False
             Else
-                task.lineLongestChanged = True
+                lineLongestChanged = True
             End If
 
             If standaloneTest() Then
@@ -7775,12 +7776,12 @@ Namespace VBClasses
             If match.correlation < task.fCorrThreshold Or task.frameCount < 10 Or lp Is Nothing Then
                 lp = lplist(0)
                 For Each lp In lplist
-                    If Math.Abs(task.lpGravity.angle - lp.angle) < task.angleThreshold Then Exit For
+                    If Math.Abs(task.lpGravity.angle - lp.angle) < AngleThreshold Then Exit For
                 Next
                 match.template = src(lp.rect)
             End If
 
-            If Math.Abs(task.lpGravity.angle - lp.angle) >= task.angleThreshold Then
+            If Math.Abs(task.lpGravity.angle - lp.angle) >= AngleThreshold Then
                 lp = Nothing
                 Exit Sub
             End If
@@ -8124,7 +8125,7 @@ Namespace VBClasses
 
             horizList.Clear()
             For Each lp In task.lines.lpList
-                If Math.Abs(task.lpHorizon.angle - lp.angle) < task.angleThreshold Then
+                If Math.Abs(task.lpHorizon.angle - lp.angle) < AngleThreshold Then
                     dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
                     horizList.Add(lp)
                 End If
@@ -8151,7 +8152,7 @@ Namespace VBClasses
 
             vertList.Clear()
             For Each lp In task.lines.lpList
-                If Math.Abs(task.lpGravity.angle - lp.angle) < task.angleThreshold Then
+                If Math.Abs(task.lpGravity.angle - lp.angle) < AngleThreshold Then
                     dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
                     vertList.Add(lp)
                 End If
@@ -13202,7 +13203,7 @@ Namespace VBClasses
                 If index >= match3.lpOutput.Count Then Continue For
                 If index >= lplast.Count And lplast.Count > 0 Then Continue For
                 Dim age As Integer = 1
-                If Math.Abs(lplast(index).angle - match3.lpOutput(index).angle) < task.angleThreshold Then
+                If Math.Abs(lplast(index).angle - match3.lpOutput(index).angle) < AngleThreshold Then
                     Dim p1GridIndex = task.gridMap.Get(Of Integer)(match3.lpOutput(index).p1.Y, match3.lpOutput(index).p1.X)
                     Dim p2GridIndex = task.gridMap.Get(Of Integer)(match3.lpOutput(index).p2.Y, match3.lpOutput(index).p2.X)
                     Dim p1GridIndexLast = task.gridMap.Get(Of Integer)(lplast(index).p1.Y, lplast(index).p1.X)
@@ -14608,7 +14609,7 @@ Namespace VBClasses
             dst2 = src
             Dim count As Integer
             For Each lp In task.lines.lpList
-                If Math.Abs(lp.angle - degrees) < task.angleThreshold Then
+                If Math.Abs(lp.angle - degrees) < AngleThreshold Then
                     dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth * 2, task.lineType)
                     count += 1
                 Else
@@ -14730,7 +14731,7 @@ Namespace VBClasses
             Dim lp1 = New lpData(New cv.Point2f(lp.p1.X - disp1, lp.p1.Y),
                                  New cv.Point2f(lp.ptCenter.X - disp2, lp.ptCenter.Y))
             Dim lp2 = New lpData(New cv.Point2f(lp.p1.X - disp1, lp.p1.Y), New cv.Point2f(lp.p2.X - disp3, lp.p2.Y))
-            If Math.Abs(lp1.angle - lp2.angle) < task.angleThreshold Then lpOutput = lp2
+            If Math.Abs(lp1.angle - lp2.angle) < AngleThreshold Then lpOutput = lp2
             dst3.Line(lpOutput.p1, lpOutput.p2, task.highlight, task.lineWidth + 1, task.lineType)
             dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth + 1, task.lineType)
         End Sub
@@ -14779,7 +14780,7 @@ Namespace VBClasses
                                      New cv.Point2f(lp.ptCenter.X - disp2, lp.ptCenter.Y))
                 Dim lp2 = New lpData(New cv.Point2f(lp.p1.X - disp1, lp.p1.Y),
                                      New cv.Point2f(lp.p2.X - disp3, lp.p2.Y))
-                If Math.Abs(lp1.angle - lp2.angle) >= task.angleThreshold Then Continue For
+                If Math.Abs(lp1.angle - lp2.angle) >= AngleThreshold Then Continue For
 
                 Dim lpOut = lp2
                 lp.index = lpOutput.Count
@@ -14799,23 +14800,24 @@ Namespace VBClasses
         Public match As New Match_Basics
         Public deltaX As Single, deltaY As Single
         Dim lp As New lpData
+        Public lineLongestChanged As Boolean
         Public Sub New()
             desc = "Identify the longest line in the output of Line_Basics_TA."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             Dim lplist = task.lines.lpList
-            task.lineLongestChanged = False
+            lineLongestChanged = False
             ' camera is often warming up for the first few images.
             If match.correlation < task.fCorrThreshold Or task.frameCount < 10 Or task.heartBeat Then
                 lp = lplist(0)
                 match.template = task.gray(lp.rect)
-                task.lineLongestChanged = True
+                lineLongestChanged = True
             End If
 
             match.Run(task.gray.Clone)
 
             If match.correlation < task.fCorrThreshold Then
-                task.lineLongestChanged = True
+                lineLongestChanged = True
                 If lplist.Count > 1 Then
                     Dim histogram As New cv.Mat
                     cv.Cv2.CalcHist({task.lines.dst1(lp.rect)}, {0}, emptyMat, histogram, 1, {lplist.Count},
@@ -14884,7 +14886,7 @@ Namespace VBClasses
                 showVectors(dst2)
                 dst3.SetTo(0)
                 For Each lp In task.lines.lpList
-                    If Math.Abs(task.lpGravity.angle - lp.angle) < task.angleThreshold Then dst3.Line(lp.p1, lp.p2, white, task.lineWidth, task.lineType)
+                    If Math.Abs(task.lpGravity.angle - lp.angle) < AngleThreshold Then dst3.Line(lp.p1, lp.p2, white, task.lineWidth, task.lineType)
                 Next
                 labels(3) = task.lines.labels(3)
             End If
@@ -20056,10 +20058,12 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             Static lpLast As lpData = task.lines.lpList(0)
 
+            Static lastLongest As lpData = task.longestLine
+            Dim lineLongestChanged = (lastLongest.p1 = task.longestLine.p1 And lastLongest.p2 = task.longestLine.p2)
             Dim lp = task.lines.lpList(0)
-            If lp.ptE1 = lpLast.ptE1 And lp.ptE2 = lpLast.ptE2 Or task.lineLongestChanged Then
+            If lp.ptE1 = lpLast.ptE1 And lp.ptE2 = lpLast.ptE2 Or lineLongestChanged Then
                 dst2 = src
-                If task.lineLongestChanged Then lpLast = task.lines.lpList(0)
+                If lineLongestChanged Then lpLast = task.lines.lpList(0)
             Else
                 Dim rotateAngle = GetAngleBetweenLinesBySlopes(lp.slope, lpLast.slope)
 

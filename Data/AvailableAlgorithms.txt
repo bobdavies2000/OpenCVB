@@ -1686,6 +1686,8 @@ Spectrum_Y
 Spectrum_Z
 Stabilizer_Basics
 Stabilizer_IMU
+Stabilizer_OrientationPRY
+Stabilizer_PRY
 StableDepth_Basics
 StableDepth_Max
 StableGray_Basics_TA

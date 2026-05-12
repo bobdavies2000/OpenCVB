@@ -9,6 +9,7 @@ Public Module vbc
     Public Const maxSlope As Integer = 100000
     Public Const PixelsPerRad As Single = 60.0F
     Public Const RadToDeg As Double = 57.295779513082323
+    Public Const AngleThreshold As Integer = 2
     Public Const fmt0 = "0"
     Public Const fmt1 = "0.0"
     Public Const fmt2 = "0.00"
@@ -44,12 +45,13 @@ Public Module vbc
         If task.myStopWatch Is Nothing Then task.myStopWatch = Stopwatch.StartNew()
 
         ' update the time measures
-        task.msWatch = task.myStopWatch.ElapsedMilliseconds
+        Dim msWatch = task.myStopWatch.ElapsedMilliseconds
 
         task.quarterBeat = False
         task.midHeartBeat = False
         task.heartBeat = False
-        Dim ms = (task.msWatch - task.msLast) / 1000
+        Static msLast As Integer
+        Dim ms = (msWatch - msLast) / 1000
         For i = 0 To task.quarter.Count - 1
             If task.quarter(i) = False And ms > Choose(i + 1, 0.25, 0.5, 0.75, 1.0) Then
                 task.quarterBeat = True
@@ -69,9 +71,9 @@ Public Module vbc
         End If
 
         Dim frameDuration = 1000 / task.fpsAlgorithm
-        task.almostHeartBeat = If(task.msWatch - task.msLast + frameDuration * 1.5 > 1000, True, False)
+        task.almostHeartBeat = If(msWatch - msLast + frameDuration * 1.5 > 1000, True, False)
 
-        If (task.msWatch - task.msLast) > 1000 Then task.msLast = task.msWatch
+        If (msWatch - msLast) > 1000 Then msLast = msWatch
         If task.heartBeatLT Then task.toggleOn = Not task.toggleOn
 
         Static lastHeartBeatLT As Boolean = False

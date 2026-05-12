@@ -366,7 +366,7 @@ Public Class NR_Line_Parallel : Inherits TaskParent
             Dim lp1 = task.lines.lpList(parallels.ElementAt(i).Value - 1)
             For j = i + 1 To parallels.Count - 1
                 Dim lp2 = task.lines.lpList(parallels.ElementAt(j).Value - 1)
-                If Math.Abs(lp1.angle - lp2.angle) < task.angleThreshold Then
+                If Math.Abs(lp1.angle - lp2.angle) < angleThreshold Then
                     If classes(index) Is Nothing Then classes(index) = New List(Of Integer)({lp1.index})
                     classes(index).Add(lp2.index)
                 Else
@@ -841,7 +841,7 @@ Public Class Line_BrickList : Inherits TaskParent
             Dim pt = allPoints(i)
             For j = i + 1 To allPoints.Count - 1
                 Dim lpTest = New lpData(pt, allPoints(j))
-                'If Math.Abs(lp.angle - lpTest.angle) < task.angleThreshold Then
+                'If Math.Abs(lp.angle - lpTest.angle) < AngleThreshold Then
                 angles.Add(lpTest.angle)
                 ptList.Add(pt)
                 ptList.Add(allPoints(j))

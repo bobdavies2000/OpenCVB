@@ -163,18 +163,15 @@ Partial Public Class AlgorithmTask
     Public heartbeatFrame As Integer
     Public afterHeartBeatLT As Boolean
     Public afterHeartBeat As Boolean
-    Public msWatch As Integer
-    Public msLast As Integer
 
     Public toggleOn As Boolean ' toggles on the heartbeat.
 
     Public pcFloor As Single ' y-value for floor...
     Public pcCeiling As Single ' y-value for ceiling...
 
-    Public lpGravity As New lpData
-    Public lpHorizon As New lpData
-    Public lineLongestChanged As Boolean
-    Public angleThreshold = 2
+    Public lpGravity As lpData
+    Public lpHorizon As lpData
+    Public longestLine As lpData
 
     Public IMU_Acceleration As cv.Point3f
     Public IMU_AverageAcceleration As cv.Point3f
@@ -192,9 +189,13 @@ Partial Public Class AlgorithmTask
     Public theta As cv.Point3f ' velocity-filtered angles around x/y/z-axis to align with gravity
     Public verticalizeAngle As Double
 
-    Public pitch As Single
-    Public yaw As Single
-    Public roll As Single
+    Public pitchDeg As Single
+    Public yawDeg As Single
+    Public rollDeg As Single
+
+    Public pitchIMU As Single
+    Public yawIMU As Single
+    Public rollIMU As Single
 
     ' RedCloud variables
     Public channelCount As Integer = 2

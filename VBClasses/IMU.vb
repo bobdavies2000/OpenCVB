@@ -938,13 +938,13 @@ Public Class NR_IMU_VelocityPlot : Inherits TaskParent
         desc = "Plot the angular velocity"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        task.pitch = task.IMU_AngularVelocity.X
-        task.yaw = task.IMU_AngularVelocity.Y
-        task.roll = task.IMU_AngularVelocity.Z
+        task.pitchIMU = task.IMU_AngularVelocity.X
+        task.yawIMU = task.IMU_AngularVelocity.Y
+        task.rollIMU = task.IMU_AngularVelocity.Z
 
-        plot.blueA = task.pitch * 1000
-        plot.greenA = task.yaw * 1000
-        plot.redA = task.roll * 1000
+        plot.blueA = task.pitchIMU * 1000
+        plot.greenA = task.yawIMU * 1000
+        plot.redA = task.rollIMU * 1000
         plot.labels(2) = "pitch X 1000 (blue), Yaw X 1000 (green), and roll X 1000 (red)"
 
         plot.Run(src)
@@ -952,9 +952,9 @@ Public Class NR_IMU_VelocityPlot : Inherits TaskParent
         dst3 = plot.dst3
 
         If task.heartBeat Then
-            strOut = "Pitch X1000 (blue): " + vbTab + Format(task.pitch * 1000, fmt1) + vbCrLf +
-                         "Yaw X1000 (green): " + vbTab + Format(task.yaw * 1000, fmt1) + vbCrLf +
-                         "Roll X1000 (red): " + vbTab + Format(task.roll * 1000, fmt1)
+            strOut = "Pitch X1000 (blue): " + vbTab + Format(task.pitchIMU * 1000, fmt1) + vbCrLf +
+                         "Yaw X1000 (green): " + vbTab + Format(task.yawIMU * 1000, fmt1) + vbCrLf +
+                         "Roll X1000 (red): " + vbTab + Format(task.rollIMU * 1000, fmt1)
         End If
         SetTrueText(strOut, 1)
     End Sub
@@ -975,13 +975,13 @@ Public Class NR_IMU_IscameraStable : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
 
-        task.pitch = task.IMU_AngularVelocity.X
-        task.yaw = task.IMU_AngularVelocity.Y
-        task.roll = task.IMU_AngularVelocity.Z
+        task.pitchIMU = task.IMU_AngularVelocity.X
+        task.yawIMU = task.IMU_AngularVelocity.Y
+        task.rollIMU = task.IMU_AngularVelocity.Z
         If task.heartBeat Then
-            strOut = "Pitch X1000 (blue): " + vbTab + Format(task.pitch * 1000, fmt1) + vbCrLf +
-                     "Yaw X1000 (green): " + vbTab + Format(task.yaw * 1000, fmt1) + vbCrLf +
-                     "Roll X1000 (red): " + vbTab + Format(task.roll * 1000, fmt1)
+            strOut = "Pitch X1000 (blue): " + vbTab + Format(task.pitchIMU * 1000, fmt1) + vbCrLf +
+                     "Yaw X1000 (green): " + vbTab + Format(task.yawIMU * 1000, fmt1) + vbCrLf +
+                     "Roll X1000 (red): " + vbTab + Format(task.rollIMU * 1000, fmt1)
         End If
         SetTrueText(strOut, 2)
     End Sub
