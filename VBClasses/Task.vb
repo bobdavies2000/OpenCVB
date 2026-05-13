@@ -114,7 +114,7 @@ Public Class AlgorithmTask : Implements IDisposable
         grid.Run(task.color)
         imuBasics.Run(emptyMat)
         gravityMatrix.Run(emptyMat)
-        ma
+
         If gOptions.CreateGif.Checked Then
             optionsChanged = False
         Else
