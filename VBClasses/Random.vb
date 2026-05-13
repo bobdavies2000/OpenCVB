@@ -572,8 +572,8 @@ Public Class NR_Random_KalmanPoints : Inherits TaskParent
     Dim targetSet As New List(Of cv.Point2f)
     Dim currSet As New List(Of cv.Point2f)
     Dim refreshPoints As Boolean = True
+    Dim kalman As New Kalman_Basics
     Public Sub New()
-        task.kalman = New Kalman_Basics
         Dim offset = dst2.Width / 5
         random.range = New cv.Rect(offset, offset, Math.Abs(dst2.Width - offset * 2), Math.Abs(dst2.Height - offset * 2))
         OptionParent.FindSlider("Random Pixel Count").Value = 10
@@ -586,19 +586,19 @@ Public Class NR_Random_KalmanPoints : Inherits TaskParent
             currSet = New List(Of cv.Point2f)(random.PointList) ' just to get the updated size
             refreshPoints = False
 
-            If targetSet.Count * 2 <> task.kalman.kInput.Length Then ReDim task.kalman.kInput(targetSet.Count * 2 - 1)
+            If targetSet.Count * 2 <> kalman.kInput.Length Then ReDim kalman.kInput(targetSet.Count * 2 - 1)
 
         End If
 
         For i = 0 To targetSet.Count - 1
             Dim pt As cv.Point = targetSet(i)
-            task.kalman.kInput(i * 2) = pt.X
-            task.kalman.kInput(i * 2 + 1) = pt.Y
+            kalman.kInput(i * 2) = pt.X
+            kalman.kInput(i * 2 + 1) = pt.Y
         Next
 
-        task.kalman.Run(emptyMat)
-        For i = 0 To task.kalman.kOutput.Count - 1 Step 2
-            currSet(i / 2) = New cv.Point(task.kalman.kOutput(i), task.kalman.kOutput(i + 1))
+        kalman.Run(emptyMat)
+        For i = 0 To kalman.kOutput.Count - 1 Step 2
+            currSet(i / 2) = New cv.Point(kalman.kOutput(i), kalman.kOutput(i + 1))
         Next
 
         dst2.SetTo(0)

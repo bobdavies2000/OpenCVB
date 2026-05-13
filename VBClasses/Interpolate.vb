@@ -46,8 +46,8 @@ Public Class Interpolate_Kalman : Inherits TaskParent
     Dim myFrameCount As Integer
     Dim heartCount As Integer
     Dim options As New Options_Kalman
+    Dim kalman As New Kalman_Basics
     Public Sub New()
-        task.kalman = New Kalman_Basics
         desc = "Use Kalman to smooth the grayscale results of interpolation"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -57,25 +57,25 @@ Public Class Interpolate_Kalman : Inherits TaskParent
 
         dst2 = inter.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         If task.optionsChanged Then
-            ReDim task.kalman.kInput(dst2.Width * dst2.Height - 1)
+            ReDim kalman.kInput(dst2.Width * dst2.Height - 1)
             myFrameCount = 1
             updatedFrames = 0
         End If
 
         Dim tmp32f As New cv.Mat
         dst2.ConvertTo(tmp32f, cv.MatType.CV_32F)
-        tmp32f.GetArray(Of Single)(task.kalman.kInput)
-        task.kalman.Run(emptyMat)
+        tmp32f.GetArray(Of Single)(kalman.kInput)
+        kalman.Run(emptyMat)
 
-        Dim results(task.kalman.kInput.Length - 1) As Byte
-        For i = 0 To task.kalman.kOutput.Length - 1
-            Dim val = task.kalman.kOutput(i)
+        Dim results(kalman.kInput.Length - 1) As Byte
+        For i = 0 To kalman.kOutput.Length - 1
+            Dim val = kalman.kOutput(i)
             If Single.IsNaN(val) Then val = 255
             If val < 0 Then val = 0
             If val > 255 Then val = 255
             results(i) = val
         Next
-        Marshal.Copy(results, 0, dst2.Data, task.kalman.kOutput.Length)
+        Marshal.Copy(results, 0, dst2.Data, kalman.kOutput.Length)
 
         If options.useKalman Then
             labels(2) = "Kalman-smoothed output after resizing to " + CStr(dst2.Width) + "x" + CStr(dst2.Height)

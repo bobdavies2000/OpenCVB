@@ -419,8 +419,8 @@ Public Class NR_Depth_ForegroundHead : Inherits TaskParent
     Dim fgnd As New NR_Depth_ForegroundBlob
     Public trustedRect As cv.Rect
     Public trustworthy As Boolean
+    Dim kalman As New Kalman_Basics
     Public Sub New()
-        task.kalman = New Kalman_Basics
         labels(2) = "Blue is current, red is kalman, green is trusted"
         desc = "Use NR_Depth_Foreground to find the foreground blob.  Then find the probable head of the person in front of the camera."
     End Sub
@@ -437,10 +437,10 @@ Public Class NR_Depth_ForegroundHead : Inherits TaskParent
             If xx + rectSize / 2 > src.Width Then xx = src.Width - rectSize
             dst2 = fgnd.dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
 
-            task.kalman.kInput = {xx, yy, rectSize, rectSize}
-            task.kalman.Run(emptyMat)
+            kalman.kInput = {xx, yy, rectSize, rectSize}
+            kalman.Run(emptyMat)
             Dim nextRect = New cv.Rect(xx, yy, rectSize, rectSize)
-            Dim kRect = New cv.Rect(task.kalman.kOutput(0), task.kalman.kOutput(1), task.kalman.kOutput(2), task.kalman.kOutput(3))
+            Dim kRect = New cv.Rect(kalman.kOutput(0), kalman.kOutput(1), kalman.kOutput(2), kalman.kOutput(3))
             dst2.Rectangle(kRect, cv.Scalar.Red, 2)
             dst2.Rectangle(nextRect, cv.Scalar.Blue, 2)
             If Math.Abs(kRect.X - nextRect.X) < rectSize / 4 And Math.Abs(kRect.Y - nextRect.Y) < rectSize / 4 Then
@@ -533,7 +533,7 @@ Public Class NR_Depth_ForegroundOverTime : Inherits TaskParent
         labels = {"", "", "Foreground objects", "Edges for the Foreground Objects"}
         dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
-        task.fOptions.FrameHistoryCount.Value  = 5
+        task.fOptions.FrameHistoryCount.Value = 5
         desc = "Create a fused foreground mask over x number of frames (task.fOptions.FrameHistoryCount.Value )"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -547,7 +547,7 @@ Public Class NR_Depth_ForegroundOverTime : Inherits TaskParent
         For Each m In lastFrames
             dst2 += m
         Next
-        If lastFrames.Count >= task.fOptions.FrameHistoryCount.Value  Then lastFrames.RemoveAt(0)
+        If lastFrames.Count >= task.fOptions.FrameHistoryCount.Value Then lastFrames.RemoveAt(0)
 
         contours.Run(dst2)
         dst2.SetTo(0)
@@ -1149,9 +1149,9 @@ End Class
 
 Public Class NR_Depth_MinMaxToVoronoi : Inherits TaskParent
     Dim bricks As New Brick_Basics
+    Dim kalman As New Kalman_Basics
     Public Sub New()
-        task.kalman = New Kalman_Basics
-        ReDim task.kalman.kInput(task.gridRects.Count * 4 - 1)
+        ReDim kalman.kInput(task.gridRects.Count * 4 - 1)
         labels = {"", "", "Red is min distance, blue is max distance", "Voronoi representation of min point (only) for each cell."}
         desc = "Find min and max depth in each roi and create a voronoi representation using the min and max points."
     End Sub

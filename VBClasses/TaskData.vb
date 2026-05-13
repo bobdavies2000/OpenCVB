@@ -145,7 +145,6 @@ Partial Public Class AlgorithmTask
     Public camDirection As Single ' camera direction in radians.
 
     Public paletteRandom As Palette_RandomColors
-    Public kalman As Kalman_Basics
 
     Public gifCreator As Gif_OpenCVB
     Public gifImages As New List(Of Bitmap)

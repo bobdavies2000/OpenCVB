@@ -418,25 +418,25 @@ End Class
 Public Class NR_HistValley_Simple : Inherits TaskParent
     Dim trends As New SLR_Trends
     Public depthRegions As New List(Of Integer)
+    Dim kalman As New Kalman_Basics
     Public Sub New()
-        task.kalman = New Kalman_Basics
         desc = "Identify ranges by marking the depth histogram entries from valley to valley"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         trends.Run(src)
         If trends.resultingValues.Count = 0 Then Exit Sub
 
-        If task.kalman.kInput.Length <> task.histogramBins Then ReDim task.kalman.kInput(task.histogramBins - 1)
-        task.kalman.kInput = trends.resultingValues.ToArray
-        task.kalman.Run(emptyMat)
+        If kalman.kInput.Length <> task.histogramBins Then ReDim kalman.kInput(task.histogramBins - 1)
+        kalman.kInput = trends.resultingValues.ToArray
+        kalman.Run(emptyMat)
 
         dst2.SetTo(cv.Scalar.Black)
         Dim barWidth As Single = dst2.Width / trends.resultingValues.Count
         Dim colorIndex As Integer
         Dim color = task.scalarColors(colorIndex Mod 256)
         Dim vals() = {-1, -1, -1}
-        For i = 0 To task.kalman.kOutput.Count - 1
-            Dim h = dst2.Height - task.kalman.kOutput(i)
+        For i = 0 To kalman.kOutput.Count - 1
+            Dim h = dst2.Height - kalman.kOutput(i)
             vals(0) = vals(1)
             vals(1) = vals(2)
             vals(2) = h
@@ -536,8 +536,8 @@ End Class
 Public Class NR_HistValley_GrayKalman : Inherits TaskParent
     Dim hist As New Histogram_Kalman
     Dim auto As New OpAuto_Valley
+    Dim kalman As New Kalman_Basics
     Public Sub New()
-        task.kalman = New Kalman_Basics
         If standalone Then task.gOptions.setHistogramBins(255)
         If standalone Then OptionParent.FindSlider("Desired boundary count").Value = 4
         desc = "Find the histogram valleys for a grayscale image."
@@ -550,14 +550,14 @@ Public Class NR_HistValley_GrayKalman : Inherits TaskParent
 
         auto.Run(hist.hist.histogram)
 
-        ReDim task.kalman.kInput(auto.valleyOrder.Count - 1)
+        ReDim kalman.kInput(auto.valleyOrder.Count - 1)
         For i = 0 To auto.valleyOrder.Count - 1
-            task.kalman.kInput(i) = auto.valleyOrder.ElementAt(i).Value
+            kalman.kInput(i) = auto.valleyOrder.ElementAt(i).Value
         Next
-        task.kalman.Run(emptyMat)
+        kalman.Run(emptyMat)
 
         'Dim lastEntry As Integer
-        'For i = 0 To task.kalman.kOutput.Count - 1
+        'For i = 0 To kalman.kOutput.Count - 1
         '    Dim entry = auto.valleyOrder.ElementAt(i).Value
         '    For j = lastEntry To entry - 1
         '        hist.hist.histogram.Set(Of Single)(j, 0, i)

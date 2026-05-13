@@ -183,10 +183,10 @@ End Class
 
 Public Class NR_Corner_BasicsCentroid : Inherits TaskParent
     Dim fast As New Corner_Basics
+    Dim kalman As New Kalman_Basics
     Public Sub New()
-        task.kalman = New Kalman_Basics
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
-        ReDim task.kalman.kInput(1) ' 2 elements - cv.point
+        ReDim kalman.kInput(1) ' 2 elements - cv.point
         desc = "Find interesting points with the FAST and smooth the centroid with kalman"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -198,10 +198,10 @@ Public Class NR_Corner_BasicsCentroid : Inherits TaskParent
         Next
         Dim m = cv.Cv2.Moments(dst3, True)
         If m.M00 > 500 Then ' if more than x pixels are present (avoiding a zero area!)
-            task.kalman.kInput(0) = m.M10 / m.M00
-            task.kalman.kInput(1) = m.M01 / m.M00
-            task.kalman.Run(emptyMat)
-            dst2.Circle(New cv.Point(task.kalman.kOutput(0), task.kalman.kOutput(1)), 10, cv.Scalar.Red, -1, task.lineType)
+            kalman.kInput(0) = m.M10 / m.M00
+            kalman.kInput(1) = m.M01 / m.M00
+            kalman.Run(emptyMat)
+            dst2.Circle(New cv.Point(kalman.kOutput(0), kalman.kOutput(1)), 10, cv.Scalar.Red, -1, task.lineType)
         End If
     End Sub
 End Class

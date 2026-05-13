@@ -265,6 +265,7 @@ Public Class NR_Plane_EqCorrelation : Inherits TaskParent
     Public correlations As New List(Of Single)
     Public equations As New List(Of cv.Vec4f)
     Public ptList2D As New List(Of List(Of cv.Point))
+    Dim kalman As Kalman_Basics
     Public Sub New()
         desc = "Classify equations based on the correlation of their coefficients"
     End Sub
@@ -306,9 +307,9 @@ Public Class NR_Plane_EqCorrelation : Inherits TaskParent
         Dim s2 = If(pt(2) < 0, " - ", " + ")
 
         If count(index) > plane.equations.Count / 4 Then
-            If task.kalman Is Nothing Then task.kalman = New Kalman_Basics
+            If kalman Is Nothing Then kalman = New Kalman_Basics
             If task.heartBeat Then
-                With task.kalman
+                With kalman
                     .kInput = {pt(0), pt(1), pt(2), pt(3)}
                     .Run(src)
 

@@ -5,9 +5,9 @@ Public Class Moments_Basics : Inherits TaskParent
     Public scaleFactor As Integer = 1
     Public offsetPt As cv.Point
     Dim options As New Options_Kalman
+    Dim kalman As New Kalman_Basics
     Public Sub New()
-        task.kalman = New Kalman_Basics
-        ReDim task.kalman.kInput(2 - 1) ' 2 elements - cv.point
+        ReDim kalman.kInput(2 - 1) ' 2 elements - cv.point
         labels(2) = "Red dot = Kalman smoothed centroid"
         desc = "Compute the centroid of the provided mask file."
     End Sub
@@ -22,10 +22,10 @@ Public Class Moments_Basics : Inherits TaskParent
         Dim m = cv.Cv2.Moments(fore.dst2, True)
 
         If options.useKalman Then
-            task.kalman.kInput(0) = m.M10 / m.M00
-            task.kalman.kInput(1) = m.M01 / m.M00
-            task.kalman.Run(emptyMat)
-            center = New cv.Point2f(task.kalman.kOutput(0), task.kalman.kOutput(1))
+            kalman.kInput(0) = m.M10 / m.M00
+            kalman.kInput(1) = m.M01 / m.M00
+            kalman.Run(emptyMat)
+            center = New cv.Point2f(kalman.kOutput(0), kalman.kOutput(1))
         Else
             center = New cv.Point2f(m.M10 / m.M00, m.M01 / m.M00)
         End If
@@ -40,9 +40,9 @@ End Class
 
 Public Class NR_Moments_CentroidKalman : Inherits TaskParent
     Dim fore As New NR_Foreground_KMeans
+    Dim kalman As New Kalman_Basics
     Public Sub New()
-        task.kalman = New Kalman_Basics
-        ReDim task.kalman.kInput(2 - 1) ' 2 elements - cv.point
+        ReDim kalman.kInput(2 - 1) ' 2 elements - cv.point
         labels(2) = "Red dot = Kalman smoothed centroid"
         desc = "Compute the centroid of the foreground depth and smooth with Kalman filter."
     End Sub
@@ -51,10 +51,10 @@ Public Class NR_Moments_CentroidKalman : Inherits TaskParent
         dst2 = fore.dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         Dim m = cv.Cv2.Moments(fore.dst2, True)
         If m.M00 > 5000 Then ' if more than x pixels are present (avoiding a zero area!)
-            task.kalman.kInput(0) = m.M10 / m.M00
-            task.kalman.kInput(1) = m.M01 / m.M00
-            task.kalman.Run(emptyMat)
-            dst2.Circle(New cv.Point(task.kalman.kOutput(0), task.kalman.kOutput(1)), task.DotSize + 5, cv.Scalar.Red, -1, task.lineType)
+            kalman.kInput(0) = m.M10 / m.M00
+            kalman.kInput(1) = m.M01 / m.M00
+            kalman.Run(emptyMat)
+            dst2.Circle(New cv.Point(kalman.kOutput(0), kalman.kOutput(1)), task.DotSize + 5, cv.Scalar.Red, -1, task.lineType)
         End If
     End Sub
 End Class

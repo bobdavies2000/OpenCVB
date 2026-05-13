@@ -167,10 +167,10 @@ End Class
 ' http://opencvexamples.blogspot.com/2014/01/kalman-filter-implementation-tracking.html
 ' https://www.codeproject.com/Articles/865935/Object-Tracking-Kalman-Filter-with-Ease
 Public Class NR_Kalman_MousePredict : Inherits TaskParent
+    Dim kalman As New Kalman_Basics
     Public Sub New()
-        task.kalman = New Kalman_Basics
-        ReDim task.kalman.kInput(2 - 1)
-        ReDim task.kalman.kOutput(2 - 1)
+        ReDim kalman.kInput(2 - 1)
+        ReDim kalman.kOutput(2 - 1)
 
         labels(2) = "Red is real mouse, white is prediction"
         desc = "Use kalman filter to predict the next mouse location."
@@ -178,11 +178,11 @@ Public Class NR_Kalman_MousePredict : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         If task.frameCount Mod 300 = 0 Then dst2.SetTo(0)
 
-        Dim lastStateResult = New cv.Point(task.kalman.kOutput(0), task.kalman.kOutput(1))
+        Dim lastStateResult = New cv.Point(kalman.kOutput(0), kalman.kOutput(1))
         Static lastRealMouse As cv.Point = task.mouseMovePoint
-        task.kalman.kInput = {task.mouseMovePoint.X, task.mouseMovePoint.Y}
-        task.kalman.Run(emptyMat)
-        dst2.Line(New cv.Point(task.kalman.kOutput(0), task.kalman.kOutput(1)), lastStateResult, white, task.lineWidth, task.lineType)
+        kalman.kInput = {task.mouseMovePoint.X, task.mouseMovePoint.Y}
+        kalman.Run(emptyMat)
+        dst2.Line(New cv.Point(kalman.kOutput(0), kalman.kOutput(1)), lastStateResult, white, task.lineWidth, task.lineType)
         dst2.Line(task.mouseMovePoint, lastRealMouse, cv.Scalar.Red)
         lastRealMouse = task.mouseMovePoint
     End Sub

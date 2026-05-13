@@ -759,28 +759,27 @@ Namespace VBClasses
 
 
     Public Class XO_Depth_MinMaxToVoronoi : Inherits TaskParent
+        Dim kalman As New Kalman_Basics
         Public Sub New()
-            task.kalman = New Kalman_Basics
-            ReDim task.kalman.kInput(task.gridRects.Count * 4 - 1)
-
+            ReDim kalman.kInput(task.gridRects.Count * 4 - 1)
             labels = {"", "", "Red is min distance, blue is max distance", "Voronoi representation of min point (only) for each cell."}
             desc = "Find min and max depth in each grid square and create a voronoi representation using the min and max points."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If task.optionsChanged Then ReDim task.kalman.kInput(task.gridRects.Count * 4 - 1)
+            If task.optionsChanged Then ReDim kalman.kInput(task.gridRects.Count * 4 - 1)
 
             Parallel.For(0, task.gridRects.Count,
                 Sub(i)
                     Dim gRect = task.gridRects(i)
                     Dim mm As mmData = GetMinMax(task.pcSplit(2)(gRect), task.depthmask(gRect))
                     If mm.minLoc.X < 0 Or mm.minLoc.Y < 0 Then mm.minLoc = New cv.Point2f(0, 0)
-                    task.kalman.kInput(i * 4) = mm.minLoc.X
-                    task.kalman.kInput(i * 4 + 1) = mm.minLoc.Y
-                    task.kalman.kInput(i * 4 + 2) = mm.maxLoc.X
-                    task.kalman.kInput(i * 4 + 3) = mm.maxLoc.Y
+                    kalman.kInput(i * 4) = mm.minLoc.X
+                    kalman.kInput(i * 4 + 1) = mm.minLoc.Y
+                    kalman.kInput(i * 4 + 2) = mm.maxLoc.X
+                    kalman.kInput(i * 4 + 3) = mm.maxLoc.Y
                 End Sub)
 
-            task.kalman.Run(emptyMat)
+            kalman.Run(emptyMat)
 
             Static minList(task.gridRects.Count - 1) As cv.Point2f
             Static maxList(task.gridRects.Count - 1) As cv.Point2f
@@ -790,10 +789,10 @@ Namespace VBClasses
             End If
             For Each index In task.motion.motionSort
                 Dim rect = task.gridRects(index)
-                Dim ptmin = New cv.Point2f(task.kalman.kOutput(index * 4) + rect.X,
-                                           task.kalman.kOutput(index * 4 + 1) + rect.Y)
-                Dim ptmax = New cv.Point2f(task.kalman.kOutput(index * 4 + 2) + rect.X,
-                                           task.kalman.kOutput(index * 4 + 3) + rect.Y)
+                Dim ptmin = New cv.Point2f(kalman.kOutput(index * 4) + rect.X,
+                                           kalman.kOutput(index * 4 + 1) + rect.Y)
+                Dim ptmax = New cv.Point2f(kalman.kOutput(index * 4 + 2) + rect.X,
+                                           kalman.kOutput(index * 4 + 3) + rect.Y)
                 ptmin = lpData.validatePoint(ptmin)
                 ptmax = lpData.validatePoint(ptmax)
                 minList(index) = ptmin
@@ -1511,10 +1510,9 @@ Namespace VBClasses
         Public p2 As cv.Point
         Dim gradientColors(100) As cv.Scalar
         Dim frameCount As Integer
+        Dim kalman As New Kalman_Basics
         Public Sub New()
-            task.kalman = New Kalman_Basics
-            task.kalman.kOutput = {0, 0, 0, 0}
-
+            kalman.kOutput = {0, 0, 0, 0}
             Dim color1 = cv.Scalar.Yellow, color2 = cv.Scalar.Blue
             Dim f As Double = 1.0
             For i = 0 To gradientColors.Length - 1
@@ -1534,10 +1532,10 @@ Namespace VBClasses
                     k2 = New cv.Point(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height))
                     dst2.SetTo(0)
                 End If
-                task.kalman.kInput = {k1.X, k1.Y, k2.X, k2.Y}
-                task.kalman.Run(emptyMat)
-                p1 = New cv.Point(task.kalman.kOutput(0), task.kalman.kOutput(1))
-                p2 = New cv.Point(task.kalman.kOutput(2), task.kalman.kOutput(3))
+                kalman.kInput = {k1.X, k1.Y, k2.X, k2.Y}
+                kalman.Run(emptyMat)
+                p1 = New cv.Point(kalman.kOutput(0), kalman.kOutput(1))
+                p2 = New cv.Point(kalman.kOutput(2), kalman.kOutput(3))
             End If
             frameCount += 1
             dst2.Line(p1, p2, gradientColors(frameCount Mod gradientColors.Count), task.lineWidth, task.lineType)
@@ -3859,9 +3857,9 @@ Namespace VBClasses
 
     Public Class XO_Structured_FloorCeiling : Inherits TaskParent
         Public slice As New Structured_SliceEither
+        Dim kalman As New Kalman_Basics
         Public Sub New()
-            task.kalman = New Kalman_Basics
-            ReDim task.kalman.kInput(2 - 1)
+            ReDim kalman.kInput(2 - 1)
             OptionParent.FindCheckBox("Top View (Unchecked Side View)").Checked = False
             desc = "Find the floor or ceiling plane"
         End Sub
@@ -3895,12 +3893,12 @@ Namespace VBClasses
                 End If
             Next
 
-            task.kalman.kInput(0) = floorY
-            task.kalman.kInput(1) = ceilingY
-            task.kalman.Run(emptyMat)
+            kalman.kInput(0) = floorY
+            kalman.kInput(1) = ceilingY
+            kalman.Run(emptyMat)
 
             labels(2) = "Current slice is at row =" + CStr(task.mouseMovePoint.Y)
-            labels(3) = "Ceiling is at row =" + CStr(CInt(task.kalman.kOutput(1))) + " floor at y=" + CStr(CInt(task.kalman.kOutput(0)))
+            labels(3) = "Ceiling is at row =" + CStr(CInt(kalman.kOutput(1))) + " floor at y=" + CStr(CInt(kalman.kOutput(0)))
 
             dst2.Line(New cv.Point(0, floorY), New cv.Point(dst2.Width, floorY), cv.Scalar.Yellow, task.lineWidth, task.lineType)
             SetTrueText("floor", New cv.Point(10, floorY + task.DotSize), 3)
@@ -6021,8 +6019,8 @@ Namespace VBClasses
     Public Class XO_FPoly_PlotWeighted : Inherits TaskParent
         Public fPlot As New XO_FPoly_Plot
         Dim plotHist As New PlotBar_Basics
+        Dim kalman As New Kalman_Basics
         Public Sub New()
-            task.kalman = New Kalman_Basics
             plotHist.minRange = 0
             plotHist.removeZeroEntry = False
             labels = {"", "Distance change from previous frame", "", "anchor and companions - input to distance difference"}
@@ -6033,11 +6031,11 @@ Namespace VBClasses
             dst3 = fPlot.dst3
 
             Dim lastPlot As cv.Mat = plotHist.dst2.Clone
-            If task.optionsChanged Then ReDim task.kalman.kInput(fPlot.hist.Length - 1)
+            If task.optionsChanged Then ReDim kalman.kInput(fPlot.hist.Length - 1)
 
-            task.kalman.kInput = fPlot.hist
-            task.kalman.Run(emptyMat)
-            fPlot.hist = task.kalman.kOutput
+            kalman.kInput = fPlot.hist
+            kalman.Run(emptyMat)
+            fPlot.hist = kalman.kOutput
 
             Dim hlist = fPlot.hist.ToList
             Dim peak = hlist.Max
@@ -6365,8 +6363,8 @@ Namespace VBClasses
         Public fPD As fPolyData
         Public rotatePoints As New XO_FPoly_RotatePoints
         Dim near As New XO_Line_Nearest
+        Dim kalman As New Kalman_Basics
         Public Sub New()
-            task.kalman = New Kalman_Basics
             labels = {"", "", "Output of XO_FPoly_Basics", "Center of rotation is where the extended lines intersect"}
             desc = "Find the center of rotation using the perpendicular lines from polymp and FLine (feature line) in XO_FPoly_Basics"
         End Sub
@@ -6414,9 +6412,9 @@ Namespace VBClasses
             altCenterShift = New cv.Point2f(fPD.currPoly(fPD.polyPrevSideIndex).X - fPD.prevPoly(fPD.polyPrevSideIndex).X,
                                             fPD.currPoly(fPD.polyPrevSideIndex).Y - fPD.prevPoly(fPD.polyPrevSideIndex).Y)
 
-            task.kalman.kInput = {fPD.rotateAngle}
-            task.kalman.Run(emptyMat)
-            fPD.rotateAngle = task.kalman.kOutput(0)
+            kalman.kInput = {fPD.rotateAngle}
+            kalman.Run(emptyMat)
+            fPD.rotateAngle = kalman.kOutput(0)
 
             rotatePoints.poly = fPD.currPoly
             rotatePoints.polyPrev = fPD.prevPoly
@@ -11960,9 +11958,9 @@ Namespace VBClasses
         Dim kalmanRR As New Kalman_Basics
         Dim centerRect As cv.Rect
         Dim drawRotate As New Draw_RotatedRect
+        Dim kalman As New Kalman_Basics
         Public Sub New()
-            task.kalman = New Kalman_Basics
-            ReDim task.kalman.kInput(2 - 1)
+            ReDim kalman.kInput(2 - 1)
             labels(3) = "Template for motion matchTemplate.  Shake the camera to see Kalman impact."
             desc = "Kalmanize the output of center rotation"
         End Sub
@@ -11976,10 +11974,10 @@ Namespace VBClasses
                 newRect = centerRect
                 drawRotate.rr = New cv.RotatedRect(motion.matchCenter, task.centerRect.Size, 0)
             Else
-                task.kalman.kInput = {motion.translation.X, motion.translation.Y}
-                task.kalman.Run(emptyMat)
+                kalman.kInput = {motion.translation.X, motion.translation.Y}
+                kalman.Run(emptyMat)
 
-                newRect = New cv.Rect(centerRect.X + task.kalman.kOutput(0), centerRect.Y + task.kalman.kOutput(1),
+                newRect = New cv.Rect(centerRect.X + kalman.kOutput(0), centerRect.Y + kalman.kOutput(1),
                                       centerRect.Width, centerRect.Height)
 
                 kalmanRR.kInput = New Single() {motion.matchCenter.X, motion.matchCenter.Y, motion.angle}
@@ -16058,8 +16056,8 @@ Namespace VBClasses
 
     Public Class XO_RedList_CellsAtDepth : Inherits TaskParent
         Dim plot As New PlotBar_Basics
+        Dim kalman As New Kalman_Basics
         Public Sub New()
-            task.kalman = New Kalman_Basics
             plot.removeZeroEntry = False
             task.gOptions.HistBinBar.Value = 20
             labels(3) = "Use mouse to select depth to highlight.  Histogram shows count of cells at each depth."
@@ -16083,10 +16081,10 @@ Namespace VBClasses
                 hist(slot) += rc.pixels
             Next
 
-            task.kalman.kInput = hist
-            task.kalman.Run(emptyMat)
+            kalman.kInput = hist
+            kalman.Run(emptyMat)
 
-            Dim histMat = cv.Mat.FromPixelData(histBins, 1, cv.MatType.CV_32F, task.kalman.kOutput)
+            Dim histMat = cv.Mat.FromPixelData(histBins, 1, cv.MatType.CV_32F, kalman.kOutput)
             plot.Run(histMat)
             dst3 = plot.dst2
 
