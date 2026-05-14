@@ -905,7 +905,7 @@ End Class
 
 
 Public Class NR_Depth_StableMinMax : Inherits TaskParent
-    Public dMin As New StableDepth_Basics
+    Public dMin As New StableDepth_Basics_TA
     Public dMax As New StableDepth_Max
     Public options As New Options_MinMaxNone
     Public Sub New()

@@ -650,3 +650,128 @@ Public Class RedColor_FLessMinMaxRange : Inherits TaskParent
         SetTrueText(redC.strOut, 1)
     End Sub
 End Class
+
+
+
+
+
+
+''' <summary>
+''' Isolate a main subject from the scene (similar intent to iPhone "Copy Subject"): run RedColor segmentation,
+''' pick a salient cell at the image center that is not the dominant background, then composite that region onto a neutral backdrop.
+''' Click a cell (task.rcD) when available to override the auto-picked subject.
+''' </summary>
+Public Class RedColor_Isolate : Inherits TaskParent
+    Dim redC As New RedColor_Basics
+    Public Sub New()
+        redC.runSelectCell = True
+        desc = "Isolate subject via RedColor cells: auto-pick center cell (non-background size); use selected cell if set."
+    End Sub
+    Private Shared Function Clip(v As Integer, lo As Integer, hi As Integer) As Integer
+        If v < lo Then Return lo
+        If v > hi Then Return hi
+        Return v
+    End Function
+    Private Shared Function CellMaskFull(rcMap As cv.Mat, rc As rcData) As cv.Mat
+        Dim m As New cv.Mat(rcMap.Size, cv.MatType.CV_8U, 0)
+        Using roi = rcMap(rc.rect)
+            Using part = roi.InRange(rc.index, rc.index)
+                part.CopyTo(m(rc.rect))
+            End Using
+        End Using
+        Return m
+    End Function
+    Private Shared Sub MorphClean(mask As cv.Mat)
+        Dim k = cv.Cv2.GetStructuringElement(cv.MorphShapes.Rect, New cv.Size(3, 3))
+        cv.Cv2.MorphologyEx(mask, mask, cv.MorphTypes.Open, k)
+    End Sub
+    Private Function PickSubject(rcMap As cv.Mat, rcList As List(Of rcData)) As rcData
+        If rcList Is Nothing OrElse rcList.Count = 0 Then Return Nothing
+        Dim total = rcMap.Rows * rcMap.Cols
+        Dim minPx = CInt(total * 0.003)
+        Dim maxPx = CInt(total * 0.62)
+
+        If task.rcD IsNot Nothing AndAlso task.rcD.pixels > 0 Then
+            For Each rc In rcList
+                If rc.index = task.rcD.index Then Return rc
+            Next
+        End If
+
+        Dim cx = task.workRes.Width \ 2
+        Dim cy = task.workRes.Height \ 2
+        Dim idxCenter = rcMap.Get(Of Integer)(cy, cx) - 1
+        If idxCenter >= 0 AndAlso idxCenter < rcList.Count Then
+            Dim rc0 = rcList(idxCenter)
+            If rc0.pixels >= minPx AndAlso rc0.pixels <= maxPx Then Return rc0
+        End If
+
+        Dim bestVotes As Integer = -1
+        Dim bestRc As rcData = Nothing
+        Dim freq As New Dictionary(Of Integer, Integer)
+        For dy = -4 To 4
+            For dx = -4 To 4
+                Dim y = Clip(cy + dy, 0, rcMap.Rows - 1)
+                Dim x = Clip(cx + dx, 0, rcMap.Cols - 1)
+                Dim ix = rcMap.Get(Of Integer)(y, x)
+                If ix <= 0 OrElse ix > rcList.Count Then Continue For
+                Dim rc = rcList(ix - 1)
+                If rc.pixels < minPx OrElse rc.pixels > maxPx Then Continue For
+                If Not freq.ContainsKey(ix) Then freq(ix) = 0
+                freq(ix) += 1
+            Next
+        Next
+        For Each kv In freq
+            If kv.Value > bestVotes Then
+                bestVotes = kv.Value
+                bestRc = rcList(kv.Key - 1)
+            End If
+        Next
+        If bestRc IsNot Nothing Then Return bestRc
+
+        Dim bestScore As Integer = -1
+        For Each rc In rcList
+            If rc.pixels < minPx OrElse rc.pixels > maxPx Then Continue For
+            If rc.rect.Contains(New cv.Point(cx, cy)) = False Then Continue For
+            If rc.pixels > bestScore Then
+                bestScore = rc.pixels
+                bestRc = rc
+            End If
+        Next
+        Return bestRc
+    End Function
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        Dim bgr = If(src IsNot Nothing AndAlso src.Channels() = 3, src, task.color)
+        redC.Run(bgr)
+
+        If redC.rcList Is Nothing OrElse redC.rcList.Count = 0 Then
+            dst2 = bgr.Clone
+            labels(2) = "RedColor produced no cells."
+            dst3.SetTo(0)
+            Exit Sub
+        End If
+
+        Dim subject = PickSubject(redC.rcMap, redC.rcList)
+        If subject Is Nothing Then
+            dst2 = bgr.Clone
+            labels(2) = "Could not auto-pick a subject; try clicking a RedColor cell or adjust scene."
+            dst3.SetTo(0)
+            Exit Sub
+        End If
+
+        Dim mask = CellMaskFull(redC.rcMap, subject)
+        MorphClean(mask)
+
+        dst2 = New cv.Mat(bgr.Size(), cv.MatType.CV_8UC3, New cv.Scalar(245, 245, 245))
+        bgr.CopyTo(dst2, mask)
+
+        dst3 = New cv.Mat(mask.Size(), cv.MatType.CV_8UC3, New cv.Scalar(0, 0, 0))
+        dst3.SetTo(New cv.Scalar(255, 255, 255), mask)
+
+        labels(2) = "Subject index=" + CStr(subject.index) + ", pixels=" + CStr(subject.pixels) +
+                    " (RedColor cell cutout; not ML portrait matting)."
+        labels(3) = "White = kept region. Select another cell with RedColor UI to retarget."
+        strOut = "Uses RedCloud color flood cells (RedColor_Basics). Auto-pick avoids cells covering most of the frame." + vbCrLf +
+                 "For iPhone-like quality you would need a learned segmenter; this is a fast geometric proxy."
+        SetTrueText(strOut, 3)
+    End Sub
+End Class

@@ -227,9 +227,9 @@ Public Class NR_Hist3D_PixelClassify : Inherits TaskParent
         If task.rcD Is Nothing Then
             SetTrueText("Select any cell", 3)
             Exit Sub
+        ElseIf task.rcD.rect.Width > 0 Then
+            dst2(task.rcD.rect).SetTo(white, task.rcD.mask)
         End If
-
-        dst2(task.rcD.rect).SetTo(white, task.rcD.mask)
     End Sub
 End Class
 

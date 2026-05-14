@@ -544,6 +544,7 @@ ML_Basics
 ML_FeatureLess
 ML_FeatureLess_Grid
 ML_RemoveDups_CPP
+MLMatting_Basics
 Moments_Basics
 Motion_Basics_TA
 Motion_CloudGrid
@@ -1621,6 +1622,7 @@ RedColor_FLessCorrelation
 RedColor_FLessMinMaxRange
 RedColor_GridRects
 RedColor_Hulls
+RedColor_Isolate
 RedColor_LeftRight
 RedFlood_Basics
 RedFlood_Color
@@ -1688,7 +1690,7 @@ Stabilizer_Basics
 Stabilizer_IMU
 Stabilizer_OrientationPRY
 Stabilizer_PRY
-StableDepth_Basics
+StableDepth_Basics_TA
 StableDepth_Max
 StableGray_Basics_TA
 StableGray_BasicsMax

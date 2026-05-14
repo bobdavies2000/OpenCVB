@@ -1,5 +1,5 @@
 ﻿Imports cv = OpenCvSharp
-Public Class StableDepth_Basics : Inherits TaskParent
+Public Class StableDepth_Basics_TA : Inherits TaskParent
     Dim colorize As New DepthColorizer_CPP
     Public pointcloud As cv.Mat
     Public pcSplit(2) As cv.Mat
@@ -78,7 +78,7 @@ Public Class StableDepth_Max : Inherits TaskParent
         cv.Cv2.Max(pcsplit(2), lastDepth, accumDepth)
 
         If myHeartbeat = False Then
-            dst3 = StableDepth_Basics.updateXY(pcsplit(2), accumDepth)
+            dst3 = StableDepth_Basics_TA.updateXY(pcsplit(2), accumDepth)
             task.pointCloud.CopyTo(pointcloud, dst3)
         End If
 

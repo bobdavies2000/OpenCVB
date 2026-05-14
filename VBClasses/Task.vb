@@ -44,7 +44,7 @@ Public Class AlgorithmTask : Implements IDisposable
         motion.standalone = False
         motionStable = New StableGray_Measure_TA
 
-        stabilizeDepth = New StableDepth_Basics
+        stabilizeDepth = New StableDepth_Basics_TA
         stabilizeGray = New StableGray_Basics_TA
 
         prepCloud = New Cloud_Gravity_TA

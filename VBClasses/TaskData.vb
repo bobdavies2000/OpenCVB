@@ -89,7 +89,7 @@ Partial Public Class AlgorithmTask
     Public lineTrack As LineTrack_Basics_TA
     Public motion As Motion_Basics_TA
     Public motionStable As StableGray_Measure_TA
-    Public stabilizeDepth As StableDepth_Basics
+    Public stabilizeDepth As StableDepth_Basics_TA
     Public stabilizeGray As StableGray_Basics_TA
     Public prepCloud As Cloud_Gravity_TA
     Public depthTiers As Depth_Tiers_TA
