@@ -34,7 +34,7 @@ End Class
 Public Class NR_BlurMotion_Deblur : Inherits TaskParent
     Dim mblur As New BlurMotion_Basics_TA
     Private Function calcPSF(filterSize As cv.Size, len As Integer, theta As Double) As cv.Mat
-        Dim h As New cv.Mat(filterSize, cv.MatType.CV_32F, cv.Scalar.All(0))
+        Dim h As New cv.Mat(filterSize, cv.MatType.CV_32F, 0)
         Dim pt = New cv.Point(filterSize.Width / 2, filterSize.Height / 2)
         h.Ellipse(pt, New cv.Size(0, CInt(len / 2)), 90 - theta, 0, 360, New cv.Scalar(255), -1)
         Dim summa = h.Sum()

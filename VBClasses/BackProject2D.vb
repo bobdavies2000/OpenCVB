@@ -337,7 +337,7 @@ Public Class NR_BackProject2D_RowCol : Inherits TaskParent
             rect = New cv.Rect(r.X, 0, r.Width, dst2.Height)
         End If
         dst2.Rectangle(rect, task.highlight, task.lineWidth)
-        Dim histData As New cv.Mat(backp.hist2d.histogram.Size, cv.MatType.CV_32F, cv.Scalar.All(0))
+        Dim histData As New cv.Mat(backp.hist2d.histogram.Size, cv.MatType.CV_32F, 0)
         backp.hist2d.histogram(rect).CopyTo(histData(rect))
 
         Dim ranges() = backp.hist2d.ranges

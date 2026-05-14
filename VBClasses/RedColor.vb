@@ -1,5 +1,4 @@
 Imports System.Runtime.InteropServices
-Imports VBClasses
 Imports cv = OpenCvSharp
 Public Class RedColor_Basics : Inherits TaskParent
     Implements IDisposable
@@ -41,7 +40,7 @@ Public Class NR_RedColor_CPP : Inherits TaskParent
     Implements IDisposable
     Public classCount As Integer
     Public rcList As New List(Of rcData)
-    Public rcMap As cv.Mat = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+    Public rcMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
     Public Sub New()
         cPtr = RedCloudLined_Open()
         desc = "Run the C++ RedCloud interface without a mask"

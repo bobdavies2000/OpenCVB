@@ -177,7 +177,11 @@ End Class
 ''' Yaw: signed angle of the longest line vs in-image "horizontal" (perpendicular to projected gravity); useful when the tracked line is horizontal in the world.
 ''' </summary>
 Public Class Stabilizer_PRY : Inherits TaskParent
-    Private Const RadToDeg As Double = 180.0 / Math.PI
+    Public Sub New()
+        desc = "Cursor.ai: Pitch, roll, yaw from task.longestLine and task.lpGravity (image-plane geometry; yaw assumes scene line is horizontal in world)."
+        labels(2) = "PRY (deg) from longest line + gravity"
+        labels(3) = "Red = longestLine, yellow = lpGravity"
+    End Sub
     Private Shared Function Unit2D(p1 As cv.Point2f, p2 As cv.Point2f) As cv.Point2f
         Dim dx = p2.X - p1.X
         Dim dy = p2.Y - p1.Y
@@ -194,12 +198,6 @@ Public Class Stabilizer_PRY : Inherits TaskParent
         End While
         Return d
     End Function
-    Public Sub New()
-        desc = "Cursor.ai: Pitch, roll, yaw from task.longestLine and task.lpGravity (image-plane geometry; yaw assumes scene line is horizontal in world)."
-        labels(2) = "PRY (deg) from longest line + gravity"
-        labels(3) = "Red = longestLine, yellow = lpGravity"
-    End Sub
-
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst2 = src.Clone
 
