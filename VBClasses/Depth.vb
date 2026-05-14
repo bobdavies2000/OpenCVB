@@ -1506,6 +1506,7 @@ Public Class Depth_Tiers_TA : Inherits TaskParent
     Dim histogram As cv.Mat
     Public classCount As Integer = 10 ' can be set externally as well.
     Dim ranges() As cv.Rangef = {New cv.Rangef(0.1, task.MaxZmeters)}
+    Public everyFrame As Boolean = False
     Public Sub New()
         desc = "Trim the depth to increase the size of each bin."
     End Sub
@@ -1520,7 +1521,7 @@ Public Class Depth_Tiers_TA : Inherits TaskParent
         End If
         If src.Type <> cv.MatType.CV_32F Then src = task.pcSplit(2)
 
-        If task.heartBeat Then
+        If task.heartBeat Or everyFrame Then
             cv.Cv2.CalcBackProject({src}, {0}, histogram, dst1, ranges)
             dst1.ConvertTo(dst2, cv.MatType.CV_8U)
             dst3 = Palettize(dst2)

@@ -1,8 +1,44 @@
 Imports System.Runtime.InteropServices
 Imports cv = OpenCvSharp
 Public Class RedColor_Basics : Inherits TaskParent
-    Implements IDisposable
-    Public classCount As Integer
+    Public rcList As New List(Of rcData)
+    Public rcMap As cv.Mat = New cv.Mat(dst2.Size, cv.MatType.CV_32S, 0)
+    Public options As New Options_RedCloud
+    Public redFlood As New RedCloud_Flood_CPP
+    Public runSelectCell As Boolean = True
+    Dim edges As New Edge_Canny
+    Public Sub New()
+        task.depthTiers.everyFrame = True
+        desc = "Run the C++ RedCloud interface without a mask"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        options.Run()
+
+        edges.Run(task.gray)
+
+        Dim input As cv.Mat = Mat_Basics.srcMustBe8U(src) + task.depthTiers.dst2 + 1
+        input.SetTo(0, edges.dst2)
+        redFlood.Run(input)
+        dst2 = redFlood.dst2
+        labels(2) = redFlood.labels(2)
+
+        rcMap = redFlood.rcMap.Clone
+        rcList = New List(Of rcData)(redFlood.rcList)
+
+        If runSelectCell Then
+            strOut = RedUtil_Basics.selectCell(rcMap, rcList)
+            SetTrueText(strOut, 3)
+        End If
+
+        If task.rcD Is Nothing Then SetTrueText("Select any cell", 3)
+    End Sub
+End Class
+
+
+
+
+
+Public Class NR_RedColor_Basics : Inherits TaskParent
     Public rcList As New List(Of rcData)
     Public rcMap As cv.Mat = New cv.Mat(dst2.Size, cv.MatType.CV_32S, 0)
     Public options As New Options_RedCloud

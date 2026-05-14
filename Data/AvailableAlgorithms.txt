@@ -1363,6 +1363,7 @@ NR_RedCC_Merge
 NR_RedCloud_Basics
 NR_RedCloud_CellDepthHistogram
 NR_RedCloud_ColorChangeCause
+NR_RedColor_Basics
 NR_RedColor_CPP
 NR_RedColor_FeaturesKNN
 NR_RedColor_GoodCellInput
