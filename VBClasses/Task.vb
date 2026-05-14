@@ -192,13 +192,6 @@ Public Class AlgorithmTask : Implements IDisposable
         foreground.Run(emptyMat)
 
         Dim saveOptionsChanged = optionsChanged
-        If activateTaskForms Then
-            If sharpGL IsNot Nothing Then sharpGL.Activate()
-            treeView.Activate()
-            allOptions.Activate()
-            If PixelViewer IsNot Nothing Then PixelViewer.viewerForm.Activate()
-            activateTaskForms = False
-        End If
 
 
 

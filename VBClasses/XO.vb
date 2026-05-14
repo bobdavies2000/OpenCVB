@@ -18343,7 +18343,7 @@ Namespace VBClasses
 
 
     Public Class XO_RedWC_Basics : Inherits TaskParent
-        Public redC As New RedCloud_Flood_CPP
+        Public redC As New RedColor_Basics
         Dim wcDataX As New XO_RedWC_Core
         Dim wcDataY As New XO_RedWC_Core
         Public rcList As New List(Of rcData)
@@ -18405,7 +18405,7 @@ Namespace VBClasses
 
 
     Public Class XO_RedWC_BasicsOld : Inherits TaskParent
-        Public redC As New RedCloud_Flood_CPP
+        Public redC As New RedColor_Basics
         Public indexer As New Indexer_Basics
         Dim wcDataX As New XO_RedWC_Core
         Dim wcDataY As New XO_RedWC_Core
@@ -18638,7 +18638,7 @@ Namespace VBClasses
 
     Public Class XO_RedCloud_Basics1 : Inherits TaskParent
         Public indexer As New Indexer_Basics
-        Public redC As New RedCloud_Flood_CPP
+        Public redC As New RedColor_Basics
         Dim element As New cv.Mat
         Public rcList As New List(Of rcData)
         Public rcMap As cv.Mat

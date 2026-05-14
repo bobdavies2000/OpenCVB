@@ -42,7 +42,7 @@ Public Class NR_RedColor_Basics : Inherits TaskParent
     Public rcList As New List(Of rcData)
     Public rcMap As cv.Mat = New cv.Mat(dst2.Size, cv.MatType.CV_32S, 0)
     Public options As New Options_RedCloud
-    Public redFlood As New RedCloud_Flood_CPP
+    Public redFlood As New RedColor_Basics
     Public runSelectCell As Boolean = True
     Public Sub New()
         desc = "Run the C++ RedCloud interface without a mask"

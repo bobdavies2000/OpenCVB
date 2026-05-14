@@ -80,9 +80,11 @@ Namespace MainApp
         End Sub
         Private Sub clickPic(sender As Object, e As EventArgs)
             If vbc.task Is Nothing Then Exit Sub
-            'If vbc.task IsNot Nothing Then  if vbc.task.sharpgl IsNot Nothing Then sharpGL.Activate()
-            If vbc.task IsNot Nothing Then If vbc.task.treeView IsNot Nothing Then vbc.task.treeView.Activate()
-            If vbc.task IsNot Nothing Then If vbc.task.allOptions IsNot Nothing Then vbc.task.allOptions.Activate()
+            If vbc.task IsNot Nothing Then
+                If vbc.task.sharpGL IsNot Nothing Then vbc.task.sharpGL.Activate()
+                If vbc.task.treeView IsNot Nothing Then vbc.task.treeView.Activate()
+                If vbc.task.allOptions IsNot Nothing Then vbc.task.allOptions.Activate()
+            End If
             vbc.task.clickPoint = vbc.task.mouseMovePoint
             vbc.task.mouseClickFlag = True
         End Sub

@@ -127,7 +127,7 @@ End Class
 
 Public Class RedCloud_BasicsFlood : Inherits TaskParent
     Dim prepXY As New RedPrep_XY_Add
-    Public redC As New RedCloud_Flood_CPP
+    Public redC As New RedColor_Basics
     Public rcList As New List(Of rcData)
     Public rcMap As cv.Mat
     Public Sub New()
@@ -167,7 +167,7 @@ End Class
 
 
 Public Class NR_RedCloud_Basics : Inherits TaskParent
-    Public redC As New RedCloud_Flood_CPP
+    Public redC As New RedColor_Basics
     Public rcList As New List(Of rcData)
     Public rcMap As cv.Mat
     Public Sub New()
