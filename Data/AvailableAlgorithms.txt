@@ -546,7 +546,7 @@ ML_Basics
 ML_FeatureLess
 ML_FeatureLess_Grid
 ML_RemoveDups_CPP
-MLMatting_Basics
+ModNet_Basics
 Moments_Basics
 Motion_Basics_TA
 Motion_CloudGrid

@@ -10,7 +10,7 @@ Imports Microsoft.ML.OnnxRuntime.Tensors
 ''' "Inconsistent shape for ConcatLayer" in OpenCV.
 ''' Place modnet.onnx under ModNet/ (see candidate list in ResolveAndLoadModel).
 ''' </summary>
-Public Class MLMatting_Basics : Inherits TaskParent
+Public Class ModNet_Basics : Inherits TaskParent
     Dim ortSession As InferenceSession = Nothing
     Dim ortInputName As String = "input"
     Dim ortOutputName As String = ""
@@ -73,7 +73,7 @@ Public Class MLMatting_Basics : Inherits TaskParent
             Using results = ortSession.Run(inputs)
                 Dim picked As NamedOnnxValue = Nothing
                 For Each v In results
-                    If ortOutputName <> "" AndAlso v.Name = ortOutputName Then
+                    If v.Name = ortOutputName Then
                         picked = v
                         Exit For
                     End If

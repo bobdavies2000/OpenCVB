@@ -1,5 +1,4 @@
 Imports cv = OpenCvSharp
-Imports VBClasses
 Public Class FeatureLess_Basics : Inherits TaskParent
     Public fLessList As New List(Of cv.Rect)
     Public options As New Options_FeatureLess
@@ -11,40 +10,38 @@ Public Class FeatureLess_Basics : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
 
-        If src.Channels <> 1 Then src = task.grayOriginal
-
         dst3 = src
+        dst2.SetTo(0)
         ' at higher resolutions, the correlation works but the fLessThreshold does not...
         If task.workRes.Width >= 1280 Then
+            If src.Channels <> 1 Then src = task.grayOriginal ' only the raw image can be used with correlation.
             Static corr As New Correlation_Basics
             corr.Run(src)
             fLessList = New List(Of cv.Rect)(corr.fLessList)
         Else
+            If src.Channels <> 1 Then src = task.gray ' the motion-filtered image can be used a lower resolutions.
             fLessList.Clear()
             For Each r In task.gridRects
                 Dim mm = GetMinMax(src(r))
-                If mm.range < options.fLessThreshold Then fLessList.Add(r)
+                If mm.range < options.fLessThreshold Then
+                    dst2(r).SetTo(255)
+                    dst3.Rectangle(r, white, task.lineWidth)
+                    fLessList.Add(r)
+                End If
             Next
         End If
 
-        dst2.SetTo(0)
-        For Each r In fLessList
-            dst2(r).SetTo(255)
-            dst3.Rectangle(r, 255, task.lineWidth)
-        Next
+        'Dim index As Integer = 1
+        'For Each r In task.gridRects
+        '    Dim val = dst2.Get(Of Byte)(r.TopLeft.Y, r.TopLeft.X)
+        '    If val = 255 Then
+        '        Dim floodCount = dst2.FloodFill(r.TopLeft, index)
+        '        index += 1
+        '        If index >= 255 Then Exit For
+        '    End If
+        'Next
 
-        Dim index As Integer = 1
-        For Each r In task.gridRects
-            Dim val = dst2.Get(Of Byte)(r.TopLeft.Y, r.TopLeft.X)
-            If val = 255 Then
-                Dim floodCount = dst2.FloodFill(r.TopLeft, index)
-                index += 1
-                If index >= 255 Then Exit For
-            End If
-        Next
-
-        labels(2) = CStr(index) + " featureless clusters were found."
-        labels(3) = CStr(fLessList.Count) + " grid squares were found to be featureless (<gridRect>.mm.range < " +
+        labels(2) = CStr(fLessList.Count) + " grid squares were found to be featureless (<gridRect>.mm.range < " +
                 CStr(options.fLessThreshold) + ")"
     End Sub
 End Class
@@ -417,17 +414,17 @@ End Class
 
 
 Public Class FeatureLess_LeftRight : Inherits TaskParent
-    Dim fLessRaw As New FeatureLess_Basics
+    Dim fLess As New FeatureLess_Basics
     Public Sub New()
         labels = {"", "", "FeatureLess Left mask", "FeatureLess Right mask"}
         desc = "Find the featureless regions of the left and right images"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        fLessRaw.Run(task.leftView)
-        dst2 = fLessRaw.dst2.Clone
+        fLess.Run(task.leftView)
+        dst2 = fLess.dst2.Clone
 
-        fLessRaw.Run(task.rightView)
-        dst3 = fLessRaw.dst2.Clone
+        fLess.Run(task.rightView)
+        dst3 = fLess.dst2.Clone
     End Sub
 End Class
 
@@ -704,15 +701,17 @@ End Class
 
 Public Class FeatureLess_Clusters : Inherits TaskParent
     Dim fLess As New FeatureLess_Basics
+    Dim floodPoints As New List(Of cv.Point)
     Public Sub New()
         desc = "Identify the clusters in the FeatureLess_Basics output"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         fLess.Run(task.gray)
         dst2 = fLess.dst2.Clone
-        labels(3) = fLess.labels(2)
+        labels = fLess.labels
 
         Dim index As Integer = 1
+        Dim sortList As New SortedList(Of Integer, cv.Point)(New compareAllowIdenticalIntegerInverted)
         For Each r In task.gridRects
             Dim val = dst2.Get(Of Byte)(r.TopLeft.Y, r.TopLeft.X)
             If val = 255 Then

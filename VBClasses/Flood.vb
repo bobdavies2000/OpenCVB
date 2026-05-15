@@ -1,6 +1,5 @@
 Imports System.Runtime.InteropServices
 Imports cv = OpenCvSharp
-Imports VBClasses
 Public Class Flood_Basics : Inherits TaskParent
     Implements IDisposable
     Public rcList As New List(Of rcData)

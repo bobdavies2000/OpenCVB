@@ -1,5 +1,4 @@
 Imports System.Runtime.InteropServices
-Imports VBClasses
 Imports cv = OpenCvSharp
 Public Class RedFlood_Basics : Inherits TaskParent
     Public rcList As New List(Of rcData)

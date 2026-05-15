@@ -245,17 +245,17 @@ End Class
 
 
 Public Class LeftRight_FeatureLess : Inherits TaskParent
-    Public fLessRaw As New FeatureLess_Basics
+    Public fLess As New FeatureLess_Basics
     Public Sub New()
         labels = {"", "", "Reduced Left Image", "Reduced Right Image"}
         desc = "Reduce both the left and right color images"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        fLessRaw.Run(task.leftView)
-        dst2 = fLessRaw.dst2.Clone
+        fLess.Run(task.leftView)
+        dst2 = fLess.dst2.Clone
 
-        fLessRaw.Run(task.rightView)
-        dst3 = fLessRaw.dst2.Clone
+        fLess.Run(task.rightView)
+        dst3 = fLess.dst2.Clone
     End Sub
 End Class
 

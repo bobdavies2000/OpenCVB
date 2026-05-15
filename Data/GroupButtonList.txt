@@ -136,7 +136,7 @@ MeanShift
 MeanSubtraction
 Mesh
 ML
-MLMatting
+ModNet
 Moments
 Motion
 Mouse
