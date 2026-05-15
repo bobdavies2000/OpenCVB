@@ -1,4 +1,5 @@
 Imports System.Runtime.InteropServices
+Imports VBClasses
 Imports cv = OpenCvSharp
 Public Class KNN_Basics : Inherits TaskParent
     Public knn2 As New KNN_N2Basics
@@ -1013,3 +1014,48 @@ Public Class KNN_FindLine : Inherits TaskParent
         closestLine = task.lines.lpList(knn.result(0, 0))
     End Sub
 End Class
+
+
+
+
+
+Public Class KNN_Grid : Inherits TaskParent
+    Dim knn As New KNN_N3Basics
+    Dim fLess As New FeatureLess_Basics
+    Public Sub New()
+        desc = "Use FeatureLess_Basics grid elements to define the clusters for all remaining pixels."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        fLess.Run(task.gray)
+        dst2 = fLess.dst2
+        labels(2) = fLess.labels(2)
+
+        Dim clusters As New List(Of Byte)
+        knn.trainInput.Clear()
+        knn.queries.Clear()
+        For Each r In task.gridRects
+            Dim val = fLess.dst2.Get(Of Byte)(r.TopLeft.Y, r.TopLeft.X)
+            If val > 0 Then
+                knn.trainInput.Add(New cv.Vec3f(r.TopLeft.X, r.TopLeft.Y, task.gray(r).Mean()(0)))
+                clusters.Add(val)
+            Else
+                For y = 0 To r.Height - 1
+                    For x = 0 To r.Width - 1
+                        knn.queries.Add(New cv.Vec3f(r.TopLeft.X + x, r.TopLeft.Y + y, task.gray(r).Mean()(0)))
+                    Next
+                Next
+            End If
+        Next
+
+        knn.Run(emptyMat)
+
+        For i = 0 To knn.queries.Count - 1
+            Dim index = knn.result(i, 0)
+            Dim vecTrain = knn.trainInput(index)
+            Dim entry = fLess.dst2.Get(Of Byte)(vecTrain.y, vecTrain.z)
+            Dim vecTest = knn.queries(i)
+            dst2.Set(Of Byte)(vecTest.y, vecTest.x, entry)
+        Next
+    End Sub
+End Class
+

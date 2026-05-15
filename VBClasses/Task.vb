@@ -178,7 +178,10 @@ Public Class AlgorithmTask : Implements IDisposable
         End If
 
         prepCloud.Run(emptyMat) '******* this may rotate for gravity if gravity is selected *******
-        If gOptions.stabilizeDepthRGB.Checked Then stabilizeDepth.Run(emptyMat)
+        If gOptions.stabilizeDepthRGB.Checked Then
+            stabilizeDepth.Run(emptyMat)
+            task.depthRGB = stabilizeDepth.dst2
+        End If
 
         colorizer.Run(src)
         depthTiers.Run(task.pcSplit(2))
@@ -190,8 +193,6 @@ Public Class AlgorithmTask : Implements IDisposable
         lineTrack.Run(gray)
 
         foreground.Run(emptyMat)
-
-        Dim saveOptionsChanged = optionsChanged
 
 
 

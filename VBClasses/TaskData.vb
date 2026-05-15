@@ -77,7 +77,6 @@ Partial Public Class AlgorithmTask
     Public colorMapBricks As cv.Mat
 
     ' task algorithms - operate on every frame regardless of which algorithm is being run.
-    Public colorizer As DepthColorizer_Basics_TA
     Public filterBasics As Filter_Basics_TA
     Public foreground As Foreground_Basics_TA
     Public gravityBasics As Gravity_Basics_TA
@@ -89,6 +88,7 @@ Partial Public Class AlgorithmTask
     Public lineTrack As LineTrack_Basics_TA
     Public motion As Motion_Basics_TA
     Public motionStable As StableGray_Measure_TA
+    Public colorizer As DepthColorizer_Basics_TA
     Public stabilizeDepth As StableDepth_Basics_TA
     Public stabilizeGray As StableGray_Basics_TA
     Public prepCloud As Cloud_Gravity_TA
@@ -208,7 +208,6 @@ Partial Public Class AlgorithmTask
     Public rangesCloud() As cv.Rangef
 
     Public mouseClickFlag As Boolean
-    Public activateTaskForms As Boolean
     Public mousePicTag As Integer ' which image was the mouse in?
     Public mouseDisplayPoint As cv.Point ' Mouse location in terms of the display resolution
     Public mouseMagnifyStartPoint As cv.Point ' Mouse location in terms of the display resolution

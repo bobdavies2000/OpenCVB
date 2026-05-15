@@ -58,13 +58,14 @@ Public Class DepthColorizer_Basics_TA : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If task.gOptions.displayDst1.Checked = False Or standaloneTest() Then
-            Dim depthData(task.pcSplit(2).Total - 1) As Single
-            task.pcSplit(2).GetArray(Of Single)(depthData)
-            Dim handleSrc = GCHandle.Alloc(depthData, GCHandleType.Pinned)
-            Dim imagePtr = Depth_Colorizer_Run(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, task.MaxZmeters)
-            handleSrc.Free()
-
-            If imagePtr <> 0 Then task.depthRGB = cv.Mat.FromPixelData(src.Rows, src.Cols, cv.MatType.CV_8UC3, imagePtr)
+            If task.gOptions.stabilizeDepthRGB.Checked = False Then
+                Dim depthData(task.pcSplit(2).Total - 1) As Single
+                task.pcSplit(2).GetArray(Of Single)(depthData)
+                Dim handleSrc = GCHandle.Alloc(depthData, GCHandleType.Pinned)
+                Dim imagePtr = Depth_Colorizer_Run(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, task.MaxZmeters)
+                handleSrc.Free()
+                If imagePtr <> 0 Then task.depthRGB = cv.Mat.FromPixelData(src.Rows, src.Cols, cv.MatType.CV_8UC3, imagePtr)
+            End If
 
             Dim depth = task.pcSplit(2).Get(Of Single)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
             Dim gridIndex = task.gridMap.Get(Of Integer)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
@@ -73,8 +74,8 @@ Public Class DepthColorizer_Basics_TA : Inherits TaskParent
             Dim brickDepth = depthGrid.Mean(task.depthmask(r))(0)
             Dim mm = GetMinMax(depthGrid, task.depthmask(r))
             task.depthAndDepthRange = "Pixel/Brick Depth " + Format(depth, fmt3) + "/" + Format(brickDepth, fmt3) +
-                                                  "m grid = " + CStr(gridIndex) + " " + vbCrLf + "Depth range = " +
-                                                  Format(mm.maxVal - mm.minVal, fmt3) + "m"
+                                      "m grid = " + CStr(gridIndex) + " " + vbCrLf + "Depth range = " +
+                                      Format(mm.maxVal - mm.minVal, fmt3) + "m"
         Else
             task.depthAndDepthRange = ""
         End If

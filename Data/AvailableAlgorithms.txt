@@ -251,6 +251,7 @@ FeatureFlow_LucasKanade
 FeatureLess_Basics
 FeatureLess_BasicsMotion
 FeatureLess_Cells
+FeatureLess_Clusters
 FeatureLess_Correlation
 FeatureLess_FeatureLines
 FeatureLess_Features
@@ -431,6 +432,7 @@ KMeans_MultiChannel
 KMeans_TierCount
 KNN_Basics
 KNN_FindLine
+KNN_Grid
 KNN_MinDistance
 KNN_N2Basics
 KNN_N3Basics
