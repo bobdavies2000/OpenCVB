@@ -701,24 +701,40 @@ End Class
 
 Public Class FeatureLess_Clusters : Inherits TaskParent
     Dim fLess As New FeatureLess_Basics
-    Dim floodPoints As New List(Of cv.Point)
+    Public clusterList As New List(Of List(Of Integer))
     Public Sub New()
+        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
         desc = "Identify the clusters in the FeatureLess_Basics output"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         fLess.Run(task.gray)
         dst2 = fLess.dst2.Clone
-        labels = fLess.labels
+        labels(2) = fLess.labels(2)
 
-        Dim index As Integer = 1
+        Dim clusterRects(task.gridRects.Count - 1) As Byte
         Dim sortList As New SortedList(Of Integer, cv.Point)(New compareAllowIdenticalIntegerInverted)
-        For Each r In task.gridRects
+        For i = 0 To task.gridRects.Count - 1
+            Dim r = task.gridRects(i)
             Dim val = dst2.Get(Of Byte)(r.TopLeft.Y, r.TopLeft.X)
             If val = 255 Then
-                dst2.FloodFill(r.TopLeft, index)
-                index += 1
-                If index >= 255 Then Exit For
+                val = dst1.Get(Of Byte)(r.TopLeft.Y, r.TopLeft.X)
+                If val = 0 Then val = sortList.Count + 1
+                sortList.Add(dst2.FloodFill(r.TopLeft, val), r.TopLeft)
+                If sortList.Count >= 255 Then Exit For
             End If
+            clusterRects(i) = val
+        Next
+
+        clusterList.Clear()
+        For i = 0 To sortList.Count - 1
+            clusterList.Add(New List(Of Integer))
+        Next
+
+        For i = 0 To task.gridRects.Count - 1
+            Dim index = clusterRects(i)
+            If index >= clusterList.Count Then index = 0 ' that val was for a cluster that is now gone.
+            dst2(task.gridRects(i)).SetTo(index)
+            clusterList(index).Add(i)
         Next
 
         dst3 = Palettize(dst2, 0)
@@ -727,8 +743,13 @@ Public Class FeatureLess_Clusters : Inherits TaskParent
         clusterID = dst2.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X)
 
         If clusterID > 0 Then
-            dst1 = dst2.InRange(clusterID, clusterID)
-            task.color.SetTo(white, dst1)
+            dst0 = dst2.Clone
+            dst0.FloodFill(task.clickPoint, 255)
+            dst0 = dst0.Threshold(254, 255, cv.ThresholdTypes.Binary)
+            task.color.SetTo(white, dst0)
         End If
+
+        dst1 = dst2.Clone
+        labels(3) = CStr(sortList.Count) + " clusters were found "
     End Sub
 End Class

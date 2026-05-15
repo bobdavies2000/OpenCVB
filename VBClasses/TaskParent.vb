@@ -106,10 +106,10 @@ Public Class TaskParent : Implements IDisposable
         dst.Rectangle(rect, task.highlight, task.lineWidth, task.lineType)
     End Sub
     Public Shared Function Palettize(input As cv.Mat, Optional first As Byte = 1) As cv.Mat
-        If first <> 0 Then
-            task.colorMap.Set(Of cv.Vec3b)(0, 0, task.vecColors(0))
-        Else
+        If first = 0 Then
             task.colorMap.Set(Of cv.Vec3b)(0, 0, New cv.Vec3b(0, 0, 0))
+        Else
+            task.colorMap.Set(Of cv.Vec3b)(0, 0, task.vecColors(0))
         End If
         Dim output As New cv.Mat
         If input.Type <> cv.MatType.CV_8U Then
