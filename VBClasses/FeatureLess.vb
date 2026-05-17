@@ -701,36 +701,46 @@ End Class
 
 Public Class FeatureLess_Clusters : Inherits TaskParent
     Dim fLess As New FeatureLess_Basics
-    Public clusterList As New List(Of List(Of Integer))
+    Public clusterList As New SortedList(Of Integer, List(Of Integer))(New compareAllowIdenticalIntegerInverted)
+    Public floodPoints As New List(Of cv.Point)
     Public Sub New()
         desc = "Identify the clusters in the FeatureLess_Basics output"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
+        Static lastMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+
         fLess.Run(task.gray)
         dst2 = fLess.dst2.Clone
         labels(2) = fLess.labels(2)
 
         Dim sortList As New SortedList(Of Integer, cv.Point)(New compareAllowIdenticalIntegerInverted)
         sortList.Add(0, New cv.Point(0, 0))
+        floodPoints.Clear()
         For i = 0 To task.gridRects.Count - 1
             Dim r = task.gridRects(i)
             Dim val = dst2.Get(Of Byte)(r.TopLeft.Y, r.TopLeft.X)
             If val = 255 Then
                 sortList.Add(dst2.FloodFill(r.TopLeft, sortList.Count), r.TopLeft)
                 If sortList.Count >= 254 Then Exit For
+                floodPoints.Add(r.TopLeft)
             End If
         Next
 
-        clusterList.Clear()
+        Dim tmpList As New List(Of List(Of Integer))
         For i = 0 To sortList.Count - 1
-            clusterList.Add(New List(Of Integer))
+            tmpList.Add(New List(Of Integer))
         Next
 
         For i = 0 To task.gridRects.Count - 1
             Dim r = task.gridRects(i)
             Dim index = dst2.Get(Of Byte)(r.TopLeft.Y, r.TopLeft.X)
             dst2(task.gridRects(i)).SetTo(index)
-            clusterList(index).Add(i)
+            tmpList(index).Add(i)
+        Next
+
+        clusterList.Clear()
+        For Each lst In tmpList
+            clusterList.Add(lst.Count, lst)
         Next
 
         If standaloneTest() Then dst3 = Palettize(dst2, 0)
@@ -747,6 +757,8 @@ Public Class FeatureLess_Clusters : Inherits TaskParent
             End If
         End If
         labels(3) = CStr(sortList.Count - 1) + " clusters were found "
+
+        lastMap = dst2.Clone
     End Sub
 End Class
 
@@ -768,9 +780,19 @@ Public Class FeatureLess_ToList : Inherits TaskParent
         clusters.Run(task.gray)
         labels(2) = clusters.labels(3)
 
+        'classCount = floodPoints.Count + 1
+        'For Each pt In floodPoints
+        '    Dim val = lastMap.Get(Of Byte)(pt.Y, pt.X)
+        '    If val = 0 Or val >= Then
+        '        classCount += 1
+        '        val = classCount
+        '    End If
+        '    dst2.FloodFill(pt, val)
+        'Next
+
         rcList.Clear()
         rcMap.SetTo(0)
-        clusterList = New List(Of List(Of Integer))(clusters.clusterList)
+        clusterList = New List(Of List(Of Integer))(clusters.clusterList.Values)
         For i = 1 To clusterList.Count - 1
             If clusterList(i).Count = 0 Then Continue For
             Dim rectX As New List(Of Integer)
