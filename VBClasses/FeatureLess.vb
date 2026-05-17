@@ -702,7 +702,6 @@ End Class
 Public Class FeatureLess_Clusters : Inherits TaskParent
     Dim fLess As New FeatureLess_Basics
     Public clusterList As New SortedList(Of Integer, List(Of Integer))(New compareAllowIdenticalIntegerInverted)
-    Public floodPoints As New List(Of cv.Point)
     Public Sub New()
         desc = "Identify the clusters in the FeatureLess_Basics output"
     End Sub
@@ -711,21 +710,20 @@ Public Class FeatureLess_Clusters : Inherits TaskParent
         dst2 = fLess.dst2.Clone
         labels(2) = fLess.labels(2)
 
-        Dim sortList As New SortedList(Of Integer, cv.Point)(New compareAllowIdenticalIntegerInverted)
-        sortList.Add(0, New cv.Point(0, 0))
-        floodPoints.Clear()
+        Dim floodPoints As New List(Of cv.Point)
         For i = 0 To task.gridRects.Count - 1
             Dim r = task.gridRects(i)
             Dim val = dst2.Get(Of Byte)(r.TopLeft.Y, r.TopLeft.X)
             If val = 255 Then
-                sortList.Add(dst2.FloodFill(r.TopLeft, sortList.Count), r.TopLeft)
-                If sortList.Count >= 254 Then Exit For
+                dst2.FloodFill(r.TopLeft, floodPoints.Count + 1)
                 floodPoints.Add(r.TopLeft)
+                If floodPoints.Count >= 254 Then Exit For
             End If
         Next
 
         Dim tmpList As New List(Of List(Of Integer))
-        For i = 0 To sortList.Count - 1
+        tmpList.Add(New List(Of Integer))
+        For i = 0 To floodPoints.Count - 1
             tmpList.Add(New List(Of Integer))
         Next
 
@@ -754,7 +752,7 @@ Public Class FeatureLess_Clusters : Inherits TaskParent
                 task.color.SetTo(white, dst0)
             End If
         End If
-        labels(3) = CStr(sortList.Count - 1) + " clusters were found "
+        labels(3) = CStr(floodPoints.Count - 1) + " clusters were found "
     End Sub
 End Class
 
@@ -781,16 +779,9 @@ Public Class FeatureLess_ToList : Inherits TaskParent
         labels(2) = clusters.labels(3)
         clusterList = New List(Of List(Of Integer))(clusters.clusterList.Values)
 
-        'For Each pt In clusters.floodPoints
-        '    Dim val = lastMap.Get(Of Integer)(pt.Y, pt.X)
-        '    If val = 0 Or val >= tmpList.Count Then
-        '        val = classCount
-        '    End If
-        '    dst2.FloodFill(pt, val)
-        'Next
-
         rcList.Clear()
         rcMap.SetTo(0)
+        Dim usedIndex As New HashSet(Of Integer)
         For i = 1 To clusterList.Count - 1
             If clusterList(i).Count = 0 Then Continue For
             Dim rectX As New List(Of Integer)
@@ -807,21 +798,37 @@ Public Class FeatureLess_ToList : Inherits TaskParent
             Dim rect = ValidateRect(New cv.Rect(minX, minY, w, h))
 
             Dim pt = task.gridRects(clusterList(i)(0)).TopLeft
-
-
-
-
-
-
-
-
-
             Dim val = dst2.Get(Of Byte)(pt.Y, pt.X)
             Dim rc = New rcData(dst2(rect), rect, val)
 
-            rc.index = i
+
+
+            'Dim lastIndex = lastMap.Get(Of Integer)(rc.maxDist.Y, rc.maxDist.X)
+            'If lastIndex > 0 And lastIndex < rcLastList.Count Then
+            '    Dim rcLast As rcData = rcLastList(lastIndex)
+            '    If lastIndex <> val Then
+            '        For Each rcTest In rcLastList
+            '            Dim valTest = dst2.Get(Of Byte)(rcTest.maxDist.Y, rcTest.maxDist.X)
+            '            If valTest = val Then
+            '                rcLast = rcTest
+            '                Exit For
+            '            End If
+            '        Next
+            '    End If
+            '    rc.age = rcLast.age + 1
+            '    If usedIndex.Contains(rcLast.index) = False Then
+            '        rc.index = rcLast.index
+            '        rcMap(rc.rect).SetTo(rc.index, rc.mask)
+            '    End If
+            'End If
+            'usedIndex.Add(rc.index)
+
+
+
             rcList.Add(rc)
             rcMap(rc.rect).SetTo(rc.index, rc.mask)
+
+            ' If rcList.Count >= 3 Then Exit For
         Next
 
         dst3 = Palettize(rcMap, 0)
