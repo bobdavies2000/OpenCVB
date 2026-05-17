@@ -707,8 +707,6 @@ Public Class FeatureLess_Clusters : Inherits TaskParent
         desc = "Identify the clusters in the FeatureLess_Basics output"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        Static lastMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-
         fLess.Run(task.gray)
         dst2 = fLess.dst2.Clone
         labels(2) = fLess.labels(2)
@@ -757,8 +755,6 @@ Public Class FeatureLess_Clusters : Inherits TaskParent
             End If
         End If
         labels(3) = CStr(sortList.Count - 1) + " clusters were found "
-
-        lastMap = dst2.Clone
     End Sub
 End Class
 
@@ -777,14 +773,17 @@ Public Class FeatureLess_ToList : Inherits TaskParent
         desc = "Create a RedCloud rcList from FeatureLess_Cluster output"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        clusters.Run(task.gray)
-        labels(2) = clusters.labels(3)
+        Dim lastMap As cv.Mat = rcMap.Clone
+        Dim rcLastList As New List(Of rcData)(rcList)
 
-        'classCount = floodPoints.Count + 1
-        'For Each pt In floodPoints
-        '    Dim val = lastMap.Get(Of Byte)(pt.Y, pt.X)
-        '    If val = 0 Or val >= Then
-        '        classCount += 1
+        clusters.Run(task.gray)
+        dst2 = clusters.dst2.Clone
+        labels(2) = clusters.labels(3)
+        clusterList = New List(Of List(Of Integer))(clusters.clusterList.Values)
+
+        'For Each pt In clusters.floodPoints
+        '    Dim val = lastMap.Get(Of Integer)(pt.Y, pt.X)
+        '    If val = 0 Or val >= tmpList.Count Then
         '        val = classCount
         '    End If
         '    dst2.FloodFill(pt, val)
@@ -792,7 +791,6 @@ Public Class FeatureLess_ToList : Inherits TaskParent
 
         rcList.Clear()
         rcMap.SetTo(0)
-        clusterList = New List(Of List(Of Integer))(clusters.clusterList.Values)
         For i = 1 To clusterList.Count - 1
             If clusterList(i).Count = 0 Then Continue For
             Dim rectX As New List(Of Integer)
@@ -809,15 +807,24 @@ Public Class FeatureLess_ToList : Inherits TaskParent
             Dim rect = ValidateRect(New cv.Rect(minX, minY, w, h))
 
             Dim pt = task.gridRects(clusterList(i)(0)).TopLeft
-            Dim val = clusters.dst2.Get(Of Byte)(pt.Y, pt.X)
-            Dim rc = New rcData(clusters.dst2(rect), rect, val)
 
-            rc.color = task.scalarColors(rc.index Mod 255)
+
+
+
+
+
+
+
+
+            Dim val = dst2.Get(Of Byte)(pt.Y, pt.X)
+            Dim rc = New rcData(dst2(rect), rect, val)
+
+            rc.index = i
             rcList.Add(rc)
             rcMap(rc.rect).SetTo(rc.index, rc.mask)
         Next
 
-        dst2 = Palettize(rcMap, 0)
+        dst3 = Palettize(rcMap, 0)
 
         strOut = RedUtil_Basics.selectCell(rcMap, rcList)
         SetTrueText(strOut, 1)

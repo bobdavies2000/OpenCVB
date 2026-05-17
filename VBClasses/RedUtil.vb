@@ -141,7 +141,7 @@ Public Class RedUtil_Basics : Inherits TaskParent
             clickIndex = rcMap.Get(Of Integer)(task.clickPoint.Y, task.clickPoint.X)
             If clickIndex = 0 Then
                 task.rcD = Nothing
-                Return vbCrLf + vbCrLf + "No cell defined there."
+                Return vbCrLf + vbCrLf + "Click anywhere to select a cell for inspection."
             End If
             If clickIndex < rcList.Count Then
                 task.rcD = rcList(clickIndex - 1)
