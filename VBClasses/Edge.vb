@@ -1589,7 +1589,7 @@ Public Class Edge_Featureless : Inherits TaskParent
 
         strOut = "Scene motion = " + CStr(sceneMotionDetected) + vbCrLf +
                  "Camera motion threshold = " + CStr(rectCountThreshold) + vbCrLf +
-                 "Current gridrect count = " + CStr(fLess.fLessList.Count)
+                 "Current gridrect count = " + CStr(fLess.rectList.Count)
 
         SetTrueText(strOut, 3)
     End Sub

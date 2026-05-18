@@ -253,7 +253,7 @@ FeatureLess_Basics
 FeatureLess_BasicsMotion
 FeatureLess_Cells
 FeatureLess_Clusters
-FeatureLess_ClustersHist
+FeatureLess_ClustersHist2D
 FeatureLess_Correlation
 FeatureLess_FeatureLines
 FeatureLess_Features

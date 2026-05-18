@@ -533,7 +533,7 @@ Public Class Motion_Featureless : Inherits TaskParent
         labels(2) = edges.labels(2)
 
         plotdots.maxScale = task.gridRects.Count
-        plotdots.plotData(0) = edges.fLess.fLessList.Count
+        plotdots.plotData(0) = edges.fLess.rectList.Count
         plotdots.Run(src)
         dst3 = plotdots.dst2
         labels(3) = plotdots.labels(2)

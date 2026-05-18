@@ -4,7 +4,7 @@ Imports System.Windows.Media
 Imports sl
 Imports cv = OpenCvSharp
 Public Class FeatureLess_Basics : Inherits TaskParent
-    Public fLessList As New List(Of cv.Rect)
+    Public rectList As New List(Of cv.Rect)
     Public featureX As New List(Of Single)
     Public featureY As New List(Of Single)
     Dim edges As New Edge_Canny
@@ -20,20 +20,20 @@ Public Class FeatureLess_Basics : Inherits TaskParent
         dst3 = src
 
         dst2.SetTo(0)
-        fLessList.Clear()
+        rectList.Clear()
         featureX.Clear()
         featureY.Clear()
         For Each r In task.gridRects
             If edges.dst2(r).CountNonZero > 0 Then Continue For
             dst2(r).SetTo(255)
             dst3.Rectangle(r, white, task.lineWidth)
-            fLessList.Add(r)
+            rectList.Add(r)
 
             featureX.Add(src(r).Mean()(0))
             featureY.Add(task.pcSplit(2)(r).Mean(task.depthmask(r))(0))
         Next
 
-        labels(2) = CStr(fLessList.Count) + " featureless grid squares were found"
+        labels(2) = CStr(rectList.Count) + " featureless grid squares were found"
     End Sub
 End Class
 
@@ -94,7 +94,7 @@ End Class
 
 Public Class FeatureLess_BasicsMotion : Inherits TaskParent
     Public fLessRaw As New FeatureLess_Basics
-    Public fLessList As New List(Of cv.Rect)
+    Public rectList As New List(Of cv.Rect)
     Public fLessNot As New List(Of cv.Rect)
     Public ptList As New HashSet(Of cv.Point)
     Public Sub New()
@@ -104,19 +104,19 @@ Public Class FeatureLess_BasicsMotion : Inherits TaskParent
         fLessRaw.Run(src)
         If task.optionsChanged Then
             dst2 = fLessRaw.dst3.Clone
-            fLessList = New List(Of cv.Rect)(fLessRaw.fLessList)
+            rectList = New List(Of cv.Rect)(fLessRaw.rectList)
         End If
 
         ptList.Clear()
         Dim newList As New List(Of cv.Rect)
         ' remove any grid rects that had motion.
-        For Each r In fLessList
+        For Each r In rectList
             Dim val = task.motion.motionMask.Get(Of Byte)(r.Y, r.X)
             If val <> 0 Then dst2(r).SetTo(0) Else newList.Add(r)
             ptList.Add(r.TopLeft)
         Next
 
-        For Each r In fLessRaw.fLessList
+        For Each r In fLessRaw.rectList
             Dim val = task.motion.motionMask.Get(Of Byte)(r.TopLeft.Y, r.TopLeft.X)
             If val = 0 Then
                 If ptList.Contains(r.TopLeft) = False Then
@@ -132,7 +132,7 @@ Public Class FeatureLess_BasicsMotion : Inherits TaskParent
             If dst2.Get(Of Byte)(r.TopLeft.Y, r.TopLeft.X) = 0 Then fLessNot.Add(r)
         Next
 
-        If newList.Count > 0 Then fLessList = New List(Of cv.Rect)(newList)
+        If newList.Count > 0 Then rectList = New List(Of cv.Rect)(newList)
 
         labels(2) = fLessRaw.labels(2)
     End Sub
@@ -669,7 +669,7 @@ Public Class FeatureLess_Features : Inherits TaskParent
         For Each lp In task.lines.lpList
             dst2.Line(lp.p1, lp.p2, black, task.lineWidth)
         Next
-        Dim count = task.gridRects.Count - fLess.fLessList.Count
+        Dim count = task.gridRects.Count - fLess.rectList.Count
         labels(2) = "Current frame: " + CStr(count) + " grid squares had features"
     End Sub
 End Class
@@ -732,7 +732,7 @@ Public Class FeatureLess_FeatureLines : Inherits TaskParent
         For Each lp In task.lines.lpList
             dst2.Line(lp.p1, lp.p2, black, task.lineWidth)
         Next
-        Dim count = task.gridRects.Count - fLess.fLessList.Count
+        Dim count = task.gridRects.Count - fLess.rectList.Count
         labels(2) = "Current frame: " + CStr(count) + " grid squares had features"
     End Sub
 End Class
@@ -868,6 +868,7 @@ Public Class FeatureLess_ClustersHist2D : Inherits TaskParent
     Dim fLess As New FeatureLess_Basics
     Dim plotHist As New PlotBar_Histogram2D
     Public Sub New()
+        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
         desc = "Isolate clusters using a 2D histogram"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -878,7 +879,6 @@ Public Class FeatureLess_ClustersHist2D : Inherits TaskParent
                                           fLess.featureX.ToArray())
         Dim yInput = cv.Mat.FromPixelData(fLess.featureY.Count, 1, cv.MatType.CV_32F,
                                           fLess.featureY.ToArray())
-
         Dim mmX = GetMinMax(xInput)
         plotHist.ranges = {New cv.Rangef(mmX.minVal - 0.01, 255.01), New cv.Rangef(0, task.MaxZmeters)}
 
@@ -887,28 +887,32 @@ Public Class FeatureLess_ClustersHist2D : Inherits TaskParent
 
         plotHist.Run(features)
 
-        dst3 = plotHist.dst2.Threshold(0, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs
+        Dim histogram = plotHist.histogram.Threshold(0, 255, cv.ThresholdTypes.Binary)
 
         Dim floodPoints As New List(Of cv.Point)
-        Dim stepX = CInt(dst2.Width / task.histogramBins)
-        Dim stepY = CInt(dst2.Height / task.histogramBins)
-        For y = 0 To dst3.Height - 1 Step stepY
-            For x = 0 To dst3.Width - 1 Step stepX
-                Dim r = New cv.Rect(x, y, stepX, stepY)
+        For y = 0 To histogram.Height - 1
+            For x = 0 To histogram.Width - 1
                 Dim pt = New cv.Point(x, y)
-                Dim val = dst3.Get(Of Byte)(y, x)
+                Dim val = histogram.Get(Of Single)(y, x)
                 If val = 255 Then
-                    dst3.FloodFill(pt, floodPoints.Count + 1)
+                    histogram.FloodFill(pt, floodPoints.Count + 1)
                     floodPoints.Add(pt)
                     If floodPoints.Count >= 254 Then Exit For
                 End If
             Next
         Next
 
-        'Dim backP As New cv.Mat
-        'cv.Cv2.CalcBackProject({features}, {0, 1}, plotHist.histogram, backP, plotHist.ranges)
-        'dst3 = backP.Normalize(0, 255, cv.NormTypes.MinMax)
-        'dst3.ConvertTo(dst3, cv.MatType.CV_8U)
+        Dim backP As New cv.Mat
+        cv.Cv2.CalcBackProject({features}, {0, 1}, histogram, backP, plotHist.ranges)
+        Dim histArray(histogram.Rows * histogram.Cols - 1) As Single
+        backP.GetArray(Of Single)(histArray)
+
+        dst3.SetTo(0)
+        For i = 0 To fLess.rectList.Count - 1
+            Dim r = fLess.rectList(i)
+
+            dst3(r).SetTo(histArray(i))
+        Next
 
         dst2 = Palettize(dst3, 0)
 
