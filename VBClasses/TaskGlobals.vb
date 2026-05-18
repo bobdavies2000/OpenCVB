@@ -41,6 +41,9 @@ Public Module vbc
     Public Function vecToScalar(c As cv.Vec3b) As cv.Scalar
         Return New cv.Scalar(c(0), c(1), c(2))
     End Function
+    Public Function ScalarToVec(c As cv.Scalar) As cv.Vec3b
+        Return New cv.Vec3b(c(0), c(1), c(2))
+    End Function
     Public Sub taskUpdate()
         If task.myStopWatch Is Nothing Then task.myStopWatch = Stopwatch.StartNew()
 

@@ -711,13 +711,18 @@ Public Class FeatureLess_Clusters : Inherits TaskParent
         labels(2) = fLess.labels(2)
 
         Dim floodPoints As New List(Of cv.Point)
+        Dim minPixels = task.gridWH * task.gridWH
         For i = 0 To task.gridRects.Count - 1
             Dim r = task.gridRects(i)
             Dim val = dst2.Get(Of Byte)(r.TopLeft.Y, r.TopLeft.X)
             If val = 255 Then
-                dst2.FloodFill(r.TopLeft, floodPoints.Count + 1)
-                floodPoints.Add(r.TopLeft)
-                If floodPoints.Count >= 254 Then Exit For
+                Dim floodCount = dst2.FloodFill(r.TopLeft, floodPoints.Count + 1)
+                If floodCount >= minPixels Then
+                    floodPoints.Add(r.TopLeft)
+                    If floodPoints.Count >= 254 Then Exit For
+                Else
+                    dst2.FloodFill(r.TopLeft, 0)
+                End If
             End If
         Next
 
@@ -781,7 +786,6 @@ Public Class FeatureLess_ToList : Inherits TaskParent
 
         rcList.Clear()
         rcMap.SetTo(0)
-        Dim usedIndex As New HashSet(Of Integer)
         For i = 1 To clusterList.Count - 1
             If clusterList(i).Count = 0 Then Continue For
             Dim rectX As New List(Of Integer)
@@ -801,35 +805,74 @@ Public Class FeatureLess_ToList : Inherits TaskParent
             Dim val = dst2.Get(Of Byte)(pt.Y, pt.X)
             Dim rc = New rcData(dst2(rect), rect, val)
 
-
-
-            'Dim lastIndex = lastMap.Get(Of Integer)(rc.maxDist.Y, rc.maxDist.X)
-            'If lastIndex > 0 And lastIndex < rcLastList.Count Then
-            '    Dim rcLast As rcData = rcLastList(lastIndex)
-            '    If lastIndex <> val Then
-            '        For Each rcTest In rcLastList
-            '            Dim valTest = dst2.Get(Of Byte)(rcTest.maxDist.Y, rcTest.maxDist.X)
-            '            If valTest = val Then
-            '                rcLast = rcTest
-            '                Exit For
-            '            End If
-            '        Next
-            '    End If
-            '    rc.age = rcLast.age + 1
-            '    If usedIndex.Contains(rcLast.index) = False Then
-            '        rc.index = rcLast.index
-            '        rcMap(rc.rect).SetTo(rc.index, rc.mask)
-            '    End If
-            'End If
-            'usedIndex.Add(rc.index)
-
-
-
             rcList.Add(rc)
             rcMap(rc.rect).SetTo(rc.index, rc.mask)
-
-            ' If rcList.Count >= 3 Then Exit For
         Next
+
+        dst3 = Palettize(rcMap, 0)
+
+        strOut = RedUtil_Basics.selectCell(rcMap, rcList)
+        If task.rcD IsNot Nothing Then
+            strOut += "Index of task.rcD = " + CStr(rcList.IndexOf(task.rcD)) + vbCrLf
+            strOut += "Value in rcMap = " + CStr(rcMap.Get(Of Integer)(task.clickPoint.Y, task.clickPoint.X)) + vbCrLf
+        End If
+        SetTrueText(strOut, 1)
+    End Sub
+End Class
+
+
+
+
+Public Class FeatureLess_ToList1 : Inherits TaskParent
+    Dim clusters As New FeatureLess_Clusters
+    Public clusterList As New List(Of List(Of Integer))
+    Public rcList As New List(Of rcData)
+    Public rcMap As New cv.Mat(dst2.Size, cv.MatType.CV_32S, 0)
+    Public Sub New()
+        If standalone Then task.gOptions.displayDst1.Checked = True
+        desc = "Create a RedCloud rcList from FeatureLess_Cluster output"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        Dim lastMap As cv.Mat = rcMap.Clone
+        Dim rcLastList As New List(Of rcData)(rcList)
+
+        clusters.Run(task.gray)
+        dst2 = clusters.dst2.Clone
+        labels(2) = clusters.labels(3)
+        clusterList = New List(Of List(Of Integer))(clusters.clusterList.Values)
+
+        rcList.Clear()
+        rcMap.SetTo(0)
+        For i = 1 To clusterList.Count - 1
+            If clusterList(i).Count = 0 Then Continue For
+            Dim rectX As New List(Of Integer)
+            Dim rectY As New List(Of Integer)
+            For Each index In clusterList(i)
+                rectX.Add(task.gridRects(index).TopLeft.X)
+                rectY.Add(task.gridRects(index).TopLeft.Y)
+            Next
+
+            Dim minX = rectX.Min
+            Dim minY = rectY.Min
+            Dim w = rectX.Max - minX + task.gridWH
+            Dim h = rectY.Max - minY + task.gridWH
+            Dim rect = ValidateRect(New cv.Rect(minX, minY, w, h))
+
+            Dim pt = task.gridRects(clusterList(i)(0)).TopLeft
+            Dim val = dst2.Get(Of Byte)(pt.Y, pt.X)
+            Dim rc = New rcData(dst2(rect), rect, val)
+            rcList.Add(rc)
+            rcMap(rc.rect).SetTo(rc.index, rc.mask)
+        Next
+
+        'Dim usedIndex As New HashSet(Of Integer)
+        'For Each rc In rcList
+        '    If usedIndex.Contains(rc.index) Then
+        '        rc.index += 1
+        '        rcMap(rc.rect).SetTo(rc.index, rc.mask)
+        '    End If
+        '    usedIndex.Add(rc.index)
+        'Next
 
         dst3 = Palettize(rcMap, 0)
 
