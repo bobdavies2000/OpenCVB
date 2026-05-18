@@ -1508,11 +1508,11 @@ Public Class Depth_Tiers_TA : Inherits TaskParent
     Dim ranges() As cv.Rangef = {New cv.Rangef(0.1, task.MaxZmeters)}
     Public everyFrame As Boolean = False
     Public Sub New()
+        task.gOptions.HistBinBar.Value = classCount
         desc = "Trim the depth to increase the size of each bin."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If task.optionsChanged Then
-            task.gOptions.setHistogramBins(classCount)
             histogram = New cv.Mat(New cv.Size(1, classCount), cv.MatType.CV_32F, 0)
             For i = 1 To classCount - 1
                 histogram.Set(Of Single)(0, i, i)

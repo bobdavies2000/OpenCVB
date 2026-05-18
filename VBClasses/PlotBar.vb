@@ -83,30 +83,6 @@ End Class
 
 
 
-Public Class PlotBar_Histogram2D : Inherits TaskParent
-    Public Sub New()
-        labels = {"", "", "2D Histogram", ""}
-        desc = "Plot a 2D histgram from the input Mat"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        Dim histogram = src.Clone
-        If standalone Then
-            Static colorFmt As New Color_Basics
-            colorFmt.Run(src)
-            src = colorFmt.dst2
-            Dim bins = task.histogramBins
-            cv.Cv2.CalcHist({src}, {0, 1}, New cv.Mat(), histogram, 2, {bins, bins}, task.rangesBGR)
-        End If
-
-        dst2 = histogram.Resize(dst2.Size(), 0, 0, cv.InterpolationFlags.Nearest)
-
-        If standaloneTest() Then dst3 = dst2.Threshold(0, 255, cv.ThresholdTypes.Binary)
-    End Sub
-End Class
-
-
-
-
 
 Public Class PlotBar_HistCoreRange : Inherits TaskParent
     Public redCore As New RedPrep_Core
@@ -163,3 +139,24 @@ End Class
 
 
 
+Public Class PlotBar_Histogram2D : Inherits TaskParent
+    Public ranges = task.rangesBGR
+    Public histogram As New cv.Mat
+    Public Sub New()
+        labels = {"", "", "2D Histogram", ""}
+        desc = "Plot a 2D histgram from the input Mat"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        If standalone Then
+            Static colorFmt As New Color_Basics
+            colorFmt.Run(src)
+            src = colorFmt.dst2
+        End If
+        Dim bins = task.histogramBins
+        cv.Cv2.CalcHist({src}, {0, 1}, New cv.Mat(), histogram, 2, {bins, bins}, ranges)
+
+        dst2 = histogram.Resize(dst2.Size(), 0, 0, cv.InterpolationFlags.Nearest)
+
+        If standaloneTest() Then dst3 = dst2.Threshold(0, 255, cv.ThresholdTypes.Binary)
+    End Sub
+End Class

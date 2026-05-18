@@ -1,5 +1,47 @@
+Imports System.Diagnostics.Metrics
+Imports System.Threading
+Imports System.Windows.Media
+Imports sl
 Imports cv = OpenCvSharp
 Public Class FeatureLess_Basics : Inherits TaskParent
+    Public fLessList As New List(Of cv.Rect)
+    Public featureX As New List(Of Single)
+    Public featureY As New List(Of Single)
+    Dim edges As New Edge_Canny
+    Public Sub New()
+        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        desc = "Identify featureless squares using the gray scale range - see 'Correlation_Basics'."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        If src.Channels <> 1 Then src = task.gray
+        edges.Run(src)
+        labels(3) = edges.labels(2)
+
+        dst3 = src
+
+        dst2.SetTo(0)
+        fLessList.Clear()
+        featureX.Clear()
+        featureY.Clear()
+        For Each r In task.gridRects
+            If edges.dst2(r).CountNonZero > 0 Then Continue For
+            dst2(r).SetTo(255)
+            dst3.Rectangle(r, white, task.lineWidth)
+            fLessList.Add(r)
+
+            featureX.Add(src(r).Mean()(0))
+            featureY.Add(task.pcSplit(2)(r).Mean(task.depthmask(r))(0))
+        Next
+
+        labels(2) = CStr(fLessList.Count) + " featureless grid squares were found"
+    End Sub
+End Class
+
+
+
+
+
+Public Class NR_FeatureLess_Basics : Inherits TaskParent
     Public fLessList As New List(Of cv.Rect)
     Public options As New Options_FeatureLess
     Public Sub New()
@@ -704,6 +746,7 @@ Public Class FeatureLess_Clusters : Inherits TaskParent
     Dim fLess As New FeatureLess_Basics
     Public floodPoints As New List(Of cv.Point)
     Public Sub New()
+
         desc = "Identify the clusters in the FeatureLess_Basics output"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -821,28 +864,55 @@ End Class
 
 
 
-Public Class FeatureLess_BasicsNew : Inherits TaskParent
-    Public fLessList As New List(Of cv.Rect)
-    Dim edges As New Edge_Canny
+Public Class FeatureLess_ClustersHist2D : Inherits TaskParent
+    Dim fLess As New FeatureLess_Basics
+    Dim plotHist As New PlotBar_Histogram2D
     Public Sub New()
-        desc = "Identify featureless squares using the gray scale range - see 'Correlation_Basics'."
+        desc = "Isolate clusters using a 2D histogram"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If src.Channels <> 1 Then src = task.gray ' the motion-filtered image can be used a lower resolutions.
-        edges.Run(src)
-        labels(3) = edges.labels(2)
+        fLess.Run(task.gray)
+        labels(2) = "X values are depth, Y values are gray levels.  " + fLess.labels(2)
 
-        dst3 = src
+        Dim xInput = cv.Mat.FromPixelData(fLess.featureX.Count, 1, cv.MatType.CV_32F,
+                                          fLess.featureX.ToArray())
+        Dim yInput = cv.Mat.FromPixelData(fLess.featureY.Count, 1, cv.MatType.CV_32F,
+                                          fLess.featureY.ToArray())
 
-        dst2.SetTo(0)
-        fLessList.Clear()
-        For Each r In task.gridRects
-            If edges.dst2(r).CountNonZero > 0 Then Continue For
-            dst2(r).SetTo(255)
-            dst3.Rectangle(r, white, task.lineWidth)
-            fLessList.Add(r)
+        Dim mmX = GetMinMax(xInput)
+        plotHist.ranges = {New cv.Rangef(mmX.minVal - 0.01, 255.01), New cv.Rangef(0, task.MaxZmeters)}
+
+        Dim features As New cv.Mat
+        cv.Cv2.Merge({xInput, yInput}, features)
+
+        plotHist.Run(features)
+
+        dst3 = plotHist.dst2.Threshold(0, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs
+
+        Dim floodPoints As New List(Of cv.Point)
+        Dim stepX = CInt(dst2.Width / task.histogramBins)
+        Dim stepY = CInt(dst2.Height / task.histogramBins)
+        For y = 0 To dst3.Height - 1 Step stepY
+            For x = 0 To dst3.Width - 1 Step stepX
+                Dim r = New cv.Rect(x, y, stepX, stepY)
+                Dim pt = New cv.Point(x, y)
+                Dim val = dst3.Get(Of Byte)(y, x)
+                If val = 255 Then
+                    dst3.FloodFill(pt, floodPoints.Count + 1)
+                    floodPoints.Add(pt)
+                    If floodPoints.Count >= 254 Then Exit For
+                End If
+            Next
         Next
 
-        labels(2) = CStr(fLessList.Count) + " featureless grid squares were found"
+        'Dim backP As New cv.Mat
+        'cv.Cv2.CalcBackProject({features}, {0, 1}, plotHist.histogram, backP, plotHist.ranges)
+        'dst3 = backP.Normalize(0, 255, cv.NormTypes.MinMax)
+        'dst3.ConvertTo(dst3, cv.MatType.CV_8U)
+
+        dst2 = Palettize(dst3, 0)
+
+        labels(3) = CStr(floodPoints.Count) + " clusters were identified."
     End Sub
 End Class
+

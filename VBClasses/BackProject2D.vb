@@ -50,54 +50,6 @@ End Class
 
 
 
-
-' https://docs.opencvb.org/3.4/dc/df6/tutorial_py_Histogram_backprojection.html
-'Public Class BackProject2D_BasicsOld : Inherits TaskParent
-'    Public hist2d As New Hist2D_Basics
-'    Public xRange As Integer = 255
-'    Public yRange As Integer = 255
-'    Public minX As Single, maxX As Single, minY As Single, maxY As Single
-'    Public colorFmt As New Color_Basics
-'    Public bpCol As Integer, bpRow As Integer
-'    Public Sub New()
-'        If standalone Then task.gOptions.setGridSize(5)
-'        desc = "A 2D histogram is built from 2 channels of any 3-channel input and the results are displayed."
-'    End Sub
-'    Public Overrides sub RunAlg(src As cv.Mat)
-'        bpCol = Math.Floor(task.mouseMovePoint.X / task.bricksPerRow)
-'        bpRow = Math.Floor(task.mouseMovePoint.Y / task.bricksPerCol)
-
-'        colorFmt.Run(src)
-'        hist2d.Run(colorFmt.dst2)
-'        dst2 = hist2d.dst2
-
-'        minX = bpRow * xRange / task.brickEdgeLen
-'        maxX = (bpRow + 1) * xRange / task.brickEdgeLen
-'        minY = bpCol * yRange / task.brickEdgeLen
-'        maxY = (bpCol + 1) * yRange / task.brickEdgeLen
-
-'        Dim ranges() = New cv.Rangef() {New cv.Rangef(minX, maxX), New cv.Rangef(minY, maxY)}
-'        cv.Cv2.CalcBackProject({src}, task.gOptions.channels, hist2d.histogram, dst0, ranges)
-'        Dim bpCount = hist2d.histogram.Get(Of Single)(bpRow, bpCol)
-
-'        dst3.SetTo(0)
-'        dst3.SetTo(cv.Scalar.Yellow, dst0)
-'        If task.heartBeat Then
-'            labels(2) = colorFmt.options.colorFormat + ": Cell minX/maxX " + Format(minX, "0") + "/" + Format(maxX, "0") + " minY/maxY " +
-'                                Format(minY, "0") + "/" + Format(maxY, "0")
-'            Dim c1 = task.gOptions.channels(0), c2 = task.gOptions.channels(1)
-'            labels(3) = "That combination of channel " + CStr(c1) + "/" + CStr(c2) + " has " + CStr(bpCount) +
-'                        " pixels while image total is " + Format(dst0.Total, "0")
-'        End If
-'        SetTrueText("Use Global Algorithm Option 'grid Square Size' to control the 2D histogram at left",
-'                    New cv.Point(10, dst3.Height - 20), 3)
-'    End Sub
-'End Class
-
-
-
-
-
 Public Class NR_BackProject2D_Compare : Inherits TaskParent
     Dim hueSat As New PhotoShop_HSV
     Dim backP As New BackProject2D_Basics
@@ -358,5 +310,41 @@ Public Class NR_BackProject2D_RowCol : Inherits TaskParent
         End If
 
         SetTrueText(strOut, 1)
+    End Sub
+End Class
+
+
+
+
+
+Public Class BackProject2D_Grayscale : Inherits TaskParent
+    Dim histBar As New PlotBar_Histogram2D
+    Dim colorFmt As New Color_Basics
+    Dim channels() As Integer = {0, 1}
+    Public Sub New()
+        labels = {"", "", "2D histogram (PlotBar_Histogram2D)", "Backprojection from that histogram (BGR ch 0/1)"}
+        desc = "Build the 2D histogram with PlotBar_Histogram2D, then CalcBackProject to map each pixel to histogram likelihood."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        Dim colorSrc As cv.Mat
+        If standalone Then
+            colorFmt.Run(src)
+            colorSrc = colorFmt.dst2
+        Else
+            colorSrc = src
+        End If
+
+        histBar.Run(colorSrc)
+        dst2 = histBar.dst2
+
+        Dim backP As New cv.Mat
+        cv.Cv2.CalcBackProject({colorSrc}, channels, histBar.histogram, backP, histBar.ranges)
+        dst3 = backP.Normalize(0, 255, cv.NormTypes.MinMax)
+        dst3.ConvertTo(dst3, cv.MatType.CV_8U)
+
+        If standaloneTest() Then
+            labels(3) = "Backprojection min/max " + Format(GetMinMax(backP).minVal, fmt2) + "/" +
+                Format(GetMinMax(backP).maxVal, fmt2)
+        End If
     End Sub
 End Class

@@ -20,6 +20,7 @@ BackProject2D_Basics
 BackProject2D_Filter
 BackProject2D_FilterSide
 BackProject2D_FilterTop
+BackProject2D_Grayscale
 Benford_Basics
 Bezier_Basics
 BGSubtract_Basics
@@ -250,9 +251,9 @@ FeatureFlow_Basics
 FeatureFlow_LucasKanade
 FeatureLess_Basics
 FeatureLess_BasicsMotion
-FeatureLess_BasicsNew
 FeatureLess_Cells
 FeatureLess_Clusters
+FeatureLess_ClustersHist
 FeatureLess_Correlation
 FeatureLess_FeatureLines
 FeatureLess_Features
@@ -934,6 +935,7 @@ NR_Feature_StableVisual
 NR_Feature_SteadyCam
 NR_Feature_TraceDelaunay
 NR_Feature_WithDepth
+NR_FeatureLess_Basics
 NR_FeatureLess_Canny
 NR_FeatureLess_Contours
 NR_FeatureLess_Correlation
