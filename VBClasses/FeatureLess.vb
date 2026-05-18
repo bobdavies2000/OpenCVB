@@ -816,3 +816,33 @@ Public Class FeatureLess_ToList : Inherits TaskParent
         SetTrueText(strOut, 1)
     End Sub
 End Class
+
+
+
+
+
+Public Class FeatureLess_BasicsNew : Inherits TaskParent
+    Public fLessList As New List(Of cv.Rect)
+    Dim edges As New Edge_Canny
+    Public Sub New()
+        desc = "Identify featureless squares using the gray scale range - see 'Correlation_Basics'."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        If src.Channels <> 1 Then src = task.gray ' the motion-filtered image can be used a lower resolutions.
+        edges.Run(src)
+        labels(3) = edges.labels(2)
+
+        dst3 = src
+
+        dst2.SetTo(0)
+        fLessList.Clear()
+        For Each r In task.gridRects
+            If edges.dst2(r).CountNonZero > 0 Then Continue For
+            dst2(r).SetTo(255)
+            dst3.Rectangle(r, white, task.lineWidth)
+            fLessList.Add(r)
+        Next
+
+        labels(2) = CStr(fLessList.Count) + " featureless grid squares were found"
+    End Sub
+End Class

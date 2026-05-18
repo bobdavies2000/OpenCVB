@@ -250,6 +250,7 @@ FeatureFlow_Basics
 FeatureFlow_LucasKanade
 FeatureLess_Basics
 FeatureLess_BasicsMotion
+FeatureLess_BasicsNew
 FeatureLess_Cells
 FeatureLess_Clusters
 FeatureLess_Correlation

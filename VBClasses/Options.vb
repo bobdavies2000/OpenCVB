@@ -8179,13 +8179,19 @@ End Class
 
 Public Class Options_FeatureLess : Inherits OptionParent
     Public fLessThreshold As Integer = 30
+    Public maxPixels As Integer = 100
     Public Sub New()
         ' high resolution cameras need a higher threshold (but real high will use correlation.)
         If task.workRes.Width >= 960 Then fLessThreshold = 50
-        If sliders.Setup(traceName) Then sliders.setupTrackBar("Grid Range Threshold", 0, 255, fLessThreshold)
+        If sliders.Setup(traceName) Then
+            sliders.setupTrackBar("Grid Max Pixels", 0, 200, maxPixels)
+            sliders.setupTrackBar("Grid Range Threshold", 0, 255, fLessThreshold)
+        End If
     End Sub
     Public Sub Run()
+        Static pixelsSlider = FindSlider("Grid Max Pixels")
         Static gridSlider = FindSlider("Grid Range Threshold")
+        maxPixels = pixelsSlider.value
         fLessThreshold = gridSlider.value
     End Sub
 End Class
