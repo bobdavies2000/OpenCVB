@@ -33,7 +33,7 @@ Public Class FeatureLess_Basics : Inherits TaskParent
             featureY.Add(task.pcSplit(2)(r).Mean(task.depthmask(r))(0))
         Next
 
-        labels(2) = CStr(rectList.Count) + " featureless grid squares were found"
+        labels(2) = CStr(rectList.Count) + " featureless grid squares"
     End Sub
 End Class
 
@@ -867,13 +867,29 @@ End Class
 Public Class FeatureLess_ClustersHist2D : Inherits TaskParent
     Dim fLess As New FeatureLess_Basics
     Dim plotHist As New PlotBar_Histogram2D
+    Public histArray(task.histogramBins * task.histogramBins - 1) As Single
+    Public floodPoints As New List(Of cv.Point)
+    Public features As New cv.Mat
+    Public histogram As cv.Mat
+    Public bpArray() As Single
     Public Sub New()
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
         desc = "Isolate clusters using a 2D histogram"
     End Sub
+    Public Function backProjectHistArray(histogram As cv.Mat) As cv.Mat
+        Dim backP As New cv.Mat
+        cv.Cv2.CalcBackProject({features}, {0, 1}, histogram, backP, plotHist.ranges)
+        ReDim bpArray(histogram.Rows * histogram.Cols - 1)
+        backP.GetArray(Of Single)(bpArray)
+
+        Dim dst As New cv.Mat(task.workRes, cv.MatType.CV_8U, 0)
+        For i = 0 To fLess.rectList.Count - 1
+            dst(fLess.rectList(i)).SetTo(bpArray(i))
+        Next
+        Return dst
+    End Function
     Public Overrides Sub RunAlg(src As cv.Mat)
         fLess.Run(task.gray)
-        labels(2) = "X values are depth, Y values are gray levels.  " + fLess.labels(2)
 
         Dim xInput = cv.Mat.FromPixelData(fLess.featureX.Count, 1, cv.MatType.CV_32F,
                                           fLess.featureX.ToArray())
@@ -882,14 +898,11 @@ Public Class FeatureLess_ClustersHist2D : Inherits TaskParent
         Dim mmX = GetMinMax(xInput)
         plotHist.ranges = {New cv.Rangef(mmX.minVal - 0.01, 255.01), New cv.Rangef(0, task.MaxZmeters)}
 
-        Dim features As New cv.Mat
         cv.Cv2.Merge({xInput, yInput}, features)
-
         plotHist.Run(features)
 
-        Dim histogram = plotHist.histogram.Threshold(0, 255, cv.ThresholdTypes.Binary)
-
-        Dim floodPoints As New List(Of cv.Point)
+        histogram = plotHist.histogram.Threshold(0, 255, cv.ThresholdTypes.Binary)
+        floodPoints.Clear()
         For y = 0 To histogram.Height - 1
             For x = 0 To histogram.Width - 1
                 Dim pt = New cv.Point(x, y)
@@ -901,29 +914,103 @@ Public Class FeatureLess_ClustersHist2D : Inherits TaskParent
                 End If
             Next
         Next
-        Dim histArray(histogram.Rows * histogram.Cols - 1) As Single
+
         histogram.GetArray(Of Single)(histArray)
-        'Dim histlist = histArray.ToList()
-        'histlist(histlist.IndexOf(histlist.Max)) = 1
-        ' histogram = cv.Mat.FromPixelData(histlist.Count, 1, cv.MatType.CV_32S, histlist.ToArray)
 
-        Dim mm = GetMinMax(histogram)
-        '  histogram.Set(Of Single)(mm.maxLoc.Y, mm.maxLoc.X, 1)
+        If standalone Then
+            dst3 = backProjectHistArray(histogram)
+            dst2 = Palettize(dst3, 0)
+        End If
 
-        Dim backP As New cv.Mat
-        cv.Cv2.CalcBackProject({features}, {0, 1}, histogram, backP, plotHist.ranges)
-        Dim bpArray(histogram.Rows * histogram.Cols - 1) As Single
-        backP.GetArray(Of Single)(bpArray)
+        plotHist.labels(2) = "X scale is mean grayscale color and the Y scale is mean depth."
+        labels(2) = CStr(floodPoints.Count) + " clusters were found for the " + fLess.labels(2)
+        labels(3) = CStr(floodPoints.Count) + " clusters were identified."
+    End Sub
+End Class
 
-        dst3.SetTo(0)
-        For i = 0 To fLess.rectList.Count - 1
-            Dim r = fLess.rectList(i)
-            dst3(r).SetTo(bpArray(i))
+
+
+
+
+Public Class FeatureLess_Mapper : Inherits TaskParent
+    Dim fLessHist As New FeatureLess_ClustersHist2D
+    Public Sub New()
+        desc = "Match the histArray to the original histArray as much as possible."
+    End Sub
+    Private Sub logHistArray(histArray() As Single)
+        For i = 0 To task.histogramBins - 1
+            Debug.Write(CStr(i) + vbTab)
+            For j = task.histogramBins * i To task.histogramBins * (i + 1) - 1
+                Debug.Write(CStr(histArray(j)) + ", ")
+            Next
+            Debug.WriteLine("")
+        Next
+        Debug.WriteLine("---------------------")
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        fLessHist.Run(task.gray)
+        Dim nextArray() = CType(fLessHist.histArray.Clone, Single())
+        ' logHistArray(nextArray)
+
+        Static histArray0() As Single = nextArray
+        If task.optionsChanged Then histArray0 = nextArray
+        Dim histList = nextArray.ToList
+
+        Dim mapper As New List(Of List(Of Integer))
+        For i = 0 To histList.Max
+            mapper.Add(New List(Of Integer))
         Next
 
+        For i = 0 To task.histogramBins - 1
+            For j = task.histogramBins * i To task.histogramBins * (i + 1) - 1
+                If histArray0(j) = 0 And nextArray(j) <> 0 Then
+                    mapper.Add(New List(Of Integer))
+                    mapper(mapper.Count - 1).Add(nextArray(j))
+                Else
+                    mapper(nextArray(j)).Add(histArray0(j))
+                End If
+            Next
+        Next
+
+        For i = 0 To task.histogramBins - 1
+            For j = task.histogramBins * i To task.histogramBins * (i + 1) - 1
+                If nextArray(j) = 0 Then Continue For
+                If mapper(nextArray(j)).Count > 0 Then
+                    nextArray(j) = CInt(mapper(nextArray(j)).Average)
+                End If
+            Next
+        Next
+
+        Dim tester As Integer
+        For i = 0 To nextArray.Count - 1
+            If nextArray(i) <> 0 Then
+                tester += 1
+                nextArray(i) = tester
+                Exit For
+            End If
+        Next
+
+        Dim histogram As cv.Mat
+        histogram = cv.Mat.FromPixelData(nextArray.Count, 1, cv.MatType.CV_32F, nextArray)
+        dst1 = fLessHist.backProjectHistArray(histogram)
+        dst0 = Palettize(dst1, 0)
+
+        Dim bp1 = CType(fLessHist.bpArray.Clone, Single())
+
+        histogram = fLessHist.histogram
+        dst3 = fLessHist.backProjectHistArray(histogram)
         dst2 = Palettize(dst3, 0)
 
-        labels(3) = CStr(floodPoints.Count) + " clusters were identified."
+        Dim bp2 = CType(fLessHist.bpArray.Clone, Single())
+
+        Dim count As Integer
+        For i = 0 To bp2.Count - 1
+            If bp2(i) = 0 And bp1(i) = 0 Then Continue For
+            If bp2(i) > 0 And bp1(i) > 0 Then Continue For
+            count += 1
+        Next
+
+        histArray0 = nextArray
     End Sub
 End Class
 
