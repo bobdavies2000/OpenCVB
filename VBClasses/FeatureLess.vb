@@ -953,7 +953,7 @@ Public Class FeatureLess_Mapper : Inherits TaskParent
         ' logHistArray(nextArray)
 
         Static histArray0() As Single = nextArray
-        If task.optionsChanged Then histArray0 = nextArray
+        If task.heartBeatLT Then histArray0 = nextArray
         Dim histList = nextArray.ToList
 
         Dim mapper As New List(Of List(Of Integer))
@@ -963,6 +963,7 @@ Public Class FeatureLess_Mapper : Inherits TaskParent
 
         For i = 0 To task.histogramBins - 1
             For j = task.histogramBins * i To task.histogramBins * (i + 1) - 1
+                ' This is for new histogram entries that were not in the previous histogram
                 If histArray0(j) = 0 And nextArray(j) <> 0 Then
                     mapper.Add(New List(Of Integer))
                     mapper(mapper.Count - 1).Add(nextArray(j))
@@ -975,42 +976,19 @@ Public Class FeatureLess_Mapper : Inherits TaskParent
         For i = 0 To task.histogramBins - 1
             For j = task.histogramBins * i To task.histogramBins * (i + 1) - 1
                 If nextArray(j) = 0 Then Continue For
+                ' This test removes histogram entries that were in the previous histogram but are there no longer.
                 If mapper(nextArray(j)).Count > 0 Then
                     nextArray(j) = CInt(mapper(nextArray(j)).Average)
                 End If
             Next
         Next
 
-        Dim tester As Integer
-        For i = 0 To nextArray.Count - 1
-            If nextArray(i) <> 0 Then
-                tester += 1
-                nextArray(i) = tester
-                Exit For
-            End If
-        Next
-
-        Dim histogram As cv.Mat
-        histogram = cv.Mat.FromPixelData(nextArray.Count, 1, cv.MatType.CV_32F, nextArray)
-        dst1 = fLessHist.backProjectHistArray(histogram)
-        dst0 = Palettize(dst1, 0)
-
-        Dim bp1 = CType(fLessHist.bpArray.Clone, Single())
-
-        histogram = fLessHist.histogram
+        Dim histogram = cv.Mat.FromPixelData(task.histogramBins, task.histogramBins, cv.MatType.CV_32F, nextArray)
         dst3 = fLessHist.backProjectHistArray(histogram)
         dst2 = Palettize(dst3, 0)
 
-        Dim bp2 = CType(fLessHist.bpArray.Clone, Single())
-
-        Dim count As Integer
-        For i = 0 To bp2.Count - 1
-            If bp2(i) = 0 And bp1(i) = 0 Then Continue For
-            If bp2(i) > 0 And bp1(i) > 0 Then Continue For
-            count += 1
-        Next
-
-        histArray0 = nextArray
+        labels(2) = CStr(mapper.Count) + " cluster flood points in the histogram and " + CStr(fLessHist.bpArray.Count) +
+                    " non-zero grid rects."
     End Sub
 End Class
 
