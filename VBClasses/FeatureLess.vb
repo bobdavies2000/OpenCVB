@@ -901,17 +901,24 @@ Public Class FeatureLess_ClustersHist2D : Inherits TaskParent
                 End If
             Next
         Next
+        Dim histArray(histogram.Rows * histogram.Cols - 1) As Single
+        histogram.GetArray(Of Single)(histArray)
+        'Dim histlist = histArray.ToList()
+        'histlist(histlist.IndexOf(histlist.Max)) = 1
+        ' histogram = cv.Mat.FromPixelData(histlist.Count, 1, cv.MatType.CV_32S, histlist.ToArray)
+
+        Dim mm = GetMinMax(histogram)
+        '  histogram.Set(Of Single)(mm.maxLoc.Y, mm.maxLoc.X, 1)
 
         Dim backP As New cv.Mat
         cv.Cv2.CalcBackProject({features}, {0, 1}, histogram, backP, plotHist.ranges)
-        Dim histArray(histogram.Rows * histogram.Cols - 1) As Single
-        backP.GetArray(Of Single)(histArray)
+        Dim bpArray(histogram.Rows * histogram.Cols - 1) As Single
+        backP.GetArray(Of Single)(bpArray)
 
         dst3.SetTo(0)
         For i = 0 To fLess.rectList.Count - 1
             Dim r = fLess.rectList(i)
-
-            dst3(r).SetTo(histArray(i))
+            dst3(r).SetTo(bpArray(i))
         Next
 
         dst2 = Palettize(dst3, 0)

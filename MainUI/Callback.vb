@@ -117,9 +117,9 @@ Namespace MainApp
                                        Dim tmp As cv.Mat
                                        For i = 0 To pics.Count - 1
                                            tmp = vbc.task.dstList(i).Clone
-                                           tmp.Rectangle(vbc.task.drawRect, task.highlight, 1)
+                                           tmp.Rectangle(vbc.task.drawRect, task.highlight, task.lineWidth)
                                            If vbc.task.pixelViewerRect.Width > 0 Then
-                                               tmp.Rectangle(vbc.task.pixelViewerRect, task.highlight, 1)
+                                               tmp.Rectangle(vbc.task.pixelViewerRect, task.highlight, task.lineWidth)
                                            End If
                                            tmp = tmp.Resize(New cv.Size(settings.displayRes.Width, settings.displayRes.Height))
                                            If pics(i).Image IsNot Nothing Then pics(i).Image.Dispose()
