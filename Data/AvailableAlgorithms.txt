@@ -252,7 +252,7 @@ FeatureFlow_LucasKanade
 FeatureLess_Basics
 FeatureLess_BasicsMotion
 FeatureLess_Cells
-FeatureLess_Clusters
+FeatureLess_ClusterFlood
 FeatureLess_ClustersHist2D
 FeatureLess_Correlation
 FeatureLess_FeatureLines
@@ -261,6 +261,7 @@ FeatureLess_LeftRight
 FeatureLess_Lines
 FeatureLess_Mapper
 FeatureLess_NotImages
+FeatureLess_Predict
 FeatureLess_RedColor
 FeatureLess_Stabilized
 FeatureLess_ToList
@@ -549,6 +550,7 @@ Mesh_BasicsInput
 ML_Basics
 ML_FeatureLess
 ML_FeatureLess_Grid
+ML_RandomForest
 ML_RemoveDups_CPP
 ModNet_Basics
 Moments_Basics

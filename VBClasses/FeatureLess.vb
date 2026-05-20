@@ -1,13 +1,11 @@
 Imports System.Diagnostics.Metrics
-Imports System.Threading
-Imports System.Windows.Media
-Imports sl
+Imports System.Windows.Forms.VisualStyles
 Imports cv = OpenCvSharp
 Public Class FeatureLess_Basics : Inherits TaskParent
     Public rectList As New List(Of cv.Rect)
-    Public featureX As New List(Of Single)
-    Public featureY As New List(Of Single)
     Dim edges As New Edge_Canny
+    Public grayMat As cv.Mat
+    Public depthMat As cv.Mat
     Public Sub New()
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         desc = "Identify featureless squares using the gray scale range - see 'Correlation_Basics'."
@@ -18,20 +16,22 @@ Public Class FeatureLess_Basics : Inherits TaskParent
         labels(3) = edges.labels(2)
 
         dst3 = src
-
         dst2.SetTo(0)
         rectList.Clear()
-        featureX.Clear()
-        featureY.Clear()
+        Dim featureGray As New List(Of Single)
+        Dim featureDepth As New List(Of Single)
         For Each r In task.gridRects
             If edges.dst2(r).CountNonZero > 0 Then Continue For
             dst2(r).SetTo(255)
             dst3.Rectangle(r, white, task.lineWidth)
             rectList.Add(r)
 
-            featureX.Add(src(r).Mean()(0))
-            featureY.Add(task.pcSplit(2)(r).Mean(task.depthmask(r))(0))
+            featureGray.Add(src(r).Mean()(0))
+            featureDepth.Add(task.pcSplit(2)(r).Mean(task.depthmask(r))(0))
         Next
+
+        grayMat = cv.Mat.FromPixelData(featureGray.Count, 1, cv.MatType.CV_32F, featureGray.ToArray())
+        depthMat = cv.Mat.FromPixelData(featureDepth.Count, 1, cv.MatType.CV_32F, featureDepth.ToArray())
 
         labels(2) = CStr(rectList.Count) + " featureless grid squares"
     End Sub
@@ -742,53 +742,8 @@ End Class
 
 
 
-Public Class FeatureLess_Clusters : Inherits TaskParent
-    Dim fLess As New FeatureLess_Basics
-    Public floodPoints As New List(Of cv.Point)
-    Public Sub New()
-
-        desc = "Identify the clusters in the FeatureLess_Basics output"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        fLess.Run(task.gray)
-        dst2 = fLess.dst2.Clone
-        labels(2) = fLess.labels(2)
-
-        floodPoints.Clear()
-        For i = 0 To task.gridRects.Count - 1
-            Dim r = task.gridRects(i)
-            Dim val = dst2.Get(Of Byte)(r.TopLeft.Y, r.TopLeft.X)
-            If val = 255 Then
-                Dim floodCount = dst2.FloodFill(r.TopLeft, floodPoints.Count + 1)
-                floodPoints.Add(r.TopLeft)
-                If floodPoints.Count >= 254 Then Exit For
-            End If
-        Next
-
-        If standaloneTest() Then dst3 = Palettize(dst2, 0)
-
-        If standalone Then
-            Static clusterID As Byte
-            clusterID = dst2.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X)
-
-            If clusterID > 0 Then
-                dst0 = dst2.Clone
-                dst0.FloodFill(task.clickPoint, 255)
-                dst0 = dst0.Threshold(254, 255, cv.ThresholdTypes.Binary)
-                task.color.SetTo(white, dst0)
-            End If
-        End If
-        labels(3) = CStr(floodPoints.Count - 1) + " clusters were found "
-    End Sub
-End Class
-
-
-
-
-
-
 Public Class FeatureLess_ToList : Inherits TaskParent
-    Dim clusters As New FeatureLess_Clusters
+    Dim clusters As New FeatureLess_ClusterFlood
     Public clusterX As New List(Of List(Of Integer))
     Public clusterY As New List(Of List(Of Integer))
     Public rcList As New List(Of rcData)
@@ -863,9 +818,89 @@ End Class
 
 
 
+Public Class FeatureLess_Mapper : Inherits TaskParent
+    Dim fLessHist As New FeatureLess_ClustersHist2D
+    Public Sub New()
+        desc = "Match the histArray to the original histArray as much as possible."
+    End Sub
+    Private Sub logHistArray(histArray() As Single)
+        For i = 0 To task.histogramBins - 1
+            Debug.Write(CStr(i) + vbTab)
+            For j = task.histogramBins * i To task.histogramBins * (i + 1) - 1
+                Debug.Write(CStr(histArray(j)) + ", ")
+            Next
+            Debug.WriteLine("")
+        Next
+        Debug.WriteLine("---------------------")
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        fLessHist.Run(task.gray)
+        Dim nextArray() = CType(fLessHist.histArray.Clone, Single())
+        ' logHistArray(nextArray)
+
+        Static histArray0() As Single = nextArray
+        If task.heartBeatLT Then histArray0 = nextArray
+        Dim histList = nextArray.ToList
+
+        Dim histogram = cv.Mat.FromPixelData(task.histogramBins, task.histogramBins, cv.MatType.CV_32F, nextArray)
+        dst3 = fLessHist.backProjectHistArray(histogram)
+        dst2 = Palettize(dst3, 0)
+
+        labels(2) = CStr(histList.Max) + " cluster flood points in the histogram and " + CStr(fLessHist.bpArray.Count) +
+                    " non-zero grid rects."
+    End Sub
+End Class
+
+
+
+
+
+Public Class FeatureLess_ClusterFlood : Inherits TaskParent
+    Dim fLess As New FeatureLess_Basics
+    Public floodPoints As New List(Of cv.Point)
+    Public Sub New()
+        desc = "Identify the clusters in the FeatureLess_Basics output"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        fLess.Run(task.gray)
+        dst2 = fLess.dst2.Clone
+        labels(2) = fLess.labels(2)
+
+        floodPoints.Clear()
+        For i = 0 To task.gridRects.Count - 1
+            Dim r = task.gridRects(i)
+            Dim val = dst2.Get(Of Byte)(r.TopLeft.Y, r.TopLeft.X)
+            If val = 255 Then
+                Dim floodCount = dst2.FloodFill(r.TopLeft, floodPoints.Count + 1)
+                floodPoints.Add(r.TopLeft)
+                If floodPoints.Count >= 254 Then Exit For
+            End If
+        Next
+
+        If standaloneTest() Then dst3 = Palettize(dst2, 0)
+
+        If standalone Then
+            Static clusterID As Byte
+            clusterID = dst2.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X)
+
+            If clusterID > 0 Then
+                dst0 = dst2.Clone
+                dst0.FloodFill(task.clickPoint, 255)
+                dst0 = dst0.Threshold(254, 255, cv.ThresholdTypes.Binary)
+                task.color.SetTo(white, dst0)
+            End If
+        End If
+        labels(3) = CStr(floodPoints.Count - 1) + " clusters were found "
+    End Sub
+End Class
+
+
+
+
+
 
 Public Class FeatureLess_ClustersHist2D : Inherits TaskParent
-    Dim fLess As New FeatureLess_Basics
+    Public fLess As New FeatureLess_Basics
     Dim plotHist As New PlotBar_Histogram2D
     Public histArray(task.histogramBins * task.histogramBins - 1) As Single
     Public floodPoints As New List(Of cv.Point)
@@ -891,14 +926,10 @@ Public Class FeatureLess_ClustersHist2D : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         fLess.Run(task.gray)
 
-        Dim xInput = cv.Mat.FromPixelData(fLess.featureX.Count, 1, cv.MatType.CV_32F,
-                                          fLess.featureX.ToArray())
-        Dim yInput = cv.Mat.FromPixelData(fLess.featureY.Count, 1, cv.MatType.CV_32F,
-                                          fLess.featureY.ToArray())
-        Dim mmX = GetMinMax(xInput)
+        Dim mmX = GetMinMax(fLess.grayMat)
         plotHist.ranges = {New cv.Rangef(mmX.minVal - 0.01, 255.01), New cv.Rangef(0, task.MaxZmeters)}
 
-        cv.Cv2.Merge({xInput, yInput}, features)
+        cv.Cv2.Merge({fLess.grayMat, fLess.depthMat}, features)
         plotHist.Run(features)
 
         histogram = plotHist.histogram.Threshold(0, 255, cv.ThresholdTypes.Binary)
@@ -932,63 +963,56 @@ End Class
 
 
 
-Public Class FeatureLess_Mapper : Inherits TaskParent
-    Dim fLessHist As New FeatureLess_ClustersHist2D
+Public Class FeatureLess_Predict : Inherits TaskParent
+    Dim ml As New ML_RandomForest
+    Dim edges As New Edge_Canny
+    Dim flessHist As New FeatureLess_ClustersHist2D
+    Dim histArray(task.histogramBins * task.histogramBins - 1) As Single
     Public Sub New()
-        desc = "Match the histArray to the original histArray as much as possible."
-    End Sub
-    Private Sub logHistArray(histArray() As Single)
-        For i = 0 To task.histogramBins - 1
-            Debug.Write(CStr(i) + vbTab)
-            For j = task.histogramBins * i To task.histogramBins * (i + 1) - 1
-                Debug.Write(CStr(histArray(j)) + ", ")
-            Next
-            Debug.WriteLine("")
-        Next
-        Debug.WriteLine("---------------------")
+        desc = "Use edges, depth, color, and location to predict featureless regions."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        fLessHist.Run(task.gray)
-        Dim nextArray() = CType(fLessHist.histArray.Clone, Single())
-        ' logHistArray(nextArray)
+        If src.Channels <> 1 Then src = task.gray
 
-        Static histArray0() As Single = nextArray
-        If task.heartBeatLT Then histArray0 = nextArray
-        Dim histList = nextArray.ToList
+        Dim rows = task.gridRects.Count
+        Dim trainLabels(rows - 1) As Single
+        If task.heartBeat Then
+            flessHist.Run(task.gray)
+            flessHist.histogram.GetArray(Of Single)(histArray)
+        End If
 
-        Dim mapper As New List(Of List(Of Integer))
-        For i = 0 To histList.Max
-            mapper.Add(New List(Of Integer))
+        edges.Run(src)
+
+        If rows = 0 Then Exit Sub
+        Dim flat(rows * 5 - 1) As Single
+        Dim index As Integer
+        Dim i As Integer = 0
+        For Each r In task.gridRects
+            flat(index) = edges.dst2(r).CountNonZero
+            flat(index + 1) = src(r).Mean()(0)
+            flat(index + 2) = task.pcSplit(2)(r).Mean(task.depthmask(r))(0)
+            flat(index + 3) = CSng(r.TopLeft.X)
+            flat(index + 4) = CSng(r.TopLeft.Y)
+            ' 1 = featureless (no edges in cell), 0 = has features — same rule as FeatureLess_Basics
+            trainLabels(i) = If(flat(index) = 0, 1.0F, 0.0F)
+            index += 5
+            i += 1
         Next
 
-        For i = 0 To task.histogramBins - 1
-            For j = task.histogramBins * i To task.histogramBins * (i + 1) - 1
-                ' This is for new histogram entries that were not in the previous histogram
-                If histArray0(j) = 0 And nextArray(j) <> 0 Then
-                    mapper.Add(New List(Of Integer))
-                    mapper(mapper.Count - 1).Add(nextArray(j))
-                Else
-                    mapper(nextArray(j)).Add(histArray0(j))
+        ml.trainMat = cv.Mat.FromPixelData(rows, 5, cv.MatType.CV_32F, flat)
+        ml.trainResponse = cv.Mat.FromPixelData(rows, 1, cv.MatType.CV_32F, trainLabels)
+        ml.testMat = ml.trainMat.Clone()
+
+        ml.Run(emptyMat)
+
+        If standaloneTest() Then
+            dst2.SetTo(0)
+            For j = 0 To rows - 1
+                If ml.predictions.Get(Of Single)(j, 0) >= 0.5 Then
+                    dst2(task.gridRects(j)).SetTo(255)
                 End If
             Next
-        Next
-
-        For i = 0 To task.histogramBins - 1
-            For j = task.histogramBins * i To task.histogramBins * (i + 1) - 1
-                If nextArray(j) = 0 Then Continue For
-                ' This test removes histogram entries that were in the previous histogram but are there no longer.
-                If mapper(nextArray(j)).Count > 0 Then
-                    nextArray(j) = CInt(mapper(nextArray(j)).Average)
-                End If
-            Next
-        Next
-
-        Dim histogram = cv.Mat.FromPixelData(task.histogramBins, task.histogramBins, cv.MatType.CV_32F, nextArray)
-        dst3 = fLessHist.backProjectHistArray(histogram)
-        dst2 = Palettize(dst3, 0)
-
-        labels(2) = CStr(mapper.Count) + " cluster flood points in the histogram and " + CStr(fLessHist.bpArray.Count) +
-                    " non-zero grid rects."
+            labels(2) = CStr(rows) + " grid cells predicted"
+        End If
     End Sub
 End Class
-
