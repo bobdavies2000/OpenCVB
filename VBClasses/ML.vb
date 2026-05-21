@@ -734,17 +734,12 @@ Public Class ML_RandomForest : Inherits TaskParent
         desc = "Run RandomForest on the provided inputs..."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If trainMat.Empty OrElse trainResponse.Empty Then Exit Sub
         Dim nSamples = trainMat.Rows
         Dim varCount = trainMat.Cols
-        If nSamples = 0 Or varCount = 0 Then Exit Sub
-        If trainResponse.Rows <> nSamples Or trainResponse.Cols <> 1 Then
+        If trainResponse.Rows <> nSamples Then
             SetTrueText("ML_RandomForest: trainResponse must be " + CStr(nSamples) + "x1 (one label per row of trainMat).")
             Exit Sub
         End If
-
-        Dim responseMat = trainResponse
-        Dim respFormat = cv.MatType.CV_32F
 
         rtrees.MinSampleCount = 2
         rtrees.MaxDepth = 4
@@ -756,17 +751,10 @@ Public Class ML_RandomForest : Inherits TaskParent
         rtrees.ActiveVarCount = varCount
         rtrees.TermCriteria = cv.TermCriteria.Both(5, 0)
 
-        If responseMat.Type <> respFormat Then
-            responseMat = responseMat.Clone()
-            responseMat.ConvertTo(responseMat, respFormat)
-        End If
-        rtrees.Train(trainMat, cv.ML.SampleTypes.RowSample, responseMat)
-
-        ' training data is prepared on every heartbeat - no need to predict it on the heartbeat.
-        rtrees.Predict(testMat, predictions)
-
-        If predictions.Type <> cv.MatType.CV_32F Then
-            predictions.ConvertTo(predictions, cv.MatType.CV_32F)
+        If task.heartBeatLT Then
+            rtrees.Train(trainMat, cv.ML.SampleTypes.RowSample, trainResponse)
+        Else
+            rtrees.Predict(testMat, predictions)
         End If
     End Sub
     Protected Overrides Sub Finalize()

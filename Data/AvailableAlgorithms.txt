@@ -259,7 +259,6 @@ FeatureLess_FeatureLines
 FeatureLess_Features
 FeatureLess_LeftRight
 FeatureLess_Lines
-FeatureLess_Mapper
 FeatureLess_NotImages
 FeatureLess_Predict
 FeatureLess_PredictOld
