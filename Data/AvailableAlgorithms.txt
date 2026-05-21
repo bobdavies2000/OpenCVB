@@ -262,6 +262,7 @@ FeatureLess_Lines
 FeatureLess_Mapper
 FeatureLess_NotImages
 FeatureLess_Predict
+FeatureLess_PredictOld
 FeatureLess_RedColor
 FeatureLess_Stabilized
 FeatureLess_ToList

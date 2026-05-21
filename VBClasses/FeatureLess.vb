@@ -1,8 +1,8 @@
 Imports System.Diagnostics.Metrics
-Imports System.Windows.Forms.VisualStyles
 Imports cv = OpenCvSharp
 Public Class FeatureLess_Basics : Inherits TaskParent
     Public rectList As New List(Of cv.Rect)
+    Public rectIndex As New List(Of integer)
     Dim edges As New Edge_Canny
     Public grayMat As cv.Mat
     Public depthMat As cv.Mat
@@ -18,13 +18,16 @@ Public Class FeatureLess_Basics : Inherits TaskParent
         dst3 = src
         dst2.SetTo(0)
         rectList.Clear()
+        rectIndex.Clear()
         Dim featureGray As New List(Of Single)
         Dim featureDepth As New List(Of Single)
-        For Each r In task.gridRects
+        For i = 0 To task.gridRects.Count - 1
+            Dim r = task.gridRects(i)
             If edges.dst2(r).CountNonZero > 0 Then Continue For
             dst2(r).SetTo(255)
             dst3.Rectangle(r, white, task.lineWidth)
             rectList.Add(r)
+            rectIndex.Add(i)
 
             featureGray.Add(src(r).Mean()(0))
             featureDepth.Add(task.pcSplit(2)(r).Mean(task.depthmask(r))(0))
@@ -921,6 +924,7 @@ Public Class FeatureLess_ClustersHist2D : Inherits TaskParent
         For i = 0 To fLess.rectList.Count - 1
             dst(fLess.rectList(i)).SetTo(bpArray(i))
         Next
+
         Return dst
     End Function
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -948,14 +952,13 @@ Public Class FeatureLess_ClustersHist2D : Inherits TaskParent
 
         histogram.GetArray(Of Single)(histArray)
 
-        If standalone Then
-            dst3 = backProjectHistArray(histogram)
-            dst2 = Palettize(dst3, 0)
-        End If
+        dst3 = backProjectHistArray(histogram)
+        Dim clusterCount = GetMinMax(dst3).maxVal - 1
+        dst2 = Palettize(dst3, 0)
 
         plotHist.labels(2) = "X scale is mean grayscale color and the Y scale is mean depth."
-        labels(2) = CStr(floodPoints.Count) + " clusters were found for the " + fLess.labels(2)
-        labels(3) = CStr(floodPoints.Count) + " clusters were identified."
+        labels(2) = CStr(clusterCount) + " clusters were found for the " + fLess.labels(2)
+        labels(3) = CStr(clusterCount) + " clusters were identified."
     End Sub
 End Class
 
@@ -963,11 +966,11 @@ End Class
 
 
 
-Public Class FeatureLess_Predict : Inherits TaskParent
+Public Class FeatureLess_PredictOld : Inherits TaskParent
     Dim ml As New ML_RandomForest
     Dim edges As New Edge_Canny
     Dim flessHist As New FeatureLess_ClustersHist2D
-    Dim histArray(task.histogramBins * task.histogramBins - 1) As Single
+    Public clusters() As Single
     Public Sub New()
         desc = "Use edges, depth, color, and location to predict featureless regions."
     End Sub
@@ -976,9 +979,15 @@ Public Class FeatureLess_Predict : Inherits TaskParent
 
         Dim rows = task.gridRects.Count
         Dim trainLabels(rows - 1) As Single
+        Dim i As Integer = 0
         If task.heartBeat Then
             flessHist.Run(task.gray)
-            flessHist.histogram.GetArray(Of Single)(histArray)
+
+            ReDim clusters(task.gridRects.Count - 1)
+            For i = 0 To flessHist.fLess.rectIndex.Count - 1
+                Dim bpIndex = flessHist.fLess.rectIndex(i)
+                clusters(bpIndex) = flessHist.bpArray(i)
+            Next
         End If
 
         edges.Run(src)
@@ -986,7 +995,6 @@ Public Class FeatureLess_Predict : Inherits TaskParent
         If rows = 0 Then Exit Sub
         Dim flat(rows * 5 - 1) As Single
         Dim index As Integer
-        Dim i As Integer = 0
         For Each r In task.gridRects
             flat(index) = edges.dst2(r).CountNonZero
             flat(index + 1) = src(r).Mean()(0)
@@ -1013,6 +1021,101 @@ Public Class FeatureLess_Predict : Inherits TaskParent
                 End If
             Next
             labels(2) = CStr(rows) + " grid cells predicted"
+        End If
+    End Sub
+End Class
+
+
+
+
+
+Public Class FeatureLess_Predict : Inherits TaskParent
+    Dim ml As New ML_RandomForest
+    Dim edges As New Edge_Canny
+    Public clusters() As Single
+    Public Sub New()
+        desc = "Use edges, depth, color, and location to predict featureless regions."
+    End Sub
+    Public Function backProjectHistArray(histogram As cv.Mat) As cv.Mat
+        Dim backP As New cv.Mat
+        cv.Cv2.CalcBackProject({features}, {0, 1}, histogram, backP, plotHist.ranges)
+        ReDim bpArray(histogram.Rows * histogram.Cols - 1)
+        backP.GetArray(Of Single)(bpArray)
+
+        Dim dst As New cv.Mat(task.workRes, cv.MatType.CV_8U, 0)
+        For i = 0 To fLess.rectList.Count - 1
+            dst(fLess.rectList(i)).SetTo(bpArray(i))
+        Next
+
+        Return dst
+    End Function
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        If src.Channels <> 1 Then src = task.gray
+
+        Dim rectCount = task.gridRects.Count
+        Dim trainLabels(rectCount - 1) As Single
+        Dim i As Integer = 0
+        Dim histogram As New cv.Mat
+        Dim mmX = GetMinMax(src)
+        Dim ranges = {New cv.Rangef(mmX.minVal - 0.01, 255.01), New cv.Rangef(0, task.MaxZmeters)}
+        If task.heartBeat Then
+            Dim bins = task.histogramBins
+            cv.Cv2.CalcHist({src}, {0, 1}, New cv.Mat(), histogram, 2, {bins, bins}, ranges)
+
+            histogram = histogram.Threshold(0, 255, cv.ThresholdTypes.Binary)
+            Dim floodCount As Integer = 1
+            For y = 0 To histogram.Height - 1
+                For x = 0 To histogram.Width - 1
+                    Dim pt = New cv.Point(x, y)
+                    Dim val = histogram.Get(Of Single)(y, x)
+                    If val = 255 Then
+                        histogram.FloodFill(pt, floodCount)
+                        floodCount += 1
+                        If floodCount >= 254 Then Exit For
+                    End If
+                Next
+            Next
+
+            dst3 = backProjectHistArray(histogram)
+
+            'ReDim clusters(task.gridRects.Count - 1)
+            'For i = 0 To flessHist.fLess.rectIndex.Count - 1
+            '    Dim bpIndex = flessHist.fLess.rectIndex(i)
+            '    clusters(bpIndex) = flessHist.bpArray(i)
+            'Next
+        End If
+
+        edges.Run(src)
+
+        If rectCount = 0 Then Exit Sub
+        Dim flat(rectCount * 5 - 1) As Single
+        Dim index As Integer
+        For Each r In task.gridRects
+            flat(index) = edges.dst2(r).CountNonZero
+            flat(index + 1) = src(r).Mean()(0)
+            flat(index + 2) = task.pcSplit(2)(r).Mean(task.depthmask(r))(0)
+            flat(index + 3) = CSng(r.TopLeft.X)
+            flat(index + 4) = CSng(r.TopLeft.Y)
+            ' 1 = featureless (no edges in cell), 0 = has features — same rule as FeatureLess_Basics
+            trainLabels(i) = If(flat(index) = 0, 1.0F, 0.0F)
+            index += 5
+            i += 1
+        Next
+
+        ml.trainMat = cv.Mat.FromPixelData(rectCount, 5, cv.MatType.CV_32F, flat)
+        ml.trainResponse = cv.Mat.FromPixelData(rectCount, 1, cv.MatType.CV_32F, trainLabels)
+        ml.testMat = ml.trainMat.Clone()
+
+        ml.Run(emptyMat)
+
+        If standaloneTest() Then
+            dst2.SetTo(0)
+            For j = 0 To rectCount - 1
+                If ml.predictions.Get(Of Single)(j, 0) >= 0.5 Then
+                    dst2(task.gridRects(j)).SetTo(255)
+                End If
+            Next
+            labels(2) = CStr(rectCount) + " grid cells predicted"
         End If
     End Sub
 End Class
