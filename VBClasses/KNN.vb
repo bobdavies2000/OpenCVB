@@ -1010,7 +1010,6 @@ Public Class KNN_NNBasics : Inherits TaskParent
     Public trainInput As New List(Of Single) ' put training data here
     Public queries As New List(Of Single) ' put Query data here
     Public result(,) As Integer ' Get results here...
-    Dim messageSent As Boolean
     Public neighbors As New cv.Mat
     Public options As New Options_KNN
     Public Sub New()
@@ -1026,11 +1025,6 @@ Public Class KNN_NNBasics : Inherits TaskParent
             Exit Sub
         End If
 
-        If options.knnDimension = 0 Then
-            If messageSent = False Then MessageBox.Show("The KNN dimension needs to be set for the general purpose KNN_Basics to start")
-            Exit Sub
-        End If
-
         Dim qRows = CInt(queries.Count / options.knnDimension)
         If qRows = 0 Then
             SetTrueText("There were no queries provided.  There is nothing to do...")
@@ -1040,9 +1034,9 @@ Public Class KNN_NNBasics : Inherits TaskParent
         Dim queryMat = cv.Mat.FromPixelData(qRows, options.knnDimension, cv.MatType.CV_32F, queries.ToArray)
 
         Dim trainData = cv.Mat.FromPixelData(trainInput.Count \ options.knnDimension,
-                                                  options.knnDimension, cv.MatType.CV_32F, trainInput.ToArray)
+                                             options.knnDimension, cv.MatType.CV_32F, trainInput.ToArray)
         Dim response = cv.Mat.FromPixelData(trainData.Rows, 1, cv.MatType.CV_32S,
-                                                 Enumerable.Range(start:=0, trainData.Rows).ToArray)
+                                            Enumerable.Range(start:=0, trainData.Rows).ToArray)
 
         knn.Train(trainData, cv.ML.SampleTypes.RowSample, response)
         Dim dm = trainInput.Count
@@ -1055,6 +1049,53 @@ Public Class KNN_NNBasics : Inherits TaskParent
                 If test < trainInput.Count And test >= 0 Then result(i, j) = neighbors.Get(Of Single)(i, j)
             Next
         Next
+    End Sub
+    Protected Overrides Sub Finalize()
+        If knn IsNot Nothing Then knn.Dispose()
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class KNN_NNBasicsRaw : Inherits TaskParent
+    Implements IDisposable
+    Public knn As cv.ML.KNearest
+    Public result(,) As Integer ' Get results here...
+    Public queryMat As New cv.Mat
+    Public trainMat As New cv.Mat
+    Public dimension As Integer
+    Dim neighbors As New cv.Mat
+    Public Sub New()
+        knn = cv.ML.KNearest.Create()
+        desc = "Generalize the use knn with X input points.  Find the nearest requested neighbors."
+    End Sub
+    Public Sub runTestData()
+        knn.FindNearest(queryMat, trainMat.Rows, New cv.Mat, neighbors)
+
+        ReDim result(neighbors.Rows - 1, neighbors.Cols - 1)
+        For i = 0 To neighbors.Rows - 1
+            For j = 0 To neighbors.Cols - 1
+                result(i, j) = neighbors.Get(Of Single)(i, j)
+            Next
+        Next
+    End Sub
+    Public Function runQueryBest(query As cv.Mat) As Integer
+        knn.FindNearest(query, trainMat.Rows, New cv.Mat, neighbors)
+        Return neighbors.Get(Of Single)(0, 0)
+    End Function
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        Dim responseList As IEnumerable(Of Integer) = Enumerable.Range(0, 10).Select(Function(x) x)
+        If standaloneTest() Then
+            SetTrueText("There is no output for the " + traceName + " algorithm when run standaloneTest().  Use the " + traceName + "_Test algorithm")
+            Exit Sub
+        End If
+
+        Dim response = cv.Mat.FromPixelData(trainMat.Rows, 1, cv.MatType.CV_32S, Enumerable.Range(start:=0, trainMat.Rows).ToArray)
+
+        knn.Train(trainMat, cv.ML.SampleTypes.RowSample, response)
     End Sub
     Protected Overrides Sub Finalize()
         If knn IsNot Nothing Then knn.Dispose()

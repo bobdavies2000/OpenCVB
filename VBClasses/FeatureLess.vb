@@ -1,19 +1,16 @@
-Imports System.Drawing.Imaging
 Imports System.Runtime.InteropServices
-Imports System.Windows.Documents
+Imports OpenCvSharp
 Imports cv = OpenCvSharp
 Public Class FeatureLess_Basics : Inherits TaskParent
     Public rectList As New List(Of cv.Rect)
     Public rectIndex As New List(Of Integer)
     Dim edges As New Edge_Canny
-    Public grayMat As cv.Mat
-    Public depthMat As cv.Mat
     Public Sub New()
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         desc = "Identify featureless squares using the gray scale range - see 'Correlation_Basics'."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If src.Channels <> 1 Then src = task.gray
+        If src.Channels <> 1 Then src = task.gray.Clone
         edges.Run(src)
         labels(3) = edges.labels(2)
 
@@ -21,8 +18,6 @@ Public Class FeatureLess_Basics : Inherits TaskParent
         dst2.SetTo(0)
         rectList.Clear()
         rectIndex.Clear()
-        Dim featureGray As New List(Of Single)
-        Dim featureDepth As New List(Of Single)
         For i = 0 To task.gridRects.Count - 1
             Dim r = task.gridRects(i)
             If edges.dst2(r).CountNonZero > 0 Then Continue For
@@ -30,13 +25,7 @@ Public Class FeatureLess_Basics : Inherits TaskParent
             dst3.Rectangle(r, white, task.lineWidth)
             rectList.Add(r)
             rectIndex.Add(i)
-
-            featureGray.Add(src(r).Mean()(0))
-            featureDepth.Add(task.pcSplit(2)(r).Mean(task.depthmask(r))(0))
         Next
-
-        grayMat = cv.Mat.FromPixelData(featureGray.Count, 1, cv.MatType.CV_32F, featureGray.ToArray())
-        depthMat = cv.Mat.FromPixelData(featureDepth.Count, 1, cv.MatType.CV_32F, featureDepth.ToArray())
 
         labels(2) = CStr(rectList.Count) + " featureless grid squares"
     End Sub
@@ -870,64 +859,64 @@ End Class
 
 
 
-Public Class FeatureLess_ClustersHist2D : Inherits TaskParent
-    Public fLess As New FeatureLess_Basics
-    Public histArray(task.histogramBins * task.histogramBins - 1) As Single
-    Public features As New cv.Mat
-    Public bpArray() As Single
-    Public Sub New()
-        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
-        desc = "Isolate clusters using a 2D histogram"
-    End Sub
-    Public Function backProjectHistArray(histogram As cv.Mat, ranges() As cv.Rangef) As cv.Mat
-        Dim backP As New cv.Mat
-        cv.Cv2.CalcBackProject({features}, {0, 1}, histogram, backP, ranges)
-        ReDim bpArray(histogram.Rows * histogram.Cols - 1)
-        backP.GetArray(Of Single)(bpArray)
+'Public Class FeatureLess_ClustersHist2D : Inherits TaskParent
+'    Public fLess As New FeatureLess_Basics
+'    Public histArray(task.histogramBins * task.histogramBins - 1) As Single
+'    Public features As New cv.Mat
+'    Public bpArray() As Single
+'    Public Sub New()
+'        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
+'        desc = "Isolate clusters using a 2D histogram"
+'    End Sub
+'    Public Function backProjectHistArray(histogram As cv.Mat, ranges() As cv.Rangef) As cv.Mat
+'        Dim backP As New cv.Mat
+'        cv.Cv2.CalcBackProject({features}, {0, 1}, histogram, backP, ranges)
+'        ReDim bpArray(histogram.Rows * histogram.Cols - 1)
+'        backP.GetArray(Of Single)(bpArray)
 
-        Dim dst As New cv.Mat(task.workRes, cv.MatType.CV_8U, 0)
-        For i = 0 To fLess.rectList.Count - 1
-            dst(fLess.rectList(i)).SetTo(bpArray(i))
-        Next
+'        Dim dst As New cv.Mat(task.workRes, cv.MatType.CV_8U, 0)
+'        For i = 0 To fLess.rectList.Count - 1
+'            dst(fLess.rectList(i)).SetTo(bpArray(i))
+'        Next
 
-        Return dst
-    End Function
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        fLess.Run(task.gray)
+'        Return dst
+'    End Function
+'    Public Overrides Sub RunAlg(src As cv.Mat)
+'        fLess.Run(task.gray)
 
-        Dim mmX = GetMinMax(fLess.grayMat)
-        Dim ranges() As cv.Rangef = {New cv.Rangef(mmX.minVal - 0.01, 255.01), New cv.Rangef(0, task.MaxZmeters)}
+'        Dim mmX = GetMinMax(fLess.grayMat)
+'        Dim ranges() As cv.Rangef = {New cv.Rangef(mmX.minVal - 0.01, 255.01), New cv.Rangef(0, task.MaxZmeters)}
 
-        cv.Cv2.Merge({fLess.grayMat, fLess.depthMat}, features)
+'        cv.Cv2.Merge({fLess.grayMat, fLess.depthMat}, features)
 
-        Dim histogram As New cv.Mat
-        Dim bins = task.histogramBins
-        cv.Cv2.CalcHist({features}, {0, 1}, New cv.Mat(), histogram, 2, {bins, bins}, ranges)
+'        Dim histogram As New cv.Mat
+'        Dim bins = task.histogramBins
+'        cv.Cv2.CalcHist({features}, {0, 1}, New cv.Mat(), histogram, 2, {bins, bins}, ranges)
 
-        histogram = histogram.Threshold(0, 255, cv.ThresholdTypes.Binary)
-        Dim floodIndex As Integer = 1
-        For y = 0 To histogram.Height - 1
-            For x = 0 To histogram.Width - 1
-                Dim pt = New cv.Point(x, y)
-                Dim val = histogram.Get(Of Single)(y, x)
-                If val = 255 Then
-                    histogram.FloodFill(pt, floodIndex)
-                    floodIndex += 1
-                    If floodIndex >= 254 Then Exit For
-                End If
-            Next
-        Next
+'        histogram = histogram.Threshold(0, 255, cv.ThresholdTypes.Binary)
+'        Dim floodIndex As Integer = 1
+'        For y = 0 To histogram.Height - 1
+'            For x = 0 To histogram.Width - 1
+'                Dim pt = New cv.Point(x, y)
+'                Dim val = histogram.Get(Of Single)(y, x)
+'                If val = 255 Then
+'                    histogram.FloodFill(pt, floodIndex)
+'                    floodIndex += 1
+'                    If floodIndex >= 254 Then Exit For
+'                End If
+'            Next
+'        Next
 
-        histogram.GetArray(Of Single)(histArray)
+'        histogram.GetArray(Of Single)(histArray)
 
-        dst3 = backProjectHistArray(histogram, ranges)
-        Dim clusterCount = GetMinMax(dst3).maxVal - 1
-        dst2 = Palettize(dst3, 0)
+'        dst3 = backProjectHistArray(histogram, ranges)
+'        Dim clusterCount = GetMinMax(dst3).maxVal - 1
+'        dst2 = Palettize(dst3, 0)
 
-        labels(2) = CStr(clusterCount) + " clusters were found for the " + "X scale is mean grayscale color and the Y scale is mean depth."
-        labels(3) = CStr(clusterCount) + " clusters were identified."
-    End Sub
-End Class
+'        labels(2) = CStr(clusterCount) + " clusters were found for the " + "X scale is mean grayscale color and the Y scale is mean depth."
+'        labels(3) = CStr(clusterCount) + " clusters were identified."
+'    End Sub
+'End Class
 
 
 
@@ -1057,13 +1046,13 @@ Public Class FeatureLess_PredictIndex : Inherits TaskParent
         dst1 = dst2.Threshold(0, 255, cv.ThresholdTypes.BinaryInv)
         labels(2) = feat.labels(2)
 
-        Dim features = cv.Mat.FromPixelData(feat.idList.Count, feat.inputVariableCount, cv.MatType.CV_32F, feat.flat.ToArray)
+        Dim features = cv.Mat.FromPixelData(feat.idList.Count, feat.inputVariableCount, cv.MatType.CV_32F, feat.featureList.ToArray)
 
         Dim singleEntry(feat.inputVariableCount * 2 - 1) As Single
         Static saveIDList As List(Of Single)
         Static savefeatures As List(Of Single)
         If task.heartBeatLT Then
-            savefeatures = feat.flat
+            savefeatures = feat.featureList
             saveIDList = feat.idList
             ml.trainMat = features
             ml.trainResponse = cv.Mat.FromPixelData(feat.idList.Count, 1, cv.MatType.CV_32F, feat.idList.ToArray)
@@ -1073,7 +1062,7 @@ Public Class FeatureLess_PredictIndex : Inherits TaskParent
             ' ml.testMat = features
 
             For i = 0 To feat.inputVariableCount * 2 - 1
-                singleEntry(i) = Math.Floor(feat.flat(i))
+                singleEntry(i) = Math.Floor(feat.featureList(i))
             Next
 
             ml.testMat = cv.Mat.FromPixelData(2, feat.inputVariableCount, cv.MatType.CV_32F, singleEntry)
@@ -1108,37 +1097,42 @@ End Class
 
 Public Class FeatureLess_Features : Inherits TaskParent
     Dim fLess As New FeatureLess_Basics
-    Public flat As New List(Of Single)
+    Public featureList As New List(Of Single)
     Public idList As New List(Of Single)
-    Public inputVariableCount As Integer = 3
+    Public inputVariableCount As Integer = 2
     Public Sub New()
         desc = "Expanded floodfill usage for the featureLess image."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        fLess.Run(task.gray)
+        fLess.Run(task.gray.Clone)
         dst2 = fLess.dst2
 
         Dim rect As New cv.Rect
         Dim mask = New cv.Mat(New cv.Size(dst2.Width + 2, dst2.Height + 2), cv.MatType.CV_8U, 0)
         Dim flags = cv.FloodFillFlags.FixedRange Or (255 << 8)
         Dim index As Integer = 1
-        flat.Clear()
+        featureList.Clear()
         idList.Clear()
+        Dim minSize = task.gridWH * task.gridWH
         For Each r In task.gridRects
             If dst2.Get(Of Byte)(r.TopLeft.Y, r.TopLeft.X) = 255 Then
-                idList.Add(CSng(index))
                 Dim Count = cv.Cv2.FloodFill(dst2, mask, r.TopLeft, index, rect, 0, 0, flags)
-                index += 1
-                flat.Add(src(r).Mean()(0) / 255)
-                flat.Add(task.pcSplit(2)(r).Mean(task.depthmask(r))(0) / task.MaxZmeters)
-                flat.Add(Count / src.Total)
-                'flat.Add(rect.X)
-                'flat.Add(rect.Y)
-                'flat.Add(rect.Width)
-                'flat.Add(rect.Height)
-                'flat.Add(-1)
-                'flat.Add(r.TopLeft.X)
-                'flat.Add(r.TopLeft.Y)
+                If Count > minSize Then
+                    Dim rMask = mask(rect).InRange(index, index)
+
+                    idList.Add(CSng(index))
+                    featureList.Add(src(rect).Mean(rMask)(0))
+                    rMask.SetTo(0, task.noDepthMask(rect))
+                    featureList.Add(task.pcSplit(2)(rect).Mean(rMask)(0))
+                    'featureList.Add(Count)
+                    'featureList.Add(rect.X)
+                    'featureList.Add(rect.Y)
+                    'featureList.Add(rect.Width)
+                    'featureList.Add(rect.Height)
+                    index += 1
+                Else
+                    dst2(r).SetTo(0)
+                End If
             End If
         Next
 
@@ -1150,59 +1144,41 @@ End Class
 
 
 
-'Public Class FeatureLess_IndexKNN : Inherits TaskParent
-'    Dim feat As New FeatureLess_Features
-'    Dim knn As New KNN_Basics
-'    Public Sub New()
-'        desc = "Predict the index for each featureLess region using the features Mat."
-'    End Sub
-'    Public Overrides Sub RunAlg(src As cv.Mat)
-'        feat.Run(task.gray)
-'        dst2 = feat.dst2
-'        dst1 = dst2.Threshold(0, 255, cv.ThresholdTypes.BinaryInv)
-'        labels(2) = feat.labels(2)
+Public Class FeatureLess_IndexKNN : Inherits TaskParent
+    Dim feat As New FeatureLess_Features
+    Dim knn As New KNN_NNBasicsRaw
+    Public Sub New()
+        task.gOptions.DebugCheckBox.Checked = True
+        knn.dimension = feat.inputVariableCount
+        desc = "Predict the index for each featureLess region using the features Mat."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        feat.Run(task.gray.Clone)
+        dst2 = feat.dst2
+        labels(2) = feat.labels(2)
 
-'        Dim features = cv.Mat.FromPixelData(feat.idList.Count, feat.inputVariableCount, cv.MatType.CV_32F, feat.flat.ToArray)
+        Dim queries = cv.Mat.FromPixelData(feat.featureList.Count \ knn.dimension, knn.dimension, cv.MatType.CV_32F, feat.featureList.ToArray)
+        Cv2.Normalize(queries, queries, 0, 1, NormTypes.MinMax)
 
-'        Dim singleEntry(feat.inputVariableCount * 2 - 1) As Single
-'        Static saveIDList As List(Of Single)
-'        Static savefeatures As List(Of Single)
-'        If task.heartBeatLT Then
-'            savefeatures = feat.flat
-'            saveIDList = feat.idList
-'            ml.trainMat = features
-'            ml.trainResponse = cv.Mat.FromPixelData(feat.idList.Count, 1, cv.MatType.CV_32F, feat.idList.ToArray)
-'            ml.predictions = ml.trainResponse.Clone
-'            dst3 = feat.dst3
-'        Else
-'            ' ml.testMat = features
+        If task.gOptions.DebugCheckBox.Checked Then
+            task.gOptions.DebugCheckBox.Checked = False
+            Dim train = cv.Mat.FromPixelData(queries.Rows, knn.dimension, cv.MatType.CV_32F, feat.featureList.ToArray)
+            Cv2.Normalize(train, knn.trainMat, 0, 1, NormTypes.MinMax)
+            knn.Run(emptyMat)
+            dst3 = feat.dst3
+        Else
+            Dim colors(255) As cv.Vec3b
+            colors(0) = New cv.Vec3b
 
-'            For i = 0 To feat.inputVariableCount * 2 - 1
-'                singleEntry(i) = Math.Floor(feat.flat(i))
-'            Next
+            For i = 0 To feat.idList.Count - 1
+                Dim newIndex = knn.runQueryBest(queries.Row(i))
+                colors(i + 1) = task.vecColors(newIndex)
+            Next
 
-'            ml.testMat = cv.Mat.FromPixelData(2, feat.inputVariableCount, cv.MatType.CV_32F, singleEntry)
-'        End If
+            Dim colorMap = cv.Mat.FromPixelData(256, 1, cv.MatType.CV_8UC3, colors)
+            cv.Cv2.ApplyColorMap(dst2, dst3, colorMap)
+        End If
 
-'        ml.Run(emptyMat)
-
-'        Dim tmp(ml.testMat.Rows - 1) As Single
-'        Dim predictions(ml.testMat.Rows - 1) As Integer
-
-'        Marshal.Copy(ml.predictions.Data, tmp, 0, tmp.Length)
-'        For i = 0 To predictions.Count - 1
-'            predictions(i) = CInt(tmp(i))
-'        Next
-
-'        'Dim colors(255) As cv.Vec3b
-'        'Dim maxClass As Integer
-'        'For i = 0 To ml.predictions.Rows - 1
-'        '    colors(i) = task.vecColors(predictions(i))
-'        '    If predictions(i) > maxClass Then maxClass = predictions(i)
-'        'Next
-
-'        'Dim colorMap = cv.Mat.FromPixelData(256, 1, cv.MatType.CV_8UC3, colors)
-'        'cv.Cv2.ApplyColorMap(dst2, dst3, colorMap)
-'        'dst3.SetTo(0, dst1)
-'    End Sub
-'End Class
+        labels(2) = CStr(knn.trainMat.Rows) + " featureless clusters were found."
+    End Sub
+End Class

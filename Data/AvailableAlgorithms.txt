@@ -253,11 +253,11 @@ FeatureLess_Basics
 FeatureLess_BasicsMotion
 FeatureLess_Cells
 FeatureLess_ClusterFlood
-FeatureLess_ClustersHist2D
 FeatureLess_Correlation
 FeatureLess_FeatureLines
 FeatureLess_Features
 FeatureLess_FeaturesOld
+FeatureLess_IndexKNN
 FeatureLess_LeftRight
 FeatureLess_Lines
 FeatureLess_NotImages
@@ -444,6 +444,7 @@ KNN_N2Basics
 KNN_N3Basics
 KNN_N4Basics
 KNN_NNBasics
+KNN_NNBasicsRaw
 KNN_NormalizedBasics
 KNN_OneToOne
 LaneFinder_Basics
