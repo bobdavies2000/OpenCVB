@@ -867,6 +867,7 @@ End Class
 
 
 
+
 Public Class FeatureLess_ClustersHist2D : Inherits TaskParent
     Public fLess As New FeatureLess_Basics
     Public histArray(task.histogramBins * task.histogramBins - 1) As Single
@@ -963,7 +964,7 @@ Public Class FeatureLess_Predict : Inherits TaskParent
         edges.Run(src)
 
         Dim rectCount = task.gridRects.Count
-        Dim inputVariableCount As Integer = 5
+        Dim inputVariableCount As Integer = 3
         Dim flat(rectCount * inputVariableCount - 1) As Single
         Dim colorDepth As New List(Of Single)
         Dim edgeCounts As New List(Of Integer)
@@ -979,8 +980,8 @@ Public Class FeatureLess_Predict : Inherits TaskParent
                 colorDepth.Add(flat(index + 1))
             End If
             flat(index + 2) = edgeCount
-            flat(index + 3) = CSng(r.TopLeft.X)
-            flat(index + 4) = CSng(r.TopLeft.Y)
+            'flat(index + 3) = CSng(r.TopLeft.X)
+            'flat(index + 4) = CSng(r.TopLeft.Y)
             index += inputVariableCount
         Next
 

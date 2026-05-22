@@ -1,7 +1,3 @@
-Imports System.Windows.Forms
-Imports System.IO
-Imports System.Threading
-Imports System.Runtime.InteropServices
 Module Startup
     <STAThread()>
     Sub Main()
