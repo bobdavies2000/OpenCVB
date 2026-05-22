@@ -1,8 +1,10 @@
-Imports System.Diagnostics.Metrics
+Imports System.Drawing.Imaging
+Imports System.Runtime.InteropServices
+Imports System.Windows.Documents
 Imports cv = OpenCvSharp
 Public Class FeatureLess_Basics : Inherits TaskParent
     Public rectList As New List(Of cv.Rect)
-    Public rectIndex As New List(Of integer)
+    Public rectIndex As New List(Of Integer)
     Dim edges As New Edge_Canny
     Public grayMat As cv.Mat
     Public depthMat As cv.Mat
@@ -651,7 +653,7 @@ End Class
 
 
 
-Public Class FeatureLess_Features : Inherits TaskParent
+Public Class FeatureLess_FeaturesOld : Inherits TaskParent
     Dim feat As New Feature_Basics
     Dim fLess As New FeatureLess_Basics
     Public Sub New()
@@ -903,7 +905,6 @@ Public Class FeatureLess_ClustersHist2D : Inherits TaskParent
         cv.Cv2.CalcHist({features}, {0, 1}, New cv.Mat(), histogram, 2, {bins, bins}, ranges)
 
         histogram = histogram.Threshold(0, 255, cv.ThresholdTypes.Binary)
-
         Dim floodIndex As Integer = 1
         For y = 0 To histogram.Height - 1
             For x = 0 To histogram.Width - 1
@@ -1038,3 +1039,170 @@ Public Class FeatureLess_Predict : Inherits TaskParent
         labels(2) = CStr(maxClass) + " grid cell clusters found with prediction."
     End Sub
 End Class
+
+
+
+
+
+
+Public Class FeatureLess_PredictIndex : Inherits TaskParent
+    Dim feat As New FeatureLess_Features
+    Dim ml As New ML_RandomForest
+    Public Sub New()
+        desc = "Predict the index for each featureLess region using the features Mat."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        feat.Run(task.gray)
+        dst2 = feat.dst2
+        dst1 = dst2.Threshold(0, 255, cv.ThresholdTypes.BinaryInv)
+        labels(2) = feat.labels(2)
+
+        Dim features = cv.Mat.FromPixelData(feat.idList.Count, feat.inputVariableCount, cv.MatType.CV_32F, feat.flat.ToArray)
+
+        Dim singleEntry(feat.inputVariableCount * 2 - 1) As Single
+        Static saveIDList As List(Of Single)
+        Static savefeatures As List(Of Single)
+        If task.heartBeatLT Then
+            savefeatures = feat.flat
+            saveIDList = feat.idList
+            ml.trainMat = features
+            ml.trainResponse = cv.Mat.FromPixelData(feat.idList.Count, 1, cv.MatType.CV_32F, feat.idList.ToArray)
+            ml.predictions = ml.trainResponse.Clone
+            dst3 = feat.dst3
+        Else
+            ' ml.testMat = features
+
+            For i = 0 To feat.inputVariableCount * 2 - 1
+                singleEntry(i) = Math.Floor(feat.flat(i))
+            Next
+
+            ml.testMat = cv.Mat.FromPixelData(2, feat.inputVariableCount, cv.MatType.CV_32F, singleEntry)
+        End If
+
+        ml.Run(emptyMat)
+
+        Dim tmp(ml.testMat.Rows - 1) As Single
+        Dim predictions(ml.testMat.Rows - 1) As Integer
+
+        Marshal.Copy(ml.predictions.Data, tmp, 0, tmp.Length)
+        For i = 0 To predictions.Count - 1
+            predictions(i) = CInt(tmp(i))
+        Next
+
+        'Dim colors(255) As cv.Vec3b
+        'Dim maxClass As Integer
+        'For i = 0 To ml.predictions.Rows - 1
+        '    colors(i) = task.vecColors(predictions(i))
+        '    If predictions(i) > maxClass Then maxClass = predictions(i)
+        'Next
+
+        'Dim colorMap = cv.Mat.FromPixelData(256, 1, cv.MatType.CV_8UC3, colors)
+        'cv.Cv2.ApplyColorMap(dst2, dst3, colorMap)
+        'dst3.SetTo(0, dst1)
+    End Sub
+End Class
+
+
+
+
+
+Public Class FeatureLess_Features : Inherits TaskParent
+    Dim fLess As New FeatureLess_Basics
+    Public flat As New List(Of Single)
+    Public idList As New List(Of Single)
+    Public inputVariableCount As Integer = 3
+    Public Sub New()
+        desc = "Expanded floodfill usage for the featureLess image."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        fLess.Run(task.gray)
+        dst2 = fLess.dst2
+
+        Dim rect As New cv.Rect
+        Dim mask = New cv.Mat(New cv.Size(dst2.Width + 2, dst2.Height + 2), cv.MatType.CV_8U, 0)
+        Dim flags = cv.FloodFillFlags.FixedRange Or (255 << 8)
+        Dim index As Integer = 1
+        flat.Clear()
+        idList.Clear()
+        For Each r In task.gridRects
+            If dst2.Get(Of Byte)(r.TopLeft.Y, r.TopLeft.X) = 255 Then
+                idList.Add(CSng(index))
+                Dim Count = cv.Cv2.FloodFill(dst2, mask, r.TopLeft, index, rect, 0, 0, flags)
+                index += 1
+                flat.Add(src(r).Mean()(0) / 255)
+                flat.Add(task.pcSplit(2)(r).Mean(task.depthmask(r))(0) / task.MaxZmeters)
+                flat.Add(Count / src.Total)
+                'flat.Add(rect.X)
+                'flat.Add(rect.Y)
+                'flat.Add(rect.Width)
+                'flat.Add(rect.Height)
+                'flat.Add(-1)
+                'flat.Add(r.TopLeft.X)
+                'flat.Add(r.TopLeft.Y)
+            End If
+        Next
+
+        dst3 = Palettize(dst2, 0)
+
+        labels(2) = CStr(index) + " regions were found."
+    End Sub
+End Class
+
+
+
+'Public Class FeatureLess_IndexKNN : Inherits TaskParent
+'    Dim feat As New FeatureLess_Features
+'    Dim knn As New KNN_Basics
+'    Public Sub New()
+'        desc = "Predict the index for each featureLess region using the features Mat."
+'    End Sub
+'    Public Overrides Sub RunAlg(src As cv.Mat)
+'        feat.Run(task.gray)
+'        dst2 = feat.dst2
+'        dst1 = dst2.Threshold(0, 255, cv.ThresholdTypes.BinaryInv)
+'        labels(2) = feat.labels(2)
+
+'        Dim features = cv.Mat.FromPixelData(feat.idList.Count, feat.inputVariableCount, cv.MatType.CV_32F, feat.flat.ToArray)
+
+'        Dim singleEntry(feat.inputVariableCount * 2 - 1) As Single
+'        Static saveIDList As List(Of Single)
+'        Static savefeatures As List(Of Single)
+'        If task.heartBeatLT Then
+'            savefeatures = feat.flat
+'            saveIDList = feat.idList
+'            ml.trainMat = features
+'            ml.trainResponse = cv.Mat.FromPixelData(feat.idList.Count, 1, cv.MatType.CV_32F, feat.idList.ToArray)
+'            ml.predictions = ml.trainResponse.Clone
+'            dst3 = feat.dst3
+'        Else
+'            ' ml.testMat = features
+
+'            For i = 0 To feat.inputVariableCount * 2 - 1
+'                singleEntry(i) = Math.Floor(feat.flat(i))
+'            Next
+
+'            ml.testMat = cv.Mat.FromPixelData(2, feat.inputVariableCount, cv.MatType.CV_32F, singleEntry)
+'        End If
+
+'        ml.Run(emptyMat)
+
+'        Dim tmp(ml.testMat.Rows - 1) As Single
+'        Dim predictions(ml.testMat.Rows - 1) As Integer
+
+'        Marshal.Copy(ml.predictions.Data, tmp, 0, tmp.Length)
+'        For i = 0 To predictions.Count - 1
+'            predictions(i) = CInt(tmp(i))
+'        Next
+
+'        'Dim colors(255) As cv.Vec3b
+'        'Dim maxClass As Integer
+'        'For i = 0 To ml.predictions.Rows - 1
+'        '    colors(i) = task.vecColors(predictions(i))
+'        '    If predictions(i) > maxClass Then maxClass = predictions(i)
+'        'Next
+
+'        'Dim colorMap = cv.Mat.FromPixelData(256, 1, cv.MatType.CV_8UC3, colors)
+'        'cv.Cv2.ApplyColorMap(dst2, dst3, colorMap)
+'        'dst3.SetTo(0, dst1)
+'    End Sub
+'End Class

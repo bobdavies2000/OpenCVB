@@ -257,10 +257,12 @@ FeatureLess_ClustersHist2D
 FeatureLess_Correlation
 FeatureLess_FeatureLines
 FeatureLess_Features
+FeatureLess_FeaturesOld
 FeatureLess_LeftRight
 FeatureLess_Lines
 FeatureLess_NotImages
 FeatureLess_Predict
+FeatureLess_PredictIndex
 FeatureLess_RedColor
 FeatureLess_Stabilized
 FeatureLess_ToList

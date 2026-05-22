@@ -754,6 +754,7 @@ Public Class ML_RandomForest : Inherits TaskParent
         If task.heartBeatLT Then
             rtrees.Train(trainMat, cv.ML.SampleTypes.RowSample, trainResponse)
         Else
+            predictions = New cv.Mat
             rtrees.Predict(testMat, predictions)
         End If
     End Sub
