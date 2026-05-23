@@ -1099,8 +1099,10 @@ Public Class FeatureLess_Features : Inherits TaskParent
     Dim fLess As New FeatureLess_Basics
     Public featureList As New List(Of Single)
     Public idList As New List(Of Single)
-    Public inputVariableCount As Integer = 2
+    Public inputVariableCount As Integer = 5
+    Public rcList As New List(Of rcData)
     Public Sub New()
+        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         desc = "Expanded floodfill usage for the featureLess image."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -1109,26 +1111,27 @@ Public Class FeatureLess_Features : Inherits TaskParent
 
         Dim rect As New cv.Rect
         Dim mask = New cv.Mat(New cv.Size(dst2.Width + 2, dst2.Height + 2), cv.MatType.CV_8U, 0)
-        Dim flags = cv.FloodFillFlags.FixedRange Or (255 << 8)
         Dim index As Integer = 1
         featureList.Clear()
         idList.Clear()
+        rcList.Clear()
         Dim minSize = task.gridWH * task.gridWH
         For Each r In task.gridRects
             If dst2.Get(Of Byte)(r.TopLeft.Y, r.TopLeft.X) = 255 Then
+                Dim flags = cv.FloodFillFlags.FixedRange Or (index << 8)
                 Dim Count = cv.Cv2.FloodFill(dst2, mask, r.TopLeft, index, rect, 0, 0, flags)
                 If Count > minSize Then
-                    Dim rMask = mask(rect).InRange(index, index)
+                    Dim rc = New rcData(mask(rect), rect, index)
+                    rcList.Add(rc)
 
                     idList.Add(CSng(index))
-                    featureList.Add(src(rect).Mean(rMask)(0))
-                    rMask.SetTo(0, task.noDepthMask(rect))
-                    featureList.Add(task.pcSplit(2)(rect).Mean(rMask)(0))
-                    'featureList.Add(Count)
-                    'featureList.Add(rect.X)
-                    'featureList.Add(rect.Y)
-                    'featureList.Add(rect.Width)
-                    'featureList.Add(rect.Height)
+
+                    featureList.Add(src(rect).Mean(rc.mask)(0))
+                    featureList.Add(rc.wGrid.Z)
+
+                    featureList.Add(rc.pixels)
+                    featureList.Add(rc.maxDist.X)
+                    featureList.Add(rc.maxDist.Y)
                     index += 1
                 Else
                     dst2(r).SetTo(0)
@@ -1148,11 +1151,13 @@ Public Class FeatureLess_IndexKNN : Inherits TaskParent
     Dim feat As New FeatureLess_Features
     Dim knn As New KNN_NNBasicsRaw
     Public Sub New()
-        task.gOptions.DebugCheckBox.Checked = True
         knn.dimension = feat.inputVariableCount
         desc = "Predict the index for each featureLess region using the features Mat."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
+        Dim lastImage = feat.dst2.Clone
+        Dim lastList = New List(Of rcData)(feat.rcList)
+
         feat.Run(task.gray.Clone)
         dst2 = feat.dst2
         labels(2) = feat.labels(2)
@@ -1160,25 +1165,44 @@ Public Class FeatureLess_IndexKNN : Inherits TaskParent
         Dim queries = cv.Mat.FromPixelData(feat.featureList.Count \ knn.dimension, knn.dimension, cv.MatType.CV_32F, feat.featureList.ToArray)
         Cv2.Normalize(queries, queries, 0, 1, NormTypes.MinMax)
 
-        If task.gOptions.DebugCheckBox.Checked Then
-            task.gOptions.DebugCheckBox.Checked = False
+        If task.heartBeat Then
             Dim train = cv.Mat.FromPixelData(queries.Rows, knn.dimension, cv.MatType.CV_32F, feat.featureList.ToArray)
             Cv2.Normalize(train, knn.trainMat, 0, 1, NormTypes.MinMax)
             knn.Run(emptyMat)
-            dst3 = feat.dst3
-        Else
-            Dim colors(255) As cv.Vec3b
-            colors(0) = New cv.Vec3b
-
-            For i = 0 To feat.idList.Count - 1
-                Dim newIndex = knn.runQueryBest(queries.Row(i))
-                colors(i + 1) = task.vecColors(newIndex)
-            Next
-
-            Dim colorMap = cv.Mat.FromPixelData(256, 1, cv.MatType.CV_8UC3, colors)
-            cv.Cv2.ApplyColorMap(dst2, dst3, colorMap)
         End If
 
+        Dim colors(255) As cv.Vec3b
+        colors(0) = New cv.Vec3b
+
+        For Each rc In feat.rcList
+            Dim lastIndex = lastImage.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
+            If lastIndex > 0 And lastIndex < lastList.Count Then
+                rc.indexLast = lastIndex
+                rc.age = lastList(lastIndex).age + 1
+                If rc.age >= 1000 Then rc.age = 10
+                rc.index = lastIndex
+                rc.color = lastList(lastIndex).color
+            End If
+        Next
+
+
+        For i = 0 To feat.idList.Count - 1
+            Dim rc = feat.rcList(i)
+            If rc.indexLast = 0 Then
+                Dim newIndex = knn.runQueryBest(queries.Row(i))
+                colors(i + 1) = task.vecColors(newIndex)
+            Else
+                colors(i + 1) = task.vecColors(rc.index)
+            End If
+            SetTrueText(CStr(rc.age), rc.maxDist, 3)
+        Next
+
+        Dim colorMap = cv.Mat.FromPixelData(256, 1, cv.MatType.CV_8UC3, colors)
+        cv.Cv2.ApplyColorMap(dst2, dst3, colorMap)
+
+        For Each rc In feat.rcList
+            dst3.Rectangle(rc.rect, task.highlight, task.lineWidth)
+        Next
         labels(2) = CStr(knn.trainMat.Rows) + " featureless clusters were found."
     End Sub
 End Class
