@@ -39,8 +39,7 @@ Public Class RedUtil_Basics : Inherits TaskParent
         End If
         Return findCause
     End Function
-    Public Shared Function rcDataMatch(rc As rcData, rcListLast As List(Of rcData),
-                                               rcMapLast As cv.Mat) As rcData
+    Public Shared Function rcDataMatch(rc As rcData, rcListLast As List(Of rcData), rcMapLast As cv.Mat) As rcData
         Dim r1 = rc.rect
         Dim indexLast = rcMapLast.Get(Of Integer)(rc.maxDist.Y, rc.maxDist.X)
 
@@ -138,7 +137,11 @@ Public Class RedUtil_Basics : Inherits TaskParent
     Public Shared Function selectCell(rcMap As cv.Mat, rcList As List(Of rcData)) As String
         Dim clickIndex As Integer = 0, outStr As String = ""
         If rcList.Count > 0 Then
-            clickIndex = rcMap.Get(Of Integer)(task.clickPoint.Y, task.clickPoint.X)
+            If rcMap.Type = cv.MatType.CV_32S Then
+                clickIndex = rcMap.Get(Of Integer)(task.clickPoint.Y, task.clickPoint.X)
+            Else
+                clickIndex = rcMap.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X)
+            End If
             If clickIndex = 0 Then
                 task.rcD = Nothing
                 Return vbCrLf + vbCrLf + "Click anywhere to select a cell for inspection."

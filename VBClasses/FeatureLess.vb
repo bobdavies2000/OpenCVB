@@ -1,4 +1,5 @@
 Imports System.Runtime.InteropServices
+Imports System.Windows.Documents
 Imports OpenCvSharp
 Imports cv = OpenCvSharp
 Public Class FeatureLess_Basics : Inherits TaskParent
@@ -1151,6 +1152,7 @@ Public Class FeatureLess_IndexKNN : Inherits TaskParent
     Dim feat As New FeatureLess_Features
     Dim knn As New KNN_NNBasicsRaw
     Public Sub New()
+        If standalone Then task.gOptions.displayDst1.Checked = True
         knn.dimension = feat.inputVariableCount
         desc = "Predict the index for each featureLess region using the features Mat."
     End Sub
@@ -1175,25 +1177,19 @@ Public Class FeatureLess_IndexKNN : Inherits TaskParent
         colors(0) = New cv.Vec3b
 
         For Each rc In feat.rcList
-            Dim lastIndex = lastImage.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
+            Dim lastIndex = lastImage.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X) - 1
             If lastIndex > 0 And lastIndex < lastList.Count Then
                 rc.indexLast = lastIndex
                 rc.age = lastList(lastIndex).age + 1
                 If rc.age >= 1000 Then rc.age = 10
                 rc.index = lastIndex
-                rc.color = lastList(lastIndex).color
             End If
         Next
 
-
         For i = 0 To feat.idList.Count - 1
             Dim rc = feat.rcList(i)
-            If rc.indexLast = 0 Then
-                Dim newIndex = knn.runQueryBest(queries.Row(i))
-                colors(i + 1) = task.vecColors(newIndex)
-            Else
-                colors(i + 1) = task.vecColors(rc.index)
-            End If
+            Dim newIndex = knn.runQueryBest(queries.Row(i))
+            colors(i + 1) = task.vecColors(newIndex)
             SetTrueText(CStr(rc.age), rc.maxDist, 3)
         Next
 
@@ -1203,6 +1199,10 @@ Public Class FeatureLess_IndexKNN : Inherits TaskParent
         For Each rc In feat.rcList
             dst3.Rectangle(rc.rect, task.highlight, task.lineWidth)
         Next
+
+        strOut = RedUtil_Basics.selectCell(dst2, feat.rcList)
+        SetTrueText(strOut, 1)
+
         labels(2) = CStr(knn.trainMat.Rows) + " featureless clusters were found."
     End Sub
 End Class
