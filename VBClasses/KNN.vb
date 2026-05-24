@@ -8,20 +8,28 @@ Public Class KNN_Basics : Inherits TaskParent
     Public queries As New List(Of cv.Point2f)
     Public neighbors As New List(Of List(Of Integer))
     Public result(,) As Integer ' Get results here...
-    Public desiredMatches As Integer = -1 ' -1 indicates it is to use the number of queries.
     Public Sub New()
         desc = "Default unnormalized KNN with dimension 2"
     End Sub
+    Public Shared Function getResults(nData() As Single, rows As Integer, cols As Integer) As Integer(,)
+        Dim result(rows - 1, cols - 1) As Integer
+        For i = 0 To rows - 1
+            For j = 0 To cols - 1
+                Dim test = nData(i * cols + j)
+                If test < nData.Length And test >= 0 Then result(i, j) = CInt(nData(i * cols + j))
+            Next
+        Next
+        Return result
+    End Function
     Public Overrides Sub RunAlg(src As cv.Mat)
         If standalone Then
-            Static bPoint As New BrickPoint_Basics
-            bPoint.Run(src)
-
-            trainInput.Clear()
-            For Each pt In bPoint.ptList
-                trainInput.Add(New cv.Point2f(pt.X, pt.Y))
-            Next
-            queries = trainInput
+            Static random As New Random_Basics
+            If task.heartBeatLT Then
+                random.Run(src)
+                trainInput = New List(Of cv.Point2f)(random.PointList)
+            End If
+            random.Run(src)
+            queries = New List(Of cv.Point2f)(random.PointList)
         End If
 
         If ptListQuery.Count > 0 Then
@@ -38,17 +46,12 @@ Public Class KNN_Basics : Inherits TaskParent
 
         knn2.trainInput = trainInput
         knn2.queries = queries
-        knn2.desiredMatches = desiredMatches
         knn2.Run(src)
         neighbors = knn2.neighbors
         result = knn2.result
-
-        If standaloneTest() Then
-            dst2 = task.color
-            For Each pt In trainInput
-                dst2.Circle(pt, task.DotSize, cv.Scalar.Red, -1, task.lineType)
-                dst2.Circle(pt, task.DotSize, task.highlight)
-            Next
+        If standalone Then
+            knn2.displayResults()
+            dst2 = knn2.dst2
         End If
     End Sub
 End Class
@@ -64,7 +67,6 @@ Public Class KNN_N2Basics : Inherits TaskParent
     Public queries As New List(Of cv.Point2f) ' put Query data here
     Public neighbors As New List(Of List(Of Integer))
     Public result(,) As Integer ' Get results here...
-    Public desiredMatches As Integer = -1 ' -1 indicates it is to use the number of queries.
     Public Sub New()
         knn = cv.ML.KNearest.Create()
         labels(2) = "Red=TrainingData, yellow = queries"
@@ -110,10 +112,9 @@ Public Class KNN_N2Basics : Inherits TaskParent
         knn.Train(trainData, cv.ML.SampleTypes.RowSample, response)
         Dim neighborMat As New cv.Mat
 
-        Dim dm = If(desiredMatches < 0, trainInput.Count, desiredMatches)
-        knn.FindNearest(queryMat, dm, New cv.Mat, neighborMat)
+        knn.FindNearest(queryMat, trainInput.Count, New cv.Mat, neighborMat)
 
-        Dim nData(queryMat.Rows * dm - 1) As Single
+        Dim nData(queryMat.Rows * trainInput.Count - 1) As Single
         If nData.Length = 0 Then Exit Sub
         Marshal.Copy(neighborMat.Data, nData, 0, nData.Length)
 
@@ -121,6 +122,7 @@ Public Class KNN_N2Basics : Inherits TaskParent
             If Math.Abs(nData(i)) > trainInput.Count Then nData(i) = 0 ' value must be within the range of traininput
         Next
 
+        Dim dm = trainInput.Count
         ReDim result(queryMat.Rows - 1, dm - 1)
         neighbors.Clear()
         For i = 0 To queryMat.Rows - 1
@@ -136,7 +138,8 @@ Public Class KNN_N2Basics : Inherits TaskParent
             Next
             neighbors.Add(res)
         Next
-        If standaloneTest() Then displayResults()
+
+        If standalone Then displayResults()
     End Sub
     Protected Overrides Sub Finalize()
         If knn IsNot Nothing Then knn.Dispose()
@@ -205,7 +208,7 @@ Public Class KNN_N3Basics : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If standaloneTest() Then
-            SetTrueText("There is no output for the " + traceName + " algorithm when run standaloneTest().  Use the " + traceName + "Test algorithm")
+            SetTrueText("There is no output for the " + traceName + " algorithm when run standaloneTest().  Use the KNN_N3BasicsTest.")
             Exit Sub
         End If
 

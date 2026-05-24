@@ -27,7 +27,7 @@ Public Class Neighbor_Basics : Inherits TaskParent
 
         nabs.Clear()
         For Each rc In redC.rcList
-            For i = 0 To Math.Min(knn.neighbors.Count, options.neighbors) - 1
+            For i = 0 To Math.Min(knn.queries.Count, options.neighbors) - 1
                 nabs.Add(knn.neighbors(rc.index - 1)(i))
             Next
         Next

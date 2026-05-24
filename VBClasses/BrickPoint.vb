@@ -391,9 +391,9 @@ Public Class NR_BrickPoint_KNN : Inherits TaskParent
         knn.Run(emptyMat)
 
         lplist.Clear()
-        For i = 0 To knn.neighbors.Count - 1
+        For i = 0 To knn.queries.Count - 1
             Dim p1 = knn.trainInput(i)
-            Dim p2 = knn.trainInput(knn.neighbors(i)(1))
+            Dim p2 = knn.trainInput(knn.result(i, 1))
             dst3.Line(p1, p2, 255, task.lineWidth, task.lineWidth)
             lplist.Add(New lpData(p1, p2))
         Next

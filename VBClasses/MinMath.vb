@@ -73,7 +73,7 @@ Public Class NR_MinMath_KNN : Inherits TaskParent
         knn.Run(emptyMat)
 
         dst2 = src.Clone
-        For i = 0 To knn.neighbors.Count - 1
+        For i = 0 To knn.queries.Count - 1
             Dim p1 = knn.queries(i)
             Dim p2 = knn.queries(knn.neighbors(i)(1))
             dst2.Line(p1, p2, task.highlight, task.lineWidth, task.lineType)

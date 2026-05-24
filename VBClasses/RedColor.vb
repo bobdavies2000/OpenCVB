@@ -507,13 +507,13 @@ Public Class NR_RedColor_FeaturesKNN : Inherits TaskParent
         labels(2) = feat.labels(2)
 
         knn.ptListQuery = New List(Of cv.Point)(feat.features)
+        knn.ptListTrain = New List(Of cv.Point)(feat.features)
         knn.Run(src)
 
-
         dst3 = src.Clone
-        For i = 0 To knn.neighbors.Count - 1
+        For i = 0 To knn.queries.Count - 1
             Dim p1 = knn.ptListQuery(i)
-            Dim index = knn.neighbors(i)(knn.neighbors(i).Count - 1)
+            Dim index = knn.result(i, knn.trainInput.Count - 1)
             If index >= 0 And index < knn.ptListTrain.Count Then
                 Dim p2 = knn.ptListTrain(index)
                 dst3.Circle(p1, task.DotSize, cv.Scalar.Yellow, -1, task.lineType)
@@ -551,7 +551,7 @@ Public Class NR_RedColor_GoodCellInput : Inherits TaskParent
         knn.Run(src)
 
         featureList.Clear()
-        For i = 0 To knn.neighbors.Count - 1
+        For i = 0 To knn.queries.Count - 1
             Dim p1 = knn.queries(i)
             Dim index = knn.neighbors(i)(0) ' find nearest
             If index >= 0 And index < knn.trainInput.Count Then

@@ -104,9 +104,9 @@ Public Class NR_TextureFlow_Bricks : Inherits TaskParent
         knn.queries = New List(Of cv.Point2f)(knn.trainInput)
         knn.Run(emptyMat)
 
-        For i = 0 To knn.neighbors.Count - 1
-            dst3.Line(knn.trainInput(i), knn.trainInput(knn.neighbors(i)(1)), 255, task.lineWidth, task.lineType)
-            dst3.Line(knn.trainInput(i), knn.trainInput(knn.neighbors(i)(2)), 255, task.lineWidth, task.lineType)
+        For i = 0 To knn.queries.Count - 1
+            dst3.Line(knn.trainInput(i), knn.trainInput(knn.result(i, 1)), 255, task.lineWidth, task.lineType)
+            dst3.Line(knn.trainInput(i), knn.trainInput(knn.result(i, 2)), 255, task.lineWidth, task.lineType)
         Next
 
         flow.Run(dst3)

@@ -8583,9 +8583,9 @@ Namespace VBClasses
             knn.Run(emptyMat)
 
             dst3 = task.lines.dst3.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-            For i = 0 To knn.neighbors.Count - 1
+            For i = 0 To knn.queries.Count - 1
                 Dim p1 = knn.queries(i)
-                Dim p2 = knn.trainInput(knn.neighbors(i)(0))
+                Dim p2 = knn.trainInput(knn.result(i, 0))
                 dst3.Line(p1, p2, task.highlight, task.lineWidth + 3, task.lineType)
             Next
 
@@ -15534,7 +15534,6 @@ Namespace VBClasses
         Dim redC As New RedCloud_Basics
         Public matchList As New List(Of cv.Point2f)
         Public Sub New()
-            knn.desiredMatches = 2
             task.gOptions.DebugSlider.Value = 2
             labels(2) = "Use the debugslider to define the maximum distance between 'close' points."
             desc = "Use KNN to connect hulls logically."
