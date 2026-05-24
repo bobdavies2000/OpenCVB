@@ -10,7 +10,10 @@ Public Class KNN_Basics : Inherits TaskParent
     Public Sub New()
         desc = "Default unnormalized KNN with dimension 2"
     End Sub
-    Public Shared Function getResults(nData() As Single, rows As Integer, cols As Integer) As Integer(,)
+    Public Shared Function getResults(neighbors As cv.Mat, rows As Integer, cols As Integer) As Integer(,)
+        Dim nData(rows * cols - 1) As Single
+        Marshal.Copy(neighbors.Data, nData, 0, nData.Length)
+
         Dim result(rows - 1, cols - 1) As Integer
         For i = 0 To rows - 1
             For j = 0 To cols - 1
@@ -107,26 +110,11 @@ Public Class KNN_N2Basics : Inherits TaskParent
         Dim response = cv.Mat.FromPixelData(trainData.Rows, 1, cv.MatType.CV_32S, Enumerable.Range(start:=0, trainData.Rows).ToArray)
 
         knn.Train(trainData, cv.ML.SampleTypes.RowSample, response)
-        Dim neighborMat As New cv.Mat
 
-        knn.FindNearest(queryMat, trainInput.Count, New cv.Mat, neighborMat)
+        Dim neighbors As New cv.Mat
+        knn.FindNearest(queryMat, trainInput.Count, New cv.Mat, neighbors)
 
-        Dim nData(queryMat.Rows * trainInput.Count - 1) As Single
-        If nData.Length = 0 Then Exit Sub
-        Marshal.Copy(neighborMat.Data, nData, 0, nData.Length)
-
-        For i = 0 To nData.Count - 1
-            If Math.Abs(nData(i)) > trainInput.Count Then nData(i) = 0 ' value must be within the range of traininput
-        Next
-
-        Dim dm = trainInput.Count
-        ReDim result(queryMat.Rows - 1, dm - 1)
-        For i = 0 To queryMat.Rows - 1
-            For j = 0 To dm - 1
-                Dim test = nData(i * dm + j)
-                If test < nData.Length And test >= 0 Then result(i, j) = CInt(nData(i * dm + j))
-            Next
-        Next
+        result = KNN_Basics.getResults(neighbors, queryMat.Rows, trainInput.Count)
 
         If standalone Then displayResults()
     End Sub
@@ -213,19 +201,9 @@ Public Class KNN_N3Basics : Inherits TaskParent
         knn.Train(trainData, cv.ML.SampleTypes.RowSample, response)
 
         Dim neighbors As New cv.Mat
-        Dim dm = trainInput.Count
-        knn.FindNearest(queryMat, dm, New cv.Mat, neighbors)
+        knn.FindNearest(queryMat, trainInput.Count, New cv.Mat, neighbors)
 
-        Dim nData(queryMat.Rows * dm - 1) As Single
-        Marshal.Copy(neighbors.Data, nData, 0, nData.Length)
-
-        ReDim result(queryMat.Rows - 1, dm - 1)
-        For i = 0 To queryMat.Rows - 1
-            For j = 0 To dm - 1
-                Dim test = nData(i * dm + j)
-                If test < nData.Length And test >= 0 Then result(i, j) = CInt(nData(i * dm + j))
-            Next
-        Next
+        result = KNN_Basics.getResults(neighbors, queryMat.Rows, trainInput.Count)
     End Sub
     Protected Overrides Sub Finalize()
         If knn IsNot Nothing Then knn.Dispose()
@@ -259,20 +237,11 @@ Public Class KNN_N4Basics : Inherits TaskParent
 
         Dim response = cv.Mat.FromPixelData(trainData.Rows, 1, cv.MatType.CV_32S, Enumerable.Range(start:=0, trainData.Rows).ToArray)
         knn.Train(trainData, cv.ML.SampleTypes.RowSample, response)
+
         Dim neighbors As New cv.Mat
-        Dim dm = trainInput.Count
-        knn.FindNearest(queryMat, dm, New cv.Mat, neighbors)
+        knn.FindNearest(queryMat, trainInput.Count, New cv.Mat, neighbors)
 
-        Dim nData(queryMat.Rows * dm - 1) As Single
-        Marshal.Copy(neighbors.Data, nData, 0, nData.Length)
-
-        ReDim result(queryMat.Rows - 1, dm - 1)
-        For i = 0 To queryMat.Rows - 1
-            For j = 0 To dm - 1
-                Dim test = nData(i * dm + j)
-                If test < nData.Length And test >= 0 Then result(i, j) = CInt(nData(i * dm + j))
-            Next
-        Next
+        result = KNN_Basics.getResults(neighbors, queryMat.Rows, trainInput.Count)
     End Sub
     Protected Overrides Sub Finalize()
         If knn IsNot Nothing Then knn.Dispose()
@@ -1018,16 +987,9 @@ Public Class KNN_NNBasics : Inherits TaskParent
                                             Enumerable.Range(start:=0, trainData.Rows).ToArray)
 
         knn.Train(trainData, cv.ML.SampleTypes.RowSample, response)
-        Dim dm = trainInput.Count
-        knn.FindNearest(queryMat, dm, New cv.Mat, neighbors)
+        knn.FindNearest(queryMat, trainInput.Count, New cv.Mat, neighbors)
 
-        ReDim result(neighbors.Rows - 1, neighbors.Cols - 1)
-        For i = 0 To neighbors.Rows - 1
-            For j = 0 To neighbors.Cols - 1
-                Dim test = neighbors.Get(Of Single)(i, j)
-                If test < trainInput.Count And test >= 0 Then result(i, j) = neighbors.Get(Of Single)(i, j)
-            Next
-        Next
+        result = KNN_Basics.getResults(neighbors, queryMat.Rows, trainInput.Count)
     End Sub
     Protected Overrides Sub Finalize()
         If knn IsNot Nothing Then knn.Dispose()
@@ -1052,15 +1014,8 @@ Public Class KNN_NNBasicsRaw : Inherits TaskParent
         desc = "Generalize the use knn with X input points.  Find the nearest requested neighbors."
     End Sub
     Public Sub runTestData()
-        cv.Cv2.Normalize(queryMat, queryMat, 0, 1, cv.NormTypes.L2)
         knn.FindNearest(queryMat, trainMat.Rows, New cv.Mat, neighbors)
-
-        ReDim result(neighbors.Rows - 1, neighbors.Cols - 1)
-        For i = 0 To neighbors.Rows - 1
-            For j = 0 To neighbors.Cols - 1
-                result(i, j) = neighbors.Get(Of Single)(i, j)
-            Next
-        Next
+        result = KNN_Basics.getResults(neighbors, queryMat.Rows, trainMat.Rows)
     End Sub
     Public Function runQueryBest(query As cv.Mat) As Integer
         knn.FindNearest(query, trainMat.Rows, New cv.Mat, neighbors)
@@ -1075,7 +1030,6 @@ Public Class KNN_NNBasicsRaw : Inherits TaskParent
 
         Dim response = cv.Mat.FromPixelData(trainMat.Rows, 1, cv.MatType.CV_32S, Enumerable.Range(start:=0, trainMat.Rows).ToArray)
 
-        cv.Cv2.Normalize(trainMat, trainMat, 0, 1, cv.NormTypes.L2)
         knn.Train(trainMat, cv.ML.SampleTypes.RowSample, response)
     End Sub
     Protected Overrides Sub Finalize()

@@ -1173,9 +1173,6 @@ Public Class FeatureLess_IndexKNN : Inherits TaskParent
             knn.Run(emptyMat)
         End If
 
-        Dim colors(255) As cv.Vec3b
-        colors(0) = New cv.Vec3b
-
         For Each rc In feat.rcList
             Dim lastIndex = lastImage.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X) - 1
             If lastIndex > 0 And lastIndex < lastList.Count Then
@@ -1186,6 +1183,7 @@ Public Class FeatureLess_IndexKNN : Inherits TaskParent
             End If
         Next
 
+        Dim colors(255) As cv.Vec3b
         For i = 0 To feat.idList.Count - 1
             Dim rc = feat.rcList(i)
             Dim newIndex = knn.runQueryBest(queries.Row(i))
