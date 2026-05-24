@@ -6,7 +6,6 @@ Public Class KNN_Basics : Inherits TaskParent
     Public ptListQuery As New List(Of cv.Point)
     Public trainInput As New List(Of cv.Point2f)
     Public queries As New List(Of cv.Point2f)
-    Public neighbors As New List(Of List(Of Integer))
     Public result(,) As Integer ' Get results here...
     Public Sub New()
         desc = "Default unnormalized KNN with dimension 2"
@@ -47,7 +46,6 @@ Public Class KNN_Basics : Inherits TaskParent
         knn2.trainInput = trainInput
         knn2.queries = queries
         knn2.Run(src)
-        neighbors = knn2.neighbors
         result = knn2.result
         If standalone Then
             knn2.displayResults()
@@ -65,7 +63,6 @@ Public Class KNN_N2Basics : Inherits TaskParent
     Public knn As cv.ML.KNearest
     Public trainInput As New List(Of cv.Point2f) ' put training data here
     Public queries As New List(Of cv.Point2f) ' put Query data here
-    Public neighbors As New List(Of List(Of Integer))
     Public result(,) As Integer ' Get results here...
     Public Sub New()
         knn = cv.ML.KNearest.Create()
@@ -124,19 +121,11 @@ Public Class KNN_N2Basics : Inherits TaskParent
 
         Dim dm = trainInput.Count
         ReDim result(queryMat.Rows - 1, dm - 1)
-        neighbors.Clear()
         For i = 0 To queryMat.Rows - 1
-            Dim pt = queries(i)
-            Dim res = New List(Of Integer)
             For j = 0 To dm - 1
                 Dim test = nData(i * dm + j)
-                If test < nData.Length And test >= 0 Then
-                    result(i, j) = CInt(nData(i * dm + j))
-                    Dim index = nData(i * dm + j)
-                    res.Add(index)
-                End If
+                If test < nData.Length And test >= 0 Then result(i, j) = CInt(nData(i * dm + j))
             Next
-            neighbors.Add(res)
         Next
 
         If standalone Then displayResults()

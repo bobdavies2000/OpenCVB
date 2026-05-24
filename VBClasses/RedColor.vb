@@ -553,7 +553,7 @@ Public Class NR_RedColor_GoodCellInput : Inherits TaskParent
         featureList.Clear()
         For i = 0 To knn.queries.Count - 1
             Dim p1 = knn.queries(i)
-            Dim index = knn.neighbors(i)(0) ' find nearest
+            Dim index = knn.result(i, 0) ' find nearest
             If index >= 0 And index < knn.trainInput.Count Then
                 Dim p2 = knn.trainInput(index)
                 If p1.DistanceTo(p2) < maxDistance Then featureList.Add(p1)

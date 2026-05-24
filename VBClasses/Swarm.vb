@@ -19,12 +19,10 @@ Public Class Swarm_Basics : Inherits TaskParent
         Dim dst = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         Dim queries = knn.queries
         Dim trainInput = knn.trainInput
-        Dim neighbors = knn.neighbors
         For i = 0 To queries.Count - 1
-            Dim nabList = neighbors(i)
             Dim pt = queries(i)
-            For j = 0 To Math.Min(nabList.Count, options.ptCount) - 1
-                Dim ptNew = trainInput(nabList(j))
+            For j = 0 To Math.Min(knn.trainInput.Count, options.ptCount) - 1
+                Dim ptNew = trainInput(knn.result(i, j))
                 dst.Line(pt, ptNew, white, task.lineWidth, task.lineType)
                 If ptNew.X < options.border Then dst.Line(New cv.Point2f(0, ptNew.Y), ptNew, white, task.lineWidth, task.lineType)
                 If ptNew.Y < options.border Then dst.Line(New cv.Point2f(ptNew.X, 0), ptNew, white, task.lineWidth, task.lineType)
@@ -55,8 +53,7 @@ Public Class Swarm_Basics : Inherits TaskParent
         Dim disList As New List(Of Single)
         Dim dirList As New List(Of Single) ' angle in radians
         For i = 0 To knn.queries.Count - 1
-            Dim nabList = knn.neighbors(i)
-            Dim trainIndex = nabList(0) ' index of the matched train input
+            Dim trainIndex = knn.result(i, 0) ' index of the matched train input
             Dim pt = knn.queries(i)
             Dim ptNew = knn.trainInput(trainIndex)
             Dim nextDist = pt.DistanceTo(ptNew)

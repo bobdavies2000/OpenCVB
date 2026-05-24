@@ -75,9 +75,9 @@ Public Class NR_MinMath_KNN : Inherits TaskParent
         dst2 = src.Clone
         For i = 0 To knn.queries.Count - 1
             Dim p1 = knn.queries(i)
-            Dim p2 = knn.queries(knn.neighbors(i)(1))
+            Dim p2 = knn.queries(knn.result(i, 1))
             dst2.Line(p1, p2, task.highlight, task.lineWidth, task.lineType)
-            Dim p3 = knn.queries(knn.neighbors(i)(2))
+            Dim p3 = knn.queries(knn.result(i, 2))
             dst3.Line(p1, p2, task.highlight, task.lineWidth, task.lineType)
         Next
     End Sub

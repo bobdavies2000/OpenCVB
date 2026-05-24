@@ -851,7 +851,7 @@ Public Class Feature_KNN : Inherits TaskParent
         knn.Run(src)
 
         For i = 0 To knn.queries.Count - 1
-            Dim trainIndex = knn.neighbors(i)(0) ' index of the matched train input
+            Dim trainIndex = knn.result(i, 0) ' index of the matched train input
             Dim pt = knn.ptListTrain(trainIndex)
             Dim qPt = feat.features(i)
             If pt.DistanceTo(qPt) > 2 Then knn.ptListTrain(trainIndex) = feat.features(i)
