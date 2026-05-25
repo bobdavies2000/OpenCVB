@@ -159,8 +159,8 @@ End Class
 Public Class KNN_Farthest : Inherits TaskParent
     Public knn As New KNN_Minimal
     Public lpFar As lpData
-    Public trainInput As New List(Of cv.Point2f) ' put training data here
-    Public queries As New List(Of cv.Point2f) ' put Query data here
+    Public trainInput As New List(Of cv.Point2f)
+    Public queries As New List(Of cv.Point2f)
     Public Sub New()
         labels = {"", "", "Lines connecting pairs that are farthest.", "Training Input which is also query input and longest line"}
         desc = "Use KNN to find the farthest point from each query point."
@@ -397,8 +397,10 @@ End Class
 
 
 Public Class KNN_Grid : Inherits TaskParent
-    Dim knn As New XO_KNN_N3Basics
+    Dim knn As New KNN_Minimal
     Dim fLess As New FeatureLess_Basics
+    Public trainInput As New List(Of cv.Point3f)
+    Public queries As New List(Of cv.Point3f)
     Public Sub New()
         desc = "Use FeatureLess_Basics grid elements to define the clusters for all remaining pixels."
     End Sub
@@ -408,29 +410,32 @@ Public Class KNN_Grid : Inherits TaskParent
         labels(2) = fLess.labels(2)
 
         Dim clusters As New List(Of Byte)
-        knn.trainInput.Clear()
-        knn.queries.Clear()
+        trainInput.Clear()
+        queries.Clear()
         For Each r In task.gridRects
             Dim val = fLess.dst2.Get(Of Byte)(r.TopLeft.Y, r.TopLeft.X)
             If val > 0 Then
-                knn.trainInput.Add(New cv.Vec3f(r.TopLeft.X, r.TopLeft.Y, task.gray(r).Mean()(0)))
+                trainInput.Add(New cv.Vec3f(r.TopLeft.X, r.TopLeft.Y, task.gray(r).Mean()(0)))
                 clusters.Add(val)
             Else
                 For y = 0 To r.Height - 1
                     For x = 0 To r.Width - 1
-                        knn.queries.Add(New cv.Vec3f(r.TopLeft.X + x, r.TopLeft.Y + y, task.gray(r).Mean()(0)))
+                        queries.Add(New cv.Vec3f(r.TopLeft.X + x, r.TopLeft.Y + y, task.gray(r).Mean()(0)))
                     Next
                 Next
             End If
         Next
 
+        Dim dimension = 3
+        knn.queryMat = cv.Mat.FromPixelData(queries.Count, dimension, cv.MatType.CV_32F, queries.ToArray)
+        knn.trainMat = cv.Mat.FromPixelData(trainInput.Count, dimension, cv.MatType.CV_32F, trainInput.ToArray)
         knn.Run(emptyMat)
 
-        For i = 0 To knn.queries.Count - 1
+        For i = 0 To queries.Count - 1
             Dim index = knn.result(i, 0)
-            Dim vecTrain = knn.trainInput(index)
+            Dim vecTrain = trainInput(index)
             Dim entry = fLess.dst2.Get(Of Byte)(vecTrain.Y, vecTrain.Z)
-            Dim vecTest = knn.queries(i)
+            Dim vecTest = queries(i)
             dst2.Set(Of Byte)(vecTest.Y, vecTest.X, entry)
         Next
     End Sub
@@ -480,8 +485,8 @@ Public Class KNN_Dimension3 : Inherits TaskParent
     Dim knn As New KNN_Minimal
     Dim dist As New Distance_Point3D
     Dim random As New Random_Basics3D
-    Public trainInput As New List(Of cv.Point3f) ' put training data here
-    Public queries As New List(Of cv.Point3f) ' put Query data here
+    Public trainInput As New List(Of cv.Point3f)
+    Public queries As New List(Of cv.Point3f)
     Public Sub New()
         labels(2) = "Red=TrainingData, yellow = queries, text shows Euclidean distance to that point from query point"
         OptionParent.FindSlider("Random Pixel Count").Value = 100
@@ -545,8 +550,8 @@ Public Class KNN_Dimension4 : Inherits TaskParent
     Dim knn As New KNN_Minimal
     Dim dist As New Distance_Point4D
     Dim random As New Random_Basics4D
-    Public trainInput As New List(Of cv.Vec4f) ' put training data here
-    Public queries As New List(Of cv.Vec4f) ' put Query data here
+    Public trainInput As New List(Of cv.Vec4f)
+    Public queries As New List(Of cv.Vec4f)
     Public Sub New()
         labels(2) = "Red=TrainingData, yellow = queries, text shows Euclidean distance to that point from query point"
         OptionParent.FindSlider("Random Pixel Count").Value = 5
@@ -594,8 +599,8 @@ End Class
 
 Public Class KNN_DimensionN : Inherits TaskParent
     Dim knn As New KNN_Minimal
-    Public trainInput As New List(Of Single) ' put training data here
-    Public queries As New List(Of Single) ' put Query data here
+    Public trainInput As New List(Of Single)
+    Public queries As New List(Of Single)
     Public Sub New()
         labels(2) = "Highlight color (Yellow) is query.  The red dots are the training set."
         desc = "Test the use of the general form KNN_BasicsN algorithm"
@@ -649,8 +654,8 @@ Public Class KNN_FindLine : Inherits TaskParent
     Public inputLine As lpData
     Public closestLine As lpData
     Dim knn As New KNN_Minimal
-    Public trainInput As New List(Of cv.Vec4f) ' put training data here
-    Public queries As New List(Of cv.Vec4f) ' put Query data here
+    Public trainInput As New List(Of cv.Vec4f)
+    Public queries As New List(Of cv.Vec4f)
     Public Sub New()
         queries.Add(New cv.Vec4f)
         knn.standalone = False

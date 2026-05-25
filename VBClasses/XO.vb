@@ -20079,8 +20079,8 @@ Namespace VBClasses
     Public Class XO_KNN_N2Basics : Inherits TaskParent
         Implements IDisposable
         Public knn As cv.ML.KNearest
-        Public trainInput As New List(Of cv.Point2f) ' put training data here
-        Public queries As New List(Of cv.Point2f) ' put Query data here
+        Public trainInput As New List(Of cv.Point2f)
+        Public queries As New List(Of cv.Point2f)
         Public result(,) As Integer ' Get results here...
         Public Sub New()
             knn = cv.ML.KNearest.Create()
@@ -20133,8 +20133,8 @@ Namespace VBClasses
     Public Class XO_KNN_N3Basics : Inherits TaskParent
         Implements IDisposable
         Public knn As cv.ML.KNearest
-        Public trainInput As New List(Of cv.Point3f) ' put training data here
-        Public queries As New List(Of cv.Point3f) ' put Query data here
+        Public trainInput As New List(Of cv.Point3f)
+        Public queries As New List(Of cv.Point3f)
         Public result(,) As Integer ' Get results here...
         Public Sub New()
             knn = cv.ML.KNearest.Create()
@@ -20176,8 +20176,8 @@ Namespace VBClasses
     Public Class XO_KNN_N4Basics : Inherits TaskParent
         Implements IDisposable
         Public knn As cv.ML.KNearest
-        Public trainInput As New List(Of cv.Vec4f) ' put training data here
-        Public queries As New List(Of cv.Vec4f) ' put Query data here
+        Public trainInput As New List(Of cv.Vec4f)
+        Public queries As New List(Of cv.Vec4f)
         Public result(,) As Integer ' Get results here...
         Public Sub New()
             knn = cv.ML.KNearest.Create()
@@ -20219,8 +20219,8 @@ Namespace VBClasses
     Public Class XO_KNN_NNBasics : Inherits TaskParent
         Implements IDisposable
         Public knn As cv.ML.KNearest
-        Public trainInput As New List(Of Single) ' put training data here
-        Public queries As New List(Of Single) ' put Query data here
+        Public trainInput As New List(Of Single)
+        Public queries As New List(Of Single)
         Public result(,) As Integer ' Get results here...
         Public neighbors As New cv.Mat
         Public options As New Options_KNN
@@ -20265,8 +20265,8 @@ Namespace VBClasses
         Dim lpLast As lpData
         Dim lpCurr As New lpData
         Dim knn As New KNN_Minimal
-        Public trainInput As New List(Of cv.Vec4f) ' put training data here
-        Public queries As New List(Of cv.Vec4f) ' put Query data here
+        Public trainInput As New List(Of cv.Vec4f)
+        Public queries As New List(Of cv.Vec4f)
         Public Sub New()
             queries.Add(New cv.Vec4f)
             If standalone Then task.gOptions.displayDst0.Checked = True

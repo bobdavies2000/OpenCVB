@@ -1683,10 +1683,12 @@ End Class
 Public Class Line_TrackV : Inherits TaskParent
     Public lastV As New List(Of lpData)
     Public matchList As New List(Of lpData)
-    Dim knn As New XO_KNN_N4Basics
+    Dim knn As New KNN_Minimal
     Dim match As New Match_Basics
     Dim lastImage As cv.Mat
     Dim verticalLast As New List(Of lpData)
+    Public trainInput As New List(Of cv.Vec4f)
+    Public queries As New List(Of cv.Vec4f)
     Public Sub New()
         labels(3) = "The vertical lines found in the previous heartbeat image."
         desc = "Track the vertical lines on the heartbeat."
@@ -1713,17 +1715,20 @@ Public Class Line_TrackV : Inherits TaskParent
                 dst3.Line(lp.ptE1, lp.ptE2, lp.color, task.lineWidth, cv.LineTypes.Link4)
             Next
 
-            knn.trainInput.Clear()
+            trainInput.Clear()
             For Each lp In verticalLast
-                knn.trainInput.Add(New cv.Vec4f(lp.ptE1.X, lp.ptE1.Y, lp.ptE2.X, lp.ptE2.Y))
+                trainInput.Add(New cv.Vec4f(lp.ptE1.X, lp.ptE1.Y, lp.ptE2.X, lp.ptE2.Y))
             Next
 
             Dim verticalsCurr = getVerticals(task.lines.lpList)
-            knn.queries.Clear()
+            queries.Clear()
             For Each lp In verticalsCurr
-                knn.queries.Add(New cv.Vec4f(lp.ptE1.X, lp.ptE1.Y, lp.ptE2.X, lp.ptE2.Y))
+                queries.Add(New cv.Vec4f(lp.ptE1.X, lp.ptE1.Y, lp.ptE2.X, lp.ptE2.Y))
             Next
 
+            Dim dimension = 4
+            knn.queryMat = cv.Mat.FromPixelData(queries.Count, dimension, cv.MatType.CV_32F, queries.ToArray)
+            knn.trainMat = cv.Mat.FromPixelData(trainInput.Count, dimension, cv.MatType.CV_32F, trainInput.ToArray)
             knn.Run(emptyMat)
 
             matchList.Clear()
@@ -1733,7 +1738,7 @@ Public Class Line_TrackV : Inherits TaskParent
             Dim intersectCount As Integer
             For i = 0 To verticalsCurr.Count - 1
                 Dim lp = verticalsCurr(i)
-                Dim vec = knn.trainInput(knn.result(i, 0))
+                Dim vec = trainInput(knn.result(i, 0))
                 Dim lpPrev = New lpData(New cv.Point2f(vec(0), vec(1)), New cv.Point2f(vec(2), vec(3)))
 
                 If lp.rect.IntersectsWith(lpPrev.rect) Then

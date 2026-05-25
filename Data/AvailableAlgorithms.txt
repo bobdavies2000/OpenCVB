@@ -484,7 +484,6 @@ Line_LeftRightMotion
 Line_LeftTrack
 Line_Longest
 Line_LongestTest
-Line_LongestTestKNN
 Line_Map
 Line_MapRects
 Line_Motion

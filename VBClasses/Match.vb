@@ -664,8 +664,8 @@ End Class
 
 Public Class Match_LinesKNN : Inherits TaskParent
     Dim knn As New KNN_Minimal
-    Public trainInput As New List(Of cv.Vec4f) ' put training data here
-    Public queries As New List(Of cv.Vec4f) ' put Query data here
+    Public trainInput As New List(Of cv.Vec4f)
+    Public queries As New List(Of cv.Vec4f)
     Public Sub New()
         labels(2) = "Match lines on the heartbeat using the line extended to the image edges."
         desc = "Use the 2 points from a line as input to a 4-dimension KNN"

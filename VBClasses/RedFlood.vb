@@ -1,14 +1,15 @@
 Imports System.Runtime.InteropServices
-Imports VBClasses
 Imports cv = OpenCvSharp
 Public Class RedFlood_Basics : Inherits TaskParent
     Public rcList As New List(Of rcData)
     Public rcMap As New cv.Mat(dst2.Size, cv.MatType.CV_32S, 0)
     Dim redMask As New RedFlood_MapAndList
     Dim fLess As New FeatureLess_Basics
-    Dim knn As New XO_KNN_N3Basics
+    Dim knn As New KNN_Minimal
+    Public trainInput As New List(Of cv.Point3f)
+    Public queries As New List(Of cv.Point3f)
     Public Sub New()
-        knn.queries.Add(New cv.Point3f(0, 0, 0)) ' we only need one entry in the queries.
+        queries.Add(New cv.Point3f(0, 0, 0)) ' we only need one entry in the queries.
         If standalone Then task.gOptions.displayDst1.Checked = True
         desc = "Use KNN to identify the previous cell for each current cell"
     End Sub
@@ -22,15 +23,20 @@ Public Class RedFlood_Basics : Inherits TaskParent
         Dim rcListLast As New List(Of rcData)(rcList)
         Dim lastColorMat = dst3.Clone
 
-        knn.trainInput.Clear()
+        trainInput.Clear()
         For Each rc In redMask.rcList
-            knn.trainInput.Add(New cv.Point3f(rc.maxDist.X, rc.maxDist.Y, rc.pixels))
+            trainInput.Add(New cv.Point3f(rc.maxDist.X, rc.maxDist.Y, rc.pixels))
         Next
 
         dst3.SetTo(0)
         For Each rc In redMask.rcList
-            knn.queries(0) = New cv.Point3f(rc.maxDist.X, rc.maxDist.Y, rc.pixels)
+            queries(0) = New cv.Point3f(rc.maxDist.X, rc.maxDist.Y, rc.pixels)
+
+            Dim dimension = 3
+            knn.queryMat = cv.Mat.FromPixelData(queries.Count, dimension, cv.MatType.CV_32F, queries.ToArray)
+            knn.trainMat = cv.Mat.FromPixelData(trainInput.Count, dimension, cv.MatType.CV_32F, trainInput.ToArray)
             knn.Run(emptyMat)
+
             Dim lastIndex = knn.result(0, 0)
             If rcListLast.Count > 0 And lastIndex < rcListLast.Count Then
                 Dim rcLast = rcListLast(lastIndex)
@@ -570,8 +576,8 @@ Public Class NR_RedFlood_KNN : Inherits TaskParent
     Dim fLess As New FeatureLess_Basics
     Dim knn As New KNN_Minimal
     Public fLessGridRects As New List(Of List(Of Integer))
-    Public trainInput As New List(Of cv.Point3f) ' put training data here
-    Public queries As New List(Of cv.Point3f) ' put Query data here
+    Public trainInput As New List(Of cv.Point3f)
+    Public queries As New List(Of cv.Point3f)
     Public Sub New()
         queries.Add(New cv.Point3f)
         If standalone Then task.gOptions.displayDst1.Checked = True
