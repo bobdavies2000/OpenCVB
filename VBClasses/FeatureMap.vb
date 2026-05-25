@@ -426,26 +426,28 @@ Public Class FeatureMap_Info : Inherits TaskParent
             dst2 = fcs.dst2
         End If
 
-        Dim fp = task.fpD
-        strOut = "Feature point: " + fp.pt.ToString + vbCrLf + vbCrLf
-        strOut += "index = " + CStr(fp.index) + vbCrLf
-        strOut += "age (in frames) = " + CStr(fp.age) + vbCrLf
-        strOut += "Facet count = " + CStr(fp.facets.Count) + " facets" + vbCrLf
-        strOut += "ClickPoint = " + task.clickPoint.ToString + vbCrLf + vbCrLf
+        If task.fpD IsNot Nothing Then
+            Dim fp = task.fpD
+            strOut = "Feature point: " + fp.pt.ToString + vbCrLf + vbCrLf
+            strOut += "index = " + CStr(fp.index) + vbCrLf
+            strOut += "age (in frames) = " + CStr(fp.age) + vbCrLf
+            strOut += "Facet count = " + CStr(fp.facets.Count) + " facets" + vbCrLf
+            strOut += "ClickPoint = " + task.clickPoint.ToString + vbCrLf + vbCrLf
 
-        strOut += "brickIndex = " + CStr(fp.brickIndex) + vbCrLf
-        Dim brick = bricks.brickList(fp.brickIndex)
-        strOut += CStr(brick.age) + vbTab + "Age" + vbTab + vbCrLf
-        strOut += Format(brick.correlation, fmt3) + vbTab + "Correlation to right image" + vbCrLf
+            strOut += "brickIndex = " + CStr(fp.brickIndex) + vbCrLf
+            Dim brick = bricks.brickList(fp.brickIndex)
+            strOut += CStr(brick.age) + vbTab + "Age" + vbTab + vbCrLf
+            strOut += Format(brick.correlation, fmt3) + vbTab + "Correlation to right image" + vbCrLf
 
-        strOut += "Depth = " + Format(fp.depth, fmt1)
-        strOut += vbCrLf
-        strOut += "Index " + vbTab + "Facet X" + vbTab + "Facet Y" + vbCrLf
-        For i = 0 To fp.facets.Count - 1
-            strOut += CStr(i) + ":" + vbTab + CStr(fp.facets(i).X) + vbTab + CStr(fp.facets(i).Y) + vbCrLf
-        Next
+            strOut += "Depth = " + Format(fp.depth, fmt1)
+            strOut += vbCrLf
+            strOut += "Index " + vbTab + "Facet X" + vbTab + "Facet Y" + vbCrLf
+            For i = 0 To fp.facets.Count - 1
+                strOut += CStr(i) + ":" + vbTab + CStr(fp.facets(i).X) + vbTab + CStr(fp.facets(i).Y) + vbCrLf
+            Next
 
-        If standalone Then SetTrueText(strOut, 3)
+            If standalone Then SetTrueText(strOut, 3)
+        End If
     End Sub
 End Class
 
@@ -802,7 +804,7 @@ Public Class FeatureMap_CreateList : Inherits TaskParent
             If fp.depth > 0 Then dst3.Circle(fp.pt, task.DotSize, task.highlight, -1, task.lineType)
         Next
 
-        If standalone Then FeatureMap_Basics.fpCellContour(task.fpD, task.color)
+        If standalone And task.fpD IsNot Nothing Then FeatureMap_Basics.fpCellContour(task.fpD, task.color)
         If task.heartBeat Then labels(2) = traceName + ": " + Format(feat.features.Count, "000") + " cells found " +
                                            "using " + task.fOptions.FeatureMethod.Text
     End Sub

@@ -1,5 +1,4 @@
 Imports cv = OpenCvSharp
-Imports VBClasses
 Public Class Convex_Basics : Inherits TaskParent
     Public hull() As cv.Point
     Dim options As New Options_Convex
@@ -21,7 +20,11 @@ Public Class Convex_Basics : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
 
-        Dim hullList = task.rcD.contour
+        Dim hullList As New List(Of cv.Point)
+        If task.rcD IsNot Nothing Then
+            If task.rcD.contour IsNot Nothing Then hullList = task.rcD.contour
+        End If
+
         If standaloneTest() Then
             If Not task.heartBeat Then Exit Sub
             hullList = buildRandomHullPoints()

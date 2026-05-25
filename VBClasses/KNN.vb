@@ -215,43 +215,6 @@ End Class
 
 
 
-Public Class KNN_N4Basics : Inherits TaskParent
-    Implements IDisposable
-    Public knn As cv.ML.KNearest
-    Public trainInput As New List(Of cv.Vec4f) ' put training data here
-    Public queries As New List(Of cv.Vec4f) ' put Query data here
-    Public result(,) As Integer ' Get results here...
-    Public Sub New()
-        knn = cv.ML.KNearest.Create()
-        labels(2) = "Red=TrainingData, yellow = queries, text shows Z distance to that point from query point"
-        desc = "Use knn with the input 4D points in the image.  Find the nearest neighbors."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        Dim KNNdimension = 4
-        Dim queryMat = cv.Mat.FromPixelData(queries.Count, KNNdimension, cv.MatType.CV_32F, queries.ToArray)
-        cv.Cv2.Normalize(queryMat, queryMat, 1, 0, cv.NormTypes.MinMax)
-
-        If trainInput.Count = 0 Then trainInput = New List(Of cv.Vec4f)(queries) ' first pass, just match the queries.
-        Dim trainData = cv.Mat.FromPixelData(trainInput.Count, KNNdimension, cv.MatType.CV_32F, trainInput.ToArray)
-        cv.Cv2.Normalize(trainData, trainData, 1, 0, cv.NormTypes.MinMax)
-
-        Dim response = cv.Mat.FromPixelData(trainData.Rows, 1, cv.MatType.CV_32S, Enumerable.Range(start:=0, trainData.Rows).ToArray)
-        knn.Train(trainData, cv.ML.SampleTypes.RowSample, response)
-
-        Dim neighbors As New cv.Mat
-        knn.FindNearest(queryMat, trainInput.Count, New cv.Mat, neighbors)
-
-        result = KNN_Basics.getResults(neighbors, queryMat.Rows, trainInput.Count)
-    End Sub
-    Protected Overrides Sub Finalize()
-        If knn IsNot Nothing Then knn.Dispose()
-    End Sub
-End Class
-
-
-
-
-
 
 
 Public Class NR_KNN_N3BasicsTest : Inherits TaskParent
@@ -833,33 +796,6 @@ End Class
 
 
 
-Public Class KNN_FindLine : Inherits TaskParent
-    Public inputLine As lpData
-    Public closestLine As lpData
-    Dim knn As New KNN_N4Basics
-    Public Sub New()
-        knn.queries.Add(New cv.Vec4f)
-        desc = "Find the line in task.lines.lpList closest to the requested line"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        If standalone Then inputLine = task.lpGravity
-
-        knn.trainInput.Clear()
-        For Each lp In task.lines.lpList
-            knn.trainInput.Add(New cv.Vec4f(lp.ptE1.X, lp.ptE1.Y, lp.ptE2.X, lp.ptE2.Y))
-        Next
-
-        knn.queries(0) = New cv.Vec4f(inputLine.ptE1.X, inputLine.ptE1.Y, inputLine.ptE2.X, inputLine.ptE2.Y)
-        knn.Run(emptyMat)
-
-        closestLine = task.lines.lpList(knn.result(0, 0))
-    End Sub
-End Class
-
-
-
-
-
 Public Class KNN_Grid : Inherits TaskParent
     Dim knn As New KNN_N3Basics
     Dim fLess As New FeatureLess_Basics
@@ -1034,5 +970,82 @@ Public Class KNN_NNBasicsRaw : Inherits TaskParent
     End Sub
     Protected Overrides Sub Finalize()
         If knn IsNot Nothing Then knn.Dispose()
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class KNN_N4Basics : Inherits TaskParent
+    Implements IDisposable
+    Public knn As cv.ML.KNearest
+    Public trainInput As New List(Of cv.Vec4f) ' put training data here
+    Public queries As New List(Of cv.Vec4f) ' put Query data here
+    Public result(,) As Integer ' Get results here...
+    Public Sub New()
+        knn = cv.ML.KNearest.Create()
+        labels(2) = "Red=TrainingData, yellow = queries, text shows Z distance to that point from query point"
+        desc = "Use knn with the input 4D points in the image.  Find the nearest neighbors."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        If queries.Count = 0 Or trainInput.Count = 0 Then
+            SetTrueText("There is no output for the " + traceName + " algorithm when run standaloneTest().  Use the KNN_N4BasicsTest.")
+            Exit Sub
+        End If
+
+        Dim KNNdimension = 4
+        Dim queryMat = cv.Mat.FromPixelData(queries.Count, KNNdimension, cv.MatType.CV_32F, queries.ToArray)
+        cv.Cv2.Normalize(queryMat, queryMat, 1, 0, cv.NormTypes.MinMax)
+
+        If trainInput.Count = 0 Then trainInput = New List(Of cv.Vec4f)(queries) ' first pass, just match the queries.
+        Dim trainData = cv.Mat.FromPixelData(trainInput.Count, KNNdimension, cv.MatType.CV_32F, trainInput.ToArray)
+        cv.Cv2.Normalize(trainData, trainData, 1, 0, cv.NormTypes.MinMax)
+
+        Dim response = cv.Mat.FromPixelData(trainData.Rows, 1, cv.MatType.CV_32S, Enumerable.Range(start:=0, trainData.Rows).ToArray)
+        knn.Train(trainData, cv.ML.SampleTypes.RowSample, response)
+
+        Dim neighbors As New cv.Mat
+        knn.FindNearest(queryMat, trainInput.Count, New cv.Mat, neighbors)
+
+        result = KNN_Basics.getResults(neighbors, queryMat.Rows, trainInput.Count)
+    End Sub
+    Protected Overrides Sub Finalize()
+        If knn IsNot Nothing Then knn.Dispose()
+    End Sub
+End Class
+
+
+
+
+
+Public Class KNN_FindLine : Inherits TaskParent
+    Public inputLine As lpData
+    Public closestLine As lpData
+    Dim knn As New KNN_N4Basics
+    Public Sub New()
+        knn.queries.Add(New cv.Vec4f)
+        knn.standalone = False
+        desc = "Find the line in task.lines.lpList closest to the requested line"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        If standalone Then inputLine = task.lpGravity
+
+        knn.trainInput.Clear()
+        For Each lp In task.lines.lpList
+            knn.trainInput.Add(New cv.Vec4f(lp.ptE1.X, lp.ptE1.Y, lp.ptE2.X, lp.ptE2.Y))
+        Next
+
+        knn.queries(0) = New cv.Vec4f(inputLine.ptE1.X, inputLine.ptE1.Y, inputLine.ptE2.X, inputLine.ptE2.Y)
+        knn.Run(emptyMat)
+
+        If knn.result IsNot Nothing Then
+            closestLine = task.lines.lpList(knn.result(0, 0))
+            dst2 = src
+            dst2.Line(closestLine.p1, closestLine.p2, task.highlight, task.lineWidth)
+            dst2.Line(inputLine.p1, inputLine.p2, task.highlight, task.lineWidth)
+        End If
+
     End Sub
 End Class

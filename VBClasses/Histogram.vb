@@ -1425,9 +1425,7 @@ Public Class Histogram_PointCloud : Inherits TaskParent
                 cv.Cv2.CalcHist({task.pointCloud}, task.channels, New cv.Mat(), histogram,
                                      task.channelCount, task.histBinList, task.ranges)
 
-                Static plot2D As New PlotBar_Histogram2D
-                plot2D.Run(histogram)
-                dst2 = plot2D.dst2
+                dst2 = histogram.Resize(dst2.Size(), 0, 0, cv.InterpolationFlags.Nearest)
                 labels(2) = "2D plot of 2D histogram."
                 If dst2.Type <> cv.MatType.CV_8U Then dst2.ConvertTo(dst2, cv.MatType.CV_8U)
             Case "XYZ Reduction"

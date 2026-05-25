@@ -1156,6 +1156,13 @@ Public Class FeatureLess_IndexKNN : Inherits TaskParent
         knn.dimension = feat.inputVariableCount
         desc = "Predict the index for each featureLess region using the features Mat."
     End Sub
+    Private Function foundLast(rc As rcData, lrc As rcData) As rcData
+        rc.age = lrc.age + 1
+        If rc.age >= 1000 Then rc.age = 10
+        rc.index = rc.indexLast
+        rc.color = lrc.color
+        Return rc
+    End Function
     Public Overrides Sub RunAlg(src As cv.Mat)
         Dim lastImage = feat.dst2.Clone
         Dim lastList = New List(Of rcData)(feat.rcList)
@@ -1164,38 +1171,37 @@ Public Class FeatureLess_IndexKNN : Inherits TaskParent
         dst2 = feat.dst2
         labels(2) = feat.labels(2)
 
-        Dim queries = cv.Mat.FromPixelData(feat.featureList.Count \ knn.dimension, knn.dimension, cv.MatType.CV_32F, feat.featureList.ToArray)
-        Cv2.Normalize(queries, queries, 0, 1, NormTypes.MinMax)
+        Dim nVal = knn.dimension
+        Dim queries = cv.Mat.FromPixelData(feat.featureList.Count \ nVal, nVal, cv.MatType.CV_32F, feat.featureList.ToArray)
 
-        If task.heartBeat Then
-            Dim train = cv.Mat.FromPixelData(queries.Rows, knn.dimension, cv.MatType.CV_32F, feat.featureList.ToArray)
-            Cv2.Normalize(train, knn.trainMat, 0, 1, NormTypes.MinMax)
-            knn.Run(emptyMat)
-        End If
+        knn.trainMat = cv.Mat.FromPixelData(queries.Rows, nVal, cv.MatType.CV_32F, feat.featureList.ToArray)
+        knn.Run(emptyMat)
 
+        Static maxDistList As New List(Of cv.Point)
         For Each rc In feat.rcList
             Dim lastIndex = lastImage.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X) - 1
-            If lastIndex > 0 And lastIndex < lastList.Count Then
+            If lastIndex >= 0 And lastIndex < lastList.Count Then
                 rc.indexLast = lastIndex
-                rc.age = lastList(lastIndex).age + 1
-                If rc.age >= 1000 Then rc.age = 10
-                rc.index = lastIndex
+                rc = foundLast(rc, lastList(lastIndex))
+            Else
+                'If maxDistList.Contains(rc.maxDStable) Then
+                '    rc.indexLast = maxDistList.IndexOf(rc.maxDStable)
+                '    rc = foundLast(rc, lastList(rc.indexLast))
+                'End If
             End If
         Next
 
-        Dim colors(255) As cv.Vec3b
-        For i = 0 To feat.idList.Count - 1
-            Dim rc = feat.rcList(i)
-            Dim newIndex = knn.runQueryBest(queries.Row(i))
-            colors(i + 1) = task.vecColors(newIndex)
+        dst3.SetTo(0)
+        For Each rc In feat.rcList
+            dst3(rc.rect).SetTo(rc.color, rc.mask)
             SetTrueText(CStr(rc.age), rc.maxDist, 3)
         Next
 
-        Dim colorMap = cv.Mat.FromPixelData(256, 1, cv.MatType.CV_8UC3, colors)
-        cv.Cv2.ApplyColorMap(dst2, dst3, colorMap)
-
+        maxDistList.Clear()
         For Each rc In feat.rcList
             dst3.Rectangle(rc.rect, task.highlight, task.lineWidth)
+            maxDistList.Add(rc.maxDStable)
+            If task.heartBeat Then rc.color = task.scalarColors(rc.index + 1)
         Next
 
         strOut = RedUtil_Basics.selectCell(dst2, feat.rcList)

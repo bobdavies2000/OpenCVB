@@ -39,8 +39,6 @@ End Class
 
 
 Public Class Hist2D_Cloud : Inherits TaskParent
-    Dim plot1D As New PlotBar_Histogram2D
-    Dim channels() As Integer
     Public ranges() As cv.Rangef
     Public histogram As New cv.Mat
     Public Sub New()
@@ -60,9 +58,8 @@ Public Class Hist2D_Cloud : Inherits TaskParent
         cv.Cv2.CalcHist({task.pointCloud}, task.channels, New cv.Mat(),
                             histogram, 2, {task.histogramBins, task.histogramBins}, ranges)
 
-        plot1D.Run(histogram)
-        dst2 = plot1D.dst2
-        channels = task.channels
+        dst2 = histogram.Resize(dst2.Size(), 0, 0, cv.InterpolationFlags.Nearest)
+        dst3 = Palettize(dst2, 0)
     End Sub
 End Class
 
