@@ -438,6 +438,10 @@ KMeans_MultiChannel
 KMeans_TierCount
 KNN_Basics
 KNN_BasicsNew
+KNN_Dimension2
+KNN_Dimension3
+KNN_Dimension4
+KNN_DimensionN
 KNN_FindLine
 KNN_Grid
 KNN_MinDistance
@@ -1165,12 +1169,8 @@ NR_KMeans_SimKColor
 NR_KMeans_SimKDepth
 NR_KMeans_Simple_CPP
 NR_KMeans_Valleys
-NR_KNN_Dimension2
 NR_KNN_Farthest
 NR_KNN_MaxDistance
-NR_KNN_N3BasicsTest
-NR_KNN_N4BasicsTest
-NR_KNN_NNBasicsTest
 NR_LaneFinder_Edges
 NR_LaneFinder_ROI
 NR_Laplacian_Blur
