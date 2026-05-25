@@ -15656,9 +15656,7 @@ Namespace VBClasses
             knn.Run(src)
             dst2 = em.dst2 + knn.dst2
 
-            knn.knn2.displayResults()
-            dst3 = knn.dst2
-
+            dst3 = KNN_BasicsNew.displayResults(knn.result, knn.queries, knn.trainInput)
             knn.trainInput = New List(Of cv.Point2f)(knn.queries)
         End Sub
     End Class
