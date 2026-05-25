@@ -1150,7 +1150,7 @@ End Class
 
 Public Class FeatureLess_IndexKNN : Inherits TaskParent
     Dim feat As New FeatureLess_Features
-    Dim knn As New KNN_NNBasicsRaw
+    Dim knn As New KNN_IndividualQuery
     Public Sub New()
         If standalone Then task.gOptions.displayDst1.Checked = True
         knn.dimension = feat.inputVariableCount

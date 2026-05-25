@@ -1,3 +1,4 @@
+Imports VBClasses
 Imports cv = OpenCvSharp
 Public Class Line_Basics_TA : Inherits TaskParent
     Public lpList As New List(Of lpData)
@@ -366,7 +367,7 @@ Public Class NR_Line_Parallel : Inherits TaskParent
             Dim lp1 = task.lines.lpList(parallels.ElementAt(i).Value - 1)
             For j = i + 1 To parallels.Count - 1
                 Dim lp2 = task.lines.lpList(parallels.ElementAt(j).Value - 1)
-                If Math.Abs(lp1.angle - lp2.angle) < angleThreshold Then
+                If Math.Abs(lp1.angle - lp2.angle) < AngleThreshold Then
                     If classes(index) Is Nothing Then classes(index) = New List(Of Integer)({lp1.index})
                     classes(index).Add(lp2.index)
                 Else
@@ -1682,7 +1683,7 @@ End Class
 Public Class Line_TrackV : Inherits TaskParent
     Public lastV As New List(Of lpData)
     Public matchList As New List(Of lpData)
-    Dim knn As New KNN_N4Basics
+    Dim knn As New XO_KNN_N4Basics
     Dim match As New Match_Basics
     Dim lastImage As cv.Mat
     Dim verticalLast As New List(Of lpData)
@@ -1875,77 +1876,6 @@ Public Class Line_LongestTest : Inherits TaskParent
     End Sub
 End Class
 
-
-
-
-Public Class Line_LongestTestKNN : Inherits TaskParent
-    Dim lpLast As lpData
-    Dim lpCurr As New lpData
-    Dim knn As New KNN_N4Basics
-    Public Sub New()
-        knn.queries.Add(New cv.Vec4f)
-        If standalone Then task.gOptions.displayDst0.Checked = True
-        If standalone Then task.gOptions.displayDst1.Checked = True
-        desc = "Check to see that the longest line is always present."
-    End Sub
-    Public Shared Function compareLines(lpCurr As lpData, lpLast As lpData) As Boolean
-        Dim distThreshold = task.gridWH
-        If (lpCurr.ptE1.DistanceTo(lpLast.ptE1) < distThreshold And
-           lpCurr.ptE2.DistanceTo(lpLast.ptE2) < distThreshold) Or
-           (lpCurr.ptE2.DistanceTo(lpLast.ptE1) < distThreshold And
-           lpCurr.ptE1.DistanceTo(lpLast.ptE2) < distThreshold) Then
-            Return True
-        End If
-        Return False
-    End Function
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        Static presentCount As Integer
-        Static lostLongest As Integer
-        dst0 = task.lines.dst2
-        If task.lines.lpList.Count = 0 Then
-            dst2.SetTo(0)
-        Else
-            If lpLast Is Nothing Then
-                lpCurr = task.lines.lpList(0)
-                lpLast = task.lines.lpList(0)
-            End If
-
-            knn.trainInput.Clear()
-            For Each lp In task.lines.lpList
-                knn.trainInput.Add(New cv.Vec4f(lp.ptE1.X, lp.ptE1.Y, lp.ptE2.X, lp.ptE2.Y))
-            Next
-
-            knn.queries(0) = New cv.Vec4f(lpCurr.ptE1.X, lpCurr.ptE1.Y, lpCurr.ptE2.X, lpCurr.ptE2.Y)
-            knn.Run(emptyMat)
-
-            lpCurr = task.lines.lpList(knn.result(0, 0))
-
-            dst1 = task.color.Clone
-            dst1.Line(lpCurr.ptE1, lpCurr.ptE2, task.highlight, task.lineWidth)
-            If compareLines(lpCurr, lpLast) Then
-                dst2.Line(lpCurr.ptE1, lpCurr.ptE2, task.highlight, task.lineWidth)
-                presentCount += 1
-                If presentCount > 1000 Then presentCount = 100
-                lpLast = lpCurr
-            Else
-                dst2.SetTo(0)
-                lostLongest = 15
-                presentCount = 0
-                lpLast = Nothing
-            End If
-        End If
-
-        If lostLongest > 0 Then
-            SetTrueText("The longest line was lost! ", 2)
-            lostLongest -= 1
-        End If
-        labels(2) = "The longest line has been present " + CStr(presentCount) + " times."
-
-        SetTrueText("If the camera is moved, the longest line (task.lines.lpList(0) should produce a solid." + vbCrLf +
-                    "If that line disappears or its center moves a log, dst2 is set to 0 and it starts over." + vbCrLf +
-                    "It should not disappear unless the movement makes another line the lpList(0)", 3)
-    End Sub
-End Class
 
 
 

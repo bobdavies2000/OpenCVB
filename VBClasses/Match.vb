@@ -663,7 +663,9 @@ End Class
 
 
 Public Class Match_LinesKNN : Inherits TaskParent
-    Dim knn As New KNN_N4Basics
+    Dim knn As New KNN_Minimal
+    Public trainInput As New List(Of cv.Vec4f) ' put training data here
+    Public queries As New List(Of cv.Vec4f) ' put Query data here
     Public Sub New()
         labels(2) = "Match lines on the heartbeat using the line extended to the image edges."
         desc = "Use the 2 points from a line as input to a 4-dimension KNN"
@@ -671,17 +673,19 @@ Public Class Match_LinesKNN : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         Dim lplist = task.lines.lpList
 
-        dst2 = dst2
+        dst2 = src
         Static lastPt As New List(Of lpData)(lplist)
 
-        knn.queries.Clear()
+        queries.Clear()
         For Each lp In lplist
-            knn.queries.Add(New cv.Vec4f(lp.p1.X, lp.p1.Y, lp.p2.X, lp.p2.Y))
+            queries.Add(New cv.Vec4f(lp.p1.X, lp.p1.Y, lp.p2.X, lp.p2.Y))
         Next
-        If task.optionsChanged Then knn.trainInput = New List(Of cv.Vec4f)(knn.queries)
-        knn.Run(src)
+        If task.optionsChanged Then trainInput = New List(Of cv.Vec4f)(queries)
 
-        If knn.queries.Count = 0 Then Exit Sub
+        Dim dimension = 4
+        knn.queryMat = cv.Mat.FromPixelData(queries.Count, dimension, cv.MatType.CV_32F, queries.ToArray)
+        knn.trainMat = cv.Mat.FromPixelData(trainInput.Count, dimension, cv.MatType.CV_32F, trainInput.ToArray)
+        knn.Run(src)
 
         For Each i In knn.result
             If i >= lplist.Count Then Continue For
@@ -694,7 +698,7 @@ Public Class Match_LinesKNN : Inherits TaskParent
             End If
         Next
 
-        knn.trainInput = New List(Of cv.Vec4f)(knn.queries)
+        trainInput = New List(Of cv.Vec4f)(queries)
         lastPt = New List(Of lpData)(lplist)
     End Sub
 End Class
