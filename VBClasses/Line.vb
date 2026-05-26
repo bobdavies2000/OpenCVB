@@ -474,9 +474,13 @@ Public Class NR_Line_Select : Inherits TaskParent
         desc = "Select a line with mouse movement and put the selection into task.lpD."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        delaunay.Run(src)
-        dst2 = delaunay.dst1
-        labels(2) = delaunay.labels(2)
+        Static lpList As New List(Of lpData)
+        If task.heartBeatLT Then
+            delaunay.Run(src)
+            lpList = New List(Of lpData)(task.lines.lpList)
+            labels(2) = delaunay.labels(2)
+            dst2 = delaunay.dst2
+        End If
         strOut = task.lpD.lpDisplay(dst3)
         SetTrueText(strOut, 1) ' the line info is already prepped in strout in delaunay.
     End Sub

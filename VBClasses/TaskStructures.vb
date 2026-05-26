@@ -613,23 +613,14 @@ Public Module Structures
             p2 = New cv.Point2f()
         End Sub
         Public Function lpDisplay(ByRef dst As cv.Mat) As String
-            dst.SetTo(0)
-            For Each lp In task.lines.lpList
-                dst.Line(lp.p1, lp.
-                                 p2, white, task.lineWidth, cv.LineTypes.Link8)
-                dst.Circle(lp.ptCenter, task.DotSize, task.highlight, -1)
-            Next
-
-            dst.Line(task.lpD.p1, task.lpD.p2, task.highlight, task.lineWidth + 1, task.lineType)
-
             Dim strOut = "rcList index = " + CStr(index) + vbCrLf
-            strOut = "Age = " + CStr(task.lpD.age) + vbCrLf
+            strOut += "Age = " + CStr(task.lpD.age) + vbCrLf
+            strOut += "Angle = " + Format(angle, fmt1) + vbCrLf
             strOut += "Length (pixels) = " + Format(task.lpD.length, fmt1) + " index = " + CStr(task.lpD.index) + vbCrLf
 
             strOut += "p1 = " + task.lpD.p1.ToString + ", p2 = " + task.lpD.p2.ToString + vbCrLf
             strOut += "ptE1 = " + task.lpD.ptE1.ToString + ", ptE2 = " + task.lpD.ptE2.ToString + vbCrLf + vbCrLf
-            strOut += "RGB Angle = " + CStr(task.lpD.angle) + vbCrLf
-            strOut += "RGB Slope = " + Format(task.lpD.slope, fmt3) + vbCrLf
+            strOut += "Slope = " + Format(task.lpD.slope, fmt3) + vbCrLf
             strOut += vbCrLf + "NOTE: the Y-Axis is inverted - Y increases down so slopes are inverted." + vbCrLf + vbCrLf
             Return strOut
         End Function

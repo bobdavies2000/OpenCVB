@@ -686,3 +686,44 @@ Public Class KNN_FindLine : Inherits TaskParent
         dst3 = task.lines.dst3
     End Sub
 End Class
+
+
+
+Public Class KNN_FindLineNew : Inherits TaskParent
+    Public inputLine As lpData
+    Public closestLine As lpData
+    Dim knn As New KNN_Minimal
+    Public trainInput As New List(Of Single)
+    Public queries As New List(Of Single)
+    Dim dimension = 4
+    Public Sub New()
+        For i = 0 To dimension - 1
+            queries.Add(New Single)
+        Next
+        labels(3) = "The lines found in the current image - task.lines.dst3"
+        desc = "Find the line in task.lines.lpList closest to the requested line"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        If standalone Then inputLine = task.lpGravity
+
+        'trainInput.Clear()
+        'For Each lp In task.lines.lpList
+        '    trainInput.Add(New cv.Point3f(lp.angle, lp.ptCenter.X, lp.ptCenter.X))
+        'Next
+
+        'Dim dimension = 4
+        'queries(0) = New cv.Vec4f(inputLine.ptE1.X, inputLine.ptE1.Y, inputLine.ptE2.X, inputLine.ptE2.Y)
+        'knn.queryMat = cv.Mat.FromPixelData(queries.Count, dimension, cv.MatType.CV_32F, queries.ToArray)
+        'knn.trainMat = cv.Mat.FromPixelData(trainInput.Count, dimension, cv.MatType.CV_32F, trainInput.ToArray)
+        'knn.Run(emptyMat)
+
+        'If knn.result IsNot Nothing Then
+        '    closestLine = task.lines.lpList(knn.result(0, 0))
+        '    dst2 = src
+        '    dst2.Line(closestLine.ptE1, closestLine.ptE2, task.highlight, task.lineWidth + 1)
+        '    dst2.Line(inputLine.p1, inputLine.p2, task.highlight, task.lineWidth + 1)
+        'End If
+
+        'dst3 = task.lines.dst3
+    End Sub
+End Class

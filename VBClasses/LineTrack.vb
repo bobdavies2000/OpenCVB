@@ -38,7 +38,7 @@ Public Class LineTrack_Basics : Inherits TaskParent
             task.longestLine = New lpData(lpTmp.ptE1, lpTmp.ptE2)
 
             dst2 = task.color.Clone
-            dst2.Line(task.longestLine.p1, task.longestLine.p2, task.highlight, task.lineWidth)
+            dst2.Line(task.longestLine.p1, task.longestLine.p2, task.highlight, task.lineWidth + 1)
             If compareLines(task.longestLine, lpLast) Then
                 presentCount += 1
                 If presentCount > 1000 Then presentCount = 100
