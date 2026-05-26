@@ -232,6 +232,7 @@ Public Class KNN_OneToOne : Inherits TaskParent
         End If
 
         knn.queries = queries
+        knn.trainInput = New List(Of cv.Point2f)(queries)
         knn.Run(src)
 
         Dim nearest As New List(Of Integer)

@@ -52,14 +52,17 @@ Public Class NR_Stabilizer_Basics : Inherits TaskParent
 
             knn.ptListQuery = feat.features
             knn.ptListTrain = feat.lastFeatures
-            knn.Run(emptyMat)
+            If feat.lastFeatures.Count = 0 Then knn.ptListTrain = feat.features
+            If feat.features.Count > 0 And feat.lastFeatures.Count > 0 Then
+                knn.Run(emptyMat)
 
-            dst3.SetTo(0)
-            For i = 0 To Math.Min(knn.ptListTrain.Count, knn.ptListQuery.Count) - 1
-                Dim p1 = knn.ptListQuery(i)
-                Dim p2 = knn.ptListTrain(knn.result(i, 0))
-                dst3.Line(p1, p2, task.highlight, task.lineWidth)
-            Next
+                dst3.SetTo(0)
+                For i = 0 To Math.Min(knn.ptListTrain.Count, knn.ptListQuery.Count) - 1
+                    Dim p1 = knn.ptListQuery(i)
+                    Dim p2 = knn.ptListTrain(knn.result(i, 0))
+                    dst3.Line(p1, p2, task.highlight, task.lineWidth)
+                Next
+            End If
         End If
     End Sub
 End Class

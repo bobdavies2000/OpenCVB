@@ -548,6 +548,7 @@ Public Class NR_RedColor_GoodCellInput : Inherits TaskParent
         Dim maxDistance = distSlider.Value
 
         knn.ptListQuery = New List(Of cv.Point)(feat.features)
+        knn.ptListTrain = New List(Of cv.Point)(feat.features)
         knn.Run(src)
 
         featureList.Clear()
