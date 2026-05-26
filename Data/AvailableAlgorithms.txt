@@ -443,7 +443,6 @@ KNN_Dimension4
 KNN_DimensionN
 KNN_Farthest
 KNN_FindLine
-KNN_FindLineNew
 KNN_Grid
 KNN_IndividualQuery
 KNN_MinDistance
@@ -475,8 +474,10 @@ Line_DepthHistogram
 Line_EdgeLine
 Line_EdgeLineCompare
 Line_EdgePoints
+Line_FindClosest
 Line_Finder
 Line_FinderPlus
+Line_FindLast
 Line_FindSimple
 Line_Intersection
 Line_KNNTop

@@ -1,11 +1,11 @@
-Imports VBClasses
 Imports cv = OpenCvSharp
 Public Class Line_Basics_TA : Inherits TaskParent
     Public lpList As New List(Of lpData)
+    Public lpLast As New List(Of lpData)
     Public motionMask As cv.Mat = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 255)
     Public basics As New Line_Basics
+    Dim lpClose As New Line_FindClosest
     Public Sub New()
-        labels(2) = "Line_Basics output"
         desc = "Run FLD (Fast Line Detector) with sobel input."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -16,6 +16,28 @@ Public Class Line_Basics_TA : Inherits TaskParent
         dst3 = basics.dst3
         labels = basics.labels
         lpList = New List(Of lpData)(basics.lpList)
+
+        Dim count As Integer
+        dst1 = src.Clone
+        For Each lp In lpLast
+            lpClose.inputLine = lp
+            lpClose.Run(dst1)
+            If lpClose.closestLine IsNot Nothing Then
+                Dim lpCurr = task.lines.lpList(lpClose.closestLine.index - 1)
+                lpCurr.age += 1
+                If lpCurr.age >= 1000 Then lpCurr.age = 10
+                count += 1
+            End If
+            If standaloneTest() Then SetTrueText(CStr(lp.age), New cv.Point2f(lp.ptCenter.X + 2, lp.ptCenter.Y + 2), 3)
+        Next
+
+        Static minCount As Integer = count
+        If task.heartBeat Then minCount = count
+        If count < minCount Then minCount = count
+
+        lpLast = New List(Of lpData)(task.lines.lpList)
+
+        labels(2) = CStr(count) + " lines were matched to the previous image.  The minimum matched was " + CStr(minCount)
     End Sub
 End Class
 
@@ -1434,27 +1456,6 @@ End Class
 
 
 
-
-Public Class Line_FinderPlus : Inherits TaskParent
-    Dim find As New Line_Finder
-    Dim lines As New Line_Basics_TA
-    Public Sub New()
-        desc = "Find lines in the brickline_find output"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        find.Run(task.gray)
-        dst2 = find.dst3
-
-        lines.Run(dst2)
-        dst3 = lines.dst2
-        labels(3) = lines.labels(2)
-    End Sub
-End Class
-
-
-
-
-
 Public Class Line_RedFlood : Inherits TaskParent
     Dim edges As New Edge_Basics
     Dim flood As New Flood_BasicsMask
@@ -1590,94 +1591,6 @@ Public Class NR_Line_Finder : Inherits TaskParent
     End Sub
 End Class
 
-
-
-
-
-Public Class Line_Finder : Inherits TaskParent
-    Public ptList() As cv.Point
-    Dim edges As New Edge_Basics
-    Dim side As Integer
-    Dim pixels(side * side) As cv.Point
-    Dim sortX As New SortedList(Of Integer, cv.Point)(New compareAllowIdenticalInteger)
-    Public Sub New()
-        dst0 = New cv.Mat(dst0.Size, cv.MatType.CV_8U, 0)
-        side = task.gOptions.GridSlider.Value
-        ReDim pixels(side * side)
-        desc = "Find only the bricks containing what are clearly lines."
-    End Sub
-    Public Function findLines(pixels() As cv.Point) As lpData
-        Dim ordered As Boolean = True
-        Dim minX As Integer, maxX As Integer, minY = pixels(0).Y, maxY = pixels.Last.Y
-        For i = 1 To pixels.Count - 1
-            If Math.Abs(pixels(i).Y - pixels(i - 1).Y) > 1 Then
-                ordered = False
-                Exit For
-            End If
-        Next
-
-        If ordered Then
-            sortX.Clear()
-            For Each pt In pixels
-                sortX.Add(pt.X, pt)
-            Next
-            minX = sortX.Values(0).X
-            maxX = sortX.Values.Last.X
-
-            For i = 1 To sortX.Values.Count - 1
-                If Math.Abs(sortX.Values(i).X - sortX.Values(i - 1).X) > 1 Then
-                    ordered = False
-                    Exit For
-                End If
-            Next
-        End If
-
-        If ordered = False Then Return Nothing
-        Dim lp = New lpData(New cv.Point(minX, minY), New cv.Point(maxX, maxY))
-        If Not pixels.Contains(lp.p1) Or Not pixels.Contains(lp.p2) Then Return Nothing
-        Return lp
-    End Function
-
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        dst2 = src.Clone
-        edges.Run(task.gray)
-        dst1 = edges.dst2
-        labels(2) = edges.labels(2)
-
-        Dim maxPixels = side * 1.5
-        dst3.SetTo(0)
-        dst0.SetTo(0)
-        For i = 0 To task.gridRects.Count - 1
-            Dim r = task.gridRects(i)
-
-            Dim pixelCount = dst1(r).CountNonZero
-            If pixelCount = 0 Or pixelCount > maxPixels Then Continue For
-            If pixelCount < side Then Continue For
-
-            Dim pixelMat = dst1(r).FindNonZero
-
-            pixelMat.GetArray(Of cv.Point)(pixels)
-
-            Dim lp = findLines(pixels)
-
-            ' use this line for debugging...
-            If task.drawRect.Contains(r.TopLeft) Then Dim k = 0
-
-            If lp IsNot Nothing Then
-                dst2(r).Line(lp.p1, lp.p2, task.highlight, task.lineWidth + 1)
-                dst0(r).Set(Of Byte)(lp.p1.Y, lp.p1.X, 255)
-                dst0(r).Set(Of Byte)(lp.p2.Y, lp.p2.X, 255)
-            End If
-        Next
-
-        Dim pointMat = dst0.FindNonZero()
-        ReDim ptList(pointMat.Rows)
-        pointMat.GetArray(Of cv.Point)(ptList)
-
-        dst3.SetTo(0)
-        dst3.SetTo(task.highlight, dst0)
-    End Sub
-End Class
 
 
 
@@ -1977,5 +1890,191 @@ Public Class Line_EdgePoints : Inherits TaskParent
             End If
         End If
         SetTrueText(strOut, 1)
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Line_FinderPlus : Inherits TaskParent
+    Dim find As New Line_Finder
+    Dim lines As New Line_Basics_TA
+    Public Sub New()
+        desc = "Find lines in the brickline_find output"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        find.Run(task.gray)
+        dst2 = find.dst3
+
+        lines.Run(dst2)
+        dst3 = lines.dst2
+        labels(3) = lines.labels(2)
+    End Sub
+End Class
+
+
+
+
+
+Public Class Line_Finder : Inherits TaskParent
+    Public ptList() As cv.Point
+    Dim edges As New Edge_Basics
+    Dim side As Integer
+    Dim pixels(side * side) As cv.Point
+    Dim sortX As New SortedList(Of Integer, cv.Point)(New compareAllowIdenticalInteger)
+    Public Sub New()
+        dst0 = New cv.Mat(dst0.Size, cv.MatType.CV_8U, 0)
+        side = task.gOptions.GridSlider.Value
+        ReDim pixels(side * side)
+        desc = "Find only the bricks containing what are clearly lines."
+    End Sub
+    Public Function findLines(pixels() As cv.Point) As lpData
+        Dim ordered As Boolean = True
+        Dim minX As Integer, maxX As Integer, minY = pixels(0).Y, maxY = pixels.Last.Y
+        For i = 1 To pixels.Count - 1
+            If Math.Abs(pixels(i).Y - pixels(i - 1).Y) > 1 Then
+                ordered = False
+                Exit For
+            End If
+        Next
+
+        If ordered Then
+            sortX.Clear()
+            For Each pt In pixels
+                sortX.Add(pt.X, pt)
+            Next
+            minX = sortX.Values(0).X
+            maxX = sortX.Values.Last.X
+
+            For i = 1 To sortX.Values.Count - 1
+                If Math.Abs(sortX.Values(i).X - sortX.Values(i - 1).X) > 1 Then
+                    ordered = False
+                    Exit For
+                End If
+            Next
+        End If
+
+        If ordered = False Then Return Nothing
+        Dim lp = New lpData(New cv.Point(minX, minY), New cv.Point(maxX, maxY))
+        If Not pixels.Contains(lp.p1) Or Not pixels.Contains(lp.p2) Then Return Nothing
+        Return lp
+    End Function
+
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        dst2 = src.Clone
+        edges.Run(task.gray)
+        dst1 = edges.dst2
+        labels(2) = edges.labels(2)
+
+        Dim maxPixels = side * 1.5
+        dst3.SetTo(0)
+        dst0.SetTo(0)
+        For i = 0 To task.gridRects.Count - 1
+            Dim r = task.gridRects(i)
+
+            Dim pixelCount = dst1(r).CountNonZero
+            If pixelCount = 0 Or pixelCount > maxPixels Then Continue For
+            If pixelCount < side Then Continue For
+
+            Dim pixelMat = dst1(r).FindNonZero
+
+            pixelMat.GetArray(Of cv.Point)(pixels)
+
+            Dim lp = findLines(pixels)
+
+            ' use this line for debugging...
+            If task.drawRect.Contains(r.TopLeft) Then Dim k = 0
+
+            If lp IsNot Nothing Then
+                dst2(r).Line(lp.p1, lp.p2, task.highlight, task.lineWidth + 1)
+                dst0(r).Set(Of Byte)(lp.p1.Y, lp.p1.X, 255)
+                dst0(r).Set(Of Byte)(lp.p2.Y, lp.p2.X, 255)
+            End If
+        Next
+
+        Dim pointMat = dst0.FindNonZero()
+        ReDim ptList(pointMat.Rows)
+        pointMat.GetArray(Of cv.Point)(ptList)
+
+        dst3.SetTo(0)
+        dst3.SetTo(task.highlight, dst0)
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Line_FindLast : Inherits TaskParent
+    Dim lpClose As New Line_FindClosest
+    Public Sub New()
+        desc = "Match the lines from the previous image to the current image."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        Static lpLast As New List(Of lpData)(task.lines.lpList)
+
+        dst2 = src.Clone
+        Dim count As Integer
+        For Each lp In lpLast
+            lpClose.inputLine = lp
+            lpClose.Run(src)
+            If lpClose.candidates.Count > 0 Then
+                dst2.Line(lpClose.closestLine.p1, lpClose.closestLine.p2, task.highlight, task.lineWidth + 1)
+                count += 1
+                SetTrueText(CStr(lpClose.closestLine.age), New cv.Point2f(lp.ptCenter.X + 2, lp.ptCenter.Y + 2), 2)
+            End If
+        Next
+
+        lpLast = task.lines.lpList
+
+        labels(2) = CStr(count) + " lines were matched to the previous image."
+    End Sub
+End Class
+
+
+
+
+Public Class Line_FindClosest : Inherits TaskParent
+    Public inputLine As lpData
+    Public closestLine As lpData
+    Public candidates As New List(Of lpData)
+    Public Sub New()
+        labels(3) = "The lines found in the current image - task.lines.dst3"
+        desc = "Find the line in task.lines.lpList closest to the requested line"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        If standalone Then inputLine = task.lpGravity
+        If standaloneTest() Then
+            dst3 = task.lines.dst3
+            dst2 = src
+            dst2.Line(inputLine.p1, inputLine.p2, white, task.lineWidth + 1)
+        End If
+        candidates.Clear()
+        For Each lp In task.lines.lpList
+            If Math.Abs(lp.angle - inputLine.angle) < 2 Then
+                If standaloneTest() Then dst2.Line(lp.ptE1, lp.ptE2, task.highlight, task.lineWidth)
+                candidates.Add(lp)
+            End If
+        Next
+
+        labels(2) = "There were " + CStr(candidates.Count) + " with an angle within 2 degrees of the input line."
+        closestLine = Nothing
+        If candidates.Count = 0 Then Exit Sub ' no lines were found.
+
+        Dim distances As New List(Of Single)
+        For Each lp In candidates
+            Dim distance = inputLine.ptE1.DistanceTo(lp.ptE1) + inputLine.ptE2.DistanceTo(lp.ptE2)
+            If distance >= dst2.Height Then
+                distance = inputLine.ptE1.DistanceTo(lp.ptE2) + inputLine.ptE2.DistanceTo(lp.ptE1)
+            End If
+            distances.Add(distance)
+        Next
+
+        closestLine = candidates(distances.IndexOf(distances.Min))
+        closestLine.age = inputLine.age + 1
+        dst2.Line(closestLine.ptE1, closestLine.ptE2, task.highlight, task.lineWidth + 2)
     End Sub
 End Class
