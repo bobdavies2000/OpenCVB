@@ -20427,4 +20427,65 @@ Namespace VBClasses
         End Sub
     End Class
 
+
+
+
+
+
+    Public Class XO_FeatureLess_PredictIndex : Inherits TaskParent
+        Dim feat As New FeatureLess_Features
+        Dim ml As New ML_RandomForest
+        Public Sub New()
+            desc = "Predict the index for each featureLess region using the features Mat."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            feat.Run(task.gray)
+            dst2 = feat.dst2
+            dst1 = dst2.Threshold(0, 255, cv.ThresholdTypes.BinaryInv)
+            labels(2) = feat.labels(2)
+
+            Dim features = cv.Mat.FromPixelData(feat.idList.Count, feat.inputVariableCount, cv.MatType.CV_32F, feat.featureList.ToArray)
+
+            Dim singleEntry(feat.inputVariableCount * 2 - 1) As Single
+            Static saveIDList As List(Of Single)
+            Static savefeatures As List(Of Single)
+            If task.heartBeatLT Then
+                savefeatures = feat.featureList
+                saveIDList = feat.idList
+                ml.trainMat = features
+                ml.trainResponse = cv.Mat.FromPixelData(feat.idList.Count, 1, cv.MatType.CV_32F, feat.idList.ToArray)
+                ml.predictions = ml.trainResponse.Clone
+                dst3 = feat.dst3
+            Else
+                ' ml.testMat = features
+
+                For i = 0 To feat.inputVariableCount * 2 - 1
+                    singleEntry(i) = Math.Floor(feat.featureList(i))
+                Next
+
+                ml.testMat = cv.Mat.FromPixelData(2, feat.inputVariableCount, cv.MatType.CV_32F, singleEntry)
+            End If
+
+            ml.Run(emptyMat)
+
+            Dim tmp(ml.testMat.Rows - 1) As Single
+            Dim predictions(ml.testMat.Rows - 1) As Integer
+
+            Marshal.Copy(ml.predictions.Data, tmp, 0, tmp.Length)
+            For i = 0 To predictions.Count - 1
+                predictions(i) = CInt(tmp(i))
+            Next
+
+            'Dim colors(255) As cv.Vec3b
+            'Dim maxClass As Integer
+            'For i = 0 To ml.predictions.Rows - 1
+            '    colors(i) = task.vecColors(predictions(i))
+            '    If predictions(i) > maxClass Then maxClass = predictions(i)
+            'Next
+
+            'Dim colorMap = cv.Mat.FromPixelData(256, 1, cv.MatType.CV_8UC3, colors)
+            'cv.Cv2.ApplyColorMap(dst2, dst3, colorMap)
+            'dst3.SetTo(0, dst1)
+        End Sub
+    End Class
 End Namespace
