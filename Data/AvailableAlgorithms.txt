@@ -463,6 +463,7 @@ Line_Basics
 Line_Basics_TA
 Line_BasicsEmboss
 Line_BasicsLSD
+Line_BasicsNew
 Line_BasicsNoMotion
 Line_Brick
 Line_BrickList
@@ -475,7 +476,6 @@ Line_EdgePoints
 Line_FindClosest
 Line_Finder
 Line_FinderPlus
-Line_FindLast
 Line_FindSimple
 Line_Intersection
 Line_KNNTop

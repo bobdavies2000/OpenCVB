@@ -466,6 +466,7 @@ Public Module Structures
         Public angle As Single ' varies from -90 to 90 degrees
         Public color As cv.Scalar
         Public index As Integer
+        Public indexLast As Integer ' index into task.lines.lpLast of the previous location of the line.
         Public length As Single
         Public p1 As cv.Point2f
         Public p2 As cv.Point2f

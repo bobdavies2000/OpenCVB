@@ -2,7 +2,7 @@ Imports System.Runtime.InteropServices
 Imports cv = OpenCvSharp
 Public Class LineTrack_Basics : Inherits TaskParent
     Public lpInput As New lpData
-    Dim lpClose As New Line_FindClosest
+    Dim lpFind As New Line_FindClosest
     Public Sub New()
         desc = "Track the longest line even if it is no longer the longest and flag when it is lost."
     End Sub
@@ -14,9 +14,9 @@ Public Class LineTrack_Basics : Inherits TaskParent
         If task.lines.lpList.Count = 0 Or task.firstPass Then
             resetLongest()
         Else
-            lpClose.inputLine = task.longestLine
-            lpClose.Run(emptyMat)
-            Dim lpTmp = lpClose.closestLine
+            lpFind.inputLine = task.longestLine
+            lpFind.Run(emptyMat)
+            Dim lpTmp = lpFind.closestLine
 
             If lpTmp IsNot Nothing Then
                 task.longestLine = New lpData(lpTmp.ptE1, lpTmp.ptE2)

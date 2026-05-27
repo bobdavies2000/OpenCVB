@@ -777,7 +777,7 @@ End Class
 
 Public Class NR_Brick_Lines : Inherits TaskParent
     Dim bricks As New Brick_Basics
-    Dim lines As New Line_Basics
+    Dim lines As New Line_BasicsNew
     Dim options As New Options_LeftRightCorrelation
     Dim motionLeft As New Motion_Basics_TA
     Public Sub New()
@@ -791,7 +791,6 @@ Public Class NR_Brick_Lines : Inherits TaskParent
 
         motionLeft.Run(task.leftView)
 
-        lines.motionMask = motionLeft.dst3
         lines.Run(task.leftView)
         dst2 = lines.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
@@ -845,7 +844,7 @@ End Class
 
 Public Class NR_Brick_NoDepthLines : Inherits TaskParent
     Dim bricks As New Brick_Basics
-    Dim lines As New Line_Basics
+    Dim lines As New Line_BasicsNew
     Dim options As New Options_LeftRightCorrelation
     Dim motionLeft As New Motion_Basics_TA
     Public Sub New()
@@ -861,7 +860,6 @@ Public Class NR_Brick_NoDepthLines : Inherits TaskParent
 
         motionLeft.Run(task.leftView)
 
-        lines.motionMask = motionLeft.dst3
         lines.Run(task.leftView)
         dst2 = lines.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 

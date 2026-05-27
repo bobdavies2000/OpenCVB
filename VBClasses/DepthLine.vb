@@ -1,8 +1,7 @@
 Imports cv = OpenCvSharp
 Public Class DepthLine_Basics : Inherits TaskParent
-    Public prepEdges As New RedPrep_EdgeMask
-    Dim lines As New Line_Basics
-    Public motionLeft As New Motion_Basics_TA
+    Public prepEdges As New RedPrep_Basics
+    Dim lines As New Line_BasicsNew
     Public lpList As New List(Of lpData)
     Public Sub New()
         If standalone Then task.gOptions.displayDst0.Checked = True
@@ -21,10 +20,7 @@ Public Class DepthLine_Basics : Inherits TaskParent
             prepEdges.dst3 = src
         End If
 
-        motionLeft.Run(task.leftView)
-
-        lines.motionMask = motionLeft.dst3
-        lines.Run(prepEdges.dst3)
+        lines.Run(prepEdges.dst2)
         dst2 = lines.dst2
         lpList = New List(Of lpData)(lines.lpList)
 
@@ -44,7 +40,6 @@ Public Class NR_DepthLine_XY : Inherits TaskParent
         desc = "Find vertical lines in the reduced depth data."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        lineD.prepEdges.reductionName = "XY Reduction"
         lineD.Run(src)
 
         lpList = New List(Of lpData)(lineD.lpList)
@@ -62,11 +57,12 @@ Public Class DepthLine_V : Inherits TaskParent
     Dim lineD As New DepthLine_Basics
     Public lpList As New List(Of lpData)
     Public Sub New()
+        OptionParent.FindCheckBox("Prep Edges in Y").Checked = False
         If standalone Then task.gOptions.displayDst0.Checked = True
         desc = "Find vertical lines in the reduced depth data."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        lineD.prepEdges.reductionName = "X Reduction"
+        ' lineD.prepEdges.reductionName = "X Reduction"
         lineD.Run(src)
 
         lpList = New List(Of lpData)(lineD.lpList)
@@ -85,10 +81,10 @@ Public Class DepthLine_H : Inherits TaskParent
     Public lpList As New List(Of lpData)
     Public Sub New()
         If standalone Then task.gOptions.displayDst0.Checked = True
+        OptionParent.FindCheckBox("Prep Edges in X").Checked = False
         desc = "Find horizontal lines in the reduced depth data."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        lineD.prepEdges.reductionName = "Y Reduction"
         lineD.Run(src)
 
         lpList = New List(Of lpData)(lineD.lpList)
@@ -180,16 +176,12 @@ End Class
 
 
 Public Class NR_DepthLine_HV2 : Inherits TaskParent
-    Dim lineX As New RedPrep_EdgeMask
-    Dim lineY As New RedPrep_EdgeMask
+    Dim lineX As New RedPrep_Basics
+    Dim lineY As New RedPrep_Basics
     Public lpList As New List(Of lpData)
-    Dim lines As New Line_Basics
-    Public motionLeft As New Motion_Basics_TA
+    Dim lines As New Line_BasicsNew
     Public Sub New()
-        lineX.reductionName = "X Reduction"
-        lineY.reductionName = "Y Reduction"
         task.fOptions.ReductionSlider.Value = 200
-        If standalone Then task.gOptions.displayDst0.Checked = True
         labels(3) = "Input to Line_Basics_TA"
         desc = "Find horizontal and vertical lines in the reduced depth data."
     End Sub
@@ -198,14 +190,10 @@ Public Class NR_DepthLine_HV2 : Inherits TaskParent
         lineX.Run(src)
         lineY.Run(src)
 
-        dst1 = lineX.dst3
-        dst1 = dst1 Or lineY.dst3
+        dst1 = lineX.dst2
+        dst1 = dst1 Or lineY.dst2
 
-        dst0 = task.leftView
-        motionLeft.Run(dst0)
-
-        lines.motionMask = motionLeft.dst3
-        lines.Run(dst3)
+        lines.Run(dst1)
 
         dst2 = lines.dst2
         lpList = New List(Of lpData)(lines.lpList)
@@ -220,6 +208,8 @@ Public Class NR_DepthLine_HV2 : Inherits TaskParent
         labels(2) = lines.labels(2)
     End Sub
 End Class
+
+
 
 
 
