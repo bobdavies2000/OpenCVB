@@ -1,5 +1,5 @@
 Imports cv = OpenCvSharp
-Public Class StableLine_Basics : Inherits TaskParent
+Public Class StableLine_BasicsOld : Inherits TaskParent
     Public lp As lpData
     Public lpLast As lpData
     Public Sub New()
@@ -68,7 +68,7 @@ End Class
 
 
 
-Public Class StableLine_BasicsCount : Inherits TaskParent
+Public Class StableLine_BasicsOldCount : Inherits TaskParent
     Public basics As New FeatureMap_StablePoints
     Public goodCounts As New SortedList(Of Integer, Integer)(New compareAllowIdenticalIntegerInverted)
     Dim bPoint As New BrickPoint_Basics

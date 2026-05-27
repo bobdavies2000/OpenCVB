@@ -1,5 +1,5 @@
 Imports cv = OpenCvSharp
-Public Class FitLine_Basics_TA : Inherits TaskParent
+Public Class FitLine_BasicsOld_TA : Inherits TaskParent
     Public ptList As New List(Of cv.Point2f)
     Public lp As New lpData
     Public Sub New()
@@ -69,7 +69,7 @@ Public Class NR_FitLine_Lines : Inherits TaskParent
     Public Sub New()
         OptionParent.FindSlider("DrawCount").Value = 2
         labels(2) = "If the contours overlap, then one line the trendline for both is found.  Otherwise, 2 lines are found."
-        labels(3) = "FitLine_Basics_TA contour input - if they overlap, a trendline will be found."
+        labels(3) = "FitLine_BasicsOld_TA contour input - if they overlap, a trendline will be found."
         desc = "Show how Fitline API works.  When the lines overlap the image has a single contour " +
                    "and the lines are occasionally not found."
     End Sub
@@ -176,7 +176,7 @@ End Class
 
 
 
-Public Class NR_FitLine_Basics_TA3D : Inherits TaskParent
+Public Class NR_FitLine_BasicsOld_TA3D : Inherits TaskParent
     Public ptList As New List(Of cv.Point3f)
     Public lp As lpData
     Public center As cv.Point2f
@@ -218,7 +218,7 @@ End Class
 Public Class NR_FitLine_Grid : Inherits TaskParent
     Dim nZero As New FindNonZero_Basics
     Dim edges As New Edge_Basics
-    Dim fitline As New FitLine_Basics_TA
+    Dim fitline As New FitLine_BasicsOld_TA
     Public Sub New()
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
         desc = "Find lines within each r."

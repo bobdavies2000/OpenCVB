@@ -777,7 +777,7 @@ End Class
 
 Public Class NR_Brick_Lines : Inherits TaskParent
     Dim bricks As New Brick_Basics
-    Dim lines As New Line_BasicsNew
+    Dim lines As New Line_Basics
     Dim options As New Options_LeftRightCorrelation
     Dim motionLeft As New Motion_Basics_TA
     Public Sub New()
@@ -844,7 +844,7 @@ End Class
 
 Public Class NR_Brick_NoDepthLines : Inherits TaskParent
     Dim bricks As New Brick_Basics
-    Dim lines As New Line_BasicsNew
+    Dim lines As New Line_Basics
     Dim options As New Options_LeftRightCorrelation
     Dim motionLeft As New Motion_Basics_TA
     Public Sub New()

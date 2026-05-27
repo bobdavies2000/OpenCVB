@@ -1,61 +1,35 @@
 Imports cv = OpenCvSharp
-Public Class Line_Basics_TA : Inherits TaskParent
-    Public lpList As New List(Of lpData)
-    Public lpLast As New List(Of lpData)
-    Public basics As New Line_Basics
-    Dim lpFind As New Line_FindClosest
-    Public Sub New()
-        desc = "Run FLD (Fast Line Detector) with sobel input."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        If src.Channels <> 1 Or src.Type <> cv.MatType.CV_8U Then src = task.gray.Clone
-
-        basics.Run(src)
-        dst2 = basics.dst2
-        dst3 = basics.dst3
-        labels = basics.labels
-        lpList = New List(Of lpData)(basics.lpList)
-
-        Dim count As Integer
-        dst1 = src.Clone
-        For Each lp In lpLast
-            lpFind.inputLine = lp
-            lpFind.Run(dst1)
-            If lpFind.closestLine IsNot Nothing Then
-                Dim lpCurr = task.lines.lpList(lpFind.closestLine.index - 1)
-                lpCurr.age += 1
-                If lpCurr.age >= 1000 Then lpCurr.age = 10
-                count += 1
-            End If
-            If standaloneTest() Then SetTrueText(CStr(lp.age), New cv.Point2f(lp.ptCenter.X + 2, lp.ptCenter.Y + 2), 3)
-        Next
-
-        Static minCount As Integer = count
-        If task.heartBeat Then minCount = count
-        If count < minCount Then minCount = count
-
-        lpLast = New List(Of lpData)(task.lines.lpList)
-
-        labels(2) = CStr(count) + " lines were matched to the previous image.  The minimum matched was " + CStr(minCount)
-    End Sub
-End Class
-
-
-
-
 Public Class Line_Basics : Inherits TaskParent
     Implements IDisposable
     Public lpList As New List(Of lpData)
+    Public lpLast As New List(Of lpData)
     Public ld As cv.XImgProc.FastLineDetector
-    Public motionMask As cv.Mat = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 255)
     Dim edges As New Edge_Sobel
-    Public edgeDuplicates As New List(Of lpData) ' lines that are dropped to help LineTrack algorithms.
+    Dim lpSorted As New SortedList(Of Single, lpData)(New compareAllowIdenticalSingleInverted)
+    Dim lpFind As New Line_FindClosest
     Public Sub New()
         dst1 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
-        labels(2) = "Line_Basics output"
         ld = cv.XImgProc.CvXImgProc.CreateFastLineDetector
         desc = "Run FLD (Fast Line Detector) with sobel input."
+    End Sub
+    Public Sub getRawSortedLines(lines As cv.Vec4f())
+        lpSorted.Clear()
+        For Each v In lines
+            If v(0) >= 0 And v(0) <= task.workRes.Width And v(1) >= 0 And v(1) <= task.workRes.Height And
+               v(2) >= 0 And v(2) <= task.workRes.Width And v(3) >= 0 And v(3) <= task.workRes.Height Then
+                Dim p1 = New cv.Point(CInt(v(0)), CInt(v(1)))
+                Dim p2 = New cv.Point(CInt(v(2)), CInt(v(3)))
+                If p1.X >= 0 And p1.X < task.workRes.Width And p1.Y >= 0 And p1.Y < task.workRes.Height And
+                   p2.X >= 0 And p2.X < task.workRes.Width And p2.Y >= 0 And p2.Y < task.workRes.Height Then
+                    p1 = lpData.validatePoint(p1)
+                    p2 = lpData.validatePoint(p2)
+                    Dim lp = New lpData(p1, p2)
+                    If lp.rect.Width = 0 Then Continue For
+                    lpSorted.Add(lp.length, lp)
+                End If
+            End If
+        Next
     End Sub
     Public Shared Function getRawLines(lines As cv.Vec4f()) As List(Of lpData)
         Dim lpList As New List(Of lpData)
@@ -76,6 +50,127 @@ Public Class Line_Basics : Inherits TaskParent
         Next
         Return lpList
     End Function
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        lpLast = New List(Of lpData)(lpList)
+
+        dst2 = task.color.Clone
+        If src.Channels <> 1 Or src.Type <> cv.MatType.CV_8U Then src = task.gray.Clone
+
+        edges.Run(src)
+        labels(2) = edges.labels(2)
+
+        getRawSortedLines(ld.Detect(edges.dst2))
+
+        lpList.Clear()
+        Dim removeNearDuplicates As Boolean = True
+        If removeNearDuplicates Then
+            Dim edgeMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+            For Each lp In lpSorted.Values
+                Dim val1 = edgeMap.Get(Of Byte)(lp.ptE1.Y, lp.ptE1.X)
+                Dim val2 = edgeMap.Get(Of Byte)(lp.ptE1.Y, lp.ptE1.X)
+                If val1 > 0 And val2 > 0 Then Continue For
+
+                lp.index = lpList.Count + 1
+
+                Dim gridIndex = task.gridMap.Get(Of Integer)(Math.Floor(lp.ptE1.Y), Math.Floor(lp.ptE1.X))
+                edgeMap(task.gridNabeRects(gridIndex)).SetTo(lp.index)
+                lpList.Add(lp)
+
+                Dim tierIndex = task.depthTiers.dst2.Get(Of Byte)(lp.p1.Y, lp.p1.X)
+                dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth + 1, cv.LineTypes.Link4)
+            Next
+        Else
+            For Each lp In lpSorted.Values
+                lp.index = lpList.Count + 1
+                lpList.Add(lp)
+                dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth + 1, cv.LineTypes.Link4)
+            Next
+        End If
+
+        Dim count As Integer
+        For Each lp In lpLast
+            lpFind.inputLine = lp
+            lpFind.Run(src)
+            Dim closest = lpFind.closestLine
+            If closest IsNot Nothing Then
+                If closest.index < lpList.Count Then
+                    Dim lpCurr = lpList(closest.index - 1)
+                    lpCurr.age = lp.age + 1
+                    lpCurr.indexLast = lp.index
+                    If lpCurr.age >= 1000 Then lpCurr.age = 10
+                    count += 1
+                End If
+            End If
+            If standaloneTest() Then SetTrueText(CStr(lp.age), New cv.Point2f(lp.ptCenter.X + 2, lp.ptCenter.Y + 2), 2)
+        Next
+
+        Dim lpAgeSort As New SortedList(Of Integer, Integer)(New compareAllowIdenticalIntegerInverted)
+        For Each lp In lpList
+            lpAgeSort.Add(lp.age, lp.index)
+        Next
+
+        dst3.SetTo(0)
+        Dim ages As New List(Of Integer)
+        For i = 0 To Math.Min(10, lpList.Count) - 1
+            Dim lp = lpList(lpAgeSort.Values(i) - 1)
+            dst3.Line(lp.p1, lp.p2, 255, task.lineWidth)
+            SetTrueText(CStr(lp.age), New cv.Point(lp.ptCenter.X + 2, lp.ptCenter.Y + 2), 3)
+            ages.Add(lp.age)
+        Next
+
+        Static minCount As Integer = count
+        If task.heartBeat Then minCount = count
+        If count < minCount Then minCount = count
+        Dim ageCount = lpAgeSort.Keys.Count
+        labels(2) = CStr(lpList.Count) + " lines found.  Value next to the line is the age.  Minimal count = " + CStr(minCount) +
+                    " Average age = " + If(ageCount > 0, Format(lpAgeSort.Keys.Average, fmt1), "0")
+
+        labels(3) = "The " + CStr(ages.Count) + " oldest lines found - average age = " +
+                    If(ages.Count > 0, Format(ages.Average, fmt1), "0")
+    End Sub
+    Protected Overrides Sub Finalize()
+        ld.Dispose()
+    End Sub
+End Class
+
+
+
+
+
+Public Class Line_Basics_TA : Inherits TaskParent
+    Public lpList As New List(Of lpData)
+    Public basics As New Line_Basics
+    Public Sub New()
+        desc = "Run FLD (Fast Line Detector) with sobel input."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        If src.Channels <> 1 Or src.Type <> cv.MatType.CV_8U Then src = task.gray.Clone
+
+        basics.Run(src)
+        dst2 = basics.dst2
+        dst3 = basics.dst3
+        labels = basics.labels
+        lpList = New List(Of lpData)(basics.lpList)
+    End Sub
+End Class
+
+
+
+
+Public Class Line_BasicsOld : Inherits TaskParent
+    Implements IDisposable
+    Public lpList As New List(Of lpData)
+    Public ld As cv.XImgProc.FastLineDetector
+    Public motionMask As cv.Mat = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 255)
+    Dim edges As New Edge_Sobel
+    Public edgeDuplicates As New List(Of lpData) ' lines that are dropped to help LineTrack algorithms.
+    Public Sub New()
+        dst1 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
+        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
+        labels(2) = "Line_BasicsOld output"
+        ld = cv.XImgProc.CvXImgProc.CreateFastLineDetector
+        desc = "Run FLD (Fast Line Detector) with sobel input."
+    End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst2 = task.color.Clone
         If src.Channels <> 1 Or src.Type <> cv.MatType.CV_8U Then src = task.gray.Clone
@@ -128,7 +223,7 @@ End Class
 
 
 
-Public Class Line_BasicsLSD : Inherits TaskParent
+Public Class Line_BasicsOldLSD : Inherits TaskParent
     Implements IDisposable
     Public lpList As New List(Of lpData)
     Dim lsd As cv.LineSegmentDetector
@@ -257,17 +352,17 @@ End Class
 
 
 
-Public Class NR_Line_Basics_TATest : Inherits TaskParent
+Public Class NR_Line_BasicsOld_Test : Inherits TaskParent
     Dim lines As New Line_Basics
     Public Sub New()
-        desc = "Line_Basics_TA is a task algorithm so this is the better way to test it."
+        desc = "Line_Basics is a task algorithm so this is the better way to test it."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        lines.motionMask = task.motion.motionMask
         lines.Run(task.gray)
         dst2.SetTo(0)
         For Each lp In lines.lpList
             dst2.Line(lp.p1, lp.p2, lp.color, task.lineWidth, task.lineType)
+            SetTrueText(CStr(lp.age), New cv.Point(lp.ptCenter.X + 2, lp.ptCenter.Y + 2), 2)
         Next
         labels(2) = lines.labels(2)
     End Sub
@@ -557,65 +652,20 @@ End Class
 
 
 
-Public Class Line_Motion : Inherits TaskParent
-    Dim lrLines As New Line_LeftRightMotion
-    Public Sub New()
-        If standalone Then task.gOptions.showMotionMask.Checked = True
-        desc = "Show lines with motion and lines with no motion in the leftView."
-    End Sub
-    Private Function lpMotion(lp As lpData) As Boolean
-        ' return true if either line endpoint was in the motion mask.
-        If lrLines.linesLeft.motionMask.Get(Of Byte)(lp.p1.Y, lp.p1.X) Then Return True
-        If lrLines.linesRight.motionMask.Get(Of Byte)(lp.p2.Y, lp.p2.X) Then Return True
-        Return False
-    End Function
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        dst2 = task.leftView.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-        dst3 = dst2.Clone
-        lrLines.Run(Nothing)
-
-        Dim motionCount As Integer
-        Dim noMotionCount As Integer
-        For Each lp In lrLines.linesLeft.lpList
-            If lpMotion(lp) Then
-                dst2.Line(lp.p1, lp.p2, lp.color, task.lineWidth + 1, task.lineType)
-                motionCount += 1
-            Else
-                dst3.Line(lp.p1, lp.p2, lp.color, task.lineWidth + 1, task.lineType)
-                noMotionCount += 1
-            End If
-        Next
-        labels(2) = CStr(motionCount) + " lines showed motion"
-        labels(3) = CStr(noMotionCount) + " lines showed no motion"
-    End Sub
-End Class
-
-
-
-
 Public Class Line_LeftRightMotion : Inherits TaskParent
-    Public linesLeft As New Line_Basics
     Public linesRight As New Line_Basics
-    Dim motionLeft As New Motion_Basics_TA
-    Dim motionRight As New Motion_Basics_TA
     Public Sub New()
         labels = {"", "", "Left image lines", "Right image lines"}
         desc = "Find the lines in the Left and Right images."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        motionLeft.Run(task.leftView)
-        linesLeft.motionMask = motionLeft.dst3
-        linesLeft.Run(task.leftView)
+        dst2 = task.lines.dst2
+        labels(2) = task.lines.labels(2)
 
-        dst2 = linesLeft.dst2
-        labels(2) = linesLeft.labels(2)
-
-        motionRight.Run(task.rightView)
-        linesRight.motionMask = motionRight.dst3
         linesRight.Run(task.rightView)
 
         dst3 = linesRight.dst2
-        labels(3) = linesLeft.labels(2)
+        labels(3) = linesRight.labels(2)
     End Sub
 End Class
 
@@ -634,7 +684,7 @@ Public Class Line_Vertical : Inherits TaskParent
         lrLines.Run(src)
         dst2 = task.leftView.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         lpLeft.Clear()
-        For Each lp In lrLines.linesLeft.lpList
+        For Each lp In task.lines.lpList
             If Math.Abs(lp.angle) > 87 Then
                 lpLeft.Add(lp)
                 dst2.Line(lp.p1, lp.p2, lp.color, task.lineWidth, task.lineType)
@@ -646,6 +696,7 @@ Public Class Line_Vertical : Inherits TaskParent
         For Each lp In lrLines.linesRight.lpList
             If Math.Abs(lp.angle) > 87 Then
                 lpRight.Add(lp)
+                SetTrueText(CStr(lp.age), New cv.Point(lp.ptCenter.X + 2, lp.ptCenter.Y + 2), 3)
                 dst3.Line(lp.p1, lp.p2, lp.color, task.lineWidth, task.lineType)
             End If
         Next
@@ -673,7 +724,6 @@ Public Class Line_LeftTrack : Inherits TaskParent
     ''' <summary>Tracked lines: (trackId, lpData, color, missedCount).</summary>
     Dim tracked As New List(Of TrackedLine)
     Dim nextTrackId As Integer = 1
-    Const minLength As Single = 12.0F
     Const maxMissed As Integer = 5
     Const maxTracked As Integer = 200
     Const angleThresh As Single = 8.0F
@@ -681,7 +731,7 @@ Public Class Line_LeftTrack : Inherits TaskParent
     Const lenRatioThresh As Single = 0.45F
 
     Public lpList As New List(Of lpData)
-    Dim lines As New Line_Basics
+    Dim lines As New Line_BasicsOld
     Dim options As New Options_LeftRightCorrelation
     Dim motionLeft As New Motion_Basics_TA
     Public Sub New()
@@ -704,10 +754,7 @@ Public Class Line_LeftTrack : Inherits TaskParent
         options.Run()
 
         dst0 = task.leftView
-        motionLeft.Run(task.leftView)
-        lines.motionMask = motionLeft.dst3
-        lines.Run(task.leftView)
-        Dim raw = lines.lpList
+        Dim raw = task.lines.lpList
 
         Dim usedRaw As New HashSet(Of lpData)
         Dim usedTracked As New HashSet(Of TrackedLine)
@@ -783,27 +830,20 @@ End Class
 
 
 Public Class Line_Tracker : Inherits TaskParent
-    Dim lines As New Line_Basics
     Dim options As New Options_LeftRightCorrelation
     Dim lpList As New List(Of lpData)
-    Dim motionLeft As New Motion_Basics_TA
     Public Sub New()
-        If standalone Then task.gOptions.displayDst0.Checked = True
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         desc = "Track lines in the left image."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
 
-        dst0 = task.leftView
-        motionLeft.Run(task.leftView)
-        lines.motionMask = motionLeft.dst3
-        lines.Run(task.leftView)
-        labels(2) = lines.labels(2)
+        labels(2) = task.lines.labels(2)
 
         dst2.SetTo(0)
         lpList.Clear()
-        For Each lp In lines.lpList
+        For Each lp In task.lines.lpList
             dst2.Line(lp.p1, lp.p2, lp.index + 1, options.lineTrackerWidth, cv.LineTypes.Link8)
             lpList.Add(lp)
             If lpList.Count > 10 Then Exit For
@@ -1052,8 +1092,8 @@ End Class
 
 
 Public Class Line_LeftRight : Inherits TaskParent
-    Dim linesLeft As New Line_Basics_TA
-    Dim linesRight As New Line_Basics_TA
+    Dim linesLeft As New Line_Basics
+    Dim linesRight As New Line_Basics
     Dim stableLR As New StableGray_LeftRight
     Public Sub New()
         desc = "Find the lines in the left and right images."
@@ -1089,8 +1129,8 @@ End Class
 
 
 
-Public Class Line_BasicsNoMotion : Inherits TaskParent
-    Dim lines As New Line_Basics
+Public Class Line_BasicsOldNoMotion : Inherits TaskParent
+    Dim lines As New Line_BasicsOld
     Public Sub New()
         desc = "Ignore motion when finding the lines."
     End Sub
@@ -1109,7 +1149,7 @@ End Class
 
 
 Public Class Line_TranslatedRightView : Inherits TaskParent
-    Dim lines As New Line_Basics_TA
+    Dim lines As New Line_Basics
     Public lpListRight As New List(Of lpData)
     Public Sub New()
         desc = "Translate lines from the color (left for ZED) image to the right image.."
@@ -1161,10 +1201,10 @@ End Class
 
 
 Public Class Line_EdgeLineCompare : Inherits TaskParent
-    Dim edgeLine As New EdgeLine_Basics
+    Dim edgeLine As New EdgeLine_BasicsOld
     Public Sub New()
-        labels(3) = "Lines where edgeline_basics and line_basics_TA agree."
-        desc = "Compare the output of EdgeLine_Basics and Line_Basics_TA"
+        labels(3) = "Lines where edgeLine_BasicsOld and Line_Basics agree."
+        desc = "Compare the output of EdgeLine_BasicsOld and Line_Basics"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         edgeLine.Run(src)
@@ -1279,8 +1319,8 @@ End Class
 
 
 Public Class Line_EdgeLine : Inherits TaskParent
-    Dim edgeLine As New EdgeLine_Basics
-    Dim lines As New Line_Basics_TA
+    Dim edgeLine As New EdgeLine_BasicsOld
+    Dim lines As New Line_Basics
     Public Sub New()
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         desc = "Search for lines in the EdgeLine output."
@@ -1388,11 +1428,11 @@ End Class
 
 
 
-'Public Class Line_Basics : Inherits TaskParent
+'Public Class Line_BasicsOld : Inherits TaskParent
 '    Dim lpList As New List(Of lpData)
 '    Public Sub New()
 '        labels(2) = "The top 10 lines in the latest image."
-'        desc = "Find the top 10 lines and track them until they are lost then run Line_Basics_TA again."
+'        desc = "Find the top 10 lines and track them until they are lost then run Line_Basics again."
 '    End Sub
 '    Public Overrides Sub RunAlg(src As cv.Mat)
 '        dst2 = src
@@ -1598,7 +1638,7 @@ End Class
 
 
 
-Public Class Line_BasicsEmboss : Inherits TaskParent
+Public Class Line_BasicsOldEmboss : Inherits TaskParent
     Implements IDisposable
     Public lpList As New List(Of lpData)
     Dim ld As cv.XImgProc.FastLineDetector
@@ -1636,7 +1676,7 @@ End Class
 
 Public Class Line_Sobel : Inherits TaskParent
     Dim edges As New Edge_Sobel
-    Dim lines As New Line_Basics_TA
+    Dim lines As New Line_Basics
     Public Sub New()
         desc = "Find lines in the Sobel output"
     End Sub
@@ -1712,7 +1752,7 @@ End Class
 
 
 
-Public Class Line_EdgePoints : Inherits TaskParent
+Public Class XO_Line_EdgePoints : Inherits TaskParent
     Dim knn As New KNN_Basics
     Public xMatches As New List(Of Single)
     Public yMatches As New List(Of Single)
@@ -1731,7 +1771,7 @@ Public Class Line_EdgePoints : Inherits TaskParent
             knn.queries.Add(lp.ptE2)
         Next
 
-        For Each lp In task.lines.basics.edgeDuplicates
+        For Each lp In task.lines.lpList
             knn.queries.Add(lp.ptE1)
             knn.queries.Add(lp.ptE2)
             lpList.Add(lp)
@@ -1808,7 +1848,7 @@ End Class
 
 Public Class Line_FinderPlus : Inherits TaskParent
     Dim find As New Line_Finder
-    Dim lines As New Line_Basics_TA
+    Dim lines As New Line_Basics
     Public Sub New()
         desc = "Find lines in the brickline_find output"
     End Sub
@@ -1953,122 +1993,5 @@ Public Class Line_FindClosest : Inherits TaskParent
             If .age >= 1000 Then .age = 10
             dst2.Line(.ptE1, .ptE2, task.highlight, task.lineWidth + 2)
         End With
-    End Sub
-End Class
-
-
-
-Public Class Line_BasicsNew : Inherits TaskParent
-    Implements IDisposable
-    Public lpList As New List(Of lpData)
-    Public lpLast As New List(Of lpData)
-    Public ld As cv.XImgProc.FastLineDetector
-    Dim edges As New Edge_Sobel
-    Dim lpSorted As New SortedList(Of Single, lpData)(New compareAllowIdenticalSingleInverted)
-    Dim lpFind As New Line_FindClosest
-    Public Sub New()
-        dst1 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
-        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
-        ld = cv.XImgProc.CvXImgProc.CreateFastLineDetector
-        desc = "Run FLD (Fast Line Detector) with sobel input."
-    End Sub
-    Public Sub getRawLines(lines As cv.Vec4f())
-        lpSorted.Clear()
-        For Each v In lines
-            If v(0) >= 0 And v(0) <= task.workRes.Width And v(1) >= 0 And v(1) <= task.workRes.Height And
-               v(2) >= 0 And v(2) <= task.workRes.Width And v(3) >= 0 And v(3) <= task.workRes.Height Then
-                Dim p1 = New cv.Point(CInt(v(0)), CInt(v(1)))
-                Dim p2 = New cv.Point(CInt(v(2)), CInt(v(3)))
-                If p1.X >= 0 And p1.X < task.workRes.Width And p1.Y >= 0 And p1.Y < task.workRes.Height And
-                   p2.X >= 0 And p2.X < task.workRes.Width And p2.Y >= 0 And p2.Y < task.workRes.Height Then
-                    p1 = lpData.validatePoint(p1)
-                    p2 = lpData.validatePoint(p2)
-                    Dim lp = New lpData(p1, p2)
-                    If lp.rect.Width = 0 Then Continue For
-                    lpSorted.Add(lp.length, lp)
-                End If
-            End If
-        Next
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        lpLast = New List(Of lpData)(lpList)
-
-        dst2 = task.color.Clone
-        If src.Channels <> 1 Or src.Type <> cv.MatType.CV_8U Then src = task.gray.Clone
-
-        edges.Run(src)
-        labels(2) = edges.labels(2)
-
-        getRawLines(ld.Detect(edges.dst2))
-
-        lpList.Clear()
-        Dim removeNearDuplicates As Boolean = True
-        If removeNearDuplicates Then
-            Dim edgeMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-            For Each lp In lpSorted.Values
-                Dim val1 = edgeMap.Get(Of Byte)(lp.ptE1.Y, lp.ptE1.X)
-                Dim val2 = edgeMap.Get(Of Byte)(lp.ptE1.Y, lp.ptE1.X)
-                If val1 > 0 And val2 > 0 Then Continue For
-
-                lp.index = lpList.Count + 1
-
-                Dim gridIndex = task.gridMap.Get(Of Integer)(Math.Floor(lp.ptE1.Y), Math.Floor(lp.ptE1.X))
-                edgeMap(task.gridNabeRects(gridIndex)).SetTo(lp.index)
-                lpList.Add(lp)
-
-                Dim tierIndex = task.depthTiers.dst2.Get(Of Byte)(lp.p1.Y, lp.p1.X)
-                dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth + 1, cv.LineTypes.Link4)
-            Next
-        Else
-            For Each lp In lpSorted.Values
-                lp.index = lpList.Count + 1
-                lpList.Add(lp)
-                dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth + 1, cv.LineTypes.Link4)
-            Next
-        End If
-
-        Dim count As Integer
-        For Each lp In lpLast
-            lpFind.inputLine = lp
-            lpFind.Run(src)
-            Dim closest = lpFind.closestLine
-            If closest IsNot Nothing Then
-                If closest.index < lpList.Count Then
-                    Dim lpCurr = lpList(closest.index - 1)
-                    lpCurr.age = lp.age + 1
-                    lpCurr.indexLast = lp.index
-                    If lpCurr.age >= 1000 Then lpCurr.age = 10
-                    count += 1
-                End If
-            End If
-            If standaloneTest() Then SetTrueText(CStr(lp.age), New cv.Point2f(lp.ptCenter.X + 2, lp.ptCenter.Y + 2), 2)
-        Next
-
-        Dim lpAgeSort As New SortedList(Of Integer, Integer)(New compareAllowIdenticalIntegerInverted)
-        For Each lp In lpList
-            lpAgeSort.Add(lp.age, lp.index)
-        Next
-
-        dst3.SetTo(0)
-        Dim ages As New List(Of Integer)
-        For i = 0 To Math.Min(10, lpList.Count) - 1
-            Dim lp = lpList(lpAgeSort.Values(i) - 1)
-            dst3.Line(lp.p1, lp.p2, 255, task.lineWidth)
-            SetTrueText(CStr(lp.age), New cv.Point(lp.ptCenter.X + 2, lp.ptCenter.Y + 2), 3)
-            ages.Add(lp.age)
-        Next
-
-        Static minCount As Integer = count
-        If task.heartBeat Then minCount = count
-        If count < minCount Then minCount = count
-        Dim ageCount = lpAgeSort.Keys.Count
-        labels(2) = CStr(lpList.Count) + " lines found.  Value next to the line is the age.  Minimal count = " + CStr(minCount) +
-                    " Average age = " + If(ageCount > 0, Format(lpAgeSort.Keys.Average, fmt1), "0")
-
-        labels(3) = "The " + CStr(ages.Count) + " oldest lines found - average age = " +
-                    If(ages.Count > 0, Format(ages.Average, fmt1), "0")
-    End Sub
-    Protected Overrides Sub Finalize()
-        ld.Dispose()
     End Sub
 End Class

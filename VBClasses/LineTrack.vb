@@ -660,7 +660,7 @@ Public Class NR_LineTrack_CorrelationTrack : Inherits TaskParent
     Public lp As lpData
     Public Sub New()
         task.fOptions.MatchCorrSlider.Value = 90
-        desc = "Track each of the lines found in Line_Basics_TA"
+        desc = "Track each of the lines found in Line_Basics"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If src.Channels <> 1 Then src = task.gray.Clone

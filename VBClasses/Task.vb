@@ -187,7 +187,6 @@ Public Class AlgorithmTask : Implements IDisposable
         depthTiers.Run(task.pcSplit(2))
 
         gravityBasics.Run(src.Clone)
-        lines.basics.motionMask = motion.motionMask
         lines.Run(gray)
         histBinList = {histogramBins, histogramBins, histogramBins}
         lineTrack.Run(gray)

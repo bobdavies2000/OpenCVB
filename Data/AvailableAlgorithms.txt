@@ -64,7 +64,7 @@ Brick_Plot
 Brick_Ranges
 Brick_Search
 Brick_Variability
-BrickLine_Basics
+BrickLine_BasicsOld
 BrickLine_DepthGap
 BrickLine_Edges
 BrickLine_EdgesNoEdges
@@ -156,7 +156,7 @@ DepthColorizer_Basics_TA
 DepthColorizer_CloudPixels
 DepthColorizer_CPP
 DepthColorizer_Mean
-DepthLine_Basics
+DepthLine_BasicsOld
 DepthLine_H
 DepthLine_HV
 DepthLine_Points
@@ -227,7 +227,7 @@ Edge_SobelNaive
 Edge_SobelV
 Edge_SobelVertical
 Edge_StableLeftRight
-EdgeLine_Basics
+EdgeLine_BasicsOld
 EdgeLine_KeyColorOnly
 EdgeLine_LeftRightMotion
 Eigen_Input
@@ -280,7 +280,7 @@ FindMinRect_Basics
 FindNonZero_Basics
 FindNonZero_Line3D
 FitEllipse_Basics
-FitLine_Basics_TA
+FitLine_BasicsOld_TA
 FitLine_Conventional
 Flood_Basics
 Flood_BasicsDemo
@@ -388,7 +388,7 @@ Hough_Lines_MT
 Hough_Structural
 Hull_Basics
 Hull_Contour
-HullLine_Basics_TA
+HullLine_BasicsOld_TA
 HullLine_EdgePoints
 Image_Basics
 Image_RedCloudColor
@@ -461,10 +461,10 @@ LeftRight_Reduction
 LeftRight_Stable
 Line_Basics
 Line_Basics_TA
-Line_BasicsEmboss
-Line_BasicsLSD
-Line_BasicsNew
-Line_BasicsNoMotion
+Line_BasicsOld
+Line_BasicsOldEmboss
+Line_BasicsOldLSD
+Line_BasicsOldNoMotion
 Line_Brick
 Line_BrickList
 Line_BrickListTest
@@ -472,7 +472,6 @@ Line_Core
 Line_DepthHistogram
 Line_EdgeLine
 Line_EdgeLineCompare
-Line_EdgePoints
 Line_FindClosest
 Line_Finder
 Line_FinderPlus
@@ -486,7 +485,6 @@ Line_Longest
 Line_LongestTest
 Line_Map
 Line_MapRects
-Line_Motion
 Line_Perpendicular
 Line_RedFlood
 Line_Sobel
@@ -979,7 +977,7 @@ NR_FitEllipse_AMS_CPP
 NR_FitEllipse_Direct_CPP
 NR_FitEllipse_Rectangle
 NR_FitEllipse_RedCloud
-NR_FitLine_Basics_TA3D
+NR_FitLine_BasicsOld_TA3D
 NR_FitLine_Example2D
 NR_FitLine_Grid
 NR_FitLine_Lines
@@ -1174,7 +1172,7 @@ NR_LeftRight_Edges
 NR_LeftRight_EdgesColor
 NR_LeftRight_RawLeft
 NR_LeftRight_RGBAlignLeft
-NR_Line_Basics_TATest
+NR_Line_BasicsOld_Test
 NR_Line_Finder
 NR_Line_Parallel
 NR_Line_Select
@@ -1560,7 +1558,7 @@ PlotTime_FixedScale
 PlotTime_Scalar
 PlotTime_Single
 PlyFormat_Basics
-PolyLine_Basics_TA
+PolyLine_BasicsOld_TA
 PongWars_Basics
 ProCon_Basics
 ProCon_Variation
@@ -1707,8 +1705,8 @@ StableGray_RGBMax
 StableGray_RGBMin
 StableGray_RGBMinMaxCompare
 StableGray_ToggleMinMax
-StableLine_Basics
-StableLine_BasicsCount
+StableLine_BasicsOld
+StableLine_BasicsOldCount
 Stitch_Basics
 Stripes_Basics
 Stripes_CloudX

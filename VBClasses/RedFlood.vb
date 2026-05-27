@@ -189,7 +189,7 @@ Public Class RedFlood_Color : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         If standalone Then contours.Run(src)
         If src.Type <> cv.MatType.CV_8U Then
-            If standalone And task.fOptions.Color8USource.SelectedItem = "EdgeLine_Basics" Then
+            If standalone And task.fOptions.Color8USource.SelectedItem = "EdgeLine_BasicsOld" Then
                 dst1 = contours.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
             Else
                 dst1 = Mat_Basics.srcMustBe8U(src)
@@ -477,7 +477,7 @@ Public Class RedFlood_List : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         contours.Run(src)
         If src.Type <> cv.MatType.CV_8U Then
-            If standalone And task.fOptions.Color8USource.SelectedItem = "EdgeLine_Basics" Then
+            If standalone And task.fOptions.Color8USource.SelectedItem = "EdgeLine_BasicsOld" Then
                 dst1 = contours.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
             Else
                 dst1 = Mat_Basics.srcMustBe8U(src)

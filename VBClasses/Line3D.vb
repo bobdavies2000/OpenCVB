@@ -112,7 +112,7 @@ Public Class Line3D_ReconstructLine : Inherits TaskParent
     Public selectLine As New Delaunay_LineSelect
     Public pointcloud As New cv.Mat(dst2.Size, cv.MatType.CV_32FC3, 0)
     Public Sub New()
-        desc = "Build the 3D lines found in Line_Basics_TA"
+        desc = "Build the 3D lines found in Line_Basics"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         selectLine.Run(src)

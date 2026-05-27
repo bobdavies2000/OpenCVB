@@ -1,12 +1,12 @@
 Imports cv = OpenCvSharp
-Public Class DepthLine_Basics : Inherits TaskParent
+Public Class DepthLine_BasicsOld : Inherits TaskParent
     Public prepEdges As New RedPrep_Basics
-    Dim lines As New Line_BasicsNew
+    Dim lines As New Line_Basics
     Public lpList As New List(Of lpData)
     Public Sub New()
         If standalone Then task.gOptions.displayDst0.Checked = True
         labels(0) = "LeftView after brightness/contrast transform."
-        labels(3) = "Input to Line_Basics_TA"
+        labels(3) = "Input to Line_Basics"
         desc = "Find lines in reduced the depth data."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -33,7 +33,7 @@ End Class
 
 
 Public Class NR_DepthLine_XY : Inherits TaskParent
-    Dim lineD As New DepthLine_Basics
+    Dim lineD As New DepthLine_BasicsOld
     Public lpList As New List(Of lpData)
     Public Sub New()
         If standalone Then task.gOptions.displayDst0.Checked = True
@@ -54,7 +54,7 @@ End Class
 
 
 Public Class DepthLine_V : Inherits TaskParent
-    Dim lineD As New DepthLine_Basics
+    Dim lineD As New DepthLine_BasicsOld
     Public lpList As New List(Of lpData)
     Public Sub New()
         OptionParent.FindCheckBox("Prep Edges in Y").Checked = False
@@ -77,7 +77,7 @@ End Class
 
 
 Public Class DepthLine_H : Inherits TaskParent
-    Dim lineD As New DepthLine_Basics
+    Dim lineD As New DepthLine_BasicsOld
     Public lpList As New List(Of lpData)
     Public Sub New()
         If standalone Then task.gOptions.displayDst0.Checked = True
@@ -179,10 +179,10 @@ Public Class NR_DepthLine_HV2 : Inherits TaskParent
     Dim lineX As New RedPrep_Basics
     Dim lineY As New RedPrep_Basics
     Public lpList As New List(Of lpData)
-    Dim lines As New Line_BasicsNew
+    Dim lines As New Line_Basics
     Public Sub New()
         task.fOptions.ReductionSlider.Value = 200
-        labels(3) = "Input to Line_Basics_TA"
+        labels(3) = "Input to Line_Basics"
         desc = "Find horizontal and vertical lines in the reduced depth data."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
