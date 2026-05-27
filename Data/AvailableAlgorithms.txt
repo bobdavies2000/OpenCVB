@@ -442,7 +442,7 @@ KNN_Dimension3
 KNN_Dimension4
 KNN_DimensionN
 KNN_Farthest
-KNN_FindLine
+KNN_FindLineKNN
 KNN_Grid
 KNN_IndividualQuery
 KNN_MinDistance
@@ -465,7 +465,6 @@ Line_Basics_TA
 Line_BasicsEmboss
 Line_BasicsLSD
 Line_BasicsNoMotion
-Line_BasicsNoMotion1
 Line_Brick
 Line_BrickList
 Line_BrickListTest
@@ -514,7 +513,6 @@ LineSeg_Match
 LineSeg_Top3
 LineTrack_Basics
 LineTrack_Basics_TA
-LineTrack_Horizontal
 LineTrack_Match
 LineTrack_MatchLines
 LineTrack_PitchRoll

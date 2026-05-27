@@ -20335,4 +20335,96 @@ Namespace VBClasses
                         "It should not disappear unless the movement makes another line the lpList(0)", 3)
         End Sub
     End Class
+
+
+
+
+    Public Class XO_Line_BasicsNoMotion1 : Inherits TaskParent
+        Implements IDisposable
+        Public lpList As New List(Of lpData)
+        Dim ld As cv.XImgProc.FastLineDetector
+        Public removeOverlappingLines As Boolean = True
+        Public overLappingCount As Integer
+        Public Sub New()
+            dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
+            If standalone Then task.gOptions.showMotionMask.Checked = True
+            ld = cv.XImgProc.CvXImgProc.CreateFastLineDetector
+            desc = "NOT Working.  The test using dst1 is not reliable."
+        End Sub
+        Public Shared Function getRawLines(lines As cv.Vec4f()) As List(Of lpData)
+            Dim lpList As New List(Of lpData)
+            For Each v In lines
+                If v(0) >= 0 And v(0) <= task.workRes.Width And v(1) >= 0 And v(1) <= task.workRes.Height And
+                           v(2) >= 0 And v(2) <= task.workRes.Width And v(3) >= 0 And v(3) <= task.workRes.Height Then
+                    Dim p1 = New cv.Point(CInt(v(0)), CInt(v(1)))
+                    Dim p2 = New cv.Point(CInt(v(2)), CInt(v(3)))
+                    If p1.X >= 0 And p1.X < task.workRes.Width And p1.Y >= 0 And p1.Y < task.workRes.Height And
+                               p2.X >= 0 And p2.X < task.workRes.Width And p2.Y >= 0 And p2.Y < task.workRes.Height Then
+                        p1 = lpData.validatePoint(p1)
+                        p2 = lpData.validatePoint(p2)
+                        Dim lp = New lpData(p1, p2)
+                        If lp.pVec1(2) > 0 And lp.pVec2(2) > 0 Then lpList.Add(lp)
+                    End If
+                End If
+            Next
+            Return lpList
+        End Function
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            If src.Channels <> 1 Then src = task.gray.Clone
+            dst2 = src.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+            If lpList.Count <= 1 Then lpList = getRawLines(ld.Detect(src))
+
+            Static lastLineImage As cv.Mat = dst1.Clone
+            Dim sortlines As New SortedList(Of Single, lpData)(New compareAllowIdenticalSingleInverted)
+            For Each lp In lpList
+                Dim val = lastLineImage.Get(Of Byte)(lp.ptCenter.Y, lp.ptCenter.X)
+                If val = lp.index + 1 Then
+                    lp.age += 1
+                    sortlines.Add(lp.length, lp)
+                End If
+            Next
+            Dim count As Integer = sortlines.Count
+
+            lpList = getRawLines(ld.Detect(src))
+
+            For Each lp In lpList
+                Dim val = lastLineImage.Get(Of Byte)(lp.ptCenter.Y, lp.ptCenter.X)
+                If val = 0 Then sortlines.Add(lp.length, lp)
+            Next
+            Dim newCount As Integer = sortlines.Count - count
+
+            lpList.Clear()
+            overLappingCount = 0
+            dst1.SetTo(0)
+            For Each lp In sortlines.Values
+                lp.index = lpList.Count
+                If removeOverlappingLines Then
+                    If lp.rect.Width = 0 Then Continue For
+                    If lp.rect.Height = 0 Then Continue For
+                    If dst1(lp.rect).CountNonZero > 0 Then
+                        overLappingCount += 1
+                        Continue For
+                    End If
+                End If
+                dst1.Line(lp.p1, lp.p2, lp.index + 1, task.lineWidth, cv.LineTypes.Link4)
+                dst2.Line(lp.p1, lp.p2, lp.color, task.lineWidth + 1, task.lineType)
+                lpList.Add(lp)
+            Next
+
+            dst3 = dst1.Threshold(0, 255, cv.ThresholdTypes.Binary)
+
+            If lpList.Count > 0 Then
+                If task.lpD Is Nothing Then task.lpD = lpList(0)
+            End If
+
+            lastLineImage = dst1.Clone
+
+            labels(2) = CStr(count) + " lines retained - " + CStr(newCount) + " were new"
+            If removeOverlappingLines Then labels(2) += ". " + CStr(overLappingCount) + " overlap(s) removed."
+        End Sub
+        Protected Overrides Sub Finalize()
+            ld.Dispose()
+        End Sub
+    End Class
+
 End Namespace

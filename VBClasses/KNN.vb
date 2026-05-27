@@ -651,7 +651,7 @@ End Class
 
 
 
-Public Class KNN_FindLine : Inherits TaskParent
+Public Class KNN_FindLineKNN : Inherits TaskParent
     Public inputLine As lpData
     Public closestLine As lpData
     Dim knn As New KNN_Minimal
@@ -664,7 +664,7 @@ Public Class KNN_FindLine : Inherits TaskParent
         desc = "Find the line in task.lines.lpList closest to the requested line"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If standalone Then inputLine = task.lpGravity
+        If standalone Then inputLine = task.longestLine
 
         trainInput.Clear()
         For Each lp In task.lines.lpList

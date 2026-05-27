@@ -1,64 +1,42 @@
 Imports System.Runtime.InteropServices
 Imports cv = OpenCvSharp
 Public Class LineTrack_Basics : Inherits TaskParent
-    Dim lpLast As New lpData
     Public lpInput As New lpData
-    Public reSyncImage As Boolean = True ' if true, the longest line was lost.
-    Dim knn As New KNN_FindLine
+    Dim lpClose As New Line_FindClosest
+    Public presentCount As Integer
     Public Sub New()
         desc = "Track the longest line even if it is no longer the longest and flag when it is lost."
     End Sub
-    Public Shared Function compareLines(lpCurr As lpData, lpLast As lpData) As Boolean
-        Dim distThreshold = If(task.workRes.Width > 640, task.gridWH * 2, task.gridWH)
-        If (lpCurr.ptE1.DistanceTo(lpLast.ptE1) < distThreshold And
-           lpCurr.ptE2.DistanceTo(lpLast.ptE2) < distThreshold) Or
-           (lpCurr.ptE2.DistanceTo(lpLast.ptE1) < distThreshold And
-           lpCurr.ptE1.DistanceTo(lpLast.ptE2) < distThreshold) Then
-            Return True
-        End If
-        Return False
-    End Function
-    Private Sub reset()
-        task.longestLine = If(standalone, task.lines.lpList(0), lpInput)
-        lpLast = task.longestLine
-        reSyncImage = False
+    Public Sub reset()
+        presentCount = 0
+        task.longestLine = task.lines.lpList(0)
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        Static presentCount As Integer
-        Static lostLongest As Integer
+        If task.firstPass Then reset()
         If task.lines.lpList.Count = 0 Then
-            dst2.SetTo(0)
+            reset()
         Else
-            If reSyncImage Then reset()
+            lpClose.inputLine = task.longestLine
+            lpClose.Run(emptyMat)
+            Dim lpTmp = lpClose.closestLine
 
-            knn.inputLine = task.longestLine
-            knn.Run(emptyMat)
-            Dim lpTmp = knn.closestLine
-
-            task.longestLine = New lpData(lpTmp.ptE1, lpTmp.ptE2)
-
-            dst2 = task.color.Clone
-            dst2.Line(task.longestLine.p1, task.longestLine.p2, task.highlight, task.lineWidth + 1)
-            If compareLines(task.longestLine, lpLast) Then
+            If lpTmp IsNot Nothing Then
+                task.longestLine = New lpData(lpTmp.ptE1, lpTmp.ptE2)
+                task.longestLine.age = lpTmp.age
+                dst2 = task.color.Clone
+                With task.longestLine
+                    dst2.Line(.p1, .p2, task.highlight, task.lineWidth + 1)
+                    SetTrueText(CStr(.age), New cv.Point2f(.ptCenter.X + 2, .ptCenter.Y + 2), 2)
+                End With
                 presentCount += 1
-                If presentCount > 1000 Then presentCount = 100
-                lpLast = task.longestLine
+                If presentCount > 1000 Then presentCount = 10
             Else
-                lostLongest = 15
-                presentCount = 0
                 reset()
-                reSyncImage = True
             End If
-        End If
-
-        If lostLongest > 0 Then
-            SetTrueText("The longest line was lost! ", 2)
-            lostLongest -= 1
         End If
         labels(2) = "The longest line has been present for " + CStr(presentCount) + " frames."
 
-        SetTrueText("The requested line is tracked until it is lost." + vbCrLf +
-                    "When the line is lost, the input line (default longest) is found and tracked.", 3)
+        SetTrueText("The longest line is the default line.  It has been present for " + CStr(presentCount) + " frames.", 3)
     End Sub
 End Class
 
@@ -67,21 +45,23 @@ End Class
 
 Public Class LineTrack_Basics_TA : Inherits TaskParent
     Public lpCurr As New lpData
-    Public lineTrack As New LineTrack_Basics
-    Public reSyncImage As Boolean = True ' if true, the longest line was lost.
+    Public lineTrackTask As New LineTrack_Basics
     Public Sub New()
-        desc = "Track the longest line and flag it (reSyncImage) when it is lost."
+        desc = "Track the longest line and measure its age."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If task.lines.lpList.Count = 0 Then Exit Sub ' nothing yet.
-        If lineTrack.reSyncImage Then lineTrack.lpInput = task.lines.lpList(0)
-        lineTrack.Run(emptyMat)
-        labels(2) = lineTrack.labels(2)
+        lineTrackTask.Run(emptyMat)
+        labels(2) = lineTrackTask.labels(2)
 
         lpCurr = task.longestLine
-        reSyncImage = lineTrack.reSyncImage
 
-        If standaloneTest() Then dst2 = lineTrack.dst2.Clone
+        If standaloneTest() Then
+            dst2 = lineTrackTask.dst2.Clone
+            With task.longestLine
+                SetTrueText(CStr(.age), New cv.Point2f(.ptCenter.X + 2, .ptCenter.Y + 2), 2)
+            End With
+        End If
 
         SetTrueText("The longest line (task.lines.lpList(0) is tracked until it is lost." + vbCrLf +
                     "When that line is lost, the longest line is found and tracked.", 3)
@@ -859,56 +839,56 @@ End Class
 
 
 
-Public Class LineTrack_Horizontal : Inherits TaskParent
-    Public lpCurr As New lpData
-    Public lineTrack As New LineTrack_Basics
-    Public Sub New()
-        desc = "Track the longest horizontal line (if available)"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        ' if no horizontal lines are available, then pick the second longest vertical
-        ' line and track the perpendicular.
+'Public Class LineTrack_Horizontal : Inherits TaskParent
+'    Public lpCurr As New lpData
+'    Public lineTrack As New LineTrack_Basics
+'    Public Sub New()
+'        desc = "Track the longest horizontal line (if available)"
+'    End Sub
+'    Public Overrides Sub RunAlg(src As cv.Mat)
+'        ' if no horizontal lines are available, then pick the second longest vertical
+'        ' line and track the perpendicular.
 
-        Static lpSave As lpData
-        If lineTrack.reSyncImage Then
-            Dim foundHoriz As Boolean = False
-            For Each lp In task.lines.lpList
-                If lp.index = 1 Then Continue For ' longest is already being tracked.
-                If lp.ptE1.X = 0 Then
-                    lpSave = lp
-                    lineTrack.lpInput = lpSave
-                    foundHoriz = True
-                    Exit For
-                End If
-            Next
+'        Static lpSave As lpData
+'        If lineTrack.presentCount > 0 Then
+'            Dim foundHoriz As Boolean = False
+'            For Each lp In task.lines.lpList
+'                If lp.index = 1 Then Continue For ' longest is already being tracked.
+'                If lp.ptE1.X = 0 Then
+'                    lpSave = lp
+'                    lineTrack.lpInput = lpSave
+'                    foundHoriz = True
+'                    Exit For
+'                End If
+'            Next
 
-            If foundHoriz = False Then
-                For Each lp In task.lines.lpList
-                    If lp.index = 1 Then Continue For ' longest is already being tracked.
-                    If lp.ptE1.Y = 0 Or lp.ptE2.Y = 0 Then
-                        lpSave = lp
-                        lineTrack.lpInput = Line_Perpendicular.computePerp(lpSave)
-                        foundHoriz = True
-                        Exit For
-                    End If
-                Next
-            End If
-        End If
-        lineTrack.Run(emptyMat)
-        labels(2) = lineTrack.labels(2)
+'            If foundHoriz = False Then
+'                For Each lp In task.lines.lpList
+'                    If lp.index = 1 Then Continue For ' longest is already being tracked.
+'                    If lp.ptE1.Y = 0 Or lp.ptE2.Y = 0 Then
+'                        lpSave = lp
+'                        lineTrack.lpInput = Line_Perpendicular.computePerp(lpSave)
+'                        foundHoriz = True
+'                        Exit For
+'                    End If
+'                Next
+'            End If
+'        End If
+'        lineTrack.Run(emptyMat)
+'        labels(2) = lineTrack.labels(2)
 
-        lpCurr = task.longestLine
+'        lpCurr = task.longestLine
 
-        If standaloneTest() Then
-            dst2 = lineTrack.dst2.Clone
-            dst2.Line(lpSave.p1, lpSave.p2, white, task.lineWidth)
-        End If
+'        If standaloneTest() Then
+'            dst2 = lineTrack.dst2.Clone
+'            dst2.Line(lpSave.p1, lpSave.p2, white, task.lineWidth)
+'        End If
 
-        SetTrueText("The longest horizontal line is tracked until it is lost." + vbCrLf +
-                    "When that line is lost, the longest line is found and tracked.", 3)
+'        SetTrueText("The longest horizontal line is tracked until it is lost." + vbCrLf +
+'                    "When that line is lost, the longest line is found and tracked.", 3)
 
-    End Sub
-End Class
+'    End Sub
+'End Class
 
 
 

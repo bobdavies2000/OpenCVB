@@ -8,7 +8,7 @@ Public Class Stabilizer_Basics : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         If src.Channels <> 1 Then src = task.grayOriginal
 
-        If task.lineTrack.reSyncImage Then
+        If task.lineTrack.lineTrackTask.presentCount = 0 Then
             dst2 = src.Clone
             Exit Sub
         End If
@@ -160,7 +160,7 @@ Public Class Stabilizer_OrientationPRY : Inherits TaskParent
         labels(2) = "Pitch=" + Format(pitchDeg, fmt2) + " deg  Roll(IMU Z)=" + Format(rollDeg, fmt2) +
                     " deg  Yaw(gyro int)=" + Format(yawDeg, fmt2) + " deg"
         labels(3) = "lpCurr angle=" + Format(lpCurr.angle, fmt2) + " deg, roll(image lpGravity)=" + Format(rollImageDeg, fmt2) +
-                    " deg, reSyncImage=" + CStr(task.lineTrack.reSyncImage)
+                    " deg, line present " + CStr(task.lineTrack.lineTrackTask.presentCount) + " frames"
 
         strOut = "Pitch/roll use task.accRadians (X,Z) from gravity/IMU pipeline (radians converted to degrees)." + vbCrLf +
                  "Yaw uses integrated IMU_AngularVelocity.Y (rad/s); reset on options change — it drifts without magnetometer." + vbCrLf +
