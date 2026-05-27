@@ -3,18 +3,16 @@ Imports cv = OpenCvSharp
 Public Class LineTrack_Basics : Inherits TaskParent
     Public lpInput As New lpData
     Dim lpClose As New Line_FindClosest
-    Public presentCount As Integer
     Public Sub New()
         desc = "Track the longest line even if it is no longer the longest and flag when it is lost."
     End Sub
-    Public Sub reset()
-        presentCount = 0
+    Private Sub resetLongest()
         task.longestLine = task.lines.lpList(0)
+        task.longestLine.age = 1
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If task.firstPass Then reset()
-        If task.lines.lpList.Count = 0 Then
-            reset()
+        If task.lines.lpList.Count = 0 Or task.firstPass Then
+            resetLongest()
         Else
             lpClose.inputLine = task.longestLine
             lpClose.Run(emptyMat)
@@ -28,15 +26,13 @@ Public Class LineTrack_Basics : Inherits TaskParent
                     dst2.Line(.p1, .p2, task.highlight, task.lineWidth + 1)
                     SetTrueText(CStr(.age), New cv.Point2f(.ptCenter.X + 2, .ptCenter.Y + 2), 2)
                 End With
-                presentCount += 1
-                If presentCount > 1000 Then presentCount = 10
             Else
-                reset()
+                resetLongest()
             End If
         End If
-        labels(2) = "The longest line has been present for " + CStr(presentCount) + " frames."
+        labels(2) = "The longest line has been present for " + CStr(task.longestLine.age) + " frames."
 
-        SetTrueText("The longest line is the default line.  It has been present for " + CStr(presentCount) + " frames.", 3)
+        SetTrueText("The longest line is the default line.  It has been present for " + CStr(task.longestLine.age) + " frames.", 3)
     End Sub
 End Class
 
