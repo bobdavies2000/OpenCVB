@@ -16,6 +16,7 @@ Public Class LineTrack_Basics : Inherits TaskParent
             resetLongest()
         Else
             lpFind.inputLine = If(task.longestLine Is Nothing, task.lines.lpList(0), task.longestLine)
+            lpFind.lpList = task.lines.lpList
             lpFind.Run(emptyMat)
             Dim lpTmp = lpFind.closestLine
 
@@ -37,33 +38,6 @@ Public Class LineTrack_Basics : Inherits TaskParent
     End Sub
 End Class
 
-
-
-
-'Public Class LineTrack_Basics_TA : Inherits TaskParent
-'    Public lpCurr As New lpData
-'    Public lineTrackTask As New LineTrack_Basics
-'    Public Sub New()
-'        desc = "Track the longest line and measure its age."
-'    End Sub
-'    Public Overrides Sub RunAlg(src As cv.Mat)
-'        If task.lines.lpList.Count = 0 Then Exit Sub ' nothing yet.
-'        lineTrackTask.Run(emptyMat)
-'        labels(2) = lineTrackTask.labels(2)
-
-'        lpCurr = task.longestLine
-
-'        If standaloneTest() Then
-'            dst2 = lineTrackTask.dst2.Clone
-'            With task.longestLine
-'                SetTrueText(CStr(.age), New cv.Point2f(.ptCenter.X + 2, .ptCenter.Y + 2), 2)
-'            End With
-'        End If
-
-'        SetTrueText("The longest line (task.lines.lpList(0) is tracked until it is lost." + vbCrLf +
-'                    "When that line is lost, the longest line is found and tracked.", 3)
-'    End Sub
-'End Class
 
 
 

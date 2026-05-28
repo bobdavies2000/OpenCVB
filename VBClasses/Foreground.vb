@@ -8,7 +8,7 @@ Public Class Foreground_Basics_TA : Inherits TaskParent
         desc = "Create a histogram of depth and find foreground as X% of points."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If task.heartBeat Then
+        If task.heartBeat Or hist.histogram.Total = 0 Then
             dst1 = task.pcSplit(2).Threshold(task.MaxZmeters, 255, cv.ThresholdTypes.BinaryInv).ConvertScaleAbs
             dst1.SetTo(0, task.noDepthMask)
             dst0 = task.pcSplit(2).Clone
@@ -17,6 +17,7 @@ Public Class Foreground_Basics_TA : Inherits TaskParent
             hist.Run(dst0)
             dst2 = hist.dst2
 
+            If hist.histogram.Total = 0 Then Exit Sub
             Dim histArray(hist.histogram.Total - 1) As Single
             hist.histogram.GetArray(Of Single)(histArray)
 

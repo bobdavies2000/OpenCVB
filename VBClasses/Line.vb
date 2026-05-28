@@ -109,24 +109,32 @@ Public Class Line_Basics : Inherits TaskParent
             lpAgeSort.Add(lp.age, lp.index)
         Next
 
-        If lpList.Count = 0 Then Exit Sub
+        Static gravity = task.lpGravity
+        If (task.longestLine = gravity Or task.longestLine Is Nothing) And lpList.Count > 0 Then task.longestLine = lpList(0)
+        If lpList.Count > 0 Then
+            lpFind.inputLine = If(task.longestLine Is Nothing, lpList(0), task.longestLine)
+            lpFind.lpList = lpList
+            lpFind.Run(emptyMat)
+            Dim lpTmp = lpFind.closestLine
 
-        lpFind.inputLine = If(task.longestLine Is Nothing, lpList(0), task.longestLine)
-        lpFind.Run(emptyMat)
-        Dim lpTmp = lpFind.closestLine
-
-        If lpTmp IsNot Nothing Then
-            task.longestLine = New lpData(lpTmp.ptE1, lpTmp.ptE2)
-            If standaloneTest() Then
-                dst3 = task.color.Clone
-                With task.longestLine
-                    dst3.Line(.p1, .p2, task.highlight, task.lineWidth + 1)
-                    SetTrueText(CStr(.age), New cv.Point2f(.ptCenter.X + 2, .ptCenter.Y + 2), 2)
-                End With
+            If lpTmp Is Nothing Then
+                gravity = task.lpGravity
+                task.longestLine = task.lpGravity
             Else
-                task.longestLine = task.lines.lpList(0)
-                task.longestLine.age = 1
+                task.longestLine = New lpData(lpTmp.ptE1, lpTmp.ptE2)
             End If
+        Else
+            gravity = task.lpGravity
+            task.longestLine = task.lpGravity
+            lpList.Add(task.longestLine) ' need to always have something in lplist...
+        End If
+
+        If standaloneTest() Then
+            dst3 = task.color.Clone
+            With task.longestLine
+                dst3.Line(.p1, .p2, task.highlight, task.lineWidth + 1)
+                SetTrueText(CStr(.age), New cv.Point2f(.ptCenter.X + 2, .ptCenter.Y + 2), 2)
+            End With
         End If
 
         Static minCount As Integer = count
@@ -156,7 +164,6 @@ Public Class Line_Basics_TA : Inherits TaskParent
 
         basics.Run(src)
         dst2 = basics.dst2
-        dst3 = basics.dst3
         labels = basics.labels
         lpList = New List(Of lpData)(basics.lpList)
         trueData = basics.trueData
@@ -1967,20 +1974,26 @@ End Class
 Public Class Line_FindClosest : Inherits TaskParent
     Public inputLine As lpData
     Public closestLine As lpData
+    Public lpList As New List(Of lpData)
     Public Sub New()
         labels(3) = "The lines found in the current image - task.lines.dst3"
         desc = "Find the line in task.lines.lpList closest to the requested line"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If task.lines.lpList.Count = 0 Then Exit Sub
-        If standalone Then inputLine = If(task.longestLine Is Nothing, task.lines.lpList(0), task.longestLine)
+        If standalone Then lpList = task.lines.lpList
+        If lpList.Count = 0 Then
+            closestLine = Nothing
+            Exit Sub
+        End If
+
         If standaloneTest() Then
             dst3 = task.lines.dst3
             dst2 = task.color.Clone
             dst2.Line(inputLine.p1, inputLine.p2, white, task.lineWidth + 1)
         End If
+
         Dim candidates As New List(Of lpData)
-        For Each lp In task.lines.lpList
+        For Each lp In lpList
             If Math.Abs(lp.angle - inputLine.angle) < 2 Then candidates.Add(lp)
         Next
 

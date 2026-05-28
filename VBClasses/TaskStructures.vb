@@ -462,6 +462,11 @@ Public Module Structures
 
 
     Public Class lpData
+        Implements IEquatable(Of lpData)
+
+        ''' <summary>Endpoint tolerance for Equals / operator = (pixels).</summary>
+        Private Const pointEps As Single = 0.001F
+
         Public age As Integer = 1
         Public angle As Single ' varies from -90 to 90 degrees
         Public color As cv.Scalar
@@ -613,6 +618,38 @@ Public Module Structures
             p1 = New cv.Point2f()
             p2 = New cv.Point2f()
         End Sub
+
+        Private Shared Function PointsEqual(a As cv.Point2f, b As cv.Point2f) As Boolean
+            Return Math.Abs(a.X - b.X) <= pointEps AndAlso Math.Abs(a.Y - b.Y) <= pointEps
+        End Function
+
+        ''' <summary>True when both lines have the same segment endpoints (p1 left, p2 right per constructor convention).</summary>
+        Public Overloads Function Equals(other As lpData) As Boolean Implements IEquatable(Of lpData).Equals
+            If other Is Nothing Then Return False
+            If ReferenceEquals(Me, other) Then Return True
+            Return PointsEqual(p1, other.p1) AndAlso PointsEqual(p2, other.p2)
+        End Function
+
+        Public Overrides Function Equals(obj As Object) As Boolean
+            Return Equals(TryCast(obj, lpData))
+        End Function
+
+        Public Overrides Function GetHashCode() As Integer
+            Dim h1 = CInt(Math.Round(p1.X / pointEps)) Xor (CInt(Math.Round(p1.Y / pointEps)) << 1)
+            Dim h2 = CInt(Math.Round(p2.X / pointEps)) Xor (CInt(Math.Round(p2.Y / pointEps)) << 1)
+            Return h1 Xor (h2 << 2)
+        End Function
+
+        Public Shared Operator =(left As lpData, right As lpData) As Boolean
+            If left Is right Then Return True
+            If left Is Nothing OrElse right Is Nothing Then Return False
+            Return left.Equals(right)
+        End Operator
+
+        Public Shared Operator <>(left As lpData, right As lpData) As Boolean
+            Return Not (left = right)
+        End Operator
+
         Public Function lpDisplay(ByRef dst As cv.Mat) As String
             Dim strOut = "rcList index = " + CStr(index) + vbCrLf
             strOut += "Age = " + CStr(task.lpD.age) + vbCrLf

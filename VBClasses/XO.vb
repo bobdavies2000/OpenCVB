@@ -20523,4 +20523,73 @@ Namespace VBClasses
             labels(3) = CStr(noMotionCount) + " lines showed no motion"
         End Sub
     End Class
+
+
+
+
+
+    Public Class XO_KNN_FindLineKNN : Inherits TaskParent
+        Public inputLine As lpData
+        Public closestLine As lpData
+        Dim knn As New KNN_Minimal
+        Public trainInput As New List(Of cv.Vec4f)
+        Public queries As New List(Of cv.Vec4f)
+        Public Sub New()
+            queries.Add(New cv.Vec4f)
+            knn.standalone = False
+            labels(3) = "The lines found in the current image - task.lines.dst3"
+            desc = "Find the line in task.lines.lpList closest to the requested line"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            If standalone Then inputLine = task.longestLine
+
+            trainInput.Clear()
+            For Each lp In task.lines.lpList
+                trainInput.Add(New cv.Vec4f(lp.ptE1.X, lp.ptE1.Y, lp.ptE2.X, lp.ptE2.Y))
+            Next
+
+            Dim dimension = 4
+            queries(0) = New cv.Vec4f(inputLine.ptE1.X, inputLine.ptE1.Y, inputLine.ptE2.X, inputLine.ptE2.Y)
+            knn.queryMat = cv.Mat.FromPixelData(queries.Count, dimension, cv.MatType.CV_32F, queries.ToArray)
+            knn.trainMat = cv.Mat.FromPixelData(trainInput.Count, dimension, cv.MatType.CV_32F, trainInput.ToArray)
+            knn.Run(emptyMat)
+
+            If knn.result IsNot Nothing Then
+                closestLine = task.lines.lpList(knn.result(0, 0))
+                dst2 = src
+                dst2.Line(closestLine.ptE1, closestLine.ptE2, task.highlight, task.lineWidth + 1)
+                dst2.Line(inputLine.p1, inputLine.p2, task.highlight, task.lineWidth + 1)
+            End If
+
+            dst3 = task.lines.dst3
+        End Sub
+    End Class
+
+
+
+
+    Public Class XO_LineTrack_Basics_TA : Inherits TaskParent
+        Public lpCurr As New lpData
+        Public lineTrackTask As New LineTrack_Basics
+        Public Sub New()
+            desc = "Track the longest line and measure its age."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            If task.lines.lpList.Count = 0 Then Exit Sub ' nothing yet.
+            lineTrackTask.Run(emptyMat)
+            labels(2) = lineTrackTask.labels(2)
+
+            lpCurr = task.longestLine
+
+            If standaloneTest() Then
+                dst2 = lineTrackTask.dst2.Clone
+                With task.longestLine
+                    SetTrueText(CStr(.age), New cv.Point2f(.ptCenter.X + 2, .ptCenter.Y + 2), 2)
+                End With
+            End If
+
+            SetTrueText("The longest line (task.lines.lpList(0) is tracked until it is lost." + vbCrLf +
+                        "When that line is lost, the longest line is found and tracked.", 3)
+        End Sub
+    End Class
 End Namespace
