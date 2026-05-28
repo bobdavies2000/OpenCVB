@@ -15,7 +15,7 @@ Public Class LineTrack_Basics : Inherits TaskParent
         If task.lines.lpList.Count = 0 Or task.firstPass Then
             resetLongest()
         Else
-            lpFind.inputLine = task.longestLine
+            lpFind.inputLine = If(task.longestLine Is Nothing, task.lines.lpList(0), task.longestLine)
             lpFind.Run(emptyMat)
             Dim lpTmp = lpFind.closestLine
 
@@ -901,7 +901,8 @@ Public Class LineTrack_Triangle : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst2 = src.Clone
-        Dim lp = task.longestLine
+        If task.lines.lpList.Count = 0 Then Exit Sub
+        Dim lp = If(task.longestLine Is Nothing, task.lines.lpList(0), task.longestLine)
         dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth)
 
         Dim lpPerp = Line_Perpendicular.computePerp(lp)

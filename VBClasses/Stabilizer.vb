@@ -8,6 +8,7 @@ Public Class Stabilizer_Basics : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         If src.Channels <> 1 Then src = task.grayOriginal
 
+        If task.longestLine Is Nothing Then Exit Sub
         If task.longestLine.age <= 1 Then
             dst2 = src.Clone
             Exit Sub
@@ -125,6 +126,7 @@ Public Class Stabilizer_OrientationPRY : Inherits TaskParent
             Exit Sub
         End If
 
+        If task.longestLine Is Nothing Then Exit Sub
         Dim lpCurr = task.longestLine
         If lpCurr.length <= 0 Then
             labels(2) = "Longest line not ready (lpCurr invalid)."

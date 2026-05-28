@@ -64,9 +64,11 @@ Public Class KNN_Basics : Inherits TaskParent
 
         knn2.trainMat = cv.Mat.FromPixelData(trainInput.Count, KNNdimension, cv.MatType.CV_32F, trainInput.ToArray)
         knn2.queryMat = cv.Mat.FromPixelData(queries.Count, KNNdimension, cv.MatType.CV_32F, queries.ToArray)
-        knn2.Run(src)
-        result = knn2.result
-        If standalone Then dst2 = KNN_Basics.displayResults(result, queries, trainInput)
+        If knn2.trainMat.Rows > 0 And knn2.queryMat.Rows > 0 Then
+            knn2.Run(src)
+            result = knn2.result
+            If standalone Then dst2 = KNN_Basics.displayResults(result, queries, trainInput)
+        End If
     End Sub
 End Class
 
@@ -664,7 +666,8 @@ Public Class KNN_FindLineKNN : Inherits TaskParent
         desc = "Find the line in task.lines.lpList closest to the requested line"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If standalone Then inputLine = task.longestLine
+        If task.lines.lpList.Count = 0 Then Exit Sub
+        If standalone Then inputLine = If(task.longestLine Is Nothing, task.lines.lpList(0), task.longestLine)
 
         trainInput.Clear()
         For Each lp In task.lines.lpList

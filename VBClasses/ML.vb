@@ -734,6 +734,10 @@ Public Class ML_RandomForest : Inherits TaskParent
         desc = "Run RandomForest on the provided inputs..."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
+        If standalone Then
+            SetTrueText("No output when run standalone...")
+            Exit Sub
+        End If
         Dim nSamples = trainMat.Rows
         Dim varCount = trainMat.Cols
         If trainResponse.Rows <> nSamples Then

@@ -109,6 +109,26 @@ Public Class Line_Basics : Inherits TaskParent
             lpAgeSort.Add(lp.age, lp.index)
         Next
 
+        If lpList.Count = 0 Then Exit Sub
+
+        lpFind.inputLine = If(task.longestLine Is Nothing, lpList(0), task.longestLine)
+        lpFind.Run(emptyMat)
+        Dim lpTmp = lpFind.closestLine
+
+        If lpTmp IsNot Nothing Then
+            task.longestLine = New lpData(lpTmp.ptE1, lpTmp.ptE2)
+            If standaloneTest() Then
+                dst3 = task.color.Clone
+                With task.longestLine
+                    dst3.Line(.p1, .p2, task.highlight, task.lineWidth + 1)
+                    SetTrueText(CStr(.age), New cv.Point2f(.ptCenter.X + 2, .ptCenter.Y + 2), 2)
+                End With
+            Else
+                task.longestLine = task.lines.lpList(0)
+                task.longestLine.age = 1
+            End If
+        End If
+
         Static minCount As Integer = count
         If task.heartBeat Then minCount = count
         If count < minCount Then minCount = count
@@ -325,7 +345,7 @@ Public Class Line_WithAging : Inherits TaskParent
 
         dst3 = dst1.Threshold(0, 255, cv.ThresholdTypes.Binary)
 
-        If lpList.Count > 0 Then
+        If lpList.Count > 0 And task.lpD IsNot Nothing Then
             If task.lpD.rect.Width = 0 Then task.lpD = lpList(0)
         End If
 
@@ -434,7 +454,7 @@ Public Class Line_Perpendicular : Inherits TaskParent
         Return New lpData(p1, p2)
     End Function
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If standaloneTest() Then input = task.longestLine
+        If standaloneTest() Then input = task.lpGravity
         dst2.SetTo(0)
         dst2.Line(input.p1, input.p2, white, task.lineWidth, task.lineType)
 
@@ -1952,7 +1972,8 @@ Public Class Line_FindClosest : Inherits TaskParent
         desc = "Find the line in task.lines.lpList closest to the requested line"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If standalone Then inputLine = task.longestLine
+        If task.lines.lpList.Count = 0 Then Exit Sub
+        If standalone Then inputLine = If(task.longestLine Is Nothing, task.lines.lpList(0), task.longestLine)
         If standaloneTest() Then
             dst3 = task.lines.dst3
             dst2 = task.color.Clone
