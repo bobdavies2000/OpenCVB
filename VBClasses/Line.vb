@@ -101,21 +101,12 @@ Public Class Line_Basics : Inherits TaskParent
                     count += 1
                 End If
             End If
-            If standaloneTest() Then SetTrueText(CStr(lp.age), New cv.Point2f(lp.ptCenter.X + 2, lp.ptCenter.Y + 2), 2)
+            SetTrueText(CStr(lp.age), New cv.Point2f(lp.ptCenter.X + 2, lp.ptCenter.Y + 2), 2)
         Next
 
         Dim lpAgeSort As New SortedList(Of Integer, Integer)(New compareAllowIdenticalIntegerInverted)
         For Each lp In lpList
             lpAgeSort.Add(lp.age, lp.index)
-        Next
-
-        dst3.SetTo(0)
-        Dim ages As New List(Of Integer)
-        For i = 0 To Math.Min(10, lpList.Count) - 1
-            Dim lp = lpList(lpAgeSort.Values(i) - 1)
-            dst3.Line(lp.p1, lp.p2, 255, task.lineWidth)
-            SetTrueText(CStr(lp.age), New cv.Point(lp.ptCenter.X + 2, lp.ptCenter.Y + 2), 3)
-            ages.Add(lp.age)
         Next
 
         Static minCount As Integer = count
@@ -124,9 +115,6 @@ Public Class Line_Basics : Inherits TaskParent
         Dim ageCount = lpAgeSort.Keys.Count
         labels(2) = CStr(lpList.Count) + " lines found.  Value next to the line is the age.  Minimal count = " + CStr(minCount) +
                     " Average age = " + If(ageCount > 0, Format(lpAgeSort.Keys.Average, fmt1), "0")
-
-        labels(3) = "The " + CStr(ages.Count) + " oldest lines found - average age = " +
-                    If(ages.Count > 0, Format(ages.Average, fmt1), "0")
     End Sub
     Protected Overrides Sub Finalize()
         ld.Dispose()
@@ -151,6 +139,7 @@ Public Class Line_Basics_TA : Inherits TaskParent
         dst3 = basics.dst3
         labels = basics.labels
         lpList = New List(Of lpData)(basics.lpList)
+        trueData = basics.trueData
     End Sub
 End Class
 
@@ -445,7 +434,7 @@ Public Class Line_Perpendicular : Inherits TaskParent
         Return New lpData(p1, p2)
     End Function
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If standaloneTest() Then input = task.lineTrack.lpCurr
+        If standaloneTest() Then input = task.longestLine
         dst2.SetTo(0)
         dst2.Line(input.p1, input.p2, white, task.lineWidth, task.lineType)
 

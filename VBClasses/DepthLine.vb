@@ -1,5 +1,5 @@
 Imports cv = OpenCvSharp
-Public Class DepthLine_BasicsOld : Inherits TaskParent
+Public Class DepthLine_Basics : Inherits TaskParent
     Public prepEdges As New RedPrep_Basics
     Dim lines As New Line_Basics
     Public lpList As New List(Of lpData)
@@ -33,7 +33,7 @@ End Class
 
 
 Public Class NR_DepthLine_XY : Inherits TaskParent
-    Dim lineD As New DepthLine_BasicsOld
+    Dim lineD As New DepthLine_Basics
     Public lpList As New List(Of lpData)
     Public Sub New()
         If standalone Then task.gOptions.displayDst0.Checked = True
@@ -54,7 +54,7 @@ End Class
 
 
 Public Class DepthLine_V : Inherits TaskParent
-    Dim lineD As New DepthLine_BasicsOld
+    Dim lineD As New DepthLine_Basics
     Public lpList As New List(Of lpData)
     Public Sub New()
         OptionParent.FindCheckBox("Prep Edges in Y").Checked = False
@@ -77,7 +77,7 @@ End Class
 
 
 Public Class DepthLine_H : Inherits TaskParent
-    Dim lineD As New DepthLine_BasicsOld
+    Dim lineD As New DepthLine_Basics
     Public lpList As New List(Of lpData)
     Public Sub New()
         If standalone Then task.gOptions.displayDst0.Checked = True

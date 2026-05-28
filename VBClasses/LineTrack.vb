@@ -1,6 +1,7 @@
 Imports System.Runtime.InteropServices
 Imports cv = OpenCvSharp
 Public Class LineTrack_Basics : Inherits TaskParent
+    Public lpCurr As New lpData
     Public lpInput As New lpData
     Dim lpFind As New Line_FindClosest
     Public Sub New()
@@ -39,30 +40,30 @@ End Class
 
 
 
-Public Class LineTrack_Basics_TA : Inherits TaskParent
-    Public lpCurr As New lpData
-    Public lineTrackTask As New LineTrack_Basics
-    Public Sub New()
-        desc = "Track the longest line and measure its age."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        If task.lines.lpList.Count = 0 Then Exit Sub ' nothing yet.
-        lineTrackTask.Run(emptyMat)
-        labels(2) = lineTrackTask.labels(2)
+'Public Class LineTrack_Basics_TA : Inherits TaskParent
+'    Public lpCurr As New lpData
+'    Public lineTrackTask As New LineTrack_Basics
+'    Public Sub New()
+'        desc = "Track the longest line and measure its age."
+'    End Sub
+'    Public Overrides Sub RunAlg(src As cv.Mat)
+'        If task.lines.lpList.Count = 0 Then Exit Sub ' nothing yet.
+'        lineTrackTask.Run(emptyMat)
+'        labels(2) = lineTrackTask.labels(2)
 
-        lpCurr = task.longestLine
+'        lpCurr = task.longestLine
 
-        If standaloneTest() Then
-            dst2 = lineTrackTask.dst2.Clone
-            With task.longestLine
-                SetTrueText(CStr(.age), New cv.Point2f(.ptCenter.X + 2, .ptCenter.Y + 2), 2)
-            End With
-        End If
+'        If standaloneTest() Then
+'            dst2 = lineTrackTask.dst2.Clone
+'            With task.longestLine
+'                SetTrueText(CStr(.age), New cv.Point2f(.ptCenter.X + 2, .ptCenter.Y + 2), 2)
+'            End With
+'        End If
 
-        SetTrueText("The longest line (task.lines.lpList(0) is tracked until it is lost." + vbCrLf +
-                    "When that line is lost, the longest line is found and tracked.", 3)
-    End Sub
-End Class
+'        SetTrueText("The longest line (task.lines.lpList(0) is tracked until it is lost." + vbCrLf +
+'                    "When that line is lost, the longest line is found and tracked.", 3)
+'    End Sub
+'End Class
 
 
 
@@ -896,11 +897,11 @@ Public Class LineTrack_Triangle : Inherits TaskParent
     Public roll As Single
     Public yaw As Single
     Public Sub New()
-        desc = "Measure the camera motion using LineTrack_Basics_TA results"
+        desc = "Measure the camera motion using Line_Basics results"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst2 = src.Clone
-        Dim lp = task.lineTrack.lpCurr
+        Dim lp = task.longestLine
         dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth)
 
         Dim lpPerp = Line_Perpendicular.computePerp(lp)

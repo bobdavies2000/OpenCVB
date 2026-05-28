@@ -156,7 +156,7 @@ DepthColorizer_Basics_TA
 DepthColorizer_CloudPixels
 DepthColorizer_CPP
 DepthColorizer_Mean
-DepthLine_BasicsOld
+DepthLine_Basics
 DepthLine_H
 DepthLine_HV
 DepthLine_Points
@@ -509,7 +509,6 @@ LineSeg_LBD
 LineSeg_Match
 LineSeg_Top3
 LineTrack_Basics
-LineTrack_Basics_TA
 LineTrack_Match
 LineTrack_MatchLines
 LineTrack_PitchRoll

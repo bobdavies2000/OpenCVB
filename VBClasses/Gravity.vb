@@ -242,7 +242,7 @@ Public Class Gravity_LineTrackStabilize : Inherits TaskParent
         If graySrc.Empty Then Exit Sub
         If task.optionsChanged Or task.firstPass Then ResetState()
 
-        Dim lpCurr = task.lineTrack.lpCurr
+        Dim lpCurr = task.longestLine
         Dim lpGravity = task.lpGravity
 
         If Not refReady Then

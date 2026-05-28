@@ -13,7 +13,7 @@ Public Class Stabilizer_Basics : Inherits TaskParent
             Exit Sub
         End If
 
-        Dim lpCurr = task.lineTrack.lpCurr
+        Dim lpCurr = task.longestLine
         If task.heartBeatLT Or task.optionsChanged Then
             refLine = New lpData(lpCurr.p1, lpCurr.p2)
         End If
@@ -119,13 +119,13 @@ Public Class Stabilizer_OrientationPRY : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst2 = task.color.Clone
 
-        If task.lines.lpList.Count = 0 OrElse task.lineTrack Is Nothing Then
+        If task.lines.lpList.Count = 0 Then
             labels(2) = "No lines or line tracker unavailable."
             labels(3) = ""
             Exit Sub
         End If
 
-        Dim lpCurr = task.lineTrack.lpCurr
+        Dim lpCurr = task.longestLine
         If lpCurr.length <= 0 Then
             labels(2) = "Longest line not ready (lpCurr invalid)."
             labels(3) = ""

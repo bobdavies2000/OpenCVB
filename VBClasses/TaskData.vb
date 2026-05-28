@@ -85,7 +85,6 @@ Partial Public Class AlgorithmTask
     Public imuBasics As IMU_Basics_TA
     Public leftRightBrightness As LeftRight_Brightness_TA
     Public lines As Line_Basics_TA
-    Public lineTrack As LineTrack_Basics_TA
     Public motion As Motion_Basics_TA
     Public motionStable As StableGray_Measure_TA
     Public colorizer As DepthColorizer_Basics_TA

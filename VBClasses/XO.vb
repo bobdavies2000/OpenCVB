@@ -14537,7 +14537,7 @@ Namespace VBClasses
 
 
 
-    Public Class XO_DepthLine_BasicsOld_TA : Inherits TaskParent
+    Public Class XO_DepthLine_Basics_TA : Inherits TaskParent
         Dim bricks As New Brick_Basics
         Public Sub New()
             dst0 = New cv.Mat(dst0.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))

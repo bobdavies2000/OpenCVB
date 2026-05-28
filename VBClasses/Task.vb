@@ -54,7 +54,6 @@ Public Class AlgorithmTask : Implements IDisposable
         filterBasics = New Filter_Basics_TA
         foreground = New Foreground_Basics_TA
         If task.leftRightBrightnessAdjust Then leftRightBrightness = New LeftRight_Brightness_TA
-        lineTrack = New LineTrack_Basics_TA
 
         ' all the algorithms in the list are task algorithms that are children of the algorithm.
         For i = 1 To cpu.callTrace.Count - 1
@@ -189,7 +188,6 @@ Public Class AlgorithmTask : Implements IDisposable
         gravityBasics.Run(src.Clone)
         lines.Run(gray)
         histBinList = {histogramBins, histogramBins, histogramBins}
-        lineTrack.Run(gray)
 
         foreground.Run(emptyMat)
 
