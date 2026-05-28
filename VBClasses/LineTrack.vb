@@ -7,30 +7,19 @@ Public Class LineTrack_Basics : Inherits TaskParent
     Public Sub New()
         desc = "Track the longest line even if it is no longer the longest and flag when it is lost."
     End Sub
-    Private Sub resetLongest()
-        task.longestLine = task.lines.lpList(0)
-        task.longestLine.age = 1
-    End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If task.lines.lpList.Count = 0 Or task.firstPass Then
-            resetLongest()
-        Else
-            lpFind.inputLine = If(task.longestLine Is Nothing, task.lines.lpList(0), task.longestLine)
-            lpFind.lpList = task.lines.lpList
-            lpFind.Run(emptyMat)
-            Dim lpTmp = lpFind.closestLine
+        lpFind.inputLine = task.longestLine
+        lpFind.lpList = task.lines.lpList
+        lpFind.Run(emptyMat)
+        Dim lpTmp = lpFind.closestLine
 
-            If lpTmp IsNot Nothing Then
-                task.longestLine = New lpData(lpTmp.ptE1, lpTmp.ptE2)
-                task.longestLine.age = lpTmp.age
-                dst2 = task.color.Clone
-                With task.longestLine
-                    dst2.Line(.p1, .p2, task.highlight, task.lineWidth + 1)
-                    SetTrueText(CStr(.age), New cv.Point2f(.ptCenter.X + 2, .ptCenter.Y + 2), 2)
-                End With
-            Else
-                resetLongest()
-            End If
+        If lpTmp IsNot Nothing Then
+            task.longestLine = New lpData(lpTmp.ptE1, lpTmp.ptE2) With {.age = lpTmp.age}
+            dst2 = task.color.Clone
+            With task.longestLine
+                dst2.Line(.p1, .p2, task.highlight, task.lineWidth + 1)
+                SetTrueText(CStr(.age), New cv.Point2f(.ptCenter.X + 2, .ptCenter.Y + 2), 2)
+            End With
         End If
         labels(2) = "The longest line has been present for " + CStr(task.longestLine.age) + " frames."
 
@@ -875,8 +864,7 @@ Public Class LineTrack_Triangle : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst2 = src.Clone
-        If task.lines.lpList.Count = 0 Then Exit Sub
-        Dim lp = If(task.longestLine Is Nothing, task.lines.lpList(0), task.longestLine)
+        Dim lp = task.longestLine
         dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth)
 
         Dim lpPerp = Line_Perpendicular.computePerp(lp)
