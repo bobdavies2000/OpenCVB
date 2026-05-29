@@ -3,11 +3,20 @@ Public Class Line_Basics_TA : Inherits TaskParent
     Public lpList As New List(Of lpData)
     Public lpLast As New List(Of lpData)
     Public basicsFLD As New Line_Basics
-    Public basicsLSD As New LineSeg_BasicsAlt
+    Public basicsLSD As New LineSeg_Basics
     Public Sub New()
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
         desc = "Run FLD (Fast Line Detector) with sobel input."
     End Sub
+    Public Shared Function lines8U(lpList As List(Of lpData)) As cv.Mat
+        Dim dst = New cv.Mat(task.workRes, cv.MatType.CV_8U, 0)
+        For Each lp In lpList
+            dst.Line(lp.p1, lp.p2, 255, task.lineWidth)
+        Next
+
+        dst.Line(task.longestLine.p1, task.longestLine.p2, 255, task.lineWidth + 1)
+        Return dst
+    End Function
     Public Overrides Sub RunAlg(src As cv.Mat)
         If src.Channels <> 1 Or src.Type <> cv.MatType.CV_8U Then src = task.gray.Clone
 
@@ -26,15 +35,10 @@ Public Class Line_Basics_TA : Inherits TaskParent
             lpList = New List(Of lpData)(basicsLSD.lpList)
         End If
 
-        dst3.SetTo(0)
+        dst3 = lines8U(lpList)
         For Each lp In lpList
-            dst3.Line(lp.p1, lp.p2, 255, task.lineWidth)
             SetTrueText(CStr(lp.age), New cv.Point(lp.ptCenter.X + 2, lp.ptCenter.Y + 2), 3)
         Next
-
-        With task.longestLine
-            dst3.Line(.p1, .p2, 255, task.lineWidth + 1)
-        End With
     End Sub
 End Class
 
@@ -50,20 +54,13 @@ Public Class Line_Basics : Inherits TaskParent
     Public Sub New()
         desc = "Run FLD (Fast Line Detector) With sobel input."
     End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        dst2 = task.color.Clone
-        If src.Channels <> 1 Or src.Type <> cv.MatType.CV_8U Then src = task.gray.Clone
+    Public Shared Function removeDuplicates(coreList As List(Of lpData)) As List(Of lpData)
+        Dim lpList As New List(Of lpData)
 
-        edges.Run(src)
-        labels(2) = edges.labels(2)
-
-        core.Run(edges.dst2)
-
-        lpList.Clear()
         Dim removeNearDuplicates As Boolean = True
         If removeNearDuplicates Then
-            Dim edgeMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-            For Each lp In core.lpList
+            Dim edgeMap As New cv.Mat(task.workRes, cv.MatType.CV_8U, 0)
+            For Each lp In coreList
                 Dim val1 = edgeMap.Get(Of Byte)(lp.ptE1.Y, lp.ptE1.X)
                 Dim val2 = edgeMap.Get(Of Byte)(lp.ptE1.Y, lp.ptE1.X)
                 If val1 > 0 And val2 > 0 Then Continue For
@@ -73,17 +70,28 @@ Public Class Line_Basics : Inherits TaskParent
                 Dim gridIndex = task.gridMap.Get(Of Integer)(Math.Floor(lp.ptE1.Y), Math.Floor(lp.ptE1.X))
                 edgeMap(task.gridNabeRects(gridIndex)).SetTo(lp.index)
                 lpList.Add(lp)
-
-                Dim tierIndex = task.depthTiers.dst2.Get(Of Byte)(lp.p1.Y, lp.p1.X)
-                dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth + 1, cv.LineTypes.Link4)
             Next
         Else
-            For Each lp In core.lpList
+            For Each lp In coreList
                 lp.index = lpList.Count + 1
                 lpList.Add(lp)
-                dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth + 1, cv.LineTypes.Link4)
             Next
         End If
+        Return lpList
+    End Function
+    Public Shared Function findLastLine(lpList As List(Of lpData)) As lpData
+
+    End Function
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        dst2 = task.color.Clone
+        If src.Channels <> 1 Or src.Type <> cv.MatType.CV_8U Then src = task.gray.Clone
+
+        edges.Run(src)
+        labels(2) = edges.labels(2)
+
+        core.Run(edges.dst2)
+
+        lpList = removeDuplicates(core.lpList)
 
         Dim count As Integer
         For Each lp In task.lines.lpLast
@@ -99,7 +107,6 @@ Public Class Line_Basics : Inherits TaskParent
                     count += 1
                 End If
             End If
-            SetTrueText(CStr(lp.age), New cv.Point2f(lp.ptCenter.X + 2, lp.ptCenter.Y + 2), 2)
         Next
 
         Dim lpAgeSort As New SortedList(Of Integer, Integer)(New compareAllowIdenticalIntegerInverted)
@@ -134,6 +141,9 @@ Public Class Line_Basics : Inherits TaskParent
         Dim ageCount = lpAgeSort.Keys.Count
         labels(2) = CStr(lpList.Count) + " lines found.  Value Next To the line Is the age.  Minimal count = " + CStr(minCount) +
                     " Average age = " + If(ageCount > 0, Format(lpAgeSort.Keys.Average, fmt1), "0")
+
+        dst3 = task.lines.dst3
+        trueData = task.lines.trueData
     End Sub
 End Class
 

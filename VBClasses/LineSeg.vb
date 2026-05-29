@@ -1,6 +1,82 @@
 ﻿Imports cv = OpenCvSharp
 Public Class LineSeg_Basics : Inherits TaskParent
     Public lpList As New List(Of lpData)
+    Dim lpFind As New Line_FindClosest
+    Public core As New LineSeg_Core
+    Public Sub New()
+        desc = "Run FLD (Fast Line Detector) with sobel input."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        dst2 = task.color.Clone
+        If src.Channels <> 1 Or src.Type <> cv.MatType.CV_8U Then src = task.gray.Clone
+
+        core.Run(src)
+
+        lpList = Line_Basics.removeDuplicates(core.lpList)
+        For Each lp In lpList
+            dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth + 1, cv.LineTypes.Link4)
+        Next
+
+        Dim count As Integer
+        For Each lp In task.lines.lpLast
+            lpFind.inputLine = lp
+            lpFind.Run(src)
+            Dim closest = lpFind.closestLine
+            If closest IsNot Nothing Then
+                If closest.index < lpList.Count Then
+                    Dim lpCurr = lpList(closest.index - 1)
+                    lpCurr.age = lp.age + 1
+                    lpCurr.indexLast = lp.index
+                    If lpCurr.age >= 1000 Then lpCurr.age = 10
+                    count += 1
+                End If
+            End If
+        Next
+
+        Dim lpAgeSort As New SortedList(Of Integer, Integer)(New compareAllowIdenticalIntegerInverted)
+        For Each lp In lpList
+            lpAgeSort.Add(lp.age, lp.index)
+        Next
+
+        Static gravity = task.lpGravity
+        If (task.longestLine = gravity Or task.longestLine Is Nothing) And lpList.Count > 0 Then task.longestLine = lpList(0)
+        If lpList.Count > 0 Then
+            lpFind.inputLine = If(task.longestLine Is Nothing, lpList(0), task.longestLine)
+            lpFind.lpList = lpList
+            lpFind.Run(emptyMat)
+            Dim lpTmp = lpFind.closestLine
+
+            If lpTmp Is Nothing Then
+                gravity = task.lpGravity
+                task.longestLine = task.lpGravity
+            Else
+                task.longestLine = New lpData(lpTmp.ptE1, lpTmp.ptE2)
+                task.longestLine.age = lpTmp.age
+            End If
+        Else
+            gravity = task.lpGravity
+            task.longestLine = task.lpGravity
+            lpList.Add(task.longestLine) ' need to always have something in lplist...
+        End If
+
+        Static minCount As Integer = count
+        If task.heartBeat Then minCount = count
+        If count < minCount Then minCount = count
+        Dim ageCount = lpAgeSort.Keys.Count
+        labels(2) = CStr(lpList.Count) + " lines found.  Value next to the line is the age.  Minimal count = " + CStr(minCount) +
+                    " Average age = " + If(ageCount > 0, Format(lpAgeSort.Keys.Average, fmt1), "0")
+
+        dst3 = task.lines.dst3
+        trueData = task.lines.trueData
+    End Sub
+End Class
+
+
+
+
+
+Public Class NR_LineSeg_Basics : Inherits TaskParent
+    Public lpList As New List(Of lpData)
     Public lpLast As New List(Of lpData)
     Dim core As New LineSeg_Core
     Public Sub New()
@@ -641,7 +717,7 @@ Public Class LineSeg_FLD : Inherits TaskParent
         dst0.SetTo(0)
         lSeg.dst1.CopyTo(dst0, dst3)
 
-        Dim histArray = LineSeg_Basics.lineHistogram(dst0, Math.Max(task.lines.lpList.Count, lSeg.lpList.Count))
+        Dim histArray = NR_LineSeg_Basics.lineHistogram(dst0, Math.Max(task.lines.lpList.Count, lSeg.lpList.Count))
 
         dst3.SetTo(0)
         For i = 0 To Math.Min(histArray.Count, lSeg.lpList.Count) - 1
@@ -677,7 +753,7 @@ Public Class LineSeg_Detector : Inherits TaskParent
         dst0.SetTo(0)
         lSeg.dst1.CopyTo(dst0, dst3)
 
-        Dim histArray = LineSeg_Basics.lineHistogram(dst0, Math.Max(task.lines.lpList.Count, lSeg.lpList.Count))
+        Dim histArray = NR_LineSeg_Basics.lineHistogram(dst0, Math.Max(task.lines.lpList.Count, lSeg.lpList.Count))
 
         dst3.SetTo(0)
         For i = 0 To Math.Min(histArray.Count, lSeg.lpList.Count) - 1
@@ -685,100 +761,5 @@ Public Class LineSeg_Detector : Inherits TaskParent
                 dst3.Line(lSeg.lpList(i).p1, lSeg.lpList(i).p2, 255, task.lineWidth, task.lineType)
             End If
         Next
-    End Sub
-End Class
-
-
-
-
-
-Public Class LineSeg_BasicsAlt : Inherits TaskParent
-    Public lpList As New List(Of lpData)
-    Dim lpFind As New Line_FindClosest
-    Public core As New LineSeg_Core
-    Public Sub New()
-        desc = "Run FLD (Fast Line Detector) with sobel input."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        dst2 = task.color.Clone
-        If src.Channels <> 1 Or src.Type <> cv.MatType.CV_8U Then src = task.gray.Clone
-
-        core.Run(src)
-
-        lpList.Clear()
-        Dim removeNearDuplicates As Boolean = True
-        If removeNearDuplicates Then
-            Dim edgeMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-            For Each lp In core.lpList
-                Dim val1 = edgeMap.Get(Of Byte)(lp.ptE1.Y, lp.ptE1.X)
-                Dim val2 = edgeMap.Get(Of Byte)(lp.ptE1.Y, lp.ptE1.X)
-                If val1 > 0 And val2 > 0 Then Continue For
-
-                lp.index = lpList.Count + 1
-
-                Dim gridIndex = task.gridMap.Get(Of Integer)(Math.Floor(lp.ptE1.Y), Math.Floor(lp.ptE1.X))
-                edgeMap(task.gridNabeRects(gridIndex)).SetTo(lp.index)
-                lpList.Add(lp)
-
-                Dim tierIndex = task.depthTiers.dst2.Get(Of Byte)(lp.p1.Y, lp.p1.X)
-                dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth + 1, cv.LineTypes.Link4)
-            Next
-        Else
-            For Each lp In core.lpList
-                lp.index = lpList.Count + 1
-                lpList.Add(lp)
-                dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth + 1, cv.LineTypes.Link4)
-            Next
-        End If
-
-        Dim count As Integer
-        For Each lp In task.lines.lpLast
-            lpFind.inputLine = lp
-            lpFind.Run(src)
-            Dim closest = lpFind.closestLine
-            If closest IsNot Nothing Then
-                If closest.index < lpList.Count Then
-                    Dim lpCurr = lpList(closest.index - 1)
-                    lpCurr.age = lp.age + 1
-                    lpCurr.indexLast = lp.index
-                    If lpCurr.age >= 1000 Then lpCurr.age = 10
-                    count += 1
-                End If
-            End If
-            SetTrueText(CStr(lp.age), New cv.Point2f(lp.ptCenter.X + 2, lp.ptCenter.Y + 2), 2)
-        Next
-
-        Dim lpAgeSort As New SortedList(Of Integer, Integer)(New compareAllowIdenticalIntegerInverted)
-        For Each lp In lpList
-            lpAgeSort.Add(lp.age, lp.index)
-        Next
-
-        Static gravity = task.lpGravity
-        If (task.longestLine = gravity Or task.longestLine Is Nothing) And lpList.Count > 0 Then task.longestLine = lpList(0)
-        If lpList.Count > 0 Then
-            lpFind.inputLine = If(task.longestLine Is Nothing, lpList(0), task.longestLine)
-            lpFind.lpList = lpList
-            lpFind.Run(emptyMat)
-            Dim lpTmp = lpFind.closestLine
-
-            If lpTmp Is Nothing Then
-                gravity = task.lpGravity
-                task.longestLine = task.lpGravity
-            Else
-                task.longestLine = New lpData(lpTmp.ptE1, lpTmp.ptE2)
-                task.longestLine.age = lpTmp.age
-            End If
-        Else
-            gravity = task.lpGravity
-            task.longestLine = task.lpGravity
-            lpList.Add(task.longestLine) ' need to always have something in lplist...
-        End If
-
-        Static minCount As Integer = count
-        If task.heartBeat Then minCount = count
-        If count < minCount Then minCount = count
-        Dim ageCount = lpAgeSort.Keys.Count
-        labels(2) = CStr(lpList.Count) + " lines found.  Value next to the line is the age.  Minimal count = " + CStr(minCount) +
-                    " Average age = " + If(ageCount > 0, Format(lpAgeSort.Keys.Average, fmt1), "0")
     End Sub
 End Class

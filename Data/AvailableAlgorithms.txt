@@ -500,7 +500,6 @@ Line3D_ReconstructLine
 Line3D_Selection
 LinearRegression_Basics
 LineSeg_Basics
-LineSeg_BasicsAlt
 LineSeg_BasicsFail
 LineSeg_Core
 LineSeg_Detector
@@ -1180,6 +1179,7 @@ NR_Line3D_DrawArbitrary
 NR_Line3D_Longest
 NR_LinearRegression_Random
 NR_LinearRegression_Test
+NR_LineSeg_Basics
 NR_LineTrack_Basics
 NR_LineTrack_CenterNeighbor
 NR_LineTrack_CenterRange
