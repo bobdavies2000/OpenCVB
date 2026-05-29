@@ -326,7 +326,6 @@ Public Class Delaunay_LineSelect : Inherits TaskParent
         delaunay.inputPoints.Clear()
         For Each lp In task.lines.lpList
             delaunay.inputPoints.Add(lp.p1)
-            delaunay.inputPoints.Add(lp.ptCenter)
             delaunay.inputPoints.Add(lp.p2)
         Next
 
@@ -338,20 +337,18 @@ Public Class Delaunay_LineSelect : Inherits TaskParent
         Dim ptList As New List(Of Integer)
         For Each lp In task.lines.lpList
             facetList.Add(delaunay.dst1.Get(Of Byte)(lp.p1.Y, lp.p1.X))
-            facetList.Add(delaunay.dst1.Get(Of Byte)(lp.ptCenter.Y, lp.ptCenter.X))
             facetList.Add(delaunay.dst1.Get(Of Byte)(lp.p2.Y, lp.p2.X))
 
-            ptList.Add(lp.index)
             ptList.Add(lp.index)
             ptList.Add(lp.index)
         Next
 
         Dim facet = delaunay.dst1.Get(Of Byte)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
         Dim facetIndex = facetList.IndexOf(facet)
-        If facetIndex = -1 Or facetIndex >= ptList.Count Then Exit Sub
+        If facetIndex = -1 Or facetIndex >= ptList.Count Then facetIndex = 0
         Dim lineIndex = ptList(facetIndex)
-        If lineIndex >= task.lines.lpList.Count Then Exit Sub
-        task.lpD = task.lines.lpList(ptList(facetIndex))
+        If lineIndex >= task.lines.lpList.Count Then lineIndex = 0
+        task.lpD = task.lines.lpList(ptList(facetIndex \ 2))
 
         Dim p1GridIndex = task.gridMap.Get(Of Integer)(task.lpD.p1.Y, task.lpD.p1.X)
         Static saveID As Integer = p1GridIndex
@@ -360,16 +357,14 @@ Public Class Delaunay_LineSelect : Inherits TaskParent
             task.optionsChanged = True
         End If
 
-        Dim index1 As Integer, index2 As Integer, index3 As Integer
+        Dim index1 As Integer, index2 As Integer
         index1 = delaunay.dst1.Get(Of Byte)(task.lpD.p1.Y, task.lpD.p1.X)
-        index2 = delaunay.dst1.Get(Of Byte)(task.lpD.ptCenter.Y, task.lpD.ptCenter.X)
-        index3 = delaunay.dst1.Get(Of Byte)(task.lpD.p2.Y, task.lpD.p2.X)
+        index2 = delaunay.dst1.Get(Of Byte)(task.lpD.p2.Y, task.lpD.p2.X)
 
         dst3.SetTo(0)
-        dst3.FillConvexPoly(delaunay.facetList(index1), task.lpD.color, cv.LineTypes.Link4)
-        dst3.FillConvexPoly(delaunay.facetList(index2), task.lpD.color, cv.LineTypes.Link4)
-        dst3.FillConvexPoly(delaunay.facetList(index3), task.lpD.color, cv.LineTypes.Link4)
-        dst3.Line(task.lpD.p1, task.lpD.p2, cv.Scalar.Green, task.lineWidth, task.lineWidth)
+        dst3.Polylines({delaunay.facetList(index1).ToArray}, True, white, task.lineWidth, cv.LineTypes.Link4)
+        dst3.Polylines({delaunay.facetList(index2).ToArray}, True, white, task.lineWidth, cv.LineTypes.Link4)
+        dst3.Line(task.lpD.p1, task.lpD.p2, task.highlight, task.lineWidth, task.lineWidth)
 
         If task.lpD Is Nothing Then task.lpD = task.lines.lpList(0)
         strOut = task.lpD.lpDisplay(dst2)
@@ -377,12 +372,10 @@ Public Class Delaunay_LineSelect : Inherits TaskParent
 
         For Each lp In task.lines.lpList
             index1 = delaunay.dst1.Get(Of Byte)(lp.p1.Y, lp.p1.X)
-            index2 = delaunay.dst1.Get(Of Byte)(lp.ptCenter.Y, lp.ptCenter.X)
-            index3 = delaunay.dst1.Get(Of Byte)(lp.p2.Y, lp.p2.X)
+            index2 = delaunay.dst1.Get(Of Byte)(lp.p2.Y, lp.p2.X)
 
-            dst1.FillConvexPoly(delaunay.facetList(index1), lp.color, cv.LineTypes.Link4)
-            dst1.FillConvexPoly(delaunay.facetList(index2), lp.color, cv.LineTypes.Link4)
-            dst1.FillConvexPoly(delaunay.facetList(index3), lp.color, cv.LineTypes.Link4)
+            dst1.Polylines({delaunay.facetList(index1).ToArray}, True, white, task.lineWidth, cv.LineTypes.Link4)
+            dst1.Polylines({delaunay.facetList(index2).ToArray}, True, white, task.lineWidth, cv.LineTypes.Link4)
         Next
 
         For Each lp In task.lines.lpList

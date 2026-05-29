@@ -55,6 +55,7 @@ Namespace MainApp
             MainToolStrip.Name = "MainToolStrip"
             MainToolStrip.Padding = New Padding(0, 0, 3, 0)
             MainToolStrip.Size = New Size(1275, 39)
+            MainToolStrip.ShowItemToolTips = True
             MainToolStrip.TabIndex = 0
             MainToolStrip.Text = "MainToolStrip"
             ' 
@@ -136,6 +137,7 @@ Namespace MainApp
             AlgDescription.MaxLength = 200
             AlgDescription.Name = "AlgDescription"
             AlgDescription.Size = New Size(499, 37)
+            AlgDescription.ReadOnly = True
             AlgDescription.Text = "Description - hover if the description is too long to fit."
             AlgDescription.ToolTipText = "Description"
             ' 

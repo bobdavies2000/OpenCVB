@@ -120,19 +120,12 @@ Public Class Line_Basics : Inherits TaskParent
                 task.longestLine = task.lpGravity
             Else
                 task.longestLine = New lpData(lpTmp.ptE1, lpTmp.ptE2)
+                task.longestLine.age = lpTmp.age
             End If
         Else
             gravity = task.lpGravity
             task.longestLine = task.lpGravity
             lpList.Add(task.longestLine) ' need to always have something in lplist...
-        End If
-
-        If standaloneTest() Then
-            dst3 = task.color.Clone
-            With task.longestLine
-                dst3.Line(.p1, .p2, task.highlight, task.lineWidth + 1)
-                SetTrueText(CStr(.age), New cv.Point2f(.ptCenter.X + 2, .ptCenter.Y + 2), 2)
-            End With
         End If
 
         Static minCount As Integer = count
@@ -155,6 +148,7 @@ Public Class Line_Basics_TA : Inherits TaskParent
     Public lpList As New List(Of lpData)
     Public basics As New Line_Basics
     Public Sub New()
+        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
         desc = "Run FLD (Fast Line Detector) with sobel input."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -164,7 +158,16 @@ Public Class Line_Basics_TA : Inherits TaskParent
         dst2 = basics.dst2
         labels = basics.labels
         lpList = New List(Of lpData)(basics.lpList)
-        trueData = basics.trueData
+
+        dst3.SetTo(0)
+        For Each lp In lpList
+            dst3.Line(lp.p1, lp.p2, 255, task.lineWidth)
+            SetTrueText(CStr(lp.age), New cv.Point(lp.ptCenter.X + 2, lp.ptCenter.Y + 2), 3)
+        Next
+
+        With task.longestLine
+            dst3.Line(.p1, .p2, 255, task.lineWidth + 1)
+        End With
     End Sub
 End Class
 
@@ -1228,10 +1231,7 @@ Public Class Line_EdgeLineCompare : Inherits TaskParent
         dst2 = edgeLine.dst2
         labels(2) = edgeLine.labels(2)
 
-        dst3.SetTo(0)
-        For Each lp In task.lines.lpList
-            dst3.Line(lp.p1, lp.p2, 255, task.lineWidth)
-        Next
+        dst3 = task.lines.dst3
     End Sub
 End Class
 

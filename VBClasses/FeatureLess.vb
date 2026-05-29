@@ -677,7 +677,6 @@ End Class
 Public Class FeatureLess_FeatureLines : Inherits TaskParent
     Dim fLess As New FeatureLess_Basics
     Public Sub New()
-        task.gOptions.displayDst1.Checked = True
         desc = "Use lines to further divide featureless from features."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)

@@ -119,6 +119,7 @@ Public Class Line3D_ReconstructLine : Inherits TaskParent
         dst2 = selectLine.dst2
         labels(2) = selectLine.labels(2)
 
+        If task.lpD Is Nothing Then task.lpD = task.lines.lpList(0)
         If task.lpD.age = 1 Or task.optionsChanged Then
             findLine3D.lp = task.lpD
             findLine3D.Run(src)

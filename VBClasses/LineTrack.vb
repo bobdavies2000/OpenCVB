@@ -533,11 +533,9 @@ Public Class NR_LineTrack_SearchX : Inherits TaskParent
     Dim searchCount As Integer = 9
     Dim addw As New AddWeighted_Basics
     Public Sub New()
-        If standalone Then task.gOptions.displayDst1.Checked = True
         dst1 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
-        lastImage = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         desc = "Confirm any camera motion using the task.lines output.  Needs work!"
     End Sub
     Private Function testOffset(compareIndex As Integer, i As Integer) As Integer
@@ -552,11 +550,7 @@ Public Class NR_LineTrack_SearchX : Inherits TaskParent
         SetTrueText(strOut, 2)
         If task.heartBeatLT = False Then Exit Sub
 
-        dst3.SetTo(0)
-        For Each lp In task.lines.lpList
-            dst3.Line(lp.p1, lp.p2, 255, task.lineWidth)
-        Next
-
+        dst3 = task.lines.dst3
         If task.firstPass Then lastImage = dst3.Clone
 
         Dim countList As New List(Of (count As Integer, index As Integer))
@@ -594,7 +588,7 @@ Public Class NR_LineTrack_SearchX : Inherits TaskParent
                                                 0.25, 0, dst2)
         End If
 
-        lastImage = dst3.Clone
+        lastImage = task.lines.dst3.Clone
     End Sub
 End Class
 

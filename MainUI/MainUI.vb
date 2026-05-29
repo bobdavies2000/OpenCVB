@@ -16,6 +16,22 @@ Namespace MainApp
         Dim magnifyIndex As Integer
         Dim windowsFont = New System.Drawing.Font("Tahoma", 9)
         Dim pixelViewerRect As cv.Rect
+        ''' <summary>ToolStripTextBox ignores ToolTipText; tooltip is set on the hosted TextBox.</summary>
+        Private ReadOnly algDescToolTip As New ToolTip With {
+            .AutoPopDelay = 32000,
+            .InitialDelay = 400,
+            .ReshowDelay = 200,
+            .ShowAlways = True
+        }
+
+        Private Sub SetAlgDescription(desc As String)
+            Dim text = If(desc, "")
+            AlgDescription.Text = text
+            If AlgDescription.Control IsNot Nothing Then
+                algDescToolTip.SetToolTip(AlgDescription.Control, text)
+            End If
+        End Sub
+
         Private Sub MainForm_Load(sender As Object, e As EventArgs) Handles MyBase.Load
             updatePath(homeDir + "bin\", "Oak-3D/Oak-4D camera support.")
             updatePath(homeDir + "OakD\depthai-core\Build\vcpkg_installed\x64-windows\bin\", "Oak-3D/Oak-4D camera support.")
@@ -377,8 +393,7 @@ Namespace MainApp
             vbc.task.lowResDepth = New cv.Mat(vbc.task.workRes, cv.MatType.CV_32F)
             vbc.task.lowResColor = New cv.Mat(vbc.task.workRes, cv.MatType.CV_32F)
             vbc.task.MainUI_Algorithm = createAlgorithm(settings.algorithm)
-            AlgDescription.Text = vbc.task.MainUI_Algorithm.desc
-            AlgDescription.ToolTipText = vbc.task.MainUI_Algorithm.desc
+            SetAlgDescription(vbc.task.MainUI_Algorithm.desc)
             vbc.task.resolutionDetails = resolutionDetails
 
             If vbc.task.calibData IsNot Nothing Then vbc.task.calibData = camera.calibData

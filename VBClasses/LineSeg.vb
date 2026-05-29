@@ -633,12 +633,8 @@ Public Class LineSeg_FLD : Inherits TaskParent
         lSeg.Run(task.gray)
         dst2 = lSeg.dst3
         labels(2) = lSeg.labels(2)
-
-        dst1.SetTo(0)
-        For Each lp In task.lines.lpList
-            dst1.Line(lp.p1, lp.p2, 255, task.lineWidth)
-        Next
         labels(1) = task.lines.labels(2)
+        dst1 = task.lines.dst3
 
         dst3 = dst1 And dst2
 
@@ -673,10 +669,7 @@ Public Class LineSeg_Detector : Inherits TaskParent
         dst2 = lSeg.dst3
         labels(2) = lSeg.labels(2)
 
-        dst1.SetTo(0)
-        For Each lp In task.lines.lpList
-            dst1.Line(lp.p1, lp.p2, 255, task.lineWidth)
-        Next
+        dst1 = task.lines.dst3
         labels(1) = task.lines.labels(2)
 
         dst3 = dst1 And dst2
