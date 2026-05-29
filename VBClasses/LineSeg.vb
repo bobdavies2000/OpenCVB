@@ -694,15 +694,12 @@ End Class
 
 Public Class LineSeg_BasicsAlt : Inherits TaskParent
     Public lpList As New List(Of lpData)
-    Public lpLast As New List(Of lpData)
     Dim lpFind As New Line_FindClosest
     Public core As New LineSeg_Core
     Public Sub New()
         desc = "Run FLD (Fast Line Detector) with sobel input."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        lpLast = New List(Of lpData)(lpList)
-
         dst2 = task.color.Clone
         If src.Channels <> 1 Or src.Type <> cv.MatType.CV_8U Then src = task.gray.Clone
 
@@ -735,7 +732,7 @@ Public Class LineSeg_BasicsAlt : Inherits TaskParent
         End If
 
         Dim count As Integer
-        For Each lp In lpLast
+        For Each lp In task.lines.lpLast
             lpFind.inputLine = lp
             lpFind.Run(src)
             Dim closest = lpFind.closestLine

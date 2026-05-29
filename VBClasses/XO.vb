@@ -5308,7 +5308,7 @@ Namespace VBClasses
                 SetTrueText(Format(match.correlation, fmt3), match.newCenter)
             End If
 
-            Dim lpListRaw = Line_Core.getRawSortedLines(task.lines.basics.core.ld.Detect(src))
+            Dim lpListRaw = Line_Core.getRawSortedLines(task.lines.basicsFLD.core.ld.Detect(src))
             If lpListRaw.Count > 0 Then lp = lpListRaw(0)
             dst2(matchRect).Line(lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
         End Sub
@@ -5359,7 +5359,7 @@ Namespace VBClasses
                 End If
             Else
                 dst3(subsetrect).SetTo(0)
-                Dim vecArray = task.lines.basics.core.ld.Detect(src(subsetrect))
+                Dim vecArray = task.lines.basicsFLD.core.ld.Detect(src(subsetrect))
                 Dim lpListRaw = Line_Core.getRawSortedLines(vecArray)
                 For Each lp In lplist
                     dst3.Line(lp.p1, lp.p2, 255, task.lineWidth, task.lineType)
@@ -15034,7 +15034,7 @@ Namespace VBClasses
             Dim maxAngle = angleSlider.Value
 
             dst2 = src.Clone
-            Dim vecArray = task.lines.basics.core.ld.Detect(task.gray)
+            Dim vecArray = task.lines.basicsFLD.core.ld.Detect(task.gray)
             Dim lplist = Line_Core.getRawSortedLines(vecArray)
 
             sortedVerticals.Clear()
@@ -17019,7 +17019,7 @@ Namespace VBClasses
             If src.Channels <> 1 Or src.Type <> cv.MatType.CV_8U Then src = task.gray.Clone
             If lpList.Count <= 1 Then
                 motionMask.SetTo(255)
-                Dim vecArray1 = task.lines.basics.core.ld.Detect(src)
+                Dim vecArray1 = task.lines.basicsFLD.core.ld.Detect(src)
                 lpList = Line_Core.getRawSortedLines(vecArray1)
             End If
 
@@ -17033,7 +17033,7 @@ Namespace VBClasses
                 End If
             Next
 
-            Dim vecArray = task.lines.basics.core.ld.Detect(src)
+            Dim vecArray = task.lines.basicsFLD.core.ld.Detect(src)
             Dim lpListRaw = Line_Core.getRawSortedLines(vecArray)
 
 

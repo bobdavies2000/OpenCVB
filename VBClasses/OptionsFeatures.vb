@@ -88,6 +88,9 @@
                 ColorDiffSlider.Value = 10
         End Select
         FrameHistoryCount.Value = 3
+        LineCombo.Items.Add("Fast Line Detection")
+        LineCombo.Items.Add("Line Segment Detection")
+        LineCombo.SelectedItem = "Line Segment Detection"
     End Sub
 
 
@@ -141,6 +144,10 @@
 
 
     Private Sub ColorSource_SelectedIndexChanged(sender As Object, e As EventArgs) Handles Color8USource.SelectedIndexChanged
+        task.optionsChanged = True
+    End Sub
+
+    Private Sub LineCombo_SelectedIndexChanged(sender As Object, e As EventArgs) Handles LineCombo.SelectedIndexChanged
         task.optionsChanged = True
     End Sub
 End Class

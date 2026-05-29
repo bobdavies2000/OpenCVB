@@ -1,7 +1,9 @@
 Imports cv = OpenCvSharp
 Public Class Line_Basics_TA : Inherits TaskParent
     Public lpList As New List(Of lpData)
-    Public basics As New Line_Basics
+    Public lpLast As New List(Of lpData)
+    Public basicsFLD As New Line_Basics
+    Public basicsLSD As New LineSeg_BasicsAlt
     Public Sub New()
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
         desc = "Run FLD (Fast Line Detector) with sobel input."
@@ -9,10 +11,20 @@ Public Class Line_Basics_TA : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         If src.Channels <> 1 Or src.Type <> cv.MatType.CV_8U Then src = task.gray.Clone
 
-        basics.Run(src)
-        dst2 = basics.dst2
-        labels = basics.labels
-        lpList = New List(Of lpData)(basics.lpList)
+        lpLast = New List(Of lpData)(lpList)
+        If task.optionsChanged Then lpLast.Clear()
+
+        If task.fOptions.LineCombo.Text = "Fast Line Detection" Then
+            basicsFLD.Run(src)
+            dst2 = basicsFLD.dst2
+            labels = basicsFLD.labels
+            lpList = New List(Of lpData)(basicsFLD.lpList)
+        Else
+            basicsLSD.Run(src)
+            dst2 = basicsLSD.dst2
+            labels = basicsLSD.labels
+            lpList = New List(Of lpData)(basicsLSD.lpList)
+        End If
 
         dst3.SetTo(0)
         For Each lp In lpList
@@ -32,16 +44,13 @@ End Class
 
 Public Class Line_Basics : Inherits TaskParent
     Public lpList As New List(Of lpData)
-    Public lpLast As New List(Of lpData)
     Dim edges As New Edge_Sobel
     Dim lpFind As New Line_FindClosest
     Public core As New Line_Core
     Public Sub New()
-        desc = "Run FLD (Fast Line Detector) with sobel input."
+        desc = "Run FLD (Fast Line Detector) With sobel input."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        lpLast = New List(Of lpData)(lpList)
-
         dst2 = task.color.Clone
         If src.Channels <> 1 Or src.Type <> cv.MatType.CV_8U Then src = task.gray.Clone
 
@@ -77,7 +86,7 @@ Public Class Line_Basics : Inherits TaskParent
         End If
 
         Dim count As Integer
-        For Each lp In lpLast
+        For Each lp In task.lines.lpLast
             lpFind.inputLine = lp
             lpFind.Run(src)
             Dim closest = lpFind.closestLine
@@ -123,7 +132,7 @@ Public Class Line_Basics : Inherits TaskParent
         If task.heartBeat Then minCount = count
         If count < minCount Then minCount = count
         Dim ageCount = lpAgeSort.Keys.Count
-        labels(2) = CStr(lpList.Count) + " lines found.  Value next to the line is the age.  Minimal count = " + CStr(minCount) +
+        labels(2) = CStr(lpList.Count) + " lines found.  Value Next To the line Is the age.  Minimal count = " + CStr(minCount) +
                     " Average age = " + If(ageCount > 0, Format(lpAgeSort.Keys.Average, fmt1), "0")
     End Sub
 End Class
@@ -141,7 +150,7 @@ Public Class Line_Core : Inherits TaskParent
         ld = cv.XImgProc.CvXImgProc.CreateFastLineDetector
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-        desc = "Use FastLineDetector (OpenCV Contrib) to find all the lines inside drawRect"
+        desc = "Use FastLineDetector (OpenCV Contrib) To find all the lines inside drawRect"
     End Sub
     Public Shared Function getRawSortedLines(lines As cv.Vec4f()) As List(Of lpData)
         Dim lpSorted As New SortedList(Of Single, lpData)(New compareAllowIdenticalSingleInverted)
@@ -198,7 +207,7 @@ Public Class Line_BasicsOld : Inherits TaskParent
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
         labels(2) = "Line_BasicsOld output"
         ld = cv.XImgProc.CvXImgProc.CreateFastLineDetector
-        desc = "Run FLD (Fast Line Detector) with sobel input."
+        desc = "Run FLD (Fast Line Detector) With sobel input."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst2 = task.color.Clone
@@ -241,7 +250,7 @@ Public Class Line_BasicsOld : Inherits TaskParent
 
         dst3 = dst1.Threshold(0, 255, cv.ThresholdTypes.Binary)
 
-        labels(3) = CStr(lpList.Count) + " lines found and " + CStr(edgeDuplicates.Count) + " edge duplicates."
+        labels(3) = CStr(lpList.Count) + " lines found And " + CStr(edgeDuplicates.Count) + " edge duplicates."
     End Sub
     Protected Overrides Sub Finalize()
         ld.Dispose()
@@ -262,7 +271,7 @@ Public Class Line_BasicsOldLSD : Inherits TaskParent
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
         labels(2) = "Edges_Basics output"
         lsd = cv.LineSegmentDetector.Create()
-        desc = "Run FLD (Fast Line Detector) with sobel input."
+        desc = "Run FLD (Fast Line Detector) With sobel input."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst2 = task.color.Clone
@@ -313,7 +322,7 @@ Public Class Line_WithAging : Inherits TaskParent
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
         If standalone Then task.gOptions.showMotionMask.Checked = True
         ld = cv.XImgProc.CvXImgProc.CreateFastLineDetector
-        desc = "If line is NOT in motion mask, then keep it.  If line is in motion mask, add it."
+        desc = "If line Is Not In motion mask, Then keep it.  If line Is In motion mask, add it."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If standalone Then motionMask = task.motion.motionMask
@@ -369,7 +378,7 @@ Public Class Line_WithAging : Inherits TaskParent
             If task.lpD.rect.Width = 0 Then task.lpD = lpList(0)
         End If
 
-        labels(2) = CStr(count) + " lines retained - " + CStr(newCount) + " were new"
+        labels(2) = CStr(count) + " lines retained - " + CStr(newCount) + " were New"
         If removeOverlappingLines Then labels(2) += ". " + CStr(overLappingCount) + " overlap(s) removed."
     End Sub
     Protected Overrides Sub Finalize()
@@ -384,7 +393,7 @@ End Class
 Public Class NR_Line_BasicsOld_Test : Inherits TaskParent
     Dim lines As New Line_Basics
     Public Sub New()
-        desc = "Line_Basics is a task algorithm so this is the better way to test it."
+        desc = "Line_Basics Is a task algorithm so this Is the better way To test it."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         lines.Run(task.gray)
@@ -406,8 +415,8 @@ Public Class Line_Perpendicular : Inherits TaskParent
     Public input As lpData
     Public output As lpData
     Public Sub New()
-        labels = {"", "", "White is the line selected for display and yellow is perpendicular line", ""}
-        desc = "Find the line perpendicular to the line created by the points provided."
+        labels = {"", "", "White Is the line selected For display And yellow Is perpendicular line", ""}
+        desc = "Find the line perpendicular To the line created by the points provided."
     End Sub
     Public Shared Function computePerp(lp As lpData) As lpData
         Dim midPoint = New cv.Point2f((lp.p1.X + lp.p2.X) / 2, (lp.p1.Y + lp.p2.Y) / 2)
@@ -440,7 +449,7 @@ Public Class Line_Perpendicular : Inherits TaskParent
         dst2.Circle(input.ptCenter, task.DotSize + 2, cv.Scalar.Red, -1, task.lineType)
         dst2.Line(output.p1, output.p2, yellow, task.lineWidth, task.lineType)
 
-        If standaloneTest() Then SetTrueText("The line displayed at left is the gravity vector.", 3)
+        If standaloneTest() Then SetTrueText("The line displayed at left Is the gravity vector.", 3)
     End Sub
 End Class
 
@@ -453,8 +462,8 @@ Public Class NR_Line_Parallel : Inherits TaskParent
     Public classes() As List(Of Integer) ' groups of lines that are parallel
     Public unParallel As New List(Of Integer) ' lines which are not parallel
     Public Sub New()
-        labels(2) = "Text shows the parallel class with 0 being unparallel."
-        desc = "Identify lines that are parallel (or nearly so), perpendicular, and not parallel."
+        labels(2) = "Text shows the parallel Class With 0 being unparallel."
+        desc = "Identify lines that are parallel (Or nearly so), perpendicular, And Not parallel."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst2 = src.Clone
@@ -517,7 +526,7 @@ Public Class Line_Intersection : Inherits TaskParent
     Public lp1 As lpData, lp2 As lpData
     Public intersectionPoint As cv.Point2f
     Public Sub New()
-        desc = "Determine if 2 lines intersect, where the point is, and if that point is in the image."
+        desc = "Determine If 2 lines intersect, where the point Is, And If that point Is In the image."
     End Sub
     Public Shared Function IntersectTest(p1 As cv.Point2f, p2 As cv.Point2f, p3 As cv.Point2f, p4 As cv.Point2f) As cv.Point2f
         Dim x = p3 - p1
@@ -576,7 +585,7 @@ Public Class NR_Line_Select : Inherits TaskParent
     Public delaunay As New Delaunay_LineSelect
     Public Sub New()
         If standalone Then task.gOptions.displayDst1.Checked = True
-        desc = "Select a line with mouse movement and put the selection into task.lpD."
+        desc = "Select a line With mouse movement And put the selection into task.lpD."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         Static lpList As New List(Of lpData)
@@ -605,7 +614,7 @@ Public Class Line_DepthHistogram : Inherits TaskParent
         plot.plotHist.removeZeroEntry = True
         If standalone Then task.gOptions.DebugCheckBox.Checked = True
         If standalone Then task.gOptions.displayDst1.Checked = True
-        desc = "Show the histogram of the depth data for a line.  Use debug check box to study longest line."
+        desc = "Show the histogram Of the depth data For a line.  Use debug check box To study longest line."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         lineVert.Run(src)
@@ -625,14 +634,14 @@ Public Class Line_DepthHistogram : Inherits TaskParent
             If task.gOptions.DebugCheckBox.Checked Then
                 dst2 = plot.plotHist.dst2
                 dst3.Rectangle(lp.rect, task.highlight, task.lineWidth)
-                labels(3) = "The histogram at left indicates that the depth is likely at " + Format(depth1, fmt1) + "m" + vbCrLf
+                labels(3) = "The histogram at left indicates that the depth Is likely at " + Format(depth1, fmt1) + "m" + vbCrLf
                 labels(2) = plot.plotHist.labels(2)
                 Exit For
             End If
         Next
-        strOut = "To view any line, uncheck the debugCheckBox in the global options." + vbCrLf
+        strOut = "To view any line, uncheck the debugCheckBox In the Global options." + vbCrLf
         strOut += "With debugCheckBox checked, only the longest line will be displayed." + vbCrLf
-        strOut += "Hover with the mouse over the line whose depth will be plotted." + vbCrLf
+        strOut += "Hover With the mouse over the line whose depth will be plotted." + vbCrLf
         SetTrueText(strOut, 1)
     End Sub
 End Class
@@ -645,7 +654,7 @@ Public Class Line_LeftRightMotion : Inherits TaskParent
     Public linesRight As New Line_Basics
     Public Sub New()
         labels = {"", "", "Left image lines", "Right image lines"}
-        desc = "Find the lines in the Left and Right images."
+        desc = "Find the lines In the Left And Right images."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst2 = task.lines.dst2
@@ -667,7 +676,7 @@ Public Class Line_Vertical : Inherits TaskParent
     Public lpLeft As New List(Of lpData)
     Public lpRight As New List(Of lpData)
     Public Sub New()
-        desc = "Find just the vertical lines in the left and right images."
+        desc = "Find just the vertical lines In the left And right images."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         lrLines.Run(src)
