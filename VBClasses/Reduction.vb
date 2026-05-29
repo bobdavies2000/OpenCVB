@@ -77,6 +77,7 @@ Public Class NR_Reduction_HeatMapLines1 : Inherits TaskParent
     Public setupSide As New Cloud_SetupSide
     Public setupTop As New Cloud_SetupTop
     Dim reduction As New Reduction_PointCloud
+    Dim core As New Line_Core
     Public Sub New()
         labels(2) = "Gravity rotated Side View with detected lines"
         labels(3) = "Gravity rotated Top View width detected lines"
@@ -86,15 +87,23 @@ Public Class NR_Reduction_HeatMapLines1 : Inherits TaskParent
         reduction.Run(src)
         heat.Run(src)
 
-        Dim vecArray = task.lines.basics.ld.Detect(heat.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
-        Dim lplist = Line_Basics.getRawLines(vecArray)
+        core.Run(heat.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
+
         setupTop.Run(heat.dst2)
         dst2 = setupTop.dst2
 
-        vecArray = task.lines.basics.ld.Detect(heat.dst3.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
-        lplist = Line_Basics.getRawLines(vecArray)
+        For Each lp In core.lpList
+            dst2.Line(lp.p1, lp.p2, white, task.lineWidth)
+        Next
+
+        core.Run(heat.dst3.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
+
         setupSide.Run(heat.dst3)
         dst3 = setupSide.dst2
+
+        For Each lp In core.lpList
+            dst3.Line(lp.p1, lp.p2, white, task.lineWidth)
+        Next
     End Sub
 End Class
 

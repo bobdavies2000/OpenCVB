@@ -435,6 +435,7 @@ End Class
 
 Public Class NR_BackProject_MaskLines : Inherits TaskParent
     Dim masks As New PlotMouse_MaskBackProject
+    Dim core As New Line_Core
     Public Sub New()
         If standalone Then task.gOptions.displayDst1.Checked = True
         dst1 = New cv.Mat(dst1.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
@@ -445,7 +446,8 @@ Public Class NR_BackProject_MaskLines : Inherits TaskParent
         masks.Run(src)
         dst2 = masks.dst2
 
-        Dim lpList = Line_Basics.getRawLines(task.lines.basics.ld.Detect(masks.dst1))
+        core.Run(task.gray)
+        Dim lpList = core.lpList
 
         dst1.SetTo(0)
         For Each lp In lpList

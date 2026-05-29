@@ -82,6 +82,7 @@ End Class
 
 Public Class NR_Structured_MultiSliceLines : Inherits TaskParent
     Dim multi As New Structured_MultiSlice
+    Dim core As New Line_Core
     Public Sub New()
         desc = "Detect lines in the multiSlice output"
     End Sub
@@ -89,11 +90,10 @@ Public Class NR_Structured_MultiSliceLines : Inherits TaskParent
         multi.Run(src)
         dst3 = multi.dst3
 
-        Dim vecArray = task.lines.basics.ld.Detect(dst3.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
-        Dim lpList = Line_Basics.getRawLines(vecArray)
+        core.Run(dst3.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
 
         dst2.SetTo(0)
-        For Each lp In lpList
+        For Each lp In core.lpList
             dst2.Line(lp.p1, lp.p2, white, task.lineWidth, task.lineType)
         Next
     End Sub

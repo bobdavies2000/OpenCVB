@@ -144,6 +144,53 @@ End Class
 
 
 
+
+Public Class Line_Core : Inherits TaskParent
+    Implements IDisposable
+    Public ld As cv.XImgProc.FastLineDetector
+    Public lpList As New List(Of lpData)
+    Public Sub New()
+        ld = cv.XImgProc.CvXImgProc.CreateFastLineDetector
+        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
+        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        desc = "Use FastLineDetector (OpenCV Contrib) to find all the lines inside drawRect"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        If src.Channels() <> 1 Then src = task.gray
+        If src.Type <> cv.MatType.CV_8U Then src.ConvertTo(src, cv.MatType.CV_8U)
+
+        Dim vecArray() As cv.Vec4f
+        Dim drawing As Boolean = False
+        If task.drawRectFinal.Width > 0 And task.drawRectFinal.Height > 0 Then
+            dst1.SetTo(0)
+            src(task.drawRectFinal).CopyTo(dst1)
+            drawing = True
+            vecArray = ld.Detect(dst1)
+        Else
+            vecArray = ld.Detect(src)
+        End If
+
+        lpList = Line_Basics.getRawLines(vecArray)
+
+        dst2.SetTo(0)
+        For Each lp In lpList
+            If drawing Then
+                dst2(task.drawRectFinal).Line(lp.p1, lp.p2, 255, task.lineWidth, task.lineType)
+            Else
+                dst2.Line(lp.p1, lp.p2, 255, task.lineWidth, task.lineType)
+            End If
+        Next
+
+        labels(2) = CStr(lpList.Count) + " lines were detected."
+    End Sub
+    Protected Overrides Sub Finalize()
+        ld.Dispose()
+    End Sub
+End Class
+
+
+
+
 Public Class Line_Basics_TA : Inherits TaskParent
     Public lpList As New List(Of lpData)
     Public basics As New Line_Basics
@@ -385,48 +432,6 @@ Public Class NR_Line_BasicsOld_Test : Inherits TaskParent
     End Sub
 End Class
 
-
-
-
-
-
-Public Class Line_Core : Inherits TaskParent
-    Implements IDisposable
-    Public lpList As New List(Of lpData)
-    Public Sub New()
-        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
-        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-        desc = "Use FastLineDetector (OpenCV Contrib) to find all the lines inside drawRect"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        If src.Channels() <> 1 Then src = task.gray
-        If src.Type <> cv.MatType.CV_8U Then src.ConvertTo(src, cv.MatType.CV_8U)
-
-        Dim vecArray() As cv.Vec4f
-        Dim drawing As Boolean = False
-        If task.drawRectFinal.Width > 0 And task.drawRectFinal.Height > 0 Then
-            dst1.SetTo(0)
-            src(task.drawRectFinal).CopyTo(dst1)
-            drawing = True
-            vecArray = task.lines.basics.ld.Detect(dst1)
-        Else
-            vecArray = task.lines.basics.ld.Detect(src)
-        End If
-
-        lpList = Line_Basics.getRawLines(vecArray)
-
-        dst2.SetTo(0)
-        For Each lp In lpList
-            If drawing Then
-                dst2(task.drawRectFinal).Line(lp.p1, lp.p2, 255, task.lineWidth, task.lineType)
-            Else
-                dst2.Line(lp.p1, lp.p2, 255, task.lineWidth, task.lineType)
-            End If
-        Next
-
-        labels(2) = CStr(lpList.Count) + " lines were detected."
-    End Sub
-End Class
 
 
 
