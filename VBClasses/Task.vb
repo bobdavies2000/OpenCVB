@@ -212,6 +212,7 @@ Public Class AlgorithmTask : Implements IDisposable
                 displayObject = task.cpu.activeObjects(index)
             End If
         End If
+
         Dim nextTrueData As List(Of TrueText) = displayObject.trueData
         trueData = New List(Of TrueText)(nextTrueData)
 

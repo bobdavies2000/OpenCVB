@@ -12,62 +12,17 @@ Public Class LineSeg_Basics : Inherits TaskParent
 
         core.Run(src)
 
-        lpList = Line_Basics.removeDuplicates(core.lpList)
-        For Each lp In lpList
-            dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth + 1, cv.LineTypes.Link4)
-        Next
+        lpList = Line_Basics_TA.removeDuplicates(core.lpList)
+        lpList = Line_Basics_TA.removeDuplicates(core.lpList)
+        Dim averageAge = Line_Basics_TA.updateAgesAndLongest()
 
-        Dim count As Integer
-        For Each lp In task.lines.lpLast
-            lpFind.inputLine = lp
-            lpFind.Run(src)
-            Dim closest = lpFind.closestLine
-            If closest IsNot Nothing Then
-                If closest.index < lpList.Count Then
-                    Dim lpCurr = lpList(closest.index - 1)
-                    lpCurr.age = lp.age + 1
-                    lpCurr.indexLast = lp.index
-                    If lpCurr.age >= 1000 Then lpCurr.age = 10
-                    count += 1
-                End If
-            End If
-        Next
-
-        Dim lpAgeSort As New SortedList(Of Integer, Integer)(New compareAllowIdenticalIntegerInverted)
-        For Each lp In lpList
-            lpAgeSort.Add(lp.age, lp.index)
-        Next
-
-        Static gravity = task.lpGravity
-        If (task.longestLine = gravity Or task.longestLine Is Nothing) And lpList.Count > 0 Then task.longestLine = lpList(0)
-        If lpList.Count > 0 Then
-            lpFind.inputLine = If(task.longestLine Is Nothing, lpList(0), task.longestLine)
-            lpFind.lpList = lpList
-            lpFind.Run(emptyMat)
-            Dim lpTmp = lpFind.closestLine
-
-            If lpTmp Is Nothing Then
-                gravity = task.lpGravity
-                task.longestLine = task.lpGravity
-            Else
-                task.longestLine = New lpData(lpTmp.ptE1, lpTmp.ptE2)
-                task.longestLine.age = lpTmp.age
-            End If
-        Else
-            gravity = task.lpGravity
-            task.longestLine = task.lpGravity
-            lpList.Add(task.longestLine) ' need to always have something in lplist...
-        End If
-
-        Static minCount As Integer = count
-        If task.heartBeat Then minCount = count
-        If count < minCount Then minCount = count
-        Dim ageCount = lpAgeSort.Keys.Count
-        labels(2) = CStr(lpList.Count) + " lines found.  Value next to the line is the age.  Minimal count = " + CStr(minCount) +
-                    " Average age = " + If(ageCount > 0, Format(lpAgeSort.Keys.Average, fmt1), "0")
+        labels(2) = CStr(task.lines.lpList.Count) + " lines found.  Value Next To the line Is the age." +
+                    " Average age = " + If(task.lines.lpList.Count > 0, Format(averageAge, fmt1), "0")
 
         dst3 = task.lines.dst3
-        trueData = task.lines.trueData
+        For Each lp In lpList
+            SetTrueText(CStr(lp.age), New cv.Point(lp.ptCenter.X + 2, lp.ptCenter.Y + 2), 3)
+        Next
     End Sub
 End Class
 
