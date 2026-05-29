@@ -1,53 +1,14 @@
 Imports cv = OpenCvSharp
 Public Class Line_Basics : Inherits TaskParent
-    Implements IDisposable
     Public lpList As New List(Of lpData)
     Public lpLast As New List(Of lpData)
-    Public ld As cv.XImgProc.FastLineDetector
     Dim edges As New Edge_Sobel
     Dim lpSorted As New SortedList(Of Single, lpData)(New compareAllowIdenticalSingleInverted)
     Dim lpFind As New Line_FindClosest
+    Public core As New Line_Core
     Public Sub New()
-        ld = cv.XImgProc.CvXImgProc.CreateFastLineDetector
         desc = "Run FLD (Fast Line Detector) with sobel input."
     End Sub
-    Public Sub getRawSortedLines(lines As cv.Vec4f())
-        lpSorted.Clear()
-        For Each v In lines
-            If v(0) >= 0 And v(0) <= task.workRes.Width And v(1) >= 0 And v(1) <= task.workRes.Height And
-               v(2) >= 0 And v(2) <= task.workRes.Width And v(3) >= 0 And v(3) <= task.workRes.Height Then
-                Dim p1 = New cv.Point(CInt(v(0)), CInt(v(1)))
-                Dim p2 = New cv.Point(CInt(v(2)), CInt(v(3)))
-                If p1.X >= 0 And p1.X < task.workRes.Width And p1.Y >= 0 And p1.Y < task.workRes.Height And
-                   p2.X >= 0 And p2.X < task.workRes.Width And p2.Y >= 0 And p2.Y < task.workRes.Height Then
-                    p1 = lpData.validatePoint(p1)
-                    p2 = lpData.validatePoint(p2)
-                    Dim lp = New lpData(p1, p2)
-                    If lp.rect.Width = 0 Then Continue For
-                    lpSorted.Add(lp.length, lp)
-                End If
-            End If
-        Next
-    End Sub
-    Public Shared Function getRawLines(lines As cv.Vec4f()) As List(Of lpData)
-        Dim lpList As New List(Of lpData)
-        For Each v In lines
-            If v(0) >= 0 And v(0) <= task.workRes.Width And v(1) >= 0 And v(1) <= task.workRes.Height And
-                           v(2) >= 0 And v(2) <= task.workRes.Width And v(3) >= 0 And v(3) <= task.workRes.Height Then
-                Dim p1 = New cv.Point(CInt(v(0)), CInt(v(1)))
-                Dim p2 = New cv.Point(CInt(v(2)), CInt(v(3)))
-                If p1.X >= 0 And p1.X < task.workRes.Width And p1.Y >= 0 And p1.Y < task.workRes.Height And
-                   p2.X >= 0 And p2.X < task.workRes.Width And p2.Y >= 0 And p2.Y < task.workRes.Height Then
-                    p1 = lpData.validatePoint(p1)
-                    p2 = lpData.validatePoint(p2)
-                    Dim lp = New lpData(p1, p2)
-                    If lp.rect.Width = 0 Then Continue For
-                    lpList.Add(New lpData(p1, p2))
-                End If
-            End If
-        Next
-        Return lpList
-    End Function
     Public Overrides Sub RunAlg(src As cv.Mat)
         lpLast = New List(Of lpData)(lpList)
 
@@ -57,7 +18,7 @@ Public Class Line_Basics : Inherits TaskParent
         edges.Run(src)
         labels(2) = edges.labels(2)
 
-        getRawSortedLines(ld.Detect(edges.dst2))
+        core.Run(edges.dst2)
 
         lpList.Clear()
         Dim removeNearDuplicates As Boolean = True
@@ -135,9 +96,6 @@ Public Class Line_Basics : Inherits TaskParent
         labels(2) = CStr(lpList.Count) + " lines found.  Value next to the line is the age.  Minimal count = " + CStr(minCount) +
                     " Average age = " + If(ageCount > 0, Format(lpAgeSort.Keys.Average, fmt1), "0")
     End Sub
-    Protected Overrides Sub Finalize()
-        ld.Dispose()
-    End Sub
 End Class
 
 
@@ -155,30 +113,36 @@ Public Class Line_Core : Inherits TaskParent
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         desc = "Use FastLineDetector (OpenCV Contrib) to find all the lines inside drawRect"
     End Sub
+    Public Shared Function getRawSortedLines(lines As cv.Vec4f()) As List(Of lpData)
+        Dim lpSorted As New SortedList(Of Single, lpData)(New compareAllowIdenticalSingleInverted)
+        For Each v In lines
+            If v(0) >= 0 And v(0) <= task.workRes.Width And v(1) >= 0 And v(1) <= task.workRes.Height And
+               v(2) >= 0 And v(2) <= task.workRes.Width And v(3) >= 0 And v(3) <= task.workRes.Height Then
+                Dim p1 = New cv.Point(CInt(v(0)), CInt(v(1)))
+                Dim p2 = New cv.Point(CInt(v(2)), CInt(v(3)))
+                If p1.X >= 0 And p1.X < task.workRes.Width And p1.Y >= 0 And p1.Y < task.workRes.Height And
+                   p2.X >= 0 And p2.X < task.workRes.Width And p2.Y >= 0 And p2.Y < task.workRes.Height Then
+                    p1 = lpData.validatePoint(p1)
+                    p2 = lpData.validatePoint(p2)
+                    Dim lp = New lpData(p1, p2)
+                    If lp.rect.Width = 0 Then Continue For
+                    lpSorted.Add(lp.length, lp)
+                End If
+            End If
+        Next
+
+        Dim lpList As New List(Of lpData)(lpSorted.Values)
+        Return lpList
+    End Function
     Public Overrides Sub RunAlg(src As cv.Mat)
         If src.Channels() <> 1 Then src = task.gray
         If src.Type <> cv.MatType.CV_8U Then src.ConvertTo(src, cv.MatType.CV_8U)
 
-        Dim vecArray() As cv.Vec4f
-        Dim drawing As Boolean = False
-        If task.drawRectFinal.Width > 0 And task.drawRectFinal.Height > 0 Then
-            dst1.SetTo(0)
-            src(task.drawRectFinal).CopyTo(dst1)
-            drawing = True
-            vecArray = ld.Detect(dst1)
-        Else
-            vecArray = ld.Detect(src)
-        End If
-
-        lpList = Line_Basics.getRawLines(vecArray)
+        lpList = getRawSortedLines(ld.Detect(src))
 
         dst2.SetTo(0)
         For Each lp In lpList
-            If drawing Then
-                dst2(task.drawRectFinal).Line(lp.p1, lp.p2, 255, task.lineWidth, task.lineType)
-            Else
-                dst2.Line(lp.p1, lp.p2, 255, task.lineWidth, task.lineType)
-            End If
+            dst2.Line(lp.p1, lp.p2, 255, task.lineWidth, task.lineType)
         Next
 
         labels(2) = CStr(lpList.Count) + " lines were detected."
@@ -242,7 +206,7 @@ Public Class Line_BasicsOld : Inherits TaskParent
         edges.Run(src)
         labels(2) = edges.labels(2)
 
-        Dim newList = Line_Basics.getRawLines(ld.Detect(edges.dst2))
+        Dim newList = Line_Core.getRawSortedLines(ld.Detect(edges.dst2))
 
         dst1.SetTo(0)
         Dim lpSorted As New SortedList(Of Single, Integer)(New compareAllowIdenticalSingleInverted)
@@ -310,7 +274,7 @@ Public Class Line_BasicsOldLSD : Inherits TaskParent
         lsd.Detect(src, vecMat)
         Dim vecArray() As cv.Vec4f = Nothing
         vecMat.GetArray(Of cv.Vec4f)(vecArray)
-        lpList = Line_Basics.getRawLines(vecArray)
+        lpList = Line_Core.getRawSortedLines(vecArray)
 
         dst1.SetTo(0)
         Dim index As Integer
@@ -357,7 +321,7 @@ Public Class Line_WithAging : Inherits TaskParent
         dst2 = src.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         If lpList.Count <= 1 Then
             motionMask.SetTo(255)
-            lpList = Line_Basics.getRawLines(ld.Detect(src))
+            lpList = Line_Core.getRawSortedLines(ld.Detect(src))
         End If
 
         Dim sortlines As New SortedList(Of Single, lpData)(New compareAllowIdenticalSingleInverted)
@@ -369,7 +333,7 @@ Public Class Line_WithAging : Inherits TaskParent
         Next
         Dim count As Integer = sortlines.Count
 
-        lpList = Line_Basics.getRawLines(ld.Detect(src))
+        lpList = Line_Core.getRawSortedLines(ld.Detect(src))
 
         For Each lp In lpList
             If motionMask.Get(Of Byte)(lp.p1.Y, lp.p1.X) Or motionMask.Get(Of Byte)(lp.p2.Y, lp.p2.X) Then
@@ -1611,7 +1575,7 @@ Public Class Line_BasicsOldEmboss : Inherits TaskParent
         emboss.Run(src)
         dst2 = emboss.dst3
 
-        lpList = Line_Basics.getRawLines(ld.Detect(dst2))
+        lpList = Line_Core.getRawSortedLines(ld.Detect(dst2))
 
         dst1.SetTo(0)
         For Each lp In lpList

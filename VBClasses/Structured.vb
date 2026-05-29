@@ -91,11 +91,7 @@ Public Class NR_Structured_MultiSliceLines : Inherits TaskParent
         dst3 = multi.dst3
 
         core.Run(dst3.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
-
-        dst2.SetTo(0)
-        For Each lp In core.lpList
-            dst2.Line(lp.p1, lp.p2, white, task.lineWidth, task.lineType)
-        Next
+        dst2 = core.dst2
     End Sub
 End Class
 
