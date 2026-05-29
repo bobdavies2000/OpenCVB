@@ -1113,7 +1113,7 @@ End Class
 
 
 
-Public Class Brick_Search : Inherits TaskParent
+Public Class NR_Brick_Search : Inherits TaskParent
     Dim lpList As New List(Of lpData)
     Public Sub New()
         task.fOptions.MatchCorrSlider.Value = 0.8

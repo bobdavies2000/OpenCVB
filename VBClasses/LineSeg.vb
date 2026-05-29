@@ -625,6 +625,7 @@ Public Class LineSeg_FLD : Inherits TaskParent
     Public lpList As New List(Of lpData)
     Public Sub New()
         dst0 = New cv.Mat(dst0.Size, cv.MatType.CV_8U, 0)
+        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
         If standalone Then task.gOptions.displayDst1.Checked = True
         desc = "Merge the results of Line Segment Descriptor and Fast Line Detector."
     End Sub
@@ -633,7 +634,10 @@ Public Class LineSeg_FLD : Inherits TaskParent
         dst2 = lSeg.dst3
         labels(2) = lSeg.labels(2)
 
-        dst1 = task.lines.dst3
+        dst1.SetTo(0)
+        For Each lp In task.lines.lpList
+            dst1.Line(lp.p1, lp.p2, 255, task.lineWidth)
+        Next
         labels(1) = task.lines.labels(2)
 
         dst3 = dst1 And dst2
@@ -644,7 +648,7 @@ Public Class LineSeg_FLD : Inherits TaskParent
         Dim histArray = LineSeg_Basics.lineHistogram(dst0, Math.Max(task.lines.lpList.Count, lSeg.lpList.Count))
 
         dst3.SetTo(0)
-        For i = 0 To histArray.Count - 1
+        For i = 0 To Math.Min(histArray.Count, lSeg.lpList.Count) - 1
             If histArray(i) > 5 Then
                 dst3.Line(lSeg.lpList(i).p1, lSeg.lpList(i).p2, 255, task.lineWidth, task.lineType)
             End If
@@ -660,6 +664,7 @@ Public Class LineSeg_Detector : Inherits TaskParent
     Public lpList As New List(Of lpData)
     Public Sub New()
         dst0 = New cv.Mat(dst0.Size, cv.MatType.CV_8U, 0)
+        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
         If standalone Then task.gOptions.displayDst1.Checked = True
         desc = "Compare the results of the line segment detector and fast line detector."
     End Sub
@@ -668,7 +673,10 @@ Public Class LineSeg_Detector : Inherits TaskParent
         dst2 = lSeg.dst3
         labels(2) = lSeg.labels(2)
 
-        dst1 = task.lines.dst3
+        dst1.SetTo(0)
+        For Each lp In task.lines.lpList
+            dst1.Line(lp.p1, lp.p2, 255, task.lineWidth)
+        Next
         labels(1) = task.lines.labels(2)
 
         dst3 = dst1 And dst2
@@ -679,7 +687,7 @@ Public Class LineSeg_Detector : Inherits TaskParent
         Dim histArray = LineSeg_Basics.lineHistogram(dst0, Math.Max(task.lines.lpList.Count, lSeg.lpList.Count))
 
         dst3.SetTo(0)
-        For i = 0 To histArray.Count - 1
+        For i = 0 To Math.Min(histArray.Count, lSeg.lpList.Count) - 1
             If histArray(i) > 5 Then
                 dst3.Line(lSeg.lpList(i).p1, lSeg.lpList(i).p2, 255, task.lineWidth, task.lineType)
             End If

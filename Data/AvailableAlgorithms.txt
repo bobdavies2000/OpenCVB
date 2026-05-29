@@ -62,7 +62,6 @@ Brick_LeftRight
 Brick_LeftRightMouse
 Brick_Plot
 Brick_Ranges
-Brick_Search
 Brick_Variability
 BrickLine_BasicsOld
 BrickLine_DepthGap
@@ -476,8 +475,8 @@ Line_Finder
 Line_FinderPlus
 Line_FindSimple
 Line_Intersection
-Line_KNNTop
 Line_LeftRight
+Line_LeftRightEdges
 Line_LeftRightMotion
 Line_LeftTrack
 Line_Longest
@@ -487,6 +486,7 @@ Line_MapRects
 Line_Perpendicular
 Line_RedFlood
 Line_Sobel
+Line_TopBottomEdges
 Line_Tracker
 Line_TrackV
 Line_TranslatedRightView
@@ -677,6 +677,7 @@ NR_Brick_MLColorDepth
 NR_Brick_NoDepthLines
 NR_Brick_Plot
 NR_Brick_RGBtoLeft
+NR_Brick_Search
 NR_BrickLine_DepthGaps
 NR_BrickLine_Lines
 NR_BrickPoint_Best

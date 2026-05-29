@@ -107,7 +107,7 @@ Public Class KNN_Minimal : Inherits TaskParent
         cv.Cv2.Normalize(queryMat, queryNormalized, 1, 0, cv.NormTypes.MinMax)
         knn.FindNearest(queryNormalized, trainMat.Rows, New cv.Mat, neighbors)
 
-        result = KNN_Basics.getResults(neighbors, queryMat.Rows, trainMat.Rows)
+        If neighbors.Rows > 0 Then result = KNN_Basics.getResults(neighbors, queryMat.Rows, trainMat.Rows)
     End Sub
     Protected Overrides Sub Finalize()
         If knn IsNot Nothing Then knn.Dispose()
@@ -646,5 +646,58 @@ Public Class KNN_DimensionN : Inherits TaskParent
                             "the results may appear incorrect because the higher dimensions are projected into " + vbCrLf +
                             "a 2-dimensional presentation.", 3)
         End If
+    End Sub
+End Class
+
+
+
+
+
+Public Class Line_TopBottomEdges : Inherits TaskParent
+    Public tops As New List(Of lpData)
+    Public bottoms As New List(Of lpData)
+    Public Sub New()
+        desc = "Find all the lines that intersect the top AND bottom of the image."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        dst2 = src.Clone
+
+        tops.Clear()
+        bottoms.Clear()
+        For Each lp In task.lines.lpList
+            If lp.ptE1.Y = 0 And lp.ptE2.Y = dst2.Height - 1 Then
+                dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth + 1)
+                tops.Add(lp)
+            ElseIf lp.ptE1.Y = dst2.Height - 1 And lp.ptE2.Y = 0 Then
+                dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth + 1)
+                bottoms.Add(lp)
+            End If
+        Next
+    End Sub
+End Class
+
+
+
+
+Public Class Line_LeftRightEdges : Inherits TaskParent
+    Public lefts As New List(Of lpData)
+    Public rights As New List(Of lpData)
+    Public Sub New()
+        desc = "Find all the lines that intersect the top AND bottom of the image."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        dst2 = src.Clone
+
+        lefts.Clear()
+        rights.Clear()
+        For Each lp In task.lines.lpList
+            If lp.ptE1.X = 0 And lp.ptE2.X = dst2.Width - 1 Then
+                dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth + 1)
+                lefts.Add(lp)
+            ElseIf lp.ptE1.x = dst2.width - 1 And lp.ptE2.x = 0 Then
+                dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth + 1)
+                rights.Add(lp)
+            End If
+        Next
     End Sub
 End Class

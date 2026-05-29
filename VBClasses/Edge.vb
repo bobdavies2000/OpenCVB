@@ -1347,22 +1347,23 @@ Public Class NR_Edge_Stability : Inherits TaskParent
         Dim popMin = If(pops.Count > 0, pops.Min, 0)
         Dim popMax = If(pops.Count > 0, pops.Max, 0)
         labels(2) = CStr(gEdges.featureRects.Count) + " feature rects with an average population of " +
-                             Format(popAverage, fmt1) + " and with min = " + CStr(popMin) +
-                             " and max = " + CStr(popMax) + ".  Circled cell has max features."
+                                 Format(popAverage, fmt1) + " and with min = " + CStr(popMin) +
+                                 " and max = " + CStr(popMax) + ".  Circled cell has max features."
+        If pops.Count > 0 Then
+            Dim index = pops.IndexOf(pops.Max)
+            Dim gSize = task.brickEdgeLen
+            Dim pt = New cv.Point(gEdges.featureRects(index).X + gSize / 2, gEdges.featureRects(index).Y + gSize / 2)
+            dst2.Circle(pt, gSize * 1.5, 255, task.lineWidth * 2)
 
-        Dim index = pops.IndexOf(pops.Max)
-        Dim gSize = task.brickEdgeLen
-        Dim pt = New cv.Point(gEdges.featureRects(index).X + gSize / 2, gEdges.featureRects(index).Y + gSize / 2)
-        dst2.Circle(pt, gSize * 1.5, 255, task.lineWidth * 2)
-
-        dst3.SetTo(0)
-        dst3.Circle(pt, gSize * 1.5, 255, task.lineWidth * 2)
-        Dim count As Integer
-        For Each index In popSorted.Values
-            dst3.Rectangle(gEdges.featureRects(index), white, task.lineWidth)
-            count += 1
-            If count >= 20 Then Exit For
-        Next
+            dst3.SetTo(0)
+            dst3.Circle(pt, gSize * 1.5, 255, task.lineWidth * 2)
+            Dim count As Integer
+            For Each index In popSorted.Values
+                dst3.Rectangle(gEdges.featureRects(index), white, task.lineWidth)
+                count += 1
+                If count >= 20 Then Exit For
+            Next
+        End If
     End Sub
 End Class
 

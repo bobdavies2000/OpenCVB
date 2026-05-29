@@ -592,10 +592,11 @@ Public Class RedCloud_MotionFilter : Inherits TaskParent
         Dim histogram As New cv.Mat
         Dim ranges() As cv.Rangef = New cv.Rangef() {New cv.Rangef(0, redC.rcList.Count + 1)}
         cv.Cv2.CalcHist({dst1}, {0}, New cv.Mat, histogram, 1, {redC.rcList.Count}, ranges)
-        histogram.Set(Of Single)(0, 0, 0) ' remove the count for cell 0 - no cell information.
 
         Dim count = histogram.CountNonZero()
         SetTrueText(CStr(count) + " cells had motion.", 3)
+        If count = 0 Then Exit Sub
+        histogram.Set(Of Single)(0, 0, 0) ' remove the count for cell 0 - no cell information.
 
         Dim histArray(histogram.Rows - 1) As Single
         histogram.GetArray(Of Single)(histArray)

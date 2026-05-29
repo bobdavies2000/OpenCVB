@@ -484,7 +484,7 @@ Public Class NR_LineTrack_Top3 : Inherits TaskParent
 
         If task.heartBeat Then
             lpList.Clear()
-            For i = 0 To 2
+            For i = 0 To Math.Min(3, task.lines.lpList.Count) - 1
                 lpList.Add(task.lines.lpList(i))
             Next
             dst3.SetTo(0)
@@ -534,15 +534,16 @@ Public Class NR_LineTrack_SearchX : Inherits TaskParent
     Dim addw As New AddWeighted_Basics
     Public Sub New()
         If standalone Then task.gOptions.displayDst1.Checked = True
-        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
+        dst1 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
+        lastImage = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         desc = "Confirm any camera motion using the task.lines output.  Needs work!"
     End Sub
     Private Function testOffset(compareIndex As Integer, i As Integer) As Integer
         Dim r1 = New cv.Rect(compareIndex, 0, dst1.Width - searchCount, dst1.Height)
         Dim r2 = New cv.Rect(i, 0, dst1.Width - searchCount, dst1.Height)
 
-        dst1 = task.lines.dst3.Clone
         dst1(r1).SetTo(0, lastImage(r2))
 
         Return dst1.CountNonZero
@@ -550,9 +551,13 @@ Public Class NR_LineTrack_SearchX : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         SetTrueText(strOut, 2)
         If task.heartBeatLT = False Then Exit Sub
-        If task.firstPass Then lastImage = task.lines.dst3.Clone
 
-        dst3 = task.lines.dst3
+        dst3.SetTo(0)
+        For Each lp In task.lines.lpList
+            dst3.Line(lp.p1, lp.p2, 255, task.lineWidth)
+        Next
+
+        If task.firstPass Then lastImage = dst3.Clone
 
         Dim countList As New List(Of (count As Integer, index As Integer))
         strOut = ""
@@ -589,7 +594,7 @@ Public Class NR_LineTrack_SearchX : Inherits TaskParent
                                                 0.25, 0, dst2)
         End If
 
-        lastImage = task.lines.dst3.Clone
+        lastImage = dst3.Clone
     End Sub
 End Class
 

@@ -128,7 +128,10 @@ Public Class NR_PCA_CellMask : Inherits TaskParent
         labels(2) = pca.labels(2)
 
         Dim rc = task.rcD
-        If rc Is Nothing Then rc = pca.redC.rcList(0)
+        If rc Is Nothing Then
+            If pca.redC.rcList.Count = 0 Then Exit Sub
+            rc = pca.redC.rcList(0)
+        End If
         Dim mmZ = GetMinMax(task.pcSplit(2)(rc.rect), rc.mask)
         If mmZ.maxVal > 0 Then
             pcaPrep.Run(task.pointCloud(rc.rect).Clone)

@@ -20592,4 +20592,70 @@ Namespace VBClasses
                         "When that line is lost, the longest line is found and tracked.", 3)
         End Sub
     End Class
+
+
+
+
+
+    Public Class XO_Line_KNNTop : Inherits TaskParent
+        Dim knn As New KNN_Basics
+        Public Sub New()
+            If standalone Then task.gOptions.displayDst1.Checked = True
+            labels(3) = "The same lines in their location in the previous frame."
+            desc = "Find all the lines that intersect the top AND bottom of the image."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            If task.heartBeat = False Then
+                SetTrueText(strOut, 1)
+                Exit Sub
+            End If
+            dst2 = task.color.Clone
+            dst3 = task.color.Clone
+
+            knn.queries.Clear()
+            Dim lpList As New List(Of lpData)
+            For Each lp In task.lines.lpList
+                If lp.ptE1.Y = 0 And lp.ptE2.Y = dst2.Height - 1 Then
+                    knn.queries.Add(lp.p1)
+                    lpList.Add(lp)
+                    If lpList.Count > 3 Then Exit For
+                End If
+            Next
+
+            If task.firstPass Then knn.trainInput = New List(Of cv.Point2f)(knn.queries)
+
+            knn.Run(emptyMat)
+
+            Dim tops As New List(Of Single)
+            Dim bots As New List(Of Single)
+            strOut = "Index" + vbTab + "Before X" + vbTab + "After X" + vbCrLf
+            For i = 0 To knn.queries.Count - 1
+                Dim p1 = knn.queries(i)
+                Dim p2 = knn.trainInput(knn.result(i, 1))
+
+                Dim d1 = p1.X - p2.X
+                Dim d2 = p1.Y - p2.Y
+
+                'If Math.Abs(d1) < 5 And Math.Abs(d2) < 5 Then
+                tops.Add(d1)
+                bots.Add(d2)
+
+                Dim lp1 = New lpData(New cv.Point2f(p1.X, 0), New cv.Point2f(p1.Y, dst2.Height))
+                dst3.Line(lp1.p1, lp1.p2, white, task.lineWidth + 1)
+
+                Dim lp2 = New lpData(New cv.Point2f(p2.X, 0), New cv.Point2f(p2.Y, dst2.Height))
+                dst2.Line(lp2.p1, lp2.p2, task.highlight, task.lineWidth + 1)
+                strOut += CStr(i) + vbTab + CStr(lp1.p1.X) + vbTab + CStr(lp1.p2.X) + vbCrLf
+                strOut += CStr(i) + vbTab + CStr(lp2.p1.X) + vbTab + CStr(lp2.p2.X) + vbCrLf
+                ' End If
+            Next
+            SetTrueText(strOut, 1)
+            If tops.Count > 0 And bots.Count > 0 Then
+                labels(2) = CStr(tops.Count) + " Top points have moved " + Format(tops.Average, fmt1) +
+                            CStr(bots.Count) + " bottom points have moved " + Format(bots.Average, fmt1)
+            End If
+
+            knn.trainInput = New List(Of cv.Point2f)(knn.queries)
+        End Sub
+    End Class
 End Namespace
