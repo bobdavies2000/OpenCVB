@@ -500,6 +500,7 @@ Line3D_ReconstructLine
 Line3D_Selection
 LinearRegression_Basics
 LineSeg_Basics
+LineSeg_BasicsAlt
 LineSeg_BasicsFail
 LineSeg_Core
 LineSeg_Detector

@@ -1,9 +1,39 @@
 Imports cv = OpenCvSharp
+Public Class Line_Basics_TA : Inherits TaskParent
+    Public lpList As New List(Of lpData)
+    Public basics As New Line_Basics
+    Public Sub New()
+        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
+        desc = "Run FLD (Fast Line Detector) with sobel input."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        If src.Channels <> 1 Or src.Type <> cv.MatType.CV_8U Then src = task.gray.Clone
+
+        basics.Run(src)
+        dst2 = basics.dst2
+        labels = basics.labels
+        lpList = New List(Of lpData)(basics.lpList)
+
+        dst3.SetTo(0)
+        For Each lp In lpList
+            dst3.Line(lp.p1, lp.p2, 255, task.lineWidth)
+            SetTrueText(CStr(lp.age), New cv.Point(lp.ptCenter.X + 2, lp.ptCenter.Y + 2), 3)
+        Next
+
+        With task.longestLine
+            dst3.Line(.p1, .p2, 255, task.lineWidth + 1)
+        End With
+    End Sub
+End Class
+
+
+
+
+
 Public Class Line_Basics : Inherits TaskParent
     Public lpList As New List(Of lpData)
     Public lpLast As New List(Of lpData)
     Dim edges As New Edge_Sobel
-    Dim lpSorted As New SortedList(Of Single, lpData)(New compareAllowIdenticalSingleInverted)
     Dim lpFind As New Line_FindClosest
     Public core As New Line_Core
     Public Sub New()
@@ -24,7 +54,7 @@ Public Class Line_Basics : Inherits TaskParent
         Dim removeNearDuplicates As Boolean = True
         If removeNearDuplicates Then
             Dim edgeMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-            For Each lp In lpSorted.Values
+            For Each lp In core.lpList
                 Dim val1 = edgeMap.Get(Of Byte)(lp.ptE1.Y, lp.ptE1.X)
                 Dim val2 = edgeMap.Get(Of Byte)(lp.ptE1.Y, lp.ptE1.X)
                 If val1 > 0 And val2 > 0 Then Continue For
@@ -39,7 +69,7 @@ Public Class Line_Basics : Inherits TaskParent
                 dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth + 1, cv.LineTypes.Link4)
             Next
         Else
-            For Each lp In lpSorted.Values
+            For Each lp In core.lpList
                 lp.index = lpList.Count + 1
                 lpList.Add(lp)
                 dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth + 1, cv.LineTypes.Link4)
@@ -152,35 +182,6 @@ Public Class Line_Core : Inherits TaskParent
     End Sub
 End Class
 
-
-
-
-Public Class Line_Basics_TA : Inherits TaskParent
-    Public lpList As New List(Of lpData)
-    Public basics As New Line_Basics
-    Public Sub New()
-        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
-        desc = "Run FLD (Fast Line Detector) with sobel input."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        If src.Channels <> 1 Or src.Type <> cv.MatType.CV_8U Then src = task.gray.Clone
-
-        basics.Run(src)
-        dst2 = basics.dst2
-        labels = basics.labels
-        lpList = New List(Of lpData)(basics.lpList)
-
-        dst3.SetTo(0)
-        For Each lp In lpList
-            dst3.Line(lp.p1, lp.p2, 255, task.lineWidth)
-            SetTrueText(CStr(lp.age), New cv.Point(lp.ptCenter.X + 2, lp.ptCenter.Y + 2), 3)
-        Next
-
-        With task.longestLine
-            dst3.Line(.p1, .p2, 255, task.lineWidth + 1)
-        End With
-    End Sub
-End Class
 
 
 
@@ -1920,71 +1921,5 @@ Public Class Line_FindClosest : Inherits TaskParent
             If .age >= 1000 Then .age = 10
             dst2.Line(.ptE1, .ptE2, task.highlight, task.lineWidth + 2)
         End With
-    End Sub
-End Class
-
-
-
-
-
-Public Class XO_Line_KNNTop : Inherits TaskParent
-    Dim knn As New KNN_Basics
-    Public Sub New()
-        If standalone Then task.gOptions.displayDst1.Checked = True
-        labels(3) = "The same lines in their location in the previous frame."
-        desc = "Find all the lines that intersect the top AND bottom of the image."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        If task.heartBeat = False Then
-            SetTrueText(strOut, 1)
-            Exit Sub
-        End If
-        dst2 = task.color.Clone
-        dst3 = task.color.Clone
-
-        knn.queries.Clear()
-        Dim lpList As New List(Of lpData)
-        For Each lp In task.lines.lpList
-            If lp.ptE1.Y = 0 And lp.ptE2.Y = dst2.Height - 1 Then
-                knn.queries.Add(lp.p1)
-                lpList.Add(lp)
-                If lpList.Count > 3 Then Exit For
-            End If
-        Next
-
-        If task.firstPass Then knn.trainInput = New List(Of cv.Point2f)(knn.queries)
-
-        knn.Run(emptyMat)
-
-        Dim tops As New List(Of Single)
-        Dim bots As New List(Of Single)
-        strOut = "Index" + vbTab + "Before X" + vbTab + "After X" + vbCrLf
-        For i = 0 To knn.queries.Count - 1
-            Dim p1 = knn.queries(i)
-            Dim p2 = knn.trainInput(knn.result(i, 1))
-
-            Dim d1 = p1.X - p2.X
-            Dim d2 = p1.Y - p2.Y
-
-            'If Math.Abs(d1) < 5 And Math.Abs(d2) < 5 Then
-            tops.Add(d1)
-            bots.Add(d2)
-
-            Dim lp1 = New lpData(New cv.Point2f(p1.X, 0), New cv.Point2f(p1.Y, dst2.Height))
-            dst3.Line(lp1.p1, lp1.p2, white, task.lineWidth + 1)
-
-            Dim lp2 = New lpData(New cv.Point2f(p2.X, 0), New cv.Point2f(p2.Y, dst2.Height))
-            dst2.Line(lp2.p1, lp2.p2, task.highlight, task.lineWidth + 1)
-            strOut += CStr(i) + vbTab + CStr(lp1.p1.X) + vbTab + CStr(lp1.p2.X) + vbCrLf
-            strOut += CStr(i) + vbTab + CStr(lp2.p1.X) + vbTab + CStr(lp2.p2.X) + vbCrLf
-            ' End If
-        Next
-        SetTrueText(strOut, 1)
-        If tops.Count > 0 And bots.Count > 0 Then
-            labels(2) = CStr(tops.Count) + " Top points have moved " + Format(tops.Average, fmt1) +
-                        CStr(bots.Count) + " bottom points have moved " + Format(bots.Average, fmt1)
-        End If
-
-        knn.trainInput = New List(Of cv.Point2f)(knn.queries)
     End Sub
 End Class
