@@ -9,7 +9,6 @@ Public Class LineTrack_Basics : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         lpFind.inputLine = task.longestLine
-        lpFind.lpList = task.lines.lpList
         lpFind.Run(emptyMat)
         Dim lpTmp = lpFind.closestLine
 

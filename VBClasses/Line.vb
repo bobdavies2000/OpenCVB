@@ -8,15 +8,6 @@ Public Class Line_Basics_TA : Inherits TaskParent
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
         desc = "Run FLD (Fast Line Detector) with sobel input."
     End Sub
-    Public Shared Function lines8U(lpList As List(Of lpData)) As cv.Mat
-        Dim dst = New cv.Mat(task.workRes, cv.MatType.CV_8U, 0)
-        For Each lp In lpList
-            dst.Line(lp.p1, lp.p2, 255, task.lineWidth)
-        Next
-
-        dst.Line(task.longestLine.p1, task.longestLine.p2, 255, task.lineWidth + 1)
-        Return dst
-    End Function
     Public Shared Function removeDuplicates(coreList As List(Of lpData)) As List(Of lpData)
         Dim lpList As New List(Of lpData)
 
@@ -44,7 +35,6 @@ Public Class Line_Basics_TA : Inherits TaskParent
     End Function
     Public Shared Function updateAgesAndLongest() As Single
         Static lpFind As New Line_FindClosest
-        lpFind.lpList = task.lines.lpList
         For Each lp In task.lines.lpLast
             lpFind.inputLine = lp
             lpFind.Run(Nothing)
@@ -53,6 +43,7 @@ Public Class Line_Basics_TA : Inherits TaskParent
                 If closest.index < task.lines.lpList.Count Then
                     Dim lpCurr = task.lines.lpList(closest.index - 1)
                     lpCurr.indexLast = lp.index
+                    lpCurr.age = lp.age + 1
                     If lpCurr.age >= 1000 Then lpCurr.age = 10
                 End If
             End If
@@ -68,7 +59,6 @@ Public Class Line_Basics_TA : Inherits TaskParent
         If task.lines.lpList.Count > 0 Then
             If task.longestLine = gravity Or task.longestLine Is Nothing Then task.longestLine = task.lines.lpList(0)
             lpFind.inputLine = task.longestLine
-            lpFind.lpList = task.lines.lpList
             lpFind.Run(emptyMat)
             Dim lpTmp = lpFind.closestLine
 
@@ -100,15 +90,20 @@ Public Class Line_Basics_TA : Inherits TaskParent
             basicsFLD.Run(src)
             dst2 = basicsFLD.dst2
             labels = basicsFLD.labels
-            lpList = New List(Of lpData)(basicsFLD.lpList)
         Else
             basicsLSD.Run(src)
             dst2 = basicsLSD.dst2
             labels = basicsLSD.labels
-            lpList = New List(Of lpData)(basicsLSD.lpList)
         End If
 
-        dst3 = lines8U(lpList)
+        dst3.SetTo(0)
+        For Each lp In lpList
+            dst3.Line(lp.p1, lp.p2, 255, task.lineWidth)
+        Next
+
+        dst3.Line(task.longestLine.p1, task.longestLine.p2, 255, task.lineWidth + 1)
+        labels(3) = CStr(task.lines.lpList.Count) + " lines.  Highlighted line is the current longest line."
+
         For Each lp In lpList
             SetTrueText(CStr(lp.age), New cv.Point(lp.ptCenter.X + 2, lp.ptCenter.Y + 2), 3)
         Next
@@ -135,14 +130,14 @@ Public Class Line_Basics : Inherits TaskParent
 
         core.Run(edges.dst2)
 
-        lpList = Line_Basics_TA.removeDuplicates(core.lpList)
+        task.lines.lpList = Line_Basics_TA.removeDuplicates(core.lpList)
         Dim averageAge = Line_Basics_TA.updateAgesAndLongest()
 
-        labels(2) = CStr(task.lines.lpList.Count) + " lines found.  Value Next To the line Is the age." +
+        labels(2) = CStr(task.lines.lpList.Count) + " lines found.  Line age is also shown." +
                     " Average age = " + If(task.lines.lpList.Count > 0, Format(averageAge, fmt1), "0")
 
         dst3 = task.lines.dst3
-        For Each lp In lpList
+        For Each lp In task.lines.lpList
             SetTrueText(CStr(lp.age), New cv.Point(lp.ptCenter.X + 2, lp.ptCenter.Y + 2), 3)
         Next
     End Sub
@@ -272,7 +267,7 @@ End Class
 
 
 
-Public Class Line_BasicsOldLSD : Inherits TaskParent
+Public Class NR_Line_BasicsLSD : Inherits TaskParent
     Implements IDisposable
     Public lpList As New List(Of lpData)
     Dim lsd As cv.LineSegmentDetector
@@ -397,25 +392,6 @@ Public Class Line_WithAging : Inherits TaskParent
     End Sub
 End Class
 
-
-
-
-
-Public Class NR_Line_BasicsOld_Test : Inherits TaskParent
-    Dim lines As New Line_Basics
-    Public Sub New()
-        desc = "Line_Basics Is a task algorithm so this Is the better way To test it."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        lines.Run(task.gray)
-        dst2.SetTo(0)
-        For Each lp In lines.lpList
-            dst2.Line(lp.p1, lp.p2, lp.color, task.lineWidth, task.lineType)
-            SetTrueText(CStr(lp.age), New cv.Point(lp.ptCenter.X + 2, lp.ptCenter.Y + 2), 2)
-        Next
-        labels(2) = lines.labels(2)
-    End Sub
-End Class
 
 
 
@@ -1900,16 +1876,12 @@ End Class
 Public Class Line_FindClosest : Inherits TaskParent
     Public inputLine As lpData
     Public closestLine As lpData
-    Public lpList As New List(Of lpData)
     Public Sub New()
         labels(3) = "The lines found in the current image - task.lines.dst3"
         desc = "Find the line in task.lines.lpList closest to the requested line"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If standalone Then
-            lpList = task.lines.lpList
-            inputLine = task.longestLine
-        End If
+        If standalone Then inputLine = task.longestLine
 
         If standaloneTest() Then
             dst3 = task.lines.dst3
@@ -1918,7 +1890,7 @@ Public Class Line_FindClosest : Inherits TaskParent
         End If
 
         Dim candidates As New List(Of lpData)
-        For Each lp In lpList
+        For Each lp In task.lines.lpList
             If Math.Abs(lp.angle - inputLine.angle) < 2 Then candidates.Add(lp)
         Next
 

@@ -461,7 +461,6 @@ Line_Basics
 Line_Basics_TA
 Line_BasicsOld
 Line_BasicsOldEmboss
-Line_BasicsOldLSD
 Line_BasicsOldNoMotion
 Line_Brick
 Line_BrickList
@@ -1171,7 +1170,7 @@ NR_LeftRight_Edges
 NR_LeftRight_EdgesColor
 NR_LeftRight_RawLeft
 NR_LeftRight_RGBAlignLeft
-NR_Line_BasicsOld_Test
+NR_Line_BasicsLSD
 NR_Line_Finder
 NR_Line_Parallel
 NR_Line_Select

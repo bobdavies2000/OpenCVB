@@ -1,7 +1,6 @@
 ﻿Imports cv = OpenCvSharp
 Public Class LineSeg_Basics : Inherits TaskParent
     Public lpList As New List(Of lpData)
-    Dim lpFind As New Line_FindClosest
     Public core As New LineSeg_Core
     Public Sub New()
         desc = "Run FLD (Fast Line Detector) with sobel input."
@@ -12,15 +11,14 @@ Public Class LineSeg_Basics : Inherits TaskParent
 
         core.Run(src)
 
-        lpList = Line_Basics_TA.removeDuplicates(core.lpList)
-        lpList = Line_Basics_TA.removeDuplicates(core.lpList)
+        task.lines.lpList = Line_Basics_TA.removeDuplicates(core.lpList)
         Dim averageAge = Line_Basics_TA.updateAgesAndLongest()
 
         labels(2) = CStr(task.lines.lpList.Count) + " lines found.  Value Next To the line Is the age." +
                     " Average age = " + If(task.lines.lpList.Count > 0, Format(averageAge, fmt1), "0")
 
         dst3 = task.lines.dst3
-        For Each lp In lpList
+        For Each lp In task.lines.lpList
             SetTrueText(CStr(lp.age), New cv.Point(lp.ptCenter.X + 2, lp.ptCenter.Y + 2), 3)
         Next
     End Sub
