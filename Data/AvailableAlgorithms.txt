@@ -483,6 +483,7 @@ Line_LongestTest
 Line_Map
 Line_MapRects
 Line_Perpendicular
+Line_RawFLD
 Line_RedFlood
 Line_Sobel
 Line_TopBottomEdges

@@ -1,31 +1,26 @@
 Imports cv = OpenCvSharp
 Public Class DepthLine_Basics : Inherits TaskParent
     Public prepEdges As New RedPrep_Basics
-    Dim lines As New Line_Basics
+    Dim lines As New Line_RawFLD
     Public lpList As New List(Of lpData)
     Public Sub New()
-        If standalone Then task.gOptions.displayDst0.Checked = True
-        labels(0) = "LeftView after brightness/contrast transform."
-        labels(3) = "Input to Line_Basics"
         desc = "Find lines in reduced the depth data."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If task.optionsChanged Then lines.lpList.Clear()
-
-        dst0 = task.leftView
-
         If src.Type <> cv.MatType.CV_32FC3 Then
-            prepEdges.Run(src)
+            prepEdges.Run(task.pointCloud.Clone)
         Else
             prepEdges.dst3 = src
         End If
 
         lines.Run(prepEdges.dst2)
         dst2 = lines.dst2
+        labels(2) = lines.labels(2)
+
         lpList = New List(Of lpData)(lines.lpList)
 
-        dst3 = prepEdges.dst3
-        labels(2) = lines.labels(2)
+        dst3 = prepEdges.dst2
+        labels(3) = "Output of RedPrep_Basics, input to Line_RawFLD"
     End Sub
 End Class
 

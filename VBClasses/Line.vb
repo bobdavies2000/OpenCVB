@@ -126,7 +126,6 @@ Public Class Line_Basics : Inherits TaskParent
         If src.Channels <> 1 Or src.Type <> cv.MatType.CV_8U Then src = task.gray.Clone
 
         edges.Run(src)
-        labels(2) = edges.labels(2)
 
         core.Run(edges.dst2)
 
@@ -140,6 +139,34 @@ Public Class Line_Basics : Inherits TaskParent
         For Each lp In task.lines.lpList
             SetTrueText(CStr(lp.age), New cv.Point(lp.ptCenter.X + 2, lp.ptCenter.Y + 2), 3)
         Next
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Line_RawFLD : Inherits TaskParent
+    Public lpList As New List(Of lpData)
+    Dim edges As New Edge_Sobel
+    Public core As New Line_Core
+    Public Sub New()
+        desc = "Run FLD (Fast Line Detector) With sobel input."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        dst2 = task.color.Clone
+        If src.Channels <> 1 Or src.Type <> cv.MatType.CV_8U Then src = task.gray.Clone
+
+        edges.Run(src)
+        core.Run(edges.dst2)
+        lpList = New List(Of lpData)(core.lpList)
+
+        For Each lp In lpList
+            dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth)
+        Next
+
+        labels(2) = CStr(lpList.Count) + " lines found."
     End Sub
 End Class
 
