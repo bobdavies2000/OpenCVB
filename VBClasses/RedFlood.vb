@@ -608,6 +608,7 @@ Public Class NR_RedFlood_KNN : Inherits TaskParent
             trainInput.Add(New cv.Point3f(rc.maxDist.X, rc.maxDist.Y, rc.pixels))
         Next
 
+        If redCore.rects Is Nothing Then Exit Sub ' nothing to work on...
         dst3.SetTo(0)
         rcMap.SetTo(0)
         rcList.Clear()

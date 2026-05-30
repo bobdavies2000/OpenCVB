@@ -224,6 +224,7 @@ Public Class NR_RedWGrid_Validate : Inherits TaskParent
         labels(2) = RedWGrid.labels(2)
 
         Dim mm = GetMinMax(RedWGrid.prepData.reduced32f)
+        If mm.minVal = mm.maxVal Then Exit Sub ' there is no data in reduced32f
         Dim ranges = {New cv.Rangef(mm.minVal, mm.maxVal)}
         Dim histogram As New cv.Mat
         Dim histBins As Integer = 500

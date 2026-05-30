@@ -11,6 +11,7 @@ Public Class Spectrum_Basics : Inherits TaskParent
         dSpec.Run(src)
         gSpec.Run(src)
 
+        If task.redList.rclist.Count = 0 Then Exit Sub ' nothing to work on.
         If task.rcD Is Nothing Then task.rcD = task.redList.rclist(0)
         If task.heartBeat And task.rcD.index > 0 Then
             strOut = dSpec.strOut + vbCrLf + vbCrLf

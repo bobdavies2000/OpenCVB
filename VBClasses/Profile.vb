@@ -154,6 +154,8 @@ Public Class NR_Profile_Derivative : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         sides.Run(src)
         dst2 = sides.dst2
+
+        If sides.redC.rcList.Count = 0 Then Exit Sub ' nothing to work on...
         Dim rc = task.rcD
         If rc Is Nothing Then rc = sides.redC.rcList(0)
 
@@ -319,6 +321,7 @@ Public Class NR_Profile_Kalman : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         sides.Run(src)
+        If sides.redC.rcList.Count = 0 Then Exit Sub ' nothing to work on...
         dst1 = sides.dst2
         dst2 = sides.dst3
         Dim rc = task.rcD

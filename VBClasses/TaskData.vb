@@ -97,7 +97,7 @@ Partial Public Class AlgorithmTask
     Public palette As Palette_LoadColorMap
     Public PixelViewer As Pixel_Viewer
     Public pixelViewerOn As Boolean
-    Public redList As RedFlood_List ' only referenced by XO algorithms so not really used.
+    Public redList As RedFlood_List
 
     Public GLRequest As Integer
     Public GLcloud As cv.Mat
