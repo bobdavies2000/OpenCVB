@@ -14,7 +14,7 @@ Public Class Stabilizer_Basics : Inherits TaskParent
         End If
 
         Dim lpCurr = task.longestLine
-        If task.heartBeatLT Or task.optionsChanged Then
+        If task.heartBeatLT Or task.optionsChanged Or refLine Is Nothing Then
             refLine = New lpData(lpCurr.p1, lpCurr.p2)
         End If
 

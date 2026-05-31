@@ -90,9 +90,9 @@ Public Class Blob_RenderBlobs : Inherits TaskParent
         desc = "Use connected components to find blobs."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        input.Run(src)
-        dst2 = input.dst2
-        If task.frameCount Mod input.updateFrequency = 0 Then
+        If task.heartBeatLT Then
+            input.Run(src)
+            dst2 = input.dst2
             Dim binary = task.gray.Threshold(0, 255, cv.ThresholdTypes.Otsu Or cv.ThresholdTypes.Binary)
             Dim labelView = dst2.EmptyClone
             Dim stats As New cv.Mat
@@ -101,9 +101,9 @@ Public Class Blob_RenderBlobs : Inherits TaskParent
             Dim labelCount = cv.Cv2.ConnectedComponentsWithStats(binary, labelView, stats, centroids)
             cc.RenderBlobs(labelView)
 
-            For Each b In cc.Blobs.Skip(1)
-                dst2.Rectangle(b.Rect, cv.Scalar.Red, task.lineWidth + 1, task.lineType)
-            Next
+            'For Each b In cc.Blobs.Skip(1)
+            '    dst2.Rectangle(b.Rect, cv.Scalar.Red, task.lineWidth + 1, task.lineType)
+            'Next
 
             Dim maxBlob = cc.GetLargestBlob()
             dst3.SetTo(0)

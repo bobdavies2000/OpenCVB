@@ -121,10 +121,6 @@ Public Class NR_FeatureMap_BasicsOld : Inherits TaskParent
     Public Sub New()
         desc = "Create the reference map for FCS. "
     End Sub
-    Public Function ShowPalettizeColor(input As cv.Mat) As cv.Mat
-        If task.paletteRandom Is Nothing Then task.paletteRandom = New Palette_RandomColors
-        Return task.paletteRandom.useColorMapFull(input)
-    End Function
     Public Overrides Sub RunAlg(src As cv.Mat)
         contours.Run(src)
         Static restartRequest As Boolean
@@ -140,7 +136,9 @@ Public Class NR_FeatureMap_BasicsOld : Inherits TaskParent
 
         fcs.Run(emptyMat)
 
-        dst2 = ShowPalettizeColor(fcs.fcsMap)
+        Static paletteRandom = New Palette_RandomColors
+        dst2 = paletteRandom.useColorMapFull(fcs.fcsMap)
+
         dst3 = contours.dst2
         labels(2) = fcs.labels(2)
         labels(3) = contours.labels(2)

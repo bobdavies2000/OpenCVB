@@ -547,3 +547,65 @@ Public Class Delaunay_Map : Inherits TaskParent
         SetTrueText(strOut, 1)
     End Sub
 End Class
+
+
+
+
+
+
+Public Class Delaunay_EmptyClone : Inherits TaskParent
+    Public inputPoints As New List(Of cv.Point2f)
+    Public facetList As New List(Of List(Of cv.Point))
+    Dim subdiv As New cv.Subdiv2D
+
+    Public Sub New()
+        dst3 = New cv.Mat(dst2.Size(), cv.MatType.CV_32SC1, 0)
+        desc = "CoPilot: Subdivide an image based on the points provided (EmptyClone version)."
+    End Sub
+
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        ' Generate random points if standalone
+        If task.heartBeat And standalone Then
+            Static random As New Random_Basics
+            random.Run(src)
+            inputPoints = New List(Of cv.Point2f)(random.PointList)
+        End If
+
+        ' Reset subdiv
+        subdiv.InitDelaunay(New cv.Rect(0, 0, dst2.Width, dst2.Height))
+        subdiv.Insert(inputPoints)
+
+        ' Allocate dst3 using EmptyClone (same size/type, no data copy)
+        dst3 = dst3.EmptyClone()
+        dst3.SetTo(0)
+
+        ' Extract Voronoi facets
+        Dim facets = New cv.Point2f()() {}
+        subdiv.GetVoronoiFacetList(New List(Of Integer)(), facets, Nothing)
+
+        facetList.Clear()
+
+        ' Convert facets to integer polygons and fill them
+        For i = 0 To facets.Length - 1
+            Dim nextFacet As New List(Of cv.Point)
+
+            For j = 0 To facets(i).Length - 1
+                nextFacet.Add(New cv.Point(
+                    CInt(facets(i)(j).X),
+                    CInt(facets(i)(j).Y)
+                ))
+            Next
+
+            ' Fill facet with its index
+            dst3.FillConvexPoly(nextFacet.ToArray(), i, cv.LineTypes.Link4)
+
+            facetList.Add(nextFacet)
+        Next
+
+        ' Convert to 8U and colorize
+        dst3.ConvertTo(dst1, cv.MatType.CV_8U)
+        dst2 = Palettize(dst1)
+
+        labels(2) = traceName + ": " + Format(inputPoints.Count, "000") + " cells were present."
+    End Sub
+End Class
