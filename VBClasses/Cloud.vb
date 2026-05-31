@@ -372,7 +372,6 @@ Public Class Cloud_SurfaceH : Inherits TaskParent
         heat.Run(src)
         dst2 = heat.dst2
         Dim hist = New cv.Mat(dst2.Height, 1, cv.MatType.CV_32F, cv.Scalar.All(0))
-        Dim indexer = hist.GetGenericIndexer(Of Single)()
 
         topRow = 0
         botRow = 0
@@ -380,17 +379,17 @@ Public Class Cloud_SurfaceH : Inherits TaskParent
         Dim peakVal As Integer
         If dst2.Channels() <> 1 Then dst1 = dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         For i = 0 To dst1.Height - 1
-            indexer(i) = dst1.Row(i).CountNonZero
-            If peakVal < indexer(i) Then
-                peakVal = indexer(i)
+            hist.At(Of Single)(i, 0) = dst1.Row(i).CountNonZero
+            If peakVal < hist.At(Of Single)(i, 0) Then
+                peakVal = CInt(hist.At(Of Single)(i, 0))
                 peakRow = i
             End If
-            If topRow = 0 And indexer(i) > 10 Then topRow = i
+            If topRow = 0 And hist.At(Of Single)(i, 0) > 10 Then topRow = i
         Next
 
         plotHist.maxRange = (Math.Floor(peakVal / 100) + 1) * 100
         For i = hist.Rows - 1 To 0 Step -1
-            If botRow = 0 And indexer(i) > 10 Then botRow = i
+            If botRow = 0 And hist.At(Of Single)(i, 0) > 10 Then botRow = i
         Next
         plotHist.Run(hist)
         dst3 = plotHist.dst2.Transpose()

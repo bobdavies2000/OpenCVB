@@ -1261,20 +1261,18 @@ Namespace VBClasses
 
             Dim nextB As Byte
             Dim region As Integer = -1
-            Dim indexer1 = dst2.GetGenericIndexer(Of Byte)()
-            Dim indexer2 = dst3.GetGenericIndexer(Of Byte)()
             If noVertCheck.checked = False Then
                 For x = 0 To dst2.Width - 1
                     region = -1
                     For y = 0 To dst2.Height - 1
-                        nextB = indexer1(y, x)
+                        nextB = dst2.At(Of Byte)(y, x)
                         If nextB = lineMatch Then
                             region = -1
                         Else
                             If region = -1 Then
                                 region = nextB
                             Else
-                                indexer1(y, x) = region
+                                dst2.At(Of Byte)(y, x) = region
                             End If
                         End If
                     Next
@@ -1284,18 +1282,18 @@ Namespace VBClasses
             For y = 0 To dst3.Height - 1
                 region = -1
                 For x = 0 To dst3.Width - 1
-                    nextB = indexer2(y, x)
+                    nextB = dst3.At(Of Byte)(y, x)
                     If nextB = lineMatch Then
                         region = -1
                     Else
                         If region = -1 Then
                             If y = 0 Then
-                                region = indexer1(y, x)
+                                region = dst2.At(Of Byte)(y, x)
                             Else
                                 Dim vals As New List(Of Integer)
                                 Dim counts As New List(Of Integer)
                                 For i = x To dst3.Width - 1
-                                    Dim nextVal = indexer1(y - 1, i)
+                                    Dim nextVal = dst2.At(Of Byte)(y - 1, i)
                                     If nextVal = lineMatch Then Exit For
                                     If vals.Contains(nextVal) Then
                                         counts(vals.IndexOf(nextVal)) += 1
@@ -1308,7 +1306,7 @@ Namespace VBClasses
                                 Next
                             End If
                         Else
-                            indexer2(y, x) = region
+                            dst3.At(Of Byte)(y, x) = region
                         End If
                     End If
                 Next

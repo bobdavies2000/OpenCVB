@@ -211,16 +211,15 @@ Public Class NR_Pixel_GetSet : Inherits TaskParent
 
         mats.mat(1) = rgb.Clone()
         watch = Stopwatch.StartNew()
-        Dim indexer = mats.mat(1).GetGenericIndexer(Of cv.Vec3b)
         For y = 0 To rows - 1
             For x = 0 To cols - 1
-                Dim color = indexer(y, x)
+                Dim color = mats.mat(1).At(Of cv.Vec3b)(y, x)
                 color(0).SwapWith(color(2))
-                indexer(y, x) = color
+                mats.mat(1).At(Of cv.Vec3b)(y, x) = color
             Next
         Next
         watch.Stop()
-        output += "Upper right image is Generic Indexer and it took " + CStr(watch.ElapsedMilliseconds) + "ms" + vbCrLf + vbCrLf
+        output += "Upper right image is Mat.At and it took " + CStr(watch.ElapsedMilliseconds) + "ms" + vbCrLf + vbCrLf
 
         watch = Stopwatch.StartNew()
         Dim colorArray(cols * rows - 1) As cv.Vec3b

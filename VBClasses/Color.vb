@@ -42,15 +42,12 @@ Public Class Color_Measure : Inherits TaskParent
         Static lastSrc As cv.Mat = dst2.Clone
 
         Dim threshold = task.fOptions.ColorDiffSlider.Value
-        Dim indexSrc = dst2.GetGenericIndexer(Of Byte)()
-        Dim indexLast = lastSrc.GetGenericIndexer(Of Byte)()
-        Dim indexOut = dst3.GetGenericIndexer(Of Byte)()
         dst3.SetTo(0)
         For y = 0 To src.Rows - 1
             For x = 0 To src.Cols - 1
-                Dim valSrc As Integer = indexSrc(y, x)
-                Dim valLast As Integer = indexLast(y, x)
-                If Math.Abs(valSrc - valLast) >= threshold Then indexOut(y, x) = 255
+                Dim valSrc As Integer = dst2.At(Of Byte)(y, x)
+                Dim valLast As Integer = lastSrc.At(Of Byte)(y, x)
+                If Math.Abs(valSrc - valLast) >= threshold Then dst3.At(Of Byte)(y, x) = 255
             Next
         Next
 

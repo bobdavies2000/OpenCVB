@@ -49,20 +49,18 @@ Public Class MDScaling_Cities : Inherits TaskParent
         values.Threshold(0, 0, cv.ThresholdTypes.Tozero)
 
         Dim result = vectors.RowRange(0, 2)
-        Dim at = result.GetGenericIndexer(Of Double)()
         For r = 0 To result.Rows - 1
             For c = 0 To result.Cols - 1
-                at(r, c) *= Math.Sqrt(values.Get(Of Double)(r))
+                result.At(Of Double)(r, c) *= Math.Sqrt(values.Get(Of Double)(r))
             Next
         Next
 
         result.Normalize(0, 800, cv.NormTypes.MinMax)
 
-        at = result.GetGenericIndexer(Of Double)()
         Dim maxX As Double, maxY As Double, minX As Double = Double.MaxValue, minY As Double = Double.MaxValue
         For c = 0 To size - 1
-            Dim x = -at(0, c)
-            Dim y = at(1, c)
+            Dim x = -result.At(Of Double)(0, c)
+            Dim y = result.At(Of Double)(1, c)
             If maxX < x Then maxX = x
             If maxY < y Then maxY = y
             If minX > x Then minX = x
@@ -72,8 +70,8 @@ Public Class MDScaling_Cities : Inherits TaskParent
         Dim h = dst2.Height
         dst2.SetTo(0)
         For c = 0 To size - 1
-            Dim x = -at(0, c)
-            Dim y = at(1, c)
+            Dim x = -result.At(Of Double)(0, c)
+            Dim y = result.At(Of Double)(1, c)
             x = w * 0.1 + 0.7 * w * (x - minX) / (maxX - minX)
             y = h * 0.1 + 0.7 * h * (y - minY) / (maxY - minY)
             dst2.Circle(New cv.Point(x, y), task.DotSize + 3, cv.Scalar.Red, -1, task.lineType)

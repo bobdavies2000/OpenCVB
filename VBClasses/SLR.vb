@@ -248,10 +248,9 @@ Public Class SLR_Trends : Inherits TaskParent
         hist.Run(src)
         dst2 = hist.dst2
 
-        Dim indexer = hist.histogram.GetGenericIndexer(Of Single)()
         valList = New List(Of Single)
         For i = 0 To hist.histogram.Rows - 1
-            valList.Add(indexer(i))
+            valList.Add(hist.histogram.At(Of Single)(i, 0))
         Next
         barMidPoint = dst2.Width / valList.Count / 2
 

@@ -30,7 +30,7 @@ Public Class NR_Mat_PointToMat : Inherits TaskParent
     Dim random As New Random_Basics
     Public Sub New()
         labels(2) = "Random_Basics points (original)"
-        labels(3) = "Random_Basics points after format change with indexer"
+        labels(3) = "Random_Basics points after format change with Mat.At"
         desc = "Convert point2f into a mat of points"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -42,11 +42,11 @@ Public Class NR_Mat_PointToMat : Inherits TaskParent
 
         Dim rows = random.PointList.Count
         Dim pMat = cv.Mat.FromPixelData(rows, 1, cv.MatType.CV_32FC2, random.PointList.ToArray)
-        Dim indexer = pMat.GetGenericIndexer(Of cv.Vec2f)()
         dst3.SetTo(0)
         Dim white = New cv.Vec3b(255, 255, 255)
         For i = 0 To rows - 1
-            dst3.Set(Of cv.Vec3b)(indexer(i)(1), indexer(i)(0), white)
+            Dim pt = pMat.At(Of cv.Vec2f)(i, 0)
+            dst3.Set(Of cv.Vec3b)(CInt(pt(1)), CInt(pt(0)), white)
         Next
     End Sub
 End Class
@@ -66,10 +66,9 @@ Public Class NR_Mat_MatToPoint : Inherits TaskParent
         Dim vec As New cv.Vec3b
         Dim index As Integer = 0
         Dim m3b = src.Clone()
-        Dim indexer = m3b.GetGenericIndexer(Of cv.Vec3b)()
         For y = 0 To src.Rows - 1
             For x = 0 To src.Cols - 1
-                vec = indexer(y, x)
+                vec = m3b.At(Of cv.Vec3b)(y, x)
                 points(index) = New cv.Vec3b(vec(0), vec(1), vec(2))
                 index += 1
             Next

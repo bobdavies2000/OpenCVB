@@ -514,9 +514,8 @@ Public Class RedPrep_Depth : Inherits TaskParent
         Dim histogram As New Mat(), dst As New cv.Mat
         Cv2.CalcHist({input}, {0}, New Mat(), histogram, 1, {task.histogramBins}, ranges)
 
-        Dim histIndexer = histogram.GetGenericIndexer(Of Single)()
         For j = histogram.Rows - 1 To 0 Step -1
-            histIndexer(j, 0) = j
+            histogram.At(Of Single)(j, 0) = j
         Next
 
         Cv2.CalcBackProject({input}, {0}, histogram, dst, ranges)

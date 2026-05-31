@@ -6,18 +6,16 @@ Public Class Indexer_Basics : Inherits TaskParent
     End Sub
     Public Shared Function buildEdges(Input As cv.Mat) As cv.Mat
         Dim horizontalMat = Input.Clone
-        Dim indexer1 As cv.MatIndexer(Of Byte) = horizontalMat.GetGenericIndexer(Of Byte)()
         For y = 0 To horizontalMat.Rows - 1
             For x = 1 To horizontalMat.Cols - 1
-                If indexer1(y, x) = indexer1(y, x - 1) Then indexer1(y, x - 1) = 0
+                If horizontalMat.At(Of Byte)(y, x) = horizontalMat.At(Of Byte)(y, x - 1) Then horizontalMat.At(Of Byte)(y, x - 1) = 0
             Next
         Next
 
         Dim verticalMat = Input.Clone
-        Dim indexer2 As cv.MatIndexer(Of Byte) = verticalMat.GetGenericIndexer(Of Byte)()
         For x = 0 To verticalMat.Cols - 1
             For y = 1 To verticalMat.Rows - 1
-                If indexer2(y, x) = indexer2(y - 1, x) Then indexer2(y - 1, x) = 0
+                If verticalMat.At(Of Byte)(y, x) = verticalMat.At(Of Byte)(y - 1, x) Then verticalMat.At(Of Byte)(y, x - 1) = 0
             Next
         Next
 
@@ -62,20 +60,19 @@ Public Class Indexer_Corners : Inherits TaskParent
         labels(2) = indexBasics.labels(2)
 
         dst3 = indexBasics.prep.dst2.Clone
-        Dim indexer As cv.MatIndexer(Of Byte) = dst3.GetGenericIndexer(Of Byte)()
         Dim rectList As New List(Of cv.Rect)
         For y = 1 To dst3.Rows - 3
             For x = 1 To dst3.Cols - 3
                 vals.Clear()
-                vals.Add(indexer(y - 1, x - 1))
-                addVal(indexer(y - 1, x))
-                addVal(indexer(y - 1, x + 1))
-                addVal(indexer(y, x - 1))
-                addVal(indexer(y, x))
-                addVal(indexer(y, x + 1))
-                addVal(indexer(y + 1, x - 1))
-                addVal(indexer(y + 1, x))
-                addVal(indexer(y + 1, x + 1))
+                vals.Add(dst3.At(Of Byte)(y - 1, x - 1))
+                addVal(dst3.At(Of Byte)(y - 1, x))
+                addVal(dst3.At(Of Byte)(y - 1, x + 1))
+                addVal(dst3.At(Of Byte)(y, x - 1))
+                addVal(dst3.At(Of Byte)(y, x))
+                addVal(dst3.At(Of Byte)(y, x + 1))
+                addVal(dst3.At(Of Byte)(y + 1, x - 1))
+                addVal(dst3.At(Of Byte)(y + 1, x))
+                addVal(dst3.At(Of Byte)(y + 1, x + 1))
                 If vals.Count > 2 Then rectList.Add(New cv.Rect(x - 1, y - 1, 3, 3))
             Next
         Next
@@ -83,7 +80,7 @@ Public Class Indexer_Corners : Inherits TaskParent
         Dim count As Integer
         dst1.SetTo(0)
         For Each r In rectList
-            Dim val = indexer(r.Y, r.X)
+            Dim val = dst3.At(Of Byte)(r.Y, r.X)
             If val <> 0 Then
                 dst1(r).SetTo(255)
                 dst3(r).SetTo(0)

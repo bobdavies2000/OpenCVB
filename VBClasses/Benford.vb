@@ -41,11 +41,10 @@ Public Class Benford_Basics : Inherits TaskParent
         End If
 
         gray32f = gray32f.Reshape(1, gray32f.Width * gray32f.Height)
-        Dim indexer = gray32f.GetGenericIndexer(Of Single)()
         ReDim counts(expectedDistribution.Count - 1)
         If use99 = False Then
             For i = 0 To gray32f.Rows - 1
-                Dim val = indexer(i)
+                Dim val = gray32f.At(Of Single)(i, 0)
                 Dim valstr = val.ToString
                 If val <> 0 And Single.IsNaN(val) = False Then
                     Dim firstInt = Regex.Match(valstr, "[1-9]{1}")
@@ -55,7 +54,7 @@ Public Class Benford_Basics : Inherits TaskParent
         Else
             ' this is for the distribution 10-99
             For i = 0 To gray32f.Rows - 1
-                Dim val = indexer(i)
+                Dim val = gray32f.At(Of Single)(i, 0)
                 If val <> 0 And Single.IsNaN(val) = False Then
                     Dim valstr = val.ToString
                     Dim firstInt = Regex.Match(valstr, "[1-9]{1}").ToString
