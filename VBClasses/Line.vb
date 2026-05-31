@@ -11,7 +11,7 @@ Public Class Line_Basics_TA : Inherits TaskParent
     Public Shared Function removeDuplicates(coreList As List(Of lpData)) As List(Of lpData)
         Dim lpList As New List(Of lpData)
 
-        Dim removeNearDuplicates As Boolean = True
+        Dim removeNearDuplicates As Boolean = False
         If removeNearDuplicates Then
             Dim edgeMap As New cv.Mat(task.workRes, cv.MatType.CV_8U, 0)
             For Each lp In coreList
@@ -116,7 +116,6 @@ End Class
 
 Public Class Line_Basics : Inherits TaskParent
     Public lpList As New List(Of lpData)
-    Dim edges As New Edge_Sobel
     Public core As New Line_Core
     Public Sub New()
         desc = "Run FLD (Fast Line Detector) With sobel input."
@@ -125,9 +124,7 @@ Public Class Line_Basics : Inherits TaskParent
         dst2 = task.color.Clone
         If src.Channels <> 1 Or src.Type <> cv.MatType.CV_8U Then src = task.gray.Clone
 
-        edges.Run(src)
-
-        core.Run(edges.dst2)
+        core.Run(src)
 
         task.lines.lpList = Line_Basics_TA.removeDuplicates(core.lpList)
         Dim averageAge = Line_Basics_TA.updateAgesAndLongest()
@@ -149,7 +146,6 @@ End Class
 
 Public Class Line_RawFLD : Inherits TaskParent
     Public lpList As New List(Of lpData)
-    Dim edges As New Edge_Sobel
     Public core As New Line_Core
     Public Sub New()
         desc = "Run FLD (Fast Line Detector) With sobel input."
@@ -158,8 +154,7 @@ Public Class Line_RawFLD : Inherits TaskParent
         dst2 = task.color.Clone
         If src.Channels <> 1 Or src.Type <> cv.MatType.CV_8U Then src = task.gray.Clone
 
-        edges.Run(src)
-        core.Run(edges.dst2)
+        core.Run(src)
         lpList = New List(Of lpData)(core.lpList)
 
         For Each lp In lpList

@@ -83,7 +83,11 @@ public class CamZed
         else if (captureRes.Height == 1080) init_params.resolution = sl.RESOLUTION.HD1080;
         else if (captureRes.Height == 1200) init_params.resolution = sl.RESOLUTION.HD1200; // Corrected to HD1200, assuming was intended
         else if (captureRes.Height == 600) init_params.resolution = sl.RESOLUTION.HDSVGA;
-        else if (captureRes.Height == 376) init_params.resolution = sl.RESOLUTION.VGA;
+        else if (captureRes.Height == 376)
+        {
+            init_params.cameraFPS = 100;
+            init_params.resolution = sl.RESOLUTION.VGA;
+        }
 
         zed = new sl.Camera(0);
         sl.ERROR_CODE errCode = zed.Open(ref init_params);
