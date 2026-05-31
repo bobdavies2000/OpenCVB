@@ -11,16 +11,18 @@ Public Class LineSeg_Basics : Inherits TaskParent
 
         core.Run(src)
 
-        task.lines.lpList = Line_Basics_TA.removeDuplicates(core.lpList)
-        Dim averageAge = Line_Basics_TA.updateAgesAndLongest(task.lines.lpList)
+        Dim lastList = New List(Of lpData)(lpList)
+        lpList = Line_Basics_TA.removeDuplicates(core.lpList)
+        Dim averageAge = Line_Basics_TA.updateAgesAndLongest(lpList, lastList)
 
-        labels(2) = CStr(task.lines.lpList.Count) + " lines found.  Value Next To the line Is the age." +
-                    " Average age = " + If(task.lines.lpList.Count > 0, Format(averageAge, fmt1), "0")
+        labels(2) = CStr(lpList.Count) + " lines found.  Value Next To the line Is the age." +
+                    " Average age = " + If(lpList.Count > 0, Format(averageAge, fmt1), "0")
 
         dst3 = task.lines.dst3
         For Each lp In task.lines.lpList
             SetTrueText(CStr(lp.age), New cv.Point(lp.ptCenter.X + 2, lp.ptCenter.Y + 2), 3)
         Next
+        task.lines.lpList = New List(Of lpData)(lpList)
     End Sub
 End Class
 

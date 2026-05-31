@@ -33,20 +33,19 @@ Public Class Line_Basics_TA : Inherits TaskParent
         End If
         Return lpList
     End Function
-    Public Shared Function updateAgesAndLongest(inputList As List(Of lpData)) As Single
+    Public Shared Function updateAgesAndLongest(inputList As List(Of lpData), lastList As List(Of lpData)) As Single
         Static lpFind As New Line_FindClosest
         lpFind.lpList = inputList
+        lpFind.lastList = lastList
         For Each lp In inputList
             lpFind.inputLine = lp
             lpFind.Run(Nothing)
-            Dim closest = lpFind.closestLine
-            If closest IsNot Nothing Then
-                If closest.index > 0 And closest.index < inputList.Count Then
-                    Dim lpCurr = task.lines.lpList(closest.index - 1)
-                    lpCurr.indexLast = lp.index
-                    lpCurr.age = lp.age + 1
-                    If lpCurr.age >= 1000 Then lpCurr.age = 10
-                End If
+            Dim lpLast = lpFind.closestLine
+            If lpLast IsNot Nothing Then
+                Dim lpCurr = lp
+                lpCurr.indexLast = lpLast.index
+                lpCurr.age = lpLast.age + 1
+                If lpCurr.age >= 1000 Then lpCurr.age = 10
             End If
         Next
 
@@ -127,8 +126,9 @@ Public Class Line_Basics : Inherits TaskParent
 
         core.Run(src)
 
+        Dim lastList = New List(Of lpData)(lpList)
         lpList = Line_Basics_TA.removeDuplicates(core.lpList)
-        Dim averageAge = Line_Basics_TA.updateAgesAndLongest(lpList)
+        Dim averageAge = Line_Basics_TA.updateAgesAndLongest(lpList, lastList)
 
         labels(2) = CStr(task.lines.lpList.Count) + " lines found.  Line age is also shown." +
                     " Average age = " + If(task.lines.lpList.Count > 0, Format(averageAge, fmt1), "0")
@@ -137,6 +137,8 @@ Public Class Line_Basics : Inherits TaskParent
         For Each lp In task.lines.lpList
             SetTrueText(CStr(lp.age), New cv.Point(lp.ptCenter.X + 2, lp.ptCenter.Y + 2), 3)
         Next
+
+        task.lines.lpList = New List(Of lpData)(lpList)
     End Sub
 End Class
 
@@ -1866,6 +1868,7 @@ Public Class Line_FindClosest : Inherits TaskParent
     Public inputLine As lpData
     Public closestLine As lpData
     Public lpList As New List(Of lpData)
+    Public LastList As New List(Of lpData)
     Public Sub New()
         labels(3) = "The lines found in the current image - task.lines.dst3"
         desc = "Find the line in provided lpList closest to the requested line"
@@ -1880,7 +1883,7 @@ Public Class Line_FindClosest : Inherits TaskParent
         End If
 
         Dim candidates As New List(Of lpData)
-        For Each lp In lpList
+        For Each lp In LastList
             If Math.Abs(lp.angle - inputLine.angle) < 2 Then candidates.Add(lp)
         Next
 
@@ -1915,26 +1918,21 @@ Public Class Line_LeftRight : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         stableLR.Run(emptyMat)
 
-        Dim lpList As New List(Of lpData)
-        If task.Settings.cameraName.Contains("StereoLabs") = False Then
-            linesLeft.Run(task.leftView)
-            lpList = New List(Of lpData)(linesLeft.lpList)
-            dst2 = linesLeft.dst2
-        Else
-            dst2 = task.leftView.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-            lpList = New List(Of lpData)(task.lines.lpList)
-        End If
+        Dim lastList = New List(Of lpData)(linesLeft.lpList)
+        linesLeft.Run(stableLR.dst2)
+        dst2 = linesLeft.dst2
 
-        Dim averageAgeLeft = Line_Basics_TA.updateAgesAndLongest(lpList)
+        Dim averageAgeLeft = Line_Basics_TA.updateAgesAndLongest(linesLeft.lpList, lastList)
 
-        For Each lp In lpList
+        For Each lp In linesLeft.lpList
             dst2.Line(lp.p1, lp.p2, lp.color, task.lineWidth + 1, task.lineType)
             SetTrueText(CStr(lp.age), New cv.Point(lp.ptCenter.X + 2, lp.ptCenter.Y + 2), 2)
         Next
         labels(2) = task.lines.labels(2)
 
+        lastList = New List(Of lpData)(linesRight.lpList)
         linesRight.Run(stableLR.dst3)
-        Dim averageAgeRight = Line_Basics_TA.updateAgesAndLongest(linesRight.lpList)
+        Dim averageAgeRight = Line_Basics_TA.updateAgesAndLongest(linesRight.lpList, lastList)
 
         dst3 = task.rightView.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         For Each lp In linesRight.lpList
