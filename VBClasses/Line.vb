@@ -1103,42 +1103,6 @@ End Class
 
 
 
-Public Class Line_LeftRight : Inherits TaskParent
-    Dim linesLeft As New Line_Basics
-    Dim linesRight As New Line_Basics
-    Dim stableLR As New StableGray_LeftRight
-    Public Sub New()
-        desc = "Find the lines in the left and right images."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        stableLR.Run(emptyMat)
-
-        Dim lpList As New List(Of lpData)
-        If task.Settings.cameraName.Contains("StereoLabs") = False Then
-            linesLeft.Run(task.leftView)
-            lpList = linesLeft.lpList
-            dst2 = linesLeft.dst2
-        Else
-            dst2 = task.leftView.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-            lpList = task.lines.lpList
-        End If
-
-        For Each lp In task.lines.lpList
-            dst2.Line(lp.p1, lp.p2, lp.color, task.lineWidth + 1, task.lineType)
-        Next
-        labels(2) = task.lines.labels(2)
-
-        linesRight.Run(stableLR.dst3)
-        dst3 = task.rightView.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-        For Each lp In linesRight.lpList
-            dst3.Line(lp.p1, lp.p2, lp.color, task.lineWidth + 1, task.lineType)
-        Next
-        labels(3) = linesRight.labels(2)
-    End Sub
-End Class
-
-
-
 
 
 Public Class Line_BasicsOldNoMotion : Inherits TaskParent
@@ -1936,5 +1900,42 @@ Public Class Line_FindClosest : Inherits TaskParent
 
         closestLine = candidates(distances.IndexOf(distances.Min))
         dst2.Line(closestLine.ptE1, closestLine.ptE2, task.highlight, task.lineWidth + 2)
+    End Sub
+End Class
+
+
+
+
+Public Class Line_LeftRight : Inherits TaskParent
+    Dim linesLeft As New Line_Basics
+    Dim linesRight As New Line_Basics
+    Dim stableLR As New StableGray_LeftRight
+    Public Sub New()
+        desc = "Find the lines in the left and right images."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        stableLR.Run(emptyMat)
+
+        Dim lpList As New List(Of lpData)
+        If task.Settings.cameraName.Contains("StereoLabs") = False Then
+            linesLeft.Run(task.leftView)
+            lpList = linesLeft.lpList
+            dst2 = linesLeft.dst2
+        Else
+            dst2 = task.leftView.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+            lpList = task.lines.lpList
+        End If
+
+        For Each lp In task.lines.lpList
+            dst2.Line(lp.p1, lp.p2, lp.color, task.lineWidth + 1, task.lineType)
+        Next
+        labels(2) = task.lines.labels(2)
+
+        linesRight.Run(stableLR.dst3)
+        dst3 = task.rightView.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        For Each lp In linesRight.lpList
+            dst3.Line(lp.p1, lp.p2, lp.color, task.lineWidth + 1, task.lineType)
+        Next
+        labels(3) = linesRight.labels(2)
     End Sub
 End Class

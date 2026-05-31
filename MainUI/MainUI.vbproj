@@ -34,7 +34,6 @@
     <PackageReference Include="OpenCvSharp4.Extensions" Version="4.13.0.20260531" />
     <PackageReference Include="OpenCvSharp4.runtime.win" Version="4.13.0.20260531" />
     <PackageReference Include="OpenCvSharp4.Windows" Version="4.13.0.20260531" />
-    <PackageReference Include="Stereolabs.zed" Version="5.0.1" />
   </ItemGroup>
 
   <ItemGroup>
