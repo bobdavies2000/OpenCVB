@@ -20,11 +20,23 @@
     <PackageReference Include="OpenCvSharp4.Extensions" Version="4.13.0.20260531" />
     <PackageReference Include="OpenCvSharp4.runtime.win" Version="4.13.0.20260531" />
     <PackageReference Include="OpenCvSharp4.Windows" Version="4.13.0.20260531" />
-    <PackageReference Include="Stereolabs.zed" Version="5.0.1" />
+    <!-- GeneratePathProperty: native sl_zed_c.dll must match this package (ZED SDK v5.3). -->
+    <PackageReference Include="Stereolabs.zed" Version="5.3.0" GeneratePathProperty="true" />
   </ItemGroup>
 
   <ItemGroup>
-    <Content Remove="C:\Users\bobda\.nuget\packages\stereolabs.zed\5.0.1\build\..\runtimes\win10-x64\native\sl_zed_c.dll" />
+    <Content Include="$(PkgStereolabs_zed)\runtimes\win-x64\native\sl_zed_c.dll" Link="sl_zed_c.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
+
+  <Target Name="CopySlZedCNativeDll" AfterTargets="Build">
+    <Copy SourceFiles="$(PkgStereolabs_zed)\runtimes\win-x64\native\sl_zed_c.dll"
+          DestinationFiles="$(TargetDir)sl_zed_c.dll" OverwriteReadOnlyFiles="true"
+          Condition="Exists('$(PkgStereolabs_zed)\runtimes\win-x64\native\sl_zed_c.dll')" />
+    <Copy SourceFiles="$(ZedSdkBin)\sl_zed64.dll"
+          DestinationFiles="$(TargetDir)sl_zed64.dll" SkipUnchangedFiles="true"
+          Condition="'$(ZedSdkBin)' != '' and Exists('$(ZedSdkBin)\sl_zed64.dll')" />
+  </Target>
 
 </Project>

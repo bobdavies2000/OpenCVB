@@ -1,0 +1,10 @@
+<Project>
+  <!-- Shared ZED SDK paths for OpenCVB (see ZED_SDK/Install-ZedSdk.ps1). -->
+  <PropertyGroup>
+    <OpenCVBRepoRoot>$(MSBuildThisFileDirectory.TrimEnd('\'))</OpenCVBRepoRoot>
+    <ZedSdkProjectNativeBin>$(OpenCVBRepoRoot)\ZED_SDK\native\bin</ZedSdkProjectNativeBin>
+    <ZedSdkBin Condition="'$(ZedSdkBin)' == '' and Exists('$(ZedSdkProjectNativeBin)\sl_zed64.dll')">$(ZedSdkProjectNativeBin)</ZedSdkBin>
+    <ZedSdkBin Condition="'$(ZedSdkBin)' == '' and Exists('C:\Program Files (x86)\ZED SDK\bin\sl_zed64.dll')">C:\Program Files (x86)\ZED SDK\bin</ZedSdkBin>
+    <ZedSdkBin Condition="'$(ZedSdkBin)' == '' and Exists('C:\Program Files\ZED SDK\bin\sl_zed64.dll')">C:\Program Files\ZED SDK\bin</ZedSdkBin>
+  </PropertyGroup>
+</Project>

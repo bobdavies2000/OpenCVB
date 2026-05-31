@@ -84,10 +84,9 @@ echo Oak-D Camera (Luxonis):
 echo   - should not require any additional setup
 echo.
 echo StereoLabs ZED Camera:
-echo   - Goto: https://download.stereolabs.com/zedsdk/
-echo   - Install Stereolabs SDK with CUDA 12 (or latest) support
-echo   - StereoLabs SDK install may also download and install CUDA if not already present.
-echo   - Set CUDA_PATH=C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v12.X
+echo   - Run: powershell -ExecutionPolicy Bypass -File ZED_SDK\Install-ZedSdk.ps1
+echo   - Or: https://download.stereolabs.com/zedsdk/5.3/cu12/win
+echo   - OpenCVB uses ZED SDK 5.3 + Stereolabs.zed NuGet 5.3 (CUDA 12 build matches CUDA 12.x)
 echo.
 echo Intel RealSense Camera:
 echo   - librealsense is built automatically with C# bindings

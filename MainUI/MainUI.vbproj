@@ -34,6 +34,14 @@
     <PackageReference Include="OpenCvSharp4.Extensions" Version="4.13.0.20260531" />
     <PackageReference Include="OpenCvSharp4.runtime.win" Version="4.13.0.20260531" />
     <PackageReference Include="OpenCvSharp4.Windows" Version="4.13.0.20260531" />
+    <PackageReference Include="Stereolabs.zed" Version="5.3.0" GeneratePathProperty="true" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Must match Stereolabs.zed 5.3.x; do not rely on an older ZED SDK\bin sl_zed_c.dll on PATH. -->
+    <Content Include="$(PkgStereolabs_zed)\runtimes\win-x64\native\sl_zed_c.dll" Link="sl_zed_c.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 
   <ItemGroup>
@@ -107,6 +115,18 @@
   <ItemGroup>
     <Folder Include="Libs\" />
   </ItemGroup>
+
+  <!-- Always overwrite output sl_zed_c.dll so a stale ~194KB (5.0.x) copy cannot survive rebuilds. -->
+  <Target Name="CopySlZedCNativeDll" AfterTargets="Build">
+    <PropertyGroup>
+      <_SlZedCSource>$(PkgStereolabs_zed)\runtimes\win-x64\native\sl_zed_c.dll</_SlZedCSource>
+      <_SlZedCOut>$(TargetDir)sl_zed_c.dll</_SlZedCOut>
+    </PropertyGroup>
+    <Copy SourceFiles="$(_SlZedCSource)" DestinationFiles="$(_SlZedCOut)" OverwriteReadOnlyFiles="true" Condition="Exists('$(_SlZedCSource)')" />
+    <Error Condition="!Exists('$(_SlZedCOut)')" Text="Missing $(_SlZedCOut). Install NuGet Stereolabs.zed 5.3.0." />
+    <Copy SourceFiles="$(ZedSdkBin)\sl_zed64.dll" DestinationFiles="$(TargetDir)sl_zed64.dll" SkipUnchangedFiles="true"
+          Condition="'$(ZedSdkBin)' != '' and Exists('$(ZedSdkBin)\sl_zed64.dll')" />
+  </Target>
 
   <ItemGroup>
     <ProjectReference Include="..\CamZed\CamZed.csproj" />
