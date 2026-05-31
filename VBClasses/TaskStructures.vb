@@ -467,7 +467,7 @@ Public Module Structures
         ''' <summary>Endpoint tolerance for Equals / operator = (pixels).</summary>
         Private Const pointEps As Single = 0.001F
 
-        Public age As Integer = 0
+        Public age As Integer = 1
         Public angle As Single ' varies from -90 to 90 degrees
         Public color As cv.Scalar
         Public index As Integer
