@@ -43,7 +43,6 @@ Public Class Line_Basics_TA : Inherits TaskParent
             Dim lpLast = lpFind.closestLine
             If lpLast IsNot Nothing Then
                 Dim lpCurr = lp
-                lpCurr.indexLast = lpLast.index
                 lpCurr.age = lpLast.age + 1
                 If lpCurr.age >= 1000 Then lpCurr.age = 10
             End If
@@ -1913,32 +1912,36 @@ Public Class Line_LeftRight : Inherits TaskParent
     Dim linesRight As New Line_Core
     Dim stableLR As New StableGray_LeftRight
     Public Sub New()
+        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        dst3 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         desc = "Find the lines in the left and right images."
     End Sub
+    Private Function processImage(input As cv.Mat, output As cv.Mat) As String
+
+    End Function
     Public Overrides Sub RunAlg(src As cv.Mat)
         stableLR.Run(emptyMat)
 
         Dim lastList = New List(Of lpData)(linesLeft.lpList)
         linesLeft.Run(stableLR.dst2)
-        dst2 = linesLeft.dst2
-
         Dim averageAgeLeft = Line_Basics_TA.updateAgesAndLongest(linesLeft.lpList, lastList)
 
+        dst2.SetTo(0)
         For Each lp In linesLeft.lpList
-            dst2.Line(lp.p1, lp.p2, lp.color, task.lineWidth + 1, task.lineType)
+            dst2.Line(lp.p1, lp.p2, 255, task.lineWidth, task.lineType)
             SetTrueText(CStr(lp.age), New cv.Point(lp.ptCenter.X + 2, lp.ptCenter.Y + 2), 2)
         Next
-        labels(2) = task.lines.labels(2)
+        labels(2) = CStr(linesLeft.lpList.Count) + " lines in the left image.  Highlighted line is the current longest line."
 
         lastList = New List(Of lpData)(linesRight.lpList)
         linesRight.Run(stableLR.dst3)
         Dim averageAgeRight = Line_Basics_TA.updateAgesAndLongest(linesRight.lpList, lastList)
 
-        dst3 = task.rightView.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        dst3.SetTo(0)
         For Each lp In linesRight.lpList
-            dst3.Line(lp.p1, lp.p2, lp.color, task.lineWidth + 1, task.lineType)
+            dst3.Line(lp.p1, lp.p2, 255, task.lineWidth, task.lineType)
             SetTrueText(CStr(lp.age), New cv.Point(lp.ptCenter.X + 2, lp.ptCenter.Y + 2), 3)
         Next
-        labels(3) = linesRight.labels(2)
+        labels(3) = CStr(linesRight.lpList.Count) + " lines in the right image."
     End Sub
 End Class

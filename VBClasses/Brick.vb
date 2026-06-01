@@ -792,7 +792,7 @@ Public Class NR_Brick_Lines : Inherits TaskParent
         motionLeft.Run(task.leftView)
 
         lines.Run(task.leftView)
-        dst2 = lines.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        dst2 = lines.dst2
 
         Dim count As Integer
         dst3.SetTo(0)
@@ -805,7 +805,7 @@ Public Class NR_Brick_Lines : Inherits TaskParent
             End If
         Next
         labels(3) = CStr(count) + " of " + CStr(bricks.brickList.Count) +
-                            " rects had an edge and a range for depth > X cm's"
+            " rects had an edge and a range for depth > X cm's"
     End Sub
 End Class
 
