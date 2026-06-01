@@ -1444,8 +1444,8 @@ Public Class Histogram_PointCloud : Inherits TaskParent
                 If histData.Count < 128 And task.histogramBins < task.gOptions.HistBinBar.Maximum Then
                     task.histogramBins += 1
                 End If
-                If task.gridRects.Count < histData.Length And task.brickEdgeLen > 2 Then
-                    task.brickEdgeLen -= 1
+                If task.gridRects.Count < histData.Length And task.gridWH > 2 Then
+                    task.gridWH -= 1
                     grid.Run(src)
                     dst2.SetTo(0)
                 End If

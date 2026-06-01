@@ -1908,8 +1908,8 @@ End Class
 
 
 Public Class Line_LeftRight : Inherits TaskParent
-    Dim linesLeft As New Line_Core
-    Dim linesRight As New Line_Core
+    Public linesLeft As New Line_Core
+    Public linesRight As New Line_Core
     Dim stableLR As New StableGray_LeftRight
     Public Sub New()
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)

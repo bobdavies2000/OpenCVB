@@ -437,7 +437,7 @@ Public Class NR_FeatureLess_History : Inherits TaskParent
 
         Dim countCurr = dst2.CountNonZero
         Dim countAll = dst3.CountNonZero
-        Dim sqPixels = task.brickEdgeLen * task.brickEdgeLen
+        Dim sqPixels = task.gridWH * task.gridWH
         labels(2) = "Current frame: " + Format(countCurr / sqPixels, fmt0) + " grid squares and " +
                         Format(countAll / sqPixels, fmt0) + " of all grid squares."
     End Sub
@@ -588,7 +588,7 @@ Public Class FeatureLess_Cells : Inherits TaskParent
         Dim rect As cv.Rect
         Dim mask = New cv.Mat(New cv.Size(dst2.Width + 2, dst2.Height + 2), cv.MatType.CV_8U, 0)
         Dim flags As cv.FloodFillFlags = cv.FloodFillFlags.Link4
-        Dim minSize = task.brickEdgeLen * task.brickEdgeLen
+        Dim minSize = task.gridWH * task.gridWH
         Dim countList As New SortedList(Of Integer, Integer)(New compareAllowIdenticalIntegerInverted)
         For Each r In fLess.fLessList
             Dim val = dst2.Get(Of Byte)(r.Y, r.X)

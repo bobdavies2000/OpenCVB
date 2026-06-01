@@ -287,8 +287,8 @@ Public Class BrickLine_LeftRightMotion : Inherits TaskParent
             r.rect = task.gridRects(index)
 
             ' too close to the edges of the image
-            If task.gridNabeRects(index).Width + r.rect.X + task.brickEdgeLen * 2 > dst2.Width Then Continue For
-            If task.gridNabeRects(index).Height + r.rect.Y + task.brickEdgeLen * 2 > dst2.Height Then Continue For
+            If task.gridNabeRects(index).Width + r.rect.X + task.gridWH * 2 > dst2.Width Then Continue For
+            If task.gridNabeRects(index).Height + r.rect.Y + task.gridWH * 2 > dst2.Height Then Continue For
 
             r.lRect = r.rect
             r.depth = task.pcSplit(2)(r.rect).Mean()(0)

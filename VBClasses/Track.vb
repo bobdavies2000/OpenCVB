@@ -117,14 +117,14 @@ Public Class NR_Track_GridRect : Inherits TaskParent
             searchRect = task.gridNabeRects(gridIndex)
             Dim x = originalRect.X - searchRect.X
             Dim y = originalRect.Y - searchRect.Y
-            track.inputRect = New cv.Rect(x, y, task.brickEdgeLen, task.brickEdgeLen)
+            track.inputRect = New cv.Rect(x, y, task.gridWH, task.gridWH)
             dst3 = src
             dst3.Rectangle(searchRect, white, task.lineWidth)
             dst3.Rectangle(originalRect, white, task.lineWidth)
         End If
         track.Run(task.gray(searchRect))
         dst2 = src
-        Dim r = New cv.Rect(originalRect.X + track.outputRect.X, originalRect.Y + track.outputRect.Y, task.brickEdgeLen, task.brickEdgeLen)
+        Dim r = New cv.Rect(originalRect.X + track.outputRect.X, originalRect.Y + track.outputRect.Y, task.gridWH, task.gridWH)
         dst2.Rectangle(r, white, task.lineWidth)
         dst3.Rectangle(r, white, task.lineWidth)
     End Sub

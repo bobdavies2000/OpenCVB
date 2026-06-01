@@ -17,9 +17,9 @@ Public Class Grid_Basics_TA : Inherits TaskParent
             task.gridNabes.Clear()
 
             task.gridRects.Clear()
-            For y = 0 To dst2.Height - 1 Step task.brickEdgeLen
-                For x = 0 To dst2.Width - 1 Step task.brickEdgeLen
-                    Dim roi = ValidateRect(New cv.Rect(x, y, task.brickEdgeLen, task.brickEdgeLen))
+            For y = 0 To dst2.Height - 1 Step task.gridWH
+                For x = 0 To dst2.Width - 1 Step task.gridWH
+                    Dim roi = ValidateRect(New cv.Rect(x, y, task.gridWH, task.gridWH))
 
                     If roi.Bottom = dst2.Height - 1 Then roi.Height += 1
                     If roi.BottomRight.X = dst2.Width - 1 Then roi.Width += 1
@@ -33,11 +33,11 @@ Public Class Grid_Basics_TA : Inherits TaskParent
             Next
 
             task.gridMask.SetTo(0)
-            For x = task.brickEdgeLen To dst2.Width - 1 Step task.brickEdgeLen
+            For x = task.gridWH To dst2.Width - 1 Step task.gridWH
                 Dim p1 = New cv.Point(x, 0), p2 = New cv.Point(x, dst2.Height)
                 task.gridMask.Line(p1, p2, 255, 1)
             Next
-            For y = task.brickEdgeLen To dst2.Height - 1 Step task.brickEdgeLen
+            For y = task.gridWH To dst2.Height - 1 Step task.gridWH
                 Dim p1 = New cv.Point(0, y), p2 = New cv.Point(dst2.Width, y)
                 task.gridMask.Line(p1, p2, 255, 1)
             Next
@@ -86,20 +86,20 @@ Public Class Grid_Basics_TA : Inherits TaskParent
                     yList.Add(rect.BottomRight.Y)
                 Next
                 Dim r = New cv.Rect(xList.Min, yList.Min, xList.Max - xList.Min, yList.Max - yList.Min)
-                If r.Width < task.brickEdgeLen * 3 Then
-                    If r.X + r.Width >= dst2.Width Then r.X = dst2.Width - task.brickEdgeLen * 3
-                    r.Width = task.brickEdgeLen * 3
+                If r.Width < task.gridWH * 3 Then
+                    If r.X + r.Width >= dst2.Width Then r.X = dst2.Width - task.gridWH * 3
+                    r.Width = task.gridWH * 3
                 End If
-                If r.Height < task.brickEdgeLen * 3 Then
-                    If r.Y + r.Height >= dst2.Height Then r.Y = dst2.Height - task.brickEdgeLen * 3
-                    r.Height = task.brickEdgeLen * 3
+                If r.Height < task.gridWH * 3 Then
+                    If r.Y + r.Height >= dst2.Height Then r.Y = dst2.Height - task.gridWH * 3
+                    r.Height = task.gridWH * 3
                 End If
-                If r.Width <> task.brickEdgeLen * 3 Then r.Width = task.brickEdgeLen * 3
-                If r.Height <> task.brickEdgeLen * 3 Then r.Height = task.brickEdgeLen * 3
+                If r.Width <> task.gridWH * 3 Then r.Width = task.gridWH * 3
+                If r.Height <> task.gridWH * 3 Then r.Height = task.gridWH * 3
                 task.gridNabeRects.Add(r)
             Next
 
-            task.brickEdgeLen = task.brickEdgeLen
+            task.gridWH = task.gridWH
             task.bricksPerCol = bricksPerCol
             task.bricksPerRow = bricksPerRow
             task.gridWH = task.gridRects(0).Width
@@ -109,7 +109,7 @@ Public Class Grid_Basics_TA : Inherits TaskParent
             task.color.CopyTo(dst2)
             dst2.SetTo(white, task.gridMask)
             labels(2) = "Grid_Basics_TA " + CStr(task.gridRects.Count) + " (" + CStr(task.bricksPerCol) + "X" + CStr(task.bricksPerRow) + ") " +
-                                                 CStr(task.brickEdgeLen) + "X" + CStr(task.brickEdgeLen) + " regions"
+                                                 CStr(task.gridWH) + "X" + CStr(task.gridWH) + " regions"
         End If
     End Sub
 End Class
@@ -309,8 +309,8 @@ Public Class NR_Grid_TrackCenter : Inherits TaskParent
             center = New cv.Point(r.X + r.Width / 2, r.Y + r.Height / 2)
         End If
 
-        Dim pad = task.brickEdgeLen / 2
-        Dim searchRect = ValidateRect(New cv.Rect(center.X - pad, center.Y - pad, task.brickEdgeLen, task.brickEdgeLen))
+        Dim pad = task.gridWH / 2
+        Dim searchRect = ValidateRect(New cv.Rect(center.X - pad, center.Y - pad, task.gridWH, task.gridWH))
         match.Run(src(searchRect))
         center = match.newCenter
 

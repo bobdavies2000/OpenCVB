@@ -335,10 +335,10 @@ Public Class NR_Gravity_RGB : Inherits TaskParent
         survey.Run(dst3)
         dst2 = survey.dst2
 
-        Dim incrX = dst1.Width / task.brickEdgeLen
-        Dim incrY = dst1.Height / task.brickEdgeLen
-        For y = 0 To task.brickEdgeLen - 1
-            For x = 0 To task.brickEdgeLen - 1
+        Dim incrX = dst1.Width / task.gridWH
+        Dim incrY = dst1.Height / task.gridWH
+        For y = 0 To task.gridWH - 1
+            For x = 0 To task.gridWH - 1
                 SetTrueText(CStr(survey.results(x, y)), New cv.Point(x * incrX, y * incrY), 2)
             Next
         Next
@@ -379,10 +379,10 @@ Public Class NR_Gravity_BrickRotate : Inherits TaskParent
         survey.Run(dst3)
         dst2 = survey.dst2
 
-        Dim incrX = dst1.Width / task.brickEdgeLen
-        Dim incrY = dst1.Height / task.brickEdgeLen
-        For y = 0 To task.brickEdgeLen - 1
-            For x = 0 To task.brickEdgeLen - 1
+        Dim incrX = dst1.Width / task.gridWH
+        Dim incrY = dst1.Height / task.gridWH
+        For y = 0 To task.gridWH - 1
+            For x = 0 To task.gridWH - 1
                 SetTrueText(CStr(survey.results(x, y)), New cv.Point(x * incrX, y * incrY), 2)
             Next
         Next

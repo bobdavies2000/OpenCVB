@@ -17,7 +17,7 @@ Public Class NR_PhotoShop_Clahe : Inherits TaskParent
         If src.Channels() <> 1 Then src = task.gray
         dst2 = src
         Dim claheObj = cv.Cv2.CreateCLAHE()
-        claheObj.TilesGridSize() = New cv.Size(CInt(task.brickEdgeLen), CInt(task.brickEdgeLen))
+        claheObj.TilesGridSize() = New cv.Size(CInt(task.gridWH), CInt(task.gridWH))
         claheObj.ClipLimit = clipSlider.Value
         claheObj.Apply(src, dst3)
         claheObj.Dispose()

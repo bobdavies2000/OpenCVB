@@ -89,7 +89,7 @@ Public Class Profile_Basics : Inherits TaskParent
 
         If task.heartBeat Then
             strOut = "X     " + vbTab + "Y     " + vbTab + "Z " + vbTab + "units=meters" + vbCrLf
-            Dim w = task.brickEdgeLen
+            Dim w = task.gridWH
             For i = 0 To corners.Count - 1
                 strOut += point3fToString(corners3D(i)) + vbTab + cornerNames(i) + vbCrLf
             Next

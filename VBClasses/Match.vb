@@ -458,11 +458,11 @@ Public Class Match_Point : Inherits TaskParent
             Exit Sub
         End If
 
-        Dim radius = task.brickEdgeLen / 2
+        Dim radius = task.gridWH / 2
 
-        Dim rect = ValidateRect(New cv.Rect(pt.X - radius, pt.Y - radius, task.brickEdgeLen, task.brickEdgeLen))
-        searchRect = ValidateRect(New cv.Rect(rect.X - task.brickEdgeLen, rect.Y - task.brickEdgeLen,
-                                                  task.brickEdgeLen * 3, task.brickEdgeLen * 3))
+        Dim rect = ValidateRect(New cv.Rect(pt.X - radius, pt.Y - radius, task.gridWH, task.gridWH))
+        searchRect = ValidateRect(New cv.Rect(rect.X - task.gridWH, rect.Y - task.gridWH,
+                                                  task.gridWH * 3, task.gridWH * 3))
         cv.Cv2.MatchTemplate(target(rect), src(searchRect), dst0, cv.TemplateMatchModes.CCoeffNormed)
         Dim mmData = GetMinMax(dst0)
         correlation = mmData.maxVal
@@ -609,20 +609,20 @@ Public Class NR_Match_LinePairTest : Inherits TaskParent
         desc = "Use MatchTemplate to find the new location of the template and update the point provided."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        Dim radius = task.brickEdgeLen / 2
+        Dim radius = task.gridWH / 2
 
         Dim rect As cv.Rect
 
         If target(0) IsNot Nothing And correlation(0) < task.fCorrThreshold Then target(0) = Nothing
         If task.mouseClickFlag Then
             ptx(0) = task.clickPoint
-            ptx(1) = New cv.Point2f(msRNG.Next(task.brickEdgeLen, dst2.Width - 2 * task.brickEdgeLen),
-                                        msRNG.Next(task.brickEdgeLen, dst2.Height - 2 * task.brickEdgeLen))
+            ptx(1) = New cv.Point2f(msRNG.Next(task.gridWH, dst2.Width - 2 * task.gridWH),
+                                        msRNG.Next(task.gridWH, dst2.Height - 2 * task.gridWH))
 
-            rect = ValidateRect(New cv.Rect(ptx(0).X - radius, ptx(0).Y - radius, task.brickEdgeLen, task.brickEdgeLen))
+            rect = ValidateRect(New cv.Rect(ptx(0).X - radius, ptx(0).Y - radius, task.gridWH, task.gridWH))
             target(0) = src(rect)
 
-            rect = ValidateRect(New cv.Rect(ptx(1).X - radius, ptx(1).Y - radius, task.brickEdgeLen, task.brickEdgeLen))
+            rect = ValidateRect(New cv.Rect(ptx(1).X - radius, ptx(1).Y - radius, task.gridWH, task.gridWH))
             target(1) = src(rect)
         End If
 
@@ -636,9 +636,9 @@ Public Class NR_Match_LinePairTest : Inherits TaskParent
         dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_32FC1, 0)
 
         For i = 0 To ptx.Count - 1
-            rect = ValidateRect(New cv.Rect(ptx(i).X - radius, ptx(i).Y - radius, task.brickEdgeLen, task.brickEdgeLen))
-            Dim searchRect = ValidateRect(New cv.Rect(rect.X - task.brickEdgeLen, rect.Y - task.brickEdgeLen,
-                                                          task.brickEdgeLen * 3, task.brickEdgeLen * 3))
+            rect = ValidateRect(New cv.Rect(ptx(i).X - radius, ptx(i).Y - radius, task.gridWH, task.gridWH))
+            Dim searchRect = ValidateRect(New cv.Rect(rect.X - task.gridWH, rect.Y - task.gridWH,
+                                                          task.gridWH * 3, task.gridWH * 3))
             cv.Cv2.MatchTemplate(target(i), src(searchRect), dst0, cv.TemplateMatchModes.CCoeffNormed)
             Dim mmData = GetMinMax(dst0)
             correlation(i) = mmData.maxVal
@@ -649,7 +649,7 @@ Public Class NR_Match_LinePairTest : Inherits TaskParent
             ptx(i) = New cv.Point2f(mmData.maxLoc.X + searchRect.X + radius, mmData.maxLoc.Y + searchRect.Y + radius)
             dst3.Circle(ptx(i), task.DotSize, task.highlight, -1, task.lineType)
             dst3.Rectangle(searchRect, cv.Scalar.Yellow, 1)
-            rect = ValidateRect(New cv.Rect(ptx(i).X - radius, ptx(i).Y - radius, task.brickEdgeLen, task.brickEdgeLen))
+            rect = ValidateRect(New cv.Rect(ptx(i).X - radius, ptx(i).Y - radius, task.gridWH, task.gridWH))
             target(i) = task.color(rect)
         Next
 

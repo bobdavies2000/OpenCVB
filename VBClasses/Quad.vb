@@ -330,8 +330,8 @@ Public Class NR_Quad_Boundaries : Inherits TaskParent
         options.Run()
 
         dst2 = bricks.dst2.Clone
-        Dim width = dst2.Width / task.brickEdgeLen
-        Dim height = dst2.Height / task.brickEdgeLen
+        Dim width = dst2.Width / task.gridWH
+        Dim height = dst2.Height / task.gridWH
         For i = 0 To bricks.brickList.Count - width Step width
             For j = i + 1 To i + width - 1
                 Dim brick1 = bricks.brickList(j).depth

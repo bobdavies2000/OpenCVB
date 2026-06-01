@@ -101,7 +101,7 @@ Public Class NR_Brick_FullDepth : Inherits TaskParent
         Dim col As Integer, bricksPerRow = task.bricksPerRow
         Static whiteCol As Integer = bricksPerRow / 2
         If task.mouseClickFlag Then
-            whiteCol = Math.Round(bricksPerRow * (task.clickPoint.X - task.brickEdgeLen / 2) / dst2.Width)
+            whiteCol = Math.Round(bricksPerRow * (task.clickPoint.X - task.gridWH / 2) / dst2.Width)
         End If
         For Each brick In bricks.brickList
             If brick.depth > 0 Then
@@ -727,8 +727,8 @@ Public Class NR_Brick_EdgeFlips : Inherits TaskParent
         Next
 
         For Each r In fLessRects
-            Dim x = CInt(r.X / task.brickEdgeLen)
-            Dim y = CInt(r.Y / task.brickEdgeLen)
+            Dim x = CInt(r.X / task.gridWH)
+            Dim y = CInt(r.Y / task.gridWH)
             task.lowResDepth.Set(Of Single)(y, x, lastDepth.Get(Of Single)(y, x))
         Next
         lastDepth = task.lowResDepth.Clone

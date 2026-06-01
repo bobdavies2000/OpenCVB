@@ -72,7 +72,7 @@ Public Class Entropy_Highest : Inherits TaskParent
                     eMaxRect = roi
                 End If
                 If entropy.entropyVal < minEntropy Then minEntropy = entropy.entropyVal
-                If standaloneTest() And task.brickEdgeLen > 16 Then
+                If standaloneTest() And task.gridWH > 16 Then
                     Dim pt = New cv.Point(roi.X, roi.Y)
                     SetTrueText(Format(entropy.entropyVal, fmt2), pt, 2)
                     SetTrueText(Format(entropy.entropyVal, fmt2), pt, 3)

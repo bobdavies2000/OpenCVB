@@ -365,24 +365,24 @@ Namespace VBClasses
             desc = "Validate the horizon points using Match_Basics"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            Dim pad = task.brickEdgeLen / 2
+            Dim pad = task.gridWH / 2
 
             src = task.gray
             If task.heartBeat Then
                 ptLeft = task.lpGravity.p1
                 ptRight = task.lpGravity.p2
-                Dim r = ValidateRect(New cv.Rect(ptLeft.X - pad, ptLeft.Y - pad, task.brickEdgeLen, task.brickEdgeLen))
+                Dim r = ValidateRect(New cv.Rect(ptLeft.X - pad, ptLeft.Y - pad, task.gridWH, task.gridWH))
                 leftTemplate = src(r)
 
-                r = ValidateRect(New cv.Rect(ptRight.X - pad, ptRight.Y - pad, task.brickEdgeLen, task.brickEdgeLen))
+                r = ValidateRect(New cv.Rect(ptRight.X - pad, ptRight.Y - pad, task.gridWH, task.gridWH))
                 rightTemplate = src(r)
             Else
-                Dim r = ValidateRect(New cv.Rect(ptLeft.X - pad, ptLeft.Y - pad, task.brickEdgeLen, task.brickEdgeLen))
+                Dim r = ValidateRect(New cv.Rect(ptLeft.X - pad, ptLeft.Y - pad, task.gridWH, task.gridWH))
                 match.template = leftTemplate.Clone
                 match.Run(src)
                 ptLeft = match.newCenter
 
-                r = ValidateRect(New cv.Rect(ptRight.X - pad, ptRight.Y - pad, task.brickEdgeLen, task.brickEdgeLen))
+                r = ValidateRect(New cv.Rect(ptRight.X - pad, ptRight.Y - pad, task.gridWH, task.gridWH))
                 match.template = leftTemplate.Clone
                 match.Run(src)
                 ptLeft = match.newCenter
@@ -2710,8 +2710,8 @@ Namespace VBClasses
         Public Shared Function perpendicularPoints(pt As cv.Point2f, slope As Single) As lpData
             Dim perpSlope = -1 / slope
             Dim angleRadians As Double = Math.Atan(perpSlope)
-            Dim xShift = task.brickEdgeLen * Math.Cos(angleRadians)
-            Dim yShift = task.brickEdgeLen * Math.Sin(angleRadians)
+            Dim xShift = task.gridWH * Math.Cos(angleRadians)
+            Dim yShift = task.gridWH * Math.Sin(angleRadians)
             Dim p1 = New cv.Point(pt.X + xShift, pt.Y + yShift)
             Dim p2 = New cv.Point(pt.X - xShift, pt.Y - yShift)
             If p1.X < 0 Then p1.X = 0
@@ -3309,7 +3309,7 @@ Namespace VBClasses
             If task.optionsChanged Or correlationTest Or lineDisp.maskCount / lineDisp.distance < linePercentThreshold Or
                lineDisp.distance < distanceThreshold Then
 
-                Dim pad = task.brickEdgeLen / 2
+                Dim pad = task.gridWH / 2
                 lines.subsetRect = New cv.Rect(pad * 3, pad * 3, src.Width - pad * 6, src.Height - pad * 6)
                 lines.Run(src.Clone)
 
@@ -3468,7 +3468,7 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             dst2 = src.Clone
-            Dim pad = task.brickEdgeLen / 2
+            Dim pad = task.gridWH / 2
 
             Static p1 As cv.Point, p2 As cv.Point
             If task.heartBeat Or match1.correlation < task.fCorrThreshold And
@@ -3476,11 +3476,11 @@ Namespace VBClasses
                 knn.Run(src.Clone)
 
                 p1 = knn.lastPair.p1
-                Dim r1 = ValidateRect(New cv.Rect(p1.X - pad, p1.Y - pad, task.brickEdgeLen, task.brickEdgeLen))
+                Dim r1 = ValidateRect(New cv.Rect(p1.X - pad, p1.Y - pad, task.gridWH, task.gridWH))
                 match1.template = src(r1).Clone
 
                 p2 = knn.lastPair.p2
-                Dim r2 = ValidateRect(New cv.Rect(p2.X - pad, p2.Y - pad, task.brickEdgeLen, task.brickEdgeLen))
+                Dim r2 = ValidateRect(New cv.Rect(p2.X - pad, p2.Y - pad, task.gridWH, task.gridWH))
                 match2.template = src(r2).Clone
             End If
 
@@ -4476,7 +4476,7 @@ Namespace VBClasses
             Dim p1 = bricks.brickList(0).lRect.TopLeft
             Dim p2 = bricks.brickList(bricks.brickList.Count - 1).lRect.BottomRight
 
-            ' Dim rect = ValidateRect(New cv.Rect(p1.X - task.brickEdgeLen, p1.Y - task.brickEdgeLen, task.brickEdgeLen * 2, task.brickEdgeLen * 2))
+            ' Dim rect = ValidateRect(New cv.Rect(p1.X - task.gridWH, p1.Y - task.gridWH, task.gridWH * 2, task.gridWH * 2))
             cv.Cv2.MatchTemplate(task.gray(task.drawRect), task.leftView, dst2, cv.TemplateMatchModes.CCoeffNormed)
             Dim mm = GetMinMax(dst2)
             dst3 = src(ValidateRect(New cv.Rect(mm.maxLoc.X / 2, mm.maxLoc.Y / 2, dst2.Width, dst2.Height)))
@@ -7096,7 +7096,7 @@ Namespace VBClasses
             featureRects.Clear()
             For Each pt In feat.topFeatures
                 Dim index As Integer = task.gridMap.Get(Of Integer)(pt.Y, pt.X)
-                Dim roi = New cv.Rect(pt.X - half, pt.Y - half, task.brickEdgeLen, task.brickEdgeLen)
+                Dim roi = New cv.Rect(pt.X - half, pt.Y - half, task.gridWH, task.gridWH)
                 roi = ValidateRect(roi)
                 featureRects.Add(roi)
                 searchRects.Add(task.gridNabeRects(index))
@@ -7105,14 +7105,14 @@ Namespace VBClasses
             dst2 = dst1.Clone
             For Each pt In feat.topFeatures
                 Dim index As Integer = task.gridMap.Get(Of Integer)(pt.Y, pt.X)
-                Dim roi = New cv.Rect(pt.X - half, pt.Y - half, task.brickEdgeLen, task.brickEdgeLen)
+                Dim roi = New cv.Rect(pt.X - half, pt.Y - half, task.gridWH, task.gridWH)
                 roi = ValidateRect(roi)
                 dst2.Rectangle(roi, task.highlight, task.lineWidth)
                 dst2.Rectangle(task.gridNabeRects(index), task.highlight, task.lineWidth)
             Next
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            half = CInt(task.brickEdgeLen / 2)
+            half = CInt(task.gridWH / 2)
 
             dst1 = src.Clone
             feat.Run(src)
@@ -7492,7 +7492,7 @@ Namespace VBClasses
             options.Run()
 
             If task.optionsChanged Then
-                Dim size = task.brickEdgeLen
+                Dim size = task.gridWH
                 ul = New cv.Rect(0, 0, size, size)
                 ur = New cv.Rect(dst2.Width - size, 0, size, size)
                 ll = New cv.Rect(0, dst2.Height - size, size, size)
@@ -8944,7 +8944,7 @@ Namespace VBClasses
             desc = "Find the top feature cells and track them in the next frame."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            Dim half As Integer = CInt(task.brickEdgeLen / 2)
+            Dim half As Integer = CInt(task.gridWH / 2)
             Dim pt As cv.Point
             If task.heartBeatLT Then
                 feat.Run(src)
@@ -8953,7 +8953,7 @@ Namespace VBClasses
                 saveMat = src.Clone
                 For Each pt In feat.features
                     Dim index As Integer = task.gridMap.Get(Of Integer)(pt.Y, pt.X)
-                    Dim roi = New cv.Rect(pt.X - half, pt.Y - half, task.brickEdgeLen, task.brickEdgeLen)
+                    Dim roi = New cv.Rect(pt.X - half, pt.Y - half, task.gridWH, task.gridWH)
                     roi = ValidateRect(roi) ' stub bricks are fixed here 
                     featureRects.Add(roi)
                     searchRects.Add(task.gridNabeRects(index))
@@ -8962,7 +8962,7 @@ Namespace VBClasses
                 dst2 = saveMat.Clone
                 For Each pt In feat.features
                     Dim index As Integer = task.gridMap.Get(Of Integer)(pt.Y, pt.X)
-                    Dim roi = New cv.Rect(pt.X - half, pt.Y - half, task.brickEdgeLen, task.brickEdgeLen)
+                    Dim roi = New cv.Rect(pt.X - half, pt.Y - half, task.gridWH, task.gridWH)
                     roi = ValidateRect(roi) ' stub bricks are fixed here 
                     dst2.Rectangle(roi, task.highlight, task.lineWidth)
                     dst2.Rectangle(task.gridNabeRects(index), task.highlight, task.lineWidth)
@@ -12714,7 +12714,7 @@ Namespace VBClasses
             If src.Channels() <> 1 Then src = task.gray
             src.SetTo(0, task.noDepthMask)
 
-            Dim threshold = task.brickEdgeLen * task.brickEdgeLen / 2
+            Dim threshold = task.gridWH * task.gridWH / 2
             Dim activeList(task.gridRects.Count - 1) As Boolean
             dst3.SetTo(0)
             Parallel.For(0, task.gridRects.Count,
@@ -15376,7 +15376,7 @@ Namespace VBClasses
             Dim diffY As New List(Of Integer)
             Dim correlationMat As New cv.Mat
             dst2 = src.Clone
-            Dim sz = task.brickEdgeLen
+            Dim sz = task.gridWH
             For Each mps In knn.matches
                 Dim currRect = ValidateRect(New cv.Rect(mps.p1.X - sz, mps.p1.Y - sz, sz * 2, sz * 2))
                 Dim prevRect = ValidateRect(New cv.Rect(mps.p2.X - sz, mps.p2.Y - sz, currRect.Width, currRect.Height))
@@ -15676,17 +15676,17 @@ Namespace VBClasses
         Public Function createCell(src As cv.Mat, correlation As Single, pt As cv.Point2f) As tCell
             Dim tc As New tCell
 
-            tc.rect = ValidateRect(New cv.Rect(pt.X - task.brickEdgeLen, pt.Y - task.brickEdgeLen, task.brickEdgeLen * 2, task.brickEdgeLen * 2))
+            tc.rect = ValidateRect(New cv.Rect(pt.X - task.gridWH, pt.Y - task.gridWH, task.gridWH * 2, task.gridWH * 2))
             tc.correlation = correlation
             tc.depth = task.pcSplit(2)(tc.rect).Mean(task.depthmask(tc.rect))(0) / 1000
             tc.center = pt
-            tc.searchRect = ValidateRect(New cv.Rect(tc.center.X - task.brickEdgeLen * 3, tc.center.Y - task.brickEdgeLen * 3,
-                                                     task.brickEdgeLen * 6, task.brickEdgeLen * 6))
+            tc.searchRect = ValidateRect(New cv.Rect(tc.center.X - task.gridWH * 3, tc.center.Y - task.gridWH * 3,
+                                                     task.gridWH * 6, task.gridWH * 6))
             If tc.template Is Nothing Then tc.template = src(tc.rect).Clone
             Return tc
         End Function
         Public Overrides Sub RunAlg(src As cv.Mat)
-            Dim rSize = task.brickEdgeLen
+            Dim rSize = task.gridWH
             If standaloneTest() And task.heartBeat Then
                 options.Run()
                 tCells.Clear()
@@ -18912,13 +18912,13 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             feat.Run(task.gray)
 
-            Dim pad = task.brickEdgeLen / 2
+            Dim pad = task.gridWH / 2
             strOut = ""
             If mPoints.ptx.Count <= 3 Then
                 mPoints.ptx.Clear()
                 For Each pt In feat.features
                     mPoints.ptx.Add(pt)
-                    Dim rect = ValidateRect(New cv.Rect(pt.X - pad, pt.Y - pad, task.brickEdgeLen, task.brickEdgeLen))
+                    Dim rect = ValidateRect(New cv.Rect(pt.X - pad, pt.Y - pad, task.gridWH, task.gridWH))
                 Next
                 strOut = "Restart tracking -----------------------------------------------------------------------------" + vbCrLf
             End If

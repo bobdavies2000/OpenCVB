@@ -177,7 +177,7 @@ Public Class NR_BrickPoint_DistanceAbove : Inherits TaskParent
         Next
 
         Dim minLen = lengths.Min, maxLen = lengths.Max
-        If maxLen = task.brickEdgeLen And minLen = task.brickEdgeLen Then Exit Sub
+        If maxLen = task.gridWH And minLen = task.gridWH Then Exit Sub
 
         plotHist.Run(cv.Mat.FromPixelData(lengths.Count, 1, cv.MatType.CV_32F, lengths.ToArray))
         dst2 = plotHist.dst2
@@ -286,19 +286,19 @@ Public Class NR_BrickPoint_PopulationSurvey : Inherits TaskParent
         dst1 = bPoint.dst2
         dst3 = src
 
-        ReDim results(task.brickEdgeLen - 1, task.brickEdgeLen - 1)
+        ReDim results(task.gridWH - 1, task.gridWH - 1)
         For Each pt In bPoint.ptList
             Dim index = task.gridMap.Get(Of Integer)(pt.Y, pt.X)
             Dim brick = bricks.brickList(index)
             results(brick.mm.maxLoc.X, brick.mm.maxLoc.Y) += 1
         Next
 
-        Dim incrX = dst1.Width / task.brickEdgeLen
-        Dim incrY = dst1.Height / task.brickEdgeLen
+        Dim incrX = dst1.Width / task.gridWH
+        Dim incrY = dst1.Height / task.gridWH
         Dim row = Math.Floor(task.mouseMovePoint.Y / incrY)
         Dim col = Math.Floor(task.mouseMovePoint.X / incrX)
 
-        dst2 = cv.Mat.FromPixelData(task.brickEdgeLen, task.brickEdgeLen, cv.MatType.CV_32F, results)
+        dst2 = cv.Mat.FromPixelData(task.gridWH, task.gridWH, cv.MatType.CV_32F, results)
 
         For Each brick In bricks.brickList
             If brick.mm.maxLoc.X = col And brick.mm.maxLoc.Y = row Then
@@ -307,8 +307,8 @@ Public Class NR_BrickPoint_PopulationSurvey : Inherits TaskParent
             End If
         Next
 
-        For y = 0 To task.brickEdgeLen - 1
-            For x = 0 To task.brickEdgeLen - 1
+        For y = 0 To task.gridWH - 1
+            For x = 0 To task.gridWH - 1
                 SetTrueText(CStr(results(x, y)), New cv.Point(x * incrX, y * incrY), 2)
             Next
         Next

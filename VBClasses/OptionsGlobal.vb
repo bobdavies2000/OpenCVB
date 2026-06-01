@@ -28,7 +28,7 @@ Public Class OptionsGlobal
 
         task.DotSize = 1
         task.cvFontThickness = 1
-        task.brickEdgeLen = 8
+        task.gridWH = 8
         task.smallBrick = 8
         task.DotSize = 1
         task.lineWidth = 1
@@ -39,35 +39,35 @@ Public Class OptionsGlobal
                 task.cvFontThickness = 4
                 task.DotSize = 5
                 task.lineWidth = 5
-                task.brickEdgeLen = 48
+                task.gridWH = 48
                 task.smallRes = New cv.Size(240, 135)
             Case 1280
                 task.cvFontSize = 2.5
                 task.cvFontThickness = 2
                 task.DotSize = 5
                 task.lineWidth = 4
-                task.brickEdgeLen = 36
+                task.gridWH = 36
             Case 960
                 task.cvFontSize = 1.5
                 task.DotSize = 2
                 task.lineWidth = 2
-                task.brickEdgeLen = 24
+                task.gridWH = 24
                 task.smallRes = New cv.Size(336, 188)
             Case 672
                 task.cvFontSize = 1.5
                 task.DotSize = 2
                 task.lineWidth = 2
-                task.brickEdgeLen = 16
+                task.gridWH = 16
                 task.smallRes = New cv.Size(336, 188)
             Case 640
                 task.cvFontSize = 1.5
                 task.lineWidth = 2
                 task.DotSize = 2
-                task.brickEdgeLen = 16
+                task.gridWH = 16
             Case 480
                 task.cvFontSize = 1.2
                 task.smallRes = New cv.Size(480, 270)
-                task.brickEdgeLen = 12
+                task.gridWH = 12
             Case 240
                 task.cvFontSize = 1.2
                 task.smallRes = New cv.Size(240, 150)
@@ -79,14 +79,14 @@ Public Class OptionsGlobal
             Case 168
                 task.cvFontSize = 0.5
                 task.smallRes = New cv.Size(168, 94)
-                task.brickEdgeLen = 5
+                task.gridWH = 5
             Case 160
                 task.cvFontSize = 1.0
                 task.smallRes = New cv.Size(160, 120)
-                task.brickEdgeLen = 5
+                task.gridWH = 5
         End Select
 
-        GridSlider.Value = task.brickEdgeLen
+        GridSlider.Value = task.gridWH
         DotSizeSlider.Value = task.DotSize
         DotSizeLabel.Text = CStr(DotSizeSlider.Value)
         LineWidth.Value = task.lineWidth
@@ -138,7 +138,7 @@ Public Class OptionsGlobal
     End Sub
     Private Sub GridSlider_ValueChanged(sender As Object, e As EventArgs) Handles GridSlider.ValueChanged
         GridSizeLabel.Text = CStr(GridSlider.Value)
-        task.brickEdgeLen = GridSlider.Value
+        task.gridWH = GridSlider.Value
         task.optionsChanged = True
     End Sub
     Private Sub HistBinBar_ValueChanged(sender As Object, e As EventArgs) Handles HistBinBar.ValueChanged

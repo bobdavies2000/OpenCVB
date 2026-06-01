@@ -427,7 +427,7 @@ Public Class NR_Cloud_GridInspector : Inherits TaskParent
         dst2.Line(topPt, botPt, 255, task.lineWidth, task.lineWidth)
 
         SetTrueText("Values show r.pt3d values at the blue line.", New cv.Point(dst2.Width / 2, 0), 3)
-        For i = 0 To dst2.Height - 1 Step task.brickEdgeLen
+        For i = 0 To dst2.Height - 1 Step task.gridWH
             Dim pt = New cv.Point2f(cLine, i)
             Dim index = task.gridMap.Get(Of Integer)(pt.Y, pt.X)
             Dim center = bricks.brickList(index).center
@@ -693,7 +693,7 @@ Public Class NR_Cloud_Continuous_GridXY : Inherits TaskParent
 
         dst2.SetTo(0)
         Dim brickPrev = bricks.brickList(0)
-        Dim cellMat As New cv.Mat(task.brickEdgeLen, task.brickEdgeLen, cv.MatType.CV_8U, cv.Scalar.All(127))
+        Dim cellMat As New cv.Mat(task.gridWH, task.gridWH, cv.MatType.CV_8U, cv.Scalar.All(127))
         For Each brick In bricks.brickList
             Dim brickAbove = bricks.brickList(CInt(brick.index Mod task.bricksPerRow))
             If brick.correlation > task.fCorrThreshold Then

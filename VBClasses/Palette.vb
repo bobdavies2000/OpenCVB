@@ -277,10 +277,10 @@ Public Class NR_Palette_TaskColors : Inherits TaskParent
         desc = "Display that task.scalarColors and task.vecColors"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If task.brickEdgeLen <= 10 Then direction *= -1
-        If task.brickEdgeLen >= 100 Then direction *= -1
+        If task.gridWH <= 10 Then direction *= -1
+        If task.gridWH >= 100 Then direction *= -1
 
-        task.brickEdgeLen -= direction * 1
+        task.gridWH -= direction * 1
         task.grid.Run(src)
 
         For i = 0 To task.gridRects.Count - 1

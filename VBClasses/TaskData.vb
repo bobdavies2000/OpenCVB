@@ -53,7 +53,6 @@ Partial Public Class AlgorithmTask
     Public DotSize As Integer
     Public lineWidth As Integer
     Public cvFontThickness As Integer
-    Public brickEdgeLen As Integer
     Public cvFontSize As Single
     Public lineType As cv.LineTypes
     Public histogramBins As Integer
@@ -125,7 +124,7 @@ Partial Public Class AlgorithmTask
     Public gridNabes As New List(Of List(Of Integer))
     Public gridMap As New cv.Mat
     Public gridMask As New cv.Mat
-    Public gridWH As Integer ' grid width/height.
+    Public gridWH As Integer ' grid width and height.
     Public gridROIclicked As Integer
     Public depthDiffMeters As Single ' bricks > than this value are depth edges - in meters
 

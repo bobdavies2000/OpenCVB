@@ -16,7 +16,7 @@ Public Class Puzzle_Basics : Inherits TaskParent
         Dim inputROI As New List(Of cv.Rect)
         For j = 0 To task.gridRects.Count - 1
             Dim gRect = task.gridRects(j)
-            If gRect.Width = task.brickEdgeLen And gRect.Height = task.brickEdgeLen Then inputROI.Add(task.gridRects(j))
+            If gRect.Width = task.gridWH And gRect.Height = task.gridWH Then inputROI.Add(task.gridRects(j))
         Next
 
         scrambled = Shuffle(inputROI)
@@ -26,8 +26,8 @@ Public Class Puzzle_Basics : Inherits TaskParent
         For i = 0 To scrambled.Count - 1
             Dim gRect = task.gridRects(i)
             Dim gr2 = scrambled(i)
-            If gRect.Width = task.brickEdgeLen And gRect.Height = task.brickEdgeLen And
-                       gr2.Width = task.brickEdgeLen And gr2.Height = task.brickEdgeLen Then dst2(gr2) = src(gRect)
+            If gRect.Width = task.gridWH And gRect.Height = task.gridWH And
+                       gr2.Width = task.gridWH And gr2.Height = task.gridWH Then dst2(gr2) = src(gRect)
         Next
     End Sub
 End Class
