@@ -3,22 +3,22 @@ Public Class LineSeg_Basics : Inherits TaskParent
     Public lpList As New List(Of lpData)
     Public core As New LineSeg_Core
     Public Sub New()
-        desc = "Run FLD (Fast Line Detector) with sobel input."
+        desc = "Run LSD (Line Segment Detector) with sobel input."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        dst2 = task.color.Clone
         If src.Channels <> 1 Or src.Type <> cv.MatType.CV_8U Then src = task.gray.Clone
 
         core.Run(src)
+        dst2 = core.dst2
 
         Dim lastList = New List(Of lpData)(lpList)
         lpList = Line_Basics_TA.removeDuplicates(core.lpList)
         Dim averageAge = Line_Basics_TA.updateAgesAndLongest(lpList, lastList)
 
-        labels(2) = CStr(lpList.Count) + " lines found.  Value Next To the line Is the age." +
+        labels(2) = "Line Segment Detector (LSD): " + CStr(lpList.Count) + " lines found.  Value Next To the line Is the age." +
                     " Average age = " + If(lpList.Count > 0, Format(averageAge, fmt1), "0")
 
-        dst3 = task.lines.dst3
+        dst3 = task.lines.dst2
         For Each lp In task.lines.lpList
             SetTrueText(CStr(lp.age), New cv.Point(lp.ptCenter.X + 2, lp.ptCenter.Y + 2), 3)
         Next
@@ -26,6 +26,45 @@ Public Class LineSeg_Basics : Inherits TaskParent
     End Sub
 End Class
 
+
+
+
+
+Public Class LineSeg_Core : Inherits TaskParent
+    Implements IDisposable
+    Public lpList As New List(Of lpData)
+    Dim lsd As cv.LineSegmentDetector
+    Public Sub New()
+        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
+        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
+        desc = "Cursor.ai: Use Line Segment Detector (LSD) to find lines in the image."
+        lsd = cv.LineSegmentDetector.Create()
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        If src.Channels <> 1 Then src = task.gray.Clone
+
+        Dim vecMat As New cv.Mat
+        lsd.Detect(src, vecMat)
+        Dim vecArray() As cv.Vec4f = Nothing
+        vecMat.GetArray(Of cv.Vec4f)(vecArray)
+        lpList = Line_Core.getRawSortedLines(vecArray)
+
+        dst1.SetTo(0)
+        dst3.SetTo(0)
+        dst2 = task.color.Clone
+        For i = 0 To lpList.Count - 1
+            Dim lp = lpList(i)
+            lp.index = i
+            dst1.Line(lp.p1, lp.p2, lp.index + 1, task.lineWidth, cv.LineTypes.Link4)
+            dst2.Line(lp.p1, lp.p2, lp.color, task.lineWidth + 1, task.lineType)
+        Next
+        dst3 = dst1.Threshold(0, 255, cv.ThresholdTypes.Binary)
+        labels(2) = CStr(lpList.Count) + " LSD line segments were detected."
+    End Sub
+    Protected Overrides Sub Finalize()
+        lsd.Dispose()
+    End Sub
+End Class
 
 
 
@@ -133,45 +172,6 @@ Public Class NR_LineSeg_Basics : Inherits TaskParent
     End Sub
 End Class
 
-
-
-
-
-Public Class LineSeg_Core : Inherits TaskParent
-    Implements IDisposable
-    Public lpList As New List(Of lpData)
-    Dim lsd As cv.LineSegmentDetector
-    Public Sub New()
-        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
-        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
-        desc = "Cursor.ai: Use Line Segment Detector (LSD) to find lines in the image."
-        lsd = cv.LineSegmentDetector.Create()
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        If src.Channels <> 1 Then src = task.gray.Clone
-
-        Dim vecMat As New cv.Mat
-        lsd.Detect(src, vecMat)
-        Dim vecArray() As cv.Vec4f = Nothing
-        vecMat.GetArray(Of cv.Vec4f)(vecArray)
-        lpList = Line_Core.getRawSortedLines(vecArray)
-
-        dst1.SetTo(0)
-        dst3.SetTo(0)
-        dst2 = task.color.Clone
-        For i = 0 To lpList.Count - 1
-            Dim lp = lpList(i)
-            lp.index = i
-            dst1.Line(lp.p1, lp.p2, lp.index + 1, task.lineWidth, cv.LineTypes.Link4)
-            dst2.Line(lp.p1, lp.p2, lp.color, task.lineWidth + 1, task.lineType)
-        Next
-        dst3 = dst1.Threshold(0, 255, cv.ThresholdTypes.Binary)
-        labels(2) = CStr(lpList.Count) + " LSD line segments were detected."
-    End Sub
-    Protected Overrides Sub Finalize()
-        lsd.Dispose()
-    End Sub
-End Class
 
 
 

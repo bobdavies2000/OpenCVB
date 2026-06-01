@@ -930,6 +930,74 @@ Namespace VBClasses
 
 
 
+    Public Class XO_Line_BasicsOld_TACore : Inherits TaskParent
+        Implements IDisposable
+        Public lpList As New List(Of lpData)
+        Public motionMask As cv.Mat = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 255)
+        Dim ld As cv.XImgProc.FastLineDetector
+        Public Sub New()
+            ld = cv.XImgProc.CvXImgProc.CreateFastLineDetector
+            dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
+            If standalone Then task.gOptions.showMotionMask.Checked = True
+            desc = "If line is NOT in motion mask, then keep it.  If line is in motion mask, add it."
+        End Sub
+        Private Function lpMotion(lp As lpData) As Boolean
+            ' return true if either line endpoint was in the motion mask.
+            If motionMask.Get(Of Byte)(lp.p1.Y, lp.p1.X) Then Return True
+            If motionMask.Get(Of Byte)(lp.p2.Y, lp.p2.X) Then Return True
+            Return False
+        End Function
+
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            If src.Channels <> 1 Or src.Type <> cv.MatType.CV_8U Then src = task.gray.Clone
+            If lpList.Count <= 1 Then
+                motionMask.SetTo(255)
+                Dim vecArray1 = ld.Detect(src)
+                lpList = Line_Core.getRawSortedLines(vecArray1)
+            End If
+
+            Dim sortlines As New SortedList(Of Single, lpData)(New compareAllowIdenticalSingleInverted)
+            Dim count As Integer
+            For Each lp In lpList
+                If lpMotion(lp) = False Then
+                    lp.age += 1
+                    sortlines.Add(lp.length, lp)
+                    count += 1
+                End If
+            Next
+
+            Dim vecArray = ld.Detect(src)
+            Dim lpListRaw = Line_Core.getRawSortedLines(vecArray)
+
+
+            For Each lp In lpListRaw
+                If lpMotion(lp) Then sortlines.Add(lp.length, lp)
+            Next
+
+            lpList.Clear()
+            For Each lp In sortlines.Values
+                lp.index = lpList.Count
+                lpList.Add(lp)
+            Next
+
+            dst1.SetTo(0)
+            dst2.SetTo(0)
+            For Each lp In lpList
+                dst1.Line(lp.p1, lp.p2, lp.index + 1, 1, cv.LineTypes.Link4)
+                dst2.Line(lp.p1, lp.p2, lp.color, task.lineWidth, task.lineType)
+            Next
+
+            If task.frameCount > 10 Then If task.lpD.rect.Width = 0 Then task.lpD = lpList(0)
+
+            labels(2) = CStr(lpList.Count) + " lines - " + CStr(lpList.Count - count) + " were new"
+        End Sub
+        Protected Overrides Sub Finalize()
+            ld.Dispose()
+        End Sub
+    End Class
+
+
+
 
 
 
@@ -5277,10 +5345,13 @@ Namespace VBClasses
 
 
     Public Class XO_TrackLine_BasicsOld_TASimple : Inherits TaskParent
+        Implements IDisposable
         Dim lp As New lpData
         Dim match As New Match_Basics
         Dim matchRect As cv.Rect
+        Dim ld As cv.XImgProc.FastLineDetector
         Public Sub New()
+            ld = cv.XImgProc.CvXImgProc.CreateFastLineDetector
             desc = "Track an individual line as best as possible."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -5306,9 +5377,12 @@ Namespace VBClasses
                 SetTrueText(Format(match.correlation, fmt3), match.newCenter)
             End If
 
-            Dim lpListRaw = Line_Core.getRawSortedLines(task.lines.basicsFLD.core.ld.Detect(src))
+            Dim lpListRaw = Line_Core.getRawSortedLines(ld.Detect(src))
             If lpListRaw.Count > 0 Then lp = lpListRaw(0)
             dst2(matchRect).Line(lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
+        End Sub
+        Protected Overrides Sub Finalize()
+            ld.Dispose()
         End Sub
     End Class
 
@@ -5317,11 +5391,14 @@ Namespace VBClasses
 
 
     Public Class XO_TrackLine_BasicsOld_TAOld : Inherits TaskParent
+        Implements IDisposable
         Public lpInput As lpData
         Public foundLine As Boolean
         Dim match As New XO_LineTrack_Correlation
         Dim options As New Options_Features
+        Dim ld As cv.XImgProc.FastLineDetector
         Public Sub New()
+            ld = cv.XImgProc.CvXImgProc.CreateFastLineDetector
             desc = "Track an individual line as best as possible."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -5357,7 +5434,7 @@ Namespace VBClasses
                 End If
             Else
                 dst3(subsetrect).SetTo(0)
-                Dim vecArray = task.lines.basicsFLD.core.ld.Detect(src(subsetrect))
+                Dim vecArray = ld.Detect(src(subsetrect))
                 Dim lpListRaw = Line_Core.getRawSortedLines(vecArray)
                 For Each lp In lplist
                     dst3.Line(lp.p1, lp.p2, 255, task.lineWidth, task.lineType)
@@ -5382,6 +5459,9 @@ Namespace VBClasses
             dst2 = src
             dst2.Line(lpInput.p1, lpInput.p2, task.highlight, task.lineWidth + 1, task.lineType)
             dst2.Rectangle(subsetrect, task.highlight, task.lineWidth)
+        End Sub
+        Protected Overrides Sub Finalize()
+            ld.Dispose()
         End Sub
     End Class
 
@@ -14701,7 +14781,7 @@ Namespace VBClasses
 
 
     Public Class XO_Line_LeftRightMotionMatch : Inherits TaskParent
-        Dim lrLines As New Line_LeftRightMotion
+        Dim lrLines As New NR_Line_LeftRightMotion
         Public lp As New lpData
         Public lpOutput As New lpData
         Public Sub New()
@@ -14740,7 +14820,7 @@ Namespace VBClasses
 
 
     Public Class XO_Line_LeftRightMotionMatch3 : Inherits TaskParent
-        Dim lrLines As New Line_LeftRightMotion
+        Dim lrLines As New NR_Line_LeftRightMotion
         Public lp As New lpData
         Public lpOutput As New List(Of lpData)
         Public Sub New()
@@ -14982,82 +15062,6 @@ Namespace VBClasses
             lpLast = New lpData(task.lines.lpList(0).ptE1, task.lines.lpList(0).ptE2)
         End Sub
     End Class
-
-
-
-
-
-    Public Class XO_Line_GCloud : Inherits TaskParent
-        Public sortedVerticals As New SortedList(Of Single, gravityLine)(New compareAllowIdenticalSingleInverted)
-        Public sortedHorizontals As New SortedList(Of Single, gravityLine)(New compareAllowIdenticalSingleInverted)
-        Public allLines As New SortedList(Of Single, gravityLine)(New compareAllowIdenticalSingleInverted)
-        Public options As New Options_LineFinder
-        Dim match As New XO_Match_tCell
-        Dim angleSlider As System.Windows.Forms.TrackBar
-        Public Sub New()
-            angleSlider = OptionParent.FindSlider("Angle tolerance in degrees")
-            labels(2) = "XO_Line_GCloud - Blue are vertical lines using the angle thresholds."
-            desc = "Find all the vertical lines using the point cloud rectified with the IMU vector for gravity."
-        End Sub
-        Public Function updateGLine(src As cv.Mat, gRect As gravityLine, p1 As cv.Point, p2 As cv.Point) As gravityLine
-            gRect.tc1.center = p1
-            gRect.tc2.center = p2
-            gRect.tc1 = match.createCell(src, gRect.tc1.correlation, p1)
-            gRect.tc2 = match.createCell(src, gRect.tc2.correlation, p2)
-            gRect.tc1.strOut = Format(gRect.tc1.correlation, fmt2) + vbCrLf + Format(gRect.tc1.depth, fmt2) + "m"
-            gRect.tc2.strOut = Format(gRect.tc2.correlation, fmt2) + vbCrLf + Format(gRect.tc2.depth, fmt2) + "m"
-
-            Dim mean = task.pointCloud(gRect.tc1.rect).Mean(task.depthmask(gRect.tc1.rect))
-            gRect.pt1 = New cv.Point3f(mean(0), mean(1), mean(2))
-            gRect.tc1.depth = gRect.pt1.Z
-            mean = task.pointCloud(gRect.tc2.rect).Mean(task.depthmask(gRect.tc2.rect))
-            gRect.pt2 = New cv.Point3f(mean(0), mean(1), mean(2))
-            gRect.tc2.depth = gRect.pt2.Z
-
-            gRect.len3D = Distance_Basics.distance3D(gRect.pt1, gRect.pt2)
-            If gRect.pt1 = New cv.Point3f Or gRect.pt2 = New cv.Point3f Then
-                gRect.len3D = 0
-            Else
-                gRect.arcX = Math.Asin((gRect.pt1.X - gRect.pt2.X) / gRect.len3D) * RadToDeg
-                gRect.arcY = Math.Abs(Math.Asin((gRect.pt1.Y - gRect.pt2.Y) / gRect.len3D) * RadToDeg)
-                If gRect.arcY > 90 Then gRect.arcY -= 90
-                gRect.arcZ = Math.Asin((gRect.pt1.Z - gRect.pt2.Z) / gRect.len3D) * RadToDeg
-            End If
-
-            Return gRect
-        End Function
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            options.Run()
-
-            Dim maxAngle = angleSlider.Value
-
-            dst2 = src.Clone
-            Dim vecArray = task.lines.basicsFLD.core.ld.Detect(task.gray)
-            Dim lplist = Line_Core.getRawSortedLines(vecArray)
-
-            sortedVerticals.Clear()
-            sortedHorizontals.Clear()
-            For Each lp In lplist
-                Dim gRect As New gravityLine
-                gRect = updateGLine(src, gRect, lp.p1, lp.p2)
-                allLines.Add(lp.p1.DistanceTo(lp.p2), gRect)
-                If Math.Abs(90 - gRect.arcY) < maxAngle And gRect.tc1.depth > 0 And gRect.tc2.depth > 0 Then
-                    sortedVerticals.Add(lp.p1.DistanceTo(lp.p2), gRect)
-                    dst2.Line(lp.p1, lp.p2, cv.Scalar.Blue, task.lineWidth, task.lineType)
-                End If
-                If Math.Abs(gRect.arcY) <= maxAngle And gRect.tc1.depth > 0 And gRect.tc2.depth > 0 Then
-                    sortedHorizontals.Add(lp.p1.DistanceTo(lp.p2), gRect)
-                    dst2.Line(lp.p1, lp.p2, cv.Scalar.Yellow, task.lineWidth, task.lineType)
-                End If
-            Next
-
-            labels(2) = Format(sortedHorizontals.Count, "00") + " Horizontal lines were identified and " +
-                        Format(sortedVerticals.Count, "00") + " Vertical lines were identified."
-        End Sub
-    End Class
-
-
-
 
 
 
@@ -16879,8 +16883,8 @@ Namespace VBClasses
 
 
     Public Class XO_Line_LeftRightMotion1 : Inherits TaskParent
-        Public linesLeft As New Line_BasicsOld
-        Public linesRight As New Line_BasicsOld
+        Public linesLeft As New NR_Line_BasicsOld
+        Public linesRight As New NR_Line_BasicsOld
         Dim motionLeft As New Motion_Basics_TA
         Dim motionRight As New Motion_Basics_TA
         Public Sub New()
@@ -16998,68 +17002,6 @@ Namespace VBClasses
 
 
 
-    Public Class XO_Line_BasicsOld_TACore : Inherits TaskParent
-        Public lpList As New List(Of lpData)
-        Public motionMask As cv.Mat = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 255)
-        Public Sub New()
-            dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
-            If standalone Then task.gOptions.showMotionMask.Checked = True
-            desc = "If line is NOT in motion mask, then keep it.  If line is in motion mask, add it."
-        End Sub
-        Private Function lpMotion(lp As lpData) As Boolean
-            ' return true if either line endpoint was in the motion mask.
-            If motionMask.Get(Of Byte)(lp.p1.Y, lp.p1.X) Then Return True
-            If motionMask.Get(Of Byte)(lp.p2.Y, lp.p2.X) Then Return True
-            Return False
-        End Function
-
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            If src.Channels <> 1 Or src.Type <> cv.MatType.CV_8U Then src = task.gray.Clone
-            If lpList.Count <= 1 Then
-                motionMask.SetTo(255)
-                Dim vecArray1 = task.lines.basicsFLD.core.ld.Detect(src)
-                lpList = Line_Core.getRawSortedLines(vecArray1)
-            End If
-
-            Dim sortlines As New SortedList(Of Single, lpData)(New compareAllowIdenticalSingleInverted)
-            Dim count As Integer
-            For Each lp In lpList
-                If lpMotion(lp) = False Then
-                    lp.age += 1
-                    sortlines.Add(lp.length, lp)
-                    count += 1
-                End If
-            Next
-
-            Dim vecArray = task.lines.basicsFLD.core.ld.Detect(src)
-            Dim lpListRaw = Line_Core.getRawSortedLines(vecArray)
-
-
-            For Each lp In lpListRaw
-                If lpMotion(lp) Then sortlines.Add(lp.length, lp)
-            Next
-
-            lpList.Clear()
-            For Each lp In sortlines.Values
-                lp.index = lpList.Count
-                lpList.Add(lp)
-            Next
-
-            dst1.SetTo(0)
-            dst2.SetTo(0)
-            For Each lp In lpList
-                dst1.Line(lp.p1, lp.p2, lp.index + 1, 1, cv.LineTypes.Link4)
-                dst2.Line(lp.p1, lp.p2, lp.color, task.lineWidth, task.lineType)
-            Next
-
-            If task.frameCount > 10 Then If task.lpD.rect.Width = 0 Then task.lpD = lpList(0)
-
-            labels(2) = CStr(lpList.Count) + " lines - " + CStr(lpList.Count - count) + " were new"
-        End Sub
-    End Class
-
-
-
 
 
 
@@ -17114,7 +17056,7 @@ Namespace VBClasses
 
 
     Public Class XO_Line_Map : Inherits TaskParent
-        Dim lines As New Line_BasicsOld
+        Dim lines As New NR_Line_BasicsOld
         Public lpList As New List(Of lpData)
         Dim options As New Options_LeftRightCorrelation
         Dim motionLeft As New Motion_Basics_TA
@@ -20337,6 +20279,83 @@ Namespace VBClasses
 
 
 
+    Public Class XO_Line_GCloud : Inherits TaskParent
+        Implements IDisposable
+        Public sortedVerticals As New SortedList(Of Single, gravityLine)(New compareAllowIdenticalSingleInverted)
+        Public sortedHorizontals As New SortedList(Of Single, gravityLine)(New compareAllowIdenticalSingleInverted)
+        Public allLines As New SortedList(Of Single, gravityLine)(New compareAllowIdenticalSingleInverted)
+        Public options As New Options_LineFinder
+        Dim match As New XO_Match_tCell
+        Dim angleSlider As System.Windows.Forms.TrackBar
+        Dim ld As cv.XImgProc.FastLineDetector
+        Public Sub New()
+            ld = cv.XImgProc.CvXImgProc.CreateFastLineDetector
+            angleSlider = OptionParent.FindSlider("Angle tolerance in degrees")
+            labels(2) = "XO_Line_GCloud - Blue are vertical lines using the angle thresholds."
+            desc = "Find all the vertical lines using the point cloud rectified with the IMU vector for gravity."
+        End Sub
+        Public Function updateGLine(src As cv.Mat, gRect As gravityLine, p1 As cv.Point, p2 As cv.Point) As gravityLine
+            gRect.tc1.center = p1
+            gRect.tc2.center = p2
+            gRect.tc1 = match.createCell(src, gRect.tc1.correlation, p1)
+            gRect.tc2 = match.createCell(src, gRect.tc2.correlation, p2)
+            gRect.tc1.strOut = Format(gRect.tc1.correlation, fmt2) + vbCrLf + Format(gRect.tc1.depth, fmt2) + "m"
+            gRect.tc2.strOut = Format(gRect.tc2.correlation, fmt2) + vbCrLf + Format(gRect.tc2.depth, fmt2) + "m"
+
+            Dim mean = task.pointCloud(gRect.tc1.rect).Mean(task.depthmask(gRect.tc1.rect))
+            gRect.pt1 = New cv.Point3f(mean(0), mean(1), mean(2))
+            gRect.tc1.depth = gRect.pt1.Z
+            mean = task.pointCloud(gRect.tc2.rect).Mean(task.depthmask(gRect.tc2.rect))
+            gRect.pt2 = New cv.Point3f(mean(0), mean(1), mean(2))
+            gRect.tc2.depth = gRect.pt2.Z
+
+            gRect.len3D = Distance_Basics.distance3D(gRect.pt1, gRect.pt2)
+            If gRect.pt1 = New cv.Point3f Or gRect.pt2 = New cv.Point3f Then
+                gRect.len3D = 0
+            Else
+                gRect.arcX = Math.Asin((gRect.pt1.X - gRect.pt2.X) / gRect.len3D) * RadToDeg
+                gRect.arcY = Math.Abs(Math.Asin((gRect.pt1.Y - gRect.pt2.Y) / gRect.len3D) * RadToDeg)
+                If gRect.arcY > 90 Then gRect.arcY -= 90
+                gRect.arcZ = Math.Asin((gRect.pt1.Z - gRect.pt2.Z) / gRect.len3D) * RadToDeg
+            End If
+
+            Return gRect
+        End Function
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            options.Run()
+
+            Dim maxAngle = angleSlider.Value
+
+            dst2 = src.Clone
+            Dim vecArray = ld.Detect(task.gray)
+            Dim lplist = Line_Core.getRawSortedLines(vecArray)
+
+            sortedVerticals.Clear()
+            sortedHorizontals.Clear()
+            For Each lp In lplist
+                Dim gRect As New gravityLine
+                gRect = updateGLine(src, gRect, lp.p1, lp.p2)
+                allLines.Add(lp.p1.DistanceTo(lp.p2), gRect)
+                If Math.Abs(90 - gRect.arcY) < maxAngle And gRect.tc1.depth > 0 And gRect.tc2.depth > 0 Then
+                    sortedVerticals.Add(lp.p1.DistanceTo(lp.p2), gRect)
+                    dst2.Line(lp.p1, lp.p2, cv.Scalar.Blue, task.lineWidth, task.lineType)
+                End If
+                If Math.Abs(gRect.arcY) <= maxAngle And gRect.tc1.depth > 0 And gRect.tc2.depth > 0 Then
+                    sortedHorizontals.Add(lp.p1.DistanceTo(lp.p2), gRect)
+                    dst2.Line(lp.p1, lp.p2, cv.Scalar.Yellow, task.lineWidth, task.lineType)
+                End If
+            Next
+
+            labels(2) = Format(sortedHorizontals.Count, "00") + " Horizontal lines were identified and " +
+                        Format(sortedVerticals.Count, "00") + " Vertical lines were identified."
+        End Sub
+        Protected Overrides Sub Finalize()
+            ld.Dispose()
+        End Sub
+    End Class
+
+
+
     Public Class XO_Line_BasicsOldNoMotion1 : Inherits TaskParent
         Implements IDisposable
         Public lpList As New List(Of lpData)
@@ -20492,7 +20511,7 @@ Namespace VBClasses
 
 
     Public Class XO_Line_MotionOld : Inherits TaskParent
-        Dim lrLines As New Line_LeftRightMotion
+        Dim lrLines As New NR_Line_LeftRightMotion
         Public Sub New()
             If standalone Then task.gOptions.showMotionMask.Checked = True
             desc = "Show lines with motion and lines with no motion in the leftView."

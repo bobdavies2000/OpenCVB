@@ -472,6 +472,7 @@ Public Module Structures
         Public color As cv.Scalar
         Public index As Integer
         Public length As Single
+
         Public p1 As cv.Point2f
         Public p2 As cv.Point2f
 

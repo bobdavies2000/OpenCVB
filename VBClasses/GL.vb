@@ -43,7 +43,7 @@ End Class
 
 
 Public Class GL_BasicsLineMap : Inherits TaskParent
-    Dim mapLine As New Line_MapRects
+    Dim mapLine As New NR_Line_MapRects
     Public Sub New()
         desc = "Display the pointcloud updated with the line information"
     End Sub

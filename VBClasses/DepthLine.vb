@@ -1,7 +1,7 @@
 Imports cv = OpenCvSharp
 Public Class DepthLine_Basics : Inherits TaskParent
     Public prepEdges As New RedPrep_Basics
-    Dim lines As New Line_RawFLD
+    Dim lines As New NR_Line_RawFLD
     Public lpList As New List(Of lpData)
     Public Sub New()
         desc = "Find lines in reduced the depth data."

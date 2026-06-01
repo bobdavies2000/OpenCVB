@@ -164,32 +164,6 @@ End Class
 
 
 
-Public Class StableGray_LeftRight : Inherits TaskParent
-    Dim stableLeft As New StableGray_Basics_TA
-    Dim stableRight As New StableGray_Basics_TA
-    Public Sub New()
-        labels = {"", "", "Stable gray left image", "Stable gray right image"}
-        desc = "Create the stable gray left and right images."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        If task.gOptions.stabilizeDepthRGB.Checked Then
-            stableLeft.Run(task.leftView)
-            dst2 = stableLeft.dst2
-            If task.heartBeat Then labels(2) = stableLeft.labels(2)
-
-            stableRight.Run(task.rightView)
-            dst3 = stableRight.dst2
-            If task.heartBeat Then labels(3) = stableRight.labels(2)
-        Else
-            dst2 = task.leftView
-            dst3 = task.rightView
-        End If
-    End Sub
-End Class
-
-
-
-
 Public Class StableGray_MinMaxCompare : Inherits TaskParent
     Dim minRGB As New StableGray_BasicsMin
     Dim maxRGB As New StableGray_BasicsMax
@@ -336,6 +310,55 @@ Public Class StableGray_ToggleMinMax : Inherits TaskParent
             maxRGB.Run(task.grayOriginal)
             dst2 = maxRGB.dst2
             labels(2) = "Max gray image - should be a little lighter."
+        End If
+    End Sub
+End Class
+
+
+
+
+
+Public Class StableGray_LeftRight : Inherits TaskParent
+    Dim stableLeft As New StableGray_Basics_TA
+    Dim stableRight As New StableGray_Basics_TA
+    Public Sub New()
+        labels = {"", "", "Stable gray left image", "Stable gray right image"}
+        desc = "Create the stable gray left and right images."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        If task.gOptions.stabilizeDepthRGB.Checked Then
+            stableLeft.Run(task.leftView)
+            dst2 = stableLeft.dst2
+            If task.heartBeat Then labels(2) = stableLeft.labels(2)
+
+            stableRight.Run(task.rightView)
+            dst3 = stableRight.dst2
+            If task.heartBeat Then labels(3) = stableRight.labels(2)
+        Else
+            dst2 = task.leftView
+            dst3 = task.rightView
+        End If
+    End Sub
+End Class
+
+
+
+
+
+Public Class StableGray_Right : Inherits TaskParent
+    Dim stableRight As New StableGray_Basics_TA
+    Public Sub New()
+        labels = {"", "", "Stable gray left image", "Stable gray right image"}
+        desc = "Create the stable gray right image."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        If task.gOptions.stabilizeDepthRGB.Checked Then
+            stableRight.Run(task.rightView)
+            dst3 = stableRight.dst2
+            If task.heartBeat Then labels(3) = stableRight.labels(2)
+        Else
+            dst2 = task.leftView
+            dst3 = task.rightView
         End If
     End Sub
 End Class

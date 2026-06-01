@@ -2,8 +2,6 @@ Imports cv = OpenCvSharp
 Public Class Line_Basics_TA : Inherits TaskParent
     Public lpList As New List(Of lpData)
     Public lpLast As New List(Of lpData)
-    Public basicsFLD As New Line_Basics
-    Public basicsLSD As New LineSeg_Basics
     Public Sub New()
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
         desc = "Run FLD (Fast Line Detector) with sobel input."
@@ -11,7 +9,7 @@ Public Class Line_Basics_TA : Inherits TaskParent
     Public Shared Function removeDuplicates(coreList As List(Of lpData)) As List(Of lpData)
         Dim lpList As New List(Of lpData)
 
-        Dim removeNearDuplicates As Boolean = False
+        Dim removeNearDuplicates As Boolean = True
         If removeNearDuplicates Then
             Dim edgeMap As New cv.Mat(task.workRes, cv.MatType.CV_8U, 0)
             For Each lp In coreList
@@ -26,10 +24,7 @@ Public Class Line_Basics_TA : Inherits TaskParent
                 lpList.Add(lp)
             Next
         Else
-            For Each lp In coreList
-                lp.index = lpList.Count + 1
-                lpList.Add(lp)
-            Next
+            Return coreList
         End If
         Return lpList
     End Function
@@ -86,10 +81,12 @@ Public Class Line_Basics_TA : Inherits TaskParent
         If task.optionsChanged Then lpLast.Clear()
 
         If task.fOptions.LineCombo.Text = "Fast Line Detection" Then
+            Static basicsFLD As New Line_Basics
             basicsFLD.Run(src)
             dst2 = basicsFLD.dst2
             labels = basicsFLD.labels
         Else
+            Static basicsLSD As New LineSeg_Basics
             basicsLSD.Run(src)
             dst2 = basicsLSD.dst2
             labels = basicsLSD.labels
@@ -121,15 +118,15 @@ Public Class Line_Basics : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If src.Channels <> 1 Or src.Type <> cv.MatType.CV_8U Then src = task.gray.Clone
-        dst2 = src
 
         core.Run(src)
+        dst2 = core.dst2
 
         Dim lastList = New List(Of lpData)(lpList)
         lpList = Line_Basics_TA.removeDuplicates(core.lpList)
         Dim averageAge = Line_Basics_TA.updateAgesAndLongest(lpList, lastList)
 
-        labels(2) = CStr(task.lines.lpList.Count) + " lines found.  Line age is also shown." +
+        labels(2) = "Fast Line Detector (FLD): " + CStr(task.lines.lpList.Count) + " lines found.  Line age is also shown." +
                     " Average age = " + If(task.lines.lpList.Count > 0, Format(averageAge, fmt1), "0")
 
         dst3 = task.lines.dst3
@@ -146,7 +143,7 @@ End Class
 
 
 
-Public Class Line_RawFLD : Inherits TaskParent
+Public Class NR_Line_RawFLD : Inherits TaskParent
     Public lpList As New List(Of lpData)
     Public core As New Line_Core
     Public Sub New()
@@ -227,7 +224,59 @@ End Class
 
 
 
-Public Class Line_BasicsOld : Inherits TaskParent
+Public Class NR_Line_TopBottomEdges : Inherits TaskParent
+    Public tops As New List(Of lpData)
+    Public bottoms As New List(Of lpData)
+    Public Sub New()
+        desc = "Find all the lines that intersect the top AND bottom of the image."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        dst2 = src.Clone
+
+        tops.Clear()
+        bottoms.Clear()
+        For Each lp In task.lines.lpList
+            If lp.ptE1.Y = 0 And lp.ptE2.Y = dst2.Height - 1 Then
+                dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth + 1)
+                tops.Add(lp)
+            ElseIf lp.ptE1.Y = dst2.Height - 1 And lp.ptE2.Y = 0 Then
+                dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth + 1)
+                bottoms.Add(lp)
+            End If
+        Next
+    End Sub
+End Class
+
+
+
+
+Public Class NR_Line_LeftRightEdges : Inherits TaskParent
+    Public lefts As New List(Of lpData)
+    Public rights As New List(Of lpData)
+    Public Sub New()
+        desc = "Find all the lines that intersect the top AND bottom of the image."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        dst2 = src.Clone
+
+        lefts.Clear()
+        rights.Clear()
+        For Each lp In task.lines.lpList
+            If lp.ptE1.X = 0 And lp.ptE2.X = dst2.Width - 1 Then
+                dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth + 1)
+                lefts.Add(lp)
+            ElseIf lp.ptE1.X = dst2.Width - 1 And lp.ptE2.X = 0 Then
+                dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth + 1)
+                rights.Add(lp)
+            End If
+        Next
+    End Sub
+End Class
+
+
+
+
+Public Class NR_Line_BasicsOld : Inherits TaskParent
     Implements IDisposable
     Public lpList As New List(Of lpData)
     Public ld As cv.XImgProc.FastLineDetector
@@ -341,7 +390,7 @@ End Class
 
 
 
-Public Class Line_WithAging : Inherits TaskParent
+Public Class NR_Line_WithAging : Inherits TaskParent
     Implements IDisposable
     Public lpList As New List(Of lpData)
     Public motionMask As cv.Mat = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 255)
@@ -619,8 +668,8 @@ End Class
 
 
 
-Public Class Line_DepthHistogram : Inherits TaskParent
-    Dim lineVert As New Line_Vertical
+Public Class NR_Line_DepthHistogram : Inherits TaskParent
+    Dim lineVert As New NR_Line_Vertical
     Dim plot As New PlotMouse_Basics
     Public Sub New()
         plot.plotHist.createHistogram = True
@@ -663,7 +712,7 @@ End Class
 
 
 
-Public Class Line_LeftRightMotion : Inherits TaskParent
+Public Class NR_Line_LeftRightMotion : Inherits TaskParent
     Public linesRight As New Line_Basics
     Public Sub New()
         labels = {"", "", "Left image lines", "Right image lines"}
@@ -684,8 +733,8 @@ End Class
 
 
 
-Public Class Line_Vertical : Inherits TaskParent
-    Dim lrLines As New Line_LeftRightMotion
+Public Class NR_Line_Vertical : Inherits TaskParent
+    Dim lrLines As New NR_Line_LeftRightMotion
     Public lpLeft As New List(Of lpData)
     Public lpRight As New List(Of lpData)
     Public Sub New()
@@ -731,7 +780,7 @@ End Class
 
 
 ''' <summary>Find all lines in the image, assign each an ID, and track them as the camera moves.</summary>
-Public Class Line_LeftTrack : Inherits TaskParent
+Public Class NR_Line_LeftTrack : Inherits TaskParent
     ''' <summary>Tracked lines: (trackId, lpData, color, missedCount).</summary>
     Dim tracked As New List(Of TrackedLine)
     Dim nextTrackId As Integer = 1
@@ -742,7 +791,7 @@ Public Class Line_LeftTrack : Inherits TaskParent
     Const lenRatioThresh As Single = 0.45F
 
     Public lpList As New List(Of lpData)
-    Dim lines As New Line_BasicsOld
+    Dim lines As New NR_Line_BasicsOld
     Dim options As New Options_LeftRightCorrelation
     Dim motionLeft As New Motion_Basics_TA
     Public Sub New()
@@ -840,7 +889,7 @@ End Class
 
 
 
-Public Class Line_Tracker : Inherits TaskParent
+Public Class NR_Line_Tracker : Inherits TaskParent
     Dim options As New Options_LeftRightCorrelation
     Dim lpList As New List(Of lpData)
     Public Sub New()
@@ -869,7 +918,7 @@ End Class
 
 
 
-Public Class Line_BrickList : Inherits TaskParent
+Public Class NR_Line_BrickList : Inherits TaskParent
     Public lp As lpData ' set this input
     Public lpOutput As lpData ' this is the result lp
     Public sobel As New Edge_Sobel
@@ -955,8 +1004,8 @@ End Class
 
 
 
-Public Class Line_BrickListTest : Inherits TaskParent
-    Dim brickLines As New Line_BrickList
+Public Class NR_Line_BrickListTest : Inherits TaskParent
+    Dim brickLines As New NR_Line_BrickList
     Public Sub New()
         desc = "Find the brick list for each line in the lines.lplist"
     End Sub
@@ -973,7 +1022,7 @@ End Class
 
 
 
-Public Class Line_MapRects : Inherits TaskParent
+Public Class NR_Line_MapRects : Inherits TaskParent
     Public lpList As New List(Of lpData) ' the list of non-overlapping lines.
     Public pointCloud As New cv.Mat
     Dim depthToWorld As New Cloud_DepthToWorld
@@ -1060,7 +1109,7 @@ End Class
 
 
 
-Public Class Line_Map : Inherits TaskParent
+Public Class NR_Line_Map : Inherits TaskParent
     Public Sub New()
         If standalone Then task.gOptions.displayDst1.Checked = True
         labels(1) = "Move mouse over any image to see line."
@@ -1104,8 +1153,8 @@ End Class
 
 
 
-Public Class Line_BasicsOldNoMotion : Inherits TaskParent
-    Dim lines As New Line_BasicsOld
+Public Class NR_Line_BasicsOldNoMotion : Inherits TaskParent
+    Dim lines As New NR_Line_BasicsOld
     Public Sub New()
         desc = "Ignore motion when finding the lines."
     End Sub
@@ -1123,7 +1172,7 @@ End Class
 
 
 
-Public Class Line_TranslatedRightView : Inherits TaskParent
+Public Class NR_Line_TranslatedRightView : Inherits TaskParent
     Dim lines As New Line_Basics
     Public lpListRight As New List(Of lpData)
     Public Sub New()
@@ -1175,7 +1224,7 @@ End Class
 
 
 
-Public Class Line_EdgeLineCompare : Inherits TaskParent
+Public Class NR_Line_EdgeLineCompare : Inherits TaskParent
     Dim edgeLine As New EdgeLine_BasicsOld
     Public Sub New()
         dst3 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
@@ -1195,7 +1244,7 @@ End Class
 
 
 
-Public Class Line_Longest : Inherits TaskParent
+Public Class NR_Line_Longest : Inherits TaskParent
     Public Sub New()
         desc = "Compare the longest lines of the current and previous image."
     End Sub
@@ -1225,7 +1274,7 @@ End Class
 
 
 
-Public Class Line_EdgeLine : Inherits TaskParent
+Public Class NR_Line_EdgeLine : Inherits TaskParent
     Dim edgeLine As New EdgeLine_BasicsOld
     Dim lines As New Line_Basics
     Public Sub New()
@@ -1255,7 +1304,7 @@ End Class
 
 
 
-Public Class Line_FindSimple : Inherits TaskParent
+Public Class NR_Line_FindSimple : Inherits TaskParent
     Dim edges As New Edge_Basics
     Dim side As Integer
     Dim pixels(side * side) As cv.Point
@@ -1311,7 +1360,7 @@ End Class
 
 
 
-Public Class Line_RedFlood : Inherits TaskParent
+Public Class NR_Line_RedFlood : Inherits TaskParent
     Dim edges As New Edge_Basics
     Dim flood As New Flood_BasicsMask
     Public Sub New()
@@ -1335,33 +1384,7 @@ End Class
 
 
 
-'Public Class Line_BasicsOld : Inherits TaskParent
-'    Dim lpList As New List(Of lpData)
-'    Public Sub New()
-'        labels(2) = "The top 10 lines in the latest image."
-'        desc = "Find the top 10 lines and track them until they are lost then run Line_Basics again."
-'    End Sub
-'    Public Overrides Sub RunAlg(src As cv.Mat)
-'        dst2 = src
-
-'        If lpList.Count < 2 Then
-'            For i = 0 To Math.Min(10, task.lines.lpList.Count) - 1
-'                lpList.Add(task.lines.lpList(i))
-'            Next
-'        End If
-
-'        For Each lp In lpList
-'            dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth + 2)
-'        Next
-'    End Sub
-'End Class
-
-
-
-
-
-
-Public Class Line_Brick : Inherits TaskParent
+Public Class NR_Line_Brick : Inherits TaskParent
     Dim lpList As New List(Of lpData)
     Public Sub New()
         desc = "Find the bricks that clearly have lines"
@@ -1452,7 +1475,7 @@ End Class
 
 
 
-Public Class Line_TrackV : Inherits TaskParent
+Public Class NR_Line_TrackV : Inherits TaskParent
     Public lastV As New List(Of lpData)
     Public matchList As New List(Of lpData)
     Dim knn As New KNN_Minimal
@@ -1545,7 +1568,7 @@ End Class
 
 
 
-Public Class Line_BasicsOldEmboss : Inherits TaskParent
+Public Class NR_Line_BasicsOldEmboss : Inherits TaskParent
     Implements IDisposable
     Public lpList As New List(Of lpData)
     Dim ld As cv.XImgProc.FastLineDetector
@@ -1581,7 +1604,7 @@ End Class
 
 
 
-Public Class Line_Sobel : Inherits TaskParent
+Public Class NR_Line_Sobel : Inherits TaskParent
     Dim edges As New Edge_Sobel
     Dim lines As New Line_Basics
     Public Sub New()
@@ -1603,7 +1626,7 @@ End Class
 
 
 
-Public Class Line_LongestTest : Inherits TaskParent
+Public Class NR_Line_LongestTest : Inherits TaskParent
     Dim lpLast As New lpData
     Public Sub New()
         If standalone Then task.gOptions.displayDst1.Checked = True
@@ -1753,7 +1776,7 @@ End Class
 
 
 
-Public Class Line_FinderPlus : Inherits TaskParent
+Public Class NR_Line_FinderPlus : Inherits TaskParent
     Dim find As New Line_Finder
     Dim lines As New Line_Basics
     Public Sub New()
@@ -1907,6 +1930,58 @@ End Class
 
 
 
+
+
+
+Public Class Line_LeftRightMatch : Inherits TaskParent
+    Dim lineLR As New Line_LeftRight
+    Public Sub New()
+        desc = "Match lines in the left and right images."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        lineLR.Run(emptyMat)
+
+        Dim leftLines = lineLR.linesLeft.lpList
+        Dim rightLines = lineLR.linesRight.lpList
+
+        Dim averageAge = Line_Basics_TA.updateAgesAndLongest(leftLines, rightLines)
+
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Line_RightOnly : Inherits TaskParent
+    Public linesRight As New Line_Core
+    Dim stableR As New StableGray_Right
+    Public lpList As New List(Of lpData)
+    Public Sub New()
+        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        desc = "Find the lines in the right image."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        stableR.Run(emptyMat)
+
+        Dim lastList = New List(Of lpData)(linesRight.lpList)
+        linesRight.Run(stableR.dst3)
+        lpList = Line_Basics_TA.removeDuplicates(linesRight.lpList)
+        Dim averageAge = Line_Basics_TA.updateAgesAndLongest(linesRight.lpList, lastList)
+
+        dst2.SetTo(0)
+        For Each lp In linesRight.lpList
+            dst2.Line(lp.p1, lp.p2, 255, task.lineWidth, task.lineType)
+            SetTrueText(CStr(lp.age), New cv.Point(lp.ptCenter.X + 2, lp.ptCenter.Y + 2), 2)
+        Next
+        labels(2) = CStr(lpList.Count) + " lines in the right image with average age = " + Format(averageAge, fmt1)
+    End Sub
+End Class
+
+
+
+
 Public Class Line_LeftRight : Inherits TaskParent
     Public linesLeft As New Line_Core
     Public linesRight As New Line_Core
@@ -1914,31 +1989,77 @@ Public Class Line_LeftRight : Inherits TaskParent
     Public Sub New()
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         dst3 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-        desc = "Find the lines in the left and right images."
+        desc = "Find the lines in the left and right images - use StableGray_LeftRight for left/right images."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        stableLR.Run(emptyMat)
+        If task.Settings.cameraName.StartsWith("StereoLabs") Then
+            Static lrZED As New Line_LeftRightZED
+            lrZED.Run(emptyMat)
+            dst2 = lrZED.dst2
+            dst3 = lrZED.dst3
+            labels = lrZED.labels
 
-        Dim lastList = New List(Of lpData)(linesLeft.lpList)
-        linesLeft.Run(stableLR.dst2)
-        Dim averageAgeLeft = Line_Basics_TA.updateAgesAndLongest(linesLeft.lpList, lastList)
+            For Each lp In task.lines.lpList
+                SetTrueText(CStr(lp.age), New cv.Point(lp.ptCenter.X + 2, lp.ptCenter.Y + 2), 2)
+            Next
 
+            For Each lp In lrZED.rightOnly.lpList
+                SetTrueText(CStr(lp.age), New cv.Point(lp.ptCenter.X + 2, lp.ptCenter.Y + 2), 3)
+            Next
+        Else
+            stableLR.Run(emptyMat)
+
+            Dim lastList = New List(Of lpData)(linesLeft.lpList)
+            linesLeft.Run(stableLR.dst2)
+            linesLeft.lpList = Line_Basics_TA.removeDuplicates(linesLeft.lpList)
+            Dim averageAgeLeft = Line_Basics_TA.updateAgesAndLongest(linesLeft.lpList, lastList)
+
+            dst2.SetTo(0)
+            For Each lp In linesLeft.lpList
+                dst2.Line(lp.p1, lp.p2, 255, task.lineWidth, task.lineType)
+                SetTrueText(CStr(lp.age), New cv.Point(lp.ptCenter.X + 2, lp.ptCenter.Y + 2), 2)
+            Next
+            labels(2) = CStr(linesLeft.lpList.Count) + " lines in the left image.  Highlighted line is the current longest line."
+
+            lastList = New List(Of lpData)(linesRight.lpList)
+            linesRight.Run(stableLR.dst3)
+            linesRight.lpList = Line_Basics_TA.removeDuplicates(linesRight.lpList)
+            Dim averageAgeRight = Line_Basics_TA.updateAgesAndLongest(linesRight.lpList, lastList)
+
+            dst3.SetTo(0)
+            For Each lp In linesRight.lpList
+                dst3.Line(lp.p1, lp.p2, 255, task.lineWidth, task.lineType)
+                SetTrueText(CStr(lp.age), New cv.Point(lp.ptCenter.X + 2, lp.ptCenter.Y + 2), 3)
+            Next
+            labels(3) = CStr(linesRight.lpList.Count) + " lines in the right image."
+        End If
+    End Sub
+End Class
+
+
+
+Public Class Line_LeftRightZED : Inherits TaskParent
+    Public rightOnly As New Line_RightOnly
+    Public Sub New()
+        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        dst3 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        desc = "Find the lines in the left and right images.  Left image is already found for StereoLabs..."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
         dst2.SetTo(0)
-        For Each lp In linesLeft.lpList
+        For Each lp In task.lines.lpList
             dst2.Line(lp.p1, lp.p2, 255, task.lineWidth, task.lineType)
             SetTrueText(CStr(lp.age), New cv.Point(lp.ptCenter.X + 2, lp.ptCenter.Y + 2), 2)
         Next
-        labels(2) = CStr(linesLeft.lpList.Count) + " lines in the left image.  Highlighted line is the current longest line."
+        labels(2) = CStr(task.lines.lpList.Count) + " lines in the left image."
 
-        lastList = New List(Of lpData)(linesRight.lpList)
-        linesRight.Run(stableLR.dst3)
-        Dim averageAgeRight = Line_Basics_TA.updateAgesAndLongest(linesRight.lpList, lastList)
+        rightOnly.Run(emptyMat)
+        labels(3) = rightOnly.labels(2)
 
         dst3.SetTo(0)
-        For Each lp In linesRight.lpList
+        For Each lp In rightOnly.lpList
             dst3.Line(lp.p1, lp.p2, 255, task.lineWidth, task.lineType)
             SetTrueText(CStr(lp.age), New cv.Point(lp.ptCenter.X + 2, lp.ptCenter.Y + 2), 3)
         Next
-        labels(3) = CStr(linesRight.lpList.Count) + " lines in the right image."
     End Sub
 End Class
