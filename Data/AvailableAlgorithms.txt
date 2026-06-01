@@ -256,7 +256,6 @@ FeatureLess_ClusterFlood
 FeatureLess_Correlation
 FeatureLess_FeatureLines
 FeatureLess_Features
-FeatureLess_FeaturesOld
 FeatureLess_IndexKNN
 FeatureLess_LeftRight
 FeatureLess_Lines
@@ -943,6 +942,7 @@ NR_FeatureLess_Contours
 NR_FeatureLess_Correlation
 NR_FeatureLess_Correlations
 NR_FeatureLess_DCT
+NR_FeatureLess_FeaturesOld
 NR_FeatureLess_Histogram
 NR_FeatureLess_History
 NR_FeatureLess_Sobel
@@ -1646,7 +1646,6 @@ RedPrep_XY_Add
 Reduction_Basics
 Reduction_BasicsParmInput
 Reduction_PointCloud
-RedUtil_Basics
 RedWGrid_Basics
 RedWGrid_Basics2
 RedWGrid_Click
@@ -1739,6 +1738,7 @@ Track_BasicsQT
 Triangle_Basics
 Triangle_Find
 Triangle_HullContour
+Utility_Basics
 Video_Basics
 Video_MinRect
 Vignetting_Basics

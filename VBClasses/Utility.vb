@@ -10,10 +10,64 @@ Public Enum causes
     colorSync
     wGridNotInLastList
 End Enum
-Public Class RedUtil_Basics : Inherits TaskParent
-    Dim redC As New RedCloud_Basics
+Public Class Utility_Basics : Inherits TaskParent
     Public Sub New()
-        desc = "Provide a home for some shared utility functions for the RedCloud algorithms."
+        desc = "Provide a home for some shared utility functions."
+    End Sub
+    Public Shared Function getFontsize() As Single
+        Dim fontSize As Single
+        Select Case task.workRes.Width
+            Case 1920
+                fontSize = 3.5
+            Case 1280
+                fontSize = 2.5
+            Case 960
+                fontSize = 1.5
+            Case 672
+                fontSize = 1.5
+            Case 640
+                fontSize = 1.5
+            Case 480
+                fontSize = 1.2
+            Case 240
+                fontSize = 1.2
+            Case 336
+                fontSize = 1.0
+            Case 320
+                fontSize = 1.0
+            Case 168
+                fontSize = 0.5
+            Case 160
+                fontSize = 1.0
+        End Select
+        Return fontSize
+    End Function
+    Public Shared Function getThickness() As Integer
+        Dim fontThickness As Integer = 1
+        Select Case task.workRes.Width
+            Case 1920
+                fontThickness = 4
+            Case 1280
+                fontThickness = 2
+        End Select
+        Return fontThickness
+    End Function
+    Public Shared Sub AddPlotScale(dst As cv.Mat, minVal As Double, maxVal As Double, Optional lineCount As Integer = 3)
+        Dim fontSize = getFontsize()
+        Dim fontThickness = getThickness()
+
+        Dim spacer = dst.Height / (lineCount + 1)
+        Dim spaceVal = (maxVal - minVal) / (lineCount + 1)
+        If lineCount > 1 Then If spaceVal < 1 Then spaceVal = 1
+        For i = 0 To lineCount
+            Dim p1 = New cv.Point(0, spacer * i)
+            Dim p2 = New cv.Point(dst.Width, spacer * i)
+            dst.Line(p1, p2, white, fontThickness)
+            Dim nextVal = (maxVal - spaceVal * i)
+            Dim nextText = If(maxVal > 1000, Format(nextVal / 1000, "###,##0.0") + "k", Format(nextVal, fmt1))
+            Dim p3 = New cv.Point(0, p1.Y + 12)
+            cv.Cv2.PutText(dst, nextText, p3, cv.HersheyFonts.HersheyPlain, fontSize, white, fontThickness, task.lineType)
+        Next
     End Sub
     Public Shared Function findCause(rcMap As cv.Mat, rcList As List(Of rcData)) As String
         Dim clickIndex = rcMap.Get(Of Integer)(task.clickPoint.Y, task.clickPoint.X)
@@ -166,11 +220,8 @@ Public Class RedUtil_Basics : Inherits TaskParent
         End If
         Return outStr
     End Function
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        redC.Run(src)
-        dst2 = redC.dst2
-        labels(2) = redC.labels(2)
 
-        SetTrueText(redC.strOut, 3)
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        SetTrueText("Utility_Basics is to make some small 'Shared' utilities available.)", 3)
     End Sub
 End Class

@@ -26,7 +26,7 @@ Public Class RedColor_Basics : Inherits TaskParent
         rcList = New List(Of rcData)(redFlood.rcList)
 
         If runSelectCell Then
-            strOut = RedUtil_Basics.selectCell(rcMap, rcList)
+            strOut = Utility_Basics.selectCell(rcMap, rcList)
             SetTrueText(strOut, 3)
         End If
 
@@ -58,7 +58,7 @@ Public Class NR_RedColor_Basics : Inherits TaskParent
         rcList = New List(Of rcData)(redFlood.rcList)
 
         If runSelectCell Then
-            strOut = RedUtil_Basics.selectCell(rcMap, rcList)
+            strOut = Utility_Basics.selectCell(rcMap, rcList)
             SetTrueText(strOut, 3)
         End If
 
@@ -156,7 +156,7 @@ Public Class NR_RedColor_CPP : Inherits TaskParent
         Next
 
         If standaloneTest() Then
-            strOut = RedUtil_Basics.selectCell(rcMap, rcList)
+            strOut = Utility_Basics.selectCell(rcMap, rcList)
             SetTrueText(strOut, 3)
         End If
 
@@ -322,7 +322,7 @@ Public Class RedColor_GridRects : Inherits TaskParent
             dst3(r).SetTo(rc.color)
             rcGridMap(r).SetTo(rc.index)
         Next
-        strOut = RedUtil_Basics.selectCell(redC.rcMap, redC.rcList)
+        strOut = Utility_Basics.selectCell(redC.rcMap, redC.rcList)
     End Sub
 End Class
 
@@ -657,7 +657,7 @@ Public Class RedColor_DelaunayMap : Inherits TaskParent
         dMap.rcList = New List(Of rcData)(redC.rcList)
         dMap.Run(emptyMat)
 
-        strOut = RedUtil_Basics.DelaunaySelect(dMap.rcMap, dMap.rcList)
+        strOut = Utility_Basics.DelaunaySelect(dMap.rcMap, dMap.rcList)
         SetTrueText(strOut, 3)
     End Sub
 End Class

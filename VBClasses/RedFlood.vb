@@ -53,7 +53,7 @@ Public Class RedFlood_Basics : Inherits TaskParent
             dst3(rc.rect).SetTo(rc.color, rc.mask)
         Next
 
-        strOut = RedUtil_Basics.selectCell(redMask.dst2, redMask.rcList)
+        strOut = Utility_Basics.selectCell(redMask.dst2, redMask.rcList)
         SetTrueText(strOut, 1)
         If task.rcD IsNot Nothing Then task.clickPoint = task.rcD.maxDist
 
@@ -218,7 +218,7 @@ Public Class RedFlood_Color : Inherits TaskParent
         labels(3) = CStr(rclist.Count) + " loosely defined cells found"
 
         dst2.ConvertTo(rcMap, cv.MatType.CV_32S)
-        strOut = RedUtil_Basics.selectCell(rcMap, rclist)
+        strOut = Utility_Basics.selectCell(rcMap, rclist)
         SetTrueText(strOut, 1)
     End Sub
 End Class
@@ -501,7 +501,7 @@ Public Class RedFlood_List : Inherits TaskParent
             rcMap(rc.rect).SetTo(rc.index, rc.mask)
         Next
 
-        strOut = RedUtil_Basics.selectCell(rcMap, rclist)
+        strOut = Utility_Basics.selectCell(rcMap, rclist)
         SetTrueText(strOut, 1)
     End Sub
 End Class
@@ -647,7 +647,7 @@ Public Class NR_RedFlood_KNN : Inherits TaskParent
             rcList.Add(rc)
         Next
 
-        strOut = RedUtil_Basics.selectCell(rcMap, rcList)
+        strOut = Utility_Basics.selectCell(rcMap, rcList)
         SetTrueText(strOut, 1)
         If task.rcD IsNot Nothing Then task.clickPoint = task.rcD.maxDist
 
@@ -793,7 +793,7 @@ Public Class RedFlood_Delaunay : Inherits TaskParent
         'For Each rc In redMask.rcList
         '    DrawTour(dst3(rc.rect), rc.contour, task.highlight, task.lineWidth)
         'Next
-        strOut = RedUtil_Basics.DelaunaySelect(rcMap, redMask.rcList)
+        strOut = Utility_Basics.DelaunaySelect(rcMap, redMask.rcList)
         SetTrueText(strOut, 1)
     End Sub
 End Class

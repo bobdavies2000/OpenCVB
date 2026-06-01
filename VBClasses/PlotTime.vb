@@ -82,7 +82,7 @@ Public Class PlotTime_Basics : Inherits TaskParent
         If standaloneTest() Then labels(2) = "RGB Means: blue = " + Format(plotData(0), fmt1) + " green = " + Format(plotData(1), fmt1) + " red = " + Format(plotData(2), fmt1)
         Dim lineCount = CInt(maxScale - minScale - 1)
         If lineCount > 3 Or lineCount < 0 Then lineCount = 3
-        PlotOpenCV_Basics.AddPlotScale(dst2, minScale, maxScale, lineCount)
+        Utility_Basics.AddPlotScale(dst2, minScale, maxScale, lineCount)
     End Sub
 End Class
 
@@ -140,7 +140,7 @@ Public Class PlotTime_Single : Inherits TaskParent
 
         Dim p1 = New cv.Point(0, dst2.Height / 2)
         Dim p2 = New cv.Point(dst2.Width, dst2.Height / 2)
-        dst2.Line(p1, p2, white, task.cvFontThickness)
+        dst2.Line(p1, p2, white, Utility_Basics.getThickness)
         If standaloneTest() Then SetTrueText("standaloneTest() test is with the blue channel mean of the color image.", 3)
     End Sub
 End Class
@@ -268,6 +268,6 @@ Public Class PlotTime_FixedScale : Inherits TaskParent
         SetTrueText(strOut, 3)
         Dim lineCount = CInt(maxScale - minScale - 1)
         If lineCount > 3 Or lineCount < 0 Then lineCount = 3
-        If showScale Then PlotOpenCV_Basics.AddPlotScale(dst2, minScale, maxScale, lineCount)
+        If showScale Then Utility_Basics.AddPlotScale(dst2, minScale, maxScale, lineCount)
     End Sub
 End Class

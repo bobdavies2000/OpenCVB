@@ -643,7 +643,7 @@ End Class
 
 
 
-Public Class FeatureLess_FeaturesOld : Inherits TaskParent
+Public Class NR_FeatureLess_FeaturesOld : Inherits TaskParent
     Dim feat As New Feature_Basics
     Dim fLess As New FeatureLess_Basics
     Public Sub New()
@@ -804,7 +804,7 @@ Public Class FeatureLess_ToList : Inherits TaskParent
 
         dst3 = Palettize(rcMap, 0)
 
-        strOut = RedUtil_Basics.selectCell(rcMap, rcList)
+        strOut = Utility_Basics.selectCell(rcMap, rcList)
         SetTrueText(strOut, 1)
     End Sub
 End Class
@@ -1142,7 +1142,7 @@ Public Class FeatureLess_IndexKNN : Inherits TaskParent
             If task.heartBeat Then rc.color = task.scalarColors(rc.index + 1)
         Next
 
-        strOut = RedUtil_Basics.selectCell(dst2, feat.rcList)
+        strOut = Utility_Basics.selectCell(dst2, feat.rcList)
         SetTrueText(strOut, 1)
 
         labels(2) = CStr(knn.trainMat.Rows) + " featureless clusters were found."

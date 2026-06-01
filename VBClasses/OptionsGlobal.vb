@@ -27,7 +27,6 @@ Public Class OptionsGlobal
         ShowAllOptions.Checked = task.Settings.ShowAllOptions
 
         task.DotSize = 1
-        task.cvFontThickness = 1
         task.gridWH = 8
         task.smallBrick = 8
         task.DotSize = 1
@@ -35,53 +34,40 @@ Public Class OptionsGlobal
         task.smallRes = New cv.Size(320, 240)
         Select Case task.workRes.Width
             Case 1920
-                task.cvFontSize = 3.5
-                task.cvFontThickness = 4
                 task.DotSize = 5
                 task.lineWidth = 5
                 task.gridWH = 48
                 task.smallRes = New cv.Size(240, 135)
             Case 1280
-                task.cvFontSize = 2.5
-                task.cvFontThickness = 2
                 task.DotSize = 5
                 task.lineWidth = 4
                 task.gridWH = 36
             Case 960
-                task.cvFontSize = 1.5
                 task.DotSize = 2
                 task.lineWidth = 2
                 task.gridWH = 24
                 task.smallRes = New cv.Size(336, 188)
             Case 672
-                task.cvFontSize = 1.5
                 task.DotSize = 2
                 task.lineWidth = 2
                 task.gridWH = 16
                 task.smallRes = New cv.Size(336, 188)
             Case 640
-                task.cvFontSize = 1.5
                 task.lineWidth = 2
                 task.DotSize = 2
                 task.gridWH = 16
             Case 480
-                task.cvFontSize = 1.2
                 task.smallRes = New cv.Size(480, 270)
                 task.gridWH = 12
             Case 240
-                task.cvFontSize = 1.2
                 task.smallRes = New cv.Size(240, 150)
             Case 336
-                task.cvFontSize = 1.0
                 task.smallRes = New cv.Size(336, 188)
             Case 320
-                task.cvFontSize = 1.0
             Case 168
-                task.cvFontSize = 0.5
                 task.smallRes = New cv.Size(168, 94)
                 task.gridWH = 5
             Case 160
-                task.cvFontSize = 1.0
                 task.smallRes = New cv.Size(160, 120)
                 task.gridWH = 5
         End Select

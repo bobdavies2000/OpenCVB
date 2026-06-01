@@ -11342,7 +11342,7 @@ Namespace VBClasses
                 Next
             Next
 
-            strOut = RedUtil_Basics.selectCell(rcMap, rcList)
+            strOut = Utility_Basics.selectCell(rcMap, rcList)
             SetTrueText(strOut, 3)
 
             labels(2) = "Cells found = " + CStr(rcList.Count) + " and " + CStr(newList.Count) + " were color only cells."
@@ -12372,7 +12372,7 @@ Namespace VBClasses
                 rcList.Add(rc)
             Next
 
-            strOut = RedUtil_Basics.selectCell(redC.rcMap, redC.rcList)
+            strOut = Utility_Basics.selectCell(redC.rcMap, redC.rcList)
             If task.rcD IsNot Nothing Then strOut += vbCrLf + vbCrLf +
                                                Format(percentImage, "0.0%") + " of image" + vbCrLf +
                                                CStr(rcList.Count) + " cells present"
@@ -12476,7 +12476,7 @@ Namespace VBClasses
                 labels(2) = CStr(rcList.Count) + " regions were identified "
             End If
 
-            strOut = RedUtil_Basics.selectCell(rcMap, rcList)
+            strOut = Utility_Basics.selectCell(rcMap, rcList)
             If task.rcD IsNot Nothing And task.rcD.pixels > 0 Then
                 strOut += vbCrLf + vbCrLf + Format(percentImage, "0.0%") + " of image" + vbCrLf +
                               CStr(rcList.Count) + " cells present"
@@ -13721,7 +13721,7 @@ Namespace VBClasses
                     SetTrueText(CStr(rc.age), rc.maxDist)
                 Next
 
-                strOut = RedUtil_Basics.selectCell(redC.rcMap, redC.rcList)
+                strOut = Utility_Basics.selectCell(redC.rcMap, redC.rcList)
                 SetTrueText(strOut, 3)
             End If
 
@@ -13827,7 +13827,7 @@ Namespace VBClasses
             rcListLast = New List(Of rcData)(rcList)
             rcMapLast = rcMap.Clone
 
-            strOut = RedUtil_Basics.selectCell(rcMap, rcList)
+            strOut = Utility_Basics.selectCell(rcMap, rcList)
             SetTrueText(strOut, 1)
         End Sub
     End Class
@@ -13901,7 +13901,7 @@ Namespace VBClasses
                 Next
                 labels(3) = "There were " + CStr(rcLost.Count) + " cells temporarily lost."
 
-                strOut = RedUtil_Basics.selectCell(rcMap, rcList)
+                strOut = Utility_Basics.selectCell(rcMap, rcList)
                 SetTrueText(strOut, 3)
             End If
         End Sub
@@ -13936,7 +13936,7 @@ Namespace VBClasses
             dst2 = redC.dst2
 
             If standaloneTest() Then
-                strOut = RedUtil_Basics.selectCell(redC.rcMap, redC.rcList)
+                strOut = Utility_Basics.selectCell(redC.rcMap, redC.rcList)
                 SetTrueText(strOut, 3)
             End If
         End Sub
@@ -13992,7 +13992,7 @@ Namespace VBClasses
                     dst2.Circle(rc.maxDist, task.DotSize, task.highlight, -1)
                 Next
 
-                strOut = RedUtil_Basics.selectCell(rcMap, rcList)
+                strOut = Utility_Basics.selectCell(rcMap, rcList)
                 SetTrueText(strOut, 3)
             End If
 
@@ -14076,7 +14076,7 @@ Namespace VBClasses
                 rc.mask = rc.mask Or colorMask
             Next
 
-            strOut = RedUtil_Basics.selectCell(histID.redCC.redC.rcMap, histID.redCC.redC.rcList)
+            strOut = Utility_Basics.selectCell(histID.redCC.redC.rcMap, histID.redCC.redC.rcList)
             If task.rcD IsNot Nothing And task.rcD.pixels > 0 Then
                 dst3.SetTo(0)
                 dst3(task.rcD.rect).SetTo(white, task.rcD.mask)
@@ -16732,7 +16732,7 @@ Namespace VBClasses
                 redC.rcMap(rc.rect).SetTo(rc.index, rc.mask)
             Next
 
-            strOut = RedUtil_Basics.selectCell(redC.rcMap, redC.rcList)
+            strOut = Utility_Basics.selectCell(redC.rcMap, redC.rcList)
             SetTrueText(strOut, 3)
         End Sub
     End Class
@@ -18649,11 +18649,11 @@ Namespace VBClasses
             dst2 = redC.dst2
             labels(2) = redC.labels(2)
 
-            strOut = RedUtil_Basics.selectCell(redC.rcMap, redC.rcList)
+            strOut = Utility_Basics.selectCell(redC.rcMap, redC.rcList)
             If task.rcD IsNot Nothing Then dst2.Rectangle(task.rcD.rect, task.highlight, task.lineWidth)
             If strOut <> "" Then SetTrueText(strOut, 3) Else SetTrueText("Click on any cell", 3)
 
-            Dim causeLabel = RedUtil_Basics.findCause(redC.rcMap, redC.rcList)
+            Dim causeLabel = Utility_Basics.findCause(redC.rcMap, redC.rcList)
 
             If causeLabel <> "" Then
                 If labels(3) = "" Then labels(3) = causeLabel Else labels(3) += ", " + causeLabel
@@ -18733,7 +18733,7 @@ Namespace VBClasses
             Dim matchAverage As Single
             For Each rc In newList.Values
                 Dim maxDist = rc.maxDist
-                rc = RedUtil_Basics.rcMatch(rc, rcListLast, wGridList, rcMapLast)
+                rc = Utility_Basics.rcMatch(rc, rcListLast, wGridList, rcMapLast)
 
                 If rc.age = 1 Then unMatched += 1 Else matchCount += 1
                 matchAverage += rc.age
@@ -18760,7 +18760,7 @@ Namespace VBClasses
             Next
 
             If standalone Then
-                strOut = RedUtil_Basics.selectCell(rcMap, rcList)
+                strOut = Utility_Basics.selectCell(rcMap, rcList)
                 SetTrueText(strOut, 3)
             End If
 
@@ -18797,11 +18797,11 @@ Namespace VBClasses
             dst2 = redC.dst2
             labels(2) = redC.labels(2)
 
-            strOut = RedUtil_Basics.selectCell(redC.rcMap, redC.rcList)
+            strOut = Utility_Basics.selectCell(redC.rcMap, redC.rcList)
             If task.rcD IsNot Nothing Then dst2.Rectangle(task.rcD.rect, task.highlight, task.lineWidth)
             If strOut <> "" Then SetTrueText(strOut, 3) Else SetTrueText("Click on any cell", 3)
 
-            Dim causeLabel = RedUtil_Basics.findCause(redC.rcMap, redC.rcList)
+            Dim causeLabel = Utility_Basics.findCause(redC.rcMap, redC.rcList)
             If task.mouseClickFlag Then
                 causeLabel = ""
                 labels(3) = ""

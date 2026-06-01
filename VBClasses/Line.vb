@@ -1916,9 +1916,6 @@ Public Class Line_LeftRight : Inherits TaskParent
         dst3 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         desc = "Find the lines in the left and right images."
     End Sub
-    Private Function processImage(input As cv.Mat, output As cv.Mat) As String
-
-    End Function
     Public Overrides Sub RunAlg(src As cv.Mat)
         stableLR.Run(emptyMat)
 

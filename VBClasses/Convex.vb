@@ -160,7 +160,7 @@ Public Class Convex_RedColorDefects : Inherits TaskParent
         dst1 = redC.dst2
         labels(2) = redC.labels(2)
 
-        RedUtil_Basics.selectCell(redC.rcMap, redC.rcList)
+        Utility_Basics.selectCell(redC.rcMap, redC.rcList)
         If task.rcD Is Nothing Then
             SetTrueText("Select any cell", 3)
             Exit Sub

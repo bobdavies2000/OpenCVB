@@ -286,7 +286,7 @@ Public Class NR_Bin2Way_RedCloudLightToDark : Inherits TaskParent
 
         dst3 = Palettize(rcMap)
 
-        strOut = RedUtil_Basics.selectCell(rcMap, rclist)
+        strOut = Utility_Basics.selectCell(rcMap, rclist)
         SetTrueText(strOut, 1)
     End Sub
 End Class

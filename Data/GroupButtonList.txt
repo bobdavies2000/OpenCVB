@@ -181,7 +181,6 @@ RedColor
 RedFlood
 RedPrep
 Reduction
-RedUtil
 RedWGrid
 Region
 Remap
@@ -210,6 +209,7 @@ TextureFlow
 Threshold
 Track
 Triangle
+Utility
 Video
 Vignetting
 Volume

@@ -31,7 +31,7 @@ Public Class RedCloud_Basics : Inherits TaskParent
         Dim matchAverage As Single
         Dim blackVec As New cv.Vec3b
         For Each rc In redCore.rcList
-            rc = RedUtil_Basics.rcDataMatch(rc, rcListLast, rcMapLast)
+            rc = Utility_Basics.rcDataMatch(rc, rcListLast, rcMapLast)
 
             If rc.age = 1 Then unMatched += 1 Else matchCount += 1
             matchAverage += rc.age
@@ -48,7 +48,7 @@ Public Class RedCloud_Basics : Inherits TaskParent
         Next
 
         If runSelectCell Then
-            strOut = RedUtil_Basics.selectCell(rcMap, rcList)
+            strOut = Utility_Basics.selectCell(rcMap, rcList)
             SetTrueText(strOut, 3)
         End If
 
@@ -145,7 +145,7 @@ Public Class RedCloud_BasicsFlood : Inherits TaskParent
         If task.rcD IsNot Nothing Then dst2.Rectangle(task.rcD.rect, task.highlight, task.lineWidth)
         If strOut <> "" Then SetTrueText(redC.strOut, 3) Else SetTrueText("Click on any cell", 3)
 
-        Dim causeLabel = RedUtil_Basics.findCause(redC.rcMap, redC.rcList)
+        Dim causeLabel = Utility_Basics.findCause(redC.rcMap, redC.rcList)
         If task.mouseClickFlag Then
             causeLabel = ""
             labels(3) = ""
@@ -181,7 +181,7 @@ Public Class NR_RedCloud_Basics : Inherits TaskParent
         If task.rcD IsNot Nothing Then dst2.Rectangle(task.rcD.rect, task.highlight, task.lineWidth)
         If strOut <> "" Then SetTrueText(redC.strOut, 3) Else SetTrueText("Click on any cell", 3)
 
-        Dim causeLabel = RedUtil_Basics.findCause(redC.rcMap, redC.rcList)
+        Dim causeLabel = Utility_Basics.findCause(redC.rcMap, redC.rcList)
         If task.mouseClickFlag Then
             causeLabel = ""
             labels(3) = ""
@@ -416,7 +416,7 @@ Public Class NR_RedCloud_ColorChangeCause : Inherits TaskParent
         labels(2) = redC.labels(2)
         dst2.SetTo(0, task.noDepthMask)
 
-        labels(3) = RedUtil_Basics.findCause(redC.rcMap, redC.rcList)
+        labels(3) = Utility_Basics.findCause(redC.rcMap, redC.rcList)
     End Sub
 End Class
 
@@ -518,7 +518,7 @@ Public Class RedCloud_Flood_CPP : Inherits TaskParent
         For i = 0 To newList.Values.Count - 1
             Dim rc = newList.Values(i)
             Dim maxDist = rc.maxDist
-            rc = RedUtil_Basics.rcMatch(rc, rcListLast, wGridList, rcMapLast)
+            rc = Utility_Basics.rcMatch(rc, rcListLast, wGridList, rcMapLast)
 
             If rc.age = 1 Then unMatched += 1 Else matchCount += 1
             matchAverage += rc.age
@@ -549,7 +549,7 @@ Public Class RedCloud_Flood_CPP : Inherits TaskParent
 
 
 
-        strOut = RedUtil_Basics.selectCell(rcMap, rcList)
+        strOut = Utility_Basics.selectCell(rcMap, rcList)
         SetTrueText(strOut, 3)
 
         wGridList.Clear()
@@ -667,7 +667,7 @@ Public Class RedCloud_DelaunayMap : Inherits TaskParent
         dMap.rcList = New List(Of rcData)(redC.rcList)
         dMap.Run(emptyMat)
 
-        strOut = RedUtil_Basics.DelaunaySelect(dMap.rcMap, dMap.rcList)
+        strOut = Utility_Basics.DelaunaySelect(dMap.rcMap, dMap.rcList)
         SetTrueText(strOut, 3)
     End Sub
 End Class

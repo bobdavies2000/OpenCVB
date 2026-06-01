@@ -469,7 +469,6 @@ Public Module Structures
 
         Public age As Integer = 1
         Public angle As Single ' varies from -90 to 90 degrees
-        Public angleDelta As Single ' how much did the angle change from the previous image.
         Public color As cv.Scalar
         Public index As Integer
         Public length As Single

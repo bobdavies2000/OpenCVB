@@ -80,7 +80,7 @@ Public Class RedWGrid_Basics : Inherits TaskParent
             End If
         Next
 
-        strOut = RedUtil_Basics.selectCell(rcMap, rcList)
+        strOut = Utility_Basics.selectCell(rcMap, rcList)
         SetTrueText(strOut, 3)
 
         labels(2) = CStr(rcList.Count) + " cells remain after merging masks for " + CStr(count) + " wGrid points."

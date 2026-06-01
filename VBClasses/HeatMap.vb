@@ -116,7 +116,7 @@ Public Class HeatMap_Cell : Inherits TaskParent
         labels(2) = flood.labels(2)
         If flood.rcList.Count = 0 Then Exit Sub ' nothing to work on!
 
-        strOut = RedUtil_Basics.selectCell(flood.rcMap, flood.rcList)
+        strOut = Utility_Basics.selectCell(flood.rcMap, flood.rcList)
 
         dst0 = New cv.Mat(dst2.Size(), cv.MatType.CV_32FC3, 0)
         If task.rcD IsNot Nothing Then task.pointCloud(task.rcD.rect).CopyTo(dst0(task.rcD.rect), task.rcD.mask)

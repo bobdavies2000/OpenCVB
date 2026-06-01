@@ -66,7 +66,7 @@ Public Class PlotMouse_Basics32F : Inherits TaskParent
 
         Dim stepsize = dst2.Width / task.MaxZmeters
         For i = 1 To CInt(task.MaxZmeters) - 1
-            dst2.Line(New cv.Point(stepsize * i, 0), New cv.Point(stepsize * i, dst2.Height), white, task.cvFontThickness)
+            dst2.Line(New cv.Point(stepsize * i, 0), New cv.Point(stepsize * i, dst2.Height), white, Utility_Basics.getThickness)
         Next
 
         Dim barWidth = dst2.Width / task.histogramBins
