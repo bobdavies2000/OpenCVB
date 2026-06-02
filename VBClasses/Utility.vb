@@ -190,24 +190,22 @@ Public Class Utility_Basics : Inherits TaskParent
     End Function
     Public Shared Function selectCell(rcMap As cv.Mat, rcList As List(Of rcData)) As String
         Dim clickIndex As Integer = 0, outStr As String = ""
-        If rcList.Count > 0 Then
-            If rcMap.Type = cv.MatType.CV_32S Then
-                clickIndex = rcMap.Get(Of Integer)(task.clickPoint.Y, task.clickPoint.X)
-            Else
-                clickIndex = rcMap.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X)
-            End If
-            If clickIndex = 0 Then
-                task.rcD = Nothing
-                Return vbCrLf + vbCrLf + "Click anywhere to select a cell for inspection."
-            End If
-            If clickIndex < rcList.Count Then
-                task.rcD = rcList(clickIndex - 1)
-                task.color(task.rcD.rect).SetTo(white, task.rcD.mask)
-                outStr = task.rcD.displayCell()
-            Else
-                Return vbCrLf + vbCrLf + "That cell is no longer present."
-            End If
+        If rcMap.Type = cv.MatType.CV_32S Then
+            clickIndex = rcMap.Get(Of Integer)(task.clickPoint.Y, task.clickPoint.X)
+        Else
+            clickIndex = rcMap.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X)
         End If
+        If clickIndex > 0 And clickIndex < rcList.Count Then
+            task.rcD = rcList(clickIndex - 1)
+            task.color(task.rcD.rect).SetTo(white, task.rcD.mask)
+            outStr = task.rcD.displayCell()
+        ElseIf rcList.Count = 0 Then
+            rcList.Add(New rcData(task.color, New cv.Rect(0, 0, task.color.Width, task.color.Height), 1))
+        Else
+            task.rcD = rcList(0)
+            Return vbCrLf + vbCrLf + "The biggest cell is provided when clicking between cells." + vbCrLf 
+        End If
+
         Return outStr
     End Function
     Public Shared Function DelaunaySelect(rcMap As cv.Mat, rcList As List(Of rcData)) As String
@@ -220,7 +218,6 @@ Public Class Utility_Basics : Inherits TaskParent
         End If
         Return outStr
     End Function
-
     Public Overrides Sub RunAlg(src As cv.Mat)
         SetTrueText("Utility_Basics is to make some small 'Shared' utilities available.)", 3)
     End Sub

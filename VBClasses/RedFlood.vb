@@ -242,10 +242,6 @@ Public Class NR_RedFlood_CellDepthHistogram : Inherits TaskParent
         labels(2) = redC.labels(2)
 
         SetTrueText(redC.strOut, 1)
-        If task.rcD Is Nothing Then
-            SetTrueText("Select any cell", 1)
-            Exit Sub
-        End If
         If task.heartBeat Then
             Dim depth As cv.Mat = task.pcSplit(2)(task.rcD.rect)
             depth.SetTo(0, task.noDepthMask(task.rcD.rect))
@@ -295,10 +291,6 @@ Public Class NR_RedMark_Features : Inherits TaskParent
         labels(2) = redC.labels(2)
 
         SetTrueText(redC.strOut, 1)
-        If task.rcD Is Nothing Then
-            SetTrueText("Select any cell", 1)
-            Exit Sub
-        End If
 
         Dim rc = task.rcD
 

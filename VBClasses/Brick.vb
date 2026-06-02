@@ -861,7 +861,7 @@ Public Class NR_Brick_NoDepthLines : Inherits TaskParent
         motionLeft.Run(task.leftView)
 
         lines.Run(task.leftView)
-        dst2 = lines.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        dst2 = lines.dst2
 
         Dim count As Integer
         dst3.SetTo(0)

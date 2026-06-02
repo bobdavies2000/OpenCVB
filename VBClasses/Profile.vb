@@ -22,10 +22,6 @@ Public Class Profile_Basics : Inherits TaskParent
         labels(2) = redC.labels(2)
 
         SetTrueText(redC.strOut, 1)
-        If task.rcD Is Nothing Then
-            SetTrueText("Select any cell", 1)
-            Exit Sub
-        End If
 
         Dim rc = task.rcD
         Dim depthPixels = task.depthmask(rc.rect).CountNonZero

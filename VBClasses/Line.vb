@@ -1931,29 +1931,6 @@ End Class
 
 
 
-
-
-Public Class Line_LeftRightMatch : Inherits TaskParent
-    Dim lineLR As New Line_LeftRight
-    Public Sub New()
-        desc = "Match lines in the left and right images."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        lineLR.Run(emptyMat)
-
-        Dim leftLines = lineLR.linesLeft.lpList
-        Dim rightLines = lineLR.linesRight.lpList
-
-        Dim averageAge = Line_Basics_TA.updateAgesAndLongest(leftLines, rightLines)
-
-    End Sub
-End Class
-
-
-
-
-
-
 Public Class Line_RightOnly : Inherits TaskParent
     Public linesRight As New Line_Core
     Dim stableR As New StableGray_Right
@@ -1983,9 +1960,8 @@ End Class
 
 
 Public Class Line_LeftRight : Inherits TaskParent
-    Public linesLeft As New Line_Core
-    Public linesRight As New Line_Core
-    Dim stableLR As New StableGray_LeftRight
+    Public leftList As New List(Of lpData)
+    Public rightList As New List(Of lpData)
     Public Sub New()
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         dst3 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
@@ -1999,14 +1975,20 @@ Public Class Line_LeftRight : Inherits TaskParent
             dst3 = lrZED.dst3
             labels = lrZED.labels
 
-            For Each lp In task.lines.lpList
+            leftList = New List(Of lpData)(task.lines.lpList)
+            rightList = New List(Of lpData)(lrZED.rightOnly.lpList)
+
+            For Each lp In leftList
                 SetTrueText(CStr(lp.age), New cv.Point(lp.ptCenter.X + 2, lp.ptCenter.Y + 2), 2)
             Next
 
-            For Each lp In lrZED.rightOnly.lpList
+            For Each lp In rightList
                 SetTrueText(CStr(lp.age), New cv.Point(lp.ptCenter.X + 2, lp.ptCenter.Y + 2), 3)
             Next
         Else
+            Static stableLR As New StableGray_LeftRight
+            Static linesLeft As New Line_Core
+            Static linesRight As New Line_Core
             stableLR.Run(emptyMat)
 
             Dim lastList = New List(Of lpData)(linesLeft.lpList)
@@ -2060,6 +2042,142 @@ Public Class Line_LeftRightZED : Inherits TaskParent
         For Each lp In rightOnly.lpList
             dst3.Line(lp.p1, lp.p2, 255, task.lineWidth, task.lineType)
             SetTrueText(CStr(lp.age), New cv.Point(lp.ptCenter.X + 2, lp.ptCenter.Y + 2), 3)
+        Next
+    End Sub
+End Class
+
+
+
+
+Public Class Line_DepthSimple : Inherits TaskParent
+    Dim lineLR As New Line_LeftRight
+    Public Sub New()
+        desc = "How many lines have both endpoints with depth?"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        lineLR.Run(emptyMat)
+        dst2 = lineLR.dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        labels(2) = lineLR.labels(2)
+
+        Dim leftLines = lineLR.leftList
+        Dim rightLines = lineLR.rightList
+
+        Dim count As Integer
+        For Each lp In leftLines
+            Dim depth1 = task.pcSplit(2).Get(Of Single)(lp.p1.Y, lp.p1.X)
+            If depth1 > 0 Then dst2.Circle(lp.p1, task.DotSize + 2, task.highlight, -1)
+            Dim depth2 = task.pcSplit(2).Get(Of Single)(lp.p2.Y, lp.p2.X)
+            If depth2 > 0 Then dst2.Circle(lp.p2, task.DotSize + 2, task.highlight, -1)
+
+            If depth1 > 0 And depth2 > 0 Then count += 1
+        Next
+
+        SetTrueText(CStr(count) + " lines had depth at both endpoints", 3)
+    End Sub
+End Class
+
+
+
+Public Class Line_Depth : Inherits TaskParent
+    Public lpList As New List(Of lpData)
+    Public Sub New()
+        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
+        desc = "Get the best measure of depth for the end points of each line."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        lpList.Clear()
+        For Each lp In task.lines.lpList
+            dst1(lp.rect).SetTo(0)
+            dst1.Line(lp.p1, lp.p2, 255, task.lineWidth)
+
+            If task.drawRect.Width > 0 Then
+                If lp.rect.IntersectsWith(task.drawRect) Then
+                    Dim k = 0
+                End If
+            End If
+
+            Dim ptArray() As cv.Point = Nothing
+            dst1(lp.rect).FindNonZero().GetArray(Of cv.Point)(ptArray)
+
+            Dim depth1 As Single = 0, depth2 As Single = 0
+            Dim p1 As cv.Point = Nothing
+            Dim p2 As cv.Point = Nothing
+            For Each p1 In ptArray
+                p1 = New cv.Point(lp.rect.X + p1.X, lp.rect.Y + p1.Y)
+                depth1 = task.pcSplit(2).Get(Of Single)(p1.Y, p1.X)
+                If depth1 > 0 Then Exit For
+            Next
+
+            If depth1 > 0 Then
+                For i = ptArray.Count - 1 To 0 Step -1
+                    p2 = New cv.Point(lp.rect.X + ptArray(i).X, lp.rect.Y + ptArray(i).Y)
+                    depth2 = task.pcSplit(2).Get(Of Single)(p2.Y, p2.X)
+                    If depth2 > 0 Then
+                        Dim lpNew = New lpData(p1, p2)
+                        If lpNew.length > task.gridWH * 2 And lpNew.rect.Width > 0 And lpNew.rect.Height > 0 Then
+                            lpNew.age = lp.age
+                            lpNew.index = lpList.Count + 1
+                            lpNew.pVec1 = task.pointCloud.Get(Of cv.Vec3f)(p1.Y, p1.X)
+                            lpNew.pVec2 = task.pointCloud.Get(Of cv.Vec3f)(p2.Y, p2.X)
+                            lpList.Add(lpNew)
+                            Exit For
+                        End If
+                    End If
+                Next
+            End If
+        Next
+
+        dst3 = task.pointCloud.Clone
+        dst2 = task.color.Clone
+        For Each lp In lpList
+            dst3.Line(lp.p1, lp.p2, black, task.lineWidth + 4)
+            dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth + 1)
+            SetTrueText(CStr(lp.age), New cv.Point(lp.ptCenter.X + 2, lp.ptCenter.Y + 2), 2)
+        Next
+        labels(2) = CStr(lpList.Count) + " lines had depth at or near both endpoints.  Value is line age."
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Line_DepthUpdate : Inherits TaskParent
+    Dim lineDepth As New Line_Depth
+    Public Sub New()
+        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
+        desc = "For each line in the lpList output of Line_Depth, update the pointcloud with linear data."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        lineDepth.Run(emptyMat)
+        dst2 = lineDepth.dst2
+        labels(2) = lineDepth.labels(2)
+
+        dst3 = task.pointCloud.Clone
+        For Each lp In lineDepth.lpList
+            Dim vec1 = task.pointCloud.Get(Of cv.Vec3f)(lp.p1.Y, lp.p1.X)
+            Dim vec2 = task.pointCloud.Get(Of cv.Vec3f)(lp.p2.Y, lp.p2.X)
+
+            dst1(lp.rect).SetTo(0)
+            dst1.Line(lp.p1, lp.p2, 255, 1)
+
+            Dim ptArray() As cv.Point = Nothing
+            dst1(lp.rect).FindNonZero().GetArray(Of cv.Point)(ptArray)
+
+            Dim xIncr = (vec1.Item0 - vec2.Item0) / ptArray.Count
+            Dim yIncr = (vec1.Item1 - vec2.Item1) / ptArray.Count
+            Dim zIncr = (vec1.Item2 - vec2.Item2) / ptArray.Count
+
+            dst3.Line(lp.p1, lp.p2, black, task.lineWidth + 4)
+            dst2.Line(lp.p1, lp.p2, black, task.lineWidth + 2)
+            dst2.Line(lp.p1, lp.p2, task.highlight, 1)
+            For i = 0 To ptArray.Count - 1
+                Dim pt = ptArray(i)
+                Dim vec = New cv.Vec3f(vec1.Item0 + i * xIncr, vec1.Item1 + i * yIncr, vec1.Item2 + i * zIncr)
+                dst3.Set(Of cv.Vec3f)(pt.Y, pt.X, vec)
+            Next
+            SetTrueText(CStr(lp.age), New cv.Point(lp.ptCenter.X + 2, lp.ptCenter.Y + 2), 2)
         Next
     End Sub
 End Class

@@ -357,7 +357,6 @@ Public Class Contour_SidePoints : Inherits TaskParent
         sides.Run(src)
         dst2 = sides.dst2
         Dim rc = task.rcD
-        If rc Is Nothing Then Exit Sub
 
         If sides.corners.Count > 0 And task.heartBeat Then
             ptLeft = sides.corners(1)
@@ -490,11 +489,6 @@ Public Class NR_Contour_Compare : Inherits TaskParent
 
         SetTrueText(redC.strOut, 3)
 
-        If task.rcD Is Nothing Then
-            SetTrueText("Select any cell", 3)
-            Exit Sub
-        End If
-
         Dim tmp = task.rcD.mask.Clone
 
         Dim allContours As cv.Point()() = Nothing
@@ -525,11 +519,7 @@ Public Class NR_Contour_Smoothing : Inherits TaskParent
         labels(2) = redC.labels(2)
         SetTrueText(redC.strOut, 3)
 
-        If task.rcD Is Nothing Then
-            SetTrueText("Select any cell", 3)
-            Exit Sub
-        End If
-
+        Utility_Basics.selectCell(redC.rcMap, redC.rcList)
         Dim rc = task.rcD
 
         dst1.SetTo(0)

@@ -234,10 +234,6 @@ Public Class NR_LUT_RedCloud : Inherits TaskParent
         labels(2) = redC.labels(2)
 
         SetTrueText(redC.strOut, 3)
-        If task.rcD Is Nothing Then
-            SetTrueText("Select any cell", 3)
-            Exit Sub
-        End If
 
         dst3.SetTo(0)
         Dim rc = task.rcD

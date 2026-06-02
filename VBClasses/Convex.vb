@@ -68,10 +68,6 @@ Public Class NR_Convex_RedColor : Inherits TaskParent
         labels(2) = redC.labels(2)
 
         SetTrueText(redC.strOut, 3)
-        If task.rcD Is Nothing Then
-            SetTrueText("Select any cell", 3)
-            Exit Sub
-        End If
 
         If task.rcD.contour IsNot Nothing Then
             convex.Run(src)
@@ -161,14 +157,8 @@ Public Class Convex_RedColorDefects : Inherits TaskParent
         labels(2) = redC.labels(2)
 
         Utility_Basics.selectCell(redC.rcMap, redC.rcList)
-        If task.rcD Is Nothing Then
-            SetTrueText("Select any cell", 3)
-            Exit Sub
-        End If
 
         Dim rc = task.rcD
-        If rc.mask Is Nothing Then rc = redC.rcList(0)
-
         Dim sz = New cv.Size(dst2.Height * rc.mask.Width / rc.mask.Height, dst2.Height)
         If rc.mask.Width > rc.mask.Height Then
             sz = New cv.Size(dst2.Width, dst2.Height * rc.mask.Height / rc.mask.Width)

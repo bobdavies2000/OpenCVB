@@ -82,10 +82,6 @@ Public Class PCA_Mask : Inherits TaskParent
             labels(2) = redC.labels(2)
 
             SetTrueText(redC.strOut, 1)
-            If task.rcD Is Nothing Then
-                SetTrueText("Select any cell", 1)
-                Exit Sub
-            End If
         End If
 
         Dim rc = task.rcD

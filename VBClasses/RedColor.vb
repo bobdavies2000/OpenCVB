@@ -29,8 +29,6 @@ Public Class RedColor_Basics : Inherits TaskParent
             strOut = Utility_Basics.selectCell(rcMap, rcList)
             SetTrueText(strOut, 3)
         End If
-
-        If task.rcD Is Nothing Then SetTrueText("Select any cell", 3)
     End Sub
 End Class
 
@@ -60,11 +58,6 @@ Public Class NR_RedColor_Basics : Inherits TaskParent
         If runSelectCell Then
             strOut = Utility_Basics.selectCell(rcMap, rcList)
             SetTrueText(strOut, 3)
-        End If
-
-        If task.rcD Is Nothing Then
-            SetTrueText("Select any cell", 3)
-            Exit Sub
         End If
     End Sub
 End Class
@@ -722,7 +715,6 @@ Public Class RedColor_Isolate : Inherits TaskParent
         cv.Cv2.MorphologyEx(mask, mask, cv.MorphTypes.Open, k)
     End Sub
     Private Function PickSubject(rcMap As cv.Mat, rcList As List(Of rcData)) As rcData
-        If rcList Is Nothing OrElse rcList.Count = 0 Then Return Nothing
         Dim total = rcMap.Rows * rcMap.Cols
         Dim minPx = CInt(total * 0.003)
         Dim maxPx = CInt(total * 0.62)
@@ -778,13 +770,6 @@ Public Class RedColor_Isolate : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         Dim bgr = If(src IsNot Nothing AndAlso src.Channels() = 3, src, task.color)
         redC.Run(bgr)
-
-        If redC.rcList Is Nothing OrElse redC.rcList.Count = 0 Then
-            dst2 = bgr.Clone
-            labels(2) = "RedColor produced no cells."
-            dst3.SetTo(0)
-            Exit Sub
-        End If
 
         Dim subject = PickSubject(redC.rcMap, redC.rcList)
         If subject Is Nothing Then

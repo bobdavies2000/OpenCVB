@@ -12,7 +12,6 @@ Public Class Triangle_Basics : Inherits TaskParent
         dst2 = redC.dst2
         labels(2) = redC.labels(2)
 
-        If task.rcD Is Nothing Then task.rcD = redC.rcList(0)
         dst3.SetTo(0)
         Dim pt3D As New List(Of cv.Point3f)
         For Each pt In task.rcD.contour
@@ -94,10 +93,6 @@ Public Class NR_Triangle_Cell : Inherits TaskParent
         labels(2) = redC.labels(2)
 
         SetTrueText(redC.strOut, 1)
-        If task.rcD Is Nothing Then
-            SetTrueText("Select any cell", 1)
-            Exit Sub
-        End If
 
         Dim rc = task.rcD
         If rc.index = 0 Then Exit Sub
@@ -158,10 +153,6 @@ Public Class NR_Triangle_Mask : Inherits TaskParent
         labels(2) = redC.labels(2)
 
         SetTrueText(redC.strOut, 1)
-        If task.rcD Is Nothing Then
-            SetTrueText("Select any cell", 1)
-            Exit Sub
-        End If
 
         Dim rc = task.rcD
         If rc.index = 0 Then Exit Sub

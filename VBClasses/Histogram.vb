@@ -1248,10 +1248,6 @@ Public Class NR_Histogram_RedCell : Inherits TaskParent
         labels(2) = redC.labels(2)
 
         SetTrueText(redC.strOut, 1)
-        If task.rcD Is Nothing Then
-            SetTrueText("Select any cell", 1)
-            Exit Sub
-        End If
 
         hist.rc = task.rcD
         If hist.rc.index = 0 Or hist.rc.wcMean(2) = 0 Then Exit Sub

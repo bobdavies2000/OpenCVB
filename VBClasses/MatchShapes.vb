@@ -80,10 +80,6 @@ Public Class MatchShapes_Nearby : Inherits TaskParent
                 Exit Sub
             End If
         End If
-        If task.rcD Is Nothing Then
-            SetTrueText(selectMsg, 3)
-            Exit Sub
-        End If
 
         Static rcListLast As New List(Of rcData)
         If task.heartBeat Then
@@ -184,10 +180,6 @@ Public Class NR_MatchShapes_Contours : Inherits TaskParent
 
         If task.heartBeat Then dst3.SetTo(0)
         SetTrueText(redC.strOut, 1)
-        If task.rcD Is Nothing Then
-            SetTrueText("Select any cell", 1)
-            Exit Sub
-        End If
 
         Dim rcX = task.rcD
         If rcX Is Nothing Then rcX = redC.rcList(0)

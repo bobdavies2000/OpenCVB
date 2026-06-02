@@ -13,11 +13,6 @@ Public Class Volume_Basics : Inherits TaskParent
         labels(2) = redC.labels(2)
 
         SetTrueText(redC.strOut, 1)
-        If task.rcD Is Nothing Then
-            SetTrueText("Select any cell", 1)
-            Exit Sub
-        End If
-
         rc = task.rcD
         If rc Is Nothing Then rc = redC.rcList(0)
         If rc.contour Is Nothing Then Exit Sub

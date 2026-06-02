@@ -302,6 +302,7 @@ Gif_OpenCVB
 GL_Basics
 GL_BasicsLineMap
 GL_DisplayPC
+GL_DrawLineDepth
 GL_Featureless
 GL_LogicalLines
 GL_LogicalLines1
@@ -460,11 +461,13 @@ LeftRight_Stable
 Line_Basics
 Line_Basics_TA
 Line_Core
+Line_Depth
+Line_DepthSimple
+Line_DepthUpdate
 Line_FindClosest
 Line_Finder
 Line_Intersection
 Line_LeftRight
-Line_LeftRightMatch
 Line_LeftRightZED
 Line_Perpendicular
 Line_RightOnly
@@ -959,8 +962,6 @@ NR_FitLine_Grid
 NR_FitLine_Lines
 NR_FitLine_Simple
 NR_FitLine_Simple3D
-NR_FLANN_Basics
-NR_FLANN_Test
 NR_Flood_Minimal
 NR_Flood_SimpleRedColor
 NR_Flood_Tiers
@@ -989,7 +990,6 @@ NR_GL_Line3DReconstructed
 NR_GL_Line3DWhite
 NR_GL_LinePoints3D
 NR_GL_LinePointsAll
-NR_GL_LogicalCloud
 NR_GL_MainForm
 NR_GL_ReadLines
 NR_GL_ReadPC

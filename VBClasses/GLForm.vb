@@ -192,7 +192,8 @@ Public Class SharpGLForm
         options2.Run()
         prepareSharpGL()
     End Sub
-    Public Function RunSharp(func As Integer, Optional pointcloud As cv.Mat = Nothing, Optional RGB As cv.Mat = Nothing) As String
+    Public Function RunSharp(func As Integer, Optional pointcloud As cv.Mat = Nothing, Optional RGB As cv.Mat = Nothing,
+                             Optional lpList As List(Of lpData) = Nothing) As String
         optionsSetup()
 
         Dim label = ""
@@ -205,7 +206,7 @@ Public Class SharpGLForm
 
             Case oCase.readLines
                 label = drawCloud(pointcloud, RGB)
-                label += draw3DLines(task.lines.lpList)
+                label += draw3DLines(lpList)
                 readPointCloud()
 
             Case oCase.readQuads
@@ -246,23 +247,24 @@ Public Class SharpGLForm
                 drawQuads()
 
             Case oCase.draw3DLines
-                label = draw3DLines(task.lines.lpList)
+                label = drawCloud(pointcloud, RGB)
+                label = draw3DLines(lpList)
 
             Case oCase.draw3DLinesAndCloud
                 label = drawCloud(pointcloud, RGB)
 
-                label += " " + draw3DLines(task.lines.lpList)
+                label += " " + draw3DLines(lpList)
         End Select
 
         gl.Flush()
         Return label
     End Function
-    Private Function draw3DLines(lplist As List(Of lpData)) As String
+    Public Function draw3DLines(lplist As List(Of lpData)) As String
         gl.LineWidth(options.pointSize)
         gl.Begin(OpenGL.GL_LINES)
+        Dim color = task.highlight
         For Each lp In lplist
-            If lp.pVec1(2) < 0.1 Or lp.pVec2(2) < 0.1 Then Continue For ' Lines that are impossibly close
-            gl.Color(lp.color(2) / 255, lp.color(1) / 255, lp.color(0) / 255)
+            gl.Color(color(2) / 255, color(1) / 255, color(0) / 255)
             gl.Vertex(lp.pVec1(0), -lp.pVec1(1), -lp.pVec1(2))
             gl.Vertex(lp.pVec2(0), -lp.pVec2(1), -lp.pVec2(2))
         Next

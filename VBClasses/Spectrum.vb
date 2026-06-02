@@ -11,8 +11,6 @@ Public Class Spectrum_Basics : Inherits TaskParent
         dSpec.Run(src)
         gSpec.Run(src)
 
-        If task.redList.rclist.Count = 0 Then Exit Sub ' nothing to work on.
-        If task.rcD Is Nothing Then task.rcD = task.redList.rclist(0)
         If task.heartBeat And task.rcD.index > 0 Then
             strOut = dSpec.strOut + vbCrLf + vbCrLf
             strOut += gSpec.strOut
@@ -44,10 +42,6 @@ Public Class Spectrum_X : Inherits TaskParent
             labels(2) = redC.labels(2)
 
             SetTrueText(redC.strOut, 1)
-            If task.rcD Is Nothing Then
-                SetTrueText("Select any cell", 1)
-                Exit Sub
-            End If
         End If
 
         If task.heartBeat And task.rcD.index > 0 Then
@@ -80,10 +74,6 @@ Public Class Spectrum_Y : Inherits TaskParent
             labels(2) = redC.labels(2)
 
             SetTrueText(redC.strOut, 1)
-            If task.rcD Is Nothing Then
-                SetTrueText("Select any cell", 1)
-                Exit Sub
-            End If
         End If
 
         If task.heartBeat And task.rcD.index > 0 Then
@@ -115,10 +105,6 @@ Public Class Spectrum_Z : Inherits TaskParent
             labels(2) = redC.labels(2)
 
             SetTrueText(redC.strOut, 1)
-            If task.rcD Is Nothing Then
-                SetTrueText("Select any cell", 1)
-                Exit Sub
-            End If
         End If
 
         If task.rcD IsNot Nothing Then
@@ -158,10 +144,6 @@ Public Class Spectrum_Cloud : Inherits TaskParent
             labels(2) = redC.labels(2)
 
             SetTrueText(redC.strOut, 1)
-            If task.rcD Is Nothing Then
-                SetTrueText("Select any cell", 1)
-                Exit Sub
-            End If
         End If
 
         If task.heartBeat Then
@@ -201,10 +183,6 @@ Public Class NR_Spectrum_GrayAndCloud : Inherits TaskParent
             labels(2) = redC.labels(2)
 
             SetTrueText(redC.strOut, 1)
-            If task.rcD Is Nothing Then
-                SetTrueText("Select any cell", 1)
-                Exit Sub
-            End If
         End If
 
         If task.heartBeat Then
@@ -240,10 +218,6 @@ Public Class NR_Spectrum_RGB : Inherits TaskParent
             labels(2) = redC.labels(2)
 
             SetTrueText(redC.strOut, 1)
-            If task.rcD Is Nothing Then
-                SetTrueText("Select any cell", 1)
-                Exit Sub
-            End If
         End If
 
         Dim split = src.Split()
@@ -285,10 +259,6 @@ Public Class NR_Spectrum_CellZoom : Inherits TaskParent
         redC.Run(src)
         dst2 = redC.dst2
         labels(2) = redC.labels(2)
-        If task.rcD Is Nothing Then
-            SetTrueText("Select any cell", 1)
-            Exit Sub
-        End If
 
         If task.heartBeat Then
             breakdown.Run(src)
@@ -324,10 +294,6 @@ Public Class Spectrum_Breakdown : Inherits TaskParent
             redC.Run(src)
             dst2 = redC.dst2
             labels(2) = redC.labels(2)
-            If task.rcD Is Nothing Then
-                SetTrueText("Select any cell", 1)
-                Exit Sub
-            End If
         End If
 
         Dim rc = task.rcD
@@ -452,10 +418,6 @@ Public Class Spectrum_Gray : Inherits TaskParent
         labels(2) = redC.labels(2)
 
         SetTrueText(redC.strOut, 1)
-        If task.rcD Is Nothing Then
-            SetTrueText("Select any cell", 1)
-            Exit Sub
-        End If
 
         Dim input = src(task.rcD.rect)
         If input.Type <> cv.MatType.CV_8U Then input = input.CvtColor(cv.ColorConversionCodes.BGR2GRAY)

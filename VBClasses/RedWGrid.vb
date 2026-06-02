@@ -476,11 +476,6 @@ Public Class RedWGrid_Click : Inherits TaskParent
         dst2 = dups.dst2
         labels(2) = dups.labels(2)
 
-        If task.rcD Is Nothing Then
-            SetTrueText("Click on any cell present in dst2", 3)
-            Exit Sub
-        End If
-
         SetTrueText(dups.strOut, 3)
 
         Select Case options.clickName

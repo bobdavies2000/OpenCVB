@@ -92,6 +92,11 @@ Public Class KNN_Minimal : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
 
+        If queryMat.Rows = 0 Or trainMat.Rows = 0 Then
+            SetTrueText("The queryMat or trainMat (or both) are empty.  Try again...")
+            Exit Sub
+        End If
+
         Dim responseList As IEnumerable(Of Integer) = Enumerable.Range(0, 10).Select(Function(x) x)
         If standaloneTest() Then
             SetTrueText("There is no output for the " + traceName + " algorithm when run standaloneTest().  Use the " + traceName + "_Test algorithm")

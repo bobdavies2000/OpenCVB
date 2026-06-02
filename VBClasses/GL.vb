@@ -462,7 +462,7 @@ Public Class NR_GL_ReadLines : Inherits TaskParent
             dst3.Line(lp.p1, lp.p2, white, task.lineWidth, task.lineType)
         Next
 
-        strOut = task.sharpGL.RunSharp(oCase.readLines, task.pointCloud, dst3)
+        strOut = task.sharpGL.RunSharp(oCase.readLines, task.pointCloud, dst3, task.lines.lpList)
         SetTrueText(strOut, 3)
 
         labels(3) = task.lines.labels(2)
@@ -560,34 +560,20 @@ End Class
 
 
 
-Public Class NR_GL_Draw3DLines : Inherits TaskParent
-    Public Sub New()
-        desc = "Draw the RGB lines in SharpGL"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        dst2 = task.lines.dst2
-        strOut = task.sharpGL.RunSharp(oCase.draw3DLines)
-        SetTrueText(strOut, 3)
-    End Sub
-End Class
 
-
-
-
-
-Public Class NR_GL_LogicalCloud : Inherits TaskParent
-    Dim glTest As New GL_LogicalLines
-    Public Sub New()
-        glTest.drawRequest = oCase.draw3DLinesAndCloud
-        desc = "Draw the logical lines found and include the entire pointcloud."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        glTest.Run(src)
-        SetTrueText(glTest.strOut, 3)
-        dst2 = glTest.dst2
-        labels = glTest.labels
-    End Sub
-End Class
+'Public Class NR_GL_LogicalCloud : Inherits TaskParent
+'    Dim glTest As New GL_LogicalLines
+'    Public Sub New()
+'        glTest.drawRequest = oCase.draw3DLinesAndCloud
+'        desc = "Draw the logical lines found and include the entire pointcloud."
+'    End Sub
+'    Public Overrides Sub RunAlg(src As cv.Mat)
+'        glTest.Run(src)
+'        SetTrueText(glTest.strOut, 3)
+'        dst2 = glTest.dst2
+'        labels = glTest.labels
+'    End Sub
+'End Class
 
 
 
@@ -662,7 +648,6 @@ End Class
 
 Public Class GL_LogicalLines : Inherits TaskParent
     Dim logLines As New Line3D_LogicalLines
-    Public drawRequest As Integer = oCase.draw3DLines
     Public Sub New()
         desc = "Draw the logical lines found in the point cloud with the RGB lines."
     End Sub
@@ -676,7 +661,7 @@ Public Class GL_LogicalLines : Inherits TaskParent
         End If
 
         labels = logLines.labels
-        task.sharpGL.RunLines(drawRequest, logLines.lpList)
+        task.sharpGL.RunLines(oCase.draw3DLines, logLines.lpList)
     End Sub
 End Class
 
@@ -685,7 +670,6 @@ End Class
 
 Public Class GL_LogicalLines1 : Inherits TaskParent
     Dim logLines As New Line3D_LogicalLines
-    Public drawRequest As Integer = oCase.draw3DLines
     Public Sub New()
         desc = "Draw the logical lines found in the point cloud with the RGB lines."
     End Sub
@@ -695,7 +679,7 @@ Public Class GL_LogicalLines1 : Inherits TaskParent
 
         dst3.SetTo(0)
         labels = logLines.labels
-        task.sharpGL.RunLines(drawRequest, logLines.lpList)
+        task.sharpGL.RunLines(oCase.draw3DLines, logLines.lpList)
     End Sub
 End Class
 
@@ -736,5 +720,38 @@ Public Class GL_Featureless : Inherits TaskParent
 
         strOut = task.sharpGL.RunSharp(oCase.drawPointCloudRGB, dst1, dst3)
         SetTrueText(strOut, 2)
+    End Sub
+End Class
+
+
+
+
+
+Public Class NR_GL_Draw3DLines : Inherits TaskParent
+    Public Sub New()
+        desc = "Draw the RGB lines in SharpGL"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        dst2 = task.lines.dst2
+        strOut = task.sharpGL.RunSharp(oCase.draw3DLines, task.pointCloud, task.color, task.lines.lpList)
+        SetTrueText(strOut, 3)
+    End Sub
+End Class
+
+
+
+
+Public Class GL_DrawLineDepth : Inherits TaskParent
+    Dim lineDepth As New Line_Depth
+    Public Sub New()
+        desc = "Draw the lines with depth found in Line_DepthLines"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        lineDepth.Run(emptyMat)
+        dst2 = lineDepth.dst2
+        labels(2) = lineDepth.labels(2)
+
+        strOut = task.sharpGL.RunSharp(oCase.draw3DLines, lineDepth.dst3, task.color, lineDepth.lpList)
+        SetTrueText(strOut, 3)
     End Sub
 End Class

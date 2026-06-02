@@ -404,7 +404,6 @@ Public Class Plane_Points : Inherits TaskParent
         dst2 = redC.dst2
         labels(2) = redC.labels(2)
 
-        If task.rcD Is Nothing Then task.rcD = redC.rcList(0)
         Dim rc = task.rcD
 
         Dim pt As cv.Point3f, list2D As New List(Of cv.Point)

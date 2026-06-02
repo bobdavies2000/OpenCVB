@@ -112,7 +112,10 @@ Public Class RedCloud_Core : Inherits TaskParent
         End If
 
         rcList = sweepImage(src, src.Total * 0.0001)
-
+        If rcList.Count = 0 Then
+            rcList.Add(New rcData(src, New cv.Rect(0, 0, src.Width, src.Height), 1))
+            task.rcD = rcList(0)
+        End If
         dst2.SetTo(0)
         For Each rc In rcList
             dst2(rc.rect).SetTo(rc.index Mod 254, rc.mask)
@@ -217,11 +220,6 @@ Public Class NR_RedCloud_CellDepthHistogram : Inherits TaskParent
         redC.Run(src)
         dst2 = redC.dst2
         labels(2) = redC.labels(2)
-
-        If task.rcD Is Nothing Then
-            task.rcD = redC.rcList(0)
-            task.clickPoint = task.rcD.maxDist
-        End If
 
         SetTrueText(redC.strOut, 1)
 
