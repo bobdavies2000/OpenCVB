@@ -1137,7 +1137,7 @@ Public Class NR_Line_Map : Inherits TaskParent
         dst2 = Palettize(dst3, 0)
 
         Dim index = dst3.Get(Of Byte)(task.mouseMovePoint.Y, task.mouseMovePoint.X) - 1
-        If task.lines.lpList.Count > 0 Then
+        If task.lines.lpList.Count > 0 And index < task.lines.lpList.Count Then
             If index <= 0 Then
                 If task.lpD Is Nothing Then task.lpD = task.lines.lpList(0)
             Else
