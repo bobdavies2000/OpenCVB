@@ -47,6 +47,7 @@ if not exist Open3D\Install (
 	echo Building Open3D ^(C++ library, may take a long time^)...
 	cmake -S Open3D -B Open3D/Build -G "Visual Studio 18 2026" -A x64 ^
 		-DCMAKE_INSTALL_PREFIX="%CD%\Open3D\Install" ^
+		-DSTATIC_WINDOWS_RUNTIME=OFF ^
 		-DBUILD_PYTHON_MODULE=OFF ^
 		-DBUILD_EXAMPLES=OFF ^
 		-DBUILD_UNIT_TESTS=OFF ^
@@ -55,7 +56,14 @@ if not exist Open3D\Install (
 	cmake --build Open3D/Build --config Release --target INSTALL
 	cmake --build Open3D/Build --config Debug --target INSTALL
 	echo Open3D C++ installed to %CD%\Open3D\Install
+) else if exist Open3D\Build\CMakeCache.txt (
+	rem Ensure Open3D uses /MD to match CPP_Native and OpenCV ^(not /MT^).
+	cmake Open3D/Build -DSTATIC_WINDOWS_RUNTIME=OFF >nul 2>&1
 )
+
+echo Installing Open3D Python package ^(pip^)...
+python -m pip install --upgrade open3d
+if errorlevel 1 echo Warning: pip install open3d failed - is Python on PATH?
 
 if not exist opencv\Build (
 	cmake -S OpenCV -B OpenCV/Build -G "Visual Studio 18 2026" -A x64 -DBUILD_PERF_TESTS=NO -DBUILD_TESTS=NO -DBUILD_opencv_python_tests=NO -DOPENCV_EXTRA_MODULES_PATH=OpenCV/OpenCV_Contrib/Modules

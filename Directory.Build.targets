@@ -1,0 +1,43 @@
+<Project>
+  <Import Project="$(OpenCVBRepoRoot)\Open3D\OpenCVBIncludes.props"
+          Condition="Exists('$(OpenCVBRepoRoot)\Open3D\OpenCVBIncludes.props')" />
+  <Import Project="$(OpenCVBRepoRoot)\Open3D\OpenCVBLibraries.props"
+          Condition="Exists('$(OpenCVBRepoRoot)\Open3D\OpenCVBLibraries.props')" />
+
+  <PropertyGroup Condition="'$(MSBuildProjectName)' == 'Open3D_Native'">
+    <OpenCVBOpen3DConsumer>true</OpenCVBOpen3DConsumer>
+    <OpenCVBHasOpen3D>true</OpenCVBHasOpen3D>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(OpenCVBOpen3DConsumer)' == 'true' And '$(OpenCVBOpen3DIncludes)' != ''">
+    <ExternalIncludePath>$(OpenCVBOpen3DIncludes);$(ExternalIncludePath)</ExternalIncludePath>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(OpenCVBOpen3DConsumer)' == 'true' And '$(OpenCVBOpen3DLibDirs)' != ''">
+    <LibraryPath>$(OpenCVBOpen3DLibDirs);$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+
+  <ItemDefinitionGroup Condition="'$(OpenCVBOpen3DConsumer)' == 'true' And '$(OpenCVBOpen3DIncludes)' != ''">
+    <ClCompile>
+      <AdditionalIncludeDirectories>$(OpenCVBOpen3DIncludes);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions Condition="'$(OpenCVBHasOpen3D)' == 'true'">OPENCVB_HAS_OPEN3D=1;OPEN3D_STATIC;GLEW_STATIC;FMT_HEADER_ONLY;FMT_USE_WINDOWS_H=0;FMT_STRING_ALIAS=1;MKL_ILP64;IPP_VERSION_INT=20211100;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+  </ItemDefinitionGroup>
+
+  <ItemDefinitionGroup Condition="'$(OpenCVBOpen3DConsumer)' == 'true' And '$(OpenCVBOpen3DLibDirs)' != ''">
+    <Link>
+      <AdditionalLibraryDirectories>$(OpenCVBOpen3DLibDirs);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies Condition="'$(OpenCVBHasOpen3D)' == 'true'">ws2_32.lib;rpcrt4.lib;iphlpapi.lib;opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+
+  <!-- Open3D links against Intel TBB as a DLL at runtime. -->
+  <Target Name="OpenCVBCopyOpen3DTbb" AfterTargets="Build"
+          Condition="'$(OpenCVBOpen3DConsumer)' == 'true' And '$(OpenCVBHasOpen3D)' == 'true'">
+    <ItemGroup>
+      <_Open3DTbbDll Include="$(OpenCVBRepoRoot)\Open3D\Build\msvc_*\tbb12*.dll" />
+    </ItemGroup>
+    <Copy SourceFiles="@(_Open3DTbbDll)" DestinationFolder="$(TargetDir)" SkipUnchangedFiles="true"
+          Condition="'@(_Open3DTbbDll)' != ''" />
+  </Target>
+</Project>
