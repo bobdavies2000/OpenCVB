@@ -35,6 +35,28 @@ if not exist OakD\depthai-core (
 	cd ..\..\
 )
 
+if not exist Open3D (
+	"c:\Program Files\Git\bin\git.exe" clone --recursive "https://github.com/isl-org/Open3D.git"
+) else (
+	cd Open3D
+	"c:\Program Files\Git\bin\git.exe" submodule update --init --recursive
+	cd ..\
+)
+
+if not exist Open3D\Install (
+	echo Building Open3D ^(C++ library, may take a long time^)...
+	cmake -S Open3D -B Open3D/Build -G "Visual Studio 18 2026" -A x64 ^
+		-DCMAKE_INSTALL_PREFIX="%CD%\Open3D\Install" ^
+		-DBUILD_PYTHON_MODULE=OFF ^
+		-DBUILD_EXAMPLES=OFF ^
+		-DBUILD_UNIT_TESTS=OFF ^
+		-DBUILD_GUI=OFF ^
+		-DBUILD_WEBRTC=OFF
+	cmake --build Open3D/Build --config Release --target INSTALL
+	cmake --build Open3D/Build --config Debug --target INSTALL
+	echo Open3D C++ installed to %CD%\Open3D\Install
+)
+
 if not exist opencv\Build (
 	cmake -S OpenCV -B OpenCV/Build -G "Visual Studio 18 2026" -A x64 -DBUILD_PERF_TESTS=NO -DBUILD_TESTS=NO -DBUILD_opencv_python_tests=NO -DOPENCV_EXTRA_MODULES_PATH=OpenCV/OpenCV_Contrib/Modules
 	msbuild.exe OpenCV/Build/OpenCV.slnx /p:Configuration=Debug
@@ -93,5 +115,10 @@ echo   - librealsense is built automatically with C# bindings
 echo.
 echo Orbbec Gemini Camera:
 echo   - OrbbecSDK and OrbbecSDK_CSharp are built automatically
+echo.
+echo Open3D:
+echo   - C++: built to Open3D\Install ^(use -DCMAKE_PREFIX_PATH=...\Open3D\Install in CMake^)
+echo   - Python: pip install open3d ^(if python is on PATH^)
+echo   - Docs: https://www.open3d.org/docs/latest/compilation.html
 echo.
 SET /P ok="Press Enter to continue after reviewing the log."

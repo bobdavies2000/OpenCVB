@@ -1101,7 +1101,7 @@ Public Class NR_Line_MapRects : Inherits TaskParent
         Else
             If task.lpD Is Nothing Then task.lpD = task.lines.lpList(0)
         End If
-        task.lpD.lpDisplay(dst1)
+        SetTrueText(task.lpD.lpDisplay(dst1), 1)
     End Sub
 End Class
 

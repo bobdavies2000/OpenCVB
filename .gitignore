@@ -395,3 +395,6 @@ Build/
 # ZED SDK installer and vendored native DLLs (run ZED_SDK/Install-ZedSdk.ps1)
 ZED_SDK/installer/*.exe
 ZED_SDK/native/bin/*.dll
+# Open3D built from source (Update_All.bat)
+Open3D/Build/
+Open3D/Install/
