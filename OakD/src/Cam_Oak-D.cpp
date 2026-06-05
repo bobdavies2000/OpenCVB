@@ -23,7 +23,6 @@ public:
 	std::unique_ptr<dai::Pipeline> pipeline;
 	std::shared_ptr<dai::Device> device;
 	Mat rgb, leftView, rightView, depth16u, disparity;
-	uint16_t* depthBuffer = nullptr;
 	dai::CalibrationHandler deviceCalib;
 	double imuTimeStamp;
 	bool firstTs = false;
@@ -108,7 +107,6 @@ public:
 		int maxIntDisparity = pipeStereo->initialConfig->getMaxDisparity();
 		maxDisparity = static_cast<float>(maxIntDisparity);
 		disparityFactor = maxDisparity > 0 ? 255.0f / maxDisparity : 1.0f;
-		depthBuffer = new uint16_t[captureRows * captureCols * 2];
 	}
 
 
@@ -125,9 +123,7 @@ public:
 		auto inRight = qRight->get<dai::ImgFrame>();
 
 		auto depthFrame = inDepth->getFrame();
-		depth16u = depthFrame;
-		// Why can't OakDRawDepth just return depth16u.data?  This works though... Only depth fails using .data.
-		std::memcpy(depthBuffer, depth16u.data, captureRows * captureCols * 2);
+		depthFrame.convertTo(depth16u, CV_16UC1, 1);
 
 		rgb = inRGB->getCvFrame();
 		
@@ -172,14 +168,11 @@ public:
 		if (pipeline) {
 			pipeline->stop();
 		}
-		delete[] depthBuffer;
-		depthBuffer = nullptr;
 		device.reset();
 	}
 };
 
 extern "C" __declspec(dllexport) int* OakDRawDepth3D(OakDCamera* cPtr) { return (int*)cPtr->depth16u.data; }
-extern "C" __declspec(dllexport) int* OakDRawDepth4D(OakDCamera* cPtr) { return (int*)cPtr->depthBuffer;  } // why is this needed? depth16u fails.
 extern "C" __declspec(dllexport) int* OakDDisparity(OakDCamera* cPtr) { return (int*)cPtr->disparity.data; }
 extern "C" __declspec(dllexport) double OakDIMUTimeStamp(OakDCamera* cPtr) { return cPtr->imuTimeStamp; }
 extern "C" __declspec(dllexport) int* OakDGyro(OakDCamera* cPtr) { return (int*)&cPtr->gyroValues.x; }

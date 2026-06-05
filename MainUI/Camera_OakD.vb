@@ -3,26 +3,82 @@ Imports System.Threading
 Imports cv = OpenCvSharp
 
 Namespace MainApp
+#Region "Externs"
     Public Class Camera_OakD : Inherits GenericCamera
+        <DllImport("Cam_Oak-D.dll", CallingConvention:=CallingConvention.Cdecl)>
+        Private Shared Function OakDOpen(w As Integer, h As Integer, deviceIndex As Integer) As IntPtr
+        End Function
+
+        <DllImport("Cam_Oak-D.dll", CallingConvention:=CallingConvention.Cdecl)>
+        Private Shared Sub OakDWaitForFrame(cPtr As IntPtr)
+        End Sub
+
+        <DllImport("Cam_Oak-D.dll", CallingConvention:=CallingConvention.Cdecl)>
+        Private Shared Function OakDColor(cPtr As IntPtr) As IntPtr
+        End Function
+
+        <DllImport("Cam_Oak-D.dll", CallingConvention:=CallingConvention.Cdecl)>
+        Private Shared Function OakDLeftImage(cPtr As IntPtr) As IntPtr
+        End Function
+
+        <DllImport("Cam_Oak-D.dll", CallingConvention:=CallingConvention.Cdecl)>
+        Private Shared Function OakDRightImage(cPtr As IntPtr) As IntPtr
+        End Function
+
+        <DllImport("Cam_Oak-D.dll", CallingConvention:=CallingConvention.Cdecl)>
+        Private Shared Function OakDRawDepth3D(cPtr As IntPtr) As IntPtr
+        End Function
+
+        <DllImport("Cam_Oak-D.dll", CallingConvention:=CallingConvention.Cdecl)>
+        Private Shared Function OakDGyro(cPtr As IntPtr) As IntPtr
+        End Function
+
+        <DllImport("Cam_Oak-D.dll", CallingConvention:=CallingConvention.Cdecl)>
+        Private Shared Function OakDAccel(cPtr As IntPtr) As IntPtr
+        End Function
+
+        <DllImport("Cam_Oak-D.dll", CallingConvention:=CallingConvention.Cdecl)>
+        Private Shared Function OakDIMUTimeStamp(cPtr As IntPtr) As Double
+        End Function
+
+        <DllImport("Cam_Oak-D.dll", CallingConvention:=CallingConvention.Cdecl)>
+        Private Shared Function OakDintrinsics(cPtr As IntPtr, camera As Integer) As IntPtr
+        End Function
+
+        <DllImport("Cam_Oak-D.dll", CallingConvention:=CallingConvention.Cdecl)>
+        Private Shared Function OakDExtrinsicsRGBtoLeft(cPtr As IntPtr) As IntPtr
+        End Function
+
+        <DllImport("Cam_Oak-D.dll", CallingConvention:=CallingConvention.Cdecl)>
+        Private Shared Function OakDExtrinsicsLeftToRight(cPtr As IntPtr) As IntPtr
+        End Function
+
+        <DllImport("Cam_Oak-D.dll", CallingConvention:=CallingConvention.Cdecl)>
+        Private Shared Sub OakDStop(cPtr As IntPtr)
+        End Sub
+
+        <DllImport("Cam_Oak-D.dll", CallingConvention:=CallingConvention.Cdecl)>
+        Private Shared Function OakDDisparity(cPtr As IntPtr) As IntPtr
+        End Function
+
         Private cPtr As IntPtr
         Private deviceClass As Integer = 3 ' 3D or 4D.
+#End Region
 
         Public Sub New(_workRes As cv.Size, _captureRes As cv.Size, deviceName As String)
-            OakDNative.EnsureLoaded()
-
             captureRes = _captureRes
             workRes = _workRes
 
             Dim deviceIndex = If(deviceName.Contains("Oak-4D"), settings.OakIndex4D, settings.OakIndex3D)
             deviceClass = If(deviceName.Contains("Oak-4D"), 4, 3)
-            cPtr = OakDNative.OakDOpen(captureRes.Width, captureRes.Height, deviceIndex)
+            cPtr = OakDOpen(captureRes.Width, captureRes.Height, deviceIndex)
 
             If cPtr = IntPtr.Zero Then
                 Throw New Exception("Failed to open Oak-D camera")
             End If
 
             Dim ratio = captureRes.Width \ workRes.Width
-            Dim intrinsicsPtr = OakDNative.OakDintrinsics(cPtr, 1) ' RGB camera
+            Dim intrinsicsPtr = OakDintrinsics(cPtr, 1) ' RGB camera
             If intrinsicsPtr <> IntPtr.Zero Then
                 Dim intrinsics(8) As Single
                 Marshal.Copy(intrinsicsPtr, intrinsics, 0, 9)
@@ -32,7 +88,7 @@ Namespace MainApp
                 calibData.rgbIntrinsics.ppy = intrinsics(5) / ratio
             End If
 
-            Dim leftIntrinsicsPtr = OakDNative.OakDintrinsics(cPtr, 2) ' Left camera
+            Dim leftIntrinsicsPtr = OakDintrinsics(cPtr, 2) ' Left camera
             If leftIntrinsicsPtr <> IntPtr.Zero Then
                 Dim intrinsics(8) As Single
                 Marshal.Copy(leftIntrinsicsPtr, intrinsics, 0, 9)
@@ -42,7 +98,7 @@ Namespace MainApp
                 calibData.leftIntrinsics.ppy = intrinsics(5) / ratio
             End If
 
-            Dim rightIntrinsicsPtr = OakDNative.OakDintrinsics(cPtr, 3) ' Right camera
+            Dim rightIntrinsicsPtr = OakDintrinsics(cPtr, 3) ' Right camera
             If rightIntrinsicsPtr <> IntPtr.Zero Then
                 Dim intrinsics(8) As Single
                 Marshal.Copy(rightIntrinsicsPtr, intrinsics, 0, 9)
@@ -52,7 +108,7 @@ Namespace MainApp
                 calibData.rightIntrinsics.ppy = intrinsics(5) / ratio
             End If
 
-            Dim rgbToLeftPtr = OakDNative.OakDExtrinsicsRGBtoLeft(cPtr)
+            Dim rgbToLeftPtr = OakDExtrinsicsRGBtoLeft(cPtr)
             Dim extrinsics(11) As Single
             If rgbToLeftPtr <> IntPtr.Zero Then
                 Marshal.Copy(rgbToLeftPtr, extrinsics, 0, 12)
@@ -76,7 +132,7 @@ Namespace MainApp
                 calibData.ColorToLeft_rotation(8) = extrinsics(10)
             End If
 
-            Dim leftToRightPtr = OakDNative.OakDExtrinsicsLeftToRight(cPtr)
+            Dim leftToRightPtr = OakDExtrinsicsLeftToRight(cPtr)
             If leftToRightPtr <> IntPtr.Zero Then
                 Marshal.Copy(leftToRightPtr, extrinsics, 0, 12)
                 ReDim calibData.LtoR_translation(2)
@@ -128,53 +184,57 @@ Namespace MainApp
             Dim rows = captureRes.Height
             Dim cols = captureRes.Width
 
-            OakDNative.OakDWaitForFrame(cPtr)
+            OakDWaitForFrame(cPtr)
 
             SyncLock cameraMutex
-                Dim leftPtr = OakDNative.OakDLeftImage(cPtr)
+                Dim leftPtr = OakDLeftImage(cPtr)
                 If leftPtr <> IntPtr.Zero Then
                     leftView = cv.Mat.FromPixelData(rows, cols, cv.MatType.CV_8UC1, leftPtr).Clone()
                     leftView = leftView.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
                 End If
 
-                Dim rightPtr = OakDNative.OakDRightImage(cPtr)
+                Dim rightPtr = OakDRightImage(cPtr)
                 If rightPtr <> IntPtr.Zero Then
                     rightView = cv.Mat.FromPixelData(rows, cols, cv.MatType.CV_8UC1, rightPtr).Clone()
                     rightView = rightView.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
                 End If
 
-                Dim depthPtr = If(deviceClass = 3, OakDNative.OakDRawDepth3D(cPtr), OakDNative.OakDRawDepth4D(cPtr))
+                Dim depthPtr = OakDRawDepth3D(cPtr) ' , OakDRawDepth4D(cPtr))
                 If depthPtr <> IntPtr.Zero Then
-                    depth16u = cv.Mat.FromPixelData(rows, cols, cv.MatType.CV_16UC1, depthPtr).Clone()
+                    If rows = 720 Then
+                        depth16u = cv.Mat.FromPixelData(360, 640, cv.MatType.CV_16UC1, depthPtr).Clone()
+                    Else
+                        depth16u = cv.Mat.FromPixelData(240, 320, cv.MatType.CV_16UC1, depthPtr).Clone()
+                    End If
                     depth16u = depth16u.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
                     pointCloud = ComputePointCloud(depth16u, calibData.leftIntrinsics)
                 End If
 
-                Dim rgbPtr = OakDNative.OakDColor(cPtr)
+                    Dim rgbPtr = OakDColor(cPtr)
                 If rgbPtr <> IntPtr.Zero Then
                     color = cv.Mat.FromPixelData(rows, cols, cv.MatType.CV_8UC3, rgbPtr).Clone()
                     color = color.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
                 End If
 
                 If deviceClass = 4 Then
-                    Dim disparityPtr = OakDNative.OakDDisparity(cPtr)
+                    Dim disparityPtr = OakDDisparity(cPtr)
                     If disparityPtr <> IntPtr.Zero Then
                         disparity = cv.Mat.FromPixelData(rows, cols, cv.MatType.CV_8UC1, disparityPtr).Clone()
                         disparity = disparity.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
                     End If
                 End If
 
-                Dim accelPtr = OakDNative.OakDAccel(cPtr)
+                Dim accelPtr = OakDAccel(cPtr)
                 If accelPtr <> IntPtr.Zero Then
                     IMU_Acceleration = Marshal.PtrToStructure(Of cv.Point3f)(accelPtr)
                 End If
 
-                Dim gyroPtr = OakDNative.OakDGyro(cPtr)
+                Dim gyroPtr = OakDGyro(cPtr)
                 If gyroPtr <> IntPtr.Zero Then
                     IMU_AngularVelocity = Marshal.PtrToStructure(Of cv.Point3f)(gyroPtr)
                 End If
 
-                IMU_FrameTime = OakDNative.OakDIMUTimeStamp(cPtr)
+                IMU_FrameTime = OakDIMUTimeStamp(cPtr)
             End SyncLock
 
             MyBase.GetNextFrameCounts()
@@ -182,7 +242,7 @@ Namespace MainApp
 
         Public Overrides Sub StopCamera()
             If cPtr <> IntPtr.Zero Then
-                OakDNative.OakDStop(cPtr)
+                OakDStop(cPtr)
                 cPtr = IntPtr.Zero
             End If
         End Sub

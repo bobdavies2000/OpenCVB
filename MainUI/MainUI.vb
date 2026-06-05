@@ -63,7 +63,6 @@ Namespace MainApp
             updatePath(homeDir + "OakD\depthai-core\Build\Debug", "Oak-3D/Oak-4D camera support.")
             updatePath(homeDir + "opencv\Build\bin\Release\", "OpenCV native DLLs for Cam_Oak-D.dll")
             updatePath(homeDir + "opencv\Build\bin\Debug\", "OpenCV native DLLs for Cam_Oak-D.dll")
-            OakDNative.EnsureLoaded()
         End Sub
         Private Sub pathFixup()
             updatePath(homeDir + "bin\", "Release version of CPP_Native.dll")

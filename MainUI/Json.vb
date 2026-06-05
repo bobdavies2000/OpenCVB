@@ -37,6 +37,14 @@ Namespace MainApp
         Private Shared Function SetupDiDestroyDeviceInfoList(ByVal DeviceInfoSet As IntPtr) As Boolean
         End Function
 
+        <DllImport("Cam_Oak-D.dll", CallingConvention:=CallingConvention.Cdecl)>
+        Private Shared Function OakDDevices() As Integer
+        End Function
+
+        <DllImport("Cam_Oak-D.dll", CallingConvention:=CallingConvention.Cdecl)>
+        Private Shared Function OakDNextDevice() As IntPtr
+        End Function
+
         Private jsonFileName As String
         Public Sub New(fileName As String)
             jsonFileName = fileName
@@ -68,10 +76,9 @@ Namespace MainApp
             Settings.OakIndex3D = -1
             Settings.OakIndex4D = -1
             Try
-                OakDNative.EnsureLoaded()
-                Dim countOak = OakDNative.OakDDevices()
+                Dim countOak = OakDDevices()
                 For i = 0 To countOak - 1
-                    Dim strPtr = OakDNative.OakDNextDevice()
+                    Dim strPtr = OakDNextDevice()
                     Dim productName As String = Marshal.PtrToStringAnsi(strPtr)
                     If productName.StartsWith("OAK-D") Then Settings.OakIndex3D = i
                     If productName.StartsWith("OAK-4") Then Settings.OakIndex4D = i

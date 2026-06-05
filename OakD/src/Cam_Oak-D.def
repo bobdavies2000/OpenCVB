@@ -14,7 +14,6 @@ EXPORTS
     OakDNextDevice
     OakDOpen
     OakDRawDepth3D
-    OakDRawDepth4D
     OakDRightImage
     OakDStop
     OakDWaitForFrame
