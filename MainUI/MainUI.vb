@@ -33,14 +33,15 @@ Namespace MainApp
         End Sub
 
         Private Sub MainForm_Load(sender As Object, e As EventArgs) Handles MyBase.Load
-            updatePath(homeDir + "bin\", "Oak-3D/Oak-4D camera support.")
-            updatePath(homeDir + "OakD\depthai-core\Build\vcpkg_installed\x64-windows\bin\", "Oak-3D/Oak-4D camera support.")
-            updatePath(homeDir + "OakD\depthai-core\Build\Release", "Oak-3D/Oak-4D camera support.")
-            updatePath(homeDir + "OakD\depthai-core\Build\Debug", "Oak-3D/Oak-4D camera support.")
-
+            ensureOakPaths()
             Application.DoEvents()
             settings = settingsIO.Load()
             pathFixup()
+            Try
+                Debug.WriteLine(Open3D_PrintVersion())
+            Catch ex As Exception
+                Debug.WriteLine("Open3D_PrintVersion failed: " + ex.Message)
+            End Try
 
             addPics()
 
@@ -55,13 +56,22 @@ Namespace MainApp
             Application.DoEvents()
             StartStopTask()
         End Sub
+        Private Sub ensureOakPaths()
+            updatePath(homeDir + "bin\", "Oak-3D/Oak-4D camera support.")
+            updatePath(homeDir + "OakD\depthai-core\Build\vcpkg_installed\x64-windows\bin\", "Oak-3D/Oak-4D camera support.")
+            updatePath(homeDir + "OakD\depthai-core\Build\Release", "Oak-3D/Oak-4D camera support.")
+            updatePath(homeDir + "OakD\depthai-core\Build\Debug", "Oak-3D/Oak-4D camera support.")
+            updatePath(homeDir + "opencv\Build\bin\Release\", "OpenCV native DLLs for Cam_Oak-D.dll")
+            updatePath(homeDir + "opencv\Build\bin\Debug\", "OpenCV native DLLs for Cam_Oak-D.dll")
+            OakDNative.EnsureLoaded()
+        End Sub
         Private Sub pathFixup()
             updatePath(homeDir + "bin\", "Release version of CPP_Native.dll")
             updatePath(homeDir + "opencv\Build\bin\Release\", "OpenCV and OpenCV Contrib are needed for C++ classes.")
             updatePath(homeDir + "opencv\Build\bin\Debug\", "OpenCV and OpenCV Contrib are needed for C++ classes.")
 
             Dim cudaPath = Environment.GetEnvironmentVariable("CUDA_PATH")
-            If cudaPath IsNot Nothing And settings.cameraName.StartsWith("StereoLabs") Then
+            If cudaPath IsNot Nothing AndAlso settings IsNot Nothing AndAlso settings.cameraName.StartsWith("StereoLabs") Then
                 updatePath(cudaPath, "Cuda - needed for StereoLabs")
                 updatePath("C:\Program Files (x86)\ZED SDK\bin", "StereoLabs support")
             End If

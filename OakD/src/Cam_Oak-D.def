@@ -1,0 +1,21 @@
+LIBRARY Cam_Oak-D
+EXPORTS
+    OakDAccel
+    OakDColor
+    OakDDevices
+    OakDDisparity
+    OakDDisparityFactor
+    OakDExtrinsicsLeftToRight
+    OakDExtrinsicsRGBtoLeft
+    OakDGyro
+    OakDIMUTimeStamp
+    OakDLaserOff
+    OakDLeftImage
+    OakDNextDevice
+    OakDOpen
+    OakDRawDepth3D
+    OakDRawDepth4D
+    OakDRightImage
+    OakDStop
+    OakDWaitForFrame
+    OakDintrinsics

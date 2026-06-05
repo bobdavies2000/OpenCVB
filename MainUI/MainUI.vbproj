@@ -117,6 +117,34 @@
   </ItemGroup>
 
   <!-- Always overwrite output sl_zed_c.dll so a stale ~194KB (5.0.x) copy cannot survive rebuilds. -->
+  <Target Name="BuildCamOakDRelease" BeforeTargets="CopyOakNativeDlls">
+    <MSBuild Projects="$(MSBuildThisFileDirectory)..\OakD\src\Cam_Oak-D.vcxproj"
+             Properties="Configuration=Release;Platform=x64"
+             Targets="Build" />
+  </Target>
+
+  <Target Name="CopyOakNativeDlls" AfterTargets="Build">
+    <PropertyGroup>
+      <_OakRepoBin>$(MSBuildThisFileDirectory)..\bin\</_OakRepoBin>
+      <_OakVcpkgBin>$(MSBuildThisFileDirectory)..\OakD\depthai-core\Build\vcpkg_installed\x64-windows\bin\</_OakVcpkgBin>
+      <_OpenCvReleaseBin>$(MSBuildThisFileDirectory)..\opencv\Build\bin\Release\</_OpenCvReleaseBin>
+    </PropertyGroup>
+    <Copy SourceFiles="$(_OakRepoBin)Cam_Oak-D.dll" DestinationFolder="$(TargetDir)" OverwriteReadOnlyFiles="true"
+          Condition="Exists('$(_OakRepoBin)Cam_Oak-D.dll')" />
+    <Copy SourceFiles="$(_OakVcpkgBin)libusb-1.0.dll" DestinationFolder="$(TargetDir)" SkipUnchangedFiles="true"
+          Condition="Exists('$(_OakVcpkgBin)libusb-1.0.dll')" />
+    <Copy SourceFiles="$(_OpenCvReleaseBin)opencv_core4140.dll" DestinationFolder="$(TargetDir)" SkipUnchangedFiles="true"
+          Condition="Exists('$(_OpenCvReleaseBin)opencv_core4140.dll')" />
+    <Copy SourceFiles="$(_OpenCvReleaseBin)opencv_imgproc4140.dll" DestinationFolder="$(TargetDir)" SkipUnchangedFiles="true"
+          Condition="Exists('$(_OpenCvReleaseBin)opencv_imgproc4140.dll')" />
+    <Copy SourceFiles="$(_OpenCvReleaseBin)opencv_calib3d4140.dll" DestinationFolder="$(TargetDir)" SkipUnchangedFiles="true"
+          Condition="Exists('$(_OpenCvReleaseBin)opencv_calib3d4140.dll')" />
+    <Copy SourceFiles="$(_OpenCvReleaseBin)opencv_videoio4140.dll" DestinationFolder="$(TargetDir)" SkipUnchangedFiles="true"
+          Condition="Exists('$(_OpenCvReleaseBin)opencv_videoio4140.dll')" />
+    <Error Condition="!Exists('$(TargetDir)Cam_Oak-D.dll') and Exists('$(_OakRepoBin)Cam_Oak-D.dll')"
+           Text="Missing $(TargetDir)Cam_Oak-D.dll. Build Cam_Oak-D (Release|x64) first." />
+  </Target>
+
   <Target Name="CopySlZedCNativeDll" AfterTargets="Build">
     <PropertyGroup>
       <_SlZedCSource>$(PkgStereolabs_zed)\runtimes\win-x64\native\sl_zed_c.dll</_SlZedCSource>
@@ -133,7 +161,9 @@
     <ProjectReference Include="..\CPP_Native\CPP_Native.vcxproj" />
     <ProjectReference Include="..\GifBuilder\GifBuilder.vbproj" />
     <ProjectReference Include="..\jsonShared\jsonShared.vbproj" />
-    <ProjectReference Include="..\OakD\src\Cam_Oak-D.vcxproj" />
+    <ProjectReference Include="..\OakD\src\Cam_Oak-D.vcxproj">
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
     <ProjectReference Include="..\VBClasses\VBClasses.vbproj" />
   </ItemGroup>
 

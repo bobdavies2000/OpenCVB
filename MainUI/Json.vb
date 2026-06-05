@@ -37,14 +37,6 @@ Namespace MainApp
         Private Shared Function SetupDiDestroyDeviceInfoList(ByVal DeviceInfoSet As IntPtr) As Boolean
         End Function
 
-        <DllImport("Cam_Oak-D.dll", CallingConvention:=CallingConvention.Cdecl)>
-        Private Shared Function OakDDevices() As Integer
-        End Function
-
-        <DllImport("Cam_Oak-D.dll", CallingConvention:=CallingConvention.Cdecl)>
-        Private Shared Function OakDNextDevice() As IntPtr
-        End Function
-
         Private jsonFileName As String
         Public Sub New(fileName As String)
             jsonFileName = fileName
@@ -73,20 +65,27 @@ Namespace MainApp
 
             If Settings.paintFrequency = 0 Then Settings.paintFrequency = 30
 
-            'Dim countOak = OakDDevices()
-            'For i = 0 To countOak - 1
-            '    Dim strPtr = OakDNextDevice()
-            '    Dim productName As String = Marshal.PtrToStringAnsi(strPtr)
-            '    If productName.StartsWith("OAK-D") Then Settings.OakIndex3D = i
-            '    If productName.StartsWith("OAK-4") Then Settings.OakIndex4D = i
-            'Next
+            Settings.OakIndex3D = -1
+            Settings.OakIndex4D = -1
+            Try
+                OakDNative.EnsureLoaded()
+                Dim countOak = OakDNative.OakDDevices()
+                For i = 0 To countOak - 1
+                    Dim strPtr = OakDNative.OakDNextDevice()
+                    Dim productName As String = Marshal.PtrToStringAnsi(strPtr)
+                    If productName.StartsWith("OAK-D") Then Settings.OakIndex3D = i
+                    If productName.StartsWith("OAK-4") Then Settings.OakIndex4D = i
+                Next
+            Catch ex As Exception
+                Debug.WriteLine("OakDDevices failed: " & ex.Message)
+            End Try
 
             Settings.cameraPresent = New List(Of Boolean)
             For i = 0 To cameraNames.Count - 1
                 Dim searchname = cameraNames(i)
                 Dim present As Boolean = False
-                'If searchname.StartsWith("Oak-3D") And countOak > 0 Then present = Settings.OakIndex3D >= 0
-                'If searchname.StartsWith("Oak-4D") And countOak > 0 Then present = Settings.OakIndex4D >= 0
+                If searchname.StartsWith("Oak-3D") Then present = Settings.OakIndex3D >= 0
+                If searchname.StartsWith("Oak-4D") Then present = Settings.OakIndex4D >= 0
                 If searchname.StartsWith("StereoLabs ZED 2/2i") Then searchname = "ZED 2"
 
                 Dim subsetList As New List(Of String)

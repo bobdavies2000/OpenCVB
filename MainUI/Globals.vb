@@ -2,9 +2,9 @@
 
 Module GlobalVariables
     Public settings As jsonShared.Settings
-    '                                         "Oak-3D camera",
     Public cameraNames As New List(Of String)({"Intel(R) RealSense(TM) Depth Camera 435i",
                                                "Intel(R) RealSense(TM) Depth Camera 455",
+                                               "Oak-3D camera",
                                                "Oak-4D camera",
                                                "Orbbec Gemini 335",
                                                "Orbbec Gemini 335L",
@@ -57,5 +57,9 @@ Module GlobalVariables
     End Enum
     <DllImport("user32.dll", SetLastError:=True)>
     Public Function SendMessage(hWnd As IntPtr, msg As Integer, wParam As IntPtr, lParam As IntPtr) As IntPtr
+    End Function
+
+    <DllImport("Open3D_Native.dll", CallingConvention:=CallingConvention.Cdecl, CharSet:=CharSet.Ansi, EntryPoint:="Open3D_PrintVersion")>
+    Public Function Open3D_PrintVersion() As <Runtime.InteropServices.MarshalAs(Runtime.InteropServices.UnmanagedType.LPStr)> String
     End Function
 End Module

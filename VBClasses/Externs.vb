@@ -1382,4 +1382,12 @@ Module Externs
     <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function RedCart_CPP_RunCPP(cPtr As IntPtr, dataPtr As IntPtr, rows As Integer, cols As Integer) As IntPtr
     End Function
+
+
+
+
+
+    <DllImport("Open3D_Native.dll", CallingConvention:=CallingConvention.Cdecl, CharSet:=CharSet.Ansi, EntryPoint:="Open3D_PrintVersion")>
+    Public Function Open3D_PrintVersion() As <Runtime.InteropServices.MarshalAs(Runtime.InteropServices.UnmanagedType.LPStr)> String
+    End Function
 End Module
