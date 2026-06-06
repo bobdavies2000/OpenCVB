@@ -1,13 +1,12 @@
-Imports System.Runtime.InteropServices
-Imports System.Windows.Documents
-Imports OpenCvSharp
+Imports System.Diagnostics.Metrics
 Imports cv = OpenCvSharp
 Public Class FeatureLess_Basics : Inherits TaskParent
+    Public brickList As New List(Of cv.Rect)
     Public rectList As New List(Of cv.Rect)
-    Public rectIndex As New List(Of Integer)
+    Public matList As New List(Of cv.Mat)
     Dim edges As New Edge_Canny
     Public Sub New()
-        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
         desc = "Identify featureless squares using the gray scale range - see 'Correlation_Basics'."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -15,20 +14,45 @@ Public Class FeatureLess_Basics : Inherits TaskParent
         edges.Run(src)
         labels(3) = edges.labels(2)
 
-        dst3 = src
-        dst2.SetTo(0)
-        rectList.Clear()
-        rectIndex.Clear()
+        dst1.SetTo(0)
+        brickList.Clear()
         For i = 0 To task.gridRects.Count - 1
             Dim r = task.gridRects(i)
             If edges.dst2(r).CountNonZero > 0 Then Continue For
-            dst2(r).SetTo(255)
-            dst3.Rectangle(r, white, task.lineWidth)
-            rectList.Add(r)
-            rectIndex.Add(i)
+            If task.depthmask(r).CountNonZero = 0 Then Continue For
+            dst1(r).SetTo(255)
+
+            brickList.Add(r)
+        Next
+        Dim countRects = brickList.Count
+
+        Dim index = 1
+        Dim rect As cv.Rect
+        Dim mask = New cv.Mat(New cv.Size(dst1.Width + 2, dst1.Height + 2), cv.MatType.CV_8U, 0)
+        Dim flags As cv.FloodFillFlags = cv.FloodFillFlags.Link4
+        Dim minSize = task.gridWH * task.gridWH
+        Dim countList As New SortedList(Of Integer, cv.Rect)(New compareAllowIdenticalIntegerInverted)
+        rectList.Clear()
+        matList.Clear()
+        For Each r In brickList
+            Dim val = dst1.Get(Of Byte)(r.Y, r.X)
+            If val = 255 Then
+                Dim count = cv.Cv2.FloodFill(dst1, mask, r.TopLeft, index, rect, 0, 0, flags)
+                If count > minSize Then
+                    countList.Add(count, r)
+                    rectList.Add(rect)
+                    matList.Add(mask(rect).InRange(index, index))
+                    index += 1
+                Else
+                    dst1(r).SetTo(0)
+                End If
+            End If
         Next
 
-        labels(2) = CStr(rectList.Count) + " featureless grid squares"
+        dst2 = Palettize(dst1, 0)
+
+        brickList = New List(Of cv.Rect)(countList.Values)
+        labels(2) = CStr(brickList.Count) + " featureless grid regions with " + CStr(countRects) + " input grid rects"
     End Sub
 End Class
 
@@ -87,7 +111,7 @@ End Class
 
 
 
-Public Class FeatureLess_BasicsMotion : Inherits TaskParent
+Public Class NR_FeatureLess_BasicsMotion : Inherits TaskParent
     Public fLessRaw As New FeatureLess_Basics
     Public rectList As New List(Of cv.Rect)
     Public fLessNot As New List(Of cv.Rect)
@@ -99,7 +123,7 @@ Public Class FeatureLess_BasicsMotion : Inherits TaskParent
         fLessRaw.Run(src)
         If task.optionsChanged Then
             dst2 = fLessRaw.dst3.Clone
-            rectList = New List(Of cv.Rect)(fLessRaw.rectList)
+            rectList = New List(Of cv.Rect)(fLessRaw.brickList)
         End If
 
         ptList.Clear()
@@ -111,7 +135,7 @@ Public Class FeatureLess_BasicsMotion : Inherits TaskParent
             ptList.Add(r.TopLeft)
         Next
 
-        For Each r In fLessRaw.rectList
+        For Each r In fLessRaw.brickList
             Dim val = task.motion.motionMask.Get(Of Byte)(r.TopLeft.Y, r.TopLeft.X)
             If val = 0 Then
                 If ptList.Contains(r.TopLeft) = False Then
@@ -529,7 +553,7 @@ End Class
 
 
 
-Public Class FeatureLess_Lines : Inherits TaskParent
+Public Class NR_FeatureLess_Lines : Inherits TaskParent
     Dim fLess As New FeatureLess_Basics
     Dim ranges() As cv.Rangef = New cv.Rangef() {New cv.Rangef(0, 255)}
     Public lpList As New List(Of lpData)
@@ -664,7 +688,7 @@ Public Class NR_FeatureLess_FeaturesOld : Inherits TaskParent
         For Each lp In task.lines.lpList
             dst2.Line(lp.p1, lp.p2, black, task.lineWidth)
         Next
-        Dim count = task.gridRects.Count - fLess.rectList.Count
+        Dim count = task.gridRects.Count - fLess.brickList.Count
         labels(2) = "Current frame: " + CStr(count) + " grid squares had features"
     End Sub
 End Class
@@ -726,7 +750,7 @@ Public Class FeatureLess_FeatureLines : Inherits TaskParent
         For Each lp In task.lines.lpList
             dst2.Line(lp.p1, lp.p2, black, task.lineWidth)
         Next
-        Dim count = task.gridRects.Count - fLess.rectList.Count
+        Dim count = task.gridRects.Count - fLess.brickList.Count
         labels(2) = "Current frame: " + CStr(count) + " grid squares had features"
     End Sub
 End Class
@@ -857,71 +881,7 @@ End Class
 
 
 
-
-
-'Public Class FeatureLess_ClustersHist2D : Inherits TaskParent
-'    Public fLess As New FeatureLess_Basics
-'    Public histArray(task.histogramBins * task.histogramBins - 1) As Single
-'    Public features As New cv.Mat
-'    Public bpArray() As Single
-'    Public Sub New()
-'        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
-'        desc = "Isolate clusters using a 2D histogram"
-'    End Sub
-'    Public Function backProjectHistArray(histogram As cv.Mat, ranges() As cv.Rangef) As cv.Mat
-'        Dim backP As New cv.Mat
-'        cv.Cv2.CalcBackProject({features}, {0, 1}, histogram, backP, ranges)
-'        ReDim bpArray(histogram.Rows * histogram.Cols - 1)
-'        backP.GetArray(Of Single)(bpArray)
-
-'        Dim dst As New cv.Mat(task.workRes, cv.MatType.CV_8U, 0)
-'        For i = 0 To fLess.rectList.Count - 1
-'            dst(fLess.rectList(i)).SetTo(bpArray(i))
-'        Next
-
-'        Return dst
-'    End Function
-'    Public Overrides Sub RunAlg(src As cv.Mat)
-'        fLess.Run(task.gray)
-
-'        Dim mmX = GetMinMax(fLess.grayMat)
-'        Dim ranges() As cv.Rangef = {New cv.Rangef(mmX.minVal - 0.01, 255.01), New cv.Rangef(0, task.MaxZmeters)}
-
-'        cv.Cv2.Merge({fLess.grayMat, fLess.depthMat}, features)
-
-'        Dim histogram As New cv.Mat
-'        Dim bins = task.histogramBins
-'        cv.Cv2.CalcHist({features}, {0, 1}, New cv.Mat(), histogram, 2, {bins, bins}, ranges)
-
-'        histogram = histogram.Threshold(0, 255, cv.ThresholdTypes.Binary)
-'        Dim floodIndex As Integer = 1
-'        For y = 0 To histogram.Height - 1
-'            For x = 0 To histogram.Width - 1
-'                Dim pt = New cv.Point(x, y)
-'                Dim val = histogram.Get(Of Single)(y, x)
-'                If val = 255 Then
-'                    histogram.FloodFill(pt, floodIndex)
-'                    floodIndex += 1
-'                    If floodIndex >= 254 Then Exit For
-'                End If
-'            Next
-'        Next
-
-'        histogram.GetArray(Of Single)(histArray)
-
-'        dst3 = backProjectHistArray(histogram, ranges)
-'        Dim clusterCount = GetMinMax(dst3).maxVal - 1
-'        dst2 = Palettize(dst3, 0)
-
-'        labels(2) = CStr(clusterCount) + " clusters were found for the " + "X scale is mean grayscale color and the Y scale is mean depth."
-'        labels(3) = CStr(clusterCount) + " clusters were identified."
-'    End Sub
-'End Class
-
-
-
-
-Public Class FeatureLess_Predict : Inherits TaskParent
+Public Class NR_FeatureLess_Predict : Inherits TaskParent
     Dim ml As New ML_RandomForest
     Dim edges As New Edge_Canny
     Public clusters() As Single
@@ -1146,5 +1106,143 @@ Public Class FeatureLess_IndexKNN : Inherits TaskParent
         SetTrueText(strOut, 1)
 
         labels(2) = CStr(knn.trainMat.Rows) + " featureless clusters were found."
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class NR_FeatureLess_ClustersHist2D : Inherits TaskParent
+    Public fLess As New FeatureLess_Basics
+    Public histArray(task.histogramBins * task.histogramBins - 1) As Single
+    Public features As New cv.Mat
+    Public bpArray() As Single
+    Public Sub New()
+        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
+        desc = "Isolate clusters using a 2D histogram"
+    End Sub
+    Public Function backProjectHistArray(histogram As cv.Mat, ranges() As cv.Rangef) As cv.Mat
+        Dim backP As New cv.Mat
+        cv.Cv2.CalcBackProject({features}, {0, 1}, histogram, backP, ranges)
+        ReDim bpArray(histogram.Rows * histogram.Cols - 1)
+        backP.GetArray(Of Single)(bpArray)
+
+        Dim dst As New cv.Mat(task.workRes, cv.MatType.CV_8U, 0)
+        For i = 0 To fLess.brickList.Count - 1
+            dst(fLess.brickList(i)).SetTo(bpArray(i))
+        Next
+
+        Return dst
+    End Function
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        fLess.Run(task.gray)
+
+        Dim mmX = GetMinMax(fLess.dst2)
+        Dim ranges() As cv.Rangef = {New cv.Rangef(mmX.minVal - 0.01, 255.01), New cv.Rangef(0, task.MaxZmeters)}
+
+        Dim depthMat = task.pcSplit(2).Clone
+        depthMat.SetTo(0, Not fLess.dst2)
+
+        Dim grayMat As New cv.Mat
+        fLess.dst2.ConvertTo(grayMat, cv.MatType.CV_32F)
+
+        cv.Cv2.Merge({grayMat, depthMat}, features)
+
+        Dim histogram As New cv.Mat
+        Dim bins = task.histogramBins
+        cv.Cv2.CalcHist({features}, {0, 1}, New cv.Mat(), histogram, 2, {bins, bins}, ranges)
+
+        histogram = histogram.Threshold(0, 255, cv.ThresholdTypes.Binary)
+        Dim floodIndex As Integer = 1
+        For y = 0 To histogram.Height - 1
+            For x = 0 To histogram.Width - 1
+                Dim pt = New cv.Point(x, y)
+                Dim val = histogram.Get(Of Single)(y, x)
+                If val = 255 Then
+                    histogram.FloodFill(pt, floodIndex)
+                    floodIndex += 1
+                    If floodIndex >= 254 Then Exit For
+                End If
+            Next
+        Next
+
+        histogram.GetArray(Of Single)(histArray)
+
+        dst3 = backProjectHistArray(histogram, ranges)
+        Dim clusterCount = GetMinMax(dst3).maxVal - 1
+        dst2 = Palettize(dst3, 0)
+
+        labels(2) = CStr(clusterCount) + " clusters were found for the " + "X scale is mean grayscale color and the Y scale is mean depth."
+        labels(3) = CStr(clusterCount) + " clusters were identified."
+    End Sub
+End Class
+
+
+
+
+
+Public Class FeatureLess_Lines : Inherits TaskParent
+    Dim fLess As New FeatureLess_Basics
+    Dim stepSize As Integer
+    Public Sub New()
+        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        dst0 = New cv.Mat(dst0.Size, cv.MatType.CV_8U, 0)
+        Dim stepsize = task.gridWH
+        For i = stepsize / 2 To dst0.Width - 1 Step stepsize
+            dst0.Line(New cv.Point(i, 0), New cv.Point(i, dst0.Width), 255, task.lineWidth)
+        Next
+        For i = stepsize / 2 To dst0.Height - 1 Step stepsize
+            dst0.Line(New cv.Point(0, i), New cv.Point(dst0.Width, i), 255, task.lineWidth)
+        Next
+        desc = "Find horizontal and vertical lines through the center of featureless grid rects."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        If src.Channels <> 1 Then src = task.gray
+
+        If task.optionsChanged Then stepSize = task.gridWH
+
+        fLess.Run(src)
+        dst2 = fLess.dst2
+        labels(2) = fLess.labels(2)
+        Dim lpList(fLess.matList.Count - 1) As List(Of lpData)
+        For i = 0 To fLess.matList.Count - 1
+            Dim mat = fLess.matList(i)
+            Dim r = fLess.rectList(i)
+
+            For j = CInt(stepSize / 2) To dst2.Height - 1 Step stepSize
+                Dim nextRow = mat.Row(j)
+                Dim points = nextRow.FindNonZero()
+                Dim ptArray(points.Rows) As cv.Point
+                points.GetArray(Of cv.Point)(ptArray)
+                Dim p1 = New cv.Point(0, 0)
+                Dim p2 = New cv.Point(0, 0)
+                For c = 0 To ptArray.Count - 1
+                    Dim val = task.pointCloud.Get(Of cv.Vec3f)(ptArray(c).Y, ptArray(c).X)
+                    If val(2) > 0 Then
+                        p1 = New cv.Point(r.X + ptArray(c).X, j)
+                        Exit For
+                    End If
+                Next
+
+                For c = ptArray.Count - 1 To 0 Step -1
+                    Dim val = task.pointCloud.Get(Of cv.Vec3f)(ptArray(c).Y, ptArray(c).X)
+                    If val(2) > 0 Then
+                        p2 = New cv.Point(r.Y + ptArray(c).X, j)
+                        Exit For
+                    End If
+                Next
+
+                If Not (p1.X = 0 And p1.Y = 0) And Not (p2.X = 0 And p2.Y = 0) Then
+                    If lpList(i) Is Nothing Then lpList(i) = New List(Of lpData)
+                    lpList(i).Add(New lpData(p1, p2))
+                    dst2.Line(p1, p2, white, task.lineWidth)
+                End If
+            Next
+        Next
+
+        labels(2) = CStr(lpList.Count) + " horizontal lines encountered with depth"
     End Sub
 End Class

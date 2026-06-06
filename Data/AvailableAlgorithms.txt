@@ -250,7 +250,6 @@ Feature_Points
 FeatureFlow_Basics
 FeatureFlow_LucasKanade
 FeatureLess_Basics
-FeatureLess_BasicsMotion
 FeatureLess_Cells
 FeatureLess_ClusterFlood
 FeatureLess_Correlation
@@ -260,7 +259,6 @@ FeatureLess_IndexKNN
 FeatureLess_LeftRight
 FeatureLess_Lines
 FeatureLess_NotImages
-FeatureLess_Predict
 FeatureLess_RedColor
 FeatureLess_Stabilized
 FeatureLess_ToList
@@ -916,7 +914,9 @@ NR_Feature_SteadyCam
 NR_Feature_TraceDelaunay
 NR_Feature_WithDepth
 NR_FeatureLess_Basics
+NR_FeatureLess_BasicsMotion
 NR_FeatureLess_Canny
+NR_FeatureLess_ClustersHist2D
 NR_FeatureLess_Contours
 NR_FeatureLess_Correlation
 NR_FeatureLess_Correlations
@@ -924,6 +924,8 @@ NR_FeatureLess_DCT
 NR_FeatureLess_FeaturesOld
 NR_FeatureLess_Histogram
 NR_FeatureLess_History
+NR_FeatureLess_Lines
+NR_FeatureLess_Predict
 NR_FeatureLess_Sobel
 NR_FeatureLess_Unique3Pixels
 NR_FeatureLess_UniquePixels
