@@ -145,6 +145,7 @@ Neighbor
 NR
 OEX
 OpAuto
+Open3D
 ORB
 Palette
 PCA

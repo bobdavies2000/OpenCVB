@@ -1,6 +1,7 @@
 #pragma once
 
 #ifdef _DEBUG
+#pragma comment(lib, "tbb12.lib")
 #pragma comment(lib, "Open3D.lib")
 #pragma comment(lib, "Open3D_3rdparty_glew.lib")
 #pragma comment(lib, "Open3D_3rdparty_liblzf.lib")
@@ -59,6 +60,7 @@
 #pragma comment(lib, "vtkpugixml-9.1d.lib")
 #pragma comment(lib, "vtksys-9.1d.lib")
 #else
+#pragma comment(lib, "tbb12.lib")
 #pragma comment(lib, "Open3D.lib")
 #pragma comment(lib, "Open3D_3rdparty_glew.lib")
 #pragma comment(lib, "Open3D_3rdparty_liblzf.lib")

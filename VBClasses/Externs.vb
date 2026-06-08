@@ -1390,4 +1390,10 @@ Module Externs
     <DllImport("Open3D_Native.dll", CallingConvention:=CallingConvention.Cdecl, CharSet:=CharSet.Ansi, EntryPoint:="Open3D_PrintVersion")>
     Public Function Open3D_PrintVersion() As <Runtime.InteropServices.MarshalAs(Runtime.InteropServices.UnmanagedType.LPStr)> String
     End Function
+
+    <DllImport("Open3D_Native.dll", CallingConvention:=CallingConvention.Cdecl)>
+    Public Function Open3D_AlphaShape(points As IntPtr, pointCount As Integer, alpha As Double,
+                                      vertices As IntPtr, ByRef vertexCount As Integer, maxVertices As Integer,
+                                      triangles As IntPtr, ByRef triangleCount As Integer, maxTriangles As Integer) As Integer
+    End Function
 End Module

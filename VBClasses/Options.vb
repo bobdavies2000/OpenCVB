@@ -8241,3 +8241,20 @@ Public Class Options_BrickPoint : Inherits OptionParent
         threshold = bpSlider.value
     End Sub
 End Class
+
+
+
+
+
+Public Class Options_AlphaShape : Inherits OptionParent
+    Public alpha As Double = 0.03
+    Public Sub New()
+        If sliders.Setup(traceName) Then
+            sliders.setupTrackBar("Alpha x 1000", 1, 500, CInt(alpha * 1000))
+        End If
+    End Sub
+    Public Sub Run()
+        Static alphaSlider = OptionParent.FindSlider("Alpha x 1000")
+        alpha = alphaSlider.value / 1000.0R
+    End Sub
+End Class

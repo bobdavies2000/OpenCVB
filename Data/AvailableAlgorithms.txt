@@ -1499,6 +1499,7 @@ OEX_PointPolygon
 OpAuto_Peaks2D
 OpAuto_Peaks2DGrid
 OpAuto_Valley
+Open3D_Shape
 ORB_Basics
 Palette_Basics
 Palette_CustomColorMap

@@ -123,6 +123,26 @@
              Targets="Build" />
   </Target>
 
+  <Target Name="BuildOpen3DNativeRelease" BeforeTargets="CopyOpen3DNativeDlls">
+    <MSBuild Projects="$(MSBuildThisFileDirectory)..\Open3D_Native\Open3D_Native.vcxproj"
+             Properties="Configuration=Release;Platform=x64"
+             Targets="Build" />
+  </Target>
+
+  <Target Name="CopyOpen3DNativeDlls" AfterTargets="Build">
+    <PropertyGroup>
+      <_Open3DRepoBin>$(MSBuildThisFileDirectory)..\bin\</_Open3DRepoBin>
+      <_Open3DTbbDll>$(MSBuildThisFileDirectory)..\Open3D\Build\msvc_*\tbb12*.dll</_Open3DTbbDll>
+    </PropertyGroup>
+    <Copy SourceFiles="$(_Open3DRepoBin)Open3D_Native.dll" DestinationFolder="$(TargetDir)" OverwriteReadOnlyFiles="true"
+          Condition="Exists('$(_Open3DRepoBin)Open3D_Native.dll')" />
+    <ItemGroup>
+      <_Open3DTbbFiles Include="$(_Open3DTbbDll)" />
+    </ItemGroup>
+    <Copy SourceFiles="@(_Open3DTbbFiles)" DestinationFolder="$(TargetDir)" SkipUnchangedFiles="true"
+          Condition="'@(_Open3DTbbFiles)' != ''" />
+  </Target>
+
   <Target Name="CopyOakNativeDlls" AfterTargets="Build">
     <PropertyGroup>
       <_OakRepoBin>$(MSBuildThisFileDirectory)..\bin\</_OakRepoBin>
