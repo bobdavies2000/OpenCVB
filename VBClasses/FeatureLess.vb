@@ -1180,7 +1180,7 @@ End Class
 
 
 
-Public Class FeatureLess_Lines : Inherits TaskParent
+Public Class FeatureLess_XLines : Inherits TaskParent
     Dim fLess As New FeatureLess_Basics
     Public Sub New()
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
@@ -1190,9 +1190,10 @@ Public Class FeatureLess_Lines : Inherits TaskParent
         If src.Channels <> 1 Then src = task.gray
 
         fLess.Run(src)
-        Dim lpList As New List(Of lpData)
         dst1 = fLess.dst1
         dst2 = Palettize(dst1, 0)
+
+        Dim lpList As New List(Of lpData)
         For y = task.gridWH / 2 To dst1.Height - 1 Step task.gridWH
             Dim p1 = newPoint, p2 = newPoint
             Dim val1 As Integer, val2 As Integer
@@ -1203,6 +1204,47 @@ Public Class FeatureLess_Lines : Inherits TaskParent
                     If val1 = 0 Then p1 = New cv.Point(x + task.gridWH, y)
                     If val1 <> 0 And (x = 0 And val1 <> 0) Then p1 = New cv.Point(x, y)
                     If val2 = 0 Then p2 = New cv.Point(x + task.gridWH - 1, y)
+                    If p1 <> newPoint And p2 <> newPoint Then
+                        lpList.Add(New lpData(p1, p2))
+                        dst2.Line(p1, p2, white, task.lineWidth)
+                        p1 = newPoint
+                        p2 = newPoint
+                    End If
+                End If
+            Next
+        Next
+        labels(2) = CStr(lpList.Count) + " horizontal lines encountered with depth"
+    End Sub
+End Class
+
+
+
+
+
+Public Class FeatureLess_YLines : Inherits TaskParent
+    Dim fLess As New FeatureLess_Basics
+    Public Sub New()
+        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        desc = "Find horizontal and vertical lines through the center of featureless grid rects."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        If src.Channels <> 1 Then src = task.gray
+
+        fLess.Run(src)
+        dst1 = fLess.dst1
+        dst2 = Palettize(dst1, 0)
+
+        Dim lpList As New List(Of lpData)
+        For x = task.gridWH / 2 To dst1.Width - 1 Step task.gridWH
+            Dim p1 = newPoint, p2 = newPoint
+            Dim val1 As Integer, val2 As Integer
+            For y = 0 To dst1.Height - 1 Step task.gridWH
+                val1 = dst1.Get(Of Byte)(y, x)
+                val2 = If(y + task.gridWH >= dst2.Height, 0, dst1.Get(Of Byte)(y + task.gridWH, x))
+                If val1 <> val2 Or (y = 0 And val1 <> 0) Then
+                    If val1 = 0 Then p1 = New cv.Point(x, y + task.gridWH)
+                    If val1 <> 0 And (y = 0 And val1 <> 0) Then p1 = New cv.Point(x, y)
+                    If val2 = 0 Then p2 = New cv.Point(x, y + task.gridWH - 1)
                     If p1 <> newPoint And p2 <> newPoint Then
                         lpList.Add(New lpData(p1, p2))
                         dst2.Line(p1, p2, white, task.lineWidth)
