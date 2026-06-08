@@ -1,9 +1,8 @@
-Imports System.Diagnostics.Metrics
 Imports cv = OpenCvSharp
 Public Class FeatureLess_Basics : Inherits TaskParent
     Public brickList As New List(Of cv.Rect)
-    Public rectList As New List(Of cv.Rect)
-    Public matList As New List(Of cv.Mat)
+    Public regionList As New List(Of cv.Rect)
+    Public depthList As New List(Of Single)
     Dim edges As New Edge_Canny
     Public Sub New()
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
@@ -16,6 +15,7 @@ Public Class FeatureLess_Basics : Inherits TaskParent
 
         dst1.SetTo(0)
         brickList.Clear()
+        depthList.Clear()
         For i = 0 To task.gridRects.Count - 1
             Dim r = task.gridRects(i)
             If edges.dst2(r).CountNonZero > 0 Then Continue For
@@ -23,25 +23,22 @@ Public Class FeatureLess_Basics : Inherits TaskParent
             dst1(r).SetTo(255)
 
             brickList.Add(r)
+            depthList.Add(task.pcSplit(2)(r).Mean(task.depthmask(r)))
         Next
         Dim countRects = brickList.Count
 
         Dim index = 1
         Dim rect As cv.Rect
         Dim mask = New cv.Mat(New cv.Size(dst1.Width + 2, dst1.Height + 2), cv.MatType.CV_8U, 0)
-        Dim flags As cv.FloodFillFlags = cv.FloodFillFlags.Link4
         Dim minSize = task.gridWH * task.gridWH
-        Dim countList As New SortedList(Of Integer, cv.Rect)(New compareAllowIdenticalIntegerInverted)
-        rectList.Clear()
-        matList.Clear()
+        regionList.Clear()
         For Each r In brickList
             Dim val = dst1.Get(Of Byte)(r.Y, r.X)
             If val = 255 Then
+                Dim flags = cv.FloodFillFlags.FixedRange Or (index << 8)
                 Dim count = cv.Cv2.FloodFill(dst1, mask, r.TopLeft, index, rect, 0, 0, flags)
                 If count > minSize Then
-                    countList.Add(count, r)
-                    rectList.Add(rect)
-                    matList.Add(mask(rect).InRange(index, index))
+                    regionList.Add(r)
                     index += 1
                 Else
                     dst1(r).SetTo(0)
@@ -51,7 +48,6 @@ Public Class FeatureLess_Basics : Inherits TaskParent
 
         dst2 = Palettize(dst1, 0)
 
-        brickList = New List(Of cv.Rect)(countList.Values)
         labels(2) = CStr(brickList.Count) + " featureless grid regions with " + CStr(countRects) + " input grid rects"
     End Sub
 End Class
@@ -1186,63 +1182,37 @@ End Class
 
 Public Class FeatureLess_Lines : Inherits TaskParent
     Dim fLess As New FeatureLess_Basics
-    Dim stepSize As Integer
     Public Sub New()
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-        dst0 = New cv.Mat(dst0.Size, cv.MatType.CV_8U, 0)
-        Dim stepsize = task.gridWH
-        For i = stepsize / 2 To dst0.Width - 1 Step stepsize
-            dst0.Line(New cv.Point(i, 0), New cv.Point(i, dst0.Width), 255, task.lineWidth)
-        Next
-        For i = stepsize / 2 To dst0.Height - 1 Step stepsize
-            dst0.Line(New cv.Point(0, i), New cv.Point(dst0.Width, i), 255, task.lineWidth)
-        Next
         desc = "Find horizontal and vertical lines through the center of featureless grid rects."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If src.Channels <> 1 Then src = task.gray
 
-        If task.optionsChanged Then stepSize = task.gridWH
-
         fLess.Run(src)
-        dst2 = fLess.dst2
-        labels(2) = fLess.labels(2)
-        Dim lpList(fLess.matList.Count - 1) As List(Of lpData)
-        For i = 0 To fLess.matList.Count - 1
-            Dim mat = fLess.matList(i)
-            Dim r = fLess.rectList(i)
-
-            For j = CInt(stepSize / 2) To dst2.Height - 1 Step stepSize
-                Dim nextRow = mat.Row(j)
-                Dim points = nextRow.FindNonZero()
-                Dim ptArray(points.Rows) As cv.Point
-                points.GetArray(Of cv.Point)(ptArray)
-                Dim p1 = New cv.Point(0, 0)
-                Dim p2 = New cv.Point(0, 0)
-                For c = 0 To ptArray.Count - 1
-                    Dim val = task.pointCloud.Get(Of cv.Vec3f)(ptArray(c).Y, ptArray(c).X)
-                    If val(2) > 0 Then
-                        p1 = New cv.Point(r.X + ptArray(c).X, j)
-                        Exit For
+        Dim lpList As New List(Of lpData)
+        dst1 = fLess.dst1
+        dst2 = Palettize(dst1, 0)
+        For y = task.gridWH / 2 To dst1.Height - 1 Step task.gridWH
+            Dim p1 = newPoint, p2 = newPoint
+            Dim val1 As Integer, val2 As Integer
+            For x = 0 To dst1.Width - 1 Step task.gridWH
+                val1 = dst1.Get(Of Byte)(y, x)
+                val2 = If(x + task.gridWH >= dst2.Width, 0, dst1.Get(Of Byte)(y, x + task.gridWH))
+                If val1 <> val2 Or (x = 0 And val1 <> 0) Then
+                    If val1 = 0 Then p1 = New cv.Point(x + task.gridWH, y)
+                    If val1 <> 0 And (x = 0 And val1 <> 0) Then p1 = New cv.Point(x, y)
+                    If val2 = 0 Then p2 = New cv.Point(x + task.gridWH - 1, y)
+                    If p1 <> newPoint And p2 <> newPoint Then
+                        lpList.Add(New lpData(p1, p2))
+                        dst2.Line(p1, p2, white, task.lineWidth)
+                        p1 = newPoint
+                        p2 = newPoint
                     End If
-                Next
-
-                For c = ptArray.Count - 1 To 0 Step -1
-                    Dim val = task.pointCloud.Get(Of cv.Vec3f)(ptArray(c).Y, ptArray(c).X)
-                    If val(2) > 0 Then
-                        p2 = New cv.Point(r.Y + ptArray(c).X, j)
-                        Exit For
-                    End If
-                Next
-
-                If Not (p1.X = 0 And p1.Y = 0) And Not (p2.X = 0 And p2.Y = 0) Then
-                    If lpList(i) Is Nothing Then lpList(i) = New List(Of lpData)
-                    lpList(i).Add(New lpData(p1, p2))
-                    dst2.Line(p1, p2, white, task.lineWidth)
                 End If
             Next
         Next
-
         labels(2) = CStr(lpList.Count) + " horizontal lines encountered with depth"
     End Sub
 End Class
+
