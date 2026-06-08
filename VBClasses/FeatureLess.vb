@@ -2,7 +2,6 @@ Imports cv = OpenCvSharp
 Public Class FeatureLess_Basics : Inherits TaskParent
     Public brickList As New List(Of cv.Rect)
     Public regionList As New List(Of cv.Rect)
-    Public depthList As New List(Of Single)
     Dim edges As New Edge_Canny
     Public Sub New()
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
@@ -15,7 +14,6 @@ Public Class FeatureLess_Basics : Inherits TaskParent
 
         dst1.SetTo(0)
         brickList.Clear()
-        depthList.Clear()
         For i = 0 To task.gridRects.Count - 1
             Dim r = task.gridRects(i)
             If edges.dst2(r).CountNonZero > 0 Then Continue For
@@ -23,7 +21,6 @@ Public Class FeatureLess_Basics : Inherits TaskParent
             dst1(r).SetTo(255)
 
             brickList.Add(r)
-            depthList.Add(task.pcSplit(2)(r).Mean(task.depthmask(r)))
         Next
         Dim countRects = brickList.Count
 
@@ -1182,6 +1179,7 @@ End Class
 
 Public Class FeatureLess_XLines : Inherits TaskParent
     Dim fLess As New FeatureLess_Basics
+    Public lpList As New List(Of lpData)
     Public Sub New()
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         desc = "Find horizontal and vertical lines through the center of featureless grid rects."
@@ -1193,7 +1191,7 @@ Public Class FeatureLess_XLines : Inherits TaskParent
         dst1 = fLess.dst1
         dst2 = Palettize(dst1, 0)
 
-        Dim lpList As New List(Of lpData)
+        lpList.Clear()
         For y = task.gridWH / 2 To dst1.Height - 1 Step task.gridWH
             Dim p1 = newPoint, p2 = newPoint
             Dim val1 As Integer, val2 As Integer
@@ -1205,7 +1203,12 @@ Public Class FeatureLess_XLines : Inherits TaskParent
                     If val1 <> 0 And (x = 0 And val1 <> 0) Then p1 = New cv.Point(x, y)
                     If val2 = 0 Then p2 = New cv.Point(x + task.gridWH - 1, y)
                     If p1 <> newPoint And p2 <> newPoint Then
-                        lpList.Add(New lpData(p1, p2))
+                        Dim lp = New lpData(p1, p2)
+                        Dim r = New cv.Rect(p1.X, p1.Y, task.gridWH, task.gridWH)
+                        lp.p1Depth = task.pointCloud(r).Mean(task.depthmask(r))
+                        r = New cv.Rect(p2.X, p2.Y, task.gridWH, task.gridWH)
+                        lp.p2Depth = task.pointCloud(r).Mean(task.depthmask(r))
+                        lpList.Add(lp)
                         dst2.Line(p1, p2, white, task.lineWidth)
                         p1 = newPoint
                         p2 = newPoint
@@ -1223,6 +1226,7 @@ End Class
 
 Public Class FeatureLess_YLines : Inherits TaskParent
     Dim fLess As New FeatureLess_Basics
+    Public lpList As New List(Of lpData)
     Public Sub New()
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         desc = "Find horizontal and vertical lines through the center of featureless grid rects."
@@ -1234,7 +1238,7 @@ Public Class FeatureLess_YLines : Inherits TaskParent
         dst1 = fLess.dst1
         dst2 = Palettize(dst1, 0)
 
-        Dim lpList As New List(Of lpData)
+        lpList.Clear()
         For x = task.gridWH / 2 To dst1.Width - 1 Step task.gridWH
             Dim p1 = newPoint, p2 = newPoint
             Dim val1 As Integer, val2 As Integer

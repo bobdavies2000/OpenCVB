@@ -471,6 +471,9 @@ Public Module Structures
         Public angle As Single ' varies from -90 to 90 degrees
         Public color As cv.Scalar
 
+        Public p1Depth As cv.Scalar
+        Public p2Depth As cv.Scalar
+
         Public index As Integer
         Public length As Single
 
