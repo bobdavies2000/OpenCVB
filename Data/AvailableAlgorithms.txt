@@ -303,6 +303,7 @@ GL_BasicsLineMap
 GL_DisplayPC
 GL_DrawLineDepth
 GL_Featureless
+GL_FeatureLessVLines
 GL_LogicalLines
 GL_LogicalLines1
 GL_PlotHist

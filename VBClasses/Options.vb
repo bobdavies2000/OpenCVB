@@ -14,7 +14,7 @@ Public Class Options_SharpGL : Inherits OptionParent
             sliders.setupTrackBar("Perspective", 1, 100, 45)
             sliders.setupTrackBar("zNear X100", 1, 100, 10)
             sliders.setupTrackBar("zFar", 1, 100, 100)
-            sliders.setupTrackBar("Pointsize", 1, 10, 5)
+            sliders.setupTrackBar("Pointsize", 1, 40, 5)
             sliders.setupTrackBar("SharpGL X range", 1, 10, 1)
             sliders.setupTrackBar("SharpGL Y range", 1, 10, 1)
         End If

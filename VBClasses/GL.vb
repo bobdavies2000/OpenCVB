@@ -755,3 +755,30 @@ Public Class GL_DrawLineDepth : Inherits TaskParent
         SetTrueText(strOut, 3)
     End Sub
 End Class
+
+
+
+
+Public Class GL_FeatureLessVLines : Inherits TaskParent
+    Dim yLines As New FeatureLess_YLines
+    Public Sub New()
+        OptionParent.FindSlider("Pointsize").Value = 30
+        desc = "Draw FeatureLess_yLines lpList in SharpGL using endpoint depth."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        yLines.Run(src)
+        dst2 = yLines.dst2
+        labels(2) = yLines.labels(2)
+
+        dst3 = task.pointCloud.Clone
+        'dst3.SetTo(0, Not yLines.dst1)
+        For Each lp In yLines.lpList
+            lp.pVec1 = New cv.Vec3f(CSng(lp.p1Depth(0)), CSng(lp.p1Depth(1)), CSng(lp.p1Depth(2)))
+            lp.pVec2 = New cv.Vec3f(CSng(lp.p2Depth(0)), CSng(lp.p2Depth(1)), CSng(lp.p2Depth(2)))
+            dst3.Line(lp.p1, lp.p2, black, task.lineWidth + 4)
+        Next
+
+        strOut = task.sharpGL.RunSharp(oCase.draw3DLines, dst3, task.color, yLines.lpList)
+        SetTrueText(strOut, 3)
+    End Sub
+End Class
