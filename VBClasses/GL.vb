@@ -767,7 +767,7 @@ Public Class GL_FeatureLessVLines : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         yLines.Run(src)
-        dst2 = yLines.dst2
+        dst2 = yLines.dst2.Clone
         labels(2) = yLines.labels(2)
 
         dst3 = task.pointCloud.Clone

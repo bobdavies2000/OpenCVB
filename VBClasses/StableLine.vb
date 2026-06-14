@@ -12,7 +12,7 @@ Public Class StableLine_BasicsOld : Inherits TaskParent
         Dim isSlope1Vertical As Boolean = Double.IsInfinity(slope1)
         Dim isSlope2Vertical As Boolean = Double.IsInfinity(slope2)
 
-        If isSlope1Vertical AndAlso isSlope2Vertical Then
+        If isSlope1Vertical And isSlope2Vertical Then
             ' Both lines are vertical, so they are parallel.
             Return 0.0 ' Angle is 0 degrees
         ElseIf isSlope1Vertical Then

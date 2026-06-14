@@ -624,14 +624,14 @@ Public Module Structures
         End Sub
 
         Private Shared Function PointsEqual(a As cv.Point2f, b As cv.Point2f) As Boolean
-            Return Math.Abs(a.X - b.X) <= pointEps AndAlso Math.Abs(a.Y - b.Y) <= pointEps
+            Return Math.Abs(a.X - b.X) <= pointEps And Math.Abs(a.Y - b.Y) <= pointEps
         End Function
 
         ''' <summary>True when both lines have the same segment endpoints (p1 left, p2 right per constructor convention).</summary>
         Public Overloads Function Equals(other As lpData) As Boolean Implements IEquatable(Of lpData).Equals
             If other Is Nothing Then Return False
             If ReferenceEquals(Me, other) Then Return True
-            Return PointsEqual(p1, other.p1) AndAlso PointsEqual(p2, other.p2)
+            Return PointsEqual(p1, other.p1) And PointsEqual(p2, other.p2)
         End Function
 
         Public Overrides Function Equals(obj As Object) As Boolean

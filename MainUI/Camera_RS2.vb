@@ -106,15 +106,15 @@ Namespace MainApp
             Using frames As FrameSet = pipe.WaitForFrames(5000)
                 SyncLock cameraMutex
                     For Each frame As Intel.RealSense.Frame In frames
-                        If frame.Profile.Stream = Stream.Color AndAlso frame.Profile.Index = 0 Then
+                        If frame.Profile.Stream = Stream.Color And frame.Profile.Index = 0 Then
                             color = cv.Mat.FromPixelData(rows, cols, cv.MatType.CV_8UC3, frame.Data)
                             color = color.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
                         End If
-                        If frame.Profile.Stream = Stream.Infrared AndAlso frame.Profile.Index = 1 Then
+                        If frame.Profile.Stream = Stream.Infrared And frame.Profile.Index = 1 Then
                             leftView = cv.Mat.FromPixelData(rows, cols, cv.MatType.CV_8UC1, frame.Data)
                             leftView = leftView.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
                         End If
-                        If frame.Profile.Stream = Stream.Infrared AndAlso frame.Profile.Index = 2 Then
+                        If frame.Profile.Stream = Stream.Infrared And frame.Profile.Index = 2 Then
                             rightView = cv.Mat.FromPixelData(rows, cols, cv.MatType.CV_8UC1, frame.Data)
                             rightView = rightView.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
                         End If

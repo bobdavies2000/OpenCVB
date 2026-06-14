@@ -59,7 +59,7 @@ Namespace MainApp
                             (totalHeight - 30) + (GroupDataView.Location.Y * 2))
         End Sub
         Private Sub GroupDataView_CellContentClick(sender As Object, e As DataGridViewCellEventArgs) Handles GroupDataView.CellContentClick
-            If e.RowIndex >= 0 AndAlso e.ColumnIndex >= 0 Then
+            If e.RowIndex >= 0 And e.ColumnIndex >= 0 Then
                 selectedGroup = GroupDataView.Rows(e.RowIndex).Cells(e.ColumnIndex).Value?.ToString()
                 Me.DialogResult = DialogResult.OK
                 Me.Close()

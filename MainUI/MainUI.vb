@@ -413,11 +413,11 @@ Namespace MainApp
             Dim groupsForm As New AtoZ()
             groupsForm.homeDir = New DirectoryInfo(homeDir + "\Data")
 
-            If groupsForm.ShowDialog() = DialogResult.OK AndAlso Not String.IsNullOrEmpty(groupsForm.selectedGroup) Then
+            If groupsForm.ShowDialog() = DialogResult.OK And Not String.IsNullOrEmpty(groupsForm.selectedGroup) Then
                 ' Find and select the first algorithm that starts with the selected group
                 For Each alg In AvailableAlgorithms.Items
                     Dim algStr = alg.ToString()
-                    If Not String.IsNullOrWhiteSpace(algStr) AndAlso algStr.StartsWith(groupsForm.selectedGroup) Then
+                    If Not String.IsNullOrWhiteSpace(algStr) And algStr.StartsWith(groupsForm.selectedGroup) Then
                         AvailableAlgorithms.SelectedItem = algStr
                         Exit For
                     End If

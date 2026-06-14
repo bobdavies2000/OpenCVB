@@ -142,12 +142,12 @@ Public Class Stabilizer_OrientationPRY : Inherits TaskParent
         Dim yawDeg = yawRad * RadToDeg
 
         Dim rollImageDeg As Single = 0.0F
-        If task.lpGravity IsNot Nothing AndAlso task.lpGravity.length > 0 Then
+        If task.lpGravity IsNot Nothing And task.lpGravity.length > 0 Then
             rollImageDeg = task.lpGravity.angle
         End If
 
         dst2.Line(lpCurr.ptE1, lpCurr.ptE2, cv.Scalar.Red, task.lineWidth + 1, task.lineType)
-        If task.lpGravity IsNot Nothing AndAlso task.lpGravity.length > 0 Then
+        If task.lpGravity IsNot Nothing And task.lpGravity.length > 0 Then
             dst2.Line(task.lpGravity.ptE1, task.lpGravity.ptE2, cv.Scalar.Yellow, task.lineWidth, task.lineType)
         End If
 

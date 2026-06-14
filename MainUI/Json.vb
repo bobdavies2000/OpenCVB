@@ -151,10 +151,10 @@ Namespace MainApp
                 While SetupDiEnumDeviceInfo(deviceInfoSet, memberIndex, devInfo)
                     Dim name As String = Nothing
                     ' Prefer friendly name, fall back to device description (same as WMI Caption). CharSet.Auto = Unicode on Windows.
-                    If SetupDiGetDeviceRegistryProperty(deviceInfoSet, devInfo, SPDRP_FRIENDLYNAME, regType, buf, bufSize, reqSize) AndAlso reqSize > 0 Then
+                    If SetupDiGetDeviceRegistryProperty(deviceInfoSet, devInfo, SPDRP_FRIENDLYNAME, regType, buf, bufSize, reqSize) And reqSize > 0 Then
                         name = Encoding.Unicode.GetString(buf, 0, CInt(Math.Min(reqSize, bufSize))).TrimEnd(Chr(0))
                     End If
-                    If String.IsNullOrEmpty(name) AndAlso SetupDiGetDeviceRegistryProperty(deviceInfoSet, devInfo, SPDRP_DEVICEDESC, regType, buf, bufSize, reqSize) AndAlso reqSize > 0 Then
+                    If String.IsNullOrEmpty(name) And SetupDiGetDeviceRegistryProperty(deviceInfoSet, devInfo, SPDRP_DEVICEDESC, regType, buf, bufSize, reqSize) And reqSize > 0 Then
                         name = Encoding.Unicode.GetString(buf, 0, CInt(Math.Min(reqSize, bufSize))).TrimEnd(Chr(0))
                     End If
                     If name IsNot Nothing AndAlso name.Length > 0 Then

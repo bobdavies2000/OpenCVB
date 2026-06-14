@@ -719,7 +719,7 @@ Public Class RedColor_Isolate : Inherits TaskParent
         Dim minPx = CInt(total * 0.003)
         Dim maxPx = CInt(total * 0.62)
 
-        If task.rcD IsNot Nothing AndAlso task.rcD.pixels > 0 Then
+        If task.rcD IsNot Nothing And task.rcD.pixels > 0 Then
             For Each rc In rcList
                 If rc.index = task.rcD.index Then Return rc
             Next
@@ -728,9 +728,9 @@ Public Class RedColor_Isolate : Inherits TaskParent
         Dim cx = task.workRes.Width \ 2
         Dim cy = task.workRes.Height \ 2
         Dim idxCenter = rcMap.Get(Of Integer)(cy, cx) - 1
-        If idxCenter >= 0 AndAlso idxCenter < rcList.Count Then
+        If idxCenter >= 0 And idxCenter < rcList.Count Then
             Dim rc0 = rcList(idxCenter)
-            If rc0.pixels >= minPx AndAlso rc0.pixels <= maxPx Then Return rc0
+            If rc0.pixels >= minPx And rc0.pixels <= maxPx Then Return rc0
         End If
 
         Dim bestVotes As Integer = -1
@@ -768,7 +768,7 @@ Public Class RedColor_Isolate : Inherits TaskParent
         Return bestRc
     End Function
     Public Overrides Sub RunAlg(src As cv.Mat)
-        Dim bgr = If(src IsNot Nothing AndAlso src.Channels() = 3, src, task.color)
+        Dim bgr = If(src IsNot Nothing And src.Channels() = 3, src, task.color)
         redC.Run(bgr)
 
         Dim subject = PickSubject(redC.rcMap, redC.rcList)

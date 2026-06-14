@@ -32,7 +32,7 @@ Module Program
                     Dim trimmedLine As String = line.Trim()
 
                     ' Count non-empty, non-comment lines
-                    If Not String.IsNullOrEmpty(trimmedLine) AndAlso Not trimmedLine.StartsWith("'") Then
+                    If Not String.IsNullOrEmpty(trimmedLine) And Not trimmedLine.StartsWith("'") Then
                         totalLinesRead += 1
                     End If
 
@@ -93,7 +93,7 @@ Module Program
             Dim groupTokens As New SortedList(Of String, String)
             For Each className As String In vbClasses.Keys
                 Dim parts() As String = className.Split("_"c)
-                If parts.Length > 0 AndAlso Not String.IsNullOrEmpty(parts(0)) Then
+                If parts.Length > 0 And Not String.IsNullOrEmpty(parts(0)) Then
                     If Not groupTokens.ContainsKey(parts(0)) Then
                         groupTokens.Add(parts(0), parts(0))
                     End If
@@ -136,7 +136,7 @@ Module Program
         Dim classIndex As Integer = trimmedLine.IndexOf("Class ")
         Dim inheritsIndex As Integer = trimmedLine.IndexOf(": Inherits")
 
-        If classIndex >= 0 AndAlso inheritsIndex > classIndex Then
+        If classIndex >= 0 And inheritsIndex > classIndex Then
             Dim startPos As Integer = classIndex + 6  ' Length of "Class "
             Dim className As String = trimmedLine.Substring(startPos, inheritsIndex - startPos).Trim()
             Return className

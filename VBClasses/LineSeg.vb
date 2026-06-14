@@ -90,7 +90,7 @@ Public Class NR_LineSeg_Basics : Inherits TaskParent
         Dim mm = task.motion.motionMask
         If lp.rect.Width > 0 And lp.rect.Height > 0 Then
             Dim r = ValidateRect(lp.rect)
-            If r.Width > 0 And r.Height > 0 AndAlso mm(r).CountNonZero > 0 Then Return True
+            If r.Width > 0 And r.Height > 0 And mm(r).CountNonZero > 0 Then Return True
         End If
         Dim pts = {lp.p1, lp.p2, lp.ptCenter}
         For Each pt In pts
@@ -339,7 +339,7 @@ Public Class LineSeg_LBD : Inherits TaskParent
         lpList = New List(Of lpData)(lineSeg.lpList)
 
         Dim gray As cv.Mat = task.gray
-        If src.Channels = 1 AndAlso src.Type = cv.MatType.CV_8U Then gray = src
+        If src.Channels = 1 And src.Type = cv.MatType.CV_8U Then gray = src
 
         If lpList.Count = 0 Then
             descriptors = New cv.Mat(0, DescriptorBytes, cv.MatType.CV_8U)

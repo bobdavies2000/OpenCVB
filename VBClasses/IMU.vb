@@ -96,18 +96,18 @@ Public Class IMU_GravityComplementary : Inherits TaskParent
         If Math.Abs(dx) > 0.0001F Then
             Dim t0 = -cx / dx
             Dim y0 = cy + t0 * dy
-            If y0 >= 0 AndAlso y0 <= height Then tList.Add(t0)
+            If y0 >= 0 And y0 <= height Then tList.Add(t0)
             Dim t1 = (width - cx) / dx
             Dim y1 = cy + t1 * dy
-            If y1 >= 0 AndAlso y1 <= height Then tList.Add(t1)
+            If y1 >= 0 And y1 <= height Then tList.Add(t1)
         End If
         If Math.Abs(dy) > 0.0001F Then
             Dim t0 = -cy / dy
             Dim x0 = cx + t0 * dx
-            If x0 >= 0 AndAlso x0 <= width Then tList.Add(t0)
+            If x0 >= 0 And x0 <= width Then tList.Add(t0)
             Dim t1 = (height - cy) / dy
             Dim x1 = cx + t1 * dx
-            If x1 >= 0 AndAlso x1 <= width Then tList.Add(t1)
+            If x1 >= 0 And x1 <= width Then tList.Add(t1)
         End If
         If tList.Count < 2 Then
             Return (New cv.Point2f(cx, 0), New cv.Point2f(cx, height))

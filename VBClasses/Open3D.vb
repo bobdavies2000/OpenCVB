@@ -71,13 +71,13 @@ Public Class Open3D_Shape : Inherits TaskParent
         For Each pt In pointList
             Dim px = CInt(task.workRes.Width * pt.X / task.MaxZmeters)
             Dim py = CInt(task.workRes.Height * (1.0F - pt.Z / task.MaxZmeters))
-            If px >= 0 AndAlso px < dst2.Width AndAlso py >= 0 AndAlso py < dst2.Height Then
+            If px >= 0 And px < dst2.Width And py >= 0 And py < dst2.Height Then
                 dst2.Circle(New cv.Point(px, py), 1, white, -1, task.lineType)
             End If
         Next
 
         dst3 = src.Clone()
-        If ok <> 0 AndAlso vertexCount > 0 AndAlso triangleCount > 0 Then
+        If ok <> 0 And vertexCount > 0 And triangleCount > 0 Then
             DrawMeshTopView(dst3, vertexCount, triangleCount)
             labels(3) = CStr(vertexCount) + " vertices, " + CStr(triangleCount) + " triangles, alpha=" + Format(options.alpha, "0.###")
         Else
