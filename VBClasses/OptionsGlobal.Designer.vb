@@ -48,7 +48,7 @@ Partial Class OptionsGlobal
         DebugSliderLabel = New Label()
         DebugCheckBox = New CheckBox()
         GroupBox2 = New GroupBox()
-        stabilizeDepthRGB = New CheckBox()
+        stableDepthRGB = New CheckBox()
         gravityPointCloud = New CheckBox()
         CreateGif = New CheckBox()
         ShowAllOptions = New CheckBox()
@@ -333,7 +333,7 @@ Partial Class OptionsGlobal
         ' 
         ' GroupBox2
         ' 
-        GroupBox2.Controls.Add(stabilizeDepthRGB)
+        GroupBox2.Controls.Add(stableDepthRGB)
         GroupBox2.Controls.Add(gravityPointCloud)
         GroupBox2.Controls.Add(CreateGif)
         GroupBox2.Controls.Add(ShowAllOptions)
@@ -348,18 +348,18 @@ Partial Class OptionsGlobal
         GroupBox2.TabStop = False
         GroupBox2.Text = "Miscellaneous Globals"
         ' 
-        ' stabilizeDepthRGB
+        ' stableDepthRGB
         ' 
-        stabilizeDepthRGB.AutoSize = True
-        stabilizeDepthRGB.Checked = True
-        stabilizeDepthRGB.CheckState = CheckState.Checked
-        stabilizeDepthRGB.Location = New Point(16, 228)
-        stabilizeDepthRGB.Margin = New Padding(3, 4, 3, 4)
-        stabilizeDepthRGB.Name = "stabilizeDepthRGB"
-        stabilizeDepthRGB.Size = New Size(366, 34)
-        stabilizeDepthRGB.TabIndex = 11
-        stabilizeDepthRGB.Text = "Stabilize Depth/RGB using Motion"
-        stabilizeDepthRGB.UseVisualStyleBackColor = True
+        stableDepthRGB.AutoSize = True
+        stableDepthRGB.Checked = True
+        stableDepthRGB.CheckState = CheckState.Checked
+        stableDepthRGB.Location = New Point(16, 228)
+        stableDepthRGB.Margin = New Padding(3, 4, 3, 4)
+        stableDepthRGB.Name = "stableDepthRGB"
+        stableDepthRGB.Size = New Size(366, 34)
+        stableDepthRGB.TabIndex = 11
+        stableDepthRGB.Text = "Stabilize Depth/RGB using Motion"
+        stableDepthRGB.UseVisualStyleBackColor = True
         ' 
         ' gravityPointCloud
         ' 
@@ -610,5 +610,5 @@ Partial Class OptionsGlobal
     Friend WithEvents PaintFrequencyLabel As Label
     Friend WithEvents Label9 As Label
     Friend WithEvents ShowSplash As CheckBox
-    Friend WithEvents stabilizeDepthRGB As CheckBox
+    Friend WithEvents stableDepthRGB As CheckBox
 End Class

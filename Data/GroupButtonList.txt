@@ -87,6 +87,7 @@ Gravity
 Grid
 GridRect
 GuidedBP
+HeartBeat
 HeatMap
 HighVis
 Hist2D

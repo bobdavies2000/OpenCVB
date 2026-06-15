@@ -11376,7 +11376,7 @@ Namespace VBClasses
         Dim redC As New RedCloud_Basics
         Dim reduction As New Reduction_Basics
         Public Sub New()
-            task.gOptions.stabilizeDepthRGB.Checked = False
+            task.gOptions.stableDepthRGB.Checked = False
             desc = "Use RedColor for regions with no depth to add cells to RedCloud"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -11556,10 +11556,10 @@ Namespace VBClasses
 
             labels(2) = Format(motionSort.Count / task.gridRects.Count, "00%") + " Of bricks had motion."
 
-            If task.gOptions.stabilizeDepthRGB.Checked = False Then dst1.SetTo(255)
+            If task.gOptions.stableDepthRGB.Checked = False Then dst1.SetTo(255)
 
             If standaloneTest() Then
-                If task.gOptions.stabilizeDepthRGB.Checked Then src.CopyTo(dst2, dst3)
+                If task.gOptions.stableDepthRGB.Checked Then src.CopyTo(dst2, dst3)
                 Static diff As New Diff_Basics
                 diff.lastFrame = dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
                 diff.Run(src)
@@ -11824,7 +11824,7 @@ Namespace VBClasses
             desc = "Isolate all motion in the scene"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If task.gOptions.stabilizeDepthRGB.Checked = False Then Exit Sub
+            If task.gOptions.stableDepthRGB.Checked = False Then Exit Sub
 
             If src.Channels <> 1 Then src = task.gray
             If task.heartBeat Then dst2 = src.Clone
@@ -13476,7 +13476,7 @@ Namespace VBClasses
             End If
 
             Dim motionRect = XO_Motion_RectHistory.getMotionRect()
-            If task.gOptions.stabilizeDepthRGB.Checked Then
+            If task.gOptions.stableDepthRGB.Checked Then
                 If task.heartBeatLT Or task.frameCount < 5 Or task.optionsChanged Then
                     dst2 = task.pointCloud.Clone
                 End If
@@ -19830,7 +19830,7 @@ Namespace VBClasses
     Public Class XO_Feature_NoMotion : Inherits TaskParent
         Public feat As New Feature_Basics
         Public Sub New()
-            task.gOptions.stabilizeDepthRGB.Checked = False
+            task.gOptions.stableDepthRGB.Checked = False
             dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
             desc = "Find good features to track in a BGR image using the motion mask+"
         End Sub

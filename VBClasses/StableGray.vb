@@ -109,7 +109,7 @@ Public Class StableGray_RGBMin : Inherits TaskParent
         desc = "Build a StableRGB by running StableGray_BasicsMin with all 3 channels."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If task.gOptions.stabilizeDepthRGB.Checked Then
+        If task.gOptions.stableDepthRGB.Checked Then
             Dim split = task.color.Split()
 
             stableB.Run(split(0))
@@ -141,7 +141,7 @@ Public Class StableGray_RGBMax : Inherits TaskParent
         desc = "Build a StableRGB by running StableGray_BasicsMin with all 3 channels."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If task.gOptions.stabilizeDepthRGB.Checked Then
+        If task.gOptions.stableDepthRGB.Checked Then
             Dim split = task.color.Split()
 
             stableB.Run(split(0))
@@ -326,7 +326,7 @@ Public Class StableGray_LeftRight : Inherits TaskParent
         desc = "Create the stable gray left and right images."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If task.gOptions.stabilizeDepthRGB.Checked Then
+        If task.gOptions.stableDepthRGB.Checked Then
             stableLeft.Run(task.leftView)
             dst2 = stableLeft.dst2
             If task.heartBeat Then labels(2) = stableLeft.labels(2)
@@ -352,7 +352,7 @@ Public Class StableGray_Right : Inherits TaskParent
         desc = "Create the stable gray right image."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If task.gOptions.stabilizeDepthRGB.Checked Then
+        If task.gOptions.stableDepthRGB.Checked Then
             stableRight.Run(task.rightView)
             dst3 = stableRight.dst2
             If task.heartBeat Then labels(3) = stableRight.labels(2)

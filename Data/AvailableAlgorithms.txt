@@ -330,6 +330,7 @@ GuidedBP_HotPoints
 GuidedBP_MultiSlice
 GuidedBP_Top
 GuidedBP_TopView
+HeartBeat_Basics_TA
 HeatMap_Basics
 HeatMap_Cell
 HeatMap_Hot

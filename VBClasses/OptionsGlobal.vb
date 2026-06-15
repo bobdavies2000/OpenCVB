@@ -211,7 +211,7 @@ Public Class OptionsGlobal
     Private Sub ShowSplash_CheckedChanged(sender As Object, e As EventArgs) Handles ShowSplash.CheckedChanged
         SaveSetting("OpenCVB", "ShowSplash", "ShowSplash", ShowSplash.Checked)
     End Sub
-    Private Sub stabilizeDepthRGB_CheckedChanged(sender As Object, e As EventArgs) Handles stabilizeDepthRGB.CheckedChanged
+    Private Sub stableDepthRGB_CheckedChanged(sender As Object, e As EventArgs) Handles stableDepthRGB.CheckedChanged
         task.optionsChanged = True
     End Sub
     Private Sub CrossHairs_CheckedChanged(sender As Object, e As EventArgs) Handles CrossHairs.CheckedChanged

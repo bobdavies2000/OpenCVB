@@ -123,7 +123,7 @@ Public Class NR_Photon_Distance3D : Inherits TaskParent
     Public Sub New()
         hist.plotHist.removeZeroEntry = False
         task.gOptions.setHistogramBins(10)
-        task.gOptions.stabilizeDepthRGB.Checked = False
+        task.gOptions.stableDepthRGB.Checked = False
         desc = "Plot a histogram of the 3D distance of each picture from the previous image."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)

@@ -43,9 +43,10 @@ Public Class AlgorithmTask : Implements IDisposable
         motion = New Motion_Basics_TA
         motion.standalone = False
         motionStable = New StableGray_Measure_TA
+        heartBeats = New HeartBeat_Basics_TA
 
-        stabilizeDepth = New StableDepth_Basics_TA
-        stabilizeGray = New StableGray_Basics_TA
+        stableDepth = New StableDepth_Basics_TA
+        stableGray = New StableGray_Basics_TA
 
         prepCloud = New Cloud_Gravity_TA
         depthTiers = New Depth_Tiers_TA
@@ -60,7 +61,7 @@ Public Class AlgorithmTask : Implements IDisposable
             cpu.callTrace(i) = settings.algorithm + "\" + cpu.callTrace(i)
         Next
 
-        taskUpdate()
+        heartBeats.Run(Nothing)
         fOptions.Show()
         gOptions.Show()
         treeView.Show()
@@ -96,7 +97,7 @@ Public Class AlgorithmTask : Implements IDisposable
             allOptions.layoutOptions(normalRequest:=True)
         End If
 
-        taskUpdate()
+        heartBeats.Run(Nothing)
 
         If task.firstPass Then task.cpu.initialize(Settings.algorithm)
 
@@ -129,11 +130,11 @@ Public Class AlgorithmTask : Implements IDisposable
             rightView = leftRightBrightness.dst3
         End If
 
-        If gOptions.stabilizeDepthRGB.Checked Then
+        If gOptions.stableDepthRGB.Checked Then
             motionStable.Run(task.gray)
 
             motion.Run(gray)
-            stabilizeGray.Run(task.gray)
+            stableGray.Run(task.gray)
         Else
             motion.motionMask.SetTo(255)
             motion.motionSort.Clear()
@@ -177,9 +178,9 @@ Public Class AlgorithmTask : Implements IDisposable
         End If
 
         prepCloud.Run(emptyMat) '******* this may rotate for gravity if gravity is selected *******
-        If gOptions.stabilizeDepthRGB.Checked Then
-            stabilizeDepth.Run(emptyMat)
-            task.depthRGB = stabilizeDepth.dst2
+        If gOptions.stableDepthRGB.Checked Then
+            stableDepth.Run(emptyMat)
+            task.depthRGB = stableDepth.dst2
         End If
 
         colorizer.Run(src)

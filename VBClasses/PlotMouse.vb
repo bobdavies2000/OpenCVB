@@ -172,9 +172,9 @@ Public Class PlotMouse_StableGray : Inherits TaskParent
         desc = "Plot the stable grayscale image."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If task.gOptions.stabilizeDepthRGB.Checked Then
-            dst0 = task.stabilizeGray.dst2
-            labels(0) = task.stabilizeGray.labels(2)
+        If task.gOptions.stableDepthRGB.Checked Then
+            dst0 = task.stableGray.dst2
+            labels(0) = task.stableGray.labels(2)
         Else
             dst0 = task.gray
             labels(0) = "Original task.gray - unchanged."

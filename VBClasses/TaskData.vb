@@ -85,10 +85,11 @@ Partial Public Class AlgorithmTask
     Public motion As Motion_Basics_TA
     Public motionStable As StableGray_Measure_TA
     Public colorizer As DepthColorizer_Basics_TA
-    Public stabilizeDepth As StableDepth_Basics_TA
-    Public stabilizeGray As StableGray_Basics_TA
+    Public stableDepth As StableDepth_Basics_TA
+    Public stableGray As StableGray_Basics_TA
     Public prepCloud As Cloud_Gravity_TA
     Public depthTiers As Depth_Tiers_TA
+    Public heartBeats As HeartBeat_Basics_TA
 
     Public motionFeatures As cv.Point2f
     Public palette As Palette_LoadColorMap

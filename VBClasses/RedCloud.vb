@@ -10,7 +10,7 @@ Public Class RedCloud_Basics : Inherits TaskParent
     Public keyColors As New KeyColor_Reduction
     Public runSelectCell As Boolean = True
     Public Sub New()
-        task.gOptions.stabilizeDepthRGB.Checked = True
+        task.gOptions.stableDepthRGB.Checked = True
         desc = "Build contours for each cell"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)

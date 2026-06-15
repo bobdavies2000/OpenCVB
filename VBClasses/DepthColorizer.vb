@@ -58,7 +58,7 @@ Public Class DepthColorizer_Basics_TA : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If task.gOptions.displayDst1.Checked = False Or standaloneTest() Then
-            If task.gOptions.stabilizeDepthRGB.Checked = False Then
+            If task.gOptions.stableDepthRGB.Checked = False Then
                 Dim depthData(task.pcSplit(2).Total - 1) As Single
                 task.pcSplit(2).GetArray(Of Single)(depthData)
                 Dim handleSrc = GCHandle.Alloc(depthData, GCHandleType.Pinned)
