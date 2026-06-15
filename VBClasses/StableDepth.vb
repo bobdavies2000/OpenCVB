@@ -17,8 +17,7 @@ Public Class StableDepth_Basics_TA : Inherits TaskParent
     End Function
     Public Overrides Sub RunAlg(src As cv.Mat)
         Static lastDepth As cv.Mat = task.pcSplit(2).Clone
-        Dim myHeartbeat = task.heartBeat Or task.optionsChanged
-        If myHeartbeat Then
+        If task.heartBeat Then
             pointcloud = task.pointCloud.Clone
         Else
             task.pointCloud.CopyTo(pointcloud, task.motion.motionMask)
@@ -29,7 +28,7 @@ Public Class StableDepth_Basics_TA : Inherits TaskParent
         Dim accumDepth As New cv.Mat
         cv.Cv2.Min(pcSplit(2), lastDepth, accumDepth)
 
-        If myHeartbeat = False Then
+        If task.heartBeat = False Then
             dst3 = updateXY(lastDepth, accumDepth)
             task.pointCloud.CopyTo(pointcloud, dst3)
         End If

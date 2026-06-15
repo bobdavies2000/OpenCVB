@@ -192,9 +192,7 @@ Public Class Grid_FPS : Inherits TaskParent
     Dim skipCount As Integer
     Dim saveSkip As Integer
     Public Sub New()
-        If sliders.Setup(traceName) Then
-            sliders.setupTrackBar("Desired FPS rate", 1, 10, desiredFPS)
-        End If
+        If sliders.Setup(traceName) Then sliders.setupTrackBar("Desired FPS rate", 1, 10, desiredFPS)
         desc = "Provide a service that lets any algorithm control its frame rate"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -211,8 +209,7 @@ Public Class Grid_FPS : Inherits TaskParent
         Else
             skipCount += 1
         End If
-        strOut = "Grid heartbeat set to " + CStr(desiredFPS) + " times per second.  " +
-                      CStr(saveSkip) + " frames skipped"
+        strOut = "Grid heartbeat fps " + CStr(desiredFPS) + " per sec.  " + CStr(saveSkip) + " frames skipped"
     End Sub
 End Class
 

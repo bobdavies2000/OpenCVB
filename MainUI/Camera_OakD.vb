@@ -199,18 +199,22 @@ Namespace MainApp
                     rightView = rightView.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
                 End If
 
-                Dim depthPtr = OakDRawDepth3D(cPtr) ' , OakDRawDepth4D(cPtr))
+                Dim depthPtr = OakDRawDepth3D(cPtr)
                 If depthPtr <> IntPtr.Zero Then
-                    If rows = 720 Then
-                        depth16u = cv.Mat.FromPixelData(360, 640, cv.MatType.CV_16UC1, depthPtr).Clone()
+                    If deviceClass = 3 Then
+                        If rows = 720 Then
+                            depth16u = cv.Mat.FromPixelData(360, 640, cv.MatType.CV_16UC1, depthPtr).Clone()
+                        Else
+                            depth16u = cv.Mat.FromPixelData(240, 320, cv.MatType.CV_16UC1, depthPtr).Clone()
+                        End If
+                        depth16u = depth16u.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
                     Else
-                        depth16u = cv.Mat.FromPixelData(240, 320, cv.MatType.CV_16UC1, depthPtr).Clone()
+                        depth16u = cv.Mat.FromPixelData(rows, cols, cv.MatType.CV_16UC1, depthPtr).Clone()
                     End If
-                    depth16u = depth16u.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
                     pointCloud = ComputePointCloud(depth16u, calibData.leftIntrinsics)
                 End If
 
-                    Dim rgbPtr = OakDColor(cPtr)
+                Dim rgbPtr = OakDColor(cPtr)
                 If rgbPtr <> IntPtr.Zero Then
                     color = cv.Mat.FromPixelData(rows, cols, cv.MatType.CV_8UC3, rgbPtr).Clone()
                     color = color.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
