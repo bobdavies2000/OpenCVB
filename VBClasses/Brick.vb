@@ -1000,7 +1000,7 @@ Public Class Brick_Features : Inherits TaskParent
         bricks.Run(src)
 
         dst2 = src.Clone
-        dst2.SetTo(0, fLess.dst2)
+        dst2.SetTo(0, fLess.dst1)
         labels(2) = fLess.labels(2)
 
         dst3 = task.rightView.CvtColor(cv.ColorConversionCodes.GRAY2BGR)

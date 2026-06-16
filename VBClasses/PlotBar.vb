@@ -160,3 +160,19 @@ Public Class PlotBar_Histogram2D : Inherits TaskParent
         If standaloneTest() Then dst3 = dst2.Threshold(0, 255, cv.ThresholdTypes.Binary)
     End Sub
 End Class
+
+
+
+
+
+Public Class PlotBar_Depth : Inherits TaskParent
+    Dim hist As New PlotMouse_Basics
+    Public Sub New()
+        desc = "Plot the depth data (duplicate of PlotMouse_Basics)"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        hist.Run(src)
+        dst2 = hist.dst2
+        labels(2) = hist.labels(2)
+    End Sub
+End Class

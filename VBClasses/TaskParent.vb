@@ -159,6 +159,7 @@ Public Class TaskParent : Implements IDisposable
         Catch ex As Exception
             Debug.WriteLine($"Exception in {traceName}: {ex.Message}")
             Debug.WriteLine($"Stack trace: {ex.StackTrace}")
+            Debugger.Break()
         End Try
 
         task.cpu.measureEndRun()

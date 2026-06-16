@@ -1,5 +1,4 @@
-﻿Imports SharpGL.SceneGraph.Raytracing
-Imports cv = OpenCvSharp
+﻿Imports cv = OpenCvSharp
 Public Class PlotMouse_Basics : Inherits TaskParent
     Public plotHist As New PlotBar_Basics
     Public histogram As New cv.Mat
@@ -11,14 +10,28 @@ Public Class PlotMouse_Basics : Inherits TaskParent
         desc = "Show CV_8U data as a histogram and use mouse movement to control the backprojection."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
+        Static bins As Single = task.histogramBins
+        If src.Channels <> 1 Then src = task.pcSplit(2)
+
+        If task.optionsChanged Then bins = task.histogramBins
+        Dim barWidth = dst2.Width / bins
+        If task.heartBeat Then
+            If plotHist.histArray IsNot Nothing Then
+                For i = plotHist.histArray.Count - 1 To 0 Step -1
+                    If plotHist.histArray(i) > 0 Then
+                        bins = plotHist.histArray.Count - i
+                        If bins = 1 Then bins = task.histogramBins
+                        Exit For
+                    End If
+                Next
+            End If
+        End If
         dst3 = task.color.Clone
 
-        If src.Channels <> 1 Then src = task.gray
-
+        plotHist.maxRange = task.MaxZmeters
         plotHist.Run(src)
         dst2 = plotHist.dst2
 
-        Dim barWidth = dst2.Width / task.histogramBins
         Dim histIndex = Math.Floor(task.mouseMovePoint.X / barWidth)
 
         Dim minRange = (plotHist.ranges(0).End - plotHist.ranges(0).Start) * histIndex / task.histogramBins

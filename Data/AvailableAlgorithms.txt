@@ -1548,6 +1548,7 @@ Plane_From3Points
 Plane_OnlyPlanes
 Plane_Points
 PlotBar_Basics
+PlotBar_Depth
 PlotBar_HistCoreRange
 PlotBar_Histogram2D
 PlotDots_Basics

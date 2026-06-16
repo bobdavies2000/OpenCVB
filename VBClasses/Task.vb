@@ -61,7 +61,7 @@ Public Class AlgorithmTask : Implements IDisposable
             cpu.callTrace(i) = settings.algorithm + "\" + cpu.callTrace(i)
         Next
 
-        heartBeats.Run(Nothing)
+        HeartBeat_Basics_TA.setHeartBeat()
         fOptions.Show()
         gOptions.Show()
         treeView.Show()

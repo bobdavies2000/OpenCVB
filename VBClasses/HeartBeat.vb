@@ -3,7 +3,7 @@ Public Class HeartBeat_Basics_TA : Inherits TaskParent
     Public Sub New()
         desc = "Update the heart beat variables"
     End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
+    Public Shared Sub setHeartBeat()
         If task.myStopWatch Is Nothing Then task.myStopWatch = Stopwatch.StartNew()
 
         ' update the time measures
@@ -48,5 +48,9 @@ Public Class HeartBeat_Basics_TA : Inherits TaskParent
         lastHeartBeatLT = task.heartBeatLT
 
         task.metersPerPixel = task.MaxZmeters / task.workRes.Height ' meters per pixel in projections - side and top.
+
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        setHeartBeat()
     End Sub
 End Class
