@@ -13,7 +13,7 @@ Public Class Flood_Basics : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         fLess.Run(task.grayOriginal.Clone)
-        dst1 = fLess.dst2
+        dst1 = fLess.dst1
 
         Dim imagePtr As IntPtr
         Dim inputData(src.Total - 1) As Byte

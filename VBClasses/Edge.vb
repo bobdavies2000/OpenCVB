@@ -1580,7 +1580,7 @@ Public Class Edge_Featureless : Inherits TaskParent
         'sceneMotionDetected = fLess.fLessList.Count < rectCountThreshold
 
         dst2 = src.Clone
-        dst2.SetTo(0, fLess.dst2)
+        dst2.SetTo(0, fLess.dst1)
         labels(2) = fLess.labels(2)
 
         'edges.Run(dst2.Clone)

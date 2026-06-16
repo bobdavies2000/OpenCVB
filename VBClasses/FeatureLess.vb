@@ -521,7 +521,7 @@ Public Class FeatureLess_Stabilized : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         fLess.Run(src)
-        dst2 = fLess.dst2
+        dst2 = fLess.dst1
 
         Static fLessLast = dst2.Clone
 
@@ -771,6 +771,8 @@ Public Class FeatureLess_ToList : Inherits TaskParent
         dst2 = clusters.dst2.Clone
         labels(2) = clusters.labels(3)
 
+        If clusters.floodPoints.Count <= 1 Then Exit Sub ' nothing to work on...
+
         clusterX.Clear()
         clusterY.Clear()
         For i = 0 To clusters.floodPoints.Count ' adding one extra for the zero class...
@@ -839,7 +841,7 @@ Public Class FeatureLess_ClusterFlood : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         fLess.Run(task.gray)
-        dst2 = fLess.dst2.Clone
+        dst2 = fLess.dst1.Clone
         labels(2) = fLess.labels(2)
 
         floodPoints.Clear()
@@ -1066,6 +1068,9 @@ Public Class FeatureLess_IndexKNN : Inherits TaskParent
         Dim queries = cv.Mat.FromPixelData(feat.featureList.Count \ nVal, nVal, cv.MatType.CV_32F, feat.featureList.ToArray)
 
         knn.trainMat = cv.Mat.FromPixelData(queries.Rows, nVal, cv.MatType.CV_32F, feat.featureList.ToArray)
+
+        If feat.featureList.Count = 0 Then Exit Sub ' nothing to work with...
+
         knn.Run(emptyMat)
 
         Static maxDistList As New List(Of cv.Point)
@@ -1133,11 +1138,11 @@ Public Class NR_FeatureLess_ClustersHist2D : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         fLess.Run(task.gray)
 
-        Dim mmX = GetMinMax(fLess.dst2)
+        Dim mmX = GetMinMax(fLess.dst1)
         Dim ranges() As cv.Rangef = {New cv.Rangef(mmX.minVal - 0.01, 255.01), New cv.Rangef(0, task.MaxZmeters)}
 
         Dim depthMat = task.pcSplit(2).Clone
-        depthMat.SetTo(0, Not fLess.dst2)
+        depthMat.SetTo(0, Not fLess.dst1)
 
         Dim grayMat As New cv.Mat
         fLess.dst2.ConvertTo(grayMat, cv.MatType.CV_32F)
@@ -1181,7 +1186,6 @@ Public Class FeatureLess_XLines : Inherits TaskParent
     Dim fLess As New FeatureLess_Basics
     Public lpList As New List(Of lpData)
     Public Sub New()
-        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         desc = "Find horizontal and vertical lines through the center of featureless grid rects."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -1203,12 +1207,7 @@ Public Class FeatureLess_XLines : Inherits TaskParent
                     If val1 <> 0 And (x = 0 And val1 <> 0) Then p1 = New cv.Point(x, y)
                     If val2 = 0 Then p2 = New cv.Point(x + task.gridWH - 1, y)
                     If p1 <> newPoint And p2 <> newPoint Then
-                        Dim lp = New lpData(p1, p2)
-                        Dim r = New cv.Rect(p1.X, p1.Y, task.gridWH, task.gridWH)
-                        lp.p1Depth = task.pointCloud(r).Mean(task.depthmask(r))
-                        r = New cv.Rect(p2.X, p2.Y, task.gridWH, task.gridWH)
-                        lp.p2Depth = task.pointCloud(r).Mean(task.depthmask(r))
-                        lpList.Add(lp)
+                        lpList.Add(New lpData(p1, p2))
                         dst2.Line(p1, p2, white, task.lineWidth)
                         p1 = newPoint
                         p2 = newPoint
