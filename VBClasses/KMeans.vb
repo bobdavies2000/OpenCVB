@@ -219,7 +219,7 @@ End Class
 
 
 Public Class KMeans_Edges : Inherits TaskParent
-    Dim edges As New Edge_Basics
+    Dim edges As New Edge_Basics_TA
     Public km As New KMeans_Image
     Public classCount As Integer
     Dim redC As New RedCloud_Basics

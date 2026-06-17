@@ -892,20 +892,17 @@ End Class
 
 
 Public Class Contour_RotateRect : Inherits TaskParent
-    Dim edges As New Edge_Basics
     Dim findRect As New FindMinRect_Basics
     Dim options As New Options_MinArea
     Public Sub New()
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         dst1 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-        desc = "Use minRectArea to busy areas in an image."
+        desc = "Use minRectArea to isolate busy areas in an image."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
 
-        edges.Run(task.gray)
-
-        Dim contours = cv.Cv2.FindContoursAsArray(edges.dst2, cv.RetrievalModes.Tree, cv.ContourApproximationModes.ApproxSimple)
+        Dim contours = cv.Cv2.FindContoursAsArray(task.edges.dst2, cv.RetrievalModes.Tree, cv.ContourApproximationModes.ApproxSimple)
         Dim sortedTours As New SortedList(Of Integer, Tuple(Of cv.RotatedRect, Integer))(New compareAllowIdenticalInteger)
         For i = 0 To contours.Count - 1
             findRect.inputContour = contours(i)

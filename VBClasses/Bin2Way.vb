@@ -148,17 +148,14 @@ End Class
 
 Public Class NR_Bin2Way_GradationEdges : Inherits TaskParent
     Dim grad As New Bin2Way_Gradation
-    Dim edges As New Edge_Basics
     Public Sub New()
         labels(2) = "4-way gradation of the color image with edges added."
         desc = "Add edges to the 4-way gradation."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        edges.Run(task.gray)
-
         grad.Run(src)
         dst2 = grad.dst2
-        dst2.SetTo(0, edges.dst2)
+        dst2.SetTo(0, task.edges.dst2)
     End Sub
 End Class
 

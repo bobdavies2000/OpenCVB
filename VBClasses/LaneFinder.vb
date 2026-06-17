@@ -53,7 +53,7 @@ End Class
 ' https://github.com/mohamedameen93/Lane-lines-detection-using-Python-and-OpenCV
 Public Class NR_LaneFinder_Edges : Inherits TaskParent
     Dim input As New LaneFinder_Videos
-    Dim edges As New Edge_Basics
+    Dim edges As New Edge_Basics_TA
     Public Sub New()
         desc = "Using the videos provided, find the lane markers."
     End Sub

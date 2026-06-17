@@ -1191,7 +1191,7 @@ Namespace VBClasses
 
     Public Class XO_Line_DisplayInfoOld : Inherits TaskParent
         Public tcells As New List(Of tCell)
-        Dim canny As New Edge_Basics
+        Dim canny As New Edge_Basics_TA
         Dim blur As New Blur_Basics
         Public distance As Integer
         Public maskCount As Integer
@@ -1273,7 +1273,7 @@ Namespace VBClasses
 
 
     Public Class XO_Line_Canny : Inherits TaskParent
-        Dim canny As New Edge_Basics
+        Dim canny As New Edge_Basics_TA
         Public lpList As New List(Of lpData)
         Dim lines As New XO_Line_RawSorted
         Public Sub New()
@@ -6776,7 +6776,7 @@ Namespace VBClasses
 
     Public Class XO_FPoly_EdgeRemoval : Inherits TaskParent
         Dim fMask As New XO_FPoly_ImageMask
-        Dim edges As New Edge_Basics
+        Dim edges As New Edge_Basics_TA
         Public Sub New()
             If standalone Then task.gOptions.displayDst1.Checked = True
             desc = "Remove edges from the FPoly_ImageMask"

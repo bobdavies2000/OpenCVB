@@ -23,10 +23,7 @@
         EdgeMethods.Items.Add("Binarized Sobel")
         EdgeMethods.Items.Add("Canny")
         EdgeMethods.Items.Add("Color Gap")
-        EdgeMethods.Items.Add("Deriche")
         EdgeMethods.Items.Add("Laplacian")
-        EdgeMethods.Items.Add("Resize and Add")
-        EdgeMethods.Items.Add("Scharr")
         EdgeMethods.Items.Add("Sobel")
         EdgeMethods.SelectedItem() = "Canny"
         task.edgeMethod = "Canny"

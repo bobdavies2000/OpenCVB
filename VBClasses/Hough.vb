@@ -3,7 +3,7 @@ Imports cv = OpenCvSharp
 ' https://docs.opencvb.org/3.1.0/d6/d10/tutorial_py_houghlines.html
 ' https://github.com/JiphuTzu/opencvsharp/blob/master/sample/SamplesVB/Samples/HoughLinesSample.vb
 Public Class Hough_Basics : Inherits TaskParent
-    Dim edges As New Edge_Basics
+    Dim edges As New Edge_Basics_TA
     Public segments() As cv.LineSegmentPolar
     Public options As New Options_Hough
     Public Sub New()
@@ -107,7 +107,7 @@ End Class
 
 
 Public Class Hough_Lines_MT : Inherits TaskParent
-    Dim edges As New Edge_Basics
+    Dim edges As New Edge_Basics_TA
     Dim options As New Options_Hough
     Public Sub New()
         labels(2) = "Output of the Canny Edge algorithm (no Hough lines)"
@@ -147,7 +147,7 @@ End Class
 
 
 Public Class Hough_Featureless : Inherits TaskParent
-    Public edges As New Edge_Basics
+    Public edges As New Edge_Basics_TA
     Public noDepthCount() As Integer
     Public options As New Options_Hough
     Public roiColor() As cv.Vec3b
@@ -189,7 +189,7 @@ End Class
 
 
 Public Class Hough_FeatureLessTopX : Inherits TaskParent
-    Public edges As New Edge_Basics
+    Public edges As New Edge_Basics_TA
     Public options As New Options_Hough
     Public maskFless As cv.Mat
     Public maskFeat As cv.Mat
@@ -294,7 +294,7 @@ End Class
 
 
 Public Class Hough_Lines : Inherits TaskParent
-    Dim edges As New Edge_Basics
+    Dim edges As New Edge_Basics_TA
     Dim options As New Options_Hough
     Public Sub New()
         task.gOptions.GridSlider.Value = 30
@@ -322,7 +322,7 @@ End Class
 
 
 Public Class NR_Hough_FullImage : Inherits TaskParent
-    Dim edges As New Edge_Basics
+    Dim edges As New Edge_Basics_TA
     Public segments() As cv.LineSegmentPolar
     Public options As New Options_Hough
     Public Sub New()
@@ -353,7 +353,7 @@ End Class
 
 
 Public Class NR_Hough_Probabilistic : Inherits TaskParent
-    Dim edges As New Edge_Basics
+    Dim edges As New Edge_Basics_TA
     Public segments() As cv.LineSegmentPolar
     Public options As New Options_Hough
     Public Sub New()
@@ -384,7 +384,7 @@ End Class
 
 
 Public Class Hough_Structural : Inherits TaskParent
-    Dim edges As New Edge_Basics
+    Dim edges As New Edge_Basics_TA
     Public options As New Options_Hough
     Public Sub New()
         desc = "Gemini generated: find the structural lines (stable, long lines) in the image using Hough"

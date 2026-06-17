@@ -44,6 +44,7 @@ Public Class AlgorithmTask : Implements IDisposable
         motion.standalone = False
         motionStable = New StableGray_Measure_TA
         heartBeats = New HeartBeat_Basics_TA
+        edges = New Edge_Basics_TA
 
         stableDepth = New StableDepth_Basics_TA
         stableGray = New StableGray_Basics_TA
@@ -191,6 +192,7 @@ Public Class AlgorithmTask : Implements IDisposable
         histBinList = {histogramBins, histogramBins, histogramBins}
 
         foreground.Run(emptyMat)
+        edges.Run(task.gray)
 
 
 

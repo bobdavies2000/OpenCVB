@@ -1305,7 +1305,7 @@ End Class
 
 
 Public Class NR_Line_FindSimple : Inherits TaskParent
-    Dim edges As New Edge_Basics
+    Dim edges As New Edge_Basics_TA
     Dim side As Integer
     Dim pixels(side * side) As cv.Point
     Public Sub New()
@@ -1361,7 +1361,7 @@ End Class
 
 
 Public Class NR_Line_RedFlood : Inherits TaskParent
-    Dim edges As New Edge_Basics
+    Dim edges As New Edge_Basics_TA
     Dim flood As New Flood_BasicsMask
     Public Sub New()
         flood.showSelected = False
@@ -1410,7 +1410,7 @@ End Class
 
 
 Public Class NR_Line_Finder : Inherits TaskParent
-    Dim edges As New Edge_Basics
+    Dim edges As New Edge_Basics_TA
     Dim side As Integer
     Dim pixels(side * side) As cv.Point
     Public Sub New()
@@ -1798,7 +1798,7 @@ End Class
 
 Public Class Line_Finder : Inherits TaskParent
     Public ptList() As cv.Point
-    Dim edges As New Edge_Basics
+    Dim edges As New Edge_Basics_TA
     Dim side As Integer
     Dim pixels(side * side) As cv.Point
     Dim sortX As New SortedList(Of Integer, cv.Point)(New compareAllowIdenticalInteger)

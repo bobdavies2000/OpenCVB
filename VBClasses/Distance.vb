@@ -370,16 +370,12 @@ End Class
 
 Public Class NR_Distance_Edges : Inherits TaskParent
     Dim distance As New Distance_Basics
-    Dim edges As New Edge_Basics
     Public Sub New()
-        desc = "Combine the output of edge_Basics and distance_basics."
+        desc = "Combine the output of Edge_Basics_TA and distance_basics."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         distance.Run(task.depthmask)
-
-        edges.Run(src)
-
-        dst2 = ShowAddweighted(distance.dst2, edges.dst2, labels(2))
+        dst2 = ShowAddweighted(distance.dst2, task.edges.dst2, labels(2))
     End Sub
 End Class
 

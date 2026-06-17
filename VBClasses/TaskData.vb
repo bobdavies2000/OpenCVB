@@ -90,6 +90,7 @@ Partial Public Class AlgorithmTask
     Public prepCloud As Cloud_Gravity_TA
     Public depthTiers As Depth_Tiers_TA
     Public heartBeats As HeartBeat_Basics_TA
+    Public edges As Edge_Basics_TA
 
     Public motionFeatures As cv.Point2f
     Public palette As Palette_LoadColorMap

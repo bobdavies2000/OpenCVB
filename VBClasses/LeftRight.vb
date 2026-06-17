@@ -124,7 +124,7 @@ End Class
 
 
 Public Class NR_LeftRight_Edges : Inherits TaskParent
-    Dim edges As New Edge_Basics
+    Dim edges As New Edge_Basics_TA
     Public Sub New()
         desc = "Display the edges in the left and right views"
         labels(2) = "Left Image"
@@ -146,7 +146,7 @@ End Class
 
 
 Public Class NR_LeftRight_EdgesColor : Inherits TaskParent
-    Dim edges As New Edge_Basics
+    Dim edges As New Edge_Basics_TA
     Public Sub New()
         If standalone Then task.gOptions.displayDst0.Checked = True
         desc = "Display the edges in the left, right, and color views"

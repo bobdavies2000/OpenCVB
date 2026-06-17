@@ -203,7 +203,8 @@ Draw_Shapes
 Draw_SymmetricalShapes
 Duster_Basics
 Duster_MaskZ
-Edge_Basics
+Edge_Basics_TA
+Edge_BinarizedReduction
 Edge_Canny
 Edge_CannyAccum
 Edge_CannyHistory
@@ -616,7 +617,7 @@ NR_Bin3Way_RedColorDarkest
 NR_Bin3Way_RedColorLightest
 NR_Bin3Way_RedColorOther
 NR_Bin4Way_BasicsColors
-NR_Bin4Way_Canny
+NR_Bin4Way_Edges
 NR_Bin4Way_Regions1
 NR_Bin4Way_RegionsLeftRight
 NR_Bin4Way_SplitGaps
@@ -841,7 +842,6 @@ NR_Draw_LineTest
 NR_Duster_BasicsY
 NR_Duster_RedCloud
 NR_Edge_BinarizedBrightness
-NR_Edge_BinarizedReduction
 NR_Edge_CannyCombined
 NR_Edge_CannyLeftRight
 NR_Edge_CannyMin

@@ -96,17 +96,14 @@ End Class
 
 
 Public Class NR_AddWeighted_Edges : Inherits TaskParent
-    Dim edges As New Edge_Basics
     Public Sub New()
-        labels = {"", "", "Edges_BinarizedSobel output", "AddWeighted edges and BGR image"}
         desc = "Add in the edges separating light and dark to the color image"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        edges.Run(src)
-        dst2 = edges.dst2
-        labels(2) = edges.labels(2)
+        dst2 = task.edges.dst2
+        labels(2) = task.edges.labels(2)
 
-        dst3 = ShowAddweighted(edges.dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR), src, labels(3))
+        dst3 = ShowAddweighted(task.edges.dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR), src, labels(3))
     End Sub
 End Class
 

@@ -1,7 +1,6 @@
 Imports cv = OpenCvSharp
 Public Class FeatureLess_Basics : Inherits TaskParent
     Public brickList As New List(Of cv.Rect)
-    Dim edges As New Edge_Canny
     Public Sub New()
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
         desc = "Identify featureless grid rects using the gray scale range - see 'Correlation_Basics'."
@@ -21,15 +20,14 @@ Public Class FeatureLess_Basics : Inherits TaskParent
         Return input
     End Function
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If src.Channels <> 1 Then src = task.gray.Clone
-        edges.Run(src)
-        labels(3) = edges.labels(2)
+        dst2 = task.edges.dst2
+        labels(3) = task.edges.labels(2)
 
         dst1.SetTo(0)
         brickList.Clear()
         For i = 0 To task.gridRects.Count - 1
             Dim r = task.gridRects(i)
-            If edges.dst2(r).CountNonZero > 0 Then Continue For
+            If task.edges.dst2(r).CountNonZero > 0 Then Continue For
             dst1(r).SetTo(255)
             brickList.Add(r)
         Next
@@ -279,7 +277,7 @@ End Class
 
 
 Public Class NR_FeatureLess_Canny : Inherits TaskParent
-    Dim edges As New Edge_Basics
+    Dim edges As New Edge_Basics_TA
     Dim options As New Options_Sobel()
     Public Sub New()
         desc = "Use Canny edges to define featureless regions."

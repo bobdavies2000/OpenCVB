@@ -1,18 +1,13 @@
 Imports System.IO
 Imports System.Runtime.InteropServices
-Imports System.Windows.Forms.Design.AxImporter
-Imports VBClasses
 Imports cv = OpenCvSharp
-Public Class Edge_Basics : Inherits TaskParent
+Public Class Edge_Basics_TA : Inherits TaskParent
     Dim canny As Edge_Canny
-    Dim scharr As NR_Edge_Scharr
-    Dim binRed As NR_Edge_BinarizedReduction
+    Dim binRed As Edge_BinarizedReduction
     Dim binSobel As Bin4Way_Sobel
     Dim sobel As Edge_Sobel
     Dim colorGap As NR_Edge_ColorGap_CPP
-    Dim deriche As Edge_Deriche_CPP
     Dim Laplacian As Edge_Laplacian
-    Dim resizeAdd As Edge_ResizeAdd
     Dim regions As NR_Edge_Regions
     Dim edges As Object
     Public Sub New()
@@ -25,21 +20,15 @@ Public Class Edge_Basics : Inherits TaskParent
             saveSelection = task.edgeMethod
             Select Case task.edgeMethod
                 Case "Binarized Reduction"
-                    edges = New NR_Edge_BinarizedReduction
+                    edges = New Edge_BinarizedReduction
                 Case "Binarized Sobel"
                     edges = New Bin4Way_Sobel
                 Case "Canny"
                     edges = New Edge_Canny
                 Case "Color Gap"
                     edges = New NR_Edge_ColorGap_CPP
-                Case "Deriche"
-                    edges = New Edge_Deriche_CPP
                 Case "Laplacian"
                     edges = New Edge_Laplacian
-                Case "Resize and Add"
-                    edges = New Edge_ResizeAdd
-                Case "Scharr"
-                    edges = New NR_Edge_Scharr
                 Case "Sobel"
                     edges = New Edge_Sobel
             End Select
@@ -62,7 +51,7 @@ End Class
 Public Class NR_Edge_MotionFree : Inherits TaskParent
     Dim canny As New Edge_Canny
     Dim scharr As NR_Edge_Scharr
-    Dim binRed As NR_Edge_BinarizedReduction
+    Dim binRed As Edge_BinarizedReduction
     Dim binSobel As Bin4Way_Sobel
     Dim sobel As Edge_SobelNaive
     Dim colorGap As NR_Edge_ColorGap_CPP
@@ -84,7 +73,7 @@ Public Class NR_Edge_MotionFree : Inherits TaskParent
                 Case "Scharr"
                     edges = New NR_Edge_Scharr
                 Case "Binarized Reduction"
-                    edges = New NR_Edge_BinarizedReduction
+                    edges = New Edge_BinarizedReduction
                 Case "Binarized Sobel"
                     edges = New Bin4Way_Sobel
                 Case "Sobel"
@@ -115,7 +104,6 @@ End Class
 
 Public Class NR_Edge_DepthAndColor : Inherits TaskParent
     Dim shadow As New Depth_Holes
-    Dim edges As New Edge_Basics
     Dim dilate As New Dilate_Basics
     Public Sub New()
         OptionParent.findRadio("Dilate shape: Rect").Checked = True
@@ -125,15 +113,15 @@ Public Class NR_Edge_DepthAndColor : Inherits TaskParent
         labels(3) = "Edges in color and depth no dilate"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        edges.Run(src)
         shadow.Run(src)
 
         dst3 = If(shadow.dst3.Channels() <> 1, shadow.dst3.CvtColor(cv.ColorConversionCodes.BGR2GRAY), shadow.dst3)
-        dst3 += edges.dst2.Threshold(1, 255, cv.ThresholdTypes.Binary)
+        dst3 += task.edges.dst2.Threshold(1, 255, cv.ThresholdTypes.Binary)
 
         dilate.Run(dst3)
         dilate.dst2.SetTo(0, shadow.dst2)
         dst2 = dilate.dst2
+        labels(2) = dilate.labels(2)
     End Sub
 End Class
 
@@ -269,7 +257,7 @@ End Class
 
 
 Public Class NR_Edge_DCTinput : Inherits TaskParent
-    Dim edges As New Edge_Basics
+    Dim edges As New Edge_Basics_TA
     Dim dct As New DCT_FeatureLess
     Public Sub New()
         labels(2) = "Canny edges produced from original grayscale image"
@@ -277,14 +265,14 @@ Public Class NR_Edge_DCTinput : Inherits TaskParent
         desc = "Use the featureless regions to enhance the edge detection"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-
-        edges.Run(src)
-        dst2 = edges.dst2.Clone
+        dst2 = task.edges.dst2.Clone
+        labels(2) = task.edges.labels(2)
 
         dct.Run(src)
-        Dim tmp = src.SetTo(white, dct.dst2)
-        edges.Run(tmp)
+        dst1 = src.SetTo(white, dct.dst2)
+        edges.Run(dst1)
         dst3 = edges.dst2
+        labels(3) = edges.labels(2)
     End Sub
 End Class
 
@@ -295,7 +283,6 @@ End Class
 
 
 Public Class NR_Edge_Consistent : Inherits TaskParent
-    Dim edges As New Edge_Basics
     Dim saveFrames As New List(Of cv.Mat)
     Public Sub New()
         desc = "Edges that are consistent for x number of frames"
@@ -303,13 +290,12 @@ Public Class NR_Edge_Consistent : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         If task.optionsChanged Then saveFrames = New List(Of cv.Mat)
 
-        edges.Run(src.Clone)
-
-        Dim tmp = If(edges.dst2.Channels() = 1, edges.dst2.Clone, edges.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
-        saveFrames.Add(tmp)
-        If saveFrames.Count > task.fOptions.FrameHistoryCount.Value  Then saveFrames.RemoveAt(0)
+        dst1 = task.edges.dst2.Clone
+        saveFrames.Add(dst1)
+        If saveFrames.Count > task.fOptions.FrameHistoryCount.Value Then saveFrames.RemoveAt(0)
 
         dst2 = saveFrames(0)
+        labels(2) = task.edges.labels(2)
         For i = 1 To saveFrames.Count - 1
             dst2 = saveFrames(i) And dst2
         Next
@@ -324,7 +310,7 @@ End Class
 
 
 
-Public Class NR_Edge_BinarizedReduction : Inherits TaskParent
+Public Class Edge_BinarizedReduction : Inherits TaskParent
     Dim edges As New Bin4Way_Sobel
     Dim reduction As New Reduction_Basics
     Public Sub New()
@@ -346,15 +332,15 @@ End Class
 
 
 Public Class NR_Edge_BinarizedBrightness : Inherits TaskParent
-    Dim edges As New Edge_Basics
+    Dim edges As New Edge_Basics_TA
     Dim bright As New Brightness_Basics
     Public Sub New()
         labels(2) = "Edges for the same image before brightness."
         desc = "Visualize the impact of brightness on Edge Detection"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        edges.Run(src)
-        dst2 = edges.dst2
+        dst2 = task.edges.dst2
+        labels(2) = task.edges.labels(2)
 
         bright.Run(src)
         edges.Run(bright.dst2)
@@ -600,7 +586,7 @@ End Class
 
 Public Class NR_Edge_Reduction : Inherits TaskParent
     Dim reduction As New Reduction_Basics
-    Dim edge As New Edge_Basics
+    Dim edge As New Edge_Basics_TA
     Public Sub New()
         task.fOptions.ReductionSlider.Value = 1
         labels = {"", "", "Edges in the Reduction output", "Reduction_Basics output"}
@@ -609,9 +595,11 @@ Public Class NR_Edge_Reduction : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         reduction.Run(src)
         dst3 = reduction.dst2
+        labels(3) = reduction.labels(2)
 
         edge.Run(dst3)
         dst2 = edge.dst2
+        labels(2) = edge.labels(2)
     End Sub
 End Class
 
@@ -622,7 +610,7 @@ End Class
 
 
 Public Class NR_Edge_Regions : Inherits TaskParent
-    Dim edge As New Edge_Basics
+    Dim edge As New Edge_Basics_TA
     Public Sub New()
         labels = {"", "", "Edge_Canny output for the depth regions", "Identified regions "}
         desc = "Find the edges for the depth tiers."
@@ -663,7 +651,7 @@ Public Class Edge_CannyHistory : Inherits TaskParent
         For Each m In frameList
             dst3 = dst3 Or m
         Next
-        If frameList.Count >= task.fOptions.FrameHistoryCount.Value  Then frameList.RemoveAt(0)
+        If frameList.Count >= task.fOptions.FrameHistoryCount.Value Then frameList.RemoveAt(0)
     End Sub
 End Class
 
@@ -824,7 +812,7 @@ End Class
 
 Public Class NR_Edge_Projection : Inherits TaskParent
     Dim valley As New HistValley_OptionsAuto
-    Dim canny As New Edge_Basics
+    Dim canny As New Edge_Basics_TA
     Public Sub New()
         labels(3) = "Canny edges in grayscale (red) and edges in back projection (blue)"
         desc = "Find the edges in the HistValley_FromPeaks backprojection"
@@ -854,7 +842,7 @@ End Class
 
 
 Public Class NR_Edge_RedCloud : Inherits TaskParent
-    Dim canny As New Edge_Basics
+    Dim canny As New Edge_Basics_TA
     Public mats As New Mat_4Click
     Dim redC As New RedCloud_Basics
     Public Sub New()
@@ -888,7 +876,7 @@ End Class
 
 Public Class NR_Edge_Color8U : Inherits TaskParent
     Public colorMethods(10 - 1)
-    Dim canny As New Edge_Basics
+    Dim canny As New Edge_Basics_TA
     Dim options As New Options_ColorMethod
     Public Sub New()
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U)
@@ -1162,7 +1150,7 @@ End Class
 
 
 Public Class NR_Edge_Sweep : Inherits TaskParent
-    Dim edges As New Edge_Basics
+    Dim edges As New Edge_Basics_TA
     Public Sub New()
         desc = "Sweep through the various edge algorithms"
     End Sub
@@ -1305,7 +1293,7 @@ End Class
 
 Public Class NR_Edge_CloudData : Inherits TaskParent
     Dim prep As New RedPrep_Core
-    Dim edges As New Edge_Basics
+    Dim edges As New Edge_Basics_TA
     Public Sub New()
         desc = "Find the lines in the RedPrep_Core output"
     End Sub
@@ -1331,7 +1319,7 @@ Public Class NR_Edge_Stability : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         gEdges.Run(src)
-        dst2 = gEdges.edges.dst2
+        dst2 = task.edges.dst2
 
         Dim popSorted As New SortedList(Of Integer, Integer)(New compareAllowIdenticalIntegerInverted)
         Dim pops As New List(Of Integer)
@@ -1510,7 +1498,7 @@ End Class
 
 
 Public Class Edge_LeftRight : Inherits TaskParent
-    Dim edges As New Edge_Basics
+    Dim edges As New Edge_Basics_TA
     Public Sub New()
         desc = "A general view of the different edge algorithms applied to the left and right images."
     End Sub
@@ -1530,7 +1518,7 @@ End Class
 
 
 Public Class NR_Edge_MotionFrames : Inherits TaskParent
-    Dim edges As New Edge_Basics
+    Dim edges As New Edge_Basics_TA
     Dim frames As New History_Basics
     Dim diff As New Diff_Basics
     Public Sub New()
@@ -1550,7 +1538,7 @@ Public Class NR_Edge_MotionFrames : Inherits TaskParent
         diff.Run(dst1)
         diff.dst2.ConvertTo(dst3, cv.MatType.CV_8U)
 
-        labels(2) = "Accumulated edges over " + CStr(task.fOptions.FrameHistoryCount.Value ) + " frames."
+        labels(2) = "Accumulated edges over " + CStr(task.fOptions.FrameHistoryCount.Value) + " frames."
     End Sub
 End Class
 
@@ -1602,7 +1590,7 @@ End Class
 
 Public Class Edge_StableLeftRight : Inherits TaskParent
     Dim stableLR As New StableGray_LeftRight
-    Dim edges As New Edge_Basics
+    Dim edges As New Edge_Basics_TA
     Public Sub New()
         desc = "Show the edges of the stableLeft/Right images."
     End Sub

@@ -250,7 +250,7 @@ End Class
 Public Class NR_RedWGrid_CheckerBoardWall : Inherits TaskParent
     Public prepData As New RedPrep_Core
     Public classCount As Integer
-    Dim edges As New Edge_Basics
+    Dim edges As New Edge_Basics_TA
     Public Sub New()
         desc = "Use this algorithm to build a checkerboard when pointing at a wall."
     End Sub

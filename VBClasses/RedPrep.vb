@@ -118,7 +118,7 @@ End Class
 
 Public Class NR_RedPrep_DepthEdges : Inherits TaskParent
     Dim prep As New RedPrep_Depth
-    Dim edges As New Edge_Basics
+    Dim edges As New Edge_Basics_TA
     Public Sub New()
         desc = "Find the edges of XY depth boundaries."
     End Sub

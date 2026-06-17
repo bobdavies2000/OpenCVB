@@ -516,7 +516,7 @@ Public Class NR_Brick_MLColor : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         bricks.Run(src)
         bounds.Run(src)
-        Dim edgeMask = bounds.feat.edges.dst2
+        Dim edgeMask = task.edges.dst2
 
         Dim rgb32f As New cv.Mat, tmp As New cv.Mat
         src.ConvertTo(rgb32f, cv.MatType.CV_32FC3)
@@ -668,7 +668,6 @@ End Class
 
 Public Class NR_Brick_EdgeFlips : Inherits TaskParent
     Dim bricks As New Brick_Basics
-    Public edges As New Edge_Basics
     Public featureRects As New List(Of cv.Rect)
     Public featureMask As New cv.Mat
     Public fLessMask As New cv.Mat
@@ -684,15 +683,13 @@ Public Class NR_Brick_EdgeFlips : Inherits TaskParent
         Static stateList As New List(Of Single)
         Static lastDepth As cv.Mat = task.lowResDepth.Clone
 
-        edges.Run(src)
-
         featureRects.Clear()
         fLessRects.Clear()
         featureMask.SetTo(0)
         fLessMask.SetTo(0)
         Dim flist As New List(Of Single)
         For Each r In task.gridRects
-            flist.Add(If(edges.dst2(r).CountNonZero <= 1, 1, 2))
+            flist.Add(If(task.edges.dst2(r).CountNonZero <= 1, 1, 2))
         Next
 
         If task.optionsChanged Or stateList.Count = 0 Then
@@ -748,7 +745,6 @@ End Class
 Public Class NR_Brick_Edges : Inherits TaskParent
     Dim bricks As New Brick_Basics
     Dim options As New Options_LeftRightCorrelation
-    Public edges As New Edge_Basics
     Public Sub New()
         dst3 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         desc = "Add edges to features"
@@ -757,8 +753,8 @@ Public Class NR_Brick_Edges : Inherits TaskParent
         bricks.Run(src)
         options.Run()
 
-        edges.Run(task.leftView)
-        dst2 = edges.dst2
+        dst2 = task.edges.dst2
+        labels(2) = task.edges.labels(2)
 
         Dim count As Integer
         dst3.SetTo(0)

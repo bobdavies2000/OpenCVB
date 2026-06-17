@@ -217,7 +217,7 @@ End Class
 
 Public Class NR_FitLine_Grid : Inherits TaskParent
     Dim nZero As New FindNonZero_Basics
-    Dim edges As New Edge_Basics
+    Dim edges As New Edge_Basics_TA
     Dim fitline As New FitLine_BasicsOld_TA
     Public Sub New()
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)

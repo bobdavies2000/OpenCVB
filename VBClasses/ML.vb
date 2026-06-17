@@ -152,7 +152,7 @@ Public Class NR_Brick_MLColorDepth : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         bounds.Run(src)
-        Dim edgeMask = bounds.feat.edges.dst2
+        Dim edgeMask = task.edges.dst2
 
         Dim rgb32f As New cv.Mat, tmp As New cv.Mat
         src.ConvertTo(rgb32f, cv.MatType.CV_32FC3)

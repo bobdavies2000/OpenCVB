@@ -1,7 +1,7 @@
 Imports cv = OpenCvSharp
 Public Class NR_MinMath_Edges : Inherits TaskParent
     Dim bPoints As New BrickPoint_Basics
-    Dim edges As New Edge_Basics
+    Dim edges As New Edge_Basics_TA
     Public Sub New()
         desc = "Use brickpoints to track edges."
     End Sub

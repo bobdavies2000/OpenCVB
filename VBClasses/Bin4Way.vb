@@ -103,8 +103,8 @@ End Class
 
 
 
-Public Class NR_Bin4Way_Canny : Inherits TaskParent
-    Dim edges As New Edge_Basics
+Public Class NR_Bin4Way_Edges : Inherits TaskParent
+    Dim edges As New Edge_Basics_TA
     Dim binary As New Bin4Way_SplitMean
     Dim mats As New Mat_4Click
     Public Sub New()
@@ -112,7 +112,6 @@ Public Class NR_Bin4Way_Canny : Inherits TaskParent
         desc = "Find edges from each of the binarized images"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-
         binary.Run(src)
 
         edges.Run(binary.mats.mat(0))  ' the light and dark halves
@@ -202,7 +201,6 @@ End Class
 
 
 Public Class Bin4Way_UnstableEdges : Inherits TaskParent
-    Dim canny As New Edge_Basics
     Dim blur As New Blur_Basics
     Dim unstable As New Bin4Way_Unstable
     Public Sub New()
@@ -210,13 +208,14 @@ Public Class Bin4Way_UnstableEdges : Inherits TaskParent
         desc = "Find unstable pixels but remove those that are also edges."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        canny.Run(src)
-        blur.Run(canny.dst2)
+        task.edges.Run(src)
+        blur.Run(task.edges.dst2)
         dst1 = blur.dst2.Threshold(0, 255, cv.ThresholdTypes.Binary)
 
         unstable.Run(src)
         dst2 = unstable.dst2
         dst3 = unstable.dst3
+        labels = unstable.labels
 
         If task.gOptions.DebugCheckBox.Checked = False Then dst3.SetTo(0, dst1)
     End Sub

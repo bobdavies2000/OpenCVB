@@ -109,7 +109,7 @@ End Class
 
 Public Class NR_SuperPixel_WithCanny : Inherits TaskParent
     Dim pixels As New SuperPixel_Basics_CPP
-    Dim edges As New Edge_Basics
+    Dim edges As New Edge_Basics_TA
     Public Sub New()
         desc = "Create SuperPixels using RGBDepth image."
     End Sub

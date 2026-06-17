@@ -271,7 +271,7 @@ End Class
 Public Class Flood_FeatureLess : Inherits TaskParent
     Dim fLess As New FeatureLess_DepthFull
     Dim redC As New RedColor_Basics
-    Dim edges As New Edge_Basics
+    Dim edges As New Edge_Basics_TA
     Public Sub New()
         If standalone Then task.gOptions.displayDst1.Checked = True
         desc = "Match flooded cells with FeatureLess clusters"
