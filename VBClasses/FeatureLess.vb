@@ -1,12 +1,25 @@
 Imports cv = OpenCvSharp
 Public Class FeatureLess_Basics : Inherits TaskParent
     Public brickList As New List(Of cv.Rect)
-    Public regionList As New List(Of cv.Rect)
     Dim edges As New Edge_Canny
     Public Sub New()
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
-        desc = "Identify featureless squares using the gray scale range - see 'Correlation_Basics'."
+        desc = "Identify featureless grid rects using the gray scale range - see 'Correlation_Basics'."
     End Sub
+    Public Shared Function buildMap(brickList As List(Of cv.Rect), input As cv.Mat) As cv.Mat
+        Dim index = 1
+        Dim rect As cv.Rect
+        Dim mask = New cv.Mat(New cv.Size(input.Width + 2, input.Height + 2), cv.MatType.CV_8U, 0)
+        For Each r In brickList
+            Dim val = input.Get(Of Byte)(r.Y, r.X)
+            If val = 255 Then
+                Dim flags = cv.FloodFillFlags.FixedRange Or (index << 8)
+                Dim count = cv.Cv2.FloodFill(input, mask, r.TopLeft, index, rect, 0, 0, flags)
+                index += 1
+            End If
+        Next
+        Return input
+    End Function
     Public Overrides Sub RunAlg(src As cv.Mat)
         If src.Channels <> 1 Then src = task.gray.Clone
         edges.Run(src)
@@ -17,35 +30,15 @@ Public Class FeatureLess_Basics : Inherits TaskParent
         For i = 0 To task.gridRects.Count - 1
             Dim r = task.gridRects(i)
             If edges.dst2(r).CountNonZero > 0 Then Continue For
-            If task.depthmask(r).CountNonZero = 0 Then Continue For
             dst1(r).SetTo(255)
-
             brickList.Add(r)
         Next
         Dim countRects = brickList.Count
 
-        Dim index = 1
-        Dim rect As cv.Rect
-        Dim mask = New cv.Mat(New cv.Size(dst1.Width + 2, dst1.Height + 2), cv.MatType.CV_8U, 0)
-        Dim minSize = task.gridWH * task.gridWH
-        regionList.Clear()
-        For Each r In brickList
-            Dim val = dst1.Get(Of Byte)(r.Y, r.X)
-            If val = 255 Then
-                Dim flags = cv.FloodFillFlags.FixedRange Or (index << 8)
-                Dim count = cv.Cv2.FloodFill(dst1, mask, r.TopLeft, index, rect, 0, 0, flags)
-                If count > minSize Then
-                    regionList.Add(r)
-                    index += 1
-                Else
-                    dst1(r).SetTo(0)
-                End If
-            End If
-        Next
-
+        dst1 = buildMap(brickList, dst1)
         dst2 = Palettize(dst1, 0)
 
-        labels(2) = CStr(brickList.Count) + " featureless grid regions with " + CStr(countRects) + " input grid rects"
+        labels(2) = CStr(brickList.Count) + " featureless grid regions "
     End Sub
 End Class
 
@@ -53,7 +46,7 @@ End Class
 
 
 
-Public Class NR_FeatureLess_Basics : Inherits TaskParent
+Public Class NR_FeatureLess_Depth : Inherits TaskParent
     Public fLessList As New List(Of cv.Rect)
     Public options As New Options_FeatureLess
     Public Sub New()
@@ -104,8 +97,8 @@ End Class
 
 
 
-Public Class NR_FeatureLess_BasicsMotion : Inherits TaskParent
-    Public fLessRaw As New FeatureLess_Basics
+Public Class NR_FeatureLess_DepthMotion : Inherits TaskParent
+    Public fLessRaw As New FeatureLess_DepthFull
     Public rectList As New List(Of cv.Rect)
     Public fLessNot As New List(Of cv.Rect)
     Public ptList As New HashSet(Of cv.Point)
@@ -468,7 +461,7 @@ End Class
 
 
 Public Class FeatureLess_LeftRight : Inherits TaskParent
-    Dim fLess As New FeatureLess_Basics
+    Dim fLess As New FeatureLess_DepthFull
     Public Sub New()
         labels = {"", "", "FeatureLess Left mask", "FeatureLess Right mask"}
         desc = "Find the featureless regions of the left and right images"
@@ -489,10 +482,10 @@ End Class
 
 Public Class FeatureLess_RedColor : Inherits TaskParent
     Public redC As New RedCloud_Flood_CPP
-    Public fLess As New FeatureLess_Basics
+    Public fLess As New FeatureLess_DepthFull
     Public Sub New()
         If standalone Then task.gOptions.displayDst1.Checked = True
-        desc = "Use the FeatureLess_Basics output as input to RedColor_Basics"
+        desc = "Use the FeatureLess_DepthFull output as input to RedColor_Basics"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         fLess.Run(task.grayOriginal.Clone)
@@ -514,7 +507,7 @@ End Class
 
 
 Public Class FeatureLess_Stabilized : Inherits TaskParent
-    Dim fLess As New FeatureLess_Basics
+    Dim fLess As New FeatureLess_DepthFull
     Dim diff As New Diff_Simple
     Public Sub New()
         desc = "Double-check that any differences from the previous fLess output occurred because of motion."
@@ -547,7 +540,7 @@ End Class
 
 
 Public Class NR_FeatureLess_Lines : Inherits TaskParent
-    Dim fLess As New FeatureLess_Basics
+    Dim fLess As New FeatureLess_DepthFull
     Dim ranges() As cv.Rangef = New cv.Rangef() {New cv.Rangef(0, 255)}
     Public lpList As New List(Of lpData)
     Public Sub New()
@@ -635,7 +628,7 @@ End Class
 
 
 Public Class FeatureLess_NotImages : Inherits TaskParent
-    Dim fLess As New FeatureLess_Basics
+    Dim fLess As New FeatureLess_DepthFull
     Public Sub New()
         labels(3) = "All regions in the image with features."
         desc = "Provide masks for both the featureless and non-featureless regions."
@@ -662,7 +655,7 @@ End Class
 
 Public Class NR_FeatureLess_FeaturesOld : Inherits TaskParent
     Dim feat As New Feature_Basics
-    Dim fLess As New FeatureLess_Basics
+    Dim fLess As New FeatureLess_DepthFull
     Public Sub New()
         desc = "Isolate features in the not of the featureless regions."
     End Sub
@@ -692,7 +685,7 @@ End Class
 
 
 Public Class FeatureLess_FeatureLines : Inherits TaskParent
-    Dim fLess As New FeatureLess_Basics
+    Dim fLess As New FeatureLess_DepthFull
     Public Sub New()
         desc = "Use lines to further divide featureless from features."
     End Sub
@@ -834,10 +827,10 @@ End Class
 
 
 Public Class FeatureLess_ClusterFlood : Inherits TaskParent
-    Dim fLess As New FeatureLess_Basics
+    Dim fLess As New FeatureLess_DepthFull
     Public floodPoints As New List(Of cv.Point)
     Public Sub New()
-        desc = "Identify the clusters in the FeatureLess_Basics output"
+        desc = "Identify the clusters in the FeatureLess_DepthFull output"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         fLess.Run(task.gray)
@@ -990,7 +983,7 @@ End Class
 
 
 Public Class FeatureLess_Features : Inherits TaskParent
-    Dim fLess As New FeatureLess_Basics
+    Dim fLess As New FeatureLess_DepthFull
     Public featureList As New List(Of Single)
     Public idList As New List(Of Single)
     Public inputVariableCount As Integer = 5
@@ -1114,7 +1107,7 @@ End Class
 
 
 Public Class NR_FeatureLess_ClustersHist2D : Inherits TaskParent
-    Public fLess As New FeatureLess_Basics
+    Public fLess As New FeatureLess_DepthFull
     Public histArray(task.histogramBins * task.histogramBins - 1) As Single
     Public features As New cv.Mat
     Public bpArray() As Single
@@ -1183,7 +1176,7 @@ End Class
 
 
 Public Class FeatureLess_XLines : Inherits TaskParent
-    Dim fLess As New FeatureLess_Basics
+    Dim fLess As New FeatureLess_DepthFull
     Public lpList As New List(Of lpData)
     Public Sub New()
         desc = "Find horizontal and vertical lines through the center of featureless grid rects."
@@ -1224,7 +1217,7 @@ End Class
 
 
 Public Class FeatureLess_YLines : Inherits TaskParent
-    Dim fLess As New FeatureLess_Basics
+    Dim fLess As New FeatureLess_DepthFull
     Public lpList As New List(Of lpData)
     Public Sub New()
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
@@ -1261,3 +1254,79 @@ Public Class FeatureLess_YLines : Inherits TaskParent
     End Sub
 End Class
 
+
+
+
+Public Class FeatureLess_DepthFull : Inherits TaskParent
+    Public brickList As New List(Of cv.Rect)
+    Dim edges As New Edge_Canny
+    Public Sub New()
+        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
+        desc = "Identify featureless squares using the gray scale range - see 'Correlation_Basics'."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        If src.Channels <> 1 Then src = task.gray.Clone
+        edges.Run(src)
+        labels(3) = edges.labels(2)
+
+        dst1.SetTo(0)
+        brickList.Clear()
+        For i = 0 To task.gridRects.Count - 1
+            Dim r = task.gridRects(i)
+            If edges.dst2(r).CountNonZero > 0 Then Continue For
+            If task.depthmask(r).CountNonZero = 0 Then Continue For
+            dst1(r).SetTo(255)
+
+            brickList.Add(r)
+        Next
+        Dim countRects = brickList.Count
+
+        Dim index = 1
+        Dim rect As cv.Rect
+        Dim mask = New cv.Mat(New cv.Size(dst1.Width + 2, dst1.Height + 2), cv.MatType.CV_8U, 0)
+        Dim minSize = task.gridWH * task.gridWH
+        For Each r In brickList
+            Dim val = dst1.Get(Of Byte)(r.Y, r.X)
+            If val = 255 Then
+                Dim flags = cv.FloodFillFlags.FixedRange Or (index << 8)
+                Dim count = cv.Cv2.FloodFill(dst1, mask, r.TopLeft, index, rect, 0, 0, flags)
+                If count > minSize Then
+                    index += 1
+                Else
+                    dst1(r).SetTo(0)
+                End If
+            End If
+        Next
+
+        dst2 = Palettize(dst1, 0)
+
+        labels(2) = CStr(brickList.Count) + " featureless grid regions with " + CStr(countRects) + " input grid rects"
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class FeatureLess_Depth : Inherits TaskParent
+    Public brickList As New List(Of cv.Rect)
+    Public fLess As New FeatureLess_Basics
+    Public Sub New()
+        desc = "Same as FeatureLess_Basics but remove those grid rects with no depth"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        fLess.Run(task.gray)
+
+        dst1.SetTo(0)
+        brickList.Clear()
+        For Each r In fLess.brickList
+            If task.depthmask(r).CountNonZero = 0 Then Continue For
+            brickList.Add(r)
+            dst1(r).SetTo(255)
+        Next
+
+        dst2 = fLess.dst2
+        labels(2) = fLess.labels(2)
+    End Sub
+End Class

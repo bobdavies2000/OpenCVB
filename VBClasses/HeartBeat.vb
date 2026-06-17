@@ -1,5 +1,6 @@
 ﻿Imports cv = OpenCvSharp
 Public Class HeartBeat_Basics_TA : Inherits TaskParent
+    Const ms1000 = 1000
     Public Sub New()
         desc = "Update the heart beat variables"
     End Sub
@@ -12,8 +13,14 @@ Public Class HeartBeat_Basics_TA : Inherits TaskParent
         task.quarterBeat = False
         task.midHeartBeat = False
         task.heartBeat = False
+
         Static msLast As Integer
-        Dim ms = (msWatch - msLast) / 1000
+        Dim ms = (msWatch - msLast) / ms1000
+        If msLast > msWatch Then
+            msLast = msWatch
+            ms = ms1000
+        End If
+
         For i = 0 To task.quarter.Count - 1
             If task.quarter(i) = False And ms > Choose(i + 1, 0.25, 0.5, 0.75, 1.0) Then
                 task.quarterBeat = True
@@ -32,10 +39,10 @@ Public Class HeartBeat_Basics_TA : Inherits TaskParent
             If task.heartBeatCount Mod 5 = 0 Then task.heartBeatLT = True
         End If
 
-        Dim frameDuration = 1000 / task.fpsAlgorithm
-        task.almostHeartBeat = If(msWatch - msLast + frameDuration * 1.5 > 1000, True, False)
+        Dim frameDuration = ms1000 / task.fpsAlgorithm
+        task.almostHeartBeat = If(msWatch - msLast + frameDuration * 1.5 > ms1000, True, False)
 
-        If (msWatch - msLast) > 1000 Then msLast = msWatch
+        If (msWatch - msLast) > ms1000 Then msLast = msWatch
         If task.heartBeatLT Then task.toggleOn = Not task.toggleOn
 
         Static lastHeartBeatLT As Boolean = False

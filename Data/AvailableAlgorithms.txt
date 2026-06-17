@@ -253,6 +253,8 @@ FeatureLess_Basics
 FeatureLess_Cells
 FeatureLess_ClusterFlood
 FeatureLess_Correlation
+FeatureLess_Depth
+FeatureLess_DepthFull
 FeatureLess_FeatureLines
 FeatureLess_Features
 FeatureLess_IndexKNN
@@ -917,14 +919,14 @@ NR_Feature_StableVisual
 NR_Feature_SteadyCam
 NR_Feature_TraceDelaunay
 NR_Feature_WithDepth
-NR_FeatureLess_Basics
-NR_FeatureLess_BasicsMotion
 NR_FeatureLess_Canny
 NR_FeatureLess_ClustersHist2D
 NR_FeatureLess_Contours
 NR_FeatureLess_Correlation
 NR_FeatureLess_Correlations
 NR_FeatureLess_DCT
+NR_FeatureLess_Depth
+NR_FeatureLess_DepthMotion
 NR_FeatureLess_FeaturesOld
 NR_FeatureLess_Histogram
 NR_FeatureLess_History

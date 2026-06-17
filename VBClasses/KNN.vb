@@ -406,11 +406,11 @@ End Class
 
 Public Class KNN_Grid : Inherits TaskParent
     Dim knn As New KNN_Minimal
-    Dim fLess As New FeatureLess_Basics
+    Dim fLess As New FeatureLess_DepthFull
     Public trainInput As New List(Of cv.Point3f)
     Public queries As New List(Of cv.Point3f)
     Public Sub New()
-        desc = "Use FeatureLess_Basics grid elements to define the clusters for all remaining pixels."
+        desc = "Use FeatureLess_DepthFull grid elements to define the clusters for all remaining pixels."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         fLess.Run(task.gray)

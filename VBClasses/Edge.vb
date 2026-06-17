@@ -1559,7 +1559,7 @@ End Class
 
 Public Class Edge_Featureless : Inherits TaskParent
     Dim edges As New Edge_Canny
-    Public fLess As New FeatureLess_Basics
+    Public fLess As New FeatureLess_DepthFull
     Dim histArray(0) As Integer
     Dim histList As New List(Of Integer)
     Public sceneMotionDetected As Boolean

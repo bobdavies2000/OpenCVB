@@ -4,7 +4,7 @@ Public Class Flood_Basics : Inherits TaskParent
     Implements IDisposable
     Public rcList As New List(Of rcData)
     Public rcMap As cv.Mat = New cv.Mat(dst2.Size, cv.MatType.CV_32S, 0)
-    Public fLess As New FeatureLess_Basics
+    Public fLess As New FeatureLess_DepthFull
     Dim lastCenters As New HashSet(Of cv.Rect)
     Public Sub New()
         If standalone Then task.gOptions.displayDst1.Checked = True
@@ -269,7 +269,7 @@ End Class
 
 
 Public Class Flood_FeatureLess : Inherits TaskParent
-    Dim fLess As New FeatureLess_Basics
+    Dim fLess As New FeatureLess_DepthFull
     Dim redC As New RedColor_Basics
     Dim edges As New Edge_Basics
     Public Sub New()

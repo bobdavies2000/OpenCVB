@@ -704,7 +704,7 @@ End Class
 Public Class RedCloud_FeatureLess : Inherits TaskParent
     Dim fRed As New FeatureLess_RedColor
     Public Sub New()
-        desc = "Use the FeatureLess_Basics output as input to RedCloud - identical to FeatureLess_RedColor (now)"
+        desc = "Use the FeatureLess_DepthFull output as input to RedCloud - identical to FeatureLess_RedColor (now)"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         fRed.Run(task.gray)
