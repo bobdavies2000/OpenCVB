@@ -242,12 +242,12 @@ Public Class Flood_BasicsMask : Inherits TaskParent
     Public inputRemoved As cv.Mat
     Public showSelected As Boolean = True
     Public redC As New RedColor_Basics
+    Dim color8U As New Color8U_Basics
     Public Sub New()
         labels(3) = "The inputRemoved mask is used to limit how much of the image is processed."
         desc = "Floodfill by color as usual."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        Static color8U As New Color8U_Basics
         color8U.Run(src)
         inputRemoved = task.pcSplit(2).InRange(task.MaxZmeters, task.MaxZmeters).ConvertScaleAbs()
         src = color8U.dst2

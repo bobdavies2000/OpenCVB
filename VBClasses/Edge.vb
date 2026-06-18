@@ -8,7 +8,6 @@ Public Class Edge_Basics_TA : Inherits TaskParent
     Dim sobel As Edge_Sobel
     Dim colorGap As NR_Edge_ColorGap_CPP
     Dim Laplacian As Edge_Laplacian
-    Dim regions As NR_Edge_Regions
     Dim edges As Object
     Public Sub New()
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
@@ -58,7 +57,6 @@ Public Class NR_Edge_MotionFree : Inherits TaskParent
     Dim deriche As Edge_Deriche_CPP
     Dim Laplacian As Edge_Laplacian
     Dim resizeAdd As Edge_ResizeAdd
-    Dim regions As NR_Edge_Regions
     Dim edges As Object
     Public Sub New()
         desc = "Use Radio Buttons to select the different edge algorithms."
@@ -586,10 +584,8 @@ End Class
 
 Public Class NR_Edge_Reduction : Inherits TaskParent
     Dim reduction As New Reduction_Basics
-    Dim edge As New Edge_Basics_TA
     Public Sub New()
         task.fOptions.ReductionSlider.Value = 1
-        labels = {"", "", "Edges in the Reduction output", "Reduction_Basics output"}
         desc = "Find edges in the reduction image."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -597,9 +593,8 @@ Public Class NR_Edge_Reduction : Inherits TaskParent
         dst3 = reduction.dst2
         labels(3) = reduction.labels(2)
 
-        edge.Run(dst3)
-        dst2 = edge.dst2
-        labels(2) = edge.labels(2)
+        dst2 = task.edges.dst2
+        labels(2) = task.edges.labels(2)
     End Sub
 End Class
 
@@ -609,7 +604,7 @@ End Class
 
 
 
-Public Class NR_Edge_Regions : Inherits TaskParent
+Public Class NR_Edge_DepthTiers : Inherits TaskParent
     Dim edge As New Edge_Basics_TA
     Public Sub New()
         labels = {"", "", "Edge_Canny output for the depth regions", "Identified regions "}
@@ -812,25 +807,24 @@ End Class
 
 Public Class NR_Edge_Projection : Inherits TaskParent
     Dim valley As New HistValley_OptionsAuto
-    Dim canny As New Edge_Basics_TA
+    Dim edges As New Edge_Basics_TA
     Public Sub New()
-        labels(3) = "Canny edges in grayscale (red) and edges in back projection (blue)"
+        labels(3) = "Canny edges (red) and edges in back projection (blue)"
         desc = "Find the edges in the HistValley_FromPeaks backprojection"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        canny.Run(src)
-        dst1 = canny.dst2.Clone
+        dst1 = task.edges.dst2
 
         valley.Run(src)
         dst2 = valley.dst1
 
-        canny.Run(valley.dst1)
+        edges.Run(dst1)
 
         Dim offset = 1
         Dim r1 = New cv.Rect(offset, offset, dst2.Width - offset - 1, dst2.Height - offset - 1)
         Dim r2 = New cv.Rect(0, 0, dst2.Width - offset - 1, dst2.Height - offset - 1)
         dst3.SetTo(white)
-        dst3(r1).SetTo(cv.Scalar.Blue, canny.dst2(r2))
+        dst3(r1).SetTo(cv.Scalar.Blue, edges.dst2(r2))
         dst3.SetTo(cv.Scalar.Red, dst1)
         labels(2) = valley.labels(3)
     End Sub
@@ -842,7 +836,7 @@ End Class
 
 
 Public Class NR_Edge_RedCloud : Inherits TaskParent
-    Dim canny As New Edge_Basics_TA
+    Dim edges As New Edge_Basics_TA
     Public mats As New Mat_4Click
     Dim redC As New RedCloud_Basics
     Public Sub New()
@@ -851,15 +845,14 @@ Public Class NR_Edge_RedCloud : Inherits TaskParent
         desc = "Identify cell boundaries that are also edges."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        canny.Run(src)
-        mats.mat(0) = canny.dst2
+        mats.mat(0) = task.edges.dst2
 
         redC.Run(src)
         mats.mat(1) = redC.dst2
         labels(3) = redC.labels(2)
 
-        canny.Run(redC.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
-        mats.mat(2) = canny.dst2
+        edges.Run(redC.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
+        mats.mat(2) = edges.dst2
 
         mats.mat(3) = mats.mat(2).SetTo(0, Not mats.mat(0))
 
@@ -869,80 +862,6 @@ Public Class NR_Edge_RedCloud : Inherits TaskParent
     End Sub
 End Class
 
-
-
-
-
-
-Public Class NR_Edge_Color8U : Inherits TaskParent
-    Public colorMethods(10 - 1)
-    Dim canny As New Edge_Basics_TA
-    Dim options As New Options_ColorMethod
-    Public Sub New()
-        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U)
-        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U)
-        labels = {"", "", "The 'OR' of each selected method", "The 'AND' of each selected method"}
-
-        desc = "Find edges in a variety of Color8U algorithms then find the edges common to all."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        If task.firstPass Then
-            Dim frmCheck = OptionParent.FindFrm("Options_ColorMethod CheckBoxes")
-            frmCheck.Left = task.gOptions.Width / 2
-        End If
-        options.Run()
-
-        For i = 0 To colorMethods.Count - 1
-            If options.check.Box(i).Checked Then
-                If colorMethods(i) Is Nothing Then
-                    Select Case i
-                        Case 0
-                            colorMethods(i) = New BackProject_Full
-                        Case 1
-                            colorMethods(i) = New Bin4Way_Regions
-                        Case 2
-                            colorMethods(i) = New NR_Binarize_DepthTiers
-                        Case 3
-                            colorMethods(i) = New EdgeLine_BasicsOld
-                        Case 4
-                            colorMethods(i) = New Hist3Dcolor_Basics
-                        Case 5
-                            colorMethods(i) = New KMeans_Basics
-                        Case 6
-                            colorMethods(i) = New LUT_Basics
-                        Case 7
-                            colorMethods(i) = New Reduction_Basics
-                        Case 8
-                            colorMethods(i) = New PCA_NColor_CPP
-                        Case 9
-                            colorMethods(i) = New MeanSubtraction_Gray
-                    End Select
-                End If
-            End If
-        Next
-
-        dst2.SetTo(0)
-        dst3.SetTo(0)
-        Dim initdst3 As Boolean
-        For i = 0 To colorMethods.Count - 1
-            If options.check.Box(i).Checked Then
-                colorMethods(i).run(src)
-                If options.check.Box(i).Text = "EdgeLine_BasicsOld" Then
-                    canny.dst2 = colorMethods(i).dst2
-                Else
-                    canny.Run(colorMethods(i).dst3)
-                End If
-                dst2 = dst2 Or canny.dst2
-                If initdst3 = False Then
-                    dst3 = canny.dst2
-                    initdst3 = True
-                Else
-                    dst3 = dst3 And canny.dst2
-                End If
-            End If
-        Next
-    End Sub
-End Class
 
 
 
@@ -1150,7 +1069,6 @@ End Class
 
 
 Public Class NR_Edge_Sweep : Inherits TaskParent
-    Dim edges As New Edge_Basics_TA
     Public Sub New()
         desc = "Sweep through the various edge algorithms"
     End Sub
@@ -1163,12 +1081,10 @@ Public Class NR_Edge_Sweep : Inherits TaskParent
             task.fOptions.EdgeMethods.SelectedIndex = index
         End If
 
-        edges.Run(src)
-        dst2 = edges.dst2
+        dst2 = task.edges.dst2
 
-        strOut = "Current edge algorithm is " + task.fOptions.EdgeMethods.SelectedText
+        labels(2) = task.edges.labels(2)
         labels(2) = strOut
-        SetTrueText(strOut, 3)
     End Sub
 End Class
 
@@ -1758,5 +1674,26 @@ Public Class Edge_Sobel : Inherits TaskParent
 
         dst0 = src.Sobel(cv.MatType.CV_32F, 0, 1, kernelSize).ConvertScaleAbs()
         dst2 = dst2 Or dst0.Threshold(50, 255, cv.ThresholdTypes.Binary)
+    End Sub
+End Class
+
+
+
+
+
+Public Class NR_Edge_Color8U : Inherits TaskParent
+    Public color8u As New Color8U_Basics
+    Dim edges As New Edge_Basics_TA
+    Public Sub New()
+        labels(2) = "Input to edges algorithm"
+        desc = "Find edges in a variety of Color8U algorithms then find the edges common to all."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        color8u.Run(src)
+        dst2 = color8u.dst3.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+
+        edges.Run(dst2)
+        dst3 = edges.dst2
+        labels(3) = edges.labels(2)
     End Sub
 End Class

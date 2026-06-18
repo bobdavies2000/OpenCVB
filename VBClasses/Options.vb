@@ -1149,9 +1149,9 @@ Public Class Options_Dither : Inherits OptionParent
         End If
         If radio.Setup(traceName) Then
             Dim radioChoices = {"Bayer16", "Bayer8", "Bayer4", "Bayer3", "Bayer2", "BayerRgbNbpp", "BayerRgb3bpp", "BayerRgb6bpp",
-                                                "BayerRgb9bpp", "BayerRgb12bpp", "BayerRgb15bpp", "BayerRgb18bpp", "FSRgbNbpp", "Floyd-Steinberg",
-                                                "FSRgb3bpp", "FSRgb6bpp", "FSRgb9bpp", "FSRgb12bpp", "FSRgb15bpp", "FSRgb18bpp",
-                                                "SierraLiteRgbNbpp", "SierraLite", "SierraRgbNbpp", "Sierra"}
+                                "BayerRgb9bpp", "BayerRgb12bpp", "BayerRgb15bpp", "BayerRgb18bpp", "FSRgbNbpp", "Floyd-Steinberg",
+                                "FSRgb3bpp", "FSRgb6bpp", "FSRgb9bpp", "FSRgb12bpp", "FSRgb15bpp", "FSRgb18bpp",
+                                "SierraLiteRgbNbpp", "SierraLite", "SierraRgbNbpp", "Sierra"}
             For i = 0 To radioChoices.Count - 1
                 radio.addRadio(radioChoices(i))
             Next

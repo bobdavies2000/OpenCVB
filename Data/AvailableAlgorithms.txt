@@ -853,6 +853,7 @@ NR_Edge_Consistent
 NR_Edge_DCTfrequency
 NR_Edge_DCTinput
 NR_Edge_DepthAndColor
+NR_Edge_DepthTiers
 NR_Edge_DericheFiltered
 NR_Edge_DiffXYZ
 NR_Edge_HSV
@@ -869,7 +870,6 @@ NR_Edge_Projection
 NR_Edge_RandomForest_CPP
 NR_Edge_RedCloud
 NR_Edge_Reduction
-NR_Edge_Regions
 NR_Edge_Scharr
 NR_Edge_SobelCustomLeftRight
 NR_Edge_SobelLR

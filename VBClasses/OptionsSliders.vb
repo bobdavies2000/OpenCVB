@@ -67,28 +67,20 @@ Public Class OptionsSliders
         If disposing Then
             ' Remove event handlers
             For Each trackbar In mytrackbars
-                If trackbar IsNot Nothing Then
-                    RemoveHandler trackbar.ValueChanged, AddressOf TrackBar_ValueChanged
-                End If
+                If trackbar IsNot Nothing Then RemoveHandler trackbar.ValueChanged, AddressOf TrackBar_ValueChanged
             Next
 
             ' Dispose all dynamically created controls
             For Each group In groups
-                If group IsNot Nothing Then
-                    group.Dispose()
-                End If
+                If group IsNot Nothing Then group.Dispose()
             Next
 
             For Each trackbar In mytrackbars
-                If trackbar IsNot Nothing Then
-                    trackbar.Dispose()
-                End If
+                If trackbar IsNot Nothing Then trackbar.Dispose()
             Next
 
             For Each label In myLabels
-                If label IsNot Nothing Then
-                    label.Dispose()
-                End If
+                If label IsNot Nothing Then label.Dispose()
             Next
 
             ' Clear the lists

@@ -41,11 +41,7 @@ Public Class Color8U_Basics : Inherits TaskParent
         ElseIf task.fOptions.Color8USource.Text = "Binarize_DepthTiers" Then
             dst2 = task.depthTiers.dst2 ' no need to run depthTiers.  It is already run.
         Else
-            If src.Type = cv.MatType.CV_8U Then
-                classifier.run(src)
-            Else
-                classifier.Run(task.gray)
-            End If
+            classifier.run(If(src.Type = cv.MatType.CV_8U, src, task.gray))
             dst2 = classifier.dst2.clone
         End If
 
