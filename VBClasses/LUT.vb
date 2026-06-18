@@ -168,7 +168,6 @@ End Class
 Public Class NR_LUT_Watershed : Inherits TaskParent
     Public wShed As New Watershed_Basics
     Public lut As New LUT_Equalized
-    Dim edges As New Edge_Basics_TA
     Public Sub New()
         labels(3) = "LUT output with edges highlighted."
         labels(2) = "Watershed Results - draw a rectangle to create a region"
@@ -179,8 +178,8 @@ Public Class NR_LUT_Watershed : Inherits TaskParent
         lut.Run(src)
         dst3 = lut.dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
 
-        edges.Run(src)
-        dst3.SetTo(white, edges.dst2)
+        dst3.SetTo(white, task.edges.dst2)
+        labels(3) = task.edges.labels(2)
 
         wShed.Run(dst3)
         dst2 = wShed.dst3

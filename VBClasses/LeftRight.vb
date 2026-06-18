@@ -154,8 +154,7 @@ Public Class NR_LeftRight_EdgesColor : Inherits TaskParent
         labels(3) = "Right Image"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        edges.Run(task.gray)
-        dst0 = edges.dst2.Clone
+        dst0 = task.edges.dst2.Clone
 
         edges.Run(task.leftView)
         dst2 = edges.dst2.Clone

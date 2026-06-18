@@ -1,7 +1,6 @@
 Imports cv = OpenCvSharp
 Public Class NR_MinMath_Edges : Inherits TaskParent
     Dim bPoints As New BrickPoint_Basics
-    Dim edges As New Edge_Basics_TA
     Public Sub New()
         desc = "Use brickpoints to track edges."
     End Sub
@@ -10,9 +9,8 @@ Public Class NR_MinMath_Edges : Inherits TaskParent
         dst2 = bPoints.dst2
         labels(2) = bPoints.labels(2)
 
-        edges.Run(src)
-        dst3 = edges.dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-        labels(3) = edges.labels(2)
+        dst3 = task.edges.dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        labels(3) = task.edges.labels(2)
 
         For Each bp In bPoints.ptList
             dst3.Circle(bp, task.DotSize, task.highlight, -1, task.lineType)

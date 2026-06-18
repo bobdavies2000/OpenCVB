@@ -390,7 +390,6 @@ Hough_FeatureLessTopX
 Hough_LaneFinder
 Hough_Lines
 Hough_Lines_MT
-Hough_Structural
 Hull_Basics
 Hull_Contour
 HullLine_BasicsOld_TA
@@ -1097,6 +1096,7 @@ NR_HMM_Example_CPP
 NR_Hough_Circles
 NR_Hough_FullImage
 NR_Hough_Probabilistic
+NR_Hough_Structural
 NR_Hough_Sudoku
 NR_Hull_Defect
 NR_HullLine_SelectHull

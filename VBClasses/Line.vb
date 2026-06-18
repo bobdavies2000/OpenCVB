@@ -1334,9 +1334,8 @@ Public Class NR_Line_FindSimple : Inherits TaskParent
         Return Nothing
     End Function
     Public Overrides Sub RunAlg(src As cv.Mat)
-        edges.Run(task.gray)
-        dst2 = edges.dst2
-        labels(2) = edges.labels(2)
+        dst2 = task.edges.dst2
+        labels(2) = task.edges.labels(2)
 
         dst3.SetTo(0)
         For i = 0 To task.gridRects.Count - 1
@@ -1361,16 +1360,14 @@ End Class
 
 
 Public Class NR_Line_RedFlood : Inherits TaskParent
-    Dim edges As New Edge_Basics_TA
     Dim flood As New Flood_BasicsMask
     Public Sub New()
         flood.showSelected = False
         desc = "Use the edges as input to flood."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        edges.Run(task.gray)
-        dst3 = edges.dst2
-        labels(3) = edges.labels(2)
+        dst3 = task.edges.dst2
+        labels(3) = task.edges.labels(2)
 
         flood.inputRemoved = Not dst3
         flood.Run(dst3)
@@ -1410,7 +1407,6 @@ End Class
 
 
 Public Class NR_Line_Finder : Inherits TaskParent
-    Dim edges As New Edge_Basics_TA
     Dim side As Integer
     Dim pixels(side * side) As cv.Point
     Public Sub New()
@@ -1442,9 +1438,8 @@ Public Class NR_Line_Finder : Inherits TaskParent
         Return lpList
     End Function
     Public Overrides Sub RunAlg(src As cv.Mat)
-        edges.Run(task.gray)
-        dst2 = edges.dst2
-        labels(2) = edges.labels(2)
+        dst2 = task.edges.dst2
+        labels(2) = task.edges.labels(2)
 
         dst3.SetTo(0)
         For i = 0 To task.gridRects.Count - 1
@@ -1798,7 +1793,6 @@ End Class
 
 Public Class Line_Finder : Inherits TaskParent
     Public ptList() As cv.Point
-    Dim edges As New Edge_Basics_TA
     Dim side As Integer
     Dim pixels(side * side) As cv.Point
     Dim sortX As New SortedList(Of Integer, cv.Point)(New compareAllowIdenticalInteger)
@@ -1842,9 +1836,8 @@ Public Class Line_Finder : Inherits TaskParent
 
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst2 = src.Clone
-        edges.Run(task.gray)
-        dst1 = edges.dst2
-        labels(2) = edges.labels(2)
+        dst1 = task.edges.dst2
+        labels(2) = task.edges.labels(2)
 
         Dim maxPixels = side * 1.5
         dst3.SetTo(0)

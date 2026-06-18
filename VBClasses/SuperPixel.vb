@@ -109,18 +109,16 @@ End Class
 
 Public Class NR_SuperPixel_WithCanny : Inherits TaskParent
     Dim pixels As New SuperPixel_Basics_CPP
-    Dim edges As New Edge_Basics_TA
     Public Sub New()
         desc = "Create SuperPixels using RGBDepth image."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        edges.Run(src)
         src = task.color.Clone()
-        src.SetTo(white, edges.dst2)
+        src.SetTo(white, task.edges.dst2)
         pixels.Run(src)
         dst2 = pixels.dst2
         dst3 = pixels.dst3.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-        dst3.SetTo(cv.Scalar.Red, edges.dst2)
+        dst3.SetTo(cv.Scalar.Red, task.edges.dst2)
         labels(3) = "Edges provided by Canny in red"
     End Sub
 End Class

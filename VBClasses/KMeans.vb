@@ -219,7 +219,6 @@ End Class
 
 
 Public Class KMeans_Edges : Inherits TaskParent
-    Dim edges As New Edge_Basics_TA
     Public km As New KMeans_Image
     Public classCount As Integer
     Dim redC As New RedCloud_Basics
@@ -228,8 +227,7 @@ Public Class KMeans_Edges : Inherits TaskParent
         desc = "Use edges to isolate regions in the KMeans output - not much different from KMeans_Basics."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        edges.Run(src)
-        src.SetTo(white, edges.dst2)
+        src.SetTo(white, task.edges.dst2)
 
         km.Run(src)
         dst3 = km.dst2 + 1
