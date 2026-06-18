@@ -471,15 +471,13 @@ End Class
 
 Public Class GridRect_Canny : Inherits TaskParent
     Dim bricks As New Brick_Basics
-    Dim edges As New Edge_Basics_TA
     Public Sub New()
         task.gOptions.GridSlider.Value = dst2.Width \ 40 ' arbitrary but the goal is to get a reasonable (< 500) number of roi's.
         desc = "Find all the GridCells with edges in them."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         bricks.Run(src)
-        edges.Run(src)
-        dst3 = edges.dst2
+        dst3 = task.edges.dst2
 
         dst2.SetTo(0)
         For Each brick In bricks.brickList

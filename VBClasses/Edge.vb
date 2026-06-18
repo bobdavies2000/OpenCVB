@@ -1434,7 +1434,6 @@ End Class
 
 
 Public Class NR_Edge_MotionFrames : Inherits TaskParent
-    Dim edges As New Edge_Basics_TA
     Dim frames As New History_Basics
     Dim diff As New Diff_Basics
     Public Sub New()
@@ -1444,8 +1443,7 @@ Public Class NR_Edge_MotionFrames : Inherits TaskParent
         desc = "Collect edges over several frames controlled with global frame history"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        edges.Run(src)
-        dst1 = edges.dst2
+        dst1 = task.edges.dst2
 
         frames.Run(dst1)
         dst2 = frames.dst2

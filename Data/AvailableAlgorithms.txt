@@ -919,7 +919,6 @@ NR_Feature_StableVisual
 NR_Feature_SteadyCam
 NR_Feature_TraceDelaunay
 NR_Feature_WithDepth
-NR_FeatureLess_Canny
 NR_FeatureLess_ClustersHist2D
 NR_FeatureLess_Contours
 NR_FeatureLess_Correlation

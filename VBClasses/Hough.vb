@@ -3,7 +3,6 @@ Imports cv = OpenCvSharp
 ' https://docs.opencvb.org/3.1.0/d6/d10/tutorial_py_houghlines.html
 ' https://github.com/JiphuTzu/opencvsharp/blob/master/sample/SamplesVB/Samples/HoughLinesSample.vb
 Public Class Hough_Basics : Inherits TaskParent
-    Dim edges As New Edge_Basics_TA
     Public segments() As cv.LineSegmentPolar
     Public options As New Options_Hough
     Public Sub New()
@@ -26,17 +25,15 @@ Public Class Hough_Basics : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
-        edges.Run(src)
-
-        segments = cv.Cv2.HoughLines(edges.dst2, options.rho, options.theta, options.threshold)
+        segments = cv.Cv2.HoughLines(task.edges.dst2, options.rho, options.theta, options.threshold)
         labels(2) = "Found " + CStr(segments.Length) + " Lines"
 
         If standaloneTest() Then
             src.CopyTo(dst2)
-            dst2.SetTo(white, edges.dst2)
+            dst2.SetTo(white, task.edges.dst2)
             src.CopyTo(dst3)
             houghShowLines(dst2, segments, options.lineCount)
-            Dim probSegments = cv.Cv2.HoughLinesP(edges.dst2, options.rho, options.theta, options.threshold)
+            Dim probSegments = cv.Cv2.HoughLinesP(task.edges.dst2, options.rho, options.theta, options.threshold)
             For i = 0 To Math.Min(probSegments.Length, options.lineCount) - 1
                 Dim line = probSegments(i)
                 dst3.Line(line.P1, line.P2, cv.Scalar.Red, task.lineWidth + 2, task.lineType)
@@ -107,7 +104,6 @@ End Class
 
 
 Public Class Hough_Lines_MT : Inherits TaskParent
-    Dim edges As New Edge_Basics_TA
     Dim options As New Options_Hough
     Public Sub New()
         labels(2) = "Output of the Canny Edge algorithm (no Hough lines)"
@@ -117,8 +113,7 @@ Public Class Hough_Lines_MT : Inherits TaskParent
 
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
-        edges.Run(src)
-        dst2 = edges.dst2
+        dst2 = task.edges.dst2
 
         Dim depth8uC3 = task.depthRGB
         Parallel.ForEach(task.gridRects,

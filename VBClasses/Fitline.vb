@@ -217,15 +217,14 @@ End Class
 
 Public Class NR_FitLine_Grid : Inherits TaskParent
     Dim nZero As New FindNonZero_Basics
-    Dim edges As New Edge_Basics_TA
     Dim fitline As New FitLine_BasicsOld_TA
     Public Sub New()
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
         desc = "Find lines within each r."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        edges.Run(src)
-        dst2 = edges.dst2
+        dst2 = task.edges.dst2
+        labels(2) = task.edges.labels(2)
 
         dst3.SetTo(0)
         For Each rect In task.gridRects

@@ -276,26 +276,6 @@ End Class
 
 
 
-Public Class NR_FeatureLess_Canny : Inherits TaskParent
-    Dim edges As New Edge_Basics_TA
-    Dim options As New Options_Sobel()
-    Public Sub New()
-        desc = "Use Canny edges to define featureless regions."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        options.Run()
-
-        edges.Run(src)
-        dst2 = Not edges.dst2.Threshold(options.distanceThreshold, 255, cv.ThresholdTypes.Binary)
-    End Sub
-End Class
-
-
-
-
-
-
-
 
 Public Class NR_FeatureLess_Sobel : Inherits TaskParent
     Dim edges As New Edge_Sobel
