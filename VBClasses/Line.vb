@@ -1225,11 +1225,11 @@ End Class
 
 
 Public Class NR_Line_EdgeLineCompare : Inherits TaskParent
-    Dim edgeLine As New EdgeLine_BasicsOld
+    Dim edgeLine As New EdgeLine_Basics
     Public Sub New()
         dst3 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-        labels(3) = "Lines where edgeLine_BasicsOld and Line_Basics agree."
-        desc = "Compare the output of EdgeLine_BasicsOld and Line_Basics"
+        labels(3) = "Lines where EdgeLine_Basics and Line_Basics agree."
+        desc = "Compare the output of EdgeLine_Basics and Line_Basics"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         edgeLine.Run(src)
@@ -1275,7 +1275,7 @@ End Class
 
 
 Public Class NR_Line_EdgeLine : Inherits TaskParent
-    Dim edgeLine As New EdgeLine_BasicsOld
+    Dim edgeLine As New EdgeLine_Basics
     Dim lines As New Line_Basics
     Public Sub New()
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)

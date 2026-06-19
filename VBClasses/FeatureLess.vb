@@ -5,7 +5,7 @@ Public Class FeatureLess_Basics : Inherits TaskParent
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
         desc = "Identify featureless grid rects using the gray scale range - see 'Correlation_Basics'."
     End Sub
-    Public Shared Function buildMap(brickList As List(Of cv.Rect), input As cv.Mat) As cv.Mat
+    Public Function buildMap(brickList As List(Of cv.Rect), input As cv.Mat) As cv.Mat
         Dim index = 1
         Dim rect As cv.Rect
         Dim mask = New cv.Mat(New cv.Size(input.Width + 2, input.Height + 2), cv.MatType.CV_8U, 0)
@@ -34,6 +34,57 @@ Public Class FeatureLess_Basics : Inherits TaskParent
         Dim countRects = brickList.Count
 
         dst1 = buildMap(brickList, dst1)
+        dst2 = Palettize(dst1, 0)
+
+        labels(2) = CStr(brickList.Count) + " featureless grid regions "
+    End Sub
+End Class
+
+
+
+
+
+Public Class FeatureLess_BasicsNew : Inherits TaskParent
+    Public brickList As New List(Of cv.Rect)
+    Public Sub New()
+        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
+        desc = "Identify featureless grid rects using the gray scale range - see 'Correlation_Basics'."
+    End Sub
+    Public Function buildMap(input As cv.Mat) As cv.Mat
+        Dim rect As cv.Rect
+        Dim mask = New cv.Mat(New cv.Size(input.Width + 2, input.Height + 2), cv.MatType.CV_8U, 0)
+
+        Dim usedColors As New List(Of Byte)
+        Dim regionIndex As Integer = 1
+        Dim mm = GetMinMax(input)
+        For Each r In brickList
+            Dim val = input.Get(Of Byte)(r.Y, r.X)
+            If val = 255 Then
+                Dim index = dst1.Get(Of Byte)(r.Y, r.X)
+                If usedColors.Contains(index) Then index = regionIndex
+                Dim flags = cv.FloodFillFlags.FixedRange Or (index << 8)
+                Dim count = cv.Cv2.FloodFill(input, mask, r.TopLeft, index, rect, 0, 0, flags)
+                regionIndex += 1
+                'usedColors.Add(index)
+            End If
+        Next
+        Return input
+    End Function
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        dst2 = task.edges.dst2
+        labels(3) = task.edges.labels(2)
+
+        dst1.SetTo(0)
+        brickList.Clear()
+        For i = 0 To task.gridRects.Count - 1
+            Dim r = task.gridRects(i)
+            If task.edges.dst2(r).CountNonZero > 0 Then Continue For
+            dst1(r).SetTo(255)
+            brickList.Add(r)
+        Next
+        Dim countRects = brickList.Count
+
+        dst1 = buildMap(dst1.Clone)
         dst2 = Palettize(dst1, 0)
 
         labels(2) = CStr(brickList.Count) + " featureless grid regions "
@@ -251,7 +302,7 @@ End Class
 
 
 Public Class NR_FeatureLess_Contours : Inherits TaskParent
-    Dim edgeline As New EdgeLine_BasicsOld
+    Dim edgeline As New EdgeLine_Basics
     Dim contours As New Contour_Basics
     Public Sub New()
         desc = "Use Contour_Basics to get the contour data for the top contours by size."
@@ -576,18 +627,13 @@ Public Class FeatureLess_Cells : Inherits TaskParent
         Dim rect As cv.Rect
         Dim mask = New cv.Mat(New cv.Size(dst2.Width + 2, dst2.Height + 2), cv.MatType.CV_8U, 0)
         Dim flags As cv.FloodFillFlags = cv.FloodFillFlags.Link4
-        Dim minSize = task.gridWH * task.gridWH
         Dim countList As New SortedList(Of Integer, Integer)(New compareAllowIdenticalIntegerInverted)
         For Each r In fLess.fLessList
             Dim val = dst2.Get(Of Byte)(r.Y, r.X)
             If val = 255 Then
                 Dim count = cv.Cv2.FloodFill(dst2, mask, r.TopLeft, index, rect, 0, 0, flags)
-                If count > minSize Then
-                    countList.Add(count, index)
-                    index += 1
-                Else
-                    dst2(r).SetTo(0)
-                End If
+                countList.Add(count, index)
+                index += 1
             End If
         Next
 
@@ -980,27 +1026,22 @@ Public Class FeatureLess_Features : Inherits TaskParent
         featureList.Clear()
         idList.Clear()
         rcList.Clear()
-        Dim minSize = task.gridWH * task.gridWH
         For Each r In task.gridRects
             If dst2.Get(Of Byte)(r.TopLeft.Y, r.TopLeft.X) = 255 Then
                 Dim flags = cv.FloodFillFlags.FixedRange Or (index << 8)
                 Dim Count = cv.Cv2.FloodFill(dst2, mask, r.TopLeft, index, rect, 0, 0, flags)
-                If Count > minSize Then
-                    Dim rc = New rcData(mask(rect), rect, index)
-                    rcList.Add(rc)
+                Dim rc = New rcData(mask(rect), rect, index)
+                rcList.Add(rc)
 
-                    idList.Add(CSng(index))
+                idList.Add(CSng(index))
 
-                    featureList.Add(src(rect).Mean(rc.mask)(0))
-                    featureList.Add(rc.wGrid.Z)
+                featureList.Add(src(rect).Mean(rc.mask)(0))
+                featureList.Add(rc.wGrid.Z)
 
-                    featureList.Add(rc.pixels)
-                    featureList.Add(rc.maxDist.X)
-                    featureList.Add(rc.maxDist.Y)
-                    index += 1
-                Else
-                    dst2(r).SetTo(0)
-                End If
+                featureList.Add(rc.pixels)
+                featureList.Add(rc.maxDist.X)
+                featureList.Add(rc.maxDist.Y)
+                index += 1
             End If
         Next
 
@@ -1153,88 +1194,6 @@ End Class
 
 
 
-Public Class FeatureLess_XLines : Inherits TaskParent
-    Dim fLess As New FeatureLess_DepthFull
-    Public lpList As New List(Of lpData)
-    Public Sub New()
-        desc = "Find horizontal and vertical lines through the center of featureless grid rects."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        If src.Channels <> 1 Then src = task.gray
-
-        fLess.Run(src)
-        dst1 = fLess.dst1
-        dst2 = Palettize(dst1, 0)
-
-        lpList.Clear()
-        For y = task.gridWH / 2 To dst1.Height - 1 Step task.gridWH
-            Dim p1 = newPoint, p2 = newPoint
-            Dim val1 As Integer, val2 As Integer
-            For x = 0 To dst1.Width - 1 Step task.gridWH
-                val1 = dst1.Get(Of Byte)(y, x)
-                val2 = If(x + task.gridWH >= dst2.Width, 0, dst1.Get(Of Byte)(y, x + task.gridWH))
-                If val1 <> val2 Or (x = 0 And val1 <> 0) Then
-                    If val1 = 0 Then p1 = New cv.Point(x + task.gridWH, y)
-                    If val1 <> 0 And (x = 0 And val1 <> 0) Then p1 = New cv.Point(x, y)
-                    If val2 = 0 Then p2 = New cv.Point(x + task.gridWH - 1, y)
-                    If p1 <> newPoint And p2 <> newPoint Then
-                        lpList.Add(New lpData(p1, p2))
-                        dst2.Line(p1, p2, white, task.lineWidth)
-                        p1 = newPoint
-                        p2 = newPoint
-                    End If
-                End If
-            Next
-        Next
-        labels(2) = CStr(lpList.Count) + " horizontal lines encountered with depth"
-    End Sub
-End Class
-
-
-
-
-
-Public Class FeatureLess_YLines : Inherits TaskParent
-    Dim fLess As New FeatureLess_DepthFull
-    Public lpList As New List(Of lpData)
-    Public Sub New()
-        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-        desc = "Find horizontal and vertical lines through the center of featureless grid rects."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        If src.Channels <> 1 Then src = task.gray
-
-        fLess.Run(src)
-        dst1 = fLess.dst1
-        dst2 = Palettize(dst1, 0)
-
-        lpList.Clear()
-        For x = task.gridWH / 2 To dst1.Width - 1 Step task.gridWH
-            Dim p1 = newPoint, p2 = newPoint
-            Dim val1 As Integer, val2 As Integer
-            For y = 0 To dst1.Height - 1 Step task.gridWH
-                val1 = dst1.Get(Of Byte)(y, x)
-                val2 = If(y + task.gridWH >= dst2.Height, 0, dst1.Get(Of Byte)(y + task.gridWH, x))
-                If val1 <> val2 Or (y = 0 And val1 <> 0) Then
-                    If val1 = 0 Then p1 = New cv.Point(x, y + task.gridWH)
-                    If val1 <> 0 And (y = 0 And val1 <> 0) Then p1 = New cv.Point(x, y)
-                    If val2 = 0 Then p2 = New cv.Point(x, y + task.gridWH - 1)
-                    If p1 <> newPoint And p2 <> newPoint Then
-                        lpList.Add(New lpData(p1, p2))
-                        dst2.Line(p1, p2, white, task.lineWidth)
-                        p1 = newPoint
-                        p2 = newPoint
-                    End If
-                End If
-            Next
-        Next
-        labels(2) = CStr(lpList.Count) + " horizontal lines encountered with depth"
-    End Sub
-End Class
-
-
-
-
 Public Class FeatureLess_DepthFull : Inherits TaskParent
     Public brickList As New List(Of cv.Rect)
     Dim edges As New Edge_Canny
@@ -1262,17 +1221,12 @@ Public Class FeatureLess_DepthFull : Inherits TaskParent
         Dim index = 1
         Dim rect As cv.Rect
         Dim mask = New cv.Mat(New cv.Size(dst1.Width + 2, dst1.Height + 2), cv.MatType.CV_8U, 0)
-        Dim minSize = task.gridWH * task.gridWH
         For Each r In brickList
             Dim val = dst1.Get(Of Byte)(r.Y, r.X)
             If val = 255 Then
                 Dim flags = cv.FloodFillFlags.FixedRange Or (index << 8)
                 Dim count = cv.Cv2.FloodFill(dst1, mask, r.TopLeft, index, rect, 0, 0, flags)
-                If count > minSize Then
-                    index += 1
-                Else
-                    dst1(r).SetTo(0)
-                End If
+                index += 1
             End If
         Next
 
@@ -1306,5 +1260,133 @@ Public Class FeatureLess_Depth : Inherits TaskParent
 
         dst2 = fLess.dst2
         labels(2) = fLess.labels(2)
+    End Sub
+End Class
+
+
+
+
+
+Public Class FeatureLess_XLines : Inherits TaskParent
+    Dim fLess As New FeatureLess_Basics
+    Public lpList As New List(Of lpData)
+    Public Sub New()
+        desc = "Find horizontal and vertical lines through the center of featureless grid rects."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        If src.Channels <> 1 Then src = task.gray
+
+        fLess.Run(src)
+        dst1 = fLess.dst1
+        dst2 = Palettize(dst1, 0)
+
+        lpList.Clear()
+        For y = task.gridWH To dst1.Height - 1 Step task.gridWH
+            Dim p1 = newPoint, p2 = newPoint
+            Dim val1 As Integer, val2 As Integer
+            For x = 0 To dst1.Width - 1 Step task.gridWH
+                val1 = dst1.Get(Of Byte)(y, x)
+                val2 = If(x + task.gridWH >= dst2.Width, 0, dst1.Get(Of Byte)(y, x + task.gridWH))
+                If val1 <> val2 Or (x = 0 And val1 <> 0) Then
+                    If val1 = 0 Then p1 = New cv.Point(x + task.gridWH, y)
+                    If val1 <> 0 And (x = 0 And val1 <> 0) Then p1 = New cv.Point(x, y)
+                    If val2 = 0 Then p2 = New cv.Point(x + task.gridWH - 1, y)
+                    If p1 <> newPoint And p2 <> newPoint Then
+                        Dim lp = New lpData(p1, p2)
+                        lp.fLessID = If(val1 = 0, val2, val1)
+                        lpList.Add(lp)
+                        dst2.Line(p1, p2, white, task.lineWidth)
+                        p1 = newPoint
+                        p2 = newPoint
+                    End If
+                End If
+            Next
+        Next
+        labels(2) = CStr(lpList.Count) + " horizontal lines encountered with depth"
+    End Sub
+End Class
+
+
+
+
+
+Public Class FeatureLess_YLines : Inherits TaskParent
+    Dim fLess As New FeatureLess_Basics
+    Public lpList As New List(Of lpData)
+    Public Sub New()
+        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        desc = "Find horizontal and vertical lines through the center of featureless grid rects."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        If src.Channels <> 1 Then src = task.gray
+
+        fLess.Run(src)
+        dst1 = fLess.dst1
+        dst2 = Palettize(dst1, 0)
+
+        lpList.Clear()
+        For x = task.gridWH To dst1.Width - 1 Step task.gridWH
+            Dim p1 = newPoint, p2 = newPoint
+            Dim val1 As Integer, val2 As Integer
+            For y = 0 To dst1.Height - 1 Step task.gridWH
+                val1 = dst1.Get(Of Byte)(y, x)
+                val2 = If(y + task.gridWH >= dst2.Height, 0, dst1.Get(Of Byte)(y + task.gridWH, x))
+                If val1 <> val2 Or (y = 0 And val1 <> 0) Then
+                    If val1 = 0 Then p1 = New cv.Point(x, y + task.gridWH)
+                    If val1 <> 0 And (y = 0 And val1 <> 0) Then p1 = New cv.Point(x, y)
+                    If val2 = 0 Then p2 = New cv.Point(x, y + task.gridWH - 1)
+                    If p1 <> newPoint And p2 <> newPoint Then
+                        Dim lp = New lpData(p1, p2)
+                        lp.fLessID = If(val1 = 0, val2, val1)
+                        lpList.Add(lp)
+                        dst2.Line(p1, p2, white, task.lineWidth)
+                        p1 = newPoint
+                        p2 = newPoint
+                    End If
+                End If
+            Next
+        Next
+
+        labels(2) = CStr(lpList.Count) + " horizontal lines encountered with depth"
+    End Sub
+End Class
+
+
+
+
+
+Public Class FeatureLess_Lines : Inherits TaskParent
+    Dim xLines As New FeatureLess_XLines
+    Dim yLines As New FeatureLess_YLines
+    Public Sub New()
+        desc = "Access the line data to get info about the featureless region."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        xLines.Run(task.gray)
+        dst2 = xLines.dst2
+        labels(2) = xLines.labels(2)
+
+        yLines.Run(task.gray)
+        dst2 = yLines.dst2
+        labels(2) = yLines.labels(2)
+
+        Static selectedRegion As Integer = -1
+        If task.mouseClickFlag Then
+            selectedRegion = xLines.dst1.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X)
+        End If
+
+        If selectedRegion > 0 Then
+            dst3.SetTo(0)
+            For Each lp In xLines.lpList
+                If lp.fLessID = selectedRegion Then
+                    dst3.Line(lp.p1, lp.p2, white, task.lineWidth)
+                End If
+            Next
+            For Each lp In yLines.lpList
+                If lp.fLessID = selectedRegion Then
+                    dst3.Line(lp.p1, lp.p2, white, task.lineWidth)
+                End If
+            Next
+        End If
     End Sub
 End Class

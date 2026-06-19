@@ -1,5 +1,5 @@
 Imports cv = OpenCvSharp
-Public Class BrickLine_BasicsOld : Inherits TaskParent
+Public Class BrickLine_Basics : Inherits TaskParent
     Dim bricks As New Brick_Basics
     Dim hist As New Histogram_GridCell
     Public edgeRequest As Boolean
@@ -82,7 +82,7 @@ End Class
 
 
 Public Class BrickLine_Edges : Inherits TaskParent
-    Dim findCells As New BrickLine_BasicsOld
+    Dim findCells As New BrickLine_Basics
     Public Sub New()
         findCells.edgeRequest = True
         labels(3) = "Use the 'Feature' option 'Selected Feature' to highlight different edges."
@@ -103,7 +103,7 @@ End Class
 
 
 Public Class BrickLine_DepthGap : Inherits TaskParent
-    Dim findCells As New BrickLine_BasicsOld
+    Dim findCells As New BrickLine_Basics
     Dim bricks As New Brick_Basics
     Public Sub New()
         labels(2) = "Cells highlighted below have a significant gap in depth from their neighbors."
@@ -181,7 +181,7 @@ End Class
 
 
 Public Class NR_BrickLine_Lines : Inherits TaskParent
-    Dim findCells As New BrickLine_BasicsOld
+    Dim findCells As New BrickLine_Basics
     Public Sub New()
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
         labels(3) = "Use the 'Feature' option 'Selected Feature' to highlight different lines."
@@ -207,7 +207,7 @@ End Class
 Public Class BrickLine_EdgesNoEdges : Inherits TaskParent
     Public edges As New List(Of Integer)
     Public noEdges As New List(Of Integer)
-    Dim edgeline As New EdgeLine_BasicsOld
+    Dim edgeline As New EdgeLine_Basics
     Public Sub New()
         desc = "Define each grid square according to whether it has edges or not.  Ignore peripheral bricks..."
     End Sub
@@ -250,7 +250,7 @@ Public Class BrickLine_LeftRightMotion : Inherits TaskParent
     Dim fLess As New BrickLine_EdgesNoEdges
     Dim mats As New Mat_4Click
     Public bestBricks As New List(Of Integer)
-    Dim edgeline As New EdgeLine_BasicsOld
+    Dim edgeline As New EdgeLine_Basics
     Public Sub New()
         labels(1) = "Left edges, right edges, bricks with left image edges, bricks with right image edges"
         labels(2) = "The cells below have depth and good correlation left to right"

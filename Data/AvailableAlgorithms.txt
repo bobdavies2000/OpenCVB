@@ -63,7 +63,7 @@ Brick_LeftRightMouse
 Brick_Plot
 Brick_Ranges
 Brick_Variability
-BrickLine_BasicsOld
+BrickLine_Basics
 BrickLine_DepthGap
 BrickLine_Edges
 BrickLine_EdgesNoEdges
@@ -228,7 +228,8 @@ Edge_SobelNaive
 Edge_SobelV
 Edge_SobelVertical
 Edge_StableLeftRight
-EdgeLine_BasicsOld
+EdgeLine_Basics
+EdgeLine_Compare
 EdgeLine_KeyColorOnly
 EdgeLine_LeftRightMotion
 Eigen_Input
@@ -251,6 +252,7 @@ Feature_Points
 FeatureFlow_Basics
 FeatureFlow_LucasKanade
 FeatureLess_Basics
+FeatureLess_BasicsNew
 FeatureLess_Cells
 FeatureLess_ClusterFlood
 FeatureLess_Correlation
@@ -260,6 +262,7 @@ FeatureLess_FeatureLines
 FeatureLess_Features
 FeatureLess_IndexKNN
 FeatureLess_LeftRight
+FeatureLess_Lines
 FeatureLess_NotImages
 FeatureLess_RedColor
 FeatureLess_Stabilized

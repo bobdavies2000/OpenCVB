@@ -1,6 +1,6 @@
 Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
-Public Class EdgeLine_BasicsOld : Inherits TaskParent
+Public Class EdgeLine_Basics : Inherits TaskParent
     Implements IDisposable
     Public rcList As New List(Of rcData)
     Public rcMap As New cv.Mat
@@ -61,7 +61,7 @@ End Class
 
 
 Public Class NR_EdgeLine_Motion : Inherits TaskParent
-    Dim edgeLine As New EdgeLine_BasicsOld
+    Dim edgeLine As New EdgeLine_Basics
     Public rcList As New List(Of rcData)
     Public classCount As Integer
     Public Sub New()
@@ -184,7 +184,7 @@ End Class
 
 Public Class NR_EdgeLine_SplitMean : Inherits TaskParent
     Dim binary As New Bin4Way_SplitMean
-    Dim edges As New EdgeLine_BasicsOld
+    Dim edges As New EdgeLine_Basics
     Public Sub New()
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         desc = "find the edges in a 4-way color split of the image."
@@ -293,7 +293,7 @@ End Class
 Public Class NR_EdgeLine_BrickPoints : Inherits TaskParent
     Dim bPoint As New BrickPoint_Basics
     Public classCount As Integer
-    Dim edgeline As New EdgeLine_BasicsOld
+    Dim edgeline As New EdgeLine_Basics
     Public Sub New()
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
         If standalone Then task.gOptions.displayDst1.Checked = True
@@ -364,7 +364,7 @@ End Class
 
 Public Class NR_EdgeLine_DepthSegments : Inherits TaskParent
     Public segments As New List(Of List(Of cv.Point))
-    Dim edgeline As New EdgeLine_BasicsOld
+    Dim edgeline As New EdgeLine_Basics
     Public Sub New()
         labels(3) = "Highlighting the individual line segments one by one."
         desc = "Break up any edgeline segments that cross depth boundaries."
@@ -413,7 +413,7 @@ End Class
 
 
 Public Class EdgeLine_LeftRightMotion : Inherits TaskParent
-    Dim edges As New EdgeLine_BasicsOld
+    Dim edges As New EdgeLine_Basics
     Public Sub New()
         labels(3) = "Right View: Note it is updated on every frame - it cannot use the motion mask."
         desc = "Build the left and right edge lines."
@@ -478,5 +478,30 @@ Public Class EdgeLine_KeyColorOnly : Inherits TaskParent
     End Sub
     Protected Overrides Sub Finalize()
         EdgeLineRaw_Close(cPtr)
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class EdgeLine_Compare : Inherits TaskParent
+    Dim edgeLine As New EdgeLine_Basics
+    Public Sub New()
+        If standalone Then task.gOptions.displayDst1.Checked = True
+        labels(1) = "The output of EdgeLine_basics after using task.edges.dst2 to zero out overlap."
+        desc = "Compare EdgeLine with Edge_Basics - edgeline is cleaner with more straight lines."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        edgeLine.Run(task.gray)
+        dst2 = edgeLine.dst2.Threshold(0, 255, cv.ThresholdTypes.Binary)
+        labels(2) = edgeLine.labels(2)
+
+        dst3 = task.edges.dst2
+        labels(3) = task.edges.labels(2)
+
+        dst1 = dst2.Clone
+        dst1.SetTo(0, dst3)
     End Sub
 End Class

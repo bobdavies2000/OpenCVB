@@ -1185,7 +1185,7 @@ End Class
 
 
 Public Class NR_Edge_NoDepth : Inherits TaskParent
-    Dim edgeline As New EdgeLine_BasicsOld
+    Dim edgeline As New EdgeLine_Basics
     Public Sub New()
         If standalone Then task.gOptions.displayDst1.Checked = True
         labels = {"", "", "All edges available", "Below - edges without depth, Above - edges with depth (color from contour.)"}

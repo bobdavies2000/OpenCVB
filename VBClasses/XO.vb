@@ -4368,10 +4368,10 @@ Namespace VBClasses
 
 
     Public Class XO_Contour_RedCloudEdges : Inherits TaskParent
-        Dim edgeline As New EdgeLine_BasicsOld
+        Dim edgeline As New EdgeLine_Basics
         Public Sub New()
             dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
-            labels = {"", "EdgeLine_BasicsOld output", "", "Pixels below are both cell boundaries and edges."}
+            labels = {"", "EdgeLine_Basics output", "", "Pixels below are both cell boundaries and edges."}
             desc = "Intersect the cell contours and the edges in the image."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -4511,7 +4511,7 @@ Namespace VBClasses
 
     Public Class XO_Color8U_Edges : Inherits TaskParent
         Dim edges As New Edge_Canny
-        Dim edgeline As New EdgeLine_BasicsOld
+        Dim edgeline As New EdgeLine_Basics
         Public Sub New()
             desc = "Find edges in the Color8U_Basics output"
         End Sub
@@ -12982,7 +12982,7 @@ Namespace VBClasses
         Public options As New Options_Contours
         Public Sub New()
             labels(3) = "Details for the selected contour."
-            task.fOptions.Color8USource.SelectedItem = "EdgeLine_BasicsOld"
+            task.fOptions.Color8USource.SelectedItem = "EdgeLine_Basics"
             desc = "List retrieval mode contour finder"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -13013,7 +13013,7 @@ Namespace VBClasses
         Dim sortContours As New Contour_Sort
         Public Sub New()
             OptionParent.findRadio("CComp").Checked = True
-            task.fOptions.Color8USource.SelectedItem = "EdgeLine_BasicsOld"
+            task.fOptions.Color8USource.SelectedItem = "EdgeLine_Basics"
             desc = "CComp retrieval mode contour finder"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -15893,7 +15893,7 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             contours.Run(src)
             If src.Type <> cv.MatType.CV_8U Then
-                If standalone And task.fOptions.Color8USource.SelectedItem = "EdgeLine_BasicsOld" Then
+                If standalone And task.fOptions.Color8USource.SelectedItem = "EdgeLine_Basics" Then
                     dst1 = contours.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
                 Else
                     dst1 = Mat_Basics.srcMustBe8U(src)
@@ -16822,7 +16822,7 @@ Namespace VBClasses
         Public contourList As New List(Of contourData)
         Public contourMap As New cv.Mat(task.workRes, cv.MatType.CV_32F, 0)
         Dim sortContours As New Contour_Sort
-        Dim edgeline As New EdgeLine_BasicsOld
+        Dim edgeline As New EdgeLine_Basics
         Public Sub New()
             labels(3) = "Input to OpenCV's FindContours"
             desc = "General purpose contour finder"
@@ -17150,7 +17150,7 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             contours.Run(src)
             If src.Type <> cv.MatType.CV_8U Then
-                If standalone And task.fOptions.Color8USource.SelectedItem = "EdgeLine_BasicsOld" Then
+                If standalone And task.fOptions.Color8USource.SelectedItem = "EdgeLine_Basics" Then
                     dst1 = contours.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
                 Else
                     dst1 = Mat_Basics.srcMustBe8U(src)
@@ -18894,7 +18894,7 @@ Namespace VBClasses
     Public Class XO_Brick_EdgeDraw : Inherits TaskParent
         Dim bricks As New Brick_Basics
         Dim regions As New XO_Region_Contours
-        Dim edgeline As New EdgeLine_BasicsOld
+        Dim edgeline As New EdgeLine_Basics
         Public Sub New()
             desc = "Lines can mean cells are connected."
         End Sub
