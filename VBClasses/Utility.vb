@@ -203,7 +203,7 @@ Public Class Utility_Basics : Inherits TaskParent
             rcList.Add(New rcData(task.color, New cv.Rect(0, 0, task.color.Width, task.color.Height), 1))
         Else
             task.rcD = rcList(0)
-            Return vbCrLf + vbCrLf + "The biggest cell is provided when clicking between cells." + vbCrLf 
+            Return vbCrLf + vbCrLf + "Click any cell to see details." + vbCrLf
         End If
 
         Return outStr

@@ -610,30 +610,6 @@ End Class
 
 
 
-Public Class RedColor_FLessCorrelation : Inherits TaskParent
-    Public redC As New RedCloud_Flood_CPP
-    Dim corr As New Correlation_Basics
-    Public Sub New()
-        If standalone Then task.gOptions.displayDst1.Checked = True
-        labels(3) = "Contour_Basics output that is input to RedColor_Basics."
-        desc = "Use the output of the Correlation_Basics as input the RedColor_Basics."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        corr.Run(src)
-        dst3 = corr.dst2
-
-        redC.Run(dst3)
-        dst2 = redC.dst2
-        labels(2) = redC.labels(2)
-
-        SetTrueText(redC.strOut, 1)
-    End Sub
-End Class
-
-
-
-
-
 
 Public Class RedColor_DelaunayMap : Inherits TaskParent
     Public dMap As New Delaunay_Map
@@ -655,30 +631,6 @@ Public Class RedColor_DelaunayMap : Inherits TaskParent
     End Sub
 End Class
 
-
-
-
-
-
-Public Class RedColor_FLessMinMaxRange : Inherits TaskParent
-    Public redC As New RedCloud_Flood_CPP
-    Dim corrRange As New Correlation_MinMaxRange
-    Public Sub New()
-        If standalone Then task.gOptions.displayDst1.Checked = True
-        labels(3) = "Contour_Basics output that is input to RedColor_Basics."
-        desc = "Use the output of the Correlation_Basics as input the RedColor_Basics."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        corrRange.Run(src)
-        dst3 = corrRange.dst2
-
-        redC.Run(dst3)
-        dst2 = redC.dst2
-        labels(2) = redC.labels(2)
-
-        SetTrueText(redC.strOut, 1)
-    End Sub
-End Class
 
 
 
@@ -794,5 +746,77 @@ Public Class RedColor_Isolate : Inherits TaskParent
         strOut = "Uses RedCloud color flood cells (RedColor_Basics). Auto-pick avoids cells covering most of the frame." + vbCrLf +
                  "For iPhone-like quality you would need a learned segmenter; this is a fast geometric proxy."
         SetTrueText(strOut, 3)
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class RedColor_FLessCorrelation : Inherits TaskParent
+    Public redC As New RedCloud_Flood_CPP
+    Dim corr As New Correlation_Basics
+    Public Sub New()
+        If standalone Then task.gOptions.displayDst1.Checked = True
+        labels(3) = "Contour_Basics output that is input to RedColor_Basics."
+        desc = "Use the output of the Correlation_Basics as input the RedColor_Basics."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        corr.Run(src)
+        dst3 = corr.dst2
+
+        redC.Run(dst3)
+        dst2 = redC.dst2
+        labels(2) = redC.labels(2)
+
+        SetTrueText(redC.strOut, 1)
+    End Sub
+End Class
+
+
+
+
+Public Class RedColor_FLessMinMaxRange : Inherits TaskParent
+    Public redC As New RedCloud_Flood_CPP
+    Dim corrRange As New Correlation_MinMaxRange
+    Public Sub New()
+        If standalone Then task.gOptions.displayDst1.Checked = True
+        labels(3) = "Contour_Basics output that is input to RedColor_Basics."
+        desc = "Use the output of the Correlation_Basics as input the RedColor_Basics."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        corrRange.Run(src)
+        dst3 = corrRange.dst2
+
+        redC.Run(dst3)
+        dst2 = redC.dst2
+        labels(2) = redC.labels(2)
+
+        SetTrueText(redC.strOut, 1)
+    End Sub
+End Class
+
+
+
+
+
+Public Class RedColor_FeatureLess : Inherits TaskParent
+    Public redC As New RedColor_Basics
+    Dim fLess As New FeatureLess_Basics
+    Public Sub New()
+        If standalone Then task.gOptions.displayDst1.Checked = True
+        desc = "Use the output of the FeatureLess_Basics as input the RedColor_Basics."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        fLess.Run(src)
+        dst3 = fLess.dst2
+        labels(3) = fLess.labels(2)
+
+        redC.Run(dst3)
+        dst2 = redC.dst2
+        labels(2) = redC.labels(2)
+
+        SetTrueText(redC.strOut, 1)
     End Sub
 End Class

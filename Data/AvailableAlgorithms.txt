@@ -253,6 +253,9 @@ FeatureFlow_Basics
 FeatureFlow_LucasKanade
 FeatureLess_Basics
 FeatureLess_BasicsNew
+FeatureLess_BasicsRedC
+FeatureLess_BasicsTest
+FeatureLess_BasicsTest1
 FeatureLess_Cells
 FeatureLess_ClusterFlood
 FeatureLess_Correlation
@@ -1635,6 +1638,7 @@ RedColor_Bricks
 RedColor_Contour
 RedColor_Contours
 RedColor_DelaunayMap
+RedColor_FeatureLess
 RedColor_FLessCorrelation
 RedColor_FLessMinMaxRange
 RedColor_GridRects
