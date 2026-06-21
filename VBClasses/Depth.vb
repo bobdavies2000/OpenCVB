@@ -1502,7 +1502,7 @@ End Class
 
 
 
-Public Class Depth_Tiers_TA : Inherits TaskParent
+Public Class Depth_Tiers : Inherits TaskParent
     Dim histogram As cv.Mat
     Public classCount As Integer = 10 ' can be set externally as well.
     Dim ranges() As cv.Rangef = {New cv.Rangef(0.1, task.MaxZmeters)}

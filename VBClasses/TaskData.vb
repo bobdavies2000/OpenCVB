@@ -89,7 +89,7 @@ Partial Public Class AlgorithmTask
     Public stableDepth As StableDepth_Basics_TA
     Public stableGray As StableGray_Basics_TA
     Public prepCloud As Cloud_Gravity_TA
-    Public depthTiers As Depth_Tiers_TA
+    Public depthTiers As Depth_Tiers
     Public heartBeats As HeartBeat_Basics_TA
     Public edges As Edge_Basics_TA
 

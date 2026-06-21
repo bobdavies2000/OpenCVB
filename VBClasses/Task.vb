@@ -51,7 +51,6 @@ Public Class AlgorithmTask : Implements IDisposable
         stableGray = New StableGray_Basics_TA
 
         prepCloud = New Cloud_Gravity_TA
-        depthTiers = New Depth_Tiers_TA
         grid = New Grid_Basics_TA
         lines = New Line_Basics_TA
         filterBasics = New Filter_Basics_TA
@@ -186,7 +185,6 @@ Public Class AlgorithmTask : Implements IDisposable
         End If
 
         colorizer.Run(src)
-        depthTiers.Run(task.pcSplit(2))
 
         gravityBasics.Run(src.Clone)
         lines.Run(gray)

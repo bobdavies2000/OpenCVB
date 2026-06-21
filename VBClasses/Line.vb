@@ -283,6 +283,7 @@ Public Class NR_Line_BasicsOld : Inherits TaskParent
     Public motionMask As cv.Mat = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 255)
     Dim edges As New Edge_Sobel
     Public edgeDuplicates As New List(Of lpData) ' lines that are dropped to help LineTrack algorithms.
+    Dim tiers As New Depth_Tiers
     Public Sub New()
         dst1 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
@@ -306,6 +307,8 @@ Public Class NR_Line_BasicsOld : Inherits TaskParent
             lpSorted.Add(lp.length, i)
         Next
 
+        tiers.Run(src)
+
         lpList.Clear()
         edgeDuplicates.Clear()
         Dim edgeMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
@@ -325,7 +328,7 @@ Public Class NR_Line_BasicsOld : Inherits TaskParent
             lpList.Add(lp)
 
             dst1.Line(lp.p1, lp.p2, lp.index, task.lineWidth, cv.LineTypes.Link4)
-            Dim tierIndex = task.depthTiers.dst2.Get(Of Byte)(lp.p1.Y, lp.p1.X)
+            Dim tierIndex = tiers.dst2.Get(Of Byte)(lp.p1.Y, lp.p1.X)
             dst2.Line(lp.p1, lp.p2, task.scalarColors(tierIndex), task.lineWidth + 1, cv.LineTypes.Link4)
         Next
 
@@ -347,6 +350,7 @@ Public Class NR_Line_BasicsLSD : Inherits TaskParent
     Public lpList As New List(Of lpData)
     Dim lsd As cv.LineSegmentDetector
     Dim edges As New Edge_Sobel
+    Dim tiers As New Depth_Tiers
     Public Sub New()
         dst1 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
@@ -361,6 +365,8 @@ Public Class NR_Line_BasicsLSD : Inherits TaskParent
         edges.Run(src)
         labels(2) = edges.labels(2)
 
+        tiers.Run(src)
+
         Dim vecMat As New cv.Mat
         lsd.Detect(src, vecMat)
         Dim vecArray() As cv.Vec4f = Nothing
@@ -373,7 +379,7 @@ Public Class NR_Line_BasicsLSD : Inherits TaskParent
             index += 1
             lp.index = index
             dst1.Line(lp.p1, lp.p2, lp.index, task.lineWidth, cv.LineTypes.Link4)
-            Dim tierIndex = task.depthTiers.dst2.Get(Of Byte)(lp.p1.Y, lp.p1.X)
+            Dim tierIndex = tiers.dst2.Get(Of Byte)(lp.p1.Y, lp.p1.X)
             dst2.Line(lp.p1, lp.p2, task.scalarColors(tierIndex), task.lineWidth + 1, cv.LineTypes.Link4)
         Next
 

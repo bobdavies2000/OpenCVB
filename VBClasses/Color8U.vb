@@ -15,8 +15,6 @@ Public Class Color8U_Basics : Inherits TaskParent
                     If colorMethods(index) Is Nothing Then colorMethods(index) = New BackProject_Full
                 Case "Bin4Way_Regions"
                     If colorMethods(index) Is Nothing Then colorMethods(index) = New Bin4Way_Regions
-                Case "Binarize_DepthTiers"
-                    If colorMethods(index) Is Nothing Then colorMethods(index) = task.depthTiers
                 Case "EdgeLine_Basics"
                     If colorMethods(index) Is Nothing Then colorMethods(index) = New EdgeLine_Basics
                 Case "Hist3DColor_Basics"
@@ -38,8 +36,6 @@ Public Class Color8U_Basics : Inherits TaskParent
         If task.fOptions.Color8USource.Text = "PCA_NColor_CPP" Then
             classifier.Run(src.Clone)
             dst2 = classifier.dst2.clone
-        ElseIf task.fOptions.Color8USource.Text = "Binarize_DepthTiers" Then
-            dst2 = task.depthTiers.dst2 ' no need to run depthTiers.  It is already run.
         Else
             classifier.run(If(src.Type = cv.MatType.CV_8U, src, task.gray))
             dst2 = classifier.dst2.clone

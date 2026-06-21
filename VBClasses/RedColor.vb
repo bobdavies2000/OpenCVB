@@ -6,14 +6,15 @@ Public Class RedColor_Basics : Inherits TaskParent
     Public options As New Options_RedCloud
     Public redFlood As New RedCloud_Flood_CPP
     Public runSelectCell As Boolean = True
+    Dim tiers As New Depth_Tiers
     Public Sub New()
-        task.depthTiers.everyFrame = True
         desc = "Run the C++ RedCloud interface without a mask"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
+        tiers.Run(src)
 
-        Dim input As cv.Mat = Mat_Basics.srcMustBe8U(src) + task.depthTiers.dst2 + 1
+        Dim input As cv.Mat = Mat_Basics.srcMustBe8U(src) + tiers.dst2 + 1
         input.SetTo(0, task.edges.dst2)
         redFlood.Run(input)
         dst2 = redFlood.dst2
@@ -361,7 +362,7 @@ End Class
 Public Class RedColor_Contour : Inherits TaskParent
     Public redC As New RedColor_Basics
     Public Sub New()
-        If New cv.Size(task.workRes.Width, task.workRes.Height) <> New cv.Size(168, 94) Then task.fOptions.FrameHistoryCount.Value  = 1
+        If New cv.Size(task.workRes.Width, task.workRes.Height) <> New cv.Size(168, 94) Then task.fOptions.FrameHistoryCount.Value = 1
         desc = "Get stats on each RedCloud cell."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -827,14 +828,14 @@ Public Class RedColor_BasicsNew : Inherits TaskParent
     Public options As New Options_RedCloud
     Public redFlood As New RedCloud_Flood_CPP
     Public runSelectCell As Boolean = True
+    Dim tiers As New Depth_Tiers
     Public Sub New()
-        task.depthTiers.everyFrame = True
         desc = "Run the C++ RedCloud interface without a mask"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
 
-        Dim input As cv.Mat = Mat_Basics.srcMustBe8U(src) + task.depthTiers.dst2 + 1
+        Dim input As cv.Mat = Mat_Basics.srcMustBe8U(src) + tiers.dst2 + 1
         input.SetTo(0, task.edges.dst2)
         redFlood.Run(input)
         dst2 = redFlood.dst2
