@@ -14,11 +14,11 @@ Public Class Motion_Basics_TA : Inherits TaskParent
                     "the Feature Option 'Motion pixel threshold'." + vbCrLf +
                     " to adjust accuracy of accumulated image.", 3)
 
-        If task.motionStable.motionDecision = False Then
-            motionSort.Clear()
-            motionMask.SetTo(0)
-            Exit Sub ' we don't have any changes.
-        End If
+        'If task.motionStable.motionDecision = False Then
+        '    motionSort.Clear()
+        '    motionMask.SetTo(0)
+        '    Exit Sub ' we don't have any changes.
+        'End If
 
         If src.Channels <> 1 Then src = task.gray.Clone
         If task.optionsChanged Then dst2 = src.Clone

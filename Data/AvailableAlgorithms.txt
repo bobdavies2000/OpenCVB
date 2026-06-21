@@ -253,10 +253,6 @@ FeatureFlow_Basics
 FeatureFlow_LucasKanade
 FeatureLess_Basics
 FeatureLess_Basics_TA
-FeatureLess_BasicsNew
-FeatureLess_BasicsRedC
-FeatureLess_BasicsTest
-FeatureLess_BasicsTest2
 FeatureLess_Cells
 FeatureLess_ClusterFlood
 FeatureLess_Correlation
@@ -925,6 +921,10 @@ NR_Feature_StableVisual
 NR_Feature_SteadyCam
 NR_Feature_TraceDelaunay
 NR_Feature_WithDepth
+NR_FeatureLess_Basics
+NR_FeatureLess_BasicsRedC
+NR_FeatureLess_BasicsTest
+NR_FeatureLess_BasicsTest2
 NR_FeatureLess_ClustersHist2D
 NR_FeatureLess_Contours
 NR_FeatureLess_Correlation
@@ -1717,7 +1717,7 @@ StableGray_Basics_TA
 StableGray_BasicsMax
 StableGray_BasicsMin
 StableGray_LeftRight
-StableGray_Measure_TA
+StableGray_Measure
 StableGray_MeasureOverTime
 StableGray_MinMaxCompare
 StableGray_MinMaxRange

@@ -221,7 +221,7 @@ End Class
 
 
 
-Public Class StableGray_Measure_TA : Inherits TaskParent
+Public Class StableGray_Measure : Inherits TaskParent
     Dim plot As New PlotMouse_Basics
     Public percentZero As Single
     Public averageDiff As Single
@@ -267,6 +267,7 @@ End Class
 Public Class StableGray_MeasureOverTime : Inherits TaskParent
     Dim plotPercent As New PlotTime_Basics
     Dim plotAverage As New PlotTime_Basics
+    Dim motionStable As New StableGray_Measure
     Public Sub New()
         plotPercent.maxScale = 100
         plotPercent.minScale = 0
@@ -278,16 +279,18 @@ Public Class StableGray_MeasureOverTime : Inherits TaskParent
         desc = "Measure % of pixels with zero difference over time."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        plotPercent.plotData = New cv.Scalar(task.motionStable.percentZero, 0, 0)
+        motionStable.Run(src)
+
+        plotPercent.plotData = New cv.Scalar(motionStable.percentZero, 0, 0)
         plotPercent.Run(src)
         dst2 = plotPercent.dst2
 
-        plotAverage.plotData = New cv.Scalar(task.motionStable.averageDiff, 0, 0)
+        plotAverage.plotData = New cv.Scalar(motionStable.averageDiff, 0, 0)
         plotAverage.Run(src)
         dst3 = plotAverage.dst2
 
-        labels(2) = "Percent of image identical at the pixel level = " + Format(task.motionStable.percentZero / 100, "0%")
-        labels(3) = task.motionStable.labels(3)
+        labels(2) = "Percent of image identical at the pixel level = " + Format(motionStable.percentZero / 100, "0%")
+        labels(3) = motionStable.labels(3)
     End Sub
 End Class
 

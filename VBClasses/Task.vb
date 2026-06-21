@@ -42,7 +42,8 @@ Public Class AlgorithmTask : Implements IDisposable
         imuBasics = New IMU_Basics_TA
         motion = New Motion_Basics_TA
         motion.standalone = False
-        motionStable = New StableGray_Measure_TA
+        ' motionStable = New StableGray_Measure
+        fLess = New FeatureLess_Basics_TA
         heartBeats = New HeartBeat_Basics_TA
         edges = New Edge_Basics_TA
 
@@ -132,7 +133,7 @@ Public Class AlgorithmTask : Implements IDisposable
         End If
 
         If gOptions.stableDepthRGB.Checked Then
-            motionStable.Run(task.gray)
+            ' motionStable.Run(task.gray)
 
             motion.Run(gray)
             stableGray.Run(task.gray)
@@ -193,6 +194,7 @@ Public Class AlgorithmTask : Implements IDisposable
 
         foreground.Run(emptyMat)
         edges.Run(task.gray)
+        fLess.Run(emptyMat)
 
 
 
