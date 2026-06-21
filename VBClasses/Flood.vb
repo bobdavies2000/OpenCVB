@@ -93,7 +93,6 @@ End Class
 
 Public Class Flood_BasicsDemo : Inherits TaskParent
     Dim flood As New Flood_Basics
-    Dim edges As New Edge_Canny
     Public Sub New()
         labels(3) = "Edge_Canny output"
         desc = "Use color to connect FCS cells - visualize the data mostly."
@@ -104,8 +103,7 @@ Public Class Flood_BasicsDemo : Inherits TaskParent
 
         dst1 = src.Clone
 
-        edges.Run(src)
-        dst3 = edges.dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        dst3 = task.edges.dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
 
         dst2.SetTo(white, dst3)
     End Sub
@@ -202,15 +200,13 @@ End Class
 
 
 Public Class Flood_Edges : Inherits TaskParent
-    Dim edges As New Edge_Canny
     Public Sub New()
         If standalone Then task.gOptions.displayDst1.Checked = True
         desc = "Floodfill the selected segment of the RedPrep image."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        edges.Run(task.gray)
-        dst3 = edges.dst2
-        labels(3) = edges.labels(2)
+        dst3 = task.edges.dst2
+        labels(3) = task.edges.labels(2)
 
         Dim rcList = RedCloud_Core.sweepImage(dst3, 0)
 

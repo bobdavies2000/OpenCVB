@@ -869,17 +869,15 @@ End Class
 
 
 Public Class Edge_CannyAccum : Inherits TaskParent
-    Dim canny As New Edge_Canny
-    Dim accum As New NR_AddWeighted_DepthAccumulate
+    Dim accum As New AddWeighted_Accumulate
     Public Sub New()
+        labels(2) = "Accumulated canny edges."
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         desc = "Accumulate Canny edges to highlight all real edges better."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        canny.Run(task.gray)
-        accum.Run(canny.dst2)
+        accum.Run(task.edges.dst2)
         dst2 = accum.dst2
-        labels(2) = "Accumulated canny edges."
     End Sub
 End Class
 
@@ -1159,6 +1157,8 @@ Public Class NR_Edge_MeanSubtraction : Inherits TaskParent
         canny.Run(LRMeanSub.dst2)
 
         If task.optionsChanged Then dst2 = canny.dst2.Clone Else canny.dst2.CopyTo(dst2, task.motion.motionMask)
+
+        If standaloneTest() Then dst3 = task.edges.dst2 - dst2
     End Sub
 End Class
 
@@ -1460,10 +1460,7 @@ End Class
 
 
 Public Class Edge_Featureless : Inherits TaskParent
-    Dim edges As New Edge_Canny
     Public fLess As New FeatureLess_DepthFull
-    Dim histArray(0) As Integer
-    Dim histList As New List(Of Integer)
     Public sceneMotionDetected As Boolean
     Public rectCountThreshold As Integer
     Public Sub New()
@@ -1472,23 +1469,9 @@ Public Class Edge_Featureless : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         fLess.Run(task.grayOriginal)
 
-        'If task.heartBeat Then
-        '    If task.firstPass = False Then rectCountThreshold = histList.IndexOf(histList.Max)
-        '    ReDim histArray(task.gridRects.Count - 1)
-        '    histList = histArray.ToList
-        'End If
-
-        'histList(fLess.fLessList.Count) += 1
-        'sceneMotionDetected = fLess.fLessList.Count < rectCountThreshold
-
         dst2 = src.Clone
         dst2.SetTo(0, fLess.dst1)
         labels(2) = fLess.labels(2)
-
-        'edges.Run(dst2.Clone)
-        'dst3 = edges.dst2
-        'Dim count = task.gridRects.Count - fLess.fLessList.Count
-        'labels(2) = "Current frame: " + CStr(count) + " grid squares had features"
 
         strOut = "Scene motion = " + CStr(sceneMotionDetected) + vbCrLf +
                  "Camera motion threshold = " + CStr(rectCountThreshold) + vbCrLf +

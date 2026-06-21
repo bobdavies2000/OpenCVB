@@ -88,6 +88,7 @@ End Class
 
 
 
+
 Public Class NR_FeatureLess_Basics : Inherits TaskParent
     Public brickList As New List(Of cv.Rect)
     Dim redC As New RedColor_Basics
@@ -1010,7 +1011,6 @@ End Class
 
 Public Class NR_FeatureLess_Predict : Inherits TaskParent
     Dim ml As New ML_RandomForest
-    Dim edges As New Edge_Canny
     Public clusters() As Single
     Dim ranges() As cv.Rangef
     Public bpArray() As Single
@@ -1037,9 +1037,6 @@ Public Class NR_FeatureLess_Predict : Inherits TaskParent
         Return gridList
     End Function
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If src.Channels <> 1 Then src = task.gray
-        edges.Run(src)
-
         Dim rectCount = task.gridRects.Count
         Dim inputVariableCount As Integer = 3
         Dim flat(rectCount * inputVariableCount - 1) As Single
@@ -1047,7 +1044,7 @@ Public Class NR_FeatureLess_Predict : Inherits TaskParent
         Dim edgeCounts As New List(Of Integer)
         Dim index As Integer
         For Each r In task.gridRects
-            Dim edgeCount = edges.dst2(r).CountNonZero
+            Dim edgeCount = task.edges.dst2(r).CountNonZero
             edgeCounts.Add(edgeCount)
 
             flat(index) = src(r).Mean()(0)
@@ -1063,7 +1060,7 @@ Public Class NR_FeatureLess_Predict : Inherits TaskParent
         Next
 
         ml.testMat = cv.Mat.FromPixelData(rectCount, inputVariableCount, cv.MatType.CV_32F, flat)
-        Dim mmX = GetMinMax(src)
+        Dim mmX = GetMinMax(task.gray)
         ranges = {New cv.Rangef(mmX.minVal - 0.01, 255.01), New cv.Rangef(0, task.MaxZmeters)}
 
         Dim trainLabels(rectCount - 1) As Single
@@ -1311,21 +1308,19 @@ End Class
 
 Public Class FeatureLess_DepthFull : Inherits TaskParent
     Public brickList As New List(Of cv.Rect)
-    Dim edges As New Edge_Canny
     Public Sub New()
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
-        desc = "Identify featureless squares using the gray scale range - see 'Correlation_Basics'."
+        desc = "Identify featureless gridrects that also have depth."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If src.Channels <> 1 Then src = task.gray.Clone
-        edges.Run(src)
-        labels(3) = edges.labels(2)
+        labels(3) = task.edges.labels(2)
 
         dst1.SetTo(0)
         brickList.Clear()
         For i = 0 To task.gridRects.Count - 1
             Dim r = task.gridRects(i)
-            If edges.dst2(r).CountNonZero > 0 Then Continue For
+            If task.edges.dst2(r).CountNonZero > 0 Then Continue For
             If task.depthmask(r).CountNonZero = 0 Then Continue For
             dst1(r).SetTo(255)
 

@@ -1635,6 +1635,7 @@ RedCloud_MotionFilter
 RedCloud_Reliable
 RedCloud_RGB
 RedColor_Basics
+RedColor_BasicsNew
 RedColor_Bricks
 RedColor_Contour
 RedColor_Contours

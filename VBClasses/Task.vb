@@ -194,7 +194,7 @@ Public Class AlgorithmTask : Implements IDisposable
 
         foreground.Run(emptyMat)
         edges.Run(task.gray)
-        fLess.Run(emptyMat)
+        fLess.Run(src)
 
 
 

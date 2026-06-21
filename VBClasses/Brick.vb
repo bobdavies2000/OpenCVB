@@ -905,13 +905,7 @@ Public Class Brick_Variability : Inherits TaskParent
             depthList.Add(depth)
         Next
 
-        If standaloneTest() Then
-            Static edges As New Edge_Canny
-            edges.Run(src)
-            dst3 = edges.dst2
-        Else
-            dst3.SetTo(0)
-        End If
+        If standaloneTest() Then dst3 = task.edges.dst2 Else dst3.SetTo(0)
 
         If task.heartBeat Then
             Static lastDepthList = New List(Of Single)(depthList)
@@ -957,13 +951,7 @@ Public Class Brick_Ranges : Inherits TaskParent
         dst2.SetTo(0, fLess.dst2)
         labels(2) = fLess.labels(2)
 
-        If standaloneTest() Then
-            Static edges As New Edge_Canny
-            edges.Run(src)
-            dst3 = edges.dst2
-        Else
-            dst3.SetTo(0)
-        End If
+        If standaloneTest() Then dst3 = task.edges.dst2 Else dst3.SetTo(0)
 
         rangeJumpers.Clear()
         For i = 0 To task.gridRects.Count - 1

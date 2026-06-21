@@ -223,7 +223,6 @@ End Class
 
 Public Class NR_FeatureMap_Edges : Inherits TaskParent
     Dim fcs As New FeatureMap_CreateList
-    Dim edges As New Edge_Canny
     Public Sub New()
         desc = "Use edges to connect feature points to their neighbors."
     End Sub
@@ -231,12 +230,11 @@ Public Class NR_FeatureMap_Edges : Inherits TaskParent
         fcs.Run(src)
         dst2 = src
 
-        edges.Run(src)
-        dst3 = edges.dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        dst3 = task.edges.dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         For Each fp In fcs.fpList
             If fp.depth Then
-                dst2.Circle(fp.pt, task.DotSize, task.highlight, -1, task.lineType)
-                dst3.Circle(fp.pt, task.DotSize, task.highlight, -1, task.lineType)
+                dst2.Circle(fp.pt, task.DotSize + 3, task.highlight, -1, task.lineType)
+                dst3.Circle(fp.pt, task.DotSize + 3, task.highlight, -1, task.lineType)
             End If
         Next
         labels = fcs.labels
