@@ -148,7 +148,7 @@ Depth_NotMissing
 Depth_Outline
 Depth_ReliableLines
 Depth_TierCount
-Depth_Tiers_TA
+Depth_Tiers
 Depth_TiersOld
 Depth_World
 Depth_WorldXYZ
@@ -265,6 +265,7 @@ FeatureLess_LeftRight
 FeatureLess_Lines
 FeatureLess_NotImages
 FeatureLess_RedColor
+FeatureLess_Reduction
 FeatureLess_Stabilized
 FeatureLess_ToList
 FeatureLess_XLines

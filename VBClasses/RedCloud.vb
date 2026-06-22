@@ -1,5 +1,4 @@
 Imports System.Runtime.InteropServices
-Imports System.Windows.Documents
 Imports VBClasses
 Imports cv = OpenCvSharp
 Public Class RedCloud_Basics : Inherits TaskParent

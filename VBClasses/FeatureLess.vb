@@ -44,6 +44,7 @@ End Class
 
 
 Public Class FeatureLess_Basics_TA : Inherits TaskParent
+    Public brickList As New List(Of cv.Rect)
     Dim index As Integer
     Public Sub New()
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
@@ -68,16 +69,21 @@ Public Class FeatureLess_Basics_TA : Inherits TaskParent
         dst2 = task.edges.dst2
 
         dst1.SetTo(0)
+        brickList.Clear()
         For Each r In task.gridRects
-            If task.edges.dst2(r).CountNonZero = 0 Then dst1(r).SetTo(255)
+            If task.edges.dst2(r).CountNonZero = 0 Then
+                dst1(r).SetTo(255)
+                brickList.Add(r)
+            End If
         Next
 
         If task.heartBeat Then
             dst3 = buildMap()
         Else
+            brickList.Clear()
             For Each r In task.gridRects
                 Dim val = dst1.Get(Of Byte)(r.Y, r.X)
-                If val = 0 Then dst3(r).SetTo(0)
+                If val = 0 Then dst3(r).SetTo(0) Else brickList.Add(r)
             Next
         End If
         dst2 = Palettize(dst3, 0)
@@ -1353,23 +1359,20 @@ End Class
 
 Public Class FeatureLess_Depth : Inherits TaskParent
     Public brickList As New List(Of cv.Rect)
-    Public fLess As New FeatureLess_Basics
     Public Sub New()
         desc = "Same as FeatureLess_Basics but remove those grid rects with no depth"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        fLess.Run(task.gray)
-
         dst1.SetTo(0)
         brickList.Clear()
-        For Each r In fLess.brickList
+        For Each r In task.fLess.brickList
             If task.depthmask(r).CountNonZero = 0 Then Continue For
             brickList.Add(r)
             dst1(r).SetTo(255)
         Next
 
-        dst2 = fLess.dst2
-        labels(2) = fLess.labels(2)
+        dst2 = task.fLess.dst2
+        labels(2) = task.fLess.labels(2)
     End Sub
 End Class
 
@@ -1378,7 +1381,6 @@ End Class
 
 
 Public Class FeatureLess_XLines : Inherits TaskParent
-    Dim fLess As New FeatureLess_Basics
     Public lpList As New List(Of lpData)
     Public Sub New()
         desc = "Find horizontal and vertical lines through the center of featureless grid rects."
@@ -1386,9 +1388,8 @@ Public Class FeatureLess_XLines : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         If src.Channels <> 1 Then src = task.gray
 
-        fLess.Run(src)
-        dst1 = fLess.dst1
-        dst2 = Palettize(dst1, 0)
+        dst1 = task.fLess.dst3
+        dst2 = task.fLess.dst2
 
         lpList.Clear()
         For y = task.gridWH To dst1.Height - 1 Step task.gridWH
@@ -1421,7 +1422,6 @@ End Class
 
 
 Public Class FeatureLess_YLines : Inherits TaskParent
-    Dim fLess As New FeatureLess_Basics
     Public lpList As New List(Of lpData)
     Public Sub New()
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
@@ -1430,9 +1430,8 @@ Public Class FeatureLess_YLines : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         If src.Channels <> 1 Then src = task.gray
 
-        fLess.Run(src)
-        dst1 = fLess.dst1
-        dst2 = Palettize(dst1, 0)
+        dst1 = task.fLess.dst3
+        dst2 = task.fLess.dst2
 
         lpList.Clear()
         For x = task.gridWH To dst1.Width - 1 Step task.gridWH
@@ -1549,5 +1548,22 @@ Public Class NR_FeatureLess_BasicsTest2 : Inherits TaskParent
         dst2 = Palettize(dst3, 0)
 
         labels(2) = CStr(brickList.Count) + " featureless grid regions "
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class FeatureLess_Reduction : Inherits TaskParent
+    Dim reduction As New Reduction_Basics
+    Public Sub New()
+        task.fOptions.ReductionSlider.Value = 50
+        desc = "Flood each featureless gridRect in the reduced image."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        reduction.Run(task.gray)
+        dst2 = reduction.dst3
     End Sub
 End Class

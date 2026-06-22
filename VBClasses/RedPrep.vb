@@ -139,6 +139,7 @@ End Class
 
 Public Class NR_RedPrep_DepthTiers : Inherits TaskParent
     Dim prep As New RedPrep_Depth
+    Dim tiers As New Depth_Tiers
     Public Sub New()
         labels(3) = "RedPrep_Depth output defines regions with common XY."
         desc = "Find the edges of XY depth boundaries."
@@ -148,7 +149,9 @@ Public Class NR_RedPrep_DepthTiers : Inherits TaskParent
         dst3 = prep.dst3
         dst1 = prep.dst2
 
-        dst1 += task.depthTiers.dst3.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        tiers.Run(src)
+
+        dst1 += tiers.dst3.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
         dst2 = Palettize(dst1)
     End Sub

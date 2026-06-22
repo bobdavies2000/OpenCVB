@@ -3,18 +3,20 @@ Imports cv = OpenCvSharp
 Public Class RedColor_Basics : Inherits TaskParent
     Public rcList As New List(Of rcData)
     Public rcMap As cv.Mat = New cv.Mat(dst2.Size, cv.MatType.CV_32S, 0)
-    Public options As New Options_RedCloud
     Public redFlood As New RedCloud_Flood_CPP
     Public runSelectCell As Boolean = True
     Dim tiers As New Depth_Tiers
+    Dim color8U As New Color8U_Basics
     Public Sub New()
         desc = "Run the C++ RedCloud interface without a mask"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        options.Run()
+        color8U.Run(src)
+        dst3 = color8U.dst2
+
         tiers.Run(src)
 
-        Dim input As cv.Mat = Mat_Basics.srcMustBe8U(src) + tiers.dst2 + 1
+        Dim input As cv.Mat = dst3 + tiers.dst2 + 1
         input.SetTo(0, task.edges.dst2)
         redFlood.Run(input)
         dst2 = redFlood.dst2
@@ -355,30 +357,6 @@ Public Class NR_RedColor_List : Inherits TaskParent
     End Sub
 End Class
 
-
-
-
-
-Public Class RedColor_Contour : Inherits TaskParent
-    Public redC As New RedColor_Basics
-    Public Sub New()
-        If New cv.Size(task.workRes.Width, task.workRes.Height) <> New cv.Size(168, 94) Then task.fOptions.FrameHistoryCount.Value = 1
-        desc = "Get stats on each RedCloud cell."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        redC.Run(src)
-        dst3 = redC.dst2
-        labels(3) = redC.labels(2)
-
-        dst2.SetTo(0)
-        For Each rc In redC.rcList
-            DrawTour(dst2(rc.rect), rc.contour, rc.color, -1)
-            If task.rcD IsNot Nothing Then
-                If rc.index = task.rcD.index Then DrawTour(dst2(rc.rect), rc.contour, white, -1)
-            End If
-        Next
-    End Sub
-End Class
 
 
 
@@ -801,15 +779,13 @@ End Class
 
 Public Class RedColor_FeatureLess : Inherits TaskParent
     Public redC As New RedColor_Basics
-    Dim fLess As New FeatureLess_Basics
     Public Sub New()
         If standalone Then task.gOptions.displayDst1.Checked = True
         desc = "Use the output of the FeatureLess_Basics as input the RedColor_Basics."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        fLess.Run(src)
-        dst3 = fLess.dst2
-        labels(3) = fLess.labels(2)
+        dst3 = task.fLess.dst2
+        labels(3) = task.fLess.labels(2)
 
         redC.Run(dst3)
         dst2 = redC.dst2
@@ -822,31 +798,52 @@ End Class
 
 
 
+
+Public Class RedColor_Contour : Inherits TaskParent
+    Public redC As New RedColor_Basics
+    Public Sub New()
+        If New cv.Size(task.workRes.Width, task.workRes.Height) <> New cv.Size(168, 94) Then task.fOptions.FrameHistoryCount.Value = 1
+        desc = "Get stats on each RedColor cell."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        redC.Run(src)
+        dst3 = redC.dst2
+        labels(3) = redC.labels(2)
+
+        dst2.SetTo(0)
+        For Each rc In redC.rcList
+            DrawTour(dst2(rc.rect), rc.contour, rc.color, -1)
+            If task.rcD IsNot Nothing Then
+                If rc.index = task.rcD.index Then DrawTour(dst2(rc.rect), rc.contour, white, -1)
+            End If
+        Next
+    End Sub
+End Class
+
+
+
 Public Class RedColor_BasicsNew : Inherits TaskParent
     Public rcList As New List(Of rcData)
     Public rcMap As cv.Mat = New cv.Mat(dst2.Size, cv.MatType.CV_32S, 0)
-    Public options As New Options_RedCloud
-    Public redFlood As New RedCloud_Flood_CPP
-    Public runSelectCell As Boolean = True
-    Dim tiers As New Depth_Tiers
+    Public reduction As New Reduction_Basics
     Public Sub New()
-        desc = "Run the C++ RedCloud interface without a mask"
+        If standalone Then task.gOptions.displayDst1.Checked = True
+        task.fOptions.ReductionSlider.Value = 32
+        desc = "Use the FeatureLess regions to improve the RedColor output."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        options.Run()
+        reduction.Run(src)
+        dst2 = reduction.dst2
+        labels(2) = reduction.labels(2)
+        dst3 = Palettize(dst2)
 
-        Dim input As cv.Mat = Mat_Basics.srcMustBe8U(src) + tiers.dst2 + 1
-        input.SetTo(0, task.edges.dst2)
-        redFlood.Run(input)
-        dst2 = redFlood.dst2
-        labels(2) = redFlood.labels(2)
+        Dim rect As cv.Rect
+        Dim mask = New cv.Mat(New cv.Size(dst2.Width + 2, dst2.Height + 2), cv.MatType.CV_8U, 0)
+        Dim flags = cv.FloodFillFlags.FixedRange Or (255 << 8) Or cv.FloodFillFlags.MaskOnly
+        Dim count = cv.Cv2.FloodFill(dst2, mask, pt, 255, rect, 0, 0, flags)
+        'Dim mask = cv.Mat.FromPixelData(dst2.Rows + 2, dst2.Cols + 2, cv.MatType.CV_8U, imagePtr)
 
-        rcMap = redFlood.rcMap.Clone
-        rcList = New List(Of rcData)(redFlood.rcList)
-
-        If runSelectCell Then
-            strOut = Utility_Basics.selectCell(rcMap, rcList)
-            SetTrueText(strOut, 3)
-        End If
+        strOut = Utility_Basics.selectCell(rcMap, rcList)
+        SetTrueText(strOut, 1)
     End Sub
 End Class
