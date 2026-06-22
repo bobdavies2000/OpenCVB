@@ -833,17 +833,59 @@ Public Class RedColor_BasicsNew : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         reduction.Run(src)
-        dst2 = reduction.dst2
         labels(2) = reduction.labels(2)
-        dst3 = Palettize(dst2)
 
         Dim rect As cv.Rect
         Dim mask = New cv.Mat(New cv.Size(dst2.Width + 2, dst2.Height + 2), cv.MatType.CV_8U, 0)
-        Dim flags = cv.FloodFillFlags.FixedRange Or (255 << 8) Or cv.FloodFillFlags.MaskOnly
-        Dim count = cv.Cv2.FloodFill(dst2, mask, pt, 255, rect, 0, 0, flags)
-        'Dim mask = cv.Mat.FromPixelData(dst2.Rows + 2, dst2.Cols + 2, cv.MatType.CV_8U, imagePtr)
+        Dim rcSorted As New SortedList(Of Integer, rcData)(New compareAllowIdenticalInteger)
+        For Each r In task.fLess.brickList
+            Dim val = mask.Get(Of Byte)(r.Y, r.X)
+            If val = 0 Then
+                Dim index As Integer = task.fLess.dst3.Get(Of Byte)(r.Y, r.X)
+                If index > 0 Then
+                    Dim flags = cv.FloodFillFlags.FixedRange Or cv.FloodFillFlags.Link4 Or (index << 8)
+                    Dim count = cv.Cv2.FloodFill(reduction.dst2, mask, r.TopLeft, index, rect, 0, 0, flags)
+                    rect = ValidateRect(rect)
+                    If mask(rect).CountNonZero > 0 Then
+                        rcSorted.Add(index, New rcData(mask(rect), rect, index))
+                    End If
+                End If
+            End If
+        Next
+
+        Dim rcSizeSort As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
+        For i = 0 To rcSorted.Count - 2
+            Dim rc = rcSorted.ElementAt(i).Value
+            Dim rcNext = rcSorted.ElementAt(i + 1).Value
+            If rc.index = rcNext.index Then
+                For j = i To rcSorted.Count - 2
+                    rcNext = rcSorted.ElementAt(j + 1).Value
+                    If rc.index = rcNext.index Then
+                        rc.rect = rc.rect.Union(rcNext.rect)
+                        rc = New rcData(reduction.dst2(rc.rect), rc.rect, rc.index)
+                    Else
+                        rcSizeSort.Add(rc.pixels, rc)
+                        i = j
+                        Exit For
+                    End If
+                Next
+            Else
+                rcSizeSort.Add(rc.pixels, rc)
+            End If
+        Next
+
+        rcMap.SetTo(0)
+        rcList.Clear()
+        For Each rc In rcSizeSort.Values
+            rc.index = rcList.Count + 1
+            rcMap(rc.rect).SetTo(rc.index, rc.mask)
+            rcList.Add(rc)
+        Next
 
         strOut = Utility_Basics.selectCell(rcMap, rcList)
         SetTrueText(strOut, 1)
+
+        dst2 = Palettize(rcMap, 0)
+        labels(2) = CStr(rcList.Count) + " cells were identified."
     End Sub
 End Class
