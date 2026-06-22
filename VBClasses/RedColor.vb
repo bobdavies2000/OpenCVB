@@ -3,6 +3,82 @@ Imports cv = OpenCvSharp
 Public Class RedColor_Basics : Inherits TaskParent
     Public rcList As New List(Of rcData)
     Public rcMap As cv.Mat = New cv.Mat(dst2.Size, cv.MatType.CV_32S, 0)
+    Public reduction As New Reduction_Basics
+    Public runSelectCell As Boolean = True
+    Public Sub New()
+        If standalone Then task.gOptions.displayDst1.Checked = True
+        task.fOptions.ReductionSlider.Value = 32
+        desc = "Use the FeatureLess regions to improve the RedColor output."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        reduction.Run(src)
+        labels(2) = reduction.labels(2)
+
+        Dim rect As cv.Rect
+        Dim mask = New cv.Mat(New cv.Size(dst2.Width + 2, dst2.Height + 2), cv.MatType.CV_8U, 0)
+        Dim rcSorted As New SortedList(Of Integer, rcData)(New compareAllowIdenticalInteger)
+        For Each r In task.fLess.brickList
+            Dim val = mask.Get(Of Byte)(r.Y, r.X)
+            If val = 0 Then
+                Dim index As Integer = task.fLess.dst3.Get(Of Byte)(r.Y, r.X)
+                If index > 0 Then
+                    Dim flags = cv.FloodFillFlags.FixedRange Or cv.FloodFillFlags.Link4 Or (index << 8)
+                    Dim count = cv.Cv2.FloodFill(reduction.dst2, mask, r.TopLeft, index, rect, 0, 0, flags)
+                    rect = ValidateRect(rect)
+                    If mask(rect).CountNonZero > 0 Then
+                        rcSorted.Add(index, New rcData(mask(rect), rect, index))
+                    End If
+                End If
+            End If
+        Next
+
+        Dim rcSizeSort As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
+        For i = 0 To rcSorted.Count - 2
+            Dim rc = rcSorted.ElementAt(i).Value
+            Dim rcNext = rcSorted.ElementAt(i + 1).Value
+            If rc.index = rcNext.index Then
+                For j = i To rcSorted.Count - 2
+                    rcNext = rcSorted.ElementAt(j + 1).Value
+                    If rc.index = rcNext.index Then
+                        rc.rect = rc.rect.Union(rcNext.rect)
+                        rc = New rcData(reduction.dst2(rc.rect), rc.rect, rc.index)
+                    Else
+                        rcSizeSort.Add(rc.pixels, rc)
+                        i = j
+                        Exit For
+                    End If
+                Next
+            Else
+                rcSizeSort.Add(rc.pixels, rc)
+            End If
+        Next
+
+        rcMap.SetTo(0)
+        rcList.Clear()
+        For Each rc In rcSizeSort.Values
+            rc.index = rcList.Count + 1
+            rcMap(rc.rect).SetTo(rc.index, rc.mask)
+            rcList.Add(rc)
+        Next
+
+        If runSelectCell Then
+            strOut = Utility_Basics.selectCell(rcMap, rcList)
+            SetTrueText(strOut, 1)
+        End If
+
+        dst2 = Palettize(rcMap, 0)
+
+        labels(2) = CStr(rcList.Count) + " cells were identified."
+    End Sub
+End Class
+
+
+
+
+
+Public Class RedColor_BasicsOld : Inherits TaskParent
+    Public rcList As New List(Of rcData)
+    Public rcMap As cv.Mat = New cv.Mat(dst2.Size, cv.MatType.CV_32S, 0)
     Public redFlood As New RedCloud_Flood_CPP
     Public runSelectCell As Boolean = True
     Dim tiers As New Depth_Tiers
@@ -817,75 +893,5 @@ Public Class RedColor_Contour : Inherits TaskParent
                 If rc.index = task.rcD.index Then DrawTour(dst2(rc.rect), rc.contour, white, -1)
             End If
         Next
-    End Sub
-End Class
-
-
-
-Public Class RedColor_BasicsNew : Inherits TaskParent
-    Public rcList As New List(Of rcData)
-    Public rcMap As cv.Mat = New cv.Mat(dst2.Size, cv.MatType.CV_32S, 0)
-    Public reduction As New Reduction_Basics
-    Public Sub New()
-        If standalone Then task.gOptions.displayDst1.Checked = True
-        task.fOptions.ReductionSlider.Value = 32
-        desc = "Use the FeatureLess regions to improve the RedColor output."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        reduction.Run(src)
-        labels(2) = reduction.labels(2)
-
-        Dim rect As cv.Rect
-        Dim mask = New cv.Mat(New cv.Size(dst2.Width + 2, dst2.Height + 2), cv.MatType.CV_8U, 0)
-        Dim rcSorted As New SortedList(Of Integer, rcData)(New compareAllowIdenticalInteger)
-        For Each r In task.fLess.brickList
-            Dim val = mask.Get(Of Byte)(r.Y, r.X)
-            If val = 0 Then
-                Dim index As Integer = task.fLess.dst3.Get(Of Byte)(r.Y, r.X)
-                If index > 0 Then
-                    Dim flags = cv.FloodFillFlags.FixedRange Or cv.FloodFillFlags.Link4 Or (index << 8)
-                    Dim count = cv.Cv2.FloodFill(reduction.dst2, mask, r.TopLeft, index, rect, 0, 0, flags)
-                    rect = ValidateRect(rect)
-                    If mask(rect).CountNonZero > 0 Then
-                        rcSorted.Add(index, New rcData(mask(rect), rect, index))
-                    End If
-                End If
-            End If
-        Next
-
-        Dim rcSizeSort As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
-        For i = 0 To rcSorted.Count - 2
-            Dim rc = rcSorted.ElementAt(i).Value
-            Dim rcNext = rcSorted.ElementAt(i + 1).Value
-            If rc.index = rcNext.index Then
-                For j = i To rcSorted.Count - 2
-                    rcNext = rcSorted.ElementAt(j + 1).Value
-                    If rc.index = rcNext.index Then
-                        rc.rect = rc.rect.Union(rcNext.rect)
-                        rc = New rcData(reduction.dst2(rc.rect), rc.rect, rc.index)
-                    Else
-                        rcSizeSort.Add(rc.pixels, rc)
-                        i = j
-                        Exit For
-                    End If
-                Next
-            Else
-                rcSizeSort.Add(rc.pixels, rc)
-            End If
-        Next
-
-        rcMap.SetTo(0)
-        rcList.Clear()
-        For Each rc In rcSizeSort.Values
-            rc.index = rcList.Count + 1
-            rcMap(rc.rect).SetTo(rc.index, rc.mask)
-            rcList.Add(rc)
-        Next
-
-        strOut = Utility_Basics.selectCell(rcMap, rcList)
-        SetTrueText(strOut, 1)
-
-        dst2 = Palettize(rcMap, 0)
-        labels(2) = CStr(rcList.Count) + " cells were identified."
     End Sub
 End Class
