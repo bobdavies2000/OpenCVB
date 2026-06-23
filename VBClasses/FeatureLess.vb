@@ -33,7 +33,7 @@ Public Class FeatureLess_Basics_TA : Inherits TaskParent
             End If
         Next
 
-        If task.heartBeat Then
+        If task.heartBeatLT Then
             dst3 = buildMap()
         Else
             brickList.Clear()
@@ -1554,15 +1554,62 @@ End Class
 
 
 
-
-Public Class FeatureLess_Reduction : Inherits TaskParent
-    Dim reduction As New Reduction_Basics
+Public Class FeatureLess_Tracker : Inherits TaskParent
+    Public regions As New List(Of (count As Integer, r As cv.Rect))
     Public Sub New()
-        task.fOptions.ReductionSlider.Value = 50
-        desc = "Flood each featureless gridRect in the reduced image."
+        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
+        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
+        desc = "Track featureless regions."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        reduction.Run(task.gray)
-        dst2 = reduction.dst3
+        Dim rect As cv.Rect
+        Dim mask = New cv.Mat(New cv.Size(dst1.Width + 2, dst1.Height + 2), cv.MatType.CV_8U, 0)
+        Dim index As Integer
+        regions.Clear()
+
+        dst0 = task.fLess.dst1.Clone
+        Dim overlap = dst0.Clone
+        overlap.SetTo(0, dst1)
+
+        For Each r In task.gridRects
+            Dim val1 = dst0.Get(Of Byte)(r.Y, r.X)
+            Dim val2 = dst1.Get(Of Byte)(r.Y, r.X)
+            If val1 = 255 And val2 = 255 Then
+                index = dst3.Get(Of Byte)(r.Y, r.X)
+                If index > 0 Then
+                    Dim flags = cv.FloodFillFlags.FixedRange Or (index << 8)
+                    Dim count = cv.Cv2.FloodFill(dst0, mask, r.TopLeft, index, rect, 0, 0, flags)
+                    regions.Add((count, ValidateRect(rect)))
+                End If
+            End If
+        Next
+
+        dst2 = Palettize(dst0, 0)
+        labels(2) = CStr(index) + " regions were found."
+
+        dst1 = task.fLess.dst1.Clone
+        dst3 = task.fLess.dst3.Clone
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class FeatureLess_Overlap : Inherits TaskParent
+    Public Sub New()
+        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
+        labels = {"", "", "Grid rects that did not overlap", "Grid rects that overlapped."}
+        desc = "Compare the current and previous featureless regions and define overlap and not overlap."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        dst0 = task.fLess.dst1.Clone
+
+        dst2 = dst0.Clone
+        dst2.SetTo(0, dst1)
+        dst3 = dst0 And dst1
+
+        dst1 = task.fLess.dst1.Clone
     End Sub
 End Class
