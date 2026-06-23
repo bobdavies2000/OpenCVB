@@ -1,48 +1,4 @@
 Imports cv = OpenCvSharp
-Public Class FeatureLess_Basics : Inherits TaskParent
-    Public brickList As New List(Of cv.Rect)
-    Public Sub New()
-        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
-        desc = "Identify featureless grid rects."
-    End Sub
-    Public Function buildMap(brickList As List(Of cv.Rect), input As cv.Mat) As cv.Mat
-        Dim index = 1
-        Dim rect As cv.Rect
-        Dim mask = New cv.Mat(New cv.Size(input.Width + 2, input.Height + 2), cv.MatType.CV_8U, 0)
-        For Each r In brickList
-            Dim val = input.Get(Of Byte)(r.Y, r.X)
-            If val = 255 Then
-                Dim flags = cv.FloodFillFlags.FixedRange Or (index << 8)
-                Dim count = cv.Cv2.FloodFill(input, mask, r.TopLeft, index, rect, 0, 0, flags)
-                index += 1
-            End If
-        Next
-        Return input
-    End Function
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        dst2 = task.edges.dst2
-        labels(3) = task.edges.labels(2)
-
-        dst1.SetTo(0)
-        brickList.Clear()
-        For i = 0 To task.gridRects.Count - 1
-            Dim r = task.gridRects(i)
-            If task.edges.dst2(r).CountNonZero > 0 Then Continue For
-            dst1(r).SetTo(255)
-            brickList.Add(r)
-        Next
-        Dim countRects = brickList.Count
-
-        dst1 = buildMap(brickList, dst1)
-        dst2 = Palettize(dst1, 0)
-
-        labels(2) = CStr(brickList.Count) + " featureless grid regions "
-    End Sub
-End Class
-
-
-
-
 Public Class FeatureLess_Basics_TA : Inherits TaskParent
     Public brickList As New List(Of cv.Rect)
     Dim index As Integer
@@ -91,6 +47,49 @@ Public Class FeatureLess_Basics_TA : Inherits TaskParent
     End Sub
 End Class
 
+
+
+
+Public Class FeatureLess_BasicsOld : Inherits TaskParent
+    Public brickList As New List(Of cv.Rect)
+    Public Sub New()
+        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
+        desc = "Identify featureless grid rects."
+    End Sub
+    Public Function buildMap(brickList As List(Of cv.Rect), input As cv.Mat) As cv.Mat
+        Dim index = 1
+        Dim rect As cv.Rect
+        Dim mask = New cv.Mat(New cv.Size(input.Width + 2, input.Height + 2), cv.MatType.CV_8U, 0)
+        For Each r In brickList
+            Dim val = input.Get(Of Byte)(r.Y, r.X)
+            If val = 255 Then
+                Dim flags = cv.FloodFillFlags.FixedRange Or (index << 8)
+                Dim count = cv.Cv2.FloodFill(input, mask, r.TopLeft, index, rect, 0, 0, flags)
+                index += 1
+            End If
+        Next
+        Return input
+    End Function
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        dst2 = task.edges.dst2
+        labels(3) = task.edges.labels(2)
+
+        dst1.SetTo(0)
+        brickList.Clear()
+        For i = 0 To task.gridRects.Count - 1
+            Dim r = task.gridRects(i)
+            If task.edges.dst2(r).CountNonZero > 0 Then Continue For
+            dst1(r).SetTo(255)
+            brickList.Add(r)
+        Next
+        Dim countRects = brickList.Count
+
+        dst1 = buildMap(brickList, dst1)
+        dst2 = Palettize(dst1, 0)
+
+        labels(2) = CStr(brickList.Count) + " featureless grid regions "
+    End Sub
+End Class
 
 
 
