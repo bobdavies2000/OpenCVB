@@ -11,43 +11,45 @@ Public Class RedColor_Basics : Inherits TaskParent
         desc = "Use the FeatureLess regions to improve the RedColor output."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        reduction.Run(src)
-        labels(2) = reduction.labels(2)
+        If src.Channels <> 1 Then
+            reduction.Run(src)
+            src = reduction.dst2
+        End If
 
         Dim rect As cv.Rect
         Dim mask = New cv.Mat(New cv.Size(dst2.Width + 2, dst2.Height + 2), cv.MatType.CV_8U, 0)
-        Dim rcSorted As New SortedList(Of Integer, (index As Integer, r As cv.Rect))(New compareAllowIdenticalInteger)
+        Dim rectSorted As New SortedList(Of Integer, (index As Integer, r As cv.Rect))(New compareAllowIdenticalInteger)
         For Each r In task.fLess.brickList
             Dim val = mask.Get(Of Byte)(r.Y, r.X)
             If val = 0 Then
                 Dim index As Integer = task.fLess.dst3.Get(Of Byte)(r.Y, r.X)
                 If index > 0 Then
                     Dim flags = cv.FloodFillFlags.FixedRange Or cv.FloodFillFlags.Link4 Or (index << 8)
-                    Dim count = cv.Cv2.FloodFill(reduction.dst2, mask, r.TopLeft, index, rect, 0, 0, flags)
+                    Dim count = cv.Cv2.FloodFill(src, mask, r.TopLeft, index, rect, 0, 0, flags)
                     rect = ValidateRect(rect)
-                    If mask(rect).CountNonZero > 0 Then rcSorted.Add(index, (index, rect))
+                    If mask(rect).CountNonZero > 0 Then rectSorted.Add(index, (index, rect))
                 End If
             End If
         Next
 
         Dim rcSizeSort As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
-        For i = 0 To rcSorted.Count - 2
-            Dim r1 = rcSorted.ElementAt(i).Value.r
-            Dim r2 = rcSorted.ElementAt(i + 1).Value.r
-            If rcSorted.ElementAt(i).Value.index = rcSorted.ElementAt(i + 1).Value.index Then
-                For j = i To rcSorted.Count - 2
-                    r2 = rcSorted.ElementAt(j + 1).Value.r
-                    If rcSorted.ElementAt(j).Value.index = rcSorted.ElementAt(j + 1).Value.index Then
+        For i = 0 To rectSorted.Count - 2
+            Dim r1 = rectSorted.ElementAt(i).Value.r
+            Dim r2 = rectSorted.ElementAt(i + 1).Value.r
+            If rectSorted.ElementAt(i).Value.index = rectSorted.ElementAt(i + 1).Value.index Then
+                For j = i To rectSorted.Count - 2
+                    r2 = rectSorted.ElementAt(j + 1).Value.r
+                    If rectSorted.ElementAt(j).Value.index = rectSorted.ElementAt(j + 1).Value.index Then
                         r1 = r1.Union(r2)
                     Else
-                        Dim rc = New rcData(reduction.dst2(r1), r1, rcSorted.ElementAt(j).Value.index)
+                        Dim rc = New rcData(src(r1), r1, rectSorted.ElementAt(j).Value.index)
                         rcSizeSort.Add(rc.pixels, rc)
                         i = j
                         Exit For
                     End If
                 Next
             Else
-                Dim rc = New rcData(reduction.dst2(r1), r1, rcSorted.ElementAt(i).Value.index)
+                Dim rc = New rcData(src(r1), r1, rectSorted.ElementAt(i).Value.index)
                 rcSizeSort.Add(rc.pixels, rc)
             End If
         Next

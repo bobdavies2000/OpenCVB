@@ -32,8 +32,9 @@ Bin2Way_Basics
 Bin2Way_Gradation
 Bin2Way_RecurseOnce
 Bin3Way_Basics
+Bin3Way_GrayScale
 Bin3Way_KMeans
-Bin3Way_RedCloud
+Bin3Way_RedColor
 Bin4Way_Basics
 Bin4Way_Regions
 Bin4Way_Sobel
@@ -615,7 +616,6 @@ NR_Bin2Way_RedCloudDarkest
 NR_Bin2Way_RedCloudLight
 NR_Bin2Way_RedCloudLightToDark
 NR_Bin2Way_RedColor
-NR_Bin3Way_Color
 NR_Bin3Way_RedColorDarkest
 NR_Bin3Way_RedColorLightest
 NR_Bin3Way_RedColorOther

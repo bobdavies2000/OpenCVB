@@ -85,27 +85,6 @@ End Class
 
 
 
-Public Class NR_Bin3Way_Color : Inherits TaskParent
-    Dim bin3 As New Bin3Way_KMeans
-    Public Sub New()
-        dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
-        desc = "Build the palette input that best separates the light and dark regions of an image"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        bin3.Run(src)
-        dst2.SetTo(4)
-        dst2.SetTo(1, bin3.bin3.mats.mat(0))
-        dst2.SetTo(2, bin3.bin3.mats.mat(1))
-        dst2.SetTo(3, bin3.bin3.mats.mat(2))
-        dst3 = Palettize(dst2)
-    End Sub
-End Class
-
-
-
-
-
-
 
 Public Class NR_Bin3Way_RedColorDarkest : Inherits TaskParent
     Dim bin3 As New Bin3Way_KMeans
@@ -171,12 +150,30 @@ End Class
 
 
 
-Public Class Bin3Way_RedCloud : Inherits TaskParent
-    Dim redC0 As New RedColor_Basics
-    Dim redC1 As New RedColor_Basics
-    Dim redC2 As New RedColor_Basics
+
+Public Class Bin3Way_GrayScale : Inherits TaskParent
     Dim bin3 As New Bin3Way_KMeans
-    Dim mats As New Mat_4Click
+    Public Sub New()
+        dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
+        desc = "Build the palette input that best separates the light and dark regions of an image"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        bin3.Run(src)
+        dst2.SetTo(4)
+        dst2.SetTo(1, bin3.bin3.mats.mat(0))
+        dst2.SetTo(2, bin3.bin3.mats.mat(1))
+        dst2.SetTo(3, bin3.bin3.mats.mat(2))
+        dst3 = Palettize(dst2)
+    End Sub
+End Class
+
+
+
+
+
+Public Class Bin3Way_RedColor : Inherits TaskParent
+    Dim redC As New RedColor_Basics
+    Dim bin3 As New Bin3Way_GrayScale
     Public Sub New()
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         labels(3) = "The output of all 3 RedColor runs are combined below."
@@ -186,20 +183,9 @@ Public Class Bin3Way_RedCloud : Inherits TaskParent
         bin3.Run(src)
         labels(2) = bin3.labels(2)
 
-        Dim mat = bin3.bin3.mats.mat
-        Dim redC As Object = Nothing
-        For i = 0 To 2
-            If i = 0 Then redC = redC0
-            If i = 1 Then redC = redC1
-            If i = 2 Then redC = redC2
-            redC.run(mat(i))
-            mats.mat(i) = redC.dst2
-            mats.mat(i).SetTo(0, Not mat(i))
-            mats.mat(i).CopyTo(dst3, mat(i))
-        Next
-
-        mats.Run(emptyMat)
-        dst2 = mats.dst2
+        redC.Run(bin3.dst2)
+        dst2 = redC.dst2
+        labels(2) = CStr(redC.rcList.Count) + " cells found in the image."
     End Sub
 End Class
 

@@ -10699,7 +10699,7 @@ Namespace VBClasses
 
 
     Public Class XO_RedList_Consistent : Inherits TaskParent
-        Dim redCold As New Bin3Way_RedCloud
+        Dim redCold As New Bin3Way_RedColor
         Dim diff As New Diff_Basics
         Dim cellmaps As New List(Of cv.Mat)
         Dim cellLists As New List(Of List(Of rcData))

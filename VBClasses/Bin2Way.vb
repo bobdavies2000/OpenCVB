@@ -92,7 +92,8 @@ Public Class NR_Bin2Way_RedColor : Inherits TaskParent
             dst1(rc.rect).SetTo(rc.index, rc.mask)
         Next
 
-        dst2 = Palettize(dst1)
+        dst2 = Palettize(dst1, 0)
+        SetTrueText(redC.strOut, 3)
     End Sub
 End Class
 
