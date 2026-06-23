@@ -201,18 +201,17 @@ Public Class AlgorithmTask : Implements IDisposable
 
 
 
-
-        Dim displayObject = task.MainUI_Algorithm
+        Dim displayObject = MainUI_Algorithm
         Dim index As Integer = 0
-        If task.cpu.displayObjectName IsNot Nothing Then
-            If task.cpu.displayObjectName <> displayObject.traceName Then
-                For Each td In task.cpu.activeObjects
-                    If td.traceName.endswith(task.cpu.displayObjectName) Then
-                        index = task.cpu.activeObjects.IndexOf(td)
+        If cpu.displayObjectName IsNot Nothing Then
+            If cpu.displayObjectName <> displayObject.traceName Then
+                For Each td In cpu.activeObjects
+                    If td.traceName.endswith(cpu.displayObjectName) Then
+                        index = cpu.activeObjects.IndexOf(td)
                         Exit For
                     End If
                 Next
-                displayObject = task.cpu.activeObjects(index)
+                displayObject = cpu.activeObjects(index)
             End If
         End If
 
@@ -229,6 +228,10 @@ Public Class AlgorithmTask : Implements IDisposable
         dstList(2) = Mat_Convert.Mat_Check8UC3(displayObject.dst2)
         dstList(3) = Mat_Convert.Mat_Check8UC3(displayObject.dst3)
 
+        Dim pt = mouseMovePoint
+        Dim tag = task.mousePicTag
+        mousePixelValue = dstList(tag).Get(Of cv.Vec3b)(pt.Y, pt.X)
+
         If gOptions.ShowGrid.Checked Then dstList(2).SetTo(cv.Scalar.White, gridMask)
         If gOptions.showMotionMask.Checked Then
             ' motion cloud contains all the RGB motion as well.
@@ -237,23 +240,22 @@ Public Class AlgorithmTask : Implements IDisposable
             Next
         End If
 
-
         If gOptions.CrossHairs.Checked Then
             Gravity_Basics_TA.showVectors(dstList(0))
             Dim lp = If(lpGravity IsNot Nothing, lpGravity, lines.lpList(0))
-            Dim pt = New cv.Point2f((lp.ptE1.X + lp.ptE2.X) / 2 + 5, (lp.ptE1.Y + lp.ptE2.Y) / 2)
+            pt = New cv.Point2f((lp.ptE1.X + lp.ptE2.X) / 2 + 5, (lp.ptE1.Y + lp.ptE2.Y) / 2)
         End If
 
         trueData.Clear()
-        trueData.Add(New TrueText(task.depthAndDepthRange, New cv.Point(task.mouseMovePoint.X, task.mouseMovePoint.Y - 24), 1))
+        trueData.Add(New TrueText(depthAndDepthRange, New cv.Point(mouseMovePoint.X, mouseMovePoint.Y - 24), 1))
         For Each tt In displayObject.trueData
             trueData.Add(tt)
         Next
 
         displayObject.trueData.Clear()
         labels = displayObject.labels
-        If task.gOptions.displayDst0.Checked = False Then labels(0) = task.resolutionDetails
-        If task.gOptions.displayDst1.Checked = False Then labels(1) = task.depthAndDepthRange.Replace(vbCrLf, "")
+        If gOptions.displayDst0.Checked = False Then labels(0) = resolutionDetails
+        If gOptions.displayDst1.Checked = False Then labels(1) = depthAndDepthRange.Replace(vbCrLf, "")
     End Sub
     Private Sub pixelViewerOrGIFProcessing(src As cv.Mat, dst1 As cv.Mat, dst2 As cv.Mat, dst3 As cv.Mat)
         If vbc.task.pixelViewerOn Then

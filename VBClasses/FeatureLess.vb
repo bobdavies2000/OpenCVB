@@ -1554,49 +1554,6 @@ End Class
 
 
 
-Public Class FeatureLess_Tracker : Inherits TaskParent
-    Public regions As New List(Of (count As Integer, r As cv.Rect))
-    Public Sub New()
-        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
-        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
-        desc = "Track featureless regions."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        Dim rect As cv.Rect
-        Dim mask = New cv.Mat(New cv.Size(dst1.Width + 2, dst1.Height + 2), cv.MatType.CV_8U, 0)
-        Dim index As Integer
-        regions.Clear()
-
-        dst0 = task.fLess.dst1.Clone
-        Dim overlap = dst0.Clone
-        overlap.SetTo(0, dst1)
-
-        For Each r In task.gridRects
-            Dim val1 = dst0.Get(Of Byte)(r.Y, r.X)
-            Dim val2 = dst1.Get(Of Byte)(r.Y, r.X)
-            If val1 = 255 And val2 = 255 Then
-                index = dst3.Get(Of Byte)(r.Y, r.X)
-                If index > 0 Then
-                    Dim flags = cv.FloodFillFlags.FixedRange Or (index << 8)
-                    Dim count = cv.Cv2.FloodFill(dst0, mask, r.TopLeft, index, rect, 0, 0, flags)
-                    regions.Add((count, ValidateRect(rect)))
-                End If
-            End If
-        Next
-
-        dst2 = Palettize(dst0, 0)
-        labels(2) = CStr(index) + " regions were found."
-
-        dst1 = task.fLess.dst1.Clone
-        dst3 = task.fLess.dst3.Clone
-    End Sub
-End Class
-
-
-
-
-
-
 Public Class FeatureLess_Overlap : Inherits TaskParent
     Public Sub New()
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
@@ -1611,5 +1568,65 @@ Public Class FeatureLess_Overlap : Inherits TaskParent
         dst3 = dst0 And dst1
 
         dst1 = task.fLess.dst1.Clone
+    End Sub
+End Class
+
+
+
+
+
+Public Class FeatureLess_Tracker : Inherits TaskParent
+    Public regions As New List(Of (count As Integer, r As cv.Rect))
+    Dim overlap As New FeatureLess_Overlap
+    Public Sub New()
+        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
+        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
+        If standalone Then task.gOptions.displayDst1.Checked = True
+        desc = "Track featureless regions."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        Dim rect As cv.Rect
+        Dim mask = New cv.Mat(New cv.Size(dst1.Width + 2, dst1.Height + 2), cv.MatType.CV_8U, 0)
+        Dim index As Integer
+
+        overlap.Run(emptyMat)
+
+        regions.Clear()
+        dst0 = task.fLess.dst1.Clone
+        Dim newCandidates As New List(Of cv.Rect)
+        Dim floodRects As New List(Of cv.Rect)
+        For Each r In task.gridRects
+            If overlap.dst3(r).Get(Of Byte)(0, 0) = 255 Then
+                index = dst3(r).Get(Of Byte)(0, 0)
+                If index > 0 And dst0(r).Get(Of Byte)(0, 0) = 255 Then
+                    Dim flags = cv.FloodFillFlags.FixedRange Or (index << 8)
+                    Dim count = cv.Cv2.FloodFill(dst0, mask, r.TopLeft, index, rect, 0, 0, flags)
+                    regions.Add((count, ValidateRect(rect)))
+                    floodRects.Add(r)
+                End If
+            ElseIf overlap.dst2(r).Get(Of Byte)(0, 0) = 255 Then
+                newCandidates.Add(r)
+            End If
+        Next
+
+        Dim indexNew = regions.Count + 1
+        For Each r In newCandidates
+            If dst3(r).Get(Of Byte)(0, 0) = 0 And dst0(r).Get(Of Byte)(0, 0) = 255 Then
+                Dim flags = cv.FloodFillFlags.FixedRange Or (indexNew << 8)
+                Dim count = cv.Cv2.FloodFill(dst0, mask, r.TopLeft, indexNew, rect, 0, 0, flags)
+                regions.Add((count, ValidateRect(rect)))
+                indexNew += 1
+            End If
+        Next
+
+        dst2 = Palettize(dst0, 0)
+        labels(2) = CStr(regions.Count) + " regions were found."
+
+        dst1 = task.fLess.dst1.Clone
+        dst3 = task.fLess.dst3.Clone
+
+        For Each r In floodRects
+            dst2.Rectangle(r, task.highlight, task.lineWidth)
+        Next
     End Sub
 End Class

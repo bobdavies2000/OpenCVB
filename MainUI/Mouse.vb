@@ -71,9 +71,11 @@ Namespace MainApp
             End If
 
             If vbc.task.drawRect.Width > 0 And vbc.task.drawRect.Height > 0 Then
-                StatusLabel.Text += "DrawRect = " + String.Format("x: {0}, y: {1}, w: {2}, h: {3}", vbc.task.drawRect.X, vbc.task.drawRect.Y,
-                                    vbc.task.drawRect.Width, vbc.task.drawRect.Height)
+                StatusLabel.Text += " DrawRect = " + String.Format("x: {0}, y: {1}, w: {2}, h: {3}",
+                                                                  vbc.task.drawRect.X, vbc.task.drawRect.Y,
+                                                                  vbc.task.drawRect.Width, vbc.task.drawRect.Height)
             End If
+            StatusLabel.Text += "  Current pixel: " + vbc.task.mousePixelValue.ToString
         End Sub
         Private Sub campic_DoubleClick(sender As Object, e As EventArgs)
             DrawingRectangle = False

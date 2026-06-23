@@ -11,7 +11,7 @@ Namespace MainApp
         Dim algHistory As New List(Of String)
         Dim recentMenu() As ToolStripMenuItem
         Dim labels As List(Of Label)
-        Dim pics As New List(Of PictureBox)
+        Public Shared pics As New List(Of PictureBox)
         Dim resolutionDetails As String
         Dim magnifyIndex As Integer
         Dim windowsFont = New System.Drawing.Font("Tahoma", 9)

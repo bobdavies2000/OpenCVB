@@ -212,6 +212,7 @@ Partial Public Class AlgorithmTask
     Public mouseMagnifyEndPoint As cv.Point ' Mouse location in terms of the display resolution
     Public mouseMagnifyPicTag As Integer = -1
     Public mouseMovePoint As cv.Point ' mouse location in the workRes resolution.
+    Public mousePixelValue As cv.Vec3b
     Public mouseMovePointUpdated As Boolean
 
     Public CPU_TimeStamp As Double
