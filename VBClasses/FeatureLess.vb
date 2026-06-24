@@ -22,8 +22,6 @@ Public Class FeatureLess_Basics_TA : Inherits TaskParent
         Return input
     End Function
     Public Overrides Sub RunAlg(src As cv.Mat)
-        dst2 = task.edges.dst2
-
         dst1.SetTo(0)
         brickList.Clear()
         For Each r In task.gridRects
@@ -33,15 +31,12 @@ Public Class FeatureLess_Basics_TA : Inherits TaskParent
             End If
         Next
 
-        If task.heartBeatLT Then
-            dst3 = buildMap()
-        Else
-            brickList.Clear()
-            For Each r In task.gridRects
-                Dim val = dst1.Get(Of Byte)(r.Y, r.X)
-                If val = 0 Then dst3(r).SetTo(0) Else brickList.Add(r)
-            Next
-        End If
+        dst3 = buildMap()
+        brickList.Clear()
+        For Each r In task.gridRects
+            Dim val = dst1.Get(Of Byte)(r.Y, r.X)
+            If val > 0 Then brickList.Add(r)
+        Next
         dst2 = Palettize(dst3, 0)
         labels(2) = CStr(index) + " regions were found."
     End Sub
@@ -1554,26 +1549,6 @@ End Class
 
 
 
-Public Class FeatureLess_Overlap : Inherits TaskParent
-    Public Sub New()
-        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
-        labels = {"", "", "Grid rects that did not overlap", "Grid rects that overlapped."}
-        desc = "Compare the current and previous featureless regions and define overlap and not overlap."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        dst0 = task.fLess.dst1.Clone
-
-        dst2 = dst0.Clone
-        dst2.SetTo(0, dst1)
-        dst3 = dst0 And dst1
-
-        dst1 = task.fLess.dst1.Clone
-    End Sub
-End Class
-
-
-
-
 
 Public Class FeatureLess_Tracker : Inherits TaskParent
     Public regions As New List(Of (count As Integer, r As cv.Rect))
@@ -1623,10 +1598,98 @@ Public Class FeatureLess_Tracker : Inherits TaskParent
         labels(2) = CStr(regions.Count) + " regions were found."
 
         dst1 = task.fLess.dst1.Clone
-        dst3 = task.fLess.dst3.Clone
+        If task.heartBeatLT Then dst3 = task.fLess.dst3.Clone
 
         For Each r In floodRects
             dst2.Rectangle(r, task.highlight, task.lineWidth)
         Next
+    End Sub
+End Class
+
+
+
+
+
+Public Class FeatureLess_Overlap : Inherits TaskParent
+    Public Sub New()
+        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
+        labels = {"", "", "Grid rects that did not overlap", "Grid rects that overlapped."}
+        desc = "Compare the current and previous featureless regions and define overlap and not overlap."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        dst0 = task.fLess.dst1.Clone
+
+        dst2 = dst0.Clone
+        dst2.SetTo(0, dst1)
+        dst3 = dst0 And dst1
+
+        dst1 = task.fLess.dst1.Clone
+    End Sub
+End Class
+
+
+
+
+
+Public Class FeatureLess_BasicsNew : Inherits TaskParent
+    Public regions As New List(Of (count As Integer, r As cv.Rect))
+    Dim index As Integer
+    Dim rect As cv.Rect
+    Dim mask As cv.Mat = New cv.Mat(New cv.Size(dst2.Width + 2, dst2.Height + 2), cv.MatType.CV_8U, 0)
+    Dim overlap As New FeatureLess_Overlap
+    Public Sub New()
+        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
+        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 255)
+        desc = "Identify featureless grid rects."
+    End Sub
+    Public Function buildMap(input As cv.Mat) As cv.Mat
+        mask.setto(0)
+        For Each r In task.gridRects
+            Dim val1 = input(r).Get(Of Byte)(0, 0)
+            Dim val2 = dst3(r).Get(Of Byte)(0, 0)
+            If val1 = 255 And val2 > 0 Then
+                index = val2
+                Dim flags = cv.FloodFillFlags.FixedRange Or (index << 8)
+                Dim count = cv.Cv2.FloodFill(input, mask, r.TopLeft, index, rect, 0, 0, flags)
+                regions.Add((count, ValidateRect(rect)))
+            End If
+        Next
+        Return input
+    End Function
+    Public Function buildMapHeartBeat(input As cv.Mat) As cv.Mat
+        mask.setto(0)
+        index = 1
+        For Each r In task.gridRects
+            Dim val = input.Get(Of Byte)(r.Y, r.X)
+            If val = 255 Then
+                Dim flags = cv.FloodFillFlags.FixedRange Or (index << 8)
+                Dim count = cv.Cv2.FloodFill(input, mask, r.TopLeft, index, rect, 0, 0, flags)
+                regions.Add((count, ValidateRect(rect)))
+                index += 1
+            End If
+        Next
+        Return input
+    End Function
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        dst1.SetTo(0)
+        For Each r In task.gridRects
+            If task.edges.dst2(r).CountNonZero = 0 Then dst1(r).SetTo(255)
+        Next
+
+        regions.Clear()
+        If task.heartBeatLT Then dst3 = buildMapHeartBeat(dst1.Clone) Else dst3 = buildMap(dst1.Clone)
+
+        index = regions.Count + 1
+        For Each r In task.gridRects
+            If dst3(r).Get(Of Byte)(0, 0) = 255 Then
+                Dim flags = cv.FloodFillFlags.FixedRange Or (index << 8)
+                Dim count = cv.Cv2.FloodFill(dst3, mask, r.TopLeft, index, rect, 0, 0, flags)
+                regions.Add((count, ValidateRect(rect)))
+                index += 1
+            End If
+        Next
+        dst2 = Palettize(dst3, 0)
+
+        labels(2) = CStr(regions.Count) + " regions were found."
     End Sub
 End Class
