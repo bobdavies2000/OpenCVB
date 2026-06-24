@@ -24,8 +24,7 @@
         EdgeMethods.Items.Add("Color Gap")
         EdgeMethods.Items.Add("Laplacian")
         EdgeMethods.Items.Add("Sobel")
-        EdgeMethods.SelectedItem() = "Canny"
-        task.edgeMethod = "Canny"
+        EdgeMethods.SelectedItem() = "Sobel"
 
         MatchCorrSlider.Value = 95
 
@@ -104,7 +103,6 @@
         task.verticalLines = False
     End Sub
     Private Sub EdgeMethods_SelectedIndexChanged(sender As Object, e As EventArgs) Handles EdgeMethods.SelectedIndexChanged
-        task.edgeMethod = EdgeMethods.Text
         task.optionsChanged = True
     End Sub
 

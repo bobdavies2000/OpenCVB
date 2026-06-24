@@ -18,8 +18,87 @@ Public Class RedColor_Basics : Inherits TaskParent
 
         Dim rect As cv.Rect
         Dim mask = New cv.Mat(New cv.Size(dst2.Width + 2, dst2.Height + 2), cv.MatType.CV_8U, 0)
-        Dim rectSorted As New SortedList(Of Integer, (index As Integer, r As cv.Rect))(New compareAllowIdenticalInteger)
+        Dim rectSorted As New SortedList(Of Integer, (count As Integer, r As cv.Rect))(New compareAllowIdenticalInteger)
         For Each r In task.fLess.brickList
+            Dim val = mask(r).Get(Of Byte)(0, 0)
+            If val = 0 Then
+                Dim index As Integer = task.fLess.dst3(r).Get(Of Byte)(0, 0)
+                If index > 0 Then
+                    Dim flags = cv.FloodFillFlags.FixedRange Or cv.FloodFillFlags.Link4 Or (index << 8)
+                    Dim count = cv.Cv2.FloodFill(src, mask, r.TopLeft, index, rect, 0, 0, flags)
+                    rectSorted.Add(index, (count, ValidateRect(rect)))
+                End If
+            End If
+        Next
+
+        Dim rcSizeSort As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
+        For i = 0 To rectSorted.Count - 2
+            Dim r1 = rectSorted.ElementAt(i).Value.r
+            If rectSorted.ElementAt(i).Key = rectSorted.ElementAt(i + 1).Key Then
+                For j = i To rectSorted.Count - 2
+                    Dim r2 = rectSorted.ElementAt(j + 1).Value.r
+                    If rectSorted.ElementAt(j).Key = rectSorted.ElementAt(j + 1).Key Then
+                        r1 = r1.Union(r2)
+                    Else
+                        Dim rc = New rcData(src(r1), r1, rectSorted.ElementAt(j).Key)
+                        rc.index = rectSorted.ElementAt(j).Key
+                        rcSizeSort.Add(rectSorted.ElementAt(i).Value.count, rc)
+                        i = j
+                        Exit For
+                    End If
+                Next
+            Else
+                Dim rc = New rcData(src(r1), r1, rectSorted.ElementAt(i).Key)
+                rc.index = rectSorted.ElementAt(i).Key
+                rcSizeSort.Add(rectSorted.ElementAt(i).Value.count, rc)
+            End If
+        Next
+
+        rcMap.SetTo(0)
+        rcList.Clear()
+        For Each rc In rcSizeSort.Values
+            rcList.Add(rc)
+            rcMap(rc.rect).SetTo(rcList.Count, rc.mask)
+        Next
+
+        If runSelectCell Then
+            strOut = Utility_Basics.selectCell(rcMap, rcList)
+            SetTrueText(strOut, 1)
+        End If
+
+        dst3 = task.fLess.dst2
+
+        labels(2) = CStr(rcList.Count) + " cells were identified."
+    End Sub
+End Class
+
+
+
+
+
+Public Class RedColor_BrickList : Inherits TaskParent
+    Public rcList As New List(Of rcData)
+    Public rcMap As cv.Mat = New cv.Mat(dst2.Size, cv.MatType.CV_32S, 0)
+    Public reduction As New Reduction_Basics
+    Public runSelectCell As Boolean = True
+    Dim bricks As New FeatureLess_BrickList
+    Public Sub New()
+        If standalone Then task.gOptions.displayDst1.Checked = True
+        task.fOptions.ReductionSlider.Value = 32
+        desc = "Use the FeatureLess regions to improve the RedColor output."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        If src.Channels <> 1 Then
+            reduction.Run(src)
+            src = reduction.dst2
+        End If
+
+        bricks.Run(src)
+
+        Dim rect As cv.Rect
+        Dim mask = New cv.Mat(New cv.Size(dst2.Width + 2, dst2.Height + 2), cv.MatType.CV_8U, 0)
+        Dim rectSorted As New SortedList(Of Integer, (index As Integer, r As cv.Rect))(New compareAllowIdenticalInteger)
+        For Each r In bricks.brickList
             Dim val = mask.Get(Of Byte)(r.Y, r.X)
             If val = 0 Then
                 Dim index As Integer = task.fLess.dst3.Get(Of Byte)(r.Y, r.X)

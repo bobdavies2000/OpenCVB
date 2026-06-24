@@ -15,9 +15,9 @@ Public Class Edge_Basics_TA : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         Static saveSelection As String = ""
-        If saveSelection <> task.edgeMethod Then
-            saveSelection = task.edgeMethod
-            Select Case task.edgeMethod
+        If saveSelection <> task.fOptions.EdgeMethods.Text Then
+            saveSelection = task.fOptions.EdgeMethods.Text
+            Select Case task.fOptions.EdgeMethods.Text
                 Case "Binarized Reduction"
                     edges = New Edge_BinarizedReduction
                 Case "Binarized Sobel"
@@ -39,7 +39,7 @@ Public Class Edge_Basics_TA : Inherits TaskParent
         If edges.dst2.Channels <> 1 Then edges.dst2 = edges.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         If edges.dst2.Type <> cv.MatType.CV_8UC1 Then edges.dst2.ConvertTo(edges.dst2, cv.MatType.CV_8U)
         dst2 = edges.dst2
-        labels(2) = traceName + " - selection = " + task.edgeMethod
+        labels(2) = traceName + " - selection = " + task.fOptions.EdgeMethods.Text
     End Sub
 End Class
 
@@ -63,9 +63,9 @@ Public Class NR_Edge_MotionFree : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         Static saveSelection As String = ""
-        If saveSelection <> task.edgeMethod Then
-            saveSelection = task.edgeMethod
-            Select Case task.edgeMethod
+        If saveSelection <> task.fOptions.EdgeMethods.Text Then
+            saveSelection = task.fOptions.EdgeMethods.Text
+            Select Case task.fOptions.EdgeMethods.Text
                 Case "Canny"
                     edges = New Edge_Canny
                 Case "Scharr"
@@ -91,7 +91,7 @@ Public Class NR_Edge_MotionFree : Inherits TaskParent
 
         If dst2.Channels <> 1 Then dst2 = dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         If dst2.Type <> cv.MatType.CV_8UC1 Then dst2.ConvertTo(dst2, cv.MatType.CV_8U)
-        labels(2) = traceName + " - selection = " + task.edgeMethod
+        labels(2) = traceName + " - selection = " + task.fOptions.EdgeMethods.Text
     End Sub
 End Class
 

@@ -253,8 +253,8 @@ Feature_Points
 FeatureFlow_Basics
 FeatureFlow_LucasKanade
 FeatureLess_Basics_TA
-FeatureLess_BasicsNew
 FeatureLess_BasicsOld
+FeatureLess_BrickList
 FeatureLess_Cells
 FeatureLess_ClusterFlood
 FeatureLess_Correlation
@@ -1639,6 +1639,7 @@ RedCloud_Reliable
 RedCloud_RGB
 RedColor_Basics
 RedColor_BasicsOld
+RedColor_BrickList
 RedColor_Bricks
 RedColor_Contour
 RedColor_Contours

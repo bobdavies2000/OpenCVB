@@ -1,5 +1,77 @@
 Imports cv = OpenCvSharp
 Public Class FeatureLess_Basics_TA : Inherits TaskParent
+    Public regions As New SortedList(Of Integer, cv.Rect)(New compareAllowIdenticalIntegerInverted)
+    Public brickList As New List(Of cv.Rect)
+    Dim index As Integer
+    Dim rect As cv.Rect
+    Dim mask As cv.Mat = New cv.Mat(New cv.Size(dst2.Width + 2, dst2.Height + 2), cv.MatType.CV_8U, 0)
+    Public Sub New()
+        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
+        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 255)
+        labels(3) = "CV_8U representation of the regions"
+        desc = "Identify featureless grid rects."
+    End Sub
+    Public Function buildMap(input As cv.Mat) As cv.Mat
+        mask.SetTo(0)
+        For Each r In task.gridRects
+            Dim val1 = input(r).Get(Of Byte)(0, 0)
+            Dim val2 = dst3(r).Get(Of Byte)(0, 0)
+            If val1 = 255 And val2 > 0 Then
+                index = val2
+                Dim flags = cv.FloodFillFlags.FixedRange Or (index << 8)
+                Dim count = cv.Cv2.FloodFill(input, mask, r.TopLeft, index, rect, 0, 0, flags)
+                regions.Add(count, ValidateRect(rect))
+            End If
+        Next
+        Return input
+    End Function
+    Public Function buildMapHeartBeat(input As cv.Mat) As cv.Mat
+        mask.SetTo(0)
+        index = 1
+        For Each r In task.gridRects
+            Dim val = input.Get(Of Byte)(r.Y, r.X)
+            If val = 255 Then
+                Dim flags = cv.FloodFillFlags.FixedRange Or (index << 8)
+                Dim count = cv.Cv2.FloodFill(input, mask, r.TopLeft, index, rect, 0, 0, flags)
+                regions.Add(count, ValidateRect(rect))
+                index += 1
+            End If
+        Next
+        Return input
+    End Function
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        brickList.Clear()
+        dst1.SetTo(0)
+        For Each r In task.gridRects
+            If task.edges.dst2(r).CountNonZero = 0 Then
+                dst1(r).SetTo(255)
+                brickList.Add(r)
+            End If
+        Next
+
+        regions.Clear()
+        If task.heartBeatLT Then dst3 = buildMapHeartBeat(dst1.Clone) Else dst3 = buildMap(dst1.Clone)
+
+        index = regions.Count + 1
+        For Each r In task.gridRects
+            If dst3(r).Get(Of Byte)(0, 0) = 255 Then
+                Dim flags = cv.FloodFillFlags.FixedRange Or (index << 8)
+                Dim count = cv.Cv2.FloodFill(dst3, mask, r.TopLeft, index, rect, 0, 0, flags)
+                regions.Add(count, ValidateRect(rect))
+                index += 1
+            End If
+        Next
+        dst2 = Palettize(dst3, 0)
+
+        labels(2) = CStr(regions.Count) + " regions were found."
+    End Sub
+End Class
+
+
+
+
+
+Public Class FeatureLess_BrickList : Inherits TaskParent
     Public brickList As New List(Of cv.Rect)
     Dim index As Integer
     Public Sub New()
@@ -1624,72 +1696,5 @@ Public Class FeatureLess_Overlap : Inherits TaskParent
         dst3 = dst0 And dst1
 
         dst1 = task.fLess.dst1.Clone
-    End Sub
-End Class
-
-
-
-
-
-Public Class FeatureLess_BasicsNew : Inherits TaskParent
-    Public regions As New List(Of (count As Integer, r As cv.Rect))
-    Dim index As Integer
-    Dim rect As cv.Rect
-    Dim mask As cv.Mat = New cv.Mat(New cv.Size(dst2.Width + 2, dst2.Height + 2), cv.MatType.CV_8U, 0)
-    Dim overlap As New FeatureLess_Overlap
-    Public Sub New()
-        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
-        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 255)
-        desc = "Identify featureless grid rects."
-    End Sub
-    Public Function buildMap(input As cv.Mat) As cv.Mat
-        mask.setto(0)
-        For Each r In task.gridRects
-            Dim val1 = input(r).Get(Of Byte)(0, 0)
-            Dim val2 = dst3(r).Get(Of Byte)(0, 0)
-            If val1 = 255 And val2 > 0 Then
-                index = val2
-                Dim flags = cv.FloodFillFlags.FixedRange Or (index << 8)
-                Dim count = cv.Cv2.FloodFill(input, mask, r.TopLeft, index, rect, 0, 0, flags)
-                regions.Add((count, ValidateRect(rect)))
-            End If
-        Next
-        Return input
-    End Function
-    Public Function buildMapHeartBeat(input As cv.Mat) As cv.Mat
-        mask.setto(0)
-        index = 1
-        For Each r In task.gridRects
-            Dim val = input.Get(Of Byte)(r.Y, r.X)
-            If val = 255 Then
-                Dim flags = cv.FloodFillFlags.FixedRange Or (index << 8)
-                Dim count = cv.Cv2.FloodFill(input, mask, r.TopLeft, index, rect, 0, 0, flags)
-                regions.Add((count, ValidateRect(rect)))
-                index += 1
-            End If
-        Next
-        Return input
-    End Function
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        dst1.SetTo(0)
-        For Each r In task.gridRects
-            If task.edges.dst2(r).CountNonZero = 0 Then dst1(r).SetTo(255)
-        Next
-
-        regions.Clear()
-        If task.heartBeatLT Then dst3 = buildMapHeartBeat(dst1.Clone) Else dst3 = buildMap(dst1.Clone)
-
-        index = regions.Count + 1
-        For Each r In task.gridRects
-            If dst3(r).Get(Of Byte)(0, 0) = 255 Then
-                Dim flags = cv.FloodFillFlags.FixedRange Or (index << 8)
-                Dim count = cv.Cv2.FloodFill(dst3, mask, r.TopLeft, index, rect, 0, 0, flags)
-                regions.Add((count, ValidateRect(rect)))
-                index += 1
-            End If
-        Next
-        dst2 = Palettize(dst3, 0)
-
-        labels(2) = CStr(regions.Count) + " regions were found."
     End Sub
 End Class

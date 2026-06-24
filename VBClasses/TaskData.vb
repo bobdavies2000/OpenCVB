@@ -40,7 +40,6 @@ Partial Public Class AlgorithmTask
     Public fpsCamera As Single
 
     Public verticalLines As Boolean
-    Public edgeMethod As String
 
     Public workRes As cv.Size
     Public smallRes As cv.Size ' the recommended small resolution for this capture size.
