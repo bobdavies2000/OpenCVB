@@ -33,13 +33,8 @@ Public Class Color8U_Basics : Inherits TaskParent
             classifier = colorMethods(index)
         End If
 
-        If task.fOptions.Color8USource.Text = "PCA_NColor_CPP" Then
-            classifier.Run(src.Clone)
-            dst2 = classifier.dst2.clone
-        Else
-            classifier.run(If(src.Type = cv.MatType.CV_8U, src, task.gray))
-            dst2 = classifier.dst2.clone
-        End If
+        classifier.run(If(src.Type = cv.MatType.CV_8U, src, task.gray))
+        dst2 = classifier.dst2.clone
 
         classCount = classifier.classCount
 

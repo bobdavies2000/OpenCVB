@@ -13,6 +13,7 @@ Public Class Reduction_Basics : Inherits TaskParent
         labels(2) = "Reduced image - factor = " + CStr(task.reduction)
 
         dst3 = Palettize(dst2 + 1, 0)
+
         labels(2) = CStr(classCount) + " colors after reduction - 8uC1 below"
     End Sub
 End Class

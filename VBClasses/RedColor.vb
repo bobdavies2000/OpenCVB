@@ -3,17 +3,18 @@ Imports cv = OpenCvSharp
 Public Class RedColor_Basics : Inherits TaskParent
     Public rcList As New List(Of rcData)
     Public rcMap As cv.Mat = New cv.Mat(dst2.Size, cv.MatType.CV_32S, 0)
-    Public reduction As New Reduction_Basics
+    Public color8U As New Color8U_Basics
     Public runSelectCell As Boolean = True
     Public Sub New()
         If standalone Then task.gOptions.displayDst1.Checked = True
+        labels(3) = "The output of FeatureLess_Basics.  Note that cell colors match the RedColor output."
         task.fOptions.ReductionSlider.Value = 32
         desc = "Use the FeatureLess regions to improve the RedColor output."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If src.Channels <> 1 Then
-            reduction.Run(src)
-            src = reduction.dst2
+            color8U.Run(task.grayOriginal)
+            src = color8U.dst2
         End If
 
         Dim rect As cv.Rect
@@ -58,7 +59,7 @@ Public Class RedColor_Basics : Inherits TaskParent
         rcList.Clear()
         For Each rc In rcSizeSort.Values
             rcList.Add(rc)
-            rcMap(rc.rect).SetTo(rcList.Count, rc.mask)
+            rcMap(rc.rect).SetTo(rc.index, rc.mask)
         Next
 
         If runSelectCell Then
@@ -66,6 +67,7 @@ Public Class RedColor_Basics : Inherits TaskParent
             SetTrueText(strOut, 1)
         End If
 
+        dst2 = Palettize(rcMap, 0)
         dst3 = task.fLess.dst2
 
         labels(2) = CStr(rcList.Count) + " cells were identified."

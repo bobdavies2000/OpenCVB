@@ -883,12 +883,7 @@ Public Class PCA_NColor_CPP : Inherits TaskParent
         desc = "Create a faster version of the PCA_NColor algorithm."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If src.Channels <> 3 Then
-            Static sendMsg As Boolean = True
-            If sendMsg Then MessageBox.Show("PCA algorithms need rgb data - not grayscale")
-            sendMsg = False
-            Exit Sub
-        End If
+        If src.Channels <> 3 Then src = src.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
 
         If task.heartBeat Then pcaPalette.Run(src) ' get the palette in VB.Net
         Marshal.Copy(src.Data, rgb, 0, rgb.Length)

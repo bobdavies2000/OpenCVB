@@ -195,16 +195,20 @@ Public Class Utility_Basics : Inherits TaskParent
         Else
             clickIndex = rcMap.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X)
         End If
-        If clickIndex > 0 And clickIndex < rcList.Count Then
-            task.rcD = rcList(clickIndex - 1)
-            task.color(task.rcD.rect).SetTo(white, task.rcD.mask)
-            outStr = task.rcD.displayCell()
-        ElseIf rcList.Count = 0 Then
-            rcList.Add(New rcData(task.color, New cv.Rect(0, 0, task.color.Width, task.color.Height), 1))
-        Else
-            task.rcD = rcList(0)
+        If clickIndex = 0 Then
             Return vbCrLf + vbCrLf + "Click any cell to see details." + vbCrLf
         End If
+
+        If rcList.Count = 0 Then
+            rcList.Add(New rcData(task.color, New cv.Rect(0, 0, task.color.Width, task.color.Height), 1))
+        End If
+
+        task.rcD = rcList(0)
+        For Each rc In rcList
+            If clickIndex = rc.index Then task.rcD = rc
+        Next
+        task.color(task.rcD.rect).SetTo(white, task.rcD.mask)
+        outStr = task.rcD.displayCell()
 
         Return outStr
     End Function
