@@ -13,7 +13,7 @@ Public Class RedColor_Basics : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If src.Channels <> 1 Then
-            color8U.Run(task.grayOriginal)
+            color8U.Run(task.gray)
             src = color8U.dst2
         End If
 

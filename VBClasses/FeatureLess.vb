@@ -4,10 +4,10 @@ Public Class FeatureLess_Basics_TA : Inherits TaskParent
     Public brickList As New List(Of cv.Rect)
     Dim index As Integer
     Dim rect As cv.Rect
-    Dim mask As cv.Mat = New cv.Mat(New cv.Size(dst2.Width + 2, dst2.Height + 2), cv.MatType.CV_8U, 0)
+    Public mask As cv.Mat = New cv.Mat(New cv.Size(dst2.Width + 2, dst2.Height + 2), cv.MatType.CV_8U, 0)
     Public Sub New()
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
-        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 255)
+        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
         labels(3) = "CV_8U representation of the regions"
         desc = "Identify featureless grid rects."
     End Sub
@@ -1703,45 +1703,28 @@ End Class
 
 
 
-Public Class FeatureLess_BrickListNew : Inherits TaskParent
-    Public brickList As New List(Of cv.Rect)
-    Dim index As Integer
-    Public Sub New()
-        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
-        desc = "Identify featureless grid rects."
-    End Sub
-    Public Function buildMap() As cv.Mat
-        Dim input = dst1.Clone
-        index = 1
-        Dim rect As cv.Rect
-        Dim mask = New cv.Mat(New cv.Size(input.Width + 2, input.Height + 2), cv.MatType.CV_8U, 0)
-        For Each r In task.gridRects
-            Dim val = input.Get(Of Byte)(r.Y, r.X)
-            If val = 255 Then
-                Dim flags = cv.FloodFillFlags.FixedRange Or (index << 8)
-                Dim count = cv.Cv2.FloodFill(input, mask, r.TopLeft, index, rect, 0, 0, flags)
-                index += 1
-            End If
-        Next
-        Return input
-    End Function
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        dst1.SetTo(0)
-        brickList.Clear()
-        For Each r In task.gridRects
-            If task.edges.dst2(r).CountNonZero = 0 Then
-                dst1(r).SetTo(255)
-                brickList.Add(r)
-            End If
-        Next
 
-        dst3 = buildMap()
-        brickList.Clear()
-        For Each r In task.gridRects
-            Dim val = dst1.Get(Of Byte)(r.Y, r.X)
-            If val > 0 Then brickList.Add(r)
+Public Class FeatureLess_LUT : Inherits TaskParent
+    Dim color8u As New Color8U_Basics
+    Public Sub New()
+        task.fOptions.ReductionSlider.Value = 32
+        desc = "Find the LUT values in each featureless region."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        color8u.Run(task.gray)
+        dst1 = task.fLess.dst3
+        dst2 = color8u.dst3
+        dst3 = task.fLess.mask
+
+        For i = 0 To task.fLess.regions.Count - 1
+            Dim r = task.fLess.regions.ElementAt(i).Value
+            Dim index As Integer = task.fLess.dst3(r).Get(Of Byte)(0, 0)
+            Dim gridMask = dst1(r).InRange(index, index)
+            Dim tour = ContourBuild(gridMask)
+            If i = Math.Abs(task.gOptions.DebugSlider.Value) Then
+                DrawTour(dst2(r), tour, task.highlight, task.lineWidth)
+                DrawTour(dst3(r), tour, 255, task.lineWidth)
+            End If
         Next
-        dst2 = Palettize(dst3, 0)
-        labels(2) = CStr(index) + " regions were found."
     End Sub
 End Class

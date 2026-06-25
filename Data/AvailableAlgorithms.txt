@@ -265,6 +265,7 @@ FeatureLess_Features
 FeatureLess_IndexKNN
 FeatureLess_LeftRight
 FeatureLess_Lines
+FeatureLess_LUT
 FeatureLess_NotImages
 FeatureLess_Overlap
 FeatureLess_RedColor
