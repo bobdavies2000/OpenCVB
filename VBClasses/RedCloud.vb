@@ -73,6 +73,7 @@ Public Class RedCloud_Core : Inherits TaskParent
     Public rcList As New List(Of rcData)
     Public Sub New()
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        task.fOptions.ReductionSlider.Value = 200
         desc = "Find the biggest chunks of consistent depth data "
     End Sub
     Public Shared Function sweepImage(input As cv.Mat, minSize As Integer) As List(Of rcData)

@@ -65,6 +65,7 @@ Public Class RedColor_Basics : Inherits TaskParent
         If runSelectCell Then
             strOut = Utility_Basics.selectCell(rcMap, rcList)
             SetTrueText(strOut, 1)
+            If task.rcD Is Nothing AndAlso rcList.Count > 0 Then task.rcD = rcList(0)
         End If
 
         dst2 = Palettize(rcMap, 0)

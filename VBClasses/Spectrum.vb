@@ -295,8 +295,9 @@ Public Class Spectrum_Breakdown : Inherits TaskParent
             dst2 = redC.dst2
             labels(2) = redC.labels(2)
         End If
-
+        Exit Sub
         Dim rc = task.rcD
+        If rc Is Nothing Then Exit Sub
         Dim ranges As List(Of rangeData), input As cv.Mat
         Dim depthPixels = task.depthmask(rc.rect).CountNonZero
         If depthPixels / rc.pixels < 0.5 Then
