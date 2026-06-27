@@ -1,3 +1,4 @@
+Imports VBClasses
 Imports cv = OpenCvSharp
 Public Class Swarm_Basics : Inherits TaskParent
     Public knn As New KNN_Basics
@@ -40,7 +41,7 @@ Public Class Swarm_Basics : Inherits TaskParent
 
         If task.optionsChanged Then cornerHistory.Clear()
 
-        Dim histCount = task.fOptions.FrameHistoryCount.Value 
+        Dim histCount = task.fOptions.FrameHistoryCount.Value
         cornerHistory.Add(feat.features)
 
         Dim lastIndex = cornerHistory.Count - 1
@@ -125,106 +126,3 @@ Public Class NR_Swarm_LeftRight : Inherits TaskParent
         SetTrueText(strOut, 1)
     End Sub
 End Class
-
-
-
-
-
-
-
-
-Public Class NR_Swarm_Percentage : Inherits TaskParent
-    Dim swarm As New Swarm_Flood
-    Dim options As New Options_SwarmPercent
-    Dim redC As New RedColor_Basics
-    Public Sub New()
-        desc = "Use features to segment a percentage of the image then use RedCloud with a mask for the rest of the image."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        options.Run()
-        redC.Run(src)
-        dst2 = redC.dst2
-        labels(2) = redC.labels(2)
-
-        swarm.Run(src)
-        dst2 = swarm.dst2
-
-        dst3.SetTo(0)
-        Dim pixels As Integer
-        Dim count As Integer
-        For Each rc In redC.rcList
-            dst3(rc.rect).SetTo(rc.color, rc.mask)
-            pixels += rc.pixels
-            count += 1
-            If pixels / src.Total >= options.percent Then Exit For
-        Next
-        labels(3) = "The top " + CStr(count) + " cells by size = " + Format(options.percent, "0%") + " of the pixels"
-    End Sub
-End Class
-
-
-
-
-Public Class Swarm_Flood : Inherits TaskParent
-    Dim swarm As New Swarm_Basics
-    Public flood As New Flood_BasicsMask
-    Dim color8U As New Color8U_Basics
-    Public Sub New()
-        desc = "Floodfill the color image using the swarm outline as a mask"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        swarm.Run(src)
-
-        color8U.Run(src)
-
-        flood.inputRemoved = swarm.dst2
-        flood.Run(color8U.dst2)
-        dst2 = flood.dst2
-
-        SetTrueText(flood.redC.strOut, 3)
-    End Sub
-End Class
-
-
-
-'Public Class Swarm_Flood1 : Inherits TaskParent
-'    Dim swarm As New Swarm_Basics
-'    Public flood As New Flood_BasicsMask
-'    Dim color8U As New Color8U_Basics
-'    Public Sub New()
-'        desc = "Floodfill the color image using the swarm outline as a mask"
-'    End Sub
-'    Public Shared Sub oldSelectCell()
-'        Static redC As New RedColor_Basics
-'        redC.Run(src)
-'        If redC.rcList.Count = 0 Then Exit Sub
-'        If task.clickPoint = newPoint And redC.rcList.Count > 1 Then
-'            task.clickPoint = redC.rcList(1).maxDist
-'        End If
-'        Dim index = task.redList.rcMap.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X)
-'        If index = 0 Then Exit Sub
-'        If index > 0 And index < redC.rcList.Count Then
-'            task.rcD = redC.rcList(index)
-'            task.color(task.rcD.rect).SetTo(cv.Scalar.White, task.rcD.mask)
-'        Else
-'            ' the 0th cell is always the upper left corner with just 1 pixel.
-'            If redC.rcList.Count > 1 Then task.rcD = redC.rcList(1)
-'        End If
-'    End Sub
-'    Public Overrides Sub RunAlg(src As cv.Mat)
-'        redC.Run(src)
-'        dst2 = redC.dst2
-'        labels(2) = redC.labels(2)
-
-'        swarm.Run(src)
-
-'        color8U.Run(src)
-
-'        flood.inputRemoved = swarm.dst2
-'        flood.Run(color8U.dst2)
-'        dst2 = flood.dst2
-
-'        oldSelectCell()
-'        ' labels(2) = flood.cellGen.labels(2)
-'    End Sub
-'End Class

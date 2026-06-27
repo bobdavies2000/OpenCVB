@@ -1483,7 +1483,6 @@ NR_SVM_ReuseBasics
 NR_SVM_ReuseRandom
 NR_SVM_TestCase
 NR_Swarm_LeftRight
-NR_Swarm_Percentage
 NR_TextureFlow_Bricks
 NR_TextureFlow_Depth
 NR_TextureFlow_DepthSegments
@@ -1754,7 +1753,6 @@ SuperRes_Input
 SVM_Basics
 SVM_SampleData
 Swarm_Basics
-Swarm_Flood
 Texture_Basics
 TextureFlow_Basics
 Threshold_Basics

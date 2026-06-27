@@ -247,11 +247,10 @@ Public Class Flood_BasicsMask : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         color8U.Run(src)
-        inputRemoved = task.pcSplit(2).InRange(task.MaxZmeters, task.MaxZmeters).ConvertScaleAbs()
+        inputRemoved = task.pcSplit(2).InRange(task.MaxZmeters, 1000).ConvertScaleAbs()
         src = color8U.dst2
 
-        dst3 = inputRemoved
-        If inputRemoved IsNot Nothing Then src.SetTo(0, inputRemoved)
+        src.SetTo(0, inputRemoved)
 
         redC.Run(src)
         labels(2) = redC.labels(2)

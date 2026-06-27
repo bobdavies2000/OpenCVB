@@ -215,7 +215,7 @@ Public Class NR_Projection_Floor : Inherits TaskParent
         labels(2) = isolate.labels(2)
         labels(3) = isolate.labels(3)
 
-        If objSlider.Value + 1 >= isolate.side.objects.rclist.Count Then Exit Sub
+        If objSlider.Value + 1 > isolate.side.objects.rclist.Count Then Exit Sub
         Dim rc = isolate.top.objects.rclist(objSlider.Value + 1) ' the biggest by default...
         Dim rowList As New List(Of Integer)
         For y = 0 To rc.rect.Height - 1

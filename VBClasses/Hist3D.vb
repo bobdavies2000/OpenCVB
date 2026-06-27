@@ -224,7 +224,7 @@ Public Class NR_Hist3D_PixelClassify : Inherits TaskParent
         dst2 = redC.dst2
         labels(2) = redC.labels(2)
         SetTrueText(redC.strOut, 3)
-        If task.rcD.rect.Width > 0 Then dst2(task.rcD.rect).SetTo(white, task.rcD.mask)
+        If task.rcD IsNot Nothing AndAlso task.rcD.rect.Width > 0 Then dst2(task.rcD.rect).SetTo(white, task.rcD.mask)
     End Sub
 End Class
 
