@@ -1,6 +1,7 @@
 Imports cv = OpenCvSharp
 Public Class FeatureLess_Basics_TA : Inherits TaskParent
     Public regions As New SortedList(Of Integer, cv.Rect)(New compareAllowIdenticalIntegerInverted)
+    Public indexList As New SortedList(Of Integer, Integer)(New compareAllowIdenticalIntegerInverted)
     Public brickList As New List(Of cv.Rect)
     Dim index As Integer
     Dim rect As cv.Rect
@@ -21,6 +22,7 @@ Public Class FeatureLess_Basics_TA : Inherits TaskParent
                 Dim flags = cv.FloodFillFlags.FixedRange Or (index << 8)
                 Dim count = cv.Cv2.FloodFill(input, mask, r.TopLeft, index, rect, 0, 0, flags)
                 regions.Add(count, ValidateRect(rect))
+                indexList.Add(count, index)
             End If
         Next
         Return input
@@ -34,6 +36,7 @@ Public Class FeatureLess_Basics_TA : Inherits TaskParent
                 Dim flags = cv.FloodFillFlags.FixedRange Or (index << 8)
                 Dim count = cv.Cv2.FloodFill(input, mask, r.TopLeft, index, rect, 0, 0, flags)
                 regions.Add(count, ValidateRect(rect))
+                indexList.Add(count, index)
                 index += 1
             End If
         Next
@@ -50,6 +53,7 @@ Public Class FeatureLess_Basics_TA : Inherits TaskParent
         Next
 
         regions.Clear()
+        indexList.Clear()
         If task.heartBeatLT Then dst3 = buildMapHeartBeat(dst1.Clone) Else dst3 = buildMap(dst1.Clone)
 
         index = regions.Count + 1
@@ -58,6 +62,7 @@ Public Class FeatureLess_Basics_TA : Inherits TaskParent
                 Dim flags = cv.FloodFillFlags.FixedRange Or (index << 8)
                 Dim count = cv.Cv2.FloodFill(dst3, mask, r.TopLeft, index, rect, 0, 0, flags)
                 regions.Add(count, ValidateRect(rect))
+                indexList.Add(count, index)
                 index += 1
             End If
         Next
@@ -1704,11 +1709,12 @@ End Class
 
 
 
-Public Class FeatureLess_LUT : Inherits TaskParent
+Public Class FeatureLess_ReductionTest : Inherits TaskParent
     Dim color8u As New Color8U_Basics
+    Dim rcList As New List(Of rcData)
     Public Sub New()
         task.fOptions.ReductionSlider.Value = 32
-        desc = "Find the LUT values in each featureless region."
+        desc = "Identify each featureless region by index."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         color8u.Run(task.gray)
@@ -1716,15 +1722,64 @@ Public Class FeatureLess_LUT : Inherits TaskParent
         dst2 = color8u.dst3
         dst3 = task.fLess.mask
 
+        rcList.Clear()
         For i = 0 To task.fLess.regions.Count - 1
-            Dim r = task.fLess.regions.ElementAt(i).Value
-            Dim index As Integer = task.fLess.dst3(r).Get(Of Byte)(0, 0)
-            Dim gridMask = dst1(r).InRange(index, index)
-            Dim tour = ContourBuild(gridMask)
-            If i = Math.Abs(task.gOptions.DebugSlider.Value) Then
-                DrawTour(dst2(r), tour, task.highlight, task.lineWidth)
-                DrawTour(dst3(r), tour, 255, task.lineWidth)
-            End If
+            Dim r = task.fLess.regions.Values(i)
+            rcList.Add(New rcData(dst1(r), r, task.fLess.indexList.Values(i)))
         Next
+
+        Dim rcIndex = Math.Abs(task.gOptions.DebugSlider.Value)
+        If rcIndex < rcList.Count Then
+            Dim rc = rcList(rcIndex)
+            DrawTour(dst2(rc.rect), rc.contour, task.highlight, task.lineWidth)
+            DrawTour(dst3(rc.rect), rc.contour, 255, task.lineWidth)
+        End If
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class FeatureLess_CalcHist : Inherits TaskParent
+    Dim color8u As New Color8U_Basics
+    Dim histMapList As New List(Of (Index As Integer, histList As List(Of Integer)))
+    Public Sub New()
+        dst0 = New cv.Mat(dst0.Size, cv.MatType.CV_8U, 0)
+        task.fOptions.ReductionSlider.Value = 32
+        desc = "Find the LUT values in each featureless region."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        color8u.Run(task.gray)
+        dst1 = task.fLess.dst3
+        dst2 = color8u.dst3
+
+        Dim ranges() As cv.Rangef = New cv.Rangef() {New cv.Rangef(0, 255)}
+        histMapList.Clear()
+        For i = 0 To task.fLess.regions.Count - 1
+            Dim r = task.fLess.regions.Values(i)
+            Dim histogram As New cv.Mat
+            cv.Cv2.CalcHist({dst1(r)}, {0}, New cv.Mat, histogram, 1, {256}, ranges)
+            Dim histArray(histogram.Rows - 1) As Single
+            histogram.GetArray(Of Single)(histArray)
+            Dim histList As New List(Of Integer)
+            For j = 0 To histArray.Count - 1
+                If histArray(j) > 0 Then histList.Add(j)
+            Next
+            histMapList.Add((task.fLess.indexList.Values(i), histList))
+        Next
+
+        dst0.SetTo(0)
+        For Each tup In histMapList
+            Dim lutArray As Byte() = Enumerable.Repeat(CByte(0), 256).ToArray()
+            For Each index In tup.histList
+                lutArray(index) = tup.Index
+            Next
+
+            dst0 += color8u.dst2.LUT(lutArray)
+        Next
+
+        dst3 = Palettize(dst0)
     End Sub
 End Class

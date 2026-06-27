@@ -255,6 +255,7 @@ FeatureFlow_LucasKanade
 FeatureLess_Basics_TA
 FeatureLess_BasicsOld
 FeatureLess_BrickList
+FeatureLess_CalcHist
 FeatureLess_Cells
 FeatureLess_ClusterFlood
 FeatureLess_Correlation
@@ -265,10 +266,10 @@ FeatureLess_Features
 FeatureLess_IndexKNN
 FeatureLess_LeftRight
 FeatureLess_Lines
-FeatureLess_LUT
 FeatureLess_NotImages
 FeatureLess_Overlap
 FeatureLess_RedColor
+FeatureLess_ReductionTest
 FeatureLess_Stabilized
 FeatureLess_ToList
 FeatureLess_Tracker
