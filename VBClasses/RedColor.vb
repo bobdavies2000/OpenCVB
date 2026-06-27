@@ -978,3 +978,47 @@ Public Class RedColor_Contour : Inherits TaskParent
         Next
     End Sub
 End Class
+
+
+
+
+
+
+Public Class RedColor_Restart : Inherits TaskParent
+    Dim color8u As New Color8U_Basics
+    Public rcList As New List(Of rcData)
+    Public Sub New()
+        task.gOptions.displayDst1.Checked = True
+        task.fOptions.ReductionSlider.Value = 32
+        desc = "FloodFill each color8U output and create an rclist"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        color8u.Run(task.gray)
+        dst1 = task.fLess.dst3
+        dst3 = color8u.dst2 + 1
+
+        rcList.Clear()
+        Dim rect As cv.Rect
+        Dim mask As cv.Mat = New cv.Mat(New cv.Size(dst2.Width + 2, dst2.Height + 2), cv.MatType.CV_8U, 0)
+        For Each r In task.gridRects
+            If mask(r).Get(Of Byte)(0, 0) = 0 Then
+                Dim index As Integer = dst3(r).Get(Of Byte)(0, 0)
+                Dim flags = cv.FloodFillFlags.FixedRange Or (index << 8)
+                Dim count = cv.Cv2.FloodFill(dst3, mask, r.TopLeft, index, rect, 0, 0, flags)
+                If count > 0 Then rcList.Add(New rcData(dst3(rect), rect, index))
+            End If
+        Next
+        dst2 = Palettize(dst3)
+
+        Dim otherMask = Not mask.Threshold(0, 255, cv.ThresholdTypes.Binary)(New cv.Rect(1, 1, dst2.Width, dst2.Height))
+        dst2.SetTo(0, otherMask)
+        dst3.SetTo(0, otherMask)
+
+        strOut = Utility_Basics.selectCell(dst3, rcList)
+        SetTrueText(strOut, 1)
+
+        If task.rcD IsNot Nothing Then dst2.Rectangle(task.rcD.rect, task.highlight, task.lineWidth)
+
+        labels(2) = CStr(rcList.Count) + " cells were found."
+    End Sub
+End Class

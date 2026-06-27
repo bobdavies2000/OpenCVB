@@ -1652,6 +1652,7 @@ RedColor_GridRects
 RedColor_Hulls
 RedColor_Isolate
 RedColor_LeftRight
+RedColor_Restart
 RedFlood_Basics
 RedFlood_Color
 RedFlood_CPP
