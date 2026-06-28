@@ -219,10 +219,22 @@ Public Class Utility_Basics : Inherits TaskParent
     Public Shared Function DelaunaySelect(rcMap As cv.Mat, rcList As List(Of rcData)) As String
         Dim outStr As String = ""
         If rcList.Count > 0 Then
-            Dim index = rcMap.Get(Of Integer)(task.clickPoint.Y, task.clickPoint.X)
-            task.rcD = rcList(index - 1)
-            task.color(task.rcD.rect).SetTo(white, task.rcD.mask)
-            outStr = task.rcD.displayCell()
+            Dim clickIndex = rcMap.Get(Of Integer)(task.clickPoint.Y, task.clickPoint.X)
+            If clickIndex = 0 Then
+                Return vbCrLf + vbCrLf + "Click any cell to see details." + vbCrLf
+            End If
+
+            If rcList.Count = 0 Then
+                rcList.Add(New rcData(task.color, New cv.Rect(0, 0, task.color.Width, task.color.Height), 1))
+            End If
+
+            task.rcD = rcList(0)
+            For Each rc In rcList
+                If clickIndex = rc.index Then
+                    task.rcD = rc
+                    If task.rcD.rect.Contains(task.clickPoint) Then Exit For
+                End If
+            Next
         End If
         Return outStr
     End Function

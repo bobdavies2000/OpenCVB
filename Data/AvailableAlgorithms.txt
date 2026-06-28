@@ -1638,6 +1638,7 @@ RedCloud_Motion
 RedCloud_MotionFilter
 RedCloud_Reliable
 RedCloud_RGB
+RedColor_BasicLeftRight
 RedColor_Basics
 RedColor_BasicsOld
 RedColor_BrickList

@@ -748,9 +748,8 @@ End Class
 
 Public Class RedColor_DelaunayMap : Inherits TaskParent
     Public dMap As New Delaunay_Map
-    Dim redC As New RedColor_Basics
+    Dim redC As New RedColor_Restart
     Public Sub New()
-        redC.runSelectCell = False
         desc = "Run RedColor as usual but use the Delaunay map to select cells."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -761,8 +760,7 @@ Public Class RedColor_DelaunayMap : Inherits TaskParent
         dMap.rcList = New List(Of rcData)(redC.rcList)
         dMap.Run(emptyMat)
 
-        strOut = Utility_Basics.DelaunaySelect(dMap.rcMap, dMap.rcList)
-        SetTrueText(strOut, 3)
+        SetTrueText(redC.strOut, 3)
     End Sub
 End Class
 
@@ -993,32 +991,54 @@ Public Class RedColor_Restart : Inherits TaskParent
         desc = "FloodFill each color8U output and create an rclist"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        color8u.Run(task.gray)
-        dst1 = task.fLess.dst3
-        dst3 = color8u.dst2 + 1
+        If src.Channels <> 1 Then
+            color8u.Run(task.gray)
+            src = color8u.dst2 + 1
+        End If
 
         rcList.Clear()
         Dim rect As cv.Rect
         Dim mask As cv.Mat = New cv.Mat(New cv.Size(dst2.Width + 2, dst2.Height + 2), cv.MatType.CV_8U, 0)
         For Each r In task.gridRects
             If mask(r).Get(Of Byte)(0, 0) = 0 Then
-                Dim index As Integer = dst3(r).Get(Of Byte)(0, 0)
+                Dim index As Integer = src(r).Get(Of Byte)(0, 0)
                 Dim flags = cv.FloodFillFlags.FixedRange Or (index << 8)
-                Dim count = cv.Cv2.FloodFill(dst3, mask, r.TopLeft, index, rect, 0, 0, flags)
-                If count > 0 Then rcList.Add(New rcData(dst3(rect), rect, index))
+                Dim count = cv.Cv2.FloodFill(src, mask, r.TopLeft, index, rect, 0, 0, flags)
+                If count > 0 Then rcList.Add(New rcData(src(rect), rect, index))
             End If
         Next
-        dst2 = Palettize(dst3)
+        dst2 = Palettize(src)
 
         Dim otherMask = Not mask.Threshold(0, 255, cv.ThresholdTypes.Binary)(New cv.Rect(1, 1, dst2.Width, dst2.Height))
         dst2.SetTo(0, otherMask)
-        dst3.SetTo(0, otherMask)
+        src.SetTo(0, otherMask)
 
-        strOut = Utility_Basics.selectCell(dst3, rcList)
+        strOut = Utility_Basics.selectCell(src, rcList)
         SetTrueText(strOut, 1)
 
         If task.rcD IsNot Nothing Then dst2.Rectangle(task.rcD.rect, task.highlight, task.lineWidth)
 
         labels(2) = CStr(rcList.Count) + " cells were found."
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class RedColor_BasicLeftRight : Inherits TaskParent
+    Dim redC As New RedColor_Restart
+    Public Sub New()
+        desc = "Use RedColor_Restart on the left and right images."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        redC.Run(task.leftView)
+        dst2 = redC.dst2
+        labels(2) = redC.labels(2)
+
+        redC.Run(task.rightView)
+        dst3 = redC.dst2
+        labels(3) = redC.labels(2)
     End Sub
 End Class

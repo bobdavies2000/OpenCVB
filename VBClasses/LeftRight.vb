@@ -1,5 +1,6 @@
-Imports cv = OpenCvSharp
+Imports jsonShared
 Imports VBClasses
+Imports cv = OpenCvSharp
 Public Class LeftRight_Basics : Inherits TaskParent
     Public meanLeft As Double
     Public meanRight As Double
@@ -9,7 +10,10 @@ Public Class LeftRight_Basics : Inherits TaskParent
         desc = "Display the left and right views as they came from the camera."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If task.leftRightBrightnessAdjust Then
+        If task.Settings.cameraName.Contains("StereoLabs") Then
+            dst2 = task.leftView.Clone
+            dst3 = task.rightView.Clone
+        Else
             brightness.run(task.leftView)
             Dim tmpLeft As cv.Mat = brightness.dst2 ' input array conflict
             task.leftView = tmpLeft.Normalize(100, 150, cv.NormTypes.MinMax)
@@ -19,9 +23,6 @@ Public Class LeftRight_Basics : Inherits TaskParent
             Dim tmpRight As cv.Mat = brightness.dst2 ' inputarray conflict
             task.rightView = tmpRight.Normalize(100, 150, cv.NormTypes.MinMax)
             If standaloneTest() Then dst3 = task.rightView
-        Else
-            dst2 = task.leftView.Clone
-            dst3 = task.rightView.Clone
         End If
     End Sub
 End Class

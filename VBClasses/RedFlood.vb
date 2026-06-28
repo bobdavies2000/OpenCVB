@@ -745,7 +745,7 @@ End Class
 
 Public Class RedFlood_Delaunay : Inherits TaskParent
     Dim subdiv As New cv.Subdiv2D
-    Dim redMask As New RedFlood_Basics
+    Dim redC As New RedColor_Restart
     Dim facetList As New List(Of List(Of cv.Point))
     Dim rcMap As New cv.Mat(dst2.Size, cv.MatType.CV_32S, 0)
     Public Sub New()
@@ -754,14 +754,14 @@ Public Class RedFlood_Delaunay : Inherits TaskParent
         desc = "Fill the delaunay map with the index for each cell."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        redMask.Run(src)
-        dst2 = redMask.dst3
-        labels(2) = redMask.labels(3)
+        redC.Run(src)
+        dst2 = redC.dst3
+        labels(2) = redC.labels(3)
 
         subdiv.InitDelaunay(New cv.Rect(0, 0, dst2.Width, dst2.Height))
 
         Dim inputPoints As New List(Of cv.Point2f)
-        For Each rc In redMask.rcList
+        For Each rc In redC.rcList
             inputPoints.Add(rc.maxDist)
         Next
         subdiv.Insert(inputPoints)
@@ -776,16 +776,12 @@ Public Class RedFlood_Delaunay : Inherits TaskParent
                 nextFacet.Add(New cv.Point(facets(i)(j).X, facets(i)(j).Y))
             Next
 
-            Dim rc = redMask.rcList(i)
+            Dim rc = redC.rcList(i)
             rcMap.FillConvexPoly(nextFacet, rc.index, cv.LineTypes.Link4)
             If standaloneTest() Then dst3.FillConvexPoly(nextFacet, rc.color, cv.LineTypes.Link4)
             facetList.Add(nextFacet)
         Next
 
-        'For Each rc In redMask.rcList
-        '    DrawTour(dst3(rc.rect), rc.contour, task.highlight, task.lineWidth)
-        'Next
-        strOut = Utility_Basics.DelaunaySelect(rcMap, redMask.rcList)
-        SetTrueText(strOut, 1)
+        SetTrueText(redC.strOut, 1)
     End Sub
 End Class

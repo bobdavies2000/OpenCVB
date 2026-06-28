@@ -652,9 +652,8 @@ End Class
 
 Public Class RedCloud_DelaunayMap : Inherits TaskParent
     Public dMap As New Delaunay_Map
-    Dim redC As New RedCloud_Basics
+    Dim redC As New RedColor_Restart
     Public Sub New()
-        redC.runSelectCell = False
         desc = "Run RedColor as usual but use the Delaunay map to select cells."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -665,8 +664,7 @@ Public Class RedCloud_DelaunayMap : Inherits TaskParent
         dMap.rcList = New List(Of rcData)(redC.rcList)
         dMap.Run(emptyMat)
 
-        strOut = Utility_Basics.DelaunaySelect(dMap.rcMap, dMap.rcList)
-        SetTrueText(strOut, 3)
+        SetTrueText(redC.strOut, 3)
     End Sub
 End Class
 
