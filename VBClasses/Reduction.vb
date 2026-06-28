@@ -7,10 +7,11 @@ Public Class Reduction_Basics : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         If src.Channels() <> 1 Then src = task.gray
 
-        classCount = Math.Ceiling(255 / task.reduction)
+        Dim reduction = task.fOptions.ReductionColor.Value
+        classCount = Math.Ceiling(255 / reduction)
 
-        dst2 = src / task.reduction
-        labels(2) = "Reduced image - factor = " + CStr(task.reduction)
+        dst2 = src / reduction
+        labels(2) = "Reduced image - factor = " + CStr(reduction)
 
         dst3 = Palettize(dst2 + 1, 0)
 
@@ -147,7 +148,6 @@ Public Class NR_Reduction_XYZ : Inherits TaskParent
     Dim reduction As New Reduction_Basics
     Dim options As New Options_ReductionXYZ
     Public Sub New()
-        task.fOptions.ReductionSlider.Value = 400
         desc = "Use reduction to slice the point cloud in 3 dimensions"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)

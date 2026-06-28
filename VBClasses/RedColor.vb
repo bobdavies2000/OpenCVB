@@ -8,7 +8,6 @@ Public Class RedColor_Basics : Inherits TaskParent
     Public Sub New()
         If standalone Then task.gOptions.displayDst1.Checked = True
         labels(3) = "The output of FeatureLess_Basics.  Note that cell colors match the RedColor output."
-        task.fOptions.ReductionSlider.Value = 32
         desc = "Use the FeatureLess regions to improve the RedColor output."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -87,7 +86,6 @@ Public Class RedColor_BrickList : Inherits TaskParent
     Dim bricks As New FeatureLess_BrickList
     Public Sub New()
         If standalone Then task.gOptions.displayDst1.Checked = True
-        task.fOptions.ReductionSlider.Value = 32
         desc = "Use the FeatureLess regions to improve the RedColor output."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -985,35 +983,34 @@ End Class
 Public Class RedColor_Restart : Inherits TaskParent
     Dim color8u As New Color8U_Basics
     Public rcList As New List(Of rcData)
+    Public rcMap As New cv.Mat
     Public Sub New()
         task.gOptions.displayDst1.Checked = True
-        task.fOptions.ReductionSlider.Value = 32
         desc = "FloodFill each color8U output and create an rclist"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If src.Channels <> 1 Then
-            color8u.Run(task.gray)
-            src = color8u.dst2 + 1
-        End If
+        If src.Channels <> 1 Then color8u.Run(task.gray) Else color8u.Run(src)
+        src = color8u.dst2 + 1
 
+        rcMap = src.Clone
         rcList.Clear()
         Dim rect As cv.Rect
         Dim mask As cv.Mat = New cv.Mat(New cv.Size(dst2.Width + 2, dst2.Height + 2), cv.MatType.CV_8U, 0)
         For Each r In task.gridRects
             If mask(r).Get(Of Byte)(0, 0) = 0 Then
-                Dim index As Integer = src(r).Get(Of Byte)(0, 0)
+                Dim index As Integer = rcMap(r).Get(Of Byte)(0, 0)
                 Dim flags = cv.FloodFillFlags.FixedRange Or (index << 8)
-                Dim count = cv.Cv2.FloodFill(src, mask, r.TopLeft, index, rect, 0, 0, flags)
-                If count > 0 Then rcList.Add(New rcData(src(rect), rect, index))
+                Dim count = cv.Cv2.FloodFill(rcMap, mask, r.TopLeft, index, rect, 0, 0, flags)
+                If count > 0 Then rcList.Add(New rcData(rcMap(rect), rect, index))
             End If
         Next
-        dst2 = Palettize(src)
+        dst2 = Palettize(rcMap)
 
         Dim otherMask = Not mask.Threshold(0, 255, cv.ThresholdTypes.Binary)(New cv.Rect(1, 1, dst2.Width, dst2.Height))
         dst2.SetTo(0, otherMask)
-        src.SetTo(0, otherMask)
+        rcMap.SetTo(0, otherMask)
 
-        strOut = Utility_Basics.selectCell(src, rcList)
+        strOut = Utility_Basics.selectCell(rcMap, rcList)
         SetTrueText(strOut, 1)
 
         If task.rcD IsNot Nothing Then dst2.Rectangle(task.rcD.rect, task.highlight, task.lineWidth)
@@ -1021,6 +1018,7 @@ Public Class RedColor_Restart : Inherits TaskParent
         labels(2) = CStr(rcList.Count) + " cells were found."
     End Sub
 End Class
+
 
 
 

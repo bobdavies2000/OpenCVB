@@ -16714,6 +16714,7 @@ Namespace VBClasses
                     minRes = New cv.Size(168, 94)
             End Select
             desc = "Run RedCloud at the smallest resolution and resize. NOT WORTH IT!"
+            task.fOptions.ReductionColor.Value = 200
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             Dim minRect = New cv.Rect(0, 0, minRes.Width, minRes.Height)
@@ -16723,10 +16724,6 @@ Namespace VBClasses
             labels(2) = redC.labels(2)
 
             dst2 = dst1.Resize(task.workRes)
-
-            If task.firstPass Then
-                task.fOptions.ReductionSlider.Value = 200
-            End If
 
             Dim ratio = task.workRes.Width \ minRes.Width
             redC.rcMap.SetTo(0)
@@ -18434,13 +18431,14 @@ Namespace VBClasses
 
             labels(2) = CStr(regionList.Count) + " non-zero regions > " + CStr(CInt(sizeThreshold)) + " pixels"
             wcMap.SetTo(255)
+            Dim reduction = task.fOptions.ReductionColor.Value
             For i = 0 To regionList.Count - 1
                 Dim index = regionList(i)
                 dst0 = dst2.InRange(index, index)
                 Dim mean = prepData.reduced32s.Mean(dst0)
 
-                If CInt(mean(0)) Mod task.reduction = 0 Then
-                    Dim region = CInt(mean(0) / task.reduction)
+                If CInt(mean(0)) Mod reduction = 0 Then
+                    Dim region = CInt(mean(0) / reduction)
                     wcMap.SetTo(region, dst0)
                 End If
             Next
@@ -18473,13 +18471,14 @@ Namespace VBClasses
             strOut = ""
             Dim count As Integer
             wcMap.SetTo(0)
+            Dim reduction = task.fOptions.ReductionColor.Value
             For i = 0 To regionList.Count - 1
                 Dim index = regionList(i)
                 dst0 = dst2.InRange(index, index)
                 Dim mean = wcData.prepData.reduced32s.Mean(dst0)
 
-                If CInt(mean(0)) Mod task.reduction = 0 Then
-                    Dim region = CInt(mean(0) / task.reduction)
+                If CInt(mean(0)) Mod reduction = 0 Then
+                    Dim region = CInt(mean(0) / reduction)
                     wcMap.SetTo(region, dst0)
                     If region = 0 Then
                         strOut += vbCrLf + If(i Mod 3 = 2 Or i Mod 3 = 1, vbCrLf, "")
@@ -18659,7 +18658,7 @@ Namespace VBClasses
             Dim rcMapLast As cv.Mat = rcMap.Clone
 
             Dim minPixels As Integer = dst2.Total * 0.001
-            If task.reduction < 50 Then minPixels = 0
+            If task.fOptions.ReductionColor.Value < 50 Then minPixels = 0
             Dim index As Integer = 1
             Dim newList As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
             For i = 0 To rects.Count - 1

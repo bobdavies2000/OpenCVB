@@ -51,7 +51,7 @@ Public Class NR_BackProject_Reduction : Inherits TaskParent
     Dim bProject As New BackProject_Basics
     Public Sub New()
         labels(3) = "Backprojection of highlighted histogram bin"
-        task.fOptions.ReductionSlider.Value = 50
+        task.fOptions.ReductionColor.Value = 50
         desc = "Use the histogram of a reduced BGR image to isolate featureless portions of an image."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -60,7 +60,7 @@ Public Class NR_BackProject_Reduction : Inherits TaskParent
         bProject.Run(reduction.dst2)
         dst2 = bProject.dst2
         dst3 = bProject.dst3
-        labels(2) = "Reduction = " + CStr(task.reduction) + " and bins = " + CStr(task.histogramBins)
+        labels(2) = "Reduction = " + CStr(task.fOptions.ReductionColor.Value) + " and bins = " + CStr(task.histogramBins)
     End Sub
 End Class
 

@@ -14,12 +14,6 @@ Public Class Motion_Basics_TA : Inherits TaskParent
                     "the Feature Option 'Motion pixel threshold'." + vbCrLf +
                     " to adjust accuracy of accumulated image.", 3)
 
-        'If task.motionStable.motionDecision = False Then
-        '    motionSort.Clear()
-        '    motionMask.SetTo(0)
-        '    Exit Sub ' we don't have any changes.
-        'End If
-
         If src.Channels <> 1 Then src = task.gray.Clone
         If task.optionsChanged Then dst2 = src.Clone
 
@@ -46,10 +40,16 @@ Public Class Motion_Basics_TA : Inherits TaskParent
             Next
         Next
 
+        If motionSort.Count / task.gridRects.Count > 0.5 Then
+            motionMask.SetTo(255)
+            src.CopyTo(dst2)
+            labels(2) = "Image below is accumulated using motion mask.  Grid rects with motion: all of them."
+        Else
+            labels(2) = "Image below is accumulated using motion mask.  Grid rects with motion: " + CStr(nabeList.Count)
+        End If
         dst3 = motionMask
 
-        dst1 = task.rightView.Clone
-
+        'dst1 = task.rightView.Clone
         'motionRight.Run(task.rightView)
         'motionRightMask = motionRight.dst3
         'dst1.SetTo(255, motionRightMask)
@@ -74,7 +74,6 @@ Public Class Motion_Basics_TA : Inherits TaskParent
         '    Next
         'Next
         'dst1.SetTo(255, motionRight)
-        labels(2) = "Image below is accumulated using motion mask.  Grid rects with motion: " + CStr(nabeList.Count)
     End Sub
 End Class
 

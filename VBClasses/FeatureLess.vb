@@ -1713,7 +1713,6 @@ Public Class FeatureLess_ReductionTest : Inherits TaskParent
     Dim color8u As New Color8U_Basics
     Dim rcList As New List(Of rcData)
     Public Sub New()
-        task.fOptions.ReductionSlider.Value = 32
         desc = "Identify each featureless region by index."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -1747,7 +1746,6 @@ Public Class FeatureLess_CalcHist : Inherits TaskParent
     Dim histMapList As New List(Of (Index As Integer, histList As List(Of Integer)))
     Public Sub New()
         dst0 = New cv.Mat(dst0.Size, cv.MatType.CV_8U, 0)
-        task.fOptions.ReductionSlider.Value = 32
         desc = "Find the LUT values in each featureless region."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)

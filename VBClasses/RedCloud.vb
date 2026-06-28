@@ -73,7 +73,6 @@ Public Class RedCloud_Core : Inherits TaskParent
     Public rcList As New List(Of rcData)
     Public Sub New()
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-        task.fOptions.ReductionSlider.Value = 200
         desc = "Find the biggest chunks of consistent depth data "
     End Sub
     Public Shared Function sweepImage(input As cv.Mat, minSize As Integer) As List(Of rcData)
@@ -134,7 +133,6 @@ Public Class RedCloud_BasicsFlood : Inherits TaskParent
     Public rcList As New List(Of rcData)
     Public rcMap As cv.Mat
     Public Sub New()
-        task.fOptions.ReductionSlider.Value = 200
         desc = "Use the more complete RedPrep_XY_Add as input to RedCloud."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -338,7 +336,7 @@ Public Class RedCloud_Matches : Inherits TaskParent
     Dim redC As New RedCloud_Basics
     Public rcList As New List(Of rcData)
     Public Sub New()
-        task.fOptions.ReductionSlider.Value = 120
+        task.fOptions.ReductionColor.Value = 120
         desc = "Display the RedCloud cells that matched to the previous frame."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -373,7 +371,7 @@ Public Class RedCloud_Matched : Inherits TaskParent
     Public rcList As New List(Of rcData)
     Public Sub New()
         If standalone Then task.gOptions.displayDst1.Checked = True
-        task.fOptions.ReductionSlider.Value = 120
+        task.fOptions.ReductionColor.Value = 120
         desc = "Use the first cell when age > 1"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)

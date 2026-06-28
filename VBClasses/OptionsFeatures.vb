@@ -59,7 +59,8 @@
             Color8USource.Items.Add(method)
         Next
         Color8USource.SelectedItem = "Reduction_Basics"
-        ReductionSlider.Value = 200
+        ReductionColor.Value = 32
+        ReductionDepth.Value = 200
 
         ColorDiffSlider.Value = 10
         MotionPixelSlider.Maximum = 10
@@ -109,9 +110,12 @@
 
 
 
-    Private Sub ReductionSlider_ValueChanged(sender As Object, e As EventArgs) Handles ReductionSlider.ValueChanged
-        Lab1.Text = Format(ReductionSlider.Value, fmt0)
-        task.reduction = ReductionSlider.Value
+    Private Sub ReductionColor_ValueChanged(sender As Object, e As EventArgs) Handles ReductionColor.ValueChanged
+        Lab1.Text = Format(ReductionColor.Value, fmt0)
+        task.optionsChanged = True
+    End Sub
+    Private Sub ReductionDepth_ValueChanged(sender As Object, e As EventArgs) Handles ReductionDepth.ValueChanged
+        Lab9.Text = Format(ReductionDepth.Value, fmt0)
         task.optionsChanged = True
     End Sub
     Private Sub FCorrSlider_ValueChanged(sender As Object, e As EventArgs) Handles MatchCorrSlider.ValueChanged

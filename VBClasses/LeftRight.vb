@@ -222,21 +222,17 @@ End Class
 Public Class LeftRight_Reduction : Inherits TaskParent
     Public reduction As New Reduction_Basics
     Public Sub New()
+        task.fOptions.ReductionColor.Value = 50
         desc = "Add color to the 8-bit infrared images."
         labels(2) = "Left Image"
         labels(3) = "Right Image"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        Dim saveReductionFactor = task.reduction
-        task.reduction = 50
-
         reduction.Run(task.leftView)
         dst2 = Palettize(reduction.dst2.Clone)
 
         reduction.Run(task.rightView)
         dst3 = Palettize(reduction.dst2.Clone)
-
-        task.reduction = saveReductionFactor
     End Sub
 End Class
 

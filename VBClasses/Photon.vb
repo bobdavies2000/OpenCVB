@@ -1,3 +1,4 @@
+Imports System.Windows.Forms.Design.AxImporter
 Imports cv = OpenCvSharp
 'https://security.stackexchange.com/questions/42428/Is-generating-random-numbers-using-a-smartphone-camera-a-good-idea
 Public Class Photon_Basics : Inherits TaskParent
@@ -52,11 +53,12 @@ Public Class NR_Photon_Test : Inherits TaskParent
 
         Dim testCount = dst2.Width - 1
         strOut = ""
+        Dim reductionVal = task.fOptions.ReductionColor.Value
         For i = 0 To counts.Length - 1
-            mats.mat(i) = dst1.InRange(task.reduction * i, task.reduction * i)
+            mats.mat(i) = dst1.InRange(reductionVal * i, reductionVal * i)
             counts(i).Add(mats.mat(i).CountNonZero)
             If counts(i).Count > testCount Then counts(i).RemoveAt(0)
-            strOut += "for " + CStr(i * task.reduction) + " average = " + Format(counts(i).Average, "###,##0") + " min = " +
+            strOut += "for " + CStr(i * reductionVal) + " average = " + Format(counts(i).Average, "###,##0") + " min = " +
                            Format(counts(i).Min, "###,##0.0") + " max = " + Format(counts(i).Max, "###,##0.0") + vbCrLf
         Next
         SetTrueText(strOut, 3)

@@ -585,7 +585,7 @@ End Class
 Public Class NR_Edge_Reduction : Inherits TaskParent
     Dim reduction As New Reduction_Basics
     Public Sub New()
-        task.fOptions.ReductionSlider.Value = 1
+        task.fOptions.ReductionColor.Value = 1
         desc = "Find edges in the reduction image."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -1678,5 +1678,26 @@ Public Class NR_Edge_Color8U : Inherits TaskParent
         edges.Run(dst2)
         dst3 = edges.dst2
         labels(3) = edges.labels(2)
+    End Sub
+End Class
+
+
+
+
+
+Public Class Edge_RedEdges : Inherits TaskParent
+    Dim color8u As New Color8U_Basics
+    Dim edges As New Edge_Basics_TA
+    Public Sub New()
+        desc = "Find the edges in the RedColor output."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        color8u.Run(task.gray)
+
+        edges.Run(color8u.dst3.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
+        dst2 = edges.dst2
+
+        dst3 = dst2.Clone
+        dst3.SetTo(0, task.edges.dst2)
     End Sub
 End Class

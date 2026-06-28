@@ -217,6 +217,7 @@ Edge_DiffZ_CPP
 Edge_Featureless
 Edge_Laplacian
 Edge_LeftRight
+Edge_RedEdges
 Edge_ResizeAdd
 Edge_RGB
 Edge_Sobel

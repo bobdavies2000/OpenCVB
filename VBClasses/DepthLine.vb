@@ -176,7 +176,6 @@ Public Class NR_DepthLine_HV2 : Inherits TaskParent
     Public lpList As New List(Of lpData)
     Dim lines As New Line_Basics
     Public Sub New()
-        task.fOptions.ReductionSlider.Value = 200
         labels(3) = "Input to Line_Basics"
         desc = "Find horizontal and vertical lines in the reduced depth data."
     End Sub
@@ -290,7 +289,6 @@ Public Class DepthLine_TextureFlow : Inherits TaskParent
     Dim lineY As New RedPrep_EdgeMask
     Dim texFlow As New TextureFlow_Basics
     Public Sub New()
-        task.fOptions.ReductionSlider.Value = 200
         desc = "Use texture flow on the mesh input"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)

@@ -62,7 +62,7 @@ Public Class Image_RedCloudColor : Inherits TaskParent
     Dim redC As New RedColor_Basics
     Dim reduction As New Reduction_Basics
     Public Sub New()
-        task.fOptions.ReductionSlider.Value = 50
+        task.fOptions.ReductionColor.Value = 50
         If standalone Then task.gOptions.displayDst1.Checked = True
         desc = "Use RedCloud on a photo instead of the video stream."
     End Sub

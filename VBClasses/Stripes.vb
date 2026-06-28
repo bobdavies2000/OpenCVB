@@ -10,11 +10,12 @@ Public Class Stripes_Basics : Inherits TaskParent
         Dim depth32S As New cv.Mat
         depth32f.ConvertTo(depth32S, cv.MatType.CV_32S)
 
+        Dim reduction = task.fOptions.ReductionColor.Value
         Dim mm = GetMinMax(depth32S, task.depthmask)
-        dst2 = cv.Cv2.Abs(depth32S) / task.reduction
+        dst2 = cv.Cv2.Abs(depth32S) / reduction
         Dim maxVal = Math.Min(Math.Abs(mm.minVal), mm.maxVal) ' symmetric around 0
         If maxVal = 0 Then maxVal = mm.maxVal ' symmetric around 0 except for Z where all values are above 0
-        classCount = maxVal \ task.reduction
+        classCount = maxVal \ reduction
 
         dst3 = Palettize(dst2)
         mm = GetMinMax(dst2, task.depthmask)

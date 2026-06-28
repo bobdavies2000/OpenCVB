@@ -10,7 +10,7 @@ Public Class RedPrep_Basics : Inherits TaskParent
         desc = "Reduction transform for the point cloud"
     End Sub
     Private Function reduceChan(chan As cv.Mat, noDepthmask As cv.Mat) As cv.Mat
-        chan *= task.reduction
+        chan *= task.fOptions.ReductionDepth.Value
         Dim mm As mmData = GetMinMax(chan)
         Dim dst32f As New cv.Mat
         If Math.Abs(mm.minVal) > mm.maxVal Then
@@ -31,7 +31,7 @@ Public Class RedPrep_Basics : Inherits TaskParent
         If src.Type <> cv.MatType.CV_32FC3 Then src = task.pointCloud.Clone
 
         Dim pc32S As New cv.Mat
-        src.ConvertTo(pc32S, cv.MatType.CV_32SC3, 1000 / task.reduction)
+        src.ConvertTo(pc32S, cv.MatType.CV_32SC3, 1000 / task.fOptions.ReductionDepth.Value)
         Dim split = pc32S.Split()
 
         dst2.SetTo(0)
@@ -63,7 +63,7 @@ Public Class RedPrep_Basics : Inherits TaskParent
         ' this rectangle prevents bleeds at the image edges.  It is necessary.  Test without it to see the impact.
         dst2.Rectangle(New cv.Rect(0, 0, dst2.Width, dst2.Height), 255, 2)
 
-        labels(2) = "Using reduction factor = " + CStr(task.reduction)
+        labels(2) = "Using reduction factor = " + CStr(task.fOptions.ReductionDepth.Value)
     End Sub
 End Class
 
@@ -211,7 +211,7 @@ Public Class NR_RedPrep_CloudAndColor : Inherits TaskParent
         desc = "Reduction transform for the point cloud"
     End Sub
     Private Function reduceChan(chan As cv.Mat) As cv.Mat
-        chan *= task.reduction
+        chan *= task.fOptions.ReductionDepth.Value
         Dim mm As mmData = GetMinMax(chan)
         Dim dst32f As New cv.Mat
         If Math.Abs(mm.minVal) > mm.maxVal Then
@@ -230,7 +230,7 @@ Public Class NR_RedPrep_CloudAndColor : Inherits TaskParent
         options.Run()
 
         Dim pc32S As New cv.Mat
-        task.pointCloud.ConvertTo(pc32S, cv.MatType.CV_32SC3, 1000 / task.reduction)
+        task.pointCloud.ConvertTo(pc32S, cv.MatType.CV_32SC3, 1000 / task.fOptions.ReductionDepth.Value)
         Dim split = pc32S.Split()
 
         dst2.SetTo(0)
@@ -255,7 +255,7 @@ Public Class NR_RedPrep_CloudAndColor : Inherits TaskParent
         dst3.CopyTo(dst2, task.noDepthMask)
 
         dst2.Rectangle(New cv.Rect(0, 0, dst2.Width - 1, dst2.Height - 1), 255, task.lineWidth)
-        labels(2) = "Using reduction factor = " + CStr(task.reduction)
+        labels(2) = "Using reduction factor = " + CStr(task.fOptions.ReductionDepth.Value)
     End Sub
 End Class
 
@@ -337,28 +337,29 @@ Public Class RedPrep_Core : Inherits TaskParent
         options.Run()
         optionsPrep.Run()
 
+        Dim reduction = task.fOptions.ReductionDepth.Value
         Dim split() = {New cv.Mat, New cv.Mat, New cv.Mat}
-        task.pcSplit(0).ConvertTo(split(0), cv.MatType.CV_32S, 1000 / task.reduction)
-        task.pcSplit(1).ConvertTo(split(1), cv.MatType.CV_32S, 1000 / task.reduction)
-        task.pcSplit(2).ConvertTo(split(2), cv.MatType.CV_32S, 1000 / task.reduction)
+        task.pcSplit(0).ConvertTo(split(0), cv.MatType.CV_32S, 1000 / reduction)
+        task.pcSplit(1).ConvertTo(split(1), cv.MatType.CV_32S, 1000 / reduction)
+        task.pcSplit(2).ConvertTo(split(2), cv.MatType.CV_32S, 1000 / reduction)
 
         If presetReductionName <> "" Then task.reductionName = presetReductionName
 
         Select Case task.reductionName
             Case "X Reduction"
-                reduced32s = split(0) * task.reduction
+                reduced32s = split(0) * reduction
             Case "Y Reduction"
-                reduced32s = split(1) * task.reduction
+                reduced32s = split(1) * reduction
             Case "Z Reduction"
-                reduced32s = split(2) * task.reduction
+                reduced32s = split(2) * reduction
             Case "XY Reduction"
-                reduced32s = (split(0) + split(1)) * task.reduction
+                reduced32s = (split(0) + split(1)) * reduction
             Case "XZ Reduction"
-                reduced32s = (split(0) + split(2)) * task.reduction
+                reduced32s = (split(0) + split(2)) * reduction
             Case "YZ Reduction"
-                reduced32s = (split(1) + split(2)) * task.reduction
+                reduced32s = (split(1) + split(2)) * reduction
             Case "XYZ Reduction"
-                reduced32s = (split(0) + split(1) + split(2)) * task.reduction
+                reduced32s = (split(0) + split(1) + split(2)) * reduction
         End Select
 
         reduced32s.ConvertTo(reduced32f, cv.MatType.CV_32F)
@@ -369,7 +370,7 @@ Public Class RedPrep_Core : Inherits TaskParent
         dst2 += 1
         dst2.SetTo(0, task.noDepthMask)
 
-        labels(2) = "Using reduction amount = " + CStr(task.reduction)
+        labels(2) = "Using reduction amount = " + CStr(reduction)
 
         If standalone Then
             Dim ranges = New cv.Rangef() {New cv.Rangef(-1, 256)}
@@ -430,10 +431,11 @@ Public Class RedPrep_XY_Add : Inherits TaskParent
         desc = "Prepare the X and Y regions and add them together."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        task.pcSplit(0).ConvertTo(dst0, cv.MatType.CV_32S, 1000 / task.reduction)
-        task.pcSplit(1).ConvertTo(dst1, cv.MatType.CV_32S, 1000 / task.reduction)
+        Dim reduction = task.fOptions.ReductionDepth.Value
+        task.pcSplit(0).ConvertTo(dst0, cv.MatType.CV_32S, 1000 / reduction)
+        task.pcSplit(1).ConvertTo(dst1, cv.MatType.CV_32S, 1000 / reduction)
 
-        cv.Cv2.Add(dst0 * task.reduction, dst1 * task.reduction, dst2)
+        cv.Cv2.Add(dst0 * reduction, dst1 * reduction, dst2)
         dst2 = cv.Cv2.Abs(dst0 + dst1) + 1
         dst2.SetTo(0, task.noDepthMask)
 
