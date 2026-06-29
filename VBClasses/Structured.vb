@@ -80,7 +80,7 @@ End Class
 
 
 
-Public Class NR_Structured_MultiSliceLines : Inherits TaskParent
+Public Class XR_Structured_MultiSliceLines : Inherits TaskParent
     Dim multi As New Structured_MultiSlice
     Dim core As New Line_Core
     Public Sub New()
@@ -102,7 +102,7 @@ End Class
 
 
 
-Public Class NR_Structured_CountTop : Inherits TaskParent
+Public Class XR_Structured_CountTop : Inherits TaskParent
     Dim slice As New Structured_SliceV
     Dim plot As New PlotBar_Basics
     Dim counts As New List(Of Single)
@@ -154,7 +154,7 @@ End Class
 
 
 
-Public Class NR_Structured_MultiSliceH : Inherits TaskParent
+Public Class XR_Structured_MultiSliceH : Inherits TaskParent
     Public heat As New HeatMap_Basics
     Public sliceMask As cv.Mat
     Dim options As New Options_Structured
@@ -193,7 +193,7 @@ End Class
 
 
 
-Public Class NR_Structured_SliceXPlot : Inherits TaskParent
+Public Class XR_Structured_SliceXPlot : Inherits TaskParent
     Dim multi As New Structured_MultiSlice
     Dim options As New Options_Structured
     Public Sub New()
@@ -231,7 +231,7 @@ End Class
 
 
 
-Public Class NR_Structured_SliceYPlot : Inherits TaskParent
+Public Class XR_Structured_SliceYPlot : Inherits TaskParent
     Dim multi As New Structured_MultiSlice
     Dim options As New Options_Structured
     Public Sub New()
@@ -335,7 +335,7 @@ End Class
 
 
 
-Public Class NR_Structured_TransformH : Inherits TaskParent
+Public Class XR_Structured_TransformH : Inherits TaskParent
     Dim options As New Options_Structured
     Dim histTop As New Projection_HistTop
     Public Sub New()
@@ -380,7 +380,7 @@ End Class
 
 
 
-Public Class NR_Structured_TransformV : Inherits TaskParent
+Public Class XR_Structured_TransformV : Inherits TaskParent
     Dim options As New Options_Structured
     Dim histSide As New Projection_HistSide
     Public Sub New()
@@ -427,7 +427,7 @@ End Class
 
 
 
-Public Class NR_Structured_CountSide : Inherits TaskParent
+Public Class XR_Structured_CountSide : Inherits TaskParent
     Dim slice As New Structured_SliceH
     Dim plot As New PlotBar_Basics
     Dim rotate As New Rotate_Basics
@@ -477,7 +477,7 @@ End Class
 
 
 
-Public Class NR_Structured_CountSideSum : Inherits TaskParent
+Public Class XR_Structured_CountSideSum : Inherits TaskParent
     Public counts As New List(Of Single)
     Public maxCountIndex As Integer
     Public yValues As New List(Of Single)
@@ -627,7 +627,7 @@ End Class
 
 
 
-Public Class NR_Structured_SurveyH : Inherits TaskParent
+Public Class XR_Structured_SurveyH : Inherits TaskParent
     Public Sub New()
         labels(2) = "Each slice represents point cloud pixels with the same Y-Range"
         labels(3) = "Y-Range - compressed to increase the size of each slice.  Use Y-range slider to adjust the size of each slice."
@@ -672,7 +672,7 @@ End Class
 
 
 
-Public Class NR_Structured_SurveyV : Inherits TaskParent
+Public Class XR_Structured_SurveyV : Inherits TaskParent
     Public Sub New()
         labels(2) = "Each slice represents point cloud pixels with the same X-Range"
         labels(3) = "X-Range - compressed to increase the size of each slice.  Use X-range slider to adjust the size of each slice."
@@ -718,7 +718,7 @@ End Class
 
 
 
-Public Class NR_Structured_MultiSlicePolygon : Inherits TaskParent
+Public Class XR_Structured_MultiSlicePolygon : Inherits TaskParent
     Dim multi As New Structured_MultiSlice
     Dim options As New Options_StructuredMulti
     Public Sub New()
@@ -807,7 +807,7 @@ End Class
 
 
 
-Public Class NR_Structured_MultiSliceV : Inherits TaskParent
+Public Class XR_Structured_MultiSliceV : Inherits TaskParent
     Public heat As New HeatMap_Basics
     Dim options As New Options_Structured
     Public Sub New()
@@ -847,7 +847,7 @@ End Class
 
 
 
-Public Class NR_Structured_LinearizeFloor : Inherits TaskParent
+Public Class XR_Structured_LinearizeFloor : Inherits TaskParent
     Public floor As New XO_Structured_FloorCeiling
     Dim kalman As New Kalman_VB_Basics
     Public sliceMask As cv.Mat

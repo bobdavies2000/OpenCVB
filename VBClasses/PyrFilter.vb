@@ -17,7 +17,7 @@ End Class
 
 
 
-Public Class NR_PyrFilter_RedCloud : Inherits TaskParent
+Public Class XR_PyrFilter_RedCloud : Inherits TaskParent
     Dim reduction As New Reduction_Basics
     Dim pyr As New PyrFilter_Basics_TA
     Dim redC As New RedCloud_Basics

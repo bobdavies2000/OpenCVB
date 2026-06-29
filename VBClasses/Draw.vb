@@ -301,7 +301,7 @@ End Class
 
 
 
-Public Class NR_Draw_ClipLine : Inherits TaskParent
+Public Class XR_Draw_ClipLine : Inherits TaskParent
     Dim flow As New Font_FlowText
     Dim pt1 As cv.Point
     Dim pt2 As cv.Point
@@ -386,7 +386,7 @@ End Class
 
 
 
-Public Class NR_Draw_LineTest : Inherits TaskParent
+Public Class XR_Draw_LineTest : Inherits TaskParent
     Dim line As New Draw_Line
     Public Sub New()
         desc = "Test the external use of the Draw_Line algorithm - provide 2 points and draw the line..."

@@ -58,7 +58,7 @@ End Class
 
 
 
-Public Class NR_ImageOffset_SliceH : Inherits TaskParent
+Public Class XR_ImageOffset_SliceH : Inherits TaskParent
     Dim iOff As New ImageOffset_Basics
     Dim plot As New PlotOpenCV_Points
     Dim options As New Options_SLR
@@ -120,7 +120,7 @@ End Class
 
 
 
-Public Class NR_ImageOffset_SliceV : Inherits TaskParent
+Public Class XR_ImageOffset_SliceV : Inherits TaskParent
     Dim iOff As New ImageOffset_Basics
     Dim plot As New PlotOpenCV_Points
     Dim options As New Options_SLR
@@ -179,7 +179,7 @@ End Class
 
 
 
-Public Class NR_ImageOffset_Cloud : Inherits TaskParent
+Public Class XR_ImageOffset_Cloud : Inherits TaskParent
     Public Sub New()
         desc = "Create a pointcloud with the results of the imageOffset slices"
     End Sub

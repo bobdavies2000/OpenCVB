@@ -35,7 +35,7 @@ End Class
 
 
 
-Public Class NR_Palette_Color : Inherits TaskParent
+Public Class XR_Palette_Color : Inherits TaskParent
     Dim options As New Options_Colors
     Public Sub New()
         desc = "Define a color Using sliders."
@@ -56,7 +56,7 @@ End Class
 
 
 
-Public Class NR_Palette_LinearPolar : Inherits TaskParent
+Public Class XR_Palette_LinearPolar : Inherits TaskParent
     Public rotateOptions As New Options_Resize
     Dim pt = New cv.Point2f(msRNG.Next(0, dst2.Cols - 1), msRNG.Next(0, dst2.Rows - 1))
     Public Sub New()
@@ -90,7 +90,7 @@ End Class
 
 
 
-Public Class NR_Palette_Reduction : Inherits TaskParent
+Public Class XR_Palette_Reduction : Inherits TaskParent
     Dim reduction As New Reduction_Basics
     Public Sub New()
         desc = "Map colors To different palette"
@@ -107,7 +107,7 @@ End Class
 
 
 
-Public Class NR_Palette_DrawTest : Inherits TaskParent
+Public Class XR_Palette_DrawTest : Inherits TaskParent
     Dim draw As New Draw_Shapes
     Public Sub New()
         desc = "Experiment With palette Using a drawn image"
@@ -122,7 +122,7 @@ End Class
 
 
 
-Public Class NR_Palette_Gradient : Inherits TaskParent
+Public Class XR_Palette_Gradient : Inherits TaskParent
     Public color1 As cv.Scalar
     Public color2 As cv.Scalar
     Public Sub New()
@@ -154,7 +154,7 @@ End Class
 
 
 
-Public Class NR_Palette_DepthColorMap : Inherits TaskParent
+Public Class XR_Palette_DepthColorMap : Inherits TaskParent
     Public gradientColorMap As New cv.Mat
     Dim gColor As New Gradient_Color
     Public Sub New()
@@ -203,11 +203,11 @@ End Class
 
 
 
-Public Class NR_Palette_RGBDepth : Inherits TaskParent
+Public Class XR_Palette_RGBDepth : Inherits TaskParent
     Dim gradientColorMap As New cv.Mat
     Dim gColor As New Gradient_Color
     Public Sub New()
-        desc = "Build a colormap that best shows the depth.  NOTE: duplicate of NR_Palette_DepthColorMap but no slider."
+        desc = "Build a colormap that best shows the depth.  NOTE: duplicate of XR_Palette_DepthColorMap but no slider."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If task.optionsChanged Then
@@ -240,7 +240,7 @@ End Class
 
 
 
-Public Class NR_Palette_Layout2D : Inherits TaskParent
+Public Class XR_Palette_Layout2D : Inherits TaskParent
     Public Sub New()
         desc = "Layout the available colors in a 2D grid"
     End Sub
@@ -261,7 +261,7 @@ End Class
 
 
 
-Public Class NR_Palette_LeftRightImages : Inherits TaskParent
+Public Class XR_Palette_LeftRightImages : Inherits TaskParent
     Public Sub New()
         desc = "Use a palette with the left and right images."
     End Sub
@@ -270,7 +270,7 @@ Public Class NR_Palette_LeftRightImages : Inherits TaskParent
         dst3 = Palettize(task.rightView.ConvertScaleAbs)
     End Sub
 End Class
-Public Class NR_Palette_TaskColors : Inherits TaskParent
+Public Class XR_Palette_TaskColors : Inherits TaskParent
     Dim direction = 1
     Public Sub New()
         labels = {"", "", "ScalarColors", "VecColors"}
@@ -296,7 +296,7 @@ End Class
 
 
 
-Public Class NR_Palette_Create : Inherits TaskParent
+Public Class XR_Palette_Create : Inherits TaskParent
     Dim schemes() As FileInfo
     Dim schemeName As String
     Dim colorGrad As New cv.Mat
@@ -472,7 +472,7 @@ End Class
 
 
 
-Public Class NR_Palette_GrayToColor : Inherits TaskParent
+Public Class XR_Palette_GrayToColor : Inherits TaskParent
     Public Sub New()
         desc = "Build a palette for the current image using samples from each gray level.  Everything turns out sepia-like."
     End Sub
@@ -512,7 +512,7 @@ End Class
 
 
 
-Public Class NR_Palette_Bin4Way : Inherits TaskParent
+Public Class XR_Palette_Bin4Way : Inherits TaskParent
     Dim binary As New Bin4Way_SplitMean
     Public classCount As Integer
     Dim tiers As New Depth_Tiers
@@ -625,7 +625,7 @@ End Class
 
 
 
-Public Class NR_Palette_RandomWithBlack : Inherits TaskParent
+Public Class XR_Palette_RandomWithBlack : Inherits TaskParent
     Public whitebackground As Boolean
     Public colorMap As New cv.Mat
     Public Sub New()

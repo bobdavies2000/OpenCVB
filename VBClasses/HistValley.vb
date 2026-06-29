@@ -254,7 +254,7 @@ End Class
 
 
 
-Public Class NR_HistValley_Test : Inherits TaskParent
+Public Class XR_HistValley_Test : Inherits TaskParent
     Public valleyOrder As New SortedList(Of Integer, Integer)(New compareAllowIdenticalInteger)
     Public options As New Options_Boundary
     Dim kalmanHist As New Histogram_Kalman
@@ -367,7 +367,7 @@ End Class
 
 
 
-Public Class NR_HistValley_Diff : Inherits TaskParent
+Public Class XR_HistValley_Diff : Inherits TaskParent
     Dim diff As New Diff_Basics
     Dim valley As New HistValley_FromPeaks
     Public Sub New()
@@ -390,7 +390,7 @@ End Class
 
 
 
-Public Class NR_HistValley_EdgeDraw : Inherits TaskParent
+Public Class XR_HistValley_EdgeDraw : Inherits TaskParent
     Dim valley As New HistValley_FromPeaks
     Dim edgeline As New EdgeLine_Basics
     Public Sub New()
@@ -415,7 +415,7 @@ End Class
 
 
 
-Public Class NR_HistValley_Simple : Inherits TaskParent
+Public Class XR_HistValley_Simple : Inherits TaskParent
     Dim trends As New SLR_Trends
     Public depthRegions As New List(Of Integer)
     Dim kalman As New Kalman_Basics
@@ -467,7 +467,7 @@ End Class
 
 
 
-Public Class NR_HistValley_Tiers : Inherits TaskParent
+Public Class XR_HistValley_Tiers : Inherits TaskParent
     Dim valleys As New HistValley_FromPeaks
     Public Sub New()
         labels = {"", "", "CV_8U tier map with values ranging from 0 to the desired valley count", "ShowPalette output of dst2."}
@@ -496,7 +496,7 @@ End Class
 
 
 
-Public Class NR_HistValley_Colors : Inherits TaskParent
+Public Class XR_HistValley_Colors : Inherits TaskParent
     Dim hist As New Histogram_Kalman
     Dim auto As New OpAuto_Valley
     Dim splitIndex As Integer
@@ -533,7 +533,7 @@ End Class
 
 
 
-Public Class NR_HistValley_GrayKalman : Inherits TaskParent
+Public Class XR_HistValley_GrayKalman : Inherits TaskParent
     Dim hist As New Histogram_Kalman
     Dim auto As New OpAuto_Valley
     Dim kalman As New Kalman_Basics
@@ -574,7 +574,7 @@ End Class
 
 
 
-Public Class NR_HistValley_GrayScale1 : Inherits TaskParent
+Public Class XR_HistValley_GrayScale1 : Inherits TaskParent
     Dim hist As New Histogram_Basics
     Public Sub New()
         If standalone Then task.gOptions.setHistogramBins(255)

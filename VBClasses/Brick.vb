@@ -86,7 +86,7 @@ End Class
 
 
 
-Public Class NR_Brick_FullDepth : Inherits TaskParent
+Public Class XR_Brick_FullDepth : Inherits TaskParent
     Dim bricks As New Brick_Basics
     Public Sub New()
         labels(2) = "Left image bricks - no overlap.  Click in any column to highlight that column."
@@ -122,7 +122,7 @@ End Class
 
 
 
-Public Class NR_Brick_InstantUpdate : Inherits TaskParent
+Public Class XR_Brick_InstantUpdate : Inherits TaskParent
     Dim bricks As New Brick_Basics
     Public Sub New()
         bricks.instantUpdate = True
@@ -147,7 +147,7 @@ End Class
 
 
 
-Public Class NR_Brick_CorrelationInput : Inherits TaskParent
+Public Class XR_Brick_CorrelationInput : Inherits TaskParent
     Dim bricks As New Brick_Basics
     Dim LRMeanSub As New MeanSubtraction_LeftRight
     Public Sub New()
@@ -181,7 +181,7 @@ End Class
 
 
 
-Public Class NR_Brick_Info : Inherits TaskParent
+Public Class XR_Brick_Info : Inherits TaskParent
     Dim bricks As New Brick_Basics
     Public Sub New()
         task.clickPoint = New cv.Point(dst2.Width / 2, dst2.Height / 2)
@@ -218,7 +218,7 @@ End Class
 
 
 
-Public Class NR_Brick_LeftToColor : Inherits TaskParent
+Public Class XR_Brick_LeftToColor : Inherits TaskParent
     Dim bricks As New Brick_Basics
     Public Sub New()
         If task.Settings.cameraName.StartsWith("Intel(R) RealSense(TM) Depth Camera") Then task.gOptions.gravityPointCloud.Checked = False
@@ -287,7 +287,7 @@ End Class
 
 
 
-Public Class NR_Brick_RGBtoLeft : Inherits TaskParent
+Public Class XR_Brick_RGBtoLeft : Inherits TaskParent
     Dim bricks As New Brick_Basics
     Public Sub New()
         labels(3) = "Right camera image..."
@@ -328,7 +328,7 @@ End Class
 
 
 
-Public Class NR_Brick_CloudMaxVal : Inherits TaskParent
+Public Class XR_Brick_CloudMaxVal : Inherits TaskParent
     Dim bricks As New Brick_Basics
     Dim template As New Math_Intrinsics
     Public Sub New()
@@ -368,7 +368,7 @@ End Class
 
 
 
-Public Class NR_Brick_CloudMean : Inherits TaskParent
+Public Class XR_Brick_CloudMean : Inherits TaskParent
     Dim bricks As New Brick_Basics
     Dim template As New Math_Intrinsics
     Public Sub New()
@@ -406,7 +406,7 @@ End Class
 
 
 
-Public Class NR_Brick_CloudRange : Inherits TaskParent
+Public Class XR_Brick_CloudRange : Inherits TaskParent
     Dim bricks As New Brick_Basics
     Dim template As New Math_Intrinsics
     Public Sub New()
@@ -451,9 +451,9 @@ End Class
 
 
 
-Public Class NR_Brick_FeaturesAndEdges : Inherits TaskParent
+Public Class XR_Brick_FeaturesAndEdges : Inherits TaskParent
     Dim bricks As New Brick_Basics
-    Public feat As New NR_Brick_EdgeFlips
+    Public feat As New XR_Brick_EdgeFlips
     Public boundaryCells As New List(Of List(Of Integer))
     Public Sub New()
         labels(2) = "Gray and black regions are featureless while white has features..."
@@ -503,10 +503,10 @@ End Class
 
 
 
-Public Class NR_Brick_MLColor : Inherits TaskParent
+Public Class XR_Brick_MLColor : Inherits TaskParent
     Dim bricks As New Brick_Basics
     Dim ml As New ML_Basics
-    Dim bounds As New NR_Brick_FeaturesAndEdges
+    Dim bounds As New XR_Brick_FeaturesAndEdges
     Public Sub New()
         If standalone Then task.gOptions.displayDst1.Checked = True
         ml.buildEveryPass = True
@@ -578,7 +578,7 @@ End Class
 
 
 
-Public Class NR_Brick_CorrelationMap : Inherits TaskParent
+Public Class XR_Brick_CorrelationMap : Inherits TaskParent
     Dim bricks As New Brick_Basics
     Public Sub New()
         labels(3) = "The map to identify each r's depth."
@@ -666,7 +666,7 @@ End Class
 
 
 
-Public Class NR_Brick_EdgeFlips : Inherits TaskParent
+Public Class XR_Brick_EdgeFlips : Inherits TaskParent
     Dim bricks As New Brick_Basics
     Public featureRects As New List(Of cv.Rect)
     Public featureMask As New cv.Mat
@@ -742,7 +742,7 @@ End Class
 
 
 
-Public Class NR_Brick_Edges : Inherits TaskParent
+Public Class XR_Brick_Edges : Inherits TaskParent
     Dim bricks As New Brick_Basics
     Dim options As New Options_LeftRightCorrelation
     Public Sub New()
@@ -771,7 +771,7 @@ End Class
 
 
 
-Public Class NR_Brick_Lines : Inherits TaskParent
+Public Class XR_Brick_Lines : Inherits TaskParent
     Dim bricks As New Brick_Basics
     Dim lines As New Line_Basics
     Dim options As New Options_LeftRightCorrelation
@@ -808,7 +808,7 @@ End Class
 
 
 
-Public Class NR_Brick_HighRange : Inherits TaskParent
+Public Class XR_Brick_HighRange : Inherits TaskParent
     Dim bricks As New Brick_Basics
     Dim options As New Options_LeftRightCorrelation
     Public Sub New()
@@ -838,7 +838,7 @@ End Class
 
 
 
-Public Class NR_Brick_NoDepthLines : Inherits TaskParent
+Public Class XR_Brick_NoDepthLines : Inherits TaskParent
     Dim bricks As New Brick_Basics
     Dim lines As New Line_Basics
     Dim options As New Options_LeftRightCorrelation
@@ -1000,7 +1000,7 @@ End Class
 
 
 
-Public Class NR_Brick_Plot : Inherits TaskParent
+Public Class XR_Brick_Plot : Inherits TaskParent
     Dim bricks As New Brick_Basics
     Dim plotHist As New PlotBar_Basics
     Public Sub New()
@@ -1097,7 +1097,7 @@ End Class
 
 
 
-Public Class NR_Brick_Search : Inherits TaskParent
+Public Class XR_Brick_Search : Inherits TaskParent
     Dim lpList As New List(Of lpData)
     Public Sub New()
         task.fOptions.MatchCorrSlider.Value = 0.8

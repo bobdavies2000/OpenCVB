@@ -76,7 +76,7 @@ Namespace VBClasses
 
 
 
-    Public Class NR_KeyColor_Contours : Inherits TaskParent
+    Public Class XR_KeyColor_Contours : Inherits TaskParent
         Public keyList As New List(Of keyData)
         Public keyMap As New cv.Mat(task.workRes, cv.MatType.CV_8U, 0)
         Dim edgeline As New EdgeLine_KeyColorOnly
@@ -137,9 +137,9 @@ Namespace VBClasses
 
 
 
-    Public Class NR_KeyColor_OverDepth : Inherits TaskParent
+    Public Class XR_KeyColor_OverDepth : Inherits TaskParent
         Dim redC As New RedCloud_Basics
-        Dim keyColors As New NR_KeyColor_Contours
+        Dim keyColors As New XR_KeyColor_Contours
         Public Sub New()
             dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
             desc = "Overlay the KeyColor_Contours cells on the reduced depth results."
@@ -169,9 +169,9 @@ Namespace VBClasses
 
 
 
-    Public Class NR_KeyColor_OverColor : Inherits TaskParent
+    Public Class XR_KeyColor_OverColor : Inherits TaskParent
         Dim redC As New RedColor_Basics
-        Dim keyColors As New NR_KeyColor_Contours
+        Dim keyColors As New XR_KeyColor_Contours
         Public Sub New()
             dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
             desc = "Overlay the KeyColor_Contours cells on the reduced color results."
@@ -201,10 +201,10 @@ Namespace VBClasses
 
 
 
-    Public Class NR_KeyColor_Straight : Inherits TaskParent
+    Public Class XR_KeyColor_Straight : Inherits TaskParent
         Public rcList As New List(Of rcData)
         Public rcMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-        Dim keyColors As New NR_KeyColor_Contours
+        Dim keyColors As New XR_KeyColor_Contours
         Public Sub New()
             dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
             desc = "Convert the keyList into an rcList"

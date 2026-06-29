@@ -1,6 +1,6 @@
 Imports cv = OpenCvSharp
 ' https://en.wikipedia.org/wiki/Scatter_matrix
-Public Class NR_ScatterMatrix_Example : Inherits TaskParent
+Public Class XR_ScatterMatrix_Example : Inherits TaskParent
     Dim data(,) As Double
     Dim meanVector As Double()
     Public Sub New()

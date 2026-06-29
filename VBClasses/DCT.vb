@@ -29,7 +29,7 @@ End Class
 
 
 
-Public Class NR_DCT_RGB : Inherits TaskParent
+Public Class XR_DCT_RGB : Inherits TaskParent
     Public dct As New DCT_Basics
     Public Sub New()
         labels(3) = "Difference from original"
@@ -64,7 +64,7 @@ End Class
 
 
 
-Public Class NR_DCT_Depth : Inherits TaskParent
+Public Class XR_DCT_Depth : Inherits TaskParent
     Dim dct As New DCT_Basics
     Public Sub New()
         labels(3) = "Subtract DCT inverse from Grayscale depth"
@@ -133,7 +133,7 @@ End Class
 
 
 
-Public Class NR_DCT_Surfaces_debug : Inherits TaskParent
+Public Class XR_DCT_Surfaces_debug : Inherits TaskParent
     Dim mats As New Mat_4to1
     Dim dct As New DCT_FeatureLess
     Dim flow As New Font_FlowText

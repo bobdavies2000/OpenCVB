@@ -46,7 +46,7 @@ End Class
 
 
 ' https://www.csharpcodi.com/csharp-examples/OpenCvSharp.ConnectedComponents.RenderBlobs(OpenCvSharp.Mat)/
-Public Class NR_CComp_Shapes : Inherits TaskParent
+Public Class XR_CComp_Shapes : Inherits TaskParent
     Dim shapes As cv.Mat
     Dim mats As New Mat_4Click
     Public Sub New()
@@ -113,7 +113,7 @@ End Class
 
 
 
-Public Class NR_CComp_Hulls : Inherits TaskParent
+Public Class XR_CComp_Hulls : Inherits TaskParent
     Dim ccomp As New CComp_Both
     Dim hulls As New RedColor_Hulls
     Public Sub New()

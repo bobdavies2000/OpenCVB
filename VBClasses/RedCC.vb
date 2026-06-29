@@ -99,7 +99,7 @@ End Class
 
 
 
-Public Class NR_RedCC_Merge : Inherits TaskParent
+Public Class XR_RedCC_Merge : Inherits TaskParent
     Public redC As New RedCloud_Basics
     Public color8u As New Color8U_Basics
     Public Sub New()
@@ -131,7 +131,7 @@ End Class
 
 
 
-Public Class NR_RedCC_CellHistogram : Inherits TaskParent
+Public Class XR_RedCC_CellHistogram : Inherits TaskParent
     Dim plot As New PlotBar_Basics
     Dim redCC As New RedCC_Basics
     Public Sub New()

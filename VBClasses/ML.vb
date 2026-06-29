@@ -141,9 +141,9 @@ End Class
 
 
 
-Public Class NR_Brick_MLColorDepth : Inherits TaskParent
+Public Class XR_Brick_MLColorDepth : Inherits TaskParent
     Dim ml As New ML_Basics
-    Dim bounds As New NR_Brick_FeaturesAndEdges
+    Dim bounds As New XR_Brick_FeaturesAndEdges
     Public Sub New()
         If standalone Then task.gOptions.displayDst1.Checked = True
         ml.buildEveryPass = True
@@ -217,7 +217,7 @@ End Class
 
 
 
-Public Class NR_ML_DepthFromColor : Inherits TaskParent
+Public Class XR_ML_DepthFromColor : Inherits TaskParent
     Implements IDisposable
     Dim colorPal As New DepthColorizer_Basics_TA
     Dim mats As New Mat_4Click
@@ -281,7 +281,7 @@ End Class
 
 
 
-Public Class NR_ML_DepthFromXYColor : Inherits TaskParent
+Public Class XR_ML_DepthFromXYColor : Inherits TaskParent
     Implements IDisposable
     Dim mats As New Mat_4to1
     Dim resizer As New Resize_Smaller
@@ -373,7 +373,7 @@ Public Structure mlColor
 End Structure
 
 
-Public Class NR_ML_Color2Depth : Inherits TaskParent
+Public Class XR_ML_Color2Depth : Inherits TaskParent
     Implements IDisposable
     Dim color8U As New Color8U_Basics
     Dim rtree As RTrees
@@ -448,7 +448,7 @@ End Structure
 
 
 
-Public Class NR_ML_ColorInTier2Depth : Inherits TaskParent
+Public Class XR_ML_ColorInTier2Depth : Inherits TaskParent
     Implements IDisposable
     Dim color8U As New Color8U_Basics
     Dim rtree As RTrees

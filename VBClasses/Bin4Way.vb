@@ -103,7 +103,7 @@ End Class
 
 
 
-Public Class NR_Bin4Way_Edges : Inherits TaskParent
+Public Class XR_Bin4Way_Edges : Inherits TaskParent
     Dim edges As New Edge_Basics_TA
     Dim binary As New Bin4Way_SplitMean
     Dim mats As New Mat_4Click
@@ -179,7 +179,7 @@ End Class
 
 
 
-Public Class NR_Bin4Way_Unstable1 : Inherits TaskParent
+Public Class XR_Bin4Way_Unstable1 : Inherits TaskParent
     Dim binary As New Bin4Way_SplitMean
     Dim diff As New Diff_Basics
     Public Sub New()
@@ -227,7 +227,7 @@ End Class
 
 
 
-Public Class NR_Bin4Way_UnstablePixels : Inherits TaskParent
+Public Class XR_Bin4Way_UnstablePixels : Inherits TaskParent
     Dim unstable As New Bin4Way_UnstableEdges
     Public gapValues As New List(Of Byte)
     Public Sub New()
@@ -288,7 +288,7 @@ End Class
 
 
 
-Public Class NR_Bin4Way_SplitValley : Inherits TaskParent
+Public Class XR_Bin4Way_SplitValley : Inherits TaskParent
     Dim binary As New Binarize_Simple
     Dim valley As New HistValley_Basics
     Public mats As New Mat_4Click
@@ -392,8 +392,8 @@ End Class
 
 
 
-Public Class NR_Bin4Way_SplitGaps : Inherits TaskParent
-    Dim unstable As New NR_Bin4Way_UnstablePixels
+Public Class XR_Bin4Way_SplitGaps : Inherits TaskParent
+    Dim unstable As New XR_Bin4Way_UnstablePixels
     Public mats As New Mat_4Click
     Dim diff(3) As Diff_Basics
     Public Sub New()
@@ -434,7 +434,7 @@ End Class
 
 
 
-Public Class NR_Bin4Way_RegionsLeftRight : Inherits TaskParent
+Public Class XR_Bin4Way_RegionsLeftRight : Inherits TaskParent
     Dim binaryLeft As New Bin4Way_SplitMean
     Dim binaryRight As New Bin4Way_SplitMean
     Public classCount = 4 ' 4-way split
@@ -471,7 +471,7 @@ End Class
 
 
 
-Public Class NR_Bin4Way_Regions1 : Inherits TaskParent
+Public Class XR_Bin4Way_Regions1 : Inherits TaskParent
     Dim binary As New Binarize_Simple
     Public mats As New Mat_4Click
     Public classCount = 4 ' 4-way split 
@@ -503,7 +503,7 @@ End Class
 
 
 
-Public Class NR_Bin4Way_BasicsColors : Inherits TaskParent
+Public Class XR_Bin4Way_BasicsColors : Inherits TaskParent
     Dim bin4 As New Bin4Way_Basics
     Dim color8U As New Color8U_Basics
     Public Sub New()

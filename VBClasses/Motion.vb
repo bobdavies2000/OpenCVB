@@ -110,7 +110,7 @@ End Class
 
 
 
-Public Class NR_Motion_Basics : Inherits TaskParent
+Public Class XR_Motion_Basics : Inherits TaskParent
     Public motionSort As New List(Of Integer)
     Public diff As New Diff_Basics
     Public motionMask As cv.Mat = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 255)
@@ -175,7 +175,7 @@ End Class
 
 
 
-Public Class NR_Motion_ValidateRight : Inherits TaskParent
+Public Class XR_Motion_ValidateRight : Inherits TaskParent
     Dim diff As New Diff_Basics
     Dim motionRight As New Motion_Right
     Public Sub New()

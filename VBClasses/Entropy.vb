@@ -97,7 +97,7 @@ End Class
 
 
 
-Public Class NR_Entropy_FAST : Inherits TaskParent
+Public Class XR_Entropy_FAST : Inherits TaskParent
     Dim fast As New Corner_Basics
     Dim entropy As New Entropy_Highest
     Public Sub New()
@@ -163,7 +163,7 @@ End Class
 
 
 
-Public Class NR_Entropy_SubDivisions : Inherits TaskParent
+Public Class XR_Entropy_SubDivisions : Inherits TaskParent
     Dim entropy As New Entropy_Rectangle
     Dim entropies As New List(Of List(Of Single))
     Dim eROI As New List(Of List(Of cv.Rect))
@@ -256,7 +256,7 @@ End Class
 
 
 
-Public Class NR_Entropy_BinaryImage : Inherits TaskParent
+Public Class XR_Entropy_BinaryImage : Inherits TaskParent
     Dim binary As New Binarize_Simple
     Dim entropy As New Entropy_Basics
     Public Sub New()

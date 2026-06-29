@@ -116,7 +116,7 @@ End Class
 
 
 
-Public Class NR_Hist3Dcolor_ZeroGroups : Inherits TaskParent
+Public Class XR_Hist3Dcolor_ZeroGroups : Inherits TaskParent
     Public maskInput As New cv.Mat
     Public classCount As Integer
     Public histogram As New cv.Mat
@@ -203,7 +203,7 @@ End Class
 
 
 
-Public Class NR_Hist3Dcolor_Select : Inherits TaskParent
+Public Class XR_Hist3Dcolor_Select : Inherits TaskParent
     Dim hColor As New Hist3Dcolor_Basics
     Public Sub New()
         labels(3) = "The highlighted pixels are in the selected bin"
@@ -232,7 +232,7 @@ End Class
 
 
 
-Public Class NR_Hist3Dcolor_Basics_CPP : Inherits TaskParent
+Public Class XR_Hist3Dcolor_Basics_CPP : Inherits TaskParent
     Public histogram As New cv.Mat
     Public prepareImage As Boolean = True
     Public histogram1D As New cv.Mat
@@ -280,7 +280,7 @@ End Class
 
 
 
-Public Class NR_Hist3Dcolor_Diff : Inherits TaskParent
+Public Class XR_Hist3Dcolor_Diff : Inherits TaskParent
     Dim hColor As New Hist3Dcolor_Basics
     Dim diff As New Diff_Basics
     Public Sub New()

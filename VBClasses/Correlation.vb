@@ -168,7 +168,7 @@ End Class
 
 
 
-Public Class NR_Correlation_Basics : Inherits TaskParent
+Public Class XR_Correlation_Basics : Inherits TaskParent
     Dim kFlood As New KMeans_Edges
     Dim options As New Options_FeatureMatch
     Public Sub New()

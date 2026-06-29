@@ -118,7 +118,7 @@ End Class
 
 
 
-Public Class NR_Filter_NormalizedKernel : Inherits TaskParent
+Public Class XR_Filter_NormalizedKernel : Inherits TaskParent
     Dim options As New Options_FilterNorm
     Public Sub New()
         desc = "Create a normalized kernel and use it."
@@ -143,7 +143,7 @@ End Class
 
 
 ' https://docs.opencvb.org/2.4/doc/tutorials/imgproc/imgtrans/filter_2d/filter_2d.html
-Public Class NR_Filter_Normalized2D : Inherits TaskParent
+Public Class XR_Filter_Normalized2D : Inherits TaskParent
     Dim options As New Options_Filter
     Public Sub New()
         desc = "Create and apply a normalized kernel."
@@ -165,7 +165,7 @@ End Class
 
 
 'https://www.cc.gatech.edu/classes/AY2015/cs4475_summer/documents/smoothing_separable.py
-Public Class NR_Filter_SepFilter2D : Inherits TaskParent
+Public Class XR_Filter_SepFilter2D : Inherits TaskParent
     Dim options As New Options_SepFilter2D
     Public Sub New()
         labels(2) = "Gaussian Blur result"
@@ -193,7 +193,7 @@ End Class
 
 
 ' https://datamahadev.com/filters-in-image-processing-using-opencv/
-Public Class NR_Filter_Minimum : Inherits TaskParent
+Public Class XR_Filter_Minimum : Inherits TaskParent
     Dim options As New Options_Filter
     Public Sub New()
         desc = "Implement the Minimum Filter - use minimum value in kernel"
@@ -212,7 +212,7 @@ End Class
 
 
 ' https://datamahadev.com/filters-in-image-processing-using-opencv/
-Public Class NR_Filter_Maximum : Inherits TaskParent
+Public Class XR_Filter_Maximum : Inherits TaskParent
     Dim options As New Options_Filter
     Public Sub New()
         desc = "Implement the Maximum Filter - use maximum value in kernel"
@@ -231,7 +231,7 @@ End Class
 
 
 ' https://datamahadev.com/filters-in-image-processing-using-opencv/
-Public Class NR_Filter_Mean : Inherits TaskParent
+Public Class XR_Filter_Mean : Inherits TaskParent
     Dim options As New Options_Filter
     Public Sub New()
         desc = "Implement the Mean Filter - use mean value in kernel"
@@ -250,7 +250,7 @@ End Class
 
 
 ' https://datamahadev.com/filters-in-image-processing-using-opencv/
-Public Class NR_Filter_Median : Inherits TaskParent
+Public Class XR_Filter_Median : Inherits TaskParent
     Dim options As New Options_Filter
     Public Sub New()
         desc = "Implement the Median Filter - use median value in kernel"

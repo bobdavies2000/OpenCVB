@@ -149,7 +149,7 @@ End Class
 
 
 
-Public Class NR_Derivative_Sobel1 : Inherits TaskParent
+Public Class XR_Derivative_Sobel1 : Inherits TaskParent
     Dim deriv As New Derivative_Sobel
     Public Sub New()
         If standalone Then task.gOptions.displayDst1.Checked = True
@@ -183,7 +183,7 @@ End Class
 
 
 
-Public Class NR_Derivative_Laplacian : Inherits TaskParent
+Public Class XR_Derivative_Laplacian : Inherits TaskParent
     Dim options As New Options_LaplacianKernels
     Dim deriv As New Derivative_Sobel
     Public Sub New()
@@ -210,7 +210,7 @@ End Class
 
 
 
-Public Class NR_Derivative_Classes : Inherits TaskParent
+Public Class XR_Derivative_Classes : Inherits TaskParent
     Dim deriv As New Derivative_Sobel
     Public classCountX As Integer
     Public classCountY As Integer

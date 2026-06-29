@@ -27,7 +27,7 @@ End Class
 
 
 
-Public Class NR_Salience_Basics_MT : Inherits TaskParent
+Public Class XR_Salience_Basics_MT : Inherits TaskParent
     Dim salience As New Salience_Basics_CPP
     Public Sub New()
         OptionParent.FindSlider("Salience numScales").Value = 2

@@ -51,7 +51,7 @@ End Class
 
 
 
-Public Class NR_AddWeighted_DepthAccumulate : Inherits TaskParent
+Public Class XR_AddWeighted_DepthAccumulate : Inherits TaskParent
     Dim options As New Options_AddWeighted
     Public Sub New()
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_32F, 0)
@@ -72,7 +72,7 @@ End Class
 
 
 
-Public Class NR_AddWeighted_InfraRed : Inherits TaskParent
+Public Class XR_AddWeighted_InfraRed : Inherits TaskParent
     Public Sub New()
         desc = "Align the depth data with the left or right view.  Oak-D is aligned with the right image.  Some cameras are not close to aligned."
     End Sub
@@ -95,7 +95,7 @@ End Class
 
 
 
-Public Class NR_AddWeighted_Edges : Inherits TaskParent
+Public Class XR_AddWeighted_Edges : Inherits TaskParent
     Public Sub New()
         desc = "Add in the edges separating light and dark to the color image"
     End Sub
@@ -113,7 +113,7 @@ End Class
 
 
 
-Public Class NR_AddWeighted_LeftRight : Inherits TaskParent
+Public Class XR_AddWeighted_LeftRight : Inherits TaskParent
     Public Sub New()
         desc = "Use AddWeighted to add the left and right images."
     End Sub

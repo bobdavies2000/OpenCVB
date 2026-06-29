@@ -2698,7 +2698,7 @@ Namespace VBClasses
 
     Public Class XO_Brick_FeatureGaps : Inherits TaskParent
         Dim bricks As New Brick_Basics
-        Dim feat As New NR_BrickPoint_Features
+        Dim feat As New XR_BrickPoint_Features
         Dim gaps As New XO_Region_Gaps
         Public Sub New()
             labels(2) = "The output of Brick_Gaps overlaid with the output of the Brick_Features"
@@ -8479,7 +8479,7 @@ Namespace VBClasses
 
     Public Class XO_Line_GravityToLongest : Inherits TaskParent
         Dim kalman As New Kalman_Basics
-        Dim matchLine As New NR_LineTrack_Correlation
+        Dim matchLine As New XR_LineTrack_Correlation
         Public Sub New()
             desc = "Highlight both vertical and horizontal lines"
         End Sub
@@ -9916,7 +9916,7 @@ Namespace VBClasses
 
     Public Class XO_RedCloud_PrepEdgesXY : Inherits TaskParent
         Dim prep As New RedPrep_Depth
-        Dim redMask As New NR_RedFlood_Basics
+        Dim redMask As New XR_RedFlood_Basics
         Dim cellGen As New RedFlood_ToRedColor
         Public Sub New()
             dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
@@ -12678,7 +12678,7 @@ Namespace VBClasses
     Public Class XO_Flood_BasicsMaskOld : Inherits TaskParent
         Public inputRemoved As cv.Mat
         Public cellGen As New RedFlood_ToRedColor
-        Dim redMask As New NR_RedFlood_Basics
+        Dim redMask As New XR_RedFlood_Basics
         Public buildinputRemoved As Boolean
         Public showSelected As Boolean = True
         Dim color8U As New Color8U_Basics
@@ -14783,7 +14783,7 @@ Namespace VBClasses
 
 
     Public Class XO_Line_LeftRightMotionMatch : Inherits TaskParent
-        Dim lrLines As New NR_Line_LeftRightMotion
+        Dim lrLines As New XR_Line_LeftRightMotion
         Public lp As New lpData
         Public lpOutput As New lpData
         Public Sub New()
@@ -14822,7 +14822,7 @@ Namespace VBClasses
 
 
     Public Class XO_Line_LeftRightMotionMatch3 : Inherits TaskParent
-        Dim lrLines As New NR_Line_LeftRightMotion
+        Dim lrLines As New XR_Line_LeftRightMotion
         Public lp As New lpData
         Public lpOutput As New List(Of lpData)
         Public Sub New()
@@ -15790,7 +15790,7 @@ Namespace VBClasses
     Public Class XO_RedFlood_Flippers : Inherits TaskParent
         Public flipCells As New List(Of rcData)
         Public nonFlipCells As New List(Of rcData)
-        Dim redMask As New NR_RedFlood_Basics
+        Dim redMask As New XR_RedFlood_Basics
         Public Sub New()
             If standalone Then task.gOptions.displayDst1.Checked = True
             labels(3) = "Highlighted below are the cells which flipped in color from the previous frame."
@@ -15884,7 +15884,7 @@ Namespace VBClasses
     Public Class XO_RedList_BasicsNew : Inherits TaskParent
         Public inputRemoved As cv.Mat
         Public cellGen As New RedFlood_ToRedColor
-        Public redMask As New NR_RedFlood_Basics
+        Public redMask As New XR_RedFlood_Basics
         Public rclist As New List(Of rcData)
         Public rcMap As cv.Mat ' redColor map 
         Public contours As New Contour_Basics
@@ -16882,8 +16882,8 @@ Namespace VBClasses
 
 
     Public Class XO_Line_LeftRightMotion1 : Inherits TaskParent
-        Public linesLeft As New NR_Line_BasicsOld
-        Public linesRight As New NR_Line_BasicsOld
+        Public linesLeft As New XR_Line_BasicsOld
+        Public linesRight As New XR_Line_BasicsOld
         Dim motionLeft As New Motion_Basics_TA
         Dim motionRight As New Motion_Basics_TA
         Public Sub New()
@@ -17055,7 +17055,7 @@ Namespace VBClasses
 
 
     Public Class XO_Line_Map : Inherits TaskParent
-        Dim lines As New NR_Line_BasicsOld
+        Dim lines As New XR_Line_BasicsOld
         Public lpList As New List(Of lpData)
         Dim options As New Options_LeftRightCorrelation
         Dim motionLeft As New Motion_Basics_TA
@@ -17093,7 +17093,7 @@ Namespace VBClasses
     Public Class XO_RedList_Basics : Inherits TaskParent
         Public inputRemoved As cv.Mat
         Public cellGen As New RedFlood_ToRedColor
-        Public redMask As New NR_RedFlood_Basics
+        Public redMask As New XR_RedFlood_Basics
         Public rclist As New List(Of rcData)
         Public rcMap As cv.Mat ' redColor map 
         Public contours As New Contour_Basics
@@ -17437,7 +17437,7 @@ Namespace VBClasses
 
 
     Public Class XO_Foreground_CellsBack : Inherits TaskParent
-        Dim fore As New NR_Foreground_Hist3D
+        Dim fore As New XR_Foreground_Hist3D
         Public rclist As New List(Of rcData)
         Public Sub New()
             desc = "Get the background cells"
@@ -17796,7 +17796,7 @@ Namespace VBClasses
 
 
     Public Class XO_Foreground_CellsFore : Inherits TaskParent
-        Dim fore As New NR_Foreground_Hist3D
+        Dim fore As New XR_Foreground_Hist3D
         Public rclist As New List(Of rcData)
         Public Sub New()
             desc = "Get the foreground cells"
@@ -18917,7 +18917,7 @@ Namespace VBClasses
 
 
     Public Class XO_Region_Contours : Inherits TaskParent
-        Public redM As New NR_RedFlood_Basics
+        Public redM As New XR_RedFlood_Basics
         Public connect As New Region_Rects
         Public Sub New()
             dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
@@ -20517,7 +20517,7 @@ Namespace VBClasses
 
 
     Public Class XO_Line_MotionOld : Inherits TaskParent
-        Dim lrLines As New NR_Line_LeftRightMotion
+        Dim lrLines As New XR_Line_LeftRightMotion
         Public Sub New()
             If standalone Then task.gOptions.showMotionMask.Checked = True
             desc = "Show lines with motion and lines with no motion in the leftView."

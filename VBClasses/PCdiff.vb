@@ -47,7 +47,7 @@ End Class
 
 
 
-Public Class NR_PCdiff_Edges : Inherits TaskParent
+Public Class XR_PCdiff_Edges : Inherits TaskParent
     Dim pcDiff As New PCdiff_Basics
     Public Sub New()
         task.gOptions.DebugSlider.Value = 0
@@ -153,7 +153,7 @@ End Class
 
 
 
-Public Class NR_PCdiff_GuidedBP : Inherits TaskParent
+Public Class XR_PCdiff_GuidedBP : Inherits TaskParent
     Dim points As New PCdiff_Points
     Dim backP As New GuidedBP_TopView
     Public Sub New()

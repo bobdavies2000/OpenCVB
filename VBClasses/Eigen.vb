@@ -1,5 +1,5 @@
 Imports cv = OpenCvSharp
-Public Class NR_Eigen_Basics : Inherits TaskParent
+Public Class XR_Eigen_Basics : Inherits TaskParent
     Public inputData() As Double
     Public Sub New()
         desc = "Solve a system of equations using OpenCV's EigenVV"
@@ -53,7 +53,7 @@ End Class
 
 
 ' http://www.cs.cmu.edu/~youngwoo/doc/lineFittingTest.cpp
-Public Class NR_Eigen_Fitline : Inherits TaskParent
+Public Class XR_Eigen_Fitline : Inherits TaskParent
     Dim noisyLine As New Eigen_Input
     Dim eigenVec As New cv.Mat(2, 2, cv.MatType.CV_32F, cv.Scalar.All(0)), eigenVal As New cv.Mat(2, 2, cv.MatType.CV_32F, cv.Scalar.All(0))
     Dim theta As Single, len As Single, m2 As Single

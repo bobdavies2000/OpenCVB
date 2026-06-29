@@ -89,7 +89,7 @@ End Class
 
 
 
-Public Class NR_RedFlood_Basics : Inherits TaskParent
+Public Class XR_RedFlood_Basics : Inherits TaskParent
     Implements IDisposable
     Public mdList As New List(Of maskData)
     Public classCount As Integer
@@ -149,8 +149,8 @@ End Class
 
 
 
-Public Class NR_RedFlood_Redraw : Inherits TaskParent
-    Public redMask As New NR_RedFlood_Basics
+Public Class XR_RedFlood_Redraw : Inherits TaskParent
+    Public redMask As New XR_RedFlood_Basics
     Public Sub New()
         desc = "Redraw the image using the mean color of each cell."
     End Sub
@@ -177,7 +177,7 @@ End Class
 
 Public Class RedFlood_Color : Inherits TaskParent
     Dim cellGen As New RedFlood_ToRedColor
-    Dim redMask As New NR_RedFlood_Basics
+    Dim redMask As New XR_RedFlood_Basics
     Public rclist As New List(Of rcData)
     Public rcMap As New cv.Mat ' redColor map 
     Dim contours As New Contour_Basics
@@ -227,7 +227,7 @@ End Class
 
 
 
-Public Class NR_RedFlood_CellDepthHistogram : Inherits TaskParent
+Public Class XR_RedFlood_CellDepthHistogram : Inherits TaskParent
     Dim plot As New PlotBar_Basics
     Dim redC As New RedCloud_Basics
     Public Sub New()
@@ -265,7 +265,7 @@ End Class
 
 
 
-Public Class NR_RedMark_Features : Inherits TaskParent
+Public Class XR_RedMark_Features : Inherits TaskParent
     Dim options As New Options_RedCloudFeatures
     Dim redC As New RedCloud_Basics
     Public Sub New()
@@ -329,7 +329,7 @@ End Class
 
 
 
-Public Class NR_RedFlood_Consistent : Inherits TaskParent
+Public Class XR_RedFlood_Consistent : Inherits TaskParent
     Dim redC As New RedCloud_Basics
     Public Sub New()
         dst1 = New cv.Mat(dst1.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
@@ -355,7 +355,7 @@ End Class
 
 
 
-Public Class NR_RedFlood_Hue : Inherits TaskParent
+Public Class XR_RedFlood_Hue : Inherits TaskParent
     Dim hue As New Color8U_Hue
     Dim redMask As New RedFlood_Color
     Public Sub New()
@@ -380,7 +380,7 @@ End Class
 
 
 
-Public Class NR_RedFlood_FourColor : Inherits TaskParent
+Public Class XR_RedFlood_FourColor : Inherits TaskParent
     Dim binar4 As New Bin4Way_Regions
     Dim redC As New RedColor_Basics
     Public Sub New()
@@ -405,7 +405,7 @@ End Class
 
 
 Public Class RedFlood_ToRedColor : Inherits TaskParent
-    Public redMask As New NR_RedFlood_Basics
+    Public redMask As New XR_RedFlood_Basics
     Public mdList As New List(Of maskData)
     Public rcList As New List(Of rcData)
     Public rcMap As New cv.Mat(dst2.Size, cv.MatType.CV_32S, 0)
@@ -449,7 +449,7 @@ End Class
 Public Class RedFlood_List : Inherits TaskParent
     Public inputRemoved As cv.Mat
     Public cellGen As New RedFlood_ToRedColor
-    Public redMask As New NR_RedFlood_Basics
+    Public redMask As New XR_RedFlood_Basics
     Public contours As New Contour_Basics
     Public rcMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
     Public rclist As New List(Of rcData)
@@ -561,7 +561,7 @@ End Class
 
 
 
-Public Class NR_RedFlood_KNN : Inherits TaskParent
+Public Class XR_RedFlood_KNN : Inherits TaskParent
     Public rcList As New List(Of rcData)
     Public rcMap As New cv.Mat(dst2.Size, cv.MatType.CV_32S, 0)
     Dim redCore As New RedFlood_CPP

@@ -53,7 +53,7 @@ End Class
 
 
 
-Public Class NR_GuidedBP_HotPointsKNN : Inherits TaskParent
+Public Class XR_GuidedBP_HotPointsKNN : Inherits TaskParent
     Dim ptHot As New GuidedBP_HotPoints
     Dim knnSide As New KNN_Basics
     Dim knnTop As New KNN_Basics
@@ -106,7 +106,7 @@ End Class
 
 
 
-Public Class NR_GuidedBP_PlanesPlot : Inherits TaskParent
+Public Class XR_GuidedBP_PlanesPlot : Inherits TaskParent
     Dim histSide As New Projection_HistSide
     Public Sub New()
         labels = {"", "", "Side view", "Plot of nonzero rows in the side view"}
@@ -153,7 +153,7 @@ End Class
 
 
 
-Public Class NR_GuidedBP_Lookup : Inherits TaskParent
+Public Class XR_GuidedBP_Lookup : Inherits TaskParent
     Dim guided As New GuidedBP_Basics
     Public Sub New()
         task.clickPoint = New cv.Point(dst2.Width / 2, dst2.Height / 2)
@@ -331,7 +331,7 @@ End Class
 
 
 
-Public Class NR_GuidedBP_Points : Inherits TaskParent
+Public Class XR_GuidedBP_Points : Inherits TaskParent
     Public hotPoints As New GuidedBP_Basics
     Public classCount As Integer
     Public selectedPoint As cv.Point

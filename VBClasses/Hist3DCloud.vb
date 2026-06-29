@@ -55,7 +55,7 @@ End Class
 
 
 
-Public Class NR_Hist3Dcloud_DepthSplit : Inherits TaskParent
+Public Class XR_Hist3Dcloud_DepthSplit : Inherits TaskParent
     Dim hist As List(Of Histogram_Kalman)
     Dim hist2d As List(Of Hist2D_Cloud)
     Dim mats1 As New Mat_4Click
@@ -95,7 +95,7 @@ End Class
 
 
 
-Public Class NR_Hist3Dcloud_Highlights : Inherits TaskParent
+Public Class XR_Hist3Dcloud_Highlights : Inherits TaskParent
     Public histogram As New cv.Mat
     Public ranges() As cv.Rangef
     Dim maskval As Integer
@@ -158,7 +158,7 @@ End Class
 
 
 
-Public Class NR_Hist3Dcloud_BP_Filter : Inherits TaskParent
+Public Class XR_Hist3Dcloud_BP_Filter : Inherits TaskParent
     Public histogram As New cv.Mat
     Dim options As New Options_HistXD
     Dim optionsEx As New Options_Hist3D

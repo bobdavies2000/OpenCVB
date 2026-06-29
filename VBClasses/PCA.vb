@@ -111,7 +111,7 @@ End Class
 
 
 
-Public Class NR_PCA_CellMask : Inherits TaskParent
+Public Class XR_PCA_CellMask : Inherits TaskParent
     Dim pca As New PCA_Mask
     Dim pcaPrep As New PCA_Prep_CPP
     Public Sub New()
@@ -187,7 +187,7 @@ End Class
 
 
 
-Public Class NR_PCA_Depth : Inherits TaskParent
+Public Class XR_PCA_Depth : Inherits TaskParent
     Dim pca As New PCA_Reconstruct
     Public Sub New()
         desc = "Reconstruct a depth stream as a composite of X images."
@@ -202,7 +202,7 @@ End Class
 
 
 ' https://docs.opencvb.org/3.1.0/d1/dee/tutorial_introduction_to_pca.html
-Public Class NR_PCA_DrawImage : Inherits TaskParent
+Public Class XR_PCA_DrawImage : Inherits TaskParent
     Dim pca As New PCA_Reconstruct
     Dim image As New cv.Mat
     Public Sub New()
@@ -918,7 +918,7 @@ End Class
 
 
 ' https://www.codeproject.com/Tips/5384047/Implementing-Principal-Component-Analysis-Image-Se
-Public Class NR_PCA_NColorPalettize : Inherits TaskParent
+Public Class XR_PCA_NColorPalettize : Inherits TaskParent
     Dim custom As New Palette_CustomColorMap
     Dim pcaPalette As New PCA_Palettize
     Dim answer(dst2.Width * dst2.Height - 1) As Byte

@@ -1,6 +1,6 @@
 Imports cv = OpenCvSharp
 ' https://github.com/epiception/SGM-Census
-Public Class NR_SemiGlobalMatching_CPP : Inherits TaskParent
+Public Class XR_SemiGlobalMatching_CPP : Inherits TaskParent
     Implements IDisposable
     Dim leftData(0) As Byte
     Dim rightData(0) As Byte

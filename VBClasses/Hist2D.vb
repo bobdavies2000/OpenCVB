@@ -68,7 +68,7 @@ End Class
 
 
 
-Public Class NR_Hist2D_Depth : Inherits TaskParent
+Public Class XR_Hist2D_Depth : Inherits TaskParent
     Dim hist2d As New Hist2D_Cloud
     Public channels() As Integer
     Public ranges() As cv.Rangef
@@ -98,7 +98,7 @@ End Class
 
 
 
-Public Class NR_Hist2D_Zoom : Inherits TaskParent
+Public Class XR_Hist2D_Zoom : Inherits TaskParent
     Dim hist2d As New Hist2D_Basics
     Dim zoom As New Magnify_Basics
     Public Sub New()
@@ -175,7 +175,7 @@ End Class
 
 
 
-Public Class NR_Hist2D_PlotHistogram1D : Inherits TaskParent
+Public Class XR_Hist2D_PlotHistogram1D : Inherits TaskParent
     Dim histogram As New cv.Mat
     Dim plotHist As New PlotBar_Basics
     Public Sub New()

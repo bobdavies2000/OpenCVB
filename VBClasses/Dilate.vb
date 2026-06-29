@@ -24,7 +24,7 @@ End Class
 
 
 
-Public Class NR_Dilate_OpenClose : Inherits TaskParent
+Public Class XR_Dilate_OpenClose : Inherits TaskParent
     Dim options As New Options_Dilate
     Public Sub New()
         desc = "Erode and dilate with MorphologyEx on the BGR and Depth image."
@@ -45,7 +45,7 @@ End Class
 
 
 
-Public Class NR_Dilate_Erode : Inherits TaskParent
+Public Class XR_Dilate_Erode : Inherits TaskParent
     Dim options As New Options_Dilate
     Public Sub New()
         desc = "Erode and dilate with MorphologyEx on the input image."

@@ -74,7 +74,7 @@ End Class
 
 
 
-Public Class NR_Histogram_Grayscale : Inherits TaskParent
+Public Class XR_Histogram_Grayscale : Inherits TaskParent
     Public hist As New Histogram_Basics
     Public Sub New()
         If standalone Then task.gOptions.setHistogramBins(255)
@@ -144,7 +144,7 @@ End Class
 
 
 
-Public Class NR_Histogram_NormalizeGray : Inherits TaskParent
+Public Class XR_Histogram_NormalizeGray : Inherits TaskParent
     Public hist As New Histogram_Basics
     Dim options As New Options_Histogram
     Public Sub New()
@@ -198,7 +198,7 @@ End Class
 
 
 
-Public Class NR_Histogram_ColorsAndGray : Inherits TaskParent
+Public Class XR_Histogram_ColorsAndGray : Inherits TaskParent
     Dim histogram As New Histogram_Basics
     Dim mats As New Mat_4Click
     Public Sub New()
@@ -229,7 +229,7 @@ End Class
 
 
 
-Public Class NR_Histogram_Frustrum : Inherits TaskParent
+Public Class XR_Histogram_Frustrum : Inherits TaskParent
     Dim heat As New HeatMap_Basics
     Public Sub New()
         If standalone Then task.gOptions.displayDst1.Checked = True
@@ -258,7 +258,7 @@ End Class
 
 
 
-Public Class NR_Histogram_PeakMax : Inherits TaskParent
+Public Class XR_Histogram_PeakMax : Inherits TaskParent
     Dim hist As New Histogram_Basics
     Dim options As New Options_Kalman
     Public Sub New()
@@ -398,7 +398,7 @@ End Class
 
 
 
-Public Class NR_Histogram_PeaksDepth : Inherits TaskParent
+Public Class XR_Histogram_PeaksDepth : Inherits TaskParent
     Dim peaks As New Histogram_PeakFinder
     Public Sub New()
         desc = "Find the peaks - columns taller that both neighbors - in the histogram"
@@ -420,7 +420,7 @@ End Class
 
 
 
-Public Class NR_Histogram_PeaksRGB : Inherits TaskParent
+Public Class XR_Histogram_PeaksRGB : Inherits TaskParent
     Public mats As New Mat_4Click
     Dim peaks(2) As Histogram_PeakFinder
     Public Sub New()
@@ -457,7 +457,7 @@ End Class
 
 
 
-Public Class NR_Histogram_Color : Inherits TaskParent
+Public Class XR_Histogram_Color : Inherits TaskParent
     Public histogram As New cv.Mat
     Public plotHist As New PlotBar_Basics
     Public ranges() As cv.Rangef
@@ -648,7 +648,7 @@ End Class
 
 
 
-Public Class NR_Histogram_ComparePlot : Inherits TaskParent
+Public Class XR_Histogram_ComparePlot : Inherits TaskParent
     Dim comp As New Histogram_CompareGray
     Dim ttLabels As New List(Of TrueText)
     Public Sub New()
@@ -678,7 +678,7 @@ End Class
 
 
 
-Public Class NR_Histogram_CompareNumber : Inherits TaskParent
+Public Class XR_Histogram_CompareNumber : Inherits TaskParent
     Dim comp As New Histogram_CompareGray
     Dim plot As New PlotTime_Scalar
     Public Sub New()
@@ -709,7 +709,7 @@ End Class
 
 
 ' https://study.marearts.com/2014/11/opencv-emdearth-mover-distance-example.html
-Public Class NR_Histogram_CompareEMD_hsv : Inherits TaskParent
+Public Class XR_Histogram_CompareEMD_hsv : Inherits TaskParent
     Dim hist As New Histogram_Basics
     Public Sub New()
         labels = {"", "", "Kalman-smoothed normalized histogram output", "Plot of the sum of the differences between recent normalized histograms"}
@@ -757,7 +757,7 @@ End Class
 
 
 
-Public Class NR_Histogram_Peaks : Inherits TaskParent
+Public Class XR_Histogram_Peaks : Inherits TaskParent
     Dim masks As New PlotMouse_MaskBackProject
     Public Sub New()
         desc = "Interactive Histogram"
@@ -775,7 +775,7 @@ End Class
 
 
 
-Public Class NR_Histogram_Lab : Inherits TaskParent
+Public Class XR_Histogram_Lab : Inherits TaskParent
     Dim hist As New Histogram_Basics
     Public Sub New()
         If standalone Then task.gOptions.displayDst1.Checked = True
@@ -805,7 +805,7 @@ End Class
 
 
 
-Public Class NR_Histogram_PointCloudXYZ : Inherits TaskParent
+Public Class XR_Histogram_PointCloudXYZ : Inherits TaskParent
     Public plotHist As New PlotBar_Basics
     Public Sub New()
         plotHist.createHistogram = True
@@ -855,7 +855,7 @@ End Class
 
 
 
-Public Class NR_Histogram_FlatSurfaces : Inherits TaskParent
+Public Class XR_Histogram_FlatSurfaces : Inherits TaskParent
     Dim masks As New PlotMouse_MaskBackProject
     Public Sub New()
         desc = "Find flat surfaces with the histogram"
@@ -892,7 +892,7 @@ End Class
 
 
 
-Public Class NR_Histogram_Gotcha2D : Inherits TaskParent
+Public Class XR_Histogram_Gotcha2D : Inherits TaskParent
     Public histogram As New cv.Mat
     Public Sub New()
         labels(2) = "ZY (Side View)"
@@ -927,7 +927,7 @@ End Class
 
 
 
-Public Class NR_Histogram_Gotcha : Inherits TaskParent
+Public Class XR_Histogram_Gotcha : Inherits TaskParent
     Public histogram As New cv.Mat
     Dim hist As New Histogram_Basics
     Public Sub New()
@@ -959,7 +959,7 @@ End Class
 
 
 
-Public Class NR_Histogram_GotchaFixed_CPP : Inherits TaskParent
+Public Class XR_Histogram_GotchaFixed_CPP : Inherits TaskParent
     Implements IDisposable
     Public Sub New()
         cPtr = Histogram_1D_Open()
@@ -993,7 +993,7 @@ End Class
 
 
 
-Public Class NR_Histogram_Byte_CPP : Inherits TaskParent
+Public Class XR_Histogram_Byte_CPP : Inherits TaskParent
     Implements IDisposable
     Public plotHist As New PlotBar_Basics
     Public Sub New()
@@ -1054,7 +1054,7 @@ End Class
 
 
 
-Public Class NR_Histogram_CloudX : Inherits TaskParent
+Public Class XR_Histogram_CloudX : Inherits TaskParent
     Dim histDim As New Histogram_Cloud
     Public Sub New()
         histDim.dimensionLabel = "X"
@@ -1071,7 +1071,7 @@ End Class
 
 
 
-Public Class NR_Histogram_CloudY : Inherits TaskParent
+Public Class XR_Histogram_CloudY : Inherits TaskParent
     Dim histDim As New Histogram_Cloud
     Public Sub New()
         histDim.dimensionLabel = "Y"
@@ -1088,7 +1088,7 @@ End Class
 
 
 
-Public Class NR_Histogram_CloudZ : Inherits TaskParent
+Public Class XR_Histogram_CloudZ : Inherits TaskParent
     Dim histDim As New Histogram_Cloud
     Public Sub New()
         histDim.dimensionLabel = "Z"
@@ -1233,7 +1233,7 @@ End Class
 
 
 
-Public Class NR_Histogram_RedCell : Inherits TaskParent
+Public Class XR_Histogram_RedCell : Inherits TaskParent
     Dim hist As New Histogram_Depth
     Dim redC As New RedCloud_Basics
     Public Sub New()
@@ -1297,8 +1297,8 @@ End Class
 
 
 
-Public Class NR_Histogram_ToggleFeatureLess : Inherits TaskParent
-    Dim fLessBrick As New NR_BrickPoint_FeatureLess
+Public Class XR_Histogram_ToggleFeatureLess : Inherits TaskParent
+    Dim fLessBrick As New XR_BrickPoint_FeatureLess
     Dim plotHist As New PlotBar_Basics
     Public Sub New()
         plotHist.maxRange = 255
@@ -1470,7 +1470,7 @@ End Class
 
 
 
-Public Class NR_Histogram_LeftAndColor : Inherits TaskParent
+Public Class XR_Histogram_LeftAndColor : Inherits TaskParent
     Dim hist As New Histogram_Basics
     Public Sub New()
         labels(2) = "Left View Histogram"
@@ -1490,7 +1490,7 @@ End Class
 
 
 
-Public Class NR_Histogram_LeftRightAndColor : Inherits TaskParent
+Public Class XR_Histogram_LeftRightAndColor : Inherits TaskParent
     Dim hist As New Histogram_Basics
     Public Sub New()
         If standalone Then task.gOptions.displayDst1.Checked = True
@@ -1514,7 +1514,7 @@ End Class
 
 
 
-Public Class NR_Histogram_InverseLUT : Inherits TaskParent
+Public Class XR_Histogram_InverseLUT : Inherits TaskParent
     Dim hist As New Histogram_Basics
     Public Sub New()
         task.gOptions.displayDst1.Checked = True

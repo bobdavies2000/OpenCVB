@@ -50,7 +50,7 @@ End Class
 
 
 
-Public Class NR_Color8U_Grayscale : Inherits TaskParent
+Public Class XR_Color8U_Grayscale : Inherits TaskParent
     Dim options As New Options_Grayscale8U
     Public classCount = 255
     Public Sub New()
@@ -86,7 +86,7 @@ End Class
 
 
 
-Public Class NR_Color8U_Depth : Inherits TaskParent
+Public Class XR_Color8U_Depth : Inherits TaskParent
     Public reduction As New Reduction_Basics
     Public depth As New Depth_InRange
     Public classCount As Integer
@@ -114,7 +114,7 @@ End Class
 
 
 
-Public Class NR_Color8U_KMeans : Inherits TaskParent
+Public Class XR_Color8U_KMeans : Inherits TaskParent
     Public km0 As New KMeans_Basics
     Public km1 As New KMeans_Basics
     Public km2 As New KMeans_Basics
@@ -153,7 +153,7 @@ End Class
 
 
 
-Public Class NR_Color8U_RedHue : Inherits TaskParent
+Public Class XR_Color8U_RedHue : Inherits TaskParent
     Dim options As New Options_CamShift
     Public Sub New()
         labels = {"", "", "Pixels with Red Hue", ""}
@@ -199,7 +199,7 @@ End Class
 
 
 ' https://stackoverflow.com/questions/40233986/python-is-there-a-function-or-formula-to-find-the-complementary-colour-of-a-rgb
-Public Class NR_Color8U_ComplementaryTest : Inherits TaskParent
+Public Class XR_Color8U_ComplementaryTest : Inherits TaskParent
     Dim images As New Image_Basics
     Dim comp As New Color8U_Complementary
     Public Sub New()
@@ -223,7 +223,7 @@ End Class
 
 
 ' https://github.com/BhanuPrakashNani/Image_Processing/tree/master/Est.%20Transformation
-Public Class NR_Color8U_InRange : Inherits TaskParent
+Public Class XR_Color8U_InRange : Inherits TaskParent
     Public Sub New()
         labels = {"", "", "Original", "After InRange processing"}
         desc = "Use inRange to isolate colors from the background"
@@ -243,7 +243,7 @@ End Class
 
 
 
-Public Class NR_Color8U_TopX : Inherits TaskParent
+Public Class XR_Color8U_TopX : Inherits TaskParent
     Dim topX As New Hist3Dcolor_TopXColors
     Dim options As New Options_Color8UTopX
     Public Sub New()
@@ -285,7 +285,7 @@ End Class
 
 
 ' https://github.com/AjinkyaChavan9/RGB-Color-Classifier-with-Deep-Learning-using-Keras-and-Tensorflow
-Public Class NR_Color8U_Common : Inherits TaskParent
+Public Class XR_Color8U_Common : Inherits TaskParent
     Dim common As New List(Of cv.Vec3b)
     Dim commonScalar As List(Of cv.Scalar) = {cv.Scalar.Blue, cv.Scalar.Green, cv.Scalar.Red, cv.Scalar.Yellow, cv.Scalar.Pink, cv.Scalar.Purple, cv.Scalar.Brown,
                                                   cv.Scalar.Gray, cv.Scalar.Black, white}.ToList
@@ -317,7 +317,7 @@ End Class
 
 
 
-Public Class NR_Color8U_Smoothing : Inherits TaskParent
+Public Class XR_Color8U_Smoothing : Inherits TaskParent
     Dim frames As New History_Basics
     Public Sub New()
         labels = {"", "", "Averaged BGR image over the last X frames", ""}
@@ -355,7 +355,7 @@ End Class
 
 
 
-Public Class NR_Color8U_BlackAndWhite : Inherits TaskParent
+Public Class XR_Color8U_BlackAndWhite : Inherits TaskParent
     Dim options As New Options_StdevGrid
     Public Sub New()
         labels = {"", "", "Mask to identify all 'black' regions", "Mask identifies all 'white' regions"}

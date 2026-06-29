@@ -35,7 +35,7 @@ End Class
 
 
 ' https://stackoverflow.com/questions/47706339/car-counting-and-classification-using-emgucv-and-vb-net
-Public Class NR_Video_CarCounting : Inherits TaskParent
+Public Class XR_Video_CarCounting : Inherits TaskParent
     Dim flow As New Font_FlowText
     Dim video As New Video_Basics
     Dim bgSub As New BGSubtract_MOG
@@ -83,7 +83,7 @@ End Class
 
 
 ' https://stackoverflow.com/questions/47706339/car-counting-and-classification-using-emgucv-and-vb-net
-Public Class NR_Video_CarCComp : Inherits TaskParent
+Public Class XR_Video_CarCComp : Inherits TaskParent
     Dim cc As New CComp_Both
     Dim video As New Video_Basics
     Dim bgSub As New BGSubtract_MOG
@@ -139,7 +139,7 @@ End Class
 
 
 
-Public Class NR_Video_MinCircle : Inherits TaskParent
+Public Class XR_Video_MinCircle : Inherits TaskParent
     Dim video As New Video_MinRect
     Public Sub New()
         desc = "Find area of car outline - example of using MinEnclosingCircle"

@@ -86,7 +86,7 @@ End Class
 
 
 
-Public Class NR_Bin3Way_RedColorDarkest : Inherits TaskParent
+Public Class XR_Bin3Way_RedColorDarkest : Inherits TaskParent
     Dim bin3 As New Bin3Way_KMeans
     Dim flood As New Flood_BasicsMask
     Public Sub New()
@@ -107,7 +107,7 @@ End Class
 
 
 
-Public Class NR_Bin3Way_RedColorLightest : Inherits TaskParent
+Public Class XR_Bin3Way_RedColorLightest : Inherits TaskParent
     Dim bin3 As New Bin3Way_KMeans
     Dim flood As New Flood_BasicsMask
     Public Sub New()
@@ -126,7 +126,7 @@ End Class
 
 
 
-Public Class NR_Bin3Way_RedColorOther : Inherits TaskParent
+Public Class XR_Bin3Way_RedColorOther : Inherits TaskParent
     Dim bin3 As New Bin3Way_KMeans
     Dim flood As New Flood_BasicsMask
     Dim color8U As New Color8U_Basics

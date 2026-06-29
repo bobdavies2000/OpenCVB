@@ -43,7 +43,7 @@ End Class
 
 
 
-Public Class NR_FindNonZero_SoloPoints : Inherits TaskParent
+Public Class XR_FindNonZero_SoloPoints : Inherits TaskParent
     Dim hotTop As New BackProject_SoloTop
     Dim hotSide As New BackProject_SoloSide
     Dim nZero As New FindNonZero_Basics
@@ -72,7 +72,7 @@ End Class
 
 
 
-Public Class NR_FindNonZero_Line3DWorld : Inherits TaskParent
+Public Class XR_FindNonZero_Line3DWorld : Inherits TaskParent
     Public lp As lpData
     Public vecMat As New cv.Mat
     Public ptList As New List(Of cv.Point)

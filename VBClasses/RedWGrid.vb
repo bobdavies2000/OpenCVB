@@ -138,7 +138,7 @@ End Class
 
 
 
-Public Class NR_RedWGrid_PrepData : Inherits TaskParent
+Public Class XR_RedWGrid_PrepData : Inherits TaskParent
     Dim prepData As New RedPrep_Core
     Public Sub New()
         desc = "Prepare the grid of point cloud data."
@@ -158,7 +158,7 @@ End Class
 
 
 
-Public Class NR_RedWGrid_Basics1 : Inherits TaskParent
+Public Class XR_RedWGrid_Basics1 : Inherits TaskParent
     Public prepData As New RedPrep_Core
     Public lut As New cv.Mat
     Public lutList As New List(Of Byte)
@@ -211,8 +211,8 @@ End Class
 
 
 
-Public Class NR_RedWGrid_Validate : Inherits TaskParent
-    Dim RedWGrid As New NR_RedWGrid_PrepY
+Public Class XR_RedWGrid_Validate : Inherits TaskParent
+    Dim RedWGrid As New XR_RedWGrid_PrepY
     Public Sub New()
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
         task.gOptions.displayDst1.Checked = True
@@ -247,7 +247,7 @@ End Class
 
 
 
-Public Class NR_RedWGrid_CheckerBoardWall : Inherits TaskParent
+Public Class XR_RedWGrid_CheckerBoardWall : Inherits TaskParent
     Public prepData As New RedPrep_Core
     Public classCount As Integer
     Dim edges As New Edge_Basics_TA
@@ -270,7 +270,7 @@ End Class
 
 
 
-Public Class NR_RedWGrid_CPP : Inherits TaskParent
+Public Class XR_RedWGrid_CPP : Inherits TaskParent
     Implements IDisposable
     Dim prep As New RedPrep_Basics
     Public Sub New()
@@ -300,7 +300,7 @@ End Class
 
 
 
-Public Class NR_RedWGrid_PrepXOld : Inherits TaskParent
+Public Class XR_RedWGrid_PrepXOld : Inherits TaskParent
     Public prepData As New RedPrep_Core
     Public classCount As Integer
     Public lut As cv.Mat
@@ -319,7 +319,7 @@ End Class
 
 
 
-Public Class NR_RedWGrid_PrepY : Inherits TaskParent
+Public Class XR_RedWGrid_PrepY : Inherits TaskParent
     Public prepData As New RedPrep_Core
     Public classCount As Integer
     Public Sub New()
@@ -339,8 +339,8 @@ End Class
 
 
 Public Class RedWGrid_PrepXYAlt : Inherits TaskParent
-    Dim redX As New NR_RedWGrid_PrepX
-    Dim redY As New NR_RedWGrid_PrepY
+    Dim redX As New XR_RedWGrid_PrepX
+    Dim redY As New XR_RedWGrid_PrepY
     Public Sub New()
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
@@ -369,7 +369,7 @@ End Class
 
 
 
-Public Class NR_RedWGrid_PrepX : Inherits TaskParent
+Public Class XR_RedWGrid_PrepX : Inherits TaskParent
     Public prepData As New RedPrep_Core
     Public classCount As Integer
     Public Sub New()
@@ -391,7 +391,7 @@ End Class
 
 
 Public Class RedWGrid_Debug : Inherits TaskParent
-    Dim RedWGrid As New NR_RedWGrid_Basics1
+    Dim RedWGrid As New XR_RedWGrid_Basics1
     Public classCount As Integer
     Public Sub New()
         If standalone Then task.gOptions.displayDst1.Checked = True
@@ -423,7 +423,7 @@ End Class
 
 
 
-Public Class NR_RedWGrid_Basics : Inherits TaskParent
+Public Class XR_RedWGrid_Basics : Inherits TaskParent
     Dim redC As New RedCloud_Basics
     Dim currSet As New List(Of cv.Point3d)
     Public Sub New()

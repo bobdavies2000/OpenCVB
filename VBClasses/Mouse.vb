@@ -20,7 +20,7 @@ End Class
 
 
 
-Public Class NR_Mouse_LeftClickZoom : Inherits TaskParent
+Public Class XR_Mouse_LeftClickZoom : Inherits TaskParent
     Public Sub New()
         labels(2) = "Left click and drag to draw a rectangle"
         desc = "Demonstrate what the left-click enables"
@@ -70,7 +70,7 @@ End Class
 
 
 
-Public Class NR_Mouse_ValidateLocation : Inherits TaskParent
+Public Class XR_Mouse_ValidateLocation : Inherits TaskParent
     Public Sub New()
         desc = "With custom display resolutions, it is necessary to validate the location in terms of the workres."
     End Sub

@@ -27,7 +27,7 @@ End Class
 
 
 
-Public Class NR_TextureFlow_Depth : Inherits TaskParent
+Public Class XR_TextureFlow_Depth : Inherits TaskParent
     Dim flow As New TextureFlow_Basics
     Public Sub New()
         desc = "Display texture flow in the depth data"
@@ -43,7 +43,7 @@ End Class
 
 
 
-Public Class NR_TextureFlow_Reduction : Inherits TaskParent
+Public Class XR_TextureFlow_Reduction : Inherits TaskParent
     Dim flow As New TextureFlow_Basics
     Dim reduction As New Reduction_Basics
     Public Sub New()
@@ -64,7 +64,7 @@ End Class
 
 
 
-Public Class NR_TextureFlow_DepthSegments : Inherits TaskParent
+Public Class XR_TextureFlow_DepthSegments : Inherits TaskParent
     Dim segments As New Histogram_CloudSegments
     Dim diffx As New Edge_DiffX_CPP
     Dim flow As New TextureFlow_Basics
@@ -86,8 +86,8 @@ End Class
 
 
 
-Public Class NR_TextureFlow_Bricks : Inherits TaskParent
-    Dim bPoint As New NR_BrickPoint_Best
+Public Class XR_TextureFlow_Bricks : Inherits TaskParent
+    Dim bPoint As New XR_BrickPoint_Best
     Dim flow As New TextureFlow_Basics
     Dim knn As New KNN_Basics
     Public Sub New()

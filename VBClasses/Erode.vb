@@ -24,7 +24,7 @@ End Class
 
 
 
-Public Class NR_Erode_CloudXY : Inherits TaskParent
+Public Class XR_Erode_CloudXY : Inherits TaskParent
     Dim erode As New Erode_Basics
     Dim dilate As New Dilate_Basics
     Dim erodeMask As New Erode_Basics
@@ -57,7 +57,7 @@ End Class
 
 
 
-Public Class NR_Erode_DepthSeed : Inherits TaskParent
+Public Class XR_Erode_DepthSeed : Inherits TaskParent
     Dim erode As New Erode_Basics
     Dim options As New Options_Erode
     Public Sub New()
@@ -85,7 +85,7 @@ End Class
 
 
 
-Public Class NR_Erode_Dilate : Inherits TaskParent
+Public Class XR_Erode_Dilate : Inherits TaskParent
     Dim options As New Options_Dilate
     Public Sub New()
         desc = "Erode and then dilate with MorphologyEx on the input image."

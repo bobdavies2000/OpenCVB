@@ -32,7 +32,7 @@ End Class
 
 
 'https://docs.opencvb.org/3.4/d7/d4d/tutorial_py_thresholding.html
-Public Class NR_Binarize_OTSU : Inherits TaskParent
+Public Class XR_Binarize_OTSU : Inherits TaskParent
     Dim binarize As Binarize_Basics
     Dim options As New Options_Binarize
     Public Sub New()
@@ -68,7 +68,7 @@ End Class
 
 
 
-Public Class NR_Binarize_Niblack_Sauvola : Inherits TaskParent
+Public Class XR_Binarize_Niblack_Sauvola : Inherits TaskParent
     Dim options As New Options_BinarizeNiBlack
     Public Sub New()
         desc = "Binarize an image using Niblack and Sauvola"
@@ -89,7 +89,7 @@ End Class
 
 
 
-Public Class NR_Binarize_Wolf_Nick : Inherits TaskParent
+Public Class XR_Binarize_Wolf_Nick : Inherits TaskParent
     Dim options As New Options_BinarizeNiBlack
     Public Sub New()
         desc = "Binarize an image using Niblack and Nick"
@@ -109,7 +109,7 @@ End Class
 
 
 
-Public Class NR_Binarize_KMeansMasks : Inherits TaskParent
+Public Class XR_Binarize_KMeansMasks : Inherits TaskParent
     Dim km As New KMeans_Image
     Dim mats As New Mat_4Click
     Public Sub New()
@@ -138,7 +138,7 @@ End Class
 
 
 
-Public Class NR_Binarize_KMeansRGB : Inherits TaskParent
+Public Class XR_Binarize_KMeansRGB : Inherits TaskParent
     Dim km As New KMeans_Image
     Dim mats As New Mat_4Click
     Public Sub New()
@@ -164,7 +164,7 @@ End Class
 
 
 
-Public Class NR_Binarize_DepthTiers : Inherits TaskParent
+Public Class XR_Binarize_DepthTiers : Inherits TaskParent
     Dim binar4 As New Bin4Way_Regions
     Public classCount = 200 ' 4-way split with 50 depth levels at 10 cm's each.
     Dim tiers As New Depth_Tiers
@@ -187,7 +187,7 @@ End Class
 
 
 
-Public Class NR_Binarize_FourPixelFlips : Inherits TaskParent
+Public Class XR_Binarize_FourPixelFlips : Inherits TaskParent
     Dim binar4 As New Bin4Way_Regions
     Public Sub New()
         desc = "Identify the marginal regions that flip between subdivisions based on brightness."

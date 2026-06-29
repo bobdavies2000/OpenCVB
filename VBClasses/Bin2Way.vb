@@ -43,7 +43,7 @@ End Class
 
 
 
-Public Class NR_Bin2Way_KMeans : Inherits TaskParent
+Public Class XR_Bin2Way_KMeans : Inherits TaskParent
     Public bin2 As New Bin2Way_Basics
     Dim kmeans As New KMeans_Dimensions
     Dim mats As New Mat_4Click
@@ -71,7 +71,7 @@ End Class
 
 
 
-Public Class NR_Bin2Way_RedColor : Inherits TaskParent
+Public Class XR_Bin2Way_RedColor : Inherits TaskParent
     Dim bin2 As New Bin2Way_Gradation
     Dim redC As New RedColor_Basics
     Public Sub New()
@@ -147,7 +147,7 @@ End Class
 
 
 
-Public Class NR_Bin2Way_GradationEdges : Inherits TaskParent
+Public Class XR_Bin2Way_GradationEdges : Inherits TaskParent
     Dim grad As New Bin2Way_Gradation
     Public Sub New()
         labels(2) = "4-way gradation of the color image with edges added."
@@ -163,7 +163,7 @@ End Class
 
 
 
-Public Class NR_Bin2Way_RedCloudDarkest : Inherits TaskParent
+Public Class XR_Bin2Way_RedCloudDarkest : Inherits TaskParent
     Dim bin2 As New Bin2Way_RecurseOnce
     Dim flood As New Flood_BasicsMask
     Public Sub New()
@@ -184,7 +184,7 @@ End Class
 
 
 
-Public Class NR_Bin2Way_RedCloudLight : Inherits TaskParent
+Public Class XR_Bin2Way_RedCloudLight : Inherits TaskParent
     Dim bin2 As New Bin2Way_RecurseOnce
     Dim flood As New Flood_BasicsMask
     Public Sub New()
@@ -240,7 +240,7 @@ End Class
 
 
 
-Public Class NR_Bin2Way_RedCloudLightToDark : Inherits TaskParent
+Public Class XR_Bin2Way_RedCloudLightToDark : Inherits TaskParent
     Dim recurse As New Bin2Way_RecurseOnce
     Dim redCs(3) As RedColor_Basics
     Dim mats As New Mat_4to1

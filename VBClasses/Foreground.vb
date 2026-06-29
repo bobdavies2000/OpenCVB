@@ -45,7 +45,7 @@ End Class
 
 
 
-Public Class NR_Foreground_KMeansDepth : Inherits TaskParent
+Public Class XR_Foreground_KMeansDepth : Inherits TaskParent
     Dim simK As New KMeans_Depth
     Public fgDepth As Single
     Public fg As New cv.Mat, bg As New cv.Mat, classCount As Integer
@@ -96,7 +96,7 @@ End Class
 
 
 
-Public Class NR_Foreground_KMeans : Inherits TaskParent
+Public Class XR_Foreground_KMeans : Inherits TaskParent
     Dim km As New KMeans_Image
     Public Sub New()
         OptionParent.FindSlider("KMeans k").Value = 2
@@ -135,7 +135,7 @@ End Class
 
 
 
-Public Class NR_Foreground_Hist3D : Inherits TaskParent
+Public Class XR_Foreground_Hist3D : Inherits TaskParent
     Dim hcloud As New Hist3Dcloud_Basics
     Public Sub New()
         hcloud.maskInput = task.noDepthMask

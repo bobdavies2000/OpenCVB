@@ -57,7 +57,7 @@ End Class
 
 
 
-Public Class NR_Disparity_Edges : Inherits TaskParent
+Public Class XR_Disparity_Edges : Inherits TaskParent
     Dim disparity As New Disparity_Basics
     Dim edgeline As New EdgeLine_Basics
     Public Sub New()
@@ -85,7 +85,7 @@ End Class
 
 
 
-Public Class NR_Disparity_Validate : Inherits TaskParent
+Public Class XR_Disparity_Validate : Inherits TaskParent
     Dim disparity As New Disparity_Basics
     Public Sub New()
         dst3 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
@@ -124,7 +124,7 @@ End Class
 
 ' Z = 0.5 * 1000 / 100 = 5 meters
 ' The Function() relating depth To disparity Is only valid For a calibrated stereo setup.
-Public Class NR_Disparity_Inverse : Inherits TaskParent
+Public Class XR_Disparity_Inverse : Inherits TaskParent
     Public Sub New()
         task.drawRect = New cv.Rect(dst2.Width / 2 - 10, dst2.Height / 2 - 10, 20, 20)
         desc = "Use the depth to find the disparity"
@@ -157,7 +157,7 @@ End Class
 
 
 
-Public Class NR_Disparity_Color8u : Inherits TaskParent
+Public Class XR_Disparity_Color8u : Inherits TaskParent
     Dim color8u As New Color8U_LeftRight
     Dim disparity As New Disparity_Basics
     Public Sub New()

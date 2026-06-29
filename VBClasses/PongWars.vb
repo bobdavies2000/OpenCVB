@@ -119,7 +119,7 @@ End Class
 
 
 
-Public Class NR_PongWars_Two : Inherits TaskParent
+Public Class XR_PongWars_Two : Inherits TaskParent
     Dim pong1 As New PongWars_Basics
     Dim pong2 As New PongWars_Basics
     Public Sub New()

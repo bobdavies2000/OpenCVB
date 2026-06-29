@@ -4,7 +4,7 @@ Imports cv = OpenCvSharp
 Public Class GrabCut_Basics : Inherits TaskParent
     Public fgFineTune As cv.Mat
     Public bgFineTune As cv.Mat
-    Public fore As New NR_Foreground_KMeansDepth
+    Public fore As New XR_Foreground_KMeansDepth
     Dim bgModel As cv.Mat = New cv.Mat(1, 65, cv.MatType.CV_64F, cv.Scalar.All(0))
     Dim fgModel As cv.Mat = New cv.Mat(1, 65, cv.MatType.CV_64F, cv.Scalar.All(0))
     Public Sub New()
@@ -43,7 +43,7 @@ End Class
 
 
 
-Public Class NR_GrabCut_FineTune : Inherits TaskParent
+Public Class XR_GrabCut_FineTune : Inherits TaskParent
     Dim basics As New GrabCut_Basics
     Dim mats As New Mat_4to1
     Dim options As New Options_GrabCut
@@ -94,7 +94,7 @@ End Class
 
 
 
-Public Class NR_GrabCut_ImageRect : Inherits TaskParent
+Public Class XR_GrabCut_ImageRect : Inherits TaskParent
     Dim bgModel As New cv.Mat, fgModel As New cv.Mat
     Dim bgRect1 = New cv.Rect(482, 0, 128, 640)
     Dim bgRect2 = New cv.Rect(0, 0, 162, 320)
@@ -143,7 +143,7 @@ End Class
 
 
 
-Public Class NR_GrabCut_ImageMask : Inherits TaskParent
+Public Class XR_GrabCut_ImageMask : Inherits TaskParent
     Dim image As cv.Mat
     Public Sub New()
         Dim fileInputName = New FileInfo(task.homeDir + "data/cat.jpg")

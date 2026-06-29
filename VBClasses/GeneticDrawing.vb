@@ -187,7 +187,7 @@ End Class
 
 
 ' https://github.com/anopara/genetic-drawing
-Public Class NR_GeneticDrawing_Color : Inherits TaskParent
+Public Class XR_GeneticDrawing_Color : Inherits TaskParent
     Dim gDraw(3 - 1) As GeneticDrawing_Basics
     Public Sub New()
 
@@ -227,8 +227,8 @@ End Class
 
 
 
-Public Class NR_GeneticDrawing_Photo : Inherits TaskParent
-    Dim gDraw As NR_GeneticDrawing_Color
+Public Class XR_GeneticDrawing_Photo : Inherits TaskParent
+    Dim gDraw As XR_GeneticDrawing_Color
     Dim inputFileName As String
     Dim fileNameForm As OptionsFileName
     Public Sub New()
@@ -263,7 +263,7 @@ Public Class NR_GeneticDrawing_Photo : Inherits TaskParent
                 Exit Sub
             End If
             ' If gDraw IsNot Nothing Then gDraw.Dispose()
-            gDraw = New NR_GeneticDrawing_Color()
+            gDraw = New XR_GeneticDrawing_Color()
 
             If fullsizeImage.Width <> dst2.Width Or fullsizeImage.Height <> dst2.Height Then
                 Dim newSize = New cv.Size(dst2.Height * fullsizeImage.Width / fullsizeImage.Height, dst2.Height)

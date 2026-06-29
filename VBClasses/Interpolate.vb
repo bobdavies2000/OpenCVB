@@ -113,7 +113,7 @@ End Class
 
 
 
-Public Class NR_Interpolate_Lines : Inherits TaskParent
+Public Class XR_Interpolate_Lines : Inherits TaskParent
     Dim inter As New Interpolate_Basics
     Public Sub New()
         OptionParent.FindSlider("Interpolation Resize %").Value = 80
@@ -141,7 +141,7 @@ End Class
 
 
 
-Public Class NR_Interpolate_Difference : Inherits TaskParent
+Public Class XR_Interpolate_Difference : Inherits TaskParent
     Dim inter As New Interpolate_Kalman
     Dim diff As New Diff_Basics
     Public Sub New()
@@ -165,7 +165,7 @@ End Class
 
 
 
-Public Class NR_Interpolate_QuarterBeat : Inherits TaskParent
+Public Class XR_Interpolate_QuarterBeat : Inherits TaskParent
     Dim diff As New Diff_Basics
     Dim updatedFrames As Integer
     Dim myFrameCount As Integer

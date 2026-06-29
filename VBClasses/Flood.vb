@@ -113,7 +113,7 @@ End Class
 
 
 
-Public Class NR_Flood_SimpleRedColor : Inherits TaskParent
+Public Class XR_Flood_SimpleRedColor : Inherits TaskParent
     Public redC As New RedColor_Basics
     Public Sub New()
         desc = "Build the RedColor cells with the grayscale input."
@@ -133,7 +133,7 @@ End Class
 
 
 
-Public Class NR_Flood_Tiers : Inherits TaskParent
+Public Class XR_Flood_Tiers : Inherits TaskParent
     Dim flood As New Flood_BasicsMask
     Dim color8U As New Color8U_Basics
     Dim tiers As New Depth_Tiers
@@ -171,7 +171,7 @@ End Class
 
 
 
-Public Class NR_Flood_Minimal : Inherits TaskParent
+Public Class XR_Flood_Minimal : Inherits TaskParent
     Dim prep As New RedPrep_Basics
     Public Sub New()
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)

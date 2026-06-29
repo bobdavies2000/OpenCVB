@@ -46,7 +46,7 @@ End Class
 
 
 
-Public Class NR_BackProject_Reduction : Inherits TaskParent
+Public Class XR_BackProject_Reduction : Inherits TaskParent
     Dim reduction As New Reduction_Basics
     Dim bProject As New BackProject_Basics
     Public Sub New()
@@ -68,7 +68,7 @@ End Class
 
 
 
-Public Class NR_BackProject_PointCloud : Inherits TaskParent
+Public Class XR_BackProject_PointCloud : Inherits TaskParent
     Public hist As New Histogram_PointCloud_XZ_YZ
     Public Sub New()
         dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_32FC3, 0)
@@ -164,7 +164,7 @@ End Class
 
 
 
-Public Class NR_BackProject_Unstable : Inherits TaskParent
+Public Class XR_BackProject_Unstable : Inherits TaskParent
     Dim backP As New BackProject_Full
     Dim diff As New Diff_Basics
     Public Sub New()
@@ -229,7 +229,7 @@ End Class
 
 
 
-Public Class NR_BackProject_Horizontal : Inherits TaskParent
+Public Class XR_BackProject_Horizontal : Inherits TaskParent
     Dim bpTop As New BackProject_Top
     Dim bpSide As New BackProject_Side
     Public Sub New()
@@ -365,7 +365,7 @@ End Class
 
 
 
-Public Class NR_BackProject_Mouse : Inherits TaskParent
+Public Class XR_BackProject_Mouse : Inherits TaskParent
     Dim backP As New BackProject_Image
     Public Sub New()
         labels(2) = "Use the mouse to select what should be shown in the backprojection of the depth histogram"
@@ -382,7 +382,7 @@ End Class
 
 
 
-Public Class NR_BackProject_MeterByMeter : Inherits TaskParent
+Public Class XR_BackProject_MeterByMeter : Inherits TaskParent
     Dim histogram As New cv.Mat
     Public Sub New()
         desc = "Backproject the depth data at 1 meter intervals without a histogram."
@@ -412,7 +412,7 @@ End Class
 
 
 
-Public Class NR_BackProject_Hue : Inherits TaskParent
+Public Class XR_BackProject_Hue : Inherits TaskParent
     Dim hue As New OEX_CalcBackProject_Demo1
     Public classCount As Integer
     Public Sub New()
@@ -433,7 +433,7 @@ End Class
 
 
 
-Public Class NR_BackProject_MaskLines : Inherits TaskParent
+Public Class XR_BackProject_MaskLines : Inherits TaskParent
     Dim masks As New PlotMouse_MaskBackProject
     Dim core As New Line_Core
     Public Sub New()
@@ -464,7 +464,7 @@ End Class
 
 
 
-Public Class NR_BackProject_MaskList : Inherits TaskParent
+Public Class XR_BackProject_MaskList : Inherits TaskParent
     Public histList As New List(Of List(Of Single))
     Public histogramList As New List(Of cv.Mat)
     Dim inputMatList As New List(Of cv.Mat)
@@ -524,7 +524,7 @@ End Class
 
 
 ' https://docs.opencvb.org/3.4/da/d7f/tutorial_back_projection.html
-Public Class NR_BackProject_FullOld : Inherits TaskParent
+Public Class XR_BackProject_FullOld : Inherits TaskParent
     Public classCount As Integer
     Public ranges() As cv.Rangef = New cv.Rangef() {New cv.Rangef(0, 255)}
     Public Sub New()
@@ -551,7 +551,7 @@ End Class
 
 
 
-Public Class NR_BackProject_InRangeDepthTest : Inherits TaskParent
+Public Class XR_BackProject_InRangeDepthTest : Inherits TaskParent
     Public classCount As Integer
     Public Sub New()
         task.gOptions.setHistogramBins(4)
@@ -592,7 +592,7 @@ End Class
 
 
 
-Public Class NR_BackProject_InRangeDepth : Inherits TaskParent
+Public Class XR_BackProject_InRangeDepth : Inherits TaskParent
     Public classCount As Integer
     Public Sub New()
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
@@ -632,7 +632,7 @@ End Class
 
 
 
-Public Class NR_BackProject_Basics_Depth : Inherits TaskParent
+Public Class XR_BackProject_Basics_Depth : Inherits TaskParent
     Public bpDepth As New BackProject_Depth
     Public Sub New()
         task.gOptions.setHistogramBins(20)
@@ -652,7 +652,7 @@ End Class
 
 
 
-Public Class NR_BackProject_DepthSlider : Inherits TaskParent
+Public Class XR_BackProject_DepthSlider : Inherits TaskParent
     Public bpDepth As New BackProject_Depth
     Public Sub New()
         task.gOptions.setHistogramBins(20)

@@ -66,7 +66,7 @@ End Class
 
 
 
-Public Class NR_SuperPixel_BinarizedImage : Inherits TaskParent
+Public Class XR_SuperPixel_BinarizedImage : Inherits TaskParent
     Dim pixels As New SuperPixel_Basics_CPP
     Dim binarize As Binarize_Basics
     Public Sub New()
@@ -90,7 +90,7 @@ End Class
 
 
 
-Public Class NR_SuperPixel_Depth : Inherits TaskParent
+Public Class XR_SuperPixel_Depth : Inherits TaskParent
     Dim pixels As New SuperPixel_Basics_CPP
     Public Sub New()
         desc = "Create SuperPixels using RGBDepth image."
@@ -107,7 +107,7 @@ End Class
 
 
 
-Public Class NR_SuperPixel_WithCanny : Inherits TaskParent
+Public Class XR_SuperPixel_WithCanny : Inherits TaskParent
     Dim pixels As New SuperPixel_Basics_CPP
     Public Sub New()
         desc = "Create SuperPixels using RGBDepth image."
@@ -128,7 +128,7 @@ End Class
 
 
 
-Public Class NR_SuperPixel_WithLineDetector : Inherits TaskParent
+Public Class XR_SuperPixel_WithLineDetector : Inherits TaskParent
     Dim pixels As New SuperPixel_Basics_CPP
     Public Sub New()
         labels(3) = "Input to superpixel basics."

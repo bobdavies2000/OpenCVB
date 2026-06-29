@@ -45,7 +45,7 @@ End Class
 
 
 
-Public Class NR_OEX_CalcBackProject_Demo2 : Inherits TaskParent
+Public Class XR_OEX_CalcBackProject_Demo2 : Inherits TaskParent
     Public histogram As New cv.Mat
     Public classCount As Integer = 10 ' initial value is just a guess.  It is refined after the first pass.
     Public Sub New()
@@ -89,7 +89,7 @@ End Class
 
 
 
-Public Class NR_OEX_bgfg_segm : Inherits TaskParent
+Public Class XR_OEX_bgfg_segm : Inherits TaskParent
     Dim bgSub As New BGSubtract_Basics
     Public Sub New()
         desc = "OpenCV example bgfg_segm - existing BGSubtract_Basics is the same."
@@ -107,7 +107,7 @@ End Class
 
 
 
-Public Class NR_OEX_bgSub : Inherits TaskParent
+Public Class XR_OEX_bgSub : Inherits TaskParent
     Implements IDisposable
     Dim pBackSub As cv.BackgroundSubtractor
     Dim options As New Options_BGSubtract
@@ -143,7 +143,7 @@ End Class
 
 
 
-Public Class NR_OEX_BasicLinearTransforms : Inherits TaskParent
+Public Class XR_OEX_BasicLinearTransforms : Inherits TaskParent
     Dim options As New Options_BrightnessContrast
     Public Sub New()
         desc = "OpenCV Example BasicLinearTransforms - NOTE: much faster than BasicLinearTransformTrackBar"
@@ -159,10 +159,10 @@ End Class
 
 
 
-Public Class NR_OEX_BasicLinearTransformsTrackBar : Inherits TaskParent
+Public Class XR_OEX_BasicLinearTransformsTrackBar : Inherits TaskParent
     Dim options As New Options_BrightnessContrast
     Public Sub New()
-        desc = "OpenCV Example BasicLinearTransformTrackBar - much slower than NR_OEX_BasicLinearTransforms"
+        desc = "OpenCV Example BasicLinearTransformTrackBar - much slower than XR_OEX_BasicLinearTransforms"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
@@ -186,7 +186,7 @@ End Class
 
 
 
-Public Class NR_OEX_delaunay2 : Inherits TaskParent
+Public Class XR_OEX_delaunay2 : Inherits TaskParent
     Dim active_facet_color As New cv.Scalar(0, 0, 255)
     Dim delaunay_color As New cv.Scalar(255, 255, 255)
     Dim points As New List(Of cv.Point2f)
@@ -271,7 +271,7 @@ End Class
 
 
 
-Public Class NR_OEX_MeanShift : Inherits TaskParent
+Public Class XR_OEX_MeanShift : Inherits TaskParent
     Dim term_crit As New cv.TermCriteria(cv.CriteriaTypes.Eps + cv.CriteriaTypes.Count, 10, 1.0)
     Dim ranges() As cv.Rangef = New cv.Rangef() {New cv.Rangef(0, 180)}
     Public histogram As New cv.Mat
@@ -354,7 +354,7 @@ End Class
 
 
 
-Public Class NR_OEX_PointPolygon_demo : Inherits TaskParent
+Public Class XR_OEX_PointPolygon_demo : Inherits TaskParent
     Dim pointPoly As New OEX_PointPolygon
     Public Sub New()
         dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
@@ -387,7 +387,7 @@ End Class
 
 
 
-Public Class NR_OEX_Remap : Inherits TaskParent
+Public Class XR_OEX_Remap : Inherits TaskParent
     Dim remap As New Remap_Basics
     Public Sub New()
         desc = "The OpenCV Remap example became the Remap_Basics algorithm."
@@ -406,7 +406,7 @@ End Class
 
 
 
-Public Class NR_OEX_Threshold : Inherits TaskParent
+Public Class XR_OEX_Threshold : Inherits TaskParent
     Dim threshold As New Threshold_Basics
     Public Sub New()
         desc = "OpenCV Example Threshold became Threshold_Basics"
@@ -426,7 +426,7 @@ End Class
 
 
 
-Public Class NR_OEX_Threshold_Inrange : Inherits TaskParent
+Public Class XR_OEX_Threshold_Inrange : Inherits TaskParent
     Dim options As New Options_OEX
     Public Sub New()
         desc = "OpenCV Example Threshold_Inrange"
@@ -445,7 +445,7 @@ End Class
 
 
 
-Public Class NR_OEX_Points_Classifier : Inherits TaskParent
+Public Class XR_OEX_Points_Classifier : Inherits TaskParent
     Dim basics As New Classifier_Basics_CPP
     Public Sub New()
         desc = "OpenCV Example Points_Classifier became Classifier_Basics"
@@ -465,7 +465,7 @@ End Class
 
 
 
-Public Class NR_OEX_Core_Reduce : Inherits TaskParent
+Public Class XR_OEX_Core_Reduce : Inherits TaskParent
     Public Sub New()
         desc = "Use OpenCV's reduce API to create row/col sums, averages, and min/max."
     End Sub
@@ -529,7 +529,7 @@ End Class
 
 
 
-Public Class NR_OEX_Core_Split : Inherits TaskParent
+Public Class XR_OEX_Core_Split : Inherits TaskParent
     Public Sub New()
         desc = "OpenCV Example Core_Split"
     End Sub
@@ -565,7 +565,7 @@ End Class
 
 
 
-Public Class NR_OEX_Filter2D : Inherits TaskParent
+Public Class XR_OEX_Filter2D : Inherits TaskParent
     Dim ddepth As cv.MatType = -1, anchor = New cv.Point(-1, -1), kernelSize As Integer = 3, ind = 0
     Public Sub New()
         desc = "OpenCV Example Filter2D demo - Use a varying kernel to show the impact."
@@ -585,7 +585,7 @@ End Class
 
 
 
-Public Class NR_OEX_FitEllipse : Inherits TaskParent
+Public Class XR_OEX_FitEllipse : Inherits TaskParent
     Implements IDisposable
     Dim img As cv.Mat
     Dim options As New Options_FitEllipse

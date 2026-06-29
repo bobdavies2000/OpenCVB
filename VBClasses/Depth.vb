@@ -17,7 +17,7 @@ End Class
 
 
 
-Public Class NR_Depth_Display : Inherits TaskParent
+Public Class XR_Depth_Display : Inherits TaskParent
     Public Sub New()
         If standalone Then task.gOptions.displayDst1.Checked = True
         If standalone Then task.gOptions.displayDst1.Checked = True
@@ -38,7 +38,7 @@ End Class
 
 
 
-Public Class NR_Depth_FirstLastDistance : Inherits TaskParent
+Public Class XR_Depth_FirstLastDistance : Inherits TaskParent
     Public Sub New()
         desc = "Monitor the first and last depth distances"
     End Sub
@@ -68,7 +68,7 @@ End Class
 
 
 
-Public Class NR_Depth_HolesRect : Inherits TaskParent
+Public Class XR_Depth_HolesRect : Inherits TaskParent
     Dim shadow As New Depth_Holes
     Public Sub New()
         labels(2) = "The 10 largest contours in the depth holes."
@@ -102,7 +102,7 @@ End Class
 
 
 
-Public Class NR_Depth_MeanStdevPlot : Inherits TaskParent
+Public Class XR_Depth_MeanStdevPlot : Inherits TaskParent
     Dim plot1 As New PlotTime_Single
     Dim plot2 As New PlotTime_Single
     Public Sub New()
@@ -129,7 +129,7 @@ End Class
 
 
 
-Public Class NR_Depth_Uncertainty : Inherits TaskParent
+Public Class XR_Depth_Uncertainty : Inherits TaskParent
     Dim retina As New Retina_Basics_CPP
     Dim options As New Options_Uncertainty
     Public Sub New()
@@ -151,7 +151,7 @@ End Class
 
 
 
-Public Class NR_Depth_LocalMinMax_MT : Inherits TaskParent
+Public Class XR_Depth_LocalMinMax_MT : Inherits TaskParent
     Public minPoint(0) As cv.Point2f
     Public maxPoint(0) As cv.Point2f
     Public Sub New()
@@ -195,7 +195,7 @@ End Class
 
 
 
-Public Class NR_Depth_ColorMap : Inherits TaskParent
+Public Class XR_Depth_ColorMap : Inherits TaskParent
     Dim options As New Options_DepthColor
     Public Sub New()
         desc = "Display the depth as a color map"
@@ -238,7 +238,7 @@ End Class
 
 
 
-Public Class NR_Depth_Median : Inherits TaskParent
+Public Class XR_Depth_Median : Inherits TaskParent
     Dim median As New Math_Median_CDF
     Public Sub New()
         median.rangeMax = task.MaxZmeters
@@ -268,7 +268,7 @@ End Class
 
 
 
-Public Class NR_Depth_SmoothingMat : Inherits TaskParent
+Public Class XR_Depth_SmoothingMat : Inherits TaskParent
     Dim options As New Options_Depth
     Public Sub New()
         labels(3) = "Depth pixels after smoothing"
@@ -296,12 +296,12 @@ End Class
 
 
 
-Public Class NR_Depth_Smoothing : Inherits TaskParent
-    Dim smooth As New NR_Depth_SmoothingMat
+Public Class XR_Depth_Smoothing : Inherits TaskParent
+    Dim smooth As New XR_Depth_SmoothingMat
     Dim reduction As New Reduction_Basics
     Public reducedDepth As New cv.Mat
     Public mats As New Mat_4to1
-    Public colorize As New NR_Depth_ColorMap
+    Public colorize As New XR_Depth_ColorMap
     Public Sub New()
         labels(3) = "Mask of depth that is smooth"
         desc = "This attempt to get the depth data to 'calm' down is not working well enough to be useful - needs more work"
@@ -330,7 +330,7 @@ End Class
 
 
 
-Public Class NR_Depth_HolesOverTime : Inherits TaskParent
+Public Class XR_Depth_HolesOverTime : Inherits TaskParent
     Dim images As New List(Of cv.Mat)
     Public Sub New()
         dst0 = New cv.Mat(dst0.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
@@ -397,7 +397,7 @@ End Class
 
 
 
-Public Class NR_Depth_Dilate : Inherits TaskParent
+Public Class XR_Depth_Dilate : Inherits TaskParent
     Dim dilate As New Dilate_Basics
     Public Sub New()
         desc = "Dilate the depth data to fill holes."
@@ -415,14 +415,14 @@ End Class
 
 
 
-Public Class NR_Depth_ForegroundHead : Inherits TaskParent
-    Dim fgnd As New NR_Depth_ForegroundBlob
+Public Class XR_Depth_ForegroundHead : Inherits TaskParent
+    Dim fgnd As New XR_Depth_ForegroundBlob
     Public trustedRect As cv.Rect
     Public trustworthy As Boolean
     Dim kalman As New Kalman_Basics
     Public Sub New()
         labels(2) = "Blue is current, red is kalman, green is trusted"
-        desc = "Use NR_Depth_Foreground to find the foreground blob.  Then find the probable head of the person in front of the camera."
+        desc = "Use XR_Depth_Foreground to find the foreground blob.  Then find the probable head of the person in front of the camera."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         fgnd.Run(src)
@@ -460,7 +460,7 @@ End Class
 
 
 
-Public Class NR_Depth_RGBShadow : Inherits TaskParent
+Public Class XR_Depth_RGBShadow : Inherits TaskParent
     Public Sub New()
         desc = "Merge the BGR and Depth Shadow"
     End Sub
@@ -476,7 +476,7 @@ End Class
 
 
 
-Public Class NR_Depth_BGSubtract : Inherits TaskParent
+Public Class XR_Depth_BGSubtract : Inherits TaskParent
     Dim bgSub As New BGSubtract_Basics
     Public Sub New()
         labels = {"", "", "Latest task.noDepthMask", "BGSubtract output for the task.noDepthMask"}
@@ -499,7 +499,7 @@ End Class
 
 
 
-Public Class NR_Depth_MaxMask : Inherits TaskParent
+Public Class XR_Depth_MaxMask : Inherits TaskParent
     Dim contour As New Contour_Regions
     Public Sub New()
         labels = {"", "", "Depth that is too far", "Contour of depth that is too far..."}
@@ -524,9 +524,9 @@ End Class
 
 
 
-Public Class NR_Depth_ForegroundOverTime : Inherits TaskParent
+Public Class XR_Depth_ForegroundOverTime : Inherits TaskParent
     Dim options As New Options_ForeGround
-    Dim fore As New NR_Depth_Foreground
+    Dim fore As New XR_Depth_Foreground
     Dim contours As New Contour_Largest
     Dim lastFrames As New List(Of cv.Mat)
     Public Sub New()
@@ -565,7 +565,7 @@ End Class
 
 
 
-Public Class NR_Depth_ForegroundBlob : Inherits TaskParent
+Public Class XR_Depth_ForegroundBlob : Inherits TaskParent
     Dim options As New Options_ForeGround
     Public blobLocation As New List(Of cv.Point)
     Public maxIndex As Integer
@@ -619,7 +619,7 @@ End Class
 
 
 
-Public Class NR_Depth_Foreground : Inherits TaskParent
+Public Class XR_Depth_Foreground : Inherits TaskParent
     Dim options As New Options_ForeGround
     Dim contours As New Contour_Largest
     Public Sub New()
@@ -715,7 +715,7 @@ End Class
 
 
 
-Public Class NR_Depth_Regions : Inherits TaskParent
+Public Class XR_Depth_Regions : Inherits TaskParent
     Public classCount As Integer = 5
     Public Sub New()
         desc = "Separate the scene into a specified number of regions by depth"
@@ -739,7 +739,7 @@ End Class
 
 
 
-Public Class NR_Depth_Colorizer_VB : Inherits TaskParent
+Public Class XR_Depth_Colorizer_VB : Inherits TaskParent
     Dim nearColor = cv.Scalar.Yellow
     Dim farColor = cv.Scalar.Blue
     Public Sub New()
@@ -770,8 +770,8 @@ End Class
 
 
 
-Public Class NR_Depth_PunchIncreasing : Inherits TaskParent
-    Public depth As New NR_Depth_PunchDecreasing
+Public Class XR_Depth_PunchIncreasing : Inherits TaskParent
+    Public depth As New XR_Depth_PunchDecreasing
     Public Sub New()
         depth.Increasing = True
         desc = "Identify where depth is increasing - retreating from the camera."
@@ -789,9 +789,9 @@ End Class
 
 
 
-Public Class NR_Depth_PunchDecreasing : Inherits TaskParent
+Public Class XR_Depth_PunchDecreasing : Inherits TaskParent
     Public Increasing As Boolean
-    Dim fore As New NR_Depth_Foreground
+    Dim fore As New XR_Depth_Foreground
     Public Sub New()
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Threshold in millimeters", 0, 1000, 8)
         dst1 = New cv.Mat(dst1.Size(), cv.MatType.CV_32F, cv.Scalar.All(0))
@@ -823,7 +823,7 @@ End Class
 
 
 
-Public Class NR_Depth_Contour : Inherits TaskParent
+Public Class XR_Depth_Contour : Inherits TaskParent
     Dim contour As New Contour_Regions
     Public Sub New()
         dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
@@ -877,9 +877,9 @@ End Class
 
 
 
-Public Class NR_Depth_StableAverage : Inherits TaskParent
+Public Class XR_Depth_StableAverage : Inherits TaskParent
     Dim dAvg As New DepthColorizer_Mean
-    Dim extrema As New NR_Depth_StableMinMax
+    Dim extrema As New XR_Depth_StableMinMax
     Public Sub New()
         OptionParent.findRadio("Use farthest distance").Checked = True
         desc = "Use Depth_StableMax_TA to remove the artifacts from the depth averaging"
@@ -904,7 +904,7 @@ End Class
 
 
 
-Public Class NR_Depth_StableMinMax : Inherits TaskParent
+Public Class XR_Depth_StableMinMax : Inherits TaskParent
     Public dMin As New StableDepth_Basics_TA
     Public dMax As New StableDepth_Max
     Public options As New Options_MinMaxNone
@@ -938,7 +938,7 @@ End Class
 
 
 
-Public Class NR_Depth_Flatland : Inherits TaskParent
+Public Class XR_Depth_Flatland : Inherits TaskParent
     Dim options As New Options_FlatLand
     Public Sub New()
         labels(3) = "Grayscale version"
@@ -960,7 +960,7 @@ End Class
 
 
 
-Public Class NR_Depth_MinMaxNone : Inherits TaskParent
+Public Class XR_Depth_MinMaxNone : Inherits TaskParent
     Public options As New Options_MinMaxNone
     Dim filtered As Integer
     Public Sub New()
@@ -999,7 +999,7 @@ End Class
 
 
 
-Public Class NR_Depth_InfinityCheck : Inherits TaskParent
+Public Class XR_Depth_InfinityCheck : Inherits TaskParent
     Public Sub New()
         desc = "Check the pointcloud depth for infinities"
     End Sub
@@ -1049,7 +1049,7 @@ End Class
 
 
 
-Public Class NR_Depth_ColorizerOld : Inherits TaskParent
+Public Class XR_Depth_ColorizerOld : Inherits TaskParent
     Dim customColorMap As cv.Mat
     Dim gColor As New Gradient_Color
     Public Sub New()
@@ -1075,7 +1075,7 @@ End Class
 
 
 
-Public Class NR_Depth_CellTiers : Inherits TaskParent
+Public Class XR_Depth_CellTiers : Inherits TaskParent
     Public valley As New HistValley_Count
     Dim redC As New RedCloud_Basics
     Public Sub New()
@@ -1112,7 +1112,7 @@ End Class
 
 
 
-Public Class NR_Depth_ErrorEstimate : Inherits TaskParent
+Public Class XR_Depth_ErrorEstimate : Inherits TaskParent
     Dim bricks As New Brick_Basics
     Public Sub New()
         dst1 = New cv.Mat(dst2.Size, cv.MatType.CV_32F)
@@ -1147,7 +1147,7 @@ End Class
 
 
 
-Public Class NR_Depth_MinMaxToVoronoi : Inherits TaskParent
+Public Class XR_Depth_MinMaxToVoronoi : Inherits TaskParent
     Dim bricks As New Brick_Basics
     Dim kalman As New Kalman_Basics
     Public Sub New()
@@ -1197,7 +1197,7 @@ End Class
 
 
 
-Public Class NR_Depth_WorldXYMT : Inherits TaskParent
+Public Class XR_Depth_WorldXYMT : Inherits TaskParent
     Dim bricks As New Brick_Basics
     Public depthUnitsMeters = False
     Public Sub New()
@@ -1360,7 +1360,7 @@ End Class
 
 
 
-Public Class NR_Depth_StableMaxMotion : Inherits TaskParent
+Public Class XR_Depth_StableMaxMotion : Inherits TaskParent
     Public stableMax As cv.Mat
     Dim colorize As New DepthColorizer_CPP
     Dim pcMotion As New Motion_CloudPixel
@@ -1383,7 +1383,7 @@ End Class
 
 
 
-Public Class NR_Depth_StableMinMotion : Inherits TaskParent
+Public Class XR_Depth_StableMinMotion : Inherits TaskParent
     Public stableMin As cv.Mat
     Dim colorize As New DepthColorizer_CPP
     Dim pcMotion As New Motion_CloudPixel
@@ -1416,7 +1416,7 @@ End Class
 
 
 
-Public Class NR_Depth_StableMax : Inherits TaskParent
+Public Class XR_Depth_StableMax : Inherits TaskParent
     Public stableDepth As cv.Mat
     Dim colorize As New DepthColorizer_CPP
     Public Sub New()
@@ -1445,7 +1445,7 @@ End Class
 
 
 
-Public Class NR_Depth_StableMin : Inherits TaskParent
+Public Class XR_Depth_StableMin : Inherits TaskParent
     Public stableDepth As cv.Mat
     Dim colorize As New DepthColorizer_CPP
     Public Sub New()

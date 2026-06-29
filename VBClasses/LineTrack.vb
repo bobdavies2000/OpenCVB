@@ -31,7 +31,7 @@ End Class
 
 
 
-Public Class NR_LineTrack_Basics : Inherits TaskParent
+Public Class XR_LineTrack_Basics : Inherits TaskParent
     Public lp As lpData
     Public lpNew As lpData
     Public diffX As Integer
@@ -75,7 +75,7 @@ End Class
 
 
 
-Public Class NR_LineTrack_Concat : Inherits TaskParent
+Public Class XR_LineTrack_Concat : Inherits TaskParent
     Public lpInput As lpData
     Dim match As New Match_Basics
     Public correlation As Single
@@ -122,7 +122,7 @@ End Class
 
 
 
-Public Class NR_LineTrack_CorrelationNabe : Inherits TaskParent
+Public Class XR_LineTrack_CorrelationNabe : Inherits TaskParent
     Public lpInput As lpData
     Dim match As New Match_Basics
     Public p1Correlation As Single
@@ -229,7 +229,7 @@ End Class
 
 
 
-Public Class NR_LineTrack_Tester : Inherits TaskParent
+Public Class XR_LineTrack_Tester : Inherits TaskParent
     Dim match As New LineTrack_Match
     Public Sub New()
         task.gOptions.DebugCheckBox.Checked = True
@@ -373,7 +373,7 @@ End Class
 
 
 
-Public Class NR_LineTrack_CenterNeighbor : Inherits TaskParent
+Public Class XR_LineTrack_CenterNeighbor : Inherits TaskParent
     Dim bricks As New Brick_Basics
     Public options As New Options_LineRect
     Public Sub New()
@@ -428,7 +428,7 @@ End Class
 
 
 
-Public Class NR_LineTrack_CenterRange : Inherits TaskParent
+Public Class XR_LineTrack_CenterRange : Inherits TaskParent
     Public options As New Options_LineRect
     Dim bricks As New Brick_Basics
     Public Sub New()
@@ -467,8 +467,8 @@ End Class
 
 
 
-Public Class NR_LineTrack_Top3 : Inherits TaskParent
-    Dim lineT As New NR_LineTrack_Basics
+Public Class XR_LineTrack_Top3 : Inherits TaskParent
+    Dim lineT As New XR_LineTrack_Basics
     Dim lpList As New List(Of lpData)
     Dim match As New Match_Basics
     Public Sub New()
@@ -527,7 +527,7 @@ End Class
 
 
 
-Public Class NR_LineTrack_SearchX : Inherits TaskParent
+Public Class XR_LineTrack_SearchX : Inherits TaskParent
     Dim lastImage As cv.Mat
     Dim searchCount As Integer = 9
     Dim addw As New AddWeighted_Basics
@@ -595,7 +595,7 @@ End Class
 
 
 
-Public Class NR_LineTrack_Changes : Inherits TaskParent
+Public Class XR_LineTrack_Changes : Inherits TaskParent
     Public Sub New()
         labels(2) = "Move camera or wave at camera to see the impact on the lines."
         labels(3) = "Current lines.  dst2 is the difference between lines in current vs. previous image."
@@ -616,8 +616,8 @@ End Class
 
 
 
-Public Class NR_LineTrack_CorrelationTrack : Inherits TaskParent
-    Dim lineT As New NR_LineTrack_Correlation
+Public Class XR_LineTrack_CorrelationTrack : Inherits TaskParent
+    Dim lineT As New XR_LineTrack_Correlation
     Dim lpList As New List(Of lpData)
     Public lp As lpData
     Public Sub New()
@@ -655,7 +655,7 @@ End Class
 
 
 
-Public Class NR_LineTrack_Correlation : Inherits TaskParent
+Public Class XR_LineTrack_Correlation : Inherits TaskParent
     Public lpInput As lpData
     Dim match1 As New Match_Basics
     Dim match2 As New Match_Basics

@@ -94,7 +94,7 @@ End Class
 
 
 
-Public Class NR_Swarm_LeftRight : Inherits TaskParent
+Public Class XR_Swarm_LeftRight : Inherits TaskParent
     Public leftDistance As Single
     Public leftDirection As Single
     Public leftMax As Single

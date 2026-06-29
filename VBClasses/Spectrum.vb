@@ -165,7 +165,7 @@ End Class
 
 
 
-Public Class NR_Spectrum_GrayAndCloud : Inherits TaskParent
+Public Class XR_Spectrum_GrayAndCloud : Inherits TaskParent
     Dim options As New Options_Spectrum
     Dim gSpec As New Spectrum_Gray
     Dim sCloud As New Spectrum_Cloud
@@ -201,7 +201,7 @@ End Class
 
 
 
-Public Class NR_Spectrum_RGB : Inherits TaskParent
+Public Class XR_Spectrum_RGB : Inherits TaskParent
     Dim options As New Options_Spectrum
     Dim gSpec As New Spectrum_Gray
     Dim redC As New RedColor_Basics
@@ -243,7 +243,7 @@ End Class
 
 
 
-Public Class NR_Spectrum_CellZoom : Inherits TaskParent
+Public Class XR_Spectrum_CellZoom : Inherits TaskParent
     Dim proportion As New Resize_Proportional
     Dim breakdown As New Spectrum_Breakdown
     Dim redC As New RedCloud_Basics
@@ -354,7 +354,7 @@ End Class
 
 
 
-Public Class NR_Spectrum_RedCloud : Inherits TaskParent
+Public Class XR_Spectrum_RedCloud : Inherits TaskParent
     Dim breakdown As New Spectrum_Breakdown
     Dim redC As New RedColor_Basics
     Public Sub New()
@@ -382,7 +382,7 @@ End Class
 
 
 
-Public Class NR_Spectrum_Mask : Inherits TaskParent
+Public Class XR_Spectrum_Mask : Inherits TaskParent
     Dim gSpec As New Spectrum_Gray
     Public Sub New()
         If standalone Then strOut = "Select a cell to see its depth spectrum"

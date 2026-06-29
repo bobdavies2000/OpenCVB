@@ -120,7 +120,7 @@ End Class
 
 
 
-Public Class NR_FeatureLess_Basics : Inherits TaskParent
+Public Class XR_FeatureLess_Basics : Inherits TaskParent
     Public brickList As New List(Of cv.Rect)
     Dim redC As New RedColor_Basics
     Public Sub New()
@@ -154,7 +154,7 @@ End Class
 
 
 
-Public Class NR_FeatureLess_BasicsRedC : Inherits TaskParent
+Public Class XR_FeatureLess_BasicsRedC : Inherits TaskParent
     Public brickList As New List(Of cv.Rect)
     Dim redC As New RedColor_Basics
     Public Sub New()
@@ -188,7 +188,7 @@ End Class
 
 
 
-Public Class NR_FeatureLess_BasicsTest : Inherits TaskParent
+Public Class XR_FeatureLess_BasicsTest : Inherits TaskParent
     Public brickList As New List(Of cv.Rect)
     Public regionList As New List(Of List(Of cv.Rect))
     Public Sub New()
@@ -242,7 +242,7 @@ End Class
 
 
 
-Public Class NR_FeatureLess_Depth : Inherits TaskParent
+Public Class XR_FeatureLess_Depth : Inherits TaskParent
     Public fLessList As New List(Of cv.Rect)
     Public options As New Options_FeatureLess
     Public Sub New()
@@ -293,7 +293,7 @@ End Class
 
 
 
-Public Class NR_FeatureLess_DepthMotion : Inherits TaskParent
+Public Class XR_FeatureLess_DepthMotion : Inherits TaskParent
     Public fLessRaw As New FeatureLess_DepthFull
     Public rectList As New List(Of cv.Rect)
     Public fLessNot As New List(Of cv.Rect)
@@ -364,7 +364,7 @@ End Class
 
 
 
-Public Class NR_FeatureLess_Correlation : Inherits TaskParent
+Public Class XR_FeatureLess_Correlation : Inherits TaskParent
     Public fLessList As New List(Of cv.Rect)
     Dim smallGrid As New Grid_SquaresOnly
     Public options As New Options_FeatureLess
@@ -421,7 +421,7 @@ End Class
 
 
 
-Public Class NR_FeatureLess_Correlations : Inherits TaskParent
+Public Class XR_FeatureLess_Correlations : Inherits TaskParent
     Dim corr As New Correlation_BasicsPlot
     Public Sub New()
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
@@ -448,7 +448,7 @@ End Class
 
 
 
-Public Class NR_FeatureLess_Contours : Inherits TaskParent
+Public Class XR_FeatureLess_Contours : Inherits TaskParent
     Dim edgeline As New EdgeLine_Basics
     Dim contours As New Contour_Basics
     Public Sub New()
@@ -475,7 +475,7 @@ End Class
 
 
 
-Public Class NR_FeatureLess_Sobel : Inherits TaskParent
+Public Class XR_FeatureLess_Sobel : Inherits TaskParent
     Dim edges As New Edge_Sobel
     Dim options As New Options_Sobel()
     Public Sub New()
@@ -495,7 +495,7 @@ End Class
 
 
 
-Public Class NR_FeatureLess_UniquePixels : Inherits TaskParent
+Public Class XR_FeatureLess_UniquePixels : Inherits TaskParent
     Dim fless As New Hough_FeatureLessTopX
     Dim sort As New Sort_1Channel
     Public Sub New()
@@ -517,7 +517,7 @@ End Class
 
 
 
-Public Class NR_FeatureLess_Unique3Pixels : Inherits TaskParent
+Public Class XR_FeatureLess_Unique3Pixels : Inherits TaskParent
     Dim fLessTopX As New Hough_FeatureLessTopX
     Dim sort3 As New Sort_3Channel
     Public Sub New()
@@ -537,7 +537,7 @@ End Class
 
 
 
-Public Class NR_FeatureLess_Histogram : Inherits TaskParent
+Public Class XR_FeatureLess_Histogram : Inherits TaskParent
     Dim backP As New BackProject_FeatureLess
     Public Sub New()
         desc = "Create a histogram of the featureless regions"
@@ -559,7 +559,7 @@ End Class
 
 
 
-Public Class NR_FeatureLess_DCT : Inherits TaskParent
+Public Class XR_FeatureLess_DCT : Inherits TaskParent
     Dim dct As New DCT_FeatureLess
     Public Sub New()
         labels(3) = "Largest FeatureLess Region"
@@ -606,7 +606,7 @@ End Class
 
 
 
-Public Class NR_FeatureLess_History : Inherits TaskParent
+Public Class XR_FeatureLess_History : Inherits TaskParent
     Dim frames As New History_Basics
     Dim fLess As New FeatureLess_Correlation
     Public Sub New()
@@ -715,7 +715,7 @@ End Class
 
 
 
-Public Class NR_FeatureLess_Lines : Inherits TaskParent
+Public Class XR_FeatureLess_Lines : Inherits TaskParent
     Dim fLess As New FeatureLess_DepthFull
     Dim ranges() As cv.Rangef = New cv.Rangef() {New cv.Rangef(0, 255)}
     Public lpList As New List(Of lpData)
@@ -824,7 +824,7 @@ End Class
 
 
 
-Public Class NR_FeatureLess_FeaturesOld : Inherits TaskParent
+Public Class XR_FeatureLess_FeaturesOld : Inherits TaskParent
     Dim feat As New Feature_Basics
     Dim fLess As New FeatureLess_DepthFull
     Public Sub New()
@@ -1040,7 +1040,7 @@ End Class
 
 
 
-Public Class NR_FeatureLess_Predict : Inherits TaskParent
+Public Class XR_FeatureLess_Predict : Inherits TaskParent
     Dim ml As New ML_RandomForest
     Public clusters() As Single
     Dim ranges() As cv.Rangef
@@ -1268,7 +1268,7 @@ End Class
 
 
 
-Public Class NR_FeatureLess_ClustersHist2D : Inherits TaskParent
+Public Class XR_FeatureLess_ClustersHist2D : Inherits TaskParent
     Public fLess As New FeatureLess_DepthFull
     Public histArray(task.histogramBins * task.histogramBins - 1) As Single
     Public features As New cv.Mat
@@ -1529,7 +1529,7 @@ End Class
 
 
 
-Public Class NR_FeatureLess_BasicsTest2 : Inherits TaskParent
+Public Class XR_FeatureLess_BasicsTest2 : Inherits TaskParent
     Public brickList As New List(Of cv.Rect)
     Public Sub New()
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)

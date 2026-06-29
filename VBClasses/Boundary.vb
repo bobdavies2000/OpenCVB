@@ -89,7 +89,7 @@ End Class
 
 
 
-Public Class NR_Boundary_RemovedRects : Inherits TaskParent
+Public Class XR_Boundary_RemovedRects : Inherits TaskParent
     Public bRects As New Boundary_Rectangles
     Public Sub New()
         If standalone Then task.gOptions.displayDst1.Checked = True
@@ -115,7 +115,7 @@ End Class
 
 
 
-Public Class NR_Boundary_GuidedBP : Inherits TaskParent
+Public Class XR_Boundary_GuidedBP : Inherits TaskParent
     Dim guided As New GuidedBP_Depth
     Dim redC As New RedColor_Basics
     Public Sub New()

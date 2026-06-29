@@ -42,7 +42,7 @@ End Class
 
 
 
-Public Class NR_LinearRegression_Test : Inherits TaskParent
+Public Class XR_LinearRegression_Test : Inherits TaskParent
     Dim regress As New LinearRegression_Basics
     Public Sub New()
         desc = "A simple example of using OpenCV's linear regression."
@@ -69,7 +69,7 @@ End Class
 
 
 
-Public Class NR_LinearRegression_Random : Inherits TaskParent
+Public Class XR_LinearRegression_Random : Inherits TaskParent
     Dim regress As New LinearRegression_Basics
     Dim random As New Random_Basics
     Public Sub New()

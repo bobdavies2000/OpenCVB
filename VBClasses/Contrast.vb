@@ -1,6 +1,6 @@
 Imports cv = OpenCvSharp
 Imports VBClasses
-Public Class NR_Contrast_Basics : Inherits TaskParent
+Public Class XR_Contrast_Basics : Inherits TaskParent
     Dim options As New Options_BrightnessContrast
     Public Sub New()
         labels(2) = "Brightness/Contrast"
@@ -18,7 +18,7 @@ End Class
 
 
 
-Public Class NR_Contrast_POW : Inherits TaskParent
+Public Class XR_Contrast_POW : Inherits TaskParent
     Dim options As New Options_BrightnessContrast
     Public Sub New()
         labels = {"", "", "Original Image", "Contrast reduced with POW function"}

@@ -55,7 +55,7 @@ End Class
 
 
 
-Public Class NR_Convex_RedColor : Inherits TaskParent
+Public Class XR_Convex_RedColor : Inherits TaskParent
     Dim convex As New Convex_Basics
     Dim redC As New RedCloud_Basics
     Public Sub New()
@@ -86,7 +86,7 @@ End Class
 
 
 ' https://stackoverflow.com/questions/31354150/opencv-convexity-defects-drawing
-Public Class NR_Convex_Defects : Inherits TaskParent
+Public Class XR_Convex_Defects : Inherits TaskParent
     Dim contours As New Contour_Largest
     Public Sub New()
         dst2 = cv.Cv2.ImRead(task.homeDir + "Data/star2.png").Threshold(200, 255,

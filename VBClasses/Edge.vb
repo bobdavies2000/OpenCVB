@@ -6,7 +6,7 @@ Public Class Edge_Basics_TA : Inherits TaskParent
     Dim binRed As Edge_BinarizedReduction
     Dim binSobel As Bin4Way_Sobel
     Dim sobel As Edge_Sobel
-    Dim colorGap As NR_Edge_ColorGap_CPP
+    Dim colorGap As XR_Edge_ColorGap_CPP
     Dim Laplacian As Edge_Laplacian
     Dim edges As Object
     Public Sub New()
@@ -25,7 +25,7 @@ Public Class Edge_Basics_TA : Inherits TaskParent
                 Case "Canny"
                     edges = New Edge_Canny
                 Case "Color Gap"
-                    edges = New NR_Edge_ColorGap_CPP
+                    edges = New XR_Edge_ColorGap_CPP
                 Case "Laplacian"
                     edges = New Edge_Laplacian
                 Case "Sobel"
@@ -47,13 +47,13 @@ End Class
 
 
 
-Public Class NR_Edge_MotionFree : Inherits TaskParent
+Public Class XR_Edge_MotionFree : Inherits TaskParent
     Dim canny As New Edge_Canny
-    Dim scharr As NR_Edge_Scharr
+    Dim scharr As XR_Edge_Scharr
     Dim binRed As Edge_BinarizedReduction
     Dim binSobel As Bin4Way_Sobel
     Dim sobel As Edge_SobelNaive
-    Dim colorGap As NR_Edge_ColorGap_CPP
+    Dim colorGap As XR_Edge_ColorGap_CPP
     Dim deriche As Edge_Deriche_CPP
     Dim Laplacian As Edge_Laplacian
     Dim resizeAdd As Edge_ResizeAdd
@@ -69,7 +69,7 @@ Public Class NR_Edge_MotionFree : Inherits TaskParent
                 Case "Canny"
                     edges = New Edge_Canny
                 Case "Scharr"
-                    edges = New NR_Edge_Scharr
+                    edges = New XR_Edge_Scharr
                 Case "Binarized Reduction"
                     edges = New Edge_BinarizedReduction
                 Case "Binarized Sobel"
@@ -77,7 +77,7 @@ Public Class NR_Edge_MotionFree : Inherits TaskParent
                 Case "Sobel"
                     edges = New Edge_SobelNaive
                 Case "Color Gap"
-                    edges = New NR_Edge_ColorGap_CPP
+                    edges = New XR_Edge_ColorGap_CPP
                 Case "Deriche"
                     edges = New Edge_Deriche_CPP
                 Case "Laplacian"
@@ -100,7 +100,7 @@ End Class
 
 
 
-Public Class NR_Edge_DepthAndColor : Inherits TaskParent
+Public Class XR_Edge_DepthAndColor : Inherits TaskParent
     Dim shadow As New Depth_Holes
     Dim dilate As New Dilate_Basics
     Public Sub New()
@@ -127,7 +127,7 @@ End Class
 
 
 'https://docs.opencvb.org/2.4/doc/tutorials/imgproc/imgtrans/sobel_derivatives/sobel_derivatives.html
-Public Class NR_Edge_Scharr : Inherits TaskParent
+Public Class XR_Edge_Scharr : Inherits TaskParent
     Dim options As New Options_Edges
     Public Sub New()
         labels(3) = "x field + y field in CV_32F format"
@@ -150,7 +150,7 @@ End Class
 
 
 ' https://www.learnopencvb.com/non-photorealistic-rendering-using-opencv-python-c/
-Public Class NR_Edge_Preserving : Inherits TaskParent
+Public Class XR_Edge_Preserving : Inherits TaskParent
     Dim options As New Options_Edges
     Public Sub New()
         labels(3) = "Edge preserving blur for BGR depth image above"
@@ -179,7 +179,7 @@ End Class
 
 
 '  https://docs.opencvb.org/3.1.0/d0/da5/tutorial_ximgproc_prediction.html
-Public Class NR_Edge_RandomForest_CPP : Inherits TaskParent
+Public Class XR_Edge_RandomForest_CPP : Inherits TaskParent
     Implements IDisposable
     Dim rgbData() As cv.Vec3b
     Dim options As New Options_Edges2
@@ -224,7 +224,7 @@ End Class
 
 
 
-Public Class NR_Edge_DCTfrequency : Inherits TaskParent
+Public Class XR_Edge_DCTfrequency : Inherits TaskParent
     Dim options As New Options_Edges2
     Public Sub New()
         labels(3) = "Mask for the isolated frequencies"
@@ -254,7 +254,7 @@ End Class
 
 
 
-Public Class NR_Edge_DCTinput : Inherits TaskParent
+Public Class XR_Edge_DCTinput : Inherits TaskParent
     Dim edges As New Edge_Basics_TA
     Dim dct As New DCT_FeatureLess
     Public Sub New()
@@ -280,7 +280,7 @@ End Class
 
 
 
-Public Class NR_Edge_Consistent : Inherits TaskParent
+Public Class XR_Edge_Consistent : Inherits TaskParent
     Dim saveFrames As New List(Of cv.Mat)
     Public Sub New()
         desc = "Edges that are consistent for x number of frames"
@@ -329,7 +329,7 @@ End Class
 
 
 
-Public Class NR_Edge_BinarizedBrightness : Inherits TaskParent
+Public Class XR_Edge_BinarizedBrightness : Inherits TaskParent
     Dim edges As New Edge_Basics_TA
     Dim bright As New Brightness_Basics
     Public Sub New()
@@ -356,7 +356,7 @@ End Class
 
 
 
-Public Class NR_Edge_SobelLRBinarized : Inherits TaskParent
+Public Class XR_Edge_SobelLRBinarized : Inherits TaskParent
     Dim edges As New Bin4Way_Sobel
     Public Sub New()
         labels = {"", "", "Horizontal Sobel - Left View", "Horizontal Sobel - Right View"}
@@ -380,7 +380,7 @@ End Class
 
 
 
-Public Class NR_Edge_Matching : Inherits TaskParent
+Public Class XR_Edge_Matching : Inherits TaskParent
     Dim match As New Match_Basics
     Dim redRects As New List(Of Integer)
     Dim options As New Options_EdgeMatching
@@ -486,7 +486,7 @@ End Class
 
 
 ' https://scikit-image.org/docs/dev/auto_examples/color_exposure/plot_adapt_rgb.html#sphx-glr-auto-examples-color-exposure-plot-adapt-rgb-py
-Public Class NR_Edge_HSV : Inherits TaskParent
+Public Class XR_Edge_HSV : Inherits TaskParent
     Dim edges As New Edge_RGB
     Public Sub New()
         desc = "Combine the edges from all 3 HSV channels"
@@ -502,7 +502,7 @@ End Class
 
 
 
-Public Class NR_Edge_ColorGap_CPP : Inherits TaskParent
+Public Class XR_Edge_ColorGap_CPP : Inherits TaskParent
     Implements IDisposable
     Dim gap As New Edge_ColorGap_VB
     Public Sub New()
@@ -582,7 +582,7 @@ End Class
 
 
 
-Public Class NR_Edge_Reduction : Inherits TaskParent
+Public Class XR_Edge_Reduction : Inherits TaskParent
     Dim reduction As New Reduction_Basics
     Public Sub New()
         task.fOptions.ReductionColor.Value = 1
@@ -604,7 +604,7 @@ End Class
 
 
 
-Public Class NR_Edge_DepthTiers : Inherits TaskParent
+Public Class XR_Edge_DepthTiers : Inherits TaskParent
     Dim edge As New Edge_Basics_TA
     Dim tiers As New Depth_Tiers
     Public Sub New()
@@ -686,7 +686,7 @@ End Class
 
 
 
-Public Class NR_Edge_CannyCombined : Inherits TaskParent
+Public Class XR_Edge_CannyCombined : Inherits TaskParent
     Dim canny As New Edge_CannyHistory
     Dim edges As New Edge_ResizeAdd
     Public Sub New()
@@ -781,7 +781,7 @@ End Class
 
 
 
-Public Class NR_Edge_SobelCustomLeftRight : Inherits TaskParent
+Public Class XR_Edge_SobelCustomLeftRight : Inherits TaskParent
     Dim custom As New Edge_SobelCustom
     Public Sub New()
         If standalone Then task.gOptions.displayDst1.Checked = True
@@ -807,7 +807,7 @@ End Class
 
 
 
-Public Class NR_Edge_Projection : Inherits TaskParent
+Public Class XR_Edge_Projection : Inherits TaskParent
     Dim valley As New HistValley_OptionsAuto
     Dim edges As New Edge_Basics_TA
     Public Sub New()
@@ -837,7 +837,7 @@ End Class
 
 
 
-Public Class NR_Edge_RedCloud : Inherits TaskParent
+Public Class XR_Edge_RedCloud : Inherits TaskParent
     Dim edges As New Edge_Basics_TA
     Public mats As New Mat_4Click
     Dim redC As New RedCloud_Basics
@@ -887,7 +887,7 @@ End Class
 
 
 
-Public Class NR_Edge_CloudSegments : Inherits TaskParent
+Public Class XR_Edge_CloudSegments : Inherits TaskParent
     Dim segments As New Histogram_CloudSegments
     Dim edges As New Edge_Sobel
     Public Sub New()
@@ -993,7 +993,7 @@ End Class
 
 
 
-Public Class NR_Edge_DiffXYZ : Inherits TaskParent
+Public Class XR_Edge_DiffXYZ : Inherits TaskParent
     Dim diffX As New Edge_DiffX_CPP
     Dim diffY As New Edge_DiffY_CPP
     Dim diffZ As New Edge_DiffZ_CPP
@@ -1026,7 +1026,7 @@ End Class
 
 
 'https://docs.opencvb.org/2.4/doc/tutorials/imgproc/imgtrans/laplace_operator/laplace_operator.html
-Public Class NR_Edge_LaplacianColor : Inherits TaskParent
+Public Class XR_Edge_LaplacianColor : Inherits TaskParent
     Dim options As New Options_LaplacianKernels
     Public Sub New()
         If standalone Then task.gOptions.displayDst1.Checked = True
@@ -1068,7 +1068,7 @@ End Class
 
 
 
-Public Class NR_Edge_Sweep : Inherits TaskParent
+Public Class XR_Edge_Sweep : Inherits TaskParent
     Public Sub New()
         desc = "Sweep through the various edge algorithms"
     End Sub
@@ -1126,7 +1126,7 @@ End Class
 
 
 
-Public Class NR_Edge_DericheFiltered : Inherits TaskParent
+Public Class XR_Edge_DericheFiltered : Inherits TaskParent
     Dim deriche As New Edge_Deriche_CPP
     Public Sub New()
         desc = "Filter the data from the Deriche algorithm to highlight the edges."
@@ -1147,7 +1147,7 @@ End Class
 
 
 
-Public Class NR_Edge_MeanSubtraction : Inherits TaskParent
+Public Class XR_Edge_MeanSubtraction : Inherits TaskParent
     Dim canny As New Edge_Canny
     Dim LRMeanSub As New MeanSubtraction_Basics
     Public Sub New()
@@ -1170,7 +1170,7 @@ End Class
 
 
 'https://docs.opencvb.org/2.4/doc/tutorials/imgproc/imgtrans/sobel_derivatives/sobel_derivatives.html
-Public Class NR_Edge_SobelQT : Inherits TaskParent
+Public Class XR_Edge_SobelQT : Inherits TaskParent
     Public Sub New()
         desc = "Show Sobel vertical and horizontal edge detection no options."
     End Sub
@@ -1186,7 +1186,7 @@ End Class
 
 
 
-Public Class NR_Edge_NoDepth : Inherits TaskParent
+Public Class XR_Edge_NoDepth : Inherits TaskParent
     Dim edgeline As New EdgeLine_Basics
     Public Sub New()
         If standalone Then task.gOptions.displayDst1.Checked = True
@@ -1209,7 +1209,7 @@ End Class
 
 
 
-Public Class NR_Edge_CloudData : Inherits TaskParent
+Public Class XR_Edge_CloudData : Inherits TaskParent
     Dim prep As New RedPrep_Core
     Dim edges As New Edge_Basics_TA
     Public Sub New()
@@ -1230,8 +1230,8 @@ End Class
 
 
 
-Public Class NR_Edge_Stability : Inherits TaskParent
-    Dim gEdges As New NR_Brick_EdgeFlips
+Public Class XR_Edge_Stability : Inherits TaskParent
+    Dim gEdges As New XR_Brick_EdgeFlips
     Public Sub New()
         desc = "Measure the stability of edges in each grid Rect"
     End Sub
@@ -1278,7 +1278,7 @@ End Class
 
 
 
-Public Class NR_Edge_LeftRightDepth : Inherits TaskParent
+Public Class XR_Edge_LeftRightDepth : Inherits TaskParent
     Dim edgesLR As New Edge_LeftRight
     Public ptLeft As New List(Of cv.Point)
     Public ptRight As New List(Of cv.Point)
@@ -1328,7 +1328,7 @@ End Class
 
 
 
-Public Class NR_Edge_LeftRightBrick : Inherits TaskParent
+Public Class XR_Edge_LeftRightBrick : Inherits TaskParent
     Dim bricks As New Brick_Basics
     Dim edgesLR As New Edge_LeftRight
     Public means As New List(Of Single)
@@ -1377,7 +1377,7 @@ End Class
 
 
 
-Public Class NR_Edge_CannyMin : Inherits TaskParent
+Public Class XR_Edge_CannyMin : Inherits TaskParent
     Dim canny As New Edge_Canny
     Public Sub New()
         OptionParent.FindSlider("Canny threshold1").Value = 200
@@ -1395,7 +1395,7 @@ End Class
 
 
 
-Public Class NR_Edge_CannyLeftRight : Inherits TaskParent
+Public Class XR_Edge_CannyLeftRight : Inherits TaskParent
     Dim canny As New Edge_Canny
     Public Sub New()
         OptionParent.FindSlider("Canny threshold1").Value = 200
@@ -1435,7 +1435,7 @@ End Class
 
 
 
-Public Class NR_Edge_MotionFrames : Inherits TaskParent
+Public Class XR_Edge_MotionFrames : Inherits TaskParent
     Dim frames As New History_Basics
     Dim diff As New Diff_Basics
     Public Sub New()
@@ -1536,7 +1536,7 @@ End Class
 
 
 
-Public Class NR_Edge_SobelLR : Inherits TaskParent
+Public Class XR_Edge_SobelLR : Inherits TaskParent
     Dim sobel As New Edge_SobelNaive
     Public Sub New()
         OptionParent.FindSlider("Sobel kernel Size").Value = 3
@@ -1664,7 +1664,7 @@ End Class
 
 
 
-Public Class NR_Edge_Color8U : Inherits TaskParent
+Public Class XR_Edge_Color8U : Inherits TaskParent
     Public color8u As New Color8U_Basics
     Dim edges As New Edge_Basics_TA
     Public Sub New()

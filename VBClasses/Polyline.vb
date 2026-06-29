@@ -18,7 +18,7 @@ End Class
 
 
 
-Public Class NR_PolyLine_IEnumerableExample : Inherits TaskParent
+Public Class XR_PolyLine_IEnumerableExample : Inherits TaskParent
     Dim options As New Options_PolyLines
     Public Sub New()
         desc = "Manually create an ienumerable(of ienumerable(of cv.point))."
@@ -45,7 +45,7 @@ End Class
 
 ' VB.Net implementation of the browse example in Opencvb.
 ' https://github.com/opencv/opencv/blob/master/samples/python/browse.py
-Public Class NR_PolyLine_Random : Inherits TaskParent
+Public Class XR_PolyLine_Random : Inherits TaskParent
     Dim zoom As New Pixel_Zoom
     Public Sub New()
         labels(2) = "To zoom move the mouse over the image"

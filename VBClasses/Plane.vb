@@ -164,7 +164,7 @@ End Class
 
 
 
-Public Class NR_Plane_FlatSurfaces : Inherits TaskParent
+Public Class XR_Plane_FlatSurfaces : Inherits TaskParent
     Dim addW As New AddWeighted_Basics
     Dim plane As New Plane_CellColor
     Public Sub New()
@@ -260,7 +260,7 @@ End Class
 
 
 
-Public Class NR_Plane_EqCorrelation : Inherits TaskParent
+Public Class XR_Plane_EqCorrelation : Inherits TaskParent
     Dim plane As New Plane_Points
     Public correlations As New List(Of Single)
     Public equations As New List(Of cv.Vec4f)
@@ -460,7 +460,7 @@ End Class
 
 
 
-Public Class NR_Plane_Histogram : Inherits TaskParent
+Public Class XR_Plane_Histogram : Inherits TaskParent
     Dim solo As New Cloud_Solo
     Dim hist As New Histogram_Basics
     Public peakCeiling As Single
@@ -599,7 +599,7 @@ End Class
 
 
 
-Public Class NR_Plane_Verticals : Inherits TaskParent
+Public Class XR_Plane_Verticals : Inherits TaskParent
     Dim solo As New Cloud_Solo
     Dim frames As New History_Basics
     Public Sub New()
@@ -633,7 +633,7 @@ End Class
 
 
 
-Public Class NR_Plane_Horizontals : Inherits TaskParent
+Public Class XR_Plane_Horizontals : Inherits TaskParent
     Dim solo As New Cloud_Solo
     Dim frames As New History_Basics
     Public Sub New()
@@ -669,7 +669,7 @@ End Class
 
 
 
-Public Class NR_Plane_FloorStudy : Inherits TaskParent
+Public Class XR_Plane_FloorStudy : Inherits TaskParent
     Public slice As New Structured_SliceH
     Dim yList As New List(Of Single)
     Public planeY As Single

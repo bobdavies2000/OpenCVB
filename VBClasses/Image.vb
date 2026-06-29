@@ -88,7 +88,7 @@ End Class
 
 
 
-Public Class NR_Image_MSER : Inherits TaskParent
+Public Class XR_Image_MSER : Inherits TaskParent
     Public images As New Image_Series
     Dim core As New MSER_Detect
     Dim options As New Options_Images
@@ -115,7 +115,7 @@ End Class
 
 
 
-Public Class NR_Image_Icon : Inherits TaskParent
+Public Class XR_Image_Icon : Inherits TaskParent
     Dim inputImage As Bitmap
     Public Sub New()
         Dim filePath As String = task.homeDir + "/MainUI/Data/Magnify.png"

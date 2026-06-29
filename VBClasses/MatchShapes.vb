@@ -126,7 +126,7 @@ End Class
 
 
 
-Public Class NR_MatchShapes_Hulls : Inherits TaskParent
+Public Class XR_MatchShapes_Hulls : Inherits TaskParent
     Dim options As New Options_MatchShapes
     Dim hulls As New RedColor_Hulls
     Public Sub New()
@@ -162,7 +162,7 @@ End Class
 
 
 
-Public Class NR_MatchShapes_Contours : Inherits TaskParent
+Public Class XR_MatchShapes_Contours : Inherits TaskParent
     Dim options As New Options_MatchShapes
     Dim redC As New RedColor_Basics
     Public Sub New()
@@ -201,7 +201,7 @@ End Class
 
 
 
-Public Class NR_MatchShapes_NearbyHull : Inherits TaskParent
+Public Class XR_MatchShapes_NearbyHull : Inherits TaskParent
     Public similarCells As New List(Of rcData)
     Public bestCell As Integer
     Dim rc As New rcData

@@ -1,6 +1,6 @@
 Imports cv = OpenCvSharp
 ' https://www.programcreek.com/python/example/70396/cv2.imencode
-Public Class NR_Encode_Basics : Inherits TaskParent
+Public Class XR_Encode_Basics : Inherits TaskParent
     Dim options As New Options_Encode
     Public Sub New()
         desc = "Error Level Analysis - to verify a jpg image has not been modified."
@@ -30,7 +30,7 @@ End Class
 
 
 ' https://answers.opencvb.org/question/31519/encode-image-in-jpg-with-opencv-avoiding-the-artifacts-effect/
-Public Class NR_Encode_Scaling : Inherits TaskParent
+Public Class XR_Encode_Scaling : Inherits TaskParent
     Dim options As New Options_Encode
     Public Sub New()
         desc = "JPEG Encoder"

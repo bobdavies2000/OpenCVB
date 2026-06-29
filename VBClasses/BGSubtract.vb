@@ -36,7 +36,7 @@ End Class
 
 
 ' https://github.com/opencv/opencv_contrib/blob/master/modules/bgsegm/samples/bgfg.cpp
-Public Class NR_BGSubtract_Basics_QT : Inherits TaskParent
+Public Class XR_BGSubtract_Basics_QT : Inherits TaskParent
     Implements IDisposable
     Dim learnRate As Double
     Public Sub New()
@@ -90,7 +90,7 @@ End Class
 
 
 
-Public Class NR_BGSubtract_MOG2_QT : Inherits TaskParent
+Public Class XR_BGSubtract_MOG2_QT : Inherits TaskParent
     Implements IDisposable
     Dim MOG2 As cv.BackgroundSubtractorMOG2
     Public Sub New()
@@ -113,7 +113,7 @@ End Class
 
 
 
-Public Class NR_BGSubtract_MotionDetect : Inherits TaskParent
+Public Class XR_BGSubtract_MotionDetect : Inherits TaskParent
     Dim options As New Options_MotionDetect
     Public Sub New()
         labels(3) = "Only Motion Added"
@@ -177,7 +177,7 @@ End Class
 
 
 
-Public Class NR_BGSubtract_GMG_KNN : Inherits TaskParent
+Public Class XR_BGSubtract_GMG_KNN : Inherits TaskParent
     Implements IDisposable
     Dim gmg As cv.BackgroundSubtractorGMG
     Dim knn As cv.BackgroundSubtractorKNN
@@ -209,7 +209,7 @@ End Class
 
 
 
-Public Class NR_BGSubtract_MOG_RGBDepth : Inherits TaskParent
+Public Class XR_BGSubtract_MOG_RGBDepth : Inherits TaskParent
     Implements IDisposable
     Public grayMat As New cv.Mat
     Dim options As New Options_BGSubtract
@@ -237,7 +237,7 @@ End Class
 
 
 
-Public Class NR_BGSubtract_MOG_Retina : Inherits TaskParent
+Public Class XR_BGSubtract_MOG_Retina : Inherits TaskParent
     Dim bgSub As New BGSubtract_MOG
     Dim retina As New Retina_Basics_CPP
     Public Sub New()
@@ -255,7 +255,7 @@ End Class
 
 
 
-Public Class NR_BGSubtract_DepthOrColorMotion : Inherits TaskParent
+Public Class XR_BGSubtract_DepthOrColorMotion : Inherits TaskParent
     Public motion As New Diff_UnstableDepthAndColor
     Public Sub New()
         desc = "Detect motion with both depth and color changes"
@@ -274,7 +274,7 @@ End Class
 
 
 
-Public Class NR_BGSubtract_Video : Inherits TaskParent
+Public Class XR_BGSubtract_Video : Inherits TaskParent
     Dim bgSub As New BGSubtract_Basics
     Dim video As New Video_Basics
     Public Sub New()
@@ -351,7 +351,7 @@ End Class
 
 
 
-Public Class NR_BGSubtract_Reduction : Inherits TaskParent
+Public Class XR_BGSubtract_Reduction : Inherits TaskParent
     Dim reduction As New Reduction_Basics
     Dim bgSub As New BGSubtract_Basics
     Public Sub New()

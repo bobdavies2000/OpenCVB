@@ -48,7 +48,7 @@ End Class
 
 
 
-Public Class NR_GridRect_Color : Inherits TaskParent
+Public Class XR_GridRect_Color : Inherits TaskParent
     Public Sub New()
         task.gOptions.GridSlider.Value = dst2.Width \ 40 ' arbitrary but the goal is to get a reasonable (< 500) number of r's.
         dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
@@ -168,7 +168,7 @@ End Class
 
 
 
-Public Class NR_GridRect_ColorSplit : Inherits TaskParent
+Public Class XR_GridRect_ColorSplit : Inherits TaskParent
     Dim devGrid As New GridRect_Sorted
     Public Sub New()
         devGrid.maskVal = 255
@@ -200,7 +200,7 @@ End Class
 
 
 
-Public Class NR_GridRect_CorrelationMotion : Inherits TaskParent
+Public Class XR_GridRect_CorrelationMotion : Inherits TaskParent
     Public gather As New GridRect_Basics
     Dim plot As New PlotTime_Single
     Dim options As New Options_Features
@@ -271,7 +271,7 @@ End Class
 
 
 
-Public Class NR_GridRect_LowStdevCorrelation : Inherits TaskParent
+Public Class XR_GridRect_LowStdevCorrelation : Inherits TaskParent
     Dim gather As New GridRect_LowStdev
     Dim correlations As New List(Of Single)
     Dim options As New Options_Features
@@ -323,7 +323,7 @@ End Class
 
 
 
-Public Class NR_GridRect_LR : Inherits TaskParent
+Public Class XR_GridRect_LR : Inherits TaskParent
     Public gLeft As New GridRect_Basics
     Public gRight As New GridRect_Basics
     Public Sub New()
@@ -345,7 +345,7 @@ End Class
 
 
 
-Public Class NR_GridRect_LRClick : Inherits TaskParent
+Public Class XR_GridRect_LRClick : Inherits TaskParent
     Dim gather As New GridRect_Basics
     Dim ClickPoint As cv.Point, picTag As Integer
     Dim options As New Options_Features
@@ -426,7 +426,7 @@ End Class
 
 
 
-Public Class NR_GridRect_LRAll : Inherits TaskParent
+Public Class XR_GridRect_LRAll : Inherits TaskParent
     Dim gather As New GridRect_Basics
     Dim options As New Options_Features
     Public sortedRects As New SortedList(Of Single, cv.Rect)(New compareAllowIdenticalSingleInverted)
@@ -491,7 +491,7 @@ End Class
 
 
 
-Public Class NR_GridRect_Sobel : Inherits TaskParent
+Public Class XR_GridRect_Sobel : Inherits TaskParent
     Dim edges As New GridRect_Canny
     Dim sobel As New Edge_Sobel
     Public Sub New()

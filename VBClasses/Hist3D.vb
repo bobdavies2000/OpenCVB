@@ -89,7 +89,7 @@ End Class
 
 
 
-Public Class NR_Hist3D_RedCloud : Inherits TaskParent
+Public Class XR_Hist3D_RedCloud : Inherits TaskParent
     Dim hist3D As New Hist3D_Basics
     Dim redC As New RedColor_Basics
     Public Sub New()
@@ -116,7 +116,7 @@ End Class
 
 
 
-Public Class NR_Hist3D_RedColor : Inherits TaskParent
+Public Class XR_Hist3D_RedColor : Inherits TaskParent
     Dim hColor As New Hist3Dcolor_Basics
     Dim redC As New RedColor_Basics
     Public Sub New()
@@ -144,10 +144,10 @@ End Class
 
 
 
-Public Class NR_Hist3D_DepthWithMask : Inherits TaskParent
+Public Class XR_Hist3D_DepthWithMask : Inherits TaskParent
     Dim hColor As New Hist3Dcolor_Basics
     Public depthMask As New cv.Mat
-    Dim fore As New NR_Foreground_KMeans
+    Dim fore As New XR_Foreground_KMeans
     Public Sub New()
         desc = "Isolate the foreground and no depth in the image and run it through Hist3D_Basics"
     End Sub
@@ -211,7 +211,7 @@ End Class
 
 
 
-Public Class NR_Hist3D_PixelClassify : Inherits TaskParent
+Public Class XR_Hist3D_PixelClassify : Inherits TaskParent
     Dim pixel As New Hist3D_Pixel
     Dim redC As New RedColor_Basics
     Public Sub New()
@@ -233,7 +233,7 @@ End Class
 
 
 
-Public Class NR_Hist3D_PixelDiffMask : Inherits TaskParent
+Public Class XR_Hist3D_PixelDiffMask : Inherits TaskParent
     Dim pixel As New Hist3D_Pixel
     Public Sub New()
         desc = "Build better image segmentation - remove unstable pixels from 3D color histogram backprojection"
@@ -252,7 +252,7 @@ End Class
 
 
 
-Public Class NR_Hist3D_RedCloudGrid : Inherits TaskParent
+Public Class XR_Hist3D_RedCloudGrid : Inherits TaskParent
     Dim pixels As New Pixel_Vectors
     Dim hVector As New Hist3Dcolor_Vector
     Public Sub New()

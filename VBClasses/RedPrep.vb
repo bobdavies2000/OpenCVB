@@ -70,7 +70,7 @@ End Class
 
 
 
-Public Class NR_RedPrep_VB : Inherits TaskParent
+Public Class XR_RedPrep_VB : Inherits TaskParent
     Public Sub New()
         desc = "Simpler transforms for the point cloud using CalcHist instead of reduction."
     End Sub
@@ -116,7 +116,7 @@ End Class
 
 
 
-Public Class NR_RedPrep_DepthEdges : Inherits TaskParent
+Public Class XR_RedPrep_DepthEdges : Inherits TaskParent
     Dim prep As New RedPrep_Depth
     Dim edges As New Edge_Basics_TA
     Public Sub New()
@@ -137,7 +137,7 @@ End Class
 
 
 
-Public Class NR_RedPrep_DepthTiers : Inherits TaskParent
+Public Class XR_RedPrep_DepthTiers : Inherits TaskParent
     Dim prep As New RedPrep_Depth
     Dim tiers As New Depth_Tiers
     Public Sub New()
@@ -201,7 +201,7 @@ End Class
 
 
 
-Public Class NR_RedPrep_CloudAndColor : Inherits TaskParent
+Public Class XR_RedPrep_CloudAndColor : Inherits TaskParent
     Dim prepEdges As New RedPrep_Edges_CPP
     Public options As New Options_RedPrep
     Dim redSimple As New RedColor_Basics
@@ -263,7 +263,7 @@ End Class
 
 
 
-Public Class NR_RedPrep_EdgesX : Inherits TaskParent
+Public Class XR_RedPrep_EdgesX : Inherits TaskParent
     Dim edges As New RedPrep_Basics
     Public Sub New()
         OptionParent.FindCheckBox("Prep Edges in Y").Checked = False
@@ -284,7 +284,7 @@ End Class
 
 
 
-Public Class NR_RedPrep_EdgesY : Inherits TaskParent
+Public Class XR_RedPrep_EdgesY : Inherits TaskParent
     Dim edges As New RedPrep_Basics
     Public Sub New()
         OptionParent.FindCheckBox("Prep Edges in X").Checked = False

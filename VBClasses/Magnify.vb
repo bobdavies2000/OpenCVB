@@ -16,7 +16,7 @@ End Class
 
 
 
-Public Class NR_Magnify_Example : Inherits TaskParent
+Public Class XR_Magnify_Example : Inherits TaskParent
     Dim prep As New Neighbor_Intersects
     Dim zoom As New Magnify_Basics
     Public Sub New()

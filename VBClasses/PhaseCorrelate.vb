@@ -75,7 +75,7 @@ End Class
 
 
 
-Public Class NR_PhaseCorrelate_BasicsTest : Inherits TaskParent
+Public Class XR_PhaseCorrelate_BasicsTest : Inherits TaskParent
     Dim random As New PhaseCorrelate_RandomInput
     Dim stable As New PhaseCorrelate_Basics
     Public Sub New()
@@ -151,7 +151,7 @@ End Class
 
 
 
-Public Class NR_PhaseCorrelate_Depth : Inherits TaskParent
+Public Class XR_PhaseCorrelate_Depth : Inherits TaskParent
     Dim phaseC As New PhaseCorrelate_Basics
     Public Sub New()
         desc = "Use phase correlation on the depth data"
@@ -188,7 +188,7 @@ End Class
 
 
 ' https://docs.opencvb.org/master/d7/df3/group__imgproc__motion.html
-Public Class NR_PhaseCorrelate_HanningWindow : Inherits TaskParent
+Public Class XR_PhaseCorrelate_HanningWindow : Inherits TaskParent
     Public Sub New()
         labels(2) = "Looking down on a bell curve in 2 dimensions"
         desc = "Show what a Hanning window looks like"

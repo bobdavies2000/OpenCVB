@@ -102,7 +102,7 @@ End Class
 
 
 
-Public Class NR_Stripes_Histogram : Inherits TaskParent
+Public Class XR_Stripes_Histogram : Inherits TaskParent
     Dim stripes As New Stripes_XYZ
     Public Sub New()
         desc = "Show a histogram for the output of stripes"

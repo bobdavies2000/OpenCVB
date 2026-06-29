@@ -64,7 +64,7 @@ End Class
 
 
 
-Public Class NR_Rectangle_Overlap : Inherits TaskParent
+Public Class XR_Rectangle_Overlap : Inherits TaskParent
     Public rect1 As cv.Rect
     Public rect2 As cv.Rect
     Public enclosingRect As New cv.Rect
@@ -114,7 +114,7 @@ End Class
 
 
 
-Public Class NR_Rectangle_Intersection : Inherits TaskParent
+Public Class XR_Rectangle_Intersection : Inherits TaskParent
     Public inputRects As New List(Of cv.Rect)
     Dim draw As New Rectangle_Basics
     Public enclosingRects As New List(Of cv.Rect)
@@ -187,7 +187,7 @@ End Class
 
 
 
-Public Class NR_Rectangle_Union : Inherits TaskParent
+Public Class XR_Rectangle_Union : Inherits TaskParent
     Dim draw As New Rectangle_Basics
     Public inputRects As New List(Of cv.Rect)
     Public allRect As cv.Rect ' a rectangle covering all the input
@@ -238,7 +238,7 @@ End Class
 
 
 
-Public Class NR_Rectangle_MultiOverlap : Inherits TaskParent
+Public Class XR_Rectangle_MultiOverlap : Inherits TaskParent
     Public inputRects As New List(Of cv.Rect)
     Public outputRects As New List(Of cv.Rect)
     Dim draw As New Rectangle_Basics

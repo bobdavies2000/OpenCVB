@@ -129,7 +129,7 @@ End Class
 
 
 
-Public Class NR_Corner_PreCornerDetect : Inherits TaskParent
+Public Class XR_Corner_PreCornerDetect : Inherits TaskParent
     Dim median As New Math_Median_CDF
     Dim options As New Options_PreCorners
     Public Sub New()
@@ -181,7 +181,7 @@ End Class
 
 
 
-Public Class NR_Corner_BasicsCentroid : Inherits TaskParent
+Public Class XR_Corner_BasicsCentroid : Inherits TaskParent
     Dim fast As New Corner_Basics
     Dim kalman As New Kalman_Basics
     Public Sub New()
@@ -213,7 +213,7 @@ End Class
 
 
 
-Public Class NR_Corner_BasicsCentroids : Inherits TaskParent
+Public Class XR_Corner_BasicsCentroids : Inherits TaskParent
     Dim fast As New Corner_Basics
     Dim fastCenters() As cv.Point2f
     Public Sub New()
@@ -249,7 +249,7 @@ End Class
 
 
 ' https://github.com/PacktPublishing/OpenCV3-Computer-Vision-Application-Programming-Cookbook-Third-Edition/blob/master/Chapter08/harrisDetector.h
-Public Class NR_Corner_Harris_CPP : Inherits TaskParent
+Public Class XR_Corner_Harris_CPP : Inherits TaskParent
     Implements IDisposable
     Dim options As New Options_Harris
     Public Sub New()
@@ -324,7 +324,7 @@ End Class
 
 
 
-Public Class NR_Corner_RedCloud : Inherits TaskParent
+Public Class XR_Corner_RedCloud : Inherits TaskParent
     Dim corners As New Neighbor_Intersects
     Dim redC As New RedCloud_Basics
     Public Sub New()
@@ -349,7 +349,7 @@ End Class
 
 
 
-Public Class NR_Corner_SubPix : Inherits TaskParent
+Public Class XR_Corner_SubPix : Inherits TaskParent
     Dim fast As New Corner_Basics
     Dim options As New Options_PreCorners
     Public Sub New()

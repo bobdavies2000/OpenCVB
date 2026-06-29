@@ -158,7 +158,7 @@ End Class
 
 
 ' https://natureofcode.com/book/chapter-7-cellular-automata/
-Public Class NR_CellularAutomata_LifeColor : Inherits TaskParent
+Public Class XR_CellularAutomata_LifeColor : Inherits TaskParent
     Dim game As New CellularAutomata_Life
     Public Sub New()
         game.backColor = white
@@ -189,7 +189,7 @@ End Class
 
 
 ' http://ptgmedia.pearsoncmg.com/images/0672320665/downloads/The%20Game%20of%20Life.html
-Public Class NR_CellularAutomata_LifePopulation : Inherits TaskParent
+Public Class XR_CellularAutomata_LifePopulation : Inherits TaskParent
     Dim plot As New PlotTime_Single
     Dim game As New CellularAutomata_Life
     Public Sub New()
@@ -210,7 +210,7 @@ End Class
 
 
 
-Public Class NR_CellularAutomata_MultiPoint : Inherits TaskParent
+Public Class XR_CellularAutomata_MultiPoint : Inherits TaskParent
     Dim cell As New CellularAutomata_Basics
     Dim val1 As Integer = 0
     Dim val2 As Integer = dst2.Width / 2
@@ -237,7 +237,7 @@ End Class
 
 
 ' https://mathworld.wolfram.com/ElementaryCellularAutomaton.html
-Public Class NR_CellularAutomata_All256 : Inherits TaskParent
+Public Class XR_CellularAutomata_All256 : Inherits TaskParent
     Dim cell As New CellularAutomata_Basics
     Dim options As New Options_CellAutomata
     Dim ruleSlider As System.Windows.Forms.TrackBar

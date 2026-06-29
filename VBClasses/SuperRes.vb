@@ -90,7 +90,7 @@ End Class
 
 
 
-Public Class NR_SuperRes_SubPixelZoom : Inherits TaskParent
+Public Class XR_SuperRes_SubPixelZoom : Inherits TaskParent
     Dim zoom As New Pixel_SubPixel
     Dim video As New SuperRes_Input
     Public Sub New()

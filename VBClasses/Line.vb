@@ -143,7 +143,7 @@ End Class
 
 
 
-Public Class NR_Line_RawFLD : Inherits TaskParent
+Public Class XR_Line_RawFLD : Inherits TaskParent
     Public lpList As New List(Of lpData)
     Public core As New Line_Core
     Public Sub New()
@@ -224,7 +224,7 @@ End Class
 
 
 
-Public Class NR_Line_TopBottomEdges : Inherits TaskParent
+Public Class XR_Line_TopBottomEdges : Inherits TaskParent
     Public tops As New List(Of lpData)
     Public bottoms As New List(Of lpData)
     Public Sub New()
@@ -250,7 +250,7 @@ End Class
 
 
 
-Public Class NR_Line_LeftRightEdges : Inherits TaskParent
+Public Class XR_Line_LeftRightEdges : Inherits TaskParent
     Public lefts As New List(Of lpData)
     Public rights As New List(Of lpData)
     Public Sub New()
@@ -276,7 +276,7 @@ End Class
 
 
 
-Public Class NR_Line_BasicsOld : Inherits TaskParent
+Public Class XR_Line_BasicsOld : Inherits TaskParent
     Implements IDisposable
     Public lpList As New List(Of lpData)
     Public ld As cv.XImgProc.FastLineDetector
@@ -345,7 +345,7 @@ End Class
 
 
 
-Public Class NR_Line_BasicsLSD : Inherits TaskParent
+Public Class XR_Line_BasicsLSD : Inherits TaskParent
     Implements IDisposable
     Public lpList As New List(Of lpData)
     Dim lsd As cv.LineSegmentDetector
@@ -396,7 +396,7 @@ End Class
 
 
 
-Public Class NR_Line_WithAging : Inherits TaskParent
+Public Class XR_Line_WithAging : Inherits TaskParent
     Implements IDisposable
     Public lpList As New List(Of lpData)
     Public motionMask As cv.Mat = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 255)
@@ -526,7 +526,7 @@ End Class
 
 
 
-Public Class NR_Line_Parallel : Inherits TaskParent
+Public Class XR_Line_Parallel : Inherits TaskParent
     Public classes() As List(Of Integer) ' groups of lines that are parallel
     Public unParallel As New List(Of Integer) ' lines which are not parallel
     Public Sub New()
@@ -649,7 +649,7 @@ End Class
 
 
 
-Public Class NR_Line_Select : Inherits TaskParent
+Public Class XR_Line_Select : Inherits TaskParent
     Public delaunay As New Delaunay_LineSelect
     Public Sub New()
         If standalone Then task.gOptions.displayDst1.Checked = True
@@ -674,8 +674,8 @@ End Class
 
 
 
-Public Class NR_Line_DepthHistogram : Inherits TaskParent
-    Dim lineVert As New NR_Line_Vertical
+Public Class XR_Line_DepthHistogram : Inherits TaskParent
+    Dim lineVert As New XR_Line_Vertical
     Dim plot As New PlotMouse_Basics
     Public Sub New()
         plot.plotHist.createHistogram = True
@@ -718,7 +718,7 @@ End Class
 
 
 
-Public Class NR_Line_LeftRightMotion : Inherits TaskParent
+Public Class XR_Line_LeftRightMotion : Inherits TaskParent
     Public linesRight As New Line_Basics
     Public Sub New()
         labels = {"", "", "Left image lines", "Right image lines"}
@@ -739,8 +739,8 @@ End Class
 
 
 
-Public Class NR_Line_Vertical : Inherits TaskParent
-    Dim lrLines As New NR_Line_LeftRightMotion
+Public Class XR_Line_Vertical : Inherits TaskParent
+    Dim lrLines As New XR_Line_LeftRightMotion
     Public lpLeft As New List(Of lpData)
     Public lpRight As New List(Of lpData)
     Public Sub New()
@@ -786,7 +786,7 @@ End Class
 
 
 ''' <summary>Find all lines in the image, assign each an ID, and track them as the camera moves.</summary>
-Public Class NR_Line_LeftTrack : Inherits TaskParent
+Public Class XR_Line_LeftTrack : Inherits TaskParent
     ''' <summary>Tracked lines: (trackId, lpData, color, missedCount).</summary>
     Dim tracked As New List(Of TrackedLine)
     Dim nextTrackId As Integer = 1
@@ -797,7 +797,7 @@ Public Class NR_Line_LeftTrack : Inherits TaskParent
     Const lenRatioThresh As Single = 0.45F
 
     Public lpList As New List(Of lpData)
-    Dim lines As New NR_Line_BasicsOld
+    Dim lines As New XR_Line_BasicsOld
     Dim options As New Options_LeftRightCorrelation
     Dim motionLeft As New Motion_Basics_TA
     Public Sub New()
@@ -895,7 +895,7 @@ End Class
 
 
 
-Public Class NR_Line_Tracker : Inherits TaskParent
+Public Class XR_Line_Tracker : Inherits TaskParent
     Dim options As New Options_LeftRightCorrelation
     Dim lpList As New List(Of lpData)
     Public Sub New()
@@ -924,7 +924,7 @@ End Class
 
 
 
-Public Class NR_Line_BrickList : Inherits TaskParent
+Public Class XR_Line_BrickList : Inherits TaskParent
     Public lp As lpData ' set this input
     Public lpOutput As lpData ' this is the result lp
     Public sobel As New Edge_Sobel
@@ -1010,8 +1010,8 @@ End Class
 
 
 
-Public Class NR_Line_BrickListTest : Inherits TaskParent
-    Dim brickLines As New NR_Line_BrickList
+Public Class XR_Line_BrickListTest : Inherits TaskParent
+    Dim brickLines As New XR_Line_BrickList
     Public Sub New()
         desc = "Find the brick list for each line in the lines.lplist"
     End Sub
@@ -1028,7 +1028,7 @@ End Class
 
 
 
-Public Class NR_Line_MapRects : Inherits TaskParent
+Public Class XR_Line_MapRects : Inherits TaskParent
     Public lpList As New List(Of lpData) ' the list of non-overlapping lines.
     Public pointCloud As New cv.Mat
     Dim depthToWorld As New Cloud_DepthToWorld
@@ -1115,7 +1115,7 @@ End Class
 
 
 
-Public Class NR_Line_Map : Inherits TaskParent
+Public Class XR_Line_Map : Inherits TaskParent
     Public Sub New()
         If standalone Then task.gOptions.displayDst1.Checked = True
         labels(1) = "Move mouse over any image to see line."
@@ -1159,8 +1159,8 @@ End Class
 
 
 
-Public Class NR_Line_BasicsOldNoMotion : Inherits TaskParent
-    Dim lines As New NR_Line_BasicsOld
+Public Class XR_Line_BasicsOldNoMotion : Inherits TaskParent
+    Dim lines As New XR_Line_BasicsOld
     Public Sub New()
         desc = "Ignore motion when finding the lines."
     End Sub
@@ -1178,7 +1178,7 @@ End Class
 
 
 
-Public Class NR_Line_TranslatedRightView : Inherits TaskParent
+Public Class XR_Line_TranslatedRightView : Inherits TaskParent
     Dim lines As New Line_Basics
     Public lpListRight As New List(Of lpData)
     Public Sub New()
@@ -1230,7 +1230,7 @@ End Class
 
 
 
-Public Class NR_Line_EdgeLineCompare : Inherits TaskParent
+Public Class XR_Line_EdgeLineCompare : Inherits TaskParent
     Dim edgeLine As New EdgeLine_Basics
     Public Sub New()
         dst3 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
@@ -1250,7 +1250,7 @@ End Class
 
 
 
-Public Class NR_Line_Longest : Inherits TaskParent
+Public Class XR_Line_Longest : Inherits TaskParent
     Public Sub New()
         desc = "Compare the longest lines of the current and previous image."
     End Sub
@@ -1280,7 +1280,7 @@ End Class
 
 
 
-Public Class NR_Line_EdgeLine : Inherits TaskParent
+Public Class XR_Line_EdgeLine : Inherits TaskParent
     Dim edgeLine As New EdgeLine_Basics
     Dim lines As New Line_Basics
     Public Sub New()
@@ -1310,7 +1310,7 @@ End Class
 
 
 
-Public Class NR_Line_FindSimple : Inherits TaskParent
+Public Class XR_Line_FindSimple : Inherits TaskParent
     Dim edges As New Edge_Basics_TA
     Dim side As Integer
     Dim pixels(side * side) As cv.Point
@@ -1365,7 +1365,7 @@ End Class
 
 
 
-Public Class NR_Line_RedFlood : Inherits TaskParent
+Public Class XR_Line_RedFlood : Inherits TaskParent
     Dim flood As New Flood_BasicsMask
     Public Sub New()
         flood.showSelected = False
@@ -1387,7 +1387,7 @@ End Class
 
 
 
-Public Class NR_Line_Brick : Inherits TaskParent
+Public Class XR_Line_Brick : Inherits TaskParent
     Dim lpList As New List(Of lpData)
     Public Sub New()
         desc = "Find the bricks that clearly have lines"
@@ -1412,7 +1412,7 @@ End Class
 
 
 
-Public Class NR_Line_Finder : Inherits TaskParent
+Public Class XR_Line_Finder : Inherits TaskParent
     Dim side As Integer
     Dim pixels(side * side) As cv.Point
     Public Sub New()
@@ -1476,7 +1476,7 @@ End Class
 
 
 
-Public Class NR_Line_TrackV : Inherits TaskParent
+Public Class XR_Line_TrackV : Inherits TaskParent
     Public lastV As New List(Of lpData)
     Public matchList As New List(Of lpData)
     Dim knn As New KNN_Minimal
@@ -1569,7 +1569,7 @@ End Class
 
 
 
-Public Class NR_Line_BasicsOldEmboss : Inherits TaskParent
+Public Class XR_Line_BasicsOldEmboss : Inherits TaskParent
     Implements IDisposable
     Public lpList As New List(Of lpData)
     Dim ld As cv.XImgProc.FastLineDetector
@@ -1605,7 +1605,7 @@ End Class
 
 
 
-Public Class NR_Line_Sobel : Inherits TaskParent
+Public Class XR_Line_Sobel : Inherits TaskParent
     Dim edges As New Edge_Sobel
     Dim lines As New Line_Basics
     Public Sub New()
@@ -1627,7 +1627,7 @@ End Class
 
 
 
-Public Class NR_Line_LongestTest : Inherits TaskParent
+Public Class XR_Line_LongestTest : Inherits TaskParent
     Dim lpLast As New lpData
     Public Sub New()
         If standalone Then task.gOptions.displayDst1.Checked = True
@@ -1777,7 +1777,7 @@ End Class
 
 
 
-Public Class NR_Line_FinderPlus : Inherits TaskParent
+Public Class XR_Line_FinderPlus : Inherits TaskParent
     Dim find As New Line_Finder
     Dim lines As New Line_Basics
     Public Sub New()

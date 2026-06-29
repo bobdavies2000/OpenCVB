@@ -1,6 +1,6 @@
 Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
-Public Class NR_Guess_Depth_CPP : Inherits TaskParent
+Public Class XR_Guess_Depth_CPP : Inherits TaskParent
     Implements IDisposable
     Public Sub New()
         cPtr = Guess_Depth_Open()
@@ -30,7 +30,7 @@ End Class
 
 
 
-Public Class NR_Guess_ImageEdges_CPP : Inherits TaskParent
+Public Class XR_Guess_ImageEdges_CPP : Inherits TaskParent
     Implements IDisposable
     Public Sub New()
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Max Distance from edge", 0, 100, 50)

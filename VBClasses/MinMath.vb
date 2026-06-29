@@ -1,5 +1,5 @@
 Imports cv = OpenCvSharp
-Public Class NR_MinMath_Edges : Inherits TaskParent
+Public Class XR_MinMath_Edges : Inherits TaskParent
     Dim bPoints As New BrickPoint_Basics
     Public Sub New()
         desc = "Use brickpoints to track edges."
@@ -24,7 +24,7 @@ End Class
 
 
 
-Public Class NR_MinMath_EdgeLine : Inherits TaskParent
+Public Class XR_MinMath_EdgeLine : Inherits TaskParent
     Dim bPoints As New BrickPoint_Basics
     Dim edgeline As New EdgeLine_Basics
     Public Sub New()
@@ -51,7 +51,7 @@ End Class
 
 
 
-Public Class NR_MinMath_KNN : Inherits TaskParent
+Public Class XR_MinMath_KNN : Inherits TaskParent
     Dim bPoint As New BrickPoint_Basics
     Dim knn As New KNN_Basics
     Public Sub New()

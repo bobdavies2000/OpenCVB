@@ -45,7 +45,7 @@ End Class
 
 
 
-Public Class NR_Reduction_Floodfill : Inherits TaskParent
+Public Class XR_Reduction_Floodfill : Inherits TaskParent
     Public reduction As New Reduction_Basics
     Dim redC As New RedColor_Basics
     Public Sub New()
@@ -74,7 +74,7 @@ End Class
 
 
 
-Public Class NR_Reduction_HeatMapLines1 : Inherits TaskParent
+Public Class XR_Reduction_HeatMapLines1 : Inherits TaskParent
     Dim heat As New HeatMap_Basics
     Public setupSide As New Cloud_SetupSide
     Public setupTop As New Cloud_SetupTop
@@ -114,7 +114,7 @@ End Class
 
 
 
-Public Class NR_Reduction_HeatMapLines : Inherits TaskParent
+Public Class XR_Reduction_HeatMapLines : Inherits TaskParent
     Dim heat As New HeatMap_Basics
     Public setupSide As New Cloud_SetupSide
     Public setupTop As New Cloud_SetupTop
@@ -144,7 +144,7 @@ End Class
 
 
 
-Public Class NR_Reduction_XYZ : Inherits TaskParent
+Public Class XR_Reduction_XYZ : Inherits TaskParent
     Dim reduction As New Reduction_Basics
     Dim options As New Options_ReductionXYZ
     Public Sub New()
@@ -176,7 +176,7 @@ End Class
 
 
 
-Public Class NR_Reduction_Histogram : Inherits TaskParent
+Public Class XR_Reduction_Histogram : Inherits TaskParent
     Dim reduction As New Reduction_Basics
     Dim plot As New PlotBar_Basics
     Public Sub New()
@@ -200,7 +200,7 @@ End Class
 
 
 
-Public Class NR_Reduction_BGR : Inherits TaskParent
+Public Class XR_Reduction_BGR : Inherits TaskParent
     Dim reduction As New Reduction_Basics
     Dim mats As New Mat_4Click
     Public Sub New()
@@ -230,7 +230,7 @@ End Class
 
 
 
-Public Class NR_Reduction_MotionTest : Inherits TaskParent
+Public Class XR_Reduction_MotionTest : Inherits TaskParent
     Dim reduction As New Reduction_Basics
     Dim diff As New Diff_Basics
     Public Sub New()
@@ -280,7 +280,7 @@ End Class
 
 
 
-Public Class NR_Reduction_Edges : Inherits TaskParent
+Public Class XR_Reduction_Edges : Inherits TaskParent
     Dim edges As New Edge_Laplacian
     Dim reduction As New Reduction_Basics
     Public Sub New()
@@ -301,7 +301,7 @@ End Class
 
 
 
-Public Class NR_Reduction_NoDepth : Inherits TaskParent
+Public Class XR_Reduction_NoDepth : Inherits TaskParent
     Dim reduction As New Reduction_Basics
     Public Sub New()
         desc = "Reduce the grayscale image where there is no depth."

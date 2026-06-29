@@ -27,7 +27,7 @@ End Class
 
 
 
-Public Class NR_Sort_RectAndMask : Inherits TaskParent
+Public Class XR_Sort_RectAndMask : Inherits TaskParent
     Dim sort As New Sort_Basics
     Public mask As cv.Mat
     Public rect As cv.Rect
@@ -55,7 +55,7 @@ End Class
 
 
 
-Public Class NR_Sort_MLPrepTest_CPP : Inherits TaskParent
+Public Class XR_Sort_MLPrepTest_CPP : Inherits TaskParent
     Implements IDisposable
     Public reduction As New Reduction_Basics
     Public MLTestData As New cv.Mat
@@ -230,7 +230,7 @@ End Class
 
 
 
-Public Class NR_Sort_GrayScale1 : Inherits TaskParent
+Public Class XR_Sort_GrayScale1 : Inherits TaskParent
     Dim sort As New Sort_Integer
     Dim pixels(2)() As Byte
     Public Sub New()
@@ -270,7 +270,7 @@ End Class
 
 
 
-Public Class NR_Sort_GrayScale : Inherits TaskParent
+Public Class XR_Sort_GrayScale : Inherits TaskParent
     Dim plot As New PlotBar_Basics
     Dim pixels(2)() As Byte
     Public Sub New()

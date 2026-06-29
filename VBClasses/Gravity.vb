@@ -317,8 +317,8 @@ End Class
 
 
 
-Public Class NR_Gravity_RGB : Inherits TaskParent
-    Dim survey As New NR_BrickPoint_PopulationSurvey
+Public Class XR_Gravity_RGB : Inherits TaskParent
+    Dim survey As New XR_BrickPoint_PopulationSurvey
     Public Sub New()
         desc = "Rotate the RGB image using the offset from gravity."
     End Sub
@@ -350,9 +350,9 @@ End Class
 
 
 
-Public Class NR_Gravity_BrickRotate : Inherits TaskParent
+Public Class XR_Gravity_BrickRotate : Inherits TaskParent
     Dim bricks As New Brick_Basics
-    Dim survey As New NR_BrickPoint_PopulationSurvey
+    Dim survey As New XR_BrickPoint_PopulationSurvey
     Public Sub New()
         desc = "Rotate the grid point using the offset from gravity."
     End Sub
@@ -393,7 +393,7 @@ End Class
 
 
 
-Public Class NR_Gravity_Basics_TAOld : Inherits TaskParent
+Public Class XR_Gravity_Basics_TAOld : Inherits TaskParent
     Public points As New List(Of cv.Point2f)
     Public autoDisplay As Boolean
     Public Sub New()
@@ -459,7 +459,7 @@ End Class
 
 
 
-Public Class NR_Gravity_Basics_Original : Inherits TaskParent
+Public Class XR_Gravity_Basics_Original : Inherits TaskParent
     Public vec As New lpData
     Public Sub New()
         dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))

@@ -37,7 +37,7 @@ End Class
 
 
 
-Public Class NR_Hull_Defect : Inherits TaskParent
+Public Class XR_Hull_Defect : Inherits TaskParent
     Public hull As New List(Of cv.Point)
     Public contour As cv.Point()
     Public Sub New()

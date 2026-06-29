@@ -54,7 +54,7 @@ End Class
 
 
 
-Public Class NR_Watershed_DepthReduction : Inherits TaskParent
+Public Class XR_Watershed_DepthReduction : Inherits TaskParent
     Dim watershed As New Watershed_Basics
     Dim reduction As New Reduction_Basics
     Public Sub New()
@@ -80,7 +80,7 @@ End Class
 
 
 
-Public Class NR_Watershed_DepthAuto : Inherits TaskParent
+Public Class XR_Watershed_DepthAuto : Inherits TaskParent
     Dim watershed As New Watershed_Basics
     Public Sub New()
         watershed.UseCorners = True

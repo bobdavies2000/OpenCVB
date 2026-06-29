@@ -266,7 +266,7 @@ End Class
 
 
 
-Public Class NR_MSER_LeftRight : Inherits TaskParent
+Public Class XR_MSER_LeftRight : Inherits TaskParent
     Dim left As New MSER_Left
     Dim right As New MSER_Right
     Public Sub New()
@@ -330,7 +330,7 @@ End Class
 
 
 ' https://github.com/opencv/opencv/blob/master/samples/python/mser.py
-Public Class NR_MSER_Hulls : Inherits TaskParent
+Public Class XR_MSER_Hulls : Inherits TaskParent
     Dim options As New Options_MSER
     Dim mser As New MSER_Basics
     Public Sub New()
@@ -363,7 +363,7 @@ End Class
 
 
 ' https://github.com/opencv/opencv/blob/master/samples/cpp/detect_mser.cpp
-Public Class NR_MSER_TestSynthetic : Inherits TaskParent
+Public Class XR_MSER_TestSynthetic : Inherits TaskParent
     Dim options As New Options_MSER
     Dim synth As New MSER_SyntheticInput
     Dim mser As New MSER_Basics
@@ -390,7 +390,7 @@ End Class
 
 
 
-Public Class NR_MSER_Grayscale : Inherits TaskParent
+Public Class XR_MSER_Grayscale : Inherits TaskParent
     Dim mser As New MSER_Basics
     Dim reduction As New Reduction_Basics
     Public Sub New()
@@ -412,7 +412,7 @@ End Class
 
 
 
-Public Class NR_MSER_ReducedRGB : Inherits TaskParent
+Public Class XR_MSER_ReducedRGB : Inherits TaskParent
     Dim mser As New MSER_Basics
     Dim color8u As New Color8U_Basics
     Public Sub New()
@@ -436,7 +436,7 @@ End Class
 
 
 'https://github.com/opencv/opencv/blob/master/samples/cpp/detect_rr.cpp
-Public Class NR_MSER_ROI : Inherits TaskParent
+Public Class XR_MSER_ROI : Inherits TaskParent
     Public containers As New List(Of cv.Rect)
     Dim options As New Options_MSER
     Dim core As New MSER_Detect
@@ -498,7 +498,7 @@ End Class
 
 
 ' https://github.com/shimat/opencvsharp/wiki/MSER
-Public Class NR_MSER_TestExample : Inherits TaskParent
+Public Class XR_MSER_TestExample : Inherits TaskParent
     Implements IDisposable
     Dim image As cv.Mat
     Dim mser As cv.MSER
@@ -553,7 +553,7 @@ End Class
 
 
 
-Public Class NR_MSER_RedCloud : Inherits TaskParent
+Public Class XR_MSER_RedCloud : Inherits TaskParent
     Dim mser As New MSER_Basics
     Dim redC As New RedColor_Basics
     Public Sub New()
@@ -574,7 +574,7 @@ End Class
 
 
 
-Public Class NR_MSER_Mask_CPP : Inherits TaskParent
+Public Class XR_MSER_Mask_CPP : Inherits TaskParent
     Implements IDisposable
     Dim options As New Options_MSER
     Public classCount As Integer
@@ -624,7 +624,7 @@ End Class
 
 
 
-Public Class NR_MSER_Binarize : Inherits TaskParent
+Public Class XR_MSER_Binarize : Inherits TaskParent
     Dim mser As New MSER_Basics
     Dim bin4 As New Bin4Way_Regions
     Public Sub New()

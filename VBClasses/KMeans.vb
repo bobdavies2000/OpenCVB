@@ -75,7 +75,7 @@ End Class
 
 
 
-Public Class NR_KMeans_k2_to_k8 : Inherits TaskParent
+Public Class XR_KMeans_k2_to_k8 : Inherits TaskParent
     Dim Mats As New Mat_4Click
     Dim km As New KMeans_Basics
     Dim kmIndex As Integer
@@ -108,7 +108,7 @@ End Class
 
 
 
-Public Class NR_KMeans_Fuzzy : Inherits TaskParent
+Public Class XR_KMeans_Fuzzy : Inherits TaskParent
     Dim km As New KMeans_Image
     Public fuzzyD As New Fuzzy_Basics
     Public Sub New()
@@ -129,7 +129,7 @@ End Class
 
 
 ' http://man.hubwiz.com/docset/Opencv.docset/Contents/Resources/Documents/d9/dde/samples_2cpp_2kmeans_8cpp-example.html
-Public Class NR_KMeans_MultiGaussian_CPP : Inherits TaskParent
+Public Class XR_KMeans_MultiGaussian_CPP : Inherits TaskParent
     Implements IDisposable
     Public Sub New()
         cPtr = KMeans_MultiGaussian_Open()
@@ -148,7 +148,7 @@ End Class
 
 
 
-Public Class NR_KMeans_CustomData : Inherits TaskParent
+Public Class XR_KMeans_CustomData : Inherits TaskParent
     Dim km As New KMeans_Basics
     Public centers = New cv.Mat()
     Dim random = New Random_Basics
@@ -185,7 +185,7 @@ End Class
 
 
 
-Public Class NR_KMeans_Simple_CPP : Inherits TaskParent
+Public Class XR_KMeans_Simple_CPP : Inherits TaskParent
     Implements IDisposable
     Public Sub New()
         cPtr = Kmeans_Simple_Open()
@@ -247,7 +247,7 @@ End Class
 
 
 
-Public Class NR_KMeans_CompareMulti : Inherits TaskParent
+Public Class XR_KMeans_CompareMulti : Inherits TaskParent
     Dim km As New KMeans_Image
     Dim multi As New KMeans_MultiChannel
     Public Sub New()
@@ -341,7 +341,7 @@ End Class
 
 
 
-Public Class NR_KMeans_DepthPlusGray : Inherits TaskParent
+Public Class XR_KMeans_DepthPlusGray : Inherits TaskParent
     Dim km As New KMeans_Basics
     Dim grayPlus(2 - 1) As cv.Mat
     Public Sub New()
@@ -430,7 +430,7 @@ End Class
 
 
 
-Public Class NR_KMeans_Valleys : Inherits TaskParent
+Public Class XR_KMeans_Valleys : Inherits TaskParent
     Dim km As New KMeans_Basics
     Dim tiers As New KMeans_TierCount
     Public Sub New()
@@ -484,7 +484,7 @@ End Class
 
 
 
-Public Class NR_KMeans_SimKColor : Inherits TaskParent
+Public Class XR_KMeans_SimKColor : Inherits TaskParent
     Dim plot1D As New Hist3Dcolor_PlotHist1D
     Dim simK As New Hist3D_BuildHistogram
     Public classCount As Integer
@@ -515,7 +515,7 @@ End Class
 
 
 
-Public Class NR_KMeans_SimKDepth : Inherits TaskParent
+Public Class XR_KMeans_SimKDepth : Inherits TaskParent
     Dim plot1D As New Hist3Dcloud_PlotHist1D
     Dim simK As New Hist3D_BuildHistogram
     Public classCount As Integer

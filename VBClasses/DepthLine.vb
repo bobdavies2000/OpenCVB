@@ -1,7 +1,7 @@
 Imports cv = OpenCvSharp
 Public Class DepthLine_Basics : Inherits TaskParent
     Public prepEdges As New RedPrep_Basics
-    Dim lines As New NR_Line_RawFLD
+    Dim lines As New XR_Line_RawFLD
     Public lpList As New List(Of lpData)
     Public Sub New()
         desc = "Find lines in reduced the depth data."
@@ -27,7 +27,7 @@ End Class
 
 
 
-Public Class NR_DepthLine_XY : Inherits TaskParent
+Public Class XR_DepthLine_XY : Inherits TaskParent
     Dim lineD As New DepthLine_Basics
     Public lpList As New List(Of lpData)
     Public Sub New()
@@ -96,10 +96,10 @@ End Class
 
 
 
-Public Class NR_DepthLine_Common : Inherits TaskParent
+Public Class XR_DepthLine_Common : Inherits TaskParent
     Dim lineX As New DepthLine_V
     Dim lineY As New DepthLine_H
-    Dim lineXY As New NR_DepthLine_XY
+    Dim lineXY As New XR_DepthLine_XY
     Public lpList As New List(Of lpData)
     Public Sub New()
         If standalone Then task.gOptions.displayDst0.Checked = True
@@ -170,7 +170,7 @@ End Class
 
 
 
-Public Class NR_DepthLine_HV2 : Inherits TaskParent
+Public Class XR_DepthLine_HV2 : Inherits TaskParent
     Dim lineX As New RedPrep_Basics
     Dim lineY As New RedPrep_Basics
     Public lpList As New List(Of lpData)

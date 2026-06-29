@@ -56,7 +56,7 @@ End Class
 
 
 
-Public Class NR_AsciiArt_Diff : Inherits TaskParent
+Public Class XR_AsciiArt_Diff : Inherits TaskParent
     Dim grayAA As New AsciiArt_Color
     Dim diff As New Diff_Basics
     Public Sub New()

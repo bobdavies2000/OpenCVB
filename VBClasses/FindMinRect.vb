@@ -34,7 +34,7 @@ End Class
 
 
 
-Public Class NR_FindMinRect_Motion : Inherits TaskParent
+Public Class XR_FindMinRect_Motion : Inherits TaskParent
     Dim bgSub As New BGSubtract_Basics
     Public Sub New()
         OptionParent.FindSlider("MOG Learn Rate X1000").Value = 100 ' low threshold to maximize motion

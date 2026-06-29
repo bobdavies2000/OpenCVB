@@ -35,7 +35,7 @@ End Class
 
 
 
-Public Class NR_FrameRate_BasicsGray : Inherits TaskParent
+Public Class XR_FrameRate_BasicsGray : Inherits TaskParent
     Dim mats As New Mat_4to1
     Dim frameCounts(4 - 1) As Integer
     Public Sub New()

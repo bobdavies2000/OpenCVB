@@ -87,7 +87,7 @@ End Class
 
 
 
-Public Class NR_Cloud_Inverse : Inherits TaskParent
+Public Class XR_Cloud_Inverse : Inherits TaskParent
     Dim colorizer As New DepthColorizer_CPP
     Public Sub New()
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_32F, 0)
@@ -117,7 +117,7 @@ End Class
 
 
 
-Public Class NR_Cloud_Display : Inherits TaskParent
+Public Class XR_Cloud_Display : Inherits TaskParent
     Dim pcHistory As New List(Of cv.Mat)
     Public Sub New()
         dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_32FC3, 0)
@@ -296,7 +296,7 @@ End Class
 
 
 
-Public Class NR_Cloud_SoloRegions : Inherits TaskParent
+Public Class XR_Cloud_SoloRegions : Inherits TaskParent
     Public solo As New Cloud_Solo
     Dim dilate As New Dilate_Basics
     Public Sub New()
@@ -317,7 +317,7 @@ End Class
 
 
 
-Public Class NR_Cloud_SurfaceH_CPP : Inherits TaskParent
+Public Class XR_Cloud_SurfaceH_CPP : Inherits TaskParent
     Public heat As New HeatMap_Basics
     Public plot As New PlotOpenCV_CPP
     Public topRow As Integer
@@ -406,7 +406,7 @@ End Class
 
 
 
-Public Class NR_Cloud_GridInspector : Inherits TaskParent
+Public Class XR_Cloud_GridInspector : Inherits TaskParent
     Dim bricks As New Brick_Basics
     Public Sub New()
         dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
@@ -444,7 +444,7 @@ End Class
 
 
 
-Public Class NR_Cloud_FrustrumTop : Inherits TaskParent
+Public Class XR_Cloud_FrustrumTop : Inherits TaskParent
     Dim frustrum As New Draw_Frustrum
     Dim heat As New HeatMap_Basics
     Dim setupTop As New Cloud_SetupTop
@@ -468,7 +468,7 @@ End Class
 
 
 
-Public Class NR_Cloud_FrustrumSide : Inherits TaskParent
+Public Class XR_Cloud_FrustrumSide : Inherits TaskParent
     Dim frustrum As New Draw_Frustrum
     Dim heat As New HeatMap_Basics
     Dim setupSide As New Cloud_SetupSide
@@ -515,7 +515,7 @@ End Class
 
 
 
-Public Class NR_Cloud_ReducedTopView : Inherits TaskParent
+Public Class XR_Cloud_ReducedTopView : Inherits TaskParent
     Dim split2 As New Cloud_ReduceSplit2
     Public Sub New()
         desc = "Create a stable side view of the point cloud"
@@ -534,7 +534,7 @@ End Class
 
 
 
-Public Class NR_Cloud_ReducedSideView : Inherits TaskParent
+Public Class XR_Cloud_ReducedSideView : Inherits TaskParent
     Dim split2 As New Cloud_ReduceSplit2
     Public Sub New()
         desc = "Show where vertical neighbor depth values are within X mm's"
@@ -554,7 +554,7 @@ End Class
 
 
 
-Public Class NR_Cloud_ReducedViews : Inherits TaskParent
+Public Class XR_Cloud_ReducedViews : Inherits TaskParent
     Dim split2 As New Cloud_ReduceSplit2
     Public Sub New()
         labels = {"", "", "Reduced side view", "Reduced top view"}
@@ -580,7 +580,7 @@ End Class
 
 
 
-Public Class NR_Cloud_Split : Inherits TaskParent
+Public Class XR_Cloud_Split : Inherits TaskParent
     Public Sub New()
         desc = "Attempting to debug pointcloud problem - display the 3 components"
     End Sub
@@ -603,7 +603,7 @@ End Class
 
 
 
-Public Class NR_Cloud_Continuous_VB : Inherits TaskParent
+Public Class XR_Cloud_Continuous_VB : Inherits TaskParent
     Dim options As New Options_Features
     Public Sub New()
         dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
@@ -638,7 +638,7 @@ End Class
 
 
 
-Public Class NR_Cloud_Continuous_GridX : Inherits TaskParent
+Public Class XR_Cloud_Continuous_GridX : Inherits TaskParent
     Dim options As New Options_Features
     Dim bricks As New Brick_Basics
     Public Sub New()
@@ -677,7 +677,7 @@ End Class
 
 
 
-Public Class NR_Cloud_Continuous_GridXY : Inherits TaskParent
+Public Class XR_Cloud_Continuous_GridXY : Inherits TaskParent
     Dim options As New Options_Features
     Dim bricks As New Brick_Basics
     Public Sub New()
@@ -716,7 +716,7 @@ End Class
 
 
 
-Public Class NR_Cloud_Templates : Inherits TaskParent
+Public Class XR_Cloud_Templates : Inherits TaskParent
     Public templateX As New cv.Mat, templateY As New cv.Mat
     Dim contours As New Contour_Basics
     Public Sub New()

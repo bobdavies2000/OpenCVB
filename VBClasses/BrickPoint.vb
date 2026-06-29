@@ -112,7 +112,7 @@ End Class
 
 
 
-Public Class NR_BrickPoint_TopRow : Inherits TaskParent
+Public Class XR_BrickPoint_TopRow : Inherits TaskParent
     Dim bricks As New Brick_Basics
     Dim bPoint As New BrickPoint_Basics
     Public Sub New()
@@ -146,7 +146,7 @@ End Class
 
 
 
-Public Class NR_BrickPoint_DistanceAbove : Inherits TaskParent
+Public Class XR_BrickPoint_DistanceAbove : Inherits TaskParent
     Dim bricks As New Brick_Basics
     Dim plotHist As New PlotBar_Basics
     Public Sub New()
@@ -205,7 +205,7 @@ End Class
 
 
 
-Public Class NR_BrickPoint_Best : Inherits TaskParent
+Public Class XR_BrickPoint_Best : Inherits TaskParent
     Dim bPoint As New BrickPoint_Basics
     Public bestBricks As New List(Of cv.Point)
     Public Sub New()
@@ -232,7 +232,7 @@ End Class
 
 
 
-Public Class NR_BrickPoint_Busiest : Inherits TaskParent
+Public Class XR_BrickPoint_Busiest : Inherits TaskParent
     Dim bricks As New Brick_Basics
     Dim bPoint As New BrickPoint_Basics
     Public bestBricks As New List(Of cv.Point)
@@ -271,7 +271,7 @@ End Class
 
 
 
-Public Class NR_BrickPoint_PopulationSurvey : Inherits TaskParent
+Public Class XR_BrickPoint_PopulationSurvey : Inherits TaskParent
     Dim bricks As New Brick_Basics
     Dim bPoint As New BrickPoint_Basics
     Public results(,) As Single
@@ -329,11 +329,11 @@ End Class
 
 
 
-Public Class NR_BrickPoint_ContourCompare : Inherits TaskParent
-    Dim fLess As New NR_BrickPoint_FeatureLess
+Public Class XR_BrickPoint_ContourCompare : Inherits TaskParent
+    Dim fLess As New XR_BrickPoint_FeatureLess
     Dim contours As New Contour_Basics
     Public Sub New()
-        desc = "Compare Contour_Basics to NR_BrickPoint_FeatureLess"
+        desc = "Compare Contour_Basics to XR_BrickPoint_FeatureLess"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         fLess.Run(src)
@@ -351,7 +351,7 @@ End Class
 
 
 
-Public Class NR_BrickPoint_FeatureLess : Inherits TaskParent
+Public Class XR_BrickPoint_FeatureLess : Inherits TaskParent
     Public classCount As Integer
     Public contours As New Contour_Basics
     Public Sub New()
@@ -374,7 +374,7 @@ End Class
 
 
 
-Public Class NR_BrickPoint_KNN : Inherits TaskParent
+Public Class XR_BrickPoint_KNN : Inherits TaskParent
     Public bPoint As New BrickPoint_Basics
     Dim knn As New KNN_Basics
     Public lplist As New List(Of lpData)
@@ -408,8 +408,8 @@ End Class
 
 
 
-Public Class NR_BrickPoint_EndPoints : Inherits TaskParent
-    Dim brickKNN As New NR_BrickPoint_KNN
+Public Class XR_BrickPoint_EndPoints : Inherits TaskParent
+    Dim brickKNN As New XR_BrickPoint_KNN
     Public Sub New()
         If standalone Then task.gOptions.displayDst1.Checked = True
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_32F, 0)
@@ -484,7 +484,7 @@ End Class
 
 
 
-Public Class NR_BrickPoint_Vertical : Inherits TaskParent
+Public Class XR_BrickPoint_Vertical : Inherits TaskParent
     Dim vertical As New Edge_SobelVertical
     Public bpCore As New BrickPoint_Core
     Public ptList As New List(Of cv.Point)
@@ -503,7 +503,7 @@ End Class
 
 
 
-Public Class NR_BrickPoint_Horizontal : Inherits TaskParent
+Public Class XR_BrickPoint_Horizontal : Inherits TaskParent
     Dim horizontal As New Edge_SobelHorizontal
     Public bpCore As New BrickPoint_Core
     Public ptList As New List(Of cv.Point)
@@ -523,7 +523,7 @@ End Class
 
 
 
-Public Class NR_BrickPoint_Blocks : Inherits TaskParent
+Public Class XR_BrickPoint_Blocks : Inherits TaskParent
     Dim options As New Options_Sobel
     Public Sub New()
         desc = "Use the bricks to portray the brickpoints"
@@ -550,7 +550,7 @@ End Class
 
 
 
-Public Class NR_BrickPoint_Features : Inherits TaskParent
+Public Class XR_BrickPoint_Features : Inherits TaskParent
     Dim bricks As New Brick_Basics
     Dim feat As New Feature_Bricks
     Public featureBricks As New List(Of cv.Rect)

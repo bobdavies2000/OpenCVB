@@ -1,5 +1,5 @@
 Imports cv = OpenCvSharp
-Public Class NR_Deterministic_Basics : Inherits TaskParent
+Public Class XR_Deterministic_Basics : Inherits TaskParent
     Dim deter As New Edge_Canny
     Dim diff As New Diff_Basics
     Public Sub New()
@@ -68,7 +68,7 @@ End Class
 
 
 
-Public Class NR_Deterministic_Histogram : Inherits TaskParent
+Public Class XR_Deterministic_Histogram : Inherits TaskParent
     Dim deter As New Deterministic_MotionMask
     Dim plothist As New PlotBar_Basics
     Public Sub New()
@@ -99,7 +99,7 @@ End Class
 
 
 
-Public Class NR_Deterministic_BackProject : Inherits TaskParent
+Public Class XR_Deterministic_BackProject : Inherits TaskParent
     Dim deter As New Deterministic_MotionMask
     Dim bProject As New BackProject_Basics
     Public Sub New()

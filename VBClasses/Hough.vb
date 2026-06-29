@@ -48,7 +48,7 @@ End Class
 
 
 
-Public Class NR_Hough_Sudoku : Inherits TaskParent
+Public Class XR_Hough_Sudoku : Inherits TaskParent
     Dim hough As New Hough_Basics
     Public Sub New()
         OptionParent.FindSlider("Hough rho").Value = 1
@@ -71,7 +71,7 @@ End Class
 
 
 ' https://docs.opencvb.org/3.1.0/d6/d10/tutorial_py_houghlines.html
-Public Class NR_Hough_Circles : Inherits TaskParent
+Public Class XR_Hough_Circles : Inherits TaskParent
     Dim circles As New Draw_Circles
     Dim method As Integer = 3
     Public Sub New()
@@ -309,7 +309,7 @@ End Class
 
 
 
-Public Class NR_Hough_FullImage : Inherits TaskParent
+Public Class XR_Hough_FullImage : Inherits TaskParent
     Public segments() As cv.LineSegmentPolar
     Public options As New Options_Hough
     Public Sub New()
@@ -337,7 +337,7 @@ End Class
 
 
 
-Public Class NR_Hough_Probabilistic : Inherits TaskParent
+Public Class XR_Hough_Probabilistic : Inherits TaskParent
     Public segments() As cv.LineSegmentPolar
     Public options As New Options_Hough
     Public Sub New()
@@ -363,7 +363,7 @@ End Class
 
 
 
-Public Class NR_Hough_Structural : Inherits TaskParent
+Public Class XR_Hough_Structural : Inherits TaskParent
     Public options As New Options_Hough
     Public Sub New()
         desc = "Gemini generated: find the structural lines (stable, long lines) in the image using Hough"

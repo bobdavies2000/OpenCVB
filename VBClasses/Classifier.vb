@@ -76,7 +76,7 @@ End Module
 
 
 
-Public Class NR_Classifier_Bayesian : Inherits TaskParent
+Public Class XR_Classifier_Bayesian : Inherits TaskParent
     Implements IDisposable
     Dim options As New Options_Classifier
     Public Sub New()

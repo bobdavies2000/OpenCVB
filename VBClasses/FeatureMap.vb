@@ -114,7 +114,7 @@ End Class
 
 
 
-Public Class NR_FeatureMap_BasicsOld : Inherits TaskParent
+Public Class XR_FeatureMap_BasicsOld : Inherits TaskParent
     Dim fcs As New FeatureMap_Core
     Dim contours As New Contour_Basics
     Public desiredMapCount As Integer = 5
@@ -183,7 +183,7 @@ End Class
 
 
 
-Public Class NR_FeatureMap_ViewLeft : Inherits TaskParent
+Public Class XR_FeatureMap_ViewLeft : Inherits TaskParent
     Dim fcs As New FeatureMap_CreateList
     Public Sub New()
         desc = "Build an FCS for left view."
@@ -203,7 +203,7 @@ End Class
 
 
 
-Public Class NR_FeatureMap_ViewRight : Inherits TaskParent
+Public Class XR_FeatureMap_ViewRight : Inherits TaskParent
     Dim fcs As New FeatureMap_CreateList
     Public Sub New()
         desc = "Build an FCS for right view."
@@ -221,7 +221,7 @@ End Class
 
 
 
-Public Class NR_FeatureMap_Edges : Inherits TaskParent
+Public Class XR_FeatureMap_Edges : Inherits TaskParent
     Dim fcs As New FeatureMap_CreateList
     Public Sub New()
         desc = "Use edges to connect feature points to their neighbors."
@@ -245,7 +245,7 @@ End Class
 
 
 
-Public Class NR_FeatureMap_WithAge : Inherits TaskParent
+Public Class XR_FeatureMap_WithAge : Inherits TaskParent
     Dim fcs As New FeatureMap_CreateList
     Public Sub New()
         desc = "Display the age of each cell."
@@ -267,7 +267,7 @@ End Class
 
 
 
-Public Class NR_FeatureMap_BestAge : Inherits TaskParent
+Public Class XR_FeatureMap_BestAge : Inherits TaskParent
     Dim fcs As New FeatureMap_CreateList
     Public Sub New()
         labels(3) = "Ages are kept below 1000 to make the output more readable..."
@@ -300,7 +300,7 @@ End Class
 
 
 
-Public Class NR_FeatureMap_RedCloud1 : Inherits TaskParent
+Public Class XR_FeatureMap_RedCloud1 : Inherits TaskParent
     Dim fcs As New FeatureMap_CreateList
     Dim redC As New RedCloud_Basics
     Public Sub New()
@@ -328,7 +328,7 @@ End Class
 
 
 
-Public Class NR_FeatureMap_InfoTest : Inherits TaskParent
+Public Class XR_FeatureMap_InfoTest : Inherits TaskParent
     Dim fcs As New FeatureMap_CreateList
     Dim info As New FeatureMap_Info
     Public Sub New()
@@ -349,7 +349,7 @@ End Class
 
 
 
-Public Class NR_FeatureMap_MotionDirection : Inherits TaskParent
+Public Class XR_FeatureMap_MotionDirection : Inherits TaskParent
     Dim fcsM As New FeatureMap_Motion
     Dim plothist As New PlotBar_Basics
     Dim mats As New Mat_4Click
@@ -452,7 +452,7 @@ End Class
 
 
 
-Public Class NR_FeatureMap_Lines : Inherits TaskParent
+Public Class XR_FeatureMap_Lines : Inherits TaskParent
     Dim fcs As New FeatureMap_CreateList
     Dim options As New Options_Features
     Public Sub New()
@@ -480,7 +480,7 @@ End Class
 
 
 
-Public Class NR_FeatureMap_ByDepth : Inherits TaskParent
+Public Class XR_FeatureMap_ByDepth : Inherits TaskParent
     Dim plotHist As New PlotBar_Basics
     Dim fcs As New FeatureMap_CreateList
     Dim palInput As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
@@ -594,7 +594,7 @@ End Class
 
 
 
-Public Class NR_FeatureMap_PeripheryNot : Inherits TaskParent
+Public Class XR_FeatureMap_PeripheryNot : Inherits TaskParent
     Dim perif As New FeatureMap_Periphery
     Public Sub New()
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
@@ -618,7 +618,7 @@ End Class
 
 
 
-Public Class NR_FeatureMap_BrickPoints : Inherits TaskParent
+Public Class XR_FeatureMap_BrickPoints : Inherits TaskParent
     Public facetGen As New Delaunay_Generations
     Public ptList As New List(Of cv.Point2f)
     Public anchorPoint As cv.Point2f

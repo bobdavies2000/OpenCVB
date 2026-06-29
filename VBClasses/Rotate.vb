@@ -31,7 +31,7 @@ End Class
 
 
 
-Public Class NR_Rotate_Box : Inherits TaskParent
+Public Class XR_Rotate_Box : Inherits TaskParent
     Dim rotation As New Rotate_Basics
     Public Sub New()
         task.drawRect = New cv.Rect(100, 100, 100, 100)
@@ -73,7 +73,7 @@ End Class
 
 
 
-Public Class NR_Rotate_Example : Inherits TaskParent
+Public Class XR_Rotate_Example : Inherits TaskParent
     Dim rotate As New Rotate_Basics
     Public Sub New()
         rotate.rotateCenter = New cv.Point(dst2.Height / 2, dst2.Height / 2)
@@ -113,7 +113,7 @@ End Class
 
 
 
-Public Class NR_Rotate_Verticalize : Inherits TaskParent
+Public Class XR_Rotate_Verticalize : Inherits TaskParent
     Dim rotate As New Rotate_Basics
     Public angleSlider As New System.Windows.Forms.TrackBar
     Public Sub New()

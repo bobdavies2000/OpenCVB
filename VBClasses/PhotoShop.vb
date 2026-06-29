@@ -1,6 +1,6 @@
 Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
-Public Class NR_PhotoShop_Clahe : Inherits TaskParent
+Public Class XR_PhotoShop_Clahe : Inherits TaskParent
     ' Contrast Limited Adaptive Histogram Equalization (CLAHE) : Inherits TaskParent
     Public Sub New()
         If sliders.Setup(traceName) Then
@@ -47,7 +47,7 @@ End Class
 
 
 
-Public Class NR_PhotoShop_AlphaBeta : Inherits TaskParent
+Public Class XR_PhotoShop_AlphaBeta : Inherits TaskParent
     Public Sub New()
         desc = "Use alpha and beta with ConvertScaleAbs."
         If sliders.Setup(traceName) Then
@@ -95,7 +95,7 @@ End Class
 
 
 ' https://blog.csdn.net/just_sort/article/details/85982871
-Public Class NR_PhotoShop_WhiteBalancePlot : Inherits TaskParent
+Public Class XR_PhotoShop_WhiteBalancePlot : Inherits TaskParent
     Dim hist As New Histogram_Graph
     Dim whiteCPP As New PhotoShop_WhiteBalance
     Public Sub New()
@@ -169,7 +169,7 @@ End Class
 
 
 ' https://blog.csdn.net/just_sort/article/details/85982871
-Public Class NR_PhotoShop_PlotHist : Inherits TaskParent
+Public Class XR_PhotoShop_PlotHist : Inherits TaskParent
     Dim whiteBal As New PhotoShop_ChangeMask
     Public hist1 As New Histogram_Basics
     Public hist2 As New Histogram_Basics
@@ -204,7 +204,7 @@ End Class
 
 
 ' https://github.com/spmallick/learnopencv/tree/master/
-Public Class NR_PhotoShop_Sepia : Inherits TaskParent
+Public Class XR_PhotoShop_Sepia : Inherits TaskParent
     Public Sub New()
         desc = "Create a sepia image"
     End Sub
@@ -281,7 +281,7 @@ End Class
 
 
 ' https://github.com/spmallick/learnopencv/tree/master/
-Public Class NR_PhotoShop_EmbossAll : Inherits TaskParent
+Public Class XR_PhotoShop_EmbossAll : Inherits TaskParent
     Dim emboss As New PhotoShop_Emboss
     Dim mats As New Mat_4to1
     Dim sizeSlider As TrackBar
@@ -337,7 +337,7 @@ End Class
 
 
 ' https://github.com/spmallick/learnopencv/tree/master/
-Public Class NR_PhotoShop_DuoTone : Inherits TaskParent
+Public Class XR_PhotoShop_DuoTone : Inherits TaskParent
     Dim options As New Options_Photoshop
     Public Sub New()
 
@@ -394,7 +394,7 @@ End Class
 
 
 
-Public Class NR_PhotoShop_UnsharpMask : Inherits TaskParent
+Public Class XR_PhotoShop_UnsharpMask : Inherits TaskParent
     Public Sub New()
         If sliders.Setup(traceName) Then
             sliders.setupTrackBar("sigma", 1, 2000, 100)
@@ -429,7 +429,7 @@ End Class
 
 
 ' https://www.learnopencvb.com/non-photorealistic-rendering-using-opencv-python-c/
-Public Class NR_PhotoShop_SharpenStylize : Inherits TaskParent
+Public Class XR_PhotoShop_SharpenStylize : Inherits TaskParent
     Public Sub New()
         If sliders.Setup(traceName) Then
             sliders.setupTrackBar("Stylize Sigma_s", 0, 200, 60)
@@ -475,7 +475,7 @@ End Class
 
 
 ' https://cppsecrets.com/users/2582658986657266505064717765737646677977/Convert-photo-to-sketch-using-python.php?fbclid=IwAR3pOtiqxeOPiqouii7tmN9Q7yA5vG4dFdXGqA0XgZqcMB87w5a1PEMzGOw
-Public Class NR_PhotoShop_Pencil_Manual : Inherits TaskParent
+Public Class XR_PhotoShop_Pencil_Manual : Inherits TaskParent
     Public Sub New()
         If sliders.Setup(traceName) Then
             sliders.setupTrackBar("Blur kernel size", 2, 100, 10)
@@ -514,7 +514,7 @@ End Class
 
 
 
-Public Class NR_PhotoShop_Vignetting : Inherits TaskParent
+Public Class XR_PhotoShop_Vignetting : Inherits TaskParent
     Dim vignet As New Vignetting_Basics
     Public Sub New()
         labels(2) = "Vignetted image.  Click anywhere to establish a different center."

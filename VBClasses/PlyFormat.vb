@@ -39,7 +39,7 @@ End Class
 
 
 
-Public Class NR_PlyFormat_PlusRGB : Inherits TaskParent
+Public Class XR_PlyFormat_PlusRGB : Inherits TaskParent
     Public options As New Options_PlyFormat
     Dim saveFileName As String
     Public Sub New()

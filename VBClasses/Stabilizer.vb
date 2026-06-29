@@ -38,7 +38,7 @@ End Class
 
 
 
-Public Class NR_Stabilizer_Basics : Inherits TaskParent
+Public Class XR_Stabilizer_Basics : Inherits TaskParent
     Dim feat As New Feature_Basics
     Dim knn As New KNN_Basics
     Public Sub New()

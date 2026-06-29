@@ -105,7 +105,7 @@ End Class
 
 
 ' http://opencvexamples.blogspot.com/
-Public Class NR_WarpAffine_Captcha : Inherits TaskParent
+Public Class XR_WarpAffine_Captcha : Inherits TaskParent
     Const charHeight = 40
     Const charWidth = 30
     Const captchaLength = 8
@@ -327,7 +327,7 @@ End Class
 
 
 ' https://github.com/BhanuPrakashNani/Image_Processing/blob/master/Successive%20Rotations/rotation.py
-Public Class NR_WarpAffine_Repeated : Inherits TaskParent
+Public Class XR_WarpAffine_Repeated : Inherits TaskParent
     Public Sub New()
         labels = {"", "", "Rotated repeatedly 45 degrees - note the blur", "Rotated repeatedly 90 degrees"}
         desc = "Compare an image before and after repeated and equivalent in degrees rotations."
@@ -383,7 +383,7 @@ End Class
 
 
 ' https://github.com/BhanuPrakashNani/Image_Processing/blob/master/Successive%20Rotations/rotation.py
-Public Class NR_WarpAffine_RepeatedExample8 : Inherits TaskParent
+Public Class XR_WarpAffine_RepeatedExample8 : Inherits TaskParent
     Public Sub New()
         labels = {"", "", "Rotated repeatedly 45 degrees", "Rotated repeatedly 90 degrees"}
         desc = "Compare an image before and after repeated rotations."

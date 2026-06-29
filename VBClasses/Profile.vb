@@ -139,7 +139,7 @@ End Class
 
 
 
-Public Class NR_Profile_Derivative : Inherits TaskParent
+Public Class XR_Profile_Derivative : Inherits TaskParent
     Public sides As New Profile_Basics
     Dim saveTrueText As New List(Of TrueText)
     Public Sub New()
@@ -211,7 +211,7 @@ End Class
 
 
 
-Public Class NR_Profile_ConcentrationSide : Inherits TaskParent
+Public Class XR_Profile_ConcentrationSide : Inherits TaskParent
     Dim profile As New Profile_ConcentrationTop
     Public Sub New()
         OptionParent.FindCheckBox("Top View (Unchecked Side View)").Checked = False
@@ -306,7 +306,7 @@ End Class
 
 
 
-Public Class NR_Profile_Kalman : Inherits TaskParent
+Public Class XR_Profile_Kalman : Inherits TaskParent
     Dim sides As New Profile_Basics
     Dim kalman As New Kalman_Basics
     Public Sub New()

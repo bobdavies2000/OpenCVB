@@ -143,7 +143,6 @@ Motion
 Mouse
 MSER
 Neighbor
-NR
 OEX
 OpAuto
 Open3D

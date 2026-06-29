@@ -157,7 +157,7 @@ End Class
 
 
 
-Public Class NR_SLR_TrendImages : Inherits TaskParent
+Public Class XR_SLR_TrendImages : Inherits TaskParent
     Dim trends As New SLR_Trends
     Dim options As New Options_SLRImages
     Public Sub New()
@@ -204,7 +204,7 @@ End Class
 
 
 
-Public Class NR_SLR_SurfaceH : Inherits TaskParent
+Public Class XR_SLR_SurfaceH : Inherits TaskParent
     Dim surface As New Cloud_SurfaceH
     Public Sub New()
         desc = "Use the Cloud_SurfaceH data to indicate valleys and peaks."

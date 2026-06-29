@@ -28,7 +28,7 @@ End Class
 
 
 
-Public Class NR_MaxDist_NoRectangle : Inherits TaskParent
+Public Class XR_MaxDist_NoRectangle : Inherits TaskParent
     Dim redC As New RedCloud_Basics
     Public Sub New()
         labels(3) = "Below left shows hullMask while below shows the contour mask."
@@ -48,7 +48,7 @@ Public Class NR_MaxDist_NoRectangle : Inherits TaskParent
 
         If zeroRectangle Then
             Dim tmp As cv.Mat = rc.mask.Clone
-            ' see NR_MaxDist_NoRectangle below to confirm this is needed (it is.)
+            ' see XR_MaxDist_NoRectangle below to confirm this is needed (it is.)
             tmp.Rectangle(New cv.Rect(0, 0, rc.mask.Width, rc.mask.Height), 0, 1)
             Dim distance32f = tmp.DistanceTransform(cv.DistanceTypes.L1, 0)
             Dim mm As mmData = vbc.GetMinMax(distance32f)

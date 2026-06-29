@@ -79,7 +79,7 @@ End Class
 
 
 
-Public Class NR_Triangle_Cell : Inherits TaskParent
+Public Class XR_Triangle_Cell : Inherits TaskParent
     Public triangles As New List(Of cv.Point3f)
     Dim redC As New RedCloud_Basics
     Public Sub New()
@@ -138,7 +138,7 @@ End Class
 
 
 
-Public Class NR_Triangle_Mask : Inherits TaskParent
+Public Class XR_Triangle_Mask : Inherits TaskParent
     Public triangles As New List(Of cv.Point3f)
     Dim redC As New RedCloud_Basics
     Public Sub New()

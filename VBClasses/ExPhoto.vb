@@ -1,7 +1,7 @@
 Imports cv = OpenCvSharp
 Imports OpenCvSharp.XPhoto
 Imports System.Runtime.InteropServices
-Public Class NR_ExPhoto_Bm3dDenoise : Inherits TaskParent
+Public Class XR_ExPhoto_Bm3dDenoise : Inherits TaskParent
     Public Sub New()
         desc = "Denoise image with block matching and filtering."
         labels(2) = "Bm3dDenoising"
@@ -22,7 +22,7 @@ End Class
 
 
 
-Public Class NR_ExPhoto_Bm3dDenoiseDepthImage : Inherits TaskParent
+Public Class XR_ExPhoto_Bm3dDenoiseDepthImage : Inherits TaskParent
     Public Sub New()
         desc = "Denoise the depth image with block matching and filtering."
         labels(3) = "Difference from Input"
@@ -46,7 +46,7 @@ End Class
 
 
 ' https://github.com/opencv/opencv_contrib/blob/master/modules/xphoto/samples/oil.cpp
-Public Class NR_ExPhoto_OilPaint_CPP : Inherits TaskParent
+Public Class XR_ExPhoto_OilPaint_CPP : Inherits TaskParent
     Implements IDisposable
     Dim options As New Options_XPhoto
     Public Sub New()
@@ -102,7 +102,7 @@ End Class
 
 
 
-Public Class NR_ExPhoto_Inpaint_CPP : Inherits TaskParent
+Public Class XR_ExPhoto_Inpaint_CPP : Inherits TaskParent
     Implements IDisposable
     Dim inpVB As New ExPhoto_Inpaint
     Public Sub New()

@@ -167,7 +167,7 @@ End Class
 
 
 
-Public Class NR_RedCloud_Basics : Inherits TaskParent
+Public Class XR_RedCloud_Basics : Inherits TaskParent
     Public redC As New RedColor_Basics
     Public rcList As New List(Of rcData)
     Public rcMap As cv.Mat
@@ -205,7 +205,7 @@ End Class
 
 
 
-Public Class NR_RedCloud_CellDepthHistogram : Inherits TaskParent
+Public Class XR_RedCloud_CellDepthHistogram : Inherits TaskParent
     Dim plot As New PlotBar_Basics
     Dim redC As New RedCloud_Basics
     Public Sub New()
@@ -401,7 +401,7 @@ End Class
 
 
 
-Public Class NR_RedCloud_ColorChangeCause : Inherits TaskParent
+Public Class XR_RedCloud_ColorChangeCause : Inherits TaskParent
     Dim redC As New RedCloud_Basics
     Public Sub New()
         desc = "Click on a cell to determine why it is changing colors."

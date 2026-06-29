@@ -40,7 +40,7 @@ End Class
 
 
 ' https://docs.opencvb.org/3.4.2/de/dc7/fitellipse_8cpp-example.html
-Public Class NR_FitEllipse_AMS_CPP : Inherits TaskParent
+Public Class XR_FitEllipse_AMS_CPP : Inherits TaskParent
     Dim options As New Options_MinArea
     Public inputPoints As New List(Of cv.Point2f)
     Public Sub New()
@@ -86,7 +86,7 @@ End Class
 
 
 ' https://docs.opencvb.org/3.4.2/de/dc7/fitellipse_8cpp-example.html
-Public Class NR_FitEllipse_Direct_CPP : Inherits TaskParent
+Public Class XR_FitEllipse_Direct_CPP : Inherits TaskParent
     Dim options As New Options_MinArea
     Public Sub New()
         labels(2) = "The FitEllipse_Direct C++ "
@@ -128,7 +128,7 @@ End Class
 
 
 
-Public Class NR_FitEllipse_RedCloud : Inherits TaskParent
+Public Class XR_FitEllipse_RedCloud : Inherits TaskParent
     Dim fitE As New FitEllipse_Basics
     Dim redC As New RedCloud_Basics
     Public Sub New()
@@ -163,7 +163,7 @@ End Class
 
 
 
-Public Class NR_FitEllipse_Rectangle : Inherits TaskParent
+Public Class XR_FitEllipse_Rectangle : Inherits TaskParent
     Public noisyLine As New Eigen_Input
     Public rect As cv.RotatedRect
     Public vertices() As cv.Point2f

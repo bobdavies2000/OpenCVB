@@ -75,7 +75,7 @@ End Class
 
 
 
-Public Class NR_HullLine_SelectHull : Inherits TaskParent
+Public Class XR_HullLine_SelectHull : Inherits TaskParent
     Dim hullLines As New HullLine_BasicsOld_TA
     Public Sub New()
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)

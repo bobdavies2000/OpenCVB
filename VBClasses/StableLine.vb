@@ -110,7 +110,7 @@ End Class
 
 
 
-Public Class NR_StableLine_Lines : Inherits TaskParent
+Public Class XR_StableLine_Lines : Inherits TaskParent
     Public basics As New FeatureMap_StablePoints
     Public Sub New()
         If standalone Then task.gOptions.displayDst1.Checked = True
@@ -146,7 +146,7 @@ End Class
 
 
 
-Public Class NR_StableLine_FAST : Inherits TaskParent
+Public Class XR_StableLine_FAST : Inherits TaskParent
     Public basics As New FeatureMap_StablePoints
     Dim fast As New Corner_Basics
     Public Sub New()

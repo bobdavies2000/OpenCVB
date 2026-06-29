@@ -26,7 +26,7 @@ End Class
 
 
 
-Public Class NR_Mat_PointToMat : Inherits TaskParent
+Public Class XR_Mat_PointToMat : Inherits TaskParent
     Dim random As New Random_Basics
     Public Sub New()
         labels(2) = "Random_Basics points (original)"
@@ -56,7 +56,7 @@ End Class
 
 
 
-Public Class NR_Mat_MatToPoint : Inherits TaskParent
+Public Class XR_Mat_MatToPoint : Inherits TaskParent
     Public Sub New()
         desc = "Convert a mat into a vector of points."
         labels(2) = "Reconstructed BGR Image"
@@ -83,7 +83,7 @@ End Class
 
 
 
-Public Class NR_Mat_Transpose : Inherits TaskParent
+Public Class XR_Mat_Transpose : Inherits TaskParent
     Public Sub New()
         desc = "Transpose a Mat and show task.results.."
         labels(2) = "Color Image Transposed"
@@ -103,7 +103,7 @@ End Class
 
 
 ' https://csharp.hotexamples.com/examples/OpenCvSharp/Mat/-/php-mat-class-examples.html#0x95f170f4714e3258c220a78eacceeee99591440b9885a2997bbbc6b3aebdcf1c-19,,37,
-Public Class NR_Mat_Tricks : Inherits TaskParent
+Public Class XR_Mat_Tricks : Inherits TaskParent
     Public Sub New()
         labels(2) = "Image squeezed into square Mat"
         labels(3) = "Mat transposed around the diagonal"
@@ -123,7 +123,7 @@ End Class
 
 ' https://csharp.hotexamples.com/examples/OpenCvSharp/MatExpr/-/php-matexpr-class-examples.html
 ' https://github.com/shimat/opencvsharp_samples/blob/cba08badef1d5ab3c81ab158a64828a918c73df5/SamplesCS/Samples/MatOperations.cs
-Public Class NR_Mat_RowColRange : Inherits TaskParent
+Public Class XR_Mat_RowColRange : Inherits TaskParent
     Public Sub New()
         labels(2) = "BitwiseNot of RowRange and ColRange"
         desc = "Perform operation on a range of cols and/or Rows."
@@ -141,7 +141,7 @@ End Class
 
 
 
-Public Class NR_Mat_Managed : Inherits TaskParent
+Public Class XR_Mat_Managed : Inherits TaskParent
     Dim autoRand As New Random()
     Dim img(dst2.Total - 1) As cv.Vec3b
     Dim nextColor As cv.Vec3b
@@ -167,7 +167,7 @@ End Class
 
 
 
-Public Class NR_Mat_MultiplyReview : Inherits TaskParent
+Public Class XR_Mat_MultiplyReview : Inherits TaskParent
     Public Sub New()
         desc = "Review matrix multiplication"
     End Sub
@@ -221,7 +221,7 @@ End Class
 
 
 ' https://stackoverflow.com/questions/11015119/inverse-matrix-opencv-matrix-inv-not-working-properly
-Public Class NR_Mat_Inverse : Inherits TaskParent
+Public Class XR_Mat_Inverse : Inherits TaskParent
     Public matrix(,) As Single = {{1.1688, 0.23, 62.2}, {-0.013, 1.225, -6.29}, {0, 0, 1}}
     Public validateInverse As Boolean
     Public inverse As New cv.Mat
@@ -277,7 +277,7 @@ End Class
 
 
 
-Public Class NR_Mat_Inverse_4D : Inherits TaskParent
+Public Class XR_Mat_Inverse_4D : Inherits TaskParent
     Dim defaultInput(,) As Double = {{3, 7, 2, 5}, {4, 0, 1, 1}, {1, 6, 3, 0}, {2, 8, 4, 3}}
     Public input As cv.Mat
     Public Sub New()
@@ -445,7 +445,7 @@ End Class
 
 
 
-Public Class NR_Mat_FindNearZero : Inherits TaskParent
+Public Class XR_Mat_FindNearZero : Inherits TaskParent
     Public Sub New()
         If sliders.Setup(traceName) Then sliders.setupTrackBar("FindNearZero threshold X1000", 0, 200, 10)
         desc = "Find samples near zero using FindNonZero"

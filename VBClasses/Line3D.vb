@@ -45,7 +45,7 @@ End Class
 
 
 
-Public Class NR_Line3D_Longest : Inherits TaskParent
+Public Class XR_Line3D_Longest : Inherits TaskParent
     Dim bricks As New Brick_Basics
     Public Sub New()
         dst0 = New cv.Mat(dst0.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
@@ -144,7 +144,7 @@ End Class
 
 
 
-Public Class NR_Line3D_DrawArbitrary : Inherits TaskParent
+Public Class XR_Line3D_DrawArbitrary : Inherits TaskParent
     Public p1 As cv.Point, p2 As cv.Point
     Dim plot As New PlotTime_Scalar
     Dim toggleFirstSecond As Boolean

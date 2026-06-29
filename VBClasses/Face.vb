@@ -1,6 +1,6 @@
 Imports cv = OpenCvSharp
 ' https://docs.opencvb.org/2.4/doc/tutorials/objdetect/cascade_classifier/cascade_classifier.html
-Public Class NR_Face_Haar_LBP : Inherits TaskParent
+Public Class XR_Face_Haar_LBP : Inherits TaskParent
     Dim haarCascade As cv.CascadeClassifier
     Dim lbpCascade As cv.CascadeClassifier
     Public Sub New()
@@ -28,7 +28,7 @@ End Class
 
 
 
-Public Class NR_Face_Haar_Alt : Inherits TaskParent
+Public Class XR_Face_Haar_Alt : Inherits TaskParent
     Dim haarCascade As cv.CascadeClassifier
     Public Sub New()
         haarCascade = New cv.CascadeClassifier(task.homeDir + "Data/haarcascade_frontalface_alt.xml")
@@ -37,6 +37,6 @@ Public Class NR_Face_Haar_Alt : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst2 = src.Clone()
-        NR_Face_Haar_LBP.DetectFace(dst2, haarCascade)
+        XR_Face_Haar_LBP.DetectFace(dst2, haarCascade)
     End Sub
 End Class

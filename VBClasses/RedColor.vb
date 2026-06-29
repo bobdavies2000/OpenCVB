@@ -242,7 +242,7 @@ End Class
 
 
 
-Public Class NR_RedColor_Basics : Inherits TaskParent
+Public Class XR_RedColor_Basics : Inherits TaskParent
     Public rcList As New List(Of rcData)
     Public rcMap As cv.Mat = New cv.Mat(dst2.Size, cv.MatType.CV_32S, 0)
     Public options As New Options_RedCloud
@@ -271,7 +271,7 @@ End Class
 
 
 
-Public Class NR_RedColor_CPP : Inherits TaskParent
+Public Class XR_RedColor_CPP : Inherits TaskParent
     Implements IDisposable
     Public classCount As Integer
     Public rcList As New List(Of rcData)
@@ -398,7 +398,7 @@ End Class
 
 
 
-Public Class NR_RedColor_NWay : Inherits TaskParent
+Public Class XR_RedColor_NWay : Inherits TaskParent
     Dim binN As New BinNWay_Basics
     Dim redC As New RedColor_Basics
     Public Sub New()
@@ -530,10 +530,10 @@ End Class
 
 
 
-Public Class NR_RedColor_List : Inherits TaskParent
+Public Class XR_RedColor_List : Inherits TaskParent
     Public inputRemoved As cv.Mat
     Public cellGen As New RedFlood_ToRedColor
-    Public redMask As New NR_RedFlood_Basics
+    Public redMask As New XR_RedFlood_Basics
     Public rclist As New List(Of rcData)
     Public rcMap As New cv.Mat(dst2.Size, cv.MatType.CV_32S, 0)
     Public contours As New Contour_Basics
@@ -570,7 +570,7 @@ End Class
 
 
 
-Public Class NR_RedColor_Lines : Inherits TaskParent
+Public Class XR_RedColor_Lines : Inherits TaskParent
     Dim redC As New RedCloud_Basics
     Public Sub New()
         dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, 0)
@@ -602,7 +602,7 @@ End Class
 
 
 
-Public Class NR_RedColor_LineSingle : Inherits TaskParent
+Public Class XR_RedColor_LineSingle : Inherits TaskParent
     Dim track As New RedColor_Contour
     Dim leftMost As Integer, rightmost As Integer
     Dim leftCenter As cv.Point, rightCenter As cv.Point
@@ -669,7 +669,7 @@ End Class
 
 
 
-Public Class NR_RedColor_FeaturesKNN : Inherits TaskParent
+Public Class XR_RedColor_FeaturesKNN : Inherits TaskParent
     Public knn As New KNN_Basics
     Dim feat As New Feature_Basics
     Public Sub New()
@@ -706,7 +706,7 @@ End Class
 
 
 
-Public Class NR_RedColor_GoodCellInput : Inherits TaskParent
+Public Class XR_RedColor_GoodCellInput : Inherits TaskParent
     Public knn As New KNN_Basics
     Public featureList As New List(Of cv.Point2f)
     Dim feat As New Feature_Basics
@@ -745,7 +745,7 @@ End Class
 
 
 
-Public Class NR_RedColor_Points : Inherits TaskParent
+Public Class XR_RedColor_Points : Inherits TaskParent
     Dim track As New RedColor_Contour
     Public Sub New()
         dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))

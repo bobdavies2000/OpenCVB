@@ -80,7 +80,7 @@ End Class
 
 
 
-Public Class NR_Cluster_Hulls : Inherits TaskParent
+Public Class XR_Cluster_Hulls : Inherits TaskParent
     Dim cluster As New Cluster_Basics
     Public hulls As New List(Of List(Of cv.Point))
     Dim bPoint As New BrickPoint_Basics

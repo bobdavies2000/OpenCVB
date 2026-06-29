@@ -304,7 +304,7 @@ End Class
 
 
 
-Public Class NR_KNN_MaxDistance : Inherits TaskParent
+Public Class XR_KNN_MaxDistance : Inherits TaskParent
     Dim knn As New KNN_Basics
     Public outputPoints As New List(Of (cv.Point2f, cv.Point2f))
     Public options As New Options_KNN

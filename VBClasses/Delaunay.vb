@@ -46,7 +46,7 @@ End Class
 
 
 ' https://github.com/npinto/opencv/blob/master/samples/c/delaunay.c
-Public Class NR_Delaunay_SubDiv : Inherits TaskParent
+Public Class XR_Delaunay_SubDiv : Inherits TaskParent
     Dim random As New Random_Basics
     Public Sub New()
         OptionParent.FindSlider("Random Pixel Count").Value = 100
@@ -98,7 +98,7 @@ End Class
 
 
 ' https://github.com/shimat/opencvsharp/wiki/Subdiv2D
-Public Class NR_Delaunay_Subdiv2D : Inherits TaskParent
+Public Class XR_Delaunay_Subdiv2D : Inherits TaskParent
     Public Sub New()
         labels(3) = "Voronoi facets for the same subdiv2D"
         desc = "Generate random points and divide the image around those points."
@@ -150,7 +150,7 @@ End Class
 
 
 
-Public Class NR_Delaunay_GenerationsNoKNN : Inherits TaskParent
+Public Class XR_Delaunay_GenerationsNoKNN : Inherits TaskParent
     Public inputPoints As New List(Of cv.Point2f)
     Public facet As New Delaunay_Basics
     Dim random As New Random_Basics

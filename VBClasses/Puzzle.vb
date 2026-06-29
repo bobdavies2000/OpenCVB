@@ -82,7 +82,7 @@ End Class
 
 
 
-Public Class NR_Puzzle_SolverDynamic : Inherits TaskParent
+Public Class XR_Puzzle_SolverDynamic : Inherits TaskParent
     Dim puzzle As New Puzzle_Solver
     Public Sub New()
         If standalone Then task.gOptions.GridSlider.Value = 8

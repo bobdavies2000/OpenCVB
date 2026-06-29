@@ -69,7 +69,7 @@ End Class
 
 
 
-Public Class NR_LineSeg_Basics : Inherits TaskParent
+Public Class XR_LineSeg_Basics : Inherits TaskParent
     Public lpList As New List(Of lpData)
     Public lpLast As New List(Of lpData)
     Dim core As New LineSeg_Core
@@ -672,7 +672,7 @@ Public Class LineSeg_FLD : Inherits TaskParent
         dst0.SetTo(0)
         lSeg.dst1.CopyTo(dst0, dst3)
 
-        Dim histArray = NR_LineSeg_Basics.lineHistogram(dst0, Math.Max(task.lines.lpList.Count, lSeg.lpList.Count))
+        Dim histArray = XR_LineSeg_Basics.lineHistogram(dst0, Math.Max(task.lines.lpList.Count, lSeg.lpList.Count))
 
         dst3.SetTo(0)
         For i = 0 To Math.Min(histArray.Count, lSeg.lpList.Count) - 1
@@ -708,7 +708,7 @@ Public Class LineSeg_Detector : Inherits TaskParent
         dst0.SetTo(0)
         lSeg.dst1.CopyTo(dst0, dst3)
 
-        Dim histArray = NR_LineSeg_Basics.lineHistogram(dst0, Math.Max(task.lines.lpList.Count, lSeg.lpList.Count))
+        Dim histArray = XR_LineSeg_Basics.lineHistogram(dst0, Math.Max(task.lines.lpList.Count, lSeg.lpList.Count))
 
         dst3.SetTo(0)
         For i = 0 To Math.Min(histArray.Count, lSeg.lpList.Count) - 1

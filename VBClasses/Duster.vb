@@ -91,7 +91,7 @@ End Class
 
 
 
-Public Class NR_Duster_BasicsY : Inherits TaskParent
+Public Class XR_Duster_BasicsY : Inherits TaskParent
     Dim dust As New Duster_MaskZ
     Public Sub New()
         desc = "Removed blowback in the pointcloud"
@@ -118,7 +118,7 @@ End Class
 
 
 
-Public Class NR_Duster_RedCloud : Inherits TaskParent
+Public Class XR_Duster_RedCloud : Inherits TaskParent
     Dim duster As New Duster_Basics
     Dim redMask As New RedFlood_Basics
     Public Sub New()

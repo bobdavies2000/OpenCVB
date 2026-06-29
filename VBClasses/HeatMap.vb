@@ -39,7 +39,7 @@ End Class
 
 
 
-Public Class NR_HeatMap_Grid : Inherits TaskParent
+Public Class XR_HeatMap_Grid : Inherits TaskParent
     Dim heat As New HeatMap_Basics
     Public Sub New()
         task.gOptions.GridSlider.Value = 5
@@ -138,7 +138,7 @@ End Class
 
 
 
-Public Class NR_HeatMap_GuidedBP : Inherits TaskParent
+Public Class XR_HeatMap_GuidedBP : Inherits TaskParent
     Dim guided As New GuidedBP_Basics
     Public Sub New()
         desc = "This is just a placeholder to make it easy to find the GuidedBP_Basics which shows objects in top/side views."

@@ -81,7 +81,7 @@ End Class
 
 
 
-Public Class NR_Region_Quads : Inherits TaskParent
+Public Class XR_Region_Quads : Inherits TaskParent
     Public quadMat As New cv.Mat
     Public inputRects As New List(Of cv.Rect)
     Dim bricks As New Brick_Basics
@@ -212,7 +212,7 @@ End Class
 
 
 Public Class Region_Depth : Inherits TaskParent
-    Public redMask As New NR_RedFlood_Basics
+    Public redMask As New XR_RedFlood_Basics
     Public connect As New Region_Rects
     Public mdLargest As New List(Of maskData)
     Dim bricks As New Brick_Basics

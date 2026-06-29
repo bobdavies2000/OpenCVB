@@ -53,7 +53,7 @@ End Class
 
 
 ' http://opencvexamples.blogspot.com/2014/01/kalman-filter-implementation-tracking.html
-Public Class NR_Kalman_Compare : Inherits TaskParent
+Public Class XR_Kalman_Compare : Inherits TaskParent
     Dim kalman() As Kalman_Single
     Public plot As New PlotTime_Scalar
     Public kPlot As New PlotTime_Scalar
@@ -101,7 +101,7 @@ End Class
 
 
 'https://github.com/opencv/opencv/blob/master/samples/cpp/kalman.cpp
-Public Class NR_Kalman_RotatingPoint : Inherits TaskParent
+Public Class XR_Kalman_RotatingPoint : Inherits TaskParent
     Dim kf As New cv.KalmanFilter(2, 1, 0)
     Dim kState As New cv.Mat(2, 1, cv.MatType.CV_32F)
     Dim processNoise As New cv.Mat(2, 1, cv.MatType.CV_32F)
@@ -166,7 +166,7 @@ End Class
 
 ' http://opencvexamples.blogspot.com/2014/01/kalman-filter-implementation-tracking.html
 ' https://www.codeproject.com/Articles/865935/Object-Tracking-Kalman-Filter-with-Ease
-Public Class NR_Kalman_MousePredict : Inherits TaskParent
+Public Class XR_Kalman_MousePredict : Inherits TaskParent
     Dim kalman As New Kalman_Basics
     Public Sub New()
         ReDim kalman.kInput(2 - 1)
@@ -294,7 +294,7 @@ End Class
 
 
 
-Public Class NR_Kalman_DepthSmall : Inherits TaskParent
+Public Class XR_Kalman_DepthSmall : Inherits TaskParent
     Dim kalman As New Kalman_ImageSmall
     Public Sub New()
         labels(2) = "Mask of non-zero depth after Kalman smoothing"
@@ -314,7 +314,7 @@ End Class
 
 
 
-Public Class NR_Kalman_Depth32f : Inherits TaskParent
+Public Class XR_Kalman_Depth32f : Inherits TaskParent
     Dim kalman As New Kalman_CVMat
     Dim resize As Resize_Smaller
     Public Sub New()

@@ -1,7 +1,7 @@
 Imports cv = OpenCvSharp
 Imports System.Threading
 ' https://answers.opencvb.org/question/122331/how-to-subtract-a-constant-from-a-3-channel-mat/
-Public Class NR_Math_Subtract : Inherits TaskParent
+Public Class XR_Math_Subtract : Inherits TaskParent
     Dim options As New Options_Colors
     Public Sub New()
         desc = "Subtract a Mat using a scalar.  Set scalar to zero to see pixels saturate to zero."
@@ -72,7 +72,7 @@ End Class
 
 
 
-Public Class NR_Math_DepthMeanStdev : Inherits TaskParent
+Public Class XR_Math_DepthMeanStdev : Inherits TaskParent
     Dim minMax As New Depth_NotMissing
     Public Sub New()
         desc = "This algorithm shows that just using the max depth at each pixel does not improve quality of measurement"
@@ -100,7 +100,7 @@ End Class
 
 
 
-Public Class NR_Math_RGBCorrelation : Inherits TaskParent
+Public Class XR_Math_RGBCorrelation : Inherits TaskParent
     Dim flow As New Font_FlowText
     Dim match As New Match_Basics
     Dim options As New Options_Features
@@ -138,7 +138,7 @@ End Class
 
 
 
-Public Class NR_Math_StdevBoundary : Inherits TaskParent
+Public Class XR_Math_StdevBoundary : Inherits TaskParent
     Dim stdev As New Math_Stdev
     Public Sub New()
         labels(2) = "Low stdev regions.  Gaps filled with OTSU results"
@@ -260,7 +260,7 @@ End Class
 
 
 
-Public Class NR_Math_ImageMaskedAverage : Inherits TaskParent
+Public Class XR_Math_ImageMaskedAverage : Inherits TaskParent
     Dim images As New List(Of cv.Mat)
     Public Sub New()
         desc = "Mask off pixels where the difference is great and create an image that is the mean of x number of previous images."
@@ -295,7 +295,7 @@ End Class
 
 
 ' https://stackoverflow.com/questions/7572640/how-do-i-know-if-two-vectors-are-near-parallel
-Public Class NR_Math_ParallelTest : Inherits TaskParent
+Public Class XR_Math_ParallelTest : Inherits TaskParent
     Public v1 = New cv.Point3f(1, 0, 0)
     Public v2 = New cv.Point3f(5, 0, 0)
     Public showWork As Boolean = True

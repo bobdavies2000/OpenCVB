@@ -30,7 +30,7 @@ End Class
 
 
 ' https://www.tutorialspoint.com/opencv/opencv_adaptive_threshold.htm
-Public Class NR_Threshold_Adaptive : Inherits TaskParent
+Public Class XR_Threshold_Adaptive : Inherits TaskParent
     Dim options As New Options_Threshold
     Dim optionsAdaptive As New Options_AdaptiveThreshold
     Public Sub New()
@@ -142,7 +142,7 @@ End Class
 
 
 
-Public Class NR_Threshold_ColorSource : Inherits TaskParent
+Public Class XR_Threshold_ColorSource : Inherits TaskParent
     Dim color8U As New Color8U_Basics
     Dim byChan As New Threshold_ByChannels
     Public Sub New()

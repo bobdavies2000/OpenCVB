@@ -42,7 +42,7 @@ End Class
 
 
 
-Public Class NR_History_Cloud : Inherits TaskParent
+Public Class XR_History_Cloud : Inherits TaskParent
     Public frames As New History_BasicsNoSaturation
     Dim saveFrames As New List(Of cv.Mat)
     Public Sub New()
@@ -109,7 +109,7 @@ End Class
 
 
 
-Public Class NR_History_BasicsDiff : Inherits TaskParent
+Public Class XR_History_BasicsDiff : Inherits TaskParent
     Dim frames As New History_BasicsNoSaturation
     Dim diff As New Diff_Basics
     Public Sub New()
