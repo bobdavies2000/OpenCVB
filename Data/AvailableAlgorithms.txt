@@ -1641,6 +1641,7 @@ RedCloud_Reliable
 RedCloud_RGB
 RedColor_BasicLeftRight
 RedColor_Basics
+RedColor_BasicsFeatureLess
 RedColor_BasicsOld
 RedColor_BrickList
 RedColor_Bricks
@@ -1654,7 +1655,6 @@ RedColor_GridRects
 RedColor_Hulls
 RedColor_Isolate
 RedColor_LeftRight
-RedColor_Restart
 RedFlood_Basics
 RedFlood_Color
 RedFlood_CPP

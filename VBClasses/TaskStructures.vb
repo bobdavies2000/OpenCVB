@@ -381,6 +381,7 @@ Public Module Structures
         Public Sub New()
         End Sub
         Public Sub New(_mask As cv.Mat, _rect As cv.Rect, _index As Integer)
+            Dim reduction As Integer = task.fOptions.ReductionDepth.Value
             rect = _rect
             If _index >= 0 Then
                 mask = _mask.InRange(_index, _index)
@@ -404,15 +405,16 @@ Public Module Structures
             gridIndex = task.gridMap.Get(Of Integer)(maxDist.Y, maxDist.X)
             If _index >= 0 Then color = task.scalarColors(index Mod 255)
             pixels = mask.CountNonZero
-            'wcMean = task.pointCloud(rect).Mean(task.depthmask(rect))
-            'Dim x = Math.Round(wcMean(0) * 1000 / task.reduction)
-            'Dim y = Math.Round(wcMean(1) * 1000 / task.reduction)
-            'Dim z = Math.Round(wcMean(2) * 1000 / task.reduction)
-            'If Math.Abs(x) < 0.000000000001 Then x = 0
-            'If Math.Abs(y) < 0.000000000001 Then y = 0
-            'If Math.Abs(z) < 0.000000000001 Then z = 0
-            'wGrid = New cv.Point3d(x, y, z)
-            'If Single.IsInfinity(wcMean(2)) Then depthDelta = 0
+
+            wcMean = task.pointCloud(rect).Mean(task.depthmask(rect))
+            Dim x = Math.Round(wcMean(0) * 1000 / reduction)
+            Dim y = Math.Round(wcMean(1) * 1000 / reduction)
+            Dim z = Math.Round(wcMean(2) * 1000 / reduction)
+            If Math.Abs(x) < 0.000000000001 Then x = 0
+            If Math.Abs(y) < 0.000000000001 Then y = 0
+            If Math.Abs(z) < 0.000000000001 Then z = 0
+            wGrid = New cv.Point3d(x, y, z)
+            If Single.IsInfinity(wcMean(2)) Then depthDelta = 0
         End Sub
         Public Shared Function getHullMask(hull As List(Of cv.Point), mask As cv.Mat) As cv.Mat
             Dim hullMask = New cv.Mat(mask.Size, cv.MatType.CV_8U, 0)

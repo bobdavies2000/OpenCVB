@@ -650,7 +650,7 @@ End Class
 
 Public Class RedCloud_DelaunayMap : Inherits TaskParent
     Public dMap As New Delaunay_Map
-    Dim redC As New RedColor_Restart
+    Dim redC As New RedColor_Basics
     Public Sub New()
         desc = "Run RedColor as usual but use the Delaunay map to select cells."
     End Sub

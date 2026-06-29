@@ -745,7 +745,7 @@ End Class
 
 Public Class RedFlood_Delaunay : Inherits TaskParent
     Dim subdiv As New cv.Subdiv2D
-    Dim redC As New RedColor_Restart
+    Dim redC As New RedColor_Basics
     Dim facetList As New List(Of List(Of cv.Point))
     Dim rcMap As New cv.Mat(dst2.Size, cv.MatType.CV_32S, 0)
     Public Sub New()
