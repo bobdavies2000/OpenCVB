@@ -76,7 +76,7 @@ End Class
 
 
 
-Public Class FeatureLess_BasicsOld : Inherits TaskParent
+Public Class XR_FeatureLess_BasicsOld : Inherits TaskParent
     Public brickList As New List(Of cv.Rect)
     Public Sub New()
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)

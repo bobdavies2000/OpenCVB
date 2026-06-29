@@ -225,7 +225,7 @@ End Class
 
 
 
-Public Class Binarize_SimpleOld : Inherits TaskParent
+Public Class XR_Binarize_SimpleOld : Inherits TaskParent
     Public meanScalar As cv.Scalar
     Public injectVal As Integer = 255
     Public Sub New()

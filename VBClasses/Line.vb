@@ -287,7 +287,6 @@ Public Class XR_Line_BasicsOld : Inherits TaskParent
     Public Sub New()
         dst1 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
-        labels(2) = "Line_BasicsOld output"
         ld = cv.XImgProc.CvXImgProc.CreateFastLineDetector
         desc = "Run FLD (Fast Line Detector) With sobel input."
     End Sub

@@ -68,7 +68,7 @@ End Class
 
 
 
-Public Class StableLine_BasicsOldCount : Inherits TaskParent
+Public Class XR_StableLine_BasicsOldCount : Inherits TaskParent
     Public basics As New FeatureMap_StablePoints
     Public goodCounts As New SortedList(Of Integer, Integer)(New compareAllowIdenticalIntegerInverted)
     Dim bPoint As New BrickPoint_Basics

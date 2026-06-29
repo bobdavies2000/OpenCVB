@@ -203,7 +203,7 @@ End Class
 
 
 
-Public Class RedColor_BasicsOld : Inherits TaskParent
+Public Class XR_RedColor_BasicsOld : Inherits TaskParent
     Public rcList As New List(Of rcData)
     Public rcMap As cv.Mat = New cv.Mat(dst2.Size, cv.MatType.CV_32S, 0)
     Public redFlood As New RedCloud_Flood_CPP

@@ -1473,7 +1473,7 @@ End Class
 
 
 
-Public Class Depth_TiersOld : Inherits TaskParent
+Public Class XR_Depth_TiersOld : Inherits TaskParent
     Public classCount As Integer
     Dim options As New Options_DepthTiers
     Public Sub New()

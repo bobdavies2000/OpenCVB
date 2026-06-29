@@ -6963,7 +6963,7 @@ Namespace VBClasses
 
 
     Public Class XO_FPoly_TopFeatures : Inherits TaskParent
-        Public stable As New StableLine_BasicsOldCount
+        Public stable As New XR_StableLine_BasicsOldCount
         Public options As New Options_FPoly
         Public feat As New Feature_Basics
         Public topFeatures As New List(Of cv.Point)

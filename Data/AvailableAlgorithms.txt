@@ -44,7 +44,6 @@ Bin4Way_UnstableEdges
 Bin4Way_UnstablePixels1
 Binarize_Basics
 Binarize_Simple
-Binarize_SimpleOld
 BinNWay_Basics
 Bitmap_ToMat
 Blob_Basics
@@ -150,7 +149,6 @@ Depth_Outline
 Depth_ReliableLines
 Depth_TierCount
 Depth_Tiers
-Depth_TiersOld
 Depth_World
 Depth_WorldXYZ
 DepthColorizer_Basics_TA
@@ -254,7 +252,6 @@ Feature_Points
 FeatureFlow_Basics
 FeatureFlow_LucasKanade
 FeatureLess_Basics_TA
-FeatureLess_BasicsOld
 FeatureLess_BrickList
 FeatureLess_CalcHist
 FeatureLess_Cells
@@ -703,7 +700,6 @@ RedCloud_RGB
 RedColor_BasicLeftRight
 RedColor_Basics
 RedColor_BasicsFeatureLess
-RedColor_BasicsOld
 RedColor_BrickList
 RedColor_Bricks
 RedColor_Contour
@@ -797,7 +793,6 @@ StableGray_RGBMinMaxCompare
 StableGray_Right
 StableGray_ToggleMinMax
 StableLine_BasicsOld
-StableLine_BasicsOldCount
 Stitch_Basics
 Stripes_Basics
 Stripes_CloudX
