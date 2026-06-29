@@ -30,12 +30,18 @@ Public Class RedColor_Basics : Inherits TaskParent
         dst2.SetTo(0, otherMask)
         rcMap.SetTo(0, otherMask)
 
+        If task.rcD IsNot Nothing Then dst2.Rectangle(task.rcD.rect, task.highlight, task.lineWidth)
+
+        Dim rcIndex As Integer
+        For Each rc In rcList
+            rcIndex += 1
+            rc.index = rcIndex
+        Next
+
         strOut = Utility_Basics.selectCell(rcMap, rcList)
         SetTrueText(strOut, 1)
 
-        If task.rcD IsNot Nothing Then dst2.Rectangle(task.rcD.rect, task.highlight, task.lineWidth)
-
-        labels(2) = CStr(rcList.Count) + " cells were found."
+        labels(2) = CStr(rcIndex) + " cells were found."
     End Sub
 End Class
 
