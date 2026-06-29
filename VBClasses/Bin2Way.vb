@@ -89,7 +89,7 @@ Public Class NR_Bin2Way_RedColor : Inherits TaskParent
 
         dst1.SetTo(0)
         For Each rc In redC.rcList
-            dst1(rc.rect).SetTo(rc.index, rc.mask)
+            dst1(rc.rect).SetTo(rc.mapID, rc.mask)
         Next
 
         dst2 = Palettize(dst1, 0)
@@ -277,9 +277,9 @@ Public Class NR_Bin2Way_RedCloudLightToDark : Inherits TaskParent
         dst3.SetTo(0)
         rcMap.setto(0)
         For Each rc In newList.Values
-            rc.index = rclist.Count + 1
+            rc.mapID = rclist.Count + 1
             rclist.Add(rc)
-            rcMap(rc.rect).setto(rc.index, rc.mask)
+            rcMap(rc.rect).setto(rc.mapID, rc.mask)
         Next
 
         dst3 = Palettize(rcMap)

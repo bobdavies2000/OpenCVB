@@ -84,7 +84,7 @@ Public Class RedColor_BasicsFeatureLess : Inherits TaskParent
                         r1 = r1.Union(r2)
                     Else
                         Dim rc = New rcData(src(r1), r1, rectSorted.ElementAt(j).Key)
-                        rc.index = rectSorted.ElementAt(j).Key
+                        rc.mapID = rectSorted.ElementAt(j).Key
                         rcSizeSort.Add(rectSorted.ElementAt(i).Value.count, rc)
                         i = j
                         Exit For
@@ -92,7 +92,7 @@ Public Class RedColor_BasicsFeatureLess : Inherits TaskParent
                 Next
             Else
                 Dim rc = New rcData(src(r1), r1, rectSorted.ElementAt(i).Key)
-                rc.index = rectSorted.ElementAt(i).Key
+                rc.mapID = rectSorted.ElementAt(i).Key
                 rcSizeSort.Add(rectSorted.ElementAt(i).Value.count, rc)
             End If
         Next
@@ -101,7 +101,7 @@ Public Class RedColor_BasicsFeatureLess : Inherits TaskParent
         rcList.Clear()
         For Each rc In rcSizeSort.Values
             rcList.Add(rc)
-            rcMap(rc.rect).SetTo(rc.index, rc.mask)
+            rcMap(rc.rect).SetTo(rc.mapID, rc.mask)
         Next
 
         If runSelectCell Then
@@ -180,8 +180,8 @@ Public Class RedColor_BrickList : Inherits TaskParent
         rcMap.SetTo(0)
         rcList.Clear()
         For Each rc In rcSizeSort.Values
-            rc.index = rcList.Count + 1
-            rcMap(rc.rect).SetTo(rc.index, rc.mask)
+            rc.mapID = rcList.Count + 1
+            rcMap(rc.rect).SetTo(rc.mapID, rc.mask)
             rcList.Add(rc)
         Next
 
@@ -334,15 +334,15 @@ Public Class NR_RedColor_CPP : Inherits TaskParent
             End If
             usedColor.Add(rc.color)
 
-            rc.index = rcList.Count + 1
+            rc.mapID = rcList.Count + 1
             rcList.Add(rc)
-            rcMap(rc.rect).SetTo(rc.index, rc.mask)
+            rcMap(rc.rect).SetTo(rc.mapID, rc.mask)
             SetTrueText(CStr(rc.age), rc.maxDist)
         Next
 
         dst2.SetTo(0)
         For Each rc In rcList
-            rc.mask = rcMap(rc.rect).InRange(rc.index, rc.index)
+            rc.mask = rcMap(rc.rect).InRange(rc.mapID, rc.mapID)
             rc.buildMaxDist()
             dst2(rc.rect).SetTo(rc.color, rc.mask)
             dst2.Circle(rc.maxDist, task.DotSize, task.highlight, -1)
@@ -477,7 +477,7 @@ Public Class RedColor_Hulls : Inherits TaskParent
                 Catch ex As Exception
                     defectCount += 1
                 End Try
-                DrawTour(rcMap(rc.rect), rc.hull, rc.index, -1)
+                DrawTour(rcMap(rc.rect), rc.hull, rc.mapID, -1)
                 rclist.Add(rc)
             End If
         Next
@@ -513,7 +513,7 @@ Public Class RedColor_GridRects : Inherits TaskParent
             If index >= redC.rcList.Count Or index < 0 Then Continue For
             Dim rc = redC.rcList(index)
             dst3(r).SetTo(rc.color)
-            rcGridMap(r).SetTo(rc.index)
+            rcGridMap(r).SetTo(rc.mapID)
         Next
         strOut = Utility_Basics.selectCell(redC.rcMap, redC.rcList)
     End Sub
@@ -610,7 +610,7 @@ Public Class NR_RedColor_LineSingle : Inherits TaskParent
             Dim d = pt.DistanceTo(rc.maxDist)
             If d < bestDistance Then
                 bestDistance = d
-                bestIndex = rc.index
+                bestIndex = rc.mapID
             End If
         Next
         Return bestIndex
@@ -624,8 +624,8 @@ Public Class NR_RedColor_LineSingle : Inherits TaskParent
         End If
         Dim xList As New SortedList(Of Integer, Integer)(New compareAllowIdenticalIntegerInverted)
         For Each rc In track.redC.rcList
-            If rc.index = 0 Then Continue For
-            xList.Add(rc.rect.X, rc.index)
+            If rc.mapID = 0 Then Continue For
+            xList.Add(rc.rect.X, rc.mapID)
         Next
 
         Dim minLeft As Integer = xList.Count / 4
@@ -829,7 +829,7 @@ Public Class RedColor_Isolate : Inherits TaskParent
     Private Shared Function CellMaskFull(rcMap As cv.Mat, rc As rcData) As cv.Mat
         Dim m As New cv.Mat(rcMap.Size, cv.MatType.CV_8U, 0)
         Using roi = rcMap(rc.rect)
-            Using part = roi.InRange(rc.index, rc.index)
+            Using part = roi.InRange(rc.mapID, rc.mapID)
                 part.CopyTo(m(rc.rect))
             End Using
         End Using
@@ -846,7 +846,7 @@ Public Class RedColor_Isolate : Inherits TaskParent
 
         If task.rcD IsNot Nothing And task.rcD.pixels > 0 Then
             For Each rc In rcList
-                If rc.index = task.rcD.index Then Return rc
+                If rc.mapID = task.rcD.mapID Then Return rc
             Next
         End If
 
@@ -913,7 +913,7 @@ Public Class RedColor_Isolate : Inherits TaskParent
         dst3 = New cv.Mat(mask.Size(), cv.MatType.CV_8UC3, New cv.Scalar(0, 0, 0))
         dst3.SetTo(New cv.Scalar(255, 255, 255), mask)
 
-        labels(2) = "Subject index=" + CStr(subject.index) + ", pixels=" + CStr(subject.pixels) +
+        labels(2) = "Subject index=" + CStr(subject.mapID) + ", pixels=" + CStr(subject.pixels) +
                     " (RedColor cell cutout; not ML portrait matting)."
         labels(3) = "White = kept region. Select another cell with RedColor UI to retarget."
         strOut = "Uses RedCloud color flood cells (RedColor_Basics). Auto-pick avoids cells covering most of the frame." + vbCrLf +
@@ -1011,7 +1011,7 @@ Public Class RedColor_Contour : Inherits TaskParent
         For Each rc In redC.rcList
             DrawTour(dst2(rc.rect), rc.contour, rc.color, -1)
             If task.rcD IsNot Nothing Then
-                If rc.index = task.rcD.index Then DrawTour(dst2(rc.rect), rc.contour, white, -1)
+                If rc.mapID = task.rcD.mapID Then DrawTour(dst2(rc.rect), rc.contour, white, -1)
             End If
         Next
     End Sub

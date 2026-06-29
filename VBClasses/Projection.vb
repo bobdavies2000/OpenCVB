@@ -37,7 +37,7 @@ Public Class Projection_Basics : Inherits TaskParent
         rclist.Clear()
         rclist.Add(New rcData)
         For Each rc In sortedCells.Values
-            rc.index = rclist.Count
+            rc.mapID = rclist.Count
             rclist.Add(rc)
         Next
 
@@ -51,7 +51,7 @@ Public Class Projection_Basics : Inherits TaskParent
         Dim xy1 As Single, xy2 As Single, z1 As Single, z2 As Single
         If task.heartBeat Then strOut = ""
         For Each rc In rclist
-            If rc.index = 0 Then Continue For
+            If rc.mapID = 0 Then Continue For
             If viewType = "Side" Then
                 xy1 = (ranges(0).End - ranges(0).Start) * rc.rect.Y / dst2.Height + ranges(0).Start
                 xy2 = (ranges(0).End - ranges(0).Start) * (rc.rect.Y + rc.rect.Height) / dst2.Height + ranges(0).Start
@@ -65,7 +65,7 @@ Public Class Projection_Basics : Inherits TaskParent
             End If
             objectList.Add(New cv.Vec4f(xy1, xy2, z1, z2))
             If task.heartBeat Then
-                strOut += "Object " + vbTab + CStr(rc.index) + vbTab + Format(xy2 - xy1, fmt3) + " m " + meterDesc + vbTab +
+                strOut += "Object " + vbTab + CStr(rc.mapID) + vbTab + Format(xy2 - xy1, fmt3) + " m " + meterDesc + vbTab +
                                            Format(z1, fmt1) + "m " + " to " + Format(z2, fmt1) + "m from camera" + vbTab + CStr(rc.pixels) + " pixels" + vbCrLf
             End If
         Next

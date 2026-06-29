@@ -10055,10 +10055,10 @@ Namespace VBClasses
             rcList.Clear()
             dst1.SetTo(0)
             For Each rc In newList.Values
-                rc.index = rcList.Count + 1
+                rc.mapID = rcList.Count + 1
                 rcList.Add(rc)
-                dst1(rc.rect).SetTo(rc.index Mod 255, rc.mask)
-                SetTrueText(CStr(rc.index), New cv.Point(rc.rect.X, rc.rect.Y))
+                dst1(rc.rect).SetTo(rc.mapID Mod 255, rc.mask)
+                SetTrueText(CStr(rc.mapID), New cv.Point(rc.rect.X, rc.rect.Y))
             Next
             dst2 = Palettize(dst1, 0)
 
@@ -10324,7 +10324,7 @@ Namespace VBClasses
             Dim rc = task.rcD
 
             Dim gridID As Integer = task.gridMap.Get(Of Integer)(rc.maxDist.Y, rc.maxDist.X)
-            strOut = "rc.index = " + CStr(rc.index) + vbTab + " gridID = " + CStr(gridID) + vbTab
+            strOut = "rc.mapID = " + CStr(rc.mapID) + vbTab + " gridID = " + CStr(gridID) + vbTab
             strOut += "rc.age = " + CStr(rc.age) + vbCrLf
             strOut += "rc.rect: " + CStr(rc.rect.X) + ", " + CStr(rc.rect.Y) + ", "
             strOut += CStr(rc.rect.Width) + ", " + CStr(rc.rect.Height) + vbCrLf
@@ -10428,9 +10428,9 @@ Namespace VBClasses
 
                 dst3.SetTo(0)
                 For Each rc In task.redList.rclist
-                    Dim color = (grayMeans(rc.index) - min) * 255 / (max - min)
+                    Dim color = (grayMeans(rc.mapID) - min) * 255 / (max - min)
                     dst3(rc.rect).SetTo(color, rc.mask)
-                    dst1(rc.rect).SetTo(If(grayMeans(rc.index) > avg, 255, 0), rc.mask)
+                    dst1(rc.rect).SetTo(If(grayMeans(rc.mapID) > avg, 255, 0), rc.mask)
                 Next
             End If
         End Sub
@@ -10733,7 +10733,7 @@ Namespace VBClasses
                         End If
                     Next
                     If present Then
-                        rc.index = task.redList.rclist.Count
+                        rc.mapID = task.redList.rclist.Count
                         task.redList.rclist.Add(rc)
                     End If
                 Next
@@ -10743,7 +10743,7 @@ Namespace VBClasses
             task.redList.rcMap.SetTo(0)
             For Each rc In task.redList.rclist
                 dst2(rc.rect).SetTo(rc.color, rc.mask)
-                task.redList.rcMap(rc.rect).SetTo(rc.index, rc.mask)
+                task.redList.rcMap(rc.rect).SetTo(rc.mapID, rc.mask)
             Next
 
             For Each mat In diffs
@@ -10839,9 +10839,9 @@ Namespace VBClasses
             task.redList.rcMap.SetTo(0)
             Dim dst As New cv.Mat(task.workRes, cv.MatType.CV_8UC3, 0)
             For Each rc In rclist
-                task.redList.rcMap(rc.rect).SetTo(rc.index, rc.mask)
+                task.redList.rcMap(rc.rect).SetTo(rc.mapID, rc.mask)
                 dst(rc.rect).SetTo(rc.color, rc.mask)
-                If rc.index >= 255 Then Exit For
+                If rc.mapID >= 255 Then Exit For
             Next
             Return dst
         End Function
@@ -11051,7 +11051,7 @@ Namespace VBClasses
                     If histArray(i) > 0 Then
                         Dim rc = task.redList.rclist(i)
                         If rc.wcMean(2) > md.mm.minVal And rc.wcMean(2) < md.mm.maxVal Then
-                            rc.index = rclist.Count
+                            rc.mapID = rclist.Count
                             rc.color = color
                             dst2(rc.rect).SetTo(rc.color, rc.mask)
                             rclist.Add(rc)
@@ -11097,7 +11097,7 @@ Namespace VBClasses
                 Dim c = dst1.Get(Of cv.Vec3b)(rc.maxDist.Y, rc.maxDist.X)
                 Dim color = New cv.Scalar(c(0), c(1), c(2))
                 If color = black Then color = yellow
-                rc.index = rclist.Count
+                rc.mapID = rclist.Count
                 rc.color = color
                 dst2(rc.rect).SetTo(rc.color, rc.mask)
                 dst2.Circle(rc.maxDist, task.DotSize, task.highlight, -1, task.lineType)
@@ -11357,7 +11357,7 @@ Namespace VBClasses
                 cellMaps(i) = task.redList.rcMap.Clone
                 rclist(i) = New List(Of rcData)(task.redList.rclist)
                 For Each orc In task.redList.rclist
-                    If orc.index = 0 Then Continue For
+                    If orc.mapID = 0 Then Continue For
                     sortedCells.Add(orc.pixels, orc)
                 Next
             Next
@@ -11411,10 +11411,10 @@ Namespace VBClasses
                             'If count >= minCount Then
                             Dim rc = New rcData(dst3(rect), rect, index)
                             If rc Is Nothing Then Continue For
-                            rc.color = task.scalarColors(rc.index)
+                            rc.color = task.scalarColors(rc.mapID)
                             newList.Add(rc)
-                            'dst1(rc.rect).SetTo(rc.index Mod 255, rc.mask)
-                            SetTrueText(CStr(rc.index), rc.rect.TopLeft)
+                            'dst1(rc.rect).SetTo(rc.mapID Mod 255, rc.mask)
+                            SetTrueText(CStr(rc.mapID), rc.rect.TopLeft)
                             index += 1
                             'Else
                             '    dst1(rect).SetTo(255, mask(rect))
@@ -12315,7 +12315,7 @@ Namespace VBClasses
             For i = 1 To histArray.Count - 1
                 If histArray(i) > 0 And pcUsed.Contains(i) = False Then
                     Dim rc = redC.rcList(i)
-                    dst3(rc.rect).SetTo(task.scalarColors(rc.index), rc.mask)
+                    dst3(rc.rect).SetTo(task.scalarColors(rc.mapID), rc.mask)
                     pcUsed.Add(i)
                 End If
             Next
@@ -12446,8 +12446,8 @@ Namespace VBClasses
                     rc.age = rcListLast(indexLast).age + 1
                     If rc.age > 1000 Then rc.age = 2
                 End If
-                rc.index = rcList.Count + 1
-                rcMap(rc.rect).SetTo(rc.index, rc.mask)
+                rc.mapID = rcList.Count + 1
+                rcMap(rc.rect).SetTo(rc.mapID, rc.mask)
                 dst2(rc.rect).SetTo(rc.color, rc.mask)
                 dst2.Circle(rc.maxDist, task.DotSize, task.highlight, -1)
                 SetTrueText(CStr(rc.age), rc.maxDist)
@@ -12541,12 +12541,12 @@ Namespace VBClasses
                         Dim count = cv.Cv2.FloodFill(dst1, mask, pt, index, rect, 0, 0, flags)
                         If rect.Width > 0 And rect.Height > 0 And rect.Width < dst2.Width And rect.Height < dst2.Height Then
                             Dim pcc = New rcData(dst1(rect), rect, index)
-                            If pcc.index >= 0 Then
-                                pcc.index = index
+                            If pcc.mapID >= 0 Then
+                                pcc.mapID = index
                                 pcc.color = rc.color
                                 pcc.age = rc.age + 1
                                 rcList.Add(pcc)
-                                rcMap(pcc.rect).SetTo(pcc.index Mod 255, pcc.mask)
+                                rcMap(pcc.rect).SetTo(pcc.mapID Mod 255, pcc.mask)
 
                                 index += 1
                             End If
@@ -12660,7 +12660,7 @@ Namespace VBClasses
                 cellMaps(i) = task.redList.rcMap.Clone
                 rclist(i) = New List(Of rcData)(task.redList.rclist)
                 For Each rc In rclist(i)
-                    If rc.index = 0 Then Continue For
+                    If rc.mapID = 0 Then Continue For
                     sortedCells.Add(rc.pixels, rc)
                 Next
             Next
@@ -13893,8 +13893,8 @@ Namespace VBClasses
                     End If
                     rc.color = rcListLast(indexLast).color
                 End If
-                rc.index = rcList.Count + 1
-                rcMap(rc.rect).SetTo(rc.index, rc.mask)
+                rc.mapID = rcList.Count + 1
+                rcMap(rc.rect).SetTo(rc.mapID, rc.mask)
                 dst2(rc.rect).SetTo(rc.color, rc.mask)
                 If standaloneTest() Then
                     dst2.Circle(rc.maxDist, task.DotSize, task.highlight, -1)
@@ -13954,15 +13954,15 @@ Namespace VBClasses
                         Dim count = cv.Cv2.FloodFill(dst1, mask, pt, index, rect, 0, 0, flags)
                         If count > minCount Then
                             Dim pcc = New rcData(dst1(rect), rect, index)
-                            If pcc.index >= 0 Then
+                            If pcc.mapID >= 0 Then
                                 pcc.color = rc.color
                                 pcc.age = rc.age + 1
                                 rcList.Add(pcc)
-                                rcMap(pcc.rect).SetTo(pcc.index Mod 255, pcc.mask)
+                                rcMap(pcc.rect).SetTo(pcc.mapID Mod 255, pcc.mask)
                                 index += 1
                             End If
                         Else
-                            If rcLost.Contains(rc.index - 1) = False Then rcLost.Add(rc.index - 1)
+                            If rcLost.Contains(rc.mapID - 1) = False Then rcLost.Add(rc.mapID - 1)
                         End If
                     End If
                 Next
@@ -14055,9 +14055,9 @@ Namespace VBClasses
                         Dim count = cv.Cv2.FloodFill(dst3, mask, pt, index, rect, 0, 0, flags)
                         If count > minCount Then
                             Dim rc = New rcData(dst3(rect), rect, index)
-                            If rc.index >= 0 Then
+                            If rc.mapID >= 0 Then
                                 rcList.Add(rc)
-                                rcMap(rc.rect).SetTo(rc.index Mod 255, rc.mask)
+                                rcMap(rc.rect).SetTo(rc.mapID Mod 255, rc.mask)
                                 index += 1
                             End If
                         Else
@@ -14152,7 +14152,7 @@ Namespace VBClasses
 
             For Each rc In histID.redCC.redC.rcList
                 Dim colorMask As New cv.Mat(rc.rect.Size, cv.MatType.CV_8U, 0)
-                For Each index In histID.colorIDList(rc.index - 1)
+                For Each index In histID.colorIDList(rc.mapID - 1)
                     colorMask = colorMask Or histID.redCC.color8u.dst2(rc.rect).InRange(index, index)
                 Next
                 rc.mask = rc.mask Or colorMask
@@ -16078,7 +16078,7 @@ Namespace VBClasses
                 If rc.wcMean(2) > task.MaxZmeters Then rc.wcMean(2) = task.MaxZmeters
                 slot = rc.wcMean(2) \ task.MaxZmeters * histBins
                 If slot >= hist.Length Then slot = hist.Length - 1
-                slotList(slot).Add(rc.index)
+                slotList(slot).Add(rc.mapID)
                 hist(slot) += rc.pixels
             Next
 
@@ -16732,7 +16732,7 @@ Namespace VBClasses
                 rc.rect = New cv.Rect(r.X * ratio, r.Y * ratio, r.Width * ratio, r.Height * ratio)
                 Dim maskSize = New cv.Size(rc.rect.Width, rc.rect.Height)
                 rc.mask = rc.mask.Resize(maskSize)
-                redC.rcMap(rc.rect).SetTo(rc.index, rc.mask)
+                redC.rcMap(rc.rect).SetTo(rc.mapID, rc.mask)
             Next
 
             strOut = Utility_Basics.selectCell(redC.rcMap, redC.rcList)
@@ -17041,8 +17041,8 @@ Namespace VBClasses
             dst3.SetTo(0)
             For i = 1 To redC.rcList.Count - 2
                 Dim rc = redC.rcList(i)
-                rc.index = i - 1
-                rc.color = task.scalarColors(rc.index)
+                rc.mapID = i - 1
+                rc.color = task.scalarColors(rc.mapID)
                 rc.maxDist = roRect.lpList(i).ptCenter
                 dst3(rc.rect).SetTo(rc.color, rc.mask)
                 rcList.Add(rc)
@@ -17132,15 +17132,15 @@ Namespace VBClasses
             task.redList.rcMap.SetTo(0)
             Static saveColorSetting = task.gOptions.trackingLabel
             For Each rc In sortedCells
-                rc.index = task.redList.rclist.Count
+                rc.mapID = task.redList.rclist.Count
 
                 If saveColorSetting <> task.gOptions.trackingLabel Then rc.color = black
-                If rc.color = black Then rc.color = task.scalarColors(rc.index)
+                If rc.color = black Then rc.color = task.scalarColors(rc.mapID)
 
                 task.redList.rclist.Add(rc)
-                task.redList.rcMap(rc.rect).SetTo(rc.index, rc.mask)
+                task.redList.rcMap(rc.rect).SetTo(rc.mapID, rc.mask)
                 DisplayCells.Circle(rc.maxDist, task.DotSize, task.highlight, -1)
-                If rc.index >= 255 Then Exit For
+                If rc.mapID >= 255 Then Exit For
             Next
             saveColorSetting = task.gOptions.trackingLabel
             task.redList.rcMap.SetTo(0, task.noDepthMask)
@@ -17212,7 +17212,7 @@ Namespace VBClasses
                 cellMaps(i) = task.redList.rcMap.Clone
                 rclist(i) = New List(Of rcData)(task.redList.rclist)
                 For Each rc In task.redList.rclist
-                    If rc.index = 0 Then Continue For
+                    If rc.mapID = 0 Then Continue For
                     sortedCells.Add(rc.pixels, rc)
                 Next
             Next
@@ -17415,7 +17415,7 @@ Namespace VBClasses
                 maxDists.Clear()
                 For Each rc In rclist
                     maxDists.Add(rc.maxDist)
-                    maxIndex.Add(rc.index)
+                    maxIndex.Add(rc.mapID)
                 Next
             Else
                 flood.Run(src)
@@ -17845,7 +17845,7 @@ Namespace VBClasses
                     Catch ex As Exception
                         defectCount += 1
                     End Try
-                    DrawTour(rcMap(rc.rect), rc.hull, rc.index, -1)
+                    DrawTour(rcMap(rc.rect), rc.hull, rc.mapID, -1)
                     rclist.Add(rc)
                 End If
             Next
@@ -17972,7 +17972,7 @@ Namespace VBClasses
             task.redList.rclist.Clear()
             task.redList.rclist.Add(New rcData)
             For Each rc In newList
-                rc.index = task.redList.rclist.Count
+                rc.mapID = task.redList.rclist.Count
                 task.redList.rclist.Add(rc)
             Next
 
@@ -18045,9 +18045,9 @@ Namespace VBClasses
                 usedColors.Add(rc.color)
 
                 If task.redList.rcMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X) = 0 Then
-                    rc.index = task.redList.rclist.Count
+                    rc.mapID = task.redList.rclist.Count
                     newCells.Add(rc)
-                    task.redList.rcMap(rc.rect).SetTo(rc.index, rc.mask)
+                    task.redList.rcMap(rc.rect).SetTo(rc.mapID, rc.mask)
                     dst3(rc.rect).SetTo(rc.color, rc.mask)
                 End If
             Next
@@ -18553,7 +18553,7 @@ Namespace VBClasses
             dst3.SetTo(0)
             If index > 0 Then
                 Dim rcCenter = redWC.rcList(index - 1)
-                labels(3) = "The highlighted cell neighbors for rc = " + CStr(rcCenter.index)
+                labels(3) = "The highlighted cell neighbors for rc = " + CStr(rcCenter.mapID)
                 SetTrueText(rcCenter.displayCell, 1)
                 For y = -1 To 1
                     For x = -1 To 1
@@ -18681,13 +18681,13 @@ Namespace VBClasses
                 If rc.age = 1 Then unMatched += 1 Else matchCount += 1
                 matchAverage += rc.age
 
-                rc.index = rcList.Count + 1
+                rc.mapID = rcList.Count + 1
 
                 ' The first cell often contains other cells completely within it.
                 ' These often causes the maxdist to move around.
                 ' So just fix the color here and create a stable image.
                 ' The cells within the largest cell will switch colors but many cells are stable.
-                If rc.index = 1 Then rc.color = blue
+                If rc.mapID = 1 Then rc.color = blue
                 If maxDist <> rc.maxDist Then changed += 1
 
                 rcList.Add(rc)
@@ -18695,10 +18695,10 @@ Namespace VBClasses
                 If rc.pixels = 0 Then
                     ' when the cell is very small, pixels can be zero - buildcontours failed.  No mask.
                     'dst2(rc.rect).SetTo(rc.color)
-                    'rcMap(rc.rect).SetTo(rc.index)
+                    'rcMap(rc.rect).SetTo(rc.mapID)
                 Else
                     dst2(rc.rect).SetTo(rc.color, rc.mask)
-                    rcMap(rc.rect).SetTo(rc.index, rc.mask)
+                    rcMap(rc.rect).SetTo(rc.mapID, rc.mask)
                 End If
             Next
 
@@ -19234,10 +19234,10 @@ Namespace VBClasses
                 Dim contains As New List(Of Integer)
                 For j = 0 To task.redList.rclist.Count - 1
                     Dim rcBig = task.redList.rclist(j)
-                    If rcBig.rect.IntersectsWith(rc.rect) Then nabs.Add(rcBig.index)
-                    If rcBig.rect.Contains(rc.rect) Then contains.Add(rcBig.index)
+                    If rcBig.rect.IntersectsWith(rc.rect) Then nabs.Add(rcBig.mapID)
+                    If rcBig.rect.Contains(rc.rect) Then contains.Add(rcBig.mapID)
                 Next
-                If contains.Count = 1 Then removeCells.Add(rc.index)
+                If contains.Count = 1 Then removeCells.Add(rc.mapID)
             Next
 
             dst3.SetTo(0)

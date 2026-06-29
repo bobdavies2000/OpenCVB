@@ -367,7 +367,7 @@ Public Module Structures
         Public eq As cv.Vec4f ' only here for compatibility
         Public gridIndex As Integer
         Public hull As List(Of cv.Point)
-        Public index As Integer
+        Public mapID As Integer
         Public indexLast As Integer ' only here for compatibility
         Public mask As cv.Mat
         Public maxDist As cv.Point
@@ -385,7 +385,7 @@ Public Module Structures
             rect = _rect
             If _index >= 0 Then
                 mask = _mask.InRange(_index, _index)
-                index = _index
+                mapID = _index
             Else
                 mask = _mask.Clone
             End If
@@ -394,7 +394,7 @@ Public Module Structures
                 If contour.Count >= 3 Then ' need at least 3 points for a contour.
                     Dim listOfPoints = New List(Of List(Of cv.Point))({contour})
                     mask = New cv.Mat(mask.Size, cv.MatType.CV_8U, 0)
-                    cv.Cv2.DrawContours(mask, listOfPoints, 0, cv.Scalar.All(index), -1, cv.LineTypes.Link4)
+                    cv.Cv2.DrawContours(mask, listOfPoints, 0, cv.Scalar.All(mapID), -1, cv.LineTypes.Link4)
 
                     ' keep the hull points around (there aren't many of them.)
                     hull = cv.Cv2.ConvexHull(contour.ToArray, True).ToList
@@ -403,7 +403,7 @@ Public Module Structures
             buildMaxDist()
 
             gridIndex = task.gridMap.Get(Of Integer)(maxDist.Y, maxDist.X)
-            If _index >= 0 Then color = task.scalarColors(index Mod 255)
+            If _index >= 0 Then color = task.scalarColors(mapID Mod 255)
             pixels = mask.CountNonZero
 
             wcMean = task.pointCloud(rect).Mean(task.depthmask(rect))
@@ -440,7 +440,7 @@ Public Module Structures
             If Single.IsNaN(depthDelta) = False Then
                 strout += "DepthDelta (mm's) = " + Format(CInt(depthDelta * 1000), "00") + vbCrLf
                 strout += "Hull count = " + If(hull Is Nothing, "0", CStr(hull.Count)) + vbCrLf
-                strout += "index = " + CStr(index) + vbCrLf
+                strout += "mapID = " + CStr(mapID) + vbCrLf
                 strout += "MaxDist = " + CStr(maxDist.X) + "," + CStr(maxDist.Y) + vbCrLf
                 strout += "Multi-Mask flag = " + CStr(multiMask) + vbCrLf
                 strout += "Pixel count = " + CStr(pixels) + vbCrLf

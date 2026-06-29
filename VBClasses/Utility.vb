@@ -206,7 +206,7 @@ Public Class Utility_Basics : Inherits TaskParent
 
         task.rcD = rcList(0)
         For Each rc In rcList
-            If clickIndex = rc.index Then
+            If clickIndex = rc.mapID Then
                 task.rcD = rc
                 If task.rcD.rect.Contains(task.clickPoint) Then Exit For
             End If
@@ -230,7 +230,7 @@ Public Class Utility_Basics : Inherits TaskParent
 
             task.rcD = rcList(0)
             For Each rc In rcList
-                If clickIndex = rc.index Then
+                If clickIndex = rc.mapID Then
                     task.rcD = rc
                     If task.rcD.rect.Contains(task.clickPoint) Then Exit For
                 End If

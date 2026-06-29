@@ -163,7 +163,7 @@ Public Class NR_Profile_Derivative : Inherits TaskParent
         dst3.SetTo(0)
 
         Dim color As cv.Scalar, near = cv.Scalar.Yellow, far = cv.Scalar.Blue
-        If rc.index > 0 Then
+        If rc.mapID > 0 Then
             For i = 0 To rc.contour.Count - 1
                 Dim pt = rc.contour(i)
                 Dim vec = task.pointCloud(rc.rect).Get(Of cv.Point3f)(pt.Y, pt.X)
@@ -331,7 +331,7 @@ Public Class NR_Profile_Kalman : Inherits TaskParent
 
         kalman.Run(emptyMat)
 
-        If rc.index > 0 Then
+        If rc.mapID > 0 Then
             dst3.SetTo(0)
             DrawTour(dst3(rc.rect), rc.contour, cv.Scalar.Yellow)
             For i = 0 To sides.corners.Count - 1

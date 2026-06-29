@@ -675,12 +675,12 @@ Public Class Pixel_Vector3D : Inherits TaskParent
                 hColor.inputMask = rc.mask
                 hColor.Run(src(rc.rect))
                 pixelVector.Add(hColor.histArray.ToList)
-                strOut += "(" + CStr(rc.index) + ") "
+                strOut += "(" + CStr(rc.mapID) + ") "
                 For Each count In hColor.histArray
                     strOut += CStr(count) + ","
                 Next
                 strOut += vbCrLf
-                If rc.index >= maxRegion Then Exit For
+                If rc.mapID >= maxRegion Then Exit For
             Next
         End If
         SetTrueText(strOut, 3)
@@ -690,7 +690,7 @@ Public Class Pixel_Vector3D : Inherits TaskParent
         For Each rc In redC.rcList
             task.color(rc.rect).CopyTo(dst2(rc.rect), rc.mask)
             dst1(rc.rect).SetTo(rc.color, rc.mask)
-            If rc.index <= maxRegion Then SetTrueText(CStr(rc.index), rc.maxDist, 2)
+            If rc.mapID <= maxRegion Then SetTrueText(CStr(rc.mapID), rc.maxDist, 2)
         Next
         labels(1) = redC.labels(3)
     End Sub

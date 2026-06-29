@@ -972,16 +972,16 @@ Public Class FeatureLess_ToList : Inherits TaskParent
         rcList.Clear()
         For Each rc In sortList.Values
             If task.heartBeat Or True Then
-                rc.index = rcList.Count + 1
+                rc.mapID = rcList.Count + 1
             Else
                 Dim lastIndex = lastMap.Get(Of Integer)(rc.maxDist.Y, rc.maxDist.X)
-                rc.index = rcList.Count + 1
+                rc.mapID = rcList.Count + 1
                 If lastIndex > 0 And lastIndex < rcLastList.Count Then
-                    rc.index = lastIndex
+                    rc.mapID = lastIndex
                     rc.age = rcLastList(lastIndex).age + 1
                 End If
             End If
-            rcMap(rc.rect).SetTo(rc.index, rc.mask)
+            rcMap(rc.rect).SetTo(rc.mapID, rc.mask)
             rcList.Add(rc)
         Next
 
@@ -1207,7 +1207,7 @@ Public Class FeatureLess_IndexKNN : Inherits TaskParent
     Private Function foundLast(rc As rcData, lrc As rcData) As rcData
         rc.age = lrc.age + 1
         If rc.age >= 1000 Then rc.age = 10
-        rc.index = rc.indexLast
+        rc.mapID = rc.indexLast
         rc.color = lrc.color
         Return rc
     End Function
@@ -1252,7 +1252,7 @@ Public Class FeatureLess_IndexKNN : Inherits TaskParent
         For Each rc In feat.rcList
             dst3.Rectangle(rc.rect, task.highlight, task.lineWidth)
             maxDistList.Add(rc.maxDStable)
-            If task.heartBeat Then rc.color = task.scalarColors(rc.index + 1)
+            If task.heartBeat Then rc.color = task.scalarColors(rc.mapID + 1)
         Next
 
         strOut = Utility_Basics.selectCell(dst2, feat.rcList)

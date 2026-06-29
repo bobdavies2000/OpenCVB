@@ -218,10 +218,10 @@ Namespace VBClasses
             keyColors.keyList.RemoveAt(0)
             For Each key In keyColors.keyList
                 Dim rc = New rcData(key.mask, key.rect, -1)
-                rc.index = rcList.Count + 1
+                rc.mapID = rcList.Count + 1
                 rc.contour = key.contour
                 rcList.Add(rc)
-                rcMap(rc.rect).SetTo(rc.index, rc.mask)
+                rcMap(rc.rect).SetTo(rc.mapID, rc.mask)
             Next
 
             dst2 = Palettize(rcMap, 0)

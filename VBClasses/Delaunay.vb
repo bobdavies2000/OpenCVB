@@ -539,7 +539,7 @@ Public Class Delaunay_Map : Inherits TaskParent
             Next
 
             Dim rc = rcList(i)
-            rcMap.FillConvexPoly(nextFacet, rc.index, cv.LineTypes.Link4)
+            rcMap.FillConvexPoly(nextFacet, rc.mapID, cv.LineTypes.Link4)
             dst3.FillConvexPoly(nextFacet, rc.color, cv.LineTypes.Link4)
             facetList.Add(nextFacet)
         Next

@@ -14,7 +14,7 @@ Public Class MaxDist_Basics : Inherits TaskParent
         Dim index As Integer = 1
         For Each rc In redC.rcList
             Dim rcTest = New rcData(rc.mask, rc.rect, index)
-            If rcTest.index >= 0 Then
+            If rcTest.mapID >= 0 Then
                 rcTest.color = rc.color
                 dst3(rcTest.rect).SetTo(rcTest.color, rcTest.mask)
                 dst3.Circle(rc.maxDist, task.DotSize, task.highlight, -1)
@@ -39,7 +39,7 @@ Public Class NR_MaxDist_NoRectangle : Inherits TaskParent
         Dim rc As New rcData
         rc.mask = _mask.InRange(_index, _index)
         rc.rect = _rect
-        rc.index = _index
+        rc.mapID = _index
         Dim contour = ContourBuild(rc.mask)
         If contour.Count < 3 Then Return Nothing
         Dim listOfPoints = New List(Of List(Of cv.Point))({contour})
@@ -58,7 +58,7 @@ Public Class NR_MaxDist_NoRectangle : Inherits TaskParent
 
         rc.hull = cv.Cv2.ConvexHull(contour.ToArray, True).ToList
 
-        rc.color = task.vecColors(rc.index)
+        rc.color = task.vecColors(rc.mapID)
         rc.pixels = rc.mask.CountNonZero
         Return rc
     End Function
@@ -73,7 +73,7 @@ Public Class NR_MaxDist_NoRectangle : Inherits TaskParent
             ' This rcList will NOT use the rectangle of zeros (definitely need the rectangle!)
             Dim rcTest = setCloudData(rc.mask, rc.rect, rcList.Count + 1, False)
             If rcTest Is Nothing Then Continue For
-            If rcTest.index >= 0 Then
+            If rcTest.mapID >= 0 Then
                 rcTest.color = rc.color
                 dst3(rcTest.rect).SetTo(rcTest.color, rcTest.mask)
                 dst3.Circle(rc.maxDist, task.DotSize, task.highlight, -1)

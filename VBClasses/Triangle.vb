@@ -95,7 +95,7 @@ Public Class NR_Triangle_Cell : Inherits TaskParent
         SetTrueText(redC.strOut, 1)
 
         Dim rc = task.rcD
-        If rc.index = 0 Then Exit Sub
+        If rc.mapID = 0 Then Exit Sub
 
         dst3.SetTo(0)
         Dim pt3D As New List(Of cv.Point3f)
@@ -155,7 +155,7 @@ Public Class NR_Triangle_Mask : Inherits TaskParent
         SetTrueText(redC.strOut, 1)
 
         Dim rc = task.rcD
-        If rc.index = 0 Then Exit Sub
+        If rc.mapID = 0 Then Exit Sub
 
         dst3.SetTo(0)
         Dim pt3D As New List(Of cv.Point3f)

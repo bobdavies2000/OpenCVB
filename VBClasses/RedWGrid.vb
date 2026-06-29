@@ -15,7 +15,7 @@ Public Class RedWGrid_Basics : Inherits TaskParent
         Dim dups As New SortedList(Of String, Integer)(New compareAllowIdenticalString)
         For Each rc In redC.rcList
             dups.Add(Format(rc.wGrid.X, "000") + Format(rc.wGrid.Y, "000") + Format(rc.wGrid.Z, "000"),
-                                    rc.index - 1)
+                                    rc.mapID - 1)
         Next
 
         Dim newList As New List(Of rcData)
@@ -69,8 +69,8 @@ Public Class RedWGrid_Basics : Inherits TaskParent
         For Each rc In newList
             If rc IsNot Nothing Then
                 If rc.multiMask Then count += 1
-                rc.index = rcList.Count + 1
-                rcMap(rc.rect).SetTo(rc.index, rc.mask)
+                rc.mapID = rcList.Count + 1
+                rcMap(rc.rect).SetTo(rc.mapID, rc.mask)
                 rcList.Add(rc)
                 dst2(rc.rect).SetTo(rc.color, rc.mask)
 

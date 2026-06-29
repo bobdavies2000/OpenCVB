@@ -11,7 +11,7 @@ Public Class Spectrum_Basics : Inherits TaskParent
         dSpec.Run(src)
         gSpec.Run(src)
 
-        If task.heartBeat And task.rcD.index > 0 Then
+        If task.heartBeat And task.rcD.mapID > 0 Then
             strOut = dSpec.strOut + vbCrLf + vbCrLf
             strOut += gSpec.strOut
         End If
@@ -44,7 +44,7 @@ Public Class Spectrum_X : Inherits TaskParent
             SetTrueText(redC.strOut, 1)
         End If
 
-        If task.heartBeat And task.rcD.index > 0 Then
+        If task.heartBeat And task.rcD.mapID > 0 Then
             Dim ranges = options.buildDepthRanges(task.pcSplit(0)(task.rcD.rect).Clone, " pointcloud X ")
             strOut = options.strOut
         End If
@@ -76,7 +76,7 @@ Public Class Spectrum_Y : Inherits TaskParent
             SetTrueText(redC.strOut, 1)
         End If
 
-        If task.heartBeat And task.rcD.index > 0 Then
+        If task.heartBeat And task.rcD.mapID > 0 Then
             Dim ranges = options.buildDepthRanges(task.pcSplit(1)(task.rcD.rect).Clone, " pointcloud Y ")
             strOut = options.strOut
         End If
@@ -108,7 +108,7 @@ Public Class Spectrum_Z : Inherits TaskParent
         End If
 
         If task.rcD IsNot Nothing Then
-            If task.heartBeat And task.rcD.index > 0 Then
+            If task.heartBeat And task.rcD.mapID > 0 Then
                 Dim ranges = options.buildDepthRanges(task.pcSplit(2)(task.rcD.rect).Clone, " pointcloud Z ")
                 strOut = options.strOut
             End If

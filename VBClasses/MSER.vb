@@ -12,9 +12,9 @@ Public Class MSER_Basics : Inherits TaskParent
     Public Function RebuildRCMap(rcMap As cv.Mat, rclist As List(Of rcData)) As cv.Mat
         Dim dst As New cv.Mat(task.workRes, cv.MatType.CV_8UC3, 0)
         For Each rc In rclist
-            rcMap(rc.rect).SetTo(rc.index, rc.mask)
+            rcMap(rc.rect).SetTo(rc.mapID, rc.mask)
             dst(rc.rect).SetTo(rc.color, rc.mask)
-            If rc.index >= 255 Then Exit For
+            If rc.mapID >= 255 Then Exit For
         Next
         Return dst
     End Function
@@ -120,11 +120,11 @@ Public Class MSER_Basics2 : Inherits TaskParent
         Dim matchCount As Integer
         For i = 0 To floodPoints.Count - 1
             Dim rc As New rcData
-            rc.index = rclist.Count
+            rc.mapID = rclist.Count
             Dim val = dst3.Get(Of Byte)(floodPoints(i).Y, floodPoints(i).X)
             rc.rect = boxInput(boxes.ElementAt(i).Value)
             rc.mask = dst3(rc.rect).InRange(val, val)
-            dst1(rc.rect).SetTo(rc.index, rc.mask)
+            dst1(rc.rect).SetTo(rc.mapID, rc.mask)
             rc.pixels = detect.maskCounts(i)
 
             rc.indexLast = lastMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
@@ -133,7 +133,7 @@ Public Class MSER_Basics2 : Inherits TaskParent
             If rc.indexLast <> 0 Then matchCount += 1
 
             rclist.Add(rc)
-            cellMap(rc.rect).SetTo(rc.index, rc.mask)
+            cellMap(rc.rect).SetTo(rc.mapID, rc.mask)
             dst2(rc.rect).SetTo(rc.color, rc.mask)
         Next
 

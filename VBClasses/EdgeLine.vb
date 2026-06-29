@@ -75,7 +75,7 @@ Public Class NR_EdgeLine_Motion : Inherits TaskParent
         Dim n = rc.contour.Count - 1
         nextList.Clear()
         nextList.Add(rc.contour)
-        cv.Cv2.Polylines(dst2(rc.rect), nextList, False, cv.Scalar.All(rc.index), task.lineWidth, task.lineType)
+        cv.Cv2.Polylines(dst2(rc.rect), nextList, False, cv.Scalar.All(rc.mapID), task.lineWidth, task.lineType)
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         Dim histogram As New cv.Mat
@@ -93,7 +93,7 @@ Public Class NR_EdgeLine_Motion : Inherits TaskParent
             For i = 1 To histarray.Count - 1
                 If histarray(i) = 0 Then
                     Dim rc = edgeLine.rcList(i - 1)
-                    rc.index = newList.Count + 1
+                    rc.mapID = newList.Count + 1
                     newList.Add(rc)
 
                     rcDataDraw(rc)
@@ -113,10 +113,10 @@ Public Class NR_EdgeLine_Motion : Inherits TaskParent
 
         Dim count As Integer
         For Each rc In edgeLine.rcList
-            If rc.index > 0 Then
-                If histarray(rc.index - 1) > 0 And rc.contour.Count > 0 Then
+            If rc.mapID > 0 Then
+                If histarray(rc.mapID - 1) > 0 And rc.contour.Count > 0 Then
                     count += 1
-                    rc.index = newList.Count + 1
+                    rc.mapID = newList.Count + 1
                     If rc.contour.Count > 0 Then
                         Dim gIndex = task.gridMap.Get(Of Integer)(rc.contour(0).Y, rc.contour(0).X)
                         rc.color = task.vecColors(gIndex Mod 255)

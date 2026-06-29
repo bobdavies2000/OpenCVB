@@ -1250,7 +1250,7 @@ Public Class NR_Histogram_RedCell : Inherits TaskParent
         SetTrueText(redC.strOut, 1)
 
         hist.rc = task.rcD
-        If hist.rc.index = 0 Or hist.rc.wcMean(2) = 0 Then Exit Sub
+        If hist.rc.mapID = 0 Or hist.rc.wcMean(2) = 0 Then Exit Sub
 
         dst0.SetTo(0)
         task.pcSplit(2)(hist.rc.rect).CopyTo(dst0)
@@ -1578,7 +1578,7 @@ Public Class Histogram_Depth : Inherits TaskParent
         plotHist.minRange = 0
         plotHist.maxRange = task.MaxZmeters
         If rc IsNot Nothing Then
-            If rc.index = 0 Then Exit Sub
+            If rc.mapID = 0 Then Exit Sub
             If src.Size <> rc.rect.Size Then src = src(rc.rect).Clone
         Else
             mm = GetMinMax(src)

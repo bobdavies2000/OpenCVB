@@ -40,15 +40,15 @@ Public Class RedFlood_Basics : Inherits TaskParent
             Dim lastIndex = knn.result(0, 0)
             If rcListLast.Count > 0 And lastIndex < rcListLast.Count Then
                 Dim rcLast = rcListLast(lastIndex)
-                rc.indexLast = rcLast.index
+                rc.indexLast = rcLast.mapID
                 rc.maxDStable = rcLast.maxDist
             End If
 
             Dim lastColor = lastColorMat.Get(Of cv.Vec3b)(rc.maxDist.Y, rc.maxDist.X)
             If lastColor <> black Then
-                If lastColor <> task.vecColors(rc.index) Then rc.color = lastColor
+                If lastColor <> task.vecColors(rc.mapID) Then rc.color = lastColor
             Else
-                rc.color = task.scalarColors(rc.index)
+                rc.color = task.scalarColors(rc.mapID)
             End If
             dst3(rc.rect).SetTo(rc.color, rc.mask)
         Next
@@ -428,10 +428,10 @@ Public Class RedFlood_ToRedColor : Inherits TaskParent
             ' DrawTour(rc.mask, rc.contour, 255, -1)
             rc.pixels = redMask.mdList(i).mask.CountNonZero
             rc.age = 1
-            rc.index = sortedCells.Count + 1
+            rc.mapID = sortedCells.Count + 1
             sortedCells.Add(rc.pixels, rc)
 
-            rcMap(rc.rect).SetTo(rc.index, rc.mask)
+            rcMap(rc.rect).SetTo(rc.mapID, rc.mask)
         Next
 
         rcList = New List(Of rcData)(sortedCells.Values)
@@ -488,9 +488,9 @@ Public Class RedFlood_List : Inherits TaskParent
         rclist.Clear()
         For Each md In redMask.mdList
             Dim rc = New rcData(md.mask, md.rect, md.index)
-            rc.index = rclist.Count + 1
+            rc.mapID = rclist.Count + 1
             rclist.Add(rc)
-            rcMap(rc.rect).SetTo(rc.index, rc.mask)
+            rcMap(rc.rect).SetTo(rc.mapID, rc.mask)
         Next
 
         strOut = Utility_Basics.selectCell(rcMap, rclist)
@@ -633,8 +633,8 @@ Public Class NR_RedFlood_KNN : Inherits TaskParent
                 End If
             End If
 
-            rc.index = rcList.Count + 1
-            rcMap(rc.rect).SetTo(rc.index, rc.mask)
+            rc.mapID = rcList.Count + 1
+            rcMap(rc.rect).SetTo(rc.mapID, rc.mask)
             dst3(rc.rect).SetTo(rc.color, rc.mask)
             rcList.Add(rc)
         Next
@@ -645,7 +645,7 @@ Public Class NR_RedFlood_KNN : Inherits TaskParent
 
         For Each rc In rcList
             dst3.Circle(rc.maxDist, task.DotSize, task.highlight, -1)
-            SetTrueText(CStr(rc.index) + ", " + CStr(rc.age), rc.maxDist, 3)
+            SetTrueText(CStr(rc.mapID) + ", " + CStr(rc.age), rc.maxDist, 3)
         Next
 
         labels(3) = "Palette version of the data in dst2 with " + CStr(classcount) + " regions."
@@ -720,15 +720,15 @@ Public Class RedFlood_MapAndList : Inherits TaskParent
             rc.rect = redCore.rects(i)
             rc.mask = redCore.dst2(rc.rect).InRange(i + 1, i + 1)
             rc = New rcData(rc.mask, rc.rect, -1)
-            rc.index = rcList.Count + 1
+            rc.mapID = rcList.Count + 1
 
             rc.contour = ContourBuild(rc.mask)
             Dim listOfPoints = New List(Of List(Of cv.Point))({rc.contour})
             rc.mask = New cv.Mat(rc.mask.Size, cv.MatType.CV_8U, 0)
-            cv.Cv2.DrawContours(rc.mask, listOfPoints, 0, cv.Scalar.All(rc.index), -1, cv.LineTypes.Link4)
+            cv.Cv2.DrawContours(rc.mask, listOfPoints, 0, cv.Scalar.All(rc.mapID), -1, cv.LineTypes.Link4)
 
-            rc.color = task.scalarColors(rc.index Mod 255)
-            dst2(rc.rect).SetTo(rc.index, rc.mask)
+            rc.color = task.scalarColors(rc.mapID Mod 255)
+            dst2(rc.rect).SetTo(rc.mapID, rc.mask)
             rcList.Add(rc)
         Next
 
@@ -777,7 +777,7 @@ Public Class RedFlood_Delaunay : Inherits TaskParent
             Next
 
             Dim rc = redC.rcList(i)
-            rcMap.FillConvexPoly(nextFacet, rc.index, cv.LineTypes.Link4)
+            rcMap.FillConvexPoly(nextFacet, rc.mapID, cv.LineTypes.Link4)
             If standaloneTest() Then dst3.FillConvexPoly(nextFacet, rc.color, cv.LineTypes.Link4)
             facetList.Add(nextFacet)
         Next

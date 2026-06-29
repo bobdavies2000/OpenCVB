@@ -34,8 +34,8 @@ Public Class RedCloud_Basics : Inherits TaskParent
 
             If rc.age = 1 Then unMatched += 1 Else matchCount += 1
             matchAverage += rc.age
-            rc.index = rcList.Count + 1
-            rcMap(rc.rect).SetTo(rc.index, rc.mask)
+            rc.mapID = rcList.Count + 1
+            rcMap(rc.rect).SetTo(rc.mapID, rc.mask)
 
             rcList.Add(rc)
 
@@ -92,10 +92,10 @@ Public Class RedCloud_Core : Inherits TaskParent
                     If rect.Width > 0 And rect.Height > 0 Then
                         If count >= minSize Then
                             rc = New rcData(input(rect), rect, index)
-                            If rc.index < 0 Then Continue For
+                            If rc.mapID < 0 Then Continue For
                             newList.Add(rc.pixels, rc)
                             index += 1
-                            rc.index = newList.Count
+                            rc.mapID = newList.Count
                         End If
                     End If
                 End If
@@ -117,7 +117,7 @@ Public Class RedCloud_Core : Inherits TaskParent
         End If
         dst2.SetTo(0)
         For Each rc In rcList
-            dst2(rc.rect).SetTo(rc.index Mod 254, rc.mask)
+            dst2(rc.rect).SetTo(rc.mapID Mod 254, rc.mask)
         Next
         dst3 = Palettize(dst2, 0)
         labels(2) = "RedCloud cells identified: " + CStr(rcList.Count)
@@ -519,7 +519,7 @@ Public Class RedCloud_Flood_CPP : Inherits TaskParent
             If rc.age = 1 Then unMatched += 1 Else matchCount += 1
             matchAverage += rc.age
 
-            rc.index = rcList.Count + 1
+            rc.mapID = rcList.Count + 1
 
             If task.heartBeat Then
                 Dim color = keyColors.dst2.Get(Of cv.Vec3b)(rc.maxDist.Y, rc.maxDist.X)
@@ -532,14 +532,14 @@ Public Class RedCloud_Flood_CPP : Inherits TaskParent
             rcList.Add(rc)
 
             dst2(rc.rect).SetTo(rc.color, rc.mask)
-            rcMap(rc.rect).SetTo(rc.index, rc.mask)
+            rcMap(rc.rect).SetTo(rc.mapID, rc.mask)
         Next
 
 
 
         'For Each rc In rcList
         '    Dim test = rcMap.Get(Of Integer)(rc.maxDist.Y, rc.maxDist.X)
-        '    If rc.index <> test Then Dim k = 0
+        '    If rc.mapID <> test Then Dim k = 0
         'Next
 
 
@@ -608,9 +608,9 @@ Public Class RedCloud_MotionFilter : Inherits TaskParent
         rcList.Clear()
         For Each rc In redC.rcList
             If rc.age > 1 Then
-                If rcMotionCells.Contains(rc.index) = False Then
+                If rcMotionCells.Contains(rc.mapID) = False Then
                     dst3(rc.rect).SetTo(rc.color, rc.mask)
-                    rcMap(rc.rect).SetTo(rc.index, rc.mask)
+                    rcMap(rc.rect).SetTo(rc.mapID, rc.mask)
                     rcList.Add(rc)
                 End If
             End If
