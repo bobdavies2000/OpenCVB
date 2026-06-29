@@ -56,7 +56,7 @@ Public Class XR_Reduction_Floodfill : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         reduction.Run(src)
         dst2 = Palettize(reduction.dst2)
-        dst3 = runRedList(reduction.dst2, labels(3))
+        dst3 = RedFlood_List.runRedList(reduction.dst2, labels(3))
 
         redC.Run(reduction.dst2)
         dst3 = redC.dst2

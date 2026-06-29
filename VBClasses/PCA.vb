@@ -76,7 +76,7 @@ Public Class PCA_Mask : Inherits TaskParent
     End Function
     Public Overrides Sub RunAlg(src As cv.Mat)
         If standaloneTest() Or runRedCflag Then
-            dst2 = runRedList(src, labels(2))
+            dst2 = RedFlood_List.runRedList(src, labels(2))
             redC.Run(src)
             dst2 = redC.dst2
             labels(2) = redC.labels(2)

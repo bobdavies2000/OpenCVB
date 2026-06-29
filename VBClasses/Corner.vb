@@ -325,7 +325,7 @@ End Class
 
 
 Public Class XR_Corner_RedCloud : Inherits TaskParent
-    Dim corners As New Neighbor_Intersects
+    Dim corners As New Neighbor_Intersects32S
     Dim redC As New RedCloud_Basics
     Public Sub New()
         labels = {"", "", "Grayscale", "Highlighted points show where more than 2 cells intersect."}

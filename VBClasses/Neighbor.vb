@@ -52,7 +52,7 @@ End Class
 
 
 
-Public Class Neighbor_Intersects : Inherits TaskParent
+Public Class Neighbor_Intersects8u : Inherits TaskParent
     Public nPoints As New List(Of cv.Point)
     Public Sub New()
         desc = "Find the corner points where multiple cells intersect."
@@ -60,6 +60,60 @@ Public Class Neighbor_Intersects : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         If standaloneTest() Or src.Type <> cv.MatType.CV_32S Then
             Static redC As New RedColor_Basics
+            redC.Run(src)
+            dst2 = redC.dst2
+            labels(2) = redC.labels(2)
+            src = redC.rcMap
+        End If
+
+        Dim samples(src.Total - 1) As Byte
+        src.GetArray(Of Byte)(samples)
+
+        Dim w = dst2.Width
+        nPoints.Clear()
+        Dim kSize As Integer = 3
+        For y = 0 To dst1.Height - kSize
+            For x = 0 To dst1.Width - kSize
+                Dim nabs As New SortedList(Of Integer, Integer)
+                For yy = y To y + kSize - 1
+                    For xx = x To x + kSize - 1
+                        Dim val = samples(yy * w + xx)
+                        If val = 0 And removeZeroNeighbors Then Continue For
+                        If nabs.ContainsKey(val) = False Then nabs.Add(val, 0)
+                    Next
+                Next
+                If nabs.Count > 2 Then
+                    nPoints.Add(New cv.Point(x, y))
+                End If
+            Next
+        Next
+
+        If standaloneTest() Then
+            dst3 = task.color.Clone
+            For Each pt In nPoints
+                dst2.Circle(pt, task.DotSize, task.highlight, -1, task.lineType)
+                dst3.Circle(pt, task.DotSize, cv.Scalar.Yellow, -1, task.lineType)
+            Next
+        End If
+
+        labels(3) = CStr(nPoints.Count) + " intersections with 3 or more cells were found"
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class Neighbor_Intersects32S : Inherits TaskParent
+    Public nPoints As New List(Of cv.Point)
+    Public Sub New()
+        desc = "Find the corner points where multiple cells intersect."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        If standaloneTest() Or src.Type <> cv.MatType.CV_32S Then
+            Static redC As New RedCloud_Basics
             redC.Run(src)
             dst2 = redC.dst2
             labels(2) = redC.labels(2)
@@ -109,7 +163,7 @@ End Class
 
 
 Public Class Neighbor_ColorOnly : Inherits TaskParent
-    Dim corners As New Neighbor_Intersects
+    Dim corners As New Neighbor_Intersects8u
     Dim redC As New RedColor_Basics
     Public Sub New()
         desc = "Find neighbors in a redColor cellMap"
@@ -138,7 +192,7 @@ Public Class Neighbor_Precise : Inherits TaskParent
     Public nabList As New List(Of List(Of Integer))
     Public rclist As List(Of rcData)
     Public runRedCflag As Boolean = False
-    Dim redC As New RedColor_Basics
+    Dim redC As New RedCloud_Basics
     Public Sub New()
         cPtr = Neighbor_Open()
         desc = "Find the neighbors in a selected RedCell"

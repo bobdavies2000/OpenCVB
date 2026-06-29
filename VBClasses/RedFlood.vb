@@ -284,7 +284,7 @@ Public Class XR_RedMark_Features : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
 
-        dst2 = runRedList(src, labels(2))
+        dst2 = RedFlood_List.runRedList(src, labels(2))
         redC.Run(src)
         dst2 = redC.dst2
         labels(2) = redC.labels(2)
@@ -456,6 +456,12 @@ Public Class RedFlood_List : Inherits TaskParent
         task.gOptions.displayDst1.Checked = True
         desc = "Find cells and then match them to the previous generation with minimum boundary"
     End Sub
+    Public Shared Function runRedList(src As cv.Mat, ByRef label As String) As cv.Mat
+        If task.redList Is Nothing Then task.redList = New RedFlood_List
+        task.redList.Run(src)
+        label = task.redList.labels(2)
+        Return task.redList.dst2
+    End Function
     Public Shared Function DisplayCells(mdList As List(Of maskData)) As cv.Mat
         Dim dst As New cv.Mat(task.workRes, cv.MatType.CV_8UC3, 0)
 

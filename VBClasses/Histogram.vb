@@ -1242,7 +1242,7 @@ Public Class XR_Histogram_RedCell : Inherits TaskParent
         desc = "Review depth data for a RedCloud Cell"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        dst2 = runRedList(src, labels(2))
+        dst2 = RedFlood_List.runRedList(src, labels(2))
         redC.Run(src)
         dst2 = redC.dst2
         labels(2) = redC.labels(2)

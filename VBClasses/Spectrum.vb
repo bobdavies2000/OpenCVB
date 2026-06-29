@@ -7,7 +7,7 @@ Public Class Spectrum_Basics : Inherits TaskParent
         desc = "Given a RedCloud cell, create a spectrum that contains the ranges of the depth and color."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        dst2 = runRedList(src, labels(2))
+        dst2 = RedFlood_List.runRedList(src, labels(2))
         dSpec.Run(src)
         gSpec.Run(src)
 

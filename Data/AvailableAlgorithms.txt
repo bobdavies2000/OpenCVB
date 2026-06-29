@@ -568,7 +568,8 @@ MSER_Right
 MSER_SyntheticInput
 Neighbor_Basics
 Neighbor_ColorOnly
-Neighbor_Intersects
+Neighbor_Intersects32S
+Neighbor_Intersects8u
 Neighbor_Precise
 OEX_CalcBackProject_Demo1
 OEX_PointPolygon

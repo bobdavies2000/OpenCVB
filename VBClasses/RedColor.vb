@@ -36,7 +36,7 @@ Public Class RedColor_Basics : Inherits TaskParent
         Next
 
         strOut = Utility_Basics.selectCell(rcMap, rcList)
-        SetTrueText(strOut, 1)
+        SetTrueText(strOut, 3)
 
         labels(2) = CStr(rcIndex) + " cells were found."
     End Sub

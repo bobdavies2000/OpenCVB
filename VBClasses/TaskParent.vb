@@ -130,19 +130,6 @@ Public Class TaskParent : Implements IDisposable
         label = "AddWeighted: src1 = " + Format(wt, "0%") + " vs. src2 = " + Format(1 - wt, "0%")
         Return addw.dst2
     End Function
-    Public Function runRedList(src As cv.Mat, ByRef label As String, removeMask As cv.Mat) As cv.Mat
-        If task.redList Is Nothing Then task.redList = New RedFlood_List
-        task.redList.inputRemoved = removeMask
-        task.redList.Run(src)
-        label = task.redList.labels(2)
-        Return task.redList.dst2
-    End Function
-    Public Function runRedList(src As cv.Mat, ByRef label As String) As cv.Mat
-        If task.redList Is Nothing Then task.redList = New RedFlood_List
-        task.redList.Run(src)
-        label = task.redList.labels(2)
-        Return task.redList.dst2
-    End Function
     Public Shared Sub DrawTour(dst As cv.Mat, contour As List(Of cv.Point), color As cv.Scalar, Optional lineWidth As Integer = -1,
                             Optional lineType As cv.LineTypes = cv.LineTypes.Link8)
         If contour Is Nothing Then Exit Sub
