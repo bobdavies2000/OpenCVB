@@ -11214,7 +11214,6 @@ Namespace VBClasses
             dst3(rc.rect).SetTo(rc.color, rc.mask)
             dst3.Circle(rc.maxDist, task.DotSize + 2, cv.Scalar.Black)
             dst3.Circle(rc.maxDist, task.DotSize, task.highlight, -1, task.lineType)
-            labels(3) = "MaxDStable was the same for " + CStr(stableCount) + " frames"
         End Sub
     End Class
 
@@ -15853,16 +15852,16 @@ Namespace VBClasses
             dst3 = flipper.dst2
 
             dst2.SetTo(0)
-            Dim ptmaxDstable As New List(Of cv.Point)
+            Dim ptmaxDist As New List(Of cv.Point)
             For Each rc In flipper.nonFlipCells
                 dst2(rc.rect).SetTo(rc.color, rc.mask)
-                ptmaxDstable.Add(rc.maxDist)
+                ptmaxDist.Add(rc.maxDist)
             Next
 
             Dim count As Integer
             For Each rc In flipper.flipCells
                 Dim lrc = lastCells(rc.indexLast)
-                Dim index = ptmaxDstable.IndexOf(lrc.maxDist)
+                Dim index = ptmaxDist.IndexOf(lrc.maxDist)
                 If index > 0 Then
                     Dim rcNabe = flipper.nonFlipCells(index)
                     dst2(rc.rect).SetTo(rcNabe.color, rc.mask)
@@ -16283,8 +16282,8 @@ Namespace VBClasses
     Public Class XO_RedList_UnstableCells : Inherits TaskParent
         Dim prevList As New List(Of cv.Point)
         Public Sub New()
-            labels = {"", "", "Current generation of cells", "Recently changed cells highlighted - indicated by rc.maxDStable changing"}
-            desc = "Use maxDStable to identify unstable cells - cells which were NOT present in the previous generation."
+            labels = {"", "", "Current generation of cells", "Recently changed cells highlighted - indicated by rc.maxDist"}
+            desc = "Use maxDist to identify unstable cells - cells which were NOT present in the previous generation."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             dst2 = runRedList(src, labels(2))
@@ -16318,8 +16317,8 @@ Namespace VBClasses
     Public Class XO_RedList_UnstableHulls : Inherits TaskParent
         Dim prevList As New List(Of cv.Point)
         Public Sub New()
-            labels = {"", "", "Current generation of cells", "Recently changed cells highlighted - indicated by rc.maxDStable changing"}
-            desc = "Use maxDStable to identify unstable cells - cells which were NOT present in the previous generation."
+            labels = {"", "", "Current generation of cells", "Recently changed cells highlighted - indicated by rc.maxDist"}
+            desc = "Use maxDist to identify unstable cells - cells which were NOT present in the previous generation."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             dst2 = runRedList(src, labels(2))
@@ -17967,7 +17966,7 @@ Namespace VBClasses
                 dst1(rc.rect).SetTo(255, rc.mask)
             Next
             labels(3) = CStr(count) + " of " + CStr(task.redList.rclist.Count) + " redCloud cells had motion." +
-                        "  There were " + CStr(countMaxD) + " maxDstable matches and " + CStr(countMissedMaxD) + " misses"
+                        "  There were " + CStr(countMaxD) + " maxDist matches and " + CStr(countMissedMaxD) + " misses"
 
             task.redList.rclist.Clear()
             task.redList.rclist.Add(New rcData)

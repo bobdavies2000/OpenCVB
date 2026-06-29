@@ -1234,11 +1234,6 @@ Public Class FeatureLess_IndexKNN : Inherits TaskParent
             If lastIndex >= 0 And lastIndex < lastList.Count Then
                 rc.indexLast = lastIndex
                 rc = foundLast(rc, lastList(lastIndex))
-            Else
-                'If maxDistList.Contains(rc.maxDStable) Then
-                '    rc.indexLast = maxDistList.IndexOf(rc.maxDStable)
-                '    rc = foundLast(rc, lastList(rc.indexLast))
-                'End If
             End If
         Next
 
@@ -1251,7 +1246,7 @@ Public Class FeatureLess_IndexKNN : Inherits TaskParent
         maxDistList.Clear()
         For Each rc In feat.rcList
             dst3.Rectangle(rc.rect, task.highlight, task.lineWidth)
-            maxDistList.Add(rc.maxDStable)
+            maxDistList.Add(rc.maxDist)
             If task.heartBeat Then rc.color = task.scalarColors(rc.mapID + 1)
         Next
 

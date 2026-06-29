@@ -41,7 +41,6 @@ Public Class RedFlood_Basics : Inherits TaskParent
             If rcListLast.Count > 0 And lastIndex < rcListLast.Count Then
                 Dim rcLast = rcListLast(lastIndex)
                 rc.indexLast = rcLast.mapID
-                rc.maxDStable = rcLast.maxDist
             End If
 
             Dim lastColor = lastColorMat.Get(Of cv.Vec3b)(rc.maxDist.Y, rc.maxDist.X)
