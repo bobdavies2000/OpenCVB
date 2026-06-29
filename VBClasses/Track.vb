@@ -1,7 +1,6 @@
 ﻿Imports cv = OpenCvSharp
 Public Class Track_Basics : Inherits TaskParent
     Dim redC As New RedColor_Basics
-    Dim lostCell As Boolean
     Public Sub New()
         desc = "Track the selected cell."
     End Sub
@@ -12,11 +11,15 @@ Public Class Track_Basics : Inherits TaskParent
 
         Static rclast As rcData = task.rcD
 
-        If lostCell And task.mouseClickFlag = False Then
-            SetTrueText("Unable to find the cell" + vbCrLf + "Click any cell to start tracking again.", 3)
-            Exit Sub
-        Else
-            lostCell = False
+        If rclast.mapID <> task.rcD.mapID And task.mouseClickFlag = False Then
+            For Each rc In redC.rcList
+                If rc.mapID = rclast.mapID Then
+                    If rc.rect.Contains(task.clickPoint) Then
+                        task.rcD = rc
+                        Exit For
+                    End If
+                End If
+            Next
         End If
 
         Dim clickIndex = redC.rcMap.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X)
@@ -25,15 +28,10 @@ Public Class Track_Basics : Inherits TaskParent
         task.clickPoint = task.rcD.maxDist
         labels(3) = "Map ID = " + CStr(task.rcD.mapID)
 
-        If rclast.mapID <> task.rcD.mapID And task.mouseClickFlag = False Then
-            lostCell = True
-            Exit Sub
-        End If
-
         strOut = Utility_Basics.selectCell(redC.rcMap, redC.rcList)
         SetTrueText(strOut, 1)
 
-        rclast = task.rcD
+        If rclast.mapID = task.rcD.mapID Then rclast = task.rcD
     End Sub
 End Class
 
@@ -72,7 +70,7 @@ Public Class Track_Simple : Inherits TaskParent
         End If
 
         strOut = Utility_Basics.selectCell(redC.rcMap, redC.rcList)
-        SetTrueText(strOut, 1)
+        SetTrueText(strOut, 3)
 
         rclast = task.rcD
     End Sub

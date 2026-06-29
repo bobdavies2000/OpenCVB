@@ -80,7 +80,6 @@ Public Class RedCloud_Core : Inherits TaskParent
         Dim rect As New cv.Rect
         Dim mask = New cv.Mat(New cv.Size(input.Width + 2, input.Height + 2), cv.MatType.CV_8U, 0)
         Dim flags As cv.FloodFillFlags = cv.FloodFillFlags.Link4
-        '  Or cv.FloodFillFlags.MaskOnly - maskonly is expensive but why?
         Dim rc As rcData = Nothing
         Dim newList As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
         For y = 0 To input.Height - 1

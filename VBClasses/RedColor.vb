@@ -6,7 +6,7 @@ Public Class RedColor_Basics : Inherits TaskParent
     Public rcMap As New cv.Mat
     Public runSelectCell As Boolean = True
     Public Sub New()
-        task.gOptions.displayDst1.Checked = True
+        If standalone Then task.gOptions.displayDst1.Checked = True
         desc = "FloodFill each color8U output and create an rclist"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -19,10 +19,10 @@ Public Class RedColor_Basics : Inherits TaskParent
         Dim mask As cv.Mat = New cv.Mat(New cv.Size(dst2.Width + 2, dst2.Height + 2), cv.MatType.CV_8U, 0)
         For Each r In task.gridRects
             If mask(r).Get(Of Byte)(0, 0) = 0 Then
-                Dim index As Integer = rcMap(r).Get(Of Byte)(0, 0)
-                Dim flags = cv.FloodFillFlags.FixedRange Or (index << 8)
-                Dim count = cv.Cv2.FloodFill(rcMap, mask, r.TopLeft, index, rect, 0, 0, flags)
-                If count > 0 Then rcList.Add(New rcData(rcMap(rect), rect, index))
+                Dim mapID As Integer = rcMap(r).Get(Of Byte)(0, 0)
+                Dim flags = cv.FloodFillFlags.FixedRange Or cv.FloodFillFlags.MaskOnly Or (255 << 8)
+                Dim count = cv.Cv2.FloodFill(rcMap, mask, r.TopLeft, mapID, rect, 0, 0, flags)
+                If count > 0 Then rcList.Add(New rcData(rcMap(rect), rect, mapID))
             End If
         Next
         dst2 = Palettize(rcMap)
@@ -31,6 +31,7 @@ Public Class RedColor_Basics : Inherits TaskParent
 
         Dim rcIndex As Integer
         For Each rc In rcList
+            If rcMap.Get(Of Byte)(rc.maxDStable.Y, rc.maxDStable.X) <> rc.mapID Then rc.maxDStable = rc.maxDist
             rc.index = rcIndex
             rcIndex += 1
         Next
