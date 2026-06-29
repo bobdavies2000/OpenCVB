@@ -29,9 +29,9 @@ Public Class Track_Basics : Inherits TaskParent
         labels(3) = "Map ID = " + CStr(task.rcD.mapID)
 
         strOut = Utility_Basics.selectCell(redC.rcMap, redC.rcList)
-        SetTrueText(strOut, 1)
+        SetTrueText(strOut, 3)
 
-        If rclast.mapID = task.rcD.mapID Then rclast = task.rcD
+        If rclast.mapID = task.rcD.mapID Then rclast = task.rcD Else Dim k = 0
     End Sub
 End Class
 

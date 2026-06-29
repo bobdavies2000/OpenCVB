@@ -31,7 +31,6 @@ Public Class RedColor_Basics : Inherits TaskParent
 
         Dim rcIndex As Integer
         For Each rc In rcList
-            If rcMap.Get(Of Byte)(rc.maxDStable.Y, rc.maxDStable.X) <> rc.mapID Then rc.maxDStable = rc.maxDist
             rc.index = rcIndex
             rcIndex += 1
         Next

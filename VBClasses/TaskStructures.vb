@@ -425,7 +425,7 @@ Public Module Structures
         End Function
         Public Sub buildMaxDist()
             Dim tmp As cv.Mat = mask.Clone
-            ' Rectangle is definitely needed.  Test it again with MaxDist_NoRectangle.
+            ' Rectangle is definitely needed.  Test it again with MaxDist_NoRectangle to verify that the rectangle is essential.
             tmp.Rectangle(New cv.Rect(0, 0, mask.Width, mask.Height), 0, 1)
             Dim distance32f = tmp.DistanceTransform(cv.DistanceTypes.L1, 0)
             Dim mm As mmData = GetMinMax(distance32f)
