@@ -823,7 +823,10 @@ Threshold_Basics
 Threshold_ByChannels
 Threshold_Definitions
 Track_Basics
-Track_BasicsQT
+Track_FindNearest
+Track_Simple
+TrackOpenCV_Basics
+TrackOpenCV_Basics_QT
 Triangle_Basics
 Triangle_Find
 Triangle_HullContour

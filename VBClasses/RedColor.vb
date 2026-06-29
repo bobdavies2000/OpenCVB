@@ -4,6 +4,7 @@ Public Class RedColor_Basics : Inherits TaskParent
     Dim color8u As New Color8U_Basics
     Public rcList As New List(Of rcData)
     Public rcMap As New cv.Mat
+    Public runSelectCell As Boolean = True
     Public Sub New()
         task.gOptions.displayDst1.Checked = True
         desc = "FloodFill each color8U output and create an rclist"
@@ -26,16 +27,12 @@ Public Class RedColor_Basics : Inherits TaskParent
         Next
         dst2 = Palettize(rcMap)
 
-        Dim otherMask = Not mask.Threshold(0, 255, cv.ThresholdTypes.Binary)(New cv.Rect(1, 1, dst2.Width, dst2.Height))
-        dst2.SetTo(0, otherMask)
-        rcMap.SetTo(0, otherMask)
-
-        If task.rcD IsNot Nothing Then dst2.Rectangle(task.rcD.rect, task.highlight, task.lineWidth)
+        If task.rcD IsNot Nothing And standaloneTest() Then dst2.Rectangle(task.rcD.rect, task.highlight, task.lineWidth)
 
         Dim rcIndex As Integer
         For Each rc In rcList
-            rcIndex += 1
             rc.index = rcIndex
+            rcIndex += 1
         Next
 
         strOut = Utility_Basics.selectCell(rcMap, rcList)

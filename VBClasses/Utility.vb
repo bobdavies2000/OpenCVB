@@ -197,14 +197,10 @@ Public Class Utility_Basics : Inherits TaskParent
         End If
 
         If clickIndex = 0 Then
-            Return vbCrLf + vbCrLf + "Click any cell to see details." + vbCrLf
+            If rcList.Count = 0 Then rcList.Add(New rcData(task.color, New cv.Rect(0, 0, task.color.Width, task.color.Height), 1))
+            task.rcD = rcList(0)
         End If
 
-        If rcList.Count = 0 Then
-            rcList.Add(New rcData(task.color, New cv.Rect(0, 0, task.color.Width, task.color.Height), 1))
-        End If
-
-        task.rcD = rcList(0)
         For Each rc In rcList
             If clickIndex = rc.mapID Then
                 task.rcD = rc
@@ -213,6 +209,7 @@ Public Class Utility_Basics : Inherits TaskParent
         Next
         task.color(task.rcD.rect).SetTo(white, task.rcD.mask)
         outStr = task.rcD.displayCell()
+        task.clickPoint = task.rcD.maxDist
 
         Return outStr
     End Function
