@@ -672,9 +672,6 @@ Rectangle_Basics
 Rectangle_EnclosingPoints
 Rectangle_Fit
 Rectangle_Rotated
-RedCC_Basics
-RedCC_BasicsCombined
-RedCC_Color8U
 RedCloud_Basics
 RedCloud_BasicsFlood
 RedCloud_Core
@@ -1653,8 +1650,6 @@ XR_Rectangle_MultiOverlap
 XR_Rectangle_Overlap
 XR_Rectangle_Union
 XR_RecursiveBilateralFilter_CPP
-XR_RedCC_CellHistogram
-XR_RedCC_Merge
 XR_RedCloud_Basics
 XR_RedCloud_CellDepthHistogram
 XR_RedCloud_ColorChangeCause

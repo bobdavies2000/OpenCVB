@@ -176,7 +176,6 @@ Quadrant
 Quaternion
 Random
 Rectangle
-RedCC
 RedCloud
 RedCloudNew
 RedColor
