@@ -528,7 +528,7 @@ End Class
 Public Class XO_RedFlood_BasicsOld : Inherits TaskParent
     Public rcList As New List(Of rcDataOld)
     Public rcMap As New cv.Mat(dst2.Size, cv.MatType.CV_32S, 0)
-    Dim redMask As New RedFlood_MapAndList
+    Dim redMask As New XO_RedFlood_MapAndList
     Dim fLess As New FeatureLess_DepthFull
     Dim knn As New KNN_Minimal
     Public trainInput As New List(Of cv.Point3f)

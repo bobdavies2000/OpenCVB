@@ -434,7 +434,6 @@ Kalman_VB
 Kalman_VB_Basics
 Keyboard_Basics
 KeyColor_Basics
-KeyColor_Delaunay
 KeyColor_Reduction
 KLT_Basics
 KMeans_Basics
@@ -720,9 +719,6 @@ RedColor_GridRects
 RedColor_Hulls
 RedColor_Isolate
 RedColor_LeftRight
-RedFlood_CPP
-RedFlood_Delaunay
-RedFlood_MapAndList
 RedPrep_Basics
 RedPrep_Core
 RedPrep_Depth
@@ -1674,7 +1670,6 @@ XR_RedColor_Lines
 XR_RedColor_LineSingle
 XR_RedColor_NWay
 XR_RedColor_Points
-XR_RedFlood_KNN
 XR_RedPrep_CloudAndColor
 XR_RedPrep_DepthEdges
 XR_RedPrep_DepthTiers

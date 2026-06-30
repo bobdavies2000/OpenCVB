@@ -229,34 +229,4 @@ Namespace VBClasses
         End Sub
     End Class
 
-
-
-
-    Public Class KeyColor_Delaunay : Inherits TaskParent
-        Public redMask As New RedFlood_MapAndList
-        Dim delaunay As New Delaunay_Basics
-        Public facetList As New List(Of List(Of cv.Point))
-        Dim fLess As New FeatureLess_DepthFull
-        Public Sub New()
-            If standalone Then task.gOptions.displayDst1.Checked = True
-            desc = "Use the maxDist points as input to delaunay."
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            fLess.Run(src)
-            dst1 = fLess.dst3
-            labels(1) = fLess.labels(2)
-
-            redMask.Run(dst1)
-            dst2 = Palettize(redMask.dst2, 0)
-            labels(2) = redMask.labels(3)
-
-            delaunay.inputPoints.Clear()
-            For Each rc In redMask.rcList
-                delaunay.inputPoints.Add(rc.maxDist)
-            Next
-
-            delaunay.Run(emptyMat)
-            dst3 = delaunay.dst2.Clone
-        End Sub
-    End Class
 End Namespace
