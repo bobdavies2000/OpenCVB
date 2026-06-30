@@ -211,51 +211,6 @@ End Class
 
 
 
-Public Class Region_Depth : Inherits TaskParent
-    Public redMask As New XR_RedFlood_Basics
-    Public connect As New Region_Rects
-    Public mdLargest As New List(Of maskData)
-    Dim bricks As New Brick_Basics
-    Public Sub New()
-        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
-        desc = "Find the main regions connected in depth and build a contour for each."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        bricks.Run(src)
-
-        connect.Run(src.Clone)
-        redMask.Run(Not connect.dst2)
-        If redMask.mdList.Count = 0 Then Exit Sub
-
-        dst1.SetTo(0)
-        For Each md In redMask.mdList
-            dst1(md.rect).SetTo(md.index, md.mask)
-        Next
-
-        Dim minSize As Integer = src.Total / 25
-        dst2.SetTo(0)
-        mdLargest.Clear()
-        For Each brick In bricks.brickList
-            Dim index = dst1.Get(Of Byte)(brick.center.Y, brick.center.X)
-            Dim md = redMask.mdList(index)
-            If index = 0 Then
-                dst2(brick.rect).SetTo(black)
-            Else
-                If md.pixels > minSize Then
-                    dst2(brick.rect).SetTo(task.scalarColors(index))
-                    mdLargest.Add(md)
-                End If
-            End If
-        Next
-
-        dst3 = ShowAddweighted(src, dst2, labels(3))
-        labels(2) = "There were " + CStr(redMask.mdList.Count) + " connected contours found."
-    End Sub
-End Class
-
-
-
-
 
 
 

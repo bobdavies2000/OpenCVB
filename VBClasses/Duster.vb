@@ -113,26 +113,3 @@ Public Class XR_Duster_BasicsY : Inherits TaskParent
     End Sub
 End Class
 
-
-
-
-
-
-Public Class XR_Duster_RedCloud : Inherits TaskParent
-    Dim duster As New Duster_Basics
-    Dim redMask As New RedFlood_Basics
-    Public Sub New()
-        desc = "Run Bin3Way_RedCloud on the largest regions identified in Duster_Basics"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        duster.Run(src)
-        dst1 = duster.dust.dst2.InRange(1, 1)
-
-        dst3.SetTo(0)
-        src.CopyTo(dst3, dst1)
-
-        redMask.Run(src)
-        dst2 = redMask.dst3
-        labels(2) = redMask.labels(2)
-    End Sub
-End Class

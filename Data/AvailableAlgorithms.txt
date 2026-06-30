@@ -137,7 +137,6 @@ Delaunay_Color
 Delaunay_ConsistentColor
 Delaunay_Contours
 Delaunay_EmptyClone
-Delaunay_FeatureLess
 Delaunay_Generations
 Delaunay_LineSelect
 Delaunay_Map
@@ -534,8 +533,6 @@ MeanSubtraction_LeftRight
 Mesh_Basics
 Mesh_BasicsInput
 ML_Basics
-ML_FeatureLess
-ML_FeatureLess_Grid
 ML_RandomForest
 ML_RemoveDups_CPP
 ModNet_Basics
@@ -685,7 +682,6 @@ RedCloud_Basics
 RedCloud_BasicsFlood
 RedCloud_Core
 RedCloud_DelaunayMap
-RedCloud_FeatureLess
 RedCloud_Flood_CPP
 RedCloud_Foreground
 RedCloud_KNN
@@ -726,7 +722,6 @@ RedColor_GridRects
 RedColor_Hulls
 RedColor_Isolate
 RedColor_LeftRight
-RedFlood_Basics
 RedFlood_Color
 RedFlood_CPP
 RedFlood_Delaunay
@@ -755,7 +750,6 @@ RedWGrid_PrepXY
 RedWGrid_PrepXYAlt
 Region_Basics
 Region_Core
-Region_Depth
 Region_DepthCorrelation
 Region_Rects
 Region_RectsH
@@ -1138,7 +1132,6 @@ XR_DNN_SuperResize
 XR_Draw_ClipLine
 XR_Draw_LineTest
 XR_Duster_BasicsY
-XR_Duster_RedCloud
 XR_Edge_BinarizedBrightness
 XR_Edge_CannyCombined
 XR_Edge_CannyLeftRight
@@ -1691,7 +1684,6 @@ XR_RedColor_LineSingle
 XR_RedColor_List
 XR_RedColor_NWay
 XR_RedColor_Points
-XR_RedFlood_Basics
 XR_RedFlood_CellDepthHistogram
 XR_RedFlood_Consistent
 XR_RedFlood_FourColor

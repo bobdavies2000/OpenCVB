@@ -1,4 +1,5 @@
 Imports System.Runtime.InteropServices
+Imports VBClasses
 Imports cv = OpenCvSharp
 Public Class RedColor_Basics : Inherits TaskParent
     Dim color8u As New Color8U_Basics
@@ -524,13 +525,98 @@ End Class
 
 
 
+Public Class XO_RedFlood_BasicsOld : Inherits TaskParent
+    Public rcList As New List(Of rcDataOld)
+    Public rcMap As New cv.Mat(dst2.Size, cv.MatType.CV_32S, 0)
+    Dim redMask As New RedFlood_MapAndList
+    Dim fLess As New FeatureLess_DepthFull
+    Dim knn As New KNN_Minimal
+    Public trainInput As New List(Of cv.Point3f)
+    Public queries As New List(Of cv.Point3f)
+    Public Sub New()
+        queries.Add(New cv.Point3f(0, 0, 0)) ' we only need one entry in the queries.
+        If standalone Then task.gOptions.displayDst1.Checked = True
+        desc = "Use KNN to identify the previous cell for each current cell"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        fLess.Run(src)
+        dst2 = fLess.dst3
+        labels(2) = fLess.labels(2)
+
+        redMask.Run(dst2)
+
+        Dim rcListLast As New List(Of rcDataOld)(rcList)
+        Dim lastColorMat = dst3.Clone
+
+        trainInput.Clear()
+        For Each rc In redMask.rcList
+            trainInput.Add(New cv.Point3f(rc.maxDist.X, rc.maxDist.Y, rc.pixels))
+        Next
+
+        dst3.SetTo(0)
+        For Each rc In redMask.rcList
+            queries(0) = New cv.Point3f(rc.maxDist.X, rc.maxDist.Y, rc.pixels)
+
+            Dim dimension = 3
+            knn.queryMat = cv.Mat.FromPixelData(queries.Count, dimension, cv.MatType.CV_32F, queries.ToArray)
+            knn.trainMat = cv.Mat.FromPixelData(trainInput.Count, dimension, cv.MatType.CV_32F, trainInput.ToArray)
+            knn.Run(emptyMat)
+
+            Dim lastIndex = knn.result(0, 0)
+            If rcListLast.Count > 0 And lastIndex < rcListLast.Count Then
+                Dim rcLast = rcListLast(lastIndex)
+                rc.indexLast = rcLast.mapID
+            End If
+
+            Dim lastColor = lastColorMat.Get(Of cv.Vec3b)(rc.maxDist.Y, rc.maxDist.X)
+            If lastColor <> black Then
+                If lastColor <> task.vecColors(rc.mapID) Then rc.color = lastColor
+            Else
+                rc.color = task.scalarColors(rc.mapID)
+            End If
+            dst3(rc.rect).SetTo(rc.color, rc.mask)
+        Next
+
+        strOut = Utility_Basics.selectCell(redMask.dst2, redMask.rcList)
+        SetTrueText(strOut, 1)
+        If task.rcD IsNot Nothing Then task.clickPoint = task.rcD.maxDist
+
+        Dim usedColors As New List(Of cv.Scalar)
+        rcList.Clear()
+        For Each rc In redMask.rcList
+            If rc.indexLast > 0 Then
+                Dim rcLast = rcListLast(rc.indexLast - 1)
+                Dim gridIndex = rc.gridIndex
+                Dim lastGridIndex = rcLast.gridIndex
+                If task.gridNabes(gridIndex).Contains(lastGridIndex) Then
+                    rc.age = rcLast.age + 1
+                    If rc.age > 1000 Then rc.age = 2
+                End If
+            End If
+
+            If usedColors.Contains(rc.color) Then
+                rc.color = New cv.Scalar(msRNG.Next(0, 255), msRNG.Next(0, 255), msRNG.Next(0, 255))
+                dst3(rc.rect).SetTo(rc.color, rc.mask)
+            End If
+            usedColors.Add(rc.color)
+
+            rcList.Add(rc)
+        Next
+
+        rcMap = redMask.dst2.Clone
+
+        labels(3) = CStr(redMask.rcList.Count) + " cells were identified."
+    End Sub
+End Class
+
+
 
 
 
 Public Class XR_RedColor_List : Inherits TaskParent
     Public inputRemoved As cv.Mat
     Public cellGen As New RedFlood_ToRedColor
-    Public redMask As New XR_RedFlood_Basics
+    Public redMask As New XO_RedFlood_BasicsTest
     Public rclist As New List(Of rcDataOld)
     Public rcMap As New cv.Mat(dst2.Size, cv.MatType.CV_32S, 0)
     Public contours As New Contour_Basics
