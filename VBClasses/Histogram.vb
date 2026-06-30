@@ -1233,37 +1233,6 @@ End Class
 
 
 
-Public Class XR_Histogram_RedCell : Inherits TaskParent
-    Dim hist As New Histogram_Depth
-    Dim redC As New RedCloud_Basics
-    Public Sub New()
-        dst0 = New cv.Mat(dst0.Size(), cv.MatType.CV_32F, cv.Scalar.All(0))
-        labels = {"", "", "RedCloud cells", "Histogram of the depth for the selected cell."}
-        desc = "Review depth data for a RedCloud Cell"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        dst2 = RedFlood_List.runRedList(src, labels(2))
-        redC.Run(src)
-        dst2 = redC.dst2
-        labels(2) = redC.labels(2)
-
-        SetTrueText(redC.strOut, 1)
-
-        hist.rc = task.rcD
-        If hist.rc.mapID = 0 Or hist.rc.wcMean(2) = 0 Then Exit Sub
-
-        dst0.SetTo(0)
-        task.pcSplit(2)(hist.rc.rect).CopyTo(dst0)
-
-        hist.Run(dst0)
-        dst3 = hist.dst2
-    End Sub
-End Class
-
-
-
-
-
 Public Class Histogram_GridCell : Inherits TaskParent
     Dim histogram As New cv.Mat
     Public mask As New cv.Mat

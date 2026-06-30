@@ -1,24 +1,5 @@
 Imports cv = OpenCvSharp
-Public Class Spectrum_Basics : Inherits TaskParent
-    Dim dSpec As New Spectrum_Z
-    Dim gSpec As New Spectrum_Gray
-    Public options As New Options_Spectrum
-    Public Sub New()
-        desc = "Given a RedCloud cell, create a spectrum that contains the ranges of the depth and color."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        dst2 = RedFlood_List.runRedList(src, labels(2))
-        dSpec.Run(src)
-        gSpec.Run(src)
 
-        If task.heartBeat And task.rcD.mapID > 0 Then
-            strOut = dSpec.strOut + vbCrLf + vbCrLf
-            strOut += gSpec.strOut
-        End If
-
-        SetTrueText(strOut, 3)
-    End Sub
-End Class
 
 
 

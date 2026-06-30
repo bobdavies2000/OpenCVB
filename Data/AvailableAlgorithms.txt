@@ -578,8 +578,6 @@ Palette_Random
 Palette_RandomColorMap
 Palette_RandomColors
 Palette_Variable
-PCA_LineMask
-PCA_Mask
 PCA_NColor
 PCA_NColor_CPP
 PCA_Palettize
@@ -722,13 +720,9 @@ RedColor_GridRects
 RedColor_Hulls
 RedColor_Isolate
 RedColor_LeftRight
-RedFlood_Color
 RedFlood_CPP
 RedFlood_Delaunay
-RedFlood_List
 RedFlood_MapAndList
-RedFlood_Test
-RedFlood_ToRedColor
 RedPrep_Basics
 RedPrep_Core
 RedPrep_Depth
@@ -774,7 +768,6 @@ Sort_1Channel
 Sort_3Channel
 Sort_Basics
 Sort_Integer
-Spectrum_Basics
 Spectrum_Breakdown
 Spectrum_Cloud
 Spectrum_Gray
@@ -1370,7 +1363,6 @@ XR_Histogram_Peaks
 XR_Histogram_PeaksDepth
 XR_Histogram_PeaksRGB
 XR_Histogram_PointCloudXYZ
-XR_Histogram_RedCell
 XR_Histogram_ToggleFeatureLess
 XR_History_BasicsDiff
 XR_History_Cloud
@@ -1592,7 +1584,6 @@ XR_Palette_RandomWithBlack
 XR_Palette_Reduction
 XR_Palette_RGBDepth
 XR_Palette_TaskColors
-XR_PCA_CellMask
 XR_PCA_Depth
 XR_PCA_DrawImage
 XR_PCA_NColorPalettize
@@ -1681,16 +1672,9 @@ XR_RedColor_FeaturesKNN
 XR_RedColor_GoodCellInput
 XR_RedColor_Lines
 XR_RedColor_LineSingle
-XR_RedColor_List
 XR_RedColor_NWay
 XR_RedColor_Points
-XR_RedFlood_CellDepthHistogram
-XR_RedFlood_Consistent
-XR_RedFlood_FourColor
-XR_RedFlood_Hue
 XR_RedFlood_KNN
-XR_RedFlood_Redraw
-XR_RedMark_Features
 XR_RedPrep_CloudAndColor
 XR_RedPrep_DepthEdges
 XR_RedPrep_DepthTiers
@@ -1699,7 +1683,6 @@ XR_RedPrep_EdgesY
 XR_RedPrep_VB
 XR_Reduction_BGR
 XR_Reduction_Edges
-XR_Reduction_Floodfill
 XR_Reduction_HeatMapLines
 XR_Reduction_HeatMapLines1
 XR_Reduction_Histogram

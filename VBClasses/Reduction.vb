@@ -45,30 +45,6 @@ End Class
 
 
 
-Public Class XR_Reduction_Floodfill : Inherits TaskParent
-    Public reduction As New Reduction_Basics
-    Dim redC As New RedColor_Basics
-    Public Sub New()
-        If standalone Then task.gOptions.displayDst1.Checked = True
-        labels(2) = "Reduced input to floodfill"
-        desc = "Use the reduction output as input to floodfill to get masks of cells."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        reduction.Run(src)
-        dst2 = Palettize(reduction.dst2)
-        dst3 = RedFlood_List.runRedList(reduction.dst2, labels(3))
-
-        redC.Run(reduction.dst2)
-        dst3 = redC.dst2
-        labels(3) = redC.labels(2)
-
-        SetTrueText(redC.strOut, 1)
-    End Sub
-End Class
-
-
-
-
 
 
 

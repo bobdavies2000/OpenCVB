@@ -613,43 +613,6 @@ End Class
 
 
 
-Public Class XR_RedColor_List : Inherits TaskParent
-    Public inputRemoved As cv.Mat
-    Public cellGen As New RedFlood_ToRedColor
-    Public redMask As New XO_RedFlood_BasicsTest
-    Public rclist As New List(Of rcDataOld)
-    Public rcMap As New cv.Mat(dst2.Size, cv.MatType.CV_32S, 0)
-    Public contours As New Contour_Basics
-    Public Sub New()
-        desc = "Find cells and then match them to the previous generation with minimum boundary"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        contours.Run(src)
-        If src.Type <> cv.MatType.CV_8U Then
-            dst1 = contours.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        Else
-            dst1 = src
-        End If
-
-        If inputRemoved IsNot Nothing Then dst1.SetTo(0, inputRemoved)
-        redMask.Run(dst1)
-
-        If redMask.mdList.Count = 0 Then Exit Sub ' no data to process.
-        cellGen.mdList = redMask.mdList
-        cellGen.Run(redMask.dst2)
-
-        rclist = New List(Of rcDataOld)(cellGen.rcList)
-        rcMap = cellGen.rcMap
-        dst2 = Palettize(rcMap)
-
-        labels(2) = cellGen.labels(2)
-    End Sub
-End Class
-
-
-
-
-
 
 
 
