@@ -154,12 +154,6 @@ DepthColorizer_Basics_TA
 DepthColorizer_CloudPixels
 DepthColorizer_CPP
 DepthColorizer_Mean
-DepthLine_Basics
-DepthLine_H
-DepthLine_HV
-DepthLine_Points
-DepthLine_TextureFlow
-DepthLine_V
 DepthLinear_Input
 DepthLinear_InputX
 DepthLinear_InputY
@@ -673,7 +667,6 @@ Rectangle_Fit
 Rectangle_Rotated
 RedCloud_Basics
 RedCloud_Core
-RedCloud_DelaunayMap
 RedCloud_Flood_CPP
 RedCloud_Foreground
 RedCloud_KNN
@@ -715,7 +708,6 @@ RedColor_Isolate
 RedColor_LeftRight
 RedPrep_Basics
 RedPrep_Core
-RedPrep_EdgeMask
 RedPrep_Edges_CPP
 Reduction_Basics
 Reduction_BasicsParmInput
@@ -1054,9 +1046,6 @@ XR_Depth_StableMinMotion
 XR_Depth_TiersOld
 XR_Depth_Uncertainty
 XR_Depth_WorldXYMT
-XR_DepthLine_Common
-XR_DepthLine_HV2
-XR_DepthLine_XY
 XR_DepthLinear_Basics
 XR_DepthLinear_ImageX
 XR_DepthLinear_ImageY

@@ -43,7 +43,6 @@ DCT
 Delaunay
 Depth
 DepthColorizer
-DepthLine
 DepthLinear
 Derivative
 Deterministic

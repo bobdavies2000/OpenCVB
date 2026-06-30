@@ -17,7 +17,7 @@ Public Class AlgorithmTask : Implements IDisposable
         allOptions.Size = New System.Drawing.Size(task.Settings.allOptionsWidth, task.Settings.allOptionsHeight)
         allOptions.positionedFromSettings = True
 
-        If (settings.algorithm.StartsWith("GL_") Or settings.algorithm.StartsWith("NR_GL_")) And
+        If (settings.algorithm.StartsWith("GL_") Or settings.algorithm.StartsWith("XR_GL_")) And
                     settings.algorithm <> "GL_MainForm" And optionsChanged Then
             If sharpGL IsNot Nothing Then sharpGL.Dispose()
             sharpGL = New SharpGLForm
@@ -225,7 +225,10 @@ Public Class AlgorithmTask : Implements IDisposable
 
         Dim pt = mouseMovePoint
         Dim tag = task.mousePicTag
-        mousePixelValue = dstList(tag).Get(Of cv.Vec3b)(pt.Y, pt.X)
+        Try
+            mousePixelValue = dstList(tag).Get(Of cv.Vec3b)(pt.Y, pt.X)
+        Catch ex As Exception
+        End Try
 
         If gOptions.ShowGrid.Checked Then dstList(2).SetTo(cv.Scalar.White, gridMask)
         If gOptions.showMotionMask.Checked Then

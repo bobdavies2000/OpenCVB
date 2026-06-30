@@ -10648,7 +10648,7 @@ Namespace VBClasses
 
 
     Public Class XO_RedCloud_PrepEdges : Inherits TaskParent
-        Dim prepEdges As New RedPrep_EdgeMask
+        Dim prepEdges As New XO_RedPrep_EdgeMask
         Public rcList As New List(Of rcDataOld)
         Public Sub New()
             dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
@@ -24383,6 +24383,371 @@ Namespace VBClasses
 
             dst3 = Palettize(dst2, 0)
             labels(2) = "The input has been consolidated into " + CStr(mm.maxVal) + " categories"
+        End Sub
+    End Class
+
+
+
+
+
+    Public Class XO_RedPrep_EdgeMask : Inherits TaskParent
+        Public reductionName As String
+        Public prep As New RedPrep_Core
+        Public Sub New()
+            OptionParent.findRadio("XY Reduction").Checked = True
+            dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
+            desc = "Get the edges in the RedPrep_Core output"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            prep.Run(src)
+            dst2 = prep.dst2
+            labels(2) = prep.labels(2)
+
+            dst3.SetTo(0)
+            For y = 1 To dst2.Height - 2
+                For x = 1 To dst2.Width - 2
+                    Dim pix1 = dst2.Get(Of Byte)(y, x)
+                    Dim pix2 = dst2.Get(Of Byte)(y, x + 1)
+                    If pix1 <> 0 And pix2 <> 0 And pix1 <> pix2 Then dst3.Set(Of Byte)(y, x, 255)
+
+                    pix2 = dst2.Get(Of Byte)(y + 1, x)
+                    If pix1 <> 0 And pix2 <> 0 And pix1 <> pix2 Then dst3.Set(Of Byte)(y, x, 255)
+
+                    pix2 = dst2.Get(Of Byte)(y + 1, x + 1)
+                    If pix1 <> 0 And pix2 <> 0 And pix1 <> pix2 Then dst3.Set(Of Byte)(y, x, 255)
+                Next
+            Next
+
+            dst2.SetTo(0, dst3)
+        End Sub
+    End Class
+
+
+
+
+    Public Class XO_DepthLine_Points : Inherits TaskParent
+        Dim lineX As New XO_RedPrep_EdgeMask
+        Dim lineY As New XO_RedPrep_EdgeMask
+        Public ptList As New List(Of cv.Point)
+        Public ptDepth As New List(Of Single)
+        Public ptGrid As New List(Of Integer)
+        Public motionLeft As New Motion_Basics_TA
+        Public Sub New()
+            lineX.reductionName = "X Reduction"
+            lineY.reductionName = "Y Reduction"
+            dst0 = New cv.Mat(dst0.Size, cv.MatType.CV_8U, 0)
+            dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
+            desc = "Identify the points where horizontal and vertical depth lines intersect."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            If task.optionsChanged Then ptList.Clear()
+
+            lineX.Run(src)
+            lineY.Run(src)
+            motionLeft.Run(task.leftView)
+
+            dst0.SetTo(0)
+            dst1.SetTo(0)
+
+            dst0.SetTo(64, lineX.dst3)
+            dst1.SetTo(64, lineY.dst3)
+
+            dst3 = dst0 + dst1
+            dst1 = dst3.Threshold(127, 255, cv.ThresholdTypes.Binary)
+
+            Dim ptMat = dst1.FindNonZero()
+            labels(3) = CStr(ptMat.Rows) + " Points found"
+
+            Dim retainedList As New List(Of cv.Point)
+            Dim retainedDepth As New List(Of Single)
+            Dim retainedGrid As New List(Of Integer)
+            For i = 0 To ptList.Count - 1
+                Dim pt = ptList(i)
+                If motionLeft.dst3.Get(Of Byte)(pt.Y, pt.X) = 0 Then
+                    retainedList.Add(pt)
+                    retainedDepth.Add(ptDepth(i))
+                    retainedGrid.Add(ptGrid(i))
+                End If
+            Next
+            Dim count = retainedList.Count
+
+            ptList = New List(Of cv.Point)(retainedList)
+            ptDepth = New List(Of Single)(retainedDepth)
+            ptGrid = New List(Of Integer)(retainedGrid)
+            For i = 0 To ptMat.Rows - 1
+                Dim pt = ptMat.Get(Of cv.Point)(i, 0)
+
+                ' the grid rect may have already been found.
+                Dim index = task.gridMap.Get(Of Integer)(pt.Y, pt.X)
+                If ptGrid.Contains(index) = False Then
+                    If motionLeft.dst3.Get(Of Byte)(pt.Y, pt.X) > 0 Then
+                        ptList.Add(pt)
+                        Dim r = task.gridRects(index)
+                        dst1(r).SetTo(0)
+                        ptDepth.Add(task.pcSplit(2)(r).Mean(task.depthmask(r))(0))
+                        ptGrid.Add(index)
+                    End If
+                End If
+            Next
+
+            dst2 = task.leftView.Clone
+            For Each pt In ptList
+                dst2.Circle(pt, task.DotSize, white, -1, task.lineType)
+            Next
+            Dim newCount = ptList.Count - count
+            labels(2) = CStr(count) + " points were retained " + CStr(newCount) + " points were added."
+        End Sub
+    End Class
+
+
+
+
+    Public Class XO_DepthLine_TextureFlow : Inherits TaskParent
+        Dim lineX As New XO_RedPrep_EdgeMask
+        Dim lineY As New XO_RedPrep_EdgeMask
+        Dim texFlow As New TextureFlow_Basics
+        Public Sub New()
+            desc = "Use texture flow on the mesh input"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            lineX.Run(src)
+            lineY.Run(src)
+
+            dst3 = lineX.dst3 Or lineY.dst3
+
+            texFlow.Run(dst3)
+            dst2 = texFlow.dst2
+        End Sub
+    End Class
+
+
+
+
+    Public Class XO_DepthLine_Basics : Inherits TaskParent
+        Public prepEdges As New RedPrep_Basics
+        Dim lines As New XR_Line_RawFLD
+        Public lpList As New List(Of lpData)
+        Public Sub New()
+            desc = "Find lines in reduced the depth data."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            If src.Type <> cv.MatType.CV_32FC3 Then
+                prepEdges.Run(task.pointCloud.Clone)
+            Else
+                prepEdges.dst3 = src
+            End If
+
+            lines.Run(prepEdges.dst2)
+            dst2 = lines.dst2
+            labels(2) = lines.labels(2)
+
+            lpList = New List(Of lpData)(lines.lpList)
+
+            dst3 = prepEdges.dst2
+            labels(3) = "Output of RedPrep_Basics, input to Line_RawFLD"
+        End Sub
+    End Class
+
+
+
+
+    Public Class XO_DepthLine_XY : Inherits TaskParent
+        Dim lineD As New XO_DepthLine_Basics
+        Public lpList As New List(Of lpData)
+        Public Sub New()
+            If standalone Then task.gOptions.displayDst0.Checked = True
+            desc = "Find vertical lines in the reduced depth data."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            lineD.Run(src)
+
+            lpList = New List(Of lpData)(lineD.lpList)
+            dst0 = task.leftView
+            dst2 = lineD.dst2
+            dst3 = lineD.dst3
+            labels = lineD.labels
+        End Sub
+    End Class
+
+
+
+
+    Public Class XO_DepthLine_V : Inherits TaskParent
+        Dim lineD As New XO_DepthLine_Basics
+        Public lpList As New List(Of lpData)
+        Public Sub New()
+            OptionParent.FindCheckBox("Prep Edges in Y").Checked = False
+            If standalone Then task.gOptions.displayDst0.Checked = True
+            desc = "Find vertical lines in the reduced depth data."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            ' lineD.prepEdges.reductionName = "X Reduction"
+            lineD.Run(src)
+
+            lpList = New List(Of lpData)(lineD.lpList)
+            dst0 = task.leftView
+            dst2 = lineD.dst2
+            dst3 = lineD.dst3
+            labels = lineD.labels
+        End Sub
+    End Class
+
+
+
+
+    Public Class XO_DepthLine_H : Inherits TaskParent
+        Dim lineD As New XO_DepthLine_Basics
+        Public lpList As New List(Of lpData)
+        Public Sub New()
+            If standalone Then task.gOptions.displayDst0.Checked = True
+            OptionParent.FindCheckBox("Prep Edges in X").Checked = False
+            desc = "Find horizontal lines in the reduced depth data."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            lineD.Run(src)
+
+            lpList = New List(Of lpData)(lineD.lpList)
+            dst0 = task.leftView
+            dst2 = lineD.dst2
+            dst3 = lineD.dst3
+            labels = lineD.labels
+        End Sub
+    End Class
+
+
+
+
+
+
+
+    Public Class XO_DepthLine_Common : Inherits TaskParent
+        Dim lineX As New XO_DepthLine_V
+        Dim lineY As New XO_DepthLine_H
+        Dim lineXY As New XO_DepthLine_XY
+        Public lpList As New List(Of lpData)
+        Public Sub New()
+            If standalone Then task.gOptions.displayDst0.Checked = True
+            desc = "Find vertical lines in the reduced depth data."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            lineX.Run(src)
+            lineY.Run(src)
+            lineXY.Run(src)
+
+            dst0 = task.leftView
+            dst2.SetTo(0)
+            For Each lp In lineX.lpList
+                dst2.Line(lp.p1, lp.p2, white, task.lineWidth, task.lineType)
+            Next
+            For Each lp In lineY.lpList
+                dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
+            Next
+            labels(0) = lineX.labels(0)
+
+            labels(2) = CStr(lineY.lpList.Count) + " horizontal (yellow), " +
+                                CStr(lineX.lpList.Count) + " vertical (white) lines, " +
+                                CStr(lineXY.lpList.Count) + " XY lines (various colors)"
+        End Sub
+    End Class
+
+
+
+
+
+
+
+    Public Class XO_DepthLine_HV : Inherits TaskParent
+        Dim lineX As New XO_DepthLine_V
+        Dim lineY As New XO_DepthLine_H
+        Public lpList As New List(Of lpData)
+        Public Sub New()
+            If standalone Then task.gOptions.displayDst0.Checked = True
+            desc = "Find horizontal and vertical lines in the reduced depth data."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            lineX.Run(src)
+            lineY.Run(src)
+
+            dst0 = task.leftView
+
+            dst2.SetTo(0)
+            For Each lp In lineX.lpList
+                dst2.Line(lp.p1, lp.p2, white, task.lineWidth, task.lineType)
+            Next
+
+            For Each lp In lineY.lpList
+                dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
+            Next
+
+            dst3 = lineX.dst3
+            dst3 = dst3 Or lineY.dst3
+
+            labels(0) = lineX.labels(0)
+            labels(2) = CStr(lineY.lpList.Count) + " horizontal (yellow), " +
+                                CStr(lineX.lpList.Count) + " vertical (white) lines"
+        End Sub
+    End Class
+
+
+
+
+
+
+
+    Public Class XO_DepthLine_HV2 : Inherits TaskParent
+        Dim lineX As New RedPrep_Basics
+        Dim lineY As New RedPrep_Basics
+        Public lpList As New List(Of lpData)
+        Dim lines As New Line_Basics
+        Public Sub New()
+            labels(3) = "Input to Line_Basics"
+            desc = "Find horizontal and vertical lines in the reduced depth data."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            If task.optionsChanged Then lpList.Clear()
+            lineX.Run(src)
+            lineY.Run(src)
+
+            dst1 = lineX.dst2
+            dst1 = dst1 Or lineY.dst2
+
+            lines.Run(dst1)
+
+            dst2 = lines.dst2
+            lpList = New List(Of lpData)(lines.lpList)
+
+            dst3 = dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+            If task.toggleOn Then
+                For Each lp In lpList
+                    dst3.Line(lp.p1, lp.p2, task.highlight, task.lineWidth * 2, task.lineType)
+                Next
+            End If
+
+            labels(2) = lines.labels(2)
+        End Sub
+    End Class
+
+
+
+
+
+
+
+    Public Class XO_RedCloud_DelaunayMap : Inherits TaskParent
+        Public dMap As New Delaunay_Map
+        Dim redC As New RedColor_Basics
+        Public Sub New()
+            desc = "Run RedColor as usual but use the Delaunay map to select cells."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            redC.Run(src)
+            dst2 = redC.dst2
+            labels(2) = redC.labels(2)
+
+            dMap.rcList = New List(Of rcDataOld)(redC.rcList)
+            dMap.Run(emptyMat)
+
+            SetTrueText(redC.strOut, 3)
         End Sub
     End Class
 

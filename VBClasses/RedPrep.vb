@@ -174,39 +174,3 @@ Public Class RedPrep_Core : Inherits TaskParent
 End Class
 
 
-
-
-
-
-Public Class RedPrep_EdgeMask : Inherits TaskParent
-    Public reductionName As String
-    Public prep As New RedPrep_Core
-    Public Sub New()
-        OptionParent.findRadio("XY Reduction").Checked = True
-        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
-        desc = "Get the edges in the RedPrep_Core output"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        prep.Run(src)
-        dst2 = prep.dst2
-        labels(2) = prep.labels(2)
-
-        dst3.SetTo(0)
-        For y = 1 To dst2.Height - 2
-            For x = 1 To dst2.Width - 2
-                Dim pix1 = dst2.Get(Of Byte)(y, x)
-                Dim pix2 = dst2.Get(Of Byte)(y, x + 1)
-                If pix1 <> 0 And pix2 <> 0 And pix1 <> pix2 Then dst3.Set(Of Byte)(y, x, 255)
-
-                pix2 = dst2.Get(Of Byte)(y + 1, x)
-                If pix1 <> 0 And pix2 <> 0 And pix1 <> pix2 Then dst3.Set(Of Byte)(y, x, 255)
-
-                pix2 = dst2.Get(Of Byte)(y + 1, x + 1)
-                If pix1 <> 0 And pix2 <> 0 And pix1 <> pix2 Then dst3.Set(Of Byte)(y, x, 255)
-            Next
-        Next
-
-        dst2.SetTo(0, dst3)
-    End Sub
-End Class
-
