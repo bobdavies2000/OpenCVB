@@ -126,43 +126,6 @@ End Class
 
 
 
-Public Class RedCloud_BasicsFlood : Inherits TaskParent
-    Dim prepXY As New RedPrep_XY_Add
-    Public redC As New RedColor_Basics
-    Public rcList As New List(Of rcDataOld)
-    Public rcMap As cv.Mat
-    Public Sub New()
-        desc = "Use the more complete RedPrep_XY_Add as input to RedCloud."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        prepXY.Run(src)
-        prepXY.dst2.ConvertTo(dst2, cv.MatType.CV_8U)
-
-        redC.Run(dst2)
-        dst2 = redC.dst2
-        labels(2) = redC.labels(2)
-
-        If task.rcD IsNot Nothing Then dst2.Rectangle(task.rcD.rect, task.highlight, task.lineWidth)
-        If strOut <> "" Then SetTrueText(redC.strOut, 3) Else SetTrueText("Click on any cell", 3)
-
-        Dim causeLabel = Utility_Basics.findCause(redC.rcMap, redC.rcList)
-        If task.mouseClickFlag Then
-            causeLabel = ""
-            labels(3) = ""
-        End If
-
-        If causeLabel <> "" Then
-            If labels(3) = "" Then labels(3) = causeLabel Else labels(3) += ", " + causeLabel
-            If labels(3).Length > 80 Then labels(3) = causeLabel
-        End If
-
-        rcList = New List(Of rcDataOld)(redC.rcList)
-        rcMap = redC.rcMap.Clone
-    End Sub
-End Class
-
-
-
 
 
 

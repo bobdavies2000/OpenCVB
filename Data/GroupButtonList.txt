@@ -181,8 +181,6 @@ RedCloudNew
 RedColor
 RedPrep
 Reduction
-RedWGrid
-Region
 Remap
 Resize
 Retina

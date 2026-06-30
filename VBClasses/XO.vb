@@ -2535,74 +2535,704 @@ Namespace VBClasses
 
 
 
-    Public Class XO_Region_Palette : Inherits TaskParent
-        Dim hRects As New Region_RectsH
-        Dim vRects As New Region_RectsV
-        Dim mats As New Mat_4Click
+    Public Class XO_Region_PaletteOld : Inherits TaskParent
+        Dim bricks As New Brick_Basics
+        Dim regions As New XO_Region_Core
+        Public hRects As New List(Of cv.Rect)
+        Public vRects As New List(Of cv.Rect)
         Public Sub New()
-            dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
-            desc = "Assign an index to each of vertical and horizontal rects in Region_Rects"
+            dst0 = New cv.Mat(dst0.Size, cv.MatType.CV_32S, 0)
+            dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_32S, 0)
+            labels(2) = "Move mouse over a line to see the depth values.  Results will be in Labels(3)"
+            desc = "Display bricks that are connected by depth vertically and horizontally."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            hRects.Run(src)
+            bricks.Run(src)
+            regions.Run(src)
 
-            Dim indexH As Integer
-            dst1.SetTo(0)
-            For Each r In hRects.hRects
-                If r.Y = 0 Then
-                    indexH += 1
-                    dst1(r).SetTo(indexH)
-                Else
-                    Dim foundLast As Boolean
-                    For x = r.X To r.X + r.Width - 1
-                        Dim lastIndex = dst1.Get(Of Byte)(r.Y - 1, x)
-                        If lastIndex <> 0 Then
-                            dst1(r).SetTo(lastIndex)
-                            foundLast = True
-                            Exit For
-                        End If
+            hRects.Clear()
+            dst0.SetTo(0)
+            dst2.SetTo(0)
+            For Each tuple In regions.hTuples
+                Dim brick1 = bricks.brickList(tuple.Item1)
+                Dim brick2 = bricks.brickList(tuple.Item2)
+                If brick1.depth = 0 Or brick2.depth = 0 Then Continue For
+                If brick1.center.DistanceTo(brick2.center) > task.gridWH Then
+                    Dim r = brick1.rect
+                    For i = brick1.index + 1 To brick2.index - 1
+                        r = r.Union(bricks.brickList(i).rect)
                     Next
-                    If foundLast = False Then
-                        indexH += 1
-                        dst1(r).SetTo(indexH)
-                    End If
+                    hRects.Add(r)
+                    dst0(r).SetTo(hRects.Count)
+
+                    Dim color = task.scalarColors(task.bricksPerCol * r.Y \ dst2.Height Mod 255)
+                    dst2(r).SetTo(color)
                 End If
             Next
-            mats.mat(0) = Palettize(dst1)
 
-            mats.mat(1) = ShowAddweighted(src, mats.mat(0), labels(3))
-
-            vRects.Run(src)
-            Dim indexV As Integer
+            vRects.Clear()
             dst1.SetTo(0)
-            For Each r In vRects.vRects
-                If r.X = 0 Then
-                    indexV += 1
-                    dst1(r).SetTo(indexV)
-                Else
-                    Dim foundLast As Boolean
-                    For y = r.Y To r.Y + r.Height - 1
-                        Dim lastIndex = dst1.Get(Of Byte)(y, r.X - 1)
-                        If lastIndex <> 0 Then
-                            dst1(r).SetTo(lastIndex)
-                            foundLast = True
-                            Exit For
-                        End If
+            dst3.SetTo(0)
+            For Each tuple In regions.vTuples
+                Dim brick1 = bricks.brickList(tuple.Item1)
+                Dim brick2 = bricks.brickList(tuple.Item2)
+                If brick1.depth = 0 Or brick2.depth = 0 Then Continue For
+                If brick1.center.DistanceTo(brick2.center) > task.gridWH Then
+                    Dim r = brick1.rect
+                    For i = brick1.index + task.bricksPerRow To brick2.index - 1 Step task.bricksPerRow
+                        r = r.Union(bricks.brickList(i).rect)
                     Next
-                    If foundLast = False Then
-                        indexV += 1
-                        dst1(r).SetTo(indexV)
-                    End If
+                    vRects.Add(r)
+                    dst1(r).SetTo(vRects.Count)
+
+                    Dim color = task.scalarColors(task.bricksPerRow * r.X \ dst2.Width Mod 255)
+                    dst3(r).SetTo(color)
                 End If
             Next
-            mats.mat(2) = Palettize(dst1)
 
-            mats.mat(3) = ShowAddweighted(src, mats.mat(2), labels(3))
-            labels(2) = CStr(indexV + indexH) + " regions were found that were connected in depth."
+            Dim rect As cv.Rect
+            If task.mousePicTag = 2 Then
+                Dim index = dst0.Get(Of Integer)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
+                If index = 0 Then Exit Sub
+                rect = hRects(index - 1)
+            Else
+                Dim index = dst1.Get(Of Integer)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
+                If index = 0 Then Exit Sub
+                rect = vRects(index - 1)
+            End If
 
-            mats.Run(emptyMat)
-            dst2 = mats.dst2
-            dst3 = mats.dst3
+            Dim brickIndex = task.gridMap.Get(Of Integer)(rect.Y, rect.X)
+            If brickIndex > 0 Then
+                labels(3) = "Depth = " + Format(bricks.brickList(brickIndex).depth, fmt1) + "m"
+                brickIndex = task.gridMap.Get(Of Integer)(rect.BottomRight.Y, rect.BottomRight.X)
+                labels(3) += " to " + Format(bricks.brickList(brickIndex).depth, fmt1) + "m"
+            Else
+                labels(3) = "No depth region present..."
+            End If
+        End Sub
+    End Class
+
+
+
+
+
+
+    Public Class XO_Region_Quads : Inherits TaskParent
+        Public quadMat As New cv.Mat
+        Public inputRects As New List(Of cv.Rect)
+        Dim bricks As New Brick_Basics
+        Public Sub New()
+            desc = "Build Quads for each rectangle in the list horizontal rectangles."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            bricks.Run(src)
+
+            If standalone Then
+                Static regions As New XO_Region_Basics
+                regions.Run(src)
+                dst2 = regions.dst2
+                dst3 = regions.dst3
+                inputRects = regions.hRects
+            End If
+
+            Dim quadData As New List(Of cv.Point3f)
+            For Each rect In inputRects
+                Dim index1 = task.gridMap.Get(Of Integer)(rect.Y, rect.X)
+                Dim index2 = task.gridMap.Get(Of Integer)(rect.BottomRight.Y - 1, rect.BottomRight.X - 1)
+                If index1 = 0 Or index2 = 0 Then Continue For
+
+                Dim brick1 = bricks.brickList(index1)
+                Dim brick2 = bricks.brickList(index2)
+
+                quadData.Add(New cv.Point3f(brick1.color(0), brick1.color(1), brick1.color(2)))
+
+                Dim p0 = Cloud_Basics.worldCoordinates(rect.TopLeft, brick1.depth)
+                Dim p1 = Cloud_Basics.worldCoordinates(rect.BottomRight, brick2.depth)
+
+                quadData.Add(New cv.Point3f(p0.X, p0.Y, brick1.depth))
+                quadData.Add(New cv.Point3f(p1.X, p0.Y, brick2.depth))
+                quadData.Add(New cv.Point3f(p1.X, p1.Y, brick2.depth))
+                quadData.Add(New cv.Point3f(p0.X, p1.Y, brick1.depth))
+            Next
+
+            quadMat = cv.Mat.FromPixelData(quadData.Count, 1, cv.MatType.CV_32FC3, quadData.ToArray)
+        End Sub
+    End Class
+
+
+
+
+
+
+
+    Public Class XO_Region_CoreOld : Inherits TaskParent
+        Public hTuples As New List(Of Tuple(Of Integer, Integer))
+        Public vTuples As New List(Of Tuple(Of Integer, Integer))
+        Dim colStart As Integer, colEnd As Integer, colorIndex As Integer
+        Dim rowStart As Integer, bottomRight As cv.Point, topLeft As cv.Point
+        Dim options As New Options_Features
+        Dim bricks As New Brick_Basics
+        Public Sub New()
+            desc = "Connect cells that are close in depth"
+        End Sub
+        Private Sub hTestRect(brick1 As brickData, brick2 As brickData, nextStart As Integer)
+            If Math.Abs(brick1.depth - brick2.depth) > task.depthDiffMeters Or nextStart = -1 Then
+                Dim p1 = bricks.brickList(colStart).rect.TopLeft
+                Dim p2 = bricks.brickList(colEnd).rect.BottomRight
+                dst2.Rectangle(p1, p2, task.scalarColors(colorIndex Mod 256), -1)
+                colorIndex += 1
+                hTuples.Add(New Tuple(Of Integer, Integer)(colStart, colEnd))
+                colStart = nextStart
+                colEnd = colStart
+            Else
+                colEnd += 1
+            End If
+        End Sub
+        Private Sub vTestRect(brick1 As brickData, brick2 As brickData, brickNext As Integer, nextStart As Integer)
+            If Math.Abs(brick1.depth - brick2.depth) > task.depthDiffMeters Or nextStart = -1 Then
+                bottomRight = bricks.brickList(brickNext).rect.BottomRight
+                dst3.Rectangle(topLeft, bottomRight, task.scalarColors(colorIndex Mod 256), -1)
+                colorIndex += 1
+                vTuples.Add(New Tuple(Of Integer, Integer)(rowStart, brickNext))
+                rowStart = nextStart
+                If nextStart >= 0 Then topLeft = bricks.brickList(rowStart).rect.TopLeft
+            End If
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            options.Run()
+            bricks.Run(src)
+
+            dst2.SetTo(0)
+            dst3.SetTo(0)
+
+            hTuples.Clear()
+            colorIndex = 0
+            For i = 0 To task.bricksPerCol - 1
+                colStart = i * task.bricksPerRow
+                colEnd = colStart
+                For j = 0 To task.bricksPerRow - 2
+                    hTestRect(bricks.brickList(i * task.bricksPerRow + j),
+                                  bricks.brickList(i * task.bricksPerRow + j + 1), i * task.bricksPerRow + j + 1)
+                Next
+                hTestRect(bricks.brickList(i * task.bricksPerRow + task.bricksPerCol - 1),
+                              bricks.brickList(i * task.bricksPerRow + task.bricksPerCol - 1), -1)
+            Next
+            labels(2) = CStr(colorIndex) + " horizontal slices were connected because cell depth difference < " +
+                        CStr(task.depthDiffMeters) + " meters"
+
+            vTuples.Clear()
+            Dim index As Integer
+            colorIndex = 0
+            For i = 0 To task.bricksPerRow - 1
+                rowStart = i
+                topLeft = bricks.brickList(i).rect.TopLeft
+                bottomRight = bricks.brickList(i + task.bricksPerRow).rect.TopLeft
+                For j = 0 To task.bricksPerCol - 2
+                    index = i + (j + 1) * task.bricksPerRow
+                    If index >= bricks.brickList.Count Then index = bricks.brickList.Count - 1
+                    vTestRect(bricks.brickList(i + j * task.bricksPerRow),
+                                  bricks.brickList(index), i + j * task.bricksPerRow, index)
+                Next
+                Dim brickNext = i + (task.bricksPerCol - 1) * task.bricksPerRow
+                If brickNext >= bricks.brickList.Count Then brickNext = bricks.brickList.Count - 1
+                vTestRect(bricks.brickList(brickNext), bricks.brickList(index), brickNext, -1)
+            Next
+
+            labels(3) = CStr(colorIndex) + " vertical slices were connected because cell depth difference < " +
+                        CStr(task.depthDiffMeters) + " meters"
+        End Sub
+    End Class
+
+
+
+
+
+
+
+
+    Public Class XO_Region_RectsHOld1 : Inherits TaskParent
+        Dim bricks As New Brick_Basics
+        Public hRects As New List(Of cv.Rect)
+        Dim connect As New XO_Region_Core
+        Public Sub New()
+            dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+            desc = "Connect bricks with similar depth - horizontally scanning."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            bricks.Run(src)
+            connect.Run(src)
+
+            dst2.SetTo(0)
+            dst3.SetTo(0)
+            hRects.Clear()
+            Dim index As Integer
+            For Each tup In connect.hTuples
+                If tup.Item1 = tup.Item2 Then Continue For
+                Dim brick1 = bricks.brickList(tup.Item1)
+                Dim brick2 = bricks.brickList(tup.Item2)
+
+                Dim w = brick2.rect.BottomRight.X - brick1.rect.X
+                Dim h = brick1.rect.Height
+
+                Dim r = New cv.Rect(brick1.rect.X + 1, brick1.rect.Y, w - 1, h)
+
+                hRects.Add(r)
+                dst2(r).SetTo(255)
+
+                index += 1
+                dst3(r).SetTo(task.scalarColors(index Mod 256))
+            Next
+        End Sub
+    End Class
+
+
+
+
+
+
+    Public Class XO_Region_RectsVOld : Inherits TaskParent
+        Dim bricks As New Brick_Basics
+        Public vRects As New List(Of cv.Rect)
+        Dim connect As New XO_Region_Core
+        Public Sub New()
+            dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+            desc = "Connect bricks with similar depth - vertically scanning."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            bricks.Run(src)
+
+            connect.Run(src)
+
+            dst2.SetTo(0)
+            dst3.SetTo(0)
+            vRects.Clear()
+            Dim index As Integer
+            For Each tup In connect.vTuples
+                If tup.Item1 = tup.Item2 Then Continue For
+                Dim brick1 = bricks.brickList(tup.Item1)
+                Dim brick2 = bricks.brickList(tup.Item2)
+
+                Dim w = brick1.rect.Width
+                Dim h = brick2.rect.BottomRight.Y - brick1.rect.Y
+
+                Dim r = New cv.Rect(brick1.rect.X, brick1.rect.Y + 1, w, h - 1)
+                vRects.Add(r)
+                dst2(r).SetTo(255)
+
+                index += 1
+                dst3(r).SetTo(task.scalarColors(index Mod 256))
+            Next
+        End Sub
+    End Class
+
+
+
+
+
+
+    Public Class XO_Region_RectsOld : Inherits TaskParent
+        Dim bricks As New Brick_Basics
+        Dim hConn As New XO_Region_RectsH
+        Dim vConn As New XO_Region_RectsV
+        Public Sub New()
+            desc = "Isolate the connected depth bricks both vertically and horizontally."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            bricks.Run(src)
+            hConn.Run(src)
+            vConn.Run(src)
+
+            dst2 = (Not vConn.dst2).ToMat Or (Not hConn.dst2).ToMat
+
+            dst3 = src
+            dst3.SetTo(0, dst2)
+        End Sub
+    End Class
+
+
+
+
+    Public Class XO_Region_DepthCorrelation : Inherits TaskParent
+        Dim bricks As New Brick_Basics
+        Public Sub New()
+            dst0 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
+            dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
+            labels(3) = "The matching bricks in the right view that were used in the correlation computation"
+            desc = "Create depth region markers using a correlation threshold"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            bricks.Run(src)
+
+            dst0.SetTo(0)
+            dst1.SetTo(0)
+            Dim count As Integer
+            For Each brick In bricks.brickList
+                If brick.correlation > task.fCorrThreshold Then
+                    dst0.Rectangle(brick.rRect, 255, -1)
+                    dst1.Rectangle(brick.rect, 255, -1)
+                    count += 1
+                End If
+            Next
+
+            dst2.SetTo(0)
+            src.CopyTo(dst2, dst1)
+
+            dst3.SetTo(0)
+            task.rightView.CopyTo(dst3, dst0)
+
+            labels(2) = Format(count / bricks.brickList.Count, "0%") + " of bricks had color correlation of " +
+                        Format(task.fCorrThreshold, "0.0%") + " or better"
+        End Sub
+    End Class
+
+
+    Public Class XO_Region_Palette : Inherits TaskParent
+        Dim bricks As New Brick_Basics
+        Dim regions As New XO_Region_Core
+        Public hRects As New List(Of cv.Rect)
+        Public vRects As New List(Of cv.Rect)
+        Public Sub New()
+            dst0 = New cv.Mat(dst0.Size, cv.MatType.CV_32S, 0)
+            dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_32S, 0)
+            labels(2) = "Move mouse over a line to see the depth values.  Results will be in Labels(3)"
+            desc = "Display bricks that are connected by depth vertically and horizontally."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            bricks.Run(src)
+            regions.Run(src)
+
+            hRects.Clear()
+            dst0.SetTo(0)
+            dst2.SetTo(0)
+            For Each tuple In regions.hTuples
+                Dim brick1 = bricks.brickList(tuple.Item1)
+                Dim brick2 = bricks.brickList(tuple.Item2)
+                If brick1.depth = 0 Or brick2.depth = 0 Then Continue For
+                If brick1.center.DistanceTo(brick2.center) > task.gridWH Then
+                    Dim r = brick1.rect
+                    For i = brick1.index + 1 To brick2.index - 1
+                        r = r.Union(bricks.brickList(i).rect)
+                    Next
+                    hRects.Add(r)
+                    dst0(r).SetTo(hRects.Count)
+
+                    Dim color = task.scalarColors(task.bricksPerCol * r.Y \ dst2.Height Mod 255)
+                    dst2(r).SetTo(color)
+                End If
+            Next
+
+            vRects.Clear()
+            dst1.SetTo(0)
+            dst3.SetTo(0)
+            For Each tuple In regions.vTuples
+                Dim brick1 = bricks.brickList(tuple.Item1)
+                Dim brick2 = bricks.brickList(tuple.Item2)
+                If brick1.depth = 0 Or brick2.depth = 0 Then Continue For
+                If brick1.center.DistanceTo(brick2.center) > task.gridWH Then
+                    Dim r = brick1.rect
+                    For i = brick1.index + task.bricksPerRow To brick2.index - 1 Step task.bricksPerRow
+                        r = r.Union(bricks.brickList(i).rect)
+                    Next
+                    vRects.Add(r)
+                    dst1(r).SetTo(vRects.Count)
+
+                    Dim color = task.scalarColors(task.bricksPerRow * r.X \ dst2.Width Mod 255)
+                    dst3(r).SetTo(color)
+                End If
+            Next
+
+            Dim rect As cv.Rect
+            If task.mousePicTag = 2 Then
+                Dim index = dst0.Get(Of Integer)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
+                If index = 0 Then Exit Sub
+                rect = hRects(index - 1)
+            Else
+                Dim index = dst1.Get(Of Integer)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
+                If index = 0 Then Exit Sub
+                rect = vRects(index - 1)
+            End If
+
+            Dim brickIndex = task.gridMap.Get(Of Integer)(rect.Y, rect.X)
+            If brickIndex > 0 Then
+                labels(3) = "Depth = " + Format(bricks.brickList(brickIndex).depth, fmt1) + "m"
+                brickIndex = task.gridMap.Get(Of Integer)(rect.BottomRight.Y, rect.BottomRight.X)
+                labels(3) += " to " + Format(bricks.brickList(brickIndex).depth, fmt1) + "m"
+            Else
+                labels(3) = "No depth region present..."
+            End If
+        End Sub
+    End Class
+
+
+
+
+
+
+    Public Class XO_Region_Quads1 : Inherits TaskParent
+        Public quadMat As New cv.Mat
+        Public inputRects As New List(Of cv.Rect)
+        Dim bricks As New Brick_Basics
+        Public Sub New()
+            desc = "Build Quads for each rectangle in the list horizontal rectangles."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            bricks.Run(src)
+
+            If standalone Then
+                Static regions As New XO_Region_Basics
+                regions.Run(src)
+                dst2 = regions.dst2
+                dst3 = regions.dst3
+                inputRects = regions.hRects
+            End If
+
+            Dim quadData As New List(Of cv.Point3f)
+            For Each rect In inputRects
+                Dim index1 = task.gridMap.Get(Of Integer)(rect.Y, rect.X)
+                Dim index2 = task.gridMap.Get(Of Integer)(rect.BottomRight.Y - 1, rect.BottomRight.X - 1)
+                If index1 = 0 Or index2 = 0 Then Continue For
+
+                Dim brick1 = bricks.brickList(index1)
+                Dim brick2 = bricks.brickList(index2)
+
+                quadData.Add(New cv.Point3f(brick1.color(0), brick1.color(1), brick1.color(2)))
+
+                Dim p0 = Cloud_Basics.worldCoordinates(rect.TopLeft, brick1.depth)
+                Dim p1 = Cloud_Basics.worldCoordinates(rect.BottomRight, brick2.depth)
+
+                quadData.Add(New cv.Point3f(p0.X, p0.Y, brick1.depth))
+                quadData.Add(New cv.Point3f(p1.X, p0.Y, brick2.depth))
+                quadData.Add(New cv.Point3f(p1.X, p1.Y, brick2.depth))
+                quadData.Add(New cv.Point3f(p0.X, p1.Y, brick1.depth))
+            Next
+
+            quadMat = cv.Mat.FromPixelData(quadData.Count, 1, cv.MatType.CV_32FC3, quadData.ToArray)
+        End Sub
+    End Class
+
+
+
+
+
+
+
+    Public Class XO_Region_CoreOld2 : Inherits TaskParent
+        Public hTuples As New List(Of Tuple(Of Integer, Integer))
+        Public vTuples As New List(Of Tuple(Of Integer, Integer))
+        Dim colStart As Integer, colEnd As Integer, colorIndex As Integer
+        Dim rowStart As Integer, bottomRight As cv.Point, topLeft As cv.Point
+        Dim options As New Options_Features
+        Dim bricks As New Brick_Basics
+        Public Sub New()
+            desc = "Connect cells that are close in depth"
+        End Sub
+        Private Sub hTestRect(brick1 As brickData, brick2 As brickData, nextStart As Integer)
+            If Math.Abs(brick1.depth - brick2.depth) > task.depthDiffMeters Or nextStart = -1 Then
+                Dim p1 = bricks.brickList(colStart).rect.TopLeft
+                Dim p2 = bricks.brickList(colEnd).rect.BottomRight
+                dst2.Rectangle(p1, p2, task.scalarColors(colorIndex Mod 256), -1)
+                colorIndex += 1
+                hTuples.Add(New Tuple(Of Integer, Integer)(colStart, colEnd))
+                colStart = nextStart
+                colEnd = colStart
+            Else
+                colEnd += 1
+            End If
+        End Sub
+        Private Sub vTestRect(brick1 As brickData, brick2 As brickData, brickNext As Integer, nextStart As Integer)
+            If Math.Abs(brick1.depth - brick2.depth) > task.depthDiffMeters Or nextStart = -1 Then
+                bottomRight = bricks.brickList(brickNext).rect.BottomRight
+                dst3.Rectangle(topLeft, bottomRight, task.scalarColors(colorIndex Mod 256), -1)
+                colorIndex += 1
+                vTuples.Add(New Tuple(Of Integer, Integer)(rowStart, brickNext))
+                rowStart = nextStart
+                If nextStart >= 0 Then topLeft = bricks.brickList(rowStart).rect.TopLeft
+            End If
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            options.Run()
+            bricks.Run(src)
+
+            dst2.SetTo(0)
+            dst3.SetTo(0)
+
+            hTuples.Clear()
+            colorIndex = 0
+            For i = 0 To task.bricksPerCol - 1
+                colStart = i * task.bricksPerRow
+                colEnd = colStart
+                For j = 0 To task.bricksPerRow - 2
+                    hTestRect(bricks.brickList(i * task.bricksPerRow + j),
+                                  bricks.brickList(i * task.bricksPerRow + j + 1), i * task.bricksPerRow + j + 1)
+                Next
+                hTestRect(bricks.brickList(i * task.bricksPerRow + task.bricksPerCol - 1),
+                              bricks.brickList(i * task.bricksPerRow + task.bricksPerCol - 1), -1)
+            Next
+            labels(2) = CStr(colorIndex) + " horizontal slices were connected because cell depth difference < " +
+                        CStr(task.depthDiffMeters) + " meters"
+
+            vTuples.Clear()
+            Dim index As Integer
+            colorIndex = 0
+            For i = 0 To task.bricksPerRow - 1
+                rowStart = i
+                topLeft = bricks.brickList(i).rect.TopLeft
+                bottomRight = bricks.brickList(i + task.bricksPerRow).rect.TopLeft
+                For j = 0 To task.bricksPerCol - 2
+                    index = i + (j + 1) * task.bricksPerRow
+                    If index >= bricks.brickList.Count Then index = bricks.brickList.Count - 1
+                    vTestRect(bricks.brickList(i + j * task.bricksPerRow),
+                                  bricks.brickList(index), i + j * task.bricksPerRow, index)
+                Next
+                Dim brickNext = i + (task.bricksPerCol - 1) * task.bricksPerRow
+                If brickNext >= bricks.brickList.Count Then brickNext = bricks.brickList.Count - 1
+                vTestRect(bricks.brickList(brickNext), bricks.brickList(index), brickNext, -1)
+            Next
+
+            labels(3) = CStr(colorIndex) + " vertical slices were connected because cell depth difference < " +
+                        CStr(task.depthDiffMeters) + " meters"
+        End Sub
+    End Class
+
+
+
+
+
+
+
+
+    Public Class XO_Region_RectsHOld : Inherits TaskParent
+        Dim bricks As New Brick_Basics
+        Public hRects As New List(Of cv.Rect)
+        Dim connect As New XO_Region_Core
+        Public Sub New()
+            dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+            desc = "Connect bricks with similar depth - horizontally scanning."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            bricks.Run(src)
+            connect.Run(src)
+
+            dst2.SetTo(0)
+            dst3.SetTo(0)
+            hRects.Clear()
+            Dim index As Integer
+            For Each tup In connect.hTuples
+                If tup.Item1 = tup.Item2 Then Continue For
+                Dim brick1 = bricks.brickList(tup.Item1)
+                Dim brick2 = bricks.brickList(tup.Item2)
+
+                Dim w = brick2.rect.BottomRight.X - brick1.rect.X
+                Dim h = brick1.rect.Height
+
+                Dim r = New cv.Rect(brick1.rect.X + 1, brick1.rect.Y, w - 1, h)
+
+                hRects.Add(r)
+                dst2(r).SetTo(255)
+
+                index += 1
+                dst3(r).SetTo(task.scalarColors(index Mod 256))
+            Next
+        End Sub
+    End Class
+
+
+
+
+
+
+    Public Class XO_Region_RectsVOld1 : Inherits TaskParent
+        Dim bricks As New Brick_Basics
+        Public vRects As New List(Of cv.Rect)
+        Dim connect As New XO_Region_Core
+        Public Sub New()
+            dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+            desc = "Connect bricks with similar depth - vertically scanning."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            bricks.Run(src)
+
+            connect.Run(src)
+
+            dst2.SetTo(0)
+            dst3.SetTo(0)
+            vRects.Clear()
+            Dim index As Integer
+            For Each tup In connect.vTuples
+                If tup.Item1 = tup.Item2 Then Continue For
+                Dim brick1 = bricks.brickList(tup.Item1)
+                Dim brick2 = bricks.brickList(tup.Item2)
+
+                Dim w = brick1.rect.Width
+                Dim h = brick2.rect.BottomRight.Y - brick1.rect.Y
+
+                Dim r = New cv.Rect(brick1.rect.X, brick1.rect.Y + 1, w, h - 1)
+                vRects.Add(r)
+                dst2(r).SetTo(255)
+
+                index += 1
+                dst3(r).SetTo(task.scalarColors(index Mod 256))
+            Next
+        End Sub
+    End Class
+
+
+
+
+
+
+    Public Class XO_Region_RectsOld2 : Inherits TaskParent
+        Dim bricks As New Brick_Basics
+        Dim hConn As New XO_Region_RectsH
+        Dim vConn As New XO_Region_RectsV
+        Public Sub New()
+            desc = "Isolate the connected depth bricks both vertically and horizontally."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            bricks.Run(src)
+            hConn.Run(src)
+            vConn.Run(src)
+
+            dst2 = (Not vConn.dst2).ToMat Or (Not hConn.dst2).ToMat
+
+            dst3 = src
+            dst3.SetTo(0, dst2)
+        End Sub
+    End Class
+
+
+
+
+    Public Class XO_Region_DepthCorrelation1 : Inherits TaskParent
+        Dim bricks As New Brick_Basics
+        Public Sub New()
+            dst0 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
+            dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
+            labels(3) = "The matching bricks in the right view that were used in the correlation computation"
+            desc = "Create depth region markers using a correlation threshold"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            bricks.Run(src)
+
+            dst0.SetTo(0)
+            dst1.SetTo(0)
+            Dim count As Integer
+            For Each brick In bricks.brickList
+                If brick.correlation > task.fCorrThreshold Then
+                    dst0.Rectangle(brick.rRect, 255, -1)
+                    dst1.Rectangle(brick.rect, 255, -1)
+                    count += 1
+                End If
+            Next
+
+            dst2.SetTo(0)
+            src.CopyTo(dst2, dst1)
+
+            dst3.SetTo(0)
+            task.rightView.CopyTo(dst3, dst0)
+
+            labels(2) = Format(count / bricks.brickList.Count, "0%") + " of bricks had color correlation of " +
+                        Format(task.fCorrThreshold, "0.0%") + " or better"
         End Sub
     End Class
 
@@ -2664,7 +3294,7 @@ Namespace VBClasses
 
 
     Public Class XO_Region_Gaps : Inherits TaskParent
-        Dim connect As New Region_Core
+        Dim connect As New XO_Region_Core
         Dim bricks As New Brick_Basics
         Public Sub New()
             labels(2) = "bricks with single cells removed for both vertical and horizontal connected cells."
@@ -9665,7 +10295,7 @@ Namespace VBClasses
 
 
     Public Class XO_RedCloud_Contours : Inherits TaskParent
-        Dim prep As New RedPrep_Depth
+        Dim prep As New XO_RedPrep_Depth
         Dim contours As New Contour_Basics
         Public Sub New()
             dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
@@ -9737,7 +10367,7 @@ Namespace VBClasses
 
 
     Public Class XO_RedCloud_PrepOutline : Inherits TaskParent
-        Public prep As New RedPrep_Depth
+        Public prep As New XO_RedPrep_Depth
         Public Sub New()
             desc = "Remove corners of RedCloud cells in the prep data."
         End Sub
@@ -9920,7 +10550,7 @@ Namespace VBClasses
 
 
     Public Class XO_RedCloud_PrepEdgesXY : Inherits TaskParent
-        Dim prep As New RedPrep_Depth
+        Dim prep As New XO_RedPrep_Depth
         Dim redMask As New XO_RedFlood_BasicsTest
         Dim cellGen As New XO_RedFlood_ToRedColor
         Public Sub New()
@@ -18922,7 +19552,7 @@ Namespace VBClasses
 
     Public Class XO_Region_Contours : Inherits TaskParent
         Public redM As New XO_RedFlood_BasicsTest
-        Public connect As New Region_Rects
+        Public connect As New XO_Region_Rects
         Public Sub New()
             dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
             desc = "Find the main regions connected in depth and build a contour for each."
@@ -21255,7 +21885,7 @@ Namespace VBClasses
 
     Public Class XO_Region_Depth : Inherits TaskParent
         Public redMask As New XO_RedFlood_BasicsTest
-        Public connect As New Region_Rects
+        Public connect As New XO_Region_Rects
         Public mdLargest As New List(Of maskData)
         Dim bricks As New Brick_Basics
         Public Sub New()
@@ -22407,6 +23037,1358 @@ Namespace VBClasses
             dst3 = plot.dst2
         End Sub
     End Class
+
+
+
+
+    Public Class XO_RedWGrid_BasicsOld : Inherits TaskParent
+        Public redC As New RedCloud_Basics
+        Public rcList As New List(Of rcDataOld)
+        Public rcMap As New cv.Mat(dst2.Size, cv.MatType.CV_32S, 0)
+        Public Sub New()
+            dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
+            desc = "Consolidate duplicate world grid coordinates."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            redC.Run(src)
+            labels(2) = redC.labels(2)
+
+            Dim dups As New SortedList(Of String, Integer)(New compareAllowIdenticalString)
+            For Each rc In redC.rcList
+                dups.Add(Format(rc.wGrid.X, "000") + Format(rc.wGrid.Y, "000") + Format(rc.wGrid.Z, "000"),
+                                        rc.mapID - 1)
+            Next
+
+            Dim newList As New List(Of rcDataOld)
+            Dim rc1 As rcDataOld = Nothing
+            Dim rc2 As rcDataOld = Nothing
+            Dim r As cv.Rect
+            dst1.SetTo(0)
+            For i = 1 To dups.Count - 1
+                If rc1 Is Nothing Then rc1 = redC.rcList(dups.Values(i - 1))
+                rc2 = redC.rcList(dups.Values(i))
+
+                If rc1.wGrid.X = rc2.wGrid.X And rc1.wGrid.Y = rc2.wGrid.Y And
+                            Math.Abs(rc1.wcMean(2) - rc2.wcMean(2)) < 1.0 Then
+                    r = rc1.rect.Union(rc2.rect)
+                    dst1(r).SetTo(0)
+                    dst1(rc1.rect).SetTo(255, rc1.mask)
+                    dst1(rc2.rect).SetTo(255, rc2.mask)
+                    rc1.rect = r
+                    rc1.mask = dst1(r).Clone
+                    ' take the values of depthdelta and wcmean from the larger of the 2 rcDataOld's
+                    If rc1.pixels < rc2.pixels Then
+                        rc1.depthDelta = rc2.depthDelta
+                        rc1.wcMean = rc2.wcMean
+                    End If
+                    rc1.multiMask = True
+                    If rc1.wGrid.X = -2 And rc1.wGrid.Y = 0 Then Dim k = 0
+                Else
+                    If rc1.multiMask Then
+                        rc1.contour = New List(Of cv.Point)
+                        rc1.hull = New List(Of cv.Point)
+                        rc1.pixels = rc1.mask.CountNonZero
+                    End If
+                    newList.Add(rc1)
+                    rc1 = Nothing
+                End If
+            Next
+
+            If rc1 IsNot Nothing Then
+                rc1.contour = New List(Of cv.Point)
+                rc1.hull = New List(Of cv.Point)
+                rc1.pixels = rc1.mask.CountNonZero
+                newList.Add(rc1)
+            Else
+                newList.Add(rc2)
+            End If
+
+            rcList.Clear()
+            rcMap.SetTo(0)
+            dst2.SetTo(0)
+            Dim count As Integer
+            For Each rc In newList
+                If rc IsNot Nothing Then
+                    If rc.multiMask Then count += 1
+                    rc.mapID = rcList.Count + 1
+                    rcMap(rc.rect).SetTo(rc.mapID, rc.mask)
+                    rcList.Add(rc)
+                    dst2(rc.rect).SetTo(rc.color, rc.mask)
+
+                    If task.gOptions.DebugCheckBox.Checked And rc.multiMask Then
+                        dst2(rc.rect).SetTo(task.highlight, rc.mask)
+                    End If
+                End If
+            Next
+
+            strOut = Utility_Basics.selectCell(rcMap, rcList)
+            SetTrueText(strOut, 3)
+
+            labels(2) = CStr(rcList.Count) + " cells remain after merging masks for " + CStr(count) + " wGrid points."
+            labels(3) = CStr(count) + " multi-mask cells found"
+        End Sub
+    End Class
+
+
+
+
+
+    Public Class XO_RedWGrid_Basics2 : Inherits TaskParent
+        Public prepData As New RedPrep_Core
+        Dim redC As New RedCloud_Basics
+        Public Sub New()
+            labels(3) = "Use debug slider to select region to display."
+            OptionParent.findRadio("X Reduction").Checked = True
+            desc = "Run RedCloud on the output of RedPrep_Core"
+        End Sub
+        Public Shared Function countClasses(input As cv.Mat, ByRef label As String) As cv.Mat
+            Dim histogram As New cv.Mat
+            cv.Cv2.CalcHist({input}, {0}, task.depthmask, histogram, 1, {256}, {New cv.Rangef(0, 256)})
+            Dim histArray(255) As Single
+            histogram.GetArray(Of Single)(histArray)
+
+            Dim sizeThreshold = input.Total * 0.001 ' ignore regions less than 0.1% - 1/10th of 1%
+            Dim lutArray(255) As Byte
+            Dim regionList As New List(Of Integer)
+            For i = 1 To histArray.Count - 1
+                If histArray(i) > sizeThreshold Then
+                    regionList.Add(i)
+                    lutArray(i) = regionList.Count
+                End If
+            Next
+
+            Dim lut As New cv.Mat(1, 256, cv.MatType.CV_8U)
+            lut.SetArray(Of Byte)(lutArray)
+
+            label = CStr(regionList.Count) + " non-zero regions more than " + CStr(sizeThreshold) + " pixels"
+            Return lut
+        End Function
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            prepData.Run(emptyMat)
+
+            dst3 = prepData.reduced32s.Normalize(255, 0, cv.NormTypes.MinMax)
+            dst3.ConvertTo(dst3, cv.MatType.CV_8U)
+            dst3.SetTo(0, task.noDepthMask)
+
+            redC.Run(dst3)
+            dst2 = redC.dst2
+            labels(2) = redC.labels(2)
+        End Sub
+    End Class
+
+
+
+
+    Public Class XO_RedWGrid_PrepData : Inherits TaskParent
+        Dim prepData As New RedPrep_Core
+        Public Sub New()
+            desc = "Prepare the grid of point cloud data."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            prepData.Run(emptyMat)
+            dst3 = prepData.reduced32s.Normalize(255, 0, cv.NormTypes.MinMax)
+            dst3.SetTo(0, task.noDepthMask)
+            dst2 = Palettize(dst3, 0)
+            labels(2) = prepData.labels(2)
+
+            Dim val = prepData.reduced32f.Get(Of Single)(task.clickPoint.Y, task.clickPoint.X)
+            SetTrueText("Depth = " + Format(val, fmt3), 3)
+        End Sub
+    End Class
+
+
+
+
+    Public Class XO_RedWGrid_Basics1 : Inherits TaskParent
+        Public prepData As New RedPrep_Core
+        Public lut As New cv.Mat
+        Public lutList As New List(Of Byte)
+        Public Sub New()
+            task.gOptions.DebugSlider.Value = 1
+            labels(3) = "Use debug slider to select region to display."
+            OptionParent.findRadio("X Reduction").Checked = True
+            desc = "Prepare the grid of point cloud data."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            prepData.Run(emptyMat)
+            labels(2) = prepData.labels(2)
+
+            lut = XO_RedWGrid_Basics2.countClasses(prepData.dst2.Clone, labels(2))
+            lutList.Clear()
+            For i = 0 To lut.Cols - 1
+                Dim val = lut.Get(Of Byte)(0, i)
+                If val > 0 Then lutList.Add(val)
+            Next
+            dst1 = prepData.dst2.LUT(lut)
+            dst2 = Palettize(dst1, 0)
+
+            If standalone Then
+                Dim index = Math.Abs(task.gOptions.DebugSlider.Value)
+                If index < lutList.Count Then
+                    dst3 = dst1.InRange(index, index)
+                End If
+            End If
+        End Sub
+    End Class
+
+
+
+
+
+    Public Class XO_RedWGrid_PrepXY : Inherits TaskParent
+        Public RedWGrid As New XO_RedWGrid_Basics2
+        Public Sub New()
+            OptionParent.findRadio("XY Reduction").Checked = True
+            desc = "Prep the XY regions in the reduced depth data."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            RedWGrid.Run(src)
+            dst2 = Palettize(RedWGrid.dst1, 0)
+            labels(2) = RedWGrid.labels(2)
+        End Sub
+    End Class
+
+
+
+
+
+    Public Class XO_RedWGrid_Validate : Inherits TaskParent
+        Dim RedWGrid As New XO_RedWGrid_PrepY
+        Public Sub New()
+            dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
+            task.gOptions.displayDst1.Checked = True
+            desc = "Identify the different regions in the RedWGrid_PrepX/Y using the debugslider"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            RedWGrid.Run(src)
+            dst2 = RedWGrid.dst2
+            labels(2) = RedWGrid.labels(2)
+
+            Dim mm = GetMinMax(RedWGrid.prepData.reduced32f)
+            If mm.minVal = mm.maxVal Then Exit Sub ' there is no data in reduced32f
+            Dim ranges = {New cv.Rangef(mm.minVal, mm.maxVal)}
+            Dim histogram As New cv.Mat
+            Dim histBins As Integer = 500
+            cv.Cv2.CalcHist({RedWGrid.prepData.reduced32f}, {0}, task.depthmask, histogram, 1, {histBins}, ranges)
+            Dim histArray(histogram.Rows - 1) As Single
+            histogram.GetArray(Of Single)(histArray)
+            Dim incr = mm.range / histBins
+
+            dst1.SetTo(0)
+            For i = 0 To histArray.Count - 1
+                Dim tmp = RedWGrid.prepData.reduced32f.InRange(mm.minVal + incr * i, mm.minVal + incr * (i + 1))
+                dst1.SetTo(i + 1, tmp)
+            Next
+            dst1.SetTo(0, task.noDepthMask)
+
+            dst3 = Palettize(dst1, 0)
+        End Sub
+    End Class
+
+
+
+
+    Public Class XO_RedWGrid_CheckerBoardWall : Inherits TaskParent
+        Public prepData As New RedPrep_Core
+        Public classCount As Integer
+        Dim edges As New Edge_Basics_TA
+        Public Sub New()
+            desc = "Use this algorithm to build a checkerboard when pointing at a wall."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            ' prepData.reductionName = "XY Reduction" ' default
+            prepData.Run(src)
+
+            Dim lut = XO_RedWGrid_Basics2.countClasses(prepData.dst2, labels(2))
+            dst2 = prepData.dst2.LUT(lut)
+
+            edges.Run(dst2)
+            dst3 = edges.dst2
+        End Sub
+    End Class
+
+
+
+
+
+    Public Class XO_RedWGrid_CPP : Inherits TaskParent
+        Implements IDisposable
+        Dim prep As New RedPrep_Basics
+        Public Sub New()
+            cPtr = RedCart_CPP_Open()
+            desc = "Hit the locations where floodfill slips up by placeing a dot in the intersection."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            prep.Run(src)
+            dst2 = prep.dst1
+            labels(2) = prep.labels(2)
+
+            Dim cppData(dst2.Total - 1) As Byte
+            dst2.GetArray(Of Byte)(cppData)
+            Dim handleSrc = GCHandle.Alloc(cppData, GCHandleType.Pinned)
+            Dim imagePtr = RedCart_CPP_RunCPP(cPtr, handleSrc.AddrOfPinnedObject(), dst2.Rows, dst2.Cols)
+            handleSrc.Free()
+
+            dst3 = cv.Mat.FromPixelData(src.Rows, src.Cols, cv.MatType.CV_8U, imagePtr).Clone
+            dst3.SetTo(255, task.noDepthMask)
+            dst2.SetTo(0, dst3)
+        End Sub
+        Protected Overrides Sub Finalize()
+            RedCart_CPP_Close(cPtr)
+        End Sub
+    End Class
+
+
+
+
+    Public Class XO_RedWGrid_PrepXOld : Inherits TaskParent
+        Public prepData As New RedPrep_Core
+        Public classCount As Integer
+        Public lut As cv.Mat
+        Public Sub New()
+            OptionParent.findRadio("X Reduction").Checked = True
+            desc = "Prep the vertical regions in the reduced depth data."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            prepData.Run(src)
+            dst2 = prepData.dst3
+
+            Dim lut = XO_RedWGrid_Basics2.countClasses(prepData.dst2, labels(2))
+            dst2 = prepData.dst2.LUT(lut)
+        End Sub
+    End Class
+
+
+
+    Public Class XO_RedWGrid_PrepY : Inherits TaskParent
+        Public prepData As New RedPrep_Core
+        Public classCount As Integer
+        Public Sub New()
+            OptionParent.findRadio("Y Reduction").Checked = True
+            desc = "Prep the horizontal regions in the reduced depth data."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            prepData.Run(src)
+            dst2 = prepData.dst3
+
+            Dim lut = XO_RedWGrid_Basics2.countClasses(prepData.dst2, labels(2))
+            dst2 = prepData.dst2.LUT(lut)
+        End Sub
+    End Class
+
+
+
+
+    Public Class XO_RedWGrid_PrepXYAlt : Inherits TaskParent
+        Dim redX As New XO_RedWGrid_PrepX
+        Dim redY As New XO_RedWGrid_PrepY
+        Public Sub New()
+            dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
+            dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+            dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
+
+            If standalone Then task.gOptions.displayDst1.Checked = True
+            desc = "Add the output of PrepX and PrepY.  Point camera at a wall for interesting results."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            redX.Run(src)
+            dst1 = redX.dst2
+            dst1.SetTo(0, task.noDepthMask)
+            labels(1) = CStr(redX.classCount) + " regions were found"
+
+            redY.Run(src)
+            dst3 = redY.dst2
+            dst3.SetTo(0, task.noDepthMask)
+            labels(3) = CStr(redY.classCount) + " regions were found"
+
+            dst2 = dst1 Or dst3
+            labels(2) = CStr(redX.classCount + redY.classCount) + " regions were found"
+        End Sub
+    End Class
+
+
+
+
+
+    Public Class XO_RedWGrid_PrepX : Inherits TaskParent
+        Public prepData As New RedPrep_Core
+        Public classCount As Integer
+        Public Sub New()
+            OptionParent.findRadio("X Reduction").Checked = True
+            desc = "Prep the vertical regions in the reduced depth data."
+        End Sub
+
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            prepData.Run(src)
+            dst2 = prepData.dst3
+
+            Dim lut = XO_RedWGrid_Basics2.countClasses(prepData.dst2, labels(2))
+            dst2 = prepData.dst2.LUT(lut)
+        End Sub
+    End Class
+
+
+
+
+
+    Public Class XO_RedWGrid_Debug : Inherits TaskParent
+        Dim RedWGrid As New XO_RedWGrid_Basics1
+        Public classCount As Integer
+        Public Sub New()
+            If standalone Then task.gOptions.displayDst1.Checked = True
+            desc = "Identify each region using the debug slider."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            RedWGrid.Run(emptyMat)
+            dst3 = RedWGrid.dst2
+            labels(3) = RedWGrid.labels(2)
+            strOut = ""
+
+            For i = 1 To RedWGrid.lutList.Count - 1
+                dst2 = RedWGrid.dst1.InRange(i, i)
+                Dim mean = RedWGrid.prepData.reduced32s.Mean(dst2)
+                strOut += "Mean of selected region " + CStr(i) + " = " + Format(mean(0), fmt0) + "  "
+                If i Mod 2 = 0 Then strOut += vbCrLf
+            Next
+
+            dst2 = (RedWGrid.prepData.reduced32s - -1000) * 255 / (2000)
+            dst2.ConvertTo(dst2, cv.MatType.CV_8U)
+            dst2.SetTo(0, task.noDepthMask)
+
+
+            labels(1) = CStr(RedWGrid.lutList.Count) + " non-zero regions."
+            SetTrueText(strOut, 1)
+        End Sub
+    End Class
+
+
+
+
+    Public Class XO_RedWGrid_Basics : Inherits TaskParent
+        Public redC As New RedCloud_Basics
+        Dim currSet As New List(Of cv.Point3d)
+        Public Sub New()
+            If standalone Then task.gOptions.displayDst1.Checked = True
+            desc = "Identify where RedCloud world coordinates are changing"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            redC.Run(src)
+            dst2 = redC.dst2
+            labels(2) = redC.labels(2)
+
+            Dim lastSet As New List(Of cv.Point3d)(currSet)
+            dst2.SetTo(0)
+            Static count As Integer
+            If task.heartBeatLT Or task.frameCount = 2 Then
+                dst3.SetTo(0)
+                count = 0
+            End If
+            currSet.Clear()
+            For Each rc In redC.rcList
+                currSet.Add(rc.wGrid)
+                If lastSet.Contains(rc.wGrid) Then
+                    dst2(rc.rect).SetTo(rc.color, rc.mask)
+                Else
+                    dst3(rc.rect).SetTo(rc.color, rc.mask)
+                    count += 1
+                End If
+            Next
+
+            SetTrueText(redC.strOut, 1)
+
+            labels(3) = CStr(count) + " unstable cells = not matched since the last heartbeatLT"
+        End Sub
+    End Class
+
+
+
+
+
+    Public Class XO_RedWGrid_Click : Inherits TaskParent
+        Dim dups As New XO_RedWGrid_Basics
+        Dim options As New Options_WGrid
+        Public Sub New()
+            desc = "Click on any RedCloud cell to see similar cells connected by the wGrid point."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            options.Run()
+
+            dups.Run(src)
+            dst2 = dups.dst2
+            labels(2) = dups.labels(2)
+
+            SetTrueText(dups.strOut, 3)
+
+            Select Case options.clickName
+                Case "Identify Row"
+                    Dim row = task.rcD.wGrid.Y
+                    For Each rc In dups.redC.rcList
+                        If rc.wGrid.Y = row Then
+                            dst2(rc.rect).SetTo(white, rc.mask)
+                        End If
+                    Next
+                    labels(3) = "Row " + CStr(row) + " selected"
+                Case "Identify Col"
+                    Dim col = task.rcD.wGrid.X
+                    For Each rc In dups.redC.rcList
+                        If rc.wGrid.X = col Then
+                            dst2(rc.rect).SetTo(white, rc.mask)
+                        End If
+                    Next
+                    labels(3) = "Col " + CStr(col) + " selected"
+                Case "Identify Neighbors"
+                    Dim row = task.rcD.wGrid.Y
+                    Dim col = task.rcD.wGrid.X
+                    For Each rc In dups.redC.rcList
+                        If Math.Abs(task.rcD.wGrid.X - rc.wGrid.X) <= 1 And
+                                   Math.Abs(task.rcD.wGrid.Y - rc.wGrid.Y) <= 1 Then
+                            dst2(rc.rect).SetTo(white, rc.mask)
+                        End If
+                    Next
+                Case "Identify Multi-Mask Cells"
+                    For Each rc In dups.redC.rcList
+                        If rc.multiMask Then dst2(rc.rect).SetTo(white, rc.mask)
+                    Next
+            End Select
+
+        End Sub
+    End Class
+
+
+
+
+    Public Class XO_RedWGrid_Pattern : Inherits TaskParent
+        Dim redC As New RedCloud_Basics
+        Dim points As New List(Of cv.Point)
+        Dim colorIndex As Integer
+        Public Sub New()
+            If standalone Then task.gOptions.displayDst1.Checked = True
+            labels = {"", "", "World Grid X lines", "World Grid Y Lines"}
+            desc = "Highlight the layout pattern of the World Grid."
+        End Sub
+        Private Sub nextLine(x As Integer, y As Integer, dst As cv.Mat)
+            Dim pt = New cv.Point(x, y)
+            Dim index = points.IndexOf(pt)
+            If index >= 0 Then
+                Dim rc = redC.rcList(index)
+                dst(rc.rect).SetTo(task.scalarColors(colorIndex), rc.mask)
+            End If
+
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            redC.Run(src)
+            If task.toggleOn Then
+                dst1 = redC.dst2
+            Else
+                dst1.SetTo(0)
+                SetTrueText(redC.strOut, 1)
+            End If
+            labels(1) = redC.labels(2)
+
+            points.Clear()
+
+            For Each rc In redC.rcList
+                points.Add(New cv.Point(rc.wGrid.X, rc.wGrid.Y))
+            Next
+
+            colorIndex = 0
+            dst2 = dst1.Clone
+            For y = -10 To 10
+                For x = -10 To 10
+                    nextLine(x, y, dst2)
+                Next
+                colorIndex += 1
+            Next
+
+            dst3 = dst1.Clone
+            colorIndex = 0
+            For x = -10 To 10
+                For y = -10 To 10
+                    nextLine(x, y, dst3)
+                Next
+                colorIndex += 1
+            Next
+        End Sub
+    End Class
+
+
+
+    Public Class XO_Region_Basics : Inherits TaskParent
+        Dim bricks As New Brick_Basics
+        Dim regions As New XO_Region_Core
+        Public hRects As New List(Of cv.Rect)
+        Public vRects As New List(Of cv.Rect)
+        Public Sub New()
+            dst0 = New cv.Mat(dst0.Size, cv.MatType.CV_32S, 0)
+            dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_32S, 0)
+            labels(2) = "Move mouse over a line to see the depth values.  Results will be in Labels(3)"
+            desc = "Display bricks that are connected by depth vertically and horizontally."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            bricks.Run(src)
+            regions.Run(src)
+
+            hRects.Clear()
+            dst0.SetTo(0)
+            dst2.SetTo(0)
+            For Each tuple In regions.hTuples
+                Dim brick1 = bricks.brickList(tuple.Item1)
+                Dim brick2 = bricks.brickList(tuple.Item2)
+                If brick1.depth = 0 Or brick2.depth = 0 Then Continue For
+                If brick1.center.DistanceTo(brick2.center) > task.gridWH Then
+                    Dim r = brick1.rect
+                    For i = brick1.index + 1 To brick2.index - 1
+                        r = r.Union(bricks.brickList(i).rect)
+                    Next
+                    hRects.Add(r)
+                    dst0(r).SetTo(hRects.Count)
+
+                    Dim color = task.scalarColors(task.bricksPerCol * r.Y \ dst2.Height Mod 255)
+                    dst2(r).SetTo(color)
+                End If
+            Next
+
+            vRects.Clear()
+            dst1.SetTo(0)
+            dst3.SetTo(0)
+            For Each tuple In regions.vTuples
+                Dim brick1 = bricks.brickList(tuple.Item1)
+                Dim brick2 = bricks.brickList(tuple.Item2)
+                If brick1.depth = 0 Or brick2.depth = 0 Then Continue For
+                If brick1.center.DistanceTo(brick2.center) > task.gridWH Then
+                    Dim r = brick1.rect
+                    For i = brick1.index + task.bricksPerRow To brick2.index - 1 Step task.bricksPerRow
+                        r = r.Union(bricks.brickList(i).rect)
+                    Next
+                    vRects.Add(r)
+                    dst1(r).SetTo(vRects.Count)
+
+                    Dim color = task.scalarColors(task.bricksPerRow * r.X \ dst2.Width Mod 255)
+                    dst3(r).SetTo(color)
+                End If
+            Next
+
+            Dim rect As cv.Rect
+            If task.mousePicTag = 2 Then
+                Dim index = dst0.Get(Of Integer)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
+                If index = 0 Then Exit Sub
+                rect = hRects(index - 1)
+            Else
+                Dim index = dst1.Get(Of Integer)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
+                If index = 0 Then Exit Sub
+                rect = vRects(index - 1)
+            End If
+
+            Dim brickIndex = task.gridMap.Get(Of Integer)(rect.Y, rect.X)
+            If brickIndex > 0 Then
+                labels(3) = "Depth = " + Format(bricks.brickList(brickIndex).depth, fmt1) + "m"
+                brickIndex = task.gridMap.Get(Of Integer)(rect.BottomRight.Y, rect.BottomRight.X)
+                labels(3) += " to " + Format(bricks.brickList(brickIndex).depth, fmt1) + "m"
+            Else
+                labels(3) = "No depth region present..."
+            End If
+        End Sub
+    End Class
+
+
+
+
+
+
+    Public Class XO_Region_Quads2 : Inherits TaskParent
+        Public quadMat As New cv.Mat
+        Public inputRects As New List(Of cv.Rect)
+        Dim bricks As New Brick_Basics
+        Public Sub New()
+            desc = "Build Quads for each rectangle in the list horizontal rectangles."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            bricks.Run(src)
+
+            If standalone Then
+                Static regions As New XO_Region_Basics
+                regions.Run(src)
+                dst2 = regions.dst2
+                dst3 = regions.dst3
+                inputRects = regions.hRects
+            End If
+
+            Dim quadData As New List(Of cv.Point3f)
+            For Each rect In inputRects
+                Dim index1 = task.gridMap.Get(Of Integer)(rect.Y, rect.X)
+                Dim index2 = task.gridMap.Get(Of Integer)(rect.BottomRight.Y - 1, rect.BottomRight.X - 1)
+                If index1 = 0 Or index2 = 0 Then Continue For
+
+                Dim brick1 = bricks.brickList(index1)
+                Dim brick2 = bricks.brickList(index2)
+
+                quadData.Add(New cv.Point3f(brick1.color(0), brick1.color(1), brick1.color(2)))
+
+                Dim p0 = Cloud_Basics.worldCoordinates(rect.TopLeft, brick1.depth)
+                Dim p1 = Cloud_Basics.worldCoordinates(rect.BottomRight, brick2.depth)
+
+                quadData.Add(New cv.Point3f(p0.X, p0.Y, brick1.depth))
+                quadData.Add(New cv.Point3f(p1.X, p0.Y, brick2.depth))
+                quadData.Add(New cv.Point3f(p1.X, p1.Y, brick2.depth))
+                quadData.Add(New cv.Point3f(p0.X, p1.Y, brick1.depth))
+            Next
+
+            quadMat = cv.Mat.FromPixelData(quadData.Count, 1, cv.MatType.CV_32FC3, quadData.ToArray)
+        End Sub
+    End Class
+
+
+
+
+
+
+
+    Public Class XO_Region_Core : Inherits TaskParent
+        Public hTuples As New List(Of Tuple(Of Integer, Integer))
+        Public vTuples As New List(Of Tuple(Of Integer, Integer))
+        Dim colStart As Integer, colEnd As Integer, colorIndex As Integer
+        Dim rowStart As Integer, bottomRight As cv.Point, topLeft As cv.Point
+        Dim options As New Options_Features
+        Dim bricks As New Brick_Basics
+        Public Sub New()
+            desc = "Connect cells that are close in depth"
+        End Sub
+        Private Sub hTestRect(brick1 As brickData, brick2 As brickData, nextStart As Integer)
+            If Math.Abs(brick1.depth - brick2.depth) > task.depthDiffMeters Or nextStart = -1 Then
+                Dim p1 = bricks.brickList(colStart).rect.TopLeft
+                Dim p2 = bricks.brickList(colEnd).rect.BottomRight
+                dst2.Rectangle(p1, p2, task.scalarColors(colorIndex Mod 256), -1)
+                colorIndex += 1
+                hTuples.Add(New Tuple(Of Integer, Integer)(colStart, colEnd))
+                colStart = nextStart
+                colEnd = colStart
+            Else
+                colEnd += 1
+            End If
+        End Sub
+        Private Sub vTestRect(brick1 As brickData, brick2 As brickData, brickNext As Integer, nextStart As Integer)
+            If Math.Abs(brick1.depth - brick2.depth) > task.depthDiffMeters Or nextStart = -1 Then
+                bottomRight = bricks.brickList(brickNext).rect.BottomRight
+                dst3.Rectangle(topLeft, bottomRight, task.scalarColors(colorIndex Mod 256), -1)
+                colorIndex += 1
+                vTuples.Add(New Tuple(Of Integer, Integer)(rowStart, brickNext))
+                rowStart = nextStart
+                If nextStart >= 0 Then topLeft = bricks.brickList(rowStart).rect.TopLeft
+            End If
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            options.Run()
+            bricks.Run(src)
+
+            dst2.SetTo(0)
+            dst3.SetTo(0)
+
+            hTuples.Clear()
+            colorIndex = 0
+            For i = 0 To task.bricksPerCol - 1
+                colStart = i * task.bricksPerRow
+                colEnd = colStart
+                For j = 0 To task.bricksPerRow - 2
+                    hTestRect(bricks.brickList(i * task.bricksPerRow + j),
+                                      bricks.brickList(i * task.bricksPerRow + j + 1), i * task.bricksPerRow + j + 1)
+                Next
+                hTestRect(bricks.brickList(i * task.bricksPerRow + task.bricksPerCol - 1),
+                                  bricks.brickList(i * task.bricksPerRow + task.bricksPerCol - 1), -1)
+            Next
+            labels(2) = CStr(colorIndex) + " horizontal slices were connected because cell depth difference < " +
+                            CStr(task.depthDiffMeters) + " meters"
+
+            vTuples.Clear()
+            Dim index As Integer
+            colorIndex = 0
+            For i = 0 To task.bricksPerRow - 1
+                rowStart = i
+                topLeft = bricks.brickList(i).rect.TopLeft
+                bottomRight = bricks.brickList(i + task.bricksPerRow).rect.TopLeft
+                For j = 0 To task.bricksPerCol - 2
+                    index = i + (j + 1) * task.bricksPerRow
+                    If index >= bricks.brickList.Count Then index = bricks.brickList.Count - 1
+                    vTestRect(bricks.brickList(i + j * task.bricksPerRow),
+                                      bricks.brickList(index), i + j * task.bricksPerRow, index)
+                Next
+                Dim brickNext = i + (task.bricksPerCol - 1) * task.bricksPerRow
+                If brickNext >= bricks.brickList.Count Then brickNext = bricks.brickList.Count - 1
+                vTestRect(bricks.brickList(brickNext), bricks.brickList(index), brickNext, -1)
+            Next
+
+            labels(3) = CStr(colorIndex) + " vertical slices were connected because cell depth difference < " +
+                            CStr(task.depthDiffMeters) + " meters"
+        End Sub
+    End Class
+
+
+
+
+
+
+
+
+    Public Class XO_Region_RectsH : Inherits TaskParent
+        Dim bricks As New Brick_Basics
+        Public hRects As New List(Of cv.Rect)
+        Dim connect As New XO_Region_Core
+        Public Sub New()
+            dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+            desc = "Connect bricks with similar depth - horizontally scanning."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            bricks.Run(src)
+            connect.Run(src)
+
+            dst2.SetTo(0)
+            dst3.SetTo(0)
+            hRects.Clear()
+            Dim index As Integer
+            For Each tup In connect.hTuples
+                If tup.Item1 = tup.Item2 Then Continue For
+                Dim brick1 = bricks.brickList(tup.Item1)
+                Dim brick2 = bricks.brickList(tup.Item2)
+
+                Dim w = brick2.rect.BottomRight.X - brick1.rect.X
+                Dim h = brick1.rect.Height
+
+                Dim r = New cv.Rect(brick1.rect.X + 1, brick1.rect.Y, w - 1, h)
+
+                hRects.Add(r)
+                dst2(r).SetTo(255)
+
+                index += 1
+                dst3(r).SetTo(task.scalarColors(index Mod 256))
+            Next
+        End Sub
+    End Class
+
+
+
+
+
+
+    Public Class XO_Region_RectsV : Inherits TaskParent
+        Dim bricks As New Brick_Basics
+        Public vRects As New List(Of cv.Rect)
+        Dim connect As New XO_Region_Core
+        Public Sub New()
+            dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+            desc = "Connect bricks with similar depth - vertically scanning."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            bricks.Run(src)
+
+            connect.Run(src)
+
+            dst2.SetTo(0)
+            dst3.SetTo(0)
+            vRects.Clear()
+            Dim index As Integer
+            For Each tup In connect.vTuples
+                If tup.Item1 = tup.Item2 Then Continue For
+                Dim brick1 = bricks.brickList(tup.Item1)
+                Dim brick2 = bricks.brickList(tup.Item2)
+
+                Dim w = brick1.rect.Width
+                Dim h = brick2.rect.BottomRight.Y - brick1.rect.Y
+
+                Dim r = New cv.Rect(brick1.rect.X, brick1.rect.Y + 1, w, h - 1)
+                vRects.Add(r)
+                dst2(r).SetTo(255)
+
+                index += 1
+                dst3(r).SetTo(task.scalarColors(index Mod 256))
+            Next
+        End Sub
+    End Class
+
+
+
+
+
+
+    Public Class XO_Region_Rects : Inherits TaskParent
+        Dim bricks As New Brick_Basics
+        Dim hConn As New XO_Region_RectsH
+        Dim vConn As New XO_Region_RectsV
+        Public Sub New()
+            desc = "Isolate the connected depth bricks both vertically and horizontally."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            bricks.Run(src)
+            hConn.Run(src)
+            vConn.Run(src)
+
+            dst2 = (Not vConn.dst2).ToMat Or (Not hConn.dst2).ToMat
+
+            dst3 = src
+            dst3.SetTo(0, dst2)
+        End Sub
+    End Class
+
+
+
+
+    Public Class XO_Region_DepthCorrelation3 : Inherits TaskParent
+        Dim bricks As New Brick_Basics
+        Public Sub New()
+            dst0 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
+            dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
+            labels(3) = "The matching bricks in the right view that were used in the correlation computation"
+            desc = "Create depth region markers using a correlation threshold"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            bricks.Run(src)
+
+            dst0.SetTo(0)
+            dst1.SetTo(0)
+            Dim count As Integer
+            For Each brick In bricks.brickList
+                If brick.correlation > task.fCorrThreshold Then
+                    dst0.Rectangle(brick.rRect, 255, -1)
+                    dst1.Rectangle(brick.rect, 255, -1)
+                    count += 1
+                End If
+            Next
+
+            dst2.SetTo(0)
+            src.CopyTo(dst2, dst1)
+
+            dst3.SetTo(0)
+            task.rightView.CopyTo(dst3, dst0)
+
+            labels(2) = Format(count / bricks.brickList.Count, "0%") + " of bricks had color correlation of " +
+                            Format(task.fCorrThreshold, "0.0%") + " or better"
+        End Sub
+    End Class
+
+
+
+
+
+
+
+    Public Class XO_RedPrep_CloudAndColor : Inherits TaskParent
+        Dim prepEdges As New RedPrep_Edges_CPP
+        Public options As New Options_RedPrep
+        Dim redSimple As New RedColor_Basics
+        Dim edges As New EdgeLine_Basics
+        Public Sub New()
+            dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+            desc = "Reduction transform for the point cloud"
+        End Sub
+        Private Function reduceChan(chan As cv.Mat) As cv.Mat
+            chan *= task.fOptions.ReductionDepth.Value
+            Dim mm As mmData = GetMinMax(chan)
+            Dim dst32f As New cv.Mat
+            If Math.Abs(mm.minVal) > mm.maxVal Then
+                mm.minVal = -mm.maxVal
+                chan.ConvertTo(dst32f, cv.MatType.CV_32F)
+                Dim mask = dst32f.Threshold(mm.minVal, mm.minVal, cv.ThresholdTypes.BinaryInv)
+                mask.ConvertTo(mask, cv.MatType.CV_8U)
+                dst32f.SetTo(mm.minVal, mask)
+            End If
+            chan = (chan - mm.minVal) * 255 / (mm.maxVal - mm.minVal)
+            chan.ConvertTo(chan, cv.MatType.CV_8U)
+            chan.SetTo(0, task.noDepthMask)
+            Return chan
+        End Function
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            options.Run()
+
+            Dim pc32S As New cv.Mat
+            task.pointCloud.ConvertTo(pc32S, cv.MatType.CV_32SC3, 1000 / task.fOptions.ReductionDepth.Value)
+            Dim split = pc32S.Split()
+
+            dst2.SetTo(0)
+            If options.PrepX Then
+                prepEdges.Run(reduceChan(split(0)))
+                dst2 = dst2 Or prepEdges.dst3
+            End If
+
+            If options.PrepY Then
+                prepEdges.Run(reduceChan(split(1)))
+                dst2 = dst2 Or prepEdges.dst3
+            End If
+
+            If options.PrepZ Then
+                prepEdges.Run(reduceChan(split(2)))
+                dst2 = dst2 Or prepEdges.dst3
+            End If
+
+            redSimple.Run(src)
+            edges.Run(redSimple.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
+            dst3 = edges.dst2
+            dst3.CopyTo(dst2, task.noDepthMask)
+
+            dst2.Rectangle(New cv.Rect(0, 0, dst2.Width - 1, dst2.Height - 1), 255, task.lineWidth)
+            labels(2) = "Using reduction factor = " + CStr(task.fOptions.ReductionDepth.Value)
+        End Sub
+    End Class
+
+
+
+
+
+    Public Class XO_RedPrep_EdgesX : Inherits TaskParent
+        Dim edges As New RedPrep_Basics
+        Public Sub New()
+            OptionParent.FindCheckBox("Prep Edges in Y").Checked = False
+            OptionParent.FindCheckBox("Prep Edges in Z").Checked = False
+            desc = "Find X depth edges in the pointcloud data."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            edges.Run(src)
+            dst2 = edges.dst2
+            labels(2) = edges.labels(2)
+
+            dst2.SetTo(0, task.noDepthMask)
+        End Sub
+    End Class
+
+
+
+
+
+
+    Public Class XO_RedPrep_EdgesY : Inherits TaskParent
+        Dim edges As New RedPrep_Basics
+        Public Sub New()
+            OptionParent.FindCheckBox("Prep Edges in X").Checked = False
+            OptionParent.FindCheckBox("Prep Edges in Z").Checked = False
+            desc = "Find Y depth edges in the pointcloud data."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            edges.Run(src)
+            dst2 = edges.dst2
+            labels(2) = edges.labels(2)
+
+            dst2.SetTo(0, task.noDepthMask)
+        End Sub
+    End Class
+
+
+
+
+    Public Class XO_RedPrep_VB : Inherits TaskParent
+        Public Sub New()
+            desc = "Simpler transforms for the point cloud using CalcHist instead of reduction."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            Dim histogram As New cv.Mat
+
+            Dim ranges As cv.Rangef() = Nothing, zeroCount As Integer
+            For i = 0 To 1
+                Select Case i
+                    Case 0 ' X Reduction
+                        dst1 = task.pcSplit(0)
+                        ranges = New cv.Rangef() {New cv.Rangef(-task.xRange, task.xRange)}
+                    Case 1 ' Y Reduction
+                        dst1 = task.pcSplit(1)
+                        ranges = New cv.Rangef() {New cv.Rangef(-task.yRange, task.yRange)}
+                End Select
+
+                cv.Cv2.CalcHist({dst1}, {0}, task.depthmask, histogram, 1, {task.histogramBins}, ranges)
+
+                Dim histArray(histogram.Total - 1) As Single
+                Marshal.Copy(histogram.Data, histArray, 0, histArray.Length)
+
+                For j = 0 To histArray.Count - 1
+                    If histArray(j) = 0 Then zeroCount += 1
+                    histArray(j) = j
+                Next
+
+                histogram = cv.Mat.FromPixelData(histogram.Rows, 1, cv.MatType.CV_32F, histArray)
+                cv.Cv2.CalcBackProject({dst1}, {0}, histogram, dst1, ranges)
+
+                If i = 0 Then dst3 = dst1.Clone Else dst3 += dst1
+            Next
+
+            dst3.ConvertTo(dst2, cv.MatType.CV_8U)
+            dst2.SetTo(0, task.noDepthMask)
+
+            labels(2) = CStr(task.histogramBins * 2 - zeroCount) + " depth regions mapped (control with histogram bins.)"
+        End Sub
+    End Class
+
+
+
+
+
+
+    Public Class XO_RedPrep_DepthEdges : Inherits TaskParent
+        Dim prep As New XO_RedPrep_Depth
+        Dim edges As New Edge_Basics_TA
+        Public Sub New()
+            desc = "Find the edges of XY depth boundaries."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            prep.Run(src)
+            dst3 = prep.dst3
+
+            edges.Run(dst3.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
+            dst2 = edges.dst2
+            labels(2) = edges.labels(2)
+        End Sub
+    End Class
+
+
+
+
+
+
+    Public Class XO_RedPrep_DepthTiers : Inherits TaskParent
+        Dim prep As New XO_RedPrep_Depth
+        Dim tiers As New Depth_Tiers
+        Public Sub New()
+            labels(3) = "XO_RedPrep_Depth output defines regions with common XY."
+            desc = "Find the edges of XY depth boundaries."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            prep.Run(src)
+            dst3 = prep.dst3
+            dst1 = prep.dst2
+
+            tiers.Run(src)
+
+            dst1 += tiers.dst3.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+
+            dst2 = Palettize(dst1)
+        End Sub
+    End Class
+
+
+
+
+
+
+    Public Class XO_RedPrep_EdgesZ : Inherits TaskParent
+        Dim edges As New RedPrep_Basics
+        Public Sub New()
+            OptionParent.FindCheckBox("Prep Edges in X").Checked = False
+            OptionParent.FindCheckBox("Prep Edges in Y").Checked = False
+            desc = "Find Z depth edges in the pointcloud data."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            edges.Run(src)
+            dst2 = edges.dst2
+            dst2.SetTo(0, task.noDepthMask)
+
+            labels(2) = edges.labels(2)
+        End Sub
+    End Class
+
+
+
+
+
+
+    Public Class XO_RedCloud_BasicsFlood : Inherits TaskParent
+        Dim prepXY As New XO_RedPrep_XY_Add
+        Public redC As New RedColor_Basics
+        Public rcList As New List(Of rcDataOld)
+        Public rcMap As cv.Mat
+        Public Sub New()
+            desc = "Use the more complete RedPrep_XY_Add as input to RedCloud."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            prepXY.Run(src)
+            prepXY.dst2.ConvertTo(dst2, cv.MatType.CV_8U)
+
+            redC.Run(dst2)
+            dst2 = redC.dst2
+            labels(2) = redC.labels(2)
+
+            If task.rcD IsNot Nothing Then dst2.Rectangle(task.rcD.rect, task.highlight, task.lineWidth)
+            If strOut <> "" Then SetTrueText(redC.strOut, 3) Else SetTrueText("Click on any cell", 3)
+
+            Dim causeLabel = Utility_Basics.findCause(redC.rcMap, redC.rcList)
+            If task.mouseClickFlag Then
+                causeLabel = ""
+                labels(3) = ""
+            End If
+
+            If causeLabel <> "" Then
+                If labels(3) = "" Then labels(3) = causeLabel Else labels(3) += ", " + causeLabel
+                If labels(3).Length > 80 Then labels(3) = causeLabel
+            End If
+
+            rcList = New List(Of rcDataOld)(redC.rcList)
+            rcMap = redC.rcMap.Clone
+        End Sub
+    End Class
+
+
+
+
+    Public Class XO_RedPrep_XY_Add : Inherits TaskParent
+        Public Sub New()
+            desc = "Prepare the X and Y regions and add them together."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            Dim reduction = task.fOptions.ReductionDepth.Value
+            task.pcSplit(0).ConvertTo(dst0, cv.MatType.CV_32S, 1000 / reduction)
+            task.pcSplit(1).ConvertTo(dst1, cv.MatType.CV_32S, 1000 / reduction)
+
+            cv.Cv2.Add(dst0 * reduction, dst1 * reduction, dst2)
+            dst2 = cv.Cv2.Abs(dst0 + dst1) + 1
+            dst2.SetTo(0, task.noDepthMask)
+
+            dst3 = Palettize(dst2, 0)
+        End Sub
+    End Class
+
+
+
+
+    Public Class XO_RedPrep_Motion : Inherits TaskParent
+        Dim prep As New RedPrep_Basics
+        Dim pcMotion As New Motion_CloudPixel
+        Public Sub New()
+            If standalone Then task.gOptions.displayDst1.Checked = True
+            desc = "Compare the RedPrep_Basics output and the motion cloud mask."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            pcMotion.Run(emptyMat)
+
+            prep.Run(src)
+            dst2 = prep.dst2
+            labels(2) = prep.labels(2)
+
+            dst3 = pcMotion.dst2
+
+            dst1 = dst2.Clone
+            dst1.SetTo(0, dst3)
+
+            dst0 = dst3 And dst2
+        End Sub
+    End Class
+
+
+
+
+
+
+
+    Public Class XO_RedPrep_Depth_CPP : Inherits TaskParent
+        Implements IDisposable
+        Public Sub New()
+            cPtr = PrepXY_Open()
+            desc = "Run the C++ PrepXY to create a list of mask, rect, and other info about image"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            Dim inputX(task.pcSplit(0).Total - 1) As Single
+            Dim inputY(task.pcSplit(1).Total - 1) As Single
+
+            task.pcSplit(0).GetArray(Of Single)(inputX)
+            task.pcSplit(1).GetArray(Of Single)(inputY)
+
+            Dim handleX = GCHandle.Alloc(inputX, GCHandleType.Pinned)
+            Dim handleY = GCHandle.Alloc(inputY, GCHandleType.Pinned)
+
+            Dim imagePtr = PrepXY_Run(cPtr, handleX.AddrOfPinnedObject(), handleY.AddrOfPinnedObject(), src.Rows, src.Cols,
+                                  task.xRange, task.yRange, task.histogramBins)
+            handleX.Free()
+            handleY.Free()
+
+            dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, cv.MatType.CV_8U, imagePtr).Clone
+            dst2.SetTo(0, task.noDepthMask)
+            Dim mm = GetMinMax(dst2)
+
+            dst3 = Palettize(dst2, 0)
+            labels(2) = "The input has been consolidated into " + CStr(mm.maxVal) + " categories"
+        End Sub
+        Protected Overrides Sub Finalize()
+            If cPtr <> 0 Then cPtr = PrepXY_Close(cPtr)
+        End Sub
+    End Class
+
+
+
+
+
+    Public Class XO_Contour_Depth1 : Inherits TaskParent
+        Dim prep As New XO_RedPrep_Depth ' only interested in XY reduction.
+        Dim contours As New Contour_Basics
+        Public Sub New()
+            desc = "Find the contours in the cloud data."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            prep.Run(src)
+
+            contours.Run(prep.dst2)
+            dst2 = contours.dst2
+            labels(2) = contours.labels(2)
+        End Sub
+    End Class
+
+
+
+
+
+
+
+
+    Public Class XO_PlotOpenCV_RedPrepData : Inherits TaskParent
+        Dim prep As New XO_RedPrep_Depth
+        Dim plot As New PlotBar_Basics
+        Public Sub New()
+            plot.createHistogram = True
+            desc = "Plot the RedCloud prep data to see if any patterns emerge."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            prep.Run(task.pcSplit(2))
+            dst2 = prep.dst3
+            labels(2) = prep.labels(2) + "  (task.histogramBins = " + CStr(task.histogramBins) + ")"
+
+            plot.minRange = 1
+            plot.maxRange = plot.minRange + task.MaxZmeters * 1000
+            plot.Run(prep.dst2)
+            dst3 = plot.dst2
+            labels(3) = "Min/Max values " + Format(plot.mm.minVal / 1000, fmt2) + "/" +
+                                                    Format(plot.mm.maxVal / 1000, fmt2) + " meters"
+        End Sub
+    End Class
+
+
+
+
+    Public Class XO_RedPrep_Depth : Inherits TaskParent
+        Public Sub New()
+            desc = "Run the C++ PrepXY to create a list of mask, rect, and other info about image"
+        End Sub
+        Private Function histAndBack(input As cv.Mat, ranges() As Rangef) As cv.Mat
+            Dim histogram As New Mat(), dst As New cv.Mat
+            Cv2.CalcHist({input}, {0}, New Mat(), histogram, 1, {task.histogramBins}, ranges)
+
+            For j = histogram.Rows - 1 To 0 Step -1
+                histogram.At(Of Single)(j, 0) = j
+            Next
+
+            Cv2.CalcBackProject({input}, {0}, histogram, dst, ranges)
+            Return dst
+        End Function
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            Dim rangeArrayX = {New Rangef(-task.xRange, task.xRange)}
+            Dim rangeArrayY = {New Rangef(-task.yRange, task.yRange)}
+
+            dst0 = histAndBack(task.pcSplit(0), rangeArrayX)
+            dst1 = histAndBack(task.pcSplit(1), rangeArrayY)
+            dst2 = dst0 + dst1
+            dst2.SetTo(0, task.noDepthMask)
+            dst2.ConvertTo(dst2, MatType.CV_8U)
+
+            Dim mm = GetMinMax(dst2)
+
+            dst3 = Palettize(dst2, 0)
+            labels(2) = "The input has been consolidated into " + CStr(mm.maxVal) + " categories"
+        End Sub
+    End Class
+
+
+
+
 
 
 End Namespace

@@ -139,31 +139,3 @@ Public Class PlotOpenCV_Points : Inherits TaskParent
 End Class
 
 
-
-
-
-
-
-
-
-Public Class PlotOpenCV_RedPrepData : Inherits TaskParent
-    Dim prep As New RedPrep_Depth
-    Dim plot As New PlotBar_Basics
-    Public Sub New()
-        plot.createHistogram = True
-        desc = "Plot the RedCloud prep data to see if any patterns emerge."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        prep.Run(task.pcSplit(2))
-        dst2 = prep.dst3
-        labels(2) = prep.labels(2) + "  (task.histogramBins = " + CStr(task.histogramBins) + ")"
-
-        plot.minRange = 1
-        plot.maxRange = plot.minRange + task.MaxZmeters * 1000
-        plot.Run(prep.dst2)
-        dst3 = plot.dst2
-        labels(3) = "Min/Max values " + Format(plot.mm.minVal / 1000, fmt2) + "/" +
-                                                    Format(plot.mm.maxVal / 1000, fmt2) + " meters"
-    End Sub
-End Class
-

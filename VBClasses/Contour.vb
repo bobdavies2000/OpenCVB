@@ -871,26 +871,6 @@ End Class
 
 
 
-Public Class XR_Contour_Depth : Inherits TaskParent
-    Dim prep As New RedPrep_Depth ' only interested in XY reduction.
-    Dim contours As New Contour_Basics
-    Public Sub New()
-        desc = "Find the contours in the cloud data."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        prep.Run(src)
-
-        contours.Run(prep.dst2)
-        dst2 = contours.dst2
-        labels(2) = contours.labels(2)
-    End Sub
-End Class
-
-
-
-
-
-
 Public Class Contour_RotateRect : Inherits TaskParent
     Dim findRect As New FindMinRect_Basics
     Dim options As New Options_MinArea
