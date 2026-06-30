@@ -108,6 +108,7 @@ Partial Public Class AlgorithmTask
     Public fpMap As New cv.Mat ' feature map
 
     Public brickD As brickData ' the currently selected gRect
+    Public rcMinD As rcMin ' the currently selected redCloud Cell
     Public rcD As rcData ' the currently selected redCloud Cell
     Public lpD As lpData ' the currently selected line pair
     Public fpD As fpData ' the currently selected feature point.

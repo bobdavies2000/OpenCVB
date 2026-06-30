@@ -684,6 +684,7 @@ RedCC_BasicsCombined
 RedCC_Color8U
 RedCloud_Basics
 RedCloud_BasicsFlood
+RedCloud_ColorCells
 RedCloud_Core
 RedCloud_DelaunayMap
 RedCloud_FeatureLess
@@ -693,6 +694,7 @@ RedCloud_KNN
 RedCloud_LeftRight
 RedCloud_Matched
 RedCloud_Matches
+RedCloud_Min
 RedCloud_Motion
 RedCloud_MotionFilter
 RedCloud_Reliable

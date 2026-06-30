@@ -213,6 +213,32 @@ Public Class Utility_Basics : Inherits TaskParent
 
         Return outStr
     End Function
+    Public Shared Function selectMinCell(rcMap As cv.Mat, rcList As List(Of rcMin), picTag As Integer) As String
+        Dim clickIndex As Integer = 0, outStr As String = ""
+        If rcMap.Type = cv.MatType.CV_32S Then
+            clickIndex = rcMap.Get(Of Integer)(task.clickPoint.Y, task.clickPoint.X)
+        Else
+            clickIndex = rcMap.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X)
+        End If
+
+        If clickIndex = 0 Then
+            If rcList.Count = 0 Then rcList.Add(New rcMin(task.color, New cv.Rect(0, 0, task.color.Width, task.color.Height), 1))
+            task.rcMinD = rcList(0)
+        End If
+
+        For Each rc In rcList
+            If clickIndex = rc.mapID Then
+                task.rcMinD = rc
+                If task.rcMinD.rect.Contains(task.clickPoint) Then Exit For
+            End If
+        Next
+
+        task.color(task.rcMinD.rect).SetTo(white, If(picTag = 2, task.rcMinD.mask, task.rcMinD.maskDepth))
+        outStr = task.rcMinD.displayCell()
+        task.clickPoint = task.rcMinD.maxDistDepth
+
+        Return outStr
+    End Function
     Public Shared Function DelaunaySelect(rcMap As cv.Mat, rcList As List(Of rcData)) As String
         Dim outStr As String = ""
         If rcList.Count > 0 Then
