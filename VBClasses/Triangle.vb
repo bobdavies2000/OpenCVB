@@ -53,7 +53,7 @@ Public Class Triangle_HullContour : Inherits TaskParent
         hulls.Run(src)
         dst2 = hulls.dst2
         If hulls.rclist.Count <= 1 Then Exit Sub
-        Static rc As rcData = hulls.rclist(0)
+        Static rc As rcDataOld = hulls.rclist(0)
 
         rc.contour = ContourBuild(rc.mask, cv.ContourApproximationModes.ApproxTC89L1)
 

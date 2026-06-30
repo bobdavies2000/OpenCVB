@@ -1,7 +1,7 @@
 Imports cv = OpenCvSharp
 Public Class Projection_Basics : Inherits TaskParent
-    Public redCellInput As New List(Of rcData)
-    Public rclist As New List(Of rcData)
+    Public redCellInput As New List(Of rcDataOld)
+    Public rclist As New List(Of rcDataOld)
     Public viewType As String = "Top"
     Public objectList As New List(Of cv.Vec4f)
     Public showRectangles As Boolean = True
@@ -23,7 +23,7 @@ Public Class Projection_Basics : Inherits TaskParent
             redCellInput = redC.rcList
         End If
 
-        Dim sortedCells As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
+        Dim sortedCells As New SortedList(Of Integer, rcDataOld)(New compareAllowIdenticalIntegerInverted)
         Dim check2 As Integer
         For i = 0 To redCellInput.Count - 1
             Dim rc = redCellInput(i)
@@ -35,7 +35,7 @@ Public Class Projection_Basics : Inherits TaskParent
         Next
 
         rclist.Clear()
-        rclist.Add(New rcData)
+        rclist.Add(New rcDataOld)
         For Each rc In sortedCells.Values
             rc.mapID = rclist.Count
             rclist.Add(rc)

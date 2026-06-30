@@ -571,7 +571,7 @@ Public Module Structures
 
 
 
-    Public Class rcData
+    Public Class rcDataOld
         Public age As Integer = 1
         Public color As cv.Scalar
         Public colorChange As Integer ' 0 no change, 1 , 
@@ -677,7 +677,7 @@ Public Module Structures
 
 
 
-    Public Class rcMin
+    Public Class rcData
         Public contour As List(Of cv.Point)
         Public depth As Single
         Public mapID As Integer

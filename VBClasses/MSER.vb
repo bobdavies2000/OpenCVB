@@ -3,13 +3,13 @@ Imports cv = OpenCvSharp
 ' https://github.com/opencv/opencv/blob/master/samples/cpp/detect_mser.cpp
 Public Class MSER_Basics : Inherits TaskParent
     Dim detect As New MSER_CPP
-    Public mserCells As New List(Of rcData)
+    Public mserCells As New List(Of rcDataOld)
     Public floodPoints As New List(Of cv.Point)
     Public redC As New RedColor_Basics
     Public Sub New()
         desc = "Create cells for each region in MSER (Maximally Stable Extremal Region) output"
     End Sub
-    Public Function RebuildRCMap(rcMap As cv.Mat, rclist As List(Of rcData)) As cv.Mat
+    Public Function RebuildRCMap(rcMap As cv.Mat, rclist As List(Of rcDataOld)) As cv.Mat
         Dim dst As New cv.Mat(task.workRes, cv.MatType.CV_8UC3, 0)
         For Each rc In rclist
             rcMap(rc.rect).SetTo(rc.mapID, rc.mask)
@@ -32,14 +32,14 @@ Public Class MSER_Basics : Inherits TaskParent
         Next
         floodPoints = New List(Of cv.Point)(detect.floodPoints)
 
-        Dim sortedCells As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
+        Dim sortedCells As New SortedList(Of Integer, rcDataOld)(New compareAllowIdenticalIntegerInverted)
 
         Dim matched As New SortedList(Of Integer, Integer)(New compareAllowIdenticalIntegerInverted)
 
         dst0 = detect.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         For i = 0 To boxes.Count - 1
             Dim index = boxes.ElementAt(i).Value
-            Dim rc As New rcData
+            Dim rc As New rcDataOld
             rc.rect = boxInput(index)
             Dim val = dst0.Get(Of Byte)(floodPoints(index).Y, floodPoints(index).X)
             rc.mask = dst0(rc.rect).InRange(val, val)
@@ -61,7 +61,7 @@ Public Class MSER_Basics : Inherits TaskParent
             If rc.pixels > 0 Then sortedCells.Add(rc.pixels, rc)
         Next
 
-        redC.rcList = New List(Of rcData)(sortedCells.Values)
+        redC.rcList = New List(Of rcDataOld)(sortedCells.Values)
         dst2 = RebuildRCMap(redC.rcMap, redC.rcList)
 
         labels(2) = CStr(redC.rcList.Count) + " cells were identified and " + CStr(matched.Count) + " were matched."
@@ -112,14 +112,14 @@ Public Class MSER_Basics2 : Inherits TaskParent
             boxes.Add(r.Width * r.Height, i)
         Next
 
-        Dim rclist As New List(Of rcData)({New rcData})
+        Dim rclist As New List(Of rcDataOld)({New rcDataOld})
         dst1.SetTo(0)
         dst2.SetTo(0)
         Dim lastMap = cellMap.Clone
         cellMap.SetTo(0)
         Dim matchCount As Integer
         For i = 0 To floodPoints.Count - 1
-            Dim rc As New rcData
+            Dim rc As New rcDataOld
             rc.mapID = rclist.Count
             Dim val = dst3.Get(Of Byte)(floodPoints(i).Y, floodPoints(i).X)
             rc.rect = boxInput(boxes.ElementAt(i).Value)

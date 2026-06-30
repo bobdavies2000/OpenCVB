@@ -2,7 +2,7 @@
 Imports cv = OpenCvSharp
 Public Class RedWGrid_Basics : Inherits TaskParent
     Public redC As New RedCloud_Basics
-    Public rcList As New List(Of rcData)
+    Public rcList As New List(Of rcDataOld)
     Public rcMap As New cv.Mat(dst2.Size, cv.MatType.CV_32S, 0)
     Public Sub New()
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
@@ -18,9 +18,9 @@ Public Class RedWGrid_Basics : Inherits TaskParent
                                     rc.mapID - 1)
         Next
 
-        Dim newList As New List(Of rcData)
-        Dim rc1 As rcData = Nothing
-        Dim rc2 As rcData = Nothing
+        Dim newList As New List(Of rcDataOld)
+        Dim rc1 As rcDataOld = Nothing
+        Dim rc2 As rcDataOld = Nothing
         Dim r As cv.Rect
         dst1.SetTo(0)
         For i = 1 To dups.Count - 1
@@ -35,7 +35,7 @@ Public Class RedWGrid_Basics : Inherits TaskParent
                 dst1(rc2.rect).SetTo(255, rc2.mask)
                 rc1.rect = r
                 rc1.mask = dst1(r).Clone
-                ' take the values of depthdelta and wcmean from the larger of the 2 rcData's
+                ' take the values of depthdelta and wcmean from the larger of the 2 rcDataOld's
                 If rc1.pixels < rc2.pixels Then
                     rc1.depthDelta = rc2.depthDelta
                     rc1.wcMean = rc2.wcMean

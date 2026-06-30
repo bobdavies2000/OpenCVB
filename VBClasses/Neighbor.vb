@@ -190,7 +190,7 @@ End Class
 Public Class Neighbor_Precise : Inherits TaskParent
     Implements IDisposable
     Public nabList As New List(Of List(Of Integer))
-    Public rclist As List(Of rcData)
+    Public rclist As List(Of rcDataOld)
     Public runRedCflag As Boolean = False
     Dim redC As New RedCloud_Basics
     Public Sub New()

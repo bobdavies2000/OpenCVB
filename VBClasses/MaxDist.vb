@@ -13,7 +13,7 @@ Public Class MaxDist_Basics : Inherits TaskParent
         dst3.SetTo(0)
         Dim index As Integer = 1
         For Each rc In redC.rcList
-            Dim rcTest = New rcData(rc.mask, rc.rect, index)
+            Dim rcTest = New rcDataOld(rc.mask, rc.rect, index)
             If rcTest.mapID >= 0 Then
                 rcTest.color = rc.color
                 dst3(rcTest.rect).SetTo(rcTest.color, rcTest.mask)
@@ -35,8 +35,8 @@ Public Class XR_MaxDist_NoRectangle : Inherits TaskParent
         desc = "Does the mask need to have rectangle of zeros?  Answer: yes"
     End Sub
     Public Function setCloudData(_mask As cv.Mat, _rect As cv.Rect, _index As Integer,
-                                                Optional zeroRectangle As Boolean = True) As rcData
-        Dim rc As New rcData
+                                                Optional zeroRectangle As Boolean = True) As rcDataOld
+        Dim rc As New rcDataOld
         rc.mask = _mask.InRange(_index, _index)
         rc.rect = _rect
         rc.mapID = _index
@@ -67,7 +67,7 @@ Public Class XR_MaxDist_NoRectangle : Inherits TaskParent
         dst2 = redC.dst2
         labels(2) = redC.labels(2)
 
-        Dim rcList As New List(Of rcData)
+        Dim rcList As New List(Of rcDataOld)
         dst3.SetTo(0)
         For Each rc In redC.rcList
             ' This rcList will NOT use the rectangle of zeros (definitely need the rectangle!)

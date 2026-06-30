@@ -6,7 +6,7 @@ Public Class Plane_Basics : Inherits TaskParent
         labels = {"", "Top down mask after after thresholding heatmap", "Vertical regions", "Horizontal regions"}
         desc = "Find the regions that are mostly vertical and mostly horizontal."
     End Sub
-    Public Shared Function validContourPoint(rc As rcData, pt As cv.Point, offset As Integer) As cv.Point
+    Public Shared Function validContourPoint(rc As rcDataOld, pt As cv.Point, offset As Integer) As cv.Point
         If pt.X < rc.rect.Width And pt.Y < rc.rect.Height Then Return pt
         Dim count = rc.contour.Count
         For i = offset + 1 To rc.contour.Count - 1
@@ -15,7 +15,7 @@ Public Class Plane_Basics : Inherits TaskParent
         Next
         Return New cv.Point
     End Function
-    Public Shared Function build3PointEquation(rc As rcData) As cv.Vec4f
+    Public Shared Function build3PointEquation(rc As rcDataOld) As cv.Vec4f
         If rc.contour.Count < 3 Then Return New cv.Vec4f
         Dim offset = rc.contour.Count / 3
         Dim p1 = validContourPoint(rc, rc.contour(offset * 0), offset * 0)
@@ -225,7 +225,7 @@ Public Class Plane_OnlyPlanes : Inherits TaskParent
         labels = {"", "", "RedCloud Cells", "gCloud reworked with planes instead of depth data"}
         desc = "Replace the gCloud with planes in every RedCloud cell"
     End Sub
-    Public Sub buildCloudPlane(rc As rcData)
+    Public Sub buildCloudPlane(rc As rcDataOld)
         For y = 0 To rc.rect.Height - 1
             For x = 0 To rc.rect.Width - 1
                 If rc.mask.Get(Of Byte)(y, x) > 0 Then
@@ -338,7 +338,7 @@ Public Class Plane_CellColor : Inherits TaskParent
         labels = {"", "", "RedCloud Cells", "Blue - normal is closest to the X-axis, green - to the Y-axis, and Red - to the Z-axis"}
         desc = "Create a plane equation from the points in each RedCloud cell and color the cell with the direction of the normal"
     End Sub
-    Public Function buildContourPoints(rc As rcData) As List(Of cv.Point3f)
+    Public Function buildContourPoints(rc As rcDataOld) As List(Of cv.Point3f)
         Dim fitPoints As New List(Of cv.Point3f)
         For Each pt In rc.contour
             If pt.X >= rc.rect.Width Or pt.Y >= rc.rect.Height Then Continue For
@@ -347,7 +347,7 @@ Public Class Plane_CellColor : Inherits TaskParent
         Next
         Return fitPoints
     End Function
-    Public Function buildMaskPointEq(rc As rcData) As List(Of cv.Point3f)
+    Public Function buildMaskPointEq(rc As rcDataOld) As List(Of cv.Point3f)
         Dim fitPoints As New List(Of cv.Point3f)
         For y = 0 To rc.rect.Height - 1
             For x = 0 To rc.rect.Width - 1
@@ -364,7 +364,7 @@ Public Class Plane_CellColor : Inherits TaskParent
         labels(2) = redC.labels(2)
 
         dst3.SetTo(0)
-        Dim newCells As New List(Of rcData)
+        Dim newCells As New List(Of rcDataOld)
         For Each rc In redC.rcList
             rc.eq = New cv.Vec4f
             If options.useMaskPoints Then
@@ -519,7 +519,7 @@ End Class
 
 ' https://stackoverflow.com/questions/33997220/plane-construction-from-3d-points-in-opencv
 Public Class Plane_Equation : Inherits TaskParent
-    Public rc As New rcData
+    Public rc As New rcDataOld
     Public justEquation As String
     Dim redC As New RedColor_Basics
     Public Sub New()

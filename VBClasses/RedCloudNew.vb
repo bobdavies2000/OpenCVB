@@ -1,8 +1,8 @@
-Imports System.Runtime.InteropServices
+﻿Imports System.Runtime.InteropServices
 Imports VBClasses
 Imports cv = OpenCvSharp
-Public Class RedCloud_Basics : Inherits TaskParent
-    Public redCore As New RedCloud_Core
+Public Class RedCloudNew_Basics : Inherits TaskParent
+    Public redCore As New RedCloudNew_Core
     Public rcList As New List(Of rcDataOld)
     Public rcMap As cv.Mat = New cv.Mat(dst2.Size, cv.MatType.CV_32S, 0)
     Public options As New Options_RedCloud
@@ -68,7 +68,7 @@ End Class
 
 
 
-Public Class RedCloud_Core : Inherits TaskParent
+Public Class RedCloudNew_Core : Inherits TaskParent
     Public prepEdges As New RedPrep_Basics
     Public rcList As New List(Of rcDataOld)
     Public Sub New()
@@ -126,7 +126,7 @@ End Class
 
 
 
-Public Class RedCloud_BasicsFlood : Inherits TaskParent
+Public Class RedCloudNew_BasicsFlood : Inherits TaskParent
     Dim prepXY As New RedPrep_XY_Add
     Public redC As New RedColor_Basics
     Public rcList As New List(Of rcDataOld)
@@ -166,7 +166,7 @@ End Class
 
 
 
-Public Class XR_RedCloud_Basics : Inherits TaskParent
+Public Class XR_RedCloudNew_Basics : Inherits TaskParent
     Public redC As New RedColor_Basics
     Public rcList As New List(Of rcDataOld)
     Public rcMap As cv.Mat
@@ -204,9 +204,9 @@ End Class
 
 
 
-Public Class XR_RedCloud_CellDepthHistogram : Inherits TaskParent
+Public Class XR_RedCloudNew_CellDepthHistogram : Inherits TaskParent
     Dim plot As New PlotBar_Basics
-    Dim redC As New RedCloud_Basics
+    Dim redC As New RedCloudNew_Basics
     Public Sub New()
         task.gOptions.setHistogramBins(100)
         If standalone Then task.gOptions.displayDst1.Checked = True
@@ -242,9 +242,9 @@ End Class
 
 
 
-Public Class RedCloud_LeftRight : Inherits TaskParent
+Public Class RedCloudNew_LeftRight : Inherits TaskParent
     Dim bricks As New Brick_Basics
-    Dim redC As New RedCloud_Basics
+    Dim redC As New RedCloudNew_Basics
     Public Sub New()
         desc = "Map the RedCloud output into the right view."
     End Sub
@@ -272,8 +272,8 @@ End Class
 
 
 
-Public Class RedCloud_KNN : Inherits TaskParent
-    Dim redC As New RedCloud_Basics
+Public Class RedCloudNew_KNN : Inherits TaskParent
+    Dim redC As New RedCloudNew_Basics
     Dim knn As New KNN_Basics
     Public hulls As New List(Of List(Of cv.Point))
     Public Sub New()
@@ -311,8 +311,8 @@ End Class
 
 
 
-Public Class RedCloud_RGB : Inherits TaskParent
-    Dim redC As New RedCloud_Basics
+Public Class RedCloudNew_RGB : Inherits TaskParent
+    Dim redC As New RedCloudNew_Basics
     Public Sub New()
         desc = "Display the RGB data rather than the rc.color"
     End Sub
@@ -331,8 +331,8 @@ End Class
 
 
 
-Public Class RedCloud_Matches : Inherits TaskParent
-    Dim redC As New RedCloud_Basics
+Public Class RedCloudNew_Matches : Inherits TaskParent
+    Dim redC As New RedCloudNew_Basics
     Public rcList As New List(Of rcDataOld)
     Public Sub New()
         task.fOptions.ReductionColor.Value = 120
@@ -365,8 +365,8 @@ End Class
 
 
 
-Public Class RedCloud_Matched : Inherits TaskParent
-    Dim redC As New RedCloud_Basics
+Public Class RedCloudNew_Matched : Inherits TaskParent
+    Dim redC As New RedCloudNew_Basics
     Public rcList As New List(Of rcDataOld)
     Public Sub New()
         If standalone Then task.gOptions.displayDst1.Checked = True
@@ -400,8 +400,8 @@ End Class
 
 
 
-Public Class XR_RedCloud_ColorChangeCause : Inherits TaskParent
-    Dim redC As New RedCloud_Basics
+Public Class XR_RedCloudNew_ColorChangeCause : Inherits TaskParent
+    Dim redC As New RedCloudNew_Basics
     Public Sub New()
         desc = "Click on a cell to determine why it is changing colors."
     End Sub
@@ -420,8 +420,8 @@ End Class
 
 
 
-Public Class RedCloud_Reliable : Inherits TaskParent
-    Dim redC As New RedCloud_Basics
+Public Class RedCloudNew_Reliable : Inherits TaskParent
+    Dim redC As New RedCloudNew_Basics
     Public Sub New()
         desc = "Display only those cells that are consistently present since the last heartbeat."
     End Sub
@@ -447,7 +447,7 @@ End Class
 
 
 
-Public Class RedCloud_Flood_CPP : Inherits TaskParent
+Public Class RedCloudNew_Flood_CPP : Inherits TaskParent
     Implements IDisposable
     Public classCount As Integer
     Public rcList As New List(Of rcDataOld)
@@ -564,8 +564,8 @@ End Class
 
 
 
-Public Class RedCloud_MotionFilter : Inherits TaskParent
-    Dim redC As New RedCloud_Basics
+Public Class RedCloudNew_MotionFilter : Inherits TaskParent
+    Dim redC As New RedCloudNew_Basics
     Public rcList As New List(Of rcDataOld)
     Public rcMap As New cv.Mat(dst2.Size, cv.MatType.CV_32S, 0)
     Dim pcMotion As New Motion_CloudPixel
@@ -621,8 +621,8 @@ End Class
 
 
 
-Public Class RedCloud_Motion : Inherits TaskParent
-    Dim redC As New RedCloud_Basics
+Public Class RedCloudNew_Motion : Inherits TaskParent
+    Dim redC As New RedCloudNew_Basics
     Dim addw As New AddWeighted_Basics
     Dim pcMotion As New Motion_CloudPixel
     Public Sub New()
@@ -647,7 +647,7 @@ End Class
 
 
 
-Public Class RedCloud_DelaunayMap : Inherits TaskParent
+Public Class RedCloudNew_DelaunayMap : Inherits TaskParent
     Public dMap As New Delaunay_Map
     Dim redC As New RedColor_Basics
     Public Sub New()
@@ -669,8 +669,8 @@ End Class
 
 
 
-Public Class RedCloud_Foreground : Inherits TaskParent
-    Dim redC As New RedCloud_Basics
+Public Class RedCloudNew_Foreground : Inherits TaskParent
+    Dim redC As New RedCloudNew_Basics
     Public Sub New()
         desc = "Find and monitor the cells in the foreground"
     End Sub
@@ -692,3 +692,71 @@ Public Class RedCloud_Foreground : Inherits TaskParent
     End Sub
 End Class
 
+
+
+
+
+
+Public Class RedCloudNew_Min : Inherits TaskParent
+    Dim color8u As New Color8U_Basics
+    Public rcMap As New cv.Mat
+    Public rcList As New List(Of rcData) ' includes cloud data.
+    Public Sub New()
+        dst0 = New cv.Mat(dst0.Size, cv.MatType.CV_8U, 0)
+        If standalone Then task.gOptions.displayDst1.Checked = True
+        labels(3) = "RedCloud cells with depth."
+        desc = "FloodFill each color8U output and create an rclist"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        If src.Channels <> 1 Then color8u.Run(task.gray) Else color8u.Run(src)
+        src = color8u.dst2 + 1
+
+        rcMap = src.Clone
+        Dim minList As New List(Of rcData)
+        Dim rect As cv.Rect
+        Dim mask As cv.Mat = New cv.Mat(New cv.Size(dst2.Width + 2, dst2.Height + 2), cv.MatType.CV_8U, 0)
+        For Each r In task.gridRects
+            If mask(r).Get(Of Byte)(0, 0) = 0 Then
+                Dim mapID As Integer = rcMap(r).Get(Of Byte)(0, 0)
+                Dim flags = cv.FloodFillFlags.FixedRange Or cv.FloodFillFlags.MaskOnly Or (255 << 8)
+                Dim count = cv.Cv2.FloodFill(rcMap, mask, r.TopLeft, mapID, rect, 0, 0, flags)
+                If count > 0 Then minList.Add(New rcData(rcMap(rect), rect, mapID))
+            End If
+        Next
+        dst2 = Palettize(rcMap)
+
+        If task.rcMinD IsNot Nothing And standaloneTest() Then dst2.Rectangle(task.rcMinD.rect, task.highlight, task.lineWidth)
+
+        dst3.SetTo(0)
+        Dim sortList As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
+        For i = 0 To minList.Count - 1
+            Dim rc = minList(i)
+            rc.maxDist = rc.buildMaxDist(rc.mask)
+
+            rc.depth = task.pcSplit(2)(rc.rect).Mean(rc.mask)
+            rc.maskDepth = rc.mask.Clone
+            rc.maskDepth.SetTo(0, task.noDepthMask(rc.rect))
+            rc.pixelsDepth = rc.maskDepth.CountNonZero
+            rc.maxDistDepth = rc.buildMaxDist(rc.maskDepth)
+
+            sortList.Add(rc.pixels, rc)
+        Next
+
+        rcList = New List(Of rcData)(sortList.Values)
+        Dim rcIndex As Integer
+        For Each rc In rcList
+            rc.index = rcIndex
+            dst0(rc.rect).SetTo(rc.mapID, rc.mask)
+            rcIndex += 1
+        Next
+
+        Static picTag = task.mousePicTag
+        If task.mouseClickFlag Then picTag = task.mousePicTag
+        strOut = Utility_Basics.selectMinCell(rcMap, rcList, picTag)
+        SetTrueText(strOut, 1)
+
+        dst3 = Palettize(dst0)
+        dst3.SetTo(0, task.noDepthMask)
+        labels(2) = CStr(rcList.Count) + " RedColor cells were found."
+    End Sub
+End Class

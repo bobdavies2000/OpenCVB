@@ -2,7 +2,7 @@ Imports System.Runtime.InteropServices
 Imports cv = OpenCvSharp
 Public Class RedColor_Basics : Inherits TaskParent
     Dim color8u As New Color8U_Basics
-    Public rcList As New List(Of rcData)
+    Public rcList As New List(Of rcDataOld)
     Public rcMap As New cv.Mat
     Public runSelectCell As Boolean = True
     Public Sub New()
@@ -22,7 +22,7 @@ Public Class RedColor_Basics : Inherits TaskParent
                 Dim mapID As Integer = rcMap(r).Get(Of Byte)(0, 0)
                 Dim flags = cv.FloodFillFlags.FixedRange Or cv.FloodFillFlags.MaskOnly Or (255 << 8)
                 Dim count = cv.Cv2.FloodFill(rcMap, mask, r.TopLeft, mapID, rect, 0, 0, flags)
-                If count > 0 Then rcList.Add(New rcData(rcMap(rect), rect, mapID))
+                If count > 0 Then rcList.Add(New rcDataOld(rcMap(rect), rect, mapID))
             End If
         Next
         dst2 = Palettize(rcMap)
@@ -47,7 +47,7 @@ End Class
 
 
 Public Class RedColor_BasicsFeatureLess : Inherits TaskParent
-    Public rcList As New List(Of rcData)
+    Public rcList As New List(Of rcDataOld)
     Public rcMap As cv.Mat = New cv.Mat(dst2.Size, cv.MatType.CV_32S, 0)
     Public color8U As New Color8U_Basics
     Public runSelectCell As Boolean = True
@@ -77,7 +77,7 @@ Public Class RedColor_BasicsFeatureLess : Inherits TaskParent
             End If
         Next
 
-        Dim rcSizeSort As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
+        Dim rcSizeSort As New SortedList(Of Integer, rcDataOld)(New compareAllowIdenticalIntegerInverted)
         For i = 0 To rectSorted.Count - 2
             Dim r1 = rectSorted.ElementAt(i).Value.r
             If rectSorted.ElementAt(i).Key = rectSorted.ElementAt(i + 1).Key Then
@@ -86,7 +86,7 @@ Public Class RedColor_BasicsFeatureLess : Inherits TaskParent
                     If rectSorted.ElementAt(j).Key = rectSorted.ElementAt(j + 1).Key Then
                         r1 = r1.Union(r2)
                     Else
-                        Dim rc = New rcData(src(r1), r1, rectSorted.ElementAt(j).Key)
+                        Dim rc = New rcDataOld(src(r1), r1, rectSorted.ElementAt(j).Key)
                         rc.mapID = rectSorted.ElementAt(j).Key
                         rcSizeSort.Add(rectSorted.ElementAt(i).Value.count, rc)
                         i = j
@@ -94,7 +94,7 @@ Public Class RedColor_BasicsFeatureLess : Inherits TaskParent
                     End If
                 Next
             Else
-                Dim rc = New rcData(src(r1), r1, rectSorted.ElementAt(i).Key)
+                Dim rc = New rcDataOld(src(r1), r1, rectSorted.ElementAt(i).Key)
                 rc.mapID = rectSorted.ElementAt(i).Key
                 rcSizeSort.Add(rectSorted.ElementAt(i).Value.count, rc)
             End If
@@ -125,7 +125,7 @@ End Class
 
 
 Public Class RedColor_BrickList : Inherits TaskParent
-    Public rcList As New List(Of rcData)
+    Public rcList As New List(Of rcDataOld)
     Public rcMap As cv.Mat = New cv.Mat(dst2.Size, cv.MatType.CV_32S, 0)
     Public reduction As New Reduction_Basics
     Public runSelectCell As Boolean = True
@@ -158,7 +158,7 @@ Public Class RedColor_BrickList : Inherits TaskParent
             End If
         Next
 
-        Dim rcSizeSort As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
+        Dim rcSizeSort As New SortedList(Of Integer, rcDataOld)(New compareAllowIdenticalIntegerInverted)
         For i = 0 To rectSorted.Count - 2
             Dim r1 = rectSorted.ElementAt(i).Value.r
             Dim r2 = rectSorted.ElementAt(i + 1).Value.r
@@ -168,14 +168,14 @@ Public Class RedColor_BrickList : Inherits TaskParent
                     If rectSorted.ElementAt(j).Value.index = rectSorted.ElementAt(j + 1).Value.index Then
                         r1 = r1.Union(r2)
                     Else
-                        Dim rc = New rcData(src(r1), r1, rectSorted.ElementAt(j).Value.index)
+                        Dim rc = New rcDataOld(src(r1), r1, rectSorted.ElementAt(j).Value.index)
                         rcSizeSort.Add(rc.pixels, rc)
                         i = j
                         Exit For
                     End If
                 Next
             Else
-                Dim rc = New rcData(src(r1), r1, rectSorted.ElementAt(i).Value.index)
+                Dim rc = New rcDataOld(src(r1), r1, rectSorted.ElementAt(i).Value.index)
                 rcSizeSort.Add(rc.pixels, rc)
             End If
         Next
@@ -204,7 +204,7 @@ End Class
 
 
 Public Class XR_RedColor_BasicsOld : Inherits TaskParent
-    Public rcList As New List(Of rcData)
+    Public rcList As New List(Of rcDataOld)
     Public rcMap As cv.Mat = New cv.Mat(dst2.Size, cv.MatType.CV_32S, 0)
     Public redFlood As New RedCloud_Flood_CPP
     Public runSelectCell As Boolean = True
@@ -226,7 +226,7 @@ Public Class XR_RedColor_BasicsOld : Inherits TaskParent
         labels(2) = redFlood.labels(2)
 
         rcMap = redFlood.rcMap.Clone
-        rcList = New List(Of rcData)(redFlood.rcList)
+        rcList = New List(Of rcDataOld)(redFlood.rcList)
 
         If runSelectCell Then
             strOut = Utility_Basics.selectCell(rcMap, rcList)
@@ -240,7 +240,7 @@ End Class
 
 
 Public Class XR_RedColor_Basics : Inherits TaskParent
-    Public rcList As New List(Of rcData)
+    Public rcList As New List(Of rcDataOld)
     Public rcMap As cv.Mat = New cv.Mat(dst2.Size, cv.MatType.CV_32S, 0)
     Public options As New Options_RedCloud
     Public redFlood As New RedColor_Basics
@@ -256,7 +256,7 @@ Public Class XR_RedColor_Basics : Inherits TaskParent
         labels(2) = redFlood.labels(2)
 
         rcMap = redFlood.rcMap.Clone
-        rcList = New List(Of rcData)(redFlood.rcList)
+        rcList = New List(Of rcDataOld)(redFlood.rcList)
 
         If runSelectCell Then
             strOut = Utility_Basics.selectCell(rcMap, rcList)
@@ -271,7 +271,7 @@ End Class
 Public Class XR_RedColor_CPP : Inherits TaskParent
     Implements IDisposable
     Public classCount As Integer
-    Public rcList As New List(Of rcData)
+    Public rcList As New List(Of rcDataOld)
     Public rcMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
     Public Sub New()
         cPtr = RedCloudLined_Open()
@@ -297,14 +297,14 @@ Public Class XR_RedColor_CPP : Inherits TaskParent
         Dim rects(classCount - 1) As cv.Rect
         rectData.GetArray(Of cv.Rect)(rects)
 
-        Dim rcListLast = New List(Of rcData)(rcList)
+        Dim rcListLast = New List(Of rcDataOld)(rcList)
         Dim rcMapLast As cv.Mat = rcMap.Clone
 
         Dim minPixels As Integer = dst2.Total * 0.001
         Dim index As Integer = 1
-        Dim newList As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
+        Dim newList As New SortedList(Of Integer, rcDataOld)(New compareAllowIdenticalIntegerInverted)
         For i = 0 To rects.Count - 1
-            Dim rc = New rcData(dst0(rects(i)), rects(i), index)
+            Dim rc = New rcDataOld(dst0(rects(i)), rects(i), index)
             If rc.pixels < minPixels Then Continue For
             newList.Add(rc.pixels, rc)
             index += 1
@@ -455,7 +455,7 @@ End Class
 
 
 Public Class RedColor_Hulls : Inherits TaskParent
-    Public rclist As New List(Of rcData)
+    Public rclist As New List(Of rcDataOld)
     Public rcMap As New cv.Mat(dst2.Size, cv.MatType.CV_32S, 0)
     Dim redC As New RedColor_Basics
     Public Sub New()
@@ -531,7 +531,7 @@ Public Class XR_RedColor_List : Inherits TaskParent
     Public inputRemoved As cv.Mat
     Public cellGen As New RedFlood_ToRedColor
     Public redMask As New XR_RedFlood_Basics
-    Public rclist As New List(Of rcData)
+    Public rclist As New List(Of rcDataOld)
     Public rcMap As New cv.Mat(dst2.Size, cv.MatType.CV_32S, 0)
     Public contours As New Contour_Basics
     Public Sub New()
@@ -552,7 +552,7 @@ Public Class XR_RedColor_List : Inherits TaskParent
         cellGen.mdList = redMask.mdList
         cellGen.Run(redMask.dst2)
 
-        rclist = New List(Of rcData)(cellGen.rcList)
+        rclist = New List(Of rcDataOld)(cellGen.rcList)
         rcMap = cellGen.rcMap
         dst2 = Palettize(rcMap)
 
@@ -801,7 +801,7 @@ Public Class RedColor_DelaunayMap : Inherits TaskParent
         dst2 = redC.dst2
         labels(2) = redC.labels(2)
 
-        dMap.rcList = New List(Of rcData)(redC.rcList)
+        dMap.rcList = New List(Of rcDataOld)(redC.rcList)
         dMap.Run(emptyMat)
 
         SetTrueText(redC.strOut, 3)
@@ -829,7 +829,7 @@ Public Class RedColor_Isolate : Inherits TaskParent
         If v > hi Then Return hi
         Return v
     End Function
-    Private Shared Function CellMaskFull(rcMap As cv.Mat, rc As rcData) As cv.Mat
+    Private Shared Function CellMaskFull(rcMap As cv.Mat, rc As rcDataOld) As cv.Mat
         Dim m As New cv.Mat(rcMap.Size, cv.MatType.CV_8U, 0)
         Using roi = rcMap(rc.rect)
             Using part = roi.InRange(rc.mapID, rc.mapID)
@@ -842,7 +842,7 @@ Public Class RedColor_Isolate : Inherits TaskParent
         Dim k = cv.Cv2.GetStructuringElement(cv.MorphShapes.Rect, New cv.Size(3, 3))
         cv.Cv2.MorphologyEx(mask, mask, cv.MorphTypes.Open, k)
     End Sub
-    Private Function PickSubject(rcMap As cv.Mat, rcList As List(Of rcData)) As rcData
+    Private Function PickSubject(rcMap As cv.Mat, rcList As List(Of rcDataOld)) As rcDataOld
         Dim total = rcMap.Rows * rcMap.Cols
         Dim minPx = CInt(total * 0.003)
         Dim maxPx = CInt(total * 0.62)
@@ -862,7 +862,7 @@ Public Class RedColor_Isolate : Inherits TaskParent
         End If
 
         Dim bestVotes As Integer = -1
-        Dim bestRc As rcData = Nothing
+        Dim bestRc As rcDataOld = Nothing
         Dim freq As New Dictionary(Of Integer, Integer)
         For dy = -4 To 4
             For dx = -4 To 4

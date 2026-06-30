@@ -69,7 +69,7 @@ Public Class Utility_Basics : Inherits TaskParent
             cv.Cv2.PutText(dst, nextText, p3, cv.HersheyFonts.HersheyPlain, fontSize, white, fontThickness, task.lineType)
         Next
     End Sub
-    Public Shared Function findCause(rcMap As cv.Mat, rcList As List(Of rcData)) As String
+    Public Shared Function findCause(rcMap As cv.Mat, rcList As List(Of rcDataOld)) As String
         Dim clickIndex = rcMap.Get(Of Integer)(task.clickPoint.Y, task.clickPoint.X)
         findCause = ""
         If clickIndex > 0 And clickIndex < rcList.Count Then
@@ -93,7 +93,7 @@ Public Class Utility_Basics : Inherits TaskParent
         End If
         Return findCause
     End Function
-    Public Shared Function rcDataMatch(rc As rcData, rcListLast As List(Of rcData), rcMapLast As cv.Mat) As rcData
+    Public Shared Function rcDataMatch(rc As rcDataOld, rcListLast As List(Of rcDataOld), rcMapLast As cv.Mat) As rcDataOld
         Dim r1 = rc.rect
         Dim indexLast = rcMapLast.Get(Of Integer)(rc.maxDist.Y, rc.maxDist.X)
 
@@ -136,9 +136,9 @@ Public Class Utility_Basics : Inherits TaskParent
         End If
         Return rc
     End Function
-    Public Shared Function rcMatch(rc As rcData, rcListLast As List(Of rcData),
+    Public Shared Function rcMatch(rc As rcDataOld, rcListLast As List(Of rcDataOld),
                                            wGridLastList As List(Of cv.Point3d),
-                                           rcMapLast As cv.Mat) As rcData
+                                           rcMapLast As cv.Mat) As rcDataOld
         Dim r1 = rc.rect
         Dim indexLast = wGridLastList.IndexOf(rc.wGrid)
         If indexLast >= 0 And indexLast < rcListLast.Count Then
@@ -188,7 +188,7 @@ Public Class Utility_Basics : Inherits TaskParent
         End If
         Return rc
     End Function
-    Public Shared Function selectCell(rcMap As cv.Mat, rcList As List(Of rcData)) As String
+    Public Shared Function selectCell(rcMap As cv.Mat, rcList As List(Of rcDataOld)) As String
         Dim clickIndex As Integer = 0, outStr As String = ""
         If rcMap.Type = cv.MatType.CV_32S Then
             clickIndex = rcMap.Get(Of Integer)(task.clickPoint.Y, task.clickPoint.X)
@@ -197,7 +197,7 @@ Public Class Utility_Basics : Inherits TaskParent
         End If
 
         If clickIndex = 0 Then
-            If rcList.Count = 0 Then rcList.Add(New rcData(task.color, New cv.Rect(0, 0, task.color.Width, task.color.Height), 1))
+            If rcList.Count = 0 Then rcList.Add(New rcDataOld(task.color, New cv.Rect(0, 0, task.color.Width, task.color.Height), 1))
             task.rcD = rcList(0)
         End If
 
@@ -213,7 +213,7 @@ Public Class Utility_Basics : Inherits TaskParent
 
         Return outStr
     End Function
-    Public Shared Function selectMinCell(rcMap As cv.Mat, rcList As List(Of rcMin), picTag As Integer) As String
+    Public Shared Function selectMinCell(rcMap As cv.Mat, rcList As List(Of rcData), picTag As Integer) As String
         Dim clickIndex As Integer = 0, outStr As String = ""
         If rcMap.Type = cv.MatType.CV_32S Then
             clickIndex = rcMap.Get(Of Integer)(task.clickPoint.Y, task.clickPoint.X)
@@ -222,7 +222,7 @@ Public Class Utility_Basics : Inherits TaskParent
         End If
 
         If clickIndex = 0 Then
-            If rcList.Count = 0 Then rcList.Add(New rcMin(task.color, New cv.Rect(0, 0, task.color.Width, task.color.Height), 1))
+            If rcList.Count = 0 Then rcList.Add(New rcData(task.color, New cv.Rect(0, 0, task.color.Width, task.color.Height), 1))
             task.rcMinD = rcList(0)
         End If
 
@@ -239,7 +239,7 @@ Public Class Utility_Basics : Inherits TaskParent
 
         Return outStr
     End Function
-    Public Shared Function DelaunaySelect(rcMap As cv.Mat, rcList As List(Of rcData)) As String
+    Public Shared Function DelaunaySelect(rcMap As cv.Mat, rcList As List(Of rcDataOld)) As String
         Dim outStr As String = ""
         If rcList.Count > 0 Then
             Dim clickIndex = rcMap.Get(Of Integer)(task.clickPoint.Y, task.clickPoint.X)
@@ -248,7 +248,7 @@ Public Class Utility_Basics : Inherits TaskParent
             End If
 
             If rcList.Count = 0 Then
-                rcList.Add(New rcData(task.color, New cv.Rect(0, 0, task.color.Width, task.color.Height), 1))
+                rcList.Add(New rcDataOld(task.color, New cv.Rect(0, 0, task.color.Width, task.color.Height), 1))
             End If
 
             task.rcD = rcList(0)

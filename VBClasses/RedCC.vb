@@ -1,7 +1,7 @@
 Imports cv = OpenCvSharp
 Public Class RedCC_Basics : Inherits TaskParent
     Dim reduction As New Reduction_Basics
-    Public rcList As List(Of rcData)
+    Public rcList As List(Of rcDataOld)
     Public rcMap As cv.Mat
     Public redC1 As New RedColor_Basics
     Public redC2 As New RedCloud_Basics
@@ -32,7 +32,7 @@ End Class
 
 Public Class RedCC_BasicsCombined : Inherits TaskParent
     Dim reduction As New Reduction_Basics
-    Public rcList As List(Of rcData)
+    Public rcList As List(Of rcDataOld)
     Public redC1 As New RedColor_Basics
     Public redC2 As New RedCloud_Basics
     Public Sub New()
@@ -62,7 +62,7 @@ Public Class RedCC_BasicsCombined : Inherits TaskParent
         labels(2) = redC1.labels(2)
         dst2 = redC1.dst2
 
-        rcList = New List(Of rcData)(redC1.rcList)
+        rcList = New List(Of rcDataOld)(redC1.rcList)
         SetTrueText(redC1.strOut, 3)
     End Sub
 End Class

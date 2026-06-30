@@ -4282,7 +4282,7 @@ Namespace VBClasses
 
     Public Class XO_Contour_RedCloudCorners : Inherits TaskParent
         Public corners(4 - 1) As cv.Point
-        Public rc As New rcData
+        Public rc As New rcDataOld
         Public Sub New()
             labels(2) = "The RedCloud Output with the highlighted contour to smooth"
             desc = "Find the point farthest from the center in each cell."
@@ -9942,7 +9942,7 @@ Namespace VBClasses
     Public Class XO_RedCloud_PrepEdgesTest : Inherits TaskParent
         Dim redCold As New XO_RedCloud_HeartBeat
         Dim prep As New RedPrep_Basics
-        Public rcList As New List(Of rcData)
+        Public rcList As New List(Of rcDataOld)
         Public Sub New()
             desc = "Floodfill each region of the RedPrep_Basics output."
         End Sub
@@ -9967,7 +9967,7 @@ Namespace VBClasses
             For Each rc In redCold.rcList
                 Dim count = cv.Cv2.FloodFill(dst3, mask, rc.maxDist, index, rect, 0, 0, flags)
                 If count >= minCount And count < maxCount Then
-                    Dim pd = New rcData(dst3(rect), rect, index)
+                    Dim pd = New rcDataOld(dst3(rect), rect, index)
                     dst2(rect).SetTo(task.scalarColors(index), mask(rect))
                     rcList.Add(pd)
                     index += 1
@@ -10014,7 +10014,7 @@ Namespace VBClasses
 
     Public Class XO_RedCloud_PrepEdges : Inherits TaskParent
         Dim prepEdges As New RedPrep_EdgeMask
-        Public rcList As New List(Of rcData)
+        Public rcList As New List(Of rcDataOld)
         Public Sub New()
             dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
             labels(3) = "Map of reduced point cloud - CV_8U"
@@ -10031,7 +10031,7 @@ Namespace VBClasses
             Dim flags = cv.FloodFillFlags.FixedRange Or (255 << 8) Or cv.FloodFillFlags.MaskOnly
             Dim maskUsed As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
             Dim minCount = dst3.Total * 0.001, maxCount = dst3.Total * 3 / 4
-            Dim newList As New SortedList(Of Integer, rcData)(New compareAllowIdenticalInteger)
+            Dim newList As New SortedList(Of Integer, rcDataOld)(New compareAllowIdenticalInteger)
             For y = 1 To dst3.Height - 2
                 For x = 0 To dst3.Width - 2
                     Dim pt = New cv.Point(x, y)
@@ -10043,7 +10043,7 @@ Namespace VBClasses
                             Dim r = New cv.Rect(rect.X + 1, rect.Y + 1, rect.Width - 1, rect.Height - 1)
                             maskUsed.Rectangle(r, 255, -1)
                             If count >= minCount And count < maxCount Then
-                                Dim rc = New rcData(mask(r), r, index)
+                                Dim rc = New rcDataOld(mask(r), r, index)
                                 index += 1
                                 newList.Add(rc.maxDist.Y, rc)
                             End If
@@ -10702,7 +10702,7 @@ Namespace VBClasses
         Dim redCold As New Bin3Way_RedColor
         Dim diff As New Diff_Basics
         Dim cellmaps As New List(Of cv.Mat)
-        Dim cellLists As New List(Of List(Of rcData))
+        Dim cellLists As New List(Of List(Of rcDataOld))
         Dim diffs As New List(Of cv.Mat)
         Public Sub New()
             dst1 = New cv.Mat(dst1.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
@@ -10716,12 +10716,12 @@ Namespace VBClasses
             diff.Run(task.redList.rcMap)
             dst1 = diff.dst2
 
-            cellLists.Add(New List(Of rcData)(task.redList.rclist))
+            cellLists.Add(New List(Of rcDataOld)(task.redList.rclist))
             cellmaps.Add(task.redList.rcMap And Not dst1)
             diffs.Add(dst1.Clone)
 
             task.redList.rclist.Clear()
-            task.redList.rclist.Add(New rcData)
+            task.redList.rclist.Add(New rcDataOld)
             For i = 0 To cellLists.Count - 1
                 For Each rc In cellLists(i)
                     Dim present As Boolean = True
@@ -10800,7 +10800,7 @@ Namespace VBClasses
 
 
     Public Class XO_RedList_ContourAdd : Inherits TaskParent
-        Public rclist As New List(Of rcData)
+        Public rclist As New List(Of rcDataOld)
         Public Sub New()
 
             desc = "Add a contour for each RedColor cell."
@@ -10835,7 +10835,7 @@ Namespace VBClasses
         Public Sub New()
             desc = "Show the maxdist before and after updating the mask with the contour."
         End Sub
-        Public Shared Function RebuildRCMap(rclist As List(Of rcData)) As cv.Mat
+        Public Shared Function RebuildRCMap(rclist As List(Of rcDataOld)) As cv.Mat
             task.redList.rcMap.SetTo(0)
             Dim dst As New cv.Mat(task.workRes, cv.MatType.CV_8UC3, 0)
             For Each rc In rclist
@@ -10845,7 +10845,7 @@ Namespace VBClasses
             Next
             Return dst
         End Function
-        Public Shared Function GetMaxDist(ByRef rc As rcData) As cv.Point
+        Public Shared Function GetMaxDist(ByRef rc As rcDataOld) As cv.Point
             Dim mask = rc.mask.Clone
             mask.Rectangle(New cv.Rect(0, 0, mask.Width, mask.Height), 0, 1)
             Dim distance32f = mask.DistanceTransform(cv.DistanceTypes.L1, 0)
@@ -11038,7 +11038,7 @@ Namespace VBClasses
             Dim histogram As New cv.Mat
             Dim ranges = {New cv.Rangef(0, 255)}
             Dim histArray(254) As Single
-            Dim rclist As New List(Of rcData)
+            Dim rclist As New List(Of rcDataOld)
             Dim usedList As New List(Of Integer)
             For Each md In mdList
                 cv.Cv2.CalcHist({task.redList.rcMap(md.rect)}, {0}, md.mask, histogram, 1, {255}, ranges)
@@ -11082,11 +11082,11 @@ Namespace VBClasses
             dst1 = regions.dst2
 
             RedFlood_List.runRedList(src, labels(2))
-            Dim lastList As New List(Of rcData)(task.redList.rclist)
+            Dim lastList As New List(Of rcDataOld)(task.redList.rclist)
 
             dst2.SetTo(0)
 
-            Dim rclist As New List(Of rcData)
+            Dim rclist As New List(Of rcDataOld)
             For Each rc In task.redList.rclist
                 If task.motion.motionMask(rc.rect).CountNonZero = 0 Then
                     If rc.indexLast > 0 And rc.indexLast < lastList.Count Then rc = lastList(rc.indexLast)
@@ -11104,7 +11104,7 @@ Namespace VBClasses
                 rclist.Add(rc)
             Next
 
-            task.redList.rclist = New List(Of rcData)(rclist)
+            task.redList.rclist = New List(Of rcDataOld)(rclist)
             labels(3) = CStr(rclist.Count) + " redCloud cells were found"
         End Sub
     End Class
@@ -11127,12 +11127,12 @@ Namespace VBClasses
             dst1 = regions.redM.dst2
 
             RedFlood_List.runRedList(src, labels(2))
-            Static rcLastList As New List(Of rcData)(task.redList.rclist)
+            Static rcLastList As New List(Of rcDataOld)(task.redList.rclist)
 
             Dim mdList = New List(Of maskData)(regions.redM.mdList)
             Dim histogram As New cv.Mat
             Dim ranges = {New cv.Rangef(0, 255)}
-            Dim rclist As New List(Of rcData)
+            Dim rclist As New List(Of rcDataOld)
             Dim lastCount As Integer
             Dim histArray(mdList.Count - 1) As Single
             For Each rc In task.redList.rclist
@@ -11157,8 +11157,8 @@ Namespace VBClasses
                 dst2(rc.rect).SetTo(rc.color, rc.mask)
             Next
 
-            task.redList.rclist = New List(Of rcData)(rclist)
-            rcLastList = New List(Of rcData)(rclist)
+            task.redList.rclist = New List(Of rcDataOld)(rclist)
+            rcLastList = New List(Of rcDataOld)(rclist)
             labels(3) = CStr(rclist.Count) + " redCloud cells were found and " + CStr(lastCount) + " cells had no motion."
         End Sub
     End Class
@@ -11202,7 +11202,7 @@ Namespace VBClasses
             If task.redList.rclist.Count = 0 Then Exit Sub ' next frame please...
 
             Dim rc = task.redList.rclist(1)
-            Static rcSave As rcData = rc, stableCount As Integer
+            Static rcSave As rcDataOld = rc, stableCount As Integer
             If rc.maxDist <> rcSave.maxDist Then
                 rcSave = rc
                 stableCount = 1
@@ -11307,7 +11307,7 @@ Namespace VBClasses
 
             Dim changedPixels = dst3.CvtColor(cv.ColorConversionCodes.BGR2GRAY).CountNonZero
             Dim changedCells As Integer
-            For Each rc As rcData In task.redList.rclist
+            For Each rc As rcDataOld In task.redList.rclist
                 If rc.indexLast = 0 Then changedCells += 1
             Next
 
@@ -11327,11 +11327,11 @@ Namespace VBClasses
     Public Class XO_Bin2Way_RedCloud : Inherits TaskParent
         Dim bin2 As New Bin2Way_RecurseOnce
         Dim flood As New Flood_BasicsMask
-        Dim cellMaps(3) As cv.Mat, rclist(3) As List(Of rcData)
+        Dim cellMaps(3) As cv.Mat, rclist(3) As List(Of rcDataOld)
         Dim options As New Options_Bin2WayRedCloud
         Public Sub New()
             flood.showSelected = False
-            desc = "Identify the lightest, darkest, and other regions separately and then combine the rcData."
+            desc = "Identify the lightest, darkest, and other regions separately and then combine the rcDataOld."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
@@ -11339,14 +11339,14 @@ Namespace VBClasses
 
             If task.optionsChanged Then
                 For i = 0 To rclist.Count - 1
-                    rclist(i) = New List(Of rcData)
+                    rclist(i) = New List(Of rcDataOld)
                     cellMaps(i) = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
                 Next
             End If
 
             bin2.Run(src)
 
-            Dim sortedCells As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
+            Dim sortedCells As New SortedList(Of Integer, rcDataOld)(New compareAllowIdenticalIntegerInverted)
             For i = options.startRegion To options.endRegion
                 task.redList.rcMap = cellMaps(i)
 
@@ -11354,7 +11354,7 @@ Namespace VBClasses
                 flood.inputRemoved = Not bin2.mats.mat(i)
                 flood.Run(bin2.mats.mat(i))
                 cellMaps(i) = task.redList.rcMap.Clone
-                rclist(i) = New List(Of rcData)(task.redList.rclist)
+                rclist(i) = New List(Of rcDataOld)(task.redList.rclist)
                 For Each orc In task.redList.rclist
                     If orc.mapID = 0 Then Continue For
                     sortedCells.Add(orc.pixels, orc)
@@ -11372,7 +11372,7 @@ Namespace VBClasses
 
 
     Public Class XO_RedCloudAndColor_Basics : Inherits TaskParent
-        Public rcList As New List(Of rcData)
+        Public rcList As New List(Of rcDataOld)
         Public rcMap = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         Dim redC As New RedCloud_Basics
         Dim reduction As New Reduction_Basics
@@ -11385,9 +11385,9 @@ Namespace VBClasses
             dst2 = redC.dst2
             labels(2) = redC.labels(2)
 
-            Static rcListLast = New List(Of rcData)
+            Static rcListLast = New List(Of rcDataOld)
             Dim rcMapLast = rcMap.clone
-            rcList = New List(Of rcData)(redC.rcList)
+            rcList = New List(Of rcDataOld)(redC.rcList)
 
             dst3 = task.gray
             dst3.SetTo(0, task.depthmask)
@@ -11399,7 +11399,7 @@ Namespace VBClasses
             Dim minCount = dst2.Total * 0.001
             Dim mask = New cv.Mat(New cv.Size(dst3.Width + 2, dst3.Height + 2), cv.MatType.CV_8U, 0)
             Dim flags As cv.FloodFillFlags = cv.FloodFillFlags.Link4 ' Or cv.FloodFillFlags.MaskOnly ' maskonly is expensive but why?
-            Dim newList As New List(Of rcData)
+            Dim newList As New List(Of rcDataOld)
             For y = 0 To dst1.Height - 1
                 For x = 0 To dst1.Width - 1
                     Dim pt = New cv.Point(x, y)
@@ -11408,7 +11408,7 @@ Namespace VBClasses
                         Dim count = cv.Cv2.FloodFill(dst1, mask, pt, index, rect, 0, 0, flags)
                         If rect.Width > 0 And rect.Height > 0 Then
                             'If count >= minCount Then
-                            Dim rc = New rcData(dst3(rect), rect, index)
+                            Dim rc = New rcDataOld(dst3(rect), rect, index)
                             If rc Is Nothing Then Continue For
                             rc.color = task.scalarColors(rc.mapID)
                             newList.Add(rc)
@@ -11428,7 +11428,7 @@ Namespace VBClasses
 
             labels(2) = "Cells found = " + CStr(rcList.Count) + " and " + CStr(newList.Count) + " were color only cells."
 
-            rcListLast = New List(Of rcData)(rcList)
+            rcListLast = New List(Of rcDataOld)(rcList)
         End Sub
     End Class
 
@@ -12369,7 +12369,7 @@ Namespace VBClasses
 
 
     Public Class XO_Contour_Outline : Inherits TaskParent
-        Public rc As New rcData
+        Public rc As New rcDataOld
         Public Sub New()
             desc = "Create a simplified contour of the selected cell"
         End Sub
@@ -12402,7 +12402,7 @@ Namespace VBClasses
 
 
     Public Class XO_RedCloud_MotionTest : Inherits TaskParent
-        Public rcList As New List(Of rcData)
+        Public rcList As New List(Of rcDataOld)
         Public rcMap As cv.Mat = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         Public percentImage As Single
         Dim redC As New RedCloud_Basics
@@ -12410,7 +12410,7 @@ Namespace VBClasses
             If standalone Then task.gOptions.displayDst1.Checked = True
             desc = "Build contours for each cell"
         End Sub
-        Public Function motionDisplayCell() As rcData
+        Public Function motionDisplayCell() As rcDataOld
             Dim clickIndex = rcMap.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X) - 1
             If clickIndex >= 0 Then
                 Return rcList(clickIndex)
@@ -12423,7 +12423,7 @@ Namespace VBClasses
             labels(2) = redC.labels(2)
             labels(2) = redC.labels(2) + If(standalone, "  Age of each cell is displayed as well.", "")
 
-            Static rcListLast = New List(Of rcData)(rcList)
+            Static rcListLast = New List(Of rcDataOld)(rcList)
             Static rcMapLast As cv.Mat = rcMap.Clone
 
             rcList.Clear()
@@ -12459,7 +12459,7 @@ Namespace VBClasses
                                                CStr(rcList.Count) + " cells present"
             SetTrueText(strOut, 1)
 
-            rcListLast = New List(Of rcData)(rcList)
+            rcListLast = New List(Of rcDataOld)(rcList)
             rcMapLast = rcMap.Clone
         End Sub
     End Class
@@ -12502,7 +12502,7 @@ Namespace VBClasses
 
     Public Class XO_RedCloud_HeartBeat : Inherits TaskParent
         Dim redC As New RedCloud_Basics
-        Public rcList As New List(Of rcData)
+        Public rcList As New List(Of rcDataOld)
         Public percentImage As Single
         Public rcMap = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         Public prepEdges As New RedPrep_Basics
@@ -12516,12 +12516,12 @@ Namespace VBClasses
                 redC.Run(src)
                 dst2 = redC.dst2
                 labels(2) = redC.labels(2)
-                rcList = New List(Of rcData)(redC.rcList)
+                rcList = New List(Of rcDataOld)(redC.rcList)
                 dst3 = redC.dst2
                 dst1 = redC.redCore.prepEdges.dst2
                 labels(3) = redC.labels(2)
             Else
-                Dim rcListLast = New List(Of rcData)(redC.rcList)
+                Dim rcListLast = New List(Of rcDataOld)(redC.rcList)
 
                 prepEdges.Run(src)
                 dst1 = prepEdges.dst2.Threshold(0, 255, cv.ThresholdTypes.Binary)
@@ -12539,7 +12539,7 @@ Namespace VBClasses
                     If rcMap.Get(Of Byte)(pt.Y, pt.X) = 0 Then
                         Dim count = cv.Cv2.FloodFill(dst1, mask, pt, index, rect, 0, 0, flags)
                         If rect.Width > 0 And rect.Height > 0 And rect.Width < dst2.Width And rect.Height < dst2.Height Then
-                            Dim pcc = New rcData(dst1(rect), rect, index)
+                            Dim pcc = New rcDataOld(dst1(rect), rect, index)
                             If pcc.mapID >= 0 Then
                                 pcc.mapID = index
                                 pcc.color = rc.color
@@ -12574,11 +12574,11 @@ Namespace VBClasses
         Dim bin3 As New Bin3Way_KMeans
         Dim flood As New Flood_BasicsMask
         Dim color8U As New Color8U_Basics
-        Dim cellMaps(2) As cv.Mat, rclist(2) As List(Of rcData)
+        Dim cellMaps(2) As cv.Mat, rclist(2) As List(Of rcDataOld)
         Dim options As New Options_Bin3WayRedCloud
         Dim redC As New RedColor_Basics
         Public Sub New()
-            desc = "Identify the lightest, darkest, and 'Other' regions separately and then combine the rcData."
+            desc = "Identify the lightest, darkest, and 'Other' regions separately and then combine the rcDataOld."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
@@ -12589,7 +12589,7 @@ Namespace VBClasses
 
             If task.optionsChanged Then
                 For i = 0 To rclist.Count - 1
-                    rclist(i) = New List(Of rcData)
+                    rclist(i) = New List(Of rcDataOld)
                     cellMaps(i) = New cv.Mat(dst2.Size(), cv.MatType.CV_32S, 0)
                 Next
             End If
@@ -12608,10 +12608,10 @@ Namespace VBClasses
                     flood.Run(bin3.bin3.mats.mat(i))
                 End If
                 cellMaps(i) = redC.rcMap.Clone
-                rclist(i) = New List(Of rcData)(redC.rcList)
+                rclist(i) = New List(Of rcDataOld)(redC.rcList)
             Next
 
-            Dim sortedCells As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
+            Dim sortedCells As New SortedList(Of Integer, rcDataOld)(New compareAllowIdenticalIntegerInverted)
             For i = 0 To 2
                 For Each rc In rclist(i)
                     sortedCells.Add(rc.pixels, rc)
@@ -12631,11 +12631,11 @@ Namespace VBClasses
     Public Class XO_Bin3Way_RedCloud : Inherits TaskParent
         Dim bin3 As New Bin3Way_KMeans
         Dim flood As New Flood_BasicsMask
-        Dim cellMaps(2) As cv.Mat, rclist(2) As List(Of rcData)
+        Dim cellMaps(2) As cv.Mat, rclist(2) As List(Of rcDataOld)
         Dim options As New Options_Bin3WayRedCloud
         Public Sub New()
             flood.showSelected = False
-            desc = "Identify the lightest, darkest, and other regions separately and then combine the rcData."
+            desc = "Identify the lightest, darkest, and other regions separately and then combine the rcDataOld."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
@@ -12643,21 +12643,21 @@ Namespace VBClasses
 
             If task.optionsChanged Then
                 For i = 0 To rclist.Count - 1
-                    rclist(i) = New List(Of rcData)
+                    rclist(i) = New List(Of rcDataOld)
                     cellMaps(i) = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
                 Next
             End If
 
             bin3.Run(src)
 
-            Dim sortedCells As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
+            Dim sortedCells As New SortedList(Of Integer, rcDataOld)(New compareAllowIdenticalIntegerInverted)
             For i = options.startRegion To options.endRegion
                 task.redList.rcMap = cellMaps(i)
                 task.redList.rclist = rclist(i)
                 flood.inputRemoved = Not bin3.bin3.mats.mat(i)
                 flood.Run(bin3.bin3.mats.mat(i))
                 cellMaps(i) = task.redList.rcMap.Clone
-                rclist(i) = New List(Of rcData)(task.redList.rclist)
+                rclist(i) = New List(Of rcDataOld)(task.redList.rclist)
                 For Each rc In rclist(i)
                     If rc.mapID = 0 Then Continue For
                     sortedCells.Add(rc.pixels, rc)
@@ -13862,7 +13862,7 @@ Namespace VBClasses
 
     Public Class XO_RedColor_BasicsSlow : Inherits TaskParent
         Public redCore As New XO_RedColor_Sweep
-        Public rcList As New List(Of rcData)
+        Public rcList As New List(Of rcDataOld)
         Public rcMap As cv.Mat = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         Public Sub New()
             If standalone Then task.gOptions.displayDst1.Checked = True
@@ -13872,7 +13872,7 @@ Namespace VBClasses
             redCore.Run(src)
             dst3 = redCore.dst3
 
-            Static rcListLast = New List(Of rcData)(redCore.rcList)
+            Static rcListLast = New List(Of rcDataOld)(redCore.rcList)
             Static rcMapLast As cv.Mat = redCore.rcMap.clone
 
             rcList.Clear()
@@ -13905,7 +13905,7 @@ Namespace VBClasses
             labels(2) = CStr(rcList.Count) + " redColor cells were identified "
             labels(3) = redCore.labels(3)
 
-            rcListLast = New List(Of rcData)(rcList)
+            rcListLast = New List(Of rcDataOld)(rcList)
             rcMapLast = rcMap.Clone
 
             strOut = Utility_Basics.selectCell(rcMap, rcList)
@@ -13922,7 +13922,7 @@ Namespace VBClasses
 
     Public Class XO_RedColor_HeartBeat : Inherits TaskParent
         Dim redCore As New XO_RedColor_BasicsSlow
-        Public rcList As New List(Of rcData)
+        Public rcList As New List(Of rcDataOld)
         Public rcMap = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         Public Sub New()
             desc = "Run RedColor_Core on the heartbeat but just floodFill at maxDist otherwise."
@@ -13952,7 +13952,7 @@ Namespace VBClasses
                     If rcMap.Get(Of Byte)(pt.Y, pt.X) = 0 Then
                         Dim count = cv.Cv2.FloodFill(dst1, mask, pt, index, rect, 0, 0, flags)
                         If count > minCount Then
-                            Dim pcc = New rcData(dst1(rect), rect, index)
+                            Dim pcc = New rcDataOld(dst1(rect), rect, index)
                             If pcc.mapID >= 0 Then
                                 pcc.color = rc.color
                                 pcc.age = rc.age + 1
@@ -14027,7 +14027,7 @@ Namespace VBClasses
 
 
     Public Class XO_RedColor_Sweep : Inherits TaskParent
-        Public rcList As New List(Of rcData)
+        Public rcList As New List(Of rcDataOld)
         Public reduction As New Reduction_Basics
         Public rcMap = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         Public Sub New()
@@ -14053,7 +14053,7 @@ Namespace VBClasses
                     If dst3.Get(Of Byte)(pt.Y, pt.X) > 0 Then
                         Dim count = cv.Cv2.FloodFill(dst3, mask, pt, index, rect, 0, 0, flags)
                         If count > minCount Then
-                            Dim rc = New rcData(dst3(rect), rect, index)
+                            Dim rc = New rcDataOld(dst3(rect), rect, index)
                             If rc.mapID >= 0 Then
                                 rcList.Add(rc)
                                 rcMap(rc.rect).SetTo(rc.mapID Mod 255, rc.mask)
@@ -15787,8 +15787,8 @@ Namespace VBClasses
 
 
     Public Class XO_RedFlood_Flippers : Inherits TaskParent
-        Public flipCells As New List(Of rcData)
-        Public nonFlipCells As New List(Of rcData)
+        Public flipCells As New List(Of rcDataOld)
+        Public nonFlipCells As New List(Of rcDataOld)
         Dim redMask As New XR_RedFlood_Basics
         Public Sub New()
             If standalone Then task.gOptions.displayDst1.Checked = True
@@ -15810,7 +15810,7 @@ Namespace VBClasses
             dst2.SetTo(0)
             Dim currMap = XO_RedList_Basics.DisplayCells()
             For Each md In redMask.mdList
-                Dim rc = New rcData(md.mask, md.rect, md.index)
+                Dim rc = New rcDataOld(md.mask, md.rect, md.index)
 
                 Dim lastColor = lastMap.Get(Of cv.Vec3b)(rc.maxDist.Y, rc.maxDist.X)
                 Dim currColor = currMap.Get(Of cv.Vec3b)(rc.maxDist.Y, rc.maxDist.X)
@@ -15847,7 +15847,7 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             dst1 = RedFlood_List.runRedList(src, labels(2))
-            Dim lastCells As New List(Of rcData)(task.redList.rclist)
+            Dim lastCells As New List(Of rcDataOld)(task.redList.rclist)
             flipper.Run(src)
             dst3 = flipper.dst2
 
@@ -15884,7 +15884,7 @@ Namespace VBClasses
         Public inputRemoved As cv.Mat
         Public cellGen As New RedFlood_ToRedColor
         Public redMask As New XR_RedFlood_Basics
-        Public rclist As New List(Of rcData)
+        Public rclist As New List(Of rcDataOld)
         Public rcMap As cv.Mat ' redColor map 
         Public contours As New Contour_Basics
         Public Sub New()
@@ -16002,7 +16002,7 @@ Namespace VBClasses
 
     Public Class XO_RedList_Equations : Inherits TaskParent
         Dim eq As New Plane_Equation
-        Public rclist As New List(Of rcData)
+        Public rclist As New List(Of rcDataOld)
         Dim redC As New RedColor_Basics
         Public Sub New()
             labels(3) = "The estimated plane equations for the largest 20 RedCloud cells."
@@ -16015,11 +16015,11 @@ Namespace VBClasses
                 dst2 = redC.dst2
                 labels(2) = redC.labels(2)
 
-                rclist = New List(Of rcData)(redC.rcList)
+                rclist = New List(Of rcDataOld)(redC.rcList)
             End If
 
-            Dim newCells As New List(Of rcData)
-            For Each rc As rcData In rclist
+            Dim newCells As New List(Of rcDataOld)
+            For Each rc As rcDataOld In rclist
                 If rc.contour.Count > 4 Then
                     eq.rc = rc
                     eq.Run(src)
@@ -16027,7 +16027,7 @@ Namespace VBClasses
                 End If
             Next
 
-            rclist = New List(Of rcData)(newCells)
+            rclist = New List(Of rcDataOld)(newCells)
 
             If task.heartBeat Then
                 Dim index As Integer
@@ -17024,7 +17024,7 @@ Namespace VBClasses
 
     Public Class XO_Line_RotatedRects : Inherits TaskParent
         Dim roRect As New XO_Line_Map
-        Public rcList As New List(Of rcData)
+        Public rcList As New List(Of rcDataOld)
         Dim redC As New RedColor_Basics
         Public Sub New()
             desc = "Track each rotated rect."
@@ -17093,7 +17093,7 @@ Namespace VBClasses
         Public inputRemoved As cv.Mat
         Public cellGen As New RedFlood_ToRedColor
         Public redMask As New XR_RedFlood_Basics
-        Public rclist As New List(Of rcData)
+        Public rclist As New List(Of rcDataOld)
         Public rcMap As cv.Mat ' redColor map 
         Public contours As New Contour_Basics
         Public Sub New()
@@ -17125,9 +17125,9 @@ Namespace VBClasses
 
             Return dst
         End Function
-        Public Shared Function RebuildRCMap(sortedCells As List(Of rcData)) As cv.Mat
+        Public Shared Function RebuildRCMap(sortedCells As List(Of rcDataOld)) As cv.Mat
             task.redList.rclist.Clear()
-            task.redList.rclist.Add(New rcData) ' placeholder rcData so map is correct.
+            task.redList.rclist.Add(New rcDataOld) ' placeholder rcDataOld so map is correct.
             task.redList.rcMap.SetTo(0)
             Static saveColorSetting = task.gOptions.trackingLabel
             For Each rc In sortedCells
@@ -17183,11 +17183,11 @@ Namespace VBClasses
     Public Class XO_Bin4Way_RedCloud : Inherits TaskParent
         Dim bin2 As New XO_Bin4Way_BasicsOld
         Dim flood As New Flood_BasicsMask
-        Dim cellMaps(3) As cv.Mat, rclist(3) As List(Of rcData)
+        Dim cellMaps(3) As cv.Mat, rclist(3) As List(Of rcDataOld)
         Dim options As New Options_Bin2WayRedCloud
         Public Sub New()
             flood.showSelected = False
-            desc = "Identify the lightest and darkest regions separately and then combine the rcData."
+            desc = "Identify the lightest and darkest regions separately and then combine the rcDataOld."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
@@ -17195,21 +17195,21 @@ Namespace VBClasses
 
             If task.optionsChanged Then
                 For i = 0 To rclist.Count - 1
-                    rclist(i) = New List(Of rcData)
+                    rclist(i) = New List(Of rcDataOld)
                     cellMaps(i) = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
                 Next
             End If
 
             bin2.Run(src)
 
-            Dim sortedCells As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
+            Dim sortedCells As New SortedList(Of Integer, rcDataOld)(New compareAllowIdenticalIntegerInverted)
             For i = options.startRegion To options.endRegion
                 task.redList.rcMap = cellMaps(i)
                 task.redList.rclist = rclist(i)
                 flood.inputRemoved = Not bin2.mats.mat(i)
                 flood.Run(bin2.mats.mat(i))
                 cellMaps(i) = task.redList.rcMap.Clone
-                rclist(i) = New List(Of rcData)(task.redList.rclist)
+                rclist(i) = New List(Of rcDataOld)(task.redList.rclist)
                 For Each rc In task.redList.rclist
                     If rc.mapID = 0 Then Continue For
                     sortedCells.Add(rc.pixels, rc)
@@ -17274,7 +17274,7 @@ Namespace VBClasses
 
 
     Public Class XO_Contour_SelfIntersect : Inherits TaskParent
-        Public rc As New rcData
+        Public rc As New rcDataOld
         Public Sub New()
             desc = "Search the contour points for duplicates indicating the contour is self-intersecting."
         End Sub
@@ -17313,7 +17313,7 @@ Namespace VBClasses
         Public pixelVector As New List(Of List(Of Single))
         Dim distances As New SortedList(Of Double, Integer)(New compareAllowIdenticalDoubleInverted)
         Dim lastDistances As New SortedList(Of Double, Integer)(New compareAllowIdenticalDoubleInverted)
-        Dim lastrcList As New List(Of rcData)
+        Dim lastrcList As New List(Of rcDataOld)
         Public Sub New()
             If standalone Then task.gOptions.displayDst1.Checked = True
             OptionParent.FindSlider("Histogram 3D Bins").Value = 5
@@ -17383,7 +17383,7 @@ Namespace VBClasses
                 lastDistances.Add(el.Key, el.Value)
             Next
 
-            lastrcList = New List(Of rcData)(task.redList.rclist)
+            lastrcList = New List(Of rcDataOld)(task.redList.rclist)
         End Sub
     End Class
 
@@ -17395,7 +17395,7 @@ Namespace VBClasses
 
     Public Class XO_Flood_Motion : Inherits TaskParent
         Dim flood As New Flood_Basics
-        Dim rclist As New List(Of rcData)
+        Dim rclist As New List(Of rcDataOld)
         Dim maxDists As New List(Of cv.Point2f)
         Dim maxIndex As New List(Of Integer)
         Public Sub New()
@@ -17405,7 +17405,7 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             If task.heartBeat Then
                 flood.Run(src)
-                rclist = New List(Of rcData)(task.redList.rclist)
+                rclist = New List(Of rcDataOld)(task.redList.rclist)
                 dst2 = flood.dst2.Clone
                 dst3 = flood.dst2.Clone
                 labels(2) = flood.labels(2)
@@ -17437,7 +17437,7 @@ Namespace VBClasses
 
     Public Class XO_Foreground_CellsBack : Inherits TaskParent
         Dim fore As New XR_Foreground_Hist3D
-        Public rclist As New List(Of rcData)
+        Public rclist As New List(Of rcDataOld)
         Public Sub New()
             desc = "Get the background cells"
         End Sub
@@ -17463,8 +17463,8 @@ Namespace VBClasses
         Dim guide As New GuidedBP_MultiSlice
         Public redCx As New RedFlood_List
         Public redCy As New RedFlood_List
-        Public rcListX As New List(Of rcData)
-        Public rcListY As New List(Of rcData)
+        Public rcListX As New List(Of rcDataOld)
+        Public rcListY As New List(Of rcDataOld)
         Public rcMapX As New cv.Mat
         Public rcMapY As New cv.Mat
         Public Sub New()
@@ -17477,13 +17477,13 @@ Namespace VBClasses
             redCx.Run(guide.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
             rcMapX = task.redList.rcMap.Clone
             dst2 = redCx.dst2
-            rcListX = New List(Of rcData)(task.redList.rclist)
+            rcListX = New List(Of rcDataOld)(task.redList.rclist)
             labels(2) = CStr(task.redList.rclist.Count) + " cells were found in vertical segments"
 
             redCx.Run(guide.dst3.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
             rcMapY = task.redList.rcMap.Clone
             dst3 = redCx.dst2
-            rcListY = New List(Of rcData)(task.redList.rclist)
+            rcListY = New List(Of rcDataOld)(task.redList.rclist)
             labels(3) = CStr(task.redList.rclist.Count) + " cells were found in horizontal segments"
         End Sub
     End Class
@@ -17496,8 +17496,8 @@ Namespace VBClasses
         Public redCold As New XO_GuidedBP_RedCloud
         Public mats As New Mat_4Click
         Dim options As New Options_BP_Regions
-        Public rcListX As New List(Of rcData)
-        Public rcListY As New List(Of rcData)
+        Public rcListX As New List(Of rcDataOld)
+        Public rcListY As New List(Of rcDataOld)
         Public rcMapX As New cv.Mat
         Public rcMapY As New cv.Mat
         Public Sub New()
@@ -17671,7 +17671,7 @@ Namespace VBClasses
 
 
     Public Class XO_Histogram_ShapeSide : Inherits TaskParent
-        Public rc As New rcData
+        Public rc As New rcDataOld
         Public Sub New()
             task.gOptions.setHistogramBins(60)
             labels = {"", "", "ZY Side View", "ZY Side View Mask"}
@@ -17700,7 +17700,7 @@ Namespace VBClasses
 
 
     Public Class XO_Histogram_ShapeTop : Inherits TaskParent
-        Public rc As New rcData
+        Public rc As New rcDataOld
         Public Sub New()
             task.gOptions.setHistogramBins(60)
             labels = {"", "", "ZY Side View", "ZY Side View Mask"}
@@ -17737,7 +17737,7 @@ Namespace VBClasses
             desc = "Prepare the list of 2D triangles"
         End Sub
         Private Function addTriangle(c1 As cv.Point, c2 As cv.Point, center As cv.Point,
-                                         rc As rcData, shift As cv.Point3f) As List(Of cv.Point)
+                                         rc As rcDataOld, shift As cv.Point3f) As List(Of cv.Point)
             Dim pt1 = Cloud_Basics.worldCoordinates(New cv.Point3f(c1.X, c1.Y, rc.wcMean(2)))
             Dim ptCenter = Cloud_Basics.worldCoordinates(New cv.Point3f(center.X, center.Y, rc.wcMean(2)))
             Dim pt2 = Cloud_Basics.worldCoordinates(New cv.Point3f(c2.X, c2.Y, rc.wcMean(2)))
@@ -17796,7 +17796,7 @@ Namespace VBClasses
 
     Public Class XO_Foreground_CellsFore : Inherits TaskParent
         Dim fore As New XR_Foreground_Hist3D
-        Public rclist As New List(Of rcData)
+        Public rclist As New List(Of rcDataOld)
         Public Sub New()
             desc = "Get the foreground cells"
         End Sub
@@ -17822,7 +17822,7 @@ Namespace VBClasses
 
 
     Public Class XO_RedList_Hulls : Inherits TaskParent
-        Public rclist As New List(Of rcData)
+        Public rclist As New List(Of rcDataOld)
         Public rcMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         Public Sub New()
             labels = {"", "Cells where convexity defects failed", "", "Improved contour results Using OpenCV's ConvexityDefects"}
@@ -17864,8 +17864,8 @@ Namespace VBClasses
 
     Public Class XO_RedList_LikelyFlatSurfaces : Inherits TaskParent
         Dim verts As New Plane_Basics
-        Public vCells As New List(Of rcData)
-        Public hCells As New List(Of rcData)
+        Public vCells As New List(Of rcDataOld)
+        Public hCells As New List(Of rcDataOld)
         Public Sub New()
             labels(1) = "RedCloud output"
             desc = "Use the mask for vertical surfaces to identify RedCloud cells that appear to be flat."
@@ -17936,13 +17936,13 @@ Namespace VBClasses
             RedFlood_List.runRedList(src, labels(2))
             If task.redList.rclist.Count = 0 Then Exit Sub
 
-            Static rcLastList As New List(Of rcData)(task.redList.rclist)
+            Static rcLastList As New List(Of rcDataOld)(task.redList.rclist)
 
             Dim count As Integer
             dst1.SetTo(0)
             task.redList.rclist.RemoveAt(0)
-            'Dim newList As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
-            Dim newList As New List(Of rcData), tmp As New cv.Mat
+            'Dim newList As New SortedList(Of Integer, rcDataOld)(New compareAllowIdenticalIntegerInverted)
+            Dim newList As New List(Of rcDataOld), tmp As New cv.Mat
             Dim countMaxD As Integer, countMissedMaxD As Integer
             For Each rc In task.redList.rclist
                 tmp = task.motion.motionMask(rc.rect) And rc.mask
@@ -17969,13 +17969,13 @@ Namespace VBClasses
                         "  There were " + CStr(countMaxD) + " maxDist matches and " + CStr(countMissedMaxD) + " misses"
 
             task.redList.rclist.Clear()
-            task.redList.rclist.Add(New rcData)
+            task.redList.rclist.Add(New rcDataOld)
             For Each rc In newList
                 rc.mapID = task.redList.rclist.Count
                 task.redList.rclist.Add(rc)
             Next
 
-            rcLastList = New List(Of rcData)(task.redList.rclist)
+            rcLastList = New List(Of rcDataOld)(task.redList.rclist)
 
             dst3.SetTo(0)
             For Each rc In task.redList.rclist
@@ -18021,11 +18021,11 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             RedFlood_List.runRedList(src, labels(3))
 
-            Dim lastCells As New List(Of rcData)(task.redList.rclist)
+            Dim lastCells As New List(Of rcDataOld)(task.redList.rclist)
             Dim lastMap As cv.Mat = task.redList.rcMap.Clone
             Dim lastColors As cv.Mat = dst3.Clone
 
-            Dim newCells As New List(Of rcData)
+            Dim newCells As New List(Of rcDataOld)
             task.redList.rcMap.SetTo(0)
             dst3.SetTo(0)
             Dim usedColors = New List(Of cv.Scalar)({black})
@@ -18051,7 +18051,7 @@ Namespace VBClasses
                 End If
             Next
 
-            task.redList.rclist = New List(Of rcData)(newCells)
+            task.redList.rclist = New List(Of rcDataOld)(newCells)
             labels(3) = CStr(task.redList.rclist.Count) + " cells were identified."
             labels(2) = task.redList.labels(3) + " " + CStr(unmatched) + " cells were not matched to previous frame."
 
@@ -18281,7 +18281,7 @@ Namespace VBClasses
         Public redC As New RedColor_Basics
         Dim wcDataX As New XO_RedWC_Core
         Dim wcDataY As New XO_RedWC_Core
-        Public rcList As New List(Of rcData)
+        Public rcList As New List(Of rcDataOld)
         Public rcTranslate As New List(Of cv.Point3d)
         Public Sub New()
             If standalone Then task.gOptions.displayDst1.Checked = True
@@ -18344,7 +18344,7 @@ Namespace VBClasses
         Public indexer As New Indexer_Basics
         Dim wcDataX As New XO_RedWC_Core
         Dim wcDataY As New XO_RedWC_Core
-        Public rcList As New List(Of rcData)
+        Public rcList As New List(Of rcDataOld)
         Public rcTranslate As New List(Of cv.Point3d)
         Public Sub New()
             If standalone Then task.gOptions.displayDst1.Checked = True
@@ -18577,7 +18577,7 @@ Namespace VBClasses
         Public indexer As New Indexer_Basics
         Public redC As New RedColor_Basics
         Dim element As New cv.Mat
-        Public rcList As New List(Of rcData)
+        Public rcList As New List(Of rcDataOld)
         Public rcMap As cv.Mat
         Public Sub New()
             element = cv.Cv2.GetStructuringElement(cv.MorphShapes.Rect, New cv.Size(3, 3))
@@ -18602,7 +18602,7 @@ Namespace VBClasses
                 If labels(3).Length > 80 Then labels(3) = causeLabel
             End If
 
-            rcList = New List(Of rcData)(redC.rcList)
+            rcList = New List(Of rcDataOld)(redC.rcList)
             rcMap = redC.rcMap.Clone
         End Sub
     End Class
@@ -18615,7 +18615,7 @@ Namespace VBClasses
     Public Class XO_RedCloud_FloodLine_CPP : Inherits TaskParent
         Implements IDisposable
         Public classCount As Integer
-        Public rcList As New List(Of rcData)
+        Public rcList As New List(Of rcDataOld)
         Public rcMap As cv.Mat = New cv.Mat(dst2.Size, cv.MatType.CV_32S, 0)
         Public wGridList As New List(Of cv.Point3d)
         Public options As New Options_RedCloud
@@ -18653,15 +18653,15 @@ Namespace VBClasses
             Dim rects(classCount - 1) As cv.Rect
             rectData.GetArray(Of cv.Rect)(rects)
 
-            Dim rcListLast = New List(Of rcData)(rcList)
+            Dim rcListLast = New List(Of rcDataOld)(rcList)
             Dim rcMapLast As cv.Mat = rcMap.Clone
 
             Dim minPixels As Integer = dst2.Total * 0.001
             If task.fOptions.ReductionColor.Value < 50 Then minPixels = 0
             Dim index As Integer = 1
-            Dim newList As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
+            Dim newList As New SortedList(Of Integer, rcDataOld)(New compareAllowIdenticalIntegerInverted)
             For i = 0 To rects.Count - 1
-                Dim rc = New rcData(dst0(rects(i)), rects(i), index)
+                Dim rc = New rcDataOld(dst0(rects(i)), rects(i), index)
                 If rc.pixels < minPixels Then Continue For
                 newList.Add(rc.pixels, rc)
                 index += 1
@@ -18727,7 +18727,7 @@ Namespace VBClasses
     Public Class XO_RedCloud_BasicsLined : Inherits TaskParent
         Public indexer As New Indexer_Corners
         Public redC As New XO_RedCloud_FloodLine_CPP
-        Public rcList As New List(Of rcData)
+        Public rcList As New List(Of rcDataOld)
         Public rcMap As cv.Mat
         Public Sub New()
             desc = "Assign abstract world coordinates to each RedCloud cell."
@@ -18754,7 +18754,7 @@ Namespace VBClasses
                 If labels(3).Length > 80 Then labels(3) = causeLabel
             End If
 
-            rcList = New List(Of rcData)(redC.rcList)
+            rcList = New List(Of rcDataOld)(redC.rcList)
             rcMap = redC.rcMap.Clone
         End Sub
     End Class
@@ -18800,7 +18800,7 @@ Namespace VBClasses
 
     Public Class XO_RedWGrid_ValidateCols : Inherits TaskParent
         Dim redC As New RedCloud_Basics
-        Public rcList As New List(Of rcData)
+        Public rcList As New List(Of rcDataOld)
         Public column As Integer
         Public ptX As New List(Of Integer)
         Public Sub New()
@@ -20843,4 +20843,324 @@ Namespace VBClasses
             labels(3) = "The top " + CStr(count) + " cells by size = " + Format(options.percent, "0%") + " of the pixels"
         End Sub
     End Class
+
+
+
+
+    Public Class XO_RedCloud_ColorCells : Inherits TaskParent
+        Public redCore As New RedCloud_Core
+        Public rcList As New List(Of rcDataOld)
+        Public rcMap As cv.Mat = New cv.Mat(dst2.Size, cv.MatType.CV_32S, 0)
+        Public options As New Options_RedCloud
+        Public runSelectCell As Boolean = True
+        Dim redC As New RedColor_Basics
+        Public Sub New()
+            task.gOptions.stableDepthRGB.Checked = True
+            desc = "Build contours for each cell"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            options.Run()
+
+            redC.Run(task.gray)
+
+            redCore.Run(src)
+            labels(3) = redCore.labels(3)
+
+            Dim rcListLast As New List(Of rcDataOld)(rcList)
+            Dim rcMapLast As cv.Mat = rcMap.Clone
+
+            rcList.Clear()
+            rcMap.SetTo(0)
+            dst2.SetTo(0)
+            Dim matchCount As Integer
+            Dim unMatched As Integer
+            Dim matchAverage As Single
+            Dim blackVec As New cv.Vec3b
+            For Each rc In redCore.rcList
+                rc = Utility_Basics.rcDataMatch(rc, rcListLast, rcMapLast)
+
+                If rc.age = 1 Then unMatched += 1 Else matchCount += 1
+                matchAverage += rc.age
+                rc.mapID = rcList.Count + 1
+                rcMap(rc.rect).SetTo(rc.mapID, rc.mask)
+
+                rcList.Add(rc)
+
+                If task.heartBeat Then
+                    Dim color = redC.dst2.Get(Of cv.Vec3b)(rc.maxDist.Y, rc.maxDist.X)
+                    If color <> blackVec Then rc.color = color
+                End If
+                dst2(rc.rect).SetTo(rc.color, rc.mask)
+            Next
+
+            If runSelectCell Then
+                strOut = Utility_Basics.selectCell(rcMap, rcList)
+                SetTrueText(strOut, 3)
+            End If
+
+            dst1 = redC.dst2
+
+            labels(2) = CStr(unMatched) + " were new cells and " + CStr(matchCount) + " were matched, " +
+                                    "average age: " + Format(matchAverage / rcList.Count, fmt1)
+        End Sub
+    End Class
+
+
+
+
+
+
+    Public Class XO_FeatureLess_RedColor : Inherits TaskParent
+        Public redC As New RedCloud_Flood_CPP
+        Public fLess As New FeatureLess_DepthFull
+        Public Sub New()
+            If standalone Then task.gOptions.displayDst1.Checked = True
+            desc = "Use the FeatureLess_DepthFull output as input to RedColor_Basics"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            fLess.Run(task.gray)
+            dst3 = fLess.dst2
+            labels(3) = fLess.labels(2)
+
+            redC.Run(dst3)
+
+            dst2.SetTo(0)
+            dst2 = redC.dst2
+            labels(2) = redC.labels(2)
+
+            strOut = redC.strOut
+            SetTrueText(strOut, 1)
+        End Sub
+    End Class
+
+
+
+
+
+    Public Class XO_RedCloud_FeatureLess : Inherits TaskParent
+        Dim fRed As New XO_FeatureLess_RedColor
+        Public Sub New()
+            desc = "Use the FeatureLess_DepthFull output as input to RedCloud - identical to FeatureLess_RedColor (now)"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            fRed.Run(task.gray)
+            dst2 = fRed.dst2
+            labels(2) = fRed.labels(2)
+
+            ' If task.rcD IsNot Nothing Then task.clickPoint = task.rcD.maxDist
+            SetTrueText(fRed.strOut, 3)
+        End Sub
+    End Class
+
+
+
+
+    Public Class XO_Delaunay_FeatureLess : Inherits TaskParent
+        Dim fLessColor As New XO_FeatureLess_RedColor
+        Dim delaunay As New Delaunay_Color
+        Public Sub New()
+            labels(3) = "Delaunay cells cover the image completely and roughly match featureless regions."
+            desc = "Segment the image based on the featureless regions."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            fLessColor.Run(src)
+            dst2 = fLessColor.dst2
+            labels(2) = fLessColor.labels(2)
+
+            delaunay.inputPoints.Clear()
+            delaunay.inputColors.Clear()
+
+            For Each r In fLessColor.fLess.brickList
+                Dim pt = r.TopLeft
+                Dim val = fLessColor.redC.rcMap.Get(Of Integer)(pt.Y, pt.X)
+                delaunay.inputPoints.Add(New cv.Point2f(pt.X, pt.Y))
+                delaunay.inputColors.Add(val - 1)
+            Next
+            delaunay.Run(dst2)
+            dst3 = delaunay.dst2
+        End Sub
+    End Class
+
+
+
+    Public Class XO_ML_FeatureLess : Inherits TaskParent
+        Implements IDisposable
+        Dim fRed As New XO_FeatureLess_RedColor
+        Dim rtree As RTrees
+        Public Sub New()
+            If standalone Then task.gOptions.displayDst1.Checked = True
+            dst1 = New cv.Mat(dst2.Size, cv.MatType.CV_8U)
+            desc = "Cursor.ai: Use FeatureLess_RedColor to learn BGR in each featureless grid cell, then RTrees predicts cell-id per pixel in that cell's surrounding grid rects."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            fRed.Run(src)
+            dst1 = fRed.dst3.Clone
+            dst3 = fRed.dst2.Clone
+            labels(3) = fRed.labels(3)
+
+            Dim flIndices As New List(Of Integer)
+            For i = 0 To task.gridRects.Count - 1
+                Dim gr = task.gridRects(i)
+                If fRed.dst3.Get(Of Byte)(gr.Y, gr.X) > 0 Then flIndices.Add(i)
+            Next
+
+            labels(2) = CStr(flIndices.Count) + " featureless cells; neighbor rects colored by predicted cell id."
+
+            If flIndices.Count < 2 Then
+                SetTrueText("ML_FeatureLess needs at least 2 featureless grid cells.", 2)
+                dst2 = src.Clone
+                Exit Sub
+            End If
+
+            Dim rgb32f As New cv.Mat
+            src.ConvertTo(rgb32f, cv.MatType.CV_32FC3)
+
+            Dim learnParts As New List(Of cv.Mat)
+            Dim respParts As New List(Of cv.Mat)
+            For classId = 0 To flIndices.Count - 1
+                Dim gr = task.gridRects(flIndices(classId))
+                Dim patch = rgb32f(gr).Clone()
+                Dim flat = patch.Reshape(1, patch.Rows * patch.Cols)
+                learnParts.Add(flat)
+                respParts.Add(New cv.Mat(flat.Rows, 1, cv.MatType.CV_32F, New cv.Scalar(classId)))
+            Next
+
+            Dim learnInput As New cv.Mat
+            Dim response As New cv.Mat
+            cv.Cv2.VConcat(learnParts.ToArray(), learnInput)
+            cv.Cv2.VConcat(respParts.ToArray(), response)
+
+            If rtree Is Nothing Then
+                rtree = cv.ML.RTrees.Create()
+                rtree.MinSampleCount = 2
+                rtree.MaxDepth = 10
+            End If
+            rtree.Train(learnInput, cv.ML.SampleTypes.RowSample, response)
+
+            dst2.SetTo(0)
+            Dim nCells = flIndices.Count
+            For classId = 0 To flIndices.Count - 1
+                Dim center = flIndices(classId)
+                Dim nabeList = task.gridNabes(center)
+                For j = 1 To nabeList.Count - 1
+                    Dim nb = nabeList(j)
+                    Dim gr = task.gridRects(nb)
+                    Dim patch = rgb32f(gr).Clone()
+                    Dim testMat = patch.Reshape(1, patch.Rows * patch.Cols)
+                    Dim pred As New cv.Mat
+                    rtree.Predict(testMat, pred)
+                    Dim predMap = pred.Reshape(1, gr.Height)
+                    Dim cls8u = New cv.Mat(gr.Size, cv.MatType.CV_8U)
+                    For py = 0 To gr.Height - 1
+                        For px = 0 To gr.Width - 1
+                            Dim pid = predMap.Get(Of Single)(py, px)
+                            Dim cid = CInt(Math.Floor(pid + 0.5F))
+                            If cid < 0 Then cid = 0
+                            If cid >= nCells Then cid = nCells - 1
+                            cls8u.Set(Of Byte)(py, px, CByte(Math.Min(255, cid + 1)))
+                        Next
+                    Next
+                    Dim colored = Palettize(cls8u)
+                    colored.CopyTo(dst2(gr))
+                Next
+            Next
+        End Sub
+        Protected Overrides Sub Finalize()
+            If rtree IsNot Nothing Then rtree.Dispose()
+        End Sub
+    End Class
+
+
+
+
+    Public Class XO_ML_FeatureLess_Grid : Inherits TaskParent
+        Implements IDisposable
+        Dim fRed As New XO_FeatureLess_RedColor
+        Dim rtree As RTrees
+        Public Sub New()
+            If standalone Then task.gOptions.displayDst1.Checked = True
+            dst1 = New cv.Mat(dst2.Size, cv.MatType.CV_8U)
+            desc = "Cursor.ai: Train mean-BGR per FeatureLess_RedColor cell. FeatureLess rects use known class colors; other neighbors green if RTrees class matches center, red if not."
+        End Sub
+        Private Shared Function MeanBGR(rgb32f As cv.Mat, gr As cv.Rect) As cv.Vec3f
+            Dim m = rgb32f(gr).Mean()
+            Return New cv.Vec3f(CSng(m.Val0), CSng(m.Val1), CSng(m.Val2))
+        End Function
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            fRed.Run(src)
+            dst1 = fRed.dst3.Clone
+            dst3 = fRed.dst2.Clone
+            labels(3) = fRed.labels(3)
+
+            Dim flIndices As New List(Of Integer)
+            For i = 0 To task.gridRects.Count - 1
+                Dim gr = task.gridRects(i)
+                If fRed.dst3.Get(Of Byte)(gr.Y, gr.X) > 0 Then flIndices.Add(i)
+            Next
+
+            labels(2) = CStr(flIndices.Count) + " featureless cells; rectList cells shown as known class; others same/diff vs center."
+
+            If flIndices.Count < 2 Then
+                SetTrueText("ML_FeatureLess_Grid needs at least 2 featureless grid cells.", 2)
+                dst2 = src.Clone
+                Exit Sub
+            End If
+
+            Dim classByGrid As New Dictionary(Of Integer, Integer)
+            For i = 0 To flIndices.Count - 1
+                classByGrid(flIndices(i)) = i
+            Next
+
+            Dim rgb32f As New cv.Mat
+            src.ConvertTo(rgb32f, cv.MatType.CV_32FC3)
+
+            Dim nCells = flIndices.Count
+            Dim learnInput As New cv.Mat(nCells, 3, cv.MatType.CV_32F)
+            Dim response As New cv.Mat(nCells, 1, cv.MatType.CV_32F)
+            For classId = 0 To nCells - 1
+                Dim gr = task.gridRects(flIndices(classId))
+                learnInput.Set(Of cv.Vec3f)(classId, 0, MeanBGR(rgb32f, gr))
+                response.Set(Of Single)(classId, 0, CSng(classId))
+            Next
+
+            If rtree Is Nothing Then
+                rtree = cv.ML.RTrees.Create()
+                rtree.MinSampleCount = 2
+                rtree.MaxDepth = 10
+            End If
+            rtree.Train(learnInput, cv.ML.SampleTypes.RowSample, response)
+
+            dst2.SetTo(0)
+            Dim testRow As New cv.Mat(1, 3, cv.MatType.CV_32F)
+            Dim pred As New cv.Mat
+            Dim green As New cv.Scalar(0, 255, 0)
+            Dim red As New cv.Scalar(0, 0, 255)
+            For classId = 0 To nCells - 1
+                Dim center = flIndices(classId)
+                Dim nabeList = task.gridNabes(center)
+                For j = 1 To nabeList.Count - 1
+                    Dim nb = nabeList(j)
+                    Dim gr = task.gridRects(nb)
+                    If classByGrid.ContainsKey(nb) Then
+                        dst2(gr).SetTo(task.scalarColors(classByGrid(nb) Mod 256))
+                    Else
+                        testRow.Set(Of cv.Vec3f)(0, 0, MeanBGR(rgb32f, gr))
+                        rtree.Predict(testRow, pred)
+                        Dim pid = pred.Get(Of Single)(0, 0)
+                        Dim predClass = CInt(Math.Floor(pid + 0.5F))
+                        If predClass < 0 Then predClass = 0
+                        If predClass >= nCells Then predClass = nCells - 1
+                        Dim same = (predClass = classId)
+                        dst2(gr).SetTo(If(same, green, red))
+                    End If
+                Next
+            Next
+        End Sub
+        Protected Overrides Sub Finalize()
+            If rtree IsNot Nothing Then rtree.Dispose()
+        End Sub
+    End Class
+
+
+
 End Namespace

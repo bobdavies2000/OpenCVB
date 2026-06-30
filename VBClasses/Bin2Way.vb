@@ -244,7 +244,7 @@ Public Class XR_Bin2Way_RedCloudLightToDark : Inherits TaskParent
     Dim recurse As New Bin2Way_RecurseOnce
     Dim redCs(3) As RedColor_Basics
     Dim mats As New Mat_4to1
-    Dim rclist As New List(Of rcData)
+    Dim rclist As New List(Of rcDataOld)
     Dim rcMap = New cv.Mat(dst2.Size, cv.MatType.CV_32S, 0)
     Public Sub New()
         For i = 0 To redCs.Count - 1
@@ -258,7 +258,7 @@ Public Class XR_Bin2Way_RedCloudLightToDark : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         recurse.Run(src)
 
-        Dim newList As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
+        Dim newList As New SortedList(Of Integer, rcDataOld)(New compareAllowIdenticalIntegerInverted)
         For i = 0 To recurse.mats.mat.Count - 1
             Dim m = recurse.mats.mat(i)
 

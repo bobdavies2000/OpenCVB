@@ -178,6 +178,7 @@ Random
 Rectangle
 RedCC
 RedCloud
+RedCloudNew
 RedColor
 RedFlood
 RedPrep
@@ -220,3 +221,4 @@ WarpModel
 WarpPerspective
 Watershed
 XFeatures2D
+XR

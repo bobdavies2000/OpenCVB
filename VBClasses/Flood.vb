@@ -2,7 +2,7 @@ Imports System.Runtime.InteropServices
 Imports cv = OpenCvSharp
 Public Class Flood_Basics : Inherits TaskParent
     Implements IDisposable
-    Public rcList As New List(Of rcData)
+    Public rcList As New List(Of rcDataOld)
     Public rcMap As cv.Mat = New cv.Mat(dst2.Size, cv.MatType.CV_32S, 0)
     Public fLess As New FeatureLess_DepthFull
     Dim lastCenters As New HashSet(Of cv.Rect)
@@ -35,7 +35,7 @@ Public Class Flood_Basics : Inherits TaskParent
         Dim rects(classCount - 1) As cv.Rect
         rectData.GetArray(Of cv.Rect)(rects)
 
-        Dim rcLastList = New List(Of rcData)(rcList)
+        Dim rcLastList = New List(Of rcDataOld)(rcList)
 
         rcList.Clear()
         rcMap.SetTo(0)
@@ -43,7 +43,7 @@ Public Class Flood_Basics : Inherits TaskParent
         For Each r In rects
             ' skip the cells that are just one gridRect.
             If r.Size <> task.gridRects(0).Size Then
-                Dim rc = New rcData(dst0(r), r, rcList.Count + 1)
+                Dim rc = New rcDataOld(dst0(r), r, rcList.Count + 1)
                 If rc.pixels > 0 Then
                     For i = 0 To lastCenters.Count - 1
                         Dim rect = lastCenters(i)

@@ -202,7 +202,7 @@ Namespace VBClasses
 
 
     Public Class XR_KeyColor_Straight : Inherits TaskParent
-        Public rcList As New List(Of rcData)
+        Public rcList As New List(Of rcDataOld)
         Public rcMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         Dim keyColors As New XR_KeyColor_Contours
         Public Sub New()
@@ -217,7 +217,7 @@ Namespace VBClasses
 
             keyColors.keyList.RemoveAt(0)
             For Each key In keyColors.keyList
-                Dim rc = New rcData(key.mask, key.rect, -1)
+                Dim rc = New rcDataOld(key.mask, key.rect, -1)
                 rc.mapID = rcList.Count + 1
                 rc.contour = key.contour
                 rcList.Add(rc)

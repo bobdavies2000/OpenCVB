@@ -470,39 +470,11 @@ End Class
 
 
 
-Public Class Delaunay_FeatureLess : Inherits TaskParent
-    Dim fLessColor As New FeatureLess_RedColor
-    Dim delaunay As New Delaunay_Color
-    Public Sub New()
-        labels(3) = "Delaunay cells cover the image completely and roughly match featureless regions."
-        desc = "Segment the image based on the featureless regions."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        fLessColor.Run(src)
-        dst2 = fLessColor.dst2
-        labels(2) = fLessColor.labels(2)
-
-        delaunay.inputPoints.Clear()
-        delaunay.inputColors.Clear()
-
-        For Each r In fLessColor.fLess.brickList
-            Dim pt = r.TopLeft
-            Dim val = fLessColor.redC.rcMap.Get(Of Integer)(pt.Y, pt.X)
-            delaunay.inputPoints.Add(New cv.Point2f(pt.X, pt.Y))
-            delaunay.inputColors.Add(val - 1)
-        Next
-        delaunay.Run(dst2)
-        dst3 = delaunay.dst2
-    End Sub
-End Class
-
-
-
 
 
 Public Class Delaunay_Map : Inherits TaskParent
     Dim subdiv As New cv.Subdiv2D
-    Public rcList As List(Of rcData)
+    Public rcList As List(Of rcDataOld)
     Public rcMap As New cv.Mat(dst2.Size, cv.MatType.CV_32S, 0)
     Public Sub New()
         If standalone Then task.gOptions.displayDst1.Checked = True
@@ -516,7 +488,7 @@ Public Class Delaunay_Map : Inherits TaskParent
             dst2 = redC.dst2
             labels(2) = redC.labels(2)
             strOut = redC.strOut
-            rcList = New List(Of rcData)(redC.rcList)
+            rcList = New List(Of rcDataOld)(redC.rcList)
         End If
 
         subdiv.InitDelaunay(New cv.Rect(0, 0, dst2.Width, dst2.Height))

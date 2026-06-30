@@ -9,7 +9,7 @@ Public Class Track_Basics : Inherits TaskParent
         dst2 = redC.dst2
         labels(2) = redC.labels(2)
 
-        Static rclast As rcData = task.rcD
+        Static rclast As rcDataOld = task.rcD
 
         If rclast.mapID <> task.rcD.mapID And task.mouseClickFlag = False Then
             For Each rc In redC.rcList
@@ -49,7 +49,7 @@ Public Class Track_Simple : Inherits TaskParent
         dst2 = redC.dst2
         labels(2) = redC.labels(2)
 
-        Static rclast As rcData = task.rcD
+        Static rclast As rcDataOld = task.rcD
 
         If lostCell And task.mouseClickFlag = False Then
             SetTrueText("Unable to find the cell" + vbCrLf + "Click any cell to start tracking again.", 3)
@@ -90,7 +90,7 @@ Public Class Track_FindNearest : Inherits TaskParent
         redC.Run(task.gray)
         dst2 = redC.dst2
         labels(2) = redC.labels(2)
-        Static rclast As rcData = task.rcD
+        Static rclast As rcDataOld = task.rcD
 
         Dim clickIndex = redC.rcMap.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X)
         dst2.Circle(task.rcD.maxDist, task.DotSize + 2, task.highlight, -1)

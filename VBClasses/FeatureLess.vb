@@ -655,33 +655,6 @@ End Class
 
 
 
-
-Public Class FeatureLess_RedColor : Inherits TaskParent
-    Public redC As New RedCloud_Flood_CPP
-    Public fLess As New FeatureLess_DepthFull
-    Public Sub New()
-        If standalone Then task.gOptions.displayDst1.Checked = True
-        desc = "Use the FeatureLess_DepthFull output as input to RedColor_Basics"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        fLess.Run(task.grayOriginal.Clone)
-        dst3 = fLess.dst2
-        labels(3) = fLess.labels(2)
-
-        redC.Run(dst3)
-
-        dst2.SetTo(0)
-        dst2 = redC.dst2
-        labels(2) = redC.labels(2)
-
-        strOut = redC.strOut
-        SetTrueText(strOut, 1)
-    End Sub
-End Class
-
-
-
-
 Public Class FeatureLess_Stabilized : Inherits TaskParent
     Dim fLess As New FeatureLess_DepthFull
     Dim diff As New Diff_Simple
@@ -921,7 +894,7 @@ Public Class FeatureLess_ToList : Inherits TaskParent
     Dim clusters As New FeatureLess_ClusterFlood
     Public clusterX As New List(Of List(Of Integer))
     Public clusterY As New List(Of List(Of Integer))
-    Public rcList As New List(Of rcData)
+    Public rcList As New List(Of rcDataOld)
     Public rcMap As New cv.Mat(dst2.Size, cv.MatType.CV_32S, 0)
     Public Sub New()
         If standalone Then task.gOptions.displayDst1.Checked = True
@@ -929,7 +902,7 @@ Public Class FeatureLess_ToList : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         Dim lastMap As cv.Mat = rcMap.Clone
-        Dim rcLastList As New List(Of rcData)(rcList)
+        Dim rcLastList As New List(Of rcDataOld)(rcList)
 
         clusters.Run(task.gray)
         dst2 = clusters.dst2.Clone
@@ -955,7 +928,7 @@ Public Class FeatureLess_ToList : Inherits TaskParent
             clusterY(cIndex).Add(r.TopLeft.Y)
         Next
 
-        Dim sortList As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
+        Dim sortList As New SortedList(Of Integer, rcDataOld)(New compareAllowIdenticalIntegerInverted)
         For i = 1 To clusterX.Count - 1
             Dim minX = clusterX(i).Min
             Dim minY = clusterY(i).Min
@@ -965,7 +938,7 @@ Public Class FeatureLess_ToList : Inherits TaskParent
 
             Dim pt = New cv.Point(clusterX(i)(0), clusterY(i)(0))
             Dim val = dst2.Get(Of Byte)(pt.Y, pt.X)
-            Dim rc = New rcData(dst2(rect), rect, val)
+            Dim rc = New rcDataOld(dst2(rect), rect, val)
             sortList.Add(rc.pixels, rc)
         Next
 
@@ -1154,7 +1127,7 @@ Public Class FeatureLess_Features : Inherits TaskParent
     Public featureList As New List(Of Single)
     Public idList As New List(Of Single)
     Public inputVariableCount As Integer = 5
-    Public rcList As New List(Of rcData)
+    Public rcList As New List(Of rcDataOld)
     Public Sub New()
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         desc = "Expanded floodfill usage for the featureLess image."
@@ -1173,7 +1146,7 @@ Public Class FeatureLess_Features : Inherits TaskParent
             If dst2.Get(Of Byte)(r.TopLeft.Y, r.TopLeft.X) = 255 Then
                 Dim flags = cv.FloodFillFlags.FixedRange Or (index << 8)
                 Dim Count = cv.Cv2.FloodFill(dst2, mask, r.TopLeft, index, rect, 0, 0, flags)
-                Dim rc = New rcData(mask(rect), rect, index)
+                Dim rc = New rcDataOld(mask(rect), rect, index)
                 rcList.Add(rc)
 
                 idList.Add(CSng(index))
@@ -1204,7 +1177,7 @@ Public Class FeatureLess_IndexKNN : Inherits TaskParent
         knn.dimension = feat.inputVariableCount
         desc = "Predict the index for each featureLess region using the features Mat."
     End Sub
-    Private Function foundLast(rc As rcData, lrc As rcData) As rcData
+    Private Function foundLast(rc As rcDataOld, lrc As rcDataOld) As rcDataOld
         rc.age = lrc.age + 1
         If rc.age >= 1000 Then rc.age = 10
         rc.mapID = rc.indexLast
@@ -1213,7 +1186,7 @@ Public Class FeatureLess_IndexKNN : Inherits TaskParent
     End Function
     Public Overrides Sub RunAlg(src As cv.Mat)
         Dim lastImage = feat.dst2.Clone
-        Dim lastList = New List(Of rcData)(feat.rcList)
+        Dim lastList = New List(Of rcDataOld)(feat.rcList)
 
         feat.Run(task.gray.Clone)
         dst2 = feat.dst2
@@ -1706,7 +1679,7 @@ End Class
 
 Public Class FeatureLess_ReductionTest : Inherits TaskParent
     Dim color8u As New Color8U_Basics
-    Dim rcList As New List(Of rcData)
+    Dim rcList As New List(Of rcDataOld)
     Public Sub New()
         desc = "Identify each featureless region by index."
     End Sub
@@ -1719,7 +1692,7 @@ Public Class FeatureLess_ReductionTest : Inherits TaskParent
         rcList.Clear()
         For i = 0 To task.fLess.regions.Count - 1
             Dim r = task.fLess.regions.Values(i)
-            rcList.Add(New rcData(dst1(r), r, task.fLess.indexList.Values(i)))
+            rcList.Add(New rcDataOld(dst1(r), r, task.fLess.indexList.Values(i)))
         Next
 
         Dim rcIndex = Math.Abs(task.gOptions.DebugSlider.Value)

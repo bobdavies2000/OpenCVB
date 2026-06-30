@@ -1,7 +1,7 @@
 Imports System.Runtime.InteropServices
 Imports cv = OpenCvSharp
 Public Class RedFlood_Basics : Inherits TaskParent
-    Public rcList As New List(Of rcData)
+    Public rcList As New List(Of rcDataOld)
     Public rcMap As New cv.Mat(dst2.Size, cv.MatType.CV_32S, 0)
     Dim redMask As New RedFlood_MapAndList
     Dim fLess As New FeatureLess_DepthFull
@@ -20,7 +20,7 @@ Public Class RedFlood_Basics : Inherits TaskParent
 
         redMask.Run(dst2)
 
-        Dim rcListLast As New List(Of rcData)(rcList)
+        Dim rcListLast As New List(Of rcDataOld)(rcList)
         Dim lastColorMat = dst3.Clone
 
         trainInput.Clear()
@@ -177,7 +177,7 @@ End Class
 Public Class RedFlood_Color : Inherits TaskParent
     Dim cellGen As New RedFlood_ToRedColor
     Dim redMask As New XR_RedFlood_Basics
-    Public rclist As New List(Of rcData)
+    Public rclist As New List(Of rcDataOld)
     Public rcMap As New cv.Mat ' redColor map 
     Dim contours As New Contour_Basics
     Public inputRemoved As cv.Mat
@@ -206,7 +206,7 @@ Public Class RedFlood_Color : Inherits TaskParent
 
         rclist.Clear()
         For Each md In redMask.mdList
-            Dim rc = New rcData(md.mask, md.rect, rclist.Count + 1)
+            Dim rc = New rcDataOld(md.mask, md.rect, rclist.Count + 1)
             rc.buildMaxDist()
             rclist.Add(rc)
         Next
@@ -406,7 +406,7 @@ End Class
 Public Class RedFlood_ToRedColor : Inherits TaskParent
     Public redMask As New XR_RedFlood_Basics
     Public mdList As New List(Of maskData)
-    Public rcList As New List(Of rcData)
+    Public rcList As New List(Of rcDataOld)
     Public rcMap As New cv.Mat(dst2.Size, cv.MatType.CV_32S, 0)
     Public Sub New()
         desc = "Generate the RedColor cells from the rects, mask, and pixel counts."
@@ -417,11 +417,11 @@ Public Class RedFlood_ToRedColor : Inherits TaskParent
         labels(2) = redMask.labels(3)
 
         Dim rcMapLast = rcMap.Clone
-        Dim rcListLast As New List(Of rcData)(rcList)
-        Dim sortedCells As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
+        Dim rcListLast As New List(Of rcDataOld)(rcList)
+        Dim sortedCells As New SortedList(Of Integer, rcDataOld)(New compareAllowIdenticalIntegerInverted)
         rcMap.SetTo(0)
         For i = 0 To redMask.mdList.Count - 1
-            Dim rc = New rcData(redMask.mdList(i).mask, redMask.mdList(i).rect, sortedCells.Count)
+            Dim rc = New rcDataOld(redMask.mdList(i).mask, redMask.mdList(i).rect, sortedCells.Count)
             rc.mask = redMask.mdList(i).mask
             If rc.rect.Size = dst2.Size Then Continue For ' RedFlood_List can find a cell this big.  
             ' DrawTour(rc.mask, rc.contour, 255, -1)
@@ -433,7 +433,7 @@ Public Class RedFlood_ToRedColor : Inherits TaskParent
             rcMap(rc.rect).SetTo(rc.mapID, rc.mask)
         Next
 
-        rcList = New List(Of rcData)(sortedCells.Values)
+        rcList = New List(Of rcDataOld)(sortedCells.Values)
         labels(2) = CStr(rcList.Count) + " total cells "
 
         SetTrueText(redMask.strOut, 3)
@@ -451,7 +451,7 @@ Public Class RedFlood_List : Inherits TaskParent
     Public redMask As New XR_RedFlood_Basics
     Public contours As New Contour_Basics
     Public rcMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-    Public rclist As New List(Of rcData)
+    Public rclist As New List(Of rcDataOld)
     Public Sub New()
         task.gOptions.displayDst1.Checked = True
         desc = "Find cells and then match them to the previous generation with minimum boundary"
@@ -492,7 +492,7 @@ Public Class RedFlood_List : Inherits TaskParent
         rcMap.SetTo(0)
         rclist.Clear()
         For Each md In redMask.mdList
-            Dim rc = New rcData(md.mask, md.rect, md.index)
+            Dim rc = New rcDataOld(md.mask, md.rect, md.index)
             rc.mapID = rclist.Count + 1
             rclist.Add(rc)
             rcMap(rc.rect).SetTo(rc.mapID, rc.mask)
@@ -508,7 +508,7 @@ End Class
 
 
 Public Class RedFlood_Test : Inherits TaskParent
-    Public rcList As New List(Of rcData)
+    Public rcList As New List(Of rcDataOld)
     Public rcMap As New cv.Mat(dst2.Size, cv.MatType.CV_32S, 0)
     Dim redCore As New RedFlood_CPP
     Dim fLess As New FeatureLess_DepthFull
@@ -567,7 +567,7 @@ End Class
 
 
 Public Class XR_RedFlood_KNN : Inherits TaskParent
-    Public rcList As New List(Of rcData)
+    Public rcList As New List(Of rcDataOld)
     Public rcMap As New cv.Mat(dst2.Size, cv.MatType.CV_32S, 0)
     Dim redCore As New RedFlood_CPP
     Dim fLess As New FeatureLess_DepthFull
@@ -588,7 +588,7 @@ Public Class XR_RedFlood_KNN : Inherits TaskParent
         redCore.Run(dst2)
         Dim classcount = redCore.classCount
 
-        Dim rcListLast As New List(Of rcData)(rcList)
+        Dim rcListLast As New List(Of rcDataOld)(rcList)
 
         fLessGridRects.Clear()
         For i = 0 To classcount
@@ -614,7 +614,7 @@ Public Class XR_RedFlood_KNN : Inherits TaskParent
             Dim mask255 = redCore.dst2(r).InRange(i + 1, i + 1)
             Dim mask As New cv.Mat(mask255.Size, cv.MatType.CV_8U, 0)
             redCore.dst2(r).CopyTo(mask, mask255)
-            Dim rc As New rcData(mask, r, i + 1)
+            Dim rc As New rcDataOld(mask, r, i + 1)
             rc.color = task.scalarColors((rcList.Count + 1) Mod 255)
 
             queries(0) = New cv.Point3f(rc.maxDist.X, rc.maxDist.Y, rc.pixels)
@@ -705,7 +705,7 @@ End Class
 
 
 Public Class RedFlood_MapAndList : Inherits TaskParent
-    Public rcList As New List(Of rcData)
+    Public rcList As New List(Of rcDataOld)
     Dim redCore As New RedFlood_CPP
     Public Sub New()
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_32S, 0)
@@ -721,10 +721,10 @@ Public Class RedFlood_MapAndList : Inherits TaskParent
         dst2.SetTo(0)
         rcList.Clear()
         For i = 0 To classcount - 1
-            Dim rc As New rcData
+            Dim rc As New rcDataOld
             rc.rect = redCore.rects(i)
             rc.mask = redCore.dst2(rc.rect).InRange(i + 1, i + 1)
-            rc = New rcData(rc.mask, rc.rect, -1)
+            rc = New rcDataOld(rc.mask, rc.rect, -1)
             rc.mapID = rcList.Count + 1
 
             rc.contour = ContourBuild(rc.mask)
