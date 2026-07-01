@@ -673,6 +673,7 @@ RedCloud_KNN
 RedCloud_LeftRight
 RedCloud_Matched
 RedCloud_Matches
+RedCloud_Min
 RedCloud_Motion
 RedCloud_MotionFilter
 RedCloud_Reliable
@@ -686,7 +687,6 @@ RedCloudNew_KNN
 RedCloudNew_LeftRight
 RedCloudNew_Matched
 RedCloudNew_Matches
-RedCloudNew_Min
 RedCloudNew_Motion
 RedCloudNew_MotionFilter
 RedCloudNew_Reliable

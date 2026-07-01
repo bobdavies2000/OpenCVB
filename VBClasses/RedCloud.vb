@@ -635,3 +635,72 @@ Public Class RedCloud_Foreground : Inherits TaskParent
     End Sub
 End Class
 
+
+
+
+
+
+
+Public Class RedCloud_Min : Inherits TaskParent
+    Dim color8u As New Color8U_Basics
+    Public rcMap As New cv.Mat
+    Public rcList As New List(Of rcData) ' includes cloud data.
+    Public Sub New()
+        dst0 = New cv.Mat(dst0.Size, cv.MatType.CV_8U, 0)
+        If standalone Then task.gOptions.displayDst1.Checked = True
+        labels(3) = "RedCloud cells with depth."
+        desc = "FloodFill each color8U output and create an rclist"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        If src.Channels <> 1 Then color8u.Run(task.gray) Else color8u.Run(src)
+        src = color8u.dst2 + 1
+
+        rcMap = src.Clone
+        Dim minList As New List(Of rcData)
+        Dim rect As cv.Rect
+        Dim mask As cv.Mat = New cv.Mat(New cv.Size(dst2.Width + 2, dst2.Height + 2), cv.MatType.CV_8U, 0)
+        For Each r In task.gridRects
+            If mask(r).Get(Of Byte)(0, 0) = 0 Then
+                Dim mapID As Integer = rcMap(r).Get(Of Byte)(0, 0)
+                Dim flags = cv.FloodFillFlags.FixedRange Or cv.FloodFillFlags.MaskOnly Or (255 << 8)
+                Dim count = cv.Cv2.FloodFill(rcMap, mask, r.TopLeft, mapID, rect, 0, 0, flags)
+                If count > 0 Then minList.Add(New rcData(rcMap(rect), rect, mapID))
+            End If
+        Next
+        dst2 = Palettize(rcMap)
+
+        If task.rcMinD IsNot Nothing And standaloneTest() Then dst2.Rectangle(task.rcMinD.rect, task.highlight, task.lineWidth)
+
+        dst3.SetTo(0)
+        Dim sortList As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
+        For i = 0 To minList.Count - 1
+            Dim rc = minList(i)
+            rc.maxDist = rc.buildMaxDist(rc.mask)
+
+            rc.depth = task.pcSplit(2)(rc.rect).Mean(rc.mask)
+            rc.maskDepth = rc.mask.Clone
+            rc.maskDepth.SetTo(0, task.noDepthMask(rc.rect))
+            rc.pixelsDepth = rc.maskDepth.CountNonZero
+            rc.maxDistDepth = rc.buildMaxDist(rc.maskDepth)
+
+            sortList.Add(rc.pixels, rc)
+        Next
+
+        rcList = New List(Of rcData)(sortList.Values)
+        Dim rcIndex As Integer
+        For Each rc In rcList
+            rc.index = rcIndex
+            dst0(rc.rect).SetTo(rc.mapID, rc.mask)
+            rcIndex += 1
+        Next
+
+        Static picTag = task.mousePicTag
+        If task.mouseClickFlag Then picTag = task.mousePicTag
+        strOut = Utility_Basics.selectMinCell(rcMap, rcList, picTag)
+        SetTrueText(strOut, 1)
+
+        dst3 = Palettize(dst0)
+        dst3.SetTo(0, task.noDepthMask)
+        labels(2) = CStr(rcList.Count) + " RedColor cells were found."
+    End Sub
+End Class
