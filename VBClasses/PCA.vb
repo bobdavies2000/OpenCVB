@@ -718,7 +718,6 @@ Public Class PCA_NColor : Inherits TaskParent
     Public palette(256 * 3) As Byte
     Public rgb(dst1.Total * dst1.ElemSize - 1) As Byte
     Public buff(rgb.Length - 1) As Byte
-    Dim answer(dst1.Total - 1) As Byte
     Public Sub New()
         custom.colorMap = New cv.Mat(256, 1, cv.MatType.CV_8UC3)
         desc = "Use PCA to build a palettized CV_8U image from the input using a palette."

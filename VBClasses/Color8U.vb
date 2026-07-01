@@ -8,15 +8,16 @@ Public Class Color8U_Basics : Inherits TaskParent
         desc = "Classify pixels by color using a variety of techniques"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
+        Static saveColorMethod As String = task.fOptions.Color8USource.Text
         If task.optionsChanged Or classifier Is Nothing Then
+            If saveColorMethod <> task.fOptions.Color8USource.Text Then classifier = Nothing
+            saveColorMethod = task.fOptions.Color8USource.Text
             Dim index = task.fOptions.Color8USource.SelectedIndex
             Select Case task.fOptions.Color8USource.Text
                 Case "BackProject_Full"
                     If colorMethods(index) Is Nothing Then colorMethods(index) = New BackProject_Full
                 Case "Bin4Way_Regions"
                     If colorMethods(index) Is Nothing Then colorMethods(index) = New Bin4Way_Regions
-                Case "EdgeLine_Basics"
-                    If colorMethods(index) Is Nothing Then colorMethods(index) = New EdgeLine_Basics
                 Case "Hist3DColor_Basics"
                     If colorMethods(index) Is Nothing Then colorMethods(index) = New Hist3Dcolor_Basics
                 Case "KMeans_Basics"
@@ -40,8 +41,7 @@ Public Class Color8U_Basics : Inherits TaskParent
 
         dst3 = Palettize(dst2)
         labels(3) = "dst3 = Palettize(dst2) - " + task.fOptions.Color8USource.Text
-        labels(2) = "Color8U_Basics: method = " + classifier.tracename + " produced " + CStr(classCount) +
-                            " pixel classifications"
+        labels(2) = "Color8U_Basics: method = " + classifier.tracename + " produced " + CStr(classCount) + " pixel classifications"
     End Sub
 End Class
 
