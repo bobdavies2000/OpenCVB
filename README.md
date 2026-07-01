@@ -22,7 +22,6 @@
     -   There are now fewer algorithms in the algorithm combo box.
     -   XR algorithms are not typically tested but may be added to overnight runs.
     -   More algorithms were moved to XO.vb for future reference.
--   .
 
 ![](media/4f148edf7cdcd9c57e94253f574fc63a.gif)
 
