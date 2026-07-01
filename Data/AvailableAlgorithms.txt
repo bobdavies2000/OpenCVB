@@ -691,9 +691,9 @@ RedCloudNew_Motion
 RedCloudNew_MotionFilter
 RedCloudNew_Reliable
 RedCloudNew_RGB
-RedColor_BasicLeftRight
 RedColor_Basics
 RedColor_BasicsFeatureLess
+RedColor_BasicsLeftRight
 RedColor_BrickList
 RedColor_Bricks
 RedColor_Contour

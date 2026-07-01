@@ -1075,7 +1075,7 @@ End Class
 
 
 
-Public Class RedColor_BasicLeftRight : Inherits TaskParent
+Public Class RedColor_BasicsLeftRight : Inherits TaskParent
     Dim redC As New RedColor_Basics
     Public Sub New()
         desc = "Use RedColor_Basics on the left and right images."
