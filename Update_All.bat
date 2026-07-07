@@ -1,4 +1,36 @@
 @echo off
+
+where python >nul 2>&1
+if errorlevel 1 (
+	echo ERROR: Python is not installed or not on PATH.
+	echo Install from https://www.python.org/downloads/ and check "Add Python to PATH".
+	SET /P ok="Press Enter to continue after reviewing the log."
+	exit /b 1
+)
+python --version
+
+where dotnet >nul 2>&1
+if errorlevel 1 (
+	echo ERROR: .NET is not installed or not on PATH.
+	echo Install .NET 8.0 from https://dotnet.microsoft.com/download/dotnet/8.0
+	SET /P ok="Press Enter to continue after reviewing the log."
+	exit /b 1
+)
+dotnet --list-runtimes | findstr /C:"Microsoft.NETCore.App 8." >nul 2>&1
+if errorlevel 1 (
+	echo ERROR: .NET 8.0 runtime is not installed.
+	echo Install from https://dotnet.microsoft.com/download/dotnet/8.0
+	SET /P ok="Press Enter to continue after reviewing the log."
+	exit /b 1
+)
+dotnet --list-runtimes | findstr /C:"Microsoft.WindowsDesktop.App 8." >nul 2>&1
+if errorlevel 1 (
+	echo ERROR: .NET 8.0 Windows Desktop runtime is not installed.
+	echo Install from https://dotnet.microsoft.com/download/dotnet/8.0
+	SET /P ok="Press Enter to continue after reviewing the log."
+	exit /b 1
+)
+
 call "C:\Program Files\Microsoft Visual Studio\18\Community\VC\Auxiliary\Build\vcvarsall.bat" x86_amd64
 
 @echo off
@@ -56,9 +88,13 @@ if not exist Open3D\Install (
 	cmake --build Open3D/Build --config Release --target INSTALL
 	cmake --build Open3D/Build --config Debug --target INSTALL
 	echo Open3D C++ installed to %CD%\Open3D\Install
+	powershell -NoProfile -ExecutionPolicy Bypass -File Open3D\Generate-OpenCVBProps.ps1
 ) else if exist Open3D\Build\CMakeCache.txt (
 	rem Ensure Open3D uses /MD to match CPP_Native and OpenCV ^(not /MT^).
 	cmake Open3D/Build -DSTATIC_WINDOWS_RUNTIME=OFF >nul 2>&1
+	if not exist Open3D\OpenCVBLibraries.props (
+		powershell -NoProfile -ExecutionPolicy Bypass -File Open3D\Generate-OpenCVBProps.ps1
+	)
 )
 
 echo Installing Open3D Python package ^(pip^)...
@@ -98,11 +134,17 @@ if not exist OakD\depthai-core\Build (
 	echo Building Oak-D camera support...
 	mkdir OakD\depthai-core\Build
 	cd OakD\depthai-core\Build
-	cmake .. -DCMAKE_BUILD_TYPE=Release -DDEPTHAI_BUILD_EXAMPLES=OFF -DBUILD_SHARED_LIBS=ON -DDEPTHAI_SANITIZE=OFF -DOpenCV_DIR=..\..\..\OpenCV\Build
-	cmake --build . --config Release
-	cmake --build . --config Debug
+	cmake .. -G "Visual Studio 18 2026" -A x64 -DDEPTHAI_BUILD_EXAMPLES=OFF -DBUILD_SHARED_LIBS=OFF -DDEPTHAI_SANITIZE=OFF -DOpenCV_DIR=..\..\..\opencv\Build
+	cmake --build . --config Release --target depthai-core depthai-resources XLink
+	cmake --build . --config Debug --target depthai-core depthai-resources XLink
 	echo Oak-D camera support built successfully.
 	cd ..\..\..\
+) else if not exist OakD\depthai-core\Build\Release\depthai-core.lib (
+	echo Building Oak-D camera support ^(depthai-core not yet built^)...
+	cmake OakD\depthai-core\Build -DOpenCV_DIR="%CD%\opencv\Build" -DDEPTHAI_BUILD_EXAMPLES=OFF -DBUILD_SHARED_LIBS=OFF -DDEPTHAI_SANITIZE=OFF
+	cmake --build OakD\depthai-core\Build --config Release --target depthai-core depthai-resources XLink
+	cmake --build OakD\depthai-core\Build --config Debug --target depthai-core depthai-resources XLink
+	echo Oak-D camera support built successfully.
 )
 
 echo.

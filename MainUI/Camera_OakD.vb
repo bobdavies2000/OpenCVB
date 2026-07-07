@@ -207,10 +207,10 @@ Namespace MainApp
                         Else
                             depth16u = cv.Mat.FromPixelData(240, 320, cv.MatType.CV_16UC1, depthPtr).Clone()
                         End If
-                        depth16u = depth16u.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
                     Else
                         depth16u = cv.Mat.FromPixelData(rows, cols, cv.MatType.CV_16UC1, depthPtr).Clone()
                     End If
+                    depth16u = depth16u.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
                     pointCloud = ComputePointCloud(depth16u, calibData.leftIntrinsics)
                 End If
 

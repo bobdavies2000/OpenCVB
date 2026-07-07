@@ -237,22 +237,6 @@ End Class
 
 
 
-Public Class XR_BGSubtract_MOG_Retina : Inherits TaskParent
-    Dim bgSub As New BGSubtract_MOG
-    Dim retina As New Retina_Basics_CPP
-    Public Sub New()
-        labels = {"", "", "MOG results of depth motion", "Difference from retina depth motion."}
-        desc = "Use the bio-inspired retina algorithm to create a background/foreground using depth."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        retina.Run(task.depthRGB)
-        bgSub.Run(retina.dst3.Clone())
-        dst2 = bgSub.dst2
-        cv.Cv2.Subtract(bgSub.dst2, retina.dst3, dst3)
-    End Sub
-End Class
-
-
 
 
 Public Class XR_BGSubtract_DepthOrColorMotion : Inherits TaskParent

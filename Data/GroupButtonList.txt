@@ -182,7 +182,6 @@ RedPrep
 Reduction
 Remap
 Resize
-Retina
 ROI
 Rotate
 Salience

@@ -717,7 +717,6 @@ Remap_Flip
 Resize_Basics
 Resize_Proportional
 Resize_Smaller
-Retina_Basics_CPP
 ROI_Basics
 Rotate_Basics
 Rotate_BasicsQT
@@ -848,7 +847,6 @@ XR_Bezier_Example
 XR_BGSubtract_Basics_QT
 XR_BGSubtract_DepthOrColorMotion
 XR_BGSubtract_GMG_KNN
-XR_BGSubtract_MOG_Retina
 XR_BGSubtract_MOG_RGBDepth
 XR_BGSubtract_MOG2_QT
 XR_BGSubtract_MotionDetect
@@ -1044,7 +1042,6 @@ XR_Depth_StableMin
 XR_Depth_StableMinMax
 XR_Depth_StableMinMotion
 XR_Depth_TiersOld
-XR_Depth_Uncertainty
 XR_Depth_WorldXYMT
 XR_DepthLinear_Basics
 XR_DepthLinear_ImageX
@@ -1640,7 +1637,6 @@ XR_Reduction_Histogram
 XR_Reduction_MotionTest
 XR_Reduction_NoDepth
 XR_Reduction_XYZ
-XR_Retina_Depth
 XR_ROI_Accumulate
 XR_ROI_AccumulateOld
 XR_ROI_FindNonZeroNoSingle

@@ -129,24 +129,6 @@ End Class
 
 
 
-Public Class XR_Depth_Uncertainty : Inherits TaskParent
-    Dim retina As New Retina_Basics_CPP
-    Dim options As New Options_Uncertainty
-    Public Sub New()
-        labels(3) = "Mask of areas with stable depth"
-        desc = "Use the bio-inspired retina algorithm to determine depth uncertainty."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        options.Run()
-
-        retina.Run(task.depthRGB)
-        dst2 = retina.dst2
-        dst3 = retina.dst3.Threshold(options.uncertaintyThreshold, 255, cv.ThresholdTypes.Binary)
-    End Sub
-End Class
-
-
-
 
 
 
