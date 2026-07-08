@@ -667,6 +667,7 @@ Rectangle_Basics
 Rectangle_EnclosingPoints
 Rectangle_Fit
 Rectangle_Rotated
+RedC_Basics
 RedCloud_Basics
 RedCloud_Core
 RedCloud_Flood_CPP
@@ -675,12 +676,10 @@ RedCloud_KNN
 RedCloud_LeftRight
 RedCloud_Matched
 RedCloud_Matches
-RedCloud_Min
 RedCloud_Motion
 RedCloud_MotionFilter
 RedCloud_Reliable
 RedCloud_RGB
-RedCloud_Sizes
 RedCloudNew_Basics
 RedCloudNew_Core
 RedCloudNew_DelaunayMap
@@ -1618,6 +1617,8 @@ XR_Rectangle_MultiOverlap
 XR_Rectangle_Overlap
 XR_Rectangle_Union
 XR_RecursiveBilateralFilter_CPP
+XR_RedC_Lines
+XR_RedC_Sizes
 XR_RedCloud_Basics
 XR_RedCloud_CellDepthHistogram
 XR_RedCloud_ColorChangeCause

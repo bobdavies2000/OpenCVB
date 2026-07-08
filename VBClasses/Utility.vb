@@ -223,7 +223,8 @@ Public Class Utility_Basics : Inherits TaskParent
         If clickIndex = 0 Then Return "There is no cell at that location"
         If task.rcMinD Is Nothing Then task.rcMinD = rcList(0)
 
-        For Each rc In rcList
+        For i = rcList.Count - 1 To 0 Step -1
+            Dim rc = rcList(i)
             If clickIndex = rc.mapID Then
                 task.rcMinD = rc
                 If task.rcMinD.rect.Contains(task.clickPoint) Then
@@ -235,7 +236,7 @@ Public Class Utility_Basics : Inherits TaskParent
 
         If task.rcMinD Is Nothing Then task.rcMinD = rcList(0)
 
-        ' If task.rcMinD.mapID <> task.gOptions.DebugSlider.Value Then Dim k = 0
+        If task.rcMinD.mapID <> task.gOptions.DebugSlider.Value Then Dim k = 0
 
         task.color(task.rcMinD.rect).SetTo(white, task.rcMinD.mask)
         outStr = task.rcMinD.displayCell()
