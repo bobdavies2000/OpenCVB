@@ -509,11 +509,9 @@ Public Module Structures
             Dim h = Math.Abs(p1.Y - p2.Y) + pad
             ' p1 is always leftmost point.
             If Math.Abs(angle) > 45 Then
-                rect = New cv.Rect(p1.X - pad, Math.Min(p1.Y, p2.Y),
-                                           Math.Max(pad * 2, w), Math.Max(pad * 2, h))
+                rect = New cv.Rect(p1.X - pad, Math.Min(p1.Y, p2.Y), Math.Max(pad * 2, w), Math.Max(pad * 2, h))
             Else
-                rect = New cv.Rect(p1.X, Math.Min(p1.Y, p2.Y) - pad,
-                                       Math.Max(pad * 2, w), Math.Max(pad * 2, h))
+                rect = New cv.Rect(p1.X, Math.Min(p1.Y, p2.Y) - pad, Math.Max(pad * 2, w), Math.Max(pad * 2, h))
             End If
 
             rect = ValidateRect(rect)
@@ -730,11 +728,10 @@ Public Module Structures
             strout += "depth = " + Format(depth, fmt1) + vbCrLf
             strout += "index = " + CStr(index) + vbCrLf
             strout += "MaxDist = " + CStr(maxDist.X) + ", " + CStr(maxDist.Y) + vbCrLf
-            strout += "MaxDist = " + CStr(maxDist.X) + ", " + CStr(maxDist.Y) + vbCrLf
             strout += "Pixel count = " + CStr(pixels) + vbCrLf
             strout += "Pixel with depth = " + CStr(pixelsDepth) + vbCrLf
             strout += "Rect: X = " + CStr(rect.X) + ", Y = " + CStr(rect.Y) + ", "
-            strout += "width = " + CStr(rect.Width) + ", height = " + CStr(rect.Height) + vbCrLf
+            strout += "Width = " + CStr(rect.Width) + ", height = " + CStr(rect.Height) + vbCrLf
             strout += "ClickPoint = " + CStr(task.clickPoint.X) + ", " + CStr(task.clickPoint.Y) + vbCrLf
 
             Return strout

@@ -1032,6 +1032,7 @@ XR_Depth_MinMaxToVoronoi
 XR_Depth_PunchDecreasing
 XR_Depth_PunchIncreasing
 XR_Depth_Regions
+XR_Depth_ReliableLines
 XR_Depth_RGBShadow
 XR_Depth_Smoothing
 XR_Depth_SmoothingMat
@@ -1414,6 +1415,7 @@ XR_Line_EdgeLineCompare
 XR_Line_Finder
 XR_Line_FinderPlus
 XR_Line_FindSimple
+XR_Line_LeftRight
 XR_Line_LeftRightEdges
 XR_Line_LeftRightMotion
 XR_Line_LeftTrack

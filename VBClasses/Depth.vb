@@ -1,3 +1,4 @@
+Imports OpenCvSharp
 Imports cv = OpenCvSharp
 ' https://stackoverflow.com/questions/19093728/rotate-image-around-x-y-z-axis-in-opencv
 ' https://stackoverflow.com/questions/7019407/translating-and-rotating-an-image-in-3d-using-opencv
@@ -1278,68 +1279,6 @@ End Class
 
 
 
-Public Class Depth_ReliableLines : Inherits TaskParent
-    Dim rightPoints As New List(Of cv.Point)
-    Dim bricks As New Brick_Basics
-    Public Sub New()
-        desc = "Find the lines that are consistent in both the left and right images."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        bricks.Run(src)
-
-        If task.Settings.cameraName.StartsWith("StereoLabs") = False Then
-            SetTrueText("The " + traceName + " algorithm is currently only working for StereoLabs cameras.")
-            Exit Sub
-        End If
-        dst2 = src
-        dst3 = task.rightView.CvtColor(cv.ColorConversionCodes.GRAY2BGR) ' so we can show the red line...
-
-        Dim count As Integer
-        Dim lastPoints As New List(Of cv.Point)(rightPoints)
-        rightPoints.Clear()
-        For Each lp In task.lines.lpList
-            Dim p1GridIndex = task.gridMap.Get(Of Integer)(lp.p1.Y, lp.p1.X)
-            Dim p2GridIndex = task.gridMap.Get(Of Integer)(lp.p2.Y, lp.p2.X)
-            Dim brick1 = bricks.brickList(p1GridIndex)
-            Dim brick2 = bricks.brickList(p2GridIndex)
-            dst2.Line(lp.p1, lp.p2, lp.color, task.lineWidth + 1, task.lineType)
-
-            Dim p1 = lp.p1 ' avoid updating list of lines.
-            Dim p2 = lp.p2
-            If brick1.depth > 0 And brick2.depth > 0 Then
-                p1.X -= task.calibData.baseline * task.calibData.leftIntrinsics.fx / brick1.depth
-                p2.X -= task.calibData.baseline * task.calibData.leftIntrinsics.fx / brick2.depth
-
-                Dim pt1 = New cv.Point(CInt(p1.X), CInt(p1.Y))
-                Dim pt2 = New cv.Point(CInt(p2.X), CInt(p2.Y))
-
-                Dim found1 = rightPoints.Contains(pt1)
-                Dim found2 = rightPoints.Contains(pt2)
-
-                If found1 = False Then rightPoints.Add(pt1)
-                If found2 = False Then rightPoints.Add(pt2)
-
-                If found1 And lastPoints.Contains(pt1) And found2 And lastPoints.Contains(pt2) Then
-                    dst3.Line(p1, p2, lp.color, task.lineWidth + 1, task.lineType)
-                    rightPoints.Add(p1)
-                    rightPoints.Add(p2)
-                Else
-                    count += 1
-                End If
-            Else
-                count += 1
-            End If
-        Next
-
-        If task.heartBeat Then
-            labels(2) = task.lines.labels(2)
-            labels(3) = CStr(count) + " were not consistently present after translation."
-        End If
-    End Sub
-End Class
-
-
-
 
 
 Public Class XR_Depth_StableMaxMotion : Inherits TaskParent
@@ -1537,5 +1476,138 @@ Public Class Depth_TierCount : Inherits TaskParent
         SetTrueText("'K' value = " + CStr(classCount) + " after averaging.  Instanteous value = " +
                         CStr(valley.valleyOrder.Count), 3)
         labels(2) = "There are " + CStr(classCount)
+    End Sub
+End Class
+
+
+
+
+Public Class XR_Depth_ReliableLines : Inherits TaskParent
+    Dim rightPoints As New List(Of cv.Point)
+    Dim bricks As New Brick_Basics
+    Public Sub New()
+        desc = "Find the lines that are consistent in both the left and right images."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        bricks.Run(src)
+
+        If task.Settings.cameraName.StartsWith("StereoLabs") = False Then
+            SetTrueText("The " + traceName + " algorithm is currently only working for StereoLabs cameras.")
+            Exit Sub
+        End If
+        dst2 = src
+        dst3 = task.rightView.CvtColor(cv.ColorConversionCodes.GRAY2BGR) ' so we can show the red line...
+
+        Dim count As Integer
+        Dim lastPoints As New List(Of cv.Point)(rightPoints)
+        rightPoints.Clear()
+        For Each lp In task.lines.lpList
+            Dim p1GridIndex = task.gridMap.Get(Of Integer)(lp.p1.Y, lp.p1.X)
+            Dim p2GridIndex = task.gridMap.Get(Of Integer)(lp.p2.Y, lp.p2.X)
+            Dim brick1 = bricks.brickList(p1GridIndex)
+            Dim brick2 = bricks.brickList(p2GridIndex)
+            dst2.Line(lp.p1, lp.p2, lp.color, task.lineWidth + 1, task.lineType)
+
+            Dim p1 = lp.p1 ' avoid updating list of lines.
+            Dim p2 = lp.p2
+            If brick1.depth > 0 And brick2.depth > 0 Then
+                p1.X -= task.calibData.baseline * task.calibData.leftIntrinsics.fx / brick1.depth
+                p2.X -= task.calibData.baseline * task.calibData.leftIntrinsics.fx / brick2.depth
+
+                Dim pt1 = New cv.Point(CInt(p1.X), CInt(p1.Y))
+                Dim pt2 = New cv.Point(CInt(p2.X), CInt(p2.Y))
+
+                Dim found1 = rightPoints.Contains(pt1)
+                Dim found2 = rightPoints.Contains(pt2)
+
+                If found1 = False Then rightPoints.Add(pt1)
+                If found2 = False Then rightPoints.Add(pt2)
+
+                If found1 And lastPoints.Contains(pt1) And found2 And lastPoints.Contains(pt2) Then
+                    dst3.Line(p1, p2, lp.color, task.lineWidth + 1, task.lineType)
+                    rightPoints.Add(p1)
+                    rightPoints.Add(p2)
+                Else
+                    count += 1
+                End If
+            Else
+                count += 1
+            End If
+        Next
+
+        If task.heartBeat Then
+            labels(2) = task.lines.labels(2)
+            labels(3) = CStr(count) + " were not consistently present after translation."
+        End If
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+Public Class Depth_ReliableLines : Inherits TaskParent
+    Dim linesLR As New Line_LeftRight
+    Dim knn As New KNN_Basics
+    Public Sub New()
+        desc = "Find the lines that are consistent in both the left and right images."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        linesLR.Run(emptyMat)
+        dst2 = linesLR.dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        For Each lp In linesLR.rightList
+            dst2.Line(lp.p1, lp.p2, task.scalarColors(lp.index Mod 256), task.lineWidth, cv.LineTypes.AntiAlias)
+        Next
+        labels(2) = linesLR.labels(2)
+
+        knn.queries.Clear()
+        For Each lp In linesLR.leftList
+            knn.queries.Add(New cv.Point2f(lp.angle, lp.slope))
+        Next
+
+        knn.trainInput.Clear()
+        For Each lp In linesLR.rightList
+            knn.trainInput.Add(New cv.Point2f(lp.angle, lp.slope))
+        Next
+
+        If knn.queries.Count = 0 Or knn.trainInput.Count = 0 Then Exit Sub
+        knn.Run(emptyMat)
+
+        dst3.SetTo(0)
+        Dim count As Integer
+        For i = 0 To knn.result.GetLength(0) - 1
+            Dim lp1 = linesLR.leftList(i)
+            Dim lp2 = linesLR.rightList(knn.result(i, 0))
+
+            ' Line 1 defined by two points
+            Dim p1 = lp1.p1
+            Dim p2 = lp1.p2
+
+            ' Line 2 defined by two points (Parallel to Line 1, just shifted)
+            Dim p3 = lp2.p1
+            Dim p4 = lp2.p2
+
+            ' 1. Calculate direction vectors
+            Dim vectorA As New Point2f(p2.X - p1.X, p2.Y - p1.Y)
+            Dim vectorB As New Point2f(p4.X - p3.X, p4.Y - p3.Y)
+
+            ' 2. Normalize the vectors so length doesn't skew the threshold
+            Dim normA As New Point2f(vectorA.X / lp1.length, vectorA.Y / lp1.length)
+            Dim normB As New Point2f(vectorB.X / lp2.length, vectorB.Y / lp2.length)
+
+            ' 3. Compute 2D Cross Product of normalized vectors
+            Dim crossProduct As Single = (normA.X * normB.Y) - (normA.Y * normB.X)
+
+            ' 4. Check against a small tolerance threshold (e.g., 0.001)
+            Dim tolerance As Single = 0.01F
+            If Math.Abs(crossProduct) < tolerance Then
+                dst3.Line(lp2.p1, lp2.p2, task.scalarColors(lp2.index Mod 256), task.lineWidth, cv.LineTypes.AntiAlias)
+                count += 1
+            End If
+        Next
+        labels(3) = "There were " + CStr(count) + " lines that appear parallel using the cross product"
     End Sub
 End Class

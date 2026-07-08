@@ -1957,67 +1957,6 @@ End Class
 
 
 
-Public Class Line_LeftRight : Inherits TaskParent
-    Public leftList As New List(Of lpData)
-    Public rightList As New List(Of lpData)
-    Public Sub New()
-        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-        dst3 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-        desc = "Find the lines in the left and right images - use StableGray_LeftRight for left/right images."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        If task.Settings.cameraName.StartsWith("StereoLabs") Then
-            Static lrZED As New Line_LeftRightZED
-            lrZED.Run(emptyMat)
-            dst2 = lrZED.dst2
-            dst3 = lrZED.dst3
-            labels = lrZED.labels
-
-            leftList = New List(Of lpData)(task.lines.lpList)
-            rightList = New List(Of lpData)(lrZED.rightOnly.lpList)
-
-            For Each lp In leftList
-                SetTrueText(CStr(lp.age), New cv.Point(lp.ptCenter.X + 2, lp.ptCenter.Y + 2), 2)
-            Next
-
-            For Each lp In rightList
-                SetTrueText(CStr(lp.age), New cv.Point(lp.ptCenter.X + 2, lp.ptCenter.Y + 2), 3)
-            Next
-        Else
-            Static stableLR As New StableGray_LeftRight
-            Static linesLeft As New Line_Core
-            Static linesRight As New Line_Core
-            stableLR.Run(emptyMat)
-
-            Dim lastList = New List(Of lpData)(linesLeft.lpList)
-            linesLeft.Run(stableLR.dst2)
-            linesLeft.lpList = Line_Basics_TA.removeDuplicates(linesLeft.lpList)
-            Dim averageAgeLeft = Line_Basics_TA.updateAgesAndLongest(linesLeft.lpList, lastList)
-
-            dst2.SetTo(0)
-            For Each lp In linesLeft.lpList
-                dst2.Line(lp.p1, lp.p2, 255, task.lineWidth, task.lineType)
-                SetTrueText(CStr(lp.age), New cv.Point(lp.ptCenter.X + 2, lp.ptCenter.Y + 2), 2)
-            Next
-            labels(2) = CStr(linesLeft.lpList.Count) + " lines in the left image.  Highlighted line is the current longest line."
-
-            lastList = New List(Of lpData)(linesRight.lpList)
-            linesRight.Run(stableLR.dst3)
-            linesRight.lpList = Line_Basics_TA.removeDuplicates(linesRight.lpList)
-            Dim averageAgeRight = Line_Basics_TA.updateAgesAndLongest(linesRight.lpList, lastList)
-
-            dst3.SetTo(0)
-            For Each lp In linesRight.lpList
-                dst3.Line(lp.p1, lp.p2, 255, task.lineWidth, task.lineType)
-                SetTrueText(CStr(lp.age), New cv.Point(lp.ptCenter.X + 2, lp.ptCenter.Y + 2), 3)
-            Next
-            labels(3) = CStr(linesRight.lpList.Count) + " lines in the right image."
-        End If
-    End Sub
-End Class
-
-
-
 Public Class Line_LeftRightZED : Inherits TaskParent
     Public rightOnly As New Line_RightOnly
     Public Sub New()
@@ -2177,5 +2116,108 @@ Public Class Line_DepthUpdate : Inherits TaskParent
             Next
             SetTrueText(CStr(lp.age), New cv.Point(lp.ptCenter.X + 2, lp.ptCenter.Y + 2), 2)
         Next
+    End Sub
+End Class
+
+
+
+
+Public Class XR_Line_LeftRight : Inherits TaskParent
+    Public leftList As New List(Of lpData)
+    Public rightList As New List(Of lpData)
+    Public Sub New()
+        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        dst3 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        desc = "Find the lines in the left and right images - use StableGray_LeftRight for left/right images."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        If task.Settings.cameraName.StartsWith("StereoLabs") Then
+            Static lrZED As New Line_LeftRightZED
+            lrZED.Run(emptyMat)
+            dst2 = lrZED.dst2
+            dst3 = lrZED.dst3
+            labels = lrZED.labels
+
+            leftList = New List(Of lpData)(task.lines.lpList)
+            rightList = New List(Of lpData)(lrZED.rightOnly.lpList)
+
+            For Each lp In leftList
+                SetTrueText(CStr(lp.age), New cv.Point(lp.ptCenter.X + 2, lp.ptCenter.Y + 2), 2)
+            Next
+
+            For Each lp In rightList
+                SetTrueText(CStr(lp.age), New cv.Point(lp.ptCenter.X + 2, lp.ptCenter.Y + 2), 3)
+            Next
+        Else
+            Static stableLR As New StableGray_LeftRight
+            Static linesLeft As New Line_Core
+            Static linesRight As New Line_Core
+            stableLR.Run(emptyMat)
+
+            Dim lastList = New List(Of lpData)(linesLeft.lpList)
+            linesLeft.Run(stableLR.dst2)
+            linesLeft.lpList = Line_Basics_TA.removeDuplicates(linesLeft.lpList)
+            Dim averageAgeLeft = Line_Basics_TA.updateAgesAndLongest(linesLeft.lpList, lastList)
+
+            dst2.SetTo(0)
+            For Each lp In linesLeft.lpList
+                dst2.Line(lp.p1, lp.p2, 255, task.lineWidth, task.lineType)
+                SetTrueText(CStr(lp.age), New cv.Point(lp.ptCenter.X + 2, lp.ptCenter.Y + 2), 2)
+            Next
+            labels(2) = CStr(linesLeft.lpList.Count) + " lines in the left image.  Highlighted line is the current longest line."
+
+            lastList = New List(Of lpData)(linesRight.lpList)
+            linesRight.Run(stableLR.dst3)
+            linesRight.lpList = Line_Basics_TA.removeDuplicates(linesRight.lpList)
+            Dim averageAgeRight = Line_Basics_TA.updateAgesAndLongest(linesRight.lpList, lastList)
+
+            dst3.SetTo(0)
+            For Each lp In linesRight.lpList
+                dst3.Line(lp.p1, lp.p2, 255, task.lineWidth, task.lineType)
+                SetTrueText(CStr(lp.age), New cv.Point(lp.ptCenter.X + 2, lp.ptCenter.Y + 2), 3)
+            Next
+            labels(3) = CStr(linesRight.lpList.Count) + " lines in the right image."
+        End If
+    End Sub
+End Class
+
+
+
+
+
+Public Class Line_LeftRight : Inherits TaskParent
+    Public leftList As New List(Of lpData)
+    Public rightList As New List(Of lpData)
+    Dim linesRight As New Line_Core
+    Public Sub New()
+        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        dst3 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        desc = "Find the lines in the left and right images - use StableGray_LeftRight for left/right images."
+    End Sub
+    Private Sub showLines(dst As cv.Mat, lpList As List(Of lpData), pictag As Integer)
+        dst.SetTo(0)
+        For Each lp In lpList
+            dst.Line(lp.p1, lp.p2, 255, task.lineWidth, task.lineType)
+            SetTrueText(CStr(lp.age), New cv.Point(lp.ptCenter.X + 2, lp.ptCenter.Y + 2), pictag)
+        Next
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        Dim lastList = New List(Of lpData)(leftList)
+        leftList = New List(Of lpData)(task.lines.lpList)
+
+        Dim averageAgeLeft = Line_Basics_TA.updateAgesAndLongest(leftList, lastList)
+        showLines(dst2, leftList, 2)
+        labels(2) = CStr(leftList.Count) + " lines were found in the left image shown in white "
+
+        Static stableLR As New StableGray_LeftRight
+        stableLR.Run(emptyMat)
+
+        lastList = New List(Of lpData)(rightList)
+        linesRight.Run(stableLR.dst3)
+        rightList = Line_Basics_TA.removeDuplicates(linesRight.lpList)
+
+        Dim averageAgeRight = Line_Basics_TA.updateAgesAndLongest(rightList, lastList)
+        showLines(dst3, rightList, 3)
+        labels(2) += " and " + CStr(rightList.Count) + " lines in the right image shown in color."
     End Sub
 End Class
