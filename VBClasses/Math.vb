@@ -1,5 +1,6 @@
-Imports cv = OpenCvSharp
 Imports System.Threading
+Imports OpenCvSharp
+Imports cv = OpenCvSharp
 ' https://answers.opencvb.org/question/122331/how-to-subtract-a-constant-from-a-3-channel-mat/
 Public Class XR_Math_Subtract : Inherits TaskParent
     Dim options As New Options_Colors
@@ -288,42 +289,6 @@ End Class
 
 
 
-
-
-
-
-
-
-' https://stackoverflow.com/questions/7572640/how-do-i-know-if-two-vectors-are-near-parallel
-Public Class XR_Math_ParallelTest : Inherits TaskParent
-    Public v1 = New cv.Point3f(1, 0, 0)
-    Public v2 = New cv.Point3f(5, 0, 0)
-    Public showWork As Boolean = True
-    Public Sub New()
-        labels = {"", "", "Parallel Test Output", ""}
-        desc = "Test if 2 vectors are parallel"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        v1 *= 1 / Math.Sqrt(v1.X * v1.X + v1.Y * v1.Y + v1.Z * v1.Z) ' normalize the input
-        v2 *= 1 / Math.Sqrt(v2.X * v2.X + v2.Y * v2.Y + v2.Z * v2.Z)
-        Dim n1 = Plane_Basics.dotProduct3D(v1, v2)
-
-        If showWork Then
-            strOut = "Input: " + vbCrLf
-            strOut += "normalized v1" + " = " + Format(v1.X, fmt3) + ", " + Format(v1.Y, fmt3) + ", " + Format(v1.Z, fmt3) + vbCrLf
-            strOut += "normalized v2" + " = " + Format(v2.X, fmt3) + ", " + Format(v2.Y, fmt3) + ", " + Format(v2.Z, fmt3) + vbCrLf
-
-            strOut += "Dot Product = " + Format(n1, fmt3) + " - if close to 1, the vectors are parallel" + vbCrLf
-            SetTrueText(strOut, 2)
-        End If
-    End Sub
-End Class
-
-
-
-
-
-
 Public Class Math_Stdev : Inherits TaskParent
     Public highStdevMask As cv.Mat
     Public lowStdevMask As cv.Mat
@@ -373,5 +338,78 @@ Public Class Math_Stdev : Inherits TaskParent
         Dim stdevPercent = " stdev " + Format(stdevSlider.Value, "0.0")
         labels(2) = CStr(updateCount) + " of " + CStr(task.gridRects.Count) + " segments with < " + stdevPercent
         labels(3) = CStr(task.gridRects.Count - updateCount) + " out of " + CStr(task.gridRects.Count) + " had stdev > " + Format(stdevSlider.Value, "0.0")
+    End Sub
+End Class
+
+
+
+
+
+
+
+' https://stackoverflow.com/questions/7572640/how-do-i-know-if-two-vectors-are-near-parallel
+Public Class Math_DotProduct3D : Inherits TaskParent
+    Public v1 = New cv.Point3f(1, 0, 0)
+    Public v2 = New cv.Point3f(5, 0, 0)
+    Public showWork As Boolean = True
+    Public Sub New()
+        labels = {"", "", "Parallel Test Output", ""}
+        desc = "Test if 2 vectors are parallel"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        v1 *= 1 / Math.Sqrt(v1.X * v1.X + v1.Y * v1.Y + v1.Z * v1.Z) ' normalize the input
+        v2 *= 1 / Math.Sqrt(v2.X * v2.X + v2.Y * v2.Y + v2.Z * v2.Z)
+        Dim n1 = Plane_Basics.dotProduct3D(v1, v2)
+
+        If showWork Then
+            strOut = "Input: " + vbCrLf
+            strOut += "normalized v1" + " = " + Format(v1.X, fmt3) + ", " + Format(v1.Y, fmt3) + ", " + Format(v1.Z, fmt3) + vbCrLf
+            strOut += "normalized v2" + " = " + Format(v2.X, fmt3) + ", " + Format(v2.Y, fmt3) + ", " + Format(v2.Z, fmt3) + vbCrLf
+
+            strOut += "Dot Product = " + Format(n1, fmt3) + " - if close to 1, the vectors are parallel" + vbCrLf
+            SetTrueText(strOut, 2)
+        End If
+    End Sub
+End Class
+
+
+
+
+
+
+
+' https://stackoverflow.com/questions/7572640/how-do-i-know-if-two-vectors-are-near-parallel
+Public Class Math_CrossProduct2D : Inherits TaskParent
+    Public lp1 As lpData
+    Public lp2 As lpData
+    Public parallelResult As Boolean
+    Public showWork As Boolean = True
+    Public Sub New()
+        labels = {"", "", "Parallel Test Output", ""}
+        desc = "Test if 2 vectors are parallel using their cross product with result close to 0."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        ' Line 1 defined by two points
+        Dim p1 = lp1.p1
+        Dim p2 = lp1.p2
+
+        ' Line 2 defined by two points (Parallel to Line 1, just shifted)
+        Dim p3 = lp2.p1
+        Dim p4 = lp2.p2
+
+        ' 1. Calculate direction vectors
+        Dim vectorA As New Point2f(p2.X - p1.X, p2.Y - p1.Y)
+        Dim vectorB As New Point2f(p4.X - p3.X, p4.Y - p3.Y)
+
+        ' 2. Normalize the vectors so length doesn't skew the threshold
+        Dim normA As New Point2f(vectorA.X / lp1.length, vectorA.Y / lp1.length)
+        Dim normB As New Point2f(vectorB.X / lp2.length, vectorB.Y / lp2.length)
+
+        ' 3. Compute 2D Cross Product of normalized vectors
+        Dim crossProduct As Single = (normA.X * normB.Y) - (normA.Y * normB.X)
+
+        ' 4. Check against a small tolerance threshold (e.g., 0.001)
+        Dim tolerance As Single = 0.01F
+        parallelResult = Math.Abs(crossProduct) < tolerance
     End Sub
 End Class

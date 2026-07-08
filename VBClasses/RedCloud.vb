@@ -645,6 +645,7 @@ Public Class RedCloud_Min : Inherits TaskParent
     Dim color8u As New Color8U_Basics
     Public rcMap As New cv.Mat
     Public rcList As New List(Of rcData) ' includes cloud data.
+    Public rcNone As New cv.Mat
     Public Sub New()
         dst0 = New cv.Mat(dst0.Size, cv.MatType.CV_8U, 0)
         If standalone Then task.gOptions.displayDst1.Checked = True
@@ -667,7 +668,11 @@ Public Class RedCloud_Min : Inherits TaskParent
                 If count > 0 Then minList.Add(New rcData(rcMap(rect), rect, mapID))
             End If
         Next
-        dst2 = Palettize(rcMap)
+
+        cv.Cv2.ImShow("mask", mask)
+        rcNone = mask(New cv.Rect(1, 1, dst2.Width, dst2.Height))
+        rcMap.SetTo(0, Not rcNone)
+        dst2 = Palettize(rcMap, 0)
 
         If task.rcMinD IsNot Nothing And standaloneTest() Then dst2.Rectangle(task.rcMinD.rect, task.highlight, task.lineWidth)
 
@@ -694,13 +699,41 @@ Public Class RedCloud_Min : Inherits TaskParent
             rcIndex += 1
         Next
 
-        Static picTag = task.mousePicTag
-        If task.mouseClickFlag Then picTag = task.mousePicTag
-        strOut = Utility_Basics.selectMinCell(rcMap, rcList, picTag)
+        strOut = Utility_Basics.selectMinCell(rcMap, rcList)
         SetTrueText(strOut, 1)
 
-        dst3 = Palettize(dst0)
+        dst3 = Palettize(dst0, 0)
         dst3.SetTo(0, task.noDepthMask)
         labels(2) = CStr(rcList.Count) + " RedColor cells were found."
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class RedCloud_Sizes : Inherits TaskParent
+    Dim redC As New RedCloud_Min
+    Public Sub New()
+        If standalone Then task.gOptions.DebugSlider.Value = 32
+        desc = "Use the debug slider to display cells of X pixels or less."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        redC.Run(src)
+        dst2 = redC.dst2
+        labels(2) = redC.labels(2)
+
+        If task.heartBeat Then dst3.SetTo(0)
+        Dim count As Integer
+        For Each rc In redC.rcList
+            If rc.pixels <= task.gOptions.DebugSlider.Value Then
+                Dim vec = dst2.Get(Of cv.Vec3b)(rc.maxDist.Y, rc.maxDist.X)
+                dst3(rc.rect).SetTo(vec, rc.mask)
+                count += 1
+            End If
+        Next
+
+        labels(3) = CStr(count) + " cells smaller than " + CStr(task.gOptions.DebugSlider.Value) + " pixels."
     End Sub
 End Class

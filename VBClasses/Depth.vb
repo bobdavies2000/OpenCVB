@@ -1552,6 +1552,7 @@ End Class
 Public Class Depth_ReliableLines : Inherits TaskParent
     Dim linesLR As New Line_LeftRight
     Dim knn As New KNN_Basics
+    Dim pTest As New Math_CrossProduct2D
     Public Sub New()
         desc = "Find the lines that are consistent in both the left and right images."
     End Sub
@@ -1579,32 +1580,12 @@ Public Class Depth_ReliableLines : Inherits TaskParent
         dst3.SetTo(0)
         Dim count As Integer
         For i = 0 To knn.result.GetLength(0) - 1
-            Dim lp1 = linesLR.leftList(i)
-            Dim lp2 = linesLR.rightList(knn.result(i, 0))
+            pTest.lp1 = linesLR.leftList(i)
+            pTest.lp2 = linesLR.rightList(knn.result(i, 0))
 
-            ' Line 1 defined by two points
-            Dim p1 = lp1.p1
-            Dim p2 = lp1.p2
-
-            ' Line 2 defined by two points (Parallel to Line 1, just shifted)
-            Dim p3 = lp2.p1
-            Dim p4 = lp2.p2
-
-            ' 1. Calculate direction vectors
-            Dim vectorA As New Point2f(p2.X - p1.X, p2.Y - p1.Y)
-            Dim vectorB As New Point2f(p4.X - p3.X, p4.Y - p3.Y)
-
-            ' 2. Normalize the vectors so length doesn't skew the threshold
-            Dim normA As New Point2f(vectorA.X / lp1.length, vectorA.Y / lp1.length)
-            Dim normB As New Point2f(vectorB.X / lp2.length, vectorB.Y / lp2.length)
-
-            ' 3. Compute 2D Cross Product of normalized vectors
-            Dim crossProduct As Single = (normA.X * normB.Y) - (normA.Y * normB.X)
-
-            ' 4. Check against a small tolerance threshold (e.g., 0.001)
-            Dim tolerance As Single = 0.01F
-            If Math.Abs(crossProduct) < tolerance Then
-                dst3.Line(lp2.p1, lp2.p2, task.scalarColors(lp2.index Mod 256), task.lineWidth, cv.LineTypes.AntiAlias)
+            pTest.Run(emptyMat)
+            If pTest.parallelResult Then
+                dst3.Line(pTest.lp2.p1, pTest.lp2.p2, task.scalarColors(pTest.lp2.index Mod 256), task.lineWidth, cv.LineTypes.AntiAlias)
                 count += 1
             End If
         Next

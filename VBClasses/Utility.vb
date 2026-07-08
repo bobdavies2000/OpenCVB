@@ -213,27 +213,31 @@ Public Class Utility_Basics : Inherits TaskParent
 
         Return outStr
     End Function
-    Public Shared Function selectMinCell(rcMap As cv.Mat, rcList As List(Of rcData), picTag As Integer) As String
-        Dim clickIndex As Integer = 0, outStr As String = ""
-        If rcMap.Type = cv.MatType.CV_32S Then
-            clickIndex = rcMap.Get(Of Integer)(task.clickPoint.Y, task.clickPoint.X)
-        Else
-            clickIndex = rcMap.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X)
-        End If
+    Public Shared Function selectMinCell(rcMap As cv.Mat, rcList As List(Of rcData)) As String
+        If rcList.Count = 0 Then Return ""
 
-        If clickIndex = 0 Then
-            If rcList.Count = 0 Then rcList.Add(New rcData(task.color, New cv.Rect(0, 0, task.color.Width, task.color.Height), 1))
-            task.rcMinD = rcList(0)
-        End If
+        Dim outStr As String = ""
+        Static clickIndex = rcMap.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X)
+        If task.mouseClickFlag Then clickIndex = rcMap.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X)
+
+        If clickIndex = 0 Then Return "There is no cell at that location"
+        If task.rcMinD Is Nothing Then task.rcMinD = rcList(0)
 
         For Each rc In rcList
             If clickIndex = rc.mapID Then
                 task.rcMinD = rc
-                If task.rcMinD.rect.Contains(task.clickPoint) Then Exit For
+                If task.rcMinD.rect.Contains(task.clickPoint) Then
+                    task.clickPoint = task.rcMinD.maxDist
+                    Exit For
+                End If
             End If
         Next
 
-        task.color(task.rcMinD.rect).SetTo(white, If(picTag = 2, task.rcMinD.mask, task.rcMinD.maskDepth))
+        If task.rcMinD Is Nothing Then task.rcMinD = rcList(0)
+
+        ' If task.rcMinD.mapID <> task.gOptions.DebugSlider.Value Then Dim k = 0
+
+        task.color(task.rcMinD.rect).SetTo(white, task.rcMinD.mask)
         outStr = task.rcMinD.displayCell()
         task.clickPoint = task.rcMinD.maxDistDepth
 

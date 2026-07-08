@@ -512,6 +512,8 @@ Match_Point
 Match_VH
 MatchShapes_Basics
 MatchShapes_Nearby
+Math_CrossProduct2D
+Math_DotProduct3D
 Math_ImageAverage
 Math_Intrinsics
 Math_Median_CDF
@@ -678,6 +680,7 @@ RedCloud_Motion
 RedCloud_MotionFilter
 RedCloud_Reliable
 RedCloud_RGB
+RedCloud_Sizes
 RedCloudNew_Basics
 RedCloudNew_Core
 RedCloudNew_DelaunayMap
@@ -1483,7 +1486,6 @@ XR_MatchShapes_Hulls
 XR_MatchShapes_NearbyHull
 XR_Math_DepthMeanStdev
 XR_Math_ImageMaskedAverage
-XR_Math_ParallelTest
 XR_Math_RGBCorrelation
 XR_Math_StdevBoundary
 XR_Math_Subtract
