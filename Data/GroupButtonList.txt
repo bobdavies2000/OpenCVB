@@ -177,7 +177,6 @@ Random
 Rectangle
 RedC
 RedCloud
-RedCloudNew
 RedColor
 RedPrep
 Reduction
