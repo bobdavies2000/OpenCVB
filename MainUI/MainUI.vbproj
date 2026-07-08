@@ -30,10 +30,10 @@
   <ItemGroup>
     <PackageReference Include="Intel.RealSenseWithNativeDll" Version="2.51.1.1" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.5-beta1" />
-    <PackageReference Include="OpenCvSharp4" Version="4.13.0.20260531" />
-    <PackageReference Include="OpenCvSharp4.Extensions" Version="4.13.0.20260531" />
-    <PackageReference Include="OpenCvSharp4.runtime.win" Version="4.13.0.20260531" />
-    <PackageReference Include="OpenCvSharp4.Windows" Version="4.13.0.20260531" />
+    <PackageReference Include="OpenCvSharp5" Version="5.0.0.20260703" />
+    <PackageReference Include="OpenCvSharp5.runtime.wasm" Version="5.0.0.20260703" />
+    <PackageReference Include="OpenCvSharp5.runtime.win" Version="5.0.0.20260703" />
+    <PackageReference Include="OpenCvSharp5.Windows" Version="5.0.0.20260703" />
     <PackageReference Include="Stereolabs.zed" Version="5.3.0" GeneratePathProperty="true" />
   </ItemGroup>
 
@@ -118,15 +118,11 @@
 
   <!-- Always overwrite output sl_zed_c.dll so a stale ~194KB (5.0.x) copy cannot survive rebuilds. -->
   <Target Name="BuildCamOakDRelease" BeforeTargets="CopyOakNativeDlls">
-    <MSBuild Projects="$(MSBuildThisFileDirectory)..\OakD\src\Cam_Oak-D.vcxproj"
-             Properties="Configuration=Release;Platform=x64"
-             Targets="Build" />
+    <MSBuild Projects="$(MSBuildThisFileDirectory)..\OakD\src\Cam_Oak-D.vcxproj" Properties="Configuration=Release;Platform=x64" Targets="Build" />
   </Target>
 
   <Target Name="BuildOpen3DNativeRelease" BeforeTargets="CopyOpen3DNativeDlls">
-    <MSBuild Projects="$(MSBuildThisFileDirectory)..\Open3D_Native\Open3D_Native.vcxproj"
-             Properties="Configuration=Release;Platform=x64"
-             Targets="Build" />
+    <MSBuild Projects="$(MSBuildThisFileDirectory)..\Open3D_Native\Open3D_Native.vcxproj" Properties="Configuration=Release;Platform=x64" Targets="Build" />
   </Target>
 
   <Target Name="CopyOpen3DNativeDlls" AfterTargets="Build">
@@ -134,13 +130,11 @@
       <_Open3DRepoBin>$(MSBuildThisFileDirectory)..\bin\</_Open3DRepoBin>
       <_Open3DTbbDll>$(MSBuildThisFileDirectory)..\Open3D\Build\msvc_*\tbb12*.dll</_Open3DTbbDll>
     </PropertyGroup>
-    <Copy SourceFiles="$(_Open3DRepoBin)Open3D_Native.dll" DestinationFolder="$(TargetDir)" OverwriteReadOnlyFiles="true"
-          Condition="Exists('$(_Open3DRepoBin)Open3D_Native.dll')" />
+    <Copy SourceFiles="$(_Open3DRepoBin)Open3D_Native.dll" DestinationFolder="$(TargetDir)" OverwriteReadOnlyFiles="true" Condition="Exists('$(_Open3DRepoBin)Open3D_Native.dll')" />
     <ItemGroup>
       <_Open3DTbbFiles Include="$(_Open3DTbbDll)" />
     </ItemGroup>
-    <Copy SourceFiles="@(_Open3DTbbFiles)" DestinationFolder="$(TargetDir)" SkipUnchangedFiles="true"
-          Condition="'@(_Open3DTbbFiles)' != ''" />
+    <Copy SourceFiles="@(_Open3DTbbFiles)" DestinationFolder="$(TargetDir)" SkipUnchangedFiles="true" Condition="'@(_Open3DTbbFiles)' != ''" />
   </Target>
 
   <Target Name="CopyOakNativeDlls" AfterTargets="Build">
@@ -149,20 +143,13 @@
       <_OakVcpkgBin>$(MSBuildThisFileDirectory)..\OakD\depthai-core\Build\vcpkg_installed\x64-windows\bin\</_OakVcpkgBin>
       <_OpenCvReleaseBin>$(MSBuildThisFileDirectory)..\opencv\Build\bin\Release\</_OpenCvReleaseBin>
     </PropertyGroup>
-    <Copy SourceFiles="$(_OakRepoBin)Cam_Oak-D.dll" DestinationFolder="$(TargetDir)" OverwriteReadOnlyFiles="true"
-          Condition="Exists('$(_OakRepoBin)Cam_Oak-D.dll')" />
-    <Copy SourceFiles="$(_OakVcpkgBin)libusb-1.0.dll" DestinationFolder="$(TargetDir)" SkipUnchangedFiles="true"
-          Condition="Exists('$(_OakVcpkgBin)libusb-1.0.dll')" />
-    <Copy SourceFiles="$(_OpenCvReleaseBin)opencv_core4140.dll" DestinationFolder="$(TargetDir)" SkipUnchangedFiles="true"
-          Condition="Exists('$(_OpenCvReleaseBin)opencv_core4140.dll')" />
-    <Copy SourceFiles="$(_OpenCvReleaseBin)opencv_imgproc4140.dll" DestinationFolder="$(TargetDir)" SkipUnchangedFiles="true"
-          Condition="Exists('$(_OpenCvReleaseBin)opencv_imgproc4140.dll')" />
-    <Copy SourceFiles="$(_OpenCvReleaseBin)opencv_calib3d4140.dll" DestinationFolder="$(TargetDir)" SkipUnchangedFiles="true"
-          Condition="Exists('$(_OpenCvReleaseBin)opencv_calib3d4140.dll')" />
-    <Copy SourceFiles="$(_OpenCvReleaseBin)opencv_videoio4140.dll" DestinationFolder="$(TargetDir)" SkipUnchangedFiles="true"
-          Condition="Exists('$(_OpenCvReleaseBin)opencv_videoio4140.dll')" />
-    <Error Condition="!Exists('$(TargetDir)Cam_Oak-D.dll') and Exists('$(_OakRepoBin)Cam_Oak-D.dll')"
-           Text="Missing $(TargetDir)Cam_Oak-D.dll. Build Cam_Oak-D (Release|x64) first." />
+    <Copy SourceFiles="$(_OakRepoBin)Cam_Oak-D.dll" DestinationFolder="$(TargetDir)" OverwriteReadOnlyFiles="true" Condition="Exists('$(_OakRepoBin)Cam_Oak-D.dll')" />
+    <Copy SourceFiles="$(_OakVcpkgBin)libusb-1.0.dll" DestinationFolder="$(TargetDir)" SkipUnchangedFiles="true" Condition="Exists('$(_OakVcpkgBin)libusb-1.0.dll')" />
+    <Copy SourceFiles="$(_OpenCvReleaseBin)opencv_core4140.dll" DestinationFolder="$(TargetDir)" SkipUnchangedFiles="true" Condition="Exists('$(_OpenCvReleaseBin)opencv_core4140.dll')" />
+    <Copy SourceFiles="$(_OpenCvReleaseBin)opencv_imgproc4140.dll" DestinationFolder="$(TargetDir)" SkipUnchangedFiles="true" Condition="Exists('$(_OpenCvReleaseBin)opencv_imgproc4140.dll')" />
+    <Copy SourceFiles="$(_OpenCvReleaseBin)opencv_calib3d4140.dll" DestinationFolder="$(TargetDir)" SkipUnchangedFiles="true" Condition="Exists('$(_OpenCvReleaseBin)opencv_calib3d4140.dll')" />
+    <Copy SourceFiles="$(_OpenCvReleaseBin)opencv_videoio4140.dll" DestinationFolder="$(TargetDir)" SkipUnchangedFiles="true" Condition="Exists('$(_OpenCvReleaseBin)opencv_videoio4140.dll')" />
+    <Error Condition="!Exists('$(TargetDir)Cam_Oak-D.dll') and Exists('$(_OakRepoBin)Cam_Oak-D.dll')" Text="Missing $(TargetDir)Cam_Oak-D.dll. Build Cam_Oak-D (Release|x64) first." />
   </Target>
 
   <Target Name="CopySlZedCNativeDll" AfterTargets="Build">
@@ -172,8 +159,7 @@
     </PropertyGroup>
     <Copy SourceFiles="$(_SlZedCSource)" DestinationFiles="$(_SlZedCOut)" OverwriteReadOnlyFiles="true" Condition="Exists('$(_SlZedCSource)')" />
     <Error Condition="!Exists('$(_SlZedCOut)')" Text="Missing $(_SlZedCOut). Install NuGet Stereolabs.zed 5.3.0." />
-    <Copy SourceFiles="$(ZedSdkBin)\sl_zed64.dll" DestinationFiles="$(TargetDir)sl_zed64.dll" SkipUnchangedFiles="true"
-          Condition="'$(ZedSdkBin)' != '' and Exists('$(ZedSdkBin)\sl_zed64.dll')" />
+    <Copy SourceFiles="$(ZedSdkBin)\sl_zed64.dll" DestinationFiles="$(TargetDir)sl_zed64.dll" SkipUnchangedFiles="true" Condition="'$(ZedSdkBin)' != '' and Exists('$(ZedSdkBin)\sl_zed64.dll')" />
   </Target>
 
   <ItemGroup>
