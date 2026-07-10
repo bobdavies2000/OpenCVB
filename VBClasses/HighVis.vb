@@ -19,7 +19,7 @@ Public Class HighVis_Basics : Inherits TaskParent
             dst1(brick.rect).SetTo((brick.correlation + 1) * 127)
         Next
 
-        dst0 = dst1.Threshold(0, 255, cv.ThresholdTypes.Binary)
+        cv.Cv2.Threshold(dst1, dst0, 0, 255, cv.ThresholdTypes.Binary)
         Dim mm = GetMinMax(dst1, dst0)
         dst2 = ShowPaletteDepth((dst1 - mm.minVal) * mm.maxVal / (mm.maxVal - mm.minVal))
         labels(2) = bricks.labels(2)

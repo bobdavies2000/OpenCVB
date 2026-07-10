@@ -28,7 +28,7 @@ Public Class XR_PyrFilter_RedCloud : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         pyr.Run(src)
-        dst3 = pyr.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        cv.Cv2.CvtColor(pyr.dst2, dst3, cv.ColorConversionCodes.BGR2GRAY)
 
         reduction.Run(dst3)
 

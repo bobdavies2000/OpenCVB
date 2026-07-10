@@ -25,7 +25,7 @@ Public Class EdgeLine_Basics : Inherits TaskParent
 
         Dim imageEdgeWidth = If(dst2.Width >= 1280, 4, 2)
         ' prevent leaks at the image boundary...
-        dst2.Rectangle(New cv.Rect(0, 0, dst2.Width - 1, dst2.Height - 1), 255, imageEdgeWidth)
+        cv.Cv2.Rectangle(dst2, New cv.Rect(0, 0, dst2.Width - 1, dst2.Height - 1), cv.Scalar.All(255), imageEdgeWidth)
 
         Dim rectPtr = EdgeLineRaw_Rects(cPtr)
         If rectPtr = IntPtr.Zero Then Exit Sub ' no rects
@@ -167,7 +167,7 @@ Public Class XR_EdgeLine_Simple : Inherits TaskParent
 
         Dim imageEdgeWidth = 2
         If dst2.Width >= 1280 Then imageEdgeWidth = 4
-        dst2.Rectangle(New cv.Rect(0, 0, dst2.Width - 1, dst2.Height - 1), 255, imageEdgeWidth) ' prevent leaks at the image boundary...
+        cv.Cv2.Rectangle(dst2, New cv.Rect(0, 0, dst2.Width - 1, dst2.Height - 1), cv.Scalar.All(255), imageEdgeWidth) ' prevent leaks at the image boundary...
     End Sub
     Protected Overrides Sub Finalize()
         EdgeLineSimple_Close(cPtr)
@@ -311,7 +311,7 @@ Public Class XR_EdgeLine_BrickPoints : Inherits TaskParent
             End If
             If debugSegment >= edgeline.classCount Then debugSegment = 0
             If debugSegment Then
-                edgeline.dst1 = edgeline.dst2.InRange(debugSegment, debugSegment)
+                                  cv.Cv2.InRange(edgeline.dst2, debugSegment, debugSegment, edgeline.dst1)
                 edgeline.dst1.CopyTo(dst, edgeline.dst1)
             End If
             debugSegment += 1
@@ -348,7 +348,7 @@ Public Class XR_EdgeLine_BrickPoints : Inherits TaskParent
             classCount += 1
             Dim p1 = segment(0)
             For Each p2 In segment
-                dst3.Circle(p2, task.DotSize, task.highlight, -1, task.lineType)
+            cv.Cv2.Circle(dst3, p2, task.DotSize, task.highlight, -1, task.lineType)
                 ' dst3.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
                 p1 = p2
             Next
@@ -392,9 +392,9 @@ Public Class XR_EdgeLine_DepthSegments : Inherits TaskParent
             If nextSeg.Count > 0 Then segments.Add(nextSeg)
         Next
 
-        dst3 = dst2.Threshold(0, 255, cv.ThresholdTypes.Binary)
+        cv.Cv2.Threshold(dst2, dst3, 0, 255, cv.ThresholdTypes.Binary)
         Dim r = New cv.Rect(0, 0, dst2.Width, dst2.Height)
-        dst3.Rectangle(r, black, 4)
+        cv.Cv2.Rectangle(dst3, r, black, 4)
         If task.toggleOn Then
             SetTrueText("Segments without depth removed.", 3)
         Else
@@ -452,7 +452,7 @@ Public Class EdgeLine_KeyColorOnly : Inherits TaskParent
 
         Dim imageEdgeWidth = If(dst2.Width >= 1280, 4, 2)
         ' prevent leaks at the image boundary...
-        dst2.Rectangle(New cv.Rect(0, 0, dst2.Width - 1, dst2.Height - 1), 255, imageEdgeWidth)
+        cv.Cv2.Rectangle(dst2, New cv.Rect(0, 0, dst2.Width - 1, dst2.Height - 1), cv.Scalar.All(255), imageEdgeWidth)
 
         Dim rectPtr = EdgeLineRaw_Rects(cPtr)
         If rectPtr = IntPtr.Zero Then Exit Sub ' no rects
@@ -495,7 +495,7 @@ Public Class EdgeLine_Compare : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         edgeLine.Run(task.gray)
-        dst2 = edgeLine.dst2.Threshold(0, 255, cv.ThresholdTypes.Binary)
+        cv.Cv2.Threshold(edgeLine.dst2, dst2, 0, 255, cv.ThresholdTypes.Binary)
         labels(2) = edgeLine.labels(2)
 
         dst3 = task.edges.dst2

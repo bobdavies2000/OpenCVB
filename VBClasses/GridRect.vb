@@ -26,8 +26,8 @@ Public Class GridRect_Basics : Inherits TaskParent
         For i = 0 To stdevList.Count - 1
             Dim r = task.gridRects(i)
             Dim depthCheck = task.noDepthMask(r)
-            If stdevList(i) < stdevAverage Or depthCheck.CountNonZero / depthCheck.Total > 0.5 Then
-                dst3.Rectangle(r, white, -1)
+            If stdevList(i) <cv.Cv2.CountNonZero(stdevAverage Or depthCheck) / depthCheck.Total > 0.5 Then
+            cv.Cv2.Rectangle(dst3, r, white, -1)
             Else
                 rects.Add(r)
             End If
@@ -73,12 +73,14 @@ Public Class XR_GridRect_Color : Inherits TaskParent
         For i = 0 To stdevList0.Count - 1
             Dim r = task.gridRects(i)
             If stdevList0(i) < avg0 And stdevList1(i) < avg1 And stdevList2(i) < avg2 Then
-                dst3.Rectangle(r, white, -1)
+            cv.Cv2.Rectangle(dst3, r, white, -1)
             End If
         Next
         labels(3) = "Stdev average X/Y/Z = " + CInt(stdevList0.Average).ToString + ", " + CInt(stdevList1.Average).ToString + ", " + CInt(stdevList2.Average).ToString
 
-        dst2 = ShowAddweighted(dst3.CvtColor(cv.ColorConversionCodes.GRAY2BGR), src, labels(2))
+        Dim _cvtGrid As New cv.Mat
+        cv.Cv2.CvtColor(dst3, _cvtGrid, cv.ColorConversionCodes.GRAY2BGR)
+        dst2 = ShowAddweighted(_cvtGrid, src, labels(2))
     End Sub
 End Class
 
@@ -155,7 +157,11 @@ Public Class GridRect_Sorted : Inherits TaskParent
             End If
         Next
 
-        If standaloneTest() Then dst3 = ShowAddweighted(dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR), src, labels(3))
+        If standaloneTest() Then
+            Dim _cvtGrid3 As New cv.Mat
+            cv.Cv2.CvtColor(dst2, _cvtGrid3, cv.ColorConversionCodes.GRAY2BGR)
+            dst3 = ShowAddweighted(_cvtGrid3, src, labels(3))
+        End If
 
         labels(3) = $"{count} roi's or " + Format(count / sortedStd.Count, "0%") + " have an average stdev sum of " +
                         Format(avg, fmt1) + " or less"
@@ -364,9 +370,11 @@ Public Class XR_GridRect_LRClick : Inherits TaskParent
         options.Run()
 
         dst0 = src.Clone
-        dst3 = If(task.rightView.Channels() <> 3, task.rightView.CvtColor(cv.ColorConversionCodes.GRAY2BGR), task.rightView.Clone)
+        Dim _cvtInline As New cv.Mat
+        cv.Cv2.CvtColor(task.rightView, _cvtInline, cv.ColorConversionCodes.GRAY2BGR)
+        dst3 = If(task.rightView.Channels() <> 3,_cvtInline, task.rightView.Clone)
         src = task.gray
-        If task.rightView.Channels() <> 1 Then task.rightView = task.rightView.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If task.rightView.Channels() <> 1 Then cv.Cv2.CvtColor(task.rightView, task.rightView, cv.ColorConversionCodes.BGR2GRAY)
 
         gather.Run(src)
         dst2 = gather.dst2
@@ -377,7 +385,7 @@ Public Class XR_GridRect_LRClick : Inherits TaskParent
         If ClickPoint = newPoint Then setClickPoint(gather.rects(gather.rects.Count / 2).TopLeft, 2)
         Dim gridIndex As Integer = task.gridMap.Get(Of Integer)(ClickPoint.Y, ClickPoint.X)
         Dim r = task.gridRects(gridIndex)
-        dst2.Rectangle(r, white, task.lineWidth)
+        cv.Cv2.Rectangle(dst2, r, white, task.lineWidth)
 
         Dim correlationMat As New cv.Mat
         Dim corr As New List(Of Single)
@@ -406,11 +414,11 @@ Public Class XR_GridRect_LRClick : Inherits TaskParent
                     strOut += "Right Mean = " + Format(mean(0), fmt3) + " Right stdev = " + Format(stdev(0), fmt3) + vbCrLf
                     strOut += "Right rectangle is offset " + CStr(offset) + " pixels from the left image rectangle"
                 End If
-                dst3.Rectangle(rectRight, task.highlight, task.lineWidth)
-                dst0.Rectangle(r, task.highlight, task.lineWidth)
+                cv.Cv2.Rectangle(dst3, rectRight, task.highlight, task.lineWidth)
+cv.Cv2.Rectangle(dst0, r, task.highlight, task.lineWidth)
                 dst1.SetTo(0)
-                dst1.Circle(r.TopLeft, task.DotSize, task.highlight, -1, task.lineType)
-                dst1.Circle(rectRight.TopLeft, task.DotSize + 2, task.highlight, -1, task.lineType)
+                cv.Cv2.Circle(dst1, r.TopLeft, task.DotSize, task.highlight, -1, task.lineType)
+                cv.Cv2.Circle(dst1, rectRight.TopLeft, task.DotSize + 2, task.highlight, -1, task.lineType)
                 Dim pt = New cv.Point(rectRight.X, r.Y + 5)
                 SetTrueText(CStr(offset) + " pixel offset" + vbCrLf + "Larger = Right", pt, 1)
                 SetTrueText(strOut, 1)
@@ -438,9 +446,11 @@ Public Class XR_GridRect_LRAll : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
 
-        dst3 = If(task.rightView.Channels() <> 3, task.rightView.CvtColor(cv.ColorConversionCodes.GRAY2BGR), task.rightView.Clone)
+        Dim _cvtInline As New cv.Mat
+        cv.Cv2.CvtColor(task.rightView, _cvtInline, cv.ColorConversionCodes.GRAY2BGR)
+        dst3 = If(task.rightView.Channels() <> 3,_cvtInline, task.rightView.Clone)
         src = task.gray
-        If task.rightView.Channels() <> 1 Then task.rightView = task.rightView.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If task.rightView.Channels() <> 1 Then cv.Cv2.CvtColor(task.rightView, task.rightView, cv.ColorConversionCodes.BGR2GRAY)
 
         gather.Run(src)
         dst2 = gather.dst2
@@ -459,7 +469,7 @@ Public Class XR_GridRect_LRAll : Inherits TaskParent
         labels(2) = CStr(sortedRects.Count) + " roi's had left/right correlation higher than " + Format(task.fCorrThreshold, fmt3)
 
         For Each roi In sortedRects.Values
-            dst3.Rectangle(roi, task.highlight, task.lineWidth)
+        cv.Cv2.Rectangle(dst3, roi, task.highlight, task.lineWidth)
         Next
     End Sub
 End Class
@@ -481,7 +491,7 @@ Public Class GridRect_Canny : Inherits TaskParent
 
         dst2.SetTo(0)
         For Each brick In bricks.brickList
-            If dst3(brick.rect).CountNonZero Then src(brick.rect).CopyTo(dst2(brick.rect))
+If cv.Cv2.CountNonZero(dst3(brick.rect)) Then src(brick.rect).CopyTo(dst2(brick.rect))
         Next
     End Sub
 End Class

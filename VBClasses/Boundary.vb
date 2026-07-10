@@ -1,4 +1,4 @@
-﻿Imports cv = OpenCvSharp
+Imports cv = OpenCvSharp
 Public Class Boundary_Basics : Inherits TaskParent
     Public redC As New RedColor_Basics
     Dim color8U As New Color8U_Basics
@@ -42,7 +42,7 @@ Public Class Boundary_Rectangles : Inherits TaskParent
 
         dst2.SetTo(0)
         For Each rc In bounds.redC.rcList
-            dst2.Rectangle(rc.rect, task.highlight, task.lineWidth)
+        cv.Cv2.Rectangle(dst2, rc.rect, task.highlight, task.lineWidth)
         Next
         labels(2) = $"{bounds.redC.rcList.Count} rectangles before contain test"
 
@@ -75,7 +75,7 @@ Public Class Boundary_Rectangles : Inherits TaskParent
 
         dst3.SetTo(0)
         For Each r In rects
-            dst3.Rectangle(r, task.highlight, task.lineWidth)
+        cv.Cv2.Rectangle(dst3, r, task.highlight, task.lineWidth)
         Next
         labels(3) = $"{rects.Count} rectangles after contain test"
     End Sub

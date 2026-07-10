@@ -1,6 +1,5 @@
-﻿Imports cv = OpenCvSharp
+Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
-Imports OpenCvSharp.Dnn
 Imports Microsoft.ML.OnnxRuntime
 Imports Microsoft.ML.OnnxRuntime.Tensors
 
@@ -41,8 +40,7 @@ Public Class ModNet_Basics : Inherits TaskParent
     Private Shared Function PreprocessToNCHW(resizedBgr As cv.Mat) As DenseTensor(Of Single)
         Dim count = 1 * 3 * dnnSize.Height * dnnSize.Width
         Dim data(count - 1) As Single
-        Using blob = CvDnn.BlobFromImage(resizedBgr, 1.0 / 127.5, dnnSize,
-                                         New cv.Scalar(127.5, 127.5, 127.5), True, False)
+        Using blob = cv.Cv2.Dnn.BlobFromImage(resizedBgr, 1.0 / 127.5, dnnSize, New cv.Scalar(127.5, 127.5, 127.5), True, False)
             Marshal.Copy(blob.Data, data, 0, count)
         End Using
         Return New DenseTensor(Of Single)(data, {1, 3, dnnSize.Height, dnnSize.Width})
@@ -94,7 +92,7 @@ Public Class ModNet_Basics : Inherits TaskParent
         If mm.maxVal > 1.05 Then alpha512.ConvertTo(alpha512, cv.MatType.CV_32F, 1.0 / 255.0)
 
         Dim alphaFull As New cv.Mat
-        cv.Cv2.Resize(alpha512, alphaFull, src.Size(), 0, 0, cv.InterpolationFlags.Linear)
+        cv.Cv2.Resize(alpha512, alphaFull, src.Size(), 0)
 
         Dim ones As New cv.Mat(alphaFull.Size, cv.MatType.CV_32F, New cv.Scalar(1))
         Dim zeros As New cv.Mat(alphaFull.Size, cv.MatType.CV_32F, New cv.Scalar(0))
@@ -103,7 +101,7 @@ Public Class ModNet_Basics : Inherits TaskParent
 
         Dim src32 As New cv.Mat
         src.ConvertTo(src32, cv.MatType.CV_32FC3)
-        Dim ch = src32.Split()
+        Dim ch = cv.Cv2.Split(src32)
         Dim inv As New cv.Mat(alphaFull.Size, cv.MatType.CV_32F)
         Dim onePlane As New cv.Mat(alphaFull.Size, cv.MatType.CV_32F, New cv.Scalar(1))
         cv.Cv2.Subtract(onePlane, alphaFull, inv)

@@ -1,4 +1,4 @@
-﻿Imports cv = OpenCvSharp
+Imports cv = OpenCvSharp
 Public Class Bin2Way_Basics : Inherits TaskParent
     Public hist As New Histogram_Basics
     Public mats As New Mat_4Click
@@ -26,10 +26,10 @@ Public Class Bin2Way_Basics : Inherits TaskParent
         Next
 
         Dim offset = halfSplit / bins * dst3.Width
-        dst3.Line(New cv.Point(offset, 0), New cv.Point(offset, dst3.Height), white, task.lineWidth, task.lineWidth)
+        cv.Cv2.Line(dst3, New cv.Point(offset, 0), New cv.Point(offset, dst3.Height), white, task.lineWidth, task.lineWidth)
 
-        mats.mat(0) = task.gray.InRange(0, halfSplit - 1)         ' darkest
-        mats.mat(1) = task.gray.InRange(halfSplit, 255)            ' lightest
+                  cv.Cv2.InRange(task.gray, 0, halfSplit - 1, mats.mat(0))         ' darkest
+                  cv.Cv2.InRange(task.gray, halfSplit, 255, mats.mat(1))            ' lightest
 
         If standaloneTest() Then
             mats.Run(emptyMat)

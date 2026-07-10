@@ -1,5 +1,6 @@
 Imports System.Drawing
 Imports cv = OpenCvSharp
+Imports gdip = OpenCvSharp.GdipExtensions
 ' https://www.csharpcodi.com/csharp-examples/OpenCvSharp.Extensions.BitmapConverter.ToBitmap(OpenCvSharp.Mat)/
 Public Class Bitmap_ToMat : Inherits TaskParent
     Public Sub New()
@@ -10,9 +11,9 @@ Public Class Bitmap_ToMat : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         Dim filePath As String = task.homeDir + "opencv/Samples/Data/lena.jpg"
         Dim bitmap = New System.Drawing.Bitmap(filePath)
-        dst2 = cv.Extensions.BitmapConverter.ToMat(bitmap).Resize(src.Size)
+        cv.Cv2.Resize(gdip.BitmapConverter.ToMat(bitmap), dst2, src.Size)
 
-        bitmap = cv.Extensions.BitmapConverter.ToBitmap(src)
-        dst3 = cv.Extensions.BitmapConverter.ToMat(bitmap)
+        bitmap = gdip.BitmapConverter.ToBitmap(src)
+        dst3 = gdip.BitmapConverter.ToMat(bitmap)
     End Sub
 End Class

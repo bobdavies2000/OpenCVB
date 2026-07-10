@@ -1,4 +1,4 @@
-ï»¿Imports cv = OpenCvSharp
+Imports cv = OpenCvSharp
 Public Class LineSeg_Basics : Inherits TaskParent
     Public lpList As New List(Of lpData)
     Public core As New LineSeg_Core
@@ -55,10 +55,10 @@ Public Class LineSeg_Core : Inherits TaskParent
         For i = 0 To lpList.Count - 1
             Dim lp = lpList(i)
             lp.index = i
-            dst1.Line(lp.p1, lp.p2, lp.index + 1, task.lineWidth, cv.LineTypes.Link4)
-            dst2.Line(lp.p1, lp.p2, lp.color, task.lineWidth + 1, task.lineType)
+            cv.Cv2.Line(dst1, lp.p1, lp.p2, lp.index + 1, task.lineWidth, cv.LineTypes.Link4)
+            cv.Cv2.Line(dst2, lp.p1, lp.p2, lp.color, task.lineWidth + 1, task.lineType)
         Next
-        dst3 = dst1.Threshold(0, 255, cv.ThresholdTypes.Binary)
+        cv.Cv2.Threshold(dst1, dst3, 0, 255, cv.ThresholdTypes.Binary)
         labels(2) = CStr(lpList.Count) + " LSD line segments were detected."
     End Sub
     Protected Overrides Sub Finalize()
@@ -90,7 +90,7 @@ Public Class XR_LineSeg_Basics : Inherits TaskParent
         Dim mm = task.motion.motionMask
         If lp.rect.Width > 0 And lp.rect.Height > 0 Then
             Dim r = ValidateRect(lp.rect)
-            If r.Width > 0 And r.Height > 0 And mm(r).CountNonZero > 0 Then Return True
+            If r.Width > 0 And r.Height >cv.Cv2.CountNonZero(0 And mm(r)) > 0 Then Return True
         End If
         Dim pts = {lp.p1, lp.p2, lp.ptCenter}
         For Each pt In pts
@@ -162,8 +162,8 @@ Public Class XR_LineSeg_Basics : Inherits TaskParent
         dst2 = task.color.Clone
         For i = 0 To lpList.Count - 1
             Dim lp = lpList(i)
-            dst3.Line(lp.p1, lp.p2, 255, task.lineWidth, cv.LineTypes.Link4)
-            dst2.Line(lp.p1, lp.p2, lp.color, task.lineWidth + 1, task.lineType)
+            cv.Cv2.Line(dst3, lp.p1, lp.p2, 255, task.lineWidth, cv.LineTypes.Link4)
+            cv.Cv2.Line(dst2, lp.p1, lp.p2, lp.color, task.lineWidth + 1, task.lineType)
         Next
 
         labels(2) = CStr(retainedPrior) + " prior line(s) kept (no motion), " +
@@ -198,7 +198,7 @@ Public Class LineSeg_BasicsFail : Inherits TaskParent
         Dim mm = task.motion.motionMask
         If lp.rect.Width > 0 And lp.rect.Height > 0 Then
             Dim r = ValidateRect(lp.rect)
-            If r.Width > 0 And r.Height > 0 And mm(r).CountNonZero > 0 Then Return True
+            If r.Width > 0 And r.Height >cv.Cv2.CountNonZero(0 And mm(r)) > 0 Then Return True
         End If
         Dim pts = {lp.p1, lp.p2, lp.ptCenter}
         For Each pt In pts
@@ -249,8 +249,8 @@ Public Class LineSeg_BasicsFail : Inherits TaskParent
         For i = 0 To lpList.Count - 1
             Dim lp = lpList(i)
             lp.index = i
-            dst3.Line(lp.p1, lp.p2, 255, task.lineWidth, cv.LineTypes.Link4)
-            dst2.Line(lp.p1, lp.p2, lp.color, task.lineWidth + 1, task.lineType)
+            cv.Cv2.Line(dst3, lp.p1, lp.p2, 255, task.lineWidth, cv.LineTypes.Link4)
+            cv.Cv2.Line(dst2, lp.p1, lp.p2, lp.color, task.lineWidth + 1, task.lineType)
         Next
         labels(2) = CStr(lpList.Count) + " lines (retained when motion; updated from LSD when stable)."
         labels(3) = CStr(detected.Count) + " lines detected this frame from LineSeg_Basics."
@@ -263,7 +263,7 @@ End Class
 
 ''' <summary>
 ''' LBD-style line binary descriptors: 256 bits (32 bytes) per segment from Sobel magnitude samples
-''' in a 5Ã—7 band around each line. OpenCvSharp 4.x does not expose cv::line_descriptor::BinaryDescriptor;
+''' in a 5×7 band around each line. OpenCvSharp 4.x does not expose cv::line_descriptor::BinaryDescriptor;
 ''' this matches the same descriptor layout (one uchar row per line) used for Hamming distance.
 ''' </summary>
 Public Class LineSeg_LBD : Inherits TaskParent
@@ -277,7 +277,7 @@ Public Class LineSeg_LBD : Inherits TaskParent
     Public descriptors As New cv.Mat
     Dim lineSeg As New LineSeg_Basics
     Public Sub New()
-        desc = "Cursor.ai: LBD-style 256-bit binary descriptors for each line from LineSeg_Basics (Sobel magnitude, 5Ã—7 band sampling)"
+        desc = "Cursor.ai: LBD-style 256-bit binary descriptors for each line from LineSeg_Basics (Sobel magnitude, 5×7 band sampling)"
     End Sub
     Private Shared Function ClampF(v As Single, lo As Single, hi As Single) As Single
         If v < lo Then Return lo
@@ -290,7 +290,7 @@ Public Class LineSeg_LBD : Inherits TaskParent
         If xi < 0 Or yi < 0 Or xi >= m.Width Or yi >= m.Height Then Return 0
         Return m.Get(Of Single)(yi, xi)
     End Function
-    ''' <summary>Fill samples(0..34) with gradient magnitude on a 5Ã—7 grid across the line support region.</summary>
+    ''' <summary>Fill samples(0..34) with gradient magnitude on a 5×7 grid across the line support region.</summary>
     Private Shared Sub FillBandSamples(m As cv.Mat, lp As lpData, samples As Single())
         Dim p1 = New cv.Point2f(lp.p1.X, lp.p1.Y)
         Dim p2 = New cv.Point2f(lp.p2.X, lp.p2.Y)
@@ -369,7 +369,7 @@ Public Class LineSeg_LBD : Inherits TaskParent
         For i = 0 To lpList.Count - 1
             Dim lp = lpList(i)
             Dim color = task.scalarColors((lp.index + 1) Mod 255)
-            dst2.Line(lp.p1, lp.p2, color, task.lineWidth + 1, task.lineType)
+            cv.Cv2.Line(dst2, lp.p1, lp.p2, color, task.lineWidth + 1, task.lineType)
         Next
 
         labels(2) = CStr(lpList.Count) + " LineSeg_Basics lines, " + CStr(DescriptorBytes) + " bytes LBD-style descriptor per line."
@@ -478,8 +478,8 @@ Public Class LineSeg_Match : Inherits TaskParent
 
         For k = 0 To lpList.Count - 1
             Dim c = task.scalarColors((k + 1) Mod 255)
-            dst2.Line(lpList(k).p1, lpList(k).p2, c, task.lineWidth + 2, task.lineType)
-            dst3.Line(lpPrevMatched(k).p1, lpPrevMatched(k).p2, c, task.lineWidth + 2, task.lineType)
+            cv.Cv2.Line(dst2, lpList(k).p1, lpList(k).p2, c, task.lineWidth + 2, task.lineType)
+            cv.Cv2.Line(dst3, lpPrevMatched(k).p1, lpPrevMatched(k).p2, c, task.lineWidth + 2, task.lineType)
         Next
 
         currDesc.CopyTo(descPrev)
@@ -640,7 +640,7 @@ Public Class LineSeg_Top3 : Inherits TaskParent
             Dim lp = currLp(li)
             lp.color = task.scalarColors(i)
             lpList.Add(lp)
-            dst2.Line(lp.p1, lp.p2, lp.color, task.lineWidth + 2, task.lineType)
+            cv.Cv2.Line(dst2, lp.p1, lp.p2, lp.color, task.lineWidth + 2, task.lineType)
         Next
 
         labels(2) = CStr(lpList.Count) + " LineSeg_LBD line(s) tracked (heartBeatLT re-picks top 3 by length)."
@@ -677,7 +677,7 @@ Public Class LineSeg_FLD : Inherits TaskParent
         dst3.SetTo(0)
         For i = 0 To Math.Min(histArray.Count, lSeg.lpList.Count) - 1
             If histArray(i) > 5 Then
-                dst3.Line(lSeg.lpList(i).p1, lSeg.lpList(i).p2, 255, task.lineWidth, task.lineType)
+                cv.Cv2.Line(dst3, lSeg.lpList(i).p1, lSeg.lpList(i).p2, 255, task.lineWidth, task.lineType)
             End If
         Next
     End Sub
@@ -713,7 +713,7 @@ Public Class LineSeg_Detector : Inherits TaskParent
         dst3.SetTo(0)
         For i = 0 To Math.Min(histArray.Count, lSeg.lpList.Count) - 1
             If histArray(i) > 5 Then
-                dst3.Line(lSeg.lpList(i).p1, lSeg.lpList(i).p2, 255, task.lineWidth, task.lineType)
+                cv.Cv2.Line(dst3, lSeg.lpList(i).p1, lSeg.lpList(i).p2, 255, task.lineWidth, task.lineType)
             End If
         Next
     End Sub

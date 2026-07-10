@@ -213,8 +213,8 @@ Public Class XR_Hist3Dcolor_Select : Inherits TaskParent
         hColor.Run(src)
 
         Dim selection = task.gOptions.DebugSlider.Value
-        dst2 = hColor.dst2.InRange(selection, selection)
-        Dim saveCount = dst2.CountNonZero
+                  cv.Cv2.InRange(hColor.dst2, selection, selection, dst2)
+        Dim saveCount = cv.Cv2.CountNonZero(dst2)
 
         dst3 = src.Clone
         dst3.SetTo(white, dst2)

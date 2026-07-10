@@ -240,9 +240,9 @@ Public Class XR_Quad_Bricks : Inherits TaskParent
             Dim gRect = task.gridRects(i)
             Dim center = New cv.Point(gRect.X + gRect.Width / 2, gRect.Y + gRect.Height / 2)
             Dim index = redC.rcMap.Get(Of Byte)(center.Y, center.X)
-            Dim depthMin As Single = 0, depthMax As Single = 0, minLoc As cv.Point, maxLoc As cv.Point
+            Dim depthMin As Double = 0, depthMax As Double = 0, minLoc As cv.Point, maxLoc As cv.Point
             If index > 0 And index < redC.rcList.Count Then
-                task.pcSplit(2)(gRect).MinMaxLoc(depthMin, depthMax, minLoc, maxLoc, task.depthmask(gRect))
+                cv.Cv2.MinMaxLoc(task.pcSplit(2)(gRect), depthMin, depthMax, minLoc, maxLoc, task.depthmask(gRect))
                 Dim rc = redC.rcList(index - 1)
                 depthMin = If(depthMax > rc.wcMean(2), rc.wcMean(2), depthMin)
 
@@ -337,7 +337,7 @@ Public Class XR_Quad_Boundaries : Inherits TaskParent
                 Dim brick1 = bricks.brickList(j).depth
                 Dim brick2 = bricks.brickList(j - 1).depth
                 If Math.Abs(brick1 - brick2) > task.depthDiffMeters Then
-                    dst2.Rectangle(bricks.brickList(j).rect, task.highlight, -1)
+                cv.Cv2.Rectangle(dst2, bricks.brickList(j).rect, task.highlight, -1)
                 End If
             Next
         Next
@@ -347,7 +347,7 @@ Public Class XR_Quad_Boundaries : Inherits TaskParent
                 Dim brick1 = bricks.brickList(j * width).depth
                 Dim brick2 = bricks.brickList((j - 1) * width).depth
                 If Math.Abs(brick1 - brick2) > task.depthDiffMeters Then
-                    dst2.Rectangle(bricks.brickList(j).rect, task.highlight, -1)
+                cv.Cv2.Rectangle(dst2, bricks.brickList(j).rect, task.highlight, -1)
                 End If
             Next
         Next

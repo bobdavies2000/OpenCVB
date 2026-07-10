@@ -223,9 +223,9 @@ Public Class XR_BGSubtract_MOG_RGBDepth : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
-        grayMat = task.depthRGB.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        cv.Cv2.CvtColor(task.depthRGB, grayMat, cv.ColorConversionCodes.BGR2GRAY)
         MOGDepth.Apply(grayMat, grayMat, options.learnRate)
-        dst2 = grayMat.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        cv.Cv2.CvtColor(grayMat, dst2, cv.ColorConversionCodes.GRAY2BGR)
 
         MOGRGB.Apply(task.gray, dst3, options.learnRate)
     End Sub
@@ -349,7 +349,7 @@ Public Class XR_BGSubtract_Reduction : Inherits TaskParent
         bgSub.Run(dst2)
         dst3 = bgSub.dst2.Clone
 
-        labels(3) = "Count nonzero = " + CStr(dst3.CountNonZero)
+        labels(3) = "Count nonzero = " + CStr(cv.Cv2.CountNonZero(dst3))
     End Sub
 End Class
 

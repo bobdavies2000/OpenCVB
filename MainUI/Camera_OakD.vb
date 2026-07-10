@@ -190,13 +190,13 @@ Namespace MainApp
                 Dim leftPtr = OakDLeftImage(cPtr)
                 If leftPtr <> IntPtr.Zero Then
                     leftView = cv.Mat.FromPixelData(rows, cols, cv.MatType.CV_8UC1, leftPtr).Clone()
-                    leftView = leftView.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
+                    cv.Cv2.Resize(leftView, leftView, workRes, 0, 0, cv.InterpolationFlags.Nearest)
                 End If
 
                 Dim rightPtr = OakDRightImage(cPtr)
                 If rightPtr <> IntPtr.Zero Then
                     rightView = cv.Mat.FromPixelData(rows, cols, cv.MatType.CV_8UC1, rightPtr).Clone()
-                    rightView = rightView.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
+                    cv.Cv2.Resize(rightView, rightView, workRes, 0, 0, cv.InterpolationFlags.Nearest)
                 End If
 
                 Dim depthPtr = OakDRawDepth3D(cPtr)
@@ -210,21 +210,21 @@ Namespace MainApp
                     Else
                         depth16u = cv.Mat.FromPixelData(rows, cols, cv.MatType.CV_16UC1, depthPtr).Clone()
                     End If
-                    depth16u = depth16u.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
+                    cv.Cv2.Resize(depth16u, depth16u, workRes, 0, 0, cv.InterpolationFlags.Nearest)
                     pointCloud = ComputePointCloud(depth16u, calibData.leftIntrinsics)
                 End If
 
                 Dim rgbPtr = OakDColor(cPtr)
                 If rgbPtr <> IntPtr.Zero Then
                     color = cv.Mat.FromPixelData(rows, cols, cv.MatType.CV_8UC3, rgbPtr).Clone()
-                    color = color.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
+                    cv.Cv2.Resize(color, color, workRes, 0, 0, cv.InterpolationFlags.Nearest)
                 End If
 
                 If deviceClass = 4 Then
                     Dim disparityPtr = OakDDisparity(cPtr)
                     If disparityPtr <> IntPtr.Zero Then
                         disparity = cv.Mat.FromPixelData(rows, cols, cv.MatType.CV_8UC1, disparityPtr).Clone()
-                        disparity = disparity.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
+                        cv.Cv2.Resize(disparity, disparity, workRes, 0, 0, cv.InterpolationFlags.Nearest)
                     End If
                 End If
 

@@ -1,7 +1,8 @@
-﻿Imports System.Numerics
+Imports System.Numerics
 Imports System.Threading
 Imports System.Windows.Forms.VisualStyles.VisualStyleElement
 Imports Intel.RealSense
+Imports OpenCvSharp.ML.DTrees
 Imports cv = OpenCvSharp
 Public Class GenericCamera
     Public cameraMutex = New Mutex(True, "CameraMutex")
@@ -21,7 +22,7 @@ Public Class GenericCamera
     Public captureRes As cv.Size
     Public workRes As cv.Size
 
-    Public calibData As CameraInfo
+    Public calibData As cameraInfo
 
     Public Event FrameReady(sender As GenericCamera)
     Public isCapturing As Boolean
@@ -135,9 +136,9 @@ Public Class GenericCamera
             Next
         Next
 
-        Dim split = pc.Split()
+        Dim pcSplit() As cv.Mat = cv.Cv2.Split(pc)
         Dim minVal As Double, maxVal As Double
-        split(2).MinMaxLoc(minVal, maxVal)
+        cv.Cv2.MinMaxLoc(pcSplit(2), minVal, maxVal)
         Return pc
     End Function
     Public Overridable Sub StopCamera()

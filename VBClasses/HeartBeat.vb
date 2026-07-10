@@ -1,4 +1,4 @@
-﻿Imports cv = OpenCvSharp
+Imports cv = OpenCvSharp
 Public Class HeartBeat_Basics_TA : Inherits TaskParent
     Const ms1000 = 1000
     Public Sub New()

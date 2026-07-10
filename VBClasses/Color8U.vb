@@ -128,7 +128,7 @@ Public Class XR_Color8U_KMeans : Inherits TaskParent
         colorFmt.Run(src)
         dst0 = colorFmt.dst2
 
-        Dim split = dst0.Split()
+        Dim split = cv.Cv2.Split(dst0)
 
         km0.Run(split(0))
         dst1 = km0.dst2 * 255 / km0.classCount
@@ -162,8 +162,10 @@ Public Class XR_Color8U_RedHue : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
 
-        Dim hsv = src.CvtColor(cv.ColorConversionCodes.BGR2HSV)
-        Dim mask = hsv.InRange(options.camSBins, New cv.Scalar(180, 255, options.camMax))
+        Dim hsv As New cv.Mat
+        cv.Cv2.CvtColor(src, hsv, cv.ColorConversionCodes.BGR2HSV)
+        Dim mask As New cv.Mat
+        cv.Cv2.InRange(hsv, options.camSBins, New cv.Scalar(180, 255, options.camMax), mask)
         dst2.SetTo(0)
         src.CopyTo(dst2, mask)
     End Sub
@@ -183,11 +185,12 @@ Public Class Color8U_Complementary : Inherits TaskParent
         desc = "Display the current image in complementary colors"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        Dim hsv = src.CvtColor(cv.ColorConversionCodes.BGR2HSV)
-        Dim split = hsv.Split()
+        Dim hsv As New cv.Mat
+        cv.Cv2.CvtColor(src, hsv, cv.ColorConversionCodes.BGR2HSV)
+        Dim split = cv.Cv2.Split(hsv)
         split(0) += 90 Mod 180
         cv.Cv2.Merge(split, dst3)
-        dst2 = dst3.CvtColor(cv.ColorConversionCodes.HSV2BGR)
+        cv.Cv2.CvtColor(dst3, dst2, cv.ColorConversionCodes.HSV2BGR)
     End Sub
 End Class
 
@@ -230,7 +233,7 @@ Public Class XR_Color8U_InRange : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst2 = cv.Cv2.ImRead(task.homeDir + "Data/1.jpg", cv.ImreadModes.Grayscale)
-        dst1 = dst2.InRange(105, 165) ' should make this a slider and experiment further...
+                  cv.Cv2.InRange(dst2, 105, 165, dst1) ' should make this a slider and experiment further...
         dst3 = dst2.Clone
         dst3.SetTo(0, dst1)
     End Sub
@@ -342,10 +345,11 @@ Public Class Color8U_Hue : Inherits TaskParent
         desc = "Isolate those regions in the image that have a reddish hue."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        Dim hsv = src.CvtColor(cv.ColorConversionCodes.BGR2HSV)
+        Dim hsv As New cv.Mat
+        cv.Cv2.CvtColor(src, hsv, cv.ColorConversionCodes.BGR2HSV)
         Dim loBins As cv.Scalar = New cv.Scalar(0, 40, 32)
         Dim hiBins As cv.Scalar = New cv.Scalar(180, 255, 255)
-        dst2 = hsv.InRange(loBins, hiBins)
+                  cv.Cv2.InRange(hsv, loBins, hiBins, dst2)
     End Sub
 End Class
 
@@ -365,8 +369,8 @@ Public Class XR_Color8U_BlackAndWhite : Inherits TaskParent
         options.Run()
 
         dst1 = task.gray
-        dst2 = dst1.Threshold(options.minThreshold, 255, cv.ThresholdTypes.BinaryInv)
-        dst3 = dst1.Threshold(options.maxThreshold, 255, cv.ThresholdTypes.Binary)
+        cv.Cv2.Threshold(dst1, dst2, options.minThreshold, 255, cv.ThresholdTypes.BinaryInv)
+        cv.Cv2.Threshold(dst1, dst3, options.maxThreshold, 255, cv.ThresholdTypes.Binary)
     End Sub
 End Class
 

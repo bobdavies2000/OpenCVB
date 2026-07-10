@@ -1,5 +1,5 @@
 Imports cv = OpenCvSharp
-Imports cvext = OpenCvSharp.Extensions
+Imports cvext = OpenCvSharp.GdipExtensions
 Namespace MainApp
     Partial Public Class MainUI
         Public camera As GenericCamera = Nothing
@@ -117,11 +117,11 @@ Namespace MainApp
                                        Dim tmp As cv.Mat
                                        For i = 0 To pics.Count - 1
                                            tmp = vbc.task.dstList(i).Clone
-                                           tmp.Rectangle(vbc.task.drawRect, task.highlight, task.lineWidth)
+                                           cv.Cv2.Rectangle(tmp, vbc.task.drawRect, task.highlight, task.lineWidth)
                                            If vbc.task.pixelViewerRect.Width > 0 Then
-                                               tmp.Rectangle(vbc.task.pixelViewerRect, task.highlight, task.lineWidth)
+                                           cv.Cv2.Rectangle(tmp, vbc.task.pixelViewerRect, task.highlight, task.lineWidth)
                                            End If
-                                           tmp = tmp.Resize(New cv.Size(settings.displayRes.Width, settings.displayRes.Height))
+                                           cv.Cv2.Resize(tmp, tmp, New cv.Size(settings.displayRes.Width, settings.displayRes.Height))
                                            If pics(i).Image IsNot Nothing Then pics(i).Image.Dispose()
                                            pics(i).Image = cvext.BitmapConverter.ToBitmap(tmp)
                                        Next

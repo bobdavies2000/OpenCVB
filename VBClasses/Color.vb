@@ -1,4 +1,4 @@
-﻿Imports cv = OpenCvSharp
+Imports cv = OpenCvSharp
 Public Class Color_Basics : Inherits TaskParent
     Public options As New Options_Color
     Public Sub New()
@@ -12,17 +12,17 @@ Public Class Color_Basics : Inherits TaskParent
             Case "BGR"
                 dst2 = src.Clone
             Case "LAB"
-                dst2 = src.CvtColor(cv.ColorConversionCodes.BGR2Lab)
+                cv.Cv2.CvtColor(src, dst2, cv.ColorConversionCodes.BGR2Lab)
             Case "HSV"
-                dst2 = src.CvtColor(cv.ColorConversionCodes.BGR2HSV)
+                cv.Cv2.CvtColor(src, dst2, cv.ColorConversionCodes.BGR2HSV)
             Case "XYZ"
-                dst2 = src.CvtColor(cv.ColorConversionCodes.BGR2XYZ)
+                cv.Cv2.CvtColor(src, dst2, cv.ColorConversionCodes.BGR2XYZ)
             Case "HLS"
-                dst2 = src.CvtColor(cv.ColorConversionCodes.BGR2HLS)
+                cv.Cv2.CvtColor(src, dst2, cv.ColorConversionCodes.BGR2HLS)
             Case "YUV"
-                dst2 = src.CvtColor(cv.ColorConversionCodes.BGR2YUV)
+                cv.Cv2.CvtColor(src, dst2, cv.ColorConversionCodes.BGR2YUV)
             Case "YCrCb"
-                dst2 = src.CvtColor(cv.ColorConversionCodes.BGR2YCrCb)
+                cv.Cv2.CvtColor(src, dst2, cv.ColorConversionCodes.BGR2YCrCb)
         End Select
     End Sub
 End Class
@@ -52,12 +52,12 @@ Public Class Color_Measure : Inherits TaskParent
         Next
 
         For Each index In task.motion.motionSort
-            dst2.Rectangle(task.gridRects(index), 255, task.lineWidth)
-            dst3.Rectangle(task.gridRects(index), 255, task.lineWidth)
+            cv.Cv2.Rectangle(dst2, task.gridRects(index), cv.Scalar.All(255), task.lineWidth)
+            cv.Cv2.Rectangle(dst3, task.gridRects(index), cv.Scalar.All(255), task.lineWidth)
         Next
         lastSrc = dst2.Clone
 
-        Dim count = dst3.CountNonZero()
+        Dim count = cv.Cv2.CountNonZero(dst3)
         labels(3) = "At " + " color diff threshold " + CStr(threshold) + ", differences: " + CStr(count)
     End Sub
 End Class

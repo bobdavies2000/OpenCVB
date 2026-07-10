@@ -9,10 +9,10 @@ Public Class InPaint_Basics : Inherits TaskParent
     Public Function drawRandomLine(dst As cv.Mat) As cv.Mat
         Dim p1 = New cv.Point2f(msRNG.Next(dst.Cols / 4, dst.Cols * 3 / 4), msRNG.Next(dst.Rows / 4, dst.Rows * 3 / 4))
         Dim p2 = New cv.Point2f(msRNG.Next(dst.Cols / 4, dst.Cols * 3 / 4), msRNG.Next(dst.Rows / 4, dst.Rows * 3 / 4))
-        dst2.Line(p1, p2, New cv.Scalar(0, 0, 0), task.lineWidth, task.lineType)
+        cv.Cv2.Line(dst2, p1, p2, New cv.Scalar(0, 0, 0), task.lineWidth, task.lineType)
         Dim mask = New cv.Mat(dst2.Size(), cv.MatType.CV_8UC1)
         mask.SetTo(0)
-        mask.Line(p1, p2, cv.Scalar.All(255), task.lineWidth, task.lineType)
+        cv.Cv2.Line(mask, p1, p2, cv.Scalar.All(255), task.lineWidth, task.lineType)
         Return mask
     End Function
     Public Overrides Sub RunAlg(src As cv.Mat)

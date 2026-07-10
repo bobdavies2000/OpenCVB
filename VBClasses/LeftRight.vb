@@ -16,12 +16,12 @@ Public Class LeftRight_Basics : Inherits TaskParent
         Else
             brightness.run(task.leftView)
             Dim tmpLeft As cv.Mat = brightness.dst2 ' input array conflict
-            task.leftView = tmpLeft.Normalize(100, 150, cv.NormTypes.MinMax)
+            cv.Cv2.Normalize(tmpLeft, task.leftView, 100, 150, cv.NormTypes.MinMax)
             If standaloneTest() Then dst2 = task.leftView
 
             brightness.run(task.rightView)
             Dim tmpRight As cv.Mat = brightness.dst2 ' inputarray conflict
-            task.rightView = tmpRight.Normalize(100, 150, cv.NormTypes.MinMax)
+            cv.Cv2.Normalize(tmpRight, task.rightView, 100, 150, cv.NormTypes.MinMax)
             If standaloneTest() Then dst3 = task.rightView
         End If
     End Sub
@@ -94,7 +94,7 @@ Public Class XR_LeftRight_RGBAlignLeft : Inherits TaskParent
         Dim xS = options.xShift
         Dim yS = options.yShift
         Dim rect = New cv.Rect(xD + xS, yD + yS, w - xD * 2, h - yD * 2)
-        dst2 = task.leftView(rect).Resize(dst0.Size)
+        cv.Cv2.Resize(task.leftView(rect), dst2, dst0.Size)
 
         dst3 = ShowAddweighted(dst2, src, labels(3))
     End Sub
@@ -180,11 +180,11 @@ Public Class LeftRight_Brightness_TA : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         Options.Run()
 
-        dst2 = task.leftView.ConvertScaleAbs(Options.brightness, Options.contrast)
-        dst2 = dst2.Normalize(0, 255, cv.NormTypes.MinMax)
+        cv.Cv2.ConvertScaleAbs(task.leftView, dst2, Options.brightness, Options.contrast)
+        cv.Cv2.Normalize(dst2, dst2, 0, 255, cv.NormTypes.MinMax)
 
-        dst3 = task.rightView.ConvertScaleAbs(Options.brightness, Options.contrast)
-        dst3 = dst3.Normalize(0, 255, cv.NormTypes.MinMax)
+        cv.Cv2.ConvertScaleAbs(task.rightView, dst3, Options.brightness, Options.contrast)
+        cv.Cv2.Normalize(dst3, dst3, 0, 255, cv.NormTypes.MinMax)
 
         labels(2) = "Left Image brightness/contrast = " + CStr(Options.brightness) + "/" + CStr(Options.contrast)
         labels(3) = "Right Image brightness/contrast = " + CStr(Options.brightness) + "/" + CStr(Options.contrast)

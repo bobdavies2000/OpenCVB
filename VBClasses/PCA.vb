@@ -1,5 +1,6 @@
-Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
+Imports SharpGL.SceneGraph.Raytracing
+Imports cv = OpenCvSharp
 ' You can find the main direction of a series of points using principal component analysis �(PCA).
 ' PCA is a statistical technique that can be used to find the directions of greatest variance in a dataset.
 ' The main direction of a series of points is the direction of greatest variance in the dataset.
@@ -53,7 +54,7 @@ Public Class PCA_Reconstruct : Inherits TaskParent
         images(index) = task.gray
         Dim gray32f As New cv.Mat
         images(index).ConvertTo(gray32f, cv.MatType.CV_32F)
-        gray32f = gray32f.Normalize(0, 255, cv.NormTypes.MinMax)
+        cv.Cv2.Normalize(gray32f, gray32f, 0, 255, cv.NormTypes.MinMax)
         images32f(index) = gray32f.Reshape(1, 1)
         If task.frameCount >= images.Length Then
             Dim data = New cv.Mat(images.Length, src.Rows * src.Cols, cv.MatType.CV_32F)
@@ -103,17 +104,19 @@ Public Class XR_PCA_DrawImage : Inherits TaskParent
         Dim hypotenuse = Math.Sqrt((p.Y - q.Y) * (p.Y - q.Y) + (p.X - q.X) * (p.X - q.X))
         q.X = p.X - scale * hypotenuse * Math.Cos(angle)
         q.Y = p.Y - scale * hypotenuse * Math.Sin(angle)
-        img.Line(p, q, color, task.lineWidth, task.lineType)
+        cv.Cv2.Line(img, p, q, color, task.lineWidth, task.lineType)
         p.X = q.X + 9 * Math.Cos(angle + Math.PI / 4)
         p.Y = q.Y + 9 * Math.Sin(angle + Math.PI / 4)
-        img.Line(p, q, color, task.lineWidth, task.lineType)
+        cv.Cv2.Line(img, p, q, color, task.lineWidth, task.lineType)
         p.X = q.X + 9 * Math.Cos(angle - Math.PI / 4)
         p.Y = q.Y + 9 * Math.Sin(angle - Math.PI / 4)
-        img.Line(p, q, color, task.lineWidth, task.lineType)
+        cv.Cv2.Line(img, p, q, color, task.lineWidth, task.lineType)
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        dst2 = image.Resize(dst2.Size())
-        Dim gray = dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY).Threshold(50, 255, cv.ThresholdTypes.Binary Or cv.ThresholdTypes.Otsu)
+        cv.Cv2.Resize(image, dst2, dst2.Size())
+        Dim gray As New cv.Mat
+        cv.Cv2.CvtColor(dst2, gray, cv.ColorConversionCodes.BGR2GRAY)
+        cv.Cv2.Threshold(gray, gray, 50, 255, cv.ThresholdTypes.Binary Or cv.ThresholdTypes.Otsu)
         Dim hierarchy() As cv.HierarchyIndex = Nothing
         Dim contours As cv.Point()() = Nothing
         cv.Cv2.FindContours(gray, contours, hierarchy, cv.RetrievalModes.List, cv.ContourApproximationModes.ApproxNone)
@@ -139,7 +142,7 @@ Public Class XR_PCA_DrawImage : Inherits TaskParent
                 eigen_val(j) = pca_analysis.Eigenvalues.Get(Of Double)(0, j)
             Next
 
-            dst3.Circle(cntr, task.DotSize + 1, cv.Scalar.BlueViolet, -1, task.lineType)
+            cv.Cv2.Circle(dst3, cntr, task.DotSize + 1, cv.Scalar.BlueViolet, -1, task.lineType)
             Dim factor As Single = 0.02F ' scaling factor for the lines depicting the principal components.
             Dim ept1 = New cv.Point(cntr.X + factor * eigen_vecs(0).X * eigen_val(0), cntr.Y + factor * eigen_vecs(0).Y * eigen_val(0))
             Dim ept2 = New cv.Point(cntr.X - factor * eigen_vecs(1).X * eigen_val(1), cntr.Y - factor * eigen_vecs(1).Y * eigen_val(1))
@@ -739,7 +742,8 @@ Public Class PCA_NColor : Inherits TaskParent
         dst2 = custom.dst2
 
         Dim tmp = cv.Mat.FromPixelData(256, 1, cv.MatType.CV_8UC3, palette)
-        Dim paletteCount = tmp.CvtColor(cv.ColorConversionCodes.BGR2GRAY).CountNonZero()
+        cv.Cv2.CvtColor(tmp, tmp, cv.ColorConversionCodes.BGR2GRAY)
+        Dim paletteCount = cv.Cv2.CountNonZero(tmp)
 
         If standaloneTest() Then
             dst3 = Palettize(img8u)
@@ -769,7 +773,7 @@ Public Class PCA_NColor_CPP : Inherits TaskParent
         desc = "Create a faster version of the PCA_NColor algorithm."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If src.Channels <> 3 Then src = src.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        If src.Channels <> 3 Then cv.Cv2.CvtColor(src, src, cv.ColorConversionCodes.GRAY2BGR)
 
         If task.heartBeat Then pcaPalette.Run(src) ' get the palette in VB.Net
         Marshal.Copy(src.Data, rgb, 0, rgb.Length)

@@ -12,7 +12,7 @@ Public Class Covariance_Basics : Inherits TaskParent
             random.Run(src)
             src = cv.Mat.FromPixelData(random.PointList.Count, 2, cv.MatType.CV_32F, random.PointList.ToArray)
             For i = 0 To random.PointList.Count - 1
-                dst3.Circle(random.PointList(i), 3, white, -1, task.lineType)
+            cv.Cv2.Circle(dst3, random.PointList(i), 3, white, -1, task.lineType)
             Next
         End If
         Dim samples2 = src.Reshape(2)
@@ -27,15 +27,15 @@ Public Class Covariance_Basics : Inherits TaskParent
         Next
         strOut += vbCrLf
 
-        Dim overallMean = samples2.Mean()
+        Dim overallMean = cv.Cv2.Mean(samples2)
         Dim center = New cv.Point2f(overallMean(0), overallMean(1))
         strOut += "Mean (img1, img2) = (" + Format(center.X, fmt0) + ", " + Format(center.Y, fmt0) + ")" + vbCrLf
 
         If standaloneTest() Then
             Static lastCenter As cv.Point2f = center
-            dst3.Circle(center, 5, cv.Scalar.Red, -1, task.lineType)
-            dst3.Circle(lastCenter, 5, task.highlight, task.lineWidth + 1, task.lineType)
-            dst3.Line(center, lastCenter, cv.Scalar.Red, task.lineWidth + 1, task.lineType)
+            cv.Cv2.Circle(dst3, center, 5, cv.Scalar.Red, -1, task.lineType)
+            cv.Cv2.Circle(dst3, lastCenter, 5, task.highlight, task.lineWidth + 1, task.lineType)
+            cv.Cv2.Line(dst3, center, lastCenter, cv.Scalar.Red, task.lineWidth + 1, task.lineType)
             lastCenter = center
             strOut += "Yellow is last center, red is the current center"
         End If

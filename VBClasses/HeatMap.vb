@@ -25,9 +25,11 @@ Public Class HeatMap_Basics : Inherits TaskParent
         sideframes.Run(histogramSide)
         dst1 = sideframes.dst2
 
-        dst2 = Palettize(dst0.ConvertScaleAbs(), 0).Clone
-        dst3 = Palettize(dst1.ConvertScaleAbs(), 0)
-        labels(2) = "Top view of heat map with the last " + CStr(task.fOptions.FrameHistoryCount.Value ) + " frames"
+        cv.Cv2.ConvertScaleAbs(dst0, dst0)
+        dst2 = Palettize(dst0, 0)
+        cv.Cv2.ConvertScaleAbs(dst1, dst1)
+        dst3 = Palettize(dst1, 0)
+        labels(2) = "Top view of heat map with the last " + CStr(task.fOptions.FrameHistoryCount.Value) + " frames"
         labels(3) = "Side view of heat map with the last " + CStr(task.fOptions.FrameHistoryCount.Value ) + " frames"
     End Sub
 End Class
@@ -58,11 +60,11 @@ Public Class XR_HeatMap_Grid : Inherits TaskParent
         Dim maxCount1 As Integer, maxCount2 As Integer
         Dim sync1 As New Object, sync2 As New Object
         For Each roi In task.gridRects
-            Dim count1 = heat.histogramTop(roi).CountNonZero
+            Dim count1 = cv.Cv2.CountNonZero(heat.histogramTop(roi))
             dst2(roi).SetTo(count1)
             If count1 > maxCount1 Then maxCount1 = count1
 
-            Dim count2 = heat.histogramSide(roi).CountNonZero
+            Dim count2 = cv.Cv2.CountNonZero(heat.histogramSide(roi))
             dst3(roi).SetTo(count2)
             If count2 > maxCount2 Then maxCount2 = count2
         Next
@@ -91,8 +93,8 @@ Public Class HeatMap_Hot : Inherits TaskParent
 
         Dim mmTop = GetMinMax(dst2)
         Dim mmSide = GetMinMax(dst3)
-        labels(2) = CStr(mmTop.maxVal) + " max count " + CStr(dst2.CountNonZero) + " pixels in the top down view"
-        labels(3) = CStr(mmSide.maxVal) + " max count " + CStr(dst3.CountNonZero) + " pixels in the side view"
+        labels(2) = CStr(mmTop.maxVal) + " max count " + CStr(cv.Cv2.CountNonZero(dst2)) + " pixels in the top down view"
+        labels(3) = CStr(mmSide.maxVal) + " max count " + CStr(cv.Cv2.CountNonZero(dst3)) + " pixels in the side view"
     End Sub
 End Class
 

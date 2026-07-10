@@ -1,4 +1,4 @@
-﻿Imports System.Runtime.InteropServices
+Imports System.Runtime.InteropServices
 
 Module GlobalVariables
     Public settings As jsonShared.Settings

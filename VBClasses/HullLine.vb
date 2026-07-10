@@ -24,7 +24,7 @@ Public Class HullLine_BasicsOld_TA : Inherits TaskParent
 
                 lpList.Add(lp)
                 ptLast = pt
-                dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
+                cv.Cv2.Line(dst2, lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
                 If lpList.Count >= maxLines Then Exit For
             Next
             If lpList.Count >= maxLines Then Exit For
@@ -64,8 +64,8 @@ Public Class HullLine_EdgePoints : Inherits TaskParent
         dst2 = src.Clone
         For Each lpIn In hullLines.lpList
             Dim lp = EdgePointOffset(lpIn, 1)
-            dst2.Circle(New cv.Point(CInt(lp.ptE1.X), CInt(lp.ptE1.Y)), task.DotSize, task.highlight, -1, task.lineType)
-            dst2.Circle(New cv.Point(CInt(lp.ptE2.X), CInt(lp.ptE2.Y)), task.DotSize, task.highlight, -1, task.lineType)
+            cv.Cv2.Circle(dst2, New cv.Point(CInt(lp.ptE1.X), CInt(lp.ptE1.Y)), task.DotSize, task.highlight, -1, task.lineType)
+            cv.Cv2.Circle(dst2, New cv.Point(CInt(lp.ptE2.X), CInt(lp.ptE2.Y)), task.DotSize, task.highlight, -1, task.lineType)
         Next
         labels(2) = hullLines.labels(2)
     End Sub

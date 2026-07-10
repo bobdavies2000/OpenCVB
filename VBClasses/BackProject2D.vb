@@ -1,4 +1,4 @@
-﻿Imports cv = OpenCvSharp
+Imports cv = OpenCvSharp
 ' https://docs.opencvb.org/3.4/dc/df6/tutorial_py_Histogram_backprojection.html
 Public Class BackProject2D_Basics : Inherits TaskParent
     Public hist2d As New Hist2D_Basics
@@ -27,7 +27,7 @@ Public Class BackProject2D_Basics : Inherits TaskParent
         End If
         cv.Cv2.CalcBackProject({colorFmt.dst2}, hist2d.channels, histogram, dst0, hist2d.ranges)
 
-        Dim bpCount = hist2d.histogram(r).CountNonZero
+        Dim bpCount = cv.Cv2.CountNonZero(hist2d.histogram(r))
 
         If backProjectByGrid Then
             Dim mm = GetMinMax(dst0)
@@ -97,7 +97,7 @@ Public Class XR_BackProject2D_Top : Inherits TaskParent
         dst2 = heat.dst2
 
         cv.Cv2.CalcBackProject({task.pointCloud}, task.channelsTop, heat.histogramTop, dst1, task.rangesTop)
-        dst1 = dst1.ConvertScaleAbs()
+        cv.Cv2.ConvertScaleAbs(dst1, dst1)
         dst1.ConvertTo(dst1, cv.MatType.CV_8U)
         dst3 = Palettize(dst1)
     End Sub
@@ -118,7 +118,7 @@ Public Class XR_BackProject2D_Side : Inherits TaskParent
         dst2 = heat.dst3
 
         cv.Cv2.CalcBackProject({task.pointCloud}, task.channelsSide, heat.histogramSide, dst1, task.rangesSide)
-        dst1 = dst1.ConvertScaleAbs()
+        cv.Cv2.ConvertScaleAbs(dst1, dst1)
         dst1.ConvertTo(dst1, cv.MatType.CV_8U)
         dst3 = Palettize(dst1)
     End Sub
@@ -144,7 +144,7 @@ Public Class BackProject2D_Filter : Inherits TaskParent
             cv.Cv2.CalcHist({task.pointCloud}, task.channelsSide, New cv.Mat, histogram, 2, task.bins2D, task.rangesSide)
         End If
         'histogram.Col(0).SetTo(0)
-        dst2 = histogram.Threshold(threshold, 255, cv.ThresholdTypes.Binary)
+        cv.Cv2.Threshold(histogram, dst2, threshold, 255, cv.ThresholdTypes.Binary)
     End Sub
 End Class
 
@@ -288,7 +288,7 @@ Public Class XR_BackProject2D_RowCol : Inherits TaskParent
         Else
             rect = New cv.Rect(r.X, 0, r.Width, dst2.Height)
         End If
-        dst2.Rectangle(rect, task.highlight, task.lineWidth)
+        cv.Cv2.Rectangle(dst2, rect, task.highlight, task.lineWidth)
         Dim histData As New cv.Mat(backp.hist2d.histogram.Size, cv.MatType.CV_32F, 0)
         backp.hist2d.histogram(rect).CopyTo(histData(rect))
 
@@ -300,8 +300,9 @@ Public Class XR_BackProject2D_RowCol : Inherits TaskParent
         dst0.SetTo(0, dst1)
 
         If task.heartBeat Then
-            Dim count = histData(rect).Sum
-            labels(3) = "Selected " + selection + " = " + CStr(histData(rect).CountNonZero) + " non-zero histogram entries representing total pixels of " + CStr(count)
+            Dim count = cv.Cv2.Sum(histData(rect))
+            labels(3) = "Selected " + selection + " = " + CStr(cv.Cv2.CountNonZero(histData(rect))) +
+                        " non-zero histogram entries representing total pixels of " + CStr(count)
         End If
 
         If task.heartBeat Then
@@ -339,7 +340,7 @@ Public Class BackProject2D_Grayscale : Inherits TaskParent
 
         Dim backP As New cv.Mat
         cv.Cv2.CalcBackProject({colorSrc}, channels, histBar.histogram, backP, histBar.ranges)
-        dst3 = backP.Normalize(0, 255, cv.NormTypes.MinMax)
+        cv.Cv2.Normalize(backP, dst3, 0, 255, cv.NormTypes.MinMax)
         dst3.ConvertTo(dst3, cv.MatType.CV_8U)
 
         If standaloneTest() Then

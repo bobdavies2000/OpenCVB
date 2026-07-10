@@ -73,11 +73,11 @@ Public Class XR_Eigen_Fitline : Inherits TaskParent
         Dim p1 = New cv.Point(line.X1, line.Y1)
         Dim p2 = New cv.Point(src.Width, line.Vy / line.Vx * src.Width + bb)
         Dim lp = findEdgePoints(New lpData(p1, p2))
-        dst2.Line(lp.p1, lp.p2, cv.Scalar.Red, task.lineWidth + 4, task.lineType)
+        cv.Cv2.Line(dst2, lp.p1, lp.p2, cv.Scalar.Red, task.lineWidth + 4, task.lineType)
 
         Dim pointMat = cv.Mat.FromPixelData(pointCount, 1, cv.MatType.CV_32FC2, noisyLine.PointList.ToArray)
-        Dim mean = pointMat.Mean()
-        Dim split() = pointMat.Split()
+        Dim mean = cv.Cv2.Mean(pointMat)
+        Dim split() = cv.Cv2.Split(pointMat)
         Dim mmX = GetMinMax(split(0))
         Dim mmY = GetMinMax(split(1))
 
@@ -107,17 +107,17 @@ Public Class XR_Eigen_Fitline : Inherits TaskParent
         m2 = (p2.Y - p1.Y) / (p2.X - p1.X)
 
         If Math.Abs(m2) > 1.0 Then
-            dst2.Line(p1, p2, task.highlight, task.lineWidth + 2, task.lineType)
+            cv.Cv2.Line(dst2, p1, p2, task.highlight, task.lineWidth + 2, task.lineType)
         Else
             p1 = New cv.Point2f(mean.Val0 - Math.Cos(-theta) * len / 2, mean.Val1 - Math.Sin(-theta) * len / 2)
             p2 = New cv.Point2f(mean.Val0 + Math.Cos(-theta) * len / 2, mean.Val1 + Math.Sin(-theta) * len / 2)
             m2 = (p2.Y - p1.Y) / (p2.X - p1.X)
-            dst2.Line(p1, p2, cv.Scalar.Yellow, task.lineWidth + 1, task.lineType)
+            cv.Cv2.Line(dst2, p1, p2, cv.Scalar.Yellow, task.lineWidth + 1, task.lineType)
         End If
 
         p1 = New cv.Point(0, noisyLine.bb)
         p2 = New cv.Point(src.Width, noisyLine.m * src.Width + noisyLine.bb)
-        dst2.Line(p1, p2, cv.Scalar.Blue, task.lineWidth, task.lineType)
+        cv.Cv2.Line(dst2, p1, p2, cv.Scalar.Blue, task.lineWidth, task.lineType)
         SetTrueText("Ground Truth m = " + Format(noisyLine.m, fmt2) + " eigen m = " + Format(m2, fmt2) + "    len = " + CStr(CInt(len)) + vbCrLf +
                         "Confidence = " + Format(eigenVal.Get(Of Single)(0, 0) / eigenVal.Get(Of Single)(1, 0), fmt1) + vbCrLf +
                         "theta: atan2(" + Format(eigenVec.Get(Of Single)(1, 0), fmt1) + ", " + Format(eigenVec.Get(Of Single)(0, 0), fmt1) + ") = " +
@@ -151,7 +151,7 @@ Public Class Eigen_Input : Inherits TaskParent
         For Each pt In eigen3D.PointList
             Dim p1 = New cv.Point2f(pt.X, pt.Y)
             PointList.Add(p1)
-            dst2.Circle(p1, task.DotSize, 255, -1, task.lineType)
+            cv.Cv2.Circle(dst2, p1, task.DotSize, 255, -1, task.lineType)
         Next
     End Sub
 End Class
@@ -204,7 +204,7 @@ Public Class Eigen_Input3D : Inherits TaskParent
             Dim pt = New cv.Point3f(startx + i * incr + noiseOffsetX,
                                         Math.Max(0, Math.Min(m * (startx + i * incr) + bb + noiseOffsetY, height)), Rnd() * depth)
             PointList.Add(pt)
-            dst2.Circle(New cv.Point2f(pt.X, pt.Y), task.DotSize + 1, highLight, -1, task.lineType)
+            cv.Cv2.Circle(dst2, New cv.Point2f(pt.X, pt.Y), task.DotSize + 1, highLight, -1, task.lineType)
         Next
     End Sub
 End Class

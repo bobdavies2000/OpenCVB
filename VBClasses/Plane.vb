@@ -47,7 +47,7 @@ Public Class Plane_Basics : Inherits TaskParent
     End Function
     Public Shared Function fitDepthPlane(fitDepth As List(Of cv.Point3f)) As cv.Vec4f
         Dim wDepth = cv.Mat.FromPixelData(fitDepth.Count, 1, cv.MatType.CV_32FC3, fitDepth.ToArray)
-        Dim columnSum = wDepth.Sum()
+        Dim columnSum = cv.Cv2.Sum(wDepth)
         Dim count = CDbl(fitDepth.Count)
         Dim plane As New cv.Vec4f
         Dim centroid = New cv.Point3f
@@ -475,7 +475,8 @@ Public Class XR_Plane_Histogram : Inherits TaskParent
         solo.Run(src)
         dst3 = solo.dst3
 
-        Dim points = dst3.FindNonZero()
+        Dim points As New cv.Mat
+        cv.Cv2.FindNonZero(dst3, points)
         Dim yList As New List(Of Single)
         For i = 0 To points.Rows - 1
             Dim pt = points.Get(Of cv.Point)(i, 0)
@@ -496,14 +497,14 @@ Public Class XR_Plane_Histogram : Inherits TaskParent
         floorPop = mm.maxVal
         Dim peak = hist.mm.minVal + (midHist + mm.maxLoc.Y + 1) * rangePerBin
         Dim rX As Integer = (midHist + mm.maxLoc.Y) * binWidth
-        dst2.Rectangle(New cv.Rect(rX, 0, binWidth, dst2.Height), cv.Scalar.Black, task.lineWidth)
+        cv.Cv2.Rectangle(dst2, New cv.Rect(rX, 0, binWidth, dst2.Height), cv.Scalar.Black, task.lineWidth)
         If Math.Abs(peak - peakCeiling) > rangePerBin Then peakCeiling = peak
 
         mm = GetMinMax(hist.histogram(New cv.Rect(0, 0, 1, midHist)))
         ceilingPop = mm.maxVal
         peak = hist.mm.minVal + (mm.maxLoc.Y + 1) * rangePerBin
         rX = mm.maxLoc.Y * binWidth
-        dst2.Rectangle(New cv.Rect(rX, 0, binWidth, dst2.Height), cv.Scalar.Yellow, task.lineWidth)
+        cv.Cv2.Rectangle(dst2, New cv.Rect(rX, 0, binWidth, dst2.Height), cv.Scalar.Yellow, task.lineWidth)
         If Math.Abs(peak - peakFloor) > rangePerBin * 2 Then peakFloor = peak
 
         labels(3) = "Peak Ceiling = " + Format(peakCeiling, fmt3) + " and Peak Floor = " + Format(peakFloor, fmt3)
@@ -611,7 +612,7 @@ Public Class XR_Plane_Verticals : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         solo.Run(src)
-        dst3 = solo.heat.topframes.dst2.InRange(task.projectionThreshold * task.fOptions.FrameHistoryCount.Value , dst2.Total)
+                  cv.Cv2.InRange(solo.heat.topframes.dst2, task.projectionThreshold * task.fOptions.FrameHistoryCount.Value , dst2.Total, dst3)
 
         dst1 = New cv.Mat(dst1.Size(), cv.MatType.CV_32FC1, 0)
         solo.heat.dst0.CopyTo(dst1, dst3)
@@ -621,7 +622,7 @@ Public Class XR_Plane_Verticals : Inherits TaskParent
 
         frames.Run(dst2)
         frames.dst2.ConvertTo(dst2, cv.MatType.CV_8U)
-        dst2 = frames.dst2.Threshold(0, 255, cv.ThresholdTypes.Binary)
+        cv.Cv2.Threshold(frames.dst2, dst2, 0, 255, cv.ThresholdTypes.Binary)
         dst2.ConvertTo(dst0, cv.MatType.CV_8U)
         task.color.SetTo(white, dst0)
     End Sub
@@ -645,7 +646,7 @@ Public Class XR_Plane_Horizontals : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         solo.Run(src)
-        dst3 = solo.heat.sideframes.dst2.InRange(task.projectionThreshold * task.fOptions.FrameHistoryCount.Value , dst2.Total)
+                  cv.Cv2.InRange(solo.heat.sideframes.dst2, task.projectionThreshold * task.fOptions.FrameHistoryCount.Value , dst2.Total, dst3)
 
         dst1 = New cv.Mat(dst1.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         solo.heat.dst1.CopyTo(dst1, dst3)
@@ -655,7 +656,7 @@ Public Class XR_Plane_Horizontals : Inherits TaskParent
 
         frames.Run(dst2)
         frames.dst2.ConvertTo(dst2, cv.MatType.CV_8U)
-        dst2 = frames.dst2.Threshold(0, 255, cv.ThresholdTypes.Binary)
+        cv.Cv2.Threshold(frames.dst2, dst2, 0, 255, cv.ThresholdTypes.Binary)
         dst2.ConvertTo(dst0, cv.MatType.CV_8U)
         task.color.SetTo(white, dst0)
     End Sub
@@ -685,16 +686,17 @@ Public Class XR_Plane_FloorStudy : Inherits TaskParent
         slice.Run(src)
         dst1 = slice.dst3
 
-        dst0 = dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        cv.Cv2.CvtColor(dst1, dst0, cv.ColorConversionCodes.BGR2GRAY)
         Dim thicknessCMs = task.metersPerPixel * 1000 / 100, rect As cv.Rect, nextY As Single
         For y = dst0.Height - 2 To 0 Step -1
             rect = New cv.Rect(0, y, dst0.Width - 1, 1)
-            Dim count = dst0(rect).CountNonZero
+            Dim count = cv.Cv2.CountNonZero(dst0(rect))
             If count > options.countThreshold Then
                 nextY = -task.yRange * (task.sideCameraPoint.Y - y) / task.sideCameraPoint.Y - thicknessCMs / 2.5 ' narrow it down to about 1 cm
                 labels(2) = "Y = " + Format(planeY, fmt3) + " separates the floor."
                 SetTrueText(labels(2), 3)
-                Dim sliceMask = task.pcSplit(1).InRange(cv.Scalar.All(planeY), cv.Scalar.All(3.0))
+                Dim sliceMask As New cv.Mat
+                cv.Cv2.InRange(task.pcSplit(1), cv.Scalar.All(planeY), cv.Scalar.All(3.0), sliceMask)
                 dst2 = src
                 dst2.SetTo(white, sliceMask)
                 Exit For
@@ -704,6 +706,6 @@ Public Class XR_Plane_FloorStudy : Inherits TaskParent
         yList.Add(nextY)
         planeY = yList.Average()
         If yList.Count > 20 Then yList.RemoveAt(0)
-        dst1.Line(New cv.Point(0, rect.Y), New cv.Point(dst2.Width, rect.Y), cv.Scalar.Yellow, slice.options.sliceSize, task.lineType)
+        cv.Cv2.Line(dst1, New cv.Point(0, rect.Y), New cv.Point(dst2.Width, rect.Y), cv.Scalar.Yellow, slice.options.sliceSize, task.lineType)
     End Sub
 End Class

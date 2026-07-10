@@ -1,4 +1,4 @@
-﻿Imports cv = OpenCvSharp
+Imports cv = OpenCvSharp
 Public Class StableDepth_Basics_TA : Inherits TaskParent
     Dim colorize As New DepthColorizer_CPP
     Public pointcloud As cv.Mat
@@ -11,7 +11,9 @@ Public Class StableDepth_Basics_TA : Inherits TaskParent
     Public Shared Function updateXY(lastDepth As cv.Mat, accumDepth As cv.Mat) As cv.Mat
         Dim diffDepth As New cv.Mat
         cv.Cv2.Absdiff(lastDepth, accumDepth, diffDepth)
-        Dim mask = diffDepth.Threshold(0, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs()
+        Dim mask As New cv.Mat
+        cv.Cv2.Threshold(diffDepth, mask, 0, 255, cv.ThresholdTypes.Binary)
+        cv.Cv2.ConvertScaleAbs(mask, mask)
         mask.SetTo(0, task.motion.motionMask)
         Return mask
     End Function
@@ -24,7 +26,7 @@ Public Class StableDepth_Basics_TA : Inherits TaskParent
             task.pointCloud.CopyTo(pointcloud, task.noDepthMask)
         End If
 
-        pcSplit = pointcloud.Split()
+        pcSplit = cv.Cv2.Split(pointcloud)
         Dim accumDepth As New cv.Mat
         cv.Cv2.Min(pcSplit(2), lastDepth, accumDepth)
 
@@ -36,12 +38,13 @@ Public Class StableDepth_Basics_TA : Inherits TaskParent
         colorize.Run(accumDepth)
         dst2 = colorize.dst2
 
-        pcSplit = pointcloud.Split()
+        pcSplit = cv.Cv2.Split(pointcloud)
         lastDepth = pcSplit(2).Clone
 
         task.pointCloud = pointcloud.Clone
         task.pcSplit = pcSplit
-        task.depthmask = pcSplit(2).Threshold(0, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs
+        cv.Cv2.Threshold(pcSplit(2), task.depthmask, 0, 255, cv.ThresholdTypes.Binary)
+        cv.Cv2.ConvertScaleAbs(task.depthmask, task.depthmask)
         task.noDepthMask = Not task.depthmask
     End Sub
 End Class
@@ -72,7 +75,7 @@ Public Class StableDepth_Max : Inherits TaskParent
             task.pointCloud.CopyTo(pointcloud, task.noDepthMask)
         End If
 
-        pcsplit = pointcloud.Split()
+        pcsplit = cv.Cv2.Split(pointcloud)
         Dim accumDepth As New cv.Mat
         cv.Cv2.Max(pcsplit(2), lastDepth, accumDepth)
 
@@ -84,13 +87,14 @@ Public Class StableDepth_Max : Inherits TaskParent
         colorize.Run(accumDepth)
         dst2 = colorize.dst2
 
-        pcsplit = pointcloud.Split()
+        pcsplit = cv.Cv2.Split(pointcloud)
         lastDepth = pcsplit(2).Clone
 
         If TA_Active Then
             task.pointCloud = pointcloud.Clone
             task.pcSplit = pcsplit
-            task.depthmask = pcsplit(2).Threshold(0, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs
+            cv.Cv2.Threshold(pcsplit(2), task.depthmask, 0, 255, cv.ThresholdTypes.Binary)
+            cv.Cv2.ConvertScaleAbs(task.depthmask, task.depthmask)
             task.noDepthMask = Not task.depthmask
         End If
     End Sub

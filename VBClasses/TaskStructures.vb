@@ -1,4 +1,4 @@
-﻿Imports OpenCvSharp
+Imports OpenCvSharp
 Imports cv = OpenCvSharp
 Public Module Structures
     Public Enum pointStyle
@@ -170,8 +170,8 @@ Public Module Structures
         Public Sub jitterTest(dst As cv.Mat, parent As Object) ' return true if there is nothing to change
             If jitterCheck Is Nothing Then jitterCheck = New cv.Mat(dst.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
             Dim polymp = currmp()
-            parent.jitterCheck.Line(polymp.p1, polymp.p2, 255, task.lineWidth, task.lineType)
-            Dim jitterPixels = jitterCheck.CountNonZero
+            cv.Cv2.Line(parent.jitterCheck, polymp.p1, polymp.p2, 255, task.lineWidth, task.lineType)
+            Dim jitterPixels = cv.Cv2.CountNonZero(jitterCheck)
             If jitterPixels = lastJitterPixels Then featureLineChanged = True Else featureLineChanged = False
             lastJitterPixels = jitterPixels
         End Sub
@@ -343,8 +343,9 @@ Public Module Structures
         End Function
         Public Function GetMaxDistContour(ByRef contour As keyData) As cv.Point
             Dim mask = contour.mask.Clone
-            mask.Rectangle(New cv.Rect(0, 0, mask.Width, mask.Height), 0, 1)
-            Dim distance32f = mask.DistanceTransform(cv.DistanceTypes.L1, 0)
+            cv.Cv2.Rectangle(mask, New cv.Rect(0, 0, mask.Width, mask.Height), cv.Scalar.All(0), 1)
+            Dim distance32f As New cv.Mat
+            cv.Cv2.DistanceTransform(mask, distance32f, cv.DistanceTypes.L1, cv.DistanceTransformMasks.Precise, cv.MatType.CV_32F)
             Dim mm As mmData = GetMinMax(distance32f)
             mm.maxLoc.X += contour.rect.X
             mm.maxLoc.Y += contour.rect.Y
@@ -422,7 +423,7 @@ Public Module Structures
             ' Compute cosine of the angle
             Dim cosTheta As Double = dot / (mag1 * mag2)
 
-            ' Clamp due to floating‑point noise
+            ' Clamp due to floating-point noise
             If cosTheta > 1 Then cosTheta = 1
             If cosTheta < -1 Then cosTheta = -1
 
@@ -454,14 +455,14 @@ Public Module Structures
             pVec1 = task.pointCloud.Get(Of cv.Vec3f)(p1.Y, p1.X)
             If Single.IsNaN(pVec1(0)) Or pVec1(2) = 0 Then
                 Dim r = task.gridRects(p1GridIndex)
-                pVec1 = New cv.Vec3f(0, 0, task.pcSplit(2)(r).Mean(task.depthmask(r)).Item(0))
+                pVec1 = New cv.Vec3f(0, 0, cv.Cv2.Mean(task.pcSplit(2)(r), task.depthmask(r)).Item(0))
             End If
 
             pVec2 = task.pointCloud.Get(Of cv.Vec3f)(p2.Y, p2.X)
             If Single.IsNaN(pVec2(0)) Or pVec2(2) = 0 Then
                 Dim p2GridIndex = task.gridMap.Get(Of Integer)(p2.Y, p2.X)
                 Dim r = task.gridRects(p2GridIndex)
-                pVec2 = New cv.Vec3f(0, 0, task.pcSplit(2)(r).Mean(task.depthmask(r)).Item(0))
+                pVec2 = New cv.Vec3f(0, 0, cv.Cv2.Mean(task.pcSplit(2)(r), task.depthmask(r)).Item(0))
             End If
 
             If p1.X <> p2.X Then
@@ -596,7 +597,7 @@ Public Module Structures
             Dim reduction As Integer = task.fOptions.ReductionDepth.Value
             rect = _rect
             If _mapID >= 0 Then
-                mask = _mask.InRange(_mapID, _mapID)
+                cv.Cv2.InRange(_mask, _mapID, _mapID, mask)
                 mapID = _mapID
             Else
                 mask = _mask.Clone
@@ -616,9 +617,9 @@ Public Module Structures
 
             gridIndex = task.gridMap.Get(Of Integer)(maxDist.Y, maxDist.X)
             If _mapID >= 0 Then color = task.scalarColors(mapID Mod 255)
-            pixels = mask.CountNonZero
+            pixels = cv.Cv2.CountNonZero(mask)
 
-            wcMean = task.pointCloud(rect).Mean(task.depthmask(rect))
+            wcMean = cv.Cv2.Mean(task.pointCloud(rect), task.depthmask(rect))
             Dim x = Math.Round(wcMean(0) * 1000 / reduction)
             Dim y = Math.Round(wcMean(1) * 1000 / reduction)
             Dim z = Math.Round(wcMean(2) * 1000 / reduction)
@@ -637,8 +638,9 @@ Public Module Structures
         Public Sub buildMaxDist()
             Dim tmp As cv.Mat = mask.Clone
             ' Rectangle is definitely needed.  Test it again with MaxDist_NoRectangle to verify that the rectangle is essential.
-            tmp.Rectangle(New cv.Rect(0, 0, mask.Width, mask.Height), 0, 1)
-            Dim distance32f = tmp.DistanceTransform(cv.DistanceTypes.L1, 0)
+            cv.Cv2.Rectangle(tmp, New cv.Rect(0, 0, mask.Width, mask.Height), cv.Scalar.All(0), 1)
+            Dim distance32f As New cv.Mat
+            cv.Cv2.DistanceTransform(tmp, distance32f, cv.DistanceTypes.L1, cv.DistanceTransformMasks.Precise, cv.MatType.CV_32F)
             Dim mm As mmData = GetMinMax(distance32f)
             maxDist.X = mm.maxLoc.X + rect.X
             maxDist.Y = mm.maxLoc.Y + rect.Y
@@ -680,7 +682,7 @@ Public Module Structures
         Public depth As Single
         Public mapID As Integer
         Public index As Integer
-        Public mask As cv.Mat
+        Public mask As New cv.Mat
         Public maskDepth As cv.Mat
         Public maxDist As cv.Point
         Public maxDistDepth As cv.Point
@@ -693,7 +695,7 @@ Public Module Structures
             Dim reduction As Integer = task.fOptions.ReductionDepth.Value
             rect = _rect
             If _mapID >= 0 Then
-                mask = _mask.InRange(_mapID, _mapID)
+                cv.Cv2.InRange(_mask, _mapID, _mapID, mask)
                 mapID = _mapID
             Else
                 mask = _mask.Clone
@@ -706,12 +708,13 @@ Public Module Structures
                     cv.Cv2.DrawContours(mask, listOfPoints, 0, cv.Scalar.All(mapID), -1, cv.LineTypes.Link4)
                 End If
             End If
-            pixels = mask.CountNonZero
+            pixels = cv.Cv2.CountNonZero(mask)
         End Sub
         Public Function buildMaxDist(ByVal mask As cv.Mat) As cv.Point
             ' Rectangle is definitely needed.  Test it again with MaxDist_NoRectangle to verify that the rectangle is essential.
-            mask.Rectangle(New cv.Rect(0, 0, mask.Width, mask.Height), 0, 1)
-            Dim distance32f = mask.DistanceTransform(cv.DistanceTypes.L1, 0)
+            cv.Cv2.Rectangle(mask, New cv.Rect(0, 0, mask.Width, mask.Height), cv.Scalar.All(0), 1)
+            Dim distance32f As New cv.Mat
+            cv.Cv2.DistanceTransform(mask, distance32f, cv.DistanceTypes.L1, cv.DistanceTransformMasks.Precise, cv.MatType.CV_32F)
             Dim mm As mmData = GetMinMax(distance32f)
             Dim maxDist As cv.Point
             maxDist.X = mm.maxLoc.X + rect.X

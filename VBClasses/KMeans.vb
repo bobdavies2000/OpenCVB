@@ -323,9 +323,10 @@ Public Class KMeans_Image : Inherits TaskParent
         counts.Clear()
         Dim k = km.options.kMeansK
         For i = 0 To k - 1
-            Dim mask = km.dst2.InRange(i, i)
+            Dim mask As New cv.Mat
+            cv.Cv2.InRange(km.dst2, i, i, mask)
             masks.Add(mask)
-            counts.Add(mask.CountNonZero)
+            counts.Add(cv.Cv2.CountNonZero(mask))
         Next
         If task.heartBeat Then maskIndex += 1
         If maskIndex >= masks.Count Then maskIndex = 0
@@ -399,18 +400,19 @@ Public Class KMeans_Dimensions : Inherits TaskParent
                 merge = task.pointCloud
             Case 4 ' color + depth
                 src.ConvertTo(src, cv.MatType.CV_32F)
-                task.pcSplit(2) = task.pcSplit(2).Normalize(0, 255, cv.NormTypes.MinMax)
+                cv.Cv2.Normalize(task.pcSplit(2), task.pcSplit(2), 0, 255, cv.NormTypes.MinMax)
                 cv.Cv2.Merge({src, task.pcSplit(2)}, merge)
             Case 5 ' color + pcSplit(0) and pcSplit(1)
                 src.ConvertTo(src, cv.MatType.CV_32F)
-                task.pcSplit(0) = task.pcSplit(0).Normalize(0, 255, cv.NormTypes.MinMax)
-                task.pcSplit(1) = task.pcSplit(1).Normalize(0, 255, cv.NormTypes.MinMax)
+                cv.Cv2.Normalize(task.pcSplit(0), task.pcSplit(0), 0, 255, cv.NormTypes.MinMax)
+                cv.Cv2.Normalize(task.pcSplit(1), task.pcSplit(1), 0, 255, cv.NormTypes.MinMax)
                 cv.Cv2.Merge({src, task.pcSplit(0), task.pcSplit(1)}, merge)
             Case 6 ' color + pointcloud
                 src.ConvertTo(src, cv.MatType.CV_32F)
-                Dim tmp1 = task.pcSplit(0).Normalize(0, 255, cv.NormTypes.MinMax)
-                Dim tmp2 = task.pcSplit(1).Normalize(0, 255, cv.NormTypes.MinMax)
-                Dim tmp3 = task.pcSplit(2).Normalize(0, 255, cv.NormTypes.MinMax)
+                Dim tmp1 As New cv.Mat, tmp2 As New cv.Mat, tmp3 As New cv.Mat
+                cv.Cv2.Normalize(task.pcSplit(0), tmp1, 0, 255, cv.NormTypes.MinMax)
+                cv.Cv2.Normalize(task.pcSplit(1), tmp2, 0, 255, cv.NormTypes.MinMax)
+                cv.Cv2.Normalize(task.pcSplit(2), tmp3, 0, 255, cv.NormTypes.MinMax)
                 cv.Cv2.Merge({src, tmp1, tmp2, tmp3}, merge)
         End Select
 
@@ -535,7 +537,7 @@ Public Class XR_KMeans_SimKDepth : Inherits TaskParent
             classCount = simK.classCount
         End If
         cv.Cv2.CalcBackProject({src}, {2}, plot1D.histogram, dst1, task.rangesCloud)
-        dst1 = dst1.ConvertScaleAbs
+        cv.Cv2.ConvertScaleAbs(dst1, dst1)
 
         dst2 = Palettize(dst1)
 

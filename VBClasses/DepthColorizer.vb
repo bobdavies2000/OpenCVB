@@ -71,7 +71,7 @@ Public Class DepthColorizer_Basics_TA : Inherits TaskParent
             Dim gridIndex = task.gridMap.Get(Of Integer)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
             Dim r = task.gridRects(gridIndex)
             Dim depthGrid = task.pcSplit(2)(r)
-            Dim brickDepth = depthGrid.Mean(task.depthmask(r))(0)
+            Dim brickDepth = cv.Cv2.Mean(depthGrid, task.depthmask(r))(0)
             Dim mm = GetMinMax(depthGrid, task.depthmask(r))
             task.depthAndDepthRange = "Pixel/Brick Depth " + Format(depth, fmt3) + "/" + Format(brickDepth, fmt3) +
                                       "m grid = " + CStr(gridIndex) + " " + vbCrLf + "Depth range = " +

@@ -17,11 +17,11 @@ Public Class BlurMotion_Basics_TA : Inherits TaskParent
         kernel = New cv.Mat(options.kernelSize, options.kernelSize, cv.MatType.CV_32F, cv.Scalar.All(0))
         Dim pt1 = New cv.Point(0, (options.kernelSize - 1) / 2)
         Dim pt2 = New cv.Point(options.kernelSize * Math.Cos(options.theta) + pt1.X, options.kernelSize * Math.Sin(options.theta) + pt1.Y)
-        kernel.Line(pt1, pt2, New cv.Scalar(1 / options.kernelSize))
-        dst2 = src.Filter2D(-1, kernel)
+        cv.Cv2.Line(kernel, pt1, pt2, New cv.Scalar(1 / options.kernelSize))
+        cv.Cv2.Filter2D(src, dst2, -1, kernel)
         pt1 += New cv.Point(src.Width / 2, src.Height / 2)
         pt2 += New cv.Point(src.Width / 2, src.Height / 2)
-        If options.showDirection Then dst2.Line(pt1, pt2, cv.Scalar.Yellow, task.lineWidth + 3, task.lineType)
+        If options.showDirection Then cv.Cv2.Line(dst2, pt1, pt2, cv.Scalar.Yellow, task.lineWidth + 3, task.lineType)
     End Sub
 End Class
 
@@ -36,8 +36,8 @@ Public Class XR_BlurMotion_Deblur : Inherits TaskParent
     Private Function calcPSF(filterSize As cv.Size, len As Integer, theta As Double) As cv.Mat
         Dim h As New cv.Mat(filterSize, cv.MatType.CV_32F, 0)
         Dim pt = New cv.Point(filterSize.Width / 2, filterSize.Height / 2)
-        h.Ellipse(pt, New cv.Size(0, CInt(len / 2)), 90 - theta, 0, 360, New cv.Scalar(255), -1)
-        Dim summa = h.Sum()
+        cv.Cv2.Ellipse(h, pt, New cv.Size(0, CInt(len / 2)), 90 - theta, 0, 360, New cv.Scalar(255), -1)
+        Dim summa As cv.Scalar = cv.Cv2.Sum(h)
         Return h / summa(0)
     End Function
     Private Function calcWeinerFilter(input_h_PSF As cv.Mat, nsr As Double) As cv.Mat
@@ -46,7 +46,7 @@ Public Class XR_BlurMotion_Deblur : Inherits TaskParent
         Dim complexI As New cv.Mat
         cv.Cv2.Merge(planes, complexI)
         cv.Cv2.Dft(complexI, complexI)
-        planes = complexI.Split()
+        planes = cv.Cv2.Split(complexI)
         Dim denom As New cv.Mat
         cv.Cv2.Pow(cv.Cv2.Abs(planes(0)), 2, denom)
         denom += nsr
@@ -106,7 +106,7 @@ Public Class XR_BlurMotion_Deblur : Inherits TaskParent
         cv.Cv2.MulSpectrums(complexI, complexH, complexIH, 0)
 
         cv.Cv2.Idft(complexIH, complexIH)
-        planes = complexIH.Split()
+        planes = cv.Cv2.Split(complexIH)
         Return planes(0)
     End Function
     Public Sub New()
@@ -136,14 +136,15 @@ Public Class XR_BlurMotion_Deblur : Inherits TaskParent
         Dim h = calcPSF(roi.Size(), mblur.options.restoreLen, mblur.options.theta)
         Dim hW = calcWeinerFilter(h, 1.0 / mblur.options.SNR)
 
-        Dim gray8u = dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        Dim gray8u As New cv.Mat
+        cv.Cv2.CvtColor(dst2, gray8u, cv.ColorConversionCodes.BGR2GRAY)
         Dim imgIn As New cv.Mat
         gray8u.ConvertTo(imgIn, cv.MatType.CV_32F)
         imgIn = edgeTaper(imgIn, mblur.options.gamma, beta)
 
         Dim imgOut = filter2DFreq(imgIn(roi), hW)
         imgOut.ConvertTo(dst3, cv.MatType.CV_8U)
-        dst3.Normalize(0, 255, cv.NormTypes.MinMax)
+        cv.Cv2.Normalize(dst3, dst3, 0, 255, cv.NormTypes.MinMax)
     End Sub
 End Class
 

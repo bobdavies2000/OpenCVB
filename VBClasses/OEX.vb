@@ -12,17 +12,18 @@ Public Class OEX_CalcBackProject_Demo1 : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         Dim ranges() As cv.Rangef = New cv.Rangef() {New cv.Rangef(0, 180)}
 
-        Dim hsv As cv.Mat = task.color.CvtColor(cv.ColorConversionCodes.BGR2HSV)
+        Dim hsv As New cv.Mat
+        cv.Cv2.CvtColor(task.color, hsv, cv.ColorConversionCodes.BGR2HSV)
         cv.Cv2.CalcHist({hsv}, {0}, New cv.Mat, histogram, 1, {task.histogramBins}, ranges)
-        classCount = histogram.CountNonZero
-        dst0 = histogram.Normalize(0, classCount, cv.NormTypes.MinMax) ' for the backprojection.
+        classCount = cv.Cv2.CountNonZero(histogram)
+        cv.Cv2.Normalize(histogram, dst0, 0, classCount, cv.NormTypes.MinMax) ' for the backprojection.
 
         Dim histArray(histogram.Total - 1) As Single
         histogram.GetArray(Of Single)(histArray)
 
         Dim peakValue = histArray.ToList.Max
 
-        histogram = histogram.Normalize(0, 1, cv.NormTypes.MinMax)
+        cv.Cv2.Normalize(histogram, histogram, 0, 1, cv.NormTypes.MinMax)
         histogram.GetArray(Of Single)(histArray)
 
         cv.Cv2.CalcBackProject({hsv}, {0}, dst0, dst2, ranges)
@@ -33,7 +34,7 @@ Public Class OEX_CalcBackProject_Demo1 : Inherits TaskParent
         For i = 0 To bins - 1
             Dim h = dst2.Height * histArray(i)
             Dim r = New cv.Rect(i * binW, dst2.Height - h, binW, h)
-            dst3.Rectangle(r, cv.Scalar.Black, -1)
+            cv.Cv2.Rectangle(dst3, r, cv.Scalar.Black, -1)
         Next
         labels(3) = $"The max value below is {peakValue}"
     End Sub
@@ -70,10 +71,11 @@ Public Class XR_OEX_CalcBackProject_Demo2 : Inherits TaskParent
         End If
         Dim ranges() As cv.Rangef = New cv.Rangef() {New cv.Rangef(0, 180), New cv.Rangef(0, 256)}
 
-        Dim hsv As cv.Mat = task.color.CvtColor(cv.ColorConversionCodes.BGR2HSV)
+        Dim hsv As New cv.Mat
+        cv.Cv2.CvtColor(task.color, hsv, cv.ColorConversionCodes.BGR2HSV)
         cv.Cv2.CalcHist({hsv}, {0, 1}, New cv.Mat, histogram, 2, {task.histogramBins, task.histogramBins}, ranges)
-        classCount = histogram.CountNonZero
-        histogram = histogram.Normalize(0, 255, cv.NormTypes.MinMax)
+        classCount = cv.Cv2.CountNonZero(histogram)
+        cv.Cv2.Normalize(histogram, histogram, 0, 255, cv.NormTypes.MinMax)
         cv.Cv2.CalcBackProject({hsv}, {0, 1}, histogram, dst2, ranges)
 
         dst3 = src
@@ -207,14 +209,14 @@ Public Class XR_OEX_delaunay2 : Inherits TaskParent
             Do
                 Dim org As cv.Point, dst As cv.Point
                 If subdiv.EdgeOrg(e, org) > 0 And subdiv.EdgeDst(e, dst) > 0 Then
-                    img.Line(org, dst, activeColor, task.lineWidth + 3, task.lineType, 0)
+                    cv.Cv2.Line(img, org, dst, activeColor, task.lineWidth + 3, task.lineType, 0)
                 End If
 
                 e = subdiv.GetEdge(e, cv.Subdiv2D.NEXT_AROUND_LEFT)
             Loop While e <> e0
         End If
 
-        img.Circle(pt, task.DotSize, activeColor, -1, task.lineType)
+        cv.Cv2.Circle(img, pt, task.DotSize, activeColor, -1, task.lineType)
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If task.quarterBeat Then
@@ -232,9 +234,9 @@ Public Class XR_OEX_delaunay2 : Inherits TaskParent
                     pts(0) = New cv.Point(Math.Round(t(0)), Math.Round(t(1)))
                     pts(1) = New cv.Point(Math.Round(t(2)), Math.Round(t(3)))
                     pts(2) = New cv.Point(Math.Round(t(4)), Math.Round(t(5)))
-                    dst2.Line(pts(0), pts(1), delaunay_color, task.lineWidth, task.lineType)
-                    dst2.Line(pts(1), pts(2), delaunay_color, task.lineWidth, task.lineType)
-                    dst2.Line(pts(2), pts(0), delaunay_color, task.lineWidth, task.lineType)
+                    cv.Cv2.Line(dst2, pts(0), pts(1), delaunay_color, task.lineWidth, task.lineType)
+                    cv.Cv2.Line(dst2, pts(1), pts(2), delaunay_color, task.lineWidth, task.lineType)
+                    cv.Cv2.Line(dst2, pts(2), pts(0), delaunay_color, task.lineWidth, task.lineType)
                 Next
             Else
                 dst1 = dst2.Clone
@@ -251,11 +253,11 @@ Public Class XR_OEX_delaunay2 : Inherits TaskParent
                     ifacet.AddRange(facets(i).Select(Function(p) New cv.Point(p.X, p.Y)))
 
                     Dim color = task.vecColors(i Mod 256)
-                    dst3.FillConvexPoly(ifacet, color, 8, 0)
+                    cv.Cv2.FillConvexPoly(dst3, ifacet, color, 8, 0)
 
                     ifacets(0) = ifacet
                     cv.Cv2.Polylines(dst3, ifacets, True, New cv.Vec3b, task.lineWidth, task.lineType)
-                    dst3.Circle(centers(i), 3, New cv.Vec3b, -1, task.lineType)
+                    cv.Cv2.Circle(dst3, centers(i), 3, New cv.Vec3b, -1, task.lineType)
                 Next
 
                 points.Clear()
@@ -282,14 +284,15 @@ Public Class XR_OEX_MeanShift : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         Dim roi = If(task.drawRect.Width > 0, task.drawRect, New cv.Rect(0, 0, dst2.Width, dst2.Height))
-        Dim hsv As cv.Mat = src.CvtColor(cv.ColorConversionCodes.BGR2HSV)
+        Dim hsv As New cv.Mat
+        cv.Cv2.CvtColor(src, hsv, cv.ColorConversionCodes.BGR2HSV)
         dst2 = src
         If task.optionsChanged Then
             trackWindow = roi
             Dim mask As New cv.Mat
             cv.Cv2.InRange(hsv, New cv.Scalar(0, 60, 32), New cv.Scalar(180, 255, 255), mask)
             cv.Cv2.CalcHist({hsv(roi)}, {0}, New cv.Mat, histogram, 1, {task.histogramBins}, ranges)
-            histogram = histogram.Normalize(0, 255, cv.NormTypes.MinMax)
+            cv.Cv2.Normalize(histogram, histogram, 0, 255, cv.NormTypes.MinMax)
         End If
         cv.Cv2.CalcBackProject({hsv}, {0}, histogram, dst3, ranges)
         If trackWindow.Width <> 0 Then
@@ -311,7 +314,7 @@ Public Class OEX_PointPolygon : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         If standaloneTest() Then
             rotatedRect.Run(src)
-            src = rotatedRect.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+            cv.Cv2.CvtColor(rotatedRect.dst2, src, cv.ColorConversionCodes.BGR2GRAY)
         End If
 
         dst2 = src.Clone
@@ -372,7 +375,7 @@ Public Class XR_OEX_PointPolygon_demo : Inherits TaskParent
 
         dst2.SetTo(0)
         For i As Integer = 0 To vert.Count - 1
-            dst2.Line(vert(i), vert((i + 1) Mod 6), white, task.lineWidth, task.lineType)
+            cv.Cv2.Line(dst2, vert(i), vert((i + 1) Mod 6), white, task.lineWidth, task.lineType)
         Next
 
         pointPoly.Run(dst2)
@@ -434,8 +437,9 @@ Public Class XR_OEX_Threshold_Inrange : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
 
-        Dim hsv = src.CvtColor(cv.ColorConversionCodes.BGR2HSV)
-        dst2 = hsv.InRange(options.lows, options.highs)
+        Dim hsv As New cv.Mat
+        cv.Cv2.CvtColor(src, hsv, cv.ColorConversionCodes.BGR2HSV)
+        cv.Cv2.InRange(hsv, options.lows, options.highs, dst2)
     End Sub
 End Class
 
@@ -536,7 +540,7 @@ Public Class XR_OEX_Core_Split : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         Dim d As cv.Mat = cv.Mat.FromPixelData(2, 2, cv.MatType.CV_8UC3, New Byte() {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12})
 
-        Dim channels = d.Split()
+        Dim channels = cv.Cv2.Split(d)
 
         Dim samples(d.Total * d.ElemSize - 1) As Byte
         Marshal.Copy(d.Data, samples, 0, samples.Length)
@@ -576,7 +580,7 @@ Public Class XR_OEX_Filter2D : Inherits TaskParent
         kernelSize = 3 + 2 * (ind Mod 5)
         Dim kernel As cv.Mat = New cv.Mat(kernelSize, kernelSize, cv.MatType.CV_32F, cv.Scalar.All(1 / (kernelSize * kernelSize)))
 
-        dst2 = src.Filter2D(ddepth, kernel, anchor, 0, cv.BorderTypes.Default)
+        cv.Cv2.Filter2D(src, dst2, ddepth, kernel, anchor, 0, cv.BorderTypes.Default)
         SetTrueText("Kernel size = " + CStr(kernelSize), 3)
     End Sub
 End Class
@@ -591,7 +595,7 @@ Public Class XR_OEX_FitEllipse : Inherits TaskParent
     Dim options As New Options_FitEllipse
     Public Sub New()
         Dim fileInputName As New FileInfo(task.homeDir + "opencv/samples/data/ellipses.jpg")
-        img = cv.Cv2.ImRead(fileInputName.FullName).CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        cv.Cv2.CvtColor(cv.Cv2.ImRead(fileInputName.FullName), img, cv.ColorConversionCodes.BGR2GRAY)
 
         cPtr = OEX_FitEllipse_Open()
         desc = "OEX Example fitellipse"

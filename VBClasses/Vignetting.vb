@@ -86,7 +86,7 @@ Public Class Vignetting_Removal : Inherits TaskParent
         If standaloneTest() And defaultImage Is Nothing Then
             Dim fileInfo = New FileInfo(task.homeDir + "data/nature.jpg")
             If fileInfo.Exists Then defaultImage = cv.Cv2.ImRead(fileInfo.FullName)
-            defaultImage = defaultImage.Resize(dst3.Size)
+            cv.Cv2.Resize(defaultImage, defaultImage, dst3.Size)
             dst2 = defaultImage.Clone
         End If
         If standaloneTest() Then basics.Run(defaultImage) Else basics.Run(src)

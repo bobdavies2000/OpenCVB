@@ -108,19 +108,19 @@ Namespace MainApp
                     For Each frame As Intel.RealSense.Frame In frames
                         If frame.Profile.Stream = Stream.Color And frame.Profile.Index = 0 Then
                             color = cv.Mat.FromPixelData(rows, cols, cv.MatType.CV_8UC3, frame.Data)
-                            color = color.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
+                            cv.Cv2.Resize(color, color, workRes, 0, 0, cv.InterpolationFlags.Nearest)
                         End If
                         If frame.Profile.Stream = Stream.Infrared And frame.Profile.Index = 1 Then
                             leftView = cv.Mat.FromPixelData(rows, cols, cv.MatType.CV_8UC1, frame.Data)
-                            leftView = leftView.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
+                            cv.Cv2.Resize(leftView, leftView, workRes, 0, 0, cv.InterpolationFlags.Nearest)
                         End If
                         If frame.Profile.Stream = Stream.Infrared And frame.Profile.Index = 2 Then
                             rightView = cv.Mat.FromPixelData(rows, cols, cv.MatType.CV_8UC1, frame.Data)
-                            rightView = rightView.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
+                            cv.Cv2.Resize(rightView, rightView, workRes, 0, 0, cv.InterpolationFlags.Nearest)
                         End If
                         If frame.Profile.Stream = Stream.Depth Then
                             depth16u = cv.Mat.FromPixelData(rows, cols, cv.MatType.CV_16UC1, frame.Data)
-                            depth16u = depth16u.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
+                            cv.Cv2.Resize(depth16u, depth16u, workRes, 0, 0, cv.InterpolationFlags.Nearest)
                             pointCloud = ComputePointCloud(depth16u, calibData.leftIntrinsics)
                         End If
                         If frame.Profile.Stream = Stream.Accel Then

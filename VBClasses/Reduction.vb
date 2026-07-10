@@ -65,22 +65,25 @@ Public Class XR_Reduction_HeatMapLines1 : Inherits TaskParent
         reduction.Run(src)
         heat.Run(src)
 
-        core.Run(heat.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
+        Dim _core_cvt As New cv.Mat
+        cv.Cv2.CvtColor(heat.dst2, _core_cvt, cv.ColorConversionCodes.BGR2GRAY)
+        core.Run(_core_cvt)
 
         setupTop.Run(heat.dst2)
         dst2 = setupTop.dst2
 
         For Each lp In core.lpList
-            dst2.Line(lp.p1, lp.p2, white, task.lineWidth)
+            cv.Cv2.Line(dst2, lp.p1, lp.p2, white, task.lineWidth)
         Next
 
-        core.Run(heat.dst3.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
+        cv.Cv2.CvtColor(heat.dst3, _core_cvt, cv.ColorConversionCodes.BGR2GRAY)
+        core.Run(_core_cvt)
 
         setupSide.Run(heat.dst3)
         dst3 = setupSide.dst2
 
         For Each lp In core.lpList
-            dst3.Line(lp.p1, lp.p2, white, task.lineWidth)
+            cv.Cv2.Line(dst3, lp.p1, lp.p2, white, task.lineWidth)
         Next
     End Sub
 End Class
@@ -130,7 +133,7 @@ Public Class XR_Reduction_XYZ : Inherits TaskParent
         options.Run()
 
         If src.Type <> cv.MatType.CV_32FC3 Then src = task.pointCloud
-        Dim split = src.Split()
+        Dim split = cv.Cv2.Split(src)
         For i = 0 To split.Length - 1
             If options.reduceXYZ(i) Then
                 split(i) *= 1000
@@ -183,7 +186,8 @@ Public Class XR_Reduction_BGR : Inherits TaskParent
         desc = "Reduce BGR image in parallel"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        Dim split = src.Split
+        Dim split As cv.Mat() = Nothing
+        cv.Cv2.Split(src, split)
 
         For i = 0 To 2
             reduction.Run(split(i))
@@ -222,7 +226,7 @@ Public Class XR_Reduction_MotionTest : Inherits TaskParent
         Else
             dst2.CopyTo(dst3, task.motion.motionMask)
 
-            diff.lastFrame = dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+            cv.Cv2.CvtColor(dst2, diff.lastFrame, cv.ColorConversionCodes.BGR2GRAY)
             diff.Run(dst3)
             dst1 = diff.dst2
         End If

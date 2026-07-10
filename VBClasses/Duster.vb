@@ -9,8 +9,9 @@ Public Class Duster_Basics : Inherits TaskParent
         dust.Run(src)
 
         For i = 1 To dust.classCount
-            Dim mask = dust.dst2.InRange(i, i)
-            Dim depth = task.pcSplit(2).Mean(mask)
+            Dim mask As New cv.Mat
+            cv.Cv2.InRange(dust.dst2, i, i, mask)
+            Dim depth = cv.Cv2.Mean(task.pcSplit(2), mask)
             task.pcSplit(2).SetTo(depth(0), mask)
         Next
 
@@ -84,7 +85,7 @@ Public Class Duster_MaskZ : Inherits TaskParent
 
         dst3 = Palettize(dst2)
         labels(2) = "dst2 = CV_8U version of depth segmented into " + CStr(classCount) + " clusters."
-        dst0 = dst2.Threshold(0, 255, cv.ThresholdTypes.Binary)
+        cv.Cv2.Threshold(dst2, dst0, 0, 255, cv.ThresholdTypes.Binary)
     End Sub
 End Class
 
@@ -100,8 +101,9 @@ Public Class XR_Duster_BasicsY : Inherits TaskParent
         dust.Run(src)
 
         For i = 1 To dust.classCount
-            Dim mask = dust.dst2.InRange(i, i)
-            Dim pcY = task.pcSplit(1).Mean(mask)
+            Dim mask As New cv.Mat
+            cv.Cv2.InRange(dust.dst2, i, i, mask)
+            Dim pcY = cv.Cv2.Mean(task.pcSplit(1), mask)
             task.pcSplit(1).SetTo(pcY(0), mask)
         Next
 

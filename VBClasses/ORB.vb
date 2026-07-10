@@ -16,7 +16,7 @@ Public Class ORB_Basics : Inherits TaskParent
         keypoints = orb.Detect(src)
         dst2 = src.Clone()
         For Each kpt In keypoints
-            dst2.Circle(kpt.Pt, task.DotSize + 1, cv.Scalar.Yellow, -1, task.lineType)
+        cv.Cv2.Circle(dst2, kpt.Pt, task.DotSize + 1, cv.Scalar.Yellow, -1, task.lineType)
         Next
         labels(2) = CStr(keypoints.Count) + " key points were identified"
     End Sub

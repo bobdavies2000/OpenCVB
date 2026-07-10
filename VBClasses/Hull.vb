@@ -21,7 +21,7 @@ Public Class Hull_Basics : Inherits TaskParent
             random.Run(src)
             dst2.SetTo(0)
             For Each pt In random.PointList
-                dst2.Circle(pt, task.DotSize, white, -1, task.lineType)
+            cv.Cv2.Circle(dst2, pt, task.DotSize, white, -1, task.lineType)
             Next
             inputPoints = New List(Of cv.Point2f)(random.PointList)
         End If

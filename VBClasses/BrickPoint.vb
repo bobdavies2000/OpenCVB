@@ -18,7 +18,7 @@ Public Class BrickPoint_Basics : Inherits TaskParent
         ptList = New List(Of cv.Point)(bpCore.ptList)
 
         For Each pt In ptList
-            dst3.Circle(pt, task.DotSize, 255, -1, task.lineType)
+        cv.Cv2.Circle(dst3, pt, task.DotSize, 255, -1, task.lineType)
         Next
         labels(2) = bpCore.labels(2)
     End Sub
@@ -55,7 +55,7 @@ Public Class BrickPoint_Core : Inherits TaskParent
         Next
 
         For Each pt In ptList
-            dst2.Circle(pt, task.DotSize, task.highlight, -1, task.lineType)
+        cv.Cv2.Circle(dst2, pt, task.DotSize, task.highlight, -1, task.lineType)
         Next
 
         labels(2) = "Of the " + CStr(task.gridRects.Count) + " candidates, " + CStr(ptList.Count) +
@@ -100,7 +100,7 @@ Public Class BrickPoint_Plot : Inherits TaskParent
         dst3 = src
         For Each brick In bPoint.bpCore.bricks.brickList
             If brick.mm.maxVal <= maxVal And brick.mm.maxVal >= minVal Then
-                dst3.Circle(New cv.Point(brick.mm.maxLoc.X + brick.rect.X, brick.mm.maxLoc.Y + brick.rect.Y), task.DotSize, task.highlight, -1, task.lineType)
+            cv.Cv2.Circle(dst3, New cv.Point(brick.mm.maxLoc.X + brick.rect.X, brick.mm.maxLoc.Y + brick.rect.Y), task.DotSize, task.highlight, -1, task.lineType)
             End If
         Next
         labels(2) = "There were " + CStr(sobelValues.Count) + " points found.  Cursor over each bar to see where they originated from"
@@ -130,8 +130,8 @@ Public Class XR_BrickPoint_TopRow : Inherits TaskParent
             If brick.mm.maxLoc = newPoint Then Continue For
             If brick.mm.maxVal <> 255 Then Continue For
             If brick.mm.maxLoc.Y = brick.rect.Y Then
-                dst2.Circle(brick.mm.maxLoc, task.DotSize, task.highlight, -1, task.lineType)
-                dst3.Circle(brick.rect.TopLeft, task.DotSize, task.highlight, -1, task.lineType)
+            cv.Cv2.Circle(dst2, brick.mm.maxLoc, task.DotSize, task.highlight, -1, task.lineType)
+            cv.Cv2.Circle(dst3, brick.rect.TopLeft, task.DotSize, task.highlight, -1, task.lineType)
                 count += 1
             End If
         Next
@@ -194,7 +194,7 @@ Public Class XR_BrickPoint_DistanceAbove : Inherits TaskParent
         For Each brick In bricks.brickList
             Dim lp = lpList(brick.index)
             If lp.length < min Or lp.length > max Then Continue For
-            dst3.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineWidth)
+            cv.Cv2.Line(dst3, lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineWidth)
         Next
     End Sub
 End Class
@@ -221,8 +221,8 @@ Public Class XR_BrickPoint_Best : Inherits TaskParent
         bestBricks.Clear()
         For Each pt In bPoint.ptList
             bestBricks.Add(pt)
-            dst2.Circle(pt, task.DotSize, task.highlight, -1, task.lineType)
-            dst3.Circle(pt, task.DotSize, 255, -1, task.lineType)
+            cv.Cv2.Circle(dst2, pt, task.DotSize, task.highlight, -1, task.lineType)
+            cv.Cv2.Circle(dst3, pt, task.DotSize, 255, -1, task.lineType)
         Next
     End Sub
 End Class
@@ -251,14 +251,13 @@ Public Class XR_BrickPoint_Busiest : Inherits TaskParent
         For Each pt In bPoint.ptList
             Dim index = task.gridMap.Get(Of Integer)(pt.Y, pt.X)
             Dim brick = bricks.brickList(index)
-            If brick.correlation > 0.9 And brick.depth < task.MaxZmeters Then sortedBricks.Add(bPoint.sobel.dst2(brick.rect).CountNonZero, brick.rect)
+            If brick.correlation > 0.9 And brick.depth < task.MaxZmeters Then sortedBricks.Add(cv.Cv2.CountNonZero(bPoint.sobel.dst2(brick.rect)), brick.rect)
         Next
 
         dst3 = bPoint.sobel.dst2
-        For i = 0 To sortedBricks.Count - 1
-            Dim ele = sortedBricks.ElementAt(i)
-            dst2.Rectangle(ele.Value, task.highlight, task.lineWidth)
-            dst3.Rectangle(ele.Value, 255, task.lineWidth)
+        For Each r In sortedBricks.Values
+            cv.Cv2.Rectangle(dst2, r, task.highlight, task.lineWidth)
+            cv.Cv2.Rectangle(dst3, r, cv.Scalar.All(255), task.lineWidth)
         Next
         labels(2) = CStr(sortedBricks.Count) + " bricks had max Sobel values with high left/right correlation and depth < " + CStr(CInt(task.MaxZmeters)) + "m"
     End Sub
@@ -303,7 +302,7 @@ Public Class XR_BrickPoint_PopulationSurvey : Inherits TaskParent
         For Each brick In bricks.brickList
             If brick.mm.maxLoc.X = col And brick.mm.maxLoc.Y = row Then
                 Dim ptfeat = New cv.Point(brick.mm.maxLoc.X + brick.rect.X, brick.mm.maxLoc.Y + brick.rect.Y)
-                dst3.Circle(ptfeat, task.DotSize, task.highlight, -1, task.lineType)
+                cv.Cv2.Circle(dst3, ptfeat, task.DotSize, task.highlight, -1, task.lineType)
             End If
         Next
 
@@ -313,7 +312,9 @@ Public Class XR_BrickPoint_PopulationSurvey : Inherits TaskParent
             Next
         Next
 
-        dst2 = dst2.Resize(dst0.Size, 0, 0, cv.InterpolationFlags.Nearest).ConvertScaleAbs
+        cv.Cv2.Resize(dst2, dst2, dst0.Size, 0, 0, cv.InterpolationFlags.Nearest)
+        cv.Cv2.ConvertScaleAbs(dst3, dst2, 255)
+        cv.Cv2.ConvertScaleAbs(dst2, dst2)
         Dim mm = GetMinMax(dst2)
         dst2 *= 255 / mm.maxVal
         labels(3) = "There were " + CStr(results(col, row)) + " features at row/col " + CStr(row) + "/" + CStr(col)
@@ -394,13 +395,13 @@ Public Class XR_BrickPoint_KNN : Inherits TaskParent
         For i = 0 To knn.queries.Count - 1
             Dim p1 = knn.trainInput(i)
             Dim p2 = knn.trainInput(knn.result(i, 1))
-            dst3.Line(p1, p2, 255, task.lineWidth, task.lineWidth)
+            cv.Cv2.Line(dst3, p1, p2, 255, task.lineWidth, task.lineWidth)
             lplist.Add(New lpData(p1, p2))
         Next
 
         dst2 = src.Clone
         For Each lp In task.lines.lpList
-            dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineWidth)
+            cv.Cv2.Line(dst2, lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineWidth)
         Next
     End Sub
 End Class
@@ -442,7 +443,7 @@ Public Class XR_BrickPoint_EndPoints : Inherits TaskParent
 
         For Each index In lineList
             Dim lp = lplist(index)
-            dst2.Line(lp.ptE1, lp.ptE2, task.highlight, task.lineWidth, task.lineWidth)
+            cv.Cv2.Line(dst2, lp.ptE1, lp.ptE2, task.highlight, task.lineWidth, task.lineWidth)
         Next
     End Sub
 End Class
@@ -471,7 +472,7 @@ Public Class BrickPoint_MaxSobel : Inherits TaskParent
             If mm.maxVal >= options.sobelThreshold Then
                 Dim pt = New cv.Point(mm.maxLoc.X + rect.X, mm.maxLoc.Y + rect.Y)
                 features.Add(pt)
-                dst2.Circle(pt, task.DotSize, task.highlight, -1, task.lineType)
+                cv.Cv2.Circle(dst2, pt, task.DotSize, task.highlight, -1, task.lineType)
             End If
         Next
 
@@ -574,14 +575,14 @@ Public Class XR_BrickPoint_Features : Inherits TaskParent
 
         If task.gOptions.DebugCheckBox.Checked Then
             For Each pt In featList
-                dst2.Circle(pt, task.DotSize, cv.Scalar.Black, -1, task.lineType)
+            cv.Cv2.Circle(dst2, pt, task.DotSize, cv.Scalar.Black, -1, task.lineType)
             Next
         End If
 
         If standaloneTest() Then
             dst3.SetTo(0)
             For Each r In featureBricks
-                dst3.Rectangle(r, white, -1)
+            cv.Cv2.Rectangle(dst3, r, white, -1)
             Next
             dst3 = Not dst3
         End If

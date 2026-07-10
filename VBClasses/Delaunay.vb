@@ -28,7 +28,7 @@ Public Class Delaunay_Basics : Inherits TaskParent
                 nextFacet.Add(New cv.Point(facets(i)(j).X, facets(i)(j).Y))
             Next
 
-            dst3.FillConvexPoly(nextFacet, i, cv.LineTypes.Link4)
+            cv.Cv2.FillConvexPoly(dst3, nextFacet, i, cv.LineTypes.Link4)
             facetList.Add(nextFacet)
         Next
 
@@ -64,12 +64,12 @@ Public Class XR_Delaunay_SubDiv : Inherits TaskParent
                 Dim e = edgeList(i)
                 Dim p0 = New cv.Point(Math.Round(e(0)), Math.Round(e(1)))
                 Dim p1 = New cv.Point(Math.Round(e(2)), Math.Round(e(3)))
-                dst2.Line(p0, p1, white, task.lineWidth, task.lineWidth)
+                cv.Cv2.Line(dst2, p0, p1, white, task.lineWidth, task.lineWidth)
             Next
         Next
 
         For Each pt In random.PointList
-            dst2.Circle(pt, task.DotSize + 1, cv.Scalar.Red, -1, task.lineType)
+        cv.Cv2.Circle(dst2, pt, task.DotSize + 1, cv.Scalar.Red, -1, task.lineType)
         Next
 
         Dim facets = New cv.Point2f()() {Nothing}
@@ -85,7 +85,7 @@ Public Class XR_Delaunay_SubDiv : Inherits TaskParent
                 ifacet(j) = New cv.Point(Math.Round(facets(i)(j).X), Math.Round(facets(i)(j).Y))
             Next
             ifacets(0) = ifacet
-            dst3.FillConvexPoly(ifacet, task.scalarColors(i Mod task.scalarColors.Length), cv.LineTypes.Link4)
+            cv.Cv2.FillConvexPoly(dst3, ifacet, task.scalarColors(i Mod task.scalarColors.Length), cv.LineTypes.Link4)
             cv.Cv2.Polylines(dst3, ifacets, True, cv.Scalar.Black, task.lineWidth, cv.LineTypes.Link4, 0)
         Next
     End Sub
@@ -112,7 +112,7 @@ Public Class XR_Delaunay_Subdiv2D : Inherits TaskParent
                 End Function).ToArray()
 
         For Each p In points
-            dst2.Circle(p, task.DotSize + 1, cv.Scalar.Red, -1, task.lineType)
+        cv.Cv2.Circle(dst2, p, task.DotSize + 1, cv.Scalar.Red, -1, task.lineType)
         Next
         dst3 = dst2.Clone()
 
@@ -127,7 +127,7 @@ Public Class XR_Delaunay_Subdiv2D : Inherits TaskParent
         For Each list In facetList
             Dim before = list.Last()
             For Each p In list
-                dst3.Line(before, p, cv.Scalar.Green, 1)
+                cv.Cv2.Line(dst3, before, p, cv.Scalar.Green, 1)
                 before = p
             Next
         Next
@@ -136,7 +136,7 @@ Public Class XR_Delaunay_Subdiv2D : Inherits TaskParent
         For Each edge In edgelist
             Dim p1 = New cv.Point2f(edge(0), edge(1))
             Dim p2 = New cv.Point2f(edge(2), edge(3))
-            dst2.Line(p1, p2, cv.Scalar.Green, task.lineWidth, task.lineWidth)
+            cv.Cv2.Line(dst2, p1, p2, cv.Scalar.Green, task.lineWidth, task.lineWidth)
         Next
     End Sub
 End Class
@@ -187,7 +187,7 @@ Public Class XR_Delaunay_GenerationsNoKNN : Inherits TaskParent
                     g += 1
                 End While
             End If
-            dst3.FillConvexPoly(nextFacet, g, cv.LineTypes.Link4)
+            cv.Cv2.FillConvexPoly(dst3, nextFacet, g, cv.LineTypes.Link4)
             usedG.Add(g)
             SetTrueText(CStr(g), pt, 2)
         Next
@@ -244,7 +244,7 @@ Public Class Delaunay_Generations : Inherits TaskParent
                     g += 1
                 End While
             End If
-            dst0.FillConvexPoly(nextFacet, g, cv.LineTypes.Link4)
+            cv.Cv2.FillConvexPoly(dst0, nextFacet, g, cv.LineTypes.Link4)
             usedG.Add(g)
             SetTrueText(CStr(g), lp.p2, 2)
         Next
@@ -295,14 +295,14 @@ Public Class Delaunay_ConsistentColor : Inherits TaskParent
             If usedColors.Contains(nextColor) Then nextColor = Palette_Basics.randomCellColor()
             usedColors.Add(nextColor)
 
-            dst2.FillConvexPoly(nextFacet, nextColor)
-            facet32s.FillConvexPoly(nextFacet, i, cv.LineTypes.Link4)
+            cv.Cv2.FillConvexPoly(dst2, nextFacet, nextColor)
+            cv.Cv2.FillConvexPoly(facet32s, nextFacet, i, cv.LineTypes.Link4)
             facetList.Add(nextFacet)
         Next
 
         dst1.SetTo(0)
         For Each pt In inputPoints
-            dst1.Circle(New cv.Point(pt.X, pt.Y), task.DotSize, task.highlight, -1, cv.LineTypes.Link4)
+        cv.Cv2.Circle(dst1, New cv.Point(pt.X, pt.Y), task.DotSize, task.highlight, -1, cv.LineTypes.Link4)
         Next
         lastColor = dst2.Clone
         labels(2) = traceName + ": " + Format(inputPoints.Count, "000") + " cells were present."
@@ -362,9 +362,10 @@ Public Class Delaunay_LineSelect : Inherits TaskParent
         index2 = delaunay.dst1.Get(Of Byte)(task.lpD.p2.Y, task.lpD.p2.X)
 
         dst3.SetTo(0)
-        dst3.Polylines({delaunay.facetList(index1).ToArray}, True, white, task.lineWidth, cv.LineTypes.Link4)
-        dst3.Polylines({delaunay.facetList(index2).ToArray}, True, white, task.lineWidth, cv.LineTypes.Link4)
-        dst3.Line(task.lpD.p1, task.lpD.p2, task.highlight, task.lineWidth, task.lineWidth)
+        cv.Cv2.Polylines(dst3, {delaunay.facetList(index1).ToArray}, True, white, task.lineWidth, cv.LineTypes.Link4)
+        cv.Cv2.Polylines(dst3, {delaunay.facetList(index2).ToArray}, True, white, task.lineWidth, cv.LineTypes.Link4)
+
+        cv.Cv2.Line(dst3, task.lpD.p1, task.lpD.p2, task.highlight, task.lineWidth, task.lineWidth)
 
         If task.lpD Is Nothing Then task.lpD = task.lines.lpList(0)
         strOut = task.lpD.lpDisplay(dst2)
@@ -374,12 +375,12 @@ Public Class Delaunay_LineSelect : Inherits TaskParent
             index1 = delaunay.dst1.Get(Of Byte)(lp.p1.Y, lp.p1.X)
             index2 = delaunay.dst1.Get(Of Byte)(lp.p2.Y, lp.p2.X)
 
-            dst1.Polylines({delaunay.facetList(index1).ToArray}, True, white, task.lineWidth, cv.LineTypes.Link4)
-            dst1.Polylines({delaunay.facetList(index2).ToArray}, True, white, task.lineWidth, cv.LineTypes.Link4)
+            cv.Cv2.Polylines(dst1, {delaunay.facetList(index1).ToArray}, True, white, task.lineWidth, cv.LineTypes.Link4)
+            cv.Cv2.Polylines(dst1, {delaunay.facetList(index2).ToArray}, True, white, task.lineWidth, cv.LineTypes.Link4)
         Next
 
         For Each lp In task.lines.lpList
-            dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
+            cv.Cv2.Line(dst2, lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
         Next
     End Sub
 End Class
@@ -454,9 +455,9 @@ Public Class Delaunay_Color : Inherits TaskParent
             Next
 
             If inputColors.Count = 0 Then
-                dst3.FillConvexPoly(nextFacet, i, cv.LineTypes.Link4)
+            cv.Cv2.FillConvexPoly(dst3, nextFacet, i, cv.LineTypes.Link4)
             Else
-                dst3.FillConvexPoly(nextFacet, inputColors(i), cv.LineTypes.Link4)
+            cv.Cv2.FillConvexPoly(dst3, nextFacet, inputColors(i), cv.LineTypes.Link4)
             End If
             facetList.Add(nextFacet)
         Next
@@ -511,8 +512,8 @@ Public Class Delaunay_Map : Inherits TaskParent
             Next
 
             Dim rc = rcList(i)
-            rcMap.FillConvexPoly(nextFacet, rc.mapID, cv.LineTypes.Link4)
-            dst3.FillConvexPoly(nextFacet, rc.color, cv.LineTypes.Link4)
+            cv.Cv2.FillConvexPoly(rcMap, nextFacet, rc.mapID, cv.LineTypes.Link4)
+            cv.Cv2.FillConvexPoly(dst3, nextFacet, rc.color, cv.LineTypes.Link4)
             facetList.Add(nextFacet)
         Next
 
@@ -569,7 +570,7 @@ Public Class Delaunay_EmptyClone : Inherits TaskParent
             Next
 
             ' Fill facet with its index
-            dst3.FillConvexPoly(nextFacet.ToArray(), i, cv.LineTypes.Link4)
+            cv.Cv2.FillConvexPoly(dst3, nextFacet.ToArray(), i, cv.LineTypes.Link4)
 
             facetList.Add(nextFacet)
         Next

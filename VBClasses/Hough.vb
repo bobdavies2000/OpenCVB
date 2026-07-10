@@ -20,7 +20,7 @@ Public Class Hough_Basics : Inherits TaskParent
 
             Dim pt1 As cv.Point = New cv.Point(x + 1000 * -b, y + 1000 * a)
             Dim pt2 As cv.Point = New cv.Point(x - 1000 * -b, y - 1000 * a)
-            dst.Line(pt1, pt2, cv.Scalar.Red, task.lineWidth + 1, task.lineType, 0)
+            cv.Cv2.Line(dst, pt1, pt2, cv.Scalar.Red, task.lineWidth + 1, task.lineType, 0)
         Next
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -36,7 +36,7 @@ Public Class Hough_Basics : Inherits TaskParent
             Dim probSegments = cv.Cv2.HoughLinesP(task.edges.dst2, options.rho, options.theta, options.threshold)
             For i = 0 To Math.Min(probSegments.Length, options.lineCount) - 1
                 Dim line = probSegments(i)
-                dst3.Line(line.P1, line.P2, cv.Scalar.Red, task.lineWidth + 2, task.lineType)
+                cv.Cv2.Line(dst3, line.P1, line.P2, cv.Scalar.Red, task.lineWidth + 2, task.lineType)
             Next
             labels(3) = "Probablistic lines = " + CStr(probSegments.Length)
         End If
@@ -57,7 +57,7 @@ Public Class XR_Hough_Sudoku : Inherits TaskParent
         desc = "Successful use of Hough to find lines in Sudoku grid."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        dst2 = cv.Cv2.ImRead(task.homeDir + "opencv/Samples/Data/sudoku.png").Resize(dst2.Size)
+        cv.Cv2.Resize(cv.Cv2.ImRead(task.homeDir + "opencv/Samples/Data/sudoku.png"), dst2, dst2.Size)
         dst3 = dst2.Clone
         hough.Run(dst2)
         Hough_Basics.houghShowLines(dst3, hough.segments, hough.options.lineCount)
@@ -89,7 +89,7 @@ Public Class XR_Hough_Circles : Inherits TaskParent
         dst2.CopyTo(dst3)
         For i = 0 To cFound.Length - 1
             Dim pt = New cv.Point(CInt(cFound(i).Center.X), CInt(cFound(i).Center.Y))
-            dst3.Circle(pt, cFound(i).Radius, foundColor, 5, task.lineType)
+            cv.Cv2.Circle(dst3, pt, cFound(i).Radius, foundColor, 5, task.lineType)
         Next
         labels(3) = CStr(cFound.Length) + " circles were identified"
     End Sub
@@ -160,7 +160,7 @@ Public Class Hough_Featureless : Inherits TaskParent
 
         For Each roi In task.gridRects
             Dim segments() = cv.Cv2.HoughLines(task.edges.dst2(roi), options.rho, options.theta, options.threshold)
-            If task.edges.dst2(roi).CountNonZero = 0 Then
+If cv.Cv2.CountNonZero(task.edges.dst2(roi)) = 0 Then
                 regionCount += 1
                 dst2(roi).SetTo(255)
             End If
@@ -207,7 +207,7 @@ Public Class Hough_FeatureLessTopX : Inherits TaskParent
             Sub(roi)
                 Dim segments() = cv.Cv2.HoughLines(task.edges.dst2(roi), options.rho, options.theta, options.threshold)
                 If segments.Count = 0 Then maskFless(roi).SetTo(255)
-                If task.edges.dst2(roi).CountNonZero >= minSegments Then maskFeat(roi).SetTo(255)
+If cv.Cv2.CountNonZero(task.edges.dst2(roi)) >= minSegments Then maskFeat(roi).SetTo(255)
             End Sub)
 
         maskPredict.SetTo(255)
@@ -216,7 +216,7 @@ Public Class Hough_FeatureLessTopX : Inherits TaskParent
 
         dst1.SetTo(0)
         src.CopyTo(dst1, maskPredict)
-        Dim pCount = maskPredict.CountNonZero
+        Dim pCount = cv.Cv2.CountNonZero(maskPredict)
         labels(1) = Format(pCount / dst1.Total, "0%") + " are inbetween feature and featureless"
 
         dst2.SetTo(0)
@@ -255,7 +255,7 @@ Public Class Hough_LaneFinder : Inherits TaskParent
 
             Dim pList() As cv.Point = {bl, tl, tr, br}
             mask = New cv.Mat(New cv.Size(w, h), cv.MatType.CV_8U, cv.Scalar.All(0))
-            mask.FillConvexPoly(pList, white, task.lineType)
+            cv.Cv2.FillConvexPoly(mask, pList, white, task.lineType)
         End If
         dst1 = mask.Clone
 
@@ -274,7 +274,7 @@ Public Class Hough_LaneFinder : Inherits TaskParent
         For i = 0 To segments.Length - 1
             If laneLineMinY > segments(i).P1.Y Then laneLineMinY = segments(i).P1.Y
             If laneLineMinY > segments(i).P2.Y Then laneLineMinY = segments(i).P2.Y
-            dst3.Line(segments(i).P1, segments(i).P2, task.highlight, task.lineWidth, task.lineType)
+            cv.Cv2.Line(dst3, segments(i).P1, segments(i).P2, task.highlight, task.lineWidth, task.lineType)
         Next
     End Sub
 End Class
@@ -293,7 +293,7 @@ Public Class Hough_Lines : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
-        dst2 = task.edges.dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        cv.Cv2.CvtColor(task.edges.dst2, dst2, cv.ColorConversionCodes.GRAY2BGR)
 
         dst3.SetTo(0)
         For Each roi In task.gridRects
@@ -353,7 +353,7 @@ Public Class XR_Hough_Probabilistic : Inherits TaskParent
         segments = cv.Cv2.HoughLinesP(task.edges.dst2, options.rho, options.theta, options.threshold)
         For i = 0 To Math.Min(segments.Length, options.lineCount) - 1
             Dim line = segments(i)
-            dst3.Line(line.P1, line.P2, cv.Scalar.Red, task.lineWidth + 2, task.lineType)
+            cv.Cv2.Line(dst3, line.P1, line.P2, cv.Scalar.Red, task.lineWidth + 2, task.lineType)
         Next
         labels(3) = "Probablistic lines = " + CStr(segments.Length)
     End Sub
@@ -399,7 +399,7 @@ Public Class XR_Hough_Structural : Inherits TaskParent
             Dim pt1 As New Point(CInt(Math.Round(x0 + 1000 * (-b))), CInt(Math.Round(y0 + 1000 * (a))))
             Dim pt2 As New Point(CInt(Math.Round(x0 - 1000 * (-b))), CInt(Math.Round(y0 - 1000 * (a))))
 
-            dst3.Line(pt1, pt2, task.highlight, task.lineWidth, task.lineType)
+            cv.Cv2.Line(dst3, pt1, pt2, task.highlight, task.lineWidth, task.lineType)
         Next
 
         labels(3) = CStr(lines.Count) + " lines were found."

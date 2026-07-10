@@ -164,7 +164,7 @@ Public Class WarpModel_Input : Inherits TaskParent
             For i = 0 To rgb.Count - 1
                 Dim sz = New cv.Size(src.Width * rgb(i).Height / rgb(i).Width, src.Height)
                 r(i) = New cv.Rect(0, 0, sz.Width, sz.Height)
-                rgb(i) = rgb(i).Resize(sz)
+                cv.Cv2.Resize(rgb(i), rgb(i), sz)
             Next
         End If
 

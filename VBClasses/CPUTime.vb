@@ -1,4 +1,4 @@
-﻿Public Class CPUTime
+Public Class CPUTime
     ' TreeView and trace Data.
     Public callTrace As List(Of String)
     Public algorithm_msMain As New List(Of Single)

@@ -1,7 +1,7 @@
 Imports System.IO
 Imports System.Text.RegularExpressions
 Imports cv = OpenCvSharp
-Imports cvext = OpenCvSharp.Extensions
+Imports cvext = OpenCvSharp.GdipExtensions
 Namespace MainApp
     Partial Public Class MainUI : Inherits Form
         Dim isPlaying As Boolean
@@ -228,7 +228,8 @@ Namespace MainApp
                 input = cvext.BitmapConverter.ToMat(pics(vbc.task.mouseMagnifyPicTag).Image)
                 r = validateRect(r, input.Width, input.Height)
                 If r.Width < 5 Or r.Height < 5 Then Exit Sub
-                Dim img = input(r).Resize(New cv.Size(vbc.task.drawRect.Width * 5, vbc.task.drawRect.Height * 5))
+                Dim img As New cv.Mat
+                cv.Cv2.Resize(input(r), img, New cv.Size(vbc.task.drawRect.Width * 5, vbc.task.drawRect.Height * 5))
                 cv.Cv2.ImShow("Magnifier", img)
                 vbc.task.mouseMagnifyEndPoint = New cv.Point
             End If

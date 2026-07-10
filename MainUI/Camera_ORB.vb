@@ -129,22 +129,22 @@ Namespace MainApp
             SyncLock cameraMutex
                 If cFrame IsNot Nothing Then
                     color = cv.Mat.FromPixelData(rows, cols, cv.MatType.CV_8UC3, cFrame.GetDataPtr)
-                    color = color.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
+                    cv.Cv2.Resize(color, color, workRes, 0, 0, cv.InterpolationFlags.Nearest)
                 End If
 
                 If lFrame IsNot Nothing Then
                     leftView = cv.Mat.FromPixelData(rows, cols, cv.MatType.CV_8UC1, lFrame.GetDataPtr)
-                    leftView = leftView.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
+                    cv.Cv2.Resize(leftView, leftView, workRes, 0, 0, cv.InterpolationFlags.Nearest)
                 End If
 
                 If rFrame IsNot Nothing Then
                     rightView = cv.Mat.FromPixelData(rows, cols, cv.MatType.CV_8UC1, rFrame.GetDataPtr)
-                    rightView = rightView.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
+                    cv.Cv2.Resize(rightView, rightView, workRes, 0, 0, cv.InterpolationFlags.Nearest)
                 End If
 
                 If dFrame IsNot Nothing Then
                     depth16u = cv.Mat(Of UShort).FromPixelData(rows, cols, cv.MatType.CV_16UC1, dFrame.GetDataPtr)
-                    depth16u = depth16u.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
+                    cv.Cv2.Resize(depth16u, depth16u, workRes, 0, 0, cv.InterpolationFlags.Nearest)
                     pointCloud = ComputePointCloud(depth16u, calibData.leftIntrinsics)
                 End If
 

@@ -147,20 +147,20 @@ public class CamZed
         zed.RetrieveImage(colorSL, sl.VIEW.LEFT);
         color = Cv.Mat.FromPixelData(captureRows, captureCols, Cv.MatType.CV_8UC4, colorSL.GetPtr());
         //Cv.Cv2.ImShow("color", color);
-        color = color.CvtColor(Cv.ColorConversionCodes.BGRA2BGR);
-        leftView = color.CvtColor(Cv.ColorConversionCodes.BGR2GRAY);
+        Cv.Cv2.CvtColor(color, color, Cv.ColorConversionCodes.BGRA2BGR);
+        Cv.Cv2.CvtColor(color, leftView, Cv.ColorConversionCodes.BGR2GRAY);
 
 
         zed.RetrieveImage(rightSL, sl.VIEW.RIGHT);
         rightView = Cv.Mat.FromPixelData(captureRows, captureCols, Cv.MatType.CV_8UC4, rightSL.GetPtr());
-        rightView = rightView.CvtColor(Cv.ColorConversionCodes.BGRA2BGR);
+        Cv.Cv2.CvtColor(rightView, rightView, Cv.ColorConversionCodes.BGRA2BGR);
         //Cv.Cv2.ImShow("rightView", rightView);
         //Cv.Cv2.WaitKey(1);
-        rightView = rightView.CvtColor(Cv.ColorConversionCodes.BGR2GRAY);
+        Cv.Cv2.CvtColor(rightView, rightView, Cv.ColorConversionCodes.BGR2GRAY);
 
         zed.RetrieveMeasure(pointCloudSL, sl.MEASURE.XYZBGRA);
         pointCloud = Cv.Mat.FromPixelData(captureRows, captureCols, Cv.MatType.CV_32FC4, pointCloudSL.GetPtr());
-        pointCloud = pointCloud.CvtColor(Cv.ColorConversionCodes.BGRA2BGR);
+        Cv.Cv2.CvtColor(pointCloud, pointCloud, Cv.ColorConversionCodes.BGRA2BGR);
         
         zed.RetrieveMeasure(depthSL, sl.MEASURE.DEPTH);
         depth = Cv.Mat.FromPixelData(captureRows, captureCols, Cv.MatType.CV_32FC1, depthSL.GetPtr());

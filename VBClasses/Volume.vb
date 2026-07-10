@@ -1,4 +1,4 @@
-﻿Imports cv = OpenCvSharp
+Imports cv = OpenCvSharp
 Public Class Volume_Basics : Inherits TaskParent
     Public rc As New rcDataOld
     Public volume As Single

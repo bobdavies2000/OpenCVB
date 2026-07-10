@@ -50,7 +50,7 @@ Public Class StableLine_BasicsOld : Inherits TaskParent
         If rotateAngle <> 0 Then
             Dim rotateCenter = Line_Intersection.IntersectTest(lp, lpLast)
             Dim M = cv.Cv2.GetRotationMatrix2D(rotateCenter, -rotateAngle, 1)
-            dst2 = src.WarpAffine(M, src.Size(), cv.InterpolationFlags.Cubic)
+            cv.Cv2.WarpAffine(src, dst2, M, src.Size(), cv.InterpolationFlags.Cubic)
             lpLast = lp
         Else
             If task.heartBeat Then dst2 = src.Clone
@@ -94,7 +94,7 @@ Public Class XR_StableLine_BasicsOldCount : Inherits TaskParent
         Dim g As Integer
         For i = 0 To basics.ptList.Count - 1
             Dim pt = basics.ptList(i)
-            dst2.Circle(pt, task.DotSize, task.highlight, -1, task.lineType)
+            cv.Cv2.Circle(dst2, pt, task.DotSize, task.highlight, -1, task.lineType)
             g = basics.facetGen.dst0.Get(Of Integer)(pt.Y, pt.X)
             goodCounts.Add(g, i)
             SetTrueText(CStr(g), pt)
@@ -122,13 +122,13 @@ Public Class XR_StableLine_Lines : Inherits TaskParent
         For Each lp In task.lines.lpList
             basics.facetGen.inputPoints.Add(lp.p1)
             basics.facetGen.inputPoints.Add(lp.p2)
-            dst1.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
+            cv.Cv2.Line(dst1, lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
         Next
         basics.Run(src)
         dst2 = basics.dst2
         dst3 = basics.dst3
         For Each pt In basics.ptList
-            dst2.Circle(pt, task.DotSize + 1, task.highlight, -1, task.lineType)
+        cv.Cv2.Circle(dst2, pt, task.DotSize + 1, task.highlight, -1, task.lineType)
             If standaloneTest() Then
                 Dim g = basics.facetGen.dst0.Get(Of Integer)(pt.Y, pt.X)
                 SetTrueText(CStr(g), pt)
@@ -161,7 +161,7 @@ Public Class XR_StableLine_FAST : Inherits TaskParent
         dst3 = basics.dst3
         dst2 = basics.dst2
         For Each pt In basics.ptList
-            dst2.Circle(pt, task.DotSize + 1, task.highlight, -1, task.lineType)
+        cv.Cv2.Circle(dst2, pt, task.DotSize + 1, task.highlight, -1, task.lineType)
             If standaloneTest() Then
                 Dim g = basics.facetGen.dst0.Get(Of Integer)(pt.Y, pt.X)
                 SetTrueText(CStr(g), pt)

@@ -38,7 +38,7 @@ Public Class Neighbor_Basics : Inherits TaskParent
             If task.rcD IsNot Nothing Then
                 For Each index In task.rcD.nabs
                     If index < redC.rcList.Count Then
-                        dst2.Circle(redC.rcList(index).maxDist, task.DotSize, task.highlight, -1, task.lineType)
+                    cv.Cv2.Circle(dst2, redC.rcList(index).maxDist, task.DotSize, task.highlight, -1, task.lineType)
                     End If
                 Next
             End If
@@ -91,8 +91,8 @@ Public Class Neighbor_Intersects8u : Inherits TaskParent
         If standaloneTest() Then
             dst3 = task.color.Clone
             For Each pt In nPoints
-                dst2.Circle(pt, task.DotSize, task.highlight, -1, task.lineType)
-                dst3.Circle(pt, task.DotSize, cv.Scalar.Yellow, -1, task.lineType)
+            cv.Cv2.Circle(dst2, pt, task.DotSize, task.highlight, -1, task.lineType)
+            cv.Cv2.Circle(dst3, pt, task.DotSize, cv.Scalar.Yellow, -1, task.lineType)
             Next
         End If
 
@@ -145,8 +145,8 @@ Public Class Neighbor_Intersects32S : Inherits TaskParent
         If standaloneTest() Then
             dst3 = task.color.Clone
             For Each pt In nPoints
-                dst2.Circle(pt, task.DotSize, task.highlight, -1, task.lineType)
-                dst3.Circle(pt, task.DotSize, cv.Scalar.Yellow, -1, task.lineType)
+            cv.Cv2.Circle(dst2, pt, task.DotSize, task.highlight, -1, task.lineType)
+            cv.Cv2.Circle(dst3, pt, task.DotSize, cv.Scalar.Yellow, -1, task.lineType)
             Next
         End If
 
@@ -174,7 +174,7 @@ Public Class Neighbor_ColorOnly : Inherits TaskParent
 
         corners.Run(redC.rcMap.Clone())
         For Each pt In corners.nPoints
-            dst2.Circle(pt, task.DotSize, task.highlight, -1, task.lineType)
+        cv.Cv2.Circle(dst2, pt, task.DotSize, task.highlight, -1, task.lineType)
         Next
 
         labels(2) = redC.labels(2) + " and " + CStr(corners.nPoints.Count) + " cell intersections"

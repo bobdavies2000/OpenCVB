@@ -24,7 +24,7 @@ Public Class Profile_Basics : Inherits TaskParent
         SetTrueText(redC.strOut, 1)
 
         Dim rc = task.rcD
-        Dim depthPixels = task.depthmask(rc.rect).CountNonZero
+        Dim depthPixels = cv.Cv2.CountNonZero(task.depthmask(rc.rect))
         If depthPixels = 0 Then
             strOut = "There is no depth data for that cell."
             Exit Sub
@@ -80,7 +80,7 @@ Public Class Profile_Basics : Inherits TaskParent
         Next
 
         For i = 0 To corners.Count - 1
-            dst3.Circle(corners(i), task.DotSize + 2, cornerColors(i), -1, task.lineType)
+        cv.Cv2.Circle(dst3, corners(i), task.DotSize + 2, cornerColors(i), -1, task.lineType)
         Next
 
         If task.heartBeat Then
@@ -178,12 +178,12 @@ Public Class XR_Profile_Derivative : Inherits TaskParent
                 Else
                     color = white
                 End If
-                dst3.Circle(pt, task.DotSize, color, -1, task.lineType)
+                cv.Cv2.Circle(dst3, pt, task.DotSize, color, -1, task.lineType)
 
                 If sides.cornersRaw.Contains(rc.contour(i)) Then
                     Dim index = sides.cornersRaw.IndexOf(rc.contour(i))
-                    dst1.Circle(pt, task.DotSize + 5, white, -1, task.lineType)
-                    dst1.Circle(pt, task.DotSize + 3, sides.cornerColors(index), -1, task.lineType)
+                    cv.Cv2.Circle(dst1, pt, task.DotSize + 5, white, -1, task.lineType)
+                    cv.Cv2.Circle(dst1, pt, task.DotSize + 3, sides.cornerColors(index), -1, task.lineType)
                     SetTrueText(sides.cornerNames(index), pt, 3)
                 End If
             Next
@@ -196,7 +196,7 @@ Public Class XR_Profile_Derivative : Inherits TaskParent
         For i = 0 To sides.corners.Count - 1
             color = sides.cornerColors(i)
             SetTrueText(sides.cornerNames(i), sides.corners(i), 1)
-            dst1.Circle(sides.corners(i), task.DotSize, color, -1, task.lineType)
+            cv.Cv2.Circle(dst1, sides.corners(i), task.DotSize, color, -1, task.lineType)
         Next
         SetTrueText(strOut, 1)
         saveTrueText = New List(Of TrueText)(trueData)
@@ -273,12 +273,12 @@ Public Class Profile_ConcentrationTop : Inherits TaskParent
 
         heat.Run(vecMat)
         If options.topView Then
-            dst1 = heat.dst0.Threshold(0, 255, cv.ThresholdTypes.Binary)
+            cv.Cv2.Threshold(heat.dst0, dst1, 0, 255, cv.ThresholdTypes.Binary)
         Else
-            dst1 = heat.dst1.Threshold(0, 255, cv.ThresholdTypes.Binary)
+            cv.Cv2.Threshold(heat.dst1, dst1, 0, 255, cv.ThresholdTypes.Binary)
         End If
 
-        Dim count = dst1.CountNonZero
+        Dim count = cv.Cv2.CountNonZero(dst1)
         If maxAverage < count Then
             maxAverage = count
             peakRotation = ySlider.Value
@@ -336,7 +336,7 @@ Public Class XR_Profile_Kalman : Inherits TaskParent
             DrawTour(dst3(rc.rect), rc.contour, cv.Scalar.Yellow)
             For i = 0 To sides.corners.Count - 1
                 Dim pt = New cv.Point(CInt(kalman.kOutput(i * 2)), CInt(kalman.kOutput(i * 2 + 1)))
-                dst3.Circle(pt, task.DotSize + 2, sides.cornerColors(i), -1, task.lineType)
+                cv.Cv2.Circle(dst3, pt, task.DotSize + 2, sides.cornerColors(i), -1, task.lineType)
             Next
         End If
         SetTrueText(sides.strOut, 3)

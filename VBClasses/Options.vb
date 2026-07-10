@@ -1,4 +1,4 @@
-﻿Imports System.IO
+Imports System.IO
 Imports System.Numerics
 Imports OpenCvSharp.ML
 Imports cv = OpenCvSharp
@@ -1313,7 +1313,7 @@ Public Class Options_FilterNorm : Inherits OptionParent
             End If
         Next
 
-        kernel = kernel.Normalize(alphaSlider.Value / 10, 0, normType)
+        cv.Cv2.Normalize(kernel, kernel, alphaSlider.Value / 10, 0, normType)
     End Sub
 End Class
 
@@ -5266,8 +5266,8 @@ Public Class Options_Gabor : Inherits OptionParent
         phaseOffset = phaseSlider.Value / 1000
         theta = Math.PI * thetaSlider.Value / 180
         gKernel = cv.Cv2.GetGaborKernel(New cv.Size(ksize, ksize), Sigma, theta, lambda, gamma, phaseOffset, cv.MatType.CV_32F)
-        Dim multiplier = gKernel.Sum()
-        gKernel /= 1.5 * multiplier(0)
+        Dim multiplier = cv.Cv2.Sum(gKernel)(0)
+        gKernel /= 1.5 * multiplier
     End Sub
 End Class
 
@@ -5532,7 +5532,7 @@ Public Class Options_Kalman_VB : Inherits OptionParent
         If matrix.Count > 0 Then
             Const MAX_INPUT = 20
             matrix(task.frameCount Mod MAX_INPUT) = kalmanInput
-            Dim AverageOutput = (cv.Mat.FromPixelData(MAX_INPUT, 1, cv.MatType.CV_32F, matrix.ToArray)).Mean()(0)
+            Dim AverageOutput = cv.Cv2.Mean((cv.Mat.FromPixelData(MAX_INPUT, 1, cv.MatType.CV_32F, matrix.ToArray)))(0)
 
             If AverageOutput < 0 Then AverageOutput = 0
             If AverageOutput > pointSlider.Maximum Then AverageOutput = pointSlider.Maximum
@@ -5642,15 +5642,19 @@ Public Class Options_LaPlacianPyramid : Inherits OptionParent
         ' this usage of sliders.mytrackbars(x) is OK as long as this algorithm is not reused in multiple places (which it isn't)
         Dim levelMat(barCount - 1) As cv.Mat
         For i = 0 To barCount - 2
-            Dim nextImg = img.PyrDown()
-            levelMat(i) = (img - nextImg.PyrUp(img.Size)) * sliders.mytrackbars(i).Value
+            Dim nextImg As New cv.Mat
+            cv.Cv2.PyrDown(img, nextImg)
+
+            Dim imgUp As New cv.Mat
+            cv.Cv2.PyrUp(nextImg, imgUp, img.Size)
+            levelMat(i) = (img - imgUp) * sliders.mytrackbars(i).Value
             img = nextImg
         Next
         levelMat(barCount - 1) = img * sliders.mytrackbars(barCount - 1).Value
 
         img = levelMat(barCount - 1)
         For i = barCount - 1 To 1 Step -1
-            img = img.PyrUp(levelMat(i - 1).Size)
+            cv.Cv2.PyrUp(img, levelMat(i - 1), levelMat(i - 1).Size)
             img += levelMat(i - 1)
         Next
     End Sub

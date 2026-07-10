@@ -16,12 +16,12 @@ Public Class KNN_Basics : Inherits TaskParent
         For i = 0 To queries.Count - 1
             Dim pt = queries(i)
             Dim nn = trainInput(result(i, 0))
-            dst.Circle(pt, task.DotSize + 4, cv.Scalar.Yellow, -1, task.lineType)
-            dst.Line(pt, nn, cv.Scalar.Yellow, task.lineWidth, task.lineType)
+            cv.Cv2.Circle(dst, pt, task.DotSize + 4, cv.Scalar.Yellow, -1, task.lineType)
+            cv.Cv2.Line(dst, pt, nn, cv.Scalar.Yellow, task.lineWidth, task.lineType)
         Next
 
         For Each pt In trainInput
-            dst.Circle(pt, task.DotSize + 4, cv.Scalar.Red, -1, task.lineType)
+        cv.Cv2.Circle(dst, pt, task.DotSize + 4, cv.Scalar.Red, -1, task.lineType)
         Next
         Return dst
     End Function
@@ -194,20 +194,20 @@ Public Class KNN_Farthest : Inherits TaskParent
         For i = 0 To knn.result.GetUpperBound(0) - 1
             Dim farIndex = knn.result(i, knn.result.GetUpperBound(1))
             Dim lp = New lpData(queries(i), trainInput(farIndex))
-            dst2.Circle(lp.p1, task.DotSize + 4, cv.Scalar.Yellow, -1, task.lineType)
-            dst2.Circle(lp.p2, task.DotSize + 4, cv.Scalar.Yellow, -1, task.lineType)
-            dst2.Line(lp.p1, lp.p2, cv.Scalar.Yellow, task.lineWidth, task.lineType)
+            cv.Cv2.Circle(dst2, lp.p1, task.DotSize + 4, cv.Scalar.Yellow, -1, task.lineType)
+            cv.Cv2.Circle(dst2, lp.p2, task.DotSize + 4, cv.Scalar.Yellow, -1, task.lineType)
+            cv.Cv2.Line(dst2, lp.p1, lp.p2, cv.Scalar.Yellow, task.lineWidth, task.lineType)
             farthest.Add(lp)
             distances.Add(lp.p1.DistanceTo(lp.p2))
         Next
 
         For Each pt In queries
-            dst3.Circle(pt, task.DotSize + 4, cv.Scalar.Red, -1, task.lineType)
+        cv.Cv2.Circle(dst3, pt, task.DotSize + 4, cv.Scalar.Red, -1, task.lineType)
         Next
 
         Dim maxIndex = distances.IndexOf(distances.Max())
         lpFar = farthest(maxIndex)
-        dst3.Line(lpFar.p1, lpFar.p2, white, task.lineWidth, task.lineType)
+        cv.Cv2.Line(dst3, lpFar.p1, lpFar.p2, white, task.lineWidth, task.lineType)
     End Sub
 End Class
 
@@ -278,21 +278,21 @@ Public Class KNN_OneToOne : Inherits TaskParent
 
         dst2.SetTo(0)
         For Each pt In knn.trainInput
-            dst2.Circle(pt, task.DotSize + 4, cv.Scalar.Red, -1, task.lineType)
+        cv.Cv2.Circle(dst2, pt, task.DotSize + 4, cv.Scalar.Red, -1, task.lineType)
         Next
 
         noMatch.Clear()
         matches.Clear()
         For i = 0 To queries.Count - 1
             Dim pt = queries(i)
-            dst2.Circle(pt, task.DotSize + 4, cv.Scalar.Yellow, -1, task.lineType)
+            cv.Cv2.Circle(dst2, pt, task.DotSize + 4, cv.Scalar.Yellow, -1, task.lineType)
             If nearest(i) = -1 Then
                 noMatch.Add(pt)
             Else
                 If nearest(i) < knn.trainInput.Count Then ' there seems like a boundary condition when there is only 1 traininput...
                     Dim nn = knn.trainInput(nearest(i))
                     matches.Add(New lpData(pt, nn))
-                    dst2.Line(nn, pt, white, task.lineWidth, task.lineType)
+                    cv.Cv2.Line(dst2, nn, pt, white, task.lineWidth, task.lineType)
                 End If
             End If
         Next
@@ -329,7 +329,7 @@ Public Class XR_KNN_MaxDistance : Inherits TaskParent
         For i = 0 To knn.result.GetUpperBound(0)
             Dim lp = New lpData(knn.queries(knn.result(i, knn.queries.Count - 1)),
                                 knn.queries(knn.result(i, 0)))
-            dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth)
+            cv.Cv2.Line(dst2, lp.p1, lp.p2, task.highlight, task.lineWidth)
         Next
 
         labels(2) = "There were " + CStr(perif.fcs.feat.features.Count) + " features and " +
@@ -364,7 +364,7 @@ Public Class KNN_MinDistance : Inherits TaskParent
 
         dst3.SetTo(0)
         For Each pt In feat.features
-            dst3.Circle(pt, task.DotSize, cv.Scalar.White, -1, task.lineType)
+        cv.Cv2.Circle(dst3, pt, task.DotSize, cv.Scalar.White, -1, task.lineType)
         Next
         labels(3) = "There were " + CStr(feat.features.Count) + " points in the input"
 
@@ -390,7 +390,7 @@ Public Class KNN_MinDistance : Inherits TaskParent
         outputPoints.Clear()
         outputPoints2f.Clear()
         For Each pt In knn.queries
-            dst2.Circle(pt, task.DotSize + 2, cv.Scalar.White, -1, task.lineType)
+        cv.Cv2.Circle(dst2, pt, task.DotSize + 2, cv.Scalar.White, -1, task.lineType)
             outputPoints.Add(pt)
             outputPoints2f.Add(pt)
         Next
@@ -423,12 +423,12 @@ Public Class KNN_Grid : Inherits TaskParent
         For Each r In task.gridRects
             Dim val = fLess.dst2.Get(Of Byte)(r.TopLeft.Y, r.TopLeft.X)
             If val > 0 Then
-                trainInput.Add(New cv.Vec3f(r.TopLeft.X, r.TopLeft.Y, task.gray(r).Mean()(0)))
+                trainInput.Add(New cv.Vec3f(r.TopLeft.X, r.TopLeft.Y, cv.Cv2.Mean(task.gray(r))(0)))
                 clusters.Add(val)
             Else
                 For y = 0 To r.Height - 1
                     For x = 0 To r.Width - 1
-                        queries.Add(New cv.Vec3f(r.TopLeft.X + x, r.TopLeft.Y + y, task.gray(r).Mean()(0)))
+                        queries.Add(New cv.Vec3f(r.TopLeft.X + x, r.TopLeft.Y + y, cv.Cv2.Mean(task.gray(r))(0)))
                     Next
                 Next
             End If
@@ -527,7 +527,7 @@ Public Class KNN_Dimension3 : Inherits TaskParent
         dist.inPoint1 = queries(0)
         For i = 0 To trainInput.Count - 1
             Dim pt = New cv.Point2f(trainInput(i).X, trainInput(i).Y)
-            dst2.Circle(pt, task.DotSize, cv.Scalar.Red, -1, task.lineType)
+            cv.Cv2.Circle(dst2, pt, task.DotSize, cv.Scalar.Red, -1, task.lineType)
             dist.inPoint2 = trainInput(i)
             dist.Run(src)
             SetTrueText("depth=" + CStr(trainInput(i).Z) + vbCrLf + "dist=" + Format(dist.distance, fmt0), pt)
@@ -537,8 +537,8 @@ Public Class KNN_Dimension3 : Inherits TaskParent
             For j = 0 To Math.Min(2, trainInput.Count) - 1
                 Dim index = knn.result(i, j)
                 Dim nn = New cv.Point2f(trainInput(index).X, trainInput(index).Y)
-                dst2.Circle(pt, task.DotSize, cv.Scalar.Yellow, -1, task.lineType)
-                dst2.Line(pt, nn, cv.Scalar.Yellow, task.lineWidth, task.lineType)
+                cv.Cv2.Circle(dst2, pt, task.DotSize, cv.Scalar.Yellow, -1, task.lineType)
+                cv.Cv2.Line(dst2, pt, nn, cv.Scalar.Yellow, task.lineWidth, task.lineType)
                 Dim midPt = New cv.Point2f((pt.X + nn.X) / 2, (pt.Y + nn.Y) / 2)
                 SetTrueText(CStr(j), midPt)
                 SetTrueText("depth=" + CStr(queries(i).Z), pt)
@@ -582,7 +582,7 @@ Public Class KNN_Dimension4 : Inherits TaskParent
         dist.inPoint1 = queries(0)
         For i = 0 To trainInput.Count - 1
             Dim pt = New cv.Point2f(trainInput(i)(0), trainInput(i)(1))
-            dst2.Circle(pt, task.DotSize, cv.Scalar.Red, -1, task.lineType)
+            cv.Cv2.Circle(dst2, pt, task.DotSize, cv.Scalar.Red, -1, task.lineType)
             dist.inPoint2 = trainInput(i)
             dist.Run(src)
             SetTrueText("dist=" + Format(dist.distance, fmt0), pt)
@@ -592,8 +592,8 @@ Public Class KNN_Dimension4 : Inherits TaskParent
             For j = knn.result.GetLowerBound(1) To knn.result.GetUpperBound(1)
                 Dim index = knn.result(i, j)
                 Dim nn = New cv.Point2f(trainInput(index)(0), trainInput(index)(1))
-                dst2.Circle(pt, task.DotSize, cv.Scalar.Yellow, -1, task.lineType)
-                dst2.Line(pt, nn, task.highlight, task.lineWidth, task.lineType)
+                cv.Cv2.Circle(dst2, pt, task.DotSize, cv.Scalar.Yellow, -1, task.lineType)
+                cv.Cv2.Line(dst2, pt, nn, task.highlight, task.lineWidth, task.lineType)
                 Dim midPt = New cv.Point2f((pt.X + nn.X) / 2, (pt.Y + nn.Y) / 2)
                 SetTrueText(CStr(j), midPt)
             Next
@@ -636,15 +636,15 @@ Public Class KNN_DimensionN : Inherits TaskParent
         dst2.SetTo(0)
         For i = 0 To trainInput.Count \ knn.options.knnDimension - 1 Step knn.options.knnDimension
             Dim pt = New cv.Point2f(trainInput(i), trainInput(i + 1))
-            dst2.Circle(pt, task.DotSize, cv.Scalar.Red, -1, task.lineType)
+            cv.Cv2.Circle(dst2, pt, task.DotSize, cv.Scalar.Red, -1, task.lineType)
         Next
 
         For i = 0 To queries.Count \ knn.options.knnDimension - 1 Step knn.options.knnDimension
             Dim pt = New cv.Point2f(queries(i), queries(i + 1))
             Dim index = knn.result(i, 0) * knn.options.knnDimension
             Dim nn = New cv.Point2f(trainInput(index), trainInput(index + 1))
-            dst2.Circle(pt, task.DotSize + 1, task.highlight, -1, task.lineType)
-            dst2.Line(pt, nn, task.highlight, task.lineWidth, task.lineType)
+            cv.Cv2.Circle(dst2, pt, task.DotSize + 1, task.highlight, -1, task.lineType)
+            cv.Cv2.Line(dst2, pt, nn, task.highlight, task.lineWidth, task.lineType)
         Next
         If standaloneTest() Then
             SetTrueText("Results are easily verified for the 2-dimensional case.  For higher dimension, " + vbCrLf +

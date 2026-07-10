@@ -1,4 +1,4 @@
-﻿Imports cv = OpenCvSharp
+Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Class KeyColor_Basics : Inherits TaskParent
         Dim keyList As New List(Of keyData)
@@ -39,7 +39,7 @@ Namespace VBClasses
                 tour.contour = ptArray.ToList
                 Dim listOfPoints = New List(Of List(Of cv.Point))({tour.contour})
                 cv.Cv2.DrawContours(tourMat, listOfPoints, 0, New cv.Scalar(sortedList.Count), -1, cv.LineTypes.Link8)
-                tour.mask = tourMat(tour.rect).Threshold(0, 255, cv.ThresholdTypes.Binary)
+                cv.Cv2.Threshold(tourMat(tour.rect), tour.mask, 0, 255, cv.ThresholdTypes.Binary)
                 tour.maxDist = tour.GetMaxDistContour(tour)
                 tour.pixels = cv.Cv2.ContourArea(ptArray)
                 If tour.pixels >= minSize Then sortedList.Add(tour.pixels, tour)
@@ -115,7 +115,7 @@ Namespace VBClasses
                 tour.contour = ptArray.ToList
                 Dim listOfPoints = New List(Of List(Of cv.Point))({tour.contour})
                 cv.Cv2.DrawContours(tourMat, listOfPoints, 0, New cv.Scalar(sortedList.Count), -1, cv.LineTypes.Link8)
-                tour.mask = tourMat(tour.rect).Threshold(0, 255, cv.ThresholdTypes.Binary)
+                cv.Cv2.Threshold(tourMat(tour.rect), tour.mask, 0, 255, cv.ThresholdTypes.Binary)
                 tour.maxDist = tour.GetMaxDistContour(tour)
                 tour.pixels = cv.Cv2.ContourArea(ptArray)
                 If tour.pixels >= minSize Then sortedList.Add(tour.pixels, tour)
@@ -160,7 +160,7 @@ Namespace VBClasses
             dst3 = Palettize(dst1, 0)
 
             For Each key In keyColors.keyList
-                dst3.Circle(key.maxDist, task.DotSize, task.highlight, -1)
+            cv.Cv2.Circle(dst3, key.maxDist, task.DotSize, task.highlight, -1)
             Next
             labels(3) = CStr(keyColors.keyList.Count - 1) + " regions were found with more than 1% of the image."
         End Sub
@@ -177,7 +177,9 @@ Namespace VBClasses
             desc = "Overlay the KeyColor_Contours cells on the reduced color results."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            redC.Run(keyColors.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
+        Dim _redC_cvt As New cv.Mat
+        cv.Cv2.CvtColor(keyColors.dst2, _redC_cvt, cv.ColorConversionCodes.BGR2GRAY)
+        redC.Run(_redC_cvt)
             dst2 = redC.dst2
             labels(2) = redC.labels(2)
 
@@ -192,7 +194,7 @@ Namespace VBClasses
             dst3 = Palettize(dst1, 0)
 
             For Each key In keyColors.keyList
-                dst3.Circle(key.maxDist, task.DotSize, task.highlight, -1)
+            cv.Cv2.Circle(dst3, key.maxDist, task.DotSize, task.highlight, -1)
             Next
             labels(3) = CStr(keyColors.keyList.Count - 1) + " regions were found with more than 1% of the image."
         End Sub

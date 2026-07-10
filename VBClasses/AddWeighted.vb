@@ -36,8 +36,8 @@ Public Class AddWeighted_Basics : Inherits TaskParent
             If src.Type <> cv.MatType.CV_8UC3 Or src2.Type <> cv.MatType.CV_8UC3 Then
                 If src.Type = cv.MatType.CV_32FC1 Then src = Mat_Convert.Mat_32f_To_8UC3(src)
                 If src2.Type = cv.MatType.CV_32FC1 Then src2 = Mat_Convert.Mat_32f_To_8UC3(src2)
-                If src.Type <> cv.MatType.CV_8UC3 Then src = src.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-                If src2.Type <> cv.MatType.CV_8UC3 Then src2 = src2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+                If src.Type <> cv.MatType.CV_8UC3 Then cv.Cv2.CvtColor(src, src, cv.ColorConversionCodes.GRAY2BGR)
+                If src2.Type <> cv.MatType.CV_8UC3 Then cv.Cv2.CvtColor(src2, src2, cv.ColorConversionCodes.GRAY2BGR)
             End If
         End If
 
@@ -103,7 +103,9 @@ Public Class XR_AddWeighted_Edges : Inherits TaskParent
         dst2 = task.edges.dst2
         labels(2) = task.edges.labels(2)
 
-        dst3 = ShowAddweighted(task.edges.dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR), src, labels(3))
+        Dim _cvtEdges As New cv.Mat
+        cv.Cv2.CvtColor(task.edges.dst2, _cvtEdges, cv.ColorConversionCodes.GRAY2BGR)
+        dst3 = ShowAddweighted(_cvtEdges, src, labels(3))
     End Sub
 End Class
 

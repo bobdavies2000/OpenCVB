@@ -28,11 +28,11 @@ Public Class LinearRegression_Basics : Inherits TaskParent
         p1 = New cv.Point(0, CInt(c))
         p2 = New cv.Point(dst2.Width, CInt(m * dst2.Width + c))
         dst2.SetTo(0)
-        dst2.Line(p1, p2, white, task.lineWidth, task.lineType)
+        cv.Cv2.Line(dst2, p1, p2, white, task.lineWidth, task.lineType)
 
         For i = 0 To x.Count - 1
             Dim pt As New cv.Point(x(i), y(i))
-            dst2.Circle(pt, task.DotSize, cv.Scalar.Red, -1, task.lineType)
+            cv.Cv2.Circle(dst2, pt, task.DotSize, cv.Scalar.Red, -1, task.lineType)
         Next
     End Sub
 End Class

@@ -7,10 +7,10 @@ Public Class Erode_Basics : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
 
-        If options.noshape Or options.iterations = 0 Then dst2 = src Else dst2 = src.Erode(options.element, Nothing, options.iterations)
+        If options.noshape Or options.iterations = 0 Then dst2 = src Else cv.Cv2.Erode(src, dst2, options.element, Nothing, options.iterations)
 
         If standaloneTest() Then
-            dst3 = task.depthRGB.Erode(options.element, Nothing, options.iterations)
+            cv.Cv2.Erode(task.depthRGB, dst3, options.element, Nothing, options.iterations)
             labels(3) = "Eroded Depth " + CStr(options.iterations) + " times"
         End If
         labels(2) = "Eroded BGR " + CStr(-options.iterations) + " times"

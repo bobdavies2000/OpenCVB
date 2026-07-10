@@ -1,4 +1,4 @@
-﻿Imports cv = OpenCvSharp
+Imports cv = OpenCvSharp
 Public Class Bin3Way_Basics : Inherits TaskParent
     Dim hist As New Histogram_Basics
     Public mats As New Mat_4Click
@@ -34,13 +34,13 @@ Public Class Bin3Way_Basics : Inherits TaskParent
         End If
 
         Dim offset = firstThird / bins * dst3.Width
-        dst3.Line(New cv.Point(offset, 0), New cv.Point(offset, dst3.Height), white, task.lineWidth, task.lineWidth)
+        cv.Cv2.Line(dst3, New cv.Point(offset, 0), New cv.Point(offset, dst3.Height), white, task.lineWidth, task.lineWidth)
         offset = lastThird / bins * dst3.Width
-        dst3.Line(New cv.Point(offset, 0), New cv.Point(offset, dst3.Height), white, task.lineWidth, task.lineWidth)
+        cv.Cv2.Line(dst3, New cv.Point(offset, 0), New cv.Point(offset, dst3.Height), white, task.lineWidth, task.lineWidth)
 
-        mats.mat(0) = task.gray.InRange(0, firstThird - 1)         ' darkest
-        mats.mat(1) = task.gray.InRange(lastThird, 255)            ' lightest
-        mats.mat(2) = task.gray.InRange(firstThird, lastThird - 1) ' other
+                  cv.Cv2.InRange(task.gray, 0, firstThird - 1, mats.mat(0))         ' darkest
+                  cv.Cv2.InRange(task.gray, lastThird, 255, mats.mat(1))            ' lightest
+                  cv.Cv2.InRange(task.gray, firstThird, lastThird - 1, mats.mat(2)) ' other
 
         If standaloneTest() Then
             mats.Run(emptyMat)

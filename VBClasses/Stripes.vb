@@ -109,8 +109,8 @@ Public Class XR_Stripes_Histogram : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         stripes.Run(src)
-        dst1 = stripes.dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        dst2 = stripes.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        dst3 = stripes.dst3.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        cv.Cv2.CvtColor(stripes.dst1, dst1, cv.ColorConversionCodes.BGR2GRAY)
+        cv.Cv2.CvtColor(stripes.dst2, dst2, cv.ColorConversionCodes.BGR2GRAY)
+        cv.Cv2.CvtColor(stripes.dst3, dst3, cv.ColorConversionCodes.BGR2GRAY)
     End Sub
 End Class

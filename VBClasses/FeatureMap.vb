@@ -18,7 +18,7 @@ Public Class FeatureMap_Basics : Inherits TaskParent
         For i = 0 To fp.facets.Count - 1
             Dim p1 = fp.facets(i)
             Dim p2 = fp.facets((i + 1) Mod fp.facets.Count)
-            dst.Line(p1, p2, color, task.lineWidth, task.lineType)
+            cv.Cv2.Line(dst, p1, p2, color, task.lineWidth, task.lineType)
         Next
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -36,13 +36,13 @@ Public Class FeatureMap_Basics : Inherits TaskParent
         genSorted.Clear()
         For i = 0 To basics.ptList.Count - 1
             Dim pt = basics.ptList(i)
-            If standaloneTest() Then dst2.Circle(pt, task.DotSize + 1, cv.Scalar.Yellow, -1, task.lineType)
+            If standaloneTest() Then cv.Cv2.Circle(dst2, pt, task.DotSize + 1, cv.Scalar.Yellow, -1, task.lineType)
             dst1.Set(Of Byte)(pt.Y, pt.X, 255)
 
             Dim g = basics.facetGen.dst0.Get(Of Integer)(pt.Y, pt.X)
             genSorted.Add(g, i)
             SetTrueText(CStr(g), pt)
-            dst2.Circle(pt, task.DotSize, task.highlight, -1, task.lineType)
+            cv.Cv2.Circle(dst2, pt, task.DotSize, task.highlight, -1, task.lineType)
         Next
         labels(2) = basics.labels(2)
         labels(3) = CStr(basics.ptList.Count) + " stable good features were found"
@@ -94,7 +94,7 @@ Public Class FeatureMap_StablePoints : Inherits TaskParent
         anchorPoint = ptList(index)
         If index < facetGen.facet.facetList.Count Then
             Dim bestFacet = facetGen.facet.facetList(index)
-            dst2.FillConvexPoly(bestFacet, cv.Scalar.Black, task.lineType)
+            cv.Cv2.FillConvexPoly(dst2, bestFacet, cv.Scalar.Black, task.lineType)
             DrawTour(dst2, bestFacet, task.highlight)
         End If
 
@@ -102,8 +102,8 @@ Public Class FeatureMap_StablePoints : Inherits TaskParent
         dst3 = src.Clone
         For i = 0 To ptList.Count - 1
             Dim pt = ptList(i)
-            dst2.Circle(pt, task.DotSize, task.highlight, -1, task.lineType)
-            dst3.Circle(pt, task.DotSize, task.highlight, -1, task.lineType)
+            cv.Cv2.Circle(dst2, pt, task.DotSize, task.highlight, -1, task.lineType)
+            cv.Cv2.Circle(dst3, pt, task.DotSize, task.highlight, -1, task.lineType)
         Next
         labels(2) = CStr(ptList.Count) + " stable points were identified with a max of " + CStr(maxGens) +
                         " generations."
@@ -169,7 +169,7 @@ Public Class FeatureMap_Core : Inherits TaskParent
             For Each pt In facets(i)
                 facetList.Add(New cv.Point(pt.X, pt.Y))
             Next
-            fcsMap.FillConvexPoly(facetList, i, cv.LineTypes.Link8)
+            cv.Cv2.FillConvexPoly(fcsMap, facetList, i, cv.LineTypes.Link8)
         Next
 
         If standaloneTest() Then dst2 = Palettize(fcsMap)
@@ -230,11 +230,11 @@ Public Class XR_FeatureMap_Edges : Inherits TaskParent
         fcs.Run(src)
         dst2 = src
 
-        dst3 = task.edges.dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        cv.Cv2.CvtColor(task.edges.dst2, dst3, cv.ColorConversionCodes.GRAY2BGR)
         For Each fp In fcs.fpList
             If fp.depth Then
-                dst2.Circle(fp.pt, task.DotSize + 3, task.highlight, -1, task.lineType)
-                dst3.Circle(fp.pt, task.DotSize + 3, task.highlight, -1, task.lineType)
+            cv.Cv2.Circle(dst2, fp.pt, task.DotSize + 3, task.highlight, -1, task.lineType)
+            cv.Cv2.Circle(dst3, fp.pt, task.DotSize + 3, task.highlight, -1, task.lineType)
             End If
         Next
         labels = fcs.labels
@@ -257,7 +257,7 @@ Public Class XR_FeatureMap_WithAge : Inherits TaskParent
 
         dst3.SetTo(0)
         For Each fp In fcs.fpList
-            dst3.Circle(fp.pt, task.DotSize, task.highlight, -1, task.lineType)
+        cv.Cv2.Circle(dst3, fp.pt, task.DotSize, task.highlight, -1, task.lineType)
             If fp.age >= 1000 Then fp.age = 2
         Next
     End Sub
@@ -287,7 +287,7 @@ Public Class XR_FeatureMap_BestAge : Inherits TaskParent
         Dim maxIndex As Integer = 0
         For Each index In fpSorted.Values
             Dim fp = fcs.fpList(index)
-            dst3.Circle(fp.pt, task.DotSize, task.highlight, -1, task.lineType)
+            cv.Cv2.Circle(dst3, fp.pt, task.DotSize, task.highlight, -1, task.lineType)
             If fp.age >= 1000 Then fp.age = 2
             maxIndex += 1
             If maxIndex >= 10 Then Exit For
@@ -318,7 +318,7 @@ Public Class XR_FeatureMap_RedCloud1 : Inherits TaskParent
         labels(3) = fcs.labels(2)
         For Each fp In fcs.fpList
             Dim val = dst2.Get(Of cv.Vec3b)(fp.pt.Y, fp.pt.X)
-            dst3.FillConvexPoly(fp.facets, val)
+            cv.Cv2.FillConvexPoly(dst3, fp.facets, val)
         Next
     End Sub
 End Class
@@ -513,7 +513,7 @@ Public Class XR_FeatureMap_ByDepth : Inherits TaskParent
 
         Dim incr = dst1.Width / task.histogramBins
         Dim histIndex = Math.Truncate(task.mouseMovePoint.X / incr)
-        dst1.Rectangle(New cv.Rect(CInt(histIndex * incr), 0, incr, dst2.Height), cv.Scalar.Yellow, task.lineWidth)
+        cv.Cv2.Rectangle(dst1, New cv.Rect(CInt(histIndex * incr), 0, incr, dst2.Height), cv.Scalar.Yellow, task.lineWidth)
         Dim depthIncr = (plotHist.maxRange - plotHist.minRange) / task.histogramBins
         Dim depthStart = histIndex * depthIncr
         Dim depthEnd = (histIndex + 1) * depthIncr
@@ -531,7 +531,7 @@ Public Class XR_FeatureMap_ByDepth : Inherits TaskParent
             If fp.depth > depthStart And fp.depth < depthEnd Then
                 Dim val = palInput.Get(Of Byte)(fp.pt.Y, fp.pt.X)
                 If val = 0 Then
-                    palInput.FillConvexPoly(fp.facets, fp.brickIndex Mod 255)
+                cv.Cv2.FillConvexPoly(palInput, fp.facets, fp.brickIndex Mod 255)
                     fpCells.Add((fp, task.frameCount))
                 End If
             End If
@@ -542,7 +542,9 @@ Public Class XR_FeatureMap_ByDepth : Inherits TaskParent
             FeatureMap_Basics.fpCellContour(fp, task.color, 0)
         Next
         dst3 = Palettize(palInput)
-        dst3.SetTo(0, palInput.Threshold(0, 255, cv.ThresholdTypes.BinaryInv))
+        Dim tmp As New cv.Mat
+        cv.Cv2.Threshold(palInput, tmp, 0, cv.Scalar.All(255), cv.ThresholdTypes.BinaryInv)
+        dst3.SetTo(cv.Scalar.All(0), tmp)
 
 
         Dim removeFrame As Integer = If(task.frameCount > task.fOptions.FrameHistoryCount.Value , task.frameCount - task.fOptions.FrameHistoryCount.Value , -1)
@@ -577,8 +579,8 @@ Public Class FeatureMap_Periphery : Inherits TaskParent
         ptInside.Clear()
         For Each fp In fcs.fpList
             If fp.periph Then
-                dst3.FillConvexPoly(fp.facets, cv.Scalar.Gray, task.lineType)
-                dst3.Circle(fp.pt, task.DotSize, task.highlight, -1, task.lineType)
+            cv.Cv2.FillConvexPoly(dst3, fp.facets, cv.Scalar.Gray, task.lineType)
+            cv.Cv2.Circle(dst3, fp.pt, task.DotSize, task.highlight, -1, task.lineType)
                 ptOutside.Add(fp.pt)
             Else
                 ptInside.Add(fp.pt)
@@ -606,7 +608,7 @@ Public Class XR_FeatureMap_PeripheryNot : Inherits TaskParent
 
         dst3.SetTo(0)
         For Each fp In perif.fcs.fpList
-            If fp.periph = False Then dst3.FillConvexPoly(fp.facets, 255, task.lineType)
+            If fp.periph = False Then cv.Cv2.FillConvexPoly(dst3, fp.facets, 255, task.lineType)
         Next
         ' FeatureMap_Basics.fpDSet()
         labels = perif.labels
@@ -657,7 +659,7 @@ Public Class XR_FeatureMap_BrickPoints : Inherits TaskParent
         anchorPoint = ptList(index)
         If index < facetGen.facet.facetList.Count Then
             Dim bestFacet = facetGen.facet.facetList(index)
-            dst2.FillConvexPoly(bestFacet, cv.Scalar.Black, task.lineType)
+            cv.Cv2.FillConvexPoly(dst2, bestFacet, cv.Scalar.Black, task.lineType)
             DrawTour(dst2, bestFacet, task.highlight)
         End If
 
@@ -665,8 +667,8 @@ Public Class XR_FeatureMap_BrickPoints : Inherits TaskParent
         dst3 = src.Clone
         For i = 0 To ptList.Count - 1
             Dim pt = ptList(i)
-            dst2.Circle(pt, task.DotSize, task.highlight, -1, task.lineType)
-            dst3.Circle(pt, task.DotSize, task.highlight, -1, task.lineType)
+            cv.Cv2.Circle(dst2, pt, task.DotSize, task.highlight, -1, task.lineType)
+            cv.Cv2.Circle(dst3, pt, task.DotSize, task.highlight, -1, task.lineType)
         Next
         labels(2) = CStr(ptList.Count) + " stable points were identified with a max of " + CStr(maxGens) +
                         " generations."
@@ -696,7 +698,7 @@ Public Class FeatureMap_Motion : Inherits TaskParent
         dst2 = fcs.dst2
 
         For Each fp In fcs.fpList
-            If fp.depth > 0 Then dst2.Circle(fp.pt, task.DotSize, task.highlight, -1, task.lineType)
+            If fp.depth > 0 Then cv.Cv2.Circle(dst2, fp.pt, task.DotSize, task.highlight, -1, task.lineType)
         Next
 
         Dim motionCount As Integer, linkedCount As Integer
@@ -792,12 +794,12 @@ Public Class FeatureMap_CreateList : Inherits TaskParent
 
             fpList.Add(fp)
 
-            dst2.FillConvexPoly(fp.facets, i Mod 256, task.lineType)
+            cv.Cv2.FillConvexPoly(dst2, fp.facets, i Mod 256, task.lineType)
         Next
 
         dst3 = Palettize(dst2)
         For Each fp In fpList
-            If fp.depth > 0 Then dst3.Circle(fp.pt, task.DotSize, task.highlight, -1, task.lineType)
+            If fp.depth > 0 Then cv.Cv2.Circle(dst3, fp.pt, task.DotSize, task.highlight, -1, task.lineType)
         Next
 
         If standalone And task.fpD IsNot Nothing Then FeatureMap_Basics.fpCellContour(task.fpD, task.color)

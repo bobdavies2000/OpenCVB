@@ -11,9 +11,10 @@ Public Class FrameRate_Basics : Inherits TaskParent
         For i = 0 To frameCounts.Count - 1
             mats.mat(i) = Choose(i + 1, task.color, task.leftView, task.rightView, task.depthRGB).clone()
             mats.mat(i) -= lastImages(i)
-            Dim count = mats.mat(i).Sum()
+            Dim count = cv.Cv2.Sum(mats.mat(i))
             If count(0) > 0 Or count(1) > 0 Or count(2) > 0 Then frameCounts(i) += 1
-            mats.mat(i) = mats.mat(i).Threshold(0, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs
+            cv.Cv2.Threshold(mats.mat(i), mats.mat(i), 0, 255, cv.ThresholdTypes.Binary)
+            cv.Cv2.ConvertScaleAbs(mats.mat(i), mats.mat(i))
         Next
         If task.heartBeat Then
             strOut = ""
@@ -47,16 +48,16 @@ Public Class XR_FrameRate_BasicsGray : Inherits TaskParent
         For i = 0 To frameCounts.Count - 1
             mats.mat(i) = Choose(i + 1, task.color, task.leftView, task.rightView, task.depthRGB).clone()
             If mats.mat(i).Channels > 1 Then
-                mats.mat(i) = mats.mat(i).CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-                lastImages(i) = lastImages(i).CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+                cv.Cv2.CvtColor(mats.mat(i), mats.mat(i), cv.ColorConversionCodes.BGR2GRAY)
+                cv.Cv2.CvtColor(lastImages(i), lastImages(i), cv.ColorConversionCodes.BGR2GRAY)
             Else
                 mats.mat(i) = mats.mat(i)
                 lastImages(i) = lastImages(i)
             End If
             mats.mat(i) -= lastImages(i)
-            Dim count = mats.mat(i).CountNonZero()
+            Dim count = cv.Cv2.CountNonZero(mats.mat(i))
             If count > 0 Then frameCounts(i) += 1
-            mats.mat(i) = mats.mat(i).Threshold(0, 255, cv.ThresholdTypes.Binary)
+            cv.Cv2.Threshold(mats.mat(i), mats.mat(i), 0, 255, cv.ThresholdTypes.Binary)
         Next
         If task.heartBeat Then
             strOut = ""

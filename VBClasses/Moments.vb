@@ -17,7 +17,7 @@ Public Class Moments_Basics : Inherits TaskParent
         Static center As cv.Point2f
         If standaloneTest() Then
             fore.Run(src)
-            dst2 = fore.dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+            cv.Cv2.CvtColor(fore.dst2, dst2, cv.ColorConversionCodes.GRAY2BGR)
         End If
         Dim m = cv.Cv2.Moments(fore.dst2, True)
 
@@ -29,7 +29,7 @@ Public Class Moments_Basics : Inherits TaskParent
         Else
             center = New cv.Point2f(m.M10 / m.M00, m.M01 / m.M00)
         End If
-        If standaloneTest() Then dst2.Circle(center, task.DotSize + 5, cv.Scalar.Red, -1, task.lineType)
+        If standaloneTest() Then cv.Cv2.Circle(dst2, center, task.DotSize + 5, cv.Scalar.Red, -1, task.lineType)
         centroid = New cv.Point2f(scaleFactor * (offsetPt.X + center.X), scaleFactor * (offsetPt.Y + center.Y))
     End Sub
 End Class
@@ -48,13 +48,13 @@ Public Class XR_Moments_CentroidKalman : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         fore.Run(src)
-        dst2 = fore.dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        cv.Cv2.CvtColor(fore.dst2, dst2, cv.ColorConversionCodes.GRAY2BGR)
         Dim m = cv.Cv2.Moments(fore.dst2, True)
         If m.M00 > 5000 Then ' if more than x pixels are present (avoiding a zero area!)
             kalman.kInput(0) = m.M10 / m.M00
             kalman.kInput(1) = m.M01 / m.M00
             kalman.Run(emptyMat)
-            dst2.Circle(New cv.Point(kalman.kOutput(0), kalman.kOutput(1)), task.DotSize + 5, cv.Scalar.Red, -1, task.lineType)
+            cv.Cv2.Circle(dst2, New cv.Point(kalman.kOutput(0), kalman.kOutput(1)), task.DotSize + 5, cv.Scalar.Red, -1, task.lineType)
         End If
     End Sub
 End Class

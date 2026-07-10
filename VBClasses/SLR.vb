@@ -166,7 +166,7 @@ Public Class XR_SLR_TrendImages : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
 
-        Dim split = src.Split()
+        Dim split = cv.Cv2.Split(src)
         trends.hist.plotHist.maxRange = 255
         trends.hist.plotHist.removeZeroEntry = False ' default is to look at element 0....
 
@@ -239,7 +239,7 @@ Public Class SLR_Trends : Inherits TaskParent
         Dim p1 = New cv.Point2f(x, y)
         resultingPoints.Add(p1)
         resultingValues.Add(p1.Y)
-        dst.Line(lastPoint, p1, cv.Scalar.Yellow, task.lineWidth + 1, task.lineType)
+        cv.Cv2.Line(dst, lastPoint, p1, cv.Scalar.Yellow, task.lineWidth + 1, task.lineType)
         lastPoint = p1
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)

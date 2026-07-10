@@ -1,4 +1,4 @@
-﻿Imports cv = OpenCvSharp
+Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 Imports VBClasses
 Public Class Classifier_Basics_CPP : Inherits TaskParent

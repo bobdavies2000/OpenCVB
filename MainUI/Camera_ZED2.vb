@@ -57,10 +57,10 @@ Namespace MainApp
             IMU_TimeStamp = (zed.IMU_TimeStamp - IMU_StartTime) / 4000000 ' crude conversion to milliseconds.
 
             SyncLock cameraMutex
-                color = zed.color.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
-                pointCloud = zed.pointCloud.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
-                leftView = zed.leftView.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
-                rightView = zed.rightView.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
+                cv.Cv2.Resize(zed.color, color, workRes, 0, 0, cv.InterpolationFlags.Nearest)
+                cv.Cv2.Resize(zed.pointCloud, pointCloud, workRes, 0, 0, cv.InterpolationFlags.Nearest)
+                cv.Cv2.Resize(zed.leftView, leftView, workRes, 0, 0, cv.InterpolationFlags.Nearest)
+                cv.Cv2.Resize(zed.rightView, rightView, workRes, 0, 0, cv.InterpolationFlags.Nearest)
             End SyncLock
 
             MyBase.GetNextFrameCounts()

@@ -26,7 +26,7 @@ Public Class XR_Blur_Homogeneous : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         Dim kernelSize = CInt(blurKernelSlider.Value) Or 1
-        dst2 = src.Blur(New cv.Size(kernelSize, kernelSize), New cv.Point(-1, -1))
+        cv.Cv2.Blur(src, dst2, New cv.Size(kernelSize, kernelSize), New cv.Point(-1, -1))
     End Sub
 End Class
 
@@ -87,8 +87,8 @@ Public Class XR_Blur_TopoMap : Inherits TaskParent
         dst2 = gradient.magnitude
 
         If options.kernelSize > 1 Then cv.Cv2.GaussianBlur(dst2, dst3, New cv.Size(options.kernelSize, options.kernelSize), 0, 0)
-        dst3 = dst3.Normalize(255)
-        dst3 = dst3.ConvertScaleAbs(255)
+        cv.Cv2.Normalize(dst3, dst3, 255)
+        cv.Cv2.ConvertScaleAbs(dst3, dst3, 255)
 
         dst3 = (dst3 * 1 / options.blurReduction).ToMat
         dst3 = (dst3 * options.blurReduction).ToMat
@@ -136,7 +136,7 @@ Public Class XR_Blur_Detection : Inherits TaskParent
         cv.Cv2.MeanStdDev(dst2, mean, stdev)
         SetTrueText("Blur variance is " + Format(stdev * stdev, fmt3), 3)
 
-        If standaloneTest() Then dst2.Rectangle(r, white, task.lineWidth)
+If standaloneTest() Then cv.Cv2.Rectangle(dst2, r, white, task.lineWidth)
     End Sub
 End Class
 
@@ -152,7 +152,9 @@ Public Class XR_Blur_Depth : Inherits TaskParent
         desc = "Blur the depth results to help find the boundaries to large depth regions"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        dst3 = task.depthRGB.CvtColor(cv.ColorConversionCodes.BGR2GRAY).Threshold(0, 255, cv.ThresholdTypes.Binary)
+        Dim _cvt1 As New cv.Mat
+        cv.Cv2.CvtColor(task.depthRGB, _cvt1, cv.ColorConversionCodes.BGR2GRAY)
+        cv.Cv2.Threshold(_cvt1, dst3, 0, 255, cv.ThresholdTypes.Binary)
 
         blur.Run(dst3)
         dst2 = blur.dst2

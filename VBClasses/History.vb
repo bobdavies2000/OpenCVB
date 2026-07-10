@@ -81,7 +81,7 @@ Public Class History_BasicsNoSaturation : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         Dim input = src.Clone
-        If input.Channels() <> 1 Then input = input.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If input.Channels() <> 1 Then cv.Cv2.CvtColor(input, input, cv.ColorConversionCodes.BGR2GRAY)
         If input.Type <> cv.MatType.CV_32F Then input.ConvertTo(input, cv.MatType.CV_32F)
         If dst3.Type <> input.Type Or dst3.Channels() <> input.Channels() Then dst3 = New cv.Mat(input.Size(), input.Type, 0)
         input /= 255 ' input is all zeros or ones.
@@ -146,7 +146,7 @@ Public Class History_Basics8U : Inherits TaskParent
             If task.firstPass Then lastFrame = src.Clone
             cv.Cv2.Absdiff(src, lastFrame, dst3)
             lastFrame = src.Clone
-            src = dst3.Threshold(options.pixelDiffThreshold, 255, cv.ThresholdTypes.Binary)
+            cv.Cv2.Threshold(dst3, src, options.pixelDiffThreshold, 255, cv.ThresholdTypes.Binary)
         End If
 
         If task.fOptions.FrameHistoryCount.Value  = 1 Then

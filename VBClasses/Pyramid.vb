@@ -9,12 +9,13 @@ Public Class Pyramid_Basics : Inherits TaskParent
         options.Run()
 
         If options.zoom <> 0 Then
+            Dim tmp As New cv.Mat
             If options.zoom < 0 Then
-                Dim tmp = src.PyrDown(New cv.Size(src.Cols / 2, src.Rows / 2))
+                cv.Cv2.PyrDown(src, tmp, New cv.Size(src.Cols / 2, src.Rows / 2))
                 Dim roi = New cv.Rect((src.Cols - tmp.Cols) / 2, (src.Rows - tmp.Rows) / 2, tmp.Width, tmp.Height)
                 dst2(roi) = tmp
             Else
-                Dim tmp = src.PyrUp(New cv.Size(src.Cols * 2, src.Rows * 2))
+                cv.Cv2.PyrUp(src, tmp, New cv.Size(src.Cols * 2, src.Rows * 2))
                 Dim roi = New cv.Rect((tmp.Cols - src.Cols) / 2, (tmp.Rows - src.Rows) / 2, src.Width, src.Height)
                 dst2 = tmp(roi)
             End If

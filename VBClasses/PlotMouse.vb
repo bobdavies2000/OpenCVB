@@ -1,4 +1,4 @@
-﻿Imports cv = OpenCvSharp
+Imports cv = OpenCvSharp
 Public Class PlotMouse_Basics : Inherits TaskParent
     Public plotHist As New PlotBar_Basics
     Public histogram As New cv.Mat
@@ -41,12 +41,13 @@ Public Class PlotMouse_Basics : Inherits TaskParent
         mask.ConvertTo(mask, cv.MatType.CV_8U)
 
         If mask.Size = dst3.Size Then dst3.SetTo(task.highlight, mask)
-        labels(3) = "BackProjected pixel (% of image) = " + Format(mask.CountNonZero / src.Total, "0%")
+        Dim count = cv.Cv2.CountNonZero(mask)
+        labels(3) = "BackProjected pixel (% of image) = " + Format(count / src.Total, "0%")
 
         Dim barCount = plotHist.histArray(histIndex)
         labels(2) = "Selection highlighted is " + CStr(histIndex) + " and shows " + CStr(barCount) + " (or " +
                     Format(barCount / src.Total, "0%") + ") samples"
-        dst2.Rectangle(New cv.Rect(CInt(histIndex) * barWidth, 0, barWidth, dst2.Height), cv.Scalar.Yellow, task.lineWidth)
+                    cv.Cv2.Rectangle(dst2, New cv.Rect(CInt(histIndex) * barWidth, 0, barWidth, dst2.Height), cv.Scalar.Yellow, task.lineWidth)
     End Sub
 End Class
 
@@ -79,7 +80,7 @@ Public Class PlotMouse_Basics32F : Inherits TaskParent
 
         Dim stepsize = dst2.Width / task.MaxZmeters
         For i = 1 To CInt(task.MaxZmeters) - 1
-            dst2.Line(New cv.Point(stepsize * i, 0), New cv.Point(stepsize * i, dst2.Height), white, Utility_Basics.getThickness)
+            cv.Cv2.Line(dst2, New cv.Point(stepsize * i, 0), New cv.Point(stepsize * i, dst2.Height), white, Utility_Basics.getThickness)
         Next
 
         Dim barWidth = dst2.Width / task.histogramBins
@@ -91,12 +92,12 @@ Public Class PlotMouse_Basics32F : Inherits TaskParent
         cv.Cv2.CalcBackProject({src}, {0}, histogram, mask, bpRanges)
         mask.ConvertTo(mask, cv.MatType.CV_8U)
 
-        Dim maskCount = mask.CountNonZero
+        Dim maskCount = cv.Cv2.CountNonZero(mask)
         If mask.Size = dst3.Size Then dst3.SetTo(task.highlight, mask)
         labels(3) = "BackProjected pixel (% of image) = " + Format(maskCount / src.Total, "0%")
 
         labels(2) = "Histogram Depth to " + Format(task.MaxZmeters, "0.0") + " m"
-        dst2.Rectangle(New cv.Rect(CInt(histIndex) * barWidth, 0, barWidth, dst2.Height), cv.Scalar.Yellow, task.lineWidth)
+        cv.Cv2.Rectangle(dst2, New cv.Rect(CInt(histIndex) * barWidth, 0, barWidth, dst2.Height), cv.Scalar.Yellow, task.lineWidth)
     End Sub
 End Class
 
@@ -141,17 +142,17 @@ Public Class PlotMouse_Correlation : Inherits TaskParent
         Dim totalPixels = dst2.Total ' assume we are including zeros.
         Dim barWidth = dst2.Width / task.histogramBins
         Dim histIndex = Math.Floor(task.mouseMovePoint.X / barWidth)
-        dst0 = dst1.InRange(histIndex, histIndex)
+                  cv.Cv2.InRange(dst1, histIndex, histIndex, dst0)
         If ranges(histIndex) IsNot Nothing Then
             labels(2) = "For bin " + CStr(histIndex) + " " + Format(ranges(histIndex).Average, fmt1) +
                     " average range and min/max " + Format(ranges(histIndex).Min, fmt1) + "/" +
                     Format(ranges(histIndex).Max, fmt1)
         End If
 
-        Dim actualCount = dst0.CountNonZero
+        Dim actualCount = cv.Cv2.CountNonZero(dst0)
         dst3 = task.color.Clone
         dst3.SetTo(cv.Scalar.Yellow, dst0)
-        dst2.Rectangle(New cv.Rect(CInt(histIndex) * barWidth, 0, barWidth, dst2.Height), cv.Scalar.Yellow, task.lineWidth)
+        cv.Cv2.Rectangle(dst2, New cv.Rect(CInt(histIndex) * barWidth, 0, barWidth, dst2.Height), cv.Scalar.Yellow, task.lineWidth)
     End Sub
 End Class
 
@@ -237,7 +238,7 @@ Public Class PlotMouse_MaskBackProject : Inherits TaskParent
 
         cv.Cv2.CalcBackProject({task.gray}, {0}, hist.histogram, dst1, ranges)
         dst3.SetTo(task.highlight, dst1)
-        dst2.Rectangle(New cv.Rect(CInt(histIndex * barWidth), 0, barWidth, dst2.Height), cv.Scalar.Yellow, task.lineWidth)
-        labels(3) = CStr(dst1.CountNonZero) + " pixels in the back projection."
+        cv.Cv2.Rectangle(dst2, New cv.Rect(CInt(histIndex * barWidth), 0, barWidth, dst2.Height), cv.Scalar.Yellow, task.lineWidth)
+        labels(3) = CStr(cv.Cv2.CountNonZero(dst1)) + " pixels in the back projection."
     End Sub
 End Class

@@ -862,10 +862,8 @@ XR_Binarize_DepthTiers
 XR_Binarize_FourPixelFlips
 XR_Binarize_KMeansMasks
 XR_Binarize_KMeansRGB
-XR_Binarize_Niblack_Sauvola
 XR_Binarize_OTSU
 XR_Binarize_SimpleOld
-XR_Binarize_Wolf_Nick
 XR_Blur_Depth
 XR_Blur_Detection
 XR_Blur_Gaussian
@@ -1066,7 +1064,6 @@ XR_Distance_LabelsNoDepth
 XR_Distance_PeakDepth
 XR_Distance_PeakNoDepth
 XR_Dither_Basics
-XR_DNN_Basics
 XR_DNN_SuperRes
 XR_DNN_SuperResize
 XR_Draw_ClipLine

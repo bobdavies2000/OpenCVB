@@ -11,13 +11,13 @@ Public Class XR_Transform_Resize : Inherits TaskParent
         Dim h = CInt(options.resizeFactor * src.Height)
         If options.resizeFactor > 1 Then
             Dim tmp As New cv.Mat
-            tmp = src.Resize(New cv.Size(w, h), 0)
+            cv.Cv2.Resize(src, tmp, New cv.Size(w, h), 0)
             Dim roi = New cv.Rect((w - src.Width) / 2, (h - src.Height) / 2, src.Width, src.Height)
             tmp(roi).CopyTo(dst2)
         Else
             dst2.SetTo(0)
             Dim roi = New cv.Rect((src.Width - w) / 2, (src.Height - h) / 2, w, h)
-            dst2(roi) = src.Resize(New cv.Size(w, h), 0)
+            cv.Cv2.Resize(src, dst2(roi), New cv.Size(w, h), 0)
         End If
     End Sub
 End Class
@@ -102,7 +102,7 @@ Public Class XR_Transform_Rotate : Inherits TaskParent
         imageCenter = New cv.Point2f(options.centerX, options.centerY)
         Dim rotationMat = cv.Cv2.GetRotationMatrix2D(imageCenter, options.angle, options.scale)
         cv.Cv2.WarpAffine(src, dst2, rotationMat, New cv.Size())
-        dst2.Circle(imageCenter, task.DotSize * 2, cv.Scalar.Yellow, -1, task.lineType)
-        dst2.Circle(imageCenter, task.DotSize, cv.Scalar.Blue, -1, task.lineType)
+        cv.Cv2.Circle(dst2, imageCenter, task.DotSize * 2, cv.Scalar.Yellow, -1, task.lineType)
+        cv.Cv2.Circle(dst2, imageCenter, task.DotSize, cv.Scalar.Blue, -1, task.lineType)
     End Sub
 End Class

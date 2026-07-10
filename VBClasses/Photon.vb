@@ -14,10 +14,10 @@ Public Class Photon_Basics : Inherits TaskParent
         cv.Cv2.Absdiff(src, lastImage, dst1)
 
         dst0 = dst1.Reshape(1, dst1.Rows * 3)
-        dst1 = dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        dst1 = dst1.Threshold(0, 255, cv.ThresholdTypes.Binary)
+        cv.Cv2.CvtColor(dst1, dst1, cv.ColorConversionCodes.BGR2GRAY)
+        cv.Cv2.Threshold(dst1, dst1, 0, 255, cv.ThresholdTypes.Binary)
 
-        If dst0.CountNonZero > 0 Then
+        If cv.Cv2.CountNonZero(dst0) > 0 Then
             dst2 = dst1.Clone
             hist.Run(dst0)
             dst3 = hist.dst2
@@ -55,11 +55,11 @@ Public Class XR_Photon_Test : Inherits TaskParent
         strOut = ""
         Dim reductionVal = task.fOptions.ReductionColor.Value
         For i = 0 To counts.Length - 1
-            mats.mat(i) = dst1.InRange(reductionVal * i, reductionVal * i)
-            counts(i).Add(mats.mat(i).CountNonZero)
+            cv.Cv2.InRange(dst1, reductionVal * i, reductionVal * i, mats.mat(i))
+            counts(i).Add(cv.Cv2.CountNonZero(mats.mat(i)))
             If counts(i).Count > testCount Then counts(i).RemoveAt(0)
             strOut += "for " + CStr(i * reductionVal) + " average = " + Format(counts(i).Average, "###,##0") + " min = " +
-                           Format(counts(i).Min, "###,##0.0") + " max = " + Format(counts(i).Max, "###,##0.0") + vbCrLf
+                               Format(counts(i).Min, "###,##0.0") + " max = " + Format(counts(i).Max, "###,##0.0") + vbCrLf
         Next
         SetTrueText(strOut, 3)
         mats.Run(emptyMat)
@@ -108,8 +108,10 @@ Public Class XR_Photon_Subtraction : Inherits TaskParent
         dst2 = hist.dst2
 
         subOutput = subOutput.Reshape(3, dst2.Height)
-        dst1 = subOutput.CvtColor(cv.ColorConversionCodes.BGR2GRAY).Threshold(0, 255, cv.ThresholdTypes.Binary)
-        If dst1.CountNonZero Then dst3 = dst1.Clone ' occasionally the image returned is identical to the last.  hmmm...
+        Dim _cvt1 As New cv.Mat
+        cv.Cv2.CvtColor(subOutput, _cvt1, cv.ColorConversionCodes.BGR2GRAY)
+        cv.Cv2.Threshold(_cvt1, dst1, 0, 255, cv.ThresholdTypes.Binary)
+        If cv.Cv2.CountNonZero(dst1) Then dst3 = dst1.Clone ' occasionally the image returned is identical to the last.  hmmm...
         lastImage = src
     End Sub
 End Class

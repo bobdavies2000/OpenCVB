@@ -22,8 +22,9 @@ Public Class Distance_Basics : Inherits TaskParent
     End Function
     Public Shared Function GetMaxDist(ByRef md As maskData) As cv.Point
         Dim mask = md.mask.Clone
-        mask.Rectangle(New cv.Rect(0, 0, mask.Width, mask.Height), 0, 1)
-        Dim distance32f = mask.DistanceTransform(cv.DistanceTypes.L1, 0)
+        cv.Cv2.Rectangle(mask, New cv.Rect(0, 0, mask.Width, mask.Height), cv.Scalar.All(0), 1)
+        Dim distance32f As New cv.Mat
+        cv.Cv2.DistanceTransform(mask, distance32f, cv.DistanceTypes.L1, cv.DistanceTransformMasks.Precise, cv.MatType.CV_32F)
         Dim mm As mmData = GetMinMax(distance32f)
         mm.maxLoc.X += md.rect.X
         mm.maxLoc.Y += md.rect.Y
@@ -32,8 +33,9 @@ Public Class Distance_Basics : Inherits TaskParent
     End Function
     Public Shared Function GetMaxDist(ByRef maskInput As cv.Mat, rect As cv.Rect) As cv.Point
         Dim mask = maskInput.Clone
-        mask.Rectangle(New cv.Rect(0, 0, mask.Width, mask.Height), 0, 1)
-        Dim distance32f = mask.DistanceTransform(cv.DistanceTypes.L1, 0)
+        cv.Cv2.Rectangle(mask, New cv.Rect(0, 0, mask.Width, mask.Height), cv.Scalar.All(0), 1)
+        Dim distance32f As New cv.Mat
+        cv.Cv2.DistanceTransform(mask, distance32f, cv.DistanceTypes.L1, cv.DistanceTransformMasks.Precise, cv.MatType.CV_32F)
         Dim mm As mmData = GetMinMax(distance32f)
         mm.maxLoc.X += rect.X
         mm.maxLoc.Y += rect.Y
@@ -43,8 +45,9 @@ Public Class Distance_Basics : Inherits TaskParent
     Public Shared Function GetMaxDistDepth(ByRef maskInput As cv.Mat, rect As cv.Rect) As cv.Point
         Dim depth As New cv.Mat
         task.depthmask(rect).CopyTo(depth, maskInput)
-        depth.Rectangle(New cv.Rect(0, 0, depth.Width, depth.Height), 0, 1)
-        Dim distance32f = depth.DistanceTransform(cv.DistanceTypes.L1, 0)
+        cv.Cv2.Rectangle(depth, New cv.Rect(0, 0, depth.Width, depth.Height), cv.Scalar.All(0), 1)
+        Dim distance32f As New cv.Mat
+        cv.Cv2.DistanceTransform(depth, distance32f, cv.DistanceTypes.L1, cv.DistanceTransformMasks.Precise, cv.MatType.CV_32F)
         Dim mm As mmData = GetMinMax(distance32f)
         mm.maxLoc.X += rect.X
         mm.maxLoc.Y += rect.Y
@@ -88,10 +91,11 @@ Public Class Distance_Foreground : Inherits TaskParent
         If l1Radio.Checked Then DistanceType = cv.DistanceTypes.L1
 
         dst0 = dst3 And task.gray
-        dst0 = dst0.DistanceTransform(DistanceType, cv.DistanceTransformMasks.Precise)
-        Dim dist32f = dst0.Normalize(0, 255, cv.NormTypes.MinMax)
+        cv.Cv2.DistanceTransform(dst0, dst0, DistanceType, cv.DistanceTransformMasks.Precise, cv.MatType.CV_32F)
+        Dim dist32f As New cv.Mat
+        cv.Cv2.Normalize(dst0, dist32f, 0, 255, cv.NormTypes.MinMax)
         dist32f.ConvertTo(dst1, cv.MatType.CV_8UC1)
-        dst2 = dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        cv.Cv2.CvtColor(dst1, dst2, cv.ColorConversionCodes.GRAY2BGR)
     End Sub
 End Class
 
@@ -136,7 +140,7 @@ Public Class Distance_Point3D : Inherits TaskParent
             dst2.SetTo(0)
             Dim p1 = New cv.Point(inPoint1.X, inPoint1.Y)
             Dim p2 = New cv.Point(inPoint2.X, inPoint2.Y)
-            dst2.Line(p1, p2, task.highlight, task.lineWidth, task.lineType)
+            cv.Cv2.Line(dst2, p1, p2, task.highlight, task.lineWidth, task.lineType)
 
             Dim vec1 = task.pointCloud.Get(Of cv.Point3f)(p1.Y, p1.X)
             Dim vec2 = task.pointCloud.Get(Of cv.Point3f)(p2.Y, p2.X)
@@ -208,7 +212,7 @@ Public Class XR_Distance_BinaryImage : Inherits TaskParent
             distance.Run(dst2)
         End If
         dst3 = distance.dst2
-        dst1 = dst3.Threshold(task.gOptions.DebugSlider.Value, 255, cv.ThresholdTypes.Binary)
+        cv.Cv2.Threshold(dst3, dst1, task.gOptions.DebugSlider.Value, 255, cv.ThresholdTypes.Binary)
     End Sub
 End Class
 
@@ -224,8 +228,9 @@ Public Class XR_Distance_PeakDepth : Inherits TaskParent
         desc = "Find the grid rects which are furthest from the zero depth"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If task.noDepthMask.CountNonZero = task.noDepthMask.Total Then Exit Sub ' startup issue 
-        Dim distance32f = task.depthmask.DistanceTransform(cv.DistanceTypes.L1, 0)
+If cv.Cv2.CountNonZero(task.noDepthMask) = task.noDepthMask.Total Then Exit Sub ' startup issue 
+        Dim distance32f As New cv.Mat
+        cv.Cv2.DistanceTransform(task.depthmask, distance32f, cv.DistanceTypes.L1, cv.DistanceTransformMasks.Precise, cv.MatType.CV_32F)
 
         Dim maxList As New List(Of Double)
         Dim ptList As New List(Of cv.Point)
@@ -239,7 +244,7 @@ Public Class XR_Distance_PeakDepth : Inherits TaskParent
         If standalone Then
             dst3 = src.Clone
             For Each pt In ptList
-                dst3.Circle(pt, task.DotSize, task.highlight, -1, task.lineType)
+            cv.Cv2.Circle(dst3, pt, task.DotSize, task.highlight, -1, task.lineType)
             Next
             labels(3) = CStr(ptList.Count) + " points selected"
         End If
@@ -265,8 +270,9 @@ Public Class XR_Distance_PeakNoDepth : Inherits TaskParent
         desc = "Find the grid rects which are furthest from the zero depth"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If task.noDepthMask.CountNonZero = task.noDepthMask.Total Then Exit Sub ' startup issue 
-        Dim distance32f = task.noDepthMask.DistanceTransform(cv.DistanceTypes.L1, 0)
+If cv.Cv2.CountNonZero(task.noDepthMask) = task.noDepthMask.Total Then Exit Sub ' startup issue 
+        Dim distance32f As New cv.Mat
+        cv.Cv2.DistanceTransform(task.noDepthMask, distance32f, cv.DistanceTypes.L1, cv.DistanceTransformMasks.Precise, cv.MatType.CV_32F)
 
         Dim maxList As New List(Of Double)
         Dim ptList As New List(Of cv.Point)
@@ -279,7 +285,7 @@ Public Class XR_Distance_PeakNoDepth : Inherits TaskParent
         If standalone Then
             dst3 = src.Clone
             For Each pt In ptList
-                dst3.Circle(pt, task.DotSize, task.highlight, -1, task.lineType)
+            cv.Cv2.Circle(dst3, pt, task.DotSize, task.highlight, -1, task.lineType)
             Next
             labels(3) = CStr(ptList.Count) + " points selected"
         End If
@@ -313,9 +319,9 @@ Public Class Distance_Labels : Inherits TaskParent
         If src.Channels() <> 1 Then src = task.gray
 
         cv.Cv2.DistanceTransformWithLabels(src, dst0, dst1, options.distanceType, cv.DistanceTransformMasks.Precise)
-        dst2 = dst0.Normalize(0, 255, cv.NormTypes.MinMax)
+        cv.Cv2.Normalize(dst0, dst2, 0, 255, cv.NormTypes.MinMax)
         dst2.ConvertTo(dst2, cv.MatType.CV_8UC1)
-        dst2 = dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        cv.Cv2.CvtColor(dst2, dst2, cv.ColorConversionCodes.GRAY2BGR)
 
         dst3 = Palettize(dst1)
         If standalone Then dst3.SetTo(0, task.depthmask)
@@ -400,7 +406,7 @@ Public Class Distance_Instant : Inherits TaskParent
         If standaloneTest() Then src = task.depthRGB
         If src.Channels() <> 1 Then src = task.gray
 
-        dst0 = src.DistanceTransform(options.distanceType, 0)
+        cv.Cv2.DistanceTransform(src, dst0, options.distanceType, cv.DistanceTransformMasks.Precise, cv.MatType.CV_32F)
         dst1 = Mat_Convert.Mat_32f_To_8UC3(dst0)
         dst1.ConvertTo(dst2, cv.MatType.CV_8UC1)
     End Sub
@@ -423,8 +429,8 @@ Public Class Distance_Depth : Inherits TaskParent
         Dim mm = GetMinMax(src)
         dst1 = src * 255 / mm.maxVal
         dst1.ConvertTo(dst1, cv.MatType.CV_8U)
-        dst2 = dst1.DistanceTransform(options.distanceType, 0)
-        dst3 = dst2.Threshold(task.gOptions.DebugSlider.Value, 255, cv.ThresholdTypes.Binary)
+        cv.Cv2.DistanceTransform(dst1, dst2, options.distanceType, cv.DistanceTransformMasks.Precise, cv.MatType.CV_32F)
+        cv.Cv2.Threshold(dst2, dst3, task.gOptions.DebugSlider.Value, 255, cv.ThresholdTypes.Binary)
         mm = GetMinMax(dst2)
         labels(2) = "Distance results of 32F input data (usually Depth data).  Min = " + CStr(CInt(mm.minVal)) + " and max = " + CStr(CInt(mm.maxVal))
     End Sub
@@ -447,7 +453,9 @@ Public Class XR_Distance_DepthPeaks : Inherits TaskParent
         dst2 = dist.dst2
 
         Dim threshold = Math.Abs(task.gOptions.DebugSlider.Value)
-        Dim mask = dst2.Threshold(threshold, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs
+        Dim mask As New cv.Mat
+        cv.Cv2.Threshold(dst2, mask, threshold, 255, cv.ThresholdTypes.Binary)
+        cv.Cv2.ConvertScaleAbs(mask, mask)
         dst3.SetTo(0)
         dst2.CopyTo(dst3, mask)
 
@@ -470,11 +478,11 @@ Public Class XR_Distance_ClickPoint : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
 
-        dst1 = task.gray.InRange(0, 0)
+        cv.Cv2.InRange(task.gray, 0, 0, dst1)
 
         task.gray.SetTo(255, dst1)
         task.gray.Set(Of Byte)(task.clickPoint.Y, task.clickPoint.X, 0)
-        dst2 = task.gray.DistanceTransform(options.distanceType, 0)
+        cv.Cv2.DistanceTransform(task.gray, dst2, options.distanceType, cv.DistanceTransformMasks.Precise, cv.MatType.CV_32F)
         dst3 = 255 - dst2
     End Sub
 End Class
@@ -502,7 +510,7 @@ Public Class XR_Distance_DepthBricks : Inherits TaskParent
             Dim mm = GetMinMax(dst2(brick.rect))
             If mm.maxVal >= threshold Then
                 Dim pt = New cv.Point(mm.maxLoc.X + brick.rect.X, mm.maxLoc.Y + brick.rect.Y)
-                dst3.Circle(pt, task.DotSize, task.highlight, -1, task.lineType)
+                cv.Cv2.Circle(dst3, pt, task.DotSize, task.highlight, -1, task.lineType)
             End If
         Next
     End Sub
@@ -536,6 +544,6 @@ Public Class XR_Distance_Contour : Inherits TaskParent
         dst1.SetTo(255)
         dst1(task.contourD.rect).SetTo(0, task.contourD.mask)
 
-        dst0 = dst1.DistanceTransform(options.distanceType, 0)
+        cv.Cv2.DistanceTransform(dst1, dst0, options.distanceType, cv.DistanceTransformMasks.Precise, cv.MatType.CV_32F)
     End Sub
 End Class

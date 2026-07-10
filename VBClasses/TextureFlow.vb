@@ -8,16 +8,17 @@ Public Class TextureFlow_Basics : Inherits TaskParent
         options.Run()
 
         dst2 = src.Clone
-        If src.Channels() <> 1 Then src = src.CvtColor(OpenCvSharp.ColorConversionCodes.BGR2GRAY)
-        Dim eigen = src.CornerEigenValsAndVecs(options.TFblockSize, options.TFksize)
-        Dim split = eigen.Split()
+        If src.Channels() <> 1 Then cv.Cv2.CvtColor(src, src, OpenCvSharp.ColorConversionCodes.BGR2GRAY)
+        Dim eigen As New cv.Mat
+        cv.Cv2.CornerEigenValsAndVecs(src, eigen, options.TFblockSize, options.TFksize)
+        Dim split = cv.Cv2.Split(eigen)
         Dim d2 = options.TFdelta / 2
         For y = d2 To dst2.Height - 1 Step d2
             For x = d2 To dst2.Width - 1 Step d2
                 Dim delta = New cv.Point2f(split(4).Get(Of Single)(y, x), split(5).Get(Of Single)(y, x)) * options.TFdelta
                 Dim p1 = New cv.Point(CInt(x - delta.X), CInt(y - delta.Y))
                 Dim p2 = New cv.Point(CInt(x + delta.X), CInt(y + delta.Y))
-                dst2.Line(p1, p2, white, task.lineWidth, task.lineType)
+                cv.Cv2.Line(dst2, p1, p2, white, task.lineWidth, task.lineType)
             Next
         Next
     End Sub
@@ -53,7 +54,9 @@ Public Class XR_TextureFlow_Reduction : Inherits TaskParent
         reduction.Run(src)
         dst2 = reduction.dst2
 
-        flow.Run(reduction.dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR))
+        Dim _flow_cvt As New cv.Mat
+        cv.Cv2.CvtColor(reduction.dst2, _flow_cvt, cv.ColorConversionCodes.GRAY2BGR)
+        flow.Run(_flow_cvt)
         dst3 = flow.dst2
     End Sub
 End Class
@@ -105,8 +108,8 @@ Public Class XR_TextureFlow_Bricks : Inherits TaskParent
         knn.Run(emptyMat)
 
         For i = 0 To knn.queries.Count - 1
-            dst3.Line(knn.trainInput(i), knn.trainInput(knn.result(i, 1)), 255, task.lineWidth, task.lineType)
-            dst3.Line(knn.trainInput(i), knn.trainInput(knn.result(i, 2)), 255, task.lineWidth, task.lineType)
+            cv.Cv2.Line(dst3, knn.trainInput(i), knn.trainInput(knn.result(i, 1)), 255, task.lineWidth, task.lineType)
+            cv.Cv2.Line(dst3, knn.trainInput(i), knn.trainInput(knn.result(i, 2)), 255, task.lineWidth, task.lineType)
         Next
 
         flow.Run(dst3)

@@ -20,9 +20,9 @@ Public Class Binarize_Basics : Inherits TaskParent
 
         If useBlur Then
             blur.Run(task.gray)
-            dst2 = blur.dst2.Threshold(meanScalar(0), 255, thresholdType)
+            cv.Cv2.Threshold(blur.dst2, dst2, meanScalar(0), 255, thresholdType)
         Else
-            dst2 = task.gray.Threshold(meanScalar(0), 255, thresholdType)
+            cv.Cv2.Threshold(task.gray, dst2, meanScalar(0), 255, thresholdType)
         End If
     End Sub
 End Class
@@ -68,41 +68,41 @@ End Class
 
 
 
-Public Class XR_Binarize_Niblack_Sauvola : Inherits TaskParent
-    Dim options As New Options_BinarizeNiBlack
-    Public Sub New()
-        desc = "Binarize an image using Niblack and Sauvola"
-        labels(2) = "Binarize Niblack"
-        labels(3) = "Binarize Sauvola"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        options.Run()
-        CvXImgProc.NiblackThreshold(task.gray, dst0, 255, cv.ThresholdTypes.Binary, 5, 0.5, LocalBinarizationMethods.Niblack)
-        dst2 = dst0.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-        CvXImgProc.NiblackThreshold(task.gray, dst0, 255, cv.ThresholdTypes.Binary, 5, 0.5, LocalBinarizationMethods.Sauvola)
-        dst3 = dst0.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-    End Sub
-End Class
+'Public Class XR_Binarize_Niblack_Sauvola : Inherits TaskParent
+'    Dim options As New Options_BinarizeNiBlack
+'    Public Sub New()
+'        desc = "Binarize an image using Niblack and Sauvola"
+'        labels(2) = "Binarize Niblack"
+'        labels(3) = "Binarize Sauvola"
+'    End Sub
+'    Public Overrides Sub RunAlg(src As cv.Mat)
+'        options.Run()
+'        CvXImgProc.NiblackThreshold(task.gray, dst0, 255, cv.ThresholdTypes.Binary, 5, 0.5, LocalBinarizationMethods.Niblack)
+'        dst2 = cv.Cv2.CvtColor(dst0, dst2, cv.ColorConversionCodes.GRAY2BGR)
+'        CvXImgProc.NiblackThreshold(task.gray, dst0, 255, cv.ThresholdTypes.Binary, 5, 0.5, LocalBinarizationMethods.Sauvola)
+'        dst3 = cv.Cv2.CvtColor(dst0, dst3, cv.ColorConversionCodes.GRAY2BGR)
+'    End Sub
+'End Class
 
 
 
 
 
 
-Public Class XR_Binarize_Wolf_Nick : Inherits TaskParent
-    Dim options As New Options_BinarizeNiBlack
-    Public Sub New()
-        desc = "Binarize an image using Niblack and Nick"
-        labels(2) = "Binarize Niblack"
-        labels(3) = "Binarize Nick"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        options.Run()
+'Public Class XR_Binarize_Wolf_Nick : Inherits TaskParent
+'    Dim options As New Options_BinarizeNiBlack
+'    Public Sub New()
+'        desc = "Binarize an image using Niblack and Nick"
+'        labels(2) = "Binarize Niblack"
+'        labels(3) = "Binarize Nick"
+'    End Sub
+'    Public Overrides Sub RunAlg(src As cv.Mat)
+'        options.Run()
 
-        CvXImgProc.NiblackThreshold(task.gray, dst2, 255, cv.ThresholdTypes.Binary, 5, 0.5, LocalBinarizationMethods.Wolf)
-        CvXImgProc.NiblackThreshold(task.gray, dst3, 255, cv.ThresholdTypes.Binary, 5, 0.5, LocalBinarizationMethods.Nick)
-    End Sub
-End Class
+'        CvXImgProc.NiblackThreshold(task.gray, dst2, 255, cv.ThresholdTypes.Binary, 5, 0.5, LocalBinarizationMethods.Wolf)
+'        CvXImgProc.NiblackThreshold(task.gray, dst3, 255, cv.ThresholdTypes.Binary, 5, 0.5, LocalBinarizationMethods.Nick)
+'    End Sub
+'End Class
 
 
 
@@ -198,7 +198,7 @@ Public Class XR_Binarize_FourPixelFlips : Inherits TaskParent
 
         Static lastSubD As cv.Mat = binar4.dst2.Clone
         dst3 = lastSubD - binar4.dst2
-        dst3 = dst3.Threshold(0, 255, cv.ThresholdTypes.Binary)
+        cv.Cv2.Threshold(dst3, dst3, 0, 255, cv.ThresholdTypes.Binary)
         lastSubD = binar4.dst2.Clone
     End Sub
 End Class
@@ -215,7 +215,7 @@ Public Class Binarize_Simple : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         meanScalar = cv.Cv2.Mean(task.gray)
-        dst2 = task.gray.Threshold(meanScalar(0), injectVal, cv.ThresholdTypes.Binary)
+        cv.Cv2.Threshold(task.gray, dst2, meanScalar(0), injectVal, cv.ThresholdTypes.Binary)
     End Sub
 End Class
 
@@ -233,6 +233,6 @@ Public Class XR_Binarize_SimpleOld : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         meanScalar = cv.Cv2.Mean(task.gray)
-        dst2 = src.Threshold(meanScalar(0), injectVal, cv.ThresholdTypes.Binary)
+        cv.Cv2.Threshold(src, dst2, meanScalar(0), injectVal, cv.ThresholdTypes.Binary)
     End Sub
 End Class

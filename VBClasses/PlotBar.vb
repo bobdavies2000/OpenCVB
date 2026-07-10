@@ -1,4 +1,4 @@
-﻿Imports cv = OpenCvSharp
+Imports cv = OpenCvSharp
 Public Class PlotBar_Basics : Inherits TaskParent
     Public histogram As New cv.Mat
     Public histArray() As Single
@@ -155,9 +155,9 @@ Public Class PlotBar_Histogram2D : Inherits TaskParent
         Dim bins = task.histogramBins
         cv.Cv2.CalcHist({src}, {0, 1}, New cv.Mat(), histogram, 2, {bins, bins}, ranges)
 
-        dst2 = histogram.Resize(dst2.Size(), 0, 0, cv.InterpolationFlags.Nearest)
+        cv.Cv2.Resize(histogram, dst2, dst2.Size(), 0, 0, cv.InterpolationFlags.Nearest)
 
-        If standaloneTest() Then dst3 = dst2.Threshold(0, 255, cv.ThresholdTypes.Binary)
+        If standaloneTest() Then cv.Cv2.Threshold(dst2, dst3, 0, 255, cv.ThresholdTypes.Binary)
     End Sub
 End Class
 

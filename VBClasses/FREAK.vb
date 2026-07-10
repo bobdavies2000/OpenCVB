@@ -22,13 +22,13 @@ Public Class FREAK_Basics : Inherits TaskParent
 
         For Each kpt In keypoints
             Dim r = kpt.Size / 2
-            dst2.Circle(kpt.Pt, r, cv.Scalar.Green, -1, task.lineType)
-            dst2.Line(New cv.Point(kpt.Pt.X + r, kpt.Pt.Y + r), New cv.Point(kpt.Pt.X - r, kpt.Pt.Y - r), cv.Scalar.Green, task.lineWidth, task.lineType)
-            dst2.Line(New cv.Point(kpt.Pt.X + r, kpt.Pt.Y - r), New cv.Point(kpt.Pt.X - r, kpt.Pt.Y + r), cv.Scalar.Green, task.lineWidth, task.lineType)
+            cv.Cv2.Circle(dst2, kpt.Pt, r, cv.Scalar.Green, -1, task.lineType)
+            cv.Cv2.Line(dst2, New cv.Point(kpt.Pt.X + r, kpt.Pt.Y + r), New cv.Point(kpt.Pt.X - r, kpt.Pt.Y - r), cv.Scalar.Green, task.lineWidth, task.lineType)
+            cv.Cv2.Line(dst2, New cv.Point(kpt.Pt.X + r, kpt.Pt.Y - r), New cv.Point(kpt.Pt.X - r, kpt.Pt.Y + r), cv.Scalar.Green, task.lineWidth, task.lineType)
         Next
         labels(2) = CStr(orb.keypoints.Count) + " key points were identified"
         labels(3) = CStr(orb.keypoints.Count) + " FREAK Descriptors (resized) One row = keypoint"
-        If fdesc.Width > 0 And fdesc.Height > 0 Then dst3 = fdesc.Resize(dst3.Size())
+        If fdesc.Width > 0 And fdesc.Height > 0 Then cv.Cv2.Resize(fdesc, dst3, dst3.Size())
     End Sub
     Protected Overrides Sub Finalize()
         If freak IsNot Nothing Then freak.Dispose()

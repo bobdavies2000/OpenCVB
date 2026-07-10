@@ -20,7 +20,9 @@ Public Class GeneticDrawing_Basics : Inherits TaskParent
     Public Sub New()
         options = New Options_GeneticDrawing()
         For i = 0 To brushes.Count - 1
-            brushes(i) = cv.Cv2.ImRead(task.homeDir + "Data/GeneticDrawingBrushes/" + CStr(i) + ".jpg").CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+            Dim _cvtInline As New cv.Mat
+            cv.Cv2.CvtColor(cv.Cv2.ImRead(task.homeDir + "Data/GeneticDrawingBrushes/" + CStr(i) + ".jpg"), _cvtInline, cv.ColorConversionCodes.BGR2GRAY)
+            brushes(i) =_cvtInline
         Next
 
         labels(2) = "(clkwise) original, imgStage, imgGeneration, magnitude"
@@ -34,7 +36,8 @@ Public Class GeneticDrawing_Basics : Inherits TaskParent
             Dim d = dna(i)
             Dim brushImg = brushes(d.brushNumber)
 
-            Dim br = brushImg.Resize(New cv.Size(CInt((brushImg.Width * d.size + 1) * options.brushPercent),
+            Dim br As New cv.Mat
+            cv.Cv2.Resize(brushImg, br, New cv.Size(CInt((brushImg.Width * d.size + 1) * options.brushPercent),
                                                          CInt((brushImg.Height * d.size + 1) * options.brushPercent)))
             Dim m = cv.Cv2.GetRotationMatrix2D(New cv.Point2f(br.Cols / 2, br.Rows / 2), d.rotation, 1)
             cv.Cv2.WarpAffine(br, br, m, New cv.Size(br.Cols, br.Rows))
@@ -72,7 +75,7 @@ Public Class GeneticDrawing_Basics : Inherits TaskParent
         cv.Cv2.Subtract(mats.mat(0), img, diff1)
         cv.Cv2.Subtract(img, mats.mat(0), diff2)
         cv.Cv2.Add(diff1, diff2, diff1)
-        Return diff1.Sum()
+        Return cv.Cv2.Sum(diff1)(0)
     End Function
     Private Sub startNewStage(r As cv.Rect)
         ReDim DNAseq(options.strokeCount - 1)
@@ -108,13 +111,13 @@ Public Class GeneticDrawing_Basics : Inherits TaskParent
             stage = 0
 
             If standaloneTest() Then
-                src = If(options.snapCheck, src.Clone, cv.Cv2.ImRead(task.homeDir + "Data/GeneticDrawingExample.jpg").Resize(src.Size()))
+                cv.Cv2.Resize(cv.Cv2.ImRead(task.homeDir + "Data/GeneticDrawingExample.jpg"), src, src.Size())
             End If
 
             src = If(src.Channels() = 3, task.gray, src)
             mats.mat(0) = src
             gradient.Run(mats.mat(0))
-            mats.mat(2) = gradient.magnitude.ConvertScaleAbs(255)
+            cv.Cv2.ConvertScaleAbs(gradient.magnitude, mats.mat(2), 255)
 
             startNewStage(r)
         End If
@@ -201,7 +204,7 @@ Public Class XR_GeneticDrawing_Color : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         Static restartCheck = OptionParent.FindCheckBox("Restart the algorithm with the current settings")
         Dim split() As cv.Mat
-        split = src.Split()
+        split = cv.Cv2.Split(src)
 
         Dim restartRequested = restartCheck.checked
         restartCheck.checked = False
@@ -215,7 +218,9 @@ Public Class XR_GeneticDrawing_Color : Inherits TaskParent
         cv.Cv2.Merge(split, dst3)
 
         For i = 0 To split.Count - 1
-            split(i) = If(gDraw(i).dst2.Channels() = 1, gDraw(i).dst2, gDraw(i).dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
+            Dim _cvtInline As New cv.Mat
+            cv.Cv2.CvtColor(gDraw(i).dst2, _cvtInline, cv.ColorConversionCodes.BGR2GRAY)
+            split(i) = If(gDraw(i).dst2.Channels() = 1, gDraw(i).dst2,_cvtInline)
         Next
         cv.Cv2.Merge(split, dst2)
 
@@ -271,7 +276,7 @@ Public Class XR_GeneticDrawing_Photo : Inherits TaskParent
                     newSize = New cv.Size(dst2.Width, dst2.Width * fullsizeImage.Height / fullsizeImage.Width)
                 End If
                 src.SetTo(0)
-                src(New cv.Rect(0, 0, newSize.Width, newSize.Height)) = fullsizeImage.Resize(newSize)
+                cv.Cv2.Resize(fullsizeImage, fullsizeImage, newSize)
             Else
                 src = fullsizeImage
             End If

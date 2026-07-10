@@ -38,7 +38,7 @@ Public Class XR_DCT_RGB : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         dct.options.Run()
 
-        Dim srcPlanes = src.Split()
+        Dim srcPlanes = cv.Cv2.Split(src)
 
         Dim freqPlanes(2) As cv.Mat
         For i = 0 To srcPlanes.Count - 1
@@ -120,9 +120,10 @@ Public Class DCT_FeatureLess : Inherits TaskParent
 
         dst3.SetTo(0)
         If dst2.Channels() = 3 Then
-            dst2 = dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY).Threshold(1, 255, cv.ThresholdTypes.Binary)
+            cv.Cv2.CvtColor(dst2, dst2, cv.ColorConversionCodes.BGR2GRAY)
+            cv.Cv2.Threshold(dst2, dst2, 1, 255, cv.ThresholdTypes.Binary)
         Else
-            dst2 = dst2.Threshold(1, 255, cv.ThresholdTypes.Binary)
+            cv.Cv2.Threshold(dst2, dst2, 1, 255, cv.ThresholdTypes.Binary)
         End If
         src.CopyTo(dst3, Not dst2)
         labels(2) = "Mask of DCT with highest frequency removed"
@@ -151,7 +152,9 @@ Public Class XR_DCT_Surfaces_debug : Inherits TaskParent
         mats.mat(0).SetTo(white, task.gridMask)
 
         dct.Run(src)
-        mats.mat(1) = dct.dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR).Clone()
+        Dim _cvt2 As New cv.Mat
+        cv.Cv2.CvtColor(dct.dst2, _cvt2, cv.ColorConversionCodes.GRAY2BGR)
+        mats.mat(1) = _cvt2.Clone()
         mats.mat(2) = dct.dst3.Clone()
 
         Dim mask = dct.dst2.Clone() ' result1 contains the DCT mask of featureless surfaces.
@@ -161,7 +164,7 @@ Public Class XR_DCT_Surfaces_debug : Inherits TaskParent
         Dim maxIndex As Integer
         Dim grCounts(task.gridRects.Count - 1)
         For i = 0 To task.gridRects.Count - 1
-            grCounts(i) = mask(task.gridRects(i)).CountNonZero
+            grCounts(i) = cv.Cv2.CountNonZero(mask(task.gridRects(i)))
             If grCounts(i) > grCounts(maxIndex) Then maxIndex = i
         Next
 

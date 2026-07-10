@@ -21,7 +21,7 @@ Public Class CamShift_Basics : Inherits TaskParent
             For i = 0 To binCount - 2
                 Dim h = img.Height * (hist.Get(Of Single)(i, 0)) / mm.maxVal
                 If h = 0 Then h = 5 ' show the color range in the plot
-                img.Rectangle(New cv.Rect(i * binWidth, img.Height - h, binWidth, h),
+                cv.Cv2.Rectangle(img, New cv.Rect(i * binWidth, img.Height - h, binWidth, h),
                                   New cv.Scalar(180.0 * i \ binCount, 255, 255), -1)
             Next
         End If
@@ -37,7 +37,7 @@ Public Class CamShift_Basics : Inherits TaskParent
         Dim hsize() As Integer = {task.histogramBins}
         task.drawRect = ValidateRect(task.drawRect)
         cv.Cv2.CalcHist({hue(task.drawRect)}, {0}, mask(task.drawRect), histogram, 1, hsize, ranges)
-        histogram = histogram.Normalize(0, 255, cv.NormTypes.MinMax)
+        cv.Cv2.Normalize(histogram, histogram, 0, 255, cv.NormTypes.MinMax)
         roi = task.drawRect
 
         If histogram.Rows <> 0 Then
@@ -45,10 +45,10 @@ Public Class CamShift_Basics : Inherits TaskParent
             trackBox = cv.Cv2.CamShift(dst1 And mask, roi, cv.TermCriteria.Both(10, 1))
             dst3 = Show_HSV_Hist(histogram)
             If dst3.Channels() = 1 Then dst3 = src
-            dst3 = dst3.CvtColor(cv.ColorConversionCodes.HSV2BGR)
+            cv.Cv2.CvtColor(dst3, dst3, cv.ColorConversionCodes.HSV2BGR)
         End If
         If trackBox.Size.Width > 0 Then
-            dst2.Ellipse(trackBox, white, task.lineWidth + 1, task.lineType)
+            cv.Cv2.Ellipse(dst2, trackBox, white, task.lineWidth + 1, task.lineType)
         End If
     End Sub
 End Class
@@ -68,8 +68,9 @@ Public Class CamShift_RedHue : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
 
-        Dim hsv = src.CvtColor(cv.ColorConversionCodes.BGR2HSV)
-        dst3 = hsv.InRange(options.camSBins, New cv.Scalar(180, 255, options.camMax))
+        Dim hsv As New cv.Mat
+        cv.Cv2.CvtColor(src, hsv, cv.ColorConversionCodes.BGR2HSV)
+        cv.Cv2.InRange(hsv, options.camSBins, New cv.Scalar(180, 255, options.camMax), dst3)
 
         dst2.SetTo(0)
         src.CopyTo(dst2, dst3)

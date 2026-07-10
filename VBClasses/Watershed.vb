@@ -29,7 +29,7 @@ Public Class Watershed_Basics : Inherits TaskParent
         If rects.Count > 0 Then
             Dim markers = New cv.Mat(src.Size(), cv.MatType.CV_32S, 0)
             For i = 0 To rects.Count - 1
-                markers.Rectangle(rects.ElementAt(i), cv.Scalar.All(i + 1), -1)
+            cv.Cv2.Rectangle(markers, rects.ElementAt(i), cv.Scalar.All(i + 1), -1)
             Next
 
             cv.Cv2.Watershed(src, markers)

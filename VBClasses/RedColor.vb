@@ -28,7 +28,7 @@ Public Class RedColor_Basics : Inherits TaskParent
         Next
         dst2 = Palettize(rcMap)
 
-        If task.rcD IsNot Nothing And standaloneTest() Then dst2.Rectangle(task.rcD.rect, task.highlight, task.lineWidth)
+        If task.rcD IsNot Nothing And standaloneTest() Then cv.Cv2.Rectangle(dst2, task.rcD.rect, task.highlight, task.lineWidth)
 
         Dim rcIndex As Integer
         For Each rc In rcList
@@ -154,7 +154,7 @@ Public Class RedColor_BrickList : Inherits TaskParent
                     Dim flags = cv.FloodFillFlags.FixedRange Or cv.FloodFillFlags.Link4 Or (index << 8)
                     Dim count = cv.Cv2.FloodFill(src, mask, r.TopLeft, index, rect, 0, 0, flags)
                     rect = ValidateRect(rect)
-                    If mask(rect).CountNonZero > 0 Then rectSorted.Add(index, (index, rect))
+                    If cv.Cv2.CountNonZero(mask(rect)) > 0 Then rectSorted.Add(index, (index, rect))
                 End If
             End If
         Next
@@ -346,10 +346,10 @@ Public Class XR_RedColor_CPP : Inherits TaskParent
 
         dst2.SetTo(0)
         For Each rc In rcList
-            rc.mask = rcMap(rc.rect).InRange(rc.mapID, rc.mapID)
+            cv.Cv2.InRange(rcMap(rc.rect), rc.mapID, rc.mapID, rc.mask)
             rc.buildMaxDist()
             dst2(rc.rect).SetTo(rc.color, rc.mask)
-            dst2.Circle(rc.maxDist, task.DotSize, task.highlight, -1)
+            cv.Cv2.Circle(dst2, rc.maxDist, task.DotSize, task.highlight, -1)
         Next
 
         If standaloneTest() Then
@@ -431,14 +431,16 @@ Public Class RedColor_Bricks : Inherits TaskParent
         dst0 = task.leftView
         color8u.Run(task.leftView)
 
-        redC.Run(color8u.dst3.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
+        Dim _redC_cvt As New cv.Mat
+        cv.Cv2.CvtColor(color8u.dst3, _redC_cvt, cv.ColorConversionCodes.BGR2GRAY)
+        redC.Run(_redC_cvt)
         labels(2) = redC.labels(3)
         dst2 = redC.dst2
 
         Dim count As Integer
         dst1.SetTo(0)
         For Each brick As brickData In bricks.brickList
-            If redC.rcMap(brick.lRect).CountNonZero And brick.rRect.Width > 0 Then
+            If cv.Cv2.CountNonZero(redC.rcMap(brick.lRect)) And brick.rRect.Width > 0 Then
                 dst2(brick.lRect).CopyTo(dst1(brick.rRect))
                 brick.colorClass = color8u.dst2.Get(Of Integer)
                 count += 1
@@ -626,7 +628,7 @@ Public Class XR_RedColor_Lines : Inherits TaskParent
         If task.heartBeat Then dst3.SetTo(0)
         Dim index As Integer
         For Each lp In task.lines.lpList
-            dst3.Line(lp.p1, lp.p2, 255, task.lineWidth, task.lineType)
+            cv.Cv2.Line(dst3, lp.p1, lp.p2, 255, task.lineWidth, task.lineType)
             index += 1
             If index > 10 Then Exit For
         Next
@@ -703,7 +705,7 @@ Public Class XR_RedColor_LineSingle : Inherits TaskParent
             leftCenter = track.redC.rcList(leftMost).maxDist
             rightCenter = track.redC.rcList(rightmost).maxDist
 
-            dst2.Line(leftCenter, rightCenter, white, task.lineWidth, task.lineType)
+            cv.Cv2.Line(dst2, leftCenter, rightCenter, white, task.lineWidth, task.lineType)
         End If
         labels(2) = track.redC.labels(2)
     End Sub
@@ -737,9 +739,9 @@ Public Class XR_RedColor_FeaturesKNN : Inherits TaskParent
             Dim index = knn.result(i, knn.trainInput.Count - 1)
             If index >= 0 And index < knn.ptListTrain.Count Then
                 Dim p2 = knn.ptListTrain(index)
-                dst3.Circle(p1, task.DotSize, cv.Scalar.Yellow, -1, task.lineType)
-                dst3.Circle(p2, task.DotSize, cv.Scalar.Yellow, -1, task.lineType)
-                dst3.Line(p1, p2, white, task.lineWidth, task.lineType)
+                cv.Cv2.Circle(dst3, p1, task.DotSize, cv.Scalar.Yellow, -1, task.lineType)
+                cv.Cv2.Circle(dst3, p2, task.DotSize, cv.Scalar.Yellow, -1, task.lineType)
+                cv.Cv2.Line(dst3, p1, p2, white, task.lineWidth, task.lineType)
             End If
         Next
         knn.ptListTrain = New List(Of cv.Point)(knn.ptListQuery)
@@ -802,8 +804,8 @@ Public Class XR_RedColor_Points : Inherits TaskParent
         dst3.SetTo(0)
         Dim index As Integer
         For Each lp In task.lines.lpList
-            dst3.Circle(lp.p1, task.DotSize, 255, -1, task.lineType)
-            dst3.Circle(lp.p2, task.DotSize, 255, -1, task.lineType)
+            cv.Cv2.Circle(dst3, lp.p1, task.DotSize, 255, -1, task.lineType)
+            cv.Cv2.Circle(dst3, lp.p2, task.DotSize, 255, -1, task.lineType)
             index += 1
             If index >= 10 Then Exit For
         Next
@@ -826,7 +828,7 @@ Public Class RedColor_Contours : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         contours.Run(src)
-        dst1 = contours.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        cv.Cv2.CvtColor(contours.dst2, dst1, cv.ColorConversionCodes.BGR2GRAY)
         redC.Run(dst1)
         dst2 = contours.dst2
         labels(2) = redC.labels(2)
@@ -881,7 +883,9 @@ Public Class RedColor_Isolate : Inherits TaskParent
     Private Shared Function CellMaskFull(rcMap As cv.Mat, rc As rcDataOld) As cv.Mat
         Dim m As New cv.Mat(rcMap.Size, cv.MatType.CV_8U, 0)
         Using roi = rcMap(rc.rect)
-            Using part = roi.InRange(rc.mapID, rc.mapID)
+            Dim part As New cv.Mat
+            cv.Cv2.InRange(roi, rc.mapID, rc.mapID, part)
+            Using part
                 part.CopyTo(m(rc.rect))
             End Using
         End Using

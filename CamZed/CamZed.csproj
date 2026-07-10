@@ -17,6 +17,7 @@
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="13.0.5-beta1" />
     <PackageReference Include="OpenCvSharp5" Version="5.0.0.20260703" />
+    <PackageReference Include="OpenCvSharp5.GdipExtensions" Version="5.0.0.20260703" />
     <PackageReference Include="OpenCvSharp5.runtime.wasm" Version="5.0.0.20260703" />
     <PackageReference Include="OpenCvSharp5.runtime.win" Version="5.0.0.20260703" />
     <PackageReference Include="OpenCvSharp5.Windows" Version="5.0.0.20260703" />

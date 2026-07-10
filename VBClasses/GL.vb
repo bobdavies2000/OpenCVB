@@ -79,8 +79,8 @@ Public Class XR_GL_Line3DNoMotionInput : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If src.Type <> cv.MatType.CV_32FC3 Then src = task.pointCloud.Clone
-        dst2 = task.lines.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        dst2 = dst2.Threshold(0, 255, cv.ThresholdTypes.Binary)
+        cv.Cv2.CvtColor(task.lines.dst2, dst2, cv.ColorConversionCodes.BGR2GRAY)
+        cv.Cv2.Threshold(dst2, dst2, 0, 255, cv.ThresholdTypes.Binary)
         labels(2) = task.lines.labels(2)
 
         dst0 = src
@@ -167,7 +167,9 @@ Public Class XR_GL_RunSharpHist : Inherits TaskParent
             SetTrueText(strOut, 2)
         End If
 
-        plotHist.Run(task.sharpDepth.Resize(task.workRes, cv.MatType.CV_32F, cv.InterpolationFlags.Nearest))
+        cv.Cv2.Resize(task.sharpDepth, task.sharpDepth, task.workRes, 0, 0, cv.InterpolationFlags.Nearest)
+        task.sharpDepth.ConvertTo(task.sharpDepth, cv.MatType.CV_32F)
+        plotHist.Run(task.sharpDepth)
         dst3 = plotHist.dst3
         labels(2) = plotHist.labels(2)
 
@@ -203,9 +205,9 @@ Public Class XR_GL_Line3DWhite : Inherits TaskParent
         For Each lp In task.lines.lpList
             If lp.age = 1 Or task.heartBeatLT Then
                 mask(lp.rect).SetTo(0)
-                dst2.Line(lp.p1, lp.p2, 255, task.lineWidth)
+                cv.Cv2.Line(dst2, lp.p1, lp.p2, 255, task.lineWidth)
                 pointcloud(lp.rect).CopyTo(dst3(lp.rect), dst2(lp.rect))
-                count += dst2(lp.rect).CountNonZero
+                count += cv.Cv2.CountNonZero(dst2(lp.rect))
             End If
         Next
 
@@ -243,9 +245,9 @@ Public Class XR_GL_Line3DReconstructed : Inherits TaskParent
         For Each lp In task.lines.lpList
             If lp.age = 1 Or task.heartBeat Then
                 mask(lp.rect).SetTo(0)
-                dst2.Line(lp.p1, lp.p2, 255, task.lineWidth)
+                cv.Cv2.Line(dst2, lp.p1, lp.p2, 255, task.lineWidth)
                 pointcloud(lp.rect).CopyTo(dst3(lp.rect), dst2(lp.rect))
-                count += dst2(lp.rect).CountNonZero
+                count += cv.Cv2.CountNonZero(dst2(lp.rect))
             End If
         Next
 
@@ -290,7 +292,7 @@ Public Class XR_GL_LinePointsAll : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst2.SetTo(0)
         For Each lp In task.lines.lpList
-            dst2.Line(lp.p1, lp.p2, lp.color, task.lineWidth, task.lineType)
+            cv.Cv2.Line(dst2, lp.p1, lp.p2, lp.color, task.lineWidth, task.lineType)
         Next
 
         strOut = task.sharpGL.RunSharp(oCase.line3D, task.pointCloud, dst2)
@@ -341,7 +343,9 @@ Public Class GL_PlotHist : Inherits TaskParent
             SetTrueText(strOut, 2)
         End If
 
-        Dim pcMask = task.sharpDepth.InRange(0.01F, 0.99F)
+        Dim pcMask As New cv.Mat
+
+        cv.Cv2.InRange(task.sharpDepth, 0.01F, 0.99F, pcMask)
         task.sharpDepth.SetTo(0, Not pcMask)
         plotHist.Run(task.sharpDepth)
         dst3 = plotHist.dst2
@@ -423,7 +427,8 @@ Public Class GL_DisplayPC : Inherits TaskParent
     End Function
     Public Shared Function reProject(glCloud As cv.Mat) As cv.Mat
         mm = GetMinMax(task.pcSplit(2), task.depthmask)
-        Dim pcMask = glCloud.InRange(0.01F, 0.99F)
+        Dim pcMask As New cv.Mat
+        cv.Cv2.InRange(glCloud, 0.01F, 0.99F, pcMask)
         glCloud = glCloud * (mm.maxVal - mm.minVal) + mm.minVal
         glCloud.SetTo(0, Not pcMask)
         Return invertMat(glCloud)
@@ -436,7 +441,8 @@ Public Class GL_DisplayPC : Inherits TaskParent
 
         dst2 = reProject(task.sharpDepth)
         If standaloneTest() Then
-            Dim pcMask = task.sharpDepth.InRange(0.01F, 0.99F)
+            Dim pcMask As New cv.Mat
+            cv.Cv2.InRange(task.sharpDepth, 0.01F, 0.99F, pcMask)
             dst3 = task.sharpDepth * (mm.maxVal - mm.minVal) + mm.minVal
             dst3.SetTo(0, Not pcMask)
         End If
@@ -459,7 +465,7 @@ Public Class XR_GL_ReadLines : Inherits TaskParent
         dst3 = task.color.Clone
         For Each lp In task.lines.lpList
             'dst3.Line(lp.p1, lp.p2, lp.color, task.lineWidth, task.lineType)
-            dst3.Line(lp.p1, lp.p2, white, task.lineWidth, task.lineType)
+            cv.Cv2.Line(dst3, lp.p1, lp.p2, white, task.lineWidth, task.lineType)
         Next
 
         strOut = task.sharpGL.RunSharp(oCase.readLines, task.pointCloud, dst3, task.lines.lpList)
@@ -710,7 +716,7 @@ Public Class GL_Featureless : Inherits TaskParent
         dst0.SetTo(0)
         For i = 0 To task.gridRects.Count - 1
             Dim r = task.gridRects(i)
-            Dim depth = task.pcSplit(2)(r).Mean(task.depthmask(r))(0)
+            Dim depth = cv.Cv2.Mean(task.pcSplit(2)(r), task.depthmask(r))(0)
             If depth > 0 Then ages(i) += 1 Else ages(i) = 1
             If ages(i) < 10 Then dst0(r).SetTo(255)
         Next
@@ -775,7 +781,7 @@ Public Class GL_FeatureLessVLines : Inherits TaskParent
         For Each lp In yLines.lpList
             lp.pVec1 = New cv.Vec3f(CSng(lp.p1Depth(0)), CSng(lp.p1Depth(1)), CSng(lp.p1Depth(2)))
             lp.pVec2 = New cv.Vec3f(CSng(lp.p2Depth(0)), CSng(lp.p2Depth(1)), CSng(lp.p2Depth(2)))
-            dst3.Line(lp.p1, lp.p2, black, task.lineWidth + 4)
+            cv.Cv2.Line(dst3, lp.p1, lp.p2, black, task.lineWidth + 4)
         Next
 
         strOut = task.sharpGL.RunSharp(oCase.draw3DLines, dst3, task.color, yLines.lpList)

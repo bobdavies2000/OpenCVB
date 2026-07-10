@@ -1,4 +1,4 @@
-﻿Imports System.Diagnostics.Metrics
+Imports System.Diagnostics.Metrics
 Imports cv = OpenCvSharp
 Public Class StableGray_BasicsMin : Inherits TaskParent
     Public Sub New()
@@ -17,11 +17,12 @@ Public Class StableGray_BasicsMin : Inherits TaskParent
         src.CopyTo(dst2, task.motion.motionMask)
 
         cv.Cv2.Absdiff(lastGray, dst2, dst3)
-        dst3 = dst3.Threshold(0, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs()
+        cv.Cv2.Threshold(dst3, dst3, 0, 255, cv.ThresholdTypes.Binary)
+        cv.Cv2.ConvertScaleAbs(dst3, dst3)
 
         lastGray = dst2.Clone
 
-        labels(2) = CStr(dst3.CountNonZero) + " pixels were updated with new minimums."
+        labels(2) = CStr(cv.Cv2.CountNonZero(dst3)) + " pixels were updated with new minimums."
     End Sub
 End Class
 
@@ -69,11 +70,12 @@ Public Class StableGray_BasicsMax : Inherits TaskParent
         src.CopyTo(dst2, task.motion.motionMask)
 
         cv.Cv2.Absdiff(lastGray, dst2, dst3)
-        dst3 = dst3.Threshold(0, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs()
+        cv.Cv2.Threshold(dst3, dst3, 0, 255, cv.ThresholdTypes.Binary)
+        cv.Cv2.ConvertScaleAbs(dst3, dst3)
 
         lastGray = dst2.Clone
 
-        labels(2) = CStr(dst3.CountNonZero) + " pixels were updated with new maximums."
+        labels(2) = cv.Cv2.CountNonZero(dst3) + " pixels were updated with new maximums."
     End Sub
 End Class
 
@@ -110,7 +112,7 @@ Public Class StableGray_RGBMin : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If task.gOptions.stableDepthRGB.Checked Then
-            Dim split = task.color.Split()
+            Dim split = cv.Cv2.Split(task.color)
 
             stableB.Run(split(0))
             split(0) = stableB.dst2.Clone
@@ -142,7 +144,7 @@ Public Class StableGray_RGBMax : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If task.gOptions.stableDepthRGB.Checked Then
-            Dim split = task.color.Split()
+            Dim split = cv.Cv2.Split(task.color)
 
             stableB.Run(split(0))
             split(0) = stableB.dst2.Clone
@@ -181,9 +183,10 @@ Public Class StableGray_MinMaxCompare : Inherits TaskParent
         labels(3) = "Max gray image - should be a little lighter."
 
         cv.Cv2.Absdiff(dst1, dst3, dst0)
-        dst2 = dst0.Threshold(0, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs()
+        cv.Cv2.Threshold(dst0, dst2, 0, 255, cv.ThresholdTypes.Binary)
+        cv.Cv2.ConvertScaleAbs(dst2, dst2)
 
-        Dim count = dst2.CountNonZero
+        Dim count = cv.Cv2.CountNonZero(dst2)
         labels(2) = CStr(count) + " pixels or " + Format(count / src.Total, "0.0%") +
                     " differ between min and max images. (Should be very high)"
     End Sub
@@ -208,7 +211,7 @@ Public Class StableGray_MinMaxRange : Inherits TaskParent
         labels(1) = "Min gray image"
 
         cv.Cv2.Absdiff(compare.dst1, compare.dst3, dst0)
-        Dim average = dst0.Mean().Val0
+        Dim average = cv.Cv2.Mean(dst0).Val0
         labels(3) = Format(average, fmt2) + " average pixel difference between min and max stable gray."
 
         plot.Run(dst0)
@@ -236,7 +239,7 @@ Public Class StableGray_Measure : Inherits TaskParent
         Static lastFrame As cv.Mat = task.grayOriginal
 
         cv.Cv2.Absdiff(task.grayOriginal, lastFrame, dst0)
-        averageDiff = dst0.Mean().Val0
+        averageDiff = cv.Cv2.Mean(dst0).Val0
 
         averageHistory.Add(averageDiff)
         If averageHistory.Count > 50 Then averageHistory.RemoveAt(0)

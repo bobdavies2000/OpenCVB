@@ -1,4 +1,4 @@
-﻿Imports cv = OpenCvSharp
+Imports cv = OpenCvSharp
 Public Class TrueText
     Declare Sub CopyClassToManagedCpp Lib "ManagedCppLibrary.dll" (dataPtr As IntPtr)
     Public text As String
@@ -100,10 +100,10 @@ Public Class TaskParent : Implements IDisposable
         Return False
     End Function
     Public Sub DrawRect(dst As cv.Mat, rect As cv.Rect, color As cv.Scalar)
-        dst.Rectangle(rect, color, task.lineWidth, task.lineType)
+    cv.Cv2.Rectangle(dst, rect, color, task.lineWidth, task.lineType)
     End Sub
     Public Sub DrawRect(dst As cv.Mat, rect As cv.Rect)
-        dst.Rectangle(rect, task.highlight, task.lineWidth, task.lineType)
+    cv.Cv2.Rectangle(dst, rect, task.highlight, task.lineWidth, task.lineType)
     End Sub
     Public Shared Function Palettize(input As cv.Mat, Optional first As Byte = 1) As cv.Mat
         If first = 0 Then

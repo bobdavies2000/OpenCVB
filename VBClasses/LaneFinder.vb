@@ -81,9 +81,9 @@ Public Class LaneFinder_HLSColor : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         input.Run(src)
-        dst0 = input.dst2.CvtColor(cv.ColorConversionCodes.BGR2HLS)
-        dst1 = dst0.InRange(New cv.Scalar(0, 200, 0), New cv.Scalar(255, 255, 255))
-        dst2 = dst0.InRange(New cv.Scalar(10, 0, 100), New cv.Scalar(40, 255, 255))
+        cv.Cv2.CvtColor(input.dst2, dst0, cv.ColorConversionCodes.BGR2HLS)
+        cv.Cv2.InRange(dst0, New cv.Scalar(0, 200, 0), New cv.Scalar(255, 255, 255), dst1)
+        cv.Cv2.InRange(dst0, New cv.Scalar(10, 0, 100), New cv.Scalar(40, 255, 255), dst2)
         dst3 = dst1 Or dst2
     End Sub
 End Class
@@ -117,7 +117,7 @@ Public Class XR_LaneFinder_ROI : Inherits TaskParent
 
             Dim pList() As cv.Point = {bl, tl, tr, br}
             dst1 = New cv.Mat(New cv.Size(w, h), cv.MatType.CV_8U, cv.Scalar.All(0))
-            dst1.FillConvexPoly(pList, white, task.lineType)
+            cv.Cv2.FillConvexPoly(dst1, pList, white, task.lineType)
             pListList(0) = pList
         End If
 
@@ -192,11 +192,11 @@ Public Class LaneFinder_SlopeIntercept : Inherits TaskParent
 
         Dim p1 = New cv.Point(0, leftLaneIntercept)
         Dim p2 = New cv.Point(-leftLaneIntercept / leftAvgSlope, 0)
-        tmp.Line(p1, p2, white, task.lineWidth, task.lineType)
+        cv.Cv2.Line(tmp, p1, p2, white, task.lineWidth, task.lineType)
 
         p1 = New cv.Point(0, rightLaneIntercept)
         p2 = New cv.Point((dst0.Height - rightLaneIntercept) / rightAvgSlope, dst2.Height)
-        tmp.Line(p1, p2, white, task.lineWidth, task.lineType)
+        cv.Cv2.Line(tmp, p1, p2, white, task.lineWidth, task.lineType)
 
         tmp.CopyTo(dst2, hough.mask)
         dst2.CopyTo(dst3, dst2)

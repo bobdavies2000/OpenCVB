@@ -1,4 +1,5 @@
 Imports System.Runtime.InteropServices
+Imports System.Windows.Documents
 Imports cv = OpenCvSharp
 Public Class Histogram_Basics : Inherits TaskParent
     Implements IDisposable
@@ -21,7 +22,9 @@ Public Class Histogram_Basics : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         If standalone Then
             If task.heartBeat Then splitIndex = (splitIndex + 1) Mod 3
-            mm = GetMinMax(src.ExtractChannel(splitIndex))
+            Dim input As New cv.Mat
+            cv.Cv2.ExtractChannel(src, input, splitIndex)
+            mm = GetMinMax(input)
             plotHist.backgroundColor = Choose(splitIndex + 1, cv.Scalar.LightBlue, cv.Scalar.Green, cv.Scalar.LightPink)
         Else
             If src.Channels() <> 1 Then src = task.gray
@@ -119,7 +122,7 @@ Public Class Histogram_Graph : Inherits TaskParent
             cv.Cv2.CalcHist({src}, {i}, New cv.Mat(), hist, 1, dimensions, ranges)
             histRaw(i) = hist.Clone()
             mm = GetMinMax(histRaw(i))
-            histNormalized(i) = hist.Normalize(0, hist.Rows, cv.NormTypes.MinMax)
+            cv.Cv2.Normalize(hist, histNormalized(i), 0, hist.Rows, cv.NormTypes.MinMax)
             If standaloneTest() Or plotRequested Then
                 Dim points = New List(Of cv.Point)
                 Dim listOfPoints = New List(Of List(Of cv.Point))
@@ -127,7 +130,7 @@ Public Class Histogram_Graph : Inherits TaskParent
                     points.Add(New cv.Point(CInt(j * plotWidth), dst2.Rows - dst2.Rows * histRaw(i).Get(Of Single)(j, 0) / mm.maxVal))
                 Next
                 listOfPoints.Add(points)
-                dst2.Polylines(listOfPoints, False, plotColors(i), task.lineWidth, task.lineType)
+                cv.Cv2.Polylines(dst2, listOfPoints, False, plotColors(i), task.lineWidth, task.lineType)
             End If
         Next
 
@@ -154,7 +157,7 @@ Public Class XR_Histogram_NormalizeGray : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
 
-        dst3 = src.Normalize(options.minGray, options.maxGray, cv.NormTypes.MinMax) ' only minMax is working...
+        cv.Cv2.Normalize(src, dst3, options.minGray, options.maxGray, cv.NormTypes.MinMax) ' only minMax is working...
         hist.Run(dst3)
         dst2 = hist.dst2
     End Sub
@@ -206,7 +209,7 @@ Public Class XR_Histogram_ColorsAndGray : Inherits TaskParent
         desc = "Create a histogram of a normalized image"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        Dim split = src.Split()
+        Dim split = cv.Cv2.Split(src)
         ReDim Preserve split(4 - 1)
         split(4 - 1) = task.gray ' add a 4th image - the grayscale image to the R G and B images.
         For i = 0 To split.Length - 1
@@ -282,13 +285,16 @@ Public Class XR_Histogram_PeakMax : Inherits TaskParent
         Dim pixelMin = CInt((histindex) * barRange)
         Dim pixelMax = CInt((histindex + 1) * barRange)
 
-        Dim mask = src.InRange(pixelMin, pixelMax).Threshold(1, 255, cv.ThresholdTypes.Binary)
+        Dim mask As New cv.Mat
+
+        cv.Cv2.InRange(src, pixelMin, pixelMax, mask)
+        cv.Cv2.Threshold(mask, mask, 1, 255, cv.ThresholdTypes.Binary)
         Dim tmp = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         src.CopyTo(tmp, mask)
-        dst2 = tmp.Threshold(0, 255, cv.ThresholdTypes.Binary)
+        cv.Cv2.Threshold(tmp, dst2, 0, 255, cv.ThresholdTypes.Binary)
 
         labels(2) = "BackProjection of most frequent gray pixel"
-        dst3.Rectangle(New cv.Rect(barWidth * histindex, 0, barWidth, dst2.Height), cv.Scalar.Yellow, 1)
+        cv.Cv2.Rectangle(dst3, New cv.Rect(barWidth * histindex, 0, barWidth, dst2.Height), cv.Scalar.Yellow, 1)
     End Sub
 End Class
 
@@ -431,7 +437,7 @@ Public Class XR_Histogram_PeaksRGB : Inherits TaskParent
         desc = "Find the peaks and valleys for each of the BGR channels."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        Dim split = src.Split()
+        Dim split = cv.Cv2.Split(src)
         For i = 0 To 3 - 1
             peaks(i).hist.plotHist.backgroundColor = Choose(i + 1, cv.Scalar.Blue, cv.Scalar.Green, cv.Scalar.Red)
             peaks(i).hist.plotHist.addLabels = False
@@ -468,7 +474,8 @@ Public Class XR_Histogram_Color : Inherits TaskParent
         ranges = New cv.Rangef() {New cv.Rangef(0, 255), New cv.Rangef(0, 255)}
         cv.Cv2.CalcHist({src}, {1, 2}, New cv.Mat, histogram, 1, {task.histogramBins, task.histogramBins}, ranges)
 
-        Dim test = histogram.Normalize(0, 255, cv.NormTypes.MinMax)
+        Dim test As New cv.Mat
+        cv.Cv2.Normalize(histogram, test, 0, 255, cv.NormTypes.MinMax)
 
         Dim input As New cv.Mat
         src.ConvertTo(input, cv.MatType.CV_32FC3)
@@ -504,7 +511,7 @@ Public Class Histogram_KalmanAuto : Inherits TaskParent
         If standaloneTest() Then
             If task.heartBeat Then splitIndex = If(splitIndex < 2, splitIndex + 1, 0)
             colorName = Choose(splitIndex + 1, "Blue", "Green", "Red")
-            Dim split = src.Split()
+            Dim split = cv.Cv2.Split(src)
             src = split(splitIndex)
         End If
 
@@ -563,7 +570,7 @@ Public Class Histogram_EqualizeColor : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         Dim rgb(2) As cv.Mat
         Dim rgbEq(2) As cv.Mat
-        rgbEq = task.color.Split()
+        rgbEq = cv.Cv2.Split(task.color)
 
         For i = 0 To rgb.Count - 1
             cv.Cv2.EqualizeHist(rgbEq(i), rgbEq(i))
@@ -613,7 +620,8 @@ Public Class Histogram_CompareGray : Inherits TaskParent
         dst2 = histK.dst2.Clone
         Static lastHist As cv.Mat = histK.hist.histogram
 
-        Dim histNorm As cv.Mat = histK.hist.histogram.Normalize(0, 1, cv.NormTypes.MinMax)
+        Dim histNorm As New cv.Mat
+        cv.Cv2.Normalize(histK.hist.histogram, histNorm, 0, 1, cv.NormTypes.MinMax)
         Static lastHistNorm As cv.Mat = histNorm.Clone
 
         If lastHistNorm.Size = histK.hist.histogram.Size Then
@@ -716,7 +724,8 @@ Public Class XR_Histogram_CompareEMD_hsv : Inherits TaskParent
         desc = "Use OpenCV's Earth Mover Distance to compare 2 images."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        Dim hsv = src.CvtColor(cv.ColorConversionCodes.BGR2HSV)
+        Dim hsv As New cv.Mat
+        cv.Cv2.CvtColor(src, hsv, cv.ColorConversionCodes.BGR2HSV)
         Static lastHSV As cv.Mat = hsv.Clone
 
         Dim hBins = 30, sBins = 32
@@ -724,10 +733,12 @@ Public Class XR_Histogram_CompareEMD_hsv : Inherits TaskParent
         Dim ranges = New cv.Rangef() {New cv.Rangef(0, 180), New cv.Rangef(0, 256)}
 
         cv.Cv2.CalcHist({hsv}, {0, 1}, New cv.Mat, histA, 2, {hBins, sBins}, ranges)
-        Dim histNormA As cv.Mat = histA.Normalize(0, 1, cv.NormTypes.MinMax)
+        Dim histNormA As New cv.Mat
+        cv.Cv2.Normalize(histA, histNormA, 0, 1, cv.NormTypes.MinMax)
 
         cv.Cv2.CalcHist({lastHSV}, {0, 1}, New cv.Mat, histB, 2, {hBins, sBins}, ranges)
-        Dim histNormB As cv.Mat = histB.Normalize(0, 1, cv.NormTypes.MinMax)
+        Dim histNormB As New cv.Mat
+        cv.Cv2.Normalize(histB, histNormB, 0, 1, cv.NormTypes.MinMax)
 
         Dim sig1 = New cv.Mat(sBins * hBins, 3, cv.MatType.CV_32F, cv.Scalar.All(0))
         Dim sig2 = New cv.Mat(sBins * hBins, 3, cv.MatType.CV_32F, cv.Scalar.All(0))
@@ -784,8 +795,8 @@ Public Class XR_Histogram_Lab : Inherits TaskParent
         desc = "Create a histogram from a BGR image converted to LAB."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        dst0 = src.CvtColor(cv.ColorConversionCodes.BGR2Lab)
-        Dim split = dst0.Split()
+        cv.Cv2.CvtColor(src, dst0, cv.ColorConversionCodes.BGR2Lab)
+        Dim split = cv.Cv2.Split(dst0)
 
         hist.Run(split(0))
         dst1 = hist.dst2.Clone
@@ -864,7 +875,7 @@ Public Class XR_Histogram_FlatSurfaces : Inherits TaskParent
         Dim maxRange = 4
         Dim cloudY = task.pcSplit(1).Clone
         Dim mm As mmData = GetMinMax(cloudY)
-        cloudY = cloudY.Threshold(maxRange, mm.maxVal, cv.ThresholdTypes.Trunc)
+        cv.Cv2.Threshold(cloudY, cloudY, maxRange, mm.maxVal, cv.ThresholdTypes.Trunc)
         Static saveMinVal = mm.minVal, saveMaxVal = mm.maxVal
         If task.heartBeat Then
             saveMinVal = mm.minVal
@@ -877,7 +888,7 @@ Public Class XR_Histogram_FlatSurfaces : Inherits TaskParent
         cloudY.Set(Of Single)(mm.minLoc.Y, mm.minLoc.X, -saveMinVal)
         cloudY.Set(Of Single)(mm.maxLoc.Y, mm.maxLoc.X, saveMaxVal)
         cloudY = (cloudY - saveMinVal).tomat
-        cloudY = cloudY.ConvertScaleAbs(255 / (-saveMinVal + saveMaxVal))
+        cv.Cv2.ConvertScaleAbs(cloudY, cloudY, 255 / (-saveMinVal + saveMaxVal))
         mm = GetMinMax(cloudY)
         cloudY.SetTo(0, task.noDepthMask)
         masks.Run(cloudY)
@@ -899,14 +910,14 @@ Public Class XR_Histogram_Gotcha2D : Inherits TaskParent
         desc = "Create a 2D side view for ZY histogram of depth using integer values.  Testing calcHist gotcha."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        Dim expected = task.pcSplit(2).CountNonZero
+        Dim expected = cv.Cv2.CountNonZero(task.pcSplit(2))
         Dim ranges = task.rangesSide
         If task.toggleOn Then
             ranges = New cv.Rangef() {New cv.Rangef(-10, +10), New cv.Rangef(-1, 20)}
         End If
         cv.Cv2.CalcHist({task.pointCloud}, task.channelsSide, New cv.Mat, histogram, 2, task.bins2D, task.rangesSide)
 
-        Dim actual = histogram.Sum(0)
+        Dim actual = cv.Cv2.Sum(histogram)(0)
 
         If task.heartBeat Then
             strOut = "Expected sample count:" + vbTab + CStr(expected) + vbCrLf +
@@ -918,7 +929,8 @@ Public Class XR_Histogram_Gotcha2D : Inherits TaskParent
                          "A third way samples may not match: max depth can toss samples as well."
         End If
         SetTrueText(strOut, 3)
-        dst2 = histogram.Threshold(0, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs
+        cv.Cv2.Threshold(histogram, dst2, 0, 255, cv.ThresholdTypes.Binary)
+        cv.Cv2.ConvertScaleAbs(dst2, dst2)
     End Sub
 End Class
 
@@ -941,7 +953,7 @@ Public Class XR_Histogram_Gotcha : Inherits TaskParent
 
         hist.Run(src)
 
-        Dim actual = hist.histogram.Sum(0)
+        Dim actual = cv.Cv2.Sum(hist.histogram)(0)
 
         If task.heartBeat Then
             strOut = "Expected sample count:" + vbTab + CStr(expected) + vbCrLf +
@@ -1219,7 +1231,9 @@ Public Class Histogram_CloudSegments : Inherits TaskParent
 
         dst1.SetTo(0)
         For i = 0 To plot.histogram.Rows - 1
-            Dim mask = src.InRange(i * incr, (i + 1) * incr).ConvertScaleAbs
+            Dim mask As New cv.Mat
+            cv.Cv2.InRange(src, i * incr, (i + 1) * incr, mask)
+            cv.Cv2.ConvertScaleAbs(mask, mask)
             dst1.SetTo(i + 1, mask)
         Next
         dst1.SetTo(0, task.noDepthMask)
@@ -1390,7 +1404,7 @@ Public Class Histogram_PointCloud : Inherits TaskParent
                 cv.Cv2.CalcHist({task.pointCloud}, task.channels, New cv.Mat(), histogram,
                                      task.channelCount, task.histBinList, task.ranges)
 
-                dst2 = histogram.Resize(dst2.Size(), 0, 0, cv.InterpolationFlags.Nearest)
+                cv.Cv2.Resize(histogram, dst2, dst2.Size(), 0, 0, cv.InterpolationFlags.Nearest)
                 labels(2) = "2D plot of 2D histogram."
                 If dst2.Type <> cv.MatType.CV_8U Then dst2.ConvertTo(dst2, cv.MatType.CV_8U)
             Case "XYZ Reduction"
@@ -1491,7 +1505,7 @@ Public Class XR_Histogram_InverseLUT : Inherits TaskParent
         desc = "Invert the histogram of the color image using green.  G = 0.299 R + 0.587 G + 0.114 B"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        Dim split = task.color.Split()
+        Dim split = cv.Cv2.Split(task.color)
         hist.Run(split(1))
         dst2 = hist.dst2
 
@@ -1502,9 +1516,9 @@ Public Class XR_Histogram_InverseLUT : Inherits TaskParent
         Dim minRange = New cv.Scalar(histIndex * incr)
         Dim maxRange = New cv.Scalar((histIndex + 1) * incr)
         If histIndex + 1 = task.histogramBins Then maxRange = New cv.Scalar(255)
-        dst1 = split(1).InRange(minRange, maxRange)
-        dst2.Rectangle(New cv.Rect(CInt(histIndex) * colWidth, 0, colWidth, dst2.Height), cv.Scalar.Yellow, task.lineWidth)
-        labels(1) = CStr(dst1.CountNonZero) + " pixels in that range"
+                  cv.Cv2.InRange(split(1), minRange, maxRange, dst1)
+                  cv.Cv2.Rectangle(dst2, New cv.Rect(CInt(histIndex) * colWidth, 0, colWidth, dst2.Height), cv.Scalar.Yellow, task.lineWidth)
+        labels(1) = CStr(cv.Cv2.CountNonZero(dst1)) + " pixels in that range"
 
         incr = Math.Truncate(255 / task.histogramBins)
         Dim lutTable As New cv.Mat(1, 256, cv.MatType.CV_8UC3)
@@ -1518,7 +1532,8 @@ Public Class XR_Histogram_InverseLUT : Inherits TaskParent
         Next
 
         dst0.SetTo(0)
-        dst0 = split(1).LUT(lutTable2) + 1
+        cv.Cv2.LUT(split(1), lutTable2, dst0)
+        dst0 += 1
         dst3 = Palettize(dst0)
     End Sub
 End Class
@@ -1567,12 +1582,13 @@ Public Class Histogram_Depth : Inherits TaskParent
 
         Dim stepsize = dst2.Width / task.MaxZmeters
         For i = 1 To CInt(task.MaxZmeters) - 1
-            dst2.Line(New cv.Point(stepsize * i, 0), New cv.Point(stepsize * i, dst2.Height), white, Utility_Basics.getThickness)
+            cv.Cv2.Line(dst2, New cv.Point(stepsize * i, 0), New cv.Point(stepsize * i, dst2.Height), white, Utility_Basics.getThickness)
         Next
 
         If standaloneTest() Then
-            Dim expected = src.CountNonZero
-            Dim actual = CInt(plotHist.histogram.Sum(0))
+            Dim expected = cv.Cv2.CountNonZero(src)
+            Dim actual = cv.Cv2.Sum(plotHist.histogram)(0)
+
             strOut = "Expected sample count (non-zero task.pcSplit(2) entries):" + vbTab + CStr(expected) + vbCrLf
             strOut += "Histogram sum (ranges can reduce):" + vbTab + vbTab + vbTab + CStr(actual) + vbCrLf
             strOut += "Difference:" + vbTab + vbTab + vbTab + vbTab + vbTab + vbTab + CStr(Math.Abs(actual - expected)) + vbCrLf

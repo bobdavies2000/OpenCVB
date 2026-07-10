@@ -16,8 +16,10 @@ Public Class Hist2D_Basics : Inherits TaskParent
             Return {New cv.Rangef(-histDelta, 256), New cv.Rangef(-histDelta, 256)}
         End If
 
-        Dim xInput = input.ExtractChannel(chan1)
-        Dim yInput = input.ExtractChannel(chan2)
+        Dim xInput As New cv.Mat
+        cv.Cv2.ExtractChannel(input, xInput, chan1)
+        Dim yInput As New cv.Mat
+        cv.Cv2.ExtractChannel(input, yInput, chan2)
 
         Dim mmX = GetMinMax(xInput)
         Dim mmY = GetMinMax(yInput)
@@ -29,7 +31,7 @@ Public Class Hist2D_Basics : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         ranges = GetHist2Dminmax(src, channels(0), channels(1))
         cv.Cv2.CalcHist({src}, channels, New cv.Mat(), histogram, 2, histRowsCols, ranges)
-        dst2 = histogram.Threshold(0, 255, cv.ThresholdTypes.Binary)
+        cv.Cv2.Threshold(histogram, dst2, 0, 255, cv.ThresholdTypes.Binary)
         dst2.ConvertTo(dst2, cv.MatType.CV_8U)
     End Sub
 End Class
@@ -58,7 +60,7 @@ Public Class Hist2D_Cloud : Inherits TaskParent
         cv.Cv2.CalcHist({task.pointCloud}, task.channels, New cv.Mat(),
                             histogram, 2, {task.histogramBins, task.histogramBins}, ranges)
 
-        dst2 = histogram.Resize(dst2.Size(), 0, 0, cv.InterpolationFlags.Nearest)
+        cv.Cv2.Resize(histogram, dst2, dst2.Size(), 0, 0, cv.InterpolationFlags.Nearest)
         dst3 = Palettize(dst2, 0)
     End Sub
 End Class
@@ -83,8 +85,10 @@ Public Class XR_Hist2D_Depth : Inherits TaskParent
         ranges = hist2d.ranges
         channels = task.channels
 
-        dst2 = histogram.Threshold(0, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs
-        dst3 = histogram.Threshold(task.projectionThreshold, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs
+        cv.Cv2.Threshold(histogram, dst2, 0, 255, cv.ThresholdTypes.Binary)
+        cv.Cv2.ConvertScaleAbs(dst2, dst2)
+        cv.Cv2.Threshold(histogram, dst3, task.projectionThreshold, 255, cv.ThresholdTypes.Binary)
+        cv.Cv2.ConvertScaleAbs(dst3, dst3)
 
         labels = {"", "", "Mask of the 2D histogram for selected channels", "Mask of 2D histogram after thresholding"}
     End Sub
@@ -133,12 +137,12 @@ Public Class Hist2D_HSV : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         Dim histRowsCols = {dst2.Height, dst2.Width}
 
-        src = src.CvtColor(cv.ColorConversionCodes.BGR2HSV)
+        cv.Cv2.CvtColor(src, src, cv.ColorConversionCodes.BGR2HSV)
         cv.Cv2.CalcHist({src}, {0, 2}, task.depthmask, histogram02, 2, histRowsCols, task.rangesHSV)
-        dst2 = histogram02.Threshold(0, 255, cv.ThresholdTypes.Binary)
+        cv.Cv2.Threshold(histogram02, dst2, 0, 255, cv.ThresholdTypes.Binary)
 
         cv.Cv2.CalcHist({src}, {0, 1}, task.depthmask, histogram01, 2, histRowsCols, task.rangesHSV)
-        dst3 = histogram01.Threshold(0, 255, cv.ThresholdTypes.Binary)
+        cv.Cv2.Threshold(histogram01, dst3, 0, 255, cv.ThresholdTypes.Binary)
 
         labels(2) = "Hue is on the X-Axis and Value is on the Y-Axis"
         labels(3) = "Hue is on the X-Axis and Saturation is on the Y-Axis"
@@ -160,10 +164,10 @@ Public Class Hist2D_BGR : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         Dim histRowsCols = {dst2.Height, dst2.Width}
         cv.Cv2.CalcHist({src}, {0, 2}, task.depthmask, histogram02, 2, histRowsCols, task.rangesBGR)
-        dst2 = histogram02.Threshold(0, 255, cv.ThresholdTypes.Binary)
+        cv.Cv2.Threshold(histogram02, dst2, 0, 255, cv.ThresholdTypes.Binary)
 
         cv.Cv2.CalcHist({src}, {0, 1}, task.depthmask, histogram01, 2, histRowsCols, task.rangesBGR)
-        dst3 = histogram01.Threshold(0, 255, cv.ThresholdTypes.Binary)
+        cv.Cv2.Threshold(histogram01, dst3, 0, 255, cv.ThresholdTypes.Binary)
 
         labels(2) = "Blue is on the X-Axis and Red is on the Y-Axis"
         labels(3) = "Blue is on the X-Axis and Green is on the Y-Axis"
@@ -184,9 +188,8 @@ Public Class XR_Hist2D_PlotHistogram1D : Inherits TaskParent
         desc = "Create a 2D histogram for blue to red and blue to green."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        cv.Cv2.CalcHist({src}, task.channels, task.depthmask, histogram, 2,
-                            {task.histogramBins, task.histogramBins}, task.rangesBGR)
-        dst2 = histogram.Threshold(0, 255, cv.ThresholdTypes.Binary)
+        cv.Cv2.CalcHist({src}, task.channels, task.depthmask, histogram, 2, {task.histogramBins, task.histogramBins}, task.rangesBGR)
+        cv.Cv2.Threshold(histogram, dst2, 0, 255, cv.ThresholdTypes.Binary)
 
         plotHist.Run(histogram)
         dst3 = plotHist.dst2

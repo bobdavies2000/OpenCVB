@@ -103,7 +103,7 @@ Public Class Flood_BasicsDemo : Inherits TaskParent
 
         dst1 = src.Clone
 
-        dst3 = task.edges.dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        cv.Cv2.CvtColor(task.edges.dst2, dst3, cv.ColorConversionCodes.GRAY2BGR)
 
         dst2.SetTo(white, dst3)
     End Sub
@@ -148,9 +148,11 @@ Public Class XR_Flood_Tiers : Inherits TaskParent
         If tier >= tiers.classCount Then tier = 0
 
         If tier = 0 Then
-            dst0 = Not tiers.dst2.InRange(0, 1)
+            cv.Cv2.InRange(tiers.dst2, 0, 1, dst0)
+            dst0 = Not dst0
         Else
-            dst0 = Not tiers.dst2.InRange(tier, tier)
+            cv.Cv2.InRange(tiers.dst2, tier, tier, dst0)
+            dst0 = Not dst0
         End If
 
         labels(2) = tiers.labels(2) + " in tier " + CStr(tier) + ".  Use the global options 'DebugSlider' to select different tiers."
@@ -191,7 +193,7 @@ Public Class XR_Flood_Minimal : Inherits TaskParent
             Dim count = cv.Cv2.FloodFill(dst2, mask, pt, 255, rect, 0, 0, flags)
             dst1.SetTo(0)
             dst3 = mask(New cv.Rect(1, 1, dst2.Width, dst2.Height)).Clone
-            dst1.Rectangle(rect, 255, task.lineWidth)
+            cv.Cv2.Rectangle(dst1, rect, cv.Scalar.All(255), task.lineWidth)
         End If
     End Sub
 End Class
@@ -247,7 +249,8 @@ Public Class Flood_BasicsMask : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         color8U.Run(src)
-        inputRemoved = task.pcSplit(2).InRange(task.MaxZmeters, 1000).ConvertScaleAbs()
+        cv.Cv2.InRange(task.pcSplit(2), task.MaxZmeters, 1000, inputRemoved)
+        cv.Cv2.ConvertScaleAbs(inputRemoved, inputRemoved)
         src = color8U.dst2
 
         src.SetTo(0, inputRemoved)
@@ -282,7 +285,9 @@ Public Class Flood_FeatureLess : Inherits TaskParent
         dst3 = redC.dst2
         labels(3) = redC.labels(2)
 
-        edges.Run(dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
+        Dim _edges_cvt As New cv.Mat
+        cv.Cv2.CvtColor(dst2, _edges_cvt, cv.ColorConversionCodes.BGR2GRAY)
+        edges.Run(_edges_cvt)
         dst3.SetTo(white, edges.dst2)
 
         SetTrueText(redC.strOut, 1)

@@ -37,8 +37,8 @@ Public Class PCdiff_Basics : Inherits TaskParent
 
         dst2 = New cv.Mat(dst2.Size, src.Type, 0)
         cv.Cv2.Absdiff(src(r1), src(r2), dst2(r3))
-        dst1 = dst2.Threshold(options1.mmThreshold / 1000, 255, cv.ThresholdTypes.BinaryInv)
-        dst3 = dst1.ConvertScaleAbs
+        cv.Cv2.Threshold(dst2, dst1, options1.mmThreshold / 1000, 255, cv.ThresholdTypes.BinaryInv)
+        cv.Cv2.ConvertScaleAbs(dst1, dst3)
         dst3.SetTo(0, task.noDepthMask)
     End Sub
 End Class
@@ -120,7 +120,7 @@ Public Class PCdiff_Points : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         filter.Run(src)
-        task.pcSplit = filter.dst3.Split()
+        task.pcSplit = cv.Cv2.Split(filter.dst3)
 
         dst2.SetTo(0)
         Dim countInf As Integer
@@ -144,7 +144,7 @@ Public Class PCdiff_Points : Inherits TaskParent
             Next
         Next
 
-        task.noDepthMask = task.pcSplit(2).InRange(0, 0)
+                  cv.Cv2.InRange(task.pcSplit(2), 0, 0, task.noDepthMask)
         cv.Cv2.Merge(task.pcSplit, dst3)
     End Sub
 End Class

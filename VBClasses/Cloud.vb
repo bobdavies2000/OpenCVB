@@ -149,13 +149,13 @@ Public Class Cloud_SetupSide : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         Dim distanceRatio As Single = 1
-        If src.Channels() <> 3 Then src = src.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        If src.Channels() <> 3 Then cv.Cv2.CvtColor(src, src, cv.ColorConversionCodes.GRAY2BGR)
 
         If standaloneTest() Then dst2.SetTo(0) Else src.CopyTo(dst2)
-        dst2.Circle(task.sideCameraPoint, task.DotSize, cv.Scalar.BlueViolet, -1, task.lineType)
+        cv.Cv2.Circle(dst2, task.sideCameraPoint, task.DotSize, cv.Scalar.BlueViolet, -1, task.lineType)
         For i = 1 To task.MaxZmeters
             Dim xmeter = CInt(dst2.Width * i / task.MaxZmeters * distanceRatio)
-            dst2.Line(New cv.Point(xmeter, 0), New cv.Point(xmeter, dst2.Height), cv.Scalar.AliceBlue, 1)
+            cv.Cv2.Line(dst2, New cv.Point(xmeter, 0), New cv.Point(xmeter, dst2.Height), cv.Scalar.AliceBlue, 1)
             SetTrueText(CStr(i) + "m", New cv.Point(xmeter - src.Width / 24, dst2.Height - 10))
         Next
 
@@ -185,8 +185,8 @@ Public Class Cloud_SetupSide : Inherits TaskParent
                                                    (markerRight.Y - cam.Y) * Math.Cos(task.accRadians.Z) + (markerRight.X - cam.X) * Math.Sin(task.accRadians.Z) + cam.Y)
         End If
         If standaloneTest() = False Then
-            dst2.Circle(markerLeft, task.DotSize, cv.Scalar.Red, -1, task.lineType)
-            dst2.Circle(markerRight, task.DotSize, cv.Scalar.Red, -1, task.lineType)
+        cv.Cv2.Circle(dst2, markerLeft, task.DotSize, cv.Scalar.Red, -1, task.lineType)
+        cv.Cv2.Circle(dst2, markerRight, task.DotSize, cv.Scalar.Red, -1, task.lineType)
         End If
 
         ' draw the arc enclosing the camera FOV
@@ -196,13 +196,13 @@ Public Class Cloud_SetupSide : Inherits TaskParent
         Dim fovTop = New cv.Point(dst2.Width, cam.Y - y)
         Dim fovBot = New cv.Point(dst2.Width, cam.Y + y)
 
-        dst2.Line(cam, fovTop, white, 1, task.lineType)
-        dst2.Line(cam, fovBot, white, 1, task.lineType)
+        cv.Cv2.Line(dst2, cam, fovTop, white, 1, task.lineType)
+        cv.Cv2.Line(dst2, cam, fovBot, white, 1, task.lineType)
 
-        dst2.Circle(markerLeft, task.DotSize + 3, cv.Scalar.Red, -1, task.lineType)
-        dst2.Circle(markerRight, task.DotSize + 3, cv.Scalar.Red, -1, task.lineType)
-        dst2.Line(cam, markerLeft, cv.Scalar.Red, 1, task.lineType)
-        dst2.Line(cam, markerRight, cv.Scalar.Red, 1, task.lineType)
+        cv.Cv2.Circle(dst2, markerLeft, task.DotSize + 3, cv.Scalar.Red, -1, task.lineType)
+        cv.Cv2.Circle(dst2, markerRight, task.DotSize + 3, cv.Scalar.Red, -1, task.lineType)
+        cv.Cv2.Line(dst2, cam, markerLeft, cv.Scalar.Red, 1, task.lineType)
+        cv.Cv2.Line(dst2, cam, markerRight, cv.Scalar.Red, 1, task.lineType)
 
         Dim labelLocation = New cv.Point(src.Width * 0.02, src.Height * 7 / 8)
         SetTrueText("vFOV=" + Format(180 - startAngle * 2, "0.0") + " deg.", New cv.Point(4, dst2.Height * 3 / 4))
@@ -223,13 +223,13 @@ Public Class Cloud_SetupTop : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         Dim distanceRatio As Single = 1
-        If src.Channels() <> 3 Then src = src.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        If src.Channels() <> 3 Then cv.Cv2.CvtColor(src, src, cv.ColorConversionCodes.GRAY2BGR)
 
         If standaloneTest() Then dst2.SetTo(0) Else src.CopyTo(dst2)
-        dst2.Circle(task.topCameraPoint, task.DotSize, cv.Scalar.BlueViolet, -1, task.lineType)
+        cv.Cv2.Circle(dst2, task.topCameraPoint, task.DotSize, cv.Scalar.BlueViolet, -1, task.lineType)
         For i = 1 To task.MaxZmeters
             Dim ymeter = CInt(dst2.Height - dst2.Height * i / (task.MaxZmeters * distanceRatio))
-            dst2.Line(New cv.Point(0, ymeter), New cv.Point(dst2.Width, ymeter), cv.Scalar.AliceBlue, 1)
+            cv.Cv2.Line(dst2, New cv.Point(0, ymeter), New cv.Point(dst2.Width, ymeter), cv.Scalar.AliceBlue, 1)
             SetTrueText(CStr(i) + "m", New cv.Point(10, ymeter))
         Next
 
@@ -258,17 +258,17 @@ Public Class Cloud_SetupTop : Inherits TaskParent
         Dim fovRight = New cv.Point(task.topCameraPoint.X + x, 0)
         Dim fovLeft = New cv.Point(task.topCameraPoint.X - x, fovRight.Y)
 
-        dst2.Line(task.topCameraPoint, fovLeft, white, 1, task.lineType)
+        cv.Cv2.Line(dst2, task.topCameraPoint, fovLeft, white, 1, task.lineType)
 
-        dst2.Circle(markerLeft, task.DotSize + 3, cv.Scalar.Red, -1, task.lineType)
-        dst2.Circle(markerRight, task.DotSize + 3, cv.Scalar.Red, -1, task.lineType)
-        dst2.Line(cam, markerLeft, cv.Scalar.Red, 1, task.lineType)
-        dst2.Line(cam, markerRight, cv.Scalar.Red, 1, task.lineType)
+        cv.Cv2.Circle(dst2, markerLeft, task.DotSize + 3, cv.Scalar.Red, -1, task.lineType)
+        cv.Cv2.Circle(dst2, markerRight, task.DotSize + 3, cv.Scalar.Red, -1, task.lineType)
+        cv.Cv2.Line(dst2, cam, markerLeft, cv.Scalar.Red, 1, task.lineType)
+        cv.Cv2.Line(dst2, cam, markerRight, cv.Scalar.Red, 1, task.lineType)
 
         Dim shift = (src.Width - src.Height) / 2
         Dim labelLocation = New cv.Point(dst2.Width / 2 + shift, dst2.Height * 15 / 16)
         SetTrueText("hFOV=" + Format(180 - startAngle * 2, "0.0") + " deg.", New cv.Point(4, dst2.Height * 7 / 8))
-        dst2.Line(task.topCameraPoint, fovRight, white, task.lineWidth, task.lineWidth)
+        cv.Cv2.Line(dst2, task.topCameraPoint, fovRight, white, task.lineWidth, task.lineWidth)
     End Sub
 End Class
 
@@ -286,8 +286,10 @@ Public Class Cloud_Solo : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         heat.Run(src)
-        dst2 = heat.dst0.InRange(task.fOptions.FrameHistoryCount.Value , task.fOptions.FrameHistoryCount.Value ).ConvertScaleAbs
-        dst3 = heat.dst1.InRange(task.fOptions.FrameHistoryCount.Value , task.fOptions.FrameHistoryCount.Value ).ConvertScaleAbs
+        cv.Cv2.InRange(heat.dst0, task.fOptions.FrameHistoryCount.Value, task.fOptions.FrameHistoryCount.Value, dst2)
+        cv.Cv2.ConvertScaleAbs(dst2, dst2)
+        cv.Cv2.InRange(heat.dst1, task.fOptions.FrameHistoryCount.Value, task.fOptions.FrameHistoryCount.Value, dst3)
+        cv.Cv2.ConvertScaleAbs(dst3, dst3)
     End Sub
 End Class
 
@@ -336,7 +338,13 @@ Public Class XR_Cloud_SurfaceH_CPP : Inherits TaskParent
         Dim peakVal As Integer
         For i = 0 To dst2.Height - 1
             plot.srcX.Add(i)
-            If dst2.Channels() = 1 Then plot.srcY.Add(dst2.Row(i).CountNonZero) Else plot.srcY.Add(dst2.Row(i).CvtColor(cv.ColorConversionCodes.BGR2GRAY).CountNonZero)
+            If dst2.Channels() = 1 Then
+                plot.srcY.Add(cv.Cv2.CountNonZero(dst2.Row(i)))
+            Else
+                Dim _cvt1 As New cv.Mat
+                cv.Cv2.CvtColor(dst2.Row(i), _cvt1, cv.ColorConversionCodes.BGR2GRAY)
+                plot.srcY.Add(cv.Cv2.CountNonZero(_cvt1))
+            End If
             If peakVal < plot.srcY(i) Then
                 peakVal = plot.srcY(i)
                 peakRow = i
@@ -348,8 +356,8 @@ Public Class XR_Cloud_SurfaceH_CPP : Inherits TaskParent
             If botRow = 0 And plot.srcY(i) > 10 Then botRow = i
         Next
         plot.Run(src)
-        dst3 = plot.dst2.Transpose()
-        dst3 = dst3.Flip(cv.FlipMode.Y)
+        cv.Cv2.Transpose(plot.dst2, dst3)
+        cv.Cv2.Flip(dst3, dst3, cv.FlipMode.Y)
         labels(2) = "Top row = " + CStr(topRow) + " peak row = " + CStr(peakRow) + " bottom row = " + CStr(botRow)
     End Sub
 End Class
@@ -377,9 +385,9 @@ Public Class Cloud_SurfaceH : Inherits TaskParent
         botRow = 0
         peakRow = 0
         Dim peakVal As Integer
-        If dst2.Channels() <> 1 Then dst1 = dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If dst2.Channels() <> 1 Then cv.Cv2.CvtColor(dst2, dst1, cv.ColorConversionCodes.BGR2GRAY)
         For i = 0 To dst1.Height - 1
-            hist.At(Of Single)(i, 0) = dst1.Row(i).CountNonZero
+            hist.At(Of Single)(i, 0) = cv.Cv2.CountNonZero(dst1.Row(i))
             If peakVal < hist.At(Of Single)(i, 0) Then
                 peakVal = CInt(hist.At(Of Single)(i, 0))
                 peakRow = i
@@ -392,14 +400,15 @@ Public Class Cloud_SurfaceH : Inherits TaskParent
             If botRow = 0 And hist.At(Of Single)(i, 0) > 10 Then botRow = i
         Next
         plotHist.Run(hist)
-        dst3 = plotHist.dst2.Transpose()
-        dst3 = dst3.Flip(cv.FlipMode.Y)(New cv.Rect(0, 0, dst0.Height, dst0.Height)).Resize(dst0.Size)
+        cv.Cv2.Transpose(plotHist.dst2, dst3)
+        cv.Cv2.Flip(dst3, dst3, cv.FlipMode.Y)
+        cv.Cv2.Resize(dst3, dst3, dst0.Size)
         labels(2) = "Top row = " + CStr(topRow) + " peak row = " + CStr(peakRow) + " bottom row = " + CStr(botRow)
 
         Dim ratio = task.mouseMovePoint.Y / dst2.Height
         Dim offset = ratio * dst3.Height
-        dst2.Line(New cv.Point(0, task.mouseMovePoint.Y), New cv.Point(dst2.Width, task.mouseMovePoint.Y), yellow, task.lineWidth, task.lineWidth)
-        dst3.Line(New cv.Point(0, offset), New cv.Point(dst3.Width, offset), cv.Scalar.Yellow, task.lineWidth)
+        cv.Cv2.Line(dst2, New cv.Point(0, task.mouseMovePoint.Y), New cv.Point(dst2.Width, task.mouseMovePoint.Y), yellow, task.lineWidth, task.lineWidth)
+        cv.Cv2.Line(dst3, New cv.Point(0, offset), New cv.Point(dst3.Width, offset), cv.Scalar.Yellow, task.lineWidth)
     End Sub
 End Class
 
@@ -424,7 +433,7 @@ Public Class XR_Cloud_GridInspector : Inherits TaskParent
         Dim topPt = New cv.Point2f(cLine, 0)
         Dim botPt = New cv.Point2f(cLine, dst2.Height)
         dst2 = task.depthRGB
-        dst2.Line(topPt, botPt, 255, task.lineWidth, task.lineWidth)
+        cv.Cv2.Line(dst2, topPt, botPt, 255, task.lineWidth, task.lineWidth)
 
         SetTrueText("Values show r.pt3d values at the blue line.", New cv.Point(dst2.Width / 2, 0), 3)
         For i = 0 To dst2.Height - 1 Step task.gridWH
@@ -457,7 +466,8 @@ Public Class XR_Cloud_FrustrumTop : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         frustrum.Run(src)
 
-        heat.Run(frustrum.dst3.Resize(dst2.Size))
+        cv.Cv2.Resize(frustrum.dst3, dst2, dst2.Size)
+        heat.Run(dst2)
 
         setupTop.Run(heat.dst2)
         dst2 = setupTop.dst2
@@ -480,7 +490,8 @@ Public Class XR_Cloud_FrustrumSide : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         frustrum.Run(src)
-        heat.Run(frustrum.dst3.Resize(dst2.Size))
+        cv.Cv2.Resize(frustrum.dst3, dst2, dst2.Size)
+        heat.Run(dst2)
 
         setupSide.Run(heat.dst3)
         dst2 = setupSide.dst2
@@ -525,8 +536,8 @@ Public Class XR_Cloud_ReducedTopView : Inherits TaskParent
 
         cv.Cv2.CalcHist({split2.dst3}, task.channelsTop, New cv.Mat, dst1, 2, task.bins2D, task.rangesTop)
 
-        dst1 = dst1.Flip(cv.FlipMode.X)
-        dst1 = dst1.Threshold(0, 255, cv.ThresholdTypes.Binary)
+        cv.Cv2.Flip(dst1, dst1, cv.FlipMode.X)
+        cv.Cv2.Threshold(dst1, dst1, 0, 255, cv.ThresholdTypes.Binary)
         dst1.ConvertTo(dst2, cv.MatType.CV_8UC1)
     End Sub
 End Class
@@ -544,8 +555,8 @@ Public Class XR_Cloud_ReducedSideView : Inherits TaskParent
 
         cv.Cv2.CalcHist({split2.dst3}, task.channelsSide, New cv.Mat, dst1, 2, task.bins2D, task.rangesSide)
 
-        dst1 = dst1.Threshold(0, 255, cv.ThresholdTypes.Binary)
-        dst1 = dst1.Threshold(0, 255, cv.ThresholdTypes.Binary)
+        cv.Cv2.Threshold(dst1, dst1, 0, 255, cv.ThresholdTypes.Binary)
+        cv.Cv2.Threshold(dst1, dst1, 0, 255, cv.ThresholdTypes.Binary)
         dst1.ConvertTo(dst2, cv.MatType.CV_8UC1)
     End Sub
 End Class
@@ -565,13 +576,13 @@ Public Class XR_Cloud_ReducedViews : Inherits TaskParent
 
         cv.Cv2.CalcHist({split2.dst3}, task.channelsSide, New cv.Mat, dst1, 2, task.bins2D, task.rangesSide)
 
-        dst1 = dst1.Threshold(0, 255, cv.ThresholdTypes.Binary)
+        cv.Cv2.Threshold(dst1, dst1, 0, 255, cv.ThresholdTypes.Binary)
         dst1.ConvertTo(dst2, cv.MatType.CV_8UC1)
 
         cv.Cv2.CalcHist({split2.dst3}, task.channelsTop, New cv.Mat, dst1, 2, task.bins2D, task.rangesTop)
 
-        dst1 = dst1.Flip(cv.FlipMode.X)
-        dst1 = dst1.Threshold(0, 255, cv.ThresholdTypes.Binary)
+        cv.Cv2.Flip(dst1, dst1, cv.FlipMode.X)
+        cv.Cv2.Threshold(dst1, dst1, 0, 255, cv.ThresholdTypes.Binary)
         dst1.ConvertTo(dst3, cv.MatType.CV_8UC1)
     End Sub
 End Class
@@ -745,7 +756,7 @@ Public Class XR_Cloud_Templates : Inherits TaskParent
             src = New cv.Mat(dst1.Size, cv.MatType.CV_32F, 0)
             For Each contour In contours.contourList
                 If contour.depth = 0 Then Continue For
-                contour.depth = task.pcSplit(2)(contour.rect).Mean(contour.mask)
+                contour.depth = cv.Cv2.Mean(task.pcSplit(2)(contour.rect), contour.mask)
                 src(contour.rect).SetTo(contour.depth, contour.mask)
             Next
         End If
@@ -791,7 +802,8 @@ Public Class Cloud_Gravity_TA : Inherits TaskParent
     End Function
     Public Overrides Sub RunAlg(src As cv.Mat)
         originalPointcloud = task.pointCloud.Clone
-        task.maxDepthMask = originalPointcloud.InRange(task.MaxZmeters, 10000).ConvertScaleAbs()
+                  cv.Cv2.InRange(originalPointcloud, task.MaxZmeters, 10000, task.maxDepthMask)
+        cv.Cv2.ConvertScaleAbs(task.maxDepthMask, task.maxDepthMask)
 
         If task.optionsChanged Then
             If task.rangesCloud Is Nothing Then
@@ -817,9 +829,10 @@ Public Class Cloud_Gravity_TA : Inherits TaskParent
             task.pointCloud = checkNanInf(task.pointCloud)
         End If
 
-        task.pcSplit = task.pointCloud.Split
+        cv.Cv2.Split(task.pointCloud, task.pcSplit)
 
-        task.depthmask = task.pcSplit(2).Threshold(0, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs
+        cv.Cv2.Threshold(task.pcSplit(2), task.depthmask, 0, 255, cv.ThresholdTypes.Binary)
+        cv.Cv2.ConvertScaleAbs(task.depthmask, task.depthmask)
         task.noDepthMask = Not task.depthmask
 
         If task.xRange <> task.xRangeDefault Or task.yRange <> task.yRangeDefault Then
@@ -844,21 +857,18 @@ Public Class Cloud_Consistency : Inherits TaskParent
         desc = "A cloud pixel is only real if it is present in 2 consecutive frames."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        ' If task.toggleOn Then
-        Static lastDepth As cv.Mat = task.pcSplit(2).Abs()
-        Dim lastMask = lastDepth.Threshold(0.001, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs
+        Static lastDepth As cv.Mat = task.pcSplit(2).Clone
+        Dim lastMask As New cv.Mat
+        cv.Cv2.Threshold(lastDepth, lastMask, 0.001, 255, cv.ThresholdTypes.Binary)
+        cv.Cv2.ConvertScaleAbs(lastMask, lastMask)
 
         Dim mask = lastMask And task.depthmask
         task.pointCloud.CopyTo(pointcloud, mask)
-        pcSplit = pointcloud.Split()
+        pcSplit = cv.Cv2.Split(pointcloud)
 
         dst2 = pointcloud
 
-        lastDepth = pcSplit(2).Abs()
-        'Else
-        '    pointcloud = task.pointCloud.Clone
-        '    pcSplit = task.pcSplit
-        'End If
+        lastDepth = pcSplit(2).Clone
     End Sub
 End Class
 

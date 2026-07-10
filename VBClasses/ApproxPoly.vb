@@ -1,4 +1,4 @@
-﻿Imports cv = OpenCvSharp
+Imports cv = OpenCvSharp
 ' https://stackoverflow.com/questions/22132510/opencv-approxpolydp-for-edge-maps-Not-contours
 ' https://docs.opencvb.org/4.x/js_contour_features_approxPolyDP.html
 Public Class ApproxPoly_Basics : Inherits TaskParent
@@ -51,7 +51,9 @@ Public Class XR_ApproxPoly_FindandDraw : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         rotatedRect.Run(src)
         dst2 = rotatedRect.dst2
-        dst0 = dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY).Threshold(1, 255, cv.ThresholdTypes.Binary)
+        Dim _cvt1 As New cv.Mat
+        cv.Cv2.CvtColor(dst2, _cvt1, cv.ColorConversionCodes.BGR2GRAY)
+        cv.Cv2.Threshold(_cvt1, dst0, 1, 255, cv.ThresholdTypes.Binary)
 
         dst0.ConvertTo(dst1, cv.MatType.CV_32SC1)
         cv.Cv2.FindContours(dst1, allContours, Nothing, cv.RetrievalModes.FloodFill, cv.ContourApproximationModes.ApproxSimple)

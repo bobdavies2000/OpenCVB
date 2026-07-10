@@ -1,4 +1,4 @@
-﻿Public Class OptionsCombo
+Public Class OptionsCombo
     Public Sub Setup(traceName As String, label As String, comboList As List(Of String))
         Me.MdiParent = task.allOptions
         Me.Text = traceName + " ComboBox Options"

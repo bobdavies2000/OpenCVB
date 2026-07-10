@@ -1,4 +1,4 @@
-﻿Public Class OptionsFeatures
+Public Class OptionsFeatures
     Public grayCheckbox() As RadioButton
     Public colorCheckbox() As RadioButton
     Public colorMethods() As String = {"BackProject_Full", "Bin4Way_Regions", "Hist3DColor_Basics",

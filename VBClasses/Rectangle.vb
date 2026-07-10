@@ -12,7 +12,7 @@ Public Class Rectangle_Basics : Inherits TaskParent
         For j = 0 To vertices2f.Length - 1
             vertices(j) = New cv.Point(CInt(vertices2f(j).X), CInt(vertices2f(j).Y))
         Next
-        dst.FillConvexPoly(vertices, color, task.lineType)
+        cv.Cv2.FillConvexPoly(dst, vertices, color, task.lineType)
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
@@ -96,14 +96,14 @@ Public Class XR_Rectangle_Overlap : Inherits TaskParent
 
         If rect1.IntersectsWith(rect2) Then
             enclosingRect = rect1.Union(rect2)
-            dst3.Rectangle(enclosingRect, white, 4)
+            cv.Cv2.Rectangle(dst3, enclosingRect, white, 4)
             labels(3) = "Rectangles intersect - red marks overlapping rectangle"
-            dst3.Rectangle(rect1.Intersect(rect2), cv.Scalar.Red, -1)
+            cv.Cv2.Rectangle(dst3, rect1.Intersect(rect2), cv.Scalar.Red, -1)
         Else
             labels(3) = "Rectangles don't intersect"
         End If
-        dst3.Rectangle(rect1, cv.Scalar.Yellow, 2)
-        dst3.Rectangle(rect2, cv.Scalar.Yellow, 2)
+        cv.Cv2.Rectangle(dst3, rect1, cv.Scalar.Yellow, 2)
+cv.Cv2.Rectangle(dst3, rect2, cv.Scalar.Yellow, 2)
     End Sub
 End Class
 
@@ -154,7 +154,7 @@ Public Class XR_Rectangle_Intersection : Inherits TaskParent
         Else
             dst2.SetTo(0)
             For Each r In inputRects
-                dst2.Rectangle(r, cv.Scalar.Yellow, 1)
+            cv.Cv2.Rectangle(dst2, r, cv.Scalar.Yellow, 1)
             Next
         End If
 
@@ -174,7 +174,7 @@ Public Class XR_Rectangle_Intersection : Inherits TaskParent
 
         dst3.SetTo(0)
         For Each r In enclosingRects
-            dst3.Rectangle(r, cv.Scalar.Yellow, 2)
+        cv.Cv2.Rectangle(dst3, r, cv.Scalar.Yellow, 2)
         Next
         dst3 = dst2 * 0.5 Or dst3
     End Sub
@@ -208,7 +208,7 @@ Public Class XR_Rectangle_Union : Inherits TaskParent
         Else
             dst2.SetTo(0)
             For Each r In inputRects
-                dst2.Rectangle(r, cv.Scalar.Yellow, 1)
+            cv.Cv2.Rectangle(dst2, r, cv.Scalar.Yellow, 1)
             Next
             labels(2) = "Input rectangles = " + CStr(inputRects.Count)
         End If
@@ -227,7 +227,7 @@ Public Class XR_Rectangle_Union : Inherits TaskParent
         Next
         If allRect.X + allRect.Width >= dst2.Width Then allRect.Width = dst2.Width - allRect.X
         If allRect.Y + allRect.Height >= dst2.Height Then allRect.Height = dst2.Height - allRect.Y
-        dst2.Rectangle(allRect, cv.Scalar.Red, 2)
+        cv.Cv2.Rectangle(dst2, allRect, cv.Scalar.Red, 2)
     End Sub
 End Class
 
@@ -282,7 +282,7 @@ Public Class XR_Rectangle_MultiOverlap : Inherits TaskParent
         If standaloneTest() Then
             dst3.SetTo(0)
             For Each r In outputRects
-                dst3.Rectangle(r, cv.Scalar.Yellow, 2)
+            cv.Cv2.Rectangle(dst3, r, cv.Scalar.Yellow, 2)
             Next
             dst3 = dst2 * 0.5 Or dst3
             labels(3) = CStr(outputRects.Count) + " output rectangles"
@@ -319,7 +319,7 @@ Public Class Rectangle_EnclosingPoints : Inherits TaskParent
             pointList = quickRandomPoints(20)
             dst2.SetTo(0)
             For Each pt In pointList
-                dst2.Circle(pt, task.DotSize, task.highlight, -1, task.lineType)
+            cv.Cv2.Circle(dst2, pt, task.DotSize, task.highlight, -1, task.lineType)
             Next
         End If
 
@@ -353,8 +353,8 @@ Public Class Rectangle_Fit : Inherits TaskParent
         Else
             sz = New cv.Size(w * dst1.Width, w * dst1.Height)
         End If
-        dst0 = dst1.Resize(sz)
-        If dst0.Channels = 1 Then dst0 = dst0.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        cv.Cv2.Resize(dst1, dst0, sz)
+        If dst0.Channels = 1 Then cv.Cv2.CvtColor(dst0, dst0, cv.ColorConversionCodes.GRAY2BGR)
         dst2(New cv.Rect(0, 0, sz.Width, sz.Height)) = dst0.Clone
     End Sub
 End Class

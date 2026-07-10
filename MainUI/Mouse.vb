@@ -1,4 +1,4 @@
-﻿Imports cv = OpenCvSharp
+Imports cv = OpenCvSharp
 Namespace MainApp
     Partial Public Class MainUI
         Dim DrawingRectangle As Boolean

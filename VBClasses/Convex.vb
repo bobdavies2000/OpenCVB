@@ -41,11 +41,11 @@ Public Class Convex_Basics : Inherits TaskParent
         dst2.SetTo(0)
 
         Dim pMat As cv.Mat = cv.Mat.FromPixelData(hull.Count, 1, cv.MatType.CV_32SC2, hull)
-        Dim sum = pMat.Sum()
+        Dim sum = cv.Cv2.Sum(pMat)
         DrawTour(dst2, hullList, white, -1)
 
         For i = 0 To hull.Count - 1
-            dst2.Line(hull(i), hull((i + 1) Mod hull.Count), white, task.lineWidth, task.lineWidth)
+            cv.Cv2.Line(dst2, hull(i), hull((i + 1) Mod hull.Count), white, task.lineWidth, task.lineWidth)
         Next
     End Sub
 End Class
@@ -74,7 +74,7 @@ Public Class XR_Convex_RedColor : Inherits TaskParent
 
             dst3.SetTo(0)
             dst3(task.rcD.rect) = convex.dst2(New cv.Rect(0, 0, task.rcD.rect.Width, task.rcD.rect.Height))
-            dst3.Circle(task.rcD.maxDist, task.DotSize, white, -1, task.lineType)
+            cv.Cv2.Circle(dst3, task.rcD.maxDist, task.DotSize, white, -1, task.lineType)
         End If
     End Sub
 End Class
@@ -89,9 +89,9 @@ End Class
 Public Class XR_Convex_Defects : Inherits TaskParent
     Dim contours As New Contour_Largest
     Public Sub New()
-        dst2 = cv.Cv2.ImRead(task.homeDir + "Data/star2.png").Threshold(200, 255,
-                                cv.ThresholdTypes.Binary).Resize(New cv.Size(task.workRes.Width, task.workRes.Height))
-        dst2 = dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        cv.Cv2.Threshold(cv.Cv2.ImRead(task.homeDir + "Data/star2.png"), dst2, 200, 255, cv.ThresholdTypes.Binary)
+        cv.Cv2.Resize(dst2, dst2, New cv.Size(task.workRes.Width, task.workRes.Height))
+        cv.Cv2.CvtColor(dst2, dst2, cv.ColorConversionCodes.BGR2GRAY)
 
         labels = {"", "", "Input to the ConvexHull and ConvexityDefects", "Yellow = ConvexHull, Red = ConvexityDefects, Yellow dots are convexityDefect 'Far' points"}
         desc = "Find the convexityDefects in the image"
@@ -99,16 +99,16 @@ Public Class XR_Convex_Defects : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         contours.Run(dst2.Clone)
         Dim c = contours.bestContour.ToArray
-        dst3 = dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        cv.Cv2.CvtColor(dst2, dst3, cv.ColorConversionCodes.GRAY2BGR)
         Dim hull = cv.Cv2.ConvexHull(c, False)
         Dim hullIndices = cv.Cv2.ConvexHullIndices(c, False)
         DrawTour(dst3, hull.ToList, task.highlight)
 
         Dim defects = cv.Cv2.ConvexityDefects(contours.bestContour, hullIndices.ToList)
         For Each v In defects
-            dst3.Line(c(v(0)), c(v(2)), cv.Scalar.Red, task.lineWidth + 1, task.lineType)
-            dst3.Line(c(v(1)), c(v(2)), cv.Scalar.Red, task.lineWidth + 1, task.lineType)
-            dst3.Circle(c(v(2)), task.DotSize + 2, task.highlight, -1, task.lineType)
+            cv.Cv2.Line(dst3, c(v(0)), c(v(2)), cv.Scalar.Red, task.lineWidth + 1, task.lineType)
+            cv.Cv2.Line(dst3, c(v(1)), c(v(2)), cv.Scalar.Red, task.lineWidth + 1, task.lineType)
+            cv.Cv2.Circle(dst3, c(v(2)), task.DotSize + 2, task.highlight, -1, task.lineType)
         Next
     End Sub
 End Class
@@ -163,7 +163,7 @@ Public Class Convex_RedColorDefects : Inherits TaskParent
         If rc.mask.Width > rc.mask.Height Then
             sz = New cv.Size(dst2.Width, dst2.Height * rc.mask.Height / rc.mask.Width)
         End If
-        dst0 = rc.mask.Resize(sz, 0, 0, cv.InterpolationFlags.Nearest)
+        cv.Cv2.Resize(rc.mask, dst0, sz, 0, 0, cv.InterpolationFlags.Nearest)
         Dim r = New cv.Rect(0, 0, dst0.Width, dst0.Height)
         dst3.SetTo(0)
         dst3(r).SetTo(white, dst0)

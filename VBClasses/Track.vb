@@ -1,4 +1,4 @@
-﻿Imports cv = OpenCvSharp
+Imports cv = OpenCvSharp
 Public Class Track_Basics : Inherits TaskParent
     Dim redC As New RedColor_Basics
     Public Sub New()
@@ -23,7 +23,7 @@ Public Class Track_Basics : Inherits TaskParent
         End If
 
         Dim clickIndex = redC.rcMap.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X)
-        dst2.Circle(task.rcD.maxDist, task.DotSize + 2, task.highlight, -1)
+        cv.Cv2.Circle(dst2, task.rcD.maxDist, task.DotSize + 2, task.highlight, -1)
 
         task.clickPoint = task.rcD.maxDist
         labels(3) = "Map ID = " + CStr(task.rcD.mapID)
@@ -59,7 +59,7 @@ Public Class Track_Simple : Inherits TaskParent
         End If
 
         Dim clickIndex = redC.rcMap.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X)
-        dst2.Circle(task.rcD.maxDist, task.DotSize + 2, task.highlight, -1)
+        cv.Cv2.Circle(dst2, task.rcD.maxDist, task.DotSize + 2, task.highlight, -1)
 
         task.clickPoint = task.rcD.maxDist
         labels(3) = "Map ID = " + CStr(task.rcD.mapID)
@@ -93,7 +93,7 @@ Public Class Track_FindNearest : Inherits TaskParent
         Static rclast As rcDataOld = task.rcD
 
         Dim clickIndex = redC.rcMap.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X)
-        dst2.Circle(task.rcD.maxDist, task.DotSize + 2, task.highlight, -1)
+        cv.Cv2.Circle(dst2, task.rcD.maxDist, task.DotSize + 2, task.highlight, -1)
 
         knn.trainInput.Clear()
         Dim indexList As New List(Of Integer)
@@ -116,7 +116,7 @@ Public Class Track_FindNearest : Inherits TaskParent
 
         For i = 0 To knn.result.Length - 1
             Dim rc = redC.rcList(indexList(knn.result(0, i)))
-            dst2.Circle(rc.maxDist, task.DotSize + 1, task.highlight, -1)
+            cv.Cv2.Circle(dst2, rc.maxDist, task.DotSize + 1, task.highlight, -1)
             SetTrueText(CStr(knn.result(0, i)), rc.maxDist)
             SetTrueText(CStr(knn.result(0, i)), rc.maxDist, 3)
         Next

@@ -84,8 +84,9 @@ Public Class XR_DepthLinear_Visualize : Inherits TaskParent
 
             cv.Cv2.Absdiff(pc(r2), pc(r1), dst0)
 
-            mats.mat(i) = dst0.Resize(roi.Size, 0, 0, cv.InterpolationFlags.Nearest)
-            dst1 = mats.mat(i).Threshold(options.delta, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs
+            cv.Cv2.Resize(dst0, mats.mat(i), roi.Size, 0, 0, cv.InterpolationFlags.Nearest)
+            cv.Cv2.Threshold(mats.mat(i), dst1, options.delta, 255, cv.ThresholdTypes.Binary)
+            cv.Cv2.ConvertScaleAbs(dst1, dst1)
 
             mats.mat(i).SetTo(0, dst1)
 
@@ -97,8 +98,9 @@ Public Class XR_DepthLinear_Visualize : Inherits TaskParent
                         CStr(CInt(options.delta * 1000)) + " mm's apart in the X, Y, or Z direction"
             plotHist.Run(mats.mat(i))
             matPlots.mat(i) = plotHist.dst2.Clone
-            If i = 2 Then mats.mat(2) = mats.mat(2).Threshold(0, 255, cv.ThresholdTypes.Binary)
-            mats.mat(i) = mats.mat(i).Normalize(0, 255, cv.NormTypes.MinMax).ConvertScaleAbs
+            If i = 2 Then cv.Cv2.Threshold(mats.mat(2), mats.mat(2), 0, 255, cv.ThresholdTypes.Binary)
+            cv.Cv2.Normalize(mats.mat(i), mats.mat(i), 0, 255, cv.NormTypes.MinMax)
+            cv.Cv2.ConvertScaleAbs(mats.mat(i), mats.mat(i))
         Next
 
         mats.Run(emptyMat)
@@ -121,58 +123,59 @@ End Class
 Public Class DepthLinear_Input : Inherits TaskParent
     Public plotHist As New PlotBar_Basics
     Public roi As New cv.Rect(0, 0, dst2.Width, dst2.Height)
-        Public pc As cv.Mat
-        Public options As New Options_LinearInput
-        Public Sub New()
-            If standalone Then task.gOptions.displayDst1.Checked = True
+    Public pc As cv.Mat
+    Public options As New Options_LinearInput
+    Public Sub New()
+        If standalone Then task.gOptions.displayDst1.Checked = True
 
-            plotHist.createHistogram = True
-            plotHist.removeZeroEntry = True
+        plotHist.createHistogram = True
+        plotHist.removeZeroEntry = True
 
-            labels = {"", "Mask of differences > deltaX", "Point Cloud deltaX data", ""}
-            desc = "Find pixels that are withing X mm's of a neighbor in the X direction"
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            options.Run()
+        labels = {"", "Mask of differences > deltaX", "Point Cloud deltaX data", ""}
+        desc = "Find pixels that are withing X mm's of a neighbor in the X direction"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        options.Run()
 
-            pc = task.pcSplit(options.dimension)(roi)
+        pc = task.pcSplit(options.dimension)(roi)
 
-            ' use the pixel below for Y dimension
-            Dim r1 As cv.Rect, r2 As cv.Rect
-            If options.dimension <> 1 Or (options.dimension = 2 And options.zy) Then
-                r1 = New cv.Rect(0, 0, task.cols - 1, task.rows)
-                r2 = New cv.Rect(1, 0, r1.Width, r1.Height)
-            Else
-                r1 = New cv.Rect(0, 0, task.cols, task.rows - 1)
-                r2 = New cv.Rect(0, 1, r1.Width, r1.Height)
+        ' use the pixel below for Y dimension
+        Dim r1 As cv.Rect, r2 As cv.Rect
+        If options.dimension <> 1 Or (options.dimension = 2 And options.zy) Then
+            r1 = New cv.Rect(0, 0, task.cols - 1, task.rows)
+            r2 = New cv.Rect(1, 0, r1.Width, r1.Height)
+        Else
+            r1 = New cv.Rect(0, 0, task.cols, task.rows - 1)
+            r2 = New cv.Rect(0, 1, r1.Width, r1.Height)
+        End If
+
+        cv.Cv2.Absdiff(pc(r2), pc(r1), dst0)
+
+        cv.Cv2.Resize(dst0, dst2, roi.Size, 0, 0, cv.InterpolationFlags.Nearest)
+        cv.Cv2.Threshold(dst2, dst1, options.delta, 255, cv.ThresholdTypes.Binary)
+        cv.Cv2.ConvertScaleAbs(dst1, dst1)
+
+        dst2.SetTo(0, dst1)
+        Dim msg = Choose(options.dimension + 1, "X direction", "Y direction", "Z in X-direction")
+        labels(2) = "Pointcloud data in " + msg + " where neighbors are less than " +
+                        CStr(CInt(options.delta * 1000)) + " mm's apart"
+        If standaloneTest() Then
+            If task.optionsChanged Then
+                plotHist.minRange = 0
+                plotHist.maxRange = options.delta
+                labels(3) = "0 to " + CStr(CInt(options.delta * 1000)) + " mm's difference from neighbor "
             End If
-
-            cv.Cv2.Absdiff(pc(r2), pc(r1), dst0)
-
-            dst2 = dst0.Resize(roi.Size, 0, 0, cv.InterpolationFlags.Nearest)
-            dst1 = dst2.Threshold(options.delta, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs
-
-            dst2.SetTo(0, dst1)
-            Dim msg = Choose(options.dimension + 1, "X direction", "Y direction", "Z in X-direction")
-            labels(2) = "Pointcloud data in " + msg + " where neighbors are less than " +
-                    CStr(CInt(options.delta * 1000)) + " mm's apart"
-            If standaloneTest() Then
-                If task.optionsChanged Then
-                    plotHist.minRange = 0
-                    plotHist.maxRange = options.delta
-                    labels(3) = "0 to " + CStr(CInt(options.delta * 1000)) + " mm's difference from neighbor "
-                End If
-                plotHist.Run(dst2)
-                dst3 = plotHist.dst2
-            End If
-        End Sub
-    End Class
+            plotHist.Run(dst2)
+            dst3 = plotHist.dst2
+        End If
+    End Sub
+End Class
 
 
 
 
 
-    Public Class DepthLinear_InputX : Inherits TaskParent
+Public Class DepthLinear_InputX : Inherits TaskParent
         Dim input As New DepthLinear_Input
         Public Sub New()
             OptionParent.findRadio("X Direction").Checked = True
@@ -214,8 +217,8 @@ Public Class DepthLinear_Input : Inherits TaskParent
         Public Overrides Sub RunAlg(src As cv.Mat)
             input.Run(src)
             dst2 = input.dst2
-            dst3 = dst2.Threshold(0, 255, cv.ThresholdTypes.Binary)
-            labels = input.labels
+        cv.Cv2.Threshold(dst2, dst3, 0, 255, cv.ThresholdTypes.Binary)
+        labels = input.labels
         End Sub
     End Class
 
@@ -256,7 +259,7 @@ Public Class DepthLinear_Input : Inherits TaskParent
                 plotSLR.plot.minY = -task.xRange
                 plotSLR.plot.maxY = task.xRange
             End If
-            task.depthRGB.Line(p1, p2, task.highlight, task.lineWidth)
+            cv.Cv2.Line(task.depthRGB, p1, p2, task.highlight, task.lineWidth)
 
             plotSLR.slrCore.inputX.Clear()
             plotSLR.slrCore.inputY.Clear()

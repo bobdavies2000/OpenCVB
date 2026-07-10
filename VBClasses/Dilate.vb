@@ -7,10 +7,10 @@ Public Class Dilate_Basics : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
 
-        If options.noshape Or options.iterations = 0 Then dst2 = src Else dst2 = src.Dilate(options.element, Nothing, options.iterations)
+        If options.noshape Or options.iterations = 0 Then dst2 = src Else cv.Cv2.Dilate(src, dst2, options.element, Nothing, options.iterations)
 
         If standaloneTest() Then
-            dst3 = task.depthRGB.Dilate(options.element, Nothing, options.iterations)
+            cv.Cv2.Dilate(task.depthRGB, dst3, options.element, Nothing, options.iterations)
             labels(3) = "Dilated Depth " + CStr(options.iterations) + " times"
         End If
         labels(2) = "Dilated BGR " + CStr(options.iterations) + " times"

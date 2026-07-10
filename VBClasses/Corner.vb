@@ -20,7 +20,7 @@ Public Class Corner_Basics : Inherits TaskParent
         For i = 0 To fast.features.Count - 1
             Dim pt = fast.features(i)
             If lastFeatures.Contains(pt) Then
-                dst2.Circle(pt, task.DotSize, cv.Scalar.Yellow, -1, task.lineType)
+            cv.Cv2.Circle(dst2, pt, task.DotSize, cv.Scalar.Yellow, -1, task.lineType)
                 newPts.Add(pt)
                 dst3.Set(Of Byte)(pt.Y, pt.X, 255)
             End If
@@ -65,7 +65,7 @@ Public Class Corner_Core : Inherits TaskParent
         If standaloneTest() Then
             dst3.SetTo(0)
             For Each kp As cv.KeyPoint In kpoints
-                dst2.Circle(kp.Pt, task.DotSize, cv.Scalar.Yellow, -1, task.lineType)
+            cv.Cv2.Circle(dst2, kp.Pt, task.DotSize, cv.Scalar.Yellow, -1, task.lineType)
                 dst3.Set(Of Byte)(kp.Pt.Y, kp.Pt.X, 255)
             Next
         End If
@@ -110,7 +110,7 @@ Public Class Corner_Harris : Inherits TaskParent
         For y = 0 To task.gray.Rows - 1
             For x = 0 To task.gray.Cols - 1
                 If mc.Get(Of Single)(y, x) > mm.minVal + (mm.maxVal - mm.minVal) * options.quality / options.qualityMax Then
-                    dst2.Circle(New cv.Point(x, y), task.DotSize, task.highlight, -1, task.lineType)
+                cv.Cv2.Circle(dst2, New cv.Point(x, y), task.DotSize, task.highlight, -1, task.lineType)
                     count += 1
                 End If
             Next
@@ -144,8 +144,9 @@ Public Class XR_Corner_PreCornerDetect : Inherits TaskParent
         cv.Cv2.Normalize(prob, prob, 0, 255, cv.NormTypes.MinMax)
         prob.ConvertTo(task.gray, cv.MatType.CV_8U)
         median.Run(task.gray.Clone())
-        dst2 = task.gray.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-        dst3 = task.gray.Threshold(160, 255, cv.ThresholdTypes.BinaryInv).CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        cv.Cv2.CvtColor(task.gray, dst2, cv.ColorConversionCodes.GRAY2BGR)
+        cv.Cv2.CvtColor(task.gray, dst3, cv.ColorConversionCodes.GRAY2BGR)
+        cv.Cv2.Threshold(dst3, dst3, 160, 255, cv.ThresholdTypes.BinaryInv)
         labels(3) = "median = " + CStr(median.medianVal)
     End Sub
 End Class
@@ -166,14 +167,13 @@ Public Class Corner_ShiTomasi_CPP : Inherits TaskParent
         Dim data(task.gray.Total - 1) As Byte
         Dim handle = GCHandle.Alloc(data, GCHandleType.Pinned)
         task.gray.GetArray(Of Byte)(data)
-        Dim imagePtr = Corner_ShiTomasi(handle.AddrOfPinnedObject, src.Rows, src.Cols,
-                                             options.blocksize, options.aperture)
+        Dim imagePtr = Corner_ShiTomasi(handle.AddrOfPinnedObject, src.Rows, src.Cols, options.blocksize, options.aperture)
         handle.Free()
 
         dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, cv.MatType.CV_32F, imagePtr).Clone
 
         dst3 = Mat_Convert.Mat_32f_To_8UC3(dst2)
-        dst3 = dst3.Threshold(options.threshold, 255, cv.ThresholdTypes.Binary)
+        cv.Cv2.Threshold(dst3, dst3, options.threshold, 255, cv.ThresholdTypes.Binary)
     End Sub
 End Class
 
@@ -194,14 +194,14 @@ Public Class XR_Corner_BasicsCentroid : Inherits TaskParent
         dst2 = fast.dst2
         dst3.SetTo(0)
         For Each pt In fast.features
-            dst3.Circle(pt, task.DotSize + 2, white, -1, task.lineType)
+        cv.Cv2.Circle(dst3, pt, task.DotSize + 2, white, -1, task.lineType)
         Next
         Dim m = cv.Cv2.Moments(dst3, True)
         If m.M00 > 500 Then ' if more than x pixels are present (avoiding a zero area!)
             kalman.kInput(0) = m.M10 / m.M00
             kalman.kInput(1) = m.M01 / m.M00
             kalman.Run(emptyMat)
-            dst2.Circle(New cv.Point(kalman.kOutput(0), kalman.kOutput(1)), 10, cv.Scalar.Red, -1, task.lineType)
+            cv.Cv2.Circle(dst2, New cv.Point(kalman.kOutput(0), kalman.kOutput(1)), 10, cv.Scalar.Red, -1, task.lineType)
         End If
     End Sub
 End Class
@@ -226,15 +226,16 @@ Public Class XR_Corner_BasicsCentroids : Inherits TaskParent
         ReDim fastCenters(task.gridRects.Count - 1)
         For i = 0 To task.gridRects.Count - 1
             Dim r = task.gridRects(i)
-            Dim tmp = fast.dst3(r).FindNonZero()
+            Dim tmp As New cv.Mat
+            cv.Cv2.FindNonZero(fast.dst3(r), tmp)
             If tmp.Rows > 0 Then
-                Dim mean = tmp.Mean()
+                Dim mean = cv.Cv2.Mean(tmp)
                 fastCenters(i) = New cv.Point2f(r.X + mean(0), r.Y + mean(1))
             End If
         Next
 
         For i = 0 To fastCenters.Count - 1
-            dst2.Circle(fastCenters(i), task.DotSize, cv.Scalar.Yellow, -1, task.lineType)
+        cv.Cv2.Circle(dst2, fastCenters(i), task.DotSize, cv.Scalar.Yellow, -1, task.lineType)
         Next
         ' dst2.SetTo(white, task.gridMask)
     End Sub
@@ -270,7 +271,7 @@ Public Class XR_Corner_Harris_CPP : Inherits TaskParent
         '  gray32f = Convert32f_To_8UC3(gray32f)
         gray32f.ConvertTo(dst2, cv.MatType.CV_8U)
 
-        dst3 = ShowAddweighted(dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR), task.color, labels(3))
+        cv.Cv2.CvtColor(ShowAddweighted(dst2, dst3, cv.ColorConversionCodes.GRAY2BGR), task.color, labels(3))
     End Sub
     Protected Overrides Sub Finalize()
         If cPtr <> 0 Then cPtr = Harris_Features_Close(cPtr)
@@ -308,7 +309,7 @@ Public Class Corner_HarrisDetector_CPP : Inherits TaskParent
             features.Clear()
             For i = 0 To ptCount - 1
                 features.Add(New cv.Point2f(ptMat.Get(Of Integer)(i, 0), ptMat.Get(Of Integer)(i, 1)))
-                dst2.Circle(features(i), task.DotSize, cv.Scalar.Yellow, -1, task.lineType)
+                cv.Cv2.Circle(dst2, features(i), task.DotSize, cv.Scalar.Yellow, -1, task.lineType)
             Next
         End If
     End Sub
@@ -340,8 +341,8 @@ Public Class XR_Corner_RedCloud : Inherits TaskParent
 
         dst3 = task.color.Clone
         For Each pt In corners.nPoints
-            dst2.Circle(pt, task.DotSize, task.highlight, -1, task.lineType)
-            dst3.Circle(pt, task.DotSize, cv.Scalar.Yellow, -1, task.lineType)
+        cv.Cv2.Circle(dst2, pt, task.DotSize, task.highlight, -1, task.lineType)
+        cv.Cv2.Circle(dst3, pt, task.DotSize, cv.Scalar.Yellow, -1, task.lineType)
         Next
     End Sub
 End Class
@@ -367,7 +368,7 @@ Public Class XR_Corner_SubPix : Inherits TaskParent
 
         dst2 = src
         For Each pt In fast.features
-            dst2.Circle(pt, task.DotSize, task.highlight, -1, task.lineType)
+        cv.Cv2.Circle(dst2, pt, task.DotSize, task.highlight, -1, task.lineType)
         Next
     End Sub
 End Class

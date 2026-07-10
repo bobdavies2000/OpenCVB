@@ -17,7 +17,7 @@ Public Class Rotate_Basics : Inherits TaskParent
 
         rotateAngle = optionsRotate.rotateAngle
         M = cv.Cv2.GetRotationMatrix2D(rotateCenter, -rotateAngle, 1)
-        dst2 = src.WarpAffine(M, src.Size(), options.warpFlag)
+        cv.Cv2.WarpAffine(src, dst2, M, src.Size(), options.warpFlag)
         If options.warpFlag = cv.InterpolationFlags.WarpInverseMap Then
             Mflip = cv.Cv2.GetRotationMatrix2D(rotateCenter, rotateAngle, 1)
         End If
@@ -45,7 +45,7 @@ Public Class XR_Rotate_Box : Inherits TaskParent
 
         Dim r = task.drawRect
         dst2 = src.Clone()
-        dst2.Rectangle(r, white, 1)
+        cv.Cv2.Rectangle(dst2, r, white, 1)
 
         Dim center = New cv.Point2f(r.X + r.Width / 2, r.Y + r.Height / 2)
         Dim drawBox = New cv.RotatedRect(center, New cv.Size2f(r.Width, r.Height), 0)
@@ -61,7 +61,7 @@ Public Class XR_Rotate_Box : Inherits TaskParent
         For i = 0 To dstpoints.Width - 1
             Dim p1 = dstpoints.Get(Of cv.Point2f)(0, i)
             Dim p2 = dstpoints.Get(Of cv.Point2f)(0, (i + 1) Mod 4)
-            dst3.Line(p1, p2, white, task.lineWidth + 1, task.lineType)
+            cv.Cv2.Line(dst3, p1, p2, white, task.lineWidth + 1, task.lineType)
         Next
     End Sub
 End Class
@@ -82,7 +82,7 @@ Public Class XR_Rotate_Example : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         Dim r = New cv.Rect(0, 0, src.Height, src.Height)
-        dst2(r) = src.Resize(New cv.Size(src.Height, src.Height))
+        cv.Cv2.Resize(src, dst2(r), New cv.Size(src.Height, src.Height))
         rotate.Run(dst2)
         dst3(r) = rotate.dst2(New cv.Rect(0, 0, src.Height, src.Height))
     End Sub
@@ -105,7 +105,7 @@ Public Class Rotate_BasicsQT : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         Dim M = cv.Cv2.GetRotationMatrix2D(rotateCenter, -rotateAngle, 1)
-        dst2 = src.WarpAffine(M, src.Size(), cv.InterpolationFlags.Nearest)
+        cv.Cv2.WarpAffine(src, dst2, M, src.Size(), cv.InterpolationFlags.Nearest)
     End Sub
 End Class
 

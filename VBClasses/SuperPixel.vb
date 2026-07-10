@@ -39,7 +39,7 @@ Public Class SuperPixel_Basics_CPP : Inherits TaskParent
         End If
 
         Dim input = src
-        If input.Channels() = 1 Then input = input.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        If input.Channels() = 1 Then cv.Cv2.CvtColor(input, input, cv.ColorConversionCodes.GRAY2BGR)
         Dim dataSrc(input.Total - 1) As cv.Vec3b
         input.GetArray(Of cv.Vec3b)(dataSrc)
         Dim handleSrc = GCHandle.Alloc(dataSrc, GCHandleType.Pinned)
@@ -117,7 +117,7 @@ Public Class XR_SuperPixel_WithCanny : Inherits TaskParent
         src.SetTo(white, task.edges.dst2)
         pixels.Run(src)
         dst2 = pixels.dst2
-        dst3 = pixels.dst3.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        cv.Cv2.CvtColor(pixels.dst3, dst3, cv.ColorConversionCodes.GRAY2BGR)
         dst3.SetTo(cv.Scalar.Red, task.edges.dst2)
         labels(3) = "Edges provided by Canny in red"
     End Sub

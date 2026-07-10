@@ -58,7 +58,7 @@ Public Class Puzzle_Solver : Inherits TaskParent
             puzzle.Run(src)
             dst2 = puzzle.dst2
             dst3.SetTo(0)
-            grayMat = puzzle.image.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+            cv.Cv2.CvtColor(puzzle.image, grayMat, cv.ColorConversionCodes.BGR2GRAY)
             puzzleIndex = 0
         End If
 

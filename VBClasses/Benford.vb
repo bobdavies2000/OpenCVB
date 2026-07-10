@@ -1,5 +1,6 @@
-Imports cv = OpenCvSharp
 Imports System.Text.RegularExpressions
+Imports OpenCvSharp
+Imports cv = OpenCvSharp
 ' Benford's Law is pretty cool but I don't think it is a phenomenon of nature.  It is produced from bringing real world measurements to a human scale.
 ' Reducing an image with compression works because human understanding maps the data within reach of the understanding embedded in our number system.
 ' (Further investigation: would a base other than 10 provide the same results?)
@@ -98,8 +99,8 @@ Public Class XR_Benford_NormalizedImage : Inherits TaskParent
         Dim gray32f As New cv.Mat
         task.gray.ConvertTo(gray32f, cv.MatType.CV_32F)
 
-        benford.Run(gray32f.Normalize(1))
-        dst2 = benford.dst2
+        benford.Run(gray32f)
+        cv.Cv2.Normalize(benford.dst2, dst2, 1)
         labels(2) = benford.labels(3)
         labels(3) = "Input image"
     End Sub
@@ -122,8 +123,8 @@ Public Class XR_Benford_NormalizedImage99 : Inherits TaskParent
         Dim gray32f As New cv.Mat
         task.gray.ConvertTo(gray32f, cv.MatType.CV_32F)
 
-        benford.Run(gray32f.Normalize(1))
-        dst2 = benford.dst2
+        benford.Run(gray32f)
+        cv.Cv2.Normalize(benford.dst2, dst2, 1)
         labels(2) = benford.labels(3)
         labels(3) = "Input image"
     End Sub
@@ -144,7 +145,9 @@ Public Class XR_Benford_JPEG : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
 
-        Dim jpeg() = src.ImEncode(".jpg", New Integer() {cv.ImwriteFlags.JpegQuality, options.quality})
+        Dim param = New ImageEncodingParam(ImwriteFlags.JpegQuality, options.quality)
+        Dim jpeg As Byte() = Nothing
+        cv.Cv2.ImEncode(".jpg", src, jpeg, param)
         Dim tmp = cv.Mat.FromPixelData(jpeg.Count, 1, cv.MatType.CV_8U, jpeg)
         dst3 = cv.Cv2.ImDecode(tmp, cv.ImreadModes.Color)
         benford.Run(tmp)
@@ -170,7 +173,9 @@ Public Class XR_Benford_JPEG99 : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
 
-        Dim jpeg() = src.ImEncode(".jpg", New Integer() {cv.ImwriteFlags.JpegQuality, options.quality})
+        Dim param = New ImageEncodingParam(ImwriteFlags.JpegQuality, options.quality)
+        Dim jpeg As Byte() = Nothing
+        cv.Cv2.ImEncode(".jpg", src, jpeg, param)
         Dim tmp = cv.Mat.FromPixelData(jpeg.Count, 1, cv.MatType.CV_8U, jpeg)
         dst3 = cv.Cv2.ImDecode(tmp, cv.ImreadModes.Color)
         benford.Run(tmp)
@@ -196,7 +201,9 @@ Public Class XR_Benford_PNG : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
 
-        Dim png = src.ImEncode(".png", New Integer() {cv.ImwriteFlags.PngCompression, options.compression})
+        Dim param = New ImageEncodingParam(ImwriteFlags.JpegQuality, 90)
+        Dim png As Byte() = Nothing
+        cv.Cv2.ImEncode(".jpg", src, png, param)
         Dim tmp = cv.Mat.FromPixelData(png.Count, 1, cv.MatType.CV_8U, png)
         dst3 = cv.Cv2.ImDecode(tmp, cv.ImreadModes.Color)
         benford.Run(tmp)

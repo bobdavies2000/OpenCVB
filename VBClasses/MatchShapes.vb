@@ -12,8 +12,8 @@ Public Class MatchShapes_Basics : Inherits TaskParent
         OptionParent.findRadio("FloodFill").Enabled = False
         OptionParent.findRadio("ApproxNone").Checked = True
 
-        dst0 = cv.Cv2.ImRead(task.homeDir + "Data/star1.png", cv.ImreadModes.Color).CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        dst1 = cv.Cv2.ImRead(task.homeDir + "Data/star2.png", cv.ImreadModes.Color).CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        cv.Cv2.CvtColor(cv.Cv2.ImRead(task.homeDir + "Data/star1.png", cv.ImreadModes.Color), dst0, cv.ColorConversionCodes.BGR2GRAY)
+        cv.Cv2.CvtColor(cv.Cv2.ImRead(task.homeDir + "Data/star2.png", cv.ImreadModes.Color), dst1, cv.ColorConversionCodes.BGR2GRAY)
         desc = "MatchShapes compares single hull to single hull - pretty tricky"
     End Sub
     Public Function findBiggestHull(hull As cv.Point()(), maxLen As Integer, maxIndex As Integer, dst As cv.Mat) As Integer
@@ -25,7 +25,7 @@ Public Class MatchShapes_Basics : Inherits TaskParent
         Next
 
         For Each p In hull(maxIndex)
-            dst.Circle(p, task.DotSize, cv.Scalar.Yellow, -1, task.lineType)
+        cv.Cv2.Circle(dst, p, task.DotSize, cv.Scalar.Yellow, -1, task.lineType)
         Next
         Return maxIndex
     End Function
@@ -34,14 +34,14 @@ Public Class MatchShapes_Basics : Inherits TaskParent
         match.Run()
 
         If standaloneTest() Then
-            dst2 = dst0.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-            dst3 = dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+            cv.Cv2.CvtColor(dst0, dst2, cv.ColorConversionCodes.GRAY2BGR)
+            cv.Cv2.CvtColor(dst1, dst3, cv.ColorConversionCodes.GRAY2BGR)
         End If
 
-        dst0 = dst0.Threshold(50, 255, cv.ThresholdTypes.Binary)
+        cv.Cv2.Threshold(dst0, dst0, 50, 255, cv.ThresholdTypes.Binary)
         hull1 = cv.Cv2.FindContoursAsArray(dst0, options.retrievalMode, options.ApproximationMode)
 
-        dst1 = dst1.Threshold(127, 255, cv.ThresholdTypes.Binary)
+        cv.Cv2.Threshold(dst1, dst1, 127, 255, cv.ThresholdTypes.Binary)
         hull2 = cv.Cv2.FindContoursAsArray(dst1, options.retrievalMode, options.ApproximationMode)
 
         Dim maxLen1 As Integer, maxIndex1 As Integer, maxLen2 As Integer, maxIndex2 As Integer
@@ -113,7 +113,7 @@ Public Class MatchShapes_Nearby : Inherits TaskParent
         Else
             Dim index = matchVals.IndexOf(matchVals.Min)
             Dim rc = similarCells(index)
-            dst3.Circle(rc.maxDist, task.DotSize, white, -1, task.lineType)
+            cv.Cv2.Circle(dst3, rc.maxDist, task.DotSize, white, -1, task.lineType)
             If similarCells.Count = 0 Then SetTrueText("No matches with match value < " + Format(options.matchThreshold, fmt2), New cv.Point(5, 5), 3)
         End If
         SetTrueText("Best match", task.rcD.maxDist, 3)

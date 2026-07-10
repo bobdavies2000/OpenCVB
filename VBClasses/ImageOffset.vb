@@ -45,8 +45,8 @@ Public Class ImageOffset_Basics : Inherits TaskParent
 
         dst = {dst1, dst2, dst3}
         For i = 0 To dst.Count - 1
-            masks(i) = dst(i).Threshold(options1.pixelDiffThreshold, 255,
-                                                cv.ThresholdTypes.BinaryInv).ConvertScaleAbs
+            cv.Cv2.Threshold(dst(i), masks(i), options1.pixelDiffThreshold, 255, cv.ThresholdTypes.BinaryInv)
+            cv.Cv2.ConvertScaleAbs(masks(i), masks(i))
             pcFiltered(i) = New cv.Mat(src.Size, cv.MatType.CV_32FC1, New cv.Scalar(0))
             task.pcSplit(i).CopyTo(pcFiltered(i), masks(i))
         Next
@@ -109,8 +109,8 @@ Public Class XR_ImageOffset_SliceH : Inherits TaskParent
         dst2 = mats.dst2
 
         Dim p1 = New cv.Point(0, pt.Y), p2 = New cv.Point(dst2.Width, pt.Y)
-        task.color.Line(p1, p2, task.highlight, task.lineWidth)
-        task.depthRGB.Line(p1, p2, task.highlight, task.lineWidth)
+        cv.Cv2.Line(task.color, p1, p2, task.highlight, task.lineWidth)
+        cv.Cv2.Line(task.depthRGB, p1, p2, task.highlight, task.lineWidth)
     End Sub
 End Class
 
@@ -170,8 +170,8 @@ Public Class XR_ImageOffset_SliceV : Inherits TaskParent
         dst2 = mats.dst2
 
         Dim p1 = New cv.Point(pt.X, 0), p2 = New cv.Point(pt.X, dst2.Height)
-        task.color.Line(p1, p2, task.highlight, task.lineWidth)
-        task.depthRGB.Line(p1, p2, task.highlight, task.lineWidth)
+        cv.Cv2.Line(task.color, p1, p2, task.highlight, task.lineWidth)
+        cv.Cv2.Line(task.depthRGB, p1, p2, task.highlight, task.lineWidth)
     End Sub
 End Class
 

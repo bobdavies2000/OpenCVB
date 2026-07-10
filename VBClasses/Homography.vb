@@ -1,4 +1,4 @@
-﻿Imports cv = OpenCvSharp
+Imports cv = OpenCvSharp
 Public Class Homography_Basics : Inherits TaskParent
     Public corners1 As New List(Of cv.Point2d)
     Public corners2 As New List(Of cv.Point2d)
@@ -20,7 +20,9 @@ Public Class Homography_Basics : Inherits TaskParent
         ' cannot find a homography when less than 4...
         If corners1.Count >= 4 Or corners2.Count >= 4 Then
             Dim H = cv.Cv2.FindHomography(corners1, corners2, options.hMethod)
-            If H.Width > 0 Then dst2 = src.WarpPerspective(H, src.Size)
+            If H.Width > 0 Then
+                cv.Cv2.WarpPerspective(src, dst2, H, src.Size)
+            End If
         End If
     End Sub
 End Class

@@ -18,8 +18,8 @@ Public Class Derivative_Basics : Inherits TaskParent
         plotHist.Run(histogram)
         dst2 = plotHist.dst2
 
-        Dim proximityCount As Integer = plotHist.histogram.Sum
-        Dim proximityPercent = proximityCount / dst2.Total
+        Dim proximityCount = cv.Cv2.Sum(plotHist.histogram)
+        Dim proximityPercent = proximityCount(0) / dst2.Total
 
         Dim barWidth = dst2.Width / task.histogramBins
         Dim histIndex = Math.Truncate(task.mouseMovePoint.X / barWidth)
@@ -43,7 +43,7 @@ Public Class Derivative_Basics : Inherits TaskParent
         cv.Cv2.CalcBackProject({subD.dst2(subD.options.rect1)}, {0}, histogram, mask, ranges)
 
         mask.ConvertTo(mask, cv.MatType.CV_8U)
-        mask = mask.InRange(1, 1)
+                  cv.Cv2.InRange(mask, 1, 1, mask)
 
         dst1 = task.color.Clone
         dst3.SetTo(0)
@@ -51,9 +51,10 @@ Public Class Derivative_Basics : Inherits TaskParent
         dst3.SetTo(0, task.noDepthMask)
         dst1.SetTo(0, dst3)
 
-        Dim nonz = dst3.FindNonZero()
+        Dim nonz As New cv.Mat
+        cv.Cv2.FindNonZero(dst3, nonz)
 
-        dst2.Rectangle(New cv.Rect(CInt((center - bars) * barWidth), 0,
+        cv.Cv2.Rectangle(dst2, New cv.Rect(CInt((center - bars) * barWidth), 0,
                                barWidth * (bars * 2 + centerAdjust), dst2.Height),
                                task.highlight, task.lineWidth)
 
@@ -86,7 +87,7 @@ Public Class Derivative_Subtract : Inherits TaskParent
         dst2(options.rect1) = src(options.rect1).Subtract(src(options.rect2))
         If standaloneTest() Then
             Dim mm = GetMinMax(dst2)
-            dst2 = dst2.ConvertScaleAbs(255, -mm.minVal)
+            cv.Cv2.ConvertScaleAbs(dst2, dst2, 255, -mm.minVal)
         End If
     End Sub
 End Class
@@ -106,7 +107,7 @@ Public Class Derivative_Sobel : Inherits TaskParent
         options.Run()
 
         If src.Type <> cv.MatType.CV_32F Then src = task.pcSplit(options.channel)
-        src = src.Sobel(cv.MatType.CV_32F, 1, 1, options.kernelSize)
+        cv.Cv2.Sobel(src, src, cv.MatType.CV_32F, 1, 1, options.kernelSize)
 
         Dim ranges = {New cv.Rangef(-options.derivativeRange, options.derivativeRange)}
         Dim histogram As New cv.Mat
@@ -132,12 +133,12 @@ Public Class Derivative_Sobel : Inherits TaskParent
         cv.Cv2.CalcBackProject({src}, {0}, dst1, mask, ranges)
         mask.ConvertTo(mask, cv.MatType.CV_8U)
         dst0 = mask
-        mask = mask.InRange(histIndex, histIndex)
+                  cv.Cv2.InRange(mask, histIndex, histIndex, mask)
 
         dst3 = task.color.Clone
         dst3.SetTo(white, mask)
         dst3.SetTo(0, task.noDepthMask)
-        dst2.Rectangle(New cv.Rect(CInt(histIndex * barWidth), 0, barWidth, dst2.Height), cv.Scalar.Yellow, task.lineWidth)
+        cv.Cv2.Rectangle(dst2, New cv.Rect(CInt(histIndex * barWidth), 0, barWidth, dst2.Height), cv.Scalar.Yellow, task.lineWidth)
         Dim deriv = Format(options.derivativeRange, fmt2)
         labels(2) = "Histogram of first or second derivatives.  Range -" + deriv + " to " + deriv
         labels(3) = "Backprojection into the image for the selected histogram entry - move mouse over dst2."
@@ -160,14 +161,14 @@ Public Class XR_Derivative_Sobel1 : Inherits TaskParent
         Dim channel = deriv.options.channel
         Dim chanName As String = Choose(channel + 1, "X", "Y", "Z")
         Dim kern = deriv.options.kernelSize
-        src = task.pcSplit(channel).Sobel(cv.MatType.CV_32F, 1, 0, kern)
+        cv.Cv2.Sobel(task.pcSplit(channel), src, cv.MatType.CV_32F, 1, 0, kern)
         deriv.Run(src)
         dst0 = deriv.dst2.Clone
         dst1 = deriv.dst3.Clone
         labels(0) = "Horizontal derivatives for " + chanName + " dimension of the point cloud"
         labels(1) = "Backprojection of horizontal derivatives indicated - move mouse in the image at left"
 
-        src = task.pcSplit(channel).Sobel(cv.MatType.CV_32F, 0, 1, kern)
+        cv.Cv2.Sobel(task.pcSplit(channel), src, cv.MatType.CV_32F, 0, 1, kern)
         deriv.Run(src)
         dst2 = deriv.dst2
         dst3 = deriv.dst3
@@ -194,8 +195,8 @@ Public Class XR_Derivative_Laplacian : Inherits TaskParent
 
         Dim channel = deriv.options.channel
         Dim gausskern = New cv.Size(CInt(options.gaussiankernelSize), CInt(options.gaussiankernelSize))
-        dst1 = task.pcSplit(channel).GaussianBlur(gausskern, 0, 0)
-        dst1 = dst1.Laplacian(cv.MatType.CV_32F, options.LaplaciankernelSize, 1, 0)
+        cv.Cv2.GaussianBlur(task.pcSplit(channel), dst1, gausskern, 0, 0)
+        cv.Cv2.Laplacian(dst1, dst1, cv.MatType.CV_32F, options.LaplaciankernelSize, 1, 0)
 
         deriv.Run(dst1)
         dst2 = deriv.dst2
@@ -226,11 +227,14 @@ Public Class XR_Derivative_Classes : Inherits TaskParent
         Return derivClassCount
     End Function
     Public Overrides Sub RunAlg(src As cv.Mat)
-        deriv.Run(task.pcSplit(deriv.options.channel).Sobel(cv.MatType.CV_32F, 1, 0, deriv.options.kernelSize))
+        Dim tmp As New cv.Mat
+        cv.Cv2.Sobel(task.pcSplit(deriv.options.channel), tmp, cv.MatType.CV_32F, 1, 0, deriv.options.kernelSize)
+        deriv.Run(tmp)
         classCountX = derivClassCount(dst2)
         labels(2) = $"Backprojection of X dimension of task.pcSplit({deriv.options.channel})"
 
-        deriv.Run(task.pcSplit(deriv.options.channel).Sobel(cv.MatType.CV_32F, 0, 1, deriv.options.kernelSize))
+        cv.Cv2.Sobel(task.pcSplit(deriv.options.channel), tmp, cv.MatType.CV_32F, 0, 1, deriv.options.kernelSize)
+        deriv.Run(tmp)
         classCountY = derivClassCount(dst3)
         labels(3) = $"Backprojection of Y dimension of task.pcSplit({deriv.options.channel})"
     End Sub

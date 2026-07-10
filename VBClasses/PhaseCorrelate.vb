@@ -20,7 +20,7 @@ Public Class PhaseCorrelate_Basics : Inherits TaskParent
         Static thresholdSlider = OptionParent.FindSlider("Threshold shift to cause reset of lastFrame")
 
         Dim input = src
-        If input.Channels() <> 1 Then input = input.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If input.Channels() <> 1 Then cv.Cv2.CvtColor(input, input, cv.ColorConversionCodes.BGR2GRAY)
         Dim input64 As New cv.Mat
         input.ConvertTo(input64, cv.MatType.CV_64F)
         If lastFrame Is Nothing Then lastFrame = input64.Clone
@@ -45,16 +45,16 @@ Public Class PhaseCorrelate_Basics : Inherits TaskParent
             srcRect = ValidateRect(New cv.Rect(x2, y2, stableRect.Width, stableRect.Height))
             If stableRect.Width > 0 And stableRect.Height > 0 And srcRect.Bottom <= dst2.Height Then
                 center = New cv.Point(input64.Cols / 2, input64.Rows / 2)
-                If src.Channels() = 1 Then src = src.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+                If src.Channels() = 1 Then cv.Cv2.CvtColor(src, src, cv.ColorConversionCodes.GRAY2BGR)
                 dst2 = src.Clone
-                dst2.Circle(center, radius, task.highlight, task.lineWidth + 2, task.lineType)
-                dst2.Line(center, New cv.Point(center.X + shift.X, center.Y + shift.Y), cv.Scalar.Red, task.lineWidth + 1, task.lineType)
+                cv.Cv2.Circle(dst2, center, radius, task.highlight, task.lineWidth + 2, task.lineType)
+                cv.Cv2.Line(dst2, center, New cv.Point(center.X + shift.X, center.Y + shift.Y), cv.Scalar.Red, task.lineWidth + 1, task.lineType)
 
                 src(srcRect).CopyTo(dst3(stableRect))
 
                 If radius > 5 Then
-                    dst3.Circle(center, radius, task.highlight, task.lineWidth + 2, task.lineType)
-                    dst3.Line(center, New cv.Point(center.X + shift.X, center.Y + shift.Y), cv.Scalar.Red, task.lineWidth + 1, task.lineType)
+                cv.Cv2.Circle(dst3, center, radius, task.highlight, task.lineWidth + 2, task.lineType)
+                    cv.Cv2.Line(dst3, center, New cv.Point(center.X + shift.X, center.Y + shift.Y), cv.Scalar.Red, task.lineWidth + 1, task.lineType)
                 End If
             Else
                 resetLastFrame = True
@@ -113,7 +113,7 @@ Public Class PhaseCorrelate_RandomInput : Inherits TaskParent
         options.Run()
 
         Dim input = src
-        If input.Channels() <> 1 Then input = input.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If input.Channels() <> 1 Then cv.Cv2.CvtColor(input, input, cv.ColorConversionCodes.BGR2GRAY)
 
         Dim shiftX = msRNG.Next(-options.FASTthreshold, options.FASTthreshold)
         Dim shiftY = msRNG.Next(-options.FASTthreshold, options.FASTthreshold)
@@ -170,11 +170,11 @@ Public Class XR_PhaseCorrelate_Depth : Inherits TaskParent
             labels(2) = phaseC.labels(2)
             labels(3) = phaseC.labels(3)
 
-            tmp = tmp.Normalize(0, 255, cv.NormTypes.MinMax)
+            cv.Cv2.Normalize(tmp, tmp, 0, 255, cv.NormTypes.MinMax)
             tmp.ConvertTo(dst3, cv.MatType.CV_8UC1)
 
-            dst3.Circle(phaseC.center, phaseC.radius, task.highlight, task.lineWidth + 2, task.lineType)
-            dst3.Line(phaseC.center, New cv.Point(phaseC.center.X + phaseC.shift.X, phaseC.center.Y + phaseC.shift.Y), cv.Scalar.Red, task.lineWidth + 1, task.lineType)
+            cv.Cv2.Circle(dst3, phaseC.center, phaseC.radius, task.highlight, task.lineWidth + 2, task.lineType)
+            cv.Cv2.Line(dst3, phaseC.center, New cv.Point(phaseC.center.X + phaseC.shift.X, phaseC.center.Y + phaseC.shift.Y), cv.Scalar.Red, task.lineWidth + 1, task.lineType)
         End If
 
         lastFrame = task.pcSplit(2).Clone

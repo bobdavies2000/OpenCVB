@@ -1,9 +1,10 @@
+Imports OpenCvSharp.XFeatures2D
 Imports cv = OpenCvSharp
 Module dft_Module
     Public Function inverseDFT(complexImage As cv.Mat) As cv.Mat
         Dim invDFT As New cv.Mat
         cv.Cv2.Dft(complexImage, invDFT, cv.DftFlags.Inverse Or cv.DftFlags.RealOutput)
-        invDFT = invDFT.Normalize(0, 255, cv.NormTypes.MinMax)
+        cv.Cv2.Normalize(invDFT, invDFT, 0, 255, cv.NormTypes.MinMax)
         Dim inverse8u As New cv.Mat
         invDFT.ConvertTo(inverse8u, cv.MatType.CV_8U)
         Return inverse8u
@@ -41,7 +42,7 @@ Public Class DFT_Basics : Inherits TaskParent
         cv.Cv2.Dft(complexImage, complexImage)
 
         ' compute the magnitude And switch to logarithmic scale => log(1 + sqrt(Re(DFT(I))^2 + Im(DFT(I))^2))
-        planes = complexImage.Split
+        cv.Cv2.Split(complexImage, planes)
 
         cv.Cv2.Magnitude(planes(0), planes(1), magnitude)
         magnitude += cv.Scalar.All(1) ' switch To logarithmic scale
@@ -50,7 +51,7 @@ Public Class DFT_Basics : Inherits TaskParent
         ' crop the spectrum, if it has an odd number of rows Or columns
         spectrum = magnitude(New cv.Rect(0, 0, magnitude.Cols And -2, magnitude.Rows And -2))
         ' Transform the matrix with float values into range 0-255
-        spectrum = spectrum.Normalize(0, 255, cv.NormTypes.MinMax)
+        cv.Cv2.Normalize(spectrum, spectrum, 0, 255, cv.NormTypes.MinMax)
         spectrum.ConvertTo(padded, cv.MatType.CV_8U)
 
         ' rearrange the quadrants of Fourier image  so that the origin is at the image center
@@ -91,10 +92,10 @@ Public Class XR_DFT_Inverse : Inherits TaskParent
 
         Dim diff As New cv.Mat
         cv.Cv2.Absdiff(task.gray, dst2, diff)
-        mats.mat(0) = diff.Threshold(0, 255, cv.ThresholdTypes.Binary)
+        cv.Cv2.Threshold(diff, mats.mat(0), 0, 255, cv.ThresholdTypes.Binary)
         mats.mat(1) = (diff * 50).ToMat
         mats.Run(emptyMat)
-        If mats.mat(0).CountNonZero > 0 Then
+        If cv.Cv2.CountNonZero(mats.mat(0)) > 0 Then
             dst3 = mats.dst2
             labels(3) = "Mask of difference (top) and relative diff (bot)"
         Else
@@ -165,7 +166,9 @@ Public Class XR_DFT_ButterworthDepth : Inherits TaskParent
         labels(3) = "Same filter with radius / 2"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        bfilter.Run(task.depthRGB.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
+    Dim _bfilter_cvt As New cv.Mat
+    cv.Cv2.CvtColor(task.depthRGB, _bfilter_cvt, cv.ColorConversionCodes.BGR2GRAY)
+    bfilter.Run(_bfilter_cvt)
         dst2 = bfilter.dst2
         dst3 = bfilter.dst3
     End Sub

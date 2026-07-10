@@ -466,9 +466,10 @@ Public Class XR_IMU_Stabilize : Inherits TaskParent
         smoothedMat.Set(Of Double)(0, 2, dx)
         smoothedMat.Set(Of Double)(1, 2, dy)
 
-        Dim smoothedFrame = src.WarpAffine(smoothedMat, src.Size())
+        Dim smoothedFrame As New cv.Mat
+        cv.Cv2.WarpAffine(src, smoothedFrame, smoothedMat, src.Size(), cv.InterpolationFlags.Nearest)
         smoothedFrame = smoothedFrame(New cv.Range(borderCrop, smoothedFrame.Rows - borderCrop), New cv.Range(borderCrop, smoothedFrame.Cols - borderCrop))
-        dst2 = smoothedFrame.Resize(src.Size())
+        cv.Cv2.Resize(smoothedFrame, dst2, src.Size())
         cv.Cv2.Subtract(src, dst2, dst3)
 
         Dim Text = "dx = " + Format(dx, fmt2) + vbCrLf + "dy = " + Format(dy, fmt2) + vbCrLf + "dz = " + Format(dz, fmt2)
@@ -661,8 +662,8 @@ Public Class XR_IMU_VerticalAngles : Inherits TaskParent
             strOut += Format(task.accRadians.X * RadToDeg, fmt1) + vbTab + Format(task.accRadians.Y * RadToDeg, fmt1) + vbTab + Format(task.accRadians.Z * RadToDeg, fmt1) + vbTab + vbCrLf
             SetTrueText(CStr(i), r.tc1.center, 2)
             SetTrueText(CStr(i), r.tc1.center, 3)
-            dst2.Line(r.tc1.center, r.tc2.center, task.highlight, task.lineWidth, task.lineType)
-            dst3.Line(r.tc1.center, r.tc2.center, white, task.lineWidth, task.lineType)
+            cv.Cv2.Line(dst2, r.tc1.center, r.tc2.center, task.highlight, task.lineWidth, task.lineType)
+            cv.Cv2.Line(dst3, r.tc1.center, r.tc2.center, white, task.lineWidth, task.lineType)
         Next
         SetTrueText(strOut, 3)
     End Sub
@@ -758,11 +759,11 @@ Public Class XR_IMU_Lines : Inherits TaskParent
 
             p1 = New cv.Point(kalman.kOutput(0), kalman.kOutput(1))
             p2 = New cv.Point(kalman.kOutput(2), kalman.kOutput(3))
-            dst2.Circle(p1, task.DotSize, task.highlight, -1, task.lineType)
-            dst2.Circle(p2, task.DotSize, task.highlight, -1, task.lineType)
-            dst3.Circle(p1, task.DotSize, white, -1, task.lineType)
+            cv.Cv2.Circle(dst2, p1, task.DotSize, task.highlight, -1, task.lineType)
+            cv.Cv2.Circle(dst2, p2, task.DotSize, task.highlight, -1, task.lineType)
+            cv.Cv2.Circle(dst3, p1, task.DotSize, white, -1, task.lineType)
 
-            dst3.Circle(p2, task.DotSize, white, -1, task.lineType)
+            cv.Cv2.Circle(dst3, p2, task.DotSize, white, -1, task.lineType)
             lastGcell = gcell
             strOut += CStr(0) + vbTab + Format(gcell.len3D, fmt1) + "m" + vbTab +
                                                     Format(gcell.tc1.depth, fmt1) + "m" + vbTab +
@@ -817,7 +818,7 @@ Public Class IMU_Average : Inherits TaskParent
         If task.optionsChanged Then accList.Clear()
         accList.Add(task.IMU_Acceleration)
         Dim accMat = cv.Mat.FromPixelData(accList.Count, 1, cv.MatType.CV_64FC4, accList.ToArray)
-        Dim imuMean = accMat.Mean()
+        Dim imuMean = cv.Cv2.Mean(accMat)
         task.IMU_AverageAcceleration = New cv.Point3f(imuMean(0), imuMean(1), imuMean(2))
         If accList.Count >= task.fOptions.FrameHistoryCount.Value Then accList.RemoveAt(0)
         strOut = "Average IMU acceleration: " + vbCrLf + Format(task.IMU_AverageAcceleration.X, fmt3) + vbTab + Format(task.IMU_AverageAcceleration.Y, fmt3) + vbTab +
@@ -1266,8 +1267,8 @@ Public Class IMU_VerticalVerify : Inherits TaskParent
 
                 SetTrueText(CStr(index), r.tc1.center, 2)
                 SetTrueText(CStr(index), r.tc1.center, 3)
-                dst2.Line(r.tc1.center, r.tc2.center, task.highlight, task.lineWidth, task.lineType)
-                dst3.Line(r.tc1.center, r.tc2.center, white, task.lineWidth, task.lineType)
+                cv.Cv2.Line(dst2, r.tc1.center, r.tc2.center, task.highlight, task.lineWidth, task.lineType)
+                cv.Cv2.Line(dst3, r.tc1.center, r.tc2.center, white, task.lineWidth, task.lineType)
                 brickCells(i) = r
             Else
                 brickCells.RemoveAt(i)

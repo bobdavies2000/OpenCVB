@@ -1,4 +1,4 @@
-﻿Imports cv = OpenCvSharp
+Imports cv = OpenCvSharp
 Public Class BinNWay_Basics : Inherits TaskParent
     Dim options As New Options_BinNWay
     Dim binSplit(0) As Integer
@@ -21,8 +21,9 @@ Public Class BinNWay_Basics : Inherits TaskParent
         End If
 
         For i = 0 To options.gradations - 1
-            Dim tmp = task.gray.InRange(binSplit(i), binSplit(i + 1))
-            tmp = tmp.Threshold(0, 255, cv.ThresholdTypes.Binary)
+            Dim tmp As New cv.Mat
+            cv.Cv2.InRange(task.gray, binSplit(i), binSplit(i + 1), tmp)
+            cv.Cv2.Threshold(tmp, tmp, 0, 255, cv.ThresholdTypes.Binary)
             dst1.SetTo(i + 1, tmp)
         Next
 

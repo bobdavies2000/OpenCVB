@@ -23,7 +23,7 @@ Public Class GrabCut_Basics : Inherits TaskParent
 
         fore.bg = Not fore.fg
 
-        If fore.fg.CountNonZero Then
+If cv.Cv2.CountNonZero(fore.fg) Then
             If fgFineTune IsNot Nothing Then dst0.SetTo(cv.GrabCutClasses.FGD, fgFineTune)
             If bgFineTune IsNot Nothing Then dst0.SetTo(cv.GrabCutClasses.BGD, bgFineTune)
 
@@ -130,10 +130,10 @@ Public Class XR_GrabCut_ImageRect : Inherits TaskParent
         dst2.CopyTo(dst3, dst0 + 1)
 
         dst1.SetTo(0)
-        dst1.Rectangle(bgRect1, task.highlight, task.lineWidth)
-        dst1.Rectangle(bgRect2, task.highlight, task.lineWidth)
-        dst1.Rectangle(fgRect1, task.highlight, task.lineWidth)
-        dst1.Rectangle(fgRect2, task.highlight, task.lineWidth)
+        cv.Cv2.Rectangle(dst1, bgRect1, task.highlight, task.lineWidth)
+        cv.Cv2.Rectangle(dst1, bgRect2, task.highlight, task.lineWidth)
+        cv.Cv2.Rectangle(dst1, fgRect1, task.highlight, task.lineWidth)
+        cv.Cv2.Rectangle(dst1, fgRect2, task.highlight, task.lineWidth)
     End Sub
 End Class
 
@@ -155,7 +155,9 @@ Public Class XR_GrabCut_ImageMask : Inherits TaskParent
 
         If task.heartBeat Then
             dst2 = image
-            dst0 = dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY).Threshold(50, 255, cv.ThresholdTypes.Binary)
+            Dim _cvt1 As New cv.Mat
+            cv.Cv2.CvtColor(dst2, _cvt1, cv.ColorConversionCodes.BGR2GRAY)
+            cv.Cv2.Threshold(_cvt1, dst0, 50, 255, cv.ThresholdTypes.Binary)
             dst1 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.GrabCutClasses.PR_BGD)
             dst1.SetTo(cv.GrabCutClasses.FGD, dst0)
 

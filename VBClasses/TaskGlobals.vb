@@ -1,4 +1,4 @@
-﻿Imports cv = OpenCvSharp
+Imports cv = OpenCvSharp
 Public Module vbc
     Public task As AlgorithmTask
     Public AlgorithmTestAllCount As Integer = 1
@@ -84,9 +84,9 @@ Public Module vbc
     Public Function GetMinMax(mat As cv.Mat, Optional mask As cv.Mat = Nothing) As mmData
         Dim mm As mmData
         If mask Is Nothing Then
-            mat.MinMaxLoc(mm.minVal, mm.maxVal, mm.minLoc, mm.maxLoc)
+            cv.Cv2.MinMaxLoc(mat, mm.minVal, mm.maxVal, mm.minLoc, mm.maxLoc)
         Else
-            mat.MinMaxLoc(mm.minVal, mm.maxVal, mm.minLoc, mm.maxLoc, mask)
+            cv.Cv2.MinMaxLoc(mat, mm.minVal, mm.maxVal, mm.minLoc, mm.maxLoc, mask)
         End If
 
         If Double.IsInfinity(mm.maxVal) Then

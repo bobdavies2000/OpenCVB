@@ -11,8 +11,8 @@ Public Class Gravity_Basics_TA : Inherits TaskParent
         labels(2) = "Complementary-filter gravity: angles and unit gravity vector"
     End Sub
     Public Shared Sub showVectors(dst As cv.Mat)
-        dst.Line(task.lpGravity.ptE1, task.lpGravity.ptE2, white, task.lineWidth, task.lineType)
-        dst.Line(task.lpHorizon.ptE1, task.lpHorizon.ptE2, white, task.lineWidth, task.lineType)
+        cv.Cv2.Line(dst, task.lpGravity.ptE1, task.lpGravity.ptE2, white, task.lineWidth, task.lineType)
+        cv.Cv2.Line(dst, task.lpHorizon.ptE1, task.lpHorizon.ptE2, white, task.lineWidth, task.lineType)
     End Sub
     ''' <summary>Compute two image points for the line through (cx,cy) in direction of gravity projection (gx,gy), extended to rect [0,w] x [0,h].</summary>
     Public Function GravityVectorToLineEndpoints(gravityVec As cv.Point3f, width As Integer, height As Integer) As (p1 As cv.Point2f, p2 As cv.Point2f)
@@ -143,8 +143,8 @@ Public Class Gravity_CloudMethod : Inherits TaskParent
         desc = "Method to find gravity and horizon vectors from the IMU"
     End Sub
     Public Shared Sub showVectors(dst As cv.Mat)
-        dst.Line(task.lpGravity.ptE1, task.lpGravity.ptE2, white, task.lineWidth, task.lineType)
-        dst.Line(task.lpHorizon.ptE1, task.lpHorizon.ptE2, white, task.lineWidth, task.lineType)
+        cv.Cv2.Line(dst, task.lpGravity.ptE1, task.lpGravity.ptE2, white, task.lineWidth, task.lineType)
+        cv.Cv2.Line(dst, task.lpHorizon.ptE1, task.lpHorizon.ptE2, white, task.lineWidth, task.lineType)
         'If task.lpGravity Is Nothing Then
         '    dst.Line(task.lines.lpList(0).p1, task.lines.lpList(0).p2, task.highlight, task.lineWidth * 2, task.lineType)
         '    dst.Line(task.lines.lpList(0).ptE1, task.lines.lpList(0).ptE2, white, task.lineWidth, task.lineType)
@@ -179,9 +179,10 @@ Public Class Gravity_CloudMethod : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         Dim threshold As Single = 0.015F ' surround zero by 15 cm's
 
-        dst3 = task.pcSplit(0).InRange(-threshold, threshold)
+                  cv.Cv2.InRange(task.pcSplit(0), -threshold, threshold, dst3)
         dst3.SetTo(0, task.noDepthMask)
-        Dim gPoints = dst3.FindNonZero()
+        Dim gPoints As New cv.Mat
+        cv.Cv2.FindNonZero(dst3, gPoints)
         If gPoints.Rows = 0 Then
             ' build a fake gravity vector when we don't have anything so task.lines.lplist has 1 entry.
             ' It will be updated in the next frame.  This is a startup issue.
@@ -195,7 +196,7 @@ Public Class Gravity_CloudMethod : Inherits TaskParent
         task.lpGravity = New lpData(New cv.Point2f(xTop, 0), New cv.Point2f(xBot, dst2.Height))
         If standaloneTest() Then
             dst2 = task.color
-            dst2.Line(task.lpGravity.p1, task.lpGravity.p2, task.highlight, task.lineWidth, task.lineType)
+            cv.Cv2.Line(dst2, task.lpGravity.p1, task.lpGravity.p2, task.highlight, task.lineWidth, task.lineType)
         End If
         task.lpHorizon = Line_Perpendicular.computePerp(task.lpGravity)
     End Sub
@@ -266,9 +267,11 @@ Public Class Gravity_LineTrackStabilize : Inherits TaskParent
         M.Set(Of Double)(0, 2, M.Get(Of Double)(0, 2) + tx)
         M.Set(Of Double)(1, 2, M.Get(Of Double)(1, 2) + ty)
 
-        Dim stabilized = graySrc.WarpAffine(M, graySrc.Size, cv.InterpolationFlags.Linear, cv.BorderTypes.Constant, cv.Scalar.Black)
+        Dim stabilized As New cv.Mat
+        cv.Cv2.WarpAffine(graySrc, stabilized, M, graySrc.Size, cv.InterpolationFlags.Linear, cv.BorderTypes.Constant, cv.Scalar.Black)
         Dim srcMask As New cv.Mat(graySrc.Size, cv.MatType.CV_8U, 255)
-        Dim validMask = srcMask.WarpAffine(M, graySrc.Size, cv.InterpolationFlags.Nearest, cv.BorderTypes.Constant, cv.Scalar.Black)
+        Dim validMask As New cv.Mat
+        cv.Cv2.WarpAffine(srcMask, validMask, M, graySrc.Size, cv.InterpolationFlags.Nearest, cv.BorderTypes.Constant, cv.Scalar.Black)
 
         frameHistory.Enqueue(stabilized)
         maskHistory.Enqueue(validMask)
@@ -296,17 +299,18 @@ Public Class Gravity_LineTrackStabilize : Inherits TaskParent
         cv.Cv2.Divide(sumImg, denom, avg32)
         avg32.ConvertTo(dst2, cv.MatType.CV_8U)
 
-        Dim hasData = sumCnt.Threshold(0.5, 255, cv.ThresholdTypes.Binary)
+        Dim hasData As New cv.Mat
+        cv.Cv2.Threshold(sumCnt, hasData, 0.5, 255, cv.ThresholdTypes.Binary)
         hasData.ConvertTo(hasData, cv.MatType.CV_8U)
         dst2.SetTo(0, Not hasData)
 
-        dst3 = dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        cv.Cv2.CvtColor(dst2, dst3, cv.ColorConversionCodes.GRAY2BGR)
         Dim currP1 = WarpPoint(lpCurr.p1, M)
         Dim currP2 = WarpPoint(lpCurr.p2, M)
         Dim gravP1 = WarpPoint(lpGravity.p1, M)
         Dim gravP2 = WarpPoint(lpGravity.p2, M)
-        dst3.Line(currP1, currP2, cv.Scalar.Red, task.lineWidth + 1, task.lineType)
-        dst3.Line(gravP1, gravP2, cv.Scalar.Yellow, task.lineWidth + 1, task.lineType)
+        cv.Cv2.Line(dst3, currP1, currP2, cv.Scalar.Red, task.lineWidth + 1, task.lineType)
+        cv.Cv2.Line(dst3, gravP1, gravP2, cv.Scalar.Yellow, task.lineWidth + 1, task.lineType)
 
         labels(2) = "Stabilized accumulation of last " + CStr(frameHistory.Count) + " frames."
         labels(3) = "fusedAngle=" + Format(fusedAngle, fmt2) + " deg tx=" + Format(tx, fmt2) + " ty=" + Format(ty, fmt2)
@@ -330,7 +334,7 @@ Public Class XR_Gravity_RGB : Inherits TaskParent
         If rotateAngle >= task.verticalizeAngle + 2 Then rotateAngle = task.verticalizeAngle - 2
 
         Dim M = cv.Cv2.GetRotationMatrix2D(rotateCenter, -rotateAngle, 1)
-        dst3 = src.WarpAffine(M, src.Size(), cv.InterpolationFlags.Nearest)
+        cv.Cv2.WarpAffine(src, dst3, M, src.Size(), cv.InterpolationFlags.Nearest)
 
         survey.Run(dst3)
         dst2 = survey.dst2
@@ -369,12 +373,12 @@ Public Class XR_Gravity_BrickRotate : Inherits TaskParent
         For Each brick In bricks.brickList
             Dim pt = New cv.Point(brick.mm.maxLoc.X + brick.rect.X, brick.mm.maxLoc.Y + brick.rect.Y)
             If pt.Y = brick.rect.Y Then
-                dst1.Circle(pt, task.DotSize, task.highlight, -1, task.lineType)
+            cv.Cv2.Circle(dst1, pt, task.DotSize, task.highlight, -1, task.lineType)
             End If
         Next
 
         Dim M = cv.Cv2.GetRotationMatrix2D(rotateCenter, -rotateAngle, 1)
-        dst3 = dst1.WarpAffine(M, dst1.Size(), cv.InterpolationFlags.Nearest)
+        cv.Cv2.WarpAffine(dst1, dst3, M, dst1.Size(), cv.InterpolationFlags.Nearest)
 
         survey.Run(dst3)
         dst2 = survey.dst2
@@ -408,17 +412,18 @@ Public Class XR_Gravity_Basics_TAOld : Inherits TaskParent
         dst2.SetTo(0)
         dst3.SetTo(0)
         For Each pt In points
-            dst2.Circle(pt, task.DotSize, white, -1, task.lineType)
+        cv.Cv2.Circle(dst2, pt, task.DotSize, white, -1, task.lineType)
         Next
 
-        dst2.Line(task.lpGravity.p1, task.lpGravity.p2, white, task.lineWidth, task.lineType)
-        dst3.Line(task.lpGravity.p1, task.lpGravity.p2, white, task.lineWidth, task.lineType)
+        cv.Cv2.Line(dst2, task.lpGravity.p1, task.lpGravity.p2, white, task.lineWidth, task.lineType)
+        cv.Cv2.Line(dst3, task.lpGravity.p1, task.lpGravity.p2, white, task.lineWidth, task.lineType)
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If src.Type <> cv.MatType.CV_32F Then dst0 = task.pcSplit(0) Else dst0 = src
 
-        dst0 = dst0.Abs()
-        dst1 = dst0.Threshold(0, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs()
+        cv.Cv2.Abs(dst0)
+        cv.Cv2.Threshold(dst0, dst1, 0, 255, cv.ThresholdTypes.Binary)
+        cv.Cv2.ConvertScaleAbs(dst1, dst1)
         dst0.SetTo(task.MaxZmeters, Not dst1)
 
         points.Clear()
@@ -470,7 +475,7 @@ Public Class XR_Gravity_Basics_Original : Inherits TaskParent
 
         ' rebuild the pointcloud so it is oriented to gravity.
         Dim rc = (task.pointCloud.Reshape(1, task.pointCloud.Rows * task.pointCloud.Cols) * task.gMatrix).ToMat.Reshape(3, task.pointCloud.Rows)
-        Dim split = rc.Split()
+        Dim split = cv.Cv2.Split(rc)
         Return split(index)
     End Function
     Private Function findTransition(startRow As Integer, stopRow As Integer, stepRow As Integer) As cv.Point2f
@@ -510,7 +515,7 @@ Public Class XR_Gravity_Basics_Original : Inherits TaskParent
 
         If standaloneTest() Then
             dst2.SetTo(0)
-            dst2.Line(vec.p1, vec.p2, 255, task.lineWidth, task.lineType)
+            cv.Cv2.Line(dst2, vec.p1, vec.p2, 255, task.lineWidth, task.lineType)
         End If
     End Sub
 End Class

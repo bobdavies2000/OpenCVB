@@ -26,10 +26,10 @@ Public Class Stabilizer_Basics : Inherits TaskParent
         M.Set(Of Double)(0, 2, M.Get(Of Double)(0, 2) + tx)
         M.Set(Of Double)(1, 2, M.Get(Of Double)(1, 2) + ty)
 
-        dst2 = src.WarpAffine(M, src.Size, cv.InterpolationFlags.Linear, cv.BorderTypes.Constant)
-        dst3 = dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-        dst3.Line(refLine.ptE1, refLine.ptE2, cv.Scalar.Yellow, task.lineWidth + 1, task.lineType)
-        dst3.Line(lpCurr.ptE1, lpCurr.ptE2, cv.Scalar.Red, task.lineWidth + 1, task.lineType)
+        cv.Cv2.WarpAffine(src, dst2, M, src.Size, cv.InterpolationFlags.Linear, cv.BorderTypes.Constant)
+        cv.Cv2.CvtColor(dst2, dst3, cv.ColorConversionCodes.GRAY2BGR)
+        cv.Cv2.Line(dst3, refLine.ptE1, refLine.ptE2, cv.Scalar.Yellow, task.lineWidth + 1, task.lineType)
+        cv.Cv2.Line(dst3, lpCurr.ptE1, lpCurr.ptE2, cv.Scalar.Red, task.lineWidth + 1, task.lineType)
 
         labels(3) = "Delta Angle=" + Format(angleDelta, fmt2) + " deg, tx=" + Format(tx, fmt2) + ", ty=" + Format(ty, fmt2)
     End Sub
@@ -60,7 +60,7 @@ Public Class XR_Stabilizer_Basics : Inherits TaskParent
                 For i = 0 To Math.Min(knn.ptListTrain.Count, knn.ptListQuery.Count) - 1
                     Dim p1 = knn.ptListQuery(i)
                     Dim p2 = knn.ptListTrain(knn.result(i, 0))
-                    dst3.Line(p1, p2, task.highlight, task.lineWidth)
+                    cv.Cv2.Line(dst3, p1, p2, task.highlight, task.lineWidth)
                 Next
             End If
         End If
@@ -146,9 +146,9 @@ Public Class Stabilizer_OrientationPRY : Inherits TaskParent
             rollImageDeg = task.lpGravity.angle
         End If
 
-        dst2.Line(lpCurr.ptE1, lpCurr.ptE2, cv.Scalar.Red, task.lineWidth + 1, task.lineType)
+        cv.Cv2.Line(dst2, lpCurr.ptE1, lpCurr.ptE2, cv.Scalar.Red, task.lineWidth + 1, task.lineType)
         If task.lpGravity IsNot Nothing And task.lpGravity.length > 0 Then
-            dst2.Line(task.lpGravity.ptE1, task.lpGravity.ptE2, cv.Scalar.Yellow, task.lineWidth, task.lineType)
+            cv.Cv2.Line(dst2, task.lpGravity.ptE1, task.lpGravity.ptE2, cv.Scalar.Yellow, task.lineWidth, task.lineType)
         End If
 
         labels(2) = "Pitch=" + Format(pitchDeg, fmt2) + " deg  Roll(IMU Z)=" + Format(rollDeg, fmt2) +
@@ -220,8 +220,8 @@ Public Class Stabilizer_PRY : Inherits TaskParent
         End If
         Dim yawDeg = WrapDeg(Math.Atan2(l.X * hy - l.Y * hx, l.X * hx + l.Y * hy) * RadToDeg)
 
-        dst2.Line(task.longestLine.ptE1, task.longestLine.ptE2, cv.Scalar.Red, task.lineWidth + 1, task.lineType)
-        dst2.Line(task.lpGravity.ptE1, task.lpGravity.ptE2, cv.Scalar.Yellow, task.lineWidth + 1, task.lineType)
+        cv.Cv2.Line(dst2, task.longestLine.ptE1, task.longestLine.ptE2, cv.Scalar.Red, task.lineWidth + 1, task.lineType)
+        cv.Cv2.Line(dst2, task.lpGravity.ptE1, task.lpGravity.ptE2, cv.Scalar.Yellow, task.lineWidth + 1, task.lineType)
 
         labels(2) = "Pitch=" + Format(task.pitchDeg, fmt2) + "  Roll=" + Format(rollDeg, fmt2) + "  Yaw=" + Format(yawDeg, fmt2)
         labels(3) = "longestLine angle=" + Format(task.longestLine.angle, fmt2) + " deg, lpGravity angle=" + Format(task.lpGravity.angle, fmt2) + " deg"

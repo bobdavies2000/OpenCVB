@@ -1,6 +1,6 @@
-﻿Imports SharpGL
+Imports SharpGL
 Imports cv = OpenCvSharp
-Imports OpenCvSharp.Extensions
+Imports OpenCvSharp.GdipExtensions
 Public Class SharpGLForm
     Dim gl As OpenGL
     Dim isDragging As Boolean = False
@@ -125,9 +125,9 @@ Public Class SharpGLForm
     Private Function GetMinMax(mat As cv.Mat, Optional mask As cv.Mat = Nothing) As mmData
         Dim mm As mmData = Nothing
         If mask Is Nothing Then
-            mat.MinMaxLoc(mm.minVal, mm.maxVal, mm.minLoc, mm.maxLoc)
+            cv.Cv2.MinMaxLoc(mat, mm.minVal, mm.maxVal, mm.minLoc, mm.maxLoc)
         Else
-            mat.MinMaxLoc(mm.minVal, mm.maxVal, mm.minLoc, mm.maxLoc, mask)
+            cv.Cv2.MinMaxLoc(mat, mm.minVal, mm.maxVal, mm.minLoc, mm.maxLoc, mask)
         End If
 
         If Double.IsInfinity(mm.maxVal) Then
@@ -143,10 +143,10 @@ Public Class SharpGLForm
         Dim count As Integer
         For i = 0 To task.gridRects.Count - 1
             Dim rect = task.gridRects(i)
-            Dim depth = -task.pcSplit(2)(rect).Mean(task.depthmask(rect))(0)
+            Dim depth = -cv.Cv2.Mean(task.pcSplit(2)(rect), task.depthmask(rect))(0)
             If depth = 0 Then Continue For
             count += 1
-            Dim color = task.color(rect).Mean()
+            Dim color = cv.Cv2.Mean(task.color(rect))
 
             gl.Color(CSng(color(2) / 255), CSng(color(1) / 255), CSng(color(0) / 255))
             Dim p0 = Cloud_Basics.worldCoordinates(rect.TopLeft, depth)
@@ -183,8 +183,8 @@ Public Class SharpGLForm
         task.sharpDepth = New cv.Mat(New cv.Size(GLControl.Width, GLControl.Height), cv.MatType.CV_32F, 0)
         gl.ReadPixels(0, 0, GLControl.Width, GLControl.Height, OpenGL.GL_DEPTH_COMPONENT,
                           OpenGL.GL_FLOAT, task.sharpDepth.Data)
-        task.sharpDepth = task.sharpDepth.Resize(task.workRes)
-        task.sharpDepth = task.sharpDepth.Flip(cv.FlipMode.X)
+        cv.Cv2.Resize(task.sharpDepth, task.sharpDepth, task.workRes)
+        cv.Cv2.Flip(task.sharpDepth, task.sharpDepth, cv.FlipMode.X)
     End Sub
     Private Sub optionsSetup()
         options.Run()
@@ -317,7 +317,8 @@ Public Class SharpGLForm
                 hulls.Run(task.color)
 
                 Dim textureID As UInt32() = New UInt32(0) {} ' Array to hold the texture ID
-                Dim rgba As cv.Mat = task.color.CvtColor(cv.ColorConversionCodes.BGR2RGBA)
+                Dim rgba As New cv.Mat
+                cv.Cv2.CvtColor(task.color, rgba, cv.ColorConversionCodes.BGR2RGBA)
                 Dim bitmap As Bitmap = rgba.ToBitmap()
 
                 gl.GenTextures(1, textureID)

@@ -32,6 +32,7 @@ Public Class AlgorithmTask : Implements IDisposable
         gravityCloud = New cv.Mat(workRes, cv.MatType.CV_32FC3, 0)
         noDepthMask = New cv.Mat(workRes, cv.MatType.CV_8U, 0)
         depthmask = New cv.Mat(workRes, cv.MatType.CV_8U, 0)
+        foregroundMask = New cv.Mat(workRes, cv.MatType.CV_8U, 0)
 
         colorizer = New DepthColorizer_Basics_TA
         gravityMatrix = New IMU_GMatrix_TA
@@ -234,7 +235,7 @@ Public Class AlgorithmTask : Implements IDisposable
         If gOptions.showMotionMask.Checked Then
             ' motion cloud contains all the RGB motion as well.
             For Each mIndex In motion.motionSort
-                dstList(0).Rectangle(gridRects(mIndex), cv.Scalar.White, lineWidth)
+            cv.Cv2.Rectangle(dstList(0), gridRects(mIndex), cv.Scalar.White, lineWidth)
             Next
         End If
 

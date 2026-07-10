@@ -1,4 +1,4 @@
-﻿Public Class OptionParent
+Public Class OptionParent
     Public check As New OptionsCheckbox
     Public combo As New OptionsCombo
     Public radio As New OptionsRadioButtons

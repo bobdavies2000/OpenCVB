@@ -32,14 +32,14 @@ Public Class BlockMatching_Basics : Inherits TaskParent
         Dim disparity As New cv.Mat
         blockMatch.Compute(LRMeanSub.dst2, LRMeanSub.dst3, disparity)
         disparity.ConvertTo(dst1, cv.MatType.CV_32F, 1 / 16)
-        dst1 = dst1.Threshold(0, 0, cv.ThresholdTypes.Tozero)
+        cv.Cv2.Threshold(dst1, dst1, 0, 0, cv.ThresholdTypes.Tozero)
         Dim topMargin = 10, sideMargin = 8
         Dim rect = New cv.Rect(options.numDisparity + sideMargin, topMargin, src.Width - options.numDisparity - sideMargin * 2, src.Height - topMargin * 2)
         cv.Cv2.Divide(options.distance, dst1(rect), dst1(rect)) ' this needs much more refinement.  The trackbar value is just an approximation.
-        dst1(rect) = dst1(rect).Threshold(10, 10, cv.ThresholdTypes.Trunc)
+        cv.Cv2.Threshold(dst1(rect), dst1(rect), 10, 10, cv.ThresholdTypes.Trunc)
         colorizer.Run(dst1)
         dst2(rect) = colorizer.dst2(rect)
-        dst3 = task.rightView.Resize(src.Size())
+        cv.Cv2.Resize(task.rightView, dst3, src.Size())
     End Sub
     Protected Overrides Sub Finalize()
         If blockMatch IsNot Nothing Then blockMatch.Dispose()

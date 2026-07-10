@@ -19,7 +19,7 @@ Public Class Clone_Basics : Inherits TaskParent
         Else
             cv.Cv2.Rectangle(mask, task.drawRect, cv.Scalar.White, -1)
         End If
-        dst3 = mask.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        cv.Cv2.CvtColor(mask, dst3, cv.ColorConversionCodes.GRAY2BGR)
 
         If standaloneTest() And task.frameCount Mod 10 = 0 Then cloneSpec += 1
         Select Case cloneSpec Mod 3
@@ -116,11 +116,11 @@ Public Class XR_Clone_Eagle : Inherits TaskParent
     Dim options As New Options_Clone
     Public Sub New()
         sourceImage = cv.Cv2.ImRead(task.homeDir + "Data/CloneSource.png")
-        sourceImage = sourceImage.Resize(New cv.Size(sourceImage.Width * dst2.Width / 1280, sourceImage.Height * dst2.Height / 720))
+        cv.Cv2.Resize(sourceImage, sourceImage, New cv.Size(sourceImage.Width * dst2.Width / 1280, sourceImage.Height * dst2.Height / 720))
         srcROI = New cv.Rect(0, 40, sourceImage.Width, sourceImage.Height)
 
         mask = cv.Cv2.ImRead(task.homeDir + "Data/Clonemask.png")
-        mask = mask.Resize(New cv.Size(mask.Width * dst2.Width / 1280, mask.Height * dst2.Height / 720))
+        cv.Cv2.Resize(mask, mask, New cv.Size(mask.Width * dst2.Width / 1280, mask.Height * dst2.Height / 720))
         maskROI = New cv.Rect(srcROI.Width, 40, mask.Width, mask.Height)
 
         dst3.SetTo(0)
@@ -166,14 +166,14 @@ Public Class XR_Clone_Seamless : Inherits TaskParent
         Dim radius = 100
         If task.drawRect = New cv.Rect Then
             dst3.SetTo(0)
-            dst3.Circle(center, radius, white, -1, task.lineType)
+            cv.Cv2.Circle(dst3, center, radius, white, -1, task.lineType)
         Else
             cv.Cv2.Rectangle(dst3, task.drawRect, cv.Scalar.White, -1)
         End If
 
         dst2 = src.Clone()
         cv.Cv2.SeamlessClone(task.depthRGB, src, dst3, center, dst2, options.cloneFlag)
-        dst2.Circle(center, radius, white, -1, task.lineType)
+        cv.Cv2.Circle(dst2, center, radius, white, -1, task.lineType)
     End Sub
 End Class
 

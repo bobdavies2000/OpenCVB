@@ -20,7 +20,7 @@ Public Class FeatureFlow_Basics : Inherits TaskParent
             If maxCorrelation >= task.fCorrThreshold Then
                 Dim index = correlations.IndexOf(maxCorrelation)
                 Dim lp = New lpData(p1, currFeatures(index))
-                dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth)
+                cv.Cv2.Line(dst2, lp.p1, lp.p2, task.highlight, task.lineWidth)
             End If
         Next
     End Sub
@@ -35,7 +35,7 @@ Public Class FeatureFlow_Basics : Inherits TaskParent
         buildCorrelations(lastFeatures, feat.features)
 
         For Each pt In feat.features
-            dst2.Circle(pt, task.DotSize, task.highlight, -1, task.lineType)
+        cv.Cv2.Circle(dst2, pt, task.DotSize, task.highlight, -1, task.lineType)
         Next
         lastFeatures = New List(Of cv.Point)(feat.features)
     End Sub
@@ -60,8 +60,8 @@ Public Class FeatureFlow_LucasKanade : Inherits TaskParent
         If src.Channels <> 1 Then src = task.gray
         feat.Run(src)
 
-        dst2 = src.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-        dst3 = src.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        cv.Cv2.CvtColor(src, dst2, cv.ColorConversionCodes.GRAY2BGR)
+        cv.Cv2.CvtColor(src, dst3, cv.ColorConversionCodes.GRAY2BGR)
 
         Static lastGray As cv.Mat = task.gray.Clone
         features.Clear()
@@ -82,9 +82,9 @@ Public Class FeatureFlow_LucasKanade : Inherits TaskParent
                 If length < 30 Then
                     features.Add(pt1)
                     lastFeatures.Add(pt2)
-                    dst2.Line(pt1, pt2, task.highlight, task.lineWidth + task.lineWidth, task.lineType)
-                    dst3.Circle(pt1, task.DotSize + 3, white, -1, task.lineType)
-                    dst3.Circle(pt2, task.DotSize + 1, cv.Scalar.Red, -1, task.lineType)
+                    cv.Cv2.Line(dst2, pt1, pt2, task.highlight, task.lineWidth + task.lineWidth, task.lineType)
+                    cv.Cv2.Circle(dst3, pt1, task.DotSize + 3, white, -1, task.lineType)
+                    cv.Cv2.Circle(dst3, pt2, task.DotSize + 1, cv.Scalar.Red, -1, task.lineType)
                 End If
             End If
         Next

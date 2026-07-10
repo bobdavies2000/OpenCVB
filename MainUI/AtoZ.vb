@@ -1,4 +1,4 @@
-﻿Imports System.IO
+Imports System.IO
 Namespace MainApp
     Public Class AtoZ
         Public homeDir As DirectoryInfo

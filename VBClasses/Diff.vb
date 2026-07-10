@@ -14,8 +14,8 @@ Public Class Diff_Basics : Inherits TaskParent
 
         dst3.SetTo(0)
         cv.Cv2.Absdiff(src, lastFrame, dst3)
-        dst2 = dst3.Threshold(task.colorDiffThreshold, 255, cv.ThresholdTypes.Binary)
-        changedPixels = dst2.CountNonZero
+        cv.Cv2.Threshold(dst3, dst2, task.colorDiffThreshold, 255, cv.ThresholdTypes.Binary)
+        changedPixels = cv.Cv2.CountNonZero(dst2)
         lastFrame = src.Clone
         strOut = "Motion detected - " + CStr(changedPixels) + " pixels changed with threshold " +
                          CStr(task.colorDiffThreshold)
@@ -38,7 +38,7 @@ Public Class Diff_Color : Inherits TaskParent
         If task.firstPass Then diff.lastFrame = src.Reshape(1, src.Rows * 3)
         diff.Run(src.Reshape(1, src.Rows * 3))
         dst2 = diff.dst2.Reshape(3, src.Rows)
-        dst3 = dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        cv.Cv2.CvtColor(dst2, dst3, cv.ColorConversionCodes.BGR2GRAY)
     End Sub
 End Class
 
@@ -60,7 +60,7 @@ Public Class Diff_UnstableDepthAndColor : Inherits TaskParent
         Dim unstableDepth As New cv.Mat
         Dim mask As New cv.Mat
         unstableDepth = Not depth.dst3
-        If unstableGray.Channels() = 3 Then unstableGray = unstableGray.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If unstableGray.Channels() = 3 Then cv.Cv2.CvtColor(unstableGray, unstableGray, cv.ColorConversionCodes.BGR2GRAY)
         mask = unstableGray Or unstableDepth
         dst2 = src.Clone()
         dst2.SetTo(0, mask)
@@ -144,7 +144,7 @@ Public Class Diff_RGB : Inherits TaskParent
         desc = "Create a mask that shows when R, G, and B are different.  Compare it to diff for grayscale."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        Dim split = src.Split()
+        Dim split = cv.Cv2.Split(src)
         dst2.SetTo(0)
         For i = 0 To 2
             diff(i).Run(split(i))
@@ -153,11 +153,11 @@ Public Class Diff_RGB : Inherits TaskParent
             dst2 += mats.mat(i)
         Next
 
-        dst2 = dst2.Threshold(2, 255, cv.ThresholdTypes.Binary)
+        cv.Cv2.Threshold(dst2, dst2, 2, 255, cv.ThresholdTypes.Binary)
         dst3 = task.motion.dst2
 
         If task.heartBeat Then
-            labels(2) = "Diff of RGB.split has " + CStr(dst2.CountNonZero) + " while gray has " + CStr(dst3.CountNonZero)
+            labels(2) = "Diff of RGB.split has " + CStr(cv.Cv2.CountNonZero(dst2)) + " while gray has " + CStr(cv.Cv2.CountNonZero(dst3))
         End If
     End Sub
 End Class
@@ -179,7 +179,7 @@ Public Class Diff_Simple : Inherits TaskParent
 
         cv.Cv2.Absdiff(src, lastFrame, dst3)
 
-        changedPixels = dst3.CountNonZero
+        changedPixels = cv.Cv2.CountNonZero(dst3)
         If changedPixels > 0 Then
             lastFrame = src.Clone
             strOut = CStr(changedPixels) + " pixels changed."
@@ -205,13 +205,13 @@ Public Class Diff_Depth32f : Inherits TaskParent
 
         cv.Cv2.Absdiff(src, lastFrame, dst1)
 
-        dst2 = dst1.Threshold(options.meters, 255, cv.ThresholdTypes.Binary)
+        cv.Cv2.Threshold(dst1, dst2, options.meters, 255, cv.ThresholdTypes.Binary)
 
         lastFrame = src.Clone
         If task.heartBeat Then
             labels(2) = "Depth difference from accumulated frame is > " + CStr(options.millimeters) + " mm's"
-            Dim count = dst2.CountNonZero()
-            labels(3) = CStr(count) + " pixels (" + Format(count / task.depthmask.CountNonZero, "0%") +
+            Dim count = cv.Cv2.CountNonZero(dst2)
+            labels(3) = CStr(count) + " pixels (" + Format(count /cv.Cv2.CountNonZero(task.depthmask), "0%") +
                             " of all depth pixels) were different by more than " + CStr(options.millimeters) + " mm's"
         End If
     End Sub
@@ -239,7 +239,7 @@ Public Class Diff_DepthGrid : Inherits TaskParent
         Dim nextList(task.gridRects.Count - 1) As Single
         For i = 0 To task.gridRects.Count - 1
             Dim r = task.gridRects(i)
-            nextList(i) = src(r).Mean(task.depthmask(r)).Val0
+            nextList(i) = cv.Cv2.Mean(src(r), task.depthmask(r)).Val0
         Next
 
         dst2.SetTo(0)

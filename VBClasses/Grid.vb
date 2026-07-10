@@ -35,15 +35,15 @@ Public Class Grid_Basics_TA : Inherits TaskParent
             task.gridMask.SetTo(0)
             For x = task.gridWH To dst2.Width - 1 Step task.gridWH
                 Dim p1 = New cv.Point(x, 0), p2 = New cv.Point(x, dst2.Height)
-                task.gridMask.Line(p1, p2, 255, 1)
+                cv.Cv2.Line(task.gridMask, p1, p2, 255, 1)
             Next
             For y = task.gridWH To dst2.Height - 1 Step task.gridWH
                 Dim p1 = New cv.Point(0, y), p2 = New cv.Point(dst2.Width, y)
-                task.gridMask.Line(p1, p2, 255, 1)
+                cv.Cv2.Line(task.gridMask, p1, p2, 255, 1)
             Next
 
             For i = 0 To task.gridRects.Count - 1
-                task.gridMap.Rectangle(task.gridRects(i), i, -1)
+                cv.Cv2.Rectangle(task.gridMap, task.gridRects(i), cv.Scalar.All(i), -1)
             Next
 
             ' This determines which grid rects are replaced when motion is detected.
@@ -142,7 +142,7 @@ Public Class XR_Grid_Basics_TATest : Inherits TaskParent
              Sub(i)
                  Dim r = task.gridRects(i)
                  cv.Cv2.Subtract(mean, src(r), dst3(r))
-                 dst3(r).Line(New cv.Point(0, 0), New cv.Point(r.Width, r.Height), white, task.lineWidth, task.lineType)
+                 cv.Cv2.Line(dst3(r), New cv.Point(0, 0), New cv.Point(r.Width, r.Height), white, task.lineWidth, task.lineType)
              End Sub)
     End Sub
 End Class
@@ -241,8 +241,8 @@ Public Class XR_Grid_ValidateLocation : Inherits TaskParent
         dst3.SetTo(0)
         For Each index In task.gridNabes(grIndex)
             Dim r = task.gridRects(index)
-            dst2.Rectangle(r, white, task.lineWidth)
-            dst3.Rectangle(r, 255, task.lineWidth)
+            cv.Cv2.Rectangle(dst2, r, white, task.lineWidth)
+            cv.Cv2.Rectangle(dst3, r, cv.Scalar.All(index), task.lineWidth)
         Next
     End Sub
 End Class
@@ -267,7 +267,7 @@ Public Class XR_Grid_MinMaxDepth : Inherits TaskParent
         Dim mm As mmData
         For i = 0 To minMaxLocs.Count - 1
             Dim r = task.gridRects(i)
-            task.pcSplit(2)(r).MinMaxLoc(mm.minVal, mm.maxVal, mm.minLoc, mm.maxLoc, task.depthmask(r))
+            cv.Cv2.MinMaxLoc(task.pcSplit(2)(r), mm.minVal, mm.maxVal, mm.minLoc, mm.maxLoc, task.depthmask(r))
             minMaxLocs(i) = New lpData(mm.minLoc, mm.maxLoc)
             minMaxVals(i) = New cv.Vec2f(mm.minVal, mm.maxVal)
         Next
@@ -276,8 +276,8 @@ Public Class XR_Grid_MinMaxDepth : Inherits TaskParent
             dst2.SetTo(0)
             For i = 0 To minMaxLocs.Count - 1
                 Dim lp = minMaxLocs(i)
-                dst2(task.gridRects(i)).Circle(lp.p2, task.DotSize, cv.Scalar.Red, -1, task.lineType)
-                dst2(task.gridRects(i)).Circle(lp.p1, task.DotSize, white, -1, task.lineType)
+                cv.Cv2.Circle(dst2(task.gridRects(i)), lp.p2, task.DotSize, cv.Scalar.Red, -1, task.lineType)
+                cv.Cv2.Circle(dst2(task.gridRects(i)), lp.p1, task.DotSize, white, -1, task.lineType)
             Next
             dst2.SetTo(white, task.gridMask)
         End If
@@ -313,11 +313,11 @@ Public Class XR_Grid_TrackCenter : Inherits TaskParent
 
         If standaloneTest() Then
             dst2 = src
-            dst2.Rectangle(match.newRect, task.highlight, task.lineWidth + 1, task.lineType)
-            dst2.Circle(center, task.DotSize, white, -1, task.lineType)
+            cv.Cv2.Rectangle(dst2, match.newRect, task.highlight, task.lineWidth + 1, task.lineType)
+            cv.Cv2.Circle(dst2, center, task.DotSize, white, -1, task.lineType)
 
             If task.heartBeat Then dst3.SetTo(0)
-            dst3.Circle(center, task.DotSize, task.highlight, -1, task.lineType)
+            cv.Cv2.Circle(dst3, center, task.DotSize, task.highlight, -1, task.lineType)
             SetTrueText(Format(match.correlation, fmt3), center, 3)
 
             labels(3) = "Match correlation = " + Format(match.correlation, fmt3)
@@ -367,15 +367,15 @@ Public Class Grid_Rectangles : Inherits TaskParent
             gridMask.SetTo(0)
             For x = gridWidth To dst2.Width - 1 Step gridWidth
                 Dim p1 = New cv.Point(x, 0), p2 = New cv.Point(x, dst2.Height)
-                gridMask.Line(p1, p2, 255, task.lineWidth)
+                cv.Cv2.Line(gridMask, p1, p2, 255, task.lineWidth)
             Next
             For y = gridHeight To dst2.Height - 1 Step gridHeight
                 Dim p1 = New cv.Point(0, y), p2 = New cv.Point(dst2.Width, y)
-                gridMask.Line(p1, p2, 255, task.lineWidth)
+                cv.Cv2.Line(gridMask, p1, p2, 255, task.lineWidth)
             Next
 
             For Each roi In gridRects
-                gridMap.Rectangle(roi, gridRects.IndexOf(roi), -1)
+                cv.Cv2.Rectangle(gridMap, roi, cv.Scalar.All(gridRects.IndexOf(roi)), -1)
             Next
 
             gridNabes.Clear()

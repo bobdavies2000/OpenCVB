@@ -23,7 +23,9 @@ Public Class HistPeak2D_Basics : Inherits TaskParent
             dst3 = delaunay.dst2
         End If
 
-        Dim mask = histogram.Threshold(0, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs
+        Dim mask As New cv.Mat
+        cv.Cv2.Threshold(histogram, mask, 0, 255, cv.ThresholdTypes.Binary)
+        cv.Cv2.ConvertScaleAbs(mask, mask)
         delaunay.dst1.ConvertTo(histogram, cv.MatType.CV_32F)
         histogram.SetTo(0, Not mask)
 
@@ -88,7 +90,8 @@ Public Class XR_HistPeak2D_NotHotTop : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         histTop.Run(src)
-        dst1 = histTop.histogram.InRange(0, 0).ConvertScaleAbs
+        cv.Cv2.InRange(histTop.histogram, 0, 0, dst1)
+        cv.Cv2.ConvertScaleAbs(dst1, dst1)
 
         Dim mm As mmData = GetMinMax(histTop.histogram)
         dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_32F, mm.maxVal)
@@ -117,7 +120,7 @@ Public Class XR_HistPeak2D_Edges : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         histTop.Run(src)
 
-        dst3 = histTop.histogram.Threshold(task.projectionThreshold, 255, cv.ThresholdTypes.Binary)
+        cv.Cv2.Threshold(histTop.histogram, dst3, task.projectionThreshold, 255, cv.ThresholdTypes.Binary)
         peak.histogram = histTop.histogram
         peak.Run(task.pointCloud)
         dst2 = peak.dst2
@@ -213,7 +216,7 @@ Public Class XR_HistPeak2D_HotSide : Inherits TaskParent
 
         For i = 0 To peak.auto.clusterPoints.Count - 1
             Dim pt = peak.auto.clusterPoints(i)
-            dst3.Circle(pt, task.DotSize * 3, white, -1, task.lineType)
+            cv.Cv2.Circle(dst3, pt, task.DotSize * 3, white, -1, task.lineType)
         Next
 
         peak.histogram = histSide.histogram
@@ -243,7 +246,7 @@ Public Class XR_HistPeak2D_HotTop : Inherits TaskParent
 
         For i = 0 To peak.auto.clusterPoints.Count - 1
             Dim pt = peak.auto.clusterPoints(i)
-            dst3.Circle(pt, task.DotSize * 3, white, -1, task.lineType)
+            cv.Cv2.Circle(dst3, pt, task.DotSize * 3, white, -1, task.lineType)
         Next
 
         peak.histogram = histTop.histogram

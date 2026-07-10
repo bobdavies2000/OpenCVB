@@ -165,7 +165,8 @@ Public Class XR_Brick_MLColorDepth : Inherits TaskParent
 
             ' the first grid square is the center one and the only grid square with edges.  The rest are featureless.
             Dim r = task.gridRects(nList(0))
-            Dim edgePixels = edgeMask(r).FindNonZero()
+            Dim edgePixels As New cv.Mat
+            cv.Cv2.FindNonZero(edgeMask(r), edgePixels)
 
             ' mark the edge pixels as class 2 - others will be updated next
             ml.trainResponse = New cv.Mat(nList.Count + edgePixels.Rows - 1, 1,
@@ -199,8 +200,10 @@ Public Class XR_Brick_MLColorDepth : Inherits TaskParent
             ml.testMats = {rgb32f(grB), task.pcSplit(2)(grB)}
             ml.Run(src)
 
-            dst1(grB) = ml.predictions.Threshold(1.5, 255, cv.ThresholdTypes.BinaryInv).
-                                            ConvertScaleAbs.Reshape(1, grB.Height)
+            Dim _thr1 As New cv.Mat
+            cv.Cv2.Threshold(ml.predictions, dst1(grB), 1.5, 255, cv.ThresholdTypes.BinaryInv)
+            dst1(grB) = dst1(grB).Reshape(1, grB.Height)
+            cv.Cv2.ConvertScaleAbs(dst1(grB), dst1(grB))
         Next
 
         dst2.SetTo(0)
@@ -237,25 +240,28 @@ Public Class XR_ML_DepthFromColor : Inherits TaskParent
 
         Dim colorROI As New cv.Rect(0, 0, resizer.newSize.Width, resizer.newSize.Height)
         resizer.dst2.ConvertTo(color32f, cv.MatType.CV_32FC3)
-        Dim shadowSmall = mats.mat(1).Resize(color32f.Size()).Clone()
-        color32f.SetTo(cv.Scalar.Black, shadowSmall) ' where depth is unknown, set to black (so we don't learn anything invalid, i.e. good color but missing depth.
-        Dim depth = task.pcSplit(2).Resize(color32f.Size())
+        cv.Cv2.Resize(mats.mat(1), mats.mat(1), color32f.Size())
+        color32f.SetTo(cv.Scalar.Black, mats.mat(1)) ' where depth is unknown, set to black (so we don't learn anything invalid, i.e. good color but missing depth.
+        cv.Cv2.Resize(task.pcSplit(2), dst0, color32f.Size())
 
-        Dim mask = depth.Threshold(task.MaxZmeters, 255, cv.ThresholdTypes.Binary)
+        Dim mask As New cv.Mat
+        cv.Cv2.Threshold(dst0, mask, task.MaxZmeters, 255, cv.ThresholdTypes.Binary)
         mask.ConvertTo(mask, cv.MatType.CV_8U)
-        mats.mat(2) = mask.Resize(src.Size())
+        cv.Cv2.Resize(mask, mats.mat(2), src.Size())
 
-        depth.SetTo(task.MaxZmeters, Not mask)
+        dst0.SetTo(task.MaxZmeters, Not mask)
 
-        colorPal.Run(depth.ConvertScaleAbs())
+        cv.Cv2.ConvertScaleAbs(dst0, dst0)
+        colorPal.Run(dst0)
         mats.mat(3) = colorPal.dst2.Clone()
 
-        mask = depth.Threshold(1, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs()
-        Dim maskCount = mask.CountNonZero
+        cv.Cv2.Threshold(dst0, mask, 1, 255, cv.ThresholdTypes.Binary)
+        cv.Cv2.ConvertScaleAbs(mask, mask)
+        Dim maskCount = cv.Cv2.CountNonZero(mask)
         dst2 = mask
 
         Dim learnInput = color32f.Reshape(1, color32f.Total)
-        Dim depthResponse = depth.Reshape(1, depth.Total)
+        Dim depthResponse = dst0.Reshape(1, dst0.Total)
 
         ' now learn what depths are associated with which colors.
         If rtree Is Nothing Then rtree = cv.ML.RTrees.Create()
@@ -267,7 +273,8 @@ Public Class XR_ML_DepthFromColor : Inherits TaskParent
         rtree.Predict(input, output)
         Dim predictedDepth = output.Reshape(1, src.Height)
 
-        colorPal.Run(predictedDepth.ConvertScaleAbs())
+        cv.Cv2.ConvertScaleAbs(predictedDepth, dst0)
+        colorPal.Run(dst0)
         mats.mat(0) = colorPal.dst2.Clone()
 
         mats.Run(emptyMat)
@@ -294,7 +301,9 @@ Public Class XR_ML_DepthFromXYColor : Inherits TaskParent
         ' desc = "Use BGR to predict depth across the entire image, maxDepth = slider value, resize % as well."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        mats.mat(0) = task.noDepthMask.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        Dim _cvtInline As New cv.Mat
+        cv.Cv2.CvtColor(task.noDepthMask, _cvtInline, cv.ColorConversionCodes.GRAY2BGR)
+        mats.mat(0) =_cvtInline
 
         Dim color32f As New cv.Mat
 
@@ -302,27 +311,32 @@ Public Class XR_ML_DepthFromXYColor : Inherits TaskParent
 
         Dim colorROI As New cv.Rect(0, 0, resizer.newSize.Width, resizer.newSize.Height)
         resizer.dst2.ConvertTo(color32f, cv.MatType.CV_32FC3)
-        Dim shadowSmall = task.noDepthMask.Resize(color32f.Size())
-        color32f.SetTo(cv.Scalar.Black, shadowSmall) ' where depth is unknown, set to black (so we don't learn anything invalid, i.e. good color but missing depth.
-        Dim depth32f = task.pcSplit(2).Resize(color32f.Size())
+        cv.Cv2.Resize(task.noDepthMask, dst0, color32f.Size())
+        color32f.SetTo(cv.Scalar.Black, dst0) ' where depth is unknown, set to black (so we don't learn anything invalid, i.e. good color but missing depth.
+        cv.Cv2.Resize(task.pcSplit(2), dst1, color32f.Size())
 
-        Dim mask = depth32f.Threshold(task.MaxZmeters, task.MaxZmeters, cv.ThresholdTypes.BinaryInv)
-        mask.SetTo(0, shadowSmall) ' remove the unknown depth...
+        Dim mask As New cv.Mat
+        cv.Cv2.Threshold(dst1, mask, task.MaxZmeters, task.MaxZmeters, cv.ThresholdTypes.BinaryInv)
+        mask.SetTo(0, dst0) ' remove the unknown depth...
         mask.ConvertTo(mask, cv.MatType.CV_8U)
-        mats.mat(2) = mask.CvtColor(cv.ColorConversionCodes.GRAY2BGR).Resize(src.Size)
+        Dim _cvtResize As New cv.Mat
+        cv.Cv2.CvtColor(mask, _cvtResize, cv.ColorConversionCodes.GRAY2BGR)
+        cv.Cv2.Resize(_cvtResize, mats.mat(2), src.Size)
 
         mask = Not mask
-        depth32f.SetTo(task.MaxZmeters, mask)
+        dst1.SetTo(task.MaxZmeters, mask)
+        cv.Cv2.ConvertScaleAbs(dst1, dst1)
 
-        colorizer.Run(depth32f.ConvertScaleAbs)
+        colorizer.Run(dst1)
         mats.mat(3) = colorizer.dst2.Clone()
 
-        mask = depth32f.Threshold(1, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs()
-        Dim maskCount = mask.CountNonZero
-        dst2 = mask.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        cv.Cv2.Threshold(dst1, mask, 1, 255, cv.ThresholdTypes.Binary)
+        cv.Cv2.ConvertScaleAbs(mask, mask)
+        Dim maskCount = cv.Cv2.CountNonZero(mask)
+        cv.Cv2.CvtColor(mask, dst2, cv.ColorConversionCodes.GRAY2BGR)
 
         Dim c = color32f.Reshape(1, color32f.Total)
-        Dim depthResponse = depth32f.Reshape(1, depth32f.Total)
+        Dim depthResponse = dst1.Reshape(1, dst1.Total)
 
         Dim learnInput As New cv.Mat(c.Rows, 6, cv.MatType.CV_32F, cv.Scalar.All(0))
         For y = 0 To c.Rows - 1
@@ -350,7 +364,8 @@ Public Class XR_ML_DepthFromXYColor : Inherits TaskParent
         rtree.Predict(input, output)
         Dim predictedDepth = output.Reshape(1, src.Height)
 
-        colorizer.Run(predictedDepth.ConvertScaleAbs)
+        cv.Cv2.ConvertScaleAbs(predictedDepth, predictedDepth)
+        colorizer.Run(predictedDepth)
         dst2 = colorizer.dst2.Clone()
 
         mats.Run(emptyMat)
@@ -399,12 +414,12 @@ Public Class XR_ML_Color2Depth : Inherits TaskParent
             mls.x = r.X
             mls.y = r.Y
 
-            If task.noDepthMask(r).CountNonZero > 0 Then
+If cv.Cv2.CountNonZero(task.noDepthMask(r)) > 0 Then
                 grPredict.Add(r)
                 predictList.Add(mls)
             Else
                 mlInput.Add(mls)
-                mResponse.Add(task.pcSplit(2)(r).Mean())
+                mResponse.Add(cv.Cv2.Mean(task.pcSplit(2)(r)))
             End If
         Next
 
@@ -474,12 +489,12 @@ Public Class XR_ML_ColorInTier2Depth : Inherits TaskParent
             mls.x = r.X
             mls.y = r.Y
 
-            If task.noDepthMask(r).CountNonZero > 0 Then
+If cv.Cv2.CountNonZero(task.noDepthMask(r)) > 0 Then
                 grPredict.Add(r)
                 predictList.Add(mls)
             Else
                 mlInput.Add(mls)
-                mResponse.Add(task.pcSplit(2)(r).Mean())
+                mResponse.Add(cv.Cv2.Mean(task.pcSplit(2)(r)))
             End If
         Next
 

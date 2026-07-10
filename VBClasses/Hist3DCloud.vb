@@ -35,9 +35,8 @@ Public Class Hist3Dcloud_Basics : Inherits TaskParent
         histogram = cv.Mat.FromPixelData(histArray.Count, 1, cv.MatType.CV_32F, simK.histArray)
         classCount = simK.classCount
 
-        cv.Cv2.CalcBackProject({src}, {2}, histogram, dst2,
-                                       {task.rangesCloud(task.rangesCloud.Count - 1)})
-        dst2 = dst2.ConvertScaleAbs
+        cv.Cv2.CalcBackProject({src}, {2}, histogram, dst2, {task.rangesCloud(task.rangesCloud.Count - 1)})
+        cv.Cv2.ConvertScaleAbs(dst2, dst2)
 
         dst2.SetTo(0, task.noDepthMask)
         'dst2.SetTo(classCount, task.maxDepthMask)
@@ -77,7 +76,7 @@ Public Class XR_Hist3Dcloud_DepthSplit : Inherits TaskParent
             If i = 1 Then task.channels = {0, 2}
             If i = 2 Then task.channels = {1, 2}
             hist2d(i).Run(task.pointCloud)
-            mats2.mat(i) = hist2d(i).histogram.ConvertScaleAbs
+            cv.Cv2.ConvertScaleAbs(hist2d(i).histogram, mats2.mat(i))
         Next
 
         mats1.Run(src)
@@ -149,7 +148,7 @@ Public Class XR_Hist3Dcloud_Highlights : Inherits TaskParent
         If sortedHist.ElementAt(maskval).Key = 0 Then maskval = 0
         Dim index = sortedHist.ElementAt(maskval).Value
 
-        dst3 = dst2.InRange(index, index)
+                  cv.Cv2.InRange(dst2, index, index, dst3)
         labels(3) = "There were " + CStr(sortedHist.ElementAt(maskval).Key) + " samples in bin " + CStr(index)
     End Sub
 End Class

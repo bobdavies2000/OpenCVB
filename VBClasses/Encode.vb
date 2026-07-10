@@ -1,3 +1,4 @@
+Imports OpenCvSharp
 Imports cv = OpenCvSharp
 ' https://www.programcreek.com/python/example/70396/cv2.imencode
 Public Class XR_Encode_Basics : Inherits TaskParent
@@ -12,7 +13,8 @@ Public Class XR_Encode_Basics : Inherits TaskParent
         If task.firstPass Then OptionParent.FindSlider("Encode Output Scaling").Value = 10
 
         Dim encodeParams() As Integer = {options.encodeOption, options.qualityLevel}
-        Dim buf() = src.ImEncode(".jpg", encodeParams)
+        Dim buf As Byte() = Nothing
+        cv.Cv2.ImEncode(".jpg", src, buf, encodeParams)
         Dim image = cv.Mat.FromPixelData(buf.Count, 1, cv.MatType.CV_8U, buf)
         dst3 = cv.Cv2.ImDecode(image, cv.ImreadModes.AnyColor)
 
@@ -39,8 +41,9 @@ Public Class XR_Encode_Scaling : Inherits TaskParent
         options.Run()
 
         Dim encodeParams() As Integer = {options.encodeOption, options.qualityLevel}
+        Dim buf As Byte() = Nothing
+        cv.Cv2.ImEncode(".jpg", src, buf, encodeParams)
 
-        Dim buf() = src.ImEncode(".jpg", encodeParams)
         Dim image = cv.Mat.FromPixelData(buf.Count, 1, cv.MatType.CV_8U, buf)
         dst3 = cv.Cv2.ImDecode(image, cv.ImreadModes.AnyColor)
 

@@ -19,7 +19,7 @@ Public Class Random_Basics : Inherits TaskParent
         If standaloneTest() Then
             dst2.SetTo(0)
             For Each pt In PointList
-                dst2.Circle(pt, task.DotSize, cv.Scalar.Yellow, -1, task.lineType)
+            cv.Cv2.Circle(dst2, pt, task.DotSize, cv.Scalar.Yellow, -1, task.lineType)
             Next
         End If
     End Sub
@@ -47,7 +47,7 @@ Public Class Random_Point2d : Inherits TaskParent
         If standaloneTest() Then
             dst2.SetTo(0)
             For Each pt In PointList
-                dst2.Circle(New cv.Point2f(pt.X, pt.Y), task.DotSize, task.highlight, -1, task.lineType)
+            cv.Cv2.Circle(dst2, New cv.Point2f(pt.X, pt.Y), task.DotSize, task.highlight, -1, task.lineType)
             Next
         End If
     End Sub
@@ -74,7 +74,7 @@ Public Class Random_Enumerable : Inherits TaskParent
                 End Function).ToArray
         dst2.SetTo(0)
         For Each pt In points
-            dst2.Circle(pt, task.DotSize, cv.Scalar.Yellow, -1, task.lineType)
+        cv.Cv2.Circle(dst2, pt, task.DotSize, cv.Scalar.Yellow, -1, task.lineType)
         Next
     End Sub
 End Class
@@ -103,7 +103,7 @@ Public Class Random_Basics3D : Inherits TaskParent
         If standaloneTest() Then
             dst2.SetTo(0)
             For Each pt In PointList
-                dst2.Circle(New cv.Point2f(pt.X, pt.Y), task.DotSize, cv.Scalar.Yellow, -1, task.lineType)
+            cv.Cv2.Circle(dst2, New cv.Point2f(pt.X, pt.Y), task.DotSize, cv.Scalar.Yellow, -1, task.lineType)
             Next
         End If
         Points3f = PointList.ToArray
@@ -135,7 +135,7 @@ Public Class Random_Basics4D : Inherits TaskParent
         If standaloneTest() Then
             dst2.SetTo(0)
             For Each v In PointList
-                dst2.Circle(New cv.Point2f(v(0), v(1)), task.DotSize, cv.Scalar.Yellow, -1, task.lineType)
+            cv.Cv2.Circle(dst2, New cv.Point2f(v(0), v(1)), task.DotSize, cv.Scalar.Yellow, -1, task.lineType)
             Next
         End If
         vec4f = PointList.ToArray
@@ -185,7 +185,7 @@ Public Class XR_Random_LUTMask : Inherits TaskParent
             Next
         End If
 
-        dst3 = src.LUT(lutMat)
+        cv.Cv2.LUT(src, lutMat, dst3)
         labels(2) = "Using kmeans colors with interpolation"
     End Sub
 End Class
@@ -350,7 +350,7 @@ Public Class Random_CustomDistribution : Inherits TaskParent
         End If
         Dim lastValue = inputCDF.Get(Of Single)(inputCDF.Rows - 1, 0)
         If Not (lastValue > 0.99 And lastValue <= 1.0) Then ' convert the input histogram to a cdf.
-            inputCDF *= 1 / (inputCDF.Sum()(0))
+            inputCDF *= 1 / cv.Cv2.Sum(inputCDF)(0)
             For i = 1 To inputCDF.Rows - 1
                 inputCDF.Set(Of Single)(i, 0, inputCDF.Get(Of Single)(i - 1, 0) + inputCDF.Get(Of Single)(i, 0))
             Next
@@ -503,16 +503,19 @@ Public Class XR_Random_StaticTVFaster : Inherits TaskParent
         dst2 = task.gray
 
         random.Run(src)
-        mats.mat(0) = random.dst2.Threshold(255 - percentSlider.Value * 255 / 100, 255, cv.ThresholdTypes.Binary)
-        Dim nochangeMask = random.dst2.Threshold(255 - percentSlider.Value * 255 / 100, 255, cv.ThresholdTypes.BinaryInv)
+        cv.Cv2.Threshold(random.dst2, mats.mat(0), 255 - percentSlider.Value * 255 / 100, 255, cv.ThresholdTypes.Binary)
+        Dim nochangeMask As New cv.Mat
+        cv.Cv2.Threshold(random.dst2, nochangeMask, 255 - percentSlider.Value * 255 / 100, 255, cv.ThresholdTypes.BinaryInv)
 
         Dim valMat As New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         cv.Cv2.Randu(valMat, cv.Scalar.All(0), cv.Scalar.All(valSlider.Value))
         valMat.SetTo(0, nochangeMask)
 
         random.Run(src)
-        Dim plusMask = random.dst2.Threshold(128, 255, cv.ThresholdTypes.Binary)
-        Dim minusMask = random.dst2.Threshold(128, 255, cv.ThresholdTypes.BinaryInv)
+        Dim plusMask As New cv.Mat
+        cv.Cv2.Threshold(random.dst2, plusMask, 128, 255, cv.ThresholdTypes.Binary)
+        Dim minusMask As New cv.Mat
+         cv.Cv2.Threshold(random.dst2, minusMask, 128, 255, cv.ThresholdTypes.BinaryInv)
 
         mats.mat(2) = plusMask
         mats.mat(3) = minusMask
@@ -545,7 +548,8 @@ Public Class XR_Random_StaticTVFastSimple : Inherits TaskParent
         dst2 = task.gray
 
         random.Run(src)
-        Dim nochangeMask = random.dst2.Threshold(255 - percentSlider.Value * 255 / 100, 255, cv.ThresholdTypes.BinaryInv)
+        Dim nochangeMask As New cv.Mat
+        cv.Cv2.Threshold(random.dst2, nochangeMask, 255 - percentSlider.Value * 255 / 100, 255, cv.ThresholdTypes.BinaryInv)
 
         dst3 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U)
         cv.Cv2.Randu(dst3, cv.Scalar.All(0), cv.Scalar.All(valSlider.Value))
@@ -553,8 +557,10 @@ Public Class XR_Random_StaticTVFastSimple : Inherits TaskParent
 
         Dim tmp As New cv.Mat(dst2.Size(), cv.MatType.CV_8U)
         cv.Cv2.Randu(tmp, 0, 255)
-        Dim plusMask = tmp.Threshold(128, 255, cv.ThresholdTypes.Binary)
-        Dim minusMask = tmp.Threshold(128, 255, cv.ThresholdTypes.BinaryInv)
+        Dim plusMask As New cv.Mat
+        cv.Cv2.Threshold(tmp, plusMask, 128, 255, cv.ThresholdTypes.Binary)
+        Dim minusMask As New cv.Mat
+        cv.Cv2.Threshold(tmp, minusMask, 128, 255, cv.ThresholdTypes.BinaryInv)
 
         cv.Cv2.Add(dst2, dst3, dst2, plusMask)
         cv.Cv2.Subtract(dst2, dst3, dst2, minusMask)
@@ -603,8 +609,8 @@ Public Class XR_Random_KalmanPoints : Inherits TaskParent
 
         dst2.SetTo(0)
         For i = 0 To currSet.Count - 1
-            dst2.Circle(currSet(i), task.DotSize + 2, cv.Scalar.Yellow, -1, task.lineType)
-            dst2.Circle(targetSet(i), task.DotSize + 2, cv.Scalar.Red, -1, task.lineType)
+        cv.Cv2.Circle(dst2, currSet(i), task.DotSize + 2, cv.Scalar.Yellow, -1, task.lineType)
+        cv.Cv2.Circle(dst2, targetSet(i), task.DotSize + 2, cv.Scalar.Red, -1, task.lineType)
         Next
 
         Dim noChanges As Boolean = True
@@ -654,7 +660,7 @@ Public Class Random_Clusters : Inherits TaskParent
                 If pt.X >= dst2.Width Then pt.X = dst2.Width - 1
                 If pt.Y < 0 Then pt.Y = 0
                 If pt.Y >= dst2.Height Then pt.Y = dst2.Height - 1
-                dst2.Circle(pt, task.DotSize, task.scalarColors(i Mod 256), -1, task.lineType)
+                cv.Cv2.Circle(dst2, pt, task.DotSize, task.scalarColors(i Mod 256), -1, task.lineType)
 
                 cList.Add(pt)
                 labelList.Add(i)

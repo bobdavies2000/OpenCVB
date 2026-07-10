@@ -1,5 +1,4 @@
 Imports cv = OpenCvSharp
-Imports VBClasses
 Public Class XR_Contrast_Basics : Inherits TaskParent
     Dim options As New Options_BrightnessContrast
     Public Sub New()
@@ -9,7 +8,7 @@ Public Class XR_Contrast_Basics : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
 
-        dst2 = src.ConvertScaleAbs(options.brightness, options.contrast)
+        cv.Cv2.ConvertScaleAbs(src, dst2, options.brightness, options.contrast)
     End Sub
 End Class
 
@@ -29,7 +28,7 @@ Public Class XR_Contrast_POW : Inherits TaskParent
 
         dst2 = task.gray
         dst2.ConvertTo(dst3, cv.MatType.CV_32FC3)
-        dst3 = dst3.Normalize()
-        dst3 = dst3.Pow(options.exponent)
+        cv.Cv2.Normalize(dst3, dst3)
+        cv.Cv2.Pow(dst3, options.exponent, dst3)
     End Sub
 End Class

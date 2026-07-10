@@ -32,13 +32,14 @@ Public Class Coherence_Basics : Inherits TaskParent
         Dim eigen As New cv.Mat
         Dim split() As cv.Mat
         For i = 0 To 3
-            eigen = src.CornerEigenValsAndVecs(options.str_sigma, options.eigenkernelsize)
-            split = eigen.Split()
+            cv.Cv2.CornerEigenValsAndVecs(src, eigen, options.str_sigma, options.eigenkernelsize)
+            split = cv.Cv2.Split(eigen)
             Dim x = split(2), y = split(3)
 
-            Dim gxx = src.Sobel(cv.MatType.CV_32F, 2, 0, options.sigma)
-            Dim gxy = src.Sobel(cv.MatType.CV_32F, 1, 1, options.sigma)
-            Dim gyy = src.Sobel(cv.MatType.CV_32F, 0, 2, options.sigma)
+            Dim gxx As New cv.Mat, gxy As New cv.Mat, gyy As New cv.Mat
+            cv.Cv2.Sobel(src, gxx, cv.MatType.CV_32F, 2, 0, options.sigma)
+            cv.Cv2.Sobel(src, gxy, cv.MatType.CV_32F, 1, 1, options.sigma)
+            cv.Cv2.Sobel(src, gyy, cv.MatType.CV_32F, 0, 2, options.sigma)
 
             Dim tmpX As New cv.Mat, tmpXY As New cv.Mat, tmpY As New cv.Mat
             cv.Cv2.Multiply(x, x, tmpX)
@@ -53,17 +54,21 @@ Public Class Coherence_Basics : Inherits TaskParent
             Dim gvv As New cv.Mat
             gvv = tmpX + tmpXY + tmpY
 
-            Dim mask = gvv.Threshold(0, 255, cv.ThresholdTypes.BinaryInv).ConvertScaleAbs()
+            Dim mask As New cv.Mat
+            cv.Cv2.Threshold(gvv, mask, 0, 255, cv.ThresholdTypes.BinaryInv)
+            cv.Cv2.ConvertScaleAbs(mask, mask)
 
-            Dim erode = src.Erode(New cv.Mat)
-            Dim dilate = src.Dilate(New cv.Mat)
+            Dim erode As New cv.Mat
+            cv.Cv2.Erode(src, erode, New cv.Mat)
+            Dim dilate As New cv.Mat
+            cv.Cv2.Dilate(src, dilate, New cv.Mat)
 
             Dim imgl = erode
             dilate.CopyTo(imgl, mask)
             src = src * (1 - options.blend) + imgl * options.blend
         Next
         dst2(srcRect) = src
-        dst2.Rectangle(srcRect, cv.Scalar.Yellow, 2)
+        cv.Cv2.Rectangle(dst2, srcRect, cv.Scalar.Yellow, 2)
         dst3.SetTo(0)
     End Sub
 End Class

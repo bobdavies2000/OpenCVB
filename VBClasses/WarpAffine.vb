@@ -28,7 +28,7 @@ Public Class WarpAffine_Basics : Inherits TaskParent
         M.Set(Of Double)(0, 2, M.Get(Of Double)(0, 2) + dx)
         M.Set(Of Double)(1, 2, M.Get(Of Double)(1, 2) + dy)
 
-        dst3 = graySrc.WarpAffine(M, graySrc.Size, cv.InterpolationFlags.Linear, cv.BorderTypes.Reflect101)
+        cv.Cv2.WarpAffine(graySrc, dst2, M, graySrc.Size, cv.InterpolationFlags.Linear, cv.BorderTypes.Reflect101)
 
         accum.Run(dst3)
         dst2 = accum.dst2.Clone
@@ -119,7 +119,7 @@ Public Class XR_WarpAffine_Captcha : Inherits TaskParent
             Dim j = rng.Next(0, image.Rows - 1)
             Dim center = New cv.Point(i, j)
             Dim c = New cv.Scalar(rng.Next(0, 255), rng.Next(0, 255), rng.Next(0, 255))
-            image.Circle(center, rng.Next(1, 3), c, -1, task.lineType)
+            cv.Cv2.Circle(image, center, rng.Next(1, 3), c, -1, task.lineType)
         Next
     End Sub
     Private Sub addLines(ByRef image As cv.Mat)
@@ -130,7 +130,7 @@ Public Class XR_WarpAffine_Captcha : Inherits TaskParent
             Dim endY = rng.Next(0, image.Rows - 1)
 
             Dim c = New cv.Scalar(rng.Next(0, 255), rng.Next(0, 255), rng.Next(0, 255))
-            image.Line(New cv.Point(startX, startY), New cv.Point(endX, endY), c, rng.Next(1, 3), task.lineType)
+            cv.Cv2.Line(image, New cv.Point(startX, startY), New cv.Point(endX, endY), c, rng.Next(1, 3), task.lineType)
         Next
     End Sub
 
@@ -138,7 +138,7 @@ Public Class XR_WarpAffine_Captcha : Inherits TaskParent
         Dim height = rng.Next(0, 19) * -1 + charHeight
         Dim width = rng.Next(0, 19) * -1 + charWidth
         Dim s = New cv.Size(width, height)
-        output = input.Resize(s)
+        cv.Cv2.Resize(input, output, s)
     End Sub
     Private Sub rotateImg(input As cv.Mat, ByRef output As cv.Mat)
         Dim sign = CInt(rng.NextDouble())
@@ -182,7 +182,7 @@ Public Class XR_WarpAffine_Captcha : Inherits TaskParent
         addLines(outImage)
         addNoise(outImage)
         Dim roi As New cv.Rect(0, src.Height / 2 - charHeight / 2, dst2.Cols, charHeight)
-        dst2(roi) = outImage.Resize(New cv.Size(dst2.Cols, charHeight))
+        cv.Cv2.Resize(outImage, dst2(roi), New cv.Size(dst2.Cols, charHeight))
     End Sub
 End Class
 
@@ -224,18 +224,18 @@ Public Class WarpAffine_Vec3f : Inherits TaskParent
                     Dim p1 = triangles(j).Get(Of cv.Point2f)(i) + New cv.Point2f(j * src.Width, 0)
                     Dim p2 = triangles(j).Get(Of cv.Point2f)((i + 1) Mod 3) + New cv.Point2f(j * src.Width, 0)
                     Dim color = Choose(i + 1, cv.Scalar.Red, cv.Scalar.White, cv.Scalar.Yellow)
-                    wideMat.Line(p1, p2, color, task.lineWidth + 3, task.lineType)
+                    cv.Cv2.Line(wideMat, p1, p2, color, task.lineWidth + 3, task.lineType)
                     If j = 0 Then
                         Dim p3 = triangles(j + 1).Get(Of cv.Point2f)(i) + New cv.Point2f(src.Width, 0)
-                        wideMat.Line(p1, p3, white, task.lineWidth, task.lineType)
+                        cv.Cv2.Line(wideMat, p1, p3, white, task.lineWidth, task.lineType)
                     End If
                 Next
             Next
 
             Dim corner = triangles(0).Get(Of cv.Point2f)(0)
-            wideMat.Circle(corner, task.DotSize + 5, cv.Scalar.Yellow, -1, task.lineType)
+            cv.Cv2.Circle(wideMat, corner, task.DotSize + 5, cv.Scalar.Yellow, -1, task.lineType)
             corner = New cv.Point2f(M.Get(Of Double)(0, 2) + src.Width, M.Get(Of Double)(1, 2))
-            wideMat.Circle(corner, task.DotSize + 5, cv.Scalar.Yellow, -1, task.lineType)
+            cv.Cv2.Circle(wideMat, corner, task.DotSize + 5, cv.Scalar.Yellow, -1, task.lineType)
 
             dst2 = wideMat(New cv.Rect(0, 0, src.Width, src.Height))
             dst3 = wideMat(New cv.Rect(src.Width, 0, src.Width, src.Height))
@@ -243,9 +243,9 @@ Public Class WarpAffine_Vec3f : Inherits TaskParent
             Dim pt As cv.Point
             For i = 0 To srcPoints1.Count - 1
                 pt = New cv.Point(CInt(srcPoints1(i).X), CInt(srcPoints1(i).Y))
-                dst2.Circle(pt, task.DotSize + 2, cv.Scalar.White, -1, task.lineType)
+                cv.Cv2.Circle(dst2, pt, task.DotSize + 2, cv.Scalar.White, -1, task.lineType)
                 pt = New cv.Point(CInt(srcPoints2(i).X), CInt(srcPoints2(i).Y))
-                dst3.Circle(pt, task.DotSize + 2, cv.Scalar.White, -1, task.lineType)
+                cv.Cv2.Circle(dst3, pt, task.DotSize + 2, cv.Scalar.White, -1, task.lineType)
             Next
         End If
         SetTrueText("M defined as: " + vbCrLf +
@@ -277,7 +277,7 @@ Public Class WarpAffine_Vec4f : Inherits TaskParent
             mRect.inputPoints = options.srcPoints
 
             Dim roi = New cv.Rect(50, src.Height / 2, src.Width / 6, src.Height / 6)
-            Dim smallImage = src.Resize(New cv.Size(roi.Width, roi.Height))
+            cv.Cv2.Resize(src, dst3(New cv.Rect(0, 0, roi.Width, roi.Height)), New cv.Size(roi.Width, roi.Height))
             Dim rectangles(1) As cv.RotatedRect
             mRect.Run(src)
             rectangles(1) = mRect.minRect
@@ -286,7 +286,7 @@ Public Class WarpAffine_Vec4f : Inherits TaskParent
             rectangles(0) = New cv.RotatedRect(New cv.Point2f(src.Width / 2, src.Height / 2), New cv.Size2f(src.Width, src.Height), 0)
             M = cv.Cv2.GetPerspectiveTransform(rectangles(0).Points.ToArray, rectangles(1).Points.ToArray)
             cv.Cv2.WarpPerspective(src, dst2, M, src.Size())
-            dst2(roi) = smallImage
+            dst2(roi) = dst3(roi)
 
             ' comment this line to see the real original dimensions and location.
             ' rectangles(0) = New cv.RotatedRect(New cv.Point2f(roi.X + roi.Width / 2, roi.Y + roi.Height / 2), New cv.Size2f(roi.Width, roi.Height), 0)
@@ -296,10 +296,10 @@ Public Class WarpAffine_Vec4f : Inherits TaskParent
                     Dim p2 = rectangles(j).Points((i + 1) Mod rectangles(j).Points.Length)
                     If j = 0 Then
                         Dim p3 = rectangles(1).Points(i)
-                        dst2.Line(p1, p3, white, task.lineWidth, task.lineType)
+                        cv.Cv2.Line(dst2, p1, p3, white, task.lineWidth, task.lineType)
                     End If
                     Dim color = Choose(i + 1, cv.Scalar.Red, cv.Scalar.White, cv.Scalar.Yellow, cv.Scalar.Green)
-                    dst2.Line(p1, p2, color, task.lineWidth + 3, task.lineType)
+                    cv.Cv2.Line(dst2, p1, p2, color, task.lineWidth + 3, task.lineType)
                 Next
             Next
         End If
@@ -315,9 +315,9 @@ Public Class WarpAffine_Vec4f : Inherits TaskParent
                      Format(M.Get(Of Double)(2, 1), fmt2) + vbTab +
                      Format(M.Get(Of Double)(2, 2), fmt2) + vbCrLf)
         Dim center As New cv.Point2f(M.Get(Of Double)(0, 2), M.Get(Of Double)(1, 2))
-        dst2.Circle(center, task.DotSize + 5, cv.Scalar.Yellow, -1, task.lineType)
+        cv.Cv2.Circle(dst2, center, task.DotSize + 5, cv.Scalar.Yellow, -1, task.lineType)
         center = New cv.Point2f(50, src.Height / 2)
-        dst2.Circle(center, task.DotSize + 5, cv.Scalar.Yellow, -1, task.lineType)
+        cv.Cv2.Circle(dst2, center, task.DotSize + 5, cv.Scalar.Yellow, -1, task.lineType)
     End Sub
 End Class
 

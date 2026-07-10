@@ -27,8 +27,8 @@ Public Class Match_Basics : Inherits TaskParent
         newRect = New cv.Rect(mm.maxLoc.X, mm.maxLoc.Y, w, h)
         If standaloneTest() Then
             dst2 = task.gray.Clone
-            dst2.Rectangle(newRect, white, task.lineWidth)
-            dst2.Line(task.lines.lpList(0).p1, task.lines.lpList(0).p2, white, task.lineWidth, task.lineType)
+            cv.Cv2.Rectangle(dst2, newRect, white, task.lineWidth)
+            cv.Cv2.Line(dst2, task.lines.lpList(0).p1, task.lines.lpList(0).p2, white, task.lineWidth, task.lineType)
         End If
     End Sub
 End Class
@@ -59,8 +59,8 @@ Public Class Match_Basics1 : Inherits TaskParent
         newRect = New cv.Rect(mm.maxLoc.X, mm.maxLoc.Y, template.Width, template.Height)
         If standaloneTest() Then
             dst2 = task.gray.Clone
-            dst2.Rectangle(newRect, white, task.lineWidth)
-            dst2.Line(task.lines.lpList(0).p1, task.lines.lpList(0).p2, white, task.lineWidth, task.lineType)
+            cv.Cv2.Rectangle(dst2, newRect, white, task.lineWidth)
+            cv.Cv2.Line(dst2, task.lines.lpList(0).p1, task.lines.lpList(0).p2, white, task.lineWidth, task.lineType)
         End If
     End Sub
 End Class
@@ -109,9 +109,9 @@ Public Class XR_Match_BasicsTest : Inherits TaskParent
 
         If standaloneTest() Then
             dst2 = src
-            dst2.Circle(match.newCenter, task.DotSize, white, -1, task.lineType)
-            dst2.Rectangle(matchRect, task.highlight, task.lineWidth)
-            dst3 = match.dst0.Normalize(0, 255, cv.NormTypes.MinMax)
+            cv.Cv2.Circle(dst2, match.newCenter, task.DotSize, white, -1, task.lineType)
+            cv.Cv2.Rectangle(dst2, matchRect, task.highlight, task.lineWidth)
+            cv.Cv2.Normalize(match.dst0, dst3, 0, 255, cv.NormTypes.MinMax)
             SetTrueText(Format(match.correlation, fmt3), match.newCenter)
         End If
     End Sub
@@ -220,7 +220,7 @@ Public Class XR_Match_Motion : Inherits TaskParent
         optionsMatch.Run()
 
         dst2 = src.Clone
-        If dst2.Channels() = 3 Then dst2 = dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If dst2.Channels() = 3 Then cv.Cv2.CvtColor(dst2, dst2, cv.ColorConversionCodes.BGR2GRAY)
 
         Static lastFrame As cv.Mat = dst2.Clone()
         Dim saveFrame As cv.Mat = dst2.Clone
@@ -292,7 +292,7 @@ Public Class XR_Match_TraceRedC : Inherits TaskParent
         End If
         dst1 = dst1.Add(dst0)
         dst1.ConvertTo(dst2, cv.MatType.CV_8U)
-        dst2 = dst2.Threshold(0, 255, cv.ThresholdTypes.Binary)
+        cv.Cv2.Threshold(dst2, dst2, 0, 255, cv.ThresholdTypes.Binary)
     End Sub
 End Class
 
@@ -331,7 +331,7 @@ Public Class XR_Match_TraceRedC1 : Inherits TaskParent
         End If
         dst1 = dst1.Add(dst0)
         dst1.ConvertTo(dst2, cv.MatType.CV_8U)
-        dst2 = dst2.Threshold(0, 255, cv.ThresholdTypes.Binary)
+        cv.Cv2.Threshold(dst2, dst2, 0, 255, cv.ThresholdTypes.Binary)
     End Sub
 End Class
 
@@ -365,7 +365,7 @@ Public Class Match_DrawRect : Inherits TaskParent
         match.Run(src)
 
         If standaloneTest() Or showOutput Then
-            dst0 = match.dst0.Normalize(0, 255, cv.NormTypes.MinMax)
+            cv.Cv2.Normalize(match.dst0, dst0, 0, 255, cv.NormTypes.MinMax)
             dst3.SetTo(0)
             dst0.CopyTo(dst3(New cv.Rect(inputRect.Width / 2, inputRect.Height / 2, dst0.Width, dst0.Height)))
             DrawRect(dst3, inputRect, white)
@@ -375,7 +375,7 @@ Public Class Match_DrawRect : Inherits TaskParent
         SetTrueText("maxLoc = " + CStr(match.newCenter.X) + ", " + CStr(match.newCenter.Y), New cv.Point(1, 1), 3)
 
         If standaloneTest() Then
-            dst2.Circle(match.newCenter, task.DotSize, cv.Scalar.Red, -1, task.lineType)
+        cv.Cv2.Circle(dst2, match.newCenter, task.DotSize, cv.Scalar.Red, -1, task.lineType)
             SetTrueText(Format(match.correlation, fmt3), match.newCenter, 2)
         End If
         lastImage = src
@@ -418,7 +418,7 @@ Public Class XR_Match_GoodFeatureKNN : Inherits TaskParent
 
         dst0.SetTo(0)
         For Each lp In knn.matches
-            If lp.p1.DistanceTo(lp.p2) <= maxDistance Then dst0.Line(lp.p1, lp.p2, 255, task.lineWidth + 2, cv.LineTypes.Link4)
+            If lp.p1.DistanceTo(lp.p2) <= maxDistance Then cv.Cv2.Line(dst0, lp.p1, lp.p2, 255, task.lineWidth + 2, cv.LineTypes.Link4)
         Next
         frameList.Add(dst0.Clone)
         If frameList.Count >= task.fOptions.FrameHistoryCount.Value  Then
@@ -426,7 +426,7 @@ Public Class XR_Match_GoodFeatureKNN : Inherits TaskParent
             frameList.RemoveAt(0)
         End If
         dst1 += dst0
-        dst2 = dst1.Threshold(0, 255, cv.ThresholdTypes.Binary)
+        cv.Cv2.Threshold(dst1, dst2, 0, 255, cv.ThresholdTypes.Binary)
 
         dst3 = src
         dst3.SetTo(task.highlight, dst2)
@@ -467,8 +467,8 @@ Public Class Match_Point : Inherits TaskParent
         Dim mmData = GetMinMax(dst0)
         correlation = mmData.maxVal
         pt = New cv.Point2f(mmData.maxLoc.X + searchRect.X + radius, mmData.maxLoc.Y + searchRect.Y + radius)
-        src.Circle(pt, task.DotSize, white, -1, task.lineType)
-        src.Rectangle(searchRect, cv.Scalar.Yellow, 1)
+        cv.Cv2.Circle(src, pt, task.DotSize, white, -1, task.lineType)
+        cv.Cv2.Rectangle(src, searchRect, cv.Scalar.Yellow, 1)
     End Sub
 End Class
 
@@ -589,8 +589,8 @@ Public Class Match_VH : Inherits TaskParent
             SetTrueText(CStr(i) + vbCrLf + tc.strOut + vbCrLf + Format(gRect.arcY, fmt1), gRect.tc1.center, 2)
             SetTrueText(CStr(i) + vbCrLf + tc.strOut + vbCrLf + Format(gRect.arcY, fmt1), gRect.tc1.center, 3)
 
-            dst2.Line(p1, p2, task.highlight, task.lineWidth, task.lineType)
-            dst3.Line(p1, p2, task.highlight, task.lineWidth, task.lineType)
+            cv.Cv2.Line(dst2, p1, p2, task.highlight, task.lineWidth, task.lineType)
+            cv.Cv2.Line(dst3, p1, p2, task.highlight, task.lineWidth, task.lineType)
         Next
     End Sub
 End Class
@@ -644,11 +644,11 @@ Public Class XR_Match_LinePairTest : Inherits TaskParent
             correlation(i) = mmData.maxVal
             If i = 0 Then
                 dst0.CopyTo(dst2(New cv.Rect(0, 0, dst0.Width, dst0.Height)))
-                dst2 = dst2.Threshold(task.fCorrThreshold, 255, cv.ThresholdTypes.Binary)
+                cv.Cv2.Threshold(dst2, dst2, task.fCorrThreshold, 255, cv.ThresholdTypes.Binary)
             End If
             ptx(i) = New cv.Point2f(mmData.maxLoc.X + searchRect.X + radius, mmData.maxLoc.Y + searchRect.Y + radius)
-            dst3.Circle(ptx(i), task.DotSize, task.highlight, -1, task.lineType)
-            dst3.Rectangle(searchRect, cv.Scalar.Yellow, 1)
+            cv.Cv2.Circle(dst3, ptx(i), task.DotSize, task.highlight, -1, task.lineType)
+            cv.Cv2.Rectangle(dst3, searchRect, cv.Scalar.Yellow, 1)
             rect = ValidateRect(New cv.Rect(ptx(i).X - radius, ptx(i).Y - radius, task.gridWH, task.gridWH))
             target(i) = task.color(rect)
         Next
@@ -694,7 +694,7 @@ Public Class Match_LinesKNN : Inherits TaskParent
             Dim index = knn.result(i, 0)
             If index >= 0 And index < lastPt.Count Then
                 Dim lastMP = lastPt(index)
-                dst2.Line(lp.p1, lastMP.p2, cv.Scalar.Red, task.lineWidth, task.lineType)
+                cv.Cv2.Line(dst2, lp.p1, lastMP.p2, cv.Scalar.Red, task.lineWidth, task.lineType)
             End If
         Next
 

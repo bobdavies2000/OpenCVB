@@ -141,7 +141,7 @@ Public Class XR_RedCloud_Basics : Inherits TaskParent
         dst2 = redC.dst2
         labels(2) = redC.labels(2)
 
-        If task.rcD IsNot Nothing Then dst2.Rectangle(task.rcD.rect, task.highlight, task.lineWidth)
+        If task.rcD IsNot Nothing Then cv.Cv2.Rectangle(dst2, task.rcD.rect, task.highlight, task.lineWidth)
         If strOut <> "" Then SetTrueText(redC.strOut, 3) Else SetTrueText("Click on any cell", 3)
 
         Dim causeLabel = Utility_Basics.findCause(redC.rcMap, redC.rcList)
@@ -196,7 +196,7 @@ Public Class XR_RedCloud_CellDepthHistogram : Inherits TaskParent
         Dim incr = dst2.Width / task.MaxZmeters
         For i = 1 To CInt(task.MaxZmeters - 1)
             Dim x = incr * i
-            dst3.Line(New cv.Point(x, 0), New cv.Point(x, dst2.Height), cv.Scalar.White, task.lineWidth, task.lineType)
+            cv.Cv2.Line(dst3, New cv.Point(x, 0), New cv.Point(x, dst2.Height), cv.Scalar.White, task.lineWidth, task.lineType)
         Next
         dst3 = plot.dst2
     End Sub
@@ -220,7 +220,7 @@ Public Class RedCloud_LeftRight : Inherits TaskParent
         Dim count As Integer
         dst1.SetTo(0)
         For Each brick As brickData In bricks.brickList
-            If redC.rcMap(brick.lRect).CountNonZero And brick.rRect.Width > 0 Then
+            If cv.Cv2.CountNonZero(redC.rcMap(brick.lRect)) And brick.rRect.Width > 0 Then
                 dst2(brick.lRect).CopyTo(dst1(brick.rRect))
                 count += 1
             End If
@@ -266,7 +266,7 @@ Public Class RedCloud_KNN : Inherits TaskParent
                 hullList.Add(New cv.Point(rc.rect.X + pt.X, rc.rect.Y + pt.Y))
             Next
             listOfPoints.Add(hullList)
-            dst3.FillPoly(listOfPoints, rc.color)
+            cv.Cv2.FillPoly(dst3, listOfPoints, rc.color)
         Next
     End Sub
 End Class
@@ -318,7 +318,7 @@ Public Class RedCloud_Matches : Inherits TaskParent
             End If
         Next
 
-        If task.rcD IsNot Nothing Then dst2.Rectangle(task.rcD.rect, task.highlight, task.lineWidth)
+        If task.rcD IsNot Nothing Then cv.Cv2.Rectangle(dst2, task.rcD.rect, task.highlight, task.lineWidth)
         SetTrueText(redC.strOut, 3)
         labels(3) = CStr(rcList.Count) + " matched cells below with > " + CStr(redC.options.ageThreshold) + " age"
     End Sub
@@ -352,7 +352,7 @@ Public Class RedCloud_Matched : Inherits TaskParent
             End If
         Next
 
-        If task.rcD IsNot Nothing Then dst2.Rectangle(task.rcD.rect, task.highlight, task.lineWidth)
+        If task.rcD IsNot Nothing Then cv.Cv2.Rectangle(dst2, task.rcD.rect, task.highlight, task.lineWidth)
         SetTrueText(redC.strOut, 1)
         labels(3) = CStr(rcList.Count) + " matched cells below with > " + CStr(redC.options.ageThreshold) + " age"
     End Sub
@@ -429,7 +429,7 @@ Public Class RedCloud_Flood_CPP : Inherits TaskParent
         If src.Channels <> 1 Then
             Static prepData As New RedPrep_Core
             prepData.Run(src)
-            dst1 = prepData.reduced32f.Normalize(255, 0, cv.NormTypes.MinMax)
+            cv.Cv2.Normalize(prepData.reduced32f, dst1, 255, 0, cv.NormTypes.MinMax)
             dst1.ConvertTo(dst1, cv.MatType.CV_8U)
         Else
             dst1 = src
@@ -551,7 +551,7 @@ Public Class RedCloud_MotionFilter : Inherits TaskParent
         Dim ranges() As cv.Rangef = New cv.Rangef() {New cv.Rangef(0, redC.rcList.Count + 1)}
         cv.Cv2.CalcHist({dst1}, {0}, New cv.Mat, histogram, 1, {redC.rcList.Count}, ranges)
 
-        Dim count = histogram.CountNonZero()
+        Dim count = cv.Cv2.CountNonZero(histogram)
         SetTrueText(CStr(count) + " cells had motion.", 3)
         If count = 0 Then Exit Sub
         histogram.Set(Of Single)(0, 0, 0) ' remove the count for cell 0 - no cell information.

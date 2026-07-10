@@ -1,4 +1,4 @@
-﻿Imports cv = OpenCvSharp
+Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 Imports System.Text
 Module Externs
@@ -538,7 +538,7 @@ Module Externs
 
         cv.Cv2.CalcOpticalFlowFarneback(oldGray, gray, flow, pyrScale, levels, winSize, iterations, polyN, polySigma, OpticalFlowFlags)
         Dim flowVec(1) As cv.Mat
-        flowVec = flow.Split()
+        flowVec = cv.Cv2.Split(flow)
 
         Dim hsv As New cv.Mat
         Dim hsv0 As New cv.Mat

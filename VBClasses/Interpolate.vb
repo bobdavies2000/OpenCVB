@@ -28,7 +28,7 @@ Public Class Interpolate_Basics : Inherits TaskParent
 
         dst2 = src.Clone
         Dim newSize = New cv.Size(CInt(dst2.Width * saveSliderValue / 100), CInt(dst2.Height * saveSliderValue / 100))
-        dst2 = src.Resize(newSize, 0, 0, options.warpFlag)
+        cv.Cv2.Resize(src, dst2, newSize, 0, 0, options.warpFlag)
         labels(2) = "Resize % = " + Format(saveSliderValue / 100, "0%")
     End Sub
 End Class
@@ -55,7 +55,7 @@ Public Class Interpolate_Kalman : Inherits TaskParent
 
         inter.Run(src)
 
-        dst2 = inter.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        cv.Cv2.CvtColor(inter.dst2, dst2, cv.ColorConversionCodes.BGR2GRAY)
         If task.optionsChanged Then
             ReDim kalman.kInput(dst2.Width * dst2.Height - 1)
             myFrameCount = 1
@@ -86,7 +86,7 @@ Public Class Interpolate_Kalman : Inherits TaskParent
         Static lastframe As cv.Mat = dst2.Clone
         If lastframe.Size <> dst2.Size Then lastframe = dst2.Clone
         Dim tmp As cv.Mat = dst2 - lastframe
-        Dim diffCount = tmp.CountNonZero
+        Dim diffCount = cv.Cv2.CountNonZero(tmp)
         If diffCount > inter.iOptions.pixelCountThreshold Then
             lastframe = dst2.Clone
             dst3 = src.Clone
@@ -122,14 +122,16 @@ Public Class XR_Interpolate_Lines : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         inter.Run(src)
-        dst1 = inter.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY).Resize(dst3.Size)
-        dst1 = dst1.Threshold(inter.iOptions.interpolationThreshold, 255, cv.ThresholdTypes.Binary)
+        Dim _cvtResize As New cv.Mat
+        cv.Cv2.CvtColor(inter.dst2, _cvtResize, cv.ColorConversionCodes.BGR2GRAY)
+        cv.Cv2.Resize(_cvtResize, dst1, dst3.Size)
+        cv.Cv2.Threshold(dst1, dst1, inter.iOptions.interpolationThreshold, 255, cv.ThresholdTypes.Binary)
 
         dst2 = task.lines.dst2
         dst3 = src
 
         For Each lp In task.lines.lpList
-            dst3.Line(lp.p1, lp.p2, cv.Scalar.Yellow, task.lineWidth, task.lineType)
+            cv.Cv2.Line(dst3, lp.p1, lp.p2, cv.Scalar.Yellow, task.lineWidth, task.lineType)
         Next
         labels(3) = "There were " + CStr(task.lines.lpList.Count) + " lines found"
         labels(2) = inter.labels(2)
@@ -149,7 +151,7 @@ Public Class XR_Interpolate_Difference : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         inter.Run(src)
-        dst2 = inter.dst3.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        cv.Cv2.CvtColor(inter.dst3, dst2, cv.ColorConversionCodes.BGR2GRAY)
         labels(2) = inter.labels(3)
 
         diff.lastFrame = task.gray
@@ -179,7 +181,7 @@ Public Class XR_Interpolate_QuarterBeat : Inherits TaskParent
         If task.quarterBeat Then
             diff.Run(src)
             dst3 = diff.dst2
-            If diff.dst2.CountNonZero > 0 Then
+If cv.Cv2.CountNonZero(diff.dst2) > 0 Then
                 diff.lastFrame = task.gray
                 dst2 = src
                 updatedFrames += 1

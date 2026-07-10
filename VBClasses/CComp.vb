@@ -17,7 +17,7 @@ Public Class CComp_Basics : Inherits TaskParent
         rects.Clear()
         centroids.Clear()
 
-        dst2 = task.gray.Threshold(options.threshold, 255, cv.ThresholdTypes.BinaryInv) '  + cv.ThresholdTypes.Otsu
+        cv.Cv2.Threshold(task.gray, dst2, options.threshold, 255, cv.ThresholdTypes.BinaryInv) '  + cv.ThresholdTypes.Otsu
 
         connectedComponents = cv.Cv2.ConnectedComponentsEx(dst2)
         connectedComponents.RenderBlobs(dst3)
@@ -57,16 +57,19 @@ Public Class XR_CComp_Shapes : Inherits TaskParent
         desc = "Use connected components to isolate objects in image."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        Dim gray = shapes.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        Dim binary = gray.Threshold(0, 255, cv.ThresholdTypes.Otsu + cv.ThresholdTypes.Binary)
+        Dim gray As New cv.Mat
+        cv.Cv2.CvtColor(shapes, gray, cv.ColorConversionCodes.BGR2GRAY)
+        Dim binary As New cv.Mat
+        cv.Cv2.Threshold(gray, binary, 0, 255, cv.ThresholdTypes.Otsu + cv.ThresholdTypes.Binary)
         Dim labelview = shapes.EmptyClone()
-        Dim rectView = binary.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        Dim rectView As New cv.Mat
+        cv.Cv2.CvtColor(binary, rectView, cv.ColorConversionCodes.GRAY2BGR)
         Dim cc = cv.Cv2.ConnectedComponentsEx(binary)
         If cc.LabelCount <= 1 Then Exit Sub
 
         cc.RenderBlobs(labelview)
         For Each blob In cc.Blobs.Skip(1)
-            rectView.Rectangle(blob.Rect, cv.Scalar.Red, 2)
+        cv.Cv2.Rectangle(rectView, blob.Rect, cv.Scalar.Red, 2)
         Next
 
         Dim maxBlob = cc.GetLargestBlob()
@@ -99,7 +102,8 @@ Public Class CComp_Both : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         ccomp.options.Run()
 
-        Dim light = src.Threshold(ccomp.options.light, 255, cv.ThresholdTypes.Binary)
+        Dim light As New cv.Mat
+        cv.Cv2.Threshold(src, light, ccomp.options.light, 255, cv.ThresholdTypes.Binary)
         ccomp.Run(light)
         dst2 = ccomp.dst3
         dst1 = ccomp.dst1
@@ -151,11 +155,11 @@ Public Class CComp_Stats : Inherits TaskParent
         dst2 = task.gray
         options.Run()
 
-        If standaloneTest() Then dst2 = task.gray.Threshold(options.light, 255, cv.ThresholdTypes.BinaryInv)
+        If standaloneTest() Then cv.Cv2.Threshold(task.gray, dst2, options.light, 255, cv.ThresholdTypes.BinaryInv)
 
         Dim stats As New cv.Mat
         Dim centroidRaw As New cv.Mat
-        numberOfLabels = task.gray.ConnectedComponentsWithStats(dst1, stats, centroidRaw)
+        numberOfLabels = cv.Cv2.ConnectedComponentsWithStats(dst1, dst1, stats, centroidRaw)
 
         rects.Clear()
         areas.Clear()
@@ -176,11 +180,12 @@ Public Class CComp_Stats : Inherits TaskParent
             If (r.Width = dst2.Width Or r.Height = dst2.Height) Or (r.Width = 1 Or r.Height = 1) Then Continue For
             areas.Add(area)
             unsortedRects.Add(r)
-            dst2.Rectangle(r, task.highlight, task.lineWidth)
+            cv.Cv2.Rectangle(dst2, r, task.highlight, task.lineWidth)
             index.Add(i)
             colors.Add(task.vecColors(colors.Count))
             maskOrder.Add(area, unsortedMasks.Count)
-            unsortedMasks.Add(dst1.InRange(i, i)(r))
+            cv.Cv2.InRange(dst1, i, i, dst0)
+            unsortedMasks.Add(dst0(r))
             Dim c = New cv.Point(CInt(centroidRaw.Get(Of Double)(i, 0)), CInt(centroidRaw.Get(Of Double)(i, 1)))
             unsortedCentroids.Add(c)
         Next

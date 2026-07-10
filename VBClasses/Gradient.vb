@@ -60,8 +60,8 @@ Public Class Gradient_CartToPolar : Inherits TaskParent
         magnitude = New cv.Mat
         angle = New cv.Mat
         cv.Cv2.CartToPolar(dst2, dst3, magnitude, angle, True)
-        magnitude = magnitude.Normalize()
-        magnitude = magnitude.Pow(options.exponent)
+        cv.Cv2.Normalize(magnitude, magnitude)
+        cv.Cv2.Pow(magnitude, options.exponent, magnitude)
 
         dst2 = magnitude
     End Sub
@@ -94,6 +94,6 @@ Public Class Gradient_Color : Inherits TaskParent
         For i = 0 To gradientWidth - 1
             gradient.Col(i).SetTo(gradientColors.Get(Of cv.Scalar)(0, i))
         Next
-        dst2 = gradient.Resize(dst2.Size)
+        cv.Cv2.Resize(gradient, dst2, dst2.Size)
     End Sub
 End Class

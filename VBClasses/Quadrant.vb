@@ -1,4 +1,4 @@
-﻿Imports cv = OpenCvSharp
+Imports cv = OpenCvSharp
 Public Class Quadrant_Basics : Inherits TaskParent
     Dim p1 As New cv.Point, p2 As New cv.Point(dst2.Width - 1, 0), p3 As New cv.Point(0, dst2.Height - 1)
     Dim p4 As New cv.Point(dst2.Width - 1, dst2.Height - 1), rect As New cv.Rect, mask As New cv.Mat
@@ -9,8 +9,8 @@ Public Class Quadrant_Basics : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst1.SetTo(0)
-        dst1.Line(task.lpGravity.p1, task.lpGravity.p2, 255, 1, cv.LineTypes.Link8)
-        dst1.Line(task.lpHorizon.p1, task.lpHorizon.p2, 255, 1, cv.LineTypes.Link8)
+        cv.Cv2.Line(dst1, task.lpGravity.p1, task.lpGravity.p2, 255, 1, cv.LineTypes.Link8)
+        cv.Cv2.Line(dst1, task.lpHorizon.p1, task.lpHorizon.p2, 255, 1, cv.LineTypes.Link8)
 
         Dim flags = cv.FloodFillFlags.FixedRange Or (255 << 8)
         If dst1.Get(Of Byte)(p1.Y, p1.X) = 0 Then cv.Cv2.FloodFill(dst1, New cv.Mat, p1, 1 * 255 / 4, rect, 0, 0, flags)

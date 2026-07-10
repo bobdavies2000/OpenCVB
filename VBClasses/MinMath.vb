@@ -9,11 +9,11 @@ Public Class XR_MinMath_Edges : Inherits TaskParent
         dst2 = bPoints.dst2
         labels(2) = bPoints.labels(2)
 
-        dst3 = task.edges.dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        cv.Cv2.CvtColor(task.edges.dst2, dst3, cv.ColorConversionCodes.GRAY2BGR)
         labels(3) = task.edges.labels(2)
 
         For Each bp In bPoints.ptList
-            dst3.Circle(bp, task.DotSize, task.highlight, -1, task.lineType)
+        cv.Cv2.Circle(dst3, bp, task.DotSize, task.highlight, -1, task.lineType)
         Next
     End Sub
 End Class
@@ -42,7 +42,7 @@ Public Class XR_MinMath_EdgeLine : Inherits TaskParent
         For Each bp In bPoints.ptList
             Dim val = dst3.Get(Of Byte)(bp.Y, bp.X)
             If val = 0 Then Continue For
-            dst3.Circle(bp, task.DotSize, 255, -1, task.lineType)
+            cv.Cv2.Circle(dst3, bp, task.DotSize, 255, -1, task.lineType)
         Next
     End Sub
 End Class
@@ -74,9 +74,9 @@ Public Class XR_MinMath_KNN : Inherits TaskParent
         For i = 0 To knn.queries.Count - 1
             Dim p1 = knn.queries(i)
             Dim p2 = knn.queries(knn.result(i, 1))
-            dst2.Line(p1, p2, task.highlight, task.lineWidth, task.lineType)
+            cv.Cv2.Line(dst2, p1, p2, task.highlight, task.lineWidth, task.lineType)
             Dim p3 = knn.queries(knn.result(i, 2))
-            dst3.Line(p1, p2, task.highlight, task.lineWidth, task.lineType)
+            cv.Cv2.Line(dst3, p1, p2, task.highlight, task.lineWidth, task.lineType)
         Next
     End Sub
 End Class

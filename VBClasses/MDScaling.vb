@@ -46,7 +46,7 @@ Public Class MDScaling_Cities : Inherits TaskParent
         Dim values = New cv.Mat(size, 1, cv.MatType.CV_64F)
 
         cv.Cv2.Eigen(b, values, vectors)
-        values.Threshold(0, 0, cv.ThresholdTypes.Tozero)
+        cv.Cv2.Threshold(values, values, 0, 0, cv.ThresholdTypes.Tozero)
 
         Dim result = vectors.RowRange(0, 2)
         For r = 0 To result.Rows - 1
@@ -55,7 +55,7 @@ Public Class MDScaling_Cities : Inherits TaskParent
             Next
         Next
 
-        result.Normalize(0, 800, cv.NormTypes.MinMax)
+cv.Cv2.Normalize(result, result, 0, 800, cv.NormTypes.MinMax)
 
         Dim maxX As Double, maxY As Double, minX As Double = Double.MaxValue, minY As Double = Double.MaxValue
         For c = 0 To size - 1
@@ -74,7 +74,7 @@ Public Class MDScaling_Cities : Inherits TaskParent
             Dim y = result.At(Of Double)(1, c)
             x = w * 0.1 + 0.7 * w * (x - minX) / (maxX - minX)
             y = h * 0.1 + 0.7 * h * (y - minY) / (maxY - minY)
-            dst2.Circle(New cv.Point(x, y), task.DotSize + 3, cv.Scalar.Red, -1, task.lineType)
+            cv.Cv2.Circle(dst2, New cv.Point(x, y), task.DotSize + 3, cv.Scalar.Red, -1, task.lineType)
             Dim textPos = New cv.Point(x + 5, y + 10)
             Dim cityName = Choose(c + 1, "Atlanta", "Chicago", "Denver", "Houston", "Los Angeles", "Miami", "New York", "San Francisco",
                                                  "Seattle", "Washington D.C.")

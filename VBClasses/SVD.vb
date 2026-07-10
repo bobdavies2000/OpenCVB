@@ -1,3 +1,4 @@
+Imports OpenCvSharp
 Imports cv = OpenCvSharp
 ' https://answers.opencvb.org/question/200080/parameters-of-cvsvdecomp/
 Public Class XR_SVD_Example : Inherits TaskParent
@@ -61,7 +62,7 @@ Public Class XR_SVD_Example2 : Inherits TaskParent
         If task.heartBeat Then
             Dim m = cv.Cv2.Moments(rc.mask, True)
             Dim center = New cv.Point2f(m.M10 / rc.pixels, m.M01 / rc.pixels)
-            task.color(rc.rect).Circle(center, task.DotSize, task.highlight, -1, task.lineType)
+            cv.Cv2.Circle(task.color(rc.rect), center, task.DotSize, task.highlight, -1, task.lineType)
 
             Dim mArea = cv.Mat.FromPixelData(4, 1, cv.MatType.CV_32F, {m.M20 / rc.pixels, m.Mu11 / rc.pixels, m.Mu11 / rc.pixels, m.Mu02 / rc.pixels})
             Dim U As New cv.Mat
@@ -143,11 +144,12 @@ Public Class XR_SVD_Gaussian : Inherits TaskParent
         Dim angle = -Math.Atan2(U.Get(Of Double)(0, 1), U.Get(Of Double)(0, 0)) * (180 / cv.Cv2.PI)
         strOut += "Angle = " + Format(angle, fmt3) + " radians" + vbCrLf
 
-        W = W.Sqrt() * 3
+        cv.Cv2.Sqrt(W, W)
+        W *= 3
         Dim size = New cv.Size2f(10, 100) ' New cv.Size2f(W.Get(Of Double)(0, 0), W.Get(Of Double)(1, 0))
         Dim pt = New cv.Point2f(covar.mean.Get(Of Double)(0, 0), covar.mean.Get(Of Double)(0, 1))
         Dim rrect = New cv.RotatedRect(pt, size, angle)
-        dst2.Ellipse(rrect, task.highlight, task.lineWidth, task.lineType)
+        cv.Cv2.Ellipse(dst2, rrect, task.highlight, task.lineWidth, task.lineType)
 
         SetTrueText(strOut, 3)
     End Sub

@@ -31,7 +31,7 @@ Public Class GuidedBP_Basics : Inherits TaskParent
         For Each r In sortRects.Values
             Dim pt = New cv.Point(r.X + r.Width \ 2, r.Y + r.Height \ 2)
             Dim index = indices(ptList.IndexOf(pt))
-            map.Rectangle(r, index, -1)
+            cv.Cv2.Rectangle(map, r, cv.Scalar.All(index), -1)
             SetTrueText(CStr(index), pt, dstindex)
         Next
     End Sub
@@ -77,7 +77,7 @@ Public Class XR_GuidedBP_HotPointsKNN : Inherits TaskParent
             Dim dist = p1.DistanceTo(p2)
             Dim r = rectList(i)
             If dist < r.Width / 2 And dist < r.Height / 2 Then
-                dst.Rectangle(r, white, task.lineWidth)
+            cv.Cv2.Rectangle(dst, r, white, task.lineWidth)
                 Dim pt = New cv.Point(r.X + r.Width, r.Y + r.Height)
                 SetTrueText(CStr(index), pt, dstindex)
             End If
@@ -119,9 +119,9 @@ Public Class XR_GuidedBP_PlanesPlot : Inherits TaskParent
         Dim sumList As New List(Of Integer)
         dst3.SetTo(0)
         For i = 0 To dst2.Rows - 1
-            Dim x = dst2.Row(i).CountNonZero
+            Dim x = cv.Cv2.CountNonZero(dst2.Row(i))
             sumList.Add(x)
-            dst3.Line(New cv.Point(0, i), New cv.Point(x, i), white, task.lineWidth, task.lineType)
+            cv.Cv2.Line(dst3, New cv.Point(0, i), New cv.Point(x, i), white, task.lineWidth, task.lineType)
         Next
 
         Dim flatSurfacesInRow As New List(Of Integer)
@@ -213,9 +213,9 @@ Public Class GuidedBP_Depth : Inherits TaskParent
         labels(3) = "Use task.gOptions.PointCloudReduction to select different cloud combinations."
         If standaloneTest() Then dst3 = Palettize(dst2 + 1)
 
-        Dim depthCount = task.depthmask.CountNonZero
+        Dim depthCount = cv.Cv2.CountNonZero(task.depthmask)
         dst3.SetTo(0, task.noDepthMask)
-        Dim count = dst2.CountNonZero
+        Dim count = cv.Cv2.CountNonZero(dst2)
         labels(2) = CStr(classCount) + " regions detected in the backprojection - " + Format(count / depthCount, "0%") + " of depth data"
     End Sub
 End Class
@@ -239,14 +239,15 @@ Public Class GuidedBP_HotPoints : Inherits TaskParent
     End Sub
     Private Function hotPoints(ByRef view As cv.Mat) As List(Of cv.Rect)
         Dim rect As cv.Rect
-        Dim points = view.FindNonZero()
+        Dim points As New cv.Mat
+        cv.Cv2.FindNonZero(view, points)
 
         Dim viewList As New SortedList(Of Integer, cv.Point)(New compareAllowIdenticalIntegerInverted)
         mask.SetTo(0)
         Dim lastCount As Integer = 0
         For i = 0 To points.Rows - 1
             Dim pt = points.Get(Of cv.Point)(i, 0)
-            Dim count = view.FloodFill(mask, pt, 0, rect, 0, 0, 4 Or cv.FloodFillFlags.MaskOnly Or (255 << 8))
+            Dim count = cv.Cv2.FloodFill(view, mask, pt, 0, rect, 0, 0, 4 Or cv.FloodFillFlags.MaskOnly Or (255 << 8))
             If count > 0 Then viewList.Add(count, pt)
         Next
 
@@ -254,7 +255,7 @@ Public Class GuidedBP_HotPoints : Inherits TaskParent
         Dim rectList As New List(Of cv.Rect)
         For i = 0 To Math.Min(viewList.Count, 10) - 1
             Dim pt = viewList.ElementAt(i).Value
-            view.FloodFill(mask, pt, 0, rect, 0, 0, 4 Or cv.FloodFillFlags.FixedRange Or (i + 1 << 8))
+            cv.Cv2.FloodFill(view, mask, pt, 0, rect, 0, 0, 4 Or cv.FloodFillFlags.FixedRange Or (i + 1 << 8))
             rectList.Add(New cv.Rect(rect.X - 1, rect.Y - 1, rect.Width, rect.Height))
         Next
 
@@ -300,7 +301,7 @@ Public Class GuidedBP_MultiSlice : Inherits TaskParent
         For x = 0 To histTop.dst3.Height - stepSize Step stepSize
             Dim r = New cv.Rect(x, 0, stepSize, dst2.Height)
             Dim slice = histTop.dst3(r)
-            If slice.CountNonZero Then
+If cv.Cv2.CountNonZero(slice) Then
                 histTop.histogram(r).SetTo(classCount, slice)
                 classCount += 1
             End If
@@ -316,7 +317,7 @@ Public Class GuidedBP_MultiSlice : Inherits TaskParent
         For y = 0 To histSide.dst3.Height - stepSize Step stepSize
             Dim r = New cv.Rect(0, y, dst2.Width, stepSize)
             Dim slice = histSide.dst3(r)
-            If slice.CountNonZero Then
+If cv.Cv2.CountNonZero(slice) Then
                 histSide.histogram(r).SetTo(classCount, slice)
                 classCount += 1
             End If
