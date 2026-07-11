@@ -239,7 +239,7 @@ End Class
 
 
 Public Class Flood_BasicsMask : Inherits TaskParent
-    Public inputRemoved As cv.Mat
+    Public inputRemoved As New cv.Mat
     Public showSelected As Boolean = True
     Public redC As New RedColor_Basics
     Dim color8U As New Color8U_Basics

@@ -13,10 +13,9 @@ Public Class Palette_Basics : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         labels(2) = "ColorMap = " + task.gOptions.Palettes.Text
 
-        If src.Type = cv.MatType.CV_32F Then
-            src = Mat_Convert.Mat_32f_To_8UC3(src)
-            src.ConvertTo(src, cv.MatType.CV_8U)
-        End If
+        If src.Channels <> 1 Then src = task.gray.Clone
+
+        If src.Type = cv.MatType.CV_32F Then src.ConvertTo(src, cv.MatType.CV_8U)
 
         Dim mapIndex = Choose(task.paletteIndex + 1, cv.ColormapTypes.Autumn, cv.ColormapTypes.Bone,
                                       cv.ColormapTypes.Cividis, cv.ColormapTypes.Cool, cv.ColormapTypes.Hot,
@@ -25,7 +24,7 @@ Public Class Palette_Basics : Inherits TaskParent
                                       cv.ColormapTypes.Pink, cv.ColormapTypes.Plasma, cv.ColormapTypes.Rainbow,
                                       cv.ColormapTypes.Spring, cv.ColormapTypes.Summer, cv.ColormapTypes.Twilight,
                                       cv.ColormapTypes.TwilightShifted, cv.ColormapTypes.Viridis, cv.ColormapTypes.Winter)
-        cv.Cv2.ApplyColorMap(src, dst2, mapIndex)
+        cv.Cv2.ApplyColorMap(src, dst2, cv.ColormapTypes.Jet)
     End Sub
 End Class
 

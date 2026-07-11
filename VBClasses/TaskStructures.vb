@@ -307,7 +307,7 @@ Public Module Structures
         Public depth As Single
         Public hull As List(Of cv.Point)
         Public ID As Integer
-        Public mask As cv.Mat
+        Public mask As New cv.Mat
         Public maxDist As cv.Point
         Public mm As mmData
         Public pixels As Integer
@@ -328,7 +328,7 @@ Public Module Structures
 
 
     Public Class keyData
-        Public mask As cv.Mat
+        Public mask As New cv.Mat
         Public maxDist As cv.Point
         Public rect As New cv.Rect(0, 0, 1, 1)
         Public index As Integer
@@ -583,7 +583,7 @@ Public Module Structures
         Public mapID As Integer
         Public index As Integer
         Public indexLast As Integer ' only here for compatibility
-        Public mask As cv.Mat
+        Public mask As New cv.Mat
         Public maxDist As cv.Point
         Public multiMask As Boolean ' indicates if RedWGrid found duplicate wGrid points in the rclist.
         Public nabs As New List(Of Integer) ' here for compatibility.

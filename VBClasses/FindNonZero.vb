@@ -1,6 +1,6 @@
 Imports cv = OpenCvSharp
 Public Class FindNonZero_Basics : Inherits TaskParent
-    Public ptMat As cv.Mat
+    Public ptMat As New cv.Mat
     Public Sub New()
         labels(2) = "Coordinates of non-zero points"
         labels(3) = "Non-zero original points"

@@ -688,7 +688,6 @@ End Class
 
 
 Public Class BackProject_FeatureLess : Inherits TaskParent
-    Implements IDisposable
     Dim bProject As New BackProject_Basics
     Dim contours As New Contour_Basics
     Public Sub New()
@@ -702,10 +701,6 @@ Public Class BackProject_FeatureLess : Inherits TaskParent
         dst2 = bProject.dst2
         dst3 = bProject.dst3
         labels(2) = "Bins = " + CStr(task.histogramBins)
-    End Sub
-    Protected Overrides Sub Finalize()
-        bProject.Dispose()
-        contours.Dispose()
     End Sub
 End Class
 

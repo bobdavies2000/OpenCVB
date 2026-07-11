@@ -41,9 +41,8 @@ End Class
 
 Public Class Puzzle_Solver : Inherits TaskParent
     Public puzzle As New Puzzle_Basics
-    Dim solution As New List(Of cv.Rect)
     Dim match As New Match_Basics
-    Public grayMat As cv.Mat
+    Public grayMat As New cv.Mat
     Dim puzzleIndex As Integer
     Dim options As New Options_Puzzle
     Public Sub New()

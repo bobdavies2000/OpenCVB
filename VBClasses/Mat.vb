@@ -13,9 +13,14 @@ Public Class Mat_Basics : Inherits TaskParent
     End Function
     Public Overrides Sub RunAlg(src As cv.Mat)
         cv.Cv2.Resize(src, dst2, New cv.Size(src.Cols / 10, src.Rows / 10))
-        cv.Cv2.Repeat(dst2, 10, 10, dst2)
+
+        Dim tmp As New cv.Mat
+        cv.Cv2.Repeat(dst2, 10, 10, tmp)
+        dst2 = tmp.Clone
+
         cv.Cv2.Resize(task.depthRGB, dst3, New cv.Size(src.Cols / 10, src.Rows / 10))
-        cv.Cv2.Repeat(dst3, 10, 10, dst3)
+        cv.Cv2.Repeat(dst3, 10, 10, tmp)
+        dst3 = tmp.Clone
     End Sub
 End Class
 
@@ -346,7 +351,8 @@ Public Class Mat_2to1 : Inherits TaskParent
             If dst2.Type <> mat(0).Type Then dst2 = New cv.Mat(dst2.Size(), mat(0).Type)
             For i = 0 To 1
                 Dim roi = Choose(i + 1, roiTop, roibot)
-                cv.Cv2.Resize(mat(i), dst2(roi), nSize)
+                Dim resizedMat As cv.Mat = dst2(roi)
+                cv.Cv2.Resize(mat(i), resizedMat, nSize)
             Next
             If lineSeparators Then
                 cv.Cv2.Line(dst2, New cv.Point(0, dst2.Height / 2), New cv.Point(dst2.Width, dst2.Height / 2), white, task.lineWidth + 1)
@@ -437,7 +443,8 @@ Public Class Mat_4to1 : Inherits TaskParent
             Dim tmp = mat(i).Clone
             If tmp.Channels() = 1 Then cv.Cv2.CvtColor(mat(i), tmp, cv.ColorConversionCodes.GRAY2BGR)
             Dim roi = Choose(i + 1, roiTopLeft, roiTopRight, roibotLeft, roibotRight)
-            cv.Cv2.Resize(tmp, dst2(roi), nSize)
+            Dim resizeInput As cv.Mat = dst2(roi)
+            cv.Cv2.Resize(tmp, resizeInput, nSize)
         Next
         If lineSeparators Then
             cv.Cv2.Line(dst2, New cv.Point(0, dst2.Height / 2), New cv.Point(dst2.Width, dst2.Height / 2), white, task.lineWidth + 1)
@@ -509,6 +516,7 @@ Public Class Mat_Convert : Inherits TaskParent
             dst = src.Clone
         End If
         If src.Channels() = 1 And src.Type = cv.MatType.CV_8UC1 Then cv.Cv2.CvtColor(src, dst, cv.ColorConversionCodes.GRAY2BGR)
+        If src.Size <> task.workRes Then cv.Cv2.Resize(dst, dst, task.workRes)
         Return dst
     End Function
     Public Overrides Sub RunAlg(src As cv.Mat)

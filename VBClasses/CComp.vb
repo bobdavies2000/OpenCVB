@@ -159,7 +159,7 @@ Public Class CComp_Stats : Inherits TaskParent
 
         Dim stats As New cv.Mat
         Dim centroidRaw As New cv.Mat
-        numberOfLabels = cv.Cv2.ConnectedComponentsWithStats(dst1, dst1, stats, centroidRaw)
+        numberOfLabels = cv.Cv2.ConnectedComponentsWithStats(task.gray, dst1, stats, centroidRaw)
 
         rects.Clear()
         areas.Clear()

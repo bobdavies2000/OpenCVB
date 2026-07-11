@@ -123,6 +123,7 @@ Namespace MainApp
                                            End If
                                            cv.Cv2.Resize(tmp, tmp, New cv.Size(settings.displayRes.Width, settings.displayRes.Height))
                                            If pics(i).Image IsNot Nothing Then pics(i).Image.Dispose()
+                                           If tmp.Type <> cv.MatType.CV_8U Then tmp.ConvertTo(tmp, cv.MatType.CV_8U)
                                            pics(i).Image = cvext.BitmapConverter.ToBitmap(tmp)
                                        Next
                                        For i = 0 To pics.Count - 1

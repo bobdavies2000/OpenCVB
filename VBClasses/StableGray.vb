@@ -75,7 +75,7 @@ Public Class StableGray_BasicsMax : Inherits TaskParent
 
         lastGray = dst2.Clone
 
-        labels(2) = cv.Cv2.CountNonZero(dst3) + " pixels were updated with new maximums."
+        labels(2) = CStr(cv.Cv2.CountNonZero(dst3)) + " pixels were updated with new maximums."
     End Sub
 End Class
 

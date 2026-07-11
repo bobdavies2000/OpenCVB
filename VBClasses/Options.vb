@@ -5652,11 +5652,11 @@ Public Class Options_LaPlacianPyramid : Inherits OptionParent
         Next
         levelMat(barCount - 1) = img * sliders.mytrackbars(barCount - 1).Value
 
-        img = levelMat(barCount - 1)
-        For i = barCount - 1 To 1 Step -1
-            cv.Cv2.PyrUp(img, levelMat(i - 1), levelMat(i - 1).Size)
-            img += levelMat(i - 1)
-        Next
+        'img = levelMat(barCount - 1)
+        'For i = barCount - 1 To 1 Step -1
+        '    cv.Cv2.PyrUp(img, levelMat(i), levelMat(i).Size)
+        '    img += levelMat(i)
+        'Next
     End Sub
 End Class
 

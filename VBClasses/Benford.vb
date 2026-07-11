@@ -19,7 +19,7 @@ Public Class Benford_Basics : Inherits TaskParent
     Dim use99 As Boolean
     Public Sub New()
         For i = 1 To expectedDistribution.Count - 1
-            expectedDistribution(i) = Math.Log10(1 + 1 / i) ' get the precise expected values.
+            expectedDistribution(i) = Math.Log10(1 + 1 / i) ' get the expected values.
         Next
 
         labels(3) = "Actual distribution of input"
@@ -73,7 +73,7 @@ Public Class Benford_Basics : Inherits TaskParent
         plotHist.Run(hist)
         dst3 = plotHist.dst2.Clone
         For i = 0 To counts.Count - 1
-            counts(i) = gray32f.Rows * expectedDistribution(i)
+            counts(i) = gray32f.Cols * expectedDistribution(i)
         Next
 
         hist = cv.Mat.FromPixelData(counts.Length, 1, cv.MatType.CV_32F, counts)

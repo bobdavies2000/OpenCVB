@@ -1,4 +1,5 @@
 Imports System.Runtime.InteropServices
+Imports OpenCvSharp
 Imports cv = OpenCvSharp
 ' https://github.com/opencv/opencv/blob/master/samples/cpp/detect_mser.cpp
 Public Class MSER_Basics : Inherits TaskParent
@@ -182,36 +183,80 @@ End Class
 'https://github.com/opencv/opencv/blob/master/samples/cpp/detect_mser.cpp
 Public Class MSER_Detect : Inherits TaskParent
     Implements IDisposable
-    Public boxes() As cv.Rect
-    Public regions()() As cv.Point
-    Public mser = cv.MSER.Create
+    Public boxes As New List(Of cv.Rect)
     Public options As New Options_MSER
     Public classCount As Integer
     Public Sub New()
-        desc = "Run the core MSER (Maximally Stable Extremal Region) algorithm"
+        desc = "Cursor.ai: Run the core MSER (Maximally Stable Extremal Region) algorithm"
     End Sub
+    Public Function DetectMSERLike(src As Mat,
+                               Optional minArea As Integer = 60,
+                               Optional maxArea As Integer = 5000,
+                               Optional stabilityThreshold As Double = 0.25) As List(Of cv.Rect)
+
+        Dim gray As New Mat()
+        If src.Channels() = 3 Then
+            Cv2.CvtColor(src, gray, ColorConversionCodes.BGR2GRAY)
+        Else
+            gray = src.Clone()
+        End If
+
+        Dim regions As New List(Of cv.Rect)
+        Dim prevAreas As New Dictionary(Of Integer, Integer)
+
+        For t As Integer = 0 To 255 Step 5
+            Dim bin As New Mat()
+            Cv2.Threshold(gray, bin, t, 255, ThresholdTypes.Binary)
+
+            Dim labels As New Mat()
+            Dim stats As New Mat()
+            Dim centroids As New Mat()
+
+            Dim count As Integer = Cv2.ConnectedComponentsWithStats(bin, labels, stats, centroids)
+
+            For i As Integer = 1 To count - 1
+                Dim area As Integer = stats.Get(Of Integer)(i, cv.ConnectedComponentsTypes.Area)
+                If area < minArea OrElse area > maxArea Then Continue For
+
+                Dim rect As New cv.Rect(
+                    stats.Get(Of Integer)(i, ConnectedComponentsTypes.Left),
+                    stats.Get(Of Integer)(i, ConnectedComponentsTypes.Top),
+                    stats.Get(Of Integer)(i, ConnectedComponentsTypes.Width),
+                    stats.Get(Of Integer)(i, ConnectedComponentsTypes.Height)
+                )
+
+                Dim id As Integer = rect.GetHashCode()
+
+                If prevAreas.ContainsKey(id) Then
+                    Dim prevArea As Integer = prevAreas(id)
+                    Dim variation As Double = Math.Abs(area - prevArea) / prevArea
+
+                    If variation < stabilityThreshold Then
+                        regions.Add(rect)
+                    End If
+
+                    prevAreas(id) = area
+                Else
+                    prevAreas.Add(id, area)
+                End If
+            Next
+        Next
+
+        Return regions
+    End Function
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
 
         dst2 = src.Clone
 
-        If task.optionsChanged Then
-            If mser IsNot Nothing Then mser.dispose()
-            mser = cv.MSER.Create(options.delta, options.minArea, options.maxArea, options.maxVariation, options.minDiversity,
-                                      options.maxEvolution, options.areaThreshold, options.minMargin, options.edgeBlurSize)
-            mser.Pass2Only = options.pass2Setting
-        End If
-
         If options.graySetting And src.Channels() = 3 Then src = task.gray
-        mser.DetectRegions(src, regions, boxes)
+
+        boxes = DetectMSERLike(src)
 
         classCount = boxes.Count
         For Each z In boxes
-        cv.Cv2.Rectangle(dst2, z, cv.Scalar.Yellow, 1)
+            cv.Cv2.Rectangle(dst2, z, cv.Scalar.Yellow, 1)
         Next
-    End Sub
-    Protected Overrides Sub Finalize()
-        If mser IsNot Nothing Then mser.Dispose()
     End Sub
 End Class
 

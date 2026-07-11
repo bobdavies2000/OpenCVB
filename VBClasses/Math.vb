@@ -380,8 +380,8 @@ End Class
 
 ' https://stackoverflow.com/questions/7572640/how-do-i-know-if-two-vectors-are-near-parallel
 Public Class Math_CrossProduct2D : Inherits TaskParent
-    Public lp1 As lpData
-    Public lp2 As lpData
+    Public lp1 As New lpData
+    Public lp2 As New lpData
     Public parallelResult As Boolean
     Public showWork As Boolean = True
     Public Sub New()

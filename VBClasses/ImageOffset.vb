@@ -45,6 +45,7 @@ Public Class ImageOffset_Basics : Inherits TaskParent
 
         dst = {dst1, dst2, dst3}
         For i = 0 To dst.Count - 1
+            If masks(i) Is Nothing Then masks(i) = New cv.Mat
             cv.Cv2.Threshold(dst(i), masks(i), options1.pixelDiffThreshold, 255, cv.ThresholdTypes.BinaryInv)
             cv.Cv2.ConvertScaleAbs(masks(i), masks(i))
             pcFiltered(i) = New cv.Mat(src.Size, cv.MatType.CV_32FC1, New cv.Scalar(0))

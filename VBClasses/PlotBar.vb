@@ -9,7 +9,7 @@ Public Class PlotBar_Basics : Inherits TaskParent
     Public plotCenter As Single
     Public barWidth As Single
     Public addLabels As Boolean = True
-    Public removeZeroEntry As Boolean = True
+    Public removeZeroEntry As Boolean
     Public createHistogram As Boolean = False
     Public shadeValues As Boolean = True
     Public histMask As New cv.Mat
@@ -43,19 +43,28 @@ Public Class PlotBar_Basics : Inherits TaskParent
         End If
 
         If removeZeroEntry Then histogram.Set(Of Single)(0, 0, 0) ' let's not plot the values at zero...i.e. Depth at 0, for instance, needs to be removed.
-        ReDim histArray(histogram.Rows - 1)
+        Dim incr = 255 / histogram.Cols
+        Dim maxIndex As Integer = histogram.Cols
+        If histogram.Cols = 1 Then
+            ReDim histArray(histogram.Rows - 1)
+            barWidth = dst2.Width / histogram.Rows
+            plotCenter = barWidth * histogram.Rows / 2 + barWidth / 2
+            incr = 255 / histogram.Rows
+            maxIndex = histogram.Rows
+        Else
+            ReDim histArray(histogram.Cols - 1)
+            barWidth = dst2.Width / histogram.Cols
+            plotCenter = barWidth * histogram.Cols / 2 + barWidth / 2
+        End If
         histogram.GetArray(Of Single)(histArray)
 
         dst2.SetTo(backgroundColor)
-        barWidth = dst2.Width / histogram.Rows
-        plotCenter = barWidth * histogram.Rows / 2 + barWidth / 2
 
         mm = GetMinMax(histogram)
 
-        ' somewacky values for the stereolabs devices.
+        ' some wacky values for the stereolabs devices.
         If mm.minVal > -100000000 And mm.maxVal < 100000000 Then
-            If Math.Abs(mm.maxVal - mm.minVal) > 0 And histogram.Rows > 0 Then
-                Dim incr = 255 / histogram.Rows
+            If Math.Abs(mm.maxVal - mm.minVal) > 0 And histogram.Cols > 0 Then
                 Dim color As cv.Scalar
                 For i = 0 To histArray.Count - 1
                     If Single.IsNaN(histArray(i)) Then histArray(i) = 0
@@ -64,7 +73,7 @@ Public Class PlotBar_Basics : Inherits TaskParent
                         If shadeValues Then
                             Dim sIncr = (i Mod 256) * incr
                             color = New cv.Scalar(sIncr, sIncr, sIncr)
-                            If histogram.Rows > 255 Then color = cv.Scalar.Black
+                            If maxIndex > 255 Then color = cv.Scalar.Black
                         Else
                             color = cv.Scalar.Black
                         End If
@@ -140,7 +149,7 @@ End Class
 
 
 Public Class PlotBar_Histogram2D : Inherits TaskParent
-    Public ranges = task.rangesBGR
+    Public ranges() As cv.Rangef = task.rangesBGR
     Public histogram As New cv.Mat
     Public Sub New()
         labels = {"", "", "2D Histogram", ""}
@@ -155,11 +164,16 @@ Public Class PlotBar_Histogram2D : Inherits TaskParent
         Dim bins = task.histogramBins
         cv.Cv2.CalcHist({src}, {0, 1}, New cv.Mat(), histogram, 2, {bins, bins}, ranges)
 
-        cv.Cv2.Resize(histogram, dst2, dst2.Size(), 0, 0, cv.InterpolationFlags.Nearest)
+        cv.Cv2.Resize(histogram, dst2, task.workRes, 0, 0, cv.InterpolationFlags.Nearest)
 
-        If standaloneTest() Then cv.Cv2.Threshold(dst2, dst3, 0, 255, cv.ThresholdTypes.Binary)
+        If standaloneTest() Then
+            Dim thresh As New cv.Mat()
+            cv.Cv2.Threshold(dst2, thresh, 0, 255, cv.ThresholdTypes.Binary)
+            dst3 = thresh
+        End If
     End Sub
 End Class
+
 
 
 

@@ -157,7 +157,7 @@ End Class
 Public Class Sort_3Channel : Inherits TaskParent
     Dim sort As New Sort_Basics
     Dim dups As New ML_RemoveDups_CPP
-    Dim bgra As cv.Mat
+    Dim bgra As New cv.Mat
     Public Sub New()
         If standalone Then task.gOptions.displayDst1.Checked = True
         OptionParent.findRadio("Sort all pixels descending").Checked = True

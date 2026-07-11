@@ -6,7 +6,7 @@ Public Class Brightness_Basics : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         Options.Run()
-        cv.Cv2.ConvertScaleAbs(dst2, dst2, Options.brightness, Options.contrast)
+        cv.Cv2.ConvertScaleAbs(src, dst2, Options.brightness, Options.contrast)
         labels(3) = "Brightness level = " + CStr(Options.contrast)
     End Sub
 End Class
