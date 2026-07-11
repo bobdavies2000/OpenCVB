@@ -18,7 +18,7 @@ Public Class GuidedBP_Basics : Inherits TaskParent
         Dim ptList As New List(Of cv.Point)
         Dim indices As New List(Of Integer)
         For Each r In sortRects.Values
-            Dim pt = New cv.Point(r.X + r.Width \ 2, r.Y + r.Height \ 2)
+            Dim pt = lpData.validatePoint(New cv.Point(r.X + r.Width \ 2, r.Y + r.Height \ 2))
             Dim index = map.Get(Of Byte)(pt.Y, pt.X)
             If index = 0 Or indices.Contains(index) Then
                 If index = ptList.Count Then index = ptList.Count + 1 Else index = ptList.Count
@@ -29,7 +29,7 @@ Public Class GuidedBP_Basics : Inherits TaskParent
 
         map.SetTo(0)
         For Each r In sortRects.Values
-            Dim pt = New cv.Point(r.X + r.Width \ 2, r.Y + r.Height \ 2)
+            Dim pt = lpData.validatePoint(New cv.Point(r.X + r.Width \ 2, r.Y + r.Height \ 2))
             Dim index = indices(ptList.IndexOf(pt))
             cv.Cv2.Rectangle(map, r, cv.Scalar.All(index), -1)
             SetTrueText(CStr(index), pt, dstindex)
