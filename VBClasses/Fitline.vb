@@ -1,5 +1,5 @@
 Imports cv = OpenCvSharp
-Public Class FitLine_BasicsOld_TA : Inherits TaskParent
+Public Class FitLine_BasicsOld : Inherits TaskParent
     Public ptList As New List(Of cv.Point2f)
     Public lp As New lpData
     Public Sub New()
@@ -219,7 +219,7 @@ End Class
 
 Public Class XR_FitLine_Grid : Inherits TaskParent
     Dim nZero As New FindNonZero_Basics
-    Dim fitline As New FitLine_BasicsOld_TA
+    Dim fitline As New FitLine_BasicsOld
     Public Sub New()
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
         desc = "Find lines within each r."
@@ -230,11 +230,11 @@ Public Class XR_FitLine_Grid : Inherits TaskParent
 
         dst3.SetTo(0)
         For Each rect In task.gridRects
-If cv.Cv2.CountNonZero(dst2(rect)) >= 5 Then
+            If cv.Cv2.CountNonZero(dst2(rect)) >= 5 Then
                 nZero.Run(dst2(rect))
 
                 fitline.ptList.Clear()
-                For i = 0 To nZero.ptMat.Rows - 1
+                For i = 0 To nZero.ptMat.Cols - 1
                     fitline.ptList.Add(nZero.ptMat.Get(Of cv.Point)(i, 0))
                 Next
 

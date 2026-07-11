@@ -113,9 +113,11 @@ Public Class XR_Edge_DepthAndColor : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         shadow.Run(src)
 
-        Dim _cvtInline As New cv.Mat
-        cv.Cv2.CvtColor(shadow.dst3, _cvtInline, cv.ColorConversionCodes.BGR2GRAY)
-        dst3 = If(shadow.dst3.Channels() <> 1,_cvtInline, shadow.dst3)
+        If shadow.dst3.Channels <> 1 Then
+            cv.Cv2.CvtColor(shadow.dst3, dst3, cv.ColorConversionCodes.BGR2GRAY)
+        Else
+            dst3 = shadow.dst3.Clone
+        End If
         dst3 += cv.Cv2.Threshold(task.edges.dst2, task.edges.dst2, 1, 255, cv.ThresholdTypes.Binary)
 
         dilate.Run(dst3)

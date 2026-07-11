@@ -124,42 +124,42 @@ Imports OpenCvSharp.DnnSuperres
 ' https://github.com/Saafke/FSRCNN_Tensorflow
 ' https://github.com/fannymonori/TF-LapSRN
 ' https//github.com/Saafke/FSRCNN_Tensorflow/tree/master/models
-Public Class XR_DNN_SuperRes : Inherits TaskParent
-    Public options As New Options_DNN
-    Public dnn = New DnnSuperResImpl("fsrcnn", 4)
-    Dim saveModelFile = ""
-    Dim multiplier As Integer
-    Public Sub New()
-        task.drawRect = New cv.Rect(10, 10, 20, 20)
-        labels(2) = "Output of a resize using OpenCV"
-        desc = "Get better super-resolution through a DNN"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        options.Run()
-        If saveModelFile <> options.superResModelFileName Then
-            saveModelFile = options.superResModelFileName
-            multiplier = options.superResMultiplier
-            dnn = New DnnSuperResImpl(options.shortModelName, multiplier)
-            dnn.ReadModel(saveModelFile)
-        End If
-        Dim r = task.drawRect
-        If task.drawRect.Width = 0 Or task.drawRect.Height = 0 Then Exit Sub
-        Dim outRect = New cv.Rect(0, 0, r.Width * multiplier, r.Height * multiplier)
-        If outRect.Width > dst3.Width Then
-            r.Width = dst3.Width / multiplier
-            outRect.Width = dst3.Width
-        End If
-        If outRect.Height > dst3.Height Then
-            r.Height = dst3.Height / multiplier
-            outRect.Height = dst3.Height
-        End If
-        dst2.SetTo(0)
-        dst3.SetTo(0)
-        cv.Cv2.Resize(src(r), dst2(outRect), New cv.Size(r.Width * multiplier, r.Height * multiplier))
-        dnn.Upsample(src(r), dst3(outRect))
-        labels(3) = CStr(multiplier) + "X resize of selected area using DNN super resolution"
-    End Sub
-End Class
+'Public Class XR_DNN_SuperRes : Inherits TaskParent
+'    Public options As New Options_DNN
+'    Public dnn = New DnnSuperResImpl("fsrcnn", 4)
+'    Dim saveModelFile = ""
+'    Dim multiplier As Integer
+'    Public Sub New()
+'        task.drawRect = New cv.Rect(10, 10, 20, 20)
+'        labels(2) = "Output of a resize using OpenCV"
+'        desc = "Get better super-resolution through a DNN"
+'    End Sub
+'    Public Overrides Sub RunAlg(src As cv.Mat)
+'        options.Run()
+'        If saveModelFile <> options.superResModelFileName Then
+'            saveModelFile = options.superResModelFileName
+'            multiplier = options.superResMultiplier
+'            dnn = New DnnSuperResImpl(options.shortModelName, multiplier)
+'            dnn.ReadModel(saveModelFile)
+'        End If
+'        Dim r = task.drawRect
+'        If task.drawRect.Width = 0 Or task.drawRect.Height = 0 Then Exit Sub
+'        Dim outRect = New cv.Rect(0, 0, r.Width * multiplier, r.Height * multiplier)
+'        If outRect.Width > dst3.Width Then
+'            r.Width = dst3.Width / multiplier
+'            outRect.Width = dst3.Width
+'        End If
+'        If outRect.Height > dst3.Height Then
+'            r.Height = dst3.Height / multiplier
+'            outRect.Height = dst3.Height
+'        End If
+'        dst2.SetTo(0)
+'        dst3.SetTo(0)
+'        cv.Cv2.Resize(src(r), dst2(outRect), New cv.Size(r.Width * multiplier, r.Height * multiplier))
+'        dnn.Upsample(src(r), dst3(outRect))
+'        labels(3) = CStr(multiplier) + "X resize of selected area using DNN super resolution"
+'    End Sub
+'End Class
 
 
 
@@ -167,22 +167,22 @@ End Class
 
 
 
-Public Class XR_DNN_SuperResize : Inherits TaskParent
-    Dim super = New XR_DNN_SuperRes
-    Public Sub New()
-        labels(2) = "Super Res resized back to original size"
-        labels(3) = "dst3 = dst2 - src or no difference - honors original"
-        desc = "Compare superRes reduced to original size"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        super.Run(src)
-        Dim r = New cv.Rect(0, 0, dst2.Width, dst2.Height)
-        Dim tmp As New cv.Mat
-        super.dnn.upsample(src, tmp)
-        cv.Cv2.Resize(tmp, dst2, dst2.Size)
-        dst3 = dst2 - src
-    End Sub
-End Class
+'Public Class XR_DNN_SuperResize : Inherits TaskParent
+'    Dim super = New XR_DNN_SuperRes
+'    Public Sub New()
+'        labels(2) = "Super Res resized back to original size"
+'        labels(3) = "dst3 = dst2 - src or no difference - honors original"
+'        desc = "Compare superRes reduced to original size"
+'    End Sub
+'    Public Overrides Sub RunAlg(src As cv.Mat)
+'        super.Run(src)
+'        Dim r = New cv.Rect(0, 0, dst2.Width, dst2.Height)
+'        Dim tmp As New cv.Mat
+'        super.dnn.upsample(src, tmp)
+'        cv.Cv2.Resize(tmp, dst2, dst2.Size)
+'        dst3 = dst2 - src
+'    End Sub
+'End Class
 
 
 

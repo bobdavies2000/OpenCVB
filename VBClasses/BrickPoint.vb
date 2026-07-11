@@ -312,9 +312,8 @@ Public Class XR_BrickPoint_PopulationSurvey : Inherits TaskParent
             Next
         Next
 
-        cv.Cv2.Resize(dst2, dst2, dst0.Size, 0, 0, cv.InterpolationFlags.Nearest)
-        cv.Cv2.ConvertScaleAbs(dst3, dst2, 255)
-        cv.Cv2.ConvertScaleAbs(dst2, dst2)
+        cv.Cv2.Resize(dst2, dst0, dst0.Size, 0, 0, cv.InterpolationFlags.Nearest)
+        cv.Cv2.ConvertScaleAbs(dst0, dst0)
         Dim mm = GetMinMax(dst2)
         dst2 *= 255 / mm.maxVal
         labels(3) = "There were " + CStr(results(col, row)) + " features at row/col " + CStr(row) + "/" + CStr(col)

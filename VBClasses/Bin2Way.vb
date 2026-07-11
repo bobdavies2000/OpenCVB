@@ -245,7 +245,7 @@ Public Class XR_Bin2Way_RedCloudLightToDark : Inherits TaskParent
     Dim redCs(3) As RedColor_Basics
     Dim mats As New Mat_4to1
     Dim rclist As New List(Of rcDataOld)
-    Dim rcMap = New cv.Mat(dst2.Size, cv.MatType.CV_32S, 0)
+    Dim rcMap As cv.Mat = New cv.Mat(dst2.Size, cv.MatType.CV_32S, 0)
     Public Sub New()
         For i = 0 To redCs.Count - 1
             redCs(i) = New RedColor_Basics
@@ -275,11 +275,11 @@ Public Class XR_Bin2Way_RedCloudLightToDark : Inherits TaskParent
 
         rclist.Clear()
         dst3.SetTo(0)
-        rcMap.setto(0)
+        rcMap.SetTo(0)
         For Each rc In newList.Values
             rc.mapID = rclist.Count + 1
             rclist.Add(rc)
-            rcMap(rc.rect).setto(rc.mapID, rc.mask)
+            rcMap(rc.rect).SetTo(rc.mapID, rc.mask)
         Next
 
         dst3 = Palettize(rcMap)

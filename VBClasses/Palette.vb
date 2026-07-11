@@ -190,7 +190,7 @@ Public Class XR_Palette_DepthColorMap : Inherits TaskParent
         End If
 
         Dim depth8u As New cv.Mat
-        cv.Cv2.ConvertScaleAbs(task.pcSplit(2), task.pcSplit(2), cvtScaleSlider.Value)
+        cv.Cv2.ConvertScaleAbs(task.pcSplit(2), depth8u, cvtScaleSlider.Value)
         Dim ColorMap = cv.Mat.FromPixelData(256, 1, cv.MatType.CV_8UC3, gradientColorMap.Data())
         cv.Cv2.ApplyColorMap(depth8u, dst2, ColorMap)
         dst2.SetTo(0, task.noDepthMask)

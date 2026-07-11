@@ -602,8 +602,9 @@ Public Class XR_LineTrack_Changes : Inherits TaskParent
         desc = "Track the changes in the lines."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        Static lastImage = task.lines.dst3
-        dst2 = lastImage.setto(0, task.lines.dst3)
+        Static lastImage As cv.Mat = task.lines.dst3
+        lastImage.setto(0, task.lines.dst3)
+        dst2 = lastImage
 
         dst3 = task.lines.dst2
 

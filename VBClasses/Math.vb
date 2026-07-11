@@ -160,14 +160,18 @@ Public Class XR_Math_StdevBoundary : Inherits TaskParent
                 Dim m2 = dst2.Get(Of Byte)(roi.Y, roi.X + roi.Width)
                 If m1 = 0 And m2 <> 0 Then
                     Dim meanScalar = cv.Cv2.Mean(dst3(roi))
-                    dst3(roi).CopyTo(dst2(roi), cv.Cv2.Threshold(dst3(roi), dst3(roi), meanScalar(0), 255, cv.ThresholdTypes.Otsu))
+                    Dim tmp As New cv.Mat
+                    cv.Cv2.Threshold(dst3(roi), tmp, meanScalar(0), 255, cv.ThresholdTypes.Otsu)
+                    dst3(roi).CopyTo(dst2(roi), tmp)
                 End If
                 If m1 > 0 And m2 = 0 Then
-                    Dim newROI = New cv.Rect(roi.X + roi.Width, roi.Y, roi.Width, roi.Height)
+                    Dim newROI = ValidateRect(New cv.Rect(roi.X + roi.Width, roi.Y, roi.Width, roi.Height))
                     If newROI.X + newROI.Width >= dst2.Width Then newROI.Width = dst2.Width - newROI.X - 1
                     If newROI.Y + newROI.Height >= dst2.Height Then newROI.Height = dst2.Height - newROI.Y - 1
                     Dim meanScalar = cv.Cv2.Mean(dst3(newROI))
-                    dst3(newROI).CopyTo(dst2(newROI), cv.Cv2.Threshold(dst3(newROI), dst3(newROI), meanScalar(0), 255, cv.ThresholdTypes.Otsu))
+                    Dim tmp As New cv.Mat
+                    cv.Cv2.Threshold(dst3(newROI), tmp, meanScalar(0), 255, cv.ThresholdTypes.Otsu)
+                    dst3(newROI).CopyTo(dst2(newROI), tmp)
                 End If
             End If
             If roi.Y + roi.Height < dst3.Height Then
@@ -175,13 +179,17 @@ Public Class XR_Math_StdevBoundary : Inherits TaskParent
                 Dim m2 = dst2.Get(Of Byte)(roi.Y + roi.Height, roi.X)
                 If m1 = 0 And m2 <> 0 Then
                     Dim meanScalar = cv.Cv2.Mean(dst3(roi))
-                    dst3(roi).CopyTo(dst2(roi), cv.Cv2.Threshold(dst3(roi), dst3(roi), meanScalar(0), 255, cv.ThresholdTypes.Otsu))
+                    Dim tmp As New cv.Mat
+                    cv.Cv2.Threshold(dst3(roi), tmp, meanScalar(0), 255, cv.ThresholdTypes.Otsu)
+                    dst3(roi).CopyTo(dst2(roi), tmp)
                 End If
                 If m1 > 0 And m2 = 0 Then
-                    Dim newROI = New cv.Rect(roi.X, roi.Y + roi.Height, roi.Width, roi.Height)
+                    Dim newROI = ValidateRect(New cv.Rect(roi.X, roi.Y + roi.Height, roi.Width, roi.Height))
                     If newROI.Y + newROI.Height >= dst3.Height Then newROI.Height = dst3.Height - newROI.Y
                     Dim meanScalar = cv.Cv2.Mean(dst3(newROI))
-                    dst3(newROI).CopyTo(dst2(newROI), cv.Cv2.Threshold(dst3(newROI), dst3(newROI), meanScalar(0), 255, cv.ThresholdTypes.Otsu))
+                    Dim tmp As New cv.Mat
+                    cv.Cv2.Threshold(dst3(newROI), tmp, meanScalar(0), 255, cv.ThresholdTypes.Otsu)
+                    dst3(newROI).CopyTo(dst2(newROI), tmp)
                 End If
             End If
         Next

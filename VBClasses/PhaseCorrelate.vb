@@ -157,7 +157,7 @@ Public Class XR_PhaseCorrelate_Depth : Inherits TaskParent
         desc = "Use phase correlation on the depth data"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        Static lastFrame = task.pcSplit(2).Clone
+        Static lastFrame As cv.Mat = task.pcSplit(2).Clone
         phaseC.Run(task.pcSplit(2))
         dst2 = task.pcSplit(2)
         Dim tmp = New cv.Mat(dst2.Size(), cv.MatType.CV_32F, cv.Scalar.All(0))

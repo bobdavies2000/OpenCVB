@@ -591,11 +591,12 @@ End Class
 
 Public Class XR_OEX_FitEllipse : Inherits TaskParent
     Implements IDisposable
-    Dim img As cv.Mat
+    Dim img As New cv.Mat
     Dim options As New Options_FitEllipse
     Public Sub New()
         Dim fileInputName As New FileInfo(task.homeDir + "opencv/samples/data/ellipses.jpg")
-        cv.Cv2.CvtColor(cv.Cv2.ImRead(fileInputName.FullName), img, cv.ColorConversionCodes.BGR2GRAY)
+        Dim tmp As cv.Mat = cv.Cv2.ImRead(fileInputName.FullName)
+        cv.Cv2.CvtColor(tmp, img, cv.ColorConversionCodes.BGR2GRAY)
 
         cPtr = OEX_FitEllipse_Open()
         desc = "OEX Example fitellipse"

@@ -268,10 +268,10 @@ Public Class XR_Corner_Harris_CPP : Inherits TaskParent
         handleSrc.Free()
 
         Dim gray32f = cv.Mat.FromPixelData(src.Rows, src.Cols, cv.MatType.CV_32F, imagePtr)
-        '  gray32f = Convert32f_To_8UC3(gray32f)
         gray32f.ConvertTo(dst2, cv.MatType.CV_8U)
 
-        cv.Cv2.CvtColor(ShowAddweighted(dst2, dst3, cv.ColorConversionCodes.GRAY2BGR), task.color, labels(3))
+        cv.Cv2.CvtColor(dst2, dst2, cv.ColorConversionCodes.GRAY2BGR)
+        ShowAddweighted(dst2, task.color, labels(3))
     End Sub
     Protected Overrides Sub Finalize()
         If cPtr <> 0 Then cPtr = Harris_Features_Close(cPtr)

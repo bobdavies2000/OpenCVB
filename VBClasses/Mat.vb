@@ -466,9 +466,9 @@ Public Class XR_Mat_FindNearZero : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         Static thresholdSlider = OptionParent.FindSlider("FindNearZero threshold X1000")
-        Dim threshold = thresholdSlider.value / 1000
+        Dim threshold As Single = thresholdSlider.value / 1000
 
-                  cv.Cv2.InRange(task.pcSplit(1), -threshold, threshold, dst3)
+        cv.Cv2.InRange(task.pcSplit(1), -threshold, threshold, dst3)
         dst3.SetTo(0, task.noDepthMask)
         dst3.ConvertTo(dst2, cv.MatType.CV_8U)
 

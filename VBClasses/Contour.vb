@@ -638,7 +638,7 @@ Public Class XR_Contour_General : Inherits TaskParent
             If Not task.heartBeat Then Exit Sub
             rotatedRect.Run(src)
             dst2 = rotatedRect.dst2
-            cv.Cv2.CvtColor(dst2, dst2, cv.ColorConversionCodes.BGR2GRAY)
+            If dst2.Channels <> 1 Then cv.Cv2.CvtColor(dst2, dst2, cv.ColorConversionCodes.BGR2GRAY)
         Else
             If src.Type = cv.MatType.CV_8U Then dst2 = src Else dst2 = task.gray
         End If

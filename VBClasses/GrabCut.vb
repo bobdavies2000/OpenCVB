@@ -110,10 +110,14 @@ Public Class XR_GrabCut_ImageRect : Inherits TaskParent
         dst2 = cv.Cv2.ImRead(fileInputName.FullName)
 
         dst0 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.GrabCutClasses.PR_BGD)
-        dst0(bgRect1).SetTo(cv.GrabCutClasses.BGD)
-        dst0(bgRect2).SetTo(cv.GrabCutClasses.BGD)
-        dst0(fgRect1).SetTo(cv.GrabCutClasses.FGD)
-        dst0(fgRect2).SetTo(cv.GrabCutClasses.FGD)
+        Dim tmp As cv.Mat = dst0(bgRect1)
+        tmp.SetTo(cv.GrabCutClasses.BGD)
+        tmp = dst0(bgRect2)
+        tmp.SetTo(cv.GrabCutClasses.BGD)
+        tmp = dst0(fgRect1)
+        tmp.SetTo(cv.GrabCutClasses.FGD)
+        tmp = dst0(fgRect2)
+        tmp.SetTo(cv.GrabCutClasses.FGD)
 
         If task.firstPass Then
             cv.Cv2.GrabCut(dst2, dst0, bgRect1, bgModel, fgModel, 1, cv.GrabCutModes.InitWithRect)

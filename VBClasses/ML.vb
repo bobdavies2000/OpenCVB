@@ -115,13 +115,13 @@ Public Class ML_Basics : Inherits TaskParent
             End Select
 
             If responseMat.Type <> respFormat Then responseMat.ConvertTo(responseMat, respFormat)
-            classifier.Train(trainMat, cv.ML.SampleTypes.RowSample, responseMat)
+            rtrees.Train(trainMat, cv.ML.SampleTypes.RowSample, responseMat)
         End If
         Dim testMat As New cv.Mat
         cv.Cv2.Merge(testMats, testMat)
 
         testMat = cv.Mat.FromPixelData(testMat.Total, varCount, cv.MatType.CV_32F, testMat.Data)
-        classifier.Predict(testMat, predictions)
+        rtrees.Predict(testMat, predictions)
 
         If predictions.Type <> cv.MatType.CV_32F Then
             predictions.ConvertTo(predictions, cv.MatType.CV_32F)
@@ -260,8 +260,9 @@ Public Class XR_ML_DepthFromColor : Inherits TaskParent
         Dim maskCount = cv.Cv2.CountNonZero(mask)
         dst2 = mask
 
-        Dim learnInput = color32f.Reshape(1, color32f.Total)
-        Dim depthResponse = dst0.Reshape(1, dst0.Total)
+        Dim learnInput As cv.Mat = color32f.Reshape(1, color32f.Total)
+        Dim depthResponse As cv.Mat = dst0.Reshape(1, dst0.Total)
+        depthResponse.ConvertTo(depthResponse, cv.MatType.CV_32F)
 
         ' now learn what depths are associated with which colors.
         If rtree Is Nothing Then rtree = cv.ML.RTrees.Create()
@@ -337,6 +338,7 @@ Public Class XR_ML_DepthFromXYColor : Inherits TaskParent
 
         Dim c = color32f.Reshape(1, color32f.Total)
         Dim depthResponse = dst1.Reshape(1, dst1.Total)
+        depthResponse.ConvertTo(depthResponse, cv.MatType.CV_32F)
 
         Dim learnInput As New cv.Mat(c.Rows, 6, cv.MatType.CV_32F, cv.Scalar.All(0))
         For y = 0 To c.Rows - 1

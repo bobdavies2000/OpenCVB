@@ -6,7 +6,7 @@ Public Class LUT_Basics : Inherits TaskParent
     Public classCount As Integer
     Dim options As New Options_LUT
     Public segment(255) As Byte
-    Dim myLut As cv.Mat
+    Dim myLut As New cv.Mat
     Public Sub New()
         labels(3) = "Palettized version of dst2"
         desc = "Divide the image into n-segments controlled with a slider."
@@ -28,7 +28,7 @@ Public Class LUT_Basics : Inherits TaskParent
             Next
             myLut = cv.Mat.FromPixelData(1, 256, cv.MatType.CV_8U, segment)
         End If
-        If src.Channels() <> 1 Then src = task.gray
+        If src.Channels() <> 1 Or src.Type <> cv.MatType.CV_8U Then src = task.gray
         cv.Cv2.LUT(src, myLut, dst2)
         dst2 *= classCount / 255
         dst2 += 1 ' stay away from zero...
@@ -74,7 +74,7 @@ End Class
 ' https://github.com/opencv/opencv/blob/master/samples/cpp/falsecolor.cpp
 Public Class XR_LUT_Reduction : Inherits TaskParent
     Public reduction As New Reduction_Basics
-    Dim vector = New cv.Mat(256, 1, cv.MatType.CV_8UC3, cv.Scalar.All(0))
+    Dim vector As cv.Mat = New cv.Mat(256, 1, cv.MatType.CV_8UC3, cv.Scalar.All(0))
     Public Sub New()
         For i = 0 To 255
             ' trying to avoid extreme colors... 
@@ -202,7 +202,7 @@ End Class
 
 Public Class XR_LUT_Custom : Inherits TaskParent
     Dim gradMap As New Palette_RandomColorMap
-    Public colorMap As cv.Mat
+    Public colorMap As New cv.Mat
     Dim saveColorCount = -1
     Public Sub New()
         OptionParent.FindSlider("Color transitions").Value = 5

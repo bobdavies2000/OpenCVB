@@ -302,19 +302,20 @@ Public Class XR_EdgeLine_BrickPoints : Inherits TaskParent
     End Sub
     Public Sub showSegment(dst As cv.Mat)
         If task.quarterBeat Then
-            Static debugSegment = 0
-            debugSegment += 1
+            Static debugSegment As cv.Scalar = cv.Scalar.All(0)
+            debugSegment(0) += 1
             edgeline.Run(task.gray)
-            If debugSegment >= edgeline.classCount Then
-                debugSegment = 0
+            If debugSegment(0) >= edgeline.classCount Then
+                debugSegment(0) = 0
                 dst.SetTo(0)
             End If
-            If debugSegment >= edgeline.classCount Then debugSegment = 0
-            If debugSegment Then
-                                  cv.Cv2.InRange(edgeline.dst2, debugSegment, debugSegment, edgeline.dst1)
+            If debugSegment(0) >= edgeline.classCount Then debugSegment = 0
+            If debugSegment(0) Then
+                cv.Cv2.InRange(edgeline.dst2, debugSegment, debugSegment, edgeline.dst1)
                 edgeline.dst1.CopyTo(dst, edgeline.dst1)
             End If
-            debugSegment += 1
+
+            debugSegment(0) += 1
         End If
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)

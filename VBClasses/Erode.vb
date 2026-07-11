@@ -58,7 +58,6 @@ End Class
 
 
 Public Class XR_Erode_DepthSeed : Inherits TaskParent
-    Dim erode As New Erode_Basics
     Dim options As New Options_Erode
     Public Sub New()
         desc = "Erode depth to build a depth mask for inrange data."
@@ -66,7 +65,7 @@ Public Class XR_Erode_DepthSeed : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
 
-        cv.Cv2.Erode(task.pcSplit(2), dst0, erode.options.element)
+        cv.Cv2.Erode(task.pcSplit(2), dst0, options.element)
         dst0 = task.pcSplit(2) - dst0
         dst3 = dst0.LessThan(options.flatDepth).ToMat
         dst1 = task.pcSplit(2).GreaterThan(0).ToMat

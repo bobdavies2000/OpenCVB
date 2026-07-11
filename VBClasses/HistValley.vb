@@ -509,9 +509,10 @@ Public Class XR_HistValley_Colors : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If task.heartBeat Then splitIndex = (splitIndex + 1) Mod 3
-        cv.Cv2.ExtractChannel(src, src, splitIndex)
+        Dim nextChan As New cv.Mat
+        cv.Cv2.ExtractChannel(src, nextChan, splitIndex)
         hist.hist.plotHist.backgroundColor = Choose(splitIndex + 1, cv.Scalar.Blue, cv.Scalar.Green, cv.Scalar.Red)
-        hist.Run(src)
+        hist.Run(nextChan)
         dst2 = hist.dst2
 
         auto.Run(hist.hist.histogram)

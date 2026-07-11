@@ -1,44 +1,43 @@
 Imports System.Runtime.InteropServices
-Imports System.Security.Cryptography
 Imports OpenCvSharp.XPhoto
 Imports cv = OpenCvSharp
-Public Class XR_ExPhoto_Bm3dDenoise : Inherits TaskParent
-    Public Sub New()
-        desc = "Denoise image with block matching and filtering."
-        labels(2) = "Bm3dDenoising"
-        labels(3) = "Difference from Input"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        If src.Channels() <> 1 Then src = task.gray
-        cv.Cv2.EqualizeHist(src, src)
-        cv.Cv2.FastNlMeansDenoisingColored(src, dst2)
-        cv.Cv2.Subtract(dst2, src, dst3)
-        Dim mm As mmData = GetMinMax(dst3)
-        labels(3) = "Diff from input - max change=" + CStr(mm.maxVal)
-        cv.Cv2.Normalize(dst3, dst3, 0, 255, cv.NormTypes.MinMax)
-    End Sub
-End Class
+'Public Class XR_ExPhoto_Bm3dDenoise : Inherits TaskParent
+'    Public Sub New()
+'        desc = "Denoise image with block matching and filtering."
+'        labels(2) = "Bm3dDenoising"
+'        labels(3) = "Difference from Input"
+'    End Sub
+'    Public Overrides Sub RunAlg(src As cv.Mat)
+'        If src.Channels() <> 1 Then src = task.gray
+'        cv.Cv2.EqualizeHist(src, src)
+'        cv.Cv2.FastNlMeansDenoisingColored(src, dst2)
+'        cv.Cv2.Subtract(dst2, src, dst3)
+'        Dim mm As mmData = GetMinMax(dst3)
+'        labels(3) = "Diff from input - max change=" + CStr(mm.maxVal)
+'        cv.Cv2.Normalize(dst3, dst3, 0, 255, cv.NormTypes.MinMax)
+'    End Sub
+'End Class
 
 
 
 
 
-Public Class XR_ExPhoto_Bm3dDenoiseDepthImage : Inherits TaskParent
-    Public Sub New()
-        desc = "Denoise the depth image with block matching and filtering."
-        labels(3) = "Difference from Input"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        Dim test = New cv.Mat(src.Size(), cv.MatType.CV_8U)
-        Dim gray As New cv.Mat
-        cv.Cv2.EqualizeHist(task.gray, gray)
-        cv.Cv2.FastNlMeansDenoisingColored(gray, dst2)
-        cv.Cv2.Subtract(dst2, gray, dst3)
-        Dim mm As mmData = GetMinMax(dst3)
-        labels(3) = "Diff from input - max change=" + CStr(mm.maxVal)
-        cv.Cv2.Normalize(dst3, dst3, 0, 255, cv.NormTypes.MinMax)
-    End Sub
-End Class
+'Public Class XR_ExPhoto_Bm3dDenoiseDepthImage : Inherits TaskParent
+'    Public Sub New()
+'        desc = "Denoise the depth image with block matching and filtering."
+'        labels(3) = "Difference from Input"
+'    End Sub
+'    Public Overrides Sub RunAlg(src As cv.Mat)
+'        Dim test = New cv.Mat(src.Size(), cv.MatType.CV_8U)
+'        Dim gray As New cv.Mat
+'        cv.Cv2.EqualizeHist(task.gray, gray)
+'        cv.Cv2.FastNlMeansDenoisingColored(gray, dst2)
+'        cv.Cv2.Subtract(dst2, gray, dst3)
+'        Dim mm As mmData = GetMinMax(dst3)
+'        labels(3) = "Diff from input - max change=" + CStr(mm.maxVal)
+'        cv.Cv2.Normalize(dst3, dst3, 0, 255, cv.NormTypes.MinMax)
+'    End Sub
+'End Class
 
 
 

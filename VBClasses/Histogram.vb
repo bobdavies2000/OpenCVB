@@ -744,9 +744,8 @@ Public Class XR_Histogram_CompareEMD_hsv : Inherits TaskParent
             Next
         Next
 
-        Dim emd As New cv.Mat
-        cv.Cv2.EMD(sig1, sig2, cv.DistanceTypes.L2)
-        SetTrueText("EMD similarity from the current image to the last is " + Format(1 - emd, "0.0%"), 2)
+        Dim emd = cv.Cv2.EMD(sig1, sig2, cv.DistanceTypes.L2)
+        SetTrueText("EMD similarity from the current image to the last is " + (1 - emd).ToString("P1"), 2)
 
         lastHSV = hsv.Clone
     End Sub
@@ -868,7 +867,7 @@ Public Class XR_Histogram_FlatSurfaces : Inherits TaskParent
         Dim cloudY = task.pcSplit(1).Clone
         Dim mm As mmData = GetMinMax(cloudY)
         Threshold(cloudY, cloudY, maxRange, mm.maxVal, cv.ThresholdTypes.Trunc)
-        Static saveMinVal = mm.minVal, saveMaxVal = mm.maxVal
+        Static saveMinVal As Single = mm.minVal, saveMaxVal As Single = mm.maxVal
         If task.heartBeat Then
             saveMinVal = mm.minVal
             saveMaxVal = mm.maxVal
@@ -887,7 +886,7 @@ Public Class XR_Histogram_FlatSurfaces : Inherits TaskParent
         dst2 = masks.dst2
         dst3 = src
         dst3 = dst3.SetTo(white, masks.dst1)
-        labels(2) = "Range for the histogram is from " + Format(saveMinVal, fmt1) + " to " + Format(saveMaxVal, fmt1)
+        labels(2) = "Range for the histogram is from " + saveMinVal.ToString("0.0") + " to " + saveMaxVal.ToString("0.0")
     End Sub
 End Class
 

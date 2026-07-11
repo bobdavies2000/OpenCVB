@@ -135,7 +135,7 @@ Public Class XR_Filter_NormalizedKernel : Inherits TaskParent
         labels(2) = "kernel sum = " + Format(sum, fmt3)
 
         Dim dst32f As New cv.Mat
-        cv.Cv2.Filter2D(src, dst2, cv.MatType.CV_32FC1, options.kernel, anchor:=New cv.Point(0, 0))
+        cv.Cv2.Filter2D(src, dst32f, cv.MatType.CV_32FC1, options.kernel, anchor:=New cv.Point(0, 0))
         dst32f.ConvertTo(dst2, cv.MatType.CV_8UC3)
     End Sub
 End Class

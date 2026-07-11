@@ -260,7 +260,7 @@ Public Class XR_Depth_SmoothingMat : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
 
-        Static lastDepth = task.pcSplit(2)
+        Static lastDepth As cv.Mat = task.pcSplit(2)
 
         If standaloneTest() Then src = task.pcSplit(2)
         Dim rect = If(task.drawRect.Width <> 0, task.drawRect, New cv.Rect(0, 0, src.Width, src.Height))
@@ -792,7 +792,7 @@ Public Class XR_Depth_PunchDecreasing : Inherits TaskParent
         dst1.SetTo(0)
         task.pcSplit(2).CopyTo(dst1, fore.dst2)
 
-        Static lastDepth = dst1
+        Static lastDepth As cv.Mat = dst1
         Static mmSlider = OptionParent.FindSlider("Threshold in millimeters")
         Dim mmThreshold = mmSlider.Value / 1000
         If Increasing Then
