@@ -80,7 +80,7 @@ Public Class Bin4Way_Basics : Inherits TaskParent
                                                   New cv.Point(bump + plus, bump + dst2.Height / 2),
                                                   New cv.Point(bump + dst2.Width / 2 + plus, bump + dst2.Height / 2))
                 labelStr(i) = (CStr(nextCount) + " pixels" + vbCrLf + CStr(contourCounts(index)(i)) + " contours" + vbCrLf +
-                                       Format(means(index)(i), fmt0) + " mean" + vbCrLf + CStr(cv.Cv2.CountNonZero(tmpVolatile)) + " volatile")
+                                       means(index)(i).ToString(fmt0) + " mean" + vbCrLf + CStr(cv.Cv2.CountNonZero(tmpVolatile)) + " volatile")
             End If
         Next
 

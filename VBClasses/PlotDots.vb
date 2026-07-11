@@ -1,4 +1,4 @@
-Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
+﻿Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 ' https://github.com/opencv/opencv_contrib/blob/master/modules/plot/samples/plot_demo.cpp
 Public Class PlotDots_Basics : Inherits TaskParent
     Public srcX As New List(Of Double)
@@ -21,8 +21,8 @@ Public Class PlotDots_Basics : Inherits TaskParent
             Dim pt = New cv.Point(dst2.Width * srcX(i) / maxX, dst2.Height - dst2.Height * srcY(i) / maxY)
             cv.Cv2.Circle(dst2, pt, task.DotSize, plotColor, -1, task.lineType)
         Next
-        labels(2) = "x-Axis: " + Format(minX, fmt2) + " to " + Format(maxX, fmt2) +
-                    ", y-axis: " + Format(minY, fmt2) + " to " + Format(maxY, fmt2)
+        labels(2) = "x-Axis: " + minX.ToString(fmt2) + " to " + maxX.ToString(fmt2) +
+                    ", y-axis: " + minY.ToString(fmt2) + " to " + maxY.ToString(fmt2)
     End Sub
 End Class
 

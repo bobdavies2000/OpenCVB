@@ -134,7 +134,7 @@ Public Class XR_Blur_Detection : Inherits TaskParent
 
         Dim mean As Single, stdev As Single
         cv.Cv2.MeanStdDev(dst2, mean, stdev)
-        SetTrueText("Blur variance is " + Format(stdev * stdev, fmt3), 3)
+        SetTrueText("Blur variance is " + (stdev * stdev).ToString(fmt3), 3)
 
 If standaloneTest() Then cv.Cv2.Rectangle(dst2, r, white, task.lineWidth)
     End Sub

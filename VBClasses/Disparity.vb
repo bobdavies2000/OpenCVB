@@ -47,7 +47,7 @@ cv.Cv2.Rectangle(dst3, searchRect, black, task.lineWidth)
 
         If saveCorrelations.Count > 100 Then saveCorrelations.RemoveAt(0)
 
-        labels(3) = "Correlation Min/Max = " + Format(min, fmt3) + "/" + Format(max, fmt3)
+        labels(3) = "Correlation Min/Max = " + min.ToString(fmt3) + "/" + max.ToString(fmt3)
     End Sub
 End Class
 
@@ -213,10 +213,10 @@ Public Class Disparity_PlotError : Inherits TaskParent
 
         plot.Run(src)
         dst2 = plot.dst2
-        labels(2) = "Depth (x) varies from 0 to " + Format(x, fmt1) + " meters while error (y) varies from 0 to " +
-                             Format(plot.srcY.Last * 100, fmt1) + " cm's"
+        labels(2) = "Depth (x) varies from 0 to " + x.ToString(fmt1) + " meters while error (y) varies from 0 to " +
+                             (plot.srcY.Last * 100).ToString(fmt1) + " cm's"
 
-        SetTrueText("Error = " + Format(disparityCoefficient, "0.000000") + " * depth * depth", 3)
+        SetTrueText("Error = " + disparityCoefficient.ToString("0.000000") + " * depth * depth", 3)
     End Sub
 End Class
 

@@ -76,7 +76,7 @@ Public Class Fractal_MandelbrotZoom : Inherits TaskParent
         End If
         dst2 = mandel.dst2
         labels(2) = If(mandel.endX - mandel.startX >= 3.999, "Mandelbrot Zoom - draw anywhere", "Mandelbrot Zoom = ~" +
-                                                              Format(4 / (mandel.endX - mandel.startX), "###,###.0") + "X zoom")
+                                                              (4 / (mandel.endX - mandel.startX)).ToString("###,###.0") + "X zoom")
     End Sub
 End Class
 

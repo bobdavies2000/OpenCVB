@@ -20,7 +20,7 @@ Public Class FrameRate_Basics : Inherits TaskParent
             strOut = ""
             For i = 0 To frameCounts.Count - 1
                 strOut += Choose(i + 1, "Color", "Left", "Right", "Depth") + vbTab + " image frameCount = " + vbTab
-                strOut += Format(frameCounts(i), fmt0) + vbTab + " frameCount = " + CStr(task.frameCount) + vbCrLf
+                strOut += frameCounts(i).ToString(fmt0) + vbTab + " frameCount = " + CStr(task.frameCount) + vbCrLf
             Next
         End If
         SetTrueText(strOut, 3)
@@ -63,7 +63,7 @@ Public Class XR_FrameRate_BasicsGray : Inherits TaskParent
             strOut = ""
             For i = 0 To frameCounts.Count - 1
                 strOut += Choose(i + 1, "Color", "Left", "Right", "Depth") + vbTab + " image frameCount = " + vbTab
-                strOut += Format(frameCounts(i), fmt0) + vbTab + " frameCount = " + CStr(task.frameCount) + vbCrLf
+                strOut += frameCounts(i).ToString(fmt0) + vbTab + " frameCount = " + CStr(task.frameCount) + vbCrLf
             Next
         End If
         SetTrueText(strOut, 3)

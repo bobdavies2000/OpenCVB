@@ -1,4 +1,4 @@
-Imports System.Runtime.InteropServices
+﻿Imports System.Runtime.InteropServices
 Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 
 Public Class Open3D_Shape : Inherits TaskParent
@@ -79,7 +79,7 @@ Public Class Open3D_Shape : Inherits TaskParent
         dst3 = src.Clone()
         If ok <> 0 And vertexCount > 0 And triangleCount > 0 Then
             DrawMeshTopView(dst3, vertexCount, triangleCount)
-            labels(3) = CStr(vertexCount) + " vertices, " + CStr(triangleCount) + " triangles, alpha=" + Format(options.alpha, "0.###")
+            labels(3) = CStr(vertexCount) + " vertices, " + CStr(triangleCount) + " triangles, alpha=" + options.alpha.ToString("0.###")
         Else
             labels(3) = "Alpha shape failed for " + CStr(pointList.Count) + " points"
         End If

@@ -1,4 +1,4 @@
-Imports System.IO
+﻿Imports System.IO
 Imports System.Numerics
 Imports OpenCvSharp.ML
 Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
@@ -3028,7 +3028,7 @@ Public Class Options_Spectrum : Inherits OptionParent
                 rEnd = sorted.ElementAt(i).Key
                 If count > sampleThreshold Then
                     ranges.Add(New rangeData(rc.mapID, rStart, rEnd, count))
-                    strOut += "From " + Format(rStart / 100, fmt2) + "m to " + Format(rEnd / 100, fmt2) + "m = " + CStr(count) + " samples" + vbCrLf
+                    strOut += "From " + (rStart / 100).ToString(fmt2) + "m to " + (rEnd / 100).ToString(fmt2) + "m = " + CStr(count) + " samples" + vbCrLf
                 Else
                     trimCount += count
                 End If
@@ -3044,7 +3044,7 @@ Public Class Options_Spectrum : Inherits OptionParent
                 If count > sampleThreshold Then
                     rEnd = sorted.ElementAt(sorted.Count - 1).Key
                     ranges.Add(New rangeData(rc.mapID, rStart, rEnd, count))
-                    strOut += "From " + Format(rStart / 100, fmt2) + "m to " + Format(rEnd / 100, fmt2) + "m = " + CStr(count) + " samples" + vbCrLf
+                    strOut += "From " + (rStart / 100).ToString(fmt2) + "m to " + (rEnd / 100).ToString(fmt2) + "m = " + CStr(count) + " samples" + vbCrLf
                 End If
             End If
         End If

@@ -86,7 +86,7 @@ Public Class CPUTime
             algorithm_ms(i) /= sumTime
             If algorithm_ms(i) < 0 Then algorithm_ms(i) = 0
             If i >= task.cpu.algorithmNames.Count Then Exit For
-            Dim str = Format(algorithm_ms(i), "00.0%") + " " + task.cpu.algorithmNames(i)
+            Dim str = algorithm_ms(i).ToString("00.0%") + " " + task.cpu.algorithmNames(i)
             If task.cpu.displayObjectName IsNot Nothing Then
                 If task.cpu.displayObjectName.Length > 0 Then
                     If str.Contains(task.cpu.displayObjectName) Then percentStr = str
@@ -98,7 +98,7 @@ Public Class CPUTime
                 PercentTimes.Add(algorithm_ms(i), str)
             End If
         Next
-        Dim paintStr = Format(task.cpu.paintTime, fmt1) + " ms paint time / second"
+        Dim paintStr = task.cpu.paintTime.ToString(fmt1) + " ms paint time / second"
         task.cpu.paintTime = 0
 
         Dim otherTimes As New List(Of Single)
@@ -107,8 +107,8 @@ Public Class CPUTime
         Next
 
         percentTime = "Click on an algorithm to see more info. " + vbCrLf + vbCrLf
-        percentTime += "Algorithm FPS = " + Format(task.fpsAlgorithm, fmt0) + vbCrLf
-        percentTime += "Camera FPS = " + Format(task.fpsCamera, fmt0) + vbCrLf
+        percentTime += "Algorithm FPS = " + task.fpsAlgorithm.ToString(fmt0) + vbCrLf
+        percentTime += "Camera FPS = " + task.fpsCamera.ToString(fmt0) + vbCrLf
         If task.Settings.paintFrequency < 0 Then
             percentTime += "Paint Frequency: every heart beat" + vbCrLf + vbCrLf
         ElseIf task.Settings.paintFrequency = 0 Then
@@ -129,7 +129,7 @@ Public Class CPUTime
             End If
         Next
 
-        percentTime += Format(otherTimes.Sum, "00.0%") + " " + CStr(otherTimes.Count) + " algorithms each < 1.0%" +
+        percentTime += otherTimes.Sum.ToString("00.0%") + " " + CStr(otherTimes.Count) + " algorithms each < 1.0%" +
                                     vbCrLf + vbCrLf + "Click tree at left to see it below:" + vbCrLf + vbCrLf
 
         percentTime += If(percentStr Is Nothing, "Inactive algorithm selected", percentStr)

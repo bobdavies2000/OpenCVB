@@ -1,4 +1,4 @@
-Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
+﻿Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 Public Class PlotMouse_Basics : Inherits TaskParent
     Public plotHist As New PlotBar_Basics
     Public histogram As New cv.Mat
@@ -42,11 +42,11 @@ Public Class PlotMouse_Basics : Inherits TaskParent
 
         If mask.Size = dst3.Size Then dst3.SetTo(task.highlight, mask)
         Dim count = cv.Cv2.CountNonZero(mask)
-        labels(3) = "BackProjected pixel (% of image) = " + Format(count / src.Total, "0%")
+        labels(3) = "BackProjected pixel (% of image) = " + (count / src.Total).ToString("0%")
 
         Dim barCount = plotHist.histArray(histIndex)
         labels(2) = "Selection highlighted is " + CStr(histIndex) + " and shows " + CStr(barCount) + " (or " +
-                    Format(barCount / src.Total, "0%") + ") samples"
+                    (barCount / src.Total).ToString("0%") + ") samples"
                     cv.Cv2.Rectangle(dst2, New cv.Rect(CInt(histIndex) * barWidth, 0, barWidth, dst2.Height), cv.Scalar.Yellow, task.lineWidth)
     End Sub
 End Class
@@ -94,9 +94,9 @@ Public Class PlotMouse_Basics32F : Inherits TaskParent
 
         Dim maskCount = cv.Cv2.CountNonZero(mask)
         If mask.Size = dst3.Size Then dst3.SetTo(task.highlight, mask)
-        labels(3) = "BackProjected pixel (% of image) = " + Format(maskCount / src.Total, "0%")
+        labels(3) = "BackProjected pixel (% of image) = " + (maskCount / src.Total).ToString("0%")
 
-        labels(2) = "Histogram Depth to " + Format(task.MaxZmeters, "0.0") + " m"
+        labels(2) = "Histogram Depth to " + task.MaxZmeters.ToString("0.0") + " m"
         cv.Cv2.Rectangle(dst2, New cv.Rect(CInt(histIndex) * barWidth, 0, barWidth, dst2.Height), cv.Scalar.Yellow, task.lineWidth)
     End Sub
 End Class
@@ -144,9 +144,9 @@ Public Class PlotMouse_Correlation : Inherits TaskParent
         Dim histIndex = Math.Floor(task.mouseMovePoint.X / barWidth)
                   cv.Cv2.InRange(dst1, histIndex, histIndex, dst0)
         If ranges(histIndex) IsNot Nothing Then
-            labels(2) = "For bin " + CStr(histIndex) + " " + Format(ranges(histIndex).Average, fmt1) +
-                    " average range and min/max " + Format(ranges(histIndex).Min, fmt1) + "/" +
-                    Format(ranges(histIndex).Max, fmt1)
+            labels(2) = "For bin " + CStr(histIndex) + " " + ranges(histIndex).Average.ToString(fmt1) +
+                    " average range and min/max " + ranges(histIndex).Min.ToString(fmt1) + "/" +
+                    ranges(histIndex).Max.ToString(fmt1)
         End If
 
         Dim actualCount = cv.Cv2.CountNonZero(dst0)

@@ -413,7 +413,7 @@ Public Class XR_Edge_Matching : Inherits TaskParent
             maxLocs(i) = match.newRect.X
             If match.correlation > options.threshold Or redRects.Contains(i) Then
                 highlights.Add(i)
-                SetTrueText(Format(match.correlation, fmt2), New cv.Point(r.X, r.Y), 3)
+                SetTrueText(match.correlation.ToString(fmt2), New cv.Point(r.X, r.Y), 3)
             End If
         Next
 
@@ -454,7 +454,7 @@ Public Class XR_Edge_Matching : Inherits TaskParent
                 Next
             End If
         End If
-        labels(3) = "Grid segments > " + Format(options.threshold, "#0%") + " correlation coefficient"
+        labels(3) = "Grid segments > " + options.threshold.ToString("#0%") + " correlation coefficient"
     End Sub
 End Class
 
@@ -1272,7 +1272,7 @@ Public Class XR_Edge_Stability : Inherits TaskParent
         Dim popMin = If(pops.Count > 0, pops.Min, 0)
         Dim popMax = If(pops.Count > 0, pops.Max, 0)
         labels(2) = CStr(gEdges.featureRects.Count) + " feature rects with an average population of " +
-                                 Format(popAverage, fmt1) + " and with min = " + CStr(popMin) +
+                                 popAverage.ToString(fmt1) + " and with min = " + CStr(popMin) +
                                  " and max = " + CStr(popMax) + ".  Circled cell has max features."
         If pops.Count > 0 Then
             Dim index = pops.IndexOf(pops.Max)
@@ -1325,7 +1325,7 @@ Public Class XR_Edge_LeftRightDepth : Inherits TaskParent
             Dim depth = task.pcSplit(2).Get(Of Single)(pt.Y, pt.X)
             If depth > 0 Then
                 ptLeft.Add(pt)
-                SetTrueText(Format(depth, fmt1), pt, 1)
+                SetTrueText(depth.ToString(fmt1), pt, 1)
             End If
         Next
 
@@ -1337,7 +1337,7 @@ Public Class XR_Edge_LeftRightDepth : Inherits TaskParent
             Dim depth = task.pcSplit(2).Get(Of Single)(pt.Y, pt.X)
             If depth > 0 Then
                 ptRight.Add(pt)
-                SetTrueText(Format(depth, fmt1), New cv.Point(pt.X, task.mouseMovePoint.Y), 1)
+                SetTrueText(depth.ToString(fmt1), New cv.Point(pt.X, task.mouseMovePoint.Y), 1)
             End If
         Next
         labels(2) = CStr(ptLeft.Count) + " points were found in the left view"

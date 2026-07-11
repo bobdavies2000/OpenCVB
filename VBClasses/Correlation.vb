@@ -33,7 +33,7 @@ Public Class Correlation_Basics : Inherits TaskParent
         Next
 
         lastFrame = src.Clone
-        labels(2) = CStr(fLessList.Count) + " rects < " + Format(maxCorrelation - 1, fmt2) +
+        labels(2) = CStr(fLessList.Count) + " rects < " + (maxCorrelation - 1).ToString(fmt2) +
                             " correlation to last frame, indicating that they were featureless."
         SetTrueText("Use Feature Options 'Match Correlation Threshold' to shrink/grow.", 3)
     End Sub
@@ -132,9 +132,9 @@ Public Class Correlation_BasicsPlot : Inherits TaskParent
             dst3 = plotHist.dst2
 
             Dim lastEntry = plotHist.histArray.Last
-            labels(2) = "Correlation Min = " + Format(cList.Min - 1, fmt1) + ", Max = " + Format(cList.Max - 1, fmt1)
-            labels(3) = CStr(lastEntry) + " (" + Format(lastEntry / task.gridRects.Count, "0%") +
-                                ") had correlation >= " + Format(maxCorrelation - 1, fmt2) + "  Plot below ranges from -1 to 1"
+            labels(2) = "Correlation Min = " + (cList.Min - 1).ToString(fmt1) + ", Max = " + (cList.Max - 1).ToString(fmt1)
+            labels(3) = CStr(lastEntry) + " (" + (lastEntry / task.gridRects.Count).ToString("0%") +
+                                ") had correlation >= " + (maxCorrelation - 1).ToString(fmt2) + "  Plot below ranges from -1 to 1"
 
             maxCorrelation = 2.0 - 2.0 / task.histogramBins
             Dim mmRangeTest As New List(Of Double)
@@ -149,14 +149,14 @@ Public Class Correlation_BasicsPlot : Inherits TaskParent
             Dim index = task.gridMap.Get(Of Integer)(task.clickPoint.Y, task.clickPoint.X)
             Dim mm = mmList(index)
             strOut = "Click on any grid rect to see its grayscale range." + vbCrLf +
-                             "Min gray = " + Format(mm.minVal, fmt0) + vbCrLf +
-                             "Max Gray = " + Format(mm.maxVal, fmt0) + vbCrLf +
-                             "Range = " + Format(mm.range, fmt0) + vbCrLf + vbCrLf +
+                             "Min gray = " + mm.minVal.ToString(fmt0) + vbCrLf +
+                             "Max Gray = " + mm.maxVal.ToString(fmt0) + vbCrLf +
+                             "Range = " + mm.range.ToString(fmt0) + vbCrLf + vbCrLf +
                              "Surveying the deteriorated correlations:" + vbCrLf +
                              If(mmRangeTest.Count = 0,
                              "Min Range = 0" + vbCrLf + "Max Range = 0",
-                             "Min Range = " + Format(mmRangeTest.Min, fmt1) + vbCrLf +
-                             "Max Range = " + Format(mmRangeTest.Max, fmt1))
+                             "Min Range = " + mmRangeTest.Min.ToString(fmt1) + vbCrLf +
+                             "Max Range = " + mmRangeTest.Max.ToString(fmt1))
             SetTrueText(strOut, 1)
         End If
     End Sub
@@ -203,7 +203,7 @@ Public Class XR_Correlation_Basics : Inherits TaskParent
         Dim correlationmat As New cv.Mat
         cv.Cv2.MatchTemplate(row1, row2, correlationmat, options.matchOption)
         Dim correlation = correlationmat.Get(Of Single)(0, 0)
-        labels(2) = "Correlation of X to Z = " + Format(correlation, fmt2)
+        labels(2) = "Correlation of X to Z = " + correlation.ToString(fmt2)
 
         dst3.SetTo(0)
         Dim plotX As New List(Of Single)
@@ -225,9 +225,9 @@ Public Class XR_Correlation_Basics : Inherits TaskParent
                 Dim y = dst3.Height * (plotZ(i) - minZ) / (maxZ - minZ)
                 cv.Cv2.Circle(dst3, New cv.Point(x, y), task.DotSize, cv.Scalar.Yellow, -1, task.lineType)
             Next
-            SetTrueText("Z-min " + Format(minZ, fmt2), New cv.Point(10, 5), 3)
-            SetTrueText("Z-max " + Format(maxZ, fmt2) + vbCrLf + vbTab + "X-min " + Format(minx, fmt2), New cv.Point(0, dst3.Height - 20), 3)
-            SetTrueText("X-max " + Format(maxx, fmt2), New cv.Point(dst3.Width - 40, dst3.Height - 10), 3)
+            SetTrueText("Z-min " + minZ.ToString(fmt2), New cv.Point(10, 5), 3)
+            SetTrueText("Z-max " + maxZ.ToString(fmt2) + vbCrLf + vbTab + "X-min " + minx.ToString(fmt2), New cv.Point(0, dst3.Height - 20), 3)
+            SetTrueText("X-max " + maxx.ToString(fmt2), New cv.Point(dst3.Width - 40, dst3.Height - 10), 3)
         End If
     End Sub
 End Class
@@ -289,7 +289,7 @@ Public Class Correlation_LinesSimple : Inherits TaskParent
         desc = "Test the correlation of the current line image to the previous."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        SetTrueText("Correlation = " + Format(correlation, fmt2), 3)
+        SetTrueText("Correlation = " + correlation.ToString(fmt2), 3)
         If task.heartBeatLT = False Then Exit Sub
 
         Static lastImage As cv.Mat = task.lines.dst3.Clone

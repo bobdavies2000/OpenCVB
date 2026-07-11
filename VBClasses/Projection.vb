@@ -1,4 +1,4 @@
-Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
+﻿Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 Public Class Projection_Basics : Inherits TaskParent
     Public redCellInput As New List(Of rcDataOld)
     Public rclist As New List(Of rcDataOld)
@@ -65,8 +65,8 @@ Public Class Projection_Basics : Inherits TaskParent
             End If
             objectList.Add(New cv.Vec4f(xy1, xy2, z1, z2))
             If task.heartBeat Then
-                strOut += "Object " + vbTab + CStr(rc.mapID) + vbTab + Format(xy2 - xy1, fmt3) + " m " + meterDesc + vbTab +
-                                           Format(z1, fmt1) + "m " + " to " + Format(z2, fmt1) + "m from camera" + vbTab + CStr(rc.pixels) + " pixels" + vbCrLf
+                strOut += "Object " + vbTab + CStr(rc.mapID) + vbTab + (xy2 - xy1).ToString(fmt3) + " m " + meterDesc + vbTab +
+                                           z1.ToString(fmt1) + "m " + " to " + z2.ToString(fmt1) + "m from camera" + vbTab + CStr(rc.pixels) + " pixels" + vbCrLf
             End If
         Next
 

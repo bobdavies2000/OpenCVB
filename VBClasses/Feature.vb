@@ -452,7 +452,7 @@ Public Class XR_Feature_Generations : Inherits TaskParent
         Next
 
         If task.heartBeat And gens.Count > 0 Then
-            labels(2) = CStr(features.Count) + " features found with max/average " + CStr(gens(0)) + "/" + Format(gens.Average, fmt0) + " generations"
+            labels(2) = CStr(features.Count) + " features found with max/average " + CStr(gens(0)) + "/" + gens.Average.ToString(fmt0) + " generations"
         End If
     End Sub
 End Class
@@ -589,7 +589,7 @@ Public Class XR_Feature_WithDepth : Inherits TaskParent
                 depthCount += 1
             End If
         Next
-        labels(2) = CStr(depthCount) + " features had depth or " + Format(depthCount / feat.features.Count, "0%")
+        labels(2) = CStr(depthCount) + " features had depth or " + (depthCount / feat.features.Count).ToString("0%")
     End Sub
 End Class
 
@@ -980,7 +980,7 @@ Public Class Feature_LeftRightCorrelation : Inherits TaskParent
             labels(2) = CStr(features.Count) + " of " + CStr(feat.features.Count) +
                         " features had depth and high correlation to the right image."
             labels(3) = CStr(countNoDepth) + " features had no depth and " +
-                        CStr(countNoCorr) + " missed the correlation threshold of " + Format(maxCorr, fmt2)
+                        CStr(countNoCorr) + " missed the correlation threshold of " + maxCorr.ToString(fmt2)
         End If
     End Sub
 End Class

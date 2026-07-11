@@ -1,4 +1,4 @@
-Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
+﻿Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 ' https://en.wikipedia.org/wiki/Scatter_matrix
 Public Class XR_ScatterMatrix_Example : Inherits TaskParent
     Dim data(,) As Double
@@ -54,12 +54,12 @@ Public Class XR_ScatterMatrix_Example : Inherits TaskParent
 
         strOut = "For the input data:" + vbCrLf
         For i = 0 To data.Length / 2 - 1
-            strOut += Format(data(i, 0), fmt1) + ", " + Format(data(i, 1), fmt1) + vbCrLf
+            strOut += data(i, 0).ToString(fmt1) + ", " + data(i, 1).ToString(fmt1) + vbCrLf
         Next
 
         strOut += vbCrLf + vbCrLf + "The mean vector is:" + vbCrLf
         For i = 0 To meanVector.Length - 1
-            strOut += Format(meanVector(i), fmt1) + ", "
+            strOut += meanVector(i).ToString(fmt1) + ", "
         Next
 
         strOut += vbCrLf + vbCrLf + "The scatter matrix is:" + vbCrLf

@@ -1,4 +1,4 @@
-Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
+﻿Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 ' https://docs.opencvb.org/3.4/d3/dc0/group__imgproc__shape.html
 ' https://docs.opencvb.org/3.4/d5/d45/tutorial_py_contours_more_functions.html
 ' https://stackoverflow.com/questions/55529371/opencv-shape-matching-between-two-similar-shapes
@@ -49,7 +49,7 @@ Public Class MatchShapes_Basics : Inherits TaskParent
         maxIndex2 = findBiggestHull(hull2, maxLen2, maxIndex2, dst3)
 
         Dim matchVal = cv.Cv2.MatchShapes(hull1(maxIndex1), hull2(maxIndex2), match.matchOption)
-        labels(2) = "MatchShapes returned " + Format(matchVal, fmt2)
+        labels(2) = "MatchShapes returned " + matchVal.ToString(fmt2)
     End Sub
 End Class
 
@@ -114,7 +114,7 @@ Public Class MatchShapes_Nearby : Inherits TaskParent
             Dim index = matchVals.IndexOf(matchVals.Min)
             Dim rc = similarCells(index)
             cv.Cv2.Circle(dst3, rc.maxDist, task.DotSize, white, -1, task.lineType)
-            If similarCells.Count = 0 Then SetTrueText("No matches with match value < " + Format(options.matchThreshold, fmt2), New cv.Point(5, 5), 3)
+            If similarCells.Count = 0 Then SetTrueText("No matches with match value < " + options.matchThreshold.ToString(fmt2), New cv.Point(5, 5), 3)
         End If
         SetTrueText("Best match", task.rcD.maxDist, 3)
     End Sub
@@ -241,6 +241,6 @@ Public Class XR_MatchShapes_NearbyHull : Inherits TaskParent
             Next
         End If
 
-        If similarCells.Count = 0 Then SetTrueText("No matches with match value < " + Format(options.matchThreshold, fmt2), New cv.Point(5, 5), 3)
+        If similarCells.Count = 0 Then SetTrueText("No matches with match value < " + options.matchThreshold.ToString(fmt2), New cv.Point(5, 5), 3)
     End Sub
 End Class

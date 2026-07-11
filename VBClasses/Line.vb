@@ -127,7 +127,7 @@ Public Class Line_Basics : Inherits TaskParent
         Dim averageAge = Line_Basics_TA.updateAgesAndLongest(lpList, lastList)
 
         labels(2) = "Fast Line Detector (FLD): " + CStr(task.lines.lpList.Count) + " lines found.  Line age is also shown." +
-                    " Average age = " + If(task.lines.lpList.Count > 0, Format(averageAge, fmt1), "0")
+                    " Average age = " + If(task.lines.lpList.Count > 0, averageAge.ToString(fmt1), "0")
 
         dst3 = task.lines.dst3
         For Each lp In task.lines.lpList
@@ -701,7 +701,7 @@ Public Class XR_Line_DepthHistogram : Inherits TaskParent
             If task.gOptions.DebugCheckBox.Checked Then
                 dst2 = plot.plotHist.dst2
                 cv.Cv2.Rectangle(dst3, lp.rect, task.highlight, task.lineWidth)
-                labels(3) = "The histogram at left indicates that the depth Is likely at " + Format(depth1, fmt1) + "m" + vbCrLf
+                labels(3) = "The histogram at left indicates that the depth Is likely at " + depth1.ToString(fmt1) + "m" + vbCrLf
                 labels(2) = plot.plotHist.labels(2)
                 Exit For
             End If
@@ -1269,7 +1269,7 @@ Public Class XR_Line_Longest : Inherits TaskParent
             distance1 = lp.ptE1.X - lpLast.ptE1.X
             distance2 = lp.ptE2.X - lpLast.ptE2.X
         End If
-        ' Debug.WriteLine("distance1 = " + Format(distance1, fmt2) + " distance2 = " + Format(distance2, fmt2))
+        ' Debug.WriteLine("distance1 = " + distance1.ToString(fmt2) + " distance2 = " + distance2.ToString(fmt2))
         lpLast = task.lines.lpList(0)
     End Sub
 End Class
@@ -1755,8 +1755,8 @@ Public Class XO_Line_EdgePoints : Inherits TaskParent
 
         If xMatches.Count > 0 Then
             strOut = "There were " + CStr(xMatches.Count) + " useful edge points after filtering." + vbCrLf
-            strOut += "Average X offset = " + Format(xMatches.Average, fmt2) + vbCrLf
-            strOut += "Average Y offset = " + Format(yMatches.Average, fmt2) + vbCrLf
+            strOut += "Average X offset = " + xMatches.Average.ToString(fmt2) + vbCrLf
+            strOut += "Average Y offset = " + yMatches.Average.ToString(fmt2) + vbCrLf
             strOut += "There were " + CStr(lpList.Count) + " lines in the current image" + vbCrLf
             strOut += "There were " + CStr(lpList.Count * 2) + " edge points in the current image" + vbCrLf
             strOut += "There were " + CStr(vectors.Count)
@@ -1956,7 +1956,7 @@ Public Class Line_RightOnly : Inherits TaskParent
             cv.Cv2.Line(dst2, lp.p1, lp.p2, 255, task.lineWidth, task.lineType)
             SetTrueText(CStr(lp.age), New cv.Point(lp.ptCenter.X + 2, lp.ptCenter.Y + 2), 2)
         Next
-        labels(2) = CStr(lpList.Count) + " lines in the right image with average age = " + Format(averageAge, fmt1)
+        labels(2) = CStr(lpList.Count) + " lines in the right image with average age = " + averageAge.ToString(fmt1)
     End Sub
 End Class
 

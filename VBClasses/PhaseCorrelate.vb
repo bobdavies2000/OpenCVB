@@ -1,4 +1,4 @@
-Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
+﻿Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 ' https://github.com/opencv/opencv/blob/master/samples/cpp/phase_corr.cpp
 ' https://docs.opencvb.org/master/d7/df3/group__imgproc__motion.html
 Public Class PhaseCorrelate_Basics : Inherits TaskParent
@@ -64,7 +64,7 @@ Public Class PhaseCorrelate_Basics : Inherits TaskParent
         labels(3) = If(resetLastFrame, "lastFrame Reset", "Restored lastFrame")
         If resetLastFrame Then lastFrame = input64
 
-        labels(2) = "Shift = (" + Format(shift.X, fmt2) + "," + Format(shift.Y, fmt2) + ") with radius = " + Format(radius, fmt2)
+        labels(2) = "Shift = (" + shift.X.ToString(fmt2) + "," + shift.Y.ToString(fmt2) + ") with radius = " + radius.ToString(fmt2)
     End Sub
 End Class
 

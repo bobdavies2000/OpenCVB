@@ -1,4 +1,4 @@
-Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
+﻿Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 Public Class TrueText
     Declare Sub CopyClassToManagedCpp Lib "ManagedCppLibrary.dll" (dataPtr As IntPtr)
     Public text As String
@@ -127,7 +127,7 @@ Public Class TaskParent : Implements IDisposable
         addw.src2 = src2
         addw.Run(src1)
         Dim wt = addw.options.addWeighted
-        label = "AddWeighted: src1 = " + Format(wt, "0%") + " vs. src2 = " + Format(1 - wt, "0%")
+        label = "AddWeighted: src1 = " + wt.ToString("0%") + " vs. src2 = " + (1 - wt).ToString("0%")
         Return addw.dst2
     End Function
     Public Shared Sub DrawTour(dst As cv.Mat, contour As List(Of cv.Point), color As cv.Scalar, Optional lineWidth As Integer = -1,

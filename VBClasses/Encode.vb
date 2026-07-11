@@ -22,7 +22,7 @@ Public Class XR_Encode_Basics : Inherits TaskParent
 
         output.ConvertTo(dst2, cv.MatType.CV_8UC3, options.scalingLevel)
         Dim compressionRatio = buf.Length / (src.Rows * src.Cols * src.ElemSize)
-        labels(3) = "Original compressed to len=" + CStr(buf.Length) + " (" + Format(compressionRatio, "0.0%") + ")"
+        labels(3) = "Original compressed to len=" + CStr(buf.Length) + " (" + compressionRatio.ToString("0.0%") + ")"
     End Sub
 End Class
 

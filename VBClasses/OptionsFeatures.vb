@@ -1,4 +1,4 @@
-Public Class OptionsFeatures
+﻿Public Class OptionsFeatures
     Public grayCheckbox() As RadioButton
     Public colorCheckbox() As RadioButton
     Public colorMethods() As String = {"BackProject_Full", "Bin4Way_Regions", "Hist3DColor_Basics",
@@ -111,17 +111,17 @@ Public Class OptionsFeatures
 
 
     Private Sub ReductionColor_ValueChanged(sender As Object, e As EventArgs) Handles ReductionColor.ValueChanged
-        Lab1.Text = Format(ReductionColor.Value, fmt0)
+        Lab1.Text = ReductionColor.Value.ToString(fmt0)
         task.optionsChanged = True
     End Sub
     Private Sub ReductionDepth_ValueChanged(sender As Object, e As EventArgs) Handles ReductionDepth.ValueChanged
-        Lab9.Text = Format(ReductionDepth.Value, fmt0)
+        Lab9.Text = ReductionDepth.Value.ToString(fmt0)
         task.optionsChanged = True
     End Sub
     Private Sub FCorrSlider_ValueChanged(sender As Object, e As EventArgs) Handles MatchCorrSlider.ValueChanged
         task.fCorrThreshold = MatchCorrSlider.Value / 100
         task.optionsChanged = True
-        FeatureCorrelationLabel.Text = Format(task.fCorrThreshold, fmt2)
+        FeatureCorrelationLabel.Text = task.fCorrThreshold.ToString(fmt2)
     End Sub
     Private Sub FeatureSampleSize_ValueChanged(sender As Object, e As EventArgs) Handles FrameHistoryCount.ValueChanged
         task.FeatureSampleSize = FrameHistoryCount.Value

@@ -1,4 +1,4 @@
-Imports System.Runtime.InteropServices
+﻿Imports System.Runtime.InteropServices
 Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 Public Class LineTrack_Basics : Inherits TaskParent
     Public lpCurr As New lpData
@@ -66,7 +66,7 @@ Public Class XR_LineTrack_Basics : Inherits TaskParent
         If Math.Abs(lpNew.angle - lp.angle) > 3 Then lpNew = Nothing
 
         cv.Cv2.Line(dst2, lp.p1, lp.p2, task.highlight, task.lineWidth + 1, task.lineType)
-        labels(2) = "Tracking line length = " + Format(lp.length, fmt1) + " angle = " + Format(lp.angle, fmt1)
+        labels(2) = "Tracking line length = " + lp.length.ToString(fmt1) + " angle = " + lp.angle.ToString(fmt1)
     End Sub
 End Class
 
@@ -104,7 +104,7 @@ Public Class XR_LineTrack_Concat : Inherits TaskParent
             Static rFit As New Rectangle_Fit
             rFit.Run(match.template)
             dst2 = rFit.dst2.Clone
-            labels(2) = "Correlation = " + Format(correlation, fmt3)
+            labels(2) = "Correlation = " + correlation.ToString(fmt3)
 
             rFit.Run(templateLast)
             dst3 = rFit.dst2
@@ -152,9 +152,9 @@ Public Class XR_LineTrack_CorrelationNabe : Inherits TaskParent
             dst2 = src.Clone
             cv.Cv2.Line(dst2, lpInput.p1, lpInput.p2, task.highlight, task.lineWidth, task.lineType)
         End If
-        labels(2) = "Rect for p1 has correlation " + Format(p1Correlation, fmt3) +
+        labels(2) = "Rect for p1 has correlation " + p1Correlation.ToString(fmt3) +
                         " to the previous image while " +
-                        "rect for p2 has " + Format(p2Correlation, fmt3)
+                        "rect for p2 has " + p2Correlation.ToString(fmt3)
 
         lastImage = task.gray.Clone
     End Sub
@@ -512,7 +512,7 @@ Public Class XR_LineTrack_Top3 : Inherits TaskParent
                 newList.Add(lineT.lp)
             Else
                 strOut += "Lost line " + CStr(i) + " because correlation was " +
-                           Format(match.correlation, fmt2) + vbCrLf
+                           match.correlation.ToString(fmt2) + vbCrLf
             End If
         Next
 
@@ -708,9 +708,9 @@ Public Class XR_LineTrack_Correlation : Inherits TaskParent
 
         lpInput = lp
 
-        labels(2) = "Rect for p1 has correlation " + Format(p1Correlation, fmt3) +
+        labels(2) = "Rect for p1 has correlation " + p1Correlation.ToString(fmt3) +
                     " to the previous image while " +
-                    "rect for p2 has " + Format(p2Correlation, fmt3)
+                    "rect for p2 has " + p2Correlation.ToString(fmt3)
 
     End Sub
 End Class
@@ -886,23 +886,23 @@ Public Class LineTrack_Triangle : Inherits TaskParent
         Dim d2 = p1.DistanceTo(p3)
         Dim d3 = p2.DistanceTo(p3)
 
-        strOut = "P1 to P2 distance (hypotenuse) = " + Format(d1, fmt3) + " pixels" + vbCrLf
-        strOut += "P1 to P3 distance (adjacent side) = " + Format(d2, fmt3) + " pixels" + vbCrLf
-        strOut += "P2 to P3 distance (opposite side) = " + Format(d3, fmt3) + " pixels" + vbCrLf + vbCrLf
+        strOut = "P1 to P2 distance (hypotenuse) = " + d1.ToString(fmt3) + " pixels" + vbCrLf
+        strOut += "P1 to P3 distance (adjacent side) = " + d2.ToString(fmt3) + " pixels" + vbCrLf
+        strOut += "P2 to P3 distance (opposite side) = " + d3.ToString(fmt3) + " pixels" + vbCrLf + vbCrLf
 
         Dim atanP1 = Math.Atan(d3 / d2)
-        strOut += "opposite / adjacent = " + Format(d3 / d2, fmt2) + vbCrLf
-        strOut += "ArcTan " + Format(d3 / d2, fmt2) + " = " + Format(atanP1, fmt2) + " radians or " +
-                   Format(atanP1 * RadToDeg, fmt2) + " degrees " + vbCrLf + vbCrLf
+        strOut += "opposite / adjacent = " + (d3 / d2).ToString(fmt2) + vbCrLf
+        strOut += "ArcTan " + (d3 / d2).ToString(fmt2) + " = " + atanP1.ToString(fmt2) + " radians or " +
+                   (atanP1 * RadToDeg).ToString(fmt2) + " degrees " + vbCrLf + vbCrLf
 
         Dim angleP1 As Double = lpData.AngleAtPoint(p1, p2, p3)
         Dim angleP2 As Double = lpData.AngleAtPoint(p2, p1, p3)
         Dim angleP3 As Double = lpData.AngleAtPoint(p3, p1, p2)
-        strOut += "Angle at p1 = " + Format(angleP1, fmt2) + " degrees or " + Format(angleP1 / RadToDeg, fmt2) +
+        strOut += "Angle at p1 = " + angleP1.ToString(fmt2) + " degrees or " + (angleP1 / RadToDeg).ToString(fmt2) +
                   " radians" + vbCrLf
-        strOut += "Angle at p2 = " + Format(angleP2, fmt2) + " degrees or " + Format(angleP2 / RadToDeg, fmt2) +
+        strOut += "Angle at p2 = " + angleP2.ToString(fmt2) + " degrees or " + (angleP2 / RadToDeg).ToString(fmt2) +
                   " radians" + vbCrLf
-        strOut += "Angle at p3 = " + Format(angleP3, fmt2) + " degrees or " + Format(angleP3 / RadToDeg, fmt2) +
+        strOut += "Angle at p3 = " + angleP3.ToString(fmt2) + " degrees or " + (angleP3 / RadToDeg).ToString(fmt2) +
                   " radians" + vbCrLf
 
         Dim w = dst2.Width - 1, h = dst2.Height - 1
@@ -911,8 +911,8 @@ Public Class LineTrack_Triangle : Inherits TaskParent
         If p1.X = 0 Then pitch = p1.Y Else If p2.Y = 0 Then pitch = p2.Y Else If p3.Y = 0 Then pitch = p3.Y
         If p1.X = w Then pitch = p1.Y Else If p2.Y = w Then pitch = p2.Y Else If p3.Y = w Then pitch = p3.Y
 
-        strOut += "pitch = " + Format(pitch, fmt2) + " pixels"  + vbCrLf
-        strOut += "yaw = " + Format(yaw, fmt2) + " pixels" + vbCrLf
+        strOut += "pitch = " + pitch.ToString(fmt2) + " pixels"  + vbCrLf
+        strOut += "yaw = " + yaw.ToString(fmt2) + " pixels" + vbCrLf
         SetTrueText(strOut, 3)
     End Sub
 End Class

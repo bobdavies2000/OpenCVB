@@ -530,7 +530,7 @@ Public Class KNN_Dimension3 : Inherits TaskParent
             cv.Cv2.Circle(dst2, pt, task.DotSize, cv.Scalar.Red, -1, task.lineType)
             dist.inPoint2 = trainInput(i)
             dist.Run(src)
-            SetTrueText("depth=" + CStr(trainInput(i).Z) + vbCrLf + "dist=" + Format(dist.distance, fmt0), pt)
+            SetTrueText("depth=" + CStr(trainInput(i).Z) + vbCrLf + "dist=" + dist.distance.ToString(fmt0), pt)
         Next
         For i = 0 To queries.Count - 1
             Dim pt = New cv.Point2f(queries(i).X, queries(i).Y)
@@ -585,7 +585,7 @@ Public Class KNN_Dimension4 : Inherits TaskParent
             cv.Cv2.Circle(dst2, pt, task.DotSize, cv.Scalar.Red, -1, task.lineType)
             dist.inPoint2 = trainInput(i)
             dist.Run(src)
-            SetTrueText("dist=" + Format(dist.distance, fmt0), pt)
+            SetTrueText("dist=" + dist.distance.ToString(fmt0), pt)
         Next
         For i = 0 To queries.Count - 1
             Dim pt = New cv.Point2f(queries(i)(0), queries(i)(1))

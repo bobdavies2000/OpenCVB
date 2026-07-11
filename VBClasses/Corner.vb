@@ -34,7 +34,7 @@ Public Class Corner_Basics : Inherits TaskParent
                 features.Add(pt)
             Next
         End If
-        labels(2) = Format(features.Count, "000") + " identified FAST stable points - slider adjusts threshold"
+        labels(2) = features.Count.ToString("000") + " identified FAST stable points - slider adjusts threshold"
     End Sub
 End Class
 

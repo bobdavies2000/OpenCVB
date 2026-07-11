@@ -342,7 +342,7 @@ Public Class XR_Draw_ClipLine : Inherits TaskParent
         linenum += 1
 
         hitCount += If(clipped, 1, 0)
-        SetTrueText("There were " + Format(hitCount, "###,##0") + " intersects and " + Format(linenum - hitCount) + " misses",
+        SetTrueText("There were " + hitCount.ToString("###,##0") + " intersects and " + (linenum - hitCount).ToString() + " misses",
                          New cv.Point(src.Width / 2, 200))
         If r = rect Then setup()
         flow.Run(src)

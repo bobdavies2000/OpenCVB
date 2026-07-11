@@ -60,12 +60,12 @@ Public Class Derivative_Basics : Inherits TaskParent
 
         labels(2) = CStr(proximityCount) + " depth points were within " +
                             CStr(subD.options.mmThreshold * 1000) + " mm's of their neighbor or " +
-                            Format(proximityPercent, "0%")
+                            proximityPercent.ToString("0%")
 
         Dim proxDistance = 1000 * (bars * 2 + centerAdjust) * subD.options.mmThreshold * 2 /
                                    task.histogramBins
         labels(3) = "Of the " + CStr(proximityCount) + " depth points, " + CStr(nonz.Rows) +
-                            " were within " + Format(proxDistance, fmt1) + " mm's of their neighbor"
+                            " were within " + proxDistance.ToString(fmt1) + " mm's of their neighbor"
     End Sub
 End Class
 
@@ -139,7 +139,7 @@ Public Class Derivative_Sobel : Inherits TaskParent
         dst3.SetTo(white, mask)
         dst3.SetTo(0, task.noDepthMask)
         cv.Cv2.Rectangle(dst2, New cv.Rect(CInt(histIndex * barWidth), 0, barWidth, dst2.Height), cv.Scalar.Yellow, task.lineWidth)
-        Dim deriv = Format(options.derivativeRange, fmt2)
+        Dim deriv = options.derivativeRange.ToString(fmt2)
         labels(2) = "Histogram of first or second derivatives.  Range -" + deriv + " to " + deriv
         labels(3) = "Backprojection into the image for the selected histogram entry - move mouse over dst2."
     End Sub

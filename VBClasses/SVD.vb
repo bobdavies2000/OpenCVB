@@ -1,4 +1,4 @@
-Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
+﻿Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 ' https://answers.opencvb.org/question/200080/parameters-of-cvsvdecomp/
 Public Class XR_SVD_Example : Inherits TaskParent
     Public Sub New()
@@ -25,7 +25,7 @@ Public Class XR_SVD_Example : Inherits TaskParent
         strOut = ""
         For i = 0 To rec.Rows - 1
             For j = 0 To rec.Cols - 1
-                strOut += Format(rec.Get(Of Single)(i, j), fmt3) + ", "
+                strOut += rec.Get(Of Single)(i, j).ToString(fmt3) + ", "
             Next
             strOut += vbCrLf
         Next
@@ -71,7 +71,7 @@ Public Class XR_SVD_Example2 : Inherits TaskParent
             strOut = "The U Mat: " + vbCrLf
             For j = 0 To U.Rows - 1
                 For i = 0 To U.Cols - 1
-                    strOut += Format(U.Get(Of Single)(j, i), fmt3) + ", "
+                    strOut += U.Get(Of Single)(j, i).ToString(fmt3) + ", "
                 Next
                 strOut += vbCrLf
             Next
@@ -79,14 +79,14 @@ Public Class XR_SVD_Example2 : Inherits TaskParent
 
             strOut += "The tangent: " + vbCrLf
             For i = 0 To U.Cols - 1
-                strOut += Format(U.Get(Of Single)(0, i), fmt3) + ", "
+                strOut += U.Get(Of Single)(0, i).ToString(fmt3) + ", "
             Next
             strOut += vbCrLf
 
             Dim angle = Math.Atan2(U.Get(Of Single)(0, 1), U.Get(Of Single)(0, 0))
-            strOut += "Angle = " + Format(angle, fmt3) + " radians" + vbCrLf
+            strOut += "Angle = " + angle.ToString(fmt3) + " radians" + vbCrLf
 
-            strOut += "Center.X = " + Format(center.X, fmt2) + " Center.Y = " + Format(center.Y, fmt2) + vbCrLf
+            strOut += "Center.X = " + center.X.ToString(fmt2) + " Center.Y = " + center.Y.ToString(fmt2) + vbCrLf
 
             strOut += "Rect is at (" + CStr(rc.rect.X) + ", " + CStr(rc.rect.Y) + ") with width/height = " + CStr(rc.rect.Width) + "/" + CStr(rc.rect.Height) + vbCrLf
         End If
@@ -116,7 +116,7 @@ Public Class XR_SVD_Gaussian : Inherits TaskParent
         strOut = "The Covariance Mat: " + vbCrLf
         For j = 0 To covar.covariance.Rows - 1
             For i = 0 To covar.covariance.Cols - 1
-                strOut += Format(covar.covariance.Get(Of Double)(j, i), fmt3) + ", "
+                strOut += covar.covariance.Get(Of Double)(j, i).ToString(fmt3) + ", "
             Next
             strOut += vbCrLf
         Next
@@ -125,7 +125,7 @@ Public Class XR_SVD_Gaussian : Inherits TaskParent
         strOut += "The W Mat: " + vbCrLf
         For j = 0 To W.Rows - 1
             For i = 0 To W.Cols - 1
-                strOut += Format(W.Get(Of Double)(j, i), fmt3) + ", "
+                strOut += W.Get(Of Double)(j, i).ToString(fmt3) + ", "
             Next
             strOut += vbCrLf
         Next
@@ -134,14 +134,14 @@ Public Class XR_SVD_Gaussian : Inherits TaskParent
         strOut += "The U Mat: " + vbCrLf
         For j = 0 To U.Rows - 1
             For i = 0 To U.Cols - 1
-                strOut += Format(U.Get(Of Double)(j, i), fmt3) + ", "
+                strOut += U.Get(Of Double)(j, i).ToString(fmt3) + ", "
             Next
             strOut += vbCrLf
         Next
         strOut += vbCrLf
 
         Dim angle = -Math.Atan2(U.Get(Of Double)(0, 1), U.Get(Of Double)(0, 0)) * (180 / cv.Cv2.PI)
-        strOut += "Angle = " + Format(angle, fmt3) + " radians" + vbCrLf
+        strOut += "Angle = " + angle.ToString(fmt3) + " radians" + vbCrLf
 
         cv.Cv2.Sqrt(W, W)
         W *= 3

@@ -132,7 +132,7 @@ Public Class XR_Filter_NormalizedKernel : Inherits TaskParent
         For i = 0 To options.kernel.Width - 1
             sum += Math.Abs(options.kernel.Get(Of Single)(0, i))
         Next
-        labels(2) = "kernel sum = " + Format(sum, fmt3)
+        labels(2) = "kernel sum = " + sum.ToString(fmt3)
 
         Dim dst32f As New cv.Mat
         cv.Cv2.Filter2D(src, dst32f, cv.MatType.CV_32FC1, options.kernel, anchor:=New cv.Point(0, 0))

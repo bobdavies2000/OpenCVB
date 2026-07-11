@@ -1,4 +1,4 @@
-Imports System.Diagnostics.Metrics
+﻿Imports System.Diagnostics.Metrics
 Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 Public Class StableGray_BasicsMin : Inherits TaskParent
     Public Sub New()
@@ -187,7 +187,7 @@ Public Class StableGray_MinMaxCompare : Inherits TaskParent
         cv.Cv2.ConvertScaleAbs(dst2, dst2)
 
         Dim count = cv.Cv2.CountNonZero(dst2)
-        labels(2) = CStr(count) + " pixels or " + Format(count / src.Total, "0.0%") +
+        labels(2) = CStr(count) + " pixels or " + (count / src.Total).ToString("0.0%") +
                     " differ between min and max images. (Should be very high)"
     End Sub
 End Class
@@ -212,7 +212,7 @@ Public Class StableGray_MinMaxRange : Inherits TaskParent
 
         cv.Cv2.Absdiff(compare.dst1, compare.dst3, dst0)
         Dim average = cv.Cv2.Mean(dst0).Val0
-        labels(3) = Format(average, fmt2) + " average pixel difference between min and max stable gray."
+        labels(3) = average.ToString(fmt2) + " average pixel difference between min and max stable gray."
 
         plot.Run(dst0)
         dst2 = plot.dst2
@@ -245,7 +245,7 @@ Public Class StableGray_Measure : Inherits TaskParent
         If averageHistory.Count > 50 Then averageHistory.RemoveAt(0)
         averageMinimum = averageHistory.Min
         motionDecision = averageDiff >= averageMinimum + 0.1
-        labels(3) = "Motion decision: " + CStr(motionDecision) + " " + Format(averageDiff, fmt2) +
+        labels(3) = "Motion decision: " + CStr(motionDecision) + " " + averageDiff.ToString(fmt2) +
                     " average pixel difference gray to stable gray."
 
         plot.Run(dst0)
@@ -256,7 +256,7 @@ Public Class StableGray_Measure : Inherits TaskParent
         percentZero = 100 * plot.plotHist.histArray(0) / src.Total
         strOut = "Diff" + vbTab + "Count" + vbCrLf
         For i = 0 To plot.plotHist.histArray.Count - 1
-            strOut += CStr(i) + vbTab + Format(plot.plotHist.histArray(i), fmt0) + vbCrLf
+            strOut += CStr(i) + vbTab + plot.plotHist.histArray(i).ToString(fmt0) + vbCrLf
         Next
         SetTrueText(strOut, 1)
 
@@ -292,7 +292,7 @@ Public Class StableGray_MeasureOverTime : Inherits TaskParent
         plotAverage.Run(src)
         dst3 = plotAverage.dst2
 
-        labels(2) = "Percent of image identical at the pixel level = " + Format(motionStable.percentZero / 100, "0%")
+        labels(2) = "Percent of image identical at the pixel level = " + (motionStable.percentZero / 100).ToString("0%")
         labels(3) = motionStable.labels(3)
     End Sub
 End Class

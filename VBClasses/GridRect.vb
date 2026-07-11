@@ -34,7 +34,7 @@ Public Class GridRect_Basics : Inherits TaskParent
         Next
         If task.heartBeat Then
             labels(2) = CStr(rects.Count) + " of " + CStr(task.gridRects.Count) + " r's had above average standard deviation (average = " +
-                                Format(stdevList.Average, fmt1) + ")"
+                                stdevList.Average.ToString(fmt1) + ")"
         End If
 
         dst2 = ShowAddweighted(dst3, dst1, labels(2))
@@ -163,8 +163,8 @@ Public Class GridRect_Sorted : Inherits TaskParent
             dst3 = ShowAddweighted(_cvtGrid3, src, labels(3))
         End If
 
-        labels(3) = $"{count} roi's or " + Format(count / sortedStd.Count, "0%") + " have an average stdev sum of " +
-                        Format(avg, fmt1) + " or less"
+        labels(3) = $"{count} roi's or " + (count / sortedStd.Count).ToString("0%") + " have an average stdev sum of " +
+                        avg.ToString(fmt1) + " or less"
     End Sub
 End Class
 
@@ -229,7 +229,7 @@ Public Class XR_GridRect_CorrelationMotion : Inherits TaskParent
             If gather.stdevList(i) >= gather.stdevAverage Then
                 cv.Cv2.MatchTemplate(dst1(r), lastImage(r), correlationMat, cv.TemplateMatchModes.CCoeffNormed)
                 Dim corr = correlationMat.Get(Of Single)(0, 0)
-                If corr < task.fCorrThreshold Then SetTrueText(Format(corr, fmt1), r.TopLeft)
+                If corr < task.fCorrThreshold Then SetTrueText(corr.ToString(fmt1), r.TopLeft)
                 If corr < task.fCorrThreshold Then motionCount += 1
             End If
         Next
@@ -265,11 +265,11 @@ Public Class GridRect_LowStdev : Inherits TaskParent
             Dim r = task.gridRects(i)
             If gather.stdevList(i) < gather.stdevAverage Then
                 rects.Add(r)
-                SetTrueText(Format(gather.stdevList(i), fmt1), r.TopLeft, 3)
+                SetTrueText(gather.stdevList(i).ToString(fmt1), r.TopLeft, 3)
             End If
         Next
         labels = {"", "", CStr(task.gridRects.Count - gather.rects.Count) + " r's had low standard deviation",
-                                             "Stdev average = " + Format(gather.stdevList.Average, fmt1)}
+                                             "Stdev average = " + gather.stdevList.Average.ToString(fmt1)}
     End Sub
 End Class
 
@@ -316,8 +316,8 @@ Public Class XR_GridRect_LowStdevCorrelation : Inherits TaskParent
             Next
         End If
         For i = 0 To saveRects.Count - 1
-            If saveCorrs(i) < task.fCorrThreshold Then SetTrueText(Format(saveCorrs(i), fmt2), saveRects(i).TopLeft)
-            If saveCorrs(i) < task.fCorrThreshold Then SetTrueText(Format(saveStdev(i), fmt2), saveRects(i).TopLeft, 3)
+            If saveCorrs(i) < task.fCorrThreshold Then SetTrueText(saveCorrs(i).ToString(fmt2), saveRects(i).TopLeft)
+            If saveCorrs(i) < task.fCorrThreshold Then SetTrueText(saveStdev(i).ToString(fmt2), saveRects(i).TopLeft, 3)
         Next
 
         lastImage = dst1.Clone
@@ -401,17 +401,17 @@ Public Class XR_GridRect_LRClick : Inherits TaskParent
         Else
             Dim maxCorr = corr.Max
             If maxCorr < task.fCorrThreshold Then
-                SetTrueText("Correlation " + Format(maxCorr, fmt3) + " is less than " + Format(task.fCorrThreshold, fmt1), 1)
+                SetTrueText("Correlation " + maxCorr.ToString(fmt3) + " is less than " + task.fCorrThreshold.ToString(fmt1), 1)
             Else
                 Dim index = corr.IndexOf(maxCorr)
                 Dim rectRight = New cv.Rect(index, r.Y, r.Width, r.Height)
                 Dim offset = r.X - rectRight.X
                 If task.heartBeat Then
-                    strOut = "CoeffNormed max correlation = " + Format(maxCorr, fmt3) + vbCrLf
-                    strOut += "Left Mean = " + Format(gather.meanList(gridIndex), fmt3) + " Left stdev = " + Format(gather.stdevList(gridIndex), fmt3) + vbCrLf
+                    strOut = "CoeffNormed max correlation = " + maxCorr.ToString(fmt3) + vbCrLf
+                    strOut += "Left Mean = " + gather.meanList(gridIndex).ToString(fmt3) + " Left stdev = " + gather.stdevList(gridIndex).ToString(fmt3) + vbCrLf
                     Dim mean As cv.Scalar, stdev As cv.Scalar
                     cv.Cv2.MeanStdDev(dst3(rectRight), mean, stdev)
-                    strOut += "Right Mean = " + Format(mean(0), fmt3) + " Right stdev = " + Format(stdev(0), fmt3) + vbCrLf
+                    strOut += "Right Mean = " + mean(0).ToString(fmt3) + " Right stdev = " + stdev(0).ToString(fmt3) + vbCrLf
                     strOut += "Right rectangle is offset " + CStr(offset) + " pixels from the left image rectangle"
                 End If
                 cv.Cv2.Rectangle(dst3, rectRight, task.highlight, task.lineWidth)
@@ -423,7 +423,7 @@ cv.Cv2.Rectangle(dst0, r, task.highlight, task.lineWidth)
                 SetTrueText(CStr(offset) + " pixel offset" + vbCrLf + "Larger = Right", pt, 1)
                 SetTrueText(strOut, 1)
                 labels(3) = "Corresponding grid square highlighted in yellow.  Average stdev = " +
-                                    Format(gather.stdevAverage, fmt3)
+                                    gather.stdevAverage.ToString(fmt3)
             End If
         End If
     End Sub
@@ -466,7 +466,7 @@ Public Class XR_GridRect_LRAll : Inherits TaskParent
             Dim mm = vbc.GetMinMax(correlationMat)
             If mm.maxVal >= task.fCorrThreshold Then sortedRects.Add(mm.maxVal, New cv.Rect(mm.maxLoc.X, roi.Y, roi.Width, roi.Height))
         Next
-        labels(2) = CStr(sortedRects.Count) + " roi's had left/right correlation higher than " + Format(task.fCorrThreshold, fmt3)
+        labels(2) = CStr(sortedRects.Count) + " roi's had left/right correlation higher than " + task.fCorrThreshold.ToString(fmt3)
 
         For Each roi In sortedRects.Values
         cv.Cv2.Rectangle(dst3, roi, task.highlight, task.lineWidth)

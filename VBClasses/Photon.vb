@@ -1,4 +1,4 @@
-Imports System.Windows.Forms.Design.AxImporter
+﻿Imports System.Windows.Forms.Design.AxImporter
 Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 'https://security.stackexchange.com/questions/42428/Is-generating-random-numbers-using-a-smartphone-camera-a-good-idea
 Public Class Photon_Basics : Inherits TaskParent
@@ -58,8 +58,8 @@ Public Class XR_Photon_Test : Inherits TaskParent
             cv.Cv2.InRange(dst1, reductionVal * i, reductionVal * i, mats.mat(i))
             counts(i).Add(cv.Cv2.CountNonZero(mats.mat(i)))
             If counts(i).Count > testCount Then counts(i).RemoveAt(0)
-            strOut += "for " + CStr(i * reductionVal) + " average = " + Format(counts(i).Average, "###,##0") + " min = " +
-                               Format(counts(i).Min, "###,##0.0") + " max = " + Format(counts(i).Max, "###,##0.0") + vbCrLf
+            strOut += "for " + CStr(i * reductionVal) + " average = " + counts(i).Average.ToString("###,##0") + " min = " +
+                               counts(i).Min.ToString("###,##0.0") + " max = " + counts(i).Max.ToString("###,##0.0") + vbCrLf
         Next
         SetTrueText(strOut, 3)
         mats.Run(emptyMat)
@@ -148,10 +148,10 @@ Public Class XR_Photon_Distance3D : Inherits TaskParent
         Next
 
         lastColors = New List(Of cv.Vec3b)(currColors)
-        labels(2) = "Min distance 3D = " + Format(distances.Min, fmt1) + " " +
-                        "Average = " + Format(distances.Average, fmt1) + " " +
-                        "max = " + Format(distances.Max, fmt1) + " " +
-                        "Distances count = " + Format(distances.Count, "0,000")
+        labels(2) = "Min distance 3D = " + distances.Min.ToString(fmt1) + " " +
+                        "Average = " + distances.Average.ToString(fmt1) + " " +
+                        "max = " + distances.Max.ToString(fmt1) + " " +
+                        "Distances count = " + distances.Count.ToString("0,000")
 
         hist.Run(cv.Mat.FromPixelData(distances.Count, 1, cv.MatType.CV_32F, distances.ToArray))
         dst2 = hist.dst2

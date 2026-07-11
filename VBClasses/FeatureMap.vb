@@ -433,9 +433,9 @@ Public Class FeatureMap_Info : Inherits TaskParent
             strOut += "brickIndex = " + CStr(fp.brickIndex) + vbCrLf
             Dim brick = bricks.brickList(fp.brickIndex)
             strOut += CStr(brick.age) + vbTab + "Age" + vbTab + vbCrLf
-            strOut += Format(brick.correlation, fmt3) + vbTab + "Correlation to right image" + vbCrLf
+            strOut += brick.correlation.ToString(fmt3) + vbTab + "Correlation to right image" + vbCrLf
 
-            strOut += "Depth = " + Format(fp.depth, fmt1)
+            strOut += "Depth = " + fp.depth.ToString(fmt1)
             strOut += vbCrLf
             strOut += "Index " + vbTab + "Facet X" + vbTab + "Facet Y" + vbCrLf
             For i = 0 To fp.facets.Count - 1
@@ -553,7 +553,7 @@ Public Class XR_FeatureMap_ByDepth : Inherits TaskParent
             If frame = removeFrame Then fpCells.RemoveAt(i)
         Next
 
-        labels(3) = "Cells with depth between " + Format(depthStart, fmt1) + "m to " + Format(depthEnd, fmt1) + "m"
+        labels(3) = "Cells with depth between " + depthStart.ToString(fmt1) + "m to " + depthEnd.ToString(fmt1) + "m"
     End Sub
 End Class
 
@@ -723,9 +723,9 @@ Public Class FeatureMap_Motion : Inherits TaskParent
         motionPercent = 100 * motionCount / linkedCount
         If task.heartBeat Then
             labels(2) = fcs.labels(2)
-            labels(3) = Format(motionPercent, fmt1) + "% of linked cells had motion or " +
+            labels(3) = motionPercent.ToString(fmt1) + "% of linked cells had motion or " +
                             CStr(motionCount) + " of " + CStr(linkedCount) + ".  Distance moved X/Y " +
-                            Format(xDist.Average, fmt1) + "/" + Format(yDist.Average, fmt1) +
+                            xDist.Average.ToString(fmt1) + "/" + yDist.Average.ToString(fmt1) +
                             " pixels."
         End If
 
@@ -803,7 +803,7 @@ Public Class FeatureMap_CreateList : Inherits TaskParent
         Next
 
         If standalone And task.fpD IsNot Nothing Then FeatureMap_Basics.fpCellContour(task.fpD, task.color)
-        If task.heartBeat Then labels(2) = traceName + ": " + Format(feat.features.Count, "000") + " cells found " +
+        If task.heartBeat Then labels(2) = traceName + ": " + feat.features.Count.ToString("000") + " cells found " +
                                            "using " + task.fOptions.FeatureMethod.Text
     End Sub
 End Class

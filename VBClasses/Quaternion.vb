@@ -1,4 +1,4 @@
-Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
+﻿Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 Imports System.Numerics
 Public Class Quaternion_Basics : Inherits TaskParent
     Dim options As New Options_Quaternion
@@ -55,29 +55,29 @@ Public Class Quaternion_IMUPrediction : Inherits TaskParent
         Dim diffq = Quaternion.Subtract(task.IMU_Rotation, predictedRotation)
 
         SetTrueText("IMU_Acceleration = " + vbTab +
-                                     Format(task.IMU_Acceleration.X, fmt3) + vbTab +
-                                     Format(task.IMU_Acceleration.Y, fmt3) + vbTab +
-                                     Format(task.IMU_Acceleration.Z, fmt3) + vbTab + vbCrLf +
+                                     task.IMU_Acceleration.X.ToString(fmt3) + vbTab +
+                                     task.IMU_Acceleration.Y.ToString(fmt3) + vbTab +
+                                     task.IMU_Acceleration.Z.ToString(fmt3) + vbTab + vbCrLf +
                         "IMU_AngularAccel. = " + vbTab +
-                                     Format(task.IMU_AngularAcceleration.X, fmt3) + vbTab +
-                                     Format(task.IMU_AngularAcceleration.Y, fmt3) + vbTab +
-                                     Format(task.IMU_AngularAcceleration.Z, fmt3) + vbTab + vbCrLf +
+                                     task.IMU_AngularAcceleration.X.ToString(fmt3) + vbTab +
+                                     task.IMU_AngularAcceleration.Y.ToString(fmt3) + vbTab +
+                                     task.IMU_AngularAcceleration.Z.ToString(fmt3) + vbTab + vbCrLf +
                         "IMU_AngularVelocity = " + vbTab +
-                                     Format(task.IMU_AngularVelocity.X, fmt3) + vbTab +
-                                     Format(task.IMU_AngularVelocity.Y, fmt3) + vbTab +
-                                     Format(task.IMU_AngularVelocity.Z, fmt3) + vbTab + vbCrLf + vbCrLf +
+                                     task.IMU_AngularVelocity.X.ToString(fmt3) + vbTab +
+                                     task.IMU_AngularVelocity.Y.ToString(fmt3) + vbTab +
+                                     task.IMU_AngularVelocity.Z.ToString(fmt3) + vbTab + vbCrLf + vbCrLf +
                         "dt = " + dt.ToString() + vbCrLf + vbCrLf +
                         "Pose quaternion = " + vbTab +
-                                     Format(task.IMU_Rotation.X, fmt3) + vbTab +
-                                     Format(task.IMU_Rotation.Y, fmt3) + vbTab +
-                                     Format(task.IMU_Rotation.Z, fmt3) + vbTab + vbCrLf +
+                                     task.IMU_Rotation.X.ToString(fmt3) + vbTab +
+                                     task.IMU_Rotation.Y.ToString(fmt3) + vbTab +
+                                     task.IMU_Rotation.Z.ToString(fmt3) + vbTab + vbCrLf +
                         "Prediction Rotation = " + vbTab +
-                                     Format(predictedRotation.X, fmt3) + vbTab +
-                                     Format(predictedRotation.Y, fmt3) + vbTab +
-                                     Format(predictedRotation.Z, fmt3) + vbTab + vbCrLf +
+                                     predictedRotation.X.ToString(fmt3) + vbTab +
+                                     predictedRotation.Y.ToString(fmt3) + vbTab +
+                                     predictedRotation.Z.ToString(fmt3) + vbTab + vbCrLf +
                         "difference = " + vbTab + vbTab +
-                                     Format(diffq.X, fmt3) + vbTab +
-                                     Format(diffq.Y, fmt3) + vbTab +
-                                     Format(diffq.Z, fmt3) + vbTab)
+                                     diffq.X.ToString(fmt3) + vbTab +
+                                     diffq.Y.ToString(fmt3) + vbTab +
+                                     diffq.Z.ToString(fmt3) + vbTab)
     End Sub
 End Class

@@ -1,4 +1,4 @@
-Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
+﻿Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 Public Module Structures
     Public Enum pointStyle
         unFiltered = 0
@@ -272,8 +272,8 @@ Public Module Structures
             strOut += "Age = " + CStr(age) + vbCrLf
             strOut += "Rect: X = " + CStr(rect.X) + ", Y = " + CStr(rect.Y) + ", "
             strOut += ", width = " + CStr(rect.Width) + ", height = " + CStr(rect.Height) + vbCrLf
-            strOut += "Depth = " + Format(depth, fmt1) + vbCrLf
-            strOut += "Correlation = " + Format(correlation, fmt1) + vbCrLf
+            strOut += "Depth = " + depth.ToString(fmt1) + vbCrLf
+            strOut += "Correlation = " + correlation.ToString(fmt1) + vbCrLf
             Return strOut
         End Function
         Sub New()
@@ -555,12 +555,12 @@ Public Module Structures
         Public Function lpDisplay(ByRef dst As cv.Mat) As String
             Dim strOut = "rcList index = " + CStr(index) + vbCrLf
             strOut += "Age = " + CStr(task.lpD.age) + vbCrLf
-            strOut += "Angle = " + Format(angle, fmt1) + vbCrLf
-            strOut += "Length (pixels) = " + Format(task.lpD.length, fmt1) + " index = " + CStr(task.lpD.index) + vbCrLf
+            strOut += "Angle = " + angle.ToString(fmt1) + vbCrLf
+            strOut += "Length (pixels) = " + task.lpD.length.ToString(fmt1) + " index = " + CStr(task.lpD.index) + vbCrLf
 
             strOut += "p1 = " + task.lpD.p1.ToString + ", p2 = " + task.lpD.p2.ToString + vbCrLf
             strOut += "ptE1 = " + task.lpD.ptE1.ToString + ", ptE2 = " + task.lpD.ptE2.ToString + vbCrLf + vbCrLf
-            strOut += "Slope = " + Format(task.lpD.slope, fmt3) + vbCrLf
+            strOut += "Slope = " + task.lpD.slope.ToString(fmt3) + vbCrLf
             strOut += vbCrLf + "NOTE: the Y-Axis is inverted - Y increases down so slopes are inverted." + vbCrLf + vbCrLf
             Return strOut
         End Function
@@ -651,7 +651,7 @@ Public Module Structures
                 strout += "Contour count = " + CStr(contour.Count) + vbCrLf
             End If
             If Single.IsNaN(depthDelta) = False Then
-                strout += "DepthDelta (mm's) = " + Format(CInt(depthDelta * 1000), "00") + vbCrLf
+                strout += "DepthDelta (mm's) = " + CInt(depthDelta * 1000).ToString("00") + vbCrLf
                 strout += "Hull count = " + If(hull Is Nothing, "0", CStr(hull.Count)) + vbCrLf
                 strout += "mapID = " + CStr(mapID) + vbCrLf
                 strout += "index = " + CStr(index) + vbCrLf
@@ -660,9 +660,9 @@ Public Module Structures
                 strout += "Pixel count = " + CStr(pixels) + vbCrLf
                 strout += "Rect: X = " + CStr(rect.X) + ", Y = " + CStr(rect.Y) + ", "
                 strout += "width = " + CStr(rect.Width) + ", height = " + CStr(rect.Height) + vbCrLf
-                strout += "World Coordinates = " + Format(wcMean(0), fmt3) + " " +
-                                                   Format(wcMean(1), fmt3) + " " +
-                                                   Format(wcMean(2), fmt3) + vbCrLf
+                strout += "World Coordinates = " + wcMean(0).ToString(fmt3) + " " +
+                                                   wcMean(1).ToString(fmt3) + " " +
+                                                   wcMean(2).ToString(fmt3) + vbCrLf
                 strout += "World Grid coordinates = " + CStr(wGrid.X) + ", " + CStr(wGrid.Y) + vbCrLf
                 strout += "ClickPoint = " + CStr(task.clickPoint.X) + ", " + CStr(task.clickPoint.Y) + vbCrLf
             Else
@@ -727,7 +727,7 @@ Public Module Structures
                 strout += "Contour count = " + CStr(contour.Count) + vbCrLf
             End If
             strout += "mapID = " + CStr(mapID) + vbCrLf
-            strout += "depth = " + Format(depth, fmt1) + vbCrLf
+            strout += "depth = " + depth.ToString(fmt1) + vbCrLf
             strout += "index = " + CStr(index) + vbCrLf
             strout += "MaxDist = " + CStr(maxDist.X) + ", " + CStr(maxDist.Y) + vbCrLf
             strout += "Pixel count = " + CStr(pixels) + vbCrLf

@@ -150,7 +150,7 @@ Public Class AlgorithmTask : Implements IDisposable
             If gifCreator.gifC.options.buildCheck.Checked Then
                 gifCreator.gifC.options.buildCheck.Checked = False
                 For i = 0 To gifImages.Count - 1
-                    Dim fileName As New FileInfo(task.homeDir + "Temp/image" + Format(i, "000") + ".bmp")
+                    Dim fileName As New FileInfo(task.homeDir + "Temp/image" + i.ToString("000") + ".bmp")
                     gifImages(i).Save(fileName.FullName)
                 Next
 

@@ -38,7 +38,7 @@ Public Class Foreground_Basics_TA : Inherits TaskParent
         task.foregroundMask.SetTo(0, task.noDepthMask)
 
         If standaloneTest() Then dst3 = task.foregroundMask
-        labels(2) = "Foreground is defined as anything closer that " + Format(foregroundMaxDepth, fmt1) + " meters"
+        labels(2) = "Foreground is defined as anything closer that " + foregroundMaxDepth.ToString(fmt1) + " meters"
     End Sub
 End Class
 

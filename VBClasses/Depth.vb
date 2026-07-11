@@ -54,10 +54,10 @@ Public Class XR_Depth_FirstLastDistance : Inherits TaskParent
         task.depthRGB.CopyTo(dst2)
 
         If task.heartBeat Then dst3.SetTo(0)
-        labels(2) = "Min Depth " + Format(mm.minVal, fmt1) + "m"
+        labels(2) = "Min Depth " + mm.minVal.ToString(fmt1) + "m"
         identifyMinMax(mm.minLoc, labels(2))
 
-        labels(3) = "Max Depth " + Format(mm.maxVal, fmt1) + "m"
+        labels(3) = "Max Depth " + mm.maxVal.ToString(fmt1) + "m"
         identifyMinMax(mm.maxLoc, labels(3))
     End Sub
 End Class
@@ -121,8 +121,8 @@ Public Class XR_Depth_MeanStdevPlot : Inherits TaskParent
         plot2.Run(src)
         dst3 = plot2.dst2
 
-        labels(2) = "Plot of mean depth = " + Format(mean(0), fmt1) + " min = " + Format(plot1.min, fmt2) + " max = " + Format(plot1.max, fmt2)
-        labels(3) = "Plot of depth stdev = " + Format(stdev(0), fmt1) + " min = " + Format(plot2.min, fmt2) + " max = " + Format(plot2.max, fmt2)
+        labels(2) = "Plot of mean depth = " + mean(0).ToString(fmt1) + " min = " + plot1.min.ToString(fmt2) + " max = " + plot1.max.ToString(fmt2)
+        labels(3) = "Plot of depth stdev = " + stdev(0).ToString(fmt1) + " min = " + plot2.min.ToString(fmt2) + " max = " + plot2.max.ToString(fmt2)
     End Sub
 End Class
 
@@ -236,12 +236,12 @@ Public Class XR_Depth_Median : Inherits TaskParent
 
         dst2.SetTo(0, task.noDepthMask)
 
-        labels(2) = "Median Depth < " + Format(median.medianVal, fmt1)
+        labels(2) = "Median Depth < " + median.medianVal.ToString(fmt1)
 
         dst3.SetTo(0)
         task.depthRGB.CopyTo(dst3, Not mask)
         dst3.SetTo(0, task.noDepthMask)
-        labels(3) = "Median Depth > " + Format(median.medianVal, fmt1)
+        labels(3) = "Median Depth > " + median.medianVal.ToString(fmt1)
     End Sub
 End Class
 
@@ -593,7 +593,7 @@ Public Class XR_Depth_ForegroundBlob : Inherits TaskParent
             cv.Cv2.FloodFill(dst3, blobLocation(maxIndex), 250)
             cv.Cv2.InRange(dst3, 250, 250, dst2)
             dst2.SetTo(0, task.noDepthMask)
-            labels(3) = "Mask of all depth pixels < " + Format(options.maxForegroundDepthInMeters, "0.0") + "m"
+            labels(3) = "Mask of all depth pixels < " + options.maxForegroundDepthInMeters.ToString("0.0") + "m"
         End If
     End Sub
 End Class
@@ -683,7 +683,7 @@ Public Class Depth_InRange : Inherits TaskParent
         dst0.SetTo(white, dst3)
 
         If standaloneTest() Then dst2 = Palettize(dst2)
-        labels(2) = Format(classCount, "000") + " regions were found"
+        labels(2) = classCount.ToString("000") + " regions were found"
     End Sub
 End Class
 
@@ -1126,9 +1126,9 @@ Public Class XR_Depth_ErrorEstimate : Inherits TaskParent
         Dim mm = GetMinMax(dst1)
         dst2 = Palettize(dst1)
         ' dst2.SetTo(0, task.noDepthMask)
-        labels(3) = "Error estimates vary from " + Format(mm.minVal, fmt3) + " to " + Format(mm.maxVal, fmt3)
+        labels(3) = "Error estimates vary from " + mm.minVal.ToString(fmt3) + " to " + mm.maxVal.ToString(fmt3)
         If task.brickD Is Nothing Then Exit Sub
-        SetTrueText(Format(ErrorEstimate(task.brickD.depth), fmt3) + " estimated error" + vbCrLf + Format(task.brickD.depth, fmt3) + "m",
+        SetTrueText(ErrorEstimate(task.brickD.depth).ToString(fmt3) + " estimated error" + vbCrLf + task.brickD.depth.ToString(fmt3) + "m",
                         task.mouseMovePoint, 3)
     End Sub
 End Class
@@ -1455,7 +1455,7 @@ Public Class Depth_Tiers : Inherits TaskParent
             cv.Cv2.CalcBackProject({src}, {0}, histogram, dst1, ranges)
             dst1.ConvertTo(dst2, cv.MatType.CV_8U)
             dst3 = Palettize(dst2)
-            labels(3) = "Depth range: 0.1 to " + Format(task.MaxZmeters, fmt3)
+            labels(3) = "Depth range: 0.1 to " + task.MaxZmeters.ToString(fmt3)
         End If
     End Sub
 End Class

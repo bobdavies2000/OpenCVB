@@ -1,4 +1,4 @@
-Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
+﻿Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 Imports VBClasses
 Public Class Structured_Basics : Inherits TaskParent
     Public lpListX As New List(Of lpData)
@@ -223,7 +223,7 @@ Public Class XR_Structured_SliceXPlot : Inherits TaskParent
             dst2.SetTo(white, depthMask)
         End If
 
-        labels(3) = "Peak histogram count (" + Format(mm.maxVal, fmt0) + ") at " + Format(filterZ, fmt2) + " meters +-" + Format(5 / dst2.Height / task.MaxZmeters, fmt2) + " m"
+        labels(3) = "Peak histogram count (" + mm.maxVal.ToString(fmt0) + ") at " + filterZ.ToString(fmt2) + " meters +-" + (5 / dst2.Height / task.MaxZmeters).ToString(fmt2) + " m"
         SetTrueText("Use the mouse to move the yellow dot above.", New cv.Point(10, dst2.Height * 7 / 8), 3)
     End Sub
 End Class
@@ -263,7 +263,7 @@ Public Class XR_Structured_SliceYPlot : Inherits TaskParent
             dst2 = task.color.Clone
             dst2.SetTo(white, depthMask)
             Dim pixelsPerMeter = dst2.Width / task.MaxZmeters
-            labels(3) = "Peak histogram count (" + Format(mm.maxVal, fmt0) + ") at " + Format(filterZ, fmt2) + " meters +-" + Format(5 / pixelsPerMeter, fmt2) + " m"
+            labels(3) = "Peak histogram count (" + mm.maxVal.ToString(fmt0) + ") at " + filterZ.ToString(fmt2) + " meters +-" + (5 / pixelsPerMeter).ToString(fmt2) + " m"
         End If
         SetTrueText("Use the mouse to move the yellow dot above.", New cv.Point(10, dst2.Height * 7 / 8), 3)
     End Sub
@@ -308,8 +308,8 @@ Public Class Structured_SliceEither : Inherits TaskParent
 
         If minVal < 0 And maxVal > 0 Then sliceMask.SetTo(0, task.noDepthMask)
 
-        labels(2) = "At offset " + CStr(sliceVal) + " x = " + Format((maxVal + minVal) / 2, fmt2) + " with " +
-                     Format(Math.Abs(maxVal - minVal) * 100, fmt2) + " cm width"
+        labels(2) = "At offset " + CStr(sliceVal) + " x = " + ((maxVal + minVal) / 2).ToString(fmt2) + " with " +
+                     (Math.Abs(maxVal - minVal) * 100).ToString(fmt2) + " cm width"
 
         labels(3) = heat.labels(3)
 
@@ -361,8 +361,8 @@ Public Class XR_Structured_TransformH : Inherits TaskParent
         Dim maxVal = planeY + thicknessMeters
         cv.Cv2.InRange(task.pcSplit(1), minVal, maxVal, sliceMask)
 
-        labels(2) = "At offset " + CStr(ycoordinate) + " y = " + Format((maxVal + minVal) / 2, fmt2) + " with " +
-                        Format(Math.Abs(maxVal - minVal) * 100, fmt2) + " cm width"
+        labels(2) = "At offset " + CStr(ycoordinate) + " y = " + ((maxVal + minVal) / 2).ToString(fmt2) + " with " +
+                        (Math.Abs(maxVal - minVal) * 100).ToString(fmt2) + " cm width"
         If minVal < 0 And maxVal > 0 Then sliceMask.SetTo(0, task.noDepthMask)
 
         Return sliceMask
@@ -407,8 +407,8 @@ Public Class XR_Structured_TransformV : Inherits TaskParent
         Dim maxVal = planeX + thicknessMeters
         cv.Cv2.InRange(task.pcSplit(0), minVal, maxVal, sliceMask)
 
-        labels(2) = "At offset " + CStr(xCoordinate) + " x = " + Format((maxVal + minVal) / 2, fmt2) + " with " +
-                        Format(Math.Abs(maxVal - minVal) * 100, fmt2) + " cm width"
+        labels(2) = "At offset " + CStr(xCoordinate) + " x = " + ((maxVal + minVal) / 2).ToString(fmt2) + " with " +
+                        (Math.Abs(maxVal - minVal) * 100).ToString(fmt2) + " cm width"
 
         If minVal < 0 And maxVal > 0 Then sliceMask.SetTo(0, task.noDepthMask)
 
@@ -476,7 +476,7 @@ Public Class XR_Structured_CountSide : Inherits TaskParent
         cv.Cv2.Resize(dst3, dst3, New cv.Size(dst2.Width, dst2.Width))
         rotate.Run(dst3)
         dst3 = rotate.dst2
-        SetTrueText("Max flat surface at: " + vbCrLf + Format(yValues(maxCountIndex), fmt3), 2)
+        SetTrueText("Max flat surface at: " + vbCrLf + yValues(maxCountIndex).ToString(fmt3), 2)
     End Sub
 End Class
 
@@ -522,7 +522,7 @@ Public Class XR_Structured_CountSideSum : Inherits TaskParent
         If task.heartBeat Then
             strOut = "Flat surface at: "
             For i = 0 To surfaces.Count - 1
-                strOut += Format(surfaces(i), fmt3) + ", "
+                strOut += surfaces(i).ToString(fmt3) + ", "
                 If i Mod 10 = 0 And i > 0 Then strOut += vbCrLf
             Next
         End If
@@ -569,8 +569,8 @@ Public Class Structured_SliceV : Inherits TaskParent
         cv.Cv2.InRange(task.pcSplit(0), minVal, maxVal, sliceMask)
         If minVal < 0 And maxVal > 0 Then sliceMask.SetTo(0, task.noDepthMask)
 
-        labels(2) = "At offset " + CStr(xCoordinate) + " x = " + Format((maxVal + minVal) / 2, fmt2) +
-                        " with " + Format(Math.Abs(maxVal - minVal) * 100, fmt2) + " cm width"
+        labels(2) = "At offset " + CStr(xCoordinate) + " x = " + ((maxVal + minVal) / 2).ToString(fmt2) +
+                        " with " + (Math.Abs(maxVal - minVal) * 100).ToString(fmt2) + " cm width"
 
         labels(3) = heat.labels(3)
 
@@ -613,8 +613,8 @@ Public Class Structured_SliceH : Inherits TaskParent
         Dim maxVal = sliceY + thicknessMeters
         cv.Cv2.InRange(task.pcSplit(1), minVal, maxVal, sliceMask)
 
-        labels(2) = "At offset " + CStr(ycoordinate) + " y = " + Format((maxVal + minVal) / 2, fmt2) +
-                        " with " + Format(Math.Abs(maxVal - minVal) * 100, fmt2) + " cm width"
+        labels(2) = "At offset " + CStr(ycoordinate) + " y = " + ((maxVal + minVal) / 2).ToString(fmt2) +
+                        " with " + (Math.Abs(maxVal - minVal) * 100).ToString(fmt2) + " cm width"
         If minVal <= 0 And maxVal >= 0 Then sliceMask.SetTo(0, task.noDepthMask)
         labels(3) = heat.labels(2)
 

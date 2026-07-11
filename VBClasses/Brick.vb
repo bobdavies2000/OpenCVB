@@ -168,13 +168,13 @@ Public Class XR_Brick_CorrelationInput : Inherits TaskParent
         Dim corr = task.brickD.correlation
         cv.Cv2.Circle(dst2, task.brickD.lRect.TopLeft, task.DotSize, 255, -1, task.lineType)
         Dim pt = New cv.Point(task.brickD.rect.X, task.brickD.rect.Y - 10)
-        SetTrueText("Corr. " + Format(corr, fmt3) + vbCrLf, pt, 2)
-        labels(3) = "Correlation of the left grid square to the right is " + Format(corr, fmt3)
+        SetTrueText("Corr. " + corr.ToString(fmt3) + vbCrLf, pt, 2)
+        labels(3) = "Correlation of the left grid square to the right is " + corr.ToString(fmt3)
 
         Dim grayScale As Integer = 128
         DrawRect(dst2, task.brickD.lRect, grayScale)
         DrawRect(dst3, task.brickD.rRect, grayScale)
-        labels(2) = "The correlation coefficient at " + task.brickD.rect.TopLeft.ToString + " is " + Format(corr, fmt3)
+        labels(2) = "The correlation coefficient at " + task.brickD.rect.TopLeft.ToString + " is " + corr.ToString(fmt3)
     End Sub
 End Class
 
@@ -202,11 +202,11 @@ cv.Cv2.Rectangle(dst2, brick.rect, task.highlight, task.lineWidth)
 
         strOut += CStr(index) + vbTab + "Grid ID" + vbCrLf
         strOut += CStr(brick.age) + vbTab + "Age" + vbTab + vbCrLf
-        strOut += Format(brick.correlation, fmt3) + vbTab + "Correlation of the left image to right image" + vbCrLf
-        strOut += Format(brick.depth, fmt3) + vbTab + "Depth" + vbCrLf
-        strOut += Format(brick.mm.minVal, fmt3) + vbTab + "Depth mm.minval" + vbCrLf
-        strOut += Format(brick.mm.maxVal, fmt3) + vbTab + "Depth mm.maxval" + vbCrLf
-        strOut += Format(brick.mm.range, fmt3) + vbTab + "Depth mm.range" + vbCrLf
+        strOut += brick.correlation.ToString(fmt3) + vbTab + "Correlation of the left image to right image" + vbCrLf
+        strOut += brick.depth.ToString(fmt3) + vbTab + "Depth" + vbCrLf
+        strOut += brick.mm.minVal.ToString(fmt3) + vbTab + "Depth mm.minval" + vbCrLf
+        strOut += brick.mm.maxVal.ToString(fmt3) + vbTab + "Depth mm.maxval" + vbCrLf
+        strOut += brick.mm.range.ToString(fmt3) + vbTab + "Depth mm.range" + vbCrLf
 
         SetTrueText(strOut, 3)
     End Sub
@@ -609,12 +609,12 @@ Public Class XR_Brick_CorrelationMap : Inherits TaskParent
         If pt.X >= 0 And pt.X < w And pt.Y >= 0 And pt.Y < h Then
             Dim index As Integer = task.gridMap.Get(Of Integer)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
             task.brickD = bricks.brickList(index)
-            task.depthAndDepthRange = "depth = " + Format(task.brickD.depth, fmt3) + "m ID=" +
+            task.depthAndDepthRange = "depth = " + task.brickD.depth.ToString(fmt3) + "m ID=" +
                                           CStr(task.brickD.index) + vbCrLf + " range " +
-                                          Format(task.brickD.mm.minVal, fmt1) + "-" +
-                                          Format(task.brickD.mm.maxVal, fmt1) + "m, age = " +
+                                          task.brickD.mm.minVal.ToString(fmt1) + "-" +
+                                          task.brickD.mm.maxVal.ToString(fmt1) + "m, age = " +
                                           CStr(task.brickD.age) + vbCrLf +
-                                          " correlation = " + Format(task.brickD.correlation, fmt3)
+                                          " correlation = " + task.brickD.correlation.ToString(fmt3)
 
             Dim ptTextLoc = task.brickD.rect.TopLeft
             If ptTextLoc.X > w * 0.85 Or (ptTextLoc.Y < h * 0.15 And ptTextLoc.X > w * 0.15) Then
@@ -927,7 +927,7 @@ Public Class Brick_Variability : Inherits TaskParent
             Next
 
             lastDepthList = New List(Of Single)(depthList)
-            labels(3) = CStr(depthJumpers.Count) + " grid squares had depth variability > " + Format(options.meters, fmt3) + " meters"
+            labels(3) = CStr(depthJumpers.Count) + " grid squares had depth variability > " + options.meters.ToString(fmt3) + " meters"
         End If
     End Sub
 End Class
@@ -968,7 +968,7 @@ Public Class Brick_Ranges : Inherits TaskParent
         Next
 
         labels(3) = CStr(rangeJumpers.Count) + " grid squares had depth range > " +
-                            Format(options.meters, fmt3) + " meters"
+                            options.meters.ToString(fmt3) + " meters"
     End Sub
 End Class
 
@@ -1041,8 +1041,8 @@ Public Class XR_Brick_Plot : Inherits TaskParent
                 plotHist.maxRange = mmDepth.maxVal
                 plotHist.Run(split(2))
                 dst3 = plotHist.dst2
-                labels(3) = "Depth values vary from " + Format(plotHist.minRange, fmt3) +
-                                    " to " + Format(plotHist.maxRange, fmt3)
+                labels(3) = "Depth values vary from " + plotHist.minRange.ToString(fmt3) +
+                                    " to " + plotHist.maxRange.ToString(fmt3)
             End If
         End If
     End Sub
@@ -1090,8 +1090,8 @@ Public Class Brick_Plot : Inherits TaskParent
                 task.drawRect = task.gridRects(brickIndex)
 
                 dst3 = plotHist.dst2
-                labels(3) = "Depth values vary from " + Format(plotHist.minRange, fmt3) +
-                                    " to " + Format(plotHist.maxRange, fmt3)
+                labels(3) = "Depth values vary from " + plotHist.minRange.ToString(fmt3) +
+                                    " to " + plotHist.maxRange.ToString(fmt3)
             End If
         End If
     End Sub

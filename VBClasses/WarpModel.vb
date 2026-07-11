@@ -1,4 +1,4 @@
-Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
+﻿Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 Imports System.Runtime.InteropServices
 ' https://www.learnopencvb.com/image-alignment-ecc-in-opencv-c-python/
 Public Class WarpModel_Basics : Inherits TaskParent
@@ -114,7 +114,7 @@ Public Class WarpModel_ECC : Inherits TaskParent
         Dim outStr = "The warp matrix is:" + vbCrLf
         For i = 0 To warpMatrix.Length - 1
             If i Mod 3 = 0 Then outStr += vbCrLf
-            outStr += Format(warpMatrix(i), "#0.000") + vbTab
+            outStr += warpMatrix(i).ToString("#0.000") + vbTab
         Next
 
         If options.useWarpAffine Or options.useWarpHomography Then

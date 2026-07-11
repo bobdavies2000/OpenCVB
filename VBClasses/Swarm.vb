@@ -1,4 +1,4 @@
-Imports VBClasses
+﻿Imports VBClasses
 Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 Public Class Swarm_Basics : Inherits TaskParent
     Public knn As New KNN_Basics
@@ -76,11 +76,11 @@ Public Class Swarm_Basics : Inherits TaskParent
         If disList.Count > 10 Then
             distanceAvg = disList.Average
             distanceMax = Math.Max(distanceMax, disList.Max)
-            labels(2) = "Avg distance = " + Format(distanceAvg, fmt1) + vbCrLf + "Max Distance = " + Format(distanceMax, fmt1) + " (all units in pixels) "
+            labels(2) = "Avg distance = " + distanceAvg.ToString(fmt1) + vbCrLf + "Max Distance = " + distanceMax.ToString(fmt1) + " (all units in pixels) "
         End If
         If dirList.Count > 0 Then
             directionAvg = dirList.Average
-            labels(3) += " " + Format(directionAvg, fmt1) + " average direction (radians)"
+            labels(3) += " " + directionAvg.ToString(fmt1) + " average direction (radians)"
         End If
         If cornerHistory.Count >= histCount Then cornerHistory.RemoveAt(0)
     End Sub

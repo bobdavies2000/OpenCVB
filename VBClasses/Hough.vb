@@ -216,7 +216,7 @@ If cv.Cv2.CountNonZero(task.edges.dst2(roi)) >= minSegments Then maskFeat(roi).S
         dst1.SetTo(0)
         src.CopyTo(dst1, maskPredict)
         Dim pCount = cv.Cv2.CountNonZero(maskPredict)
-        labels(1) = Format(pCount / dst1.Total, "0%") + " are inbetween feature and featureless"
+        labels(1) = (pCount / dst1.Total).ToString("0%") + " are inbetween feature and featureless"
 
         dst2.SetTo(0)
         src.CopyTo(dst2, maskFless)

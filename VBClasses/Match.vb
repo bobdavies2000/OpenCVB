@@ -1,4 +1,4 @@
-Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
+﻿Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 Imports System.Threading
 Imports VBClasses
 Public Class Match_Basics : Inherits TaskParent
@@ -21,7 +21,7 @@ Public Class Match_Basics : Inherits TaskParent
         mm = GetMinMax(dst0)
 
         correlation = mm.maxVal
-        labels(2) = "Template (at right) has " + Format(correlation, fmt3) + " Correlation to the src input"
+        labels(2) = "Template (at right) has " + correlation.ToString(fmt3) + " Correlation to the src input"
         Dim w = template.Width, h = template.Height
         newCenter = New cv.Point(mm.maxLoc.X + w / 2, mm.maxLoc.Y + h / 2)
         newRect = New cv.Rect(mm.maxLoc.X, mm.maxLoc.Y, w, h)
@@ -55,7 +55,7 @@ Public Class Match_Basics1 : Inherits TaskParent
         Dim mm = GetMinMax(dst0)
 
         correlation = mm.maxVal
-        labels(2) = "Template has " + Format(correlation, fmt3) + " Correlation to the src input"
+        labels(2) = "Template has " + correlation.ToString(fmt3) + " Correlation to the src input"
         newRect = New cv.Rect(mm.maxLoc.X, mm.maxLoc.Y, template.Width, template.Height)
         If standaloneTest() Then
             dst2 = task.gray.Clone
@@ -80,7 +80,7 @@ Public Class XR_Match_Duplicate : Inherits TaskParent
         If task.drawRect.Width = 0 Then task.drawRect = New cv.Rect(10, 10, 50, 50)
         If task.optionsChanged Then match.template = src(task.drawRect).Clone
         match.Run(src(task.drawRect))
-        labels(2) = "Correlation coefficient = " + Format(match.correlation, fmt3)
+        labels(2) = "Correlation coefficient = " + match.correlation.ToString(fmt3)
     End Sub
 End Class
 
@@ -112,7 +112,7 @@ Public Class XR_Match_BasicsTest : Inherits TaskParent
             cv.Cv2.Circle(dst2, match.newCenter, task.DotSize, white, -1, task.lineType)
             cv.Cv2.Rectangle(dst2, matchRect, task.highlight, task.lineWidth)
             cv.Cv2.Normalize(match.dst0, dst3, 0, 255, cv.NormTypes.MinMax)
-            SetTrueText(Format(match.correlation, fmt3), match.newCenter)
+            SetTrueText(match.correlation.ToString(fmt3), match.newCenter)
         End If
     End Sub
 End Class
@@ -159,17 +159,17 @@ Public Class XR_Match_RandomTest : Inherits TaskParent
         If standaloneTest() Then
             dst2.SetTo(0)
             If task.heartBeat Then
-                labels(2) = "For " + CStr(template.Cols) + " test samples correlation = " + Format(correlation, fmt2)
+                labels(2) = "For " + CStr(template.Cols) + " test samples correlation = " + correlation.ToString(fmt2)
             End If
-            flow.nextMsg = "Correlation = " + Format(correlation, "#,##0.00")
+            flow.nextMsg = "Correlation = " + correlation.ToString("#,##0.00")
             flow.Run(src)
             SetTrueText("The expectation is that the " + CStr(template.Cols) + " random test samples should produce" + vbCrLf +
                             " a correlation coefficient near zero" + vbCrLf +
                             "The larger the sample size, the closer to zero the correlation will be. " + vbCrLf +
                             "Adjust task.featureSampleSize to test further." + vbCrLf +
                             "There should also be symmetry in the min and max around zero." + vbCrLf + vbCrLf +
-                            "Min Correlation = " + Format(minCorrelation, fmt3) + vbCrLf +
-                            "Max Correlation = " + Format(maxCorrelation, fmt3), 3)
+                            "Min Correlation = " + minCorrelation.ToString(fmt3) + vbCrLf +
+                            "Max Correlation = " + maxCorrelation.ToString(fmt3), 3)
         End If
     End Sub
 End Class
@@ -239,7 +239,7 @@ Public Class XR_Match_Motion : Inherits TaskParent
                     mask(roi).SetTo(255)
                     dst2(roi).SetTo(0)
                 End If
-                SetTrueText(Format(correlation.Get(Of Single)(0, 0), fmt2), pt, 2)
+                SetTrueText(correlation.Get(Of Single)(0, 0).ToString(fmt2), pt, 2)
             Else
                 Interlocked.Increment(updateCount)
             End If
@@ -249,10 +249,10 @@ Public Class XR_Match_Motion : Inherits TaskParent
         dst3.SetTo(0)
         saveFrame.CopyTo(dst3, mask)
         lastFrame = saveFrame
-        Dim corrPercent = Format(task.fCorrThreshold, "0.0%") + " correlation"
+        Dim corrPercent = task.fCorrThreshold.ToString("0.0%") + " correlation"
         labels(2) = "Correlation value for each cell is shown. " + CStr(updateCount) + " of " +
                          CStr(task.gridRects.Count) + " with < " + corrPercent + " or stdev < " +
-                         Format(optionsMatch.stdevThreshold, fmt0)
+                         optionsMatch.stdevThreshold.ToString(fmt0)
         labels(3) = CStr(task.gridRects.Count - updateCount) + " segments out of " + CStr(task.gridRects.Count) + " had > " + corrPercent
     End Sub
 End Class
@@ -376,7 +376,7 @@ Public Class Match_DrawRect : Inherits TaskParent
 
         If standaloneTest() Then
         cv.Cv2.Circle(dst2, match.newCenter, task.DotSize, cv.Scalar.Red, -1, task.lineType)
-            SetTrueText(Format(match.correlation, fmt3), match.newCenter, 2)
+            SetTrueText(match.correlation.ToString(fmt3), match.newCenter, 2)
         End If
         lastImage = src
     End Sub
@@ -519,8 +519,8 @@ Public Class Match_Brick : Inherits TaskParent
             dst3 = lastImage
             DrawRect(dst3, newRect, white)
         End If
-        labels(2) = "Delta X/Y = " + Format(deltaX, fmt2) + "/" + Format(deltaY, fmt2) + ", corr: " +
-                         Format(correlation, fmt3)
+        labels(2) = "Delta X/Y = " + deltaX.ToString(fmt2) + "/" + deltaY.ToString(fmt2) + ", corr: " +
+                         correlation.ToString(fmt3)
 
         If correlation < task.fCorrThreshold Then lastImage = task.gray.Clone
     End Sub
@@ -586,8 +586,8 @@ Public Class Match_VH : Inherits TaskParent
                 tc = Choose(j + 1, gRect.tc1, gRect.tc2)
                 If j = 0 Then p1 = tc.center Else p2 = tc.center
             Next
-            SetTrueText(CStr(i) + vbCrLf + tc.strOut + vbCrLf + Format(gRect.arcY, fmt1), gRect.tc1.center, 2)
-            SetTrueText(CStr(i) + vbCrLf + tc.strOut + vbCrLf + Format(gRect.arcY, fmt1), gRect.tc1.center, 3)
+            SetTrueText(CStr(i) + vbCrLf + tc.strOut + vbCrLf + gRect.arcY.ToString(fmt1), gRect.tc1.center, 2)
+            SetTrueText(CStr(i) + vbCrLf + tc.strOut + vbCrLf + gRect.arcY.ToString(fmt1), gRect.tc1.center, 3)
 
             cv.Cv2.Line(dst2, p1, p2, task.highlight, task.lineWidth, task.lineType)
             cv.Cv2.Line(dst3, p1, p2, task.highlight, task.lineWidth, task.lineType)
@@ -654,7 +654,7 @@ Public Class XR_Match_LinePairTest : Inherits TaskParent
         Next
 
         labels(3) = "p1 = " + CStr(ptx(0).X) + "," + CStr(ptx(0).Y) + " p2 = " + CStr(ptx(1).X) + "," + CStr(ptx(1).Y)
-        labels(2) = "Correlation = " + Format(correlation(0), fmt3) + " Search result is " + CStr(dst0.Width) + "X" + CStr(dst0.Height)
+        labels(2) = "Correlation = " + correlation(0).ToString(fmt3) + " Search result is " + CStr(dst0.Width) + "X" + CStr(dst0.Height)
     End Sub
 End Class
 

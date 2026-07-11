@@ -318,9 +318,9 @@ Public Class XR_Grid_TrackCenter : Inherits TaskParent
 
             If task.heartBeat Then dst3.SetTo(0)
             cv.Cv2.Circle(dst3, center, task.DotSize, task.highlight, -1, task.lineType)
-            SetTrueText(Format(match.correlation, fmt3), center, 3)
+            SetTrueText(match.correlation.ToString(fmt3), center, 3)
 
-            labels(3) = "Match correlation = " + Format(match.correlation, fmt3)
+            labels(3) = "Match correlation = " + match.correlation.ToString(fmt3)
         End If
     End Sub
 End Class

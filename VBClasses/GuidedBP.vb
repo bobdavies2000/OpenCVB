@@ -216,7 +216,7 @@ Public Class GuidedBP_Depth : Inherits TaskParent
         Dim depthCount = cv.Cv2.CountNonZero(task.depthmask)
         dst3.SetTo(0, task.noDepthMask)
         Dim count = cv.Cv2.CountNonZero(dst2)
-        labels(2) = CStr(classCount) + " regions detected in the backprojection - " + Format(count / depthCount, "0%") + " of depth data"
+        labels(2) = CStr(classCount) + " regions detected in the backprojection - " + (count / depthCount).ToString("0%") + " of depth data"
     End Sub
 End Class
 

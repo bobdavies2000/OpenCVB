@@ -409,9 +409,9 @@ Public Class XR_FeatureLess_Correlation : Inherits TaskParent
             Dim index = task.gridMap.Get(Of Integer)(task.clickPoint.Y, task.clickPoint.X)
             Dim mm = GetMinMax(task.gray(task.gridRects(index)))
             SetTrueText("Click on any grid rect to see its grayscale range." + vbCrLf +
-                            "Min gray = " + Format(mm.minVal, fmt0) + vbCrLf +
-                            "Max Gray = " + Format(mm.maxVal, fmt0) + vbCrLf +
-                            "Range = " + Format(mm.range, fmt0) + vbCrLf + vbCrLf, 1)
+                            "Min gray = " + mm.minVal.ToString(fmt0) + vbCrLf +
+                            "Max Gray = " + mm.maxVal.ToString(fmt0) + vbCrLf +
+                            "Range = " + mm.range.ToString(fmt0) + vbCrLf + vbCrLf, 1)
         End If
 
         labels(3) = CStr(fLessList.Count) + " grid squares were found to be featureless (range < " +
@@ -599,7 +599,7 @@ Public Class XR_FeatureLess_DCT : Inherits TaskParent
 
         cv.Cv2.InRange(mask, maxIndex + 1, maxIndex + 1, label)
         Dim nonZ = cv.Cv2.CountNonZero(label)
-        labels(3) = "Largest FeatureLess Region (" + CStr(nonZ) + " " + Format(nonZ / label.Total, "#0.0%") + " pixels)"
+        labels(3) = "Largest FeatureLess Region (" + CStr(nonZ) + " " + (nonZ / label.Total).ToString("#0.0%") + " pixels)"
         dst3.SetTo(white, label)
     End Sub
 End Class
@@ -628,8 +628,8 @@ Public Class XR_FeatureLess_History : Inherits TaskParent
         Dim countCurr = cv.Cv2.CountNonZero(dst2)
         Dim countAll = cv.Cv2.CountNonZero(dst3)
         Dim sqPixels = task.gridWH * task.gridWH
-        labels(2) = "Current frame: " + Format(countCurr / sqPixels, fmt0) + " grid squares and " +
-                        Format(countAll / sqPixels, fmt0) + " of all grid squares."
+        labels(2) = "Current frame: " + (countCurr / sqPixels).ToString(fmt0) + " grid squares and " +
+                        (countAll / sqPixels).ToString(fmt0) + " of all grid squares."
     End Sub
 End Class
 

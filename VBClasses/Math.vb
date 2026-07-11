@@ -1,4 +1,4 @@
-Imports System.Threading
+﻿Imports System.Threading
 Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 ' https://answers.opencvb.org/question/122331/how-to-subtract-a-constant-from-a-3-channel-mat/
 Public Class XR_Math_Subtract : Inherits TaskParent
@@ -59,11 +59,11 @@ Public Class Math_Median_CDF : Inherits TaskParent
 
             dst2.SetTo(0)
             src.CopyTo(dst2, mask)
-            labels(2) = "Grayscale pixels > " + Format(medianVal, fmt1)
+            labels(2) = "Grayscale pixels > " + medianVal.ToString(fmt1)
 
             dst3.SetTo(0)
             src.CopyTo(dst3, Not mask) ' show the other half.
-            labels(3) = "Grayscale pixels < " + Format(medianVal, fmt1)
+            labels(3) = "Grayscale pixels < " + medianVal.ToString(fmt1)
         End If
     End Sub
 End Class
@@ -85,11 +85,11 @@ Public Class XR_Math_DepthMeanStdev : Inherits TaskParent
         task.depthRGB.CopyTo(dst3, mask)
         If mask.Type <> cv.MatType.CV_8U Then cv.Cv2.CvtColor(mask, mask, cv.ColorConversionCodes.BGR2GRAY)
         cv.Cv2.MeanStdDev(task.pcSplit(2), mean, stdev, mask)
-        labels(3) = "stablized depth mean=" + Format(mean, fmt1) + " stdev=" + Format(stdev, fmt1)
+        labels(3) = "stablized depth mean=" + mean.ToString(fmt1) + " stdev=" + stdev.ToString(fmt1)
 
         dst2 = task.depthRGB
         cv.Cv2.MeanStdDev(task.pcSplit(2), mean, stdev)
-        labels(2) = "raw depth mean=" + Format(mean, fmt1) + " stdev=" + Format(stdev, fmt1)
+        labels(2) = "raw depth mean=" + mean.ToString(fmt1) + " stdev=" + stdev.ToString(fmt1)
     End Sub
 End Class
 
@@ -330,8 +330,8 @@ Public Class Math_Stdev : Inherits TaskParent
                 If stdev < optionsMatch.stdevThreshold Then
                     Interlocked.Increment(updateCount)
                     Dim pt = New cv.Point(roi.X + 2, roi.Y + 10)
-                    If options.showMean Then SetTrueText(Format(mean, fmt0), pt, 2)
-                    If options.showStdev Then SetTrueText(Format(stdev, fmt2), pt, 2)
+                    If options.showMean Then SetTrueText(mean.ToString(fmt0), pt, 2)
+                    If options.showStdev Then SetTrueText(stdev.ToString(fmt2), pt, 2)
                     lowStdevMask(roi).SetTo(255)
                 Else
                     highStdevMask(roi).SetTo(255)
@@ -342,9 +342,9 @@ Public Class Math_Stdev : Inherits TaskParent
         dst3.SetTo(0)
         saveFrame.CopyTo(dst3, highStdevMask)
         lastFrame = saveFrame
-        Dim stdevPercent = " stdev " + Format(stdevSlider.Value, "0.0")
+        Dim stdevPercent = " stdev " + stdevSlider.Value.ToString("0.0")
         labels(2) = CStr(updateCount) + " of " + CStr(task.gridRects.Count) + " segments with < " + stdevPercent
-        labels(3) = CStr(task.gridRects.Count - updateCount) + " out of " + CStr(task.gridRects.Count) + " had stdev > " + Format(stdevSlider.Value, "0.0")
+        labels(3) = CStr(task.gridRects.Count - updateCount) + " out of " + CStr(task.gridRects.Count) + " had stdev > " + stdevSlider.Value.ToString("0.0")
     End Sub
 End Class
 
@@ -370,10 +370,10 @@ Public Class Math_DotProduct3D : Inherits TaskParent
 
         If showWork Then
             strOut = "Input: " + vbCrLf
-            strOut += "normalized v1" + " = " + Format(v1.X, fmt3) + ", " + Format(v1.Y, fmt3) + ", " + Format(v1.Z, fmt3) + vbCrLf
-            strOut += "normalized v2" + " = " + Format(v2.X, fmt3) + ", " + Format(v2.Y, fmt3) + ", " + Format(v2.Z, fmt3) + vbCrLf
+            strOut += "normalized v1" + " = " + v1.X.ToString(fmt3) + ", " + v1.Y.ToString(fmt3) + ", " + v1.Z.ToString(fmt3) + vbCrLf
+            strOut += "normalized v2" + " = " + v2.X.ToString(fmt3) + ", " + v2.Y.ToString(fmt3) + ", " + v2.Z.ToString(fmt3) + vbCrLf
 
-            strOut += "Dot Product = " + Format(n1, fmt3) + " - if close to 1, the vectors are parallel" + vbCrLf
+            strOut += "Dot Product = " + n1.ToString(fmt3) + " - if close to 1, the vectors are parallel" + vbCrLf
             SetTrueText(strOut, 2)
         End If
     End Sub

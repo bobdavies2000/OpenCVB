@@ -18,7 +18,7 @@ Public Class AsciiArt_Basics : Inherits TaskParent
                 SetTrueText(asciiChar, New cv.Point(x * options.wStep, y * options.hStep), 2)
             Next
         Next
-        labels(2) = "Ascii version using " + Format(dst3.Height * dst3.Width, fmt0) + " characters"
+        labels(2) = "Ascii version using " + (dst3.Height * dst3.Width).ToString(fmt0) + " characters"
     End Sub
 End Class
 

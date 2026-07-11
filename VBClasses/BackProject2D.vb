@@ -40,7 +40,7 @@ Public Class BackProject2D_Basics : Inherits TaskParent
         labels(2) = colorFmt.options.colorFormat + " format " + If(classCount > 0, CStr(classCount) + " classes", " ")
         Dim c1 = task.channels(0), c2 = task.channels(1)
         labels(3) = "That combination of channel " + CStr(c1) + "/" + CStr(c2) + " has " + CStr(bpCount) +
-                            " pixels while image total is " + Format(dst0.Total, "0")
+                            " pixels while image total is " + dst0.Total.ToString("0")
         SetTrueText("Use Global Algorithm Option 'grid Square Size' to control the 2D backprojection",
                             New cv.Point(10, dst3.Height - 20), 3)
     End Sub
@@ -344,8 +344,8 @@ Public Class BackProject2D_Grayscale : Inherits TaskParent
         dst3.ConvertTo(dst3, cv.MatType.CV_8U)
 
         If standaloneTest() Then
-            labels(3) = "Backprojection min/max " + Format(GetMinMax(backP).minVal, fmt2) + "/" +
-                Format(GetMinMax(backP).maxVal, fmt2)
+            labels(3) = "Backprojection min/max " + GetMinMax(backP).minVal.ToString(fmt2) + "/" +
+                GetMinMax(backP).maxVal.ToString(fmt2)
         End If
     End Sub
 End Class

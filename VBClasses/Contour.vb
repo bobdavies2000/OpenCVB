@@ -161,7 +161,7 @@ Public Class XR_Contour_Features : Inherits TaskParent
         cv.Cv2.Circle(dst3, pt, task.DotSize, task.highlight, -1, task.lineType)
             Dim rect = task.gridRects(task.gridMap.Get(Of Integer)(pt.Y, pt.X))
             Dim correlation = getCorrelation(rect)
-            SetTrueText(Format(correlation, fmt1), pt, 3)
+            SetTrueText(correlation.ToString(fmt1), pt, 3)
         Next
         labels(2) = "There are " + CStr(contours.contourList.Count) + " contours and " +
                         CStr(feat.features.Count) + " features."
@@ -354,7 +354,7 @@ Public Class Contour_SidePoints : Inherits TaskParent
         desc = "Find the left/right and top/bottom sides of a contour"
     End Sub
     Private Function vec3fToString(v As cv.Vec3f) As String
-        Return Format(v(0), fmt3) + vbTab + Format(v(1), fmt3) + vbTab + Format(v(2), fmt3)
+        Return v(0).ToString(fmt3) + vbTab + v(1).ToString(fmt3) + vbTab + v(2).ToString(fmt3)
     End Function
     Public Overrides Sub RunAlg(src As cv.Mat)
         sides.Run(src)
@@ -688,8 +688,8 @@ Public Class XR_Contour_InfoDepth : Inherits TaskParent
         strOut = vbCrLf + vbCrLf
         Dim index = contours.contourList.IndexOf(task.contourD)
         strOut += "Index = " + CStr(index) + vbCrLf
-        strOut += "Depth = " + Format(task.contourD.depth, fmt1) + vbCrLf
-        strOut += "Range (m) = " + Format(task.contourD.mm.range, fmt1) + vbCrLf
+        strOut += "Depth = " + task.contourD.depth.ToString(fmt1) + vbCrLf
+        strOut += "Range (m) = " + task.contourD.mm.range.ToString(fmt1) + vbCrLf
         strOut += "Number of pixels in the mask: " + CStr(task.contourD.pixels) + vbCrLf
 
         DrawRect(dst2, task.contourD.rect)
@@ -941,8 +941,8 @@ Public Class XR_Contour_Info : Inherits TaskParent
 
         Dim cDesc As String = ""
         cDesc += "ID = " + CStr(tour.ID) + " (grid index of maxDist)" + vbCrLf
-        cDesc += "Depth = " + Format(tour.depth, fmt1) + " m" + vbCrLf
-        cDesc += "Range = " + Format(tour.mm.range, fmt1) + " m" + vbCrLf
+        cDesc += "Depth = " + tour.depth.ToString(fmt1) + " m" + vbCrLf
+        cDesc += "Range = " + tour.mm.range.ToString(fmt1) + " m" + vbCrLf
         cDesc += "Number of pixels in the mask: " + CStr(tour.pixels) + vbCrLf
 
         cDesc += "MaxDist point = " + CStr(tour.maxDist.X) + ", " + CStr(tour.maxDist.Y) + vbCrLf

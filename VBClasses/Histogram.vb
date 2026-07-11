@@ -52,7 +52,7 @@ Public Class Histogram_Basics : Inherits TaskParent
             labels(2) = Choose(splitIndex + 1, "Blue", "Green", "Red") + " histogram, bins = " +
                                        CStr(task.histogramBins)
         Else
-            labels(2) = "Range = " + Format(ranges(0).Start, fmt3) + " To " + Format(ranges(0).End, fmt3)
+            labels(2) = "Range = " + ranges(0).Start.ToString(fmt3) + " To " + ranges(0).End.ToString(fmt3)
         End If
     End Sub
 End Class
@@ -166,7 +166,7 @@ Public Class Histogram_Simple : Inherits TaskParent
 
         Dim ranges() = New cv.Rangef() {New cv.Rangef(plotHist.minRange, plotHist.maxRange)}
         If plotHist.minRange = plotHist.maxRange Then
-            SetTrueText("The data is just one value - " + Format(plotHist.minRange, fmt1) + vbCrLf +
+            SetTrueText("The data is just one value - " + plotHist.minRange.ToString(fmt1) + vbCrLf +
                             "A histogram is not necessary.", 3)
             Exit Sub
         End If
@@ -530,7 +530,7 @@ Public Class Histogram_KalmanAuto : Inherits TaskParent
         dst2 = plotHist.dst2
 
         labels(2) = colorName + " histogram, bins = " + CStr(task.histogramBins) + ", X ranges from " +
-                        Format(mm.minVal, "0.0") + " to " + Format(mm.maxVal, "0.0") + ", y is occurances"
+                        mm.minVal.ToString("0.0") + " to " + mm.maxVal.ToString("0.0") + ", y is occurances"
     End Sub
 End Class
 
@@ -616,7 +616,7 @@ Public Class Histogram_CompareGray : Inherits TaskParent
         If lastHistNorm.Size = histK.hist.histogram.Size Then
             Dim Comparison = CompareHist(histNorm, lastHistNorm, options.compareMethod)
             If Double.IsNaN(Comparison) Then Comparison = 0
-            labels(3) = "CompareHist output = " + Format(Comparison, fmt3) + " using " + options.compareName + " method"
+            labels(3) = "CompareHist output = " + Comparison.ToString(fmt3) + " using " + options.compareName + " method"
             trueData = New List(Of TrueText)(histK.hist.plotHist.trueData)
             SetTrueText(labels(3), 2)
         Else
@@ -845,7 +845,7 @@ Public Class XR_Histogram_PointCloudXYZ : Inherits TaskParent
                     dst3 = plotHist.dst2.Clone
             End Select
             labels(i + 1) = "Histogram " + Choose(i + 1, "X", "Y", "Z") + " ranges from " +
-                                       Format(plotHist.minRange, "0.0") + "m to " + Format(plotHist.maxRange, "0.0") + "m"
+                                       plotHist.minRange.ToString("0.0") + "m to " + plotHist.maxRange.ToString("0.0") + "m"
         Next
     End Sub
 End Class
@@ -1045,7 +1045,7 @@ Public Class Histogram_Cloud : Inherits TaskParent
         dst2 = myPlotHist.dst2
         histArray = myPlotHist.plotHist.histArray
         If task.heartBeat Then
-            strOut = "Chart left = 0 " + vbCrLf + "Chart right = " + Format(mm.maxVal, fmt0) + vbCrLf
+            strOut = "Chart left = 0 " + vbCrLf + "Chart right = " + mm.maxVal.ToString(fmt0) + vbCrLf
             labels(2) = "Shifted " + dimensionLabel + " Histogram Range = 0 to " + CStr(CInt(mm.maxVal))
         End If
         SetTrueText(strOut, 3)
@@ -1217,7 +1217,7 @@ Public Class Histogram_CloudSegments : Inherits TaskParent
         dst2 = plot.dst2.Clone
 
         labels(2) = "Plot of " + Choose(index + 1, "X", "Y", "Z") + " data in point cloud"
-        labels(3) = "Min = " + Format(mm.minVal, fmt1) + " max = " + Format(mm.maxVal, fmt1)
+        labels(3) = "Min = " + mm.minVal.ToString(fmt1) + " max = " + mm.maxVal.ToString(fmt1)
 
         dst1.SetTo(0)
         For i = 0 To plot.histogram.Rows - 1
@@ -1586,6 +1586,6 @@ Public Class Histogram_Depth : Inherits TaskParent
             'strOut += "Count nonzero entries in task.maxDepthMask: " + vbTab + vbTab + CStr(task.maxDepthMask.CountNonZero)
         End If
         SetTrueText(strOut, 3)
-        labels(2) = "Histogram Depth to " + Format(task.MaxZmeters, "0.0") + " m"
+        labels(2) = "Histogram Depth to " + task.MaxZmeters.ToString("0.0") + " m"
     End Sub
 End Class

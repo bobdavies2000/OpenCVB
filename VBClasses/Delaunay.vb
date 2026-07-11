@@ -35,7 +35,7 @@ Public Class Delaunay_Basics : Inherits TaskParent
         dst3.ConvertTo(dst1, cv.MatType.CV_8U)
         dst2 = Palettize(dst1)
 
-        labels(2) = traceName + ": " + Format(inputPoints.Count, "000") + " cells were present."
+        labels(2) = traceName + ": " + inputPoints.Count.ToString("000") + " cells were present."
     End Sub
 End Class
 
@@ -305,7 +305,7 @@ Public Class Delaunay_ConsistentColor : Inherits TaskParent
         cv.Cv2.Circle(dst1, New cv.Point(pt.X, pt.Y), task.DotSize, task.highlight, -1, cv.LineTypes.Link4)
         Next
         lastColor = dst2.Clone
-        labels(2) = traceName + ": " + Format(inputPoints.Count, "000") + " cells were present."
+        labels(2) = traceName + ": " + inputPoints.Count.ToString("000") + " cells were present."
     End Sub
 End Class
 
@@ -418,7 +418,7 @@ Public Class Delaunay_Contours : Inherits TaskParent
 
             DrawTour(dst2, ptList, 255, 1)
         Next
-        labels(2) = traceName + ": " + Format(bPoint.ptList.Count, "000") + " cells were present."
+        labels(2) = traceName + ": " + bPoint.ptList.Count.ToString("000") + " cells were present."
     End Sub
 End Class
 
@@ -464,7 +464,7 @@ Public Class Delaunay_Color : Inherits TaskParent
 
         dst2 = Palettize(dst3)
 
-        labels(2) = traceName + ": " + Format(inputPoints.Count, "000") + " cells were present."
+        labels(2) = traceName + ": " + inputPoints.Count.ToString("000") + " cells were present."
     End Sub
 End Class
 
@@ -579,6 +579,6 @@ Public Class Delaunay_EmptyClone : Inherits TaskParent
         dst3.ConvertTo(dst1, cv.MatType.CV_8U)
         dst2 = Palettize(dst1)
 
-        labels(2) = traceName + ": " + Format(inputPoints.Count, "000") + " cells were present."
+        labels(2) = traceName + ": " + inputPoints.Count.ToString("000") + " cells were present."
     End Sub
 End Class

@@ -120,8 +120,8 @@ Public Class Gravity_Basics_TA : Inherits TaskParent
 
         If standaloneTest() Then
             strOut = "Complementary filter gravity" + vbCrLf +
-                         "Tilt (rad): X=" + Format(task.accRadians.X, fmt3) + " Y=" + Format(task.accRadians.Y, fmt3) + " Z=" + Format(task.accRadians.Z, fmt3) + vbCrLf +
-                         "Gravity unit vector (body): " + Format(GravityVector.X, fmt3) + ", " + Format(GravityVector.Y, fmt3) + ", " + Format(GravityVector.Z, fmt3)
+                         "Tilt (rad): X=" + task.accRadians.X.ToString(fmt3) + " Y=" + task.accRadians.Y.ToString(fmt3) + " Z=" + task.accRadians.Z.ToString(fmt3) + vbCrLf +
+                         "Gravity unit vector (body): " + GravityVector.X.ToString(fmt3) + ", " + GravityVector.Y.ToString(fmt3) + ", " + GravityVector.Z.ToString(fmt3)
             SetTrueText(strOut)
         End If
     End Sub
@@ -313,7 +313,7 @@ Public Class Gravity_LineTrackStabilize : Inherits TaskParent
         cv.Cv2.Line(dst3, gravP1, gravP2, cv.Scalar.Yellow, task.lineWidth + 1, task.lineType)
 
         labels(2) = "Stabilized accumulation of last " + CStr(frameHistory.Count) + " frames."
-        labels(3) = "fusedAngle=" + Format(fusedAngle, fmt2) + " deg tx=" + Format(tx, fmt2) + " ty=" + Format(ty, fmt2)
+        labels(3) = "fusedAngle=" + fusedAngle.ToString(fmt2) + " deg tx=" + tx.ToString(fmt2) + " ty=" + ty.ToString(fmt2)
     End Sub
 End Class
 
@@ -509,7 +509,7 @@ Public Class XR_Gravity_Basics_Original : Inherits TaskParent
 
         If p1.X >= 1 Then
             strOut = "p1 = " + p1.ToString + vbCrLf + "p2 = " + p2.ToString + vbCrLf + "      val =  " +
-                          Format(dst0.Get(Of Single)(p1.Y, p1.X)) + vbCrLf + "lastVal = " + Format(dst0.Get(Of Single)(p1.Y, p1.X - 1))
+                          dst0.Get(Of Single)(p1.Y, p1.X).ToString() + vbCrLf + "lastVal = " + dst0.Get(Of Single)(p1.Y, p1.X - 1).ToString()
         End If
         SetTrueText(strOut, 3)
 
@@ -564,8 +564,8 @@ Public Class Gravity_Jitter : Inherits TaskParent
         dst3 = plotY.dst2.Clone
 
         If task.heartBeat Then
-            labels(1) = "xDelta (pixels) =" + Format(xDelta, fmt3)
-            labels(3) = "yDelta (pixels) =" + Format(yDelta, fmt3)
+            labels(1) = "xDelta (pixels) =" + xDelta.ToString(fmt3)
+            labels(3) = "yDelta (pixels) =" + yDelta.ToString(fmt3)
         End If
         labels(2) = "Jitter controls: increase IMU alpha and improve camera mounting"
 

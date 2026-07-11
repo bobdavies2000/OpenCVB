@@ -21,7 +21,7 @@ Public Class Covariance_Basics : Inherits TaskParent
         strOut = "The Covariance Mat: " + vbCrLf
         For j = 0 To covariance.Rows - 1
             For i = 0 To covariance.Cols - 1
-                strOut += Format(covariance.Get(Of Double)(j, i), fmt3) + ", "
+                strOut += covariance.Get(Of Double)(j, i).ToString(fmt3) + ", "
             Next
             strOut += vbCrLf
         Next
@@ -29,7 +29,7 @@ Public Class Covariance_Basics : Inherits TaskParent
 
         Dim overallMean = cv.Cv2.Mean(samples2)
         Dim center = New cv.Point2f(overallMean(0), overallMean(1))
-        strOut += "Mean (img1, img2) = (" + Format(center.X, fmt0) + ", " + Format(center.Y, fmt0) + ")" + vbCrLf
+        strOut += "Mean (img1, img2) = (" + center.X.ToString(fmt0) + ", " + center.Y.ToString(fmt0) + ")" + vbCrLf
 
         If standaloneTest() Then
             Static lastCenter As cv.Point2f = center

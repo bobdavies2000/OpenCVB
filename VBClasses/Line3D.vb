@@ -27,8 +27,8 @@ Public Class Line3D_Basics : Inherits TaskParent
             lines3D.Add(p1)
             lines3D.Add(p2)
             cv.Cv2.Line(dst2, lp.p1, lp.p2, task.highlight, task.lineWidth, cv.LineTypes.Link8)
-            SetTrueText(Format(depth1, fmt1), lp.p1, 2)
-            SetTrueText(Format(depth2, fmt1), lp.p2, 2)
+            SetTrueText(depth1.ToString(fmt1), lp.p1, 2)
+            SetTrueText(depth2.ToString(fmt1), lp.p2, 2)
         Next
 
         lines3DMat = cv.Mat.FromPixelData(lines3D.Count / 2, 1, cv.MatType.CV_32FC3, lines3D.ToArray)
@@ -90,13 +90,13 @@ Public Class XR_Line3D_Longest : Inherits TaskParent
             mm.maxLoc = lp.p1
         End If
 
-        SetTrueText("Average Depth = " + Format(depthMean, fmt1) + "m",
+        SetTrueText("Average Depth = " + depthMean.ToString(fmt1) + "m",
                         New cv.Point((lp.p1.X + lp.p2.X) / 2, (lp.p1.Y + lp.p2.Y) / 2), 2)
-        labels(2) = "Min Distance = " + Format(depthMin, fmt1) + ", Max Distance = " + Format(depthMax, fmt1) +
-                      ", Mean Distance = " + Format(depthMean, fmt1) + " meters "
+        labels(2) = "Min Distance = " + depthMin.ToString(fmt1) + ", Max Distance = " + depthMax.ToString(fmt1) +
+                      ", Mean Distance = " + depthMean.ToString(fmt1) + " meters "
 
-        SetTrueText(Format(depthMin, fmt1) + "m", New cv.Point(mm.minLoc.X + 5, mm.minLoc.Y - 15), 2)
-        SetTrueText(Format(depthMax, fmt1) + "m", New cv.Point(mm.maxLoc.X + 5, mm.maxLoc.Y - 15), 2)
+        SetTrueText(depthMin.ToString(fmt1) + "m", New cv.Point(mm.minLoc.X + 5, mm.minLoc.Y - 15), 2)
+        SetTrueText(depthMax.ToString(fmt1) + "m", New cv.Point(mm.maxLoc.X + 5, mm.maxLoc.Y - 15), 2)
     End Sub
 End Class
 
@@ -205,7 +205,7 @@ Public Class XR_Line3D_DrawArbitrary : Inherits TaskParent
         plot.Run(src)
         dst2 = plot.dst2
         dst3 = plot.dst3
-        labels(3) = "using " + CStr(nextList.Count) + " points, the correlation of X to Z = " + Format(c1, fmt3) + " (blue), correlation of Y to Z = " + Format(c2, fmt3) + " (green)"
+        labels(3) = "using " + CStr(nextList.Count) + " points, the correlation of X to Z = " + c1.ToString(fmt3) + " (blue), correlation of Y to Z = " + c2.ToString(fmt3) + " (green)"
     End Sub
 End Class
 
@@ -303,16 +303,16 @@ Public Class Line3D_Selection : Inherits TaskParent
             Next
 
             labels(2) = CStr(allPoints.Rows) + " pixels updated in the point cloud."
-            strOut = "Average depth = " + Format(depthAvg, fmt3) + vbCrLf
-            strOut += "depth1 = " + Format(depth1, fmt3) + vbCrLf
-            strOut += "depth2 = " + Format(depth2, fmt3) + vbCrLf
+            strOut = "Average depth = " + depthAvg.ToString(fmt3) + vbCrLf
+            strOut += "depth1 = " + depth1.ToString(fmt3) + vbCrLf
+            strOut += "depth2 = " + depth2.ToString(fmt3) + vbCrLf
             strOut += CStr(ptList.Count) + " points found with depth" + vbCrLf
-            strOut += Format(deltaZ, fmt4) + " deltaZ for each point." + vbCrLf
+            strOut += deltaZ.ToString(fmt4) + " deltaZ for each point." + vbCrLf
             strOut += CStr(allPoints.Rows) + " points in the original line." + vbCrLf
             SetTrueText(strOut, 3)
             SetTrueText("ptlist(0)", ptList(0))
-            SetTrueText("p1 " + Format(lp.pVec1(2), fmt1) + "m", lp.p1, 3)
-            SetTrueText("p2 " + Format(lp.pVec2(2), fmt1) + "m", lp.p2, 3)
+            SetTrueText("p1 " + lp.pVec1(2).ToString(fmt1) + "m", lp.p1, 3)
+            SetTrueText("p2 " + lp.pVec2(2).ToString(fmt1) + "m", lp.p2, 3)
         End If
     End Sub
 End Class

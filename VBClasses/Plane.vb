@@ -1,4 +1,4 @@
-Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
+﻿Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 ' http://www.ilikebigbits.com/blog/2015/3/2/plane-from-points
 Public Class Plane_Basics : Inherits TaskParent
     Dim frames As New History_Basics
@@ -129,10 +129,10 @@ Public Class Plane_From3Points : Inherits TaskParent
     Public Function vbFormatEquation(eq As cv.Vec4f) As String
         Dim s1 = If(eq(1) < 0, " - ", " +")
         Dim s2 = If(eq(2) < 0, " - ", " +")
-        Return If(eq(0) < 0, "-", " ") + Format(Math.Abs(eq(0)), fmt3) + "*x " + s1 +
-                                             Format(Math.Abs(eq(1)), fmt3) + "*y " + s2 +
-                                             Format(Math.Abs(eq(2)), fmt3) + "*z = " +
-                                             Format(eq(3), fmt3) + vbCrLf
+        Return If(eq(0) < 0, "-", " ") + Math.Abs(eq(0)).ToString(fmt3) + "*x " + s1 +
+                                             Math.Abs(eq(1)).ToString(fmt3) + "*y " + s2 +
+                                             Math.Abs(eq(2)).ToString(fmt3) + "*z = " +
+                                             eq(3).ToString(fmt3) + vbCrLf
     End Function
     Public Overrides Sub RunAlg(src As cv.Mat)
         Dim v1 = input(1) - input(0)
@@ -143,18 +143,18 @@ Public Class Plane_From3Points : Inherits TaskParent
         k = -cross.X * input(0).X - cross.Y * input(0).Y - cross.Z * input(0).Z
         strOut = "Input: " + vbCrLf
         For i = 0 To input.Count - 1
-            strOut += "p" + CStr(i) + " = " + Format(input(i).X, fmt3) + ", " + Format(input(i).Y, fmt3) + ", " + Format(input(i).Z, fmt3) + vbCrLf
+            strOut += "p" + CStr(i) + " = " + input(i).X.ToString(fmt3) + ", " + input(i).Y.ToString(fmt3) + ", " + input(i).Z.ToString(fmt3) + vbCrLf
         Next
 
-        strOut += "First " + vbTab + "difference = " + Format(v1.X, fmt3) + ", " + Format(v1.Y, fmt3) + ", " + Format(v1.Z, fmt3) + vbCrLf
-        strOut += "Second " + vbTab + "difference = " + Format(v2.X, fmt3) + ", " + Format(v2.Y, fmt3) + ", " + Format(v2.Z, fmt3) + vbCrLf
-        strOut += "Cross Product = " + Format(cross.X, fmt3) + ", " + Format(cross.Y, fmt3) + ", " + Format(cross.Z, fmt3) + vbCrLf
+        strOut += "First " + vbTab + "difference = " + v1.X.ToString(fmt3) + ", " + v1.Y.ToString(fmt3) + ", " + v1.Z.ToString(fmt3) + vbCrLf
+        strOut += "Second " + vbTab + "difference = " + v2.X.ToString(fmt3) + ", " + v2.Y.ToString(fmt3) + ", " + v2.Z.ToString(fmt3) + vbCrLf
+        strOut += "Cross Product = " + cross.X.ToString(fmt3) + ", " + cross.Y.ToString(fmt3) + ", " + cross.Z.ToString(fmt3) + vbCrLf
         strOut += "k = " + CStr(k) + vbCrLf
         strOut += vbFormatEquation(New cv.Vec4f(cross.X, cross.Y, cross.Z, k))
         Dim s1 = If(cross.Y < 0, " - ", " + ")
         Dim s2 = If(cross.Z < 0, " - ", " + ")
-        strOut += "Plane equation: " + Format(cross.X, fmt3) + "x" + s1 + Format(Math.Abs(cross.Y), fmt3) + "y" + s2 +
-                       Format(Math.Abs(cross.Z), fmt3) + "z + " + Format(-k, fmt3) + vbCrLf
+        strOut += "Plane equation: " + cross.X.ToString(fmt3) + "x" + s1 + Math.Abs(cross.Y).ToString(fmt3) + "y" + s2 +
+                       Math.Abs(cross.Z).ToString(fmt3) + "z + " + (-k).ToString(fmt3) + vbCrLf
         If showWork Then SetTrueText(strOut, 2)
     End Sub
 End Class
@@ -206,7 +206,7 @@ Public Class XR_Plane_FlatSurfaces : Inherits TaskParent
 
         addW.Run(task.color)
         dst3 = addW.dst2
-        labels(3) = "There were " + CStr(flatCount) + " RedCloud Cells with an average RMSerror per pixel less than " + Format(plane.options.rmsThreshold * 100, fmt0) + " cm"
+        labels(3) = "There were " + CStr(flatCount) + " RedCloud Cells with an average RMSerror per pixel less than " + (plane.options.rmsThreshold * 100).ToString(fmt0) + " cm"
     End Sub
 End Class
 
@@ -313,8 +313,8 @@ Public Class XR_Plane_EqCorrelation : Inherits TaskParent
                     .kInput = {pt(0), pt(1), pt(2), pt(3)}
                     .Run(src)
 
-                    strOut = "Normalized Plane equation: " + Format(.kOutput(0), fmt3) + "x" + s1 + Format(Math.Abs(.kOutput(1)), fmt3) + "y" + s2 +
-                             Format(Math.Abs(.kOutput(2)), fmt3) + "z = " + Format(- .kOutput(3), fmt3) + " with " + CStr(count(index)) +
+                    strOut = "Normalized Plane equation: " + .kOutput(0).ToString(fmt3) + "x" + s1 + Math.Abs(.kOutput(1)).ToString(fmt3) + "y" + s2 +
+                             Math.Abs(.kOutput(2)).ToString(fmt3) + "z = " + (- .kOutput(3)).ToString(fmt3) + " with " + CStr(count(index)) +
                              " closely matching plane equations." + vbCrLf
                 End With
             End If
@@ -507,7 +507,7 @@ Public Class XR_Plane_Histogram : Inherits TaskParent
         cv.Cv2.Rectangle(dst2, New cv.Rect(rX, 0, binWidth, dst2.Height), cv.Scalar.Yellow, task.lineWidth)
         If Math.Abs(peak - peakFloor) > rangePerBin * 2 Then peakFloor = peak
 
-        labels(3) = "Peak Ceiling = " + Format(peakCeiling, fmt3) + " and Peak Floor = " + Format(peakFloor, fmt3)
+        labels(3) = "Peak Ceiling = " + peakCeiling.ToString(fmt3) + " and Peak Floor = " + peakFloor.ToString(fmt3)
         SetTrueText("Yellow rectangle is likely floor and black is likely ceiling.")
     End Sub
 End Class
@@ -572,19 +572,19 @@ Public Class Plane_Equation : Inherits TaskParent
         End If
         If dotlist.Count Then
             If task.heartBeat Then
-                justEquation = Format(rc.eq(0), fmt3) + "*X + " + Format(rc.eq(1), fmt3) + "*Y + "
-                justEquation += Format(rc.eq(2), fmt3) + "*Z + " + Format(rc.eq(3), fmt3) + vbCrLf
+                justEquation = rc.eq(0).ToString(fmt3) + "*X + " + rc.eq(1).ToString(fmt3) + "*Y + "
+                justEquation += rc.eq(2).ToString(fmt3) + "*Z + " + rc.eq(3).ToString(fmt3) + vbCrLf
                 If xList.Count > 0 Then
                     strOut = "The rc.contour has " + CStr(rc.contour.Count) + " points" + vbCrLf
                     strOut += "Estimated 3D plane equation:" + vbCrLf
                     strOut += justEquation + vbCrLf
                 Else
                     If strOut.Contains("Insufficient points") = False Then
-                        strOut += vbCrLf + "Insufficient points or best dot product too low at " + Format(dotlist.Max(), "0.00")
+                        strOut += vbCrLf + "Insufficient points or best dot product too low at " + dotlist.Max().ToString("0.00")
                     End If
                 End If
                 strOut += CStr(xList.Count) + " 3D plane equations were tested with an average dot product = " +
-                                  Format(dotlist.Average, "0.00")
+                                  dotlist.Average.ToString("0.00")
             End If
         End If
         If standaloneTest() Then
@@ -693,7 +693,7 @@ Public Class XR_Plane_FloorStudy : Inherits TaskParent
             Dim count = cv.Cv2.CountNonZero(dst0(rect))
             If count > options.countThreshold Then
                 nextY = -task.yRange * (task.sideCameraPoint.Y - y) / task.sideCameraPoint.Y - thicknessCMs / 2.5 ' narrow it down to about 1 cm
-                labels(2) = "Y = " + Format(planeY, fmt3) + " separates the floor."
+                labels(2) = "Y = " + planeY.ToString(fmt3) + " separates the floor."
                 SetTrueText(labels(2), 3)
                 Dim sliceMask As New cv.Mat
                 cv.Cv2.InRange(task.pcSplit(1), cv.Scalar.All(planeY), cv.Scalar.All(3.0), sliceMask)

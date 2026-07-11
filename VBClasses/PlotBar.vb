@@ -1,4 +1,4 @@
-Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
+﻿Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 Public Class PlotBar_Basics : Inherits TaskParent
     Public histogram As New cv.Mat
     Public histArray() As Single
@@ -83,7 +83,7 @@ Public Class PlotBar_Basics : Inherits TaskParent
                 Next
                 If addLabels Then Utility_Basics.AddPlotScale(dst2, mm.minVal, mm.maxVal)
             End If
-            labels(2) = "Min/Max values " + Format(mm.minVal, fmt2) + "/" + Format(mm.maxVal, fmt2)
+            labels(2) = "Min/Max values " + mm.minVal.ToString(fmt2) + "/" + mm.maxVal.ToString(fmt2)
         End If
     End Sub
 End Class
@@ -134,8 +134,8 @@ Public Class PlotBar_HistCoreRange : Inherits TaskParent
 
         Dim minRange = wcMinVal + incr * minIndex
         Dim maxRange = wcMinVal + incr * maxIndex
-        labels(2) = "Histogram with fixed range from " + Format(wcMinVal, fmt0) + " to " + Format(wcMaxVal, fmt0)
-        labels(3) = "Histogram after trim to " + Format(minRange, fmt0) + " to " + Format(maxRange, fmt0)
+        labels(2) = "Histogram with fixed range from " + wcMinVal.ToString(fmt0) + " to " + wcMaxVal.ToString(fmt0)
+        labels(3) = "Histogram after trim to " + minRange.ToString(fmt0) + " to " + maxRange.ToString(fmt0)
 
         plotHistNew.minRange = minRange
         plotHistNew.maxRange = maxRange

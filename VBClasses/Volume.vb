@@ -1,4 +1,4 @@
-Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
+﻿Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 Public Class Volume_Basics : Inherits TaskParent
     Public rc As New rcDataOld
     Public volume As Single
@@ -40,11 +40,11 @@ Public Class Volume_Basics : Inherits TaskParent
         Dim mString = If(meterFactor = 100, "centimeters", If(meterFactor = 1, "meters", "decimeters"))
         volume = (maxX - minX) * (maxY - minY) * (maxZ - minZ) * meterFactor * meterFactor * meterFactor
         If task.heartBeat Then
-            strOut = "Volume = " + Format(volume, fmt0) + " cubic " + mString + vbCrLf + vbCrLf
+            strOut = "Volume = " + volume.ToString(fmt0) + " cubic " + mString + vbCrLf + vbCrLf
             strOut += "Min " + vbTab + "Max " + vbTab + "Range " + vbTab + " units=" + mString + vbCrLf
-            strOut += Format(minX * meterFactor, fmt0) + vbTab + Format(maxX * meterFactor, fmt0) + vbTab + Format((maxX - minX) * meterFactor, fmt0) + vbTab + " X dimension" + vbCrLf
-            strOut += Format(minY * meterFactor, fmt0) + vbTab + Format(maxY * meterFactor, fmt0) + vbTab + Format((maxY - minY) * meterFactor, fmt0) + vbTab + " Y dimension" + vbCrLf
-            strOut += Format(minZ * meterFactor, fmt0) + vbTab + Format(maxZ * meterFactor, fmt0) + vbTab + Format((maxZ - minZ) * meterFactor, fmt0) + vbTab + " Z dimension" + vbCrLf
+            strOut += (minX * meterFactor).ToString(fmt0) + vbTab + (maxX * meterFactor).ToString(fmt0) + vbTab + ((maxX - minX) * meterFactor).ToString(fmt0) + vbTab + " X dimension" + vbCrLf
+            strOut += (minY * meterFactor).ToString(fmt0) + vbTab + (maxY * meterFactor).ToString(fmt0) + vbTab + ((maxY - minY) * meterFactor).ToString(fmt0) + vbTab + " Y dimension" + vbCrLf
+            strOut += (minZ * meterFactor).ToString(fmt0) + vbTab + (maxZ * meterFactor).ToString(fmt0) + vbTab + ((maxZ - minZ) * meterFactor).ToString(fmt0) + vbTab + " Z dimension" + vbCrLf
         End If
         SetTrueText(strOut, 3)
     End Sub

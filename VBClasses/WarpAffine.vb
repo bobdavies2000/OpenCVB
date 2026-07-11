@@ -1,4 +1,4 @@
-Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
+﻿Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 Public Class WarpAffine_Basics : Inherits TaskParent
     Dim accum As New AddWeighted_Accumulate
     Public baselineRoll As Single
@@ -33,8 +33,8 @@ Public Class WarpAffine_Basics : Inherits TaskParent
         accum.Run(dst3)
         dst2 = accum.dst2.Clone
 
-        labels(2) = "IMU stabilize + AddWeighted_Accumulate with weight = " + Format(accum.options.accumWeighted, fmt1)
-        labels(3) = "Angle=" + Format(angleDeg, fmt2) + " deg, dx=" + Format(dx, fmt2) + ", dy=" + Format(dy, fmt2)
+        labels(2) = "IMU stabilize + AddWeighted_Accumulate with weight = " + accum.options.accumWeighted.ToString(fmt1)
+        labels(3) = "Angle=" + angleDeg.ToString(fmt2) + " deg, dx=" + dx.ToString(fmt2) + ", dy=" + dy.ToString(fmt2)
     End Sub
 End Class
 
@@ -93,7 +93,7 @@ Public Class WarpAffine_BasicsQT : Inherits TaskParent
         Dim rotationMatrix = cv.Cv2.GetRotationMatrix2D(rotateCenter, rotateAngle, 1.0)
         cv.Cv2.WarpAffine(src, dst2, rotationMatrix, src.Size(), cv.InterpolationFlags.Nearest)
 
-        labels(2) = "Rotated around yellow point " + Format(rotateCenter.X, fmt0) + ", " + Format(rotateCenter.Y, fmt0) +
+        labels(2) = "Rotated around yellow point " + rotateCenter.X.ToString(fmt0) + ", " + rotateCenter.Y.ToString(fmt0) +
                         " with Warpaffine with angle: " + CStr(rotateAngle)
     End Sub
 End Class
@@ -249,12 +249,12 @@ Public Class WarpAffine_Vec3f : Inherits TaskParent
             Next
         End If
         SetTrueText("M defined as: " + vbCrLf +
-                     Format(M.Get(Of Double)(0, 0), fmt2) + vbTab +
-                     Format(M.Get(Of Double)(0, 1), fmt2) + vbTab +
-                     Format(M.Get(Of Double)(0, 2), fmt2) + vbCrLf +
-                     Format(M.Get(Of Double)(1, 0), fmt2) + vbTab +
-                     Format(M.Get(Of Double)(1, 1), fmt2) + vbTab +
-                     Format(M.Get(Of Double)(1, 2), fmt2))
+                     M.Get(Of Double)(0, 0).ToString(fmt2) + vbTab +
+                     M.Get(Of Double)(0, 1).ToString(fmt2) + vbTab +
+                     M.Get(Of Double)(0, 2).ToString(fmt2) + vbCrLf +
+                     M.Get(Of Double)(1, 0).ToString(fmt2) + vbTab +
+                     M.Get(Of Double)(1, 1).ToString(fmt2) + vbTab +
+                     M.Get(Of Double)(1, 2).ToString(fmt2))
     End Sub
 End Class
 
@@ -305,15 +305,15 @@ Public Class WarpAffine_Vec4f : Inherits TaskParent
         End If
 
         SetTrueText("M defined as: " + vbCrLf +
-                     Format(M.Get(Of Double)(0, 0), fmt2) + vbTab +
-                     Format(M.Get(Of Double)(0, 1), fmt2) + vbTab +
-                     Format(M.Get(Of Double)(0, 2), fmt2) + vbCrLf +
-                     Format(M.Get(Of Double)(1, 0), fmt2) + vbTab +
-                     Format(M.Get(Of Double)(1, 1), fmt2) + vbTab +
-                     Format(M.Get(Of Double)(1, 2), fmt2) + vbCrLf +
-                     Format(M.Get(Of Double)(2, 0), fmt2) + vbTab +
-                     Format(M.Get(Of Double)(2, 1), fmt2) + vbTab +
-                     Format(M.Get(Of Double)(2, 2), fmt2) + vbCrLf)
+                     M.Get(Of Double)(0, 0).ToString(fmt2) + vbTab +
+                     M.Get(Of Double)(0, 1).ToString(fmt2) + vbTab +
+                     M.Get(Of Double)(0, 2).ToString(fmt2) + vbCrLf +
+                     M.Get(Of Double)(1, 0).ToString(fmt2) + vbTab +
+                     M.Get(Of Double)(1, 1).ToString(fmt2) + vbTab +
+                     M.Get(Of Double)(1, 2).ToString(fmt2) + vbCrLf +
+                     M.Get(Of Double)(2, 0).ToString(fmt2) + vbTab +
+                     M.Get(Of Double)(2, 1).ToString(fmt2) + vbTab +
+                     M.Get(Of Double)(2, 2).ToString(fmt2) + vbCrLf)
         Dim center As New cv.Point2f(M.Get(Of Double)(0, 2), M.Get(Of Double)(1, 2))
         cv.Cv2.Circle(dst2, center, task.DotSize + 5, cv.Scalar.Yellow, -1, task.lineType)
         center = New cv.Point2f(50, src.Height / 2)

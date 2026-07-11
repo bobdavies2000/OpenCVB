@@ -29,7 +29,7 @@ Public Class Interpolate_Basics : Inherits TaskParent
         dst2 = src.Clone
         Dim newSize = New cv.Size(CInt(dst2.Width * saveSliderValue / 100), CInt(dst2.Height * saveSliderValue / 100))
         cv.Cv2.Resize(src, dst2, newSize, 0, 0, options.warpFlag)
-        labels(2) = "Resize % = " + Format(saveSliderValue / 100, "0%")
+        labels(2) = "Resize % = " + (saveSliderValue / 100).ToString("0%")
     End Sub
 End Class
 
@@ -95,7 +95,7 @@ Public Class Interpolate_Kalman : Inherits TaskParent
 
         labels(3) = "Total frames = " + CStr(myFrameCount) + " updates=" + CStr(updatedFrames) +
                         " savings = " + CStr(myFrameCount - updatedFrames) + " or " +
-                        Format((myFrameCount - updatedFrames) / myFrameCount, "0%") + " diffCount = " + CStr(diffCount)
+                        ((myFrameCount - updatedFrames) / myFrameCount).ToString("0%") + " diffCount = " + CStr(diffCount)
 
         If task.heartBeat Then
             heartCount += 1
@@ -206,7 +206,7 @@ If cv.Cv2.CountNonZero(diff.dst2) > 0 Then
 
         labels(2) = "Total frames = " + CStr(myFrameCount) + " updates=" + CStr(updatedFrames) +
                         " savings = " + CStr(myFrameCount - updatedFrames) + " or " +
-                        Format((myFrameCount - updatedFrames) / myFrameCount, "0%") + " cameraFPS = " + Format(cameraFPS, "00.0") +
-                        " processedFPS = " + Format(processedFPS, "00.0")
+                        ((myFrameCount - updatedFrames) / myFrameCount).ToString("0%") + " cameraFPS = " + cameraFPS.ToString("00.0") +
+                        " processedFPS = " + processedFPS.ToString("00.0")
     End Sub
 End Class

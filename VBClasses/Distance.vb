@@ -151,9 +151,9 @@ Public Class Distance_Point3D : Inherits TaskParent
         Dim z = inPoint1.Z - inPoint2.Z
         distance = Math.Sqrt(x * x + y * y + z * z)
 
-        strOut = Format(inPoint1.X, fmt3) + ", " + Format(inPoint1.Y, fmt3) + ", " + Format(inPoint1.Z, fmt3) + vbCrLf
-        strOut += Format(inPoint2.X, fmt3) + ", " + Format(inPoint2.Y, fmt3) + ", " + Format(inPoint2.Z, fmt3) + vbCrLf
-        strOut += "Distance = " + Format(distance, fmt3)
+        strOut = inPoint1.X.ToString(fmt3) + ", " + inPoint1.Y.ToString(fmt3) + ", " + inPoint1.Z.ToString(fmt3) + vbCrLf
+        strOut += inPoint2.X.ToString(fmt3) + ", " + inPoint2.Y.ToString(fmt3) + ", " + inPoint2.Z.ToString(fmt3) + vbCrLf
+        strOut += "Distance = " + distance.ToString(fmt3)
         SetTrueText(strOut, 3)
     End Sub
 End Class
@@ -184,7 +184,7 @@ Public Class Distance_Point4D : Inherits TaskParent
         Dim d = inPoint1(3) - inPoint2(3)
         distance = Math.Sqrt(x * x + y * y + z * z + d * d)
 
-        strOut = inPoint1.ToString + vbCrLf + inPoint2.ToString + vbCrLf + "Distance = " + Format(distance, fmt1)
+        strOut = inPoint1.ToString + vbCrLf + inPoint2.ToString + vbCrLf + "Distance = " + distance.ToString(fmt1)
         If standalone And task.heartBeat Then SetTrueText(strOut, New cv.Point(10, 10), 2)
     End Sub
 End Class

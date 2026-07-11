@@ -1,4 +1,4 @@
-Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
+﻿Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 Public Class StableLine_BasicsOld : Inherits TaskParent
     Public lp As lpData
     Public lpLast As lpData
@@ -58,7 +58,7 @@ Public Class StableLine_BasicsOld : Inherits TaskParent
 
         If task.heartBeat Then lpLast = lp
 
-        labels(2) = "Image after rotation by " + Format(rotateAngle, fmt3) + " degrees.  Move camera to see impact."
+        labels(2) = "Image after rotation by " + rotateAngle.ToString(fmt3) + " degrees.  Move camera to see impact."
     End Sub
 End Class
 

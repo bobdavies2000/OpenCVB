@@ -15,7 +15,7 @@ Public Class Annealing_Basics_CPP : Inherits TaskParent
         cv.Cv2.Circle(dst2, cityPositions(i), task.DotSize, white, -1, task.lineType)
             cv.Cv2.Line(dst2, cityPositions(i), cityPositions(cityOrder(i)), white, task.lineWidth, task.lineType)
         Next
-        SetTrueText("Energy" + vbCrLf + Format(energy, fmt0), New cv.Point(10, 100), 2)
+        SetTrueText("Energy" + vbCrLf + energy.ToString(fmt0), New cv.Point(10, 100), 2)
     End Sub
     Public Sub setup()
         ReDim cityOrder(numberOfCities - 1)
@@ -98,7 +98,7 @@ Public Class XR_Annealing_MT_CPP : Inherits TaskParent
             anneal(i).Open() ' this will initialize the C++ copy of the city positions.
         Next
         Dim timeSpent = Now.Subtract(startTime)
-        If timeSpent.TotalSeconds < 10000 Then Debug.WriteLine("time spent on last problem = " + Format(timeSpent.TotalSeconds, fmt1) + " seconds.")
+        If timeSpent.TotalSeconds < 10000 Then Debug.WriteLine("time spent on last problem = " + timeSpent.TotalSeconds.ToString(fmt1) + " seconds.")
         startTime = Now
     End Sub
     Public Sub New()
@@ -120,9 +120,9 @@ Public Class XR_Annealing_MT_CPP : Inherits TaskParent
         For i = 0 To anneal.Length - 1
             bestList.Add(anneal(i).energy, i)
             If i Mod 2 = 0 Then
-                strOut += "CPU=" + Format(i, "00") + " energy=" + Format(anneal(i).energy, "0") + vbTab
+                strOut += "CPU=" + i.ToString("00") + " energy=" + anneal(i).energy.ToString("0") + vbTab
             Else
-                strOut += "CPU=" + Format(i, "00") + " energy=" + Format(anneal(i).energy, "0") + vbCrLf
+                strOut += "CPU=" + i.ToString("00") + " energy=" + anneal(i).energy.ToString("0") + vbCrLf
             End If
         Next
         SetTrueText(strOut, New cv.Point(10, 10), 3)

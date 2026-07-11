@@ -1,4 +1,4 @@
-Imports System.IO
+﻿Imports System.IO
 Imports System.Runtime.InteropServices
 Imports System.Threading
 Imports OpenCvSharp.ML
@@ -38,7 +38,7 @@ Namespace VBClasses
             floorList.Add(nextY)
             task.pcFloor = floorList.Average()
             If floorList.Count > task.fOptions.FrameHistoryCount.Value Then floorList.RemoveAt(0)
-            labels(2) = "Y = " + Format(task.pcFloor, fmt3) + " separates the floor.  Total pixels below floor level = " + Format(totalPixels, fmt0)
+            labels(2) = "Y = " + task.pcFloor.ToString(fmt3) + " separates the floor.  Total pixels below floor level = " + totalPixels.ToString(fmt0)
 
             For y = 0 To dst2.Height - 1
                 rect = New cv.Rect(0, y, dst0.Width - 1, 1)
@@ -55,7 +55,7 @@ Namespace VBClasses
             ceilingList.Add(nextY)
             task.pcCeiling = ceilingList.Average()
             If ceilingList.Count > task.fOptions.FrameHistoryCount.Value Then ceilingList.RemoveAt(0)
-            labels(3) = "Y = " + Format(task.pcCeiling, fmt3) + " separates the ceiling.  Total pixels above ceiling level = " + Format(totalPixels, fmt0)
+            labels(3) = "Y = " + task.pcCeiling.ToString(fmt3) + " separates the ceiling.  Total pixels above ceiling level = " + totalPixels.ToString(fmt0)
 
             If standaloneTest() Then
                 cv.Cv2.Threshold(dst0, dst2, 0, 255, cv.ThresholdTypes.Binary)
@@ -543,7 +543,7 @@ Namespace VBClasses
                     dst3.SetTo(0)
                     ' the point cloud contributes one set of camera motion distance and direction.  Now confirm it with feature points
                     feat.Run(src)
-                    strOut = "Swarm distance = " + Format(feat.distanceAvg, fmt1) + " when camMotionPixels = " + Format(task.camMotionPixels, fmt1)
+                    strOut = "Swarm distance = " + feat.distanceAvg.ToString(fmt1) + " when camMotionPixels = " + task.camMotionPixels.ToString(fmt1)
                     If (feat.distanceAvg < task.camMotionPixels / 2) Or task.heartBeat Then
                         task.camMotionPixels = 0
                         src.CopyTo(dst2)
@@ -558,7 +558,7 @@ Namespace VBClasses
 
             labels(2) = "Translation (X, Y) = (" + CStr(translationX) + ", " + CStr(translationY) + ")" +
                                 If(lpHorizon.p1.Y = 0 And lpHorizon.p2.Y = 0, " there is no horizon present", "")
-            labels(3) = "Camera direction (radians) = " + Format(task.camDirection, fmt1) + " with distance = " + Format(task.camMotionPixels, fmt1)
+            labels(3) = "Camera direction (radians) = " + task.camDirection.ToString(fmt1) + " with distance = " + task.camMotionPixels.ToString(fmt1)
         End Sub
     End Class
 
@@ -650,10 +650,10 @@ Namespace VBClasses
             lpGravity = task.lpGravity
             lpHorizon = task.lpHorizon
 
-            labels(2) = "Translation X = " + Format(translationX, fmt1) + " rotation X = " + Format(rotationX, fmt1) + " degrees " +
-                                " center of rotation X = " + Format(centerX.X, fmt0) + ", " + Format(centerX.Y, fmt0)
-            labels(3) = "Translation Y = " + Format(translationY, fmt1) + " rotation Y = " + Format(rotationY, fmt1) + " degrees " +
-                                " center of rotation Y = " + Format(centerY.X, fmt0) + ", " + Format(centerY.Y, fmt0)
+            labels(2) = "Translation X = " + translationX.ToString(fmt1) + " rotation X = " + rotationX.ToString(fmt1) + " degrees " +
+                                " center of rotation X = " + centerX.X.ToString(fmt0) + ", " + centerX.Y.ToString(fmt0)
+            labels(3) = "Translation Y = " + translationY.ToString(fmt1) + " rotation Y = " + rotationY.ToString(fmt1) + " degrees " +
+                                " center of rotation Y = " + centerY.X.ToString(fmt0) + ", " + centerY.Y.ToString(fmt0)
         End Sub
     End Class
 
@@ -753,7 +753,7 @@ Namespace VBClasses
 
             If p1.X >= 1 Then
                 strOut = "p1 = " + p1.ToString + vbCrLf + "p2 = " + p2.ToString + vbCrLf + "      val =  " +
-                                  Format(dst0.Get(Of Single)(p1.Y, p1.X)) + vbCrLf + "lastVal = " + Format(dst0.Get(Of Single)(p1.Y, p1.X - 1))
+                                  dst0.Get(Of Single)(p1.Y, p1.X).ToString() + vbCrLf + "lastVal = " + dst0.Get(Of Single)(p1.Y, p1.X - 1).ToString()
             End If
             SetTrueText(strOut, 3)
 
@@ -874,9 +874,9 @@ Namespace VBClasses
                     Dim diff = Math.Abs(grayStdev(0) - nextColorStdev)
                     If diff > threshold Then
                         cv.Cv2.Rectangle(dst2, brick.rect, cv.Scalar.All(255), task.lineWidth)
-                        SetTrueText(Format(grayStdev(0), fmt1) + " " + Format(colorStdev, fmt1), brick.rect.TopLeft, 2)
+                        SetTrueText(grayStdev(0).ToString(fmt1) + " " + colorStdev.ToString(fmt1), brick.rect.TopLeft, 2)
                         cv.Cv2.Rectangle(dst3, brick.rect, task.highlight, task.lineWidth)
-                        SetTrueText(Format(diff, fmt1), brick.rect.TopLeft, 3)
+                        SetTrueText(diff.ToString(fmt1), brick.rect.TopLeft, 3)
                         count += 1
                     End If
                 Next
@@ -1246,7 +1246,7 @@ Namespace VBClasses
                 SetTrueText(tc.strOut, New cv.Point(tc.rect.X, tc.rect.Y))
             Next
 
-            strOut = "Mask count = " + CStr(maskCount) + ", Expected count = " + CStr(distance) + " or " + Format(maskCount / distance, "0%") + vbCrLf
+            strOut = "Mask count = " + CStr(maskCount) + ", Expected count = " + CStr(distance) + " or " + (maskCount / distance).ToString("0%") + vbCrLf
             cv.Cv2.Line(dst2, p1, p2, task.highlight, task.lineWidth, task.lineType)
 
             strOut += "Color changes when correlation falls below threshold and new line is detected." + vbCrLf +
@@ -1493,7 +1493,7 @@ Namespace VBClasses
 
             If frameList.Count >= task.fOptions.FrameHistoryCount.Value Then frameList.RemoveAt(0)
             pixelcount = cv.Cv2.CountNonZero(dst3)
-            labels(3) = "There were " + CStr(lineTotal) + " lines detected using " + Format(pixelcount / 1000, "#.0") + "k pixels"
+            labels(3) = "There were " + CStr(lineTotal) + " lines detected using " + (pixelcount / 1000).ToString("#.0") + "k pixels"
         End Sub
     End Class
 
@@ -1828,8 +1828,8 @@ Namespace VBClasses
             cv.Cv2.MeanStdDev(task.pointCloud, mean, stdev, mask)
 
             strOut += "The " + maskLabel + " mask has Y mean and stdev are:" + vbCrLf
-            strOut += maskLabel + " Y Mean = " + Format(mean(1), fmt3) + vbCrLf
-            strOut += maskLabel + " Y Stdev = " + Format(stdev(1), fmt3) + vbCrLf + vbCrLf
+            strOut += maskLabel + " Y Mean = " + mean(1).ToString(fmt3) + vbCrLf
+            strOut += maskLabel + " Y Stdev = " + stdev(1).ToString(fmt3) + vbCrLf + vbCrLf
 
             If Math.Abs(mean(1)) > task.yRange / 4 Then dst1 = mask Or dst1
         End Sub
@@ -1840,7 +1840,7 @@ Namespace VBClasses
             bpLine.Run(src)
 
             If bpLine.lpList.Count > 0 Then
-                strOut = "Y range = " + Format(task.yRange, fmt3) + vbCrLf + vbCrLf
+                strOut = "Y range = " + task.yRange.ToString(fmt3) + vbCrLf + vbCrLf
                 If task.heartBeat Then yList.Clear()
                 If task.heartBeat Then dst1.SetTo(0)
                 Dim h = dst2.Height / 2
@@ -2368,7 +2368,7 @@ Namespace VBClasses
             cv.Cv2.ConvertScaleAbs(tmp32f, dst2, 255)
             dst2.SetTo(0, task.noDepthMask)
             dst2(New cv.Rect(0, dst2.Height - options.pixels, dst2.Width, options.pixels)).SetTo(0)
-            labels(2) = "White: z is within " + Format(options.threshold * 1000, fmt0) + " mm's with Y pixel offset " + CStr(options.pixels)
+            labels(2) = "White: z is within " + (options.threshold * 1000).ToString(fmt0) + " mm's with Y pixel offset " + CStr(options.pixels)
         End Sub
     End Class
 
@@ -2596,9 +2596,9 @@ Namespace VBClasses
 
             Dim brickIndex = task.gridMap.Get(Of Integer)(rect.Y, rect.X)
             If brickIndex > 0 Then
-                labels(3) = "Depth = " + Format(bricks.brickList(brickIndex).depth, fmt1) + "m"
+                labels(3) = "Depth = " + bricks.brickList(brickIndex).depth.ToString(fmt1) + "m"
                 brickIndex = task.gridMap.Get(Of Integer)(rect.BottomRight.Y, rect.BottomRight.X)
-                labels(3) += " to " + Format(bricks.brickList(brickIndex).depth, fmt1) + "m"
+                labels(3) += " to " + bricks.brickList(brickIndex).depth.ToString(fmt1) + "m"
             Else
                 labels(3) = "No depth region present..."
             End If
@@ -2873,8 +2873,8 @@ Namespace VBClasses
             dst3.SetTo(0)
             task.rightView.CopyTo(dst3, dst0)
 
-            labels(2) = Format(count / bricks.brickList.Count, "0%") + " of bricks had color correlation of " +
-                        Format(task.fCorrThreshold, "0.0%") + " or better"
+            labels(2) = (count / bricks.brickList.Count).ToString("0%") + " of bricks had color correlation of " +
+                        task.fCorrThreshold.ToString("0.0%") + " or better"
         End Sub
     End Class
 
@@ -2947,9 +2947,9 @@ Namespace VBClasses
 
             Dim brickIndex = task.gridMap.Get(Of Integer)(rect.Y, rect.X)
             If brickIndex > 0 Then
-                labels(3) = "Depth = " + Format(bricks.brickList(brickIndex).depth, fmt1) + "m"
+                labels(3) = "Depth = " + bricks.brickList(brickIndex).depth.ToString(fmt1) + "m"
                 brickIndex = task.gridMap.Get(Of Integer)(rect.BottomRight.Y, rect.BottomRight.X)
-                labels(3) += " to " + Format(bricks.brickList(brickIndex).depth, fmt1) + "m"
+                labels(3) += " to " + bricks.brickList(brickIndex).depth.ToString(fmt1) + "m"
             Else
                 labels(3) = "No depth region present..."
             End If
@@ -3224,8 +3224,8 @@ Namespace VBClasses
             dst3.SetTo(0)
             task.rightView.CopyTo(dst3, dst0)
 
-            labels(2) = Format(count / bricks.brickList.Count, "0%") + " of bricks had color correlation of " +
-                        Format(task.fCorrThreshold, "0.0%") + " or better"
+            labels(2) = (count / bricks.brickList.Count).ToString("0%") + " of bricks had color correlation of " +
+                        task.fCorrThreshold.ToString("0.0%") + " or better"
         End Sub
     End Class
 
@@ -3564,8 +3564,8 @@ Namespace VBClasses
                     End If
                 Next
             End If
-            labels(2) = "Starting with " + Format(task.lines.lpList.Count, "000") + " lines, there are " +
-                                               Format(lines3D.Count / 2, "000") + " with depth data."
+            labels(2) = "Starting with " + task.lines.lpList.Count.ToString("000") + " lines, there are " +
+                                               (lines3D.Count / 2).ToString("000") + " with depth data."
             labels(3) = "There were " + CStr(sortedVerticals.Count) + " vertical lines (blue) and " + CStr(sortedHorizontals.Count) + " horizontal lines (yellow)"
         End Sub
     End Class
@@ -3626,8 +3626,8 @@ Namespace VBClasses
                 End If
             Next
 
-            labels(2) = "Starting with " + Format(task.lines.lpList.Count, "000") +
-                                       " lines, there are " + Format(raw3D.Count, "000") + " with depth data."
+            labels(2) = "Starting with " + task.lines.lpList.Count.ToString("000") +
+                                       " lines, there are " + raw3D.Count.ToString("000") + " with depth data."
             If raw3D.Count = 0 Then
                 SetTrueText("No vertical or horizontal lines were found")
             Else
@@ -3683,7 +3683,7 @@ Namespace VBClasses
                 Dim p2 = gRect.tc2.center
                 If compare(New lpData, longest.knn.lastPair) Then longest.knn.lastPair = New lpData(p1, p2)
                 Dim pt = New cv.Point((p1.X + p2.X) / 2, (p1.Y + p2.Y) / 2)
-                SetTrueText(CStr(index) + vbCrLf + Format(gRect.arcY, fmt1), pt, 3)
+                SetTrueText(CStr(index) + vbCrLf + gRect.arcY.ToString(fmt1), pt, 3)
                 index += 1
 
                 cv.Cv2.Line(dst3, p1, p2, task.highlight, task.lineWidth, task.lineType)
@@ -3785,7 +3785,7 @@ Namespace VBClasses
                 lengthReject += 1
                 lastLength = bestLength
             End If
-            labels(3) = "Length rejects = " + Format(lengthReject / (task.frameCount + 1), "0%")
+            labels(3) = "Length rejects = " + (lengthReject / (task.frameCount + 1)).ToString("0%")
         End Sub
     End Class
 
@@ -3822,8 +3822,8 @@ Namespace VBClasses
             Dim pt2 = lines.lines3D(index + 1)
             Dim len3D = Distance_Basics.distance3D(pt1, pt2)
             Dim arcY = Math.Abs(Math.Asin((pt1.Y - pt2.Y) / len3D) * RadToDeg)
-            SetTrueText(Format(arcY, fmt3) + vbCrLf + Format(len3D, fmt3) + "m len" + vbCrLf + Format(pt1.Z, fmt1) + "m dist", p1)
-            SetTrueText(Format(arcY, fmt3) + vbCrLf + Format(len3D, fmt3) + "m len" + vbCrLf + Format(pt1.Z, fmt1) + "m distant", p1, 3)
+            SetTrueText(arcY.ToString(fmt3) + vbCrLf + len3D.ToString(fmt3) + "m len" + vbCrLf + pt1.Z.ToString(fmt1) + "m dist", p1)
+            SetTrueText(arcY.ToString(fmt3) + vbCrLf + len3D.ToString(fmt3) + "m len" + vbCrLf + pt1.Z.ToString(fmt1) + "m distant", p1, 3)
         End Sub
     End Class
 
@@ -3975,8 +3975,8 @@ Namespace VBClasses
                     cv.Cv2.Line(dst2, lp.p1, lp.p2, cv.Scalar.Red, task.lineWidth, task.lineType)
                 End If
             Next
-            labels(2) = "Slope for gravity is " + Format(task.lpGravity.slope, fmt1) + ".  Slope for horizon is " +
-                            Format(task.lpHorizon.slope, fmt1)
+            labels(2) = "Slope for gravity is " + task.lpGravity.slope.ToString(fmt1) + ".  Slope for horizon is " +
+                            task.lpHorizon.slope.ToString(fmt1)
         End Sub
     End Class
 
@@ -4079,7 +4079,7 @@ Namespace VBClasses
                     If len3D > 0 Then
                         Dim arcY = Math.Abs(Math.Asin((pt1.Y - pt2.Y) / len3D) * RadToDeg)
                         arcList.Add(arcY)
-                        flow.nextMsg += Format(arcY, fmt3) + " degrees" + vbTab + Format(len3D, fmt3) + "m " + vbTab + Format(pt1.Z, fmt1) + "m"
+                        flow.nextMsg += arcY.ToString(fmt3) + " degrees" + vbTab + len3D.ToString(fmt3) + "m " + vbTab + pt1.Z.ToString(fmt1) + "m"
                     End If
                 Next
                 If flow.nextMsg = title Then flow.nextMsg = "No feature line found..."
@@ -4099,8 +4099,8 @@ Namespace VBClasses
 
             Dim avg = arcList.Average()
             arcLongAverage.Add(avg)
-            labels(3) = "arcY avg = " + Format(avg, fmt1) + ", long term average = " + Format(arcLongAverage.Average, fmt1) +
-                            ", first was best " + Format(firstBest / task.frameCount, "0%") + " of the time, Avg of longest line " + Format(firstAverage.Average, fmt1)
+            labels(3) = "arcY avg = " + avg.ToString(fmt1) + ", long term average = " + arcLongAverage.Average.ToString(fmt1) +
+                            ", first was best " + (firstBest / task.frameCount).ToString("0%") + " of the time, Avg of longest line " + firstAverage.Average.ToString(fmt1)
             If arcLongAverage.Count > 1000 Then
                 arcLongAverage.RemoveAt(0)
                 firstAverage.RemoveAt(0)
@@ -4145,7 +4145,7 @@ Namespace VBClasses
                 task.highlight = If(task.highlight = cv.Scalar.Yellow, cv.Scalar.Blue, cv.Scalar.Yellow)
                 knn.lastPair = New lpData(New cv.Point2f, New cv.Point2f)
             End If
-            labels(2) = "Longest line end points had correlation of " + Format(match.correlation, fmt3) + " with the original longest line."
+            labels(2) = "Longest line end points had correlation of " + match.correlation.ToString(fmt3) + " with the original longest line."
         End Sub
     End Class
 
@@ -4192,8 +4192,8 @@ Namespace VBClasses
             cv.Cv2.Line(dst2, p1, p2, task.highlight, task.lineWidth, task.lineType)
             cv.Cv2.Circle(dst2, p1, task.DotSize, task.highlight, -1, task.lineType)
             cv.Cv2.Circle(dst2, p2, task.DotSize, task.highlight, -1, task.lineType)
-            SetTrueText(Format(match1.correlation, fmt3), p1)
-            SetTrueText(Format(match2.correlation, fmt3), p2)
+            SetTrueText(match1.correlation.ToString(fmt3), p1)
+            SetTrueText(match2.correlation.ToString(fmt3), p2)
         End Sub
     End Class
 
@@ -4320,8 +4320,8 @@ Namespace VBClasses
             maxX = If(maxX < mmX.maxVal, mmX.maxVal, maxX)
             maxY = If(maxY < mmY.maxVal, mmY.maxVal, maxY)
 
-            SetTrueText("mmx min/max = " + Format(minX, "0.00") + "/" + Format(maxX, "0.00") + " mmy min/max " + Format(minY, "0.00") +
-                            "/" + Format(maxY, "0.00"), 3)
+            SetTrueText("mmx min/max = " + minX.ToString("0.00") + "/" + maxX.ToString("0.00") + " mmy min/max " + minY.ToString("0.00") +
+                            "/" + maxY.ToString("0.00"), 3)
 
             dst2.SetTo(0)
             Dim white = New cv.Vec3b(255, 255, 255)
@@ -4850,7 +4850,7 @@ Namespace VBClasses
             If classCount = 0 Then Exit Sub
             Dim pixelData = cv.Mat.FromPixelData(classCount, 1, cv.MatType.CV_8UC3, Pixels_Vector_Pixels(cPtr))
             SetTrueText(CStr(classCount) + " unique BGR pixels were found in the src." + vbCrLf +
-                            "Or " + Format(classCount / src.Total, "0%") + " of the input were unique pixels.")
+                            "Or " + (classCount / src.Total).ToString("0%") + " of the input were unique pixels.")
         End Sub
         Protected Overrides Sub Finalize()
             Pixels_Vector_Close(cPtr)
@@ -5185,7 +5185,7 @@ Namespace VBClasses
             cv.Cv2.MatchTemplate(task.gray(task.drawRect), task.leftView, dst2, cv.TemplateMatchModes.CCoeffNormed)
             Dim mm = GetMinMax(dst2)
             dst3 = src(ValidateRect(New cv.Rect(mm.maxLoc.X / 2, mm.maxLoc.Y / 2, dst2.Width, dst2.Height)))
-            labels(2) = "Correlation coefficient peak = " + Format(mm.maxVal, fmt3)
+            labels(2) = "Correlation coefficient peak = " + mm.maxVal.ToString(fmt3)
         End Sub
     End Class
 
@@ -5254,14 +5254,14 @@ Namespace VBClasses
                 If standaloneTest() Then
                     For i = 0 To task.gridRects.Count - 1
                         Dim gRect = task.gridRects(i)
-                        SetTrueText(Format(meanValues(i), fmt3) + vbCrLf +
-                                        Format(stdValues(i), fmt3), gRect.Location, 3)
+                        SetTrueText(meanValues(i).ToString(fmt3) + vbCrLf +
+                                        stdValues(i).ToString(fmt3), gRect.Location, 3)
                     Next
                 End If
 
                 dst3 = dst3 Or task.gridMask
-                labels(2) = "The regions where the depth is volatile are brighter.  Stdev min " + Format(mmStd.minVal, fmt3) + " Stdev Max " + Format(mmStd.maxVal, fmt3)
-                labels(3) = "Mean/stdev for each gRect: Min " + Format(mm.minVal, fmt3) + " Max " + Format(mm.maxVal, fmt3)
+                labels(2) = "The regions where the depth is volatile are brighter.  Stdev min " + mmStd.minVal.ToString(fmt3) + " Stdev Max " + mmStd.maxVal.ToString(fmt3)
+                labels(3) = "Mean/stdev for each gRect: Min " + mm.minVal.ToString(fmt3) + " Max " + mm.maxVal.ToString(fmt3)
             End If
         End Sub
     End Class
@@ -5458,8 +5458,8 @@ Namespace VBClasses
 
                 match.Run(matchInput)
 
-                labels(2) = "Line end point correlation:  " + Format(match.correlation, fmt3) + " / " +
-                                " with " + Format(lineRuns / matchRuns, "0%") + " requiring line detection.  " +
+                labels(2) = "Line end point correlation:  " + match.correlation.ToString(fmt3) + " / " +
+                                " with " + (lineRuns / matchRuns).ToString("0%") + " requiring line detection.  " +
                                 "line detection runs = " + CStr(totalLineRuns)
             End If
 
@@ -5618,7 +5618,7 @@ Namespace VBClasses
             plot.plotData = New cv.Scalar(mm.maxVal)
             plot.Run(src)
             dst3 = plot.dst2
-            labels(3) = "Histogram maxVal = " + Format(mm.maxVal, fmt1) + " histogram mean = " + Format(mean, fmt1)
+            labels(3) = "Histogram maxVal = " + mm.maxVal.ToString(fmt1) + " histogram mean = " + mean.ToString(fmt1)
             cv.Cv2.ConvertScaleAbs(peak.histogram, mats.mat(3), 255)
 
             mats.mat(0) = peak.dst2(peak.mini.rect)
@@ -5702,7 +5702,7 @@ Namespace VBClasses
             strOut = "Adjusted = " + vbTab + CStr(adjustedCount) + "k" + vbCrLf +
                          "Expected = " + vbTab + CStr(expectedCount) + "k" + vbCrLf +
                          "Diff = " + vbTab + vbTab + CStr(diff) + vbCrLf +
-                         "xRange = " + vbTab + Format(task.xRange, fmt3)
+                         "xRange = " + vbTab + task.xRange.ToString(fmt3)
 
             If task.useXYRange Then
                 Dim saveOptionState = task.optionsChanged ' the xRange and yRange change frequently.  It is safe to ignore it.
@@ -5753,7 +5753,7 @@ Namespace VBClasses
             strOut = "Adjusted = " + vbTab + CStr(adjustedCount) + "k" + vbCrLf +
                          "Expected = " + vbTab + CStr(expectedCount) + "k" + vbCrLf +
                          "Diff = " + vbTab + vbTab + CStr(diff) + vbCrLf +
-                         "yRange = " + vbTab + Format(task.yRange, fmt3)
+                         "yRange = " + vbTab + task.yRange.ToString(fmt3)
 
             If task.useXYRange Then
                 Dim saveOptionState = task.optionsChanged ' the xRange and yRange change frequently.  It is safe to ignore it.
@@ -5909,7 +5909,7 @@ Namespace VBClasses
                 Dim contour = depthContourList(i)
                 dst2(contour.rect).SetTo(contour.ID Mod 255, contour.mask)
                 Dim str = CStr(contour.ID) + " ID" + vbCrLf + CStr(contour.pixels) + " pixels" + vbCrLf +
-                              Format(contour.depth, fmt3) + "m depth" + vbCrLf + Format(contour.mm.range, fmt3) + " range in m"
+                              contour.depth.ToString(fmt3) + "m depth" + vbCrLf + contour.mm.range.ToString(fmt3) + " range in m"
                 SetTrueText(str, contour.maxDist, 2)
             Next
 
@@ -6030,7 +6030,7 @@ Namespace VBClasses
                 cv.Cv2.Circle(dst2, match.newCenter, task.DotSize, white, -1, task.lineType)
                 cv.Cv2.Rectangle(dst2, matchRect, task.highlight, task.lineWidth)
                 cv.Cv2.Normalize(match.dst0, dst3, 0, 255, cv.NormTypes.MinMax)
-                SetTrueText(Format(match.correlation, fmt3), match.newCenter)
+                SetTrueText(match.correlation.ToString(fmt3), match.newCenter)
             End If
 
             Dim lpListRaw = Line_Core.getRawSortedLines(ld.Detect(src))
@@ -6186,7 +6186,7 @@ Namespace VBClasses
                 cv.Cv2.Rectangle(dst2, lp.rect, task.highlight, task.lineWidth)
                 cv.Cv2.Line(dst2, lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
                 cv.Cv2.Normalize(match.dst0, dst3, 0, 255, cv.NormTypes.MinMax)
-                SetTrueText(Format(match.correlation, fmt3), match.newCenter)
+                SetTrueText(match.correlation.ToString(fmt3), match.newCenter)
 
                 cv.Cv2.Rectangle(dst2, lp.rect, task.highlight, task.lineWidth)
             End If
@@ -6195,7 +6195,7 @@ Namespace VBClasses
             dst1 = Palettize(lpRectMap, 0)
             cv.Cv2.Circle(dst1, lp.ptCenter, task.DotSize, task.highlight, task.lineWidth, task.lineType)
 
-            labels(2) = "Selected line has a correlation of " + Format(match.correlation, fmt3) + " with the previous frame."
+            labels(2) = "Selected line has a correlation of " + match.correlation.ToString(fmt3) + " with the previous frame."
         End Sub
     End Class
 
@@ -6406,9 +6406,9 @@ Namespace VBClasses
             End If
             resyncFrames += 1
 
-            strOut = "Rotation: " + Format(sides.rotateAngle * RadToDeg, fmt1) + " degrees" + vbCrLf
+            strOut = "Rotation: " + (sides.rotateAngle * RadToDeg).ToString(fmt1) + " degrees" + vbCrLf
             strOut += "Translation: " + CStr(CInt(sides.centerShift.X)) + ", " + CStr(CInt(sides.centerShift.Y)) + vbCrLf
-            strOut += "Frames since last resync: " + Format(resyncFrames, "000") + vbCrLf + vbCrLf
+            strOut += "Frames since last resync: " + resyncFrames.ToString("000") + vbCrLf + vbCrLf
             strOut += "Resync last caused by: " + vbCrLf + resyncCause
 
             For Each pt In sides.currPoly ' topFeatures.stable.goodCounts
@@ -6531,10 +6531,10 @@ Namespace VBClasses
                     Dim hypotenuse = rotateCenter.DistanceTo(near.pt)
                     rotateAngle = -Math.Asin(near.nearPoint.DistanceTo(near.pt) / hypotenuse)
                     If Single.IsNaN(rotateAngle) Then rotateAngle = 0
-                    strOut = "Angle is " + Format(rotateAngle * RadToDeg, fmt1) + " degrees" + vbCrLf
+                    strOut = "Angle is " + (rotateAngle * RadToDeg).ToString(fmt1) + " degrees" + vbCrLf
                 End If
             End If
-            strOut += "Translation (shift) is " + Format(-centerShift.X, fmt0) + ", " + Format(-centerShift.Y, fmt0)
+            strOut += "Translation (shift) is " + (-centerShift.X).ToString(fmt0) + ", " + (-centerShift.Y).ToString(fmt0)
 
             If Math.Abs(rotateAngle) > 0 Then
                 rotatePoly.rotateCenter = rotateCenter
@@ -6669,9 +6669,9 @@ Namespace VBClasses
                 SetTrueText(CStr(i), fPD.currPoly(i), 1)
             Next
 
-            strOut = "Rotation: " + Format(fPD.rotateAngle * RadToDeg, fmt1) + " degrees" + vbCrLf
+            strOut = "Rotation: " + (fPD.rotateAngle * RadToDeg).ToString(fmt1) + " degrees" + vbCrLf
             strOut += "Translation: " + CStr(CInt(fPD.centerShift.X)) + ", " + CStr(CInt(fPD.centerShift.Y)) + vbCrLf
-            strOut += "Frames since last resync: " + Format(resyncFrames, "000") + vbCrLf
+            strOut += "Frames since last resync: " + resyncFrames.ToString("000") + vbCrLf
             strOut += "Last resync cause(s): " + vbCrLf + resyncCause
 
             For Each keyval In feat.stable.goodCounts
@@ -6738,8 +6738,8 @@ Namespace VBClasses
             plotHist.Run(histMat)
             dst2 = plotHist.dst2
             Dim avg = If(distDiff.Count > 0, distDiff.Average, 0)
-            labels(2) = "Average distance change (after threshholding) = " + Format(avg, fmt3) + ", peak at " + CStr(peakIndex) +
-                                " with " + Format(peak, fmt1) + " occurances"
+            labels(2) = "Average distance change (after threshholding) = " + avg.ToString(fmt3) + ", peak at " + CStr(peakIndex) +
+                                " with " + peak.ToString(fmt1) + " occurances"
         End Sub
     End Class
 
@@ -6780,8 +6780,8 @@ Namespace VBClasses
             dst2 = ShowAddweighted(plotHist.dst2, lastPlot, labels(2))
             If task.heartBeat Then
                 Dim avg = If(fPlot.distDiff.Count > 0, fPlot.distDiff.Average, 0)
-                labels(2) = "Average distance change (after threshholding) = " + Format(avg, fmt3) + ", peak at " +
-                                CStr(peakIndex) + " with " + Format(peak, fmt1) + " occurances"
+                labels(2) = "Average distance change (after threshholding) = " + avg.ToString(fmt3) + ", peak at " +
+                                CStr(peakIndex) + " with " + peak.ToString(fmt1) + " occurances"
             End If
         End Sub
     End Class
@@ -7026,9 +7026,9 @@ Namespace VBClasses
             XO_FPoly_Basics.DrawFPoly(dst3, polyPrev, white)
             XO_FPoly_Basics.DrawFPoly(dst3, rotateAndShift, cv.Scalar.Yellow)
 
-            strOut = "After Rotation: " + Format(rotatePoly.rotateAngle, fmt0) + " degrees " +
-                         "After Translation (shift) of: " + Format(centerShift.X, fmt0) + ", " + Format(centerShift.Y, fmt0) + vbCrLf +
-                         "Center of Rotation: " + Format(rotateCenter.X, fmt0) + ", " + Format(rotateCenter.Y, fmt0) + vbCrLf +
+            strOut = "After Rotation: " + rotatePoly.rotateAngle.ToString(fmt0) + " degrees " +
+                         "After Translation (shift) of: " + centerShift.X.ToString(fmt0) + ", " + centerShift.Y.ToString(fmt0) + vbCrLf +
+                         "Center of Rotation: " + rotateCenter.X.ToString(fmt0) + ", " + rotateCenter.Y.ToString(fmt0) + vbCrLf +
                          "If the algorithm is working properly, the white and yellow Feature polygons below " + vbCrLf +
                          "should match in size and location."
             SetTrueText(strOut, 3)
@@ -7079,8 +7079,8 @@ Namespace VBClasses
             cv.Cv2.Threshold(tmp, changed, options.pixelDiffThreshold, 255, cv.ThresholdTypes.Binary)
             Dim diffCount = cv.Cv2.CountNonZero(changed)
             strOut = fPoly.strOut
-            strOut += vbCrLf + Format(diffCount / 1000, fmt0) + "k pixels differ or " +
-                                   Format(diffCount / dst3.Total, "0%")
+            strOut += vbCrLf + (diffCount / 1000).ToString(fmt0) + "k pixels differ or " +
+                                   (diffCount / dst3.Total).ToString("0%")
 
             SetTrueText(strOut, 1)
         End Sub
@@ -7233,7 +7233,7 @@ Namespace VBClasses
                 resync = fpoly.resync
                 fpoly.maskChangePercent = diffCount / dst3.Total
                 strOut = fpoly.strOut
-                strOut += vbCrLf + Format(diffCount / 1000, fmt0) + "k pixels differ or " + Format(fpoly.maskChangePercent, "00%")
+                strOut += vbCrLf + (diffCount / 1000).ToString(fmt0) + "k pixels differ or " + fpoly.maskChangePercent.ToString("00%")
 
             Else
                 dst2 = fpoly.resyncImage.Clone
@@ -7326,7 +7326,7 @@ Namespace VBClasses
             cv.Cv2.Line(dst3, polymp.p1, polymp.p2, 255, task.lineWidth, task.lineType)
 
             Dim pixelCount = cv.Cv2.CountNonZero(dst3)
-            SetTrueText(Format(Math.Abs(lastPixelCount - pixelCount)) + " pixels ", 3)
+            SetTrueText(Math.Abs(lastPixelCount - pixelCount).ToString() + " pixels ", 3)
             lastPixelCount = pixelCount
         End Sub
     End Class
@@ -7401,10 +7401,10 @@ Namespace VBClasses
                     Dim hypotenuse = fPD.rotateCenter.DistanceTo(near.pt)
                     fPD.rotateAngle = -Math.Asin(near.nearPoint.DistanceTo(near.pt) / hypotenuse)
                     If Single.IsNaN(fPD.rotateAngle) Then fPD.rotateAngle = 0
-                    strOut = "Angle is " + Format(fPD.rotateAngle * RadToDeg, fmt1) + " degrees" + vbCrLf
+                    strOut = "Angle is " + (fPD.rotateAngle * RadToDeg).ToString(fmt1) + " degrees" + vbCrLf
                 End If
             End If
-            strOut += "Translation (shift) is " + Format(-fPD.centerShift.X, fmt0) + ", " + Format(-fPD.centerShift.Y, fmt0)
+            strOut += "Translation (shift) is " + (-fPD.centerShift.X).ToString(fmt0) + ", " + (-fPD.centerShift.Y).ToString(fmt0)
 
             If Math.Abs(fPD.rotateAngle) > 0 Then
                 rotatePoly.rotateCenter = fPD.rotateCenter
@@ -7518,7 +7518,7 @@ Namespace VBClasses
                 resync = fpoly.resync
                 fpoly.maskChangePercent = diffCount / dst3.Total
                 strOut = fpoly.strOut
-                strOut += vbCrLf + Format(diffCount / 1000, fmt0) + "k pixels differ or " + Format(fpoly.maskChangePercent, "00%")
+                strOut += vbCrLf + (diffCount / 1000).ToString(fmt0) + "k pixels differ or " + fpoly.maskChangePercent.ToString("00%")
             Else
                 dst2 = fpoly.sides.prevImage.Clone
                 dst3.SetTo(0)
@@ -7605,7 +7605,7 @@ Namespace VBClasses
                 If absDiff < threshold Or threshold = 0 Then
                     goodPoints.Add(pt)
                     goodFacets.Add(facet)
-                    SetTrueText(Format(absDiff, fmt1), pt, 2)
+                    SetTrueText(absDiff.ToString(fmt1), pt, 2)
                     cv.Cv2.Line(dst3, anchor, pt, task.highlight, task.lineWidth, task.lineType)
                     dst2.Set(Of cv.Vec3b)(pt.Y, pt.X, white.ToVec3b)
                 End If
@@ -7815,7 +7815,7 @@ Namespace VBClasses
             match.Run(src)
             dst3 = src
             cv.Cv2.Rectangle(dst3, match.newRect, task.highlight, task.lineWidth)
-            labels(3) = "Correlation Coefficient = " + Format(match.correlation * 100, fmt1)
+            labels(3) = "Correlation Coefficient = " + (match.correlation * 100).ToString(fmt1)
         End Sub
     End Class
 
@@ -7919,7 +7919,7 @@ Namespace VBClasses
                 Exit Sub
             End If
 
-            labels(3) = "White is the original polygon, yellow has been rotated " + Format(rotateAngle * RadToDeg) + " degrees"
+            labels(3) = "White is the original polygon, yellow has been rotated " + (rotateAngle * RadToDeg).ToString() + " degrees"
 
             ' translate so the center of rotation is 0,0
             Dim translated As New List(Of cv.Point2f)
@@ -8046,17 +8046,17 @@ Namespace VBClasses
                     src(srcRect).CopyTo(dst3(stableRect))
                     Dim nonZero = cv.Cv2.CountNonZero(dst3) / (dst3.Width * dst3.Height)
                     If nonZero < (1 - options.lostMax) Then
-                        labels(3) = "Lost pixels = " + Format(1 - nonZero, "00%")
+                        labels(3) = "Lost pixels = " + (1 - nonZero).ToString("00%")
                         resetImage = True
                     End If
-                    labels(3) = "Offset (x, y) = (" + CStr(shiftX) + "," + CStr(shiftY) + "), " + Format(nonZero, "00%") + " preserved, cc=" + Format(match.correlation, fmt2)
+                    labels(3) = "Offset (x, y) = (" + CStr(shiftX) + "," + CStr(shiftY) + "), " + nonZero.ToString("00%") + " preserved, cc=" + match.correlation.ToString(fmt2)
                 Else
-                    labels(3) = "Below correlation threshold " + Format(options.corrThreshold, fmt2) + " with " +
-                                    Format(match.correlation, fmt2)
+                    labels(3) = "Below correlation threshold " + options.corrThreshold.ToString(fmt2) + " with " +
+                                    match.correlation.ToString(fmt2)
                     resetImage = True
                 End If
             Else
-                labels(3) = "Correlation rectangle stdev is " + Format(stdev(0), "00") + " - too low"
+                labels(3) = "Correlation rectangle stdev is " + stdev(0).ToString("00") + " - too low"
                 resetImage = True
             End If
 
@@ -8165,7 +8165,7 @@ Namespace VBClasses
                 Dim ds_y = affine.Get(Of Double)(1, 1) / Math.Cos(da)
                 Dim saveDX = dx, saveDY = dy, saveDA = da
 
-                Dim text = "Original dx = " + Format(dx, fmt2) + vbCrLf + " dy = " + Format(dy, fmt2) + vbCrLf + " da = " + Format(da, fmt2)
+                Dim text = "Original dx = " + dx.ToString(fmt2) + vbCrLf + " dy = " + dy.ToString(fmt2) + vbCrLf + " da = " + da.ToString(fmt2)
                 SetTrueText(text)
 
                 Dim sx = ds_x, sy = ds_y
@@ -8183,7 +8183,7 @@ Namespace VBClasses
                 If Math.Abs(dy) > 50 Then dy = saveDY
                 If Math.Abs(da) > 50 Then da = saveDA
 
-                text = "dx = " + Format(dx, fmt2) + vbCrLf + " dy = " + Format(dy, fmt2) + vbCrLf + " da = " + Format(da, fmt2)
+                text = "dx = " + dx.ToString(fmt2) + vbCrLf + " dy = " + dy.ToString(fmt2) + vbCrLf + " da = " + da.ToString(fmt2)
                 SetTrueText(text, New cv.Point(10, 100))
 
                 Dim smoothedMat = New cv.Mat(2, 3, cv.MatType.CV_64F)
@@ -8308,7 +8308,7 @@ Namespace VBClasses
                 If task.heartBeat Then dst3.SetTo(0)
                 DrawRect(dst3, matchRect.rectOutput)
             End If
-            labels(2) = "MatchLine correlation = " + Format(matchRect.match.correlation, fmt3) +
+            labels(2) = "MatchLine correlation = " + matchRect.match.correlation.ToString(fmt3) +
                             " - Red = current gravity vector, yellow is matchLine output"
         End Sub
     End Class
@@ -8334,8 +8334,8 @@ Namespace VBClasses
                 match.Run(src)
                 dst1 = match.dst2
 
-                labels(2) = "EndPoint1 correlation:  " + Format(match.p1Correlation, fmt3) + vbTab +
-                                "EndPoint2 correlation:  " + Format(match.p1Correlation, fmt3)
+                labels(2) = "EndPoint1 correlation:  " + match.p1Correlation.ToString(fmt3) + vbTab +
+                                "EndPoint2 correlation:  " + match.p1Correlation.ToString(fmt3)
 
                 If match.p1Correlation < task.fCorrThreshold Or task.frameCount < 10 Or
                        match.p2Correlation < task.fCorrThreshold Then
@@ -8492,8 +8492,8 @@ Namespace VBClasses
 
             dst2 = task.lines.dst2
 
-            labels(2) = "Mean correlation of all the lines is " + Format(correlations.Average, fmt3)
-            labels(3) = "Min/Max correlation = " + Format(correlations.Min, fmt3) + "/" + Format(correlations.Max, fmt3)
+            labels(2) = "Mean correlation of all the lines is " + correlations.Average.ToString(fmt3)
+            labels(3) = "Min/Max correlation = " + correlations.Min.ToString(fmt3) + "/" + correlations.Max.ToString(fmt3)
             lpLast = New List(Of lpData)(task.lines.lpList)
         End Sub
     End Class
@@ -8558,7 +8558,7 @@ Namespace VBClasses
                 cv.Cv2.Line(dst2, lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
             End If
 
-            labels(2) = "Selected line has a correlation of " + Format(match.correlation, fmt3) + " with the previous frame."
+            labels(2) = "Selected line has a correlation of " + match.correlation.ToString(fmt3) + " with the previous frame."
         End Sub
     End Class
 
@@ -8869,7 +8869,7 @@ Namespace VBClasses
                     horizList.Add(lp)
                 End If
             Next
-            labels(2) = "There are " + CStr(horizList.Count) + " lines similar to the horizon " + Format(hAngle, fmt1) + " degrees"
+            labels(2) = "There are " + CStr(horizList.Count) + " lines similar to the horizon " + hAngle.ToString(fmt1) + " degrees"
         End Sub
     End Class
 
@@ -8896,7 +8896,7 @@ Namespace VBClasses
                     vertList.Add(lp)
                 End If
             Next
-            labels(2) = "There are " + CStr(vertList.Count) + " lines similar to the Gravity " + Format(gAngle, fmt1) + " degrees"
+            labels(2) = "There are " + CStr(vertList.Count) + " lines similar to the Gravity " + gAngle.ToString(fmt1) + " degrees"
         End Sub
     End Class
 
@@ -8970,7 +8970,7 @@ Namespace VBClasses
             If standaloneTest() Then
                 dst2 = src
                 cv.Cv2.Line(dst2, lpOutput.p1, lpOutput.p2, task.highlight, task.lineWidth, task.lineType)
-                labels(2) = "Distance = " + Format(sortDistance.ElementAt(0).Key, fmt1)
+                labels(2) = "Distance = " + sortDistance.ElementAt(0).Key.ToString(fmt1)
             End If
         End Sub
     End Class
@@ -9205,10 +9205,10 @@ Namespace VBClasses
             Next
 
             If task.heartBeat Then
-                labels(3) = "Gravity offset at image edge = " + Format(gravityDelta, fmt3) + " and m = " +
-                                Format(task.lpGravity.slope, fmt3)
+                labels(3) = "Gravity offset at image edge = " + gravityDelta.ToString(fmt3) + " and m = " +
+                                task.lpGravity.slope.ToString(fmt3)
                 If deltaList.Count > 0 Then
-                    labels(2) = Format(gravityDelta, fmt3) + "/" + Format(deltaList.Average(), fmt3) + " gravity delta/line average delta"
+                    labels(2) = gravityDelta.ToString(fmt3) + "/" + deltaList.Average().ToString(fmt3) + " gravity delta/line average delta"
                 Else
                     labels(2) = "No lines matched the gravity vector..."
                 End If
@@ -9633,8 +9633,8 @@ Namespace VBClasses
             deltaY2 = vec.ptE2.Y - vecLast.ptE2.Y
 
             Static strList As New List(Of String)
-            strList.Add(Format(deltaX1, fmt1) + " " + Format(deltaX2, fmt1) + " " +
-                            Format(deltaY1, fmt1) + " " + Format(deltaY2, fmt1) +
+            strList.Add(deltaX1.ToString(fmt1) + " " + deltaX2.ToString(fmt1) + " " +
+                            deltaY1.ToString(fmt1) + " " + deltaY2.ToString(fmt1) +
                             If(task.frameCount Mod 6 = 0, vbCrLf, vbTab))
             If strList.Count >= 132 Then strList.RemoveAt(0)
 
@@ -10967,8 +10967,8 @@ Namespace VBClasses
                 strOut = "There are no color cells with depth in them." + vbCrLf
             End If
             If percentDepth.Count > 0 Then
-                strOut += "Percentage average " + Format(percentDepth.Average, "0%") + vbCrLf
-                strOut += "Percentage range " + Format(percentDepth.Min, "0%") + " to " + Format(percentDepth.Max, "0%")
+                strOut += "Percentage average " + percentDepth.Average.ToString("0%") + vbCrLf
+                strOut += "Percentage range " + percentDepth.Min.ToString("0%") + " to " + percentDepth.Max.ToString("0%")
             End If
             SetTrueText(strOut, 3)
         End Sub
@@ -10997,16 +10997,16 @@ Namespace VBClasses
             strOut += "rc.maxDist = " + CStr(rc.maxDist.X) + "," + CStr(rc.maxDist.Y) + vbCrLf
 
             strOut += If(rc.wcMean(2) > 0, "Cell is marked as having depth" + vbCrLf, "")
-            strOut += "Pixels " + Format(rc.pixels, "###,###") + vbCrLf + "depth pixels "
+            strOut += "Pixels " + rc.pixels.ToString("###,###") + vbCrLf + "depth pixels "
             If rc.wcMean(2) > 0 Then
                 Dim depthPixels = cv.Cv2.CountNonZero(task.depthmask(rc.rect))
-                strOut += Format(depthPixels, "###,###") + " or " +
-                                  Format(depthPixels / rc.pixels, "0%") + " depth " + vbCrLf
+                strOut += depthPixels.ToString("###,###") + " or " +
+                                  (depthPixels / rc.pixels).ToString("0%") + " depth " + vbCrLf
             Else
-                strOut += Format(rc.pixels, "###,###") + " - no depth data" + vbCrLf
+                strOut += rc.pixels.ToString("###,###") + " - no depth data" + vbCrLf
             End If
 
-            strOut += "Cell Depth in 3D: z = " + vbTab + Format(rc.wcMean(2), fmt2) + vbCrLf
+            strOut += "Cell Depth in 3D: z = " + vbTab + rc.wcMean(2).ToString(fmt2) + vbCrLf
 
             Dim tmp = New cv.Mat(task.rcD.mask.Rows, task.rcD.mask.Cols, cv.MatType.CV_32F, cv.Scalar.All(0))
             task.pcSplit(2)(task.rcD.rect).CopyTo(tmp, task.rcD.mask)
@@ -11211,8 +11211,8 @@ Namespace VBClasses
                 strOut = "There are no color cells with depth in them." + vbCrLf
             End If
             If percentDepth.Count > 0 Then
-                strOut += "Percentage average " + Format(percentDepth.Average, "0%") + vbCrLf
-                strOut += "Percentage range " + Format(percentDepth.Min, "0%") + " to " + Format(percentDepth.Max, "0%")
+                strOut += "Percentage average " + percentDepth.Average.ToString("0%") + vbCrLf
+                strOut += "Percentage range " + percentDepth.Min.ToString("0%") + " to " + percentDepth.Max.ToString("0%")
             End If
             SetTrueText(strOut, 3)
         End Sub
@@ -11242,7 +11242,7 @@ Namespace VBClasses
                 hullCounts.Add(rc.hull.Count)
                 SetTrueText(CStr(rc.age), rc.maxDist)
             Next
-            labels(3) = "Average hull length = " + Format(hullCounts.Average, fmt1) + " points.  "
+            labels(3) = "Average hull length = " + hullCounts.Average.ToString(fmt1) + " points.  "
         End Sub
     End Class
 
@@ -11650,7 +11650,7 @@ Namespace VBClasses
                 dst3(rc.rect).SetTo(0, rc.mask)
             End If
             Dim count = cv.Cv2.CountNonZero(dst3)
-            labels(3) = "Unclassified pixel count = " + CStr(count) + " or " + Format(count / src.Total, "0%")
+            labels(3) = "Unclassified pixel count = " + CStr(count) + " or " + (count / src.Total).ToString("0%")
         End Sub
     End Class
 
@@ -11982,8 +11982,8 @@ Namespace VBClasses
 
             dst2Last = dst2.Clone
             If task.heartBeat Then
-                labels(2) = "Changed cells = " + Format(changedCells, "000") + " cells or " + Format(changedCells / redList.rclist.Count, "0%")
-                labels(3) = "Changed pixel total = " + Format(changedPixels / 1000, "0.0") + "k or " + Format(changedPixels / dst2.Total, "0%")
+                labels(2) = "Changed cells = " + changedCells.ToString("000") + " cells or " + (changedCells / redList.rclist.Count).ToString("0%")
+                labels(3) = "Changed pixel total = " + (changedPixels / 1000).ToString("0.0") + "k or " + (changedPixels / dst2.Total).ToString("0%")
             End If
         End Sub
     End Class
@@ -12224,7 +12224,7 @@ Namespace VBClasses
                 motionFlags(i) = True
             Next
 
-            labels(2) = Format(motionSort.Count / task.gridRects.Count, "00%") + " Of bricks had motion."
+            labels(2) = (motionSort.Count / task.gridRects.Count).ToString("00%") + " Of bricks had motion."
 
             If task.gOptions.stableDepthRGB.Checked = False Then dst1.SetTo(255)
 
@@ -12530,7 +12530,7 @@ Namespace VBClasses
             task.motion.motionMask = dst3.Clone
 
             labels(2) = CStr(motionSort.Count) + " grid rect's or " +
-                            Format(motionSort.Count / task.gridRects.Count, "0.0%") +
+                            (motionSort.Count / task.gridRects.Count).ToString("0.0%") +
                             " of bricks had motion."
         End Sub
     End Class
@@ -12566,12 +12566,12 @@ Namespace VBClasses
                 Dim rect = match.newRect
                 rect.X += nabeRect.X
                 rect.Y += nabeRect.Y
-                SetTrueText(Format(x, fmt0) + "/" + Format(y, fmt0), rect.TopLeft, 3)
+                SetTrueText(x.ToString(fmt0) + "/" + y.ToString(fmt0), rect.TopLeft, 3)
             Next
 
             lastGray = task.gray.Clone
             If offsetX.Count > 0 Then
-                labels(3) = "Average offset X/Y = " + Format(offsetX.Average(), fmt3) + "/" + Format(offsetY.Average(), fmt3)
+                labels(3) = "Average offset X/Y = " + offsetX.Average().ToString(fmt3) + "/" + offsetY.Average().ToString(fmt3)
             End If
         End Sub
     End Class
@@ -12693,9 +12693,9 @@ Namespace VBClasses
             drawRotate.Run(dst2)
             dst2 = drawRotate.dst2
 
-            labels(2) = "Correlation = " + Format(correlation, fmt3) + ", Translation = (" +
-                            Format(xDisp, fmt1) + "," + Format(yDisp, fmt1) + ") " +
-                            "Rotation = " + Format(angle, fmt1) + " degrees"
+            labels(2) = "Correlation = " + correlation.ToString(fmt3) + ", Translation = (" +
+                            xDisp.ToString(fmt1) + "," + yDisp.ToString(fmt1) + ") " +
+                            "Rotation = " + angle.ToString(fmt1) + " degrees"
         End Sub
     End Class
 
@@ -12788,11 +12788,11 @@ Namespace VBClasses
             dst3 = rightC.dst2
             labels(3) = rightC.labels(2)
 
-            Debug.WriteLine("translation X,Y (C/L/R): " + Format(CenterC.translation.X, fmt0) + "/" +
-                                 Format(leftC.translation.X, fmt0) + "/" + Format(rightC.translation.X, fmt0) +
-                                 ", " + Format(CenterC.translation.Y, fmt0) + "/" + Format(leftC.translation.Y, fmt0) +
-                                 "/" + Format(rightC.translation.Y, fmt0) + " rotation angle = " + Format(CenterC.angle, fmt1) +
-                                 "/" + Format(leftC.angle, fmt1) + "/" + Format(rightC.angle, fmt1))
+            Debug.WriteLine("translation X,Y (C/L/R): " + CenterC.translation.X.ToString(fmt0) + "/" +
+                                 leftC.translation.X.ToString(fmt0) + "/" + rightC.translation.X.ToString(fmt0) +
+                                 ", " + CenterC.translation.Y.ToString(fmt0) + "/" + leftC.translation.Y.ToString(fmt0) +
+                                 "/" + rightC.translation.Y.ToString(fmt0) + " rotation angle = " + CenterC.angle.ToString(fmt1) +
+                                 "/" + leftC.angle.ToString(fmt1) + "/" + rightC.angle.ToString(fmt1))
         End Sub
     End Class
 
@@ -12856,7 +12856,7 @@ Namespace VBClasses
                 angle = Math.Atan(sideOpposite / sideAdjacent) * 180 / cv.Cv2.PI
                 If mp.p1.Y = dst2.Height Then angle = -angle
                 rotatedRect = New cv.RotatedRect(mm.maxLoc, task.centerRect.Size, angle)
-                labels(3) = "angle = " + Format(angle, fmt1) + " degrees"
+                labels(3) = "angle = " + angle.ToString(fmt1) + " degrees"
                 drawRotate.rr = rotatedRect
                 drawRotate.Run(dst3)
                 dst3 = drawRotate.dst2
@@ -12952,7 +12952,7 @@ Namespace VBClasses
             frames += 1
             If task.heartBeat Then
                 strOut = "Pixels changed = " + CStr(changedPixels) + " at last heartbeat.  Since last heartbeat: " +
-                             Format(changeCount / frames, "0%") + " of frames were different"
+                             (changeCount / frames).ToString("0%") + " of frames were different"
                 changeCount = 0
                 frames = 0
             End If
@@ -13132,7 +13132,7 @@ Namespace VBClasses
 
             strOut = Utility_Basics.selectCell(redC.rcMap, redC.rcList)
             If task.rcD IsNot Nothing Then strOut += vbCrLf + vbCrLf +
-                                                   Format(percentImage, "0.0%") + " of image" + vbCrLf +
+                                                   percentImage.ToString("0.0%") + " of image" + vbCrLf +
                                                    CStr(rcList.Count) + " cells present"
             SetTrueText(strOut, 1)
 
@@ -13236,7 +13236,7 @@ Namespace VBClasses
 
             strOut = Utility_Basics.selectCell(rcMap, rcList)
             If task.rcD IsNot Nothing And task.rcD.pixels > 0 Then
-                strOut += vbCrLf + vbCrLf + Format(percentImage, "0.0%") + " of image" + vbCrLf +
+                strOut += vbCrLf + vbCrLf + percentImage.ToString("0.0%") + " of image" + vbCrLf +
                                   CStr(rcList.Count) + " cells present"
                 task.color(task.rcD.rect).SetTo(white, task.rcD.mask)
             End If
@@ -13867,7 +13867,7 @@ Namespace VBClasses
             End If
 
             labels(2) = CStr(mCore.motionSort.Count) + " grid rect's or " +
-                            Format(mCore.motionSort.Count / task.gridRects.Count, "0.0%") +
+                            (mCore.motionSort.Count / task.gridRects.Count).ToString("0.0%") +
                             " of bricks had motion."
         End Sub
     End Class
@@ -14255,7 +14255,7 @@ Namespace VBClasses
             End If
 
             labels(2) = CStr(mCore.motionSort.Count) + " grid rect's or " +
-                            Format(mCore.motionSort.Count / task.gridRects.Count, "0.0%") +
+                            (mCore.motionSort.Count / task.gridRects.Count).ToString("0.0%") +
                             " of bricks had motion."
         End Sub
     End Class
@@ -14290,7 +14290,7 @@ Namespace VBClasses
                     End Sub)
             labels(2) = "Motion added to dst3 for " + CStr(updateCount) + " segments out of " + CStr(task.gridRects.Count)
             labels(3) = CStr(task.gridRects.Count - updateCount) + " segments out of " + CStr(task.gridRects.Count) + " had > " +
-                                 Format(correlationSlider.Value / 1000, "0.0%") + " correlation. "
+                                 (correlationSlider.Value / 1000).ToString("0.0%") + " correlation. "
         End Sub
     End Class
 
@@ -14324,7 +14324,7 @@ Namespace VBClasses
             Next
             labels(2) = "Motion added to dst3 for " + CStr(roiMotion.Count) + " segments out of " + CStr(task.gridRects.Count)
             labels(3) = CStr(task.gridRects.Count - roiMotion.Count) + " segments out of " + CStr(task.gridRects.Count) + " had > " +
-                                 Format(correlationSlider.Value / 1000, "0.0%") + " correlation. "
+                                 (correlationSlider.Value / 1000).ToString("0.0%") + " correlation. "
         End Sub
     End Class
 
@@ -15341,13 +15341,13 @@ Namespace VBClasses
             End If
 
             If task.heartBeat Then
-                SetTrueText("Average Depth = " + Format(depthMean, fmt1) + "m", New cv.Point((lp.p1.X + lp.p2.X) / 2,
+                SetTrueText("Average Depth = " + depthMean.ToString(fmt1) + "m", New cv.Point((lp.p1.X + lp.p2.X) / 2,
                                                                                              (lp.p1.Y + lp.p2.Y) / 2), 2)
-                labels(2) = "Min Distance = " + Format(depthMin, fmt1) + ", Max Distance = " + Format(depthMax, fmt1) +
-                            ", Mean Distance = " + Format(depthMean, fmt1) + " meters "
+                labels(2) = "Min Distance = " + depthMin.ToString(fmt1) + ", Max Distance = " + depthMax.ToString(fmt1) +
+                            ", Mean Distance = " + depthMean.ToString(fmt1) + " meters "
 
-                SetTrueText(Format(depthMin, fmt1) + "m", New cv.Point(mm.minLoc.X + 5, mm.minLoc.Y - 15), 2)
-                SetTrueText(Format(depthMax, fmt1) + "m", New cv.Point(mm.maxLoc.X + 5, mm.maxLoc.Y - 15), 2)
+                SetTrueText(depthMin.ToString(fmt1) + "m", New cv.Point(mm.minLoc.X + 5, mm.minLoc.Y - 15), 2)
+                SetTrueText(depthMax.ToString(fmt1) + "m", New cv.Point(mm.maxLoc.X + 5, mm.maxLoc.Y - 15), 2)
             End If
         End Sub
     End Class
@@ -15404,12 +15404,12 @@ Namespace VBClasses
             cv.Cv2.Line(dst2, task.lpD.p1, task.lpD.p2, task.highlight, task.lineWidth + 1, task.lineType)
 
             strOut = "Age = " + CStr(task.lpD.age) + vbCrLf
-            strOut += "Length (pixels) = " + Format(task.lpD.length, fmt1) + " index = " + CStr(task.lpD.index) + vbCrLf
+            strOut += "Length (pixels) = " + task.lpD.length.ToString(fmt1) + " index = " + CStr(task.lpD.index) + vbCrLf
 
             strOut += "p1 = " + task.lpD.p1.ToString + ", p2 = " + task.lpD.p2.ToString + vbCrLf
             strOut += "ptE1 = " + task.lpD.ptE1.ToString + ", ptE2 = " + task.lpD.ptE2.ToString + vbCrLf + vbCrLf
             strOut += "RGB Angle = " + CStr(task.lpD.angle) + vbCrLf
-            strOut += "RGB Slope = " + Format(task.lpD.slope, fmt3) + vbCrLf
+            strOut += "RGB Slope = " + task.lpD.slope.ToString(fmt3) + vbCrLf
             strOut += vbCrLf + "NOTE: the Y-Axis is inverted - Y increases down so slopes are inverted." + vbCrLf + vbCrLf
 
             SetTrueText(strOut, 3)
@@ -15606,7 +15606,7 @@ Namespace VBClasses
                 dst3 = task.lines.dst2
             End If
 
-            labels(2) = "Selected line has a correlation of " + Format(match.correlation, fmt3) + " with the previous frame."
+            labels(2) = "Selected line has a correlation of " + match.correlation.ToString(fmt3) + " with the previous frame."
         End Sub
     End Class
 
@@ -15692,8 +15692,8 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             If task.heartBeat Then dst2.SetTo(0)
             cv.Cv2.Line(dst2, task.lines.lpList(0).p1, task.lines.lpList(0).p2, task.highlight, task.lineWidth, task.lineType)
-            labels(2) = "Longest line is " + Format(task.lines.lpList(0).length, fmt1) + " pixels, slope = " +
-                             Format(task.lines.lpList(0).slope, fmt1)
+            labels(2) = "Longest line is " + task.lines.lpList(0).length.ToString(fmt1) + " pixels, slope = " +
+                             task.lines.lpList(0).slope.ToString(fmt1)
 
             Static strList = New List(Of String)({labels(2)})
             strList.add(labels(2))
@@ -15797,7 +15797,7 @@ Namespace VBClasses
 
             If minDistances.Count > 0 Then
                 If minDist > minDistances.Max * 2 Then
-                    Debug.WriteLine("Overriding KNN min Distance Rule = " + Format(minDist, fmt0) + " max = " + Format(minDistances.Max, fmt0))
+                    Debug.WriteLine("Overriding KNN min Distance Rule = " + minDist.ToString(fmt0) + " max = " + minDistances.Max.ToString(fmt0))
                     lastPair = New lpData(trainInput(0), trainInput(1))
                 Else
                     lastPair = New lpData(p1, p2)
@@ -15852,7 +15852,7 @@ Namespace VBClasses
 
             Static minDistances As New List(Of Single)({distances(0)})
             If minDist > minDistances.Max * 4 Then
-                Debug.WriteLine("Overriding KNN min Distance Rule = " + Format(minDist, fmt0) + " max = " + Format(minDistances.Max, fmt0))
+                Debug.WriteLine("Overriding KNN min Distance Rule = " + minDist.ToString(fmt0) + " max = " + minDistances.Max.ToString(fmt0))
                 lastP1 = trainInput(0)
                 lastP2 = trainInput(1)
             End If
@@ -15928,7 +15928,7 @@ Namespace VBClasses
                 cv.Cv2.Line(dst2, p1, p2, task.highlight, task.lineWidth + 2, task.lineType)
                 lpOutput = New lpData(p1, p2)
             End If
-            labels(2) = "Longest line end points had correlation of " + Format(match.correlation, fmt3) + " with the original longest line."
+            labels(2) = "Longest line end points had correlation of " + match.correlation.ToString(fmt3) + " with the original longest line."
         End Sub
     End Class
 
@@ -15952,7 +15952,7 @@ Namespace VBClasses
             dst2 = matchLine.dst2
             cv.Cv2.Line(dst2, matchLine.lpOutput.p1, matchLine.lpOutput.p2, cv.Scalar.Red, task.lineWidth, task.lineType)
 
-            labels(2) = "Longest line end points had correlation of " + Format(matchLine.match.correlation, fmt3) +
+            labels(2) = "Longest line end points had correlation of " + matchLine.match.correlation.ToString(fmt3) +
                             " with the original longest line."
         End Sub
     End Class
@@ -15973,7 +15973,7 @@ Namespace VBClasses
             matchLine.Run(src)
             dst2 = matchLine.dst2
             cv.Cv2.Line(dst2, task.lpHorizon.p1, task.lpHorizon.p2, cv.Scalar.Red, task.lineWidth, task.lineType)
-            labels(2) = "MatchLine correlation = " + Format(matchLine.match.correlation, fmt3) + " - Red = current horizon, yellow is matchLine output"
+            labels(2) = "MatchLine correlation = " + matchLine.match.correlation.ToString(fmt3) + " - Red = current horizon, yellow is matchLine output"
         End Sub
     End Class
 
@@ -15991,7 +15991,7 @@ Namespace VBClasses
             matchLine.Run(src)
             dst2 = matchLine.dst2
             cv.Cv2.Line(dst2, task.lpGravity.p1, task.lpGravity.p2, cv.Scalar.Red, task.lineWidth, task.lineType)
-            labels(2) = "MatchLine correlation = " + Format(matchLine.match.correlation, fmt3) +
+            labels(2) = "MatchLine correlation = " + matchLine.match.correlation.ToString(fmt3) +
                             " - Red = current gravity vector, yellow is matchLine output"
         End Sub
     End Class
@@ -16036,7 +16036,7 @@ Namespace VBClasses
             Dim maxIndex = histList.IndexOf(maxVal)
             plot.maxRange = Math.Ceiling((maxVal + 50) - (maxVal + 50) Mod 50)
             label = xyStr + "Max count = " + CStr(maxVal) + " at " + CStr(maxIndex - zeroLoc) + " with " + CStr(nonZero) + " non-zero values or " +
-                                     Format(nonZero / (nonZero + zeroCount), "0%")
+                                     (nonZero / (nonZero + zeroCount)).ToString("0%")
 
             Dim histSum As Single
             For i = 0 To histList.Count - 1
@@ -16389,7 +16389,7 @@ Namespace VBClasses
                 tc.rect = ValidateRect(New cv.Rect(tc.center.X - rSize, tc.center.Y - rSize, rSize * 2, rSize * 2))
                 tc.correlation = mm.maxVal
                 tc.depth = cv.Cv2.Mean(task.pcSplit(2)(tc.rect), task.depthmask(tc.rect))(0) / 1000
-                tc.strOut = Format(tc.correlation, fmt2) + vbCrLf + Format(tc.depth, fmt2) + "m"
+                tc.strOut = tc.correlation.ToString(fmt2) + vbCrLf + tc.depth.ToString(fmt2) + "m"
                 tCells(i) = tc
             Next
 
@@ -16714,8 +16714,8 @@ Namespace VBClasses
                 strOut = ""
                 For Each rc In rclist
                     If rc.contour.Count > 4 Then
-                        Dim justEquation = Format(rc.eq(0), fmt3) + "*X + " + Format(rc.eq(1), fmt3) + "*Y + "
-                        justEquation += Format(rc.eq(2), fmt3) + "*Z + " + Format(rc.eq(3), fmt3) + vbCrLf
+                        Dim justEquation = rc.eq(0).ToString(fmt3) + "*X + " + rc.eq(1).ToString(fmt3) + "*Y + "
+                        justEquation += rc.eq(2).ToString(fmt3) + "*Z + " + rc.eq(3).ToString(fmt3) + vbCrLf
                         strOut += justEquation
                         index += 1
                         If index >= 20 Then Exit For
@@ -16806,7 +16806,7 @@ Namespace VBClasses
             Dim rc = task.rcD
             If rc.contour.Count > 0 Then
                 Dim shape = shapeCorrelation(rc.contour)
-                strOut = "Contour correlation for selected cell contour X to Y = " + Format(shape, fmt3) + vbCrLf + vbCrLf +
+                strOut = "Contour correlation for selected cell contour X to Y = " + shape.ToString(fmt3) + vbCrLf + vbCrLf +
                              "Select different cells and notice the pattern for the correlation of the contour.X to contour.Y values:" + vbCrLf +
                              "(The contour correlation - contour.x to contour.y - Is computed above.)" + vbCrLf + vbCrLf +
                              "If shape leans left, correlation Is positive And proportional to the lean." + vbCrLf +
@@ -17109,7 +17109,7 @@ Namespace VBClasses
 
             SetTrueText(">>>>>> Increasing input data >>>>>>" + vbCrLf + "All available complexity runs",
                                 New cv.Point(dst2.Width / 4, 10), 3)
-            SetTrueText(" TIME " + "(Max = " + Format(complex.maxTime, fmt0) + ")", New cv.Point(0, dst2.Height / 2), 3)
+            SetTrueText(" TIME " + "(Max = " + complex.maxTime.ToString(fmt0) + ")", New cv.Point(0, dst2.Height / 2), 3)
 
             complex.initialize = True
             complex.fileName = saveLatestFile
@@ -17119,7 +17119,7 @@ Namespace VBClasses
 
             SetTrueText(" >>>>>> Increasing input data >>>>>>" + vbCrLf + complex.options.filename.Name,
                                 New cv.Point(dst2.Width / 4, 10))
-            SetTrueText(" TIME " + "(Max = " + Format(complex.maxTime, fmt0) + ")", New cv.Point(0, dst2.Height / 2))
+            SetTrueText(" TIME " + "(Max = " + complex.maxTime.ToString(fmt0) + ")", New cv.Point(0, dst2.Height / 2))
             labels(2) = complex.labels(2)
             labels(3) = "Plots For all available complexity runs"
         End Sub
@@ -17188,7 +17188,7 @@ Namespace VBClasses
 
             SetTrueText(">>>>>> Increasing input data >>>>>>", New cv.Point(dst2.Width / 4, 10))
             SetTrueText(" TIME", New cv.Point(0, dst2.Height / 2))
-            SetTrueText("Max Time = " + Format(maxTime, fmt0), New cv.Point(10, 10))
+            SetTrueText("Max Time = " + maxTime.ToString(fmt0), New cv.Point(10, 10))
             labels(2) = "Complexity plot for " + options.filename.Name.Substring(0, Len(options.filename.Name) - 4)
         End Sub
     End Class
@@ -17265,7 +17265,7 @@ Namespace VBClasses
 
             SetTrueText(">>>>>> Increasing input data >>>>>>" + vbCrLf + options.filename.Name,
                             New cv.Point(dst2.Width / 4, 10))
-            SetTrueText(" TIME " + "(Max = " + Format(maxTime, fmt0) + ")", New cv.Point(0, dst2.Height / 2))
+            SetTrueText(" TIME " + "(Max = " + maxTime.ToString(fmt0) + ")", New cv.Point(0, dst2.Height / 2))
             labels(2) = "Complexity plot for " + options.filename.Name.Substring(0, Len(options.filename.Name) - 4)
         End Sub
     End Class
@@ -17974,7 +17974,7 @@ Namespace VBClasses
             Dim ptList As New List(Of String)
             cv.Cv2.CvtColor(rc.mask, dst3, cv.ColorConversionCodes.GRAY2BGR)
             For Each pt In rc.contour
-                Dim ptStr = Format(pt.X, "0000") + Format(pt.Y, "0000")
+                Dim ptStr = pt.X.ToString("0000") + pt.Y.ToString("0000")
                 If ptList.Contains(ptStr) Then
                     Dim pct = ptList.Count / rc.contour.Count
                     If pct > 0.1 And pct < 0.9 Then
@@ -18033,7 +18033,7 @@ Namespace VBClasses
                 Dim index As Integer
                 For Each el In distances
                     strOut += "(" + CStr(el.Value) + ") "
-                    strOut += Format(el.Key, fmt1) + vbTab
+                    strOut += el.Key.ToString(fmt1) + vbTab
                     If index Mod 6 = 5 Then strOut += vbCrLf
                     index += 1
                 Next
@@ -18042,7 +18042,7 @@ Namespace VBClasses
                 index = 0
                 For Each el In lastDistances
                     strOut += "(" + CStr(el.Value) + ") "
-                    strOut += Format(el.Key, fmt1) + vbTab
+                    strOut += el.Key.ToString(fmt1) + vbTab
                     If index Mod 6 = 5 Then strOut += vbCrLf
                     index += 1
                     Dim rc = lastrcList(el.Value)
@@ -18583,7 +18583,7 @@ Namespace VBClasses
             Next
 
             Dim rcX = task.rcD
-            SetTrueText("mean depth = " + Format(rcX.wcMean(2), "0.0"), 3)
+            SetTrueText("mean depth = " + rcX.wcMean(2).ToString("0.0"), 3)
         End Sub
     End Class
 
@@ -18988,7 +18988,7 @@ Namespace VBClasses
 
             dst1 = wcDataX.dst2 Or wcDataY.dst2
             Dim mm = GetMinMax(dst1)
-            labels(1) = "min = " + Format(mm.minVal, fmt0) + " max = " + Format(mm.maxVal, fmt0)
+            labels(1) = "min = " + mm.minVal.ToString(fmt0) + " max = " + mm.maxVal.ToString(fmt0)
 
             redC.Run(dst1)
             dst2 = redC.dst2
@@ -19171,10 +19171,10 @@ Namespace VBClasses
                     wcMap.SetTo(region, dst0)
                     If region = 0 Then
                         strOut += vbCrLf + If(i Mod 3 = 2 Or i Mod 3 = 1, vbCrLf, "")
-                        strOut += "region " + Format(region, "00") + " mean " + Format(mean(0), fmt0) + vbCrLf
+                        strOut += "region " + region.ToString("00") + " mean " + mean(0).ToString(fmt0) + vbCrLf
                         strOut += vbCrLf
                     Else
-                        strOut += "region " + Format(region, "00") + " mean " + Format(mean(0), fmt0) + vbTab
+                        strOut += "region " + region.ToString("00") + " mean " + mean(0).ToString(fmt0) + vbTab
                         If i Mod 3 = 2 Then strOut += vbCrLf
                     End If
                     count += 1
@@ -19402,7 +19402,7 @@ Namespace VBClasses
             Next
 
             labels(2) = CStr(unMatched) + " were new cells and " + CStr(matchCount) + " were matched, " +
-                                    "average age: " + Format(matchAverage / rcList.Count, fmt1)
+                                    "average age: " + (matchAverage / rcList.Count).ToString(fmt1)
         End Sub
         Protected Overrides Sub Finalize()
             If cPtr <> 0 Then cPtr = RedCloudLined_Close(cPtr)
@@ -19560,7 +19560,7 @@ Namespace VBClasses
             For i = mPoints.ptx.Count - 1 To 0 Step -1
                 If mPoints.correlation(i) > task.fCorrThreshold Then
                     cv.Cv2.Circle(dst2, mPoints.ptx(i), task.DotSize, task.highlight, -1, task.lineType)
-                    strOut += Format(mPoints.correlation(i), fmt3) + ", "
+                    strOut += mPoints.correlation(i).ToString(fmt3) + ", "
                 Else
                     mPoints.ptx.RemoveAt(i)
                 End If
@@ -19571,7 +19571,7 @@ Namespace VBClasses
             End If
 
             labels(2) = "Of the " + CStr(feat.features.Count) + " input points, " + CStr(mPoints.ptx.Count) +
-                            " points were tracked with correlation above " + Format(task.fCorrThreshold, fmt2)
+                            " points were tracked with correlation above " + task.fCorrThreshold.ToString(fmt2)
         End Sub
     End Class
 
@@ -19839,7 +19839,7 @@ Namespace VBClasses
                 frameLoc.Clear()
                 myFrameCount = 0
                 Dim sum = changedCellCounts.Sum(), avg = If(changedCellCounts.Count > 0, changedCellCounts.Average(), 0)
-                labels(3) = CStr(sum) + " new/moved cells in the last second " + Format(avg, fmt1) + " changed per frame"
+                labels(3) = CStr(sum) + " new/moved cells in the last second " + avg.ToString(fmt1) + " changed per frame"
                 labels(2) = CStr(redList.rclist.Count) + " cells, unmatched cells = " + CStr(unMatchedCells) + "   " +
                                 CStr(mostlyColor) + " cells were mostly color and " + CStr(redList.rclist.Count - mostlyColor) + " had depth."
                 changedCellCounts.Clear()
@@ -20635,9 +20635,9 @@ Namespace VBClasses
                 dst2 = src.Clone
                 cv.Cv2.Line(dst2, lpInput.p1, lpInput.p2, task.highlight, task.lineWidth, task.lineType)
             End If
-            labels(2) = "Rect for p1 has correlation " + Format(p1Correlation, fmt3) +
+            labels(2) = "Rect for p1 has correlation " + p1Correlation.ToString(fmt3) +
                                 " to the previous image while " +
-                                "rect for p2 has " + Format(p2Correlation, fmt3)
+                                "rect for p2 has " + p2Correlation.ToString(fmt3)
         End Sub
     End Class
 
@@ -20702,7 +20702,7 @@ Namespace VBClasses
                 Dim M = cv.Cv2.GetRotationMatrix2D(rotateCenter, -rotateAngle, 1)
                 cv.Cv2.WarpAffine(src, dst2, M, src.Size(), cv.InterpolationFlags.Cubic)
 
-                labels(2) = "Image after rotation by " + Format(rotateAngle, fmt3) + " degrees"
+                labels(2) = "Image after rotation by " + rotateAngle.ToString(fmt3) + " degrees"
             End If
         End Sub
     End Class
@@ -20995,8 +20995,8 @@ Namespace VBClasses
             gRect.tc2.center = p2
             gRect.tc1 = match.createCell(src, gRect.tc1.correlation, p1)
             gRect.tc2 = match.createCell(src, gRect.tc2.correlation, p2)
-            gRect.tc1.strOut = Format(gRect.tc1.correlation, fmt2) + vbCrLf + Format(gRect.tc1.depth, fmt2) + "m"
-            gRect.tc2.strOut = Format(gRect.tc2.correlation, fmt2) + vbCrLf + Format(gRect.tc2.depth, fmt2) + "m"
+            gRect.tc1.strOut = gRect.tc1.correlation.ToString(fmt2) + vbCrLf + gRect.tc1.depth.ToString(fmt2) + "m"
+            gRect.tc2.strOut = gRect.tc2.correlation.ToString(fmt2) + vbCrLf + gRect.tc2.depth.ToString(fmt2) + "m"
 
             Dim mean = cv.Cv2.Mean(task.pointCloud(gRect.tc1.rect), task.depthmask(gRect.tc1.rect))
             gRect.pt1 = New cv.Point3f(mean(0), mean(1), mean(2))
@@ -21042,8 +21042,8 @@ Namespace VBClasses
                 End If
             Next
 
-            labels(2) = Format(sortedHorizontals.Count, "00") + " Horizontal lines were identified and " +
-                            Format(sortedVerticals.Count, "00") + " Vertical lines were identified."
+            labels(2) = sortedHorizontals.Count.ToString("00") + " Horizontal lines were identified and " +
+                            sortedVerticals.Count.ToString("00") + " Vertical lines were identified."
         End Sub
         Protected Overrides Sub Finalize()
             ld.Dispose()
@@ -21364,8 +21364,8 @@ Namespace VBClasses
             Next
             SetTrueText(strOut, 1)
             If tops.Count > 0 And bots.Count > 0 Then
-                labels(2) = CStr(tops.Count) + " Top points have moved " + Format(tops.Average, fmt1) +
-                                CStr(bots.Count) + " bottom points have moved " + Format(bots.Average, fmt1)
+                labels(2) = CStr(tops.Count) + " Top points have moved " + tops.Average.ToString(fmt1) +
+                                CStr(bots.Count) + " bottom points have moved " + bots.Average.ToString(fmt1)
             End If
 
             knn.trainInput = New List(Of cv.Point2f)(knn.queries)
@@ -21531,7 +21531,7 @@ Namespace VBClasses
                 count += 1
                 If pixels / src.Total >= options.percent Then Exit For
             Next
-            labels(3) = "The top " + CStr(count) + " cells by size = " + Format(options.percent, "0%") + " of the pixels"
+            labels(3) = "The top " + CStr(count) + " cells by size = " + options.percent.ToString("0%") + " of the pixels"
         End Sub
     End Class
 
@@ -21592,7 +21592,7 @@ Namespace VBClasses
             dst1 = redC.dst2
 
             labels(2) = CStr(unMatched) + " were new cells and " + CStr(matchCount) + " were matched, " +
-                                        "average age: " + Format(matchAverage / rcList.Count, fmt1)
+                                        "average age: " + (matchAverage / rcList.Count).ToString(fmt1)
         End Sub
     End Class
 
@@ -22108,7 +22108,7 @@ Namespace VBClasses
                 plot.minRange = 0
                 plot.maxRange = task.MaxZmeters
                 plot.Run(depth)
-                labels(3) = "0 meters to " + Format(task.MaxZmeters, fmt0) + " meters - vertical lines every meter"
+                labels(3) = "0 meters to " + task.MaxZmeters.ToString(fmt0) + " meters - vertical lines every meter"
 
                 Dim incr = dst2.Width / task.MaxZmeters
                 For i = 1 To CInt(task.MaxZmeters - 1)
@@ -22165,7 +22165,7 @@ Namespace VBClasses
                 Case 1
                     dst3(rc.rect).SetTo(vbNearFar((rc.wcMean(2)) / task.MaxZmeters), rc.mask)
                     labels(3) = "rc.wcMean(2) Is highlighted in dst2"
-                    labels(3) = "Mean depth for the cell Is " + Format(rc.wcMean(2), fmt3)
+                    labels(3) = "Mean depth for the cell Is " + rc.wcMean(2).ToString(fmt3)
                 Case 2
                     cv.Cv2.MatchTemplate(task.pcSplit(0)(rc.rect), task.pcSplit(2)(rc.rect), correlationMat, cv.TemplateMatchModes.CCoeffNormed, rc.mask)
                     correlationXtoZ = correlationMat.Get(Of Single)(0, 0)
@@ -22177,7 +22177,7 @@ Namespace VBClasses
             End Select
             If options.selection = 2 Or options.selection = 3 Then
                 dst3(rc.rect).SetTo(vbNearFar(If(options.selection = 2, correlationXtoZ, correlationYtoZ) + 1), rc.mask)
-                SetTrueText("(" + Format(correlationXtoZ, fmt3) + ", " + Format(correlationYtoZ, fmt3) + ")",
+                SetTrueText("(" + correlationXtoZ.ToString(fmt3) + ", " + correlationYtoZ.ToString(fmt3) + ")",
                                 rc.rect.TopLeft, 3)
             End If
             DrawTour(dst0(rc.rect), rc.contour, cv.Scalar.Yellow)
@@ -22426,7 +22426,7 @@ Namespace VBClasses
             For y = 0 To pca_analysis.Eigenvectors.Rows - 1
                 For x = 0 To pca_analysis.Eigenvectors.Cols - 1
                     Dim val = pca_analysis.Eigenvectors.Get(Of Single)(y, x)
-                    pcaStr += Format(val, fmt3) + vbTab
+                    pcaStr += val.ToString(fmt3) + vbTab
                 Next
                 pcaStr += vbCrLf
             Next
@@ -22435,7 +22435,7 @@ Namespace VBClasses
             pcaStr += "EigenValues (PCA)" + vbTab
             For i = 0 To pca_analysis.Eigenvalues.Rows - 1
                 Dim val = pca_analysis.Eigenvalues.Get(Of Single)(i, 0)
-                pcaStr += Format(val, fmt3) + vbTab
+                pcaStr += val.ToString(fmt3) + vbTab
                 valList.Add(val)
             Next
 
@@ -22443,11 +22443,11 @@ Namespace VBClasses
 
             Dim best = valList.Min
             Dim index = valList.IndexOf(best)
-            pcaStr += "Min EigenValue = " + Format(best, fmt3) + " at index = " + CStr(index) + vbCrLf
+            pcaStr += "Min EigenValue = " + best.ToString(fmt3) + " at index = " + CStr(index) + vbCrLf
             pcaStr += "Principal Component Vector" + vbTab
             For j = 0 To pca_analysis.Eigenvectors.Cols - 1
                 Dim val = pca_analysis.Eigenvectors.Get(Of Single)(index, j)
-                pcaStr += Format(val, fmt3) + vbTab
+                pcaStr += val.ToString(fmt3) + vbTab
             Next
             pcaStr += vbCrLf
             Return pcaStr
@@ -23084,7 +23084,7 @@ Namespace VBClasses
             plot.minRange = 0
             plot.maxRange = task.MaxZmeters
             plot.Run(depth)
-            labels(3) = "0 meters to " + Format(task.MaxZmeters, fmt0) + " meters - vertical lines every meter"
+            labels(3) = "0 meters to " + task.MaxZmeters.ToString(fmt0) + " meters - vertical lines every meter"
 
             Dim incr = dst2.Width / task.MaxZmeters
             For i = 1 To CInt(task.MaxZmeters - 1)
@@ -23112,7 +23112,7 @@ Namespace VBClasses
 
             Dim dups As New SortedList(Of String, Integer)(New compareAllowIdenticalString)
             For Each rc In redC.rcList
-                dups.Add(Format(rc.wGrid.X, "000") + Format(rc.wGrid.Y, "000") + Format(rc.wGrid.Z, "000"),
+                dups.Add(rc.wGrid.X.ToString("000") + rc.wGrid.Y.ToString("000") + rc.wGrid.Z.ToString("000"),
                                         rc.mapID - 1)
             Next
 
@@ -23249,7 +23249,7 @@ Namespace VBClasses
             labels(2) = prepData.labels(2)
 
             Dim val = prepData.reduced32f.Get(Of Single)(task.clickPoint.Y, task.clickPoint.X)
-            SetTrueText("Depth = " + Format(val, fmt3), 3)
+            SetTrueText("Depth = " + val.ToString(fmt3), 3)
         End Sub
     End Class
 
@@ -23505,7 +23505,7 @@ Namespace VBClasses
             For i = 1 To RedWGrid.lutList.Count - 1
                 cv.Cv2.InRange(RedWGrid.dst1, i, i, dst2)
                 Dim mean = cv.Cv2.Mean(RedWGrid.prepData.reduced32s, dst2)
-                strOut += "Mean of selected region " + CStr(i) + " = " + Format(mean(0), fmt0) + "  "
+                strOut += "Mean of selected region " + CStr(i) + " = " + mean(0).ToString(fmt0) + "  "
                 If i Mod 2 = 0 Then strOut += vbCrLf
             Next
 
@@ -23739,9 +23739,9 @@ Namespace VBClasses
 
             Dim brickIndex = task.gridMap.Get(Of Integer)(rect.Y, rect.X)
             If brickIndex > 0 Then
-                labels(3) = "Depth = " + Format(bricks.brickList(brickIndex).depth, fmt1) + "m"
+                labels(3) = "Depth = " + bricks.brickList(brickIndex).depth.ToString(fmt1) + "m"
                 brickIndex = task.gridMap.Get(Of Integer)(rect.BottomRight.Y, rect.BottomRight.X)
-                labels(3) += " to " + Format(bricks.brickList(brickIndex).depth, fmt1) + "m"
+                labels(3) += " to " + bricks.brickList(brickIndex).depth.ToString(fmt1) + "m"
             Else
                 labels(3) = "No depth region present..."
             End If
@@ -24016,8 +24016,8 @@ Namespace VBClasses
             dst3.SetTo(0)
             task.rightView.CopyTo(dst3, dst0)
 
-            labels(2) = Format(count / bricks.brickList.Count, "0%") + " of bricks had color correlation of " +
-                            Format(task.fCorrThreshold, "0.0%") + " or better"
+            labels(2) = (count / bricks.brickList.Count).ToString("0%") + " of bricks had color correlation of " +
+                            task.fCorrThreshold.ToString("0.0%") + " or better"
         End Sub
     End Class
 
@@ -24410,8 +24410,8 @@ Namespace VBClasses
             plot.maxRange = plot.minRange + task.MaxZmeters * 1000
             plot.Run(prep.dst2)
             dst3 = plot.dst2
-            labels(3) = "Min/Max values " + Format(plot.mm.minVal / 1000, fmt2) + "/" +
-                                                    Format(plot.mm.maxVal / 1000, fmt2) + " meters"
+            labels(3) = "Min/Max values " + (plot.mm.minVal / 1000).ToString(fmt2) + "/" +
+                                                    (plot.mm.maxVal / 1000).ToString(fmt2) + " meters"
         End Sub
     End Class
 

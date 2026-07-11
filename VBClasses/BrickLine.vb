@@ -142,7 +142,7 @@ Public Class BrickLine_DepthGap : Inherits TaskParent
                 Dim brick = bricks.brickList(gapCells(i))
                 cv.Cv2.Rectangle(dst2, brick.rect, task.highlight, task.lineWidth)
                 If i = Math.Abs(task.gOptions.DebugSlider.Value) Then
-                    SetTrueText(Format(brick.depth, fmt1), brick.rect.BottomRight)
+                    SetTrueText(brick.depth.ToString(fmt1), brick.rect.BottomRight)
                 End If
             Next
         End If
@@ -309,7 +309,7 @@ Public Class BrickLine_LeftRightMotion : Inherits TaskParent
             End If
         Next
 
-        labels(3) = CStr(bestBricks.Count) + " bricks had lines and correlation >" + Format(task.fCorrThreshold, fmt2) + ") or " +
-                      Format(bestBricks.Count / task.gridRects.Count, "00%") + " of all the bricks"
+        labels(3) = CStr(bestBricks.Count) + " bricks had lines and correlation >" + task.fCorrThreshold.ToString(fmt2) + ") or " +
+                      (bestBricks.Count / task.gridRects.Count).ToString("00%") + " of all the bricks"
     End Sub
 End Class

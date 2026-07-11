@@ -1,4 +1,4 @@
-Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
+﻿Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 Public Class PlotTime_Basics : Inherits TaskParent
     Public plotData As cv.Scalar
     Public plotCount As Integer = 3
@@ -79,7 +79,7 @@ Public Class PlotTime_Basics : Inherits TaskParent
 
         columnIndex += task.DotSize
         dst2.Col(columnIndex).SetTo(0)
-        If standaloneTest() Then labels(2) = "RGB Means: blue = " + Format(plotData(0), fmt1) + " green = " + Format(plotData(1), fmt1) + " red = " + Format(plotData(2), fmt1)
+        If standaloneTest() Then labels(2) = "RGB Means: blue = " + plotData(0).ToString(fmt1) + " green = " + plotData(1).ToString(fmt1) + " red = " + plotData(2).ToString(fmt1)
         Dim lineCount = CInt(maxScale - minScale - 1)
         If lineCount > 3 Or lineCount < 0 Then lineCount = 3
         Utility_Basics.AddPlotScale(dst2, minScale, maxScale, lineCount)
@@ -130,7 +130,7 @@ Public Class PlotTime_Single : Inherits TaskParent
                 If useFixedRange Then
                     nextText = Choose(i + 1, CStr(max), CStr((max + min) \ 2), CStr(min))
                 Else
-                    nextText = Format(Choose(i + 1, max, (min + max) / 2, min), fmt)
+                    nextText = Choose(i + 1, max, (min + max) / 2, min).ToString(fmt)
                 End If
                 Dim pt = Choose(i + 1, New cv.Point(0, 10), New cv.Point(0, dst2.Height \ 2 - 5),
                             New cv.Point(0, dst2.Height - 3))
@@ -259,12 +259,12 @@ Public Class PlotTime_FixedScale : Inherits TaskParent
 
         columnIndex += 1
         dst2.Col(columnIndex).SetTo(0)
-        labels(2) = "Blue = " + Format(plotData(0), fmt1) + " Green = " + Format(plotData(1), fmt1) +
-                " Red = " + Format(plotData(2), fmt1) + " Yellow = " + Format(plotData(3), fmt1)
-        strOut = "Blue = " + Format(plotData(0), fmt1) + vbCrLf
-        strOut += "Green = " + Format(plotData(1), fmt1) + vbCrLf
-        strOut += "Red = " + Format(plotData(2), fmt1) + vbCrLf
-        strOut += "White = " + Format(plotData(3), fmt1) + vbCrLf
+        labels(2) = "Blue = " + plotData(0).ToString(fmt1) + " Green = " + plotData(1).ToString(fmt1) +
+                " Red = " + plotData(2).ToString(fmt1) + " Yellow = " + plotData(3).ToString(fmt1)
+        strOut = "Blue = " + plotData(0).ToString(fmt1) + vbCrLf
+        strOut += "Green = " + plotData(1).ToString(fmt1) + vbCrLf
+        strOut += "Red = " + plotData(2).ToString(fmt1) + vbCrLf
+        strOut += "White = " + plotData(3).ToString(fmt1) + vbCrLf
         SetTrueText(strOut, 3)
         Dim lineCount = CInt(maxScale - minScale - 1)
         If lineCount > 3 Or lineCount < 0 Then lineCount = 3

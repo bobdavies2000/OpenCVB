@@ -222,6 +222,6 @@ Imports OpenCvSharp.DnnSuperres
 
 '        Dim mm As mmData = GetMinMax(prob.Reshape(1, 1))
 '        SetTrueText("Best classification: index = " + CStr(mm.maxLoc.X) + " which is for '" + classnames(mm.maxLoc.X) + "' with Probability " +
-'                    Format(mm.maxVal, "#0.00%"), New cv.Point(40, 200))
+'                    mm.maxVal.ToString("#0.00%"), New cv.Point(40, 200))
 '    End Sub
 'End Class

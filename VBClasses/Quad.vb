@@ -1,4 +1,4 @@
-Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
+﻿Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 Public Class XR_Quad_RightView : Inherits TaskParent
     Public Sub New()
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
@@ -107,13 +107,13 @@ Public Class XR_Quad_MinMax : Inherits TaskParent
                 End If
             Next
             If showBrickDepth Then
-                SetTrueText(Format(d1, fmt1) + vbCrLf + Format(d2, fmt1), New cv.Point(gRect.X, gRect.Y), 3)
+                SetTrueText(d1.ToString(fmt1) + vbCrLf + d2.ToString(fmt1), New cv.Point(gRect.X, gRect.Y), 3)
             End If
 
             If depthList1(i).Count >= depthListMaxCount Then depthList1(i).RemoveAt(0)
             If depthList2(i).Count >= depthListMaxCount Then depthList2(i).RemoveAt(0)
         Next
-        labels(2) = traceName + " completed with " + Format(quadData.Count / 5, fmt0) +
+        labels(2) = traceName + " completed with " + (quadData.Count / 5).ToString(fmt0) +
                                         " quad sets (with a 5th element for color)"
     End Sub
 End Class
@@ -191,7 +191,7 @@ Public Class Quad_Hulls : Inherits TaskParent
                 If depthList(i).Count >= depthListMaxCount Then depthList(i).RemoveAt(0)
             End If
         Next
-        labels(2) = traceName + " completed with " + Format(quadData.Count / 5, fmt0) +
+        labels(2) = traceName + " completed with " + (quadData.Count / 5).ToString(fmt0) +
                                     " quad sets (with a 5th element for color)"
     End Sub
 End Class
@@ -299,7 +299,7 @@ Public Class XR_Quad_Bricks : Inherits TaskParent
                         End If
                     Next
                     If showBrickDepth Then
-                        SetTrueText(Format(depthMin, fmt1) + " " + Format(depthMax, fmt1), New cv.Point(gRect.X, gRect.Y))
+                        SetTrueText(depthMin.ToString(fmt1) + " " + depthMax.ToString(fmt1), New cv.Point(gRect.X, gRect.Y))
                     End If
                     If depthMinList(i).Count >= myListMax Then depthMinList(i).RemoveAt(0)
                     If depthMaxList(i).Count >= myListMax Then depthMaxList(i).RemoveAt(0)
@@ -308,8 +308,8 @@ Public Class XR_Quad_Bricks : Inherits TaskParent
                 depths.Add(depthMax)
             End If
         Next
-        labels(2) = traceName + " completed: " + Format(task.gridRects.Count, fmt0) + " gRect's produced " +
-                                    Format(quadData.Count / 25, fmt0) + " 3D bricks with color.  " +
+        labels(2) = traceName + " completed: " + task.gridRects.Count.ToString(fmt0) + " gRect's produced " +
+                                    (quadData.Count / 25).ToString(fmt0) + " 3D bricks with color.  " +
                                     "The number below are the min and max depth for each cell. "
     End Sub
 End Class

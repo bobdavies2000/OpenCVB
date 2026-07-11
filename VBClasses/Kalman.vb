@@ -379,7 +379,7 @@ Public Class Kalman_Single : Inherits TaskParent
             dst2 = plot.dst2
             dst3 = plot.dst3
             labels(2) = "Mean of the grayscale image is predicted"
-            labels(3) = "Mean (blue) = " + Format(inputReal, "0.0") + " predicted (green) = " + Format(stateResult, "0.0")
+            labels(3) = "Mean (blue) = " + inputReal.ToString("0.0") + " predicted (green) = " + stateResult.ToString("0.0")
         End If
     End Sub
 End Class

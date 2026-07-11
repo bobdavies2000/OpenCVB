@@ -24,13 +24,13 @@ Public Class XR_Eigen_Basics : Inherits TaskParent
         For i = 0 To eigenVal.Rows - 1
             scalar = eigenVal.Get(Of cv.Scalar)(0, i)
             solution(i) = scalar.Val0
-            nextLine += Format(scalar.Val0, fmt2) + vbTab + vbTab
+            nextLine += scalar.Val0.ToString(fmt2) + vbTab + vbTab
             For j = 0 To eigenVec.Rows - 1
                 scalar = eigenVec.Get(Of cv.Scalar)(i, j)
-                nextLine += Format(scalar.Val0, fmt2) + vbTab
+                nextLine += scalar.Val0.ToString(fmt2) + vbTab
             Next
             For j = 0 To eigenVec.Rows - 1
-                nextLine += vbTab + Format(inputData(i * 5 + j), fmt2)
+                nextLine += vbTab + inputData(i * 5 + j).ToString(fmt2)
             Next
             nextLine += vbCrLf + vbCrLf
         Next
@@ -40,7 +40,7 @@ Public Class XR_Eigen_Basics : Inherits TaskParent
             For j = 0 To eigenVec.Cols - 1
                 scalar = eigenVec.Get(Of cv.Scalar)(i, j)
                 If j = eigenVec.Cols - 1 Then plusSign = vbTab
-                nextLine += Format(scalar.Val0, fmt2) + " * " + Format(solution(j), fmt2) + plusSign
+                nextLine += scalar.Val0.ToString(fmt2) + " * " + solution(j).ToString(fmt2) + plusSign
             Next
             nextLine += " = " + vbTab + "0.0" + vbCrLf
         Next
@@ -118,10 +118,10 @@ Public Class XR_Eigen_Fitline : Inherits TaskParent
         p1 = New cv.Point(0, noisyLine.bb)
         p2 = New cv.Point(src.Width, noisyLine.m * src.Width + noisyLine.bb)
         cv.Cv2.Line(dst2, p1, p2, cv.Scalar.Blue, task.lineWidth, task.lineType)
-        SetTrueText("Ground Truth m = " + Format(noisyLine.m, fmt2) + " eigen m = " + Format(m2, fmt2) + "    len = " + CStr(CInt(len)) + vbCrLf +
-                        "Confidence = " + Format(eigenVal.Get(Of Single)(0, 0) / eigenVal.Get(Of Single)(1, 0), fmt1) + vbCrLf +
-                        "theta: atan2(" + Format(eigenVec.Get(Of Single)(1, 0), fmt1) + ", " + Format(eigenVec.Get(Of Single)(0, 0), fmt1) + ") = " +
-                        Format(theta, fmt4) + vbCrLf + "Note that the fitline (red) line is accurate while the Eigen (blue) is less so", 3)
+        SetTrueText("Ground Truth m = " + noisyLine.m.ToString(fmt2) + " eigen m = " + m2.ToString(fmt2) + "    len = " + CStr(CInt(len)) + vbCrLf +
+                        "Confidence = " + (eigenVal.Get(Of Single)(0, 0) / eigenVal.Get(Of Single)(1, 0)).ToString(fmt1) + vbCrLf +
+                        "theta: atan2(" + eigenVec.Get(Of Single)(1, 0).ToString(fmt1) + ", " + eigenVec.Get(Of Single)(0, 0).ToString(fmt1) + ") = " +
+                        theta.ToString(fmt4) + vbCrLf + "Note that the fitline (red) line is accurate while the Eigen (blue) is less so", 3)
     End Sub
 End Class
 

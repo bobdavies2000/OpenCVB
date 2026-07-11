@@ -584,8 +584,8 @@ Public Class XR_BackProject_InRangeDepthTest : Inherits TaskParent
             If maxRange >= task.MaxZmeters Then dst2 = dst2 Or task.maxDepthMask
         End If
 
-        labels(2) = "Histogram bin " + CStr(index) + " for range from " + Format(minRange, fmt1) + " m to " +
-                    Format(maxRange, fmt1) + " m had " + CStr(cv.Cv2.CountNonZero(dst2))
+        labels(2) = "Histogram bin " + CStr(index) + " for range from " + minRange.ToString(fmt1) + " m to " +
+                    maxRange.ToString(fmt1) + " m had " + CStr(cv.Cv2.CountNonZero(dst2))
         If task.heartBeatLT And task.frameCount > 1 Then index += 1
         If maxRange > task.MaxZmeters Then index = 0
     End Sub

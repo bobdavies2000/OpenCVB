@@ -1,4 +1,4 @@
-Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
+﻿Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 Public Class Stabilizer_Basics : Inherits TaskParent
     Private refLine As lpData
     Public Sub New()
@@ -31,7 +31,7 @@ Public Class Stabilizer_Basics : Inherits TaskParent
         cv.Cv2.Line(dst3, refLine.ptE1, refLine.ptE2, cv.Scalar.Yellow, task.lineWidth + 1, task.lineType)
         cv.Cv2.Line(dst3, lpCurr.ptE1, lpCurr.ptE2, cv.Scalar.Red, task.lineWidth + 1, task.lineType)
 
-        labels(3) = "Delta Angle=" + Format(angleDelta, fmt2) + " deg, tx=" + Format(tx, fmt2) + ", ty=" + Format(ty, fmt2)
+        labels(3) = "Delta Angle=" + angleDelta.ToString(fmt2) + " deg, tx=" + tx.ToString(fmt2) + ", ty=" + ty.ToString(fmt2)
     End Sub
 End Class
 
@@ -151,9 +151,9 @@ Public Class Stabilizer_OrientationPRY : Inherits TaskParent
             cv.Cv2.Line(dst2, task.lpGravity.ptE1, task.lpGravity.ptE2, cv.Scalar.Yellow, task.lineWidth, task.lineType)
         End If
 
-        labels(2) = "Pitch=" + Format(pitchDeg, fmt2) + " deg  Roll(IMU Z)=" + Format(rollDeg, fmt2) +
-                    " deg  Yaw(gyro int)=" + Format(yawDeg, fmt2) + " deg"
-        labels(3) = "lpCurr angle=" + Format(lpCurr.angle, fmt2) + " deg, roll(image lpGravity)=" + Format(rollImageDeg, fmt2) +
+        labels(2) = "Pitch=" + pitchDeg.ToString(fmt2) + " deg  Roll(IMU Z)=" + rollDeg.ToString(fmt2) +
+                    " deg  Yaw(gyro int)=" + yawDeg.ToString(fmt2) + " deg"
+        labels(3) = "lpCurr angle=" + lpCurr.angle.ToString(fmt2) + " deg, roll(image lpGravity)=" + rollImageDeg.ToString(fmt2) +
                     " deg, line present " + CStr(task.longestLine.age) + " frames"
 
         strOut = "Pitch/roll use task.accRadians (X,Z) from gravity/IMU pipeline (radians converted to degrees)." + vbCrLf +
@@ -223,8 +223,8 @@ Public Class Stabilizer_PRY : Inherits TaskParent
         cv.Cv2.Line(dst2, task.longestLine.ptE1, task.longestLine.ptE2, cv.Scalar.Red, task.lineWidth + 1, task.lineType)
         cv.Cv2.Line(dst2, task.lpGravity.ptE1, task.lpGravity.ptE2, cv.Scalar.Yellow, task.lineWidth + 1, task.lineType)
 
-        labels(2) = "Pitch=" + Format(task.pitchDeg, fmt2) + "  Roll=" + Format(rollDeg, fmt2) + "  Yaw=" + Format(yawDeg, fmt2)
-        labels(3) = "longestLine angle=" + Format(task.longestLine.angle, fmt2) + " deg, lpGravity angle=" + Format(task.lpGravity.angle, fmt2) + " deg"
+        labels(2) = "Pitch=" + task.pitchDeg.ToString(fmt2) + "  Roll=" + rollDeg.ToString(fmt2) + "  Yaw=" + yawDeg.ToString(fmt2)
+        labels(3) = "longestLine angle=" + task.longestLine.angle.ToString(fmt2) + " deg, lpGravity angle=" + task.lpGravity.angle.ToString(fmt2) + " deg"
 
         strOut = "Roll: atan2(gx, gy) for unit gravity direction in the image (0 when gravity aligns with image +Y / down)." + vbCrLf +
                  "Pitch: acute angle between longestLine and lpGravity in the image (both edge directions)." + vbCrLf +

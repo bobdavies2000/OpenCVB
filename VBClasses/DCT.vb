@@ -192,9 +192,9 @@ Public Class XR_DCT_Surfaces_debug : Inherits TaskParent
                 If fitPoints.Count > 0 Then
                     Dim eq = Plane_Basics.fitDepthPlane(fitPoints)
                     If Single.IsNaN(eq(0)) = False Then
-                        flow.nextMsg = "a=" + Format(eq(0), fmt2) + " b=" + Format(eq(1), fmt2) + " c=" + Format(Math.Abs(eq(2)), fmt2) +
-                                  vbTab + "depth=" + Format(-eq(3), fmt2) + "m " + "r(x,y) = " + Format(r.X, "000") + "," +
-                                  Format(r.Y, "000") + vbTab + "Min=" + Format(minDepth, fmt1) + "m " + " Max=" + Format(maxDepth, fmt1) + "m"
+                        flow.nextMsg = "a=" + eq(0).ToString(fmt2) + " b=" + eq(1).ToString(fmt2) + " c=" + Math.Abs(eq(2)).ToString(fmt2) +
+                                  vbTab + "depth=" + (-eq(3)).ToString(fmt2) + "m " + "r(x,y) = " + r.X.ToString("000") + "," +
+                                  r.Y.ToString("000") + vbTab + "Min=" + minDepth.ToString(fmt1) + "m " + " Max=" + maxDepth.ToString(fmt1) + "m"
                     End If
                 End If
             End If

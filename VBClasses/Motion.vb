@@ -1,4 +1,4 @@
-Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
+﻿Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 Public Class Motion_Basics_TA : Inherits TaskParent
     Public motionSort As New List(Of Integer) ' sorted in order of grid rect index (without actually sorting.)
     Public diff As New Diff_Basics
@@ -100,7 +100,7 @@ Public Class Motion_Validate : Inherits TaskParent
 
         Dim count = cv.Cv2.CountNonZero(dst3)
         strOut = "Pixels different from camera image: " + CStr(count) + " (" +
-                  Format(count / src.Total, "0%") + ")" + vbCrLf +
+                  (count / src.Total).ToString("0%") + ")" + vbCrLf +
                  "Grid rects with more than " + CStr(task.motionThreshold) +
                  " pixels different: " + CStr(task.motion.motionSort.Count)
         SetTrueText(strOut, 3)
@@ -288,9 +288,9 @@ Public Class Motion_CorrelationToLast : Inherits TaskParent
             plotHist.Run(cv.Mat.FromPixelData(cList.Count, 1, cv.MatType.CV_32F, cList.ToArray))
             dst1 = plotHist.dst2
 
-            labels(2) = "Min = " + Format(cList.Min, fmt1) + ", Max = " + Format(cList.Max, fmt1)
-            labels(3) = CStr(count) + " had a correlation < " + Format(maxCorrelation, fmt2) + " (" +
-                                Format(count / cList.Count, "0%") + ")" +
+            labels(2) = "Min = " + cList.Min.ToString(fmt1) + ", Max = " + cList.Max.ToString(fmt1)
+            labels(3) = CStr(count) + " had a correlation < " + maxCorrelation.ToString(fmt2) + " (" +
+                                (count / cList.Count).ToString("0%") + ")" +
                                 " The black squares have high correlation."
         End If
     End Sub
@@ -341,9 +341,9 @@ Public Class Motion_Correlation : Inherits TaskParent
         plotHist.Run(cv.Mat.FromPixelData(cList.Count, 1, cv.MatType.CV_32F, cList.ToArray))
         dst1 = plotHist.dst2
 
-        labels(2) = "Min = " + Format(cList.Min, fmt1) + ", Max = " + Format(cList.Max, fmt1)
-        labels(3) = CStr(count) + " had a correlation < " + Format(maxCorrelation, fmt2) + " (" +
-                            Format(count / cList.Count, "0%") + ")"
+        labels(2) = "Min = " + cList.Min.ToString(fmt1) + ", Max = " + cList.Max.ToString(fmt1)
+        labels(3) = CStr(count) + " had a correlation < " + maxCorrelation.ToString(fmt2) + " (" +
+                            (count / cList.Count).ToString("0%") + ")"
 
     End Sub
 End Class
@@ -387,8 +387,8 @@ Public Class Motion_Throttle : Inherits TaskParent
                     increasing = True
                 End If
 
-                nextMsg = CStr(task.motion.motionSort.Count) + vbTab + vbTab + Format(1 - identicalRatio, "0%") +
-                                                    vbTab + vbTab + Format(identicalRatio, "0%")
+                nextMsg = CStr(task.motion.motionSort.Count) + vbTab + vbTab + (1 - identicalRatio).ToString("0%") +
+                                                    vbTab + vbTab + identicalRatio.ToString("0%")
                 If increasing Then
                     nextMsg += vbTab + vbTab + "Increasing to " + CStr(currThreshold + 1)
                 ElseIf decreasing Then

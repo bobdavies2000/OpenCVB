@@ -1,4 +1,4 @@
-Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
+﻿Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 ' https://www.programcreek.com/python/example/89459/cv2.getRotationMatrix2D
 Public Class Rotate_Basics : Inherits TaskParent
     Public M As cv.Mat
@@ -21,7 +21,7 @@ Public Class Rotate_Basics : Inherits TaskParent
         If options.warpFlag = cv.InterpolationFlags.WarpInverseMap Then
             Mflip = cv.Cv2.GetRotationMatrix2D(rotateCenter, rotateAngle, 1)
         End If
-        labels(2) = "Image after rotation by " + Format(rotateAngle, fmt3)
+        labels(2) = "Image after rotation by " + rotateAngle.ToString(fmt3)
     End Sub
 End Class
 
@@ -128,6 +128,6 @@ Public Class XR_Rotate_Verticalize : Inherits TaskParent
         If standalone Then angleSlider.Value = task.verticalizeAngle * 100
         rotate.Run(src)
         dst2 = rotate.dst2
-        SetTrueText("Angle offset from gravity = " + Format(angleSlider.Value / 100, fmt2), 3)
+        SetTrueText("Angle offset from gravity = " + (angleSlider.Value / 100).ToString(fmt2), 3)
     End Sub
 End Class

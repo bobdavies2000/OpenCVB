@@ -1,4 +1,4 @@
-Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
+﻿Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 Imports System.Runtime.InteropServices
 Namespace PixelViewer
     Public Class Pixel_Viewer : Inherits TaskParent
@@ -101,10 +101,10 @@ Namespace PixelViewer
                 Case displayTypes.type8uC3
                     imgText += If(dw.X + drWidth > 1000, " col    ", " col    ") + CStr(dw.X) + " through " + CStr(dw.X + drWidth - 1) + vbLf
                     For y = 0 To img.Height - 1
-                        imgText += "r" + Format(dw.Y + y, "000") + "   "
+                        imgText += "r" + (dw.Y + y).ToString("000") + "   "
                         For x = 0 To img.Width - 1
                             Dim vec = img.Get(Of cv.Vec3b)(y, x)
-                            imgText += Format(vec(0), "000") + " " + Format(vec(1), "000") + " " + Format(vec(2), "000") + "   "
+                            imgText += vec(0).ToString("000") + " " + vec(1).ToString("000") + " " + vec(2).ToString("000") + "   "
                         Next
                         imgText += vbLf
                     Next
@@ -112,12 +112,12 @@ Namespace PixelViewer
                 Case displayTypes.type8u
                     imgText += If(dw.X + drWidth > 1000, " col    ", " col    ") + CStr(dw.X) + " through " + CStr(dw.X + drWidth - 1) + vbLf
                     For y = 0 To img.Height - 1
-                        imgText += "r" + Format(dw.Y + y, "000") + "   "
+                        imgText += "r" + (dw.Y + y).ToString("000") + "   "
                         For x = 0 To img.Width - 1
                             If (task.toggleOn And y = ClickPoint.Y) And (x = ClickPoint.X - 1 Or x = ClickPoint.X) Then
-                                imgText += Format(img.Get(Of Byte)(y, x), "000") + If((dw.X + x) Mod 5 = 4, "***", "*")
+                                imgText += img.Get(Of Byte)(y, x).ToString("000") + If((dw.X + x) Mod 5 = 4, "***", "*")
                             Else
-                                imgText += Format(img.Get(Of Byte)(y, x), "000") + If((dw.X + x) Mod 5 = 4, "   ", " ")
+                                imgText += img.Get(Of Byte)(y, x).ToString("000") + If((dw.X + x) Mod 5 = 4, "   ", " ")
                             End If
                         Next
                         imgText += vbLf
@@ -126,9 +126,9 @@ Namespace PixelViewer
                 Case displayTypes.type32F
                     imgText += If(dw.X + drWidth > 1000, " col    ", " col    ") + CStr(dw.X) + " through " + CStr(dw.X + drWidth - 1) + vbLf
                     For y = 0 To img.Height - 1
-                        imgText += "r" + Format(dw.Y + y, "000") + "   "
+                        imgText += "r" + (dw.Y + y).ToString("000") + "   "
                         For x = 0 To img.Width - 1
-                            imgText += Format(img.Get(Of Single)(y, x), format32f) + If((dw.X + x) Mod 5 = 4, "   ", " ")
+                            imgText += img.Get(Of Single)(y, x).ToString(format32f) + If((dw.X + x) Mod 5 = 4, "   ", " ")
                         Next
                         imgText += vbLf
                     Next
@@ -136,10 +136,10 @@ Namespace PixelViewer
                 Case displayTypes.type32FC3
                     imgText += If(dw.X + drWidth > 1000, " col    ", " col    ") + CStr(dw.X) + " through " + CStr(dw.X + drWidth - 1) + vbLf
                     For y = 0 To img.Height - 1
-                        imgText += "r" + Format(dw.Y + y, "000") + "   "
+                        imgText += "r" + (dw.Y + y).ToString("000") + "   "
                         For x = 0 To img.Width - 1
                             Dim vec = img.Get(Of cv.Vec3f)(y, x)
-                            imgText += Format(vec(0), format32f) + " " + Format(vec(1), format32f) + " " + Format(vec(2), format32f) + "   "
+                            imgText += vec(0).ToString(format32f) + " " + vec(1).ToString(format32f) + " " + vec(2).ToString(format32f) + "   "
                         Next
                         imgText += vbLf
                     Next
@@ -147,19 +147,19 @@ Namespace PixelViewer
                 Case displayTypes.type32SC1
                     imgText += If(dw.X + drWidth > 1000, " col    ", " col    ") + CStr(dw.X) + " through " + CStr(dw.X + drWidth - 1) + vbLf
                     For y = 0 To img.Height - 1
-                        imgText += "r" + Format(dw.Y + y, "000") + "   "
+                        imgText += "r" + (dw.Y + y).ToString("000") + "   "
                         For x = 0 To img.Width - 1
-                            imgText += Format(img.Get(Of Integer)(y, x), format32S) + "  "
+                            imgText += img.Get(Of Integer)(y, x).ToString(format32S) + "  "
                         Next
                         imgText += vbLf
                     Next
                 Case displayTypes.type32SC3
                     imgText += If(dw.X + drWidth > 1000, " col    ", " col    ") + CStr(dw.X) + " through " + CStr(dw.X + drWidth - 1) + vbLf
                     For y = 0 To img.Height - 1
-                        imgText += "r" + Format(dw.Y + y, "000") + "   "
+                        imgText += "r" + (dw.Y + y).ToString("000") + "   "
                         For x = 0 To img.Width - 1
                             Dim vec = img.Get(Of cv.Vec3i)(y, x)
-                            imgText += Format(vec(0), format32S) + " " + Format(vec(1), format32S) + " " + Format(vec(2), format32S) + "   "
+                            imgText += vec(0).ToString(format32S) + " " + vec(1).ToString(format32S) + " " + vec(2).ToString(format32S) + "   "
                         Next
                         imgText += vbLf
                     Next
@@ -261,8 +261,8 @@ Public Class Pixel_Measure : Inherits TaskParent
         Static distanceSlider = OptionParent.FindSlider("Distance in mm")
         Dim mmPP = Compute(distanceSlider.Value)
         SetTrueText("At a distance of " + CStr(distanceSlider.Value) + " mm's the camera's FOV is " +
-                        Format(mmPP * src.Width / 1000, fmt2) + " meters wide" + vbCrLf +
-                        "Pixels are " + Format(mmPP, fmt2) + " mm per pixel at " +
+                        (mmPP * src.Width / 1000).ToString(fmt2) + " meters wide" + vbCrLf +
+                        "Pixels are " + mmPP.ToString(fmt2) + " mm per pixel at " +
                         CStr(distanceSlider.Value) + " mm's in the image view")
     End Sub
 End Class
@@ -374,7 +374,7 @@ Public Class XR_Pixel_Unstable : Inherits TaskParent
         Dim avg = pixelCounts.Average()
         Dim sum = pixelCounts.Sum(Function(d As Integer) Math.Pow(d - avg, 2))
         Dim stdev = Math.Sqrt(sum / pixelCounts.Count)
-        labels(3) = "Unstable pixel count = " + Format(avg, "###,##0") + "    stdev = " + Format(stdev, "0.0")
+        labels(3) = "Unstable pixel count = " + avg.ToString("###,##0") + "    stdev = " + stdev.ToString("0.0")
         lastImage = dst2.Clone
     End Sub
 End Class
@@ -473,7 +473,7 @@ Public Class XR_Pixel_NeighborsHorizontal : Inherits TaskParent
         For i = 0 To pt1.Count - 1
             cv.Cv2.Line(dst2, pt1(i), pt2(i), cv.Scalar.Yellow, task.lineWidth, task.lineType)
         Next
-        labels(2) = CStr(pt1.Count) + " z-values within " + Format(options.threshold * 1000, fmt0) + " mm's with X pixel offset " + CStr(options.pixels)
+        labels(2) = CStr(pt1.Count) + " z-values within " + (options.threshold * 1000).ToString(fmt0) + " mm's with X pixel offset " + CStr(options.pixels)
     End Sub
 End Class
 
@@ -515,7 +515,7 @@ Public Class XR_Pixel_NeighborsVertical : Inherits TaskParent
         For i = 0 To pt1.Count - 1
             cv.Cv2.Line(dst2, pt1(i), pt2(i), cv.Scalar.Yellow, task.lineWidth, task.lineType)
         Next
-        labels(2) = CStr(pt1.Count) + " z-values within " + Format(options.threshold * 1000, fmt0) + " mm's with Y pixel offset " + CStr(options.pixels)
+        labels(2) = CStr(pt1.Count) + " z-values within " + (options.threshold * 1000).ToString(fmt0) + " mm's with Y pixel offset " + CStr(options.pixels)
     End Sub
 End Class
 
@@ -542,7 +542,7 @@ Public Class Pixel_NeighborsMaskH : Inherits TaskParent
         cv.Cv2.ConvertScaleAbs(tmp32f, dst2, 255)
         dst2.SetTo(0, task.noDepthMask)
         dst2(New cv.Rect(dst2.Width - options.pixels, 0, options.pixels, dst2.Height)).SetTo(0)
-        labels(2) = "White: z is within " + Format(options.threshold, fmt0) + " mm's with X pixel offset " + CStr(options.pixels)
+        labels(2) = "White: z is within " + options.threshold.ToString(fmt0) + " mm's with X pixel offset " + CStr(options.pixels)
     End Sub
 End Class
 
@@ -569,7 +569,7 @@ Public Class Pixel_NeighborsMaskV : Inherits TaskParent
         cv.Cv2.ConvertScaleAbs(tmp32f, dst2, 255)
         dst2.SetTo(0, task.noDepthMask)
         dst2(New cv.Rect(dst2.Width - options.pixels, 0, options.pixels, dst2.Height)).SetTo(0)
-        labels(2) = "White: z is within " + Format(options.threshold, fmt0) + " mm's with X pixel offset " + CStr(options.pixels)
+        labels(2) = "White: z is within " + options.threshold.ToString(fmt0) + " mm's with X pixel offset " + CStr(options.pixels)
     End Sub
 End Class
 
@@ -639,7 +639,7 @@ Public Class XR_Pixel_NeighborsPatchNeighbors : Inherits TaskParent
                     End If
                 Next
             Next
-            labels(2) = "Updated z-values within " + Format(options.threshold * 1000, fmt0) + " mm's with X pixel offset " + CStr(options.pixels)
+            labels(2) = "Updated z-values within " + (options.threshold * 1000).ToString(fmt0) + " mm's with X pixel offset " + CStr(options.pixels)
         Else
             labels(2) = "Z-values not updated "
         End If

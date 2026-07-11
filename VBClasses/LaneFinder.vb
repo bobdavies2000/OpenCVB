@@ -184,10 +184,10 @@ Public Class LaneFinder_SlopeIntercept : Inherits TaskParent
         rightLaneIntercept = mat1.Dot(mat3) / weight
         rightAvgSlope = mat1.Dot(mat2) / weight
 
-        SetTrueText("Left lane intercept = " + Format(leftLaneIntercept, fmt1) +
-                        " Right lane intercept = " + Format(rightLaneIntercept, fmt1) + vbCrLf +
-                        "Left slope = " + Format(leftAvgSlope, fmt3) +
-                        " Right slope = " + Format(rightAvgSlope, fmt3), 3)
+        SetTrueText("Left lane intercept = " + leftLaneIntercept.ToString(fmt1) +
+                        " Right lane intercept = " + rightLaneIntercept.ToString(fmt1) + vbCrLf +
+                        "Left slope = " + leftAvgSlope.ToString(fmt3) +
+                        " Right slope = " + rightAvgSlope.ToString(fmt3), 3)
 
         Dim tmp = dst2.EmptyClone()
 

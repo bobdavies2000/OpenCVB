@@ -116,7 +116,7 @@ Public Class XR_Diff_Identical : Inherits TaskParent
 
         If task.heartBeat Then
             labels(2) = CStr(noMotionFrames) + " frames since the last heartbeat with no motion " +
-                            " or " + Format(noMotionFrames / task.fpsAlgorithm, "0%")
+                            " or " + (noMotionFrames / task.fpsAlgorithm).ToString("0%")
             flowText.Add(labels(2))
             noMotionFrames = 0
             If flowText.Count > 20 Then flowText.RemoveAt(0)
@@ -211,7 +211,7 @@ Public Class Diff_Depth32f : Inherits TaskParent
         If task.heartBeat Then
             labels(2) = "Depth difference from accumulated frame is > " + CStr(options.millimeters) + " mm's"
             Dim count = cv.Cv2.CountNonZero(dst2)
-            labels(3) = CStr(count) + " pixels (" + Format(count /cv.Cv2.CountNonZero(task.depthmask), "0%") +
+            labels(3) = CStr(count) + " pixels (" + (count /cv.Cv2.CountNonZero(task.depthmask)).ToString("0%") +
                             " of all depth pixels) were different by more than " + CStr(options.millimeters) + " mm's"
         End If
     End Sub

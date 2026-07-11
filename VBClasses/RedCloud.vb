@@ -1,4 +1,4 @@
-Imports System.Runtime.InteropServices
+﻿Imports System.Runtime.InteropServices
 Imports VBClasses
 Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 Public Class RedCloud_Basics : Inherits TaskParent
@@ -54,7 +54,7 @@ Public Class RedCloud_Basics : Inherits TaskParent
         dst1 = keyColors.dst2
 
         labels(2) = CStr(unMatched) + " were new cells and " + CStr(matchCount) + " were matched, " +
-                                "average age: " + Format(matchAverage / rcList.Count, fmt1)
+                                "average age: " + (matchAverage / rcList.Count).ToString(fmt1)
         labels(3) = redCore.labels(3)
 
         'If task.heartbeatFrame + task.gOptions.DebugSlider.Value = task.frameCount Then
@@ -191,7 +191,7 @@ Public Class XR_RedCloud_CellDepthHistogram : Inherits TaskParent
         plot.minRange = 0
         plot.maxRange = task.MaxZmeters
         plot.Run(depth)
-        labels(3) = "0 meters to " + Format(task.MaxZmeters, fmt0) + " meters - vertical lines every meter"
+        labels(3) = "0 meters to " + task.MaxZmeters.ToString(fmt0) + " meters - vertical lines every meter"
 
         Dim incr = dst2.Width / task.MaxZmeters
         For i = 1 To CInt(task.MaxZmeters - 1)
@@ -516,7 +516,7 @@ Public Class RedCloud_Flood_CPP : Inherits TaskParent
         Next
 
         labels(2) = CStr(unMatched) + " were new cells and " + CStr(matchCount) + " were matched, " +
-                                "average age: " + Format(matchAverage / rcList.Count, fmt1)
+                                "average age: " + (matchAverage / rcList.Count).ToString(fmt1)
     End Sub
     Protected Overrides Sub Finalize()
         If cPtr <> 0 Then cPtr = RedCloudFill_Close(cPtr)
@@ -631,7 +631,7 @@ Public Class RedCloud_Foreground : Inherits TaskParent
                 count += 1
             End If
         Next
-        labels(3) = CStr(count) + " RedCloud cells were in the foreground (< " + Format(maxDepth, fmt1) + " meters)"
+        labels(3) = CStr(count) + " RedCloud cells were in the foreground (< " + maxDepth.ToString(fmt1) + " meters)"
     End Sub
 End Class
 

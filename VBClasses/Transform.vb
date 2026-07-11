@@ -1,4 +1,4 @@
-Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
+﻿Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 Public Class XR_Transform_Resize : Inherits TaskParent
     Dim options As New Options_Transform
     Public Sub New()
@@ -72,7 +72,7 @@ Public Class XR_Transform_Affine3D : Inherits TaskParent
             output += "Affine Transform 3D results:" + vbCrLf
             For i = 0 To 3 - 1
                 For j = 0 To 4 - 1
-                    output += Format(affineTransform.Get(Of Double)(i, j), fmt3) + vbTab
+                    output += affineTransform.Get(Of Double)(i, j).ToString(fmt3) + vbTab
                 Next
                 output += vbCrLf
             Next

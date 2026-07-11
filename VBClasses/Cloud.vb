@@ -205,7 +205,7 @@ Public Class Cloud_SetupSide : Inherits TaskParent
         cv.Cv2.Line(dst2, cam, markerRight, cv.Scalar.Red, 1, task.lineType)
 
         Dim labelLocation = New cv.Point(src.Width * 0.02, src.Height * 7 / 8)
-        SetTrueText("vFOV=" + Format(180 - startAngle * 2, "0.0") + " deg.", New cv.Point(4, dst2.Height * 3 / 4))
+        SetTrueText("vFOV=" + (180 - startAngle * 2).ToString("0.0") + " deg.", New cv.Point(4, dst2.Height * 3 / 4))
     End Sub
 End Class
 
@@ -267,7 +267,7 @@ Public Class Cloud_SetupTop : Inherits TaskParent
 
         Dim shift = (src.Width - src.Height) / 2
         Dim labelLocation = New cv.Point(dst2.Width / 2 + shift, dst2.Height * 15 / 16)
-        SetTrueText("hFOV=" + Format(180 - startAngle * 2, "0.0") + " deg.", New cv.Point(4, dst2.Height * 7 / 8))
+        SetTrueText("hFOV=" + (180 - startAngle * 2).ToString("0.0") + " deg.", New cv.Point(4, dst2.Height * 7 / 8))
         cv.Cv2.Line(dst2, task.topCameraPoint, fovRight, white, task.lineWidth, task.lineWidth)
     End Sub
 End Class
@@ -441,8 +441,8 @@ Public Class XR_Cloud_GridInspector : Inherits TaskParent
             Dim index = task.gridMap.Get(Of Integer)(pt.Y, pt.X)
             Dim center = bricks.brickList(index).center
             Dim xyz = task.pointCloud.Get(Of cv.Vec3f)(center.Y, center.X)
-            SetTrueText("Row " + Format(i, "00") + vbTab + vbTab + Format(xyz(0), fmt2) + vbTab +
-                                     Format(xyz(1), fmt2) + vbTab + Format(xyz(2), fmt2), New cv.Point(5, pt.Y), 3)
+            SetTrueText("Row " + i.ToString("00") + vbTab + vbTab + xyz(0).ToString(fmt2) + vbTab +
+                                     xyz(1).ToString(fmt2) + vbTab + xyz(2).ToString(fmt2), New cv.Point(5, pt.Y), 3)
         Next
         labels(2) = "Values displayed are the point cloud X, Y, and Z values for column " + CStr(cLine)
         labels(3) = "Move mouse in the image at left to see the point cloud X, Y, and Z values."
@@ -604,9 +604,9 @@ Public Class XR_Cloud_Split : Inherits TaskParent
         Dim mmy = GetMinMax(dst2)
         Dim mmz = GetMinMax(dst3)
 
-        labels(1) = "Min/Max for X " + Format(mmx.minVal, fmt1) + " / " + Format(mmx.maxVal, fmt1)
-        labels(2) = "Min/Max for Y " + Format(mmy.minVal, fmt1) + " / " + Format(mmy.maxVal, fmt1)
-        labels(3) = "Min/Max for Z " + Format(mmz.minVal, fmt1) + " / " + Format(mmz.maxVal, fmt1)
+        labels(1) = "Min/Max for X " + mmx.minVal.ToString(fmt1) + " / " + mmx.maxVal.ToString(fmt1)
+        labels(2) = "Min/Max for Y " + mmy.minVal.ToString(fmt1) + " / " + mmy.maxVal.ToString(fmt1)
+        labels(3) = "Min/Max for Z " + mmz.minVal.ToString(fmt1) + " / " + mmz.maxVal.ToString(fmt1)
     End Sub
 End Class
 

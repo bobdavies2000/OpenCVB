@@ -1,4 +1,4 @@
-Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
+﻿Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 Public Class Profile_Basics : Inherits TaskParent
     Public ptLeft As cv.Point3f, ptRight As cv.Point3f, ptTop As cv.Point3f, ptBot As cv.Point3f, ptFront As cv.Point3f, ptBack As cv.Point3f
     Public cornerNames As New List(Of String)({"   First (white)", "   Left (light blue)", "   Right (red)", "   Top (green)",
@@ -14,7 +14,7 @@ Public Class Profile_Basics : Inherits TaskParent
         desc = "Find the left/right, top/bottom, and near/far sides of a cell"
     End Sub
     Private Function point3fToString(v As cv.Point3f) As String
-        Return Format(v.X, fmt3) + vbTab + Format(v.Y, fmt3) + vbTab + Format(v.Z, fmt3)
+        Return v.X.ToString(fmt3) + vbTab + v.Y.ToString(fmt3) + vbTab + v.Z.ToString(fmt3)
     End Function
     Public Overrides Sub RunAlg(src As cv.Mat)
         redC.Run(src)
@@ -125,9 +125,9 @@ Public Class Profile_Rotation : Inherits TaskParent
             strOut += task.gravityMatrix.strOut + vbCrLf
             strOut += vbCrLf + "New gMatrix from sliders" + vbCrLf
             strOut += IMU_GMatrix_TA.gMatrixToStr(task.gravityMatrix.gMatrix) + vbCrLf + vbCrLf
-            strOut += "Angle X = " + Format(options.rotateX, fmt1) + vbCrLf
-            strOut += "Angle Y = " + Format(options.rotateY, fmt1) + vbCrLf
-            strOut += "Angle Z = " + Format(options.rotateZ, fmt1) + vbCrLf
+            strOut += "Angle X = " + options.rotateX.ToString(fmt1) + vbCrLf
+            strOut += "Angle Y = " + options.rotateY.ToString(fmt1) + vbCrLf
+            strOut += "Angle Z = " + options.rotateZ.ToString(fmt1) + vbCrLf
             SetTrueText(strOut + vbCrLf + vbCrLf + strMsg)
         End If
     End Sub

@@ -1,4 +1,4 @@
-Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
+﻿Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 Public Class Mat_Basics : Inherits TaskParent
     Public Sub New()
         desc = "Use the repeat method to replicate data."
@@ -292,14 +292,14 @@ Public Class XR_Mat_Inverse_4D : Inherits TaskParent
         Dim outstr As String = "Original Matrix " + vbCrLf
         For y = 0 To src.Rows - 1
             For x = 0 To src.Cols - 1
-                outstr += Format(src.Get(Of Double)(y, x), fmt4) + vbTab
+                outstr += src.Get(Of Double)(y, x).ToString(fmt4) + vbTab
             Next
             outstr += vbCrLf
         Next
         outstr += vbCrLf + "Matrix Inverse" + vbCrLf
         For y = 0 To src.Rows - 1
             For x = 0 To src.Cols - 1
-                outstr += Format(dst2.Get(Of Double)(y, x), fmt4) + vbTab
+                outstr += dst2.Get(Of Double)(y, x).ToString(fmt4) + vbTab
             Next
             outstr += vbCrLf
         Next

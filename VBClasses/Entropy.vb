@@ -33,7 +33,7 @@ Public Class Entropy_Basics : Inherits TaskParent
         cv.Cv2.Rectangle(dst2, task.drawRect, white, task.lineWidth)
         If task.heartBeat Then strOut = "Click anywhere to measure the entropy with rect(pt.x, pt.y, " +
                                                  CStr(stdSize) + ", " + CStr(stdSize) + ")" + vbCrLf + vbCrLf + "Total entropy = " +
-                                                 Format(entropy.entropyVal, fmt1) + vbCrLf + entropy.strOut
+                                                 entropy.entropyVal.ToString(fmt1) + vbCrLf + entropy.strOut
         SetTrueText(strOut, 3)
     End Sub
 End Class
@@ -74,8 +74,8 @@ Public Class Entropy_Highest : Inherits TaskParent
                 If entropy.entropyVal < minEntropy Then minEntropy = entropy.entropyVal
                 If standaloneTest() And task.gridWH > 16 Then
                     Dim pt = New cv.Point(roi.X, roi.Y)
-                    SetTrueText(Format(entropy.entropyVal, fmt2), pt, 2)
-                    SetTrueText(Format(entropy.entropyVal, fmt2), pt, 3)
+                    SetTrueText(entropy.entropyVal.ToString(fmt2), pt, 2)
+                    SetTrueText(entropy.entropyVal.ToString(fmt2), pt, 3)
                 End If
             End If
         Next
@@ -88,7 +88,7 @@ Public Class Entropy_Highest : Inherits TaskParent
             dst3.SetTo(0)
             cv.Cv2.Rectangle(dst3, eMaxRect, white, task.lineWidth)
         End If
-        labels(2) = "Lighter = higher entropy. Range: " + Format(minEntropy, "0.0") + " to " + Format(maxEntropy, "0.0")
+        labels(2) = "Lighter = higher entropy. Range: " + minEntropy.ToString("0.0") + " to " + maxEntropy.ToString("0.0")
     End Sub
 End Class
 
@@ -151,7 +151,7 @@ Public Class Entropy_Rectangle : Inherits TaskParent
         cv.Cv2.Normalize(hist, histNormalized, 0, hist.Rows, cv.NormTypes.MinMax)
 
         entropyVal = channelEntropy(src.Total, histNormalized) * 1000
-        strOut = "Entropy X1000 " + Format(entropyVal, fmt1) + vbCrLf
+        strOut = "Entropy X1000 " + entropyVal.ToString(fmt1) + vbCrLf
         dst2 = src
         cv.Cv2.Rectangle(dst2, task.drawRect, white, task.lineWidth)
         dst3 = src
@@ -244,7 +244,7 @@ Public Class XR_Entropy_SubDivisions : Inherits TaskParent
             Dim index = entropies(i).IndexOf(val)
             Dim roi = eROI(i)(index)
             cv.Cv2.Rectangle(dst2, roi, white)
-            If standaloneTest() Then SetTrueText(Format(entropies(i)(index), fmt2), roi.TopLeft, 3)
+            If standaloneTest() Then SetTrueText(entropies(i)(index).ToString(fmt2), roi.TopLeft, 3)
         Next
 
         dst2.SetTo(white, dst0)

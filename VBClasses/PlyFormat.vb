@@ -1,4 +1,4 @@
-Imports System.IO
+﻿Imports System.IO
 Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 Public Class PlyFormat_Basics : Inherits TaskParent
     Public options As New Options_PlyFormat
@@ -24,7 +24,7 @@ Public Class PlyFormat_Basics : Inherits TaskParent
             For y = 0 To task.pointCloud.Height - 1
                 For x = 0 To task.pointCloud.Width - 1
                     Dim vec = task.pointCloud.Get(Of cv.Vec3f)(y, x)
-                    sw.WriteLine(Format(vec(0), fmt3) + " " + Format(vec(1), fmt3) + " " + Format(vec(2), fmt3))
+                    sw.WriteLine(vec(0).ToString(fmt3) + " " + vec(1).ToString(fmt3) + " " + vec(2).ToString(fmt3))
                 Next
             Next
             sw.Close()
@@ -69,7 +69,7 @@ Public Class XR_PlyFormat_PlusRGB : Inherits TaskParent
                     For x = 0 To task.pointCloud.Width - 1
                         Dim vec = task.pointCloud.Get(Of cv.Vec3f)(y, x)
                         Dim bgr = src.Get(Of cv.Vec3b)(y, x)
-                        sw.WriteLine(Format(vec(0), fmt3) + " " + Format(vec(1), fmt3) + " " + Format(vec(2), fmt3),
+                        sw.WriteLine(vec(0).ToString(fmt3) + " " + vec(1).ToString(fmt3) + " " + vec(2).ToString(fmt3),
                                      CStr(bgr(2)) + " " + CStr(bgr(1)) + " " + CStr(bgr(0)))
                     Next
                 Next

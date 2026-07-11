@@ -1,4 +1,4 @@
-Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
+﻿Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 Imports System.Runtime.InteropServices
 Imports System.Text.RegularExpressions
 Public Class PlotOpenCV_Basics : Inherits TaskParent
@@ -59,7 +59,7 @@ Public Class PlotOpenCV_Depth : Inherits TaskParent
             For i = 1 To lineCount
                 Dim x = i * meterDepth
                 cv.Cv2.Line(dst2, New cv.Point(x, 0), New cv.Point(x, src.Height), white, task.lineWidth, task.lineType)
-                SetTrueText(Format(i, "0") + "m", New cv.Point(x + 4, src.Height - 10))
+                SetTrueText(i.ToString("0") + "m", New cv.Point(x + 4, src.Height - 10))
             Next
         End If
     End Sub
@@ -95,8 +95,8 @@ Public Class PlotOpenCV_CPP : Inherits TaskParent
         handleY.Free()
 
         Dim maxX = srcX.Max, minX = srcX.Min, maxY = srcY.Max, minY = srcY.Min
-        labels(2) = "x-Axis: " + Format(minX, fmt2) + " to " + Format(maxX, fmt2) +
-                          ", y-axis: " + Format(minY, fmt2) + " to " + Format(maxY, fmt2)
+        labels(2) = "x-Axis: " + minX.ToString(fmt2) + " to " + maxX.ToString(fmt2) +
+                          ", y-axis: " + minY.ToString(fmt2) + " to " + maxY.ToString(fmt2)
     End Sub
     Protected Overrides Sub Finalize()
         If cPtr <> 0 Then cPtr = PlotOpenCV_Close(cPtr)
@@ -133,8 +133,8 @@ Public Class PlotOpenCV_Points : Inherits TaskParent
             End If
         Next
 
-        labels(2) = "x-Axis: " + Format(minX, fmt2) + " to " + Format(maxX, fmt2) +
-                          ", y-axis: " + Format(minY, fmt2) + " to " + Format(maxY, fmt2)
+        labels(2) = "x-Axis: " + minX.ToString(fmt2) + " to " + maxX.ToString(fmt2) +
+                          ", y-axis: " + minY.ToString(fmt2) + " to " + maxY.ToString(fmt2)
     End Sub
 End Class
 
