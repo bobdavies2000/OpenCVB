@@ -1,6 +1,6 @@
 Imports System.IO
 Imports System.Runtime.InteropServices
-Imports cv = OpenCvSharp
+Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 Public Class Edge_Basics_TA : Inherits TaskParent
     Dim canny As Edge_Canny
     Dim binRed As Edge_BinarizedReduction

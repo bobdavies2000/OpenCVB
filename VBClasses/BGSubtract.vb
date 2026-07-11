@@ -1,6 +1,6 @@
 Imports System.IO
 Imports System.Runtime.InteropServices
-Imports cv = OpenCvSharp
+Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 ' https://github.com/opencv/opencv_contrib/blob/master/modules/bgsegm/samples/bgfg.cpp
 Public Class BGSubtract_Basics : Inherits TaskParent
     Implements IDisposable

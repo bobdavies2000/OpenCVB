@@ -1,4 +1,4 @@
-Imports cv = OpenCvSharp
+Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 ' Source: https://hackernoon.com/https-medium-com-matteoronchetti-pointillism-with-python-and-opencv-f4274e6bbb7b
 Public Class XR_OilPaint_Pointilism : Inherits TaskParent
     Dim randomMask As cv.Mat

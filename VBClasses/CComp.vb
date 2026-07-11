@@ -1,4 +1,4 @@
-Imports cv = OpenCvSharp
+Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 'https://github.com/oreillymedia/Learning-OpenCV-3_examples/blob/master/example_14-03.cpp
 Public Class CComp_Basics : Inherits TaskParent
     Public connectedComponents As cv.ConnectedComponents

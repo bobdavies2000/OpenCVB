@@ -1,4 +1,4 @@
-Imports cv = OpenCvSharp
+Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 ' https://docs.opencvb.org/2.4/modules/imgproc/doc/histograms.html
 Public Class Hist2D_Basics : Inherits TaskParent
     Public histRowsCols() As Integer

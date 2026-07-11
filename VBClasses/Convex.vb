@@ -1,4 +1,4 @@
-Imports cv = OpenCvSharp
+Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 Public Class Convex_Basics : Inherits TaskParent
     Public hull() As cv.Point
     Dim options As New Options_Convex

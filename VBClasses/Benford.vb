@@ -1,6 +1,5 @@
 Imports System.Text.RegularExpressions
-Imports OpenCvSharp
-Imports cv = OpenCvSharp
+Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 ' Benford's Law is pretty cool but I don't think it is a phenomenon of nature.  It is produced from bringing real world measurements to a human scale.
 ' Reducing an image with compression works because human understanding maps the data within reach of the understanding embedded in our number system.
 ' (Further investigation: would a base other than 10 provide the same results?)

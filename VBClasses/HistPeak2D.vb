@@ -1,4 +1,4 @@
-Imports cv = OpenCvSharp
+Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 Public Class HistPeak2D_Basics : Inherits TaskParent
     Public auto As New OpAuto_Peaks2DGrid
     Dim bgr As New Hist2D_BGR

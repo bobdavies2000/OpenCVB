@@ -1,4 +1,4 @@
-Imports cv = OpenCvSharp
+Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 Imports System.IO
 Imports System.Runtime.InteropServices
 Public Class Vignetting_Basics : Inherits TaskParent

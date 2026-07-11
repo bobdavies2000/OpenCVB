@@ -1,4 +1,4 @@
-Imports cv = OpenCvSharp
+Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 ' https://github.com/shimat/opencvsharp_2410/blob/master/sample/CStyleSamplesCS/Samples/MDS.cs
 Public Class MDScaling_Cities : Inherits TaskParent
     Dim CityDistance() As Double = { ' 10x10 array of distances for 10 cities

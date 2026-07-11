@@ -1,4 +1,4 @@
-Imports cv = OpenCvSharp
+Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 'https://www.pyimagesearch.com/2017/11/06/deep-learning-opencvs-blobfromimage-works/
 Public Class MeanSubtraction_Basics : Inherits TaskParent
     Public scaleValue As Single = 16

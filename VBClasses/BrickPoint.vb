@@ -1,4 +1,4 @@
-Imports cv = OpenCvSharp
+Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 Public Class BrickPoint_Basics : Inherits TaskParent
     Public sobel As New Edge_Sobel
     Public bpCore As New BrickPoint_Core

@@ -1,4 +1,4 @@
-Imports cv = OpenCvSharp
+Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 ' https://github.com/vnglst/pong-wars
 ' https://twitter.com/nicolasdnl/status/1749715070928433161
 Public Class PongWars_Basics : Inherits TaskParent

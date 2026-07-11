@@ -1,4 +1,4 @@
-Imports cv = OpenCvSharp
+Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 Public Class Resize_Basics : Inherits TaskParent
     Public newSize As cv.Size
     Public options As New Options_Resize

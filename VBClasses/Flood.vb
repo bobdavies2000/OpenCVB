@@ -1,5 +1,5 @@
 Imports System.Runtime.InteropServices
-Imports cv = OpenCvSharp
+Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 Public Class Flood_Basics : Inherits TaskParent
     Implements IDisposable
     Public rcList As New List(Of rcDataOld)

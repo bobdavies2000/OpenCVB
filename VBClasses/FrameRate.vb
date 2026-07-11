@@ -1,4 +1,4 @@
-Imports cv = OpenCvSharp
+Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 Public Class FrameRate_Basics : Inherits TaskParent
     Dim mats As New Mat_4to1
     Dim frameCounts(4 - 1) As Integer

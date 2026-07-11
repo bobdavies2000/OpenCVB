@@ -1,4 +1,4 @@
-Imports cv = OpenCvSharp
+Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 ' http://www.ilikebigbits.com/blog/2015/3/2/plane-from-points
 Public Class Plane_Basics : Inherits TaskParent
     Dim frames As New History_Basics

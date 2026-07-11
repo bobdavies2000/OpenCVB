@@ -1,4 +1,4 @@
-Imports cv = OpenCvSharp
+Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 Public Class PlotTime_Basics : Inherits TaskParent
     Public plotData As cv.Scalar
     Public plotCount As Integer = 3

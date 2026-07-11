@@ -1,5 +1,5 @@
 Imports System.IO
-Imports cv = OpenCvSharp
+Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 ' https://docs.opencvb.org/3.3.1/de/dd0/grabcut_8cpp-example.html
 Public Class GrabCut_Basics : Inherits TaskParent
     Public fgFineTune As cv.Mat

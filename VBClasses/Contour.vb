@@ -1,4 +1,4 @@
-Imports cv = OpenCvSharp
+Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 Imports VBClasses
 Public Class Contour_Basics : Inherits TaskParent
     Implements IDisposable

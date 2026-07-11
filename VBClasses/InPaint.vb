@@ -1,4 +1,4 @@
-Imports cv = OpenCvSharp
+Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 ' https://docs.opencvb.org/master/df/d3d/tutorial_py_inpainting.html#gsc.tab=0
 Public Class InPaint_Basics : Inherits TaskParent
     Dim options As New Options_InPaint

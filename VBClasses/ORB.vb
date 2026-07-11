@@ -1,4 +1,4 @@
-Imports cv = OpenCvSharp
+Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 'https://github.com/shimat/opencvsharp/wiki/ORB-and-FREAK
 Public Class ORB_Basics : Inherits TaskParent
     Implements IDisposable

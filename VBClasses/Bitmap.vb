@@ -1,5 +1,5 @@
 Imports System.Drawing
-Imports cv = OpenCvSharp
+Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 Imports gdip = OpenCvSharp.GdipExtensions
 ' https://www.csharpcodi.com/csharp-examples/OpenCvSharp.Extensions.BitmapConverter.ToBitmap(OpenCvSharp.Mat)/
 Public Class Bitmap_ToMat : Inherits TaskParent

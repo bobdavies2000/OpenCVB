@@ -1,4 +1,4 @@
-Imports cv = OpenCvSharp
+Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 Namespace VBClasses
     Public Class KeyColor_Basics : Inherits TaskParent
         Dim keyList As New List(Of keyData)

@@ -1,4 +1,4 @@
-Imports cv = OpenCvSharp
+Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 Public Class PolyLine_BasicsOld_TA : Inherits TaskParent
     Dim edgeline As New EdgeLine_Basics
     Public Sub New()

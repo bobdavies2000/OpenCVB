@@ -1,4 +1,4 @@
-Imports cv = OpenCvSharp
+Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 Public Class ROI_Basics : Inherits TaskParent
     Public diff As New Diff_Basics
     Public aoiRect As cv.Rect

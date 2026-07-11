@@ -1,4 +1,4 @@
-Imports cv = OpenCvSharp
+Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 Public Class DCT_Basics : Inherits TaskParent
     Public options As New Options_DCT
     Public Sub New()

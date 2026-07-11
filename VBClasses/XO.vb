@@ -1,7 +1,6 @@
 Imports System.IO
 Imports System.Runtime.InteropServices
 Imports System.Threading
-Imports OpenCvSharp
 Imports OpenCvSharp.ML
 Imports cv = OpenCvSharp
 Namespace VBClasses
@@ -115,7 +114,7 @@ Namespace VBClasses
             Dim threshold As Single = 0.015F
             Dim work As New cv.Mat
 
-                          cv.Cv2.InRange(task.pcSplit(1), -threshold, threshold, work)
+            cv.Cv2.InRange(task.pcSplit(1), -threshold, threshold, work)
             work.SetTo(0, task.noDepthMask)
             work.ConvertTo(dst1, cv.MatType.CV_8U)
             Dim hPoints As New cv.Mat
@@ -140,7 +139,7 @@ Namespace VBClasses
                 yRight = 0
             End If
 
-                          cv.Cv2.InRange(task.pcSplit(0), -threshold, threshold, work)
+            cv.Cv2.InRange(task.pcSplit(0), -threshold, threshold, work)
             work.SetTo(0, task.noDepthMask)
             work.ConvertTo(dst3, cv.MatType.CV_8U)
             Dim gPoints As New cv.Mat
@@ -188,7 +187,7 @@ Namespace VBClasses
 
             rc = (rc.Reshape(1, rc.Rows * rc.Cols) * task.gMatrix).ToMat.Reshape(3, rc.Rows)
 
-                          cv.Cv2.InRange(split(1), -0.05, 0.05, dst1)
+            cv.Cv2.InRange(split(1), -0.05, 0.05, dst1)
             dst1.SetTo(0, task.noDepthMask)
             Dim pointsMat As New cv.Mat
             cv.Cv2.FindNonZero(dst1, pointsMat)
@@ -210,7 +209,7 @@ Namespace VBClasses
                 cv.Cv2.Line(dst2, task.lpHorizon.p1, task.lpHorizon.p2, 255, task.lineWidth, task.lineType)
             End If
 
-                          cv.Cv2.InRange(split(0), -0.01, 0.01, dst3)
+            cv.Cv2.InRange(split(0), -0.01, 0.01, dst3)
             dst3.SetTo(0, task.noDepthMask)
             cv.Cv2.FindNonZero(dst3, pointsMat)
             If pointsMat.Rows > 0 Then
@@ -434,7 +433,7 @@ Namespace VBClasses
             dst2.SetTo(0)
             dst3.SetTo(0)
             For Each pt In points
-            cv.Cv2.Circle(dst2, pt, task.DotSize, white, -1, task.lineType)
+                cv.Cv2.Circle(dst2, pt, task.DotSize, white, -1, task.lineType)
             Next
 
             cv.Cv2.Line(dst2, task.lpGravity.p1, task.lpGravity.p2, white, task.lineWidth, task.lineType)
@@ -2100,7 +2099,7 @@ Namespace VBClasses
                 brick.rect = brick.rect
                 brick.lRect = brick.rect ' for some cameras the color image and the left image are the same but not all, i.e. Intel Realsense.
                 brick.center = New cv.Point(brick.rect.X + brick.rect.Width / 2, brick.rect.Y + brick.rect.Height / 2)
-If cv.Cv2.CountNonZero(task.depthmask(brick.rect)) Then
+                If cv.Cv2.CountNonZero(task.depthmask(brick.rect)) Then
                     cv.Cv2.MeanStdDev(task.pcSplit(2)(brick.rect), mean, stdev, task.depthmask(brick.rect))
                     brick.depth = mean(0)
                 End If
@@ -4632,12 +4631,12 @@ If cv.Cv2.CountNonZero(task.depthmask(brick.rect)) Then
             Dim output As New cv.Mat(task.pcSplit(1).Size(), cv.MatType.CV_32F, cv.Scalar.All(0))
             Dim firstCol As Integer
             For firstCol = 0 To viewX.Width - 1
-If cv.Cv2.CountNonZero(viewX.Col(firstCol)) > 0 Then Exit For
+                If cv.Cv2.CountNonZero(viewX.Col(firstCol)) > 0 Then Exit For
             Next
 
             Dim lastCol As Integer
             For lastCol = viewX.Height - 1 To 0 Step -1
-If cv.Cv2.CountNonZero(viewX.Row(lastCol)) > 0 Then Exit For
+                If cv.Cv2.CountNonZero(viewX.Row(lastCol)) > 0 Then Exit For
             Next
 
             Dim sliceMask As New cv.Mat
@@ -4654,12 +4653,12 @@ If cv.Cv2.CountNonZero(viewX.Row(lastCol)) > 0 Then Exit For
             Dim output As New cv.Mat(task.pcSplit(1).Size(), cv.MatType.CV_32F, cv.Scalar.All(0))
             Dim firstLine As Integer
             For firstLine = 0 To viewY.Height - 1
-If cv.Cv2.CountNonZero(viewY.Row(firstLine)) > 0 Then Exit For
+                If cv.Cv2.CountNonZero(viewY.Row(firstLine)) > 0 Then Exit For
             Next
 
             Dim lastLine As Integer
             For lastLine = viewY.Height - 1 To 0 Step -1
-If cv.Cv2.CountNonZero(viewY.Row(lastLine)) > 0 Then Exit For
+                If cv.Cv2.CountNonZero(viewY.Row(lastLine)) > 0 Then Exit For
             Next
 
             Dim sliceMask As New cv.Mat
@@ -5078,7 +5077,7 @@ If cv.Cv2.CountNonZero(viewY.Row(lastLine)) > 0 Then Exit For
                 cv.Cv2.InRange(left.Row(i), maxVal, maxVal, tmp)
                 dst0.Row(i).SetTo(255, tmp)
 
-                                  cv.Cv2.InRange(right.Row(i), maxVal, maxVal, tmp)
+                cv.Cv2.InRange(right.Row(i), maxVal, maxVal, tmp)
                 dst1.Row(i).SetTo(255, tmp)
             Next
         End Sub
@@ -5136,7 +5135,7 @@ If cv.Cv2.CountNonZero(viewY.Row(lastLine)) > 0 Then Exit For
                 cv.Cv2.InRange(dst0.Row(i), maxVal, maxVal, tmp)
                 dst2.Row(i).SetTo(255, tmp)
 
-                                  cv.Cv2.InRange(dst1.Row(i), maxVal, maxVal, tmp)
+                cv.Cv2.InRange(dst1.Row(i), maxVal, maxVal, tmp)
                 dst3.Row(i).SetTo(255, tmp)
             Next
         End Sub
@@ -6189,7 +6188,7 @@ If cv.Cv2.CountNonZero(viewY.Row(lastLine)) > 0 Then Exit For
                 cv.Cv2.Normalize(match.dst0, dst3, 0, 255, cv.NormTypes.MinMax)
                 SetTrueText(Format(match.correlation, fmt3), match.newCenter)
 
-cv.Cv2.Rectangle(dst2, lp.rect, task.highlight, task.lineWidth)
+                cv.Cv2.Rectangle(dst2, lp.rect, task.highlight, task.lineWidth)
             End If
 
             Dim lpRectMap = XO_Line_CoreNew.createMap()
@@ -6262,7 +6261,7 @@ cv.Cv2.Rectangle(dst2, lp.rect, task.highlight, task.lineWidth)
             gIndex = task.gridMap.Get(Of Integer)(vec.p2.Y, vec.p2.X)
             Dim lastRect = task.gridNabeRects(gIndex)
             cv.Cv2.Rectangle(dst, firstRect, task.highlight, task.lineWidth)
-cv.Cv2.Rectangle(dst, lastRect, task.highlight, task.lineWidth)
+            cv.Cv2.Rectangle(dst, lastRect, task.highlight, task.lineWidth)
         End Sub
         Public Shared Sub showVectors(dst As cv.Mat)
             cv.Cv2.Line(dst, task.lpGravity.p1, task.lpGravity.p2, white, task.lineWidth, task.lineType)
@@ -7141,7 +7140,7 @@ cv.Cv2.Rectangle(dst, lastRect, task.highlight, task.lineWidth)
             If fPD.rotateCenter = New cv.Point2f Then
                 fPD.rotateAngle = 0
             Else
-            cv.Cv2.Circle(dst2, fPD.rotateCenter, task.DotSize + 2, cv.Scalar.Red, -1, task.lineType)
+                cv.Cv2.Circle(dst2, fPD.rotateCenter, task.DotSize + 2, cv.Scalar.Red, -1, task.lineType)
                 fPD.rotateAngle = findrotateAngle(perp2.output.p1, perp2.output.p2, perp1.output.p1)
             End If
             If fPD.rotateAngle = 0 Then fPD.rotateCenter = New cv.Point2f
@@ -7851,7 +7850,7 @@ cv.Cv2.Rectangle(dst, lastRect, task.highlight, task.lineWidth)
                 Dim roi = New cv.Rect(pt.X - half, pt.Y - half, task.gridWH, task.gridWH)
                 roi = ValidateRect(roi)
                 cv.Cv2.Rectangle(dst2, roi, task.highlight, task.lineWidth)
-cv.Cv2.Rectangle(dst2, task.gridNabeRects(index), task.highlight, task.lineWidth)
+                cv.Cv2.Rectangle(dst2, task.gridNabeRects(index), task.highlight, task.lineWidth)
             Next
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -8201,8 +8200,8 @@ cv.Cv2.Rectangle(dst2, task.gridNabeRects(index), task.highlight, task.lineWidth
                 cv.Cv2.Resize(smoothedFrame, dst3, src.Size())
 
                 For i = 0 To commonPoints.Count - 1
-                cv.Cv2.Circle(dst2, commonPoints.ElementAt(i), task.DotSize + 3, cv.Scalar.Red, -1, task.lineType)
-                cv.Cv2.Circle(dst2, lastFeatures.ElementAt(i), task.DotSize + 1, cv.Scalar.Blue, -1, task.lineType)
+                    cv.Cv2.Circle(dst2, commonPoints.ElementAt(i), task.DotSize + 3, cv.Scalar.Red, -1, task.lineType)
+                    cv.Cv2.Circle(dst2, lastFeatures.ElementAt(i), task.DotSize + 1, cv.Scalar.Blue, -1, task.lineType)
                 Next
             End If
             inputFeat = Nothing ' show that we consumed the current set of features.
@@ -8252,7 +8251,7 @@ cv.Cv2.Rectangle(dst2, task.gridNabeRects(index), task.highlight, task.lineWidth
 
             dst2.SetTo(0)
             For Each pt In features
-            cv.Cv2.Circle(dst2, pt, task.DotSize, cv.Scalar.Yellow, -1, task.lineType)
+                cv.Cv2.Circle(dst2, pt, task.DotSize, cv.Scalar.Yellow, -1, task.lineType)
             Next
             labels(2) = "There were " + CStr(features.Count) + " key points detected"
         End Sub
@@ -8375,8 +8374,8 @@ cv.Cv2.Rectangle(dst2, task.gridNabeRects(index), task.highlight, task.lineWidth
             desc = "Track the selected points"
         End Sub
         Public Shared Sub DrawPolkaDot(pt As cv.Point2f, dst As cv.Mat)
-        cv.Cv2.Circle(dst, pt, task.DotSize + 2, white, -1, task.lineType)
-        cv.Cv2.Circle(dst, pt, task.DotSize, black, -1, task.lineType)
+            cv.Cv2.Circle(dst, pt, task.DotSize + 2, white, -1, task.lineType)
+            cv.Cv2.Circle(dst, pt, task.DotSize, black, -1, task.lineType)
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             If task.firstPass Then mPoint.target = src.Clone
@@ -9094,7 +9093,7 @@ cv.Cv2.Rectangle(dst2, task.gridNabeRects(index), task.highlight, task.lineWidth
             cv.Cv2.Line(dst2, p1, p2, cv.Scalar.Yellow, task.lineWidth, task.lineType)
             cv.Cv2.Line(dst2, p3, p4, cv.Scalar.Yellow, task.lineWidth, task.lineType)
             If intersectionPoint <> New cv.Point2f Then
-            cv.Cv2.Circle(dst2, intersectionPoint, task.DotSize + 4, white, -1, task.lineType)
+                cv.Cv2.Circle(dst2, intersectionPoint, task.DotSize + 4, white, -1, task.lineType)
                 labels(2) = "Intersection point = " + CStr(CInt(intersectionPoint.X)) + " x " + CStr(CInt(intersectionPoint.Y))
             Else
                 labels(2) = "Parallel!!!"
@@ -9709,7 +9708,7 @@ cv.Cv2.Rectangle(dst2, task.gridNabeRects(index), task.highlight, task.lineWidth
                     Dim roi = New cv.Rect(pt.X - half, pt.Y - half, task.gridWH, task.gridWH)
                     roi = ValidateRect(roi) ' stub bricks are fixed here 
                     cv.Cv2.Rectangle(dst2, roi, task.highlight, task.lineWidth)
-cv.Cv2.Rectangle(dst2, task.gridNabeRects(index), task.highlight, task.lineWidth)
+                    cv.Cv2.Rectangle(dst2, task.gridNabeRects(index), task.highlight, task.lineWidth)
                 Next
             End If
 
@@ -10640,7 +10639,7 @@ cv.Cv2.Rectangle(dst2, task.gridNabeRects(index), task.highlight, task.lineWidth
             Next
 
             For Each pd In rcList
-            cv.Cv2.Circle(dst2, pd.maxDist, task.DotSize, task.highlight, -1)
+                cv.Cv2.Circle(dst2, pd.maxDist, task.DotSize, task.highlight, -1)
             Next
 
             labels(2) = CStr(index) + " regions were identified"
@@ -11525,7 +11524,7 @@ cv.Cv2.Rectangle(dst2, task.gridNabeRects(index), task.highlight, task.lineWidth
             dst2 = XO_RedFlood_List.runRedList(src, labels(2))
 
             For Each rc In redList.rclist
-            cv.Cv2.Circle(dst2, rc.maxDist, task.DotSize, task.highlight, -1, task.lineType)
+                cv.Cv2.Circle(dst2, rc.maxDist, task.DotSize, task.highlight, -1, task.lineType)
             Next
 
             addTour.rclist = redList.rclist
@@ -11757,7 +11756,7 @@ cv.Cv2.Rectangle(dst2, task.gridNabeRects(index), task.highlight, task.lineWidth
 
             Dim rclist As New List(Of rcDataOld)
             For Each rc In redList.rclist
-If cv.Cv2.CountNonZero(task.motion.motionMask(rc.rect)) = 0 Then
+                If cv.Cv2.CountNonZero(task.motion.motionMask(rc.rect)) = 0 Then
                     If rc.indexLast > 0 And rc.indexLast < lastList.Count Then rc = lastList(rc.indexLast)
                 End If
                 Dim index = rclist.Count
@@ -11811,7 +11810,7 @@ If cv.Cv2.CountNonZero(task.motion.motionMask(rc.rect)) = 0 Then
                 Dim md = mdList(index)
                 rc.color = task.scalarColors(md.index)
                 If rc.indexLast <> 0 Then
-If cv.Cv2.CountNonZero((task.motion.motionMask(rc.rect) And rc.mask).ToMat) = 0 Then
+                    If cv.Cv2.CountNonZero((task.motion.motionMask(rc.rect) And rc.mask).ToMat) = 0 Then
                         rc = rcLastList(rc.indexLast)
                         lastCount += 1
                     End If
@@ -12768,9 +12767,9 @@ If cv.Cv2.CountNonZero((task.motion.motionMask(rc.rect) And rc.mask).ToMat) = 0 
             labels(1) = CenterC.labels(2)
 
             If task.leftView.Channels = 1 Then
-            Dim _leftC_cvt As New cv.Mat
-            cv.Cv2.CvtColor(task.leftView, _leftC_cvt, cv.ColorConversionCodes.GRAY2BGR)
-            leftC.Run(_leftC_cvt)
+                Dim _leftC_cvt As New cv.Mat
+                cv.Cv2.CvtColor(task.leftView, _leftC_cvt, cv.ColorConversionCodes.GRAY2BGR)
+                leftC.Run(_leftC_cvt)
             Else
                 leftC.Run(task.leftView)
             End If
@@ -12779,9 +12778,9 @@ If cv.Cv2.CountNonZero((task.motion.motionMask(rc.rect) And rc.mask).ToMat) = 0 
             labels(2) = leftC.labels(2)
 
             If task.rightView.Channels = 1 Then
-            Dim _rightC_cvt As New cv.Mat
-            cv.Cv2.CvtColor(task.rightView, _rightC_cvt, cv.ColorConversionCodes.GRAY2BGR)
-            rightC.Run(_rightC_cvt)
+                Dim _rightC_cvt As New cv.Mat
+                cv.Cv2.CvtColor(task.rightView, _rightC_cvt, cv.ColorConversionCodes.GRAY2BGR)
+                rightC.Run(_rightC_cvt)
             Else
                 rightC.Run(task.rightView)
             End If
@@ -14321,7 +14320,7 @@ If cv.Cv2.CountNonZero((task.motion.motionMask(rc.rect) And rc.mask).ToMat) = 0 
             Next
             dst2 = src
             For Each roi In roiMotion
-            cv.Cv2.Rectangle(dst2, roi, white, task.lineWidth)
+                cv.Cv2.Rectangle(dst2, roi, white, task.lineWidth)
             Next
             labels(2) = "Motion added to dst3 for " + CStr(roiMotion.Count) + " segments out of " + CStr(task.gridRects.Count)
             labels(3) = CStr(task.gridRects.Count - roiMotion.Count) + " segments out of " + CStr(task.gridRects.Count) + " had > " +
@@ -14475,7 +14474,7 @@ If cv.Cv2.CountNonZero((task.motion.motionMask(rc.rect) And rc.mask).ToMat) = 0 
             End If
             If task.heartBeatLT Then unchanged = 0
 
-cv.Cv2.Rectangle(dst2, motionRect, task.highlight, task.lineWidth)
+            cv.Cv2.Rectangle(dst2, motionRect, task.highlight, task.lineWidth)
 
             If standaloneTest() Then
                 For Each rc In redC.rcList
@@ -14576,7 +14575,7 @@ cv.Cv2.Rectangle(dst2, motionRect, task.highlight, task.lineWidth)
                 rcMap(rc.rect).SetTo(rc.mapID, rc.mask)
                 dst2(rc.rect).SetTo(rc.color, rc.mask)
                 If standaloneTest() Then
-                cv.Cv2.Circle(dst2, rc.maxDist, task.DotSize, task.highlight, -1)
+                    cv.Cv2.Circle(dst2, rc.maxDist, task.DotSize, task.highlight, -1)
                     SetTrueText(CStr(rc.age), rc.maxDist)
                 End If
                 rcList.Add(rc)
@@ -14652,7 +14651,7 @@ cv.Cv2.Rectangle(dst2, motionRect, task.highlight, task.lineWidth)
 
             If standaloneTest() Then
                 For Each rc In rcList
-                cv.Cv2.Circle(dst2, rc.maxDist, task.DotSize, task.highlight, -1)
+                    cv.Cv2.Circle(dst2, rc.maxDist, task.DotSize, task.highlight, -1)
                 Next
 
                 dst3.SetTo(0)
@@ -14750,7 +14749,7 @@ cv.Cv2.Rectangle(dst2, motionRect, task.highlight, task.lineWidth)
 
             If standaloneTest() Then
                 For Each rc In rcList
-                cv.Cv2.Circle(dst2, rc.maxDist, task.DotSize, task.highlight, -1)
+                    cv.Cv2.Circle(dst2, rc.maxDist, task.DotSize, task.highlight, -1)
                 Next
 
                 strOut = Utility_Basics.selectCell(rcMap, rcList)
@@ -14803,7 +14802,7 @@ cv.Cv2.Rectangle(dst2, motionRect, task.highlight, task.lineWidth)
                 colorIDList.Add(colorIDs)
 
                 If standaloneTest() Then
-                cv.Cv2.Circle(dst2, rc.maxDist, task.DotSize, task.highlight, -1)
+                    cv.Cv2.Circle(dst2, rc.maxDist, task.DotSize, task.highlight, -1)
                     strOut = ""
                     For Each index In colorIDs
                         strOut += CStr(index) + ","
@@ -15448,10 +15447,10 @@ cv.Cv2.Rectangle(dst2, motionRect, task.highlight, task.lineWidth)
             Next
 
             dst2 = src
-If cv.Cv2.CountNonZero(dst3) > task.FeatureSampleSize * 10 Then dst3.SetTo(0)
+            If cv.Cv2.CountNonZero(dst3) > task.FeatureSampleSize * 10 Then dst3.SetTo(0)
             For Each pt In intersects
-            cv.Cv2.Circle(dst2, pt, task.DotSize, task.highlight, -1, task.lineType)
-            cv.Cv2.Circle(dst3, pt, task.DotSize, white, -1, task.lineType)
+                cv.Cv2.Circle(dst2, pt, task.DotSize, task.highlight, -1, task.lineType)
+                cv.Cv2.Circle(dst3, pt, task.DotSize, white, -1, task.lineType)
             Next
         End Sub
     End Class
@@ -16135,8 +16134,8 @@ If cv.Cv2.CountNonZero(dst3) > task.FeatureSampleSize * 10 Then dst3.SetTo(0)
             For i = 0 To trackAll.Count - 1 Step 2
                 Dim t1 = trackAll(i)
                 For Each lp In t1
-                cv.Cv2.Circle(dst2, lp.p1, task.DotSize, task.highlight, -1, task.lineType)
-                cv.Cv2.Circle(dst2, lp.p2, task.DotSize, task.highlight, -1, task.lineType)
+                    cv.Cv2.Circle(dst2, lp.p1, task.DotSize, task.highlight, -1, task.lineType)
+                    cv.Cv2.Circle(dst2, lp.p2, task.DotSize, task.highlight, -1, task.lineType)
                     cv.Cv2.Line(dst2, lp.p1, lp.p2, cv.Scalar.Red, task.lineWidth, task.lineType)
                 Next
             Next
@@ -16232,7 +16231,7 @@ If cv.Cv2.CountNonZero(dst3) > task.FeatureSampleSize * 10 Then dst3.SetTo(0)
             For Each rc In redC.rcList
                 dst3(rc.rect).SetTo(rc.color, rc.mask)
                 For Each pt In rc.hull
-                cv.Cv2.Circle(dst2(rc.rect), pt, task.DotSize, task.highlight, -1)
+                    cv.Cv2.Circle(dst2(rc.rect), pt, task.DotSize, task.highlight, -1)
                     knn.ptListQuery.Add(New cv.Point(CInt(pt.X) + rc.rect.X, CInt(pt.Y) + rc.rect.Y))
                 Next
             Next
@@ -16594,7 +16593,7 @@ If cv.Cv2.CountNonZero(dst3) > task.FeatureSampleSize * 10 Then dst3.SetTo(0)
             dst2 = cellGen.dst2
 
             For Each rc In rclist
-            cv.Cv2.Circle(dst2, rc.maxDist, task.DotSize, task.highlight, -1, task.lineType)
+                cv.Cv2.Circle(dst2, rc.maxDist, task.DotSize, task.highlight, -1, task.lineType)
             Next
             labels(2) = cellGen.labels(2)
             labels(3) = ""
@@ -17064,7 +17063,7 @@ If cv.Cv2.CountNonZero(dst3) > task.FeatureSampleSize * 10 Then dst3.SetTo(0)
             desc = "Prepare a Color8U_Basics image using the motionMask"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-If cv.Cv2.CountNonZero(task.motion.motionMask) Then
+            If cv.Cv2.CountNonZero(task.motion.motionMask) Then
                 src.SetTo(0, Not task.motion.motionMask)
                 color8U.Run(src)
                 dst2 = color8U.dst3
@@ -17256,7 +17255,7 @@ If cv.Cv2.CountNonZero(task.motion.motionMask) Then
             For i = 0 To sortData.Count - 1
                 Dim pt = New cv.Point(dst2.Width * sortData.ElementAt(i).Key / maxX,
                                           dst2.Height - dst2.Height * sortData.ElementAt(i).Value / maxTime)
-                                          cv.Cv2.Circle(dst2, pt, task.DotSize, plotColor, -1, task.lineType)
+                cv.Cv2.Circle(dst2, pt, task.DotSize, plotColor, -1, task.lineType)
                 pointSet.Add(pt)
             Next
 
@@ -17762,7 +17761,7 @@ If cv.Cv2.CountNonZero(task.motion.motionMask) Then
 
             dst1.SetTo(0)
             For Each lp In lines.lpList
-If cv.Cv2.CountNonZero(dst1(lp.rect)) = 0 Then
+                If cv.Cv2.CountNonZero(dst1(lp.rect)) = 0 Then
                     cv.Cv2.Line(dst1, lp.p1, lp.p2, lp.index + 1, options.lineTrackerWidth, cv.LineTypes.Link8)
                 End If
             Next
@@ -17853,7 +17852,7 @@ If cv.Cv2.CountNonZero(dst1(lp.rect)) = 0 Then
             dst2 = cellGen.dst2
 
             For Each rc In redList.rclist
-            cv.Cv2.Circle(dst2, rc.maxDist, task.DotSize, task.highlight, -1, task.lineType)
+                cv.Cv2.Circle(dst2, rc.maxDist, task.DotSize, task.highlight, -1, task.lineType)
             Next
             labels(2) = cellGen.labels(2)
             labels(3) = ""
@@ -17943,10 +17942,10 @@ If cv.Cv2.CountNonZero(dst1(lp.rect)) = 0 Then
                 cv.Cv2.Line(dst3, New cv.Point(offset, 0), New cv.Point(offset, dst3.Height), white, task.lineWidth, task.lineWidth)
             Next
 
-                          cv.Cv2.InRange(task.gray, 0, quartiles(0) - 1, mats.mat(0))
-                          cv.Cv2.InRange(task.gray, quartiles(0), quartiles(1) - 1, mats.mat(1))
-                          cv.Cv2.InRange(task.gray, quartiles(1), quartiles(2) - 1, mats.mat(2))
-                          cv.Cv2.InRange(task.gray, quartiles(2), 255, mats.mat(3))
+            cv.Cv2.InRange(task.gray, 0, quartiles(0) - 1, mats.mat(0))
+            cv.Cv2.InRange(task.gray, quartiles(0), quartiles(1) - 1, mats.mat(1))
+            cv.Cv2.InRange(task.gray, quartiles(1), quartiles(2) - 1, mats.mat(2))
+            cv.Cv2.InRange(task.gray, quartiles(2), 255, mats.mat(3))
 
             If standaloneTest() Then
                 mats.Run(emptyMat)
@@ -18134,7 +18133,7 @@ If cv.Cv2.CountNonZero(dst1(lp.rect)) = 0 Then
             dst2.SetTo(0)
             For Each rc In redList.rclist
                 Dim tmp As cv.Mat = dst3(rc.rect) And rc.mask
-If cv.Cv2.CountNonZero(tmp) Then dst2(rc.rect).SetTo(rc.color, rc.mask)
+                If cv.Cv2.CountNonZero(tmp) Then dst2(rc.rect).SetTo(rc.color, rc.mask)
             Next
         End Sub
     End Class
@@ -18496,7 +18495,7 @@ If cv.Cv2.CountNonZero(tmp) Then dst2(rc.rect).SetTo(rc.color, rc.mask)
             dst2.SetTo(0)
             For Each rc In redList.rclist
                 Dim tmp As cv.Mat = dst3(rc.rect) And rc.mask
-If cv.Cv2.CountNonZero(tmp) Then dst2(rc.rect).SetTo(rc.color, rc.mask)
+                If cv.Cv2.CountNonZero(tmp) Then dst2(rc.rect).SetTo(rc.color, rc.mask)
             Next
         End Sub
     End Class
@@ -18571,7 +18570,7 @@ If cv.Cv2.CountNonZero(tmp) Then dst2(rc.rect).SetTo(rc.color, rc.mask)
             For Each rc In redList.rclist
                 If rc.wcMean(2) >= task.MaxZmeters Then Continue For
                 Dim tmp As cv.Mat = verts.dst2(rc.rect) And rc.mask
-If cv.Cv2.CountNonZero(tmp) / rc.pixels > 0.5 Then
+                If cv.Cv2.CountNonZero(tmp) / rc.pixels > 0.5 Then
                     DrawTour(dst2(rc.rect), rc.contour, rc.color, -1)
                     vCells.Add(rc)
                 End If
@@ -18635,7 +18634,7 @@ If cv.Cv2.CountNonZero(tmp) / rc.pixels > 0.5 Then
             Dim countMaxD As Integer, countMissedMaxD As Integer
             For Each rc In redList.rclist
                 tmp = task.motion.motionMask(rc.rect) And rc.mask
-If cv.Cv2.CountNonZero(tmp) = 0 Then
+                If cv.Cv2.CountNonZero(tmp) = 0 Then
                     If rc.indexLast <> 0 And rc.indexLast < rcLastList.Count Then
                         Dim lrc = rcLastList(rc.indexLast)
                         If lrc.maxDist = rc.maxDist Then
@@ -19124,7 +19123,7 @@ If cv.Cv2.CountNonZero(tmp) = 0 Then
             Dim reduction = task.fOptions.ReductionColor.Value
             For i = 0 To regionList.Count - 1
                 Dim index = regionList(i)
-                                  cv.Cv2.InRange(dst2, index, index, dst0)
+                cv.Cv2.InRange(dst2, index, index, dst0)
                 Dim mean = cv.Cv2.Mean(prepData.reduced32s, dst0)
 
                 If CInt(mean(0)) Mod reduction = 0 Then
@@ -19164,7 +19163,7 @@ If cv.Cv2.CountNonZero(tmp) = 0 Then
             Dim reduction = task.fOptions.ReductionColor.Value
             For i = 0 To regionList.Count - 1
                 Dim index = regionList(i)
-                                  cv.Cv2.InRange(dst2, index, index, dst0)
+                cv.Cv2.InRange(dst2, index, index, dst0)
                 Dim mean = cv.Cv2.Mean(wcData.prepData.reduced32s, dst0)
 
                 If CInt(mean(0)) Mod reduction = 0 Then
@@ -19560,7 +19559,7 @@ If cv.Cv2.CountNonZero(tmp) = 0 Then
             dst2 = src.Clone
             For i = mPoints.ptx.Count - 1 To 0 Step -1
                 If mPoints.correlation(i) > task.fCorrThreshold Then
-                cv.Cv2.Circle(dst2, mPoints.ptx(i), task.DotSize, task.highlight, -1, task.lineType)
+                    cv.Cv2.Circle(dst2, mPoints.ptx(i), task.DotSize, task.highlight, -1, task.lineType)
                     strOut += Format(mPoints.correlation(i), fmt3) + ", "
                 Else
                     mPoints.ptx.RemoveAt(i)
@@ -19894,8 +19893,8 @@ If cv.Cv2.CountNonZero(tmp) = 0 Then
 
             dst3 = task.color.Clone
             For Each pt In corners.nPoints
-            cv.Cv2.Circle(dst2, pt, task.DotSize, task.highlight, -1, task.lineType)
-            cv.Cv2.Circle(dst3, pt, task.DotSize, cv.Scalar.Yellow, -1, task.lineType)
+                cv.Cv2.Circle(dst2, pt, task.DotSize, task.highlight, -1, task.lineType)
+                cv.Cv2.Circle(dst3, pt, task.DotSize, cv.Scalar.Yellow, -1, task.lineType)
             Next
         End Sub
     End Class
@@ -20188,7 +20187,7 @@ If cv.Cv2.CountNonZero(tmp) = 0 Then
             dst2 = redLeft.dst2.Clone
             If standaloneTest() Then
                 For Each rc In redLeft.redC.rcList
-                cv.Cv2.Circle(dst2, rc.maxDist, task.DotSize, task.highlight, -1, task.lineType)
+                    cv.Cv2.Circle(dst2, rc.maxDist, task.DotSize, task.highlight, -1, task.lineType)
                 Next
             End If
 
@@ -20196,7 +20195,7 @@ If cv.Cv2.CountNonZero(tmp) = 0 Then
             dst3 = redRight.dst2.Clone
             If standaloneTest() Then
                 For Each rc In redRight.redC.rcList
-                cv.Cv2.Circle(dst3, rc.maxDist, task.DotSize, task.highlight, -1, task.lineType)
+                    cv.Cv2.Circle(dst3, rc.maxDist, task.DotSize, task.highlight, -1, task.lineType)
                 Next
             End If
             labels(2) = redLeft.labels(2)
@@ -20375,7 +20374,7 @@ If cv.Cv2.CountNonZero(tmp) = 0 Then
         Public Function displayFeatures(dst As cv.Mat, features As List(Of List(Of cv.Point))) As cv.Mat
             For Each ptlist In features
                 For Each pt In ptlist
-                cv.Cv2.Circle(dst, pt, task.DotSize, task.highlight, -1, task.lineType)
+                    cv.Cv2.Circle(dst, pt, task.DotSize, task.highlight, -1, task.lineType)
                 Next
             Next
             Return dst
@@ -20443,7 +20442,7 @@ If cv.Cv2.CountNonZero(tmp) = 0 Then
         End Sub
         Public Function displayFeatures(dst As cv.Mat, features As List(Of cv.Point)) As cv.Mat
             For Each pt In features
-            cv.Cv2.Circle(dst, pt, task.DotSize, task.highlight, -1, task.lineType)
+                cv.Cv2.Circle(dst, pt, task.DotSize, task.highlight, -1, task.lineType)
             Next
             Return dst
         End Function
@@ -20537,7 +20536,7 @@ If cv.Cv2.CountNonZero(tmp) = 0 Then
 
             dst3.SetTo(0)
             For Each pt In feat.features
-            cv.Cv2.Circle(dst2, pt, task.DotSize, task.highlight, -1, task.lineType)
+                cv.Cv2.Circle(dst2, pt, task.DotSize, task.highlight, -1, task.lineType)
                 dst3.Set(Of Byte)(pt.Y, pt.X, 255)
             Next
 
@@ -20564,7 +20563,7 @@ If cv.Cv2.CountNonZero(tmp) = 0 Then
             Dim stable As New List(Of cv.Point)
             For Each pt In noMotion.feat.features
                 If lastFeatures.Contains(pt) Then
-                cv.Cv2.Circle(dst2, pt, task.DotSize, task.highlight, -1, task.lineType)
+                    cv.Cv2.Circle(dst2, pt, task.DotSize, task.highlight, -1, task.lineType)
                     stable.Add(pt)
                 End If
             Next
@@ -20595,7 +20594,7 @@ If cv.Cv2.CountNonZero(tmp) = 0 Then
             dst3.SetTo(0)
             For Each fp In fpStable
                 If fp.age > 2 Then
-                cv.Cv2.Circle(dst3, fp.pt, task.DotSize, task.highlight, -1, task.lineType)
+                    cv.Cv2.Circle(dst3, fp.pt, task.DotSize, task.highlight, -1, task.lineType)
                     SetTrueText(CStr(fp.age), fp.pt, 3)
                 End If
             Next
@@ -21866,7 +21865,7 @@ If cv.Cv2.CountNonZero(tmp) = 0 Then
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             duster.Run(src)
-                          cv.Cv2.InRange(duster.dust.dst2, 1, 1, dst1)
+            cv.Cv2.InRange(duster.dust.dst2, 1, 1, dst1)
 
             dst3.SetTo(0)
             src.CopyTo(dst3, dst1)
@@ -21916,7 +21915,7 @@ If cv.Cv2.CountNonZero(tmp) = 0 Then
                 Dim md As New maskData
                 md.rect = rectlist(i)
                 If md.rect.Size = dst2.Size Then Continue For
-                                  cv.Cv2.InRange(dst2(md.rect), i + 1, i + 1, md.mask)
+                cv.Cv2.InRange(dst2(md.rect), i + 1, i + 1, md.mask)
                 md.contour = ContourBuild(md.mask)
                 DrawTour(md.mask, md.contour, 255, -1)
                 md.pixels = cv.Cv2.CountNonZero(md.mask)
@@ -22798,7 +22797,7 @@ If cv.Cv2.CountNonZero(tmp) = 0 Then
             If task.rcD IsNot Nothing Then task.clickPoint = task.rcD.maxDist
 
             For Each rc In rcList
-            cv.Cv2.Circle(dst3, rc.maxDist, task.DotSize, task.highlight, -1)
+                cv.Cv2.Circle(dst3, rc.maxDist, task.DotSize, task.highlight, -1)
                 SetTrueText(CStr(rc.mapID) + ", " + CStr(rc.age), rc.maxDist, 3)
             Next
 
@@ -22829,7 +22828,7 @@ If cv.Cv2.CountNonZero(tmp) = 0 Then
             For i = 0 To classcount - 1
                 Dim rc As New rcDataOld
                 rc.rect = redCore.rects(i)
-                                  cv.Cv2.InRange(redCore.dst2(rc.rect), i + 1, i + 1, rc.mask)
+                cv.Cv2.InRange(redCore.dst2(rc.rect), i + 1, i + 1, rc.mask)
                 rc = New rcDataOld(rc.mask, rc.rect, -1)
                 rc.mapID = rcList.Count + 1
 
@@ -22987,7 +22986,7 @@ If cv.Cv2.CountNonZero(tmp) = 0 Then
                 If index >= 254 Then Exit For
             Next
 
-                          cv.Cv2.InRange(reduction.dst2, 255, 255, dst1)
+            cv.Cv2.InRange(reduction.dst2, 255, 255, dst1)
 
             redC1.Run(reduction.dst2)
             labels(2) = redC1.labels(2)
@@ -23019,7 +23018,7 @@ If cv.Cv2.CountNonZero(tmp) = 0 Then
 
             If standaloneTest() Then
                 For Each rc In redC.rcList
-                cv.Cv2.Circle(dst2, rc.maxDist, task.DotSize, task.highlight, -1)
+                    cv.Cv2.Circle(dst2, rc.maxDist, task.DotSize, task.highlight, -1)
                 Next
             End If
         End Sub
@@ -23283,7 +23282,7 @@ If cv.Cv2.CountNonZero(tmp) = 0 Then
             If standalone Then
                 Dim index = Math.Abs(task.gOptions.DebugSlider.Value)
                 If index < lutList.Count Then
-                                          cv.Cv2.InRange(dst1, index, index, dst3)
+                    cv.Cv2.InRange(dst1, index, index, dst3)
                 End If
             End If
         End Sub
@@ -23504,7 +23503,7 @@ If cv.Cv2.CountNonZero(tmp) = 0 Then
             strOut = ""
 
             For i = 1 To RedWGrid.lutList.Count - 1
-                                  cv.Cv2.InRange(RedWGrid.dst1, i, i, dst2)
+                cv.Cv2.InRange(RedWGrid.dst1, i, i, dst2)
                 Dim mean = cv.Cv2.Mean(RedWGrid.prepData.reduced32s, dst2)
                 strOut += "Mean of selected region " + CStr(i) + " = " + Format(mean(0), fmt0) + "  "
                 If i Mod 2 = 0 Then strOut += vbCrLf
@@ -24423,26 +24422,26 @@ If cv.Cv2.CountNonZero(tmp) = 0 Then
         Public Sub New()
             desc = "Run the C++ PrepXY to create a list of mask, rect, and other info about image"
         End Sub
-        Private Function histAndBack(input As cv.Mat, ranges() As Rangef) As cv.Mat
-            Dim histogram As New Mat(), dst As New cv.Mat
-            Cv2.CalcHist({input}, {0}, New Mat(), histogram, 1, {task.histogramBins}, ranges)
+        Private Function histAndBack(input As cv.Mat, ranges() As cv.Rangef) As cv.Mat
+            Dim histogram As New cv.Mat(), dst As New cv.Mat
+            cv.Cv2.CalcHist({input}, {0}, New cv.Mat(), histogram, 1, {task.histogramBins}, ranges)
 
             For j = histogram.Rows - 1 To 0 Step -1
                 histogram.At(Of Single)(j, 0) = j
             Next
 
-            Cv2.CalcBackProject({input}, {0}, histogram, dst, ranges)
+            cv.Cv2.CalcBackProject({input}, {0}, histogram, dst, ranges)
             Return dst
         End Function
         Public Overrides Sub RunAlg(src As cv.Mat)
-            Dim rangeArrayX = {New Rangef(-task.xRange, task.xRange)}
-            Dim rangeArrayY = {New Rangef(-task.yRange, task.yRange)}
+            Dim rangeArrayX = {New cv.Rangef(-task.xRange, task.xRange)}
+            Dim rangeArrayY = {New cv.Rangef(-task.yRange, task.yRange)}
 
             dst0 = histAndBack(task.pcSplit(0), rangeArrayX)
             dst1 = histAndBack(task.pcSplit(1), rangeArrayY)
             dst2 = dst0 + dst1
             dst2.SetTo(0, task.noDepthMask)
-            dst2.ConvertTo(dst2, MatType.CV_8U)
+            dst2.ConvertTo(dst2, cv.MatType.CV_8U)
 
             Dim mm = GetMinMax(dst2)
 
@@ -24558,7 +24557,7 @@ If cv.Cv2.CountNonZero(tmp) = 0 Then
 
             dst2 = task.leftView.Clone
             For Each pt In ptList
-            cv.Cv2.Circle(dst2, pt, task.DotSize, white, -1, task.lineType)
+                cv.Cv2.Circle(dst2, pt, task.DotSize, white, -1, task.lineType)
             Next
             Dim newCount = ptList.Count - count
             labels(2) = CStr(count) + " points were retained " + CStr(newCount) + " points were added."

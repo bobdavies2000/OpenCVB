@@ -1,4 +1,4 @@
-Imports cv = OpenCvSharp
+Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 ' https://en.wikipedia.org/wiki/Scatter_matrix
 Public Class XR_ScatterMatrix_Example : Inherits TaskParent
     Dim data(,) As Double

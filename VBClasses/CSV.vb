@@ -1,4 +1,4 @@
-Imports cv = OpenCvSharp
+Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 Imports System.IO
 Public Class XR_CSV_Basics : Inherits TaskParent
     Public inputFile As String

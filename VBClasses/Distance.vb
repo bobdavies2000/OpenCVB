@@ -1,4 +1,4 @@
-Imports cv = OpenCvSharp
+Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 Public Class Distance_Basics : Inherits TaskParent
     Dim distance As New Distance_Instant
     Public Sub New()

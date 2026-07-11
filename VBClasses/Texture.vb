@@ -1,4 +1,4 @@
-Imports cv = OpenCvSharp
+Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 Public Class Texture_Basics : Inherits TaskParent
     Dim ellipse As New Draw_Ellipses
     Public texture As New cv.Mat

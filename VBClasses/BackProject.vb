@@ -1,9 +1,8 @@
-Imports System.Diagnostics.Metrics
-Imports cv = OpenCvSharp
+Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCvSharp
 ' https://docs.opencvb.org/3.4/dc/df6/tutorial_py_Histogram_backprojection.html
 Public Class BackProject_Basics : Inherits TaskParent
     Public hist As New Histogram_Basics
-    Public minRange As cv.Scalar, maxRange As cv.Scalar
+    Public minRange As Scalar, maxRange As cv.Scalar
     Public incr As Single
     Public histIndex As Integer
     Public Sub New()

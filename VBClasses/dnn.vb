@@ -1,4 +1,4 @@
-Imports cv = OpenCvSharp
+Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 Imports OpenCvSharp.Dnn
 Imports System.IO
 Imports OpenCvSharp.DnnSuperres

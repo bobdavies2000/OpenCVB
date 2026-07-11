@@ -1,4 +1,4 @@
-Imports cv = OpenCvSharp
+Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 Public Class HeatMap_Basics : Inherits TaskParent
     Public topframes As New History_Basics
     Public sideframes As New History_Basics

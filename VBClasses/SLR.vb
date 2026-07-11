@@ -1,3 +1,4 @@
+'Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCvSharp
 Imports cv = OpenCvSharp
 Imports System.IO
 Public Class SLR_Basics : Inherits TaskParent

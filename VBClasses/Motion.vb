@@ -1,4 +1,4 @@
-Imports cv = OpenCvSharp
+Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 Public Class Motion_Basics_TA : Inherits TaskParent
     Public motionSort As New List(Of Integer) ' sorted in order of grid rect index (without actually sorting.)
     Public diff As New Diff_Basics

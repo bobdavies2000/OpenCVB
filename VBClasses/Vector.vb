@@ -1,4 +1,4 @@
-Imports cv = OpenCvSharp
+Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 ' https://stackoverflow.com/questions/37492663/how-to-use-magnitude-and-absdiff-opencv-functions-to-compute-distances
 Public Class XR_Vector_Magnitude : Inherits TaskParent
     Public Sub New()

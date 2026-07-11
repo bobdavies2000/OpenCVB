@@ -1,6 +1,5 @@
 Imports System.Runtime.InteropServices
-Imports cv = OpenCvSharp
-Imports OpenCvSharp.Cv2
+Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCvSharp
 Public Class Histogram_Basics : Inherits TaskParent
     Implements IDisposable
     Public histogram As New cv.Mat

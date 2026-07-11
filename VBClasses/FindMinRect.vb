@@ -1,4 +1,4 @@
-Imports cv = OpenCvSharp
+Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 Public Class FindMinRect_Basics : Inherits TaskParent
     Public minRect As cv.RotatedRect
     Dim options As New Options_MinArea

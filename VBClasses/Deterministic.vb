@@ -1,4 +1,4 @@
-Imports cv = OpenCvSharp
+Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 Public Class XR_Deterministic_Basics : Inherits TaskParent
     Dim deter As New Edge_Canny
     Dim diff As New Diff_Basics

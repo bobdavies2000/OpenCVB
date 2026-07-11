@@ -1,4 +1,4 @@
-Imports cv = OpenCvSharp
+Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 Public Class Foreground_Basics_TA : Inherits TaskParent
     Dim hist As New Histogram_Depth
     Public foregroundMaxDepth As Single

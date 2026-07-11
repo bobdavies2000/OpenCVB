@@ -1,6 +1,5 @@
 Imports System.Runtime.InteropServices
-Imports OpenCvSharp
-Imports cv = OpenCvSharp
+Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 ' https://github.com/opencv/opencv/blob/master/samples/cpp/detect_mser.cpp
 Public Class MSER_Basics : Inherits TaskParent
     Dim detect As New MSER_CPP

@@ -1,4 +1,4 @@
-Imports cv = OpenCvSharp
+Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 Public Class Filter_Basics_TA : Inherits TaskParent
     Public filterList As String() = {"Original", "PhotoShop_HSV", "PhotoShop_SharpenDetail", "PhotoShop_WhiteBalance"}
     Dim filters(filterList.Count - 1) As Object

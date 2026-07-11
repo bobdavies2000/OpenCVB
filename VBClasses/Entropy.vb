@@ -1,4 +1,4 @@
-Imports cv = OpenCvSharp
+Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 ' http://areshopencvb.blogspot.com/2011/12/computing-entropy-of-image.html
 Public Class Entropy_Basics : Inherits TaskParent
     Dim entropy As New Entropy_Rectangle

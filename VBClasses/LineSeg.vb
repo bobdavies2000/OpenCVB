@@ -1,4 +1,4 @@
-Imports cv = OpenCvSharp
+Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 Public Class LineSeg_Basics : Inherits TaskParent
     Public lpList As New List(Of lpData)
     Public core As New LineSeg_Core

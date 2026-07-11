@@ -1,4 +1,4 @@
-Imports cv = OpenCvSharp
+Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 Imports VBClasses
 Public Class XR_Concat_Basics : Inherits TaskParent
     Public Sub New()

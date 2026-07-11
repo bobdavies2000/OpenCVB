@@ -1,4 +1,4 @@
-Imports cv = OpenCvSharp
+Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 'http://study.marearts.com/2014/12/opencv-meanshiftfiltering-example.html
 Public Class PyrFilter_Basics_TA : Inherits TaskParent
     Dim options As New Options_PyrFilter

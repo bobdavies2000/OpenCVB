@@ -1,6 +1,5 @@
 Imports System.Runtime.InteropServices
-Imports OpenCvSharp
-Imports cv = OpenCvSharp
+Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 Public Class RedPrep_Basics : Inherits TaskParent
     Dim prepEdges As New RedPrep_Edges_CPP
     Public options As New Options_RedPrep

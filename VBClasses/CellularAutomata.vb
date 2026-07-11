@@ -1,4 +1,4 @@
-Imports cv = OpenCvSharp
+Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 ' https://mathworld.wolfram.com/ElementaryCellularAutomaton.html
 Public Class CellularAutomata_Basics : Inherits TaskParent
     Public i18 As New List(Of String)({"00011110 Rule 30 (chaotic)", "00110110 Rule 54", "00111100 Rule 60", "00111110 Rule 62",

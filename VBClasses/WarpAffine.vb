@@ -1,4 +1,4 @@
-Imports cv = OpenCvSharp
+Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 Public Class WarpAffine_Basics : Inherits TaskParent
     Dim accum As New AddWeighted_Accumulate
     Public baselineRoll As Single

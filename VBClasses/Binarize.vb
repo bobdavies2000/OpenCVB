@@ -1,5 +1,5 @@
 Imports OpenCvSharp.XImgProc
-Imports cv = OpenCvSharp
+Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 
 ' https://docs.opencvb.org/3.4/d7/d4d/tutorial_py_thresholding.html
 ' https://www.learnopencvb.com/otsu-thresholding-with-opencv/?ck_subscriber_id=785741175

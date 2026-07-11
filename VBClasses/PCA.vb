@@ -1,6 +1,6 @@
 Imports System.Runtime.InteropServices
 Imports SharpGL.SceneGraph.Raytracing
-Imports cv = OpenCvSharp
+Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 ' You can find the main direction of a series of points using principal component analysis �(PCA).
 ' PCA is a statistical technique that can be used to find the directions of greatest variance in a dataset.
 ' The main direction of a series of points is the direction of greatest variance in the dataset.

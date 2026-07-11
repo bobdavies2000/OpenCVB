@@ -1,4 +1,4 @@
-Imports cv = OpenCvSharp
+Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 Public Class XR_Eigen_Basics : Inherits TaskParent
     Public inputData() As Double
     Public Sub New()

@@ -1,4 +1,4 @@
-Imports cv = OpenCvSharp
+Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 Public Class Blob_Basics : Inherits TaskParent
     Implements IDisposable
     Dim options As Options_Blob

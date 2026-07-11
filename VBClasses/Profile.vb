@@ -1,4 +1,4 @@
-Imports cv = OpenCvSharp
+Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 Public Class Profile_Basics : Inherits TaskParent
     Public ptLeft As cv.Point3f, ptRight As cv.Point3f, ptTop As cv.Point3f, ptBot As cv.Point3f, ptFront As cv.Point3f, ptBack As cv.Point3f
     Public cornerNames As New List(Of String)({"   First (white)", "   Left (light blue)", "   Right (red)", "   Top (green)",

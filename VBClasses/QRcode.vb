@@ -1,4 +1,4 @@
-Imports cv = OpenCvSharp
+Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 Imports System.IO
 Public Class QRcode_Basics : Inherits TaskParent
     Dim qrDecoder As New cv.QRCodeDetector

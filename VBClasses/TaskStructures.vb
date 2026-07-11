@@ -1,5 +1,4 @@
-Imports OpenCvSharp
-Imports cv = OpenCvSharp
+Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 Public Module Structures
     Public Enum pointStyle
         unFiltered = 0

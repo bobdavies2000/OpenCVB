@@ -1,4 +1,4 @@
-Imports cv = OpenCvSharp
+Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 Public Class BlurMotion_Basics_TA : Inherits TaskParent
     Public kernel As cv.Mat
     Public options As New Options_MotionBlur

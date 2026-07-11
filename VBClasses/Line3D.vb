@@ -1,5 +1,5 @@
 Imports System.Runtime.InteropServices
-Imports cv = OpenCvSharp
+Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 Public Class Line3D_Basics : Inherits TaskParent
     Public lines3D As New List(Of cv.Point3f)
     Public lines3DMat As New cv.Mat

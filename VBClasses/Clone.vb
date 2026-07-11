@@ -1,4 +1,4 @@
-Imports cv = OpenCvSharp
+Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 ' https://github.com/opencv/opencv/blob/master/samples/cpp/cloning_demo.cpp
 Public Class Clone_Basics : Inherits TaskParent
     Public colorChangeValues As cv.Vec3f

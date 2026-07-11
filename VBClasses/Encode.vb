@@ -1,5 +1,4 @@
-Imports OpenCvSharp
-Imports cv = OpenCvSharp
+Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 ' https://www.programcreek.com/python/example/70396/cv2.imencode
 Public Class XR_Encode_Basics : Inherits TaskParent
     Dim options As New Options_Encode

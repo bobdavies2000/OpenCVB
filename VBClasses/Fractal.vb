@@ -1,5 +1,5 @@
 Imports System.Numerics
-Imports cv = OpenCvSharp
+Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 ' https://medium.com/farouk-ounanes-home-on-the-internet/mandelbrot-set-in-c-from-scratch-c7ad6a1bf2d9
 Public Class Fractal_Mandelbrot : Inherits TaskParent
     Public startX As Single = -2

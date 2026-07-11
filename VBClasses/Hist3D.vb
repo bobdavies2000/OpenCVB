@@ -1,4 +1,4 @@
-Imports cv = OpenCvSharp
+Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 Imports System.Runtime.InteropServices
 Public Class Hist3D_Basics : Inherits TaskParent
     Dim hColor As New Hist3Dcolor_Basics

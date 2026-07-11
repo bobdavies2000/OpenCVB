@@ -1,4 +1,4 @@
-Imports cv = OpenCvSharp
+Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 Imports System.Runtime.InteropServices
 Public Class Interpolate_Basics : Inherits TaskParent
     Public options As New Options_Resize

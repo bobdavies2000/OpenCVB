@@ -1,4 +1,4 @@
-Imports cv = OpenCvSharp
+Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 Imports System.Runtime.InteropServices
 Public Class Hist3Dcloud_Basics : Inherits TaskParent
     Public histogram As New cv.Mat

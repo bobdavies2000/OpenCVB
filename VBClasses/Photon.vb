@@ -1,5 +1,5 @@
 Imports System.Windows.Forms.Design.AxImporter
-Imports cv = OpenCvSharp
+Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 'https://security.stackexchange.com/questions/42428/Is-generating-random-numbers-using-a-smartphone-camera-a-good-idea
 Public Class Photon_Basics : Inherits TaskParent
     Dim bricks As New Brick_Basics

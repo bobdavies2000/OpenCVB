@@ -1,4 +1,4 @@
-Imports cv = OpenCvSharp
+Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 Public Class BinNWay_Basics : Inherits TaskParent
     Dim options As New Options_BinNWay
     Dim binSplit(0) As Integer

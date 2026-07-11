@@ -1,4 +1,4 @@
-Imports cv = OpenCvSharp
+Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 Public Module vbc
     Public task As AlgorithmTask
     Public AlgorithmTestAllCount As Integer = 1

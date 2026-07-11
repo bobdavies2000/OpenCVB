@@ -1,5 +1,5 @@
 Imports System.Runtime.InteropServices
-Imports cv = OpenCvSharp
+Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 ' https://docs.opencvb.org/3.0-beta/modules/ml/doc/expectation_maximization.html
 ' https://github.com/opencv/opencv/blob/master/samples/cpp/em.cpp
 Public Class EMax_Basics : Inherits TaskParent

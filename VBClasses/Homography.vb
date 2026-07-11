@@ -1,4 +1,4 @@
-Imports cv = OpenCvSharp
+Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 Public Class Homography_Basics : Inherits TaskParent
     Public corners1 As New List(Of cv.Point2d)
     Public corners2 As New List(Of cv.Point2d)

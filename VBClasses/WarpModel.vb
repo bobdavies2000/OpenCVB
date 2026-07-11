@@ -1,4 +1,4 @@
-Imports cv = OpenCvSharp
+Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 Imports System.Runtime.InteropServices
 ' https://www.learnopencvb.com/image-alignment-ecc-in-opencv-c-python/
 Public Class WarpModel_Basics : Inherits TaskParent

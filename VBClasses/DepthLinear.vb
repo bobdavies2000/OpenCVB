@@ -1,4 +1,4 @@
-Imports cv = OpenCvSharp
+Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 Public Class XR_DepthLinear_Basics : Inherits TaskParent
     Dim inputX As New DepthLinear_InputX
     Dim inputY As New DepthLinear_InputY

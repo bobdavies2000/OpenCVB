@@ -1,4 +1,4 @@
-Imports cv = OpenCvSharp
+Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 ' https://docs.opencvb.org/2.4/doc/tutorials/objdetect/cascade_classifier/cascade_classifier.html
 Public Class XR_Face_Haar_LBP : Inherits TaskParent
     Dim haarCascade As cv.CascadeClassifier

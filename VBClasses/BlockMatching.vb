@@ -1,4 +1,4 @@
-Imports cv = OpenCvSharp
+Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 'https://github.com/opencv/opencv/blob/master/samples/cpp/stereo_match.cpp
 Public Class BlockMatching_Basics : Inherits TaskParent
     Implements IDisposable

@@ -1,6 +1,6 @@
 Imports jsonShared
 Imports VBClasses
-Imports cv = OpenCvSharp
+Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 Public Class LeftRight_Basics : Inherits TaskParent
     Public meanLeft As Double
     Public meanRight As Double

@@ -1,4 +1,4 @@
-Imports cv = OpenCvSharp
+Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 ' https://github.com/opencv/opencv/blob/master/samples/cpp/lkdemo.cpp
 Public Class KLT_Basics : Inherits TaskParent
     Public status As New cv.Mat

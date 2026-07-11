@@ -1,5 +1,5 @@
 Imports System.Runtime.InteropServices
-Imports cv = OpenCvSharp
+Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 ' https://github.com/opencv/opencv/blob/master/samples/cpp/falsecolor.cpp
 ' https://docs.opencvb.org/2.4/modules/core/doc/operations_on_arrays.html
 Public Class LUT_Basics : Inherits TaskParent

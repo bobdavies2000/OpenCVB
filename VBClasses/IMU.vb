@@ -1,4 +1,4 @@
-Imports cv = OpenCvSharp
+Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 ' https://github.com/IntelRealSense/librealsense/tree/master/examples/motion
 Imports VBClasses
 Public Class IMU_Basics_TA : Inherits TaskParent

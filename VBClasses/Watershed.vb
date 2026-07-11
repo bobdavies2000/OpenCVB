@@ -1,4 +1,4 @@
-Imports cv = OpenCvSharp
+Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 Public Class Watershed_Basics : Inherits TaskParent
     Dim rects As New List(Of cv.Rect)
     Public UseCorners As Boolean

@@ -1,4 +1,4 @@
-Imports cv = OpenCvSharp
+Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 Public Class Mat_Basics : Inherits TaskParent
     Public Sub New()
         desc = "Use the repeat method to replicate data."

@@ -1,4 +1,4 @@
-Imports cv = OpenCvSharp
+Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 Imports System.Threading
 Public Class Grid_Basics_TA : Inherits TaskParent
     Public Sub New()

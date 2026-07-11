@@ -1,4 +1,4 @@
-Imports cv = OpenCvSharp
+Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 Imports VBClasses
 Public Class Delaunay_Basics : Inherits TaskParent
     Public inputPoints As New List(Of cv.Point2f)

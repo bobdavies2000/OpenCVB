@@ -1,4 +1,4 @@
-Imports cv = OpenCvSharp
+Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 Public Class Projection_Basics : Inherits TaskParent
     Public redCellInput As New List(Of rcDataOld)
     Public rclist As New List(Of rcDataOld)

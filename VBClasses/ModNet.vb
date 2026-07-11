@@ -1,4 +1,4 @@
-Imports cv = OpenCvSharp
+Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 Imports System.Runtime.InteropServices
 Imports Microsoft.ML.OnnxRuntime
 Imports Microsoft.ML.OnnxRuntime.Tensors

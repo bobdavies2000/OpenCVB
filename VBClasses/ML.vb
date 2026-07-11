@@ -1,7 +1,7 @@
 Imports System.Runtime.InteropServices
 Imports OpenCvSharp.ML
 Imports VBClasses
-Imports cv = OpenCvSharp
+Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 Public Class ML_Basics : Inherits TaskParent
     Implements IDisposable
     Public trainMats() As cv.Mat ' all entries are 32FCx

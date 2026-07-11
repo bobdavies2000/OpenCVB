@@ -1,5 +1,5 @@
 Imports VBClasses
-Imports cv = OpenCvSharp
+Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 Public Class Swarm_Basics : Inherits TaskParent
     Public knn As New KNN_Basics
     Public lpList As New List(Of lpData)

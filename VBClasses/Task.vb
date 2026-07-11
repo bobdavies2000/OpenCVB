@@ -1,5 +1,5 @@
 Imports System.IO
-Imports cv = OpenCvSharp
+Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 Imports jsonShared
 Public Class AlgorithmTask : Implements IDisposable
     Public Sub Initialize(settings As jsonShared.Settings)

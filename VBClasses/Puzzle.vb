@@ -1,4 +1,4 @@
-Imports cv = OpenCvSharp
+Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 ' https://github.com/nemanja-m/gaps
 Public Class Puzzle_Basics : Inherits TaskParent
     Public scrambled As New List(Of cv.Rect) ' this is every roi regardless of size.

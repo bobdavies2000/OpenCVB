@@ -1,4 +1,4 @@
-Imports cv = OpenCvSharp
+Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 Imports System.IO
 ' https://github.com/opencv/opencv/blob/3.2.0/samples/gpu/super_resolution.cpp
 Public Class SuperRes_Basics : Inherits TaskParent

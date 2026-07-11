@@ -1,4 +1,4 @@
-Imports cv = OpenCvSharp
+Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 Public Class XR_Contrast_Basics : Inherits TaskParent
     Dim options As New Options_BrightnessContrast
     Public Sub New()

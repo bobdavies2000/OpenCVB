@@ -1,7 +1,7 @@
 Imports System.IO
 Imports System.Numerics
 Imports OpenCvSharp.ML
-Imports cv = OpenCvSharp
+Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 Public Class Options_SharpGL : Inherits OptionParent
     Public perspective As Single
     Public zNear As Single

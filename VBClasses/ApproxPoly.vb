@@ -1,4 +1,4 @@
-Imports cv = OpenCvSharp
+Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 ' https://stackoverflow.com/questions/22132510/opencv-approxpolydp-for-edge-maps-Not-contours
 ' https://docs.opencvb.org/4.x/js_contour_features_approxPolyDP.html
 Public Class ApproxPoly_Basics : Inherits TaskParent

@@ -1,5 +1,4 @@
-Imports OpenCvSharp
-Imports cv = OpenCvSharp
+Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 'http://opencvexamples.blogspot.com/2014/01/kalman-filter-implementation-tracking.html
 Public Class Kalman_Basics : Inherits TaskParent
     Dim kalman() As Kalman_Simple

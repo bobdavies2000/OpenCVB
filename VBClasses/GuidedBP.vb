@@ -1,5 +1,5 @@
 Imports System.Runtime.InteropServices
-Imports cv = OpenCvSharp
+Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 Public Class GuidedBP_Basics : Inherits TaskParent
     Public ptHot As New GuidedBP_HotPoints
     Dim topMap As New cv.Mat

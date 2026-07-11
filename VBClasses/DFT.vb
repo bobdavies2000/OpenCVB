@@ -1,5 +1,5 @@
 Imports OpenCvSharp.XFeatures2D
-Imports cv = OpenCvSharp
+Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 Module dft_Module
     Public Function inverseDFT(complexImage As cv.Mat) As cv.Mat
         Dim invDFT As New cv.Mat

@@ -1,4 +1,4 @@
-Imports cv = OpenCvSharp
+Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 Public Class Mesh_Basics : Inherits TaskParent
     Dim mesh As New Mesh_BasicsInput
     Dim feat As New Feature_Basics

@@ -1,5 +1,5 @@
 Imports System.Runtime.InteropServices
-Imports cv = OpenCvSharp
+Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 Public Class Corner_Basics : Inherits TaskParent
     Public fast As New Corner_Core
     Public features As New List(Of cv.Point2f)

@@ -1,4 +1,4 @@
-Imports cv = OpenCvSharp
+Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 Public Enum causes
     lastCellFound
     indexLastGood
@@ -64,7 +64,7 @@ Public Class Utility_Basics : Inherits TaskParent
             Dim p2 = New cv.Point(dst.Width, spacer * i)
             cv.Cv2.Line(dst, p1, p2, white, fontThickness)
             Dim nextVal = (maxVal - spaceVal * i)
-            Dim nextText = If(maxVal > 1000, Format(nextVal / 1000, "###,##0.0") + "k", Format(nextVal, fmt1))
+            Dim nextText = If(maxVal > 1000, (nextVal / 1000).ToString("N2") + "k", nextVal.ToString(fmt1))
             Dim p3 = New cv.Point(0, p1.Y + 12)
             cv.Cv2.PutText(dst, nextText, p3, cv.HersheyFonts.HersheyPlain, fontSize, white, fontThickness, task.lineType)
         Next

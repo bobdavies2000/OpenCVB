@@ -1,4 +1,4 @@
-Imports cv = OpenCvSharp
+Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 Imports System.Runtime.InteropServices
 ' https://learnopencvb.com/object-tracking-using-opencv-cpp-python/
 Public Class TrackOpenCV_Basics : Inherits TaskParent

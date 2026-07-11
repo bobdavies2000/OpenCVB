@@ -1,4 +1,4 @@
-Imports cv = OpenCvSharp
+Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 ' https://docs.opencvb.org/3.4.1/d2/dc1/camshiftdemo_8cpp-example.html
 ' https://docs.opencvb.org/3.4/d7/d00/tutorial_meanshift.html
 Public Class CamShift_Basics : Inherits TaskParent

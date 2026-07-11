@@ -1,4 +1,4 @@
-Imports cv = OpenCvSharp
+Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 'https://gist.github.com/kendricktan/93f0da88d0b25087d751ed2244cf770c
 'https://medium.com/@anuj_shah/through-the-eyes-of-gabor-filter-17d1fdb3ac97
 Public Class Gabor_Basics : Inherits TaskParent

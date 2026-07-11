@@ -1,4 +1,4 @@
-Imports cv = OpenCvSharp
+Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 Public Class BrickLine_Basics : Inherits TaskParent
     Dim bricks As New Brick_Basics
     Dim hist As New Histogram_GridCell

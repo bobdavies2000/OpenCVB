@@ -1,4 +1,4 @@
-Imports cv = OpenCvSharp
+Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 Public Class Bin2Way_Basics : Inherits TaskParent
     Public hist As New Histogram_Basics
     Public mats As New Mat_4Click

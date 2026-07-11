@@ -771,6 +771,7 @@ TextureFlow_Basics
 Threshold_Basics
 Threshold_ByChannels
 Threshold_Definitions
+Threshold_OTSU
 Track_Basics
 Track_FindNearest
 Track_Simple

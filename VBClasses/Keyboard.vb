@@ -1,4 +1,4 @@
-Imports cv = OpenCvSharp
+Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 Public Class Keyboard_Basics : Inherits TaskParent
     Public keyInput As New List(Of String)
     Dim flow As New Font_FlowText

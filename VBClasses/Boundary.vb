@@ -1,4 +1,4 @@
-Imports cv = OpenCvSharp
+Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 Public Class Boundary_Basics : Inherits TaskParent
     Public redC As New RedColor_Basics
     Dim color8U As New Color8U_Basics

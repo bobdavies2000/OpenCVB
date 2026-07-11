@@ -1,5 +1,5 @@
 Imports System.Runtime.InteropServices
-Imports cv = OpenCvSharp
+Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 Public Class Neighbor_Basics : Inherits TaskParent
     Dim knn As New KNN_Basics
     Public runRedCflag As Boolean = False

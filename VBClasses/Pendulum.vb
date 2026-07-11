@@ -1,4 +1,4 @@
-Imports cv = OpenCvSharp
+Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 'https://github.com/DinoZ1729/Double-Pendulum/blob/main/pendulum_with_trace.cpp
 Public Class Pendulum_Basics : Inherits TaskParent
     Dim l1 As Single = 150, l2 As Single = 150, m1 As Single = 10, m2 As Single = 10

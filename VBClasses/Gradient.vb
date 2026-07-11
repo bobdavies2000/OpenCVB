@@ -1,4 +1,4 @@
-Imports cv = OpenCvSharp
+Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 Public Class Gradient_Basics : Inherits TaskParent
     Public sobel As New Edge_SobelNaive
     Public Sub New()

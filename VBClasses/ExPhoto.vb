@@ -1,6 +1,7 @@
 Imports System.Runtime.InteropServices
-Imports OpenCvSharp.XPhoto
-Imports cv = OpenCvSharp
+Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCvSharp
+'Imports cv = OpenCvSharp
+'Imports OpenCvSharp.XPhoto
 'Public Class XR_ExPhoto_Bm3dDenoise : Inherits TaskParent
 '    Public Sub New()
 '        desc = "Denoise image with block matching and filtering."
@@ -113,9 +114,9 @@ Public Class XR_ExPhoto_Inpaint_CPP : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         inpVB.options.Run()
 
-        Dim iType = InpaintTypes.FSR_BEST
-        If inpVB.options.FSRFast Then iType = InpaintTypes.FSR_FAST
-        If inpVB.options.shiftMap Then iType = InpaintTypes.SHIFTMAP
+        Dim iType = OpenCvSharp.XPhoto.InpaintTypes.FSR_BEST
+        If inpVB.options.FSRFast Then iType = OpenCvSharp.XPhoto.InpaintTypes.FSR_FAST
+        If inpVB.options.shiftMap Then iType = OpenCvSharp.XPhoto.InpaintTypes.SHIFTMAP
 
         dst1 = inpVB.basics.drawRandomLine(src)
         dst3 = src.Clone

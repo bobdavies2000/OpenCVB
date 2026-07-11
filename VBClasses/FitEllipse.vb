@@ -1,4 +1,4 @@
-Imports cv = OpenCvSharp
+Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 Imports System.Runtime.InteropServices
 ' https://docs.opencvb.org/3.4.2/de/dc7/fitellipse_8cpp-example.html
 Public Class FitEllipse_Basics : Inherits TaskParent

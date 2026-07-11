@@ -1,4 +1,4 @@
-Imports cv = OpenCvSharp
+Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 Imports System.IO
 ' https://github.com/anopara/genetic-drawing
 Public Class GeneticDrawing_Basics : Inherits TaskParent

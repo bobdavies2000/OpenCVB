@@ -1,4 +1,4 @@
-Imports cv = OpenCvSharp
+Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 ''' <summary>Compute the gravity vector using the complementary filter: fuse gyro (fast, drifts) with accelerometer (slow, stable).</summary>
 Public Class Gravity_Basics_TA : Inherits TaskParent
     Dim lastTimeStamp As Double

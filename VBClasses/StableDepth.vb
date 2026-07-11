@@ -1,4 +1,4 @@
-Imports cv = OpenCvSharp
+Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 Public Class StableDepth_Basics_TA : Inherits TaskParent
     Dim colorize As New DepthColorizer_CPP
     Public pointcloud As cv.Mat

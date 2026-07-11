@@ -1,4 +1,4 @@
-Imports cv = OpenCvSharp
+Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 Public Class Covariance_Basics : Inherits TaskParent
     Dim random As New Random_Basics
     Public mean As New cv.Mat

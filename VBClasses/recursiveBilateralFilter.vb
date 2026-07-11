@@ -1,4 +1,4 @@
-Imports cv = OpenCvSharp
+Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 Imports System.Runtime.InteropServices
 ' https://github.com/ufoym
 Public Class XR_RecursiveBilateralFilter_CPP : Inherits TaskParent

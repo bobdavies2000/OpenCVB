@@ -1,4 +1,4 @@
-Imports cv = OpenCvSharp
+Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 ' http://www.mia.uni-saarland.de/Publications/weickert-dagm03.pdf
 Public Class Coherence_Basics : Inherits TaskParent
     Dim options As New Options_Coherence

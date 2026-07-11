@@ -1,4 +1,4 @@
-Imports cv = OpenCvSharp
+Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 Public Class Random_Basics : Inherits TaskParent
     Public PointList As New List(Of cv.Point2f)
     Public range As cv.Rect

@@ -1,4 +1,4 @@
-Imports cv = OpenCvSharp
+Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 Public Class HullLine_BasicsOld_TA : Inherits TaskParent
     Public hulls As New Contour_Hulls
     Public minDistance As Integer = dst2.Width * 0.02

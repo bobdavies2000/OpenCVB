@@ -1,4 +1,4 @@
-Imports cv = OpenCvSharp
+Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 Public Class FeatureFlow_Basics : Inherits TaskParent
     Dim feat As New Feature_Basics
     Public Sub New()

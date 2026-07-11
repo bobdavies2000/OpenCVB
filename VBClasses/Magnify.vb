@@ -1,4 +1,4 @@
-Imports cv = OpenCvSharp
+Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 Public Class Magnify_Basics : Inherits TaskParent
     Public Sub New()
         task.drawRect = New cv.Rect(10, 10, 50, 50)

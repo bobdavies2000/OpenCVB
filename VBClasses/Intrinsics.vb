@@ -1,4 +1,4 @@
-Imports cv = OpenCvSharp
+Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 Public Class Intrinsics_Basics : Inherits TaskParent
     Dim bricks As New Brick_Basics
     Public Sub New()

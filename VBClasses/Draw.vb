@@ -1,4 +1,4 @@
-Imports cv = OpenCvSharp
+Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 Public Class Draw_Noise : Inherits TaskParent
     Public addRandomColor As Boolean
     Public noiseMask As cv.Mat

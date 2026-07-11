@@ -1,4 +1,4 @@
-Imports cv = OpenCvSharp
+Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 Public Class Mouse_Basics : Inherits TaskParent
     Dim lastPoint = New cv.Point
     Dim colorIndex As Integer

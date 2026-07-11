@@ -1,4 +1,4 @@
-Imports cv = OpenCvSharp
+Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 ' https://www.programcreek.com/python/example/89459/cv2.getRotationMatrix2D
 Public Class Rotate_Basics : Inherits TaskParent
     Public M As cv.Mat

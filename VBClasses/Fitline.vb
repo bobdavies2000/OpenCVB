@@ -1,4 +1,4 @@
-Imports cv = OpenCvSharp
+Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 Public Class FitLine_BasicsOld : Inherits TaskParent
     Public ptList As New List(Of cv.Point2f)
     Public lp As New lpData

@@ -1,4 +1,4 @@
-Imports cv = OpenCvSharp
+Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 Public Class FeatureLess_Basics_TA : Inherits TaskParent
     Public regions As New SortedList(Of Integer, cv.Rect)(New compareAllowIdenticalIntegerInverted)
     Public indexList As New SortedList(Of Integer, Integer)(New compareAllowIdenticalIntegerInverted)

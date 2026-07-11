@@ -1,4 +1,4 @@
-Imports cv = OpenCvSharp
+Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 Public Class Rectangle_Basics : Inherits TaskParent
     Public rectangles As New List(Of cv.Rect)
     Public rotatedRectangles As New List(Of cv.RotatedRect)

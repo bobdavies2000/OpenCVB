@@ -1,6 +1,6 @@
 Imports System.Runtime.InteropServices
 Imports VBClasses
-Imports cv = OpenCvSharp
+Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 Public Class RedCloud_Basics : Inherits TaskParent
     Public redCore As New RedCloud_Core
     Public rcList As New List(Of rcDataOld)

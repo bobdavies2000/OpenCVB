@@ -1,4 +1,4 @@
-Imports cv = OpenCvSharp
+Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 Public Class XR_Etch_ASketch : Inherits TaskParent
     Dim keys As Keyboard_Basics
     Dim slateColor = New cv.Scalar(122, 122, 122)

@@ -1,4 +1,4 @@
-Imports cv = OpenCvSharp
+Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 Public Class LinearRegression_Basics : Inherits TaskParent
     Public x As New List(Of Single)
     Public y As New List(Of Single)

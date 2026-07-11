@@ -1,5 +1,5 @@
 Imports System.IO
-Imports cv = OpenCvSharp
+Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 ' https://www.kaggle.com/datasets/balraj98/berkeley-segmentation-dataset-500-bsds500
 Public Class Image_Basics : Inherits TaskParent
     Public inputFileName As String

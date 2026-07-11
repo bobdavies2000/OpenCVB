@@ -1,4 +1,4 @@
-Imports cv = OpenCvSharp
+Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 Imports OpenCvSharp.XFeatures2D
 'https://github.com/shimat/opencvsharp/wiki/ORB-and-FREAK
 Public Class FREAK_Basics : Inherits TaskParent

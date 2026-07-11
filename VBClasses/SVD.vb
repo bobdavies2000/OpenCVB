@@ -1,5 +1,4 @@
-Imports OpenCvSharp
-Imports cv = OpenCvSharp
+Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 ' https://answers.opencvb.org/question/200080/parameters-of-cvsvdecomp/
 Public Class XR_SVD_Example : Inherits TaskParent
     Public Sub New()

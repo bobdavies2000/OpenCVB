@@ -1,4 +1,4 @@
-Imports cv = OpenCvSharp
+Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 Public Class Indexer_Basics : Inherits TaskParent
     Public prep As New RedPrep_Core
     Public Sub New()

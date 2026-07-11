@@ -1,4 +1,4 @@
-Imports cv = OpenCvSharp
+Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 Public Class OpAuto_Valley : Inherits TaskParent
     Public valleyOrder As New SortedList(Of Integer, Integer)(New compareAllowIdenticalInteger)
     Public options As New Options_Boundary

@@ -1,4 +1,4 @@
-Imports cv = OpenCvSharp
+Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 ' https://github.com/epiception/SGM-Census
 Public Class XR_SemiGlobalMatching_CPP : Inherits TaskParent
     Implements IDisposable

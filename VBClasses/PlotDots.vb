@@ -1,4 +1,4 @@
-Imports cv = OpenCvSharp
+Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 ' https://github.com/opencv/opencv_contrib/blob/master/modules/plot/samples/plot_demo.cpp
 Public Class PlotDots_Basics : Inherits TaskParent
     Public srcX As New List(Of Double)

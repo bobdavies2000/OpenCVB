@@ -1,4 +1,4 @@
-Imports cv = OpenCvSharp
+Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 Public Class Disparity_Basics : Inherits TaskParent
     Dim match As New Match_Basics
     Public rightView As cv.Mat

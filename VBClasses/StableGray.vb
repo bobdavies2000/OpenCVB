@@ -1,5 +1,5 @@
 Imports System.Diagnostics.Metrics
-Imports cv = OpenCvSharp
+Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 Public Class StableGray_BasicsMin : Inherits TaskParent
     Public Sub New()
         labels(3) = "Mask of pixels that are different between last image and current after processing."

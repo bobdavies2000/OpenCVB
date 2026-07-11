@@ -1,6 +1,6 @@
 Imports System.Drawing.Imaging
 Imports System.IO
-Imports cv = OpenCvSharp
+Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 Imports cvext = OpenCvSharp.GdipExtensions
 
 ' https://stackoverflow.com/questions/1196322/how-to-create-an-animated-gif-in-net

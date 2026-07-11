@@ -1,5 +1,5 @@
 Imports System.IO
-Imports cv = OpenCvSharp
+Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 Public Class PlyFormat_Basics : Inherits TaskParent
     Public options As New Options_PlyFormat
     Dim saveFileName As String

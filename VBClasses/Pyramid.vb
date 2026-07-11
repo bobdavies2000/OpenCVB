@@ -1,4 +1,4 @@
-Imports cv = OpenCvSharp
+Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 ' https://docs.opencvb.org/3.3.1/d6/d73/Pyramids_8cpp-example.html
 Public Class Pyramid_Basics : Inherits TaskParent
     Dim options As New Options_Pyramid

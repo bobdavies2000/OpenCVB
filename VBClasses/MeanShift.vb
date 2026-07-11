@@ -1,4 +1,4 @@
-Imports cv = OpenCvSharp
+Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 ' http://answers.opencvb.org/question/175486/meanshift-sample-code-in-c/
 Public Class MeanShift_Basics : Inherits TaskParent
     Public rectangleEdgeWidth As Integer = 2

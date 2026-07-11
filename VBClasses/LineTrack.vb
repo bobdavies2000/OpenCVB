@@ -1,5 +1,5 @@
 Imports System.Runtime.InteropServices
-Imports cv = OpenCvSharp
+Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 Public Class LineTrack_Basics : Inherits TaskParent
     Public lpCurr As New lpData
     Public lpInput As New lpData

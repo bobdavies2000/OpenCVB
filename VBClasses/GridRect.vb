@@ -1,4 +1,4 @@
-Imports cv = OpenCvSharp
+Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 Public Class GridRect_Basics : Inherits TaskParent
     Public rects As New List(Of cv.Rect)
     Public meanList As New List(Of Single)

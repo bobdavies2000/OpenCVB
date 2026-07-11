@@ -1,4 +1,4 @@
-Imports cv = OpenCvSharp
+Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 Public Class SVM_Basics : Inherits TaskParent
     Implements IDisposable
     Public options As New Options_SVM

@@ -1,4 +1,4 @@
-Imports cv = OpenCvSharp
+Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 Public Class BRISK_Basics : Inherits TaskParent
     Implements IDisposable
     Dim brisk As cv.XFeatures2D.BRISK

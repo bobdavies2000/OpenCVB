@@ -1,4 +1,4 @@
-Imports cv = OpenCvSharp
+Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 Imports System.IO
 ' https://stackoverflow.com/questions/47706339/car-counting-and-classification-using-emgucv-and-vb-net
 Public Class Video_Basics : Inherits TaskParent

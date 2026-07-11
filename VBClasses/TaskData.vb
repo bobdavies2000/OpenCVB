@@ -1,5 +1,5 @@
 Imports PixelViewer
-Imports cv = OpenCvSharp
+Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 Partial Public Class AlgorithmTask
     Public Settings As jsonShared.Settings
 

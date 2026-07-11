@@ -1,4 +1,4 @@
-Imports cv = OpenCvSharp
+Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 Public Class OptionsContainer
     Dim optionsTitle As New List(Of String)
     Public hiddenOptions As New List(Of String)

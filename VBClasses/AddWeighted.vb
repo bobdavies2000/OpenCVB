@@ -1,4 +1,4 @@
-Imports cv = OpenCvSharp
+Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCvSharp
 Public Class AddWeighted_Accumulate : Inherits TaskParent
     Public options As New Options_AddWeighted
     Public Sub New()

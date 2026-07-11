@@ -1,4 +1,4 @@
-Imports cv = OpenCvSharp
+Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 ' https://www.codeproject.com/Articles/1093960/D-Polyline-Vertex-Smoothing
 Public Class XR_Smoothing_Exterior : Inherits TaskParent
     Dim hull As New Convex_Basics

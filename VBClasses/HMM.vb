@@ -1,4 +1,4 @@
-Imports cv = OpenCvSharp
+Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 Imports System.Runtime.InteropServices
 'https://github.com/omidsakhi/cv-hmm
 Public Class XR_HMM_Example_CPP : Inherits TaskParent

@@ -1,4 +1,4 @@
-Imports cv = OpenCvSharp
+Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 Public Class Blur_Basics : Inherits TaskParent
     Public Options As New Options_Blur
     Public Sub New()

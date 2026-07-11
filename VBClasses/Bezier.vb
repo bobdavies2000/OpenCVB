@@ -1,4 +1,4 @@
-Imports cv = OpenCvSharp
+Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 Public Class Bezier_Basics : Inherits TaskParent
     Public points() As cv.Point
     Public Sub New()

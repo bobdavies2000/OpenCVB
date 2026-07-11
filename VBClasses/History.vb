@@ -1,4 +1,4 @@
-Imports cv = OpenCvSharp
+Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 Public Class History_Basics : Inherits TaskParent
     Public saveFrames As New List(Of cv.Mat)
     Dim options As New Options_History

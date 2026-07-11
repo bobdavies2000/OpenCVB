@@ -1,4 +1,4 @@
-Imports cv = OpenCvSharp
+Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 Public Class Moments_Basics : Inherits TaskParent
     Public centroid As cv.Point2f
     Dim fore As New XR_Foreground_KMeans

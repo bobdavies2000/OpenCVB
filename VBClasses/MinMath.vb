@@ -1,4 +1,4 @@
-Imports cv = OpenCvSharp
+Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 Public Class XR_MinMath_Edges : Inherits TaskParent
     Dim bPoints As New BrickPoint_Basics
     Public Sub New()

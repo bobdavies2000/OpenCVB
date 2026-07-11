@@ -1,6 +1,6 @@
 Imports System.IO
 Imports System.Runtime.InteropServices
-Imports cv = OpenCvSharp
+Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 ' all examples in this file are from https://github.com/opencv/opencv/tree/4.x/samples
 Public Class OEX_CalcBackProject_Demo1 : Inherits TaskParent
     Public histogram As New cv.Mat

@@ -1,4 +1,4 @@
-Imports cv = OpenCvSharp
+Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 Public Class Stabilizer_Basics : Inherits TaskParent
     Private refLine As lpData
     Public Sub New()

@@ -1,4 +1,4 @@
-Imports cv = OpenCvSharp
+Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 Public Class Color8U_Basics : Inherits TaskParent
     Public classCount As Integer
     Public classifier As Object

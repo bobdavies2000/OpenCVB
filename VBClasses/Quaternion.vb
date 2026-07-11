@@ -1,4 +1,4 @@
-Imports cv = OpenCvSharp
+Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 Imports System.Numerics
 Public Class Quaternion_Basics : Inherits TaskParent
     Dim options As New Options_Quaternion

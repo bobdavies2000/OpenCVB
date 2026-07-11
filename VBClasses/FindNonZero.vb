@@ -1,4 +1,4 @@
-Imports cv = OpenCvSharp
+Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 Public Class FindNonZero_Basics : Inherits TaskParent
     Public ptMat As New cv.Mat
     Public Sub New()

@@ -1,5 +1,5 @@
 Imports OpenCvSharp.XFeatures2D
-Imports cv = OpenCvSharp
+Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 ' https://github.com/JiphuTzu/opencvsharp/blob/master/sample/SamplesVB/Samples/StarDetectorSample.vb
 Public Class XFeatures2D_StarDetector : Inherits TaskParent
     Implements IDisposable
