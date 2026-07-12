@@ -201,7 +201,7 @@ Public Class XR_Spectrum_RGB : Inherits TaskParent
             SetTrueText(redC.strOut, 1)
         End If
 
-        Dim splitMats = Split(src)
+        Dim splitMats() As cv.Mat = Split(src)
         gSpec.typeSpec = " blue "
         gSpec.Run(splitMats(0))
         If task.heartBeat Then strOut = gSpec.strOut + vbCrLf

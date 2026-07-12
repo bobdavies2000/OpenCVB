@@ -112,7 +112,7 @@ Public Class StableGray_RGBMin : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If task.gOptions.stableDepthRGB.Checked Then
-            Dim splitMats = Split(task.color)
+            Dim splitMats() As cv.Mat = Split(task.color)
 
             stableB.Run(splitMats(0))
             splitMats(0) = stableB.dst2.Clone
@@ -144,7 +144,7 @@ Public Class StableGray_RGBMax : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If task.gOptions.stableDepthRGB.Checked Then
-            Dim splitMats = Split(task.color)
+            Dim splitMats() As cv.Mat = Split(task.color)
 
             stableB.Run(splitMats(0))
             splitMats(0) = stableB.dst2.Clone

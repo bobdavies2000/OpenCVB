@@ -14,7 +14,7 @@ Public Class ROI_Basics : Inherits TaskParent
 
         Dim fnz As New cv.Mat
         FindNonZero(diff.dst2, fnz)
-        Dim splitMats As cv.Mat() = Split(fnz)
+        Dim splitMats() As cv.Mat = Split(fnz)
         If splitMats.Length = 0 Then Exit Sub
         Dim mm0 = GetMinMax(splitMats(0))
         Dim mm1 = GetMinMax(splitMats(1))
@@ -22,8 +22,8 @@ Public Class ROI_Basics : Inherits TaskParent
         aoiRect = New cv.Rect(mm0.minVal, mm1.minVal, mm0.maxVal - mm0.minVal, mm1.maxVal - mm1.minVal)
 
         If aoiRect.Width > 0 And aoiRect.Height > 0 Then
-        Rectangle(task.color, aoiRect, cv.Scalar.Yellow, task.lineWidth)
-Rectangle(dst2, aoiRect, white, task.lineWidth)
+            Rectangle(task.color, aoiRect, cv.Scalar.Yellow, task.lineWidth)
+            Rectangle(dst2, aoiRect, white, task.lineWidth)
         End If
     End Sub
 End Class
@@ -68,7 +68,7 @@ Public Class XR_ROI_FindNonZeroNoSingle : Inherits TaskParent
         If minX <> Integer.MaxValue Then
             aoiRect = New cv.Rect(minX, minY, maxX - minX + 1, maxY - minY + 1)
             Rectangle(task.color, aoiRect, cv.Scalar.Yellow, task.lineWidth)
-Rectangle(dst2, aoiRect, white, task.lineWidth)
+            Rectangle(dst2, aoiRect, white, task.lineWidth)
         End If
     End Sub
 End Class
@@ -110,7 +110,7 @@ Public Class XR_ROI_AccumulateOld : Inherits TaskParent
         If aoiRect <> New cv.Rect Then
             task.color(aoiRect).CopyTo(dst0(aoiRect))
             Rectangle(dst0, aoiRect, cv.Scalar.Yellow, task.lineWidth)
-Rectangle(dst2, aoiRect, white, task.lineWidth)
+            Rectangle(dst2, aoiRect, white, task.lineWidth)
         End If
         If tmp.Rows = 0 Then Exit Sub
         For i = 0 To tmp.Rows - 1
@@ -155,7 +155,7 @@ Public Class XR_ROI_Accumulate : Inherits TaskParent
 
         Dim fnz As New cv.Mat
         FindNonZero(diff.dst2, fnz)
-        Dim splitMats As cv.Mat() = Split(fnz)
+        Dim splitMats() As cv.Mat = Split(fnz)
         If splitMats.Length > 0 Then
             Dim mm0 = GetMinMax(splitMats(0))
             Dim mm1 = GetMinMax(splitMats(1))

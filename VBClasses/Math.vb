@@ -111,7 +111,7 @@ Public Class XR_Math_RGBCorrelation : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
 
-        Dim splitMats = Split(src)
+        Dim splitMats() As cv.Mat = Split(src)
         match.template = splitMats(0)
         match.Run(splitMats(1))
         Dim blueGreenCorrelation = "Blue-Green " + match.labels(2)

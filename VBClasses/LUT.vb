@@ -264,7 +264,7 @@ Public Class XR_LUT_Create : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
 
-        Dim splitMats = Split(src)
+        Dim splitMats() As cv.Mat = Split(src)
         For i = 0 To 2
             If task.firstPass Then ReDim pixels(i)(src.Total - 1)
             Marshal.Copy(splitMats(i).Data, pixels(i), 0, pixels(i).Length)

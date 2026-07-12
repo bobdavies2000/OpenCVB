@@ -11,7 +11,7 @@ Public Class TextureFlow_Basics : Inherits TaskParent
         If src.Channels() <> 1 Then CvtColor(src, src, OpenCvSharp.ColorConversionCodes.BGR2GRAY)
         Dim eigen As New cv.Mat
         CornerEigenValsAndVecs(src, eigen, options.TFblockSize, options.TFksize)
-        Dim splitMats = Split(eigen)
+        Dim splitMats() As cv.Mat = Split(eigen)
         Dim d2 = options.TFdelta / 2
         For y = d2 To dst2.Height - 1 Step d2
             For x = d2 To dst2.Width - 1 Step d2

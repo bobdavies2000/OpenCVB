@@ -32,7 +32,7 @@ Public Class RedPrep_Basics : Inherits TaskParent
 
         Dim pc32S As New cv.Mat
         src.ConvertTo(pc32S, cv.MatType.CV_32SC3, 1000 / task.fOptions.ReductionDepth.Value)
-        Dim splitMats = Split(pc32S)
+        Dim splitMats() As cv.Mat = Split(pc32S)
 
         dst2.SetTo(0)
         dst1.SetTo(0)

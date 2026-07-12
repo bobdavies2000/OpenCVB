@@ -878,7 +878,7 @@ Public Class XR_Structured_LinearizeFloor : Inherits TaskParent
         imuPC.SetTo(0, Not sliceMask)
 
         If CountNonZero(sliceMask) > 0 Then
-            Dim splitMats = Split(imuPC)
+            Dim splitMats() As cv.Mat = Split(imuPC)
             If options.xCheck Then
                 Dim mm As mmData = GetMinMax(splitMats(0), sliceMask)
 

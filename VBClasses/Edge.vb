@@ -474,7 +474,7 @@ Public Class Edge_RGB : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         Dim img32f As New cv.Mat
         src.ConvertTo(img32f, cv.MatType.CV_32FC3)
-        Dim splitMats = Split(img32f)
+        Dim splitMats() As cv.Mat = Split(img32f)
         For i = 0 To 3 - 1
             Normalize(splitMats(i), splitMats(i), 0, 255, cv.NormTypes.MinMax)
         Next

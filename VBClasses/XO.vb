@@ -182,7 +182,7 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             Dim rc = task.pointCloud
-            Dim splitMats As cv.Mat() = Split(rc)
+            Dim splitMats() As cv.Mat = Split(rc)
             splitMats(2).SetTo(task.MaxZmeters)
             cv.Cv2.Merge(splitMats, rc)
 
@@ -4311,7 +4311,7 @@ Namespace VBClasses
             If sCloud.options.indexY > yLines Then sCloud.options.indexY = yLines - 1
 
             sCloud.Run(src)
-            Dim splitMats As cv.Mat() = Split(sCloud.dst2)
+            Dim splitMats() As cv.Mat = Split(sCloud.dst2)
 
             Dim mmX = GetMinMax(splitMats(0))
             Dim mmY = GetMinMax(splitMats(1))
@@ -5508,7 +5508,7 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             resize.Run(task.pointCloud)
 
-            Dim splitMats As cv.Mat() = cv.Cv2.Split(resize.dst2)
+            Dim splitMats() As cv.Mat = cv.Cv2.Split(resize.dst2)
             cv.Cv2.Resize(task.noDepthMask, task.noDepthMask, splitMats(2).Size)
             splitMats(2).SetTo(0, task.noDepthMask)
             rect = New cv.Rect(0, 0, resize.dst2.Width, resize.dst2.Height)
@@ -5562,7 +5562,7 @@ Namespace VBClasses
             Dim gOutput = (gInput * gravityMatrix).ToMat
             input = gOutput.Reshape(3, input.Rows)
 
-            Dim splitMats = Split(input)
+            Dim splitMats() As cv.mat = Split(input)
             Dim mask As New cv.Mat
             Threshold(splitMats(2), mask, 1, 255, cv.ThresholdTypes.BinaryInv)
             ConvertScaleAbs(mask, mask, 255)
@@ -10267,7 +10267,7 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
-            Dim splitMats As cv.Mat()
+            Dim splitMats() As cv.Mat
             If src.Type = cv.MatType.CV_32FC3 Then splitMats = Split(src) Else splitMats = task.pcSplit
 
             If task.heartBeat Then
@@ -14174,7 +14174,7 @@ Namespace VBClasses
 
             If standaloneTest() Then
                 Static diff As New Diff_Depth32f
-                Dim splitMats As cv.Mat() = Split(originalPointcloud)
+                Dim splitMats() As cv.Mat = Split(originalPointcloud)
                 diff.lastFrame = splitMats(2)
                 diff.Run(task.pcSplit(2))
                 dst3 = diff.dst2
@@ -16795,7 +16795,7 @@ Namespace VBClasses
             Dim pts As cv.Mat = cv.Mat.FromPixelData(points.Count, 1, cv.MatType.CV_32SC2, points.ToArray)
             Dim pts32f As New cv.Mat
             pts.ConvertTo(pts32f, cv.MatType.CV_32FC2)
-            Dim splitMats As cv.Mat() = Split(pts32f)
+            Dim splitMats() As cv.Mat = Split(pts32f)
             Dim correlationMat As New cv.Mat
             MatchTemplate(splitMats(0), splitMats(1), correlationMat, cv.TemplateMatchModes.CCoeffNormed)
             Return correlationMat.Get(Of Single)(0, 0)
@@ -17675,7 +17675,7 @@ Namespace VBClasses
                 dst3 = originalPointcloud.Clone
 
                 Static diff As New Diff_Depth32f
-                Dim splitMats = Split(dst3)
+                Dim splitMats() As cv.mat = Split(dst3)
                 diff.lastFrame = splitMats(2)
                 diff.Run(task.pcSplit(2))
             End If
@@ -18956,7 +18956,7 @@ Namespace VBClasses
                 dst3 = originalPointcloud.Clone
 
                 Static diff As New Diff_Depth32f
-                Dim splitMats = Split(dst3)
+                Dim splitMats() As cv.mat = Split(dst3)
                 diff.lastFrame = splitMats(2)
                 diff.Run(task.pcSplit(2))
             End If
@@ -24058,7 +24058,7 @@ Namespace VBClasses
 
             Dim pc32S As New cv.Mat
             task.pointCloud.ConvertTo(pc32S, cv.MatType.CV_32SC3, 1000 / task.fOptions.ReductionDepth.Value)
-            Dim splitMats = Split(pc32S)
+            Dim splitMats() As cv.mat = Split(pc32S)
 
             dst2.SetTo(0)
             If options.PrepX Then

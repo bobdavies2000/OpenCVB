@@ -75,7 +75,7 @@ Public Class XR_Sort_MLPrepTest_CPP : Inherits TaskParent
         handleSrc.Free()
 
         MLTestData = cv.Mat.FromPixelData(src.Rows, src.Cols, cv.MatType.CV_32FC2, imagePtr).Clone
-        Dim splitMats = Split(MLTestData)
+        Dim splitMats() As cv.Mat = Split(MLTestData)
         dst2 = splitMats(0)
         dst3 = splitMats(1)
     End Sub
@@ -205,7 +205,7 @@ Public Class Sort_Integer : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If standalone Then
-            Dim splitMats = Split(src)
+            Dim splitMats() As cv.Mat = Split(src)
             Dim zero As New cv.Mat(splitMats(0).Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
             Merge({splitMats(0), splitMats(1), splitMats(2), zero}, src)
             Marshal.Copy(src.Data, data, 0, data.Length)
@@ -241,7 +241,7 @@ Public Class XR_Sort_GrayScale1 : Inherits TaskParent
         Dim gray(src.Total - 1) As Byte
         Marshal.Copy(dst1.Data, gray, 0, gray.Length)
 
-        Dim splitMats = Split(src)
+        Dim splitMats() As cv.Mat = Split(src)
         For i = 0 To 2
             If task.firstPass Then ReDim pixels(i)(src.Total - 1)
             Marshal.Copy(splitMats(i).Data, pixels(i), 0, pixels(i).Length)
@@ -277,7 +277,7 @@ Public Class XR_Sort_GrayScale : Inherits TaskParent
         desc = "Sort the grayscale image but keep the 8uc3 pixels with each gray entry."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        Dim splitMats = Split(src)
+        Dim splitMats() As cv.Mat = Split(src)
         For i = 0 To 2
             If task.firstPass Then ReDim pixels(i)(src.Total - 1)
             Marshal.Copy(splitMats(i).Data, pixels(i), 0, pixels(i).Length)

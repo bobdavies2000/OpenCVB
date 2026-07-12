@@ -144,7 +144,7 @@ Public Class Diff_RGB : Inherits TaskParent
         desc = "Create a mask that shows when R, G, and B are different.  Compare it to diff for grayscale."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        Dim splitMats = Split(src)
+        Dim splitMats() As cv.Mat = Split(src)
         dst2.SetTo(0)
         For i = 0 To 2
             diff(i).Run(splitMats(i))

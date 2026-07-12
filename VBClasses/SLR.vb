@@ -167,7 +167,7 @@ Public Class XR_SLR_TrendImages : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
 
-        Dim splitMats = cv.Cv2.Split(src)
+        Dim splitMats() As cv.Mat = cv.Cv2.Split(src)
         trends.hist.plotHist.maxRange = 255
         trends.hist.plotHist.removeZeroEntry = False ' default is to look at element 0....
 

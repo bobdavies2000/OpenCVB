@@ -128,7 +128,7 @@ Public Class XR_Color8U_KMeans : Inherits TaskParent
         colorFmt.Run(src)
         dst0 = colorFmt.dst2
 
-        Dim splitMats = Split(dst0)
+        Dim splitMats() As cv.Mat = Split(dst0)
 
         km0.Run(splitMats(0))
         dst1 = km0.dst2 * 255 / km0.classCount
@@ -187,7 +187,7 @@ Public Class Color8U_Complementary : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         Dim hsv As New cv.Mat
         CvtColor(src, hsv, cv.ColorConversionCodes.BGR2HSV)
-        Dim splitMats = Split(hsv)
+        Dim splitMats() As cv.Mat = Split(hsv)
         splitMats(0) += 90 Mod 180
         Merge(splitMats, dst3)
         CvtColor(dst3, dst2, cv.ColorConversionCodes.HSV2BGR)

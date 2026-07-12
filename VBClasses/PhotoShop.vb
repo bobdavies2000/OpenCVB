@@ -375,7 +375,7 @@ Public Class XR_PhotoShop_DuoTone : Inherits TaskParent
             expDark.Set(Of Byte)(0, i, Math.Min(Math.Pow(i, 2 - exp), 255))
         Next
 
-        Dim splitMats = Split(src)
+        Dim splitMats() As cv.Mat = Split(src)
 
         Dim switch1 As Integer
         Static frm = OptionParent.FindFrm(traceName + " Radio Buttons")

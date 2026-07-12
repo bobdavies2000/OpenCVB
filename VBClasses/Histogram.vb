@@ -195,7 +195,7 @@ Public Class XR_Histogram_ColorsAndGray : Inherits TaskParent
         desc = "Create a histogram of a normalized image"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        Dim splitMats As cv.Mat() = Split(src)
+        Dim splitMats() As cv.Mat = Split(src)
         ReDim Preserve splitMats(4 - 1)
         splitMats(4 - 1) = task.gray ' add a 4th image - the grayscale image to the R G and B images.
         For i = 0 To splitMats.Length - 1
@@ -423,7 +423,7 @@ Public Class XR_Histogram_PeaksRGB : Inherits TaskParent
         desc = "Find the peaks and valleys for each of the BGR channels."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        Dim splitMats As cv.Mat() = Split(src)
+        Dim splitMats() As cv.Mat = Split(src)
         For i = 0 To 3 - 1
             peaks(i).hist.plotHist.backgroundColor = Choose(i + 1, cv.Scalar.Blue, cv.Scalar.Green, cv.Scalar.Red)
             peaks(i).hist.plotHist.addLabels = False
@@ -497,7 +497,7 @@ Public Class Histogram_KalmanAuto : Inherits TaskParent
         If standaloneTest() Then
             If task.heartBeat Then splitIndex = If(splitIndex < 2, splitIndex + 1, 0)
             colorName = Choose(splitIndex + 1, "Blue", "Green", "Red")
-            Dim splitMats As cv.Mat() = Split(src)
+            Dim splitMats() As cv.Mat = Split(src)
             src = splitMats(splitIndex)
         End If
 
@@ -781,7 +781,7 @@ Public Class XR_Histogram_Lab : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         CvtColor(src, dst0, cv.ColorConversionCodes.BGR2Lab)
-        Dim splitMats As cv.Mat() = Nothing
+        Dim splitMats() As cv.Mat = Nothing
         Split(dst0, splitMats)
 
         hist.Run(splitMats(0))
@@ -1491,7 +1491,7 @@ Public Class XR_Histogram_InverseLUT : Inherits TaskParent
         desc = "Invert the histogram of the color image using green.  G = 0.299 R + 0.587 G + 0.114 B"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        Dim splitMats As cv.Mat() = Split(task.color)
+        Dim splitMats() As cv.Mat = Split(task.color)
         hist.Run(splitMats(1))
         dst2 = hist.dst2
 

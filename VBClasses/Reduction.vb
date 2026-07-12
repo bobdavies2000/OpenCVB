@@ -133,7 +133,7 @@ Public Class XR_Reduction_XYZ : Inherits TaskParent
         options.Run()
 
         If src.Type <> cv.MatType.CV_32FC3 Then src = task.pointCloud
-        Dim splitMats As cv.Mat() = Split(src)
+        Dim splitMats() As cv.Mat = Split(src)
         For i = 0 To splitMats.Length - 1
             If options.reduceXYZ(i) Then
                 splitMats(i) *= 1000
@@ -186,7 +186,7 @@ Public Class XR_Reduction_BGR : Inherits TaskParent
         desc = "Reduce BGR image in parallel"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        Dim splitMats As cv.Mat() = Split(src)
+        Dim splitMats() As cv.Mat = Split(src)
 
         For i = 0 To 2
             reduction.Run(splitMats(i))

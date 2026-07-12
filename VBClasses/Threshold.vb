@@ -118,7 +118,7 @@ Public Class Threshold_ByChannels : Inherits TaskParent
             src = task.gray
             Threshold(src, dst2, optionsColor.redS, 255, options.thresholdMethod)
         Else
-            Dim splitMats = Split(src)
+            Dim splitMats() As Mat = Split(src)
             Threshold(splitMats(0), splitMats(0), optionsColor.blueS, 255, options.thresholdMethod)
             Threshold(splitMats(1), splitMats(1), optionsColor.greenS, 255, options.thresholdMethod)
             Threshold(splitMats(2), splitMats(2), optionsColor.redS, 255, options.thresholdMethod)

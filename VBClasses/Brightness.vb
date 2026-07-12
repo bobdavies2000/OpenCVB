@@ -29,7 +29,7 @@ Public Class XR_Brightness_HSV : Inherits TaskParent
         CvtColor(src, dst3, cv.ColorConversionCodes.BGR2HSV)
         Dim hsv64 As New cv.Mat
         dst3.ConvertTo(hsv64, cv.MatType.CV_64F)
-        Dim splitMats = Split(hsv64)
+        Dim splitMats() As cv.Mat = Split(hsv64)
 
         splitMats(1) *= options.hsvBrightness
         Threshold(splitMats(1), splitMats(1), 255, 255, cv.ThresholdTypes.Trunc)
