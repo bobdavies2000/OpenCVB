@@ -306,8 +306,8 @@ Public Class XR_Draw_ClipLine : Inherits TaskParent
     Dim pt1 As cv.Point
     Dim pt2 As cv.Point
     Dim rect As cv.Rect
-    Dim linenum = 0
-    Dim hitCount = 0
+    Dim linenum As Integer = 0
+    Dim hitCount As Integer = 0
     Dim kalman As New Kalman_Basics
     Private Sub setup()
         ReDim kalman.kInput(8)
@@ -342,7 +342,7 @@ Public Class XR_Draw_ClipLine : Inherits TaskParent
         linenum += 1
 
         hitCount += If(clipped, 1, 0)
-        SetTrueText("There were " + hitCount.ToString("###,##0") + " intersects and " + (linenum - hitCount).ToString() + " misses",
+        SetTrueText("There were " + hitCount.ToString("N2") + " intersects and " + (linenum - hitCount).ToString() + " misses",
                          New cv.Point(src.Width / 2, 200))
         If r = rect Then setup()
         flow.Run(src)
