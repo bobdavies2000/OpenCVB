@@ -37,17 +37,17 @@ Public Class PlotMouse_Basics : Inherits TaskParent
         Dim minRange = (plotHist.ranges(0).End - plotHist.ranges(0).Start) * histIndex / task.histogramBins
         Dim maxRange = (plotHist.ranges(0).End - plotHist.ranges(0).Start) * (histIndex + 1) / task.histogramBins
         Dim bpRanges = New cv.Rangef() {New cv.Rangef(minRange, maxRange)}
-        cv.Cv2.CalcBackProject({src}, {0}, plotHist.histogram, mask, bpRanges)
+        CalcBackProject({src}, {0}, plotHist.histogram, mask, bpRanges)
         mask.ConvertTo(mask, cv.MatType.CV_8U)
 
         If mask.Size = dst3.Size Then dst3.SetTo(task.highlight, mask)
-        Dim count = cv.Cv2.CountNonZero(mask)
+        Dim count = CountNonZero(mask)
         labels(3) = "BackProjected pixel (% of image) = " + (count / src.Total).ToString("0%")
 
         Dim barCount = plotHist.histArray(histIndex)
         labels(2) = "Selection highlighted is " + CStr(histIndex) + " and shows " + CStr(barCount) + " (or " +
                     (barCount / src.Total).ToString("0%") + ") samples"
-                    cv.Cv2.Rectangle(dst2, New cv.Rect(CInt(histIndex) * barWidth, 0, barWidth, dst2.Height), cv.Scalar.Yellow, task.lineWidth)
+                    Rectangle(dst2, New cv.Rect(CInt(histIndex) * barWidth, 0, barWidth, dst2.Height), cv.Scalar.Yellow, task.lineWidth)
     End Sub
 End Class
 
@@ -72,7 +72,7 @@ Public Class PlotMouse_Basics32F : Inherits TaskParent
         If src.Channels <> 1 Then src = task.pcSplit(2)
 
         ranges = {New cv.Rangef(0, task.MaxZmeters)}
-        cv.Cv2.CalcHist({src}, {0}, New cv.Mat, histogram, 1, {task.histogramBins}, ranges)
+        CalcHist({src}, {0}, New cv.Mat, histogram, 1, {task.histogramBins}, ranges)
 
         plotHist.histogram = histogram
         plotHist.Run(plotHist.histogram)
@@ -80,7 +80,7 @@ Public Class PlotMouse_Basics32F : Inherits TaskParent
 
         Dim stepsize = dst2.Width / task.MaxZmeters
         For i = 1 To CInt(task.MaxZmeters) - 1
-            cv.Cv2.Line(dst2, New cv.Point(stepsize * i, 0), New cv.Point(stepsize * i, dst2.Height), white, Utility_Basics.getThickness)
+            Line(dst2, New cv.Point(stepsize * i, 0), New cv.Point(stepsize * i, dst2.Height), white, Utility_Basics.getThickness)
         Next
 
         Dim barWidth = dst2.Width / task.histogramBins
@@ -89,15 +89,15 @@ Public Class PlotMouse_Basics32F : Inherits TaskParent
         Dim minRange = (ranges(0).End - ranges(0).Start) * histIndex / task.histogramBins
         Dim maxRange = (ranges(0).End - ranges(0).Start) * (histIndex + 1) / task.histogramBins
         Dim bpRanges = New cv.Rangef() {New cv.Rangef(minRange, maxRange)}
-        cv.Cv2.CalcBackProject({src}, {0}, histogram, mask, bpRanges)
+        CalcBackProject({src}, {0}, histogram, mask, bpRanges)
         mask.ConvertTo(mask, cv.MatType.CV_8U)
 
-        Dim maskCount = cv.Cv2.CountNonZero(mask)
+        Dim maskCount = CountNonZero(mask)
         If mask.Size = dst3.Size Then dst3.SetTo(task.highlight, mask)
         labels(3) = "BackProjected pixel (% of image) = " + (maskCount / src.Total).ToString("0%")
 
         labels(2) = "Histogram Depth to " + task.MaxZmeters.ToString("0.0") + " m"
-        cv.Cv2.Rectangle(dst2, New cv.Rect(CInt(histIndex) * barWidth, 0, barWidth, dst2.Height), cv.Scalar.Yellow, task.lineWidth)
+        Rectangle(dst2, New cv.Rect(CInt(histIndex) * barWidth, 0, barWidth, dst2.Height), cv.Scalar.Yellow, task.lineWidth)
     End Sub
 End Class
 
@@ -142,17 +142,17 @@ Public Class PlotMouse_Correlation : Inherits TaskParent
         Dim totalPixels = dst2.Total ' assume we are including zeros.
         Dim barWidth = dst2.Width / task.histogramBins
         Dim histIndex = Math.Floor(task.mouseMovePoint.X / barWidth)
-                  cv.Cv2.InRange(dst1, histIndex, histIndex, dst0)
+                  InRange(dst1, histIndex, histIndex, dst0)
         If ranges(histIndex) IsNot Nothing Then
             labels(2) = "For bin " + CStr(histIndex) + " " + ranges(histIndex).Average.ToString(fmt1) +
                     " average range and min/max " + ranges(histIndex).Min.ToString(fmt1) + "/" +
                     ranges(histIndex).Max.ToString(fmt1)
         End If
 
-        Dim actualCount = cv.Cv2.CountNonZero(dst0)
+        Dim actualCount = CountNonZero(dst0)
         dst3 = task.color.Clone
         dst3.SetTo(cv.Scalar.Yellow, dst0)
-        cv.Cv2.Rectangle(dst2, New cv.Rect(CInt(histIndex) * barWidth, 0, barWidth, dst2.Height), cv.Scalar.Yellow, task.lineWidth)
+        Rectangle(dst2, New cv.Rect(CInt(histIndex) * barWidth, 0, barWidth, dst2.Height), cv.Scalar.Yellow, task.lineWidth)
     End Sub
 End Class
 
@@ -236,9 +236,9 @@ Public Class PlotMouse_MaskBackProject : Inherits TaskParent
 
         Dim ranges() = New cv.Rangef() {New cv.Rangef(minRange, maxRange)}
 
-        cv.Cv2.CalcBackProject({task.gray}, {0}, hist.histogram, dst1, ranges)
+        CalcBackProject({task.gray}, {0}, hist.histogram, dst1, ranges)
         dst3.SetTo(task.highlight, dst1)
-        cv.Cv2.Rectangle(dst2, New cv.Rect(CInt(histIndex * barWidth), 0, barWidth, dst2.Height), cv.Scalar.Yellow, task.lineWidth)
-        labels(3) = CStr(cv.Cv2.CountNonZero(dst1)) + " pixels in the back projection."
+        Rectangle(dst2, New cv.Rect(CInt(histIndex * barWidth), 0, barWidth, dst2.Height), cv.Scalar.Yellow, task.lineWidth)
+        labels(3) = CStr(CountNonZero(dst1)) + " pixels in the back projection."
     End Sub
 End Class

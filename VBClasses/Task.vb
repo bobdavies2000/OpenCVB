@@ -235,7 +235,7 @@ Public Class AlgorithmTask : Implements IDisposable
         If gOptions.showMotionMask.Checked Then
             ' motion cloud contains all the RGB motion as well.
             For Each mIndex In motion.motionSort
-            cv.Cv2.Rectangle(dstList(0), gridRects(mIndex), cv.Scalar.White, lineWidth)
+                Rectangle(dstList(0), gridRects(mIndex), cv.Scalar.White, lineWidth)
             Next
         End If
 

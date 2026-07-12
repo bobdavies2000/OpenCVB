@@ -37,7 +37,7 @@ Public Class PlotBar_Basics : Inherits TaskParent
             If Single.IsNaN(min) Or Single.IsInfinity(min) Then min = Single.MinValue
             If Single.IsNaN(max) Or Single.IsInfinity(max) Then max = Single.MaxValue
             ranges = {New cv.Rangef(min, max)}
-            cv.Cv2.CalcHist({src}, {0}, histMask, histogram, 1, {task.histogramBins}, ranges)
+            CalcHist({src}, {0}, histMask, histogram, 1, {task.histogramBins}, ranges)
         Else
             histogram = src
         End If
@@ -77,7 +77,7 @@ Public Class PlotBar_Basics : Inherits TaskParent
                         Else
                             color = cv.Scalar.Black
                         End If
-                        cv.Cv2.Rectangle(dst2, New cv.Rect(i * barWidth, dst2.Height - h,
+                        Rectangle(dst2, New cv.Rect(i * barWidth, dst2.Height - h,
                                                                Math.Max(1, barWidth), h), color, -1)
                     End If
                 Next
@@ -162,13 +162,13 @@ Public Class PlotBar_Histogram2D : Inherits TaskParent
             src = colorFmt.dst2
         End If
         Dim bins = task.histogramBins
-        cv.Cv2.CalcHist({src}, {0, 1}, New cv.Mat(), histogram, 2, {bins, bins}, ranges)
+        CalcHist({src}, {0, 1}, New cv.Mat(), histogram, 2, {bins, bins}, ranges)
 
-        cv.Cv2.Resize(histogram, dst2, task.workRes, 0, 0, cv.InterpolationFlags.Nearest)
+        Resize(histogram, dst2, task.workRes, 0, 0, cv.InterpolationFlags.Nearest)
 
         If standaloneTest() Then
             Dim thresh As New cv.Mat()
-            cv.Cv2.Threshold(dst2, thresh, 0, 255, cv.ThresholdTypes.Binary)
+            Threshold(dst2, thresh, 0, 255, cv.ThresholdTypes.Binary)
             dst3 = thresh
         End If
     End Sub

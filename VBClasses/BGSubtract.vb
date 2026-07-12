@@ -138,7 +138,7 @@ Public Class XR_BGSubtract_MotionDetect : Inherits TaskParent
                         Dim correlation As New cv.Mat
                         If roi.X + roi.Width > dst3.Width Then roi.Width = dst3.Width - roi.X - 1
                         If roi.Y + roi.Height > dst3.Height Then roi.Height = dst3.Height - roi.Y - 1
-                        cv.Cv2.MatchTemplate(src(roi), dst3(roi), correlation, cv.TemplateMatchModes.CCoeffNormed)
+                        MatchTemplate(src(roi), dst3(roi), correlation, cv.TemplateMatchModes.CCoeffNormed)
                         If options.CCthreshold > correlation.Get(Of Single)(0, 0) Then
                             src(roi).CopyTo(dst2(roi))
                             src(roi).CopyTo(dst3(roi))
@@ -223,9 +223,9 @@ Public Class XR_BGSubtract_MOG_RGBDepth : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
-        cv.Cv2.CvtColor(task.depthRGB, grayMat, cv.ColorConversionCodes.BGR2GRAY)
+        CvtColor(task.depthRGB, grayMat, cv.ColorConversionCodes.BGR2GRAY)
         MOGDepth.Apply(grayMat, grayMat, options.learnRate)
-        cv.Cv2.CvtColor(grayMat, dst2, cv.ColorConversionCodes.GRAY2BGR)
+        CvtColor(grayMat, dst2, cv.ColorConversionCodes.GRAY2BGR)
 
         MOGRGB.Apply(task.gray, dst3, options.learnRate)
     End Sub
@@ -349,7 +349,7 @@ Public Class XR_BGSubtract_Reduction : Inherits TaskParent
         bgSub.Run(dst2)
         dst3 = bgSub.dst2.Clone
 
-        labels(3) = "Count nonzero = " + CStr(cv.Cv2.CountNonZero(dst3))
+        labels(3) = "Count nonzero = " + CStr(CountNonZero(dst3))
     End Sub
 End Class
 

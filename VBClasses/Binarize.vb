@@ -9,20 +9,20 @@ Public Class Binarize_Basics : Inherits TaskParent
     Public histogram As New cv.Mat
     Public meanScalar As cv.Scalar
     Public mask As New cv.Mat
-    Dim blur As New Blur_Basics
+    Dim blurC As New Blur_Basics
     Public useBlur As Boolean
     Public Sub New()
         mask = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, 255)
         desc = "Binarize an image using Threshold with OTSU."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        meanScalar = cv.Cv2.Mean(src, mask)
+        meanScalar = Mean(src, mask)
 
         If useBlur Then
-            blur.Run(task.gray)
-            cv.Cv2.Threshold(blur.dst2, dst2, meanScalar(0), 255, thresholdType)
+            blurC.Run(task.gray)
+            Threshold(blurC.dst2, dst2, meanScalar(0), 255, thresholdType)
         Else
-            cv.Cv2.Threshold(task.gray, dst2, meanScalar(0), 255, thresholdType)
+            Threshold(task.gray, dst2, meanScalar(0), 255, thresholdType)
         End If
     End Sub
 End Class
@@ -45,7 +45,7 @@ Public Class XR_Binarize_OTSU : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
 
-        binarize.meanScalar = cv.Cv2.Mean(task.gray)
+        binarize.meanScalar = Mean(task.gray)
 
         binarize.useBlur = False
         Select Case labels(2)
@@ -78,9 +78,9 @@ End Class
 '    Public Overrides Sub RunAlg(src As cv.Mat)
 '        options.Run()
 '        CvXImgProc.NiblackThreshold(task.gray, dst0, 255, cv.ThresholdTypes.Binary, 5, 0.5, LocalBinarizationMethods.Niblack)
-'        dst2 = cv.Cv2.CvtColor(dst0, dst2, cv.ColorConversionCodes.GRAY2BGR)
+'        dst2 = CvtColor(dst0, dst2, cv.ColorConversionCodes.GRAY2BGR)
 '        CvXImgProc.NiblackThreshold(task.gray, dst0, 255, cv.ThresholdTypes.Binary, 5, 0.5, LocalBinarizationMethods.Sauvola)
-'        dst3 = cv.Cv2.CvtColor(dst0, dst3, cv.ColorConversionCodes.GRAY2BGR)
+'        dst3 = CvtColor(dst0, dst3, cv.ColorConversionCodes.GRAY2BGR)
 '    End Sub
 'End Class
 
@@ -198,7 +198,7 @@ Public Class XR_Binarize_FourPixelFlips : Inherits TaskParent
 
         Static lastSubD As cv.Mat = binar4.dst2.Clone
         dst3 = lastSubD - binar4.dst2
-        cv.Cv2.Threshold(dst3, dst3, 0, 255, cv.ThresholdTypes.Binary)
+        Threshold(dst3, dst3, 0, 255, cv.ThresholdTypes.Binary)
         lastSubD = binar4.dst2.Clone
     End Sub
 End Class
@@ -214,8 +214,8 @@ Public Class Binarize_Simple : Inherits TaskParent
         desc = "Binarize an image using Threshold with OTSU."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        meanScalar = cv.Cv2.Mean(task.gray)
-        cv.Cv2.Threshold(task.gray, dst2, meanScalar(0), injectVal, cv.ThresholdTypes.Binary)
+        meanScalar = Mean(task.gray)
+        Threshold(task.gray, dst2, meanScalar(0), injectVal, cv.ThresholdTypes.Binary)
     End Sub
 End Class
 
@@ -232,7 +232,7 @@ Public Class XR_Binarize_SimpleOld : Inherits TaskParent
         desc = "Binarize an image using Threshold with OTSU."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        meanScalar = cv.Cv2.Mean(task.gray)
-        cv.Cv2.Threshold(src, dst2, meanScalar(0), injectVal, cv.ThresholdTypes.Binary)
+        meanScalar = Mean(task.gray)
+        Threshold(src, dst2, meanScalar(0), injectVal, cv.ThresholdTypes.Binary)
     End Sub
 End Class

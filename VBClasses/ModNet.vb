@@ -40,7 +40,7 @@ Public Class ModNet_Basics : Inherits TaskParent
     Private Shared Function PreprocessToNCHW(resizedBgr As cv.Mat) As DenseTensor(Of Single)
         Dim count = 1 * 3 * dnnSize.Height * dnnSize.Width
         Dim data(count - 1) As Single
-        Using blob = cv.Cv2.Dnn.BlobFromImage(resizedBgr, 1.0 / 127.5, dnnSize, New cv.Scalar(127.5, 127.5, 127.5), True, False)
+        Using blob = Dnn.BlobFromImage(resizedBgr, 1.0 / 127.5, dnnSize, New cv.Scalar(127.5, 127.5, 127.5), True, False)
             Marshal.Copy(blob.Data, data, 0, count)
         End Using
         Return New DenseTensor(Of Single)(data, {1, 3, dnnSize.Height, dnnSize.Width})
@@ -60,7 +60,7 @@ Public Class ModNet_Basics : Inherits TaskParent
         If ortOutputName = "" Then ResolveAndLoadModel()
 
         Dim resized As New cv.Mat
-        cv.Cv2.Resize(src, resized, dnnSize)
+        Resize(src, resized, dnnSize)
         Dim inputTensor = PreprocessToNCHW(resized)
 
         Dim alpha512 As cv.Mat = Nothing
@@ -92,30 +92,30 @@ Public Class ModNet_Basics : Inherits TaskParent
         If mm.maxVal > 1.05 Then alpha512.ConvertTo(alpha512, cv.MatType.CV_32F, 1.0 / 255.0)
 
         Dim alphaFull As New cv.Mat
-        cv.Cv2.Resize(alpha512, alphaFull, src.Size(), 0)
+        Resize(alpha512, alphaFull, src.Size(), 0)
 
         Dim ones As New cv.Mat(alphaFull.Size, cv.MatType.CV_32F, New cv.Scalar(1))
         Dim zeros As New cv.Mat(alphaFull.Size, cv.MatType.CV_32F, New cv.Scalar(0))
-        cv.Cv2.Min(alphaFull, ones, alphaFull)
-        cv.Cv2.Max(alphaFull, zeros, alphaFull)
+        Min(alphaFull, ones, alphaFull)
+        Max(alphaFull, zeros, alphaFull)
 
         Dim src32 As New cv.Mat
         src.ConvertTo(src32, cv.MatType.CV_32FC3)
-        Dim ch = cv.Cv2.Split(src32)
+        Dim ch = Split(src32)
         Dim inv As New cv.Mat(alphaFull.Size, cv.MatType.CV_32F)
         Dim onePlane As New cv.Mat(alphaFull.Size, cv.MatType.CV_32F, New cv.Scalar(1))
-        cv.Cv2.Subtract(onePlane, alphaFull, inv)
+        Subtract(onePlane, alphaFull, inv)
 
         Dim bgPlane As New cv.Mat(alphaFull.Size, cv.MatType.CV_32F, New cv.Scalar(240.0F / 255.0F))
         For i = 0 To 2
             Dim fg As New cv.Mat
             Dim bgTerm As New cv.Mat
-            cv.Cv2.Multiply(ch(i), alphaFull, fg)
-            cv.Cv2.Multiply(inv, bgPlane, bgTerm)
-            cv.Cv2.Add(fg, bgTerm, ch(i))
+            Multiply(ch(i), alphaFull, fg)
+            Multiply(inv, bgPlane, bgTerm)
+            Add(fg, bgTerm, ch(i))
         Next
 
-        cv.Cv2.Merge(ch, src32)
+        Merge(ch, src32)
         src32.ConvertTo(dst2, cv.MatType.CV_8UC3)
 
         alphaFull.ConvertTo(dst3, cv.MatType.CV_8U, 255.0)

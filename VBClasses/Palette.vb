@@ -24,7 +24,7 @@ Public Class Palette_Basics : Inherits TaskParent
                                       cv.ColormapTypes.Pink, cv.ColormapTypes.Plasma, cv.ColormapTypes.Rainbow,
                                       cv.ColormapTypes.Spring, cv.ColormapTypes.Summer, cv.ColormapTypes.Twilight,
                                       cv.ColormapTypes.TwilightShifted, cv.ColormapTypes.Viridis, cv.ColormapTypes.Winter)
-        cv.Cv2.ApplyColorMap(src, dst2, cv.ColormapTypes.Jet)
+        ApplyColorMap(src, dst2, cv.ColormapTypes.Jet)
     End Sub
 End Class
 
@@ -78,8 +78,8 @@ Public Class XR_Palette_LinearPolar : Inherits TaskParent
 
         dst3.SetTo(0)
         If rotateOptions.warpFlag = cv.InterpolationFlags.WarpInverseMap Then radiusSlider.Value = radiusSlider.Maximum
-        cv.Cv2.WarpPolar(dst2, dst2, dst2.Size, pt, radius, cv.InterpolationFlags.Nearest, rotateOptions.warpFlag)
-        cv.Cv2.WarpPolar(src, dst3, dst3.Size, pt, radius, cv.InterpolationFlags.Nearest, rotateOptions.warpFlag)
+        WarpPolar(dst2, dst2, dst2.Size, pt, radius, cv.InterpolationFlags.Nearest, rotateOptions.warpFlag)
+        WarpPolar(src, dst3, dst3.Size, pt, radius, cv.InterpolationFlags.Nearest, rotateOptions.warpFlag)
     End Sub
 End Class
 
@@ -145,7 +145,7 @@ Public Class XR_Palette_Gradient : Inherits TaskParent
                 f -= 1 / dst1.Rows
             Next
         End If
-        If standaloneTest() Then cv.Cv2.Resize(dst1, dst2, dst2.Size)
+        If standaloneTest() Then Resize(dst1, dst2, dst2.Size)
     End Sub
 End Class
 
@@ -176,8 +176,8 @@ Public Class XR_Palette_DepthColorMap : Inherits TaskParent
             gColor.color1 = cv.Scalar.Blue
             gColor.Run(src)
 
-            cv.Cv2.HConcat(gradientColorMap, gColor.gradient, gradientColorMap)
-            cv.Cv2.Resize(gradientColorMap, gradientColorMap, New cv.Size(255, 1))
+            HConcat(gradientColorMap, gColor.gradient, gradientColorMap)
+            Resize(gradientColorMap, gradientColorMap, New cv.Size(255, 1))
 
             If standaloneTest() Then
                 If dst3.Width < 255 Then dst3 = New cv.Mat(dst3.Height, 255, cv.MatType.CV_8UC3, cv.Scalar.All(0))
@@ -190,9 +190,9 @@ Public Class XR_Palette_DepthColorMap : Inherits TaskParent
         End If
 
         Dim depth8u As New cv.Mat
-        cv.Cv2.ConvertScaleAbs(task.pcSplit(2), depth8u, cvtScaleSlider.Value)
+        ConvertScaleAbs(task.pcSplit(2), depth8u, cvtScaleSlider.Value)
         Dim ColorMap = cv.Mat.FromPixelData(256, 1, cv.MatType.CV_8UC3, gradientColorMap.Data())
-        cv.Cv2.ApplyColorMap(depth8u, dst2, ColorMap)
+        ApplyColorMap(depth8u, dst2, ColorMap)
         dst2.SetTo(0, task.noDepthMask)
     End Sub
 End Class
@@ -223,15 +223,15 @@ Public Class XR_Palette_RGBDepth : Inherits TaskParent
             gColor.color1 = cv.Scalar.Blue
             gColor.Run(src)
 
-            cv.Cv2.HConcat(gradientColorMap, gColor.gradient, gradientColorMap)
-            cv.Cv2.Resize(gradientColorMap, gradientColorMap, New cv.Size(255, 1))
+            HConcat(gradientColorMap, gColor.gradient, gradientColorMap)
+            Resize(gradientColorMap, gradientColorMap, New cv.Size(255, 1))
         End If
 
         Dim sliderVal = If(task.Settings.cameraName = "Intel(R) RealSense(TM) Depth Camera 435i", 50, 80)
         Dim depth8u As New cv.Mat
-        cv.Cv2.ConvertScaleAbs(task.pcSplit(2), depth8u)
+        ConvertScaleAbs(task.pcSplit(2), depth8u)
         Dim ColorMap = cv.Mat.FromPixelData(256, 1, cv.MatType.CV_8UC3, gradientColorMap.Data())
-        cv.Cv2.ApplyColorMap(depth8u, dst2, ColorMap)
+        ApplyColorMap(depth8u, dst2, ColorMap)
     End Sub
 End Class
 
@@ -268,8 +268,8 @@ Public Class XR_Palette_LeftRightImages : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         Dim leftView As New cv.Mat, rightView As New cv.Mat
-        cv.Cv2.ConvertScaleAbs(task.leftView, leftView)
-        cv.Cv2.ConvertScaleAbs(task.rightView, rightView)
+        ConvertScaleAbs(task.leftView, leftView)
+        ConvertScaleAbs(task.rightView, rightView)
         dst2 = Palettize(leftView)
         dst3 = Palettize(rightView)
     End Sub
@@ -354,20 +354,20 @@ Public Class XR_Palette_Create : Inherits TaskParent
                     gradMat = colorTransition(color1, color2, 255)
                     color1 = color2
                     color2 = New cv.Scalar(msRNG.Next(0, 255), msRNG.Next(0, 255), msRNG.Next(0, 255))
-                    If i = 0 Then colorGrad = gradMat Else cv.Cv2.HConcat(colorGrad, gradMat, colorGrad)
+                    If i = 0 Then colorGrad = gradMat Else HConcat(colorGrad, gradMat, colorGrad)
                 Next
-                cv.Cv2.Resize(colorGrad, colorGrad, New cv.Size(256, 1))
-                cv.Cv2.ImWrite(task.homeDir + "data\nextScheme.jpg", colorGrad) ' use this to create new color schemes.
+                Resize(colorGrad, colorGrad, New cv.Size(256, 1))
+                ImWrite(task.homeDir + "data\nextScheme.jpg", colorGrad) ' use this to create new color schemes.
             Else
-                colorGrad = cv.Cv2.ImRead(schemeName).Row(0).Clone
+                colorGrad = ImRead(schemeName).Row(0).Clone
             End If
         End If
 
         SetTrueText("Use the 'Color Transitions' slider and radio buttons to change the color ranges.", 3)
         Dim depth8u As New cv.Mat
-        cv.Cv2.ConvertScaleAbs(task.pcSplit(2), depth8u)
+        ConvertScaleAbs(task.pcSplit(2), depth8u)
         Dim colorMap = cv.Mat.FromPixelData(256, 1, cv.MatType.CV_8UC3, colorGrad.Data())
-        cv.Cv2.ApplyColorMap(depth8u, dst2, colorMap)
+        ApplyColorMap(depth8u, dst2, colorMap)
         dst2.SetTo(0, task.noDepthMask)
     End Sub
 End Class
@@ -395,7 +395,7 @@ Public Class Palette_Variable : Inherits TaskParent
             colorGrad.Set(Of cv.Vec3b)(0, i, colors(i))
         Next
         Dim colorMap = cv.Mat.FromPixelData(256, 1, cv.MatType.CV_8UC3, colorGrad.Data())
-        cv.Cv2.ApplyColorMap(src, dst2, colorMap)
+        ApplyColorMap(src, dst2, colorMap)
     End Sub
 End Class
 
@@ -424,14 +424,14 @@ Public Class Palette_RandomColorMap : Inherits TaskParent
                 gColor.Run(src)
                 gColor.color2 = gColor.color1
                 gColor.color1 = New cv.Scalar(msRNG.Next(0, 255), msRNG.Next(0, 255), msRNG.Next(0, 255))
-                If i = 0 Then gradientColorMap = gColor.gradient Else cv.Cv2.HConcat(gradientColorMap, gColor.gradient, gradientColorMap)
+                If i = 0 Then gradientColorMap = gColor.gradient Else HConcat(gradientColorMap, gColor.gradient, gradientColorMap)
             Next
-            cv.Cv2.Resize(gradientColorMap, gradientColorMap, New cv.Size(256, 1))
+            Resize(gradientColorMap, gradientColorMap, New cv.Size(256, 1))
             If standaloneTest() Then dst3 = gradientColorMap
             gradientColorMap.Set(Of cv.Vec3b)(0, 0, New cv.Vec3b) ' black is black!
         End If
         Dim ColorMap = cv.Mat.FromPixelData(256, 1, cv.MatType.CV_8UC3, gradientColorMap.Data())
-        cv.Cv2.ApplyColorMap(src, dst2, ColorMap)
+        ApplyColorMap(src, dst2, ColorMap)
     End Sub
 End Class
 
@@ -450,7 +450,7 @@ Public Class Palette_CustomColorMap : Inherits TaskParent
             Dim cMapDir As New DirectoryInfo(task.homeDir + "opencv/modules/imgproc/doc/pics/colormaps")
             Dim str = cMapDir.FullName + "/colorscale_" + task.gOptions.Palettes.Text + ".jpg"
             Dim mapFile As New FileInfo(str)
-            Dim tmp = cv.Cv2.ImRead(mapFile.FullName)
+            Dim tmp = ImRead(mapFile.FullName)
 
             colorMap = cv.Mat.FromPixelData(256, 1, cv.MatType.CV_8UC3, tmp.Data).Clone
         End If
@@ -466,8 +466,8 @@ Public Class Palette_CustomColorMap : Inherits TaskParent
             src = Mat_Convert.Mat_32f_To_8UC3(src)
             src.ConvertTo(src, cv.MatType.CV_8U)
         End If
-        cv.Cv2.ApplyColorMap(src, dst2, colorMap)
-        If standalone Then cv.Cv2.Resize(colorMap, dst3, dst3.Size)
+        ApplyColorMap(src, dst2, colorMap)
+        If standalone Then Resize(colorMap, dst3, dst3.Size)
     End Sub
 End Class
 
@@ -507,7 +507,7 @@ Public Class XR_Palette_GrayToColor : Inherits TaskParent
         Next
 
         Dim ColorMap = cv.Mat.FromPixelData(256, 1, cv.MatType.CV_8UC3, colors.Values.ToArray)
-        cv.Cv2.ApplyColorMap(src, dst2, ColorMap)
+        ApplyColorMap(src, dst2, ColorMap)
     End Sub
 End Class
 
@@ -558,7 +558,7 @@ Public Class Palette_Random : Inherits TaskParent
         desc = "Build a random colorGrad - no smooth transitions."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        cv.Cv2.ApplyColorMap(src, dst2, colorMap)
+        ApplyColorMap(src, dst2, colorMap)
     End Sub
 End Class
 
@@ -579,15 +579,15 @@ Public Class Palette_LoadColorMap : Inherits TaskParent
             labels(2) = "ColorMap = " + task.gOptions.Palettes.Text
             Dim str = cMapDir.FullName + "/colorscale_" + task.gOptions.Palettes.Text + ".jpg"
             Dim mapFile As New FileInfo(str)
-            Dim tmp = cv.Cv2.ImRead(mapFile.FullName)
+            Dim tmp = ImRead(mapFile.FullName)
 
             tmp.Col(0).SetTo(If(whitebackground, white, cv.Scalar.Black))
             tmp = tmp.Row(0)
             colorMap = cv.Mat.FromPixelData(256, 1, cv.MatType.CV_8UC3, tmp.Data).Clone
         End If
 
-        cv.Cv2.ApplyColorMap(src, dst2, colorMap)
-        If standalone Then cv.Cv2.Resize(colorMap, dst3, dst3.Size)
+        ApplyColorMap(src, dst2, colorMap)
+        If standalone Then Resize(colorMap, dst3, dst3.Size)
     End Sub
 End Class
 
@@ -610,18 +610,18 @@ Public Class Palette_RandomColors : Inherits TaskParent
         colorMapWithBlack.Set(Of cv.Vec3b)(0, 0, New cv.Vec3b) ' black is the first color...
     End Sub
     Public Function useColorMapFull(src As cv.Mat) As cv.Mat
-        cv.Cv2.ApplyColorMap(src, dst2, colorMapFull)
+        ApplyColorMap(src, dst2, colorMapFull)
         Return dst2
     End Function
     Public Function useColorMapWithBlack(src As cv.Mat) As cv.Mat
-        cv.Cv2.ApplyColorMap(src, dst3, colorMapWithBlack)
+        ApplyColorMap(src, dst3, colorMapWithBlack)
         Return dst3
     End Function
     Public Overrides Sub RunAlg(src As cv.Mat)
         If task.optionsChanged Or colorMapFull.Rows <> 256 Then rebuildColorMaps()
 
-        cv.Cv2.ApplyColorMap(src, dst2, colorMapFull)
-        If standalone Then cv.Cv2.Resize(colorMapFull, dst3, dst3.Size)
+        ApplyColorMap(src, dst2, colorMapFull)
+        If standalone Then Resize(colorMapFull, dst3, dst3.Size)
     End Sub
 End Class
 
@@ -647,7 +647,7 @@ Public Class XR_Palette_RandomWithBlack : Inherits TaskParent
             src.ConvertTo(src, cv.MatType.CV_8U)
         End If
 
-        cv.Cv2.ApplyColorMap(src, dst2, colorMap)
-        If standalone Then cv.Cv2.Resize(colorMap, dst3, dst3.Size)
+        ApplyColorMap(src, dst2, colorMap)
+        If standalone Then Resize(colorMap, dst3, dst3.Size)
     End Sub
 End Class

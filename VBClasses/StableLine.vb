@@ -18,13 +18,13 @@ Public Class StableLine_BasicsOld : Inherits TaskParent
         ElseIf isSlope1Vertical Then
             ' Line 1 is vertical (angle 90 degrees).
             ' Angle of line 2 is Atan(slope2).
-            Dim angle2Degrees As Double = Math.Atan(slope2) * 180 / cv.Cv2.PI
+            Dim angle2Degrees As Double = Math.Atan(slope2) * 180 / PI
             Dim angleDiff As Double = Math.Abs(90.0 - angle2Degrees)
             Return angleDiff
         ElseIf isSlope2Vertical Then
             ' Line 2 is vertical (angle 90 degrees).
             ' Angle of line 1 is Atan(slope1).
-            Dim angle1Degrees As Double = Math.Atan(slope1) * 180 / cv.Cv2.PI
+            Dim angle1Degrees As Double = Math.Atan(slope1) * 180 / PI
             Dim angleDiff As Double = Math.Abs(90.0 - angle1Degrees)
             Return angleDiff
         End If
@@ -38,7 +38,7 @@ Public Class StableLine_BasicsOld : Inherits TaskParent
         ' --- General Case: Use the tangent formula ---
         Dim tanTheta As Double = (slope2 - slope1) / (1 + slope1 * slope2)
         Dim angleRadians As Double = Math.Atan(tanTheta) ' Result is in (-PI/2, PI/2)
-        Dim angleDegrees As Double = angleRadians * 180 / cv.Cv2.PI
+        Dim angleDegrees As Double = angleRadians * 180 / PI
 
         Return angleDegrees
     End Function
@@ -49,8 +49,8 @@ Public Class StableLine_BasicsOld : Inherits TaskParent
         Dim rotateAngle = GetAngleBetweenLinesBySlopes(lp.slope, lpLast.slope)
         If rotateAngle <> 0 Then
             Dim rotateCenter = Line_Intersection.IntersectTest(lp, lpLast)
-            Dim M = cv.Cv2.GetRotationMatrix2D(rotateCenter, -rotateAngle, 1)
-            cv.Cv2.WarpAffine(src, dst2, M, src.Size(), cv.InterpolationFlags.Cubic)
+            Dim M = GetRotationMatrix2D(rotateCenter, -rotateAngle, 1)
+            WarpAffine(src, dst2, M, src.Size(), cv.InterpolationFlags.Cubic)
             lpLast = lp
         Else
             If task.heartBeat Then dst2 = src.Clone
@@ -94,7 +94,7 @@ Public Class XR_StableLine_BasicsOldCount : Inherits TaskParent
         Dim g As Integer
         For i = 0 To basics.ptList.Count - 1
             Dim pt = basics.ptList(i)
-            cv.Cv2.Circle(dst2, pt, task.DotSize, task.highlight, -1, task.lineType)
+            Circle(dst2, pt, task.DotSize, task.highlight, -1, task.lineType)
             g = basics.facetGen.dst0.Get(Of Integer)(pt.Y, pt.X)
             goodCounts.Add(g, i)
             SetTrueText(CStr(g), pt)
@@ -122,13 +122,13 @@ Public Class XR_StableLine_Lines : Inherits TaskParent
         For Each lp In task.lines.lpList
             basics.facetGen.inputPoints.Add(lp.p1)
             basics.facetGen.inputPoints.Add(lp.p2)
-            cv.Cv2.Line(dst1, lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
+            Line(dst1, lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
         Next
         basics.Run(src)
         dst2 = basics.dst2
         dst3 = basics.dst3
         For Each pt In basics.ptList
-        cv.Cv2.Circle(dst2, pt, task.DotSize + 1, task.highlight, -1, task.lineType)
+        Circle(dst2, pt, task.DotSize + 1, task.highlight, -1, task.lineType)
             If standaloneTest() Then
                 Dim g = basics.facetGen.dst0.Get(Of Integer)(pt.Y, pt.X)
                 SetTrueText(CStr(g), pt)
@@ -161,7 +161,7 @@ Public Class XR_StableLine_FAST : Inherits TaskParent
         dst3 = basics.dst3
         dst2 = basics.dst2
         For Each pt In basics.ptList
-        cv.Cv2.Circle(dst2, pt, task.DotSize + 1, task.highlight, -1, task.lineType)
+        Circle(dst2, pt, task.DotSize + 1, task.highlight, -1, task.lineType)
             If standaloneTest() Then
                 Dim g = basics.facetGen.dst0.Get(Of Integer)(pt.Y, pt.X)
                 SetTrueText(CStr(g), pt)

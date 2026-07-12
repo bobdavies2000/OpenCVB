@@ -21,11 +21,11 @@ Public Class Font_Basics : Inherits TaskParent
                 size = 1.5 - i * 0.1
                 msg = hersheyName + " " + size.ToString(fmt1)
             End If
-            cv.Cv2.PutText(dst2, msg, New cv.Point(10, 30 + i * 30),
+            PutText(dst2, msg, New cv.Point(10, 30 + i * 30),
                                    hersheyFont, size, white, task.lineWidth, task.lineType)
             If standalone Then
                 Dim hersheyFontItalics = hersheyFont + cv.HersheyFonts.Italic
-                cv.Cv2.PutText(dst3, hersheyName + " " + size.ToString(fmt1), New cv.Point(10, 30 + i * 30), hersheyFontItalics, size, white, task.lineWidth, task.lineType)
+                PutText(dst3, hersheyName + " " + size.ToString(fmt1), New cv.Point(10, 30 + i * 30), hersheyFontItalics, size, white, task.lineWidth, task.lineType)
             End If
         Next
     End Sub

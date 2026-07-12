@@ -15,7 +15,7 @@ Public Class Resize_Basics : Inherits TaskParent
             newSize = task.drawRect.Size
         End If
 
-        cv.Cv2.Resize(src, dst2, newSize, 0, 0, options.warpFlag)
+        Resize(src, dst2, newSize, 0, 0, options.warpFlag)
     End Sub
 End Class
 
@@ -39,7 +39,7 @@ Public Class Resize_Smaller : Inherits TaskParent
         newSize = New cv.Size(Math.Ceiling(src.Width * optGrid.lowResPercent),
                                    Math.Ceiling(src.Height * optGrid.lowResPercent))
 
-        cv.Cv2.Resize(src, dst2, newSize, 0, 0, options.warpFlag)
+        Resize(src, dst2, newSize, 0, 0, options.warpFlag)
         labels(2) = "Image after resizing to: " + CStr(newSize.Width) + "X" + CStr(newSize.Height)
     End Sub
 End Class
@@ -71,7 +71,7 @@ Public Class Resize_Proportional : Inherits TaskParent
         Else
             newSize = New cv.Size(dst2.Width * dst0.Height / dst0.Width, dst2.Height)
         End If
-        cv.Cv2.Resize(src, src, newSize, 0, 0, cv.InterpolationFlags.Nearest)
+        Resize(src, src, newSize, 0, 0, cv.InterpolationFlags.Nearest)
         Dim newRect = New cv.Rect(0, 0, newSize.Width, newSize.Height)
         dst3.SetTo(0)
         src.CopyTo(dst3(newRect))

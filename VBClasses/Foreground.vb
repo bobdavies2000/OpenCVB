@@ -9,8 +9,8 @@ Public Class Foreground_Basics_TA : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If task.heartBeat Or hist.histogram.Total = 0 Then
-            cv.Cv2.Threshold(task.pcSplit(2), dst1, task.MaxZmeters, 255, cv.ThresholdTypes.BinaryInv)
-            cv.Cv2.ConvertScaleAbs(dst1, dst1)
+            Threshold(task.pcSplit(2), dst1, task.MaxZmeters, 255, cv.ThresholdTypes.BinaryInv)
+            ConvertScaleAbs(dst1, dst1)
             dst1.SetTo(0, task.noDepthMask)
             dst0 = task.pcSplit(2).Clone
             dst0.SetTo(0, Not dst1)
@@ -22,7 +22,7 @@ Public Class Foreground_Basics_TA : Inherits TaskParent
             Dim histArray(hist.histogram.Total - 1) As Single
             hist.histogram.GetArray(Of Single)(histArray)
 
-            Dim totalSamples = cv.Cv2.CountNonZero(task.pcSplit(2))
+            Dim totalSamples = CountNonZero(task.pcSplit(2))
             Dim accum As Single = 0
             Dim incr As Single = task.MaxZmeters / task.histogramBins
             foregroundMaxDepth = 0
@@ -33,8 +33,8 @@ Public Class Foreground_Basics_TA : Inherits TaskParent
             Next
         End If
 
-        cv.Cv2.Threshold(task.pcSplit(2), task.foregroundMask, foregroundMaxDepth, 255, cv.ThresholdTypes.BinaryInv)
-        cv.Cv2.ConvertScaleAbs(task.foregroundMask, task.foregroundMask)
+        Threshold(task.pcSplit(2), task.foregroundMask, foregroundMaxDepth, 255, cv.ThresholdTypes.BinaryInv)
+        ConvertScaleAbs(task.foregroundMask, task.foregroundMask)
         task.foregroundMask.SetTo(0, task.noDepthMask)
 
         If standaloneTest() Then dst3 = task.foregroundMask
@@ -65,9 +65,9 @@ Public Class XR_Foreground_KMeansDepth : Inherits TaskParent
         Dim sortedMats As New SortedList(Of Single, Integer)(New compareAllowIdenticalSingle)
         For i = 0 To classCount - 1
             Dim tmp As New cv.Mat
-            cv.Cv2.InRange(simK.dst2, i, i, tmp)
+            InRange(simK.dst2, i, i, tmp)
             depthMats.Add(tmp.Clone)
-            Dim depth = cv.Cv2.Mean(task.pcSplit(2), tmp)(0)
+            Dim depth = Mean(task.pcSplit(2), tmp)(0)
             sortedMats.Add(depth, i)
         Next
 
@@ -81,8 +81,8 @@ Public Class XR_Foreground_KMeansDepth : Inherits TaskParent
             dst1.SetTo(index + 1, tmp)
         Next
         dst2 = Palettize(dst1)
-        cv.Cv2.Threshold(task.pcSplit(2), fg, fgDepth, 255, cv.ThresholdTypes.BinaryInv)
-        cv.Cv2.ConvertScaleAbs(fg, fg)
+        Threshold(task.pcSplit(2), fg, fgDepth, 255, cv.ThresholdTypes.BinaryInv)
+        ConvertScaleAbs(fg, fg)
         dst0 = fg
 
         fg.SetTo(0, task.noDepthMask)
@@ -112,8 +112,8 @@ Public Class XR_Foreground_KMeans : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         task.optionsChanged = True
 
-        cv.Cv2.Threshold(task.pcSplit(2), src, 1, 255, cv.ThresholdTypes.BinaryInv)
-        cv.Cv2.ConvertScaleAbs(src, src)
+        Threshold(task.pcSplit(2), src, 1, 255, cv.ThresholdTypes.BinaryInv)
+        ConvertScaleAbs(src, src)
         km.Run(src)
 
         Dim minDistance = Single.MaxValue
@@ -151,7 +151,7 @@ Public Class XR_Foreground_Hist3D : Inherits TaskParent
         hcloud.Run(src)
 
         dst2.SetTo(0)
-        cv.Cv2.InRange(hcloud.dst2, 1, 1, dst2)
+        InRange(hcloud.dst2, 1, 1, dst2)
         dst2 = dst2 Or task.noDepthMask
         dst3 = Not dst2
     End Sub

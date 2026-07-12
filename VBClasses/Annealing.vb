@@ -12,8 +12,8 @@ Public Class Annealing_Basics_CPP : Inherits TaskParent
     Public Sub drawMap()
         dst2.SetTo(0)
         For i = 0 To cityOrder.Length - 1
-        cv.Cv2.Circle(dst2, cityPositions(i), task.DotSize, white, -1, task.lineType)
-            cv.Cv2.Line(dst2, cityPositions(i), cityPositions(cityOrder(i)), white, task.lineWidth, task.lineType)
+        Circle(dst2, cityPositions(i), task.DotSize, white, -1, task.lineType)
+            Line(dst2, cityPositions(i), cityPositions(cityOrder(i)), white, task.lineWidth, task.lineType)
         Next
         SetTrueText("Energy" + vbCrLf + energy.ToString(fmt0), New cv.Point(10, 100), 2)
     End Sub

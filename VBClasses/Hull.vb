@@ -21,11 +21,11 @@ Public Class Hull_Basics : Inherits TaskParent
             random.Run(src)
             dst2.SetTo(0)
             For Each pt In random.PointList
-            cv.Cv2.Circle(dst2, pt, task.DotSize, white, -1, task.lineType)
+            Circle(dst2, pt, task.DotSize, white, -1, task.lineType)
             Next
             inputPoints = New List(Of cv.Point2f)(random.PointList)
         End If
-        Dim hull2f = cv.Cv2.ConvexHull(inputPoints, True)
+        Dim hull2f = ConvexHull(inputPoints, True)
         hull = vbFloat2Int(hull2f.ToList)
         DrawTour(dst2, hull, cv.Scalar.Yellow)
     End Sub
@@ -53,7 +53,7 @@ Public Class XR_Hull_Defect : Inherits TaskParent
             contour = hContour.contours1.sortContours.allContours(0)
         End If
 
-        Dim hullIndices = cv.Cv2.ConvexHullIndices(contour, False)
+        Dim hullIndices = ConvexHullIndices(contour, False)
         For i = 0 To contour.Count - 1
             Dim p1 = contour(i)
             For j = i + 1 To contour.Count - 1
@@ -65,7 +65,7 @@ Public Class XR_Hull_Defect : Inherits TaskParent
             Next
         Next
 
-        Dim defects = cv.Cv2.ConvexityDefects(contour, hullIndices.ToList)
+        Dim defects = ConvexityDefects(contour, hullIndices.ToList)
 
         Dim lastV As Integer = -1
         Dim newC As New List(Of cv.Point)
@@ -108,7 +108,7 @@ Public Class Hull_Contour : Inherits TaskParent
         dst3.SetTo(0)
         If contours1.sortContours.allContours.Count > 0 Then
             If contours1.sortContours.allContours(0).Count > 0 Then
-                hull = cv.Cv2.ConvexHull(contours1.sortContours.allContours(0), True).ToList
+                hull = ConvexHull(contours1.sortContours.allContours(0), True).ToList
 
                 If contours2.sortContours.allContours.Count > 0 Then
                     If contours1.sortContours.allContours(0).Count > 0 Then

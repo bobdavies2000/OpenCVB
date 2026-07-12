@@ -15,18 +15,18 @@ Public Class Structured_Basics : Inherits TaskParent
         struct.Run(src)
         lines.Run(struct.dst2)
 
-        cv.Cv2.CvtColor(task.leftView, dst2, cv.ColorConversionCodes.GRAY2BGR)
+        CvtColor(task.leftView, dst2, cv.ColorConversionCodes.GRAY2BGR)
         lpListX = New List(Of lpData)(lines.lpList)
         For Each lp In lines.lpList
-            cv.Cv2.Line(dst2, lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
+            Line(dst2, lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
         Next
         labels(2) = struct.labels(2)
 
         lines.Run(struct.dst3)
-        cv.Cv2.CvtColor(task.leftView, dst3, cv.ColorConversionCodes.GRAY2BGR)
+        CvtColor(task.leftView, dst3, cv.ColorConversionCodes.GRAY2BGR)
         lpListY = New List(Of lpData)(lines.lpList)
         For Each lp In lines.lpList
-            cv.Cv2.Line(dst3, lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
+            Line(dst3, lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
         Next
         labels(3) = struct.labels(3)
     End Sub
@@ -52,7 +52,7 @@ Public Class Structured_Core : Inherits TaskParent
             End If
             Dim minVal = sliceY - task.metersPerPixel
             Dim maxVal = sliceY + task.metersPerPixel
-                          cv.Cv2.InRange(task.pcSplit(1), minVal, maxVal, depthMask)
+                          InRange(task.pcSplit(1), minVal, maxVal, depthMask)
             dst2.SetTo(255, depthMask)
             If minVal < 0 And maxVal > 0 Then dst2.SetTo(0, task.noDepthMask)
         Next
@@ -65,7 +65,7 @@ Public Class Structured_Core : Inherits TaskParent
             End If
             Dim minVal = sliceX - task.metersPerPixel
             Dim maxVal = sliceX + task.metersPerPixel
-                          cv.Cv2.InRange(task.pcSplit(0), minVal, maxVal, depthMask)
+                          InRange(task.pcSplit(0), minVal, maxVal, depthMask)
             dst3.SetTo(255, depthMask)
             If minVal < 0 And maxVal > 0 Then dst3.SetTo(0, task.noDepthMask)
         Next
@@ -91,7 +91,7 @@ Public Class XR_Structured_MultiSliceLines : Inherits TaskParent
         dst3 = multi.dst3
 
         Dim _core_cvt As New cv.Mat
-        cv.Cv2.CvtColor(dst3, _core_cvt, cv.ColorConversionCodes.BGR2GRAY)
+        CvtColor(dst3, _core_cvt, cv.ColorConversionCodes.BGR2GRAY)
         core.Run(_core_cvt)
         dst2 = core.dst2
     End Sub
@@ -121,9 +121,9 @@ Public Class XR_Structured_CountTop : Inherits TaskParent
 
         Dim minVal = planeX - task.metersPerPixel
         Dim maxVal = planeX + task.metersPerPixel
-        cv.Cv2.InRange(task.pcSplit(0).Clone, minVal, maxVal, sliceMask)
+        InRange(task.pcSplit(0).Clone, minVal, maxVal, sliceMask)
         If minVal < 0 And maxVal > 0 Then sliceMask.SetTo(0, task.noDepthMask) ' don't include zero depth locations
-        counts.Add(cv.Cv2.CountNonZero(sliceMask))
+        counts.Add(CountNonZero(sliceMask))
         Return sliceMask
     End Function
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -140,7 +140,7 @@ Public Class XR_Structured_CountTop : Inherits TaskParent
         dst0 = makeXSlice(index)
         dst2 = task.color.Clone
         dst2.SetTo(white, dst0)
-        cv.Cv2.Line(dst1, New cv.Point(index, 0), New cv.Point(index, dst1.Height), cv.Scalar.Red, slice.options.sliceSize)
+        Line(dst1, New cv.Point(index, 0), New cv.Point(index, dst1.Height), cv.Scalar.Red, slice.options.sliceSize)
 
         Dim hist As cv.Mat = cv.Mat.FromPixelData(dst0.Width, 1, cv.MatType.CV_32F, counts.ToArray)
         plot.Run(hist)
@@ -179,7 +179,7 @@ Public Class XR_Structured_MultiSliceH : Inherits TaskParent
             Dim minVal As Double, maxVal As Double
             minVal = planeY - task.metersPerPixel
             maxVal = planeY + task.metersPerPixel
-            cv.Cv2.InRange(task.pcSplit(1).Clone, minVal, maxVal, depthMask)
+            InRange(task.pcSplit(1).Clone, minVal, maxVal, depthMask)
             sliceMask.SetTo(255, depthMask)
             If minVal < 0 And maxVal > 0 Then sliceMask.SetTo(0, task.noDepthMask)
         Next
@@ -213,13 +213,13 @@ Public Class XR_Structured_SliceXPlot : Inherits TaskParent
                                    options.sliceSize), dst3.Height - 1)
         Dim mm As mmData = GetMinMax(multi.heat.topframes.dst2(rect))
 
-        cv.Cv2.Circle(dst3, New cv.Point(col, mm.maxLoc.Y), task.DotSize + 3, cv.Scalar.Yellow, -1, task.lineType)
+        Circle(dst3, New cv.Point(col, mm.maxLoc.Y), task.DotSize + 3, cv.Scalar.Yellow, -1, task.lineType)
 
         dst2 = task.color.Clone
         Dim filterZ = (dst3.Height - mm.maxLoc.Y) / dst3.Height * task.MaxZmeters
         If filterZ > 0 Then
             Dim depthMask As New cv.Mat
-            cv.Cv2.InRange(task.pcSplit(2), filterZ - 0.05, filterZ + 0.05, depthMask) ' a 10 cm buffer surrounding the z value
+            InRange(task.pcSplit(2), filterZ - 0.05, filterZ + 0.05, depthMask) ' a 10 cm buffer surrounding the z value
             dst2.SetTo(white, depthMask)
         End If
 
@@ -253,13 +253,13 @@ Public Class XR_Structured_SliceYPlot : Inherits TaskParent
         Dim mm As mmData = GetMinMax(multi.heat.sideframes.dst2(rect))
 
         If mm.maxVal > 0 Then
-        cv.Cv2.Circle(dst3, New cv.Point(mm.maxLoc.X, row), task.DotSize + 3, cv.Scalar.Yellow, -1, task.lineType)
+        Circle(dst3, New cv.Point(mm.maxLoc.X, row), task.DotSize + 3, cv.Scalar.Yellow, -1, task.lineType)
             ' dst3.Line(New cv.Point(mm.maxLoc.X, 0), New cv.Point(mm.maxLoc.X, dst3.Height), task.highlight, task.lineWidth, task.lineType)
             Dim filterZ = mm.maxLoc.X / dst3.Width * task.MaxZmeters
 
             Dim depthMask As New cv.Mat
 
-            cv.Cv2.InRange(task.pcSplit(2), filterZ - 0.05, filterZ + 0.05, depthMask) ' a 10 cm buffer surrounding the z value
+            InRange(task.pcSplit(2), filterZ - 0.05, filterZ + 0.05, depthMask) ' a 10 cm buffer surrounding the z value
             dst2 = task.color.Clone
             dst2.SetTo(white, depthMask)
             Dim pixelsPerMeter = dst2.Width / task.MaxZmeters
@@ -297,13 +297,13 @@ Public Class Structured_SliceEither : Inherits TaskParent
             If sliceVal > task.topCameraPoint.X Then planeX = task.xRange * (sliceVal - task.topCameraPoint.X) / (dst3.Width - task.topCameraPoint.X)
             minVal = planeX - task.metersPerPixel
             maxVal = planeX + task.metersPerPixel
-                          cv.Cv2.InRange(task.pcSplit(0), minVal, maxVal, sliceMask)
+                          InRange(task.pcSplit(0), minVal, maxVal, sliceMask)
         Else
             Dim planeY = -task.yRange * (task.sideCameraPoint.Y - sliceVal) / task.sideCameraPoint.Y
             If sliceVal > task.sideCameraPoint.Y Then planeY = task.yRange * (sliceVal - task.sideCameraPoint.Y) / (dst3.Height - task.sideCameraPoint.Y)
             minVal = planeY - task.metersPerPixel
             maxVal = planeY + task.metersPerPixel
-                          cv.Cv2.InRange(task.pcSplit(1), minVal, maxVal, sliceMask)
+                          InRange(task.pcSplit(1), minVal, maxVal, sliceMask)
         End If
 
         If minVal < 0 And maxVal > 0 Then sliceMask.SetTo(0, task.noDepthMask)
@@ -314,14 +314,14 @@ Public Class Structured_SliceEither : Inherits TaskParent
         labels(3) = heat.labels(3)
 
         dst3 = heat.dst3
-        cv.Cv2.Circle(dst3, New cv.Point(task.topCameraPoint.X, dst3.Height), task.DotSize, cv.Scalar.Yellow, -1, task.lineType)
+        Circle(dst3, New cv.Point(task.topCameraPoint.X, dst3.Height), task.DotSize, cv.Scalar.Yellow, -1, task.lineType)
         If topView Then
-            cv.Cv2.Line(dst3, New cv.Point(sliceVal, 0), New cv.Point(sliceVal, dst3.Height),
+            Line(dst3, New cv.Point(sliceVal, 0), New cv.Point(sliceVal, dst3.Height),
                           cv.Scalar.Yellow, task.lineWidth)
         Else
             Dim yPlaneOffset = If(sliceVal < dst3.Height - options.sliceSize, CInt(sliceVal),
                                       dst3.Height - options.sliceSize - 1)
-            cv.Cv2.Line(dst3, New cv.Point(0, yPlaneOffset), New cv.Point(dst3.Width, yPlaneOffset), cv.Scalar.Yellow,
+            Line(dst3, New cv.Point(0, yPlaneOffset), New cv.Point(dst3.Width, yPlaneOffset), cv.Scalar.Yellow,
                           options.sliceSize)
         End If
         If standaloneTest() Then
@@ -359,7 +359,7 @@ Public Class XR_Structured_TransformH : Inherits TaskParent
         Dim thicknessMeters = options.sliceSize * task.metersPerPixel
         Dim minVal = planeY - thicknessMeters
         Dim maxVal = planeY + thicknessMeters
-        cv.Cv2.InRange(task.pcSplit(1), minVal, maxVal, sliceMask)
+        InRange(task.pcSplit(1), minVal, maxVal, sliceMask)
 
         labels(2) = "At offset " + CStr(ycoordinate) + " y = " + ((maxVal + minVal) / 2).ToString(fmt2) + " with " +
                         (Math.Abs(maxVal - minVal) * 100).ToString(fmt2) + " cm width"
@@ -405,7 +405,7 @@ Public Class XR_Structured_TransformV : Inherits TaskParent
         Dim thicknessMeters = options.sliceSize * task.metersPerPixel
         Dim minVal = planeX - thicknessMeters
         Dim maxVal = planeX + thicknessMeters
-        cv.Cv2.InRange(task.pcSplit(0), minVal, maxVal, sliceMask)
+        InRange(task.pcSplit(0), minVal, maxVal, sliceMask)
 
         labels(2) = "At offset " + CStr(xCoordinate) + " x = " + ((maxVal + minVal) / 2).ToString(fmt2) + " with " +
                         (Math.Abs(maxVal - minVal) * 100).ToString(fmt2) + " cm width"
@@ -458,22 +458,22 @@ Public Class XR_Structured_CountSide : Inherits TaskParent
 
             Dim sliceMask As New cv.Mat
 
-            cv.Cv2.InRange(task.pcSplit(1), minVal, maxVal, sliceMask)
+            InRange(task.pcSplit(1), minVal, maxVal, sliceMask)
             If minVal < 0 And maxVal > 0 Then sliceMask.SetTo(0, task.noDepthMask) ' don't include zero depth locations
-        counts.Add(cv.Cv2.CountNonZero(sliceMask))
+        counts.Add(CountNonZero(sliceMask))
             yValues.Add(planeY)
         Next
 
         Dim max = counts.Max
         maxCountIndex = counts.IndexOf(max)
-        cv.Cv2.Line(dst2, New cv.Point(0, maxCountIndex), New cv.Point(dst2.Width, maxCountIndex), cv.Scalar.Red, slice.options.sliceSize)
+        Line(dst2, New cv.Point(0, maxCountIndex), New cv.Point(dst2.Width, maxCountIndex), cv.Scalar.Red, slice.options.sliceSize)
 
         Dim hist As cv.Mat = cv.Mat.FromPixelData(dst0.Height, 1, cv.MatType.CV_32F, counts.ToArray)
         plot.dst2 = New cv.Mat(dst2.Height, dst2.Height, cv.MatType.CV_8UC3, cv.Scalar.All(0))
         plot.Run(hist)
         dst3 = plot.dst2
 
-        cv.Cv2.Resize(dst3, dst3, New cv.Size(dst2.Width, dst2.Width))
+        Resize(dst3, dst3, New cv.Size(dst2.Width, dst2.Width))
         rotate.Run(dst3)
         dst3 = rotate.dst2
         SetTrueText("Max flat surface at: " + vbCrLf + yValues(maxCountIndex).ToString(fmt3), 2)
@@ -493,7 +493,7 @@ Public Class XR_Structured_CountSideSum : Inherits TaskParent
         desc = "Count the number of points found in each slice of the point cloud data."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        cv.Cv2.CalcHist({task.pointCloud}, task.channelsSide, New cv.Mat, dst2, 2, task.bins2D, task.rangesSide)
+        CalcHist({task.pointCloud}, task.channelsSide, New cv.Mat, dst2, 2, task.bins2D, task.rangesSide)
         dst2.Col(0).SetTo(0)
 
         counts.Clear()
@@ -501,12 +501,12 @@ Public Class XR_Structured_CountSideSum : Inherits TaskParent
         Dim ratio = task.yRange / task.yRangeDefault
         For i = 0 To dst2.Height - 1
             Dim planeY = task.yRange * (i - task.sideCameraPoint.Y) / task.sideCameraPoint.Y
-            Dim sumRow As Single = cv.Cv2.Sum(dst2.Row(i))
+            Dim sumRow As Single = Sum(dst2.Row(i))
             counts.Add(sumRow)
             yValues.Add(planeY * ratio)
         Next
 
-        cv.Cv2.Threshold(dst2, dst2, 0, cv.Scalar.White, cv.ThresholdTypes.Binary)
+        Threshold(dst2, dst2, 0, cv.Scalar.White, cv.ThresholdTypes.Binary)
 
         Dim max = counts.Max
         If max = 0 Then Exit Sub
@@ -514,7 +514,7 @@ Public Class XR_Structured_CountSideSum : Inherits TaskParent
         Dim surfaces As New List(Of Single)
         For i = 0 To counts.Count - 1
             If counts(i) >= max / 2 Then
-                cv.Cv2.Line(dst2, New cv.Point(0, i), New cv.Point(dst2.Width, i), white, task.lineWidth, task.lineType)
+                Line(dst2, New cv.Point(0, i), New cv.Point(dst2.Width, i), white, task.lineWidth, task.lineType)
                 surfaces.Add(yValues(i))
             End If
         Next
@@ -532,7 +532,7 @@ Public Class XR_Structured_CountSideSum : Inherits TaskParent
         Dim barHeight = dst2.Height / counts.Count
         For i = 0 To counts.Count - 1
             Dim w = dst2.Width * counts(i) / max
-            cv.Cv2.Rectangle(dst3, New cv.Rect(0, i * barHeight, w, barHeight), cv.Scalar.Black, -1)
+            Rectangle(dst3, New cv.Rect(0, i * barHeight, w, barHeight), cv.Scalar.Black, -1)
         Next
     End Sub
 End Class
@@ -566,7 +566,7 @@ Public Class Structured_SliceV : Inherits TaskParent
         Dim thicknessMeters = options.sliceSize * task.metersPerPixel
         Dim minVal = planeX - thicknessMeters
         Dim maxVal = planeX + thicknessMeters
-        cv.Cv2.InRange(task.pcSplit(0), minVal, maxVal, sliceMask)
+        InRange(task.pcSplit(0), minVal, maxVal, sliceMask)
         If minVal < 0 And maxVal > 0 Then sliceMask.SetTo(0, task.noDepthMask)
 
         labels(2) = "At offset " + CStr(xCoordinate) + " x = " + ((maxVal + minVal) / 2).ToString(fmt2) +
@@ -575,8 +575,8 @@ Public Class Structured_SliceV : Inherits TaskParent
         labels(3) = heat.labels(3)
 
         dst3 = heat.dst2
-        cv.Cv2.Circle(dst3, New cv.Point(task.topCameraPoint.X, 0), task.DotSize, task.highlight, -1, task.lineType)
-        cv.Cv2.Line(dst3, New cv.Point(xCoordinate, 0), New cv.Point(xCoordinate, dst3.Height), task.highlight, options.sliceSize)
+        Circle(dst3, New cv.Point(task.topCameraPoint.X, 0), task.DotSize, task.highlight, -1, task.lineType)
+        Line(dst3, New cv.Point(xCoordinate, 0), New cv.Point(xCoordinate, dst3.Height), task.highlight, options.sliceSize)
         If standaloneTest() Then
             dst2 = src
             dst2.SetTo(white, sliceMask)
@@ -611,7 +611,7 @@ Public Class Structured_SliceH : Inherits TaskParent
         Dim thicknessMeters = options.sliceSize * task.metersPerPixel
         Dim minVal = sliceY - thicknessMeters
         Dim maxVal = sliceY + thicknessMeters
-        cv.Cv2.InRange(task.pcSplit(1), minVal, maxVal, sliceMask)
+        InRange(task.pcSplit(1), minVal, maxVal, sliceMask)
 
         labels(2) = "At offset " + CStr(ycoordinate) + " y = " + ((maxVal + minVal) / 2).ToString(fmt2) +
                         " with " + (Math.Abs(maxVal - minVal) * 100).ToString(fmt2) + " cm width"
@@ -620,8 +620,8 @@ Public Class Structured_SliceH : Inherits TaskParent
 
         dst3 = heat.dst3
         Dim yPlaneOffset = If(ycoordinate < dst3.Height - options.sliceSize, CInt(ycoordinate), dst3.Height - options.sliceSize - 1)
-        cv.Cv2.Circle(dst3, New cv.Point(0, task.sideCameraPoint.Y), task.DotSize, task.highlight, -1, task.lineType)
-        cv.Cv2.Line(dst3, New cv.Point(0, yPlaneOffset), New cv.Point(dst3.Width, yPlaneOffset), task.highlight, options.sliceSize)
+        Circle(dst3, New cv.Point(0, task.sideCameraPoint.Y), task.DotSize, task.highlight, -1, task.lineType)
+        Line(dst3, New cv.Point(0, yPlaneOffset), New cv.Point(dst3.Width, yPlaneOffset), task.highlight, options.sliceSize)
         If standaloneTest() Then
             dst2 = src
             dst2.SetTo(white, sliceMask)
@@ -644,19 +644,19 @@ Public Class XR_Structured_SurveyH : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         If src.Type <> cv.MatType.CV_32FC3 Then src = task.pointCloud
 
-        cv.Cv2.CalcHist({src}, task.channelsSide, New cv.Mat, dst3, 2, task.bins2D, task.rangesSide)
+        CalcHist({src}, task.channelsSide, New cv.Mat, dst3, 2, task.bins2D, task.rangesSide)
         dst3.Col(0).SetTo(0)
-        cv.Cv2.Threshold(dst3, dst3, 0, 255, cv.ThresholdTypes.Binary)
+        Threshold(dst3, dst3, 0, 255, cv.ThresholdTypes.Binary)
         dst3.ConvertTo(dst3, cv.MatType.CV_8U)
 
         Dim topRow As Integer
         For topRow = 0 To dst2.Height - 1
-If cv.Cv2.CountNonZero(dst3.Row(topRow)) Then Exit For
+If CountNonZero(dst3.Row(topRow)) Then Exit For
         Next
 
         Dim botRow As Integer
         For botRow = dst2.Height - 1 To 0 Step -1
-If cv.Cv2.CountNonZero(dst3.Row(botRow)) Then Exit For
+If CountNonZero(dst3.Row(botRow)) Then Exit For
         Next
 
         Dim index As Integer
@@ -667,7 +667,7 @@ If cv.Cv2.CountNonZero(dst3.Row(botRow)) Then Exit For
             Dim minVal = sliceY - task.metersPerPixel
             Dim maxVal = sliceY + task.metersPerPixel
             If minVal < 0 And maxVal > 0 Then Continue For
-                          cv.Cv2.InRange(task.pcSplit(1), minVal, maxVal, dst0)
+                          InRange(task.pcSplit(1), minVal, maxVal, dst0)
             dst2.SetTo(task.scalarColors(index Mod 256), dst0)
             index += 1
         Next
@@ -689,19 +689,19 @@ Public Class XR_Structured_SurveyV : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         If src.Type <> cv.MatType.CV_32FC3 Then src = task.pointCloud
 
-        cv.Cv2.CalcHist({src}, task.channelsTop, New cv.Mat, dst3, 2, task.bins2D, task.rangesTop)
+        CalcHist({src}, task.channelsTop, New cv.Mat, dst3, 2, task.bins2D, task.rangesTop)
         dst3.Row(0).SetTo(0)
-        cv.Cv2.Threshold(dst3, dst3, 0, 255, cv.ThresholdTypes.Binary)
+        Threshold(dst3, dst3, 0, 255, cv.ThresholdTypes.Binary)
         dst3.ConvertTo(dst3, cv.MatType.CV_8U)
 
         Dim column As Integer
         For column = 0 To dst2.Width - 1
-If cv.Cv2.CountNonZero(dst3.Col(column)) Then Exit For
+If CountNonZero(dst3.Col(column)) Then Exit For
         Next
 
         Dim lastColumn As Integer
         For lastColumn = dst2.Width - 1 To 0 Step -1
-If cv.Cv2.CountNonZero(dst3.Col(lastColumn)) Then Exit For
+If CountNonZero(dst3.Col(lastColumn)) Then Exit For
         Next
 
         Dim index As Integer
@@ -712,7 +712,7 @@ If cv.Cv2.CountNonZero(dst3.Col(lastColumn)) Then Exit For
             Dim minVal = sliceX - task.metersPerPixel
             Dim maxVal = sliceX + task.metersPerPixel
             If minVal < 0 And maxVal > 0 Then Continue For
-                          cv.Cv2.InRange(task.pcSplit(0), minVal, maxVal, dst0)
+                          InRange(task.pcSplit(0), minVal, maxVal, dst0)
             dst2.SetTo(task.scalarColors(index Mod 256), dst0)
             index += 1
         Next
@@ -739,19 +739,19 @@ Public Class XR_Structured_MultiSlicePolygon : Inherits TaskParent
 
         multi.Run(src)
         dst2 = Not multi.dst3
-        If dst2.Channels <> 1 Then cv.Cv2.CvtColor(dst2, dst2, cv.ColorConversionCodes.BGR2GRAY)
-        Dim rawContours = cv.Cv2.FindContoursAsArray(dst2, cv.RetrievalModes.Tree,
+        If dst2.Channels <> 1 Then CvtColor(dst2, dst2, cv.ColorConversionCodes.BGR2GRAY)
+        Dim rawContours = FindContoursAsArray(dst2, cv.RetrievalModes.Tree,
                                                           cv.ContourApproximationModes.ApproxSimple)
         Dim contours(rawContours.Length - 1)() As cv.Point
         For j = 0 To rawContours.Length - 1
-            contours(j) = cv.Cv2.ApproxPolyDP(rawContours(j), 3, True)
+            contours(j) = ApproxPolyDP(rawContours(j), 3, True)
         Next
 
         dst3.SetTo(0)
         For i = 0 To contours.Length - 1
             If contours(i).Length = 2 Then Continue For
             If contours(i).Length <= options.maxSides Then
-                cv.Cv2.DrawContours(dst3, contours, i, New cv.Scalar(0, 255, 255), task.lineWidth + 1, task.lineType)
+                DrawContours(dst3, contours, i, New cv.Scalar(0, 255, 255), task.lineWidth + 1, task.lineType)
             End If
         Next
     End Sub
@@ -789,7 +789,7 @@ Public Class Structured_MultiSlice : Inherits TaskParent
             minVal = planeX - task.metersPerPixel
             maxVal = planeX + task.metersPerPixel
             Dim depthMask As New cv.Mat
-            cv.Cv2.InRange(task.pcSplit(0), minVal, maxVal, depthMask)
+            InRange(task.pcSplit(0), minVal, maxVal, depthMask)
             dst2.SetTo(classCount, depthMask)
             classCount += 1
         Next
@@ -802,7 +802,7 @@ Public Class Structured_MultiSlice : Inherits TaskParent
             minVal = planeY - task.metersPerPixel
             maxVal = planeY + task.metersPerPixel
             Dim depthMask As New cv.Mat
-            cv.Cv2.InRange(task.pcSplit(1), minVal, maxVal, depthMask)
+            InRange(task.pcSplit(1), minVal, maxVal, depthMask)
             dst2.SetTo(classCount, depthMask)
             classCount += 1
         Next
@@ -839,7 +839,7 @@ Public Class XR_Structured_MultiSliceV : Inherits TaskParent
             Dim minVal As Double, maxVal As Double
             minVal = planeX - task.metersPerPixel
             maxVal = planeX + task.metersPerPixel
-            cv.Cv2.InRange(task.pcSplit(0).Clone, minVal, maxVal, depthMask)
+            InRange(task.pcSplit(0).Clone, minVal, maxVal, depthMask)
             sliceMask.SetTo(255, depthMask)
             If minVal < 0 And maxVal > 0 Then sliceMask.SetTo(0, task.noDepthMask)
         Next
@@ -877,60 +877,60 @@ Public Class XR_Structured_LinearizeFloor : Inherits TaskParent
         Dim imuPC = task.pointCloud.Clone
         imuPC.SetTo(0, Not sliceMask)
 
-If cv.Cv2.CountNonZero(sliceMask) > 0 Then
-            Dim split = cv.Cv2.Split(imuPC)
+        If CountNonZero(sliceMask) > 0 Then
+            Dim splitMats = Split(imuPC)
             If options.xCheck Then
-                Dim mm As mmData = GetMinMax(split(0), sliceMask)
+                Dim mm As mmData = GetMinMax(splitMats(0), sliceMask)
 
                 Dim firstCol As Integer, lastCol As Integer
                 For firstCol = 0 To sliceMask.Width - 1
-If cv.Cv2.CountNonZero(sliceMask.Col(firstCol)) > 0 Then Exit For
+                    If CountNonZero(sliceMask.Col(firstCol)) > 0 Then Exit For
                 Next
                 For lastCol = sliceMask.Width - 1 To 0 Step -1
-If cv.Cv2.CountNonZero(sliceMask.Col(lastCol)) Then Exit For
+                    If CountNonZero(sliceMask.Col(lastCol)) Then Exit For
                 Next
 
                 Dim xIncr = (mm.maxVal - mm.minVal) / (lastCol - firstCol)
                 For i = firstCol To lastCol
                     Dim maskCol = sliceMask.Col(i)
-If cv.Cv2.CountNonZero(maskCol) > 0 Then split(0).Col(i).SetTo(mm.minVal + xIncr * i, maskCol)
+                    If CountNonZero(maskCol) > 0 Then splitMats(0).Col(i).SetTo(mm.minVal + xIncr * i, maskCol)
                 Next
             End If
 
             If options.yCheck Then
-                Dim mm As mmData = GetMinMax(split(1), sliceMask)
+                Dim mm As mmData = GetMinMax(splitMats(1), sliceMask)
                 kalman.kInput = (mm.minVal + mm.maxVal) / 2
                 kalman.Run(src)
                 floorYPlane = kalman.kAverage
-                split(1).SetTo(floorYPlane, sliceMask)
+                splitMats(1).SetTo(floorYPlane, sliceMask)
             End If
 
             If options.zCheck Then
                 Dim firstRow As Integer, lastRow As Integer
                 For firstRow = 0 To sliceMask.Height - 1
-If cv.Cv2.CountNonZero(sliceMask.Row(firstRow)) > 20 Then Exit For
+                    If CountNonZero(sliceMask.Row(firstRow)) > 20 Then Exit For
                 Next
                 For lastRow = sliceMask.Height - 1 To 0 Step -1
-If cv.Cv2.CountNonZero(sliceMask.Row(lastRow)) > 20 Then Exit For
+                    If CountNonZero(sliceMask.Row(lastRow)) > 20 Then Exit For
                 Next
 
                 If lastRow >= 0 And firstRow < sliceMask.Height Then
-                    Dim meanMin = cv.Cv2.Mean(split(2).Row(lastRow), sliceMask.Row(lastRow))
-                    Dim meanMax = cv.Cv2.Mean(split(2).Row(firstRow), sliceMask.Row(firstRow))
+                    Dim meanMin = Mean(splitMats(2).Row(lastRow), sliceMask.Row(lastRow))
+                    Dim meanMax = Mean(splitMats(2).Row(firstRow), sliceMask.Row(firstRow))
                     Dim zIncr = (meanMax(0) - meanMin(0)) / Math.Abs(lastRow - firstRow)
                     For i = firstRow To lastRow
                         Dim maskRow = sliceMask.Row(i)
-                        Dim mean = cv.Cv2.Mean(split(2).Row(i), maskRow)
-If cv.Cv2.CountNonZero(maskRow) > 0 Then
-                            split(2).Row(i).SetTo(mean(0))
+                        Dim meanVal = Mean(splitMats(2).Row(i), maskRow)
+                        If CountNonZero(maskRow) > 0 Then
+                            splitMats(2).Row(i).SetTo(meanVal(0))
                         End If
                     Next
-                    cv.Cv2.Line(dst2, New cv.Point(0, firstRow), New cv.Point(dst2.Width, firstRow), cv.Scalar.Yellow, task.lineWidth + 1)
-                    cv.Cv2.Line(dst2, New cv.Point(0, lastRow), New cv.Point(dst2.Width, lastRow), cv.Scalar.Yellow, task.lineWidth + 1)
+                    Line(dst2, New cv.Point(0, firstRow), New cv.Point(dst2.Width, firstRow), cv.Scalar.Yellow, task.lineWidth + 1)
+                    Line(dst2, New cv.Point(0, lastRow), New cv.Point(dst2.Width, lastRow), cv.Scalar.Yellow, task.lineWidth + 1)
                 End If
             End If
 
-            cv.Cv2.Merge(split, imuPC)
+            Merge(splitMats, imuPC)
 
             imuPC.CopyTo(task.pointCloud, sliceMask)
         End If
@@ -951,10 +951,10 @@ Public Class Structured_Mask : Inherits TaskParent
         struct.Run(src)
         dst2.SetTo(0)
         For Each lp In struct.lpListX
-            cv.Cv2.Line(dst2, lp.p1, lp.p2, 255, task.lineWidth, cv.LineTypes.Link8)
+            Line(dst2, lp.p1, lp.p2, 255, task.lineWidth, cv.LineTypes.Link8)
         Next
         For Each lp In struct.lpListY
-            cv.Cv2.Line(dst2, lp.p1, lp.p2, 255, task.lineWidth, cv.LineTypes.Link8)
+            Line(dst2, lp.p1, lp.p2, 255, task.lineWidth, cv.LineTypes.Link8)
         Next
     End Sub
 End Class

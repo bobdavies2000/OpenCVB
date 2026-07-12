@@ -16,7 +16,7 @@ Public Class XR_SVD_Example : Inherits TaskParent
         src = cv.Mat.FromPixelData(5, 5, cv.MatType.CV_32F, inputData)
         Dim W As New cv.Mat, U As New cv.Mat, VT As New cv.Mat
 
-        cv.Cv2.SVDecomp(src, W, U, VT, cv.SVD.Flags.FullUV)
+        SVDecomp(src, W, U, VT, cv.SVD.Flags.FullUV)
 
         Dim WD As New cv.Mat(5, 5, cv.MatType.CV_32F, cv.Scalar.All(0))
         W.CopyTo(WD.Diag)
@@ -61,11 +61,11 @@ Public Class XR_SVD_Example2 : Inherits TaskParent
         If task.heartBeat Then
             Dim m = cv.Cv2.Moments(rc.mask, True)
             Dim center = New cv.Point2f(m.M10 / rc.pixels, m.M01 / rc.pixels)
-            cv.Cv2.Circle(task.color(rc.rect), center, task.DotSize, task.highlight, -1, task.lineType)
+            Circle(task.color(rc.rect), center, task.DotSize, task.highlight, -1, task.lineType)
 
             Dim mArea = cv.Mat.FromPixelData(4, 1, cv.MatType.CV_32F, {m.M20 / rc.pixels, m.Mu11 / rc.pixels, m.Mu11 / rc.pixels, m.Mu02 / rc.pixels})
             Dim U As New cv.Mat
-            cv.Cv2.SVDecomp(mArea, New cv.Mat, U, New cv.Mat, cv.SVD.Flags.FullUV)
+            SVDecomp(mArea, New cv.Mat, U, New cv.Mat, cv.SVD.Flags.FullUV)
 
 
             strOut = "The U Mat: " + vbCrLf
@@ -111,7 +111,7 @@ Public Class XR_SVD_Gaussian : Inherits TaskParent
         dst2 = src
 
         Dim U As New cv.Mat, W As New cv.Mat, VT As New cv.Mat
-        cv.Cv2.SVDecomp(covar.covariance, W, U, VT, cv.SVD.Flags.FullUV)
+        SVDecomp(covar.covariance, W, U, VT, cv.SVD.Flags.FullUV)
 
         strOut = "The Covariance Mat: " + vbCrLf
         For j = 0 To covar.covariance.Rows - 1
@@ -140,15 +140,15 @@ Public Class XR_SVD_Gaussian : Inherits TaskParent
         Next
         strOut += vbCrLf
 
-        Dim angle = -Math.Atan2(U.Get(Of Double)(0, 1), U.Get(Of Double)(0, 0)) * (180 / cv.Cv2.PI)
+        Dim angle = -Math.Atan2(U.Get(Of Double)(0, 1), U.Get(Of Double)(0, 0)) * (180 / PI)
         strOut += "Angle = " + angle.ToString(fmt3) + " radians" + vbCrLf
 
-        cv.Cv2.Sqrt(W, W)
+        Sqrt(W, W)
         W *= 3
         Dim size = New cv.Size2f(10, 100) ' New cv.Size2f(W.Get(Of Double)(0, 0), W.Get(Of Double)(1, 0))
-        Dim pt = New cv.Point2f(covar.mean.Get(Of Double)(0, 0), covar.mean.Get(Of Double)(0, 1))
+        Dim pt = New cv.Point2f(covar.meanVal.Get(Of Double)(0, 0), covar.meanVal.Get(Of Double)(0, 1))
         Dim rrect = New cv.RotatedRect(pt, size, angle)
-        cv.Cv2.Ellipse(dst2, rrect, task.highlight, task.lineWidth, task.lineType)
+        Ellipse(dst2, rrect, task.highlight, task.lineWidth, task.lineType)
 
         SetTrueText(strOut, 3)
     End Sub

@@ -24,19 +24,19 @@ Public Class HistPeak2D_Basics : Inherits TaskParent
         End If
 
         Dim mask As New cv.Mat
-        cv.Cv2.Threshold(histogram, mask, 0, 255, cv.ThresholdTypes.Binary)
-        cv.Cv2.ConvertScaleAbs(mask, mask)
+        Threshold(histogram, mask, 0, 255, cv.ThresholdTypes.Binary)
+        ConvertScaleAbs(mask, mask)
         delaunay.dst1.ConvertTo(histogram, cv.MatType.CV_32F)
         histogram.SetTo(0, Not mask)
 
         If ranges Is Nothing Or task.optionsChanged Then
             ' the pcsplit arrays have been patched for inf and nan's already in task.vb.
-            If task.Settings.cameraName.StartsWith("StereoLabs") Then cv.Cv2.Merge(task.pcSplit, src)
+            If task.Settings.cameraName.StartsWith("StereoLabs") Then Merge(task.pcSplit, src)
             ranges = Hist2D_Basics.GetHist2Dminmax(src, task.channels(0), task.channels(1))
         End If
 
         Dim backProjection As New cv.Mat
-        cv.Cv2.CalcBackProject({src}, task.channels, histogram, backProjection, ranges)
+        CalcBackProject({src}, task.channels, histogram, backProjection, ranges)
         dst2 = Palettize(backProjection)
     End Sub
 End Class
@@ -90,8 +90,8 @@ Public Class XR_HistPeak2D_NotHotTop : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         histTop.Run(src)
-        cv.Cv2.InRange(histTop.histogram, 0, 0, dst1)
-        cv.Cv2.ConvertScaleAbs(dst1, dst1)
+        InRange(histTop.histogram, 0, 0, dst1)
+        ConvertScaleAbs(dst1, dst1)
 
         Dim mm As mmData = GetMinMax(histTop.histogram)
         dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_32F, mm.maxVal)
@@ -120,7 +120,7 @@ Public Class XR_HistPeak2D_Edges : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         histTop.Run(src)
 
-        cv.Cv2.Threshold(histTop.histogram, dst3, task.projectionThreshold, 255, cv.ThresholdTypes.Binary)
+        Threshold(histTop.histogram, dst3, task.projectionThreshold, 255, cv.ThresholdTypes.Binary)
         peak.histogram = histTop.histogram
         peak.Run(task.pointCloud)
         dst2 = peak.dst2
@@ -216,7 +216,7 @@ Public Class XR_HistPeak2D_HotSide : Inherits TaskParent
 
         For i = 0 To peak.auto.clusterPoints.Count - 1
             Dim pt = peak.auto.clusterPoints(i)
-            cv.Cv2.Circle(dst3, pt, task.DotSize * 3, white, -1, task.lineType)
+            Circle(dst3, pt, task.DotSize * 3, white, -1, task.lineType)
         Next
 
         peak.histogram = histSide.histogram
@@ -246,7 +246,7 @@ Public Class XR_HistPeak2D_HotTop : Inherits TaskParent
 
         For i = 0 To peak.auto.clusterPoints.Count - 1
             Dim pt = peak.auto.clusterPoints(i)
-            cv.Cv2.Circle(dst3, pt, task.DotSize * 3, white, -1, task.lineType)
+            Circle(dst3, pt, task.DotSize * 3, white, -1, task.lineType)
         Next
 
         peak.histogram = histTop.histogram

@@ -15,7 +15,7 @@ Public Class GridRect_Basics : Inherits TaskParent
         meanList.Clear()
         Dim mean As cv.Scalar, stdev As cv.Scalar
         For Each r In task.gridRects
-            cv.Cv2.MeanStdDev(dst1(r), mean, stdev)
+            MeanStdDev(dst1(r), mean, stdev)
             stdevList.Add(stdev(0))
             meanList.Add(mean(0))
         Next
@@ -26,8 +26,8 @@ Public Class GridRect_Basics : Inherits TaskParent
         For i = 0 To stdevList.Count - 1
             Dim r = task.gridRects(i)
             Dim depthCheck = task.noDepthMask(r)
-            If stdevList(i) <cv.Cv2.CountNonZero(stdevAverage Or depthCheck) / depthCheck.Total > 0.5 Then
-            cv.Cv2.Rectangle(dst3, r, white, -1)
+            If stdevList(i) <CountNonZero(stdevAverage Or depthCheck) / depthCheck.Total > 0.5 Then
+            Rectangle(dst3, r, white, -1)
             Else
                 rects.Add(r)
             End If
@@ -60,7 +60,7 @@ Public Class XR_GridRect_Color : Inherits TaskParent
         Dim stdevList2 As New List(Of Single)
         Dim mean As cv.Scalar, stdev As cv.Scalar
         For Each r In task.gridRects
-            cv.Cv2.MeanStdDev(src(r), mean, stdev)
+            MeanStdDev(src(r), mean, stdev)
             stdevList0.Add(stdev(0))
             stdevList1.Add(stdev(1))
             stdevList2.Add(stdev(2))
@@ -73,13 +73,13 @@ Public Class XR_GridRect_Color : Inherits TaskParent
         For i = 0 To stdevList0.Count - 1
             Dim r = task.gridRects(i)
             If stdevList0(i) < avg0 And stdevList1(i) < avg1 And stdevList2(i) < avg2 Then
-            cv.Cv2.Rectangle(dst3, r, white, -1)
+            Rectangle(dst3, r, white, -1)
             End If
         Next
         labels(3) = "Stdev average X/Y/Z = " + CInt(stdevList0.Average).ToString + ", " + CInt(stdevList1.Average).ToString + ", " + CInt(stdevList2.Average).ToString
 
         Dim _cvtGrid As New cv.Mat
-        cv.Cv2.CvtColor(dst3, _cvtGrid, cv.ColorConversionCodes.GRAY2BGR)
+        CvtColor(dst3, _cvtGrid, cv.ColorConversionCodes.GRAY2BGR)
         dst2 = ShowAddweighted(_cvtGrid, src, labels(2))
     End Sub
 End Class
@@ -113,7 +113,7 @@ Public Class GridRect_Sorted : Inherits TaskParent
         grList.Clear()
         ReDim categories(9)
         For Each r In task.gridRects
-            cv.Cv2.MeanStdDev(src(r), meanS, stdev)
+            MeanStdDev(src(r), meanS, stdev)
             sortedStd.Add(stdev(0) + stdev(1) + stdev(2), r)
             Dim colorIndex As Integer = 1
             Dim mean As cv.Vec3i = New cv.Vec3i(CInt(meanS(0)), CInt(meanS(1)), CInt(meanS(2)))
@@ -159,7 +159,7 @@ Public Class GridRect_Sorted : Inherits TaskParent
 
         If standaloneTest() Then
             Dim _cvtGrid3 As New cv.Mat
-            cv.Cv2.CvtColor(dst2, _cvtGrid3, cv.ColorConversionCodes.GRAY2BGR)
+            CvtColor(dst2, _cvtGrid3, cv.ColorConversionCodes.GRAY2BGR)
             dst3 = ShowAddweighted(_cvtGrid3, src, labels(3))
         End If
 
@@ -227,7 +227,7 @@ Public Class XR_GridRect_CorrelationMotion : Inherits TaskParent
         For i = 0 To gather.stdevList.Count - 1
             Dim r = task.gridRects(i)
             If gather.stdevList(i) >= gather.stdevAverage Then
-                cv.Cv2.MatchTemplate(dst1(r), lastImage(r), correlationMat, cv.TemplateMatchModes.CCoeffNormed)
+                MatchTemplate(dst1(r), lastImage(r), correlationMat, cv.TemplateMatchModes.CCoeffNormed)
                 Dim corr = correlationMat.Get(Of Single)(0, 0)
                 If corr < task.fCorrThreshold Then SetTrueText(corr.ToString(fmt1), r.TopLeft)
                 If corr < task.fCorrThreshold Then motionCount += 1
@@ -297,7 +297,7 @@ Public Class XR_GridRect_LowStdevCorrelation : Inherits TaskParent
         Dim correlationMat As New cv.Mat
         correlations.Clear()
         For Each roi In gather.rects
-            cv.Cv2.MatchTemplate(dst1(roi), lastImage(roi), correlationMat, cv.TemplateMatchModes.CCoeffNormed)
+            MatchTemplate(dst1(roi), lastImage(roi), correlationMat, cv.TemplateMatchModes.CCoeffNormed)
             Dim corr = correlationMat.Get(Of Single)(0, 0)
             correlations.Add(corr)
         Next
@@ -311,7 +311,7 @@ Public Class XR_GridRect_LowStdevCorrelation : Inherits TaskParent
             saveStdev.Clear()
             Dim mean As cv.Scalar, stdev As cv.Scalar
             For i = 0 To saveRects.Count - 1
-                cv.Cv2.MeanStdDev(dst1(saveRects(i)), mean, stdev)
+                MeanStdDev(dst1(saveRects(i)), mean, stdev)
                 saveStdev.Add(stdev(0))
             Next
         End If
@@ -371,10 +371,10 @@ Public Class XR_GridRect_LRClick : Inherits TaskParent
 
         dst0 = src.Clone
         Dim _cvtInline As New cv.Mat
-        cv.Cv2.CvtColor(task.rightView, _cvtInline, cv.ColorConversionCodes.GRAY2BGR)
+        CvtColor(task.rightView, _cvtInline, cv.ColorConversionCodes.GRAY2BGR)
         dst3 = If(task.rightView.Channels() <> 3,_cvtInline, task.rightView.Clone)
         src = task.gray
-        If task.rightView.Channels() <> 1 Then cv.Cv2.CvtColor(task.rightView, task.rightView, cv.ColorConversionCodes.BGR2GRAY)
+        If task.rightView.Channels() <> 1 Then CvtColor(task.rightView, task.rightView, cv.ColorConversionCodes.BGR2GRAY)
 
         gather.Run(src)
         dst2 = gather.dst2
@@ -385,13 +385,13 @@ Public Class XR_GridRect_LRClick : Inherits TaskParent
         If ClickPoint = newPoint Then setClickPoint(gather.rects(gather.rects.Count / 2).TopLeft, 2)
         Dim gridIndex As Integer = task.gridMap.Get(Of Integer)(ClickPoint.Y, ClickPoint.X)
         Dim r = task.gridRects(gridIndex)
-        cv.Cv2.Rectangle(dst2, r, white, task.lineWidth)
+        Rectangle(dst2, r, white, task.lineWidth)
 
         Dim correlationMat As New cv.Mat
         Dim corr As New List(Of Single)
         For j = 0 To r.X - 1
             Dim rect = New cv.Rect(j, r.Y, r.Width, r.Height)
-            cv.Cv2.MatchTemplate(src(rect), task.rightView(rect), correlationMat,
+            MatchTemplate(src(rect), task.rightView(rect), correlationMat,
                                          cv.TemplateMatchModes.CCoeffNormed)
             corr.Add(correlationMat.Get(Of Single)(0, 0))
         Next
@@ -410,15 +410,15 @@ Public Class XR_GridRect_LRClick : Inherits TaskParent
                     strOut = "CoeffNormed max correlation = " + maxCorr.ToString(fmt3) + vbCrLf
                     strOut += "Left Mean = " + gather.meanList(gridIndex).ToString(fmt3) + " Left stdev = " + gather.stdevList(gridIndex).ToString(fmt3) + vbCrLf
                     Dim mean As cv.Scalar, stdev As cv.Scalar
-                    cv.Cv2.MeanStdDev(dst3(rectRight), mean, stdev)
+                    MeanStdDev(dst3(rectRight), mean, stdev)
                     strOut += "Right Mean = " + mean(0).ToString(fmt3) + " Right stdev = " + stdev(0).ToString(fmt3) + vbCrLf
                     strOut += "Right rectangle is offset " + CStr(offset) + " pixels from the left image rectangle"
                 End If
-                cv.Cv2.Rectangle(dst3, rectRight, task.highlight, task.lineWidth)
-cv.Cv2.Rectangle(dst0, r, task.highlight, task.lineWidth)
+                Rectangle(dst3, rectRight, task.highlight, task.lineWidth)
+Rectangle(dst0, r, task.highlight, task.lineWidth)
                 dst1.SetTo(0)
-                cv.Cv2.Circle(dst1, r.TopLeft, task.DotSize, task.highlight, -1, task.lineType)
-                cv.Cv2.Circle(dst1, rectRight.TopLeft, task.DotSize + 2, task.highlight, -1, task.lineType)
+                Circle(dst1, r.TopLeft, task.DotSize, task.highlight, -1, task.lineType)
+                Circle(dst1, rectRight.TopLeft, task.DotSize + 2, task.highlight, -1, task.lineType)
                 Dim pt = New cv.Point(rectRight.X, r.Y + 5)
                 SetTrueText(CStr(offset) + " pixel offset" + vbCrLf + "Larger = Right", pt, 1)
                 SetTrueText(strOut, 1)
@@ -447,10 +447,10 @@ Public Class XR_GridRect_LRAll : Inherits TaskParent
         options.Run()
 
         Dim _cvtInline As New cv.Mat
-        cv.Cv2.CvtColor(task.rightView, _cvtInline, cv.ColorConversionCodes.GRAY2BGR)
+        CvtColor(task.rightView, _cvtInline, cv.ColorConversionCodes.GRAY2BGR)
         dst3 = If(task.rightView.Channels() <> 3,_cvtInline, task.rightView.Clone)
         src = task.gray
-        If task.rightView.Channels() <> 1 Then cv.Cv2.CvtColor(task.rightView, task.rightView, cv.ColorConversionCodes.BGR2GRAY)
+        If task.rightView.Channels() <> 1 Then CvtColor(task.rightView, task.rightView, cv.ColorConversionCodes.BGR2GRAY)
 
         gather.Run(src)
         dst2 = gather.dst2
@@ -462,14 +462,14 @@ Public Class XR_GridRect_LRAll : Inherits TaskParent
         For Each roi In gather.rects
             If roi.X = 0 Then Continue For
             Dim r = New cv.Rect(0, roi.Y, roi.X, roi.Height)
-            cv.Cv2.MatchTemplate(src(roi), task.rightView(r), correlationMat, cv.TemplateMatchModes.CCoeffNormed)
+            MatchTemplate(src(roi), task.rightView(r), correlationMat, cv.TemplateMatchModes.CCoeffNormed)
             Dim mm = vbc.GetMinMax(correlationMat)
             If mm.maxVal >= task.fCorrThreshold Then sortedRects.Add(mm.maxVal, New cv.Rect(mm.maxLoc.X, roi.Y, roi.Width, roi.Height))
         Next
         labels(2) = CStr(sortedRects.Count) + " roi's had left/right correlation higher than " + task.fCorrThreshold.ToString(fmt3)
 
         For Each roi In sortedRects.Values
-        cv.Cv2.Rectangle(dst3, roi, task.highlight, task.lineWidth)
+        Rectangle(dst3, roi, task.highlight, task.lineWidth)
         Next
     End Sub
 End Class
@@ -491,7 +491,7 @@ Public Class GridRect_Canny : Inherits TaskParent
 
         dst2.SetTo(0)
         For Each brick In bricks.brickList
-If cv.Cv2.CountNonZero(dst3(brick.rect)) Then src(brick.rect).CopyTo(dst2(brick.rect))
+If CountNonZero(dst3(brick.rect)) Then src(brick.rect).CopyTo(dst2(brick.rect))
         Next
     End Sub
 End Class

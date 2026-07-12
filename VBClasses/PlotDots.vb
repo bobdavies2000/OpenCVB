@@ -19,7 +19,7 @@ Public Class PlotDots_Basics : Inherits TaskParent
         If wipeSlate Then dst2.SetTo(0)
         For i = 0 To srcX.Count - 1
             Dim pt = New cv.Point(dst2.Width * srcX(i) / maxX, dst2.Height - dst2.Height * srcY(i) / maxY)
-            cv.Cv2.Circle(dst2, pt, task.DotSize, plotColor, -1, task.lineType)
+            Circle(dst2, pt, task.DotSize, plotColor, -1, task.lineType)
         Next
         labels(2) = "x-Axis: " + minX.ToString(fmt2) + " to " + maxX.ToString(fmt2) +
                     ", y-axis: " + minY.ToString(fmt2) + " to " + maxY.ToString(fmt2)

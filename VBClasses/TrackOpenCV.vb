@@ -63,7 +63,7 @@ Public Class TrackOpenCV_Basics_QT : Inherits TaskParent
         Marshal.Copy(imagePtr, rectData, 0, rectData.Length)
 
         outputRect = New cv.Rect(rectData(0), rectData(1), rectData(2), rectData(3))
-        cv.Cv2.Rectangle(dst2, outputRect, white, task.lineWidth)
+        Rectangle(dst2, outputRect, white, task.lineWidth)
         SetTrueText("Draw a rectangle around any object to be tracked in the BGR image above.", 3)
     End Sub
     Protected Overrides Sub Finalize()
@@ -119,14 +119,14 @@ Public Class XR_Track_GridRect : Inherits TaskParent
             Dim y = originalRect.Y - searchRect.Y
             track.inputRect = New cv.Rect(x, y, task.gridWH, task.gridWH)
             dst3 = src
-            cv.Cv2.Rectangle(dst3, searchRect, white, task.lineWidth)
-cv.Cv2.Rectangle(dst3, originalRect, white, task.lineWidth)
+            Rectangle(dst3, searchRect, white, task.lineWidth)
+Rectangle(dst3, originalRect, white, task.lineWidth)
         End If
         track.Run(task.gray(searchRect))
         dst2 = src
         Dim r = New cv.Rect(originalRect.X + track.outputRect.X, originalRect.Y + track.outputRect.Y, task.gridWH, task.gridWH)
-        cv.Cv2.Rectangle(dst2, r, white, task.lineWidth)
-cv.Cv2.Rectangle(dst3, r, white, task.lineWidth)
+        Rectangle(dst2, r, white, task.lineWidth)
+Rectangle(dst3, r, white, task.lineWidth)
     End Sub
 End Class
 
@@ -154,7 +154,7 @@ Public Class XR_Track_Lines : Inherits TaskParent
                 track(i).inputRect = task.gridNabeRects(gridIndex)
             End If
             track(i).Run(task.gray)
-            cv.Cv2.Rectangle(dst2, track(i).outputRect, task.highlight, task.lineWidth)
+            Rectangle(dst2, track(i).outputRect, task.highlight, task.lineWidth)
         Next
         labels(2) = "Tracking the top " + CStr(track.Length) + " line endpoints"
     End Sub

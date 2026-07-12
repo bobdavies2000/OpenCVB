@@ -36,8 +36,8 @@ Public Class CellularAutomata_Basics : Inherits TaskParent
             Next
         Next
         Dim ret As New cv.Mat
-        cv.Cv2.ConvertScaleAbs(dst, ret, 255)
-        cv.Cv2.CvtColor(ret, ret, cv.ColorConversionCodes.GRAY2BGR)
+        ConvertScaleAbs(dst, ret, 255)
+        CvtColor(ret, ret, cv.ColorConversionCodes.GRAY2BGR)
         Return ret
     End Function
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -130,7 +130,7 @@ Public Class CellularAutomata_Life : Inherits TaskParent
                 End If
                 If nextgrid.Get(Of Byte)(y, x) Then
                     Dim pt = New cv.Point(x, y) * factor
-                    cv.Cv2.Circle(dst2, pt, factor / 2, nodeColor, -1, task.lineType)
+                    Circle(dst2, pt, factor / 2, nodeColor, -1, task.lineType)
                     population += 1
                 End If
             Next
@@ -172,16 +172,16 @@ Public Class XR_CellularAutomata_LifeColor : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         Dim lastBoard As New cv.Mat
-        cv.Cv2.CvtColor(game.dst2, lastBoard, cv.ColorConversionCodes.BGR2GRAY)
+        CvtColor(game.dst2, lastBoard, cv.ColorConversionCodes.BGR2GRAY)
         game.Run(src)
-        cv.Cv2.CvtColor(game.dst2, dst1, cv.ColorConversionCodes.BGR2GRAY)
+        CvtColor(game.dst2, dst1, cv.ColorConversionCodes.BGR2GRAY)
 
         Dim deaths As New cv.Mat, births As New cv.Mat
 
-        cv.Cv2.Subtract(dst1, lastBoard, births)
-        cv.Cv2.Subtract(lastBoard, dst1, deaths)
-        cv.Cv2.Threshold(births, births, 0, 255, cv.ThresholdTypes.Binary)
-        cv.Cv2.Threshold(deaths, deaths, 0, 255, cv.ThresholdTypes.Binary)
+        Subtract(dst1, lastBoard, births)
+        Subtract(lastBoard, dst1, deaths)
+        Threshold(births, births, 0, 255, cv.ThresholdTypes.Binary)
+        Threshold(deaths, deaths, 0, 255, cv.ThresholdTypes.Binary)
         dst2 = game.dst2.Clone()
         dst2.SetTo(cv.Scalar.Blue, births)
         dst2.SetTo(cv.Scalar.Red, deaths)

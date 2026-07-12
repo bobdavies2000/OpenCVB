@@ -30,7 +30,7 @@ Public Class Entropy_Basics : Inherits TaskParent
             entropy.Run(src(task.drawRect))
         End If
         dst2 = entropy.dst2
-        cv.Cv2.Rectangle(dst2, task.drawRect, white, task.lineWidth)
+        Rectangle(dst2, task.drawRect, white, task.lineWidth)
         If task.heartBeat Then strOut = "Click anywhere to measure the entropy with rect(pt.x, pt.y, " +
                                                  CStr(stdSize) + ", " + CStr(stdSize) + ")" + vbCrLf + vbCrLf + "Total entropy = " +
                                                  entropy.entropyVal.ToString(fmt1) + vbCrLf + entropy.strOut
@@ -80,13 +80,13 @@ Public Class Entropy_Highest : Inherits TaskParent
             End If
         Next
 
-        cv.Cv2.ConvertScaleAbs(dst1, dst2, 255 / (maxEntropy - minEntropy), minEntropy)
+        ConvertScaleAbs(dst1, dst2, 255 / (maxEntropy - minEntropy), minEntropy)
         dst2 = ShowAddweighted(task.gray, dst2, labels(3))
 
         If standaloneTest() Then
-            cv.Cv2.Rectangle(dst2, eMaxRect, cv.Scalar.All(255), task.lineWidth)
+            Rectangle(dst2, eMaxRect, cv.Scalar.All(255), task.lineWidth)
             dst3.SetTo(0)
-            cv.Cv2.Rectangle(dst3, eMaxRect, white, task.lineWidth)
+            Rectangle(dst3, eMaxRect, white, task.lineWidth)
         End If
         labels(2) = "Lighter = higher entropy. Range: " + minEntropy.ToString("0.0") + " to " + maxEntropy.ToString("0.0")
     End Sub
@@ -110,7 +110,7 @@ Public Class XR_Entropy_FAST : Inherits TaskParent
         entropy.Run(fast.dst2)
         dst2 = entropy.dst2
         dst3 = entropy.dst2
-        cv.Cv2.Rectangle(dst3, entropy.eMaxRect, task.highlight, task.lineWidth)
+        Rectangle(dst3, entropy.eMaxRect, task.highlight, task.lineWidth)
     End Sub
 End Class
 
@@ -146,14 +146,14 @@ Public Class Entropy_Rectangle : Inherits TaskParent
             src = src(task.drawRect)
         End If
         Dim hist As New cv.Mat
-        cv.Cv2.CalcHist({src}, {0}, New cv.Mat(), hist, 1, dimensions, ranges)
+        CalcHist({src}, {0}, New cv.Mat(), hist, 1, dimensions, ranges)
         Dim histNormalized As New cv.Mat
-        cv.Cv2.Normalize(hist, histNormalized, 0, hist.Rows, cv.NormTypes.MinMax)
+        Normalize(hist, histNormalized, 0, hist.Rows, cv.NormTypes.MinMax)
 
         entropyVal = channelEntropy(src.Total, histNormalized) * 1000
         strOut = "Entropy X1000 " + entropyVal.ToString(fmt1) + vbCrLf
         dst2 = src
-        cv.Cv2.Rectangle(dst2, task.drawRect, white, task.lineWidth)
+        Rectangle(dst2, task.drawRect, white, task.lineWidth)
         dst3 = src
         SetTrueText(strOut, 3)
     End Sub
@@ -204,16 +204,16 @@ Public Class XR_Entropy_SubDivisions : Inherits TaskParent
 
             Dim p1 = New cv.Point(0, dst2.Height / 3)
             Dim p2 = New cv.Point(dst2.Width, dst2.Height / 3)
-            cv.Cv2.Line(dst0, p1, p2, white, task.lineWidth, task.lineType)
+            Line(dst0, p1, p2, white, task.lineWidth, task.lineType)
             p1 = New cv.Point(0, dst2.Height * 2 / 3)
             p2 = New cv.Point(dst2.Width, dst2.Height * 2 / 3)
-            cv.Cv2.Line(dst0, p1, p2, white, task.lineWidth, task.lineType)
+            Line(dst0, p1, p2, white, task.lineWidth, task.lineType)
             p1 = New cv.Point(dst2.Width / 3, 0)
             p2 = New cv.Point(dst2.Width / 3, dst2.Height)
-            cv.Cv2.Line(dst0, p1, p2, white, task.lineWidth, task.lineType)
+            Line(dst0, p1, p2, white, task.lineWidth, task.lineType)
             p1 = New cv.Point(dst2.Width * 2 / 3, 0)
             p2 = New cv.Point(dst2.Width * 2 / 3, dst2.Height)
-            cv.Cv2.Line(dst0, p1, p2, white, task.lineWidth, task.lineType)
+            Line(dst0, p1, p2, white, task.lineWidth, task.lineType)
         End If
 
         dst2 = task.color.Clone
@@ -228,8 +228,8 @@ Public Class XR_Entropy_SubDivisions : Inherits TaskParent
         Dim hist As New cv.Mat
         For i = 0 To task.gridRects.Count - 1
             Dim r = task.gridRects(i)
-            cv.Cv2.CalcHist({dst1(r)}, {0}, New cv.Mat(), hist, 1, dimensions, ranges)
-            cv.Cv2.Normalize(hist, hist, 0, hist.Rows, cv.NormTypes.MinMax)
+            CalcHist({dst1(r)}, {0}, New cv.Mat(), hist, 1, dimensions, ranges)
+            Normalize(hist, hist, 0, hist.Rows, cv.NormTypes.MinMax)
 
             Dim nextEntropy = entropy.channelEntropy(dst1(r).Total, hist) * 1000
 
@@ -243,7 +243,7 @@ Public Class XR_Entropy_SubDivisions : Inherits TaskParent
             Dim val = If(task.toggleOn, entropies(i).Min, entropies(i).Max)
             Dim index = entropies(i).IndexOf(val)
             Dim roi = eROI(i)(index)
-            cv.Cv2.Rectangle(dst2, roi, white)
+            Rectangle(dst2, roi, white)
             If standaloneTest() Then SetTrueText(entropies(i)(index).ToString(fmt2), roi.TopLeft, 3)
         Next
 

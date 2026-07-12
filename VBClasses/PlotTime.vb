@@ -36,7 +36,7 @@ Public Class PlotTime_Basics : Inherits TaskParent
             columnIndex = 1
         End If
         dst2.ColRange(columnIndex, columnIndex + task.DotSize).SetTo(backColor)
-        If standaloneTest() Then plotData = cv.Cv2.Mean(task.color)
+        If standaloneTest() Then plotData = Mean(task.color)
 
         For i = 0 To plotCount - 1
             If Math.Floor(plotData(i)) < minScale Or Math.Ceiling(plotData(i)) > maxScale Then
@@ -70,11 +70,11 @@ Public Class PlotTime_Basics : Inherits TaskParent
             y *= (dst2.Height - 1)
             Dim c As New cv.Point(columnIndex - task.DotSize, y - task.DotSize)
             If c.X < 1 Then c.X = 1
-            cv.Cv2.Circle(dst2, c, task.DotSize, plotColors(i), -1, task.lineType)
+            Circle(dst2, c, task.DotSize, plotColors(i), -1, task.lineType)
         Next
 
         If task.heartBeat Then
-            cv.Cv2.Line(dst2, New cv.Point(columnIndex, 0), New cv.Point(columnIndex, dst2.Height), white, 1)
+            Line(dst2, New cv.Point(columnIndex, 0), New cv.Point(columnIndex, dst2.Height), white, 1)
         End If
 
         columnIndex += task.DotSize
@@ -103,7 +103,7 @@ Public Class PlotTime_Single : Inherits TaskParent
         desc = "Plot an input variable over time"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If standaloneTest() Then plotData = cv.Cv2.Mean(task.color, task.depthmask)(0)
+        If standaloneTest() Then plotData = Mean(task.color, task.depthmask)(0)
 
         If inputList.Count >= dst2.Width Then inputList.RemoveAt(0)
         inputList.Add(plotData)
@@ -119,7 +119,7 @@ Public Class PlotTime_Single : Inherits TaskParent
             y = y * dst2.Height - 1
             Dim c As New cv.Point2f(i, y)
             If c.X < 1 Then c.X = 1
-            cv.Cv2.Circle(dst2, c, task.DotSize, blue, -1, task.lineType)
+            Circle(dst2, c, task.DotSize, blue, -1, task.lineType)
         Next
 
         If inputList.Count > dst2.Width / 8 Then
@@ -134,13 +134,13 @@ Public Class PlotTime_Single : Inherits TaskParent
                 End If
                 Dim pt = Choose(i + 1, New cv.Point(0, 10), New cv.Point(0, dst2.Height \ 2 - 5),
                             New cv.Point(0, dst2.Height - 3))
-                cv.Cv2.PutText(dst2, nextText, pt, cv.HersheyFonts.HersheyPlain, 0.7, white, 1, task.lineType)
+                PutText(dst2, nextText, pt, cv.HersheyFonts.HersheyPlain, 0.7, white, 1, task.lineType)
             Next
         End If
 
         Dim p1 = New cv.Point(0, dst2.Height / 2)
         Dim p2 = New cv.Point(dst2.Width, dst2.Height / 2)
-        cv.Cv2.Line(dst2, p1, p2, white, Utility_Basics.getThickness)
+        Line(dst2, p1, p2, white, Utility_Basics.getThickness)
         If standaloneTest() Then SetTrueText("standaloneTest() test is with the blue channel mean of the color image.", 3)
     End Sub
 End Class
@@ -165,7 +165,7 @@ Public Class PlotTime_Scalar : Inherits TaskParent
         desc = "Plot the requested number of entries in the cv.scalar input"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If standaloneTest() Then plotData = cv.Cv2.Mean(task.color)
+        If standaloneTest() Then plotData = Mean(task.color)
 
         For i = 0 To Math.Min(plotCount, 4) - 1
             plotList(i).plotData = plotData(i)
@@ -212,7 +212,7 @@ Public Class PlotTime_FixedScale : Inherits TaskParent
             columnIndex = 1
         End If
         dst2.ColRange(columnIndex, columnIndex + task.DotSize).SetTo(backColor)
-        If standaloneTest() Then plotData = cv.Cv2.Mean(task.color)
+        If standaloneTest() Then plotData = Mean(task.color)
 
         For i = 0 To plotCount - 1
             If Math.Floor(plotData(i)) < minScale Or Math.Ceiling(plotData(i)) > maxScale Then
@@ -244,7 +244,7 @@ Public Class PlotTime_FixedScale : Inherits TaskParent
         If lastXdelta.Count >= plotSeriesCount Then lastXdelta.RemoveAt(0)
 
         If task.heartBeat Then
-            cv.Cv2.Line(dst2, New cv.Point(columnIndex, 0), New cv.Point(columnIndex, dst2.Height), white, task.lineWidth)
+            Line(dst2, New cv.Point(columnIndex, 0), New cv.Point(columnIndex, dst2.Height), white, task.lineWidth)
         End If
 
         For i = 0 To plotCount - 1
@@ -253,7 +253,7 @@ Public Class PlotTime_FixedScale : Inherits TaskParent
                 y *= dst2.Height - 1
                 Dim c As New cv.Point(columnIndex - task.DotSize, y - task.DotSize)
                 If c.X < 1 Then c.X = 1
-                cv.Cv2.Circle(dst2, c, task.DotSize, plotColors(i), -1, task.lineType)
+                Circle(dst2, c, task.DotSize, plotColors(i), -1, task.lineType)
             End If
         Next
 

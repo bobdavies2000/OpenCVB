@@ -17,13 +17,13 @@ Public Class FindNonZero_Basics : Inherits TaskParent
             Next
         End If
 
-        cv.Cv2.FindNonZero(src, ptMat)
+        FindNonZero(src, ptMat)
 
         If standaloneTest() Then
             dst3 = New cv.Mat(src.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
             ' mark the points so they are visible...
             For i = 0 To ptMat.Rows - 1
-            cv.Cv2.Circle(dst3, ptMat.Get(Of cv.Point)(0, i), task.DotSize, white, -1, task.lineType)
+            Circle(dst3, ptMat.Get(Of cv.Point)(0, i), task.DotSize, white, -1, task.lineType)
             Next
 
             Dim outstr As String = "Coordinates of the non-zero points (ordered by row - top to bottom): " + vbCrLf + vbCrLf
@@ -85,10 +85,10 @@ Public Class XR_FindNonZero_Line3DWorld : Inherits TaskParent
         If standalone Then lp = task.lines.lpList(0)
 
         dst2.SetTo(0)
-        cv.Cv2.Line(dst2, lp.p1, lp.p2, 255, task.lineWidth, cv.LineTypes.Link8)
+        Line(dst2, lp.p1, lp.p2, 255, task.lineWidth, cv.LineTypes.Link8)
 
         Dim tmp As New cv.Mat
-        cv.Cv2.FindNonZero(dst2(lp.rect), tmp)
+        FindNonZero(dst2(lp.rect), tmp)
         If tmp.Rows = 0 Then Exit Sub ' nothing to work on...
 
         ' line end points guaranteed to have depth (line is tossed if not.)  LastDepth can be 0 on first pass.
@@ -130,10 +130,10 @@ Public Class FindNonZero_Line3D : Inherits TaskParent
         If standalone Then lp = task.lines.lpList(0)
 
         dst2.SetTo(0)
-        cv.Cv2.Line(dst2, lp.p1, lp.p2, 255, task.lineWidth, cv.LineTypes.Link8)
+        Line(dst2, lp.p1, lp.p2, 255, task.lineWidth, cv.LineTypes.Link8)
 
         Dim tmp As New cv.Mat
-        cv.Cv2.FindNonZero(dst2(lp.rect), tmp)
+        FindNonZero(dst2(lp.rect), tmp)
         If tmp.Rows = 0 Then Exit Sub ' nothing to work on...
 
         Dim points(tmp.Rows - 1) As cv.Point

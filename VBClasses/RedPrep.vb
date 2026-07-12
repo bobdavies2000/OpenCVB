@@ -16,7 +16,7 @@ Public Class RedPrep_Basics : Inherits TaskParent
             mm.minVal = -mm.maxVal
             chan.ConvertTo(dst32f, cv.MatType.CV_32F)
             Dim mask As New cv.Mat
-            cv.Cv2.Threshold(dst32f, mask, mm.minVal, mm.minVal, cv.ThresholdTypes.BinaryInv)
+            Threshold(dst32f, mask, mm.minVal, mm.minVal, cv.ThresholdTypes.BinaryInv)
             mask.ConvertTo(mask, cv.MatType.CV_8U)
             dst32f.SetTo(cv.Scalar.All(mm.minVal), mask)
         End If
@@ -32,37 +32,37 @@ Public Class RedPrep_Basics : Inherits TaskParent
 
         Dim pc32S As New cv.Mat
         src.ConvertTo(pc32S, cv.MatType.CV_32SC3, 1000 / task.fOptions.ReductionDepth.Value)
-        Dim split = cv.Cv2.Split(pc32S)
+        Dim splitMats = Split(pc32S)
 
         dst2.SetTo(0)
         dst1.SetTo(0)
 
         If options.PrepX Then
-            prepEdges.Run(reduceChan(split(0), task.noDepthMask))
+            prepEdges.Run(reduceChan(splitMats(0), task.noDepthMask))
             dst1 += prepEdges.dst2
             dst2 = dst2 Or prepEdges.dst3
         End If
 
         If options.PrepY Then
-            prepEdges.Run(reduceChan(split(1), task.noDepthMask))
-            cv.Cv2.Normalize(prepEdges.dst2, prepEdges.dst2, 0, 255, cv.NormTypes.MinMax)
+            prepEdges.Run(reduceChan(splitMats(1), task.noDepthMask))
+            Normalize(prepEdges.dst2, prepEdges.dst2, 0, 255, cv.NormTypes.MinMax)
             dst1 += prepEdges.dst2
-            cv.Cv2.Normalize(dst1, dst1, 0, 255, cv.NormTypes.MinMax)
+            Normalize(dst1, dst1, 0, 255, cv.NormTypes.MinMax)
             dst2 = dst2 Or prepEdges.dst3
         End If
 
         If options.PrepZ Then
-            prepEdges.Run(reduceChan(split(2), task.noDepthMask))
+            prepEdges.Run(reduceChan(splitMats(2), task.noDepthMask))
             dst1 += prepEdges.dst2
             dst2 = dst2 Or prepEdges.dst3
         End If
 
         ' this is not as good as the operations above.
-        'prepEdges.Run(reduceChan(split(0) + split(1) + split(2)))
+        'prepEdges.Run(reduceChan(splitMats(0) + splitMats(1) + splitMats(2)))
         'dst2 = prepEdges.dst3
 
         ' this rectangle prevents bleeds at the image edges.  It is necessary.  Test without it to see the impact.
-        cv.Cv2.Rectangle(dst2, New cv.Rect(0, 0, dst2.Width, dst2.Height), cv.Scalar.All(255), 2)
+        Rectangle(dst2, New cv.Rect(0, 0, dst2.Width, dst2.Height), cv.Scalar.All(255), 2)
 
         labels(2) = "Using reduction factor = " + CStr(task.fOptions.ReductionDepth.Value)
     End Sub
@@ -97,9 +97,9 @@ Public Class RedPrep_Edges_CPP : Inherits TaskParent
 
         dst3 = cv.Mat.FromPixelData(src.Rows, src.Cols, cv.MatType.CV_8U, imagePtr).Clone
         If src.Size <> task.noDepthMask.Size Then
-            cv.Cv2.Resize(task.noDepthMask, task.noDepthMask, src.Size)
+            Resize(task.noDepthMask, task.noDepthMask, src.Size)
             dst3.SetTo(255, task.noDepthMask)
-            cv.Cv2.Resize(dst2, dst2, src.Size)
+            Resize(dst2, dst2, src.Size)
             dst2.SetTo(0, dst3)
         Else
             dst3.SetTo(255, task.noDepthMask)
@@ -165,11 +165,11 @@ Public Class RedPrep_Core : Inherits TaskParent
         If standalone Then
             Dim ranges = New cv.Rangef() {New cv.Rangef(-1, 256)}
             Dim histogram As New cv.Mat
-            cv.Cv2.CalcHist({dst2}, {0}, task.depthmask, histogram, 1, {256}, ranges)
+            CalcHist({dst2}, {0}, task.depthmask, histogram, 1, {256}, ranges)
             Dim histArray(255) As Single
             histogram.GetArray(Of Single)(histArray)
-            Dim histSum = cv.Cv2.Sum(histogram)(0)
-            If histSum <> cv.Cv2.CountNonZero(task.depthmask) Then Throw New Exception("can't happen.")
+            Dim histSum = Sum(histogram)(0)
+            If histSum <> CountNonZero(task.depthmask) Then Throw New Exception("can't happen.")
         End If
 
         dst3 = Palettize(dst2, 0)

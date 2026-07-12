@@ -13,13 +13,13 @@ Public Class FitLine_BasicsOld : Inherits TaskParent
             dst2 = noisyLine.dst2
         End If
 
-        Dim rect = cv.Cv2.FitEllipse(ptList)
+        Dim rect = FitEllipse(ptList)
         Dim v = rect.Points()
 
         Dim p1 = New cv.Point((v(0).X + v(3).X) / 2, (v(0).Y + v(3).Y) / 2)
         Dim p2 = New cv.Point((v(1).X + v(2).X) / 2, (v(1).Y + v(2).Y) / 2)
         lp = New lpData(p1, p2)
-        cv.Cv2.Line(dst2, lp.p1, lp.p2, 255, task.lineWidth, task.lineType)
+        Line(dst2, lp.p1, lp.p2, 255, task.lineWidth, task.lineType)
     End Sub
 End Class
 
@@ -43,7 +43,7 @@ Public Class FitLine_Conventional : Inherits TaskParent
             dst2 = noisyLine.dst2
         End If
 
-        Dim line2d = cv.Cv2.FitLine(ptList, cv.DistanceTypes.L2, 0, 0, 0)
+        Dim line2d = FitLine(ptList, cv.DistanceTypes.L2, 0, 0, 0)
         center = New cv.Point2f(line2d.X1, line2d.Y1)
         Dim slope = line2d.Vy / line2d.Vx
         Dim leftY = Math.Round(-line2d.X1 * slope + line2d.Y1)
@@ -51,7 +51,7 @@ Public Class FitLine_Conventional : Inherits TaskParent
         lp = New lpData(New cv.Point(0, leftY), New cv.Point(src.Cols - 1, rightY))
         If standaloneTest() Then
             dst2.SetTo(0)
-            cv.Cv2.Line(dst2, lp.p1, lp.p2, cv.Scalar.Red, task.lineWidth, task.lineType)
+            Line(dst2, lp.p1, lp.p2, cv.Scalar.Red, task.lineWidth, task.lineType)
         End If
     End Sub
 End Class
@@ -80,18 +80,18 @@ Public Class XR_FitLine_Lines : Inherits TaskParent
         If standaloneTest() Then
             draw.Run(src)
             Dim _cvt1 As New cv.Mat
-            cv.Cv2.CvtColor(draw.dst2, _cvt1, cv.ColorConversionCodes.BGR2GRAY)
-            cv.Cv2.Threshold(_cvt1, dst3, 1, 255, cv.ThresholdTypes.Binary)
-            cv.Cv2.CvtColor(dst3, dst2, cv.ColorConversionCodes.GRAY2BGR)
+            CvtColor(draw.dst2, _cvt1, cv.ColorConversionCodes.BGR2GRAY)
+            Threshold(_cvt1, dst3, 1, 255, cv.ThresholdTypes.Binary)
+            CvtColor(dst3, dst2, cv.ColorConversionCodes.GRAY2BGR)
         Else
             lines.Clear()
         End If
 
         Dim contours As cv.Point()()
-        contours = cv.Cv2.FindContoursAsArray(dst3, cv.RetrievalModes.Tree, cv.ContourApproximationModes.ApproxSimple)
+        contours = FindContoursAsArray(dst3, cv.RetrievalModes.Tree, cv.ContourApproximationModes.ApproxSimple)
         For i = 0 To contours.Length - 1
             Dim cnt = contours(i)
-            Dim line2d = cv.Cv2.FitLine(cnt, cv.DistanceTypes.L2, 0, options.radiusAccuracy, options.angleAccuracy)
+            Dim line2d = FitLine(cnt, cv.DistanceTypes.L2, 0, options.radiusAccuracy, options.angleAccuracy)
             Dim slope = line2d.Vy / line2d.Vx
             Dim leftY = Math.Round(-line2d.X1 * slope + line2d.Y1)
             Dim rightY = Math.Round((src.Cols - line2d.X1) * slope + line2d.Y1)
@@ -101,7 +101,7 @@ Public Class XR_FitLine_Lines : Inherits TaskParent
                 lines.Add(p1)
                 lines.Add(p2)
             End If
-            cv.Cv2.Line(dst2, p1, p2, cv.Scalar.Red, task.lineWidth, task.lineType)
+            Line(dst2, p1, p2, cv.Scalar.Red, task.lineWidth, task.lineType)
         Next
     End Sub
 End Class
@@ -130,20 +130,20 @@ Public Class XR_FitLine_Simple3D : Inherits TaskParent
             dst2.SetTo(0)
             ptList.Clear()
             For Each pt In random.PointList
-            cv.Cv2.Circle(dst2, New cv.Point2f(pt.X, pt.Y), task.DotSize, cv.Scalar.Yellow, -1, task.lineType)
+            Circle(dst2, New cv.Point2f(pt.X, pt.Y), task.DotSize, cv.Scalar.Yellow, -1, task.lineType)
                 ptList.Add(pt)
             Next
         End If
 
         ' Fit a line to the 3D points
-        Dim line = cv.Cv2.FitLine(ptList.ToArray, cv.DistanceTypes.L2, 0, 0, 0)
+        Dim line = FitLine(ptList.ToArray, cv.DistanceTypes.L2, 0, 0, 0)
         center = New cv.Point2f(line.X1, line.Y1)
 
         Dim p2 = New cv.Point(dst2.Width, -dst2.Width * line.Vy / line.Vx + center.Y)
         Dim lp = New lpData(center, p2)
         lpResult = findEdgePoints(lp)
         cv.Cv2.Line(dst2, lpResult.p1, lpResult.p2, task.highlight, task.lineWidth, task.lineType)
-        cv.Cv2.Circle(dst2, center, task.DotSize + 2, cv.Scalar.Blue, -1)
+        Circle(dst2, center, task.DotSize + 2, cv.Scalar.Blue, -1)
     End Sub
 End Class
 
@@ -169,8 +169,8 @@ Public Class XR_FitLine_Example2D : Inherits TaskParent
         Next
         fitLine.Run(src)
 
-        cv.Cv2.Line(dst2, fitLine.lp.p1, fitLine.lp.p2, task.highlight, task.lineWidth, task.lineType)
-        cv.Cv2.Circle(dst2, fitLine.center, task.DotSize + 2, cv.Scalar.Blue, -1)
+        Line(dst2, fitLine.lp.p1, fitLine.lp.p2, task.highlight, task.lineWidth, task.lineType)
+        Circle(dst2, fitLine.center, task.DotSize + 2, cv.Scalar.Blue, -1)
     End Sub
 End Class
 
@@ -194,13 +194,13 @@ Public Class XR_FitLine_BasicsOld_TA3D : Inherits TaskParent
             dst2.SetTo(0)
             ptList.Clear()
             For Each pt In noisyLine.PointList
-            cv.Cv2.Circle(dst2, New cv.Point2f(pt.X, pt.Y), task.DotSize, task.highlight, -1, task.lineType)
+            Circle(dst2, New cv.Point2f(pt.X, pt.Y), task.DotSize, task.highlight, -1, task.lineType)
                 ptList.Add(pt)
             Next
         End If
 
         ' Fit a line to the 3D points
-        Dim line = cv.Cv2.FitLine(ptList.ToArray, cv.DistanceTypes.L2, 0, 0, 0)
+        Dim line = FitLine(ptList.ToArray, cv.DistanceTypes.L2, 0, 0, 0)
         Dim m = line.Vy / line.Vx
         Dim bb = line.Y1 - m * line.X1
         Dim p1 = New cv.Point(line.X1, line.Y1)
@@ -208,7 +208,7 @@ Public Class XR_FitLine_BasicsOld_TA3D : Inherits TaskParent
 
         lp = findEdgePoints(New lpData(p1, p2))
         cv.Cv2.Line(dst2, lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
-        cv.Cv2.Circle(dst2, New cv.Point2f(line.X1, line.Y1), task.DotSize + 2, cv.Scalar.Blue, -1)
+        Circle(dst2, New cv.Point2f(line.X1, line.Y1), task.DotSize + 2, cv.Scalar.Blue, -1)
     End Sub
 End Class
 
@@ -230,7 +230,7 @@ Public Class XR_FitLine_Grid : Inherits TaskParent
 
         dst3.SetTo(0)
         For Each rect In task.gridRects
-            If cv.Cv2.CountNonZero(dst2(rect)) >= 5 Then
+            If CountNonZero(dst2(rect)) >= 5 Then
                 nZero.Run(dst2(rect))
 
                 fitline.ptList.Clear()
@@ -239,7 +239,7 @@ Public Class XR_FitLine_Grid : Inherits TaskParent
                 Next
 
                 fitline.Run(dst2(rect))
-                cv.Cv2.Line(dst3(rect), fitline.lp.p1, fitline.lp.p2, 255, task.lineWidth, task.lineType)
+                Line(dst3(rect), fitline.lp.p1, fitline.lp.p2, 255, task.lineWidth, task.lineType)
             End If
         Next
     End Sub
@@ -274,7 +274,7 @@ Public Class XR_FitLine_Simple : Inherits TaskParent
         Next
 
         ' Fit line using CV_DIST_L2 (least squares), with robust method
-        Dim lineParams = cv.Cv2.FitLine(points.ToArray, cv.DistanceTypes.L2, 0, 0.01, 0.01)
+        Dim lineParams = FitLine(points.ToArray, cv.DistanceTypes.L2, 0, 0.01, 0.01)
 
         ' Extract line parameters
         Dim vx As Single = lineParams.Vx

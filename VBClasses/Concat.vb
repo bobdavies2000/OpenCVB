@@ -8,10 +8,10 @@ Public Class XR_Concat_Basics : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         Dim tmp As New cv.Mat
-        cv.Cv2.HConcat(src, task.depthRGB, tmp)
-        cv.Cv2.Resize(tmp, dst2, src.Size())
-        cv.Cv2.VConcat(src, task.depthRGB, tmp)
-        cv.Cv2.Resize(tmp, dst3, src.Size())
+        HConcat(src, task.depthRGB, tmp)
+        Resize(tmp, dst2, src.Size())
+        VConcat(src, task.depthRGB, tmp)
+        Resize(tmp, dst3, src.Size())
     End Sub
 End Class
 
@@ -32,16 +32,16 @@ Public Class XR_Concat_4way : Inherits TaskParent
             img(0) = src
             img(1) = task.depthRGB
             Dim _cvtLeft As New cv.Mat
-            cv.Cv2.CvtColor(task.leftView, _cvtLeft, cv.ColorConversionCodes.GRAY2BGR)
+            CvtColor(task.leftView, _cvtLeft, cv.ColorConversionCodes.GRAY2BGR)
             img(2) = If(task.leftView.Channels() = 1, _cvtLeft, task.leftView)
             Dim _cvtRight As New cv.Mat
-            cv.Cv2.CvtColor(task.rightView, _cvtRight, cv.ColorConversionCodes.GRAY2BGR)
+            CvtColor(task.rightView, _cvtRight, cv.ColorConversionCodes.GRAY2BGR)
             img(3) = If(task.rightView.Channels() = 1, _cvtRight, task.rightView)
         End If
         Dim tmp1 As New cv.Mat, tmp2 As New cv.Mat, tmp3 As New cv.Mat
-        cv.Cv2.HConcat(img(0), img(1), tmp1)
-        cv.Cv2.HConcat(img(2), img(3), tmp2)
-        cv.Cv2.VConcat(tmp1, tmp2, tmp3)
-        cv.Cv2.Resize(tmp3, dst2, src.Size())
+        HConcat(img(0), img(1), tmp1)
+        HConcat(img(2), img(3), tmp2)
+        VConcat(tmp1, tmp2, tmp3)
+        Resize(tmp3, dst2, src.Size())
     End Sub
 End Class

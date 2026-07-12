@@ -20,7 +20,7 @@ Public Class Fuzzy_Basics : Inherits TaskParent
 
         reduction.Run(src)
         dst0 = reduction.dst2
-        If dst0.Channels() <> 1 Then cv.Cv2.CvtColor(dst0, dst0, cv.ColorConversionCodes.BGR2GRAY)
+        If dst0.Channels() <> 1 Then CvtColor(dst0, dst0, cv.ColorConversionCodes.BGR2GRAY)
 
         Dim dataSrc(dst0.Total) As Byte
         dst0.GetArray(Of Byte)(dataSrc)
@@ -29,7 +29,7 @@ Public Class Fuzzy_Basics : Inherits TaskParent
         handleSrc.Free()
 
         dst2 = cv.Mat.FromPixelData(dst0.Rows, dst0.Cols, cv.MatType.CV_8UC1, imagePtr).Clone
-        cv.Cv2.Threshold(dst2, dst3, 0, 255, cv.ThresholdTypes.BinaryInv)
+        Threshold(dst2, dst3, 0, 255, cv.ThresholdTypes.BinaryInv)
 
         Dim tmp As New cv.Mat
         If options.retrievalMode = cv.RetrievalModes.CComp Or options.retrievalMode = cv.RetrievalModes.FloodFill Then
@@ -37,7 +37,7 @@ Public Class Fuzzy_Basics : Inherits TaskParent
         Else
             dst3.ConvertTo(tmp, cv.MatType.CV_8U)
         End If
-        contours = cv.Cv2.FindContoursAsArray(tmp, options.retrievalMode, options.ApproximationMode)
+        contours = FindContoursAsArray(tmp, options.retrievalMode, options.ApproximationMode)
 
         sortContours.Clear()
         For i = 0 To contours.Length - 1
@@ -93,18 +93,18 @@ Public Class XR_Fuzzy_Filter : Inherits TaskParent
 
         Dim src32f As New cv.Mat
         reduction.dst2.ConvertTo(src32f, cv.MatType.CV_32F)
-        cv.Cv2.Filter2D(src32f, dst2, -1, kernel)
+        Filter2D(src32f, dst2, -1, kernel)
         dst3 = dst2.Subtract(src32f)
-        cv.Cv2.Threshold(dst3, dst3, 0, 255, cv.ThresholdTypes.BinaryInv)
+        Threshold(dst3, dst3, 0, 255, cv.ThresholdTypes.BinaryInv)
         dst3.ConvertTo(dst3, cv.MatType.CV_8U)
-        cv.Cv2.Threshold(dst3, dst3, 0, 255, cv.ThresholdTypes.BinaryInv)
+        Threshold(dst3, dst3, 0, 255, cv.ThresholdTypes.BinaryInv)
 
         If options.retrievalMode = cv.RetrievalModes.FloodFill Then
             Dim tmp As New cv.Mat
             dst3.ConvertTo(tmp, cv.MatType.CV_32S)
-            contours = cv.Cv2.FindContoursAsArray(tmp, options.retrievalMode, options.ApproximationMode)
+            contours = FindContoursAsArray(tmp, options.retrievalMode, options.ApproximationMode)
         Else
-            contours = cv.Cv2.FindContoursAsArray(dst3, options.retrievalMode, options.ApproximationMode)
+            contours = FindContoursAsArray(dst3, options.retrievalMode, options.ApproximationMode)
         End If
 
         sortContours.Clear()
@@ -223,10 +223,10 @@ Public Class Fuzzy_TrackerDepth : Inherits TaskParent
         For Each vec In fuzzy.sortContours.Values
             Dim contours = fuzzy.contours(vec(0))
             Dim points = cv.Mat.FromPixelData(contours.Length, 1, cv.MatType.CV_32SC2, contours.ToArray)
-            Dim center = cv.Cv2.Sum(points)
+            Dim center = Sum(points)
             points = cv.Mat.FromPixelData(contours.Length, 2, cv.MatType.CV_32S, contours.ToArray)
-            cv.Cv2.MinMaxIdx(points.Col(0), minX, maxX)
-            cv.Cv2.MinMaxIdx(points.Col(1), minY, maxY)
+            MinMaxIdx(points.Col(0), minX, maxX)
+            MinMaxIdx(points.Col(1), minY, maxY)
 
             Dim rect = New cv.Rect(minX, minY, maxX - minX, maxY - minY)
             If rect.Width * rect.Height > options.minRectSize Then
@@ -235,9 +235,9 @@ Public Class Fuzzy_TrackerDepth : Inherits TaskParent
                 rects.Add(rect)
                 layoutColor.Add(vec(1))
                 If options.displayRect Then
-                cv.Cv2.Circle(dst2, centroid, task.DotSize + 3, cv.Scalar.Yellow, -1, task.lineType)
-                cv.Cv2.Circle(dst2, centroid, task.DotSize, cv.Scalar.Red, -1, task.lineType)
-                cv.Cv2.Rectangle(dst2, rect, cv.Scalar.Yellow, 2)
+                Circle(dst2, centroid, task.DotSize + 3, cv.Scalar.Yellow, -1, task.lineType)
+                Circle(dst2, centroid, task.DotSize, cv.Scalar.Red, -1, task.lineType)
+                Rectangle(dst2, rect, cv.Scalar.Yellow, 2)
                 End If
             End If
         Next
@@ -273,7 +273,7 @@ Public Class XR_Fuzzy_TrackerDepthClick : Inherits TaskParent
             highlightRegion = tracker.fuzzy.dst2.Get(Of Byte)(highlightPoint.Y, highlightPoint.X)
         End If
         If highlightRegion >= 0 Then
-                          cv.Cv2.InRange(tracker.fuzzy.dst2, highlightRegion, highlightRegion + 1, regionMask)
+                          InRange(tracker.fuzzy.dst2, highlightRegion, highlightRegion + 1, regionMask)
             dst3.SetTo(cv.Scalar.Yellow, regionMask)
         End If
         labels(2) = CStr(tracker.fuzzy.sortContours.Count) + " regions were found in the image."

@@ -25,7 +25,7 @@ Public Class Mesh_Basics : Inherits TaskParent
             Dim depth = task.pcSplit(2).Get(Of Single)(pt.Y, pt.X)
             If depth = 0 Then
                 Dim r = ValidateRect(New cv.Rect(pt.X - pad, pt.Y - pad, task.gridWH, task.gridWH))
-                depth = cv.Cv2.Mean(task.pcSplit(2)(r), task.depthmask(r))(0)
+                depth = Mean(task.pcSplit(2)(r), task.depthmask(r))(0)
                 depthMiss += 1
             End If
         Next
@@ -70,15 +70,15 @@ Public Class Mesh_BasicsInput : Inherits TaskParent
             Dim ptLast = knn.queries(i)
             For j = 1 To options.nabeCount - 1
                 Dim pt = knn.queries(knn.result(i, j))
-                cv.Cv2.Line(dst2, ptLast, pt, white, task.lineWidth, task.lineType)
+                Line(dst2, ptLast, pt, white, task.lineWidth, task.lineType)
                 ptLast = pt
             Next
         Next
 
         dst3.SetTo(0)
         For i = 0 To knn.queries.Count - 1
-        cv.Cv2.Circle(dst2, knn.queries(i), task.DotSize, cv.Scalar.Red, -1, task.lineType)
-        cv.Cv2.Circle(dst3, knn.queries(i), task.DotSize, task.highlight, -1, task.lineType)
+        Circle(dst2, knn.queries(i), task.DotSize, cv.Scalar.Red, -1, task.lineType)
+        Circle(dst3, knn.queries(i), task.DotSize, task.highlight, -1, task.lineType)
         Next
         labels(2) = "Triangles built each input point and its " + CStr(options.nabeCount) + " nearest neighbors."
     End Sub

@@ -12,24 +12,24 @@ Public Class MeanShift_Basics : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         Dim roi = If(task.drawRect.Width > 0, task.drawRect, New cv.Rect(0, 0, dst2.Width, dst2.Height))
         Dim hsv As New cv.Mat
-        cv.Cv2.CvtColor(src, hsv, cv.ColorConversionCodes.BGR2HSV)
+        CvtColor(src, hsv, cv.ColorConversionCodes.BGR2HSV)
         Dim ch() As Integer = {0, 1, 2}
         Dim hsize() As Integer = {16, 16, 16}
         Dim ranges() = New cv.Rangef() {New cv.Rangef(0, 180)}
         If task.optionsChanged Then
             trackbox = task.drawRect
             Dim maskROI As New cv.Mat
-            cv.Cv2.InRange(hsv(roi), New cv.Scalar(0, 60, 32), New cv.Scalar(180, 255, 255), maskROI)
-            cv.Cv2.CalcHist({hsv(roi)}, ch, maskROI, histogram, 1, hsize, ranges)
-            cv.Cv2.Normalize(histogram, histogram, 0, 255, cv.NormTypes.MinMax)
+            InRange(hsv(roi), New cv.Scalar(0, 60, 32), New cv.Scalar(180, 255, 255), maskROI)
+            CalcHist({hsv(roi)}, ch, maskROI, histogram, 1, hsize, ranges)
+            Normalize(histogram, histogram, 0, 255, cv.NormTypes.MinMax)
         End If
-        cv.Cv2.CalcBackProject({hsv}, ch, histogram, dst1, ranges)
+        CalcBackProject({hsv}, ch, histogram, dst1, ranges)
         dst2 = src
         If trackbox.Width <> 0 Then
-            cv.Cv2.MeanShift(dst1, trackbox, cv.TermCriteria.Both(10, 1))
-            cv.Cv2.Rectangle(dst2, trackbox, cv.Scalar.Red, rectangleEdgeWidth, task.lineType)
+            MeanShift(dst1, trackbox, cv.TermCriteria.Both(10, 1))
+            Rectangle(dst2, trackbox, cv.Scalar.Red, rectangleEdgeWidth, task.lineType)
             dst3 = CamShift_Basics.Show_HSV_Hist(histogram)
-            cv.Cv2.CvtColor(dst3, dst3, cv.ColorConversionCodes.HSV2BGR)
+            CvtColor(dst3, dst3, cv.ColorConversionCodes.HSV2BGR)
         End If
     End Sub
 End Class

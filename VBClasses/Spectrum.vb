@@ -201,17 +201,17 @@ Public Class XR_Spectrum_RGB : Inherits TaskParent
             SetTrueText(redC.strOut, 1)
         End If
 
-        Dim split = cv.Cv2.Split(src)
+        Dim splitMats = Split(src)
         gSpec.typeSpec = " blue "
-        gSpec.Run(split(0))
+        gSpec.Run(splitMats(0))
         If task.heartBeat Then strOut = gSpec.strOut + vbCrLf
 
         gSpec.typeSpec = " green "
-        gSpec.Run(split(1))
+        gSpec.Run(splitMats(1))
         If task.heartBeat Then strOut += gSpec.strOut + vbCrLf
 
         gSpec.typeSpec = " red "
-        gSpec.Run(split(2))
+        gSpec.Run(splitMats(2))
         If task.heartBeat Then strOut += gSpec.strOut
 
         SetTrueText(strOut, 3)
@@ -280,11 +280,11 @@ Public Class Spectrum_Breakdown : Inherits TaskParent
         Dim rc = task.rcD
         If rc Is Nothing Then Exit Sub
         Dim ranges As List(Of rangeData), input As cv.Mat
-        Dim depthPixels = cv.Cv2.CountNonZero(task.depthmask(rc.rect))
+        Dim depthPixels = CountNonZero(task.depthmask(rc.rect))
         If depthPixels / rc.pixels < 0.5 Then
             input = New cv.Mat(rc.mask.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
             src(rc.rect).CopyTo(input, rc.mask)
-            cv.Cv2.CvtColor(input, input, cv.ColorConversionCodes.BGR2GRAY)
+            CvtColor(input, input, cv.ColorConversionCodes.BGR2GRAY)
         Else
             input = New cv.Mat(rc.mask.Size(), cv.MatType.CV_32F, cv.Scalar.All(0))
             task.pcSplit(2)(rc.rect).CopyTo(input, rc.mask)
@@ -303,21 +303,21 @@ Public Class Spectrum_Breakdown : Inherits TaskParent
 
         Dim rangeClip As New cv.Mat(input.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         If input.Type = cv.MatType.CV_8U Then
-                          cv.Cv2.InRange(input, maxRange.start, maxRange.ending, rangeClip)
-            cv.Cv2.Threshold(rangeClip, rangeClip, 0, 255, cv.ThresholdTypes.Binary)
-            cv.Cv2.ConvertScaleAbs(rangeClip, rangeClip)
+                          InRange(input, maxRange.start, maxRange.ending, rangeClip)
+            Threshold(rangeClip, rangeClip, 0, 255, cv.ThresholdTypes.Binary)
+            ConvertScaleAbs(rangeClip, rangeClip)
         Else
             rangeClip = New cv.Mat(rc.mask.Size(), cv.MatType.CV_32F, cv.Scalar.All(0))
             input.CopyTo(rangeClip, rc.mask)
 
-                          cv.Cv2.InRange(rangeClip, maxRange.start / 100, maxRange.ending / 100, rangeClip)
+                          InRange(rangeClip, maxRange.start / 100, maxRange.ending / 100, rangeClip)
             Dim _thr2 As New cv.Mat
-            cv.Cv2.Threshold(rangeClip, rangeClip, 0, 255, cv.ThresholdTypes.Binary)
-            cv.Cv2.ConvertScaleAbs(rangeClip, rangeClip)
+            Threshold(rangeClip, rangeClip, 0, 255, cv.ThresholdTypes.Binary)
+            ConvertScaleAbs(rangeClip, rangeClip)
         End If
 
         If buildMaskOnly = False Then
-            cv.Cv2.Threshold(rc.mask, dst3, 0, 128, cv.ThresholdTypes.Binary)
+            Threshold(rc.mask, dst3, 0, 128, cv.ThresholdTypes.Binary)
             dst3.SetTo(255, rangeClip)
         End If
 
@@ -326,7 +326,7 @@ Public Class Spectrum_Breakdown : Inherits TaskParent
             dst3 = proportion.dst2
         End If
 
-        cv.Cv2.Threshold(rc.mask, rc.mask, 0, 255, cv.ThresholdTypes.Binary)
+        Threshold(rc.mask, rc.mask, 0, 255, cv.ThresholdTypes.Binary)
         task.rcD = rc
     End Sub
 End Class
@@ -405,7 +405,7 @@ Public Class Spectrum_Gray : Inherits TaskParent
         SetTrueText(redC.strOut, 1)
 
         Dim input = src(task.rcD.rect)
-        If input.Type <> cv.MatType.CV_8U Then cv.Cv2.CvtColor(input, input, cv.ColorConversionCodes.BGR2GRAY)
+        If input.Type <> cv.MatType.CV_8U Then CvtColor(input, input, cv.ColorConversionCodes.BGR2GRAY)
         Dim ranges = options.buildColorRanges(input, typeSpec)
         strOut = options.strOut
         SetTrueText(strOut, 3)

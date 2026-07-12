@@ -8,7 +8,7 @@ Public Class XR_Contrast_Basics : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
 
-        cv.Cv2.ConvertScaleAbs(src, dst2, options.brightness, options.contrast)
+        ConvertScaleAbs(src, dst2, options.brightness, options.contrast)
     End Sub
 End Class
 
@@ -28,7 +28,7 @@ Public Class XR_Contrast_POW : Inherits TaskParent
 
         dst2 = task.gray
         dst2.ConvertTo(dst3, cv.MatType.CV_32FC3)
-        cv.Cv2.Normalize(dst3, dst3)
-        cv.Cv2.Pow(dst3, options.exponent, dst3)
+        Normalize(dst3, dst3)
+        Pow(dst3, options.exponent, dst3)
     End Sub
 End Class

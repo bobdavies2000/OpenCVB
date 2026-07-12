@@ -39,15 +39,15 @@ Public Class ImageOffset_Basics : Inherits TaskParent
 
         Dim r3 = New cv.Rect(1, 1, r1.Width, r1.Height)
 
-        cv.Cv2.Absdiff(task.pcSplit(0)(r1), task.pcSplit(0)(r2), dst1(r3))
-        cv.Cv2.Absdiff(task.pcSplit(1)(r1), task.pcSplit(1)(r2), dst2(r3))
-        cv.Cv2.Absdiff(task.pcSplit(2)(r1), task.pcSplit(2)(r2), dst3(r3))
+        Absdiff(task.pcSplit(0)(r1), task.pcSplit(0)(r2), dst1(r3))
+        Absdiff(task.pcSplit(1)(r1), task.pcSplit(1)(r2), dst2(r3))
+        Absdiff(task.pcSplit(2)(r1), task.pcSplit(2)(r2), dst3(r3))
 
         dst = {dst1, dst2, dst3}
         For i = 0 To dst.Count - 1
             If masks(i) Is Nothing Then masks(i) = New cv.Mat
-            cv.Cv2.Threshold(dst(i), masks(i), options1.pixelDiffThreshold, 255, cv.ThresholdTypes.BinaryInv)
-            cv.Cv2.ConvertScaleAbs(masks(i), masks(i))
+            Threshold(dst(i), masks(i), options1.pixelDiffThreshold, 255, cv.ThresholdTypes.BinaryInv)
+            ConvertScaleAbs(masks(i), masks(i))
             pcFiltered(i) = New cv.Mat(src.Size, cv.MatType.CV_32FC1, New cv.Scalar(0))
             task.pcSplit(i).CopyTo(pcFiltered(i), masks(i))
         Next
@@ -110,8 +110,8 @@ Public Class XR_ImageOffset_SliceH : Inherits TaskParent
         dst2 = mats.dst2
 
         Dim p1 = New cv.Point(0, pt.Y), p2 = New cv.Point(dst2.Width, pt.Y)
-        cv.Cv2.Line(task.color, p1, p2, task.highlight, task.lineWidth)
-        cv.Cv2.Line(task.depthRGB, p1, p2, task.highlight, task.lineWidth)
+        Line(task.color, p1, p2, task.highlight, task.lineWidth)
+        Line(task.depthRGB, p1, p2, task.highlight, task.lineWidth)
     End Sub
 End Class
 
@@ -171,8 +171,8 @@ Public Class XR_ImageOffset_SliceV : Inherits TaskParent
         dst2 = mats.dst2
 
         Dim p1 = New cv.Point(pt.X, 0), p2 = New cv.Point(pt.X, dst2.Height)
-        cv.Cv2.Line(task.color, p1, p2, task.highlight, task.lineWidth)
-        cv.Cv2.Line(task.depthRGB, p1, p2, task.highlight, task.lineWidth)
+        Line(task.color, p1, p2, task.highlight, task.lineWidth)
+        Line(task.depthRGB, p1, p2, task.highlight, task.lineWidth)
     End Sub
 End Class
 

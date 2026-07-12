@@ -40,10 +40,10 @@ Public Class Intrinsics_Basics : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         bricks.Run(src)
         If standalone Then
-            cv.Cv2.CvtColor(task.leftView, dst2, cv.ColorConversionCodes.GRAY2BGR)
+            CvtColor(task.leftView, dst2, cv.ColorConversionCodes.GRAY2BGR)
             Dim vec = New cv.Vec3b(0, 255, 255) ' yellow
             For Each brick In bricks.brickList
-                If brick.depth > 0 Then cv.Cv2.Circle(dst2, brick.rect.TopLeft, task.DotSize, task.highlight, -1, task.lineType)
+                If brick.depth > 0 Then Circle(dst2, brick.rect.TopLeft, task.DotSize, task.highlight, -1, task.lineType)
             Next
         End If
     End Sub
@@ -104,23 +104,23 @@ Public Class Intrinsics_TranslateRGBtoLeft : Inherits TaskParent
 
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst2 = src
-        cv.Cv2.CvtColor(task.leftView, dst3, cv.ColorConversionCodes.GRAY2BGR) ' so we can show the red line...
+        CvtColor(task.leftView, dst3, cv.ColorConversionCodes.GRAY2BGR) ' so we can show the red line...
         Dim count As Integer
         If task.Settings.cameraName.StartsWith("StereoLabs") Then
             For Each lp In task.lines.lpList
-                cv.Cv2.Line(dst2, lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
-                cv.Cv2.Line(dst3, lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
+                Line(dst2, lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
+                Line(dst3, lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
             Next
         Else
             For Each lp In task.lines.lpList
-                cv.Cv2.Line(dst2, lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
+                Line(dst2, lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
                 Dim depth1 = task.pointCloud.Get(Of cv.Point3f)(CInt(lp.p1.Y), CInt(lp.p1.X)).Z
                 Dim depth2 = task.pointCloud.Get(Of cv.Point3f)(CInt(lp.p2.Y), CInt(lp.p2.X)).Z
 
                 If depth1 > 0 And depth2 > 0 Then
                     Dim p1 = MapRgbToLeftIr(lp.p1.X, lp.p1.Y, depth1)
                     Dim p2 = MapRgbToLeftIr(lp.p2.X, lp.p2.Y, depth2)
-                    cv.Cv2.Line(dst3, p1, p2, task.highlight, task.lineWidth, task.lineType)
+                    Line(dst3, p1, p2, task.highlight, task.lineWidth, task.lineType)
                     count += 1
                 End If
             Next
@@ -258,7 +258,7 @@ Public Class Intrinsics_MapLeftToRight : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         bricks.Run(src)
         dst2 = src
-        cv.Cv2.CvtColor(task.rightView, dst3, cv.ColorConversionCodes.GRAY2BGR) ' so we can show the red line...
+        CvtColor(task.rightView, dst3, cv.ColorConversionCodes.GRAY2BGR) ' so we can show the red line...
         Dim count As Integer
         If task.Settings.cameraName.StartsWith("StereoLabs") Then
             For Each lp In task.lines.lpList
@@ -271,8 +271,8 @@ Public Class Intrinsics_MapLeftToRight : Inherits TaskParent
                 If brick1.depth > 0 And brick2.depth > 0 Then
                     p1.X -= task.calibData.baseline * task.calibData.leftIntrinsics.fx / brick1.mm.minVal
                     p2.X -= task.calibData.baseline * task.calibData.leftIntrinsics.fx / brick2.mm.minVal
-                    cv.Cv2.Line(dst2, lp.p1, lp.p2, lp.color, task.lineWidth + 1, task.lineType)
-                    cv.Cv2.Line(dst3, p1, p2, lp.color, task.lineWidth + 1, task.lineType)
+                    Line(dst2, lp.p1, lp.p2, lp.color, task.lineWidth + 1, task.lineType)
+                    Line(dst3, p1, p2, lp.color, task.lineWidth + 1, task.lineType)
                 Else
                     count += 1
                 End If

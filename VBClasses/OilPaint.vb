@@ -28,15 +28,15 @@ Public Class XR_OilPaint_Pointilism : Inherits TaskParent
                     randomMask.Set(Of cv.Point)(y, x, nPt)
                 Next
             Next
-            cv.Cv2.RandShuffle(randomMask, 1.0, myRNG) ' the RNG is not optional.
+            RandShuffle(randomMask, 1.0, myRNG) ' the RNG is not optional.
         End If
-        cv.Cv2.Resize(randomMask, randomMask, img.Size())
+        Resize(randomMask, randomMask, img.Size())
         Dim fieldx As New cv.Mat, fieldy As New cv.Mat
-        cv.Cv2.Scharr(task.gray, fieldx, cv.MatType.CV_32FC1, 1, 0, 1 / 15.36)
-        cv.Cv2.Scharr(task.gray, fieldy, cv.MatType.CV_32FC1, 0, 1, 1 / 15.36)
+        Scharr(task.gray, fieldx, cv.MatType.CV_32FC1, 1, 0, 1 / 15.36)
+        Scharr(task.gray, fieldy, cv.MatType.CV_32FC1, 0, 1, 1 / 15.36)
 
-        cv.Cv2.GaussianBlur(fieldx, fieldx, New cv.Size(options.smoothingRadius, options.smoothingRadius), 0, 0)
-        cv.Cv2.GaussianBlur(fieldy, fieldy, New cv.Size(options.smoothingRadius, options.smoothingRadius), 0, 0)
+        GaussianBlur(fieldx, fieldx, New cv.Size(options.smoothingRadius, options.smoothingRadius), 0, 0)
+        GaussianBlur(fieldy, fieldy, New cv.Size(options.smoothingRadius, options.smoothingRadius), 0, 0)
 
         For y = 0 To img.Height - 1
             For x = 0 To img.Width - 1
@@ -53,9 +53,9 @@ Public Class XR_OilPaint_Pointilism : Inherits TaskParent
 
                 Dim rotatedRect = New cv.RotatedRect(nPoint, eSize, angle)
                 If options.useElliptical Then
-                    cv.Cv2.Ellipse(dst2(saveDrawRect), rotatedRect, nextColor)
+                    Ellipse(dst2(saveDrawRect), rotatedRect, nextColor)
                 Else
-                    cv.Cv2.Circle(dst2(saveDrawRect), nPoint, slen / 4, nextColor, -1, task.lineType)
+                    Circle(dst2(saveDrawRect), nPoint, slen / 4, nextColor, -1, task.lineType)
                 End If
             Next
         Next

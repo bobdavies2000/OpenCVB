@@ -189,7 +189,7 @@ Public Class Hist3D_Pixel : Inherits TaskParent
 
         If src.Channels() <> 3 Then src = task.color
         Dim bins = options.histogram3DBins
-        cv.Cv2.CalcHist({src}, {0, 1, 2}, New cv.Mat, histogram, 3, {bins, bins, bins}, task.rangesBGR)
+        CalcHist({src}, {0, 1, 2}, New cv.Mat, histogram, 3, {bins, bins, bins}, task.rangesBGR)
 
         ReDim histArray(histogram.Total - 1)
         histogram.GetArray(Of Single)(histArray)
@@ -201,7 +201,7 @@ Public Class Hist3D_Pixel : Inherits TaskParent
         classCount = bins * bins * bins
         Marshal.Copy(histArray, 0, histogram.Data, histArray.Length)
 
-        cv.Cv2.CalcBackProject({src}, {0, 1, 2}, histogram, dst2, task.rangesBGR)
+        CalcBackProject({src}, {0, 1, 2}, histogram, dst2, task.rangesBGR)
         dst3 = Palettize(dst2)
     End Sub
 End Class
@@ -241,8 +241,8 @@ Public Class XR_Hist3D_PixelDiffMask : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         pixel.Run(src)
         Static lastImage As cv.Mat = pixel.dst2.Clone
-        cv.Cv2.Absdiff(lastImage, pixel.dst2, dst3)
-        cv.Cv2.Threshold(dst3, dst2, 0, 255, cv.ThresholdTypes.Binary)
+        Absdiff(lastImage, pixel.dst2, dst3)
+        Threshold(dst3, dst2, 0, 255, cv.ThresholdTypes.Binary)
         lastImage = pixel.dst2.Clone
     End Sub
 End Class
@@ -279,11 +279,11 @@ Public Class XR_Hist3D_RedCloudGrid : Inherits TaskParent
         dst2 = pixels.redC.rcMap
         dst0 = pixels.redC.rcMap
 
-        cv.Cv2.InRange(dst2, 0, 0, dst3)
+        InRange(dst2, 0, 0, dst3)
         If pixels.pixelVector.Count = 0 Then Exit Sub
         dst1.SetTo(0)
         For Each gRect In task.gridRects
-            If cv.Cv2.CountNonZero(dst3(gRect)) Then
+            If CountNonZero(dst3(gRect)) Then
                 Dim candidates As New List(Of Integer)
                 For y = 0 To gRect.Height - 1
                     For x = 0 To gRect.Width - 1

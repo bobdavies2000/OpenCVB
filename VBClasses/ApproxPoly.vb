@@ -22,7 +22,7 @@ Public Class ApproxPoly_Basics : Inherits TaskParent
 
         If contour.allContours.Count > 0 Then
             Dim nextContour As cv.Point()
-            nextContour = cv.Cv2.ApproxPolyDP(contour.bestContour, options.epsilon, options.closedPoly)
+            nextContour = ApproxPolyDP(contour.bestContour, options.epsilon, options.closedPoly)
             dst3.SetTo(0)
             DrawTour(dst3, nextContour.ToList, cv.Scalar.Yellow)
         Else
@@ -52,21 +52,21 @@ Public Class XR_ApproxPoly_FindandDraw : Inherits TaskParent
         rotatedRect.Run(src)
         dst2 = rotatedRect.dst2
         Dim _cvt1 As New cv.Mat
-        cv.Cv2.CvtColor(dst2, _cvt1, cv.ColorConversionCodes.BGR2GRAY)
-        cv.Cv2.Threshold(_cvt1, dst0, 1, 255, cv.ThresholdTypes.Binary)
+        CvtColor(dst2, _cvt1, cv.ColorConversionCodes.BGR2GRAY)
+        Threshold(_cvt1, dst0, 1, 255, cv.ThresholdTypes.Binary)
 
         dst0.ConvertTo(dst1, cv.MatType.CV_32SC1)
-        cv.Cv2.FindContours(dst1, allContours, Nothing, cv.RetrievalModes.FloodFill, cv.ContourApproximationModes.ApproxSimple)
+        FindContours(dst1, allContours, Nothing, cv.RetrievalModes.FloodFill, cv.ContourApproximationModes.ApproxSimple)
         dst3.SetTo(0)
 
         Dim nextContour As cv.Point()
         Dim contours As New List(Of cv.Point())
         For Each tour In allContours
-            nextContour = cv.Cv2.ApproxPolyDP(tour, 3, True)
+            nextContour = ApproxPolyDP(tour, 3, True)
             If nextContour.Count > 2 Then contours.Add(nextContour)
         Next
 
-        cv.Cv2.DrawContours(dst3, contours, -1, New cv.Scalar(0, 255, 255), task.lineWidth, task.lineType)
+        DrawContours(dst3, contours, -1, New cv.Scalar(0, 255, 255), task.lineWidth, task.lineType)
     End Sub
 End Class
 

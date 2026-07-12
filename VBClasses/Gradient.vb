@@ -8,7 +8,7 @@ Public Class Gradient_Basics : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         sobel.Run(src)
-        cv.Cv2.Phase(sobel.dst0, sobel.dst1, dst3)
+        Phase(sobel.dst0, sobel.dst1, dst3)
         dst2 = sobel.dst0
     End Sub
 End Class
@@ -24,7 +24,7 @@ Public Class Gradient_PhaseDepth : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         sobel.Run(task.pcSplit(2))
-        cv.Cv2.Phase(sobel.dst0, sobel.dst1, dst3)
+        Phase(sobel.dst0, sobel.dst1, dst3)
         dst2 = sobel.dst0
     End Sub
 End Class
@@ -59,9 +59,9 @@ Public Class Gradient_CartToPolar : Inherits TaskParent
 
         magnitude = New cv.Mat
         angle = New cv.Mat
-        cv.Cv2.CartToPolar(dst2, dst3, magnitude, angle, True)
-        cv.Cv2.Normalize(magnitude, magnitude)
-        cv.Cv2.Pow(magnitude, options.exponent, magnitude)
+        CartToPolar(dst2, dst3, magnitude, angle, True)
+        Normalize(magnitude, magnitude)
+        Pow(magnitude, options.exponent, magnitude)
 
         dst2 = magnitude
     End Sub
@@ -94,6 +94,6 @@ Public Class Gradient_Color : Inherits TaskParent
         For i = 0 To gradientWidth - 1
             gradient.Col(i).SetTo(gradientColors.Get(Of cv.Scalar)(0, i))
         Next
-        cv.Cv2.Resize(gradient, dst2, dst2.Size)
+        Resize(gradient, dst2, dst2.Size)
     End Sub
 End Class

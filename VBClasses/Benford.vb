@@ -99,7 +99,7 @@ Public Class XR_Benford_NormalizedImage : Inherits TaskParent
         task.gray.ConvertTo(gray32f, cv.MatType.CV_32F)
 
         benford.Run(gray32f)
-        cv.Cv2.Normalize(benford.dst2, dst2, 1)
+        Normalize(benford.dst2, dst2, 1)
         labels(2) = benford.labels(3)
         labels(3) = "Input image"
     End Sub
@@ -123,7 +123,7 @@ Public Class XR_Benford_NormalizedImage99 : Inherits TaskParent
         task.gray.ConvertTo(gray32f, cv.MatType.CV_32F)
 
         benford.Run(gray32f)
-        cv.Cv2.Normalize(benford.dst2, dst2, 1)
+        Normalize(benford.dst2, dst2, 1)
         labels(2) = benford.labels(3)
         labels(3) = "Input image"
     End Sub
@@ -146,9 +146,9 @@ Public Class XR_Benford_JPEG : Inherits TaskParent
 
         Dim param = New ImageEncodingParam(ImwriteFlags.JpegQuality, options.quality)
         Dim jpeg As Byte() = Nothing
-        cv.Cv2.ImEncode(".jpg", src, jpeg, param)
+        ImEncode(".jpg", src, jpeg, param)
         Dim tmp = cv.Mat.FromPixelData(jpeg.Count, 1, cv.MatType.CV_8U, jpeg)
-        dst3 = cv.Cv2.ImDecode(tmp, cv.ImreadModes.Color)
+        dst3 = ImDecode(tmp, cv.ImreadModes.Color)
         benford.Run(tmp)
         dst2 = benford.dst2
         labels(2) = benford.labels(3)
@@ -174,9 +174,9 @@ Public Class XR_Benford_JPEG99 : Inherits TaskParent
 
         Dim param = New ImageEncodingParam(ImwriteFlags.JpegQuality, options.quality)
         Dim jpeg As Byte() = Nothing
-        cv.Cv2.ImEncode(".jpg", src, jpeg, param)
+        ImEncode(".jpg", src, jpeg, param)
         Dim tmp = cv.Mat.FromPixelData(jpeg.Count, 1, cv.MatType.CV_8U, jpeg)
-        dst3 = cv.Cv2.ImDecode(tmp, cv.ImreadModes.Color)
+        dst3 = ImDecode(tmp, cv.ImreadModes.Color)
         benford.Run(tmp)
         dst2 = benford.dst2
         labels(2) = benford.labels(3)
@@ -202,9 +202,9 @@ Public Class XR_Benford_PNG : Inherits TaskParent
 
         Dim param = New ImageEncodingParam(ImwriteFlags.JpegQuality, 90)
         Dim png As Byte() = Nothing
-        cv.Cv2.ImEncode(".jpg", src, png, param)
+        ImEncode(".jpg", src, png, param)
         Dim tmp = cv.Mat.FromPixelData(png.Count, 1, cv.MatType.CV_8U, png)
-        dst3 = cv.Cv2.ImDecode(tmp, cv.ImreadModes.Color)
+        dst3 = ImDecode(tmp, cv.ImreadModes.Color)
         benford.Run(tmp)
         dst2 = benford.dst2
         labels(2) = benford.labels(3)

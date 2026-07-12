@@ -66,24 +66,24 @@ Public Class XR_Reduction_HeatMapLines1 : Inherits TaskParent
         heat.Run(src)
 
         Dim _core_cvt As New cv.Mat
-        cv.Cv2.CvtColor(heat.dst2, _core_cvt, cv.ColorConversionCodes.BGR2GRAY)
+        CvtColor(heat.dst2, _core_cvt, cv.ColorConversionCodes.BGR2GRAY)
         core.Run(_core_cvt)
 
         setupTop.Run(heat.dst2)
         dst2 = setupTop.dst2
 
         For Each lp In core.lpList
-            cv.Cv2.Line(dst2, lp.p1, lp.p2, white, task.lineWidth)
+            Line(dst2, lp.p1, lp.p2, white, task.lineWidth)
         Next
 
-        cv.Cv2.CvtColor(heat.dst3, _core_cvt, cv.ColorConversionCodes.BGR2GRAY)
+        CvtColor(heat.dst3, _core_cvt, cv.ColorConversionCodes.BGR2GRAY)
         core.Run(_core_cvt)
 
         setupSide.Run(heat.dst3)
         dst3 = setupSide.dst2
 
         For Each lp In core.lpList
-            cv.Cv2.Line(dst3, lp.p1, lp.p2, white, task.lineWidth)
+            Line(dst3, lp.p1, lp.p2, white, task.lineWidth)
         Next
     End Sub
 End Class
@@ -133,18 +133,18 @@ Public Class XR_Reduction_XYZ : Inherits TaskParent
         options.Run()
 
         If src.Type <> cv.MatType.CV_32FC3 Then src = task.pointCloud
-        Dim split = cv.Cv2.Split(src)
-        For i = 0 To split.Length - 1
+        Dim splitMats As cv.Mat() = Split(src)
+        For i = 0 To splitMats.Length - 1
             If options.reduceXYZ(i) Then
-                split(i) *= 1000
-                split(i).ConvertTo(dst0, cv.MatType.CV_32S)
+                splitMats(i) *= 1000
+                splitMats(i).ConvertTo(dst0, cv.MatType.CV_32S)
                 reduction.Run(dst0)
                 Dim mm As mmData = GetMinMax(reduction.dst2)
-                reduction.dst2.ConvertTo(split(i), cv.MatType.CV_32F)
+                reduction.dst2.ConvertTo(splitMats(i), cv.MatType.CV_32F)
             End If
         Next
 
-        cv.Cv2.Merge(split, dst3)
+        Merge(splitMats, dst3)
         dst3.SetTo(0, task.noDepthMask)
         SetTrueText("task.PointCloud (or 32fc3 input) has been reduced and is in dst3")
     End Sub
@@ -186,11 +186,10 @@ Public Class XR_Reduction_BGR : Inherits TaskParent
         desc = "Reduce BGR image in parallel"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        Dim split As cv.Mat() = Nothing
-        cv.Cv2.Split(src, split)
+        Dim splitMats As cv.Mat() = Split(src)
 
         For i = 0 To 2
-            reduction.Run(split(i))
+            reduction.Run(splitMats(i))
             If standaloneTest() Then
                 mats.mat(i) = Palettize(reduction.dst2)
             End If
@@ -200,7 +199,7 @@ Public Class XR_Reduction_BGR : Inherits TaskParent
         mats.Run(emptyMat)
         dst3 = mats.dst2
 
-        cv.Cv2.Merge(split, dst2)
+        Merge(splitMats, dst2)
     End Sub
 End Class
 
@@ -226,7 +225,7 @@ Public Class XR_Reduction_MotionTest : Inherits TaskParent
         Else
             dst2.CopyTo(dst3, task.motion.motionMask)
 
-            cv.Cv2.CvtColor(dst2, diff.lastFrame, cv.ColorConversionCodes.BGR2GRAY)
+            CvtColor(dst2, diff.lastFrame, cv.ColorConversionCodes.BGR2GRAY)
             diff.Run(dst3)
             dst1 = diff.dst2
         End If

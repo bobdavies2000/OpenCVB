@@ -13,7 +13,7 @@ Public Class XR_Solve_ByMat : Inherits TaskParent
         Dim a = cv.Mat.FromPixelData(2, 2, cv.MatType.CV_64FC1, av)
         Dim y = cv.Mat.FromPixelData(2, 1, cv.MatType.CV_64FC1, yv)
         Dim x As New cv.Mat
-        cv.Cv2.Solve(a, y, x, cv.DecompTypes.LU)
+        Solve(a, y, x, cv.DecompTypes.LU)
 
         SetTrueText("Solution ByMat: X1 = " + CStr(x.Get(Of Double)(0, 0)) + vbTab + "X2 = " + CStr(x.Get(Of Double)(0, 1)), New cv.Point(10, 125))
     End Sub
@@ -45,7 +45,7 @@ Public Class XR_Solve_ByArray : Inherits TaskParent
             yMat.Set(Of Double)(r, 0, yv(r))
         Next
         Dim x As New cv.Mat
-        cv.Cv2.Solve(avMat, yMat, x, cv.DecompTypes.LU)
+        Solve(avMat, yMat, x, cv.DecompTypes.LU)
 
         SetTrueText("Solution ByArray: X1 = " + CStr(x.Get(Of Double)(0, 0)) + vbTab + "X2 = " + CStr(x.Get(Of Double)(0, 1)), New cv.Point(10, 125))
     End Sub

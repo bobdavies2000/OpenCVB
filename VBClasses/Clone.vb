@@ -17,18 +17,18 @@ Public Class Clone_Basics : Inherits TaskParent
         If task.drawRect = New cv.Rect Then
             mask.SetTo(255)
         Else
-            cv.Cv2.Rectangle(mask, task.drawRect, cv.Scalar.White, -1)
+            Rectangle(mask, task.drawRect, cv.Scalar.White, -1)
         End If
-        cv.Cv2.CvtColor(mask, dst3, cv.ColorConversionCodes.GRAY2BGR)
+        CvtColor(mask, dst3, cv.ColorConversionCodes.GRAY2BGR)
 
         If standaloneTest() And task.frameCount Mod 10 = 0 Then cloneSpec += 1
         Select Case cloneSpec Mod 3
             Case 0
-                cv.Cv2.ColorChange(src, mask, dst2, colorChangeValues(0), colorChangeValues(1), colorChangeValues(2))
+                ColorChange(src, mask, dst2, colorChangeValues(0), colorChangeValues(1), colorChangeValues(2))
             Case 1
-                cv.Cv2.IlluminationChange(src, mask, dst2, illuminationChangeValues(0), illuminationChangeValues(1))
+                IlluminationChange(src, mask, dst2, illuminationChangeValues(0), illuminationChangeValues(1))
             Case 2
-                cv.Cv2.TextureFlattening(src, mask, dst2, textureFlatteningValues(0), textureFlatteningValues(1))
+                TextureFlattening(src, mask, dst2, textureFlatteningValues(0), textureFlatteningValues(1))
         End Select
     End Sub
 End Class
@@ -115,12 +115,12 @@ Public Class XR_Clone_Eagle : Inherits TaskParent
     Dim pt As cv.Point
     Dim options As New Options_Clone
     Public Sub New()
-        sourceImage = cv.Cv2.ImRead(task.homeDir + "Data/CloneSource.png")
-        cv.Cv2.Resize(sourceImage, sourceImage, New cv.Size(sourceImage.Width * dst2.Width / 1280, sourceImage.Height * dst2.Height / 720))
+        sourceImage = ImRead(task.homeDir + "Data/CloneSource.png")
+        Resize(sourceImage, sourceImage, New cv.Size(sourceImage.Width * dst2.Width / 1280, sourceImage.Height * dst2.Height / 720))
         srcROI = New cv.Rect(0, 40, sourceImage.Width, sourceImage.Height)
 
-        mask = cv.Cv2.ImRead(task.homeDir + "Data/Clonemask.png")
-        cv.Cv2.Resize(mask, mask, New cv.Size(mask.Width * dst2.Width / 1280, mask.Height * dst2.Height / 720))
+        mask = ImRead(task.homeDir + "Data/Clonemask.png")
+        Resize(mask, mask, New cv.Size(mask.Width * dst2.Width / 1280, mask.Height * dst2.Height / 720))
         maskROI = New cv.Rect(srcROI.Width, 40, mask.Width, mask.Height)
 
         dst3.SetTo(0)
@@ -144,7 +144,7 @@ Public Class XR_Clone_Eagle : Inherits TaskParent
             If pt.Y - srcROI.Height < 0 Then pt.Y = srcROI.Height / 2
         End If
 
-        cv.Cv2.SeamlessClone(sourceImage, dst2, mask, pt, dst2, options.cloneFlag)
+        SeamlessClone(sourceImage, dst2, mask, pt, dst2, options.cloneFlag)
     End Sub
 End Class
 
@@ -166,14 +166,14 @@ Public Class XR_Clone_Seamless : Inherits TaskParent
         Dim radius = 100
         If task.drawRect = New cv.Rect Then
             dst3.SetTo(0)
-            cv.Cv2.Circle(dst3, center, radius, white, -1, task.lineType)
+            Circle(dst3, center, radius, white, -1, task.lineType)
         Else
-            cv.Cv2.Rectangle(dst3, task.drawRect, cv.Scalar.White, -1)
+            Rectangle(dst3, task.drawRect, cv.Scalar.White, -1)
         End If
 
         dst2 = src.Clone()
-        cv.Cv2.SeamlessClone(task.depthRGB, src, dst3, center, dst2, options.cloneFlag)
-        cv.Cv2.Circle(dst2, center, radius, white, -1, task.lineType)
+        SeamlessClone(task.depthRGB, src, dst3, center, dst2, options.cloneFlag)
+        Circle(dst2, center, radius, white, -1, task.lineType)
     End Sub
 End Class
 

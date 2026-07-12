@@ -19,7 +19,7 @@ Public Class Hist3Dcolor_Basics : Inherits TaskParent
         If src.Type <> cv.MatType.CV_8UC3 Then src = task.color
         If task.heartBeat Or alwaysRun Or histogram.Width = 0 Then
             Dim bins = options.histogram3DBins
-            cv.Cv2.CalcHist({src}, {0, 1, 2}, inputMask, histogram, 3, {bins, bins, bins}, task.rangesBGR)
+            CalcHist({src}, {0, 1, 2}, inputMask, histogram, 3, {bins, bins, bins}, task.rangesBGR)
 
             ReDim histArray(histogram.Total - 1)
             histogram.GetArray(Of Single)(histArray)
@@ -30,7 +30,7 @@ Public Class Hist3Dcolor_Basics : Inherits TaskParent
             classCount = simK.classCount
         End If
 
-        cv.Cv2.CalcBackProject({src}, {0, 1, 2}, histogram, dst2, task.rangesBGR)
+        CalcBackProject({src}, {0, 1, 2}, histogram, dst2, task.rangesBGR)
 
         dst3 = Palettize(dst2)
 
@@ -132,7 +132,7 @@ Public Class XR_Hist3Dcolor_ZeroGroups : Inherits TaskParent
         If task.optionsChanged Then
             Dim bins = options.histogram3DBins
             Dim hBins() As Integer = {bins, bins, bins}
-            cv.Cv2.CalcHist({src}, {0, 1, 2}, maskInput, histogram, 3, hBins, task.rangesBGR)
+            CalcHist({src}, {0, 1, 2}, maskInput, histogram, 3, hBins, task.rangesBGR)
 
             Dim histArray(histogram.Total - 1) As Single
             histogram.GetArray(Of Single)(histArray)
@@ -164,7 +164,7 @@ Public Class XR_Hist3Dcolor_ZeroGroups : Inherits TaskParent
 
             Marshal.Copy(histArray, 0, histogram.Data, histArray.Length)
         End If
-        cv.Cv2.CalcBackProject({src}, {0, 1, 2}, histogram, dst2, task.rangesBGR)
+        CalcBackProject({src}, {0, 1, 2}, histogram, dst2, task.rangesBGR)
         dst3 = Palettize(dst2)
         labels(2) = "NR_Hist3Dcolor_ZeroGroups classCount = " + CStr(classCount)
     End Sub
@@ -213,8 +213,8 @@ Public Class XR_Hist3Dcolor_Select : Inherits TaskParent
         hColor.Run(src)
 
         Dim selection = task.gOptions.DebugSlider.Value
-                  cv.Cv2.InRange(hColor.dst2, selection, selection, dst2)
-        Dim saveCount = cv.Cv2.CountNonZero(dst2)
+                  InRange(hColor.dst2, selection, selection, dst2)
+        Dim saveCount = CountNonZero(dst2)
 
         dst3 = src.Clone
         dst3.SetTo(white, dst2)
@@ -263,7 +263,7 @@ Public Class XR_Hist3Dcolor_Basics_CPP : Inherits TaskParent
             histogram = simK.dst2
             classCount = simK.classCount
 
-            cv.Cv2.CalcBackProject({src}, {0, 1, 2}, histogram, dst2, task.rangesBGR)
+            CalcBackProject({src}, {0, 1, 2}, histogram, dst2, task.rangesBGR)
 
             Dim mm As mmData = GetMinMax(dst2)
 
@@ -325,7 +325,7 @@ Public Class Hist3Dcolor_Vector : Inherits TaskParent
             binArray = {options.histogram3DBins, options.histogram3DBins, options.histogram3DBins}
         End If
 
-        cv.Cv2.CalcHist({src}, {0, 1, 2}, inputMask, histogram, 3, binArray, task.rangesBGR)
+        CalcHist({src}, {0, 1, 2}, inputMask, histogram, 3, binArray, task.rangesBGR)
 
         ReDim histArray(histogram.Total - 1)
         histogram.GetArray(Of Single)(histArray)

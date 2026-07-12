@@ -27,12 +27,12 @@ Public Class Disparity_Basics : Inherits TaskParent
 
         rightView = task.rightView
 
-cv.Cv2.Rectangle(dst2, rect, black, task.lineWidth)
+Rectangle(dst2, rect, black, task.lineWidth)
         match.Run(rightView(searchRect))
         dst3 = rightView
         matchRect = match.newRect
 
-cv.Cv2.Rectangle(dst3, searchRect, black, task.lineWidth)
+Rectangle(dst3, searchRect, black, task.lineWidth)
         '  dst3.Rectangle(match.newRect, black, task.lineWidth)
         saveCorrelations.Add(match.correlation)
 
@@ -43,7 +43,7 @@ cv.Cv2.Rectangle(dst3, searchRect, black, task.lineWidth)
             bestRect = match.newRect
             bestRect.Y = searchRect.Y
         End If
-        cv.Cv2.Rectangle(dst3, bestRect, white, task.lineWidth)
+        Rectangle(dst3, bestRect, white, task.lineWidth)
 
         If saveCorrelations.Count > 100 Then saveCorrelations.RemoveAt(0)
 
@@ -174,12 +174,12 @@ Public Class XR_Disparity_Color8u : Inherits TaskParent
         dst3 = disparity.dst3
         labels = disparity.labels
 
-        cv.Cv2.Rectangle(task.color, disparity.rect, cv.Scalar.All(255), task.lineWidth)
-        cv.Cv2.Rectangle(dst1, disparity.matchRect, cv.Scalar.All(255), task.lineWidth)
+        Rectangle(task.color, disparity.rect, cv.Scalar.All(255), task.lineWidth)
+        Rectangle(dst1, disparity.matchRect, cv.Scalar.All(255), task.lineWidth)
 
         Dim index As Integer = task.gridMap.Get(Of Integer)(task.clickPoint.Y, task.clickPoint.X)
         Dim rect = task.gridRects(index)
-        cv.Cv2.Rectangle(dst2, rect, cv.Scalar.All(255), task.lineWidth)
+        Rectangle(dst2, rect, cv.Scalar.All(255), task.lineWidth)
     End Sub
 End Class
 

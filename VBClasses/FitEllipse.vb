@@ -1,5 +1,8 @@
-Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 Imports System.Runtime.InteropServices
+Imports System.Windows.Shapes
+Imports OpenCvSharp
+Imports OpenCvSharp.Cv2
+Imports cv = OpenCvSharp
 ' https://docs.opencvb.org/3.4.2/de/dc7/fitellipse_8cpp-example.html
 Public Class FitEllipse_Basics : Inherits TaskParent
     Dim options As New Options_MinArea
@@ -18,11 +21,11 @@ Public Class FitEllipse_Basics : Inherits TaskParent
 
         dst2.SetTo(0)
         For Each pt In inputPoints
-        cv.Cv2.Circle(dst2, pt, task.DotSize, white, -1, task.lineType)
+            Circle(dst2, pt, task.DotSize, white, -1, task.lineType)
         Next
 
         If inputPoints.Count > 4 Then
-            box = cv.Cv2.FitEllipse(inputPoints)
+            box = FitEllipse(inputPoints)
             vertices = box.Points()
             If standaloneTest() Then
                 For i = 0 To vertices.Count - 1
@@ -55,7 +58,7 @@ Public Class XR_FitEllipse_AMS_CPP : Inherits TaskParent
         End If
         dst2.SetTo(0)
         For Each pt In inputPoints
-        cv.Cv2.Circle(dst2, pt, task.DotSize, white, -1, task.lineType)
+            Circle(dst2, pt, task.DotSize, white, -1, task.lineType)
         Next
 
         Dim input As cv.Mat = cv.Mat.FromPixelData(inputPoints.Count, 1, cv.MatType.CV_32FC2, inputPoints.ToArray)
@@ -66,13 +69,13 @@ Public Class XR_FitEllipse_AMS_CPP : Inherits TaskParent
         Dim boxPtr = FitEllipse_AMS(srcHandle.AddrOfPinnedObject(), inputPoints.Count)
         srcHandle.Free()
 
-        Dim ellipse(5 - 1) As Single
-        Marshal.Copy(boxPtr, ellipse, 0, ellipse.Length)
+        Dim ellipses(5 - 1) As Single
+        Marshal.Copy(boxPtr, ellipses, 0, ellipses.Length)
 
-        Dim angle = ellipse(0)
-        Dim center = lpData.validatePoint(New cv.Point2f(ellipse(1), ellipse(2)))
-        Dim size As New cv.Size2f(ellipse(3), ellipse(4))
-        If Single.IsNaN(ellipse(3)) Or Single.IsNaN(ellipse(4)) Then Exit Sub ' one of the random points is the same
+        Dim angle = ellipses(0)
+        Dim center = lpData.validatePoint(New cv.Point2f(ellipses(1), ellipses(2)))
+        Dim size As New cv.Size2f(ellipses(3), ellipses(4))
+        If Single.IsNaN(ellipses(3)) Or Single.IsNaN(ellipses(4)) Then Exit Sub ' one of the random points is the same
         If size.Width < task.lineWidth + 1 Or size.Height < task.lineWidth + 1 Then Exit Sub
 
         Dim box = New cv.RotatedRect(center, size, angle)
@@ -99,7 +102,7 @@ Public Class XR_FitEllipse_Direct_CPP : Inherits TaskParent
 
         dst2.SetTo(0)
         For Each pt In options.srcPoints
-        cv.Cv2.Circle(dst2, pt, task.DotSize, white, -1, task.lineType)
+            Circle(dst2, pt, task.DotSize, white, -1, task.lineType)
         Next
 
         Dim input As cv.Mat = cv.Mat.FromPixelData(options.srcPoints.Count, 1, cv.MatType.CV_32FC2, options.srcPoints.ToArray)
@@ -109,12 +112,12 @@ Public Class XR_FitEllipse_Direct_CPP : Inherits TaskParent
         Dim boxPtr = FitEllipse_Direct(srcHandle.AddrOfPinnedObject(), options.srcPoints.Count)
         srcHandle.Free()
 
-        Dim ellipse(5 - 1) As Single
-        Marshal.Copy(boxPtr, ellipse, 0, ellipse.Length)
+        Dim ellipses(5 - 1) As Single
+        Marshal.Copy(boxPtr, ellipses, 0, ellipses.Length)
 
-        Dim angle = ellipse(0)
-        Dim center As New cv.Point2f(ellipse(1), ellipse(2))
-        Dim size As New cv.Size2f(ellipse(3), ellipse(4))
+        Dim angle = ellipses(0)
+        Dim center As New cv.Point2f(ellipses(1), ellipses(2))
+        Dim size As New cv.Size2f(ellipses(3), ellipses(4))
         If size.Width < task.lineWidth + 1 Or size.Height < task.lineWidth + 1 Then Exit Sub
 
         Dim box = New cv.RotatedRect(center, size, angle)
@@ -182,7 +185,7 @@ Public Class XR_FitEllipse_Rectangle : Inherits TaskParent
             End If
         End If
 
-        rect = cv.Cv2.FitEllipse(ptList)
+        rect = FitEllipse(ptList)
         vertices = rect.Points()
         For i = 0 To vertices.Count - 1
             cv.Cv2.Line(dst2, vertices(i), vertices((i + 1) Mod 4), 255, task.lineWidth, task.lineType)

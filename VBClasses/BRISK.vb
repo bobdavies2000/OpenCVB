@@ -19,7 +19,7 @@ Public Class BRISK_Basics : Inherits TaskParent
         For Each pt In keyPoints
             If pt.Size > options.minDistance Then
                 features.Add(New cv.Point2f(pt.Pt.X, pt.Pt.Y))
-                cv.Cv2.Circle(dst2, pt.Pt, task.DotSize + 1, task.highlight, -1, task.lineType)
+                Circle(dst2, pt.Pt, task.DotSize + 1, task.highlight, -1, task.lineType)
             End If
         Next
         labels(2) = CStr(features.Count) + " features found with BRISK"

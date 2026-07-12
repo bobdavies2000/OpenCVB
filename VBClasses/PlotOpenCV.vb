@@ -52,13 +52,13 @@ Public Class PlotOpenCV_Depth : Inherits TaskParent
         dst2 = plotDepth.dst2
 
         labels(2) = plotDepth.labels(2)
-        Dim Split = Regex.Split(labels(2), "\W+")
-        Dim lineCount = CInt(Split(5))
+        Dim splitStr = Regex.Split(labels(2), "\W+")
+        Dim lineCount = CInt(splitStr(5))
         If lineCount > 0 Then
             Dim meterDepth = src.Width \ lineCount
             For i = 1 To lineCount
                 Dim x = i * meterDepth
-                cv.Cv2.Line(dst2, New cv.Point(x, 0), New cv.Point(x, src.Height), white, task.lineWidth, task.lineType)
+                Line(dst2, New cv.Point(x, 0), New cv.Point(x, src.Height), white, task.lineWidth, task.lineType)
                 SetTrueText(i.ToString("0") + "m", New cv.Point(x + 4, src.Height - 10))
             Next
         End If
@@ -126,7 +126,7 @@ Public Class PlotOpenCV_Points : Inherits TaskParent
             Dim pt = New cv.Point(dst2.Width * (input(i).X - minX) \ (maxX - minX),
                                       dst2.Height - dst2.Height * (y - minY) \ (maxY - minY))
             If pt.Y <> dst2.Height / 2 Then
-            cv.Cv2.Circle(dst2, pt, task.DotSize, task.highlight, -1, task.lineType)
+            Circle(dst2, pt, task.DotSize, task.highlight, -1, task.lineType)
                 output.Add(pt)
             Else
                 output.Add(newPoint)

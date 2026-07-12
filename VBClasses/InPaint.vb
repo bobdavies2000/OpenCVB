@@ -9,17 +9,17 @@ Public Class InPaint_Basics : Inherits TaskParent
     Public Function drawRandomLine(dst As cv.Mat) As cv.Mat
         Dim p1 = New cv.Point2f(msRNG.Next(dst.Cols / 4, dst.Cols * 3 / 4), msRNG.Next(dst.Rows / 4, dst.Rows * 3 / 4))
         Dim p2 = New cv.Point2f(msRNG.Next(dst.Cols / 4, dst.Cols * 3 / 4), msRNG.Next(dst.Rows / 4, dst.Rows * 3 / 4))
-        cv.Cv2.Line(dst2, p1, p2, New cv.Scalar(0, 0, 0), task.lineWidth, task.lineType)
+        Line(dst2, p1, p2, New cv.Scalar(0, 0, 0), task.lineWidth, task.lineType)
         Dim mask = New cv.Mat(dst2.Size(), cv.MatType.CV_8UC1)
         mask.SetTo(0)
-        cv.Cv2.Line(mask, p1, p2, cv.Scalar.All(255), task.lineWidth, task.lineType)
+        Line(mask, p1, p2, cv.Scalar.All(255), task.lineWidth, task.lineType)
         Return mask
     End Function
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
         src.CopyTo(dst2)
         Dim mask As cv.Mat = drawRandomLine(dst2)
-        cv.Cv2.Inpaint(dst2, mask, dst3, task.lineWidth, If(options.telea, cv.InpaintTypes.Telea, cv.InpaintTypes.NS))
+        Inpaint(dst2, mask, dst3, task.lineWidth, If(options.telea, cv.InpaintTypes.Telea, cv.InpaintTypes.NS))
     End Sub
 End Class
 
@@ -39,7 +39,7 @@ Public Class XR_InPaint_Noise : Inherits TaskParent
         options.Run()
         noise.Run(src) ' create some noise in the result1 image.
         dst2 = noise.dst2
-        cv.Cv2.Inpaint(dst2, noise.noiseMask, dst3, noise.options.noiseWidth, If(options.telea,
+        Inpaint(dst2, noise.noiseMask, dst3, noise.options.noiseWidth, If(options.telea,
                                cv.InpaintTypes.Telea, cv.InpaintTypes.NS))
     End Sub
 End Class
@@ -61,7 +61,7 @@ Public Class XR_InPaint_Depth : Inherits TaskParent
         options.Run()
         If src.Type <> cv.MatType.CV_32F Then src = task.pcSplit(2)
         dst2 = src.Clone
-        cv.Cv2.Inpaint(src, task.noDepthMask, dst3, 20, If(options.telea, cv.InpaintTypes.Telea, cv.InpaintTypes.NS))
+        Inpaint(src, task.noDepthMask, dst3, 20, If(options.telea, cv.InpaintTypes.Telea, cv.InpaintTypes.NS))
     End Sub
 End Class
 
@@ -82,13 +82,13 @@ Public Class XR_InPaint_PointCloud : Inherits TaskParent
         options.Run()
         dst2 = task.pointCloud.Clone
 
-        Dim split(2) As cv.Mat
+        Dim splitMats(2) As cv.Mat
         For i = 0 To task.pcSplit.Count - 1
-            split(i) = New cv.Mat
-            cv.Cv2.Inpaint(task.pcSplit(i), task.noDepthMask, split(i), 20,
+            splitMats(i) = New cv.Mat
+            Inpaint(task.pcSplit(i), task.noDepthMask, splitMats(i), 20,
                                 If(options.telea, cv.InpaintTypes.Telea, cv.InpaintTypes.NS))
         Next
-        cv.Cv2.Merge(split, dst3)
+        Merge(splitMats, dst3)
     End Sub
 End Class
 
@@ -104,7 +104,7 @@ Public Class XR_InPaint_MissingDepth : Inherits TaskParent
         options.Run()
 
         ' Apply inpainting to fill missing pixels
-        cv.Cv2.Inpaint(task.pcSplit(2), task.noDepthMask, dst2, options.radius,
+        Inpaint(task.pcSplit(2), task.noDepthMask, dst2, options.radius,
                                If(options.telea, cv.InpaintTypes.Telea, cv.InpaintTypes.NS))
     End Sub
 End Class

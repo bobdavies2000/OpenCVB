@@ -21,7 +21,7 @@ Public Class GeneticDrawing_Basics : Inherits TaskParent
         options = New Options_GeneticDrawing()
         For i = 0 To brushes.Count - 1
             Dim _cvtInline As New cv.Mat
-            cv.Cv2.CvtColor(cv.Cv2.ImRead(task.homeDir + "Data/GeneticDrawingBrushes/" + CStr(i) + ".jpg"), _cvtInline, cv.ColorConversionCodes.BGR2GRAY)
+            CvtColor(ImRead(task.homeDir + "Data/GeneticDrawingBrushes/" + CStr(i) + ".jpg"), _cvtInline, cv.ColorConversionCodes.BGR2GRAY)
             brushes(i) =_cvtInline
         Next
 
@@ -37,10 +37,10 @@ Public Class GeneticDrawing_Basics : Inherits TaskParent
             Dim brushImg = brushes(d.brushNumber)
 
             Dim br As New cv.Mat
-            cv.Cv2.Resize(brushImg, br, New cv.Size(CInt((brushImg.Width * d.size + 1) * options.brushPercent),
+            Resize(brushImg, br, New cv.Size(CInt((brushImg.Width * d.size + 1) * options.brushPercent),
                                                          CInt((brushImg.Height * d.size + 1) * options.brushPercent)))
-            Dim m = cv.Cv2.GetRotationMatrix2D(New cv.Point2f(br.Cols / 2, br.Rows / 2), d.rotation, 1)
-            cv.Cv2.WarpAffine(br, br, m, New cv.Size(br.Cols, br.Rows))
+            Dim m = GetRotationMatrix2D(New cv.Point2f(br.Cols / 2, br.Rows / 2), d.rotation, 1)
+            WarpAffine(br, br, m, New cv.Size(br.Cols, br.Rows))
 
             If d.rotation < 0 Then
                 d.pt = New cv.Point(d.pt.X - br.Width, d.pt.Y - br.Height)
@@ -57,10 +57,10 @@ Public Class GeneticDrawing_Basics : Inherits TaskParent
 
             br.ConvertTo(alpha, cv.MatType.CV_32F, 1 / 255)
             Dim foreground = New cv.Mat(New cv.Size(rect.Width, rect.Height), cv.MatType.CV_32F, CSng(d.color))
-            cv.Cv2.Multiply(alpha, foreground, foreground)
-            cv.Cv2.Multiply((1.0 - alpha).ToMat, background, background)
+            Multiply(alpha, foreground, foreground)
+            Multiply((1.0 - alpha).ToMat, background, background)
 
-            cv.Cv2.Add(foreground, background, foreground)
+            Add(foreground, background, foreground)
             foreground.ConvertTo(nextImage(rect), cv.MatType.CV_8U)
         Next
         Return nextImage
@@ -72,10 +72,10 @@ Public Class GeneticDrawing_Basics : Inherits TaskParent
     Private Function calculateError(ByRef img As cv.Mat) As Single
         ' compute error for resulting image.
         Dim diff1 As New cv.Mat, diff2 As New cv.Mat
-        cv.Cv2.Subtract(mats.mat(0), img, diff1)
-        cv.Cv2.Subtract(img, mats.mat(0), diff2)
-        cv.Cv2.Add(diff1, diff2, diff1)
-        Return cv.Cv2.Sum(diff1)(0)
+        Subtract(mats.mat(0), img, diff1)
+        Subtract(img, mats.mat(0), diff2)
+        Add(diff1, diff2, diff1)
+        Return Sum(diff1)(0)
     End Function
     Private Sub startNewStage(r As cv.Rect)
         ReDim DNAseq(options.strokeCount - 1)
@@ -111,13 +111,13 @@ Public Class GeneticDrawing_Basics : Inherits TaskParent
             stage = 0
 
             If standaloneTest() Then
-                cv.Cv2.Resize(cv.Cv2.ImRead(task.homeDir + "Data/GeneticDrawingExample.jpg"), src, src.Size())
+                Resize(ImRead(task.homeDir + "Data/GeneticDrawingExample.jpg"), src, src.Size())
             End If
 
             src = If(src.Channels() = 3, task.gray, src)
             mats.mat(0) = src
             gradient.Run(mats.mat(0))
-            cv.Cv2.ConvertScaleAbs(gradient.magnitude, mats.mat(2), 255)
+            ConvertScaleAbs(gradient.magnitude, mats.mat(2), 255)
 
             startNewStage(r)
         End If
@@ -203,26 +203,25 @@ Public Class XR_GeneticDrawing_Color : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         Static restartCheck = OptionParent.FindCheckBox("Restart the algorithm with the current settings")
-        Dim split() As cv.Mat
-        split = cv.Cv2.Split(src)
+        Dim splitMats() = Split(src)
 
         Dim restartRequested = restartCheck.checked
         restartCheck.checked = False
-        For i = 0 To split.Count - 1
+        For i = 0 To splitMats.Count - 1
             gDraw(i).restartRequested = restartRequested
-            gDraw(i).Run(split(i))
-            split(i) = gDraw(i).dst3
+            gDraw(i).Run(splitMats(i))
+            splitMats(i) = gDraw(i).dst3
         Next
 
         dst3 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, 0)
-        cv.Cv2.Merge(split, dst3)
+        Merge(splitMats, dst3)
 
-        For i = 0 To split.Count - 1
+        For i = 0 To splitMats.Count - 1
             Dim _cvtInline As New cv.Mat
-            cv.Cv2.CvtColor(gDraw(i).dst2, _cvtInline, cv.ColorConversionCodes.BGR2GRAY)
-            split(i) = If(gDraw(i).dst2.Channels() = 1, gDraw(i).dst2,_cvtInline)
+            CvtColor(gDraw(i).dst2, _cvtInline, cv.ColorConversionCodes.BGR2GRAY)
+            splitMats(i) = If(gDraw(i).dst2.Channels() = 1, gDraw(i).dst2, _cvtInline)
         Next
-        cv.Cv2.Merge(split, dst2)
+        Merge(splitMats, dst2)
 
         labels(3) = gDraw(2).labels(3)
     End Sub
@@ -262,7 +261,7 @@ Public Class XR_GeneticDrawing_Photo : Inherits TaskParent
                 Exit Sub
             End If
 
-            Dim fullsizeImage = cv.Cv2.ImRead(fileInputName.FullName)
+            Dim fullsizeImage = ImRead(fileInputName.FullName)
             If fullsizeImage.Channels() <> 3 Then
                 labels(2) = "Input file must be BGR 3-channel image!"
                 Exit Sub
@@ -276,7 +275,7 @@ Public Class XR_GeneticDrawing_Photo : Inherits TaskParent
                     newSize = New cv.Size(dst2.Width, dst2.Width * fullsizeImage.Height / fullsizeImage.Width)
                 End If
                 src.SetTo(0)
-                cv.Cv2.Resize(fullsizeImage, fullsizeImage, newSize)
+                Resize(fullsizeImage, fullsizeImage, newSize)
             Else
                 src = fullsizeImage
             End If

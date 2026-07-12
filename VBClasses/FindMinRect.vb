@@ -15,14 +15,14 @@ Public Class FindMinRect_Basics : Inherits TaskParent
         End If
 
         If inputPoints.Count = 0 Then
-            minRect = cv.Cv2.MinAreaRect(inputContour)
+            minRect = MinAreaRect(inputContour)
         Else
-            minRect = cv.Cv2.MinAreaRect(inputPoints.ToArray)
+            minRect = MinAreaRect(inputPoints.ToArray)
         End If
         If standaloneTest() Then
             dst2.SetTo(0)
             For Each pt In inputPoints
-            cv.Cv2.Circle(dst2, pt, task.DotSize + 2, cv.Scalar.Red, -1, task.lineType)
+            Circle(dst2, pt, task.DotSize + 2, cv.Scalar.Red, -1, task.lineType)
             Next
             Draw_Arc.DrawRotatedOutline(minRect, dst2, cv.Scalar.Yellow)
         End If
@@ -47,11 +47,11 @@ Public Class XR_FindMinRect_Motion : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         bgSub.Run(src)
         dst1 = bgSub.dst2
-        Dim contours = cv.Cv2.FindContoursAsArray(dst1, cv.RetrievalModes.Tree, cv.ContourApproximationModes.ApproxSimple)
+        Dim contours = FindContoursAsArray(dst1, cv.RetrievalModes.Tree, cv.ContourApproximationModes.ApproxSimple)
 
         Dim contourCount As Integer
         For Each tour In contours
-            Dim minRect = cv.Cv2.MinAreaRect(tour)
+            Dim minRect = MinAreaRect(tour)
             If minRect.BoundingRect.Width > 1 And minRect.BoundingRect.Height > 1 Then
                 contourCount += 1
                 Rectangle_Basics.DrawRotatedRect(minRect, dst1, contourCount Mod 256)

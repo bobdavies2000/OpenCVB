@@ -25,7 +25,7 @@ Public Class Video_Basics : Inherits TaskParent
 
         options.maxFrames = captureVideo.FrameCount
         options.currFrame = captureVideo.PosFrames
-        cv.Cv2.Resize(dst1, dst2, dst1.Size())
+        Resize(dst1, dst2, dst1.Size())
     End Sub
 End Class
 
@@ -49,7 +49,7 @@ Public Class XR_Video_CarCounting : Inherits TaskParent
         video.Run(src)
         dst2.SetTo(0)
         bgSub.Run(video.dst1) ' use the original size of the video input - not the dst2 size...
-        cv.Cv2.Resize(bgSub.dst2, dst0, video.dst1.Size)
+        Resize(bgSub.dst2, dst0, video.dst1.Size)
         dst3 = video.dst2
 
         ' there are 5 lanes of traffic so setup 5 regions
@@ -58,21 +58,21 @@ Public Class XR_Video_CarCounting : Inherits TaskParent
         Dim finishLine = dst0.Height - activeHeight * 8
         For i = 1 To activeState.Length - 1
             Dim lane = New cv.Rect(Choose(i, 230, 460, 680, 900, 1110), finishLine, 40, activeHeight)
-            Dim cellCount = cv.Cv2.CountNonZero(dst0(lane))
+            Dim cellCount = CountNonZero(dst0(lane))
             If cellCount Then
                 activeState(i) = True
-                cv.Cv2.Rectangle(dst0, lane, cv.Scalar.Red, -1)
-                cv.Cv2.Rectangle(dst3, lane, cv.Scalar.Red, -1)
+                Rectangle(dst0, lane, cv.Scalar.Red, -1)
+                Rectangle(dst3, lane, cv.Scalar.Red, -1)
             End If
             If cellCount = 0 And activeState(i) = True Then
                 activeState(i) = False
                 carCount += 1
             End If
-            cv.Cv2.Rectangle(dst3, lane, white, 2)
+            Rectangle(dst3, lane, white, 2)
         Next
 
-        cv.Cv2.Resize(dst0, dst1, src.Size())
-        If dst1.Channels() <> dst2.Channels() Then cv.Cv2.CvtColor(dst1, dst1, cv.ColorConversionCodes.GRAY2BGR)
+        Resize(dst0, dst1, src.Size())
+        If dst1.Channels() <> dst2.Channels() Then CvtColor(dst1, dst1, cv.ColorConversionCodes.GRAY2BGR)
         flow.nextMsg = "  Cars " + CStr(carCount)
         flow.Run(src)
         dst2 = dst2 Or dst1
@@ -122,11 +122,11 @@ Public Class Video_MinRect : Inherits TaskParent
         If video.dst2.Empty() = False Then
             bgSub.Run(video.dst2)
 
-            contours = cv.Cv2.FindContoursAsArray(bgSub.dst2, cv.RetrievalModes.Tree, cv.ContourApproximationModes.ApproxSimple)
-            cv.Cv2.CvtColor(bgSub.dst2, dst2, cv.ColorConversionCodes.GRAY2BGR)
+            contours = FindContoursAsArray(bgSub.dst2, cv.RetrievalModes.Tree, cv.ContourApproximationModes.ApproxSimple)
+            CvtColor(bgSub.dst2, dst2, cv.ColorConversionCodes.GRAY2BGR)
             If standaloneTest() Then
                 For i = 0 To contours.Length - 1
-                    Dim minRect = cv.Cv2.MinAreaRect(contours(i))
+                    Dim minRect = MinAreaRect(contours(i))
                     Rectangle_Basics.DrawRotatedRect(minRect, dst2, cv.Scalar.Red)
                 Next
             End If
@@ -153,8 +153,8 @@ Public Class XR_Video_MinCircle : Inherits TaskParent
         Dim radius As Single
         If video.contours IsNot Nothing Then
             For i = 0 To video.contours.Length - 1
-                cv.Cv2.MinEnclosingCircle(video.contours(i), center, radius)
-                cv.Cv2.Circle(dst2, center, radius, white, -1, task.lineType)
+                MinEnclosingCircle(video.contours(i), center, radius)
+                Circle(dst2, center, radius, white, -1, task.lineType)
             Next
         End If
     End Sub

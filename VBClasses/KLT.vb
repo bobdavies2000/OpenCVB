@@ -18,10 +18,10 @@ Public Class KLT_Basics : Inherits TaskParent
 
         If src.Channels() <> 1 Then src = task.gray
         If options.ptInput Is Nothing Then
-            options.ptInput = cv.Cv2.GoodFeaturesToTrack(src, options.maxCorners, options.qualityLevel,
+            options.ptInput = GoodFeaturesToTrack(src, options.maxCorners, options.qualityLevel,
                                                                      options.minDistance, New cv.Mat, options.blockSize, False, 0)
             If options.ptInput.Length > 0 Then
-                options.ptInput = cv.Cv2.CornerSubPix(src, options.ptInput, options.subPixWinSize, New cv.Size(-1, -1), term)
+                options.ptInput = CornerSubPix(src, options.ptInput, options.subPixWinSize, New cv.Size(-1, -1), term)
             End If
             outputMat = cv.Mat.FromPixelData(options.ptInput.Length, 1, cv.MatType.CV_32FC2, options.ptInput)
             status = New cv.Mat(outputMat.Rows, outputMat.Cols, cv.MatType.CV_8U, cv.Scalar.All(1))
@@ -30,7 +30,7 @@ Public Class KLT_Basics : Inherits TaskParent
             ' convert the point2f vector to an inputarray (cv.Mat)
             Dim inputMat = cv.Mat.FromPixelData(options.ptInput.Length, 1, cv.MatType.CV_32FC2, options.ptInput)
             outputMat = inputMat.Clone()
-            cv.Cv2.CalcOpticalFlowPyrLK(lastGray, src, inputMat, outputMat, status, err, options.winSize, 3, term, cv.OpticalFlowFlags.None)
+            CalcOpticalFlowPyrLK(lastGray, src, inputMat, outputMat, status, err, options.winSize, 3, term, cv.OpticalFlowFlags.None)
 
             Dim k As Integer
             For i = 0 To options.ptInput.Length - 1
@@ -46,7 +46,7 @@ Public Class KLT_Basics : Inherits TaskParent
             Dim pt = outputMat.Get(Of cv.Point2f)(i)
             If pt.X >= 0 And pt.X <= src.Cols And pt.Y >= 0 And pt.Y <= src.Rows Then
                 If status.Get(Of Byte)(i) Then
-                cv.Cv2.Circle(dst2, pt, task.DotSize + 1, circleColor, -1, task.lineType)
+                Circle(dst2, pt, task.DotSize + 1, circleColor, -1, task.lineType)
                 End If
             Else
                 status.Set(Of Byte)(i, 0) ' this point is not visible!

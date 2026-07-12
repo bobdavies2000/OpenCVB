@@ -8,7 +8,7 @@ Public Class HighVis_Basics : Inherits TaskParent
     End Sub
     Public Function ShowPaletteDepth(input As cv.Mat) As cv.Mat
         Dim output As New cv.Mat
-        cv.Cv2.ApplyColorMap(input, output, task.colorMapDepth)
+        ApplyColorMap(input, output, task.colorMapDepth)
         output.SetTo(0, task.noDepthMask)
         Return output
     End Function
@@ -19,7 +19,7 @@ Public Class HighVis_Basics : Inherits TaskParent
             dst1(brick.rect).SetTo((brick.correlation + 1) * 127)
         Next
 
-        cv.Cv2.Threshold(dst1, dst0, 0, 255, cv.ThresholdTypes.Binary)
+        Threshold(dst1, dst0, 0, 255, cv.ThresholdTypes.Binary)
         Dim mm = GetMinMax(dst1, dst0)
         dst2 = ShowPaletteDepth((dst1 - mm.minVal) * mm.maxVal / (mm.maxVal - mm.minVal))
         labels(2) = bricks.labels(2)

@@ -36,13 +36,13 @@ Public Class MSER_Basics : Inherits TaskParent
 
         Dim matched As New SortedList(Of Integer, Integer)(New compareAllowIdenticalIntegerInverted)
 
-        cv.Cv2.CvtColor(detect.dst2, dst0, cv.ColorConversionCodes.BGR2GRAY)
+        CvtColor(detect.dst2, dst0, cv.ColorConversionCodes.BGR2GRAY)
         For i = 0 To boxes.Count - 1
             Dim index = boxes.ElementAt(i).Value
             Dim rc As New rcDataOld
             rc.rect = boxInput(index)
             Dim val = dst0.Get(Of Byte)(floodPoints(index).Y, floodPoints(index).X)
-                          cv.Cv2.InRange(dst0(rc.rect), val, val, rc.mask)
+            InRange(dst0(rc.rect), val, val, rc.mask)
             rc.pixels = detect.maskCounts(index)
 
             rc.contour = ContourBuild(rc.mask)
@@ -56,7 +56,7 @@ Public Class MSER_Basics : Inherits TaskParent
             End If
 
             Dim colorStdev As cv.Scalar, colormean As cv.Scalar
-            cv.Cv2.MeanStdDev(task.color(rc.rect), colormean, colorStdev, rc.mask)
+            MeanStdDev(task.color(rc.rect), colormean, colorStdev, rc.mask)
             rc.color = colormean
             If rc.pixels > 0 Then sortedCells.Add(rc.pixels, rc)
         Next
@@ -81,7 +81,7 @@ Public Class MSER_Basics1 : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         detect.Run(src)
-        cv.Cv2.CvtColor(detect.dst2, dst3, cv.ColorConversionCodes.BGR2GRAY)
+        CvtColor(detect.dst2, dst3, cv.ColorConversionCodes.BGR2GRAY)
         redC.Run(src)
         dst2 = redC.dst2
         labels(2) = redC.labels(2)
@@ -102,7 +102,7 @@ Public Class MSER_Basics2 : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         detect.Run(src)
-        cv.Cv2.CvtColor(detect.dst2, dst3, cv.ColorConversionCodes.BGR2GRAY)
+        CvtColor(detect.dst2, dst3, cv.ColorConversionCodes.BGR2GRAY)
 
         Dim floodPoints = New List(Of cv.Point)(detect.floodPoints)
         Dim boxInput = New List(Of cv.Rect)(detect.boxes)
@@ -123,7 +123,7 @@ Public Class MSER_Basics2 : Inherits TaskParent
             rc.mapID = rclist.Count
             Dim val = dst3.Get(Of Byte)(floodPoints(i).Y, floodPoints(i).X)
             rc.rect = boxInput(boxes.ElementAt(i).Value)
-                          cv.Cv2.InRange(dst3(rc.rect), val, val, rc.mask)
+            InRange(dst3(rc.rect), val, val, rc.mask)
             dst1(rc.rect).SetTo(rc.mapID, rc.mask)
             rc.pixels = detect.maskCounts(i)
 
@@ -164,7 +164,7 @@ Public Class MSER_Basics3 : Inherits TaskParent
         dst3 = src
         For i = 0 To boxes.Count - 1
             Dim r = boxes.ElementAt(i).Value
-            cv.Cv2.Rectangle(dst3, r, task.highlight, task.lineWidth)
+            Rectangle(dst3, r, task.highlight, task.lineWidth)
             If i >= displaycount Then Exit For
         Next
 
@@ -254,7 +254,7 @@ Public Class MSER_Detect : Inherits TaskParent
 
         classCount = boxes.Count
         For Each z In boxes
-            cv.Cv2.Rectangle(dst2, z, cv.Scalar.Yellow, 1)
+            Rectangle(dst2, z, cv.Scalar.Yellow, 1)
         Next
     End Sub
 End Class
@@ -270,15 +270,15 @@ End Class
 Public Class MSER_SyntheticInput : Inherits TaskParent
     Private Sub addNestedRectangles(img As cv.Mat, p0 As cv.Point, width() As Integer, color() As Integer, n As Integer)
         For i = 0 To n - 1
-            cv.Cv2.Rectangle(img, New cv.Rect(p0.X, p0.Y, width(i), width(i)), cv.Scalar.All(color(i)), 1)
+            Rectangle(img, New cv.Rect(p0.X, p0.Y, width(i), width(i)), cv.Scalar.All(color(i)), 1)
             p0 += New cv.Point((width(i) - width(i + 1)) / 2, (width(i) - width(i + 1)) / 2)
-            cv.Cv2.FloodFill(img, p0, color(i))
+            FloodFill(img, p0, color(i))
         Next
     End Sub
     Private Sub addNestedCircles(img As cv.Mat, p0 As cv.Point, width() As Integer, color() As Integer, n As Integer)
         For i = 0 To n - 1
-        cv.Cv2.Circle(img, p0, width(i) / 2, color(i), -1, task.lineType)
-            cv.Cv2.FloodFill(img, p0, color(i))
+            Circle(img, p0, width(i) / 2, color(i), -1, task.lineType)
+            FloodFill(img, p0, color(i))
         Next
     End Sub
     Public Sub New()
@@ -298,10 +298,10 @@ Public Class MSER_SyntheticInput : Inherits TaskParent
         addNestedRectangles(img, New cv.Point(410, 10), width, color3, 13)
         addNestedCircles(img, New cv.Point(600, 600), width, color4, 13)
 
-        cv.Cv2.Resize(img, img, New cv.Size(src.Rows, src.Rows))
+        Resize(img, img, New cv.Size(src.Rows, src.Rows))
         Dim _cvtInline As New cv.Mat
-        cv.Cv2.CvtColor(img, _cvtInline, cv.ColorConversionCodes.GRAY2BGR)
-        dst2(New cv.Rect(0, 0, src.Rows, src.Rows)) =_cvtInline
+        CvtColor(img, _cvtInline, cv.ColorConversionCodes.GRAY2BGR)
+        dst2(New cv.Rect(0, 0, src.Rows, src.Rows)) = _cvtInline
     End Sub
 End Class
 
@@ -392,7 +392,7 @@ Public Class XR_MSER_Hulls : Inherits TaskParent
         Dim pixels As Integer
         dst3.SetTo(0)
         For Each rc In mser.redC.rcList
-            rc.hull = cv.Cv2.ConvexHull(rc.contour.ToArray, True).ToList
+            rc.hull = ConvexHull(rc.contour.ToArray, True).ToList
             pixels += rc.pixels
             DrawTour(dst3(rc.rect), rc.hull, rc.color, -1)
         Next
@@ -518,7 +518,7 @@ Public Class XR_MSER_ROI : Inherits TaskParent
                 If center.X >= box.X And center.X <= (box.X + box.Width) Then
                     If center.Y >= box.Y And center.Y <= (box.Y + box.Height) Then
                         removeBoxes.Add(i)
-                        cv.Cv2.Rectangle(dst3, b, task.highlight, task.lineWidth)
+                        Rectangle(dst3, b, task.highlight, task.lineWidth)
                     End If
                 End If
             Next
@@ -529,7 +529,7 @@ Public Class XR_MSER_ROI : Inherits TaskParent
         End While
 
         For Each rect In containers
-        cv.Cv2.Rectangle(dst2, rect, task.highlight, task.lineWidth)
+            Rectangle(dst2, rect, task.highlight, task.lineWidth)
         Next
 
         labels(2) = CStr(containers.Count) + " consolidated regions of interest located"
@@ -553,7 +553,7 @@ Public Class XR_MSER_TestExample : Inherits TaskParent
         labels(2) = "Contour regions from MSER"
         labels(3) = "Box regions from MSER"
         If standalone Then task.gOptions.displayDst1.Checked = True
-        image = cv.Cv2.ImRead(task.homeDir + "Data/MSERtestfile.jpg", cv.ImreadModes.Color)
+        image = ImRead(task.homeDir + "Data/MSERtestfile.jpg", cv.ImreadModes.Color)
         mser = cv.MSER.Create()
         desc = "Maximally Stable Extremal Regions example - still image"
     End Sub
@@ -585,7 +585,7 @@ Public Class XR_MSER_TestExample : Inherits TaskParent
         Next
 
         For Each box In boxes
-        cv.Cv2.Rectangle(dst3, box, task.highlight, task.lineWidth + 1, task.lineType)
+            Rectangle(dst3, box, task.highlight, task.lineWidth + 1, task.lineType)
         Next
         labels(2) = CStr(boxes.Count) + " regions were found using MSER"
     End Sub
@@ -609,7 +609,7 @@ Public Class XR_MSER_RedCloud : Inherits TaskParent
         mser.Run(src)
 
         Dim _redC_cvt As New cv.Mat
-        cv.Cv2.CvtColor(mser.dst2, _redC_cvt, cv.ColorConversionCodes.BGR2GRAY)
+        CvtColor(mser.dst2, _redC_cvt, cv.ColorConversionCodes.BGR2GRAY)
         redC.Run(_redC_cvt)
         dst2 = redC.dst2
         labels(2) = redC.labels(2)
@@ -653,7 +653,7 @@ Public Class XR_MSER_Mask_CPP : Inherits TaskParent
             classCount = MSER_Count(cPtr)
             If classCount = 0 Then Exit Sub
 
-                          cv.Cv2.InRange(cv.Mat.FromPixelData(src.Rows, src.Cols, cv.MatType.CV_8UC1, imagePtr), 255, 255, dst3)
+            InRange(cv.Mat.FromPixelData(src.Rows, src.Cols, cv.MatType.CV_8UC1, imagePtr), 255, 255, dst3)
         End If
         labels(3) = CStr(classCount) + " regions identified"
 
@@ -754,7 +754,7 @@ Public Class MSER_CPP : Inherits TaskParent
         If standaloneTest() Then
             dst3 = src
             For i = 0 To boxes.Count - 1
-            cv.Cv2.Rectangle(dst3, boxes(i), task.highlight, task.lineWidth)
+                Rectangle(dst3, boxes(i), task.highlight, task.lineWidth)
             Next
         End If
         labels(2) = CStr(classcount) + " regions identified"

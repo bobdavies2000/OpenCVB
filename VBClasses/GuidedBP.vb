@@ -31,7 +31,7 @@ Public Class GuidedBP_Basics : Inherits TaskParent
         For Each r In sortRects.Values
             Dim pt = lpData.validatePoint(New cv.Point(r.X + r.Width \ 2, r.Y + r.Height \ 2))
             Dim index = indices(ptList.IndexOf(pt))
-            cv.Cv2.Rectangle(map, r, cv.Scalar.All(index), -1)
+            Rectangle(map, r, cv.Scalar.All(index), -1)
             SetTrueText(CStr(index), pt, dstindex)
         Next
     End Sub
@@ -77,7 +77,7 @@ Public Class XR_GuidedBP_HotPointsKNN : Inherits TaskParent
             Dim dist = p1.DistanceTo(p2)
             Dim r = rectList(i)
             If dist < r.Width / 2 And dist < r.Height / 2 Then
-            cv.Cv2.Rectangle(dst, r, white, task.lineWidth)
+            Rectangle(dst, r, white, task.lineWidth)
                 Dim pt = New cv.Point(r.X + r.Width, r.Y + r.Height)
                 SetTrueText(CStr(index), pt, dstindex)
             End If
@@ -119,9 +119,9 @@ Public Class XR_GuidedBP_PlanesPlot : Inherits TaskParent
         Dim sumList As New List(Of Integer)
         dst3.SetTo(0)
         For i = 0 To dst2.Rows - 1
-            Dim x = cv.Cv2.CountNonZero(dst2.Row(i))
+            Dim x = CountNonZero(dst2.Row(i))
             sumList.Add(x)
-            cv.Cv2.Line(dst3, New cv.Point(0, i), New cv.Point(x, i), white, task.lineWidth, task.lineType)
+            Line(dst3, New cv.Point(0, i), New cv.Point(x, i), white, task.lineWidth, task.lineType)
         Next
 
         Dim flatSurfacesInRow As New List(Of Integer)
@@ -207,15 +207,15 @@ Public Class GuidedBP_Depth : Inherits TaskParent
 
         Marshal.Copy(newSamples, 0, hist.histogram.Data, newSamples.Length)
 
-        cv.Cv2.CalcBackProject({src}, task.channels, hist.histogram, dst2, task.ranges)
+        CalcBackProject({src}, task.channels, hist.histogram, dst2, task.ranges)
         dst2.ConvertTo(dst2, cv.MatType.CV_8U)
 
         labels(3) = "Use task.gOptions.PointCloudReduction to select different cloud combinations."
         If standaloneTest() Then dst3 = Palettize(dst2 + 1)
 
-        Dim depthCount = cv.Cv2.CountNonZero(task.depthmask)
+        Dim depthCount = CountNonZero(task.depthmask)
         dst3.SetTo(0, task.noDepthMask)
-        Dim count = cv.Cv2.CountNonZero(dst2)
+        Dim count = CountNonZero(dst2)
         labels(2) = CStr(classCount) + " regions detected in the backprojection - " + (count / depthCount).ToString("0%") + " of depth data"
     End Sub
 End Class
@@ -240,14 +240,14 @@ Public Class GuidedBP_HotPoints : Inherits TaskParent
     Private Function hotPoints(ByRef view As cv.Mat) As List(Of cv.Rect)
         Dim rect As cv.Rect
         Dim points As New cv.Mat
-        cv.Cv2.FindNonZero(view, points)
+        FindNonZero(view, points)
 
         Dim viewList As New SortedList(Of Integer, cv.Point)(New compareAllowIdenticalIntegerInverted)
         mask.SetTo(0)
         Dim lastCount As Integer = 0
         For i = 0 To points.Rows - 1
             Dim pt = points.Get(Of cv.Point)(i, 0)
-            Dim count = cv.Cv2.FloodFill(view, mask, pt, 0, rect, 0, 0, 4 Or cv.FloodFillFlags.MaskOnly Or (255 << 8))
+            Dim count = FloodFill(view, mask, pt, 0, rect, 0, 0, 4 Or cv.FloodFillFlags.MaskOnly Or (255 << 8))
             If count > 0 Then viewList.Add(count, pt)
         Next
 
@@ -255,7 +255,7 @@ Public Class GuidedBP_HotPoints : Inherits TaskParent
         Dim rectList As New List(Of cv.Rect)
         For i = 0 To Math.Min(viewList.Count, 10) - 1
             Dim pt = viewList.ElementAt(i).Value
-            cv.Cv2.FloodFill(view, mask, pt, 0, rect, 0, 0, 4 Or cv.FloodFillFlags.FixedRange Or (i + 1 << 8))
+            FloodFill(view, mask, pt, 0, rect, 0, 0, 4 Or cv.FloodFillFlags.FixedRange Or (i + 1 << 8))
             rectList.Add(New cv.Rect(rect.X - 1, rect.Y - 1, rect.Width, rect.Height))
         Next
 
@@ -285,7 +285,6 @@ Public Class GuidedBP_MultiSlice : Inherits TaskParent
     Dim histTop As New Projection_HistTop
     Dim histSide As New Projection_HistSide
     Public sliceMask As cv.Mat
-    Public split() As cv.Mat
     Public options As New Options_Structured
     Public classCount As Integer
     Public Sub New()
@@ -301,12 +300,12 @@ Public Class GuidedBP_MultiSlice : Inherits TaskParent
         For x = 0 To histTop.dst3.Height - stepSize Step stepSize
             Dim r = New cv.Rect(x, 0, stepSize, dst2.Height)
             Dim slice = histTop.dst3(r)
-If cv.Cv2.CountNonZero(slice) Then
+            If CountNonZero(slice) Then
                 histTop.histogram(r).SetTo(classCount, slice)
                 classCount += 1
             End If
         Next
-        cv.Cv2.CalcBackProject({task.pointCloud}, task.channelsTop, histTop.histogram, dst0, task.rangesTop)
+        CalcBackProject({task.pointCloud}, task.channelsTop, histTop.histogram, dst0, task.rangesTop)
         Dim mm = GetMinMax(dst0)
         dst2 = Palettize(dst0)
         labels(2) = "The nonzero horizontal slices produced " + CStr(classCount) + " classes"
@@ -317,12 +316,12 @@ If cv.Cv2.CountNonZero(slice) Then
         For y = 0 To histSide.dst3.Height - stepSize Step stepSize
             Dim r = New cv.Rect(0, y, dst2.Width, stepSize)
             Dim slice = histSide.dst3(r)
-If cv.Cv2.CountNonZero(slice) Then
+            If CountNonZero(slice) Then
                 histSide.histogram(r).SetTo(classCount, slice)
                 classCount += 1
             End If
         Next
-        cv.Cv2.CalcBackProject({task.pointCloud}, task.channelsSide, histSide.histogram, dst1, task.rangesSide)
+        CalcBackProject({task.pointCloud}, task.channelsSide, histSide.histogram, dst1, task.rangesSide)
         dst3 = Palettize(dst1)
         labels(3) = "The nonzero vertical slices produced " + CStr(classCount) + " classes"
     End Sub
@@ -348,7 +347,7 @@ Public Class XR_GuidedBP_Points : Inherits TaskParent
         hotPoints.Run(src)
 
         hotPoints.ptHot.histTop.dst3.ConvertTo(histogramTop, cv.MatType.CV_32F)
-        cv.Cv2.CalcBackProject({task.pointCloud}, task.channelsTop, histogramTop, backP,
+        CalcBackProject({task.pointCloud}, task.channelsTop, histogramTop, backP,
                                     task.rangesTop)
 
         topRects = New List(Of cv.Rect)(hotPoints.ptHot.topRects)
@@ -357,7 +356,7 @@ Public Class XR_GuidedBP_Points : Inherits TaskParent
         dst2 = Palettize(backP)
 
         hotPoints.ptHot.histSide.dst3.ConvertTo(histogramSide, cv.MatType.CV_32F)
-        cv.Cv2.CalcBackProject({task.pointCloud}, task.channelsSide, histogramSide, dst3, task.rangesSide)
+        CalcBackProject({task.pointCloud}, task.channelsSide, histogramSide, dst3, task.rangesSide)
 
         dst3 = Palettize(dst3)
 
@@ -412,7 +411,7 @@ Public Class GuidedBP_TopView : Inherits TaskParent
         hotPoints.Run(src)
 
         hotPoints.ptHot.histTop.dst3.ConvertTo(histogramTop, cv.MatType.CV_32F)
-        cv.Cv2.CalcBackProject({src}, task.channelsTop, histogramTop, backP,
+        CalcBackProject({src}, task.channelsTop, histogramTop, backP,
                                     task.rangesTop)
 
         topRects = New List(Of cv.Rect)(hotPoints.ptHot.topRects)

@@ -16,7 +16,7 @@ Public Class Stitch_Basics : Inherits TaskParent
             Dim x1 = CInt(msRNG.Next(0, src.Width - options.width))
             Dim x2 = CInt(msRNG.Next(0, src.Height - options.height))
             Dim rect = New cv.Rect(x1, x2, options.width, options.height)
-            cv.Cv2.Rectangle(dst2, rect, cv.Scalar.Red, 2)
+            Rectangle(dst2, rect, cv.Scalar.Red, 2)
             mats.Add(src(rect).Clone())
         Next
 

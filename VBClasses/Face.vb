@@ -13,7 +13,7 @@ Public Class XR_Face_Haar_LBP : Inherits TaskParent
     Public Shared Sub DetectFace(ByRef src As cv.Mat, cascade As cv.CascadeClassifier)
         Dim faces() = cascade.DetectMultiScale(task.gray, 1.08, 3, cv.HaarDetectionTypes.ScaleImage, New cv.Size(30, 30))
         For Each fface In faces
-        cv.Cv2.Rectangle(src, fface, cv.Scalar.Red)
+        Rectangle(src, fface, cv.Scalar.Red)
         Next
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)

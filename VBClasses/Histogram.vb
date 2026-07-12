@@ -195,12 +195,11 @@ Public Class XR_Histogram_ColorsAndGray : Inherits TaskParent
         desc = "Create a histogram of a normalized image"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        Dim srcSplit As cv.Mat() = Nothing
-        Split(src, srcSplit)
-        ReDim Preserve srcSplit(4 - 1)
-        srcSplit(4 - 1) = task.gray ' add a 4th image - the grayscale image to the R G and B images.
-        For i = 0 To srcSplit.Length - 1
-            Dim histSrc = srcSplit(i)
+        Dim splitMats As cv.Mat() = Split(src)
+        ReDim Preserve splitMats(4 - 1)
+        splitMats(4 - 1) = task.gray ' add a 4th image - the grayscale image to the R G and B images.
+        For i = 0 To splitMats.Length - 1
+            Dim histSrc = splitMats(i)
             histogram.plotHist.backgroundColor = Choose(i + 1, cv.Scalar.Blue, cv.Scalar.Green, cv.Scalar.Red, cv.Scalar.PowderBlue)
             histogram.Run(histSrc)
             mats.mat(i) = histogram.plotHist.dst2.Clone
@@ -424,12 +423,11 @@ Public Class XR_Histogram_PeaksRGB : Inherits TaskParent
         desc = "Find the peaks and valleys for each of the BGR channels."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        Dim srcSplit As cv.Mat() = Nothing
-        Split(src, srcSplit)
+        Dim splitMats As cv.Mat() = Split(src)
         For i = 0 To 3 - 1
             peaks(i).hist.plotHist.backgroundColor = Choose(i + 1, cv.Scalar.Blue, cv.Scalar.Green, cv.Scalar.Red)
             peaks(i).hist.plotHist.addLabels = False
-            peaks(i).Run(srcSplit(i))
+            peaks(i).Run(splitMats(i))
             mats.mat(i) = peaks(i).dst2.Clone
         Next
 
@@ -499,9 +497,8 @@ Public Class Histogram_KalmanAuto : Inherits TaskParent
         If standaloneTest() Then
             If task.heartBeat Then splitIndex = If(splitIndex < 2, splitIndex + 1, 0)
             colorName = Choose(splitIndex + 1, "Blue", "Green", "Red")
-            Dim srcSplit As cv.Mat() = Nothing
-            Split(src, srcSplit)
-            src = srcSplit(splitIndex)
+            Dim splitMats As cv.Mat() = Split(src)
+            src = splitMats(splitIndex)
         End If
 
         If src.Channels() <> 1 Then src = task.gray
@@ -557,9 +554,8 @@ Public Class Histogram_EqualizeColor : Inherits TaskParent
         labels(2) = "Image Enhanced with Equalized Histogram"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        Dim rgb(2) As cv.Mat
-        Dim rgbEq(2) As cv.Mat
-        rgbEq = Split(task.color)
+        Dim rgb() As cv.Mat = Nothing
+        Dim rgbEq() As cv.Mat = Split(task.color)
 
         For i = 0 To rgb.Count - 1
             EqualizeHist(rgbEq(i), rgbEq(i))
@@ -689,9 +685,9 @@ Public Class XR_Histogram_CompareNumber : Inherits TaskParent
         comp.Run(src)
         dst1 = comp.dst2.Clone
 
-        Dim sum = cv.Cv2.Sum(comp.normHistDiff)(0) * 100
-        Dim sumAbs = cv.Cv2.Sum(comp.normHistDiffAbs)(0) * 100
-        plot.plotData = New cv.Scalar(sum, sumAbs, 0)
+        Dim sumVal = Sum(comp.normHistDiff)(0) * 100
+        Dim sumAbs = Sum(comp.normHistDiffAbs)(0) * 100
+        plot.plotData = New cv.Scalar(sumVal, sumAbs, 0)
         plot.Run(src)
         dst2 = plot.dst2
         dst3 = plot.dst3
@@ -743,8 +739,8 @@ Public Class XR_Histogram_CompareEMD_hsv : Inherits TaskParent
             Next
         Next
 
-        Dim emd = cv.Cv2.EMD(sig1, sig2, cv.DistanceTypes.L2)
-        SetTrueText("EMD similarity from the current image to the last is " + (1 - emd).ToString("P1"), 2)
+        Dim emdVal = cv.Cv2.EMD(sig1, sig2, cv.DistanceTypes.L2)
+        SetTrueText("EMD similarity from the current image to the last is " + (1 - emdVal).ToString("P1"), 2)
 
         lastHSV = hsv.Clone
     End Sub
@@ -785,16 +781,16 @@ Public Class XR_Histogram_Lab : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         CvtColor(src, dst0, cv.ColorConversionCodes.BGR2Lab)
-        Dim srcSplit As cv.Mat() = Nothing
-        Split(dst0, srcSplit)
+        Dim splitMats As cv.Mat() = Nothing
+        Split(dst0, splitMats)
 
-        hist.Run(srcSplit(0))
+        hist.Run(splitMats(0))
         dst1 = hist.dst2.Clone
 
-        hist.Run(srcSplit(1))
+        hist.Run(splitMats(1))
         dst2 = hist.dst2.Clone
 
-        hist.Run(srcSplit(2))
+        hist.Run(splitMats(2))
         dst3 = hist.dst2.Clone
     End Sub
 End Class
@@ -877,7 +873,7 @@ Public Class XR_Histogram_FlatSurfaces : Inherits TaskParent
 
         cloudY.Set(Of Single)(mm.minLoc.Y, mm.minLoc.X, -saveMinVal)
         cloudY.Set(Of Single)(mm.maxLoc.Y, mm.maxLoc.X, saveMaxVal)
-        cloudY = (cloudY - saveMinVal).tomat
+        cloudY = (cloudY - saveMinVal).ToMat
         ConvertScaleAbs(cloudY, cloudY, 255 / (-saveMinVal + saveMaxVal))
         mm = GetMinMax(cloudY)
         cloudY.SetTo(0, task.noDepthMask)
@@ -1495,9 +1491,8 @@ Public Class XR_Histogram_InverseLUT : Inherits TaskParent
         desc = "Invert the histogram of the color image using green.  G = 0.299 R + 0.587 G + 0.114 B"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        Dim srcSplit As cv.Mat() = Nothing
-        Split(task.color, srcSplit)
-        hist.Run(srcSplit(1))
+        Dim splitMats As cv.Mat() = Split(task.color)
+        hist.Run(splitMats(1))
         dst2 = hist.dst2
 
         Dim colWidth = dst2.Width / task.histogramBins
@@ -1507,7 +1502,7 @@ Public Class XR_Histogram_InverseLUT : Inherits TaskParent
         Dim minRange = New cv.Scalar(histIndex * incr)
         Dim maxRange = New cv.Scalar((histIndex + 1) * incr)
         If histIndex + 1 = task.histogramBins Then maxRange = New cv.Scalar(255)
-        InRange(srcSplit(1), minRange, maxRange, dst1)
+        InRange(splitMats(1), minRange, maxRange, dst1)
         Rectangle(dst2, New cv.Rect(CInt(histIndex) * colWidth, 0, colWidth, dst2.Height), cv.Scalar.Yellow, task.lineWidth)
         labels(1) = CStr(CountNonZero(dst1)) + " pixels in that range"
 
@@ -1523,7 +1518,7 @@ Public Class XR_Histogram_InverseLUT : Inherits TaskParent
         Next
 
         dst0.SetTo(0)
-        LUT(srcSplit(1), lutTable2, dst0)
+        LUT(splitMats(1), lutTable2, dst0)
         dst0 += 1
         dst3 = Palettize(dst0)
     End Sub

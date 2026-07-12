@@ -11,13 +11,13 @@ Public Class Photon_Basics : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         bricks.Run(src)
         Static lastImage As cv.Mat = src
-        cv.Cv2.Absdiff(src, lastImage, dst1)
+        Absdiff(src, lastImage, dst1)
 
         dst0 = dst1.Reshape(1, dst1.Rows * 3)
-        cv.Cv2.CvtColor(dst1, dst1, cv.ColorConversionCodes.BGR2GRAY)
-        cv.Cv2.Threshold(dst1, dst1, 0, 255, cv.ThresholdTypes.Binary)
+        CvtColor(dst1, dst1, cv.ColorConversionCodes.BGR2GRAY)
+        Threshold(dst1, dst1, 0, 255, cv.ThresholdTypes.Binary)
 
-        If cv.Cv2.CountNonZero(dst0) > 0 Then
+        If CountNonZero(dst0) > 0 Then
             dst2 = dst1.Clone
             hist.Run(dst0)
             dst3 = hist.dst2
@@ -55,8 +55,8 @@ Public Class XR_Photon_Test : Inherits TaskParent
         strOut = ""
         Dim reductionVal = task.fOptions.ReductionColor.Value
         For i = 0 To counts.Length - 1
-            cv.Cv2.InRange(dst1, reductionVal * i, reductionVal * i, mats.mat(i))
-            counts(i).Add(cv.Cv2.CountNonZero(mats.mat(i)))
+            InRange(dst1, reductionVal * i, reductionVal * i, mats.mat(i))
+            counts(i).Add(CountNonZero(mats.mat(i)))
             If counts(i).Count > testCount Then counts(i).RemoveAt(0)
             strOut += "for " + CStr(i * reductionVal) + " average = " + counts(i).Average.ToString("###,##0") + " min = " +
                                counts(i).Min.ToString("###,##0.0") + " max = " + counts(i).Max.ToString("###,##0.0") + vbCrLf
@@ -101,7 +101,7 @@ Public Class XR_Photon_Subtraction : Inherits TaskParent
 
         Static lastImage As cv.Mat = src
         Dim subOutput As New cv.Mat
-        cv.Cv2.Subtract(src, lastImage, subOutput)
+        Subtract(src, lastImage, subOutput)
         Dim histInput = subOutput.Add(cv.Scalar.All(100)).ToMat
 
         hist.Run(histInput)
@@ -109,9 +109,9 @@ Public Class XR_Photon_Subtraction : Inherits TaskParent
 
         subOutput = subOutput.Reshape(3, dst2.Height)
         Dim _cvt1 As New cv.Mat
-        cv.Cv2.CvtColor(subOutput, _cvt1, cv.ColorConversionCodes.BGR2GRAY)
-        cv.Cv2.Threshold(_cvt1, dst1, 0, 255, cv.ThresholdTypes.Binary)
-        If cv.Cv2.CountNonZero(dst1) Then dst3 = dst1.Clone ' occasionally the image returned is identical to the last.  hmmm...
+        CvtColor(subOutput, _cvt1, cv.ColorConversionCodes.BGR2GRAY)
+        Threshold(_cvt1, dst1, 0, 255, cv.ThresholdTypes.Binary)
+        If CountNonZero(dst1) Then dst3 = dst1.Clone ' occasionally the image returned is identical to the last.  hmmm...
         lastImage = src
     End Sub
 End Class

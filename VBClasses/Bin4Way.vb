@@ -51,13 +51,13 @@ Public Class Bin4Way_Basics : Inherits TaskParent
             For j = 0 To task.gridRects.Count - 1
                 Dim r = task.gridRects(j)
                 Dim tmp = matList(i)(r)
-                cv.Cv2.FindContours(tmp, allContours, Nothing, cv.RetrievalModes.External, cv.ContourApproximationModes.ApproxSimple)
+                FindContours(tmp, allContours, Nothing, cv.RetrievalModes.External, cv.ContourApproximationModes.ApproxSimple)
                 If i = 0 Then
                     contourCounts.Add(New List(Of Integer))
                     means.Add(New List(Of Single))
                 End If
                 contourCounts(j).Add(allContours.Count)
-                means(j).Add(cv.Cv2.Mean(task.gray(r), tmp)(0))
+                means(j).Add(Mean(task.gray(r), tmp)(0))
                 If i = quadrant Then SetTrueText(CStr(allContours.Count), r.TopLeft, 1)
                 counts(i, j) = allContours.Count
             Next
@@ -67,12 +67,12 @@ Public Class Bin4Way_Basics : Inherits TaskParent
         Dim ratio = dst2.Height / task.gridRects(0).Height
         For i = 0 To matList.Count - 1
             Dim tmp As cv.Mat = matList(i)(grSave) * 0.5
-            Dim nextCount = cv.Cv2.CountNonZero(tmp)
+            Dim nextCount = CountNonZero(tmp)
             Dim tmpVolatile As cv.Mat = dst0(grSave) And tmp
             tmp.SetTo(255, tmpVolatile)
             dst0(grSave).CopyTo(tmp, tmpVolatile)
             Dim r = New cv.Rect(0, 0, tmp.Width * ratio, tmp.Height * ratio)
-            cv.Cv2.Resize(tmp, mats.mat(i)(r), New cv.Size(r.Width, r.Height))
+            Resize(tmp, mats.mat(i)(r), New cv.Size(r.Width, r.Height))
 
             If task.heartBeat Then
                 Dim plus = mats.mat(i)(r).Width / 2
@@ -80,7 +80,7 @@ Public Class Bin4Way_Basics : Inherits TaskParent
                                                   New cv.Point(bump + plus, bump + dst2.Height / 2),
                                                   New cv.Point(bump + dst2.Width / 2 + plus, bump + dst2.Height / 2))
                 labelStr(i) = (CStr(nextCount) + " pixels" + vbCrLf + CStr(contourCounts(index)(i)) + " contours" + vbCrLf +
-                                       means(index)(i).ToString(fmt0) + " mean" + vbCrLf + CStr(cv.Cv2.CountNonZero(tmpVolatile)) + " volatile")
+                                       means(index)(i).ToString(fmt0) + " mean" + vbCrLf + CStr(CountNonZero(tmpVolatile)) + " volatile")
             End If
         Next
 
@@ -91,8 +91,8 @@ Public Class Bin4Way_Basics : Inherits TaskParent
         mats.Run(emptyMat)
         dst3 = mats.dst2
 
-cv.Cv2.Rectangle(dst1, grSave, white, task.lineWidth)
-cv.Cv2.Rectangle(task.color, grSave, white, task.lineWidth)
+        Rectangle(dst1, grSave, white, task.lineWidth)
+        Rectangle(task.color, grSave, white, task.lineWidth)
     End Sub
 End Class
 
@@ -115,15 +115,15 @@ Public Class XR_Bin4Way_Edges : Inherits TaskParent
         binary.Run(src)
 
         edges.Run(binary.mats.mat(0))  ' the light and dark halves
-        cv.Cv2.Threshold(edges.dst2, mats.mat(0), 0, 255, cv.ThresholdTypes.Binary)
-        cv.Cv2.Threshold(edges.dst2, mats.mat(3), 0, 255, cv.ThresholdTypes.Binary)
+        Threshold(edges.dst2, mats.mat(0), 0, 255, cv.ThresholdTypes.Binary)
+        Threshold(edges.dst2, mats.mat(3), 0, 255, cv.ThresholdTypes.Binary)
 
         edges.Run(binary.mats.mat(1))  ' the lightest of the light half
-        cv.Cv2.Threshold(edges.dst2, mats.mat(1), 0, 255, cv.ThresholdTypes.Binary)
+        Threshold(edges.dst2, mats.mat(1), 0, 255, cv.ThresholdTypes.Binary)
         mats.mat(3) = mats.mat(1) Or mats.mat(3)
 
         edges.Run(binary.mats.mat(3))  ' the darkest of the dark half
-        cv.Cv2.Threshold(edges.dst2, mats.mat(2), 0, 255, cv.ThresholdTypes.Binary)
+        Threshold(edges.dst2, mats.mat(2), 0, 255, cv.ThresholdTypes.Binary)
         mats.mat(3) = mats.mat(2) Or mats.mat(3)
         mats.Run(emptyMat)
         dst2 = mats.dst2
@@ -155,15 +155,15 @@ Public Class Bin4Way_Sobel : Inherits TaskParent
         binary.Run(src)
 
         edges.Run(binary.mats.mat(0)) ' the light and dark halves
-        cv.Cv2.Threshold(edges.dst2, mats.mat(0), 0, 255, cv.ThresholdTypes.Binary)
-        cv.Cv2.Threshold(edges.dst2, mats.mat(3), 0, 255, cv.ThresholdTypes.Binary)
+        Threshold(edges.dst2, mats.mat(0), 0, 255, cv.ThresholdTypes.Binary)
+        Threshold(edges.dst2, mats.mat(3), 0, 255, cv.ThresholdTypes.Binary)
 
         edges.Run(binary.mats.mat(1)) ' the lightest of the light half
-        cv.Cv2.Threshold(edges.dst2, mats.mat(1), 0, 255, cv.ThresholdTypes.Binary)
+        Threshold(edges.dst2, mats.mat(1), 0, 255, cv.ThresholdTypes.Binary)
         mats.mat(3) = mats.mat(1) Or mats.mat(3)
 
         edges.Run(binary.mats.mat(3))  ' the darkest of the dark half
-        cv.Cv2.Threshold(edges.dst2, mats.mat(2), 0, 255, cv.ThresholdTypes.Binary)
+        Threshold(edges.dst2, mats.mat(2), 0, 255, cv.ThresholdTypes.Binary)
         mats.mat(3) = mats.mat(2) Or mats.mat(3)
 
         mats.Run(emptyMat)
@@ -190,7 +190,7 @@ Public Class XR_Bin4Way_Unstable1 : Inherits TaskParent
         dst2 = binary.dst2
         diff.Run(binary.dst3)
         dst3 = diff.dst2
-        labels(3) = "There are " + CStr(cv.Cv2.CountNonZero(dst3)) + " unstable pixels"
+        labels(3) = "There are " + CStr(CountNonZero(dst3)) + " unstable pixels"
     End Sub
 End Class
 
@@ -201,7 +201,7 @@ End Class
 
 
 Public Class Bin4Way_UnstableEdges : Inherits TaskParent
-    Dim blur As New Blur_Basics
+    Dim blurC As New Blur_Basics
     Dim unstable As New Bin4Way_Unstable
     Public Sub New()
         If standalone Then task.gOptions.displayDst1.Checked = True
@@ -209,8 +209,8 @@ Public Class Bin4Way_UnstableEdges : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         task.edges.Run(src)
-        blur.Run(task.edges.dst2)
-        cv.Cv2.Threshold(blur.dst2, dst1, 0, 255, cv.ThresholdTypes.Binary)
+        blurC.Run(task.edges.dst2)
+        Threshold(blurC.dst2, dst1, 0, 255, cv.ThresholdTypes.Binary)
 
         unstable.Run(src)
         dst2 = unstable.dst2
@@ -238,7 +238,7 @@ Public Class XR_Bin4Way_UnstablePixels : Inherits TaskParent
         dst2 = unstable.dst3
 
         Dim points As New cv.Mat
-        cv.Cv2.FindNonZero(dst2, points)
+        FindNonZero(dst2, points)
         If points.Rows = 0 Then Exit Sub
         Dim pts(points.Rows * 2 - 1) As Integer
         Marshal.Copy(points.Data, pts, 0, pts.Length)
@@ -279,7 +279,7 @@ Public Class XR_Bin4Way_UnstablePixels : Inherits TaskParent
             strOut += CStr(index) + vbTab
         Next
         SetTrueText(strOut, 3)
-        labels(3) = "There are " + CStr(cv.Cv2.CountNonZero(dst2)) + " unstable pixels"
+        labels(3) = "There are " + CStr(CountNonZero(dst2)) + " unstable pixels"
     End Sub
 End Class
 
@@ -303,10 +303,10 @@ Public Class XR_Bin4Way_SplitValley : Inherits TaskParent
 
         If task.heartBeat Then valley.Run(task.gray)
 
-                  cv.Cv2.InRange(task.gray, 0, valley.valleys(1) - 1, mats.mat(0))
-                  cv.Cv2.InRange(task.gray, valley.valleys(1), valley.valleys(2) - 1, mats.mat(1))
-                  cv.Cv2.InRange(task.gray, valley.valleys(2), valley.valleys(3) - 1, mats.mat(2))
-                  cv.Cv2.InRange(task.gray, valley.valleys(3), 255, mats.mat(3))
+        InRange(task.gray, 0, valley.valleys(1) - 1, mats.mat(0))
+        InRange(task.gray, valley.valleys(1), valley.valleys(2) - 1, mats.mat(1))
+        InRange(task.gray, valley.valleys(2), valley.valleys(3) - 1, mats.mat(2))
+        InRange(task.gray, valley.valleys(3), 255, mats.mat(3))
 
         mats.Run(emptyMat)
         dst2 = mats.dst2
@@ -337,7 +337,7 @@ Public Class Bin4Way_UnstablePixels1 : Inherits TaskParent
         dst2 = unstable.dst3
 
         Dim points As New cv.Mat
-        cv.Cv2.FindNonZero(dst2, points)
+        FindNonZero(dst2, points)
         If points.Rows = 0 Then Exit Sub
         Dim pts(points.Rows * 2 - 1) As Integer
         Marshal.Copy(points.Data, pts, 0, pts.Length)
@@ -385,7 +385,7 @@ Public Class Bin4Way_UnstablePixels1 : Inherits TaskParent
             strOut += CStr(index) + vbTab
         Next
         SetTrueText(strOut, 3)
-        labels(3) = "There are " + CStr(cv.Cv2.CountNonZero(dst2)) + " unstable pixels"
+        labels(3) = "There are " + CStr(CountNonZero(dst2)) + " unstable pixels"
     End Sub
 End Class
 
@@ -413,7 +413,7 @@ Public Class XR_Bin4Way_SplitGaps : Inherits TaskParent
 
         Dim lastVal As Integer = 255
         For i = Math.Min(mats.mat.Count, unstable.gapValues.Count) - 1 To 0 Step -1
-                          cv.Cv2.InRange(task.gray, unstable.gapValues(i), lastVal, mats.mat(i))
+            InRange(task.gray, unstable.gapValues(i), lastVal, mats.mat(i))
             lastVal = unstable.gapValues(i)
         Next
 
@@ -425,7 +425,7 @@ Public Class XR_Bin4Way_SplitGaps : Inherits TaskParent
         mats.Run(emptyMat)
         dst2 = mats.dst2
         dst3 = mats.dst3
-        labels(1) = "There are " + CStr(cv.Cv2.CountNonZero(dst1)) + " unstable pixels"
+        labels(1) = "There are " + CStr(CountNonZero(dst1)) + " unstable pixels"
     End Sub
 End Class
 
@@ -486,12 +486,12 @@ Public Class XR_Bin4Way_Regions1 : Inherits TaskParent
         Dim mask = binary.dst2.Clone
 
         Dim midColor = binary.meanScalar(0)
-        Dim topColor = cv.Cv2.Mean(task.gray, mask)(0)
-        Dim botColor = cv.Cv2.Mean(task.gray, Not mask)(0)
-                  cv.Cv2.InRange(task.gray, 0, botColor, mats.mat(0))
-                  cv.Cv2.InRange(task.gray, botColor, midColor, mats.mat(1))
-                  cv.Cv2.InRange(task.gray, midColor, topColor, mats.mat(2))
-                  cv.Cv2.InRange(task.gray, topColor, 255, mats.mat(3))
+        Dim topColor = Mean(task.gray, mask)(0)
+        Dim botColor = Mean(task.gray, Not mask)(0)
+        InRange(task.gray, 0, botColor, mats.mat(0))
+        InRange(task.gray, botColor, midColor, mats.mat(1))
+        InRange(task.gray, midColor, topColor, mats.mat(2))
+        InRange(task.gray, topColor, 255, mats.mat(3))
 
         mats.Run(emptyMat)
         dst2 = mats.dst2
@@ -546,7 +546,7 @@ Public Class Bin4Way_Unstable : Inherits TaskParent
             diff(i).Run(binary.mats.mat(i))
             dst3 = dst3 Or diff(i).dst2
         Next
-        labels(3) = "There are " + CStr(cv.Cv2.CountNonZero(dst3)) + " unstable pixels"
+        labels(3) = "There are " + CStr(CountNonZero(dst3)) + " unstable pixels"
     End Sub
 End Class
 
@@ -604,14 +604,14 @@ Public Class Bin4Way_SplitMean : Inherits TaskParent
 
         If task.heartBeat Then
             midColor = binary.meanScalar(0)
-            topColor = cv.Cv2.Mean(task.gray, mask)(0)
-            botColor = cv.Cv2.Mean(task.gray, Not mask)(0)
+            topColor = Mean(task.gray, mask)(0)
+            botColor = Mean(task.gray, Not mask)(0)
         End If
 
-                  cv.Cv2.InRange(task.gray, 0, botColor, mats.mat(0))
-                  cv.Cv2.InRange(task.gray, botColor, midColor, mats.mat(1))
-                  cv.Cv2.InRange(task.gray, midColor, topColor, mats.mat(2))
-                  cv.Cv2.InRange(task.gray, topColor, 255, mats.mat(3))
+        InRange(task.gray, 0, botColor, mats.mat(0))
+        InRange(task.gray, botColor, midColor, mats.mat(1))
+        InRange(task.gray, midColor, topColor, mats.mat(2))
+        InRange(task.gray, topColor, 255, mats.mat(3))
 
         mats.Run(emptyMat)
         dst2 = mats.dst2

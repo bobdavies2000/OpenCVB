@@ -13,17 +13,17 @@ Public Class ROI_Basics : Inherits TaskParent
         dst2 = diff.dst2
 
         Dim fnz As New cv.Mat
-        cv.Cv2.FindNonZero(diff.dst2, fnz)
-        Dim split = cv.Cv2.Split(fnz)
-        If split.Length = 0 Then Exit Sub
-        Dim mm0 = GetMinMax(split(0))
-        Dim mm1 = GetMinMax(split(1))
+        FindNonZero(diff.dst2, fnz)
+        Dim splitMats As cv.Mat() = Split(fnz)
+        If splitMats.Length = 0 Then Exit Sub
+        Dim mm0 = GetMinMax(splitMats(0))
+        Dim mm1 = GetMinMax(splitMats(1))
 
         aoiRect = New cv.Rect(mm0.minVal, mm1.minVal, mm0.maxVal - mm0.minVal, mm1.maxVal - mm1.minVal)
 
         If aoiRect.Width > 0 And aoiRect.Height > 0 Then
-        cv.Cv2.Rectangle(task.color, aoiRect, cv.Scalar.Yellow, task.lineWidth)
-cv.Cv2.Rectangle(dst2, aoiRect, white, task.lineWidth)
+        Rectangle(task.color, aoiRect, cv.Scalar.Yellow, task.lineWidth)
+Rectangle(dst2, aoiRect, white, task.lineWidth)
         End If
     End Sub
 End Class
@@ -46,7 +46,7 @@ Public Class XR_ROI_FindNonZeroNoSingle : Inherits TaskParent
         diff.Run(src)
         dst2 = diff.dst2
         Dim tmp As New cv.Mat
-        cv.Cv2.FindNonZero(diff.dst2, tmp)
+        FindNonZero(diff.dst2, tmp)
         If tmp.Rows = 0 Then Exit Sub
 
         Dim minX = Integer.MaxValue, maxX = Integer.MinValue, minY = Integer.MaxValue, maxY = Integer.MinValue
@@ -57,7 +57,7 @@ Public Class XR_ROI_FindNonZeroNoSingle : Inherits TaskParent
             If r.X < 0 Then r.X = 0
             If r.Y < 0 Then r.Y = 0
             If r.X + r.Width < dst2.Width And r.Y + r.Height < dst2.Height Then
-                If cv.Cv2.CountNonZero(dst2(r)) > 1 Then
+                If CountNonZero(dst2(r)) > 1 Then
                     If minX > pt.X Then minX = pt.X
                     If maxX < pt.X Then maxX = pt.X
                     If minY > pt.Y Then minY = pt.Y
@@ -67,8 +67,8 @@ Public Class XR_ROI_FindNonZeroNoSingle : Inherits TaskParent
         Next
         If minX <> Integer.MaxValue Then
             aoiRect = New cv.Rect(minX, minY, maxX - minX + 1, maxY - minY + 1)
-            cv.Cv2.Rectangle(task.color, aoiRect, cv.Scalar.Yellow, task.lineWidth)
-cv.Cv2.Rectangle(dst2, aoiRect, white, task.lineWidth)
+            Rectangle(task.color, aoiRect, cv.Scalar.Yellow, task.lineWidth)
+Rectangle(dst2, aoiRect, white, task.lineWidth)
         End If
     End Sub
 End Class
@@ -104,13 +104,13 @@ Public Class XR_ROI_AccumulateOld : Inherits TaskParent
 
         diff.Run(src)
         dst3 = diff.dst2
-        cv.Cv2.BitwiseOr(dst3, dst1, dst1)
+        BitwiseOr(dst3, dst1, dst1)
         Dim tmp As New cv.Mat
-        cv.Cv2.FindNonZero(dst3, tmp)
+        FindNonZero(dst3, tmp)
         If aoiRect <> New cv.Rect Then
             task.color(aoiRect).CopyTo(dst0(aoiRect))
-            cv.Cv2.Rectangle(dst0, aoiRect, cv.Scalar.Yellow, task.lineWidth)
-cv.Cv2.Rectangle(dst2, aoiRect, white, task.lineWidth)
+            Rectangle(dst0, aoiRect, cv.Scalar.Yellow, task.lineWidth)
+Rectangle(dst2, aoiRect, white, task.lineWidth)
         End If
         If tmp.Rows = 0 Then Exit Sub
         For i = 0 To tmp.Rows - 1
@@ -122,7 +122,7 @@ cv.Cv2.Rectangle(dst2, aoiRect, white, task.lineWidth)
         Next
         aoiRect = New cv.Rect(minX, minY, maxX - minX + 1, maxY - minY + 1)
         dst1.CopyTo(dst2)
-        cv.Cv2.Rectangle(dst2, aoiRect, white, task.lineWidth)
+        Rectangle(dst2, aoiRect, white, task.lineWidth)
     End Sub
 End Class
 
@@ -154,19 +154,19 @@ Public Class XR_ROI_Accumulate : Inherits TaskParent
         diff.Run(src)
 
         Dim fnz As New cv.Mat
-        cv.Cv2.FindNonZero(diff.dst2, fnz)
-        Dim split = cv.Cv2.Split(fnz)
-        If split.Length > 0 Then
-            Dim mm0 = GetMinMax(split(0))
-            Dim mm1 = GetMinMax(split(1))
+        FindNonZero(diff.dst2, fnz)
+        Dim splitMats As cv.Mat() = Split(fnz)
+        If splitMats.Length > 0 Then
+            Dim mm0 = GetMinMax(splitMats(0))
+            Dim mm1 = GetMinMax(splitMats(1))
 
             Dim motionRect = New cv.Rect(mm0.minVal, mm1.minVal, mm0.maxVal - mm0.minVal, mm1.maxVal - mm1.minVal)
             If motionRect.Width <> 0 And motionRect.Height <> 0 Then
                 If roiRect.X > 0 Or roiRect.Y > 0 Then roiRect = motionRect.Union(roiRect) Else roiRect = motionRect
-                cv.Cv2.BitwiseOr(diff.dst2, dst2, dst2)
+                BitwiseOr(diff.dst2, dst2, dst2)
             End If
         End If
-        cv.Cv2.Rectangle(dst2, roiRect, white, task.lineWidth)
-cv.Cv2.Rectangle(task.color, roiRect, task.highlight, task.lineWidth)
+        Rectangle(dst2, roiRect, white, task.lineWidth)
+Rectangle(task.color, roiRect, task.highlight, task.lineWidth)
     End Sub
 End Class

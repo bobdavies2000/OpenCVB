@@ -13,11 +13,11 @@ Public Class XR_ContourPlane_Basics : Inherits TaskParent
 
         dst1.SetTo(0)
         For Each contour In contours.contourList
-            Dim depth = cv.Cv2.Mean(task.pcSplit(2)(contour.rect), contour.mask)
+            Dim depth = Mean(task.pcSplit(2)(contour.rect), contour.mask)
             dst1(contour.rect).SetTo(depth, contour.mask)
         Next
 
-        cv.Cv2.Merge({task.pcSplit(0), task.pcSplit(1), dst1}, dst3)
+        Merge({task.pcSplit(0), task.pcSplit(1), dst1}, dst3)
     End Sub
 End Class
 
@@ -36,9 +36,9 @@ Public Class XR_ContourPlane_MaxDist : Inherits TaskParent
         dst2 = contours.dst2
         For Each contour In contours.contourList
             Dim maxDist = Distance_Basics.GetMaxDistDepth(contour.mask, contour.rect)
-            cv.Cv2.Circle(dst2, maxDist, task.DotSize, task.highlight, -1, task.lineType)
+            Circle(dst2, maxDist, task.DotSize, task.highlight, -1, task.lineType)
             maxDist = Distance_Basics.GetMaxDist(contour.mask, contour.rect)
-            cv.Cv2.Circle(dst2, maxDist, task.DotSize, blue, -1, task.lineType)
+            Circle(dst2, maxDist, task.DotSize, blue, -1, task.lineType)
         Next
     End Sub
 End Class
@@ -70,21 +70,21 @@ Public Class XR_ContourPlane_RectX : Inherits TaskParent
                 dst3 = src
                 If task.toggleOn Then
                     rleft = ValidateRect(rleft)
-                    cv.Cv2.Rectangle(dst2, rleft, task.highlight, task.lineWidth)
+                    Rectangle(dst2, rleft, task.highlight, task.lineWidth)
                     Dim maskLeft = contour.mask(New cv.Rect(0, 0, rleft.Width, rleft.Height))
                     maskLeft = maskLeft And task.depthmask(rleft)
                     dst3(rleft).SetTo(white, maskLeft)
-                    Dim depth = cv.Cv2.Mean(task.pcSplit(2)(rleft), maskLeft)
+                    Dim depth = Mean(task.pcSplit(2)(rleft), maskLeft)
                     labels(3) = "Showing the left rectangle of the largest contour with depth = " + depth(0).ToString(fmt3)
                 Else
-                cv.Cv2.Rectangle(dst2, rRight, task.highlight, task.lineWidth)
+                Rectangle(dst2, rRight, task.highlight, task.lineWidth)
                     Dim maskRight = contour.mask(New cv.Rect(maxDist.X - contour.rect.X, 0, rRight.Width, rRight.Height))
                     maskRight = maskRight And task.depthmask(rRight)
                     dst3(rRight).SetTo(white, maskRight)
-                    Dim depth = cv.Cv2.Mean(task.pcSplit(2)(rRight), maskRight)
+                    Dim depth = Mean(task.pcSplit(2)(rRight), maskRight)
                     labels(3) = "Showing the right rectangle of the largest contour with depth = " + depth(0).ToString(fmt3)
                 End If
-                cv.Cv2.Circle(dst2, maxDist, task.DotSize, task.highlight, -1, task.lineType)
+                Circle(dst2, maxDist, task.DotSize, task.highlight, -1, task.lineType)
             End If
         Next
     End Sub

@@ -19,15 +19,15 @@ Public Class GrabCut_Basics : Inherits TaskParent
         dst0.SetTo(cv.GrabCutClasses.FGD, fore.fg)
         dst0.SetTo(cv.GrabCutClasses.BGD, fore.bg)
 
-        ' cv.Cv2.GrabCut(src, dst0, New cv.Rect, bgModel, fgModel, 1, cv.GrabCutModes.InitWithMask)
+        ' GrabCut(src, dst0, New cv.Rect, bgModel, fgModel, 1, cv.GrabCutModes.InitWithMask)
 
         fore.bg = Not fore.fg
 
-If cv.Cv2.CountNonZero(fore.fg) Then
+If CountNonZero(fore.fg) Then
             If fgFineTune IsNot Nothing Then dst0.SetTo(cv.GrabCutClasses.FGD, fgFineTune)
             If bgFineTune IsNot Nothing Then dst0.SetTo(cv.GrabCutClasses.BGD, bgFineTune)
 
-            cv.Cv2.GrabCut(src, dst0, New cv.Rect, bgModel, fgModel, 1, cv.GrabCutModes.Eval)
+            GrabCut(src, dst0, New cv.Rect, bgModel, fgModel, 1, cv.GrabCutModes.Eval)
         End If
         dst3.SetTo(0)
         src.CopyTo(dst3, dst0)
@@ -107,7 +107,7 @@ Public Class XR_GrabCut_ImageRect : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         If task.heartBeat = False Then Exit Sub
         Dim fileInputName = New FileInfo(task.homeDir + "data/cat.jpg")
-        dst2 = cv.Cv2.ImRead(fileInputName.FullName)
+        dst2 = ImRead(fileInputName.FullName)
 
         dst0 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.GrabCutClasses.PR_BGD)
         Dim tmp As cv.Mat = dst0(bgRect1)
@@ -120,24 +120,24 @@ Public Class XR_GrabCut_ImageRect : Inherits TaskParent
         tmp.SetTo(cv.GrabCutClasses.FGD)
 
         If task.firstPass Then
-            cv.Cv2.GrabCut(dst2, dst0, bgRect1, bgModel, fgModel, 1, cv.GrabCutModes.InitWithRect)
-            cv.Cv2.GrabCut(dst2, dst0, bgRect2, bgModel, fgModel, 1, cv.GrabCutModes.InitWithRect)
-            cv.Cv2.GrabCut(dst2, dst0, fgRect1, bgModel, fgModel, 1, cv.GrabCutModes.InitWithRect)
-            cv.Cv2.GrabCut(dst2, dst0, fgRect2, bgModel, fgModel, 1, cv.GrabCutModes.InitWithRect)
+            GrabCut(dst2, dst0, bgRect1, bgModel, fgModel, 1, cv.GrabCutModes.InitWithRect)
+            GrabCut(dst2, dst0, bgRect2, bgModel, fgModel, 1, cv.GrabCutModes.InitWithRect)
+            GrabCut(dst2, dst0, fgRect1, bgModel, fgModel, 1, cv.GrabCutModes.InitWithRect)
+            GrabCut(dst2, dst0, fgRect2, bgModel, fgModel, 1, cv.GrabCutModes.InitWithRect)
         End If
 
         Dim rect As New cv.Rect
 
-        cv.Cv2.GrabCut(dst2, dst0, rect, bgModel, fgModel, 1, cv.GrabCutModes.Eval)
+        GrabCut(dst2, dst0, rect, bgModel, fgModel, 1, cv.GrabCutModes.Eval)
 
         dst3.SetTo(0)
         dst2.CopyTo(dst3, dst0 + 1)
 
         dst1.SetTo(0)
-        cv.Cv2.Rectangle(dst1, bgRect1, task.highlight, task.lineWidth)
-        cv.Cv2.Rectangle(dst1, bgRect2, task.highlight, task.lineWidth)
-        cv.Cv2.Rectangle(dst1, fgRect1, task.highlight, task.lineWidth)
-        cv.Cv2.Rectangle(dst1, fgRect2, task.highlight, task.lineWidth)
+        Rectangle(dst1, bgRect1, task.highlight, task.lineWidth)
+        Rectangle(dst1, bgRect2, task.highlight, task.lineWidth)
+        Rectangle(dst1, fgRect1, task.highlight, task.lineWidth)
+        Rectangle(dst1, fgRect2, task.highlight, task.lineWidth)
     End Sub
 End Class
 
@@ -151,7 +151,7 @@ Public Class XR_GrabCut_ImageMask : Inherits TaskParent
     Dim image As cv.Mat
     Public Sub New()
         Dim fileInputName = New FileInfo(task.homeDir + "data/cat.jpg")
-        image = cv.Cv2.ImRead(fileInputName.FullName)
+        image = ImRead(fileInputName.FullName)
         desc = "Grabcut example using a single image. "
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -160,14 +160,14 @@ Public Class XR_GrabCut_ImageMask : Inherits TaskParent
         If task.heartBeat Then
             dst2 = image
             Dim _cvt1 As New cv.Mat
-            cv.Cv2.CvtColor(dst2, _cvt1, cv.ColorConversionCodes.BGR2GRAY)
-            cv.Cv2.Threshold(_cvt1, dst0, 50, 255, cv.ThresholdTypes.Binary)
+            CvtColor(dst2, _cvt1, cv.ColorConversionCodes.BGR2GRAY)
+            Threshold(_cvt1, dst0, 50, 255, cv.ThresholdTypes.Binary)
             dst1 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.GrabCutClasses.PR_BGD)
             dst1.SetTo(cv.GrabCutClasses.FGD, dst0)
 
-            cv.Cv2.GrabCut(dst2, dst1, New cv.Rect, bgModel, fgModel, 1, cv.GrabCutModes.InitWithMask)
+            GrabCut(dst2, dst1, New cv.Rect, bgModel, fgModel, 1, cv.GrabCutModes.InitWithMask)
         Else
-            cv.Cv2.GrabCut(dst2, dst1, New cv.Rect, bgModel, fgModel, 5, cv.GrabCutModes.Eval)
+            GrabCut(dst2, dst1, New cv.Rect, bgModel, fgModel, 5, cv.GrabCutModes.Eval)
         End If
 
         dst3.SetTo(0)

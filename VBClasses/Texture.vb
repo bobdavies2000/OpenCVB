@@ -13,8 +13,8 @@ Public Class Texture_Basics : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         If standaloneTest() Or src.Channels() <> 1 Then
             ellipse.Run(src)
-            cv.Cv2.CvtColor(ellipse.dst2, dst2, cv.ColorConversionCodes.BGR2GRAY)
-            cv.Cv2.ConvertScaleAbs(dst2, dst2)
+            CvtColor(ellipse.dst2, dst2, cv.ColorConversionCodes.BGR2GRAY)
+            ConvertScaleAbs(dst2, dst2)
             dst3 = ellipse.dst2.Clone
             dst3.SetTo(cv.Scalar.Yellow, task.gridMask)
         Else
@@ -23,19 +23,19 @@ Public Class Texture_Basics : Inherits TaskParent
 
         tChange = True
         If texturePop > 0 Then
-            Dim nextCount = cv.Cv2.CountNonZero(dst2(tRect))
+            Dim nextCount = CountNonZero(dst2(tRect))
             If nextCount >= texturePop * 0.95 Then tChange = False
         End If
         If tChange Then
             Dim sortcounts As New SortedList(Of Integer, cv.Rect)(New compareAllowIdenticalIntegerInverted)
             For Each roi In task.gridRects
-                sortcounts.Add(cv.Cv2.CountNonZero(dst2(roi)), roi)
+                sortcounts.Add(CountNonZero(dst2(roi)), roi)
             Next
-            If standaloneTest() Then cv.Cv2.Rectangle(dst3, sortcounts.ElementAt(0).Value, white, 2)
+            If standaloneTest() Then Rectangle(dst3, sortcounts.ElementAt(0).Value, white, 2)
             tRect = sortcounts.ElementAt(0).Value
             texture = task.color(tRect)
-            texturePop = cv.Cv2.CountNonZero(dst2(tRect))
+            texturePop = CountNonZero(dst2(tRect))
         End If
-        If standaloneTest() Then cv.Cv2.Rectangle(dst3, tRect, white, 2)
+        If standaloneTest() Then Rectangle(dst3, tRect, white, 2)
     End Sub
 End Class

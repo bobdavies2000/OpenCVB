@@ -20,7 +20,7 @@ Public Class Triangle_Basics : Inherits TaskParent
             If vec.Z = 0 Then
                 vec = Cloud_Basics.worldCoordinates(New cv.Point3f(pt.X, pt.Y, task.rcD.wcMean(2)))
             End If
-            cv.Cv2.Circle(dst3, pt, task.DotSize, cv.Scalar.Yellow, -1, task.lineType)
+            Circle(dst3, pt, task.DotSize, cv.Scalar.Yellow, -1, task.lineType)
             pt3D.Add(vec)
         Next
 
@@ -60,14 +60,14 @@ Public Class Triangle_HullContour : Inherits TaskParent
         dst3.SetTo(0)
         For Each pt In rc.contour
             pt = New cv.Point(pt.X + rc.rect.X, pt.Y + rc.rect.Y)
-            cv.Cv2.Circle(dst3, pt, task.DotSize, cv.Scalar.Yellow, -1, task.lineType)
+            Circle(dst3, pt, task.DotSize, cv.Scalar.Yellow, -1, task.lineType)
         Next
 
         dst1.SetTo(0)
         If rc.hull IsNot Nothing Then
             For Each pt In rc.hull
                 pt = New cv.Point(pt.X + rc.rect.X, pt.Y + rc.rect.Y)
-                cv.Cv2.Circle(dst1, pt, task.DotSize, cv.Scalar.Yellow, -1, task.lineType)
+                Circle(dst1, pt, task.DotSize, cv.Scalar.Yellow, -1, task.lineType)
             Next
         End If
     End Sub
@@ -110,12 +110,12 @@ Public Class XR_Triangle_Cell : Inherits TaskParent
             xFactor = rc.rect.Width * dst2.Height / rc.rect.Height
             yFactor = dst2.Height
         End If
-        cv.Cv2.Rectangle(dst3, cellRect, white, task.lineWidth)
+        Rectangle(dst3, cellRect, white, task.lineWidth)
 
         For Each pt In rc.contour
             Dim vec = task.pointCloud(rc.rect).Get(Of cv.Point3f)(pt.Y, pt.X)
             pt = New cv.Point(xFactor * pt.X / rc.rect.Width, yFactor * pt.Y / rc.rect.Height)
-            cv.Cv2.Circle(dst3, pt, task.DotSize, cv.Scalar.Yellow, -1, task.lineType)
+            Circle(dst3, pt, task.DotSize, cv.Scalar.Yellow, -1, task.lineType)
             pt3D.Add(vec)
         Next
 
@@ -170,7 +170,7 @@ Public Class XR_Triangle_Mask : Inherits TaskParent
             xFactor = rc.rect.Width * dst2.Height / rc.rect.Height
             yFactor = dst2.Height
         End If
-        cv.Cv2.Rectangle(dst3, cellRect, white, task.lineWidth)
+        Rectangle(dst3, cellRect, white, task.lineWidth)
 
         triangles.Clear()
         For y = 0 To rc.rect.Height - 1
@@ -178,14 +178,14 @@ Public Class XR_Triangle_Mask : Inherits TaskParent
                 If rc.mask.Get(Of Byte)(y, x) = 0 Then Continue For
                 Dim vec = task.pointCloud(rc.rect).Get(Of cv.Point3f)(y, x)
                 Dim pt = New cv.Point2f(xFactor * x / rc.rect.Width, yFactor * y / rc.rect.Height)
-                cv.Cv2.Circle(dst3, pt, task.DotSize, cv.Scalar.Yellow, -1, task.lineType)
+                Circle(dst3, pt, task.DotSize, cv.Scalar.Yellow, -1, task.lineType)
                 pt3D.Add(vec)
             Next
         Next
 
         Dim newMaxDist = New cv.Point2f(xFactor * (rc.maxDist.X - rc.rect.X) / rc.rect.Width,
                                           yFactor * (rc.maxDist.Y - rc.rect.Y) / rc.rect.Height)
-                                          cv.Cv2.Circle(dst3, newMaxDist, task.DotSize + 2, cv.Scalar.Red, -1, task.lineType)
+                                          Circle(dst3, newMaxDist, task.DotSize + 2, cv.Scalar.Red, -1, task.lineType)
     End Sub
 End Class
 
@@ -225,11 +225,11 @@ Public Class Triangle_Find : Inherits TaskParent
             Dim p1 = New cv.Point(pt.X, pt.Y)
             pt = triangle.Get(Of cv.Point2f)((i + 1) Mod 3)
             Dim p2 = New cv.Point(pt.X, pt.Y)
-            cv.Cv2.Line(dst2, p1, p2, cv.Scalar.Black, task.lineWidth, task.lineType)
+            Line(dst2, p1, p2, cv.Scalar.Black, task.lineWidth, task.lineType)
         Next
 
         For Each pt In srcPoints
-        cv.Cv2.Circle(dst2, pt, task.DotSize + 1, cv.Scalar.Red, -1, task.lineType)
+        Circle(dst2, pt, task.DotSize + 1, cv.Scalar.Red, -1, task.lineType)
         Next
     End Sub
 End Class

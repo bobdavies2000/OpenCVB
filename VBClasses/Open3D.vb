@@ -72,7 +72,7 @@ Public Class Open3D_Shape : Inherits TaskParent
             Dim px = CInt(task.workRes.Width * pt.X / task.MaxZmeters)
             Dim py = CInt(task.workRes.Height * (1.0F - pt.Z / task.MaxZmeters))
             If px >= 0 And px < dst2.Width And py >= 0 And py < dst2.Height Then
-            cv.Cv2.Circle(dst2, New cv.Point(px, py), 1, white, -1, task.lineType)
+            Circle(dst2, New cv.Point(px, py), 1, white, -1, task.lineType)
             End If
         Next
 
@@ -104,9 +104,9 @@ Public Class Open3D_Shape : Inherits TaskParent
             If i0 < 0 OrElse i0 >= vertexCount OrElse i1 < 0 OrElse i1 >= vertexCount OrElse i2 < 0 OrElse i2 >= vertexCount Then
                 Continue For
             End If
-            cv.Cv2.Line(dst, New cv.Point(mapX(i0), mapY(i0)), New cv.Point(mapX(i1), mapY(i1)), white, 1, task.lineType)
-            cv.Cv2.Line(dst, New cv.Point(mapX(i1), mapY(i1)), New cv.Point(mapX(i2), mapY(i2)), white, 1, task.lineType)
-            cv.Cv2.Line(dst, New cv.Point(mapX(i2), mapY(i2)), New cv.Point(mapX(i0), mapY(i0)), white, 1, task.lineType)
+            Line(dst, New cv.Point(mapX(i0), mapY(i0)), New cv.Point(mapX(i1), mapY(i1)), white, 1, task.lineType)
+            Line(dst, New cv.Point(mapX(i1), mapY(i1)), New cv.Point(mapX(i2), mapY(i2)), white, 1, task.lineType)
+            Line(dst, New cv.Point(mapX(i2), mapY(i2)), New cv.Point(mapX(i0), mapY(i0)), white, 1, task.lineType)
         Next
     End Sub
 End Class

@@ -18,7 +18,7 @@ Public Class Image_Basics : Inherits TaskParent
                 newSize = New cv.Size(dst2.Width, dst2.Width * src.Height / src.Width)
             End If
             dst2.SetTo(0)
-            cv.Cv2.Resize(src, dst2(New cv.Rect(0, 0, newSize.Width, newSize.Height)), newSize)
+            Resize(src, dst2(New cv.Rect(0, 0, newSize.Width, newSize.Height)), newSize)
         Else
             dst2 = src
         End If
@@ -69,7 +69,7 @@ Public Class Image_RedCloudColor : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         images.Run(src)
         dst0 = images.dst2.Clone
-        cv.Cv2.CvtColor(images.dst2, dst1, cv.ColorConversionCodes.BGR2GRAY)
+        CvtColor(images.dst2, dst1, cv.ColorConversionCodes.BGR2GRAY)
 
         reduction.Run(dst1)
 
@@ -77,7 +77,7 @@ Public Class Image_RedCloudColor : Inherits TaskParent
         dst2 = redC.dst2
         labels(2) = redC.labels(2)
 
-        cv.Cv2.InRange(dst1, 0, 0, dst0)
+        InRange(dst1, 0, 0, dst0)
         dst2.SetTo(0, dst0)
     End Sub
 End Class

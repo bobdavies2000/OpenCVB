@@ -729,7 +729,7 @@ Public Class Options_WarpModel : Inherits OptionParent
                 Dim nextRadio = frm.check(i)
                 If nextRadio.Checked Then
                     Dim photo As New FileInfo(task.homeDir + "Data\Prokudin\" + nextRadio.Text)
-                    pkImage = cv.Cv2.ImRead(photo.FullName, cv.ImreadModes.Grayscale)
+                    pkImage = ImRead(photo.FullName, cv.ImreadModes.Grayscale)
                     Exit For
                 End If
             Next
@@ -1242,7 +1242,7 @@ Public Class Options_SymmetricalShapes : Inherits OptionParent
         If regularCheck.Checked Then numPoints = CInt(numPoints / nGenPer) * nGenPer ' harmonize
         radius1 = r1Slider.Value
         radius2 = r2Slider.Value
-        dTheta = 2 * cv.Cv2.PI / numPoints
+        dTheta = 2 * PI / numPoints
         symmetricRipple = symCheck.Checked
         reverseInOut = reverseCheck.Checked
         fillRequest = fillCheck.checked
@@ -1313,7 +1313,7 @@ Public Class Options_FilterNorm : Inherits OptionParent
             End If
         Next
 
-        cv.Cv2.Normalize(kernel, kernel, alphaSlider.Value / 10, 0, normType)
+        Normalize(kernel, kernel, alphaSlider.Value / 10, 0, normType)
     End Sub
 End Class
 
@@ -1948,9 +1948,9 @@ Public Class Options_Warp : Inherits OptionParent
         Static fSlider = OptionParent.FindSlider("f")
         Static distanceSlider = OptionParent.FindSlider("distance")
 
-        alpha = CDbl(alphaSlider.value - 90) * cv.Cv2.PI / 180
-        beta = CDbl(betaSlider.value - 90) * cv.Cv2.PI / 180
-        gamma = CDbl(gammaSlider.value - 90) * cv.Cv2.PI / 180
+        alpha = CDbl(alphaSlider.value - 90) * PI / 180
+        beta = CDbl(betaSlider.value - 90) * PI / 180
+        gamma = CDbl(gammaSlider.value - 90) * PI / 180
         f = fSlider.value
         distance = distanceSlider.value
 
@@ -2082,7 +2082,7 @@ Public Class Options_Translation : Inherits OptionParent
     Public Sub New()
         Dim rightShift As Integer = 4
         Dim leftShift As Integer = 5
-        If task.settings.cameraName = "Intel(R) RealSense(TM) Depth Camera 435i" Then
+        If task.Settings.cameraName = "Intel(R) RealSense(TM) Depth Camera 435i" Then
             leftShift = 1
             rightShift = 2
         End If
@@ -2520,7 +2520,7 @@ Public Class Options_Dilate : Inherits OptionParent
         morphShape = cv.MorphShapes.Cross
         If ellipseRadio.Checked Then morphShape = cv.MorphShapes.Ellipse
         If rectRadio.Checked Then morphShape = cv.MorphShapes.Rect
-        element = cv.Cv2.GetStructuringElement(morphShape, New cv.Size(kernelSize, kernelSize))
+        element = GetStructuringElement(morphShape, New cv.Size(kernelSize, kernelSize))
         noshape = noShapeRadio.checked
     End Sub
 End Class
@@ -4076,11 +4076,11 @@ Public Class Options_BrightnessContrast : Inherits OptionParent
     Public Sub New()
         Dim alphaDefault = 2000
         Dim betaDefault = -100
-        If task.settings.cameraName = "Oak-D camera" Then
+        If task.Settings.cameraName = "Oak-D camera" Then
             alphaDefault = 500
             betaDefault = 0
         End If
-        If task.settings.cameraName = "Intel(R) RealSense(TM) Depth Camera 435i" Then alphaDefault = 1500
+        If task.Settings.cameraName = "Intel(R) RealSense(TM) Depth Camera 435i" Then alphaDefault = 1500
         If sliders.Setup(traceName) Then
             sliders.setupTrackBar("Alpha (contrast)", 0, 10000, alphaDefault)
             sliders.setupTrackBar("Beta (brightness)", -127, 127, betaDefault)
@@ -4865,9 +4865,9 @@ Public Class Options_DNN : Inherits OptionParent
         Dim index = findRadioIndex(frm.check)
         If radio.check(index).Checked Then
             superResModelFileName += radio.check(index).Text
-            Dim split = radio.check(index).Text.Split("_")
-            shortModelName = LCase(split(0))
-            superResMultiplier = CInt(split(1).Substring(1, 1))
+            Dim splitStr = radio.check(index).Text.Split("_")
+            shortModelName = LCase(splitStr(0))
+            superResMultiplier = CInt(splitStr(1).Substring(1, 1))
             Dim testFile As New FileInfo(superResModelFileName)
             If testFile.Exists = False Then
                 MessageBox.Show("The " + radio.check(index).Text + " super res model file is missing!")
@@ -5072,7 +5072,7 @@ Public Class Options_Erode : Inherits OptionParent
         morphShape = cv.MorphShapes.Cross
         If ellipseRadio.Checked Then morphShape = cv.MorphShapes.Ellipse
         If rectRadio.Checked Then morphShape = cv.MorphShapes.Rect
-        element = cv.Cv2.GetStructuringElement(morphShape, New cv.Size(kernelSize, kernelSize))
+        element = GetStructuringElement(morphShape, New cv.Size(kernelSize, kernelSize))
         noshape = noShapeRadio.checked
         flatDepth = depthSlider.value / 1000
     End Sub
@@ -5265,8 +5265,8 @@ Public Class Options_Gabor : Inherits OptionParent
         gamma = gammaSlider.Value / 10
         phaseOffset = phaseSlider.Value / 1000
         theta = Math.PI * thetaSlider.Value / 180
-        gKernel = cv.Cv2.GetGaborKernel(New cv.Size(ksize, ksize), Sigma, theta, lambda, gamma, phaseOffset, cv.MatType.CV_32F)
-        Dim multiplier = cv.Cv2.Sum(gKernel)(0)
+        gKernel = GetGaborKernel(New cv.Size(ksize, ksize), Sigma, theta, lambda, gamma, phaseOffset, cv.MatType.CV_32F)
+        Dim multiplier = Sum(gKernel)(0)
         gKernel /= 1.5 * multiplier
     End Sub
 End Class
@@ -5402,7 +5402,7 @@ Public Class Options_Images : Inherits OptionParent
         fileNameForm.OpenFileDialog1.CheckFileExists = False
         fileNameForm.OpenFileDialog1.Filter = "jpg (*.jpg)|*.jpg|png (*.png)|*.png|bmp (*.bmp)|*.bmp|All files (*.*)|*.*"
         fileNameForm.OpenFileDialog1.FilterIndex = 1
-        fileNameForm.filename.Text = task.settings.Image_Basics_Name
+        fileNameForm.filename.Text = task.Settings.Image_Basics_Name
         If fileNameForm.filename.Text = "" Then fileNameForm.filename.Text = task.homeDir + "Images/train/2092.jpg"
         fileNameForm.Text = "Select an image file for use in Opencv"
         fileNameForm.FileNameLabel.Text = "Select a file."
@@ -5429,7 +5429,7 @@ Public Class Options_Images : Inherits OptionParent
             If nextCheck.checked Then fileIndex += 1
             If fileIndex >= fileNameList.Count Then fileIndex = 0
             fileInputName = New FileInfo(fileNameList(fileIndex))
-            fullsizeImage = cv.Cv2.ImRead(fileInputName.FullName)
+            fullsizeImage = ImRead(fileInputName.FullName)
         End If
         nextCheck.checked = False
     End Sub
@@ -5532,7 +5532,7 @@ Public Class Options_Kalman_VB : Inherits OptionParent
         If matrix.Count > 0 Then
             Const MAX_INPUT = 20
             matrix(task.frameCount Mod MAX_INPUT) = kalmanInput
-            Dim AverageOutput = cv.Cv2.Mean((cv.Mat.FromPixelData(MAX_INPUT, 1, cv.MatType.CV_32F, matrix.ToArray)))(0)
+            Dim AverageOutput = Mean((cv.Mat.FromPixelData(MAX_INPUT, 1, cv.MatType.CV_32F, matrix.ToArray)))(0)
 
             If AverageOutput < 0 Then AverageOutput = 0
             If AverageOutput > pointSlider.Maximum Then AverageOutput = pointSlider.Maximum
@@ -5643,10 +5643,10 @@ Public Class Options_LaPlacianPyramid : Inherits OptionParent
         Dim levelMat(barCount - 1) As cv.Mat
         For i = 0 To barCount - 2
             Dim nextImg As New cv.Mat
-            cv.Cv2.PyrDown(img, nextImg)
+            PyrDown(img, nextImg)
 
             Dim imgUp As New cv.Mat
-            cv.Cv2.PyrUp(nextImg, imgUp, img.Size)
+            PyrUp(nextImg, imgUp, img.Size)
             levelMat(i) = (img - imgUp) * sliders.mytrackbars(i).Value
             img = nextImg
         Next
@@ -5654,7 +5654,7 @@ Public Class Options_LaPlacianPyramid : Inherits OptionParent
 
         'img = levelMat(barCount - 1)
         'For i = barCount - 1 To 1 Step -1
-        '    cv.Cv2.PyrUp(img, levelMat(i), levelMat(i).Size)
+        '    PyrUp(img, levelMat(i), levelMat(i).Size)
         '    img += levelMat(i)
         'Next
     End Sub

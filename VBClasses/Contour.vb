@@ -37,9 +37,9 @@ Public Class Contour_Basics : Inherits TaskParent
         If options.retrievalMode = cv.RetrievalModes.FloodFill Then
             Dim dst As New cv.Mat(task.workRes, cv.MatType.CV_8U, 0)
             input.ConvertTo(dst, cv.MatType.CV_32SC1)
-            cv.Cv2.FindContours(dst, allContours, Nothing, cv.RetrievalModes.FloodFill, mode)
+            FindContours(dst, allContours, Nothing, cv.RetrievalModes.FloodFill, mode)
         Else
-            cv.Cv2.FindContours(input, allContours, Nothing, options.retrievalMode, mode)
+            FindContours(input, allContours, Nothing, options.retrievalMode, mode)
         End If
         Return allContours
     End Function
@@ -93,16 +93,16 @@ Public Class Contour_Regions : Inherits TaskParent
         Dim mode = options.options2.ApproximationMode
         If options.retrievalMode = cv.RetrievalModes.FloodFill Then
             dst3.ConvertTo(dst1, cv.MatType.CV_32SC1)
-            cv.Cv2.FindContours(dst1, allContours, Nothing, cv.RetrievalModes.FloodFill, mode)
+            FindContours(dst1, allContours, Nothing, cv.RetrievalModes.FloodFill, mode)
         Else
-            cv.Cv2.FindContours(dst3, allContours, Nothing, options.retrievalMode, mode)
+            FindContours(dst3, allContours, Nothing, options.retrievalMode, mode)
         End If
         If allContours.Count <= 1 Then Exit Sub
 
         Dim sortedList As New SortedList(Of Integer, Integer)(New compareAllowIdenticalIntegerInverted)
         For i = 0 To allContours.Count - 1
             If allContours(i).Length < 4 Then Continue For
-            Dim count = cv.Cv2.ContourArea(allContours(i))
+            Dim count = ContourArea(allContours(i))
             If count > src.Total * 3 / 4 Then Continue For
             sortedList.Add(count, i)
         Next
@@ -138,7 +138,7 @@ Public Class XR_Contour_Features : Inherits TaskParent
     Public Shared Function getCorrelation(lrect As cv.Rect) As Single
         Dim correlationMat As New cv.Mat
         Dim rRect As cv.Rect
-        Dim depth = cv.Cv2.Mean(task.pcSplit(2)(lrect), task.depthmask(lrect))
+        Dim depth = Mean(task.pcSplit(2)(lrect), task.depthmask(lrect))
         If depth = 0 Then Return 0 ' no correlation if there is no depth...
         rRect = lrect
         rRect.X -= task.calibData.baseline * task.calibData.leftIntrinsics.fx / depth.Val0
@@ -146,7 +146,7 @@ Public Class XR_Contour_Features : Inherits TaskParent
             Return 0 ' no correlation if there is no depth...
         End If
 
-        cv.Cv2.MatchTemplate(task.leftView(lrect), task.rightView(rRect), correlationMat, cv.TemplateMatchModes.CCoeffNormed)
+        MatchTemplate(task.leftView(lrect), task.rightView(rRect), correlationMat, cv.TemplateMatchModes.CCoeffNormed)
         Return correlationMat.Get(Of Single)(0, 0)
     End Function
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -157,8 +157,8 @@ Public Class XR_Contour_Features : Inherits TaskParent
 
         dst3.SetTo(0)
         For Each pt In feat.features
-        cv.Cv2.Circle(dst2, pt, task.DotSize, task.highlight, -1, task.lineType)
-        cv.Cv2.Circle(dst3, pt, task.DotSize, task.highlight, -1, task.lineType)
+        Circle(dst2, pt, task.DotSize, task.highlight, -1, task.lineType)
+        Circle(dst3, pt, task.DotSize, task.highlight, -1, task.lineType)
             Dim rect = task.gridRects(task.gridMap.Get(Of Integer)(pt.Y, pt.X))
             Dim correlation = getCorrelation(rect)
             SetTrueText(correlation.ToString(fmt1), pt, 3)
@@ -186,7 +186,7 @@ Public Class XR_Contour_BrickPoints : Inherits TaskParent
         bPoint.Run(task.gray)
 
         For Each pt In bPoint.ptList
-        cv.Cv2.Circle(dst2, pt, task.DotSize, task.highlight, -1, task.lineType)
+        Circle(dst2, pt, task.DotSize, task.highlight, -1, task.lineType)
         Next
     End Sub
 End Class
@@ -218,7 +218,7 @@ Public Class XR_Contour_Delaunay : Inherits TaskParent
         dst2 = delaunay.dst2.Clone
 
         For Each pt In maxList
-        cv.Cv2.Circle(dst2, pt, task.DotSize, task.highlight, -1, task.lineType)
+        Circle(dst2, pt, task.DotSize, task.highlight, -1, task.lineType)
         Next
     End Sub
 End Class
@@ -240,7 +240,7 @@ Public Class XR_Contour_LineRGB : Inherits TaskParent
         labels(2) = contours.labels(2)
 
         For Each lp In task.lines.lpList
-            cv.Cv2.Line(dst2, lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineWidth)
+            Line(dst2, lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineWidth)
         Next
     End Sub
 End Class
@@ -263,10 +263,10 @@ Public Class XR_Contour_RotatedRects : Inherits TaskParent
         rotatedRect.Run(src)
         imageInput = rotatedRect.dst2
         If imageInput.Channels() = 3 Then
-            cv.Cv2.CvtColor(imageInput, dst2, cv.ColorConversionCodes.BGR2GRAY)
-            cv.Cv2.ConvertScaleAbs(dst2, dst2, 255)
+            CvtColor(imageInput, dst2, cv.ColorConversionCodes.BGR2GRAY)
+            ConvertScaleAbs(dst2, dst2, 255)
         Else
-            cv.Cv2.ConvertScaleAbs(imageInput, dst2, 255)
+            ConvertScaleAbs(imageInput, dst2, 255)
         End If
 
         basics.Run(dst2)
@@ -289,10 +289,10 @@ Public Class XR_Contour_RemoveLines : Inherits TaskParent
     Dim image As cv.Mat
     Public Sub New()
         labels = {"", "", "Identified horizontal lines - why is scale factor necessary?", "Identified vertical lines"}
-        image = cv.Cv2.ImRead(task.homeDir + "Data/invoice.jpg")
+        image = ImRead(task.homeDir + "Data/invoice.jpg")
         Dim dstSize = New cv.Size(dst2.Height * dst2.Width / image.Height, dst2.Height)
         Dim dstRect = New cv.Rect(0, 0, image.Width, dst2.Height)
-        cv.Cv2.Resize(image, image, dstSize)
+        Resize(image, image, dstSize)
         desc = "Remove the lines from an invoice image"
     End Sub
     Private Function scaleTour(tour()() As cv.Point) As cv.Point()()
@@ -308,31 +308,31 @@ Public Class XR_Contour_RemoveLines : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
 
-        cv.Cv2.Resize(image, dst2, dst2.Size)
+        Resize(image, dst2, dst2.Size)
         dst3 = dst2.Clone
         Dim gray As New cv.Mat
-        cv.Cv2.CvtColor(image, gray, cv.ColorConversionCodes.BGR2GRAY)
+        CvtColor(image, gray, cv.ColorConversionCodes.BGR2GRAY)
         Dim thresh As New cv.Mat
-        cv.Cv2.Threshold(gray, thresh, 0, 255, cv.ThresholdTypes.BinaryInv Or cv.ThresholdTypes.Otsu)
+        Threshold(gray, thresh, 0, 255, cv.ThresholdTypes.BinaryInv Or cv.ThresholdTypes.Otsu)
 
         ' remove horizontal lines
-        Dim hkernel = cv.Cv2.GetStructuringElement(cv.MorphShapes.Rect, New cv.Size(options.widthHeight, 1))
+        Dim hkernel = GetStructuringElement(cv.MorphShapes.Rect, New cv.Size(options.widthHeight, 1))
         Dim removedH As New cv.Mat
-        cv.Cv2.MorphologyEx(thresh, removedH, cv.MorphTypes.Open, hkernel,, options.iterations)
-        Dim tour = cv.Cv2.FindContoursAsArray(removedH, cv.RetrievalModes.External, cv.ContourApproximationModes.ApproxSimple)
+        MorphologyEx(thresh, removedH, cv.MorphTypes.Open, hkernel,, options.iterations)
+        Dim tour = FindContoursAsArray(removedH, cv.RetrievalModes.External, cv.ContourApproximationModes.ApproxSimple)
         tour = scaleTour(tour)
         For i = 0 To tour.Count - 1
-            cv.Cv2.DrawContours(dst2, tour, i, cv.Scalar.Black, task.lineWidth)
+            DrawContours(dst2, tour, i, cv.Scalar.Black, task.lineWidth)
         Next
 
-        Dim vkernel = cv.Cv2.GetStructuringElement(cv.MorphShapes.Rect, New cv.Size(1, options.widthHeight))
+        Dim vkernel = GetStructuringElement(cv.MorphShapes.Rect, New cv.Size(1, options.widthHeight))
         Dim removedV As New cv.Mat
-        cv.Cv2.Threshold(gray, thresh, 0, 255, cv.ThresholdTypes.BinaryInv Or cv.ThresholdTypes.Otsu)
-        cv.Cv2.MorphologyEx(thresh, removedV, cv.MorphTypes.Open, vkernel,, options.iterations)
-        tour = cv.Cv2.FindContoursAsArray(removedV, cv.RetrievalModes.External, cv.ContourApproximationModes.ApproxSimple)
+        Threshold(gray, thresh, 0, 255, cv.ThresholdTypes.BinaryInv Or cv.ThresholdTypes.Otsu)
+        MorphologyEx(thresh, removedV, cv.MorphTypes.Open, vkernel,, options.iterations)
+        tour = FindContoursAsArray(removedV, cv.RetrievalModes.External, cv.ContourApproximationModes.ApproxSimple)
         tour = scaleTour(tour)
         For i = 0 To tour.Count - 1
-            cv.Cv2.DrawContours(dst3, tour, i, cv.Scalar.Black, task.lineWidth)
+            DrawContours(dst3, tour, i, cv.Scalar.Black, task.lineWidth)
         Next
     End Sub
 End Class
@@ -376,8 +376,8 @@ Public Class Contour_SidePoints : Inherits TaskParent
             If rc.contour.Count > 0 Then
                 dst3.SetTo(0)
                 DrawTour(dst3(rc.rect), rc.contour, cv.Scalar.Yellow)
-                cv.Cv2.Line(dst3, ptLeft, ptRight, white, task.lineWidth, task.lineWidth)
-                cv.Cv2.Line(dst3, ptTop, ptBot, white, task.lineWidth, task.lineWidth)
+                Line(dst3, ptLeft, ptRight, white, task.lineWidth, task.lineWidth)
+                Line(dst3, ptTop, ptBot, white, task.lineWidth, task.lineWidth)
             End If
             If task.heartBeat Then
                 strOut = "X     " + vbTab + "Y     " + vbTab + "Z " + vbTab + " 3D location (units=meters)" + vbCrLf
@@ -443,13 +443,13 @@ Public Class Contour_Largest : Inherits TaskParent
             dst2 = src
         End If
 
-        If dst2.Channels() <> 1 Then cv.Cv2.CvtColor(dst2, dst2, cv.ColorConversionCodes.BGR2GRAY)
+        If dst2.Channels() <> 1 Then CvtColor(dst2, dst2, cv.ColorConversionCodes.BGR2GRAY)
         If options.retrievalMode = cv.RetrievalModes.FloodFill Then
             dst2.ConvertTo(dst1, cv.MatType.CV_32SC1)
-            cv.Cv2.FindContours(dst1, allContours, Nothing, options.retrievalMode, options.ApproximationMode)
+            FindContours(dst1, allContours, Nothing, options.retrievalMode, options.ApproximationMode)
             dst1.ConvertTo(dst3, cv.MatType.CV_8UC1)
         Else
-            cv.Cv2.FindContours(dst2, allContours, Nothing, options.retrievalMode, options.ApproximationMode)
+            FindContours(dst2, allContours, Nothing, options.retrievalMode, options.ApproximationMode)
         End If
 
         Dim maxCount As Integer, maxIndex As Integer
@@ -496,10 +496,10 @@ Public Class XR_Contour_Compare : Inherits TaskParent
 
         Dim allContours As cv.Point()() = Nothing
         If options.retrievalMode = cv.RetrievalModes.FloodFill Then tmp.ConvertTo(tmp, cv.MatType.CV_32SC1)
-        cv.Cv2.FindContours(tmp, allContours, Nothing, options.retrievalMode, options.ApproximationMode)
+        FindContours(tmp, allContours, Nothing, options.retrievalMode, options.ApproximationMode)
 
         dst3.SetTo(0)
-        cv.Cv2.DrawContours(dst3(task.rcD.rect), allContours, -1, cv.Scalar.Yellow)
+        DrawContours(dst3(task.rcD.rect), allContours, -1, cv.Scalar.Yellow)
     End Sub
 End Class
 
@@ -557,12 +557,12 @@ Public Class XR_Contour_FromPoints : Inherits TaskParent
             dst2.SetTo(0)
             For Each p1 In random.PointList
                 For Each p2 In random.PointList
-                    cv.Cv2.Line(dst2, p1, p2, white, task.lineWidth, task.lineWidth)
+                    Line(dst2, p1, p2, white, task.lineWidth, task.lineWidth)
                 Next
             Next
         End If
 
-        Dim hullPoints = cv.Cv2.ConvexHull(random.PointList.ToArray, True).ToList
+        Dim hullPoints = ConvexHull(random.PointList.ToArray, True).ToList
 
         Dim hull As New List(Of cv.Point)
         For Each pt In hullPoints
@@ -595,17 +595,17 @@ Public Class XR_Contour_GeneralWithOptions : Inherits TaskParent
             rotatedRect.Run(src)
             dst2 = rotatedRect.dst2
             If dst2.Channels() = 3 Then
-                cv.Cv2.CvtColor(dst2, dst2, cv.ColorConversionCodes.BGR2GRAY)
-                cv.Cv2.ConvertScaleAbs(dst2, dst2, 255)
+                CvtColor(dst2, dst2, cv.ColorConversionCodes.BGR2GRAY)
+                ConvertScaleAbs(dst2, dst2, 255)
             Else
-                cv.Cv2.ConvertScaleAbs(dst2, dst2, 255)
+                ConvertScaleAbs(dst2, dst2, 255)
             End If
         Else
             dst2 = task.gray
         End If
 
         If options.retrievalMode = cv.RetrievalModes.FloodFill Then dst2.ConvertTo(dst2, cv.MatType.CV_32SC1)
-        cv.Cv2.FindContours(dst2, allContours, Nothing, options.retrievalMode, options.ApproximationMode)
+        FindContours(dst2, allContours, Nothing, options.retrievalMode, options.ApproximationMode)
 
         contourlist.Clear()
         For Each c In allContours
@@ -638,21 +638,21 @@ Public Class XR_Contour_General : Inherits TaskParent
             If Not task.heartBeat Then Exit Sub
             rotatedRect.Run(src)
             dst2 = rotatedRect.dst2
-            If dst2.Channels <> 1 Then cv.Cv2.CvtColor(dst2, dst2, cv.ColorConversionCodes.BGR2GRAY)
+            If dst2.Channels <> 1 Then CvtColor(dst2, dst2, cv.ColorConversionCodes.BGR2GRAY)
         Else
             If src.Type = cv.MatType.CV_8U Then dst2 = src Else dst2 = task.gray
         End If
 
         If dst2.Type = cv.MatType.CV_8U Then
-            cv.Cv2.FindContours(dst2, allContours, Nothing, cv.RetrievalModes.External, cv.ContourApproximationModes.ApproxTC89KCOS)
+            FindContours(dst2, allContours, Nothing, cv.RetrievalModes.External, cv.ContourApproximationModes.ApproxTC89KCOS)
         Else
             If dst2.Type <> cv.MatType.CV_32S Then dst2.ConvertTo(dst2, cv.MatType.CV_32S)
-            cv.Cv2.FindContours(dst2, allContours, Nothing, cv.RetrievalModes.FloodFill, cv.ContourApproximationModes.ApproxTC89KCOS)
+            FindContours(dst2, allContours, Nothing, cv.RetrievalModes.FloodFill, cv.ContourApproximationModes.ApproxTC89KCOS)
         End If
 
         contourlist.Clear()
         For Each c In allContours
-            Dim area = cv.Cv2.ContourArea(c)
+            Dim area = ContourArea(c)
             contourlist.Add(c)
             If contourlist.Count >= 255 Then Exit For
         Next
@@ -693,7 +693,7 @@ Public Class XR_Contour_InfoDepth : Inherits TaskParent
         strOut += "Number of pixels in the mask: " + CStr(task.contourD.pixels) + vbCrLf
 
         DrawRect(dst2, task.contourD.rect)
-        cv.Cv2.Circle(dst2, task.contourD.maxDist, task.DotSize, task.highlight, -1, task.lineType)
+        Circle(dst2, task.contourD.maxDist, task.DotSize, task.highlight, -1, task.lineType)
 
         SetTrueText(strOut, 3)
     End Sub
@@ -719,7 +719,7 @@ Public Class XR_Contour_Lines : Inherits TaskParent
 
         dst2 = src
         For Each lp In task.lines.lpList
-            cv.Cv2.Line(dst2, lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineWidth)
+            Line(dst2, lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineWidth)
         Next
         labels(2) = task.lines.labels(2)
     End Sub
@@ -753,7 +753,7 @@ Public Class XR_Contour_Isolate : Inherits TaskParent
         dst3 = Palettize(dst1)
 
         For Each contour In contours.contourList
-        cv.Cv2.Circle(dst3, contour.maxDist, task.DotSize, task.highlight, -1, task.lineType)
+        Circle(dst3, contour.maxDist, task.DotSize, task.highlight, -1, task.lineType)
         Next
     End Sub
 End Class
@@ -787,7 +787,7 @@ Public Class Contour_Hulls : Inherits TaskParent
         contourMap.SetTo(0)
         contourList.Clear()
         For Each tour In contours.contourList
-            tour.hull = cv.Cv2.ConvexHull(tour.points.ToArray, True).ToList
+            tour.hull = ConvexHull(tour.points.ToArray, True).ToList
             Dim index = contours.contourList.IndexOf(tour)
             DrawTour(contourMap, tour.hull, tour.ID Mod 255, -1)
             contourList.Add(tour)
@@ -845,7 +845,7 @@ Public Class XR_Contour_EdgePoints : Inherits TaskParent
             For i = 0 To 1
                 Dim pt = ptList(ptIndex - i)
                 dst1.Set(Of Single)(pt.Y, pt.X, index + 1)
-                cv.Cv2.Circle(dst2, pt, task.DotSize, task.highlight, -1, task.lineType)
+                Circle(dst2, pt, task.DotSize, task.highlight, -1, task.lineType)
             Next
             If ptList.Count >= maxLines Then Exit For
         Next
@@ -886,7 +886,7 @@ Public Class Contour_RotateRect : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
 
-        Dim contours = cv.Cv2.FindContoursAsArray(task.edges.dst2, cv.RetrievalModes.Tree, cv.ContourApproximationModes.ApproxSimple)
+        Dim contours = FindContoursAsArray(task.edges.dst2, cv.RetrievalModes.Tree, cv.ContourApproximationModes.ApproxSimple)
         Dim sortedTours As New SortedList(Of Integer, Tuple(Of cv.RotatedRect, Integer))(New compareAllowIdenticalInteger)
         For i = 0 To contours.Count - 1
             findRect.inputContour = contours(i)
@@ -959,7 +959,7 @@ Public Class XR_Contour_Info : Inherits TaskParent
         dst0 = src
         dst0(task.contourD.rect).SetTo(white, task.contourD.mask)
 
-cv.Cv2.Rectangle(dst2, task.contourD.rect, task.highlight, task.lineWidth)
+Rectangle(dst2, task.contourD.rect, task.highlight, task.lineWidth)
 
         SetTrueText(strOut, 3)
     End Sub
@@ -983,9 +983,9 @@ Public Class Contour_Sort : Inherits TaskParent
     End Sub
     Public Shared Function GetMaxDistContour(ByRef contour As contourData) As cv.Point
         Dim mask = contour.mask.Clone
-        cv.Cv2.Rectangle(mask, New cv.Rect(0, 0, mask.Width, mask.Height), cv.Scalar.All(0), 1)
+        Rectangle(mask, New cv.Rect(0, 0, mask.Width, mask.Height), cv.Scalar.All(0), 1)
         Dim distance32f As New cv.Mat
-        cv.Cv2.DistanceTransform(mask, distance32f, cv.DistanceTypes.L1, cv.DistanceTransformMasks.Precise, cv.MatType.CV_32F)
+        DistanceTransform(mask, distance32f, cv.DistanceTypes.L1, cv.DistanceTransformMasks.Precise, cv.MatType.CV_32F)
         Dim mm As mmData = GetMinMax(distance32f)
         mm.maxLoc.X += contour.rect.X
         mm.maxLoc.Y += contour.rect.Y
@@ -1002,7 +1002,7 @@ Public Class Contour_Sort : Inherits TaskParent
         Dim tourMat As New cv.Mat(task.workRes, cv.MatType.CV_8U, 0)
         For Each ptArray In allContours
             Dim tour = New contourData
-            tour.pixels = cv.Cv2.ContourArea(ptArray)
+            tour.pixels = ContourArea(ptArray)
             If tour.pixels < 5 Then Continue For
             tour.points = New List(Of cv.Point)(ptArray)
             If tour.pixels > task.color.Total * 3 / 4 Then Continue For ' toss this contour - it covers everything...
@@ -1012,9 +1012,9 @@ Public Class Contour_Sort : Inherits TaskParent
 
             tourMat(tour.rect).SetTo(0)
             Dim listOfPoints = New List(Of List(Of cv.Point))({ptArray.ToList})
-            cv.Cv2.DrawContours(tourMat, listOfPoints, 0, New cv.Scalar(sortedList.Count), -1, cv.LineTypes.Link8)
-            cv.Cv2.Threshold(tourMat(tour.rect), tour.mask, 0, 255, cv.ThresholdTypes.Binary)
-            tour.depth = cv.Cv2.Mean(task.pcSplit(2)(tour.rect), task.depthmask(tour.rect))(0)
+            DrawContours(tourMat, listOfPoints, 0, New cv.Scalar(sortedList.Count), -1, cv.LineTypes.Link8)
+            Threshold(tourMat(tour.rect), tour.mask, 0, 255, cv.ThresholdTypes.Binary)
+            tour.depth = Mean(task.pcSplit(2)(tour.rect), task.depthmask(tour.rect))(0)
             tour.mm = GetMinMax(task.pcSplit(2)(tour.rect), tour.mask)
             tour.maxDist = GetMaxDistContour(tour)
             tour.ID = task.gridMap.Get(Of Integer)(tour.maxDist.Y, tour.maxDist.X)
@@ -1161,9 +1161,9 @@ Public Class Contour_SortTmp : Inherits TaskParent
     End Sub
     Public Shared Function GetMaxDistContour(ByRef contour As contourData) As cv.Point
         Dim mask = contour.mask.Clone
-        cv.Cv2.Rectangle(mask, New cv.Rect(0, 0, mask.Width, mask.Height), cv.Scalar.All(0), 1)
+        Rectangle(mask, New cv.Rect(0, 0, mask.Width, mask.Height), cv.Scalar.All(0), 1)
         Dim distance32f As New cv.Mat
-        cv.Cv2.DistanceTransform(mask, distance32f, cv.DistanceTypes.L1, cv.DistanceTransformMasks.Precise, cv.MatType.CV_32F)
+        DistanceTransform(mask, distance32f, cv.DistanceTypes.L1, cv.DistanceTransformMasks.Precise, cv.MatType.CV_32F)
         Dim mm As mmData = GetMinMax(distance32f)
         mm.maxLoc.X += contour.rect.X
         mm.maxLoc.Y += contour.rect.Y
@@ -1179,7 +1179,7 @@ Public Class Contour_SortTmp : Inherits TaskParent
         Dim tourMat As New cv.Mat(task.workRes, cv.MatType.CV_8U, 0)
         For Each ptArray In allContours
             Dim tour = New contourData
-            tour.pixels = cv.Cv2.ContourArea(ptArray)
+            tour.pixels = ContourArea(ptArray)
             If tour.pixels < 5 Then Continue For
             tour.points = New List(Of cv.Point)(ptArray)
             If tour.pixels > task.color.Total * 3 / 4 Then Continue For ' toss this contour - it covers everything...
@@ -1189,9 +1189,9 @@ Public Class Contour_SortTmp : Inherits TaskParent
 
             tourMat(tour.rect).SetTo(0)
             Dim listOfPoints = New List(Of List(Of cv.Point))({ptArray.ToList})
-            cv.Cv2.DrawContours(tourMat, listOfPoints, 0, New cv.Scalar(sortedList.Count), -1, cv.LineTypes.Link8)
-            cv.Cv2.Threshold(tourMat(tour.rect), tour.mask, 0, 255, cv.ThresholdTypes.Binary)
-            tour.depth = cv.Cv2.Mean(task.pcSplit(2)(tour.rect), task.depthmask(tour.rect))(0)
+            DrawContours(tourMat, listOfPoints, 0, New cv.Scalar(sortedList.Count), -1, cv.LineTypes.Link8)
+            Threshold(tourMat(tour.rect), tour.mask, 0, 255, cv.ThresholdTypes.Binary)
+            tour.depth = Mean(task.pcSplit(2)(tour.rect), task.depthmask(tour.rect))(0)
             tour.mm = GetMinMax(task.pcSplit(2)(tour.rect), tour.mask)
             tour.maxDist = GetMaxDistContour(tour)
             tour.ID = task.gridMap.Get(Of Integer)(tour.maxDist.Y, tour.maxDist.X)

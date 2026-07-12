@@ -6,8 +6,8 @@ Public Class MeanSubtraction_Basics : Inherits TaskParent
         desc = "Subtract the mean from the image with a scaling factor"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        Dim mean = cv.Cv2.Mean(src)
-        cv.Cv2.Subtract(mean, src, dst2)
+        Dim meanVal = Mean(src)
+        Subtract(meanVal, src, dst2)
         dst2 *= 100 / scaleValue
     End Sub
 End Class
@@ -64,8 +64,8 @@ Public Class MeanSubtraction_Left : Inherits TaskParent
         desc = "Apply mean subtraction to the left image."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        Dim mean = cv.Cv2.Mean(task.leftView)
-        cv.Cv2.Subtract(mean, task.leftView, dst2)
+        Dim meanVal = Mean(task.leftView)
+        Subtract(meanVal, task.leftView, dst2)
         dst2 *= 100 / scaleValue
     End Sub
 End Class

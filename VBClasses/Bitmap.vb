@@ -11,7 +11,7 @@ Public Class Bitmap_ToMat : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         Dim filePath As String = task.homeDir + "opencv/Samples/Data/lena.jpg"
         Dim bitmap = New System.Drawing.Bitmap(filePath)
-        cv.Cv2.Resize(gdip.BitmapConverter.ToMat(bitmap), dst2, src.Size)
+        Resize(gdip.BitmapConverter.ToMat(bitmap), dst2, src.Size)
 
         bitmap = gdip.BitmapConverter.ToBitmap(src)
         dst3 = gdip.BitmapConverter.ToMat(bitmap)

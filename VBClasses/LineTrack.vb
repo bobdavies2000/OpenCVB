@@ -16,7 +16,7 @@ Public Class LineTrack_Basics : Inherits TaskParent
             task.longestLine = New lpData(lpTmp.ptE1, lpTmp.ptE2) With {.age = lpTmp.age}
             dst2 = task.color.Clone
             With task.longestLine
-                cv.Cv2.Line(dst2, .p1, .p2, task.highlight, task.lineWidth + 1)
+                Line(dst2, .p1, .p2, task.highlight, task.lineWidth + 1)
                 SetTrueText(CStr(.age), New cv.Point2f(.ptCenter.X + 2, .ptCenter.Y + 2), 2)
             End With
         End If
@@ -65,7 +65,7 @@ Public Class XR_LineTrack_Basics : Inherits TaskParent
         End If
         If Math.Abs(lpNew.angle - lp.angle) > 3 Then lpNew = Nothing
 
-        cv.Cv2.Line(dst2, lp.p1, lp.p2, task.highlight, task.lineWidth + 1, task.lineType)
+        Line(dst2, lp.p1, lp.p2, task.highlight, task.lineWidth + 1, task.lineType)
         labels(2) = "Tracking line length = " + lp.length.ToString(fmt1) + " angle = " + lp.angle.ToString(fmt1)
     End Sub
 End Class
@@ -94,7 +94,7 @@ Public Class XR_LineTrack_Concat : Inherits TaskParent
 
         Dim nabeRect1 = task.gridNabeRects(task.gridMap.Get(Of Integer)(lpInput.p1.Y, lpInput.p1.X))
         Dim nabeRect2 = task.gridNabeRects(task.gridMap.Get(Of Integer)(lpInput.p2.Y, lpInput.p2.X))
-        cv.Cv2.HConcat(src(nabeRect1), src(nabeRect2), match.template)
+        HConcat(src(nabeRect1), src(nabeRect2), match.template)
         Static templateLast = match.template.Clone
 
         match.Run(templateLast)
@@ -150,7 +150,7 @@ Public Class XR_LineTrack_CorrelationNabe : Inherits TaskParent
 
         If standaloneTest() Then
             dst2 = src.Clone
-            cv.Cv2.Line(dst2, lpInput.p1, lpInput.p2, task.highlight, task.lineWidth, task.lineType)
+            Line(dst2, lpInput.p1, lpInput.p2, task.highlight, task.lineWidth, task.lineType)
         End If
         labels(2) = "Rect for p1 has correlation " + p1Correlation.ToString(fmt3) +
                         " to the previous image while " +
@@ -204,8 +204,8 @@ Public Class LineTrack_Match : Inherits TaskParent
                     If minAngleDelta < AngleThreshold Then ' within x degrees of the original line's angle
                         Dim index = lineIndex(angleDelta.IndexOf(minAngleDelta))
                         lpMatch = lpListLast(index)
-                        cv.Cv2.Line(dst2, lp.p1, lp.p2, color, task.lineWidth + 2, task.lineType)
-                        cv.Cv2.Line(dst3, lpMatch.p1, lpMatch.p2, color, task.lineWidth + 2, task.lineType)
+                        Line(dst2, lp.p1, lp.p2, color, task.lineWidth + 2, task.lineType)
+                        Line(dst3, lpMatch.p1, lpMatch.p2, color, task.lineWidth + 2, task.lineType)
                         lpList.Add(lp)
                         lpMatches.Add(lpMatch)
                     Else
@@ -264,12 +264,12 @@ Public Class XR_LineTrack_Tester : Inherits TaskParent
         For i = 0 To match.lpList.Count - 1
             Dim lp = match.lpList(i)
             Dim color = task.scalarColors(lp.index + 1)
-            cv.Cv2.Line(dst2, lp.p1, lp.p2, color, task.lineWidth + 2, task.lineType)
-            cv.Cv2.Line(dst2, lp.p1, lp.p2, white, task.lineWidth, task.lineType)
+            Line(dst2, lp.p1, lp.p2, color, task.lineWidth + 2, task.lineType)
+            Line(dst2, lp.p1, lp.p2, white, task.lineWidth, task.lineType)
 
             lp = match.lpMatches(i)
-            cv.Cv2.Line(dst3, lp.p1, lp.p2, color, task.lineWidth + 2, task.lineType)
-            cv.Cv2.Line(dst3, lp.p1, lp.p2, white, task.lineWidth, task.lineType)
+            Line(dst3, lp.p1, lp.p2, color, task.lineWidth + 2, task.lineType)
+            Line(dst3, lp.p1, lp.p2, white, task.lineWidth, task.lineType)
         Next
         labels(2) = match.labels(2)
         labels(3) = match.labels(3)
@@ -299,7 +299,7 @@ Public Class LineTrack_Slices : Inherits TaskParent
         For i = 0 To Math.Min(task.lines.lpList.Count, 5) - 1
             Dim lp = task.lines.lpList(i)
             Dim color = task.scalarColors(lp.index + 1)
-            cv.Cv2.Line(dst2, lp.p1, lp.p2, color, task.lineWidth + 2, task.lineType)
+            Line(dst2, lp.p1, lp.p2, color, task.lineWidth + 2, task.lineType)
 
             Dim ptMinX = New cv.Point(Math.Max(lp.ptCenter.X - lineMaxOffset, 0), lp.ptCenter.Y)
             Dim ptMaxX = New cv.Point(Math.Min(lp.ptCenter.X + lineMaxOffset, dst2.Width), lp.ptCenter.Y)
@@ -307,7 +307,7 @@ Public Class LineTrack_Slices : Inherits TaskParent
             Dim rX = New cv.Rect(ptMinX.X, lp.ptCenter.Y, ptMaxX.X - ptMinX.X, 1)
             Dim SliceX(rX.Width - 1) As Byte
             Marshal.Copy(lpMapLast(rX).Data, SliceX, 0, SliceX.Length)
-            cv.Cv2.Line(dst2, ptMinX, ptMaxX, white, task.lineWidth)
+            Line(dst2, ptMinX, ptMaxX, white, task.lineWidth)
 
             xSlices.Add(SliceX.ToList)
 
@@ -317,7 +317,7 @@ Public Class LineTrack_Slices : Inherits TaskParent
             Dim rY = New cv.Rect(lp.ptCenter.X, ptMinY.Y, 1, ptMaxY.Y - ptMinY.Y)
             Dim SliceY(rY.Height - 1) As Byte
             Marshal.Copy(lpMapLast(rY).Data, SliceY, 0, SliceY.Length)
-            cv.Cv2.Line(dst2, ptMinY, ptMaxY, white, task.lineWidth)
+            Line(dst2, ptMinY, ptMaxY, white, task.lineWidth)
 
             ySlices.Add(SliceY.ToList)
         Next
@@ -350,14 +350,14 @@ Public Class LineTrack_Rect : Inherits TaskParent
         End If
 
         Dim inputPoints() As cv.Point2f = {lpInput1.p1, lpInput1.p2, lpInput2.p1, lpInput2.p2}
-        rotatedRect = cv.Cv2.MinAreaRect(inputPoints)
+        rotatedRect = MinAreaRect(inputPoints)
         If standalone And task.heartBeat Then
             dst2.SetTo(0)
             For Each pt In inputPoints
-            cv.Cv2.Circle(dst2, pt, task.DotSize, task.highlight, -1, task.lineType)
+            Circle(dst2, pt, task.DotSize, task.highlight, -1, task.lineType)
             Next
-            cv.Cv2.Line(dst2, lpInput1.p1, lpInput1.p2, task.highlight, task.lineWidth, task.lineType)
-            cv.Cv2.Line(dst2, lpInput2.p1, lpInput2.p2, task.highlight, task.lineWidth, task.lineType)
+            Line(dst2, lpInput1.p1, lpInput1.p2, task.highlight, task.lineWidth, task.lineType)
+            Line(dst2, lpInput2.p1, lpInput2.p2, task.highlight, task.lineWidth, task.lineType)
             SetTrueText("Line 1", lpInput1.p1, 2)
             SetTrueText("Line 2", lpInput2.p1, 2)
             Draw_Arc.DrawRotatedOutline(rotatedRect, dst2, cv.Scalar.Yellow)
@@ -407,10 +407,10 @@ Public Class XR_LineTrack_CenterNeighbor : Inherits TaskParent
                 If foundObjectLine Then Exit For
             Next
             If foundObjectLine Then
-                cv.Cv2.Line(dst2, lp.p1, lp.p2, task.highlight, task.lineWidth, cv.LineTypes.Link4)
+                Line(dst2, lp.p1, lp.p2, task.highlight, task.lineWidth, cv.LineTypes.Link4)
                 depthLines += 1
             Else
-                cv.Cv2.Line(dst3, lp.p1, lp.p2, task.highlight, task.lineWidth, cv.LineTypes.Link4)
+                Line(dst3, lp.p1, lp.p2, task.highlight, task.lineWidth, cv.LineTypes.Link4)
                 colorLines += 1
             End If
         Next
@@ -448,10 +448,10 @@ Public Class XR_LineTrack_CenterRange : Inherits TaskParent
             Dim index As Integer = task.gridMap.Get(Of Integer)(center.Y, center.X)
             Dim brick = bricks.brickList(index)
             If brick.mm.maxVal - brick.mm.minVal > depthThreshold Then
-                cv.Cv2.Line(dst2, lp.p1, lp.p2, task.highlight, task.lineWidth, cv.LineTypes.Link4)
+                Line(dst2, lp.p1, lp.p2, task.highlight, task.lineWidth, cv.LineTypes.Link4)
                 depthLines += 1
             Else
-                cv.Cv2.Line(dst3, lp.p1, lp.p2, task.highlight, task.lineWidth, cv.LineTypes.Link4)
+                Line(dst3, lp.p1, lp.p2, task.highlight, task.lineWidth, cv.LineTypes.Link4)
                 colorLines += 1
             End If
         Next
@@ -496,14 +496,14 @@ Public Class XR_LineTrack_Top3 : Inherits TaskParent
             lineT.Run(src)
             Select Case i
                 Case 0
-                    cv.Cv2.Line(dst2, lineT.lp.p1, lineT.lp.p2, yellow, task.lineWidth, task.lineType)
-                    cv.Cv2.Line(dst3, lineT.lp.p1, lineT.lp.p2, yellow, task.lineWidth, task.lineType)
+                    Line(dst2, lineT.lp.p1, lineT.lp.p2, yellow, task.lineWidth, task.lineType)
+                    Line(dst3, lineT.lp.p1, lineT.lp.p2, yellow, task.lineWidth, task.lineType)
                 Case 1
-                    cv.Cv2.Line(dst2, lineT.lp.p1, lineT.lp.p2, white, task.lineWidth, task.lineType)
-                    cv.Cv2.Line(dst3, lineT.lp.p1, lineT.lp.p2, white, task.lineWidth, task.lineType)
+                    Line(dst2, lineT.lp.p1, lineT.lp.p2, white, task.lineWidth, task.lineType)
+                    Line(dst3, lineT.lp.p1, lineT.lp.p2, white, task.lineWidth, task.lineType)
                 Case 2
-                    cv.Cv2.Line(dst2, lineT.lp.p1, lineT.lp.p2, red, task.lineWidth, task.lineType)
-                    cv.Cv2.Line(dst3, lineT.lp.p1, lineT.lp.p2, red, task.lineWidth, task.lineType)
+                    Line(dst2, lineT.lp.p1, lineT.lp.p2, red, task.lineWidth, task.lineType)
+                    Line(dst3, lineT.lp.p1, lineT.lp.p2, red, task.lineWidth, task.lineType)
             End Select
 
             match.template = src(lineT.lp.rect)
@@ -543,7 +543,7 @@ Public Class XR_LineTrack_SearchX : Inherits TaskParent
 
         dst1(r1).SetTo(0, lastImage(r2))
 
-        Return cv.Cv2.CountNonZero(dst1)
+        Return CountNonZero(dst1)
     End Function
     Public Overrides Sub RunAlg(src As cv.Mat)
         SetTrueText(strOut, 2)
@@ -583,7 +583,7 @@ Public Class XR_LineTrack_SearchX : Inherits TaskParent
         If task.firstPass Or bestCount.index = 0 Then
             dst2 = lastImage(rect)
         Else
-            cv.Cv2.AddWeighted(lastImage(rect), 0.75, dst1(New cv.Rect(0, 0, rect.Width, dst2.Height)),
+            AddWeighted(lastImage(rect), 0.75, dst1(New cv.Rect(0, 0, rect.Width, dst2.Height)),
                                                 0.25, 0, dst2)
         End If
 
@@ -637,13 +637,13 @@ Public Class XR_LineTrack_CorrelationTrack : Inherits TaskParent
         For Each lp In lpList
             lineT.lpInput = lp
             lineT.Run(task.gray)
-            cv.Cv2.Line(dst2, lp.p1, lp.p2, task.highlight, task.lineWidth + 2)
-            cv.Cv2.Line(dst2, lineT.lpInput.p1, lineT.lpInput.p2, black, task.lineWidth)
+            Line(dst2, lp.p1, lp.p2, task.highlight, task.lineWidth + 2)
+            Line(dst2, lineT.lpInput.p1, lineT.lpInput.p2, black, task.lineWidth)
             lineCount += 1
             Dim p1GridIndex = task.gridMap.Get(Of Integer)(lp.p1.Y, lp.p1.X)
-            cv.Cv2.Rectangle(dst2, task.gridNabeRects(p1GridIndex), white, task.lineWidth)
+            Rectangle(dst2, task.gridNabeRects(p1GridIndex), white, task.lineWidth)
             Dim p2GridIndex = task.gridMap.Get(Of Integer)(lp.p2.Y, lp.p2.X)
-            cv.Cv2.Rectangle(dst2, task.gridNabeRects(p2GridIndex), white, task.lineWidth)
+            Rectangle(dst2, task.gridNabeRects(p2GridIndex), white, task.lineWidth)
             newList.Add(lineT.lpInput)
             If lineCount > 0 Then Exit For
         Next
@@ -703,8 +703,8 @@ Public Class XR_LineTrack_Correlation : Inherits TaskParent
         Dim lp = New lpData(p1, p2)
 
         dst2 = src.Clone
-        cv.Cv2.Line(dst2, lpInput.p1, lpInput.p2, task.highlight, task.lineWidth)
-        cv.Cv2.Line(dst2, lp.p1, lp.p2, white, task.lineWidth)
+        Line(dst2, lpInput.p1, lpInput.p2, task.highlight, task.lineWidth)
+        Line(dst2, lp.p1, lp.p2, white, task.lineWidth)
 
         lpInput = lp
 
@@ -779,9 +779,9 @@ Public Class LineTrack_MatchLines : Inherits TaskParent
             curr.age = lpListLast(j).age + 1
             If curr.age > 999 Then curr.age = 10
             lpList.Add(curr)
-            cv.Cv2.Line(dst2, curr.p1, curr.p2, task.scalarColors(curr.index + 1), task.lineWidth + 1, task.lineType)
-            cv.Cv2.Line(dst3, curr.p1, curr.p2, white, task.lineWidth)
-            cv.Cv2.Line(dst2, curr.p1, curr.p2, task.scalarColors(curr.index + 1), task.lineWidth + 1, task.lineType)
+            Line(dst2, curr.p1, curr.p2, task.scalarColors(curr.index + 1), task.lineWidth + 1, task.lineType)
+            Line(dst3, curr.p1, curr.p2, white, task.lineWidth)
+            Line(dst2, curr.p1, curr.p2, task.scalarColors(curr.index + 1), task.lineWidth + 1, task.lineType)
         Next
 
         If task.quarterBeat Then
@@ -864,14 +864,14 @@ Public Class LineTrack_Triangle : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst2 = src.Clone
         Dim lp = task.longestLine
-        cv.Cv2.Line(dst2, lp.p1, lp.p2, task.highlight, task.lineWidth)
+        Line(dst2, lp.p1, lp.p2, task.highlight, task.lineWidth)
 
         Dim lpPerp = Line_Perpendicular.computePerp(lp)
-        cv.Cv2.Line(dst2, lpPerp.p1, lpPerp.p2, task.highlight, task.lineWidth)
+        Line(dst2, lpPerp.p1, lpPerp.p2, task.highlight, task.lineWidth)
 
         Dim p1 = lpPerp.p1
         Dim p2 = If(lp.p1.Y > lp.p2.Y, lp.p2, lp.p1)
-        cv.Cv2.Line(dst2, p1, p2, task.highlight, task.lineWidth)
+        Line(dst2, p1, p2, task.highlight, task.lineWidth)
 
         intersect.lp1 = lp
         intersect.lp2 = lpPerp

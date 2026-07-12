@@ -42,7 +42,7 @@ Public Class IMU_Basics_TA : Inherits TaskParent
 
         Dim x1 = -(90 + task.accRadians.X * RadToDeg)
         Dim x2 = -(90 + task.theta.X * RadToDeg)
-        Dim y1 = task.accRadians.Y - cv.Cv2.PI
+        Dim y1 = task.accRadians.Y - PI
         If task.accRadians.X < 0 Then y1 *= -1
         task.verticalizeAngle = y1 * RadToDeg
         strOut = "Angles in degree to gravity (before velocity filter)" + vbCrLf +
@@ -54,8 +54,8 @@ Public Class IMU_Basics_TA : Inherits TaskParent
                           "cz = " + task.gravityMatrix.cz.ToString(fmt3) + " sz = " + task.gravityMatrix.sz.ToString(fmt3)
 
         task.accRadians = task.theta
-        If task.accRadians.Y > cv.Cv2.PI / 2 Then task.accRadians.Y -= cv.Cv2.PI / 2
-        task.accRadians.Z += cv.Cv2.PI / 2
+        If task.accRadians.Y > PI / 2 Then task.accRadians.Y -= PI / 2
+        task.accRadians.Z += PI / 2
 
         SetTrueText(strOut)
     End Sub
@@ -167,10 +167,10 @@ Public Class IMU_GravityComplementary : Inherits TaskParent
         End If
 
         task.accRadians = task.theta
-        If task.accRadians.Y > cv.Cv2.PI / 2 Then task.accRadians.Y -= cv.Cv2.PI / 2
-        task.accRadians.Z += cv.Cv2.PI / 2
+        If task.accRadians.Y > PI / 2 Then task.accRadians.Y -= PI / 2
+        task.accRadians.Z += PI / 2
 
-        Dim y1 = task.accRadians.Y - cv.Cv2.PI
+        Dim y1 = task.accRadians.Y - PI
         If task.accRadians.X < 0 Then y1 *= -1
         task.verticalizeAngle = y1 * RadToDeg
 
@@ -222,15 +222,15 @@ Public Class XR_IMU_Basics_Kalman : Inherits TaskParent
         task.accRadians = New cv.Point3f(kalman.kOutput(0), kalman.kOutput(1), kalman.kOutput(2))
 
         Dim x1 = -(90 + task.accRadians.X * RadToDeg)
-        Dim y1 = task.accRadians.Y - cv.Cv2.PI
+        Dim y1 = task.accRadians.Y - PI
         If task.accRadians.X < 0 Then y1 *= -1
         strOut = "Angles in degree to gravity (before velocity filter)" + vbCrLf +
                      x1.ToString(fmt1) + vbTab + (y1 * RadToDeg).ToString(fmt1) + vbTab + (task.accRadians.Z * RadToDeg).ToString(fmt1) + vbCrLf
         strOut += "cx = " + task.gravityMatrix.cx.ToString(fmt3) + " sx = " + task.gravityMatrix.sx.ToString(fmt3) + vbCrLf +
                       "cy = " + task.gravityMatrix.cy.ToString(fmt3) + " sy = " + task.gravityMatrix.sy.ToString(fmt3) + vbCrLf +
                       "cz = " + task.gravityMatrix.cz.ToString(fmt3) + " sz = " + task.gravityMatrix.sz.ToString(fmt3)
-        If task.accRadians.Y > cv.Cv2.PI / 2 Then task.accRadians.Y -= cv.Cv2.PI / 2
-        task.accRadians.Z += cv.Cv2.PI / 2
+        If task.accRadians.Y > PI / 2 Then task.accRadians.Y -= PI / 2
+        task.accRadians.Z += PI / 2
 
         SetTrueText(strOut)
     End Sub
@@ -284,7 +284,7 @@ Public Class XR_IMU_Basics_WithOptions : Inherits TaskParent
 
         Dim x1 = -(90 + task.accRadians.X * RadToDeg)
         Dim x2 = -(90 + task.theta.X * RadToDeg)
-        Dim y1 = task.accRadians.Y - cv.Cv2.PI
+        Dim y1 = task.accRadians.Y - PI
         If task.accRadians.X < 0 Then y1 *= -1
         strOut = "Angles in degree to gravity (before velocity filter)" + vbCrLf +
                      x1.ToString(fmt1) + vbTab + (y1 * RadToDeg).ToString(fmt1) + vbTab + (task.accRadians.Z * RadToDeg).ToString(fmt1) + vbCrLf +
@@ -293,8 +293,8 @@ Public Class XR_IMU_Basics_WithOptions : Inherits TaskParent
         SetTrueText(strOut)
 
         task.accRadians = task.theta
-        If task.accRadians.Y > cv.Cv2.PI / 2 Then task.accRadians.Y -= cv.Cv2.PI / 2
-        task.accRadians.Z += cv.Cv2.PI / 2
+        If task.accRadians.Y > PI / 2 Then task.accRadians.Y -= PI / 2
+        task.accRadians.Z += PI / 2
 
         SetTrueText(strOut)
     End Sub
@@ -467,10 +467,10 @@ Public Class XR_IMU_Stabilize : Inherits TaskParent
         smoothedMat.Set(Of Double)(1, 2, dy)
 
         Dim smoothedFrame As New cv.Mat
-        cv.Cv2.WarpAffine(src, smoothedFrame, smoothedMat, src.Size(), cv.InterpolationFlags.Nearest)
+        WarpAffine(src, smoothedFrame, smoothedMat, src.Size(), cv.InterpolationFlags.Nearest)
         smoothedFrame = smoothedFrame(New cv.Range(borderCrop, smoothedFrame.Rows - borderCrop), New cv.Range(borderCrop, smoothedFrame.Cols - borderCrop))
-        cv.Cv2.Resize(smoothedFrame, dst2, src.Size())
-        cv.Cv2.Subtract(src, dst2, dst3)
+        Resize(smoothedFrame, dst2, src.Size())
+        Subtract(src, dst2, dst3)
 
         Dim Text = "dx = " + dx.ToString(fmt2) + vbCrLf + "dy = " + dy.ToString(fmt2) + vbCrLf + "dz = " + dz.ToString(fmt2)
         SetTrueText(Text, New cv.Point(10, 10), 3)
@@ -662,8 +662,8 @@ Public Class XR_IMU_VerticalAngles : Inherits TaskParent
             strOut += (task.accRadians.X * RadToDeg).ToString(fmt1) + vbTab + (task.accRadians.Y * RadToDeg).ToString(fmt1) + vbTab + (task.accRadians.Z * RadToDeg).ToString(fmt1) + vbTab + vbCrLf
             SetTrueText(CStr(i), r.tc1.center, 2)
             SetTrueText(CStr(i), r.tc1.center, 3)
-            cv.Cv2.Line(dst2, r.tc1.center, r.tc2.center, task.highlight, task.lineWidth, task.lineType)
-            cv.Cv2.Line(dst3, r.tc1.center, r.tc2.center, white, task.lineWidth, task.lineType)
+            Line(dst2, r.tc1.center, r.tc2.center, task.highlight, task.lineWidth, task.lineType)
+            Line(dst3, r.tc1.center, r.tc2.center, white, task.lineWidth, task.lineType)
         Next
         SetTrueText(strOut, 3)
     End Sub
@@ -759,11 +759,11 @@ Public Class XR_IMU_Lines : Inherits TaskParent
 
             p1 = New cv.Point(kalman.kOutput(0), kalman.kOutput(1))
             p2 = New cv.Point(kalman.kOutput(2), kalman.kOutput(3))
-            cv.Cv2.Circle(dst2, p1, task.DotSize, task.highlight, -1, task.lineType)
-            cv.Cv2.Circle(dst2, p2, task.DotSize, task.highlight, -1, task.lineType)
-            cv.Cv2.Circle(dst3, p1, task.DotSize, white, -1, task.lineType)
+            Circle(dst2, p1, task.DotSize, task.highlight, -1, task.lineType)
+            Circle(dst2, p2, task.DotSize, task.highlight, -1, task.lineType)
+            Circle(dst3, p1, task.DotSize, white, -1, task.lineType)
 
-            cv.Cv2.Circle(dst3, p2, task.DotSize, white, -1, task.lineType)
+            Circle(dst3, p2, task.DotSize, white, -1, task.lineType)
             lastGcell = gcell
             strOut += CStr(0) + vbTab + gcell.len3D.ToString(fmt1) + "m" + vbTab +
                                                     gcell.tc1.depth.ToString(fmt1) + "m" + vbTab +
@@ -818,7 +818,7 @@ Public Class IMU_Average : Inherits TaskParent
         If task.optionsChanged Then accList.Clear()
         accList.Add(task.IMU_Acceleration)
         Dim accMat = cv.Mat.FromPixelData(accList.Count, 1, cv.MatType.CV_64FC4, accList.ToArray)
-        Dim imuMean = cv.Cv2.Mean(accMat)
+        Dim imuMean = Mean(accMat)
         task.IMU_AverageAcceleration = New cv.Point3f(imuMean(0), imuMean(1), imuMean(2))
         If accList.Count >= task.fOptions.FrameHistoryCount.Value Then accList.RemoveAt(0)
         strOut = "Average IMU acceleration: " + vbCrLf + task.IMU_AverageAcceleration.X.ToString(fmt3) + vbTab + task.IMU_AverageAcceleration.Y.ToString(fmt3) + vbTab +
@@ -1141,14 +1141,14 @@ Public Class IMU_GMatrix_TAWithOptions : Inherits TaskParent
         If xSlider Is Nothing Then xSlider = OptionParent.FindSlider("Rotate pointcloud around X-axis (degrees)")
         If ySlider Is Nothing Then ySlider = OptionParent.FindSlider("Rotate pointcloud around Y-axis (degrees)")
         If zSlider Is Nothing Then zSlider = OptionParent.FindSlider("Rotate pointcloud around Z-axis (degrees)")
-        cx = Math.Cos(xSlider.Value * cv.Cv2.PI / 180)
-        sx = Math.Sin(xSlider.Value * cv.Cv2.PI / 180)
+        cx = Math.Cos(xSlider.Value * PI / 180)
+        sx = Math.Sin(xSlider.Value * PI / 180)
 
-        cy = Math.Cos(ySlider.Value * cv.Cv2.PI / 180)
-        sy = Math.Sin(ySlider.Value * cv.Cv2.PI / 180)
+        cy = Math.Cos(ySlider.Value * PI / 180)
+        sy = Math.Sin(ySlider.Value * PI / 180)
 
-        cz = Math.Cos(zSlider.Value * cv.Cv2.PI / 180)
-        sz = Math.Sin(zSlider.Value * cv.Cv2.PI / 180)
+        cz = Math.Cos(zSlider.Value * PI / 180)
+        sz = Math.Sin(zSlider.Value * PI / 180)
     End Sub
     Private Function buildGmatrix() As cv.Mat
         '[cx -sx    0]  [1  0   0 ] 
@@ -1267,8 +1267,8 @@ Public Class IMU_VerticalVerify : Inherits TaskParent
 
                 SetTrueText(CStr(index), r.tc1.center, 2)
                 SetTrueText(CStr(index), r.tc1.center, 3)
-                cv.Cv2.Line(dst2, r.tc1.center, r.tc2.center, task.highlight, task.lineWidth, task.lineType)
-                cv.Cv2.Line(dst3, r.tc1.center, r.tc2.center, white, task.lineWidth, task.lineType)
+                Line(dst2, r.tc1.center, r.tc2.center, task.highlight, task.lineWidth, task.lineType)
+                Line(dst3, r.tc1.center, r.tc2.center, white, task.lineWidth, task.lineType)
                 brickCells(i) = r
             Else
                 brickCells.RemoveAt(i)

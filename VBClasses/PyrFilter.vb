@@ -7,7 +7,7 @@ Public Class PyrFilter_Basics_TA : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
-        cv.Cv2.PyrMeanShiftFiltering(src, dst2, options.spatialRadius, options.colorRadius, options.maxPyramid)
+        PyrMeanShiftFiltering(src, dst2, options.spatialRadius, options.colorRadius, options.maxPyramid)
     End Sub
 End Class
 
@@ -28,7 +28,7 @@ Public Class XR_PyrFilter_RedCloud : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         pyr.Run(src)
-        cv.Cv2.CvtColor(pyr.dst2, dst3, cv.ColorConversionCodes.BGR2GRAY)
+        CvtColor(pyr.dst2, dst3, cv.ColorConversionCodes.BGR2GRAY)
 
         reduction.Run(dst3)
 

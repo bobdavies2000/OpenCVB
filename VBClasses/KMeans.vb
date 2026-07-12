@@ -34,7 +34,7 @@ Public Class KMeans_Basics : Inherits TaskParent
             colors.SetTo(0)
         End If
 
-        cv.Cv2.Kmeans(columnVector, classCount, dst2, term, 1, options.kMeansFlag, colors)
+        Kmeans(columnVector, classCount, dst2, term, 1, options.kMeansFlag, colors)
 
         saveLabels = dst2.Clone
 
@@ -324,9 +324,9 @@ Public Class KMeans_Image : Inherits TaskParent
         Dim k = km.options.kMeansK
         For i = 0 To k - 1
             Dim mask As New cv.Mat
-            cv.Cv2.InRange(km.dst2, i, i, mask)
+            InRange(km.dst2, i, i, mask)
             masks.Add(mask)
-            counts.Add(cv.Cv2.CountNonZero(mask))
+            counts.Add(CountNonZero(mask))
         Next
         If task.heartBeat Then maskIndex += 1
         If maskIndex >= masks.Count Then maskIndex = 0
@@ -356,9 +356,9 @@ Public Class XR_KMeans_DepthPlusGray : Inherits TaskParent
         grayPlus(0).SetTo(0, task.noDepthMask)
         grayPlus(1) = task.pcSplit(2)
 
-        Dim merge As New cv.Mat
-        cv.Cv2.Merge(grayPlus, merge)
-        km.Run(merge)
+        Dim mergeMat As New cv.Mat
+        Merge(grayPlus, mergeMat)
+        km.Run(mergeMat)
 
         Dim k = km.options.kMeansK
         dst3 = km.dst2
@@ -386,37 +386,37 @@ Public Class KMeans_Dimensions : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         Static dimSlider = OptionParent.FindSlider("Dimension")
 
-        Dim merge As New cv.Mat
+        Dim mergeMat As New cv.Mat
         Select Case CInt(dimSlider.value)
             Case 1 ' grayscale
                 If src.Channels() = 1 Then
-                    src.ConvertTo(merge, cv.MatType.CV_32F)
+                    src.ConvertTo(mergeMat, cv.MatType.CV_32F)
                 Else
-                    task.gray.ConvertTo(merge, cv.MatType.CV_32F)
+                    task.gray.ConvertTo(mergeMat, cv.MatType.CV_32F)
                 End If
             Case 2 ' pointcloud x and y
-                cv.Cv2.Merge({task.pcSplit(0), task.pcSplit(1)}, merge)
+                Merge({task.pcSplit(0), task.pcSplit(1)}, mergeMat)
             Case 3 ' pointcloud dimensions
-                merge = task.pointCloud
+                mergeMat = task.pointCloud
             Case 4 ' color + depth
                 src.ConvertTo(src, cv.MatType.CV_32F)
-                cv.Cv2.Normalize(task.pcSplit(2), task.pcSplit(2), 0, 255, cv.NormTypes.MinMax)
-                cv.Cv2.Merge({src, task.pcSplit(2)}, merge)
+                Normalize(task.pcSplit(2), task.pcSplit(2), 0, 255, cv.NormTypes.MinMax)
+                Merge({src, task.pcSplit(2)}, mergeMat)
             Case 5 ' color + pcSplit(0) and pcSplit(1)
                 src.ConvertTo(src, cv.MatType.CV_32F)
-                cv.Cv2.Normalize(task.pcSplit(0), task.pcSplit(0), 0, 255, cv.NormTypes.MinMax)
-                cv.Cv2.Normalize(task.pcSplit(1), task.pcSplit(1), 0, 255, cv.NormTypes.MinMax)
-                cv.Cv2.Merge({src, task.pcSplit(0), task.pcSplit(1)}, merge)
+                Normalize(task.pcSplit(0), task.pcSplit(0), 0, 255, cv.NormTypes.MinMax)
+                Normalize(task.pcSplit(1), task.pcSplit(1), 0, 255, cv.NormTypes.MinMax)
+                Merge({src, task.pcSplit(0), task.pcSplit(1)}, mergeMat)
             Case 6 ' color + pointcloud
                 src.ConvertTo(src, cv.MatType.CV_32F)
                 Dim tmp1 As New cv.Mat, tmp2 As New cv.Mat, tmp3 As New cv.Mat
-                cv.Cv2.Normalize(task.pcSplit(0), tmp1, 0, 255, cv.NormTypes.MinMax)
-                cv.Cv2.Normalize(task.pcSplit(1), tmp2, 0, 255, cv.NormTypes.MinMax)
-                cv.Cv2.Normalize(task.pcSplit(2), tmp3, 0, 255, cv.NormTypes.MinMax)
-                cv.Cv2.Merge({src, tmp1, tmp2, tmp3}, merge)
+                Normalize(task.pcSplit(0), tmp1, 0, 255, cv.NormTypes.MinMax)
+                Normalize(task.pcSplit(1), tmp2, 0, 255, cv.NormTypes.MinMax)
+                Normalize(task.pcSplit(2), tmp3, 0, 255, cv.NormTypes.MinMax)
+                Merge({src, tmp1, tmp2, tmp3}, mergeMat)
         End Select
 
-        km.Run(merge)
+        km.Run(mergeMat)
 
         labels(2) = "Dimension = " + CStr(dimSlider.value)
         labels(3) = labels(2)
@@ -506,7 +506,7 @@ Public Class XR_KMeans_SimKColor : Inherits TaskParent
             classCount = simK.classCount
         End If
 
-        cv.Cv2.CalcBackProject({src}, {0, 1, 2}, histogram, dst1, task.rangesBGR)
+        CalcBackProject({src}, {0, 1, 2}, histogram, dst1, task.rangesBGR)
 
         dst2 = Palettize(dst1)
         labels(2) = simK.labels(2) + " with " + CStr(binSlider.value) + " histogram bins"
@@ -536,8 +536,8 @@ Public Class XR_KMeans_SimKDepth : Inherits TaskParent
             plot1D.histogram = simK.dst2
             classCount = simK.classCount
         End If
-        cv.Cv2.CalcBackProject({src}, {2}, plot1D.histogram, dst1, task.rangesCloud)
-        cv.Cv2.ConvertScaleAbs(dst1, dst1)
+        CalcBackProject({src}, {2}, plot1D.histogram, dst1, task.rangesCloud)
+        ConvertScaleAbs(dst1, dst1)
 
         dst2 = Palettize(dst1)
 

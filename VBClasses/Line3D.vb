@@ -15,18 +15,18 @@ Public Class Line3D_Basics : Inherits TaskParent
 
         For Each lp In task.lines.lpList
             Dim rect1 = task.gridRects(task.gridMap.Get(Of Integer)(lp.p1.Y, lp.p1.X))
-            Dim depth1 = cv.Cv2.Mean(task.pcSplit(2)(rect1), task.depthmask(rect1))(0)
+            Dim depth1 = Mean(task.pcSplit(2)(rect1), task.depthmask(rect1))(0)
             If depth1 = 0 Then Continue For
 
             Dim rect2 = task.gridRects(task.gridMap.Get(Of Integer)(lp.p1.Y, lp.p1.X))
-            Dim depth2 = cv.Cv2.Mean(task.pcSplit(2)(rect2), task.depthmask(rect2))(0)
+            Dim depth2 = Mean(task.pcSplit(2)(rect2), task.depthmask(rect2))(0)
             If depth2 = 0 Then Continue For
 
             Dim p1 = Cloud_Basics.worldCoordinates(rect1.TopLeft, depth1)
             Dim p2 = Cloud_Basics.worldCoordinates(rect2.TopLeft, depth2)
             lines3D.Add(p1)
             lines3D.Add(p2)
-            cv.Cv2.Line(dst2, lp.p1, lp.p2, task.highlight, task.lineWidth, cv.LineTypes.Link8)
+            Line(dst2, lp.p1, lp.p2, task.highlight, task.lineWidth, cv.LineTypes.Link8)
             SetTrueText(depth1.ToString(fmt1), lp.p1, 2)
             SetTrueText(depth2.ToString(fmt1), lp.p2, 2)
         Next
@@ -57,13 +57,13 @@ Public Class XR_Line3D_Longest : Inherits TaskParent
         Dim lp = task.lines.lpList(0)
         dst2 = src
 
-        cv.Cv2.Line(dst2, lp.p1, lp.p2, cv.Scalar.Yellow, task.lineWidth + 3, task.lineType)
+        Line(dst2, lp.p1, lp.p2, cv.Scalar.Yellow, task.lineWidth + 3, task.lineType)
 
         Dim brickMin = bricks.brickList(task.gridMap.Get(Of Integer)(lp.p1.Y, lp.p1.X))
         Dim brickMax = bricks.brickList(task.gridMap.Get(Of Integer)(lp.p2.Y, lp.p2.X))
 
         dst0.SetTo(0)
-        cv.Cv2.Line(dst0, lp.p1, lp.p2, 255, 3, task.lineType)
+        Line(dst0, lp.p1, lp.p2, 255, 3, task.lineType)
         dst0.SetTo(0, task.noDepthMask)
 
         Dim mm = GetMinMax(task.pcSplit(2), dst0)
@@ -78,9 +78,9 @@ Public Class XR_Line3D_Longest : Inherits TaskParent
         Dim depthMin = If(brickMin.depth > 0, brickMin.depth, mm.minVal)
         Dim depthMax = If(brickMax.depth > 0, brickMax.depth, mm.maxVal)
 
-        Dim depthMean = cv.Cv2.Mean(task.pcSplit(2), dst0)(0)
-        cv.Cv2.Circle(dst2, lp.p1, task.DotSize + 4, cv.Scalar.Red, -1, task.lineType)
-        cv.Cv2.Circle(dst2, lp.p2, task.DotSize + 4, cv.Scalar.Blue, -1, task.lineType)
+        Dim depthMean = Mean(task.pcSplit(2), dst0)(0)
+        Circle(dst2, lp.p1, task.DotSize + 4, cv.Scalar.Red, -1, task.lineType)
+        Circle(dst2, lp.p2, task.DotSize + 4, cv.Scalar.Blue, -1, task.lineType)
 
         If lp.p1.DistanceTo(mm.minLoc) < lp.p2.DistanceTo(mm.maxLoc) Then
             mm.minLoc = lp.p1
@@ -162,7 +162,7 @@ Public Class XR_Line3D_DrawArbitrary : Inherits TaskParent
     End Sub
     Private Function findCorrelation(pts1 As cv.Mat, pts2 As cv.Mat) As Single
         Dim correlationMat As New cv.Mat
-        cv.Cv2.MatchTemplate(pts1, pts2, correlationMat, cv.TemplateMatchModes.CCoeffNormed)
+        MatchTemplate(pts1, pts2, correlationMat, cv.TemplateMatchModes.CCoeffNormed)
         Return correlationMat.Get(Of Single)(0, 0)
     End Function
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -180,13 +180,13 @@ Public Class XR_Line3D_DrawArbitrary : Inherits TaskParent
         If toggleFirstSecond Then Exit Sub ' wait until the second point is selected...
 
         dst1 = src
-        cv.Cv2.Line(dst1, p1, p2, task.highlight, task.lineWidth, task.lineType)
+        Line(dst1, p1, p2, task.highlight, task.lineWidth, task.lineType)
         dst0.SetTo(0)
-        cv.Cv2.Line(dst0, p1, p2, 255, task.lineWidth, task.lineType)
+        Line(dst0, p1, p2, 255, task.lineWidth, task.lineType)
         dst1.SetTo(0)
         task.pcSplit(0).CopyTo(dst1, dst0)
         Dim points As New cv.Mat
-        cv.Cv2.FindNonZero(dst1, points)
+        FindNonZero(dst1, points)
 
         Dim nextList As New List(Of cv.Point3f)
         For i = 0 To points.Rows - 1
@@ -196,7 +196,7 @@ Public Class XR_Line3D_DrawArbitrary : Inherits TaskParent
         If nextList.Count = 0 Then Exit Sub ' line is completely in area with no depth.
 
         Dim pts As cv.Mat = cv.Mat.FromPixelData(nextList.Count, 1, cv.MatType.CV_32FC3, nextList.ToArray)
-        Dim zSplit = cv.Cv2.Split(pts)
+        Dim zSplit = Split(pts)
         Dim c1 = findCorrelation(zSplit(0), zSplit(2))
         Dim c2 = findCorrelation(zSplit(1), zSplit(2))
 
@@ -237,14 +237,14 @@ Public Class Line3D_Selection : Inherits TaskParent
                 lp = task.lines.lpList(Math.Abs(task.gOptions.DebugSlider.Value))
             End If
         End If
-        cv.Cv2.Line(dst3, lp.p1, lp.p2, 255, 1, cv.LineTypes.Link4)
-        If standaloneTest() Or debugRequest Then cv.Cv2.FindNonZero(dst3(lp.rect), allPoints)
+        Line(dst3, lp.p1, lp.p2, 255, 1, cv.LineTypes.Link4)
+        If standaloneTest() Or debugRequest Then FindNonZero(dst3(lp.rect), allPoints)
 
         task.pcSplit(2)(lp.rect).CopyTo(dst1(lp.rect), dst3(lp.rect))
         dst3(lp.rect).SetTo(0, task.noDepthMask(lp.rect))
-        Dim depthAvg = cv.Cv2.Mean(dst1(lp.rect), dst3(lp.rect)).Item(0)
+        Dim depthAvg = Mean(dst1(lp.rect), dst3(lp.rect)).Item(0)
         Dim points As New cv.Mat
-        cv.Cv2.FindNonZero(dst3(lp.rect), points)
+        FindNonZero(dst3(lp.rect), points)
         Dim ptList As New List(Of cv.Point)
         If points.Rows = 0 Then
             ptList.Add(lp.p1)
@@ -338,7 +338,7 @@ Public Class Line3D_DrawLines : Inherits TaskParent
         For Each selection.lp In task.lines.lpList
             selection.Run(emptyMat)
             lpList.Add(selection.lp)
-            cv.Cv2.Line(dst3, selection.lp.p1, selection.lp.p2, task.highlight, task.lineWidth)
+            Line(dst3, selection.lp.p1, selection.lp.p2, task.highlight, task.lineWidth)
         Next
     End Sub
 End Class
@@ -361,7 +361,7 @@ Public Class Line3D_DrawLines_Debug : Inherits TaskParent
         Dim lp = Selection.lp
 
         dst3.SetTo(0)
-        cv.Cv2.Line(dst3, lp.p1, lp.p2, 255, 1, cv.LineTypes.Link4)
+        Line(dst3, lp.p1, lp.p2, 255, 1, cv.LineTypes.Link4)
         dst1(lp.rect).SetTo(task.highlight, dst3(lp.rect))
 
         dst2 = task.pointCloud.Clone

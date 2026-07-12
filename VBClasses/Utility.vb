@@ -62,11 +62,11 @@ Public Class Utility_Basics : Inherits TaskParent
         For i = 0 To lineCount
             Dim p1 = New cv.Point(0, spacer * i)
             Dim p2 = New cv.Point(dst.Width, spacer * i)
-            cv.Cv2.Line(dst, p1, p2, white, fontThickness)
+            Line(dst, p1, p2, white, fontThickness)
             Dim nextVal = (maxVal - spaceVal * i)
             Dim nextText = If(maxVal > 1000, (nextVal / 1000).ToString("N2") + "k", nextVal.ToString(fmt1))
             Dim p3 = New cv.Point(0, p1.Y + 12)
-            cv.Cv2.PutText(dst, nextText, p3, cv.HersheyFonts.HersheyPlain, fontSize, white, fontThickness, task.lineType)
+            PutText(dst, nextText, p3, cv.HersheyFonts.HersheyPlain, fontSize, white, fontThickness, task.lineType)
         Next
     End Sub
     Public Shared Function findCause(rcMap As cv.Mat, rcList As List(Of rcDataOld)) As String

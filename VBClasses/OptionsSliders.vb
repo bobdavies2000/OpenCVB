@@ -50,8 +50,8 @@ Public Class OptionsSliders
     End Sub
     Private Sub TrackBar_ValueChanged(sender As Object, e As EventArgs)
         Dim outStr = myLabels(sender.tag).Text
-        Dim split = outStr.Split("=")
-        myLabels(sender.tag).Text = split(0) + "= " + CStr(mytrackbars(sender.tag).Value)
+        Dim splitStr = outStr.Split("=")
+        myLabels(sender.tag).Text = splitStr(0) + "= " + CStr(mytrackbars(sender.tag).Value)
         task.optionsChanged = True
     End Sub
     Private Sub OptionsSliders_Load(sender As Object, e As EventArgs) Handles MyBase.Load

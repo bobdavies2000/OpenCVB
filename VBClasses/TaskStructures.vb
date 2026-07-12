@@ -169,8 +169,8 @@ Public Module Structures
         Public Sub jitterTest(dst As cv.Mat, parent As Object) ' return true if there is nothing to change
             If jitterCheck Is Nothing Then jitterCheck = New cv.Mat(dst.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
             Dim polymp = currmp()
-            cv.Cv2.Line(parent.jitterCheck, polymp.p1, polymp.p2, 255, task.lineWidth, task.lineType)
-            Dim jitterPixels = cv.Cv2.CountNonZero(jitterCheck)
+            Line(parent.jitterCheck, polymp.p1, polymp.p2, 255, task.lineWidth, task.lineType)
+            Dim jitterPixels = CountNonZero(jitterCheck)
             If jitterPixels = lastJitterPixels Then featureLineChanged = True Else featureLineChanged = False
             lastJitterPixels = jitterPixels
         End Sub
@@ -342,9 +342,9 @@ Public Module Structures
         End Function
         Public Function GetMaxDistContour(ByRef contour As keyData) As cv.Point
             Dim mask = contour.mask.Clone
-            cv.Cv2.Rectangle(mask, New cv.Rect(0, 0, mask.Width, mask.Height), cv.Scalar.All(0), 1)
+            Rectangle(mask, New cv.Rect(0, 0, mask.Width, mask.Height), cv.Scalar.All(0), 1)
             Dim distance32f As New cv.Mat
-            cv.Cv2.DistanceTransform(mask, distance32f, cv.DistanceTypes.L1, cv.DistanceTransformMasks.Precise, cv.MatType.CV_32F)
+            DistanceTransform(mask, distance32f, cv.DistanceTypes.L1, cv.DistanceTransformMasks.Precise, cv.MatType.CV_32F)
             Dim mm As mmData = GetMinMax(distance32f)
             mm.maxLoc.X += contour.rect.X
             mm.maxLoc.Y += contour.rect.Y
@@ -454,14 +454,14 @@ Public Module Structures
             pVec1 = task.pointCloud.Get(Of cv.Vec3f)(p1.Y, p1.X)
             If Single.IsNaN(pVec1(0)) Or pVec1(2) = 0 Then
                 Dim r = task.gridRects(p1GridIndex)
-                pVec1 = New cv.Vec3f(0, 0, cv.Cv2.Mean(task.pcSplit(2)(r), task.depthmask(r)).Item(0))
+                pVec1 = New cv.Vec3f(0, 0, Mean(task.pcSplit(2)(r), task.depthmask(r)).Item(0))
             End If
 
             pVec2 = task.pointCloud.Get(Of cv.Vec3f)(p2.Y, p2.X)
             If Single.IsNaN(pVec2(0)) Or pVec2(2) = 0 Then
                 Dim p2GridIndex = task.gridMap.Get(Of Integer)(p2.Y, p2.X)
                 Dim r = task.gridRects(p2GridIndex)
-                pVec2 = New cv.Vec3f(0, 0, cv.Cv2.Mean(task.pcSplit(2)(r), task.depthmask(r)).Item(0))
+                pVec2 = New cv.Vec3f(0, 0, Mean(task.pcSplit(2)(r), task.depthmask(r)).Item(0))
             End If
 
             If p1.X <> p2.X Then
@@ -596,7 +596,7 @@ Public Module Structures
             Dim reduction As Integer = task.fOptions.ReductionDepth.Value
             rect = _rect
             If _mapID >= 0 Then
-                cv.Cv2.InRange(_mask, _mapID, _mapID, mask)
+                InRange(_mask, _mapID, _mapID, mask)
                 mapID = _mapID
             Else
                 mask = _mask.Clone
@@ -606,19 +606,19 @@ Public Module Structures
                 If contour.Count >= 3 Then ' need at least 3 points for a contour.
                     Dim listOfPoints = New List(Of List(Of cv.Point))({contour})
                     mask = New cv.Mat(mask.Size, cv.MatType.CV_8U, 0)
-                    cv.Cv2.DrawContours(mask, listOfPoints, 0, cv.Scalar.All(mapID), -1, cv.LineTypes.Link4)
+                    DrawContours(mask, listOfPoints, 0, cv.Scalar.All(mapID), -1, cv.LineTypes.Link4)
 
                     ' keep the hull points around (there aren't many of them.)
-                    hull = cv.Cv2.ConvexHull(contour.ToArray, True).ToList
+                    hull = ConvexHull(contour.ToArray, True).ToList
                 End If
             End If
             buildMaxDist()
 
             gridIndex = task.gridMap.Get(Of Integer)(maxDist.Y, maxDist.X)
             If _mapID >= 0 Then color = task.scalarColors(mapID Mod 255)
-            pixels = cv.Cv2.CountNonZero(mask)
+            pixels = CountNonZero(mask)
 
-            wcMean = cv.Cv2.Mean(task.pointCloud(rect), task.depthmask(rect))
+            wcMean = Mean(task.pointCloud(rect), task.depthmask(rect))
             Dim x = Math.Round(wcMean(0) * 1000 / reduction)
             Dim y = Math.Round(wcMean(1) * 1000 / reduction)
             Dim z = Math.Round(wcMean(2) * 1000 / reduction)
@@ -631,15 +631,15 @@ Public Module Structures
         Public Shared Function getHullMask(hull As List(Of cv.Point), mask As cv.Mat) As cv.Mat
             Dim hullMask = New cv.Mat(mask.Size, cv.MatType.CV_8U, 0)
             Dim listOfPoints = New List(Of List(Of cv.Point))({hull})
-            cv.Cv2.DrawContours(hullMask, listOfPoints, 0, cv.Scalar.All(255), -1, cv.LineTypes.Link8)
+            DrawContours(hullMask, listOfPoints, 0, cv.Scalar.All(255), -1, cv.LineTypes.Link8)
             Return hullMask
         End Function
         Public Sub buildMaxDist()
             Dim tmp As cv.Mat = mask.Clone
             ' Rectangle is definitely needed.  Test it again with MaxDist_NoRectangle to verify that the rectangle is essential.
-            cv.Cv2.Rectangle(tmp, New cv.Rect(0, 0, mask.Width, mask.Height), cv.Scalar.All(0), 1)
+            Rectangle(tmp, New cv.Rect(0, 0, mask.Width, mask.Height), cv.Scalar.All(0), 1)
             Dim distance32f As New cv.Mat
-            cv.Cv2.DistanceTransform(tmp, distance32f, cv.DistanceTypes.L1, cv.DistanceTransformMasks.Precise, cv.MatType.CV_32F)
+            DistanceTransform(tmp, distance32f, cv.DistanceTypes.L1, cv.DistanceTransformMasks.Precise, cv.MatType.CV_32F)
             Dim mm As mmData = GetMinMax(distance32f)
             maxDist.X = mm.maxLoc.X + rect.X
             maxDist.Y = mm.maxLoc.Y + rect.Y
@@ -694,7 +694,7 @@ Public Module Structures
             Dim reduction As Integer = task.fOptions.ReductionDepth.Value
             rect = _rect
             If _mapID >= 0 Then
-                cv.Cv2.InRange(_mask, _mapID, _mapID, mask)
+                InRange(_mask, _mapID, _mapID, mask)
                 mapID = _mapID
             Else
                 mask = _mask.Clone
@@ -704,16 +704,16 @@ Public Module Structures
                 If contour.Count >= 3 Then ' need at least 3 points for a contour.
                     Dim listOfPoints = New List(Of List(Of cv.Point))({contour})
                     mask = New cv.Mat(mask.Size, cv.MatType.CV_8U, 0)
-                    cv.Cv2.DrawContours(mask, listOfPoints, 0, cv.Scalar.All(mapID), -1, cv.LineTypes.Link4)
+                    DrawContours(mask, listOfPoints, 0, cv.Scalar.All(mapID), -1, cv.LineTypes.Link4)
                 End If
             End If
-            pixels = cv.Cv2.CountNonZero(mask)
+            pixels = CountNonZero(mask)
         End Sub
         Public Function buildMaxDist(ByVal mask As cv.Mat) As cv.Point
             ' Rectangle is definitely needed.  Test it again with MaxDist_NoRectangle to verify that the rectangle is essential.
-            cv.Cv2.Rectangle(mask, New cv.Rect(0, 0, mask.Width, mask.Height), cv.Scalar.All(0), 1)
+            Rectangle(mask, New cv.Rect(0, 0, mask.Width, mask.Height), cv.Scalar.All(0), 1)
             Dim distance32f As New cv.Mat
-            cv.Cv2.DistanceTransform(mask, distance32f, cv.DistanceTypes.L1, cv.DistanceTransformMasks.Precise, cv.MatType.CV_32F)
+            DistanceTransform(mask, distance32f, cv.DistanceTypes.L1, cv.DistanceTransformMasks.Precise, cv.MatType.CV_32F)
             Dim mm As mmData = GetMinMax(distance32f)
             Dim maxDist As cv.Point
             maxDist.X = mm.maxLoc.X + rect.X

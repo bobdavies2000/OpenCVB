@@ -29,7 +29,7 @@ Imports OpenCvSharp.DnnSuperres
 '        If infoText.Exists Then
 '            Dim infoModel As New FileInfo(task.homeDir + "Data/MobileNetSSD_deploy.caffemodel")
 '            If infoModel.Exists Then
-'                net = cv.Cv2.Dnn.ReadNetFromCaffe(infoText.FullName, infoModel.FullName)
+'                net = Dnn.ReadNetFromCaffe(infoText.FullName, infoModel.FullName)
 '                dnnPrepared = True
 '            End If
 '        End If
@@ -45,7 +45,7 @@ Imports OpenCvSharp.DnnSuperres
 'If dnnPrepared Then
 '    Dim inScaleFactor As Single = options.ScaleFactor / options.scaleMax ' should be 0.0078 by default...
 '    Dim inputBlob As Double
-'    cv.Cv2.Dnn.BlobFromImage(src(crop), inputBlob, inScaleFactor, New cv.Size(300, 300), New cv.Scalar(options.meanValue), False)
+'    Dnn.BlobFromImage(src(crop), inputBlob, inScaleFactor, New cv.Size(300, 300), New cv.Scalar(options.meanValue), False)
 
 '    src.CopyTo(dst3)
 '    src(crop).CopyTo(dst2(crop))
@@ -97,10 +97,10 @@ Imports OpenCvSharp.DnnSuperres
 '                kalman(minIndex).Run(src)
 '                rect = New cv.Rect(kalman(minIndex).kOutput(0), kalman(minIndex).kOutput(1), kalman(minIndex).kOutput(2), kalman(minIndex).kOutput(3))
 '            End If
-'            cv.Cv2.Rectangle(dst3, rect, cv.Scalar.Yellow, task.lineWidth + 2, task.lineType)
+'            Rectangle(dst3, rect, cv.Scalar.Yellow, task.lineWidth + 2, task.lineType)
 '            rect.Width = src.Width / 12
 '            rect.Height = src.Height / 16
-'            cv.Cv2.Rectangle(dst3, rect, cv.Scalar.Black, -1)
+'            Rectangle(dst3, rect, cv.Scalar.Black, -1)
 '            SetTrueText(nextName, New cv.Point(rect.X, rect.Y), 3)
 '        End If
 '    Next
@@ -155,7 +155,7 @@ Imports OpenCvSharp.DnnSuperres
 '        End If
 '        dst2.SetTo(0)
 '        dst3.SetTo(0)
-'        cv.Cv2.Resize(src(r), dst2(outRect), New cv.Size(r.Width * multiplier, r.Height * multiplier))
+'        Resize(src(r), dst2(outRect), New cv.Size(r.Width * multiplier, r.Height * multiplier))
 '        dnn.Upsample(src(r), dst3(outRect))
 '        labels(3) = CStr(multiplier) + "X resize of selected area using DNN super resolution"
 '    End Sub
@@ -179,7 +179,7 @@ Imports OpenCvSharp.DnnSuperres
 '        Dim r = New cv.Rect(0, 0, dst2.Width, dst2.Height)
 '        Dim tmp As New cv.Mat
 '        super.dnn.upsample(src, tmp)
-'        cv.Cv2.Resize(tmp, dst2, dst2.Size)
+'        Resize(tmp, dst2, dst2.Size)
 '        dst3 = dst2 - src
 '    End Sub
 'End Class
@@ -214,7 +214,7 @@ Imports OpenCvSharp.DnnSuperres
 '    End Sub
 '    Public Overrides sub RunAlg(src As cv.Mat)
 
-'        Dim image = cv.Cv2.ImRead(task.homeDir + "Data/space_shuttle.jpg")
+'        Dim image = ImRead(task.homeDir + "Data/space_shuttle.jpg")
 '        dst3 = image.Resize(dst3.Size())
 '        Dim inputBlob = CvDnn.BlobFromImage(image, 1, New cv.Size(224, 224), New cv.Scalar(104, 117, 123))
 '        net.SetInput(inputBlob, "data")

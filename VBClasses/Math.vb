@@ -10,7 +10,7 @@ Public Class XR_Math_Subtract : Inherits TaskParent
         options.Run()
 
         Dim bgr = New cv.Scalar(options.blueS, options.greenS, options.redS)
-        cv.Cv2.Subtract(bgr, src, dst2) ' or dst2 = bgr - src
+        Subtract(bgr, src, dst2) ' or dst2 = bgr - src
         dst3 = src - bgr
 
         Dim scalar = "(" + CStr(bgr(0)) + "," + CStr(bgr(1)) + "," + CStr(bgr(2)) + ")"
@@ -24,7 +24,7 @@ Module Math_Functions
     End Sub
     Public Function computeMedian(src As cv.Mat, mask As cv.Mat, totalPixels As Integer, bins As Integer, rangeMin As Single, rangeMax As Single) As Double
         Dim hist As New cv.Mat()
-        cv.Cv2.CalcHist({src}, {0}, mask, hist, 1, {bins}, {New cv.Rangef(rangeMin, rangeMax)})
+        CalcHist({src}, {0}, mask, hist, 1, {bins}, {New cv.Rangef(rangeMin, rangeMax)})
         Dim halfPixels = totalPixels / 2
 
         Dim median As Double
@@ -83,12 +83,12 @@ Public Class XR_Math_DepthMeanStdev : Inherits TaskParent
         Dim mask = minMax.dst3 ' the mask for stable depth.
         dst3.SetTo(0)
         task.depthRGB.CopyTo(dst3, mask)
-        If mask.Type <> cv.MatType.CV_8U Then cv.Cv2.CvtColor(mask, mask, cv.ColorConversionCodes.BGR2GRAY)
-        cv.Cv2.MeanStdDev(task.pcSplit(2), mean, stdev, mask)
+        If mask.Type <> cv.MatType.CV_8U Then CvtColor(mask, mask, cv.ColorConversionCodes.BGR2GRAY)
+        MeanStdDev(task.pcSplit(2), mean, stdev, mask)
         labels(3) = "stablized depth mean=" + mean.ToString(fmt1) + " stdev=" + stdev.ToString(fmt1)
 
         dst2 = task.depthRGB
-        cv.Cv2.MeanStdDev(task.pcSplit(2), mean, stdev)
+        MeanStdDev(task.pcSplit(2), mean, stdev)
         labels(2) = "raw depth mean=" + mean.ToString(fmt1) + " stdev=" + stdev.ToString(fmt1)
     End Sub
 End Class
@@ -111,17 +111,17 @@ Public Class XR_Math_RGBCorrelation : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
 
-        Dim split = cv.Cv2.Split(src)
-        match.template = split(0)
-        match.Run(split(1))
+        Dim splitMats = Split(src)
+        match.template = splitMats(0)
+        match.Run(splitMats(1))
         Dim blueGreenCorrelation = "Blue-Green " + match.labels(2)
 
-        match.template = split(1)
-        match.Run(split(1))
+        match.template = splitMats(1)
+        match.Run(splitMats(1))
         Dim redGreenCorrelation = "Red-Green " + match.labels(2)
 
-        match.template = split(2)
-        match.Run(split(0))
+        match.template = splitMats(2)
+        match.Run(splitMats(0))
         Dim redBlueCorrelation = "Red-Blue " + match.labels(2)
 
         flow.nextMsg = blueGreenCorrelation + " " + redGreenCorrelation + " " + redBlueCorrelation
@@ -158,18 +158,18 @@ Public Class XR_Math_StdevBoundary : Inherits TaskParent
                 Dim m1 = dst2.Get(Of Byte)(roi.Y, roi.X)
                 Dim m2 = dst2.Get(Of Byte)(roi.Y, roi.X + roi.Width)
                 If m1 = 0 And m2 <> 0 Then
-                    Dim meanScalar = cv.Cv2.Mean(dst3(roi))
+                    Dim meanScalar = Mean(dst3(roi))
                     Dim tmp As New cv.Mat
-                    cv.Cv2.Threshold(dst3(roi), tmp, meanScalar(0), 255, cv.ThresholdTypes.Otsu)
+                    Threshold(dst3(roi), tmp, meanScalar(0), 255, cv.ThresholdTypes.Otsu)
                     dst3(roi).CopyTo(dst2(roi), tmp)
                 End If
                 If m1 > 0 And m2 = 0 Then
                     Dim newROI = ValidateRect(New cv.Rect(roi.X + roi.Width, roi.Y, roi.Width, roi.Height))
                     If newROI.X + newROI.Width >= dst2.Width Then newROI.Width = dst2.Width - newROI.X - 1
                     If newROI.Y + newROI.Height >= dst2.Height Then newROI.Height = dst2.Height - newROI.Y - 1
-                    Dim meanScalar = cv.Cv2.Mean(dst3(newROI))
+                    Dim meanScalar = Mean(dst3(newROI))
                     Dim tmp As New cv.Mat
-                    cv.Cv2.Threshold(dst3(newROI), tmp, meanScalar(0), 255, cv.ThresholdTypes.Otsu)
+                    Threshold(dst3(newROI), tmp, meanScalar(0), 255, cv.ThresholdTypes.Otsu)
                     dst3(newROI).CopyTo(dst2(newROI), tmp)
                 End If
             End If
@@ -177,17 +177,17 @@ Public Class XR_Math_StdevBoundary : Inherits TaskParent
                 Dim m1 = dst2.Get(Of Byte)(roi.Y, roi.X)
                 Dim m2 = dst2.Get(Of Byte)(roi.Y + roi.Height, roi.X)
                 If m1 = 0 And m2 <> 0 Then
-                    Dim meanScalar = cv.Cv2.Mean(dst3(roi))
+                    Dim meanScalar = Mean(dst3(roi))
                     Dim tmp As New cv.Mat
-                    cv.Cv2.Threshold(dst3(roi), tmp, meanScalar(0), 255, cv.ThresholdTypes.Otsu)
+                    Threshold(dst3(roi), tmp, meanScalar(0), 255, cv.ThresholdTypes.Otsu)
                     dst3(roi).CopyTo(dst2(roi), tmp)
                 End If
                 If m1 > 0 And m2 = 0 Then
                     Dim newROI = ValidateRect(New cv.Rect(roi.X, roi.Y + roi.Height, roi.Width, roi.Height))
                     If newROI.Y + newROI.Height >= dst3.Height Then newROI.Height = dst3.Height - newROI.Y
-                    Dim meanScalar = cv.Cv2.Mean(dst3(newROI))
+                    Dim meanScalar = Mean(dst3(newROI))
                     Dim tmp As New cv.Mat
-                    cv.Cv2.Threshold(dst3(newROI), tmp, meanScalar(0), 255, cv.ThresholdTypes.Otsu)
+                    Threshold(dst3(newROI), tmp, meanScalar(0), 255, cv.ThresholdTypes.Otsu)
                     dst3(newROI).CopyTo(dst2(newROI), tmp)
                 End If
             End If
@@ -248,7 +248,7 @@ Public Class Math_ImageAverage : Inherits TaskParent
         If dst3.Type <> cv.MatType.CV_32F Then
             If dst3.Channels() <> 1 Then dst3.ConvertTo(dst3, cv.MatType.CV_32FC3) Else dst3.ConvertTo(dst3, cv.MatType.CV_32F)
         End If
-        cv.Cv2.Multiply(dst3, cv.Scalar.All(1 / (images.Count + 1)), dst3)
+        Multiply(dst3, cv.Scalar.All(1 / (images.Count + 1)), dst3)
         images.Add(dst3.Clone)
         If images.Count > task.fOptions.FrameHistoryCount.Value Then images.RemoveAt(0)
 
@@ -277,7 +277,7 @@ Public Class XR_Math_ImageMaskedAverage : Inherits TaskParent
         If task.optionsChanged Then images.Clear()
         Dim nextImage As New cv.Mat
         If src.Type <> cv.MatType.CV_32F Then src.ConvertTo(nextImage, cv.MatType.CV_32F) Else nextImage = src
-        cv.Cv2.Multiply(nextImage, cv.Scalar.All(1 / task.fOptions.FrameHistoryCount.Value), nextImage)
+        Multiply(nextImage, cv.Scalar.All(1 / task.fOptions.FrameHistoryCount.Value), nextImage)
         images.Add(nextImage.Clone())
         If images.Count > task.fOptions.FrameHistoryCount.Value Then images.RemoveAt(0)
 
@@ -319,14 +319,14 @@ Public Class Math_Stdev : Inherits TaskParent
         highStdevMask.SetTo(0)
 
         dst2 = src.Clone
-        If dst2.Channels() = 3 Then cv.Cv2.CvtColor(dst2, dst2, cv.ColorConversionCodes.BGR2GRAY)
+        If dst2.Channels() = 3 Then CvtColor(dst2, dst2, cv.ColorConversionCodes.BGR2GRAY)
 
         Static lastFrame As cv.Mat = dst2.Clone()
         saveFrame = dst2.Clone
         Parallel.ForEach(task.gridRects,
             Sub(roi)
                 Dim mean As Single, stdev As Single
-                cv.Cv2.MeanStdDev(dst2(roi), mean, stdev)
+                MeanStdDev(dst2(roi), mean, stdev)
                 If stdev < optionsMatch.stdevThreshold Then
                     Interlocked.Increment(updateCount)
                     Dim pt = New cv.Point(roi.X + 2, roi.Y + 10)

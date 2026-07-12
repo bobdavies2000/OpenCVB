@@ -36,7 +36,7 @@ Public Class Edge_Basics_TA : Inherits TaskParent
         If src.Channels <> 1 Then src = task.gray
 
         edges.run(src)
-        If edges.dst2.Channels <> 1 Then cv.Cv2.CvtColor(edges.dst2, edges.dst2, cv.ColorConversionCodes.BGR2GRAY)
+        If edges.dst2.Channels <> 1 Then CvtColor(edges.dst2, edges.dst2, cv.ColorConversionCodes.BGR2GRAY)
         If edges.dst2.Type <> cv.MatType.CV_8UC1 Then edges.dst2.ConvertTo(edges.dst2, cv.MatType.CV_8U)
         dst2 = edges.dst2
         labels(2) = traceName + " - selection = " + task.fOptions.EdgeMethods.Text
@@ -89,7 +89,7 @@ Public Class XR_Edge_MotionFree : Inherits TaskParent
         edges.run(src)
         dst2 = edges.dst2
 
-        If dst2.Channels <> 1 Then cv.Cv2.CvtColor(dst2, dst2, cv.ColorConversionCodes.BGR2GRAY)
+        If dst2.Channels <> 1 Then CvtColor(dst2, dst2, cv.ColorConversionCodes.BGR2GRAY)
         If dst2.Type <> cv.MatType.CV_8UC1 Then dst2.ConvertTo(dst2, cv.MatType.CV_8U)
         labels(2) = traceName + " - selection = " + task.fOptions.EdgeMethods.Text
     End Sub
@@ -114,11 +114,11 @@ Public Class XR_Edge_DepthAndColor : Inherits TaskParent
         shadow.Run(src)
 
         If shadow.dst3.Channels <> 1 Then
-            cv.Cv2.CvtColor(shadow.dst3, dst3, cv.ColorConversionCodes.BGR2GRAY)
+            CvtColor(shadow.dst3, dst3, cv.ColorConversionCodes.BGR2GRAY)
         Else
             dst3 = shadow.dst3.Clone
         End If
-        dst3 += cv.Cv2.Threshold(task.edges.dst2, task.edges.dst2, 1, 255, cv.ThresholdTypes.Binary)
+        dst3 += Threshold(task.edges.dst2, task.edges.dst2, 1, 255, cv.ThresholdTypes.Binary)
 
         dilate.Run(dst3)
         dilate.dst2.SetTo(0, shadow.dst2)
@@ -142,10 +142,10 @@ Public Class XR_Edge_Scharr : Inherits TaskParent
 
         If src.Channels <> 1 Then src = task.gray
         Dim xField As New cv.Mat
-        cv.Cv2.Scharr(src, xField, cv.MatType.CV_32FC1, 1, 0)
+        Scharr(src, xField, cv.MatType.CV_32FC1, 1, 0)
         Dim yField As New cv.Mat
-        cv.Cv2.Scharr(src, yField, cv.MatType.CV_32FC1, 0, 1)
-        cv.Cv2.Add(xField, yField, dst3)
+        Scharr(src, yField, cv.MatType.CV_32FC1, 0, 1)
+        Add(xField, yField, dst3)
         dst3.ConvertTo(dst2, cv.MatType.CV_8U, options.scharrMultiplier)
     End Sub
 End Class
@@ -166,14 +166,14 @@ Public Class XR_Edge_Preserving : Inherits TaskParent
         options.Run()
 
         If options.recurseCheck Then
-            cv.Cv2.EdgePreservingFilter(src, dst2, cv.EdgePreservingMethods.RecursFilter, options.EP_Sigma_s, options.EP_Sigma_r)
+            EdgePreservingFilter(src, dst2, cv.EdgePreservingMethods.RecursFilter, options.EP_Sigma_s, options.EP_Sigma_r)
         Else
-            cv.Cv2.EdgePreservingFilter(src, dst2, cv.EdgePreservingMethods.NormconvFilter, options.EP_Sigma_s, options.EP_Sigma_r)
+            EdgePreservingFilter(src, dst2, cv.EdgePreservingMethods.NormconvFilter, options.EP_Sigma_s, options.EP_Sigma_r)
         End If
         If options.recurseCheck Then
-            cv.Cv2.EdgePreservingFilter(task.depthRGB, dst3, cv.EdgePreservingMethods.RecursFilter, options.EP_Sigma_s, options.EP_Sigma_r)
+            EdgePreservingFilter(task.depthRGB, dst3, cv.EdgePreservingMethods.RecursFilter, options.EP_Sigma_s, options.EP_Sigma_r)
         Else
-            cv.Cv2.EdgePreservingFilter(task.depthRGB, dst3, cv.EdgePreservingMethods.NormconvFilter, options.EP_Sigma_s, options.EP_Sigma_r)
+            EdgePreservingFilter(task.depthRGB, dst3, cv.EdgePreservingMethods.NormconvFilter, options.EP_Sigma_s, options.EP_Sigma_r)
         End If
     End Sub
 End Class
@@ -215,7 +215,7 @@ Public Class XR_Edge_RandomForest_CPP : Inherits TaskParent
             Dim imagePtr = Edge_RandomForest_Run(cPtr, handleRGB.AddrOfPinnedObject(), src.Rows, src.Cols)
             handleRGB.Free()
 
-            cv.Cv2.Threshold(cv.Mat.FromPixelData(src.Rows, src.Cols, cv.MatType.CV_8U, imagePtr), dst3, options.edgeRFthreshold, 255, cv.ThresholdTypes.Binary)
+            Threshold(cv.Mat.FromPixelData(src.Rows, src.Cols, cv.MatType.CV_8U, imagePtr), dst3, options.edgeRFthreshold, 255, cv.ThresholdTypes.Binary)
         End If
     End Sub
     Protected Overrides Sub Finalize()
@@ -242,15 +242,15 @@ Public Class XR_Edge_DCTfrequency : Inherits TaskParent
         Dim frequencies As New cv.Mat
         Dim src32f As New cv.Mat
         task.gray.ConvertTo(src32f, cv.MatType.CV_32F, 1 / 255)
-        cv.Cv2.Dct(src32f, frequencies, cv.DctFlags.None)
+        Dct(src32f, frequencies, cv.DctFlags.None)
 
         Dim roi As New cv.Rect(0, 0, options.removeFrequencies, src32f.Height)
         If roi.Width > 0 Then frequencies(roi).SetTo(0)
         labels(2) = "Highest " + CStr(options.removeFrequencies) + " frequencies removed from RGBDepth"
 
-        cv.Cv2.Dct(frequencies, src32f, cv.DctFlags.Inverse)
+        Dct(frequencies, src32f, cv.DctFlags.Inverse)
         src32f.ConvertTo(dst2, cv.MatType.CV_8UC1, 255)
-        cv.Cv2.Threshold(dst2, dst3, options.dctThreshold, 255, cv.ThresholdTypes.Binary)
+        Threshold(dst2, dst3, options.dctThreshold, 255, cv.ThresholdTypes.Binary)
     End Sub
 End Class
 
@@ -423,17 +423,17 @@ Public Class XR_Edge_Matching : Inherits TaskParent
         End If
 
         Dim _cvtInline As New cv.Mat
-            cv.Cv2.CvtColor(dst2, _cvtInline, cv.ColorConversionCodes.GRAY2BGR)
+            CvtColor(dst2, _cvtInline, cv.ColorConversionCodes.GRAY2BGR)
             dst2 = If(dst2.Channels() = 3, dst2,_cvtInline)
-            cv.Cv2.CvtColor(dst3, _cvtInline, cv.ColorConversionCodes.GRAY2BGR)
+            CvtColor(dst3, _cvtInline, cv.ColorConversionCodes.GRAY2BGR)
             dst3 = If(dst3.Channels() = 3, dst3,_cvtInline)
         If options.highlightChecked Then
             labels(2) = "Matched grid segments in dst3 with disparity"
             For Each i In highlights
                 Dim r = task.gridRects(i)
-                cv.Cv2.Rectangle(dst3, r, cv.Scalar.Red, 2)
+                Rectangle(dst3, r, cv.Scalar.Red, 2)
                 r.X += maxLocs(i)
-                cv.Cv2.Rectangle(dst2, r, cv.Scalar.Red, 2)
+                Rectangle(dst2, r, cv.Scalar.Red, 2)
                 SetTrueText(CStr(maxLocs(i)), New cv.Point(r.X, r.Y), 2)
             Next
         Else
@@ -447,9 +447,9 @@ Public Class XR_Edge_Matching : Inherits TaskParent
                 If redRects.Contains(task.gridROIclicked) = False Then redRects.Add(task.gridROIclicked)
                 For Each i In redRects
                     Dim r = task.gridRects(i)
-                    cv.Cv2.Rectangle(dst3, r, cv.Scalar.Red, 2)
+                    Rectangle(dst3, r, cv.Scalar.Red, 2)
                     r.X += maxLocs(i)
-                    cv.Cv2.Rectangle(dst2, r, cv.Scalar.Red, 2)
+                    Rectangle(dst2, r, cv.Scalar.Red, 2)
                     SetTrueText(CStr(maxLocs(i)), New cv.Point(r.X, r.Y), 2)
                 Next
             End If
@@ -474,17 +474,17 @@ Public Class Edge_RGB : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         Dim img32f As New cv.Mat
         src.ConvertTo(img32f, cv.MatType.CV_32FC3)
-        Dim split = cv.Cv2.Split(img32f)
+        Dim splitMats = Split(img32f)
         For i = 0 To 3 - 1
-            cv.Cv2.Normalize(split(i), split(i), 0, 255, cv.NormTypes.MinMax)
+            Normalize(splitMats(i), splitMats(i), 0, 255, cv.NormTypes.MinMax)
         Next
-        cv.Cv2.Merge(split, img32f)
+        Merge(splitMats, img32f)
         img32f.ConvertTo(dst2, cv.MatType.CV_8UC3)
         For i = 0 To 3 - 1
-            sobel.Run(split(i))
-            split(i) = 255 - sobel.dst2
+            sobel.Run(splitMats(i))
+            splitMats(i) = 255 - sobel.dst2
         Next
-        cv.Cv2.Merge(split, dst2)
+        Merge(splitMats, dst2)
     End Sub
 End Class
 
@@ -502,7 +502,7 @@ Public Class XR_Edge_HSV : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         Dim hsv As New cv.Mat
-        cv.Cv2.CvtColor(src, hsv, cv.ColorConversionCodes.BGR2HSV)
+        CvtColor(src, hsv, cv.ColorConversionCodes.BGR2HSV)
         edges.Run(hsv)
         dst2 = edges.dst2
     End Sub
@@ -626,7 +626,7 @@ Public Class XR_Edge_DepthTiers : Inherits TaskParent
         dst3 = tiers.dst3
 
         Dim _edge_cvt As New cv.Mat
-        cv.Cv2.CvtColor(dst3, _edge_cvt, cv.ColorConversionCodes.BGR2GRAY)
+        CvtColor(dst3, _edge_cvt, cv.ColorConversionCodes.BGR2GRAY)
         edge.Run(_edge_cvt)
         dst2 = edge.dst2
     End Sub
@@ -652,7 +652,7 @@ Public Class Edge_CannyHistory : Inherits TaskParent
         options.Run()
         If src.Channels() <> 1 Then src = task.gray
 
-        cv.Cv2.Canny(src, dst2, options.threshold1, options.threshold2, options.aperture, True)
+        Canny(src, dst2, options.threshold1, options.threshold2, options.aperture, True)
         Static frameList As New List(Of cv.Mat)
         If task.optionsChanged Then frameList.Clear()
         frameList.Add(dst2)
@@ -685,10 +685,10 @@ Public Class Edge_ResizeAdd : Inherits TaskParent
         If src.Channels() <> 1 Then gray = task.gray
         Dim newFrame = gray(New cv.Range(options.vertPixels, gray.Rows - options.vertPixels),
                                 New cv.Range(options.horizPixels, gray.Cols - options.horizPixels))
-        cv.Cv2.Resize(newFrame, newFrame, gray.Size(), 0, 0, cv.InterpolationFlags.Nearest)
-        cv.Cv2.Absdiff(gray, newFrame, dst2)
-        cv.Cv2.Threshold(dst2, dst2, options1.pixelDiffThreshold, 255, cv.ThresholdTypes.Binary)
-        cv.Cv2.Add(gray, dst2, dst3)
+        Resize(newFrame, newFrame, gray.Size(), 0, 0, cv.InterpolationFlags.Nearest)
+        Absdiff(gray, newFrame, dst2)
+        Threshold(dst2, dst2, options1.pixelDiffThreshold, 255, cv.ThresholdTypes.Binary)
+        Add(gray, dst2, dst3)
     End Sub
 End Class
 
@@ -722,9 +722,9 @@ Public Class Edge_SobelCustomV : Inherits TaskParent
         desc = "Show Sobel edge detection a custom vertical kernel"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        cv.Cv2.Filter2D(src, dst1, cv.MatType.CV_32F, cv.Mat.FromPixelData(3, 3, cv.MatType.CV_32FC1, New Single() {1, 0, -1, 2, 0, -2, 1, 0, -1}))
+        Filter2D(src, dst1, cv.MatType.CV_32F, cv.Mat.FromPixelData(3, 3, cv.MatType.CV_32FC1, New Single() {1, 0, -1, 2, 0, -2, 1, 0, -1}))
         dst1.ConvertTo(dst2, src.Type)
-        cv.Cv2.Filter2D(src, dst1, cv.MatType.CV_32F, cv.Mat.FromPixelData(3, 3, cv.MatType.CV_32FC1, New Single() {3, 0, -3, 10, 0, -10, 3, 0, -3}))
+        Filter2D(src, dst1, cv.MatType.CV_32F, cv.Mat.FromPixelData(3, 3, cv.MatType.CV_32FC1, New Single() {3, 0, -3, 10, 0, -10, 3, 0, -3}))
         dst1.ConvertTo(dst3, src.Type)
     End Sub
 End Class
@@ -741,9 +741,9 @@ Public Class Edge_SobelCustomH : Inherits TaskParent
         desc = "Show Sobel edge detection a custom horizontal kernel"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        cv.Cv2.Filter2D(src, dst1, cv.MatType.CV_32F, cv.Mat.FromPixelData(3, 3, cv.MatType.CV_32FC1, New Single() {1, 2, 1, 0, 0, 0, -1, -2, -1}))
+        Filter2D(src, dst1, cv.MatType.CV_32F, cv.Mat.FromPixelData(3, 3, cv.MatType.CV_32FC1, New Single() {1, 2, 1, 0, 0, 0, -1, -2, -1}))
         dst1.ConvertTo(dst2, src.Type)
-        cv.Cv2.Filter2D(src, dst1, cv.MatType.CV_32F, cv.Mat.FromPixelData(3, 3, cv.MatType.CV_32FC1, New Single() {3, 10, 3, 0, 0, 0, -3, -10, -3}))
+        Filter2D(src, dst1, cv.MatType.CV_32F, cv.Mat.FromPixelData(3, 3, cv.MatType.CV_32FC1, New Single() {3, 10, 3, 0, 0, 0, -3, -10, -3}))
         dst1.ConvertTo(dst3, src.Type)
     End Sub
 End Class
@@ -866,7 +866,7 @@ Public Class XR_Edge_RedCloud : Inherits TaskParent
         labels(3) = redC.labels(2)
 
         Dim _edges_cvt As New cv.Mat
-        cv.Cv2.CvtColor(redC.dst2, _edges_cvt, cv.ColorConversionCodes.BGR2GRAY)
+        CvtColor(redC.dst2, _edges_cvt, cv.ColorConversionCodes.BGR2GRAY)
         edges.Run(_edges_cvt)
         mats.mat(2) = edges.dst2
 
@@ -1050,10 +1050,10 @@ Public Class XR_Edge_LaplacianColor : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
 
-        cv.Cv2.GaussianBlur(dst2, dst2, New cv.Size(options.gaussiankernelSize, options.gaussiankernelSize), 0, 0)
-        cv.Cv2.Laplacian(dst2, dst2, cv.MatType.CV_8U, options.LaplaciankernelSize, 1, 0)
-        cv.Cv2.ConvertScaleAbs(dst2, dst2)
-        cv.Cv2.Threshold(dst2, dst2, options.threshold, 255, cv.ThresholdTypes.Binary)
+        GaussianBlur(dst2, dst2, New cv.Size(options.gaussiankernelSize, options.gaussiankernelSize), 0, 0)
+        Laplacian(dst2, dst2, cv.MatType.CV_8U, options.LaplaciankernelSize, 1, 0)
+        ConvertScaleAbs(dst2, dst2)
+        Threshold(dst2, dst2, options.threshold, 255, cv.ThresholdTypes.Binary)
     End Sub
 End Class
 
@@ -1072,9 +1072,9 @@ Public Class Edge_Laplacian : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
         If src.Channels <> 1 Then src = task.gray
-        cv.Cv2.Laplacian(src, dst2, cv.MatType.CV_8U, options.LaplaciankernelSize, 1, 0)
-        cv.Cv2.ConvertScaleAbs(dst2, dst2)
-        cv.Cv2.Threshold(dst2, dst2, options.threshold, 255, cv.ThresholdTypes.Binary)
+        Laplacian(src, dst2, cv.MatType.CV_8U, options.LaplaciankernelSize, 1, 0)
+        ConvertScaleAbs(dst2, dst2)
+        Threshold(dst2, dst2, options.threshold, 255, cv.ThresholdTypes.Binary)
     End Sub
 End Class
 
@@ -1151,8 +1151,8 @@ Public Class XR_Edge_DericheFiltered : Inherits TaskParent
         dst3 = deriche.dst2
         labels(3) = deriche.labels(2)
 
-        cv.Cv2.CvtColor(dst3, dst1, cv.ColorConversionCodes.BGR2GRAY)
-        cv.Cv2.Threshold(dst1, dst2, deriche.options.threshold, 255, cv.ThresholdTypes.Binary)
+        CvtColor(dst3, dst1, cv.ColorConversionCodes.BGR2GRAY)
+        Threshold(dst1, dst2, deriche.options.threshold, 255, cv.ThresholdTypes.Binary)
 
         labels(2) = "All edges above the " + CStr(deriche.options.threshold) + " threshold in the grayscale copy of dst2"
     End Sub
@@ -1190,14 +1190,14 @@ Public Class XR_Edge_SobelQT : Inherits TaskParent
         desc = "Show Sobel vertical and horizontal edge detection no options."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        cv.Cv2.Sobel(task.gray, dst0, cv.MatType.CV_32F, 1, 0, 3)
-        cv.Cv2.Sobel(task.gray, dst1, cv.MatType.CV_32F, 0, 1, 3)
+        Sobel(task.gray, dst0, cv.MatType.CV_32F, 1, 0, 3)
+        Sobel(task.gray, dst1, cv.MatType.CV_32F, 0, 1, 3)
 
         Dim diagonal As New cv.Mat
-        cv.Cv2.Sobel(task.gray, diagonal, cv.MatType.CV_32F, 1, 1, 3)
+        Sobel(task.gray, diagonal, cv.MatType.CV_32F, 1, 1, 3)
 
         dst2 = (dst1 + dst0 + diagonal).ToMat
-        cv.Cv2.ConvertScaleAbs(dst2, dst2)
+        ConvertScaleAbs(dst2, dst2)
     End Sub
 End Class
 
@@ -1262,10 +1262,10 @@ Public Class XR_Edge_Stability : Inherits TaskParent
         Dim pops As New List(Of Integer)
         For i = 0 To gEdges.featureRects.Count - 1
             Dim roi = gEdges.featureRects(i)
-            Dim pop = cv.Cv2.CountNonZero(dst2(roi))
+            Dim pop = CountNonZero(dst2(roi))
             pops.Add(pop)
             popSorted.Add(pop, i)
-            cv.Cv2.Rectangle(dst2, roi, cv.Scalar.All(255), task.lineWidth)
+            Rectangle(dst2, roi, cv.Scalar.All(255), task.lineWidth)
         Next
 
         Dim popAverage = If(pops.Count > 0, pops.Average, 0)
@@ -1278,13 +1278,13 @@ Public Class XR_Edge_Stability : Inherits TaskParent
             Dim index = pops.IndexOf(pops.Max)
             Dim gSize = task.gridWH
             Dim pt = New cv.Point(gEdges.featureRects(index).X + gSize / 2, gEdges.featureRects(index).Y + gSize / 2)
-            cv.Cv2.Circle(dst2, pt, gSize * 1.5, 255, task.lineWidth * 2)
+            Circle(dst2, pt, gSize * 1.5, 255, task.lineWidth * 2)
 
             dst3.SetTo(0)
-            cv.Cv2.Circle(dst3, pt, gSize * 1.5, 255, task.lineWidth * 2)
+            Circle(dst3, pt, gSize * 1.5, 255, task.lineWidth * 2)
             Dim count As Integer
             For Each index In popSorted.Values
-            cv.Cv2.Rectangle(dst3, gEdges.featureRects(index), white, task.lineWidth)
+            Rectangle(dst3, gEdges.featureRects(index), white, task.lineWidth)
                 count += 1
                 If count >= 20 Then Exit For
             Next
@@ -1317,7 +1317,7 @@ Public Class XR_Edge_LeftRightDepth : Inherits TaskParent
 
         Dim r = New cv.Rect(lp.p1.X, lp.p1.Y, dst2.Width, 1)
         Dim tmp As New cv.Mat
-        cv.Cv2.FindNonZero(dst2(r), tmp)
+        FindNonZero(dst2(r), tmp)
 
         ptLeft.Clear()
         For i = 0 To tmp.Rows - 1
@@ -1329,7 +1329,7 @@ Public Class XR_Edge_LeftRightDepth : Inherits TaskParent
             End If
         Next
 
-        cv.Cv2.FindNonZero(dst2(r), tmp)
+        FindNonZero(dst2(r), tmp)
 
         ptRight.Clear()
         For i = 0 To tmp.Rows - 1
@@ -1368,22 +1368,22 @@ Public Class XR_Edge_LeftRightBrick : Inherits TaskParent
             If brick.depth = 0 Then Continue For
             If brick.rRect.X < 0 Or brick.rRect.X + brick.rRect.Width >= dst2.Width Then Continue For
             If brick.rRect.Width = 0 Or brick.rRect.Height = 0 Then Continue For
-            If cv.Cv2.CountNonZero(dst2(brick.lRect)) And cv.Cv2.CountNonZero(dst3(brick.rRect)) Then
-            cv.Cv2.Rectangle(dst2, brick.lRect, white, task.lineWidth)
-            cv.Cv2.Rectangle(dst3, brick.rRect, white, task.lineWidth)
+            If CountNonZero(dst2(brick.lRect)) And CountNonZero(dst3(brick.rRect)) Then
+            Rectangle(dst2, brick.lRect, white, task.lineWidth)
+            Rectangle(dst3, brick.rRect, white, task.lineWidth)
                 count += 1
             End If
         Next
 
-        cv.Cv2.CvtColor(dst2, dst2, cv.ColorConversionCodes.GRAY2BGR)
-        cv.Cv2.CvtColor(dst3, dst3, cv.ColorConversionCodes.GRAY2BGR)
+        CvtColor(dst2, dst2, cv.ColorConversionCodes.GRAY2BGR)
+        CvtColor(dst3, dst3, cv.ColorConversionCodes.GRAY2BGR)
 
         Dim index = task.gridMap.Get(Of Integer)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
         brick = bricks.brickList(index)
         SetTrueText(brick.displayCell, 1)
-        cv.Cv2.Rectangle(dst2, brick.lRect, task.highlight, task.lineWidth + 1)
-        cv.Cv2.Rectangle(dst3, brick.rRect, task.highlight, task.lineWidth + 1)
-        cv.Cv2.Rectangle(task.color, brick.lRect, task.highlight, task.lineWidth)
+        Rectangle(dst2, brick.lRect, task.highlight, task.lineWidth + 1)
+        Rectangle(dst3, brick.rRect, task.highlight, task.lineWidth + 1)
+        Rectangle(task.color, brick.lRect, task.highlight, task.lineWidth)
 
         labels(2) = CStr(count) + " (of " + CStr(bricks.brickList.Count) +
                             ") bricks had edges and depth in the left image.  " +
@@ -1541,7 +1541,7 @@ Public Class Edge_Canny : Inherits TaskParent
         options.Run()
         If src.Channels() <> 1 Then src = task.gray
         If src.Type() <> cv.MatType.CV_8UC1 Then src.ConvertTo(src, cv.MatType.CV_8U)
-        cv.Cv2.Canny(src, dst2, options.threshold1, options.threshold2, options.aperture, True)
+        Canny(src, dst2, options.threshold1, options.threshold2, options.aperture, True)
 
         If standaloneTest() Then
             dst3.SetTo(0)
@@ -1590,12 +1590,12 @@ Public Class Edge_SobelNaive : Inherits TaskParent
         dst0.SetTo(0)
         dst1.SetTo(0)
 
-        If options.horizontalDerivative Then cv.Cv2.Sobel(src, dst0, cv.MatType.CV_32F, 0, 1, options.kernelSize)
-        If options.verticalDerivative Then cv.Cv2.Sobel(src, dst1, cv.MatType.CV_32F, 1, 0, options.kernelSize)
+        If options.horizontalDerivative Then Sobel(src, dst0, cv.MatType.CV_32F, 0, 1, options.kernelSize)
+        If options.verticalDerivative Then Sobel(src, dst1, cv.MatType.CV_32F, 1, 0, options.kernelSize)
 
         dst2 = (dst1 + dst0).ToMat
-        cv.Cv2.ConvertScaleAbs(dst2, dst2)
-        cv.Cv2.Threshold(dst2, dst3, 50, 255, cv.ThresholdTypes.Binary)
+        ConvertScaleAbs(dst2, dst2)
+        Threshold(dst2, dst3, 50, 255, cv.ThresholdTypes.Binary)
     End Sub
 End Class
 
@@ -1614,7 +1614,7 @@ Public Class Edge_SobelHorizontal : Inherits TaskParent
         Static thresholdSlider = OptionParent.FindSlider("Sobel Intensity Threshold")
         edges.Run(src)
 
-        cv.Cv2.Threshold(edges.dst2, dst2, thresholdSlider.Value, 255, cv.ThresholdTypes.Binary)
+        Threshold(edges.dst2, dst2, thresholdSlider.Value, 255, cv.ThresholdTypes.Binary)
     End Sub
 End Class
 
@@ -1631,7 +1631,7 @@ Public Class Edge_SobelVertical : Inherits TaskParent
         Static thresholdSlider = OptionParent.FindSlider("Sobel Intensity Threshold")
         edges.Run(src)
 
-        cv.Cv2.Threshold(edges.dst2, dst2, thresholdSlider.Value, 255, cv.ThresholdTypes.Binary)
+        Threshold(edges.dst2, dst2, thresholdSlider.Value, 255, cv.ThresholdTypes.Binary)
     End Sub
 End Class
 
@@ -1646,9 +1646,9 @@ Public Class Edge_SobelH : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If src.Channels() <> 1 Then src = task.gray
-        cv.Cv2.Sobel(src, dst2, cv.MatType.CV_32F, 1, 0, 3)
-        cv.Cv2.ConvertScaleAbs(dst2, dst2)
-        cv.Cv2.Threshold(dst2, dst3, 50, 255, cv.ThresholdTypes.Binary)
+        Sobel(src, dst2, cv.MatType.CV_32F, 1, 0, 3)
+        ConvertScaleAbs(dst2, dst2)
+        Threshold(dst2, dst3, 50, 255, cv.ThresholdTypes.Binary)
     End Sub
 End Class
 
@@ -1661,9 +1661,9 @@ Public Class Edge_SobelV : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If src.Channels() <> 1 Then src = task.gray
-        cv.Cv2.Sobel(src, dst2, cv.MatType.CV_32F, 1, 0, 3)
-        cv.Cv2.ConvertScaleAbs(dst2, dst2)
-        cv.Cv2.Threshold(dst2, dst3, 50, 255, cv.ThresholdTypes.Binary)
+        Sobel(src, dst2, cv.MatType.CV_32F, 1, 0, 3)
+        ConvertScaleAbs(dst2, dst2)
+        Threshold(dst2, dst3, 50, 255, cv.ThresholdTypes.Binary)
     End Sub
 End Class
 
@@ -1677,13 +1677,13 @@ Public Class Edge_Sobel : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If src.Channels() <> 1 Then src = task.gray
-        cv.Cv2.Sobel(src, dst0, cv.MatType.CV_32F, 1, 0, kernelSize)
-        cv.Cv2.ConvertScaleAbs(dst0, dst0)
-        cv.Cv2.Threshold(dst0, dst2, 50, 255, cv.ThresholdTypes.Binary)
+        Sobel(src, dst0, cv.MatType.CV_32F, 1, 0, kernelSize)
+        ConvertScaleAbs(dst0, dst0)
+        Threshold(dst0, dst2, 50, 255, cv.ThresholdTypes.Binary)
 
-        cv.Cv2.Sobel(src, dst0, cv.MatType.CV_32F, 0, 1, kernelSize)
-        cv.Cv2.ConvertScaleAbs(dst0, dst0)
-        cv.Cv2.Threshold(dst2 Or dst0, dst2, 50, 255, cv.ThresholdTypes.Binary)
+        Sobel(src, dst0, cv.MatType.CV_32F, 0, 1, kernelSize)
+        ConvertScaleAbs(dst0, dst0)
+        Threshold(dst2 Or dst0, dst2, 50, 255, cv.ThresholdTypes.Binary)
     End Sub
 End Class
 
@@ -1700,7 +1700,7 @@ Public Class XR_Edge_Color8U : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         color8u.Run(src)
-        cv.Cv2.CvtColor(color8u.dst3, dst2, cv.ColorConversionCodes.BGR2GRAY)
+        CvtColor(color8u.dst3, dst2, cv.ColorConversionCodes.BGR2GRAY)
 
         edges.Run(dst2)
         dst3 = edges.dst2
@@ -1722,7 +1722,7 @@ Public Class Edge_RedEdges : Inherits TaskParent
         color8u.Run(task.gray)
 
         Dim _edges_cvt As New cv.Mat
-        cv.Cv2.CvtColor(color8u.dst3, _edges_cvt, cv.ColorConversionCodes.BGR2GRAY)
+        CvtColor(color8u.dst3, _edges_cvt, cv.ColorConversionCodes.BGR2GRAY)
         edges.Run(_edges_cvt)
         dst2 = edges.dst2
 

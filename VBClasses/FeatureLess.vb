@@ -20,7 +20,7 @@ Public Class FeatureLess_Basics_TA : Inherits TaskParent
             If val1 = 255 And val2 > 0 Then
                 index = val2
                 Dim flags = cv.FloodFillFlags.FixedRange Or (index << 8)
-                Dim count = cv.Cv2.FloodFill(input, mask, r.TopLeft, index, rect, 0, 0, flags)
+                Dim count = FloodFill(input, mask, r.TopLeft, index, rect, 0, 0, flags)
                 regions.Add(count, ValidateRect(rect))
                 indexList.Add(count, index)
             End If
@@ -34,7 +34,7 @@ Public Class FeatureLess_Basics_TA : Inherits TaskParent
             Dim val = input.Get(Of Byte)(r.Y, r.X)
             If val = 255 Then
                 Dim flags = cv.FloodFillFlags.FixedRange Or (index << 8)
-                Dim count = cv.Cv2.FloodFill(input, mask, r.TopLeft, index, rect, 0, 0, flags)
+                Dim count = FloodFill(input, mask, r.TopLeft, index, rect, 0, 0, flags)
                 regions.Add(count, ValidateRect(rect))
                 indexList.Add(count, index)
                 index += 1
@@ -46,7 +46,7 @@ Public Class FeatureLess_Basics_TA : Inherits TaskParent
         brickList.Clear()
         dst1.SetTo(0)
         For Each r In task.gridRects
-If cv.Cv2.CountNonZero(task.edges.dst2(r)) = 0 Then
+If CountNonZero(task.edges.dst2(r)) = 0 Then
                 dst1(r).SetTo(255)
                 brickList.Add(r)
             End If
@@ -60,7 +60,7 @@ If cv.Cv2.CountNonZero(task.edges.dst2(r)) = 0 Then
         For Each r In task.gridRects
             If dst3(r).Get(Of Byte)(0, 0) = 255 Then
                 Dim flags = cv.FloodFillFlags.FixedRange Or (index << 8)
-                Dim count = cv.Cv2.FloodFill(dst3, mask, r.TopLeft, index, rect, 0, 0, flags)
+                Dim count = FloodFill(dst3, mask, r.TopLeft, index, rect, 0, 0, flags)
                 regions.Add(count, ValidateRect(rect))
                 indexList.Add(count, index)
                 index += 1
@@ -90,7 +90,7 @@ Public Class XR_FeatureLess_BasicsOld : Inherits TaskParent
             Dim val = input.Get(Of Byte)(r.Y, r.X)
             If val = 255 Then
                 Dim flags = cv.FloodFillFlags.FixedRange Or (index << 8)
-                Dim count = cv.Cv2.FloodFill(input, mask, r.TopLeft, index, rect, 0, 0, flags)
+                Dim count = FloodFill(input, mask, r.TopLeft, index, rect, 0, 0, flags)
                 index += 1
             End If
         Next
@@ -104,7 +104,7 @@ Public Class XR_FeatureLess_BasicsOld : Inherits TaskParent
         brickList.Clear()
         For i = 0 To task.gridRects.Count - 1
             Dim r = task.gridRects(i)
-If cv.Cv2.CountNonZero(task.edges.dst2(r)) > 0 Then Continue For
+If CountNonZero(task.edges.dst2(r)) > 0 Then Continue For
             dst1(r).SetTo(255)
             brickList.Add(r)
         Next
@@ -134,7 +134,7 @@ Public Class XR_FeatureLess_Basics : Inherits TaskParent
         brickList.Clear()
         For i = 0 To task.gridRects.Count - 1
             Dim r = task.gridRects(i)
-If cv.Cv2.CountNonZero(task.edges.dst2(r)) > 0 Then Continue For
+If CountNonZero(task.edges.dst2(r)) > 0 Then Continue For
             dst1(r).SetTo(255)
             brickList.Add(r)
         Next
@@ -143,7 +143,7 @@ If cv.Cv2.CountNonZero(task.edges.dst2(r)) > 0 Then Continue For
         redC.Run(dst1.Clone)
         dst2 = redC.dst2
 
-        cv.Cv2.InRange(dst1, 0, 0, dst0)
+        InRange(dst1, 0, 0, dst0)
         dst2.SetTo(0, dst0)
 
         labels(2) = CStr(brickList.Count) + " featureless grid rects"
@@ -169,7 +169,7 @@ Public Class XR_FeatureLess_BasicsRedC : Inherits TaskParent
         brickList.Clear()
         For i = 0 To task.gridRects.Count - 1
             Dim r = task.gridRects(i)
-If cv.Cv2.CountNonZero(task.edges.dst2(r)) > 0 Then Continue For
+If CountNonZero(task.edges.dst2(r)) > 0 Then Continue For
             dst1(r).SetTo(255)
             brickList.Add(r)
         Next
@@ -178,7 +178,7 @@ If cv.Cv2.CountNonZero(task.edges.dst2(r)) > 0 Then Continue For
         redC.Run(dst1.Clone)
         dst2 = redC.dst2
 
-        cv.Cv2.InRange(dst1, 0, 0, dst0)
+        InRange(dst1, 0, 0, dst0)
         dst2.SetTo(0, dst0)
 
         labels(2) = CStr(brickList.Count) + " featureless grid rects"
@@ -213,7 +213,7 @@ Public Class XR_FeatureLess_BasicsTest : Inherits TaskParent
                     index = regionIndex
                 End If
                 Dim flags = cv.FloodFillFlags.FixedRange Or (index << 8)
-                Dim count = cv.Cv2.FloodFill(input, mask, r.TopLeft, index, rect, 0, 0, flags)
+                Dim count = FloodFill(input, mask, r.TopLeft, index, rect, 0, 0, flags)
                 usedColors.Add(index)
             End If
         Next
@@ -226,7 +226,7 @@ Public Class XR_FeatureLess_BasicsTest : Inherits TaskParent
         brickList.Clear()
         For i = 0 To task.gridRects.Count - 1
             Dim r = task.gridRects(i)
-If cv.Cv2.CountNonZero(task.edges.dst2(r)) > 0 Then Continue For
+If CountNonZero(task.edges.dst2(r)) > 0 Then Continue For
             dst1(r).SetTo(255)
             brickList.Add(r)
         Next
@@ -270,7 +270,7 @@ Public Class XR_FeatureLess_Depth : Inherits TaskParent
                 Dim mm = GetMinMax(src(r))
                 If mm.range < options.fLessThreshold Then
                     dst2(r).SetTo(255)
-                    cv.Cv2.Rectangle(dst3, r, white, task.lineWidth)
+                    Rectangle(dst3, r, white, task.lineWidth)
                     fLessList.Add(r)
                 End If
             Next
@@ -384,7 +384,7 @@ Public Class XR_FeatureLess_Correlation : Inherits TaskParent
         If src.Channels <> 1 Then input = task.gray Else input = src
 
         ' why do this resize?  Because the options.flessThreshold works at smallRes but not larger resolutions.
-        If task.workRes.Height > 270 Then cv.Cv2.Resize(input, input, task.smallRes, 0, 0, cv.InterpolationFlags.Nearest)
+        If task.workRes.Height > 270 Then Resize(input, input, task.smallRes, 0, 0, cv.InterpolationFlags.Nearest)
 
         Dim mask As New cv.Mat(input.Size, cv.MatType.CV_8U, 0)
         For Each r In smallGrid.gridRects
@@ -393,7 +393,7 @@ Public Class XR_FeatureLess_Correlation : Inherits TaskParent
             If mm.range < options.fLessThreshold Then mask(r).SetTo(255)
         Next
 
-        cv.Cv2.Resize(mask, dst2, src.Size, 0, 0, cv.InterpolationFlags.Nearest)
+        Resize(mask, dst2, src.Size, 0, 0, cv.InterpolationFlags.Nearest)
 
         fLessList.Clear()
         For Each r In task.gridRects
@@ -403,7 +403,7 @@ Public Class XR_FeatureLess_Correlation : Inherits TaskParent
         If standaloneTest() Then
             dst3 = task.gray.Clone
             For Each r In fLessList
-            cv.Cv2.Rectangle(dst3, r, white, task.lineWidth)
+            Rectangle(dst3, r, white, task.lineWidth)
             Next
 
             Dim index = task.gridMap.Get(Of Integer)(task.clickPoint.Y, task.clickPoint.X)
@@ -439,7 +439,7 @@ Public Class XR_FeatureLess_Correlations : Inherits TaskParent
             Dim r = task.gridRects(i)
             If corr.cList(i) < corr.maxCorrelation Then
                 dst2(r).SetTo(255)
-            If standaloneTest() Then cv.Cv2.Rectangle(src, r, white, task.lineWidth)
+            If standaloneTest() Then Rectangle(src, r, white, task.lineWidth)
             End If
         Next
     End Sub
@@ -487,7 +487,7 @@ Public Class XR_FeatureLess_Sobel : Inherits TaskParent
         options.Run()
 
         edges.Run(src)
-        cv.Cv2.Threshold(Not edges.dst2, dst2, options.distanceThreshold, 255, cv.ThresholdTypes.Binary)
+        Threshold(Not edges.dst2, dst2, options.distanceThreshold, 255, cv.ThresholdTypes.Binary)
     End Sub
 End Class
 
@@ -507,7 +507,7 @@ Public Class XR_FeatureLess_UniquePixels : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         fless.Run(src)
-        cv.Cv2.CvtColor(fless.dst2, dst2, cv.ColorConversionCodes.BGR2GRAY)
+        CvtColor(fless.dst2, dst2, cv.ColorConversionCodes.BGR2GRAY)
         sort.Run(dst2)
         dst3 = sort.dst2
     End Sub
@@ -527,7 +527,7 @@ Public Class XR_FeatureLess_Unique3Pixels : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         fLessTopX.Run(src)
-        cv.Cv2.CvtColor(fLessTopX.dst2, dst2, cv.ColorConversionCodes.BGR2GRAY)
+        CvtColor(fLessTopX.dst2, dst2, cv.ColorConversionCodes.BGR2GRAY)
 
         sort3.Run(fLessTopX.dst2)
         dst3 = sort3.dst2
@@ -580,7 +580,7 @@ Public Class XR_FeatureLess_DCT : Inherits TaskParent
             For x = 0 To mask.Cols - 1
                 If mask.Get(Of Byte)(y, x) = 255 Then
                     Dim pt As New cv.Point(x, y)
-                    Dim floodCount = cv.Cv2.FloodFill(mask, pt, regionCount)
+                    Dim floodCount = FloodFill(mask, pt, regionCount)
                     objectSize.Add(floodCount)
                     regionCount += 1
                 End If
@@ -597,8 +597,8 @@ Public Class XR_FeatureLess_DCT : Inherits TaskParent
 
         Dim label As New cv.Mat
 
-        cv.Cv2.InRange(mask, maxIndex + 1, maxIndex + 1, label)
-        Dim nonZ = cv.Cv2.CountNonZero(label)
+        InRange(mask, maxIndex + 1, maxIndex + 1, label)
+        Dim nonZ = CountNonZero(label)
         labels(3) = "Largest FeatureLess Region (" + CStr(nonZ) + " " + (nonZ / label.Total).ToString("#0.0%") + " pixels)"
         dst3.SetTo(white, label)
     End Sub
@@ -620,13 +620,13 @@ Public Class XR_FeatureLess_History : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         fLess.Run(task.grayOriginal)
 
-        cv.Cv2.Threshold(fLess.dst2, dst2, 0, 255, cv.ThresholdTypes.Binary)
+        Threshold(fLess.dst2, dst2, 0, 255, cv.ThresholdTypes.Binary)
 
         frames.Run(dst2)
         dst3 = frames.dst2
 
-        Dim countCurr = cv.Cv2.CountNonZero(dst2)
-        Dim countAll = cv.Cv2.CountNonZero(dst3)
+        Dim countCurr = CountNonZero(dst2)
+        Dim countAll = CountNonZero(dst3)
         Dim sqPixels = task.gridWH * task.gridWH
         labels(2) = "Current frame: " + (countCurr / sqPixels).ToString(fmt0) + " grid squares and " +
                         (countAll / sqPixels).ToString(fmt0) + " of all grid squares."
@@ -709,7 +709,7 @@ Public Class XR_FeatureLess_Lines : Inherits TaskParent
         task.lines.dst1.CopyTo(dst1, fLess.dst2)
 
         Dim histogram As New cv.Mat
-        cv.Cv2.CalcHist({dst1}, {0}, New cv.Mat, histogram, 1, {256}, ranges)
+        CalcHist({dst1}, {0}, New cv.Mat, histogram, 1, {256}, ranges)
 
         Dim histArray(histogram.Rows - 1) As Single
         histogram.GetArray(Of Single)(histArray)
@@ -719,7 +719,7 @@ Public Class XR_FeatureLess_Lines : Inherits TaskParent
         For i = 1 To Math.Min(task.lines.lpList.Count, histArray.Count) - 1
             If histArray(i) > 0 Then
                 Dim lp = task.lines.lpList(i)
-                cv.Cv2.Line(dst3, lp.p1, lp.p2, lp.color, task.lineWidth, task.lineType)
+                Line(dst3, lp.p1, lp.p2, lp.color, task.lineWidth, task.lineType)
                 lpList.Add(lp)
             End If
         Next
@@ -755,7 +755,7 @@ Public Class FeatureLess_Cells : Inherits TaskParent
         For Each r In fLess.fLessList
             Dim val = dst2.Get(Of Byte)(r.Y, r.X)
             If val = 255 Then
-                Dim count = cv.Cv2.FloodFill(dst2, mask, r.TopLeft, index, rect, 0, 0, flags)
+                Dim count = FloodFill(dst2, mask, r.TopLeft, index, rect, 0, 0, flags)
                 countList.Add(count, index)
                 index += 1
             End If
@@ -816,11 +816,11 @@ Public Class XR_FeatureLess_FeaturesOld : Inherits TaskParent
         feat.Run(dst2)
 
         For Each pt In feat.features
-        cv.Cv2.Circle(dst2, pt, task.DotSize + 2, task.highlight, -1)
+        Circle(dst2, pt, task.DotSize + 2, task.highlight, -1)
         Next
 
         For Each lp In task.lines.lpList
-            cv.Cv2.Line(dst2, lp.p1, lp.p2, black, task.lineWidth)
+            Line(dst2, lp.p1, lp.p2, black, task.lineWidth)
         Next
         Dim count = task.gridRects.Count - fLess.brickList.Count
         labels(2) = "Current frame: " + CStr(count) + " grid squares had features"
@@ -856,18 +856,18 @@ Public Class FeatureLess_FeatureLines : Inherits TaskParent
                 Dim val2 = dst1.Get(Of Byte)(p2.Y, p2.X)
                 If val1 = 255 And val2 = 0 Then
                     ' line present?
-If cv.Cv2.CountNonZero(task.lines.dst3(r2)) Then
+If CountNonZero(task.lines.dst3(r2)) Then
                         task.lines.dst0(r2).CopyTo(dst1(r2))
-                                                  cv.Cv2.InRange(dst3(r2), 0, 0, dst3(r2))
+                                                  InRange(dst3(r2), 0, 0, dst3(r2))
                         dst3(r2).SetTo(0, task.lines.dst3(r2))
                     End If
                 End If
 
                 If val1 = 0 And val2 = 255 Then
                     ' line present?
-If cv.Cv2.CountNonZero(task.lines.dst3(r1)) Then
+If CountNonZero(task.lines.dst3(r1)) Then
                         task.lines.dst0(r1).CopyTo(dst1(r1))
-                                                  cv.Cv2.InRange(dst3(r1), 0, 0, dst3(r1))
+                                                  InRange(dst3(r1), 0, 0, dst3(r1))
                         dst3(r1).SetTo(0, task.lines.dst3(r1))
                     End If
                 End If
@@ -882,7 +882,7 @@ If cv.Cv2.CountNonZero(task.lines.dst3(r1)) Then
         Next
 
         For Each lp In task.lines.lpList
-            cv.Cv2.Line(dst2, lp.p1, lp.p2, black, task.lineWidth)
+            Line(dst2, lp.p1, lp.p2, black, task.lineWidth)
         Next
         Dim count = task.gridRects.Count - fLess.brickList.Count
         labels(2) = "Current frame: " + CStr(count) + " grid squares had features"
@@ -990,7 +990,7 @@ Public Class FeatureLess_ClusterFlood : Inherits TaskParent
             Dim r = task.gridRects(i)
             Dim val = dst2.Get(Of Byte)(r.TopLeft.Y, r.TopLeft.X)
             If val = 255 Then
-                Dim floodCount = cv.Cv2.FloodFill(dst2, r.TopLeft, floodPoints.Count + 1)
+                Dim floodCount = FloodFill(dst2, r.TopLeft, floodPoints.Count + 1)
                 floodPoints.Add(r.TopLeft)
                 If floodPoints.Count >= 254 Then Exit For
             End If
@@ -1004,8 +1004,8 @@ Public Class FeatureLess_ClusterFlood : Inherits TaskParent
 
             If clusterID > 0 Then
                 dst0 = dst2.Clone
-                cv.Cv2.FloodFill(dst0, task.clickPoint, 255)
-                cv.Cv2.Threshold(dst0, dst0, 254, 255, cv.ThresholdTypes.Binary)
+                FloodFill(dst0, task.clickPoint, 255)
+                Threshold(dst0, dst0, 254, 255, cv.ThresholdTypes.Binary)
                 task.color.SetTo(white, dst0)
             End If
         End If
@@ -1029,7 +1029,7 @@ Public Class XR_FeatureLess_Predict : Inherits TaskParent
     End Sub
     Public Function backProjectHist(histogram As cv.Mat, histInput As cv.Mat, edgeCounts As List(Of Integer)) As Single()
         Dim backP As New cv.Mat
-        cv.Cv2.CalcBackProject({histInput}, {0, 1}, histogram, backP, ranges)
+        CalcBackProject({histInput}, {0, 1}, histogram, backP, ranges)
         ReDim bpArray(histogram.Rows * histogram.Cols - 1)
         backP.GetArray(Of Single)(bpArray)
 
@@ -1052,11 +1052,11 @@ Public Class XR_FeatureLess_Predict : Inherits TaskParent
         Dim edgeCounts As New List(Of Integer)
         Dim index As Integer
         For Each r In task.gridRects
-            Dim edgeCount = cv.Cv2.CountNonZero(task.edges.dst2(r))
+            Dim edgeCount = CountNonZero(task.edges.dst2(r))
             edgeCounts.Add(edgeCount)
 
-            flat(index) = cv.Cv2.Mean(src(r))(0)
-            flat(index + 1) = cv.Cv2.Mean(task.pcSplit(2)(r), task.depthmask(r))(0)
+            flat(index) = Mean(src(r))(0)
+            flat(index + 1) = Mean(task.pcSplit(2)(r), task.depthmask(r))(0)
             If edgeCount = 0 Then
                 colorDepth.Add(flat(index))
                 colorDepth.Add(flat(index + 1))
@@ -1076,9 +1076,9 @@ Public Class XR_FeatureLess_Predict : Inherits TaskParent
             Dim histogram As New cv.Mat
             Dim histInput = cv.Mat.FromPixelData(colorDepth.Count / 2, 1, cv.MatType.CV_32FC2, colorDepth.ToArray)
             Dim bins = task.histogramBins
-            cv.Cv2.CalcHist({histInput}, {0, 1}, New cv.Mat(), histogram, 2, {bins, bins}, ranges)
+            CalcHist({histInput}, {0, 1}, New cv.Mat(), histogram, 2, {bins, bins}, ranges)
 
-            cv.Cv2.Threshold(histogram, histogram, 0, 255, cv.ThresholdTypes.Binary)
+            Threshold(histogram, histogram, 0, 255, cv.ThresholdTypes.Binary)
 
             Dim floodIndex As Integer = 1
             For y = 0 To histogram.Height - 1
@@ -1086,7 +1086,7 @@ Public Class XR_FeatureLess_Predict : Inherits TaskParent
                     Dim pt = New cv.Point(x, y)
                     Dim val = histogram.Get(Of Single)(y, x)
                     If val = 255 Then
-                        cv.Cv2.FloodFill(histogram, pt, floodIndex)
+                        FloodFill(histogram, pt, floodIndex)
                         floodIndex += 1
                         If floodIndex >= 254 Then Exit For
                     End If
@@ -1149,13 +1149,13 @@ Public Class FeatureLess_Features : Inherits TaskParent
         For Each r In task.gridRects
             If dst2.Get(Of Byte)(r.TopLeft.Y, r.TopLeft.X) = 255 Then
                 Dim flags = cv.FloodFillFlags.FixedRange Or (index << 8)
-                Dim Count = cv.Cv2.FloodFill(dst2, mask, r.TopLeft, index, rect, 0, 0, flags)
+                Dim Count = FloodFill(dst2, mask, r.TopLeft, index, rect, 0, 0, flags)
                 Dim rc = New rcDataOld(mask(rect), rect, index)
                 rcList.Add(rc)
 
                 idList.Add(CSng(index))
 
-                featureList.Add(cv.Cv2.Mean(src(rect), rc.mask)(0))
+                featureList.Add(Mean(src(rect), rc.mask)(0))
                 featureList.Add(rc.wGrid.Z)
 
                 featureList.Add(rc.pixels)
@@ -1222,7 +1222,7 @@ Public Class FeatureLess_IndexKNN : Inherits TaskParent
 
         maxDistList.Clear()
         For Each rc In feat.rcList
-        cv.Cv2.Rectangle(dst3, rc.rect, task.highlight, task.lineWidth)
+        Rectangle(dst3, rc.rect, task.highlight, task.lineWidth)
             maxDistList.Add(rc.maxDist)
             If task.heartBeat Then rc.color = task.scalarColors(rc.mapID + 1)
         Next
@@ -1251,7 +1251,7 @@ Public Class XR_FeatureLess_ClustersHist2D : Inherits TaskParent
     End Sub
     Public Function backProjectHistArray(histogram As cv.Mat, ranges() As cv.Rangef) As cv.Mat
         Dim backP As New cv.Mat
-        cv.Cv2.CalcBackProject({features}, {0, 1}, histogram, backP, ranges)
+        CalcBackProject({features}, {0, 1}, histogram, backP, ranges)
         ReDim bpArray(histogram.Rows * histogram.Cols - 1)
         backP.GetArray(Of Single)(bpArray)
 
@@ -1274,20 +1274,20 @@ Public Class XR_FeatureLess_ClustersHist2D : Inherits TaskParent
         Dim grayMat As New cv.Mat
         fLess.dst2.ConvertTo(grayMat, cv.MatType.CV_32F)
 
-        cv.Cv2.Merge({grayMat, depthMat}, features)
+        Merge({grayMat, depthMat}, features)
 
         Dim histogram As New cv.Mat
         Dim bins = task.histogramBins
-        cv.Cv2.CalcHist({features}, {0, 1}, New cv.Mat(), histogram, 2, {bins, bins}, ranges)
+        CalcHist({features}, {0, 1}, New cv.Mat(), histogram, 2, {bins, bins}, ranges)
 
-        cv.Cv2.Threshold(histogram, histogram, 0, 255, cv.ThresholdTypes.Binary)
+        Threshold(histogram, histogram, 0, 255, cv.ThresholdTypes.Binary)
         Dim floodIndex As Integer = 1
         For y = 0 To histogram.Height - 1
             For x = 0 To histogram.Width - 1
                 Dim pt = New cv.Point(x, y)
                 Dim val = histogram.Get(Of Single)(y, x)
                 If val = 255 Then
-                    cv.Cv2.FloodFill(histogram, pt, floodIndex)
+                    FloodFill(histogram, pt, floodIndex)
                     floodIndex += 1
                     If floodIndex >= 254 Then Exit For
                 End If
@@ -1323,8 +1323,8 @@ Public Class FeatureLess_DepthFull : Inherits TaskParent
         brickList.Clear()
         For i = 0 To task.gridRects.Count - 1
             Dim r = task.gridRects(i)
-If cv.Cv2.CountNonZero(task.edges.dst2(r)) > 0 Then Continue For
-If cv.Cv2.CountNonZero(task.depthmask(r)) = 0 Then Continue For
+If CountNonZero(task.edges.dst2(r)) > 0 Then Continue For
+If CountNonZero(task.depthmask(r)) = 0 Then Continue For
             dst1(r).SetTo(255)
 
             brickList.Add(r)
@@ -1338,7 +1338,7 @@ If cv.Cv2.CountNonZero(task.depthmask(r)) = 0 Then Continue For
             Dim val = dst1.Get(Of Byte)(r.Y, r.X)
             If val = 255 Then
                 Dim flags = cv.FloodFillFlags.FixedRange Or (index << 8)
-                Dim count = cv.Cv2.FloodFill(dst1, mask, r.TopLeft, index, rect, 0, 0, flags)
+                Dim count = FloodFill(dst1, mask, r.TopLeft, index, rect, 0, 0, flags)
                 index += 1
             End If
         Next
@@ -1363,7 +1363,7 @@ Public Class FeatureLess_Depth : Inherits TaskParent
         dst1.SetTo(0)
         brickList.Clear()
         For Each r In task.fLess.brickList
-If cv.Cv2.CountNonZero(task.depthmask(r)) = 0 Then Continue For
+If CountNonZero(task.depthmask(r)) = 0 Then Continue For
             brickList.Add(r)
             dst1(r).SetTo(255)
         Next
@@ -1403,7 +1403,7 @@ Public Class FeatureLess_XLines : Inherits TaskParent
                         Dim lp = New lpData(p1, p2)
                         lp.fLessID = If(val1 = 0, val2, val1)
                         lpList.Add(lp)
-                        cv.Cv2.Line(dst2, p1, p2, white, task.lineWidth)
+                        Line(dst2, p1, p2, white, task.lineWidth)
                         p1 = newPoint
                         p2 = newPoint
                     End If
@@ -1445,7 +1445,7 @@ Public Class FeatureLess_YLines : Inherits TaskParent
                         Dim lp = New lpData(p1, p2)
                         lp.fLessID = If(val1 = 0, val2, val1)
                         lpList.Add(lp)
-                        cv.Cv2.Line(dst2, p1, p2, white, task.lineWidth)
+                        Line(dst2, p1, p2, white, task.lineWidth)
                         p1 = newPoint
                         p2 = newPoint
                     End If
@@ -1485,12 +1485,12 @@ Public Class FeatureLess_Lines : Inherits TaskParent
             dst3.SetTo(0)
             For Each lp In xLines.lpList
                 If lp.fLessID = selectedRegion Then
-                    cv.Cv2.Line(dst3, lp.p1, lp.p2, white, task.lineWidth)
+                    Line(dst3, lp.p1, lp.p2, white, task.lineWidth)
                 End If
             Next
             For Each lp In yLines.lpList
                 If lp.fLessID = selectedRegion Then
-                    cv.Cv2.Line(dst3, lp.p1, lp.p2, white, task.lineWidth)
+                    Line(dst3, lp.p1, lp.p2, white, task.lineWidth)
                 End If
             Next
         End If
@@ -1515,7 +1515,7 @@ Public Class XR_FeatureLess_BasicsTest2 : Inherits TaskParent
             Dim val = input.Get(Of Byte)(r.Y, r.X)
             If val = 255 Then
                 Dim flags = cv.FloodFillFlags.FixedRange Or (index << 8)
-                Dim count = cv.Cv2.FloodFill(input, mask, r.TopLeft, index, rect, 0, 0, flags)
+                Dim count = FloodFill(input, mask, r.TopLeft, index, rect, 0, 0, flags)
                 index += 1
             End If
         Next
@@ -1529,7 +1529,7 @@ Public Class XR_FeatureLess_BasicsTest2 : Inherits TaskParent
         brickList.Clear()
         For i = 0 To task.gridRects.Count - 1
             Dim r = task.gridRects(i)
-If cv.Cv2.CountNonZero(task.edges.dst2(r)) > 0 Then Continue For
+If CountNonZero(task.edges.dst2(r)) > 0 Then Continue For
             dst1(r).SetTo(255)
             brickList.Add(r)
         Next
@@ -1578,7 +1578,7 @@ Public Class FeatureLess_Tracker : Inherits TaskParent
                 index = dst3(r).Get(Of Byte)(0, 0)
                 If index > 0 And dst0(r).Get(Of Byte)(0, 0) = 255 Then
                     Dim flags = cv.FloodFillFlags.FixedRange Or (index << 8)
-                    Dim count = cv.Cv2.FloodFill(dst0, mask, r.TopLeft, index, rect, 0, 0, flags)
+                    Dim count = FloodFill(dst0, mask, r.TopLeft, index, rect, 0, 0, flags)
                     regions.Add((count, ValidateRect(rect)))
                     floodRects.Add(r)
                 End If
@@ -1591,7 +1591,7 @@ Public Class FeatureLess_Tracker : Inherits TaskParent
         For Each r In newCandidates
             If dst3(r).Get(Of Byte)(0, 0) = 0 And dst0(r).Get(Of Byte)(0, 0) = 255 Then
                 Dim flags = cv.FloodFillFlags.FixedRange Or (indexNew << 8)
-                Dim count = cv.Cv2.FloodFill(dst0, mask, r.TopLeft, indexNew, rect, 0, 0, flags)
+                Dim count = FloodFill(dst0, mask, r.TopLeft, indexNew, rect, 0, 0, flags)
                 regions.Add((count, ValidateRect(rect)))
                 indexNew += 1
             End If
@@ -1604,7 +1604,7 @@ Public Class FeatureLess_Tracker : Inherits TaskParent
         If task.heartBeatLT Then dst3 = task.fLess.dst3.Clone
 
         For Each r In floodRects
-        cv.Cv2.Rectangle(dst2, r, task.highlight, task.lineWidth)
+        Rectangle(dst2, r, task.highlight, task.lineWidth)
         Next
     End Sub
 End Class
@@ -1649,7 +1649,7 @@ Public Class FeatureLess_BrickList : Inherits TaskParent
             Dim val = input.Get(Of Byte)(r.Y, r.X)
             If val = 255 Then
                 Dim flags = cv.FloodFillFlags.FixedRange Or (index << 8)
-                Dim count = cv.Cv2.FloodFill(input, mask, r.TopLeft, index, rect, 0, 0, flags)
+                Dim count = FloodFill(input, mask, r.TopLeft, index, rect, 0, 0, flags)
                 index += 1
             End If
         Next
@@ -1659,7 +1659,7 @@ Public Class FeatureLess_BrickList : Inherits TaskParent
         dst1.SetTo(0)
         brickList.Clear()
         For Each r In task.gridRects
-If cv.Cv2.CountNonZero(task.edges.dst2(r)) = 0 Then
+If CountNonZero(task.edges.dst2(r)) = 0 Then
                 dst1(r).SetTo(255)
                 brickList.Add(r)
             End If
@@ -1730,7 +1730,7 @@ Public Class FeatureLess_CalcHist : Inherits TaskParent
         For i = 0 To task.fLess.regions.Count - 1
             Dim r = task.fLess.regions.Values(i)
             Dim histogram As New cv.Mat
-            cv.Cv2.CalcHist({dst1(r)}, {0}, New cv.Mat, histogram, 1, {256}, ranges)
+            CalcHist({dst1(r)}, {0}, New cv.Mat, histogram, 1, {256}, ranges)
             Dim histArray(histogram.Rows - 1) As Single
             histogram.GetArray(Of Single)(histArray)
             Dim histList As New List(Of Integer)
@@ -1748,7 +1748,7 @@ Public Class FeatureLess_CalcHist : Inherits TaskParent
             Next
 
             Dim tmp As New cv.Mat
-            cv.Cv2.LUT(color8u.dst2, lutArray, tmp)
+            LUT(color8u.dst2, lutArray, tmp)
             dst0 += tmp
         Next
 

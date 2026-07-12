@@ -50,7 +50,7 @@ Public Class BrickLine_Basics : Inherits TaskParent
         If edgeIndex <> 0 And edgeIndex < task.featList.Count Then
             For Each index In task.featList(edgeIndex)
                 Dim brick = bricks.brickList(index)
-                cv.Cv2.Rectangle(dst2, brick.rect, task.highlight, task.lineWidth)
+                Rectangle(dst2, brick.rect, task.highlight, task.lineWidth)
             Next
         End If
 
@@ -66,7 +66,7 @@ Public Class BrickLine_Basics : Inherits TaskParent
             For Each ele In depthSorted
                 If Math.Abs(ele.Key - lastDepth) > task.depthDiffMeters Then
                     Dim brick = bricks.brickList(ele.Value)
-                    cv.Cv2.Rectangle(dst2, brick.rect, red, task.lineWidth + 1)
+                    Rectangle(dst2, brick.rect, red, task.lineWidth + 1)
                 End If
                 lastDepth = ele.Key
             Next
@@ -140,7 +140,7 @@ Public Class BrickLine_DepthGap : Inherits TaskParent
             For i = 0 To gapCells.Count - 1
                 If debugMode Then If i <> Math.Abs(task.gOptions.DebugSlider.Value) Then Continue For
                 Dim brick = bricks.brickList(gapCells(i))
-                cv.Cv2.Rectangle(dst2, brick.rect, task.highlight, task.lineWidth)
+                Rectangle(dst2, brick.rect, task.highlight, task.lineWidth)
                 If i = Math.Abs(task.gOptions.DebugSlider.Value) Then
                     SetTrueText(brick.depth.ToString(fmt1), brick.rect.BottomRight)
                 End If
@@ -165,7 +165,7 @@ Public Class XR_BrickLine_DepthGaps : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst1.SetTo(0)
         For Each lp In task.lines.lpList
-            cv.Cv2.Line(dst1, lp.p1, lp.p2, lp.index, task.lineWidth, cv.LineTypes.Link8)
+            Line(dst1, lp.p1, lp.p2, lp.index, task.lineWidth, cv.LineTypes.Link8)
         Next
 
         findCells.Run(dst1)
@@ -190,7 +190,7 @@ Public Class XR_BrickLine_Lines : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst1.SetTo(0)
         For Each lp In task.lines.lpList
-            cv.Cv2.Line(dst1, lp.p1, lp.p2, lp.index, task.lineWidth, cv.LineTypes.Link8)
+            Line(dst1, lp.p1, lp.p2, lp.index, task.lineWidth, cv.LineTypes.Link8)
         Next
 
         findCells.Run(dst1)
@@ -223,7 +223,7 @@ Public Class BrickLine_EdgesNoEdges : Inherits TaskParent
             If r.X + r.Width = dst2.Width Then Continue For
             If r.Y = 0 Then Continue For
             If r.Y + r.Height = dst2.Height Then Continue For
-If cv.Cv2.CountNonZero(edgeline.dst2(r)) Then edges.Add(i) Else noEdges.Add(i)
+If CountNonZero(edgeline.dst2(r)) Then edges.Add(i) Else noEdges.Add(i)
         Next
 
         If standaloneTest() Then
@@ -279,7 +279,7 @@ Public Class BrickLine_LeftRightMotion : Inherits TaskParent
         '  mats.Run(emptyMat)
 
         dst2 = task.leftView
-        cv.Cv2.CvtColor(task.rightView, dst3, cv.ColorConversionCodes.GRAY2BGR)
+        CvtColor(task.rightView, dst3, cv.ColorConversionCodes.GRAY2BGR)
         Dim correlationMat As New cv.Mat
         bestBricks.Clear()
         For Each index In leftEdges
@@ -291,13 +291,13 @@ Public Class BrickLine_LeftRightMotion : Inherits TaskParent
             If task.gridNabeRects(index).Height + r.rect.Y + task.gridWH * 2 > dst2.Height Then Continue For
 
             r.lRect = r.rect
-            r.depth = cv.Cv2.Mean(task.pcSplit(2)(r.rect))(0)
+            r.depth = Mean(task.pcSplit(2)(r.rect))(0)
             If r.depth > 0 Then
                 r.rRect = r.rect
                 r.rRect.X -= task.calibData.baseline * task.calibData.leftIntrinsics.fx / r.depth
                 If r.rRect.X < 0 Or r.rRect.X + r.rRect.Width >= dst2.Width Then Continue For
 
-                cv.Cv2.MatchTemplate(task.leftView(r.lRect), task.rightView(r.rRect), correlationMat,
+                MatchTemplate(task.leftView(r.lRect), task.rightView(r.rRect), correlationMat,
                                          cv.TemplateMatchModes.CCoeffNormed)
 
                 r.correlation = correlationMat.Get(Of Single)(0, 0)

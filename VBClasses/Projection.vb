@@ -29,7 +29,7 @@ Public Class Projection_Basics : Inherits TaskParent
             Dim rc = redCellInput(i)
             Dim tmp = New cv.Mat(rc.rect.Size(), cv.MatType.CV_32F, cv.Scalar.All(0))
             src(rc.rect).CopyTo(tmp, rc.mask)
-            rc.pixels = CInt(cv.Cv2.Sum(tmp)(0))
+            rc.pixels = CInt(Sum(tmp)(0))
             sortedCells.Add(rc.pixels, rc)
             check2 += rc.pixels
         Next
@@ -71,8 +71,8 @@ Public Class Projection_Basics : Inherits TaskParent
         Next
 
         If task.heartBeat Then
-            Dim check1 = cv.Cv2.Sum(src)(0)
-            Dim depthCount = cv.Cv2.CountNonZero(task.pcSplit(2))
+            Dim check1 = Sum(src)(0)
+            Dim depthCount = CountNonZero(task.pcSplit(2))
             strOut += "Sum above   " + vbTab + CStr(check2) + " pixels" + " (losses from histogram ranges?)" + vbCrLf
             strOut += "Sum of src  " + vbTab + CStr(check1) + " pixels" + " (losses from RedCloud.)" + vbCrLf
             strOut += "Actual count" + vbTab + CStr(depthCount) + " pixels" + vbCrLf
@@ -80,7 +80,7 @@ Public Class Projection_Basics : Inherits TaskParent
         SetTrueText(strOut, 3)
         If showRectangles Then
             For i = 0 To rclist.Count - 1
-            cv.Cv2.Rectangle(dst2, rclist(i).rect, task.highlight, task.lineWidth)
+            Rectangle(dst2, rclist(i).rect, task.highlight, task.lineWidth)
             Next
         End If
         labels(2) = CStr(rclist.Count) + " objects were found in the " + viewType + " view."
@@ -113,7 +113,7 @@ Public Class XR_Projection_Lines : Inherits TaskParent
         End If
         heat.Run(src)
         If options.topCheck Then dst2 = heat.dst2 Else dst2 = heat.dst3
-        cv.Cv2.Threshold(dst2, dst1, options.projectionThreshold, 255, cv.ThresholdTypes.Binary)
+        Threshold(dst2, dst1, options.projectionThreshold, 255, cv.ThresholdTypes.Binary)
 
     End Sub
 End Class
@@ -144,7 +144,7 @@ Public Class Projection_ObjectIsolate : Inherits TaskParent
         If options.index < top.objects.objectList.Count Then
             Dim lower = New cv.Scalar(top.objects.objectList(options.index)(0), -100, top.objects.objectList(options.index)(2))
             Dim upper = New cv.Scalar(top.objects.objectList(options.index)(1), +100, top.objects.objectList(options.index)(3))
-                          cv.Cv2.InRange(task.pointCloud, lower, upper, dst0)
+                          InRange(task.pointCloud, lower, upper, dst0)
 
             dst1.SetTo(0)
             task.pointCloud.CopyTo(dst1, dst0)
@@ -181,13 +181,13 @@ Public Class Projection_Object : Inherits TaskParent
             Dim lower = New cv.Scalar(top.objects.objectList(index)(0), -100, top.objects.objectList(index)(2))
             Dim upper = New cv.Scalar(top.objects.objectList(index)(1), +100, top.objects.objectList(index)(3))
             Dim mask As New cv.Mat
-            cv.Cv2.InRange(task.pointCloud, lower, upper, mask)
+            InRange(task.pointCloud, lower, upper, mask)
 
             Dim rc = top.objects.rclist(task.gOptions.DebugSlider.Value + 1) ' the biggest by default...
             dst0.SetTo(0)
-            cv.Cv2.Threshold(top.histTop.dst2(rc.rect), dst0(rc.rect), 0, 255, cv.ThresholdTypes.Binary)
+            Threshold(top.histTop.dst2(rc.rect), dst0(rc.rect), 0, 255, cv.ThresholdTypes.Binary)
             Dim _cvtInline As New cv.Mat
-            cv.Cv2.CvtColor(dst3, _cvtInline, cv.ColorConversionCodes.BGR2GRAY)
+            CvtColor(dst3, _cvtInline, cv.ColorConversionCodes.BGR2GRAY)
             dst0.SetTo(0,_cvtInline)
 
             dst1.SetTo(0)
@@ -222,7 +222,7 @@ Public Class XR_Projection_Floor : Inherits TaskParent
         Dim rc = isolate.top.objects.rclist(objSlider.Value + 1) ' the biggest by default...
         Dim rowList As New List(Of Integer)
         For y = 0 To rc.rect.Height - 1
-        rowList.Add(cv.Cv2.CountNonZero(dst2(rc.rect).Row(y)) + rc.rect.Y)
+        rowList.Add(CountNonZero(dst2(rc.rect).Row(y)) + rc.rect.Y)
         Next
 
         Dim maxRow = rowList.Max
@@ -267,11 +267,11 @@ Public Class Projection_Cell : Inherits TaskParent
         End If
         heatCell.Run(dst0)
         Dim maskTop As New cv.Mat
-        cv.Cv2.CvtColor(heatCell.dst2, maskTop, cv.ColorConversionCodes.BGR2GRAY)
-        cv.Cv2.Threshold(maskTop, maskTop, 0, 255, cv.ThresholdTypes.Binary)
+        CvtColor(heatCell.dst2, maskTop, cv.ColorConversionCodes.BGR2GRAY)
+        Threshold(maskTop, maskTop, 0, 255, cv.ThresholdTypes.Binary)
         Dim maskSide As New cv.Mat
-        cv.Cv2.CvtColor(heatCell.dst3, maskSide, cv.ColorConversionCodes.BGR2GRAY)
-        cv.Cv2.Threshold(maskSide, maskSide, 0, 255, cv.ThresholdTypes.Binary)
+        CvtColor(heatCell.dst3, maskSide, cv.ColorConversionCodes.BGR2GRAY)
+        Threshold(maskSide, maskSide, 0, 255, cv.ThresholdTypes.Binary)
         dst1.SetTo(white, maskTop)
         dst3.SetTo(white, maskSide)
     End Sub
@@ -307,11 +307,11 @@ Public Class XR_Projection_Derivative : Inherits TaskParent
 
         heatDeriv.Run(pc)
         Dim top As New cv.Mat
-        cv.Cv2.CvtColor(heatDeriv.dst2, top, cv.ColorConversionCodes.BGR2GRAY)
-        cv.Cv2.Threshold(top, top, 0, 255, cv.ThresholdTypes.Binary)
+        CvtColor(heatDeriv.dst2, top, cv.ColorConversionCodes.BGR2GRAY)
+        Threshold(top, top, 0, 255, cv.ThresholdTypes.Binary)
         Dim side As New cv.Mat
-        cv.Cv2.CvtColor(heatDeriv.dst3, side, cv.ColorConversionCodes.BGR2GRAY)
-        cv.Cv2.Threshold(side, side, 0, 255, cv.ThresholdTypes.Binary)
+        CvtColor(heatDeriv.dst3, side, cv.ColorConversionCodes.BGR2GRAY)
+        Threshold(side, side, 0, 255, cv.ThresholdTypes.Binary)
         dst2.SetTo(cv.Scalar.White, top)
         dst3.SetTo(cv.Scalar.White, side)
     End Sub
@@ -391,13 +391,13 @@ Public Class Projection_HistSide : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If src.Type <> cv.MatType.CV_32FC3 Then src = task.pointCloud
-        cv.Cv2.CalcHist({src}, task.channelsSide, New cv.Mat, histogram, 2, task.bins2D, task.rangesSide)
+        CalcHist({src}, task.channelsSide, New cv.Mat, histogram, 2, task.bins2D, task.rangesSide)
         histogram.Col(0).SetTo(0)
 
-        cv.Cv2.ConvertScaleAbs(histogram, dst2)
+        ConvertScaleAbs(histogram, dst2)
         Dim _thr1 As New cv.Mat
-        cv.Cv2.Threshold(histogram, dst3, task.projectionThreshold, 255, cv.ThresholdTypes.Binary)
-        cv.Cv2.ConvertScaleAbs(dst3, dst3)
+        Threshold(histogram, dst3, task.projectionThreshold, 255, cv.ThresholdTypes.Binary)
+        ConvertScaleAbs(dst3, dst3)
     End Sub
 End Class
 
@@ -414,11 +414,11 @@ Public Class Projection_HistTop : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If src.Type <> cv.MatType.CV_32FC3 Then src = task.pointCloud
-        cv.Cv2.CalcHist({src}, task.channelsTop, New cv.Mat, histogram, 2, task.bins2D, task.rangesTop)
+        CalcHist({src}, task.channelsTop, New cv.Mat, histogram, 2, task.bins2D, task.rangesTop)
         histogram.Row(0).SetTo(0)
 
-        cv.Cv2.ConvertScaleAbs(histogram, dst2)
-        cv.Cv2.Threshold(histogram, dst3, task.projectionThreshold, 255, cv.ThresholdTypes.Binary)
-        cv.Cv2.ConvertScaleAbs(dst3, dst3)
+        ConvertScaleAbs(histogram, dst2)
+        Threshold(histogram, dst3, task.projectionThreshold, 255, cv.ThresholdTypes.Binary)
+        ConvertScaleAbs(dst3, dst3)
     End Sub
 End Class

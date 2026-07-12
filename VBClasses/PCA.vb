@@ -54,7 +54,7 @@ Public Class PCA_Reconstruct : Inherits TaskParent
         images(index) = task.gray
         Dim gray32f As New cv.Mat
         images(index).ConvertTo(gray32f, cv.MatType.CV_32F)
-        cv.Cv2.Normalize(gray32f, gray32f, 0, 255, cv.NormTypes.MinMax)
+        Normalize(gray32f, gray32f, 0, 255, cv.NormTypes.MinMax)
         images32f(index) = gray32f.Reshape(1, 1)
         If task.frameCount >= images.Length Then
             Dim data = New cv.Mat(images.Length, src.Rows * src.Cols, cv.MatType.CV_32F)
@@ -94,7 +94,7 @@ Public Class XR_PCA_DrawImage : Inherits TaskParent
     Dim pca As New PCA_Reconstruct
     Dim image As New cv.Mat
     Public Sub New()
-        image = cv.Cv2.ImRead(task.homeDir + "opencv/Samples/Data/pca_test1.jpg")
+        image = ImRead(task.homeDir + "opencv/Samples/Data/pca_test1.jpg")
         desc = "Use PCA to find the principal direction of an object."
         labels(2) = "Original image"
         labels(3) = "PCA Output"
@@ -104,28 +104,28 @@ Public Class XR_PCA_DrawImage : Inherits TaskParent
         Dim hypotenuse = Math.Sqrt((p.Y - q.Y) * (p.Y - q.Y) + (p.X - q.X) * (p.X - q.X))
         q.X = p.X - scale * hypotenuse * Math.Cos(angle)
         q.Y = p.Y - scale * hypotenuse * Math.Sin(angle)
-        cv.Cv2.Line(img, p, q, color, task.lineWidth, task.lineType)
+        Line(img, p, q, color, task.lineWidth, task.lineType)
         p.X = q.X + 9 * Math.Cos(angle + Math.PI / 4)
         p.Y = q.Y + 9 * Math.Sin(angle + Math.PI / 4)
-        cv.Cv2.Line(img, p, q, color, task.lineWidth, task.lineType)
+        Line(img, p, q, color, task.lineWidth, task.lineType)
         p.X = q.X + 9 * Math.Cos(angle - Math.PI / 4)
         p.Y = q.Y + 9 * Math.Sin(angle - Math.PI / 4)
-        cv.Cv2.Line(img, p, q, color, task.lineWidth, task.lineType)
+        Line(img, p, q, color, task.lineWidth, task.lineType)
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        cv.Cv2.Resize(image, dst2, dst2.Size())
+        Resize(image, dst2, dst2.Size())
         Dim gray As New cv.Mat
-        cv.Cv2.CvtColor(dst2, gray, cv.ColorConversionCodes.BGR2GRAY)
-        cv.Cv2.Threshold(gray, gray, 50, 255, cv.ThresholdTypes.Binary Or cv.ThresholdTypes.Otsu)
+        CvtColor(dst2, gray, cv.ColorConversionCodes.BGR2GRAY)
+        Threshold(gray, gray, 50, 255, cv.ThresholdTypes.Binary Or cv.ThresholdTypes.Otsu)
         Dim hierarchy() As cv.HierarchyIndex = Nothing
         Dim contours As cv.Point()() = Nothing
-        cv.Cv2.FindContours(gray, contours, hierarchy, cv.RetrievalModes.List, cv.ContourApproximationModes.ApproxNone)
+        FindContours(gray, contours, hierarchy, cv.RetrievalModes.List, cv.ContourApproximationModes.ApproxNone)
 
         dst3.SetTo(0)
         For i = 0 To contours.Length - 1
-            Dim area = cv.Cv2.ContourArea(contours(i))
+            Dim area = ContourArea(contours(i))
             If area < 100 Or area > 100000 Then Continue For
-            cv.Cv2.DrawContours(dst3, contours, i, cv.Scalar.Red, task.lineWidth, task.lineType)
+            DrawContours(dst3, contours, i, cv.Scalar.Red, task.lineWidth, task.lineType)
             Dim sz = contours(i).Length
             Dim data_pts = New cv.Mat(sz, 2, cv.MatType.CV_64FC1)
             For j = 0 To data_pts.Rows - 1
@@ -142,7 +142,7 @@ Public Class XR_PCA_DrawImage : Inherits TaskParent
                 eigen_val(j) = pca_analysis.Eigenvalues.Get(Of Double)(0, j)
             Next
 
-            cv.Cv2.Circle(dst3, cntr, task.DotSize + 1, cv.Scalar.BlueViolet, -1, task.lineType)
+            Circle(dst3, cntr, task.DotSize + 1, cv.Scalar.BlueViolet, -1, task.lineType)
             Dim factor As Single = 0.02F ' scaling factor for the lines depicting the principal components.
             Dim ept1 = New cv.Point(cntr.X + factor * eigen_vecs(0).X * eigen_val(0), cntr.Y + factor * eigen_vecs(0).Y * eigen_val(0))
             Dim ept2 = New cv.Point(cntr.X - factor * eigen_vecs(1).X * eigen_val(1), cntr.Y - factor * eigen_vecs(1).Y * eigen_val(1))
@@ -742,8 +742,8 @@ Public Class PCA_NColor : Inherits TaskParent
         dst2 = custom.dst2
 
         Dim tmp = cv.Mat.FromPixelData(256, 1, cv.MatType.CV_8UC3, palette)
-        cv.Cv2.CvtColor(tmp, tmp, cv.ColorConversionCodes.BGR2GRAY)
-        Dim paletteCount = cv.Cv2.CountNonZero(tmp)
+        CvtColor(tmp, tmp, cv.ColorConversionCodes.BGR2GRAY)
+        Dim paletteCount = CountNonZero(tmp)
 
         If standaloneTest() Then
             dst3 = Palettize(img8u)
@@ -773,7 +773,7 @@ Public Class PCA_NColor_CPP : Inherits TaskParent
         desc = "Create a faster version of the PCA_NColor algorithm."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If src.Channels <> 3 Then cv.Cv2.CvtColor(src, src, cv.ColorConversionCodes.GRAY2BGR)
+        If src.Channels <> 3 Then CvtColor(src, src, cv.ColorConversionCodes.GRAY2BGR)
 
         If task.heartBeat Then pcaPalette.Run(src) ' get the palette in VB.Net
         Marshal.Copy(src.Data, rgb, 0, rgb.Length)

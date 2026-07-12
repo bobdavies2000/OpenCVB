@@ -9,14 +9,14 @@ Public Class Quadrant_Basics : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst1.SetTo(0)
-        cv.Cv2.Line(dst1, task.lpGravity.p1, task.lpGravity.p2, 255, 1, cv.LineTypes.Link8)
-        cv.Cv2.Line(dst1, task.lpHorizon.p1, task.lpHorizon.p2, 255, 1, cv.LineTypes.Link8)
+        Line(dst1, task.lpGravity.p1, task.lpGravity.p2, 255, 1, cv.LineTypes.Link8)
+        Line(dst1, task.lpHorizon.p1, task.lpHorizon.p2, 255, 1, cv.LineTypes.Link8)
 
         Dim flags = cv.FloodFillFlags.FixedRange Or (255 << 8)
-        If dst1.Get(Of Byte)(p1.Y, p1.X) = 0 Then cv.Cv2.FloodFill(dst1, New cv.Mat, p1, 1 * 255 / 4, rect, 0, 0, flags)
-        If dst1.Get(Of Byte)(p2.Y, p2.X) = 0 Then cv.Cv2.FloodFill(dst1, New cv.Mat, p2, 2 * 255 / 4, rect, 0, 0, flags)
-        If dst1.Get(Of Byte)(p3.Y, p3.X) = 0 Then cv.Cv2.FloodFill(dst1, New cv.Mat, p3, 3 * 255 / 4, rect, 0, 0, flags)
-        If dst1.Get(Of Byte)(p4.Y, p4.X) = 0 Then cv.Cv2.FloodFill(dst1, New cv.Mat, p4, 4 * 255 / 4, rect, 0, 0, flags)
+        If dst1.Get(Of Byte)(p1.Y, p1.X) = 0 Then FloodFill(dst1, New cv.Mat, p1, 1 * 255 / 4, rect, 0, 0, flags)
+        If dst1.Get(Of Byte)(p2.Y, p2.X) = 0 Then FloodFill(dst1, New cv.Mat, p2, 2 * 255 / 4, rect, 0, 0, flags)
+        If dst1.Get(Of Byte)(p3.Y, p3.X) = 0 Then FloodFill(dst1, New cv.Mat, p3, 3 * 255 / 4, rect, 0, 0, flags)
+        If dst1.Get(Of Byte)(p4.Y, p4.X) = 0 Then FloodFill(dst1, New cv.Mat, p4, 4 * 255 / 4, rect, 0, 0, flags)
 
         dst2 = Palettize(dst1)
     End Sub

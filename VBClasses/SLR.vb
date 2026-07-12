@@ -138,10 +138,10 @@ Public Class SLR_PlotTest : Inherits TaskParent
 
         Dim lines = code.Split(vbLf)
         For Each line In lines
-            Dim split = line.Split(" ")
-            If split.Length > 1 Then
-                x.Add(split(0))
-                y.Add(split(1))
+            Dim splitStr = line.Split(" ")
+            If splitStr.Length > 1 Then
+                x.Add(splitStr(0))
+                y.Add(splitStr(1))
             End If
         Next
     End Sub
@@ -167,7 +167,7 @@ Public Class XR_SLR_TrendImages : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
 
-        Dim split = cv.Cv2.Split(src)
+        Dim splitMats = cv.Cv2.Split(src)
         trends.hist.plotHist.maxRange = 255
         trends.hist.plotHist.removeZeroEntry = False ' default is to look at element 0....
 
@@ -191,7 +191,7 @@ Public Class XR_SLR_TrendImages : Inherits TaskParent
                 labels(2) = "NR_SLR_TrendImages - Red channel"
                 splitIndex = 2
         End Select
-        trends.Run(split(splitIndex))
+        trends.Run(splitMats(splitIndex))
         dst2 = trends.dst2
     End Sub
 End Class

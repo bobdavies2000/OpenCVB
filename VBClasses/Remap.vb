@@ -31,11 +31,11 @@ Public Class Remap_Basics : Inherits TaskParent
             Case 0
                 dst2 = src
             Case 1
-                cv.Cv2.Remap(src, dst2, mapx1, mapy1, cv.InterpolationFlags.Nearest)
+                Remap(src, dst2, mapx1, mapy1, cv.InterpolationFlags.Nearest)
             Case 2
-                cv.Cv2.Remap(src, dst2, mapx2, mapy2, cv.InterpolationFlags.Nearest)
+                Remap(src, dst2, mapx2, mapy2, cv.InterpolationFlags.Nearest)
             Case 3
-                cv.Cv2.Remap(src, dst2, mapx3, mapy3, cv.InterpolationFlags.Nearest)
+                Remap(src, dst2, mapx3, mapy3, cv.InterpolationFlags.Nearest)
         End Select
 
         If task.heartBeat Then
@@ -60,11 +60,11 @@ Public Class Remap_Flip : Inherits TaskParent
             Case 0 ' do nothing!
                 src.CopyTo(dst2)
             Case 1 ' flip vertically
-                cv.Cv2.Flip(src, dst2, cv.FlipMode.Y)
+                Flip(src, dst2, cv.FlipMode.Y)
             Case 2 ' flip horizontally
-                cv.Cv2.Flip(src, dst2, cv.FlipMode.X)
+                Flip(src, dst2, cv.FlipMode.X)
             Case 3 ' flip horizontally and vertically
-                cv.Cv2.Flip(src, dst2, cv.FlipMode.XY)
+                Flip(src, dst2, cv.FlipMode.XY)
         End Select
         If task.heartBeat Then
             direction += 1

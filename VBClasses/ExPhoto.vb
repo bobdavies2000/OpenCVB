@@ -10,12 +10,12 @@ Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCvSharp
 '    End Sub
 '    Public Overrides Sub RunAlg(src As cv.Mat)
 '        If src.Channels() <> 1 Then src = task.gray
-'        cv.Cv2.EqualizeHist(src, src)
-'        cv.Cv2.FastNlMeansDenoisingColored(src, dst2)
-'        cv.Cv2.Subtract(dst2, src, dst3)
+'        EqualizeHist(src, src)
+'        FastNlMeansDenoisingColored(src, dst2)
+'        Subtract(dst2, src, dst3)
 '        Dim mm As mmData = GetMinMax(dst3)
 '        labels(3) = "Diff from input - max change=" + CStr(mm.maxVal)
-'        cv.Cv2.Normalize(dst3, dst3, 0, 255, cv.NormTypes.MinMax)
+'        Normalize(dst3, dst3, 0, 255, cv.NormTypes.MinMax)
 '    End Sub
 'End Class
 
@@ -31,12 +31,12 @@ Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCvSharp
 '    Public Overrides Sub RunAlg(src As cv.Mat)
 '        Dim test = New cv.Mat(src.Size(), cv.MatType.CV_8U)
 '        Dim gray As New cv.Mat
-'        cv.Cv2.EqualizeHist(task.gray, gray)
-'        cv.Cv2.FastNlMeansDenoisingColored(gray, dst2)
-'        cv.Cv2.Subtract(dst2, gray, dst3)
+'        EqualizeHist(task.gray, gray)
+'        FastNlMeansDenoisingColored(gray, dst2)
+'        Subtract(dst2, gray, dst3)
 '        Dim mm As mmData = GetMinMax(dst3)
 '        labels(3) = "Diff from input - max change=" + CStr(mm.maxVal)
-'        cv.Cv2.Normalize(dst3, dst3, 0, 255, cv.NormTypes.MinMax)
+'        Normalize(dst3, dst3, 0, 255, cv.NormTypes.MinMax)
 '    End Sub
 'End Class
 

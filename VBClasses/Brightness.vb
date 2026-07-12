@@ -6,7 +6,7 @@ Public Class Brightness_Basics : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         Options.Run()
-        cv.Cv2.ConvertScaleAbs(src, dst2, Options.brightness, Options.contrast)
+        ConvertScaleAbs(src, dst2, Options.brightness, Options.contrast)
         labels(3) = "Brightness level = " + CStr(Options.contrast)
     End Sub
 End Class
@@ -26,20 +26,20 @@ Public Class XR_Brightness_HSV : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
 
-        cv.Cv2.CvtColor(src, dst3, cv.ColorConversionCodes.BGR2HSV)
+        CvtColor(src, dst3, cv.ColorConversionCodes.BGR2HSV)
         Dim hsv64 As New cv.Mat
         dst3.ConvertTo(hsv64, cv.MatType.CV_64F)
-        Dim split = cv.Cv2.Split(hsv64)
+        Dim splitMats = Split(hsv64)
 
-        split(1) *= options.hsvBrightness
-        cv.Cv2.Threshold(split(1), split(1), 255, 255, cv.ThresholdTypes.Trunc)
+        splitMats(1) *= options.hsvBrightness
+        Threshold(splitMats(1), splitMats(1), 255, 255, cv.ThresholdTypes.Trunc)
 
-        split(2) *= options.hsvBrightness
-        cv.Cv2.Threshold(split(2), split(2), 255, 255, cv.ThresholdTypes.Trunc)
+        splitMats(2) *= options.hsvBrightness
+        Threshold(splitMats(2), splitMats(2), 255, 255, cv.ThresholdTypes.Trunc)
 
-        cv.Cv2.Merge(split, hsv64)
+        Merge(splitMats, hsv64)
         hsv64.ConvertTo(dst2, cv.MatType.CV_8UC3)
-        cv.Cv2.CvtColor(dst2, dst2, cv.ColorConversionCodes.HSV2BGR)
+        CvtColor(dst2, dst2, cv.ColorConversionCodes.HSV2BGR)
         labels(2) = "Brightness level = " + CStr(options.hsvBrightness)
     End Sub
 End Class
@@ -64,7 +64,7 @@ Public Class Brightness_Grid : Inherits TaskParent
 
         Dim meanVals As New List(Of Single)
         For Each r In task.gridRects
-            meanVals.Add(cv.Cv2.Mean(dst2(r))(0))
+            meanVals.Add(Mean(dst2(r))(0))
         Next
 
         Dim max = meanVals.Max

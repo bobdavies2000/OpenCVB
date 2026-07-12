@@ -13,14 +13,14 @@ Public Class FeatureFlow_Basics : Inherits TaskParent
             For Each p2 In currFeatures
                 Dim r = ValidateRect(New cv.Rect(p2.X - pad, p2.Y - pad, Math.Min(rect.Width, task.gridWH),
                                                                                  Math.Min(task.gridWH, rect.Height)))
-                cv.Cv2.MatchTemplate(dst2(rect), dst3(r), correlationmat, cv.TemplateMatchModes.CCoeffNormed)
+                MatchTemplate(dst2(rect), dst3(r), correlationmat, cv.TemplateMatchModes.CCoeffNormed)
                 correlations.Add(correlationmat.Get(Of Single)(0, 0))
             Next
             Dim maxCorrelation = correlations.Max
             If maxCorrelation >= task.fCorrThreshold Then
                 Dim index = correlations.IndexOf(maxCorrelation)
                 Dim lp = New lpData(p1, currFeatures(index))
-                cv.Cv2.Line(dst2, lp.p1, lp.p2, task.highlight, task.lineWidth)
+                Line(dst2, lp.p1, lp.p2, task.highlight, task.lineWidth)
             End If
         Next
     End Sub
@@ -35,7 +35,7 @@ Public Class FeatureFlow_Basics : Inherits TaskParent
         buildCorrelations(lastFeatures, feat.features)
 
         For Each pt In feat.features
-        cv.Cv2.Circle(dst2, pt, task.DotSize, task.highlight, -1, task.lineType)
+        Circle(dst2, pt, task.DotSize, task.highlight, -1, task.lineType)
         Next
         lastFeatures = New List(Of cv.Point)(feat.features)
     End Sub
@@ -60,8 +60,8 @@ Public Class FeatureFlow_LucasKanade : Inherits TaskParent
         If src.Channels <> 1 Then src = task.gray
         feat.Run(src)
 
-        cv.Cv2.CvtColor(src, dst2, cv.ColorConversionCodes.GRAY2BGR)
-        cv.Cv2.CvtColor(src, dst3, cv.ColorConversionCodes.GRAY2BGR)
+        CvtColor(src, dst2, cv.ColorConversionCodes.GRAY2BGR)
+        CvtColor(src, dst3, cv.ColorConversionCodes.GRAY2BGR)
 
         Static lastGray As cv.Mat = task.gray.Clone
         features.Clear()
@@ -71,7 +71,7 @@ Public Class FeatureFlow_LucasKanade : Inherits TaskParent
         Dim features1 = cv.Mat.FromPixelData(features.Count, 1, cv.MatType.CV_32FC2, features.ToArray)
         Dim features2 = New cv.Mat
         Dim status As New cv.Mat, err As New cv.Mat, winSize As New cv.Size(3, 3)
-        cv.Cv2.CalcOpticalFlowPyrLK(src, lastGray, features1, features2, status, err, winSize, 3, term, options.OpticalFlowFlag)
+        CalcOpticalFlowPyrLK(src, lastGray, features1, features2, status, err, winSize, 3, term, options.OpticalFlowFlag)
         features = New List(Of cv.Point2f)
         lastFeatures.Clear()
         For i = 0 To status.Rows - 1
@@ -82,9 +82,9 @@ Public Class FeatureFlow_LucasKanade : Inherits TaskParent
                 If length < 30 Then
                     features.Add(pt1)
                     lastFeatures.Add(pt2)
-                    cv.Cv2.Line(dst2, pt1, pt2, task.highlight, task.lineWidth + task.lineWidth, task.lineType)
-                    cv.Cv2.Circle(dst3, pt1, task.DotSize + 3, white, -1, task.lineType)
-                    cv.Cv2.Circle(dst3, pt2, task.DotSize + 1, cv.Scalar.Red, -1, task.lineType)
+                    Line(dst2, pt1, pt2, task.highlight, task.lineWidth + task.lineWidth, task.lineType)
+                    Circle(dst3, pt1, task.DotSize + 3, white, -1, task.lineType)
+                    Circle(dst3, pt2, task.DotSize + 1, cv.Scalar.Red, -1, task.lineType)
                 End If
             End If
         Next

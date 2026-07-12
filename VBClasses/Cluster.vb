@@ -61,14 +61,14 @@ Public Class Cluster_Basics : Inherits TaskParent
         For Each group In clusters
             For i = 0 To group.Value.Count - 1
                 For j = 0 To group.Value.Count - 1
-                    cv.Cv2.Line(dst2, group.Value(i), group.Value(j), white, task.lineWidth, task.lineWidth)
+                    Line(dst2, group.Value(i), group.Value(j), white, task.lineWidth, task.lineWidth)
                 Next
             Next
         Next
         dst3 = src
         For i = 0 To knn.queries.Count - 1
-        cv.Cv2.Circle(dst2, knn.queries(i), task.DotSize, cv.Scalar.Red, -1, task.lineType)
-        cv.Cv2.Circle(dst3, knn.queries(i), task.DotSize, task.highlight, -1, task.lineType)
+        Circle(dst2, knn.queries(i), task.DotSize, cv.Scalar.Red, -1, task.lineType)
+        Circle(dst3, knn.queries(i), task.DotSize, task.highlight, -1, task.lineType)
         Next
         labels(2) = CStr(clusters.Count) + " groups built from " + CStr(ptInput.Count) + " by combining each input point and its nearest neighbor."
         labels(3) = CStr(ptInput.Count) + " input features found."
@@ -97,16 +97,16 @@ Public Class XR_Cluster_Hulls : Inherits TaskParent
 
         hulls.Clear()
         For Each group In cluster.clusters
-            Dim hullPoints = cv.Cv2.ConvexHull(group.Value.ToArray, True).ToList
+            Dim hullPoints = ConvexHull(group.Value.ToArray, True).ToList
             Dim hull As New List(Of cv.Point)
             If hullPoints.Count > 2 Then
                 For Each pt In hullPoints
                     hull.Add(New cv.Point(pt.X, pt.Y))
                 Next
             ElseIf hullPoints.Count = 2 Then
-                cv.Cv2.Line(dst3, hullPoints(0), hullPoints(1), white, task.lineWidth, task.lineWidth)
+                Line(dst3, hullPoints(0), hullPoints(1), white, task.lineWidth, task.lineWidth)
             Else
-            cv.Cv2.Circle(dst3, hullPoints(0), task.DotSize, task.highlight, -1, task.lineType)
+            Circle(dst3, hullPoints(0), task.DotSize, task.highlight, -1, task.lineType)
             End If
 
             hulls.Add(hull)

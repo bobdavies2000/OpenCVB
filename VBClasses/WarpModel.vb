@@ -32,7 +32,7 @@ Public Class WarpModel_Basics : Inherits TaskParent
 
         Dim mergeInput() = {src, aligned(0), aligned(1)}
         Dim merged As New cv.Mat
-        cv.Cv2.Merge(mergeInput, merged)
+        Merge(mergeInput, merged)
         dst3.SetTo(0)
         dst3(New cv.Rect(0, 0, merged.Width, merged.Height)) = merged
         SetTrueText("Note small displacement of" + vbCrLf + "the image when gradient is used." + vbCrLf +
@@ -98,10 +98,10 @@ Public Class WarpModel_ECC : Inherits TaskParent
 
         If options.warpMode <> 3 Then
             Dim warpMat = cv.Mat.FromPixelData(2, 3, cv.MatType.CV_32F, warpMatrix)
-            cv.Cv2.WarpAffine(src2, aligned, warpMat, src.Size(), cv.InterpolationFlags.Linear + cv.InterpolationFlags.WarpInverseMap)
+            WarpAffine(src2, aligned, warpMat, src.Size(), cv.InterpolationFlags.Linear + cv.InterpolationFlags.WarpInverseMap)
         Else
             Dim warpMat = cv.Mat.FromPixelData(3, 3, cv.MatType.CV_32F, warpMatrix)
-            cv.Cv2.WarpPerspective(src2, aligned, warpMat, src.Size(), cv.InterpolationFlags.Linear + cv.InterpolationFlags.WarpInverseMap)
+            WarpPerspective(src2, aligned, warpMat, src.Size(), cv.InterpolationFlags.Linear + cv.InterpolationFlags.WarpInverseMap)
         End If
 
         dst2 = New cv.Mat(New cv.Size(task.workRes.Width, task.workRes.Height), cv.MatType.CV_8U, cv.Scalar.All(0))
@@ -164,7 +164,7 @@ Public Class WarpModel_Input : Inherits TaskParent
             For i = 0 To rgb.Count - 1
                 Dim sz = New cv.Size(src.Width * rgb(i).Height / rgb(i).Width, src.Height)
                 r(i) = New cv.Rect(0, 0, sz.Width, sz.Height)
-                cv.Cv2.Resize(rgb(i), rgb(i), sz)
+                Resize(rgb(i), rgb(i), sz)
             Next
         End If
 
@@ -173,7 +173,7 @@ Public Class WarpModel_Input : Inherits TaskParent
         dst2 = rgb(2)
 
         Dim merged As New cv.Mat
-        cv.Cv2.Merge(rgb, merged)
+        Merge(rgb, merged)
         dst3.SetTo(0)
         dst3(r(0)) = merged
     End Sub

@@ -13,10 +13,10 @@ Public Class HeatMap_Basics : Inherits TaskParent
 
         If src.Type <> cv.MatType.CV_32FC3 Then src = task.pointCloud
 
-        cv.Cv2.CalcHist({src}, task.channelsTop, New cv.Mat, histogramTop, 2, task.bins2D, task.rangesTop)
+        CalcHist({src}, task.channelsTop, New cv.Mat, histogramTop, 2, task.bins2D, task.rangesTop)
         histogramTop.Row(0).SetTo(0)
 
-        cv.Cv2.CalcHist({src}, task.channelsSide, New cv.Mat, histogramSide, 2, task.bins2D, task.rangesSide)
+        CalcHist({src}, task.channelsSide, New cv.Mat, histogramSide, 2, task.bins2D, task.rangesSide)
         histogramSide.Col(0).SetTo(0)
 
         topframes.Run(histogramTop)
@@ -25,9 +25,9 @@ Public Class HeatMap_Basics : Inherits TaskParent
         sideframes.Run(histogramSide)
         dst1 = sideframes.dst2
 
-        cv.Cv2.ConvertScaleAbs(dst0, dst0)
+        ConvertScaleAbs(dst0, dst0)
         dst2 = Palettize(dst0, 0)
-        cv.Cv2.ConvertScaleAbs(dst1, dst1)
+        ConvertScaleAbs(dst1, dst1)
         dst3 = Palettize(dst1, 0)
         labels(2) = "Top view of heat map with the last " + CStr(task.fOptions.FrameHistoryCount.Value) + " frames"
         labels(3) = "Side view of heat map with the last " + CStr(task.fOptions.FrameHistoryCount.Value ) + " frames"
@@ -60,11 +60,11 @@ Public Class XR_HeatMap_Grid : Inherits TaskParent
         Dim maxCount1 As Integer, maxCount2 As Integer
         Dim sync1 As New Object, sync2 As New Object
         For Each roi In task.gridRects
-            Dim count1 = cv.Cv2.CountNonZero(heat.histogramTop(roi))
+            Dim count1 = CountNonZero(heat.histogramTop(roi))
             dst2(roi).SetTo(count1)
             If count1 > maxCount1 Then maxCount1 = count1
 
-            Dim count2 = cv.Cv2.CountNonZero(heat.histogramSide(roi))
+            Dim count2 = CountNonZero(heat.histogramSide(roi))
             dst3(roi).SetTo(count2)
             If count2 > maxCount2 Then maxCount2 = count2
         Next
@@ -93,8 +93,8 @@ Public Class HeatMap_Hot : Inherits TaskParent
 
         Dim mmTop = GetMinMax(dst2)
         Dim mmSide = GetMinMax(dst3)
-        labels(2) = CStr(mmTop.maxVal) + " max count " + CStr(cv.Cv2.CountNonZero(dst2)) + " pixels in the top down view"
-        labels(3) = CStr(mmSide.maxVal) + " max count " + CStr(cv.Cv2.CountNonZero(dst3)) + " pixels in the side view"
+        labels(2) = CStr(mmTop.maxVal) + " max count " + CStr(CountNonZero(dst2)) + " pixels in the top down view"
+        labels(3) = CStr(mmSide.maxVal) + " max count " + CStr(CountNonZero(dst3)) + " pixels in the side view"
     End Sub
 End Class
 

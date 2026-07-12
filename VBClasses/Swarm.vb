@@ -24,11 +24,11 @@ Public Class Swarm_Basics : Inherits TaskParent
             Dim pt = queries(i)
             For j = 0 To Math.Min(knn.trainInput.Count, options.ptCount) - 1
                 Dim ptNew = trainInput(knn.result(i, j))
-                cv.Cv2.Line(dst, pt, ptNew, white, task.lineWidth, task.lineType)
-                If ptNew.X < options.border Then cv.Cv2.Line(dst, New cv.Point2f(0, ptNew.Y), ptNew, white, task.lineWidth, task.lineType)
-                If ptNew.Y < options.border Then cv.Cv2.Line(dst, New cv.Point2f(ptNew.X, 0), ptNew, white, task.lineWidth, task.lineType)
-                If ptNew.X > dst.Width - options.border Then cv.Cv2.Line(dst, New cv.Point2f(dst.Width, ptNew.Y), ptNew, white, task.lineWidth, task.lineType)
-                If ptNew.Y > dst.Height - options.border Then cv.Cv2.Line(dst, New cv.Point2f(ptNew.X, dst.Height), ptNew, white, task.lineWidth, task.lineType)
+                Line(dst, pt, ptNew, white, task.lineWidth, task.lineType)
+                If ptNew.X < options.border Then Line(dst, New cv.Point2f(0, ptNew.Y), ptNew, white, task.lineWidth, task.lineType)
+                If ptNew.Y < options.border Then Line(dst, New cv.Point2f(ptNew.X, 0), ptNew, white, task.lineWidth, task.lineType)
+                If ptNew.X > dst.Width - options.border Then Line(dst, New cv.Point2f(dst.Width, ptNew.Y), ptNew, white, task.lineWidth, task.lineType)
+                If ptNew.Y > dst.Height - options.border Then Line(dst, New cv.Point2f(ptNew.X, dst.Height), ptNew, white, task.lineWidth, task.lineType)
             Next
         Next
         Return dst
@@ -58,7 +58,7 @@ Public Class Swarm_Basics : Inherits TaskParent
             Dim pt = knn.queries(i)
             Dim ptNew = knn.trainInput(trainIndex)
             Dim nextDist = pt.DistanceTo(ptNew)
-            cv.Cv2.Line(dst2, pt, ptNew, white, task.lineWidth, task.lineType)
+            Line(dst2, pt, ptNew, white, task.lineWidth, task.lineType)
             disList.Add(nextDist)
             lpList.Add(New lpData(pt, ptNew))
             If nextDist > 0 Then

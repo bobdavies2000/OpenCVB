@@ -12,7 +12,7 @@ Public Class Stripes_Basics : Inherits TaskParent
 
         Dim reduction = task.fOptions.ReductionColor.Value
         Dim mm = GetMinMax(depth32S, task.depthmask)
-        dst2 = cv.Cv2.Abs(depth32S) / reduction
+        dst2 = Abs(depth32S) / reduction
         Dim maxVal = Math.Min(Math.Abs(mm.minVal), mm.maxVal) ' symmetric around 0
         If maxVal = 0 Then maxVal = mm.maxVal ' symmetric around 0 except for Z where all values are above 0
         classCount = maxVal \ reduction
@@ -109,8 +109,8 @@ Public Class XR_Stripes_Histogram : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         stripes.Run(src)
-        cv.Cv2.CvtColor(stripes.dst1, dst1, cv.ColorConversionCodes.BGR2GRAY)
-        cv.Cv2.CvtColor(stripes.dst2, dst2, cv.ColorConversionCodes.BGR2GRAY)
-        cv.Cv2.CvtColor(stripes.dst3, dst3, cv.ColorConversionCodes.BGR2GRAY)
+        CvtColor(stripes.dst1, dst1, cv.ColorConversionCodes.BGR2GRAY)
+        CvtColor(stripes.dst2, dst2, cv.ColorConversionCodes.BGR2GRAY)
+        CvtColor(stripes.dst3, dst3, cv.ColorConversionCodes.BGR2GRAY)
     End Sub
 End Class

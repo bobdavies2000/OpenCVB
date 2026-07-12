@@ -30,45 +30,44 @@ Public Class Coherence_Basics : Inherits TaskParent
         src = src(srcRect)
 
         Dim eigen As New cv.Mat
-        Dim split() As cv.Mat
         For i = 0 To 3
-            cv.Cv2.CornerEigenValsAndVecs(src, eigen, options.str_sigma, options.eigenkernelsize)
-            split = cv.Cv2.Split(eigen)
-            Dim x = split(2), y = split(3)
+            CornerEigenValsAndVecs(src, eigen, options.str_sigma, options.eigenkernelsize)
+            Dim splitMats() = Split(eigen)
+            Dim x = splitMats(2), y = splitMats(3)
 
             Dim gxx As New cv.Mat, gxy As New cv.Mat, gyy As New cv.Mat
-            cv.Cv2.Sobel(src, gxx, cv.MatType.CV_32F, 2, 0, options.sigma)
-            cv.Cv2.Sobel(src, gxy, cv.MatType.CV_32F, 1, 1, options.sigma)
-            cv.Cv2.Sobel(src, gyy, cv.MatType.CV_32F, 0, 2, options.sigma)
+            Sobel(src, gxx, cv.MatType.CV_32F, 2, 0, options.sigma)
+            Sobel(src, gxy, cv.MatType.CV_32F, 1, 1, options.sigma)
+            Sobel(src, gyy, cv.MatType.CV_32F, 0, 2, options.sigma)
 
             Dim tmpX As New cv.Mat, tmpXY As New cv.Mat, tmpY As New cv.Mat
-            cv.Cv2.Multiply(x, x, tmpX)
-            cv.Cv2.Multiply(tmpX, gxx, tmpX)
-            cv.Cv2.Multiply(x, y, tmpXY)
-            cv.Cv2.Multiply(tmpXY, gxy, tmpXY)
+            Multiply(x, x, tmpX)
+            Multiply(tmpX, gxx, tmpX)
+            Multiply(x, y, tmpXY)
+            Multiply(tmpXY, gxy, tmpXY)
             tmpXY.Mul(tmpXY, 2)
 
-            cv.Cv2.Multiply(y, y, tmpY)
-            cv.Cv2.Multiply(tmpY, gyy, tmpY)
+            Multiply(y, y, tmpY)
+            Multiply(tmpY, gyy, tmpY)
 
             Dim gvv As New cv.Mat
             gvv = tmpX + tmpXY + tmpY
 
             Dim mask As New cv.Mat
-            cv.Cv2.Threshold(gvv, mask, 0, 255, cv.ThresholdTypes.BinaryInv)
-            cv.Cv2.ConvertScaleAbs(mask, mask)
+            Threshold(gvv, mask, 0, 255, cv.ThresholdTypes.BinaryInv)
+            ConvertScaleAbs(mask, mask)
 
-            Dim erode As New cv.Mat
-            cv.Cv2.Erode(src, erode, New cv.Mat)
-            Dim dilate As New cv.Mat
-            cv.Cv2.Dilate(src, dilate, New cv.Mat)
+            Dim erodeMat As New cv.Mat
+            Erode(src, erodeMat, New cv.Mat)
+            Dim dilateMat As New cv.Mat
+            Dilate(src, dilateMat, New cv.Mat)
 
-            Dim imgl = erode
-            dilate.CopyTo(imgl, mask)
+            Dim imgl = erodeMat
+            dilateMat.CopyTo(imgl, mask)
             src = src * (1 - options.blend) + imgl * options.blend
         Next
         dst2(srcRect) = src
-        cv.Cv2.Rectangle(dst2, srcRect, cv.Scalar.Yellow, 2)
+        Rectangle(dst2, srcRect, cv.Scalar.Yellow, 2)
         dst3.SetTo(0)
     End Sub
 End Class

@@ -42,7 +42,7 @@ Public Class XR_DepthLinear_Basics : Inherits TaskParent
 
         inputY.Run(src)
         dst3 = inputY.dst2.Clone
-        cv.Cv2.Merge({dst2, dst3, task.pcSplit(2)}, cloud)
+        Merge({dst2, dst3, task.pcSplit(2)}, cloud)
     End Sub
 End Class
 
@@ -82,11 +82,11 @@ Public Class XR_DepthLinear_Visualize : Inherits TaskParent
                 r2 = New cv.Rect(0, 1, r1.Width, r1.Height)
             End If
 
-            cv.Cv2.Absdiff(pc(r2), pc(r1), dst0)
+            Absdiff(pc(r2), pc(r1), dst0)
 
-            cv.Cv2.Resize(dst0, mats.mat(i), roi.Size, 0, 0, cv.InterpolationFlags.Nearest)
-            cv.Cv2.Threshold(mats.mat(i), dst1, options.delta, 255, cv.ThresholdTypes.Binary)
-            cv.Cv2.ConvertScaleAbs(dst1, dst1)
+            Resize(dst0, mats.mat(i), roi.Size, 0, 0, cv.InterpolationFlags.Nearest)
+            Threshold(mats.mat(i), dst1, options.delta, 255, cv.ThresholdTypes.Binary)
+            ConvertScaleAbs(dst1, dst1)
 
             mats.mat(i).SetTo(0, dst1)
 
@@ -98,9 +98,9 @@ Public Class XR_DepthLinear_Visualize : Inherits TaskParent
                         CStr(CInt(options.delta * 1000)) + " mm's apart in the X, Y, or Z direction"
             plotHist.Run(mats.mat(i))
             matPlots.mat(i) = plotHist.dst2.Clone
-            If i = 2 Then cv.Cv2.Threshold(mats.mat(2), mats.mat(2), 0, 255, cv.ThresholdTypes.Binary)
-            cv.Cv2.Normalize(mats.mat(i), mats.mat(i), 0, 255, cv.NormTypes.MinMax)
-            cv.Cv2.ConvertScaleAbs(mats.mat(i), mats.mat(i))
+            If i = 2 Then Threshold(mats.mat(2), mats.mat(2), 0, 255, cv.ThresholdTypes.Binary)
+            Normalize(mats.mat(i), mats.mat(i), 0, 255, cv.NormTypes.MinMax)
+            ConvertScaleAbs(mats.mat(i), mats.mat(i))
         Next
 
         mats.Run(emptyMat)
@@ -149,11 +149,11 @@ Public Class DepthLinear_Input : Inherits TaskParent
             r2 = New cv.Rect(0, 1, r1.Width, r1.Height)
         End If
 
-        cv.Cv2.Absdiff(pc(r2), pc(r1), dst0)
+        Absdiff(pc(r2), pc(r1), dst0)
 
-        cv.Cv2.Resize(dst0, dst2, roi.Size, 0, 0, cv.InterpolationFlags.Nearest)
-        cv.Cv2.Threshold(dst2, dst1, options.delta, 255, cv.ThresholdTypes.Binary)
-        cv.Cv2.ConvertScaleAbs(dst1, dst1)
+        Resize(dst0, dst2, roi.Size, 0, 0, cv.InterpolationFlags.Nearest)
+        Threshold(dst2, dst1, options.delta, 255, cv.ThresholdTypes.Binary)
+        ConvertScaleAbs(dst1, dst1)
 
         dst2.SetTo(0, dst1)
         Dim msg = Choose(options.dimension + 1, "X direction", "Y direction", "Z in X-direction")
@@ -217,7 +217,7 @@ Public Class DepthLinear_InputX : Inherits TaskParent
         Public Overrides Sub RunAlg(src As cv.Mat)
             input.Run(src)
             dst2 = input.dst2
-        cv.Cv2.Threshold(dst2, dst3, 0, 255, cv.ThresholdTypes.Binary)
+        Threshold(dst2, dst3, 0, 255, cv.ThresholdTypes.Binary)
         labels = input.labels
         End Sub
     End Class
@@ -259,7 +259,7 @@ Public Class DepthLinear_InputX : Inherits TaskParent
                 plotSLR.plot.minY = -task.xRange
                 plotSLR.plot.maxY = task.xRange
             End If
-            cv.Cv2.Line(task.depthRGB, p1, p2, task.highlight, task.lineWidth)
+            Line(task.depthRGB, p1, p2, task.highlight, task.lineWidth)
 
             plotSLR.slrCore.inputX.Clear()
             plotSLR.slrCore.inputY.Clear()
@@ -321,7 +321,7 @@ Public Class DepthLinear_InputX : Inherits TaskParent
                     dst2.Set(Of Single)(y, x, CSng(outputY(x)))
                 Next
             Next
-            cv.Cv2.Merge({dst2, task.pcSplit(1), task.pcSplit(2)}, dst3)
+            Merge({dst2, task.pcSplit(1), task.pcSplit(2)}, dst3)
             dst3.SetTo(0, task.noDepthMask)
         End Sub
     End Class
@@ -369,7 +369,7 @@ Public Class DepthLinear_InputX : Inherits TaskParent
                     dst2.Set(Of Single)(y, x, CSng(outputY(y)))
                 Next
             Next
-            cv.Cv2.Merge({task.pcSplit(0), dst2, task.pcSplit(2)}, dst3)
+            Merge({task.pcSplit(0), dst2, task.pcSplit(2)}, dst3)
             dst3.SetTo(0, task.noDepthMask)
         End Sub
     End Class

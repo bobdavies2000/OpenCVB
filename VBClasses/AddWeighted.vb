@@ -10,7 +10,7 @@ Public Class AddWeighted_Accumulate : Inherits TaskParent
         options.Run()
         If src.Channels <> 1 Then src = task.gray
         If src.Type <> cv.MatType.CV_32F Then src.ConvertTo(dst3, cv.MatType.CV_32F) Else dst3 = src
-        cv.Cv2.AccumulateWeighted(dst3, dst1, options.accumWeighted, New cv.Mat)
+        AccumulateWeighted(dst3, dst1, options.accumWeighted, New cv.Mat)
         dst1.ConvertTo(dst2, cv.MatType.CV_8U)
         labels(2) = "Accumulated gray scale image"
     End Sub
@@ -36,13 +36,13 @@ Public Class AddWeighted_Basics : Inherits TaskParent
             If src.Type <> cv.MatType.CV_8UC3 Or src2.Type <> cv.MatType.CV_8UC3 Then
                 If src.Type = cv.MatType.CV_32FC1 Then src = Mat_Convert.Mat_32f_To_8UC3(src)
                 If src2.Type = cv.MatType.CV_32FC1 Then src2 = Mat_Convert.Mat_32f_To_8UC3(src2)
-                If src.Type <> cv.MatType.CV_8UC3 Then cv.Cv2.CvtColor(src, src, cv.ColorConversionCodes.GRAY2BGR)
-                If src2.Type <> cv.MatType.CV_8UC3 Then cv.Cv2.CvtColor(src2, src2, cv.ColorConversionCodes.GRAY2BGR)
+                If src.Type <> cv.MatType.CV_8UC3 Then CvtColor(src, src, cv.ColorConversionCodes.GRAY2BGR)
+                If src2.Type <> cv.MatType.CV_8UC3 Then CvtColor(src2, src2, cv.ColorConversionCodes.GRAY2BGR)
             End If
         End If
 
         weight = options.addWeighted
-        cv.Cv2.AddWeighted(src, weight, src2, 1.0 - weight, 0, dst2)
+        AddWeighted(src, weight, src2, 1.0 - weight, 0, dst2)
         labels(2) = $"Depth %: {100 - weight * 100} BGR %: {CInt(weight * 100)}"
     End Sub
 End Class
@@ -60,7 +60,7 @@ Public Class XR_AddWeighted_DepthAccumulate : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
 
-        cv.Cv2.AccumulateWeighted(task.pcSplit(2) * 1000, dst2, options.accumWeighted, New cv.Mat)
+        AccumulateWeighted(task.pcSplit(2) * 1000, dst2, options.accumWeighted, New cv.Mat)
     End Sub
 End Class
 
@@ -104,7 +104,7 @@ Public Class XR_AddWeighted_Edges : Inherits TaskParent
         labels(2) = task.edges.labels(2)
 
         Dim _cvtEdges As New cv.Mat
-        cv.Cv2.CvtColor(task.edges.dst2, _cvtEdges, cv.ColorConversionCodes.GRAY2BGR)
+        CvtColor(task.edges.dst2, _cvtEdges, cv.ColorConversionCodes.GRAY2BGR)
         dst3 = ShowAddweighted(_cvtEdges, src, labels(3))
     End Sub
 End Class

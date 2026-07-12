@@ -2,7 +2,7 @@ Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 'https://github.com/DinoZ1729/Double-Pendulum/blob/main/pendulum_with_trace.cpp
 Public Class Pendulum_Basics : Inherits TaskParent
     Dim l1 As Single = 150, l2 As Single = 150, m1 As Single = 10, m2 As Single = 10
-    Dim o1 As Single = CSng(2 * cv.Cv2.PI / 2), o2 As Single = CSng(2 * cv.Cv2.PI / 3)
+    Dim o1 As Single = CSng(2 * PI / 2), o2 As Single = CSng(2 * PI / 3)
     Dim w1 As Single, w2 As Single
     Dim g As Single = 9.81F
     Dim dw As Single = 2, dh As Single = 4
@@ -50,10 +50,10 @@ Public Class Pendulum_Basics : Inherits TaskParent
 
 
         Dim lineCenter = New cv.Point(CInt(center.x), CInt(center.y))
-        cv.Cv2.Line(dst2, lineCenter, p1, task.scalarColors(task.frameCount Mod 255), task.lineWidth, task.lineType)
-        cv.Cv2.Line(dst2, p1, p2, task.scalarColors(task.frameCount Mod 255), task.lineWidth, task.lineType)
+        Line(dst2, lineCenter, p1, task.scalarColors(task.frameCount Mod 255), task.lineWidth, task.lineType)
+        Line(dst2, p1, p2, task.scalarColors(task.frameCount Mod 255), task.lineWidth, task.lineType)
 
-        cv.Cv2.Circle(dst3, p1, task.DotSize, task.scalarColors(task.frameCount Mod 255), -1, task.lineType)
-        cv.Cv2.Circle(dst3, p2, task.DotSize, task.scalarColors(task.frameCount Mod 255), -1, task.lineType)
+        Circle(dst3, p1, task.DotSize, task.scalarColors(task.frameCount Mod 255), -1, task.lineType)
+        Circle(dst3, p2, task.DotSize, task.scalarColors(task.frameCount Mod 255), -1, task.lineType)
     End Sub
 End Class

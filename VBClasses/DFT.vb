@@ -3,8 +3,8 @@ Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 Module dft_Module
     Public Function inverseDFT(complexImage As cv.Mat) As cv.Mat
         Dim invDFT As New cv.Mat
-        cv.Cv2.Dft(complexImage, invDFT, cv.DftFlags.Inverse Or cv.DftFlags.RealOutput)
-        cv.Cv2.Normalize(invDFT, invDFT, 0, 255, cv.NormTypes.MinMax)
+        Dft(complexImage, invDFT, cv.DftFlags.Inverse Or cv.DftFlags.RealOutput)
+        Normalize(invDFT, invDFT, 0, 255, cv.NormTypes.MinMax)
         Dim inverse8u As New cv.Mat
         invDFT.ConvertTo(inverse8u, cv.MatType.CV_8U)
         Return inverse8u
@@ -31,27 +31,27 @@ Public Class DFT_Basics : Inherits TaskParent
         labels(3) = "DFT_Basics Spectrum Magnitude"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        rows = cv.Cv2.GetOptimalDFTSize(task.gray.Rows)
-        cols = cv.Cv2.GetOptimalDFTSize(task.gray.Cols)
+        rows = GetOptimalDFTSize(task.gray.Rows)
+        cols = GetOptimalDFTSize(task.gray.Cols)
         Dim padded = New cv.Mat(task.gray.Width, task.gray.Height, cv.MatType.CV_8UC3)
-        cv.Cv2.CopyMakeBorder(task.gray, padded, 0, rows - task.gray.Rows, 0, cols - task.gray.Cols, cv.BorderTypes.Constant, cv.Scalar.All(0))
+        CopyMakeBorder(task.gray, padded, 0, rows - task.gray.Rows, 0, cols - task.gray.Cols, cv.BorderTypes.Constant, cv.Scalar.All(0))
         Dim padded32 As New cv.Mat
         padded.ConvertTo(padded32, cv.MatType.CV_32F)
         Dim planes() = {padded32, New cv.Mat(padded.Size(), cv.MatType.CV_32F, cv.Scalar.All(0))}
-        cv.Cv2.Merge(planes, complexImage)
-        cv.Cv2.Dft(complexImage, complexImage)
+        Merge(planes, complexImage)
+        Dft(complexImage, complexImage)
 
         ' compute the magnitude And switch to logarithmic scale => log(1 + sqrt(Re(DFT(I))^2 + Im(DFT(I))^2))
-        cv.Cv2.Split(complexImage, planes)
+        Split(complexImage, planes)
 
         cv.Cv2.Magnitude(planes(0), planes(1), magnitude)
         magnitude += cv.Scalar.All(1) ' switch To logarithmic scale
-        cv.Cv2.Log(magnitude, magnitude)
+        Log(magnitude, magnitude)
 
         ' crop the spectrum, if it has an odd number of rows Or columns
         spectrum = magnitude(New cv.Rect(0, 0, magnitude.Cols And -2, magnitude.Rows And -2))
         ' Transform the matrix with float values into range 0-255
-        cv.Cv2.Normalize(spectrum, spectrum, 0, 255, cv.NormTypes.MinMax)
+        Normalize(spectrum, spectrum, 0, 255, cv.NormTypes.MinMax)
         spectrum.ConvertTo(padded, cv.MatType.CV_8U)
 
         ' rearrange the quadrants of Fourier image  so that the origin is at the image center
@@ -85,17 +85,17 @@ Public Class XR_DFT_Inverse : Inherits TaskParent
         task.gray.ConvertTo(gray32f, cv.MatType.CV_32F)
         Dim planes() = {gray32f, New cv.Mat(gray32f.Size(), cv.MatType.CV_32F, cv.Scalar.All(0))}
         Dim complex As New cv.Mat, complexImage As New cv.Mat
-        cv.Cv2.Merge(planes, complex)
-        cv.Cv2.Dft(complex, complexImage)
+        Merge(planes, complex)
+        Dft(complex, complexImage)
 
         dst2 = inverseDFT(complexImage)
 
         Dim diff As New cv.Mat
-        cv.Cv2.Absdiff(task.gray, dst2, diff)
-        cv.Cv2.Threshold(diff, mats.mat(0), 0, 255, cv.ThresholdTypes.Binary)
+        Absdiff(task.gray, dst2, diff)
+        Threshold(diff, mats.mat(0), 0, 255, cv.ThresholdTypes.Binary)
         mats.mat(1) = (diff * 50).ToMat
         mats.Run(emptyMat)
-        If cv.Cv2.CountNonZero(mats.mat(0)) > 0 Then
+        If CountNonZero(mats.mat(0)) > 0 Then
             dst3 = mats.dst2
             labels(3) = "Mask of difference (top) and relative diff (bot)"
         Else
@@ -137,13 +137,13 @@ Public Class DFT_ButterworthFilter_MT : Inherits TaskParent
                         Next
                     Next
                     Dim tmpMerge() = {tmp, tmp}
-                    cv.Cv2.Merge(tmpMerge, options.butterworthFilter(k))
+                    Merge(tmpMerge, options.butterworthFilter(k))
                 End Sub)
         End If
         Parallel.For(0, 2,
            Sub(k)
                Dim complex As New cv.Mat
-               cv.Cv2.MulSpectrums(options.butterworthFilter(k), dft.complexImage, complex, options.dftFlag)
+               MulSpectrums(options.butterworthFilter(k), dft.complexImage, complex, options.dftFlag)
                If k = 0 Then dst2 = inverseDFT(complex) Else dst3 = inverseDFT(complex)
            End Sub)
     End Sub
@@ -167,7 +167,7 @@ Public Class XR_DFT_ButterworthDepth : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
     Dim _bfilter_cvt As New cv.Mat
-    cv.Cv2.CvtColor(task.depthRGB, _bfilter_cvt, cv.ColorConversionCodes.BGR2GRAY)
+    CvtColor(task.depthRGB, _bfilter_cvt, cv.ColorConversionCodes.BGR2GRAY)
     bfilter.Run(_bfilter_cvt)
         dst2 = bfilter.dst2
         dst3 = bfilter.dst3

@@ -31,7 +31,7 @@ Public Class Filter_Basics_TA : Inherits TaskParent
         End If
 
         Dim _grayFilter_cvt As New cv.Mat
-        cv.Cv2.CvtColor(dst2, _grayFilter_cvt, cv.ColorConversionCodes.BGR2GRAY)
+        CvtColor(dst2, _grayFilter_cvt, cv.ColorConversionCodes.BGR2GRAY)
         grayFilter.Run(_grayFilter_cvt)
         labels(3) = grayFilter.labels(2)
         dst3 = grayFilter.dst2
@@ -106,7 +106,7 @@ Public Class Filter_Laplacian : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         Dim imgLaplacian As New cv.Mat
-        cv.Cv2.Filter2D(src, imgLaplacian, cv.MatType.CV_32F, cv.Mat.FromPixelData(3, 3, cv.MatType.CV_32FC1, New Single() {1, 1, 1, 1, -8, 1, 1, 1, 1}))
+        Filter2D(src, imgLaplacian, cv.MatType.CV_32F, cv.Mat.FromPixelData(3, 3, cv.MatType.CV_32FC1, New Single() {1, 1, 1, 1, -8, 1, 1, 1, 1}))
         src.ConvertTo(dst1, cv.MatType.CV_32F)
         dst0 = (dst1 - imgLaplacian).ToMat
         dst0.ConvertTo(dst2, src.Type)
@@ -135,7 +135,7 @@ Public Class XR_Filter_NormalizedKernel : Inherits TaskParent
         labels(2) = "kernel sum = " + sum.ToString(fmt3)
 
         Dim dst32f As New cv.Mat
-        cv.Cv2.Filter2D(src, dst32f, cv.MatType.CV_32FC1, options.kernel, anchor:=New cv.Point(0, 0))
+        Filter2D(src, dst32f, cv.MatType.CV_32FC1, options.kernel, anchor:=New cv.Point(0, 0))
         dst32f.ConvertTo(dst2, cv.MatType.CV_8UC3)
     End Sub
 End Class
@@ -155,7 +155,7 @@ Public Class XR_Filter_Normalized2D : Inherits TaskParent
         options.Run()
         Dim kernelSize As Integer = If(standaloneTest(), (task.frameCount Mod 20) + 1, options.kernelSize)
         Dim kernel = New cv.Mat(kernelSize, kernelSize, cv.MatType.CV_32F).SetTo(1 / (kernelSize * kernelSize))
-        cv.Cv2.Filter2D(src, dst2, -1, kernel)
+        Filter2D(src, dst2, -1, kernel)
         labels(2) = "Normalized KernelSize = " + CStr(kernelSize)
     End Sub
 End Class
@@ -176,16 +176,16 @@ Public Class XR_Filter_SepFilter2D : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
-        Dim kernel = cv.Cv2.GetGaussianKernel(options.xDim, options.sigma)
-        cv.Cv2.GaussianBlur(src, dst2, New cv.Size(options.xDim, options.yDim), options.sigma)
-        cv.Cv2.SepFilter2D(src, dst3, cv.MatType.CV_8UC3, kernel, kernel)
+        Dim kernel = GetGaussianKernel(options.xDim, options.sigma)
+        GaussianBlur(src, dst2, New cv.Size(options.xDim, options.yDim), options.sigma)
+        SepFilter2D(src, dst3, cv.MatType.CV_8UC3, kernel, kernel)
         If options.diffCheck Then
             Dim graySep As New cv.Mat
-            cv.Cv2.CvtColor(dst3, graySep, cv.ColorConversionCodes.BGR2GRAY)
+            CvtColor(dst3, graySep, cv.ColorConversionCodes.BGR2GRAY)
             Dim grayGauss As New cv.Mat
-            cv.Cv2.CvtColor(dst2, grayGauss, cv.ColorConversionCodes.BGR2GRAY)
-            cv.Cv2.Threshold((graySep - grayGauss).ToMat, dst3, 0, 255, cv.ThresholdTypes.Binary)
-            labels(3) = "Gaussian - SepFilter2D " + CStr(cv.Cv2.CountNonZero(dst3)) + " pixels different."
+            CvtColor(dst2, grayGauss, cv.ColorConversionCodes.BGR2GRAY)
+            Threshold((graySep - grayGauss).ToMat, dst3, 0, 255, cv.ThresholdTypes.Binary)
+            labels(3) = "Gaussian - SepFilter2D " + CStr(CountNonZero(dst3)) + " pixels different."
         Else
             labels(3) = "SepFilter2D Result"
         End If
@@ -206,8 +206,8 @@ Public Class XR_Filter_Minimum : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
         Dim kernelSize As Integer = If(standaloneTest(), (task.frameCount Mod 20) + 1, options.kernelSize)
-        Dim element = cv.Cv2.GetStructuringElement(cv.MorphShapes.Rect, New cv.Size(kernelSize, kernelSize))
-        cv.Cv2.Erode(src, dst2, element)
+        Dim element = GetStructuringElement(cv.MorphShapes.Rect, New cv.Size(kernelSize, kernelSize))
+        Erode(src, dst2, element)
     End Sub
 End Class
 
@@ -225,8 +225,8 @@ Public Class XR_Filter_Maximum : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
         Dim kernelSize As Integer = If(standaloneTest(), (task.frameCount Mod 20) + 1, options.kernelSize)
-        Dim element = cv.Cv2.GetStructuringElement(cv.MorphShapes.Rect, New cv.Size(kernelSize, kernelSize))
-        cv.Cv2.Dilate(src, dst2, element)
+        Dim element = GetStructuringElement(cv.MorphShapes.Rect, New cv.Size(kernelSize, kernelSize))
+        Dilate(src, dst2, element)
     End Sub
 End Class
 
@@ -245,7 +245,7 @@ Public Class XR_Filter_Mean : Inherits TaskParent
         options.Run()
         Dim kernelSize As Integer = If(standaloneTest(), (task.frameCount Mod 20) + 1, options.kernelSize)
         Dim kernel = (cv.Mat.Ones(cv.MatType.CV_32FC1, kernelSize, kernelSize) / (kernelSize * kernelSize)).ToMat
-        cv.Cv2.Filter2D(src, dst2, -1, kernel)
+        Filter2D(src, dst2, -1, kernel)
     End Sub
 End Class
 
@@ -264,7 +264,7 @@ Public Class XR_Filter_Median : Inherits TaskParent
         options.Run()
         Dim kernelSize As Integer = If(standaloneTest(), (task.frameCount Mod 20) + 1, options.kernelSize)
         If kernelSize Mod 2 = 0 Then kernelSize += 1
-        cv.Cv2.MedianBlur(src, dst2, kernelSize)
+        MedianBlur(src, dst2, kernelSize)
     End Sub
 End Class
 
@@ -287,6 +287,6 @@ Public Class Filter_Equalize : Inherits TaskParent
         desc = "Create an equalized image of the grayscale input."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If src.Channels = 1 Then cv.Cv2.EqualizeHist(src, dst2) Else cv.Cv2.EqualizeHist(task.gray, dst2)
+        If src.Channels = 1 Then EqualizeHist(src, dst2) Else EqualizeHist(task.gray, dst2)
     End Sub
 End Class

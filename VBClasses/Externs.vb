@@ -536,9 +536,9 @@ Module Externs
         ' if another algorithm lexically follows the OpenGL algorithms, this may change (or be deleted!)
         If oldGray.Size() <> gray.Size() Then oldGray = gray.Clone()
 
-        cv.Cv2.CalcOpticalFlowFarneback(oldGray, gray, flow, pyrScale, levels, winSize, iterations, polyN, polySigma, OpticalFlowFlags)
+        CalcOpticalFlowFarneback(oldGray, gray, flow, pyrScale, levels, winSize, iterations, polyN, polySigma, OpticalFlowFlags)
         Dim flowVec(1) As cv.Mat
-        flowVec = cv.Cv2.Split(flow)
+        flowVec = Split(flow)
 
         Dim hsv As New cv.Mat
         Dim hsv0 As New cv.Mat
@@ -547,12 +547,12 @@ Module Externs
 
         Dim magnitude As New cv.Mat
         Dim angle As New cv.Mat
-        cv.Cv2.CartToPolar(flowVec(0), flowVec(1), magnitude, angle)
+        CartToPolar(flowVec(0), flowVec(1), magnitude, angle)
         angle.ConvertTo(hsv0, cv.MatType.CV_8UC1, 180 / Math.PI / 2)
-        cv.Cv2.Normalize(magnitude, hsv2, 0, 255, cv.NormTypes.MinMax, cv.MatType.CV_8UC1)
+        Normalize(magnitude, hsv2, 0, 255, cv.NormTypes.MinMax, cv.MatType.CV_8UC1)
 
         Dim hsvVec() As cv.Mat = {hsv0, hsv1, hsv2}
-        cv.Cv2.Merge(hsvVec, hsv)
+        Merge(hsvVec, hsv)
         Return hsv
     End Function
     <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)>

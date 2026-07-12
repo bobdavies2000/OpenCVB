@@ -103,7 +103,7 @@ Public Class Flood_BasicsDemo : Inherits TaskParent
 
         dst1 = src.Clone
 
-        cv.Cv2.CvtColor(task.edges.dst2, dst3, cv.ColorConversionCodes.GRAY2BGR)
+        CvtColor(task.edges.dst2, dst3, cv.ColorConversionCodes.GRAY2BGR)
 
         dst2.SetTo(white, dst3)
     End Sub
@@ -148,10 +148,10 @@ Public Class XR_Flood_Tiers : Inherits TaskParent
         If tier >= tiers.classCount Then tier = 0
 
         If tier = 0 Then
-            cv.Cv2.InRange(tiers.dst2, 0, 1, dst0)
+            InRange(tiers.dst2, 0, 1, dst0)
             dst0 = Not dst0
         Else
-            cv.Cv2.InRange(tiers.dst2, tier, tier, dst0)
+            InRange(tiers.dst2, tier, tier, dst0)
             dst0 = Not dst0
         End If
 
@@ -190,10 +190,10 @@ Public Class XR_Flood_Minimal : Inherits TaskParent
             Dim pt = task.clickPoint
             Dim mask = New cv.Mat(New cv.Size(dst2.Width + 2, dst2.Height + 2), cv.MatType.CV_8U, 0)
             Dim flags = cv.FloodFillFlags.FixedRange Or (255 << 8) Or cv.FloodFillFlags.MaskOnly
-            Dim count = cv.Cv2.FloodFill(dst2, mask, pt, 255, rect, 0, 0, flags)
+            Dim count = FloodFill(dst2, mask, pt, 255, rect, 0, 0, flags)
             dst1.SetTo(0)
             dst3 = mask(New cv.Rect(1, 1, dst2.Width, dst2.Height)).Clone
-            cv.Cv2.Rectangle(dst1, rect, cv.Scalar.All(255), task.lineWidth)
+            Rectangle(dst1, rect, cv.Scalar.All(255), task.lineWidth)
         End If
     End Sub
 End Class
@@ -249,8 +249,8 @@ Public Class Flood_BasicsMask : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         color8U.Run(src)
-        cv.Cv2.InRange(task.pcSplit(2), task.MaxZmeters, 1000, inputRemoved)
-        cv.Cv2.ConvertScaleAbs(inputRemoved, inputRemoved)
+        InRange(task.pcSplit(2), task.MaxZmeters, 1000, inputRemoved)
+        ConvertScaleAbs(inputRemoved, inputRemoved)
         src = color8U.dst2
 
         src.SetTo(0, inputRemoved)
@@ -286,7 +286,7 @@ Public Class Flood_FeatureLess : Inherits TaskParent
         labels(3) = redC.labels(2)
 
         Dim _edges_cvt As New cv.Mat
-        cv.Cv2.CvtColor(dst2, _edges_cvt, cv.ColorConversionCodes.BGR2GRAY)
+        CvtColor(dst2, _edges_cvt, cv.ColorConversionCodes.BGR2GRAY)
         edges.Run(_edges_cvt)
         dst3.SetTo(white, edges.dst2)
 

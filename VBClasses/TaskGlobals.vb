@@ -84,9 +84,9 @@ Public Module vbc
     Public Function GetMinMax(mat As cv.Mat, Optional mask As cv.Mat = Nothing) As mmData
         Dim mm As mmData
         If mask Is Nothing Then
-            cv.Cv2.MinMaxLoc(mat, mm.minVal, mm.maxVal, mm.minLoc, mm.maxLoc)
+            MinMaxLoc(mat, mm.minVal, mm.maxVal, mm.minLoc, mm.maxLoc)
         Else
-            cv.Cv2.MinMaxLoc(mat, mm.minVal, mm.maxVal, mm.minLoc, mm.maxLoc, mask)
+            MinMaxLoc(mat, mm.minVal, mm.maxVal, mm.minLoc, mm.maxLoc, mask)
         End If
 
         If Double.IsInfinity(mm.maxVal) Then
@@ -103,7 +103,7 @@ Public Module vbc
     ' alternative optional parameter: ApproxTC89L1 or ApproxNone
     Public Function ContourBuild(mask As cv.Mat, Optional approxMode As cv.ContourApproximationModes = cv.ContourApproximationModes.ApproxNone) As List(Of cv.Point)
         Dim allContours As cv.Point()() = Nothing
-        cv.Cv2.FindContours(mask, allContours, Nothing, cv.RetrievalModes.External, approxMode)
+        FindContours(mask, allContours, Nothing, cv.RetrievalModes.External, approxMode)
 
         Dim tourCount As New List(Of Integer)
         For Each tour In allContours

@@ -12,7 +12,7 @@ Public Class Mouse_Basics : Inherits TaskParent
         lastPoint = task.mouseMovePoint
         Dim nextColor = task.scalarColors(colorIndex)
         Dim nextPt = task.mouseMovePoint
-        cv.Cv2.Circle(dst2, nextPt, task.DotSize + 3, nextColor, -1, task.lineType)
+        Circle(dst2, nextPt, task.DotSize + 3, nextColor, -1, task.lineType)
         colorIndex += 1
         If colorIndex >= task.scalarColors.Count Then colorIndex = 0
     End Sub
@@ -31,7 +31,7 @@ Public Class XR_Mouse_LeftClickZoom : Inherits TaskParent
                         "In this example, the selected region from the BGR image will be resized to fit in the Result2 image to the right." + vbCrLf +
                         "Double-click an image to remove the selected region.")
 
-        If task.drawRect.Width <> 0 And task.drawRect.Height <> 0 Then cv.Cv2.Resize(src(task.drawRect), dst3, dst3.Size())
+        If task.drawRect.Width <> 0 And task.drawRect.Height <> 0 Then Resize(src(task.drawRect), dst3, dst3.Size())
     End Sub
 End Class
 
@@ -53,14 +53,14 @@ Public Class Mouse_ClickPointUsage : Inherits TaskParent
         labels(2) = fcs.labels(2)
 
         For Each pt In fcs.feat.features
-        cv.Cv2.Circle(dst2, pt, task.DotSize, task.highlight, -1)
+        Circle(dst2, pt, task.DotSize, task.highlight, -1)
         Next
 
         SetTrueText("Click on one of the feature points (carefully) to hit the breakpoint below.")
 
         Dim val = fcs.dst2.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X)
         SetTrueText("Hit the point you selected.", 3)
-                  cv.Cv2.InRange(fcs.dst2, val, val, dst1)
+                  InRange(fcs.dst2, val, val, dst1)
         dst3.SetTo(0)
         fcs.dst3.CopyTo(dst3, dst1)
     End Sub

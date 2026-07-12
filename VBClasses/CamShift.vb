@@ -21,7 +21,7 @@ Public Class CamShift_Basics : Inherits TaskParent
             For i = 0 To binCount - 2
                 Dim h = img.Height * (hist.Get(Of Single)(i, 0)) / mm.maxVal
                 If h = 0 Then h = 5 ' show the color range in the plot
-                cv.Cv2.Rectangle(img, New cv.Rect(i * binWidth, img.Height - h, binWidth, h),
+                Rectangle(img, New cv.Rect(i * binWidth, img.Height - h, binWidth, h),
                                   New cv.Scalar(180.0 * i \ binCount, 255, 255), -1)
             Next
         End If
@@ -36,19 +36,19 @@ Public Class CamShift_Basics : Inherits TaskParent
         Dim ranges() = {New cv.Rangef(0, 180)}
         Dim hsize() As Integer = {task.histogramBins}
         task.drawRect = ValidateRect(task.drawRect)
-        cv.Cv2.CalcHist({hue(task.drawRect)}, {0}, mask(task.drawRect), histogram, 1, hsize, ranges)
-        cv.Cv2.Normalize(histogram, histogram, 0, 255, cv.NormTypes.MinMax)
+        CalcHist({hue(task.drawRect)}, {0}, mask(task.drawRect), histogram, 1, hsize, ranges)
+        Normalize(histogram, histogram, 0, 255, cv.NormTypes.MinMax)
         roi = task.drawRect
 
         If histogram.Rows <> 0 Then
-            cv.Cv2.CalcBackProject({hue}, {0}, histogram, dst1, ranges)
-            trackBox = cv.Cv2.CamShift(dst1 And mask, roi, cv.TermCriteria.Both(10, 1))
+            CalcBackProject({hue}, {0}, histogram, dst1, ranges)
+            trackBox = CamShift(dst1 And mask, roi, cv.TermCriteria.Both(10, 1))
             dst3 = Show_HSV_Hist(histogram)
             If dst3.Channels() = 1 Then dst3 = src
-            cv.Cv2.CvtColor(dst3, dst3, cv.ColorConversionCodes.HSV2BGR)
+            CvtColor(dst3, dst3, cv.ColorConversionCodes.HSV2BGR)
         End If
         If trackBox.Size.Width > 0 Then
-            cv.Cv2.Ellipse(dst2, trackBox, white, task.lineWidth + 1, task.lineType)
+            Ellipse(dst2, trackBox, white, task.lineWidth + 1, task.lineType)
         End If
     End Sub
 End Class
@@ -69,8 +69,8 @@ Public Class CamShift_RedHue : Inherits TaskParent
         options.Run()
 
         Dim hsv As New cv.Mat
-        cv.Cv2.CvtColor(src, hsv, cv.ColorConversionCodes.BGR2HSV)
-        cv.Cv2.InRange(hsv, options.camSBins, New cv.Scalar(180, 255, options.camMax), dst3)
+        CvtColor(src, hsv, cv.ColorConversionCodes.BGR2HSV)
+        InRange(hsv, options.camSBins, New cv.Scalar(180, 255, options.camMax), dst3)
 
         dst2.SetTo(0)
         src.CopyTo(dst2, dst3)

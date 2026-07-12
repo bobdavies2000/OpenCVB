@@ -12,7 +12,7 @@ Public Class XR_Deterministic_Basics : Inherits TaskParent
         deter.Run(src)
 
         If deter.dst2.Channels <> 1 Then
-            cv.Cv2.CvtColor(deter.dst2, diff.lastFrame, cv.ColorConversionCodes.BGR2GRAY)
+            CvtColor(deter.dst2, diff.lastFrame, cv.ColorConversionCodes.BGR2GRAY)
         Else
             diff.lastFrame = deter.dst2.Clone
         End If
@@ -20,7 +20,7 @@ Public Class XR_Deterministic_Basics : Inherits TaskParent
         diff.Run(dst2)
         dst3 = diff.dst2
 
-        Dim count = cv.Cv2.CountNonZero(dst3)
+        Dim count = CountNonZero(dst3)
         labels(2) = If(count, "Algorithm is NOT deterministic", "Algorithm is deterministic.") + " - there were " + CStr(count) +
                             " pixels changed."
     End Sub
@@ -48,7 +48,7 @@ Public Class Deterministic_MotionMask : Inherits TaskParent
         deter.Run(dst1)
 
         If deter.dst2.Channels <> 1 Then
-            cv.Cv2.CvtColor(deter.dst2, diff.lastFrame, cv.ColorConversionCodes.BGR2GRAY)
+            CvtColor(deter.dst2, diff.lastFrame, cv.ColorConversionCodes.BGR2GRAY)
         Else
             diff.lastFrame = deter.dst2.Clone
         End If
@@ -56,7 +56,7 @@ Public Class Deterministic_MotionMask : Inherits TaskParent
         diff.Run(dst2)
         dst3 = diff.dst2
 
-        Dim count = cv.Cv2.CountNonZero(dst3)
+        Dim count = CountNonZero(dst3)
         labels(2) = "There were " + CStr(count) + " pixels changed when running with the motion-filtered color image."
 
         lastFrame = src.Clone
@@ -128,7 +128,7 @@ Public Class XR_Deterministic_BackProject : Inherits TaskParent
         bProject.dst0.SetTo(0, Not dst3)
         dst1.SetTo(cv.Scalar.Yellow, bProject.dst0)
         Dim mask As New cv.Mat
-        cv.Cv2.CvtColor(dst1, mask, cv.ColorConversionCodes.BGR2GRAY)
+        CvtColor(dst1, mask, cv.ColorConversionCodes.BGR2GRAY)
         dst0 = src.Clone
         dst1.CopyTo(dst0, mask)
 

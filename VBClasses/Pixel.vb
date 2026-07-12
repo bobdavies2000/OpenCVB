@@ -197,7 +197,7 @@ Public Class XR_Pixel_GetSet : Inherits TaskParent
         Dim cols = src.Width
         Dim output As String = ""
         Dim rgb As New cv.Mat
-        cv.Cv2.CvtColor(src, rgb, cv.ColorConversionCodes.BGR2RGB)
+        CvtColor(src, rgb, cv.ColorConversionCodes.BGR2RGB)
 
         Dim watch = Stopwatch.StartNew()
         For y = 0 To rows - 1
@@ -316,9 +316,9 @@ Public Class XR_Pixel_SampleColor : Inherits TaskParent
 
         If standaloneTest() Then
             dst2 = src
-            cv.Cv2.Rectangle(dst2, random.range, white, 1)
+            Rectangle(dst2, random.range, white, 1)
             For Each pt In random.PointList
-            cv.Cv2.Circle(dst2, pt, task.DotSize, white, -1, task.lineType)
+            Circle(dst2, pt, task.DotSize, white, -1, task.lineType)
             Next
             labels(2) = "Dominant color value = " + CStr(maskColor(0)) + ", " + CStr(maskColor(1)) + ", " + CStr(maskColor(2))
             SetTrueText("Draw in the image to select a region for testing.", New cv.Point(10, 200), 3)
@@ -354,8 +354,8 @@ Public Class XR_Pixel_Unstable : Inherits TaskParent
         dst2 = km.dst2
         dst2.ConvertTo(dst2, cv.MatType.CV_32F)
         If lastImage Is Nothing Then lastImage = dst2.Clone
-        cv.Cv2.Subtract(dst2, lastImage, dst3)
-        cv.Cv2.Threshold(dst3, dst3, options.pixelDiffThreshold, 255, cv.ThresholdTypes.Binary)
+        Subtract(dst2, lastImage, dst3)
+        Threshold(dst3, dst3, options.pixelDiffThreshold, 255, cv.ThresholdTypes.Binary)
 
         unstable.Add(dst3)
         If unstable.Count > task.fOptions.FrameHistoryCount.Value  Then unstable.RemoveAt(0)
@@ -365,7 +365,7 @@ Public Class XR_Pixel_Unstable : Inherits TaskParent
             unstablePixels = unstablePixels Or unstable(i)
         Next
         dst3 = unstablePixels
-        Dim unstableCount = cv.Cv2.CountNonZero(dst3)
+        Dim unstableCount = CountNonZero(dst3)
 
         pixelCounts.Add(unstableCount)
         If pixelCounts.Count > 10 Then pixelCounts.RemoveAt(0)
@@ -404,7 +404,7 @@ Public Class Pixel_Zoom : Inherits TaskParent
         Dim x = Math.Min(mousePoint.X, src.Width - width)
         Dim y = Math.Min(mousePoint.Y, src.Height - height)
         dst1 = src(New cv.Rect(CInt(x), CInt(y), width, height))
-        cv.Cv2.Resize(dst1, dst2, dst2.Size(), 0, 0, cv.InterpolationFlags.Nearest)
+        Resize(dst1, dst2, dst2.Size(), 0, 0, cv.InterpolationFlags.Nearest)
     End Sub
 End Class
 
@@ -429,10 +429,10 @@ Public Class Pixel_SubPixel : Inherits TaskParent
         Dim height As Double = src.Height / zoomFactor
         Dim x = Math.Min(zoom.mousePoint.X, src.Width - width)
         Dim y = Math.Min(zoom.mousePoint.Y, src.Height - height)
-        cv.Cv2.GetRectSubPix(src, New cv.Size(width, height), New cv.Point2f(x, y), dst3)
+        GetRectSubPix(src, New cv.Size(width, height), New cv.Point2f(x, y), dst3)
         Dim r = New cv.Rect(x - width \ 2, y - height \ 2, width, height)
         r = ValidateRect(r)
-        cv.Cv2.Resize(src(r), dst2, dst2.Size)
+        Resize(src(r), dst2, dst2.Size)
         labels(2) = "Pixel_SubPixel: No SubPixel zoom with factor " + CStr(zoomFactor)
         labels(3) = "Pixel_SubPixel: SubPixel zoom with factor " + CStr(zoomFactor)
     End Sub
@@ -471,7 +471,7 @@ Public Class XR_Pixel_NeighborsHorizontal : Inherits TaskParent
 
         dst2 = task.color.Clone
         For i = 0 To pt1.Count - 1
-            cv.Cv2.Line(dst2, pt1(i), pt2(i), cv.Scalar.Yellow, task.lineWidth, task.lineType)
+            Line(dst2, pt1(i), pt2(i), cv.Scalar.Yellow, task.lineWidth, task.lineType)
         Next
         labels(2) = CStr(pt1.Count) + " z-values within " + (options.threshold * 1000).ToString(fmt0) + " mm's with X pixel offset " + CStr(options.pixels)
     End Sub
@@ -513,7 +513,7 @@ Public Class XR_Pixel_NeighborsVertical : Inherits TaskParent
 
         dst2 = task.color.Clone
         For i = 0 To pt1.Count - 1
-            cv.Cv2.Line(dst2, pt1(i), pt2(i), cv.Scalar.Yellow, task.lineWidth, task.lineType)
+            Line(dst2, pt1(i), pt2(i), cv.Scalar.Yellow, task.lineWidth, task.lineType)
         Next
         labels(2) = CStr(pt1.Count) + " z-values within " + (options.threshold * 1000).ToString(fmt0) + " mm's with Y pixel offset " + CStr(options.pixels)
     End Sub
@@ -537,9 +537,9 @@ Public Class Pixel_NeighborsMaskH : Inherits TaskParent
         Dim tmp32f = New cv.Mat(dst2.Size(), cv.MatType.CV_32F, cv.Scalar.All(0))
         Dim r1 = New cv.Rect(0, 0, dst2.Width, dst2.Height - options.pixels)
         Dim r2 = New cv.Rect(0, options.pixels, dst2.Width, dst2.Height - options.pixels)
-        cv.Cv2.Absdiff(src(r1), src(r2), tmp32f(r1))
-        cv.Cv2.Threshold(tmp32f, tmp32f, options.threshold, 255, cv.ThresholdTypes.BinaryInv)
-        cv.Cv2.ConvertScaleAbs(tmp32f, dst2, 255)
+        Absdiff(src(r1), src(r2), tmp32f(r1))
+        Threshold(tmp32f, tmp32f, options.threshold, 255, cv.ThresholdTypes.BinaryInv)
+        ConvertScaleAbs(tmp32f, dst2, 255)
         dst2.SetTo(0, task.noDepthMask)
         dst2(New cv.Rect(dst2.Width - options.pixels, 0, options.pixels, dst2.Height)).SetTo(0)
         labels(2) = "White: z is within " + options.threshold.ToString(fmt0) + " mm's with X pixel offset " + CStr(options.pixels)
@@ -564,9 +564,9 @@ Public Class Pixel_NeighborsMaskV : Inherits TaskParent
         Dim tmp32f = New cv.Mat(dst2.Size(), cv.MatType.CV_32F, cv.Scalar.All(0))
         Dim r1 = New cv.Rect(0, 0, dst2.Width, dst2.Height - options.pixels)
         Dim r2 = New cv.Rect(0, options.pixels, dst2.Width, dst2.Height - options.pixels)
-        cv.Cv2.Absdiff(src(r1), src(r2), tmp32f(r1))
-        cv.Cv2.Threshold(tmp32f, tmp32f, options.threshold, 255, cv.ThresholdTypes.BinaryInv)
-        cv.Cv2.ConvertScaleAbs(tmp32f, dst2, 255)
+        Absdiff(src(r1), src(r2), tmp32f(r1))
+        Threshold(tmp32f, tmp32f, options.threshold, 255, cv.ThresholdTypes.BinaryInv)
+        ConvertScaleAbs(tmp32f, dst2, 255)
         dst2.SetTo(0, task.noDepthMask)
         dst2(New cv.Rect(dst2.Width - options.pixels, 0, options.pixels, dst2.Height)).SetTo(0)
         labels(2) = "White: z is within " + options.threshold.ToString(fmt0) + " mm's with X pixel offset " + CStr(options.pixels)
@@ -643,7 +643,7 @@ Public Class XR_Pixel_NeighborsPatchNeighbors : Inherits TaskParent
         Else
             labels(2) = "Z-values not updated "
         End If
-        cv.Cv2.Merge(task.pcSplit, dst3)
+        Merge(task.pcSplit, dst3)
     End Sub
 End Class
 
@@ -740,7 +740,7 @@ Public Class Pixel_Mapper : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         If task.heartBeat Then
             Dim nSize = New cv.Size(src.Width / 8, src.Height / 8)
-            cv.Cv2.Resize(src, dst1, nSize)
+            Resize(src, dst1, nSize)
             Dim samples(dst1.Total - 1) As cv.Vec3b
             dst1.GetArray(Of cv.Vec3b)(samples)
 
@@ -774,7 +774,7 @@ Public Class Pixel_Mapper : Inherits TaskParent
                 colorMap.Set(Of cv.Vec3b)(i, vec)
             Next
         End If
-        cv.Cv2.ApplyColorMap(task.gray, dst2, colorMap)
+        ApplyColorMap(task.gray, dst2, colorMap)
     End Sub
 End Class
 
@@ -794,8 +794,8 @@ Public Class XR_Pixel_MapLeftRight : Inherits TaskParent
         dst2 = mapper.dst2
 
         Dim tmp As cv.Mat = task.rightView
-        If tmp.Channels = 3 Then cv.Cv2.CvtColor(tmp, tmp, cv.ColorConversionCodes.BGR2GRAY)
-        cv.Cv2.ApplyColorMap(tmp, dst3, mapper.colorMap)
+        If tmp.Channels = 3 Then CvtColor(tmp, tmp, cv.ColorConversionCodes.BGR2GRAY)
+        ApplyColorMap(tmp, dst3, mapper.colorMap)
     End Sub
 End Class
 
@@ -847,12 +847,12 @@ Public Class XR_Pixel_MapDistance : Inherits TaskParent
             Marshal.Copy(vecs3b.ToArray, 0, mapper.colorMap.Data, myColorMap.Total * myColorMap.ElemSize)
         End If
         Dim tmp As cv.Mat = task.leftView
-        If tmp.Channels = 3 Then cv.Cv2.CvtColor(tmp, tmp, cv.ColorConversionCodes.BGR2GRAY)
-        cv.Cv2.ApplyColorMap(tmp, dst2, myColorMap)
+        If tmp.Channels = 3 Then CvtColor(tmp, tmp, cv.ColorConversionCodes.BGR2GRAY)
+        ApplyColorMap(tmp, dst2, myColorMap)
 
         tmp = task.rightView
-        If tmp.Channels = 3 Then cv.Cv2.CvtColor(tmp, tmp, cv.ColorConversionCodes.BGR2GRAY)
-        cv.Cv2.ApplyColorMap(tmp, dst3, myColorMap)
+        If tmp.Channels = 3 Then CvtColor(tmp, tmp, cv.ColorConversionCodes.BGR2GRAY)
+        ApplyColorMap(tmp, dst3, myColorMap)
     End Sub
 End Class
 
@@ -915,9 +915,9 @@ Public Class XR_Pixel_Sampler : Inherits TaskParent
 
         If standaloneTest() Then
             dst2 = src
-            cv.Cv2.Rectangle(dst2, random.range, white, 1)
+            Rectangle(dst2, random.range, white, 1)
             For Each pt In random.PointList
-            cv.Cv2.Circle(dst2, pt, task.DotSize, white, -1, task.lineType)
+            Circle(dst2, pt, task.DotSize, white, -1, task.lineType)
             Next
             labels(2) = "Dominant gray value = " + CStr(dominantGray)
             SetTrueText("Draw in the image to select a region for testing.", New cv.Point(10, 200), 3)
@@ -950,7 +950,7 @@ Public Class XR_Pixel_Display : Inherits TaskParent
         dst2 = src
         If task.heartBeat Then
             Dim mean As cv.Scalar, stdev As cv.Scalar
-            cv.Cv2.MeanStdDev(src(task.drawRect), mean, stdev)
+            MeanStdDev(src(task.drawRect), mean, stdev)
             Dim pt = New cv.Vec3i(mean(0), mean(1), mean(2))
             strOut = "Mean BGR " + pt.ToString() + vbCrLf + "Stdev BGR " + stdev.ToString
         End If
@@ -1006,14 +1006,14 @@ Public Class XR_Pixel_ColorGuess : Inherits TaskParent
         End If
 
         If task.leftView.Channels = 1 Then
-            cv.Cv2.ApplyColorMap(task.leftView, dst2, myColorMap)
-            cv.Cv2.ApplyColorMap(task.rightView, dst3, myColorMap)
+            ApplyColorMap(task.leftView, dst2, myColorMap)
+            ApplyColorMap(task.rightView, dst3, myColorMap)
         Else
         Dim _gray8u As New cv.Mat
-        cv.Cv2.CvtColor(task.leftView, _gray8u, cv.ColorConversionCodes.BGR2GRAY)
-        cv.Cv2.ApplyColorMap(_gray8u, dst2, myColorMap)
-            cv.Cv2.CvtColor(task.rightView, _gray8u, cv.ColorConversionCodes.BGR2GRAY)
-            cv.Cv2.ApplyColorMap(_gray8u, dst3, myColorMap)
+        CvtColor(task.leftView, _gray8u, cv.ColorConversionCodes.BGR2GRAY)
+        ApplyColorMap(_gray8u, dst2, myColorMap)
+            CvtColor(task.rightView, _gray8u, cv.ColorConversionCodes.BGR2GRAY)
+            ApplyColorMap(_gray8u, dst3, myColorMap)
         End If
     End Sub
 End Class

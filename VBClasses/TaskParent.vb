@@ -100,10 +100,10 @@ Public Class TaskParent : Implements IDisposable
         Return False
     End Function
     Public Sub DrawRect(dst As cv.Mat, rect As cv.Rect, color As cv.Scalar)
-    cv.Cv2.Rectangle(dst, rect, color, task.lineWidth, task.lineType)
+    Rectangle(dst, rect, color, task.lineWidth, task.lineType)
     End Sub
     Public Sub DrawRect(dst As cv.Mat, rect As cv.Rect)
-    cv.Cv2.Rectangle(dst, rect, task.highlight, task.lineWidth, task.lineType)
+    Rectangle(dst, rect, task.highlight, task.lineWidth, task.lineType)
     End Sub
     Public Shared Function Palettize(input As cv.Mat, Optional first As Byte = 1) As cv.Mat
         If first = 0 Then
@@ -115,10 +115,10 @@ Public Class TaskParent : Implements IDisposable
         If input.Type <> cv.MatType.CV_8U Then
             Dim input8u As New cv.Mat
             input.ConvertTo(input8u, cv.MatType.CV_8U)
-            cv.Cv2.ApplyColorMap(input8u, output, task.colorMap)
+            ApplyColorMap(input8u, output, task.colorMap)
             Return output
         End If
-        cv.Cv2.ApplyColorMap(input, output, task.colorMap)
+        ApplyColorMap(input, output, task.colorMap)
         Return output
     End Function
     Public Function ShowAddweighted(src1 As cv.Mat, src2 As cv.Mat, ByRef label As String) As cv.Mat
@@ -135,7 +135,7 @@ Public Class TaskParent : Implements IDisposable
         If contour Is Nothing Then Exit Sub
         If contour.Count < 3 Then Exit Sub ' this is not enough to draw.
         Dim listOfPoints = New List(Of List(Of cv.Point))({contour})
-        cv.Cv2.DrawContours(dst, listOfPoints, 0, color, lineWidth, lineType)
+        DrawContours(dst, listOfPoints, 0, color, lineWidth, lineType)
     End Sub
     Public Sub Run(src As cv.Mat)
         task.cpu.measureStartRun(traceName)

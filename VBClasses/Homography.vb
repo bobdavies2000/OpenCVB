@@ -19,9 +19,9 @@ Public Class Homography_Basics : Inherits TaskParent
 
         ' cannot find a homography when less than 4...
         If corners1.Count >= 4 Or corners2.Count >= 4 Then
-            Dim H = cv.Cv2.FindHomography(corners1, corners2, options.hMethod)
+            Dim H = FindHomography(corners1, corners2, options.hMethod)
             If H.Width > 0 Then
-                cv.Cv2.WarpPerspective(src, dst2, H, src.Size)
+                WarpPerspective(src, dst2, H, src.Size)
             End If
         End If
     End Sub

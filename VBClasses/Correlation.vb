@@ -21,10 +21,10 @@ Public Class Correlation_Basics : Inherits TaskParent
         For i = 0 To task.gridRects.Count - 1
             Dim r = task.gridRects(i)
             If r <> task.gridRects(motionList(index)) Then
-                cv.Cv2.MatchTemplate(src(r), lastFrame(r), correlationMat, cv.TemplateMatchModes.CCoeffNormed)
+                MatchTemplate(src(r), lastFrame(r), correlationMat, cv.TemplateMatchModes.CCoeffNormed)
                 Dim correlation = correlationMat.Get(Of Single)(0, 0) + 1
                 If correlation < maxCorrelation Then
-                cv.Cv2.Rectangle(dst2, r, white, -1)
+                Rectangle(dst2, r, white, -1)
                     fLessList.Add(r)
                 End If
             Else
@@ -63,10 +63,10 @@ Public Class Correlation_Validate : Inherits TaskParent
         For i = 0 To task.gridRects.Count - 1
             If i <> motionList(motionIndex) Then
                 Dim r = task.gridRects(i)
-                cv.Cv2.MatchTemplate(src(r), lastsrc(r), correlationMat, cv.TemplateMatchModes.CCoeffNormed)
+                MatchTemplate(src(r), lastsrc(r), correlationMat, cv.TemplateMatchModes.CCoeffNormed)
                 Dim corr = correlationMat.Get(Of Single)(0, 0) + 1
                 If corr < corrThreshold Then
-                cv.Cv2.Rectangle(dst2, r, white, task.lineWidth)
+                Rectangle(dst2, r, white, task.lineWidth)
                     fLessList.Add(i)
                 End If
             Else
@@ -78,7 +78,7 @@ Public Class Correlation_Validate : Inherits TaskParent
             dst3 = src
             For Each index In fLessList
                 If task.motion.motionSort.Contains(index) Then
-                cv.Cv2.Rectangle(dst3, task.gridRects(index), white, task.lineWidth)
+                Rectangle(dst3, task.gridRects(index), white, task.lineWidth)
                 End If
             Next
         End If
@@ -115,7 +115,7 @@ Public Class Correlation_BasicsPlot : Inherits TaskParent
         mmRanges.Clear()
         For i = 0 To task.gridRects.Count - 1
             Dim r = task.gridRects(i)
-            cv.Cv2.MatchTemplate(task.gray(r), lastsrc(r), correlationMat, cv.TemplateMatchModes.CCoeffNormed)
+            MatchTemplate(task.gray(r), lastsrc(r), correlationMat, cv.TemplateMatchModes.CCoeffNormed)
 
             Dim corr = correlationMat.Get(Of Single)(0, 0) + 1
             cList.Add(corr)
@@ -141,7 +141,7 @@ Public Class Correlation_BasicsPlot : Inherits TaskParent
             For i = 0 To task.gridRects.Count - 1
                 Dim r = task.gridRects(i)
                 If cList(i) < maxCorrelation Then
-                cv.Cv2.Rectangle(dst2, r, white, task.lineWidth)
+                Rectangle(dst2, r, white, task.lineWidth)
                     mmRangeTest.Add(mmRanges(i))
                 End If
             Next
@@ -191,17 +191,17 @@ Public Class XR_Correlation_Basics : Inherits TaskParent
         Dim dataZ As New cv.Mat(New cv.Size(src.Width, src.Height), cv.MatType.CV_32F, cv.Scalar.All(0))
 
         Dim mask As New cv.Mat
-        cv.Cv2.CvtColor(kFlood.dst3, mask, cv.ColorConversionCodes.BGR2GRAY)
+        CvtColor(kFlood.dst3, mask, cv.ColorConversionCodes.BGR2GRAY)
         task.pcSplit(0).CopyTo(dataX, mask)
         task.pcSplit(1).CopyTo(dataY, mask)
         task.pcSplit(2).CopyTo(dataZ, mask)
 
         Dim row1 = dataX.Row(row)
         Dim row2 = dataZ.Row(row)
-        cv.Cv2.Line(dst2, New cv.Point(0, row), New cv.Point(dst2.Width, row), cv.Scalar.Yellow, task.lineWidth + 1)
+        Line(dst2, New cv.Point(0, row), New cv.Point(dst2.Width, row), cv.Scalar.Yellow, task.lineWidth + 1)
 
         Dim correlationmat As New cv.Mat
-        cv.Cv2.MatchTemplate(row1, row2, correlationmat, options.matchOption)
+        MatchTemplate(row1, row2, correlationmat, options.matchOption)
         Dim correlation = correlationmat.Get(Of Single)(0, 0)
         labels(2) = "Correlation of X to Z = " + correlation.ToString(fmt2)
 
@@ -223,7 +223,7 @@ Public Class XR_Correlation_Basics : Inherits TaskParent
             For i = 0 To plotX.Count - 1
                 Dim x = dst3.Width * (plotX(i) - minx) / (maxx - minx)
                 Dim y = dst3.Height * (plotZ(i) - minZ) / (maxZ - minZ)
-                cv.Cv2.Circle(dst3, New cv.Point(x, y), task.DotSize, cv.Scalar.Yellow, -1, task.lineType)
+                Circle(dst3, New cv.Point(x, y), task.DotSize, cv.Scalar.Yellow, -1, task.lineType)
             Next
             SetTrueText("Z-min " + minZ.ToString(fmt2), New cv.Point(10, 5), 3)
             SetTrueText("Z-max " + maxZ.ToString(fmt2) + vbCrLf + vbTab + "X-min " + minx.ToString(fmt2), New cv.Point(0, dst3.Height - 20), 3)
@@ -269,7 +269,7 @@ Public Class Correlation_MinMaxRange : Inherits TaskParent
         For Each r In task.gridRects
             Dim mm = GetMinMax(src(r))
             If mm.range < 30 Then
-            cv.Cv2.Rectangle(dst2, r, white, -1)
+            Rectangle(dst2, r, white, -1)
                 fLessList.Add(r)
             End If
         Next
@@ -297,7 +297,7 @@ Public Class Correlation_LinesSimple : Inherits TaskParent
         dst2 = task.lines.dst3.Clone
 
         Dim correlationMat As New cv.Mat
-        cv.Cv2.MatchTemplate(task.lines.dst3, lastImage, correlationMat, cv.TemplateMatchModes.CCoeffNormed)
+        MatchTemplate(task.lines.dst3, lastImage, correlationMat, cv.TemplateMatchModes.CCoeffNormed)
 
         correlation = correlationMat.Get(Of Single)(0, 0)
 

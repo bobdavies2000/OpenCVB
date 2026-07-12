@@ -22,9 +22,9 @@ Namespace VBClasses
             If options.retrievalMode = cv.RetrievalModes.FloodFill Then
                 Dim dst As New cv.Mat(task.workRes, cv.MatType.CV_8U, 0)
                 edgeline.dst2.ConvertTo(dst, cv.MatType.CV_32SC1)
-                cv.Cv2.FindContours(dst, allContours, Nothing, cv.RetrievalModes.FloodFill, mode)
+                FindContours(dst, allContours, Nothing, cv.RetrievalModes.FloodFill, mode)
             Else
-                cv.Cv2.FindContours(edgeline.dst2, allContours, Nothing, options.retrievalMode, mode)
+                FindContours(edgeline.dst2, allContours, Nothing, options.retrievalMode, mode)
             End If
 
             Dim sortedList As New SortedList(Of Integer, keyData)(New compareAllowIdenticalIntegerInverted)
@@ -38,10 +38,10 @@ Namespace VBClasses
                 tourMat(tour.rect).SetTo(0)
                 tour.contour = ptArray.ToList
                 Dim listOfPoints = New List(Of List(Of cv.Point))({tour.contour})
-                cv.Cv2.DrawContours(tourMat, listOfPoints, 0, New cv.Scalar(sortedList.Count), -1, cv.LineTypes.Link8)
-                cv.Cv2.Threshold(tourMat(tour.rect), tour.mask, 0, 255, cv.ThresholdTypes.Binary)
+                DrawContours(tourMat, listOfPoints, 0, New cv.Scalar(sortedList.Count), -1, cv.LineTypes.Link8)
+                Threshold(tourMat(tour.rect), tour.mask, 0, 255, cv.ThresholdTypes.Binary)
                 tour.maxDist = tour.GetMaxDistContour(tour)
-                tour.pixels = cv.Cv2.ContourArea(ptArray)
+                tour.pixels = ContourArea(ptArray)
                 If tour.pixels >= minSize Then sortedList.Add(tour.pixels, tour)
             Next
 
@@ -98,9 +98,9 @@ Namespace VBClasses
             If options.retrievalMode = cv.RetrievalModes.FloodFill Then
                 Dim dst As New cv.Mat(task.workRes, cv.MatType.CV_8U, 0)
                 edgeline.dst2.ConvertTo(dst, cv.MatType.CV_32SC1)
-                cv.Cv2.FindContours(dst, allContours, Nothing, cv.RetrievalModes.FloodFill, mode)
+                FindContours(dst, allContours, Nothing, cv.RetrievalModes.FloodFill, mode)
             Else
-                cv.Cv2.FindContours(edgeline.dst2, allContours, Nothing, options.retrievalMode, mode)
+                FindContours(edgeline.dst2, allContours, Nothing, options.retrievalMode, mode)
             End If
 
             Dim sortedList As New SortedList(Of Integer, keyData)(New compareAllowIdenticalIntegerInverted)
@@ -114,10 +114,10 @@ Namespace VBClasses
                 tourMat(tour.rect).SetTo(0)
                 tour.contour = ptArray.ToList
                 Dim listOfPoints = New List(Of List(Of cv.Point))({tour.contour})
-                cv.Cv2.DrawContours(tourMat, listOfPoints, 0, New cv.Scalar(sortedList.Count), -1, cv.LineTypes.Link8)
-                cv.Cv2.Threshold(tourMat(tour.rect), tour.mask, 0, 255, cv.ThresholdTypes.Binary)
+                DrawContours(tourMat, listOfPoints, 0, New cv.Scalar(sortedList.Count), -1, cv.LineTypes.Link8)
+                Threshold(tourMat(tour.rect), tour.mask, 0, 255, cv.ThresholdTypes.Binary)
                 tour.maxDist = tour.GetMaxDistContour(tour)
-                tour.pixels = cv.Cv2.ContourArea(ptArray)
+                tour.pixels = ContourArea(ptArray)
                 If tour.pixels >= minSize Then sortedList.Add(tour.pixels, tour)
             Next
 
@@ -160,7 +160,7 @@ Namespace VBClasses
             dst3 = Palettize(dst1, 0)
 
             For Each key In keyColors.keyList
-            cv.Cv2.Circle(dst3, key.maxDist, task.DotSize, task.highlight, -1)
+            Circle(dst3, key.maxDist, task.DotSize, task.highlight, -1)
             Next
             labels(3) = CStr(keyColors.keyList.Count - 1) + " regions were found with more than 1% of the image."
         End Sub
@@ -178,7 +178,7 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
         Dim _redC_cvt As New cv.Mat
-        cv.Cv2.CvtColor(keyColors.dst2, _redC_cvt, cv.ColorConversionCodes.BGR2GRAY)
+        CvtColor(keyColors.dst2, _redC_cvt, cv.ColorConversionCodes.BGR2GRAY)
         redC.Run(_redC_cvt)
             dst2 = redC.dst2
             labels(2) = redC.labels(2)
@@ -194,7 +194,7 @@ Namespace VBClasses
             dst3 = Palettize(dst1, 0)
 
             For Each key In keyColors.keyList
-            cv.Cv2.Circle(dst3, key.maxDist, task.DotSize, task.highlight, -1)
+            Circle(dst3, key.maxDist, task.DotSize, task.highlight, -1)
             Next
             labels(3) = CStr(keyColors.keyList.Count - 1) + " regions were found with more than 1% of the image."
         End Sub

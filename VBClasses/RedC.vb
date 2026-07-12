@@ -21,7 +21,7 @@ Public Class RedC_Basics : Inherits TaskParent
             If mask(r).Get(Of Byte)(0, 0) = 0 Then
                 Dim mapID As Integer = rcMap(r).Get(Of Byte)(0, 0)
                 Dim flags = cv.FloodFillFlags.FixedRange Or cv.FloodFillFlags.MaskOnly Or (255 << 8)
-                Dim count = cv.Cv2.FloodFill(rcMap, mask, r.TopLeft, mapID, rect, 0, 0, flags)
+                Dim count = FloodFill(rcMap, mask, r.TopLeft, mapID, rect, 0, 0, flags)
                 If count > 0 Then minList.Add(New rcData(rcMap(rect), rect, mapID))
             End If
         Next
@@ -30,17 +30,17 @@ Public Class RedC_Basics : Inherits TaskParent
         rcMap.SetTo(0, rcNone)
         dst2 = Palettize(rcMap, 0)
 
-        If task.rcMinD IsNot Nothing And standaloneTest() Then cv.Cv2.Rectangle(dst2, task.rcMinD.rect, task.highlight, task.lineWidth)
+        If task.rcMinD IsNot Nothing And standaloneTest() Then Rectangle(dst2, task.rcMinD.rect, task.highlight, task.lineWidth)
 
         Dim sortList As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
         For i = 0 To minList.Count - 1
             Dim rc = minList(i)
             rc.maxDist = rc.buildMaxDist(rc.mask)
 
-            rc.depth = cv.Cv2.Mean(task.pcSplit(2)(rc.rect), rc.mask)
+            rc.depth = Mean(task.pcSplit(2)(rc.rect), rc.mask)
             rc.maskDepth = rc.mask.Clone
             rc.maskDepth.SetTo(0, task.noDepthMask(rc.rect))
-            rc.pixelsDepth = cv.Cv2.CountNonZero(rc.maskDepth)
+            rc.pixelsDepth = CountNonZero(rc.maskDepth)
             rc.maxDistDepth = rc.buildMaxDist(rc.maskDepth)
 
             sortList.Add(rc.pixels, rc)

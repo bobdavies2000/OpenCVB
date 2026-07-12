@@ -35,7 +35,7 @@ Public Class XR_PolyLine_IEnumerableExample : Inherits TaskParent
 
         dst2 = New cv.Mat(src.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         ' NOTE: when there are 2 points, there will be 1 line.
-        cv.Cv2.Polylines(dst2, pts, options.polyClosed, white, task.lineWidth, task.lineType)
+        Polylines(dst2, pts, options.polyClosed, white, task.lineWidth, task.lineType)
     End Sub
 End Class
 
@@ -66,8 +66,8 @@ Public Class XR_PolyLine_Random : Inherits TaskParent
             pts.Add(points)
 
             dst2 = New cv.Mat(src.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
-            cv.Cv2.Polylines(dst2, pts, False, white, task.lineWidth, task.lineType)
-            cv.Cv2.CvtColor(dst2, dst2, cv.ColorConversionCodes.GRAY2BGR)
+            Polylines(dst2, pts, False, white, task.lineWidth, task.lineType)
+            CvtColor(dst2, dst2, cv.ColorConversionCodes.GRAY2BGR)
         End If
 
         zoom.Run(dst2)

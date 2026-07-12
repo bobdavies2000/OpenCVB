@@ -16,7 +16,7 @@ Public Class Sort_Basics : Inherits TaskParent
             options.sortOption = cv.SortFlags.EveryColumn + cv.SortFlags.Ascending
         End If
         If src.Channels() <> 1 Then src = task.gray
-        cv.Cv2.Sort(src, dst2, options.sortOption)
+        Sort(src, dst2, options.sortOption)
         If options.radio4.Checked Or options.radio5.Checked Then dst2 = dst2.Reshape(1, dst0.Rows)
     End Sub
 End Class
@@ -41,13 +41,13 @@ Public Class XR_Sort_RectAndMask : Inherits TaskParent
         Dim tmpRect = If(rect = New cv.Rect, task.drawRect, rect)
         dst1 = src(tmpRect).Clone
         If mask IsNot Nothing Then
-            cv.Cv2.Threshold(mask, mask, 0, 255, cv.ThresholdTypes.BinaryInv)
+            Threshold(mask, mask, 0, 255, cv.ThresholdTypes.BinaryInv)
             dst1.SetTo(0, mask)
         End If
         sort.Run(dst1)
         dst2 = sort.dst2.Reshape(1, dst1.Rows)
-        cv.Cv2.Resize(dst2, dst2, dst3.Size)
-        If standaloneTest() Then cv.Cv2.Resize(src(tmpRect), dst3, dst3.Size)
+        Resize(dst2, dst2, dst3.Size)
+        If standaloneTest() Then Resize(src(tmpRect), dst3, dst3.Size)
     End Sub
 End Class
 
@@ -75,9 +75,9 @@ Public Class XR_Sort_MLPrepTest_CPP : Inherits TaskParent
         handleSrc.Free()
 
         MLTestData = cv.Mat.FromPixelData(src.Rows, src.Cols, cv.MatType.CV_32FC2, imagePtr).Clone
-        Dim split = cv.Cv2.Split(MLTestData)
-        dst2 = split(0)
-        dst3 = split(1)
+        Dim splitMats = Split(MLTestData)
+        dst2 = splitMats(0)
+        dst3 = splitMats(1)
     End Sub
     Protected Overrides Sub Finalize()
         If cPtr <> 0 Then cPtr = Sort_MLPrepTest_Close(cPtr)
@@ -110,7 +110,7 @@ Public Class Sort_1Channel : Inherits TaskParent
         Static thresholdSlider = OptionParent.FindSlider("Threshold for sort input")
 
         If src.Channels() <> 1 Then src = task.gray
-        cv.Cv2.Threshold(src, dst1, thresholdSlider.Value, 255, cv.ThresholdTypes.Binary)
+        Threshold(src, dst1, thresholdSlider.Value, 255, cv.ThresholdTypes.Binary)
 
         dst2.SetTo(0)
         src.CopyTo(dst2, dst1)
@@ -124,7 +124,7 @@ Public Class Sort_1Channel : Inherits TaskParent
 
         dups.Run(dst0)
         dst3.SetTo(255)
-        Dim inputCount = cv.Cv2.CountNonZero(dups.dst3)
+        Dim inputCount = CountNonZero(dups.dst3)
         Dim testVals As New List(Of Integer)
         For i = 0 To Math.Min(inputCount, task.gridRects.Count) - 1
             Dim gRect = task.gridRects(i)
@@ -167,9 +167,9 @@ Public Class Sort_3Channel : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         Static thresholdSlider = OptionParent.FindSlider("Threshold for sort input")
         Dim inputMask = task.gray
-        If standaloneTest() Then cv.Cv2.Threshold(inputMask, inputMask, thresholdSlider.Value, 255, cv.ThresholdTypes.Binary)
+        If standaloneTest() Then Threshold(inputMask, inputMask, thresholdSlider.Value, 255, cv.ThresholdTypes.Binary)
 
-        cv.Cv2.CvtColor(src, bgra, cv.ColorConversionCodes.BGR2BGRA)
+        CvtColor(src, bgra, cv.ColorConversionCodes.BGR2BGRA)
         dst1 = cv.Mat.FromPixelData(dst1.Rows, dst1.Cols, cv.MatType.CV_32S, bgra.Data)
 
         dst0 = New cv.Mat(dst0.Size(), cv.MatType.CV_32S, 0)
@@ -177,7 +177,7 @@ Public Class Sort_3Channel : Inherits TaskParent
         sort.Run(dst0)
         dst2 = sort.dst2.Reshape(1, dst2.Rows)
         Dim tmp = cv.Mat.FromPixelData(src.Rows, src.Cols, cv.MatType.CV_8UC4, dst2.Data)
-        cv.Cv2.CvtColor(tmp, dst3, cv.ColorConversionCodes.BGRA2BGR)
+        CvtColor(tmp, dst3, cv.ColorConversionCodes.BGRA2BGR)
 
         'dups.Run(dst2)
         'dst2 = dups.dst2
@@ -205,9 +205,9 @@ Public Class Sort_Integer : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If standalone Then
-            Dim split = cv.Cv2.Split(src)
-            Dim zero As New cv.Mat(split(0).Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
-            cv.Cv2.Merge({split(0), split(1), split(2), zero}, src)
+            Dim splitMats = Split(src)
+            Dim zero As New cv.Mat(splitMats(0).Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
+            Merge({splitMats(0), splitMats(1), splitMats(2), zero}, src)
             Marshal.Copy(src.Data, data, 0, data.Length)
             src = New cv.Mat(src.Size(), cv.MatType.CV_32S, 0)
             Marshal.Copy(data, 0, src.Data, data.Length)
@@ -241,10 +241,10 @@ Public Class XR_Sort_GrayScale1 : Inherits TaskParent
         Dim gray(src.Total - 1) As Byte
         Marshal.Copy(dst1.Data, gray, 0, gray.Length)
 
-        Dim split = cv.Cv2.Split(src)
+        Dim splitMats = Split(src)
         For i = 0 To 2
             If task.firstPass Then ReDim pixels(i)(src.Total - 1)
-            Marshal.Copy(split(i).Data, pixels(i), 0, pixels(i).Length)
+            Marshal.Copy(splitMats(i).Data, pixels(i), 0, pixels(i).Length)
         Next
 
         Dim input(gray.Count - 1) As UInteger
@@ -277,10 +277,10 @@ Public Class XR_Sort_GrayScale : Inherits TaskParent
         desc = "Sort the grayscale image but keep the 8uc3 pixels with each gray entry."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        Dim split = cv.Cv2.Split(src)
+        Dim splitMats = Split(src)
         For i = 0 To 2
             If task.firstPass Then ReDim pixels(i)(src.Total - 1)
-            Marshal.Copy(split(i).Data, pixels(i), 0, pixels(i).Length)
+            Marshal.Copy(splitMats(i).Data, pixels(i), 0, pixels(i).Length)
         Next
 
         Dim totals(255) As Single

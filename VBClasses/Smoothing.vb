@@ -49,7 +49,7 @@ Public Class XR_Smoothing_Exterior : Inherits TaskParent
     Public Shared Sub DrawPoly(result As cv.Mat, polyPoints As List(Of cv.Point), color As cv.Scalar)
         If polyPoints.Count < 3 Then Exit Sub
         Dim listOfPoints = New List(Of List(Of cv.Point))({polyPoints})
-        cv.Cv2.DrawContours(result, listOfPoints, 0, color, 2)
+        DrawContours(result, listOfPoints, 0, color, 2)
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         smOptions.Run()
@@ -58,7 +58,7 @@ Public Class XR_Smoothing_Exterior : Inherits TaskParent
                 Dim hullList = hull.buildRandomHullPoints()
                 dst2.SetTo(0)
                 hull.Run(src)
-                Dim nextHull = cv.Cv2.ConvexHull(hullList.ToArray, True)
+                Dim nextHull = ConvexHull(hullList.ToArray, True)
                 inputPoints = nextHull.ToList
                 DrawPoly(dst2, inputPoints, white)
             Else
@@ -136,7 +136,7 @@ Public Class XR_Smoothing_Interior : Inherits TaskParent
                 Dim hullList = hull.buildRandomHullPoints()
                 dst2.SetTo(0)
                 hull.Run(src)
-                Dim nextHull = cv.Cv2.ConvexHull(hullList.ToArray, True)
+                Dim nextHull = ConvexHull(hullList.ToArray, True)
                 inputPoints = nextHull.ToList
                 XR_Smoothing_Exterior.DrawPoly(dst2, nextHull.ToList, white)
             Else

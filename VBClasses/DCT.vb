@@ -12,16 +12,16 @@ Public Class DCT_Basics : Inherits TaskParent
         task.gray.ConvertTo(src32f, cv.MatType.CV_32F, 1 / 255)
 
         Dim frequencies As New cv.Mat
-        cv.Cv2.Dct(src32f, frequencies, options.removeFrequency)
+        Dct(src32f, frequencies, options.removeFrequency)
 
         Dim roi As New cv.Rect(0, 0, options.removeFrequency, src32f.Height)
         If roi.Width > 0 Then frequencies(roi).SetTo(0)
         labels(2) = "Frequencies below " + CStr(options.removeFrequency) + " removed"
 
-        cv.Cv2.Dct(frequencies, src32f, cv.DctFlags.Inverse)
+        Dct(frequencies, src32f, cv.DctFlags.Inverse)
         src32f.ConvertTo(dst2, cv.MatType.CV_8UC1, 255)
 
-        cv.Cv2.Subtract(task.gray, dst2, dst3)
+        Subtract(task.gray, dst2, dst3)
     End Sub
 End Class
 
@@ -38,7 +38,7 @@ Public Class XR_DCT_RGB : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         dct.options.Run()
 
-        Dim srcPlanes = cv.Cv2.Split(src)
+        Dim srcPlanes = Split(src)
 
         Dim freqPlanes(2) As cv.Mat
         For i = 0 To srcPlanes.Count - 1
@@ -55,9 +55,9 @@ Public Class XR_DCT_RGB : Inherits TaskParent
         Next
         labels(2) = dct.labels(2)
 
-        cv.Cv2.Merge(srcPlanes, dst2)
+        Merge(srcPlanes, dst2)
 
-        cv.Cv2.Subtract(src, dst2, dst3)
+        Subtract(src, dst2, dst3)
     End Sub
 End Class
 
@@ -83,7 +83,7 @@ Public Class XR_DCT_Depth : Inherits TaskParent
         cv.Cv2.Dct(frequencies, src32f, cv.DctFlags.Inverse)
         src32f.ConvertTo(dst2, cv.MatType.CV_8UC1, 255)
 
-        cv.Cv2.Subtract(task.gray, dst2, dst3)
+        Subtract(task.gray, dst2, dst3)
     End Sub
 End Class
 
@@ -120,10 +120,10 @@ Public Class DCT_FeatureLess : Inherits TaskParent
 
         dst3.SetTo(0)
         If dst2.Channels() = 3 Then
-            cv.Cv2.CvtColor(dst2, dst2, cv.ColorConversionCodes.BGR2GRAY)
-            cv.Cv2.Threshold(dst2, dst2, 1, 255, cv.ThresholdTypes.Binary)
+            CvtColor(dst2, dst2, cv.ColorConversionCodes.BGR2GRAY)
+            Threshold(dst2, dst2, 1, 255, cv.ThresholdTypes.Binary)
         Else
-            cv.Cv2.Threshold(dst2, dst2, 1, 255, cv.ThresholdTypes.Binary)
+            Threshold(dst2, dst2, 1, 255, cv.ThresholdTypes.Binary)
         End If
         src.CopyTo(dst3, Not dst2)
         labels(2) = "Mask of DCT with highest frequency removed"
@@ -153,7 +153,7 @@ Public Class XR_DCT_Surfaces_debug : Inherits TaskParent
 
         dct.Run(src)
         Dim _cvt2 As New cv.Mat
-        cv.Cv2.CvtColor(dct.dst2, _cvt2, cv.ColorConversionCodes.GRAY2BGR)
+        CvtColor(dct.dst2, _cvt2, cv.ColorConversionCodes.GRAY2BGR)
         mats.mat(1) = _cvt2.Clone()
         mats.mat(2) = dct.dst3.Clone()
 
@@ -164,7 +164,7 @@ Public Class XR_DCT_Surfaces_debug : Inherits TaskParent
         Dim maxIndex As Integer
         Dim grCounts(task.gridRects.Count - 1)
         For i = 0 To task.gridRects.Count - 1
-            grCounts(i) = cv.Cv2.CountNonZero(mask(task.gridRects(i)))
+            grCounts(i) = CountNonZero(mask(task.gridRects(i)))
             If grCounts(i) > grCounts(maxIndex) Then maxIndex = i
         Next
 

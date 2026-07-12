@@ -20,15 +20,15 @@ Public Class Blob_Basics : Inherits TaskParent
         End If
 
         Dim binaryImage As New cv.Mat
-        cv.Cv2.CvtColor(dst2, binaryImage, cv.ColorConversionCodes.BGR2GRAY)
-        cv.Cv2.Threshold(binaryImage, binaryImage, thresh:=0, maxval:=255, type:=cv.ThresholdTypes.Binary)
+        CvtColor(dst2, binaryImage, cv.ColorConversionCodes.BGR2GRAY)
+        Threshold(binaryImage, binaryImage, thresh:=0, maxval:=255, type:=cv.ThresholdTypes.Binary)
 
         If simpleBlob Is Nothing Then
             simpleBlob = cv.SimpleBlobDetector.Create(CType(options.blobParams, cv.SimpleBlobDetector.Params))
         End If
         Dim keypoint = simpleBlob.Detect(dst2)
 
-        cv.Cv2.DrawKeypoints(image:=binaryImage,
+        DrawKeypoints(image:=binaryImage,
                              keypoints:=keypoint,
                              outImage:=dst3,
                              color:=cv.Scalar.FromRgb(255, 0, 0),
@@ -95,12 +95,12 @@ Public Class Blob_RenderBlobs : Inherits TaskParent
             input.Run(src)
             dst2 = input.dst2
             Dim binary As New cv.Mat
-            cv.Cv2.Threshold(task.gray, binary, 0, 255, cv.ThresholdTypes.Otsu Or cv.ThresholdTypes.Binary)
+            Threshold(task.gray, binary, 0, 255, cv.ThresholdTypes.Otsu Or cv.ThresholdTypes.Binary)
             Dim labelView = dst2.EmptyClone
             Dim stats As New cv.Mat
             Dim centroids As New cv.Mat
-            Dim cc = cv.Cv2.ConnectedComponentsEx(binary)
-            Dim labelCount = cv.Cv2.ConnectedComponentsWithStats(binary, labelView, stats, centroids)
+            Dim cc = ConnectedComponentsEx(binary)
+            Dim labelCount = ConnectedComponentsWithStats(binary, labelView, stats, centroids)
             cc.RenderBlobs(labelView)
 
             'For Each b In cc.Blobs.Skip(1)
@@ -111,8 +111,8 @@ Public Class Blob_RenderBlobs : Inherits TaskParent
             dst3.SetTo(0)
             cc.FilterByBlob(dst2, dst3, maxBlob)
 
-            cv.Cv2.Circle(dst3, New cv.Point(maxBlob.Centroid.X, maxBlob.Centroid.Y), task.DotSize + 3, cv.Scalar.Blue, -1, task.lineType)
-            cv.Cv2.Circle(dst3, New cv.Point(maxBlob.Centroid.X, maxBlob.Centroid.Y), task.DotSize, cv.Scalar.Yellow, -1, task.lineType)
+            Circle(dst3, New cv.Point(maxBlob.Centroid.X, maxBlob.Centroid.Y), task.DotSize + 3, cv.Scalar.Blue, -1, task.lineType)
+            Circle(dst3, New cv.Point(maxBlob.Centroid.X, maxBlob.Centroid.Y), task.DotSize, cv.Scalar.Yellow, -1, task.lineType)
         End If
     End Sub
 End Class

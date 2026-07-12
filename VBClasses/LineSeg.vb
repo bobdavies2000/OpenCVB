@@ -55,10 +55,10 @@ Public Class LineSeg_Core : Inherits TaskParent
         For i = 0 To lpList.Count - 1
             Dim lp = lpList(i)
             lp.index = i
-            cv.Cv2.Line(dst1, lp.p1, lp.p2, lp.index + 1, task.lineWidth, cv.LineTypes.Link4)
-            cv.Cv2.Line(dst2, lp.p1, lp.p2, lp.color, task.lineWidth + 1, task.lineType)
+            Line(dst1, lp.p1, lp.p2, lp.index + 1, task.lineWidth, cv.LineTypes.Link4)
+            Line(dst2, lp.p1, lp.p2, lp.color, task.lineWidth + 1, task.lineType)
         Next
-        cv.Cv2.Threshold(dst1, dst3, 0, 255, cv.ThresholdTypes.Binary)
+        Threshold(dst1, dst3, 0, 255, cv.ThresholdTypes.Binary)
         labels(2) = CStr(lpList.Count) + " LSD line segments were detected."
     End Sub
     Protected Overrides Sub Finalize()
@@ -90,7 +90,7 @@ Public Class XR_LineSeg_Basics : Inherits TaskParent
         Dim mm = task.motion.motionMask
         If lp.rect.Width > 0 And lp.rect.Height > 0 Then
             Dim r = ValidateRect(lp.rect)
-            If r.Width > 0 And r.Height >cv.Cv2.CountNonZero(0 And mm(r)) > 0 Then Return True
+            If r.Width > 0 And r.Height >CountNonZero(0 And mm(r)) > 0 Then Return True
         End If
         Dim pts = {lp.p1, lp.p2, lp.ptCenter}
         For Each pt In pts
@@ -103,7 +103,7 @@ Public Class XR_LineSeg_Basics : Inherits TaskParent
     End Function
     Public Shared Function lineHistogram(input As cv.Mat, nMax As Integer) As Single()
         Dim histogram As New cv.Mat
-        cv.Cv2.CalcHist({input}, {0}, emptyMat, histogram, 1, {nMax},
+        CalcHist({input}, {0}, emptyMat, histogram, 1, {nMax},
                          New cv.Rangef() {New cv.Rangef(-1, nMax + 1)})
 
         Dim histArray(histogram.Total - 1) As Single
@@ -162,8 +162,8 @@ Public Class XR_LineSeg_Basics : Inherits TaskParent
         dst2 = task.color.Clone
         For i = 0 To lpList.Count - 1
             Dim lp = lpList(i)
-            cv.Cv2.Line(dst3, lp.p1, lp.p2, 255, task.lineWidth, cv.LineTypes.Link4)
-            cv.Cv2.Line(dst2, lp.p1, lp.p2, lp.color, task.lineWidth + 1, task.lineType)
+            Line(dst3, lp.p1, lp.p2, 255, task.lineWidth, cv.LineTypes.Link4)
+            Line(dst2, lp.p1, lp.p2, lp.color, task.lineWidth + 1, task.lineType)
         Next
 
         labels(2) = CStr(retainedPrior) + " prior line(s) kept (no motion), " +
@@ -198,7 +198,7 @@ Public Class LineSeg_BasicsFail : Inherits TaskParent
         Dim mm = task.motion.motionMask
         If lp.rect.Width > 0 And lp.rect.Height > 0 Then
             Dim r = ValidateRect(lp.rect)
-            If r.Width > 0 And r.Height >cv.Cv2.CountNonZero(0 And mm(r)) > 0 Then Return True
+            If r.Width > 0 And r.Height >CountNonZero(0 And mm(r)) > 0 Then Return True
         End If
         Dim pts = {lp.p1, lp.p2, lp.ptCenter}
         For Each pt In pts
@@ -249,8 +249,8 @@ Public Class LineSeg_BasicsFail : Inherits TaskParent
         For i = 0 To lpList.Count - 1
             Dim lp = lpList(i)
             lp.index = i
-            cv.Cv2.Line(dst3, lp.p1, lp.p2, 255, task.lineWidth, cv.LineTypes.Link4)
-            cv.Cv2.Line(dst2, lp.p1, lp.p2, lp.color, task.lineWidth + 1, task.lineType)
+            Line(dst3, lp.p1, lp.p2, 255, task.lineWidth, cv.LineTypes.Link4)
+            Line(dst2, lp.p1, lp.p2, lp.color, task.lineWidth + 1, task.lineType)
         Next
         labels(2) = CStr(lpList.Count) + " lines (retained when motion; updated from LSD when stable)."
         labels(3) = CStr(detected.Count) + " lines detected this frame from LineSeg_Basics."
@@ -349,9 +349,9 @@ Public Class LineSeg_LBD : Inherits TaskParent
         End If
 
         Using gx As New cv.Mat(), gy As New cv.Mat(), mag As New cv.Mat()
-            cv.Cv2.Sobel(gray, gx, cv.MatType.CV_32F, 1, 0, 3)
-            cv.Cv2.Sobel(gray, gy, cv.MatType.CV_32F, 0, 1, 3)
-            cv.Cv2.Magnitude(gx, gy, mag)
+            Sobel(gray, gx, cv.MatType.CV_32F, 1, 0, 3)
+            Sobel(gray, gy, cv.MatType.CV_32F, 0, 1, 3)
+            Magnitude(gx, gy, mag)
 
             descriptors = New cv.Mat(lpList.Count, DescriptorBytes, cv.MatType.CV_8U)
             Dim samples(34) As Single
@@ -369,7 +369,7 @@ Public Class LineSeg_LBD : Inherits TaskParent
         For i = 0 To lpList.Count - 1
             Dim lp = lpList(i)
             Dim color = task.scalarColors((lp.index + 1) Mod 255)
-            cv.Cv2.Line(dst2, lp.p1, lp.p2, color, task.lineWidth + 1, task.lineType)
+            Line(dst2, lp.p1, lp.p2, color, task.lineWidth + 1, task.lineType)
         Next
 
         labels(2) = CStr(lpList.Count) + " LineSeg_Basics lines, " + CStr(DescriptorBytes) + " bytes LBD-style descriptor per line."
@@ -478,8 +478,8 @@ Public Class LineSeg_Match : Inherits TaskParent
 
         For k = 0 To lpList.Count - 1
             Dim c = task.scalarColors((k + 1) Mod 255)
-            cv.Cv2.Line(dst2, lpList(k).p1, lpList(k).p2, c, task.lineWidth + 2, task.lineType)
-            cv.Cv2.Line(dst3, lpPrevMatched(k).p1, lpPrevMatched(k).p2, c, task.lineWidth + 2, task.lineType)
+            Line(dst2, lpList(k).p1, lpList(k).p2, c, task.lineWidth + 2, task.lineType)
+            Line(dst3, lpPrevMatched(k).p1, lpPrevMatched(k).p2, c, task.lineWidth + 2, task.lineType)
         Next
 
         currDesc.CopyTo(descPrev)
@@ -640,7 +640,7 @@ Public Class LineSeg_Top3 : Inherits TaskParent
             Dim lp = currLp(li)
             lp.color = task.scalarColors(i)
             lpList.Add(lp)
-            cv.Cv2.Line(dst2, lp.p1, lp.p2, lp.color, task.lineWidth + 2, task.lineType)
+            Line(dst2, lp.p1, lp.p2, lp.color, task.lineWidth + 2, task.lineType)
         Next
 
         labels(2) = CStr(lpList.Count) + " LineSeg_LBD line(s) tracked (heartBeatLT re-picks top 3 by length)."
@@ -677,7 +677,7 @@ Public Class LineSeg_FLD : Inherits TaskParent
         dst3.SetTo(0)
         For i = 0 To Math.Min(histArray.Count, lSeg.lpList.Count) - 1
             If histArray(i) > 5 Then
-                cv.Cv2.Line(dst3, lSeg.lpList(i).p1, lSeg.lpList(i).p2, 255, task.lineWidth, task.lineType)
+                Line(dst3, lSeg.lpList(i).p1, lSeg.lpList(i).p2, 255, task.lineWidth, task.lineType)
             End If
         Next
     End Sub
@@ -713,7 +713,7 @@ Public Class LineSeg_Detector : Inherits TaskParent
         dst3.SetTo(0)
         For i = 0 To Math.Min(histArray.Count, lSeg.lpList.Count) - 1
             If histArray(i) > 5 Then
-                cv.Cv2.Line(dst3, lSeg.lpList(i).p1, lSeg.lpList(i).p2, 255, task.lineWidth, task.lineType)
+                Line(dst3, lSeg.lpList(i).p1, lSeg.lpList(i).p2, 255, task.lineWidth, task.lineType)
             End If
         Next
     End Sub

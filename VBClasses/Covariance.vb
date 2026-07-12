@@ -1,7 +1,7 @@
 Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 Public Class Covariance_Basics : Inherits TaskParent
     Dim random As New Random_Basics
-    Public mean As New cv.Mat
+    Public meanVal As New cv.Mat
     Public covariance As New cv.Mat
     Public Sub New()
         desc = "Calculate the covariance of random depth data points."
@@ -12,11 +12,11 @@ Public Class Covariance_Basics : Inherits TaskParent
             random.Run(src)
             src = cv.Mat.FromPixelData(random.PointList.Count, 2, cv.MatType.CV_32F, random.PointList.ToArray)
             For i = 0 To random.PointList.Count - 1
-            cv.Cv2.Circle(dst3, random.PointList(i), 3, white, -1, task.lineType)
+            Circle(dst3, random.PointList(i), 3, white, -1, task.lineType)
             Next
         End If
         Dim samples2 = src.Reshape(2)
-        cv.Cv2.CalcCovarMatrix(src, covariance, mean, cv.CovarFlags.Cols)
+        CalcCovarMatrix(src, covariance, meanVal, cv.CovarFlags.Cols)
 
         strOut = "The Covariance Mat: " + vbCrLf
         For j = 0 To covariance.Rows - 1
@@ -33,9 +33,9 @@ Public Class Covariance_Basics : Inherits TaskParent
 
         If standaloneTest() Then
             Static lastCenter As cv.Point2f = center
-            cv.Cv2.Circle(dst3, center, 5, cv.Scalar.Red, -1, task.lineType)
-            cv.Cv2.Circle(dst3, lastCenter, 5, task.highlight, task.lineWidth + 1, task.lineType)
-            cv.Cv2.Line(dst3, center, lastCenter, cv.Scalar.Red, task.lineWidth + 1, task.lineType)
+            Circle(dst3, center, 5, cv.Scalar.Red, -1, task.lineType)
+            Circle(dst3, lastCenter, 5, task.highlight, task.lineWidth + 1, task.lineType)
+            Line(dst3, center, lastCenter, cv.Scalar.Red, task.lineWidth + 1, task.lineType)
             lastCenter = center
             strOut += "Yellow is last center, red is the current center"
         End If
@@ -68,7 +68,7 @@ End Class
 ' https://stackoverflow.com/questions/25547823/how-i-calculate-the-covariance-between-2-images
 Public Class Covariance_Images : Inherits TaskParent
     Dim covar As New Covariance_Basics
-    Public mean As cv.Mat
+    Public meanVal As cv.Mat
     Public covariance As cv.Mat
     Dim last32f As New cv.Mat
     Public Sub New()
@@ -80,7 +80,7 @@ Public Class Covariance_Images : Inherits TaskParent
 
         Dim gray32f As New cv.Mat
         task.gray.ConvertTo(gray32f, cv.MatType.CV_32F)
-        cv.Cv2.Merge({gray32f, last32f}, dst0)
+        Merge({gray32f, last32f}, dst0)
         Dim samples = dst0.Reshape(1, dst0.Rows * dst0.Cols)
         covar.Run(samples)
 
@@ -88,7 +88,7 @@ Public Class Covariance_Images : Inherits TaskParent
 
         SetTrueText(covar.strOut, New cv.Point(10, 10), 3)
 
-        mean = covar.mean
+        meanVal = covar.meanVal
         covariance = covar.covariance
     End Sub
 End Class

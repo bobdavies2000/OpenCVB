@@ -6,10 +6,10 @@ Public Class ImShow_Basics : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If task.testAllRunning Then Exit Sub ' when testing, this can occasionally fail - mysterious.
-        If src.Width > 0 Then cv.Cv2.ImShow("color", src)
+        If src.Width > 0 Then ImShow("color", src)
     End Sub
     Protected Overrides Sub Finalize()
-        If task.testAllRunning = False Then cv.Cv2.DestroyWindow("color")
+        If task.testAllRunning = False Then DestroyWindow("color")
     End Sub
 End Class
 
@@ -24,10 +24,10 @@ Public Class ImShow_CV32FC3 : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If task.testAllRunning Then Exit Sub ' when testing, this can occasionally fail - mysterious.
-        cv.Cv2.ImShow("Point cloud", task.pointCloud)
+        ImShow("Point cloud", task.pointCloud)
         dst2 = task.pointCloud.Clone
     End Sub
     Protected Overrides Sub Finalize()
-        cv.Cv2.DestroyWindow("Point cloud")
+        DestroyWindow("Point cloud")
     End Sub
 End Class

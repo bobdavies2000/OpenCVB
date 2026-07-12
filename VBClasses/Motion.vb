@@ -22,7 +22,7 @@ Public Class Motion_Basics_TA : Inherits TaskParent
 
         motionSort.Clear()
         For i = 0 To task.gridRects.Count - 1
-            Dim diffCount = cv.Cv2.CountNonZero(diff.dst2(task.gridRects(i)))
+            Dim diffCount = CountNonZero(diff.dst2(task.gridRects(i)))
             If diffCount >= task.motionThreshold Then motionSort.Add(i)
         Next
 
@@ -96,9 +96,9 @@ Public Class Motion_Validate : Inherits TaskParent
 
         diff.lastFrame = dst2
         diff.Run(dst1)
-        cv.Cv2.Threshold(diff.dst3, dst3, task.colorDiffThreshold, 255, cv.ThresholdTypes.Binary)
+        Threshold(diff.dst3, dst3, task.colorDiffThreshold, 255, cv.ThresholdTypes.Binary)
 
-        Dim count = cv.Cv2.CountNonZero(dst3)
+        Dim count = CountNonZero(dst3)
         strOut = "Pixels different from camera image: " + CStr(count) + " (" +
                   (count / src.Total).ToString("0%") + ")" + vbCrLf +
                  "Grid rects with more than " + CStr(task.motionThreshold) +
@@ -131,7 +131,7 @@ Public Class XR_Motion_Basics : Inherits TaskParent
         task.motionThreshold = task.fOptions.MotionPixelSlider.Value
         For i = 0 To task.gridRects.Count - 1
             Dim r = task.gridRects(i)
-            Dim diffCount = cv.Cv2.CountNonZero(diff.dst2(r))
+            Dim diffCount = CountNonZero(diff.dst2(r))
             If diffCount >= task.motionThreshold Then
                 For Each index In task.gridNabes(i)
                     If gridList.Keys.Contains(index) = False Then gridList.Add(index, index)
@@ -193,14 +193,14 @@ Public Class XR_Motion_ValidateRight : Inherits TaskParent
 
         diff.lastFrame = dst2
         diff.Run(dst1)
-        cv.Cv2.Threshold(diff.dst3, dst3, task.motionThreshold, 255, cv.ThresholdTypes.Binary)
+        Threshold(diff.dst3, dst3, task.motionThreshold, 255, cv.ThresholdTypes.Binary)
 
-        SetTrueText("Pixels different from camera image: " + CStr(cv.Cv2.CountNonZero(diff.dst2)) + vbCrLf +
+        SetTrueText("Pixels different from camera image: " + CStr(CountNonZero(diff.dst2)) + vbCrLf +
                         "Grid rects with more than " + CStr(task.motionThreshold) +
                         " pixels different: " + CStr(motionRight.motion.motionSort.Count), 3)
 
         For Each index In motionRight.motion.motionSort
-            cv.Cv2.Rectangle(dst1, task.gridRects(index), cv.Scalar.All(255), task.lineWidth)
+            Rectangle(dst1, task.gridRects(index), cv.Scalar.All(255), task.lineWidth)
         Next
     End Sub
 End Class
@@ -269,16 +269,16 @@ Public Class Motion_CorrelationToLast : Inherits TaskParent
         cList.Clear()
         For Each index In task.motion.motionSort
             Dim r = task.gridRects(index)
-            cv.Cv2.MatchTemplate(dst2(r), lastFrame(r), correlationMat, cv.TemplateMatchModes.CCoeffNormed)
+            MatchTemplate(dst2(r), lastFrame(r), correlationMat, cv.TemplateMatchModes.CCoeffNormed)
 
             Dim corr = correlationMat.Get(Of Single)(0, 0)
             cList.Add(corr)
 
             If corr < maxCorrelation Then
-            cv.Cv2.Rectangle(dst3, r, white, task.lineWidth)
+            Rectangle(dst3, r, white, task.lineWidth)
                 count += 1
             Else
-            cv.Cv2.Rectangle(dst3, r, black, task.lineWidth)
+            Rectangle(dst3, r, black, task.lineWidth)
             End If
         Next
 
@@ -325,13 +325,13 @@ Public Class Motion_Correlation : Inherits TaskParent
         dst3 = src.Clone
         cList.Clear()
         For Each r In task.gridRects
-            cv.Cv2.MatchTemplate(dst2(r), lastFrame(r), correlationMat, cv.TemplateMatchModes.CCoeffNormed)
+            MatchTemplate(dst2(r), lastFrame(r), correlationMat, cv.TemplateMatchModes.CCoeffNormed)
 
             Dim corr = correlationMat.Get(Of Single)(0, 0)
             cList.Add(corr)
 
             If corr < maxCorrelation Then
-            cv.Cv2.Rectangle(dst3, r, white, task.lineWidth)
+            Rectangle(dst3, r, white, task.lineWidth)
                 count += 1
             End If
         Next
@@ -448,10 +448,10 @@ Public Class Motion_CloudGrid : Inherits TaskParent
                 If index < motionRGB.Count - 1 Then index += 1
                 Continue For
             End If
-            Dim depth = cv.Cv2.Mean(task.pcSplit(2)(r), task.depthmask(r)).Val0
+            Dim depth = Mean(task.pcSplit(2)(r), task.depthmask(r)).Val0
             If depth > 0 Then
                 Dim depthError = disparityCoefficient * depth * depth
-                Dim depthLast = cv.Cv2.Mean(lastDepth(r), lastMask(r)).Val0
+                Dim depthLast = Mean(lastDepth(r), lastMask(r)).Val0
                 If Math.Abs(depth - depthLast) > depthError Then
                     dst2(r).SetTo(255)
                     motionSort.Add(i)
@@ -493,19 +493,19 @@ Public Class Motion_CloudPixel : Inherits TaskParent
         Dim disparityCoefficient As Single = options.pixelError / (task.calibData.baseline * task.calibData.leftIntrinsics.fx)
 
         Dim errorMat As New cv.Mat
-        cv.Cv2.Multiply(task.pcSplit(2), task.pcSplit(2), errorMat)
+        Multiply(task.pcSplit(2), task.pcSplit(2), errorMat)
         errorMat *= disparityCoefficient
 
         Dim depthDelta As New cv.Mat
-        cv.Cv2.Absdiff(task.pcSplit(2), lastDepth, depthDelta)
+        Absdiff(task.pcSplit(2), lastDepth, depthDelta)
 
-        cv.Cv2.Subtract(depthDelta, errorMat, dst2)
-        cv.Cv2.Threshold(dst2, dst2, 0, 255, cv.ThresholdTypes.Binary)
+        Subtract(depthDelta, errorMat, dst2)
+        Threshold(dst2, dst2, 0, 255, cv.ThresholdTypes.Binary)
         ' dst2.ConvertTo(dst2, cv.MatType.CV_8U)
 
-        cv.Cv2.AccumulateWeighted(dst2, dst0, optionsAccum.accumWeighted, New cv.Mat)
+        AccumulateWeighted(dst2, dst0, optionsAccum.accumWeighted, New cv.Mat)
         dst0.ConvertTo(dst2, cv.MatType.CV_8U)
-        cv.Cv2.Threshold(dst2, dst2, 0, 255, cv.ThresholdTypes.Binary)
+        Threshold(dst2, dst2, 0, 255, cv.ThresholdTypes.Binary)
 
         lastDepth = task.pcSplit(2).Clone
     End Sub

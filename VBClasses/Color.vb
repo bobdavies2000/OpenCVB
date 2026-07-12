@@ -12,17 +12,17 @@ Public Class Color_Basics : Inherits TaskParent
             Case "BGR"
                 dst2 = src.Clone
             Case "LAB"
-                cv.Cv2.CvtColor(src, dst2, cv.ColorConversionCodes.BGR2Lab)
+                CvtColor(src, dst2, cv.ColorConversionCodes.BGR2Lab)
             Case "HSV"
-                cv.Cv2.CvtColor(src, dst2, cv.ColorConversionCodes.BGR2HSV)
+                CvtColor(src, dst2, cv.ColorConversionCodes.BGR2HSV)
             Case "XYZ"
-                cv.Cv2.CvtColor(src, dst2, cv.ColorConversionCodes.BGR2XYZ)
+                CvtColor(src, dst2, cv.ColorConversionCodes.BGR2XYZ)
             Case "HLS"
-                cv.Cv2.CvtColor(src, dst2, cv.ColorConversionCodes.BGR2HLS)
+                CvtColor(src, dst2, cv.ColorConversionCodes.BGR2HLS)
             Case "YUV"
-                cv.Cv2.CvtColor(src, dst2, cv.ColorConversionCodes.BGR2YUV)
+                CvtColor(src, dst2, cv.ColorConversionCodes.BGR2YUV)
             Case "YCrCb"
-                cv.Cv2.CvtColor(src, dst2, cv.ColorConversionCodes.BGR2YCrCb)
+                CvtColor(src, dst2, cv.ColorConversionCodes.BGR2YCrCb)
         End Select
     End Sub
 End Class
@@ -52,12 +52,12 @@ Public Class Color_Measure : Inherits TaskParent
         Next
 
         For Each index In task.motion.motionSort
-            cv.Cv2.Rectangle(dst2, task.gridRects(index), cv.Scalar.All(255), task.lineWidth)
-            cv.Cv2.Rectangle(dst3, task.gridRects(index), cv.Scalar.All(255), task.lineWidth)
+            Rectangle(dst2, task.gridRects(index), cv.Scalar.All(255), task.lineWidth)
+            Rectangle(dst3, task.gridRects(index), cv.Scalar.All(255), task.lineWidth)
         Next
         lastSrc = dst2.Clone
 
-        Dim count = cv.Cv2.CountNonZero(dst3)
+        Dim count = CountNonZero(dst3)
         labels(3) = "At " + " color diff threshold " + CStr(threshold) + ", differences: " + CStr(count)
     End Sub
 End Class

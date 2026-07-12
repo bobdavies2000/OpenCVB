@@ -36,9 +36,9 @@ Public Class PCdiff_Basics : Inherits TaskParent
         Dim r3 = New cv.Rect(1, 1, task.cols - 2, task.rows - 2)
 
         dst2 = New cv.Mat(dst2.Size, src.Type, 0)
-        cv.Cv2.Absdiff(src(r1), src(r2), dst2(r3))
-        cv.Cv2.Threshold(dst2, dst1, options1.mmThreshold / 1000, 255, cv.ThresholdTypes.BinaryInv)
-        cv.Cv2.ConvertScaleAbs(dst1, dst3)
+        Absdiff(src(r1), src(r2), dst2(r3))
+        Threshold(dst2, dst1, options1.mmThreshold / 1000, 255, cv.ThresholdTypes.BinaryInv)
+        ConvertScaleAbs(dst1, dst3)
         dst3.SetTo(0, task.noDepthMask)
     End Sub
 End Class
@@ -120,7 +120,7 @@ Public Class PCdiff_Points : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         filter.Run(src)
-        task.pcSplit = cv.Cv2.Split(filter.dst3)
+        task.pcSplit = Split(filter.dst3)
 
         dst2.SetTo(0)
         Dim countInf As Integer
@@ -144,8 +144,8 @@ Public Class PCdiff_Points : Inherits TaskParent
             Next
         Next
 
-                  cv.Cv2.InRange(task.pcSplit(2), 0, 0, task.noDepthMask)
-        cv.Cv2.Merge(task.pcSplit, dst3)
+                  InRange(task.pcSplit(2), 0, 0, task.noDepthMask)
+        Merge(task.pcSplit, dst3)
     End Sub
 End Class
 
@@ -162,7 +162,7 @@ Public Class XR_PCdiff_GuidedBP : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         points.Run(src)
 
-        cv.Cv2.Merge(task.pcSplit, task.pointCloud)
+        Merge(task.pcSplit, task.pointCloud)
         backP.Run(task.pointCloud)
         dst2 = backP.dst2
         labels(2) = backP.labels(2)

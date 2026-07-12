@@ -22,8 +22,8 @@ Public Class BinNWay_Basics : Inherits TaskParent
 
         For i = 0 To options.gradations - 1
             Dim tmp As New cv.Mat
-            cv.Cv2.InRange(task.gray, binSplit(i), binSplit(i + 1), tmp)
-            cv.Cv2.Threshold(tmp, tmp, 0, 255, cv.ThresholdTypes.Binary)
+            InRange(task.gray, binSplit(i), binSplit(i + 1), tmp)
+            Threshold(tmp, tmp, 0, 255, cv.ThresholdTypes.Binary)
             dst1.SetTo(i + 1, tmp)
         Next
 

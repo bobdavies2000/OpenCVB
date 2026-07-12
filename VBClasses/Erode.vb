@@ -7,10 +7,10 @@ Public Class Erode_Basics : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
 
-        If options.noshape Or options.iterations = 0 Then dst2 = src Else cv.Cv2.Erode(src, dst2, options.element, Nothing, options.iterations)
+        If options.noshape Or options.iterations = 0 Then dst2 = src Else Erode(src, dst2, options.element, Nothing, options.iterations)
 
         If standaloneTest() Then
-            cv.Cv2.Erode(task.depthRGB, dst3, options.element, Nothing, options.iterations)
+            Erode(task.depthRGB, dst3, options.element, Nothing, options.iterations)
             labels(3) = "Eroded Depth " + CStr(options.iterations) + " times"
         End If
         labels(2) = "Eroded BGR " + CStr(-options.iterations) + " times"
@@ -65,7 +65,7 @@ Public Class XR_Erode_DepthSeed : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
 
-        cv.Cv2.Erode(task.pcSplit(2), dst0, options.element)
+        Erode(task.pcSplit(2), dst0, options.element)
         dst0 = task.pcSplit(2) - dst0
         dst3 = dst0.LessThan(options.flatDepth).ToMat
         dst1 = task.pcSplit(2).GreaterThan(0).ToMat
@@ -91,8 +91,8 @@ Public Class XR_Erode_Dilate : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
-        cv.Cv2.MorphologyEx(src, dst2, cv.MorphTypes.Close, options.element)
-        cv.Cv2.MorphologyEx(dst2, dst2, cv.MorphTypes.Open, options.element)
+        MorphologyEx(src, dst2, cv.MorphTypes.Close, options.element)
+        MorphologyEx(dst2, dst2, cv.MorphTypes.Open, options.element)
     End Sub
 End Class
 

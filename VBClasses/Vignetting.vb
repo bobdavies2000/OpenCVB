@@ -42,8 +42,8 @@ Public Class XR_Vignetting_VB : Inherits TaskParent
         desc = "Create a stream of images that have been vignetted."
     End Sub
     Public Function fastCos(x As Double) As Double
-        x += cv.Cv2.PI / 2
-        If x > cv.Cv2.PI Then x -= 2 * cv.Cv2.PI
+        x += PI / 2
+        If x > PI Then x -= 2 * PI
         If x < 0 Then Return 1.27323954 * x + 0.405284735 * x * x
         Return 1.27323954 * x - 0.405284735 * x * x
     End Function
@@ -85,8 +85,8 @@ Public Class Vignetting_Removal : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         If standaloneTest() And defaultImage Is Nothing Then
             Dim fileInfo = New FileInfo(task.homeDir + "data/nature.jpg")
-            If fileInfo.Exists Then defaultImage = cv.Cv2.ImRead(fileInfo.FullName)
-            cv.Cv2.Resize(defaultImage, defaultImage, dst3.Size)
+            If fileInfo.Exists Then defaultImage = ImRead(fileInfo.FullName)
+            Resize(defaultImage, defaultImage, dst3.Size)
             dst2 = defaultImage.Clone
         End If
         If standaloneTest() Then basics.Run(defaultImage) Else basics.Run(src)

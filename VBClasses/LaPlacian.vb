@@ -9,11 +9,11 @@ Public Class Laplacian_Basics : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
-        If standaloneTest() Then cv.Cv2.GaussianBlur(src, src, options.kernel, 0, 0)
+        If standaloneTest() Then GaussianBlur(src, src, options.kernel, 0, 0)
         If src.Channels() <> 1 Then src = task.gray
-        cv.Cv2.Laplacian(src, dst3, cv.MatType.CV_16S, options.kernel.Width, options.scale, options.delta)
+        Laplacian(src, dst3, cv.MatType.CV_16S, options.kernel.Width, options.scale, options.delta)
         Dim tmp As New cv.Mat
-        cv.Cv2.Threshold(dst3, tmp, options.threshold, 255, cv.ThresholdTypes.Binary)
+        Threshold(dst3, tmp, options.threshold, 255, cv.ThresholdTypes.Binary)
         erode.Run(tmp)
         dilate.Run(erode.dst2)
         dst2 = dilate.dst2
@@ -38,18 +38,18 @@ Public Class XR_Laplacian_Blur : Inherits TaskParent
 
         Dim blurText As String
         If options.gaussianBlur Then
-            cv.Cv2.GaussianBlur(src, src, options.kernel, 0, 0)
+            GaussianBlur(src, src, options.kernel, 0, 0)
             blurText = "Gaussian"
         ElseIf options.boxFilterBlur Then
-            cv.Cv2.Blur(src, src, options.kernel)
+            Blur(src, src, options.kernel)
             blurText = "boxfilter"
         Else
-            cv.Cv2.MedianBlur(src, src, options.kernel.Width)
+            MedianBlur(src, src, options.kernel.Width)
             blurText = "MedianBlur"
         End If
         If src.Channels() <> 1 Then src = task.gray
-        cv.Cv2.Laplacian(src, dst2, cv.MatType.CV_16S, options.kernel.Width, options.scale, options.delta)
-        cv.Cv2.ConvertScaleAbs(dst2, dst2)
+        Laplacian(src, dst2, cv.MatType.CV_16S, options.kernel.Width, options.scale, options.delta)
+        ConvertScaleAbs(dst2, dst2)
         labels(2) = "Laplacian+" + blurText + " k = " + CStr(options.kernel.Width)
     End Sub
 End Class

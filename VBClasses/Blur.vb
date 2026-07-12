@@ -1,4 +1,4 @@
-Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
+Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCvSharp
 Public Class Blur_Basics : Inherits TaskParent
     Public Options As New Options_Blur
     Public Sub New()
@@ -6,7 +6,7 @@ Public Class Blur_Basics : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         Options.Run()
-        cv.Cv2.GaussianBlur(src, dst2, New cv.Size(Options.kernelSize, Options.kernelSize),
+        GaussianBlur(src, dst2, New cv.Size(Options.kernelSize, Options.kernelSize),
                                     Options.sigmaX, Options.sigmaY)
     End Sub
 End Class
@@ -18,7 +18,7 @@ End Class
 
 
 Public Class XR_Blur_Homogeneous : Inherits TaskParent
-    Dim blur As New Blur_Basics
+    Dim blurC As New Blur_Basics
     Dim blurKernelSlider As TrackBar
     Public Sub New()
         desc = "Smooth each pixel with a kernel of 1's of different sizes."
@@ -26,7 +26,7 @@ Public Class XR_Blur_Homogeneous : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         Dim kernelSize = CInt(blurKernelSlider.Value) Or 1
-        cv.Cv2.Blur(src, dst2, New cv.Size(kernelSize, kernelSize), New cv.Point(-1, -1))
+        Blur(src, dst2, New cv.Size(kernelSize, kernelSize), New cv.Point(-1, -1))
     End Sub
 End Class
 
@@ -37,7 +37,7 @@ End Class
 
 
 Public Class XR_Blur_Median : Inherits TaskParent
-    Dim blur As New Blur_Basics
+    Dim blurC As New Blur_Basics
     Dim blurKernelSlider As TrackBar
     Public Sub New()
         desc = "Replace each pixel with the median of neighborhood of varying sizes."
@@ -45,7 +45,7 @@ Public Class XR_Blur_Median : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         Dim kernelSize = CInt(blurKernelSlider.Value) Or 1
-        cv.Cv2.MedianBlur(src, dst2, kernelSize)
+        MedianBlur(src, dst2, kernelSize)
     End Sub
 End Class
 
@@ -63,7 +63,7 @@ Public Class Blur_Bilateral : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         Options.Run()
 
-        cv.Cv2.BilateralFilter(src, dst2, Options.kernelSize, Options.kernelSize * 2, Options.kernelSize / 2)
+        BilateralFilter(src, dst2, Options.kernelSize, Options.kernelSize * 2, Options.kernelSize / 2)
     End Sub
 End Class
 
@@ -86,9 +86,9 @@ Public Class XR_Blur_TopoMap : Inherits TaskParent
         gradient.Run(src)
         dst2 = gradient.magnitude
 
-        If options.kernelSize > 1 Then cv.Cv2.GaussianBlur(dst2, dst3, New cv.Size(options.kernelSize, options.kernelSize), 0, 0)
-        cv.Cv2.Normalize(dst3, dst3, 255)
-        cv.Cv2.ConvertScaleAbs(dst3, dst3, 255)
+        If options.kernelSize > 1 Then GaussianBlur(dst2, dst3, New cv.Size(options.kernelSize, options.kernelSize), 0, 0)
+        Normalize(dst3, dst3, 255)
+        ConvertScaleAbs(dst3, dst3, 255)
 
         dst3 = (dst3 * 1 / options.blurReduction).ToMat
         dst3 = (dst3 * options.blurReduction).ToMat
@@ -110,7 +110,7 @@ End Class
 
 Public Class XR_Blur_Detection : Inherits TaskParent
     Dim laplace As New Laplacian_Basics
-    Dim blur As New Blur_Basics
+    Dim blurC As New Blur_Basics
     Public Sub New()
         OptionParent.FindSlider("Laplacian Threshold").Value = 50
         OptionParent.FindSlider("Blur Kernel Size").Value = 11
@@ -123,8 +123,8 @@ Public Class XR_Blur_Detection : Inherits TaskParent
             If task.drawRect <> New cv.Rect Then r = task.drawRect
             ' deliberately blur a small region to test the algorithm
             If task.frameCount Mod 2 Then
-                blur.Run(src(r))
-                src(r) = blur.dst2
+                blurC.Run(src(r))
+                src(r) = blurC.dst2
             End If
         End If
 
@@ -133,10 +133,10 @@ Public Class XR_Blur_Detection : Inherits TaskParent
         dst3 = laplace.dst2
 
         Dim mean As Single, stdev As Single
-        cv.Cv2.MeanStdDev(dst2, mean, stdev)
+        MeanStdDev(dst2, mean, stdev)
         SetTrueText("Blur variance is " + (stdev * stdev).ToString(fmt3), 3)
 
-If standaloneTest() Then cv.Cv2.Rectangle(dst2, r, white, task.lineWidth)
+        If standaloneTest() Then Rectangle(dst2, r, white, task.lineWidth)
     End Sub
 End Class
 
@@ -147,17 +147,17 @@ End Class
 
 
 Public Class XR_Blur_Depth : Inherits TaskParent
-    Dim blur As New Blur_Basics
+    Dim blurC As New Blur_Basics
     Public Sub New()
         desc = "Blur the depth results to help find the boundaries to large depth regions"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         Dim _cvt1 As New cv.Mat
-        cv.Cv2.CvtColor(task.depthRGB, _cvt1, cv.ColorConversionCodes.BGR2GRAY)
-        cv.Cv2.Threshold(_cvt1, dst3, 0, 255, cv.ThresholdTypes.Binary)
+        CvtColor(task.depthRGB, _cvt1, cv.ColorConversionCodes.BGR2GRAY)
+        Threshold(_cvt1, dst3, 0, 255, cv.ThresholdTypes.Binary)
 
-        blur.Run(dst3)
-        dst2 = blur.dst2
+        blurC.Run(dst3)
+        dst2 = blurC.dst2
     End Sub
 End Class
 
@@ -172,7 +172,7 @@ Public Class XR_Blur_Gaussian : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
-        cv.Cv2.GaussianBlur(src, dst2, New cv.Size(options.kernelSize, options.kernelSize), 0, 0)
+        GaussianBlur(src, dst2, New cv.Size(options.kernelSize, options.kernelSize), 0, 0)
     End Sub
 End Class
 
@@ -183,7 +183,7 @@ End Class
 
 Public Class XR_Blur_PlusHistogram : Inherits TaskParent
     Dim mat2to1 As New Mat_2to1
-    Dim blur As New Blur_Bilateral
+    Dim blurB As New Blur_Bilateral
     Dim myhist As New Histogram_EqualizeGray
     Public Sub New()
         If standalone Then task.gOptions.displayDst1.Checked = True
@@ -195,10 +195,10 @@ Public Class XR_Blur_PlusHistogram : Inherits TaskParent
 
         mat2to1.mat(0) = myhist.dst2.Clone
 
-        blur.Run(task.gray)
-        dst3 = blur.dst2.Clone
+        blurB.Run(task.gray)
+        dst3 = blurB.dst2.Clone
 
-        myhist.Run(blur.dst2)
+        myhist.Run(blurB.dst2)
         dst2 = myhist.dst3
 
         mat2to1.mat(1) = myhist.dst2.Clone
@@ -215,10 +215,10 @@ End Class
 
 
 Public Class XR_Blur_Histogram : Inherits TaskParent
-    Dim blur As New Blur_Bilateral
+    Dim blurB As New Blur_Bilateral
     Dim myhist As New Histogram_Basics
     Public Sub New()
-        labels(2) = "Histogram of the input without any blur."
+        labels(2) = "Histogram of the input without any blurC."
         desc = "Visualize the impact of blurring with the histogram.  Draw a rectangle anywhere to test a section of the image."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -228,9 +228,9 @@ Public Class XR_Blur_Histogram : Inherits TaskParent
         myhist.Run(src)
         dst2 = myhist.dst2.Clone
 
-        blur.Run(src)
+        blurB.Run(src)
 
-        myhist.Run(blur.dst2)
+        myhist.Run(blurB.dst2)
         dst3 = myhist.dst2
 
         If task.heartBeat Then

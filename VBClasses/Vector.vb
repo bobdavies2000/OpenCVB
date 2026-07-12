@@ -14,10 +14,10 @@ Public Class XR_Vector_Magnitude : Inherits TaskParent
 
         ' sqrt((x2 - x1)^2 + (y2 - y1)^2)
         Dim euclidean_distance As New cv.Mat
-        cv.Cv2.Magnitude(diff_x, diff_y, euclidean_distance)
+        Magnitude(diff_x, diff_y, euclidean_distance)
         strOut += "euclidean_distance = " + CStr(euclidean_distance.Get(Of Single)(0, 0)) + vbCrLf + vbCrLf
 
-        Dim manhattan_distance = cv.Cv2.Abs(diff_x) + cv.Cv2.Abs(diff_y)
+        Dim manhattan_distance = Abs(diff_x) + Abs(diff_y)
         strOut += "manhattan_distance = " + CStr(manhattan_distance.ToMat.Get(Of Single)(0, 0)) + vbCrLf + vbCrLf
 
         ' Another way to compute L1 distance, with absdiff
@@ -25,7 +25,7 @@ Public Class XR_Vector_Magnitude : Inherits TaskParent
         Dim points1 = coordinates(cv.Range.All(), New cv.Range(0, 2))
         Dim points2 = coordinates(cv.Range.All(), New cv.Range(2, 4))
         Dim other_manhattan_distance As New cv.Mat
-        cv.Cv2.Absdiff(points1, points2, other_manhattan_distance)
+        Absdiff(points1, points2, other_manhattan_distance)
         other_manhattan_distance = other_manhattan_distance.Col(0) + other_manhattan_distance.Col(1)
         strOut += "other_manhattan_distance = " + CStr(other_manhattan_distance.Get(Of Single)(0, 0))
         SetTrueText(strOut)

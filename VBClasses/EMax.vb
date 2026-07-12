@@ -83,9 +83,9 @@ Public Class XR_EMax_Centers : Inherits TaskParent
         dst2 = emax.dst2
         Static lastCenters As New List(Of cv.Point2f)(emax.centers)
         For i = 0 To emax.centers.Count - 1
-        cv.Cv2.Circle(dst2, emax.centers(i), task.DotSize + 1, task.highlight, -1, task.lineType)
+        Circle(dst2, emax.centers(i), task.DotSize + 1, task.highlight, -1, task.lineType)
             If i < lastCenters.Count Then
-            cv.Cv2.Circle(dst2, lastCenters(i), task.DotSize + 2, cv.Scalar.Black, -1, task.lineType)
+            Circle(dst2, lastCenters(i), task.DotSize + 2, cv.Scalar.Black, -1, task.lineType)
             End If
         Next
         lastCenters = New List(Of cv.Point2f)(emax.centers)
@@ -122,7 +122,7 @@ Public Class EMax_InputClusters : Inherits TaskParent
         For i = 0 To regionCount - 1
             eLabelMat.RowRange(i * options.samplesPerRegion, (i + 1) * options.samplesPerRegion).SetTo(i)
             Dim tmp = samples.RowRange(i * options.samplesPerRegion, (i + 1) * options.samplesPerRegion)
-            cv.Cv2.Randn(tmp, New cv.Scalar(grid.gridWidth / 2, grid.gridHeight / 2),
+            Randn(tmp, New cv.Scalar(grid.gridWidth / 2, grid.gridHeight / 2),
                              cv.Scalar.All(options.sigma))
         Next
 
@@ -140,7 +140,7 @@ Public Class EMax_InputClusters : Inherits TaskParent
             Dim ePt = New cv.Point2f(CInt(roi.X + pt.X), CInt(roi.Y + pt.Y))
             eSamples.Add(ePt) ' easier to debug with just integers...
             Dim label = eLabelMat.Get(Of Integer)(i)
-            cv.Cv2.Circle(dst2, ePt, task.DotSize + 2, task.highlight, -1, task.lineType)
+            Circle(dst2, ePt, task.DotSize + 2, task.highlight, -1, task.lineType)
         Next
 
         ReDim eLabels(eLabelMat.Rows - 1)
@@ -194,7 +194,7 @@ Public Class XR_EMax_VB_Failing : Inherits TaskParent
                 Dim response = Math.Round(em_model.Predict2(sample)(1))
 
                 Dim c = task.vecColors(response)
-                cv.Cv2.Circle(dst2, New cv.Point(j, i), task.DotSize, c, -1, task.lineType)
+                Circle(dst2, New cv.Point(j, i), task.DotSize, c, -1, task.lineType)
             Next
         Next
     End Sub
@@ -232,9 +232,9 @@ Public Class XR_EMax_PointTracker : Inherits TaskParent
         For i = 0 To knn.queries.Count - 1
             Dim p1 = knn.queries(i)
             Dim p2 = knn.trainInput(knn.result(i, 0))
-            cv.Cv2.Circle(dst3, p1, task.DotSize, task.highlight, -1, task.lineType)
-            cv.Cv2.Circle(dst3, p2, task.DotSize, cv.Scalar.Red, -1, task.lineType)
-            cv.Cv2.Line(dst3, p1, p2, white, task.lineWidth, task.lineType)
+            Circle(dst3, p1, task.DotSize, task.highlight, -1, task.lineType)
+            Circle(dst3, p2, task.DotSize, cv.Scalar.Red, -1, task.lineType)
+            Line(dst3, p1, p2, white, task.lineWidth, task.lineType)
         Next
         knn.trainInput = New List(Of cv.Point2f)(knn.queries)
         dst2 = dst2 Or emax.emaxInput.dst2

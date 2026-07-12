@@ -19,7 +19,7 @@ Public Class Hist3Dcloud_Basics : Inherits TaskParent
 
         Dim bins = options.histogram3DBins
 
-        cv.Cv2.CalcHist({src}, {0, 1, 2}, maskInput, histogram, 3, {bins, bins, bins}, task.rangesCloud)
+        CalcHist({src}, {0, 1, 2}, maskInput, histogram, 3, {bins, bins, bins}, task.rangesCloud)
 
         ReDim histArray(bins - 1)
         Marshal.Copy(histogram.Data, histArray, 0, histArray.Length)
@@ -35,8 +35,8 @@ Public Class Hist3Dcloud_Basics : Inherits TaskParent
         histogram = cv.Mat.FromPixelData(histArray.Count, 1, cv.MatType.CV_32F, simK.histArray)
         classCount = simK.classCount
 
-        cv.Cv2.CalcBackProject({src}, {2}, histogram, dst2, {task.rangesCloud(task.rangesCloud.Count - 1)})
-        cv.Cv2.ConvertScaleAbs(dst2, dst2)
+        CalcBackProject({src}, {2}, histogram, dst2, {task.rangesCloud(task.rangesCloud.Count - 1)})
+        ConvertScaleAbs(dst2, dst2)
 
         dst2.SetTo(0, task.noDepthMask)
         'dst2.SetTo(classCount, task.maxDepthMask)
@@ -76,7 +76,7 @@ Public Class XR_Hist3Dcloud_DepthSplit : Inherits TaskParent
             If i = 1 Then task.channels = {0, 2}
             If i = 2 Then task.channels = {1, 2}
             hist2d(i).Run(task.pointCloud)
-            cv.Cv2.ConvertScaleAbs(hist2d(i).histogram, mats2.mat(i))
+            ConvertScaleAbs(hist2d(i).histogram, mats2.mat(i))
         Next
 
         mats1.Run(src)
@@ -141,14 +141,14 @@ Public Class XR_Hist3Dcloud_Highlights : Inherits TaskParent
         Next
 
         Marshal.Copy(samples, 0, histogram.Data, samples.Length)
-        cv.Cv2.CalcBackProject({src}, {0, 1, 2}, histogram, dst2, ranges)
+        CalcBackProject({src}, {0, 1, 2}, histogram, dst2, ranges)
 
         If task.heartBeat Then maskval += 1
 
         If sortedHist.ElementAt(maskval).Key = 0 Then maskval = 0
         Dim index = sortedHist.ElementAt(maskval).Value
 
-                  cv.Cv2.InRange(dst2, index, index, dst3)
+                  InRange(dst2, index, index, dst3)
         labels(3) = "There were " + CStr(sortedHist.ElementAt(maskval).Key) + " samples in bin " + CStr(index)
     End Sub
 End Class

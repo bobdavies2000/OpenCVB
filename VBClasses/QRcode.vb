@@ -6,12 +6,12 @@ Public Class QRcode_Basics : Inherits TaskParent
     Dim qrInput2 As New cv.Mat
     Public Sub New()
         Dim fileInfo = New FileInfo(task.homeDir + "data/QRcode1.png")
-        If fileInfo.Exists Then qrInput1 = cv.Cv2.ImRead(fileInfo.FullName)
+        If fileInfo.Exists Then qrInput1 = ImRead(fileInfo.FullName)
         fileInfo = New FileInfo(task.homeDir + "Data/QRCode2.png")
-        If fileInfo.Exists Then qrInput2 = cv.Cv2.ImRead(fileInfo.FullName)
+        If fileInfo.Exists Then qrInput2 = ImRead(fileInfo.FullName)
         If dst2.Width < 480 Then ' for the smallest configurations the default size can be too big!
-            cv.Cv2.Resize(qrInput1, qrInput1, New cv.Size(120, 160))
-            cv.Cv2.Resize(qrInput2, qrInput2, New cv.Size(120, 160))
+            Resize(qrInput1, qrInput1, New cv.Size(120, 160))
+            Resize(qrInput2, qrInput2, New cv.Size(120, 160))
         End If
         desc = "Read a QR code"
     End Sub
@@ -36,7 +36,7 @@ Public Class QRcode_Basics : Inherits TaskParent
 
         src.CopyTo(dst2)
         For i = 0 To box.Length - 1
-            cv.Cv2.Line(dst2, box(i), box((i + 1) Mod 4), cv.Scalar.Red, task.lineWidth + 2, task.lineType)
+            Line(dst2, box(i), box((i + 1) Mod 4), cv.Scalar.Red, task.lineWidth + 2, task.lineType)
         Next
         If refersTo <> "" Then labels(2) = refersTo
     End Sub

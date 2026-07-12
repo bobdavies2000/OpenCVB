@@ -25,9 +25,9 @@ Public Class BackProject2D_Basics : Inherits TaskParent
             histogram = New cv.Mat(hist2d.histogram.Size, cv.MatType.CV_32F, cv.Scalar.All(0))
             hist2d.histogram(r).CopyTo(histogram(r))
         End If
-        cv.Cv2.CalcBackProject({colorFmt.dst2}, hist2d.channels, histogram, dst0, hist2d.ranges)
+        CalcBackProject({colorFmt.dst2}, hist2d.channels, histogram, dst0, hist2d.ranges)
 
-        Dim bpCount = cv.Cv2.CountNonZero(hist2d.histogram(r))
+        Dim bpCount = CountNonZero(hist2d.histogram(r))
 
         If backProjectByGrid Then
             Dim mm = GetMinMax(dst0)
@@ -96,8 +96,8 @@ Public Class XR_BackProject2D_Top : Inherits TaskParent
         heat.Run(src)
         dst2 = heat.dst2
 
-        cv.Cv2.CalcBackProject({task.pointCloud}, task.channelsTop, heat.histogramTop, dst1, task.rangesTop)
-        cv.Cv2.ConvertScaleAbs(dst1, dst1)
+        CalcBackProject({task.pointCloud}, task.channelsTop, heat.histogramTop, dst1, task.rangesTop)
+        ConvertScaleAbs(dst1, dst1)
         dst1.ConvertTo(dst1, cv.MatType.CV_8U)
         dst3 = Palettize(dst1)
     End Sub
@@ -117,8 +117,8 @@ Public Class XR_BackProject2D_Side : Inherits TaskParent
         heat.Run(src)
         dst2 = heat.dst3
 
-        cv.Cv2.CalcBackProject({task.pointCloud}, task.channelsSide, heat.histogramSide, dst1, task.rangesSide)
-        cv.Cv2.ConvertScaleAbs(dst1, dst1)
+        CalcBackProject({task.pointCloud}, task.channelsSide, heat.histogramSide, dst1, task.rangesSide)
+        ConvertScaleAbs(dst1, dst1)
         dst1.ConvertTo(dst1, cv.MatType.CV_8U)
         dst3 = Palettize(dst1)
     End Sub
@@ -132,7 +132,7 @@ End Class
 
 
 Public Class BackProject2D_Filter : Inherits TaskParent
-    Public threshold As Integer
+    Public thresholdVal As Integer
     Public histogram As New cv.Mat
     Public Sub New()
         dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_32FC3, 0)
@@ -141,10 +141,10 @@ Public Class BackProject2D_Filter : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If standaloneTest() Then
-            cv.Cv2.CalcHist({task.pointCloud}, task.channelsSide, New cv.Mat, histogram, 2, task.bins2D, task.rangesSide)
+            CalcHist({task.pointCloud}, task.channelsSide, New cv.Mat, histogram, 2, task.bins2D, task.rangesSide)
         End If
         'histogram.Col(0).SetTo(0)
-        cv.Cv2.Threshold(histogram, dst2, threshold, 255, cv.ThresholdTypes.Binary)
+        Threshold(histogram, dst2, thresholdVal, 255, cv.ThresholdTypes.Binary)
     End Sub
 End Class
 
@@ -164,13 +164,13 @@ Public Class BackProject2D_FilterSide : Inherits TaskParent
         options.Run()
 
         Dim histogram As New cv.Mat
-        cv.Cv2.CalcHist({task.pointCloud}, task.channelsSide, New cv.Mat, histogram, 2, task.bins2D, task.rangesSide)
+        CalcHist({task.pointCloud}, task.channelsSide, New cv.Mat, histogram, 2, task.bins2D, task.rangesSide)
 
-        filter.threshold = options.sideThreshold
+        filter.thresholdVal = options.sideThreshold
         filter.histogram = histogram
         filter.Run(src)
 
-        cv.Cv2.CalcBackProject({task.pointCloud}, task.channelsSide, filter.histogram, dst1, task.rangesSide)
+        CalcBackProject({task.pointCloud}, task.channelsSide, filter.histogram, dst1, task.rangesSide)
         dst1.ConvertTo(dst1, cv.MatType.CV_8U)
 
         dst2.SetTo(0)
@@ -195,13 +195,13 @@ Public Class BackProject2D_FilterTop : Inherits TaskParent
         options.Run()
 
         Dim histogram As New cv.Mat
-        cv.Cv2.CalcHist({task.pointCloud}, task.channelsSide, New cv.Mat, histogram, 2, task.bins2D, task.rangesSide)
+        CalcHist({task.pointCloud}, task.channelsSide, New cv.Mat, histogram, 2, task.bins2D, task.rangesSide)
 
-        filter.threshold = options.topThreshold
+        filter.thresholdVal = options.topThreshold
         filter.histogram = histogram
         filter.Run(src)
 
-        cv.Cv2.CalcBackProject({task.pointCloud}, task.channelsTop, filter.dst2, dst1, task.rangesTop)
+        CalcBackProject({task.pointCloud}, task.channelsTop, filter.dst2, dst1, task.rangesTop)
         dst1.ConvertTo(dst1, cv.MatType.CV_8U)
 
         dst2.SetTo(0)
@@ -288,20 +288,20 @@ Public Class XR_BackProject2D_RowCol : Inherits TaskParent
         Else
             rect = New cv.Rect(r.X, 0, r.Width, dst2.Height)
         End If
-        cv.Cv2.Rectangle(dst2, rect, task.highlight, task.lineWidth)
+        Rectangle(dst2, rect, task.highlight, task.lineWidth)
         Dim histData As New cv.Mat(backp.hist2d.histogram.Size, cv.MatType.CV_32F, 0)
         backp.hist2d.histogram(rect).CopyTo(histData(rect))
 
         Dim ranges() = backp.hist2d.ranges
-        cv.Cv2.CalcBackProject({task.color}, backp.hist2d.channels, histData, dst1, ranges)
+        CalcBackProject({task.color}, backp.hist2d.channels, histData, dst1, ranges)
 
         dst3.SetTo(0)
         dst3.SetTo(cv.Scalar.Yellow, dst1)
         dst0.SetTo(0, dst1)
 
         If task.heartBeat Then
-            Dim count = cv.Cv2.Sum(histData(rect))
-            labels(3) = "Selected " + selection + " = " + CStr(cv.Cv2.CountNonZero(histData(rect))) +
+            Dim count = Sum(histData(rect))
+            labels(3) = "Selected " + selection + " = " + CStr(CountNonZero(histData(rect))) +
                         " non-zero histogram entries representing total pixels of " + CStr(count)
         End If
 
@@ -339,8 +339,8 @@ Public Class BackProject2D_Grayscale : Inherits TaskParent
         dst2 = histBar.dst2
 
         Dim backP As New cv.Mat
-        cv.Cv2.CalcBackProject({colorSrc}, channels, histBar.histogram, backP, histBar.ranges)
-        cv.Cv2.Normalize(backP, dst3, 0, 255, cv.NormTypes.MinMax)
+        CalcBackProject({colorSrc}, channels, histBar.histogram, backP, histBar.ranges)
+        Normalize(backP, dst3, 0, 255, cv.NormTypes.MinMax)
         dst3.ConvertTo(dst3, cv.MatType.CV_8U)
 
         If standaloneTest() Then

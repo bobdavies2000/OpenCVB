@@ -16,7 +16,7 @@ Public Class XR_Eigen_Basics : Inherits TaskParent
         End If
         Dim mat As cv.Mat = cv.Mat.FromPixelData(5, 5, cv.MatType.CV_64FC1, inputData)
         Dim eigenVal As New cv.Mat, eigenVec As New cv.Mat
-        cv.Cv2.Eigen(mat, eigenVal, eigenVec)
+        Eigen(mat, eigenVal, eigenVec)
         Dim solution(mat.Cols) As Double
 
         Dim nextLine As String = "Eigen Vals" + vbTab + "Eigen Vectors" + vbTab + vbTab + vbTab + vbTab + vbTab + "Original Matrix" + vbCrLf + vbCrLf
@@ -67,25 +67,25 @@ Public Class XR_Eigen_Fitline : Inherits TaskParent
         dst2 = noisyLine.dst2
         Dim pointCount = noisyLine.eigen3D.PointList.Count
 
-        Dim line = cv.Cv2.FitLine(noisyLine.PointList, cv.DistanceTypes.L2, 1, 0.01, 0.01)
-        Dim m = line.Vy / line.Vx
-        Dim bb = line.Y1 - m * line.X1
-        Dim p1 = New cv.Point(line.X1, line.Y1)
-        Dim p2 = New cv.Point(src.Width, line.Vy / line.Vx * src.Width + bb)
+        Dim lineX = FitLine(noisyLine.PointList, cv.DistanceTypes.L2, 1, 0.01, 0.01)
+        Dim m = lineX.Vy / lineX.Vx
+        Dim bb = lineX.Y1 - m * lineX.X1
+        Dim p1 = New cv.Point(lineX.X1, lineX.Y1)
+        Dim p2 = New cv.Point(src.Width, lineX.Vy / lineX.Vx * src.Width + bb)
         Dim lp = findEdgePoints(New lpData(p1, p2))
-        cv.Cv2.Line(dst2, lp.p1, lp.p2, cv.Scalar.Red, task.lineWidth + 4, task.lineType)
+        Line(dst2, lp.p1, lp.p2, cv.Scalar.Red, task.lineWidth + 4, task.lineType)
 
         Dim pointMat = cv.Mat.FromPixelData(pointCount, 1, cv.MatType.CV_32FC2, noisyLine.PointList.ToArray)
-        Dim mean = cv.Cv2.Mean(pointMat)
-        Dim split() = cv.Cv2.Split(pointMat)
-        Dim mmX = GetMinMax(split(0))
-        Dim mmY = GetMinMax(split(1))
+        Dim meanVal = cv.Cv2.Mean(pointMat)
+        Dim splitMats() = Split(pointMat)
+        Dim mmX = GetMinMax(splitMats(0))
+        Dim mmY = GetMinMax(splitMats(1))
 
         Dim eigenInput As New cv.Vec4f
         For i = 0 To pointCount - 1
             Dim pt = noisyLine.PointList(i)
-            Dim x = pt.X - mean.Val0
-            Dim y = pt.Y - mean.Val1
+            Dim x = pt.X - meanVal.Val0
+            Dim y = pt.Y - meanVal.Val1
             eigenInput(0) += x * x
             eigenInput(1) += x * y
             eigenInput(3) += y * y
@@ -97,22 +97,22 @@ Public Class XR_Eigen_Fitline : Inherits TaskParent
         vec4f.Add(New cv.Point2f(eigenInput(2), eigenInput(3)))
 
         Dim D = cv.Mat.FromPixelData(2, 2, cv.MatType.CV_32FC1, vec4f.ToArray)
-        cv.Cv2.Eigen(D, eigenVal, eigenVec)
+        Eigen(D, eigenVal, eigenVec)
         theta = Math.Atan2(eigenVec.Get(Of Single)(1, 0), eigenVec.Get(Of Single)(0, 0))
 
         len = Math.Sqrt(Math.Pow(mmX.maxVal - mmX.minVal, 2) + Math.Pow(mmY.maxVal - mmY.minVal, 2))
 
-        p1 = New cv.Point2f(mean.Val0 - Math.Cos(theta) * len / 2, mean.Val1 - Math.Sin(theta) * len / 2)
-        p2 = New cv.Point2f(mean.Val0 + Math.Cos(theta) * len / 2, mean.Val1 + Math.Sin(theta) * len / 2)
+        p1 = New cv.Point2f(meanVal.Val0 - Math.Cos(theta) * len / 2, meanVal.Val1 - Math.Sin(theta) * len / 2)
+        p2 = New cv.Point2f(meanVal.Val0 + Math.Cos(theta) * len / 2, meanVal.Val1 + Math.Sin(theta) * len / 2)
         m2 = (p2.Y - p1.Y) / (p2.X - p1.X)
 
         If Math.Abs(m2) > 1.0 Then
-            cv.Cv2.Line(dst2, p1, p2, task.highlight, task.lineWidth + 2, task.lineType)
+            Line(dst2, p1, p2, task.highlight, task.lineWidth + 2, task.lineType)
         Else
-            p1 = New cv.Point2f(mean.Val0 - Math.Cos(-theta) * len / 2, mean.Val1 - Math.Sin(-theta) * len / 2)
-            p2 = New cv.Point2f(mean.Val0 + Math.Cos(-theta) * len / 2, mean.Val1 + Math.Sin(-theta) * len / 2)
+            p1 = New cv.Point2f(meanVal.Val0 - Math.Cos(-theta) * len / 2, meanVal.Val1 - Math.Sin(-theta) * len / 2)
+            p2 = New cv.Point2f(meanVal.Val0 + Math.Cos(-theta) * len / 2, meanVal.Val1 + Math.Sin(-theta) * len / 2)
             m2 = (p2.Y - p1.Y) / (p2.X - p1.X)
-            cv.Cv2.Line(dst2, p1, p2, cv.Scalar.Yellow, task.lineWidth + 1, task.lineType)
+            Line(dst2, p1, p2, cv.Scalar.Yellow, task.lineWidth + 1, task.lineType)
         End If
 
         p1 = New cv.Point(0, noisyLine.bb)
@@ -151,7 +151,7 @@ Public Class Eigen_Input : Inherits TaskParent
         For Each pt In eigen3D.PointList
             Dim p1 = New cv.Point2f(pt.X, pt.Y)
             PointList.Add(p1)
-            cv.Cv2.Circle(dst2, p1, task.DotSize, 255, -1, task.lineType)
+            Circle(dst2, p1, task.DotSize, 255, -1, task.lineType)
         Next
     End Sub
 End Class
@@ -204,7 +204,7 @@ Public Class Eigen_Input3D : Inherits TaskParent
             Dim pt = New cv.Point3f(startx + i * incr + noiseOffsetX,
                                         Math.Max(0, Math.Min(m * (startx + i * incr) + bb + noiseOffsetY, height)), Rnd() * depth)
             PointList.Add(pt)
-            cv.Cv2.Circle(dst2, New cv.Point2f(pt.X, pt.Y), task.DotSize + 1, highLight, -1, task.lineType)
+            Circle(dst2, New cv.Point2f(pt.X, pt.Y), task.DotSize + 1, highLight, -1, task.lineType)
         Next
     End Sub
 End Class
