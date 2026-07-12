@@ -3,8 +3,8 @@ Public Class Mat_Basics : Inherits TaskParent
     Public Sub New()
         desc = "Use the repeat method to replicate data."
     End Sub
-    Public Shared Function srcMustBe8U(src As cv.Mat) As cv.Mat
-        If src.Type <> cv.MatType.CV_8U Then
+    Public Shared Function srcMustBe8U(src As Mat) As Mat
+        If src.Type <> MatType.CV_8U Then
             Static color8U As New Color8U_Basics
             color8U.Run(src)
             Return color8U.dst2
@@ -12,13 +12,13 @@ Public Class Mat_Basics : Inherits TaskParent
         Return src
     End Function
     Public Overrides Sub RunAlg(src As cv.Mat)
-        Resize(src, dst2, New cv.Size(src.Cols / 10, src.Rows / 10))
+        Resize(src, dst2, New Size(src.Cols / 10, src.Rows / 10))
 
-        Dim tmp As New cv.Mat
+        Dim tmp As New Mat
         Repeat(dst2, 10, 10, tmp)
         dst2 = tmp.Clone
 
-        Resize(task.depthRGB, dst3, New cv.Size(src.Cols / 10, src.Rows / 10))
+        Resize(task.depthRGB, dst3, New Size(src.Cols / 10, src.Rows / 10))
         Repeat(dst3, 10, 10, tmp)
         dst3 = tmp.Clone
     End Sub
@@ -42,16 +42,16 @@ Public Class XR_Mat_PointToMat : Inherits TaskParent
         random.Run(src)
         dst2.SetTo(0)
         For Each pt In random.PointList
-        Circle(dst2, pt, task.DotSize, cv.Scalar.Yellow, -1, task.lineType)
+        Circle(dst2, pt, task.DotSize, Scalar.Yellow, -1, task.lineType)
         Next
 
         Dim rows = random.PointList.Count
-        Dim pMat = cv.Mat.FromPixelData(rows, 1, cv.MatType.CV_32FC2, random.PointList.ToArray)
+        Dim pMat = Mat.FromPixelData(rows, 1, MatType.CV_32FC2, random.PointList.ToArray)
         dst3.SetTo(0)
-        Dim white = New cv.Vec3b(255, 255, 255)
+        Dim white = New Vec3b(255, 255, 255)
         For i = 0 To rows - 1
-            Dim pt = pMat.At(Of cv.Vec2f)(i, 0)
-            dst3.Set(Of cv.Vec3b)(CInt(pt(1)), CInt(pt(0)), white)
+            Dim pt = pMat.At(Of Vec2f)(i, 0)
+            dst3.Set(Of Vec3b)(CInt(pt(1)), CInt(pt(0)), white)
         Next
     End Sub
 End Class
@@ -67,18 +67,18 @@ Public Class XR_Mat_MatToPoint : Inherits TaskParent
         labels(2) = "Reconstructed BGR Image"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        Dim points(src.Total - 1) As cv.Vec3b
-        Dim vec As New cv.Vec3b
+        Dim points(src.Total - 1) As Vec3b
+        Dim vec As New Vec3b
         Dim index As Integer = 0
         Dim m3b = src.Clone()
         For y = 0 To src.Rows - 1
             For x = 0 To src.Cols - 1
-                vec = m3b.At(Of cv.Vec3b)(y, x)
-                points(index) = New cv.Vec3b(vec(0), vec(1), vec(2))
+                vec = m3b.At(Of Vec3b)(y, x)
+                points(index) = New Vec3b(vec(0), vec(1), vec(2))
                 index += 1
             Next
         Next
-        dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, cv.MatType.CV_8UC3, points)
+        dst2 = Mat.FromPixelData(src.Rows, src.Cols, MatType.CV_8UC3, points)
     End Sub
 End Class
 
@@ -96,7 +96,7 @@ Public Class XR_Mat_Transpose : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         Dim trColor = src.T()
-        Resize(trColor.ToMat, dst2, New cv.Size(src.Cols, src.Rows))
+        Resize(trColor.ToMat, dst2, New Size(src.Cols, src.Rows))
         Dim trBack = dst2.T()
         Resize(trBack.ToMat, dst3, src.Size())
     End Sub
@@ -115,7 +115,7 @@ Public Class XR_Mat_Tricks : Inherits TaskParent
         desc = "Show some Mat tricks."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        Resize(src, dst2, New cv.Size(src.Height, src.Height))
+        Resize(src, dst2, New Size(src.Height, src.Height))
         Dim roi = New cv.Rect(0, 0, dst2.Width, dst2.Height)
         dst3(roi) = dst2(roi).T
     End Sub
@@ -147,16 +147,16 @@ End Class
 
 Public Class XR_Mat_Managed : Inherits TaskParent
     Dim autoRand As New Random()
-    Dim img(dst2.Total - 1) As cv.Vec3b
-    Dim nextColor As cv.Vec3b
+    Dim img(dst2.Total - 1) As Vec3b
+    Dim nextColor As Vec3b
     Public Sub New()
-        labels(2) = "Color change is in the managed cv.vec3b array"
+        labels(2) = "Color change is in the managed vec3b array"
         desc = "There is a limited ability to use Mat data in Managed code directly."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, cv.MatType.CV_8UC3, img)
+        dst2 = Mat.FromPixelData(src.Rows, src.Cols, MatType.CV_8UC3, img)
         If task.heartBeat Then
-            If nextColor = New cv.Vec3b(0, 0, 255) Then nextColor = New cv.Vec3b(0, 255, 0) Else nextColor = New cv.Vec3b(0, 0, 255)
+            If nextColor = New Vec3b(0, 0, 255) Then nextColor = New Vec3b(0, 255, 0) Else nextColor = New Vec3b(0, 0, 255)
         End If
         For i = 0 To img.Length - 1
             img(i) = nextColor
@@ -228,7 +228,7 @@ End Class
 Public Class XR_Mat_Inverse : Inherits TaskParent
     Public matrix(,) As Single = {{1.1688, 0.23, 62.2}, {-0.013, 1.225, -6.29}, {0, 0, 1}}
     Public validateInverse As Boolean
-    Public inverse As New cv.Mat
+    Public inverse As New Mat
     Dim options As New Options_Mat
     Public Sub New()
         desc = "Given a 3x3 matrix, invert it and present task.results.."
@@ -247,7 +247,7 @@ Public Class XR_Mat_Inverse : Inherits TaskParent
             strOut += vbCrLf
         End If
 
-        Dim input = cv.Mat.FromPixelData(3, 3, cv.MatType.CV_32F, matrix)
+        Dim input = Mat.FromPixelData(3, 3, MatType.CV_32F, matrix)
         Invert(input, inverse, options.decompType)
 
         If standaloneTest() Or validateInverse Then
@@ -283,12 +283,12 @@ End Class
 
 Public Class XR_Mat_Inverse_4D : Inherits TaskParent
     Dim defaultInput(,) As Double = {{3, 7, 2, 5}, {4, 0, 1, 1}, {1, 6, 3, 0}, {2, 8, 4, 3}}
-    Public input As cv.Mat
+    Public input As Mat
     Public Sub New()
-        input = cv.Mat.FromPixelData(4, 4, cv.MatType.CV_64F, defaultInput)
+        input = Mat.FromPixelData(4, 4, MatType.CV_64F, defaultInput)
         desc = "Use OpenCV to invert a matrix"
     End Sub
-    Private Function printMatrixResults(src As cv.Mat, dst2 As cv.Mat) As String
+    Private Function printMatrixResults(src As Mat, dst2 As Mat) As String
         Dim outstr As String = "Original Matrix " + vbCrLf
         For y = 0 To src.Rows - 1
             For x = 0 To src.Cols - 1
@@ -311,8 +311,8 @@ Public Class XR_Mat_Inverse_4D : Inherits TaskParent
             Exit Sub
         End If
 
-        Dim result As New cv.Mat
-        Invert(input, result, cv.DecompTypes.LU)
+        Dim result As New Mat
+        Invert(input, result, DecompTypes.LU)
         Dim outstr = printMatrixResults(input, result)
         SetTrueText(outstr)
     End Sub
@@ -325,12 +325,12 @@ End Class
 
 
 Public Class Mat_2to1 : Inherits TaskParent
-    Dim mat1 As cv.Mat
-    Dim mat2 As cv.Mat
-    Public mat() As cv.Mat = {mat1, mat2}
+    Dim mat1 As Mat
+    Dim mat2 As Mat
+    Public mat() As Mat = {mat1, mat2}
     Public lineSeparators = True ' if they want lines or not...
     Public Sub New()
-        mat1 = New cv.Mat(New cv.Size(dst2.Rows, dst2.Cols), cv.MatType.CV_8UC3, cv.Scalar.All(0))
+        mat1 = New Mat(New Size(dst2.Rows, dst2.Cols), MatType.CV_8UC3, Scalar.All(0))
         mat2 = mat1.Clone()
         mat = {mat1, mat2}
 
@@ -338,7 +338,7 @@ Public Class Mat_2to1 : Inherits TaskParent
         desc = "Fill a Mat with 2 images"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        Dim nSize = New cv.Size(task.workRes.Width, task.workRes.Height / 2)
+        Dim nSize = New Size(task.workRes.Width, task.workRes.Height / 2)
         Dim roiTop = New cv.Rect(0, 0, nSize.Width, nSize.Height)
         Dim roibot = New cv.Rect(0, nSize.Height, nSize.Width, nSize.Height)
         If standaloneTest() Then
@@ -348,10 +348,10 @@ Public Class Mat_2to1 : Inherits TaskParent
         End If
         dst2.SetTo(0)
         If mat(0) IsNot Nothing Then
-            If dst2.Type <> mat(0).Type Then dst2 = New cv.Mat(dst2.Size(), mat(0).Type)
+            If dst2.Type <> mat(0).Type Then dst2 = New Mat(dst2.Size(), mat(0).Type)
             For i = 0 To 1
                 Dim roi = Choose(i + 1, roiTop, roibot)
-                Dim resizedMat As cv.Mat = dst2(roi)
+                Dim resizedMat As Mat = dst2(roi)
                 Resize(mat(i), resizedMat, nSize)
             Next
             If lineSeparators Then
@@ -367,7 +367,7 @@ End Class
 
 Public Class Mat_4Click : Inherits TaskParent
     Public mats As New Mat_4to1
-    Public mat() As cv.Mat
+    Public mat() As Mat
     Public quadrant As Integer = 3
     Public Sub New()
         mat = mats.mat
@@ -404,7 +404,7 @@ End Class
 
 
 Public Class Mat_4to1 : Inherits TaskParent
-    Public mat(3) As cv.Mat
+    Public mat(3) As Mat
     Public lineSeparators = True ' if they want lines or not...
     Public quadrant As Integer = 0
     Public Sub New()
@@ -415,35 +415,35 @@ Public Class Mat_4to1 : Inherits TaskParent
         labels(3) = "Click any quadrant at left to view it below"
         desc = "Use one Mat for up to 4 images"
     End Sub
-    Public Sub defaultMats(src As cv.Mat)
-        Dim tmpLeft As New cv.Mat, tmpRight As New cv.Mat
+    Public Sub defaultMats(src As Mat)
+        Dim tmpLeft As New Mat, tmpRight As New Mat
         If task.leftView.Channels = 1 Then
-            CvtColor(task.leftView, tmpLeft, cv.ColorConversionCodes.GRAY2BGR)
+            CvtColor(task.leftView, tmpLeft, ColorConversionCodes.GRAY2BGR)
         Else
             tmpLeft = task.leftView.Clone
         End If
 
         If task.rightView.Channels = 1 Then
-            CvtColor(task.rightView, tmpRight, cv.ColorConversionCodes.GRAY2BGR)
+            CvtColor(task.rightView, tmpRight, ColorConversionCodes.GRAY2BGR)
         Else
             tmpRight = task.rightView.Clone
         End If
         mat = {task.color.Clone, task.depthRGB.Clone, tmpLeft, tmpRight}
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        Dim nSize = New cv.Size(dst2.Width / 2, dst2.Height / 2)
+        Dim nSize = New Size(dst2.Width / 2, dst2.Height / 2)
         Dim roiTopLeft = New cv.Rect(0, 0, nSize.Width, nSize.Height)
         Dim roiTopRight = New cv.Rect(nSize.Width, 0, nSize.Width, nSize.Height)
         Dim roibotLeft = New cv.Rect(0, nSize.Height, nSize.Width, nSize.Height)
         Dim roibotRight = New cv.Rect(nSize.Width, nSize.Height, nSize.Width, nSize.Height)
         If standalone Then defaultMats(src)
 
-        dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8UC3)
+        dst2 = New Mat(dst2.Size(), MatType.CV_8UC3)
         For i = 0 To 4 - 1
             Dim tmp = mat(i).Clone
-            If tmp.Channels() = 1 Then CvtColor(mat(i), tmp, cv.ColorConversionCodes.GRAY2BGR)
+            If tmp.Channels() = 1 Then CvtColor(mat(i), tmp, ColorConversionCodes.GRAY2BGR)
             Dim roi = Choose(i + 1, roiTopLeft, roiTopRight, roibotLeft, roibotRight)
-            Dim resizeInput As cv.Mat = dst2(roi)
+            Dim resizeInput As Mat = dst2(roi)
             Resize(tmp, resizeInput, nSize)
         Next
         If lineSeparators Then
@@ -470,7 +470,7 @@ Public Class XR_Mat_FindNearZero : Inherits TaskParent
 
         InRange(task.pcSplit(1), -threshold, threshold, dst3)
         dst3.SetTo(0, task.noDepthMask)
-        dst3.ConvertTo(dst2, cv.MatType.CV_8U)
+        dst3.ConvertTo(dst2, MatType.CV_8U)
 
         FindNonZero(dst3, dst1)
         If dst1.Rows > 0 Then
@@ -487,35 +487,35 @@ Public Class Mat_Convert : Inherits TaskParent
     Public Sub New()
         desc = "Convert the input into 8uC3."
     End Sub
-    Public Shared Function Mat_32f_To_8UC3(Input As cv.Mat) As cv.Mat
-        Dim outMat As New cv.Mat
-        Normalize(Input, outMat, 0, 255, cv.NormTypes.MinMax)
+    Public Shared Function Mat_32f_To_8UC3(Input As Mat) As Mat
+        Dim outMat As New Mat
+        Normalize(Input, outMat, 0, 255, NormTypes.MinMax)
         If Input.Channels() = 1 Then
-            outMat.ConvertTo(outMat, cv.MatType.CV_8U)
-            CvtColor(outMat, outMat, cv.ColorConversionCodes.GRAY2BGR)
+            outMat.ConvertTo(outMat, MatType.CV_8U)
+            CvtColor(outMat, outMat, ColorConversionCodes.GRAY2BGR)
             Return outMat
         End If
-        outMat.ConvertTo(outMat, cv.MatType.CV_8UC3)
+        outMat.ConvertTo(outMat, MatType.CV_8UC3)
         Return outMat
     End Function
-    Public Shared Function Mat_Check8UC3(src As cv.Mat) As cv.Mat
-        If src.Type = cv.MatType.CV_8UC3 Then Return src
-        Dim dst As New cv.Mat
-        If src.Type = cv.MatType.CV_32F Then
+    Public Shared Function Mat_Check8UC3(src As Mat) As Mat
+        If src.Type = MatType.CV_8UC3 Then Return src
+        Dim dst As New Mat
+        If src.Type = MatType.CV_32F Then
             dst = Mat_32f_To_8UC3(src)
-        ElseIf src.Type = cv.MatType.CV_32SC1 Then
-            src.ConvertTo(dst, cv.MatType.CV_32F)
+        ElseIf src.Type = MatType.CV_32SC1 Then
+            src.ConvertTo(dst, MatType.CV_32F)
             dst = Mat_32f_To_8UC3(dst)
-        ElseIf src.Type = cv.MatType.CV_32SC3 Then
-            src.ConvertTo(dst, cv.MatType.CV_32F)
-            CvtColor(dst, dst, cv.ColorConversionCodes.BGR2GRAY)
+        ElseIf src.Type = MatType.CV_32SC3 Then
+            src.ConvertTo(dst, MatType.CV_32F)
+            CvtColor(dst, dst, ColorConversionCodes.BGR2GRAY)
             dst = Mat_32f_To_8UC3(dst)
-        ElseIf src.Type = cv.MatType.CV_32FC3 Then
+        ElseIf src.Type = MatType.CV_32FC3 Then
             ConvertScaleAbs(src, dst)
         Else
             dst = src.Clone
         End If
-        If src.Channels() = 1 And src.Type = cv.MatType.CV_8UC1 Then CvtColor(src, dst, cv.ColorConversionCodes.GRAY2BGR)
+        If src.Channels() = 1 And src.Type = MatType.CV_8UC1 Then CvtColor(src, dst, ColorConversionCodes.GRAY2BGR)
         If src.Size <> task.workRes Then Resize(dst, dst, task.workRes)
         Return dst
     End Function

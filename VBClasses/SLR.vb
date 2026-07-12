@@ -245,7 +245,7 @@ Public Class SLR_Trends : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         labels(2) = "Grayscale histogram - yellow line shows trend"
-        hist.plotHist.backgroundColor = cv.Scalar.Red
+        hist.plotHist.backgroundColor = red
         hist.Run(src)
         dst2 = hist.dst2
 
@@ -411,7 +411,7 @@ Public Class SLR
 
         If Math.Abs(denom) < TOLER Then
             ' The following special cases should be processed in client code:
-            ' 1. User data represent a single point;
+            ' 1. User data represent a single cv.Point;
             ' 2. Regression line is vertical: coef_a == INFINITY, coeff_b is UN-defined;
             Return False
         End If
@@ -535,7 +535,7 @@ Public Class SLR
     '                                                                
     ' a given range is not subdivided if the specified accuracy of  
     ' linear regression has been achieved, otherwise, the function  
-    ' searches for the best split point in the range ;              
+    ' searches for the best split cv.Point in the range ;              
     '                                                                
     Public Function CanSplitRangeThorough(
                     data_x As List(Of Double),
@@ -563,7 +563,7 @@ Public Class SLR
         Dim idx_b As Integer = idx_range_in.idx_b
         Dim end_offset As Integer = RangeLengthMin()
 
-        ' sequential search for the best split point in the input range 
+        ' sequential search for the best split cv.Point in the input range 
         For idx As Integer = idx_a + end_offset To idx_b - end_offset - 1
             ' sub-divided ranges 
             Dim range_left As New RangeIndex(idx_a, idx)
@@ -632,10 +632,10 @@ Public Class SLR
         Dim data_copy As New List(Of Double)(data_io)
 
         ' For better readability, where relevant the code below shows
-        ' the symmetry of processing at a current data point,
+        ' the symmetry of processing at a current data cv.Point,
         ' for example: we use (ix + 1 + ix) instead of (2 * ix + 1)
 
-        ' The first point is fixed
+        ' The first cv.Point is fixed
         sum_y = data_copy(0)
         data_io(0) = sum_y / 1.0
 
@@ -648,7 +648,7 @@ Public Class SLR
 
         ' In the middle range window length is constant
         For ix = (half_len + 1) To ((n_values - 1) - half_len)
-            ' Add to window new data point and remove from window the oldest data point
+            ' Add to window new data cv.Point and remove from window the oldest data cv.Point
             sum_y = sum_y + data_copy(ix + half_len) - data_copy(ix - half_len - 1)
             data_io(ix) = sum_y / CDbl(half_len + 1 + half_len)
         Next
@@ -662,7 +662,7 @@ Public Class SLR
             data_io(ix) = sum_y / CDbl(n_values - 1 - ix + 1 + n_values - 1 - ix)
         Next
 
-        ' The last point is fixed
+        ' The last cv.Point is fixed
         data_io(n_values - 1) = data_copy(n_values - 1)
     End Sub
 
@@ -770,7 +770,7 @@ Public Class SLR
             Dim idx_max_cur As Integer = vec_max_ind_in(k_max)
 
             ' check if the current index is inside the given range and that  
-            ' potential split will not create segment with 1 data point only 
+            ' potential split will not create segment with 1 data cv.Point only 
             If (idx_max_cur < idx_range_in.idx_a + end_offset) OrElse
                            (idx_max_cur >= idx_range_in.idx_b - end_offset) Then
                 Continue For

@@ -1,7 +1,7 @@
 Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 Public Class Hull_Basics : Inherits TaskParent
     Dim random As New Random_Basics
-    Public inputPoints As New List(Of cv.Point2f)
+    Public inputPoints As New List(Of Point2f)
     Public hull As New List(Of cv.Point)
     Public useRandomPoints As Boolean
     Public Sub New()
@@ -9,7 +9,7 @@ Public Class Hull_Basics : Inherits TaskParent
         If standalone Then random.range = New cv.Rect(100, 100, 50, 50)
         desc = "Given a list of points, create a hull that encloses them."
     End Sub
-    Private Function vbFloat2Int(ptList2f As List(Of cv.Point2f)) As List(Of cv.Point)
+    Private Function vbFloat2Int(ptList2f As List(Of Point2f)) As List(Of cv.Point)
         Dim ptList As New List(Of cv.Point)
         For Each pt In ptList2f
             ptList.Add(New cv.Point(CInt(pt.X), CInt(pt.Y)))
@@ -23,11 +23,11 @@ Public Class Hull_Basics : Inherits TaskParent
             For Each pt In random.PointList
             Circle(dst2, pt, task.DotSize, white, -1, task.lineType)
             Next
-            inputPoints = New List(Of cv.Point2f)(random.PointList)
+            inputPoints = New List(Of Point2f)(random.PointList)
         End If
         Dim hull2f = ConvexHull(inputPoints, True)
         hull = vbFloat2Int(hull2f.ToList)
-        DrawTour(dst2, hull, cv.Scalar.Yellow)
+        DrawTour(dst2, hull, Scalar.Yellow)
     End Sub
 End Class
 
@@ -94,7 +94,7 @@ Public Class Hull_Contour : Inherits TaskParent
     Public contours1 As New Contour_Basics
     Public contours2 As New Contour_Basics
     Public Sub New()
-        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        dst2 = New Mat(dst2.Size, MatType.CV_8U, 0)
         desc = "Compare the hull to the contour of a contour cell"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)

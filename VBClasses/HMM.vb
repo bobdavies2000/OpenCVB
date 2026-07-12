@@ -13,14 +13,14 @@ Public Class XR_HMM_Example_CPP : Inherits TaskParent
             SetTrueText("When XR_HMM_Example_CPP is run repeatedly as part of a 'Test All', it can run out of OpenCL memory.")
             Exit Sub
         End If
-        Dim dataSrc(src.Total - 1) As cv.Vec3b
-        src.GetArray(Of cv.Vec3b)(dataSrc)
+        Dim dataSrc(src.Total - 1) As Vec3b
+        src.GetArray(Of Vec3b)(dataSrc)
         Dim handleSrc = GCHandle.Alloc(dataSrc, GCHandleType.Pinned)
         Dim imagePtr = HMM_Run(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, src.Channels)
         handleSrc.Free()
 
         SetTrueText("Review the 'Visual Studio's Immediate Window' output to see the sharedResults.images..", 3)
-        If imagePtr <> 0 Then dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, IIf(src.Channels() = 3, cv.MatType.CV_8UC3, cv.MatType.CV_8UC1), imagePtr).Clone
+        If imagePtr <> 0 Then dst2 = Mat.FromPixelData(src.Rows, src.Cols, IIf(src.Channels() = 3, MatType.CV_8UC3, MatType.CV_8UC1), imagePtr).Clone
     End Sub
     Protected Overrides Sub Finalize()
         If cPtr <> 0 Then cPtr = HMM_Close(cPtr)

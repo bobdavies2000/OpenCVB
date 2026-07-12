@@ -3,7 +3,7 @@
 Public Class PlotDots_Basics : Inherits TaskParent
     Public srcX As New List(Of Double)
     Public srcY As New List(Of Double)
-    Public plotColor = cv.Scalar.Yellow
+    Public plotColor = Scalar.Yellow
     Public wipeSlate As Boolean = True
     Public Sub New()
         If standalone Then

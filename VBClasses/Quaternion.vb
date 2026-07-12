@@ -27,7 +27,7 @@ Public Class Quaternion_IMUPrediction : Inherits TaskParent
         labels(3) = ""
         desc = "IMU data arrives at the CPU after a delay.  Predict changes to the image based on delay and motion data."
     End Sub
-    Public Function quaternion_exp(v As cv.Point3f) As Quaternion
+    Public Function quaternion_exp(v As Point3f) As Quaternion
         v *= 0.5
         Dim theta2 = v.X * v.X + v.Y * v.Y + v.Z * v.Z
         Dim theta = Math.Sqrt(theta2)
@@ -41,11 +41,11 @@ Public Class Quaternion_IMUPrediction : Inherits TaskParent
         Dim dt = host.HostInterruptDelayEstimate
 
         Dim t = task.IMU_Translation
-        Dim predictedTranslation = New cv.Point3f(dt * (dt / 2 * task.IMU_Acceleration.X + task.IMU_AngularVelocity.X) + t.X,
+        Dim predictedTranslation = New Point3f(dt * (dt / 2 * task.IMU_Acceleration.X + task.IMU_AngularVelocity.X) + t.X,
                                                       dt * (dt / 2 * task.IMU_Acceleration.Y + task.IMU_AngularVelocity.Y) + t.Y,
                                                       dt * (dt / 2 * task.IMU_Acceleration.Z + task.IMU_AngularVelocity.Z) + t.Z)
 
-        Dim predictedW = New cv.Point3f(dt * (dt / 2 * task.IMU_AngularAcceleration.X + task.IMU_AngularVelocity.X),
+        Dim predictedW = New Point3f(dt * (dt / 2 * task.IMU_AngularAcceleration.X + task.IMU_AngularVelocity.X),
                                             dt * (dt / 2 * task.IMU_AngularAcceleration.Y + task.IMU_AngularVelocity.Y),
                                             dt * (dt / 2 * task.IMU_AngularAcceleration.Z + task.IMU_AngularVelocity.Z))
 

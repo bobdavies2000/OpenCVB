@@ -1,11 +1,11 @@
 Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 Imports System.Runtime.InteropServices
 Public Class Hist3Dcloud_Basics : Inherits TaskParent
-    Public histogram As New cv.Mat
-    Public histogram1D As New cv.Mat
+    Public histogram As New Mat
+    Public histogram1D As New Mat
     Public histArray() As Single
     Public classCount As Integer
-    Public maskInput As New cv.Mat
+    Public maskInput As New Mat
     Public simK As New Hist3D_BuildHistogram
     Dim options As New Options_Hist3D
     Public Sub New()
@@ -15,7 +15,7 @@ Public Class Hist3Dcloud_Basics : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
 
-        If src.Type <> cv.MatType.CV_32FC3 Then src = task.pointCloud
+        If src.Type <> MatType.CV_32FC3 Then src = task.pointCloud
 
         Dim bins = options.histogram3DBins
 
@@ -29,10 +29,10 @@ Public Class Hist3Dcloud_Basics : Inherits TaskParent
             If histArray(i) > threshold Then Exit For
             histArray(i) = 0
         Next
-        histogram = cv.Mat.FromPixelData(histArray.Count, 1, cv.MatType.CV_32F, histArray)
+        histogram = Mat.FromPixelData(histArray.Count, 1, MatType.CV_32F, histArray)
 
         simK.Run(histogram)
-        histogram = cv.Mat.FromPixelData(histArray.Count, 1, cv.MatType.CV_32F, simK.histArray)
+        histogram = Mat.FromPixelData(histArray.Count, 1, MatType.CV_32F, simK.histArray)
         classCount = simK.classCount
 
         CalcBackProject({src}, {2}, histogram, dst2, {task.rangesCloud(task.rangesCloud.Count - 1)})
@@ -95,8 +95,8 @@ End Class
 
 
 Public Class XR_Hist3Dcloud_Highlights : Inherits TaskParent
-    Public histogram As New cv.Mat
-    Public ranges() As cv.Rangef
+    Public histogram As New Mat
+    Public ranges() As Rangef
     Dim maskval As Integer
     Dim options As New Options_Hist3D
     Public Sub New()
@@ -106,14 +106,14 @@ Public Class XR_Hist3Dcloud_Highlights : Inherits TaskParent
         options.Run()
 
         Dim bins = options.histogram3DBins
-        If src.Type <> cv.MatType.CV_32FC3 Then src = task.pointCloud
+        If src.Type <> MatType.CV_32FC3 Then src = task.pointCloud
 
         Dim histInput(src.Total * src.ElemSize - 1) As Byte
         Marshal.Copy(src.Data, histInput, 0, histInput.Length)
 
-        Dim rx = New cv.Vec2f(-task.xRangeDefault, task.xRangeDefault)
-        Dim ry = New cv.Vec2f(-task.yRangeDefault, task.yRangeDefault)
-        Dim rz = New cv.Vec2f(0, task.MaxZmeters)
+        Dim rx = New Vec2f(-task.xRangeDefault, task.xRangeDefault)
+        Dim ry = New Vec2f(-task.yRangeDefault, task.yRangeDefault)
+        Dim rz = New Vec2f(0, task.MaxZmeters)
 
         Dim handleInput = GCHandle.Alloc(histInput, GCHandleType.Pinned)
         Dim dstPtr = Hist3Dcloud_Run(handleInput.AddrOfPinnedObject(), src.Rows, src.Cols, bins,
@@ -121,9 +121,9 @@ Public Class XR_Hist3Dcloud_Highlights : Inherits TaskParent
                                          rx.Item(1), ry.Item(1), rz.Item(1))
         handleInput.Free()
 
-        histogram = cv.Mat.FromPixelData(bins, 1, cv.MatType.CV_32F, dstPtr)
+        histogram = Mat.FromPixelData(bins, 1, MatType.CV_32F, dstPtr)
 
-        ranges = New cv.Rangef() {New cv.Rangef(rx(0), rx(1)), New cv.Rangef(ry(0), ry(1)), New cv.Rangef(rz(0), rz(1))}
+        ranges = New Rangef() {New Rangef(rx(0), rx(1)), New Rangef(ry(0), ry(1)), New Rangef(rz(0), rz(1))}
 
         Dim samples(histogram.Total - 1) As Single
         Marshal.Copy(histogram.Data, samples, 0, samples.Length)
@@ -158,12 +158,12 @@ End Class
 
 
 Public Class XR_Hist3Dcloud_BP_Filter : Inherits TaskParent
-    Public histogram As New cv.Mat
+    Public histogram As New Mat
     Dim options As New Options_HistXD
     Dim optionsEx As New Options_Hist3D
     Public Sub New()
         OptionParent.FindSlider("Histogram 3D Bins").Value = 16
-        dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_32FC3, 0)
+        dst3 = New Mat(dst3.Size(), MatType.CV_32FC3, 0)
         labels(2) = "Mask of the pointcloud image after backprojection that removes 'blowback' pixels"
         desc = "Backproject a 3D pointcloud histogram after thresholding the bins with the small samples."
     End Sub
@@ -172,14 +172,14 @@ Public Class XR_Hist3Dcloud_BP_Filter : Inherits TaskParent
         options.Run()
 
         Dim bins = optionsEx.histogram3DBins
-        If src.Type <> cv.MatType.CV_32FC3 Then src = task.pointCloud
+        If src.Type <> MatType.CV_32FC3 Then src = task.pointCloud
 
         Dim histInput(src.Total * 3 - 1) As Single
         Marshal.Copy(src.Data, histInput, 0, histInput.Length)
 
-        Dim rx = New cv.Vec2f(-task.xRangeDefault, task.xRangeDefault)
-        Dim ry = New cv.Vec2f(-task.yRangeDefault, task.yRangeDefault)
-        Dim rz = New cv.Vec2f(0, task.MaxZmeters)
+        Dim rx = New Vec2f(-task.xRangeDefault, task.xRangeDefault)
+        Dim ry = New Vec2f(-task.yRangeDefault, task.yRangeDefault)
+        Dim rz = New Vec2f(0, task.MaxZmeters)
 
         Dim handleInput = GCHandle.Alloc(histInput, GCHandleType.Pinned)
         Dim imagePtr = BackProjectCloud_Run(handleInput.AddrOfPinnedObject(), src.Rows, src.Cols, bins, options.threshold3D,
@@ -187,7 +187,7 @@ Public Class XR_Hist3Dcloud_BP_Filter : Inherits TaskParent
                                                 rx.Item(1), ry.Item(1), rz.Item(1))
         handleInput.Free()
 
-        dst2 = cv.Mat.FromPixelData(dst2.Height, dst2.Width, cv.MatType.CV_8U, imagePtr)
+        dst2 = Mat.FromPixelData(dst2.Height, dst2.Width, MatType.CV_8U, imagePtr)
         dst2.SetTo(0, task.noDepthMask)
         dst3.SetTo(0)
         task.pointCloud.CopyTo(dst3, dst2)
@@ -204,7 +204,7 @@ End Class
 Public Class Hist3Dcloud_PlotHist1D : Inherits TaskParent
     Dim hcloud As New Hist3Dcloud_Basics
     Dim plotHist As New PlotBar_Basics
-    Public histogram As cv.Mat
+    Public histogram As Mat
     Public histArray() As Single
     Dim simK As New Hist3D_BuildHistogram
     Public Sub New()
@@ -213,12 +213,12 @@ Public Class Hist3Dcloud_PlotHist1D : Inherits TaskParent
         desc = "Present the 3D histogram as a typical histogram bar chart."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If src.Type <> cv.MatType.CV_32FC3 Then src = task.pointCloud
+        If src.Type <> MatType.CV_32FC3 Then src = task.pointCloud
         hcloud.Run(src)
         ReDim histArray(hcloud.histogram.Total - 1)
         Marshal.Copy(hcloud.histogram.Data, histArray, 0, histArray.Length)
 
-        histogram = cv.Mat.FromPixelData(histArray.Count, 1, cv.MatType.CV_32F, histArray)
+        histogram = Mat.FromPixelData(histArray.Count, 1, MatType.CV_32F, histArray)
         plotHist.Run(histogram)
         dst2 = plotHist.dst2
 

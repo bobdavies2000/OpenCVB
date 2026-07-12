@@ -1,24 +1,24 @@
 Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 Public Class StableDepth_Basics_TA : Inherits TaskParent
     Dim colorize As New DepthColorizer_CPP
-    Public pointcloud As cv.Mat
-    Public pcSplit(2) As cv.Mat
+    Public pointcloud As Mat
+    Public pcSplit(2) As Mat
     Public Sub New()
         labels(2) = "Accumulated minimum values at each depth pixel.  Updated using RGB motion."
         labels(3) = "Pixels that were updated on the current frame."
-        desc = "Stabilize X, Y, and Z of the point cloud using the minimum depth encountered."
+        desc = "Stabilize X, Y, and Z of the cv.Point cloud using the minimum depth encountered."
     End Sub
-    Public Shared Function updateXY(lastDepth As cv.Mat, accumDepth As cv.Mat) As cv.Mat
-        Dim diffDepth As New cv.Mat
+    Public Shared Function updateXY(lastDepth As Mat, accumDepth As Mat) As Mat
+        Dim diffDepth As New Mat
         Absdiff(lastDepth, accumDepth, diffDepth)
-        Dim mask As New cv.Mat
-        Threshold(diffDepth, mask, 0, 255, cv.ThresholdTypes.Binary)
+        Dim mask As New Mat
+        Threshold(diffDepth, mask, 0, 255, ThresholdTypes.Binary)
         ConvertScaleAbs(mask, mask)
         mask.SetTo(0, task.motion.motionMask)
         Return mask
     End Function
     Public Overrides Sub RunAlg(src As cv.Mat)
-        Static lastDepth As cv.Mat = task.pcSplit(2).Clone
+        Static lastDepth As Mat = task.pcSplit(2).Clone
         If task.heartBeat Then
             pointcloud = task.pointCloud.Clone
         Else
@@ -27,7 +27,7 @@ Public Class StableDepth_Basics_TA : Inherits TaskParent
         End If
 
         pcSplit = Split(pointcloud)
-        Dim accumDepth As New cv.Mat
+        Dim accumDepth As New Mat
         Min(pcSplit(2), lastDepth, accumDepth)
 
         If task.heartBeat = False Then
@@ -43,7 +43,7 @@ Public Class StableDepth_Basics_TA : Inherits TaskParent
 
         task.pointCloud = pointcloud.Clone
         task.pcSplit = pcSplit
-        Threshold(pcSplit(2), task.depthmask, 0, 255, cv.ThresholdTypes.Binary)
+        Threshold(pcSplit(2), task.depthmask, 0, 255, ThresholdTypes.Binary)
         ConvertScaleAbs(task.depthmask, task.depthmask)
         task.noDepthMask = Not task.depthmask
     End Sub
@@ -56,17 +56,17 @@ End Class
 
 Public Class StableDepth_Max : Inherits TaskParent
     Dim colorize As New DepthColorizer_CPP
-    Public pointcloud As New cv.Mat
-    Public pcsplit(2) As cv.Mat
+    Public pointcloud As New Mat
+    Public pcsplit(2) As Mat
     Public TA_Active As Boolean = False
     Public Sub New()
         labels(2) = "Accumulated minimum values at each depth pixel.  Updated using RGB motion."
         labels(3) = "Pixels that were updated on the current frame."
         If standalone Then task.gOptions.displayDst1.Checked = True
-        desc = "Stabilize X, Y, and Z of the point cloud using the maximum depth encountered."
+        desc = "Stabilize X, Y, and Z of the cv.Point cloud using the maximum depth encountered."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        Static lastDepth As cv.Mat = task.pcSplit(2).Clone
+        Static lastDepth As Mat = task.pcSplit(2).Clone
         Dim myHeartbeat = task.heartBeat Or task.optionsChanged
         If myHeartbeat Then
             pointcloud = task.pointCloud.Clone
@@ -76,7 +76,7 @@ Public Class StableDepth_Max : Inherits TaskParent
         End If
 
         pcsplit = Split(pointcloud)
-        Dim accumDepth As New cv.Mat
+        Dim accumDepth As New Mat
         Max(pcsplit(2), lastDepth, accumDepth)
 
         If myHeartbeat = False Then
@@ -93,7 +93,7 @@ Public Class StableDepth_Max : Inherits TaskParent
         If TA_Active Then
             task.pointCloud = pointcloud.Clone
             task.pcSplit = pcsplit
-            Threshold(pcsplit(2), task.depthmask, 0, 255, cv.ThresholdTypes.Binary)
+            Threshold(pcsplit(2), task.depthmask, 0, 255, ThresholdTypes.Binary)
             ConvertScaleAbs(task.depthmask, task.depthmask)
             task.noDepthMask = Not task.depthmask
         End If

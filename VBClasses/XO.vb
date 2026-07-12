@@ -1,14 +1,8 @@
-﻿Imports System.IO
-Imports System.Runtime.InteropServices
-Imports System.Threading
-Imports OpenCvSharp.ML
-Imports cv = OpenCvSharp
-Imports OpenCvSharp.Cv2
+﻿Imports System.IO : Imports System.Runtime.InteropServices : Imports System.Threading
+Imports OpenCvSharp.ML : Imports cv = OpenCvSharp : Imports OpenCvSharp.Cv2 : Imports OpenCvSharp
 Namespace VBClasses
-
     Public Module moduleXO
         Public redList As XO_RedFlood_List
-
     End Module
     Public Class XO_Model_FlatSurfaces : Inherits TaskParent
         Public totalPixels As Integer
@@ -126,8 +120,8 @@ Namespace VBClasses
                 Dim y2 = findLast(hPoints, True, sampleX2)
 
                 ' This is because FindNonZero works from the top of the image down.  
-                ' If the horizon has a positive slope, the first point found will be on the right.
-                ' if the horizon has a negative slope, the first point found will be on the left.
+                ' If the horizon has a positive slope, the first cv.Point found will be on the right.
+                ' if the horizon has a negative slope, the first cv.Point found will be on the left.
                 If sampleX1 < dst2.Width / 2 Then
                     yLeft = y1
                     yRight = y2
@@ -407,7 +401,7 @@ Namespace VBClasses
     Public Class XO_Horizon_ExternalTest : Inherits TaskParent
         Dim horizon As New XO_Horizon_Basics
         Public Sub New()
-            desc = "Supply the point cloud input to Horizon_Basics"
+            desc = "Supply the cv.Point cloud input to Horizon_Basics"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             dst0 = task.pcSplit(1)
@@ -542,7 +536,7 @@ Namespace VBClasses
 
                 If secondOpinion Then
                     dst3.SetTo(0)
-                    ' the point cloud contributes one set of camera motion distance and direction.  Now confirm it with feature points
+                    ' the cv.Point cloud contributes one set of camera motion distance and direction.  Now confirm it with feature points
                     feat.Run(src)
                     strOut = "Swarm distance = " + feat.distanceAvg.ToString(fmt1) + " when camMotionPixels = " + task.camMotionPixels.ToString(fmt1)
                     If (feat.distanceAvg < task.camMotionPixels / 2) Or task.heartBeat Then
@@ -677,8 +671,9 @@ Namespace VBClasses
             Dim sinAngle As Double = Math.Sin(radians)
             Dim cosAngle As Double = Math.Cos(radians)
 
-            Dim x As Double = point.X - center.X
-            Dim y As Double = point.Y - center.Y
+            Dim pt = New cv.Point
+            Dim x As Double = pt.X - center.X
+            Dim y As Double = pt.Y - center.Y
 
             Dim xNew As Double = x * cosAngle - y * sinAngle
             Dim yNew As Double = x * sinAngle + y * cosAngle
@@ -772,7 +767,7 @@ Namespace VBClasses
         Dim kalman As New Kalman_Basics
         Public Sub New()
             ReDim kalman.kInput(task.gridRects.Count * 4 - 1)
-            labels = {"", "", "Red is min distance, blue is max distance", "Voronoi representation of min point (only) for each cell."}
+            labels = {"", "", "Red is min distance, blue is max distance", "Voronoi representation of min cv.Point (only) for each cell."}
             desc = "Find min and max depth in each grid square and create a voronoi representation using the min and max points."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -1403,14 +1398,14 @@ Namespace VBClasses
 
 
     Public Class XO_Line_Nearest : Inherits TaskParent
-        Public pt As cv.Point2f ' How close is this point to the input line?
+        Public pt As cv.Point2f ' How close is this cv.Point to the input line?
         Public lp As New lpData ' the input line.
         Public nearPoint As cv.Point2f
         Public onTheLine As Boolean
         Public distance As Single
         Public Sub New()
-            labels(2) = "Yellow line is input line, white dot is the input point, and the white line is the nearest path to the input line."
-            desc = "Find the nearest point on a line"
+            labels(2) = "Yellow line is input line, white dot is the input cv.Point, and the white line is the nearest path to the input line."
+            desc = "Find the nearest cv.Point on a line"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             If standaloneTest() And task.heartBeat Then
@@ -1630,11 +1625,11 @@ Namespace VBClasses
     Public Class XO_Line_InDepthAndBGR : Inherits TaskParent
         Public p1List As New List(Of cv.Point2f)
         Public p2List As New List(Of cv.Point2f)
-        Public z1List As New List(Of cv.Point3f) ' the point cloud values corresponding to p1 and p2
+        Public z1List As New List(Of cv.Point3f) ' the cv.Point cloud values corresponding to p1 and p2
         Public z2List As New List(Of cv.Point3f)
         Public Sub New()
             labels(2) = "Lines defined in BGR"
-            labels(3) = "Lines in BGR confirmed in the point cloud"
+            labels(3) = "Lines in BGR confirmed in the cv.Point cloud"
             desc = "Find the BGR lines and confirm they are present in the cloud data."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -2175,7 +2170,7 @@ Namespace VBClasses
         Public xyVList As New List(Of List(Of cv.Point))
         Dim options As New Options_Cloud()
         Public Sub New()
-            desc = "Reduce the point cloud to a manageable number points in 3D"
+            desc = "Reduce the cv.Point cloud to a manageable number points in 3D"
         End Sub
         Public Function findHorizontalPoints(ByRef xyList As List(Of List(Of cv.Point))) As List(Of List(Of cv.Point3f))
             Dim ptlist As New List(Of List(Of cv.Point3f))
@@ -2461,7 +2456,7 @@ Namespace VBClasses
         Public actualCount As Integer
         Public Sub New()
             dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
-            desc = "Reduce the point cloud to a manageable number points in 3D representing the averages of X, Y, and Z in that roi."
+            desc = "Reduce the cv.Point cloud to a manageable number points in 3D representing the averages of X, Y, and Z in that roi."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             If task.optionsChanged Then pcPoints = New cv.Mat(task.bricksPerCol, task.bricksPerRow, cv.MatType.CV_32FC3, cv.Scalar.All(0))
@@ -2487,7 +2482,7 @@ Namespace VBClasses
                     lastMeanZ = meanVal(2)
                 Next
             Next
-            labels(2) = "PointCloud Point Points found = " + CStr(actualCount)
+            labels(2) = "PointCloud cv.Point Points found = " + CStr(actualCount)
         End Sub
     End Class
 
@@ -2500,7 +2495,7 @@ Namespace VBClasses
     Public Class XO_PointCloud_PCPoints : Inherits TaskParent
         Public pcPoints As New List(Of cv.Point3f)
         Public Sub New()
-            desc = "Reduce the point cloud to a manageable number points in 3D using the mean value"
+            desc = "Reduce the cv.Point cloud to a manageable number points in 3D using the mean value"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             Dim rw = task.gridRects(0).Width / 2, rh = task.gridRects(0).Height / 2
@@ -2519,7 +2514,7 @@ Namespace VBClasses
                     Circle(dst2, pt, task.DotSize, Choose(CInt(pt.Y) Mod 3 + 1, red, blue, cv.Scalar.White), -1, task.lineType)
                 End If
             Next
-            labels(2) = "PointCloud Point Points found = " + CStr(pcPoints.Count / 2)
+            labels(2) = "PointCloud cv.Point Points found = " + CStr(pcPoints.Count / 2)
         End Sub
     End Class
 
@@ -4210,7 +4205,7 @@ Namespace VBClasses
         Dim mmPixel As New Pixel_Measure
         Dim options As New Options_StructuredCloud
         Public Sub New()
-            desc = "Attempt to impose a structure on the point cloud data."
+            desc = "Attempt to impose a structure on the cv.Point cloud data."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
@@ -4378,7 +4373,7 @@ Namespace VBClasses
         Public oglData As New List(Of cv.Point3f)
         Public Sub New()
             task.gOptions.GridSlider.Value = 10
-            desc = "Simplify the point cloud so it can be represented as quads in OpenGL"
+            desc = "Simplify the cv.Point cloud so it can be represented as quads in OpenGL"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             dst2 = New cv.Mat(dst3.Size(), cv.MatType.CV_32FC3, 0)
@@ -4406,7 +4401,7 @@ Namespace VBClasses
         Dim hulls As New RedColor_Hulls
         Public Sub New()
             task.gOptions.GridSlider.Value = 10
-            desc = "Use the OpenGL point size to represent the point cloud as data"
+            desc = "Use the OpenGL cv.Point size to represent the cv.Point cloud as data"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             hulls.Run(src)
@@ -4625,8 +4620,8 @@ Namespace VBClasses
         Dim thickness As Single
         Public pointcloud As New cv.Mat
         Public Sub New()
-            labels = {"", "", "X values in point cloud", "Y values in point cloud"}
-            desc = "Rebuild the point cloud using inrange - not useful yet"
+            labels = {"", "", "X values in cv.Point cloud", "Y values in cv.Point cloud"}
+            desc = "Rebuild the cv.Point cloud using inrange - not useful yet"
         End Sub
         Private Function rebuildX(viewX As cv.Mat) As cv.Mat
             Dim output As New cv.Mat(task.pcSplit(1).Size(), cv.MatType.CV_32F, cv.Scalar.All(0))
@@ -4873,7 +4868,7 @@ Namespace VBClasses
 
             sides.Run(src)
             dst3 = sides.dst3
-            SetTrueText("Center point is rcSelect.maxDist", 3)
+            SetTrueText("Center cv.Point is rcSelect.maxDist", 3)
         End Sub
     End Class
 
@@ -4919,7 +4914,7 @@ Namespace VBClasses
         Public rc As New rcDataOld
         Public Sub New()
             labels(2) = "The RedCloud Output with the highlighted contour to smooth"
-            desc = "Find the point farthest from the center in each cell."
+            desc = "Find the cv.Point farthest from the center in each cell."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             If standaloneTest() Then
@@ -5459,7 +5454,7 @@ Namespace VBClasses
 
                 match.Run(matchInput)
 
-                labels(2) = "Line end point correlation:  " + match.correlation.ToString(fmt3) + " / " +
+                labels(2) = "Line end cv.Point correlation:  " + match.correlation.ToString(fmt3) + " / " +
                                 " with " + (lineRuns / matchRuns).ToString("0%") + " requiring line detection.  " +
                                 "line detection runs = " + CStr(totalLineRuns)
             End If
@@ -5503,7 +5498,7 @@ Namespace VBClasses
         Public options As New Options_IMU
         Public Sub New()
             OptionParent.FindSlider("LowRes %").Value = 25
-            desc = "Create a mini point cloud for use with histograms"
+            desc = "Create a mini cv.Point cloud for use with histograms"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             resize.Run(task.pointCloud)
@@ -5534,7 +5529,7 @@ Namespace VBClasses
         Public Sub New()
             dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
             labels(3) = "Side view after resize percentage - use Y-Axis slider to rotate image."
-            desc = "Create a histogram for the mini point cloud"
+            desc = "Create a histogram for the mini cv.Point cloud"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             Static ySlider = OptionParent.FindSlider("Rotate pointcloud around Y-axis (degrees)")
@@ -5550,7 +5545,7 @@ Namespace VBClasses
                                        {0 * 1 + 0 * 0 + 1 * 0, 0 * 0 + 0 * cz + 1 * sz, 0 * 0 + 0 * -sz + 1 * cz}}
             '[cos(a) 0 -sin(a)]
             '[0      1       0]
-            '[sin(a) 0   cos(a] rotate the point cloud around the y-axis.
+            '[sin(a) 0   cos(a] rotate the cv.Point cloud around the y-axis.
             cy = Math.Cos(task.accRadians.Y * PI / 180)
             sy = Math.Sin(task.accRadians.Y * PI / 180)
             gM = {{gM(0, 0) * cy + gM(0, 1) * 0 + gM(0, 2) * sy}, {gM(0, 0) * 0 + gM(0, 1) * 1 + gM(0, 2) * 0}, {gM(0, 0) * -sy + gM(0, 1) * 0 + gM(0, 2) * cy},
@@ -5821,7 +5816,7 @@ Namespace VBClasses
         Dim optionsPrep As New Options_PrepData
         Public Sub New()
             OptionParent.findRadio("XY Reduction").Checked = True
-            desc = "Simpler transforms for the point cloud using CalcHist instead of reduction."
+            desc = "Simpler transforms for the cv.Point cloud using CalcHist instead of reduction."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
@@ -6795,7 +6790,7 @@ Namespace VBClasses
         Public fGrid As New XO_FPoly_Core
         Public Sub New()
             If standalone Then task.gOptions.displayDst1.Checked = True
-            labels = {"", "Movement amount - dot is current anchor point", "SyncImage aligned to current image - slide camera left or right",
+            labels = {"", "Movement amount - dot is current anchor cv.Point", "SyncImage aligned to current image - slide camera left or right",
                           "current image with distance map"}
             desc = "Feature Grid: show the accumulated camera movement in X and Y (no rotation)"
         End Sub
@@ -6844,7 +6839,7 @@ Namespace VBClasses
         Public Sub New()
             dst0 = New cv.Mat(dst0.Size(), cv.MatType.CV_8U, 255)
             If standalone Then task.gOptions.displayDst1.Checked = True
-            desc = "Track the feature grid points back to the last sync point"
+            desc = "Track the feature grid points back to the last sync cv.Point"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             Static thresholdSlider = OptionParent.FindSlider("Resync if feature moves > X pixels")
@@ -7283,7 +7278,7 @@ Namespace VBClasses
         Public fPolyCloud As cv.Mat
         Public Sub New()
             If standalone Then task.gOptions.displayDst1.Checked = True
-            desc = "Update changed point cloud pixels as indicated by the FPoly_ImageMask"
+            desc = "Update changed cv.Point cloud pixels as indicated by the FPoly_ImageMask"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             fMask.Run(src)
@@ -8386,7 +8381,7 @@ Namespace VBClasses
                 For Each pt In feat.features
                     ptx.Add(pt)
                 Next
-                SetTrueText("Move camera around to watch the point being tracked", 3)
+                SetTrueText("Move camera around to watch the cv.Point being tracked", 3)
             End If
 
             dst2 = src.Clone
@@ -8646,7 +8641,7 @@ Namespace VBClasses
             Dim index As Integer
             For Each lp In task.lines.lpList
                 Dim minXX = Math.Min(lp.p1.X, lp.p2.X)
-                If lp.p1.X <> minXX Then ' leftmost point is always in p1
+                If lp.p1.X <> minXX Then ' leftmost cv.Point is always in p1
                     Dim tmp = lp.p1
                     lp.p1 = lp.p2
                     lp.p2 = tmp
@@ -8762,7 +8757,7 @@ Namespace VBClasses
         Dim swarm As New Swarm_Basics
         Public Sub New()
             dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
-            desc = "Use KNN to find the nearest point to an endpoint and connect the 2 lines with a line."
+            desc = "Use KNN to find the nearest cv.Point to an endpoint and connect the 2 lines with a line."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             swarm.options.Run()
@@ -9075,7 +9070,7 @@ Namespace VBClasses
         Public p1 As cv.Point2f, p2 As cv.Point2f, p3 As cv.Point2f, p4 As cv.Point2f
         Public intersectionPoint As cv.Point2f
         Public Sub New()
-            desc = "Determine if 2 lines intersect, where the point is, and if that point is in the image."
+            desc = "Determine if 2 lines intersect, where the cv.Point is, and if that cv.Point is in the image."
         End Sub
 
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -9094,7 +9089,7 @@ Namespace VBClasses
             Line(dst2, p3, p4, cv.Scalar.Yellow, task.lineWidth, task.lineType)
             If intersectionPoint <> New cv.Point2f Then
                 Circle(dst2, intersectionPoint, task.DotSize + 4, white, -1, task.lineType)
-                labels(2) = "Intersection point = " + CStr(CInt(intersectionPoint.X)) + " x " + CStr(CInt(intersectionPoint.Y))
+                labels(2) = "Intersection cv.Point = " + CStr(CInt(intersectionPoint.X)) + " x " + CStr(CInt(intersectionPoint.Y))
             Else
                 labels(2) = "Parallel!!!"
             End If
@@ -9871,7 +9866,7 @@ Namespace VBClasses
 
             dst2 = task.lines.dst2
             labels(2) = CStr(lines3DList.Count) + " lines were found and " + CStr(totalPixels) +
-                            " pixels were updated in the point cloud."
+                            " pixels were updated in the cv.Point cloud."
         End Sub
     End Class
 
@@ -9917,7 +9912,7 @@ Namespace VBClasses
 
             dst2 = task.lines.dst2
             labels(2) = CStr(lines3DList.Count) + " lines were found and " + CStr(totalPixels) +
-                            " pixels were updated in the point cloud."
+                            " pixels were updated in the cv.Point cloud."
         End Sub
     End Class
 
@@ -10006,7 +10001,7 @@ Namespace VBClasses
             End If
 
             task.gOptions.setGravityUsage(False)
-            desc = "Spin the point cloud exercise"
+            desc = "Spin the cv.Point cloud exercise"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             Static xCheck As CheckBox = OptionParent.FindCheckBox("Spin pointcloud on X-axis")
@@ -10350,7 +10345,7 @@ Namespace VBClasses
     Public Class XO_RedCloud_Mats : Inherits TaskParent
         Dim mats As New Mat_4Click
         Public Sub New()
-            desc = "Simple transforms for the point cloud using CalcHist instead of reduction."
+            desc = "Simple transforms for the cv.Point cloud using CalcHist instead of reduction."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             Dim histogram As New cv.Mat
@@ -10520,7 +10515,7 @@ Namespace VBClasses
     Public Class XO_RedPrep_BasicsShow : Inherits TaskParent
         Public prep As New XO_RedCloud_PrepOutline
         Public Sub New()
-            desc = "Simpler transforms for the point cloud using CalcHist instead of reduction."
+            desc = "Simpler transforms for the cv.Point cloud using CalcHist instead of reduction."
         End Sub
         Public Shared Sub oldSelectCell()
             If redList.rclist.Count = 0 Then Exit Sub
@@ -10681,7 +10676,7 @@ Namespace VBClasses
         Public rcList As New List(Of rcDataOld)
         Public Sub New()
             dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
-            labels(3) = "Map of reduced point cloud - CV_8U"
+            labels(3) = "Map of reduced cv.Point cloud - CV_8U"
             desc = "Find the biggest chunks of consistent depth data "
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -15545,7 +15540,7 @@ Namespace VBClasses
                 Line(dst3, lpOut.p1, lpOut.p2, task.highlight, task.lineWidth + 1, task.lineType)
                 Line(dst2, lp.p1, lp.p2, task.highlight, task.lineWidth + 1, task.lineType)
             Next
-            labels(2) = CStr(lpOutput.Count) + " left image lines were matched in the right image and confirmed with the center point."
+            labels(2) = CStr(lpOutput.Count) + " left image lines were matched in the right image and confirmed with the center cv.Point."
         End Sub
     End Class
 
@@ -16253,7 +16248,7 @@ Namespace VBClasses
                     End If
                 Next
             Next
-            labels(3) = CStr(matchList.Count / 2) + " points were within " + CStr(distanceMax) + " pixels of another cell's hull point"
+            labels(3) = CStr(matchList.Count / 2) + " points were within " + CStr(distanceMax) + " pixels of another cell's hull cv.Point"
         End Sub
     End Class
 
@@ -17607,7 +17602,7 @@ Namespace VBClasses
     Public Class XO_Motion_Cloud_TA : Inherits TaskParent
         Public originalPointcloud As cv.Mat
         Public Sub New()
-            labels(1) = "The difference between the latest pointcloud and the motion-adjusted point cloud."
+            labels(1) = "The difference between the latest pointcloud and the motion-adjusted cv.Point cloud."
             labels(2) = "Point cloud after updating with the motion mask changes."
             labels(3) = "task.pointcloud for the current frame."
             desc = "Point cloud after updating with the motion mask"
@@ -18154,7 +18149,7 @@ Namespace VBClasses
         Public rcMapY As New cv.Mat
         Public Sub New()
             redList = New XO_RedFlood_List
-            desc = "Identify each segment in the X and Y point cloud data"
+            desc = "Identify each segment in the X and Y cv.Point cloud data"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             guide.Run(src)
@@ -18867,7 +18862,7 @@ Namespace VBClasses
     Public Class XO_Motion_PointCloud : Inherits TaskParent
         Public originalPointcloud As cv.Mat
         Public Sub New()
-            labels(1) = "The difference between the latest pointcloud and the motion-adjusted point cloud."
+            labels(1) = "The difference between the latest pointcloud and the motion-adjusted cv.Point cloud."
             labels(2) = "Point cloud after updating with the motion mask changes."
             labels(3) = "task.pointcloud for the current frame."
             desc = "Point cloud after updating with the motion mask"
@@ -20817,7 +20812,7 @@ Namespace VBClasses
         Public result(,) As Integer ' Get results here...
         Public Sub New()
             knn = cv.ML.KNearest.Create()
-            labels(2) = "Red=TrainingData, yellow = queries, text shows Z distance to that point from query point"
+            labels(2) = "Red=TrainingData, yellow = queries, text shows Z distance to that cv.Point from query cv.Point"
             desc = "Use knn with the input 4D points in the image.  Find the nearest neighbors."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -20988,7 +20983,7 @@ Namespace VBClasses
             ld = cv.XImgProc.FastLineDetector.Create()
             angleSlider = OptionParent.FindSlider("Angle tolerance in degrees")
             labels(2) = "XO_Line_GCloud - Blue are vertical lines using the angle thresholds."
-            desc = "Find all the vertical lines using the point cloud rectified with the IMU vector for gravity."
+            desc = "Find all the vertical lines using the cv.Point cloud rectified with the IMU vector for gravity."
         End Sub
         Public Function updateGLine(src As cv.Mat, gRect As gravityLine, p1 As cv.Point, p2 As cv.Point) As gravityLine
             gRect.tc1.center = p1
@@ -21428,7 +21423,7 @@ Namespace VBClasses
 
             Dim output = "FLANN does not appear to be working (most likely, it is my problem) but to show this:" + vbCrLf
             output += "Set query count to 1 and set to reuse the same data (defaults.)" + vbCrLf
-            output += "The query (in red) is often not picking the nearest blue point." + vbCrLf
+            output += "The query (in red) is often not picking the nearest blue cv.Point." + vbCrLf
             output += "To try different inputs, click anywhere in the image."
             output += "To test further, set the match count to a higher value and observe it will often switch blue dots." + vbCrLf
             output += "Play with the EPS and searchparams check count to see if that helps." + vbCrLf + vbCrLf
@@ -22422,7 +22417,7 @@ Namespace VBClasses
             desc = "Find the Principal Component Analysis vector for the 3D points in a RedCloud cell contour."
         End Sub
         Public Function displayResults() As String
-            Dim pcaStr = "EigenVector 3X3 matrix from PCA_Analysis of cell point cloud data at contour points:" + vbCrLf
+            Dim pcaStr = "EigenVector 3X3 matrix from PCA_Analysis of cell cv.Point cloud data at contour points:" + vbCrLf
             For y = 0 To pca_analysis.Eigenvectors.Rows - 1
                 For x = 0 To pca_analysis.Eigenvectors.Cols - 1
                     Dim val = pca_analysis.Eigenvectors.Get(Of Single)(y, x)
@@ -22547,7 +22542,7 @@ Namespace VBClasses
             If findLine3D.vecMat.Rows > 0 Then
                 pca.pca_analysis = New cv.PCA(findLine3D.vecMat, New cv.Mat, cv.PCA.Flags.DataAsRow)
                 strOut = pca.displayResults() + vbCrLf
-                strOut += "Anchor point " + lp.ptCenter.ToString + vbCrLf
+                strOut += "Anchor cv.Point " + lp.ptCenter.ToString + vbCrLf
                 Circle(dst3, lp.ptCenter, task.DotSize, 255, -1, task.lineType)
                 Circle(dst3, lp.ptCenter, task.DotSize * 2, 255, -1, task.lineType)
             End If
@@ -23005,7 +23000,7 @@ Namespace VBClasses
         Public color8u As New Color8U_Basics
         Public redC As New RedCloud_Basics
         Public Sub New()
-            desc = "Map the colors in the point cloud."
+            desc = "Map the colors in the cv.Point cloud."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             redC.Run(src)
@@ -23239,7 +23234,7 @@ Namespace VBClasses
     Public Class XO_RedWGrid_PrepData : Inherits TaskParent
         Dim prepData As New RedPrep_Core
         Public Sub New()
-            desc = "Prepare the grid of point cloud data."
+            desc = "Prepare the grid of cv.Point cloud data."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             prepData.Run(emptyMat)
@@ -23264,7 +23259,7 @@ Namespace VBClasses
             task.gOptions.DebugSlider.Value = 1
             labels(3) = "Use debug slider to select region to display."
             OptionParent.findRadio("X Reduction").Checked = True
-            desc = "Prepare the grid of point cloud data."
+            desc = "Prepare the grid of cv.Point cloud data."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             prepData.Run(emptyMat)
@@ -23446,7 +23441,7 @@ Namespace VBClasses
             dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
 
             If standalone Then task.gOptions.displayDst1.Checked = True
-            desc = "Add the output of PrepX and PrepY.  Point camera at a wall for interesting results."
+            desc = "Add the output of PrepX and PrepY.  cv.Point camera at a wall for interesting results."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             redX.Run(src)
@@ -23566,7 +23561,7 @@ Namespace VBClasses
         Dim dups As New XO_RedWGrid_Basics
         Dim options As New Options_WGrid
         Public Sub New()
-            desc = "Click on any RedCloud cell to see similar cells connected by the wGrid point."
+            desc = "Click on any RedCloud cell to see similar cells connected by the wGrid cv.Point."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
@@ -24034,7 +24029,7 @@ Namespace VBClasses
         Dim edges As New EdgeLine_Basics
         Public Sub New()
             dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-            desc = "Reduction transform for the point cloud"
+            desc = "Reduction transform for the cv.Point cloud"
         End Sub
         Private Function reduceChan(chan As cv.Mat) As cv.Mat
             chan *= task.fOptions.ReductionDepth.Value
@@ -24134,7 +24129,7 @@ Namespace VBClasses
 
     Public Class XO_RedPrep_VB : Inherits TaskParent
         Public Sub New()
-            desc = "Simpler transforms for the point cloud using CalcHist instead of reduction."
+            desc = "Simpler transforms for the cv.Point cloud using CalcHist instead of reduction."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             Dim histogram As New cv.Mat

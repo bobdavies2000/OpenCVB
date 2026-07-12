@@ -13,7 +13,7 @@ Public Class ModNet_Basics : Inherits TaskParent
     Dim ortSession As InferenceSession = Nothing
     Dim ortInputName As String = "input"
     Dim ortOutputName As String = ""
-    Shared ReadOnly dnnSize As New cv.Size(512, 512)
+    Shared ReadOnly dnnSize As New Size(512, 512)
     Public Sub New()
         desc = "Cursor.ai: Portrait matting (ONNX Runtime). Same MODNet ONNX as before; " +
                " avoids OpenCV DNN ConcatLayer errors. Model in ModNet/."
@@ -37,33 +37,33 @@ Public Class ModNet_Basics : Inherits TaskParent
     End Sub
     ''' <summary>NCHW float tensor [1,3,H,W] matching CvDnn.BlobFromImage 
     ''' (swapRB, mean 127.5, scale 1/127.5).</summary>
-    Private Shared Function PreprocessToNCHW(resizedBgr As cv.Mat) As DenseTensor(Of Single)
+    Private Shared Function PreprocessToNCHW(resizedBgr As Mat) As DenseTensor(Of Single)
         Dim count = 1 * 3 * dnnSize.Height * dnnSize.Width
         Dim data(count - 1) As Single
-        Using blob = Dnn.BlobFromImage(resizedBgr, 1.0 / 127.5, dnnSize, New cv.Scalar(127.5, 127.5, 127.5), True, False)
+        Using blob = Dnn.BlobFromImage(resizedBgr, 1.0 / 127.5, dnnSize, New Scalar(127.5, 127.5, 127.5), True, False)
             Marshal.Copy(blob.Data, data, 0, count)
         End Using
         Return New DenseTensor(Of Single)(data, {1, 3, dnnSize.Height, dnnSize.Width})
     End Function
-    Private Shared Function TensorToAlphaMat(t As Tensor(Of Single)) As cv.Mat
+    Private Shared Function TensorToAlphaMat(t As Tensor(Of Single)) As Mat
         Dim dims = t.Dimensions.ToArray()
-        If dims.Length < 2 Then Return New cv.Mat()
+        If dims.Length < 2 Then Return New Mat()
         Dim h = dims(dims.Length - 2)
         Dim w = dims(dims.Length - 1)
         Dim dense = t.ToDenseTensor()
         Dim arr = dense.Buffer.ToArray()
         Dim need = h * w
-        If arr.Length < need Then Return New cv.Mat()
-        Return cv.Mat.FromPixelData(h, w, cv.MatType.CV_32F, arr).Clone()
+        If arr.Length < need Then Return New Mat()
+        Return Mat.FromPixelData(h, w, MatType.CV_32F, arr).Clone()
     End Function
     Public Overrides Sub RunAlg(src As cv.Mat)
         If ortOutputName = "" Then ResolveAndLoadModel()
 
-        Dim resized As New cv.Mat
+        Dim resized As New Mat
         Resize(src, resized, dnnSize)
         Dim inputTensor = PreprocessToNCHW(resized)
 
-        Dim alpha512 As cv.Mat = Nothing
+        Dim alpha512 As Mat = Nothing
         Try
             Dim inputs = New List(Of NamedOnnxValue) From {
                 NamedOnnxValue.CreateFromTensor(ortInputName, inputTensor)
@@ -89,36 +89,36 @@ Public Class ModNet_Basics : Inherits TaskParent
         If alpha512 Is Nothing OrElse alpha512.Empty Then MsgBox("Empty alpha output from ONNX model.")
 
         Dim mm = GetMinMax(alpha512)
-        If mm.maxVal > 1.05 Then alpha512.ConvertTo(alpha512, cv.MatType.CV_32F, 1.0 / 255.0)
+        If mm.maxVal > 1.05 Then alpha512.ConvertTo(alpha512, MatType.CV_32F, 1.0 / 255.0)
 
-        Dim alphaFull As New cv.Mat
+        Dim alphaFull As New Mat
         Resize(alpha512, alphaFull, src.Size(), 0)
 
-        Dim ones As New cv.Mat(alphaFull.Size, cv.MatType.CV_32F, New cv.Scalar(1))
-        Dim zeros As New cv.Mat(alphaFull.Size, cv.MatType.CV_32F, New cv.Scalar(0))
+        Dim ones As New Mat(alphaFull.Size, MatType.CV_32F, New Scalar(1))
+        Dim zeros As New Mat(alphaFull.Size, MatType.CV_32F, New Scalar(0))
         Min(alphaFull, ones, alphaFull)
         Max(alphaFull, zeros, alphaFull)
 
-        Dim src32 As New cv.Mat
-        src.ConvertTo(src32, cv.MatType.CV_32FC3)
+        Dim src32 As New Mat
+        src.ConvertTo(src32, MatType.CV_32FC3)
         Dim ch = Split(src32)
-        Dim inv As New cv.Mat(alphaFull.Size, cv.MatType.CV_32F)
-        Dim onePlane As New cv.Mat(alphaFull.Size, cv.MatType.CV_32F, New cv.Scalar(1))
+        Dim inv As New Mat(alphaFull.Size, MatType.CV_32F)
+        Dim onePlane As New Mat(alphaFull.Size, MatType.CV_32F, New Scalar(1))
         Subtract(onePlane, alphaFull, inv)
 
-        Dim bgPlane As New cv.Mat(alphaFull.Size, cv.MatType.CV_32F, New cv.Scalar(240.0F / 255.0F))
+        Dim bgPlane As New Mat(alphaFull.Size, MatType.CV_32F, New Scalar(240.0F / 255.0F))
         For i = 0 To 2
-            Dim fg As New cv.Mat
-            Dim bgTerm As New cv.Mat
+            Dim fg As New Mat
+            Dim bgTerm As New Mat
             Multiply(ch(i), alphaFull, fg)
             Multiply(inv, bgPlane, bgTerm)
             Add(fg, bgTerm, ch(i))
         Next
 
         Merge(ch, src32)
-        src32.ConvertTo(dst2, cv.MatType.CV_8UC3)
+        src32.ConvertTo(dst2, MatType.CV_8UC3)
 
-        alphaFull.ConvertTo(dst3, cv.MatType.CV_8U, 255.0)
+        alphaFull.ConvertTo(dst3, MatType.CV_8U, 255.0)
     End Sub
     Protected Overrides Sub Finalize()
         If ortSession IsNot Nothing Then ortSession.Dispose()

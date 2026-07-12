@@ -11,9 +11,9 @@ Public Class Laplacian_Basics : Inherits TaskParent
         options.Run()
         If standaloneTest() Then GaussianBlur(src, src, options.kernel, 0, 0)
         If src.Channels() <> 1 Then src = task.gray
-        Laplacian(src, dst3, cv.MatType.CV_16S, options.kernel.Width, options.scale, options.delta)
-        Dim tmp As New cv.Mat
-        Threshold(dst3, tmp, options.threshold, 255, cv.ThresholdTypes.Binary)
+        Laplacian(src, dst3, MatType.CV_16S, options.kernel.Width, options.scale, options.delta)
+        Dim tmp As New Mat
+        Threshold(dst3, tmp, options.threshold, 255, ThresholdTypes.Binary)
         erode.Run(tmp)
         dilate.Run(erode.dst2)
         dst2 = dilate.dst2
@@ -48,7 +48,7 @@ Public Class XR_Laplacian_Blur : Inherits TaskParent
             blurText = "MedianBlur"
         End If
         If src.Channels() <> 1 Then src = task.gray
-        Laplacian(src, dst2, cv.MatType.CV_16S, options.kernel.Width, options.scale, options.delta)
+        Laplacian(src, dst2, MatType.CV_16S, options.kernel.Width, options.scale, options.delta)
         ConvertScaleAbs(dst2, dst2)
         labels(2) = "Laplacian+" + blurText + " k = " + CStr(options.kernel.Width)
     End Sub
@@ -65,8 +65,8 @@ Public Class Laplacian_PyramidFilter : Inherits TaskParent
         desc = "VB.Net version of the Laplacian Pyramid Filter - see http://citeseerx.ist.psu.edu/viewdoc/summary?doi=10.1.1.54.299."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        src.ConvertTo(options.img, cv.MatType.CV_32F)
+        src.ConvertTo(options.img, MatType.CV_32F)
         options.Run()
-        options.img.ConvertTo(dst2, cv.MatType.CV_8UC3)
+        options.img.ConvertTo(dst2, MatType.CV_8UC3)
     End Sub
 End Class

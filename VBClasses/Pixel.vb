@@ -5,10 +5,10 @@ Namespace PixelViewer
         Dim firstUpdate = True
         Public viewerForm As New PixelViewerForm
         Dim mouseLoc = New cv.Point(10, 10) ' assume 
-        Public dst0Input As New cv.Mat(task.workRes, cv.MatType.CV_8UC3, 0)
-        Public dst1Input As New cv.Mat(task.workRes, cv.MatType.CV_8UC3, 0)
-        Public dst2Input As New cv.Mat(task.workRes, cv.MatType.CV_8UC3, 0)
-        Public dst3Input As New cv.Mat(task.workRes, cv.MatType.CV_8UC3, 0)
+        Public dst0Input As New Mat(task.workRes, MatType.CV_8UC3, 0)
+        Public dst1Input As New Mat(task.workRes, MatType.CV_8UC3, 0)
+        Public dst2Input As New Mat(task.workRes, MatType.CV_8UC3, 0)
+        Public dst3Input As New Mat(task.workRes, MatType.CV_8UC3, 0)
         Enum displayTypes
             noType = -1
             type8uC3 = 0
@@ -32,14 +32,14 @@ Namespace PixelViewer
             Dim dst = Choose(task.mousePicTag + 1, task.dstList(0), task.dstList(1), dst2Input, dst3Input)
 
             Dim displayType = displayTypes.noType
-            If dst.Type = cv.MatType.CV_8UC3 Then displayType = displayTypes.type8uC3
-            If dst.Type = cv.MatType.CV_8U Then displayType = displayTypes.type8u
-            If dst.Type = cv.MatType.CV_32F Then displayType = displayTypes.type32F
-            If dst.Type = cv.MatType.CV_32FC3 Then displayType = displayTypes.type32FC3
-            If dst.Type = cv.MatType.CV_32SC1 Then displayType = displayTypes.type32SC1
-            If dst.Type = cv.MatType.CV_32SC3 Then displayType = displayTypes.type32SC3
+            If dst.Type = MatType.CV_8UC3 Then displayType = displayTypes.type8uC3
+            If dst.Type = MatType.CV_8U Then displayType = displayTypes.type8u
+            If dst.Type = MatType.CV_32F Then displayType = displayTypes.type32F
+            If dst.Type = MatType.CV_32FC3 Then displayType = displayTypes.type32FC3
+            If dst.Type = MatType.CV_32SC1 Then displayType = displayTypes.type32SC1
+            If dst.Type = MatType.CV_32SC3 Then displayType = displayTypes.type32SC3
             If displayType < 0 Or dst.Channels() > 3 Then
-                SetTrueText("The pixel Viewer does not support this cv.Mat!  Please add support.")
+                SetTrueText("The pixel Viewer does not support this Mat!  Please add support.")
                 Exit Sub
             End If
 
@@ -74,7 +74,7 @@ Namespace PixelViewer
             Dim mm As mmData
             Dim format32f = "0000.0"
             Dim format32S = "0000"
-            If img.Type = cv.MatType.CV_32F Or img.Type = cv.MatType.CV_32FC3 Then
+            If img.Type = MatType.CV_32F Or img.Type = MatType.CV_32FC3 Then
                 If img.Channels() = 3 Then
                     Dim tmp = img.Reshape(1)
                     mm = GetMinMax(tmp)
@@ -103,7 +103,7 @@ Namespace PixelViewer
                     For y = 0 To img.Height - 1
                         imgText += "r" + (dw.Y + y).ToString("000") + "   "
                         For x = 0 To img.Width - 1
-                            Dim vec = img.Get(Of cv.Vec3b)(y, x)
+                            Dim vec = img.Get(Of Vec3b)(y, x)
                             imgText += vec(0).ToString("000") + " " + vec(1).ToString("000") + " " + vec(2).ToString("000") + "   "
                         Next
                         imgText += vbLf
@@ -138,7 +138,7 @@ Namespace PixelViewer
                     For y = 0 To img.Height - 1
                         imgText += "r" + (dw.Y + y).ToString("000") + "   "
                         For x = 0 To img.Width - 1
-                            Dim vec = img.Get(Of cv.Vec3f)(y, x)
+                            Dim vec = img.Get(Of Vec3f)(y, x)
                             imgText += vec(0).ToString(format32f) + " " + vec(1).ToString(format32f) + " " + vec(2).ToString(format32f) + "   "
                         Next
                         imgText += vbLf
@@ -158,7 +158,7 @@ Namespace PixelViewer
                     For y = 0 To img.Height - 1
                         imgText += "r" + (dw.Y + y).ToString("000") + "   "
                         For x = 0 To img.Width - 1
-                            Dim vec = img.Get(Of cv.Vec3i)(y, x)
+                            Dim vec = img.Get(Of Vec3i)(y, x)
                             imgText += vec(0).ToString(format32S) + " " + vec(1).ToString(format32S) + " " + vec(2).ToString(format32S) + "   "
                         Next
                         imgText += vbLf
@@ -196,15 +196,15 @@ Public Class XR_Pixel_GetSet : Inherits TaskParent
         Dim rows = src.Height
         Dim cols = src.Width
         Dim output As String = ""
-        Dim rgb As New cv.Mat
-        CvtColor(src, rgb, cv.ColorConversionCodes.BGR2RGB)
+        Dim rgb As New Mat
+        CvtColor(src, rgb, ColorConversionCodes.BGR2RGB)
 
         Dim watch = Stopwatch.StartNew()
         For y = 0 To rows - 1
             For x = 0 To cols - 1
-                Dim color = rgb.Get(Of cv.Vec3b)(y, x)
+                Dim color = rgb.Get(Of Vec3b)(y, x)
                 color(0).SwapWith(color(2))
-                mats.mat(0).Set(Of cv.Vec3b)(y, x, color)
+                mats.mat(0).Set(Of Vec3b)(y, x, color)
             Next
         Next
         watch.Stop()
@@ -214,21 +214,21 @@ Public Class XR_Pixel_GetSet : Inherits TaskParent
         watch = Stopwatch.StartNew()
         For y = 0 To rows - 1
             For x = 0 To cols - 1
-                Dim color = mats.mat(1).At(Of cv.Vec3b)(y, x)
+                Dim color = mats.mat(1).At(Of Vec3b)(y, x)
                 color(0).SwapWith(color(2))
-                mats.mat(1).At(Of cv.Vec3b)(y, x) = color
+                mats.mat(1).At(Of Vec3b)(y, x) = color
             Next
         Next
         watch.Stop()
         output += "Upper right image is Mat.At and it took " + CStr(watch.ElapsedMilliseconds) + "ms" + vbCrLf + vbCrLf
 
         watch = Stopwatch.StartNew()
-        Dim colorArray(cols * rows - 1) As cv.Vec3b
-        rgb.GetArray(Of cv.Vec3b)(colorArray)
+        Dim colorArray(cols * rows - 1) As Vec3b
+        rgb.GetArray(Of Vec3b)(colorArray)
         For i = 0 To colorArray.Length - 3 Step 3
             colorArray(i).SwapWith(colorArray(i + 2))
         Next
-        mats.mat(2) = cv.Mat.FromPixelData(rows, cols, cv.MatType.CV_8UC3, colorArray)
+        mats.mat(2) = Mat.FromPixelData(rows, cols, MatType.CV_8UC3, colorArray)
         watch.Stop()
         output += "Marshal Copy took " + CStr(watch.ElapsedMilliseconds) + "ms" + vbCrLf
 
@@ -277,7 +277,7 @@ End Class
 
 Public Class XR_Pixel_SampleColor : Inherits TaskParent
     Public random As New Random_Basics
-    Public maskColor As cv.Vec3b
+    Public maskColor As Vec3b
     Public Sub New()
         desc = "Find the dominanant pixel color - not an average! This can provide consistent colorizing."
     End Sub
@@ -296,12 +296,12 @@ Public Class XR_Pixel_SampleColor : Inherits TaskParent
         End If
 
         Dim index As New List(Of cv.Point)
-        Dim pixels As New List(Of cv.Vec3b)
+        Dim pixels As New List(Of Vec3b)
         Dim counts As New List(Of Integer)
-        Dim pixel0 = New cv.Vec3b
+        Dim pixel0 = New Vec3b
         random.Run(src)
         For Each pt In random.PointList
-            Dim pixel = src.Get(Of cv.Vec3b)(pt.Y, pt.X)
+            Dim pixel = src.Get(Of Vec3b)(pt.Y, pt.X)
             If pixel <> pixel0 Then
                 If pixels.Contains(pixel) Then
                     counts(pixels.IndexOf(pixel)) += 1
@@ -335,9 +335,9 @@ Public Class XR_Pixel_Unstable : Inherits TaskParent
     Dim km As New KMeans_Basics
     Dim pixelCounts As New List(Of Integer)
     Dim k As Integer = -1
-    Dim unstable As New List(Of cv.Mat)
-    Dim lastImage As cv.Mat
-    Public unstablePixels As New cv.Mat
+    Dim unstable As New List(Of Mat)
+    Dim lastImage As Mat
+    Public unstablePixels As New Mat
     Dim kSlider = OptionParent.FindSlider("KMeans k")
     Dim options As New Options_Diff
     Public Sub New()
@@ -352,10 +352,10 @@ Public Class XR_Pixel_Unstable : Inherits TaskParent
 
         km.Run(src)
         dst2 = km.dst2
-        dst2.ConvertTo(dst2, cv.MatType.CV_32F)
+        dst2.ConvertTo(dst2, MatType.CV_32F)
         If lastImage Is Nothing Then lastImage = dst2.Clone
         Subtract(dst2, lastImage, dst3)
-        Threshold(dst3, dst3, options.pixelDiffThreshold, 255, cv.ThresholdTypes.Binary)
+        Threshold(dst3, dst3, options.pixelDiffThreshold, 255, ThresholdTypes.Binary)
 
         unstable.Add(dst3)
         If unstable.Count > task.fOptions.FrameHistoryCount.Value  Then unstable.RemoveAt(0)
@@ -404,7 +404,7 @@ Public Class Pixel_Zoom : Inherits TaskParent
         Dim x = Math.Min(mousePoint.X, src.Width - width)
         Dim y = Math.Min(mousePoint.Y, src.Height - height)
         dst1 = src(New cv.Rect(CInt(x), CInt(y), width, height))
-        Resize(dst1, dst2, dst2.Size(), 0, 0, cv.InterpolationFlags.Nearest)
+        Resize(dst1, dst2, dst2.Size(), 0, 0, InterpolationFlags.Nearest)
     End Sub
 End Class
 
@@ -429,7 +429,7 @@ Public Class Pixel_SubPixel : Inherits TaskParent
         Dim height As Double = src.Height / zoomFactor
         Dim x = Math.Min(zoom.mousePoint.X, src.Width - width)
         Dim y = Math.Min(zoom.mousePoint.Y, src.Height - height)
-        GetRectSubPix(src, New cv.Size(width, height), New cv.Point2f(x, y), dst3)
+        GetRectSubPix(src, New Size(width, height), New Point2f(x, y), dst3)
         Dim r = New cv.Rect(x - width \ 2, y - height \ 2, width, height)
         r = ValidateRect(r)
         Resize(src(r), dst2, dst2.Size)
@@ -452,7 +452,7 @@ Public Class XR_Pixel_NeighborsHorizontal : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
 
-        If src.Type <> cv.MatType.CV_32F Then src = task.pcSplit(2)
+        If src.Type <> MatType.CV_32F Then src = task.pcSplit(2)
 
         pt1.Clear()
         pt2.Clear()
@@ -471,7 +471,7 @@ Public Class XR_Pixel_NeighborsHorizontal : Inherits TaskParent
 
         dst2 = task.color.Clone
         For i = 0 To pt1.Count - 1
-            Line(dst2, pt1(i), pt2(i), cv.Scalar.Yellow, task.lineWidth, task.lineType)
+            Line(dst2, pt1(i), pt2(i), Scalar.Yellow, task.lineWidth, task.lineType)
         Next
         labels(2) = CStr(pt1.Count) + " z-values within " + (options.threshold * 1000).ToString(fmt0) + " mm's with X pixel offset " + CStr(options.pixels)
     End Sub
@@ -494,7 +494,7 @@ Public Class XR_Pixel_NeighborsVertical : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
 
-        If src.Type <> cv.MatType.CV_32F Then src = task.pcSplit(2)
+        If src.Type <> MatType.CV_32F Then src = task.pcSplit(2)
 
         pt1.Clear()
         pt2.Clear()
@@ -513,7 +513,7 @@ Public Class XR_Pixel_NeighborsVertical : Inherits TaskParent
 
         dst2 = task.color.Clone
         For i = 0 To pt1.Count - 1
-            Line(dst2, pt1(i), pt2(i), cv.Scalar.Yellow, task.lineWidth, task.lineType)
+            Line(dst2, pt1(i), pt2(i), Scalar.Yellow, task.lineWidth, task.lineType)
         Next
         labels(2) = CStr(pt1.Count) + " z-values within " + (options.threshold * 1000).ToString(fmt0) + " mm's with Y pixel offset " + CStr(options.pixels)
     End Sub
@@ -532,13 +532,13 @@ Public Class Pixel_NeighborsMaskH : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
-        If src.Type <> cv.MatType.CV_32F Then src = task.pcSplit(2)
+        If src.Type <> MatType.CV_32F Then src = task.pcSplit(2)
 
-        Dim tmp32f = New cv.Mat(dst2.Size(), cv.MatType.CV_32F, cv.Scalar.All(0))
+        Dim tmp32f = New Mat(dst2.Size(), MatType.CV_32F, Scalar.All(0))
         Dim r1 = New cv.Rect(0, 0, dst2.Width, dst2.Height - options.pixels)
         Dim r2 = New cv.Rect(0, options.pixels, dst2.Width, dst2.Height - options.pixels)
         Absdiff(src(r1), src(r2), tmp32f(r1))
-        Threshold(tmp32f, tmp32f, options.threshold, 255, cv.ThresholdTypes.BinaryInv)
+        Threshold(tmp32f, tmp32f, options.threshold, 255, ThresholdTypes.BinaryInv)
         ConvertScaleAbs(tmp32f, dst2, 255)
         dst2.SetTo(0, task.noDepthMask)
         dst2(New cv.Rect(dst2.Width - options.pixels, 0, options.pixels, dst2.Height)).SetTo(0)
@@ -559,13 +559,13 @@ Public Class Pixel_NeighborsMaskV : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
-        If src.Type <> cv.MatType.CV_32F Then src = task.pcSplit(2)
+        If src.Type <> MatType.CV_32F Then src = task.pcSplit(2)
 
-        Dim tmp32f = New cv.Mat(dst2.Size(), cv.MatType.CV_32F, cv.Scalar.All(0))
+        Dim tmp32f = New Mat(dst2.Size(), MatType.CV_32F, Scalar.All(0))
         Dim r1 = New cv.Rect(0, 0, dst2.Width, dst2.Height - options.pixels)
         Dim r2 = New cv.Rect(0, options.pixels, dst2.Width, dst2.Height - options.pixels)
         Absdiff(src(r1), src(r2), tmp32f(r1))
-        Threshold(tmp32f, tmp32f, options.threshold, 255, cv.ThresholdTypes.BinaryInv)
+        Threshold(tmp32f, tmp32f, options.threshold, 255, ThresholdTypes.BinaryInv)
         ConvertScaleAbs(tmp32f, dst2, 255)
         dst2.SetTo(0, task.noDepthMask)
         dst2(New cv.Rect(dst2.Width - options.pixels, 0, options.pixels, dst2.Height)).SetTo(0)
@@ -610,7 +610,7 @@ Public Class XR_Pixel_NeighborsPatchNeighbors : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
 
-        If src.Type <> cv.MatType.CV_32F Then src = task.pcSplit(2)
+        If src.Type <> MatType.CV_32F Then src = task.pcSplit(2)
 
         dst2 = src
         If options.patchZ Then
@@ -732,26 +732,26 @@ End Class
 
 
 Public Class Pixel_Mapper : Inherits TaskParent
-    Public colorMap As New cv.Mat(256, 1, cv.MatType.CV_8UC3, cv.Scalar.All(0))
+    Public colorMap As New Mat(256, 1, MatType.CV_8UC3, Scalar.All(0))
     Public Sub New()
         labels(2) = "The image below is the output of the ApplyColorMap"
         desc = "Resize the input to a small image, convert to gray, and map gray to color"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If task.heartBeat Then
-            Dim nSize = New cv.Size(src.Width / 8, src.Height / 8)
+            Dim nSize = New Size(src.Width / 8, src.Height / 8)
             Resize(src, dst1, nSize)
-            Dim samples(dst1.Total - 1) As cv.Vec3b
-            dst1.GetArray(Of cv.Vec3b)(samples)
+            Dim samples(dst1.Total - 1) As Vec3b
+            dst1.GetArray(Of Vec3b)(samples)
 
-            Dim sorted As New SortedList(Of Integer, cv.Vec3b)(New compareAllowIdenticalIntegerInverted)
+            Dim sorted As New SortedList(Of Integer, Vec3b)(New compareAllowIdenticalIntegerInverted)
             For i = 0 To samples.Count - 1 Step 3
                 Dim vecA = samples(i)
                 Dim gPixel = CInt(vecA(2) * 0.299 + vecA(1) * 0.587 + vecA(0) * 0.114)
                 If sorted.ContainsKey(gPixel) = False Then sorted.Add(gPixel, vecA)
             Next
 
-            Dim averaged As New SortedList(Of Integer, cv.Vec3b)
+            Dim averaged As New SortedList(Of Integer, Vec3b)
             For i = 0 To sorted.Count - 1
                 Dim ele = sorted.ElementAt(i)
                 Dim index = ele.Key
@@ -759,7 +759,7 @@ Public Class Pixel_Mapper : Inherits TaskParent
                 For j = i + 1 To sorted.Count - 1
                     If ele.Key <> sorted.ElementAt(j).Key Then Exit For
                     Dim vecB = sorted.ElementAt(j).Value
-                    vecA = New cv.Vec3b(vecA(0) / 2 + vecB(0) / 2, vecA(1) / 2 + vecB(1) / 2, vecA(2) / 2 + vecB(2) / 2)
+                    vecA = New Vec3b(vecA(0) / 2 + vecB(0) / 2, vecA(1) / 2 + vecB(1) / 2, vecA(2) / 2 + vecB(2) / 2)
                     i = j
                 Next
                 averaged.Add(index, vecA)
@@ -771,7 +771,7 @@ Public Class Pixel_Mapper : Inherits TaskParent
                 If i < averaged.Count Then
                     If iAvg <> averaged.ElementAt(i).Key Then vec = averaged.ElementAt(i).Value
                 End If
-                colorMap.Set(Of cv.Vec3b)(i, vec)
+                colorMap.Set(Of Vec3b)(i, vec)
             Next
         End If
         ApplyColorMap(task.gray, dst2, colorMap)
@@ -793,8 +793,8 @@ Public Class XR_Pixel_MapLeftRight : Inherits TaskParent
         mapper.Run(src)
         dst2 = mapper.dst2
 
-        Dim tmp As cv.Mat = task.rightView
-        If tmp.Channels = 3 Then CvtColor(tmp, tmp, cv.ColorConversionCodes.BGR2GRAY)
+        Dim tmp As Mat = task.rightView
+        If tmp.Channels = 3 Then CvtColor(tmp, tmp, ColorConversionCodes.BGR2GRAY)
         ApplyColorMap(tmp, dst3, mapper.colorMap)
     End Sub
 End Class
@@ -814,15 +814,15 @@ Public Class XR_Pixel_MapDistance : Inherits TaskParent
         mapper.Run(src)
         dst2 = mapper.dst2
 
-        Static myColorMap As cv.Mat = mapper.colorMap.Clone
+        Static myColorMap As Mat = mapper.colorMap.Clone
         If task.heartBeat Then
             Dim samples(mapper.colorMap.Total * mapper.colorMap.ElemSize - 1) As Byte
             Marshal.Copy(mapper.colorMap.Data, samples, 0, samples.Length)
 
-            Dim vecs As New List(Of cv.Point3f)
+            Dim vecs As New List(Of Point3f)
             Dim vecs3b As New List(Of Byte)
             For i = 0 To samples.Count - 1 Step 3
-                vecs.Add(New cv.Point3f(samples(i), samples(i + 1), samples(i + 2)))
+                vecs.Add(New Point3f(samples(i), samples(i + 1), samples(i + 2)))
                 vecs3b.Add(samples(i))
                 vecs3b.Add(samples(i + 1))
                 vecs3b.Add(samples(i + 2))
@@ -836,9 +836,9 @@ Public Class XR_Pixel_MapDistance : Inherits TaskParent
             Next
 
             Dim avg = distances.Average
-            Dim vec = New cv.Vec3b(vecs3b(0), samples(1), samples(2))
+            Dim vec = New Vec3b(vecs3b(0), samples(1), samples(2))
             For i = 0 To vecs.Count - 1
-                If i < 255 Then If distances(i) > avg Then vec = New cv.Vec3b(vecs3b(i * 3), samples(i * 3 + 1), samples(i * 3 + 2))
+                If i < 255 Then If distances(i) > avg Then vec = New Vec3b(vecs3b(i * 3), samples(i * 3 + 1), samples(i * 3 + 2))
                 vecs3b(i * 3) = vec(0)
                 vecs3b(i * 3 + 1) = vec(1)
                 vecs3b(i * 3 + 2) = vec(2)
@@ -846,12 +846,12 @@ Public Class XR_Pixel_MapDistance : Inherits TaskParent
 
             Marshal.Copy(vecs3b.ToArray, 0, mapper.colorMap.Data, myColorMap.Total * myColorMap.ElemSize)
         End If
-        Dim tmp As cv.Mat = task.leftView
-        If tmp.Channels = 3 Then CvtColor(tmp, tmp, cv.ColorConversionCodes.BGR2GRAY)
+        Dim tmp As Mat = task.leftView
+        If tmp.Channels = 3 Then CvtColor(tmp, tmp, ColorConversionCodes.BGR2GRAY)
         ApplyColorMap(tmp, dst2, myColorMap)
 
         tmp = task.rightView
-        If tmp.Channels = 3 Then CvtColor(tmp, tmp, cv.ColorConversionCodes.BGR2GRAY)
+        If tmp.Channels = 3 Then CvtColor(tmp, tmp, ColorConversionCodes.BGR2GRAY)
         ApplyColorMap(tmp, dst3, myColorMap)
     End Sub
 End Class
@@ -949,9 +949,9 @@ Public Class XR_Pixel_Display : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst2 = src
         If task.heartBeat Then
-            Dim mean As cv.Scalar, stdev As cv.Scalar
+            Dim mean As Scalar, stdev As Scalar
             MeanStdDev(src(task.drawRect), mean, stdev)
-            Dim pt = New cv.Vec3i(mean(0), mean(1), mean(2))
+            Dim pt = New Vec3i(mean(0), mean(1), mean(2))
             strOut = "Mean BGR " + pt.ToString() + vbCrLf + "Stdev BGR " + stdev.ToString
         End If
         SetTrueText(strOut, 3)
@@ -975,7 +975,7 @@ Public Class XR_Pixel_ColorGuess : Inherits TaskParent
         mapper.Run(src)
         dst2 = mapper.dst2
 
-        Static myColorMap As cv.Mat = mapper.colorMap.Clone
+        Static myColorMap As Mat = mapper.colorMap.Clone
         If task.heartBeat Then
             Dim samples(mapper.colorMap.Total * mapper.colorMap.ElemSize - 1) As Byte
             Marshal.Copy(mapper.colorMap.Data, samples, 0, samples.Length)
@@ -1000,8 +1000,8 @@ Public Class XR_Pixel_ColorGuess : Inherits TaskParent
             Next
 
             For i = 0 To myColorMap.Rows - 1
-                Dim vec = New cv.Vec3b(vecs(i * 3), vecs(i * 3 + 1), vecs(i * 3 + 2))
-                myColorMap.Set(Of cv.Vec3b)(i, 0, vec)
+                Dim vec = New Vec3b(vecs(i * 3), vecs(i * 3 + 1), vecs(i * 3 + 2))
+                myColorMap.Set(Of Vec3b)(i, 0, vec)
             Next
         End If
 
@@ -1009,10 +1009,10 @@ Public Class XR_Pixel_ColorGuess : Inherits TaskParent
             ApplyColorMap(task.leftView, dst2, myColorMap)
             ApplyColorMap(task.rightView, dst3, myColorMap)
         Else
-        Dim _gray8u As New cv.Mat
-        CvtColor(task.leftView, _gray8u, cv.ColorConversionCodes.BGR2GRAY)
+        Dim _gray8u As New Mat
+        CvtColor(task.leftView, _gray8u, ColorConversionCodes.BGR2GRAY)
         ApplyColorMap(_gray8u, dst2, myColorMap)
-            CvtColor(task.rightView, _gray8u, cv.ColorConversionCodes.BGR2GRAY)
+            CvtColor(task.rightView, _gray8u, ColorConversionCodes.BGR2GRAY)
             ApplyColorMap(_gray8u, dst3, myColorMap)
         End If
     End Sub

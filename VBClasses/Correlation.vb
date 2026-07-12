@@ -1,18 +1,18 @@
 Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 Public Class Correlation_Basics : Inherits TaskParent
-    Public fLessList As New List(Of cv.Rect)
+    Public fLessList As New List(of cv.Rect)
     Public maxCorrelation As Single
     Public Sub New()
-        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        dst2 = New Mat(dst2.Size, MatType.CV_8U, 0)
         task.fOptions.MatchCorrSlider.Value = 90
         desc = "Measure the correlation of all grid squares except where there is motion."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If src.Channels <> 1 Then src = task.grayOriginal.Clone
 
-        Static lastFrame As cv.Mat = src.Clone
+        Static lastFrame As Mat = src.Clone
         dst2.SetTo(0)
-        Dim correlationMat As New cv.Mat
+        Dim correlationMat As New Mat
         maxCorrelation = task.fOptions.MatchCorrSlider.Value / 100.0 + 1
         fLessList.Clear()
         Dim motionList As New List(Of Integer)(task.motion.motionSort)
@@ -21,7 +21,7 @@ Public Class Correlation_Basics : Inherits TaskParent
         For i = 0 To task.gridRects.Count - 1
             Dim r = task.gridRects(i)
             If r <> task.gridRects(motionList(index)) Then
-                MatchTemplate(src(r), lastFrame(r), correlationMat, cv.TemplateMatchModes.CCoeffNormed)
+                MatchTemplate(src(r), lastFrame(r), correlationMat, TemplateMatchModes.CCoeffNormed)
                 Dim correlation = correlationMat.Get(Of Single)(0, 0) + 1
                 If correlation < maxCorrelation Then
                 Rectangle(dst2, r, white, -1)
@@ -51,9 +51,9 @@ Public Class Correlation_Validate : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         If src.Channels <> 1 Then src = task.grayOriginal.Clone
 
-        Static lastsrc As cv.Mat = src.Clone
+        Static lastsrc As Mat = src.Clone
         dst2 = src.Clone
-        Dim correlationMat As New cv.Mat
+        Dim correlationMat As New Mat
         Dim corrThreshold = 2.0 - 2.0 / task.histogramBins
         Dim motionIndex As Integer
         Dim motionList As New List(Of Integer)(task.motion.motionSort)
@@ -63,7 +63,7 @@ Public Class Correlation_Validate : Inherits TaskParent
         For i = 0 To task.gridRects.Count - 1
             If i <> motionList(motionIndex) Then
                 Dim r = task.gridRects(i)
-                MatchTemplate(src(r), lastsrc(r), correlationMat, cv.TemplateMatchModes.CCoeffNormed)
+                MatchTemplate(src(r), lastsrc(r), correlationMat, TemplateMatchModes.CCoeffNormed)
                 Dim corr = correlationMat.Get(Of Single)(0, 0) + 1
                 If corr < corrThreshold Then
                 Rectangle(dst2, r, white, task.lineWidth)
@@ -105,17 +105,17 @@ Public Class Correlation_BasicsPlot : Inherits TaskParent
         desc = "Measure the correlation of all grid squares."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        Static lastsrc As cv.Mat = task.grayOriginal.Clone
+        Static lastsrc As Mat = task.grayOriginal.Clone
         If src.Channels <> 1 Then src = task.grayOriginal.Clone
         dst2 = task.gray.Clone
-        Dim correlationMat As New cv.Mat
+        Dim correlationMat As New Mat
         cList.Clear()
         dst3 = src
         Dim mmList As New List(Of mmData)
         mmRanges.Clear()
         For i = 0 To task.gridRects.Count - 1
             Dim r = task.gridRects(i)
-            MatchTemplate(task.gray(r), lastsrc(r), correlationMat, cv.TemplateMatchModes.CCoeffNormed)
+            MatchTemplate(task.gray(r), lastsrc(r), correlationMat, TemplateMatchModes.CCoeffNormed)
 
             Dim corr = correlationMat.Get(Of Single)(0, 0) + 1
             cList.Add(corr)
@@ -127,7 +127,7 @@ Public Class Correlation_BasicsPlot : Inherits TaskParent
         lastsrc = task.gray.Clone
 
         If cList.Count > 0 Then
-            Dim inputAdjusted = cv.Mat.FromPixelData(cList.Count, 1, cv.MatType.CV_32F, cList.ToArray) - 1
+            Dim inputAdjusted = Mat.FromPixelData(cList.Count, 1, MatType.CV_32F, cList.ToArray) - 1
             plotHist.Run(inputAdjusted)
             dst3 = plotHist.dst2
 
@@ -186,21 +186,21 @@ Public Class XR_Correlation_Basics : Inherits TaskParent
         If row = 0 Then SetTrueText("Move mouse across image to see the relationship between X and Z" + vbCrLf +
                                             "A linear relationship is a useful correlation", New cv.Point(0, 10), 3)
 
-        Dim dataX As New cv.Mat(New cv.Size(src.Width, src.Height), cv.MatType.CV_32F, cv.Scalar.All(0))
-        Dim dataY As New cv.Mat(New cv.Size(src.Width, src.Height), cv.MatType.CV_32F, cv.Scalar.All(0))
-        Dim dataZ As New cv.Mat(New cv.Size(src.Width, src.Height), cv.MatType.CV_32F, cv.Scalar.All(0))
+        Dim dataX As New Mat(New Size(src.Width, src.Height), MatType.CV_32F, Scalar.All(0))
+        Dim dataY As New Mat(New Size(src.Width, src.Height), MatType.CV_32F, Scalar.All(0))
+        Dim dataZ As New Mat(New Size(src.Width, src.Height), MatType.CV_32F, Scalar.All(0))
 
-        Dim mask As New cv.Mat
-        CvtColor(kFlood.dst3, mask, cv.ColorConversionCodes.BGR2GRAY)
+        Dim mask As New Mat
+        CvtColor(kFlood.dst3, mask, ColorConversionCodes.BGR2GRAY)
         task.pcSplit(0).CopyTo(dataX, mask)
         task.pcSplit(1).CopyTo(dataY, mask)
         task.pcSplit(2).CopyTo(dataZ, mask)
 
         Dim row1 = dataX.Row(row)
         Dim row2 = dataZ.Row(row)
-        Line(dst2, New cv.Point(0, row), New cv.Point(dst2.Width, row), cv.Scalar.Yellow, task.lineWidth + 1)
+        Line(dst2, New cv.Point(0, row), New cv.Point(dst2.Width, row), Scalar.Yellow, task.lineWidth + 1)
 
-        Dim correlationmat As New cv.Mat
+        Dim correlationmat As New Mat
         MatchTemplate(row1, row2, correlationmat, options.matchOption)
         Dim correlation = correlationmat.Get(Of Single)(0, 0)
         labels(2) = "Correlation of X to Z = " + correlation.ToString(fmt2)
@@ -223,7 +223,7 @@ Public Class XR_Correlation_Basics : Inherits TaskParent
             For i = 0 To plotX.Count - 1
                 Dim x = dst3.Width * (plotX(i) - minx) / (maxx - minx)
                 Dim y = dst3.Height * (plotZ(i) - minZ) / (maxZ - minZ)
-                Circle(dst3, New cv.Point(x, y), task.DotSize, cv.Scalar.Yellow, -1, task.lineType)
+                Circle(dst3, New cv.Point(x, y), task.DotSize, Scalar.Yellow, -1, task.lineType)
             Next
             SetTrueText("Z-min " + minZ.ToString(fmt2), New cv.Point(10, 5), 3)
             SetTrueText("Z-max " + maxZ.ToString(fmt2) + vbCrLf + vbTab + "X-min " + minx.ToString(fmt2), New cv.Point(0, dst3.Height - 20), 3)
@@ -253,18 +253,18 @@ End Class
 
 
 Public Class Correlation_MinMaxRange : Inherits TaskParent
-    Public fLessList As New List(Of cv.Rect)
+    Public fLessList As New List(of cv.Rect)
     Public Sub New()
-        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        dst2 = New Mat(dst2.Size, MatType.CV_8U, 0)
         labels = {"", "", "FeatureLess regions", "Not Featureless Regions."}
         desc = "Use range to find featureless-ness rather than correlation."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If src.Channels <> 1 Then src = task.grayOriginal.Clone
 
-        Static lastsrc As cv.Mat = src.Clone
+        Static lastsrc As Mat = src.Clone
         dst2.SetTo(0)
-        Dim correlationMat As New cv.Mat
+        Dim correlationMat As New Mat
         fLessList.Clear()
         For Each r In task.gridRects
             Dim mm = GetMinMax(src(r))
@@ -292,12 +292,12 @@ Public Class Correlation_LinesSimple : Inherits TaskParent
         SetTrueText("Correlation = " + correlation.ToString(fmt2), 3)
         If task.heartBeatLT = False Then Exit Sub
 
-        Static lastImage As cv.Mat = task.lines.dst3.Clone
+        Static lastImage As Mat = task.lines.dst3.Clone
 
         dst2 = task.lines.dst3.Clone
 
-        Dim correlationMat As New cv.Mat
-        MatchTemplate(task.lines.dst3, lastImage, correlationMat, cv.TemplateMatchModes.CCoeffNormed)
+        Dim correlationMat As New Mat
+        MatchTemplate(task.lines.dst3, lastImage, correlationMat, TemplateMatchModes.CCoeffNormed)
 
         correlation = correlationMat.Get(Of Single)(0, 0)
 

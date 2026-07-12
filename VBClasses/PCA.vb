@@ -42,8 +42,8 @@ Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 
 ' https://github.com/opencv/opencv/blob/master/samples/cpp/pca.cpp
 Public Class PCA_Reconstruct : Inherits TaskParent
-    Dim images(7) As cv.Mat
-    Dim images32f(images.Length) As cv.Mat
+    Dim images(7) As Mat
+    Dim images32f(images.Length) As Mat
     Public Sub New()
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Retained Variance", 1, 100, 95)
         desc = "Reconstruct a video stream as a composite of X images."
@@ -52,23 +52,23 @@ Public Class PCA_Reconstruct : Inherits TaskParent
         Static retainSlider = OptionParent.FindSlider("Retained Variance")
         Dim index = task.frameCount Mod images.Length
         images(index) = task.gray
-        Dim gray32f As New cv.Mat
-        images(index).ConvertTo(gray32f, cv.MatType.CV_32F)
-        Normalize(gray32f, gray32f, 0, 255, cv.NormTypes.MinMax)
+        Dim gray32f As New Mat
+        images(index).ConvertTo(gray32f, MatType.CV_32F)
+        Normalize(gray32f, gray32f, 0, 255, NormTypes.MinMax)
         images32f(index) = gray32f.Reshape(1, 1)
         If task.frameCount >= images.Length Then
-            Dim data = New cv.Mat(images.Length, src.Rows * src.Cols, cv.MatType.CV_32F)
+            Dim data = New cv.Mat(images.Length, src.Rows * src.Cols, MatType.CV_32F)
             For i = 0 To images.Length - 1
                 images32f(i).CopyTo(data.Row(i))
             Next
 
             Dim retainedVariance As Single = retainSlider.Value / 100
-            Dim pca = New cv.PCA(data, New cv.Mat, cv.PCA.Flags.DataAsRow, retainedVariance)  ' the pca inputarray cannot be Static so we reallocate each time.
+            Dim pcaData = New PCA(data, New Mat, PCA.Flags.DataAsRow, retainedVariance)  ' the pca inputarray cannot be Static so we reallocate each time.
 
-            Dim point = pca.Project(data.Row(0))
-            Dim reconstruction = pca.BackProject(point)
+            Dim pt = pcaData.Project(data.Row(0))
+            Dim reconstruction = pcaData.BackProject(pt)
             reconstruction = reconstruction.Reshape(images(0).Channels(), images(0).Rows)
-            reconstruction.ConvertTo(dst2, cv.MatType.CV_8UC1)
+            reconstruction.ConvertTo(dst2, MatType.CV_8UC1)
         End If
     End Sub
 End Class
@@ -92,14 +92,14 @@ End Class
 ' https://docs.opencvb.org/3.1.0/d1/dee/tutorial_introduction_to_pca.html
 Public Class XR_PCA_DrawImage : Inherits TaskParent
     Dim pca As New PCA_Reconstruct
-    Dim image As New cv.Mat
+    Dim image As New Mat
     Public Sub New()
         image = ImRead(task.homeDir + "opencv/Samples/Data/pca_test1.jpg")
         desc = "Use PCA to find the principal direction of an object."
         labels(2) = "Original image"
         labels(3) = "PCA Output"
     End Sub
-    Sub drawAxis(img As cv.Mat, p As cv.Point, q As cv.Point, color As cv.Scalar, scale As Single)
+    Sub drawAxis(img As Mat, p As cv.Point, q As cv.Point, color As Scalar, scale As Single)
         Dim angle = Math.Atan2(p.Y - q.Y, p.X - q.X) ' angle in radians
         Dim hypotenuse = Math.Sqrt((p.Y - q.Y) * (p.Y - q.Y) + (p.X - q.X) * (p.X - q.X))
         q.X = p.X - scale * hypotenuse * Math.Cos(angle)
@@ -114,41 +114,41 @@ Public Class XR_PCA_DrawImage : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         Resize(image, dst2, dst2.Size())
-        Dim gray As New cv.Mat
-        CvtColor(dst2, gray, cv.ColorConversionCodes.BGR2GRAY)
-        Threshold(gray, gray, 50, 255, cv.ThresholdTypes.Binary Or cv.ThresholdTypes.Otsu)
-        Dim hierarchy() As cv.HierarchyIndex = Nothing
+        Dim gray As New Mat
+        CvtColor(dst2, gray, ColorConversionCodes.BGR2GRAY)
+        Threshold(gray, gray, 50, 255, ThresholdTypes.Binary Or ThresholdTypes.Otsu)
+        Dim hierarchy() As HierarchyIndex = Nothing
         Dim contours As cv.Point()() = Nothing
-        FindContours(gray, contours, hierarchy, cv.RetrievalModes.List, cv.ContourApproximationModes.ApproxNone)
+        FindContours(gray, contours, hierarchy, RetrievalModes.List, ContourApproximationModes.ApproxNone)
 
         dst3.SetTo(0)
         For i = 0 To contours.Length - 1
             Dim area = ContourArea(contours(i))
             If area < 100 Or area > 100000 Then Continue For
-            DrawContours(dst3, contours, i, cv.Scalar.Red, task.lineWidth, task.lineType)
+            DrawContours(dst3, contours, i, Scalar.Red, task.lineWidth, task.lineType)
             Dim sz = contours(i).Length
-            Dim data_pts = New cv.Mat(sz, 2, cv.MatType.CV_64FC1)
+            Dim data_pts = New Mat(sz, 2, MatType.CV_64FC1)
             For j = 0 To data_pts.Rows - 1
                 data_pts.Set(Of Double)(j, 0, contours(i)(j).X)
                 data_pts.Set(Of Double)(j, 1, contours(i)(j).Y)
             Next
 
-            Dim pca_analysis = New cv.PCA(data_pts, New cv.Mat, cv.PCA.Flags.DataAsRow)
+            Dim pca_analysis = New PCA(data_pts, New Mat, cv.PCA.Flags.DataAsRow)
             Dim cntr = New cv.Point(CInt(pca_analysis.Mean.Get(Of Double)(0, 0)), CInt(pca_analysis.Mean.Get(Of Double)(0, 1)))
-            Dim eigen_vecs(2) As cv.Point2d
+            Dim eigen_vecs(2) As Point2d
             Dim eigen_val(2) As Double
             For j = 0 To 1
-                eigen_vecs(j) = New cv.Point2d(pca_analysis.Eigenvectors.Get(Of Double)(j, 0), pca_analysis.Eigenvectors.Get(Of Double)(j, 1))
+                eigen_vecs(j) = New Point2d(pca_analysis.Eigenvectors.Get(Of Double)(j, 0), pca_analysis.Eigenvectors.Get(Of Double)(j, 1))
                 eigen_val(j) = pca_analysis.Eigenvalues.Get(Of Double)(0, j)
             Next
 
-            Circle(dst3, cntr, task.DotSize + 1, cv.Scalar.BlueViolet, -1, task.lineType)
+            Circle(dst3, cntr, task.DotSize + 1, Scalar.BlueViolet, -1, task.lineType)
             Dim factor As Single = 0.02F ' scaling factor for the lines depicting the principal components.
             Dim ept1 = New cv.Point(cntr.X + factor * eigen_vecs(0).X * eigen_val(0), cntr.Y + factor * eigen_vecs(0).Y * eigen_val(0))
             Dim ept2 = New cv.Point(cntr.X - factor * eigen_vecs(1).X * eigen_val(1), cntr.Y - factor * eigen_vecs(1).Y * eigen_val(1))
 
-            drawAxis(dst3, cntr, ept1, cv.Scalar.Red, 1) ' primary principal component
-            drawAxis(dst3, cntr, ept2, cv.Scalar.BlueViolet, 5) ' secondary principal component
+            drawAxis(dst3, cntr, ept1, Scalar.Red, 1) ' primary principal component
+            drawAxis(dst3, cntr, ept2, Scalar.BlueViolet, 5) ' secondary principal component
         Next
     End Sub
 End Class
@@ -203,10 +203,10 @@ Public Class PCA_Palettize : Inherits TaskParent
         If standaloneTest() Then
             paletteImage = nColor.RgbToIndex(rgb, dst1.Width, dst1.Height, palette, options.desiredNcolors)
 
-            Dim img8u = New cv.Mat(dst2.Size, cv.MatType.CV_8U, cv.Scalar.All(0))
+            Dim img8u = New Mat(dst2.Size, MatType.CV_8U, Scalar.All(0))
             Marshal.Copy(paletteImage, 0, img8u.Data, paletteImage.Length)
 
-            custom.colorMap = cv.Mat.FromPixelData(256, 1, cv.MatType.CV_8UC3, palette)
+            custom.colorMap = Mat.FromPixelData(256, 1, MatType.CV_8UC3, palette)
             custom.Run(img8u)
             dst2 = custom.dst2
         End If
@@ -722,7 +722,7 @@ Public Class PCA_NColor : Inherits TaskParent
     Public rgb(dst1.Total * dst1.ElemSize - 1) As Byte
     Public buff(rgb.Length - 1) As Byte
     Public Sub New()
-        custom.colorMap = New cv.Mat(256, 1, cv.MatType.CV_8UC3)
+        custom.colorMap = New Mat(256, 1, MatType.CV_8UC3)
         desc = "Use PCA to build a palettized CV_8U image from the input using a palette."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -734,15 +734,15 @@ Public Class PCA_NColor : Inherits TaskParent
         palette = MakePalette(rgb, dst2.Width, dst2.Height, options.desiredNcolors)
         Dim paletteImage = RgbToIndex(rgb, dst1.Width, dst1.Height, palette, options.desiredNcolors)
 
-        Dim img8u = New cv.Mat(dst2.Size, cv.MatType.CV_8U, cv.Scalar.All(0))
+        Dim img8u = New Mat(dst2.Size, MatType.CV_8U, Scalar.All(0))
         Marshal.Copy(paletteImage, 0, img8u.Data, paletteImage.Length)
 
         Marshal.Copy(palette, 0, custom.colorMap.Data, palette.Length)
         custom.Run(img8u)
         dst2 = custom.dst2
 
-        Dim tmp = cv.Mat.FromPixelData(256, 1, cv.MatType.CV_8UC3, palette)
-        CvtColor(tmp, tmp, cv.ColorConversionCodes.BGR2GRAY)
+        Dim tmp = Mat.FromPixelData(256, 1, MatType.CV_8UC3, palette)
+        CvtColor(tmp, tmp, ColorConversionCodes.BGR2GRAY)
         Dim paletteCount = CountNonZero(tmp)
 
         If standaloneTest() Then
@@ -773,7 +773,7 @@ Public Class PCA_NColor_CPP : Inherits TaskParent
         desc = "Create a faster version of the PCA_NColor algorithm."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If src.Channels <> 3 Then CvtColor(src, src, cv.ColorConversionCodes.GRAY2BGR)
+        If src.Channels <> 3 Then CvtColor(src, src, ColorConversionCodes.GRAY2BGR)
 
         If task.heartBeat Then pcaPalette.Run(src) ' get the palette in VB.Net
         Marshal.Copy(src.Data, rgb, 0, rgb.Length)
@@ -785,8 +785,8 @@ Public Class PCA_NColor_CPP : Inherits TaskParent
         handlePalette.Free()
         handleSrc.Free()
 
-        dst2 = cv.Mat.FromPixelData(dst2.Height, dst2.Width, cv.MatType.CV_8U, imagePtr)
-        custom.colorMap = cv.Mat.FromPixelData(256, 1, cv.MatType.CV_8UC3, pcaPalette.palette)
+        dst2 = Mat.FromPixelData(dst2.Height, dst2.Width, MatType.CV_8U, imagePtr)
+        custom.colorMap = Mat.FromPixelData(256, 1, MatType.CV_8UC3, pcaPalette.palette)
 
         custom.Run(dst2)
 
@@ -824,10 +824,10 @@ Public Class XR_PCA_NColorPalettize : Inherits TaskParent
         Marshal.Copy(src.Data, rgb, 0, rgb.Length)
         Dim paletteImage = nColor.RgbToIndex(rgb, dst1.Width, dst1.Height, pcaPalette.palette, pcaPalette.options.desiredNcolors)
 
-        Dim img8u = New cv.Mat(dst2.Size, cv.MatType.CV_8U, cv.Scalar.All(0))
+        Dim img8u = New Mat(dst2.Size, MatType.CV_8U, Scalar.All(0))
         Marshal.Copy(paletteImage, 0, img8u.Data, paletteImage.Length)
 
-        custom.colorMap = cv.Mat.FromPixelData(256, 1, cv.MatType.CV_8UC3, pcaPalette.palette)
+        custom.colorMap = Mat.FromPixelData(256, 1, MatType.CV_8UC3, pcaPalette.palette)
 
         custom.Run(img8u)
         dst2 = custom.dst2
@@ -842,13 +842,13 @@ End Class
 
 Public Class PCA_Prep_CPP : Inherits TaskParent
     Implements IDisposable
-    Public inputData As New cv.Mat
+    Public inputData As New Mat
     Public Sub New()
         cPtr = PCA_Prep_Open()
         desc = "Take some pointcloud data and return the non-zero points in a point3f vector"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If src.Type <> cv.MatType.CV_32FC3 Then src = task.pointCloud
+        If src.Type <> MatType.CV_32FC3 Then src = task.pointCloud
 
         Dim cppData(src.Total * src.ElemSize - 1) As Byte
         Marshal.Copy(src.Data, cppData, 0, cppData.Length)
@@ -856,7 +856,7 @@ Public Class PCA_Prep_CPP : Inherits TaskParent
         Dim imagePtr = PCA_Prep_Run(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols)
         handleSrc.Free()
         Dim count = PCA_Prep_GetCount(cPtr)
-        inputData = cv.Mat.FromPixelData(count, 3, cv.MatType.CV_32F, imagePtr).Clone
+        inputData = Mat.FromPixelData(count, 3, MatType.CV_32F, imagePtr).Clone
         SetTrueText("Data has been prepared and resides in inputData public")
     End Sub
     Protected Overrides Sub Finalize()

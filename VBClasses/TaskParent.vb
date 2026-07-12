@@ -23,7 +23,7 @@ Public Class TaskParent : Implements IDisposable
     Public radio As New OptionsRadioButtons
     Public sliders As New OptionsSliders
     Public standalone As Boolean
-    Public dst0 As cv.Mat, dst1 As cv.Mat, dst2 As cv.Mat, dst3 As cv.Mat
+    Public dst0 As Mat, dst1 As Mat, dst2 As Mat, dst3 As Mat
     Public labels() As String = {"", "", "", ""}
     Public traceName As String
     Public desc As String
@@ -58,10 +58,10 @@ Public Class TaskParent : Implements IDisposable
             callStack = lines(i) + "\" + callStack
         Next
 
-        dst0 = New cv.Mat(task.workRes, cv.MatType.CV_8UC3, 0)
-        dst1 = New cv.Mat(task.workRes, cv.MatType.CV_8UC3, 0)
-        dst2 = New cv.Mat(task.workRes, cv.MatType.CV_8UC3, 0)
-        dst3 = New cv.Mat(task.workRes, cv.MatType.CV_8UC3, 0)
+        dst0 = New Mat(task.workRes, MatType.CV_8UC3, 0)
+        dst1 = New Mat(task.workRes, MatType.CV_8UC3, 0)
+        dst2 = New Mat(task.workRes, MatType.CV_8UC3, 0)
+        dst3 = New Mat(task.workRes, MatType.CV_8UC3, 0)
 
         standalone = traceName = task.Settings.algorithm
         callStack = callStack.Replace("at Startup\", "")
@@ -99,29 +99,29 @@ Public Class TaskParent : Implements IDisposable
         If standalone Or task.cpu.displayObjectName = traceName Then Return True
         Return False
     End Function
-    Public Sub DrawRect(dst As cv.Mat, rect As cv.Rect, color As cv.Scalar)
+    Public Sub DrawRect(dst As Mat, rect as cv.Rect, color As Scalar)
     Rectangle(dst, rect, color, task.lineWidth, task.lineType)
     End Sub
-    Public Sub DrawRect(dst As cv.Mat, rect As cv.Rect)
+    Public Sub DrawRect(dst As Mat, rect as cv.Rect)
     Rectangle(dst, rect, task.highlight, task.lineWidth, task.lineType)
     End Sub
-    Public Shared Function Palettize(input As cv.Mat, Optional first As Byte = 1) As cv.Mat
+    Public Shared Function Palettize(input As Mat, Optional first As Byte = 1) As Mat
         If first = 0 Then
-            task.colorMap.Set(Of cv.Vec3b)(0, 0, New cv.Vec3b(0, 0, 0))
+            task.colorMap.Set(Of Vec3b)(0, 0, New Vec3b(0, 0, 0))
         Else
-            task.colorMap.Set(Of cv.Vec3b)(0, 0, task.vecColors(0))
+            task.colorMap.Set(Of Vec3b)(0, 0, task.vecColors(0))
         End If
-        Dim output As New cv.Mat
-        If input.Type <> cv.MatType.CV_8U Then
-            Dim input8u As New cv.Mat
-            input.ConvertTo(input8u, cv.MatType.CV_8U)
+        Dim output As New Mat
+        If input.Type <> MatType.CV_8U Then
+            Dim input8u As New Mat
+            input.ConvertTo(input8u, MatType.CV_8U)
             ApplyColorMap(input8u, output, task.colorMap)
             Return output
         End If
         ApplyColorMap(input, output, task.colorMap)
         Return output
     End Function
-    Public Function ShowAddweighted(src1 As cv.Mat, src2 As cv.Mat, ByRef label As String) As cv.Mat
+    Public Function ShowAddweighted(src1 As Mat, src2 As Mat, ByRef label As String) As Mat
         Static addw As New AddWeighted_Basics
 
         addw.src2 = src2
@@ -130,8 +130,8 @@ Public Class TaskParent : Implements IDisposable
         label = "AddWeighted: src1 = " + wt.ToString("0%") + " vs. src2 = " + (1 - wt).ToString("0%")
         Return addw.dst2
     End Function
-    Public Shared Sub DrawTour(dst As cv.Mat, contour As List(Of cv.Point), color As cv.Scalar, Optional lineWidth As Integer = -1,
-                            Optional lineType As cv.LineTypes = cv.LineTypes.Link8)
+    Public Shared Sub DrawTour(dst As Mat, contour As List(Of cv.Point), color As Scalar, Optional lineWidth As Integer = -1,
+                            Optional lineType As LineTypes = LineTypes.Link8)
         If contour Is Nothing Then Exit Sub
         If contour.Count < 3 Then Exit Sub ' this is not enough to draw.
         Dim listOfPoints = New List(Of List(Of cv.Point))({contour})

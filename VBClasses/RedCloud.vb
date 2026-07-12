@@ -4,7 +4,7 @@ Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 Public Class RedCloud_Basics : Inherits TaskParent
     Public redCore As New RedCloud_Core
     Public rcList As New List(Of rcDataOld)
-    Public rcMap As cv.Mat = New cv.Mat(dst2.Size, cv.MatType.CV_32S, 0)
+    Public rcMap As Mat = New Mat(dst2.Size, MatType.CV_32S, 0)
     Public options As New Options_RedCloud
     Public keyColors As New KeyColor_Reduction
     Public runSelectCell As Boolean = True
@@ -20,7 +20,7 @@ Public Class RedCloud_Basics : Inherits TaskParent
         labels(3) = redCore.labels(3)
 
         Dim rcListLast As New List(Of rcDataOld)(rcList)
-        Dim rcMapLast As cv.Mat = rcMap.Clone
+        Dim rcMapLast As Mat = rcMap.Clone
 
         rcList.Clear()
         rcMap.SetTo(0)
@@ -28,7 +28,7 @@ Public Class RedCloud_Basics : Inherits TaskParent
         Dim matchCount As Integer
         Dim unMatched As Integer
         Dim matchAverage As Single
-        Dim blackVec As New cv.Vec3b
+        Dim blackVec As New Vec3b
         For Each rc In redCore.rcList
             rc = Utility_Basics.rcDataMatch(rc, rcListLast, rcMapLast)
 
@@ -40,7 +40,7 @@ Public Class RedCloud_Basics : Inherits TaskParent
             rcList.Add(rc)
 
             If task.heartBeat Then
-                Dim color = keyColors.dst2.Get(Of cv.Vec3b)(rc.maxDist.Y, rc.maxDist.X)
+                Dim color = keyColors.dst2.Get(Of Vec3b)(rc.maxDist.Y, rc.maxDist.X)
                 If color <> blackVec Then rc.color = color
             End If
             dst2(rc.rect).SetTo(rc.color, rc.mask)
@@ -72,14 +72,14 @@ Public Class RedCloud_Core : Inherits TaskParent
     Public prepEdges As New RedPrep_Basics
     Public rcList As New List(Of rcDataOld)
     Public Sub New()
-        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        dst2 = New Mat(dst2.Size, MatType.CV_8U, 0)
         desc = "Find the biggest chunks of consistent depth data "
     End Sub
-    Public Shared Function sweepImage(input As cv.Mat, minSize As Integer) As List(Of rcDataOld)
+    Public Shared Function sweepImage(input As Mat, minSize As Integer) As List(Of rcDataOld)
         Dim index As Integer = 1
         Dim rect As New cv.Rect
-        Dim mask = New cv.Mat(New cv.Size(input.Width + 2, input.Height + 2), cv.MatType.CV_8U, 0)
-        Dim flags As cv.FloodFillFlags = cv.FloodFillFlags.Link4
+        Dim mask = New Mat(New Size(input.Width + 2, input.Height + 2), MatType.CV_8U, 0)
+        Dim flags As FloodFillFlags = FloodFillFlags.Link4
         Dim rc As rcDataOld = Nothing
         Dim newList As New SortedList(Of Integer, rcDataOld)(New compareAllowIdenticalIntegerInverted)
         For y = 0 To input.Height - 1
@@ -132,7 +132,7 @@ End Class
 Public Class XR_RedCloud_Basics : Inherits TaskParent
     Public redC As New RedColor_Basics
     Public rcList As New List(Of rcDataOld)
-    Public rcMap As cv.Mat
+    Public rcMap As Mat
     Public Sub New()
         desc = "Assign abstract world coordinates to each RedCloud cell."
     End Sub
@@ -185,7 +185,7 @@ Public Class XR_RedCloud_CellDepthHistogram : Inherits TaskParent
 
         labels(3) = "Select a RedCloud cell to see the histogram"
 
-        Dim depth As cv.Mat = task.pcSplit(2)(task.rcD.rect)
+        Dim depth As Mat = task.pcSplit(2)(task.rcD.rect)
         depth.SetTo(0, task.noDepthMask(task.rcD.rect))
         ImShow("depth", depth)
         plot.minRange = 0
@@ -196,7 +196,7 @@ Public Class XR_RedCloud_CellDepthHistogram : Inherits TaskParent
         Dim incr = dst2.Width / task.MaxZmeters
         For i = 1 To CInt(task.MaxZmeters - 1)
             Dim x = incr * i
-            Line(dst3, New cv.Point(x, 0), New cv.Point(x, dst2.Height), cv.Scalar.White, task.lineWidth, task.lineType)
+            Line(dst3, New cv.Point(x, 0), New cv.Point(x, dst2.Height), Scalar.White, task.lineWidth, task.lineType)
         Next
         dst3 = plot.dst2
     End Sub
@@ -255,8 +255,8 @@ Public Class RedCloud_KNN : Inherits TaskParent
             For Each pt In rc.contour
                 knn.trainInput.Add(pt)
             Next
-            knn.queries = New List(Of cv.Point2f)({New cv.Point2f(0, 0), New cv.Point2f(rc.rect.Width, 0),
-                                  New cv.Point2f(rc.rect.Width, rc.rect.Height), New cv.Point2f(0, rc.rect.Height)})
+            knn.queries = New List(Of Point2f)({New Point2f(0, 0), New Point2f(rc.rect.Width, 0),
+                                  New Point2f(rc.rect.Width, rc.rect.Height), New Point2f(0, rc.rect.Height)})
             knn.Run(Nothing)
 
             listOfPoints.Clear()
@@ -414,8 +414,8 @@ Public Class RedCloud_Flood_CPP : Inherits TaskParent
     Implements IDisposable
     Public classCount As Integer
     Public rcList As New List(Of rcDataOld)
-    Public rcMap As cv.Mat = New cv.Mat(dst2.Size, cv.MatType.CV_32S, 0)
-    Public wGridList As New List(Of cv.Point3d)
+    Public rcMap As Mat = New Mat(dst2.Size, MatType.CV_32S, 0)
+    Public wGridList As New List(Of Point3d)
     Public options As New Options_RedCloud
     Public keyColors As New KeyColor_Reduction
     Public Sub New()
@@ -429,8 +429,8 @@ Public Class RedCloud_Flood_CPP : Inherits TaskParent
         If src.Channels <> 1 Then
             Static prepData As New RedPrep_Core
             prepData.Run(src)
-            Normalize(prepData.reduced32f, dst1, 255, 0, cv.NormTypes.MinMax)
-            dst1.ConvertTo(dst1, cv.MatType.CV_8U)
+            Normalize(prepData.reduced32f, dst1, 255, 0, NormTypes.MinMax)
+            dst1.ConvertTo(dst1, MatType.CV_8U)
         Else
             dst1 = src
         End If
@@ -444,18 +444,18 @@ Public Class RedCloud_Flood_CPP : Inherits TaskParent
         handleInput.Free()
 
         Dim rMask = New cv.Rect(1, 1, dst1.Width, dst1.Height)
-        Dim mask = cv.Mat.FromPixelData(dst1.Rows + 2, dst1.Cols + 2, cv.MatType.CV_8U, imagePtr)
+        Dim mask = Mat.FromPixelData(dst1.Rows + 2, dst1.Cols + 2, MatType.CV_8U, imagePtr)
         dst0 = mask(rMask).Clone
 
         classCount = RedCloudFill_Count(cPtr)
         If classCount = 0 Then Exit Sub ' no data to process.
 
-        Dim rectData = cv.Mat.FromPixelData(classCount, 1, cv.MatType.CV_32SC4, RedCloudFill_Rects(cPtr))
-        Dim rects(classCount - 1) As cv.Rect
-        rectData.GetArray(Of cv.Rect)(rects)
+        Dim rectData = Mat.FromPixelData(classCount, 1, MatType.CV_32SC4, RedCloudFill_Rects(cPtr))
+        Dim rects(classCount - 1) as cv.Rect
+        rectData.GetArray(of cv.Rect)(rects)
 
         Dim rcListLast = New List(Of rcDataOld)(rcList)
-        Dim rcMapLast As cv.Mat = rcMap.Clone
+        Dim rcMapLast As Mat = rcMap.Clone
 
         Dim index As Integer = 1
         Dim newList As New SortedList(Of Integer, rcDataOld)(New compareAllowIdenticalIntegerInverted)
@@ -466,12 +466,12 @@ Public Class RedCloud_Flood_CPP : Inherits TaskParent
         Next
 
         rcList.Clear()
-        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8UC3, 0)
+        dst2 = New Mat(dst2.Size, MatType.CV_8UC3, 0)
         Dim matchCount As Integer
         Dim unMatched As Integer
         Dim matchAverage As Single
         dst3.SetTo(0)
-        Dim blackVec As New cv.Vec3b
+        Dim blackVec As New Vec3b
         rcMap.SetTo(0)
         For i = 0 To newList.Values.Count - 1
             Dim rc = newList.Values(i)
@@ -484,7 +484,7 @@ Public Class RedCloud_Flood_CPP : Inherits TaskParent
             rc.mapID = rcList.Count + 1
 
             If task.heartBeat Then
-                Dim color = keyColors.dst2.Get(Of cv.Vec3b)(rc.maxDist.Y, rc.maxDist.X)
+                Dim color = keyColors.dst2.Get(Of Vec3b)(rc.maxDist.Y, rc.maxDist.X)
                 If color <> blackVec Then rc.color = color
             End If
 
@@ -530,10 +530,10 @@ End Class
 Public Class RedCloud_MotionFilter : Inherits TaskParent
     Dim redC As New RedCloud_Basics
     Public rcList As New List(Of rcDataOld)
-    Public rcMap As New cv.Mat(dst2.Size, cv.MatType.CV_32S, 0)
+    Public rcMap As New Mat(dst2.Size, MatType.CV_32S, 0)
     Dim pcMotion As New Motion_CloudPixel
     Public Sub New()
-        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
+        dst1 = New Mat(dst1.Size, MatType.CV_8U, 0)
         desc = "Filter changes to the RedCloud cells with motion."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -543,13 +543,13 @@ Public Class RedCloud_MotionFilter : Inherits TaskParent
         dst2 = redC.dst2
         labels(2) = redC.labels(2)
 
-        redC.rcMap.ConvertTo(dst0, cv.MatType.CV_8U)
+        redC.rcMap.ConvertTo(dst0, MatType.CV_8U)
         dst1.SetTo(0)
         dst0.CopyTo(dst1, pcMotion.dst2)
 
-        Dim histogram As New cv.Mat
-        Dim ranges() As cv.Rangef = New cv.Rangef() {New cv.Rangef(0, redC.rcList.Count + 1)}
-        CalcHist({dst1}, {0}, New cv.Mat, histogram, 1, {redC.rcList.Count}, ranges)
+        Dim histogram As New Mat
+        Dim ranges() As Rangef = New Rangef() {New Rangef(0, redC.rcList.Count + 1)}
+        CalcHist({dst1}, {0}, New Mat, histogram, 1, {redC.rcList.Count}, ranges)
 
         Dim count = CountNonZero(histogram)
         SetTrueText(CStr(count) + " cells had motion.", 3)

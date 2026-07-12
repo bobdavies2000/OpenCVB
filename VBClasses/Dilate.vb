@@ -31,7 +31,7 @@ Public Class XR_Dilate_OpenClose : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
-        Dim openClose = If(options.iterations > 0, cv.MorphTypes.Open, cv.MorphTypes.Close)
+        Dim openClose = If(options.iterations > 0, MorphTypes.Open, MorphTypes.Close)
         MorphologyEx(task.depthRGB, dst3, openClose, options.element)
         MorphologyEx(src, dst2, openClose, options.element)
     End Sub
@@ -52,7 +52,7 @@ Public Class XR_Dilate_Erode : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
-        MorphologyEx(src, dst2, cv.MorphTypes.Open, options.element)
-        MorphologyEx(dst2, dst2, cv.MorphTypes.Close, options.element)
+        MorphologyEx(src, dst2, MorphTypes.Open, options.element)
+        MorphologyEx(dst2, dst2, MorphTypes.Close, options.element)
     End Sub
 End Class

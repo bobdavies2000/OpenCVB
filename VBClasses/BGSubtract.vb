@@ -23,7 +23,7 @@ Public Class BGSubtract_Basics : Inherits TaskParent
         Dim imagePtr = BGSubtract_BGFG_Run(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, src.Channels, options.learnRate)
         handleSrc.Free()
 
-        dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, cv.MatType.CV_8UC1, imagePtr)
+        dst2 = Mat.FromPixelData(src.Rows, src.Cols, MatType.CV_8UC1, imagePtr)
         labels(2) = options.methodDesc
     End Sub
     Protected Overrides Sub Finalize()
@@ -51,7 +51,7 @@ Public Class XR_BGSubtract_Basics_QT : Inherits TaskParent
         Dim imagePtr = BGSubtract_BGFG_Run(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, src.Channels, learnRate)
         handleSrc.Free()
 
-        dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, cv.MatType.CV_8UC1, imagePtr)
+        dst2 = Mat.FromPixelData(src.Rows, src.Cols, MatType.CV_8UC1, imagePtr)
     End Sub
     Protected Overrides Sub Finalize()
         If cPtr <> 0 Then cPtr = BGSubtract_BGFG_Close(cPtr)
@@ -68,10 +68,10 @@ End Class
 
 Public Class BGSubtract_MOG2 : Inherits TaskParent
     Implements IDisposable
-    Dim MOG2 As cv.BackgroundSubtractorMOG2
+    Dim MOG2 As BackgroundSubtractorMOG2
     Dim options As New Options_BGSubtract
     Public Sub New()
-        MOG2 = cv.BackgroundSubtractorMOG2.Create()
+        MOG2 = BackgroundSubtractorMOG2.Create()
         desc = "Subtract background using a mixture of Gaussians"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -92,9 +92,9 @@ End Class
 
 Public Class XR_BGSubtract_MOG2_QT : Inherits TaskParent
     Implements IDisposable
-    Dim MOG2 As cv.BackgroundSubtractorMOG2
+    Dim MOG2 As BackgroundSubtractorMOG2
     Public Sub New()
-        MOG2 = cv.BackgroundSubtractorMOG2.Create()
+        MOG2 = BackgroundSubtractorMOG2.Create()
         desc = "Subtract background using a mixture of Gaussians - the QT version"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -135,10 +135,10 @@ Public Class XR_BGSubtract_MotionDetect : Inherits TaskParent
             taskArray(i) = System.Threading.Tasks.Task.Factory.StartNew(
                     Sub()
                         Dim roi = New cv.Rect((section Mod xfactor) * width, height * Math.Floor(section / yfactor), width, height)
-                        Dim correlation As New cv.Mat
+                        Dim correlation As New Mat
                         If roi.X + roi.Width > dst3.Width Then roi.Width = dst3.Width - roi.X - 1
                         If roi.Y + roi.Height > dst3.Height Then roi.Height = dst3.Height - roi.Y - 1
-                        MatchTemplate(src(roi), dst3(roi), correlation, cv.TemplateMatchModes.CCoeffNormed)
+                        MatchTemplate(src(roi), dst3(roi), correlation, TemplateMatchModes.CCoeffNormed)
                         If options.CCthreshold > correlation.Get(Of Single)(0, 0) Then
                             src(roi).CopyTo(dst2(roi))
                             src(roi).CopyTo(dst3(roi))
@@ -156,10 +156,10 @@ End Class
 
 Public Class BGSubtract_MOG : Inherits TaskParent
     Implements IDisposable
-    Dim MOG As cv.BackgroundSubtractorMOG
+    Dim MOG As BackgroundSubtractorMOG
     Dim options As New Options_BGSubtract
     Public Sub New()
-        MOG = cv.BackgroundSubtractorMOG.Create()
+        MOG = BackgroundSubtractorMOG.Create()
         desc = "Subtract background using a mixture of Gaussians"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -179,12 +179,12 @@ End Class
 
 Public Class XR_BGSubtract_GMG_KNN : Inherits TaskParent
     Implements IDisposable
-    Dim gmg As cv.BackgroundSubtractorGMG
-    Dim knn As cv.BackgroundSubtractorKNN
+    Dim gmg As BackgroundSubtractorGMG
+    Dim knn As BackgroundSubtractorKNN
     Dim options As New Options_BGSubtract
     Public Sub New()
-        gmg = cv.BackgroundSubtractorGMG.Create()
-        knn = cv.BackgroundSubtractorKNN.Create()
+        gmg = BackgroundSubtractorGMG.Create()
+        knn = BackgroundSubtractorKNN.Create()
         desc = "GMG and KNN API's to subtract background"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -211,21 +211,21 @@ End Class
 
 Public Class XR_BGSubtract_MOG_RGBDepth : Inherits TaskParent
     Implements IDisposable
-    Public grayMat As New cv.Mat
+    Public grayMat As New Mat
     Dim options As New Options_BGSubtract
-    Dim MOGDepth As cv.BackgroundSubtractorMOG
-    Dim MOGRGB As cv.BackgroundSubtractorMOG
+    Dim MOGDepth As BackgroundSubtractorMOG
+    Dim MOGRGB As BackgroundSubtractorMOG
     Public Sub New()
-        MOGDepth = cv.BackgroundSubtractorMOG.Create()
-        MOGRGB = cv.BackgroundSubtractorMOG.Create()
+        MOGDepth = BackgroundSubtractorMOG.Create()
+        MOGRGB = BackgroundSubtractorMOG.Create()
         labels = {"", "", "Unstable depth", "Unstable color (if there is motion)"}
         desc = "Isolate motion in both depth and color data using a mixture of Gaussians"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
-        CvtColor(task.depthRGB, grayMat, cv.ColorConversionCodes.BGR2GRAY)
+        CvtColor(task.depthRGB, grayMat, ColorConversionCodes.BGR2GRAY)
         MOGDepth.Apply(grayMat, grayMat, options.learnRate)
-        CvtColor(grayMat, dst2, cv.ColorConversionCodes.GRAY2BGR)
+        CvtColor(grayMat, dst2, ColorConversionCodes.GRAY2BGR)
 
         MOGRGB.Apply(task.gray, dst3, options.learnRate)
     End Sub
@@ -303,7 +303,7 @@ Public Class BGSubtract_Synthetic_CPP : Inherits TaskParent
             handleSrc.Free()
         End If
         Dim imagePtr = BGSubtract_Synthetic_Run(cPtr)
-        If imagePtr <> 0 Then dst2 = cv.Mat.FromPixelData(dst2.Rows, dst2.Cols, cv.MatType.CV_8UC3, imagePtr).Clone
+        If imagePtr <> 0 Then dst2 = Mat.FromPixelData(dst2.Rows, dst2.Cols, MatType.CV_8UC3, imagePtr).Clone
     End Sub
     Protected Overrides Sub Finalize()
         If cPtr <> 0 Then cPtr = BGSubtract_Synthetic_Close(cPtr)

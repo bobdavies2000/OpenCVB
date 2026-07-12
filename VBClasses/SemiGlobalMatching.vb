@@ -26,7 +26,7 @@ Public Class XR_SemiGlobalMatching_CPP : Inherits TaskParent
         'handleLeft.Free()
         'handleRight.Free()
 
-        'Dim dst2 = New cv.Mat(task.leftView.Rows, task.leftView.Cols, cv.MatType.CV_8U, imagePtr)
+        'Dim dst2 = New Mat(task.leftView.Rows, task.leftView.Cols, MatType.CV_8U, imagePtr)
         SetTrueText("This algorithm runs but always returns zero - I don't see my mistake?" + vbCrLf +
                             "Needs work but investing further is not needed - we have disparity from the device.", 3)
     End Sub

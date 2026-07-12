@@ -64,7 +64,7 @@ End Class
 
 Public Class OpAuto_Peaks2D : Inherits TaskParent
     Public options As New Options_Boundary
-    Public clusterPoints As New List(Of cv.Point2f)
+    Public clusterPoints As New List(Of Point2f)
     Dim heatmap As New HeatMap_Basics
     Public Sub New()
         If standalone Then task.gOptions.setHistogramBins(255)
@@ -104,7 +104,7 @@ End Class
 
 
 Public Class OpAuto_Peaks2DGrid : Inherits TaskParent
-    Public clusterPoints As New List(Of cv.Point2f)
+    Public clusterPoints As New List(Of Point2f)
     Dim options As New Options_Boundary
     Dim hist2d As New Hist2D_Basics
     Public Sub New()
@@ -117,7 +117,7 @@ Public Class OpAuto_Peaks2DGrid : Inherits TaskParent
         Dim desiredBoundaries = boundarySlider.value
 
         ' input should be a 2D histogram.  If standaloneTest() or src is not a histogram, get one...
-        If standaloneTest() Or src.Type = cv.MatType.CV_8UC3 Then
+        If standaloneTest() Or src.Type = MatType.CV_8UC3 Then
             hist2d.Run(src)
             src = hist2d.histogram
             dst2.SetTo(0)

@@ -22,7 +22,7 @@ Public Class Neighbor_Basics : Inherits TaskParent
         For Each rc In redC.rcList
             knn.queries.Add(rc.maxDist)
         Next
-        knn.trainInput = New List(Of cv.Point2f)(knn.queries)
+        knn.trainInput = New List(Of Point2f)(knn.queries)
         knn.Run(src)
 
         nabs.Clear()
@@ -58,7 +58,7 @@ Public Class Neighbor_Intersects8u : Inherits TaskParent
         desc = "Find the corner points where multiple cells intersect."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If standaloneTest() Or src.Type <> cv.MatType.CV_32S Then
+        If standaloneTest() Or src.Type <> MatType.CV_32S Then
             Static redC As New RedColor_Basics
             redC.Run(src)
             dst2 = redC.dst2
@@ -92,7 +92,7 @@ Public Class Neighbor_Intersects8u : Inherits TaskParent
             dst3 = task.color.Clone
             For Each pt In nPoints
             Circle(dst2, pt, task.DotSize, task.highlight, -1, task.lineType)
-            Circle(dst3, pt, task.DotSize, cv.Scalar.Yellow, -1, task.lineType)
+            Circle(dst3, pt, task.DotSize, Scalar.Yellow, -1, task.lineType)
             Next
         End If
 
@@ -112,7 +112,7 @@ Public Class Neighbor_Intersects32S : Inherits TaskParent
         desc = "Find the corner points where multiple cells intersect."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If standaloneTest() Or src.Type <> cv.MatType.CV_32S Then
+        If standaloneTest() Or src.Type <> MatType.CV_32S Then
             Static redC As New RedCloud_Basics
             redC.Run(src)
             dst2 = redC.dst2
@@ -146,7 +146,7 @@ Public Class Neighbor_Intersects32S : Inherits TaskParent
             dst3 = task.color.Clone
             For Each pt In nPoints
             Circle(dst2, pt, task.DotSize, task.highlight, -1, task.lineType)
-            Circle(dst3, pt, task.DotSize, cv.Scalar.Yellow, -1, task.lineType)
+            Circle(dst3, pt, task.DotSize, Scalar.Yellow, -1, task.lineType)
             Next
         End If
 
@@ -215,7 +215,7 @@ Public Class Neighbor_Precise : Inherits TaskParent
         SetTrueText("Review the Neighbor_Precise algorithm")
 
         'If nabCount > 0 Then
-        '    Dim nabData = New cv.Mat(nabCount, 1, cv.MatType.CV_32SC2, Neighbor_NabList(cPtr))
+        '    Dim nabData = New Mat(nabCount, 1, MatType.CV_32SC2, Neighbor_NabList(cPtr))
         '    nabList.Clear()
         '    For i = 0 To rclist.Count - 1
         '        nabList.Add(New List(Of Integer))

@@ -7,7 +7,7 @@ Public Class XR_Concat_Basics : Inherits TaskParent
         desc = "Concatenate 2 images - horizontally and vertically"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        Dim tmp As New cv.Mat
+        Dim tmp As New Mat
         HConcat(src, task.depthRGB, tmp)
         Resize(tmp, dst2, src.Size())
         VConcat(src, task.depthRGB, tmp)
@@ -19,10 +19,10 @@ End Class
 
 
 Public Class XR_Concat_4way : Inherits TaskParent
-    Public img(3) As cv.Mat
+    Public img(3) As Mat
     Public Sub New()
         For i = 0 To img.Length - 1
-            img(i) = New cv.Mat
+            img(i) = New Mat
         Next
         labels(2) = "Color/RGBDepth/Left/Right views"
         desc = "Concatenate 4 images - horizontally and vertically"
@@ -31,14 +31,14 @@ Public Class XR_Concat_4way : Inherits TaskParent
         If standaloneTest() Then
             img(0) = src
             img(1) = task.depthRGB
-            Dim _cvtLeft As New cv.Mat
-            CvtColor(task.leftView, _cvtLeft, cv.ColorConversionCodes.GRAY2BGR)
+            Dim _cvtLeft As New Mat
+            CvtColor(task.leftView, _cvtLeft, ColorConversionCodes.GRAY2BGR)
             img(2) = If(task.leftView.Channels() = 1, _cvtLeft, task.leftView)
-            Dim _cvtRight As New cv.Mat
-            CvtColor(task.rightView, _cvtRight, cv.ColorConversionCodes.GRAY2BGR)
+            Dim _cvtRight As New Mat
+            CvtColor(task.rightView, _cvtRight, ColorConversionCodes.GRAY2BGR)
             img(3) = If(task.rightView.Channels() = 1, _cvtRight, task.rightView)
         End If
-        Dim tmp1 As New cv.Mat, tmp2 As New cv.Mat, tmp3 As New cv.Mat
+        Dim tmp1 As New Mat, tmp2 As New Mat, tmp3 As New Mat
         HConcat(img(0), img(1), tmp1)
         HConcat(img(2), img(3), tmp2)
         VConcat(tmp1, tmp2, tmp3)

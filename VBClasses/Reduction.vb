@@ -65,8 +65,8 @@ Public Class XR_Reduction_HeatMapLines1 : Inherits TaskParent
         reduction.Run(src)
         heat.Run(src)
 
-        Dim _core_cvt As New cv.Mat
-        CvtColor(heat.dst2, _core_cvt, cv.ColorConversionCodes.BGR2GRAY)
+        Dim _core_cvt As New Mat
+        CvtColor(heat.dst2, _core_cvt, ColorConversionCodes.BGR2GRAY)
         core.Run(_core_cvt)
 
         setupTop.Run(heat.dst2)
@@ -76,7 +76,7 @@ Public Class XR_Reduction_HeatMapLines1 : Inherits TaskParent
             Line(dst2, lp.p1, lp.p2, white, task.lineWidth)
         Next
 
-        CvtColor(heat.dst3, _core_cvt, cv.ColorConversionCodes.BGR2GRAY)
+        CvtColor(heat.dst3, _core_cvt, ColorConversionCodes.BGR2GRAY)
         core.Run(_core_cvt)
 
         setupSide.Run(heat.dst3)
@@ -127,20 +127,20 @@ Public Class XR_Reduction_XYZ : Inherits TaskParent
     Dim reduction As New Reduction_Basics
     Dim options As New Options_ReductionXYZ
     Public Sub New()
-        desc = "Use reduction to slice the point cloud in 3 dimensions"
+        desc = "Use reduction to slice the cv.Point cloud in 3 dimensions"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
 
-        If src.Type <> cv.MatType.CV_32FC3 Then src = task.pointCloud
-        Dim splitMats() As cv.Mat = Split(src)
+        If src.Type <> MatType.CV_32FC3 Then src = task.pointCloud
+        Dim splitMats() As Mat = Split(src)
         For i = 0 To splitMats.Length - 1
             If options.reduceXYZ(i) Then
                 splitMats(i) *= 1000
-                splitMats(i).ConvertTo(dst0, cv.MatType.CV_32S)
+                splitMats(i).ConvertTo(dst0, MatType.CV_32S)
                 reduction.Run(dst0)
                 Dim mm As mmData = GetMinMax(reduction.dst2)
-                reduction.dst2.ConvertTo(splitMats(i), cv.MatType.CV_32F)
+                reduction.dst2.ConvertTo(splitMats(i), MatType.CV_32F)
             End If
         Next
 
@@ -186,7 +186,7 @@ Public Class XR_Reduction_BGR : Inherits TaskParent
         desc = "Reduce BGR image in parallel"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        Dim splitMats() As cv.Mat = Split(src)
+        Dim splitMats() As Mat = Split(src)
 
         For i = 0 To 2
             reduction.Run(splitMats(i))
@@ -225,7 +225,7 @@ Public Class XR_Reduction_MotionTest : Inherits TaskParent
         Else
             dst2.CopyTo(dst3, task.motion.motionMask)
 
-            CvtColor(dst2, diff.lastFrame, cv.ColorConversionCodes.BGR2GRAY)
+            CvtColor(dst2, diff.lastFrame, ColorConversionCodes.BGR2GRAY)
             diff.Run(dst3)
             dst1 = diff.dst2
         End If
@@ -244,14 +244,14 @@ Public Class Reduction_PointCloud : Inherits TaskParent
         desc = "Use reduction to smooth depth data"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If src.Type <> cv.MatType.CV_32FC3 Then src = task.pcSplit(2)
+        If src.Type <> MatType.CV_32FC3 Then src = task.pcSplit(2)
 
         src *= 255 / task.MaxZmeters
-        src.ConvertTo(dst0, cv.MatType.CV_32S)
+        src.ConvertTo(dst0, MatType.CV_32S)
         reduction.Run(dst0)
-        reduction.dst2.ConvertTo(dst2, cv.MatType.CV_32F)
+        reduction.dst2.ConvertTo(dst2, MatType.CV_32F)
 
-        dst2.ConvertTo(dst2, cv.MatType.CV_8U)
+        dst2.ConvertTo(dst2, MatType.CV_8U)
         dst3 = Palettize(dst2 + 1)
     End Sub
 End Class

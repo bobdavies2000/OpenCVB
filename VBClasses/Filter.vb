@@ -30,8 +30,8 @@ Public Class Filter_Basics_TA : Inherits TaskParent
             dst2 = filters(filterIndex).dst2
         End If
 
-        Dim _grayFilter_cvt As New cv.Mat
-        CvtColor(dst2, _grayFilter_cvt, cv.ColorConversionCodes.BGR2GRAY)
+        Dim _grayFilter_cvt As New Mat
+        CvtColor(dst2, _grayFilter_cvt, ColorConversionCodes.BGR2GRAY)
         grayFilter.Run(_grayFilter_cvt)
         labels(3) = grayFilter.labels(2)
         dst3 = grayFilter.dst2
@@ -105,9 +105,9 @@ Public Class Filter_Laplacian : Inherits TaskParent
         desc = "Use a filter to approximate the Laplacian derivative."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        Dim imgLaplacian As New cv.Mat
-        Filter2D(src, imgLaplacian, cv.MatType.CV_32F, cv.Mat.FromPixelData(3, 3, cv.MatType.CV_32FC1, New Single() {1, 1, 1, 1, -8, 1, 1, 1, 1}))
-        src.ConvertTo(dst1, cv.MatType.CV_32F)
+        Dim imgLaplacian As New Mat
+        Filter2D(src, imgLaplacian, MatType.CV_32F, Mat.FromPixelData(3, 3, MatType.CV_32FC1, New Single() {1, 1, 1, 1, -8, 1, 1, 1, 1}))
+        src.ConvertTo(dst1, MatType.CV_32F)
         dst0 = (dst1 - imgLaplacian).ToMat
         dst0.ConvertTo(dst2, src.Type)
         imgLaplacian.ConvertTo(dst3, src.Type)
@@ -134,9 +134,9 @@ Public Class XR_Filter_NormalizedKernel : Inherits TaskParent
         Next
         labels(2) = "kernel sum = " + sum.ToString(fmt3)
 
-        Dim dst32f As New cv.Mat
-        Filter2D(src, dst32f, cv.MatType.CV_32FC1, options.kernel, anchor:=New cv.Point(0, 0))
-        dst32f.ConvertTo(dst2, cv.MatType.CV_8UC3)
+        Dim dst32f As New Mat
+        Filter2D(src, dst32f, MatType.CV_32FC1, options.kernel, anchor:=New cv.Point(0, 0))
+        dst32f.ConvertTo(dst2, MatType.CV_8UC3)
     End Sub
 End Class
 
@@ -154,7 +154,7 @@ Public Class XR_Filter_Normalized2D : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
         Dim kernelSize As Integer = If(standaloneTest(), (task.frameCount Mod 20) + 1, options.kernelSize)
-        Dim kernel = New cv.Mat(kernelSize, kernelSize, cv.MatType.CV_32F).SetTo(1 / (kernelSize * kernelSize))
+        Dim kernel = New Mat(kernelSize, kernelSize, MatType.CV_32F).SetTo(1 / (kernelSize * kernelSize))
         Filter2D(src, dst2, -1, kernel)
         labels(2) = "Normalized KernelSize = " + CStr(kernelSize)
     End Sub
@@ -177,14 +177,14 @@ Public Class XR_Filter_SepFilter2D : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
         Dim kernel = GetGaussianKernel(options.xDim, options.sigma)
-        GaussianBlur(src, dst2, New cv.Size(options.xDim, options.yDim), options.sigma)
-        SepFilter2D(src, dst3, cv.MatType.CV_8UC3, kernel, kernel)
+        GaussianBlur(src, dst2, New Size(options.xDim, options.yDim), options.sigma)
+        SepFilter2D(src, dst3, MatType.CV_8UC3, kernel, kernel)
         If options.diffCheck Then
-            Dim graySep As New cv.Mat
-            CvtColor(dst3, graySep, cv.ColorConversionCodes.BGR2GRAY)
-            Dim grayGauss As New cv.Mat
-            CvtColor(dst2, grayGauss, cv.ColorConversionCodes.BGR2GRAY)
-            Threshold((graySep - grayGauss).ToMat, dst3, 0, 255, cv.ThresholdTypes.Binary)
+            Dim graySep As New Mat
+            CvtColor(dst3, graySep, ColorConversionCodes.BGR2GRAY)
+            Dim grayGauss As New Mat
+            CvtColor(dst2, grayGauss, ColorConversionCodes.BGR2GRAY)
+            Threshold((graySep - grayGauss).ToMat, dst3, 0, 255, ThresholdTypes.Binary)
             labels(3) = "Gaussian - SepFilter2D " + CStr(CountNonZero(dst3)) + " pixels different."
         Else
             labels(3) = "SepFilter2D Result"
@@ -206,7 +206,7 @@ Public Class XR_Filter_Minimum : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
         Dim kernelSize As Integer = If(standaloneTest(), (task.frameCount Mod 20) + 1, options.kernelSize)
-        Dim element = GetStructuringElement(cv.MorphShapes.Rect, New cv.Size(kernelSize, kernelSize))
+        Dim element = GetStructuringElement(MorphShapes.Rect, New Size(kernelSize, kernelSize))
         Erode(src, dst2, element)
     End Sub
 End Class
@@ -225,7 +225,7 @@ Public Class XR_Filter_Maximum : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
         Dim kernelSize As Integer = If(standaloneTest(), (task.frameCount Mod 20) + 1, options.kernelSize)
-        Dim element = GetStructuringElement(cv.MorphShapes.Rect, New cv.Size(kernelSize, kernelSize))
+        Dim element = GetStructuringElement(MorphShapes.Rect, New Size(kernelSize, kernelSize))
         Dilate(src, dst2, element)
     End Sub
 End Class
@@ -244,7 +244,7 @@ Public Class XR_Filter_Mean : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
         Dim kernelSize As Integer = If(standaloneTest(), (task.frameCount Mod 20) + 1, options.kernelSize)
-        Dim kernel = (cv.Mat.Ones(cv.MatType.CV_32FC1, kernelSize, kernelSize) / (kernelSize * kernelSize)).ToMat
+        Dim kernel = (Mat.Ones(MatType.CV_32FC1, kernelSize, kernelSize) / (kernelSize * kernelSize)).ToMat
         Filter2D(src, dst2, -1, kernel)
     End Sub
 End Class

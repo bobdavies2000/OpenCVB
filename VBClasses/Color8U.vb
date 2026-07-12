@@ -4,7 +4,7 @@ Public Class Color8U_Basics : Inherits TaskParent
     Public classifier As Object
     Dim colorMethods(task.fOptions.colorMethods.Count) As Object
     Public Sub New()
-        dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, 0)
+        dst2 = New Mat(dst2.Size(), MatType.CV_8U, 0)
         desc = "Classify pixels by color using a variety of techniques"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -34,7 +34,7 @@ Public Class Color8U_Basics : Inherits TaskParent
             classifier = colorMethods(index)
         End If
 
-        classifier.run(If(src.Type = cv.MatType.CV_8U, src, task.gray))
+        classifier.run(If(src.Type = MatType.CV_8U, src, task.gray))
         dst2 = classifier.dst2.clone
 
         classCount = classifier.classCount
@@ -69,11 +69,11 @@ Public Class XR_Color8U_Grayscale : Inherits TaskParent
         If options.useOpenCV Then
             dst2 = task.gray
         Else
-            dst2 = New cv.Mat(src.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
+            dst2 = New Mat(src.Size(), MatType.CV_8U, Scalar.All(0))
             Parallel.For(0, src.Rows,
                     Sub(y)
                         For x = 0 To src.Cols - 1
-                            Dim cc = src.Get(Of cv.Vec3b)(y, x)
+                            Dim cc = src.Get(Of Vec3b)(y, x)
                             dst2.Set(Of Byte)(y, x, CByte((cc(0) * 1140 + cc(1) * 5870 + cc(2) * 2989) / 10000))
                         Next
                     End Sub)
@@ -128,7 +128,7 @@ Public Class XR_Color8U_KMeans : Inherits TaskParent
         colorFmt.Run(src)
         dst0 = colorFmt.dst2
 
-        Dim splitMats() As cv.Mat = Split(dst0)
+        Dim splitMats() As Mat = Split(dst0)
 
         km0.Run(splitMats(0))
         dst1 = km0.dst2 * 255 / km0.classCount
@@ -162,10 +162,10 @@ Public Class XR_Color8U_RedHue : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
 
-        Dim hsv As New cv.Mat
-        CvtColor(src, hsv, cv.ColorConversionCodes.BGR2HSV)
-        Dim mask As New cv.Mat
-        InRange(hsv, options.camSBins, New cv.Scalar(180, 255, options.camMax), mask)
+        Dim hsv As New Mat
+        CvtColor(src, hsv, ColorConversionCodes.BGR2HSV)
+        Dim mask As New Mat
+        InRange(hsv, options.camSBins, New Scalar(180, 255, options.camMax), mask)
         dst2.SetTo(0)
         src.CopyTo(dst2, mask)
     End Sub
@@ -185,12 +185,12 @@ Public Class Color8U_Complementary : Inherits TaskParent
         desc = "Display the current image in complementary colors"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        Dim hsv As New cv.Mat
-        CvtColor(src, hsv, cv.ColorConversionCodes.BGR2HSV)
-        Dim splitMats() As cv.Mat = Split(hsv)
+        Dim hsv As New Mat
+        CvtColor(src, hsv, ColorConversionCodes.BGR2HSV)
+        Dim splitMats() As Mat = Split(hsv)
         splitMats(0) += 90 Mod 180
         Merge(splitMats, dst3)
-        CvtColor(dst3, dst2, cv.ColorConversionCodes.HSV2BGR)
+        CvtColor(dst3, dst2, ColorConversionCodes.HSV2BGR)
     End Sub
 End Class
 
@@ -232,8 +232,8 @@ Public Class XR_Color8U_InRange : Inherits TaskParent
         desc = "Use inRange to isolate colors from the background"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        dst2 = ImRead(task.homeDir + "Data/1.jpg", cv.ImreadModes.Grayscale)
-                  InRange(dst2, 105, 165, dst1) ' should make this a slider and experiment further...
+        dst2 = ImRead(task.homeDir + "Data/1.jpg", ImreadModes.Grayscale)
+        InRange(dst2, 105, 165, dst1) ' should make this a slider and experiment further...
         dst3 = dst2.Clone
         dst3.SetTo(0, dst1)
     End Sub
@@ -258,9 +258,9 @@ Public Class XR_Color8U_TopX : Inherits TaskParent
         topX.mapTopX = options.topXcount
         topX.Run(src)
 
-        Dim top As New List(Of cv.Vec3b)
+        Dim top As New List(Of Vec3b)
         For Each pt In topX.topXPixels
-            top.Add(New cv.Vec3b(pt.X, pt.Y, pt.Z))
+            top.Add(New Vec3b(pt.X, pt.Y, pt.Z))
         Next
 
         dst2 = src.Clone
@@ -268,12 +268,12 @@ Public Class XR_Color8U_TopX : Inherits TaskParent
             For x = 0 To src.Cols - 1
                 Dim distances As New List(Of Single)
                 For Each pt In top
-                    Dim vec = src.Get(Of cv.Vec3b)(y, x)
-                    distances.Add(Distance_Basics.distance3D(pt, New cv.Vec3b(vec.Item0, vec.Item1, vec.Item2)))
+                    Dim vec = src.Get(Of Vec3b)(y, x)
+                    distances.Add(Distance_Basics.distance3D(pt, New Vec3b(vec.Item0, vec.Item1, vec.Item2)))
                 Next
                 If distances.Count > 0 Then
                     Dim best = top(distances.IndexOf(distances.Min))
-                    dst2.Set(Of cv.Vec3b)(y, x, New cv.Vec3b(best.Item0, best.Item1, best.Item2))
+                    dst2.Set(Of Vec3b)(y, x, New Vec3b(best.Item0, best.Item1, best.Item2))
                 End If
             Next
         Next
@@ -289,12 +289,12 @@ End Class
 
 ' https://github.com/AjinkyaChavan9/RGB-Color-Classifier-with-Deep-Learning-using-Keras-and-Tensorflow
 Public Class XR_Color8U_Common : Inherits TaskParent
-    Dim common As New List(Of cv.Vec3b)
-    Dim commonScalar As List(Of cv.Scalar) = {cv.Scalar.Blue, cv.Scalar.Green, cv.Scalar.Red, cv.Scalar.Yellow, cv.Scalar.Pink, cv.Scalar.Purple, cv.Scalar.Brown,
-                                                  cv.Scalar.Gray, cv.Scalar.Black, white}.ToList
+    Dim common As New List(Of Vec3b)
+    Dim commonScalar As List(Of Scalar) = {Scalar.Blue, Scalar.Green, Scalar.Red, Scalar.Yellow, Scalar.Pink, Scalar.Purple, Scalar.Brown,
+                                                  Scalar.Gray, Scalar.Black, white}.ToList
     Public Sub New()
         For Each c In commonScalar
-            common.Add(New cv.Vec3b(c(0), c(1), c(2)))
+            common.Add(New Vec3b(c(0), c(1), c(2)))
         Next
         desc = "Classify every BGR pixel into some common colors"
     End Sub
@@ -303,11 +303,11 @@ Public Class XR_Color8U_Common : Inherits TaskParent
             For x = 0 To src.Cols - 1
                 Dim distances As New List(Of Single)
                 For Each pt In common
-                    Dim vec = src.Get(Of cv.Vec3b)(y, x)
-                    distances.Add(Distance_Basics.distance3D(pt, New cv.Vec3b(vec.Item0, vec.Item1, vec.Item2)))
+                    Dim vec = src.Get(Of Vec3b)(y, x)
+                    distances.Add(Distance_Basics.distance3D(pt, New Vec3b(vec.Item0, vec.Item1, vec.Item2)))
                 Next
                 Dim best = common(distances.IndexOf(distances.Min))
-                dst2.Set(Of cv.Vec3b)(y, x, New cv.Vec3b(best.Item0, best.Item1, best.Item2))
+                dst2.Set(Of Vec3b)(y, x, New Vec3b(best.Item0, best.Item1, best.Item2))
             Next
         Next
         labels(2) = "The BGR image mapped to " + CStr(common.Count) + " common colors"
@@ -324,12 +324,12 @@ Public Class XR_Color8U_Smoothing : Inherits TaskParent
     Dim frames As New History_Basics
     Public Sub New()
         labels = {"", "", "Averaged BGR image over the last X frames", ""}
-        dst0 = New cv.Mat(dst0.Size(), cv.MatType.CV_32FC3, 0)
+        dst0 = New Mat(dst0.Size(), MatType.CV_32FC3, 0)
         desc = "Merge that last X BGR frames to smooth out differences."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         frames.Run(src.Clone)
-        frames.dst2.ConvertTo(dst2, cv.MatType.CV_8UC3)
+        frames.dst2.ConvertTo(dst2, MatType.CV_8UC3)
         labels(2) = "The image below is the average of " + CStr(frames.saveFrames.Count) + " the last BGR frames"
     End Sub
 End Class
@@ -345,11 +345,11 @@ Public Class Color8U_Hue : Inherits TaskParent
         desc = "Isolate those regions in the image that have a reddish hue."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        Dim hsv As New cv.Mat
-        CvtColor(src, hsv, cv.ColorConversionCodes.BGR2HSV)
-        Dim loBins As cv.Scalar = New cv.Scalar(0, 40, 32)
-        Dim hiBins As cv.Scalar = New cv.Scalar(180, 255, 255)
-                  InRange(hsv, loBins, hiBins, dst2)
+        Dim hsv As New Mat
+        CvtColor(src, hsv, ColorConversionCodes.BGR2HSV)
+        Dim loBins As Scalar = New Scalar(0, 40, 32)
+        Dim hiBins As Scalar = New Scalar(180, 255, 255)
+        InRange(hsv, loBins, hiBins, dst2)
     End Sub
 End Class
 
@@ -369,8 +369,8 @@ Public Class XR_Color8U_BlackAndWhite : Inherits TaskParent
         options.Run()
 
         dst1 = task.gray
-        Threshold(dst1, dst2, options.minThreshold, 255, cv.ThresholdTypes.BinaryInv)
-        Threshold(dst1, dst3, options.maxThreshold, 255, cv.ThresholdTypes.Binary)
+        Threshold(dst1, dst2, options.minThreshold, 255, ThresholdTypes.BinaryInv)
+        Threshold(dst1, dst3, options.maxThreshold, 255, ThresholdTypes.Binary)
     End Sub
 End Class
 

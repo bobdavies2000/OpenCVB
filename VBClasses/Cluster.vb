@@ -24,7 +24,7 @@ Public Class Cluster_Basics : Inherits TaskParent
 
         knn.queries.Clear()
         For Each pt In ptInput
-            knn.queries.Add(New cv.Point2f(pt.X, pt.Y))
+            knn.queries.Add(New Point2f(pt.X, pt.Y))
         Next
         knn.trainInput = knn.queries
         knn.Run(src)
@@ -67,10 +67,10 @@ Public Class Cluster_Basics : Inherits TaskParent
         Next
         dst3 = src
         For i = 0 To knn.queries.Count - 1
-        Circle(dst2, knn.queries(i), task.DotSize, cv.Scalar.Red, -1, task.lineType)
+        Circle(dst2, knn.queries(i), task.DotSize, Scalar.Red, -1, task.lineType)
         Circle(dst3, knn.queries(i), task.DotSize, task.highlight, -1, task.lineType)
         Next
-        labels(2) = CStr(clusters.Count) + " groups built from " + CStr(ptInput.Count) + " by combining each input point and its nearest neighbor."
+        labels(2) = CStr(clusters.Count) + " groups built from " + CStr(ptInput.Count) + " by combining each input cv.Point and its nearest neighbor."
         labels(3) = CStr(ptInput.Count) + " input features found."
     End Sub
 End Class

@@ -59,7 +59,7 @@ Public Class Mouse_ClickPointUsage : Inherits TaskParent
         SetTrueText("Click on one of the feature points (carefully) to hit the breakpoint below.")
 
         Dim val = fcs.dst2.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X)
-        SetTrueText("Hit the point you selected.", 3)
+        SetTrueText("Hit the cv.Point you selected.", 3)
                   InRange(fcs.dst2, val, val, dst1)
         dst3.SetTo(0)
         fcs.dst3.CopyTo(dst3, dst1)

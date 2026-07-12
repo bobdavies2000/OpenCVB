@@ -2,14 +2,14 @@ Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 Public Class ImageOffset_Basics : Inherits TaskParent
     Public options As New Options_ImageOffset
     Dim options1 As New Options_Diff
-    Public masks(2) As cv.Mat
-    Public dst(2) As cv.Mat
-    Public pcFiltered(2) As cv.Mat
+    Public masks(2) As Mat
+    Public dst(2) As Mat
+    Public pcFiltered(2) As Mat
     Public Sub New()
         If standalone Then task.gOptions.displayDst1.Checked = True
-        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_32FC1, New cv.Scalar(0))
-        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_32FC1, New cv.Scalar(0))
-        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_32FC1, New cv.Scalar(0))
+        dst1 = New Mat(dst1.Size, MatType.CV_32FC1, New Scalar(0))
+        dst2 = New Mat(dst2.Size, MatType.CV_32FC1, New Scalar(0))
+        dst3 = New Mat(dst3.Size, MatType.CV_32FC1, New Scalar(0))
         desc = "Compute various differences between neighboring pixels"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -17,7 +17,7 @@ Public Class ImageOffset_Basics : Inherits TaskParent
         options1.Run()
 
         Dim r1 = New cv.Rect(1, 1, task.cols - 2, task.rows - 2)
-        Dim r2 As cv.Rect
+        Dim r2 as cv.Rect
         Select Case options.offsetDirection
             Case "Upper Left"
                 r2 = New cv.Rect(0, 0, r1.Width, r1.Height)
@@ -45,10 +45,10 @@ Public Class ImageOffset_Basics : Inherits TaskParent
 
         dst = {dst1, dst2, dst3}
         For i = 0 To dst.Count - 1
-            If masks(i) Is Nothing Then masks(i) = New cv.Mat
-            Threshold(dst(i), masks(i), options1.pixelDiffThreshold, 255, cv.ThresholdTypes.BinaryInv)
+            If masks(i) Is Nothing Then masks(i) = New Mat
+            Threshold(dst(i), masks(i), options1.pixelDiffThreshold, 255, ThresholdTypes.BinaryInv)
             ConvertScaleAbs(masks(i), masks(i))
-            pcFiltered(i) = New cv.Mat(src.Size, cv.MatType.CV_32FC1, New cv.Scalar(0))
+            pcFiltered(i) = New Mat(src.Size, MatType.CV_32FC1, New Scalar(0))
             task.pcSplit(i).CopyTo(pcFiltered(i), masks(i))
         Next
     End Sub
@@ -79,7 +79,7 @@ Public Class XR_ImageOffset_SliceH : Inherits TaskParent
             pt = New cv.Point(dst2.Width / 2, dst2.Height / 2)
         End If
 
-        Dim slice As cv.Mat
+        Dim slice As Mat
         For i = 0 To 2
             slice = iOff.pcFiltered(i).Row(pt.Y)
             Dim inputX As New List(Of Double)
@@ -96,7 +96,7 @@ Public Class XR_ImageOffset_SliceH : Inherits TaskParent
 
             plot.input.Clear()
             For j = 0 To outputX.Count - 1
-                plot.input.Add(New cv.Point2d(CDbl(outputX(j)), CDbl(outputY(j))))
+                plot.input.Add(New Point2d(CDbl(outputX(j)), CDbl(outputY(j))))
             Next
 
             plot.minY = Choose(i + 1, -task.xRange, -task.yRange, 0)
@@ -141,7 +141,7 @@ Public Class XR_ImageOffset_SliceV : Inherits TaskParent
             pt = New cv.Point(dst2.Width / 2, dst2.Height / 2)
         End If
 
-        Dim slice As cv.Mat
+        Dim slice As Mat
         For i = 0 To 2
             slice = iOff.pcFiltered(i).Col(pt.X)
             Dim inputX As New List(Of Double)
@@ -158,7 +158,7 @@ Public Class XR_ImageOffset_SliceV : Inherits TaskParent
 
             plot.input.Clear()
             For j = 0 To outputX.Count - 1
-                plot.input.Add(New cv.Point2d(CDbl(outputX(j)), CDbl(outputY(j))))
+                plot.input.Add(New Point2d(CDbl(outputX(j)), CDbl(outputY(j))))
             Next
 
             plot.minY = Choose(i + 1, -task.xRange, -task.yRange, 0)

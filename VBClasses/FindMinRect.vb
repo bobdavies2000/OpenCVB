@@ -1,8 +1,8 @@
 Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 Public Class FindMinRect_Basics : Inherits TaskParent
-    Public minRect As cv.RotatedRect
+    Public minRect As RotatedRect
     Dim options As New Options_MinArea
-    Public inputPoints As New List(Of cv.Point2f)
+    Public inputPoints As New List(Of Point2f)
     Public inputContour() As cv.Point
     Public Sub New()
         desc = "Find minimum containing rectangle for a set of points."
@@ -22,9 +22,9 @@ Public Class FindMinRect_Basics : Inherits TaskParent
         If standaloneTest() Then
             dst2.SetTo(0)
             For Each pt In inputPoints
-            Circle(dst2, pt, task.DotSize + 2, cv.Scalar.Red, -1, task.lineType)
+            Circle(dst2, pt, task.DotSize + 2, Scalar.Red, -1, task.lineType)
             Next
-            Draw_Arc.DrawRotatedOutline(minRect, dst2, cv.Scalar.Yellow)
+            Draw_Arc.DrawRotatedOutline(minRect, dst2, Scalar.Yellow)
         End If
     End Sub
 End Class
@@ -41,13 +41,13 @@ Public Class XR_FindMinRect_Motion : Inherits TaskParent
         desc = "Use minRectArea to encompass detected motion"
         labels(2) = "MinRectArea of MOG motion"
     End Sub
-    Private Function motionRectangles(gray As cv.Mat, colors() As cv.Vec3b) As cv.Mat
+    Private Function motionRectangles(gray As Mat, colors() As Vec3b) As Mat
         Return gray
     End Function
     Public Overrides Sub RunAlg(src As cv.Mat)
         bgSub.Run(src)
         dst1 = bgSub.dst2
-        Dim contours = FindContoursAsArray(dst1, cv.RetrievalModes.Tree, cv.ContourApproximationModes.ApproxSimple)
+        Dim contours = FindContoursAsArray(dst1, RetrievalModes.Tree, ContourApproximationModes.ApproxSimple)
 
         Dim contourCount As Integer
         For Each tour In contours

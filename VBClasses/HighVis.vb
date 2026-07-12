@@ -3,11 +3,11 @@ Public Class HighVis_Basics : Inherits TaskParent
     Dim bricks As New Brick_Basics
     Dim info As New XR_Brick_Info
     Public Sub New()
-        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
+        dst1 = New Mat(dst1.Size, MatType.CV_8U, 0)
         desc = "Display all the bricks that have good visibility"
     End Sub
-    Public Function ShowPaletteDepth(input As cv.Mat) As cv.Mat
-        Dim output As New cv.Mat
+    Public Function ShowPaletteDepth(input As Mat) As Mat
+        Dim output As New Mat
         ApplyColorMap(input, output, task.colorMapDepth)
         output.SetTo(0, task.noDepthMask)
         Return output
@@ -19,7 +19,7 @@ Public Class HighVis_Basics : Inherits TaskParent
             dst1(brick.rect).SetTo((brick.correlation + 1) * 127)
         Next
 
-        Threshold(dst1, dst0, 0, 255, cv.ThresholdTypes.Binary)
+        Threshold(dst1, dst0, 0, 255, ThresholdTypes.Binary)
         Dim mm = GetMinMax(dst1, dst0)
         dst2 = ShowPaletteDepth((dst1 - mm.minVal) * mm.maxVal / (mm.maxVal - mm.minVal))
         labels(2) = bricks.labels(2)

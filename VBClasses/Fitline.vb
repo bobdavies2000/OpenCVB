@@ -1,6 +1,6 @@
 Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 Public Class FitLine_BasicsOld : Inherits TaskParent
-    Public ptList As New List(Of cv.Point2f)
+    Public ptList As New List(Of Point2f)
     Public lp As New lpData
     Public Sub New()
         desc = "Use FitEllipse to build the FitLine solution."
@@ -9,7 +9,7 @@ Public Class FitLine_BasicsOld : Inherits TaskParent
         If standalone And task.heartBeatLT Then
             Static noisyLine As New Eigen_Input
             noisyLine.Run(src)
-            ptList = New List(Of cv.Point2f)(noisyLine.PointList)
+            ptList = New List(Of Point2f)(noisyLine.PointList)
             dst2 = noisyLine.dst2
         End If
 
@@ -30,8 +30,8 @@ End Class
 
 Public Class FitLine_Conventional : Inherits TaskParent
     Public lp As lpData
-    Public ptList As New List(Of cv.Point2f)
-    Public center As cv.Point2f
+    Public ptList As New List(Of Point2f)
+    Public center As Point2f
     Public Sub New()
         desc = "Show how Fitline API works with simple data."
     End Sub
@@ -39,19 +39,19 @@ Public Class FitLine_Conventional : Inherits TaskParent
         If standalone And task.heartBeatLT Then
             Static noisyLine As New Eigen_Input
             noisyLine.Run(src)
-            ptList = New List(Of cv.Point2f)(noisyLine.PointList)
+            ptList = New List(Of Point2f)(noisyLine.PointList)
             dst2 = noisyLine.dst2
         End If
 
-        Dim line2d = FitLine(ptList, cv.DistanceTypes.L2, 0, 0, 0)
-        center = New cv.Point2f(line2d.X1, line2d.Y1)
+        Dim line2d = FitLine(ptList, DistanceTypes.L2, 0, 0, 0)
+        center = New Point2f(line2d.X1, line2d.Y1)
         Dim slope = line2d.Vy / line2d.Vx
         Dim leftY = Math.Round(-line2d.X1 * slope + line2d.Y1)
         Dim rightY = Math.Round((src.Cols - line2d.X1) * slope + line2d.Y1)
         lp = New lpData(New cv.Point(0, leftY), New cv.Point(src.Cols - 1, rightY))
         If standaloneTest() Then
             dst2.SetTo(0)
-            Line(dst2, lp.p1, lp.p2, cv.Scalar.Red, task.lineWidth, task.lineType)
+            Line(dst2, lp.p1, lp.p2, Scalar.Red, task.lineWidth, task.lineType)
         End If
     End Sub
 End Class
@@ -79,19 +79,19 @@ Public Class XR_FitLine_Lines : Inherits TaskParent
 
         If standaloneTest() Then
             draw.Run(src)
-            Dim _cvt1 As New cv.Mat
-            CvtColor(draw.dst2, _cvt1, cv.ColorConversionCodes.BGR2GRAY)
-            Threshold(_cvt1, dst3, 1, 255, cv.ThresholdTypes.Binary)
-            CvtColor(dst3, dst2, cv.ColorConversionCodes.GRAY2BGR)
+            Dim _cvt1 As New Mat
+            CvtColor(draw.dst2, _cvt1, ColorConversionCodes.BGR2GRAY)
+            Threshold(_cvt1, dst3, 1, 255, ThresholdTypes.Binary)
+            CvtColor(dst3, dst2, ColorConversionCodes.GRAY2BGR)
         Else
             lines.Clear()
         End If
 
         Dim contours As cv.Point()()
-        contours = FindContoursAsArray(dst3, cv.RetrievalModes.Tree, cv.ContourApproximationModes.ApproxSimple)
+        contours = FindContoursAsArray(dst3, RetrievalModes.Tree, ContourApproximationModes.ApproxSimple)
         For i = 0 To contours.Length - 1
             Dim cnt = contours(i)
-            Dim line2d = FitLine(cnt, cv.DistanceTypes.L2, 0, options.radiusAccuracy, options.angleAccuracy)
+            Dim line2d = FitLine(cnt, DistanceTypes.L2, 0, options.radiusAccuracy, options.angleAccuracy)
             Dim slope = line2d.Vy / line2d.Vx
             Dim leftY = Math.Round(-line2d.X1 * slope + line2d.Y1)
             Dim rightY = Math.Round((src.Cols - line2d.X1) * slope + line2d.Y1)
@@ -101,7 +101,7 @@ Public Class XR_FitLine_Lines : Inherits TaskParent
                 lines.Add(p1)
                 lines.Add(p2)
             End If
-            Line(dst2, p1, p2, cv.Scalar.Red, task.lineWidth, task.lineType)
+            Line(dst2, p1, p2, Scalar.Red, task.lineWidth, task.lineType)
         Next
     End Sub
 End Class
@@ -112,9 +112,9 @@ End Class
 
 
 Public Class XR_FitLine_Simple3D : Inherits TaskParent
-    Public ptList As New List(Of cv.Point3f)
+    Public ptList As New List(Of Point3f)
     Public lpResult As lpData
-    Public center As cv.Point2f
+    Public center As Point2f
     Dim options As New Options_FitLine
     Public Sub New()
         labels(2) = "With only a few points, resulting vector can be anywhere but it will be horizontal with uniformly distributed points."
@@ -130,20 +130,20 @@ Public Class XR_FitLine_Simple3D : Inherits TaskParent
             dst2.SetTo(0)
             ptList.Clear()
             For Each pt In random.PointList
-            Circle(dst2, New cv.Point2f(pt.X, pt.Y), task.DotSize, cv.Scalar.Yellow, -1, task.lineType)
+                Circle(dst2, New Point2f(pt.X, pt.Y), task.DotSize, Scalar.Yellow, -1, task.lineType)
                 ptList.Add(pt)
             Next
         End If
 
         ' Fit a line to the 3D points
-        Dim line = FitLine(ptList.ToArray, cv.DistanceTypes.L2, 0, 0, 0)
-        center = New cv.Point2f(line.X1, line.Y1)
+        Dim line = FitLine(ptList.ToArray, DistanceTypes.L2, 0, 0, 0)
+        center = New Point2f(line.X1, line.Y1)
 
         Dim p2 = New cv.Point(dst2.Width, -dst2.Width * line.Vy / line.Vx + center.Y)
         Dim lp = New lpData(center, p2)
         lpResult = findEdgePoints(lp)
-        cv.Cv2.Line(dst2, lpResult.p1, lpResult.p2, task.highlight, task.lineWidth, task.lineType)
-        Circle(dst2, center, task.DotSize + 2, cv.Scalar.Blue, -1)
+        Cv2.Line(dst2, lpResult.p1, lpResult.p2, task.highlight, task.lineWidth, task.lineType)
+        Circle(dst2, center, task.DotSize + 2, Scalar.Blue, -1)
     End Sub
 End Class
 
@@ -165,12 +165,12 @@ Public Class XR_FitLine_Example2D : Inherits TaskParent
 
         fitLine.ptList.Clear()
         For Each pt In noisyLine.PointList
-            fitLine.ptList.Add(New cv.Point2f(pt.X, pt.Y))
+            fitLine.ptList.Add(New Point2f(pt.X, pt.Y))
         Next
         fitLine.Run(src)
 
         Line(dst2, fitLine.lp.p1, fitLine.lp.p2, task.highlight, task.lineWidth, task.lineType)
-        Circle(dst2, fitLine.center, task.DotSize + 2, cv.Scalar.Blue, -1)
+        Circle(dst2, fitLine.center, task.DotSize + 2, Scalar.Blue, -1)
     End Sub
 End Class
 
@@ -179,9 +179,9 @@ End Class
 
 
 Public Class XR_FitLine_BasicsOld_TA3D : Inherits TaskParent
-    Public ptList As New List(Of cv.Point3f)
+    Public ptList As New List(Of Point3f)
     Public lp As lpData
-    Public center As cv.Point2f
+    Public center As Point2f
     Public Sub New()
         labels(2) = "The input is a noisy trendline but the result should track pretty well."
         desc = "Use fitline to find the trendline in the input data."
@@ -194,21 +194,21 @@ Public Class XR_FitLine_BasicsOld_TA3D : Inherits TaskParent
             dst2.SetTo(0)
             ptList.Clear()
             For Each pt In noisyLine.PointList
-            Circle(dst2, New cv.Point2f(pt.X, pt.Y), task.DotSize, task.highlight, -1, task.lineType)
+                Circle(dst2, New Point2f(pt.X, pt.Y), task.DotSize, task.highlight, -1, task.lineType)
                 ptList.Add(pt)
             Next
         End If
 
         ' Fit a line to the 3D points
-        Dim line = FitLine(ptList.ToArray, cv.DistanceTypes.L2, 0, 0, 0)
+        Dim line = FitLine(ptList.ToArray, DistanceTypes.L2, 0, 0, 0)
         Dim m = line.Vy / line.Vx
         Dim bb = line.Y1 - m * line.X1
         Dim p1 = New cv.Point(line.X1, line.Y1)
         Dim p2 = New cv.Point(src.Width, line.Vy / line.Vx * src.Width + bb)
 
         lp = findEdgePoints(New lpData(p1, p2))
-        cv.Cv2.Line(dst2, lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
-        Circle(dst2, New cv.Point2f(line.X1, line.Y1), task.DotSize + 2, cv.Scalar.Blue, -1)
+        Cv2.Line(dst2, lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
+        Circle(dst2, New Point2f(line.X1, line.Y1), task.DotSize + 2, Scalar.Blue, -1)
     End Sub
 End Class
 
@@ -221,7 +221,7 @@ Public Class XR_FitLine_Grid : Inherits TaskParent
     Dim nZero As New FindNonZero_Basics
     Dim fitline As New FitLine_BasicsOld
     Public Sub New()
-        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
+        dst3 = New Mat(dst3.Size, MatType.CV_8U, 0)
         desc = "Find lines within each r."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -255,26 +255,26 @@ Public Class XR_FitLine_Simple : Inherits TaskParent
         desc = "Simple test of the Fitline interface"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        Dim points As New List(Of cv.Point2f) From {
-                 New cv.Point2f(1, 1.1F),
-                 New cv.Point2f(2, 2.0F),
-                 New cv.Point2f(3, 2.9F),
-                 New cv.Point2f(4, 4.1F),
-                 New cv.Point2f(5, 5.0F),
-                 New cv.Point2f(6, 6.1F),
-                 New cv.Point2f(7, 7.2F),
-                 New cv.Point2f(8, 8.1F),
-                 New cv.Point2f(9, 20.0F) ' Outlier
+        Dim points As New List(Of Point2f) From {
+                 New Point2f(1, 1.1F),
+                 New Point2f(2, 2.0F),
+                 New Point2f(3, 2.9F),
+                 New Point2f(4, 4.1F),
+                 New Point2f(5, 5.0F),
+                 New Point2f(6, 6.1F),
+                 New Point2f(7, 7.2F),
+                 New Point2f(8, 8.1F),
+                 New Point2f(9, 20.0F) ' Outlier
              }
 
         ' Convert to Mat
-        Dim pointMat As cv.Mat = New cv.Mat(points.Count, 1, cv.MatType.CV_32FC2)
+        Dim pointMat As Mat = New Mat(points.Count, 1, MatType.CV_32FC2)
         For i = 0 To points.Count - 1
-            pointMat.Set(Of cv.Point2f)(i, 0, points(i))
+            pointMat.Set(Of Point2f)(i, 0, points(i))
         Next
 
         ' Fit line using CV_DIST_L2 (least squares), with robust method
-        Dim lineParams = FitLine(points.ToArray, cv.DistanceTypes.L2, 0, 0.01, 0.01)
+        Dim lineParams = FitLine(points.ToArray, DistanceTypes.L2, 0, 0.01, 0.01)
 
         ' Extract line parameters
         Dim vx As Single = lineParams.Vx

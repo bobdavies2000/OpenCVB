@@ -1,11 +1,11 @@
 Imports System.Runtime.InteropServices
 Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 Public Class Line3D_Basics : Inherits TaskParent
-    Public lines3D As New List(Of cv.Point3f)
-    Public lines3DMat As New cv.Mat
+    Public lines3D As New List(Of Point3f)
+    Public lines3DMat As New Mat
     Public Sub New()
         If standalone Then task.FeatureSampleSize = 10
-        desc = "Find the end point depth for the top X longest lines."
+        desc = "Find the end cv.Point depth for the top X longest lines."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst2 = src.Clone
@@ -26,12 +26,12 @@ Public Class Line3D_Basics : Inherits TaskParent
             Dim p2 = Cloud_Basics.worldCoordinates(rect2.TopLeft, depth2)
             lines3D.Add(p1)
             lines3D.Add(p2)
-            Line(dst2, lp.p1, lp.p2, task.highlight, task.lineWidth, cv.LineTypes.Link8)
+            Line(dst2, lp.p1, lp.p2, task.highlight, task.lineWidth, LineTypes.Link8)
             SetTrueText(depth1.ToString(fmt1), lp.p1, 2)
             SetTrueText(depth2.ToString(fmt1), lp.p2, 2)
         Next
 
-        lines3DMat = cv.Mat.FromPixelData(lines3D.Count / 2, 1, cv.MatType.CV_32FC3, lines3D.ToArray)
+        lines3DMat = Mat.FromPixelData(lines3D.Count / 2, 1, MatType.CV_32FC3, lines3D.ToArray)
 
         If task.heartBeat Then
             strOut = CStr(lines3D.Count / 2) + " 3D lines are prepared in lines3D." + vbCrLf +
@@ -48,7 +48,7 @@ End Class
 Public Class XR_Line3D_Longest : Inherits TaskParent
     Dim bricks As New Brick_Basics
     Public Sub New()
-        dst0 = New cv.Mat(dst0.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
+        dst0 = New Mat(dst0.Size(), MatType.CV_8U, Scalar.All(0))
         desc = "Find the longest line in BGR and use it to measure the average depth for the line"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -57,7 +57,7 @@ Public Class XR_Line3D_Longest : Inherits TaskParent
         Dim lp = task.lines.lpList(0)
         dst2 = src
 
-        Line(dst2, lp.p1, lp.p2, cv.Scalar.Yellow, task.lineWidth + 3, task.lineType)
+        Line(dst2, lp.p1, lp.p2, Scalar.Yellow, task.lineWidth + 3, task.lineType)
 
         Dim brickMin = bricks.brickList(task.gridMap.Get(Of Integer)(lp.p1.Y, lp.p1.X))
         Dim brickMax = bricks.brickList(task.gridMap.Get(Of Integer)(lp.p2.Y, lp.p2.X))
@@ -79,8 +79,8 @@ Public Class XR_Line3D_Longest : Inherits TaskParent
         Dim depthMax = If(brickMax.depth > 0, brickMax.depth, mm.maxVal)
 
         Dim depthMean = Mean(task.pcSplit(2), dst0)(0)
-        Circle(dst2, lp.p1, task.DotSize + 4, cv.Scalar.Red, -1, task.lineType)
-        Circle(dst2, lp.p2, task.DotSize + 4, cv.Scalar.Blue, -1, task.lineType)
+        Circle(dst2, lp.p1, task.DotSize + 4, Scalar.Red, -1, task.lineType)
+        Circle(dst2, lp.p2, task.DotSize + 4, Scalar.Blue, -1, task.lineType)
 
         If lp.p1.DistanceTo(mm.minLoc) < lp.p2.DistanceTo(mm.maxLoc) Then
             mm.minLoc = lp.p1
@@ -110,7 +110,7 @@ End Class
 Public Class Line3D_ReconstructLine : Inherits TaskParent
     Public findLine3D As New FindNonZero_Line3D
     Public selectLine As New Delaunay_LineSelect
-    Public pointcloud As New cv.Mat(dst2.Size, cv.MatType.CV_32FC3, 0)
+    Public pointcloud As New Mat(dst2.Size, MatType.CV_32FC3, 0)
     Public Sub New()
         desc = "Build the 3D lines found in Line_Basics"
     End Sub
@@ -130,7 +130,7 @@ Public Class Line3D_ReconstructLine : Inherits TaskParent
             For i = 0 To findLine3D.veclist.Count - 1
                 Dim pt = findLine3D.ptList(i)
                 Dim vec = findLine3D.veclist(i)
-                pointcloud.Set(Of cv.Vec3f)(pt.Y, pt.X, vec)
+                pointcloud.Set(Of Vec3f)(pt.Y, pt.X, vec)
             Next
         End If
 
@@ -152,17 +152,17 @@ Public Class XR_Line3D_DrawArbitrary : Inherits TaskParent
         If standalone Then task.gOptions.displayDst1.Checked = True
         plot.plotCount = 2
 
-        dst0 = New cv.Mat(dst0.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
-        dst1 = New cv.Mat(dst1.Size(), cv.MatType.CV_32F, cv.Scalar.All(0))
+        dst0 = New Mat(dst0.Size(), MatType.CV_8U, Scalar.All(0))
+        dst1 = New Mat(dst1.Size(), MatType.CV_32F, Scalar.All(0))
 
         p1 = New cv.Point(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height))
         p2 = New cv.Point(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height))
         labels(2) = "Click twice in the image below to draw a line and that line's depth is correlated in X to Z and Y to Z in the plot at right"
         desc = "Determine where a 3D line is close to the real depth data"
     End Sub
-    Private Function findCorrelation(pts1 As cv.Mat, pts2 As cv.Mat) As Single
-        Dim correlationMat As New cv.Mat
-        MatchTemplate(pts1, pts2, correlationMat, cv.TemplateMatchModes.CCoeffNormed)
+    Private Function findCorrelation(pts1 As Mat, pts2 As Mat) As Single
+        Dim correlationMat As New Mat
+        MatchTemplate(pts1, pts2, correlationMat, TemplateMatchModes.CCoeffNormed)
         Return correlationMat.Get(Of Single)(0, 0)
     End Function
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -177,7 +177,7 @@ Public Class XR_Line3D_DrawArbitrary : Inherits TaskParent
             End If
         End If
 
-        If toggleFirstSecond Then Exit Sub ' wait until the second point is selected...
+        If toggleFirstSecond Then Exit Sub ' wait until the second cv.Point is selected...
 
         dst1 = src
         Line(dst1, p1, p2, task.highlight, task.lineWidth, task.lineType)
@@ -185,22 +185,22 @@ Public Class XR_Line3D_DrawArbitrary : Inherits TaskParent
         Line(dst0, p1, p2, 255, task.lineWidth, task.lineType)
         dst1.SetTo(0)
         task.pcSplit(0).CopyTo(dst1, dst0)
-        Dim points As New cv.Mat
+        Dim points As New Mat
         FindNonZero(dst1, points)
 
-        Dim nextList As New List(Of cv.Point3f)
+        Dim nextList As New List(Of Point3f)
         For i = 0 To points.Rows - 1
             Dim pt = points.Get(Of cv.Point)(i, 0)
-            nextList.Add(task.pointCloud.Get(Of cv.Point3f)(pt.Y, pt.X))
+            nextList.Add(task.pointCloud.Get(Of Point3f)(pt.Y, pt.X))
         Next
         If nextList.Count = 0 Then Exit Sub ' line is completely in area with no depth.
 
-        Dim pts As cv.Mat = cv.Mat.FromPixelData(nextList.Count, 1, cv.MatType.CV_32FC3, nextList.ToArray)
+        Dim pts As Mat = Mat.FromPixelData(nextList.Count, 1, MatType.CV_32FC3, nextList.ToArray)
         Dim zSplit = Split(pts)
         Dim c1 = findCorrelation(zSplit(0), zSplit(2))
         Dim c2 = findCorrelation(zSplit(1), zSplit(2))
 
-        plot.plotData = New cv.Scalar(c1, c2, 0)
+        plot.plotData = New Scalar(c1, c2, 0)
 
         plot.Run(src)
         dst2 = plot.dst2
@@ -216,11 +216,11 @@ End Class
 Public Class Line3D_Selection : Inherits TaskParent
     Public lp As lpData
     Public debugRequest As Boolean
-    Dim allPoints As New cv.Mat
+    Dim allPoints As New Mat
     Public Sub New()
-        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_32F, 0)
-        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_32FC3, 0)
-        dst3 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        dst1 = New Mat(dst1.Size, MatType.CV_32F, 0)
+        dst2 = New Mat(dst2.Size, MatType.CV_32FC3, 0)
+        dst3 = New Mat(dst2.Size, MatType.CV_8U, 0)
         desc = "Select a line using the debug slider."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -237,13 +237,13 @@ Public Class Line3D_Selection : Inherits TaskParent
                 lp = task.lines.lpList(Math.Abs(task.gOptions.DebugSlider.Value))
             End If
         End If
-        Line(dst3, lp.p1, lp.p2, 255, 1, cv.LineTypes.Link4)
+        Line(dst3, lp.p1, lp.p2, 255, 1, LineTypes.Link4)
         If standaloneTest() Or debugRequest Then FindNonZero(dst3(lp.rect), allPoints)
 
         task.pcSplit(2)(lp.rect).CopyTo(dst1(lp.rect), dst3(lp.rect))
         dst3(lp.rect).SetTo(0, task.noDepthMask(lp.rect))
         Dim depthAvg = Mean(dst1(lp.rect), dst3(lp.rect)).Item(0)
-        Dim points As New cv.Mat
+        Dim points As New Mat
         FindNonZero(dst3(lp.rect), points)
         Dim ptList As New List(Of cv.Point)
         If points.Rows = 0 Then
@@ -299,15 +299,15 @@ Public Class Line3D_Selection : Inherits TaskParent
                 Dim pt = allPoints.Get(Of cv.Point)(i, 0)
                 pt.X += lp.rect.X
                 pt.Y += lp.rect.Y
-                dst2.Set(Of cv.Vec3f)(pt.Y, pt.X, Cloud_Basics.worldCoordinates(pt.X, pt.Y, depth1 + i * deltaZ))
+                dst2.Set(Of Vec3f)(pt.Y, pt.X, Cloud_Basics.worldCoordinates(pt.X, pt.Y, depth1 + i * deltaZ))
             Next
 
-            labels(2) = CStr(allPoints.Rows) + " pixels updated in the point cloud."
+            labels(2) = CStr(allPoints.Rows) + " pixels updated in the cv.Point cloud."
             strOut = "Average depth = " + depthAvg.ToString(fmt3) + vbCrLf
             strOut += "depth1 = " + depth1.ToString(fmt3) + vbCrLf
             strOut += "depth2 = " + depth2.ToString(fmt3) + vbCrLf
             strOut += CStr(ptList.Count) + " points found with depth" + vbCrLf
-            strOut += deltaZ.ToString(fmt4) + " deltaZ for each point." + vbCrLf
+            strOut += deltaZ.ToString(fmt4) + " deltaZ for each cv.Point." + vbCrLf
             strOut += CStr(allPoints.Rows) + " points in the original line." + vbCrLf
             SetTrueText(strOut, 3)
             SetTrueText("ptlist(0)", ptList(0))
@@ -326,8 +326,8 @@ Public Class Line3D_DrawLines : Inherits TaskParent
     Public lpList As New List(Of lpData)
     Dim selection As New Line3D_Selection
     Public Sub New()
-        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
-        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
+        dst1 = New Mat(dst1.Size, MatType.CV_8U, 0)
+        dst3 = New Mat(dst3.Size, MatType.CV_8U, 0)
         desc = "Recompute the depth for the lines found."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -351,7 +351,7 @@ End Class
 Public Class Line3D_DrawLines_Debug : Inherits TaskParent
     Dim Selection As New Line3D_Selection
     Public Sub New()
-        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
+        dst3 = New Mat(dst3.Size, MatType.CV_8U, 0)
         Selection.debugRequest = True
         desc = "Use the debug slider in Global Options to select which line to test."
     End Sub
@@ -361,7 +361,7 @@ Public Class Line3D_DrawLines_Debug : Inherits TaskParent
         Dim lp = Selection.lp
 
         dst3.SetTo(0)
-        Line(dst3, lp.p1, lp.p2, 255, 1, cv.LineTypes.Link4)
+        Line(dst3, lp.p1, lp.p2, 255, 1, LineTypes.Link4)
         dst1(lp.rect).SetTo(task.highlight, dst3(lp.rect))
 
         dst2 = task.pointCloud.Clone

@@ -6,7 +6,7 @@ Public Class Entropy_Basics : Inherits TaskParent
         labels(2) = "Control entropy values with histogram bins slider"
         desc = "Compute the entropy in an image - a measure of contrast(iness)"
     End Sub
-    Private Function validatePreserve(ByVal r As cv.Rect) As cv.Rect
+    Private Function validatePreserve(ByVal r as cv.Rect) as cv.Rect
         If r.Width <= 0 Then r.Width = 1
         If r.Height <= 0 Then r.Height = 1
         If r.X < 0 Then r.X = 0
@@ -31,7 +31,7 @@ Public Class Entropy_Basics : Inherits TaskParent
         End If
         dst2 = entropy.dst2
         Rectangle(dst2, task.drawRect, white, task.lineWidth)
-        If task.heartBeat Then strOut = "Click anywhere to measure the entropy with rect(pt.x, pt.y, " +
+        If task.heartBeat Then strOut = "Click anywhere to measure the entropy with cv.Rect(pt.x, pt.y, " +
                                                  CStr(stdSize) + ", " + CStr(stdSize) + ")" + vbCrLf + vbCrLf + "Total entropy = " +
                                                  entropy.entropyVal.ToString(fmt1) + vbCrLf + entropy.strOut
         SetTrueText(strOut, 3)
@@ -45,9 +45,9 @@ End Class
 
 Public Class Entropy_Highest : Inherits TaskParent
     Dim entropy As New Entropy_Rectangle
-    Public eMaxRect As cv.Rect
+    Public eMaxRect as cv.Rect
     Public Sub New()
-        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_32F, 0)
+        dst1 = New Mat(dst1.Size, MatType.CV_32F, 0)
         If standalone Then
             Dim val As Integer = dst2.Width / 10
             If task.gOptions.GridSlider.Maximum < val Then task.gOptions.GridSlider.Maximum = val
@@ -84,7 +84,7 @@ Public Class Entropy_Highest : Inherits TaskParent
         dst2 = ShowAddweighted(task.gray, dst2, labels(3))
 
         If standaloneTest() Then
-            Rectangle(dst2, eMaxRect, cv.Scalar.All(255), task.lineWidth)
+            Rectangle(dst2, eMaxRect, Scalar.All(255), task.lineWidth)
             dst3.SetTo(0)
             Rectangle(dst3, eMaxRect, white, task.lineWidth)
         End If
@@ -123,7 +123,7 @@ Public Class Entropy_Rectangle : Inherits TaskParent
     Public Sub New()
         desc = "Calculate the entropy in the drawRect when run standalone"
     End Sub
-    Public Function channelEntropy(total As Integer, hist As cv.Mat) As Single
+    Public Function channelEntropy(total As Integer, hist As Mat) As Single
         channelEntropy = 0
         For i = 0 To hist.Rows - 1
             Dim hc = Math.Abs(hist.Get(Of Single)(i))
@@ -136,8 +136,8 @@ Public Class Entropy_Rectangle : Inherits TaskParent
         If src.Channels() <> 1 Then src = task.gray
 
         Dim mm = GetMinMax(src)
-        Dim ranges() = New cv.Rangef() {New cv.Rangef(mm.minVal, mm.maxVal)}
-        If mm.minVal = mm.maxVal Then ranges = New cv.Rangef() {New cv.Rangef(0, 255)}
+        Dim ranges() = New Rangef() {New Rangef(mm.minVal, mm.maxVal)}
+        If mm.minVal = mm.maxVal Then ranges = New Rangef() {New Rangef(0, 255)}
 
         If standalone Then
             If task.drawRect.Width = 0 Or task.drawRect.Height = 0 Then
@@ -145,10 +145,10 @@ Public Class Entropy_Rectangle : Inherits TaskParent
             End If
             src = src(task.drawRect)
         End If
-        Dim hist As New cv.Mat
-        CalcHist({src}, {0}, New cv.Mat(), hist, 1, dimensions, ranges)
-        Dim histNormalized As New cv.Mat
-        Normalize(hist, histNormalized, 0, hist.Rows, cv.NormTypes.MinMax)
+        Dim hist As New Mat
+        CalcHist({src}, {0}, New Mat(), hist, 1, dimensions, ranges)
+        Dim histNormalized As New Mat
+        Normalize(hist, histNormalized, 0, hist.Rows, NormTypes.MinMax)
 
         entropyVal = channelEntropy(src.Total, histNormalized) * 1000
         strOut = "Entropy X1000 " + entropyVal.ToString(fmt1) + vbCrLf
@@ -167,17 +167,17 @@ End Class
 Public Class XR_Entropy_SubDivisions : Inherits TaskParent
     Dim entropy As New Entropy_Rectangle
     Dim entropies As New List(Of List(Of Single))
-    Dim eROI As New List(Of List(Of cv.Rect))
+    Dim eROI As New List(Of List(of cv.Rect))
     Public subDivisions As New List(Of Integer)
     Public subDivisionCount As Integer = 9
     Public Sub New()
         labels(2) = "Highlighted rectangles are the top entropy in each of the 9 subdivisions."
         For i = 0 To subDivisionCount - 1
             entropies.Add(New List(Of Single)) ' 4 quadrants
-            eROI.Add(New List(Of cv.Rect)) ' 4 quadrants
+            eROI.Add(New List(of cv.Rect)) ' 4 quadrants
         Next
 
-        dst0 = New cv.Mat(dst0.Size, cv.MatType.CV_8U, 0)
+        dst0 = New Mat(dst0.Size, MatType.CV_8U, 0)
         desc = "Find the highest entropy in each quadrant"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -224,12 +224,12 @@ Public Class XR_Entropy_SubDivisions : Inherits TaskParent
 
         dst1 = task.gray.Clone
         Dim dimensions() = New Integer() {task.histogramBins}
-        Dim ranges() = New cv.Rangef() {New cv.Rangef(0, 255)}
-        Dim hist As New cv.Mat
+        Dim ranges() = New Rangef() {New Rangef(0, 255)}
+        Dim hist As New Mat
         For i = 0 To task.gridRects.Count - 1
             Dim r = task.gridRects(i)
-            CalcHist({dst1(r)}, {0}, New cv.Mat(), hist, 1, dimensions, ranges)
-            Normalize(hist, hist, 0, hist.Rows, cv.NormTypes.MinMax)
+            CalcHist({dst1(r)}, {0}, New Mat(), hist, 1, dimensions, ranges)
+            Normalize(hist, hist, 0, hist.Rows, NormTypes.MinMax)
 
             Dim nextEntropy = entropy.channelEntropy(dst1(r).Total, hist) * 1000
 

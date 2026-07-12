@@ -2,8 +2,8 @@ Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 'https://github.com/shimat/opencvsharp/wiki/ORB-and-FREAK
 Public Class ORB_Basics : Inherits TaskParent
     Implements IDisposable
-    Public keypoints() As cv.KeyPoint
-    Dim orb As cv.ORB
+    Public keypoints() As KeyPoint
+    Dim orb As ORB
     Dim options As New Options_ORB
     Public Sub New()
         desc = "Find keypoints using ORB - Oriented Fast and Rotated BRIEF"
@@ -12,11 +12,11 @@ Public Class ORB_Basics : Inherits TaskParent
         options.Run()
 
         If src.Channels() <> 1 Then src = task.gray
-        orb = cv.ORB.Create(options.desiredCount)
+        orb = ORB.Create(options.desiredCount)
         keypoints = orb.Detect(src)
         dst2 = src.Clone()
         For Each kpt In keypoints
-        Circle(dst2, kpt.Pt, task.DotSize + 1, cv.Scalar.Yellow, -1, task.lineType)
+        Circle(dst2, kpt.Pt, task.DotSize + 1, Scalar.Yellow, -1, task.lineType)
         Next
         labels(2) = CStr(keypoints.Count) + " key points were identified"
     End Sub

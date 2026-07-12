@@ -6,10 +6,10 @@ Imports OpenCvSharp.DnnSuperres
 'Public Class XR_DNN_Basics : Inherits TaskParent
 '    Dim net As Net
 '    Dim dnnPrepared As Boolean
-'    Dim crop As cv.Rect
+'    Dim crop as cv.Rect
 '    Dim dnnWidth As Integer, dnnHeight As Integer
 '    Dim kalman(10) As Kalman_Basics
-'    Public rect As cv.Rect
+'    Public rect as cv.Rect
 '    Dim options As New Options_DNN
 '    Dim classNames() = {"background", "aeroplane", "bicycle", "bird", "boat", "bottle", "bus", "car", "cat", "chair", "cow", "diningtable", "dog", "horse",
 '                                "motorbike", "person", "pottedplant", "sheep", "sofa", "train", "tvmonitor"}
@@ -45,14 +45,14 @@ Imports OpenCvSharp.DnnSuperres
 'If dnnPrepared Then
 '    Dim inScaleFactor As Single = options.ScaleFactor / options.scaleMax ' should be 0.0078 by default...
 '    Dim inputBlob As Double
-'    Dnn.BlobFromImage(src(crop), inputBlob, inScaleFactor, New cv.Size(300, 300), New cv.Scalar(options.meanValue), False)
+'    Dnn.BlobFromImage(src(crop), inputBlob, inScaleFactor, New Size(300, 300), New Scalar(options.meanValue), False)
 
 '    src.CopyTo(dst3)
 '    src(crop).CopyTo(dst2(crop))
 '    net.SetInput(inputBlob, "data")
 
 '    Dim detection = net.Forward("detection_out")
-'    Dim detectionMat = cv.Mat.FromPixelData(detection.Size(2), detection.Size(3), cv.MatType.CV_32F, detection.Data)
+'    Dim detectionMat = Mat.FromPixelData(detection.Size(2), detection.Size(3), MatType.CV_32F, detection.Data)
 
 '    Dim rows = src(crop).Rows
 '    Dim cols = src(crop).Cols
@@ -62,11 +62,11 @@ Imports OpenCvSharp.DnnSuperres
 '    For i = 0 To detectionMat.Rows - 1
 '        Dim confidence = detectionMat.Get(Of Single)(i, 2)
 '        If confidence > options.confidenceThreshold Then
-'            Dim vec = detectionMat.Get(Of cv.Vec4f)(i, 3)
+'            Dim vec = detectionMat.Get(Of Vec4f)(i, 3)
 '            If kalman(i).kInput(0) = 0 And kalman(i).kInput(1) = 0 Then
-'                kPoints.Add(New cv.Point2f(vec(0) * cols + crop.Left, vec(1) * rows + crop.Top))
+'                kPoints.Add(New Point2f(vec(0) * cols + crop.Left, vec(1) * rows + crop.Top))
 '            Else
-'                kPoints.Add(New cv.Point2f(kalman(i).kInput(0), kalman(i).kInput(1)))
+'                kPoints.Add(New Point2f(kalman(i).kInput(0), kalman(i).kInput(1)))
 '            End If
 '        End If
 '    Next
@@ -77,7 +77,7 @@ Imports OpenCvSharp.DnnSuperres
 '        If confidence > options.confidenceThreshold Then
 '            Dim nextName = classNames(CInt(detectionMat.Get(Of Single)(i, 1)))
 '            labels(3) += nextName + " "  ' display the name of what we found.
-'            Dim vec = detectionMat.Get(Of cv.Vec4f)(i, 3)
+'            Dim vec = detectionMat.Get(Of Vec4f)(i, 3)
 '            rect = New cv.Rect(vec(0) * cols + crop.Left, vec(1) * rows + crop.Top, (vec(2) - vec(0)) * cols, (vec(3) - vec(1)) * rows)
 '            rect = New cv.Rect(rect.X, rect.Y, Math.Min(dnnWidth, rect.Width), Math.Min(dnnHeight, rect.Height))
 
@@ -97,10 +97,10 @@ Imports OpenCvSharp.DnnSuperres
 '                kalman(minIndex).Run(src)
 '                rect = New cv.Rect(kalman(minIndex).kOutput(0), kalman(minIndex).kOutput(1), kalman(minIndex).kOutput(2), kalman(minIndex).kOutput(3))
 '            End If
-'            Rectangle(dst3, rect, cv.Scalar.Yellow, task.lineWidth + 2, task.lineType)
+'            Rectangle(dst3, rect, Scalar.Yellow, task.lineWidth + 2, task.lineType)
 '            rect.Width = src.Width / 12
 '            rect.Height = src.Height / 16
-'            Rectangle(dst3, rect, cv.Scalar.Black, -1)
+'            Rectangle(dst3, rect, Scalar.Black, -1)
 '            SetTrueText(nextName, New cv.Point(rect.X, rect.Y), 3)
 '        End If
 '    Next
@@ -155,7 +155,7 @@ Imports OpenCvSharp.DnnSuperres
 '        End If
 '        dst2.SetTo(0)
 '        dst3.SetTo(0)
-'        Resize(src(r), dst2(outRect), New cv.Size(r.Width * multiplier, r.Height * multiplier))
+'        Resize(src(r), dst2(outRect), New Size(r.Width * multiplier, r.Height * multiplier))
 '        dnn.Upsample(src(r), dst3(outRect))
 '        labels(3) = CStr(multiplier) + "X resize of selected area using DNN super resolution"
 '    End Sub
@@ -177,7 +177,7 @@ Imports OpenCvSharp.DnnSuperres
 '    Public Overrides Sub RunAlg(src As cv.Mat)
 '        super.Run(src)
 '        Dim r = New cv.Rect(0, 0, dst2.Width, dst2.Height)
-'        Dim tmp As New cv.Mat
+'        Dim tmp As New Mat
 '        super.dnn.upsample(src, tmp)
 '        Resize(tmp, dst2, dst2.Size)
 '        dst3 = dst2 - src
@@ -216,7 +216,7 @@ Imports OpenCvSharp.DnnSuperres
 
 '        Dim image = ImRead(task.homeDir + "Data/space_shuttle.jpg")
 '        dst3 = image.Resize(dst3.Size())
-'        Dim inputBlob = CvDnn.BlobFromImage(image, 1, New cv.Size(224, 224), New cv.Scalar(104, 117, 123))
+'        Dim inputBlob = CvDnn.BlobFromImage(image, 1, New Size(224, 224), New Scalar(104, 117, 123))
 '        net.SetInput(inputBlob, "data")
 '        Dim prob = net.Forward("prob")
 

@@ -3,7 +3,7 @@ Public Class MaxDist_Basics : Inherits TaskParent
     Dim redC As New RedCloud_Basics
     Public Sub New()
         labels(3) = "Below left shows hullMask while below shows the contour mask."
-        desc = "Find the point farthest from the edges of a mask."
+        desc = "Find the cv.Point farthest from the edges of a mask."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         redC.Run(src)
@@ -34,7 +34,7 @@ Public Class XR_MaxDist_NoRectangle : Inherits TaskParent
         labels(3) = "Below left shows hullMask while below shows the contour mask."
         desc = "Does the mask need to have rectangle of zeros?  Answer: yes"
     End Sub
-    Public Function setCloudData(_mask As cv.Mat, _rect As cv.Rect, _index As Integer,
+    Public Function setCloudData(_mask As Mat, _rect as cv.Rect, _index As Integer,
                                                 Optional zeroRectangle As Boolean = True) As rcDataOld
         Dim rc As New rcDataOld
                   InRange(_mask, _index, _index, rc.mask)
@@ -43,15 +43,15 @@ Public Class XR_MaxDist_NoRectangle : Inherits TaskParent
         Dim contour = ContourBuild(rc.mask)
         If contour.Count < 3 Then Return Nothing
         Dim listOfPoints = New List(Of List(Of cv.Point))({contour})
-        rc.mask = New cv.Mat(rc.mask.Size, cv.MatType.CV_8U, 0)
-        DrawContours(rc.mask, listOfPoints, 0, cv.Scalar.All(255), -1, cv.LineTypes.Link4)
+        rc.mask = New Mat(rc.mask.Size, MatType.CV_8U, 0)
+        DrawContours(rc.mask, listOfPoints, 0, Scalar.All(255), -1, LineTypes.Link4)
 
         If zeroRectangle Then
-            Dim tmp As cv.Mat = rc.mask.Clone
+            Dim tmp As Mat = rc.mask.Clone
             ' see XR_MaxDist_NoRectangle below to confirm this is needed (it is.)
-            Rectangle(tmp, New cv.Rect(0, 0, rc.mask.Width, rc.mask.Height), cv.Scalar.All(0), 1)
-            Dim distance32f As New cv.Mat
-            DistanceTransform(tmp, distance32f, cv.DistanceTypes.L1, cv.DistanceTransformMasks.Precise, cv.MatType.CV_32F)
+            Rectangle(tmp, New cv.Rect(0, 0, rc.mask.Width, rc.mask.Height), Scalar.All(0), 1)
+            Dim distance32f As New Mat
+            DistanceTransform(tmp, distance32f, DistanceTypes.L1, DistanceTransformMasks.Precise, MatType.CV_32F)
             Dim mm As mmData = vbc.GetMinMax(distance32f)
             rc.maxDist.X = mm.maxLoc.X + rc.rect.X
             rc.maxDist.Y = mm.maxLoc.Y + rc.rect.Y

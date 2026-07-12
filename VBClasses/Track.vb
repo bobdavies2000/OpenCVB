@@ -99,7 +99,7 @@ Public Class Track_FindNearest : Inherits TaskParent
         Dim indexList As New List(Of Integer)
         For Each rc In redC.rcList
             If rc.mapID = task.rcD.mapID Then
-                knn.trainInput.Add(New cv.Point2f(rc.maxDist.X, rc.maxDist.Y))
+                knn.trainInput.Add(New Point2f(rc.maxDist.X, rc.maxDist.Y))
                 indexList.Add(rc.index)
             End If
         Next
@@ -111,7 +111,7 @@ Public Class Track_FindNearest : Inherits TaskParent
         End If
 
         knn.queries.Clear()
-        knn.queries.Add(New cv.Point2f(rclast.maxDist.X, rclast.maxDist.Y))
+        knn.queries.Add(New Point2f(rclast.maxDist.X, rclast.maxDist.Y))
         knn.Run(emptyMat)
 
         For i = 0 To knn.result.Length - 1

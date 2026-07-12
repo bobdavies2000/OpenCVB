@@ -1,9 +1,9 @@
 Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 ' https://github.com/opencv/opencv/blob/master/samples/cpp/cloning_demo.cpp
 Public Class Clone_Basics : Inherits TaskParent
-    Public colorChangeValues As cv.Vec3f
-    Public illuminationChangeValues As cv.Vec2f
-    Public textureFlatteningValues As cv.Vec2f
+    Public colorChangeValues As Vec3f
+    Public illuminationChangeValues As Vec2f
+    Public textureFlatteningValues As Vec2f
     Public cloneSpec As Integer ' 0 is colorchange, 1 is illuminationchange, 2 is textureflattening
     Public Sub New()
 
@@ -13,13 +13,13 @@ Public Class Clone_Basics : Inherits TaskParent
         task.drawRect = New cv.Rect(dst2.Width / 4, dst2.Height / 4, dst2.Width / 2, dst2.Height / 2)
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        Dim mask As New cv.Mat(src.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
+        Dim mask As New Mat(src.Size(), MatType.CV_8U, Scalar.All(0))
         If task.drawRect = New cv.Rect Then
             mask.SetTo(255)
         Else
-            Rectangle(mask, task.drawRect, cv.Scalar.White, -1)
+            Rectangle(mask, task.drawRect, Scalar.White, -1)
         End If
-        CvtColor(mask, dst3, cv.ColorConversionCodes.GRAY2BGR)
+        CvtColor(mask, dst3, ColorConversionCodes.GRAY2BGR)
 
         If standaloneTest() And task.frameCount Mod 10 = 0 Then cloneSpec += 1
         Select Case cloneSpec Mod 3
@@ -48,7 +48,7 @@ Public Class XR_Clone_ColorChange : Inherits TaskParent
         options.Run()
 
         clone.cloneSpec = 0
-        clone.colorChangeValues = New cv.Point3f(options.blueChange, options.greenChange, options.redChange)
+        clone.colorChangeValues = New Point3f(options.blueChange, options.greenChange, options.redChange)
         clone.Run(src)
         dst2 = clone.dst2
         dst3 = clone.dst3
@@ -70,7 +70,7 @@ Public Class XR_Clone_IlluminationChange : Inherits TaskParent
         options.Run()
 
         clone.cloneSpec = 1
-        clone.illuminationChangeValues = New cv.Vec2f(options.alpha, options.beta)
+        clone.illuminationChangeValues = New Vec2f(options.alpha, options.beta)
         clone.Run(src)
         dst2 = clone.dst2
         dst3 = clone.dst3
@@ -93,7 +93,7 @@ Public Class XR_Clone_TextureFlattening : Inherits TaskParent
         options.Run()
 
         clone.cloneSpec = 2
-        clone.textureFlatteningValues = New cv.Vec2f(options.lowThreshold, options.highThreshold)
+        clone.textureFlatteningValues = New Vec2f(options.lowThreshold, options.highThreshold)
         clone.Run(src)
         dst2 = clone.dst2
         dst3 = clone.dst3
@@ -108,19 +108,19 @@ End Class
 ' https://github.com/opencv/opencv/blob/master/samples/cpp/cloning_demo.cpp
 ' https://github.com/opencv/opencv/blob/master/samples/cpp/cloning_demo.cpp
 Public Class XR_Clone_Eagle : Inherits TaskParent
-    Dim sourceImage As cv.Mat
-    Dim mask As cv.Mat
-    Dim srcROI As cv.Rect
-    Dim maskROI As cv.Rect
+    Dim sourceImage As Mat
+    Dim mask As Mat
+    Dim srcROI as cv.Rect
+    Dim maskROI as cv.Rect
     Dim pt As cv.Point
     Dim options As New Options_Clone
     Public Sub New()
         sourceImage = ImRead(task.homeDir + "Data/CloneSource.png")
-        Resize(sourceImage, sourceImage, New cv.Size(sourceImage.Width * dst2.Width / 1280, sourceImage.Height * dst2.Height / 720))
+        Resize(sourceImage, sourceImage, New Size(sourceImage.Width * dst2.Width / 1280, sourceImage.Height * dst2.Height / 720))
         srcROI = New cv.Rect(0, 40, sourceImage.Width, sourceImage.Height)
 
         mask = ImRead(task.homeDir + "Data/Clonemask.png")
-        Resize(mask, mask, New cv.Size(mask.Width * dst2.Width / 1280, mask.Height * dst2.Height / 720))
+        Resize(mask, mask, New Size(mask.Width * dst2.Width / 1280, mask.Height * dst2.Height / 720))
         maskROI = New cv.Rect(srcROI.Width, 40, mask.Width, mask.Height)
 
         dst3.SetTo(0)
@@ -168,7 +168,7 @@ Public Class XR_Clone_Seamless : Inherits TaskParent
             dst3.SetTo(0)
             Circle(dst3, center, radius, white, -1, task.lineType)
         Else
-            Rectangle(dst3, task.drawRect, cv.Scalar.White, -1)
+            Rectangle(dst3, task.drawRect, Scalar.White, -1)
         End If
 
         dst2 = src.Clone()

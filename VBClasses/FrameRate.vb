@@ -6,14 +6,14 @@ Public Class FrameRate_Basics : Inherits TaskParent
         desc = "Compare each frame to its last to figure out which frames really changed for each invocation."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        Static lastImages() As cv.Mat = {task.color.Clone, task.leftView.Clone,
+        Static lastImages() As Mat = {task.color.Clone, task.leftView.Clone,
                                                  task.rightView.Clone, task.depthRGB.Clone}
         For i = 0 To frameCounts.Count - 1
             mats.mat(i) = Choose(i + 1, task.color, task.leftView, task.rightView, task.depthRGB).clone()
             mats.mat(i) -= lastImages(i)
             Dim count = Sum(mats.mat(i))
             If count(0) > 0 Or count(1) > 0 Or count(2) > 0 Then frameCounts(i) += 1
-            Threshold(mats.mat(i), mats.mat(i), 0, 255, cv.ThresholdTypes.Binary)
+            Threshold(mats.mat(i), mats.mat(i), 0, 255, ThresholdTypes.Binary)
             ConvertScaleAbs(mats.mat(i), mats.mat(i))
         Next
         If task.heartBeat Then
@@ -43,13 +43,13 @@ Public Class XR_FrameRate_BasicsGray : Inherits TaskParent
         desc = "Compare each frame to its last to figure out which frames really changed for each invocation."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        Static lastImages() As cv.Mat = {task.color.Clone, task.leftView.Clone,
+        Static lastImages() As Mat = {task.color.Clone, task.leftView.Clone,
                                              task.rightView.Clone, task.depthRGB.Clone}
         For i = 0 To frameCounts.Count - 1
             mats.mat(i) = Choose(i + 1, task.color, task.leftView, task.rightView, task.depthRGB).clone()
             If mats.mat(i).Channels > 1 Then
-                CvtColor(mats.mat(i), mats.mat(i), cv.ColorConversionCodes.BGR2GRAY)
-                CvtColor(lastImages(i), lastImages(i), cv.ColorConversionCodes.BGR2GRAY)
+                CvtColor(mats.mat(i), mats.mat(i), ColorConversionCodes.BGR2GRAY)
+                CvtColor(lastImages(i), lastImages(i), ColorConversionCodes.BGR2GRAY)
             Else
                 mats.mat(i) = mats.mat(i)
                 lastImages(i) = lastImages(i)
@@ -57,7 +57,7 @@ Public Class XR_FrameRate_BasicsGray : Inherits TaskParent
             mats.mat(i) -= lastImages(i)
             Dim count = CountNonZero(mats.mat(i))
             If count > 0 Then frameCounts(i) += 1
-            Threshold(mats.mat(i), mats.mat(i), 0, 255, cv.ThresholdTypes.Binary)
+            Threshold(mats.mat(i), mats.mat(i), 0, 255, ThresholdTypes.Binary)
         Next
         If task.heartBeat Then
             strOut = ""

@@ -75,7 +75,7 @@ Public Class XR_Bin2Way_RedColor : Inherits TaskParent
     Dim bin2 As New Bin2Way_Gradation
     Dim redC As New RedColor_Basics
     Public Sub New()
-        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
+        dst1 = New Mat(dst1.Size, MatType.CV_8U, 0)
         desc = "Identify 4 gradations of light and combine them for input to RedColor"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -102,11 +102,11 @@ End Class
 
 Public Class Bin2Way_Gradation : Inherits TaskParent
     Dim bin2 As New Bin2Way_Basics
-    Public mats(3) As cv.Mat
+    Public mats(3) As Mat
     Public Sub New()
-        dst3 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
+        dst3 = New Mat(dst1.Size, MatType.CV_8U, 0)
         For Each m In mats
-            m = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+            m = New Mat(dst2.Size, MatType.CV_8U, 0)
         Next
 
         labels(2) = "4 gradations of light to dark - 8uC3"
@@ -115,7 +115,7 @@ Public Class Bin2Way_Gradation : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         bin2.fraction = task.gray.Total / 2
-        bin2.hist.histMask = New cv.Mat
+        bin2.hist.histMask = New Mat
         bin2.Run(task.gray)
         Dim darkestMask = bin2.mats.mat(0).Clone
         Dim lightestMask = bin2.mats.mat(1).Clone
@@ -212,7 +212,7 @@ Public Class Bin2Way_RecurseOnce : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         bin2.fraction = task.gray.Total / 2
-        bin2.hist.histMask = New cv.Mat
+        bin2.hist.histMask = New Mat
         bin2.Run(task.gray)
         Dim darkestMask = bin2.mats.mat(0).Clone
         Dim lightestMask = bin2.mats.mat(1).Clone
@@ -245,7 +245,7 @@ Public Class XR_Bin2Way_RedCloudLightToDark : Inherits TaskParent
     Dim redCs(3) As RedColor_Basics
     Dim mats As New Mat_4to1
     Dim rclist As New List(Of rcDataOld)
-    Dim rcMap As cv.Mat = New cv.Mat(dst2.Size, cv.MatType.CV_32S, 0)
+    Dim rcMap As Mat = New Mat(dst2.Size, MatType.CV_32S, 0)
     Public Sub New()
         For i = 0 To redCs.Count - 1
             redCs(i) = New RedColor_Basics

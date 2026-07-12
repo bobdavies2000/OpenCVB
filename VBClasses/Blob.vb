@@ -3,7 +3,7 @@ Public Class Blob_Basics : Inherits TaskParent
     Implements IDisposable
     Dim options As Options_Blob
     Dim input As Blob_Input
-    Dim simpleBlob As cv.SimpleBlobDetector
+    Dim simpleBlob As SimpleBlobDetector
     Public Sub New()
         options = New Options_Blob
         input = New Blob_Input
@@ -19,20 +19,20 @@ Public Class Blob_Basics : Inherits TaskParent
             dst2 = src
         End If
 
-        Dim binaryImage As New cv.Mat
-        CvtColor(dst2, binaryImage, cv.ColorConversionCodes.BGR2GRAY)
-        Threshold(binaryImage, binaryImage, thresh:=0, maxval:=255, type:=cv.ThresholdTypes.Binary)
+        Dim binaryImage As New Mat
+        CvtColor(dst2, binaryImage, ColorConversionCodes.BGR2GRAY)
+        Threshold(binaryImage, binaryImage, thresh:=0, maxval:=255, type:=ThresholdTypes.Binary)
 
         If simpleBlob Is Nothing Then
-            simpleBlob = cv.SimpleBlobDetector.Create(CType(options.blobParams, cv.SimpleBlobDetector.Params))
+            simpleBlob = SimpleBlobDetector.Create(CType(options.blobParams, SimpleBlobDetector.Params))
         End If
         Dim keypoint = simpleBlob.Detect(dst2)
 
         DrawKeypoints(image:=binaryImage,
                              keypoints:=keypoint,
                              outImage:=dst3,
-                             color:=cv.Scalar.FromRgb(255, 0, 0),
-                             flags:=cv.DrawMatchesFlags.DrawRichKeypoints)
+                             color:=Scalar.FromRgb(255, 0, 0),
+                             flags:=DrawMatchesFlags.DrawRichKeypoints)
     End Sub
     Protected Overrides Sub Finalize()
         If simpleBlob IsNot Nothing Then simpleBlob.Dispose()
@@ -94,25 +94,25 @@ Public Class Blob_RenderBlobs : Inherits TaskParent
         If task.heartBeatLT Then
             input.Run(src)
             dst2 = input.dst2
-            Dim binary As New cv.Mat
-            Threshold(task.gray, binary, 0, 255, cv.ThresholdTypes.Otsu Or cv.ThresholdTypes.Binary)
+            Dim binary As New Mat
+            Threshold(task.gray, binary, 0, 255, ThresholdTypes.Otsu Or ThresholdTypes.Binary)
             Dim labelView = dst2.EmptyClone
-            Dim stats As New cv.Mat
-            Dim centroids As New cv.Mat
+            Dim stats As New Mat
+            Dim centroids As New Mat
             Dim cc = ConnectedComponentsEx(binary)
             Dim labelCount = ConnectedComponentsWithStats(binary, labelView, stats, centroids)
             cc.RenderBlobs(labelView)
 
             'For Each b In cc.Blobs.Skip(1)
-            '    dst2.Rectangle(b.Rect, cv.Scalar.Red, task.lineWidth + 1, task.lineType)
+            '    dst2.Rectangle(b.Rect, Scalar.Red, task.lineWidth + 1, task.lineType)
             'Next
 
             Dim maxBlob = cc.GetLargestBlob()
             dst3.SetTo(0)
             cc.FilterByBlob(dst2, dst3, maxBlob)
 
-            Circle(dst3, New cv.Point(maxBlob.Centroid.X, maxBlob.Centroid.Y), task.DotSize + 3, cv.Scalar.Blue, -1, task.lineType)
-            Circle(dst3, New cv.Point(maxBlob.Centroid.X, maxBlob.Centroid.Y), task.DotSize, cv.Scalar.Yellow, -1, task.lineType)
+            Circle(dst3, New cv.Point(maxBlob.Centroid.X, maxBlob.Centroid.Y), task.DotSize + 3, Scalar.Blue, -1, task.lineType)
+            Circle(dst3, New cv.Point(maxBlob.Centroid.X, maxBlob.Centroid.Y), task.DotSize, Scalar.Yellow, -1, task.lineType)
         End If
     End Sub
 End Class

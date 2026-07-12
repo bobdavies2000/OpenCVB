@@ -1,12 +1,12 @@
 Imports OpenCvSharp.XFeatures2D
 Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 Module dft_Module
-    Public Function inverseDFT(complexImage As cv.Mat) As cv.Mat
-        Dim invDFT As New cv.Mat
-        Dft(complexImage, invDFT, cv.DftFlags.Inverse Or cv.DftFlags.RealOutput)
-        Normalize(invDFT, invDFT, 0, 255, cv.NormTypes.MinMax)
-        Dim inverse8u As New cv.Mat
-        invDFT.ConvertTo(inverse8u, cv.MatType.CV_8U)
+    Public Function inverseDFT(complexImage As Mat) As Mat
+        Dim invDFT As New Mat
+        Dft(complexImage, invDFT, DftFlags.Inverse Or DftFlags.RealOutput)
+        Normalize(invDFT, invDFT, 0, 255, NormTypes.MinMax)
+        Dim inverse8u As New Mat
+        invDFT.ConvertTo(inverse8u, MatType.CV_8U)
         Return inverse8u
     End Function
 End Module
@@ -17,10 +17,10 @@ End Module
 ' http://stackoverflow.com/questions/19761526/how-to-do-inverse-dft-in-opencv
 Public Class DFT_Basics : Inherits TaskParent
     Dim mats As New Mat_4to1
-    Public magnitude As New cv.Mat
-    Public spectrum As New cv.Mat
-    Public complexImage As New cv.Mat
-    Public grayMat As cv.Mat
+    Public magnitude As New Mat
+    Public spectrum As New Mat
+    Public complexImage As New Mat
+    Public grayMat As Mat
     Public rows As Integer
     Public cols As Integer
     Public Sub New()
@@ -33,26 +33,26 @@ Public Class DFT_Basics : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         rows = GetOptimalDFTSize(task.gray.Rows)
         cols = GetOptimalDFTSize(task.gray.Cols)
-        Dim padded = New cv.Mat(task.gray.Width, task.gray.Height, cv.MatType.CV_8UC3)
-        CopyMakeBorder(task.gray, padded, 0, rows - task.gray.Rows, 0, cols - task.gray.Cols, cv.BorderTypes.Constant, cv.Scalar.All(0))
-        Dim padded32 As New cv.Mat
-        padded.ConvertTo(padded32, cv.MatType.CV_32F)
-        Dim planes() = {padded32, New cv.Mat(padded.Size(), cv.MatType.CV_32F, cv.Scalar.All(0))}
+        Dim padded = New Mat(task.gray.Width, task.gray.Height, MatType.CV_8UC3)
+        CopyMakeBorder(task.gray, padded, 0, rows - task.gray.Rows, 0, cols - task.gray.Cols, BorderTypes.Constant, Scalar.All(0))
+        Dim padded32 As New Mat
+        padded.ConvertTo(padded32, MatType.CV_32F)
+        Dim planes() = {padded32, New Mat(padded.Size(), MatType.CV_32F, Scalar.All(0))}
         Merge(planes, complexImage)
         Dft(complexImage, complexImage)
 
         ' compute the magnitude And switch to logarithmic scale => log(1 + sqrt(Re(DFT(I))^2 + Im(DFT(I))^2))
         Split(complexImage, planes)
 
-        cv.Cv2.Magnitude(planes(0), planes(1), magnitude)
-        magnitude += cv.Scalar.All(1) ' switch To logarithmic scale
+        Cv2.Magnitude(planes(0), planes(1), magnitude)
+        magnitude += Scalar.All(1) ' switch To logarithmic scale
         Log(magnitude, magnitude)
 
         ' crop the spectrum, if it has an odd number of rows Or columns
         spectrum = magnitude(New cv.Rect(0, 0, magnitude.Cols And -2, magnitude.Rows And -2))
         ' Transform the matrix with float values into range 0-255
-        Normalize(spectrum, spectrum, 0, 255, cv.NormTypes.MinMax)
-        spectrum.ConvertTo(padded, cv.MatType.CV_8U)
+        Normalize(spectrum, spectrum, 0, 255, NormTypes.MinMax)
+        spectrum.ConvertTo(padded, MatType.CV_8U)
 
         ' rearrange the quadrants of Fourier image  so that the origin is at the image center
         Dim cx = padded.Cols \ 2
@@ -81,18 +81,18 @@ Public Class XR_DFT_Inverse : Inherits TaskParent
         desc = "Take the inverse of the Discrete Fourier Transform."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        Dim gray32f As New cv.Mat
-        task.gray.ConvertTo(gray32f, cv.MatType.CV_32F)
-        Dim planes() = {gray32f, New cv.Mat(gray32f.Size(), cv.MatType.CV_32F, cv.Scalar.All(0))}
-        Dim complex As New cv.Mat, complexImage As New cv.Mat
+        Dim gray32f As New Mat
+        task.gray.ConvertTo(gray32f, MatType.CV_32F)
+        Dim planes() = {gray32f, New Mat(gray32f.Size(), MatType.CV_32F, Scalar.All(0))}
+        Dim complex As New Mat, complexImage As New Mat
         Merge(planes, complex)
         Dft(complex, complexImage)
 
         dst2 = inverseDFT(complexImage)
 
-        Dim diff As New cv.Mat
+        Dim diff As New Mat
         Absdiff(task.gray, dst2, diff)
-        Threshold(diff, mats.mat(0), 0, 255, cv.ThresholdTypes.Binary)
+        Threshold(diff, mats.mat(0), 0, 255, ThresholdTypes.Binary)
         mats.mat(1) = (diff * 50).ToMat
         mats.Run(emptyMat)
         If CountNonZero(mats.mat(0)) > 0 Then
@@ -127,8 +127,8 @@ Public Class DFT_ButterworthFilter_MT : Inherits TaskParent
             Parallel.For(0, 2,
                 Sub(k)
                     Dim r = options.radius / (k + 1), rNext As Double
-                    options.butterworthFilter(k) = New cv.Mat(dft.complexImage.Size(), cv.MatType.CV_32FC2)
-                    Dim tmp As New cv.Mat(options.butterworthFilter(k).Size(), cv.MatType.CV_32F, cv.Scalar.All(0))
+                    options.butterworthFilter(k) = New Mat(dft.complexImage.Size(), MatType.CV_32FC2)
+                    Dim tmp As New Mat(options.butterworthFilter(k).Size(), MatType.CV_32F, Scalar.All(0))
                     Dim center As New cv.Point(options.butterworthFilter(k).Rows / 2, options.butterworthFilter(k).Cols / 2)
                     For i = 0 To options.butterworthFilter(k).Rows - 1
                         For j = 0 To options.butterworthFilter(k).Cols - 1
@@ -142,7 +142,7 @@ Public Class DFT_ButterworthFilter_MT : Inherits TaskParent
         End If
         Parallel.For(0, 2,
            Sub(k)
-               Dim complex As New cv.Mat
+               Dim complex As New Mat
                MulSpectrums(options.butterworthFilter(k), dft.complexImage, complex, options.dftFlag)
                If k = 0 Then dst2 = inverseDFT(complex) Else dst3 = inverseDFT(complex)
            End Sub)
@@ -166,9 +166,9 @@ Public Class XR_DFT_ButterworthDepth : Inherits TaskParent
         labels(3) = "Same filter with radius / 2"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-    Dim _bfilter_cvt As New cv.Mat
-    CvtColor(task.depthRGB, _bfilter_cvt, cv.ColorConversionCodes.BGR2GRAY)
-    bfilter.Run(_bfilter_cvt)
+        Dim _bfilter_cvt As New Mat
+        CvtColor(task.depthRGB, _bfilter_cvt, ColorConversionCodes.BGR2GRAY)
+        bfilter.Run(_bfilter_cvt)
         dst2 = bfilter.dst2
         dst3 = bfilter.dst3
     End Sub
@@ -223,9 +223,9 @@ Public Class XR_DFT_Shapes : Inherits TaskParent
             Case "Draw Symmetrical Shapes"
                 symShapes.Run(src)
                 dst2 = symShapes.dst2
-            Case "Draw Point"
+            Case "Draw cv.Point"
                 If task.heartBeat Then
-                    dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
+                    dst2 = New Mat(dst2.Size(), MatType.CV_8U, Scalar.All(0))
                     Dim pt1 = New cv.Point(msRNG.Next(0, dst2.Width / 10), msRNG.Next(0, dst2.Height / 10))
                     Dim pt2 = New cv.Point(msRNG.Next(0, dst2.Width / 10), msRNG.Next(0, dst2.Height / 10))
                     dst2.Set(Of Byte)(pt1.Y, pt1.X, 255)

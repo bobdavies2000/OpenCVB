@@ -14,11 +14,11 @@ Public Class Brick_Basics : Inherits TaskParent
 
         If task.optionsChanged Then brickList.Clear()
 
-        Dim correlationMat As New cv.Mat
+        Dim correlationMat As New Mat
         brickList.Clear()
         Dim depthCount As Integer
         brickDepthCount = 0
-        Dim colorstdev As cv.Scalar
+        Dim colorstdev As Scalar
         For i = 0 To task.gridRects.Count - 1
             Dim brick As New brickData
             brick.index = brickList.Count
@@ -44,17 +44,17 @@ Public Class Brick_Basics : Inherits TaskParent
 
                 If brick.lRect.Width = brick.rRect.Width Then
                     MatchTemplate(task.leftView(brick.lRect), task.rightView(brick.rRect),
-                                                         correlationMat, cv.TemplateMatchModes.CCoeffNormed)
+                                                         correlationMat, TemplateMatchModes.CCoeffNormed)
                     brick.correlation = correlationMat.Get(Of Single)(0, 0)
 
                     Dim p0 = Cloud_Basics.worldCoordinates(brick.rect.TopLeft, brick.depth)
                     Dim p1 = Cloud_Basics.worldCoordinates(brick.rect.BottomRight, brick.depth)
 
                     ' clockwise around starting in upper left.
-                    brick.corners.Add(New cv.Point3f(p0.X, p0.Y, brick.depth))
-                    brick.corners.Add(New cv.Point3f(p1.X, p0.Y, brick.depth))
-                    brick.corners.Add(New cv.Point3f(p1.X, p1.Y, brick.depth))
-                    brick.corners.Add(New cv.Point3f(p0.X, p1.Y, brick.depth))
+                    brick.corners.Add(New Point3f(p0.X, p0.Y, brick.depth))
+                    brick.corners.Add(New Point3f(p1.X, p0.Y, brick.depth))
+                    brick.corners.Add(New Point3f(p1.X, p1.Y, brick.depth))
+                    brick.corners.Add(New Point3f(p0.X, p1.Y, brick.depth))
                 End If
             End If
 
@@ -65,8 +65,8 @@ Public Class Brick_Basics : Inherits TaskParent
         If standaloneTest() Then
             Static edgesLR As New Edge_LeftRight
             edgesLR.Run(emptyMat)
-            CvtColor(edgesLR.dst2, dst2, cv.ColorConversionCodes.GRAY2BGR)
-            CvtColor(edgesLR.dst3, dst3, cv.ColorConversionCodes.GRAY2BGR)
+            CvtColor(edgesLR.dst2, dst2, ColorConversionCodes.GRAY2BGR)
+            CvtColor(edgesLR.dst3, dst3, ColorConversionCodes.GRAY2BGR)
 
             Dim index = task.gridMap.Get(Of Integer)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
             Dim brick = brickList(index)
@@ -95,8 +95,8 @@ Public Class XR_Brick_FullDepth : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         bricks.Run(src)
-        CvtColor(task.leftView, dst2, cv.ColorConversionCodes.GRAY2BGR)
-        CvtColor(task.rightView, dst3, cv.ColorConversionCodes.GRAY2BGR)
+        CvtColor(task.leftView, dst2, ColorConversionCodes.GRAY2BGR)
+        CvtColor(task.rightView, dst3, ColorConversionCodes.GRAY2BGR)
 
         Dim col As Integer, bricksPerRow = task.bricksPerRow
         Static whiteCol As Integer = bricksPerRow / 2
@@ -105,7 +105,7 @@ Public Class XR_Brick_FullDepth : Inherits TaskParent
         End If
         For Each brick In bricks.brickList
             If brick.depth > 0 Then
-                Dim color = If(col = whiteCol, cv.Scalar.Black, task.scalarColors(255 * (col / bricksPerRow)))
+                Dim color = If(col = whiteCol, Scalar.Black, task.scalarColors(255 * (col / bricksPerRow)))
                 Rectangle(dst2, brick.rect, color, task.lineWidth)
                 Rectangle(dst3, brick.rRect, color, task.lineWidth)
             End If
@@ -198,7 +198,7 @@ Public Class XR_Brick_Info : Inherits TaskParent
 
         strOut = labels(2) + vbCrLf + vbCrLf
 
-Rectangle(dst2, brick.rect, task.highlight, task.lineWidth)
+        Rectangle(dst2, brick.rect, task.highlight, task.lineWidth)
 
         strOut += CStr(index) + vbTab + "Grid ID" + vbCrLf
         strOut += CStr(brick.age) + vbTab + "Age" + vbTab + vbCrLf
@@ -226,7 +226,7 @@ Public Class XR_Brick_LeftToColor : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         bricks.Run(src)
-        CvtColor(task.leftView, dst2, cv.ColorConversionCodes.GRAY2BGR)
+        CvtColor(task.leftView, dst2, ColorConversionCodes.GRAY2BGR)
         dst3.SetTo(0)
         Dim count As Integer
         For Each brick In bricks.brickList
@@ -259,8 +259,8 @@ Public Class Brick_LeftRightMouse : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         bricks.Run(src)
         dst0 = src
-        CvtColor(task.leftView, dst2, cv.ColorConversionCodes.GRAY2BGR)
-        CvtColor(task.rightView, dst3, cv.ColorConversionCodes.GRAY2BGR)
+        CvtColor(task.leftView, dst2, ColorConversionCodes.GRAY2BGR)
+        CvtColor(task.rightView, dst3, ColorConversionCodes.GRAY2BGR)
 
         If standalone And task.testAllRunning Then
             Dim index As Integer = task.gridMap.Get(Of Integer)(task.clickPoint.Y, task.clickPoint.X)
@@ -298,7 +298,7 @@ Public Class XR_Brick_RGBtoLeft : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         bricks.Run(src)
-        Dim camInfo = task.calibData, correlationMat As New cv.Mat
+        Dim camInfo = task.calibData, correlationMat As New Mat
         Dim index As Integer = task.gridMap.Get(Of Integer)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
         Dim r As brickData
         If index > 0 And index < bricks.brickList.Count Then
@@ -313,10 +313,10 @@ Public Class XR_Brick_RGBtoLeft : Inherits TaskParent
         ' can be found.  For Intel, the left image and RGB need to be aligned first.
         ' With depth the correlation between the left and right for that grid square will be accurate (if there is depth.)
         irPt = r.rect.TopLeft ' the above cameras are already have RGB aligned to the left image.
-        labels(2) = "RGB point at " + rgbTop.ToString + " is at " + irPt.ToString + " in the left view "
+        labels(2) = "RGB cv.Point at " + rgbTop.ToString + " is at " + irPt.ToString + " in the left view "
 
-        CvtColor(task.leftView, dst2, cv.ColorConversionCodes.GRAY2BGR)
-        CvtColor(task.rightView, dst3, cv.ColorConversionCodes.GRAY2BGR)
+        CvtColor(task.leftView, dst2, ColorConversionCodes.GRAY2BGR)
+        CvtColor(task.rightView, dst3, ColorConversionCodes.GRAY2BGR)
 
         Rectangle(dst2, New cv.Rect(irPt.X, irPt.Y, r.rect.Width, r.rect.Height), task.highlight, task.lineWidth)
         Rectangle(dst3, r.rRect, task.highlight, task.lineWidth)
@@ -332,7 +332,7 @@ Public Class XR_Brick_CloudMaxVal : Inherits TaskParent
     Dim bricks As New Brick_Basics
     Dim template As New Math_Intrinsics
     Public Sub New()
-        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_32FC3, 0)
+        dst2 = New Mat(dst2.Size, MatType.CV_32FC3, 0)
         desc = "Use RGB motion bricks to determine if depth has changed in any r."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -340,7 +340,7 @@ Public Class XR_Brick_CloudMaxVal : Inherits TaskParent
         If task.heartBeatLT Or task.frameCount < 3 Then task.pointCloud.CopyTo(dst2)
 
         Dim splitCount As Integer
-        Dim splitMats() As cv.Mat = Nothing
+        Dim splitMats() As Mat = Nothing
         For Each brick In bricks.brickList
             If brick.depth > 0 Then
                 If brick.age < 10 Then
@@ -348,10 +348,10 @@ Public Class XR_Brick_CloudMaxVal : Inherits TaskParent
                     splitMats(2).SetTo(brick.mm.maxVal, task.depthmask(brick.rect))
 
                     Multiply(template.dst2(brick.rect), splitMats(2), splitMats(0))
-                    splitMats(0) *= cv.Scalar.All(1 / task.calibData.leftIntrinsics.fx)
+                    splitMats(0) *= Scalar.All(1 / task.calibData.leftIntrinsics.fx)
 
                     Multiply(template.dst3(brick.rect), splitMats(2), splitMats(1))
-                    splitMats(1) *= cv.Scalar.All(1 / task.calibData.leftIntrinsics.fy)
+                    splitMats(1) *= Scalar.All(1 / task.calibData.leftIntrinsics.fy)
 
                     Merge({splitMats(0), splitMats(1), splitMats(2)}, dst2(brick.rect))
                     splitCount += 1
@@ -373,7 +373,7 @@ Public Class XR_Brick_CloudMean : Inherits TaskParent
     Dim bricks As New Brick_Basics
     Dim template As New Math_Intrinsics
     Public Sub New()
-        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_32FC3, 0)
+        dst2 = New Mat(dst2.Size, MatType.CV_32FC3, 0)
         desc = "Use RGB motion bricks to determine if depth has changed in any r."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -381,17 +381,17 @@ Public Class XR_Brick_CloudMean : Inherits TaskParent
         If task.heartBeatLT Or task.frameCount < 3 Then task.pointCloud.CopyTo(dst2)
 
         Dim splitCount As Integer
-        Dim splitMats() As cv.Mat = Nothing
+        Dim splitMats() As Mat = Nothing
         For Each brick In bricks.brickList
             If brick.depth > 0 Then
                 Split(task.pointCloud(brick.rect), splitMats)
                 splitMats(2).SetTo(brick.depth, task.depthmask(brick.rect))
 
                 Multiply(template.dst2(brick.rect), splitMats(2), splitMats(0))
-                splitMats(0) *= cv.Scalar.All(1 / task.calibData.leftIntrinsics.fx)
+                splitMats(0) *= Scalar.All(1 / task.calibData.leftIntrinsics.fx)
 
                 Multiply(template.dst3(brick.rect), splitMats(2), splitMats(1))
-                splitMats(1) *= cv.Scalar.All(1 / task.calibData.leftIntrinsics.fy)
+                splitMats(1) *= Scalar.All(1 / task.calibData.leftIntrinsics.fy)
 
                 Merge({splitMats(0), splitMats(1), splitMats(2)}, dst2(brick.rect))
                 splitCount += 1
@@ -412,7 +412,7 @@ Public Class XR_Brick_CloudRange : Inherits TaskParent
     Dim bricks As New Brick_Basics
     Dim template As New Math_Intrinsics
     Public Sub New()
-        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_32FC3, 0)
+        dst2 = New Mat(dst2.Size, MatType.CV_32FC3, 0)
         desc = "Use RGB motion bricks to determine if depth has changed in any r."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -421,7 +421,7 @@ Public Class XR_Brick_CloudRange : Inherits TaskParent
 
         Dim splitCount As Integer
         Dim newRange As Single = 0.1F
-        Dim splitMats() As cv.Mat = Nothing
+        Dim splitMats() As Mat = Nothing
         For Each brick In bricks.brickList
             If brick.depth > 0 And brick.age = 1 Then
                 If brick.mm.range > newRange Then ' if the range within a grid square is > 10 cm's, fit it within 10 cm's.
@@ -431,10 +431,10 @@ Public Class XR_Brick_CloudRange : Inherits TaskParent
                     splitMats(2) += brick.depth
 
                     Multiply(template.dst2(brick.rect), splitMats(2), splitMats(0))
-                    splitMats(0) *= cv.Scalar.All(1 / task.calibData.leftIntrinsics.fx)
+                    splitMats(0) *= Scalar.All(1 / task.calibData.leftIntrinsics.fx)
 
                     Multiply(template.dst3(brick.rect), splitMats(2), splitMats(1))
-                    splitMats(1) *= cv.Scalar.All(1 / task.calibData.leftIntrinsics.fy)
+                    splitMats(1) *= Scalar.All(1 / task.calibData.leftIntrinsics.fy)
 
                     Merge({splitMats(0), splitMats(1), splitMats(2)}, dst2(brick.rect))
                     dst2(brick.rect).SetTo(0, task.noDepthMask(brick.rect))
@@ -460,7 +460,7 @@ Public Class XR_Brick_FeaturesAndEdges : Inherits TaskParent
     Public boundaryCells As New List(Of List(Of Integer))
     Public Sub New()
         labels(2) = "Gray and black regions are featureless while white has features..."
-        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U)
+        dst2 = New Mat(dst2.Size, MatType.CV_8U)
         desc = "Find the boundary cells between feature and featureless cells."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -479,7 +479,7 @@ Public Class XR_Brick_FeaturesAndEdges : Inherits TaskParent
                     Dim grB = task.gridRects(nabeList(i))
                     Dim val = feat.featureMask.Get(Of Byte)(grB.Y, grB.X)
                     If centerType <> val Then
-                        If addFirst Then boundList.Add(nabeList(0)) ' first element is the center point (has features)
+                        If addFirst Then boundList.Add(nabeList(0)) ' first element is the center cv.Point (has features)
                         addFirst = False
                         boundList.Add(nabeList(i))
                     End If
@@ -513,7 +513,7 @@ Public Class XR_Brick_MLColor : Inherits TaskParent
     Public Sub New()
         If standalone Then task.gOptions.displayDst1.Checked = True
         ml.buildEveryPass = True
-        dst1 = New cv.Mat(dst2.Size, cv.MatType.CV_8U)
+        dst1 = New Mat(dst2.Size, MatType.CV_8U)
         desc = "Train an ML tree to predict each pixel of the boundary cells using only color from boundary neighbors."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -521,30 +521,30 @@ Public Class XR_Brick_MLColor : Inherits TaskParent
         bounds.Run(src)
         Dim edgeMask = task.edges.dst2
 
-        Dim rgb32f As New cv.Mat, tmp As New cv.Mat
-        src.ConvertTo(rgb32f, cv.MatType.CV_32FC3)
+        Dim rgb32f As New Mat, tmp As New Mat
+        src.ConvertTo(rgb32f, MatType.CV_32FC3)
 
         dst1 = bounds.feat.fLessMask
-        Dim trainRGB As cv.Mat
+        Dim trainRGB As Mat
         For i = 0 To bounds.boundaryCells.Count - 1
             Dim nList = bounds.boundaryCells(i)
 
             ' the first r is the center one and the only r with edges.  The rest are featureless.
             Dim r = task.gridRects(nList(0))
-            Dim edgePixels As New cv.Mat
+            Dim edgePixels As New Mat
             FindNonZero(edgeMask(r), edgePixels)
 
             ' mark the edge pixels as class 2 - others will be updated next
-            ml.trainResponse = New cv.Mat(nList.Count + edgePixels.Rows - 1, 1,
-                                               cv.MatType.CV_32F, New cv.Scalar(2))
-            trainRGB = New cv.Mat(ml.trainResponse.Rows, 1, cv.MatType.CV_32FC3)
+            ml.trainResponse = New Mat(nList.Count + edgePixels.Rows - 1, 1,
+                                               MatType.CV_32F, New Scalar(2))
+            trainRGB = New Mat(ml.trainResponse.Rows, 1, MatType.CV_32FC3)
 
             For j = 1 To nList.Count - 1
                 Dim grA = task.gridRects(nList(j))
                 Dim x As Integer = Math.Floor(grA.X * task.bricksPerRow / task.cols)
                 Dim y As Integer = Math.Floor(grA.Y * task.bricksPerCol / task.rows)
-                Dim val = task.lowResColor.Get(Of cv.Vec3f)(y, x)
-                trainRGB.Set(Of cv.Vec3f)(j - 1, 0, val)
+                Dim val = task.lowResColor.Get(Of Vec3f)(y, x)
+                trainRGB.Set(Of Vec3f)(j - 1, 0, val)
                 ml.trainResponse.Set(Of Single)(j - 1, 0, 1)
             Next
 
@@ -552,8 +552,8 @@ Public Class XR_Brick_MLColor : Inherits TaskParent
             Dim index = nList.Count - 1
             For j = 0 To edgePixels.Rows - 1
                 Dim pt = edgePixels.Get(Of cv.Point)(j, 0)
-                Dim val = rgb32f.Get(Of cv.Vec3f)(r.Y + pt.Y, r.X + pt.X)
-                trainRGB.Set(Of cv.Vec3f)(index + j, 0, val) ' ml.trainResponse already set to 2
+                Dim val = rgb32f.Get(Of Vec3f)(r.Y + pt.Y, r.X + pt.X)
+                trainRGB.Set(Of Vec3f)(index + j, 0, val) ' ml.trainResponse already set to 2
             Next
 
             ml.trainMats = {trainRGB}
@@ -562,7 +562,7 @@ Public Class XR_Brick_MLColor : Inherits TaskParent
             ml.testMats = {rgb32f(grB)}
             ml.Run(src)
 
-            Threshold(ml.predictions, dst1(grB), 1.5, 255, cv.ThresholdTypes.BinaryInv)
+            Threshold(ml.predictions, dst1(grB), 1.5, 255, ThresholdTypes.BinaryInv)
             ConvertScaleAbs(dst1(grB), dst1(grB), 1, grB.Height)
         Next
 
@@ -586,11 +586,11 @@ Public Class XR_Brick_CorrelationMap : Inherits TaskParent
     Dim bricks As New Brick_Basics
     Public Sub New()
         labels(3) = "The map to identify each r's depth."
-        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
+        dst1 = New Mat(dst1.Size, MatType.CV_8U, 0)
         desc = "Display a heatmap of the correlation of the left and right images for each r."
     End Sub
-    Public Function ShowPaletteCorrelation(input As cv.Mat) As cv.Mat
-        Dim output As New cv.Mat
+    Public Function ShowPaletteCorrelation(input As Mat) As Mat
+        Dim output As New Mat
         ApplyColorMap(input, output, task.colorMapBricks)
         Return output
     End Function
@@ -645,8 +645,8 @@ Public Class Brick_LeftRight : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         bricks.Run(src)
-        CvtColor(task.leftView, dst2, cv.ColorConversionCodes.GRAY2BGR)
-        CvtColor(task.rightView, dst3, cv.ColorConversionCodes.GRAY2BGR)
+        CvtColor(task.leftView, dst2, ColorConversionCodes.GRAY2BGR)
+        CvtColor(task.rightView, dst3, ColorConversionCodes.GRAY2BGR)
 
         Dim colorIndex As Integer
         For i = 0 To task.bricksPerRow - 1 Step 2
@@ -655,8 +655,8 @@ Public Class Brick_LeftRight : Inherits TaskParent
                 Dim brick = bricks.brickList(j)
                 Dim color = task.scalarColors(colorIndex)
                 If brick.depth > 0 Then
-                Rectangle(dst2, brick.lRect, color, task.lineWidth)
-                Rectangle(dst3, brick.rRect, color, task.lineWidth)
+                    Rectangle(dst2, brick.lRect, color, task.lineWidth)
+                    Rectangle(dst3, brick.rRect, color, task.lineWidth)
                 End If
                 colorIndex += 1
             Next
@@ -673,19 +673,19 @@ End Class
 Public Class XR_Brick_EdgeFlips : Inherits TaskParent
     Dim bricks As New Brick_Basics
     Public featureRects As New List(Of cv.Rect)
-    Public featureMask As New cv.Mat
-    Public fLessMask As New cv.Mat
+    Public featureMask As New Mat
+    Public fLessMask As New Mat
     Public fLessRects As New List(Of cv.Rect)
     Public Sub New()
-        featureMask = New cv.Mat(dst3.Size, cv.MatType.CV_8U)
-        fLessMask = New cv.Mat(dst3.Size, cv.MatType.CV_8U)
+        featureMask = New Mat(dst3.Size, MatType.CV_8U)
+        fLessMask = New Mat(dst3.Size, MatType.CV_8U)
         task.fOptions.EdgeMethods.SelectedItem() = "Laplacian"
         desc = "Add edges to features"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         bricks.Run(src)
         Static stateList As New List(Of Single)
-        Static lastDepth As cv.Mat = task.lowResDepth.Clone
+        Static lastDepth As Mat = task.lowResDepth.Clone
 
         featureRects.Clear()
         fLessRects.Clear()
@@ -724,7 +724,7 @@ Public Class XR_Brick_EdgeFlips : Inherits TaskParent
         src.CopyTo(dst3, featureMask)
 
         For Each r In flipRects
-        Rectangle(dst2, r, task.highlight, task.lineWidth)
+            Rectangle(dst2, r, task.highlight, task.lineWidth)
         Next
 
         For Each r In fLessRects
@@ -750,7 +750,7 @@ Public Class XR_Brick_Edges : Inherits TaskParent
     Dim bricks As New Brick_Basics
     Dim options As New Options_LeftRightCorrelation
     Public Sub New()
-        dst3 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        dst3 = New Mat(dst2.Size, MatType.CV_8U, 0)
         desc = "Add edges to features"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -763,7 +763,7 @@ Public Class XR_Brick_Edges : Inherits TaskParent
         Dim count As Integer
         dst3.SetTo(0)
         For Each brick As brickData In bricks.brickList
-If CountNonZero(dst2(brick.lRect)) And brick.rRect.Width > 0 And brick.correlation > options.correlation Then
+            If CountNonZero(dst2(brick.lRect)) And brick.rRect.Width > 0 And brick.correlation > options.correlation Then
                 task.rightView(brick.rRect).CopyTo(dst3(brick.rRect))
                 count += 1
             End If
@@ -782,7 +782,7 @@ Public Class XR_Brick_Lines : Inherits TaskParent
     Dim motionLeft As New Motion_Basics_TA
     Public Sub New()
         labels(2) = "The lines are for the left image."
-        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
+        dst3 = New Mat(dst3.Size, MatType.CV_8U, 0)
         desc = "Find all the bricks that contain lines"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -797,7 +797,7 @@ Public Class XR_Brick_Lines : Inherits TaskParent
         Dim count As Integer
         dst3.SetTo(0)
         For Each brick As brickData In bricks.brickList
-If CountNonZero(dst2(brick.lRect)) And brick.rRect.Width > 0 And
+            If CountNonZero(dst2(brick.lRect)) And brick.rRect.Width > 0 And
                         brick.correlation > options.correlation Then
 
                 task.leftView(brick.lRect).CopyTo(dst3(brick.lRect))
@@ -816,7 +816,7 @@ Public Class XR_Brick_HighRange : Inherits TaskParent
     Dim bricks As New Brick_Basics
     Dim options As New Options_LeftRightCorrelation
     Public Sub New()
-        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
+        dst3 = New Mat(dst3.Size, MatType.CV_8U, 0)
         labels(2) = "Left view (stable)"
         desc = "Find all the bricks that have a high range (> X mm's)"
     End Sub
@@ -850,7 +850,7 @@ Public Class XR_Brick_NoDepthLines : Inherits TaskParent
     Public Sub New()
         If standalone Then task.gOptions.displayDst0.Checked = True
         labels(2) = "The lines are for the left image."
-        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
+        dst3 = New Mat(dst3.Size, MatType.CV_8U, 0)
         desc = "Find bricks that contain lines and depth zeros."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -890,7 +890,7 @@ Public Class Brick_Variability : Inherits TaskParent
     Dim fLess As New FeatureLess_DepthFull
     Public Sub New()
         OptionParent.FindSlider("Depth varies more than X mm's").Value = 30
-        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
+        dst3 = New Mat(dst3.Size, MatType.CV_8U, 0)
         desc = "Visualize where bricks have highly variable depth."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -942,7 +942,7 @@ Public Class Brick_Ranges : Inherits TaskParent
     Dim fLess As New FeatureLess_DepthFull
     Public Sub New()
         OptionParent.FindSlider("Depth varies more than X mm's").Value = 300
-        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
+        dst3 = New Mat(dst3.Size, MatType.CV_8U, 0)
         desc = "Visualize where bricks have highly variable depth range."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -991,7 +991,7 @@ Public Class Brick_Features : Inherits TaskParent
         dst2.SetTo(0, fLess.dst1)
         labels(2) = fLess.labels(2)
 
-        CvtColor(task.rightView, dst3, cv.ColorConversionCodes.GRAY2BGR)
+        CvtColor(task.rightView, dst3, ColorConversionCodes.GRAY2BGR)
         Dim index = task.gridMap.Get(Of Integer)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
         Dim brick = bricks.brickList(index)
         Rectangle(dst2, brick.lRect, task.highlight, task.lineWidth)
@@ -1029,7 +1029,7 @@ Public Class XR_Brick_Plot : Inherits TaskParent
             brick = bricks.brickList(index)
         End If
 
-        Dim splitMats() As cv.Mat = Nothing
+        Dim splitMats() As Mat = Nothing
         Split(task.pointCloud(brick.rect), splitMats)
         Dim mmDepth = GetMinMax(splitMats(2))
         If Single.IsInfinity(mmDepth.maxVal) Then Exit Sub
@@ -1075,7 +1075,7 @@ Public Class Brick_Plot : Inherits TaskParent
             brick = bricks.brickList(index)
         End If
 
-        Dim splitMats() As cv.Mat = Nothing
+        Dim splitMats() As Mat = Nothing
         Split(task.pointCloud(brick.rect), splitMats)
         Dim mmDepth = GetMinMax(splitMats(2))
         If Single.IsInfinity(mmDepth.maxVal) Then Exit Sub
@@ -1110,8 +1110,8 @@ Public Class XR_Brick_Search : Inherits TaskParent
         desc = "Search the previous image for the endpoints of the top 10 lines."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        Static lastImage As cv.Mat = task.gray.Clone
-        Dim searchArea As cv.Mat
+        Static lastImage As Mat = task.gray.Clone
+        Dim searchArea As Mat
         Dim mm1 As mmData
         Dim mm2 As mmData
         lpList.Clear()
@@ -1123,7 +1123,7 @@ Public Class XR_Brick_Search : Inherits TaskParent
             Dim rect1 = task.gridNabeRects(p1GridIndex)
             searchArea = lastImage(rect1)
             MatchTemplate(searchArea, task.gray(task.gridRects(p1GridIndex)), dst1,
-                                 cv.TemplateMatchModes.CCoeffNormed)
+                                 TemplateMatchModes.CCoeffNormed)
             mm1 = GetMinMax(dst1)
 
             If mm1.maxVal > corrThreshold Then
@@ -1131,7 +1131,7 @@ Public Class XR_Brick_Search : Inherits TaskParent
                 Dim rect2 = task.gridNabeRects(p2GridIndex)
                 searchArea = lastImage(rect2)
                 MatchTemplate(searchArea, task.gray(task.gridRects(p2GridIndex)), dst1,
-                                     cv.TemplateMatchModes.CCoeffNormed)
+                                     TemplateMatchModes.CCoeffNormed)
                 mm2 = GetMinMax(dst1)
 
                 If mm2.maxVal > corrThreshold Then

@@ -5,14 +5,14 @@ Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 ' https://www.learnopencvb.com/otsu-thresholding-with-opencv/?ck_subscriber_id=785741175
 ' https://github.com/spmallick/learnopencv/tree/master/otsu-method?ck_subscriber_id=785741175
 Public Class Binarize_Basics : Inherits TaskParent
-    Public thresholdType = cv.ThresholdTypes.Otsu
-    Public histogram As New cv.Mat
-    Public meanScalar As cv.Scalar
-    Public mask As New cv.Mat
+    Public thresholdType = ThresholdTypes.Otsu
+    Public histogram As New Mat
+    Public meanScalar As Scalar
+    Public mask As New Mat
     Dim blurC As New Blur_Basics
     Public useBlur As Boolean
     Public Sub New()
-        mask = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, 255)
+        mask = New Mat(dst2.Size(), MatType.CV_8U, 255)
         desc = "Binarize an image using Threshold with OTSU."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -50,14 +50,14 @@ Public Class XR_Binarize_OTSU : Inherits TaskParent
         binarize.useBlur = False
         Select Case labels(2)
             Case "Binary"
-                binarize.thresholdType = cv.ThresholdTypes.Binary
+                binarize.thresholdType = ThresholdTypes.Binary
             Case "Binary + OTSU"
-                binarize.thresholdType = cv.ThresholdTypes.Binary + cv.ThresholdTypes.Otsu
+                binarize.thresholdType = ThresholdTypes.Binary + ThresholdTypes.Otsu
             Case "OTSU"
-                binarize.thresholdType = cv.ThresholdTypes.Otsu
+                binarize.thresholdType = ThresholdTypes.Otsu
             Case "OTSU + Blur"
                 binarize.useBlur = True
-                binarize.thresholdType = cv.ThresholdTypes.Binary + cv.ThresholdTypes.Otsu
+                binarize.thresholdType = ThresholdTypes.Binary + ThresholdTypes.Otsu
         End Select
         binarize.Run(task.gray)
         dst2 = binarize.dst2
@@ -77,10 +77,10 @@ End Class
 '    End Sub
 '    Public Overrides Sub RunAlg(src As cv.Mat)
 '        options.Run()
-'        CvXImgProc.NiblackThreshold(task.gray, dst0, 255, cv.ThresholdTypes.Binary, 5, 0.5, LocalBinarizationMethods.Niblack)
-'        dst2 = CvtColor(dst0, dst2, cv.ColorConversionCodes.GRAY2BGR)
-'        CvXImgProc.NiblackThreshold(task.gray, dst0, 255, cv.ThresholdTypes.Binary, 5, 0.5, LocalBinarizationMethods.Sauvola)
-'        dst3 = CvtColor(dst0, dst3, cv.ColorConversionCodes.GRAY2BGR)
+'        CvXImgProc.NiblackThreshold(task.gray, dst0, 255, ThresholdTypes.Binary, 5, 0.5, LocalBinarizationMethods.Niblack)
+'        dst2 = CvtColor(dst0, dst2, ColorConversionCodes.GRAY2BGR)
+'        CvXImgProc.NiblackThreshold(task.gray, dst0, 255, ThresholdTypes.Binary, 5, 0.5, LocalBinarizationMethods.Sauvola)
+'        dst3 = CvtColor(dst0, dst3, ColorConversionCodes.GRAY2BGR)
 '    End Sub
 'End Class
 
@@ -99,8 +99,8 @@ End Class
 '    Public Overrides Sub RunAlg(src As cv.Mat)
 '        options.Run()
 
-'        CvXImgProc.NiblackThreshold(task.gray, dst2, 255, cv.ThresholdTypes.Binary, 5, 0.5, LocalBinarizationMethods.Wolf)
-'        CvXImgProc.NiblackThreshold(task.gray, dst3, 255, cv.ThresholdTypes.Binary, 5, 0.5, LocalBinarizationMethods.Nick)
+'        CvXImgProc.NiblackThreshold(task.gray, dst2, 255, ThresholdTypes.Binary, 5, 0.5, LocalBinarizationMethods.Wolf)
+'        CvXImgProc.NiblackThreshold(task.gray, dst3, 255, ThresholdTypes.Binary, 5, 0.5, LocalBinarizationMethods.Nick)
 '    End Sub
 'End Class
 
@@ -114,7 +114,7 @@ Public Class XR_Binarize_KMeansMasks : Inherits TaskParent
     Dim mats As New Mat_4Click
     Public Sub New()
         labels(2) = "Ordered from dark to light, top left darkest, bottom right lightest "
-        dst1 = New cv.Mat(dst1.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
+        dst1 = New Mat(dst1.Size(), MatType.CV_8U, Scalar.All(0))
         desc = "Display the top 4 masks from the BGR kmeans output"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -149,7 +149,7 @@ Public Class XR_Binarize_KMeansRGB : Inherits TaskParent
         km.Run(src)
         dst1.SetTo(0)
         For i = 0 To km.masks.Count - 1
-            mats.mat(i) = New cv.Mat(dst2.Size(), cv.MatType.CV_8UC3, cv.Scalar.All(0))
+            mats.mat(i) = New Mat(dst2.Size(), MatType.CV_8UC3, Scalar.All(0))
             src.CopyTo(mats.mat(i), km.masks(i))
             If i >= 3 Then Exit For
         Next
@@ -196,9 +196,9 @@ Public Class XR_Binarize_FourPixelFlips : Inherits TaskParent
         binar4.Run(src)
         dst2 = Palettize(binar4.dst2)
 
-        Static lastSubD As cv.Mat = binar4.dst2.Clone
+        Static lastSubD As Mat = binar4.dst2.Clone
         dst3 = lastSubD - binar4.dst2
-        Threshold(dst3, dst3, 0, 255, cv.ThresholdTypes.Binary)
+        Threshold(dst3, dst3, 0, 255, ThresholdTypes.Binary)
         lastSubD = binar4.dst2.Clone
     End Sub
 End Class
@@ -208,14 +208,14 @@ End Class
 
 
 Public Class Binarize_Simple : Inherits TaskParent
-    Public meanScalar As cv.Scalar
+    Public meanScalar As Scalar
     Public injectVal As Integer = 255
     Public Sub New()
         desc = "Binarize an image using Threshold with OTSU."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         meanScalar = Mean(task.gray)
-        Threshold(task.gray, dst2, meanScalar(0), injectVal, cv.ThresholdTypes.Binary)
+        Threshold(task.gray, dst2, meanScalar(0), injectVal, ThresholdTypes.Binary)
     End Sub
 End Class
 
@@ -226,13 +226,13 @@ End Class
 
 
 Public Class XR_Binarize_SimpleOld : Inherits TaskParent
-    Public meanScalar As cv.Scalar
+    Public meanScalar As Scalar
     Public injectVal As Integer = 255
     Public Sub New()
         desc = "Binarize an image using Threshold with OTSU."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         meanScalar = Mean(task.gray)
-        Threshold(src, dst2, meanScalar(0), injectVal, cv.ThresholdTypes.Binary)
+        Threshold(src, dst2, meanScalar(0), injectVal, ThresholdTypes.Binary)
     End Sub
 End Class

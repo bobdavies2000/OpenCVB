@@ -3,8 +3,8 @@ Public Class HistPeak2D_Basics : Inherits TaskParent
     Public auto As New OpAuto_Peaks2DGrid
     Dim bgr As New Hist2D_BGR
     Dim delaunay As New Delaunay_ConsistentColor
-    Public histogram As New cv.Mat
-    Public ranges() As cv.Rangef
+    Public histogram As New Mat
+    Public ranges() As Rangef
     Public Sub New()
         If standalone Then task.gOptions.displayDst1.Checked = True
         desc = "Find the top X peaks in a 2D histogram and use Delaunay to setup the backprojection"
@@ -17,16 +17,16 @@ Public Class HistPeak2D_Basics : Inherits TaskParent
         End If
         If task.heartBeat Then
             auto.Run(histogram)
-            delaunay.inputPoints = New List(Of cv.Point2f)(auto.clusterPoints)
+            delaunay.inputPoints = New List(Of Point2f)(auto.clusterPoints)
             delaunay.Run(src)
             dst1 = auto.dst2
             dst3 = delaunay.dst2
         End If
 
-        Dim mask As New cv.Mat
-        Threshold(histogram, mask, 0, 255, cv.ThresholdTypes.Binary)
+        Dim mask As New Mat
+        Threshold(histogram, mask, 0, 255, ThresholdTypes.Binary)
         ConvertScaleAbs(mask, mask)
-        delaunay.dst1.ConvertTo(histogram, cv.MatType.CV_32F)
+        delaunay.dst1.ConvertTo(histogram, MatType.CV_32F)
         histogram.SetTo(0, Not mask)
 
         If ranges Is Nothing Or task.optionsChanged Then
@@ -35,7 +35,7 @@ Public Class HistPeak2D_Basics : Inherits TaskParent
             ranges = Hist2D_Basics.GetHist2Dminmax(src, task.channels(0), task.channels(1))
         End If
 
-        Dim backProjection As New cv.Mat
+        Dim backProjection As New Mat
         CalcBackProject({src}, task.channels, histogram, backProjection, ranges)
         dst2 = Palettize(backProjection)
     End Sub
@@ -94,7 +94,7 @@ Public Class XR_HistPeak2D_NotHotTop : Inherits TaskParent
         ConvertScaleAbs(dst1, dst1)
 
         Dim mm As mmData = GetMinMax(histTop.histogram)
-        dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_32F, mm.maxVal)
+        dst3 = New Mat(dst3.Size(), MatType.CV_32F, mm.maxVal)
         dst3 -= histTop.histogram
         dst3.SetTo(0, dst1)
 
@@ -120,7 +120,7 @@ Public Class XR_HistPeak2D_Edges : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         histTop.Run(src)
 
-        Threshold(histTop.histogram, dst3, task.projectionThreshold, 255, cv.ThresholdTypes.Binary)
+        Threshold(histTop.histogram, dst3, task.projectionThreshold, 255, ThresholdTypes.Binary)
         peak.histogram = histTop.histogram
         peak.Run(task.pointCloud)
         dst2 = peak.dst2

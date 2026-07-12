@@ -1,6 +1,6 @@
 Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 Public Class FindNonZero_Basics : Inherits TaskParent
-    Public ptMat As New cv.Mat
+    Public ptMat As New Mat
     Public Sub New()
         labels(2) = "Coordinates of non-zero points"
         labels(3) = "Non-zero original points"
@@ -8,7 +8,7 @@ Public Class FindNonZero_Basics : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If standalone Then
-            src = New cv.Mat(src.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
+            src = New Mat(src.Size(), MatType.CV_8U, Scalar.All(0))
             Dim srcPoints(100 - 1) As cv.Point ' doesn't really matter how many there are.
             For i = 0 To srcPoints.Length - 1
                 srcPoints(i).X = msRNG.Next(0, src.Width)
@@ -20,7 +20,7 @@ Public Class FindNonZero_Basics : Inherits TaskParent
         FindNonZero(src, ptMat)
 
         If standaloneTest() Then
-            dst3 = New cv.Mat(src.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
+            dst3 = New Mat(src.Size(), MatType.CV_8U, Scalar.All(0))
             ' mark the points so they are visible...
             For i = 0 To ptMat.Rows - 1
             Circle(dst3, ptMat.Get(Of cv.Point)(0, i), task.DotSize, white, -1, task.lineType)
@@ -74,20 +74,20 @@ End Class
 
 Public Class XR_FindNonZero_Line3DWorld : Inherits TaskParent
     Public lp As lpData
-    Public vecMat As New cv.Mat
+    Public vecMat As New Mat
     Public ptList As New List(Of cv.Point)
-    Public veclist As New List(Of cv.Vec3f) ' Reconstructed point cloud vectors.
+    Public veclist As New List(Of Vec3f) ' Reconstructed cv.Point cloud vectors.
     Public Sub New()
-        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        dst2 = New Mat(dst2.Size, MatType.CV_8U, 0)
         desc = "Find 3D points behind an RGB line and compute their world coordinates."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If standalone Then lp = task.lines.lpList(0)
 
         dst2.SetTo(0)
-        Line(dst2, lp.p1, lp.p2, 255, task.lineWidth, cv.LineTypes.Link8)
+        Line(dst2, lp.p1, lp.p2, 255, task.lineWidth, LineTypes.Link8)
 
-        Dim tmp As New cv.Mat
+        Dim tmp As New Mat
         FindNonZero(dst2(lp.rect), tmp)
         If tmp.Rows = 0 Then Exit Sub ' nothing to work on...
 
@@ -105,12 +105,12 @@ Public Class XR_FindNonZero_Line3DWorld : Inherits TaskParent
         veclist.Clear()
         For i = 0 To ptList.Count - 1
             Dim pt = ptList(i)
-            Dim testvec = task.pointCloud.Get(Of cv.Vec3f)(pt.Y, pt.X)
+            Dim testvec = task.pointCloud.Get(Of Vec3f)(pt.Y, pt.X)
             Dim rVec = Cloud_Basics.worldCoordinates(pt, lp.pVec1(2) + incr * i)
             veclist.Add(rVec)
         Next
 
-        vecMat = cv.Mat.FromPixelData(veclist.Count, 3, cv.MatType.CV_32F, veclist.ToArray)
+        vecMat = Mat.FromPixelData(veclist.Count, 3, MatType.CV_32F, veclist.ToArray)
     End Sub
 End Class
 
@@ -119,20 +119,20 @@ End Class
 
 Public Class FindNonZero_Line3D : Inherits TaskParent
     Public lp As lpData
-    Public vecMat As New cv.Mat
+    Public vecMat As New Mat
     Public ptList As New List(Of cv.Point)
-    Public veclist As New List(Of cv.Vec3f) ' Reconstructed point cloud vectors.
+    Public veclist As New List(Of Vec3f) ' Reconstructed cv.Point cloud vectors.
     Public Sub New()
-        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        dst2 = New Mat(dst2.Size, MatType.CV_8U, 0)
         desc = "Find 3D points behind an RGB line and linearly interpolate their values."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If standalone Then lp = task.lines.lpList(0)
 
         dst2.SetTo(0)
-        Line(dst2, lp.p1, lp.p2, 255, task.lineWidth, cv.LineTypes.Link8)
+        Line(dst2, lp.p1, lp.p2, 255, task.lineWidth, LineTypes.Link8)
 
-        Dim tmp As New cv.Mat
+        Dim tmp As New Mat
         FindNonZero(dst2(lp.rect), tmp)
         If tmp.Rows = 0 Then Exit Sub ' nothing to work on...
 
@@ -152,13 +152,13 @@ Public Class FindNonZero_Line3D : Inherits TaskParent
         veclist.Clear()
         For i = 0 To ptList.Count - 1
             Dim pt = ptList(i)
-            Dim vec = task.pointCloud.Get(Of cv.Vec3f)(pt.Y, pt.X)
+            Dim vec = task.pointCloud.Get(Of Vec3f)(pt.Y, pt.X)
             vec(0) = lp.pVec1(0) + incrX * i
             vec(1) = lp.pVec1(1) + incrY * i
             vec(2) = lp.pVec1(2) + incrZ * i
             veclist.Add(vec)
         Next
 
-        vecMat = cv.Mat.FromPixelData(veclist.Count, 3, cv.MatType.CV_32F, veclist.ToArray)
+        vecMat = Mat.FromPixelData(veclist.Count, 3, MatType.CV_32F, veclist.ToArray)
     End Sub
 End Class

@@ -26,20 +26,20 @@ Public Class XR_Brightness_HSV : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
 
-        CvtColor(src, dst3, cv.ColorConversionCodes.BGR2HSV)
-        Dim hsv64 As New cv.Mat
-        dst3.ConvertTo(hsv64, cv.MatType.CV_64F)
-        Dim splitMats() As cv.Mat = Split(hsv64)
+        CvtColor(src, dst3, ColorConversionCodes.BGR2HSV)
+        Dim hsv64 As New Mat
+        dst3.ConvertTo(hsv64, MatType.CV_64F)
+        Dim splitMats() As Mat = Split(hsv64)
 
         splitMats(1) *= options.hsvBrightness
-        Threshold(splitMats(1), splitMats(1), 255, 255, cv.ThresholdTypes.Trunc)
+        Threshold(splitMats(1), splitMats(1), 255, 255, ThresholdTypes.Trunc)
 
         splitMats(2) *= options.hsvBrightness
-        Threshold(splitMats(2), splitMats(2), 255, 255, cv.ThresholdTypes.Trunc)
+        Threshold(splitMats(2), splitMats(2), 255, 255, ThresholdTypes.Trunc)
 
         Merge(splitMats, hsv64)
-        hsv64.ConvertTo(dst2, cv.MatType.CV_8UC3)
-        CvtColor(dst2, dst2, cv.ColorConversionCodes.HSV2BGR)
+        hsv64.ConvertTo(dst2, MatType.CV_8UC3)
+        CvtColor(dst2, dst2, ColorConversionCodes.HSV2BGR)
         labels(2) = "Brightness level = " + CStr(options.hsvBrightness)
     End Sub
 End Class

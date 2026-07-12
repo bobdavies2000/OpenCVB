@@ -369,7 +369,7 @@ Partial Class OptionsGlobal
         gravityPointCloud.Name = "gravityPointCloud"
         gravityPointCloud.Size = New Size(408, 34)
         gravityPointCloud.TabIndex = 8
-        gravityPointCloud.Text = "Apply gravity transform to point cloud"
+        gravityPointCloud.Text = "Apply gravity transform to Point cloud"
         gravityPointCloud.UseVisualStyleBackColor = True
         ' 
         ' CreateGif

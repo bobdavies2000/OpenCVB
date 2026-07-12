@@ -4,7 +4,7 @@ Public Class Boundary_Basics : Inherits TaskParent
     Dim color8U As New Color8U_Basics
     Public Sub New()
         task.fOptions.Color8USource.SelectedItem = "Bin4Way_Regions"
-        dst3 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
+        dst3 = New Mat(dst2.Size(), MatType.CV_8U, Scalar.All(0))
         desc = "Create a mask of the RedCloud cell boundaries"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -28,8 +28,8 @@ End Class
 
 Public Class Boundary_Rectangles : Inherits TaskParent
     Public bounds As New Boundary_Basics
-    Public rects As New List(Of cv.Rect)
-    Public smallRects As New List(Of cv.Rect)
+    Public rects As New List(of cv.Rect)
+    Public smallRects As New List(of cv.Rect)
     Public smallContours As New List(Of List(Of cv.Point))
     Dim options As New Options_BoundaryRect
     Public Sub New()
@@ -103,7 +103,7 @@ Public Class XR_Boundary_RemovedRects : Inherits TaskParent
         labels(3) = $"{bRects.bounds.redC.rcList.Count} cells before contain test"
 
         For i = 0 To bRects.smallRects.Count - 1
-            DrawTour(dst2(bRects.smallRects(i)), bRects.smallContours(i), cv.Scalar.Black, task.lineWidth)
+            DrawTour(dst2(bRects.smallRects(i)), bRects.smallContours(i), Scalar.Black, task.lineWidth)
         Next
         labels(1) = labels(2)
         labels(2) = $"{bRects.bounds.redC.rcList.Count - bRects.smallRects.Count} cells after contain test"
@@ -120,7 +120,7 @@ Public Class XR_Boundary_GuidedBP : Inherits TaskParent
     Dim redC As New RedColor_Basics
     Public Sub New()
         task.gOptions.setHistogramBins(100)
-        dst3 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
+        dst3 = New Mat(dst2.Size(), MatType.CV_8U, Scalar.All(0))
         desc = "Create a mask of the RedCloud cell boundaries using Guided Backprojection"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -147,7 +147,7 @@ End Class
 Public Class Boundary_RedColor : Inherits TaskParent
     Dim prep As New RedPrep_Basics
     Public Sub New()
-        dst3 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
+        dst3 = New Mat(dst2.Size(), MatType.CV_8U, Scalar.All(0))
         desc = "Find the RedCloud cell contours"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)

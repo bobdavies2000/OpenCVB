@@ -27,7 +27,7 @@ Public Class XR_Contrast_POW : Inherits TaskParent
         options.Run()
 
         dst2 = task.gray
-        dst2.ConvertTo(dst3, cv.MatType.CV_32FC3)
+        dst2.ConvertTo(dst3, MatType.CV_32FC3)
         Normalize(dst3, dst3)
         Pow(dst3, options.exponent, dst3)
     End Sub

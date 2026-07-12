@@ -4,7 +4,7 @@ Public Class FeatureMap_Basics : Inherits TaskParent
     Public basics As New FeatureMap_StablePoints
     Public genSorted As New SortedList(Of Integer, Integer)(New compareAllowIdenticalIntegerInverted)
     Public Sub New()
-        dst1 = New cv.Mat(dst1.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
+        dst1 = New Mat(dst1.Size(), MatType.CV_8U, Scalar.All(0))
         desc = "Track the stable good features found in the BGR image."
     End Sub
     'Public Shared Sub fpDSet()
@@ -13,8 +13,8 @@ Public Class FeatureMap_Basics : Inherits TaskParent
     '    Dim fpIndex = task.fpFromGridCell.IndexOf(brickIndex)
     '    If fpIndex >= 0 Then task.fpD = fcs.fplist(fpIndex)
     'End Sub
-    Public Shared Sub fpCellContour(fp As fpData, dst As cv.Mat, Optional colorIndex As Integer = 0)
-        Dim color = Choose(colorIndex + 1, cv.Scalar.White, cv.Scalar.Black)
+    Public Shared Sub fpCellContour(fp As fpData, dst As Mat, Optional colorIndex As Integer = 0)
+        Dim color = Choose(colorIndex + 1, Scalar.White, Scalar.Black)
         For i = 0 To fp.facets.Count - 1
             Dim p1 = fp.facets(i)
             Dim p2 = fp.facets((i + 1) Mod fp.facets.Count)
@@ -28,7 +28,7 @@ Public Class FeatureMap_Basics : Inherits TaskParent
         labels(3) = basics.labels(3)
         If basics.ptList.Count = 0 Then Exit Sub ' nothing to work on...
 
-        basics.facetGen.inputPoints = New List(Of cv.Point2f)(basics.ptList)
+        basics.facetGen.inputPoints = New List(Of Point2f)(basics.ptList)
         basics.Run(src)
         dst2 = basics.dst2
 
@@ -36,7 +36,7 @@ Public Class FeatureMap_Basics : Inherits TaskParent
         genSorted.Clear()
         For i = 0 To basics.ptList.Count - 1
             Dim pt = basics.ptList(i)
-            If standaloneTest() Then Circle(dst2, pt, task.DotSize + 1, cv.Scalar.Yellow, -1, task.lineType)
+            If standaloneTest() Then Circle(dst2, pt, task.DotSize + 1, Scalar.Yellow, -1, task.lineType)
             dst1.Set(Of Byte)(pt.Y, pt.X, 255)
 
             Dim g = basics.facetGen.dst0.Get(Of Integer)(pt.Y, pt.X)
@@ -56,8 +56,8 @@ End Class
 
 Public Class FeatureMap_StablePoints : Inherits TaskParent
     Public facetGen As New Delaunay_Generations
-    Public ptList As New List(Of cv.Point2f)
-    Public anchorPoint As cv.Point2f
+    Public ptList As New List(Of Point2f)
+    Public anchorPoint As Point2f
     Dim good As New Feature_KNN
     Public Sub New()
         desc = "Maintain the generation counts around the feature points."
@@ -80,7 +80,7 @@ Public Class FeatureMap_StablePoints : Inherits TaskParent
         Dim generations As New List(Of Integer)
         For Each pt In facetGen.inputPoints
             Dim fIndex = facetGen.facet.dst3.Get(Of Integer)(pt.Y, pt.X)
-            If fIndex >= facetGen.facet.facetList.Count Then Continue For ' new point
+            If fIndex >= facetGen.facet.facetList.Count Then Continue For ' new cv.Point
             Dim g = facetGen.dst0.Get(Of Integer)(pt.Y, pt.X)
             generations.Add(g)
             ptList.Add(pt)
@@ -94,7 +94,7 @@ Public Class FeatureMap_StablePoints : Inherits TaskParent
         anchorPoint = ptList(index)
         If index < facetGen.facet.facetList.Count Then
             Dim bestFacet = facetGen.facet.facetList(index)
-            FillConvexPoly(dst2, bestFacet, cv.Scalar.Black, task.lineType)
+            FillConvexPoly(dst2, bestFacet, Scalar.Black, task.lineType)
             DrawTour(dst2, bestFacet, task.highlight)
         End If
 
@@ -151,9 +151,9 @@ End Class
 
 
 Public Class FeatureMap_Core : Inherits TaskParent
-    Dim subdiv As New cv.Subdiv2D
-    Public inputFeatures As New List(Of cv.Point2f)
-    Public fcsMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+    Dim subdiv As New Subdiv2D
+    Public inputFeatures As New List(Of Point2f)
+    Public fcsMap As New Mat(dst2.Size, MatType.CV_8U, 0)
     Public Sub New()
         desc = "Subdivide an image based on the points provided."
     End Sub
@@ -161,7 +161,7 @@ Public Class FeatureMap_Core : Inherits TaskParent
         subdiv.InitDelaunay(New cv.Rect(0, 0, fcsMap.Width, fcsMap.Height))
         subdiv.Insert(inputFeatures)
 
-        Dim facets = New cv.Point2f()() {Nothing}
+        Dim facets = New Point2f()() {Nothing}
         subdiv.GetVoronoiFacetList(New List(Of Integer)(), facets, Nothing)
 
         For i = 0 To Math.Min(inputFeatures.Count, facets.Count) - 1
@@ -169,7 +169,7 @@ Public Class FeatureMap_Core : Inherits TaskParent
             For Each pt In facets(i)
                 facetList.Add(New cv.Point(pt.X, pt.Y))
             Next
-            FillConvexPoly(fcsMap, facetList, i, cv.LineTypes.Link8)
+            FillConvexPoly(fcsMap, facetList, i, LineTypes.Link8)
         Next
 
         If standaloneTest() Then dst2 = Palettize(fcsMap)
@@ -230,7 +230,7 @@ Public Class XR_FeatureMap_Edges : Inherits TaskParent
         fcs.Run(src)
         dst2 = src
 
-        CvtColor(task.edges.dst2, dst3, cv.ColorConversionCodes.GRAY2BGR)
+        CvtColor(task.edges.dst2, dst3, ColorConversionCodes.GRAY2BGR)
         For Each fp In fcs.fpList
             If fp.depth Then
             Circle(dst2, fp.pt, task.DotSize + 3, task.highlight, -1, task.lineType)
@@ -317,7 +317,7 @@ Public Class XR_FeatureMap_RedCloud1 : Inherits TaskParent
         dst1 = fcs.dst2
         labels(3) = fcs.labels(2)
         For Each fp In fcs.fpList
-            Dim val = dst2.Get(Of cv.Vec3b)(fp.pt.Y, fp.pt.X)
+            Dim val = dst2.Get(Of Vec3b)(fp.pt.Y, fp.pt.X)
             FillConvexPoly(dst3, fp.facets, val)
         Next
     End Sub
@@ -332,7 +332,7 @@ Public Class XR_FeatureMap_InfoTest : Inherits TaskParent
     Dim fcs As New FeatureMap_CreateList
     Dim info As New FeatureMap_Info
     Public Sub New()
-        desc = "Invoke FeatureMap_CreateList and display the contents of the selected feature point cell"
+        desc = "Invoke FeatureMap_CreateList and display the contents of the selected feature cv.Point cell"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         fcs.Run(src)
@@ -373,12 +373,12 @@ Public Class XR_FeatureMap_MotionDirection : Inherits TaskParent
 
         Dim incr = range / task.histogramBins
 
-        plothist.Run(cv.Mat.FromPixelData(fcsM.xDist.Count, 1, cv.MatType.CV_32F, fcsM.xDist.ToArray))
+        plothist.Run(Mat.FromPixelData(fcsM.xDist.Count, 1, MatType.CV_32F, fcsM.xDist.ToArray))
         Dim xDist As New List(Of Single)(plothist.histArray)
         task.motionFeatures.X = plothist.minRange + xDist.IndexOf(xDist.Max) * incr
         mats.mat(0) = plothist.dst2.Clone
 
-        plothist.Run(cv.Mat.FromPixelData(fcsM.yDist.Count, 1, cv.MatType.CV_32F, fcsM.yDist.ToArray))
+        plothist.Run(Mat.FromPixelData(fcsM.yDist.Count, 1, MatType.CV_32F, fcsM.yDist.ToArray))
         Dim yDist As New List(Of Single)(plothist.histArray)
         task.motionFeatures.Y = plothist.minRange + yDist.IndexOf(yDist.Max) * incr
         mats.mat(1) = plothist.dst2.Clone
@@ -424,7 +424,7 @@ Public Class FeatureMap_Info : Inherits TaskParent
 
         If task.fpD IsNot Nothing Then
             Dim fp = task.fpD
-            strOut = "Feature point: " + fp.pt.ToString + vbCrLf + vbCrLf
+            strOut = "Feature cv.Point: " + fp.pt.ToString + vbCrLf + vbCrLf
             strOut += "index = " + CStr(fp.index) + vbCrLf
             strOut += "age (in frames) = " + CStr(fp.age) + vbCrLf
             strOut += "Facet count = " + CStr(fp.facets.Count) + " facets" + vbCrLf
@@ -483,7 +483,7 @@ End Class
 Public Class XR_FeatureMap_ByDepth : Inherits TaskParent
     Dim plotHist As New PlotBar_Basics
     Dim fcs As New FeatureMap_CreateList
-    Dim palInput As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+    Dim palInput As New Mat(dst2.Size, MatType.CV_8U, 0)
     Dim bPoint As New BrickPoint_Basics
     Public Sub New()
         plotHist.addLabels = False
@@ -508,12 +508,12 @@ Public Class XR_FeatureMap_ByDepth : Inherits TaskParent
 
         plotHist.minRange = 0
         plotHist.maxRange = task.MaxZmeters
-        plotHist.Run(cv.Mat.FromPixelData(dBricks.Count, 1, cv.MatType.CV_32F, dBricks.ToArray))
+        plotHist.Run(Mat.FromPixelData(dBricks.Count, 1, MatType.CV_32F, dBricks.ToArray))
         dst1 = plotHist.dst2
 
         Dim incr = dst1.Width / task.histogramBins
         Dim histIndex = Math.Truncate(task.mouseMovePoint.X / incr)
-        Rectangle(dst1, New cv.Rect(CInt(histIndex * incr), 0, incr, dst2.Height), cv.Scalar.Yellow, task.lineWidth)
+        Rectangle(dst1, New cv.Rect(CInt(histIndex * incr), 0, incr, dst2.Height), Scalar.Yellow, task.lineWidth)
         Dim depthIncr = (plotHist.maxRange - plotHist.minRange) / task.histogramBins
         Dim depthStart = histIndex * depthIncr
         Dim depthEnd = (histIndex + 1) * depthIncr
@@ -542,9 +542,9 @@ Public Class XR_FeatureMap_ByDepth : Inherits TaskParent
             FeatureMap_Basics.fpCellContour(fp, task.color, 0)
         Next
         dst3 = Palettize(palInput)
-        Dim tmp As New cv.Mat
-        Threshold(palInput, tmp, 0, cv.Scalar.All(255), cv.ThresholdTypes.BinaryInv)
-        dst3.SetTo(cv.Scalar.All(0), tmp)
+        Dim tmp As New Mat
+        Threshold(palInput, tmp, 0, Scalar.All(255), ThresholdTypes.BinaryInv)
+        dst3.SetTo(Scalar.All(0), tmp)
 
 
         Dim removeFrame As Integer = If(task.frameCount > task.fOptions.FrameHistoryCount.Value , task.frameCount - task.fOptions.FrameHistoryCount.Value , -1)
@@ -564,8 +564,8 @@ End Class
 
 
 Public Class FeatureMap_Periphery : Inherits TaskParent
-    Public ptOutside As New List(Of cv.Point2f)
-    Public ptInside As New List(Of cv.Point2f)
+    Public ptOutside As New List(Of Point2f)
+    Public ptInside As New List(Of Point2f)
     Public fcs As New FeatureMap_CreateList
     Public Sub New()
         desc = "Display the cells which are on the periphery of the image"
@@ -579,7 +579,7 @@ Public Class FeatureMap_Periphery : Inherits TaskParent
         ptInside.Clear()
         For Each fp In fcs.fpList
             If fp.periph Then
-            FillConvexPoly(dst3, fp.facets, cv.Scalar.Gray, task.lineType)
+            FillConvexPoly(dst3, fp.facets, Scalar.Gray, task.lineType)
             Circle(dst3, fp.pt, task.DotSize, task.highlight, -1, task.lineType)
                 ptOutside.Add(fp.pt)
             Else
@@ -599,7 +599,7 @@ End Class
 Public Class XR_FeatureMap_PeripheryNot : Inherits TaskParent
     Dim perif As New FeatureMap_Periphery
     Public Sub New()
-        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
+        dst3 = New Mat(dst3.Size, MatType.CV_8U, 0)
         desc = "Create a mask for the cells which are not on the periphery of the image - the interior region that is fully visible and connected."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -622,8 +622,8 @@ End Class
 
 Public Class XR_FeatureMap_BrickPoints : Inherits TaskParent
     Public facetGen As New Delaunay_Generations
-    Public ptList As New List(Of cv.Point2f)
-    Public anchorPoint As cv.Point2f
+    Public ptList As New List(Of Point2f)
+    Public anchorPoint As Point2f
     Dim good As New Feature_KNN
     Public Sub New()
         desc = "Maintain the generation counts around the feature points."
@@ -645,7 +645,7 @@ Public Class XR_FeatureMap_BrickPoints : Inherits TaskParent
         Dim generations As New List(Of Integer)
         For Each pt In facetGen.inputPoints
             Dim fIndex = facetGen.facet.dst3.Get(Of Integer)(pt.Y, pt.X)
-            If fIndex >= facetGen.facet.facetList.Count Then Continue For ' new point
+            If fIndex >= facetGen.facet.facetList.Count Then Continue For ' new cv.Point
             Dim g = facetGen.dst0.Get(Of Integer)(pt.Y, pt.X)
             generations.Add(g)
             ptList.Add(pt)
@@ -659,7 +659,7 @@ Public Class XR_FeatureMap_BrickPoints : Inherits TaskParent
         anchorPoint = ptList(index)
         If index < facetGen.facet.facetList.Count Then
             Dim bestFacet = facetGen.facet.facetList(index)
-            FillConvexPoly(dst2, bestFacet, cv.Scalar.Black, task.lineType)
+            FillConvexPoly(dst2, bestFacet, Scalar.Black, task.lineType)
             DrawTour(dst2, bestFacet, task.highlight)
         End If
 
@@ -729,7 +729,7 @@ Public Class FeatureMap_Motion : Inherits TaskParent
                             " pixels."
         End If
 
-        plot.plotData = New cv.Scalar(motionPercent, 0, 0)
+        plot.plotData = New Scalar(motionPercent, 0, 0)
         plot.Run(src)
         dst1 = plot.dst2
         ' FeatureMap_Basics.fpDSet()
@@ -741,12 +741,12 @@ End Class
 
 
 Public Class FeatureMap_CreateList : Inherits TaskParent
-    Dim subdiv As New cv.Subdiv2D
+    Dim subdiv As New Subdiv2D
     Public feat As New Feature_Basics
     Dim bricks As New Brick_Basics
     Public fpList As New List(Of fpData)
     Public Sub New()
-        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        dst2 = New Mat(dst2.Size, MatType.CV_8U, 0)
         labels(3) = "Visualization of the map of feature points."
         desc = "Subdivide an image based on the points provided."
     End Sub
@@ -756,13 +756,13 @@ Public Class FeatureMap_CreateList : Inherits TaskParent
         feat.Run(task.gray)
 
         subdiv.InitDelaunay(New cv.Rect(0, 0, dst2.Width, dst2.Height))
-        Dim features As New List(Of cv.Point2f)
+        Dim features As New List(Of Point2f)
         For Each pt In feat.features
             features.Add(pt)
         Next
         subdiv.Insert(features)
 
-        Dim facets = New cv.Point2f()() {Nothing}
+        Dim facets = New Point2f()() {Nothing}
         subdiv.GetVoronoiFacetList(New List(Of Integer)(), facets, Nothing)
 
         fpList.Clear()

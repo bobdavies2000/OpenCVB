@@ -5,7 +5,7 @@ Public Class FeatureFlow_Basics : Inherits TaskParent
         desc = "Use correlations to confirm that points match the previous frame."
     End Sub
     Public Sub buildCorrelations(prevFeatures As List(Of cv.Point), currFeatures As List(Of cv.Point))
-        Dim correlationmat As New cv.Mat
+        Dim correlationmat As New Mat
         Dim pad = task.gridWH / 2
         For Each p1 In prevFeatures
             Dim rect = ValidateRect(New cv.Rect(p1.X - pad, p1.Y - pad, task.gridWH, task.gridWH))
@@ -13,7 +13,7 @@ Public Class FeatureFlow_Basics : Inherits TaskParent
             For Each p2 In currFeatures
                 Dim r = ValidateRect(New cv.Rect(p2.X - pad, p2.Y - pad, Math.Min(rect.Width, task.gridWH),
                                                                                  Math.Min(task.gridWH, rect.Height)))
-                MatchTemplate(dst2(rect), dst3(r), correlationmat, cv.TemplateMatchModes.CCoeffNormed)
+                MatchTemplate(dst2(rect), dst3(r), correlationmat, TemplateMatchModes.CCoeffNormed)
                 correlations.Add(correlationmat.Get(Of Single)(0, 0))
             Next
             Dim maxCorrelation = correlations.Max
@@ -47,8 +47,8 @@ End Class
 
 ' https://www.learnopencvb.com/optical-flow-in-opencv/?ck_subscriber_id=785741175
 Public Class FeatureFlow_LucasKanade : Inherits TaskParent
-    Public features As New List(Of cv.Point2f)
-    Public lastFeatures As New List(Of cv.Point2f)
+    Public features As New List(Of Point2f)
+    Public lastFeatures As New List(Of Point2f)
     Dim options As New Options_OpticalFlowSparse
     Dim feat As New Feature_Basics
     Public Sub New()
@@ -60,31 +60,31 @@ Public Class FeatureFlow_LucasKanade : Inherits TaskParent
         If src.Channels <> 1 Then src = task.gray
         feat.Run(src)
 
-        CvtColor(src, dst2, cv.ColorConversionCodes.GRAY2BGR)
-        CvtColor(src, dst3, cv.ColorConversionCodes.GRAY2BGR)
+        CvtColor(src, dst2, ColorConversionCodes.GRAY2BGR)
+        CvtColor(src, dst3, ColorConversionCodes.GRAY2BGR)
 
-        Static lastGray As cv.Mat = task.gray.Clone
+        Static lastGray As Mat = task.gray.Clone
         features.Clear()
         For Each pt In feat.features
             features.Add(pt)
         Next
-        Dim features1 = cv.Mat.FromPixelData(features.Count, 1, cv.MatType.CV_32FC2, features.ToArray)
-        Dim features2 = New cv.Mat
-        Dim status As New cv.Mat, err As New cv.Mat, winSize As New cv.Size(3, 3)
+        Dim features1 = Mat.FromPixelData(features.Count, 1, MatType.CV_32FC2, features.ToArray)
+        Dim features2 = New Mat
+        Dim status As New Mat, err As New Mat, winSize As New Size(3, 3)
         CalcOpticalFlowPyrLK(src, lastGray, features1, features2, status, err, winSize, 3, term, options.OpticalFlowFlag)
-        features = New List(Of cv.Point2f)
+        features = New List(Of Point2f)
         lastFeatures.Clear()
         For i = 0 To status.Rows - 1
             If status.Get(Of Byte)(i, 0) Then
-                Dim pt1 = features1.Get(Of cv.Point2f)(i, 0)
-                Dim pt2 = features2.Get(Of cv.Point2f)(i, 0)
+                Dim pt1 = features1.Get(Of Point2f)(i, 0)
+                Dim pt2 = features2.Get(Of Point2f)(i, 0)
                 Dim length = Math.Sqrt((pt1.X - pt2.X) * (pt1.X - pt2.X) + (pt1.Y - pt2.Y) * (pt1.Y - pt2.Y))
                 If length < 30 Then
                     features.Add(pt1)
                     lastFeatures.Add(pt2)
                     Line(dst2, pt1, pt2, task.highlight, task.lineWidth + task.lineWidth, task.lineType)
                     Circle(dst3, pt1, task.DotSize + 3, white, -1, task.lineType)
-                    Circle(dst3, pt2, task.DotSize + 1, cv.Scalar.Red, -1, task.lineType)
+                    Circle(dst3, pt2, task.DotSize + 1, Scalar.Red, -1, task.lineType)
                 End If
             End If
         Next

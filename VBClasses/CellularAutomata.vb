@@ -9,13 +9,13 @@ Public Class CellularAutomata_Basics : Inherits TaskParent
     Dim inputCombo = "111,110,101,100,011,010,001,000"
     Dim cellInput(,) = {{1, 1, 1}, {1, 1, 0}, {1, 0, 1}, {1, 0, 0}, {0, 1, 1}, {0, 1, 0}, {0, 0, 1}, {0, 0, 0}}
     Public options As New Options_CellAutomata
-    Public input As New cv.Mat
+    Public input As New Mat
     Public index As Integer
     Public Sub New()
         Dim label = "The 18 most interesting automata from the first 256 in 'New Kind of Science'" + vbCrLf + "The input combinations are: " + inputCombo
         desc = "Visualize the 30 interesting examples from the first 256 in 'New Kind of Science'"
     End Sub
-    Public Function createCells(outStr As String) As cv.Mat
+    Public Function createCells(outStr As String) As Mat
         Dim outcomes(7) As Byte
         For i = 0 To outcomes.Length - 1
             outcomes(i) = Integer.Parse(outStr.Substring(i, 1))
@@ -35,9 +35,9 @@ Public Class CellularAutomata_Basics : Inherits TaskParent
                 Next
             Next
         Next
-        Dim ret As New cv.Mat
+        Dim ret As New Mat
         ConvertScaleAbs(dst, ret, 255)
-        CvtColor(ret, ret, cv.ColorConversionCodes.GRAY2BGR)
+        CvtColor(ret, ret, ColorConversionCodes.GRAY2BGR)
         Return ret
     End Function
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -50,7 +50,7 @@ Public Class CellularAutomata_Basics : Inherits TaskParent
         End If
 
         If standalone Then
-            input = New cv.Mat(New cv.Size(src.Width, src.Height), cv.MatType.CV_8UC1, 0)
+            input = New Mat(New Size(src.Width, src.Height), MatType.CV_8UC1, 0)
             input.Set(Of Byte)(0, src.Width / 2, 1)
             dst2 = createCells(labels(2))
         Else
@@ -68,13 +68,13 @@ End Class
 ' http://ptgmedia.pearsoncmg.com/images/0672320665/downloads/The%20Game%20of%20Life.html
 Public Class CellularAutomata_Life : Inherits TaskParent
     Dim random As New Random_Basics
-    Dim grid As cv.Mat
-    Dim nextgrid As cv.Mat
+    Dim grid As Mat
+    Dim nextgrid As Mat
     Dim factor = 8
     Dim age As Integer
     Public population As Integer
-    Public nodeColor = cv.Scalar.White
-    Public backColor = cv.Scalar.Black
+    Public nodeColor = Scalar.White
+    Public backColor = Scalar.Black
     Dim savePointCount As Integer
     Dim lastPopulation As Integer
     Private Function CountNeighbors(cellX As Integer, cellY As Integer) As Integer
@@ -97,7 +97,7 @@ Public Class CellularAutomata_Life : Inherits TaskParent
         Return CountNeighbors
     End Function
     Public Sub New()
-        grid = New cv.Mat(dst2.Height / factor, dst2.Width / factor, cv.MatType.CV_8UC1).SetTo(0)
+        grid = New Mat(dst2.Height / factor, dst2.Width / factor, MatType.CV_8UC1).SetTo(0)
         nextgrid = grid.Clone()
         random.range = New cv.Rect(0, 0, grid.Width, grid.Height)
         OptionParent.FindSlider("Random Pixel Count").Value = grid.Width * grid.Height * 0.3 ' we want about 30% of cells filled.
@@ -165,26 +165,26 @@ Public Class XR_CellularAutomata_LifeColor : Inherits TaskParent
     Dim game As New CellularAutomata_Life
     Public Sub New()
         game.backColor = white
-        game.nodeColor = cv.Scalar.Black
+        game.nodeColor = Scalar.Black
 
         labels(2) = "Births are blue, deaths are red"
         desc = "Game of Life but with color added"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        Dim lastBoard As New cv.Mat
-        CvtColor(game.dst2, lastBoard, cv.ColorConversionCodes.BGR2GRAY)
+        Dim lastBoard As New Mat
+        CvtColor(game.dst2, lastBoard, ColorConversionCodes.BGR2GRAY)
         game.Run(src)
-        CvtColor(game.dst2, dst1, cv.ColorConversionCodes.BGR2GRAY)
+        CvtColor(game.dst2, dst1, ColorConversionCodes.BGR2GRAY)
 
-        Dim deaths As New cv.Mat, births As New cv.Mat
+        Dim deaths As New Mat, births As New Mat
 
         Subtract(dst1, lastBoard, births)
         Subtract(lastBoard, dst1, deaths)
-        Threshold(births, births, 0, 255, cv.ThresholdTypes.Binary)
-        Threshold(deaths, deaths, 0, 255, cv.ThresholdTypes.Binary)
+        Threshold(births, births, 0, 255, ThresholdTypes.Binary)
+        Threshold(deaths, deaths, 0, 255, ThresholdTypes.Binary)
         dst2 = game.dst2.Clone()
-        dst2.SetTo(cv.Scalar.Blue, births)
-        dst2.SetTo(cv.Scalar.Red, deaths)
+        dst2.SetTo(Scalar.Blue, births)
+        dst2.SetTo(Scalar.Red, deaths)
     End Sub
 End Class
 
@@ -203,7 +203,7 @@ Public Class XR_CellularAutomata_LifePopulation : Inherits TaskParent
         game.Run(src)
         dst2 = game.dst2
 
-        plot.plotData = New cv.Scalar(game.population, 0, 0)
+        plot.plotData = New Scalar(game.population, 0, 0)
         plot.Run(src)
         dst3 = plot.dst2
     End Sub
@@ -220,10 +220,10 @@ Public Class XR_CellularAutomata_MultiPoint : Inherits TaskParent
     Dim val2 As Integer = dst2.Width / 2
     Public Sub New()
         cell.index = 4 ' this one is nice...
-        desc = "All256 above starts with just one point.  Here we start with multiple points."
+        desc = "All256 above starts with just one cv.Point.  Here we start with multiple points."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        Dim tmp = New cv.Mat(New cv.Size(src.Width / 4, src.Height / 4), cv.MatType.CV_8UC1, 0)
+        Dim tmp = New Mat(New Size(src.Width / 4, src.Height / 4), MatType.CV_8UC1, 0)
         tmp.Set(0, val1, 1)
         tmp.Set(0, val2, 1)
         cell.Run(tmp)
@@ -259,7 +259,7 @@ Public Class XR_CellularAutomata_All256 : Inherits TaskParent
     End Function
     Public Overrides Sub RunAlg(src As cv.Mat)
         If task.heartBeat Then
-            cell.input = New cv.Mat(New cv.Size(src.Width / 4, src.Height / 4), cv.MatType.CV_8UC1, 0)
+            cell.input = New Mat(New Size(src.Width / 4, src.Height / 4), MatType.CV_8UC1, 0)
             cell.input.Set(Of Byte)(0, cell.input.Width / 2, 1)
 
             labels(2) = createOutcome(options.currentRule) + " options.currentRule = " + CStr(options.currentRule)

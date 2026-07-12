@@ -1,8 +1,8 @@
 Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 Public Class Texture_Basics : Inherits TaskParent
     Dim ellipse As New Draw_Ellipses
-    Public texture As New cv.Mat
-    Public tRect As cv.Rect
+    Public texture As New Mat
+    Public tRect as cv.Rect
     Dim texturePop As Integer
     Public tChange As Boolean ' if the texture hasn't changed this will be false.
     Public Sub New()
@@ -13,10 +13,10 @@ Public Class Texture_Basics : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         If standaloneTest() Or src.Channels() <> 1 Then
             ellipse.Run(src)
-            CvtColor(ellipse.dst2, dst2, cv.ColorConversionCodes.BGR2GRAY)
+            CvtColor(ellipse.dst2, dst2, ColorConversionCodes.BGR2GRAY)
             ConvertScaleAbs(dst2, dst2)
             dst3 = ellipse.dst2.Clone
-            dst3.SetTo(cv.Scalar.Yellow, task.gridMask)
+            dst3.SetTo(Scalar.Yellow, task.gridMask)
         Else
             dst2 = src
         End If

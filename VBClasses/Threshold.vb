@@ -1,5 +1,4 @@
-Imports OpenCvSharp.Cv2
-Imports OpenCvSharp
+Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCvSharp
 ' https://opencv24-python-tutorials.readthedocs.io/en/latest/py_tutorials/py_imgproc/py_thresholding/py_thresholding.html
 Public Class Threshold_Basics : Inherits TaskParent
     Public options As New Options_Threshold
@@ -7,7 +6,7 @@ Public Class Threshold_Basics : Inherits TaskParent
         labels(2) = "Original image"
         desc = "Demonstrate the use of OpenCV's threshold and all its options"
     End Sub
-    Public Overrides Sub RunAlg(src As Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
 
         labels(3) = "Image after thresholding with threshold = " + CStr(options.threshold)
@@ -34,7 +33,7 @@ Public Class XR_Threshold_Adaptive : Inherits TaskParent
         labels = {"", "", "Original input", "Output of AdaptiveThreshold"}
         desc = "Explore what adaptive threshold can do."
     End Sub
-    Public Overrides Sub RunAlg(src As Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
         optionsAdaptive.Run()
 
@@ -60,7 +59,7 @@ Public Class Threshold_Definitions : Inherits TaskParent
         labels = {"Gradient input (from Gradient_Basics)", "Binary threshold output of Gradient input at left", "Clockwise: binaryInv, Trunc, ToZero, ToZeroInv", "Current selection"}
         desc = "Demonstrate BinaryInv, Trunc, ToZero, and ToZero_Inv threshold methods"
     End Sub
-    Public Overrides Sub RunAlg(src As Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
 
         gradient.Run(src)
@@ -75,11 +74,11 @@ Public Class Threshold_Definitions : Inherits TaskParent
         dst2 = mats.dst2
         dst3 = mats.dst3
         SetTrueText("Input Gradient Image", 0)
-        SetTrueText("Binary", New Point(dst2.Width / 2 + 5, 10), 1)
+        SetTrueText("Binary", New cv.Point(dst2.Width / 2 + 5, 10), 1)
         SetTrueText("BinaryInv", 2)
-        SetTrueText("Trunc", New Point(dst2.Width / 2 + 5, 10), 2)
-        SetTrueText("ToZero", New Point(10, dst2.Height / 2 + 10), 2)
-        SetTrueText("ToZeroInv", New Point(dst2.Width / 2 + 5, dst2.Height / 2 + 10), 2)
+        SetTrueText("Trunc", New cv.Point(dst2.Width / 2 + 5, 10), 2)
+        SetTrueText("ToZero", New cv.Point(10, dst2.Height / 2 + 10), 2)
+        SetTrueText("ToZeroInv", New cv.Point(dst2.Width / 2 + 5, dst2.Height / 2 + 10), 2)
         Dim thresh = CStr(options.threshold)
         strOut = "Upper left:  the input for all the tests below..." + vbCrLf
         strOut += "Upper right:Threshold(dst0, dst0, " + thresh + ", 255, ThresholdTypes.Binary)" + vbCrLf + vbCrLf
@@ -108,7 +107,7 @@ Public Class Threshold_ByChannels : Inherits TaskParent
         OptionParent.findRadio("Trunc").Checked = True
         desc = "Threshold by channel - use red threshold slider to impact grayscale sharedResults.images.."
     End Sub
-    Public Overrides Sub RunAlg(src As Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
         optionsColor.Run()
 
@@ -144,7 +143,7 @@ Public Class XR_Threshold_ColorSource : Inherits TaskParent
     Public Sub New()
         desc = "Use all the alternative color sources as input to Threshold_ByChannels."
     End Sub
-    Public Overrides Sub RunAlg(src As Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         color8U.Run(src)
         byChan.Run(color8U.dst3)
         dst2 = byChan.dst2
@@ -163,7 +162,7 @@ Public Class Threshold_OTSU : Inherits TaskParent
         dst1 = New Mat(dst1.Size, MatType.CV_32F, 0)
         desc = "Divide an RedC cell in 2"
     End Sub
-    Public Overrides Sub RunAlg(src As Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         redC.Run(task.gray)
         dst2 = redC.dst2
         labels(2) = redC.labels(2)

@@ -14,13 +14,13 @@ Public Class XR_Encode_Basics : Inherits TaskParent
         Dim encodeParams() As Integer = {options.encodeOption, options.qualityLevel}
         Dim buf As Byte() = Nothing
         ImEncode(".jpg", src, buf, encodeParams)
-        Dim image = cv.Mat.FromPixelData(buf.Count, 1, cv.MatType.CV_8U, buf)
-        dst3 = ImDecode(image, cv.ImreadModes.AnyColor)
+        Dim image = Mat.FromPixelData(buf.Count, 1, MatType.CV_8U, buf)
+        dst3 = ImDecode(image, ImreadModes.AnyColor)
 
-        Dim output As New cv.Mat
+        Dim output As New Mat
         Absdiff(src, dst3, output)
 
-        output.ConvertTo(dst2, cv.MatType.CV_8UC3, options.scalingLevel)
+        output.ConvertTo(dst2, MatType.CV_8UC3, options.scalingLevel)
         Dim compressionRatio = buf.Length / (src.Rows * src.Cols * src.ElemSize)
         labels(3) = "Original compressed to len=" + CStr(buf.Length) + " (" + compressionRatio.ToString("0.0%") + ")"
     End Sub
@@ -43,13 +43,13 @@ Public Class XR_Encode_Scaling : Inherits TaskParent
         Dim buf As Byte() = Nothing
         ImEncode(".jpg", src, buf, encodeParams)
 
-        Dim image = cv.Mat.FromPixelData(buf.Count, 1, cv.MatType.CV_8U, buf)
-        dst3 = ImDecode(image, cv.ImreadModes.AnyColor)
+        Dim image = Mat.FromPixelData(buf.Count, 1, MatType.CV_8U, buf)
+        dst3 = ImDecode(image, ImreadModes.AnyColor)
 
-        Dim output As New cv.Mat
+        Dim output As New Mat
         Absdiff(src, dst3, output)
 
-        output.ConvertTo(dst2, cv.MatType.CV_8UC3, options.scalingLevel)
+        output.ConvertTo(dst2, MatType.CV_8UC3, options.scalingLevel)
         Dim compressionRatio = buf.Length / (src.Rows * src.Cols * src.ElemSize)
     End Sub
 End Class

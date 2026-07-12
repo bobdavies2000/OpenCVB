@@ -2,8 +2,8 @@ Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 Imports System.Threading
 Public Class Grid_Basics_TA : Inherits TaskParent
     Public Sub New()
-        task.gridMap = New cv.Mat(dst2.Size, cv.MatType.CV_32S, 0)
-        task.gridMask = New cv.Mat(dst2.Size(), cv.MatType.CV_8U)
+        task.gridMap = New Mat(dst2.Size, MatType.CV_32S, 0)
+        task.gridMask = New Mat(dst2.Size(), MatType.CV_8U)
         desc = "Create a grid of squares covering the entire image."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -43,7 +43,7 @@ Public Class Grid_Basics_TA : Inherits TaskParent
             Next
 
             For i = 0 To task.gridRects.Count - 1
-                Rectangle(task.gridMap, task.gridRects(i), cv.Scalar.All(i), -1)
+                Rectangle(task.gridMap, task.gridRects(i), Scalar.All(i), -1)
             Next
 
             ' This determines which grid rects are replaced when motion is detected.
@@ -105,7 +105,7 @@ Public Class Grid_Basics_TA : Inherits TaskParent
             task.gridWH = task.gridRects(0).Width
         End If
         If standaloneTest() Then
-            dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U)
+            dst2 = New Mat(dst2.Size(), MatType.CV_8U)
             task.color.CopyTo(dst2)
             dst2.SetTo(white, task.gridMask)
             labels(2) = "Grid_Basics_TA " + CStr(task.gridRects.Count) + " (" + CStr(task.bricksPerCol) + "X" + CStr(task.bricksPerRow) + ") " +
@@ -221,7 +221,7 @@ End Class
 
 Public Class XR_Grid_ValidateLocation : Inherits TaskParent
     Public Sub New()
-        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
+        dst3 = New Mat(dst3.Size, MatType.CV_8U, 0)
         task.clickPoint = New cv.Point(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height))
         desc = "Click any grid element to see its neighbors"
     End Sub
@@ -242,7 +242,7 @@ Public Class XR_Grid_ValidateLocation : Inherits TaskParent
         For Each index In task.gridNabes(grIndex)
             Dim r = task.gridRects(index)
             Rectangle(dst2, r, white, task.lineWidth)
-            Rectangle(dst3, r, cv.Scalar.All(index), task.lineWidth)
+            Rectangle(dst3, r, Scalar.All(index), task.lineWidth)
         Next
     End Sub
 End Class
@@ -256,7 +256,7 @@ End Class
 
 Public Class XR_Grid_MinMaxDepth : Inherits TaskParent
     Public minMaxLocs(0) As lpData
-    Public minMaxVals(0) As cv.Vec2f
+    Public minMaxVals(0) As Vec2f
     Public Sub New()
         task.gOptions.GridSlider.Value = 8
         desc = "Find the min and max depth within each grid r."
@@ -269,14 +269,14 @@ Public Class XR_Grid_MinMaxDepth : Inherits TaskParent
             Dim r = task.gridRects(i)
             MinMaxLoc(task.pcSplit(2)(r), mm.minVal, mm.maxVal, mm.minLoc, mm.maxLoc, task.depthmask(r))
             minMaxLocs(i) = New lpData(mm.minLoc, mm.maxLoc)
-            minMaxVals(i) = New cv.Vec2f(mm.minVal, mm.maxVal)
+            minMaxVals(i) = New Vec2f(mm.minVal, mm.maxVal)
         Next
 
         If standaloneTest() Then
             dst2.SetTo(0)
             For i = 0 To minMaxLocs.Count - 1
                 Dim lp = minMaxLocs(i)
-                Circle(dst2(task.gridRects(i)), lp.p2, task.DotSize, cv.Scalar.Red, -1, task.lineType)
+                Circle(dst2(task.gridRects(i)), lp.p2, task.DotSize, Scalar.Red, -1, task.lineType)
                 Circle(dst2(task.gridRects(i)), lp.p1, task.DotSize, white, -1, task.lineType)
             Next
             dst2.SetTo(white, task.gridMask)
@@ -335,14 +335,14 @@ Public Class Grid_Rectangles : Inherits TaskParent
     Public gridWidth As Integer = 10
     Public gridHeight As Integer = 10
     Public gridRects As New List(Of cv.Rect)
-    Public gridMap As New cv.Mat
+    Public gridMap As New Mat
     Public bricksPerCol As Integer
     Public bricksPerRow As Integer
-    Public gridMask As cv.Mat
+    Public gridMask As Mat
     Public gridNabes As New List(Of List(Of Integer))
     Public Sub New()
-        gridMask = New cv.Mat(dst2.Size(), cv.MatType.CV_8U)
-        gridMap = New cv.Mat(dst2.Size(), cv.MatType.CV_8U)
+        gridMask = New Mat(dst2.Size(), MatType.CV_8U)
+        gridMap = New Mat(dst2.Size(), MatType.CV_8U)
         desc = "Grids are normally square.  Grid_Special allows grid elements to be rectangles." +
                     "  Specify the Y size."
     End Sub
@@ -375,7 +375,7 @@ Public Class Grid_Rectangles : Inherits TaskParent
             Next
 
             For Each roi In gridRects
-                Rectangle(gridMap, roi, cv.Scalar.All(gridRects.IndexOf(roi)), -1)
+                Rectangle(gridMap, roi, Scalar.All(gridRects.IndexOf(roi)), -1)
             Next
 
             gridNabes.Clear()
@@ -426,7 +426,7 @@ Public Class Grid_SquaresOnly : Inherits TaskParent
 
     Public Overrides Sub RunAlg(src As cv.Mat)
         gridRects.Clear()
-        Dim input As New cv.Mat(task.smallRes, cv.MatType.CV_8U, 0)
+        Dim input As New Mat(task.smallRes, MatType.CV_8U, 0)
         For y = 0 To input.Height - 1 Step task.smallBrick
             For x = 0 To input.Width - 1 Step task.smallBrick
                 Dim roi = smallValidateRect(New cv.Rect(x, y, task.smallBrick, task.smallBrick))

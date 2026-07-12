@@ -4,7 +4,7 @@ Public Class XR_Smoothing_Exterior : Inherits TaskParent
     Dim hull As New Convex_Basics
     Public inputPoints As List(Of cv.Point)
     Public smoothPoints As List(Of cv.Point)
-    Public plotColor = cv.Scalar.Yellow
+    Public plotColor = Scalar.Yellow
     Dim smOptions As New Options_Smoothing
     Public Sub New()
         labels(2) = "Original Points (white) Smoothed (yellow)"
@@ -42,11 +42,11 @@ Public Class XR_Smoothing_Exterior : Inherits TaskParent
             Next
         Next
 
-        'add the last point, but skip the interpolated last point, so second last...
+        'add the last cv.Point, but skip the interpolated last cv.Point, so second last...
         spline.Add(spoints(spoints.Count - 2))
         Return spline
     End Function
-    Public Shared Sub DrawPoly(result As cv.Mat, polyPoints As List(Of cv.Point), color As cv.Scalar)
+    Public Shared Sub DrawPoly(result As Mat, polyPoints As List(Of cv.Point), color As Scalar)
         If polyPoints.Count < 3 Then Exit Sub
         Dim listOfPoints = New List(Of List(Of cv.Point))({polyPoints})
         DrawContours(result, listOfPoints, 0, color, 2)
@@ -83,18 +83,18 @@ Public Class XR_Smoothing_Interior : Inherits TaskParent
     Dim hull As New Convex_Basics
     Public inputPoints As List(Of cv.Point)
     Public smoothPoints As List(Of cv.Point)
-    Public plotColor = cv.Scalar.Yellow
+    Public plotColor = Scalar.Yellow
     Dim options As New Options_Smoothing
-    Private Function getCurveSmoothingChaikin(points As List(Of cv.Point), tension As Double, nrOfIterations As Integer) As List(Of cv.Point2d)
+    Private Function getCurveSmoothingChaikin(points As List(Of cv.Point), tension As Double, nrOfIterations As Integer) As List(Of Point2d)
         'the tension factor defines a scale between corner cutting distance in segment half length, i.e. between 0.05 and 0.45
         'the opposite corner will be cut by the inverse (i.e. 1-cutting distance) to keep symmetry
         'with a tension value of 0.5 this amounts to 0.25 = 1/4 and 0.75 = 3/4 the original Chaikin values
         Dim cutdist As Double = 0.05 + (tension * 0.4)
 
         'make a copy of the pointlist and feed it to the iteration
-        Dim nl As New List(Of cv.Point2d)
+        Dim nl As New List(Of Point2d)
         For i = 0 To points.Count - 1
-            nl.Add(New cv.Point2d(CDbl(points.ElementAt(i).X), CDbl(points.ElementAt(i).Y)))
+            nl.Add(New Point2d(CDbl(points.ElementAt(i).X), CDbl(points.ElementAt(i).Y)))
         Next
 
         For i = 1 To nrOfIterations
@@ -104,21 +104,21 @@ Public Class XR_Smoothing_Interior : Inherits TaskParent
         Return nl
     End Function
 
-    Private Function getSmootherChaikin(points As List(Of cv.Point2d), cuttingDist As Double) As List(Of cv.Point2d)
-        Dim nl As New List(Of cv.Point2d)
-        'always add the first point
+    Private Function getSmootherChaikin(points As List(Of Point2d), cuttingDist As Double) As List(Of Point2d)
+        Dim nl As New List(Of Point2d)
+        'always add the first cv.Point
         nl.Add(points(0))
 
         For i = 0 To points.Count - 2
-            Dim pt1 = New cv.Point2d((1 - cuttingDist) * points.ElementAt(i).X, (1 - cuttingDist) * points.ElementAt(i).Y)
-            Dim pt2 = New cv.Point2d(cuttingDist * points.ElementAt(i + 1).X, cuttingDist * points.ElementAt(i + 1).Y)
+            Dim pt1 = New Point2d((1 - cuttingDist) * points.ElementAt(i).X, (1 - cuttingDist) * points.ElementAt(i).Y)
+            Dim pt2 = New Point2d(cuttingDist * points.ElementAt(i + 1).X, cuttingDist * points.ElementAt(i + 1).Y)
             nl.Add(pt1 + pt2)
-            pt1 = New cv.Point2d(cuttingDist * points.ElementAt(i).X, cuttingDist * points.ElementAt(i).Y)
-            pt2 = New cv.Point2d((1 - cuttingDist) * points.ElementAt(i + 1).X, (1 - cuttingDist) * points.ElementAt(i + 1).Y)
+            pt1 = New Point2d(cuttingDist * points.ElementAt(i).X, cuttingDist * points.ElementAt(i).Y)
+            pt2 = New Point2d((1 - cuttingDist) * points.ElementAt(i + 1).X, (1 - cuttingDist) * points.ElementAt(i + 1).Y)
             nl.Add(pt1 + pt2)
         Next
 
-        'always add the last point
+        'always add the last cv.Point
         nl.Add(points(points.Count - 1))
         Return nl
     End Function

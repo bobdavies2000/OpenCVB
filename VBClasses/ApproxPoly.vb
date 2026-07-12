@@ -24,7 +24,7 @@ Public Class ApproxPoly_Basics : Inherits TaskParent
             Dim nextContour As cv.Point()
             nextContour = ApproxPolyDP(contour.bestContour, options.epsilon, options.closedPoly)
             dst3.SetTo(0)
-            DrawTour(dst3, nextContour.ToList, cv.Scalar.Yellow)
+            DrawTour(dst3, nextContour.ToList, Scalar.Yellow)
         Else
             labels(2) = "No contours found"
         End If
@@ -51,12 +51,12 @@ Public Class XR_ApproxPoly_FindandDraw : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         rotatedRect.Run(src)
         dst2 = rotatedRect.dst2
-        Dim _cvt1 As New cv.Mat
-        CvtColor(dst2, _cvt1, cv.ColorConversionCodes.BGR2GRAY)
-        Threshold(_cvt1, dst0, 1, 255, cv.ThresholdTypes.Binary)
+        Dim _cvt1 As New Mat
+        CvtColor(dst2, _cvt1, ColorConversionCodes.BGR2GRAY)
+        Threshold(_cvt1, dst0, 1, 255, ThresholdTypes.Binary)
 
-        dst0.ConvertTo(dst1, cv.MatType.CV_32SC1)
-        FindContours(dst1, allContours, Nothing, cv.RetrievalModes.FloodFill, cv.ContourApproximationModes.ApproxSimple)
+        dst0.ConvertTo(dst1, MatType.CV_32SC1)
+        FindContours(dst1, allContours, Nothing, RetrievalModes.FloodFill, ContourApproximationModes.ApproxSimple)
         dst3.SetTo(0)
 
         Dim nextContour As cv.Point()
@@ -66,7 +66,7 @@ Public Class XR_ApproxPoly_FindandDraw : Inherits TaskParent
             If nextContour.Count > 2 Then contours.Add(nextContour)
         Next
 
-        DrawContours(dst3, contours, -1, New cv.Scalar(0, 255, 255), task.lineWidth, task.lineType)
+        DrawContours(dst3, contours, -1, New Scalar(0, 255, 255), task.lineWidth, task.lineType)
     End Sub
 End Class
 

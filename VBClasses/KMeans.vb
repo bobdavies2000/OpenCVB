@@ -2,9 +2,9 @@ Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 Imports System.Runtime.InteropServices
 Public Class KMeans_Basics : Inherits TaskParent
     Public options As New Options_KMeans
-    Public colors As New cv.Mat
+    Public colors As New Mat
     Public buildPaletteOutput As Boolean = True
-    Public saveLabels As New cv.Mat
+    Public saveLabels As New Mat
     Public classCount As Integer
     Public Sub New()
         labels = {"", "", "", "Palette output for the kMeans labels"}
@@ -20,17 +20,17 @@ Public Class KMeans_Basics : Inherits TaskParent
         options.Run()
         classCount = options.kMeansK
         If task.optionsChanged Then
-            options.kMeansFlag = cv.KMeansFlags.PpCenters
-            saveLabels = New cv.Mat
+            options.kMeansFlag = KMeansFlags.PpCenters
+            saveLabels = New Mat
         End If
 
         Dim columnVector = src.Reshape(src.Channels, src.Height * src.Width)
         dst2 = saveLabels
 
-        If columnVector.ElemSize Mod 4 <> 0 Or columnVector.Type = cv.MatType.CV_32S Then columnVector.ConvertTo(columnVector, cv.MatType.CV_32F)
+        If columnVector.ElemSize Mod 4 <> 0 Or columnVector.Type = MatType.CV_32S Then columnVector.ConvertTo(columnVector, MatType.CV_32F)
         If colors.Width = 0 Or colors.Height = 0 Then
-            options.kMeansFlag = cv.KMeansFlags.PpCenters
-            colors = New cv.Mat(classCount, 1, cv.MatType.CV_8UC3)
+            options.kMeansFlag = KMeansFlags.PpCenters
+            colors = New Mat(classCount, 1, MatType.CV_8UC3)
             colors.SetTo(0)
         End If
 
@@ -38,7 +38,7 @@ Public Class KMeans_Basics : Inherits TaskParent
 
         saveLabels = dst2.Clone
 
-        dst2.Reshape(1, src.Height).ConvertTo(dst2, cv.MatType.CV_8U)
+        dst2.Reshape(1, src.Height).ConvertTo(dst2, MatType.CV_8U)
         dst2 += 1 ' stay away from zero...
 
         If standaloneTest() Then dst3 = Palettize(dst2)
@@ -52,16 +52,16 @@ End Class
 
 
 Public Class KMeans_MultiChannel : Inherits TaskParent
-    Public colors As New cv.Mat
+    Public colors As New Mat
     Dim km As New KMeans_Basics
     Public Sub New()
         labels = {"", "", "KMeans_Basics output with BGR input", "dst3 contains the labels spread across the palette (dst0 contains the exact labels)"}
         desc = "Cluster the input using kMeans."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If standaloneTest() Then task.color.ConvertTo(src, cv.MatType.CV_32FC3)
-        If src.Type = cv.MatType.CV_8UC3 Then src.ConvertTo(src, cv.MatType.CV_32FC3)
-        If src.Type = cv.MatType.CV_8U Then src.ConvertTo(src, cv.MatType.CV_32F)
+        If standaloneTest() Then task.color.ConvertTo(src, MatType.CV_32FC3)
+        If src.Type = MatType.CV_8UC3 Then src.ConvertTo(src, MatType.CV_32FC3)
+        If src.Type = MatType.CV_8U Then src.ConvertTo(src, MatType.CV_32F)
         km.Run(src)
         dst3 = km.dst2
 
@@ -137,7 +137,7 @@ Public Class XR_KMeans_MultiGaussian_CPP : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         Dim imagePtr = KMeans_MultiGaussian_RunCPP(cPtr, src.Rows, src.Cols)
-        If imagePtr <> 0 And task.heartBeat Then dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, cv.MatType.CV_8UC3, imagePtr).Clone()
+        If imagePtr <> 0 And task.heartBeat Then dst2 = Mat.FromPixelData(src.Rows, src.Cols, MatType.CV_8UC3, imagePtr).Clone()
     End Sub
     Protected Overrides Sub Finalize()
         If cPtr <> 0 Then cPtr = KMeans_MultiGaussian_Close(cPtr)
@@ -150,7 +150,7 @@ End Class
 
 Public Class XR_KMeans_CustomData : Inherits TaskParent
     Dim km As New KMeans_Basics
-    Public centers = New cv.Mat()
+    Public centers = New Mat()
     Dim random = New Random_Basics
     Public Sub New()
         desc = "Cluster the selected input using kMeans"
@@ -171,7 +171,7 @@ Public Class XR_KMeans_CustomData : Inherits TaskParent
                 input.Add(pt.x)
                 input.Add(pt.y)
             Next
-            dst0 = cv.Mat.FromPixelData(input.Count, 1, cv.MatType.CV_32F, input.ToArray)
+            dst0 = Mat.FromPixelData(input.Count, 1, MatType.CV_32F, input.ToArray)
         End If
 
         km.Run(dst0)
@@ -203,7 +203,7 @@ Public Class XR_KMeans_Simple_CPP : Inherits TaskParent
         Dim imagePtr = Kmeans_Simple_RunCPP(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, CSng(mm.minVal), task.MaxZmeters)
         handleSrc.Free()
 
-        dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, cv.MatType.CV_8UC3, imagePtr)
+        dst2 = Mat.FromPixelData(src.Rows, src.Cols, MatType.CV_8UC3, imagePtr)
         SetTrueText("Use 'Max Depth' in the global options to set the boundary between blue and yellow.", 3)
     End Sub
     Protected Overrides Sub Finalize()
@@ -306,7 +306,7 @@ End Class
 
 Public Class KMeans_Image : Inherits TaskParent
     Public km As New KMeans_Basics
-    Public masks As New List(Of cv.Mat)
+    Public masks As New List(Of Mat)
     Public counts As New List(Of Integer)
     Public classCount As Integer
     Dim maskIndex As Integer
@@ -323,7 +323,7 @@ Public Class KMeans_Image : Inherits TaskParent
         counts.Clear()
         Dim k = km.options.kMeansK
         For i = 0 To k - 1
-            Dim mask As New cv.Mat
+            Dim mask As New Mat
             InRange(km.dst2, i, i, mask)
             masks.Add(mask)
             counts.Add(CountNonZero(mask))
@@ -344,19 +344,19 @@ End Class
 
 Public Class XR_KMeans_DepthPlusGray : Inherits TaskParent
     Dim km As New KMeans_Basics
-    Dim grayPlus(2 - 1) As cv.Mat
+    Dim grayPlus(2 - 1) As Mat
     Public Sub New()
         km.buildPaletteOutput = False
         labels(3) = "KMeans 8-bit results"
-        grayPlus(0) = New cv.Mat(New cv.Size(task.workRes.Width, task.workRes.Height), cv.MatType.CV_32F, cv.Scalar.All(0))
+        grayPlus(0) = New Mat(New Size(task.workRes.Width, task.workRes.Height), MatType.CV_32F, Scalar.All(0))
         desc = "Cluster the rgb+depth image pixels using kMeans"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        task.gray.ConvertTo(grayPlus(0), cv.MatType.CV_32F)
+        task.gray.ConvertTo(grayPlus(0), MatType.CV_32F)
         grayPlus(0).SetTo(0, task.noDepthMask)
         grayPlus(1) = task.pcSplit(2)
 
-        Dim mergeMat As New cv.Mat
+        Dim mergeMat As New Mat
         Merge(grayPlus, mergeMat)
         km.Run(mergeMat)
 
@@ -386,33 +386,33 @@ Public Class KMeans_Dimensions : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         Static dimSlider = OptionParent.FindSlider("Dimension")
 
-        Dim mergeMat As New cv.Mat
+        Dim mergeMat As New Mat
         Select Case CInt(dimSlider.value)
             Case 1 ' grayscale
                 If src.Channels() = 1 Then
-                    src.ConvertTo(mergeMat, cv.MatType.CV_32F)
+                    src.ConvertTo(mergeMat, MatType.CV_32F)
                 Else
-                    task.gray.ConvertTo(mergeMat, cv.MatType.CV_32F)
+                    task.gray.ConvertTo(mergeMat, MatType.CV_32F)
                 End If
             Case 2 ' pointcloud x and y
                 Merge({task.pcSplit(0), task.pcSplit(1)}, mergeMat)
             Case 3 ' pointcloud dimensions
                 mergeMat = task.pointCloud
             Case 4 ' color + depth
-                src.ConvertTo(src, cv.MatType.CV_32F)
-                Normalize(task.pcSplit(2), task.pcSplit(2), 0, 255, cv.NormTypes.MinMax)
+                src.ConvertTo(src, MatType.CV_32F)
+                Normalize(task.pcSplit(2), task.pcSplit(2), 0, 255, NormTypes.MinMax)
                 Merge({src, task.pcSplit(2)}, mergeMat)
             Case 5 ' color + pcSplit(0) and pcSplit(1)
-                src.ConvertTo(src, cv.MatType.CV_32F)
-                Normalize(task.pcSplit(0), task.pcSplit(0), 0, 255, cv.NormTypes.MinMax)
-                Normalize(task.pcSplit(1), task.pcSplit(1), 0, 255, cv.NormTypes.MinMax)
+                src.ConvertTo(src, MatType.CV_32F)
+                Normalize(task.pcSplit(0), task.pcSplit(0), 0, 255, NormTypes.MinMax)
+                Normalize(task.pcSplit(1), task.pcSplit(1), 0, 255, NormTypes.MinMax)
                 Merge({src, task.pcSplit(0), task.pcSplit(1)}, mergeMat)
             Case 6 ' color + pointcloud
-                src.ConvertTo(src, cv.MatType.CV_32F)
-                Dim tmp1 As New cv.Mat, tmp2 As New cv.Mat, tmp3 As New cv.Mat
-                Normalize(task.pcSplit(0), tmp1, 0, 255, cv.NormTypes.MinMax)
-                Normalize(task.pcSplit(1), tmp2, 0, 255, cv.NormTypes.MinMax)
-                Normalize(task.pcSplit(2), tmp3, 0, 255, cv.NormTypes.MinMax)
+                src.ConvertTo(src, MatType.CV_32F)
+                Dim tmp1 As New Mat, tmp2 As New Mat, tmp3 As New Mat
+                Normalize(task.pcSplit(0), tmp1, 0, 255, NormTypes.MinMax)
+                Normalize(task.pcSplit(1), tmp2, 0, 255, NormTypes.MinMax)
+                Normalize(task.pcSplit(2), tmp3, 0, 255, NormTypes.MinMax)
                 Merge({src, tmp1, tmp2, tmp3}, mergeMat)
         End Select
 
@@ -490,7 +490,7 @@ Public Class XR_KMeans_SimKColor : Inherits TaskParent
     Dim plot1D As New Hist3Dcolor_PlotHist1D
     Dim simK As New Hist3D_BuildHistogram
     Public classCount As Integer
-    Dim histogram As New cv.Mat
+    Dim histogram As New Mat
     Public Sub New()
         desc = "Use the gaps in the 3D histogram of the color image to find 'k' and backproject the task.results.."
     End Sub
@@ -526,7 +526,7 @@ Public Class XR_KMeans_SimKDepth : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         Static binSlider = OptionParent.FindSlider("Histogram 3D Bins")
-        If src.Type <> cv.MatType.CV_32FC3 Then src = task.pointCloud
+        If src.Type <> MatType.CV_32FC3 Then src = task.pointCloud
         If task.heartBeat Then
             plot1D.Run(src)
             dst3 = plot1D.dst2

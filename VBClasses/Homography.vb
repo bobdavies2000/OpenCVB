@@ -1,7 +1,7 @@
 Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 Public Class Homography_Basics : Inherits TaskParent
-    Public corners1 As New List(Of cv.Point2d)
-    Public corners2 As New List(Of cv.Point2d)
+    Public corners1 As New List(Of Point2d)
+    Public corners2 As New List(Of Point2d)
     Dim random As New Random_Point2d
     Dim options As New Options_Homography
     Public Sub New()
@@ -10,11 +10,11 @@ Public Class Homography_Basics : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
 
-        If standaloneTest() And task.heartBeat And options.hMethod = cv.HomographyMethods.None Then
+        If standaloneTest() And task.heartBeat And options.hMethod = HomographyMethods.None Then
             random.Run(src)
-            corners1 = New List(Of cv.Point2d)(random.PointList)
+            corners1 = New List(Of Point2d)(random.PointList)
             random.Run(src)
-            corners2 = New List(Of cv.Point2d)(random.PointList)
+            corners2 = New List(Of Point2d)(random.PointList)
         End If
 
         ' cannot find a homography when less than 4...

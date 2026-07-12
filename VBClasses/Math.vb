@@ -9,7 +9,7 @@ Public Class XR_Math_Subtract : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
 
-        Dim bgr = New cv.Scalar(options.blueS, options.greenS, options.redS)
+        Dim bgr = New Scalar(options.blueS, options.greenS, options.redS)
         Subtract(bgr, src, dst2) ' or dst2 = bgr - src
         dst3 = src - bgr
 
@@ -22,9 +22,9 @@ Module Math_Functions
     Public Sub CPP_Test()
         MessageBox.Show("testing")
     End Sub
-    Public Function computeMedian(src As cv.Mat, mask As cv.Mat, totalPixels As Integer, bins As Integer, rangeMin As Single, rangeMax As Single) As Double
-        Dim hist As New cv.Mat()
-        CalcHist({src}, {0}, mask, hist, 1, {bins}, {New cv.Rangef(rangeMin, rangeMax)})
+    Public Function computeMedian(src As Mat, mask As Mat, totalPixels As Integer, bins As Integer, rangeMin As Single, rangeMax As Single) As Double
+        Dim hist As New Mat()
+        CalcHist({src}, {0}, mask, hist, 1, {bins}, {New Rangef(rangeMin, rangeMax)})
         Dim halfPixels = totalPixels / 2
 
         Dim median As Double
@@ -51,10 +51,10 @@ Public Class Math_Median_CDF : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If src.Channels() <> 1 Then src = task.gray
-        medianVal = computeMedian(src, New cv.Mat, src.Total, task.histogramBins, rangeMin, rangeMax)
+        medianVal = computeMedian(src, New Mat, src.Total, task.histogramBins, rangeMin, rangeMax)
 
         If standaloneTest() Then
-            Dim mask = New cv.Mat
+            Dim mask = New Mat
             mask = src.GreaterThan(medianVal)
 
             dst2.SetTo(0)
@@ -83,7 +83,7 @@ Public Class XR_Math_DepthMeanStdev : Inherits TaskParent
         Dim mask = minMax.dst3 ' the mask for stable depth.
         dst3.SetTo(0)
         task.depthRGB.CopyTo(dst3, mask)
-        If mask.Type <> cv.MatType.CV_8U Then CvtColor(mask, mask, cv.ColorConversionCodes.BGR2GRAY)
+        If mask.Type <> MatType.CV_8U Then CvtColor(mask, mask, ColorConversionCodes.BGR2GRAY)
         MeanStdDev(task.pcSplit(2), mean, stdev, mask)
         labels(3) = "stablized depth mean=" + mean.ToString(fmt1) + " stdev=" + stdev.ToString(fmt1)
 
@@ -111,7 +111,7 @@ Public Class XR_Math_RGBCorrelation : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
 
-        Dim splitMats() As cv.Mat = Split(src)
+        Dim splitMats() As Mat = Split(src)
         match.template = splitMats(0)
         match.Run(splitMats(1))
         Dim blueGreenCorrelation = "Blue-Green " + match.labels(2)
@@ -159,8 +159,8 @@ Public Class XR_Math_StdevBoundary : Inherits TaskParent
                 Dim m2 = dst2.Get(Of Byte)(roi.Y, roi.X + roi.Width)
                 If m1 = 0 And m2 <> 0 Then
                     Dim meanScalar = Mean(dst3(roi))
-                    Dim tmp As New cv.Mat
-                    Threshold(dst3(roi), tmp, meanScalar(0), 255, cv.ThresholdTypes.Otsu)
+                    Dim tmp As New Mat
+                    Threshold(dst3(roi), tmp, meanScalar(0), 255, ThresholdTypes.Otsu)
                     dst3(roi).CopyTo(dst2(roi), tmp)
                 End If
                 If m1 > 0 And m2 = 0 Then
@@ -168,8 +168,8 @@ Public Class XR_Math_StdevBoundary : Inherits TaskParent
                     If newROI.X + newROI.Width >= dst2.Width Then newROI.Width = dst2.Width - newROI.X - 1
                     If newROI.Y + newROI.Height >= dst2.Height Then newROI.Height = dst2.Height - newROI.Y - 1
                     Dim meanScalar = Mean(dst3(newROI))
-                    Dim tmp As New cv.Mat
-                    Threshold(dst3(newROI), tmp, meanScalar(0), 255, cv.ThresholdTypes.Otsu)
+                    Dim tmp As New Mat
+                    Threshold(dst3(newROI), tmp, meanScalar(0), 255, ThresholdTypes.Otsu)
                     dst3(newROI).CopyTo(dst2(newROI), tmp)
                 End If
             End If
@@ -178,16 +178,16 @@ Public Class XR_Math_StdevBoundary : Inherits TaskParent
                 Dim m2 = dst2.Get(Of Byte)(roi.Y + roi.Height, roi.X)
                 If m1 = 0 And m2 <> 0 Then
                     Dim meanScalar = Mean(dst3(roi))
-                    Dim tmp As New cv.Mat
-                    Threshold(dst3(roi), tmp, meanScalar(0), 255, cv.ThresholdTypes.Otsu)
+                    Dim tmp As New Mat
+                    Threshold(dst3(roi), tmp, meanScalar(0), 255, ThresholdTypes.Otsu)
                     dst3(roi).CopyTo(dst2(roi), tmp)
                 End If
                 If m1 > 0 And m2 = 0 Then
                     Dim newROI = ValidateRect(New cv.Rect(roi.X, roi.Y + roi.Height, roi.Width, roi.Height))
                     If newROI.Y + newROI.Height >= dst3.Height Then newROI.Height = dst3.Height - newROI.Y
                     Dim meanScalar = Mean(dst3(newROI))
-                    Dim tmp As New cv.Mat
-                    Threshold(dst3(newROI), tmp, meanScalar(0), 255, cv.ThresholdTypes.Otsu)
+                    Dim tmp As New Mat
+                    Threshold(dst3(newROI), tmp, meanScalar(0), 255, ThresholdTypes.Otsu)
                     dst3(newROI).CopyTo(dst2(newROI), tmp)
                 End If
             End If
@@ -204,8 +204,8 @@ End Class
 
 Public Class Math_Intrinsics : Inherits TaskParent
     Public Sub New()
-        dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_32F, 0)
-        dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_32F, 0)
+        dst2 = New Mat(dst2.Size(), MatType.CV_32F, 0)
+        dst3 = New Mat(dst3.Size(), MatType.CV_32F, 0)
 
         For i = 0 To dst2.Width - 1
             dst2.Set(Of Single)(0, i, i) ' row with 0, 1, 2, 3....
@@ -220,11 +220,11 @@ Public Class Math_Intrinsics : Inherits TaskParent
             dst3.Col(0).CopyTo(dst3.Col(i)) ' duplicate above col
         Next
 
-        dst2 = dst2.Subtract(cv.Scalar.All(task.calibData.leftIntrinsics.ppx))
-        dst3 = dst3.Subtract(cv.Scalar.All(task.calibData.leftIntrinsics.ppx))
+        dst2 = dst2.Subtract(Scalar.All(task.calibData.leftIntrinsics.ppx))
+        dst3 = dst3.Subtract(Scalar.All(task.calibData.leftIntrinsics.ppx))
 
         labels = {"", "", "Input Template showing columns", "Input Template showing rows"}
-        desc = "Build a template for use with computing the point cloud"
+        desc = "Build a template for use with computing the cv.Point cloud"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         labels(2) = "All the work for " + traceName + " is completed in the constructor"
@@ -238,17 +238,17 @@ End Class
 
 
 Public Class Math_ImageAverage : Inherits TaskParent
-    Dim images As New List(Of cv.Mat)
+    Dim images As New List(Of Mat)
     Public Sub New()
         desc = "Create an image that is the mean of x number of previous images."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If task.optionsChanged Then images.Clear()
         dst3 = src.Clone
-        If dst3.Type <> cv.MatType.CV_32F Then
-            If dst3.Channels() <> 1 Then dst3.ConvertTo(dst3, cv.MatType.CV_32FC3) Else dst3.ConvertTo(dst3, cv.MatType.CV_32F)
+        If dst3.Type <> MatType.CV_32F Then
+            If dst3.Channels() <> 1 Then dst3.ConvertTo(dst3, MatType.CV_32FC3) Else dst3.ConvertTo(dst3, MatType.CV_32F)
         End If
-        Multiply(dst3, cv.Scalar.All(1 / (images.Count + 1)), dst3)
+        Multiply(dst3, Scalar.All(1 / (images.Count + 1)), dst3)
         images.Add(dst3.Clone)
         If images.Count > task.fOptions.FrameHistoryCount.Value Then images.RemoveAt(0)
 
@@ -269,15 +269,15 @@ End Class
 
 
 Public Class XR_Math_ImageMaskedAverage : Inherits TaskParent
-    Dim images As New List(Of cv.Mat)
+    Dim images As New List(Of Mat)
     Public Sub New()
         desc = "Mask off pixels where the difference is great and create an image that is the mean of x number of previous images."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If task.optionsChanged Then images.Clear()
-        Dim nextImage As New cv.Mat
-        If src.Type <> cv.MatType.CV_32F Then src.ConvertTo(nextImage, cv.MatType.CV_32F) Else nextImage = src
-        Multiply(nextImage, cv.Scalar.All(1 / task.fOptions.FrameHistoryCount.Value), nextImage)
+        Dim nextImage As New Mat
+        If src.Type <> MatType.CV_32F Then src.ConvertTo(nextImage, MatType.CV_32F) Else nextImage = src
+        Multiply(nextImage, Scalar.All(1 / task.fOptions.FrameHistoryCount.Value), nextImage)
         images.Add(nextImage.Clone())
         If images.Count > task.fOptions.FrameHistoryCount.Value Then images.RemoveAt(0)
 
@@ -297,9 +297,9 @@ End Class
 
 
 Public Class Math_Stdev : Inherits TaskParent
-    Public highStdevMask As cv.Mat
-    Public lowStdevMask As cv.Mat
-    Public saveFrame As cv.Mat
+    Public highStdevMask As Mat
+    Public lowStdevMask As Mat
+    Public saveFrame As Mat
     Dim options As New Options_Math
     Dim optionsMatch As New Options_Match
     Dim stdevSlider As New System.Windows.Forms.TrackBar
@@ -307,8 +307,8 @@ Public Class Math_Stdev : Inherits TaskParent
         stdevSlider = OptionParent.FindSlider("Stdev Threshold")
         task.gOptions.GridSlider.Value = 16
 
-        highStdevMask = New cv.Mat(dst2.Size(), cv.MatType.CV_8U)
-        lowStdevMask = New cv.Mat(dst2.Size(), cv.MatType.CV_8U)
+        highStdevMask = New Mat(dst2.Size(), MatType.CV_8U)
+        lowStdevMask = New Mat(dst2.Size(), MatType.CV_8U)
         desc = "Compute the standard deviation in each segment"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -319,9 +319,9 @@ Public Class Math_Stdev : Inherits TaskParent
         highStdevMask.SetTo(0)
 
         dst2 = src.Clone
-        If dst2.Channels() = 3 Then CvtColor(dst2, dst2, cv.ColorConversionCodes.BGR2GRAY)
+        If dst2.Channels() = 3 Then CvtColor(dst2, dst2, ColorConversionCodes.BGR2GRAY)
 
-        Static lastFrame As cv.Mat = dst2.Clone()
+        Static lastFrame As Mat = dst2.Clone()
         saveFrame = dst2.Clone
         Parallel.ForEach(task.gridRects,
             Sub(roi)
@@ -356,8 +356,8 @@ End Class
 
 ' https://stackoverflow.com/questions/7572640/how-do-i-know-if-two-vectors-are-near-parallel
 Public Class Math_DotProduct3D : Inherits TaskParent
-    Public v1 = New cv.Point3f(1, 0, 0)
-    Public v2 = New cv.Point3f(5, 0, 0)
+    Public v1 = New Point3f(1, 0, 0)
+    Public v2 = New Point3f(5, 0, 0)
     Public showWork As Boolean = True
     Public Sub New()
         labels = {"", "", "Parallel Test Output", ""}

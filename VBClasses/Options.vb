@@ -39,7 +39,7 @@ End Class
 
 
 Public Class Options_SharpGL2 : Inherits OptionParent
-    Public eye As cv.Vec3f = New cv.Vec3f(0, 0, 0)
+    Public eye As Vec3f = New Vec3f(0, 0, 0)
     Public Sub New()
         If sliders.Setup(traceName) Then
             sliders.setupTrackBar("SharpGL Eye X X10", -180, 180, eye(0) * 10)
@@ -52,7 +52,7 @@ Public Class Options_SharpGL2 : Inherits OptionParent
         Static eyeYSlider = OptionParent.FindSlider("SharpGL Eye Y X10")
         Static eyeZSlider = OptionParent.FindSlider("SharpGL Eye Z X10")
 
-        eye = New cv.Vec3f(eyeXSlider.Value / 10, eyeYSlider.Value / 10, eyeZSlider.Value / 10)
+        eye = New Vec3f(eyeXSlider.Value / 10, eyeYSlider.Value / 10, eyeZSlider.Value / 10)
     End Sub
 End Class
 
@@ -138,7 +138,7 @@ End Class
 
 Public Class Options_CamShift : Inherits OptionParent
     Public camMax As Integer = 255
-    Public camSBins As cv.Scalar = New cv.Scalar(0, 40, 32)
+    Public camSBins As Scalar = New Scalar(0, 40, 32)
     Public Sub New()
         If sliders.Setup(traceName) Then
             sliders.setupTrackBar("CamShift vMin", 0, 255, camSBins(2))
@@ -157,7 +157,7 @@ Public Class Options_CamShift : Inherits OptionParent
 
         Dim min = Math.Min(vMin, vMax)
         camMax = Math.Max(vMin, vMax)
-        camSBins = New cv.Scalar(0, sMin, min)
+        camSBins = New Scalar(0, sMin, min)
     End Sub
 End Class
 
@@ -168,7 +168,7 @@ End Class
 
 
 Public Class Options_Contours2 : Inherits OptionParent
-    Public ApproximationMode As cv.ContourApproximationModes = cv.ContourApproximationModes.ApproxTC89KCOS
+    Public ApproximationMode As ContourApproximationModes = ContourApproximationModes.ApproxTC89KCOS
     Public Sub New()
         If radio.Setup(traceName) Then
             radio.addRadio("ApproxNone")
@@ -179,9 +179,9 @@ Public Class Options_Contours2 : Inherits OptionParent
         End If
     End Sub
     Public Sub Run()
-        Static radioChoices() As cv.ContourApproximationModes = {cv.ContourApproximationModes.ApproxNone,
-                                        cv.ContourApproximationModes.ApproxSimple, cv.ContourApproximationModes.ApproxTC89KCOS,
-                                        cv.ContourApproximationModes.ApproxTC89L1}
+        Static radioChoices() As ContourApproximationModes = {ContourApproximationModes.ApproxNone,
+                                        ContourApproximationModes.ApproxSimple, ContourApproximationModes.ApproxTC89KCOS,
+                                        ContourApproximationModes.ApproxTC89L1}
         Static frm = FindFrm(traceName + " Radio Buttons")
         ApproximationMode = radioChoices(findRadioIndex(frm.check))
     End Sub
@@ -192,8 +192,8 @@ End Class
 
 
 Public Class Options_Contours : Inherits OptionParent
-    Public retrievalMode As cv.RetrievalModes = cv.RetrievalModes.External
-    Public ApproximationMode As cv.ContourApproximationModes = cv.ContourApproximationModes.ApproxTC89KCOS
+    Public retrievalMode As RetrievalModes = RetrievalModes.External
+    Public ApproximationMode As ContourApproximationModes = ContourApproximationModes.ApproxTC89KCOS
     Public epsilon As Double = 0.03
     Public options2 As New Options_Contours2
     Public Sub New()
@@ -211,9 +211,9 @@ Public Class Options_Contours : Inherits OptionParent
         Static frm = FindFrm(traceName + " Radio Buttons")
         For i = 0 To frm.check.Count - 1
             If frm.check(i).Checked Then
-                retrievalMode = Choose(i + 1, cv.RetrievalModes.CComp, cv.RetrievalModes.External,
-                                            cv.RetrievalModes.FloodFill, cv.RetrievalModes.List,
-                                            cv.RetrievalModes.Tree)
+                retrievalMode = Choose(i + 1, RetrievalModes.CComp, RetrievalModes.External,
+                                            RetrievalModes.FloodFill, RetrievalModes.List,
+                                            RetrievalModes.Tree)
                 Exit For
             End If
         Next
@@ -259,7 +259,7 @@ End Class
 Public Class Options_Encode : Inherits OptionParent
     Public qualityLevel As Integer = 1
     Public scalingLevel As Integer = 85
-    Public encodeOption = cv.ImwriteFlags.JpegProgressive
+    Public encodeOption = ImwriteFlags.JpegProgressive
     Public Sub New()
         If sliders.Setup(traceName) Then
             sliders.setupTrackBar("Encode Quality Level", 1, 100, qualityLevel) ' make it low quality to highlight how different it can be.
@@ -281,15 +281,15 @@ Public Class Options_Encode : Inherits OptionParent
         Static frm = FindFrm(traceName + " Radio Buttons")
         For i = 0 To frm.check.Count - 1
             If frm.check(i).Checked Then
-                encodeOption = Choose(i + 1, cv.ImwriteFlags.JpegChromaQuality, cv.ImwriteFlags.JpegLumaQuality, cv.ImwriteFlags.JpegOptimize, cv.ImwriteFlags.JpegProgressive,
-                                                    cv.ImwriteFlags.JpegQuality, cv.ImwriteFlags.WebPQuality)
+                encodeOption = Choose(i + 1, ImwriteFlags.JpegChromaQuality, ImwriteFlags.JpegLumaQuality, ImwriteFlags.JpegOptimize, ImwriteFlags.JpegProgressive,
+                                                    ImwriteFlags.JpegQuality, ImwriteFlags.WebPQuality)
                 Exit For
             End If
         Next
         qualityLevel = qualitySlider.Value
         scalingLevel = scalingSlider.value
-        If encodeOption = cv.ImwriteFlags.JpegProgressive Then qualityLevel = 1 ' just on or off
-        If encodeOption = cv.ImwriteFlags.JpegOptimize Then qualityLevel = 1 ' just on or off
+        If encodeOption = ImwriteFlags.JpegProgressive Then qualityLevel = 1 ' just on or off
+        If encodeOption = ImwriteFlags.JpegOptimize Then qualityLevel = 1 ' just on or off
     End Sub
 End Class
 
@@ -357,7 +357,7 @@ End Class
 
 
 Public Class Options_MatchShapes : Inherits OptionParent
-    Public matchOption As cv.ShapeMatchModes = cv.ShapeMatchModes.I1
+    Public matchOption As ShapeMatchModes = ShapeMatchModes.I1
     Public matchThreshold As Double = 0.2
     Public maxYdelta As Double = 0.05
     Public minSize As Double = 120
@@ -387,7 +387,7 @@ Public Class Options_MatchShapes : Inherits OptionParent
         Static frm = FindFrm(traceName + " Radio Buttons")
         For i = 0 To frm.check.Count - 1
             If frm.check(i).Checked Then
-                matchOption = Choose(i + 1, cv.ShapeMatchModes.I1, cv.ShapeMatchModes.I2, cv.ShapeMatchModes.I3)
+                matchOption = Choose(i + 1, ShapeMatchModes.I1, ShapeMatchModes.I2, ShapeMatchModes.I3)
                 Exit For
             End If
         Next
@@ -475,7 +475,7 @@ End Class
 
 
 Public Class Options_Resize : Inherits OptionParent
-    Public warpFlag As cv.InterpolationFlags = cv.InterpolationFlags.Nearest
+    Public warpFlag As InterpolationFlags = InterpolationFlags.Nearest
     Public radioIndex As Integer = 0
     Public Sub New()
         If radio.Setup(traceName) Then
@@ -493,9 +493,9 @@ Public Class Options_Resize : Inherits OptionParent
         Static frm = FindFrm(traceName + " Radio Buttons")
         For i = 0 To frm.check.Count - 1
             If frm.check(i).Checked Then
-                warpFlag = Choose(i + 1, cv.InterpolationFlags.Area, cv.InterpolationFlags.Cubic, cv.InterpolationFlags.Lanczos4,
-                                                cv.InterpolationFlags.Linear, cv.InterpolationFlags.Nearest,
-                                                cv.InterpolationFlags.WarpFillOutliers, cv.InterpolationFlags.WarpInverseMap)
+                warpFlag = Choose(i + 1, InterpolationFlags.Area, InterpolationFlags.Cubic, InterpolationFlags.Lanczos4,
+                                                InterpolationFlags.Linear, InterpolationFlags.Nearest,
+                                                InterpolationFlags.WarpFillOutliers, InterpolationFlags.WarpInverseMap)
                 radioIndex = i
                 Exit For
             End If
@@ -576,7 +576,7 @@ End Class
 
 ' https://docs.opencv.org/3.4/d1/d73/tutorial_introduction_to_svm.html
 Public Class Options_SVM2 : Inherits OptionParent
-    Public SVMType As Integer = cv.ML.SVM.Types.CSvc
+    Public SVMType As Integer = ML.SVM.Types.CSvc
     Public Sub New()
         If radio.Setup(traceName) Then
             radio.addRadio("SVM Type = CSvc")
@@ -592,7 +592,7 @@ Public Class Options_SVM2 : Inherits OptionParent
         Static frm = FindFrm(traceName + " Radio Buttons")
         For i = 0 To frm.check.Count - 1
             If frm.check(i).Checked Then
-                SVMType = Choose(i + 1, cv.ML.SVM.Types.CSvc, cv.ML.SVM.Types.EpsSvr, cv.ML.SVM.Types.NuSvc, cv.ML.SVM.Types.NuSvr, cv.ML.SVM.Types.OneClass)
+                SVMType = Choose(i + 1, ML.SVM.Types.CSvc, ML.SVM.Types.EpsSvr, ML.SVM.Types.NuSvc, ML.SVM.Types.NuSvr, ML.SVM.Types.OneClass)
                 Exit For
             End If
         Next
@@ -609,7 +609,7 @@ End Class
 
 ' https://docs.opencv.org/3.4/d1/d73/tutorial_introduction_to_svm.html
 Public Class Options_SVM : Inherits OptionParent
-    Public kernelType As cv.ML.SVM.KernelTypes = cv.ML.SVM.KernelTypes.Poly
+    Public kernelType As ML.SVM.KernelTypes = ML.SVM.KernelTypes.Poly
     Public granularity As Integer = 5
     Public svmDegree As Double = 1
     Public gamma As Integer = 1
@@ -642,11 +642,11 @@ Public Class Options_SVM : Inherits OptionParent
             radio.check(2).Checked = True
         End If
     End Sub
-    Public Function createSVM() As cv.ML.SVM
-        Dim svm = cv.ML.SVM.Create()
+    Public Function createSVM() As ML.SVM
+        Dim svm = ML.SVM.Create()
         svm.Type = options2.SVMType
         svm.KernelType = kernelType
-        svm.TermCriteria = cv.TermCriteria.Both(1000, 0.000001)
+        svm.TermCriteria = TermCriteria.Both(1000, 0.000001)
         svm.Degree = svmDegree
         svm.Gamma = gamma
         svm.Coef0 = svmCoef0
@@ -657,7 +657,7 @@ Public Class Options_SVM : Inherits OptionParent
     End Function
 
     Public Sub Run()
-        Static radioChoices = {cv.ML.SVM.KernelTypes.Linear, cv.ML.SVM.KernelTypes.Poly, cv.ML.SVM.KernelTypes.Rbf, cv.ML.SVM.KernelTypes.Sigmoid}
+        Static radioChoices = {ML.SVM.KernelTypes.Linear, ML.SVM.KernelTypes.Poly, ML.SVM.KernelTypes.Rbf, ML.SVM.KernelTypes.Sigmoid}
         options2.Run()
         Static frm = FindFrm(traceName + " Radio Buttons")
         kernelType = radioChoices(findRadioIndex(frm.check))
@@ -690,7 +690,7 @@ End Class
 
 Public Class Options_WarpModel : Inherits OptionParent
     Public useGradient As Boolean = False
-    Public pkImage As cv.Mat
+    Public pkImage As Mat
     Public warpMode As Integer = 0
     Public useWarpAffine As Boolean = False
     Public useWarpHomography As Boolean = False
@@ -729,7 +729,7 @@ Public Class Options_WarpModel : Inherits OptionParent
                 Dim nextRadio = frm.check(i)
                 If nextRadio.Checked Then
                     Dim photo As New FileInfo(task.homeDir + "Data\Prokudin\" + nextRadio.Text)
-                    pkImage = ImRead(photo.FullName, cv.ImreadModes.Grayscale)
+                    pkImage = ImRead(photo.FullName, ImreadModes.Grayscale)
                     Exit For
                 End If
             Next
@@ -773,7 +773,7 @@ End Class
 
 
 Public Class Options_DCT : Inherits OptionParent
-    Public dctFlag As cv.DctFlags = New cv.DctFlags
+    Public dctFlag As DctFlags = New DctFlags
     Public runLengthMin As Integer = 15
     Public removeFrequency As Integer = 1
     Public Sub New()
@@ -796,7 +796,7 @@ Public Class Options_DCT : Inherits OptionParent
         removeFrequency = removeSlider.Value
         For i = 0 To 2
             If radio.check(i).Checked Then
-                dctFlag = Choose(i + 1, cv.DctFlags.None, cv.DctFlags.Rows, cv.DctFlags.Inverse)
+                dctFlag = Choose(i + 1, DctFlags.None, DctFlags.Rows, DctFlags.Inverse)
                 Exit For
             End If
         Next
@@ -813,12 +813,12 @@ Public Class Options_Eigen : Inherits OptionParent
     Public noiseOffset As Integer = 25
     Public Sub New()
         If sliders.Setup(traceName) Then
-            sliders.setupTrackBar("Line Point Count", 5, 200, noisyPointCount)
+            sliders.setupTrackBar("Line cv.Point Count", 5, 200, noisyPointCount)
             sliders.setupTrackBar("Line Noise", 1, 500, noiseOffset)
         End If
     End Sub
     Public Sub Run()
-        Static linePairSlider = OptionParent.FindSlider("Line Point Count")
+        Static linePairSlider = OptionParent.FindSlider("Line cv.Point Count")
         Static noiseSlider = OptionParent.FindSlider("Line Noise")
         noisyPointCount = linePairSlider.Value
         noiseOffset = noiseSlider.Value
@@ -1186,7 +1186,7 @@ End Class
 
 Public Class Options_SymmetricalShapes : Inherits OptionParent
     Public rotateAngle As Double = 0
-    Public fillColor As cv.Scalar = New cv.Scalar(0, 0, 255)
+    Public fillColor As Scalar = New Scalar(0, 0, 255)
     Public numPoints As Integer = 0
     Public nGenPer As Integer = 0
     Public radius1 As Integer = 0
@@ -1286,7 +1286,7 @@ End Class
 
 
 Public Class Options_FilterNorm : Inherits OptionParent
-    Public kernel As cv.Mat
+    Public kernel As Mat
     Public Sub New()
         If radio.Setup(traceName) Then
             radio.addRadio("INF")
@@ -1303,12 +1303,12 @@ Public Class Options_FilterNorm : Inherits OptionParent
     Public Sub Run()
         Static alphaSlider = OptionParent.FindSlider("Normalize alpha X10")
 
-        Dim normType = cv.NormTypes.L1
-        kernel = cv.Mat.FromPixelData(1, 21, cv.MatType.CV_32FC1, New Single() {2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1})
+        Dim normType = NormTypes.L1
+        kernel = Mat.FromPixelData(1, 21, MatType.CV_32FC1, New Single() {2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1})
         Static frm = FindFrm(traceName + " Radio Buttons")
         For i = 0 To frm.check.Count - 1
             If frm.check(i).Checked Then
-                normType = Choose(i + 1, cv.NormTypes.INF, cv.NormTypes.L1, cv.NormTypes.L2, cv.NormTypes.MinMax)
+                normType = Choose(i + 1, NormTypes.INF, NormTypes.L1, NormTypes.L2, NormTypes.MinMax)
                 Exit For
             End If
         Next
@@ -1382,14 +1382,14 @@ End Class
 
 
 Public Class Options_KLT : Inherits OptionParent
-    Public ptInput() As cv.Point2f
+    Public ptInput() As Point2f
     Public maxCorners As Integer = 100
     Public qualityLevel As Double = 0.01
     Public minDistance As Integer = 7
     Public blockSize As Integer = 7
     Public nightMode As Boolean = False
-    Public subPixWinSize As cv.Size = New cv.Size(10, 10)
-    Public winSize As cv.Size = New cv.Size(3, 3)
+    Public subPixWinSize As Size = New Size(10, 10)
+    Public winSize As Size = New Size(3, 3)
     Public Sub New()
         If sliders.Setup(traceName) Then
             sliders.setupTrackBar("KLT - MaxCorners", 1, 200, maxCorners)
@@ -1431,7 +1431,7 @@ End Class
 
 
 Public Class Options_Laplacian : Inherits OptionParent
-    Public kernel As cv.Size = New cv.Size(3, 3)
+    Public kernel As Size = New Size(3, 3)
     Public scale As Double = 1
     Public delta As Double = 0
     Public gaussianBlur As Boolean = False
@@ -1462,7 +1462,7 @@ Public Class Options_Laplacian : Inherits OptionParent
         Dim kernelSize As Integer = kernelSlider.Value Or 1
         scale = scaleSlider.Value / 100
         delta = deltaSlider.Value / 100
-        kernel = New cv.Size(kernelSize, kernelSize)
+        kernel = New Size(kernelSize, kernelSize)
         gaussianBlur = blurCheck.checked
         boxFilterBlur = boxCheck.checked
         threshold = thresholdSlider.value
@@ -1483,7 +1483,7 @@ Public Class Options_OpticalFlow : Inherits OptionParent
     Public iterations As Integer = 1
     Public polyN As Double = 0
     Public polySigma As Double = 0
-    Public OpticalFlowFlags As cv.OpticalFlowFlags = cv.OpticalFlowFlags.FarnebackGaussian
+    Public OpticalFlowFlags As OpticalFlowFlags = OpticalFlowFlags.FarnebackGaussian
     Public outputScaling As Integer = 0
     Public Sub New()
         If radio.Setup(traceName) Then
@@ -1523,8 +1523,8 @@ Public Class Options_OpticalFlow : Inherits OptionParent
         Static frm = FindFrm(traceName + " Radio Buttons")
         For i = 0 To frm.check.Count - 1
             If frm.check(i).Checked Then
-                OpticalFlowFlags = Choose(i + 1, cv.OpticalFlowFlags.FarnebackGaussian, cv.OpticalFlowFlags.LkGetMinEigenvals, cv.OpticalFlowFlags.None,
-                                                        cv.OpticalFlowFlags.PyrAReady, cv.OpticalFlowFlags.PyrBReady, cv.OpticalFlowFlags.UseInitialFlow)
+                OpticalFlowFlags = Choose(i + 1, OpticalFlowFlags.FarnebackGaussian, OpticalFlowFlags.LkGetMinEigenvals, OpticalFlowFlags.None,
+                                                        OpticalFlowFlags.PyrAReady, OpticalFlowFlags.PyrBReady, OpticalFlowFlags.UseInitialFlow)
                 Exit For
             End If
         Next
@@ -1538,7 +1538,7 @@ End Class
 
 
 Public Class Options_OpticalFlowSparse : Inherits OptionParent
-    Public OpticalFlowFlag As cv.OpticalFlowFlags = cv.OpticalFlowFlags.FarnebackGaussian
+    Public OpticalFlowFlag As OpticalFlowFlags = OpticalFlowFlags.FarnebackGaussian
     Public Sub New()
         If radio.Setup(traceName) Then
             radio.addRadio("FarnebackGaussian")
@@ -1555,8 +1555,8 @@ Public Class Options_OpticalFlowSparse : Inherits OptionParent
         Static frm = FindFrm(traceName + " Radio Buttons")
         For i = 0 To frm.check.Count - 1
             If frm.check(i).Checked Then
-                OpticalFlowFlag = Choose(i + 1, cv.OpticalFlowFlags.FarnebackGaussian, cv.OpticalFlowFlags.LkGetMinEigenvals, cv.OpticalFlowFlags.None,
-                                                    cv.OpticalFlowFlags.PyrAReady, cv.OpticalFlowFlags.PyrBReady, cv.OpticalFlowFlags.UseInitialFlow)
+                OpticalFlowFlag = Choose(i + 1, OpticalFlowFlags.FarnebackGaussian, OpticalFlowFlags.LkGetMinEigenvals, OpticalFlowFlags.None,
+                                                    OpticalFlowFlags.PyrAReady, OpticalFlowFlags.PyrBReady, OpticalFlowFlags.UseInitialFlow)
                 Exit For
             End If
         Next
@@ -1570,7 +1570,7 @@ End Class
 
 
 Public Class Options_XPhoto : Inherits OptionParent
-    Public colorCode As Integer = cv.ColorConversionCodes.BGR2GRAY
+    Public colorCode As Integer = ColorConversionCodes.BGR2GRAY
     Public dynamicRatio As Integer = 0
     Public blockSize As Integer = 0
     Public Sub New()
@@ -1595,8 +1595,8 @@ Public Class Options_XPhoto : Inherits OptionParent
         Static frm = FindFrm(traceName + " Radio Buttons")
         For i = 0 To frm.check.Count - 1
             If frm.check(i).Checked Then
-                colorCode = Choose(i + 1, cv.ColorConversionCodes.BGR2GRAY, cv.ColorConversionCodes.BGR2HSV, cv.ColorConversionCodes.BGR2YUV,
-                                                cv.ColorConversionCodes.BGR2XYZ, cv.ColorConversionCodes.BGR2Lab)
+                colorCode = Choose(i + 1, ColorConversionCodes.BGR2GRAY, ColorConversionCodes.BGR2HSV, ColorConversionCodes.BGR2YUV,
+                                                ColorConversionCodes.BGR2XYZ, ColorConversionCodes.BGR2Lab)
                 Exit For
             End If
         Next
@@ -1700,7 +1700,7 @@ End Class
 
 
 Public Class Options_Homography : Inherits OptionParent
-    Public hMethod = cv.HomographyMethods.None
+    Public hMethod = HomographyMethods.None
     Public Sub New()
         If FindFrm(traceName + " Radio Buttons") Is Nothing Then
             radio.Setup(traceName)
@@ -1722,11 +1722,11 @@ Public Class Options_Homography : Inherits OptionParent
         Static frm = FindFrm(traceName + " Radio Buttons")
         For i = 0 To frm.check.Count - 1
             If frm.check(i).Checked Then
-                hMethod = Choose(i + 1, cv.HomographyMethods.None, cv.HomographyMethods.LMedS, cv.HomographyMethods.Ransac,
-                                        cv.HomographyMethods.Rho, cv.HomographyMethods.USAC_DEFAULT,
-                                        cv.HomographyMethods.USAC_PARALLEL, cv.HomographyMethods.USAC_FM_8PTS,
-                                        cv.HomographyMethods.USAC_FAST, cv.HomographyMethods.USAC_ACCURATE,
-                                        cv.HomographyMethods.USAC_PROSAC, cv.HomographyMethods.USAC_MAGSAC)
+                hMethod = Choose(i + 1, HomographyMethods.None, HomographyMethods.LMedS, HomographyMethods.Ransac,
+                                        HomographyMethods.Rho, HomographyMethods.USAC_DEFAULT,
+                                        HomographyMethods.USAC_PARALLEL, HomographyMethods.USAC_FM_8PTS,
+                                        HomographyMethods.USAC_FAST, HomographyMethods.USAC_ACCURATE,
+                                        HomographyMethods.USAC_PROSAC, HomographyMethods.USAC_MAGSAC)
                 Exit For
             End If
         Next
@@ -1834,11 +1834,11 @@ Public Class Options_ColorMatch : Inherits OptionParent
     Public Sub New()
         If FindFrm(traceName + " CheckBoxes") Is Nothing Then
             check.Setup(traceName)
-            check.addCheckBox("Show Max Distance point")
+            check.addCheckBox("Show Max Distance cv.Point")
         End If
     End Sub
     Public Sub Run()
-        Static maxCheck = FindCheckBox("Show Max Distance point")
+        Static maxCheck = FindCheckBox("Show Max Distance cv.Point")
         maxDistanceCheck = maxCheck.checked
     End Sub
 End Class
@@ -1852,7 +1852,7 @@ End Class
 
 
 Public Class Options_Sort : Inherits OptionParent
-    Public sortOption As cv.SortFlags = cv.SortFlags.EveryColumn + cv.SortFlags.Ascending
+    Public sortOption As SortFlags = SortFlags.EveryColumn + SortFlags.Ascending
     Public radio0 As RadioButton
     Public radio1 As RadioButton
     Public radio2 As RadioButton
@@ -1884,9 +1884,9 @@ Public Class Options_Sort : Inherits OptionParent
     End Sub
     Public Sub Run()
         Static sortSlider = OptionParent.FindSlider("Threshold for sort input")
-        If radio1.Checked Then sortOption = cv.SortFlags.EveryColumn + cv.SortFlags.Descending
-        If radio2.Checked Then sortOption = cv.SortFlags.EveryRow + cv.SortFlags.Ascending
-        If radio3.Checked Then sortOption = cv.SortFlags.EveryRow + cv.SortFlags.Descending
+        If radio1.Checked Then sortOption = SortFlags.EveryColumn + SortFlags.Descending
+        If radio2.Checked Then sortOption = SortFlags.EveryRow + SortFlags.Ascending
+        If radio3.Checked Then sortOption = SortFlags.EveryRow + SortFlags.Descending
         sortThreshold = sortSlider.value
     End Sub
 End Class
@@ -1897,7 +1897,7 @@ End Class
 
 
 Public Class Options_Distance : Inherits OptionParent
-    Public distanceType As cv.DistanceTypes = cv.DistanceTypes.L1
+    Public distanceType As DistanceTypes = DistanceTypes.L1
     Public Sub New()
         If FindFrm(traceName + " Radio Buttons") Is Nothing Then
             radio.Setup(traceName)
@@ -1911,9 +1911,9 @@ Public Class Options_Distance : Inherits OptionParent
         Static cRadio = findRadio("C")
         Static l1Radio = findRadio("L1")
         Static l2Radio = findRadio("L2")
-        If cRadio.Checked Then distanceType = cv.DistanceTypes.C
-        If l1Radio.Checked Then distanceType = cv.DistanceTypes.L1
-        If l2Radio.Checked Then distanceType = cv.DistanceTypes.L2
+        If cRadio.Checked Then distanceType = DistanceTypes.C
+        If l1Radio.Checked Then distanceType = DistanceTypes.L1
+        If l2Radio.Checked Then distanceType = DistanceTypes.L2
     End Sub
 End Class
 
@@ -1931,7 +1931,7 @@ Public Class Options_Warp : Inherits OptionParent
     Public gamma As Double = 0
     Public f As Double = 0
     Public distance As Double = 0
-    Public transformMatrix As cv.Mat
+    Public transformMatrix As Mat
     Public Sub New()
         If sliders.Setup(traceName) Then
             sliders.setupTrackBar("Alpha", 0, 180, 90)
@@ -1983,13 +1983,13 @@ Public Class Options_Warp : Inherits OptionParent
                                     {0, f, task.rows / 2, 0},
                                     {0, 0, 1, 0}}
 
-        Dim a1 = cv.Mat.FromPixelData(4, 3, cv.MatType.CV_64F, a)
-        Dim rx = cv.Mat.FromPixelData(4, 4, cv.MatType.CV_64F, x)
-        Dim ry = cv.Mat.FromPixelData(4, 4, cv.MatType.CV_64F, y)
-        Dim rz = cv.Mat.FromPixelData(4, 4, cv.MatType.CV_64F, z)
+        Dim a1 = Mat.FromPixelData(4, 3, MatType.CV_64F, a)
+        Dim rx = Mat.FromPixelData(4, 4, MatType.CV_64F, x)
+        Dim ry = Mat.FromPixelData(4, 4, MatType.CV_64F, y)
+        Dim rz = Mat.FromPixelData(4, 4, MatType.CV_64F, z)
 
-        Dim tt = cv.Mat.FromPixelData(4, 4, cv.MatType.CV_64F, t)
-        Dim a2 = cv.Mat.FromPixelData(3, 4, cv.MatType.CV_64F, b)
+        Dim tt = Mat.FromPixelData(4, 4, MatType.CV_64F, t)
+        Dim a2 = Mat.FromPixelData(3, 4, MatType.CV_64F, b)
 
         Dim r = rx * ry * rz
         transformMatrix = a2 * (tt * (r * a1))
@@ -2004,7 +2004,7 @@ End Class
 
 
 Public Class Options_HistCompare : Inherits OptionParent
-    Public compareMethod As cv.HistCompMethods = cv.HistCompMethods.Correl
+    Public compareMethod As HistCompMethods = HistCompMethods.Correl
     Public compareName As String = "Chi Square Alt"
     Public Sub New()
         If FindFrm(traceName + " Radio Buttons") Is Nothing Then
@@ -2028,13 +2028,13 @@ Public Class Options_HistCompare : Inherits OptionParent
         Static hellingerRadio = findRadio("Compare using Hellinger")
         Static kldivRadio = findRadio("Compare using KLDiv")
 
-        If correlationRadio.checked Then compareMethod = cv.HistCompMethods.Correl
-        If chiRadio.checked Then compareMethod = cv.HistCompMethods.Chisqr
-        If intersectionRadio.checked Then compareMethod = cv.HistCompMethods.Intersect
-        If bhattRadio.checked Then compareMethod = cv.HistCompMethods.Bhattacharyya
-        If chiAltRadio.checked Then compareMethod = cv.HistCompMethods.ChisqrAlt
-        If kldivRadio.checked Then compareMethod = cv.HistCompMethods.KLDiv
-        If hellingerRadio.checked Then compareMethod = cv.HistCompMethods.Hellinger
+        If correlationRadio.checked Then compareMethod = HistCompMethods.Correl
+        If chiRadio.checked Then compareMethod = HistCompMethods.Chisqr
+        If intersectionRadio.checked Then compareMethod = HistCompMethods.Intersect
+        If bhattRadio.checked Then compareMethod = HistCompMethods.Bhattacharyya
+        If chiAltRadio.checked Then compareMethod = HistCompMethods.ChisqrAlt
+        If kldivRadio.checked Then compareMethod = HistCompMethods.KLDiv
+        If hellingerRadio.checked Then compareMethod = HistCompMethods.Hellinger
 
         If correlationRadio.checked Then compareName = "Correlation"
         If chiRadio.checked Then compareName = "Chi Square"
@@ -2150,7 +2150,7 @@ End Class
 
 Public Class Options_Emax : Inherits OptionParent
     Public predictionStepSize As Integer = 5
-    Public covarianceType = cv.EMTypes.CovMatDefault
+    Public covarianceType = EMTypes.CovMatDefault
     Public Sub New()
         If sliders.Setup(traceName) Then sliders.setupTrackBar("EMax Prediction Step Size", 1, 20, predictionStepSize)
 
@@ -2164,11 +2164,11 @@ Public Class Options_Emax : Inherits OptionParent
     Public Sub Run()
         Static stepSlider = OptionParent.FindSlider("EMax Prediction Step Size")
         predictionStepSize = stepSlider.value
-        covarianceType = cv.EMTypes.CovMatDefault
+        covarianceType = EMTypes.CovMatDefault
         Static frm = FindFrm(traceName + " Radio Buttons")
         For i = 0 To frm.check.Count - 1
             If frm.check(i).Checked = True Then
-                covarianceType = Choose(i + 1, cv.EMTypes.CovMatSpherical, cv.EMTypes.CovMatDiagonal, cv.EMTypes.CovMatGeneric)
+                covarianceType = Choose(i + 1, EMTypes.CovMatSpherical, EMTypes.CovMatDiagonal, EMTypes.CovMatGeneric)
             End If
         Next
     End Sub
@@ -2196,7 +2196,7 @@ Public Class Options_Intercepts : Inherits OptionParent
             radio.check(1).Checked = True
         End If
     End Sub
-    Public Sub showIntercepts(mousePoint As cv.Point, dst As cv.Mat)
+    Public Sub showIntercepts(mousePoint As cv.Point, dst As Mat)
     End Sub
     Public Sub Run()
         Static interceptSlider = OptionParent.FindSlider("Intercept width range in pixels")
@@ -2274,7 +2274,7 @@ End Class
 
 
 Public Class Options_Flood : Inherits OptionParent
-    Public floodFlag As cv.FloodFillFlags = 4 Or cv.FloodFillFlags.FixedRange
+    Public floodFlag As FloodFillFlags = 4 Or FloodFillFlags.FixedRange
     Public stepSize As Integer = 30
     Public minPixels As Integer = 30
     Public Sub New()
@@ -2295,7 +2295,7 @@ Public Class Options_Flood : Inherits OptionParent
         Static minSlider = OptionParent.FindSlider("Min Pixels")
 
         stepSize = stepSlider.Value
-        floodFlag = If(connectCheck.checked, 8, 4) Or If(floatingCheck.checked, cv.FloodFillFlags.FixedRange, 0)
+        floodFlag = If(connectCheck.checked, 8, 4) Or If(floatingCheck.checked, FloodFillFlags.FixedRange, 0)
         minPixels = minSlider.value
     End Sub
 End Class
@@ -2491,8 +2491,8 @@ End Class
 Public Class Options_Dilate : Inherits OptionParent
     Public kernelSize As Integer = 3
     Public iterations As Integer = 1
-    Public morphShape As cv.MorphShapes = cv.MorphShapes.Cross
-    Public element As cv.Mat
+    Public morphShape As MorphShapes = MorphShapes.Cross
+    Public element As Mat
     Public noshape As Boolean = False
     Public Sub New()
         If sliders.Setup(traceName) Then
@@ -2517,10 +2517,10 @@ Public Class Options_Dilate : Inherits OptionParent
         iterations = iterSlider.Value
         kernelSize = kernelSlider.Value Or 1
 
-        morphShape = cv.MorphShapes.Cross
-        If ellipseRadio.Checked Then morphShape = cv.MorphShapes.Ellipse
-        If rectRadio.Checked Then morphShape = cv.MorphShapes.Rect
-        element = GetStructuringElement(morphShape, New cv.Size(kernelSize, kernelSize))
+        morphShape = MorphShapes.Cross
+        If ellipseRadio.Checked Then morphShape = MorphShapes.Ellipse
+        If rectRadio.Checked Then morphShape = MorphShapes.Rect
+        element = GetStructuringElement(morphShape, New Size(kernelSize, kernelSize))
         noshape = noShapeRadio.checked
     End Sub
 End Class
@@ -2534,7 +2534,7 @@ End Class
 
 
 Public Class Options_KMeans : Inherits OptionParent
-    Public kMeansFlag As cv.KMeansFlags = cv.KMeansFlags.RandomCenters
+    Public kMeansFlag As KMeansFlags = KMeansFlags.RandomCenters
     Public kMeansK As Integer = 5
     Public Sub New()
         If sliders.Setup(traceName) Then
@@ -2558,11 +2558,11 @@ Public Class Options_KMeans : Inherits OptionParent
         Static kSlider = OptionParent.FindSlider("KMeans k")
         Select Case findRadioText(frm.check)
             Case "Use PpCenters"
-                kMeansFlag = cv.KMeansFlags.PpCenters
+                kMeansFlag = KMeansFlags.PpCenters
             Case "Use RandomCenters"
-                kMeansFlag = cv.KMeansFlags.RandomCenters
+                kMeansFlag = KMeansFlags.RandomCenters
             Case "Use Initialized Labels"
-                If task.optionsChanged Then kMeansFlag = cv.KMeansFlags.PpCenters Else kMeansFlag = cv.KMeansFlags.UseInitialLabels
+                If task.optionsChanged Then kMeansFlag = KMeansFlags.PpCenters Else kMeansFlag = KMeansFlags.UseInitialLabels
         End Select
         kMeansK = kSlider.Value
     End Sub
@@ -2766,7 +2766,7 @@ End Class
 
 
 Public Class Options_FeatureMatch : Inherits OptionParent
-    Public matchOption As cv.TemplateMatchModes = cv.TemplateMatchModes.CCoeffNormed
+    Public matchOption As TemplateMatchModes = TemplateMatchModes.CCoeffNormed
     Public matchText As String = "CCoeffNormed"
     Public Sub New()
         If radio.Setup(traceName) Then
@@ -2783,8 +2783,8 @@ Public Class Options_FeatureMatch : Inherits OptionParent
         Static frm = FindFrm(traceName + " Radio Buttons")
         For i = 0 To frm.check.Count - 1
             If frm.check(i).Checked Then
-                matchOption = Choose(i + 1, cv.TemplateMatchModes.CCoeff, cv.TemplateMatchModes.CCoeffNormed, cv.TemplateMatchModes.CCorr,
-                                                cv.TemplateMatchModes.CCorrNormed, cv.TemplateMatchModes.SqDiff, cv.TemplateMatchModes.SqDiffNormed)
+                matchOption = Choose(i + 1, TemplateMatchModes.CCoeff, TemplateMatchModes.CCoeffNormed, TemplateMatchModes.CCorr,
+                                                TemplateMatchModes.CCorrNormed, TemplateMatchModes.SqDiff, TemplateMatchModes.SqDiffNormed)
                 matchText = Choose(i + 1, "CCoeff", "CCoeffNormed", "CCorr", "CCorrNormed", "SqDiff", "SqDiffNormed")
                 Exit For
             End If
@@ -2979,7 +2979,7 @@ Public Class Options_Spectrum : Inherits OptionParent
             sliders.setupTrackBar("Sample count threshold", 1, 50, sampleThreshold)
         End If
     End Sub
-    Public Function buildDepthRanges(input As cv.Mat, typeSpec As String) As List(Of rangeData)
+    Public Function buildDepthRanges(input As Mat, typeSpec As String) As List(Of rangeData)
         Dim ranges As New List(Of rangeData)
         Dim sorted As New SortedList(Of Integer, Integer)(New compareAllowIdenticalInteger) ' the spectrum of the values 
         Dim pixels As New List(Of Integer)
@@ -3054,7 +3054,7 @@ Public Class Options_Spectrum : Inherits OptionParent
         strOut += " found while " + CStr(trimCount) + " pixels were tossed as they were in clusters with size < " + CStr(sampleThreshold) + vbCrLf
         Return ranges
     End Function
-    Public Function buildColorRanges(input As cv.Mat, typespec As String) As List(Of rangeData)
+    Public Function buildColorRanges(input As Mat, typespec As String) As List(Of rangeData)
         Dim ranges As New List(Of rangeData)
         Dim sorted As New SortedList(Of Integer, Integer)(New compareAllowIdenticalInteger) ' the spectrum of the values 
         Dim pixels As New List(Of Integer)
@@ -3176,7 +3176,7 @@ End Class
 Public Class Options_Complexity : Inherits OptionParent
     Public filename As FileInfo
     Public filenames As List(Of String)
-    Public plotColor As cv.Scalar = New cv.Scalar(255, 255, 0)
+    Public plotColor As Scalar = New Scalar(255, 255, 0)
     Public Sub New()
         Dim fnames = Directory.GetFiles(task.homeDir + "Complexity")
         filenames = fnames.ToList
@@ -3194,13 +3194,13 @@ Public Class Options_Complexity : Inherits OptionParent
             radio.check(saveIndex).Checked = True
         End If
     End Sub
-    Public Function setPlotColor() As cv.Scalar
+    Public Function setPlotColor() As Scalar
         Static frm = FindFrm(traceName + " Radio Buttons")
         Dim index As Integer = 0
         For index = 0 To filenames.Count - 1
             If filename.FullName = filenames(index) Then Exit For
         Next
-        plotColor = Choose(index Mod 4 + 1, cv.Scalar.White, cv.Scalar.Red, cv.Scalar.Green, cv.Scalar.Yellow)
+        plotColor = Choose(index Mod 4 + 1, Scalar.White, Scalar.Red, Scalar.Green, Scalar.Yellow)
         Return plotColor
     End Function
     Public Sub Run()
@@ -3208,7 +3208,7 @@ Public Class Options_Complexity : Inherits OptionParent
         For i = 0 To frm.check.count - 1
             If frm.check(i).checked Then
                 filename = New FileInfo(task.homeDir + "Complexity/" + frm.check(i).text)
-                plotColor = Choose((i + 1) Mod 4, cv.Scalar.White, cv.Scalar.Red, cv.Scalar.Green, cv.Scalar.Yellow)
+                plotColor = Choose((i + 1) Mod 4, Scalar.White, Scalar.Red, Scalar.Green, Scalar.Yellow)
                 Exit For
             End If
         Next
@@ -3341,13 +3341,13 @@ End Class
 
 
 Public Class Options_Threshold : Inherits OptionParent
-    Public thresholdMethod As cv.ThresholdTypes = cv.ThresholdTypes.Binary
+    Public thresholdMethod As ThresholdTypes = ThresholdTypes.Binary
     Public thresholdName As String = ""
     Public threshold As Integer = 128
     Public gradient As New Gradient_Color
     Public inputGray As Boolean = False
     Public otsuOption As Boolean = False
-    Public dst2 As cv.Mat
+    Public dst2 As Mat
     Public Sub New()
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Threshold value", 0, 255, threshold)
 
@@ -3373,9 +3373,9 @@ Public Class Options_Threshold : Inherits OptionParent
             dst2 = gradient.dst2
         End If
 
-        Static radioChoices = {cv.ThresholdTypes.Binary, cv.ThresholdTypes.BinaryInv,
-                                       cv.ThresholdTypes.Tozero, cv.ThresholdTypes.TozeroInv,
-                                       cv.ThresholdTypes.Triangle, cv.ThresholdTypes.Trunc}
+        Static radioChoices = {ThresholdTypes.Binary, ThresholdTypes.BinaryInv,
+                                       ThresholdTypes.Tozero, ThresholdTypes.TozeroInv,
+                                       ThresholdTypes.Triangle, ThresholdTypes.Trunc}
         Static frm = FindFrm(traceName + " Radio Buttons")
         Dim index = findRadioIndex(frm.check)
         thresholdMethod = radioChoices(index)
@@ -3397,7 +3397,7 @@ End Class
 
 
 Public Class Options_AdaptiveThreshold : Inherits OptionParent
-    Public method As cv.AdaptiveThresholdTypes = cv.AdaptiveThresholdTypes.GaussianC
+    Public method As AdaptiveThresholdTypes = AdaptiveThresholdTypes.GaussianC
     Public blockSize As Integer = 5
     Public constantVal As Integer = 0
     Public Sub New()
@@ -3422,7 +3422,7 @@ Public Class Options_AdaptiveThreshold : Inherits OptionParent
         Static constantSlider = OptionParent.FindSlider("Constant subtracted from mean Or weighted mean")
         Static blockSlider = OptionParent.FindSlider("AdaptiveThreshold block size")
 
-        method = If(gaussRadio.checked, cv.AdaptiveThresholdTypes.GaussianC, cv.AdaptiveThresholdTypes.MeanC)
+        method = If(gaussRadio.checked, AdaptiveThresholdTypes.GaussianC, AdaptiveThresholdTypes.MeanC)
         blockSize = blockSlider.Value Or 1
         constantVal = constantSlider.value
     End Sub
@@ -3461,7 +3461,7 @@ End Class
 
 
 Public Class Options_Threshold_AdaptiveMin : Inherits OptionParent
-    Public adaptiveMethod As cv.AdaptiveThresholdTypes = cv.AdaptiveThresholdTypes.GaussianC
+    Public adaptiveMethod As AdaptiveThresholdTypes = AdaptiveThresholdTypes.GaussianC
     Public Sub New()
         If FindFrm(traceName + " Radio Buttons") Is Nothing Then
             radio.Setup(traceName)
@@ -3472,7 +3472,7 @@ Public Class Options_Threshold_AdaptiveMin : Inherits OptionParent
     End Sub
     Public Sub Run()
         Static gaussRadio = findRadio("GaussianC")
-        adaptiveMethod = If(gaussRadio.checked, cv.AdaptiveThresholdTypes.GaussianC, cv.AdaptiveThresholdTypes.MeanC)
+        adaptiveMethod = If(gaussRadio.checked, AdaptiveThresholdTypes.GaussianC, AdaptiveThresholdTypes.MeanC)
     End Sub
 End Class
 
@@ -3484,7 +3484,7 @@ End Class
 
 
 Public Class Options_ThresholdAll : Inherits OptionParent
-    Public thresholdMethod As cv.ThresholdTypes = cv.ThresholdTypes.Binary
+    Public thresholdMethod As ThresholdTypes = ThresholdTypes.Binary
     Public blockSize As Integer = 5
     Public constantVal As Integer = 0
     Public maxVal As Integer = 255
@@ -3492,9 +3492,9 @@ Public Class Options_ThresholdAll : Inherits OptionParent
     Public gradient As New Gradient_Color
     Public inputGray As Boolean = False
     Public otsuOption As Boolean = False
-    Public adaptiveMethod As cv.AdaptiveThresholdTypes = cv.AdaptiveThresholdTypes.GaussianC
+    Public adaptiveMethod As AdaptiveThresholdTypes = AdaptiveThresholdTypes.GaussianC
     Dim options As New Options_Threshold_AdaptiveMin
-    Public dst2 As cv.Mat
+    Public dst2 As Mat
     Public Sub New()
         If sliders.Setup(traceName) Then
             sliders.setupTrackBar("Threshold value", 0, 255, threshold)
@@ -3525,8 +3525,8 @@ Public Class Options_ThresholdAll : Inherits OptionParent
             dst2 = gradient.dst2
         End If
 
-        Dim radioChoices = {cv.ThresholdTypes.Binary, cv.ThresholdTypes.BinaryInv, cv.ThresholdTypes.Tozero,
-                            cv.ThresholdTypes.TozeroInv, cv.ThresholdTypes.Triangle, cv.ThresholdTypes.Trunc}
+        Dim radioChoices = {ThresholdTypes.Binary, ThresholdTypes.BinaryInv, ThresholdTypes.Tozero,
+                            ThresholdTypes.TozeroInv, ThresholdTypes.Triangle, ThresholdTypes.Trunc}
         options.Run()
         adaptiveMethod = options.adaptiveMethod
 
@@ -3583,8 +3583,8 @@ End Class
 Public Class Options_DFT : Inherits OptionParent
     Public radius As Integer = 120
     Public order As Integer = 2
-    Public butterworthFilter(1) As cv.Mat
-    Public dftFlag As cv.DftFlags = cv.DftFlags.ComplexOutput
+    Public butterworthFilter(1) As Mat
+    Public dftFlag As DftFlags = DftFlags.ComplexOutput
     Public Sub New()
         If sliders.Setup(traceName) Then
             sliders.setupTrackBar("DFT B Filter - Radius", 1, task.rows, radius)
@@ -3609,8 +3609,8 @@ Public Class Options_DFT : Inherits OptionParent
         Static frm = FindFrm(traceName + " Radio Buttons")
         For i = 0 To frm.check.Count - 1
             If frm.check(i).Checked Then
-                dftFlag = Choose(i + 1, cv.DftFlags.ComplexOutput, cv.DftFlags.Inverse, cv.DftFlags.None,
-                                            cv.DftFlags.RealOutput, cv.DftFlags.Rows, cv.DftFlags.Scale)
+                dftFlag = Choose(i + 1, DftFlags.ComplexOutput, DftFlags.Inverse, DftFlags.None,
+                                            DftFlags.RealOutput, DftFlags.Rows, DftFlags.Scale)
                 Exit For
             End If
         Next
@@ -3631,7 +3631,7 @@ Public Class Options_DFTShape : Inherits OptionParent
             radio.addRadio("Draw Polygon")
             radio.addRadio("Draw Line")
             radio.addRadio("Draw Symmetrical Shapes")
-            radio.addRadio("Draw Point")
+            radio.addRadio("Draw cv.Point")
             radio.check(0).Checked = True
         End If
     End Sub
@@ -3899,7 +3899,7 @@ End Class
 Public Class Options_AsciiArt : Inherits OptionParent
     Public hStep As Double = 20
     Public wStep As Double = 20
-    Public size As cv.Size = New cv.Size(wStep, hStep)
+    Public size As Size = New Size(wStep, hStep)
     Public Sub New()
         If sliders.Setup(traceName) Then
             sliders.setupTrackBar("Character height in pixels", 20, 100, hStep)
@@ -3912,7 +3912,7 @@ Public Class Options_AsciiArt : Inherits OptionParent
 
         hStep = task.rows \ hSlider.value
         wStep = task.cols \ wSlider.value
-        size = New cv.Size(CInt(wSlider.value), CInt(hSlider.value))
+        size = New Size(CInt(wSlider.value), CInt(hSlider.value))
     End Sub
 End Class
 
@@ -3922,7 +3922,7 @@ End Class
 
 
 Public Class Options_MotionDetect : Inherits OptionParent
-    Public threadData As cv.Vec3i = New cv.Vec3i(0, 0, 0)
+    Public threadData As Vec3i = New Vec3i(0, 0, 0)
     Public CCthreshold As Double = 0
     Public pad As Integer = 0
     Public stdevThreshold As Integer = 0
@@ -3942,11 +3942,11 @@ Public Class Options_MotionDetect : Inherits OptionParent
     Public Sub Run()
         Dim w = task.cols
         Dim h = task.rows
-        Static radioChoices() As cv.Vec3i = {New cv.Vec3i(1, w, h), New cv.Vec3i(2, w / 2, h), New cv.Vec3i(4, w / 2, h / 2),
-                            New cv.Vec3i(8, w / 4, h / 2), New cv.Vec3i(16, w / 4, h / 4), New cv.Vec3i(32, w / 8, h / 4),
-                            New cv.Vec3i(32, w / 8, h / 8), New cv.Vec3i(1, w, h), New cv.Vec3i(2, w / 2, h), New cv.Vec3i(4, w / 2, h / 2),
-                            New cv.Vec3i(8, w / 4, h / 2), New cv.Vec3i(16, w / 4, h / 4), New cv.Vec3i(32, w / 8, h / 4),
-                            New cv.Vec3i(32, w / 8, h / 8)}
+        Static radioChoices() As Vec3i = {New Vec3i(1, w, h), New Vec3i(2, w / 2, h), New Vec3i(4, w / 2, h / 2),
+                            New Vec3i(8, w / 4, h / 2), New Vec3i(16, w / 4, h / 4), New Vec3i(32, w / 8, h / 4),
+                            New Vec3i(32, w / 8, h / 8), New Vec3i(1, w, h), New Vec3i(2, w / 2, h), New Vec3i(4, w / 2, h / 2),
+                            New Vec3i(8, w / 4, h / 2), New Vec3i(16, w / 4, h / 4), New Vec3i(32, w / 8, h / 4),
+                            New Vec3i(32, w / 8, h / 8)}
 
         Static correlationSlider = OptionParent.FindSlider("Correlation Threshold")
         Static frm = FindFrm(traceName + " Radio Buttons")
@@ -4374,7 +4374,7 @@ End Class
 
 Public Class Options_Blob : Inherits OptionParent
     Dim blob As New Blob_Input
-    Public blobParams As cv.SimpleBlobDetector.Params = New cv.SimpleBlobDetector.Params
+    Public blobParams As SimpleBlobDetector.Params = New SimpleBlobDetector.Params
     Public Sub New()
         blob.updateFrequency = 30
 
@@ -4403,7 +4403,7 @@ Public Class Options_Blob : Inherits OptionParent
         Static inertiaRadio = findRadio("FilterByInertia")
         Static colorRadio = findRadio("FilterByColor")
 
-        blobParams = New cv.SimpleBlobDetector.Params
+        blobParams = New SimpleBlobDetector.Params
         If areaRadio.Checked Then blobParams.FilterByArea = areaRadio.Checked
         If circRadio.Checked Then blobParams.FilterByCircularity = circRadio.Checked
         If convexRadio.Checked Then blobParams.FilterByConvexity = convexRadio.Checked
@@ -4479,7 +4479,7 @@ Public Class Options_Clone : Inherits OptionParent
     Public blueChange As Double = 0.5
     Public greenChange As Double = 0.5
     Public redChange As Double = 1.5
-    Public cloneFlag As cv.SeamlessCloneFlags = cv.SeamlessCloneFlags.MixedClone
+    Public cloneFlag As SeamlessCloneFlags = SeamlessCloneFlags.MixedClone
     Public Sub New()
         If sliders.Setup(traceName) Then
             sliders.setupTrackBar("Alpha", 0, 20, alpha * 10)
@@ -4517,7 +4517,7 @@ Public Class Options_Clone : Inherits OptionParent
         Static frm = FindFrm(traceName + " Radio Buttons")
         For i = 0 To frm.check.Count - 1
             If frm.check(i).Checked Then
-                cloneFlag = Choose(i + 1, cv.SeamlessCloneFlags.MixedClone, cv.SeamlessCloneFlags.MonochromeTransfer, cv.SeamlessCloneFlags.NormalClone)
+                cloneFlag = Choose(i + 1, SeamlessCloneFlags.MixedClone, SeamlessCloneFlags.MonochromeTransfer, SeamlessCloneFlags.NormalClone)
                 Exit For
             End If
         Next
@@ -5040,8 +5040,8 @@ End Class
 Public Class Options_Erode : Inherits OptionParent
     Public kernelSize As Integer = 3
     Public iterations As Integer = 1
-    Public morphShape As cv.MorphShapes = cv.MorphShapes.Cross
-    Public element As cv.Mat
+    Public morphShape As MorphShapes = MorphShapes.Cross
+    Public element As Mat
     Public noshape As Boolean = False
     Public flatDepth As Double = 100
     Public Sub New()
@@ -5069,10 +5069,10 @@ Public Class Options_Erode : Inherits OptionParent
         iterations = iterSlider.Value
         kernelSize = kernelSlider.Value Or 1
 
-        morphShape = cv.MorphShapes.Cross
-        If ellipseRadio.Checked Then morphShape = cv.MorphShapes.Ellipse
-        If rectRadio.Checked Then morphShape = cv.MorphShapes.Rect
-        element = GetStructuringElement(morphShape, New cv.Size(kernelSize, kernelSize))
+        morphShape = MorphShapes.Cross
+        If ellipseRadio.Checked Then morphShape = MorphShapes.Ellipse
+        If rectRadio.Checked Then morphShape = MorphShapes.Rect
+        element = GetStructuringElement(morphShape, New Size(kernelSize, kernelSize))
         noshape = noShapeRadio.checked
         flatDepth = depthSlider.value / 1000
     End Sub
@@ -5152,13 +5152,13 @@ Public Class Options_FPolyCore : Inherits OptionParent
     Public Sub New()
         If sliders.Setup(traceName) Then
             sliders.setupTrackBar("Maximum shift to trigger resync", 1, 100, maxShift)
-            sliders.setupTrackBar("Anchor point max movement", 1, 10, anchorMovement)
+            sliders.setupTrackBar("Anchor cv.Point max movement", 1, 10, anchorMovement)
         End If
     End Sub
     Public Sub Run()
         Static thresholdSlider = OptionParent.FindSlider("Resync if feature moves > X pixels")
         Static shiftSlider = OptionParent.FindSlider("Maximum shift to trigger resync")
-        Static anchorSlider = OptionParent.FindSlider("Anchor point max movement")
+        Static anchorSlider = OptionParent.FindSlider("Anchor cv.Point max movement")
         maxShift = shiftSlider.Value
         resyncThreshold = thresholdSlider.Value
         anchorMovement = anchorSlider.value
@@ -5235,7 +5235,7 @@ End Class
 
 
 Public Class Options_Gabor : Inherits OptionParent
-    Public gKernel As cv.Mat
+    Public gKernel As Mat
     Public ksize As Double = 15
     Public Sigma As Double = 4
     Public theta As Double = 90
@@ -5265,7 +5265,7 @@ Public Class Options_Gabor : Inherits OptionParent
         gamma = gammaSlider.Value / 10
         phaseOffset = phaseSlider.Value / 1000
         theta = Math.PI * thetaSlider.Value / 180
-        gKernel = GetGaborKernel(New cv.Size(ksize, ksize), Sigma, theta, lambda, gamma, phaseOffset, cv.MatType.CV_32F)
+        gKernel = GetGaborKernel(New Size(ksize, ksize), Sigma, theta, lambda, gamma, phaseOffset, MatType.CV_32F)
         Dim multiplier = Sum(gKernel)(0)
         gKernel /= 1.5 * multiplier
     End Sub
@@ -5393,7 +5393,7 @@ Public Class Options_Images : Inherits OptionParent
     Public fileInputName As FileInfo
     Public dirName As String = ""
     Public imageSeries As Boolean = False
-    Public fullsizeImage As cv.Mat
+    Public fullsizeImage As Mat
     Public Sub New()
         fileNameForm = New OptionsFileName
         dirName = task.homeDir + "Images/train"
@@ -5498,9 +5498,9 @@ Public Class Options_Kalman_VB : Inherits OptionParent
         If sliders.Setup(traceName) Then
             sliders.setupTrackBar("Move this to see results", 0, 1000, 500)
             sliders.setupTrackBar("Input with Noise", 0, 1000, 500)
-            sliders.setupTrackBar("20 point average of output", 0, 1000, 500)
+            sliders.setupTrackBar("20 cv.Point average of output", 0, 1000, 500)
             sliders.setupTrackBar("Kalman Output", 0, 1000, 500)
-            sliders.setupTrackBar("20 Point average difference", 0, 1000, 500)
+            sliders.setupTrackBar("20 cv.Point average difference", 0, 1000, 500)
             sliders.setupTrackBar("Kalman difference", 0, 1000, 500)
             sliders.setupTrackBar("Simulated Noise", 0, 100, 25)
             sliders.setupTrackBar("Simulated Bias", -100, 100, 0)
@@ -5511,8 +5511,8 @@ Public Class Options_Kalman_VB : Inherits OptionParent
         Static matrix As New List(Of Double)
         Static inputSlider = OptionParent.FindSlider("Move this to see results")
         Static noisyInputSlider = OptionParent.FindSlider("Input with Noise")
-        Static pointSlider = OptionParent.FindSlider("20 point average of output")
-        Static avgSlider = OptionParent.FindSlider("20 Point average difference")
+        Static pointSlider = OptionParent.FindSlider("20 cv.Point average of output")
+        Static avgSlider = OptionParent.FindSlider("20 cv.Point average difference")
         Static noiseSlider = OptionParent.FindSlider("Simulated Noise")
         Static biasSlider = OptionParent.FindSlider("Simulated Bias")
         Static scaleSlider = OptionParent.FindSlider("Simulated Scale")
@@ -5532,7 +5532,7 @@ Public Class Options_Kalman_VB : Inherits OptionParent
         If matrix.Count > 0 Then
             Const MAX_INPUT = 20
             matrix(task.frameCount Mod MAX_INPUT) = kalmanInput
-            Dim AverageOutput = Mean((cv.Mat.FromPixelData(MAX_INPUT, 1, cv.MatType.CV_32F, matrix.ToArray)))(0)
+            Dim AverageOutput = Mean((Mat.FromPixelData(MAX_INPUT, 1, MatType.CV_32F, matrix.ToArray)))(0)
 
             If AverageOutput < 0 Then AverageOutput = 0
             If AverageOutput > pointSlider.Maximum Then AverageOutput = pointSlider.Maximum
@@ -5625,7 +5625,7 @@ End Class
 
 
 Public Class Options_LaPlacianPyramid : Inherits OptionParent
-    Public img As New cv.Mat
+    Public img As New Mat
     Public Sub New()
         If sliders.Setup(traceName) Then
             sliders.setupTrackBar("Sharpest", 0, 10, 5)
@@ -5640,12 +5640,12 @@ Public Class Options_LaPlacianPyramid : Inherits OptionParent
         Dim barCount = sliders.mytrackbars.Count
 
         ' this usage of sliders.mytrackbars(x) is OK as long as this algorithm is not reused in multiple places (which it isn't)
-        Dim levelMat(barCount - 1) As cv.Mat
+        Dim levelMat(barCount - 1) As Mat
         For i = 0 To barCount - 2
-            Dim nextImg As New cv.Mat
+            Dim nextImg As New Mat
             PyrDown(img, nextImg)
 
-            Dim imgUp As New cv.Mat
+            Dim imgUp As New Mat
             PyrUp(nextImg, imgUp, img.Size)
             levelMat(i) = (img - imgUp) * sliders.mytrackbars(i).Value
             img = nextImg
@@ -5704,7 +5704,7 @@ End Class
 
 
 Public Class Options_Mat : Inherits OptionParent
-    Public decompType As cv.DecompTypes = cv.DecompTypes.Cholesky
+    Public decompType As DecompTypes = DecompTypes.Cholesky
     Public Sub New()
         If radio.Setup(traceName) Then
             radio.addRadio("Cholesky")
@@ -5722,8 +5722,8 @@ Public Class Options_Mat : Inherits OptionParent
         Static frm = FindFrm(traceName + " Radio Buttons")
         For i = 0 To frm.check.Count - 1
             If frm.check(i).Checked Then
-                decompType = Choose(i + 1, cv.DecompTypes.Cholesky, cv.DecompTypes.Eig, cv.DecompTypes.LU, cv.DecompTypes.Normal,
-                                                cv.DecompTypes.QR, cv.DecompTypes.SVD)
+                decompType = Choose(i + 1, DecompTypes.Cholesky, DecompTypes.Eig, DecompTypes.LU, DecompTypes.Normal,
+                                                DecompTypes.QR, DecompTypes.SVD)
                 Exit For
             End If
         Next
@@ -5812,8 +5812,8 @@ End Class
 
 
 Public Class Options_OEX : Inherits OptionParent
-    Public lows As cv.Scalar = New cv.Scalar(90, 50, 50)
-    Public highs As cv.Scalar = New cv.Scalar(180, 150, 150)
+    Public lows As Scalar = New Scalar(90, 50, 50)
+    Public highs As Scalar = New Scalar(180, 150, 150)
     Public Sub New()
         If sliders.Setup(traceName) Then
             sliders.setupTrackBar("Hue low", 0, 180, lows(0))
@@ -5831,8 +5831,8 @@ Public Class Options_OEX : Inherits OptionParent
         Static satHighSlider = OptionParent.FindSlider("Saturation high")
         Static valLowSlider = OptionParent.FindSlider("Value low")
         Static valHighSlider = OptionParent.FindSlider("Value high")
-        lows = New cv.Scalar(hueLowSlider.value, satLowSlider.value, valLowSlider.value)
-        highs = New cv.Scalar(hueHighSlider.value, satHighSlider.value, valHighSlider.value)
+        lows = New Scalar(hueLowSlider.value, satLowSlider.value, valLowSlider.value)
+        highs = New Scalar(hueHighSlider.value, satHighSlider.value, valHighSlider.value)
     End Sub
 End Class
 
@@ -5843,10 +5843,10 @@ End Class
 Public Class Options_ORB : Inherits OptionParent
     Public desiredCount As Integer = 100
     Public Sub New()
-        If sliders.Setup(traceName) Then sliders.setupTrackBar("ORB - desired point count", 10, 2000, desiredCount)
+        If sliders.Setup(traceName) Then sliders.setupTrackBar("ORB - desired cv.Point count", 10, 2000, desiredCount)
     End Sub
     Public Sub Run()
-        Static countSlider = OptionParent.FindSlider("ORB - desired point count")
+        Static countSlider = OptionParent.FindSlider("ORB - desired cv.Point count")
         desiredCount = countSlider.value
     End Sub
 End Class
@@ -5983,7 +5983,7 @@ Public Class Options_PlyFormat : Inherits OptionParent
         fileNameForm.OpenFileDialog1.CheckFileExists = False
         fileNameForm.OpenFileDialog1.Filter = "ply (*.ply)|*.ply|All files (*.*)|*.*"
         fileNameForm.OpenFileDialog1.FilterIndex = 1
-        fileNameForm.filename.Text = task.settings.plyFileName
+        fileNameForm.filename.Text = task.Settings.plyFileName
         If fileNameForm.filename.Text = "" Then fileNameForm.filename.Text = task.homeDir + "temp\pointcloud.ply"
 
         fileNameForm.Text = "Select ply output file"
@@ -6774,8 +6774,8 @@ Public Class Options_Transform : Inherits OptionParent
             sliders.setupTrackBar("Rotation center Y", 1, task.rows, task.rows / 2)
         End If
         If check.Setup(traceName) Then
-            check.addCheckBox("Check to snap the first point cloud")
-            check.addCheckBox("Check to snap the second point cloud")
+            check.addCheckBox("Check to snap the first cv.Point cloud")
+            check.addCheckBox("Check to snap the second cv.Point cloud")
         End If
     End Sub
     Public Sub Run()
@@ -6783,8 +6783,8 @@ Public Class Options_Transform : Inherits OptionParent
         Static scaleSlider = OptionParent.FindSlider("Scale Factor% (100% means no scaling)")
         Static centerXSlider = OptionParent.FindSlider("Rotation center X")
         Static centerYSlider = OptionParent.FindSlider("Rotation center Y")
-        Static firstCheckBox = FindCheckBox("Check to snap the first point cloud")
-        Static secondCheckBox = FindCheckBox("Check to snap the second point cloud")
+        Static firstCheckBox = FindCheckBox("Check to snap the first cv.Point cloud")
+        Static secondCheckBox = FindCheckBox("Check to snap the second cv.Point cloud")
         Static percentSlider = OptionParent.FindSlider("Resize Percent")
         resizeFactor = percentSlider.Value / 100
         firstCheck = firstCheckBox.checked
@@ -6830,7 +6830,7 @@ Public Class Options_Video : Inherits OptionParent
         fileNameForm.OpenFileDialog1.CheckFileExists = False
         fileNameForm.OpenFileDialog1.Filter = "video files (*.mp4)|*.mp4|All files (*.*)|*.*"
         fileNameForm.OpenFileDialog1.FilterIndex = 1
-        fileNameForm.filename.Text = task.settings.VideoFileName
+        fileNameForm.filename.Text = task.Settings.VideoFileName
         If fileNameForm.filename.Text = "" Then fileNameForm.filename.Text = fileInfo.FullName
         fileNameForm.Text = "Select a video file for input"
         fileNameForm.FileNameLabel.Text = "Select a video file for input"
@@ -7135,7 +7135,7 @@ End Class
 
 
 Public Class Options_OpenGLFunctions : Inherits OptionParent
-    Public moveAmount As cv.Scalar = New cv.Scalar(0, 0, 0)
+    Public moveAmount As Scalar = New Scalar(0, 0, 0)
     Public FOV As Double = 75
     Public yaw As Double = -3
     Public pitch As Double = 3
@@ -7143,25 +7143,25 @@ Public Class Options_OpenGLFunctions : Inherits OptionParent
     Public zNear As Double = 0
     Public zFar As Double = 20.0
     Public zTrans As Double = 0.5
-    Public eye As cv.Vec3f = New cv.Vec3f(4, 20, -2)
-    Public scaleXYZ As cv.Vec3f = New cv.Vec3f(15, 30, 1)
+    Public eye As Vec3f = New Vec3f(4, 20, -2)
+    Public scaleXYZ As Vec3f = New Vec3f(15, 30, 1)
     Public pointSize As Integer = 5
     Public Sub New()
         If sliders.Setup(traceName) Then
             sliders.setupTrackBar("OpenGL shift left/right (X-axis) X100", -300, 300, 0)
             sliders.setupTrackBar("OpenGL shift up/down (Y-axis) X100", -300, 300, 0)
             sliders.setupTrackBar("OpenGL shift fwd/back (Z-axis) X100", -300, 300, 0)
-            sliders.setupTrackBar("OpenGL Point Size", 1, 20, 2)
+            sliders.setupTrackBar("OpenGL cv.Point Size", 1, 20, 2)
         End If
     End Sub
     Public Sub Run()
         Static XmoveSlider = OptionParent.FindSlider("OpenGL shift left/right (X-axis) X100")
         Static YmoveSlider = OptionParent.FindSlider("OpenGL shift up/down (Y-axis) X100")
         Static ZmoveSlider = OptionParent.FindSlider("OpenGL shift fwd/back (Z-axis) X100")
-        Static PointSizeSlider = OptionParent.FindSlider("OpenGL Point Size")
+        Static PointSizeSlider = OptionParent.FindSlider("OpenGL cv.Point Size")
 
         pointSize = PointSizeSlider.value
-        moveAmount = New cv.Point3f(XmoveSlider.Value / 100, YmoveSlider.Value / 100, ZmoveSlider.Value / 100)
+        moveAmount = New Point3f(XmoveSlider.Value / 100, YmoveSlider.Value / 100, ZmoveSlider.Value / 100)
     End Sub
 End Class
 
@@ -7362,11 +7362,11 @@ End Class
 
 
 Public Class Options_OpenGL2 : Inherits OptionParent
-    Public moveAmount As cv.Scalar = New cv.Scalar(0, 0, 0)
+    Public moveAmount As Scalar = New Scalar(0, 0, 0)
     Public FOV As Double = 80
     Public zNear As Double = 0
     Public zFar As Double = 20
-    Public eye As cv.Vec3f = New cv.Vec3f(4, 20, -2)
+    Public eye As Vec3f = New Vec3f(4, 20, -2)
     Public Sub New()
         If sliders.Setup(traceName) Then
             sliders.setupTrackBar("OpenGL Eye X X100", -180, 180, eye(1))
@@ -7382,7 +7382,7 @@ Public Class Options_OpenGL2 : Inherits OptionParent
         Static fovSlider = OptionParent.FindSlider("OpenGL FOV")
 
         FOV = fovSlider.Value
-        eye = New cv.Vec3f(eyeXSlider.Value, eyeYSlider.Value, eyeZSlider.Value)
+        eye = New Vec3f(eyeXSlider.Value, eyeYSlider.Value, eyeZSlider.Value)
     End Sub
 End Class
 
@@ -7399,7 +7399,7 @@ Public Class Options_OpenGL3 : Inherits OptionParent
         If sliders.Setup(traceName) Then
             sliders.setupTrackBar("OpenGL zNear", 0, 100, zNear)
             sliders.setupTrackBar("OpenGL zFar", -50, 200, zFar)
-            sliders.setupTrackBar("OpenGL Point Size", 1, 20, pointSize)
+            sliders.setupTrackBar("OpenGL cv.Point Size", 1, 20, pointSize)
             sliders.setupTrackBar("zTrans (X100)", -1000, 1000, zTrans * 100)
         End If
     End Sub
@@ -7407,7 +7407,7 @@ Public Class Options_OpenGL3 : Inherits OptionParent
         Static zNearSlider = OptionParent.FindSlider("OpenGL zNear")
         Static zFarSlider = OptionParent.FindSlider("OpenGL zFar")
         Static zTransSlider = OptionParent.FindSlider("zTrans (X100)")
-        Static PointSizeSlider = OptionParent.FindSlider("OpenGL Point Size")
+        Static PointSizeSlider = OptionParent.FindSlider("OpenGL cv.Point Size")
 
         zNear = zNearSlider.Value
         zFar = zFarSlider.Value
@@ -7421,8 +7421,8 @@ End Class
 
 
 Public Class Options_OpenGL4 : Inherits OptionParent
-    Public moveAmount As cv.Scalar = New cv.Scalar(0, 0, 0)
-    Public scaleXYZ As cv.Vec3f = New cv.Vec3f(15, 30, 1)
+    Public moveAmount As Scalar = New Scalar(0, 0, 0)
+    Public scaleXYZ As Vec3f = New Vec3f(15, 30, 1)
     Public Sub New()
         If sliders.Setup(traceName) Then
             sliders.setupTrackBar("OpenGL shift left/right (X-axis) X100", -300, 300, 0)
@@ -7441,8 +7441,8 @@ Public Class Options_OpenGL4 : Inherits OptionParent
         Static scaleYSlider = OptionParent.FindSlider("OpenGL Scale Y X10")
         Static scaleZSlider = OptionParent.FindSlider("OpenGL Scale Z X10")
 
-        moveAmount = New cv.Point3f(XmoveSlider.Value / 100, YmoveSlider.Value / 100, ZmoveSlider.Value / 100)
-        scaleXYZ = New cv.Vec3f(scaleXSlider.Value, scaleYSlider.Value, scaleZSlider.Value)
+        moveAmount = New Point3f(XmoveSlider.Value / 100, YmoveSlider.Value / 100, ZmoveSlider.Value / 100)
+        scaleXYZ = New Vec3f(scaleXSlider.Value, scaleYSlider.Value, scaleZSlider.Value)
     End Sub
 End Class
 
@@ -7602,7 +7602,7 @@ End Class
 
 
 Public Class Options_MinArea : Inherits OptionParent
-    Public srcPoints As New List(Of cv.Point2f)
+    Public srcPoints As New List(Of Point2f)
     Public minSize As Integer = task.workRes.Width / 8
     Public numPoints As Integer = 5
     Public Sub New()
@@ -7614,7 +7614,7 @@ Public Class Options_MinArea : Inherits OptionParent
         Static numSlider = OptionParent.FindSlider("Area Number of Points")
         srcPoints.Clear()
 
-        Dim pt As cv.Point2f
+        Dim pt As Point2f
         numPoints = numSlider.Value
         For i = 0 To numPoints - 1
             pt.X = msRNG.Next(task.cols / 2 - minSize, task.cols / 2 + minSize)
@@ -7722,9 +7722,9 @@ Public Class Options_ReductionXYZ : Inherits OptionParent
     Public reduceXYZ() As Boolean = {True, True, True}
     Public Sub New()
         If check.Setup(traceName) Then
-            check.addCheckBox("Reduce point cloud in X direction")
-            check.addCheckBox("Reduce point cloud in Y direction")
-            check.addCheckBox("Reduce point cloud in Z direction")
+            check.addCheckBox("Reduce cv.Point cloud in X direction")
+            check.addCheckBox("Reduce cv.Point cloud in Y direction")
+            check.addCheckBox("Reduce cv.Point cloud in Z direction")
             check.Box(0).Checked = True
             check.Box(1).Checked = True
             check.Box(2).Checked = True
@@ -7742,7 +7742,7 @@ End Class
 
 Public Class Options_Features : Inherits OptionParent
     Public quality As Double = 0.01
-    Public matchOption As cv.TemplateMatchModes = cv.TemplateMatchModes.CCoeffNormed
+    Public matchOption As TemplateMatchModes = TemplateMatchModes.CCoeffNormed
     Public k As Double = 0.04
     Public blockSize As Integer = 3
 
@@ -7818,7 +7818,7 @@ Public Class Options_History : Inherits OptionParent
     End Sub
     Public Sub Run()
         Static histSlider = FindSlider("Frame History")
-        task.fOptions.FrameHistoryCount.Value  = histSlider.value
+        task.fOptions.FrameHistoryCount.Value = histSlider.value
     End Sub
 End Class
 
@@ -8082,10 +8082,10 @@ Public Class Options_PointCloud : Inherits OptionParent
         task.channelsTop = {2, 0}
         task.channelsSide = {1, 2}
 
-        task.rangesTop = New cv.Rangef() {New cv.Rangef(0.1, task.MaxZmeters + 0.1),
-                                                  New cv.Rangef(-task.xRange, task.xRange)}
-        task.rangesSide = New cv.Rangef() {New cv.Rangef(-task.yRange, task.yRange),
-                                                   New cv.Rangef(0.1, task.MaxZmeters + 0.1)}
+        task.rangesTop = New Rangef() {New Rangef(0.1, task.MaxZmeters + 0.1),
+                                                  New Rangef(-task.xRange, task.xRange)}
+        task.rangesSide = New Rangef() {New Rangef(-task.yRange, task.yRange),
+                                                   New Rangef(0.1, task.MaxZmeters + 0.1)}
 
         task.sideCameraPoint = New cv.Point(0, CInt(task.workRes.Height / 2))
         task.topCameraPoint = New cv.Point(task.workRes.Width \ 2, 0)
@@ -8094,43 +8094,43 @@ Public Class Options_PointCloud : Inherits OptionParent
         task.channelCount = 1
         task.channelIndex = 0
 
-        Dim rx = New cv.Vec2f(-task.xRangeDefault, task.xRangeDefault)
-        Dim ry = New cv.Vec2f(-task.yRangeDefault, task.yRangeDefault)
-        Dim rz = New cv.Vec2f(0, task.MaxZmeters)
-        task.rangesCloud = New cv.Rangef() {New cv.Rangef(rx.Item0, rx.Item1), New cv.Rangef(ry.Item0, ry.Item1),
-                                                    New cv.Rangef(rz.Item0, rz.Item1)}
+        Dim rx = New Vec2f(-task.xRangeDefault, task.xRangeDefault)
+        Dim ry = New Vec2f(-task.yRangeDefault, task.yRangeDefault)
+        Dim rz = New Vec2f(0, task.MaxZmeters)
+        task.rangesCloud = New Rangef() {New Rangef(rx.Item0, rx.Item1), New Rangef(ry.Item0, ry.Item1),
+                                                    New Rangef(rz.Item0, rz.Item1)}
         Select Case task.reductionName
             Case "X Reduction"
-                task.ranges = New cv.Rangef() {New cv.Rangef(rx.Item0, rx.Item1)}
+                task.ranges = New Rangef() {New Rangef(rx.Item0, rx.Item1)}
                 task.channels = {0}
                 task.histBinList = {task.histogramBins}
             Case "Y Reduction"
-                task.ranges = New cv.Rangef() {New cv.Rangef(ry.Item0, ry.Item1)}
+                task.ranges = New Rangef() {New Rangef(ry.Item0, ry.Item1)}
                 task.channels = {1}
                 task.histBinList = {task.histogramBins}
             Case "Z Reduction"
-                task.ranges = New cv.Rangef() {New cv.Rangef(rz.Item0, rz.Item1)}
+                task.ranges = New Rangef() {New Rangef(rz.Item0, rz.Item1)}
                 task.channels = {2}
                 task.histBinList = {task.histogramBins}
             Case "XY Reduction"
-                task.ranges = New cv.Rangef() {New cv.Rangef(rx.Item0, rx.Item1), New cv.Rangef(ry.Item0, ry.Item1)}
+                task.ranges = New Rangef() {New Rangef(rx.Item0, rx.Item1), New Rangef(ry.Item0, ry.Item1)}
                 task.channelCount = 2
                 task.channels = {0, 1}
                 task.histBinList = {task.histogramBins, task.histogramBins}
             Case "XZ Reduction"
-                task.ranges = New cv.Rangef() {New cv.Rangef(rx.Item0, rx.Item1), New cv.Rangef(rz.Item0, rz.Item1)}
+                task.ranges = New Rangef() {New Rangef(rx.Item0, rx.Item1), New Rangef(rz.Item0, rz.Item1)}
                 task.channelCount = 2
                 task.channels = {0, 2}
                 task.channelIndex = 1
                 task.histBinList = {task.histogramBins, task.histogramBins}
             Case "YZ Reduction"
-                task.ranges = New cv.Rangef() {New cv.Rangef(ry.Item0, ry.Item1), New cv.Rangef(rz.Item0, rz.Item1)}
+                task.ranges = New Rangef() {New Rangef(ry.Item0, ry.Item1), New Rangef(rz.Item0, rz.Item1)}
                 task.channelCount = 2
                 task.channels = {1, 2}
                 task.channelIndex = 1
                 task.histBinList = {task.histogramBins, task.histogramBins}
             Case "XYZ Reduction"
-                task.ranges = New cv.Rangef() {New cv.Rangef(rx.Item0, rx.Item1), New cv.Rangef(ry.Item0, ry.Item1), New cv.Rangef(rz.Item0, rz.Item1)}
+                task.ranges = New Rangef() {New Rangef(rx.Item0, rx.Item1), New Rangef(ry.Item0, ry.Item1), New Rangef(rz.Item0, rz.Item1)}
                 task.channelCount = 3
                 task.channels = {0, 1, 2}
                 task.channelIndex = 2

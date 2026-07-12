@@ -6,7 +6,7 @@ Public Class LUT_Basics : Inherits TaskParent
     Public classCount As Integer
     Dim options As New Options_LUT
     Public segment(255) As Byte
-    Dim myLut As New cv.Mat
+    Dim myLut As New Mat
     Public Sub New()
         labels(3) = "Palettized version of dst2"
         desc = "Divide the image into n-segments controlled with a slider."
@@ -26,9 +26,9 @@ Public Class LUT_Basics : Inherits TaskParent
             For i = incr * classCount To 255
                 segment(i) = 255
             Next
-            myLut = cv.Mat.FromPixelData(1, 256, cv.MatType.CV_8U, segment)
+            myLut = Mat.FromPixelData(1, 256, MatType.CV_8U, segment)
         End If
-        If src.Channels() <> 1 Or src.Type <> cv.MatType.CV_8U Then src = task.gray
+        If src.Channels() <> 1 Or src.Type <> MatType.CV_8U Then src = task.gray
         LUT(src, myLut, dst2)
         dst2 *= classCount / 255
         dst2 += 1 ' stay away from zero...
@@ -53,7 +53,7 @@ Public Class XR_LUT_Sliders : Inherits TaskParent
         options.Run()
 
         Dim gray = If(src.Channels() = 1, src, task.gray)
-        Dim myLut As New cv.Mat(1, 256, cv.MatType.CV_8U)
+        Dim myLut As New Mat(1, 256, MatType.CV_8U)
         Dim splitIndex As Integer
         For i = 0 To 255
             myLut.Set(Of Byte)(0, i, options.vals(splitIndex))
@@ -74,19 +74,19 @@ End Class
 ' https://github.com/opencv/opencv/blob/master/samples/cpp/falsecolor.cpp
 Public Class XR_LUT_Reduction : Inherits TaskParent
     Public reduction As New Reduction_Basics
-    Dim vector As cv.Mat = New cv.Mat(256, 1, cv.MatType.CV_8UC3, cv.Scalar.All(0))
+    Dim vector As Mat = New Mat(256, 1, MatType.CV_8UC3, Scalar.All(0))
     Public Sub New()
         For i = 0 To 255
             ' trying to avoid extreme colors... 
-            Dim vec = New cv.Vec3b(msRNG.Next(50, 240), msRNG.Next(50, 240), msRNG.Next(50, 240))
-            vector.Set(Of cv.Vec3b)(i, 0, vec)
+            Dim vec = New Vec3b(msRNG.Next(50, 240), msRNG.Next(50, 240), msRNG.Next(50, 240))
+            vector.Set(Of Vec3b)(i, 0, vec)
         Next
         labels(3) = "Custom Color Lookup Table"
         desc = "Build and use a custom color palette"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         reduction.Run(src)
-        CvtColor(reduction.dst2, dst2, cv.ColorConversionCodes.GRAY2BGR)
+        CvtColor(reduction.dst2, dst2, ColorConversionCodes.GRAY2BGR)
         LUT(dst2, vector, dst2)
     End Sub
 End Class
@@ -106,9 +106,9 @@ Public Class XR_LUT_RGBDepth : Inherits TaskParent
         desc = "Use a LUT on the RGBDepth to segregate depth data."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-    Dim _lut_cvt As New cv.Mat
-    CvtColor(task.depthRGB, _lut_cvt, cv.ColorConversionCodes.BGR2GRAY)
-    lut.Run(_lut_cvt)
+        Dim _lut_cvt As New Mat
+        CvtColor(task.depthRGB, _lut_cvt, ColorConversionCodes.BGR2GRAY)
+        lut.Run(_lut_cvt)
         dst2 = lut.dst2 * 255 / lut.classCount
         labels(2) = lut.labels(2)
     End Sub
@@ -127,7 +127,7 @@ Public Class XR_LUT_Depth32f : Inherits TaskParent
         desc = "Use a LUT on the 32-bit depth to segregate depth data."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        Dim _nrm1 As New cv.Mat
+        Dim _nrm1 As New Mat
         lut.Run(task.pcSplit(2))
         Normalize(lut.dst2, lut.dst2, 255)
         ConvertScaleAbs(lut.dst2, lut.dst2, 255)
@@ -183,7 +183,7 @@ Public Class XR_LUT_Watershed : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         lut.Run(src)
-        CvtColor(lut.dst2, dst3, cv.ColorConversionCodes.GRAY2BGR)
+        CvtColor(lut.dst2, dst3, ColorConversionCodes.GRAY2BGR)
 
         dst3.SetTo(white, task.edges.dst2)
         labels(3) = task.edges.labels(2)
@@ -202,7 +202,7 @@ End Class
 
 Public Class XR_LUT_Custom : Inherits TaskParent
     Dim gradMap As New Palette_RandomColorMap
-    Public colorMap As New cv.Mat
+    Public colorMap As New Mat
     Dim saveColorCount = -1
     Public Sub New()
         OptionParent.FindSlider("Color transitions").Value = 5
@@ -215,7 +215,7 @@ Public Class XR_LUT_Custom : Inherits TaskParent
             If saveColorCount = 20 Then colorSlider.Value = 5 Else colorSlider.Value += 1
             saveColorCount = colorSlider.Value
             gradMap.Run(src)
-            Flip(gradMap.gradientColorMap, colorMap, cv.FlipMode.X)
+            Flip(gradMap.gradientColorMap, colorMap, FlipMode.X)
         End If
         LUT(src, colorMap, dst2)
         Resize(colorMap, dst3, src.Size())
@@ -264,20 +264,20 @@ Public Class XR_LUT_Create : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
 
-        Dim splitMats() As cv.Mat = Split(src)
+        Dim splitMats() As Mat = Split(src)
         For i = 0 To 2
             If task.firstPass Then ReDim pixels(i)(src.Total - 1)
             Marshal.Copy(splitMats(i).Data, pixels(i), 0, pixels(i).Length)
         Next
 
         Dim totals(255) As Single
-        Dim lutI(255) As cv.Vec3i
+        Dim lutI(255) As Vec3i
         For i = 0 To src.Total - 1
             Dim index = CInt(0.299 * pixels(2)(i) + 0.587 * pixels(1)(i) + 0.114 * pixels(0)(i))
             totals(index) += 1
             Dim v1 = lutI(index)
-            Dim v2 = New cv.Vec3i(pixels(0)(i), pixels(1)(i), pixels(2)(i))
-            lutI(index) = New cv.Vec3i((v1(0) + v2(0)) / 2, (v1(1) + v2(1)) / 2, (v1(2) + v2(2)) / 2)
+            Dim v2 = New Vec3i(pixels(0)(i), pixels(1)(i), pixels(2)(i))
+            lutI(index) = New Vec3i((v1(0) + v2(0)) / 2, (v1(1) + v2(1)) / 2, (v1(2) + v2(2)) / 2)
         Next
 
         Dim lastVec = lutI(0)
@@ -291,13 +291,13 @@ Public Class XR_LUT_Create : Inherits TaskParent
             End If
         Next
 
-        Dim lut(255) As cv.Vec3b
+        Dim lut(255) As Vec3b
         For i = 0 To lutI.Count - 1
-            lut(i) = New cv.Vec3b(lutI(i)(0), lutI(i)(1), lutI(i)(2))
+            lut(i) = New Vec3b(lutI(i)(0), lutI(i)(1), lutI(i)(2))
         Next
 
         dst2 = task.gray
-        Dim myLut As cv.Mat = cv.Mat.FromPixelData(1, 256, cv.MatType.CV_8U, lut)
-        cv.Cv2.LUT(dst2, myLut, dst3)
+        Dim myLut As Mat = Mat.FromPixelData(1, 256, MatType.CV_8U, lut)
+        Cv2.LUT(dst2, myLut, dst3)
     End Sub
 End Class

@@ -3,13 +3,13 @@ Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 Public Class StableGray_BasicsMin : Inherits TaskParent
     Public Sub New()
         labels(3) = "Mask of pixels that are different between last image and current after processing."
-        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-        dst3 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        dst2 = New Mat(dst2.Size, MatType.CV_8U, 0)
+        dst3 = New Mat(dst2.Size, MatType.CV_8U, 0)
         desc = "Accumulate Min values where there is no motion."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If src.Channels <> 1 Then src = task.gray
-        Static lastGray As cv.Mat = src.Clone
+        Static lastGray As Mat = src.Clone
 
         ' If task.heartBeat Then lastGray = src.Clone
 
@@ -17,7 +17,7 @@ Public Class StableGray_BasicsMin : Inherits TaskParent
         src.CopyTo(dst2, task.motion.motionMask)
 
         Absdiff(lastGray, dst2, dst3)
-        Threshold(dst3, dst3, 0, 255, cv.ThresholdTypes.Binary)
+        Threshold(dst3, dst3, 0, 255, ThresholdTypes.Binary)
         ConvertScaleAbs(dst3, dst3)
 
         lastGray = dst2.Clone
@@ -30,13 +30,13 @@ End Class
 
 Public Class StableGray_Basics_TA : Inherits TaskParent
     Public Sub New()
-        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        dst2 = New Mat(dst2.Size, MatType.CV_8U, 0)
         labels(2) = "Accumulated pixels were updated with new min/max pixels."
         desc = "Accumulate Min values where there is no motion and don't compute difference in dst3."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If src.Channels <> 1 Then src = task.gray
-        Static lastGray As cv.Mat = src.Clone
+        Static lastGray As Mat = src.Clone
 
         ' If task.heartBeat Then lastGray = src.Clone
 
@@ -56,13 +56,13 @@ End Class
 Public Class StableGray_BasicsMax : Inherits TaskParent
     Public Sub New()
         labels(3) = "Mask of pixels that are different between last image and current after processing."
-        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-        dst3 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        dst2 = New Mat(dst2.Size, MatType.CV_8U, 0)
+        dst3 = New Mat(dst2.Size, MatType.CV_8U, 0)
         desc = "Accumulate Max values where there is no motion."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If src.Channels <> 1 Then src = task.gray
-        Static lastGray As cv.Mat = src.Clone
+        Static lastGray As Mat = src.Clone
 
         'If task.heartBeat Then lastGray = src.Clone
 
@@ -70,7 +70,7 @@ Public Class StableGray_BasicsMax : Inherits TaskParent
         src.CopyTo(dst2, task.motion.motionMask)
 
         Absdiff(lastGray, dst2, dst3)
-        Threshold(dst3, dst3, 0, 255, cv.ThresholdTypes.Binary)
+        Threshold(dst3, dst3, 0, 255, ThresholdTypes.Binary)
         ConvertScaleAbs(dst3, dst3)
 
         lastGray = dst2.Clone
@@ -112,7 +112,7 @@ Public Class StableGray_RGBMin : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If task.gOptions.stableDepthRGB.Checked Then
-            Dim splitMats() As cv.Mat = Split(task.color)
+            Dim splitMats() As Mat = Split(task.color)
 
             stableB.Run(splitMats(0))
             splitMats(0) = stableB.dst2.Clone
@@ -144,7 +144,7 @@ Public Class StableGray_RGBMax : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If task.gOptions.stableDepthRGB.Checked Then
-            Dim splitMats() As cv.Mat = Split(task.color)
+            Dim splitMats() As Mat = Split(task.color)
 
             stableB.Run(splitMats(0))
             splitMats(0) = stableB.dst2.Clone
@@ -183,7 +183,7 @@ Public Class StableGray_MinMaxCompare : Inherits TaskParent
         labels(3) = "Max gray image - should be a little lighter."
 
         Absdiff(dst1, dst3, dst0)
-        Threshold(dst0, dst2, 0, 255, cv.ThresholdTypes.Binary)
+        Threshold(dst0, dst2, 0, 255, ThresholdTypes.Binary)
         ConvertScaleAbs(dst2, dst2)
 
         Dim count = CountNonZero(dst2)
@@ -236,7 +236,7 @@ Public Class StableGray_Measure : Inherits TaskParent
         desc = "Measure the amount of variation in the grayscale image."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        Static lastFrame As cv.Mat = task.grayOriginal
+        Static lastFrame As Mat = task.grayOriginal
 
         Absdiff(task.grayOriginal, lastFrame, dst0)
         averageDiff = Mean(dst0).Val0
@@ -284,11 +284,11 @@ Public Class StableGray_MeasureOverTime : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         motionStable.Run(src)
 
-        plotPercent.plotData = New cv.Scalar(motionStable.percentZero, 0, 0)
+        plotPercent.plotData = New Scalar(motionStable.percentZero, 0, 0)
         plotPercent.Run(src)
         dst2 = plotPercent.dst2
 
-        plotAverage.plotData = New cv.Scalar(motionStable.averageDiff, 0, 0)
+        plotAverage.plotData = New Scalar(motionStable.averageDiff, 0, 0)
         plotAverage.Run(src)
         dst3 = plotAverage.dst2
 

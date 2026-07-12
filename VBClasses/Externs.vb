@@ -526,9 +526,9 @@ Module Externs
 
 
     ' https://docs.opencv.org/3.4/db/d7f/tutorial_js_lucas_kanade.html
-    Public Function opticalFlow_Dense(oldGray As cv.Mat, gray As cv.Mat, pyrScale As Single, levels As Integer, winSize As Integer, iterations As Integer,
-                                        polyN As Single, polySigma As Single, OpticalFlowFlags As cv.OpticalFlowFlags) As cv.Mat
-        Dim flow As New cv.Mat
+    Public Function opticalFlow_Dense(oldGray As Mat, gray As Mat, pyrScale As Single, levels As Integer, winSize As Integer, iterations As Integer,
+                                        polyN As Single, polySigma As Single, OpticalFlowFlags As OpticalFlowFlags) As Mat
+        Dim flow As New Mat
         If pyrScale >= 1 Then pyrScale = 0.99
 
         ' When running "Test All", the OpenGL code requires full resolution which switches to low resolution (if active) after completion.
@@ -537,21 +537,21 @@ Module Externs
         If oldGray.Size() <> gray.Size() Then oldGray = gray.Clone()
 
         CalcOpticalFlowFarneback(oldGray, gray, flow, pyrScale, levels, winSize, iterations, polyN, polySigma, OpticalFlowFlags)
-        Dim flowVec(1) As cv.Mat
+        Dim flowVec(1) As Mat
         flowVec = Split(flow)
 
-        Dim hsv As New cv.Mat
-        Dim hsv0 As New cv.Mat
-        Dim hsv1 As New cv.Mat(gray.Rows, gray.Cols, cv.MatType.CV_8UC1, cv.Scalar.All(255))
-        Dim hsv2 As New cv.Mat
+        Dim hsv As New Mat
+        Dim hsv0 As New Mat
+        Dim hsv1 As New Mat(gray.Rows, gray.Cols, MatType.CV_8UC1, Scalar.All(255))
+        Dim hsv2 As New Mat
 
-        Dim magnitude As New cv.Mat
-        Dim angle As New cv.Mat
+        Dim magnitude As New Mat
+        Dim angle As New Mat
         CartToPolar(flowVec(0), flowVec(1), magnitude, angle)
-        angle.ConvertTo(hsv0, cv.MatType.CV_8UC1, 180 / Math.PI / 2)
-        Normalize(magnitude, hsv2, 0, 255, cv.NormTypes.MinMax, cv.MatType.CV_8UC1)
+        angle.ConvertTo(hsv0, MatType.CV_8UC1, 180 / Math.PI / 2)
+        Normalize(magnitude, hsv2, 0, 255, NormTypes.MinMax, MatType.CV_8UC1)
 
-        Dim hsvVec() As cv.Mat = {hsv0, hsv1, hsv2}
+        Dim hsvVec() As Mat = {hsv0, hsv1, hsv2}
         Merge(hsvVec, hsv)
         Return hsv
     End Function
@@ -564,7 +564,7 @@ Module Externs
     <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function OpticalFlow_CPP_Run(sPtr As IntPtr, bgrPtr As IntPtr, rows As Integer, cols As Integer) As IntPtr
     End Function
-    Public Sub calcOpticalFlowPyrLK_Native(gray1 As cv.Mat, gray2 As cv.Mat, features1 As cv.Mat, features2 As cv.Mat)
+    Public Sub calcOpticalFlowPyrLK_Native(gray1 As Mat, gray2 As Mat, features1 As Mat, features2 As Mat)
         Dim hGray1 As GCHandle
         Dim hGray2 As GCHandle
         Dim hF1 As GCHandle
@@ -779,7 +779,7 @@ Module Externs
     Public Function PlotOpenCV_Close(cPtr As IntPtr) As IntPtr
     End Function
 
-    Public backColor = cv.Scalar.DarkGray
+    Public backColor = Scalar.DarkGray
 
     <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function PlotOpenCV_Run(cPtr As IntPtr, inX As IntPtr, inY As IntPtr, inLen As Integer,
@@ -985,8 +985,8 @@ Module Externs
     Public Declare Auto Function MoveWindow Lib "user32.dll" (ByVal hWnd As IntPtr, ByVal X As Int32, ByVal Y As Int32, ByVal nWidth As Int32,
                                                                       ByVal nHeight As Int32, ByVal bRepaint As Boolean) As Boolean
 
-    Public Declare Function GetWindowRect Lib "user32" (ByVal HWND As Integer, ByRef lpRect As RECT) As Integer
-    <StructLayout(LayoutKind.Sequential)> Public Structure RECT
+    Public Declare Function GetWindowRect Lib "user32" (ByVal HWND As Integer, ByRef lpRect As cv.Rect) As Integer
+    <StructLayout(LayoutKind.Sequential)> Public Structure Rect
         Dim Left As Integer
         Dim Top As Integer
         Dim Right As Integer

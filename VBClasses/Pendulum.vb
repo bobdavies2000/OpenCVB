@@ -6,7 +6,7 @@ Public Class Pendulum_Basics : Inherits TaskParent
     Dim w1 As Single, w2 As Single
     Dim g As Single = 9.81F
     Dim dw As Single = 2, dh As Single = 4
-    Dim center = New cv.Point2f(dst2.Width / 2, 0)
+    Dim center = New Point2f(dst2.Width / 2, 0)
     Dim fps As Single = 300
     Dim options = New Options_Pendulum()
     Public Sub New()

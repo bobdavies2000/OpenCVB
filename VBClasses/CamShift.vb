@@ -2,7 +2,7 @@ Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 ' https://docs.opencvb.org/3.4.1/d2/dc1/camshiftdemo_8cpp-example.html
 ' https://docs.opencvb.org/3.4/d7/d00/tutorial_meanshift.html
 Public Class CamShift_Basics : Inherits TaskParent
-    Public trackBox As New cv.RotatedRect
+    Public trackBox As New RotatedRect
     Dim redHue As New CamShift_RedHue
     Dim roi As New cv.Rect
     Dim histogram As New cv.Mat
@@ -11,8 +11,8 @@ Public Class CamShift_Basics : Inherits TaskParent
         labels(3) = "Histogram of targeted region (hue only)"
         desc = "CamShift Demo - draw on the images to define the object to track. "
     End Sub
-    Public Shared Function Show_HSV_Hist(hist As cv.Mat) As cv.Mat
-        Dim img As New cv.Mat(New cv.Size(task.workRes.Width, task.workRes.Height), cv.MatType.CV_8UC3, cv.Scalar.All(0))
+    Public Shared Function Show_HSV_Hist(hist As Mat) As Mat
+        Dim img As New Mat(New Size(task.workRes.Width, task.workRes.Height), MatType.CV_8UC3, Scalar.All(0))
         Dim binCount = hist.Height
         Dim binWidth = img.Width / hist.Height
         Dim mm As mmData = GetMinMax(hist)
@@ -22,7 +22,7 @@ Public Class CamShift_Basics : Inherits TaskParent
                 Dim h = img.Height * (hist.Get(Of Single)(i, 0)) / mm.maxVal
                 If h = 0 Then h = 5 ' show the color range in the plot
                 Rectangle(img, New cv.Rect(i * binWidth, img.Height - h, binWidth, h),
-                                  New cv.Scalar(180.0 * i \ binCount, 255, 255), -1)
+                                  New Scalar(180.0 * i \ binCount, 255, 255), -1)
             Next
         End If
         Return img
@@ -33,19 +33,19 @@ Public Class CamShift_Basics : Inherits TaskParent
         Dim hue = redHue.dst1
         Dim mask = redHue.dst3
 
-        Dim ranges() = {New cv.Rangef(0, 180)}
+        Dim ranges() = {New Rangef(0, 180)}
         Dim hsize() As Integer = {task.histogramBins}
         task.drawRect = ValidateRect(task.drawRect)
         CalcHist({hue(task.drawRect)}, {0}, mask(task.drawRect), histogram, 1, hsize, ranges)
-        Normalize(histogram, histogram, 0, 255, cv.NormTypes.MinMax)
+        Normalize(histogram, histogram, 0, 255, NormTypes.MinMax)
         roi = task.drawRect
 
         If histogram.Rows <> 0 Then
             CalcBackProject({hue}, {0}, histogram, dst1, ranges)
-            trackBox = CamShift(dst1 And mask, roi, cv.TermCriteria.Both(10, 1))
+            trackBox = CamShift(dst1 And mask, roi, TermCriteria.Both(10, 1))
             dst3 = Show_HSV_Hist(histogram)
             If dst3.Channels() = 1 Then dst3 = src
-            CvtColor(dst3, dst3, cv.ColorConversionCodes.HSV2BGR)
+            CvtColor(dst3, dst3, ColorConversionCodes.HSV2BGR)
         End If
         If trackBox.Size.Width > 0 Then
             Ellipse(dst2, trackBox, white, task.lineWidth + 1, task.lineType)
@@ -68,9 +68,9 @@ Public Class CamShift_RedHue : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
 
-        Dim hsv As New cv.Mat
-        CvtColor(src, hsv, cv.ColorConversionCodes.BGR2HSV)
-        InRange(hsv, options.camSBins, New cv.Scalar(180, 255, options.camMax), dst3)
+        Dim hsv As New Mat
+        CvtColor(src, hsv, ColorConversionCodes.BGR2HSV)
+        InRange(hsv, options.camSBins, New Scalar(180, 255, options.camMax), dst3)
 
         dst2.SetTo(0)
         src.CopyTo(dst2, dst3)

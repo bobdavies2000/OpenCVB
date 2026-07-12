@@ -1,10 +1,10 @@
 Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 Public Class Diff_Basics : Inherits TaskParent
     Public changedPixels As Integer
-    Public lastFrame As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 255)
+    Public lastFrame As New Mat(dst2.Size, MatType.CV_8U, 255)
     Public Sub New()
         labels = {"", "", "Highlighting the changed pixels ", "AbsDiff output"}
-        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        dst2 = New Mat(dst2.Size, MatType.CV_8U, 0)
         desc = "Capture an image and compare it to previous frame using absDiff and threshold"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -14,7 +14,7 @@ Public Class Diff_Basics : Inherits TaskParent
 
         dst3.SetTo(0)
         Absdiff(src, lastFrame, dst3)
-        Threshold(dst3, dst2, task.colorDiffThreshold, 255, cv.ThresholdTypes.Binary)
+        Threshold(dst3, dst2, task.colorDiffThreshold, 255, ThresholdTypes.Binary)
         changedPixels = CountNonZero(dst2)
         lastFrame = src.Clone
         strOut = "Motion detected - " + CStr(changedPixels) + " pixels changed with threshold " +
@@ -38,7 +38,7 @@ Public Class Diff_Color : Inherits TaskParent
         If task.firstPass Then diff.lastFrame = src.Reshape(1, src.Rows * 3)
         diff.Run(src.Reshape(1, src.Rows * 3))
         dst2 = diff.dst2.Reshape(3, src.Rows)
-        CvtColor(dst2, dst3, cv.ColorConversionCodes.BGR2GRAY)
+        CvtColor(dst2, dst3, ColorConversionCodes.BGR2GRAY)
     End Sub
 End Class
 
@@ -57,10 +57,10 @@ Public Class Diff_UnstableDepthAndColor : Inherits TaskParent
         diff.Run(src)
         Dim unstableGray = diff.dst2.Clone()
         depth.Run(task.depthRGB)
-        Dim unstableDepth As New cv.Mat
-        Dim mask As New cv.Mat
+        Dim unstableDepth As New Mat
+        Dim mask As New Mat
         unstableDepth = Not depth.dst3
-        If unstableGray.Channels() = 3 Then CvtColor(unstableGray, unstableGray, cv.ColorConversionCodes.BGR2GRAY)
+        If unstableGray.Channels() = 3 Then CvtColor(unstableGray, unstableGray, ColorConversionCodes.BGR2GRAY)
         mask = unstableGray Or unstableDepth
         dst2 = src.Clone()
         dst2.SetTo(0, mask)
@@ -75,11 +75,11 @@ End Class
 
 Public Class Diff_RGBAccum : Inherits TaskParent
     Dim diff As New Diff_Basics
-    Dim history As New List(Of cv.Mat)
+    Dim history As New List(Of Mat)
     Dim options As New Options_History
     Public Sub New()
         labels = {"", "", "Accumulated BGR image", "Mask of changed pixels"}
-        dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
+        dst2 = New Mat(dst2.Size(), MatType.CV_8U, Scalar.All(0))
         desc = "Run Diff_Basics and accumulate BGR diff data."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -89,7 +89,7 @@ Public Class Diff_RGBAccum : Inherits TaskParent
 
         diff.Run(src)
         history.Add(diff.dst2)
-        If history.Count > task.fOptions.FrameHistoryCount.Value  Then history.RemoveAt(0)
+        If history.Count > task.fOptions.FrameHistoryCount.Value Then history.RemoveAt(0)
 
         dst2.SetTo(0)
         For Each m In history
@@ -136,7 +136,7 @@ Public Class Diff_RGB : Inherits TaskParent
     Dim diff(2) As Diff_Basics
     Dim mats As New Mat_4Click
     Public Sub New()
-        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        dst2 = New Mat(dst2.Size, MatType.CV_8U, 0)
         For i = 0 To diff.Count - 1
             diff(i) = New Diff_Basics
         Next
@@ -144,7 +144,7 @@ Public Class Diff_RGB : Inherits TaskParent
         desc = "Create a mask that shows when R, G, and B are different.  Compare it to diff for grayscale."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        Dim splitMats() As cv.Mat = Split(src)
+        Dim splitMats() As Mat = Split(src)
         dst2.SetTo(0)
         For i = 0 To 2
             diff(i).Run(splitMats(i))
@@ -153,7 +153,7 @@ Public Class Diff_RGB : Inherits TaskParent
             dst2 += mats.mat(i)
         Next
 
-        Threshold(dst2, dst2, 2, 255, cv.ThresholdTypes.Binary)
+        Threshold(dst2, dst2, 2, 255, ThresholdTypes.Binary)
         dst3 = task.motion.dst2
 
         If task.heartBeat Then
@@ -168,7 +168,7 @@ End Class
 
 Public Class Diff_Simple : Inherits TaskParent
     Public changedPixels As Integer
-    Public lastFrame As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+    Public lastFrame As New Mat(dst2.Size, MatType.CV_8U, 0)
     Public Sub New()
         desc = "Simple diff of lastFrame and current src."
     End Sub
@@ -191,7 +191,7 @@ End Class
 
 
 Public Class Diff_Depth32f : Inherits TaskParent
-    Public lastFrame As cv.Mat
+    Public lastFrame As Mat
     Public options As New Options_DiffDepth
     Public Sub New()
         desc = "Where is the depth difference between frames greater than X centimeters."
@@ -199,19 +199,19 @@ Public Class Diff_Depth32f : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
 
-        If src.Type <> cv.MatType.CV_32F Then src = task.pcSplit(2).Clone
+        If src.Type <> MatType.CV_32F Then src = task.pcSplit(2).Clone
 
         If task.optionsChanged Then lastFrame = src.Clone
 
         Absdiff(src, lastFrame, dst1)
 
-        Threshold(dst1, dst2, options.meters, 255, cv.ThresholdTypes.Binary)
+        Threshold(dst1, dst2, options.meters, 255, ThresholdTypes.Binary)
 
         lastFrame = src.Clone
         If task.heartBeat Then
             labels(2) = "Depth difference from accumulated frame is > " + CStr(options.millimeters) + " mm's"
             Dim count = CountNonZero(dst2)
-            labels(3) = CStr(count) + " pixels (" + (count /CountNonZero(task.depthmask)).ToString("0%") +
+            labels(3) = CStr(count) + " pixels (" + (count / CountNonZero(task.depthmask)).ToString("0%") +
                             " of all depth pixels) were different by more than " + CStr(options.millimeters) + " mm's"
         End If
     End Sub
@@ -222,19 +222,19 @@ End Class
 
 
 Public Class Diff_DepthGrid : Inherits TaskParent
-    Public lastFrame As cv.Mat
+    Public lastFrame As Mat
     Public options As New Options_DiffDepth
     Dim depthList(task.gridRects.Count - 1) As Single
     Dim motionSort As New List(Of cv.Rect)
     Public Sub New()
-        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        dst2 = New Mat(dst2.Size, MatType.CV_8U, 0)
         desc = "Where is the depth difference between frames greater than X centimeters."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
 
         If task.optionsChanged Then ReDim depthList(task.gridRects.Count - 1)
-        If src.Type <> cv.MatType.CV_32F Then src = task.pcSplit(2).Clone
+        If src.Type <> MatType.CV_32F Then src = task.pcSplit(2).Clone
 
         Dim nextList(task.gridRects.Count - 1) As Single
         For i = 0 To task.gridRects.Count - 1

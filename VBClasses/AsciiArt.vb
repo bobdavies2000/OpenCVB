@@ -10,7 +10,7 @@ Public Class AsciiArt_Basics : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
 
-        Resize(task.gray, dst3, options.size, 0, 0, cv.InterpolationFlags.Nearest)
+        Resize(task.gray, dst3, options.size, 0, 0, InterpolationFlags.Nearest)
         For y = 0 To dst3.Height - 1
             For x = 0 To dst3.Width - 1
                 Dim grayValue = dst3.Get(Of Byte)(y, x)
@@ -30,14 +30,14 @@ End Class
 
 Public Class AsciiArt_Color : Inherits TaskParent
     Public Sub New()
-        dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
+        dst3 = New Mat(dst3.Size(), MatType.CV_8U, Scalar.All(0))
         desc = "A palette'd version of the ascii art data"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         Dim hStep = CInt(src.Height / 31) - 1
         Dim wStep = CInt(src.Width / 55) - 1
-        Dim size = New cv.Size(55, 31)
-        Resize(task.gray, dst1, size, 0, 0, cv.InterpolationFlags.Nearest)
+        Dim size = New Size(55, 31)
+        Resize(task.gray, dst1, size, 0, 0, InterpolationFlags.Nearest)
         Dim grayRatio = 12 / 255
         For y = 0 To dst1.Height - 1
             For x = 0 To dst1.Width - 1
@@ -66,8 +66,8 @@ Public Class XR_AsciiArt_Diff : Inherits TaskParent
         grayAA.Run(src)
         dst2 = grayAA.dst2
 
-        Dim _diff_cvt As New cv.Mat
-        CvtColor(dst2, _diff_cvt, cv.ColorConversionCodes.BGR2GRAY)
+        Dim _diff_cvt As New Mat
+        CvtColor(dst2, _diff_cvt, ColorConversionCodes.BGR2GRAY)
         diff.Run(_diff_cvt)
         dst3 = diff.dst2
     End Sub

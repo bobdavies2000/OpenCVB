@@ -1,8 +1,8 @@
 Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 ' Source: https://hackernoon.com/https-medium-com-matteoronchetti-pointillism-with-python-and-opencv-f4274e6bbb7b
 Public Class XR_OilPaint_Pointilism : Inherits TaskParent
-    Dim randomMask As cv.Mat
-    Dim myRNG As New cv.RNG
+    Dim randomMask As Mat
+    Dim myRNG As New RNG
     Dim options As New Options_Pointilism
     Dim saveDrawRect As New cv.Rect
     Public Sub New()
@@ -17,7 +17,7 @@ Public Class XR_OilPaint_Pointilism : Inherits TaskParent
         If saveDrawRect <> task.drawRect Then
             saveDrawRect = task.drawRect
             ' only need to create the mask to order the brush strokes once.
-            randomMask = New cv.Mat(img.Size(), cv.MatType.CV_32SC2)
+            randomMask = New Mat(img.Size(), MatType.CV_32SC2)
             Dim nPt As New cv.Point
             For y = 0 To randomMask.Height - 1
                 For x = 0 To randomMask.Width - 1
@@ -31,27 +31,27 @@ Public Class XR_OilPaint_Pointilism : Inherits TaskParent
             RandShuffle(randomMask, 1.0, myRNG) ' the RNG is not optional.
         End If
         Resize(randomMask, randomMask, img.Size())
-        Dim fieldx As New cv.Mat, fieldy As New cv.Mat
-        Scharr(task.gray, fieldx, cv.MatType.CV_32FC1, 1, 0, 1 / 15.36)
-        Scharr(task.gray, fieldy, cv.MatType.CV_32FC1, 0, 1, 1 / 15.36)
+        Dim fieldx As New Mat, fieldy As New Mat
+        Scharr(task.gray, fieldx, MatType.CV_32FC1, 1, 0, 1 / 15.36)
+        Scharr(task.gray, fieldy, MatType.CV_32FC1, 0, 1, 1 / 15.36)
 
-        GaussianBlur(fieldx, fieldx, New cv.Size(options.smoothingRadius, options.smoothingRadius), 0, 0)
-        GaussianBlur(fieldy, fieldy, New cv.Size(options.smoothingRadius, options.smoothingRadius), 0, 0)
+        GaussianBlur(fieldx, fieldx, New Size(options.smoothingRadius, options.smoothingRadius), 0, 0)
+        GaussianBlur(fieldy, fieldy, New Size(options.smoothingRadius, options.smoothingRadius), 0, 0)
 
         For y = 0 To img.Height - 1
             For x = 0 To img.Width - 1
                 Dim nPt = randomMask.Get(Of cv.Point)(y, x)
-                Dim nextColor = src.Get(Of cv.Vec3b)(saveDrawRect.Y + nPt.Y, saveDrawRect.X + nPt.X)
+                Dim nextColor = src.Get(Of Vec3b)(saveDrawRect.Y + nPt.Y, saveDrawRect.X + nPt.X)
                 Dim fx = fieldx(saveDrawRect).Get(Of Single)(nPt.Y, nPt.X)
                 Dim fy = fieldy(saveDrawRect).Get(Of Single)(nPt.Y, nPt.X)
-                Dim nPoint = New cv.Point2f(nPt.X, nPt.Y)
+                Dim nPoint = New Point2f(nPt.X, nPt.Y)
                 Dim gradient_magnitude = Math.Sqrt(fx * fx + fy * fy)
                 Dim slen = Math.Round(options.strokeSize + options.strokeSize * Math.Sqrt(gradient_magnitude))
-                Dim eSize = New cv.Size2f(slen, options.strokeSize)
+                Dim eSize = New Size2f(slen, options.strokeSize)
                 Dim direction = Math.Atan2(fx, fy)
                 Dim angle = direction * 180.0 / Math.PI + 90
 
-                Dim rotatedRect = New cv.RotatedRect(nPoint, eSize, angle)
+                Dim rotatedRect = New RotatedRect(nPoint, eSize, angle)
                 If options.useElliptical Then
                     Ellipse(dst2(saveDrawRect), rotatedRect, nextColor)
                 Else
@@ -91,10 +91,10 @@ Public Class XR_OilPaint_ManualVB : Inherits TaskParent
                 Dim redbin(options.intensity) As Integer
                 Dim maxIntensity As Integer = 0
                 Dim maxIndex As Integer = 0
-                Dim vec As cv.Vec3b
+                Dim vec As Vec3b
                 For yy = y - filterKern To y + filterKern - 1
                     For xx = x - filterKern To x + filterKern - 1
-                        vec = color.Get(Of cv.Vec3b)(yy, xx)
+                        vec = color.Get(Of Vec3b)(yy, xx)
                         Dim currentIntensity = Math.Round((CSng(vec(0)) + CSng(vec(1)) + CSng(vec(2))) * options.intensity / (255 * 3))
                         intensitybins(currentIntensity) += 1
                         bluebin(currentIntensity) += vec(0)
@@ -111,7 +111,7 @@ Public Class XR_OilPaint_ManualVB : Inherits TaskParent
                 vec(0) = If((bluebin(maxIndex) / maxIntensity) > 255, 255, bluebin(maxIndex) / maxIntensity)
                 vec(1) = If((greenbin(maxIndex) / maxIntensity) > 255, 255, greenbin(maxIndex) / maxIntensity)
                 vec(2) = If((redbin(maxIndex) / maxIntensity) > 255, 255, redbin(maxIndex) / maxIntensity)
-                result1.Set(Of cv.Vec3b)(y, x, vec)
+                result1.Set(Of Vec3b)(y, x, vec)
             Next
         Next
         result1.CopyTo(dst2(roi))

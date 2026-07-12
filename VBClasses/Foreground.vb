@@ -9,7 +9,7 @@ Public Class Foreground_Basics_TA : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If task.heartBeat Or hist.histogram.Total = 0 Then
-            Threshold(task.pcSplit(2), dst1, task.MaxZmeters, 255, cv.ThresholdTypes.BinaryInv)
+            Threshold(task.pcSplit(2), dst1, task.MaxZmeters, 255, ThresholdTypes.BinaryInv)
             ConvertScaleAbs(dst1, dst1)
             dst1.SetTo(0, task.noDepthMask)
             dst0 = task.pcSplit(2).Clone
@@ -33,7 +33,7 @@ Public Class Foreground_Basics_TA : Inherits TaskParent
             Next
         End If
 
-        Threshold(task.pcSplit(2), task.foregroundMask, foregroundMaxDepth, 255, cv.ThresholdTypes.BinaryInv)
+        Threshold(task.pcSplit(2), task.foregroundMask, foregroundMaxDepth, 255, ThresholdTypes.BinaryInv)
         ConvertScaleAbs(task.foregroundMask, task.foregroundMask)
         task.foregroundMask.SetTo(0, task.noDepthMask)
 
@@ -50,10 +50,10 @@ End Class
 Public Class XR_Foreground_KMeansDepth : Inherits TaskParent
     Dim simK As New KMeans_Depth
     Public fgDepth As Single
-    Public fg As New cv.Mat, bg As New cv.Mat, classCount As Integer
+    Public fg As New Mat, bg As New Mat, classCount As Integer
     Public Sub New()
         labels(3) = "Foreground - all the KMeans classes up to and including the first class over 1 meter."
-        dst1 = New cv.Mat(dst1.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
+        dst1 = New Mat(dst1.Size(), MatType.CV_8U, Scalar.All(0))
         desc = "Find the first KMeans class with depth over 1 meter and use it to define foreground"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -61,10 +61,10 @@ Public Class XR_Foreground_KMeansDepth : Inherits TaskParent
         classCount = simK.classCount
 
         ' Order the KMeans classes from foreground to background using depth data.
-        Dim depthMats As New List(Of cv.Mat)
+        Dim depthMats As New List(Of Mat)
         Dim sortedMats As New SortedList(Of Single, Integer)(New compareAllowIdenticalSingle)
         For i = 0 To classCount - 1
-            Dim tmp As New cv.Mat
+            Dim tmp As New Mat
             InRange(simK.dst2, i, i, tmp)
             depthMats.Add(tmp.Clone)
             Dim depth = Mean(task.pcSplit(2), tmp)(0)
@@ -81,7 +81,7 @@ Public Class XR_Foreground_KMeansDepth : Inherits TaskParent
             dst1.SetTo(index + 1, tmp)
         Next
         dst2 = Palettize(dst1)
-        Threshold(task.pcSplit(2), fg, fgDepth, 255, cv.ThresholdTypes.BinaryInv)
+        Threshold(task.pcSplit(2), fg, fgDepth, 255, ThresholdTypes.BinaryInv)
         ConvertScaleAbs(fg, fg)
         dst0 = fg
 
@@ -105,14 +105,14 @@ Public Class XR_Foreground_KMeans : Inherits TaskParent
     Public Sub New()
         OptionParent.FindSlider("KMeans k").Value = 2
         labels = {"", "", "Foreground Mask", "Background Mask"}
-        dst2 = New cv.Mat(New cv.Size(task.workRes.Width, task.workRes.Height), cv.MatType.CV_8U, cv.Scalar.All(0))
-        dst3 = New cv.Mat(New cv.Size(task.workRes.Width, task.workRes.Height), cv.MatType.CV_8U, cv.Scalar.All(0))
+        dst2 = New Mat(New Size(task.workRes.Width, task.workRes.Height), MatType.CV_8U, Scalar.All(0))
+        dst3 = New Mat(New Size(task.workRes.Width, task.workRes.Height), MatType.CV_8U, Scalar.All(0))
         desc = "Separate foreground and background using Kmeans with k=2."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         task.optionsChanged = True
 
-        Threshold(task.pcSplit(2), src, 1, 255, cv.ThresholdTypes.BinaryInv)
+        Threshold(task.pcSplit(2), src, 1, 255, ThresholdTypes.BinaryInv)
         ConvertScaleAbs(src, src)
         km.Run(src)
 

@@ -3,7 +3,7 @@ Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 Partial Public Class AlgorithmTask
     Public Settings As jsonShared.Settings
 
-    Public dstList(3) As cv.Mat
+    Public dstList(3) As Mat
 
     Public optionsChanged As Boolean
     Public allOptions As OptionsContainer
@@ -12,22 +12,22 @@ Partial Public Class AlgorithmTask
     Public treeView As TreeViewForm
     Public homeDir As String
 
-    Public color As New cv.Mat
-    Public gray As New cv.Mat
-    Public grayOriginal As New cv.Mat
-    Public leftView As New cv.Mat
-    Public rightView As New cv.Mat
-    Public pointCloud As New cv.Mat
-    Public gravityCloud As New cv.Mat
-    Public sharpDepth As cv.Mat
-    Public sharpRGB As cv.Mat
-    Public pcSplit() As cv.Mat
-    Public depthRGB As cv.Mat
+    Public color As New Mat
+    Public gray As New Mat
+    Public grayOriginal As New Mat
+    Public leftView As New Mat
+    Public rightView As New Mat
+    Public pointCloud As New Mat
+    Public gravityCloud As New Mat
+    Public sharpDepth As Mat
+    Public sharpRGB As Mat
+    Public pcSplit() As Mat
+    Public depthRGB As Mat
 
-    Public depthmask As cv.Mat
-    Public noDepthMask As cv.Mat
-    Public foregroundMask As cv.Mat
-    Public fLessMask As cv.Mat
+    Public depthmask As Mat
+    Public noDepthMask As Mat
+    Public foregroundMask As Mat
+    Public fLessMask As Mat
 
     Public firstPass As Boolean = True
 
@@ -40,20 +40,20 @@ Partial Public Class AlgorithmTask
 
     Public verticalLines As Boolean
 
-    Public workRes As cv.Size
-    Public smallRes As cv.Size ' the recommended small resolution for this capture size.
+    Public workRes As Size
+    Public smallRes As Size ' the recommended small resolution for this capture size.
     Public smallBrick As Integer ' brick size for smallRes resolution.
     Public rows As Integer
     Public cols As Integer
-    Public captureRes As cv.Size
+    Public captureRes As Size
 
     ' Global Options 
     Public DotSize As Integer
     Public lineWidth As Integer
-    Public lineType As cv.LineTypes
+    Public lineType As LineTypes
     Public histogramBins As Integer
     Public MaxZmeters As Single
-    Public highlight As cv.Scalar
+    Public highlight As Scalar
     Public closeRequest As Boolean
     Public paletteIndex As Integer
     Public fCorrThreshold As Single
@@ -64,11 +64,11 @@ Partial Public Class AlgorithmTask
     Public main_hwnd As IntPtr
 
     ' color maps
-    Public scalarColors(255) As cv.Scalar
-    Public vecColors(255) As cv.Vec3b
-    Public colorMapDepth As cv.Mat
-    Public colorMap As cv.Mat
-    Public colorMapBricks As cv.Mat
+    Public scalarColors(255) As Scalar
+    Public vecColors(255) As Vec3b
+    Public colorMapDepth As Mat
+    Public colorMap As Mat
+    Public colorMapBricks As Mat
 
     ' task algorithms - operate on every frame regardless of which algorithm is being run.
     Public filterBasics As Filter_Basics_TA
@@ -89,14 +89,14 @@ Partial Public Class AlgorithmTask
     Public heartBeats As HeartBeat_Basics_TA
     Public edges As Edge_Basics_TA
 
-    Public motionFeatures As cv.Point2f
+    Public motionFeatures As Point2f
     Public palette As Palette_LoadColorMap
     Public PixelViewer As Pixel_Viewer
     Public pixelViewerOn As Boolean
 
     Public GLRequest As Integer
-    Public GLcloud As cv.Mat
-    Public GLrgb As cv.Mat
+    Public GLcloud As Mat
+    Public GLrgb As Mat
 
     Public motionThreshold As Integer ' this is vital to motion detection - lower to be more sensitive, higher for less.
     Public colorDiffThreshold As Integer
@@ -104,13 +104,13 @@ Partial Public Class AlgorithmTask
     Public motionLinkType As Integer = 8
 
     Public featList As New List(Of List(Of Integer))
-    Public fpMap As New cv.Mat ' feature map
+    Public fpMap As New Mat ' feature map
 
     Public brickD As brickData ' the currently selected gRect
     Public rcMinD As rcData ' the currently selected redCloud Cell
     Public rcD As rcDataOld ' the currently selected redCloud Cell
     Public lpD As lpData ' the currently selected line pair
-    Public fpD As fpData ' the currently selected feature point.
+    Public fpD As fpData ' the currently selected feature cv.Point.
     Public contourD As New contourData ' the currently selected contour
 
     Public bricksPerCol As Integer
@@ -119,22 +119,22 @@ Partial Public Class AlgorithmTask
     Public gridRects As List(Of cv.Rect)
     Public gridNabeRects As New List(Of cv.Rect) ' The surrounding rect for every gridRect
     Public gridNabes As New List(Of List(Of Integer))
-    Public gridMap As New cv.Mat
-    Public gridMask As New cv.Mat
+    Public gridMap As New Mat
+    Public gridMask As New Mat
     Public gridWH As Integer ' grid width and height.
     Public gridROIclicked As Integer
     Public depthDiffMeters As Single ' bricks > than this value are depth edges - in meters
 
-    Public lowResColor As New cv.Mat
-    Public lowResDepth As New cv.Mat
+    Public lowResColor As New Mat
+    Public lowResDepth As New Mat
 
     Public MainUI_Algorithm As Object
     Public myStopWatch As Stopwatch
 
-    ' transformation matrix to convert point cloud to be vertical according to gravity.
-    Public gMatrix As New cv.Mat
+    ' transformation matrix to convert cv.Point cloud to be vertical according to gravity.
+    Public gMatrix As New Mat
     Public IMU_Rotation As System.Numerics.Quaternion
-    Public maxDepthMask As New cv.Mat
+    Public maxDepthMask As New Mat
 
     Public camMotionPixels As Single ' distance in pixels that the camera has moved.
     Public camDirection As Single ' camera direction in radians.
@@ -167,20 +167,20 @@ Partial Public Class AlgorithmTask
     Public lpHorizon As lpData
     Public longestLine As lpData
 
-    Public IMU_Acceleration As cv.Point3f
-    Public IMU_AverageAcceleration As cv.Point3f
-    Public IMU_AngularVelocity As cv.Point3f
+    Public IMU_Acceleration As Point3f
+    Public IMU_AverageAcceleration As Point3f
+    Public IMU_AngularVelocity As Point3f
 
-    Public kalmanIMUacc As cv.Point3f
-    Public kalmanIMUvelocity As cv.Point3f
+    Public kalmanIMUacc As Point3f
+    Public kalmanIMUvelocity As Point3f
     Public IMU_TimeStamp As Double
-    Public IMU_Translation As cv.Point3f
-    Public IMU_AngularAcceleration As cv.Point3f
+    Public IMU_Translation As Point3f
+    Public IMU_AngularAcceleration As Point3f
     Public IMU_FrameTime As Double
     Public IMU_AlphaFilter As Single ' high pass and low pass filter of the IMU acceleration data.
 
-    Public accRadians As cv.Point3f  ' rotation angles around x/y/z-axis to align with gravity
-    Public theta As cv.Point3f ' velocity-filtered angles around x/y/z-axis to align with gravity
+    Public accRadians As Point3f  ' rotation angles around x/y/z-axis to align with gravity
+    Public theta As Point3f ' velocity-filtered angles around x/y/z-axis to align with gravity
     Public verticalizeAngle As Double
 
     Public pitchDeg As Single
@@ -197,10 +197,10 @@ Partial Public Class AlgorithmTask
     Public channels() As Integer = {0, 1}
     Public histBinList() As Integer
     Public reductionName As String = "XY Reduction"
-    Public ranges() As cv.Rangef
-    Public rangesBGR() As cv.Rangef = New cv.Rangef() {New cv.Rangef(0, 256), New cv.Rangef(0, 256), New cv.Rangef(0, 256)}
-    Public rangesHSV() As cv.Rangef = New cv.Rangef() {New cv.Rangef(0, 180), New cv.Rangef(0, 256), New cv.Rangef(0, 256)}
-    Public rangesCloud() As cv.Rangef
+    Public ranges() As Rangef
+    Public rangesBGR() As Rangef = New Rangef() {New Rangef(0, 256), New Rangef(0, 256), New Rangef(0, 256)}
+    Public rangesHSV() As Rangef = New Rangef() {New Rangef(0, 180), New Rangef(0, 256), New Rangef(0, 256)}
+    Public rangesCloud() As Rangef
 
     Public mouseClickFlag As Boolean
     Public mousePicTag As Integer ' which image was the mouse in?
@@ -209,7 +209,7 @@ Partial Public Class AlgorithmTask
     Public mouseMagnifyEndPoint As cv.Point ' Mouse location in terms of the display resolution
     Public mouseMagnifyPicTag As Integer = -1
     Public mouseMovePoint As cv.Point ' mouse location in the workRes resolution.
-    Public mousePixelValue As cv.Vec3b
+    Public mousePixelValue As Vec3b
     Public mouseMovePointUpdated As Boolean
 
     Public CPU_TimeStamp As Double
@@ -241,8 +241,8 @@ Partial Public Class AlgorithmTask
     Public OpenGLTitle As String
     Public polyCount As Integer
 
-    Public rangesTop() As cv.Rangef
-    Public rangesSide() As cv.Rangef
+    Public rangesTop() As Rangef
+    Public rangesSide() As Rangef
     Public channelsTop() As Integer
     Public channelsSide() As Integer
     Public bins2D() As Integer

@@ -78,7 +78,7 @@ End Class
 Public Class XR_HullLine_SelectHull : Inherits TaskParent
     Dim hullLines As New HullLine_BasicsOld_TA
     Public Sub New()
-        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
+        dst1 = New Mat(dst1.Size, MatType.CV_8U, 0)
         labels(3) = "Click on any hull to see it below with its edge points."
         desc = "Display the contour hull selected."
     End Sub

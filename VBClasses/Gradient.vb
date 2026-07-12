@@ -2,7 +2,7 @@ Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 Public Class Gradient_Basics : Inherits TaskParent
     Public sobel As New Edge_SobelNaive
     Public Sub New()
-        dst3 = New cv.Mat(dst2.Size(), cv.MatType.CV_32F, cv.Scalar.All(0))
+        dst3 = New Mat(dst2.Size(), MatType.CV_32F, Scalar.All(0))
         labels = {"", "", "Gradient_Basics - Sobel output", "Phase Output"}
         desc = "Use phase to compute gradient"
     End Sub
@@ -38,8 +38,8 @@ End Class
 ' https://github.com/anopara/genetic-drawing
 Public Class Gradient_CartToPolar : Inherits TaskParent
     Public basics As New Gradient_Basics
-    Public magnitude As New cv.Mat
-    Public angle As New cv.Mat
+    Public magnitude As New Mat
+    Public angle As New Mat
     Dim options As New Options_Gradient
     Public Sub New()
         OptionParent.FindSlider("Sobel kernel Size").Value = 1
@@ -50,15 +50,15 @@ Public Class Gradient_CartToPolar : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
 
-        Dim tmp As New cv.Mat
-        src.ConvertTo(tmp, cv.MatType.CV_32FC3, 1 / 255)
+        Dim tmp As New Mat
+        src.ConvertTo(tmp, MatType.CV_32FC3, 1 / 255)
         basics.Run(tmp)
 
-        basics.sobel.dst2.ConvertTo(dst2, cv.MatType.CV_32F)
-        basics.sobel.dst2.ConvertTo(dst3, cv.MatType.CV_32F)
+        basics.sobel.dst2.ConvertTo(dst2, MatType.CV_32F)
+        basics.sobel.dst2.ConvertTo(dst3, MatType.CV_32F)
 
-        magnitude = New cv.Mat
-        angle = New cv.Mat
+        magnitude = New Mat
+        angle = New Mat
         CartToPolar(dst2, dst3, magnitude, angle, True)
         Normalize(magnitude, magnitude)
         Pow(magnitude, options.exponent, magnitude)
@@ -73,26 +73,26 @@ End Class
 
 
 Public Class Gradient_Color : Inherits TaskParent
-    Public color1 = cv.Scalar.Blue
-    Public color2 = cv.Scalar.Yellow
+    Public color1 = Scalar.Blue
+    Public color2 = Scalar.Yellow
     Public gradientWidth As Integer
-    Public gradient As cv.Mat
+    Public gradient As Mat
     Public Sub New()
         desc = "Provide a spectrum that is a gradient from one color to another."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         gradientWidth = dst2.Width
         Dim f As Double = 1.0
-        Dim gradientColors As New cv.Mat(1, gradientWidth, cv.MatType.CV_64FC3)
+        Dim gradientColors As New Mat(1, gradientWidth, MatType.CV_64FC3)
         For i = 0 To gradientWidth - 1
-            gradientColors.Set(Of cv.Scalar)(0, i, New cv.Scalar(f * color2(0) + (1 - f) * color1(0),
+            gradientColors.Set(Of Scalar)(0, i, New Scalar(f * color2(0) + (1 - f) * color1(0),
                                                                      f * color2(1) + (1 - f) * color1(1),
                                                                      f * color2(2) + (1 - f) * color1(2)))
             f -= 1 / gradientWidth
         Next
-        gradient = New cv.Mat(1, gradientWidth, cv.MatType.CV_8UC3)
+        gradient = New Mat(1, gradientWidth, MatType.CV_8UC3)
         For i = 0 To gradientWidth - 1
-            gradient.Col(i).SetTo(gradientColors.Get(Of cv.Scalar)(0, i))
+            gradient.Col(i).SetTo(gradientColors.Get(Of Scalar)(0, i))
         Next
         Resize(gradient, dst2, dst2.Size)
     End Sub

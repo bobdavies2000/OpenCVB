@@ -17,34 +17,34 @@ Public Module vbc
     Public Const fmt4 = "0.0000"
     Public newPoint As New cv.Point
     Public msRNG As New System.Random
-    Public white As New cv.Scalar(255, 255, 255), black As New cv.Scalar(0, 0, 0)
-    Public grayColor As New cv.Scalar(127, 127, 127)
-    Public yellow As New cv.Scalar(0, 255, 255), purple As New cv.Scalar(255, 0, 255)
-    Public teal As New cv.Scalar(255, 255, 0)
-    Public red As New cv.Scalar(0, 0, 255), green As New cv.Scalar(0, 255, 0)
-    Public blue As New cv.Scalar(255, 0, 0)
+    Public white As New Scalar(255, 255, 255), black As New Scalar(0, 0, 0)
+    Public grayColor As New Scalar(127, 127, 127)
+    Public yellow As New Scalar(0, 255, 255), purple As New Scalar(255, 0, 255)
+    Public teal As New Scalar(255, 255, 0)
+    Public red As New Scalar(0, 0, 255), green As New Scalar(0, 255, 0)
+    Public blue As New Scalar(255, 0, 0)
 
-    Public zero3f As New cv.Point3f
-    Public newVec4f As New cv.Vec4f
-    Public emptyMat As New cv.Mat
+    Public zero3f As New Point3f
+    Public newVec4f As New Vec4f
+    Public emptyMat As New Mat
     Public pipeCount As Integer
-    Public saveVecColors(0) As cv.Vec3b
-    Public saveScalarColors(0) As cv.Scalar
-    Public saveDepthColorMap As cv.Mat
-    Public term As New cv.TermCriteria(cv.CriteriaTypes.Eps + cv.CriteriaTypes.Count, 10, 1.0)
+    Public saveVecColors(0) As Vec3b
+    Public saveScalarColors(0) As Scalar
+    Public saveDepthColorMap As Mat
+    Public term As New TermCriteria(CriteriaTypes.Eps + CriteriaTypes.Count, 10, 1.0)
     <System.Runtime.CompilerServices.Extension()>
     Public Sub SwapWith(Of T)(ByRef thisObj As T, ByRef withThisObj As T)
         Dim tempObj = thisObj
         thisObj = withThisObj
         withThisObj = tempObj
     End Sub
-    Public Function vecToScalar(c As cv.Vec3b) As cv.Scalar
-        Return New cv.Scalar(c(0), c(1), c(2))
+    Public Function vecToScalar(c As Vec3b) As Scalar
+        Return New Scalar(c(0), c(1), c(2))
     End Function
-    Public Function ScalarToVec(c As cv.Scalar) As cv.Vec3b
-        Return New cv.Vec3b(c(0), c(1), c(2))
+    Public Function ScalarToVec(c As Scalar) As Vec3b
+        Return New Vec3b(c(0), c(1), c(2))
     End Function
-    Public Function findRectFromLine(lp As lpData) As cv.Rect
+    Public Function findRectFromLine(lp As lpData) as cv.Rect
         Dim rect = New cv.Rect(lp.p1.X, lp.p1.Y, Math.Abs(lp.p1.X - lp.p2.X), Math.Abs(lp.p1.Y - lp.p2.Y))
         If lp.p1.Y > lp.p2.Y Then rect = New cv.Rect(lp.p1.X, lp.p2.Y, rect.Width, rect.Height)
         If rect.Width < 2 Then rect.Width = 2
@@ -56,8 +56,8 @@ Public Module vbc
         Dim yIntercept = lp.p1.Y - lp.slope * lp.p1.X
         Dim w = task.cols, h = task.rows
 
-        Dim xp1 = New cv.Point2f(0, yIntercept)
-        Dim xp2 = New cv.Point2f(w, w * lp.slope + yIntercept)
+        Dim xp1 = New Point2f(0, yIntercept)
+        Dim xp2 = New Point2f(w, w * lp.slope + yIntercept)
         Dim xIntercept = -yIntercept / lp.slope
         If xp1.Y > h Then
             xp1.X = (h - yIntercept) / lp.slope
@@ -81,7 +81,7 @@ Public Module vbc
         If xp2.Y = task.color.Height Then xp2.Y -= 1
         Return New lpData(xp1, xp2)
     End Function
-    Public Function GetMinMax(mat As cv.Mat, Optional mask As cv.Mat = Nothing) As mmData
+    Public Function GetMinMax(mat As Mat, Optional mask As Mat = Nothing) As mmData
         Dim mm As mmData
         If mask Is Nothing Then
             MinMaxLoc(mat, mm.minVal, mm.maxVal, mm.minLoc, mm.maxLoc)
@@ -96,14 +96,14 @@ Public Module vbc
         mm.range = mm.maxVal - mm.minVal
         Return mm
     End Function
-    Public Function getMinMaxDrawRect(mat As cv.Mat) As mmData
+    Public Function getMinMaxDrawRect(mat As Mat) As mmData
         If task.drawRect.Width > 0 And task.drawRect.Height > 0 Then mat = mat(task.drawRect)
         Return GetMinMax(mat)
     End Function
     ' alternative optional parameter: ApproxTC89L1 or ApproxNone
-    Public Function ContourBuild(mask As cv.Mat, Optional approxMode As cv.ContourApproximationModes = cv.ContourApproximationModes.ApproxNone) As List(Of cv.Point)
+    Public Function ContourBuild(mask As Mat, Optional approxMode As ContourApproximationModes = ContourApproximationModes.ApproxNone) As List(Of cv.Point)
         Dim allContours As cv.Point()() = Nothing
-        FindContours(mask, allContours, Nothing, cv.RetrievalModes.External, approxMode)
+        FindContours(mask, allContours, Nothing, RetrievalModes.External, approxMode)
 
         Dim tourCount As New List(Of Integer)
         For Each tour In allContours
@@ -114,7 +114,7 @@ Public Module vbc
         End If
         Return New List(Of cv.Point)
     End Function
-    Public Function ValidateRect(ByVal r As cv.Rect, Optional ratio As Integer = 1) As cv.Rect
+    Public Function ValidateRect(ByVal r as cv.Rect, Optional ratio As Integer = 1) as cv.Rect
         If r.X < 0 Then r.X = 0
         If r.Y < 0 Then r.Y = 0
         If r.X + r.Width >= task.workRes.Width * ratio Then r.Width = task.workRes.Width * ratio - r.X - 1
@@ -125,7 +125,7 @@ Public Module vbc
         If r.Height <= 0 Then r.Height = 1
         Return r
     End Function
-    Public Function validateRect(r As cv.Rect, width As Integer, height As Integer) As cv.Rect
+    Public Function validateRect(r as cv.Rect, width As Integer, height As Integer) as cv.Rect
         If r.Width < 0 Then r.Width = 1
         If r.Height < 0 Then r.Height = 1
         If r.X < 0 Then r.X = 0

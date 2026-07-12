@@ -2,11 +2,11 @@
 Public Class Motion_Basics_TA : Inherits TaskParent
     Public motionSort As New List(Of Integer) ' sorted in order of grid rect index (without actually sorting.)
     Public diff As New Diff_Basics
-    Public motionMask As cv.Mat = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 255)
-    Public motionRightMask As cv.Mat = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 255) ' motion in the right image.
+    Public motionMask As Mat = New Mat(dst2.Size, MatType.CV_8U, 255)
+    Public motionRightMask As Mat = New Mat(dst2.Size, MatType.CV_8U, 255) ' motion in the right image.
     Public Sub New()
         If standalone Then task.gOptions.displayDst1.Checked = True
-        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        dst2 = New Mat(dst2.Size, MatType.CV_8U, 0)
         desc = "Find all the grid rects that had motion since the last frame."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -96,7 +96,7 @@ Public Class Motion_Validate : Inherits TaskParent
 
         diff.lastFrame = dst2
         diff.Run(dst1)
-        Threshold(diff.dst3, dst3, task.colorDiffThreshold, 255, cv.ThresholdTypes.Binary)
+        Threshold(diff.dst3, dst3, task.colorDiffThreshold, 255, ThresholdTypes.Binary)
 
         Dim count = CountNonZero(dst3)
         strOut = "Pixels different from camera image: " + CStr(count) + " (" +
@@ -113,10 +113,10 @@ End Class
 Public Class XR_Motion_Basics : Inherits TaskParent
     Public motionSort As New List(Of Integer)
     Public diff As New Diff_Basics
-    Public motionMask As cv.Mat = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 255)
+    Public motionMask As Mat = New Mat(dst2.Size, MatType.CV_8U, 255)
     Public Sub New()
         If standalone Then task.gOptions.showMotionMask.Checked = True
-        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        dst2 = New Mat(dst2.Size, MatType.CV_8U, 0)
         labels(3) = "The motion mask"
         desc = "Find all the grid rects that had motion since the last frame."
     End Sub
@@ -193,14 +193,14 @@ Public Class XR_Motion_ValidateRight : Inherits TaskParent
 
         diff.lastFrame = dst2
         diff.Run(dst1)
-        Threshold(diff.dst3, dst3, task.motionThreshold, 255, cv.ThresholdTypes.Binary)
+        Threshold(diff.dst3, dst3, task.motionThreshold, 255, ThresholdTypes.Binary)
 
         SetTrueText("Pixels different from camera image: " + CStr(CountNonZero(diff.dst2)) + vbCrLf +
                         "Grid rects with more than " + CStr(task.motionThreshold) +
                         " pixels different: " + CStr(motionRight.motion.motionSort.Count), 3)
 
         For Each index In motionRight.motion.motionSort
-            Rectangle(dst1, task.gridRects(index), cv.Scalar.All(255), task.lineWidth)
+            Rectangle(dst1, task.gridRects(index), Scalar.All(255), task.lineWidth)
         Next
     End Sub
 End Class
@@ -245,7 +245,7 @@ End Class
 Public Class Motion_CorrelationToLast : Inherits TaskParent
     Public cList As New List(Of Single)
     Public plotHist As New PlotBar_Basics
-    Public lastFrame As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+    Public lastFrame As New Mat(dst2.Size, MatType.CV_8U, 0)
     Public Sub New()
         If standalone Then task.gOptions.displayDst1.Checked = True
         plotHist.createHistogram = True
@@ -264,12 +264,12 @@ Public Class Motion_CorrelationToLast : Inherits TaskParent
         Dim maxCorrelation As Single = task.fOptions.MatchCorrSlider.Value / 100
 
         Dim count As Integer
-        Dim correlationMat As New cv.Mat
+        Dim correlationMat As New Mat
         dst3 = src.Clone
         cList.Clear()
         For Each index In task.motion.motionSort
             Dim r = task.gridRects(index)
-            MatchTemplate(dst2(r), lastFrame(r), correlationMat, cv.TemplateMatchModes.CCoeffNormed)
+            MatchTemplate(dst2(r), lastFrame(r), correlationMat, TemplateMatchModes.CCoeffNormed)
 
             Dim corr = correlationMat.Get(Of Single)(0, 0)
             cList.Add(corr)
@@ -285,7 +285,7 @@ Public Class Motion_CorrelationToLast : Inherits TaskParent
         lastFrame = src.Clone
 
         If cList.Count > 0 Then
-            plotHist.Run(cv.Mat.FromPixelData(cList.Count, 1, cv.MatType.CV_32F, cList.ToArray))
+            plotHist.Run(Mat.FromPixelData(cList.Count, 1, MatType.CV_32F, cList.ToArray))
             dst1 = plotHist.dst2
 
             labels(2) = "Min = " + cList.Min.ToString(fmt1) + ", Max = " + cList.Max.ToString(fmt1)
@@ -302,7 +302,7 @@ End Class
 Public Class Motion_Correlation : Inherits TaskParent
     Public cList As New List(Of Single)
     Public plotHist As New PlotBar_Basics
-    Public lastFrame As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+    Public lastFrame As New Mat(dst2.Size, MatType.CV_8U, 0)
     Public Sub New()
         If standalone Then task.gOptions.displayDst1.Checked = True
         plotHist.createHistogram = True
@@ -321,11 +321,11 @@ Public Class Motion_Correlation : Inherits TaskParent
         Dim maxCorrelation As Single = task.fOptions.MatchCorrSlider.Value / 100
 
         Dim count As Integer
-        Dim correlationMat As New cv.Mat
+        Dim correlationMat As New Mat
         dst3 = src.Clone
         cList.Clear()
         For Each r In task.gridRects
-            MatchTemplate(dst2(r), lastFrame(r), correlationMat, cv.TemplateMatchModes.CCoeffNormed)
+            MatchTemplate(dst2(r), lastFrame(r), correlationMat, TemplateMatchModes.CCoeffNormed)
 
             Dim corr = correlationMat.Get(Of Single)(0, 0)
             cList.Add(corr)
@@ -338,7 +338,7 @@ Public Class Motion_Correlation : Inherits TaskParent
 
         lastFrame = src.Clone
 
-        plotHist.Run(cv.Mat.FromPixelData(cList.Count, 1, cv.MatType.CV_32F, cList.ToArray))
+        plotHist.Run(Mat.FromPixelData(cList.Count, 1, MatType.CV_32F, cList.ToArray))
         dst1 = plotHist.dst2
 
         labels(2) = "Min = " + cList.Min.ToString(fmt1) + ", Max = " + cList.Max.ToString(fmt1)
@@ -423,7 +423,7 @@ Public Class Motion_CloudGrid : Inherits TaskParent
     Public Sub New()
         If standalone Then task.gOptions.showMotionMask.Checked = True
 
-        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 255)
+        dst2 = New Mat(dst2.Size, MatType.CV_8U, 255)
         desc = "Find all the grid rects that had motion since the last frame."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -432,8 +432,8 @@ Public Class Motion_CloudGrid : Inherits TaskParent
         ' assume the disparity can be off by options.pixelError pixels
         Dim disparityCoefficient = options.pixelError / (task.calibData.baseline * task.calibData.leftIntrinsics.fx)
 
-        Static lastDepth As cv.Mat = task.pcSplit(2).Clone
-        Static lastMask As cv.Mat = task.depthmask.Clone
+        Static lastDepth As Mat = task.pcSplit(2).Clone
+        Static lastMask As Mat = task.depthmask.Clone
         motionSort.Clear()
         dst2.SetTo(0)
         Dim index As Integer
@@ -479,7 +479,7 @@ Public Class Motion_CloudPixel : Inherits TaskParent
     Dim options As New Options_MotionCloud
     Dim optionsAccum As New Options_AddWeighted
     Public Sub New()
-        dst0 = New cv.Mat(dst0.Size, cv.MatType.CV_32F, 0)
+        dst0 = New Mat(dst0.Size, MatType.CV_32F, 0)
         OptionParent.FindSlider("Accumulation weight of each image X100").Value = 50
         desc = "Find pixels whose variability exceeds the error estimate."
     End Sub
@@ -487,25 +487,25 @@ Public Class Motion_CloudPixel : Inherits TaskParent
         options.Run()
         optionsAccum.Run()
 
-        Static lastDepth As cv.Mat = task.pcSplit(2).Clone
+        Static lastDepth As Mat = task.pcSplit(2).Clone
 
         ' assume the disparity can be off by options.pixelError pixels
         Dim disparityCoefficient As Single = options.pixelError / (task.calibData.baseline * task.calibData.leftIntrinsics.fx)
 
-        Dim errorMat As New cv.Mat
+        Dim errorMat As New Mat
         Multiply(task.pcSplit(2), task.pcSplit(2), errorMat)
         errorMat *= disparityCoefficient
 
-        Dim depthDelta As New cv.Mat
+        Dim depthDelta As New Mat
         Absdiff(task.pcSplit(2), lastDepth, depthDelta)
 
         Subtract(depthDelta, errorMat, dst2)
-        Threshold(dst2, dst2, 0, 255, cv.ThresholdTypes.Binary)
-        ' dst2.ConvertTo(dst2, cv.MatType.CV_8U)
+        Threshold(dst2, dst2, 0, 255, ThresholdTypes.Binary)
+        ' dst2.ConvertTo(dst2, MatType.CV_8U)
 
-        AccumulateWeighted(dst2, dst0, optionsAccum.accumWeighted, New cv.Mat)
-        dst0.ConvertTo(dst2, cv.MatType.CV_8U)
-        Threshold(dst2, dst2, 0, 255, cv.ThresholdTypes.Binary)
+        AccumulateWeighted(dst2, dst0, optionsAccum.accumWeighted, New Mat)
+        dst0.ConvertTo(dst2, MatType.CV_8U)
+        Threshold(dst2, dst2, 0, 255, ThresholdTypes.Binary)
 
         lastDepth = task.pcSplit(2).Clone
     End Sub

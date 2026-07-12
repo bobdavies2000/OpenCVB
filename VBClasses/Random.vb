@@ -1,7 +1,7 @@
 Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 Public Class Random_Basics : Inherits TaskParent
-    Public PointList As New List(Of cv.Point2f)
-    Public range As cv.Rect
+    Public PointList As New List(Of Point2f)
+    Public range as cv.Rect
     Public options As New Options_Random
     Public Sub New()
         range = New cv.Rect(0, 0, dst2.Cols, dst2.Rows)
@@ -13,13 +13,13 @@ Public Class Random_Basics : Inherits TaskParent
         Dim sizeRequest = options.count
         PointList.Clear()
         While PointList.Count < sizeRequest
-            PointList.Add(New cv.Point2f(msRNG.Next(range.X, range.X + range.Width),
+            PointList.Add(New Point2f(msRNG.Next(range.X, range.X + range.Width),
                                                       msRNG.Next(range.Y, range.Y + range.Height)))
         End While
         If standaloneTest() Then
             dst2.SetTo(0)
             For Each pt In PointList
-            Circle(dst2, pt, task.DotSize, cv.Scalar.Yellow, -1, task.lineType)
+            Circle(dst2, pt, task.DotSize, Scalar.Yellow, -1, task.lineType)
             Next
         End If
     End Sub
@@ -30,8 +30,8 @@ End Class
 
 
 Public Class Random_Point2d : Inherits TaskParent
-    Public PointList As New List(Of cv.Point2d)
-    Public range As cv.Rect
+    Public PointList As New List(Of Point2d)
+    Public range as cv.Rect
     Dim options As New Options_Random
     Public Sub New()
         range = New cv.Rect(0, 0, dst2.Cols, dst2.Rows)
@@ -42,12 +42,12 @@ Public Class Random_Point2d : Inherits TaskParent
 
         PointList.Clear()
         For i = 0 To options.count - 1
-            PointList.Add(New cv.Point2d(msRNG.Next(range.X, range.X + range.Width), msRNG.Next(range.Y, range.Y + range.Height)))
+            PointList.Add(New Point2d(msRNG.Next(range.X, range.X + range.Width), msRNG.Next(range.Y, range.Y + range.Height)))
         Next
         If standaloneTest() Then
             dst2.SetTo(0)
             For Each pt In PointList
-            Circle(dst2, New cv.Point2f(pt.X, pt.Y), task.DotSize, task.highlight, -1, task.lineType)
+            Circle(dst2, New Point2f(pt.X, pt.Y), task.DotSize, task.highlight, -1, task.lineType)
             Next
         End If
     End Sub
@@ -60,7 +60,7 @@ End Class
 
 Public Class Random_Enumerable : Inherits TaskParent
     Public options As New Options_Random
-    Public points() As cv.Point2f
+    Public points() As Point2f
     Public Sub New()
         OptionParent.FindSlider("Random Pixel Count").Value = 100
         desc = "Create an enumerable list of points using a lambda function"
@@ -68,13 +68,13 @@ Public Class Random_Enumerable : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
 
-        points = Enumerable.Range(0, options.count).Select(Of cv.Point2f)(
+        points = Enumerable.Range(0, options.count).Select(Of Point2f)(
                 Function(i)
-                    Return New cv.Point2f(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height))
+                    Return New Point2f(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height))
                 End Function).ToArray
         dst2.SetTo(0)
         For Each pt In points
-        Circle(dst2, pt, task.DotSize, cv.Scalar.Yellow, -1, task.lineType)
+        Circle(dst2, pt, task.DotSize, Scalar.Yellow, -1, task.lineType)
         Next
     End Sub
 End Class
@@ -84,9 +84,9 @@ End Class
 
 
 Public Class Random_Basics3D : Inherits TaskParent
-    Public Points3f() As cv.Point3f
+    Public Points3f() As Point3f
     Dim options As New Options_Random
-    Public PointList As New List(Of cv.Point3f)
+    Public PointList As New List(Of Point3f)
     Public ranges() As Single = {0, dst2.Width, 0, dst2.Height, 0, task.MaxZmeters}
     Public Sub New()
         OptionParent.FindSlider("Random Pixel Count").Value = 20
@@ -98,12 +98,12 @@ Public Class Random_Basics3D : Inherits TaskParent
 
         PointList.Clear()
         For i = 0 To options.count - 1
-            PointList.Add(New cv.Point3f(msRNG.Next(ranges(0), ranges(1)), msRNG.Next(ranges(2), ranges(3)), msRNG.Next(ranges(4), ranges(5))))
+            PointList.Add(New Point3f(msRNG.Next(ranges(0), ranges(1)), msRNG.Next(ranges(2), ranges(3)), msRNG.Next(ranges(4), ranges(5))))
         Next
         If standaloneTest() Then
             dst2.SetTo(0)
             For Each pt In PointList
-            Circle(dst2, New cv.Point2f(pt.X, pt.Y), task.DotSize, cv.Scalar.Yellow, -1, task.lineType)
+            Circle(dst2, New Point2f(pt.X, pt.Y), task.DotSize, Scalar.Yellow, -1, task.lineType)
             Next
         End If
         Points3f = PointList.ToArray
@@ -116,8 +116,8 @@ End Class
 
 
 Public Class Random_Basics4D : Inherits TaskParent
-    Public vec4f() As cv.Vec4f
-    Public PointList As New List(Of cv.Vec4f)
+    Public vec4f() As Vec4f
+    Public PointList As New List(Of Vec4f)
     Public ranges() As Single = {0, dst2.Width, 0, dst2.Height, 0, task.MaxZmeters, 0, task.MaxZmeters}
     Dim options As New Options_Random
     Dim countSlider As System.Windows.Forms.TrackBar
@@ -129,13 +129,13 @@ Public Class Random_Basics4D : Inherits TaskParent
         PointList.Clear()
         Dim count = countSlider.Value
         For i = 0 To count - 1
-            PointList.Add(New cv.Vec4f(msRNG.Next(ranges(0), ranges(1)), msRNG.Next(ranges(2), ranges(3)),
+            PointList.Add(New Vec4f(msRNG.Next(ranges(0), ranges(1)), msRNG.Next(ranges(2), ranges(3)),
                                                msRNG.Next(ranges(4), ranges(5)), msRNG.Next(ranges(6), ranges(7))))
         Next
         If standaloneTest() Then
             dst2.SetTo(0)
             For Each v In PointList
-            Circle(dst2, New cv.Point2f(v(0), v(1)), task.DotSize, cv.Scalar.Yellow, -1, task.lineType)
+            Circle(dst2, New Point2f(v(0), v(1)), task.DotSize, Scalar.Yellow, -1, task.lineType)
             Next
         End If
         vec4f = PointList.ToArray
@@ -147,7 +147,7 @@ End Class
 
 
 Public Class XR_Random_Shuffle : Inherits TaskParent
-    Dim myRNG As New cv.RNG
+    Dim myRNG As New RNG
     Public Sub New()
         desc = "Use randomShuffle to reorder an image."
     End Sub
@@ -166,7 +166,7 @@ End Class
 Public Class XR_Random_LUTMask : Inherits TaskParent
     Dim random As New Random_Basics
     Dim km As New KMeans_Image
-    Dim lutMat As cv.Mat
+    Dim lutMat As Mat
     Public Sub New()
         desc = "Use a random Look-Up-Table to modify few colors in a kmeans image."
         labels(3) = "kmeans run to get colors"
@@ -174,12 +174,12 @@ Public Class XR_Random_LUTMask : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         If task.heartBeat Or task.frameCount < 10 Then
             random.Run(src)
-            lutMat = New cv.Mat(New cv.Size(1, 256), cv.MatType.CV_8UC3, cv.Scalar.All(0))
+            lutMat = New Mat(New Size(1, 256), MatType.CV_8UC3, Scalar.All(0))
             Dim lutIndex = 0
             km.Run(src)
             dst2 = km.dst2
             For Each pt In random.PointList
-                lutMat.Set(lutIndex, 0, dst2.Get(Of cv.Vec3b)(pt.Y, pt.X))
+                lutMat.Set(lutIndex, 0, dst2.Get(Of Vec3b)(pt.Y, pt.X))
                 lutIndex += 1
                 If lutIndex >= lutMat.Rows Then Exit For
             Next
@@ -201,7 +201,7 @@ Public Class Random_UniformDist : Inherits TaskParent
         desc = "Create a uniform distribution."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
+        dst2 = New Mat(dst2.Size(), MatType.CV_8U, Scalar.All(0))
         Randu(dst2, minVal, maxVal)
     End Sub
 End Class
@@ -219,8 +219,8 @@ Public Class Random_NormalDist : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
 
-        If options.grayChecked And dst2.Channels() <> 1 Then dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U)
-        Randn(dst2, New cv.Scalar(options.blueVal, options.greenVal, options.redVal), cv.Scalar.All(options.stdev))
+        If options.grayChecked And dst2.Channels() <> 1 Then dst2 = New Mat(dst2.Size(), MatType.CV_8U)
+        Randn(dst2, New Scalar(options.blueVal, options.greenVal, options.redVal), Scalar.All(options.stdev))
     End Sub
 End Class
 
@@ -316,10 +316,10 @@ Public Class XR_Random_PatternGenerator_CPP : Inherits TaskParent
         desc = "Generate random patterns for use with 'Random Pattern Calibration'"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        Dim dataSrc(src.Total - 1) As cv.Vec3b
-        src.GetArray(Of cv.Vec3b)(dataSrc)
+        Dim dataSrc(src.Total - 1) As Vec3b
+        src.GetArray(Of Vec3b)(dataSrc)
         Dim imagePtr = Random_PatternGenerator_Run(cPtr, src.Rows, src.Cols)
-        dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, cv.MatType.CV_8UC1, imagePtr).Clone
+        dst2 = Mat.FromPixelData(src.Rows, src.Cols, MatType.CV_8UC1, imagePtr).Clone
     End Sub
     Protected Overrides Sub Finalize()
         If cPtr <> 0 Then cPtr = Random_PatternGenerator_Close(cPtr)
@@ -334,13 +334,13 @@ End Class
 
 
 Public Class Random_CustomDistribution : Inherits TaskParent
-    Public inputCDF As New cv.Mat ' place a cumulative distribution function here (or just put the histogram that reflects the desired random number distribution)
-    Public outputRandom = New cv.Mat(10000, 1, cv.MatType.CV_32S, cv.Scalar.All(0)) ' allocate the desired number of random numbers - size can be just one to get the next random value
-    Public outputHistogram As cv.Mat
+    Public inputCDF As New Mat ' place a cumulative distribution function here (or just put the histogram that reflects the desired random number distribution)
+    Public outputRandom = New Mat(10000, 1, MatType.CV_32S, Scalar.All(0)) ' allocate the desired number of random numbers - size can be just one to get the next random value
+    Public outputHistogram As Mat
     Public plot As New PlotBar_Basics
     Public Sub New()
         Dim loadedDice() As Single = {1, 3, 0.5, 0.5, 0.75, 0.25}
-        inputCDF = cv.Mat.FromPixelData(loadedDice.Length, 1, cv.MatType.CV_32F, loadedDice)
+        inputCDF = Mat.FromPixelData(loadedDice.Length, 1, MatType.CV_32F, loadedDice)
         desc = "Create a custom random number distribution from any histogram"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -355,7 +355,7 @@ Public Class Random_CustomDistribution : Inherits TaskParent
                 inputCDF.Set(Of Single)(i, 0, inputCDF.Get(Of Single)(i - 1, 0) + inputCDF.Get(Of Single)(i, 0))
             Next
         End If
-        outputHistogram = New cv.Mat(inputCDF.Size(), cv.MatType.CV_32F, cv.Scalar.All(0))
+        outputHistogram = New Mat(inputCDF.Size(), MatType.CV_32F, Scalar.All(0))
         Dim size = outputHistogram.Rows
         For i = 0 To outputRandom.rows - 1
             Dim uniformR1 = msRNG.NextDouble()
@@ -382,7 +382,7 @@ End Class
 Public Class XR_Random_MonteCarlo : Inherits TaskParent
     Public plot As New PlotBar_Basics
     Dim options As New Options_MonteCarlo
-    Public outputRandom = New cv.Mat(New cv.Size(1, 4000), cv.MatType.CV_32S, 0) ' allocate the desired number of random numbers - size can be just one to get the next random value
+    Public outputRandom = New Mat(New Size(1, 4000), MatType.CV_32S, 0) ' allocate the desired number of random numbers - size can be just one to get the next random value
     Public Sub New()
         plot.maxRange = 100
         desc = "Generate random numbers but prefer higher values - a linearly increasing random distribution"
@@ -390,7 +390,7 @@ Public Class XR_Random_MonteCarlo : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
 
-        Dim histogram = New cv.Mat(options.dimension, 1, cv.MatType.CV_32F, cv.Scalar.All(0))
+        Dim histogram = New Mat(options.dimension, 1, MatType.CV_32F, Scalar.All(0))
         For i = 0 To outputRandom.rows - 1
             While (1)
                 Dim r1 = msRNG.NextDouble()
@@ -419,9 +419,9 @@ End Class
 Public Class XR_Random_CustomHistogram : Inherits TaskParent
     Public random As New Random_CustomDistribution
     Public hist As New Histogram_Simple
-    Public saveHist As cv.Mat
+    Public saveHist As Mat
     Public Sub New()
-        random.outputRandom = New cv.Mat(1000, 1, cv.MatType.CV_32S, cv.Scalar.All(0))
+        random.outputRandom = New Mat(1000, 1, MatType.CV_32S, Scalar.All(0))
 
         labels(2) = "Histogram of the grayscale image"
         labels(3) = "Custom random distribution that reflects dst2 image"
@@ -503,19 +503,19 @@ Public Class XR_Random_StaticTVFaster : Inherits TaskParent
         dst2 = task.gray
 
         random.Run(src)
-        Threshold(random.dst2, mats.mat(0), 255 - percentSlider.Value * 255 / 100, 255, cv.ThresholdTypes.Binary)
-        Dim nochangeMask As New cv.Mat
-        Threshold(random.dst2, nochangeMask, 255 - percentSlider.Value * 255 / 100, 255, cv.ThresholdTypes.BinaryInv)
+        Threshold(random.dst2, mats.mat(0), 255 - percentSlider.Value * 255 / 100, 255, ThresholdTypes.Binary)
+        Dim nochangeMask As New Mat
+        Threshold(random.dst2, nochangeMask, 255 - percentSlider.Value * 255 / 100, 255, ThresholdTypes.BinaryInv)
 
-        Dim valMat As New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
-        Randu(valMat, cv.Scalar.All(0), cv.Scalar.All(valSlider.Value))
+        Dim valMat As New Mat(dst2.Size(), MatType.CV_8U, Scalar.All(0))
+        Randu(valMat, Scalar.All(0), Scalar.All(valSlider.Value))
         valMat.SetTo(0, nochangeMask)
 
         random.Run(src)
-        Dim plusMask As New cv.Mat
-        Threshold(random.dst2, plusMask, 128, 255, cv.ThresholdTypes.Binary)
-        Dim minusMask As New cv.Mat
-         Threshold(random.dst2, minusMask, 128, 255, cv.ThresholdTypes.BinaryInv)
+        Dim plusMask As New Mat
+        Threshold(random.dst2, plusMask, 128, 255, ThresholdTypes.Binary)
+        Dim minusMask As New Mat
+         Threshold(random.dst2, minusMask, 128, 255, ThresholdTypes.BinaryInv)
 
         mats.mat(2) = plusMask
         mats.mat(3) = minusMask
@@ -548,19 +548,19 @@ Public Class XR_Random_StaticTVFastSimple : Inherits TaskParent
         dst2 = task.gray
 
         random.Run(src)
-        Dim nochangeMask As New cv.Mat
-        Threshold(random.dst2, nochangeMask, 255 - percentSlider.Value * 255 / 100, 255, cv.ThresholdTypes.BinaryInv)
+        Dim nochangeMask As New Mat
+        Threshold(random.dst2, nochangeMask, 255 - percentSlider.Value * 255 / 100, 255, ThresholdTypes.BinaryInv)
 
-        dst3 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U)
-        Randu(dst3, cv.Scalar.All(0), cv.Scalar.All(valSlider.Value))
+        dst3 = New Mat(dst2.Size(), MatType.CV_8U)
+        Randu(dst3, Scalar.All(0), Scalar.All(valSlider.Value))
         dst3.SetTo(0, nochangeMask)
 
-        Dim tmp As New cv.Mat(dst2.Size(), cv.MatType.CV_8U)
+        Dim tmp As New Mat(dst2.Size(), MatType.CV_8U)
         Randu(tmp, 0, 255)
-        Dim plusMask As New cv.Mat
-        Threshold(tmp, plusMask, 128, 255, cv.ThresholdTypes.Binary)
-        Dim minusMask As New cv.Mat
-        Threshold(tmp, minusMask, 128, 255, cv.ThresholdTypes.BinaryInv)
+        Dim plusMask As New Mat
+        Threshold(tmp, plusMask, 128, 255, ThresholdTypes.Binary)
+        Dim minusMask As New Mat
+        Threshold(tmp, minusMask, 128, 255, ThresholdTypes.BinaryInv)
 
         Add(dst2, dst3, dst2, plusMask)
         Subtract(dst2, dst3, dst2, minusMask)
@@ -575,21 +575,21 @@ End Class
 
 Public Class XR_Random_KalmanPoints : Inherits TaskParent
     Dim random As New Random_Basics
-    Dim targetSet As New List(Of cv.Point2f)
-    Dim currSet As New List(Of cv.Point2f)
+    Dim targetSet As New List(Of Point2f)
+    Dim currSet As New List(Of Point2f)
     Dim refreshPoints As Boolean = True
     Dim kalman As New Kalman_Basics
     Public Sub New()
         Dim offset = dst2.Width / 5
         random.range = New cv.Rect(offset, offset, Math.Abs(dst2.Width - offset * 2), Math.Abs(dst2.Height - offset * 2))
         OptionParent.FindSlider("Random Pixel Count").Value = 10
-        desc = "Smoothly transition a random point from location to location."
+        desc = "Smoothly transition a random cv.Point from location to location."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If refreshPoints Then
             random.Run(src)
-            targetSet = New List(Of cv.Point2f)(random.PointList)
-            currSet = New List(Of cv.Point2f)(random.PointList) ' just to get the updated size
+            targetSet = New List(Of Point2f)(random.PointList)
+            currSet = New List(Of Point2f)(random.PointList) ' just to get the updated size
             refreshPoints = False
 
             If targetSet.Count * 2 <> kalman.kInput.Length Then ReDim kalman.kInput(targetSet.Count * 2 - 1)
@@ -609,8 +609,8 @@ Public Class XR_Random_KalmanPoints : Inherits TaskParent
 
         dst2.SetTo(0)
         For i = 0 To currSet.Count - 1
-        Circle(dst2, currSet(i), task.DotSize + 2, cv.Scalar.Yellow, -1, task.lineType)
-        Circle(dst2, targetSet(i), task.DotSize + 2, cv.Scalar.Red, -1, task.lineType)
+        Circle(dst2, currSet(i), task.DotSize + 2, Scalar.Yellow, -1, task.lineType)
+        Circle(dst2, targetSet(i), task.DotSize + 2, Scalar.Red, -1, task.lineType)
         Next
 
         Dim noChanges As Boolean = True
@@ -632,12 +632,12 @@ End Class
 
 Public Class Random_Clusters : Inherits TaskParent
     Public clusterLabels As New List(Of List(Of Integer))
-    Public clusters As New List(Of List(Of cv.Point2f))
+    Public clusters As New List(Of List(Of Point2f))
     Dim options As New Options_Clusters
     Public Sub New()
-        task.scalarColors(0) = cv.Scalar.Yellow
-        task.scalarColors(1) = cv.Scalar.Blue
-        task.scalarColors(2) = cv.Scalar.Red
+        task.scalarColors(0) = Scalar.Yellow
+        task.scalarColors(1) = Scalar.Blue
+        task.scalarColors(2) = Scalar.Red
         labels = {"", "", "Colorized sets", ""}
         desc = "Use OpenCV's randN API to create a cluster around a random mean with a requested stdev"
     End Sub
@@ -645,17 +645,17 @@ Public Class Random_Clusters : Inherits TaskParent
         If Not task.heartBeat Then Exit Sub
         options.Run()
 
-        Dim ptMat As cv.Mat = New cv.Mat(1, 1, cv.MatType.CV_32FC2)
+        Dim ptMat As Mat = New Mat(1, 1, MatType.CV_32FC2)
         dst2.SetTo(0)
         clusters.Clear()
         clusterLabels.Clear()
         For i = 0 To options.numClusters - 1
-            Dim mean = New cv.Scalar(msRNG.Next(dst2.Width / 8, dst2.Width * 7 / 8), msRNG.Next(dst2.Height / 8, dst2.Height * 7 / 8), 0)
-            Dim cList As New List(Of cv.Point2f)
+            Dim mean = New Scalar(msRNG.Next(dst2.Width / 8, dst2.Width * 7 / 8), msRNG.Next(dst2.Height / 8, dst2.Height * 7 / 8), 0)
+            Dim cList As New List(Of Point2f)
             Dim labelList As New List(Of Integer)
             For j = 0 To options.numPoints - 1
-                Randn(ptMat, mean, cv.Scalar.All(options.stdev))
-                Dim pt = ptMat.Get(Of cv.Point2f)(0, 0)
+                Randn(ptMat, mean, Scalar.All(options.stdev))
+                Dim pt = ptMat.Get(Of Point2f)(0, 0)
                 If pt.X < 0 Then pt.X = 0
                 If pt.X >= dst2.Width Then pt.X = dst2.Width - 1
                 If pt.Y < 0 Then pt.Y = 0

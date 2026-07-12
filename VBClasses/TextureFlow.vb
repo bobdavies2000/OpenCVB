@@ -9,13 +9,13 @@ Public Class TextureFlow_Basics : Inherits TaskParent
 
         dst2 = src.Clone
         If src.Channels() <> 1 Then CvtColor(src, src, OpenCvSharp.ColorConversionCodes.BGR2GRAY)
-        Dim eigen As New cv.Mat
+        Dim eigen As New Mat
         CornerEigenValsAndVecs(src, eigen, options.TFblockSize, options.TFksize)
-        Dim splitMats() As cv.Mat = Split(eigen)
+        Dim splitMats() As Mat = Split(eigen)
         Dim d2 = options.TFdelta / 2
         For y = d2 To dst2.Height - 1 Step d2
             For x = d2 To dst2.Width - 1 Step d2
-                Dim delta = New cv.Point2f(splitMats(4).Get(Of Single)(y, x), splitMats(5).Get(Of Single)(y, x)) * options.TFdelta
+                Dim delta = New Point2f(splitMats(4).Get(Of Single)(y, x), splitMats(5).Get(Of Single)(y, x)) * options.TFdelta
                 Dim p1 = New cv.Point(CInt(x - delta.X), CInt(y - delta.Y))
                 Dim p2 = New cv.Point(CInt(x + delta.X), CInt(y + delta.Y))
                 Line(dst2, p1, p2, white, task.lineWidth, task.lineType)
@@ -54,8 +54,8 @@ Public Class XR_TextureFlow_Reduction : Inherits TaskParent
         reduction.Run(src)
         dst2 = reduction.dst2
 
-        Dim _flow_cvt As New cv.Mat
-        CvtColor(reduction.dst2, _flow_cvt, cv.ColorConversionCodes.GRAY2BGR)
+        Dim _flow_cvt As New Mat
+        CvtColor(reduction.dst2, _flow_cvt, ColorConversionCodes.GRAY2BGR)
         flow.Run(_flow_cvt)
         dst3 = flow.dst2
     End Sub
@@ -102,9 +102,9 @@ Public Class XR_TextureFlow_Bricks : Inherits TaskParent
 
         knn.trainInput.Clear()
         For Each pt In bPoint.bestBricks
-            knn.trainInput.Add(New cv.Point2f(pt.X, pt.Y))
+            knn.trainInput.Add(New Point2f(pt.X, pt.Y))
         Next
-        knn.queries = New List(Of cv.Point2f)(knn.trainInput)
+        knn.queries = New List(Of Point2f)(knn.trainInput)
         knn.Run(emptyMat)
 
         For i = 0 To knn.queries.Count - 1

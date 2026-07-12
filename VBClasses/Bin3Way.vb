@@ -131,7 +131,7 @@ Public Class XR_Bin3Way_RedColorOther : Inherits TaskParent
     Dim flood As New Flood_BasicsMask
     Dim color8U As New Color8U_Basics
     Public Sub New()
-        flood.inputRemoved = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
+        flood.inputRemoved = New Mat(dst2.Size(), MatType.CV_8U, Scalar.All(0))
         desc = "Use RedColor with the regions that are neither lightest or darkest"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -154,7 +154,7 @@ End Class
 Public Class Bin3Way_GrayScale : Inherits TaskParent
     Dim bin3 As New Bin3Way_KMeans
     Public Sub New()
-        dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
+        dst2 = New Mat(dst2.Size(), MatType.CV_8U, Scalar.All(0))
         desc = "Build the palette input that best separates the light and dark regions of an image"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -175,7 +175,7 @@ Public Class Bin3Way_RedColor : Inherits TaskParent
     Dim redC As New RedColor_Basics
     Dim bin3 As New Bin3Way_GrayScale
     Public Sub New()
-        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        dst2 = New Mat(dst2.Size, MatType.CV_8U, 0)
         labels(3) = "The output of all 3 RedColor runs are combined below."
         desc = "Combine the results of the 3 different RedColor runs..."
     End Sub

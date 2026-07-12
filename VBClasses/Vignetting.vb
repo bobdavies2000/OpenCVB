@@ -15,13 +15,13 @@ Public Class Vignetting_Basics : Inherits TaskParent
 
         If task.clickPoint <> newPoint Then center = task.clickPoint
 
-        Dim cppData(src.Total - 1) As cv.Vec3b
-        src.GetArray(Of cv.Vec3b)(cppData)
+        Dim cppData(src.Total - 1) As Vec3b
+        src.GetArray(Of Vec3b)(cppData)
         Dim handleSrc = GCHandle.Alloc(cppData, GCHandleType.Pinned)
         Dim imagePtr = Vignetting_RunCPP(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, options.radius, center.X, center.Y, removeVig)
         handleSrc.Free()
 
-        dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, cv.MatType.CV_8UC3, imagePtr).Clone
+        dst2 = Mat.FromPixelData(src.Rows, src.Cols, MatType.CV_8UC3, imagePtr).Clone
     End Sub
     Protected Overrides Sub Finalize()
         If cPtr <> 0 Then cPtr = Vignetting_Close(cPtr)
@@ -58,12 +58,12 @@ Public Class XR_Vignetting_VB : Inherits TaskParent
                 Dim pt = New cv.Point(x, y)
                 Dim cos = fastCos(CDbl(pt.DistanceTo(center) / maxDist))
                 cos *= cos
-                Dim val = src.Get(Of cv.Vec3b)(y, x)
+                Dim val = src.Get(Of Vec3b)(y, x)
                 For i = 0 To 2
                     If (removeVig) Then tmp = Math.Floor(CDbl(val(i) / cos)) Else tmp = Math.Floor(CDbl(val(i) * cos))
                     val(i) = If(tmp > 255, 255, tmp)
                 Next
-                dst2.Set(Of cv.Vec3b)(y, x, val)
+                dst2.Set(Of Vec3b)(y, x, val)
             Next
         Next
     End Sub
@@ -76,7 +76,7 @@ End Class
 ' https://github.com/dajuric/dot-devignetting
 Public Class Vignetting_Removal : Inherits TaskParent
     Dim basics As New Vignetting_Basics
-    Dim defaultImage As cv.Mat
+    Dim defaultImage As Mat
     Public Sub New()
         basics.removeVig = True
         labels = {"", "", "Vignetted input - click anywhere to adjust the center of the vignetting.", "The devignetted output - brighter, more vivid colors."}

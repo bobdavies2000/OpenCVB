@@ -1,14 +1,14 @@
 ﻿Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 ' https://www.programcreek.com/python/example/89459/cv2.getRotationMatrix2D
 Public Class Rotate_Basics : Inherits TaskParent
-    Public M As cv.Mat
-    Public Mflip As cv.Mat
+    Public M As Mat
+    Public Mflip As Mat
     Public options As New Options_Resize
     Public rotateAngle As Single = 1000
     Public rotateCenter As cv.Point
     Public optionsRotate As New Options_Rotate
     Public Sub New()
-        rotateCenter = New cv.Point2f(dst2.Width / 2, dst2.Height / 2)
+        rotateCenter = New Point2f(dst2.Width / 2, dst2.Height / 2)
         desc = "Rotate a rectangle by a specified angle"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -18,7 +18,7 @@ Public Class Rotate_Basics : Inherits TaskParent
         rotateAngle = optionsRotate.rotateAngle
         M = GetRotationMatrix2D(rotateCenter, -rotateAngle, 1)
         WarpAffine(src, dst2, M, src.Size(), options.warpFlag)
-        If options.warpFlag = cv.InterpolationFlags.WarpInverseMap Then
+        If options.warpFlag = InterpolationFlags.WarpInverseMap Then
             Mflip = GetRotationMatrix2D(rotateCenter, rotateAngle, 1)
         End If
         labels(2) = "Image after rotation by " + rotateAngle.ToString(fmt3)
@@ -47,20 +47,20 @@ Public Class XR_Rotate_Box : Inherits TaskParent
         dst2 = src.Clone()
         Rectangle(dst2, r, white, 1)
 
-        Dim center = New cv.Point2f(r.X + r.Width / 2, r.Y + r.Height / 2)
-        Dim drawBox = New cv.RotatedRect(center, New cv.Size2f(r.Width, r.Height), 0)
-        Dim boxPoints = cv.Cv2.BoxPoints(drawBox)
-        Dim srcPoints = cv.Mat.FromPixelData(1, 4, cv.MatType.CV_32FC2, boxPoints)
-        Dim dstpoints As New cv.Mat
+        Dim center = New Point2f(r.X + r.Width / 2, r.Y + r.Height / 2)
+        Dim drawBox = New RotatedRect(center, New Size2f(r.Width, r.Height), 0)
+        Dim boxPoints = Cv2.BoxPoints(drawBox)
+        Dim srcPoints = Mat.FromPixelData(1, 4, MatType.CV_32FC2, boxPoints)
+        Dim dstpoints As New Mat
 
-        If rotation.options.warpFlag <> cv.InterpolationFlags.WarpInverseMap Then
+        If rotation.options.warpFlag <> InterpolationFlags.WarpInverseMap Then
             Transform(srcPoints, dstpoints, rotation.M)
         Else
             Transform(srcPoints, dstpoints, rotation.Mflip)
         End If
         For i = 0 To dstpoints.Width - 1
-            Dim p1 = dstpoints.Get(Of cv.Point2f)(0, i)
-            Dim p2 = dstpoints.Get(Of cv.Point2f)(0, (i + 1) Mod 4)
+            Dim p1 = dstpoints.Get(Of Point2f)(0, i)
+            Dim p2 = dstpoints.Get(Of Point2f)(0, (i + 1) Mod 4)
             Line(dst3, p1, p2, white, task.lineWidth + 1, task.lineType)
         Next
     End Sub
@@ -82,7 +82,7 @@ Public Class XR_Rotate_Example : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         Dim r = New cv.Rect(0, 0, src.Height, src.Height)
-        Resize(src, dst2(r), New cv.Size(src.Height, src.Height))
+        Resize(src, dst2(r), New Size(src.Height, src.Height))
         rotate.Run(dst2)
         dst3(r) = rotate.dst2(New cv.Rect(0, 0, src.Height, src.Height))
     End Sub
@@ -98,14 +98,14 @@ End Class
 ' https://www.programcreek.com/python/example/89459/cv2.getRotationMatrix2D
 Public Class Rotate_BasicsQT : Inherits TaskParent
     Public rotateAngle As Double
-    Public rotateCenter As cv.Point2f
+    Public rotateCenter As Point2f
     Public Sub New()
-        rotateCenter = New cv.Point2f(dst2.Width / 2, dst2.Height / 2)
+        rotateCenter = New Point2f(dst2.Width / 2, dst2.Height / 2)
         desc = "Rotate a rectangle by a specified angle"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         Dim M = GetRotationMatrix2D(rotateCenter, -rotateAngle, 1)
-        WarpAffine(src, dst2, M, src.Size(), cv.InterpolationFlags.Nearest)
+        WarpAffine(src, dst2, M, src.Size(), InterpolationFlags.Nearest)
     End Sub
 End Class
 

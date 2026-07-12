@@ -1,8 +1,8 @@
 ﻿Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 Public Class PlotMouse_Basics : Inherits TaskParent
     Public plotHist As New PlotBar_Basics
-    Public histogram As New cv.Mat
-    Public mask As New cv.Mat
+    Public histogram As New Mat
+    Public mask As New Mat
     Public Sub New()
         plotHist.removeZeroEntry = False
         plotHist.createHistogram = True
@@ -36,9 +36,9 @@ Public Class PlotMouse_Basics : Inherits TaskParent
 
         Dim minRange = (plotHist.ranges(0).End - plotHist.ranges(0).Start) * histIndex / task.histogramBins
         Dim maxRange = (plotHist.ranges(0).End - plotHist.ranges(0).Start) * (histIndex + 1) / task.histogramBins
-        Dim bpRanges = New cv.Rangef() {New cv.Rangef(minRange, maxRange)}
+        Dim bpRanges = New Rangef() {New Rangef(minRange, maxRange)}
         CalcBackProject({src}, {0}, plotHist.histogram, mask, bpRanges)
-        mask.ConvertTo(mask, cv.MatType.CV_8U)
+        mask.ConvertTo(mask, MatType.CV_8U)
 
         If mask.Size = dst3.Size Then dst3.SetTo(task.highlight, mask)
         Dim count = CountNonZero(mask)
@@ -47,7 +47,7 @@ Public Class PlotMouse_Basics : Inherits TaskParent
         Dim barCount = plotHist.histArray(histIndex)
         labels(2) = "Selection highlighted is " + CStr(histIndex) + " and shows " + CStr(barCount) + " (or " +
                     (barCount / src.Total).ToString("0%") + ") samples"
-                    Rectangle(dst2, New cv.Rect(CInt(histIndex) * barWidth, 0, barWidth, dst2.Height), cv.Scalar.Yellow, task.lineWidth)
+                    Rectangle(dst2, New cv.Rect(CInt(histIndex) * barWidth, 0, barWidth, dst2.Height), Scalar.Yellow, task.lineWidth)
     End Sub
 End Class
 
@@ -56,9 +56,9 @@ End Class
 
 Public Class PlotMouse_Basics32F : Inherits TaskParent
     Public plotHist As New PlotBar_Basics
-    Public histogram As New cv.Mat
-    Dim ranges() As cv.Rangef
-    Public mask As New cv.Mat
+    Public histogram As New Mat
+    Dim ranges() As Rangef
+    Public mask As New Mat
     Public Sub New()
         plotHist.minRange = -0.01
         plotHist.maxRange = task.MaxZmeters
@@ -71,8 +71,8 @@ Public Class PlotMouse_Basics32F : Inherits TaskParent
 
         If src.Channels <> 1 Then src = task.pcSplit(2)
 
-        ranges = {New cv.Rangef(0, task.MaxZmeters)}
-        CalcHist({src}, {0}, New cv.Mat, histogram, 1, {task.histogramBins}, ranges)
+        ranges = {New Rangef(0, task.MaxZmeters)}
+        CalcHist({src}, {0}, New Mat, histogram, 1, {task.histogramBins}, ranges)
 
         plotHist.histogram = histogram
         plotHist.Run(plotHist.histogram)
@@ -88,16 +88,16 @@ Public Class PlotMouse_Basics32F : Inherits TaskParent
 
         Dim minRange = (ranges(0).End - ranges(0).Start) * histIndex / task.histogramBins
         Dim maxRange = (ranges(0).End - ranges(0).Start) * (histIndex + 1) / task.histogramBins
-        Dim bpRanges = New cv.Rangef() {New cv.Rangef(minRange, maxRange)}
+        Dim bpRanges = New Rangef() {New Rangef(minRange, maxRange)}
         CalcBackProject({src}, {0}, histogram, mask, bpRanges)
-        mask.ConvertTo(mask, cv.MatType.CV_8U)
+        mask.ConvertTo(mask, MatType.CV_8U)
 
         Dim maskCount = CountNonZero(mask)
         If mask.Size = dst3.Size Then dst3.SetTo(task.highlight, mask)
         labels(3) = "BackProjected pixel (% of image) = " + (maskCount / src.Total).ToString("0%")
 
         labels(2) = "Histogram Depth to " + task.MaxZmeters.ToString("0.0") + " m"
-        Rectangle(dst2, New cv.Rect(CInt(histIndex) * barWidth, 0, barWidth, dst2.Height), cv.Scalar.Yellow, task.lineWidth)
+        Rectangle(dst2, New cv.Rect(CInt(histIndex) * barWidth, 0, barWidth, dst2.Height), Scalar.Yellow, task.lineWidth)
     End Sub
 End Class
 
@@ -108,7 +108,7 @@ Public Class PlotMouse_Correlation : Inherits TaskParent
     Public plotHist As New PlotBar_Basics
     Dim corr As New Correlation_BasicsPlot
     Public Sub New()
-        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
+        dst1 = New Mat(dst1.Size, MatType.CV_8U, 0)
         plotHist.minRange = 0
         plotHist.maxRange = 2
         plotHist.createHistogram = False
@@ -134,7 +134,7 @@ Public Class PlotMouse_Correlation : Inherits TaskParent
             End If
         Next
 
-        Dim histInput As cv.Mat = cv.Mat.FromPixelData(histogram.Count, 1, cv.MatType.CV_32F, histogram)
+        Dim histInput As Mat = Mat.FromPixelData(histogram.Count, 1, MatType.CV_32F, histogram)
         plotHist.Run(histInput)
         dst2 = plotHist.dst2
         labels(3) = plotHist.labels(2)
@@ -151,8 +151,8 @@ Public Class PlotMouse_Correlation : Inherits TaskParent
 
         Dim actualCount = CountNonZero(dst0)
         dst3 = task.color.Clone
-        dst3.SetTo(cv.Scalar.Yellow, dst0)
-        Rectangle(dst2, New cv.Rect(CInt(histIndex) * barWidth, 0, barWidth, dst2.Height), cv.Scalar.Yellow, task.lineWidth)
+        dst3.SetTo(Scalar.Yellow, dst0)
+        Rectangle(dst2, New cv.Rect(CInt(histIndex) * barWidth, 0, barWidth, dst2.Height), Scalar.Yellow, task.lineWidth)
     End Sub
 End Class
 
@@ -226,7 +226,7 @@ Public Class PlotMouse_MaskBackProject : Inherits TaskParent
 
         Dim minRange = (hist.ranges(0).End - hist.ranges(0).Start) * histIndex / task.histogramBins
         Dim maxRange = (hist.ranges(0).End - hist.ranges(0).Start) * (histIndex + 1) / task.histogramBins
-        Dim bpRanges = New cv.Rangef() {New cv.Rangef(minRange, maxRange)}
+        Dim bpRanges = New Rangef() {New Rangef(minRange, maxRange)}
 
         If Single.IsNaN(minRange) Or Single.IsInfinity(minRange) Or
            Single.IsNaN(maxRange) Or Single.IsInfinity(maxRange) Then
@@ -234,11 +234,11 @@ Public Class PlotMouse_MaskBackProject : Inherits TaskParent
             Exit Sub
         End If
 
-        Dim ranges() = New cv.Rangef() {New cv.Rangef(minRange, maxRange)}
+        Dim ranges() = New Rangef() {New Rangef(minRange, maxRange)}
 
         CalcBackProject({task.gray}, {0}, hist.histogram, dst1, ranges)
         dst3.SetTo(task.highlight, dst1)
-        Rectangle(dst2, New cv.Rect(CInt(histIndex * barWidth), 0, barWidth, dst2.Height), cv.Scalar.Yellow, task.lineWidth)
+        Rectangle(dst2, New cv.Rect(CInt(histIndex * barWidth), 0, barWidth, dst2.Height), Scalar.Yellow, task.lineWidth)
         labels(3) = CStr(CountNonZero(dst1)) + " pixels in the back projection."
     End Sub
 End Class

@@ -17,7 +17,7 @@ Public Class LineTrack_Basics : Inherits TaskParent
             dst2 = task.color.Clone
             With task.longestLine
                 Line(dst2, .p1, .p2, task.highlight, task.lineWidth + 1)
-                SetTrueText(CStr(.age), New cv.Point2f(.ptCenter.X + 2, .ptCenter.Y + 2), 2)
+                SetTrueText(CStr(.age), New Point2f(.ptCenter.X + 2, .ptCenter.Y + 2), 2)
             End With
         End If
         labels(2) = "The longest line has been present for " + CStr(task.longestLine.age) + " frames."
@@ -82,7 +82,7 @@ Public Class XR_LineTrack_Concat : Inherits TaskParent
     Public Sub New()
         If standalone Then task.gOptions.displayDst1.Checked = True
         labels(3) = "Correlation measures how similar the previous template is to the current one."
-        desc = "Concatenate the end point templates to return a single correlation to the previous frame."
+        desc = "Concatenate the end cv.Point templates to return a single correlation to the previous frame."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If task.optionsChanged Then
@@ -291,7 +291,7 @@ Public Class LineTrack_Slices : Inherits TaskParent
         desc = "Build slices in X and Y from the previous image near the each line's center."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        Static lpMapLast As cv.Mat = task.lines.dst1.Clone
+        Static lpMapLast As Mat = task.lines.dst1.Clone
 
         dst2.SetTo(0)
         xSlices.Clear()
@@ -334,22 +334,22 @@ Public Class LineTrack_Rect : Inherits TaskParent
     Dim bricks As New Brick_Basics
     Public lpInput1 As lpData
     Public lpInput2 As lpData
-    Public rotatedRect As cv.RotatedRect
+    Public rotatedRect As RotatedRect
     Public Sub New()
         desc = "Create a rectangle from 2 lines"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         bricks.Run(src)
         If standalone Then
-            Dim p1 = New cv.Point2f(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height))
-            Dim p2 = New cv.Point2f(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height))
-            Dim p3 = New cv.Point2f(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height))
-            Dim p4 = New cv.Point2f(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height))
+            Dim p1 = New Point2f(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height))
+            Dim p2 = New Point2f(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height))
+            Dim p3 = New Point2f(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height))
+            Dim p4 = New Point2f(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height))
             lpInput1 = New lpData(p1, p2)
             lpInput2 = New lpData(p3, p4)
         End If
 
-        Dim inputPoints() As cv.Point2f = {lpInput1.p1, lpInput1.p2, lpInput2.p1, lpInput2.p2}
+        Dim inputPoints() As Point2f = {lpInput1.p1, lpInput1.p2, lpInput2.p1, lpInput2.p2}
         rotatedRect = MinAreaRect(inputPoints)
         If standalone And task.heartBeat Then
             dst2.SetTo(0)
@@ -360,7 +360,7 @@ Public Class LineTrack_Rect : Inherits TaskParent
             Line(dst2, lpInput2.p1, lpInput2.p2, task.highlight, task.lineWidth, task.lineType)
             SetTrueText("Line 1", lpInput1.p1, 2)
             SetTrueText("Line 2", lpInput2.p1, 2)
-            Draw_Arc.DrawRotatedOutline(rotatedRect, dst2, cv.Scalar.Yellow)
+            Draw_Arc.DrawRotatedOutline(rotatedRect, dst2, Scalar.Yellow)
         End If
     End Sub
 End Class
@@ -407,10 +407,10 @@ Public Class XR_LineTrack_CenterNeighbor : Inherits TaskParent
                 If foundObjectLine Then Exit For
             Next
             If foundObjectLine Then
-                Line(dst2, lp.p1, lp.p2, task.highlight, task.lineWidth, cv.LineTypes.Link4)
+                Line(dst2, lp.p1, lp.p2, task.highlight, task.lineWidth, LineTypes.Link4)
                 depthLines += 1
             Else
-                Line(dst3, lp.p1, lp.p2, task.highlight, task.lineWidth, cv.LineTypes.Link4)
+                Line(dst3, lp.p1, lp.p2, task.highlight, task.lineWidth, LineTypes.Link4)
                 colorLines += 1
             End If
         Next
@@ -448,10 +448,10 @@ Public Class XR_LineTrack_CenterRange : Inherits TaskParent
             Dim index As Integer = task.gridMap.Get(Of Integer)(center.Y, center.X)
             Dim brick = bricks.brickList(index)
             If brick.mm.maxVal - brick.mm.minVal > depthThreshold Then
-                Line(dst2, lp.p1, lp.p2, task.highlight, task.lineWidth, cv.LineTypes.Link4)
+                Line(dst2, lp.p1, lp.p2, task.highlight, task.lineWidth, LineTypes.Link4)
                 depthLines += 1
             Else
-                Line(dst3, lp.p1, lp.p2, task.highlight, task.lineWidth, cv.LineTypes.Link4)
+                Line(dst3, lp.p1, lp.p2, task.highlight, task.lineWidth, LineTypes.Link4)
                 colorLines += 1
             End If
         Next
@@ -528,13 +528,13 @@ End Class
 
 
 Public Class XR_LineTrack_SearchX : Inherits TaskParent
-    Dim lastImage As cv.Mat
+    Dim lastImage As Mat
     Dim searchCount As Integer = 9
     Dim addw As New AddWeighted_Basics
     Public Sub New()
-        dst1 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
+        dst1 = New Mat(dst2.Size, MatType.CV_8U, 0)
+        dst2 = New Mat(dst2.Size, MatType.CV_8U, 0)
+        dst3 = New Mat(dst3.Size, MatType.CV_8U, 0)
         desc = "Confirm any camera motion using the task.lines output.  Needs work!"
     End Sub
     Private Function testOffset(compareIndex As Integer, i As Integer) As Integer
@@ -569,7 +569,7 @@ Public Class XR_LineTrack_SearchX : Inherits TaskParent
         Dim bestCount = countList.MinBy(Function(x) x.count)
         strOut += CStr(bestCount.index) + " is the index with the best count" + vbCrLf
 
-        Dim rect As cv.Rect
+        Dim rect as cv.Rect
         If bestCount.index < 0 Then
             rect = New cv.Rect(searchCount + bestCount.index, 0, dst2.Width - searchCount + bestCount.index,
                                dst2.Height)
@@ -602,7 +602,7 @@ Public Class XR_LineTrack_Changes : Inherits TaskParent
         desc = "Track the changes in the lines."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        Static lastImage As cv.Mat = task.lines.dst3
+        Static lastImage As Mat = task.lines.dst3
         lastImage.setto(0, task.lines.dst3)
         dst2 = lastImage
 

@@ -5,8 +5,8 @@ Public Class Intrinsics_Basics : Inherits TaskParent
         If standalone Then task.gOptions.gravityPointCloud.Checked = False
         desc = "Some cameras don't provide aligned color and left images.  This algorithm tries to align the left and color image."
     End Sub
-    Public Shared Function translate_LeftToRight(pt As cv.Point3f) As cv.Point2f
-        Dim ptTranslated As cv.Point2f, ptTranslated3D As cv.Point3f
+    Public Shared Function translate_LeftToRight(pt As Point3f) As Point2f
+        Dim ptTranslated As Point2f, ptTranslated3D As Point3f
         ptTranslated3D.X = task.calibData.LtoR_rotation(0) * pt.X +
                                    task.calibData.LtoR_rotation(1) * pt.Y +
                                    task.calibData.LtoR_rotation(2) * pt.Z + task.calibData.LtoR_translation(0)
@@ -21,8 +21,8 @@ Public Class Intrinsics_Basics : Inherits TaskParent
 
         Return ptTranslated
     End Function
-    Public Shared Function translate_ColorToLeft(pt As cv.Point3f) As cv.Point2f
-        Dim ptTranslated As cv.Point2f, ptTranslated3D As cv.Point3f
+    Public Shared Function translate_ColorToLeft(pt As Point3f) As Point2f
+        Dim ptTranslated As Point2f, ptTranslated3D As Point3f
         ptTranslated3D.X = task.calibData.ColorToLeft_rotation(0) * pt.X +
                                    task.calibData.ColorToLeft_rotation(1) * pt.Y +
                                    task.calibData.ColorToLeft_rotation(2) * pt.Z + task.calibData.ColorToLeft_translation(0)
@@ -40,8 +40,8 @@ Public Class Intrinsics_Basics : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         bricks.Run(src)
         If standalone Then
-            CvtColor(task.leftView, dst2, cv.ColorConversionCodes.GRAY2BGR)
-            Dim vec = New cv.Vec3b(0, 255, 255) ' yellow
+            CvtColor(task.leftView, dst2, ColorConversionCodes.GRAY2BGR)
+            Dim vec = New Vec3b(0, 255, 255) ' yellow
             For Each brick In bricks.brickList
                 If brick.depth > 0 Then Circle(dst2, brick.rect.TopLeft, task.DotSize, task.highlight, -1, task.lineType)
             Next
@@ -57,12 +57,12 @@ Public Class Intrinsics_TranslateRGBtoLeft : Inherits TaskParent
         task.gOptions.highlight.SelectedItem = "Red"
         task.gOptions.LineWidth.Value += 1
         labels(3) = "The left image with the lines that can be translated on both ends."
-        desc = "Translate a point from the RGB image to the left image.  Test with the longest line as input."
+        desc = "Translate a cv.Point from the RGB image to the left image.  Test with the longest line as input."
     End Sub
     '---------------------------------------------
     ' Map a pixel from RGB image into Left IR image
     '---------------------------------------------
-    Public Shared Function MapRgbToLeftIr(uRgb As Single, vRgb As Single, depth As Single) As cv.Point2f
+    Public Shared Function MapRgbToLeftIr(uRgb As Single, vRgb As Single, depth As Single) As Point2f
         Dim rgbintr = task.calibData.rgbIntrinsics
         Dim leftintr = task.calibData.leftIntrinsics
         Dim rotation = task.calibData.ColorToLeft_Rotation
@@ -79,7 +79,7 @@ Public Class Intrinsics_TranslateRGBtoLeft : Inherits TaskParent
         Dim Prgb() As Single = {Xrgb, Yrgb, Zrgb}
 
         '-----------------------------------------
-        ' 2. Transform RGB 3D point → Left IR 3D
+        ' 2. Transform RGB 3D cv.Point → Left IR 3D
         '-----------------------------------------
         Dim Pleft(2) As Single
 
@@ -94,17 +94,17 @@ Public Class Intrinsics_TranslateRGBtoLeft : Inherits TaskParent
         Dim Zleft As Single = Pleft(2)
 
         '-----------------------------------------
-        ' 3. Project Left IR 3D point → Left pixel
+        ' 3. Project Left IR 3D cv.Point → Left pixel
         '-----------------------------------------
         Dim uLeft As Single = leftintr.fx * (Xleft / Zleft) + leftintr.ppx
         Dim vLeft As Single = leftintr.fy * (Yleft / Zleft) + leftintr.ppy
 
-        Return New cv.Point2f(uLeft, vLeft)
+        Return New Point2f(uLeft, vLeft)
     End Function
 
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst2 = src
-        CvtColor(task.leftView, dst3, cv.ColorConversionCodes.GRAY2BGR) ' so we can show the red line...
+        CvtColor(task.leftView, dst3, ColorConversionCodes.GRAY2BGR) ' so we can show the red line...
         Dim count As Integer
         If task.Settings.cameraName.StartsWith("StereoLabs") Then
             For Each lp In task.lines.lpList
@@ -114,8 +114,8 @@ Public Class Intrinsics_TranslateRGBtoLeft : Inherits TaskParent
         Else
             For Each lp In task.lines.lpList
                 Line(dst2, lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
-                Dim depth1 = task.pointCloud.Get(Of cv.Point3f)(CInt(lp.p1.Y), CInt(lp.p1.X)).Z
-                Dim depth2 = task.pointCloud.Get(Of cv.Point3f)(CInt(lp.p2.Y), CInt(lp.p2.X)).Z
+                Dim depth1 = task.pointCloud.Get(Of Point3f)(CInt(lp.p1.Y), CInt(lp.p1.X)).Z
+                Dim depth2 = task.pointCloud.Get(Of Point3f)(CInt(lp.p2.Y), CInt(lp.p2.X)).Z
 
                 If depth1 > 0 And depth2 > 0 Then
                     Dim p1 = MapRgbToLeftIr(lp.p1.X, lp.p1.Y, depth1)
@@ -135,13 +135,13 @@ End Class
 
 Public Class Intrinsics_TranslateLeftToRGB : Inherits TaskParent
     Public Sub New()
-        desc = "Translate a point from the left image to the RGB image"
+        desc = "Translate a cv.Point from the left image to the RGB image"
     End Sub
 
     '---------------------------------------------------------
     ' Convert a pixel from Left IR image to RGB image (VB.NET)
     '---------------------------------------------------------
-    'Public Function MapLeftToRgb(uLeft As Single, vLeft As Single, depth As Single) As cv.Point2f
+    'Public Function MapLeftToRgb(uLeft As Single, vLeft As Single, depth As Single) As Point2f
 
     '    Dim rgbintr = task.calibData.rgbIntrinsics
     '    Dim leftintr = task.calibData.leftIntrinsics
@@ -149,7 +149,7 @@ Public Class Intrinsics_TranslateLeftToRGB : Inherits TaskParent
     '    Dim translation = task.calibData.ColorToLeft_Translation
 
     '    '-----------------------------------------
-    '    ' 1. Unproject Left IR pixel into 3D point
+    '    ' 1. Unproject Left IR pixel into 3D cv.Point
     '    '-----------------------------------------
     '    Dim Xleft As Single = (uLeft - leftintr.ppx) * depth / leftintr.fx
     '    Dim Yleft As Single = (vLeft - leftintr.ppy) * depth / leftintr.fy
@@ -158,7 +158,7 @@ Public Class Intrinsics_TranslateLeftToRGB : Inherits TaskParent
     '    Dim Pleft() As Single = {Xleft, Yleft, Zleft}
 
     '    '-----------------------------------------------------
-    '    ' 2. Transform Left IR 3D point → RGB camera 3D point
+    '    ' 2. Transform Left IR 3D cv.Point → RGB camera 3D cv.Point
     '    '-----------------------------------------------------
     '    Dim Prgb(2) As Single
 
@@ -175,22 +175,22 @@ Public Class Intrinsics_TranslateLeftToRGB : Inherits TaskParent
     '    Dim Zrgb As Single = Prgb(2)
 
     '    '-----------------------------------------
-    '    ' 3. Project RGB 3D point → RGB pixel
+    '    ' 3. Project RGB 3D cv.Point → RGB pixel
     '    '-----------------------------------------
     '    Dim uRgb As Single = rgbintr.fx * (Xrgb / Zrgb) + rgbintr.ppx
     '    Dim vRgb As Single = rgbintr.fy * (Yrgb / Zrgb) + rgbintr.ppy
 
-    '    Return New cv.Point2f(uRgb, vRgb)
+    '    Return New Point2f(uRgb, vRgb)
     'End Function
 
     'Public Function InvertExtrinsicsOpenCV(src As Single())
     ''-----------------------------------------
     '' Convert rotation[] → 3×3 Mat
     ''-----------------------------------------
-    'Dim R = cv.Mat.FromPixelData(3, 3, MatType.CV_32F, task.calibData.ColorToLeft_Rotation)
+    'Dim R = Mat.FromPixelData(3, 3, MatType.CV_32F, task.calibData.ColorToLeft_Rotation)
 
     '' Convert translation[] → 3×1 Mat
-    'Dim T = cv.Mat.FromPixelData(3, 1, MatType.CV_32F, task.calibData.ColorToLeft_Translation)
+    'Dim T = Mat.FromPixelData(3, 1, MatType.CV_32F, task.calibData.ColorToLeft_Translation)
 
     ''-----------------------------------------
     '' 1. Invert rotation: R_inv = R^T
@@ -228,12 +228,12 @@ Public Class Intrinsics_TranslateLeftToRGB : Inherits TaskParent
 
     Public Overrides Sub RunAlg(src As cv.Mat)
         'dst2 = src
-        'dst3 = task.leftView.CvtColor(cv.ColorConversionCodes.GRAY2BGR) ' so we can show the red line...
+        'dst3 = task.leftView.CvtColor(ColorConversionCodes.GRAY2BGR) ' so we can show the red line...
         'Dim count As Integer
         'For Each lp In task.lines.lpList
         '    dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
-        '    Dim depth1 = task.pointCloud.Get(Of cv.Point3f)(CInt(lp.p1.Y), CInt(lp.p1.X)).Z
-        '    Dim depth2 = task.pointCloud.Get(Of cv.Point3f)(CInt(lp.p2.Y), CInt(lp.p2.X)).Z
+        '    Dim depth1 = task.pointCloud.Get(Of Point3f)(CInt(lp.p1.Y), CInt(lp.p1.X)).Z
+        '    Dim depth2 = task.pointCloud.Get(Of Point3f)(CInt(lp.p2.Y), CInt(lp.p2.X)).Z
 
         '    If depth1 > 0 And depth2 > 0 Then
         '        Dim p1 = MapRgbToLeftIr(lp.p1.X, lp.p1.Y, depth1)
@@ -253,12 +253,12 @@ End Class
 Public Class Intrinsics_MapLeftToRight : Inherits TaskParent
     Dim bricks As New Brick_Basics
     Public Sub New()
-        desc = "Map a point from the left image to the right image"
+        desc = "Map a cv.Point from the left image to the right image"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         bricks.Run(src)
         dst2 = src
-        CvtColor(task.rightView, dst3, cv.ColorConversionCodes.GRAY2BGR) ' so we can show the red line...
+        CvtColor(task.rightView, dst3, ColorConversionCodes.GRAY2BGR) ' so we can show the red line...
         Dim count As Integer
         If task.Settings.cameraName.StartsWith("StereoLabs") Then
             For Each lp In task.lines.lpList
@@ -280,8 +280,8 @@ Public Class Intrinsics_MapLeftToRight : Inherits TaskParent
         Else
             'For Each lp In task.lines.lpList
             '    dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
-            '    Dim depth1 = task.pointCloud.Get(Of cv.Point3f)(CInt(lp.p1.Y), CInt(lp.p1.X)).Z
-            '    Dim depth2 = task.pointCloud.Get(Of cv.Point3f)(CInt(lp.p2.Y), CInt(lp.p2.X)).Z
+            '    Dim depth1 = task.pointCloud.Get(Of Point3f)(CInt(lp.p1.Y), CInt(lp.p1.X)).Z
+            '    Dim depth2 = task.pointCloud.Get(Of Point3f)(CInt(lp.p2.Y), CInt(lp.p2.X)).Z
 
             '    If depth1 > 0 And depth2 > 0 Then
             '        Dim p1 = MapRgbToLeftIr(lp.p1.X, lp.p1.Y, depth1)

@@ -1,18 +1,18 @@
 ﻿Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 Public Class PlotBar_Basics : Inherits TaskParent
-    Public histogram As New cv.Mat
+    Public histogram As New Mat
     Public histArray() As Single
     Public minRange As Single
     Public maxRange As Single
-    Public ranges() As cv.Rangef
-    Public backgroundColor As cv.Scalar = cv.Scalar.Red
+    Public ranges() As Rangef
+    Public backgroundColor As Scalar = Scalar.Red
     Public plotCenter As Single
     Public barWidth As Single
     Public addLabels As Boolean = True
     Public removeZeroEntry As Boolean
     Public createHistogram As Boolean = False
     Public shadeValues As Boolean = True
-    Public histMask As New cv.Mat
+    Public histMask As New Mat
     Public mm As mmData
     Public Sub New()
         desc = "Plot the default gray scale data with a stable Y values at the left of the image."
@@ -27,7 +27,7 @@ Public Class PlotBar_Basics : Inherits TaskParent
                 min = mm.minVal - 0.01
                 max = mm.maxVal + 0.01
                 If min = 0 And max = 0 Then
-                    If src.Type = cv.MatType.CV_32F Then
+                    If src.Type = MatType.CV_32F Then
                         max = task.MaxZmeters
                     Else
                         max = 255
@@ -36,7 +36,7 @@ Public Class PlotBar_Basics : Inherits TaskParent
             End If
             If Single.IsNaN(min) Or Single.IsInfinity(min) Then min = Single.MinValue
             If Single.IsNaN(max) Or Single.IsInfinity(max) Then max = Single.MaxValue
-            ranges = {New cv.Rangef(min, max)}
+            ranges = {New Rangef(min, max)}
             CalcHist({src}, {0}, histMask, histogram, 1, {task.histogramBins}, ranges)
         Else
             histogram = src
@@ -65,17 +65,17 @@ Public Class PlotBar_Basics : Inherits TaskParent
         ' some wacky values for the stereolabs devices.
         If mm.minVal > -100000000 And mm.maxVal < 100000000 Then
             If Math.Abs(mm.maxVal - mm.minVal) > 0 And histogram.Cols > 0 Then
-                Dim color As cv.Scalar
+                Dim color As Scalar
                 For i = 0 To histArray.Count - 1
                     If Single.IsNaN(histArray(i)) Then histArray(i) = 0
                     If histArray(i) > 0 Then
                         Dim h As Single = histArray(i) * dst2.Height / mm.maxVal
                         If shadeValues Then
                             Dim sIncr = (i Mod 256) * incr
-                            color = New cv.Scalar(sIncr, sIncr, sIncr)
-                            If maxIndex > 255 Then color = cv.Scalar.Black
+                            color = New Scalar(sIncr, sIncr, sIncr)
+                            If maxIndex > 255 Then color = Scalar.Black
                         Else
-                            color = cv.Scalar.Black
+                            color = Scalar.Black
                         End If
                         Rectangle(dst2, New cv.Rect(i * barWidth, dst2.Height - h,
                                                                Math.Max(1, barWidth), h), color, -1)
@@ -149,8 +149,8 @@ End Class
 
 
 Public Class PlotBar_Histogram2D : Inherits TaskParent
-    Public ranges() As cv.Rangef = task.rangesBGR
-    Public histogram As New cv.Mat
+    Public ranges() As Rangef = task.rangesBGR
+    Public histogram As New Mat
     Public Sub New()
         labels = {"", "", "2D Histogram", ""}
         desc = "Plot a 2D histgram from the input Mat"
@@ -162,13 +162,13 @@ Public Class PlotBar_Histogram2D : Inherits TaskParent
             src = colorFmt.dst2
         End If
         Dim bins = task.histogramBins
-        CalcHist({src}, {0, 1}, New cv.Mat(), histogram, 2, {bins, bins}, ranges)
+        CalcHist({src}, {0, 1}, New Mat(), histogram, 2, {bins, bins}, ranges)
 
-        Resize(histogram, dst2, task.workRes, 0, 0, cv.InterpolationFlags.Nearest)
+        Resize(histogram, dst2, task.workRes, 0, 0, InterpolationFlags.Nearest)
 
         If standaloneTest() Then
-            Dim thresh As New cv.Mat()
-            Threshold(dst2, thresh, 0, 255, cv.ThresholdTypes.Binary)
+            Dim thresh As New Mat()
+            Threshold(dst2, thresh, 0, 255, ThresholdTypes.Binary)
             dst3 = thresh
         End If
     End Sub

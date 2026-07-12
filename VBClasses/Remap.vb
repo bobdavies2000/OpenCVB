@@ -1,15 +1,15 @@
 Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 Public Class Remap_Basics : Inherits TaskParent
     Public direction As Integer = 3 ' default to remap horizontally and vertically
-    Dim mapx1 As cv.Mat, mapx2 As cv.Mat, mapx3 As cv.Mat
-    Dim mapy1 As cv.Mat, mapy2 As cv.Mat, mapy3 As cv.Mat
+    Dim mapx1 As Mat, mapx2 As Mat, mapx3 As Mat
+    Dim mapy1 As Mat, mapy2 As Mat, mapy3 As Mat
     Public Sub New()
-        mapx1 = New cv.Mat(dst2.Size(), cv.MatType.CV_32F)
-        mapy1 = New cv.Mat(dst2.Size(), cv.MatType.CV_32F)
-        mapx2 = New cv.Mat(dst2.Size(), cv.MatType.CV_32F)
-        mapy2 = New cv.Mat(dst2.Size(), cv.MatType.CV_32F)
-        mapx3 = New cv.Mat(dst2.Size(), cv.MatType.CV_32F)
-        mapy3 = New cv.Mat(dst2.Size(), cv.MatType.CV_32F)
+        mapx1 = New Mat(dst2.Size(), MatType.CV_32F)
+        mapy1 = New Mat(dst2.Size(), MatType.CV_32F)
+        mapx2 = New Mat(dst2.Size(), MatType.CV_32F)
+        mapy2 = New Mat(dst2.Size(), MatType.CV_32F)
+        mapx3 = New Mat(dst2.Size(), MatType.CV_32F)
+        mapy3 = New Mat(dst2.Size(), MatType.CV_32F)
 
         For j = 0 To mapx1.Rows - 1
             For i = 0 To mapx1.Cols - 1
@@ -31,11 +31,11 @@ Public Class Remap_Basics : Inherits TaskParent
             Case 0
                 dst2 = src
             Case 1
-                Remap(src, dst2, mapx1, mapy1, cv.InterpolationFlags.Nearest)
+                Remap(src, dst2, mapx1, mapy1, InterpolationFlags.Nearest)
             Case 2
-                Remap(src, dst2, mapx2, mapy2, cv.InterpolationFlags.Nearest)
+                Remap(src, dst2, mapx2, mapy2, InterpolationFlags.Nearest)
             Case 3
-                Remap(src, dst2, mapx3, mapy3, cv.InterpolationFlags.Nearest)
+                Remap(src, dst2, mapx3, mapy3, InterpolationFlags.Nearest)
         End Select
 
         If task.heartBeat Then
@@ -60,11 +60,11 @@ Public Class Remap_Flip : Inherits TaskParent
             Case 0 ' do nothing!
                 src.CopyTo(dst2)
             Case 1 ' flip vertically
-                Flip(src, dst2, cv.FlipMode.Y)
+                Flip(src, dst2, FlipMode.Y)
             Case 2 ' flip horizontally
-                Flip(src, dst2, cv.FlipMode.X)
+                Flip(src, dst2, FlipMode.X)
             Case 3 ' flip horizontally and vertically
-                Flip(src, dst2, cv.FlipMode.XY)
+                Flip(src, dst2, FlipMode.XY)
         End Select
         If task.heartBeat Then
             direction += 1

@@ -2,16 +2,16 @@ Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCvSharp
 Public Class AddWeighted_Accumulate : Inherits TaskParent
     Public options As New Options_AddWeighted
     Public Sub New()
-        dst1 = New cv.Mat(dst2.Size, cv.MatType.CV_32F, 0)
+        dst1 = New Mat(dst2.Size, MatType.CV_32F, 0)
         labels(3) = "Current task.gray image"
         desc = "Update a running average of the image"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
         If src.Channels <> 1 Then src = task.gray
-        If src.Type <> cv.MatType.CV_32F Then src.ConvertTo(dst3, cv.MatType.CV_32F) Else dst3 = src
-        AccumulateWeighted(dst3, dst1, options.accumWeighted, New cv.Mat)
-        dst1.ConvertTo(dst2, cv.MatType.CV_8U)
+        If src.Type <> MatType.CV_32F Then src.ConvertTo(dst3, MatType.CV_32F) Else dst3 = src
+        AccumulateWeighted(dst3, dst1, options.accumWeighted, New Mat)
+        dst1.ConvertTo(dst2, MatType.CV_8U)
         labels(2) = "Accumulated gray scale image"
     End Sub
 End Class
@@ -22,7 +22,7 @@ End Class
 
 
 Public Class AddWeighted_Basics : Inherits TaskParent
-    Public src2 As cv.Mat  ' user normally provides src2! 
+    Public src2 As Mat  ' user normally provides src2! 
     Public options As New Options_AddWeighted
     Public weight As Double
     Public Sub New()
@@ -33,11 +33,11 @@ Public Class AddWeighted_Basics : Inherits TaskParent
 
         If standalone Then src2 = task.depthRGB
         If src2.Type <> src.Type Then
-            If src.Type <> cv.MatType.CV_8UC3 Or src2.Type <> cv.MatType.CV_8UC3 Then
-                If src.Type = cv.MatType.CV_32FC1 Then src = Mat_Convert.Mat_32f_To_8UC3(src)
-                If src2.Type = cv.MatType.CV_32FC1 Then src2 = Mat_Convert.Mat_32f_To_8UC3(src2)
-                If src.Type <> cv.MatType.CV_8UC3 Then CvtColor(src, src, cv.ColorConversionCodes.GRAY2BGR)
-                If src2.Type <> cv.MatType.CV_8UC3 Then CvtColor(src2, src2, cv.ColorConversionCodes.GRAY2BGR)
+            If src.Type <> MatType.CV_8UC3 Or src2.Type <> MatType.CV_8UC3 Then
+                If src.Type = MatType.CV_32FC1 Then src = Mat_Convert.Mat_32f_To_8UC3(src)
+                If src2.Type = MatType.CV_32FC1 Then src2 = Mat_Convert.Mat_32f_To_8UC3(src2)
+                If src.Type <> MatType.CV_8UC3 Then CvtColor(src, src, ColorConversionCodes.GRAY2BGR)
+                If src2.Type <> MatType.CV_8UC3 Then CvtColor(src2, src2, ColorConversionCodes.GRAY2BGR)
             End If
         End If
 
@@ -54,13 +54,13 @@ End Class
 Public Class XR_AddWeighted_DepthAccumulate : Inherits TaskParent
     Dim options As New Options_AddWeighted
     Public Sub New()
-        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_32F, 0)
+        dst2 = New Mat(dst2.Size, MatType.CV_32F, 0)
         desc = "Update a running average of the image"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
 
-        AccumulateWeighted(task.pcSplit(2) * 1000, dst2, options.accumWeighted, New cv.Mat)
+        AccumulateWeighted(task.pcSplit(2) * 1000, dst2, options.accumWeighted, New Mat)
     End Sub
 End Class
 
@@ -103,8 +103,8 @@ Public Class XR_AddWeighted_Edges : Inherits TaskParent
         dst2 = task.edges.dst2
         labels(2) = task.edges.labels(2)
 
-        Dim _cvtEdges As New cv.Mat
-        CvtColor(task.edges.dst2, _cvtEdges, cv.ColorConversionCodes.GRAY2BGR)
+        Dim _cvtEdges As New Mat
+        CvtColor(task.edges.dst2, _cvtEdges, ColorConversionCodes.GRAY2BGR)
         dst3 = ShowAddweighted(_cvtEdges, src, labels(3))
     End Sub
 End Class

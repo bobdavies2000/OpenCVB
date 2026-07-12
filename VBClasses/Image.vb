@@ -13,9 +13,9 @@ Public Class Image_Basics : Inherits TaskParent
         src = options.fullsizeImage
 
         If src.Width <> dst2.Width Or src.Height <> dst2.Height Then
-            Dim newSize = New cv.Size(dst2.Height * src.Width / src.Height, dst2.Height)
+            Dim newSize = New Size(dst2.Height * src.Width / src.Height, dst2.Height)
             If newSize.Width > dst2.Width Then
-                newSize = New cv.Size(dst2.Width, dst2.Width * src.Height / src.Width)
+                newSize = New Size(dst2.Width, dst2.Width * src.Height / src.Width)
             End If
             dst2.SetTo(0)
             Resize(src, dst2(New cv.Rect(0, 0, newSize.Width, newSize.Height)), newSize)
@@ -69,7 +69,7 @@ Public Class Image_RedCloudColor : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         images.Run(src)
         dst0 = images.dst2.Clone
-        CvtColor(images.dst2, dst1, cv.ColorConversionCodes.BGR2GRAY)
+        CvtColor(images.dst2, dst1, ColorConversionCodes.BGR2GRAY)
 
         reduction.Run(dst1)
 

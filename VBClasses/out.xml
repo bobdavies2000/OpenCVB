@@ -184,7 +184,7 @@ C:\Program Files\Microsoft Visual Studio\18\Community\MSBuild\Current\Microsoft.
   <!--<Import Project="$(MSBuildProjectExtensionsPath)$(MSBuildProjectFile).*.props" Condition="'$(ImportProjectExtensionProps)' == 'true' and exists('$(MSBuildProjectExtensionsPath)')" />-->
   <!--
       Wildcard imports come from $(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Imports\Microsoft.Common.props\ directory.
-      This is very similar to the same extension point used in Microsoft.Common.targets, which is located in
+      This is very similar to the same extension cv.Point used in Microsoft.Common.targets, which is located in
       the $(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.targets\ directory.
 
       Unfortunately, there is already a file named "Microsoft.Common.props" in this directory,
@@ -1400,7 +1400,7 @@ Copyright (C) Microsoft Corporation. All rights reserved.
 C:\Program Files\Microsoft Visual Studio\18\Community\VC\Auxiliary\Build\Microsoft.VCToolsVersion.v145.default.props
 ============================================================================================================================================
 -->
-  <!-- VC++ Redistributable is common across all SxS Toolsets and should, by default, point to the latest in the
+  <!-- VC++ Redistributable is common across all SxS Toolsets and should, by default, cv.Point to the latest in the
          v14x ABI compatible set of releases -->
   <!--
 ============================================================================================================================================
@@ -1423,7 +1423,7 @@ C:\Program Files\Microsoft Visual Studio\18\Community\VC\Auxiliary\Build\Microso
     <!-- If no files are found in the <Choose> block, we'll default to the latest -->
     <VCToolsVersionLatest>14.51</VCToolsVersionLatest>
     <VCToolsVersionPath>$([System.IO.Path]::GetFullPath($(MSBuildThisFileDirectory)\v145\Microsoft.VCToolsVersion.VC.$(VCToolsVersionLatest).props))</VCToolsVersionPath>
-    <!-- Since this release includes a Preview toolset, define MSVCBuildToolsVersionPreview to point to it -->
+    <!-- Since this release includes a Preview toolset, define MSVCBuildToolsVersionPreview to cv.Point to it -->
     <MSVCBuildToolsVersionPreview>14.52</MSVCBuildToolsVersionPreview>
     <MSVCBuildToolsVersionPreviewPath>$([System.IO.Path]::GetFullPath($(MSBuildThisFileDirectory)\v145\Microsoft.VCToolsVersion.VC.$(MSVCBuildToolsVersionPreview).props))</MSVCBuildToolsVersionPreviewPath>
   </PropertyGroup>
@@ -3011,7 +3011,7 @@ C:\Program Files\Microsoft Visual Studio\18\Community\MSBuild\Microsoft\VC\v180\
     <AutoImportDirectory Include="$(_ToolsetFolder)ImportBefore" />
     <AutoImportDirectory Include="$(_ToolsetFolder)ImportAfter" />
   </ItemGroup>
-  <!-- restore VCTargetsPath and VsInstallRoot to point to the current version -->
+  <!-- restore VCTargetsPath and VsInstallRoot to cv.Point to the current version -->
   <PropertyGroup>
     <VCTargetsPath>$(CurrentVCTargetsPath)</VCTargetsPath>
     <VsInstallRoot>$(CurrentVsInstallRoot)</VsInstallRoot>
@@ -4000,7 +4000,7 @@ C:\Program Files\Microsoft Visual Studio\18\Community\MSBuild\Current\Bin\Micros
   -->
   <PropertyGroup Condition="'$(BaseOutputPathWasSpecified)' != 'true' and '$(_OutputPathWasMissing)' == 'true'" xmlns="">
     <!--
-        When 'OutputPath' is missing or empty (along with non-existent 'BaseOutputPath') at this point means,
+        When 'OutputPath' is missing or empty (along with non-existent 'BaseOutputPath') at this cv.Point means,
         we're in legacy mode and we shall assume the current Configuration/Platform combination as invalid.
         Whether this is considered an error or a warning depends on the value of $(SkipInvalidConfigurations).
     -->
@@ -4199,7 +4199,7 @@ C:\Program Files\Microsoft Visual Studio\18\Community\MSBuild\Current\Bin\Micros
     <_SupportedArchitectures>amd64 arm64</_SupportedArchitectures>
   </PropertyGroup>
   <ItemGroup xmlns="">
-    <!-- Create an item for entry point of the ClickOnce application (Example: WindowsApplication1.exe) -->
+    <!-- Create an item for entry cv.Point of the ClickOnce application (Example: WindowsApplication1.exe) -->
     <_DeploymentManifestEntryPoint Include="@(IntermediateAssembly)">
       <TargetPath>$(TargetFileName)</TargetPath>
     </_DeploymentManifestEntryPoint>
@@ -4574,7 +4574,7 @@ C:\Program Files\Microsoft Visual Studio\18\Community\MSBuild\Current\Bin\Micros
     ============================================================
                                         Build
 
-    The main build entry point.
+    The main build entry cv.Point.
     ============================================================
     -->
   <PropertyGroup xmlns="">
@@ -4821,7 +4821,7 @@ C:\Program Files\Microsoft Visual Studio\18\Community\MSBuild\Current\Bin\Micros
     <Framework35Dir>@(_TargetFramework35DirectoryItem)</Framework35Dir>
     <Framework30Dir>@(_TargetFramework30DirectoryItem)</Framework30Dir>
     <Framework20Dir>@(_TargetFramework20DirectoryItem)</Framework20Dir>
-    <!-- Note we need to make the 4.0 FrameworkDir point to the 2.0 location by default since we shipped msbuild 4.0 that way and to change it would be a breaking change.-->
+    <!-- Note we need to make the 4.0 FrameworkDir cv.Point to the 2.0 location by default since we shipped msbuild 4.0 that way and to change it would be a breaking change.-->
     <FrameworkDir Condition="'$(FrameworkDir)' == '' and ('$(TargetFrameworkVersion)' == 'v2.0' or '$(TargetFrameworkVersion)' == 'v3.5' or '$(TargetFrameworkVersion)' == 'v4.0')">@(_TargetFramework20DirectoryItem)</FrameworkDir>
     <FrameworkDir Condition="'$(FrameworkDir)' == ''">@(_TargetFramework40DirectoryItem)</FrameworkDir>
     <TargetedFrameworkDir Condition="'$(TargetedFrameworkDir)' == ''">@(_TargetedFrameworkDirectoryItem)</TargetedFrameworkDir>
@@ -5249,7 +5249,7 @@ C:\Program Files\Microsoft Visual Studio\18\Community\MSBuild\Current\Bin\Micros
       For single-targeted projects, we normally decorate the AnnotatedProjects Item with
       UndefineProperties metadata specifying that TargetFramework should be undefined. Because it
       isn't defined properly at that stage, however, this does not happen, and TargetFramework is
-      defined at this point in addition to having been defined globally. Currently, this is always
+      defined at this cv.Point in addition to having been defined globally. Currently, this is always
       true for vcxproj.
 
       MSBuild permits building the same project twice as long as it has different sets of global properties.
@@ -6957,8 +6957,8 @@ C:\Program Files\Microsoft Visual Studio\18\Community\MSBuild\Current\Bin\Micros
     -->
   <Target Name="_DeploymentGenerateLauncher" Condition="'$(GenerateClickOnceManifests)'=='true' and '$(_DeploymentLauncherBased)' == 'true'" xmlns="">
     <!--
-      If apphost based built EXE is found, use that as the Launcher.exe's entry point otherwise
-      use the built DLL as the entry point
+      If apphost based built EXE is found, use that as the Launcher.exe's entry cv.Point otherwise
+      use the built DLL as the entry cv.Point
     -->
     <ItemGroup Condition="'$(UseAppHost)' == 'true' and '$(_IsExecutable)' == 'true' and exists('$(AppHostIntermediatePath)')">
       <EntryPointForLauncher Include="$(AppHostIntermediatePath)" TargetPath="$(AssemblyName).exe" />
@@ -8089,7 +8089,7 @@ C:\Program Files\Microsoft Visual Studio\18\Community\MSBuild\Current\Bin\Micros
     <ItemGroup Condition="'$(PublishSingleFile)' == 'true'">
       <PublishedSingleFileToBeCopied Include="@(_DeploymentManifestFiles)" />
     </ItemGroup>
-    <!-- For single-file publish case, we need to only copy the clickonce manifest, manifest entry point (launcher) and the SF EXE -->
+    <!-- For single-file publish case, we need to only copy the clickonce manifest, manifest entry cv.Point (launcher) and the SF EXE -->
     <Copy Condition="'$(PublishSingleFile)' == 'true'" SourceFiles="@(_ApplicationManifestFinal);&#xD;&#xA;                 @(_DeploymentResolvedManifestEntryPoint);&#xD;&#xA;                 @(PublishedSingleFileToBeCopied);" DestinationFiles="@(_ApplicationManifestFinal->'$(_DeploymentApplicationDir)%(TargetPath)');&#xD;&#xA;                 @(_DeploymentManifestEntryPoint->'$(_DeploymentApplicationDir)%(TargetPath)$(_DeploymentFileMappingExtension)');&#xD;&#xA;                 @(PublishedSingleFileToBeCopied->'$(_DeploymentApplicationDir)%(TargetPath)$(_DeploymentFileMappingExtension)')" SkipUnchangedFiles="$(SkipCopyUnchangedFiles)" OverwriteReadOnlyFiles="$(OverwriteReadOnlyFiles)" Retries="$(CopyRetryCount)" UseHardlinksIfPossible="$(CreateHardLinksForPublishFilesIfPossible)" UseSymboliclinksIfPossible="$(CreateSymbolicLinksForPublishFilesIfPossible)" RetryDelayMilliseconds="$(CopyRetryDelayMilliseconds)" />
     <FormatUrl InputUrl="$(_DeploymentApplicationUrl)">
       <Output TaskParameter="OutputUrl" PropertyName="_DeploymentFormattedApplicationUrl" />
@@ -8115,7 +8115,7 @@ C:\Program Files\Microsoft Visual Studio\18\Community\MSBuild\Current\Bin\Micros
   <Target Name="_DeploymentSignClickOnceDeployment" xmlns="">
     <!-- Sign manifests and the bootstrapper -->
     <SignFile CertificateThumbprint="$(_DeploymentResolvedManifestCertificateThumbprint)" TimestampUrl="$(ManifestTimestampUrl)" SigningTarget="$(_DeploymentApplicationDir)$(_DeploymentTargetApplicationManifestFileName)" TargetFrameworkIdentifier="$(TargetFrameworkIdentifier)" TargetFrameworkVersion="$(TargetFrameworkVersion)" DisallowMansignTimestampFallback="$(DisallowMansignTimestampFallback)" Condition="'$(_DeploymentSignClickOnceManifests)'=='true'" />
-    <!-- Update entry point path in deploy manifest -->
+    <!-- Update entry cv.Point path in deploy manifest -->
     <UpdateManifest ApplicationPath="$(_DeploymentApplicationFolderName)\$(_DeploymentTargetApplicationManifestFileName)" TargetFrameworkVersion="$(_DeploymentManifestTargetFrameworkVersion)" ApplicationManifest="$(_DeploymentApplicationDir)$(_DeploymentTargetApplicationManifestFileName)" InputManifest="$(OutDir)$(TargetDeployManifestFileName)" OutputManifest="$(ClickOncePublishDir)$(TargetDeployManifestFileName)">
       <Output TaskParameter="OutputManifest" ItemName="PublishedDeployManifest" />
     </UpdateManifest>
@@ -8904,7 +8904,7 @@ C:\Program Files\Microsoft Visual Studio\18\Community\MSBuild\Current\Bin\Micros
 ============================================================================================================================================
 -->
   <!--
-      With MSBuild 12, we've changed MSBuildToolsPath to for the first time point to a directory
+      With MSBuild 12, we've changed MSBuildToolsPath to for the first time cv.Point to a directory
       outside of the .NET Framework.  As a result of this, there were several targets files, of which
       this was one, that were being referenced as out of MSBuildToolsPath that are now no longer there.
 
@@ -8913,7 +8913,7 @@ C:\Program Files\Microsoft Visual Studio\18\Community\MSBuild\Current\Bin\Micros
       the shim will internally simply redirect to the real copy of the targets file in the .NET Framework.
   -->
   <!-- In the original Microsoft.Xaml.targets this is mapped to MSBuildBinPath, which is no longer
-      the .NET Framework directory and thus will no longer be the right answer. Override it to point
+      the .NET Framework directory and thus will no longer be the right answer. Override it to cv.Point
       to the correct .NET Framework location. -->
   <PropertyGroup xmlns="">
     <XamlBuildTaskPath Condition="'$(XamlBuildTaskPath)' == ''">$(MSBuildToolsPath64)</XamlBuildTaskPath>
@@ -9421,7 +9421,7 @@ Copyright (c) .NET Foundation. All rights reserved.
   <!--
     ============================================================
     Restore
-    Main entry point for restoring packages
+    Main entry cv.Point for restoring packages
     ============================================================
   -->
   <Target Name="Restore" DependsOnTargets="_GenerateRestoreGraph">
@@ -9457,7 +9457,7 @@ Copyright (c) .NET Foundation. All rights reserved.
     ============================================================
     CollectPackageReferences
     Gathers all PackageReference items from the project.
-    This target may be used as an extension point to modify
+    This target may be used as an extension cv.Point to modify
     package references before NuGet reads them.
     ============================================================
   -->
@@ -9499,7 +9499,7 @@ Copyright (c) .NET Foundation. All rights reserved.
     ============================================================
     CollectPackageDownloads
     Gathers all PackageDownload items from the project.
-    This target may be used as an extension point to modify
+    This target may be used as an extension cv.Point to modify
     package downloads before NuGet reads them.
     ============================================================
   -->
@@ -9531,7 +9531,7 @@ Copyright (c) .NET Foundation. All rights reserved.
     ============================================================
     CollectNuGetAuditSuppressions
     Gathers all NuGetAuditSuppress items from the project.
-    This target may be used as an extension point to modify
+    This target may be used as an extension cv.Point to modify
     advisory suppressions before NuGet reads them.
     ============================================================
   -->
@@ -9631,7 +9631,7 @@ Copyright (c) .NET Foundation. All rights reserved.
   <!--
     ============================================================
     _GenerateRestoreGraph
-    Entry point for creating the project to project restore graph.
+    Entry cv.Point for creating the project to project restore graph.
     ============================================================
   -->
   <Target Name="_GenerateRestoreGraph" DependsOnTargets="_FilterRestoreGraphProjectInputItems;_GetAllRestoreProjectPathItems" Returns="@(_RestoreGraphEntry)">
@@ -9654,7 +9654,7 @@ Copyright (c) .NET Foundation. All rights reserved.
   <!--
     ============================================================
     _GenerateRestoreGraphProjectEntry
-    Top level entry point within a project.
+    Top level entry cv.Point within a project.
     ============================================================
   -->
   <Target Name="_GenerateRestoreGraphProjectEntry" DependsOnTargets="_GenerateRestoreSpecs;_GenerateDotnetCliToolReferenceSpecs" Returns="@(_RestoreGraphEntry)">
@@ -9667,8 +9667,8 @@ Copyright (c) .NET Foundation. All rights reserved.
     ============================================================
   -->
   <Target Name="_GenerateRestoreSpecs" DependsOnTargets="_GetRestoreProjectStyle" Returns="@(_RestoreGraphEntry)">
-    <Message Text="Restore entry point $(MSBuildProjectFullPath)" Importance="low" />
-    <!-- Mark entry point -->
+    <Message Text="Restore entry cv.Point $(MSBuildProjectFullPath)" Importance="low" />
+    <!-- Mark entry cv.Point -->
     <ItemGroup Condition=" '$(RestoreProjects)' == '' OR '$(RestoreProjects)' == 'true' ">
       <_RestoreGraphEntry Include="$([System.Guid]::NewGuid())" Condition=" '$(RestoreProjectStyle)' != 'Unknown' ">
         <Type>RestoreSpec</Type>
@@ -9863,7 +9863,7 @@ Copyright (c) .NET Foundation. All rights reserved.
     <PropertyGroup Condition=" '$(PackageReferenceCompatibleProjectStyle)' == 'true' AND '$(_RestoreSkipContentFileWrite)' == '' ">
       <_RestoreSkipContentFileWrite Condition=" '$(TargetFrameworks)' == '' AND '$(TargetFramework)' == '' ">true</_RestoreSkipContentFileWrite>
     </PropertyGroup>
-    <!-- Write properties for the top level entry point -->
+    <!-- Write properties for the top level entry cv.Point -->
     <ItemGroup Condition=" '$(PackageReferenceCompatibleProjectStyle)' == 'true' ">
       <_RestoreGraphEntry Include="$([System.Guid]::NewGuid())">
         <Type>ProjectSpec</Type>
@@ -11954,7 +11954,7 @@ C:\Program Files\Microsoft Visual Studio\18\Community\MSBuild\Microsoft\VC\v180\
        ******************************************************************************************* -->
   <Target Name="FinalizeBuildStatus">
     <!-- Delete the incomplete build indicator.
-    Touch the last build state file to indicate no inputs should be newer than this point.  -->
+    Touch the last build state file to indicate no inputs should be newer than this cv.Point.  -->
     <Delete Files="$(LastBuildUnsuccessful)" Condition="Exists($(LastBuildUnsuccessful))" />
     <Touch Files="$(LastBuildState)" Condition="Exists($(LastBuildState))" />
   </Target>

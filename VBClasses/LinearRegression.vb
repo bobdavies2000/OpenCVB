@@ -32,7 +32,7 @@ Public Class LinearRegression_Basics : Inherits TaskParent
 
         For i = 0 To x.Count - 1
             Dim pt As New cv.Point(x(i), y(i))
-            Circle(dst2, pt, task.DotSize, cv.Scalar.Red, -1, task.lineType)
+            Circle(dst2, pt, task.DotSize, Scalar.Red, -1, task.lineType)
         Next
     End Sub
 End Class

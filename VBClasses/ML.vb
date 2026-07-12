@@ -4,10 +4,10 @@ Imports VBClasses
 Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 Public Class ML_Basics : Inherits TaskParent
     Implements IDisposable
-    Public trainMats() As cv.Mat ' all entries are 32FCx
-    Public trainResponse As cv.Mat ' 32FC1 format
-    Public testMats() As cv.Mat ' all entries are 32FCx
-    Public predictions As New cv.Mat
+    Public trainMats() As Mat ' all entries are 32FCx
+    Public trainResponse As Mat ' 32FC1 format
+    Public testMats() As Mat ' all entries are 32FCx
+    Public predictions As New Mat
     Public options As New Options_ML
     Public buildEveryPass As Boolean
     Dim classifier As Object
@@ -31,7 +31,7 @@ Public Class ML_Basics : Inherits TaskParent
         options.Run()
         labels(2) = "ML algorithm selected is " + options.ML_Name
 
-        Dim trainMat As New cv.Mat
+        Dim trainMat As New Mat
         Merge(trainMats, trainMat)
 
         Dim varCount As Integer
@@ -39,25 +39,25 @@ Public Class ML_Basics : Inherits TaskParent
             varCount += m.ElemSize / 4 ' how many 32f variables in this Mat?
         Next
 
-        trainMat = cv.Mat.FromPixelData(trainMat.Total, varCount, cv.MatType.CV_32F, trainMat.Data)
-        Dim responseMat = cv.Mat.FromPixelData(trainMats(0).Total, 1, cv.MatType.CV_32F, trainResponse.Data)
+        trainMat = Mat.FromPixelData(trainMat.Total, varCount, MatType.CV_32F, trainMat.Data)
+        Dim responseMat = Mat.FromPixelData(trainMats(0).Total, 1, MatType.CV_32F, trainResponse.Data)
 
-        Dim respFormat = cv.MatType.CV_32F
+        Dim respFormat = MatType.CV_32F
         If task.heartBeat Or buildEveryPass Then
             Select Case options.ML_Name
                 Case "NormalBayesClassifier"
-                    normalBayes = cv.ML.NormalBayesClassifier.Create()
-                    respFormat = cv.MatType.CV_32S
+                    normalBayes = ML.NormalBayesClassifier.Create()
+                    respFormat = MatType.CV_32S
                     classifier = normalBayes
                 Case "KNearest"
-                    knearest = cv.ML.KNearest.Create()
+                    knearest = ML.KNearest.Create()
                     knearest.DefaultK = 15
                     knearest.IsClassifier = True
                     classifier = knearest
                 Case "SVM"
-                    svm = cv.ML.SVM.Create()
+                    svm = ML.SVM.Create()
                     svm.C = 1
-                    svm.TermCriteria = cv.TermCriteria.Both(1000, 0.01)
+                    svm.TermCriteria = TermCriteria.Both(1000, 0.01)
                     svm.P = 0
                     svm.Nu = 0.5
                     svm.Coef0 = 1
@@ -65,10 +65,10 @@ Public Class ML_Basics : Inherits TaskParent
                     svm.Degree = 0.5
                     svm.KernelType = SVM.KernelTypes.Poly
                     svm.Type = SVM.Types.CSvc
-                    respFormat = cv.MatType.CV_32S
+                    respFormat = MatType.CV_32S
                     classifier = svm
                 Case "DTrees"
-                    dtrees = cv.ML.DTrees.Create()
+                    dtrees = ML.DTrees.Create()
                     dtrees.CVFolds = 0
                     dtrees.TruncatePrunedTree = False
                     dtrees.UseSurrogates = False
@@ -77,54 +77,54 @@ Public Class ML_Basics : Inherits TaskParent
                     dtrees.Use1SERule = False
                     classifier = dtrees
                 Case "Boost"
-                    boost = cv.ML.Boost.Create()
-                    respFormat = cv.MatType.CV_32S
+                    boost = ML.Boost.Create()
+                    respFormat = MatType.CV_32S
                     boost.BoostType = Boost.Types.Discrete
                     boost.WeakCount = 100
                     boost.WeightTrimRate = 0.95
                     boost.MaxDepth = 2
                     boost.UseSurrogates = False
-                    boost.Priors = New cv.Mat()
+                    boost.Priors = New Mat()
                     classifier = boost
 
                 Case "ANN_MLP" ' artificial neural net with multi-layer perceptron
-                    ann_mlp = cv.ML.ANN_MLP.Create()
+                    ann_mlp = ML.ANN_MLP.Create()
 
                     ' input layer, hidden layer, output layer
-                    ann_mlp.SetLayerSizes(cv.Mat.FromPixelData(1, 3, cv.MatType.CV_32SC1, {varCount, 5, 1}))
+                    ann_mlp.SetLayerSizes(Mat.FromPixelData(1, 3, MatType.CV_32SC1, {varCount, 5, 1}))
 
-                    ann_mlp.SetActivationFunction(cv.ML.ANN_MLP.ActivationFunctions.SigmoidSym, 1, 1)
-                    ann_mlp.TermCriteria = cv.TermCriteria.Both(1000, 0.000001)
-                    ann_mlp.SetTrainMethod(cv.ML.ANN_MLP.TrainingMethods.BackProp, 0.1, 0.1)
+                    ann_mlp.SetActivationFunction(ML.ANN_MLP.ActivationFunctions.SigmoidSym, 1, 1)
+                    ann_mlp.TermCriteria = TermCriteria.Both(1000, 0.000001)
+                    ann_mlp.SetTrainMethod(ML.ANN_MLP.TrainingMethods.BackProp, 0.1, 0.1)
                     classifier = ann_mlp
                 Case "LogisticRegression"
-                    If logistic Is Nothing Then logistic = cv.ML.LogisticRegression.Create()
+                    If logistic Is Nothing Then logistic = ML.LogisticRegression.Create()
                     classifier = logistic
                 Case Else
-                    If rtrees Is Nothing Then rtrees = cv.ML.RTrees.Create()
+                    If rtrees Is Nothing Then rtrees = ML.RTrees.Create()
                     rtrees.MinSampleCount = 2
                     rtrees.MaxDepth = 4
                     rtrees.RegressionAccuracy = 0.0
                     rtrees.UseSurrogates = False
                     rtrees.MaxCategories = 16
-                    rtrees.Priors = New cv.Mat
+                    rtrees.Priors = New Mat
                     rtrees.CalculateVarImportance = False
                     rtrees.ActiveVarCount = varCount
-                    rtrees.TermCriteria = cv.TermCriteria.Both(5, 0)
+                    rtrees.TermCriteria = TermCriteria.Both(5, 0)
                     classifier = rtrees
             End Select
 
             If responseMat.Type <> respFormat Then responseMat.ConvertTo(responseMat, respFormat)
-            rtrees.Train(trainMat, cv.ML.SampleTypes.RowSample, responseMat)
+            rtrees.Train(trainMat, ML.SampleTypes.RowSample, responseMat)
         End If
-        Dim testMat As New cv.Mat
+        Dim testMat As New Mat
         Merge(testMats, testMat)
 
-        testMat = cv.Mat.FromPixelData(testMat.Total, varCount, cv.MatType.CV_32F, testMat.Data)
+        testMat = Mat.FromPixelData(testMat.Total, varCount, MatType.CV_32F, testMat.Data)
         rtrees.Predict(testMat, predictions)
 
-        If predictions.Type <> cv.MatType.CV_32F Then
-            predictions.ConvertTo(predictions, cv.MatType.CV_32F)
+        If predictions.Type <> MatType.CV_32F Then
+            predictions.ConvertTo(predictions, MatType.CV_32F)
         End If
     End Sub
     Protected Overrides Sub Finalize()
@@ -148,38 +148,38 @@ Public Class XR_Brick_MLColorDepth : Inherits TaskParent
     Public Sub New()
         If standalone Then task.gOptions.displayDst1.Checked = True
         ml.buildEveryPass = True
-        dst1 = New cv.Mat(dst2.Size, cv.MatType.CV_8U)
+        dst1 = New Mat(dst2.Size, MatType.CV_8U)
         desc = "Train an ML tree to predict each pixel of the boundary cells using color and depth from boundary neighbors."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         bounds.Run(src)
         Dim edgeMask = task.edges.dst2
 
-        Dim rgb32f As New cv.Mat, tmp As New cv.Mat
-        src.ConvertTo(rgb32f, cv.MatType.CV_32FC3)
+        Dim rgb32f As New Mat, tmp As New Mat
+        src.ConvertTo(rgb32f, MatType.CV_32FC3)
 
         dst1 = bounds.feat.fLessMask
-        Dim trainRGB As cv.Mat, trainDepth As cv.Mat
+        Dim trainRGB As Mat, trainDepth As Mat
         For i = 0 To bounds.boundaryCells.Count - 1
             Dim nList = bounds.boundaryCells(i)
 
             ' the first grid square is the center one and the only grid square with edges.  The rest are featureless.
             Dim r = task.gridRects(nList(0))
-            Dim edgePixels As New cv.Mat
+            Dim edgePixels As New Mat
             FindNonZero(edgeMask(r), edgePixels)
 
             ' mark the edge pixels as class 2 - others will be updated next
-            ml.trainResponse = New cv.Mat(nList.Count + edgePixels.Rows - 1, 1,
-                                               cv.MatType.CV_32F, New cv.Scalar(2))
-            trainRGB = New cv.Mat(ml.trainResponse.Rows, 1, cv.MatType.CV_32FC3)
-            trainDepth = New cv.Mat(ml.trainResponse.Rows, 1, cv.MatType.CV_32F)
+            ml.trainResponse = New Mat(nList.Count + edgePixels.Rows - 1, 1,
+                                               MatType.CV_32F, New Scalar(2))
+            trainRGB = New Mat(ml.trainResponse.Rows, 1, MatType.CV_32FC3)
+            trainDepth = New Mat(ml.trainResponse.Rows, 1, MatType.CV_32F)
 
             For j = 1 To nList.Count - 1
                 Dim grA = task.gridRects(nList(j))
                 Dim x As Integer = Math.Floor(grA.X * task.bricksPerRow / task.cols)
                 Dim y As Integer = Math.Floor(grA.Y * task.bricksPerCol / task.rows)
-                Dim val = task.lowResColor.Get(Of cv.Vec3f)(y, x)
-                trainRGB.Set(Of cv.Vec3f)(j - 1, 0, val)
+                Dim val = task.lowResColor.Get(Of Vec3f)(y, x)
+                trainRGB.Set(Of Vec3f)(j - 1, 0, val)
                 trainDepth.Set(Of Single)(j - 1, 0, task.lowResDepth.Get(Of Single)(y, x))
                 ml.trainResponse.Set(Of Single)(j - 1, 0, 1)
             Next
@@ -188,8 +188,8 @@ Public Class XR_Brick_MLColorDepth : Inherits TaskParent
             Dim index = nList.Count - 1
             For j = 0 To edgePixels.Rows - 1
                 Dim pt = edgePixels.Get(Of cv.Point)(j, 0)
-                Dim val = rgb32f(r).Get(Of cv.Vec3f)(pt.Y, pt.X)
-                trainRGB.Set(Of cv.Vec3f)(index + j, 0, val) ' ml.trainResponse already set to 2
+                Dim val = rgb32f(r).Get(Of Vec3f)(pt.Y, pt.X)
+                trainRGB.Set(Of Vec3f)(index + j, 0, val) ' ml.trainResponse already set to 2
                 Dim depth = task.pcSplit(2)(r).Get(Of Single)(pt.Y, pt.X)
                 trainDepth.Set(Of Single)(index + j, 0, depth)
             Next
@@ -200,8 +200,8 @@ Public Class XR_Brick_MLColorDepth : Inherits TaskParent
             ml.testMats = {rgb32f(grB), task.pcSplit(2)(grB)}
             ml.Run(src)
 
-            Dim _thr1 As New cv.Mat
-            Threshold(ml.predictions, dst1(grB), 1.5, 255, cv.ThresholdTypes.BinaryInv)
+            Dim _thr1 As New Mat
+            Threshold(ml.predictions, dst1(grB), 1.5, 255, ThresholdTypes.BinaryInv)
             dst1(grB) = dst1(grB).Reshape(1, grB.Height)
             ConvertScaleAbs(dst1(grB), dst1(grB))
         Next
@@ -235,18 +235,18 @@ Public Class XR_ML_DepthFromColor : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         mats.mat(1) = task.noDepthMask.Clone
 
-        Dim color32f As New cv.Mat
+        Dim color32f As New Mat
         resizer.Run(src)
 
         Dim colorROI As New cv.Rect(0, 0, resizer.newSize.Width, resizer.newSize.Height)
-        resizer.dst2.ConvertTo(color32f, cv.MatType.CV_32FC3)
+        resizer.dst2.ConvertTo(color32f, MatType.CV_32FC3)
         Resize(mats.mat(1), mats.mat(1), color32f.Size())
-        color32f.SetTo(cv.Scalar.Black, mats.mat(1)) ' where depth is unknown, set to black (so we don't learn anything invalid, i.e. good color but missing depth.
+        color32f.SetTo(Scalar.Black, mats.mat(1)) ' where depth is unknown, set to black (so we don't learn anything invalid, i.e. good color but missing depth.
         Resize(task.pcSplit(2), dst0, color32f.Size())
 
-        Dim mask As New cv.Mat
-        Threshold(dst0, mask, task.MaxZmeters, 255, cv.ThresholdTypes.Binary)
-        mask.ConvertTo(mask, cv.MatType.CV_8U)
+        Dim mask As New Mat
+        Threshold(dst0, mask, task.MaxZmeters, 255, ThresholdTypes.Binary)
+        mask.ConvertTo(mask, MatType.CV_8U)
         Resize(mask, mats.mat(2), src.Size())
 
         dst0.SetTo(task.MaxZmeters, Not mask)
@@ -255,22 +255,22 @@ Public Class XR_ML_DepthFromColor : Inherits TaskParent
         colorPal.Run(dst0)
         mats.mat(3) = colorPal.dst2.Clone()
 
-        Threshold(dst0, mask, 1, 255, cv.ThresholdTypes.Binary)
+        Threshold(dst0, mask, 1, 255, ThresholdTypes.Binary)
         ConvertScaleAbs(mask, mask)
         Dim maskCount = CountNonZero(mask)
         dst2 = mask
 
-        Dim learnInput As cv.Mat = color32f.Reshape(1, color32f.Total)
-        Dim depthResponse As cv.Mat = dst0.Reshape(1, dst0.Total)
-        depthResponse.ConvertTo(depthResponse, cv.MatType.CV_32F)
+        Dim learnInput As Mat = color32f.Reshape(1, color32f.Total)
+        Dim depthResponse As Mat = dst0.Reshape(1, dst0.Total)
+        depthResponse.ConvertTo(depthResponse, MatType.CV_32F)
 
         ' now learn what depths are associated with which colors.
-        If rtree Is Nothing Then rtree = cv.ML.RTrees.Create()
-        rtree.Train(learnInput, cv.ML.SampleTypes.RowSample, depthResponse)
+        If rtree Is Nothing Then rtree = ML.RTrees.Create()
+        rtree.Train(learnInput, ML.SampleTypes.RowSample, depthResponse)
 
-        src.ConvertTo(color32f, cv.MatType.CV_32FC3)
+        src.ConvertTo(color32f, MatType.CV_32FC3)
         Dim input = color32f.Reshape(1, color32f.Total) ' test the entire original image.
-        Dim output As New cv.Mat
+        Dim output As New Mat
         rtree.Predict(input, output)
         Dim predictedDepth = output.Reshape(1, src.Height)
 
@@ -302,26 +302,26 @@ Public Class XR_ML_DepthFromXYColor : Inherits TaskParent
         ' desc = "Use BGR to predict depth across the entire image, maxDepth = slider value, resize % as well."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        Dim _cvtInline As New cv.Mat
-        CvtColor(task.noDepthMask, _cvtInline, cv.ColorConversionCodes.GRAY2BGR)
+        Dim _cvtInline As New Mat
+        CvtColor(task.noDepthMask, _cvtInline, ColorConversionCodes.GRAY2BGR)
         mats.mat(0) =_cvtInline
 
-        Dim color32f As New cv.Mat
+        Dim color32f As New Mat
 
         resizer.Run(src)
 
         Dim colorROI As New cv.Rect(0, 0, resizer.newSize.Width, resizer.newSize.Height)
-        resizer.dst2.ConvertTo(color32f, cv.MatType.CV_32FC3)
+        resizer.dst2.ConvertTo(color32f, MatType.CV_32FC3)
         Resize(task.noDepthMask, dst0, color32f.Size())
-        color32f.SetTo(cv.Scalar.Black, dst0) ' where depth is unknown, set to black (so we don't learn anything invalid, i.e. good color but missing depth.
+        color32f.SetTo(Scalar.Black, dst0) ' where depth is unknown, set to black (so we don't learn anything invalid, i.e. good color but missing depth.
         Resize(task.pcSplit(2), dst1, color32f.Size())
 
-        Dim mask As New cv.Mat
-        Threshold(dst1, mask, task.MaxZmeters, task.MaxZmeters, cv.ThresholdTypes.BinaryInv)
+        Dim mask As New Mat
+        Threshold(dst1, mask, task.MaxZmeters, task.MaxZmeters, ThresholdTypes.BinaryInv)
         mask.SetTo(0, dst0) ' remove the unknown depth...
-        mask.ConvertTo(mask, cv.MatType.CV_8U)
-        Dim _cvtResize As New cv.Mat
-        CvtColor(mask, _cvtResize, cv.ColorConversionCodes.GRAY2BGR)
+        mask.ConvertTo(mask, MatType.CV_8U)
+        Dim _cvtResize As New Mat
+        CvtColor(mask, _cvtResize, ColorConversionCodes.GRAY2BGR)
         Resize(_cvtResize, mats.mat(2), src.Size)
 
         mask = Not mask
@@ -331,38 +331,38 @@ Public Class XR_ML_DepthFromXYColor : Inherits TaskParent
         colorizer.Run(dst1)
         mats.mat(3) = colorizer.dst2.Clone()
 
-        Threshold(dst1, mask, 1, 255, cv.ThresholdTypes.Binary)
+        Threshold(dst1, mask, 1, 255, ThresholdTypes.Binary)
         ConvertScaleAbs(mask, mask)
         Dim maskCount = CountNonZero(mask)
-        CvtColor(mask, dst2, cv.ColorConversionCodes.GRAY2BGR)
+        CvtColor(mask, dst2, ColorConversionCodes.GRAY2BGR)
 
         Dim c = color32f.Reshape(1, color32f.Total)
         Dim depthResponse = dst1.Reshape(1, dst1.Total)
-        depthResponse.ConvertTo(depthResponse, cv.MatType.CV_32F)
+        depthResponse.ConvertTo(depthResponse, MatType.CV_32F)
 
-        Dim learnInput As New cv.Mat(c.Rows, 6, cv.MatType.CV_32F, cv.Scalar.All(0))
+        Dim learnInput As New Mat(c.Rows, 6, MatType.CV_32F, Scalar.All(0))
         For y = 0 To c.Rows - 1
             For x = 0 To c.Cols - 1
-                Dim v6 = New cv.Vec6f(c.Get(Of Single)(y, x), c.Get(Of Single)(y, x + 1), c.Get(Of Single)(y, x + 2), x, y, 0)
-                learnInput.Set(Of cv.Vec6f)(y, x, v6)
+                Dim v6 = New Vec6f(c.Get(Of Single)(y, x), c.Get(Of Single)(y, x + 1), c.Get(Of Single)(y, x + 2), x, y, 0)
+                learnInput.Set(Of Vec6f)(y, x, v6)
             Next
         Next
 
         ' Now learn what depths are associated with which colors.
-        If rtree Is Nothing Then rtree = cv.ML.RTrees.Create()
-        rtree.Train(learnInput, cv.ML.SampleTypes.RowSample, depthResponse)
+        If rtree Is Nothing Then rtree = ML.RTrees.Create()
+        rtree.Train(learnInput, ML.SampleTypes.RowSample, depthResponse)
 
-        src.ConvertTo(color32f, cv.MatType.CV_32FC3)
+        src.ConvertTo(color32f, MatType.CV_32FC3)
         Dim allC = color32f.Reshape(1, color32f.Total) ' test the entire original image.
-        Dim input As New cv.Mat(allC.Rows, 6, cv.MatType.CV_32F, cv.Scalar.All(0))
+        Dim input As New Mat(allC.Rows, 6, MatType.CV_32F, Scalar.All(0))
         For y = 0 To allC.Rows - 1
             For x = 0 To allC.Cols - 1
-                Dim v6 = New cv.Vec6f(allC.Get(Of Single)(y, x), allC.Get(Of Single)(y, x + 1), allC.Get(Of Single)(y, x + 2), x, y, 0)
-                input.Set(Of cv.Vec6f)(y, x, v6)
+                Dim v6 = New Vec6f(allC.Get(Of Single)(y, x), allC.Get(Of Single)(y, x + 1), allC.Get(Of Single)(y, x + 2), x, y, 0)
+                input.Set(Of Vec6f)(y, x, v6)
             Next
         Next
 
-        Dim output As New cv.Mat
+        Dim output As New Mat
         rtree.Predict(input, output)
         Dim predictedDepth = output.Reshape(1, src.Height)
 
@@ -404,11 +404,11 @@ Public Class XR_ML_Color2Depth : Inherits TaskParent
         dst2 = color8U.dst3
         labels(2) = "Output of Color8U_Basics running " + task.fOptions.Color8USource.Text
 
-        If rtree Is Nothing Then rtree = cv.ML.RTrees.Create()
+        If rtree Is Nothing Then rtree = ML.RTrees.Create()
         Dim mlInput As New List(Of mlColor)
         Dim mResponse As New List(Of Single)
         Dim predictList As New List(Of mlColor)
-        Dim grPredict As New List(Of cv.Rect)
+        Dim grPredict As New List(of cv.Rect)
         For i = 0 To task.gridRects.Count - 1
             Dim r = task.gridRects(i)
             Dim mls As mlColor
@@ -430,12 +430,12 @@ If CountNonZero(task.noDepthMask(r)) > 0 Then
             Exit Sub
         End If
 
-        Dim mLearn As cv.Mat = cv.Mat.FromPixelData(mlInput.Count, 3, cv.MatType.CV_32F, mlInput.ToArray)
-        Dim response As cv.Mat = cv.Mat.FromPixelData(mResponse.Count, 1, cv.MatType.CV_32F, mResponse.ToArray)
-        rtree.Train(mLearn, cv.ML.SampleTypes.RowSample, response)
+        Dim mLearn As Mat = Mat.FromPixelData(mlInput.Count, 3, MatType.CV_32F, mlInput.ToArray)
+        Dim response As Mat = Mat.FromPixelData(mResponse.Count, 1, MatType.CV_32F, mResponse.ToArray)
+        rtree.Train(mLearn, ML.SampleTypes.RowSample, response)
 
-        Dim predMat = cv.Mat.FromPixelData(predictList.Count, 3, cv.MatType.CV_32F, predictList.ToArray)
-        Dim output = New cv.Mat(predictList.Count, 1, cv.MatType.CV_32FC1, cv.Scalar.All(0))
+        Dim predMat = Mat.FromPixelData(predictList.Count, 3, MatType.CV_32F, predictList.ToArray)
+        Dim output = New Mat(predictList.Count, 1, MatType.CV_32FC1, Scalar.All(0))
         rtree.Predict(predMat, output)
 
         dst3 = task.pcSplit(2).Clone
@@ -479,11 +479,11 @@ Public Class XR_ML_ColorInTier2Depth : Inherits TaskParent
         dst2 = color8U.dst3
         labels(2) = "Output of Color8U_Basics running " + task.fOptions.Color8USource.Text
 
-        If rtree Is Nothing Then rtree = cv.ML.RTrees.Create()
+        If rtree Is Nothing Then rtree = ML.RTrees.Create()
         Dim mlInput As New List(Of mlColorInTier)
         Dim mResponse As New List(Of Single)
         Dim predictList As New List(Of mlColorInTier)
-        Dim grPredict As New List(Of cv.Rect)
+        Dim grPredict As New List(of cv.Rect)
         For i = 0 To task.gridRects.Count - 1
             Dim r = task.gridRects(i)
             Dim mls As mlColorInTier
@@ -505,12 +505,12 @@ If CountNonZero(task.noDepthMask(r)) > 0 Then
             Exit Sub
         End If
 
-        Dim mLearn As cv.Mat = cv.Mat.FromPixelData(mlInput.Count, 3, cv.MatType.CV_32F, mlInput.ToArray)
-        Dim response As cv.Mat = cv.Mat.FromPixelData(mResponse.Count, 1, cv.MatType.CV_32F, mResponse.ToArray)
-        rtree.Train(mLearn, cv.ML.SampleTypes.RowSample, response)
+        Dim mLearn As Mat = Mat.FromPixelData(mlInput.Count, 3, MatType.CV_32F, mlInput.ToArray)
+        Dim response As Mat = Mat.FromPixelData(mResponse.Count, 1, MatType.CV_32F, mResponse.ToArray)
+        rtree.Train(mLearn, ML.SampleTypes.RowSample, response)
 
-        Dim predMat = cv.Mat.FromPixelData(predictList.Count, 3, cv.MatType.CV_32F, predictList.ToArray)
-        Dim output = New cv.Mat(predictList.Count, cv.MatType.CV_32FC1, 0)
+        Dim predMat = Mat.FromPixelData(predictList.Count, 3, MatType.CV_32F, predictList.ToArray)
+        Dim output = New Mat(predictList.Count, MatType.CV_32FC1, 0)
         rtree.Predict(predMat, output)
 
         dst3 = task.pcSplit(2).Clone
@@ -538,7 +538,7 @@ Public Class ML_RemoveDups_CPP : Inherits TaskParent
         desc = "The input is BGR, convert to BGRA, and sorted as an integer.  The output is a sorted BGR Mat file with duplicates removed."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If src.Type = cv.MatType.CV_8U Then dst2 = src.Clone Else dst2 = task.gray
+        If src.Type = MatType.CV_8U Then dst2 = src.Clone Else dst2 = task.gray
 
         Dim dataSrc(dst2.Total * dst2.ElemSize) As Byte
         Marshal.Copy(dst2.Data, dataSrc, 0, dataSrc.Length)
@@ -547,7 +547,7 @@ Public Class ML_RemoveDups_CPP : Inherits TaskParent
         handleSrc.Free()
 
         Dim compressedCount = ML_RemoveDups_GetCount(cPtr)
-        dst3 = cv.Mat.FromPixelData(src.Rows, src.Cols, cv.MatType.CV_8U, imagePtr).Clone
+        dst3 = Mat.FromPixelData(src.Rows, src.Cols, MatType.CV_8U, imagePtr).Clone
 
         labels(3) = "The BGR data in dst2 after removing duplicate BGR entries.  Input count = " + CStr(dst2.Total) + " output = " + CStr(compressedCount)
     End Sub
@@ -562,13 +562,13 @@ End Class
 
 Public Class ML_RandomForest : Inherits TaskParent
     Implements IDisposable
-    Public trainMat As New cv.Mat
-    Public trainResponse As cv.Mat ' 32FC1 format
-    Public testMat As New cv.Mat
-    Public predictions As New cv.Mat
+    Public trainMat As New Mat
+    Public trainResponse As Mat ' 32FC1 format
+    Public testMat As New Mat
+    Public predictions As New Mat
     Dim rtrees As RTrees
     Public Sub New()
-        rtrees = cv.ML.RTrees.Create()
+        rtrees = ML.RTrees.Create()
         desc = "Run RandomForest on the provided inputs..."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -588,15 +588,15 @@ Public Class ML_RandomForest : Inherits TaskParent
         rtrees.RegressionAccuracy = 0.0
         rtrees.UseSurrogates = False
         rtrees.MaxCategories = 16
-        rtrees.Priors = New cv.Mat
+        rtrees.Priors = New Mat
         rtrees.CalculateVarImportance = False
         rtrees.ActiveVarCount = varCount
-        rtrees.TermCriteria = cv.TermCriteria.Both(5, 0)
+        rtrees.TermCriteria = TermCriteria.Both(5, 0)
 
         If task.heartBeatLT Then
-            rtrees.Train(trainMat, cv.ML.SampleTypes.RowSample, trainResponse)
+            rtrees.Train(trainMat, ML.SampleTypes.RowSample, trainResponse)
         Else
-            predictions = New cv.Mat
+            predictions = New Mat
             rtrees.Predict(testMat, predictions)
         End If
     End Sub

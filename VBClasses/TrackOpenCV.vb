@@ -3,8 +3,8 @@ Imports System.Runtime.InteropServices
 ' https://learnopencvb.com/object-tracking-using-opencv-cpp-python/
 Public Class TrackOpenCV_Basics : Inherits TaskParent
     Implements IDisposable
-    Public outputRect As cv.Rect
-    Public inputRect As cv.Rect
+    Public outputRect as cv.Rect
+    Public inputRect as cv.Rect
     Dim options As New Options_Tracker
     Dim track As New TrackOpenCV_Basics_QT
     Public Sub New()
@@ -34,8 +34,8 @@ End Class
 
 Public Class TrackOpenCV_Basics_QT : Inherits TaskParent
     Implements IDisposable
-    Public outputRect As cv.Rect
-    Public inputRect As cv.Rect
+    Public outputRect as cv.Rect
+    Public inputRect as cv.Rect
     Public trackerIndex As Integer = 1 ' default is "MIL" 
     Public Sub New()
         If task.drawRect.Width = 0 Or task.drawRect.Height = 0 Then
@@ -110,7 +110,7 @@ Public Class XR_Track_GridRect : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         Dim lpList = task.lines.lpList
 
-        Static searchRect As cv.Rect, originalRect As cv.Rect
+        Static searchRect as cv.Rect, originalRect as cv.Rect
         If searchRect.Width = 0 Or searchRect.Height = 0 Then
             Dim gridIndex = task.gridMap.Get(Of Integer)(lpList(0).p1.Y, lpList(0).p1.X)
             originalRect = task.gridRects(gridIndex)

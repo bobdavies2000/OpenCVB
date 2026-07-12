@@ -5,8 +5,8 @@ Public Class SuperRes_Basics : Inherits TaskParent
     Implements IDisposable
     Dim video As New SuperRes_Input
     Dim options As New Options_SuperRes
-    Dim optFlow As cv.DenseOpticalFlowExt
-    Dim superres As cv.SuperResolution
+    Dim optFlow As DenseOpticalFlowExt
+    Dim superres As SuperResolution
     Dim warningMessage As Integer = 10
     Public Sub New()
         labels(2) = "Original Input video"
@@ -34,20 +34,20 @@ Public Class SuperRes_Basics : Inherits TaskParent
         If optFlow Is Nothing Then
             Select Case options.method ' only one method available with OpenCVSharp...
                 Case "farneback"
-                    optFlow = cv.FarnebackOpticalFlow.CreateFarneback
+                    optFlow = FarnebackOpticalFlow.CreateFarneback
                 Case "brox"
-                    optFlow = cv.BroxOpticalFlow.CreateFarneback
+                    optFlow = BroxOpticalFlow.CreateFarneback
                 Case "tvl1"
-                    optFlow = cv.DualTVL1OpticalFlow.CreateDualTVL1
+                    optFlow = DualTVL1OpticalFlow.CreateDualTVL1
                 Case "pyrlk"
-                    optFlow = cv.PyrLKOpticalFlow.CreateFarneback
+                    optFlow = PyrLKOpticalFlow.CreateFarneback
             End Select
             If optFlow Is Nothing Then Exit Sub
-            superres = cv.SuperResolution.CreateBTVL1()
+            superres = SuperResolution.CreateBTVL1()
             superres.Iterations = options.iterations
             superres.Scale = 4
             superres.TemporalAreaRadius = 4
-            superres.SetInput(cv.FrameSource.CreateFrameSource_Video(video.inputFileName))
+            superres.SetInput(FrameSource.CreateFrameSource_Video(video.inputFileName))
         End If
 
         superres.NextFrame(dst3)

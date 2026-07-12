@@ -33,9 +33,9 @@ Public Class Benford_Basics : Inherits TaskParent
         use99 = True
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        Dim gray32f As New cv.Mat
+        Dim gray32f As New Mat
         If standalone Then
-            task.gray.ConvertTo(gray32f, cv.MatType.CV_32F)
+            task.gray.ConvertTo(gray32f, MatType.CV_32F)
         Else
             gray32f = src
         End If
@@ -67,16 +67,16 @@ Public Class Benford_Basics : Inherits TaskParent
             Next
         End If
 
-        Dim hist = cv.Mat.FromPixelData(counts.Length, 1, cv.MatType.CV_32F, counts)
-        plotHist.backgroundColor = cv.Scalar.Blue
+        Dim hist = Mat.FromPixelData(counts.Length, 1, MatType.CV_32F, counts)
+        plotHist.backgroundColor = Scalar.Blue
         plotHist.Run(hist)
         dst3 = plotHist.dst2.Clone
         For i = 0 To counts.Count - 1
             counts(i) = gray32f.Cols * expectedDistribution(i)
         Next
 
-        hist = cv.Mat.FromPixelData(counts.Length, 1, cv.MatType.CV_32F, counts)
-        plotHist.backgroundColor = cv.Scalar.Gray
+        hist = Mat.FromPixelData(counts.Length, 1, MatType.CV_32F, counts)
+        plotHist.backgroundColor = Scalar.Gray
         plotHist.Run(hist)
 
         dst2 = ShowAddweighted(Not plotHist.dst2, dst3, labels(2))
@@ -95,8 +95,8 @@ Public Class XR_Benford_NormalizedImage : Inherits TaskParent
         desc = "Perform a Benford analysis of an image normalized to between 0 and 1"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        Dim gray32f As New cv.Mat
-        task.gray.ConvertTo(gray32f, cv.MatType.CV_32F)
+        Dim gray32f As New Mat
+        task.gray.ConvertTo(gray32f, MatType.CV_32F)
 
         benford.Run(gray32f)
         Normalize(benford.dst2, dst2, 1)
@@ -119,8 +119,8 @@ Public Class XR_Benford_NormalizedImage99 : Inherits TaskParent
         desc = "Perform a Benford analysis for 10-99, not 1-9, of an image normalized to between 0 and 1"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        Dim gray32f As New cv.Mat
-        task.gray.ConvertTo(gray32f, cv.MatType.CV_32F)
+        Dim gray32f As New Mat
+        task.gray.ConvertTo(gray32f, MatType.CV_32F)
 
         benford.Run(gray32f)
         Normalize(benford.dst2, dst2, 1)
@@ -147,8 +147,8 @@ Public Class XR_Benford_JPEG : Inherits TaskParent
         Dim param = New ImageEncodingParam(ImwriteFlags.JpegQuality, options.quality)
         Dim jpeg As Byte() = Nothing
         ImEncode(".jpg", src, jpeg, param)
-        Dim tmp = cv.Mat.FromPixelData(jpeg.Count, 1, cv.MatType.CV_8U, jpeg)
-        dst3 = ImDecode(tmp, cv.ImreadModes.Color)
+        Dim tmp = Mat.FromPixelData(jpeg.Count, 1, MatType.CV_8U, jpeg)
+        dst3 = ImDecode(tmp, ImreadModes.Color)
         benford.Run(tmp)
         dst2 = benford.dst2
         labels(2) = benford.labels(3)
@@ -175,8 +175,8 @@ Public Class XR_Benford_JPEG99 : Inherits TaskParent
         Dim param = New ImageEncodingParam(ImwriteFlags.JpegQuality, options.quality)
         Dim jpeg As Byte() = Nothing
         ImEncode(".jpg", src, jpeg, param)
-        Dim tmp = cv.Mat.FromPixelData(jpeg.Count, 1, cv.MatType.CV_8U, jpeg)
-        dst3 = ImDecode(tmp, cv.ImreadModes.Color)
+        Dim tmp = Mat.FromPixelData(jpeg.Count, 1, MatType.CV_8U, jpeg)
+        dst3 = ImDecode(tmp, ImreadModes.Color)
         benford.Run(tmp)
         dst2 = benford.dst2
         labels(2) = benford.labels(3)
@@ -203,8 +203,8 @@ Public Class XR_Benford_PNG : Inherits TaskParent
         Dim param = New ImageEncodingParam(ImwriteFlags.JpegQuality, 90)
         Dim png As Byte() = Nothing
         ImEncode(".jpg", src, png, param)
-        Dim tmp = cv.Mat.FromPixelData(png.Count, 1, cv.MatType.CV_8U, png)
-        dst3 = ImDecode(tmp, cv.ImreadModes.Color)
+        Dim tmp = Mat.FromPixelData(png.Count, 1, MatType.CV_8U, png)
+        dst3 = ImDecode(tmp, ImreadModes.Color)
         benford.Run(tmp)
         dst2 = benford.dst2
         labels(2) = benford.labels(3)
@@ -249,8 +249,8 @@ Public Class XR_Benford_Primes : Inherits TaskParent
         If task.optionsChanged Then sieve.Run(src) ' only need to compute this once...
         SetTrueText($"Primes found: {sieve.primes.Count}", 3)
 
-        Dim tmp = cv.Mat.FromPixelData(sieve.primes.Count, 1, cv.MatType.CV_32S, sieve.primes.ToArray())
-        tmp.ConvertTo(tmp, cv.MatType.CV_32F)
+        Dim tmp = Mat.FromPixelData(sieve.primes.Count, 1, MatType.CV_32S, sieve.primes.ToArray())
+        tmp.ConvertTo(tmp, MatType.CV_32F)
         benford.Run(tmp)
         dst2 = benford.dst2
     End Sub

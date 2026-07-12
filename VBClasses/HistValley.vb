@@ -28,7 +28,7 @@ Public Class HistValley_Basics : Inherits TaskParent
         scaleList.Add(dst2.Height - dst2.Height * avg(0) / hist.plotHist.mm.maxVal)
         Dim scale = scaleList.Average()
         SetTrueText("Mean", New cv.Point(5, scale), 3)
-        Line(dst2, New cv.Point(0, scale), New cv.Point(dst2.Width, scale), cv.Scalar.Yellow, task.lineWidth + 1)
+        Line(dst2, New cv.Point(0, scale), New cv.Point(dst2.Width, scale), Scalar.Yellow, task.lineWidth + 1)
 
         If scaleList.Count > task.fOptions.FrameHistoryCount.Value  Then scaleList.RemoveAt(0)
 
@@ -72,7 +72,7 @@ Public Class HistValley_FromPeaks : Inherits TaskParent
         OptionParent.FindSlider("Desired boundary count").Value = 10
         desc = "Use the peaks identified in HistValley_Peaks to find the valleys between the peaks."
     End Sub
-    Public Sub updatePlot(dst As cv.Mat, bins As Integer)
+    Public Sub updatePlot(dst As Mat, bins As Integer)
         For Each valley In valleyIndex
             Dim col = dst.Width * valley / bins
             Line(dst, New cv.Point(col, dst.Height), New cv.Point(col, dst.Height * 9 / 10), white, task.lineWidth)
@@ -132,7 +132,7 @@ Public Class HistValley_Peaks : Inherits TaskParent
         options.Run()
         Dim desiredBoundaries = options.desiredBoundaries
 
-        If src.Type <> cv.MatType.CV_32FC1 Or standaloneTest() Then
+        If src.Type <> MatType.CV_32FC1 Or standaloneTest() Then
             src = task.pcSplit(2)
             hist.Run(src)
             dst2 = hist.dst2
@@ -196,7 +196,7 @@ End Class
 
 Public Class HistValley_Depth : Inherits TaskParent
     Public valley As New HistValley_FromPeaks
-    Dim histogram As cv.Mat
+    Dim histogram As Mat
     Public Sub New()
         labels(2) = "Top markerstop = peaks, bottom markers = valleys"
         desc = "Find the valleys in the depth histogram."
@@ -239,7 +239,7 @@ Public Class HistValley_Depth1 : Inherits TaskParent
         desc = "Find the valleys in the depth histogram."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If src.Type <> cv.MatType.CV_32F Then src = task.pcSplit(2)
+        If src.Type <> MatType.CV_32F Then src = task.pcSplit(2)
         valley.Run(src)
         dst1 = valley.dst1
         dst2 = valley.dst2
@@ -324,7 +324,7 @@ End Class
 
 Public Class HistValley_OptionsAuto : Inherits TaskParent
     Dim kalman As New Histogram_Kalman
-    Public histogram As New cv.Mat
+    Public histogram As New Mat
     Public auto As New OpAuto_Valley
     Public Sub New()
         task.gOptions.setHistogramBins(255)
@@ -352,7 +352,7 @@ Public Class HistValley_OptionsAuto : Inherits TaskParent
             Next
         End If
 
-        If src.Type = cv.MatType.CV_32F Then histogram += 1
+        If src.Type = MatType.CV_32F Then histogram += 1
 
         CalcBackProject({src}, {0}, histogram, dst1, kalman.hist.ranges)
 
@@ -400,7 +400,7 @@ Public Class XR_HistValley_EdgeDraw : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         edgeline.Run(task.gray)
         dst3 = src
-        dst3.SetTo(cv.Scalar.Black, edgeline.dst2)
+        dst3.SetTo(Scalar.Black, edgeline.dst2)
 
         valley.Run(dst3)
         dst2 = valley.dst2
@@ -430,7 +430,7 @@ Public Class XR_HistValley_Simple : Inherits TaskParent
         kalman.kInput = trends.resultingValues.ToArray
         kalman.Run(emptyMat)
 
-        dst2.SetTo(cv.Scalar.Black)
+        dst2.SetTo(Scalar.Black)
         Dim barWidth As Single = dst2.Width / trends.resultingValues.Count
         Dim colorIndex As Integer
         Dim color = task.scalarColors(colorIndex Mod 256)
@@ -453,7 +453,7 @@ Public Class XR_HistValley_Simple : Inherits TaskParent
         Dim lastPoint As cv.Point = trends.resultingPoints(0)
         For i = 1 To trends.resultingPoints.Count - 1
             Dim p1 = trends.resultingPoints(i)
-            Line(dst2, lastPoint, p1, cv.Scalar.Yellow, task.lineWidth, task.lineType)
+            Line(dst2, lastPoint, p1, Scalar.Yellow, task.lineWidth, task.lineType)
             lastPoint = p1
         Next
         labels(2) = "Depth regions between 0 and " + CStr(CInt(task.MaxZmeters + 1)) + " meters"
@@ -471,7 +471,7 @@ Public Class XR_HistValley_Tiers : Inherits TaskParent
     Dim valleys As New HistValley_FromPeaks
     Public Sub New()
         labels = {"", "", "CV_8U tier map with values ranging from 0 to the desired valley count", "ShowPalette output of dst2."}
-        dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
+        dst2 = New Mat(dst2.Size(), MatType.CV_8U, Scalar.All(0))
         desc = "Display the depth as tiers defined by the depth valleys in the histogram of depth."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -509,9 +509,9 @@ Public Class XR_HistValley_Colors : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If task.heartBeat Then splitIndex = (splitIndex + 1) Mod 3
-        Dim nextChan As New cv.Mat
+        Dim nextChan As New Mat
         ExtractChannel(src, nextChan, splitIndex)
-        hist.hist.plotHist.backgroundColor = Choose(splitIndex + 1, cv.Scalar.Blue, cv.Scalar.Green, cv.Scalar.Red)
+        hist.hist.plotHist.backgroundColor = Choose(splitIndex + 1, Scalar.Blue, Scalar.Green, Scalar.Red)
         hist.Run(nextChan)
         dst2 = hist.dst2
 
@@ -591,7 +591,7 @@ Public Class XR_HistValley_GrayScale1 : Inherits TaskParent
         Dim wquartile = dst2.Width / 4
         For i = 0 To 2
             Dim col = wquartile * (i + 1)
-            Line(dst2, New cv.Point(col, 0), New cv.Point(col, dst2.Height), cv.Scalar.Yellow, task.lineWidth + 2)
+            Line(dst2, New cv.Point(col, 0), New cv.Point(col, dst2.Height), Scalar.Yellow, task.lineWidth + 2)
         Next
 
         Dim start As Integer
@@ -644,13 +644,13 @@ Public Class HistValley_Count : Inherits TaskParent
         desc = "Count the number of peaks and valleys in the depth data provided."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If src.Type <> cv.MatType.CV_32F Then src = task.pcSplit(2)
+        If src.Type <> MatType.CV_32F Then src = task.pcSplit(2)
         If task.firstPass Then standalone = standaloneTest() ' to be consistent below and allow override.
 
         Dim mm = GetMinMax(src)
-        Dim ranges = {New cv.Rangef(mm.minVal - histDelta, mm.maxVal + histDelta)}
-        Dim histogram As New cv.Mat
-        CalcHist({src}, {0}, New cv.Mat, histogram, 1, {task.histogramBins}, ranges)
+        Dim ranges = {New Rangef(mm.minVal - histDelta, mm.maxVal + histDelta)}
+        Dim histogram As New Mat
+        CalcHist({src}, {0}, New Mat, histogram, 1, {task.histogramBins}, ranges)
 
         If standaloneFlag And task.heartBeat Then
             plot.Run(histogram)
@@ -675,7 +675,7 @@ Public Class HistValley_Count : Inherits TaskParent
                 state = True
                 Dim p1 = New cv.Point(i * incr, 0)
                 Dim p2 = New cv.Point(i * incr, dst2.Height)
-                If standaloneFlag And task.heartBeat Then Line(dst2, p1, p2, cv.Scalar.White, task.lineWidth)
+                If standaloneFlag And task.heartBeat Then Line(dst2, p1, p2, Scalar.White, task.lineWidth)
             ElseIf state = True And count < threshold Then
                 state = False
             End If
@@ -683,7 +683,7 @@ Public Class HistValley_Count : Inherits TaskParent
 
         If standaloneFlag And task.heartBeat Then
             Dim y = dst2.Height * (maxVal - threshold) / maxVal
-            Line(dst2, New cv.Point(0, y), New cv.Point(dst2.Width, y), cv.Scalar.White, task.lineWidth)
+            Line(dst2, New cv.Point(0, y), New cv.Point(dst2.Width, y), Scalar.White, task.lineWidth)
         End If
         If task.heartBeat Then strOut = CStr(classCount) + " depth classes were found - " +
                                             "marked by vertical lines."

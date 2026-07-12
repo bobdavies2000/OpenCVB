@@ -31,7 +31,7 @@ Public Class XR_Erode_CloudXY : Inherits TaskParent
     Public Sub New()
         OptionParent.FindSlider("Dilate Iterations").Value = 2
         OptionParent.findRadio("Erode shape: Ellipse").Checked = True
-        labels = {"", "", "Eroded point cloud X", "Erode point cloud Y"}
+        labels = {"", "", "Eroded cv.Point cloud X", "Erode cv.Point cloud Y"}
         desc = "Erode depth and then find edges"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -91,8 +91,8 @@ Public Class XR_Erode_Dilate : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
-        MorphologyEx(src, dst2, cv.MorphTypes.Close, options.element)
-        MorphologyEx(dst2, dst2, cv.MorphTypes.Open, options.element)
+        MorphologyEx(src, dst2, MorphTypes.Close, options.element)
+        MorphologyEx(dst2, dst2, MorphTypes.Open, options.element)
     End Sub
 End Class
 

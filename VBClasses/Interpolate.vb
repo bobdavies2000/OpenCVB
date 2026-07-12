@@ -27,7 +27,7 @@ Public Class Interpolate_Basics : Inherits TaskParent
         End If
 
         dst2 = src.Clone
-        Dim newSize = New cv.Size(CInt(dst2.Width * saveSliderValue / 100), CInt(dst2.Height * saveSliderValue / 100))
+        Dim newSize = New Size(CInt(dst2.Width * saveSliderValue / 100), CInt(dst2.Height * saveSliderValue / 100))
         Resize(src, dst2, newSize, 0, 0, options.warpFlag)
         labels(2) = "Resize % = " + (saveSliderValue / 100).ToString("0%")
     End Sub
@@ -55,15 +55,15 @@ Public Class Interpolate_Kalman : Inherits TaskParent
 
         inter.Run(src)
 
-        CvtColor(inter.dst2, dst2, cv.ColorConversionCodes.BGR2GRAY)
+        CvtColor(inter.dst2, dst2, ColorConversionCodes.BGR2GRAY)
         If task.optionsChanged Then
             ReDim kalman.kInput(dst2.Width * dst2.Height - 1)
             myFrameCount = 1
             updatedFrames = 0
         End If
 
-        Dim tmp32f As New cv.Mat
-        dst2.ConvertTo(tmp32f, cv.MatType.CV_32F)
+        Dim tmp32f As New Mat
+        dst2.ConvertTo(tmp32f, MatType.CV_32F)
         tmp32f.GetArray(Of Single)(kalman.kInput)
         kalman.Run(emptyMat)
 
@@ -83,9 +83,9 @@ Public Class Interpolate_Kalman : Inherits TaskParent
             labels(2) = "Raw output after resizing to " + CStr(dst2.Width) + "x" + CStr(dst2.Height)
         End If
 
-        Static lastframe As cv.Mat = dst2.Clone
+        Static lastframe As Mat = dst2.Clone
         If lastframe.Size <> dst2.Size Then lastframe = dst2.Clone
-        Dim tmp As cv.Mat = dst2 - lastframe
+        Dim tmp As Mat = dst2 - lastframe
         Dim diffCount = CountNonZero(tmp)
         If diffCount > inter.iOptions.pixelCountThreshold Then
             lastframe = dst2.Clone
@@ -122,16 +122,16 @@ Public Class XR_Interpolate_Lines : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         inter.Run(src)
-        Dim _cvtResize As New cv.Mat
-        CvtColor(inter.dst2, _cvtResize, cv.ColorConversionCodes.BGR2GRAY)
+        Dim _cvtResize As New Mat
+        CvtColor(inter.dst2, _cvtResize, ColorConversionCodes.BGR2GRAY)
         Resize(_cvtResize, dst1, dst3.Size)
-        Threshold(dst1, dst1, inter.iOptions.interpolationThreshold, 255, cv.ThresholdTypes.Binary)
+        Threshold(dst1, dst1, inter.iOptions.interpolationThreshold, 255, ThresholdTypes.Binary)
 
         dst2 = task.lines.dst2
         dst3 = src
 
         For Each lp In task.lines.lpList
-            Line(dst3, lp.p1, lp.p2, cv.Scalar.Yellow, task.lineWidth, task.lineType)
+            Line(dst3, lp.p1, lp.p2, Scalar.Yellow, task.lineWidth, task.lineType)
         Next
         labels(3) = "There were " + CStr(task.lines.lpList.Count) + " lines found"
         labels(2) = inter.labels(2)
@@ -151,7 +151,7 @@ Public Class XR_Interpolate_Difference : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         inter.Run(src)
-        CvtColor(inter.dst3, dst2, cv.ColorConversionCodes.BGR2GRAY)
+        CvtColor(inter.dst3, dst2, ColorConversionCodes.BGR2GRAY)
         labels(2) = inter.labels(3)
 
         diff.lastFrame = task.gray

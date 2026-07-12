@@ -4,9 +4,9 @@ Public Class BlockMatching_Basics : Inherits TaskParent
     Implements IDisposable
     Dim colorizer As New DepthColorizer_CPP
     Dim options As New Options_BlockMatching
-    Public leftView As cv.Mat, rightView As cv.Mat
+    Public leftView As Mat, rightView As Mat
     Dim LRMeanSub As New MeanSubtraction_LeftRight
-    Dim blockMatch As cv.StereoBM
+    Dim blockMatch As StereoBM
     Public Sub New()
         labels(2) = "Block matching disparity colorized like depth"
         labels(3) = "Right Image (used with left image)"
@@ -16,7 +16,7 @@ Public Class BlockMatching_Basics : Inherits TaskParent
         options.Run()
         LRMeanSub.Run(src)
 
-        If blockMatch Is Nothing Then blockMatch = cv.StereoBM.Create()
+        If blockMatch Is Nothing Then blockMatch = StereoBM.Create()
         blockMatch.BlockSize = options.blockSize
         blockMatch.MinDisparity = 0
         blockMatch.ROI1 = New cv.Rect(0, 0, task.leftView.Width, task.leftView.Height)
@@ -29,14 +29,14 @@ Public Class BlockMatching_Basics : Inherits TaskParent
         blockMatch.SpeckleRange = 32
         blockMatch.Disp12MaxDiff = 1
 
-        Dim disparity As New cv.Mat
+        Dim disparity As New Mat
         blockMatch.Compute(LRMeanSub.dst2, LRMeanSub.dst3, disparity)
-        disparity.ConvertTo(dst1, cv.MatType.CV_32F, 1 / 16)
-        Threshold(dst1, dst1, 0, 0, cv.ThresholdTypes.Tozero)
+        disparity.ConvertTo(dst1, MatType.CV_32F, 1 / 16)
+        Threshold(dst1, dst1, 0, 0, ThresholdTypes.Tozero)
         Dim topMargin = 10, sideMargin = 8
         Dim rect = New cv.Rect(options.numDisparity + sideMargin, topMargin, src.Width - options.numDisparity - sideMargin * 2, src.Height - topMargin * 2)
         Divide(options.distance, dst1(rect), dst1(rect)) ' this needs much more refinement.  The trackbar value is just an approximation.
-        Threshold(dst1(rect), dst1(rect), 10, 10, cv.ThresholdTypes.Trunc)
+        Threshold(dst1(rect), dst1(rect), 10, 10, ThresholdTypes.Trunc)
         colorizer.Run(dst1)
         dst2(rect) = colorizer.dst2(rect)
         Resize(task.rightView, dst3, src.Size())

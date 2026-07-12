@@ -1,15 +1,15 @@
 ﻿Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 Public Class PlotTime_Basics : Inherits TaskParent
-    Public plotData As cv.Scalar
+    Public plotData As Scalar
     Public plotCount As Integer = 3
-    Public plotColors() As cv.Scalar = {cv.Scalar.Blue, cv.Scalar.LawnGreen, cv.Scalar.Red, white}
-    Public backColor = cv.Scalar.DarkGray
+    Public plotColors() As Scalar = {Scalar.Blue, Scalar.LawnGreen, Scalar.Red, white}
+    Public backColor = Scalar.DarkGray
     Public minScale As Integer = 50
     Public maxScale As Integer = 200
     Public plotTriggerRescale = 50
     Public columnIndex As Integer
     Public offChartCount As Integer
-    Public lastXdelta As New List(Of cv.Scalar)
+    Public lastXdelta As New List(Of Scalar)
     Public controlScale As Boolean ' Use this to programmatically control the scale (rather than let the automated way below keep the scale.)
     Public Sub New()
         desc = "Plot an input variable over time"
@@ -93,10 +93,10 @@ End Class
 
 Public Class PlotTime_Single : Inherits TaskParent
     Public plotData As Single
-    Public backColor = cv.Scalar.DarkGray
+    Public backColor = Scalar.DarkGray
     Public max As Single, min As Single, avg, fmt As String
     Public useFixedRange As Boolean
-    Public plotColor = cv.Scalar.Blue
+    Public plotColor = Scalar.Blue
     Dim inputList As New List(Of Single)
     Public Sub New()
         labels(2) = "PlotTime_Basics "
@@ -107,7 +107,7 @@ Public Class PlotTime_Single : Inherits TaskParent
 
         If inputList.Count >= dst2.Width Then inputList.RemoveAt(0)
         inputList.Add(plotData)
-        dst2.ColRange(New cv.Range(0, inputList.Count)).SetTo(backColor)
+        dst2.ColRange(New Range(0, inputList.Count)).SetTo(backColor)
 
         If useFixedRange = False Then
             max = inputList.Max
@@ -117,7 +117,7 @@ Public Class PlotTime_Single : Inherits TaskParent
         For i = 0 To inputList.Count - 1
             y = 1 - (inputList(i) - min) / (max - min)
             y = y * dst2.Height - 1
-            Dim c As New cv.Point2f(i, y)
+            Dim c As New Point2f(i, y)
             If c.X < 1 Then c.X = 1
             Circle(dst2, c, task.DotSize, blue, -1, task.lineType)
         Next
@@ -134,7 +134,7 @@ Public Class PlotTime_Single : Inherits TaskParent
                 End If
                 Dim pt = Choose(i + 1, New cv.Point(0, 10), New cv.Point(0, dst2.Height \ 2 - 5),
                             New cv.Point(0, dst2.Height - 3))
-                PutText(dst2, nextText, pt, cv.HersheyFonts.HersheyPlain, 0.7, white, 1, task.lineType)
+                PutText(dst2, nextText, pt, HersheyFonts.HersheyPlain, 0.7, white, 1, task.lineType)
             Next
         End If
 
@@ -153,16 +153,16 @@ End Class
 
 
 Public Class PlotTime_Scalar : Inherits TaskParent
-    Public plotData As cv.Scalar
+    Public plotData As Scalar
     Public plotCount As Integer = 3
     Public plotList As New List(Of PlotTime_Single)
     Dim mats As New Mat_4Click
     Public Sub New()
         For i = 0 To 3
             plotList.Add(New PlotTime_Single)
-            plotList(i).plotColor = Choose(i + 1, cv.Scalar.Blue, cv.Scalar.Green, cv.Scalar.Red, cv.Scalar.Yellow)
+            plotList(i).plotColor = Choose(i + 1, Scalar.Blue, Scalar.Green, Scalar.Red, Scalar.Yellow)
         Next
-        desc = "Plot the requested number of entries in the cv.scalar input"
+        desc = "Plot the requested number of entries in the scalar input"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If standaloneTest() Then plotData = Mean(task.color)
@@ -185,16 +185,16 @@ End Class
 
 
 Public Class PlotTime_FixedScale : Inherits TaskParent
-    Public plotData As cv.Scalar
+    Public plotData As Scalar
     Public plotCount As Integer = 3
-    Public plotColors() As cv.Scalar = {cv.Scalar.Blue, cv.Scalar.Green, cv.Scalar.Red, white}
-    Public backColor = cv.Scalar.DarkGray
+    Public plotColors() As Scalar = {Scalar.Blue, Scalar.Green, Scalar.Red, white}
+    Public backColor = Scalar.DarkGray
     Public minScale As Integer = 50
     Public maxScale As Integer = 200
     Public plotTriggerRescale = 50
     Public columnIndex As Integer
     Public offChartCount As Integer
-    Public lastXdelta As New List(Of cv.Scalar)
+    Public lastXdelta As New List(Of Scalar)
     Public controlScale As Boolean ' Use this to programmatically control the scale (rather than let the automated way below keep the scale.)
     Public showScale As Boolean = True
     Public fixedScale As Boolean

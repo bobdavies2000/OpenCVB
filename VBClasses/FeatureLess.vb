@@ -2,24 +2,24 @@ Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 Public Class FeatureLess_Basics_TA : Inherits TaskParent
     Public regions As New SortedList(Of Integer, cv.Rect)(New compareAllowIdenticalIntegerInverted)
     Public indexList As New SortedList(Of Integer, Integer)(New compareAllowIdenticalIntegerInverted)
-    Public brickList As New List(Of cv.Rect)
+    Public brickList As New List(of cv.Rect)
     Dim index As Integer
-    Dim rect As cv.Rect
-    Public mask As cv.Mat = New cv.Mat(New cv.Size(dst2.Width + 2, dst2.Height + 2), cv.MatType.CV_8U, 0)
+    Dim rect as cv.Rect
+    Public mask As Mat = New Mat(New Size(dst2.Width + 2, dst2.Height + 2), MatType.CV_8U, 0)
     Public Sub New()
-        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
-        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
+        dst1 = New Mat(dst1.Size, MatType.CV_8U, 0)
+        dst3 = New Mat(dst3.Size, MatType.CV_8U, 0)
         labels(3) = "CV_8U representation of the regions"
         desc = "Identify featureless grid rects."
     End Sub
-    Public Function buildMap(input As cv.Mat) As cv.Mat
+    Public Function buildMap(input As Mat) As Mat
         mask.SetTo(0)
         For Each r In task.gridRects
             Dim val1 = input(r).Get(Of Byte)(0, 0)
             Dim val2 = dst3(r).Get(Of Byte)(0, 0)
             If val1 = 255 And val2 > 0 Then
                 index = val2
-                Dim flags = cv.FloodFillFlags.FixedRange Or (index << 8)
+                Dim flags = FloodFillFlags.FixedRange Or (index << 8)
                 Dim count = FloodFill(input, mask, r.TopLeft, index, rect, 0, 0, flags)
                 regions.Add(count, ValidateRect(rect))
                 indexList.Add(count, index)
@@ -27,13 +27,13 @@ Public Class FeatureLess_Basics_TA : Inherits TaskParent
         Next
         Return input
     End Function
-    Public Function buildMapHeartBeat(input As cv.Mat) As cv.Mat
+    Public Function buildMapHeartBeat(input As Mat) As Mat
         mask.SetTo(0)
         index = 1
         For Each r In task.gridRects
             Dim val = input.Get(Of Byte)(r.Y, r.X)
             If val = 255 Then
-                Dim flags = cv.FloodFillFlags.FixedRange Or (index << 8)
+                Dim flags = FloodFillFlags.FixedRange Or (index << 8)
                 Dim count = FloodFill(input, mask, r.TopLeft, index, rect, 0, 0, flags)
                 regions.Add(count, ValidateRect(rect))
                 indexList.Add(count, index)
@@ -46,7 +46,7 @@ Public Class FeatureLess_Basics_TA : Inherits TaskParent
         brickList.Clear()
         dst1.SetTo(0)
         For Each r In task.gridRects
-If CountNonZero(task.edges.dst2(r)) = 0 Then
+            If CountNonZero(task.edges.dst2(r)) = 0 Then
                 dst1(r).SetTo(255)
                 brickList.Add(r)
             End If
@@ -59,7 +59,7 @@ If CountNonZero(task.edges.dst2(r)) = 0 Then
         index = regions.Count + 1
         For Each r In task.gridRects
             If dst3(r).Get(Of Byte)(0, 0) = 255 Then
-                Dim flags = cv.FloodFillFlags.FixedRange Or (index << 8)
+                Dim flags = FloodFillFlags.FixedRange Or (index << 8)
                 Dim count = FloodFill(dst3, mask, r.TopLeft, index, rect, 0, 0, flags)
                 regions.Add(count, ValidateRect(rect))
                 indexList.Add(count, index)
@@ -77,19 +77,19 @@ End Class
 
 
 Public Class XR_FeatureLess_BasicsOld : Inherits TaskParent
-    Public brickList As New List(Of cv.Rect)
+    Public brickList As New List(of cv.Rect)
     Public Sub New()
-        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
+        dst1 = New Mat(dst1.Size, MatType.CV_8U, 0)
         desc = "Identify featureless grid rects."
     End Sub
-    Public Function buildMap(brickList As List(Of cv.Rect), input As cv.Mat) As cv.Mat
+    Public Function buildMap(brickList As List(of cv.Rect), input As Mat) As Mat
         Dim index = 1
-        Dim rect As cv.Rect
-        Dim mask = New cv.Mat(New cv.Size(input.Width + 2, input.Height + 2), cv.MatType.CV_8U, 0)
+        Dim rect as cv.Rect
+        Dim mask = New Mat(New Size(input.Width + 2, input.Height + 2), MatType.CV_8U, 0)
         For Each r In brickList
             Dim val = input.Get(Of Byte)(r.Y, r.X)
             If val = 255 Then
-                Dim flags = cv.FloodFillFlags.FixedRange Or (index << 8)
+                Dim flags = FloodFillFlags.FixedRange Or (index << 8)
                 Dim count = FloodFill(input, mask, r.TopLeft, index, rect, 0, 0, flags)
                 index += 1
             End If
@@ -121,10 +121,10 @@ End Class
 
 
 Public Class XR_FeatureLess_Basics : Inherits TaskParent
-    Public brickList As New List(Of cv.Rect)
+    Public brickList As New List(of cv.Rect)
     Dim redC As New RedColor_Basics
     Public Sub New()
-        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
+        dst1 = New Mat(dst1.Size, MatType.CV_8U, 0)
         desc = "Identify featureless grid rects using the gray scale range - see 'Correlation_Basics'."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -156,10 +156,10 @@ End Class
 
 
 Public Class XR_FeatureLess_BasicsRedC : Inherits TaskParent
-    Public brickList As New List(Of cv.Rect)
+    Public brickList As New List(of cv.Rect)
     Dim redC As New RedColor_Basics
     Public Sub New()
-        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
+        dst1 = New Mat(dst1.Size, MatType.CV_8U, 0)
         desc = "Identify featureless grid rects using the gray scale range - see 'Correlation_Basics'."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -191,18 +191,18 @@ End Class
 
 
 Public Class XR_FeatureLess_BasicsTest : Inherits TaskParent
-    Public brickList As New List(Of cv.Rect)
-    Public regionList As New List(Of List(Of cv.Rect))
+    Public brickList As New List(of cv.Rect)
+    Public regionList As New List(Of List(of cv.Rect))
     Public Sub New()
-        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
+        dst1 = New Mat(dst1.Size, MatType.CV_8U, 0)
         desc = "Identify featureless grid rects using the gray scale range - see 'Correlation_Basics'."
     End Sub
-    Public Function buildMap(input As cv.Mat) As cv.Mat
+    Public Function buildMap(input As Mat) As Mat
         Dim regionIndex As Integer = regionList.Count
         regionList.Clear()
 
-        Dim rect As cv.Rect
-        Dim mask = New cv.Mat(New cv.Size(input.Width + 2, input.Height + 2), cv.MatType.CV_8U, 0)
+        Dim rect as cv.Rect
+        Dim mask = New Mat(New Size(input.Width + 2, input.Height + 2), MatType.CV_8U, 0)
         Dim usedColors As New List(Of Byte)
         For Each r In brickList
             Dim val = input.Get(Of Byte)(r.Y, r.X)
@@ -212,7 +212,7 @@ Public Class XR_FeatureLess_BasicsTest : Inherits TaskParent
                     regionIndex += 1
                     index = regionIndex
                 End If
-                Dim flags = cv.FloodFillFlags.FixedRange Or (index << 8)
+                Dim flags = FloodFillFlags.FixedRange Or (index << 8)
                 Dim count = FloodFill(input, mask, r.TopLeft, index, rect, 0, 0, flags)
                 usedColors.Add(index)
             End If
@@ -245,11 +245,11 @@ End Class
 
 
 Public Class XR_FeatureLess_Depth : Inherits TaskParent
-    Public fLessList As New List(Of cv.Rect)
+    Public fLessList As New List(of cv.Rect)
     Public options As New Options_FeatureLess
     Public Sub New()
-        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
+        dst2 = New Mat(dst2.Size, MatType.CV_8U, 0)
+        dst3 = New Mat(dst3.Size, MatType.CV_8U, 0)
         desc = "Identify featureless squares using the gray scale range - see 'Correlation_Basics'."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -262,7 +262,7 @@ Public Class XR_FeatureLess_Depth : Inherits TaskParent
             If src.Channels <> 1 Then src = task.grayOriginal ' only the raw image can be used with correlation.
             Static corr As New Correlation_Basics
             corr.Run(src)
-            fLessList = New List(Of cv.Rect)(corr.fLessList)
+            fLessList = New List(of cv.Rect)(corr.fLessList)
         Else
             If src.Channels <> 1 Then src = task.gray ' the motion-filtered image can be used a lower resolutions.
             fLessList.Clear()
@@ -297,8 +297,8 @@ End Class
 
 Public Class XR_FeatureLess_DepthMotion : Inherits TaskParent
     Public fLessRaw As New FeatureLess_DepthFull
-    Public rectList As New List(Of cv.Rect)
-    Public fLessNot As New List(Of cv.Rect)
+    Public rectList As New List(of cv.Rect)
+    Public fLessNot As New List(of cv.Rect)
     Public ptList As New HashSet(Of cv.Point)
     Public Sub New()
         desc = "A features grid rect cannot change if there has been no motion in that grid rect."
@@ -307,11 +307,11 @@ Public Class XR_FeatureLess_DepthMotion : Inherits TaskParent
         fLessRaw.Run(src)
         If task.optionsChanged Then
             dst2 = fLessRaw.dst3.Clone
-            rectList = New List(Of cv.Rect)(fLessRaw.brickList)
+            rectList = New List(of cv.Rect)(fLessRaw.brickList)
         End If
 
         ptList.Clear()
-        Dim newList As New List(Of cv.Rect)
+        Dim newList As New List(of cv.Rect)
         ' remove any grid rects that had motion.
         For Each r In rectList
             Dim val = task.motion.motionMask.Get(Of Byte)(r.Y, r.X)
@@ -335,7 +335,7 @@ Public Class XR_FeatureLess_DepthMotion : Inherits TaskParent
             If dst2.Get(Of Byte)(r.TopLeft.Y, r.TopLeft.X) = 0 Then fLessNot.Add(r)
         Next
 
-        If newList.Count > 0 Then rectList = New List(Of cv.Rect)(newList)
+        If newList.Count > 0 Then rectList = New List(of cv.Rect)(newList)
 
         labels(2) = fLessRaw.labels(2)
     End Sub
@@ -346,7 +346,7 @@ End Class
 
 Public Class FeatureLess_Correlation : Inherits TaskParent
     Dim corr As New Correlation_Basics
-    Public fLessList As New List(Of cv.Rect)
+    Public fLessList As New List(of cv.Rect)
     Public Sub New()
         desc = "Measure the correlation of all grid squares except where there is motion."
     End Sub
@@ -356,7 +356,7 @@ Public Class FeatureLess_Correlation : Inherits TaskParent
         corr.Run(src)
         dst2 = corr.dst2
         dst3 = corr.dst3
-        fLessList = New List(Of cv.Rect)(corr.fLessList)
+        fLessList = New List(of cv.Rect)(corr.fLessList)
 
         labels(2) = corr.labels(2)
     End Sub
@@ -367,12 +367,12 @@ End Class
 
 
 Public Class XR_FeatureLess_Correlation : Inherits TaskParent
-    Public fLessList As New List(Of cv.Rect)
+    Public fLessList As New List(of cv.Rect)
     Dim smallGrid As New Grid_SquaresOnly
     Public options As New Options_FeatureLess
     Public Sub New()
         If standalone Then task.gOptions.displayDst1.Checked = True
-        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        dst2 = New Mat(dst2.Size, MatType.CV_8U, 0)
         desc = "Identify featureless squares using the gray scale range - see 'Correlation_Basics'."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -380,20 +380,20 @@ Public Class XR_FeatureLess_Correlation : Inherits TaskParent
 
         ' couldn't put this in the constructor because motion is a task algorithm.
         If task.firstPass Then smallGrid.Run(src) ' create the grid squares for the small resolution.
-        Dim input As cv.Mat
+        Dim input As Mat
         If src.Channels <> 1 Then input = task.gray Else input = src
 
         ' why do this resize?  Because the options.flessThreshold works at smallRes but not larger resolutions.
-        If task.workRes.Height > 270 Then Resize(input, input, task.smallRes, 0, 0, cv.InterpolationFlags.Nearest)
+        If task.workRes.Height > 270 Then Resize(input, input, task.smallRes, 0, 0, InterpolationFlags.Nearest)
 
-        Dim mask As New cv.Mat(input.Size, cv.MatType.CV_8U, 0)
+        Dim mask As New Mat(input.Size, MatType.CV_8U, 0)
         For Each r In smallGrid.gridRects
             r = ValidateRect(r)
             Dim mm = GetMinMax(input(r))
             If mm.range < options.fLessThreshold Then mask(r).SetTo(255)
         Next
 
-        Resize(mask, dst2, src.Size, 0, 0, cv.InterpolationFlags.Nearest)
+        Resize(mask, dst2, src.Size, 0, 0, InterpolationFlags.Nearest)
 
         fLessList.Clear()
         For Each r In task.gridRects
@@ -426,7 +426,7 @@ End Class
 Public Class XR_FeatureLess_Correlations : Inherits TaskParent
     Dim corr As New Correlation_BasicsPlot
     Public Sub New()
-        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        dst2 = New Mat(dst2.Size, MatType.CV_8U, 0)
         desc = "Identify featureless squares using the gray scale range - see 'Correlation_Basics'."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -458,7 +458,7 @@ Public Class XR_FeatureLess_Contours : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If src.Channels = 1 Then edgeline.Run(src) Else edgeline.Run(task.gray)
-        If src.Type <> cv.MatType.CV_8U Then
+        If src.Type <> MatType.CV_8U Then
             contours.Run(edgeline.dst2)
             dst2 = contours.dst2
             labels = contours.labels
@@ -487,7 +487,7 @@ Public Class XR_FeatureLess_Sobel : Inherits TaskParent
         options.Run()
 
         edges.Run(src)
-        Threshold(Not edges.dst2, dst2, options.distanceThreshold, 255, cv.ThresholdTypes.Binary)
+        Threshold(Not edges.dst2, dst2, options.distanceThreshold, 255, ThresholdTypes.Binary)
     End Sub
 End Class
 
@@ -507,7 +507,7 @@ Public Class XR_FeatureLess_UniquePixels : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         fless.Run(src)
-        CvtColor(fless.dst2, dst2, cv.ColorConversionCodes.BGR2GRAY)
+        CvtColor(fless.dst2, dst2, ColorConversionCodes.BGR2GRAY)
         sort.Run(dst2)
         dst3 = sort.dst2
     End Sub
@@ -527,7 +527,7 @@ Public Class XR_FeatureLess_Unique3Pixels : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         fLessTopX.Run(src)
-        CvtColor(fLessTopX.dst2, dst2, cv.ColorConversionCodes.BGR2GRAY)
+        CvtColor(fLessTopX.dst2, dst2, ColorConversionCodes.BGR2GRAY)
 
         sort3.Run(fLessTopX.dst2)
         dst3 = sort3.dst2
@@ -595,7 +595,7 @@ Public Class XR_FeatureLess_DCT : Inherits TaskParent
             End If
         Next
 
-        Dim label As New cv.Mat
+        Dim label As New Mat
 
         InRange(mask, maxIndex + 1, maxIndex + 1, label)
         Dim nonZ = CountNonZero(label)
@@ -620,7 +620,7 @@ Public Class XR_FeatureLess_History : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         fLess.Run(task.grayOriginal)
 
-        Threshold(fLess.dst2, dst2, 0, 255, cv.ThresholdTypes.Binary)
+        Threshold(fLess.dst2, dst2, 0, 255, ThresholdTypes.Binary)
 
         frames.Run(dst2)
         dst3 = frames.dst2
@@ -694,10 +694,10 @@ End Class
 
 Public Class XR_FeatureLess_Lines : Inherits TaskParent
     Dim fLess As New FeatureLess_DepthFull
-    Dim ranges() As cv.Rangef = New cv.Rangef() {New cv.Rangef(0, 255)}
+    Dim ranges() As Rangef = New Rangef() {New Rangef(0, 255)}
     Public lpList As New List(Of lpData)
     Public Sub New()
-        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
+        dst1 = New Mat(dst1.Size, MatType.CV_8U, 0)
         desc = "Find and display lines that are between featureless regions."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -708,8 +708,8 @@ Public Class XR_FeatureLess_Lines : Inherits TaskParent
         dst1.SetTo(0)
         task.lines.dst1.CopyTo(dst1, fLess.dst2)
 
-        Dim histogram As New cv.Mat
-        CalcHist({dst1}, {0}, New cv.Mat, histogram, 1, {256}, ranges)
+        Dim histogram As New Mat
+        CalcHist({dst1}, {0}, New Mat, histogram, 1, {256}, ranges)
 
         Dim histArray(histogram.Rows - 1) As Single
         histogram.GetArray(Of Single)(histArray)
@@ -734,7 +734,7 @@ End Class
 
 
 Public Class FeatureLess_Cells : Inherits TaskParent
-    Dim saveColorMap As cv.Mat
+    Dim saveColorMap As Mat
     Dim fLess As New FeatureLess_Correlation
     Public Sub New()
         saveColorMap = task.colorMap.Clone
@@ -748,9 +748,9 @@ Public Class FeatureLess_Cells : Inherits TaskParent
         labels(2) = fLess.labels(2)
 
         Dim index = 1
-        Dim rect As cv.Rect
-        Dim mask = New cv.Mat(New cv.Size(dst2.Width + 2, dst2.Height + 2), cv.MatType.CV_8U, 0)
-        Dim flags As cv.FloodFillFlags = cv.FloodFillFlags.Link4
+        Dim rect as cv.Rect
+        Dim mask = New Mat(New Size(dst2.Width + 2, dst2.Height + 2), MatType.CV_8U, 0)
+        Dim flags As FloodFillFlags = FloodFillFlags.Link4
         Dim countList As New SortedList(Of Integer, Integer)(New compareAllowIdenticalIntegerInverted)
         For Each r In fLess.fLessList
             Dim val = dst2.Get(Of Byte)(r.Y, r.X)
@@ -764,7 +764,7 @@ Public Class FeatureLess_Cells : Inherits TaskParent
         ' this will color the regions in size order.
         For i = 0 To countList.Count - 1
             Dim countIndex = countList.Values.ElementAt(i)
-            task.colorMap.Set(Of cv.Vec3b)(countIndex, 0, saveColorMap.Get(Of cv.Vec3b)(i, 0))
+            task.colorMap.Set(Of Vec3b)(countIndex, 0, saveColorMap.Get(Of Vec3b)(i, 0))
         Next
         dst3 = Palettize(dst2, 0)
         labels(2) = CStr(index - 1) + " featureless regions were found below (8UC1)."
@@ -899,13 +899,13 @@ Public Class FeatureLess_ToList : Inherits TaskParent
     Public clusterX As New List(Of List(Of Integer))
     Public clusterY As New List(Of List(Of Integer))
     Public rcList As New List(Of rcDataOld)
-    Public rcMap As New cv.Mat(dst2.Size, cv.MatType.CV_32S, 0)
+    Public rcMap As New Mat(dst2.Size, MatType.CV_32S, 0)
     Public Sub New()
         If standalone Then task.gOptions.displayDst1.Checked = True
         desc = "Create a RedCloud rcList from FeatureLess_Cluster output"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        Dim lastMap As cv.Mat = rcMap.Clone
+        Dim lastMap As Mat = rcMap.Clone
         Dim rcLastList As New List(Of rcDataOld)(rcList)
 
         clusters.Run(task.gray)
@@ -1005,7 +1005,7 @@ Public Class FeatureLess_ClusterFlood : Inherits TaskParent
             If clusterID > 0 Then
                 dst0 = dst2.Clone
                 FloodFill(dst0, task.clickPoint, 255)
-                Threshold(dst0, dst0, 254, 255, cv.ThresholdTypes.Binary)
+                Threshold(dst0, dst0, 254, 255, ThresholdTypes.Binary)
                 task.color.SetTo(white, dst0)
             End If
         End If
@@ -1020,15 +1020,15 @@ End Class
 Public Class XR_FeatureLess_Predict : Inherits TaskParent
     Dim ml As New ML_RandomForest
     Public clusters() As Single
-    Dim ranges() As cv.Rangef
+    Dim ranges() As Rangef
     Public bpArray() As Single
     Public Sub New()
         If standalone Then task.gOptions.displayDst1.Checked = True
-        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
+        dst3 = New Mat(dst3.Size, MatType.CV_8U, 0)
         desc = "Use edges, depth, color, and location to predict featureless regions."
     End Sub
-    Public Function backProjectHist(histogram As cv.Mat, histInput As cv.Mat, edgeCounts As List(Of Integer)) As Single()
-        Dim backP As New cv.Mat
+    Public Function backProjectHist(histogram As Mat, histInput As Mat, edgeCounts As List(Of Integer)) As Single()
+        Dim backP As New Mat
         CalcBackProject({histInput}, {0, 1}, histogram, backP, ranges)
         ReDim bpArray(histogram.Rows * histogram.Cols - 1)
         backP.GetArray(Of Single)(bpArray)
@@ -1067,18 +1067,18 @@ Public Class XR_FeatureLess_Predict : Inherits TaskParent
             index += inputVariableCount
         Next
 
-        ml.testMat = cv.Mat.FromPixelData(rectCount, inputVariableCount, cv.MatType.CV_32F, flat)
+        ml.testMat = Mat.FromPixelData(rectCount, inputVariableCount, MatType.CV_32F, flat)
         Dim mmX = GetMinMax(task.gray)
-        ranges = {New cv.Rangef(mmX.minVal - 0.01, 255.01), New cv.Rangef(0, task.MaxZmeters)}
+        ranges = {New Rangef(mmX.minVal - 0.01, 255.01), New Rangef(0, task.MaxZmeters)}
 
         Dim trainLabels(rectCount - 1) As Single
         If task.heartBeatLT Then
-            Dim histogram As New cv.Mat
-            Dim histInput = cv.Mat.FromPixelData(colorDepth.Count / 2, 1, cv.MatType.CV_32FC2, colorDepth.ToArray)
+            Dim histogram As New Mat
+            Dim histInput = Mat.FromPixelData(colorDepth.Count / 2, 1, MatType.CV_32FC2, colorDepth.ToArray)
             Dim bins = task.histogramBins
-            CalcHist({histInput}, {0, 1}, New cv.Mat(), histogram, 2, {bins, bins}, ranges)
+            CalcHist({histInput}, {0, 1}, New Mat(), histogram, 2, {bins, bins}, ranges)
 
-            Threshold(histogram, histogram, 0, 255, cv.ThresholdTypes.Binary)
+            Threshold(histogram, histogram, 0, 255, ThresholdTypes.Binary)
 
             Dim floodIndex As Integer = 1
             For y = 0 To histogram.Height - 1
@@ -1094,7 +1094,7 @@ Public Class XR_FeatureLess_Predict : Inherits TaskParent
             Next
 
             Dim gridList = backProjectHist(histogram, histInput, edgeCounts)
-            ml.trainResponse = cv.Mat.FromPixelData(rectCount, 1, cv.MatType.CV_32F, gridList)
+            ml.trainResponse = Mat.FromPixelData(rectCount, 1, MatType.CV_32F, gridList)
             ml.trainMat = ml.testMat.Clone
             ml.predictions = ml.trainResponse.Clone
 
@@ -1133,7 +1133,7 @@ Public Class FeatureLess_Features : Inherits TaskParent
     Public inputVariableCount As Integer = 5
     Public rcList As New List(Of rcDataOld)
     Public Sub New()
-        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        dst2 = New Mat(dst2.Size, MatType.CV_8U, 0)
         desc = "Expanded floodfill usage for the featureLess image."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -1141,14 +1141,14 @@ Public Class FeatureLess_Features : Inherits TaskParent
         dst2 = fLess.dst2
 
         Dim rect As New cv.Rect
-        Dim mask = New cv.Mat(New cv.Size(dst2.Width + 2, dst2.Height + 2), cv.MatType.CV_8U, 0)
+        Dim mask = New Mat(New Size(dst2.Width + 2, dst2.Height + 2), MatType.CV_8U, 0)
         Dim index As Integer = 1
         featureList.Clear()
         idList.Clear()
         rcList.Clear()
         For Each r In task.gridRects
             If dst2.Get(Of Byte)(r.TopLeft.Y, r.TopLeft.X) = 255 Then
-                Dim flags = cv.FloodFillFlags.FixedRange Or (index << 8)
+                Dim flags = FloodFillFlags.FixedRange Or (index << 8)
                 Dim Count = FloodFill(dst2, mask, r.TopLeft, index, rect, 0, 0, flags)
                 Dim rc = New rcDataOld(mask(rect), rect, index)
                 rcList.Add(rc)
@@ -1197,9 +1197,9 @@ Public Class FeatureLess_IndexKNN : Inherits TaskParent
         labels(2) = feat.labels(2)
 
         Dim nVal = knn.dimension
-        Dim queries = cv.Mat.FromPixelData(feat.featureList.Count \ nVal, nVal, cv.MatType.CV_32F, feat.featureList.ToArray)
+        Dim queries = Mat.FromPixelData(feat.featureList.Count \ nVal, nVal, MatType.CV_32F, feat.featureList.ToArray)
 
-        knn.trainMat = cv.Mat.FromPixelData(queries.Rows, nVal, cv.MatType.CV_32F, feat.featureList.ToArray)
+        knn.trainMat = Mat.FromPixelData(queries.Rows, nVal, MatType.CV_32F, feat.featureList.ToArray)
 
         If feat.featureList.Count = 0 Then Exit Sub ' nothing to work with...
 
@@ -1243,19 +1243,19 @@ End Class
 Public Class XR_FeatureLess_ClustersHist2D : Inherits TaskParent
     Public fLess As New FeatureLess_DepthFull
     Public histArray(task.histogramBins * task.histogramBins - 1) As Single
-    Public features As New cv.Mat
+    Public features As New Mat
     Public bpArray() As Single
     Public Sub New()
-        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
+        dst3 = New Mat(dst3.Size, MatType.CV_8U, 0)
         desc = "Isolate clusters using a 2D histogram"
     End Sub
-    Public Function backProjectHistArray(histogram As cv.Mat, ranges() As cv.Rangef) As cv.Mat
-        Dim backP As New cv.Mat
+    Public Function backProjectHistArray(histogram As Mat, ranges() As Rangef) As Mat
+        Dim backP As New Mat
         CalcBackProject({features}, {0, 1}, histogram, backP, ranges)
         ReDim bpArray(histogram.Rows * histogram.Cols - 1)
         backP.GetArray(Of Single)(bpArray)
 
-        Dim dst As New cv.Mat(task.workRes, cv.MatType.CV_8U, 0)
+        Dim dst As New Mat(task.workRes, MatType.CV_8U, 0)
         For i = 0 To fLess.brickList.Count - 1
             dst(fLess.brickList(i)).SetTo(bpArray(i))
         Next
@@ -1266,21 +1266,21 @@ Public Class XR_FeatureLess_ClustersHist2D : Inherits TaskParent
         fLess.Run(task.gray)
 
         Dim mmX = GetMinMax(fLess.dst1)
-        Dim ranges() As cv.Rangef = {New cv.Rangef(mmX.minVal - 0.01, 255.01), New cv.Rangef(0, task.MaxZmeters)}
+        Dim ranges() As Rangef = {New Rangef(mmX.minVal - 0.01, 255.01), New Rangef(0, task.MaxZmeters)}
 
         Dim depthMat = task.pcSplit(2).Clone
         depthMat.SetTo(0, Not fLess.dst1)
 
-        Dim grayMat As New cv.Mat
-        fLess.dst2.ConvertTo(grayMat, cv.MatType.CV_32F)
+        Dim grayMat As New Mat
+        fLess.dst2.ConvertTo(grayMat, MatType.CV_32F)
 
         Merge({grayMat, depthMat}, features)
 
-        Dim histogram As New cv.Mat
+        Dim histogram As New Mat
         Dim bins = task.histogramBins
-        CalcHist({features}, {0, 1}, New cv.Mat(), histogram, 2, {bins, bins}, ranges)
+        CalcHist({features}, {0, 1}, New Mat(), histogram, 2, {bins, bins}, ranges)
 
-        Threshold(histogram, histogram, 0, 255, cv.ThresholdTypes.Binary)
+        Threshold(histogram, histogram, 0, 255, ThresholdTypes.Binary)
         Dim floodIndex As Integer = 1
         For y = 0 To histogram.Height - 1
             For x = 0 To histogram.Width - 1
@@ -1310,9 +1310,9 @@ End Class
 
 
 Public Class FeatureLess_DepthFull : Inherits TaskParent
-    Public brickList As New List(Of cv.Rect)
+    Public brickList As New List(of cv.Rect)
     Public Sub New()
-        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
+        dst1 = New Mat(dst1.Size, MatType.CV_8U, 0)
         desc = "Identify featureless gridrects that also have depth."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -1332,12 +1332,12 @@ If CountNonZero(task.depthmask(r)) = 0 Then Continue For
         Dim countRects = brickList.Count
 
         Dim index = 1
-        Dim rect As cv.Rect
-        Dim mask = New cv.Mat(New cv.Size(dst1.Width + 2, dst1.Height + 2), cv.MatType.CV_8U, 0)
+        Dim rect as cv.Rect
+        Dim mask = New Mat(New Size(dst1.Width + 2, dst1.Height + 2), MatType.CV_8U, 0)
         For Each r In brickList
             Dim val = dst1.Get(Of Byte)(r.Y, r.X)
             If val = 255 Then
-                Dim flags = cv.FloodFillFlags.FixedRange Or (index << 8)
+                Dim flags = FloodFillFlags.FixedRange Or (index << 8)
                 Dim count = FloodFill(dst1, mask, r.TopLeft, index, rect, 0, 0, flags)
                 index += 1
             End If
@@ -1355,7 +1355,7 @@ End Class
 
 
 Public Class FeatureLess_Depth : Inherits TaskParent
-    Public brickList As New List(Of cv.Rect)
+    Public brickList As New List(of cv.Rect)
     Public Sub New()
         desc = "Same as FeatureLess_Basics but remove those grid rects with no depth"
     End Sub
@@ -1421,7 +1421,7 @@ End Class
 Public Class FeatureLess_YLines : Inherits TaskParent
     Public lpList As New List(Of lpData)
     Public Sub New()
-        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        dst2 = New Mat(dst2.Size, MatType.CV_8U, 0)
         desc = "Find horizontal and vertical lines through the center of featureless grid rects."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -1502,19 +1502,19 @@ End Class
 
 
 Public Class XR_FeatureLess_BasicsTest2 : Inherits TaskParent
-    Public brickList As New List(Of cv.Rect)
+    Public brickList As New List(of cv.Rect)
     Public Sub New()
-        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
+        dst1 = New Mat(dst1.Size, MatType.CV_8U, 0)
         desc = "Identify featureless grid rects."
     End Sub
-    Public Function buildMap(brickList As List(Of cv.Rect), input As cv.Mat) As cv.Mat
+    Public Function buildMap(brickList As List(of cv.Rect), input As Mat) As Mat
         Dim index = 1
-        Dim rect As cv.Rect
-        Dim mask = New cv.Mat(New cv.Size(input.Width + 2, input.Height + 2), cv.MatType.CV_8U, 0)
+        Dim rect as cv.Rect
+        Dim mask = New Mat(New Size(input.Width + 2, input.Height + 2), MatType.CV_8U, 0)
         For Each r In brickList
             Dim val = input.Get(Of Byte)(r.Y, r.X)
             If val = 255 Then
-                Dim flags = cv.FloodFillFlags.FixedRange Or (index << 8)
+                Dim flags = FloodFillFlags.FixedRange Or (index << 8)
                 Dim count = FloodFill(input, mask, r.TopLeft, index, rect, 0, 0, flags)
                 index += 1
             End If
@@ -1554,30 +1554,30 @@ End Class
 
 
 Public Class FeatureLess_Tracker : Inherits TaskParent
-    Public regions As New List(Of (count As Integer, r As cv.Rect))
+    Public regions As New List(Of (count As Integer, r as cv.Rect))
     Dim overlap As New FeatureLess_Overlap
     Public Sub New()
-        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
-        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
+        dst1 = New Mat(dst1.Size, MatType.CV_8U, 0)
+        dst3 = New Mat(dst3.Size, MatType.CV_8U, 0)
         If standalone Then task.gOptions.displayDst1.Checked = True
         desc = "Track featureless regions."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        Dim rect As cv.Rect
-        Dim mask = New cv.Mat(New cv.Size(dst1.Width + 2, dst1.Height + 2), cv.MatType.CV_8U, 0)
+        Dim rect as cv.Rect
+        Dim mask = New Mat(New Size(dst1.Width + 2, dst1.Height + 2), MatType.CV_8U, 0)
         Dim index As Integer
 
         overlap.Run(emptyMat)
 
         regions.Clear()
         dst0 = task.fLess.dst1.Clone
-        Dim newCandidates As New List(Of cv.Rect)
-        Dim floodRects As New List(Of cv.Rect)
+        Dim newCandidates As New List(of cv.Rect)
+        Dim floodRects As New List(of cv.Rect)
         For Each r In task.gridRects
             If overlap.dst3(r).Get(Of Byte)(0, 0) = 255 Then
                 index = dst3(r).Get(Of Byte)(0, 0)
                 If index > 0 And dst0(r).Get(Of Byte)(0, 0) = 255 Then
-                    Dim flags = cv.FloodFillFlags.FixedRange Or (index << 8)
+                    Dim flags = FloodFillFlags.FixedRange Or (index << 8)
                     Dim count = FloodFill(dst0, mask, r.TopLeft, index, rect, 0, 0, flags)
                     regions.Add((count, ValidateRect(rect)))
                     floodRects.Add(r)
@@ -1590,7 +1590,7 @@ Public Class FeatureLess_Tracker : Inherits TaskParent
         Dim indexNew = regions.Count + 1
         For Each r In newCandidates
             If dst3(r).Get(Of Byte)(0, 0) = 0 And dst0(r).Get(Of Byte)(0, 0) = 255 Then
-                Dim flags = cv.FloodFillFlags.FixedRange Or (indexNew << 8)
+                Dim flags = FloodFillFlags.FixedRange Or (indexNew << 8)
                 Dim count = FloodFill(dst0, mask, r.TopLeft, indexNew, rect, 0, 0, flags)
                 regions.Add((count, ValidateRect(rect)))
                 indexNew += 1
@@ -1615,7 +1615,7 @@ End Class
 
 Public Class FeatureLess_Overlap : Inherits TaskParent
     Public Sub New()
-        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
+        dst1 = New Mat(dst1.Size, MatType.CV_8U, 0)
         labels = {"", "", "Grid rects that did not overlap", "Grid rects that overlapped."}
         desc = "Compare the current and previous featureless regions and define overlap and not overlap."
     End Sub
@@ -1634,21 +1634,21 @@ End Class
 
 
 Public Class FeatureLess_BrickList : Inherits TaskParent
-    Public brickList As New List(Of cv.Rect)
+    Public brickList As New List(of cv.Rect)
     Dim index As Integer
     Public Sub New()
-        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
+        dst1 = New Mat(dst1.Size, MatType.CV_8U, 0)
         desc = "Identify featureless grid rects."
     End Sub
-    Public Function buildMap() As cv.Mat
+    Public Function buildMap() As Mat
         Dim input = dst1.Clone
         index = 1
-        Dim rect As cv.Rect
-        Dim mask = New cv.Mat(New cv.Size(input.Width + 2, input.Height + 2), cv.MatType.CV_8U, 0)
+        Dim rect as cv.Rect
+        Dim mask = New Mat(New Size(input.Width + 2, input.Height + 2), MatType.CV_8U, 0)
         For Each r In task.gridRects
             Dim val = input.Get(Of Byte)(r.Y, r.X)
             If val = 255 Then
-                Dim flags = cv.FloodFillFlags.FixedRange Or (index << 8)
+                Dim flags = FloodFillFlags.FixedRange Or (index << 8)
                 Dim count = FloodFill(input, mask, r.TopLeft, index, rect, 0, 0, flags)
                 index += 1
             End If
@@ -1717,7 +1717,7 @@ Public Class FeatureLess_CalcHist : Inherits TaskParent
     Dim color8u As New Color8U_Basics
     Dim histMapList As New List(Of (Index As Integer, histList As List(Of Integer)))
     Public Sub New()
-        dst0 = New cv.Mat(dst0.Size, cv.MatType.CV_8U, 0)
+        dst0 = New Mat(dst0.Size, MatType.CV_8U, 0)
         desc = "Find the LUT values in each featureless region."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -1725,12 +1725,12 @@ Public Class FeatureLess_CalcHist : Inherits TaskParent
         dst1 = task.fLess.dst3
         dst2 = color8u.dst3
 
-        Dim ranges() As cv.Rangef = New cv.Rangef() {New cv.Rangef(0, 255)}
+        Dim ranges() As Rangef = New Rangef() {New Rangef(0, 255)}
         histMapList.Clear()
         For i = 0 To task.fLess.regions.Count - 1
             Dim r = task.fLess.regions.Values(i)
-            Dim histogram As New cv.Mat
-            CalcHist({dst1(r)}, {0}, New cv.Mat, histogram, 1, {256}, ranges)
+            Dim histogram As New Mat
+            CalcHist({dst1(r)}, {0}, New Mat, histogram, 1, {256}, ranges)
             Dim histArray(histogram.Rows - 1) As Single
             histogram.GetArray(Of Single)(histArray)
             Dim histList As New List(Of Integer)
@@ -1747,7 +1747,7 @@ Public Class FeatureLess_CalcHist : Inherits TaskParent
                 lutArray(index) = tup.Index
             Next
 
-            Dim tmp As New cv.Mat
+            Dim tmp As New Mat
             LUT(color8u.dst2, lutArray, tmp)
             dst0 += tmp
         Next

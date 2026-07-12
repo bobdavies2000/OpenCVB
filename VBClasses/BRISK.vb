@@ -1,11 +1,11 @@
 Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 Public Class BRISK_Basics : Inherits TaskParent
     Implements IDisposable
-    Dim brisk As cv.XFeatures2D.BRISK
-    Public features As New List(Of cv.Point2f)
+    Dim brisk As XFeatures2D.BRISK
+    Public features As New List(Of Point2f)
     Dim options As New Options_Features
     Public Sub New()
-        brisk = cv.XFeatures2D.BRISK.Create()
+        brisk = XFeatures2D.BRISK.Create()
         desc = "Detect features with BRISK"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -18,7 +18,7 @@ Public Class BRISK_Basics : Inherits TaskParent
         features.Clear()
         For Each pt In keyPoints
             If pt.Size > options.minDistance Then
-                features.Add(New cv.Point2f(pt.Pt.X, pt.Pt.Y))
+                features.Add(New Point2f(pt.Pt.X, pt.Pt.Y))
                 Circle(dst2, pt.Pt, task.DotSize + 1, task.highlight, -1, task.lineType)
             End If
         Next

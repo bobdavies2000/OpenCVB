@@ -12,17 +12,17 @@ Public Class Color_Basics : Inherits TaskParent
             Case "BGR"
                 dst2 = src.Clone
             Case "LAB"
-                CvtColor(src, dst2, cv.ColorConversionCodes.BGR2Lab)
+                CvtColor(src, dst2, ColorConversionCodes.BGR2Lab)
             Case "HSV"
-                CvtColor(src, dst2, cv.ColorConversionCodes.BGR2HSV)
+                CvtColor(src, dst2, ColorConversionCodes.BGR2HSV)
             Case "XYZ"
-                CvtColor(src, dst2, cv.ColorConversionCodes.BGR2XYZ)
+                CvtColor(src, dst2, ColorConversionCodes.BGR2XYZ)
             Case "HLS"
-                CvtColor(src, dst2, cv.ColorConversionCodes.BGR2HLS)
+                CvtColor(src, dst2, ColorConversionCodes.BGR2HLS)
             Case "YUV"
-                CvtColor(src, dst2, cv.ColorConversionCodes.BGR2YUV)
+                CvtColor(src, dst2, ColorConversionCodes.BGR2YUV)
             Case "YCrCb"
-                CvtColor(src, dst2, cv.ColorConversionCodes.BGR2YCrCb)
+                CvtColor(src, dst2, ColorConversionCodes.BGR2YCrCb)
         End Select
     End Sub
 End Class
@@ -33,13 +33,13 @@ End Class
 Public Class Color_Measure : Inherits TaskParent
     Public Sub New()
         labels(2) = "Input image with any motion rectangles.  Adjust with 'colorDiffSlider.value'."
-        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
+        dst3 = New Mat(dst3.Size, MatType.CV_8U, 0)
         desc = "Measure the range of values color can have when no motion is present."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst2 = task.gray
 
-        Static lastSrc As cv.Mat = dst2.Clone
+        Static lastSrc As Mat = dst2.Clone
 
         Dim threshold = task.fOptions.ColorDiffSlider.Value
         dst3.SetTo(0)
@@ -52,8 +52,8 @@ Public Class Color_Measure : Inherits TaskParent
         Next
 
         For Each index In task.motion.motionSort
-            Rectangle(dst2, task.gridRects(index), cv.Scalar.All(255), task.lineWidth)
-            Rectangle(dst3, task.gridRects(index), cv.Scalar.All(255), task.lineWidth)
+            Rectangle(dst2, task.gridRects(index), Scalar.All(255), task.lineWidth)
+            Rectangle(dst3, task.gridRects(index), Scalar.All(255), task.lineWidth)
         Next
         lastSrc = dst2.Clone
 

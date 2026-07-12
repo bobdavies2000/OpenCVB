@@ -4,7 +4,7 @@ Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 Public Class RedColor_Basics : Inherits TaskParent
     Dim color8u As New Color8U_Basics
     Public rcList As New List(Of rcDataOld)
-    Public rcMap As New cv.Mat
+    Public rcMap As New Mat
     Public runSelectCell As Boolean = True
     Public Sub New()
         If standalone Then task.gOptions.displayDst1.Checked = True
@@ -16,12 +16,12 @@ Public Class RedColor_Basics : Inherits TaskParent
 
         rcMap = src.Clone
         rcList.Clear()
-        Dim rect As cv.Rect
-        Dim mask As cv.Mat = New cv.Mat(New cv.Size(dst2.Width + 2, dst2.Height + 2), cv.MatType.CV_8U, 0)
+        Dim rect as cv.Rect
+        Dim mask As Mat = New Mat(New Size(dst2.Width + 2, dst2.Height + 2), MatType.CV_8U, 0)
         For Each r In task.gridRects
             If mask(r).Get(Of Byte)(0, 0) = 0 Then
                 Dim mapID As Integer = rcMap(r).Get(Of Byte)(0, 0)
-                Dim flags = cv.FloodFillFlags.FixedRange Or cv.FloodFillFlags.MaskOnly Or (255 << 8)
+                Dim flags = FloodFillFlags.FixedRange Or FloodFillFlags.MaskOnly Or (255 << 8)
                 Dim count = FloodFill(rcMap, mask, r.TopLeft, mapID, rect, 0, 0, flags)
                 If count > 0 Then rcList.Add(New rcDataOld(rcMap(rect), rect, mapID))
             End If
@@ -49,7 +49,7 @@ End Class
 
 Public Class RedColor_BasicsFeatureLess : Inherits TaskParent
     Public rcList As New List(Of rcDataOld)
-    Public rcMap As cv.Mat = New cv.Mat(dst2.Size, cv.MatType.CV_32S, 0)
+    Public rcMap As Mat = New Mat(dst2.Size, MatType.CV_32S, 0)
     Public color8U As New Color8U_Basics
     Public runSelectCell As Boolean = True
     Public Sub New()
@@ -63,15 +63,15 @@ Public Class RedColor_BasicsFeatureLess : Inherits TaskParent
             src = color8U.dst2
         End If
 
-        Dim rect As cv.Rect
-        Dim mask = New cv.Mat(New cv.Size(dst2.Width + 2, dst2.Height + 2), cv.MatType.CV_8U, 0)
-        Dim rectSorted As New SortedList(Of Integer, (count As Integer, r As cv.Rect))(New compareAllowIdenticalInteger)
+        Dim rect as cv.Rect
+        Dim mask = New Mat(New Size(dst2.Width + 2, dst2.Height + 2), MatType.CV_8U, 0)
+        Dim rectSorted As New SortedList(Of Integer, (count As Integer, r as cv.Rect))(New compareAllowIdenticalInteger)
         For Each r In task.fLess.brickList
             Dim val = mask(r).Get(Of Byte)(0, 0)
             If val = 0 Then
                 Dim index As Integer = task.fLess.dst3(r).Get(Of Byte)(0, 0)
                 If index > 0 Then
-                    Dim flags = cv.FloodFillFlags.FixedRange Or cv.FloodFillFlags.Link4 Or (index << 8)
+                    Dim flags = FloodFillFlags.FixedRange Or FloodFillFlags.Link4 Or (index << 8)
                     Dim count = FloodFill(src, mask, r.TopLeft, index, rect, 0, 0, flags)
                     rectSorted.Add(index, (count, ValidateRect(rect)))
                 End If
@@ -127,7 +127,7 @@ End Class
 
 Public Class RedColor_BrickList : Inherits TaskParent
     Public rcList As New List(Of rcDataOld)
-    Public rcMap As cv.Mat = New cv.Mat(dst2.Size, cv.MatType.CV_32S, 0)
+    Public rcMap As Mat = New Mat(dst2.Size, MatType.CV_32S, 0)
     Public reduction As New Reduction_Basics
     Public runSelectCell As Boolean = True
     Dim bricks As New FeatureLess_BrickList
@@ -143,15 +143,15 @@ Public Class RedColor_BrickList : Inherits TaskParent
 
         bricks.Run(src)
 
-        Dim rect As cv.Rect
-        Dim mask = New cv.Mat(New cv.Size(dst2.Width + 2, dst2.Height + 2), cv.MatType.CV_8U, 0)
-        Dim rectSorted As New SortedList(Of Integer, (index As Integer, r As cv.Rect))(New compareAllowIdenticalInteger)
+        Dim rect as cv.Rect
+        Dim mask = New Mat(New Size(dst2.Width + 2, dst2.Height + 2), MatType.CV_8U, 0)
+        Dim rectSorted As New SortedList(Of Integer, (index As Integer, r as cv.Rect))(New compareAllowIdenticalInteger)
         For Each r In bricks.brickList
             Dim val = mask.Get(Of Byte)(r.Y, r.X)
             If val = 0 Then
                 Dim index As Integer = task.fLess.dst3.Get(Of Byte)(r.Y, r.X)
                 If index > 0 Then
-                    Dim flags = cv.FloodFillFlags.FixedRange Or cv.FloodFillFlags.Link4 Or (index << 8)
+                    Dim flags = FloodFillFlags.FixedRange Or FloodFillFlags.Link4 Or (index << 8)
                     Dim count = FloodFill(src, mask, r.TopLeft, index, rect, 0, 0, flags)
                     rect = ValidateRect(rect)
                     If CountNonZero(mask(rect)) > 0 Then rectSorted.Add(index, (index, rect))
@@ -206,7 +206,7 @@ End Class
 
 Public Class XR_RedColor_BasicsOld : Inherits TaskParent
     Public rcList As New List(Of rcDataOld)
-    Public rcMap As cv.Mat = New cv.Mat(dst2.Size, cv.MatType.CV_32S, 0)
+    Public rcMap As Mat = New Mat(dst2.Size, MatType.CV_32S, 0)
     Public redFlood As New RedCloud_Flood_CPP
     Public runSelectCell As Boolean = True
     Dim tiers As New Depth_Tiers
@@ -220,7 +220,7 @@ Public Class XR_RedColor_BasicsOld : Inherits TaskParent
 
         tiers.Run(src)
 
-        Dim input As cv.Mat = dst3 + tiers.dst2 + 1
+        Dim input As Mat = dst3 + tiers.dst2 + 1
         input.SetTo(0, task.edges.dst2)
         redFlood.Run(input)
         dst2 = redFlood.dst2
@@ -242,7 +242,7 @@ End Class
 
 Public Class XR_RedColor_Basics : Inherits TaskParent
     Public rcList As New List(Of rcDataOld)
-    Public rcMap As cv.Mat = New cv.Mat(dst2.Size, cv.MatType.CV_32S, 0)
+    Public rcMap As Mat = New Mat(dst2.Size, MatType.CV_32S, 0)
     Public options As New Options_RedCloud
     Public redFlood As New RedColor_Basics
     Public runSelectCell As Boolean = True
@@ -273,7 +273,7 @@ Public Class XR_RedColor_CPP : Inherits TaskParent
     Implements IDisposable
     Public classCount As Integer
     Public rcList As New List(Of rcDataOld)
-    Public rcMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+    Public rcMap As New Mat(dst2.Size, MatType.CV_8U, 0)
     Public Sub New()
         cPtr = RedCloudLined_Open()
         desc = "Run the C++ RedCloud interface without a mask"
@@ -288,18 +288,18 @@ Public Class XR_RedColor_CPP : Inherits TaskParent
 
         imagePtr = RedCloudLined_Run(cPtr, handleInput.AddrOfPinnedObject(), dst1.Rows, dst1.Cols)
         handleInput.Free()
-        dst0 = cv.Mat.FromPixelData(dst1.Rows, dst1.Cols, cv.MatType.CV_8U, imagePtr).Clone
+        dst0 = Mat.FromPixelData(dst1.Rows, dst1.Cols, MatType.CV_8U, imagePtr).Clone
 
         classCount = RedCloudLined_Count(cPtr)
 
         If classCount = 0 Then Exit Sub ' no data to process.
 
-        Dim rectData = cv.Mat.FromPixelData(classCount, 1, cv.MatType.CV_32SC4, RedCloudLined_Rects(cPtr))
-        Dim rects(classCount - 1) As cv.Rect
-        rectData.GetArray(Of cv.Rect)(rects)
+        Dim rectData = Mat.FromPixelData(classCount, 1, MatType.CV_32SC4, RedCloudLined_Rects(cPtr))
+        Dim rects(classCount - 1) as cv.Rect
+        rectData.GetArray(of cv.Rect)(rects)
 
         Dim rcListLast = New List(Of rcDataOld)(rcList)
-        Dim rcMapLast As cv.Mat = rcMap.Clone
+        Dim rcMapLast As Mat = rcMap.Clone
 
         Dim minPixels As Integer = dst2.Total * 0.001
         Dim index As Integer = 1
@@ -311,10 +311,10 @@ Public Class XR_RedColor_CPP : Inherits TaskParent
             index += 1
         Next
 
-        Dim r2 As cv.Rect
+        Dim r2 as cv.Rect
         Dim count As Integer
         rcList.Clear()
-        Dim usedColor As New List(Of cv.Scalar)
+        Dim usedColor As New List(Of Scalar)
         For Each rc In newList.Values
             Dim r1 = rc.rect
             r2 = New cv.Rect(0, 0, 1, 1) ' fake rect for conditional below...
@@ -431,8 +431,8 @@ Public Class RedColor_Bricks : Inherits TaskParent
         dst0 = task.leftView
         color8u.Run(task.leftView)
 
-        Dim _redC_cvt As New cv.Mat
-        CvtColor(color8u.dst3, _redC_cvt, cv.ColorConversionCodes.BGR2GRAY)
+        Dim _redC_cvt As New Mat
+        CvtColor(color8u.dst3, _redC_cvt, ColorConversionCodes.BGR2GRAY)
         redC.Run(_redC_cvt)
         labels(2) = redC.labels(3)
         dst2 = redC.dst2
@@ -459,7 +459,7 @@ End Class
 
 Public Class RedColor_Hulls : Inherits TaskParent
     Public rclist As New List(Of rcDataOld)
-    Public rcMap As New cv.Mat(dst2.Size, cv.MatType.CV_32S, 0)
+    Public rcMap As New Mat(dst2.Size, MatType.CV_32S, 0)
     Dim redC As New RedColor_Basics
     Public Sub New()
         labels = {"", "Cells where convexity defects failed", "", "Improved contour results Using OpenCV's ConvexityDefects"}
@@ -499,10 +499,10 @@ End Class
 
 Public Class RedColor_GridRects : Inherits TaskParent
     Dim redC As New RedColor_Basics
-    Public rcGridMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0) ' map of rc data to grid map
+    Public rcGridMap As New Mat(dst2.Size, MatType.CV_8U, 0) ' map of rc data to grid map
     Public Sub New()
         labels(3) = "RedColor output mapped into the gridRects."
-        desc = "Create a triangle representation of the point cloud with RedCloud data"
+        desc = "Create a triangle representation of the cv.Point cloud with RedCloud data"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         redC.Run(src)
@@ -529,14 +529,14 @@ End Class
 
 Public Class XO_RedFlood_BasicsOld : Inherits TaskParent
     Public rcList As New List(Of rcDataOld)
-    Public rcMap As New cv.Mat(dst2.Size, cv.MatType.CV_32S, 0)
+    Public rcMap As New Mat(dst2.Size, MatType.CV_32S, 0)
     Dim redMask As New XO_RedFlood_MapAndList
     Dim fLess As New FeatureLess_DepthFull
     Dim knn As New KNN_Minimal
-    Public trainInput As New List(Of cv.Point3f)
-    Public queries As New List(Of cv.Point3f)
+    Public trainInput As New List(Of Point3f)
+    Public queries As New List(Of Point3f)
     Public Sub New()
-        queries.Add(New cv.Point3f(0, 0, 0)) ' we only need one entry in the queries.
+        queries.Add(New Point3f(0, 0, 0)) ' we only need one entry in the queries.
         If standalone Then task.gOptions.displayDst1.Checked = True
         desc = "Use KNN to identify the previous cell for each current cell"
     End Sub
@@ -552,16 +552,16 @@ Public Class XO_RedFlood_BasicsOld : Inherits TaskParent
 
         trainInput.Clear()
         For Each rc In redMask.rcList
-            trainInput.Add(New cv.Point3f(rc.maxDist.X, rc.maxDist.Y, rc.pixels))
+            trainInput.Add(New Point3f(rc.maxDist.X, rc.maxDist.Y, rc.pixels))
         Next
 
         dst3.SetTo(0)
         For Each rc In redMask.rcList
-            queries(0) = New cv.Point3f(rc.maxDist.X, rc.maxDist.Y, rc.pixels)
+            queries(0) = New Point3f(rc.maxDist.X, rc.maxDist.Y, rc.pixels)
 
             Dim dimension = 3
-            knn.queryMat = cv.Mat.FromPixelData(queries.Count, dimension, cv.MatType.CV_32F, queries.ToArray)
-            knn.trainMat = cv.Mat.FromPixelData(trainInput.Count, dimension, cv.MatType.CV_32F, trainInput.ToArray)
+            knn.queryMat = Mat.FromPixelData(queries.Count, dimension, MatType.CV_32F, queries.ToArray)
+            knn.trainMat = Mat.FromPixelData(trainInput.Count, dimension, MatType.CV_32F, trainInput.ToArray)
             knn.Run(emptyMat)
 
             Dim lastIndex = knn.result(0, 0)
@@ -570,7 +570,7 @@ Public Class XO_RedFlood_BasicsOld : Inherits TaskParent
                 rc.indexLast = rcLast.mapID
             End If
 
-            Dim lastColor = lastColorMat.Get(Of cv.Vec3b)(rc.maxDist.Y, rc.maxDist.X)
+            Dim lastColor = lastColorMat.Get(Of Vec3b)(rc.maxDist.Y, rc.maxDist.X)
             If lastColor <> black Then
                 If lastColor <> task.vecColors(rc.mapID) Then rc.color = lastColor
             Else
@@ -583,7 +583,7 @@ Public Class XO_RedFlood_BasicsOld : Inherits TaskParent
         SetTrueText(strOut, 1)
         If task.rcD IsNot Nothing Then task.clickPoint = task.rcD.maxDist
 
-        Dim usedColors As New List(Of cv.Scalar)
+        Dim usedColors As New List(Of Scalar)
         rcList.Clear()
         For Each rc In redMask.rcList
             If rc.indexLast > 0 Then
@@ -597,7 +597,7 @@ Public Class XO_RedFlood_BasicsOld : Inherits TaskParent
             End If
 
             If usedColors.Contains(rc.color) Then
-                rc.color = New cv.Scalar(msRNG.Next(0, 255), msRNG.Next(0, 255), msRNG.Next(0, 255))
+                rc.color = New Scalar(msRNG.Next(0, 255), msRNG.Next(0, 255), msRNG.Next(0, 255))
                 dst3(rc.rect).SetTo(rc.color, rc.mask)
             End If
             usedColors.Add(rc.color)
@@ -621,7 +621,7 @@ End Class
 Public Class XR_RedColor_Lines : Inherits TaskParent
     Dim redC As New RedCloud_Basics
     Public Sub New()
-        dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, 0)
+        dst3 = New Mat(dst3.Size(), MatType.CV_8U, 0)
         desc = "Identify and track the lines in an image as RedCloud Cells"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -739,8 +739,8 @@ Public Class XR_RedColor_FeaturesKNN : Inherits TaskParent
             Dim index = knn.result(i, knn.trainInput.Count - 1)
             If index >= 0 And index < knn.ptListTrain.Count Then
                 Dim p2 = knn.ptListTrain(index)
-                Circle(dst3, p1, task.DotSize, cv.Scalar.Yellow, -1, task.lineType)
-                Circle(dst3, p2, task.DotSize, cv.Scalar.Yellow, -1, task.lineType)
+                Circle(dst3, p1, task.DotSize, Scalar.Yellow, -1, task.lineType)
+                Circle(dst3, p2, task.DotSize, Scalar.Yellow, -1, task.lineType)
                 Line(dst3, p1, p2, white, task.lineWidth, task.lineType)
             End If
         Next
@@ -756,7 +756,7 @@ End Class
 
 Public Class XR_RedColor_GoodCellInput : Inherits TaskParent
     Public knn As New KNN_Basics
-    Public featureList As New List(Of cv.Point2f)
+    Public featureList As New List(Of Point2f)
     Dim feat As New Feature_Basics
     Public Sub New()
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Max feature travel distance", 0, 100, 10)
@@ -783,7 +783,7 @@ Public Class XR_RedColor_GoodCellInput : Inherits TaskParent
                 If p1.DistanceTo(p2) < maxDistance Then featureList.Add(p1)
             End If
         Next
-        knn.trainInput = New List(Of cv.Point2f)(knn.queries)
+        knn.trainInput = New List(Of Point2f)(knn.queries)
     End Sub
 End Class
 
@@ -796,7 +796,7 @@ End Class
 Public Class XR_RedColor_Points : Inherits TaskParent
     Dim track As New RedColor_Contour
     Public Sub New()
-        dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
+        dst3 = New Mat(dst3.Size(), MatType.CV_8U, Scalar.All(0))
         labels = {"", "", "RedCloudX_Track output", "Input to RedCloudX_Track"}
         desc = "Identify and track the end points of lines in an image of RedCloud Cells"
     End Sub
@@ -828,7 +828,7 @@ Public Class RedColor_Contours : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         contours.Run(src)
-        CvtColor(contours.dst2, dst1, cv.ColorConversionCodes.BGR2GRAY)
+        CvtColor(contours.dst2, dst1, ColorConversionCodes.BGR2GRAY)
         redC.Run(dst1)
         dst2 = contours.dst2
         labels(2) = redC.labels(2)
@@ -880,10 +880,10 @@ Public Class RedColor_Isolate : Inherits TaskParent
         If v > hi Then Return hi
         Return v
     End Function
-    Private Shared Function CellMaskFull(rcMap As cv.Mat, rc As rcDataOld) As cv.Mat
-        Dim m As New cv.Mat(rcMap.Size, cv.MatType.CV_8U, 0)
+    Private Shared Function CellMaskFull(rcMap As Mat, rc As rcDataOld) As Mat
+        Dim m As New Mat(rcMap.Size, MatType.CV_8U, 0)
         Using roi = rcMap(rc.rect)
-            Dim part As New cv.Mat
+            Dim part As New Mat
             InRange(roi, rc.mapID, rc.mapID, part)
             Using part
                 part.CopyTo(m(rc.rect))
@@ -891,11 +891,11 @@ Public Class RedColor_Isolate : Inherits TaskParent
         End Using
         Return m
     End Function
-    Private Shared Sub MorphClean(mask As cv.Mat)
-        Dim k = GetStructuringElement(cv.MorphShapes.Rect, New cv.Size(3, 3))
-        MorphologyEx(mask, mask, cv.MorphTypes.Open, k)
+    Private Shared Sub MorphClean(mask As Mat)
+        Dim k = GetStructuringElement(MorphShapes.Rect, New Size(3, 3))
+        MorphologyEx(mask, mask, MorphTypes.Open, k)
     End Sub
-    Private Function PickSubject(rcMap As cv.Mat, rcList As List(Of rcDataOld)) As rcDataOld
+    Private Function PickSubject(rcMap As Mat, rcList As List(Of rcDataOld)) As rcDataOld
         Dim total = rcMap.Rows * rcMap.Cols
         Dim minPx = CInt(total * 0.003)
         Dim maxPx = CInt(total * 0.62)
@@ -963,11 +963,11 @@ Public Class RedColor_Isolate : Inherits TaskParent
         Dim mask = CellMaskFull(redC.rcMap, subject)
         MorphClean(mask)
 
-        dst2 = New cv.Mat(bgr.Size(), cv.MatType.CV_8UC3, New cv.Scalar(245, 245, 245))
+        dst2 = New Mat(bgr.Size(), MatType.CV_8UC3, New Scalar(245, 245, 245))
         bgr.CopyTo(dst2, mask)
 
-        dst3 = New cv.Mat(mask.Size(), cv.MatType.CV_8UC3, New cv.Scalar(0, 0, 0))
-        dst3.SetTo(New cv.Scalar(255, 255, 255), mask)
+        dst3 = New Mat(mask.Size(), MatType.CV_8UC3, New Scalar(0, 0, 0))
+        dst3.SetTo(New Scalar(255, 255, 255), mask)
 
         labels(2) = "Subject index=" + CStr(subject.mapID) + ", pixels=" + CStr(subject.pixels) +
                     " (RedColor cell cutout; not ML portrait matting)."
@@ -1055,7 +1055,7 @@ End Class
 Public Class RedColor_Contour : Inherits TaskParent
     Public redC As New RedColor_Basics
     Public Sub New()
-        If New cv.Size(task.workRes.Width, task.workRes.Height) <> New cv.Size(168, 94) Then task.fOptions.FrameHistoryCount.Value = 1
+        If New Size(task.workRes.Width, task.workRes.Height) <> New Size(168, 94) Then task.fOptions.FrameHistoryCount.Value = 1
         desc = "Get stats on each RedColor cell."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)

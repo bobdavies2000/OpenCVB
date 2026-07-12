@@ -1,6 +1,6 @@
 Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 Public Class Resize_Basics : Inherits TaskParent
-    Public newSize As cv.Size
+    Public newSize As Size
     Public options As New Options_Resize
     Public Sub New()
         If standalone Then task.drawRect = New cv.Rect(dst2.Width / 4, dst2.Height / 4, dst2.Width / 2, dst2.Height / 2)
@@ -27,7 +27,7 @@ End Class
 
 Public Class Resize_Smaller : Inherits TaskParent
     Public options As New Options_Resize
-    Public newSize As cv.Size
+    Public newSize As Size
     Dim optGrid As New Options_GridFromResize
     Public Sub New()
         desc = "Resize by a percentage of the image."
@@ -36,7 +36,7 @@ Public Class Resize_Smaller : Inherits TaskParent
         options.Run()
         optGrid.Run()
 
-        newSize = New cv.Size(Math.Ceiling(src.Width * optGrid.lowResPercent),
+        newSize = New Size(Math.Ceiling(src.Width * optGrid.lowResPercent),
                                    Math.Ceiling(src.Height * optGrid.lowResPercent))
 
         Resize(src, dst2, newSize, 0, 0, options.warpFlag)
@@ -65,13 +65,13 @@ Public Class Resize_Proportional : Inherits TaskParent
             If task.rcD IsNot Nothing Then src = src(task.rcD.rect)
         End If
 
-        Dim newSize As cv.Size
+        Dim newSize As Size
         If dst0.Width / dst0.Height < src.Width / src.Height Then
-            newSize = New cv.Size(dst2.Width, dst2.Height * dst0.Height / dst0.Width)
+            newSize = New Size(dst2.Width, dst2.Height * dst0.Height / dst0.Width)
         Else
-            newSize = New cv.Size(dst2.Width * dst0.Height / dst0.Width, dst2.Height)
+            newSize = New Size(dst2.Width * dst0.Height / dst0.Width, dst2.Height)
         End If
-        Resize(src, src, newSize, 0, 0, cv.InterpolationFlags.Nearest)
+        Resize(src, src, newSize, 0, 0, InterpolationFlags.Nearest)
         Dim newRect = New cv.Rect(0, 0, newSize.Width, newSize.Height)
         dst3.SetTo(0)
         src.CopyTo(dst3(newRect))

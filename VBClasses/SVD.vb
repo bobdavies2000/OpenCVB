@@ -13,15 +13,15 @@ Public Class XR_SVD_Example : Inherits TaskParent
                     1, 2, 3, 4, 5
                 }
 
-        src = cv.Mat.FromPixelData(5, 5, cv.MatType.CV_32F, inputData)
-        Dim W As New cv.Mat, U As New cv.Mat, VT As New cv.Mat
+        src = Mat.FromPixelData(5, 5, MatType.CV_32F, inputData)
+        Dim W As New Mat, U As New Mat, VT As New Mat
 
-        SVDecomp(src, W, U, VT, cv.SVD.Flags.FullUV)
+        SVDecomp(src, W, U, VT, SVD.Flags.FullUV)
 
-        Dim WD As New cv.Mat(5, 5, cv.MatType.CV_32F, cv.Scalar.All(0))
+        Dim WD As New Mat(5, 5, MatType.CV_32F, Scalar.All(0))
         W.CopyTo(WD.Diag)
 
-        Dim rec As cv.Mat = VT.T * WD * U.T
+        Dim rec As Mat = VT.T * WD * U.T
         strOut = ""
         For i = 0 To rec.Rows - 1
             For j = 0 To rec.Cols - 1
@@ -59,13 +59,13 @@ Public Class XR_SVD_Example2 : Inherits TaskParent
         SetTrueText(redC.strOut, 1)
 
         If task.heartBeat Then
-            Dim m = cv.Cv2.Moments(rc.mask, True)
-            Dim center = New cv.Point2f(m.M10 / rc.pixels, m.M01 / rc.pixels)
+            Dim m = Cv2.Moments(rc.mask, True)
+            Dim center = New Point2f(m.M10 / rc.pixels, m.M01 / rc.pixels)
             Circle(task.color(rc.rect), center, task.DotSize, task.highlight, -1, task.lineType)
 
-            Dim mArea = cv.Mat.FromPixelData(4, 1, cv.MatType.CV_32F, {m.M20 / rc.pixels, m.Mu11 / rc.pixels, m.Mu11 / rc.pixels, m.Mu02 / rc.pixels})
-            Dim U As New cv.Mat
-            SVDecomp(mArea, New cv.Mat, U, New cv.Mat, cv.SVD.Flags.FullUV)
+            Dim mArea = Mat.FromPixelData(4, 1, MatType.CV_32F, {m.M20 / rc.pixels, m.Mu11 / rc.pixels, m.Mu11 / rc.pixels, m.Mu02 / rc.pixels})
+            Dim U As New Mat
+            SVDecomp(mArea, New Mat, U, New Mat, SVD.Flags.FullUV)
 
 
             strOut = "The U Mat: " + vbCrLf
@@ -110,8 +110,8 @@ Public Class XR_SVD_Gaussian : Inherits TaskParent
         covar.Run(src)
         dst2 = src
 
-        Dim U As New cv.Mat, W As New cv.Mat, VT As New cv.Mat
-        SVDecomp(covar.covariance, W, U, VT, cv.SVD.Flags.FullUV)
+        Dim U As New Mat, W As New Mat, VT As New Mat
+        SVDecomp(covar.covariance, W, U, VT, SVD.Flags.FullUV)
 
         strOut = "The Covariance Mat: " + vbCrLf
         For j = 0 To covar.covariance.Rows - 1
@@ -145,9 +145,9 @@ Public Class XR_SVD_Gaussian : Inherits TaskParent
 
         Sqrt(W, W)
         W *= 3
-        Dim size = New cv.Size2f(10, 100) ' New cv.Size2f(W.Get(Of Double)(0, 0), W.Get(Of Double)(1, 0))
-        Dim pt = New cv.Point2f(covar.meanVal.Get(Of Double)(0, 0), covar.meanVal.Get(Of Double)(0, 1))
-        Dim rrect = New cv.RotatedRect(pt, size, angle)
+        Dim size = New Size2f(10, 100) ' New Size2f(W.Get(Of Double)(0, 0), W.Get(Of Double)(1, 0))
+        Dim pt = New Point2f(covar.meanVal.Get(Of Double)(0, 0), covar.meanVal.Get(Of Double)(0, 1))
+        Dim rrect = New RotatedRect(pt, size, angle)
         Ellipse(dst2, rrect, task.highlight, task.lineWidth, task.lineType)
 
         SetTrueText(strOut, 3)

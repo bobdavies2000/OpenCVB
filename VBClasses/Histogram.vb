@@ -17,7 +17,7 @@ Public Class Histogram_Basics : Inherits TaskParent
         If standalone Then task.gOptions.setHistogramBins(16)
         desc = "Create a histogram (no Kalman)"
     End Sub
-    Public Overrides Sub RunAlg(src As Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         If standalone Then
             If task.heartBeat Then splitIndex = (splitIndex + 1) Mod 3
             Dim input As New Mat
@@ -68,7 +68,7 @@ Public Class XR_Histogram_Grayscale : Inherits TaskParent
         If standalone Then task.gOptions.setHistogramBins(255)
         desc = "Create a histogram of the grayscale image"
     End Sub
-    Public Overrides Sub RunAlg(src As Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         hist.Run(task.gray)
         dst2 = hist.dst2
         labels = hist.labels
@@ -94,7 +94,7 @@ Public Class Histogram_Graph : Inherits TaskParent
     Public Sub New()
         desc = "Plot histograms for up to 3 channels."
     End Sub
-    Public Overrides Sub RunAlg(src As Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         Dim dimensions() = {task.histogramBins}
         Dim ranges() = New Rangef() {New Rangef(minRange, maxRange)}
 
@@ -110,10 +110,10 @@ Public Class Histogram_Graph : Inherits TaskParent
             If histNormalized(i) Is Nothing Then histNormalized(i) = New Mat
             Normalize(hist, histNormalized(i), 0, hist.Rows, NormTypes.MinMax)
             If standaloneTest() Or plotRequested Then
-                Dim points = New List(Of Point)
-                Dim listOfPoints = New List(Of List(Of Point))
+                Dim points = New List(Of cv.Point)
+                Dim listOfPoints = New List(Of List(Of cv.Point))
                 For j = 0 To task.histogramBins - 1
-                    points.Add(New Point(CInt(j * plotWidth), dst2.Rows - dst2.Rows * histRaw(i).Get(Of Single)(j, 0) / mm.maxVal))
+                    points.Add(New cv.Point(CInt(j * plotWidth), dst2.Rows - dst2.Rows * histRaw(i).Get(Of Single)(j, 0) / mm.maxVal))
                 Next
                 listOfPoints.Add(points)
                 Polylines(dst2, listOfPoints, False, plotColors(i), task.lineWidth, task.lineType)
@@ -140,7 +140,7 @@ Public Class XR_Histogram_NormalizeGray : Inherits TaskParent
         labels(2) = "Use sliders to adjust the image and create a histogram of the results"
         desc = "Create a histogram of a normalized image"
     End Sub
-    Public Overrides Sub RunAlg(src As Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
 
         Normalize(src, dst3, options.minGray, options.maxGray, NormTypes.MinMax) ' only minMax is working...
@@ -161,7 +161,7 @@ Public Class Histogram_Simple : Inherits TaskParent
         labels(2) = "Histogram of the grayscale video stream"
         desc = "Build a simple and reusable histogram for grayscale images."
     End Sub
-    Public Overrides Sub RunAlg(src As Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         If src.Channels() <> 1 Then src = task.gray
 
         Dim ranges() = New Rangef() {New Rangef(plotHist.minRange, plotHist.maxRange)}
@@ -194,7 +194,7 @@ Public Class XR_Histogram_ColorsAndGray : Inherits TaskParent
         labels(2) = "Click any quadrant at right to view it below"
         desc = "Create a histogram of a normalized image"
     End Sub
-    Public Overrides Sub RunAlg(src As Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         Dim splitMats() As Mat = Split(src)
         ReDim Preserve splitMats(4 - 1)
         splitMats(4 - 1) = task.gray ' add a 4th image - the grayscale image to the R G and B images.
@@ -225,7 +225,7 @@ Public Class XR_Histogram_Frustrum : Inherits TaskParent
         task.gOptions.setGravityUsage(False)
         desc = "Options for the side and top view.  See OptionCommon_Histogram to make settings permanent."
     End Sub
-    Public Overrides Sub RunAlg(src As Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         heat.Run(src)
         dst2 = heat.dst2
         dst3 = heat.dst3
@@ -235,7 +235,7 @@ Public Class XR_Histogram_Frustrum : Inherits TaskParent
                         "To see how these adjustments work or to add a new camera, " + vbCrLf +
                         "use the HeatMap_Basics algorithm." + vbCrLf +
                         "For new cameras, make the adjustments needed, note the value, and update " + vbCrLf +
-                        "the Select statement in the constructor for Options_CameraDetails.", New Point(10, 80), 1)
+                        "the Select statement in the constructor for Options_CameraDetails.", New cv.Point(10, 80), 1)
     End Sub
 End Class
 
@@ -256,7 +256,7 @@ Public Class XR_Histogram_PeakMax : Inherits TaskParent
         desc = "Create a histogram and back project into the image the grayscale color with the highest occurance."
         labels(3) = "Grayscale Histogram"
     End Sub
-    Public Overrides Sub RunAlg(src As Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
         options.useKalman = False
 
@@ -306,7 +306,7 @@ Public Class Histogram_PeakFinder : Inherits TaskParent
     Public Sub New()
         desc = "Find the peaks - columns taller that both neighbors - in the histogram"
     End Sub
-    Public Overrides Sub RunAlg(src As Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         If src.Channels() <> 1 Then src = task.pcSplit(2)
 
         hist.Run(src)
@@ -353,7 +353,7 @@ Public Class Histogram_PeakFinder : Inherits TaskParent
         maxList.Add(maxIndex)
 
         peakCount = CInt(allPCounts.Average)
-        SetTrueText(vbTab + "Avg peaks: " + CStr(peakCount) + ".  Current: " + CStr(peaks.Count) + " peaks.", New Point(0, 10), 3)
+        SetTrueText(vbTab + "Avg peaks: " + CStr(peakCount) + ".  Current: " + CStr(peaks.Count) + " peaks.", New cv.Point(0, 10), 3)
 
         Dim sortedPeaks = New SortedList(Of Integer, Integer)(New compareAllowIdenticalIntegerInverted)
         For i = 0 To peakCounts.Count - 1
@@ -395,7 +395,7 @@ Public Class XR_Histogram_PeaksDepth : Inherits TaskParent
     Public Sub New()
         desc = "Find the peaks - columns taller that both neighbors - in the histogram"
     End Sub
-    Public Overrides Sub RunAlg(src As Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         peaks.Run(task.pcSplit(2))
         dst2 = peaks.dst2
         labels(2) = peaks.labels(2)
@@ -422,7 +422,7 @@ Public Class XR_Histogram_PeaksRGB : Inherits TaskParent
         labels(2) = "Upper left is Blue, upper right is Green, bottom left is Red"
         desc = "Find the peaks and valleys for each of the BGR channels."
     End Sub
-    Public Overrides Sub RunAlg(src As Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         Dim splitMats() As Mat = Split(src)
         For i = 0 To 3 - 1
             peaks(i).hist.plotHist.backgroundColor = Choose(i + 1, Scalar.Blue, Scalar.Green, Scalar.Red)
@@ -456,7 +456,7 @@ Public Class XR_Histogram_Color : Inherits TaskParent
     Public Sub New()
         desc = "Create a histogram of green and red."
     End Sub
-    Public Overrides Sub RunAlg(src As Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         ranges = New Rangef() {New Rangef(0, 255), New Rangef(0, 255)}
         CalcHist({src}, {1, 2}, New Mat, histogram, 1, {task.histogramBins, task.histogramBins}, ranges)
 
@@ -493,7 +493,7 @@ Public Class Histogram_KalmanAuto : Inherits TaskParent
     Public Sub New()
         desc = "Create a histogram of the grayscale image and smooth the bar chart with a kalman filter."
     End Sub
-    Public Overrides Sub RunAlg(src As Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         If standaloneTest() Then
             If task.heartBeat Then splitIndex = If(splitIndex < 2, splitIndex + 1, 0)
             colorName = Choose(splitIndex + 1, "Blue", "Green", "Red")
@@ -553,7 +553,7 @@ Public Class Histogram_EqualizeColor : Inherits TaskParent
         desc = "Create an equalized histogram of the color image."
         labels(2) = "Image Enhanced with Equalized Histogram"
     End Sub
-    Public Overrides Sub RunAlg(src As Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         Dim rgb() As Mat = Nothing
         Dim rgbEq() As Mat = Split(task.color)
 
@@ -598,7 +598,7 @@ Public Class Histogram_CompareGray : Inherits TaskParent
         labels(2) = "Kalman-smoothed current histogram"
         desc = "Compare grayscale histograms for successive frames"
     End Sub
-    Public Overrides Sub RunAlg(src As Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
 
         histK.Run(src)
@@ -648,7 +648,7 @@ Public Class XR_Histogram_ComparePlot : Inherits TaskParent
         labels(3) = "Differences have been multiplied by 1000 to build scale at the left"
         desc = "Compare grayscale histograms for successive frames and plot the difference as a histogram."
     End Sub
-    Public Overrides Sub RunAlg(src As Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         comp.Run(src)
         dst2 = comp.dst2.Clone
 
@@ -681,7 +681,7 @@ Public Class XR_Histogram_CompareNumber : Inherits TaskParent
         labels = {"", "", "Kalman-smoothed normalized histogram output", "Plot of the sum of the differences between recent normalized histograms"}
         desc = "The idea is to reduce a comparison of 2 histograms to a single number"
     End Sub
-    Public Overrides Sub RunAlg(src As Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         comp.Run(src)
         dst1 = comp.dst2.Clone
 
@@ -692,7 +692,7 @@ Public Class XR_Histogram_CompareNumber : Inherits TaskParent
         dst2 = plot.dst2
         dst3 = plot.dst3
 
-        SetTrueText("Upper left is the sum * 100 of the difference" + vbCrLf + "Upper right is the sum of the absolute values * 100", New Point(0, dst2.Height / 2), 2)
+        SetTrueText("Upper left is the sum * 100 of the difference" + vbCrLf + "Upper right is the sum of the absolute values * 100", New cv.Point(0, dst2.Height / 2), 2)
     End Sub
 End Class
 
@@ -708,7 +708,7 @@ Public Class XR_Histogram_CompareEMD_hsv : Inherits TaskParent
         labels = {"", "", "Kalman-smoothed normalized histogram output", "Plot of the sum of the differences between recent normalized histograms"}
         desc = "Use OpenCV's Earth Mover Distance to compare 2 images."
     End Sub
-    Public Overrides Sub RunAlg(src As Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         Dim hsv As New Mat
         CvtColor(src, hsv, ColorConversionCodes.BGR2HSV)
         Static lastHSV As Mat = hsv.Clone
@@ -758,7 +758,7 @@ Public Class XR_Histogram_Peaks : Inherits TaskParent
     Public Sub New()
         desc = "Interactive Histogram"
     End Sub
-    Public Overrides Sub RunAlg(src As Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         masks.Run(src)
         dst2 = masks.dst2
         dst3 = masks.dst3
@@ -779,7 +779,7 @@ Public Class XR_Histogram_Lab : Inherits TaskParent
         labels = {"Lab Colors ", "Lab Channel 0", "Lab Channel 1", "Lab Channel 2"}
         desc = "Create a histogram from a BGR image converted to LAB."
     End Sub
-    Public Overrides Sub RunAlg(src As Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         CvtColor(src, dst0, ColorConversionCodes.BGR2Lab)
         Dim splitMats() As Mat = Nothing
         Split(dst0, splitMats)
@@ -808,9 +808,9 @@ Public Class XR_Histogram_PointCloudXYZ : Inherits TaskParent
         plotHist.createHistogram = True
         If standalone Then task.gOptions.displayDst1.Checked = True
         labels = {"", "Histogram of the X channel", "Histogram of the Y channel", "Histogram of the Z channel"}
-        desc = "Show individual channel of the point cloud data as a histogram."
+        desc = "Show individual channel of the cv.Point cloud data as a histogram."
     End Sub
-    Public Overrides Sub RunAlg(src As Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         Static ttlists As New List(Of List(Of TrueText))({New List(Of TrueText), New List(Of TrueText), New List(Of TrueText)})
         For i = 0 To 2
             dst0 = task.pcSplit(i)
@@ -857,7 +857,7 @@ Public Class XR_Histogram_FlatSurfaces : Inherits TaskParent
     Public Sub New()
         desc = "Find flat surfaces with the histogram"
     End Sub
-    Public Overrides Sub RunAlg(src As Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         Dim maxRange = 4
         Dim cloudY = task.pcSplit(1).Clone
         Dim mm As mmData = GetMinMax(cloudY)
@@ -895,7 +895,7 @@ Public Class XR_Histogram_Gotcha2D : Inherits TaskParent
         labels(2) = "ZY (Side View)"
         desc = "Create a 2D side view for ZY histogram of depth using integer values.  Testing calcHist gotcha."
     End Sub
-    Public Overrides Sub RunAlg(src As Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         Dim expected = CountNonZero(task.pcSplit(2))
         Dim ranges = task.rangesSide
         If task.toggleOn Then
@@ -932,7 +932,7 @@ Public Class XR_Histogram_Gotcha : Inherits TaskParent
         labels(2) = "Grayscale histogram"
         desc = "Simple test: input samples should equal histogram samples.  What is wrong?  Exclusive ranges!"
     End Sub
-    Public Overrides Sub RunAlg(src As Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         If src.Channels() <> 1 Then src = task.gray
 
         Dim expected = src.Total
@@ -963,7 +963,7 @@ Public Class XR_Histogram_GotchaFixed_CPP : Inherits TaskParent
         cPtr = Histogram_1D_Open()
         desc = "Testing the C++ CalcHist to investigate gotcha with sample counts"
     End Sub
-    Public Overrides Sub RunAlg(src As Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         If src.Channels() <> 1 Then src = task.gray
 
         Dim cppData(src.Total - 1) As Byte
@@ -998,7 +998,7 @@ Public Class XR_Histogram_Byte_CPP : Inherits TaskParent
         cPtr = Histogram_1D_Open()
         desc = "For Byte histograms, the C++ code works but the .Net interface doesn't honor exclusive ranges."
     End Sub
-    Public Overrides Sub RunAlg(src As Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         If src.Channels() <> 1 Then src = task.gray
 
         Dim cppData(src.Total - 1) As Byte
@@ -1029,9 +1029,9 @@ Public Class Histogram_Cloud : Inherits TaskParent
     Dim maxMaxVal As Double
     Public Sub New()
         myPlotHist.plotHist.removeZeroEntry = True
-        desc = "Plot the histogram of the X layer of the point cloud"
+        desc = "Plot the histogram of the X layer of the cv.Point cloud"
     End Sub
-    Public Overrides Sub RunAlg(src As Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         If src.Type <> MatType.CV_32F Then src = task.pcSplit(0)
         Dim mm = GetMinMax(src)
         Dim norm32f = src + Math.Abs(mm.minVal)
@@ -1056,9 +1056,9 @@ Public Class XR_Histogram_CloudX : Inherits TaskParent
     Dim histDim As New Histogram_Cloud
     Public Sub New()
         histDim.dimensionLabel = "X"
-        desc = "Plot the histogram of the X layer of the point cloud"
+        desc = "Plot the histogram of the X layer of the cv.Point cloud"
     End Sub
-    Public Overrides Sub RunAlg(src As Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         histDim.Run(task.pcSplit(0))
         dst2 = histDim.dst2
         labels = histDim.labels
@@ -1073,9 +1073,9 @@ Public Class XR_Histogram_CloudY : Inherits TaskParent
     Dim histDim As New Histogram_Cloud
     Public Sub New()
         histDim.dimensionLabel = "Y"
-        desc = "Plot the histogram of the X layer of the point cloud"
+        desc = "Plot the histogram of the X layer of the cv.Point cloud"
     End Sub
-    Public Overrides Sub RunAlg(src As Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         histDim.Run(task.pcSplit(1))
         dst2 = histDim.dst2
         labels = histDim.labels
@@ -1090,9 +1090,9 @@ Public Class XR_Histogram_CloudZ : Inherits TaskParent
     Dim histDim As New Histogram_Cloud
     Public Sub New()
         histDim.dimensionLabel = "Z"
-        desc = "Plot the histogram of the X layer of the point cloud"
+        desc = "Plot the histogram of the X layer of the cv.Point cloud"
     End Sub
-    Public Overrides Sub RunAlg(src As Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         histDim.Run(task.pcSplit(2))
         dst2 = histDim.dst2
         labels = histDim.labels
@@ -1112,7 +1112,7 @@ Public Class Histogram_Kalman : Inherits TaskParent
         labels = {"", "", "With Kalman", "Without Kalman"}
         desc = "Use Kalman to smooth the histogram sharedResults.images.."
     End Sub
-    Public Overrides Sub RunAlg(src As Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         hist.Run(src)
         dst3 = hist.dst2.Clone
 
@@ -1148,7 +1148,7 @@ Public Class Histogram_DepthSimple : Inherits TaskParent
         plotHist.addLabels = False
         desc = "Use Kalman to smooth the histogram sharedResults.images.."
     End Sub
-    Public Overrides Sub RunAlg(src As Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         If standaloneTest() Then
             mm = GetMinMax(task.pcSplit(2))
             If mm.minVal = mm.maxVal Then Exit Sub
@@ -1184,9 +1184,9 @@ Public Class Histogram_CloudSegments : Inherits TaskParent
         dst1 = New Mat(dst1.Size, MatType.CV_8U, 0)
         plot.createHistogram = True
         plot.removeZeroEntry = False
-        desc = "Find the segments of X, Y, and Z values from the point cloud."
+        desc = "Find the segments of X, Y, and Z values from the cv.Point cloud."
     End Sub
-    Public Overrides Sub RunAlg(src As Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
 
         If standalone Then
@@ -1212,7 +1212,7 @@ Public Class Histogram_CloudSegments : Inherits TaskParent
         plot.Run(src)
         dst2 = plot.dst2.Clone
 
-        labels(2) = "Plot of " + Choose(index + 1, "X", "Y", "Z") + " data in point cloud"
+        labels(2) = "Plot of " + Choose(index + 1, "X", "Y", "Z") + " data in cv.Point cloud"
         labels(3) = "Min = " + mm.minVal.ToString(fmt1) + " max = " + mm.maxVal.ToString(fmt1)
 
         dst1.SetTo(0)
@@ -1240,7 +1240,7 @@ Public Class Histogram_GridCell : Inherits TaskParent
     Public Sub New()
         desc = "Build a histogram of the cell contents"
     End Sub
-    Public Overrides Sub RunAlg(src As Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         If standalone And src.Channels = 3 Then src = task.gray
         Dim mm = GetMinMax(src)
         ReDim histarray(mm.maxVal)
@@ -1277,7 +1277,7 @@ Public Class XR_Histogram_ToggleFeatureLess : Inherits TaskParent
         task.gOptions.setHistogramBins(255)
         desc = "Toggle between a histogram of the entire image and one of the featureless regions found with grid points."
     End Sub
-    Public Overrides Sub RunAlg(src As Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         fLessBrick.Run(src)
         dst3 = fLessBrick.dst2
         labels(3) = fLessBrick.labels(2)
@@ -1313,7 +1313,7 @@ Public Class Histogram_EqualizeGray : Inherits TaskParent
         labels(3) = "Orig. Hist, Eq. Hist, Orig. Image, Eq. Image"
         desc = "Create an equalized histogram of the grayscale image."
     End Sub
-    Public Overrides Sub RunAlg(src As Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         If src.Channels <> 1 Then src = task.gray
         histogram.Run(src)
         EqualizeHist(task.gray, dst2)
@@ -1342,7 +1342,7 @@ Public Class Histogram_PointCloud_XZ_YZ : Inherits TaskParent
         labels = {"", "", "Histogram of XZ - X on the Y-Axis and Z on the X-Axis", "Histogram of YZ with Y on the Y-Axis and Z on the X-Axis"}
         desc = "Create a 2D histogram for the pointcloud in XZ and YZ."
     End Sub
-    Public Overrides Sub RunAlg(src As Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
 
         If src.Type <> MatType.CV_32FC3 Then src = task.pointCloud
@@ -1372,9 +1372,9 @@ Public Class Histogram_PointCloud : Inherits TaskParent
     Public Sub New()
         task.gOptions.setHistogramBins(9)
         labels = {"", "", "Plot of 2D histogram", "All non-zero entries in the 2D histogram"}
-        desc = "Create a 2D histogram of the point cloud data - which 2D inputs is in options."
+        desc = "Create a 2D histogram of the cv.Point cloud data - which 2D inputs is in options."
     End Sub
-    Public Overrides Sub RunAlg(src As Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
 
         Select Case task.reductionName
@@ -1446,7 +1446,7 @@ Public Class XR_Histogram_LeftAndColor : Inherits TaskParent
         labels(3) = "Grayscale Histogram"
         desc = "Show the BW histogram for the color and left view."
     End Sub
-    Public Overrides Sub RunAlg(src As Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         hist.Run(task.leftView)
         dst2 = hist.dst2.Clone
 
@@ -1468,7 +1468,7 @@ Public Class XR_Histogram_LeftRightAndColor : Inherits TaskParent
         labels(3) = "Grayscale Histogram"
         desc = "Show the BW histogram for the color and left view."
     End Sub
-    Public Overrides Sub RunAlg(src As Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         hist.Run(task.rightView)
         dst1 = hist.dst2.Clone
 
@@ -1490,7 +1490,7 @@ Public Class XR_Histogram_InverseLUT : Inherits TaskParent
         task.gOptions.HistBinBar.Value = 5
         desc = "Invert the histogram of the color image using green.  G = 0.299 R + 0.587 G + 0.114 B"
     End Sub
-    Public Overrides Sub RunAlg(src As Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         Dim splitMats() As Mat = Split(task.color)
         hist.Run(splitMats(1))
         dst2 = hist.dst2
@@ -1541,7 +1541,7 @@ Public Class Histogram_Depth : Inherits TaskParent
         task.gOptions.HistBinBar.Value = 10
         desc = "Show depth data as a histogram."
     End Sub
-    Public Overrides Sub RunAlg(src As Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         If src.Rows <= 0 Then Exit Sub
         If src.Type <> MatType.CV_32F Then src = task.pcSplit(2)
 
@@ -1568,7 +1568,7 @@ Public Class Histogram_Depth : Inherits TaskParent
 
         Dim stepsize = dst2.Width / task.MaxZmeters
         For i = 1 To CInt(task.MaxZmeters) - 1
-            Line(dst2, New Point(stepsize * i, 0), New Point(stepsize * i, dst2.Height), white, Utility_Basics.getThickness)
+            Line(dst2, New cv.Point(stepsize * i, 0), New cv.Point(stepsize * i, dst2.Height), white, Utility_Basics.getThickness)
         Next
 
         If standaloneTest() Then

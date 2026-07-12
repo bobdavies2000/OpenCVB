@@ -50,7 +50,7 @@ Public Class StableLine_BasicsOld : Inherits TaskParent
         If rotateAngle <> 0 Then
             Dim rotateCenter = Line_Intersection.IntersectTest(lp, lpLast)
             Dim M = GetRotationMatrix2D(rotateCenter, -rotateAngle, 1)
-            WarpAffine(src, dst2, M, src.Size(), cv.InterpolationFlags.Cubic)
+            WarpAffine(src, dst2, M, src.Size(), InterpolationFlags.Cubic)
             lpLast = lp
         Else
             If task.heartBeat Then dst2 = src.Clone
@@ -78,12 +78,12 @@ Public Class XR_StableLine_BasicsOldCount : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If features.Count > 0 Then
-            basics.facetGen.inputPoints = New List(Of cv.Point2f)(features)
+            basics.facetGen.inputPoints = New List(Of Point2f)(features)
         Else
             bPoint.Run(src)
             basics.facetGen.inputPoints.Clear()
             For Each pt In bPoint.ptList
-                basics.facetGen.inputPoints.Add(New cv.Point2f(pt.X, pt.Y))
+                basics.facetGen.inputPoints.Add(New Point2f(pt.X, pt.Y))
             Next
         End If
         basics.Run(src)
@@ -156,7 +156,7 @@ Public Class XR_StableLine_FAST : Inherits TaskParent
         fast.Run(src)
 
         basics.facetGen.inputPoints.Clear()
-        basics.facetGen.inputPoints = New List(Of cv.Point2f)(fast.features)
+        basics.facetGen.inputPoints = New List(Of Point2f)(fast.features)
         basics.Run(src)
         dst3 = basics.dst3
         dst2 = basics.dst2

@@ -18,7 +18,7 @@ Public Class Salience_Basics_CPP : Inherits TaskParent
         Dim imagePtr = Salience_Run(cPtr, options.numScales, grayHandle.AddrOfPinnedObject, src.Height, src.Width)
         grayHandle.Free()
 
-        dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, cv.MatType.CV_8U, imagePtr).Clone
+        dst2 = Mat.FromPixelData(src.Rows, src.Cols, MatType.CV_8U, imagePtr).Clone
     End Sub
     Protected Overrides Sub Finalize()
         If cPtr <> 0 Then cPtr = Salience_Close(cPtr)
@@ -37,7 +37,7 @@ Public Class XR_Salience_Basics_MT : Inherits TaskParent
         If src.Channels() <> 1 Then src = task.gray
         Dim threads = 32
         Dim h = src.Height \ threads
-        dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
+        dst2 = New Mat(dst2.Size(), MatType.CV_8U, Scalar.All(0))
         Parallel.For(0, threads,
                 Sub(i)
                     Dim roi = New cv.Rect(0, i * h, src.Width, Math.Min(h, src.Height - i * h))
@@ -51,7 +51,7 @@ Public Class XR_Salience_Basics_MT : Inherits TaskParent
                     Dim imagePtr = Salience_Run(cPtr, salience.options.numScales, grayHandle.AddrOfPinnedObject, roi.Height, roi.Width)
                     grayHandle.Free()
 
-                    dst2(roi) = cv.Mat.FromPixelData(roi.Height, roi.Width, cv.MatType.CV_8U, imagePtr).Clone
+                    dst2(roi) = Mat.FromPixelData(roi.Height, roi.Width, MatType.CV_8U, imagePtr).Clone
                     If cPtr <> 0 Then cPtr = Salience_Close(cPtr)
                 End Sub)
     End Sub

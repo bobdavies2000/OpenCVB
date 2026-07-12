@@ -13,8 +13,8 @@ Public Class FREAK_Basics : Inherits TaskParent
         orb.Run(src)
         dst1 = orb.dst2
 
-        If freak Is Nothing Then freak = cv.XFeatures2D.FREAK.Create()
-        Dim fdesc = New cv.Mat
+        If freak Is Nothing Then freak = XFeatures2D.FREAK.Create()
+        Dim fdesc = New Mat
         Dim keypoints = orb.keypoints.ToList
         freak.Compute(task.gray, orb.keypoints, fdesc)
 
@@ -22,9 +22,9 @@ Public Class FREAK_Basics : Inherits TaskParent
 
         For Each kpt In keypoints
             Dim r = kpt.Size / 2
-            Circle(dst2, kpt.Pt, r, cv.Scalar.Green, -1, task.lineType)
-            Line(dst2, New cv.Point(kpt.Pt.X + r, kpt.Pt.Y + r), New cv.Point(kpt.Pt.X - r, kpt.Pt.Y - r), cv.Scalar.Green, task.lineWidth, task.lineType)
-            Line(dst2, New cv.Point(kpt.Pt.X + r, kpt.Pt.Y - r), New cv.Point(kpt.Pt.X - r, kpt.Pt.Y + r), cv.Scalar.Green, task.lineWidth, task.lineType)
+            Circle(dst2, kpt.Pt, r, Scalar.Green, -1, task.lineType)
+            Line(dst2, New cv.Point(kpt.Pt.X + r, kpt.Pt.Y + r), New cv.Point(kpt.Pt.X - r, kpt.Pt.Y - r), Scalar.Green, task.lineWidth, task.lineType)
+            Line(dst2, New cv.Point(kpt.Pt.X + r, kpt.Pt.Y - r), New cv.Point(kpt.Pt.X - r, kpt.Pt.Y + r), Scalar.Green, task.lineWidth, task.lineType)
         Next
         labels(2) = CStr(orb.keypoints.Count) + " key points were identified"
         labels(3) = CStr(orb.keypoints.Count) + " FREAK Descriptors (resized) One row = keypoint"

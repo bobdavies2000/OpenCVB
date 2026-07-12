@@ -2,27 +2,27 @@
 ' https://github.com/opencv/opencv/blob/master/samples/cpp/phase_corr.cpp
 ' https://docs.opencvb.org/master/d7/df3/group__imgproc__motion.html
 Public Class PhaseCorrelate_Basics : Inherits TaskParent
-    Dim hanning As New cv.Mat
-    Public stableRect As cv.Rect
-    Public srcRect As cv.Rect
+    Dim hanning As New Mat
+    Public stableRect as cv.Rect
+    Public srcRect as cv.Rect
     Public center As cv.Point
     Public radius As Single
-    Public shift As cv.Point2d
-    Public lastFrame As cv.Mat
+    Public shift As Point2d
+    Public lastFrame As Mat
     Public response As Double
     Public resetLastFrame As Boolean
     Public Sub New()
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Threshold shift to cause reset of lastFrame", 0, 100, 30)
-        CreateHanningWindow(hanning, dst2.Size(), cv.MatType.CV_64F)
+        CreateHanningWindow(hanning, dst2.Size(), MatType.CV_64F)
         desc = "Look for a shift between the current frame and the previous"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         Static thresholdSlider = OptionParent.FindSlider("Threshold shift to cause reset of lastFrame")
 
         Dim input = src
-        If input.Channels() <> 1 Then CvtColor(input, input, cv.ColorConversionCodes.BGR2GRAY)
-        Dim input64 As New cv.Mat
-        input.ConvertTo(input64, cv.MatType.CV_64F)
+        If input.Channels() <> 1 Then CvtColor(input, input, ColorConversionCodes.BGR2GRAY)
+        Dim input64 As New Mat
+        input.ConvertTo(input64, MatType.CV_64F)
         If lastFrame Is Nothing Then lastFrame = input64.Clone
 
         shift = PhaseCorrelate(lastFrame, input64, hanning, response)
@@ -45,16 +45,16 @@ Public Class PhaseCorrelate_Basics : Inherits TaskParent
             srcRect = ValidateRect(New cv.Rect(x2, y2, stableRect.Width, stableRect.Height))
             If stableRect.Width > 0 And stableRect.Height > 0 And srcRect.Bottom <= dst2.Height Then
                 center = New cv.Point(input64.Cols / 2, input64.Rows / 2)
-                If src.Channels() = 1 Then CvtColor(src, src, cv.ColorConversionCodes.GRAY2BGR)
+                If src.Channels() = 1 Then CvtColor(src, src, ColorConversionCodes.GRAY2BGR)
                 dst2 = src.Clone
                 Circle(dst2, center, radius, task.highlight, task.lineWidth + 2, task.lineType)
-                Line(dst2, center, New cv.Point(center.X + shift.X, center.Y + shift.Y), cv.Scalar.Red, task.lineWidth + 1, task.lineType)
+                Line(dst2, center, New cv.Point(center.X + shift.X, center.Y + shift.Y), Scalar.Red, task.lineWidth + 1, task.lineType)
 
                 src(srcRect).CopyTo(dst3(stableRect))
 
                 If radius > 5 Then
                 Circle(dst3, center, radius, task.highlight, task.lineWidth + 2, task.lineType)
-                    Line(dst3, center, New cv.Point(center.X + shift.X, center.Y + shift.Y), cv.Scalar.Red, task.lineWidth + 1, task.lineType)
+                    Line(dst3, center, New cv.Point(center.X + shift.X, center.Y + shift.Y), Scalar.Red, task.lineWidth + 1, task.lineType)
                 End If
             Else
                 resetLastFrame = True
@@ -113,7 +113,7 @@ Public Class PhaseCorrelate_RandomInput : Inherits TaskParent
         options.Run()
 
         Dim input = src
-        If input.Channels() <> 1 Then CvtColor(input, input, cv.ColorConversionCodes.BGR2GRAY)
+        If input.Channels() <> 1 Then CvtColor(input, input, ColorConversionCodes.BGR2GRAY)
 
         Dim shiftX = msRNG.Next(-options.FASTthreshold, options.FASTthreshold)
         Dim shiftY = msRNG.Next(-options.FASTthreshold, options.FASTthreshold)
@@ -157,10 +157,10 @@ Public Class XR_PhaseCorrelate_Depth : Inherits TaskParent
         desc = "Use phase correlation on the depth data"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        Static lastFrame As cv.Mat = task.pcSplit(2).Clone
+        Static lastFrame As Mat = task.pcSplit(2).Clone
         phaseC.Run(task.pcSplit(2))
         dst2 = task.pcSplit(2)
-        Dim tmp = New cv.Mat(dst2.Size(), cv.MatType.CV_32F, cv.Scalar.All(0))
+        Dim tmp = New Mat(dst2.Size(), MatType.CV_32F, Scalar.All(0))
         If phaseC.resetLastFrame Then task.pcSplit(2).CopyTo(lastFrame)
         If Double.IsNaN(phaseC.response) Then
             SetTrueText("PhaseCorrelate_Basics has detected NaN's in the input image.", 3)
@@ -170,11 +170,11 @@ Public Class XR_PhaseCorrelate_Depth : Inherits TaskParent
             labels(2) = phaseC.labels(2)
             labels(3) = phaseC.labels(3)
 
-            Normalize(tmp, tmp, 0, 255, cv.NormTypes.MinMax)
-            tmp.ConvertTo(dst3, cv.MatType.CV_8UC1)
+            Normalize(tmp, tmp, 0, 255, NormTypes.MinMax)
+            tmp.ConvertTo(dst3, MatType.CV_8UC1)
 
             Circle(dst3, phaseC.center, phaseC.radius, task.highlight, task.lineWidth + 2, task.lineType)
-            Line(dst3, phaseC.center, New cv.Point(phaseC.center.X + phaseC.shift.X, phaseC.center.Y + phaseC.shift.Y), cv.Scalar.Red, task.lineWidth + 1, task.lineType)
+            Line(dst3, phaseC.center, New cv.Point(phaseC.center.X + phaseC.shift.X, phaseC.center.Y + phaseC.shift.Y), Scalar.Red, task.lineWidth + 1, task.lineType)
         End If
 
         lastFrame = task.pcSplit(2).Clone
@@ -194,7 +194,7 @@ Public Class XR_PhaseCorrelate_HanningWindow : Inherits TaskParent
         desc = "Show what a Hanning window looks like"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        CreateHanningWindow(dst2, src.Size(), cv.MatType.CV_32F)
+        CreateHanningWindow(dst2, src.Size(), MatType.CV_32F)
     End Sub
 End Class
 

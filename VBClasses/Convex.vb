@@ -13,7 +13,7 @@ Public Class Convex_Basics : Inherits TaskParent
 
         Dim hullList As New List(Of cv.Point)
         For i = 0 To options.hullCount - 1
-            hullList.Add(New cv.Point2f(msRNG.Next(dst2.Width / pad, w), msRNG.Next(dst2.Height / pad, h)))
+            hullList.Add(New Point2f(msRNG.Next(dst2.Width / pad, w), msRNG.Next(dst2.Height / pad, h)))
         Next
         Return hullList
     End Function
@@ -40,7 +40,7 @@ Public Class Convex_Basics : Inherits TaskParent
 
         dst2.SetTo(0)
 
-        Dim pMat As cv.Mat = cv.Mat.FromPixelData(hull.Count, 1, cv.MatType.CV_32SC2, hull)
+        Dim pMat As Mat = Mat.FromPixelData(hull.Count, 1, MatType.CV_32SC2, hull)
         Dim sumVal = Sum(pMat)
         DrawTour(dst2, hullList, white, -1)
 
@@ -89,9 +89,9 @@ End Class
 Public Class XR_Convex_Defects : Inherits TaskParent
     Dim contours As New Contour_Largest
     Public Sub New()
-        Threshold(ImRead(task.homeDir + "Data/star2.png"), dst2, 200, 255, cv.ThresholdTypes.Binary)
-        Resize(dst2, dst2, New cv.Size(task.workRes.Width, task.workRes.Height))
-        CvtColor(dst2, dst2, cv.ColorConversionCodes.BGR2GRAY)
+        Threshold(ImRead(task.homeDir + "Data/star2.png"), dst2, 200, 255, ThresholdTypes.Binary)
+        Resize(dst2, dst2, New Size(task.workRes.Width, task.workRes.Height))
+        CvtColor(dst2, dst2, ColorConversionCodes.BGR2GRAY)
 
         labels = {"", "", "Input to the ConvexHull and ConvexityDefects", "Yellow = ConvexHull, Red = ConvexityDefects, Yellow dots are convexityDefect 'Far' points"}
         desc = "Find the convexityDefects in the image"
@@ -99,15 +99,15 @@ Public Class XR_Convex_Defects : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         contours.Run(dst2.Clone)
         Dim c = contours.bestContour.ToArray
-        CvtColor(dst2, dst3, cv.ColorConversionCodes.GRAY2BGR)
+        CvtColor(dst2, dst3, ColorConversionCodes.GRAY2BGR)
         Dim hull = ConvexHull(c, False)
         Dim hullIndices = ConvexHullIndices(c, False)
         DrawTour(dst3, hull.ToList, task.highlight)
 
         Dim defects = ConvexityDefects(contours.bestContour, hullIndices.ToList)
         For Each v In defects
-            Line(dst3, c(v(0)), c(v(2)), cv.Scalar.Red, task.lineWidth + 1, task.lineType)
-            Line(dst3, c(v(1)), c(v(2)), cv.Scalar.Red, task.lineWidth + 1, task.lineType)
+            Line(dst3, c(v(0)), c(v(2)), Scalar.Red, task.lineWidth + 1, task.lineType)
+            Line(dst3, c(v(1)), c(v(2)), Scalar.Red, task.lineWidth + 1, task.lineType)
             Circle(dst3, c(v(2)), task.DotSize + 2, task.highlight, -1, task.lineType)
         Next
     End Sub
@@ -127,7 +127,7 @@ Public Class Convex_RedColorDefects : Inherits TaskParent
         labels(3) = "Original mask that produces the hull at left"
         desc = "Find the convexityDefects in the selected RedCloud cell"
     End Sub
-    Public Shared Function betterContour(c As List(Of cv.Point), defects() As cv.Vec4i) As List(Of cv.Point)
+    Public Shared Function betterContour(c As List(Of cv.Point), defects() As Vec4i) As List(Of cv.Point)
         Dim lastV As Integer = -1
         Dim newC As New List(Of cv.Point)
         For Each v In defects
@@ -159,11 +159,11 @@ Public Class Convex_RedColorDefects : Inherits TaskParent
         Utility_Basics.selectCell(redC.rcMap, redC.rcList)
 
         Dim rc = task.rcD
-        Dim sz = New cv.Size(dst2.Height * rc.mask.Width / rc.mask.Height, dst2.Height)
+        Dim sz = New Size(dst2.Height * rc.mask.Width / rc.mask.Height, dst2.Height)
         If rc.mask.Width > rc.mask.Height Then
-            sz = New cv.Size(dst2.Width, dst2.Height * rc.mask.Height / rc.mask.Width)
+            sz = New Size(dst2.Width, dst2.Height * rc.mask.Height / rc.mask.Width)
         End If
-        Resize(rc.mask, dst0, sz, 0, 0, cv.InterpolationFlags.Nearest)
+        Resize(rc.mask, dst0, sz, 0, 0, InterpolationFlags.Nearest)
         Dim r = New cv.Rect(0, 0, dst0.Width, dst0.Height)
         dst3.SetTo(0)
         dst3(r).SetTo(white, dst0)
@@ -179,6 +179,6 @@ Public Class Convex_RedColorDefects : Inherits TaskParent
         rc.contour = betterContour(c, defects)
         ' SetTrueText("Convexity defects will sometimes fail due to self-intersection.", 3)
 
-        DrawTour(dst2, rc.contour, cv.Scalar.Red)
+        DrawTour(dst2, rc.contour, Scalar.Red)
     End Sub
 End Class

@@ -1,13 +1,13 @@
 Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 'https://github.com/oreillymedia/Learning-OpenCV-3_examples/blob/master/example_14-03.cpp
 Public Class CComp_Basics : Inherits TaskParent
-    Public connectedComponents As cv.ConnectedComponents
+    Public connectedComponents As ConnectedComponents
     Public rects As New List(Of cv.Rect)
-    Public centroids As New List(Of cv.Point2f)
-    Dim lastImage As cv.Mat
+    Public centroids As New List(Of Point2f)
+    Dim lastImage As Mat
     Dim options As New Options_CComp
     Public Sub New()
-        dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
+        dst3 = New Mat(dst3.Size(), MatType.CV_8U, Scalar.All(0))
         labels(2) = "Input to ConnectedComponenetsEx"
         desc = "Draw bounding boxes around BGR binarized connected Components"
     End Sub
@@ -17,7 +17,7 @@ Public Class CComp_Basics : Inherits TaskParent
         rects.Clear()
         centroids.Clear()
 
-        Threshold(task.gray, dst2, options.threshold, 255, cv.ThresholdTypes.BinaryInv) '  + cv.ThresholdTypes.Otsu
+        Threshold(task.gray, dst2, options.threshold, 255, ThresholdTypes.BinaryInv) '  + ThresholdTypes.Otsu
 
         connectedComponents = ConnectedComponentsEx(dst2)
         connectedComponents.RenderBlobs(dst3)
@@ -25,7 +25,7 @@ Public Class CComp_Basics : Inherits TaskParent
         Dim count As Integer = 0
         For Each blob In connectedComponents.Blobs
             Dim rect = ValidateRect(blob.Rect)
-            Dim m = cv.Cv2.Moments(dst2(rect), True)
+            Dim m = Cv2.Moments(dst2(rect), True)
             If m.M00 = 0 Then Continue For ' avoid divide by zero...
             rects.Add(rect)
             centroids.Add(New cv.Point(CInt(m.M10 / m.M00 + rect.X), CInt(m.M01 / m.M00 + rect.Y)))
@@ -47,33 +47,33 @@ End Class
 
 ' https://www.csharpcodi.com/csharp-examples/OpenCvSharp.ConnectedComponents.RenderBlobs(OpenCvSharp.Mat)/
 Public Class XR_CComp_Shapes : Inherits TaskParent
-    Dim shapes As cv.Mat
+    Dim shapes As Mat
     Dim mats As New Mat_4Click
     Public Sub New()
         Dim filePath As String = task.homeDir + "Data/Shapes.png"
-        shapes = New cv.Mat(filePath, cv.ImreadModes.Color)
+        shapes = New Mat(filePath, ImreadModes.Color)
         labels(2) = "Largest connected component"
         labels(3) = "RectView, LabelView, Binary, grayscale"
         desc = "Use connected components to isolate objects in image."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        Dim gray As New cv.Mat
-        CvtColor(shapes, gray, cv.ColorConversionCodes.BGR2GRAY)
-        Dim binary As New cv.Mat
-        Threshold(gray, binary, 0, 255, cv.ThresholdTypes.Otsu + cv.ThresholdTypes.Binary)
+        Dim gray As New Mat
+        CvtColor(shapes, gray, ColorConversionCodes.BGR2GRAY)
+        Dim binary As New Mat
+        Threshold(gray, binary, 0, 255, ThresholdTypes.Otsu + ThresholdTypes.Binary)
         Dim labelview = shapes.EmptyClone()
-        Dim rectView As New cv.Mat
-        CvtColor(binary, rectView, cv.ColorConversionCodes.GRAY2BGR)
+        Dim rectView As New Mat
+        CvtColor(binary, rectView, ColorConversionCodes.GRAY2BGR)
         Dim cc = ConnectedComponentsEx(binary)
         If cc.LabelCount <= 1 Then Exit Sub
 
         cc.RenderBlobs(labelview)
         For Each blob In cc.Blobs.Skip(1)
-        Rectangle(rectView, blob.Rect, cv.Scalar.Red, 2)
+            Rectangle(rectView, blob.Rect, Scalar.Red, 2)
         Next
 
         Dim maxBlob = cc.GetLargestBlob()
-        Dim filtered = New cv.Mat
+        Dim filtered = New Mat
         cc.FilterByBlob(shapes, filtered, maxBlob)
         ' dst3 = filtered.Resize(dst2.Size())
 
@@ -102,8 +102,8 @@ Public Class CComp_Both : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         ccomp.options.Run()
 
-        Dim light As New cv.Mat
-        Threshold(src, light, ccomp.options.light, 255, cv.ThresholdTypes.Binary)
+        Dim light As New Mat
+        Threshold(src, light, ccomp.options.light, 255, ThresholdTypes.Binary)
         ccomp.Run(light)
         dst2 = ccomp.dst3
         dst1 = ccomp.dst1
@@ -126,7 +126,7 @@ Public Class XR_CComp_Hulls : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         ccomp.Run(task.gray)
         dst2 = ccomp.dst3
-        ccomp.dst1.ConvertTo(dst1, cv.MatType.CV_8U)
+        ccomp.dst1.ConvertTo(dst1, MatType.CV_8U)
         hulls.Run(dst1)
         dst2 = hulls.dst3
         labels(2) = hulls.labels(3)
@@ -141,33 +141,33 @@ End Class
 
 ' https://docs.opencvb.org/master/de/d01/samples_2cpp_2Regions_components_8cpp-example.html
 Public Class CComp_Stats : Inherits TaskParent
-    Public masks As New List(Of cv.Mat)
+    Public masks As New List(Of Mat)
     Public rects As New List(Of cv.Rect)
     Public areas As New List(Of Integer)
     Public centroids As New List(Of cv.Point)
     Public numberOfLabels As Integer
     Public options As New Options_CComp
     Public Sub New()
-        dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
+        dst3 = New Mat(dst3.Size(), MatType.CV_8U, Scalar.All(0))
         desc = "Use a threshold slider on the CComp input"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst2 = task.gray
         options.Run()
 
-        If standaloneTest() Then Threshold(task.gray, dst2, options.light, 255, cv.ThresholdTypes.BinaryInv)
+        If standaloneTest() Then Threshold(task.gray, dst2, options.light, 255, ThresholdTypes.BinaryInv)
 
-        Dim stats As New cv.Mat
-        Dim centroidRaw As New cv.Mat
+        Dim stats As New Mat
+        Dim centroidRaw As New Mat
         numberOfLabels = ConnectedComponentsWithStats(task.gray, dst1, stats, centroidRaw)
 
         rects.Clear()
         areas.Clear()
         centroids.Clear()
 
-        Dim colors As New List(Of cv.Vec3b)
+        Dim colors As New List(Of Vec3b)
         Dim maskOrder As New SortedList(Of Single, Integer)(New compareAllowIdenticalSingleInverted)
-        Dim unsortedMasks As New List(Of cv.Mat)
+        Dim unsortedMasks As New List(Of Mat)
         Dim unsortedRects As New List(Of cv.Rect)
         Dim unsortedCentroids As New List(Of cv.Point)
         Dim index As New List(Of Integer)
@@ -198,7 +198,7 @@ Public Class CComp_Stats : Inherits TaskParent
             centroids.Add(unsortedCentroids(mIndex))
         Next
 
-        dst1.ConvertTo(dst0, cv.MatType.CV_8U)
+        dst1.ConvertTo(dst0, MatType.CV_8U)
         dst3 = Palettize(dst0)
         labels(3) = CStr(masks.Count) + " Connected Components"
     End Sub

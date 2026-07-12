@@ -2,8 +2,8 @@ Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 Public Class HeatMap_Basics : Inherits TaskParent
     Public topframes As New History_Basics
     Public sideframes As New History_Basics
-    Public histogramTop As New cv.Mat
-    Public histogramSide As New cv.Mat
+    Public histogramTop As New Mat
+    Public histogramSide As New Mat
     Dim options As New Options_HeatMap
     Public Sub New()
         desc = "Highlight concentrations of depth pixels in the side view"
@@ -11,12 +11,12 @@ Public Class HeatMap_Basics : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
 
-        If src.Type <> cv.MatType.CV_32FC3 Then src = task.pointCloud
+        If src.Type <> MatType.CV_32FC3 Then src = task.pointCloud
 
-        CalcHist({src}, task.channelsTop, New cv.Mat, histogramTop, 2, task.bins2D, task.rangesTop)
+        CalcHist({src}, task.channelsTop, New Mat, histogramTop, 2, task.bins2D, task.rangesTop)
         histogramTop.Row(0).SetTo(0)
 
-        CalcHist({src}, task.channelsSide, New cv.Mat, histogramSide, 2, task.bins2D, task.rangesSide)
+        CalcHist({src}, task.channelsSide, New Mat, histogramSide, 2, task.bins2D, task.rangesSide)
         histogramSide.Col(0).SetTo(0)
 
         topframes.Run(histogramTop)
@@ -45,13 +45,13 @@ Public Class XR_HeatMap_Grid : Inherits TaskParent
     Dim heat As New HeatMap_Basics
     Public Sub New()
         task.gOptions.GridSlider.Value = 5
-        dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
-        dst3 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
+        dst2 = New Mat(dst2.Size(), MatType.CV_8U, Scalar.All(0))
+        dst3 = New Mat(dst2.Size(), MatType.CV_8U, Scalar.All(0))
         labels = {"", "", "Histogram mask for top-down view - original histogram in dst0", "Histogram mask for side view - original histogram in dst1"}
         desc = "Apply a grid to the HeatMap_OverTime to isolate objects."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If src.Type <> cv.MatType.CV_32FC3 Then src = task.pointCloud
+        If src.Type <> MatType.CV_32FC3 Then src = task.pointCloud
 
         heat.Run(src)
 
@@ -120,7 +120,7 @@ Public Class HeatMap_Cell : Inherits TaskParent
 
         strOut = Utility_Basics.selectCell(flood.rcMap, flood.rcList)
 
-        dst0 = New cv.Mat(dst2.Size(), cv.MatType.CV_32FC3, 0)
+        dst0 = New Mat(dst2.Size(), MatType.CV_32FC3, 0)
         If task.rcD IsNot Nothing Then task.pointCloud(task.rcD.rect).CopyTo(dst0(task.rcD.rect), task.rcD.mask)
 
         heat.Run(dst0)

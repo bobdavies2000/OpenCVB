@@ -11,7 +11,7 @@ Public Class PlotOpenCV_Basics : Inherits TaskParent
         desc = "Plot data provided in src Mat"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        hist.plotColors(0) = cv.Scalar.White
+        hist.plotColors(0) = Scalar.White
         hist.Run(src)
         dst2 = hist.dst2
 
@@ -38,7 +38,7 @@ Public Class PlotOpenCV_Depth : Inherits TaskParent
         desc = "Show depth using OpenCV's plot format with variable bins."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If src.Type <> cv.MatType.CV_32F Then src = task.pcSplit(2)
+        If src.Type <> MatType.CV_32F Then src = task.pcSplit(2)
         'src.SetTo(task.MaxZmeters, task.maxDepthMask)
 
         hist.Run(src)
@@ -90,7 +90,7 @@ Public Class PlotOpenCV_CPP : Inherits TaskParent
         Dim imagePtr = PlotOpenCV_Run(cPtr, handleX.AddrOfPinnedObject, handleY.AddrOfPinnedObject, srcX.Count,
                                           dst2.Rows, dst2.Cols)
 
-        dst2 = cv.Mat.FromPixelData(dst2.Rows, dst2.Cols, cv.MatType.CV_8UC3, imagePtr)
+        dst2 = Mat.FromPixelData(dst2.Rows, dst2.Cols, MatType.CV_8UC3, imagePtr)
         handleX.Free()
         handleY.Free()
 
@@ -107,13 +107,13 @@ End Class
 
 
 Public Class PlotOpenCV_Points : Inherits TaskParent
-    Public input As New List(Of cv.Point2d)
+    Public input As New List(Of Point2d)
     Public output As New List(Of cv.Point)
     Public minX As Double = 0, maxX As Double = dst2.Width
     Public minY As Double = -task.xRange, maxY As Double = task.xRange
     Public Sub New()
         For i = 0 To 50 ' something to plot if standaloneTest().
-            input.Add(New cv.Point2d(i, i * i * i))
+            input.Add(New Point2d(i, i * i * i))
         Next
         desc = "Plot the requested points..."
     End Sub
@@ -126,7 +126,7 @@ Public Class PlotOpenCV_Points : Inherits TaskParent
             Dim pt = New cv.Point(dst2.Width * (input(i).X - minX) \ (maxX - minX),
                                       dst2.Height - dst2.Height * (y - minY) \ (maxY - minY))
             If pt.Y <> dst2.Height / 2 Then
-            Circle(dst2, pt, task.DotSize, task.highlight, -1, task.lineType)
+                Circle(dst2, pt, task.DotSize, task.highlight, -1, task.lineType)
                 output.Add(pt)
             Else
                 output.Add(newPoint)

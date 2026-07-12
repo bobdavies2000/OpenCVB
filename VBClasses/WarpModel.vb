@@ -17,7 +17,7 @@ Public Class WarpModel_Basics : Inherits TaskParent
         dst0 = ecc.warpInput.rgb(0).Clone
         dst1 = ecc.warpInput.rgb(1).Clone
         dst2 = ecc.warpInput.rgb(2).Clone
-        Dim aligned() = {New cv.Mat, New cv.Mat}
+        Dim aligned() = {New Mat, New Mat}
         For i = 0 To 1
             If options.useGradient Then
                 src = ecc.warpInput.gradient(0)
@@ -31,7 +31,7 @@ Public Class WarpModel_Basics : Inherits TaskParent
         Next
 
         Dim mergeInput() = {src, aligned(0), aligned(1)}
-        Dim merged As New cv.Mat
+        Dim merged As New Mat
         Merge(mergeInput, merged)
         dst3.SetTo(0)
         dst3(New cv.Rect(0, 0, merged.Width, merged.Height)) = merged
@@ -52,9 +52,9 @@ Public Class WarpModel_ECC : Inherits TaskParent
     Implements IDisposable
     Public warpInput As New WarpModel_Input
     Public warpMatrix() As Single
-    Public src2 As New cv.Mat
-    Public aligned As New cv.Mat
-    Public outputRect As cv.Rect
+    Public src2 As New Mat
+    Public aligned As New Mat
+    Public outputRect as cv.Rect
     Dim options As New Options_WarpModel
     Public Sub New()
         cPtr = WarpModel_Open()
@@ -97,15 +97,15 @@ Public Class WarpModel_ECC : Inherits TaskParent
         Marshal.Copy(imagePtr, warpMatrix, 0, warpMatrix.Length)
 
         If options.warpMode <> 3 Then
-            Dim warpMat = cv.Mat.FromPixelData(2, 3, cv.MatType.CV_32F, warpMatrix)
-            WarpAffine(src2, aligned, warpMat, src.Size(), cv.InterpolationFlags.Linear + cv.InterpolationFlags.WarpInverseMap)
+            Dim warpMat = Mat.FromPixelData(2, 3, MatType.CV_32F, warpMatrix)
+            WarpAffine(src2, aligned, warpMat, src.Size(), InterpolationFlags.Linear + InterpolationFlags.WarpInverseMap)
         Else
-            Dim warpMat = cv.Mat.FromPixelData(3, 3, cv.MatType.CV_32F, warpMatrix)
-            WarpPerspective(src2, aligned, warpMat, src.Size(), cv.InterpolationFlags.Linear + cv.InterpolationFlags.WarpInverseMap)
+            Dim warpMat = Mat.FromPixelData(3, 3, MatType.CV_32F, warpMatrix)
+            WarpPerspective(src2, aligned, warpMat, src.Size(), InterpolationFlags.Linear + InterpolationFlags.WarpInverseMap)
         End If
 
-        dst2 = New cv.Mat(New cv.Size(task.workRes.Width, task.workRes.Height), cv.MatType.CV_8U, cv.Scalar.All(0))
-        dst3 = New cv.Mat(New cv.Size(task.workRes.Width, task.workRes.Height), cv.MatType.CV_8U, cv.Scalar.All(0))
+        dst2 = New Mat(New Size(task.workRes.Width, task.workRes.Height), MatType.CV_8U, Scalar.All(0))
+        dst3 = New Mat(New Size(task.workRes.Width, task.workRes.Height), MatType.CV_8U, Scalar.All(0))
 
         outputRect = New cv.Rect(0, 0, src.Width, src.Height)
         dst2(outputRect) = src
@@ -136,8 +136,8 @@ End Class
 ' https://github.com/ycui11/-Colorizing-Prokudin-Gorskii-images-of-the-Russian-Empire
 ' https://github.com/petraohlin/Colorizing-the-Prokudin-Gorskii-Collection
 Public Class WarpModel_Input : Inherits TaskParent
-    Public rgb(3 - 1) As cv.Mat
-    Public gradient(3 - 1) As cv.Mat
+    Public rgb(3 - 1) As Mat
+    Public gradient(3 - 1) As Mat
     Dim sobel As New Edge_SobelNaive
     Dim options As New Options_WarpModel
     Public Sub New()
@@ -162,7 +162,7 @@ Public Class WarpModel_Input : Inherits TaskParent
 
         If src.Width < rgb(0).Width Or src.Height < rgb(0).Height Then
             For i = 0 To rgb.Count - 1
-                Dim sz = New cv.Size(src.Width * rgb(i).Height / rgb(i).Width, src.Height)
+                Dim sz = New Size(src.Width * rgb(i).Height / rgb(i).Width, src.Height)
                 r(i) = New cv.Rect(0, 0, sz.Width, sz.Height)
                 Resize(rgb(i), rgb(i), sz)
             Next
@@ -172,7 +172,7 @@ Public Class WarpModel_Input : Inherits TaskParent
         dst1 = rgb(1)
         dst2 = rgb(2)
 
-        Dim merged As New cv.Mat
+        Dim merged As New Mat
         Merge(rgb, merged)
         dst3.SetTo(0)
         dst3(r(0)) = merged

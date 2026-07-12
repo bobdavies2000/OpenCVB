@@ -158,14 +158,14 @@ End Class
 Public Class XR_BrickLine_DepthGaps : Inherits TaskParent
     Dim findCells As New BrickLine_DepthGap
     Public Sub New()
-        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
+        dst1 = New Mat(dst1.Size, MatType.CV_8U, 0)
         labels(3) = "Use the 'Feature' option 'Selected Feature' to highlight different lines."
         desc = "Find cells that have a gap in depth from their neighbors."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst1.SetTo(0)
         For Each lp In task.lines.lpList
-            Line(dst1, lp.p1, lp.p2, lp.index, task.lineWidth, cv.LineTypes.Link8)
+            Line(dst1, lp.p1, lp.p2, lp.index, task.lineWidth, LineTypes.Link8)
         Next
 
         findCells.Run(dst1)
@@ -183,14 +183,14 @@ End Class
 Public Class XR_BrickLine_Lines : Inherits TaskParent
     Dim findCells As New BrickLine_Basics
     Public Sub New()
-        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
+        dst1 = New Mat(dst1.Size, MatType.CV_8U, 0)
         labels(3) = "Use the 'Feature' option 'Selected Feature' to highlight different lines."
         desc = "Find the cells containing lines."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst1.SetTo(0)
         For Each lp In task.lines.lpList
-            Line(dst1, lp.p1, lp.p2, lp.index, task.lineWidth, cv.LineTypes.Link8)
+            Line(dst1, lp.p1, lp.p2, lp.index, task.lineWidth, LineTypes.Link8)
         Next
 
         findCells.Run(dst1)
@@ -279,8 +279,8 @@ Public Class BrickLine_LeftRightMotion : Inherits TaskParent
         '  mats.Run(emptyMat)
 
         dst2 = task.leftView
-        CvtColor(task.rightView, dst3, cv.ColorConversionCodes.GRAY2BGR)
-        Dim correlationMat As New cv.Mat
+        CvtColor(task.rightView, dst3, ColorConversionCodes.GRAY2BGR)
+        Dim correlationMat As New Mat
         bestBricks.Clear()
         For Each index In leftEdges
             Dim r As New brickData
@@ -298,7 +298,7 @@ Public Class BrickLine_LeftRightMotion : Inherits TaskParent
                 If r.rRect.X < 0 Or r.rRect.X + r.rRect.Width >= dst2.Width Then Continue For
 
                 MatchTemplate(task.leftView(r.lRect), task.rightView(r.rRect), correlationMat,
-                                         cv.TemplateMatchModes.CCoeffNormed)
+                                         TemplateMatchModes.CCoeffNormed)
 
                 r.correlation = correlationMat.Get(Of Single)(0, 0)
                 If r.correlation >= task.fCorrThreshold Then

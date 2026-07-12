@@ -78,9 +78,9 @@ Public Class XR_GL_Line3DNoMotionInput : Inherits TaskParent
         desc = "Build a 3D model of the lines found in the rgb data."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If src.Type <> cv.MatType.CV_32FC3 Then src = task.pointCloud.Clone
-        CvtColor(task.lines.dst2, dst2, cv.ColorConversionCodes.BGR2GRAY)
-        Threshold(dst2, dst2, 0, 255, cv.ThresholdTypes.Binary)
+        If src.Type <> MatType.CV_32FC3 Then src = task.pointCloud.Clone
+        CvtColor(task.lines.dst2, dst2, ColorConversionCodes.BGR2GRAY)
+        Threshold(dst2, dst2, 0, 255, ThresholdTypes.Binary)
         labels(2) = task.lines.labels(2)
 
         dst0 = src
@@ -138,7 +138,7 @@ End Class
 Public Class XR_GL_RunSharp : Inherits TaskParent
     Dim displayPC As New GL_DisplayPC
     Public Sub New()
-        desc = "Create a SharpGL view that uses the point cloud coordinates."
+        desc = "Create a SharpGL view that uses the cv.Point cloud coordinates."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         strOut = task.sharpGL.RunSharp(oCase.readPC)
@@ -158,8 +158,8 @@ Public Class XR_GL_RunSharpHist : Inherits TaskParent
     Dim plotHist As New GL_PlotHist
     Dim displayPC As New GL_DisplayPC
     Public Sub New()
-        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_32F, 0)
-        desc = "Read the point cloud from a rendered geometry"
+        dst2 = New Mat(dst2.Size, MatType.CV_32F, 0)
+        desc = "Read the cv.Point cloud from a rendered geometry"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If standalone Then
@@ -167,8 +167,8 @@ Public Class XR_GL_RunSharpHist : Inherits TaskParent
             SetTrueText(strOut, 2)
         End If
 
-        Resize(task.sharpDepth, task.sharpDepth, task.workRes, 0, 0, cv.InterpolationFlags.Nearest)
-        task.sharpDepth.ConvertTo(task.sharpDepth, cv.MatType.CV_32F)
+        Resize(task.sharpDepth, task.sharpDepth, task.workRes, 0, 0, InterpolationFlags.Nearest)
+        task.sharpDepth.ConvertTo(task.sharpDepth, MatType.CV_32F)
         plotHist.Run(task.sharpDepth)
         dst3 = plotHist.dst3
         labels(2) = plotHist.labels(2)
@@ -185,14 +185,14 @@ End Class
 
 Public Class XR_GL_Line3DWhite : Inherits TaskParent
     Public Sub New()
-        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_32FC3, 0)
+        dst2 = New Mat(dst2.Size, MatType.CV_8U, 0)
+        dst3 = New Mat(dst3.Size, MatType.CV_32FC3, 0)
         task.FeatureSampleSize = 1000 ' want all the lines 
         desc = "Build a 3D model of the lines using the task.lines.lplist."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         Dim pointcloud = src
-        If pointcloud.Type <> cv.MatType.CV_32FC3 Then pointcloud = task.pointCloud.Clone
+        If pointcloud.Type <> MatType.CV_32FC3 Then pointcloud = task.pointCloud.Clone
 
         Static count As Integer
         If task.heartBeatLT Then
@@ -201,7 +201,7 @@ Public Class XR_GL_Line3DWhite : Inherits TaskParent
             count = 0
         End If
 
-        Dim mask = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        Dim mask = New Mat(dst2.Size, MatType.CV_8U, 0)
         For Each lp In task.lines.lpList
             If lp.age = 1 Or task.heartBeatLT Then
                 mask(lp.rect).SetTo(0)
@@ -212,7 +212,7 @@ Public Class XR_GL_Line3DWhite : Inherits TaskParent
         Next
 
         labels(2) = task.lines.labels(2)
-        labels(3) = CStr(count) + " pixels from the point cloud were moved to the GL input. "
+        labels(3) = CStr(count) + " pixels from the cv.Point cloud were moved to the GL input. "
 
         dst1.SetTo(white)
         strOut = task.sharpGL.RunSharp(oCase.line3D, dst3, dst1)
@@ -225,14 +225,14 @@ End Class
 
 Public Class XR_GL_Line3DReconstructed : Inherits TaskParent
     Public Sub New()
-        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_32FC3, 0)
+        dst2 = New Mat(dst2.Size, MatType.CV_8U, 0)
+        dst3 = New Mat(dst3.Size, MatType.CV_32FC3, 0)
         task.FeatureSampleSize = 1000 ' want all the lines 
-        desc = "Rework the point cloud data for lines to be linear in depth."
+        desc = "Rework the cv.Point cloud data for lines to be linear in depth."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         Dim pointcloud = src
-        If pointcloud.Type <> cv.MatType.CV_32FC3 Then pointcloud = task.pointCloud.Clone
+        If pointcloud.Type <> MatType.CV_32FC3 Then pointcloud = task.pointCloud.Clone
 
         Static count As Integer
         If task.heartBeat Then
@@ -241,7 +241,7 @@ Public Class XR_GL_Line3DReconstructed : Inherits TaskParent
             count = 0
         End If
 
-        Dim mask = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        Dim mask = New Mat(dst2.Size, MatType.CV_8U, 0)
         For Each lp In task.lines.lpList
             If lp.age = 1 Or task.heartBeat Then
                 mask(lp.rect).SetTo(0)
@@ -252,7 +252,7 @@ Public Class XR_GL_Line3DReconstructed : Inherits TaskParent
         Next
 
         labels(2) = task.lines.labels(2)
-        labels(3) = CStr(count) + " pixels from the point cloud were moved to the GL input. "
+        labels(3) = CStr(count) + " pixels from the cv.Point cloud were moved to the GL input. "
 
         dst1.SetTo(white)
         strOut = task.sharpGL.RunSharp(oCase.line3D, dst3, dst1)
@@ -309,7 +309,7 @@ End Class
 Public Class XR_GL_ReadPC : Inherits TaskParent
     Dim displayPC As New GL_DisplayPC
     Public Sub New()
-        desc = "Read the point cloud from a rendered geometry"
+        desc = "Read the cv.Point cloud from a rendered geometry"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         strOut = task.sharpGL.RunSharp(oCase.readPC)
@@ -343,7 +343,7 @@ Public Class GL_PlotHist : Inherits TaskParent
             SetTrueText(strOut, 2)
         End If
 
-        Dim pcMask As New cv.Mat
+        Dim pcMask As New Mat
 
         InRange(task.sharpDepth, 0.01F, 0.99F, pcMask)
         task.sharpDepth.SetTo(0, Not pcMask)
@@ -367,9 +367,9 @@ Public Class XR_GL_ReadPCHist : Inherits TaskParent
     Dim glPlot As New GL_PlotHist
     Dim displayPC As New GL_DisplayPC
     Public Sub New()
-        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_32F, 0)
+        dst2 = New Mat(dst2.Size, MatType.CV_32F, 0)
         labels(3) = "The values returned by ReadPointCloud range from 0 to 1 and should have the same profile as PlotBar_Basics."
-        desc = "Read the point cloud from a rendered geometry"
+        desc = "Read the cv.Point cloud from a rendered geometry"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         strOut = task.sharpGL.RunSharp(oCase.readPC)
@@ -396,11 +396,11 @@ Public Class GL_DisplayPC : Inherits TaskParent
     Public Shared msg As String
     Shared mm As mmData
     Public Sub New()
-        task.sharpDepth = New cv.Mat(task.workRes, cv.MatType.CV_32F, 0)
+        task.sharpDepth = New Mat(task.workRes, MatType.CV_32F, 0)
         desc = "Display the pointcloud read back from SharpGL and display it."
     End Sub
-    Public Shared Function invertMat(glDepth As cv.Mat) As cv.Mat
-        Dim dst As New cv.Mat(glDepth.Size, cv.MatType.CV_32F, 0)
+    Public Shared Function invertMat(glDepth As Mat) As Mat
+        Dim dst As New Mat(glDepth.Size, MatType.CV_32F, 0)
         Dim count As Integer, count1 As Integer
         Dim depthvals As New List(Of Single)
         For y = 0 To glDepth.Height - 1
@@ -425,9 +425,9 @@ Public Class GL_DisplayPC : Inherits TaskParent
         msg = CStr(count) + " pixels had depth while " + CStr(count1) + " inverted pixels landed in the image."
         Return dst
     End Function
-    Public Shared Function reProject(glCloud As cv.Mat) As cv.Mat
+    Public Shared Function reProject(glCloud As Mat) As Mat
         mm = GetMinMax(task.pcSplit(2), task.depthmask)
-        Dim pcMask As New cv.Mat
+        Dim pcMask As New Mat
         InRange(glCloud, 0.01F, 0.99F, pcMask)
         glCloud = glCloud * (mm.maxVal - mm.minVal) + mm.minVal
         glCloud.SetTo(0, Not pcMask)
@@ -441,7 +441,7 @@ Public Class GL_DisplayPC : Inherits TaskParent
 
         dst2 = reProject(task.sharpDepth)
         If standaloneTest() Then
-            Dim pcMask As New cv.Mat
+            Dim pcMask As New Mat
             InRange(task.sharpDepth, 0.01F, 0.99F, pcMask)
             dst3 = task.sharpDepth * (mm.maxVal - mm.minVal) + mm.minVal
             dst3.SetTo(0, Not pcMask)
@@ -460,7 +460,7 @@ Public Class XR_GL_ReadLines : Inherits TaskParent
         desc = "Draw lines in SharpGL and read them back."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If src.Type <> cv.MatType.CV_32FC3 Then src = task.pointCloud.Clone
+        If src.Type <> MatType.CV_32FC3 Then src = task.pointCloud.Clone
 
         dst3 = task.color.Clone
         For Each lp In task.lines.lpList
@@ -504,7 +504,7 @@ End Class
 Public Class XR_GL_Line3D : Inherits TaskParent
     Dim line3d As New Line3D_DrawLines
     Public Sub New()
-        desc = "Display the point cloud with the 3D lines drawn"
+        desc = "Display the cv.Point cloud with the 3D lines drawn"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         line3d.Run(src)
@@ -596,8 +596,8 @@ Public Class XR_GL_ImageHullsColor : Inherits TaskParent
         dst2 = redC.dst2
         labels(2) = redC.labels(2)
 
-        Dim dataBuffer As New List(Of cv.Vec3f)
-        Dim vec(2) As cv.Vec3f, pt As cv.Point
+        Dim dataBuffer As New List(Of Vec3f)
+        Dim vec(2) As Vec3f, pt As cv.Point
         For Each rc In redC.rcList
             If rc.hull Is Nothing Then Continue For
             Dim count As Single = rc.hull.Count
@@ -614,14 +614,14 @@ Public Class XR_GL_ImageHullsColor : Inherits TaskParent
                                                       CInt(rc.hull((i + 1) Mod count).Y + rc.rect.Y))
                     End Select
 
-                    vec(j) = task.pointCloud.Get(Of cv.Vec3f)(pt.Y, pt.X)
+                    vec(j) = task.pointCloud.Get(Of Vec3f)(pt.Y, pt.X)
                     If vec(j)(0) = 0 Or vec(j)(1) = 0 Or vec(j)(2) = 0 Then goodDepth = False
                 Next
 
                 If goodDepth Then
-                    dataBuffer.Add(New cv.Vec3f(rc.color(2), rc.color(1), rc.color(0)))
+                    dataBuffer.Add(New Vec3f(rc.color(2), rc.color(1), rc.color(0)))
                     For j = 0 To vec.Length - 1
-                        dataBuffer.Add(New cv.Vec3f(vec(j)(0), vec(j)(1), vec(j)(2)))
+                        dataBuffer.Add(New Vec3f(vec(j)(0), vec(j)(1), vec(j)(2)))
                     Next
                 End If
             Next
@@ -655,7 +655,7 @@ End Class
 Public Class GL_LogicalLines : Inherits TaskParent
     Dim logLines As New Line3D_LogicalLines
     Public Sub New()
-        desc = "Draw the logical lines found in the point cloud with the RGB lines."
+        desc = "Draw the logical lines found in the cv.Point cloud with the RGB lines."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         logLines.Run(src)
@@ -677,7 +677,7 @@ End Class
 Public Class GL_LogicalLines1 : Inherits TaskParent
     Dim logLines As New Line3D_LogicalLines
     Public Sub New()
-        desc = "Draw the logical lines found in the point cloud with the RGB lines."
+        desc = "Draw the logical lines found in the cv.Point cloud with the RGB lines."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         logLines.Run(src)
@@ -695,7 +695,7 @@ End Class
 Public Class GL_Featureless : Inherits TaskParent
     Dim fLess As New FeatureLess_Correlation
     Public Sub New()
-        dst0 = New cv.Mat(dst0.Size, cv.MatType.CV_8U, 0)
+        dst0 = New Mat(dst0.Size, MatType.CV_8U, 0)
         desc = "Display the pointcloud"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -779,8 +779,8 @@ Public Class GL_FeatureLessVLines : Inherits TaskParent
         dst3 = task.pointCloud.Clone
         'dst3.SetTo(0, Not yLines.dst1)
         For Each lp In yLines.lpList
-            lp.pVec1 = New cv.Vec3f(CSng(lp.p1Depth(0)), CSng(lp.p1Depth(1)), CSng(lp.p1Depth(2)))
-            lp.pVec2 = New cv.Vec3f(CSng(lp.p2Depth(0)), CSng(lp.p2Depth(1)), CSng(lp.p2Depth(2)))
+            lp.pVec1 = New Vec3f(CSng(lp.p1Depth(0)), CSng(lp.p1Depth(1)), CSng(lp.p1Depth(2)))
+            lp.pVec2 = New Vec3f(CSng(lp.p2Depth(0)), CSng(lp.p2Depth(1)), CSng(lp.p2Depth(2)))
             Line(dst3, lp.p1, lp.p2, black, task.lineWidth + 4)
         Next
 

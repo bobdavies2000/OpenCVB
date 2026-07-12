@@ -4,7 +4,7 @@ Imports System.Text.RegularExpressions
 Public Class Annealing_Basics_CPP : Inherits TaskParent
     Implements IDisposable
     Public numberOfCities As Integer = 25
-    Public cityPositions() As cv.Point2f
+    Public cityPositions() As Point2f
     Public cityOrder() As Integer
     Public energy As Single
     Public energyLast As Single
@@ -12,7 +12,7 @@ Public Class Annealing_Basics_CPP : Inherits TaskParent
     Public Sub drawMap()
         dst2.SetTo(0)
         For i = 0 To cityOrder.Length - 1
-        Circle(dst2, cityPositions(i), task.DotSize, white, -1, task.lineType)
+            Circle(dst2, cityPositions(i), task.DotSize, white, -1, task.lineType)
             Line(dst2, cityPositions(i), cityPositions(cityOrder(i)), white, task.lineWidth, task.lineType)
         Next
         SetTrueText("Energy" + vbCrLf + energy.ToString(fmt0), New cv.Point(10, 100), 2)
@@ -34,7 +34,7 @@ Public Class Annealing_Basics_CPP : Inherits TaskParent
         For i = 0 To cityOrder.Length - 1
             cityOrder(i) = (i + 1) Mod numberOfCities
         Next
-        dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8UC3, cv.Scalar.All(0))
+        dst2 = New Mat(dst2.Size(), MatType.CV_8UC3, Scalar.All(0))
     End Sub
     Public Sub Open()
         Dim hCityPosition = GCHandle.Alloc(cityPositions, GCHandleType.Pinned)

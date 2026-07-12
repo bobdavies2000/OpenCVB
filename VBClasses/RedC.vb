@@ -1,9 +1,9 @@
 Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 Public Class RedC_Basics : Inherits TaskParent
     Dim color8u As New Color8U_Basics
-    Public rcMap As New cv.Mat
+    Public rcMap As New Mat
     Public rcList As New List(Of rcData) ' includes cloud data.
-    Public rcNone As New cv.Mat
+    Public rcNone As New Mat
     Public Sub New()
         If standalone Then task.gOptions.displayDst1.Checked = True
         labels(3) = "RedCloud cells with depth."
@@ -15,12 +15,12 @@ Public Class RedC_Basics : Inherits TaskParent
 
         rcMap = src.Clone
         Dim minList As New List(Of rcData)
-        Dim rect As cv.Rect
-        Dim mask As cv.Mat = New cv.Mat(New cv.Size(dst2.Width + 2, dst2.Height + 2), cv.MatType.CV_8U, 0)
+        Dim rect as cv.Rect
+        Dim mask As Mat = New Mat(New Size(dst2.Width + 2, dst2.Height + 2), MatType.CV_8U, 0)
         For Each r In task.gridRects
             If mask(r).Get(Of Byte)(0, 0) = 0 Then
                 Dim mapID As Integer = rcMap(r).Get(Of Byte)(0, 0)
-                Dim flags = cv.FloodFillFlags.FixedRange Or cv.FloodFillFlags.MaskOnly Or (255 << 8)
+                Dim flags = FloodFillFlags.FixedRange Or FloodFillFlags.MaskOnly Or (255 << 8)
                 Dim count = FloodFill(rcMap, mask, r.TopLeft, mapID, rect, 0, 0, flags)
                 If count > 0 Then minList.Add(New rcData(rcMap(rect), rect, mapID))
             End If
@@ -80,7 +80,7 @@ Public Class XR_RedC_Sizes : Inherits TaskParent
         Dim count As Integer
         For Each rc In redC.rcList
             If rc.pixels <= task.gOptions.DebugSlider.Value Then
-                Dim vec = dst2.Get(Of cv.Vec3b)(rc.maxDist.Y, rc.maxDist.X)
+                Dim vec = dst2.Get(Of Vec3b)(rc.maxDist.Y, rc.maxDist.X)
                 dst3(rc.rect).SetTo(vec, rc.mask)
                 count += 1
             End If

@@ -9,6 +9,6 @@ Public Class Gabor_Basics : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
 
-        Filter2D(src, dst2, cv.MatType.CV_8UC3, options.gKernel)
+        Filter2D(src, dst2, MatType.CV_8UC3, options.gKernel)
     End Sub
 End Class

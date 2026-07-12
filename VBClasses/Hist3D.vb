@@ -146,7 +146,7 @@ End Class
 
 Public Class XR_Hist3D_DepthWithMask : Inherits TaskParent
     Dim hColor As New Hist3Dcolor_Basics
-    Public depthMask As New cv.Mat
+    Public depthMask As New Mat
     Dim fore As New XR_Foreground_KMeans
     Public Sub New()
         desc = "Isolate the foreground and no depth in the image and run it through Hist3D_Basics"
@@ -177,7 +177,7 @@ End Class
 
 
 Public Class Hist3D_Pixel : Inherits TaskParent
-    Public histogram As New cv.Mat
+    Public histogram As New Mat
     Public histArray() As Single
     Public classCount As Integer
     Dim options As New Options_Hist3D
@@ -189,7 +189,7 @@ Public Class Hist3D_Pixel : Inherits TaskParent
 
         If src.Channels() <> 3 Then src = task.color
         Dim bins = options.histogram3DBins
-        CalcHist({src}, {0, 1, 2}, New cv.Mat, histogram, 3, {bins, bins, bins}, task.rangesBGR)
+        CalcHist({src}, {0, 1, 2}, New Mat, histogram, 3, {bins, bins, bins}, task.rangesBGR)
 
         ReDim histArray(histogram.Total - 1)
         histogram.GetArray(Of Single)(histArray)
@@ -240,9 +240,9 @@ Public Class XR_Hist3D_PixelDiffMask : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         pixel.Run(src)
-        Static lastImage As cv.Mat = pixel.dst2.Clone
+        Static lastImage As Mat = pixel.dst2.Clone
         Absdiff(lastImage, pixel.dst2, dst3)
-        Threshold(dst3, dst2, 0, 255, cv.ThresholdTypes.Binary)
+        Threshold(dst3, dst2, 0, 255, ThresholdTypes.Binary)
         lastImage = pixel.dst2.Clone
     End Sub
 End Class
@@ -257,7 +257,7 @@ Public Class XR_Hist3D_RedCloudGrid : Inherits TaskParent
     Dim hVector As New Hist3Dcolor_Vector
     Public Sub New()
         task.gOptions.GridSlider.Value = 8
-        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_32S, 0)
+        dst3 = New Mat(dst3.Size, MatType.CV_32S, 0)
         desc = "Build RedCloud pixel vectors and then measure each grid element's distance to those vectors."
     End Sub
     Private Function distanceN(vec1 As List(Of Single), vec2 As List(Of Single)) As Double

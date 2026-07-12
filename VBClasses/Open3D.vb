@@ -10,23 +10,23 @@ Public Class Open3D_Shape : Inherits TaskParent
     Private maxVertices As Integer
     Private maxTriangles As Integer
     Public Sub New()
-        labels(2) = "Input point cloud (subsampled)"
+        labels(2) = "Input cv.Point cloud (subsampled)"
         labels(3) = "Alpha shape mesh (top view)"
-        desc = "Cursor.ai: Reconstruct a surface from the camera point cloud using Open3D CreateFromPointCloudAlphaShape."
+        desc = "Cursor.ai: Reconstruct a surface from the camera cv.Point cloud using Open3D CreateFromPointCloudAlphaShape."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
 
         Dim stepX = Math.Max(1, task.gridRects(0).Width)
         Dim stepY = Math.Max(1, task.gridRects(0).Height)
-        Dim pointList As New List(Of cv.Point3f)
+        Dim pointList As New List(Of Point3f)
 
         For y = stepY \ 2 To task.pointCloud.Height - 1 Step stepY
             For x = stepX \ 2 To task.pointCloud.Width - 1 Step stepX
                 If task.depthmask.Get(Of Byte)(y, x) = 0 Then Continue For
-                Dim v = task.pointCloud.Get(Of cv.Vec3f)(y, x)
+                Dim v = task.pointCloud.Get(Of Vec3f)(y, x)
                 If v.Item2 <= 0 OrElse Single.IsInfinity(v.Item2) OrElse Single.IsNaN(v.Item2) Then Continue For
-                pointList.Add(New cv.Point3f(v.Item0, v.Item1, v.Item2))
+                pointList.Add(New Point3f(v.Item0, v.Item1, v.Item2))
             Next
         Next
 
@@ -84,10 +84,10 @@ Public Class Open3D_Shape : Inherits TaskParent
             labels(3) = "Alpha shape failed for " + CStr(pointList.Count) + " points"
         End If
 
-        labels(2) = CStr(pointList.Count) + " valid 3D points from camera point cloud"
+        labels(2) = CStr(pointList.Count) + " valid 3D points from camera cv.Point cloud"
     End Sub
 
-    Private Sub DrawMeshTopView(dst As cv.Mat, vertexCount As Integer, triangleCount As Integer)
+    Private Sub DrawMeshTopView(dst As Mat, vertexCount As Integer, triangleCount As Integer)
         Dim mapX(vertexCount - 1) As Integer
         Dim mapY(vertexCount - 1) As Integer
         For i = 0 To vertexCount - 1

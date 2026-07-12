@@ -4,7 +4,7 @@ Public Class ROI_Basics : Inherits TaskParent
     Public aoiRect As cv.Rect
     Public Sub New()
         labels = {"", "", "Enclosing rectangle of all pixels that have changed", ""}
-        dst1 = New cv.Mat(dst2.Size(), cv.MatType.CV_8UC1, 0)
+        dst1 = New Mat(dst2.Size(), MatType.CV_8UC1, 0)
         task.fOptions.ColorDiffSlider.Value = 30
         desc = "Find the motion ROI in the latest image."
     End Sub
@@ -12,9 +12,9 @@ Public Class ROI_Basics : Inherits TaskParent
         diff.Run(src)
         dst2 = diff.dst2
 
-        Dim fnz As New cv.Mat
+        Dim fnz As New Mat
         FindNonZero(diff.dst2, fnz)
-        Dim splitMats() As cv.Mat = Split(fnz)
+        Dim splitMats() As Mat = Split(fnz)
         If splitMats.Length = 0 Then Exit Sub
         Dim mm0 = GetMinMax(splitMats(0))
         Dim mm1 = GetMinMax(splitMats(1))
@@ -22,7 +22,7 @@ Public Class ROI_Basics : Inherits TaskParent
         aoiRect = New cv.Rect(mm0.minVal, mm1.minVal, mm0.maxVal - mm0.minVal, mm1.maxVal - mm1.minVal)
 
         If aoiRect.Width > 0 And aoiRect.Height > 0 Then
-            Rectangle(task.color, aoiRect, cv.Scalar.Yellow, task.lineWidth)
+            Rectangle(task.color, aoiRect, Scalar.Yellow, task.lineWidth)
             Rectangle(dst2, aoiRect, white, task.lineWidth)
         End If
     End Sub
@@ -38,14 +38,14 @@ Public Class XR_ROI_FindNonZeroNoSingle : Inherits TaskParent
     Public aoiRect As cv.Rect
     Public Sub New()
         labels = {"", "", "Enclosing rectangle of all changed pixels (after removing single pixels)", ""}
-        dst1 = New cv.Mat(dst2.Size(), cv.MatType.CV_8UC1, 0)
+        dst1 = New Mat(dst2.Size(), MatType.CV_8UC1, 0)
         task.fOptions.ColorDiffSlider.Value = 30
         desc = "Find the motion ROI in just the latest image - eliminate single pixels"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         diff.Run(src)
         dst2 = diff.dst2
-        Dim tmp As New cv.Mat
+        Dim tmp As New Mat
         FindNonZero(diff.dst2, tmp)
         If tmp.Rows = 0 Then Exit Sub
 
@@ -67,7 +67,7 @@ Public Class XR_ROI_FindNonZeroNoSingle : Inherits TaskParent
         Next
         If minX <> Integer.MaxValue Then
             aoiRect = New cv.Rect(minX, minY, maxX - minX + 1, maxY - minY + 1)
-            Rectangle(task.color, aoiRect, cv.Scalar.Yellow, task.lineWidth)
+            Rectangle(task.color, aoiRect, Scalar.Yellow, task.lineWidth)
             Rectangle(dst2, aoiRect, white, task.lineWidth)
         End If
     End Sub
@@ -86,7 +86,7 @@ Public Class XR_ROI_AccumulateOld : Inherits TaskParent
     Public Sub New()
         If standalone Then task.gOptions.displayDst1.Checked = True
         labels = {"", "", "Area of Interest", ""}
-        dst1 = New cv.Mat(dst2.Size(), cv.MatType.CV_8UC1, 0)
+        dst1 = New Mat(dst2.Size(), MatType.CV_8UC1, 0)
         task.fOptions.ColorDiffSlider.Value = 30
         desc = "Accumulate pixels in a motion ROI - all pixels that are different by X"
     End Sub
@@ -105,11 +105,11 @@ Public Class XR_ROI_AccumulateOld : Inherits TaskParent
         diff.Run(src)
         dst3 = diff.dst2
         BitwiseOr(dst3, dst1, dst1)
-        Dim tmp As New cv.Mat
+        Dim tmp As New Mat
         FindNonZero(dst3, tmp)
         If aoiRect <> New cv.Rect Then
             task.color(aoiRect).CopyTo(dst0(aoiRect))
-            Rectangle(dst0, aoiRect, cv.Scalar.Yellow, task.lineWidth)
+            Rectangle(dst0, aoiRect, Scalar.Yellow, task.lineWidth)
             Rectangle(dst2, aoiRect, white, task.lineWidth)
         End If
         If tmp.Rows = 0 Then Exit Sub
@@ -138,7 +138,7 @@ Public Class XR_ROI_Accumulate : Inherits TaskParent
     Dim options As New Options_ROI
     Public Sub New()
         labels = {"", "", "Area of Interest", ""}
-        dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8UC1, 0)
+        dst2 = New Mat(dst2.Size(), MatType.CV_8UC1, 0)
         task.fOptions.ColorDiffSlider.Value = 30
         desc = "Accumulate pixels in a motion ROI until the size is x% of the total image."
     End Sub
@@ -153,9 +153,9 @@ Public Class XR_ROI_Accumulate : Inherits TaskParent
 
         diff.Run(src)
 
-        Dim fnz As New cv.Mat
+        Dim fnz As New Mat
         FindNonZero(diff.dst2, fnz)
-        Dim splitMats() As cv.Mat = Split(fnz)
+        Dim splitMats() As Mat = Split(fnz)
         If splitMats.Length > 0 Then
             Dim mm0 = GetMinMax(splitMats(0))
             Dim mm1 = GetMinMax(splitMats(1))
@@ -167,6 +167,6 @@ Public Class XR_ROI_Accumulate : Inherits TaskParent
             End If
         End If
         Rectangle(dst2, roiRect, white, task.lineWidth)
-Rectangle(task.color, roiRect, task.highlight, task.lineWidth)
+        Rectangle(task.color, roiRect, task.highlight, task.lineWidth)
     End Sub
 End Class

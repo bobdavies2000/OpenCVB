@@ -1,9 +1,9 @@
 Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 Public Class Disparity_Basics : Inherits TaskParent
     Dim match As New Match_Basics
-    Public rightView As cv.Mat
-    Public rect As cv.Rect
-    Public matchRect As cv.Rect
+    Public rightView As Mat
+    Public rect as cv.Rect
+    Public matchRect as cv.Rect
     Public Sub New()
         desc = "Given a r, find the match in the right view image."
     End Sub
@@ -13,7 +13,7 @@ Public Class Disparity_Basics : Inherits TaskParent
         Dim index As Integer = task.gridMap.Get(Of Integer)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
         Static saveIndex As Integer = index
         Static saveCorrelations As New List(Of Single)
-        Static bestRect As cv.Rect
+        Static bestRect as cv.Rect
         If saveIndex <> index Then
             saveCorrelations.Clear()
             saveIndex = index
@@ -88,7 +88,7 @@ End Class
 Public Class XR_Disparity_Validate : Inherits TaskParent
     Dim disparity As New Disparity_Basics
     Public Sub New()
-        dst3 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        dst3 = New Mat(dst2.Size, MatType.CV_8U, 0)
         desc = "To validate Disparity_Basics, build the right view from the left view.  Should always match."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -118,7 +118,7 @@ End Class
 ' f Is the focal length in pixels
 ' disparity Is the disparity in pixels
 ' The baseline Is the distance between the two cameras in a stereo setup.
-' The focal length Is the distance between the camera's lens and the sensor. The disparity is the difference in the x-coordinates of the same point in the left and right images.
+' The focal length Is the distance between the camera's lens and the sensor. The disparity is the difference in the x-coordinates of the same cv.Point in the left and right images.
 
 ' For example, if the baseline Is 0.5 meters, the focal length Is 1000 pixels, And the disparity Is 100 pixels, then the depth Is
 
@@ -136,13 +136,13 @@ Public Class XR_Disparity_Inverse : Inherits TaskParent
         ' disparity = B * f / depth
         Dim camInfo = task.calibData
         If task.drawRect.Width > 0 Then
-            Dim white As New cv.Vec3b(255, 255, 255)
+            Dim white As New Vec3b(255, 255, 255)
             For y = 0 To task.drawRect.Height - 1
                 For x = 0 To task.drawRect.Width - 1
                     Dim depth = task.pcSplit(2)(task.drawRect).Get(Of Single)(y, x)
                     If depth > 0 Then
                         Dim disp = camInfo.baseline * camInfo.leftIntrinsics.fx / depth
-                        dst3(task.drawRect).Set(Of cv.Vec3b)(y, x - disp, white)
+                        dst3(task.drawRect).Set(Of Vec3b)(y, x - disp, white)
                     End If
                 Next
             Next
@@ -174,12 +174,12 @@ Public Class XR_Disparity_Color8u : Inherits TaskParent
         dst3 = disparity.dst3
         labels = disparity.labels
 
-        Rectangle(task.color, disparity.rect, cv.Scalar.All(255), task.lineWidth)
-        Rectangle(dst1, disparity.matchRect, cv.Scalar.All(255), task.lineWidth)
+        Rectangle(task.color, disparity.rect, Scalar.All(255), task.lineWidth)
+        Rectangle(dst1, disparity.matchRect, Scalar.All(255), task.lineWidth)
 
         Dim index As Integer = task.gridMap.Get(Of Integer)(task.clickPoint.Y, task.clickPoint.X)
         Dim rect = task.gridRects(index)
-        Rectangle(dst2, rect, cv.Scalar.All(255), task.lineWidth)
+        Rectangle(dst2, rect, Scalar.All(255), task.lineWidth)
     End Sub
 End Class
 

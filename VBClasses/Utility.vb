@@ -52,7 +52,7 @@ Public Class Utility_Basics : Inherits TaskParent
         End Select
         Return fontThickness
     End Function
-    Public Shared Sub AddPlotScale(dst As cv.Mat, minVal As Double, maxVal As Double, Optional lineCount As Integer = 3)
+    Public Shared Sub AddPlotScale(dst As Mat, minVal As Double, maxVal As Double, Optional lineCount As Integer = 3)
         Dim fontSize = getFontsize()
         Dim fontThickness = getThickness()
 
@@ -66,10 +66,10 @@ Public Class Utility_Basics : Inherits TaskParent
             Dim nextVal = (maxVal - spaceVal * i)
             Dim nextText = If(maxVal > 1000, (nextVal / 1000).ToString("N2") + "k", nextVal.ToString(fmt1))
             Dim p3 = New cv.Point(0, p1.Y + 12)
-            PutText(dst, nextText, p3, cv.HersheyFonts.HersheyPlain, fontSize, white, fontThickness, task.lineType)
+            PutText(dst, nextText, p3, HersheyFonts.HersheyPlain, fontSize, white, fontThickness, task.lineType)
         Next
     End Sub
-    Public Shared Function findCause(rcMap As cv.Mat, rcList As List(Of rcDataOld)) As String
+    Public Shared Function findCause(rcMap As Mat, rcList As List(Of rcDataOld)) As String
         Dim clickIndex = rcMap.Get(Of Integer)(task.clickPoint.Y, task.clickPoint.X)
         findCause = ""
         If clickIndex > 0 And clickIndex < rcList.Count Then
@@ -88,12 +88,12 @@ Public Class Utility_Basics : Inherits TaskParent
                 Case causes.colorSync
                     findCause = "Resyncing Colors"
                 Case causes.wGridNotInLastList
-                    findCause = "wGrid point absent"
+                    findCause = "wGrid cv.Point absent"
             End Select
         End If
         Return findCause
     End Function
-    Public Shared Function rcDataMatch(rc As rcDataOld, rcListLast As List(Of rcDataOld), rcMapLast As cv.Mat) As rcDataOld
+    Public Shared Function rcDataMatch(rc As rcDataOld, rcListLast As List(Of rcDataOld), rcMapLast As Mat) As rcDataOld
         Dim r1 = rc.rect
         Dim indexLast = rcMapLast.Get(Of Integer)(rc.maxDist.Y, rc.maxDist.X)
 
@@ -137,8 +137,8 @@ Public Class Utility_Basics : Inherits TaskParent
         Return rc
     End Function
     Public Shared Function rcMatch(rc As rcDataOld, rcListLast As List(Of rcDataOld),
-                                           wGridLastList As List(Of cv.Point3d),
-                                           rcMapLast As cv.Mat) As rcDataOld
+                                           wGridLastList As List(Of Point3d),
+                                           rcMapLast As Mat) As rcDataOld
         Dim r1 = rc.rect
         Dim indexLast = wGridLastList.IndexOf(rc.wGrid)
         If indexLast >= 0 And indexLast < rcListLast.Count Then
@@ -153,7 +153,7 @@ Public Class Utility_Basics : Inherits TaskParent
         If task.optionsChanged Then rc.colorChange = causes.optionsChange
 
         If rc.colorChange <> causes.lastCellFound Then
-            ' try use the maxDist point to find the last rect.
+            ' try use the maxDist cv.Point to find the last rect.
             indexLast = rcMapLast.Get(Of Integer)(rc.maxDist.Y, rc.maxDist.X) - 1
             If indexLast >= 0 And indexLast < rcListLast.Count Then
                 Dim r2 = rcListLast(indexLast).rect
@@ -188,9 +188,9 @@ Public Class Utility_Basics : Inherits TaskParent
         End If
         Return rc
     End Function
-    Public Shared Function selectCell(rcMap As cv.Mat, rcList As List(Of rcDataOld)) As String
+    Public Shared Function selectCell(rcMap As Mat, rcList As List(Of rcDataOld)) As String
         Dim clickIndex As Integer = 0, outStr As String = ""
-        If rcMap.Type = cv.MatType.CV_32S Then
+        If rcMap.Type = MatType.CV_32S Then
             clickIndex = rcMap.Get(Of Integer)(task.clickPoint.Y, task.clickPoint.X)
         Else
             clickIndex = rcMap.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X)
@@ -213,7 +213,7 @@ Public Class Utility_Basics : Inherits TaskParent
 
         Return outStr
     End Function
-    Public Shared Function selectMinCell(rcMap As cv.Mat, rcList As List(Of rcData)) As String
+    Public Shared Function selectMinCell(rcMap As Mat, rcList As List(Of rcData)) As String
         If rcList.Count = 0 Then Return ""
 
         Dim outStr As String = ""
@@ -244,7 +244,7 @@ Public Class Utility_Basics : Inherits TaskParent
 
         Return outStr
     End Function
-    Public Shared Function DelaunaySelect(rcMap As cv.Mat, rcList As List(Of rcDataOld)) As String
+    Public Shared Function DelaunaySelect(rcMap As Mat, rcList As List(Of rcDataOld)) As String
         Dim outStr As String = ""
         If rcList.Count > 0 Then
             Dim clickIndex = rcMap.Get(Of Integer)(task.clickPoint.Y, task.clickPoint.X)

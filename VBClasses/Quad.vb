@@ -1,11 +1,11 @@
 ﻿Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 Public Class XR_Quad_RightView : Inherits TaskParent
     Public Sub New()
-        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        dst2 = New Mat(dst2.Size, MatType.CV_8U, 0)
         desc = "Create a grayscale low resolution quad view of the right image."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        Dim colorStdev As cv.Scalar, colorMean As cv.Scalar
+        Dim colorStdev As Scalar, colorMean As Scalar
         For Each rect In task.gridRects
             MeanStdDev(task.rightView(rect), colorMean, colorStdev)
             dst2(rect).SetTo(colorMean)
@@ -20,16 +20,16 @@ End Class
 
 
 Public Class XR_Quad_MinMax : Inherits TaskParent
-    Public quadData As New List(Of cv.Point3f)
+    Public quadData As New List(Of Point3f)
     Public depthList1 As New List(Of List(Of Single))
     Public depthList2 As New List(Of List(Of Single))
-    Public colorList As New List(Of cv.Scalar)
+    Public colorList As New List(Of Scalar)
     Public oglOptions As New Options_OpenGLFunctions
     Const depthListMaxCount As Integer = 10
     Dim redc As New RedColor_Basics
     Public Sub New()
         labels(3) = "Values indicate the depth of the brick at that location."
-        desc = "Create a representation of the point cloud with RedCloud data"
+        desc = "Create a representation of the cv.Point cloud with RedCloud data"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         redc.Run(src)
@@ -38,7 +38,7 @@ Public Class XR_Quad_MinMax : Inherits TaskParent
 
         oglOptions.Run()
         Dim ptM = oglOptions.moveAmount
-        Dim shift As New cv.Point3f(ptM(0), ptM(1), ptM(2))
+        Dim shift As New Point3f(ptM(0), ptM(1), ptM(2))
 
         If task.optionsChanged Then
             depthList1 = New List(Of List(Of Single))
@@ -53,8 +53,8 @@ Public Class XR_Quad_MinMax : Inherits TaskParent
         quadData.Clear()
         dst3.SetTo(0)
 
-        Dim depth32f As cv.Mat = task.pcSplit(2) * 1000, depth32s As New cv.Mat
-        depth32f.ConvertTo(depth32s, cv.MatType.CV_32S)
+        Dim depth32f As Mat = task.pcSplit(2) * 1000, depth32s As New Mat
+        depth32f.ConvertTo(depth32s, MatType.CV_32S)
         For i = 0 To task.gridRects.Count - 1
             Dim gRect = task.gridRects(i)
 
@@ -86,16 +86,16 @@ Public Class XR_Quad_MinMax : Inherits TaskParent
             Dim depthCount = If(d1 = d2, 1, 2)
             For j = 0 To depthCount - 1
                 Dim depth = Choose(j + 1, d1, d2)
-                Dim topLeft = Cloud_Basics.worldCoordinates(New cv.Point3f(gRect.X, gRect.Y, depth))
-                Dim botRight = Cloud_Basics.worldCoordinates(New cv.Point3f(gRect.X + gRect.Width, gRect.Y + gRect.Height, depth))
+                Dim topLeft = Cloud_Basics.worldCoordinates(New Point3f(gRect.X, gRect.Y, depth))
+                Dim botRight = Cloud_Basics.worldCoordinates(New Point3f(gRect.X + gRect.Width, gRect.Y + gRect.Height, depth))
 
                 Dim color = rc.color
                 dst3(gRect).SetTo(color)
-                quadData.Add(New cv.Point3f(color(0), color(1), color(2)))
-                quadData.Add(New cv.Point3f(topLeft.X + shift.X, topLeft.Y + shift.Y, depth + shift.Z))
-                quadData.Add(New cv.Point3f(botRight.X + shift.X, topLeft.Y + shift.Y, depth + shift.Z))
-                quadData.Add(New cv.Point3f(botRight.X + shift.X, botRight.Y + shift.Y, depth + shift.Z))
-                quadData.Add(New cv.Point3f(topLeft.X + shift.X, botRight.Y + shift.Y, depth + shift.Z))
+                quadData.Add(New Point3f(color(0), color(1), color(2)))
+                quadData.Add(New Point3f(topLeft.X + shift.X, topLeft.Y + shift.Y, depth + shift.Z))
+                quadData.Add(New Point3f(botRight.X + shift.X, topLeft.Y + shift.Y, depth + shift.Z))
+                quadData.Add(New Point3f(botRight.X + shift.X, botRight.Y + shift.Y, depth + shift.Z))
+                quadData.Add(New Point3f(topLeft.X + shift.X, botRight.Y + shift.Y, depth + shift.Z))
             Next
 
             Dim showBrickDepth As Boolean = False
@@ -126,19 +126,19 @@ End Class
 
 
 Public Class Quad_Hulls : Inherits TaskParent
-    Public quadData As New List(Of cv.Point3f)
+    Public quadData As New List(Of Point3f)
     Public depthList As New List(Of List(Of Single))
-    Public colorList As New List(Of cv.Scalar)
+    Public colorList As New List(Of Scalar)
     Public oglOptions As New Options_OpenGLFunctions
     Dim hulls As New RedColor_Hulls
     Const depthListMaxCount As Integer = 10
     Public Sub New()
-        desc = "Create a triangle representation of the point cloud with RedCloud data"
+        desc = "Create a triangle representation of the cv.Point cloud with RedCloud data"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         oglOptions.Run()
         Dim ptM = oglOptions.moveAmount
-        Dim shift As New cv.Point3f(ptM(0), ptM(1), ptM(2))
+        Dim shift As New Point3f(ptM(0), ptM(1), ptM(2))
 
         hulls.Run(src)
         dst2 = hulls.dst2
@@ -179,14 +179,14 @@ Public Class Quad_Hulls : Inherits TaskParent
                 dst3(gRect).SetTo(colorList(i))
 
                 Dim depth = depthList(i).Average
-                Dim topLeft = Cloud_Basics.worldCoordinates(New cv.Point3f(gRect.X, gRect.Y, depth))
-                Dim botRight = Cloud_Basics.worldCoordinates(New cv.Point3f(gRect.X + gRect.Width, gRect.Y + gRect.Height, depth))
+                Dim topLeft = Cloud_Basics.worldCoordinates(New Point3f(gRect.X, gRect.Y, depth))
+                Dim botRight = Cloud_Basics.worldCoordinates(New Point3f(gRect.X + gRect.Width, gRect.Y + gRect.Height, depth))
 
-                quadData.Add(New cv.Point3f(rc.color(0), rc.color(1), rc.color(2)))
-                quadData.Add(New cv.Point3f(topLeft.X + shift.X, topLeft.Y + shift.Y, depth + shift.Z))
-                quadData.Add(New cv.Point3f(botRight.X + shift.X, topLeft.Y + shift.Y, depth + shift.Z))
-                quadData.Add(New cv.Point3f(botRight.X + shift.X, botRight.Y + shift.Y, depth + shift.Z))
-                quadData.Add(New cv.Point3f(topLeft.X + shift.X, botRight.Y + shift.Y, depth + shift.Z))
+                quadData.Add(New Point3f(rc.color(0), rc.color(1), rc.color(2)))
+                quadData.Add(New Point3f(topLeft.X + shift.X, topLeft.Y + shift.Y, depth + shift.Z))
+                quadData.Add(New Point3f(botRight.X + shift.X, topLeft.Y + shift.Y, depth + shift.Z))
+                quadData.Add(New Point3f(botRight.X + shift.X, botRight.Y + shift.Y, depth + shift.Z))
+                quadData.Add(New Point3f(topLeft.X + shift.X, botRight.Y + shift.Y, depth + shift.Z))
 
                 If depthList(i).Count >= depthListMaxCount Then depthList(i).RemoveAt(0)
             End If
@@ -204,7 +204,7 @@ End Class
 
 
 Public Class XR_Quad_Bricks : Inherits TaskParent
-    Public quadData As New List(Of cv.Point3f)
+    Public quadData As New List(Of Point3f)
     Public depths As New List(Of Single)
     Public options As New Options_OpenGLFunctions
     Dim depthMinList As New List(Of List(Of Single))
@@ -212,7 +212,7 @@ Public Class XR_Quad_Bricks : Inherits TaskParent
     Dim myListMax = 10
     Dim redC As New RedColor_Basics
     Public Sub New()
-        desc = "Create triangles from each gRect in point cloud"
+        desc = "Create triangles from each gRect in cv.Point cloud"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         redC.Run(src)
@@ -230,11 +230,11 @@ Public Class XR_Quad_Bricks : Inherits TaskParent
 
         options.Run()
         Dim ptM = options.moveAmount
-        Dim shift As New cv.Point3f(ptM(0), ptM(1), ptM(2))
+        Dim shift As New Point3f(ptM(0), ptM(1), ptM(2))
 
         quadData.Clear()
 
-        Dim min(4 - 1) As cv.Point3f, max(4 - 1) As cv.Point3f
+        Dim min(4 - 1) As Point3f, max(4 - 1) As Point3f
         depths.Clear()
         For i = 0 To task.gridRects.Count - 1
             Dim gRect = task.gridRects(i)
@@ -254,12 +254,12 @@ Public Class XR_Quad_Bricks : Inherits TaskParent
                     Dim avg = depthMaxList(i).Average - depthMin
                     depthMax = depthMin + If(avg < 0.2, avg, 0.2) ' trim the max depth - often unreliable 
                     Dim color = rc.color
-                    quadData.Add(New cv.Point3f(color(2) / 255, color(1) / 255, color(0) / 255))
+                    quadData.Add(New Point3f(color(2) / 255, color(1) / 255, color(0) / 255))
                     For j = 0 To 4 - 1
                         Dim x = Choose(j + 1, gRect.X, gRect.X + gRect.Width, gRect.X + gRect.Width, gRect.X)
                         Dim y = Choose(j + 1, gRect.Y, gRect.Y, gRect.Y + gRect.Height, gRect.Y + gRect.Height)
-                        min(j) = Cloud_Basics.worldCoordinates(New cv.Point3f(x, y, depthMin))
-                        max(j) = Cloud_Basics.worldCoordinates(New cv.Point3f(x, y, depthMax))
+                        min(j) = Cloud_Basics.worldCoordinates(New Point3f(x, y, depthMin))
+                        max(j) = Cloud_Basics.worldCoordinates(New Point3f(x, y, depthMax))
                         min(j) += shift
                         quadData.Add(min(j))
                     Next

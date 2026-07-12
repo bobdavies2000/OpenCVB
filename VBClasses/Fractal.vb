@@ -10,7 +10,7 @@ Public Class Fractal_Mandelbrot : Inherits TaskParent
     Dim incrY As Single
     Public options As New Options_Fractal
     Public Sub New()
-        dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
+        dst2 = New Mat(dst2.Size(), MatType.CV_8U, Scalar.All(0))
         labels(2) = "Use the iteration slider to see the impact of the number of iterations."
         desc = "Run the classic Mandalbrot algorithm"
     End Sub
@@ -114,7 +114,7 @@ Public Class XR_Fractal_Julia : Inherits TaskParent
     Dim savedMouse = New cv.Point(-1, -1)
     Public Sub New()
         labels(3) = "Mouse selects different Julia Sets - zoom for detail"
-        desc = "Build Julia set from any point in the Mandelbrot fractal"
+        desc = "Build Julia set from any cv.Point in the Mandelbrot fractal"
     End Sub
     Private Function julia_point(x As Single, y As Single, r As Integer, depth As Integer, max As Integer, c As Complex, z As Complex) As cv.Point
         If Complex.Abs(z) > r Then
@@ -136,7 +136,7 @@ Public Class XR_Fractal_Julia : Inherits TaskParent
             Dim detail = 1
             Dim depth = 100
             Dim r = 2
-            dst2 = New cv.Mat(src.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
+            dst2 = New Mat(src.Size(), MatType.CV_8U, Scalar.All(0))
             Dim m = mandel.zoom.mandel
             rt = m.startX + (m.endX - m.startX) * task.mouseMovePoint.X / src.Width
             mt = m.startY + (m.endY - m.startY) * task.mouseMovePoint.Y / src.Height
@@ -163,13 +163,13 @@ End Class
 Public Class XR_Fractal_Dimension : Inherits TaskParent
     Dim redC As New RedCloud_Basics
     Public Sub New()
-        dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
+        dst3 = New Mat(dst3.Size(), MatType.CV_8U, Scalar.All(0))
         labels = {"", "", "RedFlood_List output - select any region.", "The selected region (as a square)"}
         desc = "Compute the fractal dimension of the provided (square) image.  Algorithm is incomplete."
     End Sub
-    Public Function dimension(Input As cv.Mat) As Double
-        Dim tmp64f As New cv.Mat
-        Input.ConvertTo(tmp64f, cv.MatType.CV_64F, 0, 0)
+    Public Function dimension(Input As Mat) As Double
+        Dim tmp64f As New Mat
+        Input.ConvertTo(tmp64f, MatType.CV_64F, 0, 0)
         Dim G = 256
         Dim d As Double
 
@@ -200,8 +200,8 @@ Public Class XR_Fractal_Dimension : Inherits TaskParent
         '                          # check for plateauing
         '        r_Nr.append([r, N_r])
         '                        prev = N_r
-        '                        x = np.array([np.log(1 / point[0]) For point In r_Nr])  # log(1/r)
-        'y = np.array([np.log(point[1]) For point In r_Nr])  # log(Nr)
+        '                        x = np.array([np.log(1 / cv.Point[0]) For cv.Point In r_Nr])  # log(1/r)
+        'y = np.array([np.log(point[1]) For cv.Point In r_Nr])  # log(Nr)
         'D = np.polyfit(x, y, 1)[0]  # D = lim r -> 0 log(Nr)/log(1/r)
         Return d
     End Function

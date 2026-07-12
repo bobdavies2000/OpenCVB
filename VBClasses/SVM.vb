@@ -3,9 +3,9 @@ Public Class SVM_Basics : Inherits TaskParent
     Implements IDisposable
     Public options As New Options_SVM
     Dim sampleData As New SVM_SampleData
-    Public points As New List(Of cv.Point2f)
+    Public points As New List(Of Point2f)
     Public response As New List(Of Integer)
-    Dim svm As cv.ML.SVM
+    Dim svm As ML.SVM
     Public Sub New()
         desc = "Use SVM to classify random points.  Increase the sample count to see the value of more data."
         If standalone Then task.gOptions.GridSlider.Value = 8
@@ -21,24 +21,24 @@ Public Class SVM_Basics : Inherits TaskParent
             response = sampleData.responses
         End If
 
-        Dim dataMat = cv.Mat.FromPixelData(options.sampleCount, 2, cv.MatType.CV_32FC1, points.ToArray)
-        Dim resMat = cv.Mat.FromPixelData(options.sampleCount, 1, cv.MatType.CV_32SC1, response.ToArray)
+        Dim dataMat = Mat.FromPixelData(options.sampleCount, 2, MatType.CV_32FC1, points.ToArray)
+        Dim resMat = Mat.FromPixelData(options.sampleCount, 1, MatType.CV_32SC1, response.ToArray)
         dataMat *= 1 / src.Height
 
         If task.optionsChanged Then
             If svm IsNot Nothing Then svm.Dispose()
             svm = options.createSVM()
         End If
-        svm.Train(dataMat, cv.ML.SampleTypes.RowSample, resMat)
+        svm.Train(dataMat, ML.SampleTypes.RowSample, resMat)
 
         dst3.SetTo(0)
         For Each roi In task.gridRects
             If roi.X > src.Height Then Continue For ' working only with square - not rectangles.
             Dim samples() As Single = {roi.X / src.Height, roi.Y / src.Height}
-            If svm.Predict(cv.Mat.FromPixelData(1, 2, cv.MatType.CV_32F, samples)) = 1 Then
-                dst3(roi).SetTo(cv.Scalar.Red)
+            If svm.Predict(Mat.FromPixelData(1, 2, MatType.CV_32F, samples)) = 1 Then
+                dst3(roi).SetTo(Scalar.Red)
             Else
-                dst3(roi).SetTo(cv.Scalar.GreenYellow)
+                dst3(roi).SetTo(Scalar.GreenYellow)
             End If
         Next
 
@@ -47,7 +47,7 @@ Public Class SVM_Basics : Inherits TaskParent
             For x = 1 To src.Height - 1
                 Dim y1 = CInt(sampleData.inputFunction(x - 1))
                 Dim y2 = CInt(sampleData.inputFunction(x))
-                Line(dst3, New cv.Point2f(x - 1, y1), New cv.Point2f(x, y2), white, task.lineWidth, task.lineType)
+                Line(dst3, New Point2f(x - 1, y1), New Point2f(x, y2), white, task.lineWidth, task.lineType)
             Next
         End If
     End Sub
@@ -64,7 +64,7 @@ End Class
 ' https://docs.opencvb.org/3.4/d1/d73/tutorial_introduction_to_svm.html
 Public Class SVM_SampleData : Inherits TaskParent
     Dim options As New Options_SVM
-    Public points As New List(Of cv.Point2f)
+    Public points As New List(Of Point2f)
     Public responses As New List(Of Integer)
     Public Sub New()
         desc = "Create sample data for a sample SVM application."
@@ -81,13 +81,13 @@ Public Class SVM_SampleData : Inherits TaskParent
         For i = 0 To options.sampleCount - 1
             Dim x = msRNG.Next(0, src.Height - 1)
             Dim y = msRNG.Next(0, src.Height - 1)
-            points.Add(New cv.Point2f(x, y))
+            points.Add(New Point2f(x, y))
             If y > inputFunction(x) Then
                 responses.Add(1)
-                Circle(dst2, New cv.Point(x, y), 2, cv.Scalar.Red, -1, task.lineType)
+                Circle(dst2, New cv.Point(x, y), 2, Scalar.Red, -1, task.lineType)
             Else
                 responses.Add(-1)
-                Circle(dst2, New cv.Point(x, y), 3, cv.Scalar.GreenYellow, -1, task.lineType)
+                Circle(dst2, New cv.Point(x, y), 3, Scalar.GreenYellow, -1, task.lineType)
             End If
         Next
     End Sub
@@ -103,9 +103,9 @@ End Class
 Public Class XR_SVM_TestCase : Inherits TaskParent
     Implements IDisposable
     Dim options As New Options_SVM
-    Dim points As New List(Of cv.Point2f)
+    Dim points As New List(Of Point2f)
     Dim responses As New List(Of Integer)
-    Dim svm As cv.ML.SVM
+    Dim svm As ML.SVM
     Public Sub New()
         OptionParent.FindSlider("Granularity").Value = 15
         labels = {"", "", "Input points - color is the category label", "Predictions"}
@@ -123,34 +123,34 @@ Public Class XR_SVM_TestCase : Inherits TaskParent
             points.Clear()
             responses.Clear()
             For i = 0 To 4 - 1
-                points.Add(New cv.Point2f(msRNG.Next(0, src.Width - 1), msRNG.Next(0, src.Height - 1)))
+                points.Add(New Point2f(msRNG.Next(0, src.Width - 1), msRNG.Next(0, src.Height - 1)))
                 responses.Add(Choose(i + 1, labeled, nonlabel, nonlabel, nonlabel))
             Next
         End If
 
-        Dim trainMat = cv.Mat.FromPixelData(4, 2, cv.MatType.CV_32F, points.ToArray)
-        Dim labelsMat = cv.Mat.FromPixelData(4, 1, cv.MatType.CV_32SC1, responses.ToArray)
+        Dim trainMat = Mat.FromPixelData(4, 2, MatType.CV_32F, points.ToArray)
+        Dim labelsMat = Mat.FromPixelData(4, 1, MatType.CV_32SC1, responses.ToArray)
         Dim dataMat = trainMat * 1 / src.Height
 
         If task.optionsChanged Then
             If svm IsNot Nothing Then svm.Dispose()
             svm = options.createSVM()
         End If
-        svm.Train(dataMat, cv.ML.SampleTypes.RowSample, labelsMat)
+        svm.Train(dataMat, ML.SampleTypes.RowSample, labelsMat)
 
-        Dim sampleMat As New cv.Mat(1, 2, cv.MatType.CV_32F)
+        Dim sampleMat As New Mat(1, 2, MatType.CV_32F)
         For y = 0 To dst2.Height - 1 Step options.granularity
             For x = 0 To dst2.Width - 1 Step options.granularity
                 sampleMat.Set(Of Single)(0, 0, x / src.Height)
                 sampleMat.Set(Of Single)(0, 1, y / src.Height)
                 Dim response = svm.Predict(sampleMat)
-                Dim color = If(response >= 0, cv.Scalar.Blue, cv.Scalar.Red)
+                Dim color = If(response >= 0, Scalar.Blue, Scalar.Red)
                 Circle(dst3, New cv.Point(CInt(x), CInt(y)), task.DotSize + 1, color, -1, task.lineType)
             Next
         Next
 
         For i = 0 To trainMat.Rows - 1
-            Dim color = If(labelsMat.Get(Of Integer)(i) = 1, cv.Scalar.Blue, cv.Scalar.Red)
+            Dim color = If(labelsMat.Get(Of Integer)(i) = 1, Scalar.Blue, Scalar.Red)
             Dim pt = New cv.Point(trainMat.Get(Of Single)(i, 0), trainMat.Get(Of Single)(i, 1))
             Circle(dst2, pt, task.DotSize + 2, color, -1, task.lineType)
             Circle(dst3, pt, task.DotSize + 2, color, -1, task.lineType)
@@ -172,7 +172,7 @@ End Class
 ' https://docs.opencvb.org/3.4/d1/d73/tutorial_introduction_to_svm.html
 Public Class XR_SVM_ReuseBasics : Inherits TaskParent
     Dim svm As New SVM_Basics
-    Dim points As New List(Of cv.Point2f)
+    Dim points As New List(Of Point2f)
     Dim responses As New List(Of Integer)
 
     Public Sub New()
@@ -189,7 +189,7 @@ Public Class XR_SVM_ReuseBasics : Inherits TaskParent
             points.Clear()
             responses.Clear()
             For i = 0 To 4 - 1
-                points.Add(New cv.Point2f(msRNG.Next(0, src.Height - 1), msRNG.Next(0, src.Height - 1))) ' note: working with a square, not a rectangle
+                points.Add(New Point2f(msRNG.Next(0, src.Height - 1), msRNG.Next(0, src.Height - 1))) ' note: working with a square, not a rectangle
                 responses.Add(Choose(i + 1, labeled, nonlabel, nonlabel, nonlabel))
             Next
         End If
@@ -206,7 +206,7 @@ Public Class XR_SVM_ReuseBasics : Inherits TaskParent
 
         dst2.SetTo(white)
         For i = 0 To svm.points.Count - 1
-            Dim color = If(svm.response(i) = 1, cv.Scalar.Blue, cv.Scalar.Red)
+            Dim color = If(svm.response(i) = 1, Scalar.Blue, Scalar.Red)
             Circle(dst2, svm.points(i), task.DotSize, color, -1, task.lineType)
             Circle(dst3, svm.points(i), task.DotSize, color, -1, task.lineType)
         Next
@@ -240,7 +240,7 @@ Public Class XR_SVM_ReuseRandom : Inherits TaskParent
         contour.Add(New cv.Point(rect.X + rect.Width, rect.Y))
 
         Dim width = src.Width
-        If svm.options.kernelType = cv.ML.SVM.KernelTypes.Linear Then
+        If svm.options.kernelType = ML.SVM.KernelTypes.Linear Then
             width = src.Height
             rect.X = 0
             rect.Y = src.Height - rect.Height
@@ -253,10 +253,10 @@ Public Class XR_SVM_ReuseRandom : Inherits TaskParent
             svm.points.Clear()
             svm.response.Clear()
             For i = 0 To svm.options.sampleCount - 1
-                Dim pt = New cv.Point2f(msRNG.Next(0, width - 1), msRNG.Next(0, src.Height - 1))
+                Dim pt = New Point2f(msRNG.Next(0, width - 1), msRNG.Next(0, src.Height - 1))
                 svm.points.Add(pt)
                 Dim res = 0
-                If svm.options.kernelType = cv.ML.SVM.KernelTypes.Linear Then
+                If svm.options.kernelType = ML.SVM.KernelTypes.Linear Then
                     res = If(pt.X >= pt.Y, 1, -1)
                 Else
                     res = If(PointPolygonTest(contour, pt, False) >= 0, 1, -1)
@@ -264,7 +264,7 @@ Public Class XR_SVM_ReuseRandom : Inherits TaskParent
 
                 svm.response.Add(res)
                 If res > 0 Then blueCount += 1
-                Circle(dst2, pt, task.DotSize, If(res = 1, cv.Scalar.Blue, cv.Scalar.Green), -1, task.lineType)
+                Circle(dst2, pt, task.DotSize, If(res = 1, Scalar.Blue, Scalar.Green), -1, task.lineType)
             Next
 
             svm.Run(src)
@@ -272,9 +272,9 @@ Public Class XR_SVM_ReuseRandom : Inherits TaskParent
         End If
 
         labels(3) = "There were " + CStr(blueCount) + " blue points out of " + CStr(svm.options.sampleCount)
-        If svm.options.kernelType = cv.ML.SVM.KernelTypes.Linear = False Then
-        Rectangle(dst2, rect, cv.Scalar.Black, 2)
-Rectangle(dst3, rect, cv.Scalar.Black, 2)
+        If svm.options.kernelType = ML.SVM.KernelTypes.Linear = False Then
+        Rectangle(dst2, rect, Scalar.Black, 2)
+Rectangle(dst3, rect, Scalar.Black, 2)
         End If
     End Sub
 End Class

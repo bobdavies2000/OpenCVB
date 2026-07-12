@@ -31,13 +31,13 @@ Public Class OptionsGlobal
         task.smallBrick = 8
         task.DotSize = 1
         task.lineWidth = 1
-        task.smallRes = New cv.Size(320, 240)
+        task.smallRes = New Size(320, 240)
         Select Case task.workRes.Width
             Case 1920
                 task.DotSize = 5
                 task.lineWidth = 5
                 task.gridWH = 48
-                task.smallRes = New cv.Size(240, 135)
+                task.smallRes = New Size(240, 135)
             Case 1280
                 task.DotSize = 5
                 task.lineWidth = 4
@@ -46,29 +46,29 @@ Public Class OptionsGlobal
                 task.DotSize = 2
                 task.lineWidth = 2
                 task.gridWH = 24
-                task.smallRes = New cv.Size(336, 188)
+                task.smallRes = New Size(336, 188)
             Case 672
                 task.DotSize = 2
                 task.lineWidth = 2
                 task.gridWH = 16
-                task.smallRes = New cv.Size(336, 188)
+                task.smallRes = New Size(336, 188)
             Case 640
                 task.lineWidth = 2
                 task.DotSize = 2
                 task.gridWH = 16
             Case 480
-                task.smallRes = New cv.Size(480, 270)
+                task.smallRes = New Size(480, 270)
                 task.gridWH = 12
             Case 240
-                task.smallRes = New cv.Size(240, 150)
+                task.smallRes = New Size(240, 150)
             Case 336
-                task.smallRes = New cv.Size(336, 188)
+                task.smallRes = New Size(336, 188)
             Case 320
             Case 168
-                task.smallRes = New cv.Size(168, 94)
+                task.smallRes = New Size(168, 94)
                 task.gridWH = 5
             Case 160
-                task.smallRes = New cv.Size(160, 120)
+                task.smallRes = New Size(160, 120)
                 task.gridWH = 5
         End Select
 
@@ -93,11 +93,11 @@ Public Class OptionsGlobal
         task.optionsChanged = True
         Select Case LineType.Text
             Case "AntiAlias"
-                task.lineType = cv.LineTypes.AntiAlias
+                task.lineType = LineTypes.AntiAlias
             Case "Link4"
-                task.lineType = cv.LineTypes.Link4
+                task.lineType = LineTypes.Link4
             Case "Link8"
-                task.lineType = cv.LineTypes.Link8
+                task.lineType = LineTypes.Link8
         End Select
     End Sub
     Private Sub LineWidth_ValueChanged(sender As Object, e As EventArgs) Handles LineWidth.ValueChanged
@@ -162,13 +162,13 @@ Public Class OptionsGlobal
         task.optionsChanged = True
         Select Case highlight.Text
             Case "Yellow"
-                task.highlight = cv.Scalar.Yellow
+                task.highlight = Scalar.Yellow
             Case "Black"
-                task.highlight = cv.Scalar.Black
+                task.highlight = Scalar.Black
             Case "White"
-                task.highlight = cv.Scalar.White
+                task.highlight = Scalar.White
             Case "Red"
-                task.highlight = cv.Scalar.Red
+                task.highlight = Scalar.Red
         End Select
     End Sub
     Public Sub setMaxDepth(val As Integer)

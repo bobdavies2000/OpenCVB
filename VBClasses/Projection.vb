@@ -3,7 +3,7 @@ Public Class Projection_Basics : Inherits TaskParent
     Public redCellInput As New List(Of rcDataOld)
     Public rclist As New List(Of rcDataOld)
     Public viewType As String = "Top"
-    Public objectList As New List(Of cv.Vec4f)
+    Public objectList As New List(Of Vec4f)
     Public showRectangles As Boolean = True
     Dim histTop As New Projection_HistTop
     Public redC As New RedColor_Basics
@@ -27,7 +27,7 @@ Public Class Projection_Basics : Inherits TaskParent
         Dim check2 As Integer
         For i = 0 To redCellInput.Count - 1
             Dim rc = redCellInput(i)
-            Dim tmp = New cv.Mat(rc.rect.Size(), cv.MatType.CV_32F, cv.Scalar.All(0))
+            Dim tmp = New Mat(rc.rect.Size(), MatType.CV_32F, Scalar.All(0))
             src(rc.rect).CopyTo(tmp, rc.mask)
             rc.pixels = CInt(Sum(tmp)(0))
             sortedCells.Add(rc.pixels, rc)
@@ -63,7 +63,7 @@ Public Class Projection_Basics : Inherits TaskParent
                 z1 = (ranges(0).End - ranges(0).Start) * rc.rect.Y / dst2.Height
                 z2 = (ranges(0).End - ranges(0).Start) * (rc.rect.Y + rc.rect.Height) / dst2.Height
             End If
-            objectList.Add(New cv.Vec4f(xy1, xy2, z1, z2))
+            objectList.Add(New Vec4f(xy1, xy2, z1, z2))
             If task.heartBeat Then
                 strOut += "Object " + vbTab + CStr(rc.mapID) + vbTab + (xy2 - xy1).ToString(fmt3) + " m " + meterDesc + vbTab +
                                            z1.ToString(fmt1) + "m " + " to " + z2.ToString(fmt1) + "m from camera" + vbTab + CStr(rc.pixels) + " pixels" + vbCrLf
@@ -100,7 +100,7 @@ Public Class XR_Projection_Lines : Inherits TaskParent
     Dim options As New Options_Projection
     Public Sub New()
         OptionParent.FindCheckBox("Top View (Unchecked Side View)").Checked = False
-        dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
+        dst3 = New Mat(dst3.Size(), MatType.CV_8U, Scalar.All(0))
         labels = {"", "Lines found in the threshold output", "FeatureLess cells found", "Projections of each of the FeatureLess cells"}
         desc = "Search for surfaces among the FeatureLess regions"
     End Sub
@@ -113,7 +113,7 @@ Public Class XR_Projection_Lines : Inherits TaskParent
         End If
         heat.Run(src)
         If options.topCheck Then dst2 = heat.dst2 Else dst2 = heat.dst3
-        Threshold(dst2, dst1, options.projectionThreshold, 255, cv.ThresholdTypes.Binary)
+        Threshold(dst2, dst1, options.projectionThreshold, 255, ThresholdTypes.Binary)
 
     End Sub
 End Class
@@ -130,7 +130,7 @@ Public Class Projection_ObjectIsolate : Inherits TaskParent
     Public side As New Projection_ViewSide
     Dim options As New Options_Projection
     Public Sub New()
-        dst1 = New cv.Mat(dst1.Size(), cv.MatType.CV_32FC3, 0)
+        dst1 = New Mat(dst1.Size(), MatType.CV_32FC3, 0)
         side.objects.showRectangles = False
         desc = "Using the top down view, create a histogram for Y-values of the largest object."
     End Sub
@@ -142,8 +142,8 @@ Public Class Projection_ObjectIsolate : Inherits TaskParent
         labels(3) = top.labels(2)
 
         If options.index < top.objects.objectList.Count Then
-            Dim lower = New cv.Scalar(top.objects.objectList(options.index)(0), -100, top.objects.objectList(options.index)(2))
-            Dim upper = New cv.Scalar(top.objects.objectList(options.index)(1), +100, top.objects.objectList(options.index)(3))
+            Dim lower = New Scalar(top.objects.objectList(options.index)(0), -100, top.objects.objectList(options.index)(2))
+            Dim upper = New Scalar(top.objects.objectList(options.index)(1), +100, top.objects.objectList(options.index)(3))
                           InRange(task.pointCloud, lower, upper, dst0)
 
             dst1.SetTo(0)
@@ -166,8 +166,8 @@ Public Class Projection_Object : Inherits TaskParent
     Dim side As New Projection_ViewSide
     Public Sub New()
         task.gOptions.DebugSlider.Value = 0 ' pick the biggest object...
-        dst0 = New cv.Mat(dst0.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
-        dst1 = New cv.Mat(dst1.Size(), cv.MatType.CV_32FC3, 0)
+        dst0 = New Mat(dst0.Size(), MatType.CV_8U, Scalar.All(0))
+        dst1 = New Mat(dst1.Size(), MatType.CV_32FC3, 0)
         top.objects.showRectangles = False
         desc = "Using the top down view, create a histogram for Y-values of the largest object."
     End Sub
@@ -178,16 +178,16 @@ Public Class Projection_Object : Inherits TaskParent
 
         Dim index = task.gOptions.DebugSlider.Value
         If index < top.objects.objectList.Count Then
-            Dim lower = New cv.Scalar(top.objects.objectList(index)(0), -100, top.objects.objectList(index)(2))
-            Dim upper = New cv.Scalar(top.objects.objectList(index)(1), +100, top.objects.objectList(index)(3))
-            Dim mask As New cv.Mat
+            Dim lower = New Scalar(top.objects.objectList(index)(0), -100, top.objects.objectList(index)(2))
+            Dim upper = New Scalar(top.objects.objectList(index)(1), +100, top.objects.objectList(index)(3))
+            Dim mask As New Mat
             InRange(task.pointCloud, lower, upper, mask)
 
             Dim rc = top.objects.rclist(task.gOptions.DebugSlider.Value + 1) ' the biggest by default...
             dst0.SetTo(0)
-            Threshold(top.histTop.dst2(rc.rect), dst0(rc.rect), 0, 255, cv.ThresholdTypes.Binary)
-            Dim _cvtInline As New cv.Mat
-            CvtColor(dst3, _cvtInline, cv.ColorConversionCodes.BGR2GRAY)
+            Threshold(top.histTop.dst2(rc.rect), dst0(rc.rect), 0, 255, ThresholdTypes.Binary)
+            Dim _cvtInline As New Mat
+            CvtColor(dst3, _cvtInline, ColorConversionCodes.BGR2GRAY)
             dst0.SetTo(0,_cvtInline)
 
             dst1.SetTo(0)
@@ -246,7 +246,7 @@ Public Class Projection_Cell : Inherits TaskParent
     Dim heatCell As New HeatMap_Basics
     Dim redC As New RedColor_Basics
     Public Sub New()
-        dst0 = New cv.Mat(dst0.Size(), cv.MatType.CV_32FC3, 0)
+        dst0 = New Mat(dst0.Size(), MatType.CV_32FC3, 0)
         If standalone Then task.gOptions.displayDst1.Checked = True
         labels = {"", "Top View projection of the selected cell", "RedColor_Basics output - select a cell to project at right and above", "Side projection of the selected cell"}
         desc = "Create a top and side projection of the selected cell"
@@ -266,12 +266,12 @@ Public Class Projection_Cell : Inherits TaskParent
             task.pointCloud(rc.rect).CopyTo(dst0(rc.rect), rc.mask)
         End If
         heatCell.Run(dst0)
-        Dim maskTop As New cv.Mat
-        CvtColor(heatCell.dst2, maskTop, cv.ColorConversionCodes.BGR2GRAY)
-        Threshold(maskTop, maskTop, 0, 255, cv.ThresholdTypes.Binary)
-        Dim maskSide As New cv.Mat
-        CvtColor(heatCell.dst3, maskSide, cv.ColorConversionCodes.BGR2GRAY)
-        Threshold(maskSide, maskSide, 0, 255, cv.ThresholdTypes.Binary)
+        Dim maskTop As New Mat
+        CvtColor(heatCell.dst2, maskTop, ColorConversionCodes.BGR2GRAY)
+        Threshold(maskTop, maskTop, 0, 255, ThresholdTypes.Binary)
+        Dim maskSide As New Mat
+        CvtColor(heatCell.dst3, maskSide, ColorConversionCodes.BGR2GRAY)
+        Threshold(maskSide, maskSide, 0, 255, ThresholdTypes.Binary)
         dst1.SetTo(white, maskTop)
         dst3.SetTo(white, maskSide)
     End Sub
@@ -302,18 +302,18 @@ Public Class XR_Projection_Derivative : Inherits TaskParent
         labels(2) = heat.labels(2)
         labels(3) = heat.labels(3)
 
-        Dim pc As New cv.Mat(task.pointCloud.Size, cv.MatType.CV_32FC3, 0)
+        Dim pc As New Mat(task.pointCloud.Size, MatType.CV_32FC3, 0)
         task.pointCloud.CopyTo(pc, dst1)
 
         heatDeriv.Run(pc)
-        Dim top As New cv.Mat
-        CvtColor(heatDeriv.dst2, top, cv.ColorConversionCodes.BGR2GRAY)
-        Threshold(top, top, 0, 255, cv.ThresholdTypes.Binary)
-        Dim side As New cv.Mat
-        CvtColor(heatDeriv.dst3, side, cv.ColorConversionCodes.BGR2GRAY)
-        Threshold(side, side, 0, 255, cv.ThresholdTypes.Binary)
-        dst2.SetTo(cv.Scalar.White, top)
-        dst3.SetTo(cv.Scalar.White, side)
+        Dim top As New Mat
+        CvtColor(heatDeriv.dst2, top, ColorConversionCodes.BGR2GRAY)
+        Threshold(top, top, 0, 255, ThresholdTypes.Binary)
+        Dim side As New Mat
+        CvtColor(heatDeriv.dst3, side, ColorConversionCodes.BGR2GRAY)
+        Threshold(side, side, 0, 255, ThresholdTypes.Binary)
+        dst2.SetTo(Scalar.White, top)
+        dst3.SetTo(Scalar.White, side)
     End Sub
 End Class
 
@@ -384,19 +384,19 @@ End Class
 
 
 Public Class Projection_HistSide : Inherits TaskParent
-    Public histogram As New cv.Mat
+    Public histogram As New Mat
     Public Sub New()
         labels = {"", "", "Top view with histogram counts", "ZY (Side View) - mask"}
         desc = "Create a 2D side view for ZY histogram of depth"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If src.Type <> cv.MatType.CV_32FC3 Then src = task.pointCloud
-        CalcHist({src}, task.channelsSide, New cv.Mat, histogram, 2, task.bins2D, task.rangesSide)
+        If src.Type <> MatType.CV_32FC3 Then src = task.pointCloud
+        CalcHist({src}, task.channelsSide, New Mat, histogram, 2, task.bins2D, task.rangesSide)
         histogram.Col(0).SetTo(0)
 
         ConvertScaleAbs(histogram, dst2)
-        Dim _thr1 As New cv.Mat
-        Threshold(histogram, dst3, task.projectionThreshold, 255, cv.ThresholdTypes.Binary)
+        Dim _thr1 As New Mat
+        Threshold(histogram, dst3, task.projectionThreshold, 255, ThresholdTypes.Binary)
         ConvertScaleAbs(dst3, dst3)
     End Sub
 End Class
@@ -407,18 +407,18 @@ End Class
 
 
 Public Class Projection_HistTop : Inherits TaskParent
-    Public histogram As New cv.Mat
+    Public histogram As New Mat
     Public Sub New()
         labels = {"", "", "Top view with histogram counts", "XZ (Top View) - mask"}
         desc = "Create a 2D top view for XZ histogram of depth"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If src.Type <> cv.MatType.CV_32FC3 Then src = task.pointCloud
-        CalcHist({src}, task.channelsTop, New cv.Mat, histogram, 2, task.bins2D, task.rangesTop)
+        If src.Type <> MatType.CV_32FC3 Then src = task.pointCloud
+        CalcHist({src}, task.channelsTop, New Mat, histogram, 2, task.bins2D, task.rangesTop)
         histogram.Row(0).SetTo(0)
 
         ConvertScaleAbs(histogram, dst2)
-        Threshold(histogram, dst3, task.projectionThreshold, 255, cv.ThresholdTypes.Binary)
+        Threshold(histogram, dst3, task.projectionThreshold, 255, ThresholdTypes.Binary)
         ConvertScaleAbs(dst3, dst3)
     End Sub
 End Class

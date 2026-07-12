@@ -3,7 +3,7 @@ Public Class Mesh_Basics : Inherits TaskParent
     Dim mesh As New Mesh_BasicsInput
     Dim feat As New Feature_Basics
     Public Sub New()
-        labels(2) = "Triangles built with each feature point and the specified number of nearest neighbors."
+        labels(2) = "Triangles built with each feature cv.Point and the specified number of nearest neighbors."
         desc = "Build triangles from feature points"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -41,7 +41,7 @@ End Class
 
 Public Class Mesh_BasicsInput : Inherits TaskParent
     Dim knn As New KNN_Basics
-    Public ptList As New List(Of cv.Point2f)
+    Public ptList As New List(Of Point2f)
     Dim options As New Options_Mesh
     Dim feat As New Feature_Basics
     Public Sub New()
@@ -77,9 +77,9 @@ Public Class Mesh_BasicsInput : Inherits TaskParent
 
         dst3.SetTo(0)
         For i = 0 To knn.queries.Count - 1
-        Circle(dst2, knn.queries(i), task.DotSize, cv.Scalar.Red, -1, task.lineType)
+        Circle(dst2, knn.queries(i), task.DotSize, Scalar.Red, -1, task.lineType)
         Circle(dst3, knn.queries(i), task.DotSize, task.highlight, -1, task.lineType)
         Next
-        labels(2) = "Triangles built each input point and its " + CStr(options.nabeCount) + " nearest neighbors."
+        labels(2) = "Triangles built each input cv.Point and its " + CStr(options.nabeCount) + " nearest neighbors."
     End Sub
 End Class

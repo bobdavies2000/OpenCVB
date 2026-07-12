@@ -10,12 +10,12 @@ Public Class Photon_Basics : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         bricks.Run(src)
-        Static lastImage As cv.Mat = src
+        Static lastImage As Mat = src
         Absdiff(src, lastImage, dst1)
 
         dst0 = dst1.Reshape(1, dst1.Rows * 3)
-        CvtColor(dst1, dst1, cv.ColorConversionCodes.BGR2GRAY)
-        Threshold(dst1, dst1, 0, 255, cv.ThresholdTypes.Binary)
+        CvtColor(dst1, dst1, ColorConversionCodes.BGR2GRAY)
+        Threshold(dst1, dst1, 0, 255, ThresholdTypes.Binary)
 
         If CountNonZero(dst0) > 0 Then
             dst2 = dst1.Clone
@@ -72,7 +72,7 @@ Public Class XR_Photon_Test : Inherits TaskParent
             For j = 0 To counts.Length - 1
                 Dim h = (dst2.Height - 1) * (counts(j)(i) \ dst2.Total) ' extra parens to avoid overflow at high res.
                 Dim r = ValidateRect(New cv.Rect(colWidth * i, colTop, colWidth, h))
-                If h > 0 Then dst3(r).SetTo(Choose(j + 1, cv.Scalar.Red, cv.Scalar.LightGreen, cv.Scalar.Blue, cv.Scalar.Yellow))
+                If h > 0 Then dst3(r).SetTo(Choose(j + 1, Scalar.Red, Scalar.LightGreen, Scalar.Blue, Scalar.Yellow))
                 colTop += h
             Next
         Next
@@ -97,20 +97,20 @@ Public Class XR_Photon_Subtraction : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         src = src.Reshape(1, src.Rows * 3)
-        src.ConvertTo(src, cv.MatType.CV_32F)
+        src.ConvertTo(src, MatType.CV_32F)
 
-        Static lastImage As cv.Mat = src
-        Dim subOutput As New cv.Mat
+        Static lastImage As Mat = src
+        Dim subOutput As New Mat
         Subtract(src, lastImage, subOutput)
-        Dim histInput = subOutput.Add(cv.Scalar.All(100)).ToMat
+        Dim histInput = subOutput.Add(Scalar.All(100)).ToMat
 
         hist.Run(histInput)
         dst2 = hist.dst2
 
         subOutput = subOutput.Reshape(3, dst2.Height)
-        Dim _cvt1 As New cv.Mat
-        CvtColor(subOutput, _cvt1, cv.ColorConversionCodes.BGR2GRAY)
-        Threshold(_cvt1, dst1, 0, 255, cv.ThresholdTypes.Binary)
+        Dim _cvt1 As New Mat
+        CvtColor(subOutput, _cvt1, ColorConversionCodes.BGR2GRAY)
+        Threshold(_cvt1, dst1, 0, 255, ThresholdTypes.Binary)
         If CountNonZero(dst1) Then dst3 = dst1.Clone ' occasionally the image returned is identical to the last.  hmmm...
         lastImage = src
     End Sub
@@ -133,27 +133,27 @@ Public Class XR_Photon_Distance3D : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         bricks.Run(src)
 
-        Dim currColors As New List(Of cv.Vec3b)
+        Dim currColors As New List(Of Vec3b)
         For Each roi In task.gridRects
-            currColors.Add(bricks.dst2.Get(Of cv.Vec3b)(roi.Y, roi.X))
+            currColors.Add(bricks.dst2.Get(Of Vec3b)(roi.Y, roi.X))
         Next
 
-        Static lastColors As New List(Of cv.Vec3b)(currColors)
+        Static lastColors As New List(Of Vec3b)(currColors)
         If task.optionsChanged Then
-            lastColors = New List(Of cv.Vec3b)(currColors)
+            lastColors = New List(Of Vec3b)(currColors)
         End If
 
         For i = 0 To currColors.Count - 1
             distances.Add(Distance_Basics.distance3D(lastColors(i), currColors(i)))
         Next
 
-        lastColors = New List(Of cv.Vec3b)(currColors)
+        lastColors = New List(Of Vec3b)(currColors)
         labels(2) = "Min distance 3D = " + distances.Min.ToString(fmt1) + " " +
                         "Average = " + distances.Average.ToString(fmt1) + " " +
                         "max = " + distances.Max.ToString(fmt1) + " " +
                         "Distances count = " + distances.Count.ToString("0,000")
 
-        hist.Run(cv.Mat.FromPixelData(distances.Count, 1, cv.MatType.CV_32F, distances.ToArray))
+        hist.Run(Mat.FromPixelData(distances.Count, 1, MatType.CV_32F, distances.ToArray))
         dst2 = hist.dst2
 
         If distances.Count > 100000 Then

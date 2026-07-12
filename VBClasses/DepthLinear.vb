@@ -4,7 +4,7 @@ Public Class XR_DepthLinear_Basics : Inherits TaskParent
     Dim inputY As New DepthLinear_InputY
     Dim inputZ As New DepthLinear_InputZ
     Public options As New Options_LinearInput
-    Public cloud As New cv.Mat
+    Public cloud As New Mat
     Public Sub New()
         desc = "Confine derivatives to linear values"
     End Sub
@@ -12,7 +12,7 @@ Public Class XR_DepthLinear_Basics : Inherits TaskParent
         options.Run()
 
         inputZ.Run(src)
-        Dim mask As cv.Mat = inputZ.dst2
+        Dim mask As Mat = inputZ.dst2
 
         inputX.Run(src)
         dst2 = inputX.dst2.Clone
@@ -53,7 +53,7 @@ End Class
 Public Class XR_DepthLinear_Visualize : Inherits TaskParent
     Public plotHist As New PlotBar_Basics
     Public roi As New cv.Rect(0, 0, dst2.Width, dst2.Height)
-    Public pc As cv.Mat
+    Public pc As Mat
     Public options As New Options_LinearInput
     Dim mats As New Mat_4to1
     Dim matPlots As New Mat_4to1
@@ -68,7 +68,7 @@ Public Class XR_DepthLinear_Visualize : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
-        Dim r1 As cv.Rect, r2 As cv.Rect
+        Dim r1 as cv.Rect, r2 as cv.Rect
 
         For i = 0 To task.pcSplit.Count - 1
             pc = task.pcSplit(i)(roi)
@@ -84,8 +84,8 @@ Public Class XR_DepthLinear_Visualize : Inherits TaskParent
 
             Absdiff(pc(r2), pc(r1), dst0)
 
-            Resize(dst0, mats.mat(i), roi.Size, 0, 0, cv.InterpolationFlags.Nearest)
-            Threshold(mats.mat(i), dst1, options.delta, 255, cv.ThresholdTypes.Binary)
+            Resize(dst0, mats.mat(i), roi.Size, 0, 0, InterpolationFlags.Nearest)
+            Threshold(mats.mat(i), dst1, options.delta, 255, ThresholdTypes.Binary)
             ConvertScaleAbs(dst1, dst1)
 
             mats.mat(i).SetTo(0, dst1)
@@ -98,8 +98,8 @@ Public Class XR_DepthLinear_Visualize : Inherits TaskParent
                         CStr(CInt(options.delta * 1000)) + " mm's apart in the X, Y, or Z direction"
             plotHist.Run(mats.mat(i))
             matPlots.mat(i) = plotHist.dst2.Clone
-            If i = 2 Then Threshold(mats.mat(2), mats.mat(2), 0, 255, cv.ThresholdTypes.Binary)
-            Normalize(mats.mat(i), mats.mat(i), 0, 255, cv.NormTypes.MinMax)
+            If i = 2 Then Threshold(mats.mat(2), mats.mat(2), 0, 255, ThresholdTypes.Binary)
+            Normalize(mats.mat(i), mats.mat(i), 0, 255, NormTypes.MinMax)
             ConvertScaleAbs(mats.mat(i), mats.mat(i))
         Next
 
@@ -123,7 +123,7 @@ End Class
 Public Class DepthLinear_Input : Inherits TaskParent
     Public plotHist As New PlotBar_Basics
     Public roi As New cv.Rect(0, 0, dst2.Width, dst2.Height)
-    Public pc As cv.Mat
+    Public pc As Mat
     Public options As New Options_LinearInput
     Public Sub New()
         If standalone Then task.gOptions.displayDst1.Checked = True
@@ -140,7 +140,7 @@ Public Class DepthLinear_Input : Inherits TaskParent
         pc = task.pcSplit(options.dimension)(roi)
 
         ' use the pixel below for Y dimension
-        Dim r1 As cv.Rect, r2 As cv.Rect
+        Dim r1 as cv.Rect, r2 as cv.Rect
         If options.dimension <> 1 Or (options.dimension = 2 And options.zy) Then
             r1 = New cv.Rect(0, 0, task.cols - 1, task.rows)
             r2 = New cv.Rect(1, 0, r1.Width, r1.Height)
@@ -151,8 +151,8 @@ Public Class DepthLinear_Input : Inherits TaskParent
 
         Absdiff(pc(r2), pc(r1), dst0)
 
-        Resize(dst0, dst2, roi.Size, 0, 0, cv.InterpolationFlags.Nearest)
-        Threshold(dst2, dst1, options.delta, 255, cv.ThresholdTypes.Binary)
+        Resize(dst0, dst2, roi.Size, 0, 0, InterpolationFlags.Nearest)
+        Threshold(dst2, dst1, options.delta, 255, ThresholdTypes.Binary)
         ConvertScaleAbs(dst1, dst1)
 
         dst2.SetTo(0, dst1)
@@ -217,7 +217,7 @@ Public Class DepthLinear_InputX : Inherits TaskParent
         Public Overrides Sub RunAlg(src As cv.Mat)
             input.Run(src)
             dst2 = input.dst2
-        Threshold(dst2, dst3, 0, 255, cv.ThresholdTypes.Binary)
+        Threshold(dst2, dst3, 0, 255, ThresholdTypes.Binary)
         labels = input.labels
         End Sub
     End Class
@@ -234,7 +234,7 @@ Public Class DepthLinear_InputX : Inherits TaskParent
             plotSLR.plot.minX = 0
             plotSLR.plot.maxX = dst2.Width
             labels(3) = "Move mouse in the depth image above to display line of data."
-            desc = "Isolate and display a line segment through the point cloud data"
+            desc = "Isolate and display a line segment through the cv.Point cloud data"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
@@ -244,10 +244,10 @@ Public Class DepthLinear_InputX : Inherits TaskParent
                 pt = New cv.Point(dst2.Width / 2, dst2.Height / 2)
             End If
 
-            Dim rowCol As cv.Mat, p1 As cv.Point, p2 As cv.Point
+            Dim rowCol As Mat, p1 As cv.Point, p2 As cv.Point
             If options.dimension = 1 Or (options.dimension = 2 And options.zy) Then
                 rowCol = task.pcSplit(options.dimension).Col(pt.X).Clone
-                rowCol = cv.Mat.FromPixelData(1, rowCol.Rows, cv.MatType.CV_32FC1, rowCol.Data)
+                rowCol = Mat.FromPixelData(1, rowCol.Rows, MatType.CV_32FC1, rowCol.Data)
                 p1 = New cv.Point(pt.X, 0)
                 p2 = New cv.Point(pt.X, dst2.Height)
                 plotSLR.plot.minY = -task.yRange
@@ -301,10 +301,10 @@ Public Class DepthLinear_InputX : Inherits TaskParent
 
             Dim outputX As New List(Of Double)
             Dim outputY As New List(Of Double)
-            Dim output As New List(Of cv.Point2d)
+            Dim output As New List(Of Point2d)
 
             For y = 0 To dst2.Height - 1
-                Dim rowCol As cv.Mat = task.pcSplit(0).Row(y)
+                Dim rowCol As Mat = task.pcSplit(0).Row(y)
 
                 Dim dataY(rowCol.Total - 1) As Single
                 rowCol.GetArray(Of Single)(dataY)
@@ -348,11 +348,11 @@ Public Class DepthLinear_InputX : Inherits TaskParent
 
             Dim outputX As New List(Of Double)
             Dim outputY As New List(Of Double)
-            Dim output As New List(Of cv.Point2d)
+            Dim output As New List(Of Point2d)
 
             For x = 0 To dst2.Width - 1
                 Dim rowCol = task.pcSplit(1).Col(x).Clone
-                rowCol = cv.Mat.FromPixelData(1, rowCol.Rows, cv.MatType.CV_32FC1, rowCol.Data)
+                rowCol = Mat.FromPixelData(1, rowCol.Rows, MatType.CV_32FC1, rowCol.Data)
 
                 Dim dataY(rowCol.Total - 1) As Single
                 rowCol.GetArray(Of Single)(dataY)

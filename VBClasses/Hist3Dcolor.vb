@@ -1,10 +1,10 @@
 Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 Imports System.Runtime.InteropServices
 Public Class Hist3Dcolor_Basics : Inherits TaskParent
-    Public histogram As New cv.Mat
-    Public histogram1D As New cv.Mat
+    Public histogram As New Mat
+    Public histogram1D As New Mat
     Public classCount As Integer
-    Public inputMask As New cv.Mat
+    Public inputMask As New Mat
     Public histArray() As Single
     Public simK As New Hist3D_BuildHistogram
     Public alwaysRun As Boolean
@@ -16,14 +16,14 @@ Public Class Hist3Dcolor_Basics : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
 
-        If src.Type <> cv.MatType.CV_8UC3 Then src = task.color
+        If src.Type <> MatType.CV_8UC3 Then src = task.color
         If task.heartBeat Or alwaysRun Or histogram.Width = 0 Then
             Dim bins = options.histogram3DBins
             CalcHist({src}, {0, 1, 2}, inputMask, histogram, 3, {bins, bins, bins}, task.rangesBGR)
 
             ReDim histArray(histogram.Total - 1)
             histogram.GetArray(Of Single)(histArray)
-            histogram1D = cv.Mat.FromPixelData(histogram.Total, 1, cv.MatType.CV_32F, histArray)
+            histogram1D = Mat.FromPixelData(histogram.Total, 1, MatType.CV_32F, histArray)
 
             simK.Run(histogram1D)
             histogram = simK.dst2
@@ -47,7 +47,7 @@ End Class
 
 Public Class Hist3Dcolor_UniqueRGBPixels : Inherits TaskParent
     Dim hColor As New Hist3Dcolor_Basics
-    Public pixels As New List(Of cv.Point3f)
+    Public pixels As New List(Of Point3f)
     Public counts As New List(Of Integer)
     Public Sub New()
         desc = "Get the number of non-zero BGR elements in the 3D color histogram of the current image and their BGR values"
@@ -66,7 +66,7 @@ Public Class Hist3Dcolor_UniqueRGBPixels : Inherits TaskParent
                     If index < hColor.histArray.Count Then
                         Dim val = hColor.histArray(x * bins * bins + y * bins + z)
                         If val > 0 Then
-                            pixels.Add(New cv.Point3f(CInt(255 * x / bins), CInt(255 * y / bins), CInt(255 * z / bins)))
+                            pixels.Add(New Point3f(CInt(255 * x / bins), CInt(255 * y / bins), CInt(255 * z / bins)))
                             counts.Add(val)
                         End If
                     End If
@@ -86,7 +86,7 @@ End Class
 
 Public Class Hist3Dcolor_TopXColors : Inherits TaskParent
     Dim unique As New Hist3Dcolor_UniqueRGBPixels
-    Public topXPixels As New List(Of cv.Point3i)
+    Public topXPixels As New List(Of Point3i)
     Public mapTopX As Integer = 16
     Public Sub New()
         desc = "Get the top 256 of non-zero BGR elements in the 3D color histogram of the current image and their BGR values"
@@ -94,7 +94,7 @@ Public Class Hist3Dcolor_TopXColors : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         unique.Run(src)
 
-        Dim sortedPixels As New SortedList(Of Integer, cv.Point3f)(New compareAllowIdenticalIntegerInverted)
+        Dim sortedPixels As New SortedList(Of Integer, Point3f)(New compareAllowIdenticalIntegerInverted)
         For i = 0 To unique.pixels.Count - 1
             sortedPixels.Add(unique.counts(i), unique.pixels(i))
         Next
@@ -117,9 +117,9 @@ End Class
 
 
 Public Class XR_Hist3Dcolor_ZeroGroups : Inherits TaskParent
-    Public maskInput As New cv.Mat
+    Public maskInput As New Mat
     Public classCount As Integer
-    Public histogram As New cv.Mat
+    Public histogram As New Mat
     Dim options As New Options_Hist3D
     Public Sub New()
         desc = "Breakdown the 3D histogram using the '0' entries as boundaries between clusters."
@@ -179,8 +179,8 @@ End Class
 Public Class Hist3Dcolor_PlotHist1D : Inherits TaskParent
     Dim hColor As New Hist3Dcolor_Basics
     Dim plot As New PlotBar_Basics
-    Public histogram1D As cv.Mat
-    Public histogram As cv.Mat
+    Public histogram1D As Mat
+    Public histogram As Mat
     Public histArray() As Single
     Public Sub New()
         hColor.alwaysRun = True
@@ -233,9 +233,9 @@ End Class
 
 
 Public Class XR_Hist3Dcolor_Basics_CPP : Inherits TaskParent
-    Public histogram As New cv.Mat
+    Public histogram As New Mat
     Public prepareImage As Boolean = True
-    Public histogram1D As New cv.Mat
+    Public histogram1D As New Mat
     Public simK As New Hist3D_BuildHistogram
     Public classCount As Integer
     Dim options As New Options_Hist3D
@@ -245,19 +245,19 @@ Public Class XR_Hist3Dcolor_Basics_CPP : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
 
-        Dim histInput(src.Total - 1) As cv.Vec3b
-        src.GetArray(Of cv.Vec3b)(histInput)
+        Dim histInput(src.Total - 1) As Vec3b
+        src.GetArray(Of Vec3b)(histInput)
 
         Dim handleInput = GCHandle.Alloc(histInput, GCHandleType.Pinned)
         Dim bins = options.histogram3DBins
         Dim imagePtr = Hist3Dcolor_Run(handleInput.AddrOfPinnedObject(), src.Rows, src.Cols, bins)
         handleInput.Free()
 
-        histogram = cv.Mat.FromPixelData(bins, 1, cv.MatType.CV_32F, imagePtr)
+        histogram = Mat.FromPixelData(bins, 1, MatType.CV_32F, imagePtr)
         If prepareImage Then
             Dim histArray(histogram.Total - 1) As Single
             histogram.GetArray(Of Single)(histArray)
-            histogram1D = cv.Mat.FromPixelData(histArray.Count, 1, cv.MatType.CV_32F, histArray)
+            histogram1D = Mat.FromPixelData(histArray.Count, 1, MatType.CV_32F, histArray)
 
             simK.Run(histogram)
             histogram = simK.dst2
@@ -285,7 +285,7 @@ Public Class XR_Hist3Dcolor_Diff : Inherits TaskParent
     Dim diff As New Diff_Basics
     Public Sub New()
         task.fOptions.ColorDiffSlider.Value = 0
-        dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
+        dst3 = New Mat(dst3.Size(), MatType.CV_8U, Scalar.All(0))
         labels(3) = "Unstable pixels in the backprojection below left"
         desc = "Create a mask for the color pixels that are changing with every frame of the Hist3Dcolor_basics."
     End Sub
@@ -308,8 +308,8 @@ End Class
 
 
 Public Class Hist3Dcolor_Vector : Inherits TaskParent
-    Public histogram As New cv.Mat
-    Public inputMask As New cv.Mat
+    Public histogram As New Mat
+    Public inputMask As New Mat
     Public histArray() As Single
     Public simK As New Hist3D_BuildHistogram
     Dim binArray() As Integer

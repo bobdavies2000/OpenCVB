@@ -14,11 +14,11 @@ Public Class XFeatures2D_StarDetector : Inherits TaskParent
         Dim keypoints() = detector.Detect(src)
 
         If keypoints IsNot Nothing Then
-            For Each kpt As cv.KeyPoint In keypoints
+            For Each kpt As KeyPoint In keypoints
                 Dim r As Single = kpt.Size / 2
-                Circle(dst2, kpt.Pt, CInt(Math.Truncate(r)), New cv.Scalar(0, 255, 0), -1, task.lineType)
-                Line(dst2, New cv.Point(kpt.Pt.X + r, kpt.Pt.Y + r), New cv.Point(kpt.Pt.X - r, kpt.Pt.Y - r), New cv.Scalar(0, 255, 0), task.lineWidth, cv.LineTypes.Link8, 0)
-                Line(dst2, New cv.Point(kpt.Pt.X - r, kpt.Pt.Y + r), New cv.Point(kpt.Pt.X + r, kpt.Pt.Y - r), New cv.Scalar(0, 255, 0), task.lineWidth, cv.LineTypes.Link8, 0)
+                Circle(dst2, kpt.Pt, CInt(Math.Truncate(r)), New Scalar(0, 255, 0), -1, task.lineType)
+                Line(dst2, New cv.Point(kpt.Pt.X + r, kpt.Pt.Y + r), New cv.Point(kpt.Pt.X - r, kpt.Pt.Y - r), New Scalar(0, 255, 0), task.lineWidth, LineTypes.Link8, 0)
+                Line(dst2, New cv.Point(kpt.Pt.X - r, kpt.Pt.Y + r), New cv.Point(kpt.Pt.X + r, kpt.Pt.Y - r), New Scalar(0, 255, 0), task.lineWidth, LineTypes.Link8, 0)
             Next kpt
         End If
     End Sub

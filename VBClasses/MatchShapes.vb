@@ -12,11 +12,11 @@ Public Class MatchShapes_Basics : Inherits TaskParent
         OptionParent.findRadio("FloodFill").Enabled = False
         OptionParent.findRadio("ApproxNone").Checked = True
 
-        CvtColor(ImRead(task.homeDir + "Data/star1.png", cv.ImreadModes.Color), dst0, cv.ColorConversionCodes.BGR2GRAY)
-        CvtColor(ImRead(task.homeDir + "Data/star2.png", cv.ImreadModes.Color), dst1, cv.ColorConversionCodes.BGR2GRAY)
+        CvtColor(ImRead(task.homeDir + "Data/star1.png", ImreadModes.Color), dst0, ColorConversionCodes.BGR2GRAY)
+        CvtColor(ImRead(task.homeDir + "Data/star2.png", ImreadModes.Color), dst1, ColorConversionCodes.BGR2GRAY)
         desc = "MatchShapes compares single hull to single hull - pretty tricky"
     End Sub
-    Public Function findBiggestHull(hull As cv.Point()(), maxLen As Integer, maxIndex As Integer, dst As cv.Mat) As Integer
+    Public Function findBiggestHull(hull As cv.Point()(), maxLen As Integer, maxIndex As Integer, dst As Mat) As Integer
         For i = 0 To hull.Length - 1
             If hull(i).Length > maxLen Then
                 maxLen = hull(i).Length
@@ -25,7 +25,7 @@ Public Class MatchShapes_Basics : Inherits TaskParent
         Next
 
         For Each p In hull(maxIndex)
-        Circle(dst, p, task.DotSize, cv.Scalar.Yellow, -1, task.lineType)
+        Circle(dst, p, task.DotSize, Scalar.Yellow, -1, task.lineType)
         Next
         Return maxIndex
     End Function
@@ -34,14 +34,14 @@ Public Class MatchShapes_Basics : Inherits TaskParent
         match.Run()
 
         If standaloneTest() Then
-            CvtColor(dst0, dst2, cv.ColorConversionCodes.GRAY2BGR)
-            CvtColor(dst1, dst3, cv.ColorConversionCodes.GRAY2BGR)
+            CvtColor(dst0, dst2, ColorConversionCodes.GRAY2BGR)
+            CvtColor(dst1, dst3, ColorConversionCodes.GRAY2BGR)
         End If
 
-        Threshold(dst0, dst0, 50, 255, cv.ThresholdTypes.Binary)
+        Threshold(dst0, dst0, 50, 255, ThresholdTypes.Binary)
         hull1 = FindContoursAsArray(dst0, options.retrievalMode, options.ApproximationMode)
 
-        Threshold(dst1, dst1, 127, 255, cv.ThresholdTypes.Binary)
+        Threshold(dst1, dst1, 127, 255, ThresholdTypes.Binary)
         hull2 = FindContoursAsArray(dst1, options.retrievalMode, options.ApproximationMode)
 
         Dim maxLen1 As Integer, maxIndex1 As Integer, maxLen2 As Integer, maxIndex2 As Integer

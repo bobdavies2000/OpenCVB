@@ -3,9 +3,9 @@ Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 Public Class Flood_Basics : Inherits TaskParent
     Implements IDisposable
     Public rcList As New List(Of rcDataOld)
-    Public rcMap As cv.Mat = New cv.Mat(dst2.Size, cv.MatType.CV_32S, 0)
+    Public rcMap As Mat = New Mat(dst2.Size, MatType.CV_32S, 0)
     Public fLess As New FeatureLess_DepthFull
-    Dim lastCenters As New HashSet(Of cv.Rect)
+    Dim lastCenters As New HashSet(of cv.Rect)
     Public Sub New()
         If standalone Then task.gOptions.displayDst1.Checked = True
         cPtr = RedFlood_Open()
@@ -25,15 +25,15 @@ Public Class Flood_Basics : Inherits TaskParent
         handleInput.Free()
 
         Dim rMask = New cv.Rect(1, 1, dst2.Width, dst2.Height)
-        Dim mask = cv.Mat.FromPixelData(dst2.Rows + 2, dst2.Cols + 2, cv.MatType.CV_8U, imagePtr)
+        Dim mask = Mat.FromPixelData(dst2.Rows + 2, dst2.Cols + 2, MatType.CV_8U, imagePtr)
         dst0 = mask(rMask).Clone
 
         Dim classCount = RedFlood_Count(cPtr)
         If classCount = 0 Then Exit Sub ' no data to process.
 
-        Dim rectData = cv.Mat.FromPixelData(classCount, 1, cv.MatType.CV_32SC4, RedFlood_Rects(cPtr))
-        Dim rects(classCount - 1) As cv.Rect
-        rectData.GetArray(Of cv.Rect)(rects)
+        Dim rectData = Mat.FromPixelData(classCount, 1, MatType.CV_32SC4, RedFlood_Rects(cPtr))
+        Dim rects(classCount - 1) as cv.Rect
+        rectData.GetArray(of cv.Rect)(rects)
 
         Dim rcLastList = New List(Of rcDataOld)(rcList)
 
@@ -103,7 +103,7 @@ Public Class Flood_BasicsDemo : Inherits TaskParent
 
         dst1 = src.Clone
 
-        CvtColor(task.edges.dst2, dst3, cv.ColorConversionCodes.GRAY2BGR)
+        CvtColor(task.edges.dst2, dst3, ColorConversionCodes.GRAY2BGR)
 
         dst2.SetTo(white, dst3)
     End Sub
@@ -176,7 +176,7 @@ End Class
 Public Class XR_Flood_Minimal : Inherits TaskParent
     Dim prep As New RedPrep_Basics
     Public Sub New()
-        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
+        dst1 = New Mat(dst1.Size, MatType.CV_8U, 0)
         labels(2) = "Output is from RedPrep_Core. Click any region to floodfill it."
         labels(3) = "Mask resulting region selected by the click."
         desc = "Floodfill the selected segment of the RedPrep image."
@@ -188,12 +188,12 @@ Public Class XR_Flood_Minimal : Inherits TaskParent
         If task.mouseClickFlag Then
             Dim rect As New cv.Rect
             Dim pt = task.clickPoint
-            Dim mask = New cv.Mat(New cv.Size(dst2.Width + 2, dst2.Height + 2), cv.MatType.CV_8U, 0)
-            Dim flags = cv.FloodFillFlags.FixedRange Or (255 << 8) Or cv.FloodFillFlags.MaskOnly
+            Dim mask = New Mat(New Size(dst2.Width + 2, dst2.Height + 2), MatType.CV_8U, 0)
+            Dim flags = FloodFillFlags.FixedRange Or (255 << 8) Or FloodFillFlags.MaskOnly
             Dim count = FloodFill(dst2, mask, pt, 255, rect, 0, 0, flags)
             dst1.SetTo(0)
             dst3 = mask(New cv.Rect(1, 1, dst2.Width, dst2.Height)).Clone
-            Rectangle(dst1, rect, cv.Scalar.All(255), task.lineWidth)
+            Rectangle(dst1, rect, Scalar.All(255), task.lineWidth)
         End If
     End Sub
 End Class
@@ -239,7 +239,7 @@ End Class
 
 
 Public Class Flood_BasicsMask : Inherits TaskParent
-    Public inputRemoved As New cv.Mat
+    Public inputRemoved As New Mat
     Public showSelected As Boolean = True
     Public redC As New RedColor_Basics
     Dim color8U As New Color8U_Basics
@@ -285,8 +285,8 @@ Public Class Flood_FeatureLess : Inherits TaskParent
         dst3 = redC.dst2
         labels(3) = redC.labels(2)
 
-        Dim _edges_cvt As New cv.Mat
-        CvtColor(dst2, _edges_cvt, cv.ColorConversionCodes.BGR2GRAY)
+        Dim _edges_cvt As New Mat
+        CvtColor(dst2, _edges_cvt, ColorConversionCodes.BGR2GRAY)
         edges.Run(_edges_cvt)
         dst3.SetTo(white, edges.dst2)
 

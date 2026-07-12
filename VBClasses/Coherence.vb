@@ -29,18 +29,18 @@ Public Class Coherence_Basics : Inherits TaskParent
         dst2 = src.Clone()
         src = src(srcRect)
 
-        Dim eigen As New cv.Mat
+        Dim eigen As New Mat
         For i = 0 To 3
             CornerEigenValsAndVecs(src, eigen, options.str_sigma, options.eigenkernelsize)
             Dim splitMats() = Split(eigen)
             Dim x = splitMats(2), y = splitMats(3)
 
-            Dim gxx As New cv.Mat, gxy As New cv.Mat, gyy As New cv.Mat
-            Sobel(src, gxx, cv.MatType.CV_32F, 2, 0, options.sigma)
-            Sobel(src, gxy, cv.MatType.CV_32F, 1, 1, options.sigma)
-            Sobel(src, gyy, cv.MatType.CV_32F, 0, 2, options.sigma)
+            Dim gxx As New Mat, gxy As New Mat, gyy As New Mat
+            Sobel(src, gxx, MatType.CV_32F, 2, 0, options.sigma)
+            Sobel(src, gxy, MatType.CV_32F, 1, 1, options.sigma)
+            Sobel(src, gyy, MatType.CV_32F, 0, 2, options.sigma)
 
-            Dim tmpX As New cv.Mat, tmpXY As New cv.Mat, tmpY As New cv.Mat
+            Dim tmpX As New Mat, tmpXY As New Mat, tmpY As New Mat
             Multiply(x, x, tmpX)
             Multiply(tmpX, gxx, tmpX)
             Multiply(x, y, tmpXY)
@@ -50,24 +50,24 @@ Public Class Coherence_Basics : Inherits TaskParent
             Multiply(y, y, tmpY)
             Multiply(tmpY, gyy, tmpY)
 
-            Dim gvv As New cv.Mat
+            Dim gvv As New Mat
             gvv = tmpX + tmpXY + tmpY
 
-            Dim mask As New cv.Mat
-            Threshold(gvv, mask, 0, 255, cv.ThresholdTypes.BinaryInv)
+            Dim mask As New Mat
+            Threshold(gvv, mask, 0, 255, ThresholdTypes.BinaryInv)
             ConvertScaleAbs(mask, mask)
 
-            Dim erodeMat As New cv.Mat
-            Erode(src, erodeMat, New cv.Mat)
-            Dim dilateMat As New cv.Mat
-            Dilate(src, dilateMat, New cv.Mat)
+            Dim erodeMat As New Mat
+            Erode(src, erodeMat, New Mat)
+            Dim dilateMat As New Mat
+            Dilate(src, dilateMat, New Mat)
 
             Dim imgl = erodeMat
             dilateMat.CopyTo(imgl, mask)
             src = src * (1 - options.blend) + imgl * options.blend
         Next
         dst2(srcRect) = src
-        Rectangle(dst2, srcRect, cv.Scalar.Yellow, 2)
+        Rectangle(dst2, srcRect, Scalar.Yellow, 2)
         dst3.SetTo(0)
     End Sub
 End Class

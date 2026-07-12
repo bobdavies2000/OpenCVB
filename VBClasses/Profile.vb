@@ -1,11 +1,11 @@
 ﻿Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 Public Class Profile_Basics : Inherits TaskParent
-    Public ptLeft As cv.Point3f, ptRight As cv.Point3f, ptTop As cv.Point3f, ptBot As cv.Point3f, ptFront As cv.Point3f, ptBack As cv.Point3f
+    Public ptLeft As Point3f, ptRight As Point3f, ptTop As Point3f, ptBot As Point3f, ptFront As Point3f, ptBack As Point3f
     Public cornerNames As New List(Of String)({"   First (white)", "   Left (light blue)", "   Right (red)", "   Top (green)",
                                                        "   Bottom (white)", "   Front (yellow)", "   Back (blue)"})
-    Public cornerColors As New List(Of cv.Scalar)({white, cv.Scalar.LightBlue, cv.Scalar.Red, cv.Scalar.Green,
-                                                           white, cv.Scalar.Yellow, cv.Scalar.Blue})
-    Public corners3D As New List(Of cv.Point3f)
+    Public cornerColors As New List(Of Scalar)({white, Scalar.LightBlue, Scalar.Red, Scalar.Green,
+                                                           white, Scalar.Yellow, Scalar.Blue})
+    Public corners3D As New List(Of Point3f)
     Public corners As New List(Of cv.Point)
     Public cornersRaw As New List(Of cv.Point)
     Public redC As New RedCloud_Basics
@@ -13,7 +13,7 @@ Public Class Profile_Basics : Inherits TaskParent
         If standalone Then task.gOptions.displayDst1.Checked = True
         desc = "Find the left/right, top/bottom, and near/far sides of a cell"
     End Sub
-    Private Function point3fToString(v As cv.Point3f) As String
+    Private Function point3fToString(v As Point3f) As String
         Return v.X.ToString(fmt3) + vbTab + v.Y.ToString(fmt3) + vbTab + v.Z.ToString(fmt3)
     End Function
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -32,17 +32,17 @@ Public Class Profile_Basics : Inherits TaskParent
         If rc.contour.Count < 4 Then Exit Sub
 
         dst3.SetTo(0)
-        DrawTour(dst3(rc.rect), rc.contour, cv.Scalar.Yellow)
+        DrawTour(dst3(rc.rect), rc.contour, Scalar.Yellow)
 
         Dim sortLeft As New SortedList(Of Integer, Integer)(New compareAllowIdenticalInteger)
         Dim sortTop As New SortedList(Of Integer, Integer)(New compareAllowIdenticalInteger)
         Dim sortFront As New SortedList(Of Integer, Integer)(New compareAllowIdenticalInteger)
         Dim sort2Dleft As New SortedList(Of Integer, Integer)(New compareAllowIdenticalInteger)
         Dim sort2Dtop As New SortedList(Of Integer, Integer)(New compareAllowIdenticalInteger)
-        rc.contour3D = New List(Of cv.Point3f)
+        rc.contour3D = New List(Of Point3f)
         For i = 0 To rc.contour.Count - 1
             Dim pt = rc.contour(i)
-            Dim vec = task.pointCloud(rc.rect).Get(Of cv.Point3f)(pt.Y, pt.X)
+            Dim vec = task.pointCloud(rc.rect).Get(Of Point3f)(pt.Y, pt.X)
             If Single.IsNaN(vec.Z) Or Single.IsInfinity(vec.Z) Then Continue For
             If vec.Z Then
                 sortLeft.Add(pt.X, i)
@@ -64,9 +64,9 @@ Public Class Profile_Basics : Inherits TaskParent
         corners.Clear()
         cornersRaw.Clear()
 
-        corners.Add(New cv.Point(rc.rect.X + rc.contour(0).X, rc.rect.Y + rc.contour(0).Y)) ' show the first contour point...
-        cornersRaw.Add(rc.contour(0)) ' show the first contour point...
-        corners3D.Add(task.pointCloud.Get(Of cv.Point3f)(rc.rect.Y + rc.contour(0).Y, rc.rect.X + rc.contour(0).X))
+        corners.Add(New cv.Point(rc.rect.X + rc.contour(0).X, rc.rect.Y + rc.contour(0).Y)) ' show the first contour cv.Point...
+        cornersRaw.Add(rc.contour(0)) ' show the first contour cv.Point...
+        corners3D.Add(task.pointCloud.Get(Of Point3f)(rc.rect.Y + rc.contour(0).Y, rc.rect.X + rc.contour(0).X))
 
         For i As Integer = 0 To 6 - 1
             Dim index As Integer = Choose(i + 1, 0, sortLeft.Count - 1, 0, sortTop.Count - 1, 0, sortFront.Count - 1)
@@ -75,7 +75,7 @@ Public Class Profile_Basics : Inherits TaskParent
                 Dim pt = rc.contour(ptList.ElementAt(index).Value)
                 cornersRaw.Add(pt)
                 corners.Add(New cv.Point(rc.rect.X + pt.X, rc.rect.Y + pt.Y))
-                corners3D.Add(task.pointCloud(rc.rect).Get(Of cv.Point3f)(pt.Y, pt.X))
+                corners3D.Add(task.pointCloud(rc.rect).Get(Of Point3f)(pt.Y, pt.X))
             End If
         Next
 
@@ -162,11 +162,11 @@ Public Class XR_Profile_Derivative : Inherits TaskParent
         task.trueData.Clear()
         dst3.SetTo(0)
 
-        Dim color As cv.Scalar, near = cv.Scalar.Yellow, far = cv.Scalar.Blue
+        Dim color As Scalar, near = Scalar.Yellow, far = Scalar.Blue
         If rc.mapID > 0 Then
             For i = 0 To rc.contour.Count - 1
                 Dim pt = rc.contour(i)
-                Dim vec = task.pointCloud(rc.rect).Get(Of cv.Point3f)(pt.Y, pt.X)
+                Dim vec = task.pointCloud(rc.rect).Get(Of Point3f)(pt.Y, pt.X)
                 pt = New cv.Point(pt.X * rsizeX + offset, pt.Y * rsizeY + offset)
                 Dim mmZ = GetMinMax(task.pcSplit(2)(rc.rect), rc.mask)
                 Dim t = If(mmZ.maxVal = 0, 0, (vec.Z - mmZ.minVal) / (mmZ.maxVal - mmZ.minVal))
@@ -174,7 +174,7 @@ Public Class XR_Profile_Derivative : Inherits TaskParent
                     Dim b = ((1 - t) * near(0) + t * far(0))
                     Dim g = ((1 - t) * near(1) + t * far(1))
                     Dim r = ((1 - t) * near(2) + t * far(2))
-                    color = New cv.Scalar(b, g, r)
+                    color = New Scalar(b, g, r)
                 Else
                     color = white
                 End If
@@ -189,7 +189,7 @@ Public Class XR_Profile_Derivative : Inherits TaskParent
             Next
         End If
 
-        strOut = "Points are presented clockwise starting at White dot (leftmost top point)" + vbCrLf +
+        strOut = "Points are presented clockwise starting at White dot (leftmost top cv.Point)" + vbCrLf +
                              "yellow = closer, blue = farther, " + vbCrLf + vbCrLf + sides.strOut
 
         dst1 = sides.dst3.Clone
@@ -264,7 +264,7 @@ Public Class Profile_ConcentrationTop : Inherits TaskParent
             SetTrueText("The selected cell has no 3D data.  The 3D data can only be computed from cells with depth data.", 1)
             Exit Sub
         End If
-        Dim vecMat As cv.Mat = cv.Mat.FromPixelData(rc.contour3D.Count, 1, cv.MatType.CV_32FC3, rc.contour3D.ToArray)
+        Dim vecMat As Mat = Mat.FromPixelData(rc.contour3D.Count, 1, MatType.CV_32FC3, rc.contour3D.ToArray)
 
         ySlider.Value += 1
         rotate.Run(src)
@@ -273,9 +273,9 @@ Public Class Profile_ConcentrationTop : Inherits TaskParent
 
         heat.Run(vecMat)
         If options.topView Then
-            Threshold(heat.dst0, dst1, 0, 255, cv.ThresholdTypes.Binary)
+            Threshold(heat.dst0, dst1, 0, 255, ThresholdTypes.Binary)
         Else
-            Threshold(heat.dst1, dst1, 0, 255, cv.ThresholdTypes.Binary)
+            Threshold(heat.dst1, dst1, 0, 255, ThresholdTypes.Binary)
         End If
 
         Dim count = CountNonZero(dst1)
@@ -333,7 +333,7 @@ Public Class XR_Profile_Kalman : Inherits TaskParent
 
         If rc.mapID > 0 Then
             dst3.SetTo(0)
-            DrawTour(dst3(rc.rect), rc.contour, cv.Scalar.Yellow)
+            DrawTour(dst3(rc.rect), rc.contour, Scalar.Yellow)
             For i = 0 To sides.corners.Count - 1
                 Dim pt = New cv.Point(CInt(kalman.kOutput(i * 2)), CInt(kalman.kOutput(i * 2 + 1)))
                 Circle(dst3, pt, task.DotSize + 2, sides.cornerColors(i), -1, task.lineType)

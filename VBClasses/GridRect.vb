@@ -1,19 +1,19 @@
 Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 Public Class GridRect_Basics : Inherits TaskParent
-    Public rects As New List(Of cv.Rect)
+    Public rects As New List(of cv.Rect)
     Public meanList As New List(Of Single)
     Public stdevList As New List(Of Single)
     Public stdevAverage As Single
     Public Sub New()
         task.gOptions.GridSlider.Value = dst2.Width \ 40 ' arbitrary but the goal is to get a reasonable (< 500) number of r's.
-        dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
+        dst3 = New Mat(dst3.Size(), MatType.CV_8U, Scalar.All(0))
         desc = "Compute the stdev for each r.  If small (<10), mark as featureLess."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst1 = If(src.Channels() <> 1, task.gray, src.Clone)
         stdevList.Clear()
         meanList.Clear()
-        Dim mean As cv.Scalar, stdev As cv.Scalar
+        Dim mean As Scalar, stdev As Scalar
         For Each r In task.gridRects
             MeanStdDev(dst1(r), mean, stdev)
             stdevList.Add(stdev(0))
@@ -51,14 +51,14 @@ End Class
 Public Class XR_GridRect_Color : Inherits TaskParent
     Public Sub New()
         task.gOptions.GridSlider.Value = dst2.Width \ 40 ' arbitrary but the goal is to get a reasonable (< 500) number of r's.
-        dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
+        dst3 = New Mat(dst3.Size(), MatType.CV_8U, Scalar.All(0))
         desc = "Compute the stdev for each r.  If small (<10), mark as featureLess."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         Dim stdevList0 As New List(Of Single)
         Dim stdevList1 As New List(Of Single)
         Dim stdevList2 As New List(Of Single)
-        Dim mean As cv.Scalar, stdev As cv.Scalar
+        Dim mean As Scalar, stdev As Scalar
         For Each r In task.gridRects
             MeanStdDev(src(r), mean, stdev)
             stdevList0.Add(stdev(0))
@@ -78,8 +78,8 @@ Public Class XR_GridRect_Color : Inherits TaskParent
         Next
         labels(3) = "Stdev average X/Y/Z = " + CInt(stdevList0.Average).ToString + ", " + CInt(stdevList1.Average).ToString + ", " + CInt(stdevList2.Average).ToString
 
-        Dim _cvtGrid As New cv.Mat
-        CvtColor(dst3, _cvtGrid, cv.ColorConversionCodes.GRAY2BGR)
+        Dim _cvtGrid As New Mat
+        CvtColor(dst3, _cvtGrid, ColorConversionCodes.GRAY2BGR)
         dst2 = ShowAddweighted(_cvtGrid, src, labels(2))
     End Sub
 End Class
@@ -92,13 +92,13 @@ End Class
 
 Public Class GridRect_Sorted : Inherits TaskParent
     Public sortedStd As New SortedList(Of Single, cv.Rect)(New compareAllowIdenticalSingle)
-    Public bgrList As New List(Of cv.Vec3b)
-    Public grList As New List(Of cv.Rect)
+    Public bgrList As New List(Of Vec3b)
+    Public grList As New List(of cv.Rect)
     Public categories() As Integer
     Public options As New Options_StdevGrid
     Public maskVal As Integer = 255
     Public Sub New()
-        dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
+        dst2 = New Mat(dst2.Size(), MatType.CV_8U, Scalar.All(0))
         task.gOptions.GridSlider.Value = dst2.Width \ 40 ' arbitrary but the goal is to get a reasonable (< 500) number of r's.
         If standalone = False Then maskVal = 1
         labels(2) = "Use the AddWeighted slider to observe where stdev is above average."
@@ -107,7 +107,7 @@ Public Class GridRect_Sorted : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
 
-        Dim meanS As cv.Scalar, stdev As cv.Scalar
+        Dim meanS As Scalar, stdev As Scalar
         sortedStd.Clear()
         bgrList.Clear()
         grList.Clear()
@@ -116,7 +116,7 @@ Public Class GridRect_Sorted : Inherits TaskParent
             MeanStdDev(src(r), meanS, stdev)
             sortedStd.Add(stdev(0) + stdev(1) + stdev(2), r)
             Dim colorIndex As Integer = 1
-            Dim mean As cv.Vec3i = New cv.Vec3i(CInt(meanS(0)), CInt(meanS(1)), CInt(meanS(2)))
+            Dim mean As Vec3i = New Vec3i(CInt(meanS(0)), CInt(meanS(1)), CInt(meanS(2)))
             If mean(0) < options.minThreshold And mean(1) < options.minThreshold And mean(2) < options.minThreshold Then
                 colorIndex = 1
             ElseIf mean(0) > options.maxThreshold And mean(1) > options.maxThreshold And mean(2) > options.maxThreshold Then
@@ -137,7 +137,7 @@ Public Class GridRect_Sorted : Inherits TaskParent
                 colorIndex = 9
             End If
 
-            Dim color As cv.Vec3b = Choose(colorIndex, black.ToVec3b, white.ToVec3b, grayColor.ToVec3b,
+            Dim color As Vec3b = Choose(colorIndex, black.ToVec3b, white.ToVec3b, grayColor.ToVec3b,
                                                 yellow.ToVec3b, purple.ToVec3b, teal.ToVec3b,
                                                 blue.ToVec3b, green.ToVec3b, red.ToVec3b)
             categories(colorIndex) += 1
@@ -158,8 +158,8 @@ Public Class GridRect_Sorted : Inherits TaskParent
         Next
 
         If standaloneTest() Then
-            Dim _cvtGrid3 As New cv.Mat
-            CvtColor(dst2, _cvtGrid3, cv.ColorConversionCodes.GRAY2BGR)
+            Dim _cvtGrid3 As New Mat
+            CvtColor(dst2, _cvtGrid3, ColorConversionCodes.GRAY2BGR)
             dst3 = ShowAddweighted(_cvtGrid3, src, labels(3))
         End If
 
@@ -220,14 +220,14 @@ Public Class XR_GridRect_CorrelationMotion : Inherits TaskParent
         gather.Run(dst1)
         dst2 = gather.dst2
 
-        Static lastImage As cv.Mat = dst1.Clone
+        Static lastImage As Mat = dst1.Clone
 
-        Dim correlationMat As New cv.Mat
+        Dim correlationMat As New Mat
         Dim motionCount As Integer
         For i = 0 To gather.stdevList.Count - 1
             Dim r = task.gridRects(i)
             If gather.stdevList(i) >= gather.stdevAverage Then
-                MatchTemplate(dst1(r), lastImage(r), correlationMat, cv.TemplateMatchModes.CCoeffNormed)
+                MatchTemplate(dst1(r), lastImage(r), correlationMat, TemplateMatchModes.CCoeffNormed)
                 Dim corr = correlationMat.Get(Of Single)(0, 0)
                 If corr < task.fCorrThreshold Then SetTrueText(corr.ToString(fmt1), r.TopLeft)
                 If corr < task.fCorrThreshold Then motionCount += 1
@@ -250,7 +250,7 @@ End Class
 
 
 Public Class GridRect_LowStdev : Inherits TaskParent
-    Public rects As New List(Of cv.Rect)
+    Public rects As New List(of cv.Rect)
     Dim gather As New GridRect_Basics
     Public Sub New()
         desc = "Isolate the r's with low stdev"
@@ -292,24 +292,24 @@ Public Class XR_GridRect_LowStdevCorrelation : Inherits TaskParent
         gather.Run(dst1)
         dst2 = gather.dst2
 
-        Static lastImage As cv.Mat = dst1.Clone
+        Static lastImage As Mat = dst1.Clone
 
-        Dim correlationMat As New cv.Mat
+        Dim correlationMat As New Mat
         correlations.Clear()
         For Each roi In gather.rects
-            MatchTemplate(dst1(roi), lastImage(roi), correlationMat, cv.TemplateMatchModes.CCoeffNormed)
+            MatchTemplate(dst1(roi), lastImage(roi), correlationMat, TemplateMatchModes.CCoeffNormed)
             Dim corr = correlationMat.Get(Of Single)(0, 0)
             correlations.Add(corr)
         Next
 
         Static saveCorrs As New List(Of Single)(correlations)
-        Static saveRects As New List(Of cv.Rect)(gather.rects)
+        Static saveRects As New List(of cv.Rect)(gather.rects)
         If task.heartBeat Then
             saveCorrs = New List(Of Single)(correlations)
-            saveRects = New List(Of cv.Rect)(gather.rects)
+            saveRects = New List(of cv.Rect)(gather.rects)
 
             saveStdev.Clear()
-            Dim mean As cv.Scalar, stdev As cv.Scalar
+            Dim mean As Scalar, stdev As Scalar
             For i = 0 To saveRects.Count - 1
                 MeanStdDev(dst1(saveRects(i)), mean, stdev)
                 saveStdev.Add(stdev(0))
@@ -370,11 +370,11 @@ Public Class XR_GridRect_LRClick : Inherits TaskParent
         options.Run()
 
         dst0 = src.Clone
-        Dim _cvtInline As New cv.Mat
-        CvtColor(task.rightView, _cvtInline, cv.ColorConversionCodes.GRAY2BGR)
+        Dim _cvtInline As New Mat
+        CvtColor(task.rightView, _cvtInline, ColorConversionCodes.GRAY2BGR)
         dst3 = If(task.rightView.Channels() <> 3,_cvtInline, task.rightView.Clone)
         src = task.gray
-        If task.rightView.Channels() <> 1 Then CvtColor(task.rightView, task.rightView, cv.ColorConversionCodes.BGR2GRAY)
+        If task.rightView.Channels() <> 1 Then CvtColor(task.rightView, task.rightView, ColorConversionCodes.BGR2GRAY)
 
         gather.Run(src)
         dst2 = gather.dst2
@@ -387,12 +387,12 @@ Public Class XR_GridRect_LRClick : Inherits TaskParent
         Dim r = task.gridRects(gridIndex)
         Rectangle(dst2, r, white, task.lineWidth)
 
-        Dim correlationMat As New cv.Mat
+        Dim correlationMat As New Mat
         Dim corr As New List(Of Single)
         For j = 0 To r.X - 1
             Dim rect = New cv.Rect(j, r.Y, r.Width, r.Height)
             MatchTemplate(src(rect), task.rightView(rect), correlationMat,
-                                         cv.TemplateMatchModes.CCoeffNormed)
+                                         TemplateMatchModes.CCoeffNormed)
             corr.Add(correlationMat.Get(Of Single)(0, 0))
         Next
 
@@ -409,7 +409,7 @@ Public Class XR_GridRect_LRClick : Inherits TaskParent
                 If task.heartBeat Then
                     strOut = "CoeffNormed max correlation = " + maxCorr.ToString(fmt3) + vbCrLf
                     strOut += "Left Mean = " + gather.meanList(gridIndex).ToString(fmt3) + " Left stdev = " + gather.stdevList(gridIndex).ToString(fmt3) + vbCrLf
-                    Dim mean As cv.Scalar, stdev As cv.Scalar
+                    Dim mean As Scalar, stdev As Scalar
                     MeanStdDev(dst3(rectRight), mean, stdev)
                     strOut += "Right Mean = " + mean(0).ToString(fmt3) + " Right stdev = " + stdev(0).ToString(fmt3) + vbCrLf
                     strOut += "Right rectangle is offset " + CStr(offset) + " pixels from the left image rectangle"
@@ -446,23 +446,23 @@ Public Class XR_GridRect_LRAll : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
 
-        Dim _cvtInline As New cv.Mat
-        CvtColor(task.rightView, _cvtInline, cv.ColorConversionCodes.GRAY2BGR)
+        Dim _cvtInline As New Mat
+        CvtColor(task.rightView, _cvtInline, ColorConversionCodes.GRAY2BGR)
         dst3 = If(task.rightView.Channels() <> 3,_cvtInline, task.rightView.Clone)
         src = task.gray
-        If task.rightView.Channels() <> 1 Then CvtColor(task.rightView, task.rightView, cv.ColorConversionCodes.BGR2GRAY)
+        If task.rightView.Channels() <> 1 Then CvtColor(task.rightView, task.rightView, ColorConversionCodes.BGR2GRAY)
 
         gather.Run(src)
         dst2 = gather.dst2
 
         If gather.rects.Count = 0 Then Exit Sub
 
-        Dim correlationMat As New cv.Mat
+        Dim correlationMat As New Mat
         sortedRects.Clear()
         For Each roi In gather.rects
             If roi.X = 0 Then Continue For
             Dim r = New cv.Rect(0, roi.Y, roi.X, roi.Height)
-            MatchTemplate(src(roi), task.rightView(r), correlationMat, cv.TemplateMatchModes.CCoeffNormed)
+            MatchTemplate(src(roi), task.rightView(r), correlationMat, TemplateMatchModes.CCoeffNormed)
             Dim mm = vbc.GetMinMax(correlationMat)
             If mm.maxVal >= task.fCorrThreshold Then sortedRects.Add(mm.maxVal, New cv.Rect(mm.maxLoc.X, roi.Y, roi.Width, roi.Height))
         Next

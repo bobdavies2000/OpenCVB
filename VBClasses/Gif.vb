@@ -66,7 +66,7 @@ Public Class Gif_OpenCVB : Inherits TaskParent
         End Using
         Return screenshot
     End Function
-    Public Function GetWindowImage(ByVal WindowHandle As IntPtr, ByVal rect As cv.Rect) As Bitmap
+    Public Function GetWindowImage(ByVal WindowHandle As IntPtr, ByVal rect as cv.Rect) As Bitmap
         Dim b As New Bitmap(rect.Width, rect.Height, Imaging.PixelFormat.Format24bppRgb)
 
         Using img As Graphics = Graphics.FromImage(b)
@@ -90,30 +90,30 @@ Public Class Gif_OpenCVB : Inherits TaskParent
                     If task.gOptions.CrossHairs.Checked Then Gravity_Basics_TA.showVectors(task.color)
                     Dim dst = If(task.gOptions.displayDst0.Checked, dst0, task.color)
                     If dst.Channels() = 1 Then
-                        CvtColor(dst, dst, cv.ColorConversionCodes.GRAY2BGR)
+                        CvtColor(dst, dst, ColorConversionCodes.GRAY2BGR)
                     End If
                     nextBMP = New Bitmap(dst.Width, dst.Height, Imaging.PixelFormat.Format24bppRgb)
                     cvext.BitmapConverter.ToBitmap(dst, nextBMP)
                 Case gifTypes.gifdst1
                     Dim dst = If(task.gOptions.displayDst1.Checked, dst1, task.depthRGB)
                     If dst.Channels() = 1 Then
-                        CvtColor(dst, dst, cv.ColorConversionCodes.GRAY2BGR)
+                        CvtColor(dst, dst, ColorConversionCodes.GRAY2BGR)
                     End If
                     nextBMP = New Bitmap(dst.Width, dst.Height, Imaging.PixelFormat.Format24bppRgb)
                     cvext.BitmapConverter.ToBitmap(dst, nextBMP)
                 Case gifTypes.gifdst2
-                    If task.gOptions.ShowGrid.Checked Then task.dstList(2).SetTo(cv.Scalar.White, task.gridMask)
+                    If task.gOptions.ShowGrid.Checked Then task.dstList(2).SetTo(Scalar.White, task.gridMask)
                     If task.dstList(2).Channels() = 1 Then
-                        Dim _cvtInline As New cv.Mat
-                        CvtColor(task.dstList(2), _cvtInline, cv.ColorConversionCodes.GRAY2BGR)
+                        Dim _cvtInline As New Mat
+                        CvtColor(task.dstList(2), _cvtInline, ColorConversionCodes.GRAY2BGR)
                         task.dstList(2) =_cvtInline
                     End If
                     nextBMP = New Bitmap(task.workRes.Width, task.workRes.Height, Imaging.PixelFormat.Format24bppRgb)
                     cvext.BitmapConverter.ToBitmap(task.dstList(2), nextBMP)
                 Case gifTypes.gifdst3
                     If task.dstList(3).Channels() = 1 Then
-                        Dim _cvtInline As New cv.Mat
-                        CvtColor(task.dstList(3), _cvtInline, cv.ColorConversionCodes.GRAY2BGR)
+                        Dim _cvtInline As New Mat
+                        CvtColor(task.dstList(3), _cvtInline, ColorConversionCodes.GRAY2BGR)
                         task.dstList(3) =_cvtInline
                     End If
                     nextBMP = New Bitmap(task.workRes.Width, task.workRes.Height, Imaging.PixelFormat.Format24bppRgb)
@@ -123,7 +123,7 @@ Public Class Gif_OpenCVB : Inherits TaskParent
                     nextBMP = New Bitmap(r.Width, r.Height, Imaging.PixelFormat.Format24bppRgb)
                     Dim snapshot As Bitmap = GetWindowImage(task.main_hwnd, r)
                     Dim snap = cvext.BitmapConverter.ToMat(snapshot)
-                    CvtColor(snap, snap, cv.ColorConversionCodes.BGRA2BGR)
+                    CvtColor(snap, snap, ColorConversionCodes.BGRA2BGR)
                     cvext.BitmapConverter.ToBitmap(snap, nextBMP)
                 Case gifTypes.openGLwindow
                     Dim r = New Rectangle(0, 0, task.sharpGL.Width, task.sharpGL.Height)
@@ -135,8 +135,8 @@ Public Class Gif_OpenCVB : Inherits TaskParent
                 Case gifTypes.EntireScreen
                     nextBMP = CaptureScreen()
                     Dim snap = cvext.BitmapConverter.ToMat(nextBMP)
-                    ' snap = snap.CvtColor(cv.ColorConversionCodes.BGRA2BGR)
-                    ' snap = snap.Resize(New cv.Size(snap.Width / 3, snap.Height / 3))
+                    ' snap = snap.CvtColor(ColorConversionCodes.BGRA2BGR)
+                    ' snap = snap.Resize(New Size(snap.Width / 3, snap.Height / 3))
                     cvext.BitmapConverter.ToBitmap(snap, nextBMP)
             End Select
             task.gifImages.Add(nextBMP)

@@ -29,10 +29,10 @@ Public Class AlgorithmTask : Implements IDisposable
         treeView = New TreeViewForm
 
         cpu.callTrace = New List(Of String)
-        gravityCloud = New cv.Mat(workRes, cv.MatType.CV_32FC3, 0)
-        noDepthMask = New cv.Mat(workRes, cv.MatType.CV_8U, 0)
-        depthmask = New cv.Mat(workRes, cv.MatType.CV_8U, 0)
-        foregroundMask = New cv.Mat(workRes, cv.MatType.CV_8U, 0)
+        gravityCloud = New Mat(workRes, MatType.CV_32FC3, 0)
+        noDepthMask = New Mat(workRes, MatType.CV_8U, 0)
+        depthmask = New Mat(workRes, MatType.CV_8U, 0)
+        foregroundMask = New Mat(workRes, MatType.CV_8U, 0)
 
         colorizer = New DepthColorizer_Basics_TA
         gravityMatrix = New IMU_GMatrix_TA
@@ -227,22 +227,22 @@ Public Class AlgorithmTask : Implements IDisposable
         Dim pt = mouseMovePoint
         Dim tag = task.mousePicTag
         Try
-            mousePixelValue = dstList(tag).Get(Of cv.Vec3b)(pt.Y, pt.X)
+            mousePixelValue = dstList(tag).Get(Of Vec3b)(pt.Y, pt.X)
         Catch ex As Exception
         End Try
 
-        If gOptions.ShowGrid.Checked Then dstList(2).SetTo(cv.Scalar.White, gridMask)
+        If gOptions.ShowGrid.Checked Then dstList(2).SetTo(Scalar.White, gridMask)
         If gOptions.showMotionMask.Checked Then
             ' motion cloud contains all the RGB motion as well.
             For Each mIndex In motion.motionSort
-                Rectangle(dstList(0), gridRects(mIndex), cv.Scalar.White, lineWidth)
+                Rectangle(dstList(0), gridRects(mIndex), Scalar.White, lineWidth)
             Next
         End If
 
         If gOptions.CrossHairs.Checked Then
             Gravity_Basics_TA.showVectors(dstList(0))
             Dim lp = If(lpGravity IsNot Nothing, lpGravity, lines.lpList(0))
-            pt = New cv.Point2f((lp.ptE1.X + lp.ptE2.X) / 2 + 5, (lp.ptE1.Y + lp.ptE2.Y) / 2)
+            pt = New Point2f((lp.ptE1.X + lp.ptE2.X) / 2 + 5, (lp.ptE1.Y + lp.ptE2.Y) / 2)
         End If
 
         trueData.Clear()
@@ -256,7 +256,7 @@ Public Class AlgorithmTask : Implements IDisposable
         If gOptions.displayDst0.Checked = False Then labels(0) = resolutionDetails
         If gOptions.displayDst1.Checked = False Then labels(1) = depthAndDepthRange.Replace(vbCrLf, "")
     End Sub
-    Private Sub pixelViewerOrGIFProcessing(src As cv.Mat, dst1 As cv.Mat, dst2 As cv.Mat, dst3 As cv.Mat)
+    Private Sub pixelViewerOrGIFProcessing(src As Mat, dst1 As Mat, dst2 As Mat, dst3 As Mat)
         If vbc.task.pixelViewerOn Then
             If PixelViewer IsNot Nothing Then
                 PixelViewer.viewerForm.Visible = True

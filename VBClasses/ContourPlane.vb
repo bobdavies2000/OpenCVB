@@ -3,7 +3,7 @@ Imports VBClasses
 Public Class XR_ContourPlane_Basics : Inherits TaskParent
     Dim contours As New Contour_Basics
     Public Sub New()
-        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_32F, 0)
+        dst1 = New Mat(dst1.Size, MatType.CV_32F, 0)
         desc = "Construct a simple plane at the average depth for each of the top contours"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)

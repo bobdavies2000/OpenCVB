@@ -1,6 +1,6 @@
 Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 Public Class Watershed_Basics : Inherits TaskParent
-    Dim rects As New List(Of cv.Rect)
+    Dim rects As New List(of cv.Rect)
     Public UseCorners As Boolean
     Public Sub New()
         labels(2) = "Draw rectangle to add another marker"
@@ -27,16 +27,16 @@ Public Class Watershed_Basics : Inherits TaskParent
         End If
 
         If rects.Count > 0 Then
-            Dim markers = New cv.Mat(src.Size(), cv.MatType.CV_32S, 0)
+            Dim markers = New Mat(src.Size(), MatType.CV_32S, 0)
             For i = 0 To rects.Count - 1
-            Rectangle(markers, rects.ElementAt(i), cv.Scalar.All(i + 1), -1)
+            Rectangle(markers, rects.ElementAt(i), Scalar.All(i + 1), -1)
             Next
 
             Watershed(src, markers)
 
             markers *= Math.Truncate(255 / rects.Count)
-            Dim tmp As New cv.Mat
-            markers.ConvertTo(tmp, cv.MatType.CV_8U)
+            Dim tmp As New Mat
+            markers.ConvertTo(tmp, MatType.CV_8U)
             dst3 = Palettize(tmp)
 
             dst2 = ShowAddweighted(dst3, src, labels(2))

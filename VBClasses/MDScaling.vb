@@ -13,10 +13,10 @@ Public Class MDScaling_Cities : Inherits TaskParent
                 2182, 1737, 1021, 1891, 959, 2734, 2408, 678, 0, 2329,    ' Seattle
                 543, 597, 1494, 1220, 2300, 923, 205, 2442, 2329, 0}      ' Washington D.C.
     Public Sub New()
-        labels(2) = "Resulting solution using cv.Eigen"
+        labels(2) = "Resulting solution using Eigen"
         desc = "Multidimensional scaling: Use OpenCV's Eigen function to solve a system of equations"
     End Sub
-    Private Function Torgerson(src As cv.Mat) As Double
+    Private Function Torgerson(src As Mat) As Double
         Dim rows = src.Rows
         Dim mm As mmData = GetMinMax(src)
         Dim c1 = 0
@@ -30,23 +30,23 @@ Public Class MDScaling_Cities : Inherits TaskParent
         Next
         Return Math.Max(Math.Max(c1, mm.maxVal), 0)
     End Function
-    Private Function CenteringMatrix(n As Integer) As cv.Mat
-        Return cv.Mat.Eye(n, n, cv.MatType.CV_64F) - 1.0 / n
+    Private Function CenteringMatrix(n As Integer) As Mat
+        Return Mat.Eye(n, n, MatType.CV_64F) - 1.0 / n
     End Function
     Public Overrides Sub RunAlg(src As cv.Mat)
         Dim size = 10 ' we are working with 10 cities.
-        Dim cityMat = cv.Mat.FromPixelData(size, size, cv.MatType.CV_64FC1, CityDistance)
+        Dim cityMat = Mat.FromPixelData(size, size, MatType.CV_64FC1, CityDistance)
         cityMat += Torgerson(cityMat)
         cityMat = cityMat.Mul(cityMat)
         Dim g = CenteringMatrix(size)
 
         ' calculates the inner product matrix b
         Dim b = g * cityMat * g.T * -0.5
-        Dim vectors = New cv.Mat(size, size, cv.MatType.CV_64F)
-        Dim values = New cv.Mat(size, 1, cv.MatType.CV_64F)
+        Dim vectors = New Mat(size, size, MatType.CV_64F)
+        Dim values = New Mat(size, 1, MatType.CV_64F)
 
         Eigen(b, values, vectors)
-        Threshold(values, values, 0, 0, cv.ThresholdTypes.Tozero)
+        Threshold(values, values, 0, 0, ThresholdTypes.Tozero)
 
         Dim result = vectors.RowRange(0, 2)
         For r = 0 To result.Rows - 1
@@ -55,7 +55,7 @@ Public Class MDScaling_Cities : Inherits TaskParent
             Next
         Next
 
-Normalize(result, result, 0, 800, cv.NormTypes.MinMax)
+Normalize(result, result, 0, 800, NormTypes.MinMax)
 
         Dim maxX As Double, maxY As Double, minX As Double = Double.MaxValue, minY As Double = Double.MaxValue
         For c = 0 To size - 1
@@ -74,7 +74,7 @@ Normalize(result, result, 0, 800, cv.NormTypes.MinMax)
             Dim y = result.At(Of Double)(1, c)
             x = w * 0.1 + 0.7 * w * (x - minX) / (maxX - minX)
             y = h * 0.1 + 0.7 * h * (y - minY) / (maxY - minY)
-            Circle(dst2, New cv.Point(x, y), task.DotSize + 3, cv.Scalar.Red, -1, task.lineType)
+            Circle(dst2, New cv.Point(x, y), task.DotSize + 3, Scalar.Red, -1, task.lineType)
             Dim textPos = New cv.Point(x + 5, y + 10)
             Dim cityName = Choose(c + 1, "Atlanta", "Chicago", "Denver", "Houston", "Los Angeles", "Miami", "New York", "San Francisco",
                                                  "Seattle", "Washington D.C.")

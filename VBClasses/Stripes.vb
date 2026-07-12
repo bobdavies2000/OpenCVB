@@ -5,10 +5,10 @@ Public Class Stripes_Basics : Inherits TaskParent
         desc = "Create stripes throughout the image with reduction"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If src.Type <> cv.MatType.CV_32FC1 Then src = task.pcSplit(0)
-        Dim depth32f As cv.Mat = src * 1000
-        Dim depth32S As New cv.Mat
-        depth32f.ConvertTo(depth32S, cv.MatType.CV_32S)
+        If src.Type <> MatType.CV_32FC1 Then src = task.pcSplit(0)
+        Dim depth32f As Mat = src * 1000
+        Dim depth32S As New Mat
+        depth32f.ConvertTo(depth32S, MatType.CV_32S)
 
         Dim reduction = task.fOptions.ReductionColor.Value
         Dim mm = GetMinMax(depth32S, task.depthmask)
@@ -109,8 +109,8 @@ Public Class XR_Stripes_Histogram : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         stripes.Run(src)
-        CvtColor(stripes.dst1, dst1, cv.ColorConversionCodes.BGR2GRAY)
-        CvtColor(stripes.dst2, dst2, cv.ColorConversionCodes.BGR2GRAY)
-        CvtColor(stripes.dst3, dst3, cv.ColorConversionCodes.BGR2GRAY)
+        CvtColor(stripes.dst1, dst1, ColorConversionCodes.BGR2GRAY)
+        CvtColor(stripes.dst2, dst2, ColorConversionCodes.BGR2GRAY)
+        CvtColor(stripes.dst3, dst3, ColorConversionCodes.BGR2GRAY)
     End Sub
 End Class

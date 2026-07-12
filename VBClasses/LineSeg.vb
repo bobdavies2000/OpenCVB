@@ -6,7 +6,7 @@ Public Class LineSeg_Basics : Inherits TaskParent
         desc = "Run LSD (Line Segment Detector) with sobel input."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If src.Channels <> 1 Or src.Type <> cv.MatType.CV_8U Then src = task.gray.Clone
+        If src.Channels <> 1 Or src.Type <> MatType.CV_8U Then src = task.gray.Clone
 
         core.Run(src)
         dst2 = core.dst2
@@ -33,20 +33,20 @@ End Class
 Public Class LineSeg_Core : Inherits TaskParent
     Implements IDisposable
     Public lpList As New List(Of lpData)
-    Dim lsd As cv.LineSegmentDetector
+    Dim lsd As LineSegmentDetector
     Public Sub New()
-        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
-        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
+        dst1 = New Mat(dst1.Size, MatType.CV_8U, 0)
+        dst3 = New Mat(dst3.Size, MatType.CV_8U, 0)
         desc = "Cursor.ai: Use Line Segment Detector (LSD) to find lines in the image."
-        lsd = cv.LineSegmentDetector.Create()
+        lsd = LineSegmentDetector.Create()
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If src.Channels <> 1 Then src = task.gray.Clone
 
-        Dim vecMat As New cv.Mat
+        Dim vecMat As New Mat
         lsd.Detect(src, vecMat)
-        Dim vecArray() As cv.Vec4f = Nothing
-        vecMat.GetArray(Of cv.Vec4f)(vecArray)
+        Dim vecArray() As Vec4f = Nothing
+        vecMat.GetArray(Of Vec4f)(vecArray)
         lpList = Line_Core.getRawSortedLines(vecArray)
 
         dst1.SetTo(0)
@@ -55,10 +55,10 @@ Public Class LineSeg_Core : Inherits TaskParent
         For i = 0 To lpList.Count - 1
             Dim lp = lpList(i)
             lp.index = i
-            Line(dst1, lp.p1, lp.p2, lp.index + 1, task.lineWidth, cv.LineTypes.Link4)
+            Line(dst1, lp.p1, lp.p2, lp.index + 1, task.lineWidth, LineTypes.Link4)
             Line(dst2, lp.p1, lp.p2, lp.color, task.lineWidth + 1, task.lineType)
         Next
-        Threshold(dst1, dst3, 0, 255, cv.ThresholdTypes.Binary)
+        Threshold(dst1, dst3, 0, 255, ThresholdTypes.Binary)
         labels(2) = CStr(lpList.Count) + " LSD line segments were detected."
     End Sub
     Protected Overrides Sub Finalize()
@@ -74,8 +74,8 @@ Public Class XR_LineSeg_Basics : Inherits TaskParent
     Public lpLast As New List(Of lpData)
     Dim core As New LineSeg_Core
     Public Sub New()
-        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
-        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
+        dst1 = New Mat(dst1.Size, MatType.CV_8U, 0)
+        dst3 = New Mat(dst3.Size, MatType.CV_8U, 0)
         desc = "Keep prior lines with no motion; add lines on motion (CalcHist). Colors follow best match to previous frame."
     End Sub
     Private Shared Function MatchScoreForColor(a As lpData, b As lpData) As Single
@@ -101,10 +101,10 @@ Public Class XR_LineSeg_Basics : Inherits TaskParent
         Next
         Return False
     End Function
-    Public Shared Function lineHistogram(input As cv.Mat, nMax As Integer) As Single()
-        Dim histogram As New cv.Mat
+    Public Shared Function lineHistogram(input As Mat, nMax As Integer) As Single()
+        Dim histogram As New Mat
         CalcHist({input}, {0}, emptyMat, histogram, 1, {nMax},
-                         New cv.Rangef() {New cv.Rangef(-1, nMax + 1)})
+                         New Rangef() {New Rangef(-1, nMax + 1)})
 
         Dim histArray(histogram.Total - 1) As Single
         histogram.GetArray(Of Single)(histArray)
@@ -124,7 +124,7 @@ Public Class XR_LineSeg_Basics : Inherits TaskParent
         Dim retainedPrior = outList.Count
 
         If tmpList.Count > 0 Then
-            Dim masked As New cv.Mat(core.dst1.Size, core.dst1.Type, 0)
+            Dim masked As New Mat(core.dst1.Size, core.dst1.Type, 0)
             core.dst1.CopyTo(masked, task.motion.motionMask)
             masked.CopyTo(dst1)
 
@@ -162,7 +162,7 @@ Public Class XR_LineSeg_Basics : Inherits TaskParent
         dst2 = task.color.Clone
         For i = 0 To lpList.Count - 1
             Dim lp = lpList(i)
-            Line(dst3, lp.p1, lp.p2, 255, task.lineWidth, cv.LineTypes.Link4)
+            Line(dst3, lp.p1, lp.p2, 255, task.lineWidth, LineTypes.Link4)
             Line(dst2, lp.p1, lp.p2, lp.color, task.lineWidth + 1, task.lineType)
         Next
 
@@ -182,7 +182,7 @@ Public Class LineSeg_BasicsFail : Inherits TaskParent
     Public lpList As New List(Of lpData)
     Private lSeg As New LineSeg_Basics
     Public Sub New()
-        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
+        dst3 = New Mat(dst3.Size, MatType.CV_8U, 0)
         desc = "Cursor.ai: Retain lpList lines when motion touches them; update from LSD only in stable (no-motion) regions."
     End Sub
     Private Shared Function MatchScore(lp As lpData, candidate As lpData) As Single
@@ -249,7 +249,7 @@ Public Class LineSeg_BasicsFail : Inherits TaskParent
         For i = 0 To lpList.Count - 1
             Dim lp = lpList(i)
             lp.index = i
-            Line(dst3, lp.p1, lp.p2, 255, task.lineWidth, cv.LineTypes.Link4)
+            Line(dst3, lp.p1, lp.p2, 255, task.lineWidth, LineTypes.Link4)
             Line(dst2, lp.p1, lp.p2, lp.color, task.lineWidth + 1, task.lineType)
         Next
         labels(2) = CStr(lpList.Count) + " lines (retained when motion; updated from LSD when stable)."
@@ -274,7 +274,7 @@ Public Class LineSeg_LBD : Inherits TaskParent
 
     Public lpList As New List(Of lpData)
     ''' <summary>One row per line, 32 bytes CV_8U (256 bits).</summary>
-    Public descriptors As New cv.Mat
+    Public descriptors As New Mat
     Dim lineSeg As New LineSeg_Basics
     Public Sub New()
         desc = "Cursor.ai: LBD-style 256-bit binary descriptors for each line from LineSeg_Basics (Sobel magnitude, 5×7 band sampling)"
@@ -284,16 +284,16 @@ Public Class LineSeg_LBD : Inherits TaskParent
         If v > hi Then Return hi
         Return v
     End Function
-    Private Shared Function SampleMag(m As cv.Mat, x As Single, y As Single) As Single
+    Private Shared Function SampleMag(m As Mat, x As Single, y As Single) As Single
         Dim xi = CInt(Math.Floor(x + 0.5F))
         Dim yi = CInt(Math.Floor(y + 0.5F))
         If xi < 0 Or yi < 0 Or xi >= m.Width Or yi >= m.Height Then Return 0
         Return m.Get(Of Single)(yi, xi)
     End Function
     ''' <summary>Fill samples(0..34) with gradient magnitude on a 5×7 grid across the line support region.</summary>
-    Private Shared Sub FillBandSamples(m As cv.Mat, lp As lpData, samples As Single())
-        Dim p1 = New cv.Point2f(lp.p1.X, lp.p1.Y)
-        Dim p2 = New cv.Point2f(lp.p2.X, lp.p2.Y)
+    Private Shared Sub FillBandSamples(m As Mat, lp As lpData, samples As Single())
+        Dim p1 = New Point2f(lp.p1.X, lp.p1.Y)
+        Dim p2 = New Point2f(lp.p2.X, lp.p2.Y)
         Dim vx = p2.X - p1.X
         Dim vy = p2.Y - p1.Y
         Dim len = CSng(Math.Sqrt(vx * vx + vy * vy))
@@ -318,7 +318,7 @@ Public Class LineSeg_LBD : Inherits TaskParent
             Next
         Next
     End Sub
-    Private Shared Sub ComputeDescriptor256(samples As Single(), row As cv.Mat)
+    Private Shared Sub ComputeDescriptor256(samples As Single(), row As Mat)
         Dim bits(255) As Boolean
         For b = 0 To 255
             Dim i1 = b Mod 35
@@ -338,22 +338,22 @@ Public Class LineSeg_LBD : Inherits TaskParent
         lineSeg.Run(src)
         lpList = New List(Of lpData)(lineSeg.lpList)
 
-        Dim gray As cv.Mat = task.gray
-        If src.Channels = 1 And src.Type = cv.MatType.CV_8U Then gray = src
+        Dim gray As Mat = task.gray
+        If src.Channels = 1 And src.Type = MatType.CV_8U Then gray = src
 
         If lpList.Count = 0 Then
-            descriptors = New cv.Mat(0, DescriptorBytes, cv.MatType.CV_8U)
+            descriptors = New Mat(0, DescriptorBytes, MatType.CV_8U)
             dst2 = task.color.Clone
             labels(2) = "No lines detected."
             Exit Sub
         End If
 
-        Using gx As New cv.Mat(), gy As New cv.Mat(), mag As New cv.Mat()
-            Sobel(gray, gx, cv.MatType.CV_32F, 1, 0, 3)
-            Sobel(gray, gy, cv.MatType.CV_32F, 0, 1, 3)
+        Using gx As New Mat(), gy As New Mat(), mag As New Mat()
+            Sobel(gray, gx, MatType.CV_32F, 1, 0, 3)
+            Sobel(gray, gy, MatType.CV_32F, 0, 1, 3)
             Magnitude(gx, gy, mag)
 
-            descriptors = New cv.Mat(lpList.Count, DescriptorBytes, cv.MatType.CV_8U)
+            descriptors = New Mat(lpList.Count, DescriptorBytes, MatType.CV_8U)
             Dim samples(34) As Single
             For i = 0 To lpList.Count - 1
                 Dim lp = lpList(i)
@@ -384,7 +384,7 @@ End Class
 ''' </summary>
 Public Class LineSeg_Match : Inherits TaskParent
     Dim lbd As New LineSeg_LBD
-    Private descPrev As New cv.Mat
+    Private descPrev As New Mat
     Private lpPrev As New List(Of lpData)
     ''' <summary>Current-frame lines that were matched to a previous-frame line.</summary>
     Public lpList As New List(Of lpData)
@@ -399,7 +399,7 @@ Public Class LineSeg_Match : Inherits TaskParent
         desc = "Cursor.ai: Match LineSeg_LBD line descriptors frame-to-frame (Hamming + " +
                "center distance, greedy one-to-one)."
     End Sub
-    Private Shared Function HammingRow(a As cv.Mat, rowA As Integer, b As cv.Mat, rowB As Integer) As Integer
+    Private Shared Function HammingRow(a As Mat, rowA As Integer, b As Mat, rowB As Integer) As Integer
         Dim sum = 0
         For c = 0 To LineSeg_LBD.DescriptorBytes - 1
             sum += BitCountByte(CByte(a.Get(Of Byte)(rowA, c) Xor b.Get(Of Byte)(rowB, c)))
@@ -417,7 +417,7 @@ Public Class LineSeg_Match : Inherits TaskParent
     End Function
     Public Overrides Sub RunAlg(src As cv.Mat)
         If task.optionsChanged Then
-            descPrev = New cv.Mat(0, LineSeg_LBD.DescriptorBytes, cv.MatType.CV_8U)
+            descPrev = New Mat(0, LineSeg_LBD.DescriptorBytes, MatType.CV_8U)
             lpPrev.Clear()
         End If
 
@@ -433,7 +433,7 @@ Public Class LineSeg_Match : Inherits TaskParent
         dst3 = task.color.Clone
 
         If currDesc.Rows = 0 Then
-            descPrev = New cv.Mat(0, LineSeg_LBD.DescriptorBytes, cv.MatType.CV_8U)
+            descPrev = New Mat(0, LineSeg_LBD.DescriptorBytes, MatType.CV_8U)
             lpPrev.Clear()
             labels(2) = "No lines from LineSeg_LBD."
             labels(3) = ""
@@ -510,8 +510,8 @@ Public Class LineSeg_Top3 : Inherits TaskParent
     Public lpList As New List(Of lpData)
 
     Private slotActive(SlotCount - 1) As Boolean
-    Private slotDesc As New cv.Mat(SlotCount, LineSeg_LBD.DescriptorBytes, cv.MatType.CV_8U)
-    Private slotCenter(SlotCount - 1) As cv.Point2f
+    Private slotDesc As New Mat(SlotCount, LineSeg_LBD.DescriptorBytes, MatType.CV_8U)
+    Private slotCenter(SlotCount - 1) As Point2f
     ''' <summary>Current-frame index into lbd.lpList for this slot (-1 if none / lost).</summary>
     Private slotLineIdx(SlotCount - 1) As Integer
 
@@ -529,7 +529,7 @@ Public Class LineSeg_Top3 : Inherits TaskParent
         Return n
     End Function
 
-    Private Shared Function HammingDescRowsTop3(a As cv.Mat, rowA As Integer, b As cv.Mat, rowB As Integer) As Integer
+    Private Shared Function HammingDescRowsTop3(a As Mat, rowA As Integer, b As Mat, rowB As Integer) As Integer
         Dim sum = 0
         For c = 0 To LineSeg_LBD.DescriptorBytes - 1
             sum += BitCountTop3(CByte(a.Get(Of Byte)(rowA, c) Xor b.Get(Of Byte)(rowB, c)))
@@ -537,7 +537,7 @@ Public Class LineSeg_Top3 : Inherits TaskParent
         Return sum
     End Function
 
-    Private Shared Sub CopyDescRowTop3(src As cv.Mat, srcRow As Integer, dst As cv.Mat, dstRow As Integer)
+    Private Shared Sub CopyDescRowTop3(src As Mat, srcRow As Integer, dst As Mat, dstRow As Integer)
         Using sRow = src.Row(srcRow), dRow = dst.Row(dstRow)
             sRow.CopyTo(dRow)
         End Using
@@ -655,8 +655,8 @@ Public Class LineSeg_FLD : Inherits TaskParent
     Dim lSeg As New LineSeg_Core
     Public lpList As New List(Of lpData)
     Public Sub New()
-        dst0 = New cv.Mat(dst0.Size, cv.MatType.CV_8U, 0)
-        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
+        dst0 = New Mat(dst0.Size, MatType.CV_8U, 0)
+        dst1 = New Mat(dst1.Size, MatType.CV_8U, 0)
         If standalone Then task.gOptions.displayDst1.Checked = True
         desc = "Merge the results of Line Segment Descriptor and Fast Line Detector."
     End Sub
@@ -690,8 +690,8 @@ Public Class LineSeg_Detector : Inherits TaskParent
     Dim lSeg As New LineSeg_Core
     Public lpList As New List(Of lpData)
     Public Sub New()
-        dst0 = New cv.Mat(dst0.Size, cv.MatType.CV_8U, 0)
-        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
+        dst0 = New Mat(dst0.Size, MatType.CV_8U, 0)
+        dst1 = New Mat(dst1.Size, MatType.CV_8U, 0)
         If standalone Then task.gOptions.displayDst1.Checked = True
         desc = "Compare the results of the line segment detector and fast line detector."
     End Sub

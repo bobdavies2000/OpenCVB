@@ -23,7 +23,7 @@ Public Class PlyFormat_Basics : Inherits TaskParent
             sw.WriteLine("end_header")
             For y = 0 To task.pointCloud.Height - 1
                 For x = 0 To task.pointCloud.Width - 1
-                    Dim vec = task.pointCloud.Get(Of cv.Vec3f)(y, x)
+                    Dim vec = task.pointCloud.Get(Of Vec3f)(y, x)
                     sw.WriteLine(vec(0).ToString(fmt3) + " " + vec(1).ToString(fmt3) + " " + vec(2).ToString(fmt3))
                 Next
             Next
@@ -67,8 +67,8 @@ Public Class XR_PlyFormat_PlusRGB : Inherits TaskParent
                 sw.WriteLine("end_header")
                 For y = 0 To task.pointCloud.Height - 1
                     For x = 0 To task.pointCloud.Width - 1
-                        Dim vec = task.pointCloud.Get(Of cv.Vec3f)(y, x)
-                        Dim bgr = src.Get(Of cv.Vec3b)(y, x)
+                        Dim vec = task.pointCloud.Get(Of Vec3f)(y, x)
+                        Dim bgr = src.Get(Of Vec3b)(y, x)
                         sw.WriteLine(vec(0).ToString(fmt3) + " " + vec(1).ToString(fmt3) + " " + vec(2).ToString(fmt3),
                                      CStr(bgr(2)) + " " + CStr(bgr(1)) + " " + CStr(bgr(0)))
                     Next

@@ -12,12 +12,12 @@ Public Class Swarm_Basics : Inherits TaskParent
     Dim feat As New Feature_Basics
     Public Sub New()
         task.fOptions.FrameHistoryCount.Value = task.fOptions.FrameHistoryCount.Maximum
-        dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
-        dst3 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
+        dst2 = New Mat(dst2.Size(), MatType.CV_8U, Scalar.All(0))
+        dst3 = New Mat(dst2.Size(), MatType.CV_8U, Scalar.All(0))
         desc = "Track the GoodFeatures across a frame history and connect the first and last good.corners in the history."
     End Sub
-    Public Function DrawLines() As cv.Mat
-        Dim dst = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+    Public Function DrawLines() As Mat
+        Dim dst = New Mat(dst2.Size, MatType.CV_8U, 0)
         Dim queries = knn.queries
         Dim trainInput = knn.trainInput
         For i = 0 To queries.Count - 1
@@ -25,10 +25,10 @@ Public Class Swarm_Basics : Inherits TaskParent
             For j = 0 To Math.Min(knn.trainInput.Count, options.ptCount) - 1
                 Dim ptNew = trainInput(knn.result(i, j))
                 Line(dst, pt, ptNew, white, task.lineWidth, task.lineType)
-                If ptNew.X < options.border Then Line(dst, New cv.Point2f(0, ptNew.Y), ptNew, white, task.lineWidth, task.lineType)
-                If ptNew.Y < options.border Then Line(dst, New cv.Point2f(ptNew.X, 0), ptNew, white, task.lineWidth, task.lineType)
-                If ptNew.X > dst.Width - options.border Then Line(dst, New cv.Point2f(dst.Width, ptNew.Y), ptNew, white, task.lineWidth, task.lineType)
-                If ptNew.Y > dst.Height - options.border Then Line(dst, New cv.Point2f(ptNew.X, dst.Height), ptNew, white, task.lineWidth, task.lineType)
+                If ptNew.X < options.border Then Line(dst, New Point2f(0, ptNew.Y), ptNew, white, task.lineWidth, task.lineType)
+                If ptNew.Y < options.border Then Line(dst, New Point2f(ptNew.X, 0), ptNew, white, task.lineWidth, task.lineType)
+                If ptNew.X > dst.Width - options.border Then Line(dst, New Point2f(dst.Width, ptNew.Y), ptNew, white, task.lineWidth, task.lineType)
+                If ptNew.Y > dst.Height - options.border Then Line(dst, New Point2f(ptNew.X, dst.Height), ptNew, white, task.lineWidth, task.lineType)
             Next
         Next
         Return dst
@@ -113,14 +113,14 @@ Public Class XR_Swarm_LeftRight : Inherits TaskParent
         leftDirection = swarm.directionAvg
         leftMax = swarm.distanceMax
         dst2 = task.leftView
-        dst2.SetTo(cv.Scalar.White, swarm.DrawLines())
+        dst2.SetTo(Scalar.White, swarm.DrawLines())
 
         swarm.Run(task.rightView)
         rightDistance = swarm.distanceAvg
         rightDirection = swarm.directionAvg
         rightMax = swarm.distanceMax
         dst3 = task.rightView
-        dst3.SetTo(cv.Scalar.White, swarm.DrawLines())
+        dst3.SetTo(Scalar.White, swarm.DrawLines())
 
         strOut = swarm.labels(2) + vbCrLf + swarm.labels(3)
         SetTrueText(strOut, 1)

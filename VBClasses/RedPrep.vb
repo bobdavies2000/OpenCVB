@@ -4,35 +4,35 @@ Public Class RedPrep_Basics : Inherits TaskParent
     Dim prepEdges As New RedPrep_Edges_CPP
     Public options As New Options_RedPrep
     Public Sub New()
-        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
-        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-        desc = "Reduction transform for the point cloud"
+        dst1 = New Mat(dst1.Size, MatType.CV_8U, 0)
+        dst2 = New Mat(dst2.Size, MatType.CV_8U, 0)
+        desc = "Reduction transform for the cv.Point cloud"
     End Sub
-    Private Function reduceChan(chan As cv.Mat, noDepthmask As cv.Mat) As cv.Mat
+    Private Function reduceChan(chan As Mat, noDepthmask As Mat) As Mat
         chan *= task.fOptions.ReductionDepth.Value
         Dim mm As mmData = GetMinMax(chan)
-        Dim dst32f As New cv.Mat
+        Dim dst32f As New Mat
         If Math.Abs(mm.minVal) > mm.maxVal Then
             mm.minVal = -mm.maxVal
-            chan.ConvertTo(dst32f, cv.MatType.CV_32F)
-            Dim mask As New cv.Mat
-            Threshold(dst32f, mask, mm.minVal, mm.minVal, cv.ThresholdTypes.BinaryInv)
-            mask.ConvertTo(mask, cv.MatType.CV_8U)
-            dst32f.SetTo(cv.Scalar.All(mm.minVal), mask)
+            chan.ConvertTo(dst32f, MatType.CV_32F)
+            Dim mask As New Mat
+            Threshold(dst32f, mask, mm.minVal, mm.minVal, ThresholdTypes.BinaryInv)
+            mask.ConvertTo(mask, MatType.CV_8U)
+            dst32f.SetTo(Scalar.All(mm.minVal), mask)
         End If
         chan = (chan - mm.minVal) * 255 / (mm.maxVal - mm.minVal)
-        chan.ConvertTo(chan, cv.MatType.CV_8U)
+        chan.ConvertTo(chan, MatType.CV_8U)
         chan.SetTo(0, noDepthmask)
         Return chan
     End Function
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
 
-        If src.Type <> cv.MatType.CV_32FC3 Then src = task.pointCloud.Clone
+        If src.Type <> MatType.CV_32FC3 Then src = task.pointCloud.Clone
 
-        Dim pc32S As New cv.Mat
-        src.ConvertTo(pc32S, cv.MatType.CV_32SC3, 1000 / task.fOptions.ReductionDepth.Value)
-        Dim splitMats() As cv.Mat = Split(pc32S)
+        Dim pc32S As New Mat
+        src.ConvertTo(pc32S, MatType.CV_32SC3, 1000 / task.fOptions.ReductionDepth.Value)
+        Dim splitMats() As Mat = Split(pc32S)
 
         dst2.SetTo(0)
         dst1.SetTo(0)
@@ -45,9 +45,9 @@ Public Class RedPrep_Basics : Inherits TaskParent
 
         If options.PrepY Then
             prepEdges.Run(reduceChan(splitMats(1), task.noDepthMask))
-            Normalize(prepEdges.dst2, prepEdges.dst2, 0, 255, cv.NormTypes.MinMax)
+            Normalize(prepEdges.dst2, prepEdges.dst2, 0, 255, NormTypes.MinMax)
             dst1 += prepEdges.dst2
-            Normalize(dst1, dst1, 0, 255, cv.NormTypes.MinMax)
+            Normalize(dst1, dst1, 0, 255, NormTypes.MinMax)
             dst2 = dst2 Or prepEdges.dst3
         End If
 
@@ -62,7 +62,7 @@ Public Class RedPrep_Basics : Inherits TaskParent
         'dst2 = prepEdges.dst3
 
         ' this rectangle prevents bleeds at the image edges.  It is necessary.  Test without it to see the impact.
-        Rectangle(dst2, New cv.Rect(0, 0, dst2.Width, dst2.Height), cv.Scalar.All(255), 2)
+        Rectangle(dst2, New cv.Rect(0, 0, dst2.Width, dst2.Height), Scalar.All(255), 2)
 
         labels(2) = "Using reduction factor = " + CStr(task.fOptions.ReductionDepth.Value)
     End Sub
@@ -95,7 +95,7 @@ Public Class RedPrep_Edges_CPP : Inherits TaskParent
         Dim imagePtr = RedPrep_CPP_RunCPP(cPtr, handleSrc.AddrOfPinnedObject(), dst2.Rows, dst2.Cols)
         handleSrc.Free()
 
-        dst3 = cv.Mat.FromPixelData(src.Rows, src.Cols, cv.MatType.CV_8U, imagePtr).Clone
+        dst3 = Mat.FromPixelData(src.Rows, src.Cols, MatType.CV_8U, imagePtr).Clone
         If src.Size <> task.noDepthMask.Size Then
             Resize(task.noDepthMask, task.noDepthMask, src.Size)
             dst3.SetTo(255, task.noDepthMask)
@@ -117,21 +117,21 @@ End Class
 Public Class RedPrep_Core : Inherits TaskParent
     Public options As New Options_RedPrep
     Public optionsPrep As New Options_PrepData
-    Public reduced32s As New cv.Mat
-    Public reduced32f As New cv.Mat
+    Public reduced32s As New Mat
+    Public reduced32f As New Mat
     Public presetReductionName As String = ""
     Public Sub New()
-        desc = "Reduction transform for the point cloud"
+        desc = "Reduction transform for the cv.Point cloud"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
         optionsPrep.Run()
 
         Dim reduction = task.fOptions.ReductionDepth.Value
-        Dim split() = {New cv.Mat, New cv.Mat, New cv.Mat}
-        task.pcSplit(0).ConvertTo(split(0), cv.MatType.CV_32S, 1000 / reduction)
-        task.pcSplit(1).ConvertTo(split(1), cv.MatType.CV_32S, 1000 / reduction)
-        task.pcSplit(2).ConvertTo(split(2), cv.MatType.CV_32S, 1000 / reduction)
+        Dim split() = {New Mat, New Mat, New Mat}
+        task.pcSplit(0).ConvertTo(split(0), MatType.CV_32S, 1000 / reduction)
+        task.pcSplit(1).ConvertTo(split(1), MatType.CV_32S, 1000 / reduction)
+        task.pcSplit(2).ConvertTo(split(2), MatType.CV_32S, 1000 / reduction)
 
         If presetReductionName <> "" Then task.reductionName = presetReductionName
 
@@ -152,19 +152,19 @@ Public Class RedPrep_Core : Inherits TaskParent
                 reduced32s = (split(0) + split(1) + split(2)) * reduction
         End Select
 
-        reduced32s.ConvertTo(reduced32f, cv.MatType.CV_32F)
+        reduced32s.ConvertTo(reduced32f, MatType.CV_32F)
 
         ' everything gets slammed between -1000 and 1000.  Good idea? I dunno...
         dst2 = (reduced32s - wcMinVal) * 254 / (wcMaxVal - wcMinVal)
-        dst2.ConvertTo(dst2, cv.MatType.CV_8U)
+        dst2.ConvertTo(dst2, MatType.CV_8U)
         dst2 += 1
         dst2.SetTo(0, task.noDepthMask)
 
         labels(2) = "Using reduction amount = " + CStr(reduction)
 
         If standalone Then
-            Dim ranges = New cv.Rangef() {New cv.Rangef(-1, 256)}
-            Dim histogram As New cv.Mat
+            Dim ranges = New Rangef() {New Rangef(-1, 256)}
+            Dim histogram As New Mat
             CalcHist({dst2}, {0}, task.depthmask, histogram, 1, {256}, ranges)
             Dim histArray(255) As Single
             histogram.GetArray(Of Single)(histArray)

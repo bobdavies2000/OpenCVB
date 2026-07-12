@@ -12,7 +12,7 @@ Public Class XR_Deterministic_Basics : Inherits TaskParent
         deter.Run(src)
 
         If deter.dst2.Channels <> 1 Then
-            CvtColor(deter.dst2, diff.lastFrame, cv.ColorConversionCodes.BGR2GRAY)
+            CvtColor(deter.dst2, diff.lastFrame, ColorConversionCodes.BGR2GRAY)
         Else
             diff.lastFrame = deter.dst2.Clone
         End If
@@ -42,13 +42,13 @@ Public Class Deterministic_MotionMask : Inherits TaskParent
         deter.Run(src.Clone) ' run with the unfiltered image.
         dst2 = deter.dst2.Clone
 
-        Static lastFrame As cv.Mat = task.color.Clone
+        Static lastFrame As Mat = task.color.Clone
         Dim dst1 = lastFrame.Clone
         src.CopyTo(dst1, task.motion.motionMask)
         deter.Run(dst1)
 
         If deter.dst2.Channels <> 1 Then
-            CvtColor(deter.dst2, diff.lastFrame, cv.ColorConversionCodes.BGR2GRAY)
+            CvtColor(deter.dst2, diff.lastFrame, ColorConversionCodes.BGR2GRAY)
         Else
             diff.lastFrame = deter.dst2.Clone
         End If
@@ -126,9 +126,9 @@ Public Class XR_Deterministic_BackProject : Inherits TaskParent
         End If
 
         bProject.dst0.SetTo(0, Not dst3)
-        dst1.SetTo(cv.Scalar.Yellow, bProject.dst0)
-        Dim mask As New cv.Mat
-        CvtColor(dst1, mask, cv.ColorConversionCodes.BGR2GRAY)
+        dst1.SetTo(Scalar.Yellow, bProject.dst0)
+        Dim mask As New Mat
+        CvtColor(dst1, mask, ColorConversionCodes.BGR2GRAY)
         dst0 = src.Clone
         dst1.CopyTo(dst0, mask)
 

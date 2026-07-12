@@ -11,10 +11,10 @@ Public Class PongWars_Basics : Inherits TaskParent
     Dim squares(numSquaresX - 1, numSquaresY - 1) As Integer
 
     Dim p1 = New cv.Point(task.workRes.Width / 4, task.workRes.Height / 2)
-    Dim d1 As cv.Point2f = New cv.Point(12.5, -12.5)
+    Dim d1 As Point2f = New cv.Point(12.5, -12.5)
 
     Dim p2 = New cv.Point((task.workRes.Width / 4) * 3, task.workRes.Height / 2)
-    Dim d2 As cv.Point2f = New cv.Point(-12.5, 12.5)
+    Dim d2 As Point2f = New cv.Point(-12.5, 12.5)
 
     Dim iteration As Integer = 0
     Dim p1Last As New cv.Point, p2Last As New cv.Point
@@ -28,7 +28,7 @@ Public Class PongWars_Basics : Inherits TaskParent
         p2 = New cv.Point(msRNG.Next(dst2.Width / 2, dst2.Width), msRNG.Next(dst2.Height / 4, dst2.Height))
         desc = "Pong as war between the forces of light and darkness."
     End Sub
-    Private Function UpdateSquareAndBounce(pt As cv.Point, dxy As cv.Point2f, sqClass As Integer) As cv.Point2f
+    Private Function UpdateSquareAndBounce(pt As cv.Point, dxy As Point2f, sqClass As Integer) As Point2f
         For angle As Double = 0 To Math.PI * 2 Step Math.PI / 4
             Dim checkX As Double = pt.X + Math.Cos(angle) * (sqWidth / 2)
             Dim checkY As Double = pt.Y + Math.Sin(angle) * (sqHeight / 2)
@@ -50,7 +50,7 @@ Public Class PongWars_Basics : Inherits TaskParent
 
         Return dxy
     End Function
-    Private Function CheckBoundaryCollision(pt As cv.Point, dxy As cv.Point2f) As cv.Point2f
+    Private Function CheckBoundaryCollision(pt As cv.Point, dxy As Point2f) As Point2f
         If pt.X + dxy.X > dst2.Width - sqWidth / 2 OrElse pt.X + dxy.X < sqWidth / 2 Then dxy.X = -dxy.X
         If pt.Y + dxy.Y > dst2.Height - sqHeight / 2 OrElse pt.Y + dxy.Y < sqHeight / 2 Then dxy.Y = -dxy.Y
         Return dxy

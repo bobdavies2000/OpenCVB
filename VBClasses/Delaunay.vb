@@ -1,24 +1,24 @@
 Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 Imports VBClasses
 Public Class Delaunay_Basics : Inherits TaskParent
-    Public inputPoints As New List(Of cv.Point2f)
+    Public inputPoints As New List(Of Point2f)
     Public facetList As New List(Of List(Of cv.Point))
-    Dim subdiv As New cv.Subdiv2D
+    Dim subdiv As New Subdiv2D
     Public Sub New()
-        dst3 = New cv.Mat(dst2.Size(), cv.MatType.CV_32SC1, 0)
+        dst3 = New Mat(dst2.Size(), MatType.CV_32SC1, 0)
         desc = "Subdivide an image based on the points provided."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If task.heartBeat And standalone Then
             Static random As New Random_Basics
             random.Run(src)
-            inputPoints = New List(Of cv.Point2f)(random.PointList)
+            inputPoints = New List(Of Point2f)(random.PointList)
         End If
 
         subdiv.InitDelaunay(New cv.Rect(0, 0, dst2.Width, dst2.Height))
         subdiv.Insert(inputPoints)
 
-        Dim facets = New cv.Point2f()() {Nothing}
+        Dim facets = New Point2f()() {Nothing}
         subdiv.GetVoronoiFacetList(New List(Of Integer)(), facets, Nothing)
 
         facetList.Clear()
@@ -28,11 +28,11 @@ Public Class Delaunay_Basics : Inherits TaskParent
                 nextFacet.Add(New cv.Point(facets(i)(j).X, facets(i)(j).Y))
             Next
 
-            FillConvexPoly(dst3, nextFacet, i, cv.LineTypes.Link4)
+            FillConvexPoly(dst3, nextFacet, i, LineTypes.Link4)
             facetList.Add(nextFacet)
         Next
 
-        dst3.ConvertTo(dst1, cv.MatType.CV_8U)
+        dst3.ConvertTo(dst1, MatType.CV_8U)
         dst2 = Palettize(dst1)
 
         labels(2) = traceName + ": " + inputPoints.Count.ToString("000") + " cells were present."
@@ -54,7 +54,7 @@ Public Class XR_Delaunay_SubDiv : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If standaloneTest() Then If Not task.heartBeat Then Exit Sub
-        Dim subdiv As New cv.Subdiv2D(New cv.Rect(0, 0, dst2.Width, dst2.Height))
+        Dim subdiv As New Subdiv2D(New cv.Rect(0, 0, dst2.Width, dst2.Height))
         random.Run(src)
         dst2.SetTo(0)
         For Each pt In random.PointList
@@ -69,11 +69,11 @@ Public Class XR_Delaunay_SubDiv : Inherits TaskParent
         Next
 
         For Each pt In random.PointList
-        Circle(dst2, pt, task.DotSize + 1, cv.Scalar.Red, -1, task.lineType)
+        Circle(dst2, pt, task.DotSize + 1, Scalar.Red, -1, task.lineType)
         Next
 
-        Dim facets = New cv.Point2f()() {Nothing}
-        Dim centers() As cv.Point2f = Nothing
+        Dim facets = New Point2f()() {Nothing}
+        Dim centers() As Point2f = Nothing
         subdiv.GetVoronoiFacetList(New List(Of Integer)(), facets, centers)
 
         Dim ifacet() As cv.Point
@@ -85,8 +85,8 @@ Public Class XR_Delaunay_SubDiv : Inherits TaskParent
                 ifacet(j) = New cv.Point(Math.Round(facets(i)(j).X), Math.Round(facets(i)(j).Y))
             Next
             ifacets(0) = ifacet
-            FillConvexPoly(dst3, ifacet, task.scalarColors(i Mod task.scalarColors.Length), cv.LineTypes.Link4)
-            Polylines(dst3, ifacets, True, cv.Scalar.Black, task.lineWidth, cv.LineTypes.Link4, 0)
+            FillConvexPoly(dst3, ifacet, task.scalarColors(i Mod task.scalarColors.Length), LineTypes.Link4)
+            Polylines(dst3, ifacets, True, Scalar.Black, task.lineWidth, LineTypes.Link4, 0)
         Next
     End Sub
 End Class
@@ -106,37 +106,37 @@ Public Class XR_Delaunay_Subdiv2D : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         If Not task.heartBeat Then Exit Sub ' too fast otherwise...
         dst2.SetTo(0)
-        Dim points = Enumerable.Range(0, 100).Select(Of cv.Point2f)(
+        Dim points = Enumerable.Range(0, 100).Select(Of Point2f)(
                 Function(i)
-                    Return New cv.Point2f(msRNG.Next(0, src.Width), msRNG.Next(0, src.Height))
+                    Return New Point2f(msRNG.Next(0, src.Width), msRNG.Next(0, src.Height))
                 End Function).ToArray()
 
         For Each p In points
-        Circle(dst2, p, task.DotSize + 1, cv.Scalar.Red, -1, task.lineType)
+        Circle(dst2, p, task.DotSize + 1, Scalar.Red, -1, task.lineType)
         Next
         dst3 = dst2.Clone()
 
-        Dim subdiv = New cv.Subdiv2D(New cv.Rect(0, 0, dst3.Width, dst3.Height))
+        Dim subdiv = New Subdiv2D(New cv.Rect(0, 0, dst3.Width, dst3.Height))
         subdiv.Insert(points)
 
         ' draw voronoi diagram
-        Dim facetList()() As cv.Point2f = Nothing
-        Dim facetCenters() As cv.Point2f = Nothing
+        Dim facetList()() As Point2f = Nothing
+        Dim facetCenters() As Point2f = Nothing
         subdiv.GetVoronoiFacetList(Nothing, facetList, facetCenters)
 
         For Each list In facetList
             Dim before = list.Last()
             For Each p In list
-                Line(dst3, before, p, cv.Scalar.Green, 1)
+                Line(dst3, before, p, Scalar.Green, 1)
                 before = p
             Next
         Next
 
         Dim edgelist = subdiv.GetEdgeList()
         For Each edge In edgelist
-            Dim p1 = New cv.Point2f(edge(0), edge(1))
-            Dim p2 = New cv.Point2f(edge(2), edge(3))
-            Line(dst2, p1, p2, cv.Scalar.Green, task.lineWidth, task.lineWidth)
+            Dim p1 = New Point2f(edge(0), edge(1))
+            Dim p2 = New Point2f(edge(2), edge(3))
+            Line(dst2, p1, p2, Scalar.Green, task.lineWidth, task.lineWidth)
         Next
     End Sub
 End Class
@@ -151,23 +151,23 @@ End Class
 
 
 Public Class XR_Delaunay_GenerationsNoKNN : Inherits TaskParent
-    Public inputPoints As New List(Of cv.Point2f)
+    Public inputPoints As New List(Of Point2f)
     Public facet As New Delaunay_Basics
     Dim random As New Random_Basics
     Public Sub New()
         OptionParent.FindSlider("Random Pixel Count").Value = 10
-        dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_32S, 0)
+        dst3 = New Mat(dst3.Size(), MatType.CV_32S, 0)
         labels = {"", "Mask of unmatched regions - generation set to 0",
                   "Facet Image with age of each region", "Generation counts for each region."}
-        desc = "Create a region in an image for each point provided without using KNN."
+        desc = "Create a region in an image for each cv.Point provided without using KNN."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If standaloneTest() And task.heartBeat Then
             random.Run(src)
-            inputPoints = New List(Of cv.Point2f)(random.PointList)
+            inputPoints = New List(Of Point2f)(random.PointList)
         End If
 
-        facet.inputPoints = New List(Of cv.Point2f)(inputPoints)
+        facet.inputPoints = New List(Of Point2f)(inputPoints)
         facet.Run(src)
         dst2 = facet.dst2
 
@@ -187,7 +187,7 @@ Public Class XR_Delaunay_GenerationsNoKNN : Inherits TaskParent
                     g += 1
                 End While
             End If
-            FillConvexPoly(dst3, nextFacet, g, cv.LineTypes.Link4)
+            FillConvexPoly(dst3, nextFacet, g, LineTypes.Link4)
             usedG.Add(g)
             SetTrueText(CStr(g), pt, 2)
         Next
@@ -204,27 +204,27 @@ End Class
 
 
 Public Class Delaunay_Generations : Inherits TaskParent
-    Public inputPoints As New List(Of cv.Point2f)
+    Public inputPoints As New List(Of Point2f)
     Public facet As New Delaunay_Basics
     Dim knn As New KNN_OneToOne
     Dim random As New Random_Basics
     Public Sub New()
-        dst0 = New cv.Mat(dst0.Size(), cv.MatType.CV_32S, 0)
+        dst0 = New Mat(dst0.Size(), MatType.CV_32S, 0)
         labels = {"", "Mask of unmatched regions - generation set to 0", "Facet Image with count for each region",
                       "Generation counts in CV_32SC1 format"}
         OptionParent.FindSlider("Random Pixel Count").Value = 10
-        desc = "Create a region in an image for each point provided"
+        desc = "Create a region in an image for each cv.Point provided"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If standaloneTest() Then
             If task.heartBeatLT Then random.Run(src)
-            inputPoints = New List(Of cv.Point2f)(random.PointList)
+            inputPoints = New List(Of Point2f)(random.PointList)
         End If
 
-        knn.queries = New List(Of cv.Point2f)(inputPoints)
+        knn.queries = New List(Of Point2f)(inputPoints)
         knn.Run(src)
 
-        facet.inputPoints = New List(Of cv.Point2f)(inputPoints)
+        facet.inputPoints = New List(Of Point2f)(inputPoints)
         facet.Run(src)
         dst2 = facet.dst2
 
@@ -244,7 +244,7 @@ Public Class Delaunay_Generations : Inherits TaskParent
                     g += 1
                 End While
             End If
-            FillConvexPoly(dst0, nextFacet, g, cv.LineTypes.Link4)
+            FillConvexPoly(dst0, nextFacet, g, LineTypes.Link4)
             usedG.Add(g)
             SetTrueText(CStr(g), lp.p2, 2)
         Next
@@ -256,14 +256,14 @@ End Class
 
 
 Public Class Delaunay_ConsistentColor : Inherits TaskParent
-    Public inputPoints As New List(Of cv.Point2f)
+    Public inputPoints As New List(Of Point2f)
     Public facetList As New List(Of List(Of cv.Point))
-    Public facet32s As cv.Mat
+    Public facet32s As Mat
     Dim randEnum As New Random_Enumerable
-    Dim subdiv As New cv.Subdiv2D
+    Dim subdiv As New Subdiv2D
     Public Sub New()
         If standalone Then task.gOptions.displayDst1.Checked = True
-        facet32s = New cv.Mat(dst2.Size(), cv.MatType.CV_32SC1, 0)
+        facet32s = New Mat(dst2.Size(), MatType.CV_32SC1, 0)
         labels(1) = "Input points to subdiv"
         labels(3) = "Inconsistent colors in dst2 are duplicate randomCellColor output."
         desc = "Subdivide an image based on the points provided."
@@ -271,18 +271,18 @@ Public Class Delaunay_ConsistentColor : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         If task.heartBeat And standalone Then
             randEnum.Run(src)
-            inputPoints = New List(Of cv.Point2f)(randEnum.points)
+            inputPoints = New List(Of Point2f)(randEnum.points)
         End If
 
         subdiv.InitDelaunay(New cv.Rect(0, 0, dst2.Width, dst2.Height))
         subdiv.Insert(inputPoints)
 
-        Dim facets = New cv.Point2f()() {Nothing}
+        Dim facets = New Point2f()() {Nothing}
         subdiv.GetVoronoiFacetList(New List(Of Integer)(), facets, Nothing)
 
-        Dim usedColors As New List(Of cv.Scalar)
+        Dim usedColors As New List(Of Scalar)
         facetList.Clear()
-        Static lastColor = New cv.Mat(dst2.Size(), cv.MatType.CV_8UC3, cv.Scalar.All(0))
+        Static lastColor = New Mat(dst2.Size(), MatType.CV_8UC3, Scalar.All(0))
         For i = 0 To facets.Length - 1
             Dim nextFacet As New List(Of cv.Point)
             For j = 0 To facets(i).Length - 1
@@ -290,19 +290,19 @@ Public Class Delaunay_ConsistentColor : Inherits TaskParent
             Next
 
             Dim pt = inputPoints(i)
-            Dim vec As cv.Vec3b = lastColor.Get(Of cv.Vec3b)(pt.Y, pt.X)
-            Dim nextColor As cv.Scalar = vec.ToVec3d
+            Dim vec As Vec3b = lastColor.Get(Of Vec3b)(pt.Y, pt.X)
+            Dim nextColor As Scalar = vec.ToVec3d
             If usedColors.Contains(nextColor) Then nextColor = Palette_Basics.randomCellColor()
             usedColors.Add(nextColor)
 
             FillConvexPoly(dst2, nextFacet, nextColor)
-            FillConvexPoly(facet32s, nextFacet, i, cv.LineTypes.Link4)
+            FillConvexPoly(facet32s, nextFacet, i, LineTypes.Link4)
             facetList.Add(nextFacet)
         Next
 
         dst1.SetTo(0)
         For Each pt In inputPoints
-        Circle(dst1, New cv.Point(pt.X, pt.Y), task.DotSize, task.highlight, -1, cv.LineTypes.Link4)
+        Circle(dst1, New cv.Point(pt.X, pt.Y), task.DotSize, task.highlight, -1, LineTypes.Link4)
         Next
         lastColor = dst2.Clone
         labels(2) = traceName + ": " + inputPoints.Count.ToString("000") + " cells were present."
@@ -319,7 +319,7 @@ Public Class Delaunay_LineSelect : Inherits TaskParent
     Public Sub New()
         If standalone Then task.gOptions.displayDst1.Checked = True
         labels(2) = "Each delaunay cell will select the line that it contains."
-        labels(3) = "The mouse is hovering over the Delaunay cell for the end point of the line."
+        labels(3) = "The mouse is hovering over the Delaunay cell for the end cv.Point of the line."
         desc = "Create a map for selecting lines"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -362,8 +362,8 @@ Public Class Delaunay_LineSelect : Inherits TaskParent
         index2 = delaunay.dst1.Get(Of Byte)(task.lpD.p2.Y, task.lpD.p2.X)
 
         dst3.SetTo(0)
-        Polylines(dst3, {delaunay.facetList(index1).ToArray}, True, white, task.lineWidth, cv.LineTypes.Link4)
-        Polylines(dst3, {delaunay.facetList(index2).ToArray}, True, white, task.lineWidth, cv.LineTypes.Link4)
+        Polylines(dst3, {delaunay.facetList(index1).ToArray}, True, white, task.lineWidth, LineTypes.Link4)
+        Polylines(dst3, {delaunay.facetList(index2).ToArray}, True, white, task.lineWidth, LineTypes.Link4)
 
         Line(dst3, task.lpD.p1, task.lpD.p2, task.highlight, task.lineWidth, task.lineWidth)
 
@@ -375,8 +375,8 @@ Public Class Delaunay_LineSelect : Inherits TaskParent
             index1 = delaunay.dst1.Get(Of Byte)(lp.p1.Y, lp.p1.X)
             index2 = delaunay.dst1.Get(Of Byte)(lp.p2.Y, lp.p2.X)
 
-            Polylines(dst1, {delaunay.facetList(index1).ToArray}, True, white, task.lineWidth, cv.LineTypes.Link4)
-            Polylines(dst1, {delaunay.facetList(index2).ToArray}, True, white, task.lineWidth, cv.LineTypes.Link4)
+            Polylines(dst1, {delaunay.facetList(index1).ToArray}, True, white, task.lineWidth, LineTypes.Link4)
+            Polylines(dst1, {delaunay.facetList(index2).ToArray}, True, white, task.lineWidth, LineTypes.Link4)
         Next
 
         For Each lp In task.lines.lpList
@@ -390,23 +390,23 @@ End Class
 
 
 Public Class Delaunay_Contours : Inherits TaskParent
-    Dim subdiv As New cv.Subdiv2D
+    Dim subdiv As New Subdiv2D
     Public bPoint As New BrickPoint_Basics
     Public Sub New()
-        dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
+        dst2 = New Mat(dst2.Size(), MatType.CV_8U, Scalar.All(0))
         labels(3) = "CV_8U map of Delaunay cells"
         desc = "Subdivide an image based on the points provided."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If standalone Then bPoint.Run(src)
         subdiv.InitDelaunay(New cv.Rect(0, 0, dst2.Width, dst2.Height))
-        Dim ptlist2f As New List(Of cv.Point2f)
+        Dim ptlist2f As New List(Of Point2f)
         For Each pt In bPoint.ptList
-            ptlist2f.Add(New cv.Point2f(pt.X, pt.Y))
+            ptlist2f.Add(New Point2f(pt.X, pt.Y))
         Next
         subdiv.Insert(ptlist2f)
 
-        Dim facets = New cv.Point2f()() {Nothing}
+        Dim facets = New Point2f()() {Nothing}
         subdiv.GetVoronoiFacetList(New List(Of Integer)(), facets, Nothing)
 
         dst2.SetTo(0)
@@ -426,25 +426,25 @@ End Class
 
 
 Public Class Delaunay_Color : Inherits TaskParent
-    Public inputPoints As New List(Of cv.Point2f)
+    Public inputPoints As New List(Of Point2f)
     Public inputColors As New List(Of Integer)
     Public facetList As New List(Of List(Of cv.Point))
-    Dim subdiv As New cv.Subdiv2D
+    Dim subdiv As New Subdiv2D
     Public Sub New()
-        dst3 = New cv.Mat(dst2.Size(), cv.MatType.CV_32SC1, 0)
+        dst3 = New Mat(dst2.Size(), MatType.CV_32SC1, 0)
         desc = "Subdivide an image based on the points provided."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If task.heartBeat And standalone Then
             Static random As New Random_Basics
             random.Run(src)
-            inputPoints = New List(Of cv.Point2f)(random.PointList)
+            inputPoints = New List(Of Point2f)(random.PointList)
         End If
 
         subdiv.InitDelaunay(New cv.Rect(0, 0, dst2.Width, dst2.Height))
         subdiv.Insert(inputPoints)
 
-        Dim facets = New cv.Point2f()() {Nothing}
+        Dim facets = New Point2f()() {Nothing}
         subdiv.GetVoronoiFacetList(New List(Of Integer)(), facets, Nothing)
 
         facetList.Clear()
@@ -455,9 +455,9 @@ Public Class Delaunay_Color : Inherits TaskParent
             Next
 
             If inputColors.Count = 0 Then
-            FillConvexPoly(dst3, nextFacet, i, cv.LineTypes.Link4)
+            FillConvexPoly(dst3, nextFacet, i, LineTypes.Link4)
             Else
-            FillConvexPoly(dst3, nextFacet, inputColors(i), cv.LineTypes.Link4)
+            FillConvexPoly(dst3, nextFacet, inputColors(i), LineTypes.Link4)
             End If
             facetList.Add(nextFacet)
         Next
@@ -474,9 +474,9 @@ End Class
 
 
 Public Class Delaunay_Map : Inherits TaskParent
-    Dim subdiv As New cv.Subdiv2D
+    Dim subdiv As New Subdiv2D
     Public rcList As List(Of rcDataOld)
-    Public rcMap As New cv.Mat(dst2.Size, cv.MatType.CV_32S, 0)
+    Public rcMap As New Mat(dst2.Size, MatType.CV_32S, 0)
     Public Sub New()
         If standalone Then task.gOptions.displayDst1.Checked = True
         labels(3) = "Visualization of the rcMap with colors.  The rcMap contains integers."
@@ -494,14 +494,14 @@ Public Class Delaunay_Map : Inherits TaskParent
 
         subdiv.InitDelaunay(New cv.Rect(0, 0, dst2.Width, dst2.Height))
 
-        Dim inputPoints As New List(Of cv.Point2f)
+        Dim inputPoints As New List(Of Point2f)
         For Each rc In rcList
             inputPoints.Add(rc.maxDist)
         Next
 
         subdiv.Insert(inputPoints)
 
-        Dim facets = New cv.Point2f()() {Nothing}
+        Dim facets = New Point2f()() {Nothing}
         subdiv.GetVoronoiFacetList(New List(Of Integer)(), facets, Nothing)
 
         Dim facetList As New List(Of List(Of cv.Point))
@@ -512,8 +512,8 @@ Public Class Delaunay_Map : Inherits TaskParent
             Next
 
             Dim rc = rcList(i)
-            FillConvexPoly(rcMap, nextFacet, rc.mapID, cv.LineTypes.Link4)
-            FillConvexPoly(dst3, nextFacet, rc.color, cv.LineTypes.Link4)
+            FillConvexPoly(rcMap, nextFacet, rc.mapID, LineTypes.Link4)
+            FillConvexPoly(dst3, nextFacet, rc.color, LineTypes.Link4)
             facetList.Add(nextFacet)
         Next
 
@@ -527,12 +527,12 @@ End Class
 
 
 Public Class Delaunay_EmptyClone : Inherits TaskParent
-    Public inputPoints As New List(Of cv.Point2f)
+    Public inputPoints As New List(Of Point2f)
     Public facetList As New List(Of List(Of cv.Point))
-    Dim subdiv As New cv.Subdiv2D
+    Dim subdiv As New Subdiv2D
 
     Public Sub New()
-        dst3 = New cv.Mat(dst2.Size(), cv.MatType.CV_32SC1, 0)
+        dst3 = New Mat(dst2.Size(), MatType.CV_32SC1, 0)
         desc = "CoPilot: Subdivide an image based on the points provided (EmptyClone version)."
     End Sub
 
@@ -541,7 +541,7 @@ Public Class Delaunay_EmptyClone : Inherits TaskParent
         If task.heartBeat And standalone Then
             Static random As New Random_Basics
             random.Run(src)
-            inputPoints = New List(Of cv.Point2f)(random.PointList)
+            inputPoints = New List(Of Point2f)(random.PointList)
         End If
 
         ' Reset subdiv
@@ -553,7 +553,7 @@ Public Class Delaunay_EmptyClone : Inherits TaskParent
         dst3.SetTo(0)
 
         ' Extract Voronoi facets
-        Dim facets = New cv.Point2f()() {}
+        Dim facets = New Point2f()() {}
         subdiv.GetVoronoiFacetList(New List(Of Integer)(), facets, Nothing)
 
         facetList.Clear()
@@ -570,13 +570,13 @@ Public Class Delaunay_EmptyClone : Inherits TaskParent
             Next
 
             ' Fill facet with its index
-            FillConvexPoly(dst3, nextFacet.ToArray(), i, cv.LineTypes.Link4)
+            FillConvexPoly(dst3, nextFacet.ToArray(), i, LineTypes.Link4)
 
             facetList.Add(nextFacet)
         Next
 
         ' Convert to 8U and colorize
-        dst3.ConvertTo(dst1, cv.MatType.CV_8U)
+        dst3.ConvertTo(dst1, MatType.CV_8U)
         dst2 = Palettize(dst1)
 
         labels(2) = traceName + ": " + inputPoints.Count.ToString("000") + " cells were present."

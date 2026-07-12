@@ -9,7 +9,7 @@ Public Class Duster_Basics : Inherits TaskParent
         dust.Run(src)
 
         For i = 1 To dust.classCount
-            Dim mask As New cv.Mat
+            Dim mask As New Mat
             InRange(dust.dst2, i, i, mask)
             Dim depth = Mean(task.pcSplit(2), mask)
             task.pcSplit(2).SetTo(depth(0), mask)
@@ -43,7 +43,7 @@ Public Class Duster_MaskZ : Inherits TaskParent
         Dim src32f = task.pcSplit(2)
         src32f.SetTo(task.MaxZmeters, task.maxDepthMask)
 
-        hist.fixedRanges = {New cv.Rangef(0.001, task.MaxZmeters)}
+        hist.fixedRanges = {New Rangef(0.001, task.MaxZmeters)}
         hist.Run(src32f)
 
         Dim histArray = hist.histArray
@@ -52,14 +52,14 @@ Public Class Duster_MaskZ : Inherits TaskParent
         histArray(histArray.Count - 1) = 0
 
         Dim start As Integer
-        Dim clusters As New SortedList(Of Integer, cv.Vec2i)(New compareAllowIdenticalIntegerInverted)
+        Dim clusters As New SortedList(Of Integer, Vec2i)(New compareAllowIdenticalIntegerInverted)
         Dim lastEntry As Single
         Dim sampleCount As Integer
 
         For i = 0 To histArray.Count - 1
             If histArray(i) > 0 And lastEntry = 0 Then start = i
             If histArray(i) = 0 And lastEntry > 0 Then
-                clusters.Add(sampleCount, New cv.Vec2i(start, i))
+                clusters.Add(sampleCount, New Vec2i(start, i))
                 sampleCount = 0
             End If
             lastEntry = histArray(i)
@@ -78,14 +78,14 @@ Public Class Duster_MaskZ : Inherits TaskParent
 
         Marshal.Copy(histArray, 0, hist.histogram.Data, histArray.Length)
         CalcBackProject({src32f}, {0}, hist.histogram, dst1, hist.ranges)
-        dst1.ConvertTo(dst2, cv.MatType.CV_8U)
+        dst1.ConvertTo(dst2, MatType.CV_8U)
 
         classCount += 1
         dst2.SetTo(classCount, task.maxDepthMask)
 
         dst3 = Palettize(dst2)
         labels(2) = "dst2 = CV_8U version of depth segmented into " + CStr(classCount) + " clusters."
-        Threshold(dst2, dst0, 0, 255, cv.ThresholdTypes.Binary)
+        Threshold(dst2, dst0, 0, 255, ThresholdTypes.Binary)
     End Sub
 End Class
 
@@ -101,7 +101,7 @@ Public Class XR_Duster_BasicsY : Inherits TaskParent
         dust.Run(src)
 
         For i = 1 To dust.classCount
-            Dim mask As New cv.Mat
+            Dim mask As New Mat
             InRange(dust.dst2, i, i, mask)
             Dim pcY = Mean(task.pcSplit(1), mask)
             task.pcSplit(1).SetTo(pcY(0), mask)

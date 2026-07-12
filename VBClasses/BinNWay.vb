@@ -4,7 +4,7 @@ Public Class BinNWay_Basics : Inherits TaskParent
     Dim binSplit(0) As Integer
     Dim redC As New RedColor_Basics
     Public Sub New()
-        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
+        dst1 = New Mat(dst1.Size, MatType.CV_8U, 0)
         If standalone Then task.gOptions.displayDst1.Checked = True
         desc = "Run RedColor for each gradation from light to dark."
     End Sub
@@ -21,9 +21,9 @@ Public Class BinNWay_Basics : Inherits TaskParent
         End If
 
         For i = 0 To options.gradations - 1
-            Dim tmp As New cv.Mat
+            Dim tmp As New Mat
             InRange(task.gray, binSplit(i), binSplit(i + 1), tmp)
-            Threshold(tmp, tmp, 0, 255, cv.ThresholdTypes.Binary)
+            Threshold(tmp, tmp, 0, 255, ThresholdTypes.Binary)
             dst1.SetTo(i + 1, tmp)
         Next
 

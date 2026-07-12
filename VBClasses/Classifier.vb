@@ -16,12 +16,12 @@ Public Class Classifier_Basics_CPP : Inherits TaskParent
                                                             dst2.Rows, dst2.Cols,
                                                             If(task.gOptions.DebugCheckBox.Checked, 1, 0))
         task.gOptions.DebugCheckBox.Checked = False
-        dst1 = cv.Mat.FromPixelData(dst0.Rows, dst0.Cols, cv.MatType.CV_32S, imagePtr)
+        dst1 = Mat.FromPixelData(dst0.Rows, dst0.Cols, MatType.CV_32S, imagePtr)
 
-        dst1.ConvertTo(dst0, cv.MatType.CV_8U)
+        dst1.ConvertTo(dst0, MatType.CV_8U)
         dst2 = Palettize(dst0)
         imagePtr = OEX_ShowPoints(cPtr, dst2.Rows, dst2.Cols, task.DotSize)
-        dst3 = cv.Mat.FromPixelData(dst2.Rows, dst2.Cols, cv.MatType.CV_8UC3, imagePtr)
+        dst3 = Mat.FromPixelData(dst2.Rows, dst2.Cols, MatType.CV_8UC3, imagePtr)
 
         SetTrueText("Click the global DebugCheckBox to get another set of points.", 3)
     End Sub
@@ -85,7 +85,7 @@ Public Class XR_Classifier_Bayesian : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         Dim sampleCount As Integer, methodIndex = 0
-        If src.Type <> cv.MatType.CV_32FC2 Then
+        If src.Type <> MatType.CV_32FC2 Then
             options.Run()
             sampleCount = options.sampleCount
             methodIndex = options.methodIndex
@@ -96,8 +96,8 @@ Public Class XR_Classifier_Bayesian : Inherits TaskParent
         Dim imagePtr = OEX_Points_Classifier_RunCPP(cPtr, sampleCount, methodIndex, dst2.Rows, dst2.Cols,
             If(task.gOptions.DebugCheckBox.Checked, 1, 0))
         task.gOptions.DebugCheckBox.Checked = False
-        dst1 = cv.Mat.FromPixelData(dst1.Rows, dst1.Cols, cv.MatType.CV_32S, imagePtr)
-        dst1.ConvertTo(dst0, cv.MatType.CV_8U)
+        dst1 = Mat.FromPixelData(dst1.Rows, dst1.Cols, MatType.CV_32S, imagePtr)
+        dst1.ConvertTo(dst0, MatType.CV_8U)
         dst2 = Palettize(dst0)
         imagePtr = OEX_ShowPoints(cPtr, dst2.Rows, dst2.Cols, task.DotSize)
     End Sub
@@ -120,7 +120,7 @@ Public Class Classifier_BayesianTest : Inherits TaskParent
     'Dim nabs As New Neighbor_Precise
     Dim redC As New RedCloud_Basics
     Public Sub New()
-        dst1 = New cv.Mat(dst1.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
+        dst1 = New Mat(dst1.Size(), MatType.CV_8U, Scalar.All(0))
         labels = {"", "Mask of the neighbors to the selected cell", "RedFlood_List output", "Classifier_Bayesian output"}
         If standalone Then task.gOptions.displayDst1.Checked = True
         cPtr = Classifier_Bayesian_Open()
@@ -136,7 +136,7 @@ Public Class Classifier_BayesianTest : Inherits TaskParent
         'nabs.rcList = redList.rcList
         'nabs.Run(redList.rcMap)
 
-        'Dim trainList As New List(Of cv.Scalar)
+        'Dim trainList As New List(Of Scalar)
         'Dim responseList As New List(Of Integer)
         'For Each rc In redList.rcList
         '    trainList.Add(rc.depth)
@@ -153,7 +153,7 @@ Public Class Classifier_BayesianTest : Inherits TaskParent
 
         'responseList(task.rcD.index) = 1
 
-        'Dim queryList As New List(Of cv.Scalar)
+        'Dim queryList As New List(Of Scalar)
         'Dim maskList As New List(Of Integer)
         'For i = responseList.Count - 1 To 0 Step -1
         '    If responseList(i) = -1 Then

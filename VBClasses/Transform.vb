@@ -10,14 +10,14 @@ Public Class XR_Transform_Resize : Inherits TaskParent
         Dim w = CInt(options.resizeFactor * src.Width)
         Dim h = CInt(options.resizeFactor * src.Height)
         If options.resizeFactor > 1 Then
-            Dim tmp As New cv.Mat
-            Resize(src, tmp, New cv.Size(w, h), 0)
+            Dim tmp As New Mat
+            Resize(src, tmp, New Size(w, h), 0)
             Dim roi = New cv.Rect((w - src.Width) / 2, (h - src.Height) / 2, src.Width, src.Height)
             tmp(roi).CopyTo(dst2)
         Else
             dst2.SetTo(0)
             Dim roi = New cv.Rect((src.Width - w) / 2, (src.Height - h) / 2, w, h)
-            Resize(src, dst2(roi), New cv.Size(w, h), 0)
+            Resize(src, dst2(roi), New Size(w, h), 0)
         End If
     End Sub
 End Class
@@ -27,17 +27,17 @@ End Class
 
 
 Public Class XR_Transform_Affine3D : Inherits TaskParent
-    Dim pc1 As cv.Mat
-    Dim pc2 As cv.Mat
-    Dim affineTransform As cv.Mat
+    Dim pc1 As Mat
+    Dim pc2 As Mat
+    Dim affineTransform As Mat
     Dim options As New Options_Transform
     Public Sub New()
-        desc = "Using 2 point clouds compute the 3D affine transform between them"
+        desc = "Using 2 cv.Point clouds compute the 3D affine transform between them"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
 
-        Dim output = "Use the check boxes to snapshot the different point clouds" + vbCrLf
+        Dim output = "Use the check boxes to snapshot the different cv.Point clouds" + vbCrLf
 
         If task.testAllRunning Then
             If task.frameCount = 30 Then options.firstCheck = True
@@ -47,19 +47,19 @@ Public Class XR_Transform_Affine3D : Inherits TaskParent
         If options.firstCheck Then
             pc1 = task.pointCloud.Clone()
             options.firstCheck = False
-            output += "First point cloud captured" + vbCrLf
+            output += "First cv.Point cloud captured" + vbCrLf
         End If
 
         If options.secondCheck Then
             pc2 = task.pointCloud.Clone()
             options.secondCheck = False
-            output += "Second point cloud captured" + vbCrLf
+            output += "Second cv.Point cloud captured" + vbCrLf
         End If
 
         If pc1 IsNot Nothing Then
             If pc2 IsNot Nothing Then
-                Dim inliers = New cv.Mat
-                affineTransform = New cv.Mat(3, 4, cv.MatType.CV_64F)
+                Dim inliers = New Mat
+                affineTransform = New Mat(3, 4, MatType.CV_64F)
                 pc1 = pc1.Reshape(3, pc1.Rows * pc1.Cols)
                 pc2 = pc2.Reshape(3, pc2.Rows * pc2.Cols)
                 EstimateAffine3D(pc1, pc2, affineTransform, inliers)
@@ -91,7 +91,7 @@ End Class
 
 
 Public Class XR_Transform_Rotate : Inherits TaskParent
-    Public imageCenter As cv.Point2f
+    Public imageCenter As Point2f
     Dim options As New Options_Transform
     Public Sub New()
         desc = "Rotate and scale and image based on the slider values."
@@ -99,10 +99,10 @@ Public Class XR_Transform_Rotate : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
 
-        imageCenter = New cv.Point2f(options.centerX, options.centerY)
+        imageCenter = New Point2f(options.centerX, options.centerY)
         Dim rotationMat = GetRotationMatrix2D(imageCenter, options.angle, options.scale)
-        WarpAffine(src, dst2, rotationMat, New cv.Size())
-        Circle(dst2, imageCenter, task.DotSize * 2, cv.Scalar.Yellow, -1, task.lineType)
-        Circle(dst2, imageCenter, task.DotSize, cv.Scalar.Blue, -1, task.lineType)
+        WarpAffine(src, dst2, rotationMat, New Size())
+        Circle(dst2, imageCenter, task.DotSize * 2, Scalar.Yellow, -1, task.lineType)
+        Circle(dst2, imageCenter, task.DotSize, Scalar.Blue, -1, task.lineType)
     End Sub
 End Class

@@ -2,12 +2,12 @@ Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 ' https://docs.opencvb.org/3.1.0/d6/d10/tutorial_py_houghlines.html
 ' https://github.com/JiphuTzu/opencvsharp/blob/master/sample/SamplesVB/Samples/HoughLinesSample.vb
 Public Class Hough_Basics : Inherits TaskParent
-    Public segments() As cv.LineSegmentPolar
+    Public segments() As LineSegmentPolar
     Public options As New Options_Hough
     Public Sub New()
         desc = "Use Houghlines to find lines in the image."
     End Sub
-    Public Shared Sub houghShowLines(dst As cv.Mat, segments() As cv.LineSegmentPolar, desiredCount As Integer)
+    Public Shared Sub houghShowLines(dst As Mat, segments() As LineSegmentPolar, desiredCount As Integer)
         For i = 0 To Math.Min(segments.Length, desiredCount) - 1
             Dim rho As Single = segments(i).Rho
             Dim theta As Single = segments(i).Theta
@@ -19,7 +19,7 @@ Public Class Hough_Basics : Inherits TaskParent
 
             Dim pt1 As cv.Point = New cv.Point(x + 1000 * -b, y + 1000 * a)
             Dim pt2 As cv.Point = New cv.Point(x - 1000 * -b, y - 1000 * a)
-            Line(dst, pt1, pt2, cv.Scalar.Red, task.lineWidth + 1, task.lineType, 0)
+            Line(dst, pt1, pt2, Scalar.Red, task.lineWidth + 1, task.lineType, 0)
         Next
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -35,7 +35,7 @@ Public Class Hough_Basics : Inherits TaskParent
             Dim probSegments = HoughLinesP(task.edges.dst2, options.rho, options.theta, options.threshold)
             For i = 0 To Math.Min(probSegments.Length, options.lineCount) - 1
                 Dim lineX As LineSegmentPoint = probSegments(i)
-                Line(dst3, lineX.P1, lineX.P2, cv.Scalar.Red, task.lineWidth + 2, task.lineType)
+                Line(dst3, lineX.P1, lineX.P2, Scalar.Red, task.lineWidth + 2, task.lineType)
             Next
             labels(3) = "Probablistic lines = " + CStr(probSegments.Length)
         End If
@@ -82,9 +82,9 @@ Public Class XR_Hough_Circles : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         circles.Run(src)
         dst2 = circles.dst2
-        CvtColor(dst2, dst3, cv.ColorConversionCodes.BGR2GRAY)
+        CvtColor(dst2, dst3, ColorConversionCodes.BGR2GRAY)
         Dim cFound = HoughCircles(dst3, method, 1, dst2.Rows / 4, 100, 10, 1, 200)
-        Dim foundColor = New cv.Scalar(0, 0, 255)
+        Dim foundColor = New Scalar(0, 0, 255)
         dst2.CopyTo(dst3)
         For i = 0 To cFound.Length - 1
             Dim pt = New cv.Point(CInt(cFound(i).Center.X), CInt(cFound(i).Center.Y))
@@ -143,7 +143,7 @@ End Class
 Public Class Hough_Featureless : Inherits TaskParent
     Public noDepthCount() As Integer
     Public options As New Options_Hough
-    Public roiColor() As cv.Vec3b
+    Public roiColor() As Vec3b
     Public Sub New()
         task.gOptions.GridSlider.Value = 10
         labels(2) = "Featureless mask"
@@ -181,15 +181,15 @@ End Class
 
 Public Class Hough_FeatureLessTopX : Inherits TaskParent
     Public options As New Options_Hough
-    Public maskFless As cv.Mat
-    Public maskFeat As cv.Mat
-    Public maskPredict As cv.Mat
+    Public maskFless As Mat
+    Public maskFeat As Mat
+    Public maskPredict As Mat
     Public Sub New()
         If standalone Then task.gOptions.displayDst1.Checked = True
         task.gOptions.GridSlider.Value = 10
-        maskFless = New cv.Mat(dst2.Size(), cv.MatType.CV_8U)
-        maskFeat = New cv.Mat(dst2.Size(), cv.MatType.CV_8U)
-        maskPredict = New cv.Mat(dst2.Size(), cv.MatType.CV_8U)
+        maskFless = New Mat(dst2.Size(), MatType.CV_8U)
+        maskFeat = New Mat(dst2.Size(), MatType.CV_8U)
+        maskPredict = New Mat(dst2.Size(), MatType.CV_8U)
         labels = {"", "", "Areas without features", "Areas with features"}
         desc = "Multithread Houghlines to find featureless regions in an image."
     End Sub
@@ -234,8 +234,8 @@ End Class
 
 Public Class Hough_LaneFinder : Inherits TaskParent
     Dim hls As New LaneFinder_HLSColor
-    Public segments As cv.LineSegmentPoint()
-    Public mask As cv.Mat
+    Public segments As LineSegmentPoint()
+    Public mask As Mat
     Public laneLineMinY As Integer
     Public Sub New()
         labels = {"Original video image", "Mask to isolate lane regions", "Combined yellow and white masks", "HoughLines output"}
@@ -253,13 +253,13 @@ Public Class Hough_LaneFinder : Inherits TaskParent
             Dim tr = New cv.Point(w * 0.6, h * 0.6)
 
             Dim pList() As cv.Point = {bl, tl, tr, br}
-            mask = New cv.Mat(New cv.Size(w, h), cv.MatType.CV_8U, cv.Scalar.All(0))
+            mask = New Mat(New Size(w, h), MatType.CV_8U, Scalar.All(0))
             FillConvexPoly(mask, pList, white, task.lineType)
         End If
         dst1 = mask.Clone
 
         dst0 = hls.dst0
-        dst2 = New cv.Mat(mask.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
+        dst2 = New Mat(mask.Size(), MatType.CV_8U, Scalar.All(0))
         hls.dst3.CopyTo(dst2, mask)
 
         Dim rho = 1
@@ -268,7 +268,7 @@ Public Class Hough_LaneFinder : Inherits TaskParent
         Dim minLineLength = 20
         Dim maxLineGap = 300
         segments = HoughLinesP(dst2.Clone, rho, theta, threshold, minLineLength, maxLineGap)
-        dst3 = New cv.Mat(mask.Size(), cv.MatType.CV_8UC3, cv.Scalar.All(0))
+        dst3 = New Mat(mask.Size(), MatType.CV_8UC3, Scalar.All(0))
         laneLineMinY = dst2.Height
         For i = 0 To segments.Length - 1
             If laneLineMinY > segments(i).P1.Y Then laneLineMinY = segments(i).P1.Y
@@ -292,7 +292,7 @@ Public Class Hough_Lines : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
-        CvtColor(task.edges.dst2, dst2, cv.ColorConversionCodes.GRAY2BGR)
+        CvtColor(task.edges.dst2, dst2, ColorConversionCodes.GRAY2BGR)
 
         dst3.SetTo(0)
         For Each roi In task.gridRects
@@ -309,7 +309,7 @@ End Class
 
 
 Public Class XR_Hough_FullImage : Inherits TaskParent
-    Public segments() As cv.LineSegmentPolar
+    Public segments() As LineSegmentPolar
     Public options As New Options_Hough
     Public Sub New()
         desc = "Use Houghlines to find lines in the image."
@@ -337,7 +337,7 @@ End Class
 
 
 Public Class XR_Hough_Probabilistic : Inherits TaskParent
-    Public segments() As cv.LineSegmentPolar
+    Public segments() As LineSegmentPolar
     Public options As New Options_Hough
     Public Sub New()
         task.gOptions.GridSlider.Value = 30
@@ -345,14 +345,14 @@ Public Class XR_Hough_Probabilistic : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
-        Static segments As cv.LineSegmentPoint()
+        Static segments As LineSegmentPoint()
         src.CopyTo(dst2)
         dst2.SetTo(white, task.edges.dst2)
         dst3.SetTo(0)
         segments = HoughLinesP(task.edges.dst2, options.rho, options.theta, options.threshold)
         For i = 0 To Math.Min(segments.Length, options.lineCount) - 1
             Dim lineX As LineSegmentPoint = segments(i)
-            Line(dst3, lineX.P1, lineX.P2, cv.Scalar.Red, task.lineWidth + 2, task.lineType)
+            Line(dst3, lineX.P1, lineX.P2, Scalar.Red, task.lineWidth + 2, task.lineType)
         Next
         labels(3) = "Probablistic lines = " + CStr(segments.Length)
     End Sub
@@ -395,8 +395,8 @@ Public Class XR_Hough_Structural : Inherits TaskParent
             Dim y0 As Double = b * rho
 
             ' We use 1000 as a large multiplier to ensure the line spans the view
-            Dim pt1 As New Point(CInt(Math.Round(x0 + 1000 * (-b))), CInt(Math.Round(y0 + 1000 * (a))))
-            Dim pt2 As New Point(CInt(Math.Round(x0 - 1000 * (-b))), CInt(Math.Round(y0 - 1000 * (a))))
+            Dim pt1 As New cv.Point(CInt(Math.Round(x0 + 1000 * (-b))), CInt(Math.Round(y0 + 1000 * (a))))
+            Dim pt2 As New cv.Point(CInt(Math.Round(x0 - 1000 * (-b))), CInt(Math.Round(y0 - 1000 * (a))))
 
             Line(dst3, pt1, pt2, task.highlight, task.lineWidth, task.lineType)
         Next

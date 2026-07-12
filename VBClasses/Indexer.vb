@@ -2,9 +2,9 @@ Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 Public Class Indexer_Basics : Inherits TaskParent
     Public prep As New RedPrep_Core
     Public Sub New()
-        desc = "Find edges in the reduced point cloud output using indexers"
+        desc = "Find edges in the reduced cv.Point cloud output using indexers"
     End Sub
-    Public Shared Function buildEdges(Input As cv.Mat) As cv.Mat
+    Public Shared Function buildEdges(Input As Mat) As Mat
         Dim horizontalMat = Input.Clone
         For y = 0 To horizontalMat.Rows - 1
             For x = 1 To horizontalMat.Cols - 1
@@ -47,7 +47,7 @@ Public Class Indexer_Corners : Inherits TaskParent
     Dim vals As New List(Of Byte)
     Dim indexBasics As New Indexer_Basics
     Public Sub New()
-        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
+        dst1 = New Mat(dst1.Size, MatType.CV_8U, 0)
         If standalone Then task.gOptions.displayDst1.Checked = True
         desc = "Find the corners in the RedPrep XY data and clip.  Identical to Indexer_Basics"
     End Sub
@@ -60,7 +60,7 @@ Public Class Indexer_Corners : Inherits TaskParent
         labels(2) = indexBasics.labels(2)
 
         dst3 = indexBasics.prep.dst2.Clone
-        Dim rectList As New List(Of cv.Rect)
+        Dim rectList As New List(of cv.Rect)
         For y = 1 To dst3.Rows - 3
             For x = 1 To dst3.Cols - 3
                 vals.Clear()

@@ -2,10 +2,10 @@ Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 Imports System.IO
 ' https://stackoverflow.com/questions/47706339/car-counting-and-classification-using-emgucv-and-vb-net
 Public Class Video_Basics : Inherits TaskParent
-    Public captureVideo As New cv.VideoCapture
+    Public captureVideo As New VideoCapture
     Public options As New Options_Video
     Public Sub New()
-        captureVideo = New cv.VideoCapture(options.fileInfo.FullName)
+        captureVideo = New VideoCapture(options.fileInfo.FullName)
         labels(2) = options.fileInfo.Name
         desc = "Show a video file"
     End Sub
@@ -13,13 +13,13 @@ Public Class Video_Basics : Inherits TaskParent
         options.Run()
 
         If task.optionsChanged Then
-            captureVideo = New cv.VideoCapture(options.fileInfo.FullName)
+            captureVideo = New VideoCapture(options.fileInfo.FullName)
         End If
 
         captureVideo.Read(dst1)
         If dst1.Empty() Then
             captureVideo.Dispose()
-            captureVideo = New cv.VideoCapture(options.fileInfo.FullName)
+            captureVideo = New VideoCapture(options.fileInfo.FullName)
             captureVideo.Read(dst1)
         End If
 
@@ -61,8 +61,8 @@ Public Class XR_Video_CarCounting : Inherits TaskParent
             Dim cellCount = CountNonZero(dst0(lane))
             If cellCount Then
                 activeState(i) = True
-                Rectangle(dst0, lane, cv.Scalar.Red, -1)
-                Rectangle(dst3, lane, cv.Scalar.Red, -1)
+                Rectangle(dst0, lane, Scalar.Red, -1)
+                Rectangle(dst3, lane, Scalar.Red, -1)
             End If
             If cellCount = 0 And activeState(i) = True Then
                 activeState(i) = False
@@ -72,7 +72,7 @@ Public Class XR_Video_CarCounting : Inherits TaskParent
         Next
 
         Resize(dst0, dst1, src.Size())
-        If dst1.Channels() <> dst2.Channels() Then CvtColor(dst1, dst1, cv.ColorConversionCodes.GRAY2BGR)
+        If dst1.Channels() <> dst2.Channels() Then CvtColor(dst1, dst1, ColorConversionCodes.GRAY2BGR)
         flow.nextMsg = "  Cars " + CStr(carCount)
         flow.Run(src)
         dst2 = dst2 Or dst1
@@ -122,12 +122,12 @@ Public Class Video_MinRect : Inherits TaskParent
         If video.dst2.Empty() = False Then
             bgSub.Run(video.dst2)
 
-            contours = FindContoursAsArray(bgSub.dst2, cv.RetrievalModes.Tree, cv.ContourApproximationModes.ApproxSimple)
-            CvtColor(bgSub.dst2, dst2, cv.ColorConversionCodes.GRAY2BGR)
+            contours = FindContoursAsArray(bgSub.dst2, RetrievalModes.Tree, ContourApproximationModes.ApproxSimple)
+            CvtColor(bgSub.dst2, dst2, ColorConversionCodes.GRAY2BGR)
             If standaloneTest() Then
                 For i = 0 To contours.Length - 1
                     Dim minRect = MinAreaRect(contours(i))
-                    Rectangle_Basics.DrawRotatedRect(minRect, dst2, cv.Scalar.Red)
+                    Rectangle_Basics.DrawRotatedRect(minRect, dst2, Scalar.Red)
                 Next
             End If
             dst3 = video.dst2
@@ -149,7 +149,7 @@ Public Class XR_Video_MinCircle : Inherits TaskParent
         dst2 = video.dst2
         dst3 = video.dst3
 
-        Dim center As New cv.Point2f
+        Dim center As New Point2f
         Dim radius As Single
         If video.contours IsNot Nothing Then
             For i = 0 To video.contours.Length - 1

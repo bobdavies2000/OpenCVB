@@ -9,7 +9,7 @@ Public Class XR_MinMath_Edges : Inherits TaskParent
         dst2 = bPoints.dst2
         labels(2) = bPoints.labels(2)
 
-        CvtColor(task.edges.dst2, dst3, cv.ColorConversionCodes.GRAY2BGR)
+        CvtColor(task.edges.dst2, dst3, ColorConversionCodes.GRAY2BGR)
         labels(3) = task.edges.labels(2)
 
         For Each bp In bPoints.ptList
@@ -55,7 +55,7 @@ Public Class XR_MinMath_KNN : Inherits TaskParent
     Dim bPoint As New BrickPoint_Basics
     Dim knn As New KNN_Basics
     Public Sub New()
-        desc = "Connect each grid square point with its nearest neighbor"
+        desc = "Connect each grid square cv.Point with its nearest neighbor"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         bPoint.Run(src)
@@ -64,7 +64,7 @@ Public Class XR_MinMath_KNN : Inherits TaskParent
 
         knn.queries.Clear()
         For Each pt In bPoint.ptList
-            knn.queries.Add(New cv.Point2f(pt.X, pt.Y))
+            knn.queries.Add(New Point2f(pt.X, pt.Y))
         Next
 
         knn.trainInput = knn.queries

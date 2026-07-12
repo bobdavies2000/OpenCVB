@@ -1,4 +1,4 @@
-﻿Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
+﻿Imports OpenCvSharp.Cv2 : Imports cv = OpenCvSharp
 Public Module Structures
     Public Enum pointStyle
         unFiltered = 0
@@ -225,7 +225,7 @@ Public Module Structures
 
 
 
-    Public Class fpData ' feature point -  excessive - trim this to fcsData...
+    Public Class fpData ' feature cv.Point -  excessive - trim this to fcsData...
         Public index As Integer
         Public age As Integer = 1
         Public ID As Single
@@ -404,10 +404,10 @@ Public Module Structures
             If angle < -90.0 Then angle += 180.0
             Return angle
         End Function
-        Public Shared Function AngleAtPoint(pVertex As Point2f, p1 As Point2f, p2 As Point2f) As Double
+        Public Shared Function AngleAtPoint(pVertex As cv.Point2f, p1 As cv.Point2f, p2 As cv.Point2f) As Double
             ' Build the two vectors that meet at the vertex
-            Dim v1 As New Point2f(p1.X - pVertex.X, p1.Y - pVertex.Y)
-            Dim v2 As New Point2f(p2.X - pVertex.X, p2.Y - pVertex.Y)
+            Dim v1 As New cv.Point2f(p1.X - pVertex.X, p1.Y - pVertex.Y)
+            Dim v2 As New cv.Point2f(p2.X - pVertex.X, p2.Y - pVertex.Y)
 
             ' Dot product
             Dim dot As Double = v1.X * v2.X + v1.Y * v2.Y
@@ -433,7 +433,7 @@ Public Module Structures
             p1 = validatePoint(_p1)
             p2 = validatePoint(_p2)
 
-            ' trying a simple convention: p1 is leftmost point
+            ' trying a simple convention: p1 is leftmost cv.Point
             If p1.X > p2.X Then
                 Dim ptTemp = p1
                 p1 = p2
@@ -507,7 +507,7 @@ Public Module Structures
             Dim pad As Integer = 5
             Dim w = Math.Abs(p1.X - p2.X) + pad * 2
             Dim h = Math.Abs(p1.Y - p2.Y) + pad
-            ' p1 is always leftmost point.
+            ' p1 is always leftmost cv.Point.
             If Math.Abs(angle) > 45 Then
                 rect = New cv.Rect(p1.X - pad, Math.Min(p1.Y, p2.Y), Math.Max(pad * 2, w), Math.Max(pad * 2, h))
             Else

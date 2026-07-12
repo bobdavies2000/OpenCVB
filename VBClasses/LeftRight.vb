@@ -15,13 +15,13 @@ Public Class LeftRight_Basics : Inherits TaskParent
             dst3 = task.rightView.Clone
         Else
             brightness.run(task.leftView)
-            Dim tmpLeft As cv.Mat = brightness.dst2 ' input array conflict
-            Normalize(tmpLeft, task.leftView, 100, 150, cv.NormTypes.MinMax)
+            Dim tmpLeft As Mat = brightness.dst2 ' input array conflict
+            Normalize(tmpLeft, task.leftView, 100, 150, NormTypes.MinMax)
             If standaloneTest() Then dst2 = task.leftView
 
             brightness.run(task.rightView)
-            Dim tmpRight As cv.Mat = brightness.dst2 ' inputarray conflict
-            Normalize(tmpRight, task.rightView, 100, 150, cv.NormTypes.MinMax)
+            Dim tmpRight As Mat = brightness.dst2 ' inputarray conflict
+            Normalize(tmpRight, task.rightView, 100, 150, NormTypes.MinMax)
             If standaloneTest() Then dst3 = task.rightView
         End If
     End Sub
@@ -181,10 +181,10 @@ Public Class LeftRight_Brightness_TA : Inherits TaskParent
         Options.Run()
 
         ConvertScaleAbs(task.leftView, dst2, Options.brightness, Options.contrast)
-        Normalize(dst2, dst2, 0, 255, cv.NormTypes.MinMax)
+        Normalize(dst2, dst2, 0, 255, NormTypes.MinMax)
 
         ConvertScaleAbs(task.rightView, dst3, Options.brightness, Options.contrast)
-        Normalize(dst3, dst3, 0, 255, cv.NormTypes.MinMax)
+        Normalize(dst3, dst3, 0, 255, NormTypes.MinMax)
 
         labels(2) = "Left Image brightness/contrast = " + CStr(Options.brightness) + "/" + CStr(Options.contrast)
         labels(3) = "Right Image brightness/contrast = " + CStr(Options.brightness) + "/" + CStr(Options.contrast)
@@ -263,7 +263,7 @@ Public Class LeftRight_Stable : Inherits TaskParent
     Dim stableLeft As New StableGray_BasicsMax
     Dim motionRight As New Motion_Right
     Public Sub New()
-        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        dst2 = New Mat(dst2.Size, MatType.CV_8U, 0)
         desc = "Create StableGray_Basics output for left and right images."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -273,7 +273,7 @@ Public Class LeftRight_Stable : Inherits TaskParent
 
         motionRight.Run(task.rightView)
 
-        Static lastRight As cv.Mat = task.rightView.Clone
+        Static lastRight As Mat = task.rightView.Clone
         If task.heartBeat Then lastRight = task.rightView.Clone
 
         Max(task.rightView, lastRight, dst3)

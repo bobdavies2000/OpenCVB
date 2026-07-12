@@ -1,9 +1,9 @@
 Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 ' https://github.com/nemanja-m/gaps
 Public Class Puzzle_Basics : Inherits TaskParent
-    Public scrambled As New List(Of cv.Rect) ' this is every roi regardless of size.
-    Public unscrambled As New List(Of cv.Rect) ' this is every roi regardless of size.
-    Public image As New cv.Mat
+    Public scrambled As New List(of cv.Rect) ' this is every roi regardless of size.
+    Public unscrambled As New List(of cv.Rect) ' this is every roi regardless of size.
+    Public image As New Mat
     Public Sub New()
         desc = "Create the puzzle pieces to solve with correlation."
     End Sub
@@ -13,7 +13,7 @@ Public Class Puzzle_Basics : Inherits TaskParent
     End Function
     Public Overrides Sub RunAlg(src As cv.Mat)
         unscrambled.Clear()
-        Dim inputROI As New List(Of cv.Rect)
+        Dim inputROI As New List(of cv.Rect)
         For j = 0 To task.gridRects.Count - 1
             Dim gRect = task.gridRects(j)
             If gRect.Width = task.gridWH And gRect.Height = task.gridWH Then inputROI.Add(task.gridRects(j))
@@ -42,7 +42,7 @@ End Class
 Public Class Puzzle_Solver : Inherits TaskParent
     Public puzzle As New Puzzle_Basics
     Dim match As New Match_Basics
-    Public grayMat As New cv.Mat
+    Public grayMat As New Mat
     Dim puzzleIndex As Integer
     Dim options As New Options_Puzzle
     Public Sub New()
@@ -57,7 +57,7 @@ Public Class Puzzle_Solver : Inherits TaskParent
             puzzle.Run(src)
             dst2 = puzzle.dst2
             dst3.SetTo(0)
-            CvtColor(puzzle.image, grayMat, cv.ColorConversionCodes.BGR2GRAY)
+            CvtColor(puzzle.image, grayMat, ColorConversionCodes.BGR2GRAY)
             puzzleIndex = 0
         End If
 

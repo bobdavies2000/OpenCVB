@@ -14,21 +14,21 @@ Public Class Feature_Basics : Inherits TaskParent
         If src.Channels <> 1 Then src = task.gray
         dst2 = task.color.Clone
 
-        Dim ptLatest As New List(Of cv.Point2f)
+        Dim ptLatest As New List(Of Point2f)
         Select Case task.fOptions.FeatureMethod.Text
             Case "AGAST"
                 If cPtr = 0 Then cPtr = Agast_Open()
                 src = task.color.Clone
-                Dim dataSrc(src.Total - 1) As cv.Vec3b
-                src.GetArray(Of cv.Vec3b)(dataSrc)
+                Dim dataSrc(src.Total - 1) As Vec3b
+                src.GetArray(Of Vec3b)(dataSrc)
 
                 Dim handleSrc = GCHandle.Alloc(dataSrc, GCHandleType.Pinned)
                 Dim imagePtr = Agast_Run(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, options.agastThreshold)
                 handleSrc.Free()
 
-                Dim ptMat = cv.Mat.FromPixelData(Agast_Count(cPtr), 1, cv.MatType.CV_32FC2, imagePtr).Clone
+                Dim ptMat = Mat.FromPixelData(Agast_Count(cPtr), 1, MatType.CV_32FC2, imagePtr).Clone
                 For i = 0 To ptMat.Rows - 1
-                    Dim pt = ptMat.Get(Of cv.Point2f)(i, 0)
+                    Dim pt = ptMat.Get(Of Point2f)(i, 0)
                     ptLatest.Add(pt)
                     If standaloneTest() Then Circle(dst2, pt, task.DotSize, white, -1, task.lineType)
                 Next
@@ -53,7 +53,7 @@ Public Class Feature_Basics : Inherits TaskParent
                 strOut = "FAST produced " + CStr(ptLatest.Count) + " features"
             Case "GoodFeatures"
                 ptLatest = GoodFeaturesToTrack(src, task.fOptions.FrameHistoryCount.Value, options.quality,
-                                                      options.minDistance, New cv.Mat,
+                                                      options.minDistance, New Mat,
                                                       options.blockSize, True, options.k).ToList
                 strOut = "GoodFeatures produced " + CStr(ptLatest.Count) + " features"
             Case "Harris"
@@ -108,7 +108,7 @@ End Class
 Public Class XR_Feature_Basics : Inherits TaskParent
     Implements IDisposable
     Public options As New Options_Features
-    Public features As New List(Of cv.Point2f)
+    Public features As New List(Of Point2f)
     Public Sub New()
         desc = "Gather features from a list of sources - GoodFeatures, Agast, Brisk..."
     End Sub
@@ -119,30 +119,30 @@ Public Class XR_Feature_Basics : Inherits TaskParent
 
         dst2 = task.color.Clone
 
-        Dim ptNew As New List(Of cv.Point2f)
+        Dim ptNew As New List(Of Point2f)
 
 
         strOut = ""
-        Dim ptLatest As New List(Of cv.Point2f)
+        Dim ptLatest As New List(Of Point2f)
         Select Case task.fOptions.FeatureMethod.Text
             Case "GoodFeatures"
                 ptLatest = GoodFeaturesToTrack(src, task.fOptions.FrameHistoryCount.Value, options.quality,
-                                                      options.minDistance, New cv.Mat,
+                                                      options.minDistance, New Mat,
                                                       options.blockSize, True, options.k).ToList
                 strOut = "GoodFeatures produced " + CStr(ptLatest.Count) + " features"
             Case "AGAST"
                 If cPtr = 0 Then cPtr = Agast_Open()
                 src = task.color.Clone
-                Dim dataSrc(src.Total - 1) As cv.Vec3b
-                src.GetArray(Of cv.Vec3b)(dataSrc)
+                Dim dataSrc(src.Total - 1) As Vec3b
+                src.GetArray(Of Vec3b)(dataSrc)
 
                 Dim handleSrc = GCHandle.Alloc(dataSrc, GCHandleType.Pinned)
                 Dim imagePtr = Agast_Run(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, options.agastThreshold)
                 handleSrc.Free()
 
-                Dim ptMat = cv.Mat.FromPixelData(Agast_Count(cPtr), 1, cv.MatType.CV_32FC2, imagePtr).Clone
+                Dim ptMat = Mat.FromPixelData(Agast_Count(cPtr), 1, MatType.CV_32FC2, imagePtr).Clone
                 For i = 0 To ptMat.Rows - 1
-                    Dim pt = ptMat.Get(Of cv.Point2f)(i, 0)
+                    Dim pt = ptMat.Get(Of Point2f)(i, 0)
                     ptLatest.Add(pt)
                     If standaloneTest() Then Circle(dst2, pt, task.DotSize, white, -1, task.lineType)
                 Next
@@ -187,13 +187,13 @@ Public Class XR_Feature_Basics : Inherits TaskParent
             Next
         End If
 
-        Dim sortByGrid As New SortedList(Of Single, cv.Point2f)(New compareAllowIdenticalSingle)
+        Dim sortByGrid As New SortedList(Of Single, Point2f)(New compareAllowIdenticalSingle)
         For Each pt In ptNew
             Dim index = task.gridMap.Get(Of Integer)(pt.Y, pt.X)
             sortByGrid.Add(index, pt)
         Next
 
-        features = New List(Of cv.Point2f)(sortByGrid.Values)
+        features = New List(Of Point2f)(sortByGrid.Values)
 
         For Each pt In features
         Circle(dst2, pt, task.DotSize, task.highlight, -1, task.lineType)
@@ -213,7 +213,7 @@ End Class
 
 Public Class Feature_Bricks : Inherits TaskParent
     Public features As New List(Of cv.Point)
-    Public feature2f As New List(Of cv.Point2f)
+    Public feature2f As New List(Of Point2f)
     Dim bPoint As New BrickPoint_MaxSobel
     Public Sub New()
         desc = "Gather features from the sobel grid square points and preserve those representing lines."
@@ -226,7 +226,7 @@ Public Class Feature_Bricks : Inherits TaskParent
         feature2f.Clear()
         For Each pt In bPoint.features
             Dim index = lastFeatures.IndexOf(pt)
-            If index >= 0 Then feature2f.Add(New cv.Point2f(pt.X, pt.Y))
+            If index >= 0 Then feature2f.Add(New Point2f(pt.X, pt.Y))
         Next
 
         features.Clear()
@@ -347,7 +347,7 @@ End Class
 
 Public Class XR_Feature_TraceDelaunay : Inherits TaskParent
     Dim features As New Feature_Delaunay
-    Public goodList As New List(Of List(Of cv.Point2f)) ' stable points only
+    Public goodList As New List(Of List(Of Point2f)) ' stable points only
     Public Sub New()
         labels = {"Stable points highlighted", "", "", "Delaunay map of regions defined by the feature points"}
         desc = "Trace the GoodFeatures points using only Delaunay - no KNN or RedCloud or Matching."
@@ -358,7 +358,7 @@ Public Class XR_Feature_TraceDelaunay : Inherits TaskParent
 
         If task.optionsChanged Then goodList.Clear()
 
-        Dim ptList As New List(Of cv.Point2f)
+        Dim ptList As New List(Of Point2f)
         For Each pt In features.feat.features
             ptList.Add(pt)
         Next
@@ -370,7 +370,7 @@ Public Class XR_Feature_TraceDelaunay : Inherits TaskParent
         For Each ptList In goodList
             For Each pt In ptList
             Circle(task.color, pt, task.DotSize, task.highlight, -1, task.lineType)
-                Dim c = dst3.Get(Of cv.Vec3b)(pt.Y, pt.X)
+                Dim c = dst3.Get(Of Vec3b)(pt.Y, pt.X)
                 Circle(dst2, pt, task.DotSize + 1, c, -1, task.lineType)
             Next
         Next
@@ -399,12 +399,12 @@ Public Class XR_Feature_ShiTomasi : Inherits TaskParent
             dst2 = task.leftView
             dst3 = task.rightView
             shiTomasi.Run(task.leftView)
-            Dim _cvtInline As New cv.Mat
-            CvtColor(shiTomasi.dst3, _cvtInline, cv.ColorConversionCodes.BGR2GRAY)
-            dst2.SetTo(cv.Scalar.White,_cvtInline)
+            Dim _cvtInline As New Mat
+            CvtColor(shiTomasi.dst3, _cvtInline, ColorConversionCodes.BGR2GRAY)
+            dst2.SetTo(Scalar.White,_cvtInline)
 
             shiTomasi.Run(task.rightView)
-            CvtColor(shiTomasi.dst3, _cvtInline, cv.ColorConversionCodes.BGR2GRAY)
+            CvtColor(shiTomasi.dst3, _cvtInline, ColorConversionCodes.BGR2GRAY)
             dst3.SetTo(task.highlight,_cvtInline)
         Else
             harris.Run(task.leftView)
@@ -498,7 +498,7 @@ Public Class XR_Feature_History : Inherits TaskParent
                 Dim pt = newFeatures(i)
                 features.Add(pt)
                 If gens(i) < task.fOptions.FrameHistoryCount.Value  Then
-                Circle(dst2, pt, task.DotSize + 2, cv.Scalar.Red, -1, task.lineType)
+                Circle(dst2, pt, task.DotSize + 2, Scalar.Red, -1, task.lineType)
                 Else
                     whiteCount += 1
                     Circle(dst2, pt, task.DotSize, task.highlight, -1, task.lineType)
@@ -521,8 +521,8 @@ End Class
 
 Public Class XR_Feature_AKaze : Inherits TaskParent
     Implements IDisposable
-    Dim kazeKeyPoints As cv.KeyPoint() = Nothing
-    Dim kaze As cv.XFeatures2D.AKAZE
+    Dim kazeKeyPoints As KeyPoint() = Nothing
+    Dim kaze As XFeatures2D.AKAZE
     Public Sub New()
         labels(2) = "AKAZE key points"
         desc = "Find keypoints using AKAZE algorithm."
@@ -530,8 +530,8 @@ Public Class XR_Feature_AKaze : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst2 = src.Clone()
         If src.Channels() <> 1 Then src = task.gray
-        If kaze Is Nothing Then kaze = cv.XFeatures2D.AKAZE.Create()
-        Dim kazeDescriptors As New cv.Mat()
+        If kaze Is Nothing Then kaze = XFeatures2D.AKAZE.Create()
+        Dim kazeDescriptors As New Mat()
         kaze.DetectAndCompute(src, Nothing, kazeKeyPoints, kazeDescriptors)
         For i As Integer = 0 To kazeKeyPoints.Length - 1
         Circle(dst2, kazeKeyPoints(i).Pt, task.DotSize, task.highlight, -1, task.lineType)
@@ -661,7 +661,7 @@ Public Class XR_Feature_SteadyCam : Inherits TaskParent
         feat.Run(task.gray)
 
         Static features As New List(Of cv.Point)(feat.features)
-        Static lastSrc As cv.Mat = src.Clone
+        Static lastSrc As Mat = src.Clone
 
         Dim resync = features.Count / feat.features.Count < options.resyncThreshold
         If task.heartBeat Or task.optionsChanged Or resync Then
@@ -669,8 +669,8 @@ Public Class XR_Feature_SteadyCam : Inherits TaskParent
         End If
 
         Dim ptList = New List(Of cv.Point)(features)
-        Dim correlationMat As New cv.Mat
-        Dim mode = cv.TemplateMatchModes.CCoeffNormed
+        Dim correlationMat As New Mat
+        Dim mode = TemplateMatchModes.CCoeffNormed
         features.Clear()
         For Each pt In ptList
             Dim index As Integer = task.gridMap.Get(Of Integer)(pt.Y, pt.X)
@@ -698,8 +698,8 @@ End Class
 
 Public Class XR_Feature_Agast : Inherits TaskParent
     Implements IDisposable
-    Dim agastFD As cv.XFeatures2D.AgastFeatureDetector
-    Dim stablePoints As New List(Of cv.Point2f)
+    Dim agastFD As XFeatures2D.AgastFeatureDetector
+    Dim stablePoints As New List(Of Point2f)
     Dim options As New Options_Agast
     Public Sub New()
         desc = "Use the Agast Feature Detector in the OpenCV Contrib."
@@ -709,18 +709,18 @@ Public Class XR_Feature_Agast : Inherits TaskParent
 
         If task.optionsChanged Then
             If agastFD IsNot Nothing Then agastFD.Dispose()
-            agastFD = cv.XFeatures2D.AgastFeatureDetector.Create(options.agastThreshold, options.useNonMaxSuppression,
-                                                         cv.XFeatures2D.AgastFeatureDetector.DetectorType.OAST_9_16)
+            agastFD = XFeatures2D.AgastFeatureDetector.Create(options.agastThreshold, options.useNonMaxSuppression,
+                                                         XFeatures2D.AgastFeatureDetector.DetectorType.OAST_9_16)
         End If
 
-        Dim keypoints As cv.KeyPoint() = agastFD.Detect(src)
+        Dim keypoints As KeyPoint() = agastFD.Detect(src)
 
-        Dim currPoints As New List(Of cv.Point2f)
-        For Each kpt As cv.KeyPoint In keypoints
+        Dim currPoints As New List(Of Point2f)
+        For Each kpt As KeyPoint In keypoints
             currPoints.Add(kpt.Pt)
         Next
 
-        Dim newList As New List(Of cv.Point2f)
+        Dim newList As New List(Of Point2f)
         For Each pt In stablePoints
             Dim val = task.motion.motionMask.Get(Of Byte)(pt.Y, pt.X)
             If val = 0 Then newList.Add(pt)
@@ -731,7 +731,7 @@ Public Class XR_Feature_Agast : Inherits TaskParent
             If val <> 0 Then newList.Add(pt)
         Next
 
-        stablePoints = New List(Of cv.Point2f)(newList)
+        stablePoints = New List(Of Point2f)(newList)
         dst2 = src
         For Each pt In stablePoints
         Circle(dst2, pt, task.DotSize, task.highlight, -1, task.lineType)
@@ -784,7 +784,7 @@ Public Class XR_Feature_BrickLine : Inherits TaskParent
             If brickLines.Count = 1 Then Continue For
             Dim pt = brickLines(i)(0)
             If pt = brickLines(i).Last Then Continue For
-            Dim color = vecToScalar(task.lines.dst2.Get(Of cv.Vec3b)(pt.Y, pt.X))
+            Dim color = vecToScalar(task.lines.dst2.Get(Of Vec3b)(pt.Y, pt.X))
             Circle(dst3, pt, task.DotSize, color, -1, task.lineType)
             Line(dst2, pt, brickLines(i).Last, color, task.lineWidth, task.lineType)
             Line(dst3, pt, brickLines(i).Last, color, task.lineWidth, task.lineType)
@@ -839,8 +839,8 @@ Public Class Feature_KNN : Inherits TaskParent
     Dim knn As New KNN_Basics
     Public feat As New Feature_Basics
     Public Sub New()
-        dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
-        desc = "Find good features to track in the image but use the same point if closer than a threshold"
+        dst3 = New Mat(dst3.Size(), MatType.CV_8U, Scalar.All(0))
+        desc = "Find good features to track in the image but use the same cv.Point if closer than a threshold"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         feat.Run(task.gray)
@@ -889,7 +889,7 @@ Public Class Feature_LeftRight : Inherits TaskParent
         pyrRight.Run(task.rightView)
 
         Dim ptLeft As New List(Of cv.Point)
-        CvtColor(task.leftView, dst2, cv.ColorConversionCodes.GRAY2BGR)
+        CvtColor(task.leftView, dst2, ColorConversionCodes.GRAY2BGR)
         Dim rightMatches As New List(Of cv.Point)
         For i = 0 To pyrLeft.features.Count - 1
             Dim pt = pyrLeft.features(i)
@@ -903,7 +903,7 @@ Public Class Feature_LeftRight : Inherits TaskParent
             End If
         Next
 
-        CvtColor(task.rightView, dst3, cv.ColorConversionCodes.GRAY2BGR)
+        CvtColor(task.rightView, dst3, ColorConversionCodes.GRAY2BGR)
         lastFeatures = New List(Of cv.Point)(features)
         Dim newFeatures As New List(Of cv.Point)
         For Each pt In pyrRight.features

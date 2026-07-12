@@ -1,4 +1,4 @@
-Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
+Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCvSharp : Imports System.Drawing
 ' https://docs.opencvb.org/3.4/dc/df6/tutorial_py_Histogram_backprojection.html
 Public Class BackProject2D_Basics : Inherits TaskParent
     Public hist2d As New Hist2D_Basics
@@ -10,19 +10,18 @@ Public Class BackProject2D_Basics : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         Dim index As Integer = task.gridMap.Get(Of Integer)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
-        Dim r = task.gridRects(index)
 
         colorFmt.Run(task.color)
         hist2d.Run(colorFmt.dst2)
         dst2 = hist2d.dst2
 
-        If standaloneTest() Then DrawRect(dst2, r, white)
+        Dim r As cv.Rect = task.gridRects(index)
 
-        Dim histogram As New cv.Mat
+        Dim histogram As New Mat
         If backProjectByGrid Then
             histogram = task.gridMap.Clone
         Else
-            histogram = New cv.Mat(hist2d.histogram.Size, cv.MatType.CV_32F, cv.Scalar.All(0))
+            histogram = New Mat(hist2d.histogram.Size, MatType.CV_32F, Scalar.All(0))
             hist2d.histogram(r).CopyTo(histogram(r))
         End If
         CalcBackProject({colorFmt.dst2}, hist2d.channels, histogram, dst0, hist2d.ranges)
@@ -35,7 +34,7 @@ Public Class BackProject2D_Basics : Inherits TaskParent
             dst3 = Palettize(dst0)
         Else
             dst3.SetTo(0)
-            dst3.SetTo(cv.Scalar.Yellow, dst0)
+            dst3.SetTo(Scalar.Yellow, dst0)
         End If
         labels(2) = colorFmt.options.colorFormat + " format " + If(classCount > 0, CStr(classCount) + " classes", " ")
         Dim c1 = task.channels(0), c2 = task.channels(1)
@@ -98,7 +97,7 @@ Public Class XR_BackProject2D_Top : Inherits TaskParent
 
         CalcBackProject({task.pointCloud}, task.channelsTop, heat.histogramTop, dst1, task.rangesTop)
         ConvertScaleAbs(dst1, dst1)
-        dst1.ConvertTo(dst1, cv.MatType.CV_8U)
+        dst1.ConvertTo(dst1, MatType.CV_8U)
         dst3 = Palettize(dst1)
     End Sub
 End Class
@@ -119,7 +118,7 @@ Public Class XR_BackProject2D_Side : Inherits TaskParent
 
         CalcBackProject({task.pointCloud}, task.channelsSide, heat.histogramSide, dst1, task.rangesSide)
         ConvertScaleAbs(dst1, dst1)
-        dst1.ConvertTo(dst1, cv.MatType.CV_8U)
+        dst1.ConvertTo(dst1, MatType.CV_8U)
         dst3 = Palettize(dst1)
     End Sub
 End Class
@@ -133,18 +132,18 @@ End Class
 
 Public Class BackProject2D_Filter : Inherits TaskParent
     Public thresholdVal As Integer
-    Public histogram As New cv.Mat
+    Public histogram As New Mat
     Public Sub New()
-        dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_32FC3, 0)
+        dst2 = New Mat(dst2.Size(), MatType.CV_32FC3, 0)
         task.gOptions.setHistogramBins(100) ' extra bins to help isolate the stragglers.
         desc = "Filter a 2D histogram for the backprojection."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If standaloneTest() Then
-            CalcHist({task.pointCloud}, task.channelsSide, New cv.Mat, histogram, 2, task.bins2D, task.rangesSide)
+            CalcHist({task.pointCloud}, task.channelsSide, New Mat, histogram, 2, task.bins2D, task.rangesSide)
         End If
         'histogram.Col(0).SetTo(0)
-        Threshold(histogram, dst2, thresholdVal, 255, cv.ThresholdTypes.Binary)
+        Threshold(histogram, dst2, thresholdVal, 255, ThresholdTypes.Binary)
     End Sub
 End Class
 
@@ -163,15 +162,15 @@ Public Class BackProject2D_FilterSide : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
 
-        Dim histogram As New cv.Mat
-        CalcHist({task.pointCloud}, task.channelsSide, New cv.Mat, histogram, 2, task.bins2D, task.rangesSide)
+        Dim histogram As New Mat
+        CalcHist({task.pointCloud}, task.channelsSide, New Mat, histogram, 2, task.bins2D, task.rangesSide)
 
         filter.thresholdVal = options.sideThreshold
         filter.histogram = histogram
         filter.Run(src)
 
         CalcBackProject({task.pointCloud}, task.channelsSide, filter.histogram, dst1, task.rangesSide)
-        dst1.ConvertTo(dst1, cv.MatType.CV_8U)
+        dst1.ConvertTo(dst1, MatType.CV_8U)
 
         dst2.SetTo(0)
         task.pointCloud.CopyTo(dst2, dst1)
@@ -194,15 +193,15 @@ Public Class BackProject2D_FilterTop : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
 
-        Dim histogram As New cv.Mat
-        CalcHist({task.pointCloud}, task.channelsSide, New cv.Mat, histogram, 2, task.bins2D, task.rangesSide)
+        Dim histogram As New Mat
+        CalcHist({task.pointCloud}, task.channelsSide, New Mat, histogram, 2, task.bins2D, task.rangesSide)
 
         filter.thresholdVal = options.topThreshold
         filter.histogram = histogram
         filter.Run(src)
 
         CalcBackProject({task.pointCloud}, task.channelsTop, filter.dst2, dst1, task.rangesTop)
-        dst1.ConvertTo(dst1, cv.MatType.CV_8U)
+        dst1.ConvertTo(dst1, MatType.CV_8U)
 
         dst2.SetTo(0)
         task.pointCloud.CopyTo(dst2, dst1)
@@ -288,15 +287,15 @@ Public Class XR_BackProject2D_RowCol : Inherits TaskParent
         Else
             rect = New cv.Rect(r.X, 0, r.Width, dst2.Height)
         End If
-        Rectangle(dst2, rect, task.highlight, task.lineWidth)
-        Dim histData As New cv.Mat(backp.hist2d.histogram.Size, cv.MatType.CV_32F, 0)
+        cv.Cv2.Rectangle(dst2, rect, task.highlight, task.lineWidth)
+        Dim histData As New Mat(backp.hist2d.histogram.Size, MatType.CV_32F, 0)
         backp.hist2d.histogram(rect).CopyTo(histData(rect))
 
         Dim ranges() = backp.hist2d.ranges
         CalcBackProject({task.color}, backp.hist2d.channels, histData, dst1, ranges)
 
         dst3.SetTo(0)
-        dst3.SetTo(cv.Scalar.Yellow, dst1)
+        dst3.SetTo(Scalar.Yellow, dst1)
         dst0.SetTo(0, dst1)
 
         If task.heartBeat Then
@@ -327,7 +326,7 @@ Public Class BackProject2D_Grayscale : Inherits TaskParent
         desc = "Build the 2D histogram with PlotBar_Histogram2D, then CalcBackProject to map each pixel to histogram likelihood."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        Dim colorSrc As cv.Mat
+        Dim colorSrc As Mat
         If standalone Then
             colorFmt.Run(src)
             colorSrc = colorFmt.dst2
@@ -338,10 +337,10 @@ Public Class BackProject2D_Grayscale : Inherits TaskParent
         histBar.Run(colorSrc)
         dst2 = histBar.dst2
 
-        Dim backP As New cv.Mat
+        Dim backP As New Mat
         CalcBackProject({colorSrc}, channels, histBar.histogram, backP, histBar.ranges)
-        Normalize(backP, dst3, 0, 255, cv.NormTypes.MinMax)
-        dst3.ConvertTo(dst3, cv.MatType.CV_8U)
+        Normalize(backP, dst3, 0, 255, NormTypes.MinMax)
+        dst3.ConvertTo(dst3, MatType.CV_8U)
 
         If standaloneTest() Then
             labels(3) = "Backprojection min/max " + GetMinMax(backP).minVal.ToString(fmt2) + "/" +

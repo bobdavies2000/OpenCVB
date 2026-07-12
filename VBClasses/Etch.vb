@@ -1,7 +1,7 @@
 Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 Public Class XR_Etch_ASketch : Inherits TaskParent
     Dim keys As Keyboard_Basics
-    Dim slateColor = New cv.Scalar(122, 122, 122)
+    Dim slateColor = New Scalar(122, 122, 122)
     Dim cursor As cv.Point
     Dim ms_rng As New System.Random
     Dim options As New Options_Etch_ASketch
@@ -54,7 +54,7 @@ Public Class XR_Etch_ASketch : Inherits TaskParent
             If cursor.Y < 0 Then cursor.Y = 0
             If cursor.X >= src.Width Then cursor.X = src.Width - 1
             If cursor.Y >= src.Height Then cursor.Y = src.Height - 1
-            dst2.Set(Of cv.Vec3b)(cursor.Y, cursor.X, black.ToVec3b)
+            dst2.Set(Of Vec3b)(cursor.Y, cursor.X, black.ToVec3b)
         Next
         If options.demoMode Then lastCursor = cursor
     End Sub

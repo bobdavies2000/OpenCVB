@@ -2,17 +2,17 @@ Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 Imports System.IO
 ' https://github.com/anopara/genetic-drawing
 Public Class GeneticDrawing_Basics : Inherits TaskParent
-    Public minBrushRange = New cv.Rangef(0.1, 0.3)
-    Public maxBrushRange = New cv.Rangef(0.3, 0.7)
+    Public minBrushRange = New Rangef(0.1, 0.3)
+    Public maxBrushRange = New Rangef(0.3, 0.7)
     Dim minSize As Single
     Dim maxSize As Single
-    Public brushes(4 - 1) As cv.Mat
+    Public brushes(4 - 1) As Mat
     Dim DNAseq() As DNAentry
     Dim totalError As Single
     Dim stage As Integer
     Public generation As Integer
-    Dim imgGeneration As cv.Mat
-    Dim imgStage As cv.Mat
+    Dim imgGeneration As Mat
+    Dim imgStage As Mat
     Public mats As New Mat_4Click
     Dim options As Options_GeneticDrawing
     Public gradient As New Gradient_CartToPolar
@@ -20,27 +20,27 @@ Public Class GeneticDrawing_Basics : Inherits TaskParent
     Public Sub New()
         options = New Options_GeneticDrawing()
         For i = 0 To brushes.Count - 1
-            Dim _cvtInline As New cv.Mat
-            CvtColor(ImRead(task.homeDir + "Data/GeneticDrawingBrushes/" + CStr(i) + ".jpg"), _cvtInline, cv.ColorConversionCodes.BGR2GRAY)
-            brushes(i) =_cvtInline
+            Dim _cvtInline As New Mat
+            CvtColor(ImRead(task.homeDir + "Data/GeneticDrawingBrushes/" + CStr(i) + ".jpg"), _cvtInline, ColorConversionCodes.BGR2GRAY)
+            brushes(i) = _cvtInline
         Next
 
         labels(2) = "(clkwise) original, imgStage, imgGeneration, magnitude"
         labels(3) = "Current result"
-        dst3 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, 0)
+        dst3 = New Mat(dst2.Size(), MatType.CV_8U, 0)
         desc = "Create a painting from the current video input using a genetic algorithm. Draw anywhere to focus brushes"
     End Sub
-    Private Function runDNAseq(dna() As DNAentry) As cv.Mat
+    Private Function runDNAseq(dna() As DNAentry) As Mat
         Dim nextImage = imgGeneration.Clone()
         For i = 0 To dna.Count - 1
             Dim d = dna(i)
             Dim brushImg = brushes(d.brushNumber)
 
-            Dim br As New cv.Mat
-            Resize(brushImg, br, New cv.Size(CInt((brushImg.Width * d.size + 1) * options.brushPercent),
+            Dim br As New Mat
+            Resize(brushImg, br, New Size(CInt((brushImg.Width * d.size + 1) * options.brushPercent),
                                                          CInt((brushImg.Height * d.size + 1) * options.brushPercent)))
-            Dim m = GetRotationMatrix2D(New cv.Point2f(br.Cols / 2, br.Rows / 2), d.rotation, 1)
-            WarpAffine(br, br, m, New cv.Size(br.Cols, br.Rows))
+            Dim m = GetRotationMatrix2D(New Point2f(br.Cols / 2, br.Rows / 2), d.rotation, 1)
+            WarpAffine(br, br, m, New Size(br.Cols, br.Rows))
 
             If d.rotation < 0 Then
                 d.pt = New cv.Point(d.pt.X - br.Width, d.pt.Y - br.Height)
@@ -48,30 +48,30 @@ Public Class GeneticDrawing_Basics : Inherits TaskParent
                 If d.pt.Y < 0 Then d.pt.Y = 0
             End If
 
-            Dim background As New cv.Mat, alpha As New cv.Mat
+            Dim background As New Mat, alpha As New Mat
             Dim rect = New cv.Rect(d.pt.X, d.pt.Y, br.Width, br.Height)
             If d.pt.X + rect.Width > nextImage.Width Then rect.Width = nextImage.Width - d.pt.X
             If d.pt.Y + rect.Height > nextImage.Height Then rect.Height = nextImage.Height - d.pt.Y
             If br.Width <> rect.Width Or br.Height <> rect.Height Then br = br(New cv.Rect(0, 0, rect.Width, rect.Height))
-            nextImage(rect).ConvertTo(background, cv.MatType.CV_32F)
+            nextImage(rect).ConvertTo(background, MatType.CV_32F)
 
-            br.ConvertTo(alpha, cv.MatType.CV_32F, 1 / 255)
-            Dim foreground = New cv.Mat(New cv.Size(rect.Width, rect.Height), cv.MatType.CV_32F, CSng(d.color))
+            br.ConvertTo(alpha, MatType.CV_32F, 1 / 255)
+            Dim foreground = New Mat(New Size(rect.Width, rect.Height), MatType.CV_32F, CSng(d.color))
             Multiply(alpha, foreground, foreground)
             Multiply((1.0 - alpha).ToMat, background, background)
 
             Add(foreground, background, foreground)
-            foreground.ConvertTo(nextImage(rect), cv.MatType.CV_8U)
+            foreground.ConvertTo(nextImage(rect), MatType.CV_8U)
         Next
         Return nextImage
     End Function
-    Private Function calcBrushSize(range As cv.Rangef) As Single
+    Private Function calcBrushSize(range As Rangef) As Single
         Dim t = stage / Math.Max(options.stageTotal - 1, 1)
         Return (range.End - range.Start) * (-t * t + 1) + range.Start
     End Function
-    Private Function calculateError(ByRef img As cv.Mat) As Single
+    Private Function calculateError(ByRef img As Mat) As Single
         ' compute error for resulting image.
-        Dim diff1 As New cv.Mat, diff2 As New cv.Mat
+        Dim diff1 As New Mat, diff2 As New Mat
         Subtract(mats.mat(0), img, diff1)
         Subtract(img, mats.mat(0), diff2)
         Add(diff1, diff2, diff1)
@@ -105,7 +105,7 @@ Public Class GeneticDrawing_Basics : Inherits TaskParent
         If task.drawRect.Width > 0 Then r = task.drawRect
         If restartRequested Then
             restartRequested = False
-            dst3 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, 0)
+            dst3 = New Mat(dst2.Size(), MatType.CV_8U, 0)
             imgStage = dst3.Clone
             generation = 0
             stage = 0
@@ -213,12 +213,12 @@ Public Class XR_GeneticDrawing_Color : Inherits TaskParent
             splitMats(i) = gDraw(i).dst3
         Next
 
-        dst3 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, 0)
+        dst3 = New Mat(dst2.Size(), MatType.CV_8U, 0)
         Merge(splitMats, dst3)
 
         For i = 0 To splitMats.Count - 1
-            Dim _cvtInline As New cv.Mat
-            CvtColor(gDraw(i).dst2, _cvtInline, cv.ColorConversionCodes.BGR2GRAY)
+            Dim _cvtInline As New Mat
+            CvtColor(gDraw(i).dst2, _cvtInline, ColorConversionCodes.BGR2GRAY)
             splitMats(i) = If(gDraw(i).dst2.Channels() = 1, gDraw(i).dst2, _cvtInline)
         Next
         Merge(splitMats, dst2)
@@ -270,9 +270,9 @@ Public Class XR_GeneticDrawing_Photo : Inherits TaskParent
             gDraw = New XR_GeneticDrawing_Color()
 
             If fullsizeImage.Width <> dst2.Width Or fullsizeImage.Height <> dst2.Height Then
-                Dim newSize = New cv.Size(dst2.Height * fullsizeImage.Width / fullsizeImage.Height, dst2.Height)
+                Dim newSize = New Size(dst2.Height * fullsizeImage.Width / fullsizeImage.Height, dst2.Height)
                 If newSize.Width > dst2.Width Then
-                    newSize = New cv.Size(dst2.Width, dst2.Width * fullsizeImage.Height / fullsizeImage.Width)
+                    newSize = New Size(dst2.Width, dst2.Width * fullsizeImage.Height / fullsizeImage.Width)
                 End If
                 src.SetTo(0)
                 Resize(fullsizeImage, fullsizeImage, newSize)

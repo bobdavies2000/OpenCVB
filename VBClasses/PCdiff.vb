@@ -13,7 +13,7 @@ Public Class PCdiff_Basics : Inherits TaskParent
         If standalone Then src = task.pcSplit(2)
 
         Dim r1 = New cv.Rect(1, 1, task.cols - 2, task.rows - 2)
-        Dim r2 As cv.Rect
+        Dim r2 as cv.Rect
         Select Case options.offsetDirection
             Case "Upper Left"
                 r2 = New cv.Rect(0, 0, r1.Width, r1.Height)
@@ -35,9 +35,9 @@ Public Class PCdiff_Basics : Inherits TaskParent
 
         Dim r3 = New cv.Rect(1, 1, task.cols - 2, task.rows - 2)
 
-        dst2 = New cv.Mat(dst2.Size, src.Type, 0)
+        dst2 = New Mat(dst2.Size, src.Type, 0)
         Absdiff(src(r1), src(r2), dst2(r3))
-        Threshold(dst2, dst1, options1.mmThreshold / 1000, 255, cv.ThresholdTypes.BinaryInv)
+        Threshold(dst2, dst1, options1.mmThreshold / 1000, 255, ThresholdTypes.BinaryInv)
         ConvertScaleAbs(dst1, dst3)
         dst3.SetTo(0, task.noDepthMask)
     End Sub
@@ -80,8 +80,8 @@ End Class
 Public Class PCdiff_Filter : Inherits TaskParent
     Public pcDiff As New PCdiff_Basics
     Public Sub New()
-        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, New cv.Scalar(0))
-        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_32FC3)
+        dst2 = New Mat(dst2.Size, MatType.CV_8U, New Scalar(0))
+        dst3 = New Mat(dst3.Size, MatType.CV_32FC3)
         desc = "Filter the pointcloud to isolate only pixels within X mm's of it neighbor"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -113,7 +113,7 @@ End Class
 Public Class PCdiff_Points : Inherits TaskParent
     Dim filter As New PCdiff_Filter
     Public Sub New()
-        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U)
+        dst2 = New Mat(dst2.Size, MatType.CV_8U)
         labels = {"", "", "Use 'Color Difference' slider to adjust impact",
                               "Pixels removed to make clean breaks in the depth data"}
         desc = "Review the filtered PCdiff output."

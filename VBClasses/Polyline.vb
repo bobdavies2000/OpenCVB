@@ -21,7 +21,7 @@ End Class
 Public Class XR_PolyLine_IEnumerableExample : Inherits TaskParent
     Dim options As New Options_PolyLines
     Public Sub New()
-        desc = "Manually create an ienumerable(of ienumerable(of cv.point))."
+        desc = "Manually create an ienumerable(of ienumerable(of cv.Point))."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
@@ -33,7 +33,7 @@ Public Class XR_PolyLine_IEnumerableExample : Inherits TaskParent
         Dim pts As New List(Of List(Of cv.Point))
         pts.Add(points)
 
-        dst2 = New cv.Mat(src.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
+        dst2 = New Mat(src.Size(), MatType.CV_8U, Scalar.All(0))
         ' NOTE: when there are 2 points, there will be 1 line.
         Polylines(dst2, pts, options.polyClosed, white, task.lineWidth, task.lineType)
     End Sub
@@ -55,19 +55,19 @@ Public Class XR_PolyLine_Random : Inherits TaskParent
         If task.frameCount Mod (task.fpsAlgorithm * 3) = 0 Then ' every x frames.
             Dim h = src.Height, w = src.Width
             Dim autorand As New Random
-            Dim points2f(10000) As cv.Point2f
+            Dim points2f(10000) As Point2f
             Dim pts As New List(Of List(Of cv.Point))
             Dim points As New List(Of cv.Point)
-            points2f(0) = New cv.Point2f(autorand.NextDouble() - 0.5, autorand.NextDouble() - 0.5)
+            points2f(0) = New Point2f(autorand.NextDouble() - 0.5, autorand.NextDouble() - 0.5)
             For i = 1 To points2f.Count - 1
-                points2f(i) = New cv.Point2f(autorand.NextDouble() - 0.5 + points2f(i - 1).X, autorand.NextDouble() - 0.5 + points2f(i - 1).Y)
+                points2f(i) = New Point2f(autorand.NextDouble() - 0.5 + points2f(i - 1).X, autorand.NextDouble() - 0.5 + points2f(i - 1).Y)
                 points.Add(New cv.Point(points2f(i).X * 10 + w \ 2, points2f(i).Y * 10 + h \ 2))
             Next
             pts.Add(points)
 
-            dst2 = New cv.Mat(src.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
+            dst2 = New Mat(src.Size(), MatType.CV_8U, Scalar.All(0))
             Polylines(dst2, pts, False, white, task.lineWidth, task.lineType)
-            CvtColor(dst2, dst2, cv.ColorConversionCodes.GRAY2BGR)
+            CvtColor(dst2, dst2, ColorConversionCodes.GRAY2BGR)
         End If
 
         zoom.Run(dst2)

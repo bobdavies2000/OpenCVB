@@ -7,9 +7,9 @@ Public Class Font_Basics : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If Not task.heartBeat Then Exit Sub
-        Dim hersheyFont = Choose(task.frameCount Mod 7 + 1, cv.HersheyFonts.HersheyComplex, cv.HersheyFonts.HersheyComplexSmall, cv.HersheyFonts.HersheyDuplex,
-                                         cv.HersheyFonts.HersheyPlain, cv.HersheyFonts.HersheyScriptComplex, cv.HersheyFonts.HersheyScriptSimplex, cv.HersheyFonts.HersheySimplex,
-                                         cv.HersheyFonts.HersheyTriplex, cv.HersheyFonts.Italic)
+        Dim hersheyFont = Choose(task.frameCount Mod 7 + 1, HersheyFonts.HersheyComplex, HersheyFonts.HersheyComplexSmall, HersheyFonts.HersheyDuplex,
+                                         HersheyFonts.HersheyPlain, HersheyFonts.HersheyScriptComplex, HersheyFonts.HersheyScriptSimplex, HersheyFonts.HersheySimplex,
+                                         HersheyFonts.HersheyTriplex, HersheyFonts.Italic)
         Dim hersheyName = Choose(task.frameCount Mod 7 + 1, "HersheyComplex", "HersheyComplexSmall", "HersheyDuplex", "HersheyPlain", "HersheyScriptComplex",
                                          "HersheyScriptSimplex", "HersheySimplex", "HersheyTriplex", "Italic")
         labels(2) = hersheyName
@@ -24,7 +24,7 @@ Public Class Font_Basics : Inherits TaskParent
             PutText(dst2, msg, New cv.Point(10, 30 + i * 30),
                                    hersheyFont, size, white, task.lineWidth, task.lineType)
             If standalone Then
-                Dim hersheyFontItalics = hersheyFont + cv.HersheyFonts.Italic
+                Dim hersheyFontItalics = hersheyFont + HersheyFonts.Italic
                 PutText(dst3, hersheyName + " " + size.ToString(fmt1), New cv.Point(10, 30 + i * 30), hersheyFontItalics, size, white, task.lineWidth, task.lineType)
             End If
         Next

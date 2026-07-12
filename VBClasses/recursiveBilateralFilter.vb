@@ -19,7 +19,7 @@ Public Class XR_RecursiveBilateralFilter_CPP : Inherits TaskParent
                                                             options.RBFCount)
         handleSrc.Free()
 
-        dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, cv.MatType.CV_8UC3, imagePtr).Clone
+        dst2 = Mat.FromPixelData(src.Rows, src.Cols, MatType.CV_8UC3, imagePtr).Clone
     End Sub
     Protected Overrides Sub Finalize()
         If cPtr <> 0 Then cPtr = RecursiveBilateralFilter_Close(cPtr)

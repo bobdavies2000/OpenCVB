@@ -1,9 +1,9 @@
-Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
+Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCvSharp : Imports OpenCvSharp.XImgProc
 Public Class Line_Basics_TA : Inherits TaskParent
     Public lpList As New List(Of lpData)
     Public lpLast As New List(Of lpData)
     Public Sub New()
-        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
+        dst3 = New Mat(dst3.Size, MatType.CV_8U, 0)
         desc = "Run FLD (Fast Line Detector) with sobel input."
     End Sub
     Public Shared Function removeDuplicates(coreList As List(Of lpData)) As List(Of lpData)
@@ -11,7 +11,7 @@ Public Class Line_Basics_TA : Inherits TaskParent
 
         Dim removeNearDuplicates As Boolean = True
         If removeNearDuplicates Then
-            Dim edgeMap As New cv.Mat(task.workRes, cv.MatType.CV_8U, 0)
+            Dim edgeMap As New Mat(task.workRes, MatType.CV_8U, 0)
             For Each lp In coreList
                 Dim val1 = edgeMap.Get(Of Byte)(lp.ptE1.Y, lp.ptE1.X)
                 Dim val2 = edgeMap.Get(Of Byte)(lp.ptE1.Y, lp.ptE1.X)
@@ -75,7 +75,7 @@ Public Class Line_Basics_TA : Inherits TaskParent
         Return lpAges.Average
     End Function
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If src.Channels <> 1 Or src.Type <> cv.MatType.CV_8U Then src = task.gray.Clone
+        If src.Channels <> 1 Or src.Type <> MatType.CV_8U Then src = task.gray.Clone
 
         lpLast = New List(Of lpData)(lpList)
         If task.optionsChanged Then lpLast.Clear()
@@ -117,7 +117,7 @@ Public Class Line_Basics : Inherits TaskParent
         desc = "Run FLD (Fast Line Detector) With sobel input."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If src.Channels <> 1 Or src.Type <> cv.MatType.CV_8U Then src = task.gray.Clone
+        If src.Channels <> 1 Or src.Type <> MatType.CV_8U Then src = task.gray.Clone
 
         core.Run(src)
         dst2 = core.dst2
@@ -151,7 +151,7 @@ Public Class XR_Line_RawFLD : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst2 = task.color.Clone
-        If src.Channels <> 1 Or src.Type <> cv.MatType.CV_8U Then src = task.gray.Clone
+        If src.Channels <> 1 Or src.Type <> MatType.CV_8U Then src = task.gray.Clone
 
         core.Run(src)
         lpList = New List(Of lpData)(core.lpList)
@@ -173,15 +173,15 @@ End Class
 
 Public Class Line_Core : Inherits TaskParent
     Implements IDisposable
-    Public ld As cv.XImgProc.FastLineDetector
+    Public ld As FastLineDetector
     Public lpList As New List(Of lpData)
     Public Sub New()
-        ld = cv.XImgProc.FastLineDetector.Create
-        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
-        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        ld = FastLineDetector.Create
+        dst1 = New Mat(dst1.Size, MatType.CV_8U, 0)
+        dst2 = New Mat(dst2.Size, MatType.CV_8U, 0)
         desc = "Use FastLineDetector (OpenCV Contrib) To find all the lines inside drawRect"
     End Sub
-    Public Shared Function getRawSortedLines(lines As cv.Vec4f()) As List(Of lpData)
+    Public Shared Function getRawSortedLines(lines As Vec4f()) As List(Of lpData)
         Dim lpSorted As New SortedList(Of Single, lpData)(New compareAllowIdenticalSingleInverted)
         For Each v In lines
             If v(0) >= 0 And v(0) <= task.workRes.Width And v(1) >= 0 And v(1) <= task.workRes.Height And
@@ -204,7 +204,7 @@ Public Class Line_Core : Inherits TaskParent
     End Function
     Public Overrides Sub RunAlg(src As cv.Mat)
         If src.Channels() <> 1 Then src = task.gray
-        If src.Type <> cv.MatType.CV_8U Then src.ConvertTo(src, cv.MatType.CV_8U)
+        If src.Type <> MatType.CV_8U Then src.ConvertTo(src, MatType.CV_8U)
 
         lpList = getRawSortedLines(ld.Detect(src))
 
@@ -279,20 +279,20 @@ End Class
 Public Class XR_Line_BasicsOld : Inherits TaskParent
     Implements IDisposable
     Public lpList As New List(Of lpData)
-    Public ld As cv.XImgProc.FastLineDetector
-    Public motionMask As cv.Mat = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 255)
+    Public ld As FastLineDetector
+    Public motionMask As Mat = New Mat(dst2.Size, MatType.CV_8U, 255)
     Dim edges As New Edge_Sobel
     Public edgeDuplicates As New List(Of lpData) ' lines that are dropped to help LineTrack algorithms.
     Dim tiers As New Depth_Tiers
     Public Sub New()
-        dst1 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
-        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
-        ld = cv.XImgProc.FastLineDetector.Create
+        dst1 = New Mat(dst3.Size, MatType.CV_8U, 0)
+        dst3 = New Mat(dst3.Size, MatType.CV_8U, 0)
+        ld = FastLineDetector.Create
         desc = "Run FLD (Fast Line Detector) With sobel input."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst2 = task.color.Clone
-        If src.Channels <> 1 Or src.Type <> cv.MatType.CV_8U Then src = task.gray.Clone
+        If src.Channels <> 1 Or src.Type <> MatType.CV_8U Then src = task.gray.Clone
 
         edges.Run(src)
         labels(2) = edges.labels(2)
@@ -310,7 +310,7 @@ Public Class XR_Line_BasicsOld : Inherits TaskParent
 
         lpList.Clear()
         edgeDuplicates.Clear()
-        Dim edgeMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        Dim edgeMap As New Mat(dst2.Size, MatType.CV_8U, 0)
         For index = 0 To lpSorted.Values.Count - 1
             Dim lp = newList(lpSorted.Values.ElementAt(index))
             Dim val1 = edgeMap.Get(Of Byte)(lp.ptE1.Y, lp.ptE1.X)
@@ -326,12 +326,12 @@ Public Class XR_Line_BasicsOld : Inherits TaskParent
             edgeMap(task.gridNabeRects(gridIndex)).SetTo(lp.index)
             lpList.Add(lp)
 
-            Line(dst1, lp.p1, lp.p2, lp.index, task.lineWidth, cv.LineTypes.Link4)
+            Line(dst1, lp.p1, lp.p2, lp.index, task.lineWidth, LineTypes.Link4)
             Dim tierIndex = tiers.dst2.Get(Of Byte)(lp.p1.Y, lp.p1.X)
-            Line(dst2, lp.p1, lp.p2, task.scalarColors(tierIndex), task.lineWidth + 1, cv.LineTypes.Link4)
+            Line(dst2, lp.p1, lp.p2, task.scalarColors(tierIndex), task.lineWidth + 1, LineTypes.Link4)
         Next
 
-        Threshold(dst1, dst3, 0, 255, cv.ThresholdTypes.Binary)
+        Threshold(dst1, dst3, 0, 255, ThresholdTypes.Binary)
 
         labels(3) = CStr(lpList.Count) + " lines found And " + CStr(edgeDuplicates.Count) + " edge duplicates."
     End Sub
@@ -347,29 +347,29 @@ End Class
 Public Class XR_Line_BasicsLSD : Inherits TaskParent
     Implements IDisposable
     Public lpList As New List(Of lpData)
-    Dim lsd As cv.LineSegmentDetector
+    Dim lsd As LineSegmentDetector
     Dim edges As New Edge_Sobel
     Dim tiers As New Depth_Tiers
     Public Sub New()
-        dst1 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
-        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
+        dst1 = New Mat(dst3.Size, MatType.CV_8U, 0)
+        dst3 = New Mat(dst3.Size, MatType.CV_8U, 0)
         labels(2) = "Edges_Basics output"
-        lsd = cv.LineSegmentDetector.Create()
+        lsd = LineSegmentDetector.Create()
         desc = "Run FLD (Fast Line Detector) With sobel input."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst2 = task.color.Clone
-        If src.Channels <> 1 Or src.Type <> cv.MatType.CV_8U Then src = task.gray.Clone
+        If src.Channels <> 1 Or src.Type <> MatType.CV_8U Then src = task.gray.Clone
 
         edges.Run(src)
         labels(2) = edges.labels(2)
 
         tiers.Run(src)
 
-        Dim vecMat As New cv.Mat
+        Dim vecMat As New Mat
         lsd.Detect(src, vecMat)
-        Dim vecArray() As cv.Vec4f = Nothing
-        vecMat.GetArray(Of cv.Vec4f)(vecArray)
+        Dim vecArray() As Vec4f = Nothing
+        vecMat.GetArray(Of Vec4f)(vecArray)
         lpList = Line_Core.getRawSortedLines(vecArray)
 
         dst1.SetTo(0)
@@ -377,12 +377,12 @@ Public Class XR_Line_BasicsLSD : Inherits TaskParent
         For Each lp In lpList
             index += 1
             lp.index = index
-            Line(dst1, lp.p1, lp.p2, lp.index, task.lineWidth, cv.LineTypes.Link4)
+            Line(dst1, lp.p1, lp.p2, lp.index, task.lineWidth, LineTypes.Link4)
             Dim tierIndex = tiers.dst2.Get(Of Byte)(lp.p1.Y, lp.p1.X)
-            Line(dst2, lp.p1, lp.p2, task.scalarColors(tierIndex), task.lineWidth + 1, cv.LineTypes.Link4)
+            Line(dst2, lp.p1, lp.p2, task.scalarColors(tierIndex), task.lineWidth + 1, LineTypes.Link4)
         Next
 
-        Threshold(dst1, dst3, 0, 255, cv.ThresholdTypes.Binary)
+        Threshold(dst1, dst3, 0, 255, ThresholdTypes.Binary)
 
         labels(3) = CStr(lpList.Count) + " lines found"
     End Sub
@@ -398,23 +398,23 @@ End Class
 Public Class XR_Line_WithAging : Inherits TaskParent
     Implements IDisposable
     Public lpList As New List(Of lpData)
-    Public motionMask As cv.Mat = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 255)
-    Public ld As cv.XImgProc.FastLineDetector
+    Public motionMask As Mat = New Mat(dst2.Size, MatType.CV_8U, 255)
+    Public ld As FastLineDetector
     Public removeOverlappingLines As Boolean = True
     Public overLappingCount As Integer
     Public Sub New()
-        dst0 = New cv.Mat(dst0.Size, cv.MatType.CV_8U, 0)
-        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
-        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
+        dst0 = New Mat(dst0.Size, MatType.CV_8U, 0)
+        dst1 = New Mat(dst1.Size, MatType.CV_8U, 0)
+        dst3 = New Mat(dst3.Size, MatType.CV_8U, 0)
         If standalone Then task.gOptions.showMotionMask.Checked = True
-        ld = cv.XImgProc.FastLineDetector.Create
+        ld = FastLineDetector.Create
         desc = "If line Is Not In motion mask, Then keep it.  If line Is In motion mask, add it."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If standalone Then motionMask = task.motion.motionMask
 
-        If src.Channels <> 1 Or src.Type <> cv.MatType.CV_8U Then src = task.gray.Clone
-        CvtColor(src, dst2, cv.ColorConversionCodes.GRAY2BGR)
+        If src.Channels <> 1 Or src.Type <> MatType.CV_8U Then src = task.gray.Clone
+        CvtColor(src, dst2, ColorConversionCodes.GRAY2BGR)
         If lpList.Count <= 1 Then
             motionMask.SetTo(255)
             lpList = Line_Core.getRawSortedLines(ld.Detect(src))
@@ -452,13 +452,13 @@ Public Class XR_Line_WithAging : Inherits TaskParent
                     Continue For
                 End If
             End If
-            Line(dst0, lp.ptE1, lp.ptE2, lp.index + 1, task.lineWidth + 1, cv.LineTypes.Link4)
-            Line(dst1, lp.p1, lp.p2, lp.index + 1, task.lineWidth, cv.LineTypes.Link4)
+            Line(dst0, lp.ptE1, lp.ptE2, lp.index + 1, task.lineWidth + 1, LineTypes.Link4)
+            Line(dst1, lp.p1, lp.p2, lp.index + 1, task.lineWidth, LineTypes.Link4)
             Line(dst2, lp.p1, lp.p2, lp.color, task.lineWidth + 1, task.lineType)
             lpList.Add(lp)
         Next
 
-        Threshold(dst1, dst3, 0, 255, cv.ThresholdTypes.Binary)
+        Threshold(dst1, dst3, 0, 255, ThresholdTypes.Binary)
 
         If lpList.Count > 0 And task.lpD IsNot Nothing Then
             If task.lpD.rect.Width = 0 Then task.lpD = lpList(0)
@@ -486,24 +486,24 @@ Public Class Line_Perpendicular : Inherits TaskParent
         desc = "Find the line perpendicular To the line created by the points provided."
     End Sub
     Public Shared Function computePerp(lp As lpData) As lpData
-        Dim midPoint = New cv.Point2f((lp.p1.X + lp.p2.X) / 2, (lp.p1.Y + lp.p2.Y) / 2)
+        Dim midPoint = New Point2f((lp.p1.X + lp.p2.X) / 2, (lp.p1.Y + lp.p2.Y) / 2)
         Dim m = If(lp.slope = 0, maxSlope, -1 / lp.slope)
         Dim b = midPoint.Y - m * midPoint.X
-        Dim p1 = New cv.Point2f(-b / m, 0)
-        Dim p2 = New cv.Point2f((task.workRes.Height - b) / m, task.workRes.Height)
+        Dim p1 = New Point2f(-b / m, 0)
+        Dim p2 = New Point2f((task.workRes.Height - b) / m, task.workRes.Height)
 
         Dim w = task.workRes.Width
         Dim h = task.workRes.Height
 
-        If p1.X < 0 Then p1 = New cv.Point2f(0, b)
-        If p1.X > w Then p1 = New cv.Point2f(w, m * w + b)
-        If p1.Y < 0 Then p1 = New cv.Point2f(-b / m, 0)
-        If p1.Y > h Then p1 = New cv.Point2f(w, m * w + b)
+        If p1.X < 0 Then p1 = New Point2f(0, b)
+        If p1.X > w Then p1 = New Point2f(w, m * w + b)
+        If p1.Y < 0 Then p1 = New Point2f(-b / m, 0)
+        If p1.Y > h Then p1 = New Point2f(w, m * w + b)
 
-        If p2.X < 0 Then p2 = New cv.Point2f(0, b)
-        If p2.X > w Then p2 = New cv.Point2f(w, m * w + b)
-        If p2.Y < 0 Then p2 = New cv.Point2f(-b / m, 0)
-        If p2.Y > h Then p2 = New cv.Point2f(w, m * w + b)
+        If p2.X < 0 Then p2 = New Point2f(0, b)
+        If p2.X > w Then p2 = New Point2f(w, m * w + b)
+        If p2.Y < 0 Then p2 = New Point2f(-b / m, 0)
+        If p2.Y > h Then p2 = New Point2f(w, m * w + b)
 
         Return New lpData(p1, p2)
     End Function
@@ -513,7 +513,7 @@ Public Class Line_Perpendicular : Inherits TaskParent
         Line(dst2, input.p1, input.p2, white, task.lineWidth, task.lineType)
 
         output = computePerp(input)
-        Circle(dst2, input.ptCenter, task.DotSize + 2, cv.Scalar.Red, -1, task.lineType)
+        Circle(dst2, input.ptCenter, task.DotSize + 2, Scalar.Red, -1, task.lineType)
         Line(dst2, output.p1, output.p2, yellow, task.lineWidth, task.lineType)
 
         If standaloneTest() Then SetTrueText("The line displayed at left Is the gravity vector.", 3)
@@ -591,26 +591,26 @@ End Class
 ' https://stackoverflow.com/questions/7446126/opencv-2d-line-intersection-helper-function
 Public Class Line_Intersection : Inherits TaskParent
     Public lp1 As lpData, lp2 As lpData
-    Public intersectionPoint As cv.Point2f
+    Public intersectionPoint As Point2f
     Public Sub New()
-        desc = "Determine If 2 lines intersect, where the point Is, And If that point Is In the image."
+        desc = "Determine If 2 lines intersect, where the cv.Point Is, And If that cv.Point Is In the image."
     End Sub
-    Public Shared Function IntersectTest(p1 As cv.Point2f, p2 As cv.Point2f, p3 As cv.Point2f, p4 As cv.Point2f) As cv.Point2f
+    Public Shared Function IntersectTest(p1 As Point2f, p2 As Point2f, p3 As Point2f, p4 As Point2f) As Point2f
         Dim x = p3 - p1
         Dim d1 = p2 - p1
         Dim d2 = p4 - p3
         Dim cross = d1.X * d2.Y - d1.Y * d2.X
-        If Math.Abs(cross) < 0.000001 Then Return New cv.Point2f
+        If Math.Abs(cross) < 0.000001 Then Return New Point2f
         Dim t1 = (x.X * d2.Y - x.Y * d2.X) / cross
         Dim pt = p1 + d1 * t1
         Return pt
     End Function
-    Public Shared Function IntersectTest(lp1 As lpData, lp2 As lpData) As cv.Point2f
+    Public Shared Function IntersectTest(lp1 As lpData, lp2 As lpData) As Point2f
         Dim x = lp2.p1 - lp1.p1
         Dim d1 = lp1.p2 - lp1.p1
         Dim d2 = lp2.p2 - lp2.p1
         Dim cross = d1.X * d2.Y - d1.Y * d2.X
-        If Math.Abs(cross) < 0.000001 Then Return New cv.Point2f
+        If Math.Abs(cross) < 0.000001 Then Return New Point2f
         Dim t1 = (x.X * d2.Y - x.Y * d2.X) / cross
         Dim pt = lp1.p1 + d1 * t1
         Return pt
@@ -618,10 +618,10 @@ Public Class Line_Intersection : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         If standalone Then
             If task.heartBeat Then
-                lp1 = New lpData(New cv.Point2f(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height)),
-                                     New cv.Point2f(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height)))
-                lp2 = New lpData(New cv.Point2f(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height)),
-                                     New cv.Point2f(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height)))
+                lp1 = New lpData(New Point2f(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height)),
+                                     New Point2f(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height)))
+                lp2 = New lpData(New Point2f(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height)),
+                                     New Point2f(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height)))
             End If
         End If
 
@@ -629,11 +629,11 @@ Public Class Line_Intersection : Inherits TaskParent
 
         If standaloneTest() Then
             dst2.SetTo(0)
-            Line(dst2, lp1.p1, lp1.p2, cv.Scalar.Yellow, task.lineWidth, task.lineType)
-            Line(dst2, lp2.p1, lp2.p2, cv.Scalar.Yellow, task.lineWidth, task.lineType)
-            If intersectionPoint <> New cv.Point2f Then
+            Line(dst2, lp1.p1, lp1.p2, Scalar.Yellow, task.lineWidth, task.lineType)
+            Line(dst2, lp2.p1, lp2.p2, Scalar.Yellow, task.lineWidth, task.lineType)
+            If intersectionPoint <> New Point2f Then
                 Circle(dst2, intersectionPoint, task.DotSize + 4, white, -1, task.lineType)
-                labels(2) = "Intersection point = " + CStr(CInt(intersectionPoint.X)) + " x " + CStr(CInt(intersectionPoint.Y))
+                labels(2) = "Intersection cv.Point = " + CStr(CInt(intersectionPoint.X)) + " x " + CStr(CInt(intersectionPoint.Y))
             Else
                 labels(2) = "Parallel!!!"
             End If
@@ -688,9 +688,9 @@ Public Class XR_Line_DepthHistogram : Inherits TaskParent
         dst3 = lineVert.dst2
         For Each lp In lineVert.lpLeft
             Dim depth = task.pcSplit(2)(lp.rect)
-            Dim depthMask As New cv.Mat(lp.rect.Size, cv.MatType.CV_8U, 0)
-            Dim p1 = New cv.Point2f(lp.p1.X - lp.rect.X, lp.p1.Y - lp.rect.Y)
-            Dim p2 = New cv.Point2f(lp.p2.X - lp.rect.BottomRight.X, lp.p2.Y - lp.rect.BottomRight.Y)
+            Dim depthMask As New Mat(lp.rect.Size, MatType.CV_8U, 0)
+            Dim p1 = New Point2f(lp.p1.X - lp.rect.X, lp.p1.Y - lp.rect.Y)
+            Dim p2 = New Point2f(lp.p2.X - lp.rect.BottomRight.X, lp.p2.Y - lp.rect.BottomRight.Y)
             Line(depthMask, p1, p2, 255, task.lineWidth, task.lineType)
             Dim mmDepth = GetMinMax(depth, depthMask)
             plot.plotHist.Run(depth)
@@ -747,7 +747,7 @@ Public Class XR_Line_Vertical : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         lrLines.Run(src)
-        CvtColor(task.leftView, dst2, cv.ColorConversionCodes.GRAY2BGR)
+        CvtColor(task.leftView, dst2, ColorConversionCodes.GRAY2BGR)
         lpLeft.Clear()
         For Each lp In task.lines.lpList
             If Math.Abs(lp.angle) > 87 Then
@@ -756,7 +756,7 @@ Public Class XR_Line_Vertical : Inherits TaskParent
             End If
         Next
 
-        CvtColor(task.rightView, dst3, cv.ColorConversionCodes.GRAY2BGR)
+        CvtColor(task.rightView, dst3, ColorConversionCodes.GRAY2BGR)
         lpRight.Clear()
         For Each lp In lrLines.linesRight.lpList
             If Math.Abs(lp.angle) > 87 Then
@@ -870,18 +870,18 @@ Public Class XR_Line_LeftTrack : Inherits TaskParent
         For Each t In tracked
             t.lp.index = t.trackId
             If lpList.Count < 10 Then
-                Line(dst2, t.lp.p1, t.lp.p2, t.lp.color, options.lineTrackerWidth, cv.LineTypes.Link8)
+                Line(dst2, t.lp.p1, t.lp.p2, t.lp.color, options.lineTrackerWidth, LineTypes.Link8)
             End If
             lpList.Add(t.lp)
         Next
 
         dst2 = task.leftView.Clone
-        If dst2.Channels = 1 Then CvtColor(dst2, dst2, cv.ColorConversionCodes.GRAY2BGR)
-        dst1 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        If dst2.Channels = 1 Then CvtColor(dst2, dst2, ColorConversionCodes.GRAY2BGR)
+        dst1 = New Mat(dst2.Size, MatType.CV_8U, 0)
 
         For Each t In tracked
             Line(dst2, t.lp.p1, t.lp.p2, t.lp.color, task.lineWidth, task.lineType)
-            Line(dst1, t.lp.p1, t.lp.p2, t.trackId Mod 255 + 1, 1, cv.LineTypes.Link4)
+            Line(dst1, t.lp.p1, t.lp.p2, t.trackId Mod 255 + 1, 1, LineTypes.Link4)
             SetTrueText(CStr(t.trackId), New cv.Point(CInt(t.lp.ptCenter.X), CInt(t.lp.ptCenter.Y)), 2)
         Next
 
@@ -898,7 +898,7 @@ Public Class XR_Line_Tracker : Inherits TaskParent
     Dim options As New Options_LeftRightCorrelation
     Dim lpList As New List(Of lpData)
     Public Sub New()
-        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        dst2 = New Mat(dst2.Size, MatType.CV_8U, 0)
         desc = "Track lines in the left image."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -909,7 +909,7 @@ Public Class XR_Line_Tracker : Inherits TaskParent
         dst2.SetTo(0)
         lpList.Clear()
         For Each lp In task.lines.lpList
-            Line(dst2, lp.p1, lp.p2, lp.index + 1, options.lineTrackerWidth, cv.LineTypes.Link8)
+            Line(dst2, lp.p1, lp.p2, lp.index + 1, options.lineTrackerWidth, LineTypes.Link8)
             lpList.Add(lp)
             If lpList.Count > 10 Then Exit For
         Next
@@ -931,8 +931,8 @@ Public Class XR_Line_BrickList : Inherits TaskParent
     Dim options As New Options_LeftRightCorrelation
     Public Sub New()
         labels(3) = "Find the line's bricks containing the line."
-        dst3 = New cv.Mat(dst0.Size, cv.MatType.CV_8U, 0)
-        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
+        dst3 = New Mat(dst0.Size, MatType.CV_8U, 0)
+        dst1 = New Mat(dst1.Size, MatType.CV_8U, 0)
         desc = "Add a bricklist to the requested lp"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -946,7 +946,7 @@ Public Class XR_Line_BrickList : Inherits TaskParent
         End If
 
         dst3.SetTo(0)
-        Line(dst3, lp.p1, lp.p2, lp.index + 1, options.lineTrackerWidth, cv.LineTypes.Link8)
+        Line(dst3, lp.p1, lp.p2, lp.index + 1, options.lineTrackerWidth, LineTypes.Link8)
 
         Dim r = lp.rect
         dst1.SetTo(0)
@@ -955,7 +955,7 @@ Public Class XR_Line_BrickList : Inherits TaskParent
         DrawRect(dst1, r, black)
 
         Dim allPoints As New List(Of cv.Point)
-        Dim brickList As New List(Of cv.Rect)
+        Dim brickList As New List(of cv.Rect)
         For Each rect In task.gridRects
             Dim brick = dst1(rect)
             If CountNonZero(brick) = 0 Then Continue For
@@ -996,7 +996,7 @@ Public Class XR_Line_BrickList : Inherits TaskParent
         Dim y1 = epList.Average(Function(x) x.Item2)
         Dim x2 = epList.Average(Function(x) x.Item3)
         Dim y2 = epList.Average(Function(x) x.Item4)
-        lpOutput = New lpData(New cv.Point2f(x1, y1), New cv.Point2f(x2, y2))
+        lpOutput = New lpData(New Point2f(x1, y1), New Point2f(x2, y2))
         Line(dst2, lpOutput.p1, lpOutput.p2, task.highlight, task.lineWidth, task.lineType)
 
         If standalone Then lp = lpOutput
@@ -1029,14 +1029,14 @@ End Class
 
 Public Class XR_Line_MapRects : Inherits TaskParent
     Public lpList As New List(Of lpData) ' the list of non-overlapping lines.
-    Public pointCloud As New cv.Mat
+    Public pointCloud As New Mat
     Dim depthToWorld As New Cloud_DepthToWorld
     Public Sub New()
         If standalone Then task.gOptions.displayDst1.Checked = True
         labels(1) = "Move mouse over any image to see line."
         labels(3) = "Each rectangle is divided into 2 regions defined by the line."
-        dst0 = New cv.Mat(dst0.Size, cv.MatType.CV_8U, 0)
-        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
+        dst0 = New Mat(dst0.Size, MatType.CV_8U, 0)
+        dst3 = New Mat(dst3.Size, MatType.CV_8U, 0)
         desc = "Create a map with the lp.rect field."
     End Sub
     Private Function fillTriangle(lp As lpData, p1 As cv.Point) As Boolean
@@ -1058,9 +1058,9 @@ Public Class XR_Line_MapRects : Inherits TaskParent
         For Each lp In task.lines.lpList
             Dim val = dst3.Get(Of Byte)(lp.ptCenter.Y, lp.ptCenter.X)
             If val = 0 Then
-                Rectangle(dst0, lp.rect, cv.Scalar.All(lp.index + 1), -1)
-                Rectangle(dst3, lp.rect, cv.Scalar.All(lp.index + 1), -1)
-                Line(dst3, lp.p1, lp.p2, 0, task.lineWidth, cv.LineTypes.Link8)
+                Rectangle(dst0, lp.rect, Scalar.All(lp.index + 1), -1)
+                Rectangle(dst3, lp.rect, Scalar.All(lp.index + 1), -1)
+                Line(dst3, lp.p1, lp.p2, 0, task.lineWidth, LineTypes.Link8)
                 lpList.Add(lp)
             End If
         Next
@@ -1119,7 +1119,7 @@ Public Class XR_Line_Map : Inherits TaskParent
         If standalone Then task.gOptions.displayDst1.Checked = True
         labels(1) = "Move mouse over any image to see line."
         labels(3) = "Each rectangle is divided into 2 regions defined by the line."
-        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
+        dst3 = New Mat(dst3.Size, MatType.CV_8U, 0)
         desc = "Create a map with the lp.rect field."
     End Sub
     Private Function fillTriangle(lp As lpData, p1 As cv.Point) As Boolean
@@ -1135,7 +1135,7 @@ Public Class XR_Line_Map : Inherits TaskParent
         Dim pad = 5
         dst3.SetTo(0)
         For Each lp In task.lines.lpList
-            Line(dst3, lp.p1, lp.p2, lp.index + 1, task.lineWidth * 3, cv.LineTypes.Link8)
+            Line(dst3, lp.p1, lp.p2, lp.index + 1, task.lineWidth * 3, LineTypes.Link8)
         Next
         labels(2) = CStr(task.lines.lpList.Count) + " non-overlapping lines were found."
 
@@ -1188,7 +1188,7 @@ Public Class XR_Line_TranslatedRightView : Inherits TaskParent
         dst2 = task.lines.dst2
         labels(2) = task.lines.labels(2)
 
-        CvtColor(task.rightView, dst3, cv.ColorConversionCodes.GRAY2BGR)
+        CvtColor(task.rightView, dst3, ColorConversionCodes.GRAY2BGR)
 
         lines.Run(src) ' we could use to validate the lines that are translated from the left view.
 
@@ -1232,7 +1232,7 @@ End Class
 Public Class XR_Line_EdgeLineCompare : Inherits TaskParent
     Dim edgeLine As New EdgeLine_Basics
     Public Sub New()
-        dst3 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        dst3 = New Mat(dst2.Size, MatType.CV_8U, 0)
         labels(3) = "Lines where EdgeLine_Basics and Line_Basics agree."
         desc = "Compare the output of EdgeLine_Basics and Line_Basics"
     End Sub
@@ -1283,15 +1283,15 @@ Public Class XR_Line_EdgeLine : Inherits TaskParent
     Dim edgeLine As New EdgeLine_Basics
     Dim lines As New Line_Basics
     Public Sub New()
-        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        dst2 = New Mat(dst2.Size, MatType.CV_8U, 0)
         desc = "Search for lines in the EdgeLine output."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         edgeLine.Run(task.gray)
 
-        Static matList As New List(Of cv.Mat)
-        Dim _thrEdge As New cv.Mat
-        Threshold(edgeLine.dst2, _thrEdge, 0, 255, cv.ThresholdTypes.Binary)
+        Static matList As New List(Of Mat)
+        Dim _thrEdge As New Mat
+        Threshold(edgeLine.dst2, _thrEdge, 0, 255, ThresholdTypes.Binary)
         matList.Add(_thrEdge)
         If matList.Count > 5 Then matList.RemoveAt(0)
 
@@ -1349,7 +1349,7 @@ Public Class XR_Line_FindSimple : Inherits TaskParent
             Dim r = task.gridRects(i)
             Dim pixelCount = CountNonZero(dst2(r))
             If pixelCount = 0 Or pixelCount > 20 Then Continue For
-            Dim pixelMat As New cv.Mat
+            Dim pixelMat As New Mat
             FindNonZero(dst2(r), pixelMat)
 
             pixelMat.GetArray(Of cv.Point)(pixels)
@@ -1358,8 +1358,8 @@ Public Class XR_Line_FindSimple : Inherits TaskParent
                 Line(dst3(r), lp.p1, lp.p2, task.highlight, task.lineWidth)
             End If
         Next
-        Threshold(dst2, dst2, 0, 255, cv.ThresholdTypes.Binary)
-        Threshold(dst3, dst3, 0, 255, cv.ThresholdTypes.Binary)
+        Threshold(dst2, dst2, 0, 255, ThresholdTypes.Binary)
+        Threshold(dst3, dst3, 0, 255, ThresholdTypes.Binary)
     End Sub
 End Class
 
@@ -1457,7 +1457,7 @@ Public Class XR_Line_Finder : Inherits TaskParent
             If pixelCount = 0 Or pixelCount > 20 Then Continue For
             If pixelCount < side Then Continue For
 
-            Dim pixelMat As New cv.Mat
+            Dim pixelMat As New Mat
             FindNonZero(dst2(r), pixelMat)
 
             pixelMat.GetArray(Of cv.Point)(pixels)
@@ -1484,10 +1484,10 @@ Public Class XR_Line_TrackV : Inherits TaskParent
     Public matchList As New List(Of lpData)
     Dim knn As New KNN_Minimal
     Dim match As New Match_Basics
-    Dim lastImage As cv.Mat
+    Dim lastImage As Mat
     Dim verticalLast As New List(Of lpData)
-    Public trainInput As New List(Of cv.Vec4f)
-    Public queries As New List(Of cv.Vec4f)
+    Public trainInput As New List(Of Vec4f)
+    Public queries As New List(Of Vec4f)
     Public Sub New()
         labels(3) = "The vertical lines found in the previous heartbeat image."
         desc = "Track the vertical lines on the heartbeat."
@@ -1511,23 +1511,23 @@ Public Class XR_Line_TrackV : Inherits TaskParent
         If task.heartBeatLT Then
             dst3.SetTo(0)
             For Each lp In verticalLast
-                Line(dst3, lp.ptE1, lp.ptE2, lp.color, task.lineWidth, cv.LineTypes.Link4)
+                Line(dst3, lp.ptE1, lp.ptE2, lp.color, task.lineWidth, LineTypes.Link4)
             Next
 
             trainInput.Clear()
             For Each lp In verticalLast
-                trainInput.Add(New cv.Vec4f(lp.ptE1.X, lp.ptE1.Y, lp.ptE2.X, lp.ptE2.Y))
+                trainInput.Add(New Vec4f(lp.ptE1.X, lp.ptE1.Y, lp.ptE2.X, lp.ptE2.Y))
             Next
 
             Dim verticalsCurr = getVerticals(task.lines.lpList)
             queries.Clear()
             For Each lp In verticalsCurr
-                queries.Add(New cv.Vec4f(lp.ptE1.X, lp.ptE1.Y, lp.ptE2.X, lp.ptE2.Y))
+                queries.Add(New Vec4f(lp.ptE1.X, lp.ptE1.Y, lp.ptE2.X, lp.ptE2.Y))
             Next
 
             Dim dimension = 4
-            knn.queryMat = cv.Mat.FromPixelData(queries.Count, dimension, cv.MatType.CV_32F, queries.ToArray)
-            knn.trainMat = cv.Mat.FromPixelData(trainInput.Count, dimension, cv.MatType.CV_32F, trainInput.ToArray)
+            knn.queryMat = Mat.FromPixelData(queries.Count, dimension, MatType.CV_32F, queries.ToArray)
+            knn.trainMat = Mat.FromPixelData(trainInput.Count, dimension, MatType.CV_32F, trainInput.ToArray)
             knn.Run(emptyMat)
 
             matchList.Clear()
@@ -1538,14 +1538,14 @@ Public Class XR_Line_TrackV : Inherits TaskParent
             For i = 0 To verticalsCurr.Count - 1
                 Dim lp = verticalsCurr(i)
                 Dim vec = trainInput(knn.result(i, 0))
-                Dim lpPrev = New lpData(New cv.Point2f(vec(0), vec(1)), New cv.Point2f(vec(2), vec(3)))
+                Dim lpPrev = New lpData(New Point2f(vec(0), vec(1)), New Point2f(vec(2), vec(3)))
 
                 If lp.rect.IntersectsWith(lpPrev.rect) Then
                     match.template = lastImage(lpPrev.rect)
                     match.Run(src(lp.rect))
                     If match.correlation > task.fCorrThreshold Then
-                        Line(dst2, lp.ptE1, lp.ptE2, task.scalarColors(i), task.lineWidth, cv.LineTypes.Link4)
-                        Line(dst2, lpPrev.ptE1, lpPrev.ptE2, task.scalarColors(i), task.lineWidth, cv.LineTypes.Link4)
+                        Line(dst2, lp.ptE1, lp.ptE2, task.scalarColors(i), task.lineWidth, LineTypes.Link4)
+                        Line(dst2, lpPrev.ptE1, lpPrev.ptE2, task.scalarColors(i), task.lineWidth, LineTypes.Link4)
 
                         matchList.Add(lp)
                         matchList.Add(lpPrev)
@@ -1575,16 +1575,16 @@ End Class
 Public Class XR_Line_BasicsOldEmboss : Inherits TaskParent
     Implements IDisposable
     Public lpList As New List(Of lpData)
-    Dim ld As cv.XImgProc.FastLineDetector
+    Dim ld As FastLineDetector
     Dim emboss As New PhotoShop_Emboss
     Public Sub New()
-        dst1 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
-        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
-        ld = cv.XImgProc.FastLineDetector.Create
+        dst1 = New Mat(dst3.Size, MatType.CV_8U, 0)
+        dst3 = New Mat(dst3.Size, MatType.CV_8U, 0)
+        ld = FastLineDetector.Create
         desc = "Run FLD with emboss input."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If src.Channels <> 1 Or src.Type <> cv.MatType.CV_8U Then src = task.gray.Clone
+        If src.Channels <> 1 Or src.Type <> MatType.CV_8U Then src = task.gray.Clone
 
         emboss.Run(src)
         dst2 = emboss.dst3
@@ -1594,10 +1594,10 @@ Public Class XR_Line_BasicsOldEmboss : Inherits TaskParent
         dst1.SetTo(0)
         For Each lp In lpList
             lp.index = lpList.Count
-            Line(dst1, lp.p1, lp.p2, lp.index + 1, task.lineWidth, cv.LineTypes.Link4)
+            Line(dst1, lp.p1, lp.p2, lp.index + 1, task.lineWidth, LineTypes.Link4)
         Next
 
-        Threshold(dst1, dst3, 0, 255, cv.ThresholdTypes.Binary)
+        Threshold(dst1, dst3, 0, 255, ThresholdTypes.Binary)
 
         labels(2) = CStr(lpList.Count) + " lines found"
     End Sub
@@ -1711,7 +1711,7 @@ Public Class XO_Line_EdgePoints : Inherits TaskParent
             lpList.Add(lp)
         Next
 
-        If task.firstPass Then knn.trainInput = New List(Of cv.Point2f)(knn.queries)
+        If task.firstPass Then knn.trainInput = New List(Of Point2f)(knn.queries)
 
         knn.Run(emptyMat)
 
@@ -1751,7 +1751,7 @@ Public Class XO_Line_EdgePoints : Inherits TaskParent
             yMatches.Add(p1.Y - p2.Y)
         Next
 
-        knn.trainInput = New List(Of cv.Point2f)(knn.queries)
+        knn.trainInput = New List(Of Point2f)(knn.queries)
 
         If xMatches.Count > 0 Then
             strOut = "There were " + CStr(xMatches.Count) + " useful edge points after filtering." + vbCrLf
@@ -1806,7 +1806,7 @@ Public Class Line_Finder : Inherits TaskParent
     Dim pixels(side * side) As cv.Point
     Dim sortX As New SortedList(Of Integer, cv.Point)(New compareAllowIdenticalInteger)
     Public Sub New()
-        dst0 = New cv.Mat(dst0.Size, cv.MatType.CV_8U, 0)
+        dst0 = New Mat(dst0.Size, MatType.CV_8U, 0)
         side = task.gOptions.GridSlider.Value
         ReDim pixels(side * side)
         desc = "Find only the bricks containing what are clearly lines."
@@ -1858,7 +1858,7 @@ Public Class Line_Finder : Inherits TaskParent
             If pixelCount = 0 Or pixelCount > maxPixels Then Continue For
             If pixelCount < side Then Continue For
 
-            Dim pixelMat As New cv.Mat
+            Dim pixelMat As New Mat
             FindNonZero(dst1(r), pixelMat)
 
             pixelMat.GetArray(Of cv.Point)(pixels)
@@ -1875,7 +1875,7 @@ Public Class Line_Finder : Inherits TaskParent
             End If
         Next
 
-        Dim pointMat As New cv.Mat
+        Dim pointMat As New Mat
         FindNonZero(dst0, pointMat)
         If pointMat.Rows > 0 Then
             ReDim ptList(pointMat.Rows)
@@ -1940,7 +1940,7 @@ Public Class Line_RightOnly : Inherits TaskParent
     Dim stableR As New StableGray_Right
     Public lpList As New List(Of lpData)
     Public Sub New()
-        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        dst2 = New Mat(dst2.Size, MatType.CV_8U, 0)
         desc = "Find the lines in the right image."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -1966,8 +1966,8 @@ End Class
 Public Class Line_LeftRightZED : Inherits TaskParent
     Public rightOnly As New Line_RightOnly
     Public Sub New()
-        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-        dst3 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        dst2 = New Mat(dst2.Size, MatType.CV_8U, 0)
+        dst3 = New Mat(dst2.Size, MatType.CV_8U, 0)
         desc = "Find the lines in the left and right images.  Left image is already found for StereoLabs..."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -1999,7 +1999,7 @@ Public Class Line_DepthSimple : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         lineLR.Run(emptyMat)
-        CvtColor(lineLR.dst2, dst2, cv.ColorConversionCodes.GRAY2BGR)
+        CvtColor(lineLR.dst2, dst2, ColorConversionCodes.GRAY2BGR)
         labels(2) = lineLR.labels(2)
 
         Dim leftLines = lineLR.leftList
@@ -2024,7 +2024,7 @@ End Class
 Public Class Line_Depth : Inherits TaskParent
     Public lpList As New List(Of lpData)
     Public Sub New()
-        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
+        dst1 = New Mat(dst1.Size, MatType.CV_8U, 0)
         desc = "Get the best measure of depth for the end points of each line."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -2040,7 +2040,7 @@ Public Class Line_Depth : Inherits TaskParent
             End If
 
             Dim ptArray() As cv.Point = Nothing
-            Dim _fnz As New cv.Mat
+            Dim _fnz As New Mat
             FindNonZero(dst1(lp.rect), _fnz)
             _fnz.GetArray(Of cv.Point)(ptArray)
 
@@ -2062,8 +2062,8 @@ Public Class Line_Depth : Inherits TaskParent
                         If lpNew.length > task.gridWH * 2 And lpNew.rect.Width > 0 And lpNew.rect.Height > 0 Then
                             lpNew.age = lp.age
                             lpNew.index = lpList.Count + 1
-                            lpNew.pVec1 = task.pointCloud.Get(Of cv.Vec3f)(p1.Y, p1.X)
-                            lpNew.pVec2 = task.pointCloud.Get(Of cv.Vec3f)(p2.Y, p2.X)
+                            lpNew.pVec1 = task.pointCloud.Get(Of Vec3f)(p1.Y, p1.X)
+                            lpNew.pVec2 = task.pointCloud.Get(Of Vec3f)(p2.Y, p2.X)
                             lpList.Add(lpNew)
                             Exit For
                         End If
@@ -2091,7 +2091,7 @@ End Class
 Public Class Line_DepthUpdate : Inherits TaskParent
     Dim lineDepth As New Line_Depth
     Public Sub New()
-        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
+        dst1 = New Mat(dst1.Size, MatType.CV_8U, 0)
         desc = "For each line in the lpList output of Line_Depth, update the pointcloud with linear data."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -2101,14 +2101,14 @@ Public Class Line_DepthUpdate : Inherits TaskParent
 
         dst3 = task.pointCloud.Clone
         For Each lp In lineDepth.lpList
-            Dim vec1 = task.pointCloud.Get(Of cv.Vec3f)(lp.p1.Y, lp.p1.X)
-            Dim vec2 = task.pointCloud.Get(Of cv.Vec3f)(lp.p2.Y, lp.p2.X)
+            Dim vec1 = task.pointCloud.Get(Of Vec3f)(lp.p1.Y, lp.p1.X)
+            Dim vec2 = task.pointCloud.Get(Of Vec3f)(lp.p2.Y, lp.p2.X)
 
             dst1(lp.rect).SetTo(0)
             Line(dst1, lp.p1, lp.p2, 255, 1)
 
             Dim ptArray() As cv.Point = Nothing
-            Dim _fnz As New cv.Mat
+            Dim _fnz As New Mat
             FindNonZero(dst1(lp.rect), _fnz)
             _fnz.GetArray(Of cv.Point)(ptArray)
 
@@ -2121,8 +2121,8 @@ Public Class Line_DepthUpdate : Inherits TaskParent
             Line(dst2, lp.p1, lp.p2, task.highlight, 1)
             For i = 0 To ptArray.Count - 1
                 Dim pt = ptArray(i)
-                Dim vec = New cv.Vec3f(vec1.Item0 + i * xIncr, vec1.Item1 + i * yIncr, vec1.Item2 + i * zIncr)
-                dst3.Set(Of cv.Vec3f)(pt.Y, pt.X, vec)
+                Dim vec = New Vec3f(vec1.Item0 + i * xIncr, vec1.Item1 + i * yIncr, vec1.Item2 + i * zIncr)
+                dst3.Set(Of Vec3f)(pt.Y, pt.X, vec)
             Next
             SetTrueText(CStr(lp.age), New cv.Point(lp.ptCenter.X + 2, lp.ptCenter.Y + 2), 2)
         Next
@@ -2136,8 +2136,8 @@ Public Class XR_Line_LeftRight : Inherits TaskParent
     Public leftList As New List(Of lpData)
     Public rightList As New List(Of lpData)
     Public Sub New()
-        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-        dst3 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        dst2 = New Mat(dst2.Size, MatType.CV_8U, 0)
+        dst3 = New Mat(dst2.Size, MatType.CV_8U, 0)
         desc = "Find the lines in the left and right images - use StableGray_LeftRight for left/right images."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -2200,11 +2200,11 @@ Public Class Line_LeftRight : Inherits TaskParent
     Public rightList As New List(Of lpData)
     Dim linesRight As New Line_Core
     Public Sub New()
-        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-        dst3 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        dst2 = New Mat(dst2.Size, MatType.CV_8U, 0)
+        dst3 = New Mat(dst2.Size, MatType.CV_8U, 0)
         desc = "Find the lines in the left and right images - use StableGray_LeftRight for left/right images."
     End Sub
-    Private Sub showLines(dst As cv.Mat, lpList As List(Of lpData), pictag As Integer)
+    Private Sub showLines(dst As Mat, lpList As List(Of lpData), pictag As Integer)
         dst.SetTo(0)
         For Each lp In lpList
             Line(dst, lp.p1, lp.p2, 255, task.lineWidth, task.lineType)

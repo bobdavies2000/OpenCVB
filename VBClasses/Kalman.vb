@@ -7,7 +7,7 @@ Public Class Kalman_Basics : Inherits TaskParent
     Dim saveDimension = -1
     Dim options As New Options_Kalman
     Public Sub New()
-        desc = "Use Kalman to stabilize values (such as a cv.rect.)"
+        desc = "Use Kalman to stabilize values (such as a rect.)"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
@@ -89,7 +89,7 @@ Public Class XR_Kalman_Compare : Inherits TaskParent
             kalman(i).Run(src)
         Next
 
-        kPlot.plotData = New cv.Scalar(kalman(0).stateResult, kalman(1).stateResult, kalman(2).stateResult)
+        kPlot.plotData = New Scalar(kalman(0).stateResult, kalman(1).stateResult, kalman(2).stateResult)
         kPlot.Run(src)
         dst3 = kPlot.dst2
     End Sub
@@ -102,16 +102,16 @@ End Class
 
 'https://github.com/opencv/opencv/blob/master/samples/cpp/kalman.cpp
 Public Class XR_Kalman_RotatingPoint : Inherits TaskParent
-    Dim kf As New cv.KalmanFilter(2, 1, 0)
-    Dim kState As New cv.Mat(2, 1, cv.MatType.CV_32F)
-    Dim processNoise As New cv.Mat(2, 1, cv.MatType.CV_32F)
-    Dim measurement As New cv.Mat(1, 1, cv.MatType.CV_32F, cv.Scalar.All(0))
-    Dim center As cv.Point2f, statePt As cv.Point2f
+    Dim kf As New KalmanFilter(2, 1, 0)
+    Dim kState As New Mat(2, 1, MatType.CV_32F)
+    Dim processNoise As New Mat(2, 1, MatType.CV_32F)
+    Dim measurement As New Mat(1, 1, MatType.CV_32F, Scalar.All(0))
+    Dim center As Point2f, statePt As Point2f
     Dim radius As Single
-    Private Function calcPoint(center As cv.Point2f, R As Double, angle As Double) As cv.Point
-        Return center + New cv.Point2f(Math.Cos(angle), -Math.Sin(angle)) * R
+    Private Function calcPoint(center As Point2f, R As Double, angle As Double) As cv.Point
+        Return center + New Point2f(Math.Cos(angle), -Math.Sin(angle)) * R
     End Function
-    Private Sub drawCross(dst2 As cv.Mat, center As cv.Point, color As cv.Scalar)
+    Private Sub drawCross(dst2 As Mat, center As cv.Point, color As Scalar)
         Dim d = 3
         Line(dst2, New cv.Point(center.X - d, center.Y - d), New cv.Point(center.X + d, center.Y + d), color, task.lineWidth, task.lineType)
         Line(dst2, New cv.Point(center.X + d, center.Y - d), New cv.Point(center.X - d, center.Y + d), color, task.lineWidth, task.lineType)
@@ -119,17 +119,17 @@ Public Class XR_Kalman_RotatingPoint : Inherits TaskParent
     Public Sub New()
         labels(2) = "Estimate Yellow < Real Red (if working)"
 
-        Randn(kState, New cv.Scalar(0), cv.Scalar.All(0.1))
-        kf.TransitionMatrix = cv.Mat.FromPixelData(2, 2, cv.MatType.CV_32F, New Single() {1, 1, 0, 1})
+        Randn(kState, New Scalar(0), Scalar.All(0.1))
+        kf.TransitionMatrix = Mat.FromPixelData(2, 2, MatType.CV_32F, New Single() {1, 1, 0, 1})
 
         SetIdentity(kf.MeasurementMatrix)
-        SetIdentity(kf.ProcessNoiseCov, cv.Scalar.All(0.00001))
-        SetIdentity(kf.MeasurementNoiseCov, cv.Scalar.All(0.1))
-        SetIdentity(kf.ErrorCovPost, cv.Scalar.All(1))
-        Randn(kf.StatePost, New cv.Scalar(0), cv.Scalar.All(1))
+        SetIdentity(kf.ProcessNoiseCov, Scalar.All(0.00001))
+        SetIdentity(kf.MeasurementNoiseCov, Scalar.All(0.1))
+        SetIdentity(kf.ErrorCovPost, Scalar.All(1))
+        Randn(kf.StatePost, New Scalar(0), Scalar.All(1))
         radius = dst2.Rows / 2.4 ' so we see the entire circle...
-        center = New cv.Point2f(dst2.Cols / 2, dst2.Rows / 2)
-        desc = "Track a rotating point using a Kalman filter. Yellow line (estimate) should be shorter than red (real)."
+        center = New Point2f(dst2.Cols / 2, dst2.Rows / 2)
+        desc = "Track a rotating cv.Point using a Kalman filter. Yellow line (estimate) should be shorter than red (real)."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         Dim stateAngle = kState.Get(Of Single)(0)
@@ -139,7 +139,7 @@ Public Class XR_Kalman_RotatingPoint : Inherits TaskParent
         Dim predictPt = calcPoint(center, radius, predictAngle)
         statePt = calcPoint(center, radius, stateAngle)
 
-        Randn(measurement, New cv.Scalar(0), cv.Scalar.All(kf.MeasurementNoiseCov.Get(Of Single)(0)))
+        Randn(measurement, New Scalar(0), Scalar.All(kf.MeasurementNoiseCov.Get(Of Single)(0)))
 
         measurement += kf.MeasurementMatrix * kState
         Dim measAngle = measurement.Get(Of Single)(0)
@@ -149,12 +149,12 @@ Public Class XR_Kalman_RotatingPoint : Inherits TaskParent
         drawCross(dst2, statePt, white)
         drawCross(dst2, measPt, white)
         drawCross(dst2, predictPt, white)
-        Line(dst2, statePt, measPt, New cv.Scalar(0, 0, 255), task.lineWidth + 2, task.lineType)
-        Line(dst2, statePt, predictPt, New cv.Scalar(0, 255, 255), task.lineWidth + 2, task.lineType)
+        Line(dst2, statePt, measPt, New Scalar(0, 0, 255), task.lineWidth + 2, task.lineType)
+        Line(dst2, statePt, predictPt, New Scalar(0, 255, 255), task.lineWidth + 2, task.lineType)
 
         If msRNG.Next(0, 4) <> 0 Then kf.Correct(measurement)
 
-        Randn(processNoise, cv.Scalar.Black, cv.Scalar.All(Math.Sqrt(kf.ProcessNoiseCov.Get(Of Single)(0, 0))))
+        Randn(processNoise, Scalar.Black, Scalar.All(Math.Sqrt(kf.ProcessNoiseCov.Get(Of Single)(0, 0))))
         kState = kf.TransitionMatrix * kState + processNoise
     End Sub
 End Class
@@ -183,7 +183,7 @@ Public Class XR_Kalman_MousePredict : Inherits TaskParent
         kalman.kInput = {task.mouseMovePoint.X, task.mouseMovePoint.Y}
         kalman.Run(emptyMat)
         Line(dst2, New cv.Point(kalman.kOutput(0), kalman.kOutput(1)), lastStateResult, white, task.lineWidth, task.lineType)
-        Line(dst2, task.mouseMovePoint, lastRealMouse, cv.Scalar.Red)
+        Line(dst2, task.mouseMovePoint, lastRealMouse, Scalar.Red)
         lastRealMouse = task.mouseMovePoint
     End Sub
 End Class
@@ -196,14 +196,14 @@ End Class
 
 Public Class Kalman_CVMat : Inherits TaskParent
     Dim kalman() As Kalman_Simple
-    Public output As cv.Mat
-    Public input As cv.Mat
+    Public output As Mat
+    Public input As Mat
     Dim saveDimension = -1
     Dim options As New Options_Kalman
     Public Sub New()
-        input = New cv.Mat(4, 1, cv.MatType.CV_32F, cv.Scalar.All(0))
+        input = New Mat(4, 1, MatType.CV_32F, Scalar.All(0))
         If standalone Then labels(2) = "Rectangle moves smoothly to random locations"
-        desc = "Use Kalman to stabilize a set of values such as a cv.rect or cv.Mat"
+        desc = "Use Kalman to stabilize a set of values such as a rect or Mat"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
@@ -221,7 +221,7 @@ Public Class Kalman_CVMat : Inherits TaskParent
             For i = 0 To input.Rows - 1
                 kalman(i) = New Kalman_Simple
             Next
-            output = New cv.Mat(input.Rows, 1, cv.MatType.CV_32F, cv.Scalar.All(0))
+            output = New Mat(input.Rows, 1, MatType.CV_32F, Scalar.All(0))
         End If
 
         If options.useKalman Then
@@ -247,9 +247,9 @@ Public Class Kalman_CVMat : Inherits TaskParent
             If lastRect = rect Then
                 Dim r = Draw_Arc.InitRandomRect(25)
                 Dim array() As Single = {r.X, r.Y, r.Width, r.Height}
-                input = cv.Mat.FromPixelData(4, 1, cv.MatType.CV_32F, array)
+                input = Mat.FromPixelData(4, 1, MatType.CV_32F, array)
             End If
-            Rectangle(dst2, rect, cv.Scalar.Red, 2)
+            Rectangle(dst2, rect, Scalar.Red, 2)
             lastRect = rect
         End If
     End Sub
@@ -274,17 +274,17 @@ Public Class Kalman_ImageSmall : Inherits TaskParent
         resizeC.Run(src)
 
         Dim saveOriginal = resizeC.dst2.Clone()
-        Dim gray32f As New cv.Mat
-        resizeC.dst2.ConvertTo(gray32f, cv.MatType.CV_32F)
+        Dim gray32f As New Mat
+        resizeC.dst2.ConvertTo(gray32f, MatType.CV_32F)
         kalman.input = gray32f.Reshape(1, gray32f.Width * gray32f.Height)
         kalman.Run(src)
-        Dim tmp As New cv.Mat
-        kalman.output.ConvertTo(tmp, cv.MatType.CV_8U)
+        Dim tmp As New Mat
+        kalman.output.ConvertTo(tmp, MatType.CV_8U)
         tmp = tmp.Reshape(1, gray32f.Height)
-        resize(tmp, dst2, dst2.Size())
+        Resize(tmp, dst2, dst2.Size())
         Subtract(tmp, saveOriginal, dst3)
-        Threshold(dst3, dst3, 1, 255, cv.ThresholdTypes.Binary)
-        resize(dst3, dst3, dst2.Size())
+        Threshold(dst3, dst3, 1, 255, ThresholdTypes.Binary)
+        Resize(dst3, dst3, dst2.Size())
     End Sub
 End Class
 
@@ -340,9 +340,9 @@ End Class
 
 Public Class Kalman_Single : Inherits TaskParent
     Dim plot As New PlotTime_Scalar
-    Dim kf As New cv.KalmanFilter(2, 1, 0)
-    Dim processNoise As New cv.Mat(2, 1, cv.MatType.CV_32F)
-    Public measurement As New cv.Mat(1, 1, cv.MatType.CV_32F, cv.Scalar.All(0))
+    Dim kf As New KalmanFilter(2, 1, 0)
+    Dim processNoise As New Mat(2, 1, MatType.CV_32F)
+    Public measurement As New Mat(1, 1, MatType.CV_32F, Scalar.All(0))
     Public inputReal As Single
     Public stateResult As Single
     Public ProcessNoiseCov As Single = 0.00001F
@@ -352,7 +352,7 @@ Public Class Kalman_Single : Inherits TaskParent
     Public newTransmissionMatrix As Boolean = True
     Public Sub New()
         Dim tMatrix() As Single = {1, 1, 0, 1}
-        kf.TransitionMatrix = cv.Mat.FromPixelData(2, 2, cv.MatType.CV_32F, tMatrix)
+        kf.TransitionMatrix = Mat.FromPixelData(2, 2, MatType.CV_32F, tMatrix)
         kf.MeasurementMatrix = Mat.Eye(kf.MeasurementMatrix.Rows, kf.MeasurementMatrix.Cols, MatType.CV_32F)
         kf.ProcessNoiseCov = Mat.Eye(kf.ProcessNoiseCov.Rows, kf.ProcessNoiseCov.Cols, MatType.CV_32F) * 0.00001F
         kf.MeasurementNoiseCov = Mat.Eye(kf.MeasurementNoiseCov.Rows, kf.MeasurementNoiseCov.Cols, MatType.CV_32F) * 0.1F
@@ -370,7 +370,7 @@ Public Class Kalman_Single : Inherits TaskParent
         measurement.Set(Of Single)(0, 0, inputReal)
         stateResult = kf.Correct(measurement).Get(Of Single)(0, 0)
         If standaloneTest() Then
-            plot.plotData = New cv.Scalar(inputReal, stateResult, 0, 0)
+            plot.plotData = New Scalar(inputReal, stateResult, 0, 0)
             plot.Run(src)
             dst2 = plot.dst2
             dst3 = plot.dst3
@@ -387,9 +387,9 @@ End Class
 
 ' This algorithm is different and does not inherit from TaskParent.  It is the minimal work to implement kalman to allow large Kalman sets.
 Public Class Kalman_Simple : Implements IDisposable
-    Dim kf As New cv.KalmanFilter(2, 1, 0)
-    Dim processNoise As New cv.Mat(2, 1, cv.MatType.CV_32F)
-    Public measurement As New cv.Mat(1, 1, cv.MatType.CV_32F, cv.Scalar.All(0))
+    Dim kf As New KalmanFilter(2, 1, 0)
+    Dim processNoise As New Mat(2, 1, MatType.CV_32F)
+    Public measurement As New Mat(1, 1, MatType.CV_32F, Scalar.All(0))
     Public inputReal As Single
     Public stateResult As Single
     Public ProcessNoiseCov As Single = 0.00001F
@@ -398,7 +398,7 @@ Public Class Kalman_Simple : Implements IDisposable
     Public transitionMatrix() As Single = {1, 1, 0, 1} ' Change the transition matrix externally and set newTransmissionMatrix.
     Public newTMatrix As Boolean = True
     Public Sub updateTMatrix()
-        kf.TransitionMatrix = cv.Mat.FromPixelData(2, 2, cv.MatType.CV_32F, transitionMatrix)
+        kf.TransitionMatrix = Mat.FromPixelData(2, 2, MatType.CV_32F, transitionMatrix)
         kf.MeasurementMatrix = Mat.Eye(kf.MeasurementMatrix.Rows, kf.MeasurementMatrix.Cols, MatType.CV_32F)
         kf.ProcessNoiseCov = Mat.Eye(kf.ProcessNoiseCov.Rows, kf.ProcessNoiseCov.Cols, MatType.CV_32F) * 0.00001F
         kf.MeasurementNoiseCov = Mat.Eye(kf.MeasurementNoiseCov.Rows, kf.MeasurementNoiseCov.Cols, MatType.CV_32F) * 0.1F
@@ -563,7 +563,7 @@ Public Class Kalman_VB_Basics : Inherits TaskParent
         End If
 
         matrix(task.frameCount Mod saveAvgCount) = kInput
-        kAverage = Mean((cv.Mat.FromPixelData(saveAvgCount, 1, cv.MatType.CV_32F, matrix.ToArray)))(0)
+        kAverage = Mean((Mat.FromPixelData(saveAvgCount, 1, MatType.CV_32F, matrix.ToArray)))(0)
 
         If options.useKalman Then
             'The Kalman Filter code comes from:
@@ -575,7 +575,7 @@ Public Class Kalman_VB_Basics : Inherits TaskParent
         End If
 
         If standaloneTest() Then
-            plot.plotData = New cv.Scalar(kOutput, kInput, kAverage)
+            plot.plotData = New Scalar(kOutput, kInput, kAverage)
             plot.Run(src)
             dst2 = plot.dst2
             dst3 = plot.dst3
