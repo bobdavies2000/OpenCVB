@@ -554,7 +554,7 @@ Public Class Histogram_EqualizeColor : Inherits TaskParent
         labels(2) = "Image Enhanced with Equalized Histogram"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        Dim rgb() As Mat = Nothing
+        Dim rgb(2) As Mat
         Dim rgbEq() As Mat = Split(task.color)
 
         For i = 0 To rgb.Count - 1

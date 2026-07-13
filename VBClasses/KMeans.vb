@@ -1,4 +1,4 @@
-Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
+Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 Public Class KMeans_Basics : Inherits TaskParent
     Public options As New Options_KMeans
@@ -542,5 +542,48 @@ Public Class XR_KMeans_SimKDepth : Inherits TaskParent
         dst2 = Palettize(dst1)
 
         labels(2) = simK.labels(2) + " with " + CStr(binSlider.value) + " histogram bins"
+    End Sub
+End Class
+
+
+
+
+Public Class KMeans_BimodalDepth : Inherits TaskParent
+    Public colors As New Mat
+    Public buildPaletteOutput As Boolean = True
+    Public saveLabels As New Mat
+    Public Sub New()
+        labels = {"", "", "", "Palette output for the kMeans labels"}
+        desc = "Cluster the input using kMeans."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        If src.Channels() <> 1 Or src.Type <> cv.MatType.CV_32F Then src = task.pcSplit(2)
+
+        Dim columnVector = src.Reshape(src.Channels, src.Height * src.Width)
+        Kmeans(columnVector, 2, dst1, term, 1, KMeansFlags.PpCenters, colors)
+        dst1.Reshape(1, src.Height).ConvertTo(dst1, MatType.CV_8U)
+
+        Dim fg As New Mat, bg As New Mat
+        Threshold(dst1, fg, 0, 255, cv.ThresholdTypes.Binary)
+        bg = Not fg
+
+        'Dim fgmm = GetMinMax(task.pcSplit(2), fg)
+        'Dim bgmm = GetMinMax(task.pcSplit(2), bg)
+
+        Dim fgDepth As Mat = task.pcSplit(2).Clone
+        Dim bgDepth As Mat = task.pcSplit(2).Clone
+        Dim fgMean As Double = Mean(fgDepth, task.depthmask)(0)
+        Dim bgMean As Double = Mean(bgDepth, task.depthmask)(0)
+
+        If fgMean < bgMean Then
+            dst2 = fg
+            dst3 = bg
+        Else
+            dst2 = bg
+            dst3 = fg
+        End If
+
+        dst2.SetTo(0, task.noDepthMask)
+        dst3.SetTo(0, task.noDepthMask)
     End Sub
 End Class

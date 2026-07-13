@@ -314,7 +314,7 @@ End Class
 
 Public Class XR_Kalman_Depth32f : Inherits TaskParent
     Dim kalman As New Kalman_CVMat
-    Dim resizeC As Resize_Smaller
+    Dim resizeC As New Resize_Smaller
     Public Sub New()
         labels(2) = "Mask of non-zero depth after Kalman smoothing"
         labels(3) = "Difference from original depth"
@@ -341,7 +341,6 @@ End Class
 Public Class Kalman_Single : Inherits TaskParent
     Dim plot As New PlotTime_Scalar
     Dim kf As New KalmanFilter(2, 1, 0)
-    Dim processNoise As New Mat(2, 1, MatType.CV_32F)
     Public measurement As New Mat(1, 1, MatType.CV_32F, Scalar.All(0))
     Public inputReal As Single
     Public stateResult As Single
