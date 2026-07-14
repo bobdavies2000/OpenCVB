@@ -396,9 +396,6 @@ HullLine_EdgePoints
 Image_Basics
 Image_RedCloudColor
 Image_Series
-ImageOffset_Basics
-ImShow_Basics
-ImShow_CV32FC3
 IMU_Average
 IMU_Basics_TA
 IMU_GMatrix_TA
@@ -1332,9 +1329,12 @@ XR_Hull_Defect
 XR_HullLine_SelectHull
 XR_Image_Icon
 XR_Image_MSER
+XR_ImageOffset_Basics
 XR_ImageOffset_Cloud
 XR_ImageOffset_SliceH
 XR_ImageOffset_SliceV
+XR_ImShow_Basics
+XR_ImShow_CV32FC3
 XR_IMU_Basics_Kalman
 XR_IMU_Basics_WithOptions
 XR_IMU_IscameraStable

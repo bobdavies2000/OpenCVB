@@ -103,8 +103,6 @@ Hough
 Hull
 HullLine
 Image
-ImageOffset
-ImShow
 IMU
 Indexer
 InPaint
