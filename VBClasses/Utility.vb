@@ -213,6 +213,27 @@ Public Class Utility_Basics : Inherits TaskParent
 
         Return outStr
     End Function
+    Public Shared Function selectMinCell1(rcMapIndex As Mat, rcList As List(Of rcData), stablepoints As List(Of cv.Point)) As String
+        Dim outStr As String = ""
+
+        If stablepoints.Count > 0 Then
+            Static stablePoint As New Point
+            Dim index = stablepoints.IndexOf(stablePoint)
+            If index > 0 And task.mouseClickFlag = False Then
+                task.rcMinD = rcList(index)
+            Else
+                Dim clickIndex = rcMapIndex.Get(Of Integer)(task.clickPoint.Y, task.clickPoint.X)
+                task.rcMinD = rcList(clickIndex)
+                stablePoint = task.rcMinD.maxDStable
+            End If
+
+            task.color(task.rcMinD.rect).SetTo(white, task.rcMinD.mask)
+            outStr = task.rcMinD.displayCell()
+            task.clickPoint = task.rcMinD.maxDist
+        End If
+
+        Return outStr
+    End Function
     Public Shared Function selectMinCell(rcMapIndex As Mat, rcList As List(Of rcData)) As String
         If rcList.Count = 0 Then Return ""
 

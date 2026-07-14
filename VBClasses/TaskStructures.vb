@@ -679,13 +679,11 @@ Public Module Structures
     Public Class rcData
         Public contour As List(Of cv.Point)
         Public depth As Single
-        Public mapID As Integer
         Public index As Integer
         Public mask As New cv.Mat
         Public maskDepth As cv.Mat
         Public maxDist As cv.Point
         Public maxDStable As cv.Point
-        Public maxDistDepth As cv.Point
         Public pixels As Integer
         Public pixelsDepth As Integer
         Public rect As cv.Rect
@@ -696,7 +694,6 @@ Public Module Structures
             rect = _rect
             If _mapID >= 0 Then
                 InRange(_mask, _mapID, _mapID, mask)
-                mapID = _mapID
             Else
                 mask = _mask.Clone
             End If
@@ -729,7 +726,6 @@ Public Module Structures
             If contour IsNot Nothing Then
                 strout += "Contour count = " + CStr(contour.Count) + vbCrLf
             End If
-            strout += "mapID = " + CStr(mapID) + vbCrLf
             strout += "depth = " + depth.ToString(fmt1) + vbCrLf
             strout += "index = " + CStr(index) + vbCrLf
             strout += "MaxDist = " + CStr(maxDist.X) + ", " + CStr(maxDist.Y) + vbCrLf

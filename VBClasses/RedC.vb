@@ -4,6 +4,7 @@ Public Class RedC_Basics : Inherits TaskParent
     Public rcMap As Mat = New Mat(dst2.Size, MatType.CV_8U, 0)
     Public rcMapIndex As Mat = New Mat(dst2.Size, MatType.CV_32S, 0)
     Public rcList As New List(Of rcData) ' includes cloud data.
+    Dim stablePoints As New List(Of cv.Point)
     Public Sub New()
         desc = "FloodFill each color8U output and create an rclist"
     End Sub
@@ -43,14 +44,13 @@ Public Class RedC_Basics : Inherits TaskParent
             rc.maskDepth = rc.mask.Clone
             rc.maskDepth.SetTo(0, task.noDepthMask(rc.rect))
             rc.pixelsDepth = CountNonZero(rc.maskDepth)
-            rc.maxDistDepth = rc.buildMaxDist(rc.maskDepth)
 
             sortList.Add(rc.pixels, rc)
         Next
 
         dst2 = Palettize(rcMap, 0)
 
-        If task.rcMinD IsNot Nothing And standaloneTest() Then Rectangle(dst2, task.rcMinD.rect, task.highlight, task.lineWidth)
+        If task.rcMinD IsNot Nothing And standaloneTest() Then task.drawRect = task.rcMinD.rect
 
         rcList = New List(Of rcData)(sortList.Values)
         Dim rcIndex As Integer
@@ -60,9 +60,6 @@ Public Class RedC_Basics : Inherits TaskParent
             rcMapIndex(rc.rect).SetTo(rc.index, rc.mask)
             rcIndex += 1
         Next
-
-        strOut = Utility_Basics.selectMinCell(rcMapIndex, rcList)
-        SetTrueText(strOut, 3)
 
         For Each rc In rcList
             Dim mapIDCurr = rcMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
@@ -76,6 +73,20 @@ Public Class RedC_Basics : Inherits TaskParent
                 If color <> colorLast Then rc.maxDStable = rc.maxDist
             End If
         Next
+
+        If standaloneTest() Then
+            stablePoints.Clear()
+            For Each rc In rcList
+                Circle(dst2, rc.maxDStable, task.DotSize, task.highlight, -1)
+                stablePoints.Add(rc.maxDStable)
+            Next
+        End If
+
+        If rcList.Count > 160 Then task.fOptions.ReductionColor.Value += 1
+        If rcList.Count < 100 Then task.fOptions.ReductionColor.Value -= 1
+
+        strOut = Utility_Basics.selectMinCell1(rcMapIndex, rcList, stablePoints)
+        SetTrueText(strOut, 3)
 
         labels(2) = CStr(rcList.Count) + " RedColor cells were found."
     End Sub
