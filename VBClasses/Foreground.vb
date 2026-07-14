@@ -1,5 +1,69 @@
-Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
+Imports OpenCvSharp :
+Imports OpenCvSharp.Cv2 :
+Imports cv = OpenCvSharp
 Public Class Foreground_Basics_TA : Inherits TaskParent
+    Public splitValue As Single
+    Public fgMean As Single
+    Public bgMean As Single
+    Dim centers As New Mat(2, 1, MatType.CV_32F)
+    Public Sub New()
+        labels = {"", "", "Foreground (nearer than split)", "Background (farther than split)"}
+        desc = "Cursor.ai: Split task.pcSplit(2) with kMeans k=2 and find the splitValue separating foreground from background."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        Dim depth = task.pcSplit(2).Clone
+        depth.SetTo(task.MaxZmeters, task.noDepthMask)
+
+        If task.heartBeat Then
+            Threshold(depth, depth, task.MaxZmeters + 0.001, task.MaxZmeters, cv.ThresholdTypes.Binary)
+            Dim columnVector = depth.Reshape(1, depth.Rows * depth.Cols)
+            Dim labelsMat As New Mat
+            Kmeans(columnVector, 2, labelsMat, term, 3, KMeansFlags.PpCenters, centers)
+
+            Dim c00 = centers.Get(Of Single)(0, 0)
+            Dim c10 = centers.Get(Of Single)(1, 0)
+            Dim c01 = centers.Get(Of Single)(0, 1)
+            Dim c11 = centers.Get(Of Single)(1, 1)
+            fgMean = Math.Min(c00, c10)
+            bgMean = Math.Max(c00, c10)
+            If bgMean < splitValue * 2 Then splitValue = (fgMean + bgMean) / 2.0F
+            If splitValue = 0 Then splitValue = (fgMean + bgMean) / 2.0F
+
+            InRange(task.pcSplit(2), 0.001, splitValue, dst2)
+            dst3 = Not dst2
+
+            Dim respectiveMeans As String = ""
+            If standaloneTest() Then
+                fgMean = Mean(task.pcSplit(2), dst2)
+                bgMean = Mean(task.pcSplit(2), dst3)
+                respectiveMeans = " (cluster means " + fgMean.ToString(fmt3) + " / " + bgMean.ToString(fmt3) + "m)"
+            End If
+
+            labels(2) = "Foreground depth < " + splitValue.ToString(fmt3) + "m" + respectiveMeans
+            labels(3) = "Background depth >= " + splitValue.ToString(fmt3) + "m"
+            If task.heartBeat Then
+                strOut = "splitValue = " + splitValue.ToString(fmt3) + "m" + vbCrLf +
+                             "fgMean = " + fgMean.ToString(fmt3) + "m" + vbCrLf +
+                             "bgMean = " + bgMean.ToString(fmt3) + "m"
+            End If
+        Else
+            Threshold(depth, dst2, splitValue, 255, cv.ThresholdTypes.BinaryInv)
+            ConvertScaleAbs(dst2, dst2, 255)
+            dst3 = Not dst2
+        End If
+        If dst2.Channels = 1 AndAlso CountNonZero(dst2) > src.Total * 0.9 Then Dim k = 0
+        dst3.SetTo(0, task.noDepthMask)
+
+        SetTrueText(strOut, 1)
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class XR_Foreground_Basics_TA : Inherits TaskParent
     Dim hist As New Histogram_Depth
     Public foregroundMaxDepth As Single
     Public Sub New()

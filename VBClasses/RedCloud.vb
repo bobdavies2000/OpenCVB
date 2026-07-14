@@ -624,7 +624,7 @@ Public Class RedCloud_Foreground : Inherits TaskParent
 
         dst3.SetTo(0)
         Dim count As Integer
-        Dim maxDepth = task.foreground.foregroundMaxDepth
+        Dim maxDepth = task.foreground.splitValue
         For Each rc In redC.rcList
             If rc.wcMean(2) < maxDepth Then
                 dst3(rc.rect).SetTo(rc.color, rc.mask)
