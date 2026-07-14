@@ -1542,6 +1542,7 @@ Public Class XR_Line_TrackV : Inherits TaskParent
 
                 If lp.rect.IntersectsWith(lpPrev.rect) Then
                     match.template = lastImage(lpPrev.rect)
+                    If lpPrev.rect <> lp.rect Then match.template = lastImage(lp.rect)
                     match.Run(src(lp.rect))
                     If match.correlation > task.fCorrThreshold Then
                         Line(dst2, lp.ptE1, lp.ptE2, task.scalarColors(i), task.lineWidth, LineTypes.Link4)

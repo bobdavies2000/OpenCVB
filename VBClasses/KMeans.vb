@@ -548,42 +548,55 @@ End Class
 
 
 
-Public Class KMeans_BimodalDepth : Inherits TaskParent
-    Public colors As New Mat
-    Public buildPaletteOutput As Boolean = True
-    Public saveLabels As New Mat
+
+Public Class KMeans_DepthBimodal : Inherits TaskParent
+    Public splitValue As Single
+    Public fgMean As Single
+    Public bgMean As Single
+    Dim centers As New Mat(2, 1, MatType.CV_32F)
     Public Sub New()
-        labels = {"", "", "", "Palette output for the kMeans labels"}
-        desc = "Cluster the input using kMeans."
+        labels = {"", "", "Foreground (nearer than split)", "Background (farther than split)"}
+        desc = "Cursor.ai: Split task.pcSplit(2) with kMeans k=2 and find the depth value separating foreground from background."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If src.Channels() <> 1 Or src.Type <> cv.MatType.CV_32F Then src = task.pcSplit(2)
+        Dim depth = task.pcSplit(2).Clone
+        depth.SetTo(task.MaxZmeters, task.noDepthMask)
 
-        Dim columnVector = src.Reshape(src.Channels, src.Height * src.Width)
-        Kmeans(columnVector, 2, dst1, term, 1, KMeansFlags.PpCenters, colors)
-        dst1.Reshape(1, src.Height).ConvertTo(dst1, MatType.CV_8U)
+        If task.heartBeat Then
+            Dim columnVector = depth.Reshape(1, depth.Rows * depth.Cols)
+            Dim labelsMat As New Mat
+            Kmeans(columnVector, 2, labelsMat, term, 3, KMeansFlags.PpCenters, centers)
 
-        Dim fg As New Mat, bg As New Mat
-        Threshold(dst1, fg, 0, 255, cv.ThresholdTypes.Binary)
-        bg = Not fg
+            Dim c0 = centers.Get(Of Single)(0, 0)
+            Dim c1 = centers.Get(Of Single)(1, 0)
+            fgMean = Math.Min(c0, c1)
+            bgMean = Math.Max(c0, c1)
+            If bgMean < splitValue * 2 Then splitValue = (fgMean + bgMean) / 2.0F
+            If splitValue = 0 Then splitValue = (fgMean + bgMean) / 2.0F
 
-        'Dim fgmm = GetMinMax(task.pcSplit(2), fg)
-        'Dim bgmm = GetMinMax(task.pcSplit(2), bg)
+            InRange(task.pcSplit(2), 0.001, splitValue, dst2)
+            Threshold(task.pcSplit(2), dst3, splitValue, 255, ThresholdTypes.Binary)
+            dst3.ConvertTo(dst3, MatType.CV_8U)
 
-        Dim fgDepth As Mat = task.pcSplit(2).Clone
-        Dim bgDepth As Mat = task.pcSplit(2).Clone
-        Dim fgMean As Double = Mean(fgDepth, task.depthmask)(0)
-        Dim bgMean As Double = Mean(bgDepth, task.depthmask)(0)
+            dst2.SetTo(0, task.noDepthMask)
+            dst3.SetTo(0, task.noDepthMask)
 
-        If fgMean < bgMean Then
-            dst2 = fg
-            dst3 = bg
+            labels(2) = "Foreground depth < " + splitValue.ToString(fmt3) + "m  (cluster means " +
+                        fgMean.ToString(fmt3) + " / " + bgMean.ToString(fmt3) + "m)"
+            labels(3) = "Background depth >= " + splitValue.ToString(fmt3) + "m"
+            If task.heartBeat Then
+                strOut = "splitValue = " + splitValue.ToString(fmt3) + "m" + vbCrLf +
+                         "fgMean = " + fgMean.ToString(fmt3) + "m" + vbCrLf +
+                         "bgMean = " + bgMean.ToString(fmt3) + "m"
+            End If
         Else
-            dst2 = bg
-            dst3 = fg
+            Threshold(depth, dst2, splitValue, 255, cv.ThresholdTypes.BinaryInv)
+            ConvertScaleAbs(dst2, dst2, 255)
+            dst3 = Not dst2
         End If
-
-        dst2.SetTo(0, task.noDepthMask)
+        If dst2.Channels = 1 AndAlso CountNonZero(dst2) > src.Total * 0.9 Then Dim k = 0
         dst3.SetTo(0, task.noDepthMask)
+
+        SetTrueText(strOut, 1)
     End Sub
 End Class

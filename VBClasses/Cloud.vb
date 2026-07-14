@@ -783,23 +783,6 @@ Public Class Cloud_Gravity_TA : Inherits TaskParent
     Public Sub New()
         desc = "Rebuild the cv.Point cloud with knowledge of gravity (if the option is requested.)"
     End Sub
-    Public Shared Function checkNanInf(pc As Mat) As Mat
-        Dim count As Integer
-        Dim vec As New Vec3f(0, 0, 0)
-        ' The stereolabs camera has some weird -inf and inf values in the Y-plane 
-        ' with and without gravity transform.  Probably my fault but just fix it here.
-        For y = 0 To pc.Rows - 1
-            For x = 0 To pc.Cols - 1
-                Dim val = pc.Get(Of Vec3f)(y, x)
-                If Single.IsNaN(val(0)) Or Single.IsInfinity(val(0)) Then
-                    pc.Set(Of Vec3f)(y, x, vec)
-                    count += 1
-                End If
-            Next
-        Next
-
-        Return pc
-    End Function
     Public Overrides Sub RunAlg(src As cv.Mat)
         originalPointcloud = task.pointCloud.Clone
         InRange(originalPointcloud, task.MaxZmeters, 10000, task.maxDepthMask)
@@ -823,13 +806,24 @@ Public Class Cloud_Gravity_TA : Inherits TaskParent
             task.pointCloud = task.gravityCloud
         End If
 
-        ' The stereolabs camera has some weird -inf and inf values in the Y-plane 
-        ' with and without gravity transform.  Probably my fault but just fix it here.
-        If task.Settings.cameraName = "StereoLabs ZED 2/2i" Then
-            task.pointCloud = checkNanInf(task.pointCloud)
-        End If
-
         task.pcSplit = Split(task.pointCloud)
+
+        If task.Settings.cameraName.StartsWith("StereoLabs") Then
+            For i = 0 To task.pcSplit.Count - 1
+                Cv2.PatchNaNs(task.pcSplit(i), 0)
+
+                Dim posInfMask As New Mat()
+                Cv2.Compare(task.pcSplit(i), Double.PositiveInfinity, posInfMask, CmpTypes.EQ)
+
+                Dim negInfMask As New Mat()
+                Cv2.Compare(task.pcSplit(i), Double.NegativeInfinity, negInfMask, CmpTypes.EQ)
+
+                task.pcSplit(i).SetTo(0, posInfMask)
+                task.pcSplit(i).SetTo(0, negInfMask)
+            Next
+
+            Merge(task.pcSplit, task.pointCloud)
+        End If
 
         Threshold(task.pcSplit(2), task.depthmask, 0, 255, ThresholdTypes.Binary)
         ConvertScaleAbs(task.depthmask, task.depthmask)

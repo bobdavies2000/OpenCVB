@@ -1,7 +1,4 @@
-Imports System.Threading
-Imports sl
-Imports cv = OpenCvSharp
-
+Imports System.Threading : Imports cv = OpenCvSharp : Imports OpenCvSharp : Imports OpenCvSharp.Cv2
 Namespace MainApp
     Public Class Camera_ZED2 : Inherits GenericCamera
         Dim zed As CamZed

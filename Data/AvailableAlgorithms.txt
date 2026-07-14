@@ -431,8 +431,8 @@ KeyColor_Basics
 KeyColor_Reduction
 KLT_Basics
 KMeans_Basics
-KMeans_BimodalDepth
 KMeans_Depth
+KMeans_DepthBimodal
 KMeans_Dimensions
 KMeans_Edges
 KMeans_Image
@@ -772,8 +772,6 @@ TextureFlow_Basics
 Threshold_Basics
 Threshold_ByChannels
 Threshold_Definitions
-Threshold_KMeans
-Threshold_OTSUBad
 Track_Basics
 Track_FindNearest
 Track_Simple
