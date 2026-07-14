@@ -955,7 +955,7 @@ Public Class XR_Line_BrickList : Inherits TaskParent
         DrawRect(dst1, r, black)
 
         Dim allPoints As New List(Of cv.Point)
-        Dim brickList As New List(of cv.Rect)
+        Dim brickList As New List(Of cv.Rect)
         For Each rect In task.gridRects
             Dim brick = dst1(rect)
             If CountNonZero(brick) = 0 Then Continue For

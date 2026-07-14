@@ -1,21 +1,29 @@
 Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 Public Class RedC_Basics : Inherits TaskParent
     Dim color8u As New Color8U_Basics
-    Public rcMap As New Mat
+    Public rcMap As Mat = New Mat(dst2.Size, MatType.CV_8U, 0)
+    Public rcMapIndex As Mat = New Mat(dst2.Size, MatType.CV_32S, 0)
     Public rcList As New List(Of rcData) ' includes cloud data.
-    Public rcNone As New Mat
     Public Sub New()
-        If standalone Then task.gOptions.displayDst1.Checked = True
-        labels(3) = "RedCloud cells with depth."
         desc = "FloodFill each color8U output and create an rclist"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
+        Dim rcMapLast As cv.Mat = rcMap.Clone
+        Dim rcMapIndexLast As cv.Mat = rcMapIndex.Clone
+        Dim rcListLast As New List(Of rcData)(rcList)
+
+        If task.optionsChanged Then
+            rcMapLast.SetTo(0)
+            rcMapIndex.SetTo(0)
+            rcListLast.Clear()
+        End If
+
         If src.Channels <> 1 Then color8u.Run(task.gray) Else color8u.Run(src)
         src = color8u.dst2 + 1
 
         rcMap = src.Clone
         Dim minList As New List(Of rcData)
-        Dim rect as cv.Rect
+        Dim rect As cv.Rect
         Dim mask As Mat = New Mat(New Size(dst2.Width + 2, dst2.Height + 2), MatType.CV_8U, 0)
         For Each r In task.gridRects
             If mask(r).Get(Of Byte)(0, 0) = 0 Then
@@ -25,12 +33,6 @@ Public Class RedC_Basics : Inherits TaskParent
                 If count > 0 Then minList.Add(New rcData(rcMap(rect), rect, mapID))
             End If
         Next
-
-        rcNone = Not mask(New cv.Rect(1, 1, dst2.Width, dst2.Height))
-        rcMap.SetTo(0, rcNone)
-        dst2 = Palettize(rcMap, 0)
-
-        If task.rcMinD IsNot Nothing And standaloneTest() Then Rectangle(dst2, task.rcMinD.rect, task.highlight, task.lineWidth)
 
         Dim sortList As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
         For i = 0 To minList.Count - 1
@@ -46,15 +48,34 @@ Public Class RedC_Basics : Inherits TaskParent
             sortList.Add(rc.pixels, rc)
         Next
 
+        dst2 = Palettize(rcMap, 0)
+
+        If task.rcMinD IsNot Nothing And standaloneTest() Then Rectangle(dst2, task.rcMinD.rect, task.highlight, task.lineWidth)
+
         rcList = New List(Of rcData)(sortList.Values)
         Dim rcIndex As Integer
+        rcMapIndex.SetTo(0)
         For Each rc In rcList
             rc.index = rcIndex
+            rcMapIndex(rc.rect).SetTo(rc.index, rc.mask)
             rcIndex += 1
         Next
 
-        strOut = Utility_Basics.selectMinCell(rcMap, rcList)
-        SetTrueText(strOut, 1)
+        strOut = Utility_Basics.selectMinCell(rcMapIndex, rcList)
+        SetTrueText(strOut, 3)
+
+        For Each rc In rcList
+            Dim mapIDCurr = rcMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
+            Dim mapIDLast = rcMapLast.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
+            Dim indexLast = rcMapIndexLast.Get(Of Integer)(rc.maxDist.Y, rc.maxDist.X)
+
+            If indexLast < rcListLast.Count Then
+                rc.maxDStable = If(mapIDCurr = mapIDLast, rcListLast(indexLast).maxDStable, rc.maxDist)
+                Dim color = dst2.Get(Of cv.Vec3b)(rc.maxDist.Y, rc.maxDist.X)
+                Dim colorLast = dst2.Get(Of cv.Vec3b)(rc.maxDStable.Y, rc.maxDStable.X)
+                If color <> colorLast Then rc.maxDStable = rc.maxDist
+            End If
+        Next
 
         labels(2) = CStr(rcList.Count) + " RedColor cells were found."
     End Sub
@@ -87,27 +108,5 @@ Public Class XR_RedC_Sizes : Inherits TaskParent
         Next
 
         labels(3) = CStr(count) + " cells smaller than " + CStr(task.gOptions.DebugSlider.Value) + " pixels."
-    End Sub
-End Class
-
-
-
-
-
-
-Public Class XR_RedC_Lines : Inherits TaskParent
-    Dim redC As New RedC_Basics
-    Dim lines As New Line_Basics
-    Public Sub New()
-        desc = "Use the 'Other' class of RedC cells - the unclassified areas - as input to line detection."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        redC.Run(src)
-        dst2 = redC.dst2
-        labels(2) = redC.labels(2)
-
-        lines.Run(redC.rcNone)
-        dst3 = lines.dst2
-        labels(3) = lines.labels(2)
     End Sub
 End Class

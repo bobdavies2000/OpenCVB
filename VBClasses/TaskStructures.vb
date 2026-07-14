@@ -684,6 +684,7 @@ Public Module Structures
         Public mask As New cv.Mat
         Public maskDepth As cv.Mat
         Public maxDist As cv.Point
+        Public maxDStable As cv.Point
         Public maxDistDepth As cv.Point
         Public pixels As Integer
         Public pixelsDepth As Integer
@@ -700,17 +701,18 @@ Public Module Structures
                 mask = _mask.Clone
             End If
             contour = ContourBuild(mask)
-            If _mapID >= 0 Then
-                If contour.Count >= 3 Then ' need at least 3 points for a contour.
-                    Dim listOfPoints = New List(Of List(Of cv.Point))({contour})
-                    mask = New cv.Mat(mask.Size, cv.MatType.CV_8U, 0)
-                    DrawContours(mask, listOfPoints, 0, cv.Scalar.All(mapID), -1, cv.LineTypes.Link4)
-                End If
-            End If
+            'If _mapID >= 0 Then
+            '    If contour.Count >= 3 Then ' need at least 3 points for a contour.
+            '        Dim listOfPoints = New List(Of List(Of cv.Point))({contour})
+            '        mask = New cv.Mat(mask.Size, cv.MatType.CV_8U, 0)
+            '        DrawContours(mask, listOfPoints, 0, cv.Scalar.All(mapID), -1, cv.LineTypes.Link4)
+            '    End If
+            'End If
             pixels = CountNonZero(mask)
         End Sub
         Public Function buildMaxDist(ByVal mask As cv.Mat) As cv.Point
             ' Rectangle is definitely needed.  Test it again with MaxDist_NoRectangle to verify that the rectangle is essential.
+            Threshold(mask, mask, 0, 255, cv.ThresholdTypes.Binary)
             Rectangle(mask, New cv.Rect(0, 0, mask.Width, mask.Height), cv.Scalar.All(0), 1)
             Dim distance32f As New cv.Mat
             DistanceTransform(mask, distance32f, cv.DistanceTypes.L1, cv.DistanceTransformMasks.Precise, cv.MatType.CV_32F)
@@ -718,6 +720,7 @@ Public Module Structures
             Dim maxDist As cv.Point
             maxDist.X = mm.maxLoc.X + rect.X
             maxDist.Y = mm.maxLoc.Y + rect.Y
+            maxDStable = newPoint
 
             Return maxDist
         End Function

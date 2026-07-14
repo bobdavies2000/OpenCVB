@@ -15,7 +15,11 @@ Public Class Motion_Basics_TA : Inherits TaskParent
                     " to adjust accuracy of accumulated image.", 3)
 
         If src.Channels <> 1 Then src = task.gray.Clone
-        If task.optionsChanged Then dst2 = src.Clone
+        If task.optionsChanged Or task.heartBeat Then
+            dst2 = src.Clone
+            motionMask.SetTo(255)
+            Exit Sub
+        End If
 
         diff.lastFrame = dst2
         diff.Run(src)

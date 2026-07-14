@@ -1598,7 +1598,6 @@ XR_Rectangle_MultiOverlap
 XR_Rectangle_Overlap
 XR_Rectangle_Union
 XR_RecursiveBilateralFilter_CPP
-XR_RedC_Lines
 XR_RedC_Sizes
 XR_RedCloud_Basics
 XR_RedCloud_CellDepthHistogram
