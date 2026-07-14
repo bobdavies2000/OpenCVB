@@ -30,11 +30,11 @@
   <ItemGroup>
     <PackageReference Include="Intel.RealSenseWithNativeDll" Version="2.51.1.1" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.5-beta1" />
-    <PackageReference Include="OpenCvSharp5" Version="5.0.0.20260712" />
-    <PackageReference Include="OpenCvSharp5.GdipExtensions" Version="5.0.0.20260712" />
-    <PackageReference Include="OpenCvSharp5.runtime.wasm" Version="5.0.0.20260712" />
-    <PackageReference Include="OpenCvSharp5.runtime.win" Version="5.0.0.20260712" />
-    <PackageReference Include="OpenCvSharp5.Windows" Version="5.0.0.20260712" />
+    <PackageReference Include="OpenCvSharp5" Version="5.0.0.20260713" />
+    <PackageReference Include="OpenCvSharp5.GdipExtensions" Version="5.0.0.20260713" />
+    <PackageReference Include="OpenCvSharp5.runtime.wasm" Version="5.0.0.20260713" />
+    <PackageReference Include="OpenCvSharp5.runtime.win" Version="5.0.0.20260713" />
+    <PackageReference Include="OpenCvSharp5.Windows" Version="5.0.0.20260713" />
     <PackageReference Include="Stereolabs.zed" Version="5.3.0" GeneratePathProperty="true" />
   </ItemGroup>
 
