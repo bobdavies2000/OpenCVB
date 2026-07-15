@@ -27,17 +27,19 @@ Public Class RedC_Basics : Inherits TaskParent
         minList.Add(New rcData) ' placeholder for 0
         Dim rect As cv.Rect
         Dim mask As Mat = New Mat(New Size(dst2.Width + 2, dst2.Height + 2), MatType.CV_8U, 0)
-        For Each r In task.gridRects
-            If mask(r).Get(Of Byte)(0, 0) = 0 Then
-                Dim mapID As Integer = rcMap(r).Get(Of Byte)(0, 0)
-                Dim index As Integer = minList.Count
-                Dim flags = FloodFillFlags.FixedRange Or FloodFillFlags.MaskOnly Or (255 << 8)
-                Dim count = FloodFill(rcMap, mask, r.TopLeft, index, rect, 0, 0, flags)
-                If count > 0 Then
-                    Dim rc = New rcData(rcMap(rect), rect, mapID)
-                    minList.Add(rc)
+        For y = 0 To rcMap.Height - 1
+            For x = 0 To rcMap.Width - 1
+                If mask.Get(Of Byte)(y, x) = 0 Then
+                    Dim mapID As Integer = rcMap.Get(Of Byte)(y, x)
+                    Dim index As Integer = minList.Count
+                    Dim flags = FloodFillFlags.FixedRange Or FloodFillFlags.MaskOnly Or (255 << 8)
+                    Dim count = FloodFill(rcMap, mask, New cv.Point(x, y), index, rect, 0, 0, flags)
+                    If count > 100 Then
+                        Dim rc = New rcData(rcMap(rect), rect, mapID)
+                        minList.Add(rc)
+                    End If
                 End If
-            End If
+            Next
         Next
 
         Dim sortList As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
@@ -61,7 +63,6 @@ Public Class RedC_Basics : Inherits TaskParent
         For Each rc In rcList
             rc.index = rcIndex
             rcIndexMap(rc.rect).SetTo(rc.index, rc.mask)
-
             rcIndex += 1
         Next
 
@@ -90,8 +91,12 @@ Public Class RedC_Basics : Inherits TaskParent
             Next
         End If
 
-        If rcList.Count > 160 Then task.fOptions.ReductionColor.Value += 1
-        If rcList.Count < 100 Then task.fOptions.ReductionColor.Value -= 1
+        Dim tmp As New cv.Mat
+        rcIndexMap.ConvertTo(tmp, cv.MatType.CV_8U)
+        cv.Cv2.ImShow("rcIndexMap", tmp)
+
+        If rcList.Count > 60 Then task.fOptions.ReductionColor.Value += 1
+        If rcList.Count < 30 Then task.fOptions.ReductionColor.Value -= 1
 
         strOut = Utility_Basics.selectMinCell(rcIndexMap, rcMap, rcList)
         SetTrueText(strOut, 3)
