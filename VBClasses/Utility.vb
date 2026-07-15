@@ -213,32 +213,39 @@ Public Class Utility_Basics : Inherits TaskParent
 
         Return outStr
     End Function
-    Public Shared Function selectMinCell1(rcMapIndex As Mat, rcList As List(Of rcData), stablepoints As List(Of cv.Point)) As String
+    Public Shared Function selectMinCellold(rcIndexMap As Mat, rcMap As Mat, rcList As List(Of rcData)) As String
+        If rcList.Count = 0 Then Return ""
+
+        Static myMapID As Integer
+        Static myClickPoint As cv.Point = task.clickPoint
+        If task.mouseClickFlag Then
+            myClickPoint = task.clickPoint
+            myMapID = rcMap.Get(Of Integer)(myClickPoint.Y, myClickPoint.X)
+        End If
+
         Dim outStr As String = ""
+        Dim clickIndex = rcIndexMap.Get(Of Integer)(myClickPoint.Y, myClickPoint.X)
+        Dim testMapID = rcMap.Get(Of Byte)(myClickPoint.Y, myClickPoint.X)
 
-        If stablepoints.Count > 0 Then
-            Static stablePoint As New Point
-            Dim index = stablepoints.IndexOf(stablePoint)
-            If index > 0 And task.mouseClickFlag = False Then
-                task.rcMinD = rcList(index)
-            Else
-                Dim clickIndex = rcMapIndex.Get(Of Integer)(task.clickPoint.Y, task.clickPoint.X)
-                task.rcMinD = rcList(clickIndex)
-                stablePoint = task.rcMinD.maxDStable
-            End If
-
+        If testMapID <> myMapID Then
+            outStr = "Selected cell was lost"
+            task.rcMinD = Nothing
+            myMapID = -1
+            myClickPoint = newPoint
+        Else
+            task.rcMinD = rcList(clickIndex)
             task.color(task.rcMinD.rect).SetTo(white, task.rcMinD.mask)
             outStr = task.rcMinD.displayCell()
-            task.clickPoint = task.rcMinD.maxDist
+            myClickPoint = task.rcMinD.maxDist
         End If
 
         Return outStr
     End Function
-    Public Shared Function selectMinCell(rcMapIndex As Mat, rcList As List(Of rcData)) As String
+    Public Shared Function selectMinCell(rcIndexMap As Mat, rcList As List(Of rcData)) As String
         If rcList.Count = 0 Then Return ""
 
         Dim outStr As String = ""
-        Dim clickIndex = rcMapIndex.Get(Of Integer)(task.clickPoint.Y, task.clickPoint.X)
+        Dim clickIndex = rcIndexMap.Get(Of Integer)(task.clickPoint.Y, task.clickPoint.X)
         task.rcMinD = rcList(clickIndex)
         task.color(task.rcMinD.rect).SetTo(white, task.rcMinD.mask)
         outStr = task.rcMinD.displayCell()

@@ -2,7 +2,7 @@ Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 Public Class RedC_Basics : Inherits TaskParent
     Dim color8u As New Color8U_Basics
     Public rcMap As Mat = New Mat(dst2.Size, MatType.CV_8U, 0)
-    Public rcMapIndex As Mat = New Mat(dst2.Size, MatType.CV_32S, 0)
+    Public rcIndexMap As Mat = New Mat(dst2.Size, MatType.CV_32S, 0)
     Public rcList As New List(Of rcData) ' includes cloud data.
     Dim stablePoints As New List(Of cv.Point)
     Public Sub New()
@@ -10,13 +10,13 @@ Public Class RedC_Basics : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         Dim rcMapLast As cv.Mat = rcMap.Clone
-        Dim rcMapIndexLast As cv.Mat = rcMapIndex.Clone
+        Dim rcIndexMapLast As cv.Mat = rcIndexMap.Clone
         Dim rcListLast As New List(Of rcData)(rcList)
         Dim stablePointsLast As New List(Of cv.Point)(stablePoints)
 
         If task.optionsChanged Then
             rcMapLast.SetTo(0)
-            rcMapIndex.SetTo(0)
+            rcIndexMap.SetTo(0)
             rcListLast.Clear()
         End If
 
@@ -57,10 +57,10 @@ Public Class RedC_Basics : Inherits TaskParent
 
         rcList = New List(Of rcData)(sortList.Values)
         Dim rcIndex As Integer
-        rcMapIndex.SetTo(0)
+        rcIndexMap.SetTo(0)
         For Each rc In rcList
             rc.index = rcIndex
-            rcMapIndex(rc.rect).SetTo(rc.index, rc.mask)
+            rcIndexMap(rc.rect).SetTo(rc.index, rc.mask)
 
             rcIndex += 1
         Next
@@ -68,7 +68,7 @@ Public Class RedC_Basics : Inherits TaskParent
         For Each rc In rcList
             Dim mapIDCurr = rcMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
             Dim mapIDLast = rcMapLast.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
-            Dim indexLast = rcMapIndexLast.Get(Of Integer)(rc.maxDist.Y, rc.maxDist.X)
+            Dim indexLast = rcIndexMapLast.Get(Of Integer)(rc.maxDist.Y, rc.maxDist.X)
 
             If indexLast < rcListLast.Count Then
                 rc.maxDStable = If(mapIDCurr = mapIDLast, rcListLast(indexLast).maxDStable, rc.maxDist)
@@ -93,7 +93,7 @@ Public Class RedC_Basics : Inherits TaskParent
         If rcList.Count > 160 Then task.fOptions.ReductionColor.Value += 1
         If rcList.Count < 100 Then task.fOptions.ReductionColor.Value -= 1
 
-        strOut = Utility_Basics.selectMinCell(rcMapIndex, rcList)
+        strOut = Utility_Basics.selectMinCell(rcIndexMap, rcList)
         SetTrueText(strOut, 3)
 
         If task.rcMinD IsNot Nothing And standaloneTest() Then Rectangle(dst2, task.rcMinD.rect, task.highlight, task.lineWidth)
