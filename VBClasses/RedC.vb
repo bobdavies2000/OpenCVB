@@ -20,10 +20,9 @@ Public Class RedC_Basics : Inherits TaskParent
             rcListLast.Clear()
         End If
 
-        If src.Channels <> 1 Then color8u.Run(task.gray) Else color8u.Run(src)
-        src = color8u.dst2 + 1
+        color8u.Run(task.gray)
 
-        rcMap = src.Clone
+        rcMap = color8u.dst2.Clone + 1
         Dim minList As New List(Of rcData)
         minList.Add(New rcData) ' placeholder for 0
         Dim rect As cv.Rect
@@ -31,9 +30,12 @@ Public Class RedC_Basics : Inherits TaskParent
         For Each r In task.gridRects
             If mask(r).Get(Of Byte)(0, 0) = 0 Then
                 Dim mapID As Integer = rcMap(r).Get(Of Byte)(0, 0)
+                Dim index As Integer = minList.Count
                 Dim flags = FloodFillFlags.FixedRange Or FloodFillFlags.MaskOnly Or (255 << 8)
                 Dim count = FloodFill(rcMap, mask, r.TopLeft, mapID, rect, 0, 0, flags)
-                If count > 0 Then minList.Add(New rcData(rcMap(rect), rect, mapID))
+                If count > 0 Then
+                    minList.Add(New rcData(rcMap(rect), rect, mapID))
+                End If
             End If
         Next
 
