@@ -58,7 +58,7 @@
             Dim method = colorMethods(i)
             Color8USource.Items.Add(method)
         Next
-        Color8USource.SelectedItem = "Reduction_Basics"
+        Color8USource.SelectedItem = "KMeans_Basics"
         ReductionColor.Value = 32
         ReductionDepth.Value = 200
 

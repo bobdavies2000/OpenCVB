@@ -27,15 +27,15 @@ Public Class RedC_Basics : Inherits TaskParent
         minList.Add(New rcData) ' placeholder for 0
         Dim rect As cv.Rect
         Dim mask As Mat = New Mat(New Size(dst2.Width + 2, dst2.Height + 2), MatType.CV_8U, 0)
-        For y = 0 To rcMap.Height - 1
-            For x = 0 To rcMap.Width - 1
+        Dim floodMap = rcMap.Clone
+        For y = 0 To floodMap.Height - 1
+            For x = 0 To floodMap.Width - 1
                 If mask.Get(Of Byte)(y, x) = 0 Then
-                    Dim mapID As Integer = rcMap.Get(Of Byte)(y, x)
                     Dim index As Integer = minList.Count
-                    Dim flags = FloodFillFlags.FixedRange Or FloodFillFlags.MaskOnly Or (255 << 8)
-                    Dim count = FloodFill(rcMap, mask, New cv.Point(x, y), index, rect, 0, 0, flags)
+                    Dim flags = FloodFillFlags.FixedRange Or (index << 8)
+                    Dim count = FloodFill(floodMap, mask, New cv.Point(x, y), index, rect, 0, 0, flags)
                     If count > 100 Then
-                        Dim rc = New rcData(rcMap(rect), rect, mapID)
+                        Dim rc = New rcData(floodMap(rect), rect, index)
                         minList.Add(rc)
                     End If
                 End If
@@ -84,7 +84,7 @@ Public Class RedC_Basics : Inherits TaskParent
             stablePoints.Clear()
             For Each rc In rcList
                 If stablePointsLast.Contains(rc.maxDStable) Then
-                    Circle(dst2, rc.maxDStable, task.DotSize, task.highlight, -1)
+                    Circle(dst2, rc.maxDStable, task.DotSize + 1, task.highlight, -1)
                     stableCount += 1
                 End If
                 stablePoints.Add(rc.maxDStable)
@@ -93,10 +93,9 @@ Public Class RedC_Basics : Inherits TaskParent
 
         Dim tmp As New cv.Mat
         rcIndexMap.ConvertTo(tmp, cv.MatType.CV_8U)
-        cv.Cv2.ImShow("rcIndexMap", tmp)
 
-        If rcList.Count > 60 Then task.fOptions.ReductionColor.Value += 1
-        If rcList.Count < 30 Then task.fOptions.ReductionColor.Value -= 1
+        'If rcList.Count > 60 Then task.fOptions.ReductionColor.Value += 1
+        'If rcList.Count < 30 Then task.fOptions.ReductionColor.Value -= 1
 
         strOut = Utility_Basics.selectMinCell(rcIndexMap, rcMap, rcList)
         SetTrueText(strOut, 3)
