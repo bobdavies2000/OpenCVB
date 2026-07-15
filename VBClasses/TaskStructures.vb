@@ -677,16 +677,16 @@ Public Module Structures
 
 
     Public Class rcData
-        Public contour As List(Of cv.Point)
+        Public contour As New List(Of cv.Point)
         Public depth As Single
         Public index As Integer
-        Public mask As New cv.Mat
+        Public mask As New cv.Mat(New cv.Size(1, 1), cv.MatType.CV_8U, 0)
         Public maskDepth As cv.Mat
-        Public maxDist As cv.Point
-        Public maxDStable As cv.Point
+        Public maxDist As New cv.Point
+        Public maxDStable As New cv.Point
         Public pixels As Integer
         Public pixelsDepth As Integer
-        Public rect As cv.Rect
+        Public rect As New cv.Rect(0, 0, 1, 1)
         Public Sub New()
         End Sub
         Public Sub New(_mask As cv.Mat, _rect As cv.Rect, index As Integer)

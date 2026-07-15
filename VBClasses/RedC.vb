@@ -12,6 +12,7 @@ Public Class RedC_Basics : Inherits TaskParent
         Dim rcMapLast As cv.Mat = rcMap.Clone
         Dim rcMapIndexLast As cv.Mat = rcMapIndex.Clone
         Dim rcListLast As New List(Of rcData)(rcList)
+        Dim stablePointsLast As New List(Of cv.Point)(stablePoints)
 
         If task.optionsChanged Then
             rcMapLast.SetTo(0)
@@ -24,6 +25,7 @@ Public Class RedC_Basics : Inherits TaskParent
 
         rcMap = src.Clone
         Dim minList As New List(Of rcData)
+        minList.Add(New rcData) ' placeholder for 0
         Dim rect As cv.Rect
         Dim mask As Mat = New Mat(New Size(dst2.Width + 2, dst2.Height + 2), MatType.CV_8U, 0)
         For Each r In task.gridRects
@@ -72,10 +74,14 @@ Public Class RedC_Basics : Inherits TaskParent
             End If
         Next
 
+        Dim stableCount As Integer
         If standaloneTest() Then
             stablePoints.Clear()
             For Each rc In rcList
-                Circle(dst2, rc.maxDStable, task.DotSize, task.highlight, -1)
+                If stablePointsLast.Contains(rc.maxDStable) Then
+                    Circle(dst2, rc.maxDStable, task.DotSize, task.highlight, -1)
+                    stableCount += 1
+                End If
                 stablePoints.Add(rc.maxDStable)
             Next
         End If
@@ -88,7 +94,9 @@ Public Class RedC_Basics : Inherits TaskParent
 
         If task.rcMinD IsNot Nothing And standaloneTest() Then Rectangle(dst2, task.rcMinD.rect, task.highlight, task.lineWidth)
 
-        labels(2) = CStr(rcList.Count) + " RedColor cells were found."
+        If task.heartBeat Then
+            labels(2) = CStr(rcList.Count) + " RedColor cells were found.  " + If(stableCount > 0, CStr(stableCount) + " stable cells", "")
+        End If
     End Sub
 End Class
 
