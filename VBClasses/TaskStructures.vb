@@ -689,21 +689,22 @@ Public Module Structures
         Public rect As New cv.Rect(0, 0, 1, 1)
         Public Sub New()
         End Sub
-        Public Sub New(_mask As cv.Mat, _rect As cv.Rect, index As Integer)
+        Public Sub New(_mask As cv.Mat, _rect As cv.Rect, mapID As Integer)
             Dim reduction As Integer = task.fOptions.ReductionDepth.Value
             rect = _rect
             If index >= 0 Then
-                InRange(_mask, index, index, mask)
+                InRange(_mask, mapID, mapID, mask)
             Else
                 mask = _mask.Clone
             End If
             contour = ContourBuild(mask)
             pixels = CountNonZero(mask)
         End Sub
-        Public Sub New(_mask As cv.Mat, _rect As cv.Rect, mapID As Integer, index As Integer)
+        Public Sub New(_mapMask As cv.Mat, _indexMask As cv.Mat, _rect As cv.Rect, mapID As Integer)
             Dim reduction As Integer = task.fOptions.ReductionDepth.Value
             rect = _rect
-            InRange(_mask, index, index, mask)
+            InRange(_mapMask, mapID, mapID, mask)
+            mask = mask And _indexMask
 
             contour = ContourBuild(mask)
             pixels = CountNonZero(mask)
@@ -730,6 +731,7 @@ Public Module Structures
             strout += "depth = " + depth.ToString(fmt1) + vbCrLf
             strout += "index = " + CStr(index) + vbCrLf
             strout += "MaxDist = " + CStr(maxDist.X) + ", " + CStr(maxDist.Y) + vbCrLf
+            strout += "MaxDStable = " + CStr(maxDStable.X) + ", " + CStr(maxDStable.Y) + vbCrLf
             strout += "Pixel count = " + CStr(pixels) + vbCrLf
             strout += "Pixel with depth = " + CStr(pixelsDepth) + vbCrLf
             strout += "Rect: X = " + CStr(rect.X) + ", Y = " + CStr(rect.Y) + ", "
