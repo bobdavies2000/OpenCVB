@@ -689,22 +689,15 @@ Public Module Structures
         Public rect As cv.Rect
         Public Sub New()
         End Sub
-        Public Sub New(_mask As cv.Mat, _rect As cv.Rect, _mapID As Integer)
+        Public Sub New(_mask As cv.Mat, _rect As cv.Rect, index As Integer)
             Dim reduction As Integer = task.fOptions.ReductionDepth.Value
             rect = _rect
-            If _mapID >= 0 Then
-                InRange(_mask, _mapID, _mapID, mask)
+            If index >= 0 Then
+                InRange(_mask, index, index, mask)
             Else
                 mask = _mask.Clone
             End If
             contour = ContourBuild(mask)
-            'If _mapID >= 0 Then
-            '    If contour.Count >= 3 Then ' need at least 3 points for a contour.
-            '        Dim listOfPoints = New List(Of List(Of cv.Point))({contour})
-            '        mask = New cv.Mat(mask.Size, cv.MatType.CV_8U, 0)
-            '        DrawContours(mask, listOfPoints, 0, cv.Scalar.All(mapID), -1, cv.LineTypes.Link4)
-            '    End If
-            'End If
             pixels = CountNonZero(mask)
         End Sub
         Public Function buildMaxDist(ByVal mask As cv.Mat) As cv.Point

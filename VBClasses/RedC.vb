@@ -50,8 +50,6 @@ Public Class RedC_Basics : Inherits TaskParent
 
         dst2 = Palettize(rcMap, 0)
 
-        If task.rcMinD IsNot Nothing And standaloneTest() Then task.drawRect = task.rcMinD.rect
-
         rcList = New List(Of rcData)(sortList.Values)
         Dim rcIndex As Integer
         rcMapIndex.SetTo(0)
@@ -87,6 +85,8 @@ Public Class RedC_Basics : Inherits TaskParent
 
         strOut = Utility_Basics.selectMinCell1(rcMapIndex, rcList, stablePoints)
         SetTrueText(strOut, 3)
+
+        If task.rcMinD IsNot Nothing And standaloneTest() Then Rectangle(dst2, task.rcMinD.rect, task.highlight, task.lineWidth)
 
         labels(2) = CStr(rcList.Count) + " RedColor cells were found."
     End Sub
