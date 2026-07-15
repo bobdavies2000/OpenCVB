@@ -393,9 +393,6 @@ Hull_Basics
 Hull_Contour
 HullLine_BasicsOld_TA
 HullLine_EdgePoints
-Image_Basics
-Image_RedCloudColor
-Image_Series
 IMU_Average
 IMU_Basics_TA
 IMU_GMatrix_TA
@@ -1327,8 +1324,11 @@ XR_Hough_Structural
 XR_Hough_Sudoku
 XR_Hull_Defect
 XR_HullLine_SelectHull
+XR_Image_Basics
 XR_Image_Icon
 XR_Image_MSER
+XR_Image_RedCloudColor
+XR_Image_Series
 XR_ImageOffset_Basics
 XR_ImageOffset_Cloud
 XR_ImageOffset_SliceH

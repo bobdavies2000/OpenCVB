@@ -697,7 +697,7 @@ Public Module Structures
             Else
                 mask = _mask.Clone
             End If
-            contour = ContourBuild(mask)
+            ' contour = ContourBuild(mask)
             pixels = CountNonZero(mask)
         End Sub
         Public Function buildMaxDist(ByVal mask As cv.Mat) As cv.Point

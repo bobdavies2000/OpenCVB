@@ -73,6 +73,7 @@ Public Class AlgorithmTask : Implements IDisposable
         optionsChanged = True
         readyForCameraInput = True
         task.clickPoint = New cv.Point(CInt(workRes.Width / 2), CInt(workRes.Height / 2))
+        task.mouseClickFlag = True
 
         task.gOptions.PaintFreqSlider.Value = paintFreq
         Options_PointCloud.setupCalcHist()

@@ -18802,7 +18802,7 @@ Namespace VBClasses
 
 
     Public Class XO_Image_CellStats : Inherits TaskParent
-        Dim images As New Image_RedCloudColor
+        Dim images As New XR_Image_RedCloudColor
         Dim stats As New XO_RedCell_Basics
         Public Sub New()
             images.images.images.options.imageSeries = False

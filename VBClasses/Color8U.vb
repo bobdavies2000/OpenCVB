@@ -203,7 +203,7 @@ End Class
 
 ' https://stackoverflow.com/questions/40233986/python-is-there-a-function-or-formula-to-find-the-complementary-colour-of-a-rgb
 Public Class XR_Color8U_ComplementaryTest : Inherits TaskParent
-    Dim images As New Image_Basics
+    Dim images As New XR_Image_Basics
     Dim comp As New Color8U_Complementary
     Public Sub New()
         labels = {"", "", "Original Image", "Color_Complementary version looks identical to the correct version at the link above "}

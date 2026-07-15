@@ -213,14 +213,14 @@ Public Class Utility_Basics : Inherits TaskParent
 
         Return outStr
     End Function
-    Public Shared Function selectMinCellold(rcIndexMap As Mat, rcMap As Mat, rcList As List(Of rcData)) As String
+    Public Shared Function selectMinCell(rcIndexMap As Mat, rcMap As Mat, rcList As List(Of rcData)) As String
         If rcList.Count = 0 Then Return ""
 
         Static myMapID As Integer
         Static myClickPoint As cv.Point = task.clickPoint
         If task.mouseClickFlag Then
             myClickPoint = task.clickPoint
-            myMapID = rcMap.Get(Of Integer)(myClickPoint.Y, myClickPoint.X)
+            myMapID = rcMap.Get(Of Byte)(myClickPoint.Y, myClickPoint.X)
         End If
 
         Dim outStr As String = ""
@@ -238,18 +238,6 @@ Public Class Utility_Basics : Inherits TaskParent
             outStr = task.rcMinD.displayCell()
             myClickPoint = task.rcMinD.maxDist
         End If
-
-        Return outStr
-    End Function
-    Public Shared Function selectMinCell(rcIndexMap As Mat, rcList As List(Of rcData)) As String
-        If rcList.Count = 0 Then Return ""
-
-        Dim outStr As String = ""
-        Dim clickIndex = rcIndexMap.Get(Of Integer)(task.clickPoint.Y, task.clickPoint.X)
-        task.rcMinD = rcList(clickIndex)
-        task.color(task.rcMinD.rect).SetTo(white, task.rcMinD.mask)
-        outStr = task.rcMinD.displayCell()
-        task.clickPoint = task.rcMinD.maxDist
 
         Return outStr
     End Function

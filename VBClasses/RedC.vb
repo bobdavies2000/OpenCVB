@@ -93,7 +93,7 @@ Public Class RedC_Basics : Inherits TaskParent
         If rcList.Count > 160 Then task.fOptions.ReductionColor.Value += 1
         If rcList.Count < 100 Then task.fOptions.ReductionColor.Value -= 1
 
-        strOut = Utility_Basics.selectMinCell(rcIndexMap, rcList)
+        strOut = Utility_Basics.selectMinCell(rcIndexMap, rcMap, rcList)
         SetTrueText(strOut, 3)
 
         If task.rcMinD IsNot Nothing And standaloneTest() Then Rectangle(dst2, task.rcMinD.rect, task.highlight, task.lineWidth)
