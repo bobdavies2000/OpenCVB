@@ -700,15 +700,6 @@ Public Module Structures
             contour = ContourBuild(mask)
             pixels = CountNonZero(mask)
         End Sub
-        Public Sub New(_mapMask As cv.Mat, _indexMask As cv.Mat, _rect As cv.Rect, mapID As Integer)
-            Dim reduction As Integer = task.fOptions.ReductionDepth.Value
-            rect = _rect
-            InRange(_mapMask, mapID, mapID, mask)
-            mask = mask And _indexMask
-
-            contour = ContourBuild(mask)
-            pixels = CountNonZero(mask)
-        End Sub
         Public Function buildMaxDist(ByVal mask As cv.Mat) As cv.Point
             ' Rectangle is definitely needed.  Test it again with MaxDist_NoRectangle to verify that the rectangle is essential.
             Threshold(mask, mask, 0, 255, cv.ThresholdTypes.Binary)

@@ -34,8 +34,8 @@ Public Class RedC_Basics : Inherits TaskParent
                 Dim flags = FloodFillFlags.FixedRange Or FloodFillFlags.MaskOnly Or (255 << 8)
                 Dim count = FloodFill(rcMap, mask, r.TopLeft, index, rect, 0, 0, flags)
                 If count > 0 Then
-                    ' minList.Add(New rcData(rcMap(rect), mask(rect), rect, mapID))
-                    minList.Add(New rcData(rcMap(rect), rect, mapID))
+                    Dim rc = New rcData(rcMap(rect), rect, mapID)
+                    minList.Add(rc)
                 End If
             End If
         Next
@@ -54,7 +54,6 @@ Public Class RedC_Basics : Inherits TaskParent
         Next
 
         dst2 = Palettize(rcMap, 0)
-        cv.Cv2.ImShow("Full Mask", mask)
 
         rcList = New List(Of rcData)(sortList.Values)
         Dim rcIndex As Integer
@@ -63,7 +62,6 @@ Public Class RedC_Basics : Inherits TaskParent
             rc.index = rcIndex
             rcMapIndex(rc.rect).SetTo(rc.index, rc.mask)
 
-            If rc.index = 0 Then cv.Cv2.ImShow("Mask", rc.mask)
             rcIndex += 1
         Next
 
@@ -95,7 +93,6 @@ Public Class RedC_Basics : Inherits TaskParent
         If rcList.Count > 160 Then task.fOptions.ReductionColor.Value += 1
         If rcList.Count < 100 Then task.fOptions.ReductionColor.Value -= 1
 
-        'strOut = Utility_Basics.selectMinCell1(rcMapIndex, rcList, stablePoints)
         strOut = Utility_Basics.selectMinCell(rcMapIndex, rcList)
         SetTrueText(strOut, 3)
 
