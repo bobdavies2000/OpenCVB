@@ -4,7 +4,7 @@ Imports cv = OpenCvSharp
 Public Class RedC_Basics : Inherits TaskParent
     Dim color8u As New Color8U_Basics
     Public rcMap As Mat = New Mat(dst2.Size, MatType.CV_8U, 0)
-    Public rcIndexMap As Mat = New Mat(dst2.Size, MatType.CV_32S, 0)
+    Dim rcIndexMap As Mat = New Mat(dst2.Size, MatType.CV_32S, 0)
     Public rcList As New List(Of rcData) ' includes cloud data.
     Public rcListLast As New List(Of rcData)
     Public Sub New()
@@ -34,9 +34,9 @@ Public Class RedC_Basics : Inherits TaskParent
                 If mask.Get(Of Byte)(y, x) = 0 Then
                     Dim index As Integer = sortList.Count
                     Dim mapID As Integer = rcMap.Get(Of Byte)(y, x)
-                    Dim flags = FloodFillFlags.FixedRange Or (255 << 8) ' Or FloodFillFlags.MaskOnly
+                    Dim flags = FloodFillFlags.FixedRange Or (index << 8) ' Or FloodFillFlags.MaskOnly
                     Dim count = FloodFill(floodMap, mask, New cv.Point(x, y), index, rect, 0, 0, flags)
-                    If count > 0 Then
+                    If count > 1 Then
                         Dim rc = New rcData(floodMap(rect), rect, index)
                         rc.mapID = mapID
                         sortList.Add(rc.pixels, rc)
@@ -44,8 +44,6 @@ Public Class RedC_Basics : Inherits TaskParent
                 End If
             Next
         Next
-        cv.Cv2.ImShow("Mask", mask)
-        cv.Cv2.ImShow("floodMap", floodMap)
         dst2 = Palettize(rcMap, 0)
 
         Dim rcIndex As Integer
@@ -53,18 +51,15 @@ Public Class RedC_Basics : Inherits TaskParent
         rcList.Clear()
         Dim flag = FloodFillFlags.FixedRange Or (255 << 8)
         For Each rc In sortList.Values
-            rc.index = rcIndex
+            rc.index = rcList.Count
             rcIndexMap(rc.rect).SetTo(rc.index, rc.mask)
 
             rc.maxDist = rc.buildMaxDist(rc.mask)
-            'Dim pt = New cv.Point(rc.maxDist.X - rc.rect.X, rc.maxDist.Y - rc.rect.Y)
-            'mask = New cv.Mat(New cv.Size(rc.rect.Width + 2, rc.rect.Height + 2), cv.MatType.CV_8U, 0)
-            'rc.pixels = FloodFill(rc.mask, mask, pt, 255, rect, 0, 0, flag)
-
-            If rc.index = 0 Then cv.Cv2.ImShow("rc.mask", rc.mask)
-
-            rcIndex += 1
-            rcList.Add(rc)
+            rc.pixels = CountNonZero(rc.mask)
+            If rc.pixels > 0 Then
+                rcIndex += 1
+                rcList.Add(rc)
+            End If
         Next
 
         For Each rc In rcList
@@ -78,21 +73,16 @@ Public Class RedC_Basics : Inherits TaskParent
                 Dim colorLast = dst2.Get(Of cv.Vec3b)(rc.maxDStable.Y, rc.maxDStable.X)
                 If color <> colorLast Then rc.maxDStable = rc.maxDist
             Else
-                If task.firstPass Then rc.maxdstable = rc.maxdist
+                If task.firstPass Then rc.maxDStable = rc.maxDist
             End If
         Next
-
-        Dim tmp As New cv.Mat
-        rcIndexMap.ConvertTo(tmp, cv.MatType.CV_8U)
 
         strOut = Utility_Basics.selectMinCell(rcIndexMap, rcMap, rcList)
         SetTrueText(strOut, 3)
 
         If task.rcMinD IsNot Nothing And standaloneTest() Then Rectangle(dst2, task.rcMinD.rect, task.highlight, task.lineWidth)
 
-        If task.heartBeat Then
-            labels(2) = CStr(rcList.Count) + " RedColor cells were found."
-        End If
+        If task.heartBeat Then labels(2) = CStr(rcList.Count) + " RedColor cells were found."
     End Sub
 End Class
 

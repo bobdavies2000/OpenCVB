@@ -688,14 +688,8 @@ Public Module Structures
         Public Sub New()
         End Sub
         Public Sub New(_mask As cv.Mat, _rect As cv.Rect, mapID As Integer)
-            Dim reduction As Integer = task.fOptions.ReductionDepth.Value
             rect = _rect
-            If index >= 0 Then
-                InRange(_mask, mapID, mapID, mask)
-            Else
-                mask = _mask.Clone
-            End If
-            pixels = CountNonZero(mask)
+            InRange(_mask, mapID, mapID, mask)
         End Sub
         Public Function buildMaxDist(ByVal mask As cv.Mat) As cv.Point
             ' Rectangle is definitely needed.  Test it again with MaxDist_NoRectangle to verify that the rectangle is essential.
