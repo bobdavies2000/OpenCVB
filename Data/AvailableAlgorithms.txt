@@ -662,6 +662,7 @@ Rectangle_EnclosingPoints
 Rectangle_Fit
 Rectangle_Rotated
 RedC_Basics
+RedC_TrackCell
 RedCloud_Basics
 RedCloud_Core
 RedCloud_Flood_CPP

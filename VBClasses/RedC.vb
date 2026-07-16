@@ -1,18 +1,18 @@
-Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
+Imports OpenCvSharp
+Imports OpenCvSharp.Cv2
+Imports cv = OpenCvSharp
 Public Class RedC_Basics : Inherits TaskParent
     Dim color8u As New Color8U_Basics
     Public rcMap As Mat = New Mat(dst2.Size, MatType.CV_8U, 0)
     Public rcIndexMap As Mat = New Mat(dst2.Size, MatType.CV_32S, 0)
     Public rcList As New List(Of rcData) ' includes cloud data.
     Public rcListLast As New List(Of rcData)
-    Dim stablePoints As New List(Of cv.Point)
     Public Sub New()
         desc = "FloodFill each color8U output and create an rclist"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         Dim rcMapLast As cv.Mat = rcMap.Clone
         Dim rcIndexMapLast As cv.Mat = rcIndexMap.Clone
-        Dim stablePointsLast As New List(Of cv.Point)(stablePoints)
         rcListLast = New List(Of rcData)(rcList)
 
         If task.optionsChanged Then
@@ -48,10 +48,18 @@ Public Class RedC_Basics : Inherits TaskParent
         Dim rcIndex As Integer
         rcIndexMap.SetTo(0)
         rcList.Clear()
+        Dim flag = FloodFillFlags.FixedRange Or (255 << 8)
         For Each rc In sortList.Values
             rc.index = rcIndex
             rcIndexMap(rc.rect).SetTo(rc.index, rc.mask)
+
             rc.maxDist = rc.buildMaxDist(rc.mask)
+            'Dim pt = New cv.Point(rc.maxDist.X - rc.rect.X, rc.maxDist.Y - rc.rect.Y)
+            'mask = New cv.Mat(New cv.Size(rc.rect.Width + 2, rc.rect.Height + 2), cv.MatType.CV_8U, 0)
+            'rc.pixels = FloodFill(rc.mask, mask, pt, 255, rect, 0, 0, flag)
+
+            If rc.index = 0 Then cv.Cv2.ImShow("rc.mask", rc.mask)
+
             rcIndex += 1
             rcList.Add(rc)
         Next
@@ -66,20 +74,10 @@ Public Class RedC_Basics : Inherits TaskParent
                 Dim color = dst2.Get(Of cv.Vec3b)(rc.maxDist.Y, rc.maxDist.X)
                 Dim colorLast = dst2.Get(Of cv.Vec3b)(rc.maxDStable.Y, rc.maxDStable.X)
                 If color <> colorLast Then rc.maxDStable = rc.maxDist
+            Else
+                If task.firstPass Then rc.maxdstable = rc.maxdist
             End If
         Next
-
-        Dim stableCount As Integer
-        If standaloneTest() Then
-            stablePoints.Clear()
-            For Each rc In rcList
-                If stablePointsLast.Contains(rc.maxDStable) Then
-                    Circle(dst2, rc.maxDStable, task.DotSize + 1, task.highlight, -1)
-                    stableCount += 1
-                End If
-                stablePoints.Add(rc.maxDStable)
-            Next
-        End If
 
         Dim tmp As New cv.Mat
         rcIndexMap.ConvertTo(tmp, cv.MatType.CV_8U)
@@ -90,7 +88,7 @@ Public Class RedC_Basics : Inherits TaskParent
         If task.rcMinD IsNot Nothing And standaloneTest() Then Rectangle(dst2, task.rcMinD.rect, task.highlight, task.lineWidth)
 
         If task.heartBeat Then
-            labels(2) = CStr(rcList.Count) + " RedColor cells were found.  " + If(stableCount > 0, CStr(stableCount) + " stable cells", "")
+            labels(2) = CStr(rcList.Count) + " RedColor cells were found."
         End If
     End Sub
 End Class
@@ -158,3 +156,58 @@ End Class
 
 
 
+
+
+Public Class RedC_TrackCell : Inherits TaskParent
+    Dim redC As New RedC_Basics
+    Public Sub New()
+        task.gOptions.displayDst1.Checked = True
+        task.gOptions.DebugSlider.Minimum = 0
+        desc = "Track the selected cell even after maxDStable goes beyond the edge of the cell."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        redC.Run(src)
+        dst2 = redC.dst2
+        labels(2) = redC.labels(2)
+
+        Static saveCell As rcData
+        If task.mouseClickFlag Then
+            strOut = ""
+            saveCell = task.rcMinD
+            If task.rcMinD.maxDStable = newPoint Then task.rcMinD.maxDStable = task.rcMinD.maxDist
+        End If
+
+        Dim stablePoints As New List(Of cv.Point)
+        For Each rc In redC.rcList
+            stablePoints.Add(rc.maxDStable)
+        Next
+
+        dst3.SetTo(0)
+        Dim index = stablePoints.IndexOf(saveCell.maxDStable)
+        If index >= 0 Then
+            If strOut.Length < 200 Then strOut += "Cell was found using MaxDStable..." + vbCrLf
+            Dim rc = redC.rcList(index)
+            dst3(rc.rect).SetTo(task.scalarColors(rc.mapID), rc.mask)
+            Circle(dst3, rc.maxDStable, task.DotSize + 1, task.highlight, -1)
+            If saveCell.mapID <> rc.mapID Then Dim k = 0
+            saveCell = rc
+        Else
+            'strOut = ""
+            'For i = Math.Max(saveCell.index - 2, 0) To Math.Min(redC.rcList.Count - 1, saveCell.index + 2)
+            '    Dim rc = redC.rcList(i)
+            '    If rc.mapID = saveCell.mapID And rc.rect.IntersectsWith(saveCell.rect) Then
+            '        saveCell = rc
+            '        dst3(rc.rect).SetTo(task.scalarColors(rc.mapID), rc.mask)
+            '        Circle(dst3, rc.maxDStable, task.DotSize + 1, task.highlight, -1)
+            '        strOut = "Cell was reacquired using the relative size and mapID." + vbCrLf
+            '        Exit For
+            '    End If
+            'Next
+        End If
+
+        Dim tmp As New cv.Mat
+        CvtColor(dst3, tmp, cv.ColorConversionCodes.BGR2GRAY)
+        If CountNonZero(tmp) = 0 Then strOut = "Select a cell to track it"
+        SetTrueText(strOut, 1)
+    End Sub
+End Class
