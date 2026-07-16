@@ -24,48 +24,36 @@ Public Class RedC_Basics : Inherits TaskParent
         color8u.Run(task.gray)
 
         rcMap = color8u.dst2.Clone + 1
-        Dim minList As New List(Of rcData)
-        minList.Add(New rcData) ' placeholder for 0
         Dim rect As cv.Rect
         Dim mask As Mat = New Mat(New Size(dst2.Width + 2, dst2.Height + 2), MatType.CV_8U, 0)
         Dim floodMap = rcMap.Clone
+        Dim sortList As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
         For y = 0 To floodMap.Height - 1
             For x = 0 To floodMap.Width - 1
                 If mask.Get(Of Byte)(y, x) = 0 Then
-                    Dim index As Integer = minList.Count
+                    Dim index As Integer = sortList.Count
                     Dim flags = FloodFillFlags.FixedRange Or (index << 8)
                     Dim count = FloodFill(floodMap, mask, New cv.Point(x, y), index, rect, 0, 0, flags)
                     If count > 100 Then
                         Dim rc = New rcData(floodMap(rect), rect, index)
                         rc.mapID = rcMap.Get(Of Byte)(y, x)
-                        minList.Add(rc)
+                        sortList.Add(rc.pixels, rc)
                     End If
                 End If
             Next
         Next
 
-        Dim sortList As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
-        For i = 0 To minList.Count - 1
-            Dim rc = minList(i)
-            rc.maxDist = rc.buildMaxDist(rc.mask)
-
-            rc.depth = Mean(task.pcSplit(2)(rc.rect), rc.mask)
-            rc.maskDepth = rc.mask.Clone
-            rc.maskDepth.SetTo(0, task.noDepthMask(rc.rect))
-            rc.pixelsDepth = CountNonZero(rc.maskDepth)
-
-            sortList.Add(rc.pixels, rc)
-        Next
-
         dst2 = Palettize(rcMap, 0)
 
-        rcList = New List(Of rcData)(sortList.Values)
         Dim rcIndex As Integer
         rcIndexMap.SetTo(0)
-        For Each rc In rcList
+        rcList.Clear()
+        For Each rc In sortList.Values
             rc.index = rcIndex
             rcIndexMap(rc.rect).SetTo(rc.index, rc.mask)
+            rc.maxDist = rc.buildMaxDist(rc.mask)
             rcIndex += 1
+            rcList.Add(rc)
         Next
 
         For Each rc In rcList
@@ -95,10 +83,6 @@ Public Class RedC_Basics : Inherits TaskParent
 
         Dim tmp As New cv.Mat
         rcIndexMap.ConvertTo(tmp, cv.MatType.CV_8U)
-
-
-        'If rcList.Count > 60 Then task.fOptions.ReductionColor.Value += 1
-        'If rcList.Count < 30 Then task.fOptions.ReductionColor.Value -= 1
 
         strOut = Utility_Basics.selectMinCell(rcIndexMap, rcMap, rcList)
         SetTrueText(strOut, 3)
@@ -146,7 +130,7 @@ End Class
 
 
 
-Public Class RedC_MaxDStable : Inherits TaskParent
+Public Class XR_RedC_MaxDStable : Inherits TaskParent
     Dim redC As New RedC_Basics
     Public Sub New()
         dst1 = New Mat(dst2.Size, cv.MatType.CV_8U, 0)
@@ -170,3 +154,7 @@ Public Class RedC_MaxDStable : Inherits TaskParent
         End If
     End Sub
 End Class
+
+
+
+

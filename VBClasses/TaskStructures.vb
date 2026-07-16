@@ -677,17 +677,13 @@ Public Module Structures
 
 
     Public Class rcData
-        Public contour As New List(Of cv.Point)
-        Public depth As Single
         Public index As Integer
         Public indexLast As Integer
         Public mapID As Integer
         Public mask As New cv.Mat(New cv.Size(1, 1), cv.MatType.CV_8U, 0)
-        Public maskDepth As cv.Mat
         Public maxDist As New cv.Point
         Public maxDStable As New cv.Point
         Public pixels As Integer
-        Public pixelsDepth As Integer
         Public rect As New cv.Rect(0, 0, 1, 1)
         Public Sub New()
         End Sub
@@ -699,7 +695,6 @@ Public Module Structures
             Else
                 mask = _mask.Clone
             End If
-            ' contour = ContourBuild(mask)
             pixels = CountNonZero(mask)
         End Sub
         Public Function buildMaxDist(ByVal mask As cv.Mat) As cv.Point
@@ -718,15 +713,10 @@ Public Module Structures
         End Function
         Public Function displayCell() As String
             Dim strout = ""
-            If contour IsNot Nothing Then
-                strout += "Contour count = " + CStr(contour.Count) + vbCrLf
-            End If
-            strout += "depth = " + depth.ToString(fmt1) + vbCrLf
             strout += "index = " + CStr(index) + vbCrLf
             strout += "MaxDist = " + CStr(maxDist.X) + ", " + CStr(maxDist.Y) + vbCrLf
             strout += "MaxDStable = " + CStr(maxDStable.X) + ", " + CStr(maxDStable.Y) + vbCrLf
             strout += "Pixel count = " + CStr(pixels) + vbCrLf
-            strout += "Pixel with depth = " + CStr(pixelsDepth) + vbCrLf
             strout += "Rect: X = " + CStr(rect.X) + ", Y = " + CStr(rect.Y) + ", "
             strout += "Width = " + CStr(rect.Width) + ", height = " + CStr(rect.Height) + vbCrLf
             strout += "ClickPoint = " + CStr(task.clickPoint.X) + ", " + CStr(task.clickPoint.Y) + vbCrLf
