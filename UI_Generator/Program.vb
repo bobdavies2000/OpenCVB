@@ -1,6 +1,4 @@
-Imports System
 Imports System.IO
-Imports System.Collections.Generic
 Imports System.Threading
 
 Module Program
@@ -40,8 +38,8 @@ Module Program
                         ' Parse the class name from lines like: "Public Class ClassName : Inherits " + parentName
                         Dim className As String = ExtractClassName(line)
                         If Not String.IsNullOrEmpty(className) Then
-                            'If className.StartsWith("XO_") Or className.StartsWith("XR_") Then
-                            If className.StartsWith("XO_") Then
+                            If className.StartsWith("XO_") Or className.StartsWith("XR_") Then
+                                'If className.StartsWith("XO_") Then
                                 If Not xoClasses.ContainsKey(className) Then
                                     xoClasses.Add(className, className)
                                 End If

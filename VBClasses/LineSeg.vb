@@ -263,7 +263,7 @@ End Class
 
 ''' <summary>
 ''' LBD-style line binary descriptors: 256 bits (32 bytes) per segment from Sobel magnitude samples
-''' in a 5×7 band around each line. OpenCvSharp 4.x does not expose cv::line_descriptor::BinaryDescriptor;
+''' in a 5ï¿½7 band around each line. OpenCvSharp 4.x does not expose cv::line_descriptor::BinaryDescriptor;
 ''' this matches the same descriptor layout (one uchar row per line) used for Hamming distance.
 ''' </summary>
 Public Class LineSeg_LBD : Inherits TaskParent
@@ -277,7 +277,7 @@ Public Class LineSeg_LBD : Inherits TaskParent
     Public descriptors As New Mat
     Dim lineSeg As New LineSeg_Basics
     Public Sub New()
-        desc = "Cursor.ai: LBD-style 256-bit binary descriptors for each line from LineSeg_Basics (Sobel magnitude, 5×7 band sampling)"
+        desc = "Cursor.ai: LBD-style 256-bit binary descriptors for each line from LineSeg_Basics (Sobel magnitude, 5ï¿½7 band sampling)"
     End Sub
     Private Shared Function ClampF(v As Single, lo As Single, hi As Single) As Single
         If v < lo Then Return lo
@@ -290,7 +290,7 @@ Public Class LineSeg_LBD : Inherits TaskParent
         If xi < 0 Or yi < 0 Or xi >= m.Width Or yi >= m.Height Then Return 0
         Return m.Get(Of Single)(yi, xi)
     End Function
-    ''' <summary>Fill samples(0..34) with gradient magnitude on a 5×7 grid across the line support region.</summary>
+    ''' <summary>Fill samples(0..34) with gradient magnitude on a 5ï¿½7 grid across the line support region.</summary>
     Private Shared Sub FillBandSamples(m As Mat, lp As lpData, samples As Single())
         Dim p1 = New Point2f(lp.p1.X, lp.p1.Y)
         Dim p2 = New Point2f(lp.p2.X, lp.p2.Y)

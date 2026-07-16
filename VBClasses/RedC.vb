@@ -4,6 +4,7 @@ Public Class RedC_Basics : Inherits TaskParent
     Public rcMap As Mat = New Mat(dst2.Size, MatType.CV_8U, 0)
     Public rcIndexMap As Mat = New Mat(dst2.Size, MatType.CV_32S, 0)
     Public rcList As New List(Of rcData) ' includes cloud data.
+    Public rcListLast As New List(Of rcData)
     Dim stablePoints As New List(Of cv.Point)
     Public Sub New()
         desc = "FloodFill each color8U output and create an rclist"
@@ -11,8 +12,8 @@ Public Class RedC_Basics : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         Dim rcMapLast As cv.Mat = rcMap.Clone
         Dim rcIndexMapLast As cv.Mat = rcIndexMap.Clone
-        Dim rcListLast As New List(Of rcData)(rcList)
         Dim stablePointsLast As New List(Of cv.Point)(stablePoints)
+        rcListLast = New List(Of rcData)(rcList)
 
         If task.optionsChanged Then
             rcMapLast.SetTo(0)
@@ -36,6 +37,7 @@ Public Class RedC_Basics : Inherits TaskParent
                     Dim count = FloodFill(floodMap, mask, New cv.Point(x, y), index, rect, 0, 0, flags)
                     If count > 100 Then
                         Dim rc = New rcData(floodMap(rect), rect, index)
+                        rc.mapID = rcMap.Get(Of Byte)(y, x)
                         minList.Add(rc)
                     End If
                 End If
@@ -69,10 +71,10 @@ Public Class RedC_Basics : Inherits TaskParent
         For Each rc In rcList
             Dim mapIDCurr = rcMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
             Dim mapIDLast = rcMapLast.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
-            Dim indexLast = rcIndexMapLast.Get(Of Integer)(rc.maxDist.Y, rc.maxDist.X)
+            rc.indexLast = rcIndexMapLast.Get(Of Integer)(rc.maxDist.Y, rc.maxDist.X)
 
-            If indexLast < rcListLast.Count Then
-                rc.maxDStable = If(mapIDCurr = mapIDLast, rcListLast(indexLast).maxDStable, rc.maxDist)
+            If rc.indexLast < rcListLast.Count Then
+                rc.maxDStable = If(mapIDCurr = mapIDLast, rcListLast(rc.indexLast).maxDStable, rc.maxDist)
                 Dim color = dst2.Get(Of cv.Vec3b)(rc.maxDist.Y, rc.maxDist.X)
                 Dim colorLast = dst2.Get(Of cv.Vec3b)(rc.maxDStable.Y, rc.maxDStable.X)
                 If color <> colorLast Then rc.maxDStable = rc.maxDist
@@ -93,6 +95,7 @@ Public Class RedC_Basics : Inherits TaskParent
 
         Dim tmp As New cv.Mat
         rcIndexMap.ConvertTo(tmp, cv.MatType.CV_8U)
+
 
         'If rcList.Count > 60 Then task.fOptions.ReductionColor.Value += 1
         'If rcList.Count < 30 Then task.fOptions.ReductionColor.Value -= 1
@@ -135,5 +138,35 @@ Public Class XR_RedC_Sizes : Inherits TaskParent
         Next
 
         labels(3) = CStr(count) + " cells smaller than " + CStr(task.gOptions.DebugSlider.Value) + " pixels."
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class RedC_MaxDStable : Inherits TaskParent
+    Dim redC As New RedC_Basics
+    Public Sub New()
+        dst1 = New Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        labels(3) = "Any flickering means that the maxDStable point was not the same as it was for the previous frame."
+        desc = "Find all the cells with a MaxDStable that was exactly the same in the previous frame."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        redC.Run(src)
+        dst2 = redC.dst2
+        labels(2) = redC.labels(2)
+
+        dst1.SetTo(0)
+        If redC.rcListLast.Count > 0 Then
+            For Each rc In redC.rcList
+                If rc.maxDStable = redC.rcListLast(rc.indexLast).maxDStable Then
+                    dst1(rc.rect).SetTo(rc.mapID, rc.mask)
+                End If
+            Next
+
+            dst3 = Palettize(dst1, 0)
+        End If
     End Sub
 End Class

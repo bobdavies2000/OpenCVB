@@ -2535,7 +2535,7 @@ End Class
 
 Public Class Options_KMeans : Inherits OptionParent
     Public kMeansFlag As KMeansFlags = KMeansFlags.RandomCenters
-    Public kMeansK As Integer = 7
+    Public kMeansK As Integer = 5
     Public Sub New()
         If sliders.Setup(traceName) Then
             sliders.setupTrackBar("KMeans k", 2, 32, kMeansK)

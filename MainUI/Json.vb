@@ -107,12 +107,15 @@ Namespace MainApp
             Next
 
             Dim index = cameraNames.IndexOf(Settings.cameraName)
+            If index >= 0 Then
+                If Settings.cameraPresent(index) = False Then index = -1
+            End If
             If index < 0 Then
                 Settings.cameraFound = False
                 For i = 0 To Settings.cameraPresent.Count - 1
                     If Settings.cameraPresent(i) Then
                         Settings.cameraFound = True
-                        If Settings.cameraName = Nothing Then Settings.cameraName = cameraNames(i)
+                        Settings.cameraName = cameraNames(i)
                         Settings.captureRes = New cv.Size(1280, 720)
                         Exit For
                     End If
