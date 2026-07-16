@@ -1,3 +1,34 @@
+**July 15, 2026 – Algorithm Reduction, OpenCV5, Foreground, NaN’s, RedC_Basics, MaxDStable**
+
+-   There are over 2200 algorithms in various stages of development.
+    -   Algorithms without a prefix or suffix are the core algorithms.
+    -   “_TA” suffixed algorithms are task algorithms that run on every frame.
+    -   “XR_” prefixed algorithms are low-reuse but are working fine.
+    -   “XO_” prefixed algorithms are obsolete but compile and are useful references.
+-   For now, algorithms in the first 2 categories above are in the user interface.
+    -   To promote a single algorithm, remove the “XR_” prefix.
+    -   To promote all “XR_” algorithms, look for “XR_” in UI_Generator.vb.
+-   OpenCVSharp5 is changing often and the latest NuGet version is included.
+-   OpenCVB name collisions were resolved – no more “cv” or “cv.cv2” prefixes.
+    -   There are a few collisions that require a prefix to resolve – cv.Rect, cv.Point.
+-   An improved foreground/background algorithm was implemented.
+    -   Foreground_Basics_TA uses KMeans to split depth into fore/background.
+    -   The algorithm is run on every frame because the overhead is low.
+-   StereoLabs cameras occasionally have NaNs or INFs.
+    -   They are now removed in the Cloud.vb code more efficiently.
+-   The default color8U input to RedC_Basics is KMeans_Basics.
+    -   The volatility of the results is reduced.
+-   RedC_Basics manages the maxDStable point that identifies each cell uniquely.
+    -   RedC cells no longer use the contour to build the mask.
+    -   The rcIndexMap gives a more precise map of RedC cells.
+-   Each RedC cell has a maxDStable that can be used to identify each cell exactly.
+    -   It works until the maxDStable point goes beyond the cell boundary.
+    -   The image below shows how maxDStable changes at the cell boundary.
+
+**![](media/1f28963b810c0cb380025120f5abcb54.gif)**
+
+**RedC_Basics:** *Each RedC cell has a maxDStable variable representing a point that is an absolute location in the image. MaxDStable uniquely identifies each cell regardless of camera motion. The cell shows maxDStable as a yellow dot. For the highlighted cell, as the yellow dot slips outside the cell, it is reset to maxDist. MaxDist is the point in the cell interior that is farthest from the edges of the cell. The yellow dot for the selected call is reset first when it hits the right side of the cell and again when it hits the left side of the cell. All the yellow dots are handled similarly for each cell in the image. Small cells need to reset frequently while larger cells do not. Why not just use maxDist to identify cells? MaxDist will change with every iteration.*
+
 **July 10, 2026 – Algorithm Reduction, RedC algorithms, OpenCV5**
 
 -   Almost 800 algorithms are included, averaging 36 lines of code per algorithm.
