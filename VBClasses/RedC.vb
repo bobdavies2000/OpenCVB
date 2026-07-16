@@ -28,21 +28,24 @@ Public Class RedC_Basics : Inherits TaskParent
         Dim mask As Mat = New Mat(New Size(dst2.Width + 2, dst2.Height + 2), MatType.CV_8U, 0)
         Dim floodMap = rcMap.Clone
         Dim sortList As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
+        sortList.Add(0, New rcData)
         For y = 0 To floodMap.Height - 1
             For x = 0 To floodMap.Width - 1
                 If mask.Get(Of Byte)(y, x) = 0 Then
                     Dim index As Integer = sortList.Count
-                    Dim flags = FloodFillFlags.FixedRange Or (index << 8)
+                    Dim mapID As Integer = rcMap.Get(Of Byte)(y, x)
+                    Dim flags = FloodFillFlags.FixedRange Or (255 << 8) ' Or FloodFillFlags.MaskOnly
                     Dim count = FloodFill(floodMap, mask, New cv.Point(x, y), index, rect, 0, 0, flags)
-                    If count > 100 Then
+                    If count > 0 Then
                         Dim rc = New rcData(floodMap(rect), rect, index)
-                        rc.mapID = rcMap.Get(Of Byte)(y, x)
+                        rc.mapID = mapID
                         sortList.Add(rc.pixels, rc)
                     End If
                 End If
             Next
         Next
-
+        cv.Cv2.ImShow("Mask", mask)
+        cv.Cv2.ImShow("floodMap", floodMap)
         dst2 = Palettize(rcMap, 0)
 
         Dim rcIndex As Integer
