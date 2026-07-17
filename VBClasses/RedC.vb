@@ -226,11 +226,12 @@ Public Class RedC_TrackCell : Inherits TaskParent
     End Sub
     Private Sub rcDFindCell()
         Dim mapID = redC.rcMap.Get(Of Byte)(lastStablePoint.Y, lastStablePoint.X)
+        Dim rcD = redC.rcList(redC.rcIndexMap.Get(Of Integer)(lastStablePoint.Y, lastStablePoint.X))
         lastStablePoint = newPoint
-        Dim sortOverlapRects As New SortedList(Of Integer, Integer)(New compareAllowIdenticalIntegerInverted)
+        ' Dim sortOverlapRects As New SortedList(Of Integer, Integer)(New compareAllowIdenticalIntegerInverted)
         For Each rc In redC.rcList
             If rc.mapID = mapID Then
-                If task.rcD.rect.IntersectsWith(rc.rect) Then
+                If rcD.rect.IntersectsWith(rc.rect) Then
                     'Dim overlapRect As cv.Rect = rc.rect.Intersect(task.rcD.rect)
                     'sortOverlapRects.Add(overlapRect.Width * overlapRect.Height, rc.index)
                     task.rcD = rc
@@ -243,8 +244,11 @@ Public Class RedC_TrackCell : Inherits TaskParent
         'Dim index = sortOverlapRects.Values(0)
         'task.rcD = redC.rcList(index)
         'lastStablePoint = task.rcD.maxDist
+
+        If lastStablePoint = newPoint Then Dim k = 0
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
+        If task.heartBeatLT Then dst1.SetTo(0)
         redC.Run(src)
         dst2 = redC.dst2
         labels(2) = redC.labels(2)
@@ -275,14 +279,15 @@ Public Class RedC_TrackCell : Inherits TaskParent
         If lastStablePoint = newPoint Then
             lastStablePoint = stablePoint
             rcDFindCell()
-        Else
-            Dim rc = task.rcD
-            task.color(rc.rect).SetTo(white, rc.mask)
-            dst3(rc.rect).SetTo(task.scalarColors(rc.mapID), rc.mask)
-            Rectangle(dst2, rc.rect, task.highlight, task.lineWidth)
-            Circle(dst3, rc.maxDStable, task.DotSize + 1, task.highlight, -1)
         End If
 
-        SetTrueText(task.rcD.displayCell() + vbCrLf, 1)
+        Dim rcD = task.rcD
+        task.color(rcD.rect).SetTo(white, rcD.mask)
+        dst3(rcD.rect).SetTo(task.scalarColors(rcD.mapID), rcD.mask)
+        Rectangle(dst2, rcD.rect, task.highlight, task.lineWidth)
+        Circle(dst3, rcD.maxDStable, task.DotSize + 1, task.highlight, -1)
+        Circle(dst1, lastStablePoint, task.DotSize + 1, task.highlight, -1)
+
+        SetTrueText(rcD.displayCell() + vbCrLf + lastStablePoint.ToString + vbCrLf, 1)
     End Sub
 End Class
