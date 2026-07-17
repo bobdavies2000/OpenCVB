@@ -678,7 +678,6 @@ Public Module Structures
 
     Public Class rcData
         Public index As Integer
-        Public indexLast As Integer
         Public mapID As Integer
         Public mask As New cv.Mat(New cv.Size(1, 1), cv.MatType.CV_8U, 0)
         Public maxDist As New cv.Point
@@ -708,6 +707,7 @@ Public Module Structures
         Public Function displayCell() As String
             Dim strout = ""
             strout += "index = " + CStr(index) + vbCrLf
+            strout += "mapID = " + CStr(mapID) + vbCrLf
             strout += "MaxDist = " + CStr(maxDist.X) + ", " + CStr(maxDist.Y) + vbCrLf
             strout += "MaxDStable = " + CStr(maxDStable.X) + ", " + CStr(maxDStable.Y) + vbCrLf
             strout += "Pixel count = " + CStr(pixels) + vbCrLf

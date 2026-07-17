@@ -189,7 +189,7 @@ Public Class Utility_Basics : Inherits TaskParent
         Return rc
     End Function
     Public Shared Function selectCell(rcMap As Mat, rcList As List(Of rcDataOld)) As String
-        Dim clickIndex As Integer = 0, outStr As String = ""
+        Dim clickIndex As Integer = 0, strOut As String = ""
         If rcMap.Type = MatType.CV_32S Then
             clickIndex = rcMap.Get(Of Integer)(task.clickPoint.Y, task.clickPoint.X)
         Else
@@ -208,10 +208,10 @@ Public Class Utility_Basics : Inherits TaskParent
             End If
         Next
         task.color(task.rcD.rect).SetTo(white, task.rcD.mask)
-        outStr = task.rcD.displayCell()
+        strOut = task.rcD.displayCell()
         task.clickPoint = task.rcD.maxDist
 
-        Return outStr
+        Return strOut
     End Function
     Public Shared Function selectMinCell(rcIndexMap As Mat, rcMap As Mat, rcList As List(Of rcData)) As String
         If rcList.Count = 0 Then Return ""
@@ -223,26 +223,26 @@ Public Class Utility_Basics : Inherits TaskParent
             myMapID = rcMap.Get(Of Byte)(myClickPoint.Y, myClickPoint.X)
         End If
 
-        Dim outStr As String = ""
+        Dim strOut As String = ""
         Dim clickIndex = rcIndexMap.Get(Of Integer)(myClickPoint.Y, myClickPoint.X)
         Dim testMapID = rcMap.Get(Of Byte)(myClickPoint.Y, myClickPoint.X)
 
         If testMapID <> myMapID Then
-            outStr = "Selected cell was lost"
+            strOut = "Selected cell was lost"
             task.rcMinD = Nothing
             myMapID = -1
             myClickPoint = newPoint
         Else
             task.rcMinD = rcList(clickIndex)
             task.color(task.rcMinD.rect).SetTo(white, task.rcMinD.mask)
-            outStr = task.rcMinD.displayCell()
+            strOut = task.rcMinD.displayCell()
             myClickPoint = task.rcMinD.maxDist
         End If
 
-        Return outStr
+        Return strOut
     End Function
     Public Shared Function DelaunaySelect(rcMap As Mat, rcList As List(Of rcDataOld)) As String
-        Dim outStr As String = ""
+        Dim strOut As String = ""
         If rcList.Count > 0 Then
             Dim clickIndex = rcMap.Get(Of Integer)(task.clickPoint.Y, task.clickPoint.X)
             If clickIndex = 0 Then
@@ -261,7 +261,7 @@ Public Class Utility_Basics : Inherits TaskParent
                 End If
             Next
         End If
-        Return outStr
+        Return strOut
     End Function
     Public Overrides Sub RunAlg(src As cv.Mat)
         SetTrueText("Utility_Basics is to make some small 'Shared' utilities available.)", 3)
