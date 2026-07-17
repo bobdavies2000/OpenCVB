@@ -23,7 +23,7 @@ Public Class Profile_Basics : Inherits TaskParent
 
         SetTrueText(redC.strOut, 1)
 
-        Dim rc = task.rcD
+        Dim rc = task.rcOldD
         Dim depthPixels = CountNonZero(task.depthmask(rc.rect))
         If depthPixels = 0 Then
             strOut = "There is no depth data for that cell."
@@ -152,7 +152,7 @@ Public Class XR_Profile_Derivative : Inherits TaskParent
         dst2 = sides.dst2
 
         If sides.redC.rcList.Count = 0 Then Exit Sub ' nothing to work on...
-        Dim rc = task.rcD
+        Dim rc = task.rcOldD
         If rc Is Nothing Then rc = sides.redC.rcList(0)
 
         Dim offset As Integer = 30
@@ -254,7 +254,7 @@ Public Class Profile_ConcentrationTop : Inherits TaskParent
 
         sides.Run(src)
         dst2 = sides.dst2
-        Dim rc = task.rcD
+        Dim rc = task.rcOldD
         If rc Is Nothing Then
             If sides.redC.rcList.Count = 0 Then Exit Sub
             rc = sides.redC.rcList(0)
@@ -320,7 +320,7 @@ Public Class XR_Profile_Kalman : Inherits TaskParent
         If sides.redC.rcList.Count = 0 Then Exit Sub ' nothing to work on...
         dst1 = sides.dst2
         dst2 = sides.dst3
-        Dim rc = task.rcD
+        Dim rc = task.rcOldD
         If rc Is Nothing Then rc = sides.redC.rcList(0)
 
         If kalman.kInput.Count <> sides.corners.Count * 2 Then ReDim kalman.kInput(sides.corners.Count * 2 - 1)

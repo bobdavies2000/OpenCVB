@@ -75,7 +75,7 @@ Public Class MatchShapes_Nearby : Inherits TaskParent
             redC.Run(src)
             dst2 = redC.dst2.Clone
             labels(2) = redC.labels(2)
-            If redC.rcList.Count = 0 Or task.rcD Is Nothing Then
+            If redC.rcList.Count = 0 Or task.rcOldD Is Nothing Then
                 SetTrueText(selectMsg, 3)
                 Exit Sub
             End If
@@ -98,8 +98,8 @@ Public Class MatchShapes_Nearby : Inherits TaskParent
         For i = 0 To rcListLast.Count - 1
             Dim rc2 = rcListLast(i)
             If rc2.contour Is Nothing Then Continue For
-            If Math.Abs(rc2.pixels - task.rcD.pixels) < 100 Then
-                Dim matchval = MatchShapes(task.rcD.contour, rc2.contour, options.matchOption)
+            If Math.Abs(rc2.pixels - task.rcOldD.pixels) < 100 Then
+                Dim matchval = MatchShapes(task.rcOldD.contour, rc2.contour, options.matchOption)
                 If matchval < options.matchThreshold Then
                     dst3(rc2.rect).SetTo(rc2.color, rc2.mask)
                     similarCells.Add(rc2)
@@ -116,7 +116,7 @@ Public Class MatchShapes_Nearby : Inherits TaskParent
             Circle(dst3, rc.maxDist, task.DotSize, white, -1, task.lineType)
             If similarCells.Count = 0 Then SetTrueText("No matches with match value < " + options.matchThreshold.ToString(fmt2), New cv.Point(5, 5), 3)
         End If
-        SetTrueText("Best match", task.rcD.maxDist, 3)
+        SetTrueText("Best match", task.rcOldD.maxDist, 3)
     End Sub
 End Class
 
@@ -141,8 +141,8 @@ Public Class XR_MatchShapes_Hulls : Inherits TaskParent
         dst2 = hulls.dst2
         If task.heartBeat Then dst3.SetTo(0)
 
-        If task.rcD IsNot Nothing Then
-            Dim rcX = task.rcD
+        If task.rcOldD IsNot Nothing Then
+            Dim rcX = task.rcOldD
             For Each rc In hulls.rclist
                 If rc.hull Is Nothing Or rcX.hull Is Nothing Then Continue For
                 Dim matchVal = MatchShapes(rcX.hull, rc.hull, options.matchOption)
@@ -181,7 +181,7 @@ Public Class XR_MatchShapes_Contours : Inherits TaskParent
         If task.heartBeat Then dst3.SetTo(0)
         SetTrueText(redC.strOut, 1)
 
-        Dim rcX = task.rcD
+        Dim rcX = task.rcOldD
         If rcX Is Nothing Then rcX = redC.rcList(0)
         For Each rc In redC.rcList
             If rc.contour Is Nothing Then Continue For
@@ -218,10 +218,10 @@ Public Class XR_MatchShapes_NearbyHull : Inherits TaskParent
             hulls.Run(task.color)
             If hulls.rclist.Count = 0 Then Exit Sub
             dst2 = hulls.dst2
-            rc = task.rcD
+            rc = task.rcOldD
         End If
 
-        If task.rcD IsNot Nothing Then
+        If task.rcOldD IsNot Nothing Then
             dst3.SetTo(0)
             similarCells.Clear()
 

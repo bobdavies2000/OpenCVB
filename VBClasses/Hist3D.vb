@@ -131,8 +131,8 @@ Public Class XR_Hist3D_RedColor : Inherits TaskParent
         dst2 = redC.dst2
         labels(2) = redC.labels(2)
         If redC.rcList.Count > 0 Then
-            If task.rcD IsNot Nothing Then
-                If task.rcD.pixels > 0 Then dst2(task.rcD.rect).SetTo(white, task.rcD.mask)
+            If task.rcOldD IsNot Nothing Then
+                If task.rcOldD.pixels > 0 Then dst2(task.rcOldD.rect).SetTo(white, task.rcOldD.mask)
             End If
         End If
     End Sub
@@ -224,7 +224,7 @@ Public Class XR_Hist3D_PixelClassify : Inherits TaskParent
         dst2 = redC.dst2
         labels(2) = redC.labels(2)
         SetTrueText(redC.strOut, 3)
-        If task.rcD IsNot Nothing AndAlso task.rcD.rect.Width > 0 Then dst2(task.rcD.rect).SetTo(white, task.rcD.mask)
+        If task.rcOldD IsNot Nothing AndAlso task.rcOldD.rect.Width > 0 Then dst2(task.rcOldD.rect).SetTo(white, task.rcOldD.mask)
     End Sub
 End Class
 

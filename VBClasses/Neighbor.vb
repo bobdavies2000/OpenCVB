@@ -35,8 +35,8 @@ Public Class Neighbor_Basics : Inherits TaskParent
         If standalone Then
             SetTrueText(redC.strOut, 3)
             dst3.SetTo(0)
-            If task.rcD IsNot Nothing Then
-                For Each index In task.rcD.nabs
+            If task.rcOldD IsNot Nothing Then
+                For Each index In task.rcOldD.nabs
                     If index < redC.rcList.Count Then
                     Circle(dst2, redC.rcList(index).maxDist, task.DotSize, task.highlight, -1, task.lineType)
                     End If
@@ -241,11 +241,11 @@ Public Class Neighbor_Precise : Inherits TaskParent
         '        stats.Run(task.color)
 
         '        strOut = stats.strOut
-        '        If nabList(task.rcD.index).Count > 0 Then
+        '        If nabList(task.rcOldD.index).Count > 0 Then
         '            strOut += "Neighbors: "
         '            dst1.SetTo(0)
-        '            dst1(task.rcD.rect).SetTo(task.rcD.color, task.rcD.mask)
-        '            For Each index In nabList(task.rcD.index)
+        '            dst1(task.rcOldD.rect).SetTo(task.rcOldD.color, task.rcOldD.mask)
+        '            For Each index In nabList(task.rcOldD.index)
         '                Dim rc = rclist(index)
         '                dst1(rc.rect).SetTo(rc.color, rc.mask)
         '                strOut += CStr(index) + ","

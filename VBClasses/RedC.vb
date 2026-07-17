@@ -1,6 +1,100 @@
 Imports OpenCvSharp
 Imports OpenCvSharp.Cv2
 Imports cv = OpenCvSharp
+Public Class RedC_BasicsFail : Inherits TaskParent
+    Dim color8u As New Color8U_Basics
+    Public rcMap As Mat = New Mat(dst2.Size, MatType.CV_8U, 0)
+    Public rcList As New List(Of rcData) ' includes cloud data.
+    Dim rcListLast As New List(Of rcData)
+    Public rcIndexMap As Mat = New Mat(dst2.Size, MatType.CV_32S, 0)
+    Public Sub New()
+        desc = "FloodFill each color8U output and create an rclist"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        Dim rcMapLast As cv.Mat = rcMap.Clone
+        Dim rcIndexMapLast As cv.Mat = rcIndexMap.Clone
+        rcListLast = New List(Of rcData)(rcList)
+
+        If task.optionsChanged Then
+            rcMapLast.SetTo(0)
+            rcIndexMap.SetTo(0)
+            rcListLast.Clear()
+        End If
+
+        color8u.Run(src)
+
+        rcMap = color8u.dst2.Clone + 1
+        Dim rect As cv.Rect
+        Dim mask As Mat = New Mat(New Size(dst2.Width + 2, dst2.Height + 2), MatType.CV_8U, 0)
+        Dim floodMap = rcMap.Clone
+        Dim sortList As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
+        sortList.Add(0, New rcData)
+        For y = 0 To floodMap.Height - 1
+            For x = 0 To floodMap.Width - 1
+                If mask.Get(Of Byte)(y, x) = 0 Then
+                    Dim index As Integer = sortList.Count
+                    Dim mapID As Integer = rcMap.Get(Of Byte)(y, x)
+                    Dim flags = FloodFillFlags.FixedRange Or (index << 8) ' Or FloodFillFlags.MaskOnly
+                    Dim count = FloodFill(floodMap, mask, New cv.Point(x, y), index, rect, 0, 0, flags)
+                    If count > 1 Then
+                        Dim rc = New rcData(floodMap(rect), rect, index)
+                        rc.mapID = mapID
+                        rc.pixels = count
+                        sortList.Add(rc.pixels, rc)
+                    End If
+                End If
+            Next
+        Next
+
+        dst2 = Palettize(rcMap, 0)
+
+        rcIndexMap.SetTo(0)
+        rcList.Clear()
+        Dim flag = FloodFillFlags.FixedRange Or (255 << 8)
+        For Each rc In sortList.Values
+            rc.index = rcList.Count
+
+            rc.maxDist = rc.buildMaxDist(rc.mask)
+            rc.pixels = CountNonZero(rc.mask)
+            If rc.pixels > 0 Then
+                rcIndexMap(rc.rect).SetTo(rc.index, rc.mask)
+                rcList.Add(rc)
+            End If
+        Next
+
+        If task.firstPass Then
+            For Each rc In rcList
+                rc.maxDStable = rc.maxDist
+            Next
+        Else
+            For Each rc In rcList
+                Dim indexCurr = rcIndexMap.Get(Of Integer)(rc.maxDist.Y, rc.maxDist.X)
+                Dim indexLast = rcIndexMapLast.Get(Of Integer)(rc.maxDist.Y, rc.maxDist.X)
+                Dim rcCurr = rcList(indexCurr)
+                rc.maxDStable = rc.maxDist
+                If indexLast < rcListLast.Count Then
+                    Dim rcLast = rcListLast(indexLast)
+                    If rcCurr.mapID = rcLast.mapID Then
+                        If rcCurr.rect.IntersectsWith(rcLast.rect) Then
+                            Dim md1 = rcMap.Get(Of Integer)(rcLast.maxDStable.Y, rcLast.maxDStable.X)
+                            Dim md2 = rcMapLast.Get(Of Integer)(rcLast.maxDStable.Y, rcLast.maxDStable.X)
+                            If md1 = md2 Then rc.maxDStable = rcLast.maxDStable
+                        End If
+                    End If
+                End If
+            Next
+        End If
+
+        'strOut = Utility_Basics.selectMinCell(rcIndexMap, rcMap, rcList)
+        'SetTrueText(strOut, 3)
+
+        If task.heartBeat Then labels(2) = CStr(rcList.Count) + " RedColor cells were found."
+    End Sub
+End Class
+
+
+
+
 Public Class RedC_Basics : Inherits TaskParent
     Dim color8u As New Color8U_Basics
     Public rcMap As Mat = New Mat(dst2.Size, MatType.CV_8U, 0)
@@ -81,9 +175,7 @@ Public Class RedC_Basics : Inherits TaskParent
         Next
 
         ' strOut = Utility_Basics.selectMinCell(rcIndexMap, rcMap, rcList)
-        SetTrueText(strOut, 3)
-
-        If task.rcMinD IsNot Nothing And standaloneTest() Then Rectangle(dst2, task.rcMinD.rect, task.highlight, task.lineWidth)
+        ' SetTrueText(strOut, 3)
 
         If task.heartBeat Then labels(2) = CStr(rcList.Count) + " RedColor cells were found."
     End Sub
@@ -141,8 +233,8 @@ Public Class RedC_TrackCell : Inherits TaskParent
         If task.mouseClickFlag Then
             strOut = "" + vbCrLf
             Dim clickIndex = redC.rcIndexMap.Get(Of Integer)(task.clickPoint.Y, task.clickPoint.X)
-            task.rcMinD = redC.rcList(clickIndex)
-            If task.rcMinD.maxDStable = newPoint Then task.rcMinD.maxDStable = task.rcMinD.maxDist
+            task.rcD = redC.rcList(clickIndex)
+            If task.rcD.maxDStable = newPoint Then task.rcD.maxDStable = task.rcD.maxDist
         End If
 
         Dim stablePoints As New List(Of cv.Point)
@@ -150,43 +242,40 @@ Public Class RedC_TrackCell : Inherits TaskParent
             stablePoints.Add(rc.maxDStable)
         Next
 
-        Dim index = stablePoints.IndexOf(task.rcMinD.maxDStable)
+        Dim index = stablePoints.IndexOf(task.rcD.maxDStable)
         dst3.SetTo(0)
         If index >= 0 Then
             If strOut.Length < 200 Then strOut += "Cell was found using MaxDStable..." + vbCrLf
-            task.rcMinD = redC.rcList(index)
-            lastStablePoint = task.rcMinD.maxDStable
+            task.rcD = redC.rcList(index)
+            lastStablePoint = task.rcD.maxDStable
         Else
-            Dim mapID = task.rcMinD.mapID
+            '    Dim mapID = task.rcD.mapID
             lastStablePoint = newPoint
-            For Each rc In redC.rcList
-                If rc.mapID = mapID Then
-                    If task.rcMinD.rect.IntersectsWith(rc.rect) Then
-                        index = redC.rcIndexMap.Get(Of Integer)(lastStablePoint.Y, lastStablePoint.X)
-                        If rc.index = index Then
-                            task.rcMinD = rc
-                            lastStablePoint = task.rcMinD.maxDStable
-                            Exit For
-                        End If
-                    End If
-                End If
-            Next
+            '    For Each rc In redC.rcList
+            '        If rc.mapID = mapID Then
+            '            If task.rcD.rect.IntersectsWith(rc.rect) Then
+            '                index = redC.rcIndexMap.Get(Of Integer)(lastStablePoint.Y, lastStablePoint.X)
+            '                If rc.index = index Then
+            '                    task.rcD = rc
+            '                    lastStablePoint = task.rcD.maxDStable
+            '                    Exit For
+            '                End If
+            '            End If
+            '        End If
+            '    Next
         End If
 
         If lastStablePoint = newPoint Then
             lastStablePoint = task.clickPoint
             strOut = "Select a cell to track it" + vbCrLf
         Else
-            Dim rc = task.rcMinD
+            Dim rc = task.rcD
             task.color(rc.rect).SetTo(white, rc.mask)
             dst3(rc.rect).SetTo(task.scalarColors(rc.mapID), rc.mask)
             Rectangle(dst2, rc.rect, task.highlight, task.lineWidth)
             Circle(dst3, rc.maxDStable, task.DotSize + 1, task.highlight, -1)
         End If
 
-        Dim tmpStr = task.rcMinD.displayCell()
-        strOut = tmpStr + vbCrLf + strOut
-
-        SetTrueText(strOut, 1)
+        SetTrueText(task.rcD.displayCell() + vbCrLf, 1)
     End Sub
 End Class

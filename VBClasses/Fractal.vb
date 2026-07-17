@@ -214,13 +214,13 @@ Public Class XR_Fractal_Dimension : Inherits TaskParent
 
         dst3.SetTo(0)
 
-        Static rect = New cv.Rect(0, 0, task.rcD.rect.Width, task.rcD.rect.Height)
+        Static rect = New cv.Rect(0, 0, task.rcOldD.rect.Width, task.rcOldD.rect.Height)
         If task.optionsChanged Or task.mouseClickFlag Then
-            rect = New cv.Rect(0, 0, task.rcD.rect.Width, task.rcD.rect.Height)
+            rect = New cv.Rect(0, 0, task.rcOldD.rect.Width, task.rcOldD.rect.Height)
         End If
 
-        If task.rcD.rect.Width = 0 Or task.rcD.rect.Height = 0 Then Exit Sub
-        task.rcD.mask.CopyTo(dst3(New cv.Rect(0, 0, task.rcD.rect.Width, task.rcD.rect.Height)))
+        If task.rcOldD.rect.Width = 0 Or task.rcOldD.rect.Height = 0 Then Exit Sub
+        task.rcOldD.mask.CopyTo(dst3(New cv.Rect(0, 0, task.rcOldD.rect.Width, task.rcOldD.rect.Height)))
         If rect.Width < rect.Height Then rect.Width = rect.Height Else rect.Height = rect.Width
         DrawRect(dst3, rect, white)
     End Sub

@@ -13,7 +13,7 @@ Public Class Volume_Basics : Inherits TaskParent
         labels(2) = redC.labels(2)
 
         SetTrueText(redC.strOut, 1)
-        rc = task.rcD
+        rc = task.rcOldD
         If rc Is Nothing Then rc = redC.rcList(0)
         If rc.contour Is Nothing Then Exit Sub
 

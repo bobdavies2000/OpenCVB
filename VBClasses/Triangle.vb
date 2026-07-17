@@ -14,19 +14,19 @@ Public Class Triangle_Basics : Inherits TaskParent
 
         dst3.SetTo(0)
         Dim pt3D As New List(Of Point3f)
-        For Each pt In task.rcD.contour
-            pt = New cv.Point(pt.X + task.rcD.rect.X, pt.Y + task.rcD.rect.Y)
+        For Each pt In task.rcOldD.contour
+            pt = New cv.Point(pt.X + task.rcOldD.rect.X, pt.Y + task.rcOldD.rect.Y)
             Dim vec = task.pointCloud.Get(Of Point3f)(pt.Y, pt.X)
             If vec.Z = 0 Then
-                vec = Cloud_Basics.worldCoordinates(New Point3f(pt.X, pt.Y, task.rcD.wcMean(2)))
+                vec = Cloud_Basics.worldCoordinates(New Point3f(pt.X, pt.Y, task.rcOldD.wcMean(2)))
             End If
             Circle(dst3, pt, task.DotSize, Scalar.Yellow, -1, task.lineType)
             pt3D.Add(vec)
         Next
 
-        Dim c3D = task.pointCloud.Get(Of Point3f)(task.rcD.maxDist.Y, task.rcD.maxDist.X)
+        Dim c3D = task.pointCloud.Get(Of Point3f)(task.rcOldD.maxDist.Y, task.rcOldD.maxDist.X)
         triangles.Clear()
-        Dim color3D As New Point3f(task.rcD.color(0), task.rcD.color(1), task.rcD.color(2))
+        Dim color3D As New Point3f(task.rcOldD.color(0), task.rcOldD.color(1), task.rcOldD.color(2))
         For i = 0 To pt3D.Count - 1
             triangles.Add(color3D)
             triangles.Add(c3D)
@@ -94,7 +94,7 @@ Public Class XR_Triangle_Cell : Inherits TaskParent
 
         SetTrueText(redC.strOut, 1)
 
-        Dim rc = task.rcD
+        Dim rc = task.rcOldD
         If rc.mapID = 0 Then Exit Sub
 
         dst3.SetTo(0)
@@ -154,7 +154,7 @@ Public Class XR_Triangle_Mask : Inherits TaskParent
 
         SetTrueText(redC.strOut, 1)
 
-        Dim rc = task.rcD
+        Dim rc = task.rcOldD
         If rc.mapID = 0 Then Exit Sub
 
         dst3.SetTo(0)

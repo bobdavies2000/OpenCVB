@@ -25,8 +25,8 @@ Public Class Spectrum_X : Inherits TaskParent
             SetTrueText(redC.strOut, 1)
         End If
 
-        If task.heartBeat And task.rcD.mapID > 0 Then
-            Dim ranges = options.buildDepthRanges(task.pcSplit(0)(task.rcD.rect).Clone, " pointcloud X ")
+        If task.heartBeat And task.rcOldD.mapID > 0 Then
+            Dim ranges = options.buildDepthRanges(task.pcSplit(0)(task.rcOldD.rect).Clone, " pointcloud X ")
             strOut = options.strOut
         End If
         SetTrueText(strOut, 3)
@@ -57,8 +57,8 @@ Public Class Spectrum_Y : Inherits TaskParent
             SetTrueText(redC.strOut, 1)
         End If
 
-        If task.heartBeat And task.rcD.mapID > 0 Then
-            Dim ranges = options.buildDepthRanges(task.pcSplit(1)(task.rcD.rect).Clone, " pointcloud Y ")
+        If task.heartBeat And task.rcOldD.mapID > 0 Then
+            Dim ranges = options.buildDepthRanges(task.pcSplit(1)(task.rcOldD.rect).Clone, " pointcloud Y ")
             strOut = options.strOut
         End If
         SetTrueText(strOut, 3)
@@ -88,9 +88,9 @@ Public Class Spectrum_Z : Inherits TaskParent
             SetTrueText(redC.strOut, 1)
         End If
 
-        If task.rcD IsNot Nothing Then
-            If task.heartBeat And task.rcD.mapID > 0 Then
-                Dim ranges = options.buildDepthRanges(task.pcSplit(2)(task.rcD.rect).Clone, " pointcloud Z ")
+        If task.rcOldD IsNot Nothing Then
+            If task.heartBeat And task.rcOldD.mapID > 0 Then
+                Dim ranges = options.buildDepthRanges(task.pcSplit(2)(task.rcOldD.rect).Clone, " pointcloud Z ")
                 strOut = options.strOut
             End If
         End If
@@ -277,7 +277,7 @@ Public Class Spectrum_Breakdown : Inherits TaskParent
             labels(2) = redC.labels(2)
         End If
         Exit Sub
-        Dim rc = task.rcD
+        Dim rc = task.rcOldD
         If rc Is Nothing Then Exit Sub
         Dim ranges As List(Of rangeData), input As Mat
         Dim depthPixels = CountNonZero(task.depthmask(rc.rect))
@@ -327,7 +327,7 @@ Public Class Spectrum_Breakdown : Inherits TaskParent
         End If
 
         Threshold(rc.mask, rc.mask, 0, 255, ThresholdTypes.Binary)
-        task.rcD = rc
+        task.rcOldD = rc
     End Sub
 End Class
 
@@ -352,9 +352,9 @@ Public Class XR_Spectrum_RedCloud : Inherits TaskParent
         labels(2) = redC.labels(2)
 
         dst3.SetTo(0)
-        For Each task.rcD In redC.rcList
+        For Each task.rcOldD In redC.rcList
             breakdown.Run(src)
-            dst3(task.rcD.rect).SetTo(task.rcD.color, task.rcD.mask)
+            dst3(task.rcOldD.rect).SetTo(task.rcOldD.color, task.rcOldD.mask)
         Next
     End Sub
 End Class
@@ -404,7 +404,7 @@ Public Class Spectrum_Gray : Inherits TaskParent
 
         SetTrueText(redC.strOut, 1)
 
-        Dim input = src(task.rcD.rect)
+        Dim input = src(task.rcOldD.rect)
         If input.Type <> MatType.CV_8U Then CvtColor(input, input, ColorConversionCodes.BGR2GRAY)
         Dim ranges = options.buildColorRanges(input, typeSpec)
         strOut = options.strOut

@@ -359,7 +359,7 @@ Public Class Contour_SidePoints : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         sides.Run(src)
         dst2 = sides.dst2
-        Dim rc = task.rcD
+        Dim rc = task.rcOldD
 
         If sides.corners.Count > 0 And task.heartBeat Then
             ptLeft = sides.corners(1)
@@ -492,14 +492,14 @@ Public Class XR_Contour_Compare : Inherits TaskParent
 
         SetTrueText(redC.strOut, 3)
 
-        Dim tmp = task.rcD.mask.Clone
+        Dim tmp = task.rcOldD.mask.Clone
 
         Dim allContours As cv.Point()() = Nothing
         If options.retrievalMode = RetrievalModes.FloodFill Then tmp.ConvertTo(tmp, MatType.CV_32SC1)
         FindContours(tmp, allContours, Nothing, options.retrievalMode, options.ApproximationMode)
 
         dst3.SetTo(0)
-        DrawContours(dst3(task.rcD.rect), allContours, -1, Scalar.Yellow)
+        DrawContours(dst3(task.rcOldD.rect), allContours, -1, Scalar.Yellow)
     End Sub
 End Class
 
@@ -523,7 +523,7 @@ Public Class XR_Contour_Smoothing : Inherits TaskParent
         SetTrueText(redC.strOut, 3)
 
         Utility_Basics.selectCell(redC.rcMap, redC.rcList)
-        Dim rc = task.rcD
+        Dim rc = task.rcOldD
 
         dst1.SetTo(0)
         dst3.SetTo(0)

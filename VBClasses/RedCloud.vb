@@ -112,7 +112,7 @@ Public Class RedCloud_Core : Inherits TaskParent
         rcList = sweepImage(src, src.Total * 0.0001)
         If rcList.Count = 0 Then
             rcList.Add(New rcDataOld(src, New cv.Rect(0, 0, src.Width, src.Height), 1))
-            task.rcD = rcList(0)
+            task.rcOldD = rcList(0)
         End If
         dst2.SetTo(0)
         For Each rc In rcList
@@ -141,7 +141,7 @@ Public Class XR_RedCloud_Basics : Inherits TaskParent
         dst2 = redC.dst2
         labels(2) = redC.labels(2)
 
-        If task.rcD IsNot Nothing Then Rectangle(dst2, task.rcD.rect, task.highlight, task.lineWidth)
+        If task.rcOldD IsNot Nothing Then Rectangle(dst2, task.rcOldD.rect, task.highlight, task.lineWidth)
         If strOut <> "" Then SetTrueText(redC.strOut, 3) Else SetTrueText("Click on any cell", 3)
 
         Dim causeLabel = Utility_Basics.findCause(redC.rcMap, redC.rcList)
@@ -185,8 +185,8 @@ Public Class XR_RedCloud_CellDepthHistogram : Inherits TaskParent
 
         labels(3) = "Select a RedCloud cell to see the histogram"
 
-        Dim depth As Mat = task.pcSplit(2)(task.rcD.rect)
-        depth.SetTo(0, task.noDepthMask(task.rcD.rect))
+        Dim depth As Mat = task.pcSplit(2)(task.rcOldD.rect)
+        depth.SetTo(0, task.noDepthMask(task.rcOldD.rect))
         ImShow("depth", depth)
         plot.minRange = 0
         plot.maxRange = task.MaxZmeters
@@ -318,7 +318,7 @@ Public Class RedCloud_Matches : Inherits TaskParent
             End If
         Next
 
-        If task.rcD IsNot Nothing Then Rectangle(dst2, task.rcD.rect, task.highlight, task.lineWidth)
+        If task.rcOldD IsNot Nothing Then Rectangle(dst2, task.rcOldD.rect, task.highlight, task.lineWidth)
         SetTrueText(redC.strOut, 3)
         labels(3) = CStr(rcList.Count) + " matched cells below with > " + CStr(redC.options.ageThreshold) + " age"
     End Sub
@@ -352,7 +352,7 @@ Public Class RedCloud_Matched : Inherits TaskParent
             End If
         Next
 
-        If task.rcD IsNot Nothing Then Rectangle(dst2, task.rcD.rect, task.highlight, task.lineWidth)
+        If task.rcOldD IsNot Nothing Then Rectangle(dst2, task.rcOldD.rect, task.highlight, task.lineWidth)
         SetTrueText(redC.strOut, 1)
         labels(3) = CStr(rcList.Count) + " matched cells below with > " + CStr(redC.options.ageThreshold) + " age"
     End Sub

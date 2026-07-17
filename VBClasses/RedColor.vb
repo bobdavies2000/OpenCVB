@@ -28,7 +28,7 @@ Public Class RedColor_Basics : Inherits TaskParent
         Next
         dst2 = Palettize(rcMap)
 
-        If task.rcD IsNot Nothing And standaloneTest() Then Rectangle(dst2, task.rcD.rect, task.highlight, task.lineWidth)
+        If task.rcOldD IsNot Nothing And standaloneTest() Then Rectangle(dst2, task.rcOldD.rect, task.highlight, task.lineWidth)
 
         Dim rcIndex As Integer
         For Each rc In rcList
@@ -111,7 +111,7 @@ Public Class RedColor_BasicsFeatureLess : Inherits TaskParent
         If runSelectCell Then
             strOut = Utility_Basics.selectCell(rcMap, rcList)
             SetTrueText(strOut, 1)
-            If task.rcD Is Nothing AndAlso rcList.Count > 0 Then task.rcD = rcList(0)
+            If task.rcOldD Is Nothing AndAlso rcList.Count > 0 Then task.rcOldD = rcList(0)
         End If
 
         dst2 = Palettize(rcMap, 0)
@@ -581,7 +581,7 @@ Public Class XO_RedFlood_BasicsOld : Inherits TaskParent
 
         strOut = Utility_Basics.selectCell(redMask.dst2, redMask.rcList)
         SetTrueText(strOut, 1)
-        If task.rcD IsNot Nothing Then task.clickPoint = task.rcD.maxDist
+        If task.rcOldD IsNot Nothing Then task.clickPoint = task.rcOldD.maxDist
 
         Dim usedColors As New List(Of Scalar)
         rcList.Clear()
@@ -868,7 +868,7 @@ End Class
 ''' <summary>
 ''' Isolate a main subject from the scene (similar intent to iPhone "Copy Subject"): run RedColor segmentation,
 ''' pick a salient cell at the image center that is not the dominant background, then composite that region onto a neutral backdrop.
-''' Click a cell (task.rcD) when available to override the auto-picked subject.
+''' Click a cell (task.rcOldD) when available to override the auto-picked subject.
 ''' </summary>
 Public Class RedColor_Isolate : Inherits TaskParent
     Dim redC As New RedColor_Basics
@@ -900,9 +900,9 @@ Public Class RedColor_Isolate : Inherits TaskParent
         Dim minPx = CInt(total * 0.003)
         Dim maxPx = CInt(total * 0.62)
 
-        If task.rcD IsNot Nothing And task.rcD.pixels > 0 Then
+        If task.rcOldD IsNot Nothing And task.rcOldD.pixels > 0 Then
             For Each rc In rcList
-                If rc.mapID = task.rcD.mapID Then Return rc
+                If rc.mapID = task.rcOldD.mapID Then Return rc
             Next
         End If
 
@@ -1066,8 +1066,8 @@ Public Class RedColor_Contour : Inherits TaskParent
         dst2.SetTo(0)
         For Each rc In redC.rcList
             DrawTour(dst2(rc.rect), rc.contour, rc.color, -1)
-            If task.rcD IsNot Nothing Then
-                If rc.mapID = task.rcD.mapID Then DrawTour(dst2(rc.rect), rc.contour, white, -1)
+            If task.rcOldD IsNot Nothing Then
+                If rc.mapID = task.rcOldD.mapID Then DrawTour(dst2(rc.rect), rc.contour, white, -1)
             End If
         Next
     End Sub

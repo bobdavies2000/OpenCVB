@@ -242,7 +242,7 @@ Public Class XR_LUT_RedCloud : Inherits TaskParent
         SetTrueText(redC.strOut, 3)
 
         dst3.SetTo(0)
-        Dim rc = task.rcD
+        Dim rc = task.rcOldD
         src(rc.rect).CopyTo(dst3(rc.rect), rc.mask)
 
         sort3.Run(dst3)

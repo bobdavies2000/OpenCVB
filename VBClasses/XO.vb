@@ -4896,7 +4896,7 @@ Namespace VBClasses
             For i = 0 To corners.Count - 1
                 Dim nextColor = sides.cornerColors(i)
                 Dim nextLabel = sides.cornerNames(i)
-                Line(dst3, task.rcD.maxDist, corners(i), white, task.lineWidth, task.lineType)
+                Line(dst3, task.rcOldD.maxDist, corners(i), white, task.lineWidth, task.lineType)
                 SetTrueText(nextLabel, New cv.Point(corners(i).X, corners(i).Y), 3)
             Next
 
@@ -4919,7 +4919,7 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             If standaloneTest() Then
                 dst2 = XO_RedFlood_List.runRedList(src, labels(2))
-                rc = task.rcD
+                rc = task.rcOldD
             End If
 
             dst3.SetTo(0)
@@ -8268,7 +8268,7 @@ Namespace VBClasses
             If match.correlation < task.fCorrThreshold Or rectSave <> rectInput Or task.mouseClickFlag Then
                 If standalone Then
                     dst2 = XO_RedFlood_List.runRedList(src, labels(2)).Clone
-                    rectInput = task.rcD.rect
+                    rectInput = task.rcOldD.rect
                 End If
                 rectSave = rectInput
                 match.template = src(rectInput).Clone
@@ -8294,9 +8294,9 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             dst2 = XO_RedFlood_List.runRedList(src, labels(2))
-            task.clickPoint = task.rcD.maxDist
+            task.clickPoint = task.rcOldD.maxDist
 
-            If task.heartBeat Then matchRect.rectInput = task.rcD.rect
+            If task.heartBeat Then matchRect.rectInput = task.rcOldD.rect
 
             matchRect.Run(src)
             If standalone Then
@@ -10525,11 +10525,11 @@ Namespace VBClasses
             Dim index = redList.rcMap.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X)
             If index = 0 Then Exit Sub
             If index > 0 And index < redList.rclist.Count Then
-                task.rcD = redList.rclist(index)
-                task.color(task.rcD.rect).SetTo(cv.Scalar.White, task.rcD.mask)
+                task.rcOldD = redList.rclist(index)
+                task.color(task.rcOldD.rect).SetTo(cv.Scalar.White, task.rcOldD.mask)
             Else
                 ' the 0th cell is always the upper left corner with just 1 pixel.
-                If redList.rclist.Count > 1 Then task.rcD = redList.rclist(1)
+                If redList.rclist.Count > 1 Then task.rcOldD = redList.rclist(1)
             End If
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -10980,7 +10980,7 @@ Namespace VBClasses
             desc = "Display the statistics for the selected cell."
         End Sub
         Public Sub statsString()
-            Dim rc = task.rcD
+            Dim rc = task.rcOldD
 
             Dim gridID As Integer = task.gridMap.Get(Of Integer)(rc.maxDist.Y, rc.maxDist.X)
             strOut = "rc.mapID = " + CStr(rc.mapID) + vbTab + " gridID = " + CStr(gridID) + vbTab
@@ -11003,9 +11003,9 @@ Namespace VBClasses
 
             strOut += "Cell Depth in 3D: z = " + vbTab + rc.wcMean(2).ToString(fmt2) + vbCrLf
 
-            Dim tmp = New cv.Mat(task.rcD.mask.Rows, task.rcD.mask.Cols, cv.MatType.CV_32F, cv.Scalar.All(0))
-            task.pcSplit(2)(task.rcD.rect).CopyTo(tmp, task.rcD.mask)
-            plot.rc = task.rcD
+            Dim tmp = New cv.Mat(task.rcOldD.mask.Rows, task.rcOldD.mask.Cols, cv.MatType.CV_32F, cv.Scalar.All(0))
+            task.pcSplit(2)(task.rcOldD.rect).CopyTo(tmp, task.rcOldD.mask)
+            plot.rc = task.rcOldD
             plot.Run(tmp)
             dst3 = plot.dst2
         End Sub
@@ -11037,11 +11037,11 @@ Namespace VBClasses
 
                 Dim depthDistance As New List(Of Single)
                 Dim colorDistance As New List(Of Single)
-                Dim selectedMean As cv.Scalar = Mean(src(task.rcD.rect), task.rcD.mask)
+                Dim selectedMean As cv.Scalar = Mean(src(task.rcOldD.rect), task.rcOldD.mask)
                 If redList.rclist.Count = 0 Then Exit Sub ' next frame please...
                 For Each rc In redList.rclist
                     colorDistance.Add(Distance_Basics.distance3D(selectedMean, Mean(src(rc.rect), rc.mask)))
-                    depthDistance.Add(Distance_Basics.distance3D(task.rcD.wcMean(2), rc.wcMean(2)))
+                    depthDistance.Add(Distance_Basics.distance3D(task.rcOldD.wcMean(2), rc.wcMean(2)))
                 Next
 
                 dst1.SetTo(0)
@@ -11134,9 +11134,9 @@ Namespace VBClasses
             desc = "Display the statistics for the selected cell."
         End Sub
         Public Sub statsString(src As cv.Mat)
-            Dim tmp = New cv.Mat(task.rcD.mask.Rows, task.rcD.mask.Cols, cv.MatType.CV_32F, cv.Scalar.All(0))
-            task.pcSplit(2)(task.rcD.rect).CopyTo(tmp, task.rcD.mask)
-            plot.rc = task.rcD
+            Dim tmp = New cv.Mat(task.rcOldD.mask.Rows, task.rcOldD.mask.Cols, cv.MatType.CV_32F, cv.Scalar.All(0))
+            task.pcSplit(2)(task.rcOldD.rect).CopyTo(tmp, task.rcOldD.mask)
+            plot.rc = task.rcOldD
             plot.Run(tmp)
             dst3 = plot.dst2
 
@@ -11148,8 +11148,8 @@ Namespace VBClasses
                 dst2 = XO_RedFlood_List.runRedList(src, labels(2))
                 If task.clickPoint = newPoint Then
                     If redList.rclist.Count > 1 Then
-                        task.rcD = redList.rclist(1)
-                        task.clickPoint = task.rcD.maxDist
+                        task.rcOldD = redList.rclist(1)
+                        task.clickPoint = task.rcOldD.maxDist
                     End If
                 End If
             End If
@@ -11637,7 +11637,7 @@ Namespace VBClasses
             dst3 = frames.dst2
 
             If redList.rclist.Count > 0 Then
-                dst2(task.rcD.rect).SetTo(white, task.rcD.mask)
+                dst2(task.rcOldD.rect).SetTo(white, task.rcOldD.mask)
             End If
 
             If redList.rclist.Count > 0 Then
@@ -13052,7 +13052,7 @@ Namespace VBClasses
             dst3.SetTo(0)
 
             Dim newContour As New List(Of cv.Point)
-            rc = task.rcD
+            rc = task.rcOldD
             If rc.contour.Count = 0 Then Exit Sub
             Dim p1 As cv.Point, p2 As cv.Point
             newContour.Add(p1)
@@ -13126,7 +13126,7 @@ Namespace VBClasses
             Next
 
             strOut = Utility_Basics.selectCell(redC.rcMap, redC.rcList)
-            If task.rcD IsNot Nothing Then strOut += vbCrLf + vbCrLf +
+            If task.rcOldD IsNot Nothing Then strOut += vbCrLf + vbCrLf +
                                                    percentImage.ToString("0.0%") + " of image" + vbCrLf +
                                                    CStr(rcList.Count) + " cells present"
             SetTrueText(strOut, 1)
@@ -13230,10 +13230,10 @@ Namespace VBClasses
             End If
 
             strOut = Utility_Basics.selectCell(rcMap, rcList)
-            If task.rcD IsNot Nothing And task.rcD.pixels > 0 Then
+            If task.rcOldD IsNot Nothing And task.rcOldD.pixels > 0 Then
                 strOut += vbCrLf + vbCrLf + percentImage.ToString("0.0%") + " of image" + vbCrLf +
                                   CStr(rcList.Count) + " cells present"
-                task.color(task.rcD.rect).SetTo(white, task.rcD.mask)
+                task.color(task.rcOldD.rect).SetTo(white, task.rcOldD.mask)
             End If
             SetTrueText(strOut, 1)
         End Sub
@@ -14806,7 +14806,7 @@ Namespace VBClasses
                     SetTrueText(strOut, rc.maxDist, 3)
                 End If
             Next
-            If task.rcD IsNot Nothing Then Rectangle(dst3, task.rcD.rect, white, task.lineWidth)
+            If task.rcOldD IsNot Nothing Then Rectangle(dst3, task.rcOldD.rect, white, task.lineWidth)
         End Sub
     End Class
 
@@ -14833,10 +14833,10 @@ Namespace VBClasses
             Next
 
             strOut = Utility_Basics.selectCell(histID.redCC.redC.rcMap, histID.redCC.redC.rcList)
-            If task.rcD IsNot Nothing And task.rcD.pixels > 0 Then
+            If task.rcOldD IsNot Nothing And task.rcOldD.pixels > 0 Then
                 dst3.SetTo(0)
-                dst3(task.rcD.rect).SetTo(white, task.rcD.mask)
-                task.color(task.rcD.rect).SetTo(white, task.rcD.mask)
+                dst3(task.rcOldD.rect).SetTo(white, task.rcOldD.mask)
+                task.color(task.rcOldD.rect).SetTo(white, task.rcOldD.mask)
             End If
             SetTrueText(strOut, 3)
         End Sub
@@ -16798,7 +16798,7 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             dst2 = XO_RedFlood_List.runRedList(src, labels(2))
 
-            Dim rc = task.rcD
+            Dim rc = task.rcOldD
             If rc.contour.Count > 0 Then
                 Dim shape = shapeCorrelation(rc.contour)
                 strOut = "Contour correlation for selected cell contour X to Y = " + shape.ToString(fmt3) + vbCrLf + vbCrLf +
@@ -16871,7 +16871,7 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             If standaloneTest() Then dst2 = XO_RedFlood_List.runRedList(src, labels(2))
 
-            Dim rc = task.rcD
+            Dim rc = task.rcOldD
             Dim fitPoints As New List(Of cv.Point3f)
             For Each pt In rc.contour
                 If pt.X >= rc.rect.Width Or pt.Y >= rc.rect.Height Then Continue For
@@ -16902,7 +16902,7 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             If standaloneTest() Then dst2 = XO_RedFlood_List.runRedList(src, labels(2))
 
-            Dim rc = task.rcD
+            Dim rc = task.rcOldD
             Dim fitPoints As New List(Of cv.Point3f)
             For y = 0 To rc.rect.Height - 1
                 For x = 0 To rc.rect.Width - 1
@@ -16932,7 +16932,7 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             dst2 = XO_RedFlood_List.runRedList(src, labels(2))
 
-            Dim rc = task.rcD
+            Dim rc = task.rcOldD
             If rc.wcMean(2) Then
                 eq.rc = rc
                 eq.Run(src)
@@ -17789,11 +17789,11 @@ Namespace VBClasses
             Dim index = redList.rcMap.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X)
             If index = 0 Then Exit Sub
             If index > 0 And index < redList.rclist.Count Then
-                task.rcD = redList.rclist(index)
-                task.color(task.rcD.rect).SetTo(cv.Scalar.White, task.rcD.mask)
+                task.rcOldD = redList.rclist(index)
+                task.color(task.rcOldD.rect).SetTo(cv.Scalar.White, task.rcOldD.mask)
             Else
                 ' the 0th cell is always the upper left corner with just 1 pixel.
-                If redList.rclist.Count > 1 Then task.rcD = redList.rclist(1)
+                If redList.rclist.Count > 1 Then task.rcOldD = redList.rclist(1)
             End If
         End Sub
         Public Shared Function DisplayCells() As cv.Mat
@@ -17961,7 +17961,7 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             If standaloneTest() Then
                 dst2 = XO_RedFlood_List.runRedList(src, labels(2))
-                rc = task.rcD
+                rc = task.rcOldD
                 DrawTour(dst2(rc.rect), rc.contour, white, -1)
             End If
 
@@ -18577,7 +18577,7 @@ Namespace VBClasses
                 End If
             Next
 
-            Dim rcX = task.rcD
+            Dim rcX = task.rcOldD
             SetTrueText("mean depth = " + rcX.wcMean(2).ToString("0.0"), 3)
         End Sub
     End Class
@@ -18791,7 +18791,7 @@ Namespace VBClasses
             dst3 = back.dst2
             labels(3) = back.labels(2)
             If redList.rclist.Count > 0 Then
-                dst2(task.rcD.rect).SetTo(white, task.rcD.mask)
+                dst2(task.rcOldD.rect).SetTo(white, task.rcOldD.mask)
             End If
         End Sub
     End Class
@@ -19277,7 +19277,7 @@ Namespace VBClasses
             labels(2) = redC.labels(2)
 
             strOut = Utility_Basics.selectCell(redC.rcMap, redC.rcList)
-            If task.rcD IsNot Nothing Then Rectangle(dst2, task.rcD.rect, task.highlight, task.lineWidth)
+            If task.rcOldD IsNot Nothing Then Rectangle(dst2, task.rcOldD.rect, task.highlight, task.lineWidth)
             If strOut <> "" Then SetTrueText(strOut, 3) Else SetTrueText("Click on any cell", 3)
 
             Dim causeLabel = Utility_Basics.findCause(redC.rcMap, redC.rcList)
@@ -19425,7 +19425,7 @@ Namespace VBClasses
             labels(2) = redC.labels(2)
 
             strOut = Utility_Basics.selectCell(redC.rcMap, redC.rcList)
-            If task.rcD IsNot Nothing Then Rectangle(dst2, task.rcD.rect, task.highlight, task.lineWidth)
+            If task.rcOldD IsNot Nothing Then Rectangle(dst2, task.rcOldD.rect, task.highlight, task.lineWidth)
             If strOut <> "" Then SetTrueText(strOut, 3) Else SetTrueText("Click on any cell", 3)
 
             Dim causeLabel = Utility_Basics.findCause(redC.rcMap, redC.rcList)
@@ -21633,7 +21633,7 @@ Namespace VBClasses
             dst2 = fRed.dst2
             labels(2) = fRed.labels(2)
 
-            ' If task.rcD IsNot Nothing Then task.clickPoint = task.rcD.maxDist
+            ' If task.rcOldD IsNot Nothing Then task.clickPoint = task.rcOldD.maxDist
             SetTrueText(fRed.strOut, 3)
         End Sub
     End Class
@@ -22098,8 +22098,8 @@ Namespace VBClasses
 
             SetTrueText(redC.strOut, 1)
             If task.heartBeat Then
-                Dim depth As cv.Mat = task.pcSplit(2)(task.rcD.rect)
-                depth.SetTo(0, task.noDepthMask(task.rcD.rect))
+                Dim depth As cv.Mat = task.pcSplit(2)(task.rcOldD.rect)
+                depth.SetTo(0, task.noDepthMask(task.rcOldD.rect))
                 plot.minRange = 0
                 plot.maxRange = task.MaxZmeters
                 plot.Run(depth)
@@ -22147,7 +22147,7 @@ Namespace VBClasses
 
             SetTrueText(redC.strOut, 1)
 
-            Dim rc = task.rcD
+            Dim rc = task.rcOldD
 
             dst0 = task.color
             Dim correlationMat As New cv.Mat, correlationXtoZ As Single, correlationYtoZ As Single
@@ -22394,7 +22394,7 @@ Namespace VBClasses
 
             SetTrueText(redC.strOut, 1)
 
-            hist.rc = task.rcD
+            hist.rc = task.rcOldD
             If hist.rc.mapID = 0 Or hist.rc.wcMean(2) = 0 Then Exit Sub
 
             dst0.SetTo(0)
@@ -22457,7 +22457,7 @@ Namespace VBClasses
                 SetTrueText(redC.strOut, 1)
             End If
 
-            Dim rc = task.rcD
+            Dim rc = task.rcOldD
             Dim inputPoints As New List(Of cv.Point3f)
             For Each pt In rc.contour
                 Dim vec = task.pointCloud(rc.rect).Get(Of cv.Point3f)(pt.Y, pt.X)
@@ -22496,7 +22496,7 @@ Namespace VBClasses
             dst2 = pca.dst2
             labels(2) = pca.labels(2)
 
-            Dim rc = task.rcD
+            Dim rc = task.rcOldD
             If rc Is Nothing Then
                 If pca.redC.rcList.Count = 0 Then Exit Sub
                 rc = pca.redC.rcList(0)
@@ -22567,7 +22567,7 @@ Namespace VBClasses
             dSpec.Run(src)
             gSpec.Run(src)
 
-            If task.heartBeat And task.rcD.mapID > 0 Then
+            If task.heartBeat And task.rcOldD.mapID > 0 Then
                 strOut = dSpec.strOut + vbCrLf + vbCrLf
                 strOut += gSpec.strOut
             End If
@@ -22789,7 +22789,7 @@ Namespace VBClasses
 
             strOut = Utility_Basics.selectCell(rcMap, rcList)
             SetTrueText(strOut, 1)
-            If task.rcD IsNot Nothing Then task.clickPoint = task.rcD.maxDist
+            If task.rcOldD IsNot Nothing Then task.clickPoint = task.rcOldD.maxDist
 
             For Each rc In rcList
                 Circle(dst3, rc.maxDist, task.DotSize, task.highlight, -1)
@@ -23044,9 +23044,9 @@ Namespace VBClasses
 
             SetTrueText(redC.strOut, 1)
 
-            If task.rcD IsNot Nothing Then
-                If task.rcD.pixels > 0 Then
-                    dst3(task.rcD.rect).SetTo(white, task.rcD.mask)
+            If task.rcOldD IsNot Nothing Then
+                If task.rcOldD.pixels > 0 Then
+                    dst3(task.rcOldD.rect).SetTo(white, task.rcOldD.mask)
                 End If
             End If
         End Sub
@@ -23072,9 +23072,9 @@ Namespace VBClasses
 
             labels(3) = "Select a RedCloud cell to see the histogram"
 
-            SetTrueText(task.rcD.displayCell, 1)
-            Dim depth As cv.Mat = task.pcSplit(2)(task.rcD.rect)
-            depth.SetTo(0, task.noDepthMask(task.rcD.rect))
+            SetTrueText(task.rcOldD.displayCell, 1)
+            Dim depth As cv.Mat = task.pcSplit(2)(task.rcOldD.rect)
+            depth.SetTo(0, task.noDepthMask(task.rcOldD.rect))
 
             plot.minRange = 0
             plot.maxRange = task.MaxZmeters
@@ -23574,7 +23574,7 @@ Namespace VBClasses
 
             Select Case options.clickName
                 Case "Identify Row"
-                    Dim row = task.rcD.wGrid.Y
+                    Dim row = task.rcOldD.wGrid.Y
                     For Each rc In dups.redC.rcList
                         If rc.wGrid.Y = row Then
                             dst2(rc.rect).SetTo(white, rc.mask)
@@ -23582,7 +23582,7 @@ Namespace VBClasses
                     Next
                     labels(3) = "Row " + CStr(row) + " selected"
                 Case "Identify Col"
-                    Dim col = task.rcD.wGrid.X
+                    Dim col = task.rcOldD.wGrid.X
                     For Each rc In dups.redC.rcList
                         If rc.wGrid.X = col Then
                             dst2(rc.rect).SetTo(white, rc.mask)
@@ -23590,11 +23590,11 @@ Namespace VBClasses
                     Next
                     labels(3) = "Col " + CStr(col) + " selected"
                 Case "Identify Neighbors"
-                    Dim row = task.rcD.wGrid.Y
-                    Dim col = task.rcD.wGrid.X
+                    Dim row = task.rcOldD.wGrid.Y
+                    Dim col = task.rcOldD.wGrid.X
                     For Each rc In dups.redC.rcList
-                        If Math.Abs(task.rcD.wGrid.X - rc.wGrid.X) <= 1 And
-                                   Math.Abs(task.rcD.wGrid.Y - rc.wGrid.Y) <= 1 Then
+                        If Math.Abs(task.rcOldD.wGrid.X - rc.wGrid.X) <= 1 And
+                                   Math.Abs(task.rcOldD.wGrid.Y - rc.wGrid.Y) <= 1 Then
                             dst2(rc.rect).SetTo(white, rc.mask)
                         End If
                     Next
@@ -24259,7 +24259,7 @@ Namespace VBClasses
             dst2 = redC.dst2
             labels(2) = redC.labels(2)
 
-            If task.rcD IsNot Nothing Then Rectangle(dst2, task.rcD.rect, task.highlight, task.lineWidth)
+            If task.rcOldD IsNot Nothing Then Rectangle(dst2, task.rcOldD.rect, task.highlight, task.lineWidth)
             If strOut <> "" Then SetTrueText(redC.strOut, 3) Else SetTrueText("Click on any cell", 3)
 
             Dim causeLabel = Utility_Basics.findCause(redC.rcMap, redC.rcList)

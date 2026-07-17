@@ -144,14 +144,14 @@ Public Class Classifier_BayesianTest : Inherits TaskParent
         'Next
 
         'dst1.SetTo(0)
-        'For Each index In nabs.nabList(task.rcD.index)
+        'For Each index In nabs.nabList(task.rcOldD.index)
         '    Dim rc = redList.rcList(index)
         '    dst1(rc.rect).SetTo(255, rc.mask)
         '    strOut += CStr(index) + ","
         '    responseList(index) = -1
         'Next
 
-        'responseList(task.rcD.index) = 1
+        'responseList(task.rcOldD.index) = 1
 
         'Dim queryList As New List(Of Scalar)
         'Dim maskList As New List(Of Integer)

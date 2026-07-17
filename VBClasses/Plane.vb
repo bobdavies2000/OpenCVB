@@ -249,7 +249,7 @@ Public Class Plane_OnlyPlanes : Inherits TaskParent
         Next
         If plane.options.reuseRawDepthData Then dst3 = task.pointCloud
 
-        Dim rcX = task.rcD
+        Dim rcX = task.rcOldD
     End Sub
 End Class
 
@@ -404,7 +404,7 @@ Public Class Plane_Points : Inherits TaskParent
         dst2 = redC.dst2
         labels(2) = redC.labels(2)
 
-        Dim rc = task.rcD
+        Dim rc = task.rcOldD
 
         Dim pt As Point3f, list2D As New List(Of cv.Point)
         If rc.contour IsNot Nothing Then
@@ -531,7 +531,7 @@ Public Class Plane_Equation : Inherits TaskParent
             redC.Run(src)
             dst2 = redC.dst2
             labels(2) = redC.labels(2)
-            rc = task.rcD
+            rc = task.rcOldD
             If rc Is Nothing Then SetTrueText("Select a cell in the image at left.")
         End If
 

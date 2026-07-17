@@ -21,8 +21,8 @@ Public Class Convex_Basics : Inherits TaskParent
         options.Run()
 
         Dim hullList As New List(Of cv.Point)
-        If task.rcD IsNot Nothing Then
-            If task.rcD.contour IsNot Nothing Then hullList = task.rcD.contour
+        If task.rcOldD IsNot Nothing Then
+            If task.rcOldD.contour IsNot Nothing Then hullList = task.rcOldD.contour
         End If
 
         If standaloneTest() Then
@@ -69,12 +69,12 @@ Public Class XR_Convex_RedColor : Inherits TaskParent
 
         SetTrueText(redC.strOut, 3)
 
-        If task.rcD.contour IsNot Nothing Then
+        If task.rcOldD.contour IsNot Nothing Then
             convex.Run(src)
 
             dst3.SetTo(0)
-            dst3(task.rcD.rect) = convex.dst2(New cv.Rect(0, 0, task.rcD.rect.Width, task.rcD.rect.Height))
-            Circle(dst3, task.rcD.maxDist, task.DotSize, white, -1, task.lineType)
+            dst3(task.rcOldD.rect) = convex.dst2(New cv.Rect(0, 0, task.rcOldD.rect.Width, task.rcOldD.rect.Height))
+            Circle(dst3, task.rcOldD.maxDist, task.DotSize, white, -1, task.lineType)
         End If
     End Sub
 End Class
@@ -158,7 +158,7 @@ Public Class Convex_RedColorDefects : Inherits TaskParent
 
         Utility_Basics.selectCell(redC.rcMap, redC.rcList)
 
-        Dim rc = task.rcD
+        Dim rc = task.rcOldD
         Dim sz = New Size(dst2.Height * rc.mask.Width / rc.mask.Height, dst2.Height)
         If rc.mask.Width > rc.mask.Height Then
             sz = New Size(dst2.Width, dst2.Height * rc.mask.Height / rc.mask.Width)
