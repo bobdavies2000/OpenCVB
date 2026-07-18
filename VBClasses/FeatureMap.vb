@@ -532,7 +532,7 @@ Public Class XR_FeatureMap_ByDepth : Inherits TaskParent
                 Dim val = palInput.Get(Of Byte)(fp.pt.Y, fp.pt.X)
                 If val = 0 Then
                 FillConvexPoly(palInput, fp.facets, fp.brickIndex Mod 255)
-                    fpCells.Add((fp, task.frameCount))
+                    fpCells.Add((fp, task.fOptions.FrameHistoryCount.Value))
                 End If
             End If
         Next
@@ -547,7 +547,7 @@ Public Class XR_FeatureMap_ByDepth : Inherits TaskParent
         dst3.SetTo(Scalar.All(0), tmp)
 
 
-        Dim removeFrame As Integer = If(task.frameCount > task.fOptions.FrameHistoryCount.Value , task.frameCount - task.fOptions.FrameHistoryCount.Value , -1)
+        Dim removeFrame As Integer = If(task.fOptions.FrameHistoryCount.Value > task.fOptions.FrameHistoryCount.Value, task.fOptions.FrameHistoryCount.Value - task.fOptions.FrameHistoryCount.Value, -1)
         For i = fpCells.Count - 1 To 0 Step -1
             Dim frame = fpCells(i).Item2
             If frame = removeFrame Then fpCells.RemoveAt(i)

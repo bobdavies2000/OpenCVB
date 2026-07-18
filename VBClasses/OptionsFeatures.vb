@@ -125,7 +125,7 @@
     End Sub
     Private Sub FrameHistoryCount_ValueChanged(sender As Object, e As EventArgs) Handles FrameHistoryCount.ValueChanged
         task.optionsChanged = True
-        FrameHistoryLabel.Text = CStr(task.FeatureSampleSize)
+        FrameHistoryLabel.Text = CStr(FrameHistoryCount.Value)
     End Sub
     Private Sub FeatureSampleSize_ValueChanged(sender As Object, e As EventArgs) Handles FeatureSizeSlider.ValueChanged
         task.optionsChanged = True

@@ -1223,17 +1223,17 @@ Public Class Options_SymmetricalShapes : Inherits OptionParent
         Static demoCheck = FindCheckBox("Use demo mode")
 
         If demoCheck.Checked Then
-            If task.frameCount Mod 30 = 0 Then
+            If task.fOptions.FrameHistoryCount.Value Mod 30 = 0 Then
                 If countSlider.Value < countSlider.Maximum - 17 Then countSlider.Value += 17 Else countSlider.Value = countSlider.Minimum
                 If r1Slider.Value < r1Slider.Maximum - 10 Then r1Slider.Value += 10 Else r1Slider.Value = 1
                 If r2Slider.Value > 13 Then r2Slider.Value -= 13 Else r2Slider.Value = r2Slider.Maximum
                 If nGenPerSlider.Value > 27 Then nGenPerSlider.Value -= 27 Else nGenPerSlider.Value = nGenPerSlider.Maximum
-                fillColor = task.scalarColors(task.frameCount Mod 256)
+                fillColor = task.scalarColors(task.fOptions.FrameHistoryCount.Value Mod 256)
             End If
-            If task.frameCount Mod 37 = 0 Then symCheck.Checked = Not symCheck.Checked
-            If task.frameCount Mod 222 = 0 Then fillCheck.Checked = Not fillCheck.Checked
-            If task.frameCount Mod 77 = 0 Then regularCheck.Checked = Not regularCheck.Checked
-            If task.frameCount Mod 100 = 0 Then reverseCheck.Checked = Not reverseCheck.Checked
+            If task.fOptions.FrameHistoryCount.Value Mod 37 = 0 Then symCheck.Checked = Not symCheck.Checked
+            If task.fOptions.FrameHistoryCount.Value Mod 222 = 0 Then fillCheck.Checked = Not fillCheck.Checked
+            If task.fOptions.FrameHistoryCount.Value Mod 77 = 0 Then regularCheck.Checked = Not regularCheck.Checked
+            If task.fOptions.FrameHistoryCount.Value Mod 100 = 0 Then reverseCheck.Checked = Not reverseCheck.Checked
             rotateAngle += 1
         End If
 
@@ -5531,7 +5531,7 @@ Public Class Options_Kalman_VB : Inherits OptionParent
 
         If matrix.Count > 0 Then
             Const MAX_INPUT = 20
-            matrix(task.frameCount Mod MAX_INPUT) = kalmanInput
+            matrix(task.fOptions.FrameHistoryCount.Value Mod MAX_INPUT) = kalmanInput
             Dim AverageOutput = Mean((Mat.FromPixelData(MAX_INPUT, 1, MatType.CV_32F, matrix.ToArray)))(0)
 
             If AverageOutput < 0 Then AverageOutput = 0
@@ -6998,7 +6998,7 @@ Public Class Options_ML : Inherits OptionParent
     Public Sub Run()
         Static frm = FindFrm(traceName + " Radio Buttons")
         ML_Name = frm.check(findRadioIndex(frm.check)).Text
-        If task.frameCount < 100 Or task.optionsChanged Then frm.left = task.gOptions.Width / 2 + 10
+        If task.fOptions.FrameHistoryCount.Value < 100 Or task.optionsChanged Then frm.left = task.gOptions.Width / 2 + 10
     End Sub
 End Class
 

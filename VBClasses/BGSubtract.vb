@@ -122,7 +122,7 @@ Public Class XR_BGSubtract_MotionDetect : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
 
-        If task.optionsChanged Or task.frameCount < 10 Then src.CopyTo(dst3)
+        If task.optionsChanged Or task.fOptions.FrameHistoryCount.Value < 10 Then src.CopyTo(dst3)
         Dim threadCount = options.threadData(0)
         Dim width = options.threadData(1), height = options.threadData(2)
         Dim taskArray(threadCount - 1) As System.Threading.Tasks.Task
@@ -189,8 +189,8 @@ Public Class XR_BGSubtract_GMG_KNN : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
-        If task.frameCount < 120 Then
-            SetTrueText("Waiting to get sufficient frames to learn background.  frameCount = " + CStr(task.frameCount))
+        If task.fOptions.FrameHistoryCount.Value < 120 Then
+            SetTrueText("Waiting to get sufficient frames to learn background.  frameCount = " + CStr(task.fOptions.FrameHistoryCount.Value))
         Else
             SetTrueText("")
         End If

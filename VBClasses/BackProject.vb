@@ -586,7 +586,7 @@ Public Class XR_BackProject_InRangeDepthTest : Inherits TaskParent
 
         labels(2) = "Histogram bin " + CStr(index) + " for range from " + minRange.ToString(fmt1) + " m to " +
                     maxRange.ToString(fmt1) + " m had " + CStr(CountNonZero(dst2))
-        If task.heartBeatLT And task.frameCount > 1 Then index += 1
+        If task.heartBeatLT And task.fOptions.FrameHistoryCount.Value > 1 Then index += 1
         If maxRange > task.MaxZmeters Then index = 0
     End Sub
 End Class

@@ -111,7 +111,7 @@ Public Class Feature_GoodFeatures : Inherits TaskParent
     Public Sub New()
         task.fOptions.FeatureSizeSlider.Value = 50
         labels(2) = "Good features found with GoodFeaturesToTrack"
-        desc = "Find good features in the image using OpenCV GoodFeaturesToTrack."
+        desc = "Cursor.ai: Find good features in the image using OpenCV GoodFeaturesToTrack."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()

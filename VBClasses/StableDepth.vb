@@ -58,15 +58,16 @@ Public Class StableDepth_Max : Inherits TaskParent
     Dim colorize As New DepthColorizer_CPP
     Public pointcloud As New Mat
     Public pcsplit(2) As Mat
-    Public TA_Active As Boolean = False
     Public Sub New()
         labels(2) = "Accumulated minimum values at each depth pixel.  Updated using RGB motion."
         labels(3) = "Pixels that were updated on the current frame."
-        If standalone Then task.gOptions.displayDst1.Checked = True
         desc = "Stabilize X, Y, and Z of the cv.Point cloud using the maximum depth encountered."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        Static lastDepth As Mat = task.pcSplit(2).Clone
+        Dim pcSplit() As Mat = Nothing
+        Split(task.prepCloud.originalPointcloud, pcSplit)
+        Static lastDepth As Mat = pcSplit(2).Clone
+
         Dim myHeartbeat = task.heartBeat Or task.optionsChanged
         If myHeartbeat Then
             pointcloud = task.pointCloud.Clone
@@ -75,27 +76,19 @@ Public Class StableDepth_Max : Inherits TaskParent
             task.pointCloud.CopyTo(pointcloud, task.noDepthMask)
         End If
 
-        pcsplit = Split(pointcloud)
         Dim accumDepth As New Mat
-        Max(pcsplit(2), lastDepth, accumDepth)
+        If task.heartBeat Then
+            pcSplit(2).CopyTo(lastDepth)
+            pcSplit(2).CopyTo(accumDepth)
+        Else
+            Max(pcSplit(2), lastDepth, accumDepth)
+        End If
 
         If myHeartbeat = False Then
-            dst3 = StableDepth_Basics_TA.updateXY(pcsplit(2), accumDepth)
-            task.pointCloud.CopyTo(pointcloud, dst3)
+            dst3 = StableDepth_Basics_TA.updateXY(pcSplit(2), accumDepth)
         End If
 
         colorize.Run(accumDepth)
         dst2 = colorize.dst2
-
-        pcsplit = Split(pointcloud)
-        lastDepth = pcsplit(2).Clone
-
-        If TA_Active Then
-            task.pointCloud = pointcloud.Clone
-            task.pcSplit = pcsplit
-            Threshold(pcsplit(2), task.depthmask, 0, 255, ThresholdTypes.Binary)
-            ConvertScaleAbs(task.depthmask, task.depthmask)
-            task.noDepthMask = Not task.depthmask
-        End If
     End Sub
 End Class

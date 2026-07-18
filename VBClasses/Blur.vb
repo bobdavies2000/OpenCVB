@@ -96,7 +96,7 @@ Public Class XR_Blur_TopoMap : Inherits TaskParent
         dst3 = ShowAddweighted(dst3, task.color, labels(3))
 
         labels(2) = "Blur = " + CStr(options.nextPercent) + "% Reduction Factor = " + CStr(options.blurReduction)
-        If task.frameCount Mod options.frameCycle = 0 Then options.nextPercent -= 1
+        If task.fOptions.FrameHistoryCount.Value Mod options.frameCycle = 0 Then options.nextPercent -= 1
         If options.nextPercent <= 0 Then options.nextPercent = options.savePercent
     End Sub
 End Class
@@ -122,7 +122,7 @@ Public Class XR_Blur_Detection : Inherits TaskParent
         If standaloneTest() Then
             If task.drawRect <> New cv.Rect Then r = task.drawRect
             ' deliberately blur a small region to test the algorithm
-            If task.frameCount Mod 2 Then
+            If task.fOptions.FrameHistoryCount.Value Mod 2 Then
                 blurC.Run(src(r))
                 src(r) = blurC.dst2
             End If

@@ -1,6 +1,5 @@
 AddWeighted_Accumulate
 AddWeighted_Basics
-AddWeighted_MaxDepth
 Annealing_Basics_CPP
 ApproxPoly_Basics
 AsciiArt_Basics

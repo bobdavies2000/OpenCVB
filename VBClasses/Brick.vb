@@ -337,7 +337,7 @@ Public Class XR_Brick_CloudMaxVal : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         bricks.Run(src)
-        If task.heartBeatLT Or task.frameCount < 3 Then task.pointCloud.CopyTo(dst2)
+        If task.heartBeatLT Or task.fOptions.FrameHistoryCount.Value < 3 Then task.pointCloud.CopyTo(dst2)
 
         Dim splitCount As Integer
         Dim splitMats() As Mat = Nothing
@@ -378,7 +378,7 @@ Public Class XR_Brick_CloudMean : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         bricks.Run(src)
-        If task.heartBeatLT Or task.frameCount < 3 Then task.pointCloud.CopyTo(dst2)
+        If task.heartBeatLT Or task.fOptions.FrameHistoryCount.Value < 3 Then task.pointCloud.CopyTo(dst2)
 
         Dim splitCount As Integer
         Dim splitMats() As Mat = Nothing
@@ -417,7 +417,7 @@ Public Class XR_Brick_CloudRange : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         bricks.Run(src)
-        If task.heartBeatLT Or task.frameCount < 3 Then task.pointCloud.CopyTo(dst2)
+        If task.heartBeatLT Or task.fOptions.FrameHistoryCount.Value < 3 Then task.pointCloud.CopyTo(dst2)
 
         Dim splitCount As Integer
         Dim newRange As Single = 0.1F

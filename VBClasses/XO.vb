@@ -992,7 +992,7 @@ Namespace VBClasses
                 Line(dst2, lp.p1, lp.p2, lp.color, task.lineWidth, task.lineType)
             Next
 
-            If task.frameCount > 10 Then If task.lpD.rect.Width = 0 Then task.lpD = lpList(0)
+            If task.fOptions.FrameHistoryCount.Value > 10 Then If task.lpD.rect.Width = 0 Then task.lpD = lpList(0)
 
             labels(2) = CStr(lpList.Count) + " lines - " + CStr(lpList.Count - count) + " were new"
         End Sub
@@ -1219,10 +1219,10 @@ Namespace VBClasses
             End If
             If tcells.Count < 2 Then Exit Sub
 
-            If myCurrentFrame < task.frameCount Then
+            If myCurrentFrame < task.fOptions.FrameHistoryCount.Value Then
                 canny.Run(src)
                 blurC.Run(canny.dst2)
-                myCurrentFrame = task.frameCount
+                myCurrentFrame = task.fOptions.FrameHistoryCount.Value
             End If
             dst1.SetTo(0)
             Dim p1 = tcells(0).center
@@ -3781,7 +3781,7 @@ Namespace VBClasses
                 lengthReject += 1
                 lastLength = bestLength
             End If
-            labels(3) = "Length rejects = " + (lengthReject / (task.frameCount + 1)).ToString("0%")
+            labels(3) = "Length rejects = " + (lengthReject / (task.fOptions.FrameHistoryCount.Value + 1)).ToString("0%")
         End Sub
     End Class
 
@@ -4096,7 +4096,7 @@ Namespace VBClasses
             Dim avg = arcList.Average()
             arcLongAverage.Add(avg)
             labels(3) = "arcY avg = " + avg.ToString(fmt1) + ", long term average = " + arcLongAverage.Average.ToString(fmt1) +
-                            ", first was best " + (firstBest / task.frameCount).ToString("0%") + " of the time, Avg of longest line " + firstAverage.Average.ToString(fmt1)
+                            ", first was best " + (firstBest / task.fOptions.FrameHistoryCount.Value).ToString("0%") + " of the time, Avg of longest line " + firstAverage.Average.ToString(fmt1)
             If arcLongAverage.Count > 1000 Then
                 arcLongAverage.RemoveAt(0)
                 firstAverage.RemoveAt(0)
@@ -4751,15 +4751,15 @@ Namespace VBClasses
     Public Class XO_Contour_Gray : Inherits TaskParent
         Public contour As New List(Of cv.Point)
         Public options As New Options_Contours
-        Dim myFrameCount As Integer = task.frameCount
+        Dim myFrameCount As Integer = task.fOptions.FrameHistoryCount.Value
         Dim reduction As New Reduction_Basics
         Public Sub New()
             desc = "Find the contour for the src."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If myFrameCount <> task.frameCount Then
+            If myFrameCount <> task.fOptions.FrameHistoryCount.Value Then
                 options.Run() ' avoid running options more than once per frame.
-                myFrameCount = task.frameCount
+                myFrameCount = task.fOptions.FrameHistoryCount.Value
             End If
 
             If standalone Then
@@ -4789,16 +4789,16 @@ Namespace VBClasses
     Public Class XO_Contour_RC_AddContour : Inherits TaskParent
         Public contour As New List(Of cv.Point)
         Public options As New Options_Contours
-        Dim myFrameCount As Integer = task.frameCount
+        Dim myFrameCount As Integer = task.fOptions.FrameHistoryCount.Value
         Dim reduction As New Reduction_Basics
         Dim contours As New Contour_Regions
         Public Sub New()
             desc = "Find the contour for the src."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If myFrameCount <> task.frameCount Then
+            If myFrameCount <> task.fOptions.FrameHistoryCount.Value Then
                 options.Run() ' avoid running options more than once per frame.
-                myFrameCount = task.frameCount
+                myFrameCount = task.fOptions.FrameHistoryCount.Value
             End If
 
             If standalone Then
@@ -5201,7 +5201,7 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             If task.optionsChanged Then meanSeries = New cv.Mat(task.gridRects.Count, task.fOptions.FrameHistoryCount.Value, cv.MatType.CV_32F, cv.Scalar.All(0))
 
-            Dim index = task.frameCount Mod task.fOptions.FrameHistoryCount.Value
+            Dim index = task.fOptions.FrameHistoryCount.Value Mod task.fOptions.FrameHistoryCount.Value
             Dim meanValues(task.gridRects.Count - 1) As Single
             Dim stdValues(task.gridRects.Count - 1) As Single
             Parallel.For(0, task.gridRects.Count,
@@ -5210,14 +5210,14 @@ Namespace VBClasses
                     Dim mean As cv.Scalar, stdev As cv.Scalar
                     MeanStdDev(task.pcSplit(2)(gRect), mean, stdev, task.depthmask(gRect))
                     meanSeries.Set(Of Single)(i, index, mean)
-                    If task.frameCount >= task.fOptions.FrameHistoryCount.Value - 1 Then
+                    If task.fOptions.FrameHistoryCount.Value >= task.fOptions.FrameHistoryCount.Value - 1 Then
                         MeanStdDev(meanSeries.Row(i), mean, stdev)
                         meanValues(i) = mean
                         stdValues(i) = stdev
                     End If
                 End Sub)
 
-            If task.frameCount >= task.fOptions.FrameHistoryCount.Value Then
+            If task.fOptions.FrameHistoryCount.Value >= task.fOptions.FrameHistoryCount.Value Then
                 Dim means As cv.Mat = cv.Mat.FromPixelData(task.gridRects.Count, 1, cv.MatType.CV_32F, meanValues.ToArray)
                 Dim stdevs As cv.Mat = cv.Mat.FromPixelData(task.gridRects.Count, 1, cv.MatType.CV_32F, stdValues.ToArray)
                 Dim meanmask As New cv.Mat
@@ -8128,7 +8128,7 @@ Namespace VBClasses
             features1 = cv.Mat.FromPixelData(inputFeat.Count, 1, cv.MatType.CV_32FC2, inputFeat.ToArray)
 
             Static lastFrame As cv.Mat = src.Clone()
-            If task.frameCount > 0 Then
+            If task.fOptions.FrameHistoryCount.Value > 0 Then
                 Dim features2 = New cv.Mat
                 Dim status As New cv.Mat
                 Dim err As New cv.Mat
@@ -8332,7 +8332,7 @@ Namespace VBClasses
                 labels(2) = "EndPoint1 correlation:  " + match.p1Correlation.ToString(fmt3) + vbTab +
                                 "EndPoint2 correlation:  " + match.p1Correlation.ToString(fmt3)
 
-                If match.p1Correlation < task.fCorrThreshold Or task.frameCount < 10 Or
+                If match.p1Correlation < task.fCorrThreshold Or task.fOptions.FrameHistoryCount.Value < 10 Or
                        match.p2Correlation < task.fCorrThreshold Then
 
                     task.motion.motionMask.SetTo(255) ' force a complete line detection
@@ -8415,7 +8415,7 @@ Namespace VBClasses
 
             lineLongestChanged = False
             ' camera is often warming up for the first few images.
-            If task.frameCount < 10 Or task.heartBeat Then
+            If task.fOptions.FrameHistoryCount.Value < 10 Or task.heartBeat Then
                 lp = lplist(0)
                 lineLongestChanged = True
             End If
@@ -8507,7 +8507,7 @@ Namespace VBClasses
             Dim lplist = task.lines.lpList
 
             ' camera is often warming up for the first few images.
-            If match.correlation < task.fCorrThreshold Or task.frameCount < 10 Or lp Is Nothing Then
+            If match.correlation < task.fCorrThreshold Or task.fOptions.FrameHistoryCount.Value < 10 Or lp Is Nothing Then
                 lp = lplist(0)
                 For Each lp In lplist
                     If Math.Abs(task.lpGravity.angle - lp.angle) < AngleThreshold Then Exit For
@@ -9630,7 +9630,7 @@ Namespace VBClasses
             Static strList As New List(Of String)
             strList.Add(deltaX1.ToString(fmt1) + " " + deltaX2.ToString(fmt1) + " " +
                             deltaY1.ToString(fmt1) + " " + deltaY2.ToString(fmt1) +
-                            If(task.frameCount Mod 6 = 0, vbCrLf, vbTab))
+                            If(task.fOptions.FrameHistoryCount.Value Mod 6 = 0, vbCrLf, vbTab))
             If strList.Count >= 132 Then strList.RemoveAt(0)
 
             strOut = ""
@@ -14152,7 +14152,7 @@ Namespace VBClasses
 
             Dim motionRect = XO_Motion_RectHistory.getMotionRect()
             If task.gOptions.stableDepthRGB.Checked Then
-                If task.heartBeatLT Or task.frameCount < 5 Or task.optionsChanged Then
+                If task.heartBeatLT Or task.fOptions.FrameHistoryCount.Value < 5 Or task.optionsChanged Then
                     dst2 = task.pointCloud.Clone
                 End If
 
@@ -15560,7 +15560,7 @@ Namespace VBClasses
             Dim lplist = task.lines.lpList
             lineLongestChanged = False
             ' camera is often warming up for the first few images.
-            If match.correlation < task.fCorrThreshold Or task.frameCount < 10 Or task.heartBeat Then
+            If match.correlation < task.fCorrThreshold Or task.fOptions.FrameHistoryCount.Value < 10 Or task.heartBeat Then
                 lp = lplist(0)
                 match.template = task.gray(lp.rect)
                 lineLongestChanged = True
@@ -15629,7 +15629,7 @@ Namespace VBClasses
             longLine.Run(src)
             Static lastLongest = task.lines.lpList(0)
             If task.lines.lpList(0).length <> lastLongest.length Or task.lpGravity.length = 0 Or
-                       task.frameCount < 5 Then
+                       task.fOptions.FrameHistoryCount.Value < 5 Then
                 task.lpHorizon = Line_Perpendicular.computePerp(task.lpGravity)
                 lastLongest = task.lines.lpList(0)
             End If
@@ -16963,7 +16963,7 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             dst2 = XO_RedFlood_List.runRedList(src, labels(2))
 
-            If task.heartBeat Or task.frameCount = 2 Then
+            If task.heartBeat Or task.fOptions.FrameHistoryCount.Value = 2 Then
                 dst1 = dst2.Clone
                 dst3.SetTo(0)
             End If
@@ -16998,7 +16998,7 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             dst2 = XO_RedFlood_List.runRedList(src, labels(2))
 
-            If task.heartBeat Or task.frameCount = 2 Then
+            If task.heartBeat Or task.fOptions.FrameHistoryCount.Value = 2 Then
                 dst1 = dst2.Clone
                 dst3.SetTo(0)
             End If
@@ -17428,7 +17428,7 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             bricks.run(src)
-            If task.heartBeatLT Or task.frameCount < 3 Then task.pointCloud.CopyTo(dst2)
+            If task.heartBeatLT Or task.fOptions.FrameHistoryCount.Value < 3 Then task.pointCloud.CopyTo(dst2)
             If task.motion.motionSort.Count = 0 Then Exit Sub ' no change...
 
             Dim updateCount As Integer
@@ -17643,7 +17643,7 @@ Namespace VBClasses
             End If
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If task.heartBeatLT Or task.optionsChanged Or task.frameCount < 5 Then
+            If task.heartBeatLT Or task.optionsChanged Or task.fOptions.FrameHistoryCount.Value < 5 Then
                 dst2 = task.pointCloud.Clone
                 'dst0 = task.depthMask.Clone
             End If
@@ -18926,7 +18926,7 @@ Namespace VBClasses
             End If
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If task.heartBeatLT Or task.optionsChanged Or task.frameCount < 5 Then
+            If task.heartBeatLT Or task.optionsChanged Or task.fOptions.FrameHistoryCount.Value < 5 Then
                 dst2 = task.pointCloud.Clone
             End If
             originalPointcloud = task.pointCloud.Clone ' save the original camera pointcloud.
@@ -21384,7 +21384,7 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
 
-            If options.reuseData = False Or task.frameCount < 2 Or task.mouseClickFlag Then random.Run(src) ' fill result1 with random points in x and y range of the image.
+            If options.reuseData = False Or task.fOptions.FrameHistoryCount.Value < 2 Or task.mouseClickFlag Then random.Run(src) ' fill result1 with random points in x and y range of the image.
             Dim features As cv.Mat = cv.Mat.FromPixelData(random.PointList.Count, 2, cv.MatType.CV_32F, random.PointList.ToArray)
 
             Dim matchCount = Math.Min(options.matchCount, random.PointList.Count - 1)
@@ -23532,7 +23532,7 @@ Namespace VBClasses
             Dim lastSet As New List(Of cv.Point3d)(currSet)
             dst2.SetTo(0)
             Static count As Integer
-            If task.heartBeatLT Or task.frameCount = 2 Then
+            If task.heartBeatLT Or task.fOptions.FrameHistoryCount.Value = 2 Then
                 dst3.SetTo(0)
                 count = 0
             End If

@@ -202,14 +202,14 @@ Public Class XR_Edge_RandomForest_CPP : Inherits TaskParent
         End If
         options.Run()
 
-        If task.frameCount < 100 Then SetTrueText("On the first call only, it takes a few seconds to load the randomForest model.", New cv.Point(10, 100))
+        If task.fOptions.FrameHistoryCount.Value < 100 Then SetTrueText("On the first call only, it takes a few seconds to load the randomForest model.", New cv.Point(10, 100))
 
         ' why not do this in the constructor?  Because the message is held up by the lengthy process of loading the model.
-        If task.frameCount = 5 Then
+        If task.fOptions.FrameHistoryCount.Value = 5 Then
             Dim modelInfo = New FileInfo(task.homeDir + "Data/model.yml.gz")
             cPtr = Edge_RandomForest_Open(modelInfo.FullName)
         End If
-        If task.frameCount > 5 Then ' the first images are skipped so the message above can be displayed.
+        If task.fOptions.FrameHistoryCount.Value > 5 Then ' the first images are skipped so the message above can be displayed.
             src.GetArray(Of Vec3b)(rgbData)
             Dim handleRGB = GCHandle.Alloc(rgbData, GCHandleType.Pinned)
             Dim imagePtr = Edge_RandomForest_Run(cPtr, handleRGB.AddrOfPinnedObject(), src.Rows, src.Cols)
