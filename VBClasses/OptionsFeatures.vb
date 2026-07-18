@@ -123,10 +123,13 @@
         task.optionsChanged = True
         FeatureCorrelationLabel.Text = task.fCorrThreshold.ToString(fmt2)
     End Sub
-    Private Sub FeatureSampleSize_ValueChanged(sender As Object, e As EventArgs) Handles FrameHistoryCount.ValueChanged
-        task.FeatureSampleSize = FrameHistoryCount.Value
+    Private Sub FrameHistoryCount_ValueChanged(sender As Object, e As EventArgs) Handles FrameHistoryCount.ValueChanged
         task.optionsChanged = True
         FrameHistoryLabel.Text = CStr(task.FeatureSampleSize)
+    End Sub
+    Private Sub FeatureSampleSize_ValueChanged(sender As Object, e As EventArgs) Handles FeatureSizeSlider.ValueChanged
+        task.optionsChanged = True
+        FeatureSamplesLabel.Text = CStr(FeatureSizeSlider.Value)
     End Sub
     Private Sub ColorDiffSlider_ValueChanged(sender As Object, e As EventArgs) Handles ColorDiffSlider.ValueChanged
         task.colorDiffThreshold = ColorDiffSlider.Value

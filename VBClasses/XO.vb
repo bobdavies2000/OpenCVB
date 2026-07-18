@@ -6320,7 +6320,7 @@ Namespace VBClasses
         Public sides As New XO_FPoly_Sides
         Dim options As New Options_Features
         Public Sub New()
-            task.FeatureSampleSize = 30
+            task.fOptions.FeatureSizeSlider.Value = 30
             If dst2.Width >= 640 Then OptionParent.FindSlider("Resync if feature moves > X pixels").Value = 15
             If standalone Then task.gOptions.displayDst1.Checked = True
             labels = {"", "Feature Polygon with perpendicular lines for center of rotation.", "Feature polygon created by highest generation counts",
@@ -6576,7 +6576,7 @@ Namespace VBClasses
         Dim optionsEx As New Options_Features
         Public Sub New()
             center = New XO_FPoly_Center
-            task.FeatureSampleSize = 30
+            task.fOptions.FeatureSizeSlider.Value = 30
             If dst2.Width >= 640 Then OptionParent.FindSlider("Resync if feature moves > X pixels").Value = 15
             If standalone Then task.gOptions.displayDst1.Checked = True
             labels = {"", "Feature Polygon with perpendicular lines for center of rotation.",
@@ -7569,7 +7569,7 @@ Namespace VBClasses
         Dim optionsEx As New Options_Features
         Public Sub New()
             dst0 = New cv.Mat(dst0.Size(), cv.MatType.CV_32F, cv.Scalar.All(0))
-            task.FeatureSampleSize = 20
+            task.fOptions.FeatureSizeSlider.Value = 20
             labels(3) = "Feature points with anchor"
             desc = "Feature Grid: compute distances between good features from frame to frame"
         End Sub
@@ -8714,7 +8714,7 @@ Namespace VBClasses
                 If standaloneTest() Then
                     Line(dst2, lp.p1, lp.p2, task.highlight, 10, cv.LineTypes.Link8)
                 End If
-                If lpList.Count >= task.FeatureSampleSize Then Exit For
+                If lpList.Count >= task.fOptions.FeatureSizeSlider.Value Then Exit For
             Next
 
             If standaloneTest() Then dst1 = Palettize(lpRectMap)
@@ -9836,7 +9836,7 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             Static totalPixels As Integer
-            task.FeatureSampleSize = 1000 ' use as many lines as are available.
+            task.fOptions.FeatureSizeSlider.Value = 1000 ' use as many lines as are available.
             lines3DList.Clear()
             pointcloud.SetTo(0)
             totalPixels = 0
@@ -9883,7 +9883,7 @@ Namespace VBClasses
             desc = "Build the 3D lines found in Line_Basics if there is 3D info at both end points."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            task.FeatureSampleSize = 1000 ' use as many lines as are available.
+            task.fOptions.FeatureSizeSlider.Value = 1000 ' use as many lines as are available.
             lines3DList.Clear()
             Dim totalPixels As Integer
             For Each lp In task.lines.lpList
@@ -9924,7 +9924,7 @@ Namespace VBClasses
     Public Class XO_GL_Draw3DLinesAndCloud : Inherits TaskParent
         Dim line3D As New XO_Line3D_ReconstructLines
         Public Sub New()
-            task.FeatureSampleSize = 400
+            task.fOptions.FeatureSizeSlider.Value = 400
             desc = "Draw the RGB lines in SharpGL and include the line points."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -15434,15 +15434,15 @@ Namespace VBClasses
                     If intersectionPoint.X >= 0 And intersectionPoint.X < dst2.Width Then
                         If intersectionPoint.Y >= 0 And intersectionPoint.Y < dst2.Height Then
                             intersects.Add(intersectionPoint)
-                            If intersects.Count >= task.FeatureSampleSize Then Exit For
+                            If intersects.Count >= task.fOptions.FeatureSizeSlider.Value Then Exit For
                         End If
                     End If
                 Next
-                If intersects.Count >= task.FeatureSampleSize Then Exit For
+                If intersects.Count >= task.fOptions.FeatureSizeSlider.Value Then Exit For
             Next
 
             dst2 = src
-            If CountNonZero(dst3) > task.FeatureSampleSize * 10 Then dst3.SetTo(0)
+            If CountNonZero(dst3) > task.fOptions.FeatureSizeSlider.Value * 10 Then dst3.SetTo(0)
             For Each pt In intersects
                 Circle(dst2, pt, task.DotSize, task.highlight, -1, task.lineType)
                 Circle(dst3, pt, task.DotSize, white, -1, task.lineType)
@@ -16006,7 +16006,7 @@ Namespace VBClasses
         Dim options As New Options_KNN
         Dim feat As New Feature_Basics
         Public Sub New()
-            task.FeatureSampleSize = 200
+            task.fOptions.FeatureSizeSlider.Value = 200
             dotSlider = OptionParent.FindSlider("Average distance multiplier")
             If standalone Then task.gOptions.displayDst1.Checked = True
             labels = {"", "Histogram of Y-Axis camera motion", "Yellow points are good features and the white trail in the center estimates camera motion.", "Histogram of X-Axis camera motion"}

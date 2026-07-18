@@ -74,7 +74,7 @@ End Class
 
 Public Class XR_GL_Line3DNoMotionInput : Inherits TaskParent
     Public Sub New()
-        task.FeatureSampleSize = 1000 ' want all the lines 
+        task.fOptions.FeatureSizeSlider.Value = 1000 ' want all the lines 
         desc = "Build a 3D model of the lines found in the rgb data."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -187,7 +187,7 @@ Public Class XR_GL_Line3DWhite : Inherits TaskParent
     Public Sub New()
         dst2 = New Mat(dst2.Size, MatType.CV_8U, 0)
         dst3 = New Mat(dst3.Size, MatType.CV_32FC3, 0)
-        task.FeatureSampleSize = 1000 ' want all the lines 
+        task.fOptions.FeatureSizeSlider.Value = 1000 ' want all the lines 
         desc = "Build a 3D model of the lines using the task.lines.lplist."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -227,7 +227,7 @@ Public Class XR_GL_Line3DReconstructed : Inherits TaskParent
     Public Sub New()
         dst2 = New Mat(dst2.Size, MatType.CV_8U, 0)
         dst3 = New Mat(dst3.Size, MatType.CV_32FC3, 0)
-        task.FeatureSampleSize = 1000 ' want all the lines 
+        task.fOptions.FeatureSizeSlider.Value = 1000 ' want all the lines 
         desc = "Rework the cv.Point cloud data for lines to be linear in depth."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)

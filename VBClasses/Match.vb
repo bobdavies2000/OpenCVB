@@ -144,8 +144,8 @@ Public Class XR_Match_RandomTest : Inherits TaskParent
                 maxCorrelation = Single.MinValue
                 minCorrelation = Single.MaxValue
             End If
-            template = New Mat(New Size(task.FeatureSampleSize, 1), MatType.CV_32FC1)
-            src = New Mat(New Size(task.FeatureSampleSize, 1), MatType.CV_32FC1)
+            template = New Mat(New Size(task.fOptions.FeatureSizeSlider.Value, 1), MatType.CV_32FC1)
+            src = New Mat(New Size(task.fOptions.FeatureSizeSlider.Value, 1), MatType.CV_32FC1)
             Randn(template, 100, 25)
             Randn(src, 0, 25)
         End If
@@ -166,7 +166,7 @@ Public Class XR_Match_RandomTest : Inherits TaskParent
             SetTrueText("The expectation is that the " + CStr(template.Cols) + " random test samples should produce" + vbCrLf +
                             " a correlation coefficient near zero" + vbCrLf +
                             "The larger the sample size, the closer to zero the correlation will be. " + vbCrLf +
-                            "Adjust task.featureSampleSize to test further." + vbCrLf +
+                            "Adjust 'Feature Samples' in the Feature Options to test further." + vbCrLf +
                             "There should also be symmetry in the min and max around zero." + vbCrLf + vbCrLf +
                             "Min Correlation = " + minCorrelation.ToString(fmt3) + vbCrLf +
                             "Max Correlation = " + maxCorrelation.ToString(fmt3), 3)

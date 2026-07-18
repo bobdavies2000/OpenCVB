@@ -353,12 +353,12 @@ Partial Class OptionsFeatures
         ' 
         FeatureSizeSlider.Location = New Point(220, 575)
         FeatureSizeSlider.Margin = New Padding(4)
-        FeatureSizeSlider.Maximum = 30
+        FeatureSizeSlider.Maximum = 1000
         FeatureSizeSlider.Minimum = 1
         FeatureSizeSlider.Name = "FeatureSizeSlider"
         FeatureSizeSlider.Size = New Size(550, 69)
         FeatureSizeSlider.TabIndex = 1008
-        FeatureSizeSlider.Value = 3
+        FeatureSizeSlider.Value = 50
         ' 
         ' Label11
         ' 

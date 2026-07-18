@@ -109,7 +109,7 @@ Public Class Feature_GoodFeatures : Inherits TaskParent
     Public options As New Options_Features
     Public features As New List(Of cv.Point)
     Public Sub New()
-        task.FeatureSampleSize = 50
+        task.fOptions.FeatureSizeSlider.Value = 50
         labels(2) = "Good features found with GoodFeaturesToTrack"
         desc = "Find good features in the image using OpenCV GoodFeaturesToTrack."
     End Sub
@@ -117,7 +117,7 @@ Public Class Feature_GoodFeatures : Inherits TaskParent
         options.Run()
 
         Dim gray = If(src.Channels() = 1, src, task.gray)
-        Dim points = GoodFeaturesToTrack(gray, task.FeatureSampleSize, options.quality,
+        Dim points = GoodFeaturesToTrack(gray, task.fOptions.FeatureSizeSlider.Value, options.quality,
                                          options.minDistance, New Mat,
                                          options.blockSize, False, options.k)
 
@@ -130,7 +130,7 @@ Public Class Feature_GoodFeatures : Inherits TaskParent
         Next
 
         labels(2) = CStr(features.Count) + " good features found; " +
-                    CStr(task.FeatureSampleSize) + " requested."
+                    CStr(task.fOptions.FeatureSizeSlider.Value) + " requested."
     End Sub
 End Class
 
@@ -637,7 +637,7 @@ Public Class Feature_Matching : Inherits TaskParent
     Dim match As New Match_Basics
     Dim feat As New Feature_Basics
     Public Sub New()
-        task.FeatureSampleSize = 150
+        task.fOptions.FeatureSizeSlider.Value = 150
         desc = "Use correlation coefficient to keep features from frame to frame."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -661,7 +661,7 @@ Public Class Feature_Matching : Inherits TaskParent
         labels(2) = "There were " + CStr(features.Count) + " features identified and " + CStr(matched.Count) +
                         " were matched to the previous frame"
 
-        If matched.Count < task.FeatureSampleSize / 2 Then
+        If matched.Count < task.fOptions.FeatureSizeSlider.Value / 2 Then
             feat.Run(src)
             features = feat.features
         Else
@@ -1038,6 +1038,6 @@ Public Class Feature_Points : Inherits TaskParent
         For Each pt In feat.features
         Circle(dst2, pt, task.DotSize, task.highlight, -1, task.lineType)
         Next
-        labels(2) = CStr(feat.features.Count) + " targets were present with " + CStr(task.FeatureSampleSize) + " requested."
+        labels(2) = CStr(feat.features.Count) + " targets were present with " + CStr(task.fOptions.FeatureSizeSlider.Value) + " requested."
     End Sub
 End Class
