@@ -126,7 +126,7 @@
     Private Sub FeatureSampleSize_ValueChanged(sender As Object, e As EventArgs) Handles FrameHistoryCount.ValueChanged
         task.FeatureSampleSize = FrameHistoryCount.Value
         task.optionsChanged = True
-        FeatureSampleSizeLabel.Text = CStr(task.FeatureSampleSize)
+        FrameHistoryLabel.Text = CStr(task.FeatureSampleSize)
     End Sub
     Private Sub ColorDiffSlider_ValueChanged(sender As Object, e As EventArgs) Handles ColorDiffSlider.ValueChanged
         task.colorDiffThreshold = ColorDiffSlider.Value

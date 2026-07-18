@@ -27,7 +27,7 @@ Partial Class OptionsFeatures
         EdgeMethods = New ComboBox()
         Label1 = New Label()
         Label2 = New Label()
-        FeatureSampleSizeLabel = New Label()
+        FrameHistoryLabel = New Label()
         FrameHistoryCount = New TrackBar()
         Label5 = New Label()
         FeatureCorrelationLabel = New Label()
@@ -51,36 +51,40 @@ Partial Class OptionsFeatures
         LineCombo = New ComboBox()
         Lab9 = New Label()
         Label7 = New Label()
+        FeatureSamplesLabel = New Label()
+        FeatureSizeSlider = New TrackBar()
+        Label11 = New Label()
         CType(FrameHistoryCount, ComponentModel.ISupportInitialize).BeginInit()
         CType(MatchCorrSlider, ComponentModel.ISupportInitialize).BeginInit()
         CType(ColorDiffSlider, ComponentModel.ISupportInitialize).BeginInit()
         CType(MotionPixelSlider, ComponentModel.ISupportInitialize).BeginInit()
         CType(ReductionColor, ComponentModel.ISupportInitialize).BeginInit()
         CType(ReductionDepth, ComponentModel.ISupportInitialize).BeginInit()
+        CType(FeatureSizeSlider, ComponentModel.ISupportInitialize).BeginInit()
         SuspendLayout()
         ' 
         ' FeatureMethod
         ' 
         FeatureMethod.FormattingEnabled = True
-        FeatureMethod.Location = New Point(208, 3)
+        FeatureMethod.Location = New Point(189, 7)
         FeatureMethod.Margin = New Padding(4)
         FeatureMethod.Name = "FeatureMethod"
-        FeatureMethod.Size = New Size(294, 38)
+        FeatureMethod.Size = New Size(227, 38)
         FeatureMethod.TabIndex = 0
         ' 
         ' EdgeMethods
         ' 
         EdgeMethods.FormattingEnabled = True
-        EdgeMethods.Location = New Point(208, 48)
+        EdgeMethods.Location = New Point(189, 52)
         EdgeMethods.Margin = New Padding(4)
         EdgeMethods.Name = "EdgeMethods"
-        EdgeMethods.Size = New Size(294, 38)
+        EdgeMethods.Size = New Size(227, 38)
         EdgeMethods.TabIndex = 1
         ' 
         ' Label1
         ' 
         Label1.AutoSize = True
-        Label1.Location = New Point(55, 53)
+        Label1.Location = New Point(36, 57)
         Label1.Margin = New Padding(4, 0, 4, 0)
         Label1.Name = "Label1"
         Label1.Size = New Size(145, 30)
@@ -90,26 +94,26 @@ Partial Class OptionsFeatures
         ' Label2
         ' 
         Label2.AutoSize = True
-        Label2.Location = New Point(31, 11)
+        Label2.Location = New Point(12, 15)
         Label2.Margin = New Padding(4, 0, 4, 0)
         Label2.Name = "Label2"
         Label2.Size = New Size(169, 30)
         Label2.TabIndex = 3
         Label2.Text = "Feature Method"
         ' 
-        ' FeatureSampleSizeLabel
+        ' FrameHistoryLabel
         ' 
-        FeatureSampleSizeLabel.AutoSize = True
-        FeatureSampleSizeLabel.Location = New Point(793, 330)
-        FeatureSampleSizeLabel.Margin = New Padding(4, 0, 4, 0)
-        FeatureSampleSizeLabel.Name = "FeatureSampleSizeLabel"
-        FeatureSampleSizeLabel.Size = New Size(54, 30)
-        FeatureSampleSizeLabel.TabIndex = 9
-        FeatureSampleSizeLabel.Text = "lab2"
+        FrameHistoryLabel.AutoSize = True
+        FrameHistoryLabel.Location = New Point(778, 251)
+        FrameHistoryLabel.Margin = New Padding(4, 0, 4, 0)
+        FrameHistoryLabel.Name = "FrameHistoryLabel"
+        FrameHistoryLabel.Size = New Size(54, 30)
+        FrameHistoryLabel.TabIndex = 9
+        FrameHistoryLabel.Text = "lab2"
         ' 
         ' FrameHistoryCount
         ' 
-        FrameHistoryCount.Location = New Point(235, 330)
+        FrameHistoryCount.Location = New Point(220, 251)
         FrameHistoryCount.Margin = New Padding(4)
         FrameHistoryCount.Maximum = 30
         FrameHistoryCount.Minimum = 1
@@ -120,7 +124,7 @@ Partial Class OptionsFeatures
         ' 
         ' Label5
         ' 
-        Label5.Location = New Point(78, 330)
+        Label5.Location = New Point(63, 251)
         Label5.Margin = New Padding(4, 0, 4, 0)
         Label5.Name = "Label5"
         Label5.Size = New Size(157, 30)
@@ -130,7 +134,7 @@ Partial Class OptionsFeatures
         ' FeatureCorrelationLabel
         ' 
         FeatureCorrelationLabel.AutoSize = True
-        FeatureCorrelationLabel.Location = New Point(793, 574)
+        FeatureCorrelationLabel.Location = New Point(778, 487)
         FeatureCorrelationLabel.Margin = New Padding(4, 0, 4, 0)
         FeatureCorrelationLabel.Name = "FeatureCorrelationLabel"
         FeatureCorrelationLabel.Size = New Size(54, 30)
@@ -139,7 +143,7 @@ Partial Class OptionsFeatures
         ' 
         ' MatchCorrSlider
         ' 
-        MatchCorrSlider.Location = New Point(235, 574)
+        MatchCorrSlider.Location = New Point(220, 487)
         MatchCorrSlider.Margin = New Padding(4)
         MatchCorrSlider.Maximum = 100
         MatchCorrSlider.Name = "MatchCorrSlider"
@@ -149,7 +153,7 @@ Partial Class OptionsFeatures
         ' 
         ' Label9
         ' 
-        Label9.Location = New Point(34, 574)
+        Label9.Location = New Point(19, 487)
         Label9.Margin = New Padding(4, 0, 4, 0)
         Label9.Name = "Label9"
         Label9.Size = New Size(193, 64)
@@ -181,7 +185,7 @@ Partial Class OptionsFeatures
         ' Label4
         ' 
         Label4.AutoSize = True
-        Label4.Location = New Point(34, 94)
+        Label4.Location = New Point(436, 6)
         Label4.Margin = New Padding(4, 0, 4, 0)
         Label4.Name = "Label4"
         Label4.Size = New Size(166, 30)
@@ -191,16 +195,16 @@ Partial Class OptionsFeatures
         ' Color8USource
         ' 
         Color8USource.FormattingEnabled = True
-        Color8USource.Location = New Point(208, 94)
+        Color8USource.Location = New Point(610, 6)
         Color8USource.Margin = New Padding(4)
         Color8USource.Name = "Color8USource"
-        Color8USource.Size = New Size(294, 38)
+        Color8USource.Size = New Size(227, 38)
         Color8USource.TabIndex = 22
         ' 
         ' ColorDiffLabel
         ' 
         ColorDiffLabel.AutoSize = True
-        ColorDiffLabel.Location = New Point(793, 408)
+        ColorDiffLabel.Location = New Point(778, 329)
         ColorDiffLabel.Margin = New Padding(4, 0, 4, 0)
         ColorDiffLabel.Name = "ColorDiffLabel"
         ColorDiffLabel.Size = New Size(54, 30)
@@ -209,7 +213,7 @@ Partial Class OptionsFeatures
         ' 
         ' ColorDiffSlider
         ' 
-        ColorDiffSlider.Location = New Point(235, 408)
+        ColorDiffSlider.Location = New Point(220, 329)
         ColorDiffSlider.Margin = New Padding(4)
         ColorDiffSlider.Maximum = 50
         ColorDiffSlider.Name = "ColorDiffSlider"
@@ -220,7 +224,7 @@ Partial Class OptionsFeatures
         ' Label6
         ' 
         Label6.AutoSize = True
-        Label6.Location = New Point(18, 408)
+        Label6.Location = New Point(3, 329)
         Label6.Margin = New Padding(4, 0, 4, 0)
         Label6.Name = "Label6"
         Label6.Size = New Size(208, 30)
@@ -229,7 +233,7 @@ Partial Class OptionsFeatures
         ' 
         ' MotionThreshold
         ' 
-        MotionThreshold.Location = New Point(84, 474)
+        MotionThreshold.Location = New Point(69, 395)
         MotionThreshold.Margin = New Padding(4, 0, 4, 0)
         MotionThreshold.Name = "MotionThreshold"
         MotionThreshold.Size = New Size(143, 64)
@@ -239,7 +243,7 @@ Partial Class OptionsFeatures
         ' MotionPixelLabel1
         ' 
         MotionPixelLabel1.AutoSize = True
-        MotionPixelLabel1.Location = New Point(793, 485)
+        MotionPixelLabel1.Location = New Point(778, 406)
         MotionPixelLabel1.Margin = New Padding(4, 0, 4, 0)
         MotionPixelLabel1.Name = "MotionPixelLabel1"
         MotionPixelLabel1.Size = New Size(54, 30)
@@ -248,7 +252,7 @@ Partial Class OptionsFeatures
         ' 
         ' MotionPixelSlider
         ' 
-        MotionPixelSlider.Location = New Point(235, 485)
+        MotionPixelSlider.Location = New Point(220, 406)
         MotionPixelSlider.Margin = New Padding(4)
         MotionPixelSlider.Maximum = 100
         MotionPixelSlider.Name = "MotionPixelSlider"
@@ -258,7 +262,7 @@ Partial Class OptionsFeatures
         ' 
         ' ReductionColor
         ' 
-        ReductionColor.Location = New Point(235, 194)
+        ReductionColor.Location = New Point(220, 115)
         ReductionColor.Margin = New Padding(4)
         ReductionColor.Maximum = 255
         ReductionColor.Minimum = 1
@@ -269,7 +273,7 @@ Partial Class OptionsFeatures
         ' 
         ' ReductionDepth
         ' 
-        ReductionDepth.Location = New Point(235, 261)
+        ReductionDepth.Location = New Point(220, 182)
         ReductionDepth.Margin = New Padding(4)
         ReductionDepth.Maximum = 1000
         ReductionDepth.Minimum = 1
@@ -280,7 +284,7 @@ Partial Class OptionsFeatures
         ' 
         ' Label8
         ' 
-        Label8.Location = New Point(55, 203)
+        Label8.Location = New Point(40, 124)
         Label8.Margin = New Padding(4, 0, 4, 0)
         Label8.Name = "Label8"
         Label8.Size = New Size(180, 30)
@@ -290,7 +294,7 @@ Partial Class OptionsFeatures
         ' Lab1
         ' 
         Lab1.AutoSize = True
-        Lab1.Location = New Point(793, 193)
+        Lab1.Location = New Point(778, 114)
         Lab1.Margin = New Padding(4, 0, 4, 0)
         Lab1.Name = "Lab1"
         Lab1.Size = New Size(54, 30)
@@ -300,7 +304,7 @@ Partial Class OptionsFeatures
         ' Label10
         ' 
         Label10.AutoSize = True
-        Label10.Location = New Point(34, 140)
+        Label10.Location = New Point(436, 52)
         Label10.Margin = New Padding(4, 0, 4, 0)
         Label10.Name = "Label10"
         Label10.Size = New Size(154, 30)
@@ -310,16 +314,16 @@ Partial Class OptionsFeatures
         ' LineCombo
         ' 
         LineCombo.FormattingEnabled = True
-        LineCombo.Location = New Point(208, 141)
+        LineCombo.Location = New Point(610, 53)
         LineCombo.Margin = New Padding(4)
         LineCombo.Name = "LineCombo"
-        LineCombo.Size = New Size(294, 38)
+        LineCombo.Size = New Size(227, 38)
         LineCombo.TabIndex = 1002
         ' 
         ' Lab9
         ' 
         Lab9.AutoSize = True
-        Lab9.Location = New Point(793, 260)
+        Lab9.Location = New Point(778, 181)
         Lab9.Margin = New Padding(4, 0, 4, 0)
         Lab9.Name = "Lab9"
         Lab9.Size = New Size(54, 30)
@@ -328,18 +332,51 @@ Partial Class OptionsFeatures
         ' 
         ' Label7
         ' 
-        Label7.Location = New Point(34, 275)
+        Label7.Location = New Point(19, 196)
         Label7.Margin = New Padding(4, 0, 4, 0)
         Label7.Name = "Label7"
         Label7.Size = New Size(192, 30)
         Label7.TabIndex = 1004
         Label7.Text = "Depth Reduction"
         ' 
+        ' FeatureSamplesLabel
+        ' 
+        FeatureSamplesLabel.AutoSize = True
+        FeatureSamplesLabel.Location = New Point(778, 575)
+        FeatureSamplesLabel.Margin = New Padding(4, 0, 4, 0)
+        FeatureSamplesLabel.Name = "FeatureSamplesLabel"
+        FeatureSamplesLabel.Size = New Size(54, 30)
+        FeatureSamplesLabel.TabIndex = 1009
+        FeatureSamplesLabel.Text = "lab2"
+        ' 
+        ' FeatureSizeSlider
+        ' 
+        FeatureSizeSlider.Location = New Point(220, 575)
+        FeatureSizeSlider.Margin = New Padding(4)
+        FeatureSizeSlider.Maximum = 30
+        FeatureSizeSlider.Minimum = 1
+        FeatureSizeSlider.Name = "FeatureSizeSlider"
+        FeatureSizeSlider.Size = New Size(550, 69)
+        FeatureSizeSlider.TabIndex = 1008
+        FeatureSizeSlider.Value = 3
+        ' 
+        ' Label11
+        ' 
+        Label11.Location = New Point(36, 575)
+        Label11.Margin = New Padding(4, 0, 4, 0)
+        Label11.Name = "Label11"
+        Label11.Size = New Size(184, 30)
+        Label11.TabIndex = 1007
+        Label11.Text = "Feature Samples"
+        ' 
         ' OptionsFeatures
         ' 
         AutoScaleDimensions = New SizeF(12F, 30F)
         AutoScaleMode = AutoScaleMode.Font
         ClientSize = New Size(1205, 674)
+        Controls.Add(FeatureSamplesLabel)
+        Controls.Add(FeatureSizeSlider)
+        Controls.Add(Label11)
         Controls.Add(Lab9)
         Controls.Add(Label7)
         Controls.Add(Label10)
@@ -361,7 +398,7 @@ Partial Class OptionsFeatures
         Controls.Add(FeatureCorrelationLabel)
         Controls.Add(MatchCorrSlider)
         Controls.Add(Label9)
-        Controls.Add(FeatureSampleSizeLabel)
+        Controls.Add(FrameHistoryLabel)
         Controls.Add(FrameHistoryCount)
         Controls.Add(Label5)
         Controls.Add(Label2)
@@ -378,6 +415,7 @@ Partial Class OptionsFeatures
         CType(MotionPixelSlider, ComponentModel.ISupportInitialize).EndInit()
         CType(ReductionColor, ComponentModel.ISupportInitialize).EndInit()
         CType(ReductionDepth, ComponentModel.ISupportInitialize).EndInit()
+        CType(FeatureSizeSlider, ComponentModel.ISupportInitialize).EndInit()
         ResumeLayout(False)
         PerformLayout()
     End Sub
@@ -386,7 +424,7 @@ Partial Class OptionsFeatures
     Friend WithEvents EdgeMethods As ComboBox
     Friend WithEvents Label1 As Label
     Friend WithEvents Label2 As Label
-    Friend WithEvents FeatureSampleSizeLabel As Label
+    Friend WithEvents FrameHistoryLabel As Label
     Friend WithEvents FrameHistoryCount As TrackBar
     Friend WithEvents Label5 As Label
     Friend WithEvents FeatureCorrelationLabel As Label
@@ -411,4 +449,7 @@ Partial Class OptionsFeatures
     Friend WithEvents Lab1 As Label
     Friend WithEvents Label10 As Label
     Friend WithEvents LineCombo As ComboBox
+    Friend WithEvents FeatureSamplesLabel As Label
+    Friend WithEvents FeatureSizeSlider As TrackBar
+    Friend WithEvents Label11 As Label
 End Class
