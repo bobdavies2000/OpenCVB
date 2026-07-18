@@ -237,6 +237,7 @@ ExPhoto_Inpaint
 Feature_Basics
 Feature_Bricks
 Feature_Delaunay
+Feature_GoodFeatures
 Feature_KNN
 Feature_LeftRight
 Feature_LeftRightCorrelation

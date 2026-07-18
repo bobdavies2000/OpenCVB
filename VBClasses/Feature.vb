@@ -105,6 +105,40 @@ End Class
 
 
 
+Public Class Feature_GoodFeatures : Inherits TaskParent
+    Public options As New Options_Features
+    Public features As New List(Of cv.Point)
+    Public Sub New()
+        task.FeatureSampleSize = 50
+        labels(2) = "Good features found with GoodFeaturesToTrack"
+        desc = "Find good features in the image using OpenCV GoodFeaturesToTrack."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        options.Run()
+
+        Dim gray = If(src.Channels() = 1, src, task.gray)
+        Dim points = GoodFeaturesToTrack(gray, task.FeatureSampleSize, options.quality,
+                                         options.minDistance, New Mat,
+                                         options.blockSize, False, options.k)
+
+        features.Clear()
+        dst2 = If(src.Channels() = 1, task.color.Clone, src.Clone)
+        For Each pt In points
+            Dim feature = New cv.Point(CInt(pt.X), CInt(pt.Y))
+            features.Add(feature)
+            Circle(dst2, feature, task.DotSize, task.highlight, -1, task.lineType)
+        Next
+
+        labels(2) = CStr(features.Count) + " good features found; " +
+                    CStr(task.FeatureSampleSize) + " requested."
+    End Sub
+End Class
+
+
+
+
+
+
 Public Class XR_Feature_Basics : Inherits TaskParent
     Implements IDisposable
     Public options As New Options_Features
@@ -196,7 +230,7 @@ Public Class XR_Feature_Basics : Inherits TaskParent
         features = New List(Of Point2f)(sortByGrid.Values)
 
         For Each pt In features
-        Circle(dst2, pt, task.DotSize, task.highlight, -1, task.lineType)
+            Circle(dst2, pt, task.DotSize, task.highlight, -1, task.lineType)
         Next
 
         labels(2) = strOut

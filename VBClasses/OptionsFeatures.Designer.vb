@@ -337,9 +337,9 @@ Partial Class OptionsFeatures
         ' 
         ' OptionsFeatures
         ' 
-        AutoScaleDimensions = New SizeF(12.0F, 30.0F)
+        AutoScaleDimensions = New SizeF(12F, 30F)
         AutoScaleMode = AutoScaleMode.Font
-        ClientSize = New Size(1205, 665)
+        ClientSize = New Size(1205, 674)
         Controls.Add(Lab9)
         Controls.Add(Label7)
         Controls.Add(Label10)

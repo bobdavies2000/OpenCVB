@@ -7755,6 +7755,7 @@ Public Class Options_Features : Inherits OptionParent
     Public Sub New()
         If sliders.Setup(traceName) Then
             If task.cols <= 336 Then minDistance = 10 ' small image, small distances
+            sliders.setupTrackBar("blockSize", 0, 100, blockSize)
             sliders.setupTrackBar("Min Distance", 0, 100, minDistance)
             sliders.setupTrackBar("Depth Difference Threshold (mm)", 1, 1000, 100)
             sliders.setupTrackBar("Quality Level", 1, 100, quality * 100)
@@ -7772,6 +7773,7 @@ Public Class Options_Features : Inherits OptionParent
         Static diffSlider = OptionParent.FindSlider("Depth Difference Threshold (mm)")
         Static qualitySlider = OptionParent.FindSlider("Quality Level")
         Static kSlider = OptionParent.FindSlider("k X1000")
+        Static blockSlider = OptionParent.FindSlider("blockSize")
         k = kSlider.value / 1000
 
         quality = qualitySlider.Value / 100
@@ -7781,6 +7783,7 @@ Public Class Options_Features : Inherits OptionParent
 
         task.depthDiffMeters = diffSlider.value / 1000
         minDistance = minSlider.value
+        blockSize = blockSlider.value
     End Sub
 End Class
 
