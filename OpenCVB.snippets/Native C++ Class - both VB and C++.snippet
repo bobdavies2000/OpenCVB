@@ -47,7 +47,7 @@ Namespace VBClasses
             desc = "description"
 	      End Sub
         Public Overrides Sub RunAlg(src as cv.Mat)
-            If src.Channels <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+            If src.Channels <> 1 Then CvtColor(src, src, cv.ColorConversionCodes.BGR2GRAY)
 
             Dim cppData(src.Total * src.ElemSize - 1) As Byte
             Marshal.Copy(src.Data, cppData, 0, cppData.Length - 1)

@@ -1,4 +1,5 @@
 Imports OpenCvSharp : Imports OpenCvSharp.Cv2 : Imports cv = OpenCvSharp
+Imports System.Runtime.InteropServices
 Public Class RedC_Basics : Inherits TaskParent
     Dim color8u As New Color8U_Basics
     Public rcMap As Mat = New Mat(dst2.Size, MatType.CV_8U, 0)
@@ -273,5 +274,63 @@ Public Class RedC_TrackHull : Inherits TaskParent
         lastCenter = Utility_Basics.ComputeHullCentroid(rcD.hull.ToArray, rcD)
         lastMapID = rcD.mapID
         lastRect = rcD.rect
+    End Sub
+End Class
+
+
+
+
+
+Public Class RedC_Neighbors : Inherits TaskParent
+    Dim redC As New RedC_Basics
+    Dim clickPoint As cv.Point
+    Public Sub New()
+        If standalone Then task.gOptions.displayDst1.Checked = True
+        dst0 = New cv.Mat(dst0.Size, cv.MatType.CV_32S, 0)
+        desc = "Find the neighbors for the selected cell."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        redC.Run(src)
+        dst2 = redC.dst2
+        labels(2) = redC.labels(2)
+
+        dst0.SetTo(0)
+        For i = redC.rcList.Count - 1 To 0 Step -1
+            Dim rc = redC.rcList(i)
+            FillPoly(dst0(rc.rect), {rc.hull}, rc.index)
+        Next
+
+        Dim index As Integer
+        If task.mouseClickFlag Then clickPoint = task.clickPoint
+        index = dst0.Get(Of Integer)(clickPoint.Y, clickPoint.X)
+
+        Dim rcD = redC.rcList(index)
+        SetTrueText(rcD.displayCell() + vbCrLf, 1)
+
+        Dim neighbors As New List(Of Integer)
+        For Each pt In rcD.contour
+            pt.X += rcD.rect.X
+            pt.Y += rcD.rect.Y
+            Dim rect = ValidateRect(New cv.Rect(pt.X - task.gridWH / 2, pt.Y - task.gridWH / 2, task.gridWH, task.gridWH))
+            Dim pixels(rect.Width * rect.Height - 1) As Integer
+            Dim tmp = dst0(rect).Clone
+            Marshal.Copy(tmp.Data, pixels, 0, pixels.Length)
+
+            For i = 0 To pixels.Count - 1
+                If pixels(i) = 0 Then Continue For
+                If neighbors.Contains(pixels(i)) = False Then neighbors.Add(pixels(i))
+            Next
+        Next
+
+        dst3.SetTo(0)
+        dst3(rcD.rect).SetTo(task.scalarColors(rcD.mapID), rcD.mask)
+        For i = 0 To neighbors.Count - 1
+            Dim rc = redC.rcList(neighbors(i))
+            dst3(rc.rect).SetTo(task.scalarColors(rc.mapID), rc.mask)
+        Next
+
+        dst3(rcD.rect).SetTo(task.highlight, rcD.mask)
+        Circle(dst3, clickPoint, task.DotSize + 2, white, -1)
+        labels(3) = CStr(neighbors.Count) + " neighbors were present."
     End Sub
 End Class
