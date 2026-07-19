@@ -1578,7 +1578,7 @@ Public Class Histogram_Depth : Inherits TaskParent
             strOut = "Expected sample count (non-zero task.pcSplit(2) entries):" + vbTab + CStr(expected) + vbCrLf
             strOut += "Histogram sum (ranges can reduce):" + vbTab + vbTab + vbTab + CStr(actual) + vbCrLf
             strOut += "Difference:" + vbTab + vbTab + vbTab + vbTab + vbTab + vbTab + CStr(Math.Abs(actual - expected)) + vbCrLf
-            'strOut += "Count nonzero entries in task.maxDepthMask: " + vbTab + vbTab + CStr(task.maxDepthMask.CountNonZero)
+            'strOut += "Count nonzero entries in task.depthClippedMask: " + vbTab + vbTab + CStr(task.depthClippedMask.CountNonZero)
         End If
         SetTrueText(strOut, 3)
         labels(2) = "Histogram Depth to " + task.MaxZmeters.ToString("0.0") + " m"

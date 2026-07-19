@@ -581,7 +581,7 @@ Public Class XR_BackProject_InRangeDepthTest : Inherits TaskParent
         Else
             InRange(task.pcSplit(2), minRange, maxRange, dst2)
             ConvertScaleAbs(dst2, dst2, 255)
-            If maxRange >= task.MaxZmeters Then dst2 = dst2 Or task.maxDepthMask
+            If maxRange >= task.MaxZmeters Then dst2 = dst2 Or task.depthClippedMask
         End If
 
         labels(2) = "Histogram bin " + CStr(index) + " for range from " + minRange.ToString(fmt1) + " m to " +
@@ -616,7 +616,7 @@ Public Class XR_BackProject_InRangeDepth : Inherits TaskParent
             InRange(task.pcSplit(2), minRange, maxRange, dst1)
             ConvertScaleAbs(dst1, dst1, 255)
             dst1 *= i
-            If maxRange >= task.MaxZmeters Then dst1 = dst1 Or task.maxDepthMask
+            If maxRange >= task.MaxZmeters Then dst1 = dst1 Or task.depthClippedMask
             binCounts.Add(CountNonZero(dst1))
             dst2.SetTo(i, dst1)
         Next

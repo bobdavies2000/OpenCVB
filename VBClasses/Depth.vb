@@ -489,13 +489,13 @@ Public Class XR_Depth_MaxMask : Inherits TaskParent
     Dim contour As New Contour_Regions
     Public Sub New()
         labels = {"", "", "Depth that is too far", "Contour of depth that is too far..."}
-        desc = "Display the task.maxDepthMask and its contour containing depth that is greater than maxdepth (global setting)"
+        desc = "Display the task.depthClippedMask and its contour containing depth that is greater than maxdepth (global setting)"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst2 = src
 
-        dst2.SetTo(white, task.maxDepthMask)
-        contour.Run(task.maxDepthMask)
+        dst2.SetTo(white, task.depthClippedMask)
+        contour.Run(task.depthClippedMask)
         dst3.SetTo(0)
         For Each c In contour.contourList
             Dim hull = ConvexHull(c, True).ToList

@@ -785,8 +785,6 @@ Public Class Cloud_Gravity_TA : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         originalPointcloud = task.pointCloud.Clone
-        InRange(originalPointcloud, task.MaxZmeters, 10000, task.maxDepthMask)
-        ConvertScaleAbs(task.maxDepthMask, task.maxDepthMask)
 
         If task.optionsChanged Then
             If task.rangesCloud Is Nothing Then
@@ -837,6 +835,9 @@ Public Class Cloud_Gravity_TA : Inherits TaskParent
 
             Merge(task.pcSplit, task.pointCloud)
         End If
+
+        InRange(task.pcSplit(2), task.MaxZmeters, 10000, task.depthClippedMask)
+        ConvertScaleAbs(task.depthClippedMask, task.depthClippedMask)
     End Sub
 End Class
 

@@ -39,7 +39,7 @@ Public Class PlotOpenCV_Depth : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If src.Type <> MatType.CV_32F Then src = task.pcSplit(2)
-        'src.SetTo(task.MaxZmeters, task.maxDepthMask)
+        'src.SetTo(task.MaxZmeters, task.depthClippedMask)
 
         hist.Run(src)
         plotDepth.srcX.Clear()

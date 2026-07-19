@@ -39,7 +39,7 @@ Public Class Hist3Dcloud_Basics : Inherits TaskParent
         ConvertScaleAbs(dst2, dst2)
 
         dst2.SetTo(0, task.noDepthMask)
-        'dst2.SetTo(classCount, task.maxDepthMask)
+        'dst2.SetTo(classCount, task.depthClippedMask)
         dst3 = Palettize(dst2)
 
         labels(2) = simK.labels(2) + " with " + CStr(bins) + " histogram bins"

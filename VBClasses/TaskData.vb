@@ -133,7 +133,7 @@ Partial Public Class AlgorithmTask
     ' transformation matrix to convert cv.Point cloud to be vertical according to gravity.
     Public gMatrix As New Mat
     Public IMU_Rotation As System.Numerics.Quaternion
-    Public maxDepthMask As New Mat
+    Public depthClippedMask As New Mat
 
     Public camMotionPixels As Single ' distance in pixels that the camera has moved.
     Public camDirection As Single ' camera direction in radians.

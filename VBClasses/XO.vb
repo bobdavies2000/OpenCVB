@@ -14108,12 +14108,12 @@ Namespace VBClasses
             Split(task.pointCloud, task.pcSplit)
 
             If task.optionsChanged Then
-                task.maxDepthMask = New cv.Mat(task.pcSplit(2).Size, cv.MatType.CV_8U, 0)
+                task.depthClippedMask = New cv.Mat(task.pcSplit(2).Size, cv.MatType.CV_8U, 0)
             End If
             'If task.gOptions.TruncateDepth.Checked Then
             '    task.pcSplit(2) = task.pcSplit(2).Threshold(task.MaxZmeters,
             '                                            task.MaxZmeters, cv.ThresholdTypes.Trunc)
-            '    task.maxDepthMask = task.pcSplit(2).InRange(task.MaxZmeters,
+            '    task.depthClippedMask = task.pcSplit(2).InRange(task.MaxZmeters,
             '                                            task.MaxZmeters).ConvertScaleAbs()
             '    Merge(task.pcSplit, task.pointCloud)
             'End If
@@ -15298,7 +15298,7 @@ Namespace VBClasses
             desc = "Find the longest line in BGR and use it to measure the average depth for the line"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            bricks.run(src)
+            bricks.Run(src)
             If task.lines.lpList.Count <= 1 Then Exit Sub
             Dim lp = task.lines.lpList(0)
             dst2 = src
@@ -16441,8 +16441,8 @@ Namespace VBClasses
                        "motion.  The result is sloppy and should not be used."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            bricks.run(src)
-            bricks.run(task.gray)
+            bricks.Run(src)
+            bricks.Run(task.gray)
             dst2 = task.motion.motionMask
             dst1 = task.rightView
 
@@ -17427,7 +17427,7 @@ Namespace VBClasses
             desc = "Use RGB motion bricks to determine if depth has changed in any gRect."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            bricks.run(src)
+            bricks.Run(src)
             If task.heartBeatLT Or task.fOptions.FrameHistoryCount.Value < 3 Then task.pointCloud.CopyTo(dst2)
             If task.motion.motionSort.Count = 0 Then Exit Sub ' no change...
 
@@ -17618,12 +17618,12 @@ Namespace VBClasses
             Split(task.pointCloud, task.pcSplit)
 
             If task.optionsChanged Then
-                task.maxDepthMask = New cv.Mat(task.pcSplit(2).Size, cv.MatType.CV_8U, 0)
+                task.depthClippedMask = New cv.Mat(task.pcSplit(2).Size, cv.MatType.CV_8U, 0)
             End If
             'If task.gOptions.TruncateDepth.Checked Then
             '    task.pcSplit(2) = task.pcSplit(2).Threshold(task.MaxZmeters,
             '                                                task.MaxZmeters, cv.ThresholdTypes.Trunc)
-            '    task.maxDepthMask = task.pcSplit(2).InRange(task.MaxZmeters,
+            '    task.depthClippedMask = task.pcSplit(2).InRange(task.MaxZmeters,
             '                                                task.MaxZmeters).ConvertScaleAbs()
             '    Merge(task.pcSplit, task.pointCloud)
             'End If
@@ -17670,7 +17670,7 @@ Namespace VBClasses
                 dst3 = originalPointcloud.Clone
 
                 Static diff As New Diff_Depth32f
-                Dim splitMats() As cv.mat = Split(dst3)
+                Dim splitMats() As cv.Mat = Split(dst3)
                 diff.lastFrame = splitMats(2)
                 diff.Run(task.pcSplit(2))
             End If
@@ -18901,13 +18901,13 @@ Namespace VBClasses
             Split(task.pointCloud, task.pcSplit)
 
             If task.optionsChanged Then
-                task.maxDepthMask = New cv.Mat(task.pcSplit(2).Size, cv.MatType.CV_8U, 0)
+                task.depthClippedMask = New cv.Mat(task.pcSplit(2).Size, cv.MatType.CV_8U, 0)
             End If
 
             'If task.gOptions.TruncateDepth.Checked Then
             '    task.pcSplit(2) = task.pcSplit(2).Threshold(task.MaxZmeters,
             '                                              task.MaxZmeters, cv.ThresholdTypes.Trunc)
-            '    task.maxDepthMask = task.pcSplit(2).InRange(task.MaxZmeters,
+            '    task.depthClippedMask = task.pcSplit(2).InRange(task.MaxZmeters,
             '                                              task.MaxZmeters).ConvertScaleAbs()
             '    Merge(task.pcSplit, task.pointCloud)
             'End If

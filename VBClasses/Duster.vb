@@ -17,7 +17,7 @@ Public Class Duster_Basics : Inherits TaskParent
 
         Merge(task.pcSplit, dst2)
         dst2.SetTo(0, Not dust.dst0)
-        dst2.SetTo(0, task.maxDepthMask)
+        dst2.SetTo(0, task.depthClippedMask)
 
         dst3 = dust.dst3
     End Sub
@@ -41,14 +41,14 @@ Public Class Duster_MaskZ : Inherits TaskParent
         hist.bins = options.bins
 
         Dim src32f = task.pcSplit(2)
-        src32f.SetTo(task.MaxZmeters, task.maxDepthMask)
+        src32f.SetTo(task.MaxZmeters, task.depthClippedMask)
 
         hist.fixedRanges = {New Rangef(0.001, task.MaxZmeters)}
         hist.Run(src32f)
 
         Dim histArray = hist.histArray
 
-        ' this insures that the maxDepthMask is separate from any previous cluster
+        ' this insures that the depthClippedMask is separate from any previous cluster
         histArray(histArray.Count - 1) = 0
 
         Dim start As Integer
@@ -81,7 +81,7 @@ Public Class Duster_MaskZ : Inherits TaskParent
         dst1.ConvertTo(dst2, MatType.CV_8U)
 
         classCount += 1
-        dst2.SetTo(classCount, task.maxDepthMask)
+        dst2.SetTo(classCount, task.depthClippedMask)
 
         dst3 = Palettize(dst2)
         labels(2) = "dst2 = CV_8U version of depth segmented into " + CStr(classCount) + " clusters."
@@ -109,7 +109,7 @@ Public Class XR_Duster_BasicsY : Inherits TaskParent
 
         Merge(task.pcSplit, dst2)
         dst2.SetTo(0, Not dust.dst0)
-        dst2.SetTo(0, task.maxDepthMask)
+        dst2.SetTo(0, task.depthClippedMask)
 
         dst3 = dust.dst3
     End Sub
