@@ -11,12 +11,12 @@ Public Class Laplacian_Basics : Inherits TaskParent
         options.Run()
         If standaloneTest() Then GaussianBlur(src, src, options.kernel, 0, 0)
         If src.Channels() <> 1 Then src = task.gray
-        Laplacian(src, dst3, MatType.CV_16S, options.kernel.Width, options.scale, options.delta)
+        Laplacian(src, dst2, MatType.CV_16S, options.kernel.Width, options.scale, options.delta)
         Dim tmp As New Mat
-        Threshold(dst3, tmp, options.threshold, 255, ThresholdTypes.Binary)
+        Threshold(dst2, tmp, options.threshold, 255, ThresholdTypes.Binary)
         erode.Run(tmp)
         dilate.Run(erode.dst2)
-        dst2 = dilate.dst2
+        dst3 = dilate.dst2
 
         labels(2) = "Laplacian Filter k = " + CStr(options.kernel.Width)
         labels(3) = "Laplacian after " + CStr(erode.options.iterations) + " erode iterations and " + CStr(dilate.options.iterations) + " dilate iterations"

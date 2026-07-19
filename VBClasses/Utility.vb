@@ -52,6 +52,28 @@ Public Class Utility_Basics : Inherits TaskParent
         End Select
         Return fontThickness
     End Function
+    Public Shared Function ComputeHullCentroid(hull As Point(), rcD As rcData) As Point
+        Dim area As Double = 0
+        Dim cx As Double = 0
+        Dim cy As Double = 0
+
+        For i = 0 To hull.Length - 1
+            Dim p1 = hull(i)
+            Dim p2 = hull((i + 1) Mod hull.Length)
+
+            Dim cross = p1.X * p2.Y - p2.X * p1.Y
+
+            area += cross
+            cx += (p1.X + p2.X) * cross
+            cy += (p1.Y + p2.Y) * cross
+        Next
+
+        area /= 2.0
+        cx /= (6.0 * area)
+        cy /= (6.0 * area)
+
+        Return New Point(rcD.rect.X + cx, rcD.rect.Y + cy)
+    End Function
     Public Shared Sub AddPlotScale(dst As Mat, minVal As Double, maxVal As Double, Optional lineCount As Integer = 3)
         Dim fontSize = getFontsize()
         Dim fontThickness = getThickness()

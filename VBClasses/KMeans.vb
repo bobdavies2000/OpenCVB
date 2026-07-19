@@ -110,7 +110,7 @@ End Class
 
 Public Class XR_KMeans_Fuzzy : Inherits TaskParent
     Dim km As New KMeans_Image
-    Public fuzzyD As New Fuzzy_Basics
+    Public fuzzyD As New XR_Fuzzy_Basics
     Public Sub New()
         labels(3) = "The white marks areas that are busy while the black marks areas that are consistent in color - not fuzzy."
         desc = "Use the KMeans output as input to the Fuzzy detector - those areas which have little info"

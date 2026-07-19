@@ -114,13 +114,18 @@ Public Class XR_Blur_Detection : Inherits TaskParent
     Public Sub New()
         OptionParent.FindSlider("Laplacian Threshold").Value = 50
         OptionParent.FindSlider("Blur Kernel Size").Value = 11
-        labels = {"", "", "Draw a rectangle to blur a region in alternating frames and test further", "Detected blur in the highlight regions - non-blur is white."}
+        labels = {"", "", "Detected blur in the highlight regions - non-blur is white.", "Draw a rectangle to blur a region in alternating frames and test further"}
         desc = "Detect blur in an image"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         Dim r = New cv.Rect(dst2.Width / 2 - 25, dst2.Height / 2 - 25, 50, 50)
         If standaloneTest() Then
-            If task.drawRect <> New cv.Rect Then r = task.drawRect
+            If task.drawRect <> New cv.Rect Then
+                r = task.drawRect
+                If r.Width = 0 Then r.Width = 50
+                If r.Height = 0 Then r.Height = 50
+            End If
+            r = ValidateRect(r)
             ' deliberately blur a small region to test the algorithm
             If task.fOptions.FrameHistoryCount.Value Mod 2 Then
                 blurC.Run(src(r))
@@ -128,9 +133,9 @@ Public Class XR_Blur_Detection : Inherits TaskParent
             End If
         End If
 
-        dst2 = src
         laplace.Run(src)
-        dst3 = laplace.dst2
+        dst2 = laplace.dst2
+        dst3 = laplace.dst3
 
         Dim mean As Single, stdev As Single
         MeanStdDev(dst2, mean, stdev)

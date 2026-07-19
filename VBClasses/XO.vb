@@ -24944,7 +24944,7 @@ Namespace VBClasses
 
 
 
-    Public Class RedC_BasicsFail : Inherits TaskParent
+    Public Class XO_RedC_BasicsFail : Inherits TaskParent
         Dim color8u As New Color8U_Basics
         Public rcMap As Mat = New Mat(dst2.Size, MatType.CV_8U, 0)
         Public rcList As New List(Of rcData) ' includes cloud data.

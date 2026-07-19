@@ -117,6 +117,31 @@ End Class
 
 
 
+Public Class RedC_Hulls : Inherits TaskParent
+    Dim redC As New RedC_Basics
+    Public Sub New()
+        dst1 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        desc = "Display the hull for each cell."
+    End Sub
+    Public Overrides Sub RunAlg(src As Mat)
+        redC.Run(src)
+        dst2 = redC.dst2
+        labels(2) = redC.labels(2)
+
+        For i = redC.rcList.Count - 1 To 0 Step -1
+            Dim rc = redC.rcList(i)
+            FillPoly(dst1(rc.rect), {rc.hull}, rc.mapID)
+        Next
+
+        dst3 = Palettize(dst1)
+    End Sub
+End Class
+
+
+
+
+
+
 Public Class RedC_TrackCell : Inherits TaskParent
     Dim redC As New RedC_Basics
     Dim rcLast As rcData = Nothing
@@ -124,7 +149,6 @@ Public Class RedC_TrackCell : Inherits TaskParent
     Dim strCause As New List(Of String)
     Public Sub New()
         task.gOptions.displayDst1.Checked = True
-        task.gOptions.DebugSlider.Minimum = 0
         desc = "Track the selected cell even after maxDStable goes beyond the edge of the cell."
     End Sub
     Private Function rcDFindCell(rcLast As rcData) As rcData
@@ -145,7 +169,6 @@ Public Class RedC_TrackCell : Inherits TaskParent
         labels(2) = redC.labels(2)
 
         Dim rcD As rcData = rcLast
-        strOut = "" + vbCrLf
         If task.mouseClickFlag Then
             strCause.Clear()
             strCause.Add("Clicked on a new cell")
@@ -165,7 +188,6 @@ Public Class RedC_TrackCell : Inherits TaskParent
         Dim index = stablePoints.IndexOf(rcD.maxDStable)
         dst3.SetTo(0)
         If index >= 0 Then
-            ' strCause.Add("Reaquired using maxDStable")
             rcD = redC.rcList(index)
         Else
             rcD = rcDFindCell(rcLast)
@@ -176,16 +198,16 @@ Public Class RedC_TrackCell : Inherits TaskParent
             End If
         End If
 
-        If rcD.maxDist.Y > dst2.Height / 2 Then Dim k = 0
         rcLast = rcD
 
         task.color(rcD.rect).SetTo(white, rcD.mask)
         dst3(rcD.rect).SetTo(task.scalarColors(rcD.mapID), rcD.mask)
         Rectangle(dst2, rcD.rect, task.highlight, task.lineWidth)
-        Circle(dst3, rcD.maxDist, task.DotSize + 1, task.highlight, -1)
+        Polylines(dst3(rcD.rect), {rcD.hull}, True, Scalar.Red, 2)
+        Circle(dst3, rcD.maxDStable, task.DotSize + 1, task.highlight, -1)
         Circle(dst1, rcLast.maxDist, task.DotSize + 1, task.highlight, -1)
 
-        strOut = rcD.displayCell() + vbCrLf + rcD.maxDist.ToString + vbCrLf + strCause(0)
+        strOut = rcD.displayCell() + vbCrLf + rcD.maxDist.ToString + vbCrLf + "No change: maxDStable" + vbCrLf + strCause(0)
         For i = 0 To strCause.Count - 1
             strOut += ", " + strCause(i)
             If i Mod 3 = 0 Then strOut += vbCrLf
@@ -193,5 +215,63 @@ Public Class RedC_TrackCell : Inherits TaskParent
         SetTrueText(strOut, 1)
 
         task.rcD = rcD
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class RedC_TrackHull : Inherits TaskParent
+    Dim redC As New RedC_Basics
+    Dim lastCenter As cv.Point
+    Dim lastMapID As Byte
+    Dim lastRect As cv.Rect
+    Public Sub New()
+        task.gOptions.displayDst1.Checked = True
+        dst0 = New cv.Mat(dst0.Size, cv.MatType.CV_32S, 0)
+        desc = "Track the selected cell even after maxDStable goes beyond the edge of the cell."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        If task.heartBeatLT Then dst1.SetTo(0)
+        redC.Run(src)
+        dst2 = redC.dst2
+        labels(2) = redC.labels(2)
+
+        dst0.SetTo(0)
+        For i = redC.rcList.Count - 1 To 0 Step -1
+            Dim rc = redC.rcList(i)
+            FillPoly(dst0(rc.rect), {rc.hull}, rc.index)
+        Next
+
+        Dim index As Integer
+        If task.mouseClickFlag Then
+            index = dst0.Get(Of Integer)(task.clickPoint.Y, task.clickPoint.X)
+        Else
+            index = dst0.Get(Of Integer)(lastCenter.Y, lastCenter.X)
+            For Each rc In redC.rcList
+                If rc.rect.IntersectsWith(lastRect) And rc.mapID = lastMapID Then
+                    index = rc.index
+                    Exit For ' find the largest
+                End If
+            Next
+        End If
+
+        Dim rcD = redC.rcList(index)
+
+        dst3.SetTo(0)
+        task.color(rcD.rect).SetTo(white, rcD.mask)
+        FillPoly(dst3(rcD.rect), {rcD.hull}, task.scalarColors(rcD.mapID + 1))
+        dst3(rcD.rect).SetTo(task.scalarColors(rcD.mapID), rcD.mask)
+        Rectangle(dst2, rcD.rect, task.highlight, task.lineWidth)
+        Circle(dst1, lastCenter, task.DotSize + 1, task.highlight, -1)
+        SetTrueText(rcD.displayCell() + vbCrLf, 1)
+
+        task.rcD = rcD
+        lastCenter = Utility_Basics.ComputeHullCentroid(rcD.hull.ToArray, rcD)
+        lastMapID = rcD.mapID
+        lastRect = rcD.rect
     End Sub
 End Class

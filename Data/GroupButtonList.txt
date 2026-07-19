@@ -75,7 +75,6 @@ Foreground
 Fractal
 FrameRate
 FREAK
-Fuzzy
 Gabor
 GeneticDrawing
 Gif
@@ -212,3 +211,4 @@ WarpModel
 WarpPerspective
 Watershed
 XFeatures2D
+XR

@@ -57,15 +57,14 @@ End Class
 Public Class StableDepth_Max : Inherits TaskParent
     Dim colorize As New DepthColorizer_CPP
     Public pointcloud As New Mat
-    Public pcsplit(2) As Mat
+    Public pcsplit() As Mat = Nothing
     Public Sub New()
         labels(2) = "Accumulated minimum values at each depth pixel.  Updated using RGB motion."
         labels(3) = "Pixels that were updated on the current frame."
         desc = "Stabilize X, Y, and Z of the cv.Point cloud using the maximum depth encountered."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        Dim pcSplit() As Mat = Nothing
-        Split(task.prepCloud.originalPointcloud, pcSplit)
+        Split(task.prepCloud.originalPointcloud, pcsplit)
         Static lastDepth As Mat = pcSplit(2).Clone
 
         Dim myHeartbeat = task.heartBeat Or task.optionsChanged
