@@ -34,6 +34,14 @@ Public Class Feature_Basics : Inherits TaskParent
                 Next
 
                 strOut = "AGAST produced " + CStr(ptLatest.Count) + " features"
+            Case "AKAZE"
+                Static kaze As XFeatures2D.AKAZE = XFeatures2D.AKAZE.Create()
+                Dim kazeKeyPoints As KeyPoint() = Nothing
+                Dim kazeDescriptors As New Mat()
+                kaze.DetectAndCompute(src, Nothing, kazeKeyPoints, kazeDescriptors)
+                For i = 0 To kazeKeyPoints.Length - 1
+                    ptLatest.Add(kazeKeyPoints(i).Pt)
+                Next
             Case "BrickPoint"
                 Static bPoint As New BrickPoint_MaxSobel
                 bPoint.Run(src)
@@ -52,7 +60,7 @@ Public Class Feature_Basics : Inherits TaskParent
                 ptLatest = FAST.features
                 strOut = "FAST produced " + CStr(ptLatest.Count) + " features"
             Case "GoodFeatures"
-                ptLatest = GoodFeaturesToTrack(src, task.fOptions.FrameHistoryCount.Value, options.quality,
+                ptLatest = GoodFeaturesToTrack(src, task.fOptions.FeatureSizeSlider.Value, options.quality,
                                                       options.minDistance, New Mat,
                                                       options.blockSize, True, options.k).ToList
                 strOut = "GoodFeatures produced " + CStr(ptLatest.Count) + " features"
@@ -104,6 +112,32 @@ End Class
 
 
 
+Public Class Feature_AKaze : Inherits TaskParent
+    Implements IDisposable
+    Dim kazeKeyPoints As KeyPoint() = Nothing
+    Dim kaze As XFeatures2D.AKAZE
+    Public Sub New()
+        labels(2) = "AKAZE key points"
+        desc = "Find keypoints using AKAZE algorithm."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        dst2 = src.Clone()
+        If src.Channels() <> 1 Then src = task.gray
+        If kaze Is Nothing Then kaze = XFeatures2D.AKAZE.Create()
+        Dim kazeDescriptors As New Mat()
+        kaze.DetectAndCompute(src, Nothing, kazeKeyPoints, kazeDescriptors)
+        For i = 0 To kazeKeyPoints.Length - 1
+            Circle(dst2, kazeKeyPoints(i).Pt, task.DotSize, task.highlight, -1, task.lineType)
+        Next
+    End Sub
+    Protected Overrides Sub Finalize()
+        If kaze IsNot Nothing Then kaze.Dispose()
+    End Sub
+End Class
+
+
+
+
 
 Public Class Feature_GoodFeatures : Inherits TaskParent
     Public options As New Options_Features
@@ -133,109 +167,6 @@ Public Class Feature_GoodFeatures : Inherits TaskParent
                     CStr(task.fOptions.FeatureSizeSlider.Value) + " requested."
     End Sub
 End Class
-
-
-
-
-
-
-Public Class Feature_AKAZEMatch : Inherits TaskParent
-    Implements IDisposable
-    Dim akaze As XFeatures2D.AKAZE
-    Dim matcher As BFMatcher
-    Dim lastColor As Mat
-    Dim lastKeyPoints As KeyPoint()
-    Dim lastDesc As Mat
-    Dim optionsRotate As New Options_Rotate
-    Public matches As New List(Of DMatch)
-    Public Sub New()
-        labels = {"", "", "AKAZE matches (previous | current)", "Current AKAZE keypoints"}
-        desc = "Detect AKAZE keypoints and match them to the next camera frame; descriptors stay valid under rotation."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        optionsRotate.Run()
-
-        Dim color = If(src.Channels() = 1, task.color.Clone, src.Clone)
-        Dim gray = If(src.Channels() = 1, src.Clone, task.gray.Clone)
-
-        ' Optional forced rotation of the current frame to demonstrate rotation invariance.
-        If Math.Abs(optionsRotate.rotateAngle) > 0.01 Then
-            Dim center = New Point2f(gray.Width / 2.0F, gray.Height / 2.0F)
-            Dim M = GetRotationMatrix2D(center, -optionsRotate.rotateAngle, 1)
-            WarpAffine(gray, gray, M, gray.Size())
-            WarpAffine(color, color, M, color.Size())
-        End If
-
-        If akaze Is Nothing Then akaze = XFeatures2D.AKAZE.Create()
-        If matcher Is Nothing Then matcher = New BFMatcher(NormTypes.Hamming, crossCheck:=False)
-
-        Dim keyPoints As KeyPoint() = Nothing
-        Dim desc As New Mat()
-        akaze.DetectAndCompute(gray, Nothing, keyPoints, desc)
-
-        dst3 = color.Clone
-        If keyPoints IsNot Nothing Then
-            For Each kp In keyPoints
-                Circle(dst3, kp.Pt, task.DotSize, task.highlight, -1, task.lineType)
-            Next
-        End If
-
-        matches.Clear()
-        If lastDesc IsNot Nothing AndAlso Not lastDesc.Empty() AndAlso Not desc.Empty() AndAlso
-           lastKeyPoints IsNot Nothing AndAlso lastKeyPoints.Length > 0 AndAlso
-           keyPoints IsNot Nothing AndAlso keyPoints.Length > 0 Then
-
-            Dim knn = matcher.KnnMatch(lastDesc, desc, k:=2)
-            Dim good As New List(Of DMatch)
-            For Each pair In knn
-                If pair IsNot Nothing AndAlso pair.Length >= 2 AndAlso
-                   pair(0).Distance < 0.75F * pair(1).Distance Then
-                    good.Add(pair(0))
-                End If
-            Next
-            matches = good
-
-            Dim matchImg As New Mat()
-            DrawMatches(lastColor, lastKeyPoints, color, keyPoints, good, matchImg,
-                        Nothing, Nothing, Nothing, DrawMatchesFlags.NotDrawSinglePoints)
-            Resize(matchImg, dst2, dst2.Size())
-
-            For Each m In good
-                Dim p1 = keyPoints(m.TrainIdx).Pt
-                Circle(dst3, p1, task.DotSize + 1, Scalar.Red, -1, task.lineType)
-                ' Motion vectors only when both frames share the same orientation.
-                If Math.Abs(optionsRotate.rotateAngle) <= 0.01 Then
-                    Dim p0 = lastKeyPoints(m.QueryIdx).Pt
-                    Line(dst3, p0, p1, Scalar.Green, task.lineWidth, task.lineType)
-                End If
-            Next
-
-            Dim rotNote = ""
-            If Math.Abs(optionsRotate.rotateAngle) > 0.01 Then
-                rotNote = " (current rotated " + optionsRotate.rotateAngle.ToString(fmt1) + " deg)"
-            End If
-            labels(2) = CStr(good.Count) + " matches of " + CStr(lastKeyPoints.Length) +
-                        " -> " + CStr(keyPoints.Length) + " AKAZE keypoints" + rotNote
-        Else
-            dst2 = color.Clone
-            labels(2) = "Waiting for next frame to match AKAZE features"
-        End If
-
-        labels(3) = CStr(If(keyPoints Is Nothing, 0, keyPoints.Length)) + " AKAZE keypoints on current frame"
-
-        lastColor = color
-        lastKeyPoints = keyPoints
-        If lastDesc IsNot Nothing Then lastDesc.Dispose()
-        lastDesc = desc.Clone()
-        desc.Dispose()
-    End Sub
-    Protected Overrides Sub Finalize()
-        If akaze IsNot Nothing Then akaze.Dispose()
-        If matcher IsNot Nothing Then matcher.Dispose()
-        If lastDesc IsNot Nothing Then lastDesc.Dispose()
-    End Sub
-End Class
-
 
 
 
@@ -651,32 +582,6 @@ Public Class XR_Feature_History : Inherits TaskParent
     End Sub
 End Class
 
-
-
-
-
-Public Class XR_Feature_AKaze : Inherits TaskParent
-    Implements IDisposable
-    Dim kazeKeyPoints As KeyPoint() = Nothing
-    Dim kaze As XFeatures2D.AKAZE
-    Public Sub New()
-        labels(2) = "AKAZE key points"
-        desc = "Find keypoints using AKAZE algorithm."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        dst2 = src.Clone()
-        If src.Channels() <> 1 Then src = task.gray
-        If kaze Is Nothing Then kaze = XFeatures2D.AKAZE.Create()
-        Dim kazeDescriptors As New Mat()
-        kaze.DetectAndCompute(src, Nothing, kazeKeyPoints, kazeDescriptors)
-        For i As Integer = 0 To kazeKeyPoints.Length - 1
-        Circle(dst2, kazeKeyPoints(i).Pt, task.DotSize, task.highlight, -1, task.lineType)
-        Next
-    End Sub
-    Protected Overrides Sub Finalize()
-        If kaze IsNot Nothing Then kaze.Dispose()
-    End Sub
-End Class
 
 
 
@@ -1138,8 +1043,86 @@ Public Class Feature_Points : Inherits TaskParent
         If task.heartBeat Then dst2.SetTo(0)
 
         For Each pt In feat.features
-        Circle(dst2, pt, task.DotSize, task.highlight, -1, task.lineType)
+            Circle(dst2, pt, task.DotSize, task.highlight, -1, task.lineType)
         Next
         labels(2) = CStr(feat.features.Count) + " targets were present with " + CStr(task.fOptions.FeatureSizeSlider.Value) + " requested."
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Feature_MatchAKAZE : Inherits TaskParent
+    Implements IDisposable
+    Dim akaze As XFeatures2D.AKAZE
+    Dim matcher As BFMatcher
+    Dim lastColor As Mat
+    Dim lastKeyPoints As KeyPoint()
+    Dim lastDesc As Mat
+    Public matches As New List(Of DMatch)
+    Public Sub New()
+        labels = {"", "", "Current AKAZE keypoints", "Matches connected to previous frame"}
+        desc = "Cursor.ai: Detect AKAZE keypoints and match them to the next camera frame."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        Dim color = If(src.Channels() = 1, task.color.Clone, src.Clone)
+        Dim gray = If(src.Channels() = 1, src.Clone, task.gray.Clone)
+
+        If akaze Is Nothing Then akaze = XFeatures2D.AKAZE.Create()
+        If matcher Is Nothing Then matcher = New BFMatcher(NormTypes.Hamming, crossCheck:=False)
+
+        Dim keyPoints As KeyPoint() = Nothing
+        Dim desc As New Mat()
+        akaze.DetectAndCompute(gray, Nothing, keyPoints, desc)
+
+        dst2 = color.Clone
+        If keyPoints IsNot Nothing Then
+            For Each kp In keyPoints
+                Circle(dst2, kp.Pt, task.DotSize, task.highlight, -1, task.lineType)
+            Next
+        End If
+
+        matches.Clear()
+        If lastDesc IsNot Nothing AndAlso Not lastDesc.Empty() AndAlso Not desc.Empty() AndAlso
+           lastKeyPoints IsNot Nothing AndAlso lastKeyPoints.Length > 0 AndAlso
+           keyPoints IsNot Nothing AndAlso keyPoints.Length > 0 Then
+
+            Dim knn = matcher.KnnMatch(lastDesc, desc, k:=2)
+            Dim good As New List(Of DMatch)
+            For Each pair In knn
+                If pair IsNot Nothing AndAlso pair.Length >= 2 Then
+                    If pair(0).Distance < 0.75F * pair(1).Distance Then good.Add(pair(0))
+                End If
+            Next
+            matches = good
+
+            dst3 = lastColor.Clone
+            For Each m In good
+                Dim p0 = lastKeyPoints(m.QueryIdx).Pt
+                Dim p1 = keyPoints(m.TrainIdx).Pt
+                Line(dst3, p0, p1, Scalar.Green, task.lineWidth, task.lineType)
+                Circle(dst3, p0, task.DotSize, task.highlight, -1, task.lineType)
+                Circle(dst3, p1, task.DotSize + 1, Scalar.Red, -1, task.lineType)
+            Next
+
+            labels(2) = CStr(If(keyPoints Is Nothing, 0, keyPoints.Length)) + " AKAZE keypoints on current frame"
+            labels(3) = (good.Count / lastKeyPoints.Length).ToString("0%") + " matched to previous frame."
+        Else
+            dst3 = color.Clone
+            labels(2) = CStr(If(keyPoints Is Nothing, 0, keyPoints.Length)) + " AKAZE keypoints on current frame"
+        End If
+
+        lastColor = color
+        lastKeyPoints = keyPoints
+        If lastDesc IsNot Nothing Then lastDesc.Dispose()
+        lastDesc = desc.Clone()
+        desc.Dispose()
+    End Sub
+    Protected Overrides Sub Finalize()
+        If akaze IsNot Nothing Then akaze.Dispose()
+        If matcher IsNot Nothing Then matcher.Dispose()
+        If lastDesc IsNot Nothing Then lastDesc.Dispose()
     End Sub
 End Class

@@ -233,7 +233,7 @@ Entropy_Highest
 Entropy_Rectangle
 Erode_Basics
 ExPhoto_Inpaint
-Feature_AKAZEMatch
+Feature_AKaze
 Feature_Basics
 Feature_Bricks
 Feature_Delaunay
@@ -241,6 +241,7 @@ Feature_GoodFeatures
 Feature_KNN
 Feature_LeftRight
 Feature_LeftRightCorrelation
+Feature_MatchAKAZE
 Feature_Matching
 Feature_Points
 FeatureFlow_Basics

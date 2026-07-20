@@ -10,6 +10,7 @@
         Me.Top = 0
 
         FeatureMethod.Items.Add("AGAST")
+        FeatureMethod.Items.Add("AKAZE")
         FeatureMethod.Items.Add("BrickPoint")
         FeatureMethod.Items.Add("BRISK")
         FeatureMethod.Items.Add("FAST")

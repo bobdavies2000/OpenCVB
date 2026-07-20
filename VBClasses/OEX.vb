@@ -374,7 +374,7 @@ Public Class XR_OEX_PointPolygon_demo : Inherits TaskParent
         vert.Add(New Point2f(5 * r / 2 + dst2.Width / 4, 1.34 * r))
 
         dst2.SetTo(0)
-        For i As Integer = 0 To vert.Count - 1
+        For i  = 0 To vert.Count - 1
             Line(dst2, vert(i), vert((i + 1) Mod 6), white, task.lineWidth, task.lineType)
         Next
 

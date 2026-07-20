@@ -364,7 +364,7 @@ Public Class SLR
             Return diff_max
         End If
 
-        For i As Integer = 0 To n_values - 1
+        For i  = 0 To n_values - 1
             Dim y_orig_i As Double = data_y_orig(i)
             Dim y_aprox_i As Double = data_y_approx(i)
             Dim diff_i As Double = Math.Abs(y_orig_i - y_aprox_i)
@@ -509,7 +509,7 @@ Public Class SLR
             Dim coef_b As Double = lr_params_i.CoefB
             Dim i_start As Integer = range_i.idx_a
             Dim i_end As Integer = range_i.idx_b
-            For i As Integer = i_start To i_end - 1
+            For i  = i_start To i_end - 1
                 Dim x_i As Double = data_x(i)
                 Dim y_i As Double = coef_a + coef_b * x_i
 
@@ -821,7 +821,7 @@ Public Class SLR
         SimpleMovingAverage(data_y_smooth, sm_half_len)
 
         Dim vec_deviations As New List(Of Double)
-        For i As Integer = 0 To size_y - 1
+        For i  = 0 To size_y - 1
             vec_deviations.Add(Math.Abs(data_y_smooth(i) - data_y(i)))
         Next
 

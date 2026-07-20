@@ -19,7 +19,7 @@ Public Class PongWars_Basics : Inherits TaskParent
     Dim iteration As Integer = 0
     Dim p1Last As New cv.Point, p2Last As New cv.Point
     Public Sub New()
-        For i As Integer = 0 To numSquaresX - 1
+        For i  = 0 To numSquaresX - 1
             For j As Integer = 0 To numSquaresY - 1
                 squares(i, j) = If(i < numSquaresX / 2, DAY_COLOR, NIGHT_COLOR)
             Next
@@ -59,7 +59,7 @@ Public Class PongWars_Basics : Inherits TaskParent
         Dim dayScore As Integer = 0
         Dim nightScore As Integer = 0
 
-        For i As Integer = 0 To numSquaresX - 1
+        For i  = 0 To numSquaresX - 1
             For j As Integer = 0 To numSquaresY - 1
                 If squares(i, j) = DAY_COLOR Then
                     dayScore += 1
@@ -96,7 +96,7 @@ Public Class PongWars_Basics : Inherits TaskParent
         UpdateScoreElement()
 
         dst2.SetTo(0)
-        For i As Integer = 0 To numSquaresX - 1
+        For i  = 0 To numSquaresX - 1
             For j As Integer = 0 To numSquaresY - 1
                 Dim rect = New cv.Rect(i * sqWidth, j * sqHeight, sqWidth, sqHeight)
                 Dim index = squares(i, j)

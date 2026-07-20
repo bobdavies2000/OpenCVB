@@ -20,7 +20,7 @@ Public Class XR_ScatterMatrix_Example : Inherits TaskParent
 
         For j As Integer = 0 To numCols - 1
             Dim sum As Double = 0
-            For i As Integer = 0 To numRows - 1
+            For i  = 0 To numRows - 1
                 sum += data(i, j)
             Next
             meanVector(j) = sum / numRows
@@ -33,7 +33,7 @@ Public Class XR_ScatterMatrix_Example : Inherits TaskParent
         Dim numCols As Integer = data.GetLength(1)
         Dim scatterMatrix(numCols - 1, numCols - 1) As Double
 
-        For i As Integer = 0 To numRows - 1
+        For i  = 0 To numRows - 1
             Dim row(numCols - 1) As Double
             For j As Integer = 0 To numCols - 1
                 row(j) = data(i, j) - meanVector(j)
@@ -63,7 +63,7 @@ Public Class XR_ScatterMatrix_Example : Inherits TaskParent
         Next
 
         strOut += vbCrLf + vbCrLf + "The scatter matrix is:" + vbCrLf
-        For i As Integer = 0 To numRows - 1
+        For i  = 0 To numRows - 1
             For j As Integer = 0 To numCols - 1
                 strOut += $"{matrix(i, j):F2} "
             Next

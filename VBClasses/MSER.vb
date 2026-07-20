@@ -213,7 +213,7 @@ Public Class MSER_Detect : Inherits TaskParent
 
             Dim count As Integer = Cv2.ConnectedComponentsWithStats(bin, labels, stats, centroids)
 
-            For i As Integer = 1 To count - 1
+            For i  = 1 To count - 1
                 Dim area As Integer = stats.Get(Of Integer)(i, ConnectedComponentsTypes.Area)
                 If area < minArea OrElse area > maxArea Then Continue For
 

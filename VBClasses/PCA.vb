@@ -410,7 +410,7 @@ Public Class PCA_NColor : Inherits TaskParent
         Dim varMax As Single = 0.0F
         Dim answer As Integer = 0
 
-        For i As Integer = 0 To N - 1
+        For i  = 0 To N - 1
             Dim nc As Integer = CInt(rgb(start + i * 3) * remap(0) + rgb(start + i * 3 + 1) * remap(1) + rgb(start + i * 3 + 2) * remap(2))
             hist(512 + nc) += 1
         Next
