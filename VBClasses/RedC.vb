@@ -49,6 +49,7 @@ Public Class RedC_Basics : Inherits TaskParent
 
         rcIndexMap.SetTo(0)
         rcList.Clear()
+        rcList.Add(New rcData)
         Dim flag = FloodFillFlags.FixedRange Or (255 << 8)
         For Each rc In sortList.Values
             If rc.pixels > 0 Then
@@ -204,7 +205,6 @@ Public Class RedC_TrackCell : Inherits TaskParent
         task.color(rcD.rect).SetTo(white, rcD.mask)
         dst3(rcD.rect).SetTo(task.scalarColors(rcD.mapID), rcD.mask)
         Rectangle(dst2, rcD.rect, task.highlight, task.lineWidth)
-        Polylines(dst3(rcD.rect), {rcD.hull}, True, Scalar.Red, 2)
         Circle(dst3, rcD.maxDStable, task.DotSize + 1, task.highlight, -1)
         Circle(dst1, rcLast.maxDist, task.DotSize + 1, task.highlight, -1)
 
@@ -244,6 +244,7 @@ Public Class RedC_TrackHull : Inherits TaskParent
         dst0.SetTo(0)
         For i = redC.rcList.Count - 1 To 0 Step -1
             Dim rc = redC.rcList(i)
+            rc.contourHull()
             FillPoly(dst0(rc.rect), {rc.hull}, rc.index)
         Next
 
@@ -281,7 +282,7 @@ End Class
 
 
 
-Public Class RedC_Neighbors : Inherits TaskParent
+Public Class RedC_NeighborHulls : Inherits TaskParent
     Dim redC As New RedC_Basics
     Dim clickPoint As cv.Point
     Public Sub New()
@@ -297,6 +298,7 @@ Public Class RedC_Neighbors : Inherits TaskParent
         dst0.SetTo(0)
         For i = redC.rcList.Count - 1 To 0 Step -1
             Dim rc = redC.rcList(i)
+            rc.contourHull()
             FillPoly(dst0(rc.rect), {rc.hull}, rc.index)
         Next
 
@@ -332,5 +334,76 @@ Public Class RedC_Neighbors : Inherits TaskParent
         dst3(rcD.rect).SetTo(task.highlight, rcD.mask)
         Circle(dst3, clickPoint, task.DotSize + 2, white, -1)
         labels(3) = CStr(neighbors.Count) + " neighbors were present."
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class RedC_NeighborHist : Inherits TaskParent
+    Dim redC As New RedC_Basics
+    Dim lastCenter As cv.Point
+    Dim rcD As rcData
+    Public Sub New()
+        If standalone Then task.gOptions.displayDst1.Checked = True
+        desc = "Use a histogram to find the neighbors."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        If task.heartBeatLT Then dst1.SetTo(0)
+        redC.Run(src)
+        dst2 = redC.dst2
+        labels(2) = redC.labels(2)
+
+        Dim index As Integer
+        If task.mouseClickFlag Then lastCenter = task.clickPoint
+        index = redC.rcIndexMap.Get(Of Integer)(lastCenter.Y, lastCenter.X)
+
+        If index > 0 Then
+            rcD = redC.rcList(index)
+        Else
+            Dim rect As New cv.Rect(lastCenter.X, lastCenter.Y, task.gridWH, task.gridWH)
+            Dim myMapID = redC.rcMap.Get(Of Byte)(lastCenter.Y, lastCenter.X)
+            For Each rc In redC.rcList
+                If rc.mapID = myMapID And rc.rect.IntersectsWith(rect) Then
+                    rcD = rc
+                    Exit For
+                End If
+            Next
+            If rcD Is Nothing Then rcD = redC.rcList(1)
+        End If
+        SetTrueText(rcD.displayCell() + vbCrLf, 1)
+
+        Dim histogram As New Mat, tmp As New cv.Mat
+        Dim ranges() As Rangef = New Rangef() {New Rangef(0, redC.rcList.Count + 1)}
+        Dim delta = task.gridWH / 2
+        Dim r = New cv.Rect(rcD.rect.X - delta, rcD.rect.Y - delta, rcD.rect.Width + task.gridWH, rcD.rect.Height + task.gridWH)
+        r = ValidateRect(r)
+        redC.rcIndexMap(r).ConvertTo(tmp, MatType.CV_8U)
+        ' why did I need to add 1 to tmp?!!!
+        CalcHist({tmp + 1}, {0}, New Mat, histogram, 1, {redC.rcList.Count}, ranges)
+
+        Dim histArray(histogram.Rows - 1) As Single
+        histogram.GetArray(Of Single)(histArray)
+
+        Dim neighbors As New List(Of Integer)
+        For i = 1 To histArray.Count - 1
+            If histArray(i) > 0 Then neighbors.Add(i)
+        Next
+
+        dst3.SetTo(0)
+        For i = 0 To neighbors.Count - 1
+            Dim rc = redC.rcList(neighbors(i))
+            dst3(rc.rect).SetTo(task.scalarColors(rc.mapID), rc.mask)
+        Next
+
+        dst3(rcD.rect).SetTo(task.highlight, rcD.mask)
+        Rectangle(dst3, r, task.highlight, task.lineWidth)
+        Rectangle(dst2, r, task.highlight, task.lineWidth)
+        labels(3) = CStr(neighbors.Count) + " neighbors were present."
+
+        lastCenter = rcD.maxDStable
+        Circle(dst1, lastCenter, task.DotSize + 1, task.highlight, -1)
     End Sub
 End Class

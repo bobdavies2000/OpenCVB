@@ -691,6 +691,8 @@ Public Module Structures
         Public Sub New(_mask As cv.Mat, _rect As cv.Rect, mapID As Integer)
             rect = _rect
             InRange(_mask, mapID, mapID, mask)
+        End Sub
+        Public Sub contourHull()
             contour = ContourBuild(mask)
             If contour.Count >= 3 Then ' need at least 3 points for a contour.
                 Dim listOfPoints = New List(Of List(Of cv.Point))({contour})
