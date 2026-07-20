@@ -872,7 +872,7 @@ End Class
 
 
 
-Public Class Feature_LeftRight : Inherits TaskParent
+Public Class XR_Feature_LeftRight : Inherits TaskParent
     Dim pyrLeft As New Feature_Basics
     Dim pyrRight As New Feature_Basics
     Public features As New List(Of cv.Point)
@@ -933,7 +933,7 @@ End Class
 
 
 
-Public Class Feature_LeftRightCorrelation : Inherits TaskParent
+Public Class XR_Feature_LeftRightCorrelation : Inherits TaskParent
     Dim feat As New Feature_Basics
     Public features As New List(Of cv.Point)
     Public lastFeatures As New List(Of cv.Point)
@@ -1066,8 +1066,7 @@ Public Class Feature_MatchAKAZE : Inherits TaskParent
     Dim matcher As BFMatcher
     Dim lastFrame As Mat
     Dim lastKeyPoints As KeyPoint()
-    Dim lastDesc As Mat
-    Public matches As New List(Of DMatch)
+    Dim lastDesc As New Mat
     Public features As New List(Of cv.Point)
     Public lastFeatures As New List(Of cv.Point)
     Public Sub New()
@@ -1082,38 +1081,26 @@ Public Class Feature_MatchAKAZE : Inherits TaskParent
         If matcher Is Nothing Then matcher = New BFMatcher(NormTypes.Hamming, crossCheck:=False)
 
         Dim keyPoints As KeyPoint() = Nothing
-        Dim desc As New Mat()
-        akaze.DetectAndCompute(gray, Nothing, keyPoints, desc)
+        Dim descMat As New Mat()
+        akaze.DetectAndCompute(gray, Nothing, keyPoints, descMat)
 
-        dst2 = color.Clone
-        If keyPoints IsNot Nothing Then
-            For Each kp In keyPoints
-                Circle(dst2, kp.Pt, task.DotSize, task.highlight, -1, task.lineType)
-            Next
-        End If
+        dst2 = Feature_MatchORB.displayMatches(dst2, keyPoints)
 
-        matches.Clear()
-        If lastDesc IsNot Nothing AndAlso Not lastDesc.Empty() AndAlso Not desc.Empty() AndAlso
+        If Not lastDesc.Empty() AndAlso Not descMat.Empty() AndAlso
            lastKeyPoints IsNot Nothing AndAlso lastKeyPoints.Length > 0 AndAlso
            keyPoints IsNot Nothing AndAlso keyPoints.Length > 0 Then
 
-            Dim knn = matcher.KnnMatch(lastDesc, desc, k:=2)
-            Dim good As New List(Of DMatch)
-            For Each pair In knn
-                If pair IsNot Nothing AndAlso pair.Length >= 2 Then
-                    If pair(0).Distance < 0.75F * pair(1).Distance Then good.Add(pair(0))
-                End If
-            Next
-            matches = good
+            Dim knn = matcher.KnnMatch(lastDesc, descMat, k:=2)
+            Dim matches = Feature_MatchORB.getMatches(knn)
 
             dst3 = lastFrame.Clone
-            Feature_MatchORB.DisplayMatches(dst3, good, lastKeyPoints, keyPoints, features, lastFeatures)
+            Feature_MatchORB.DisplayMatches(dst3, matches, lastKeyPoints, keyPoints, features, lastFeatures)
 
             labels(2) = CStr(If(keyPoints Is Nothing, 0, keyPoints.Length)) + " AKAZE keypoints on current frame"
-            labels(3) = (good.Count / lastKeyPoints.Length).ToString("0%") + " matched to previous frame."
+            labels(3) = (matches.Count / lastKeyPoints.Length).ToString("0%") + " matched to previous frame."
         End If
 
-        If task.heartBeat Then Feature_MatchORB.captureState(lastFrame, lastDesc, desc, lastKeyPoints, keyPoints)
+        If task.heartBeat Then Feature_MatchORB.captureState(lastFrame, lastDesc, descMat, lastKeyPoints, keyPoints)
     End Sub
     Protected Overrides Sub Finalize()
         If akaze IsNot Nothing Then akaze.Dispose()
@@ -1127,18 +1114,286 @@ End Class
 
 
 
+Public Class Feature_LeftRight : Inherits TaskParent
+    Implements IDisposable
+    Dim akaze As XFeatures2D.AKAZE
+    Dim matcher As BFMatcher
+    Public features As New List(Of cv.Point)
+    Public lastFeatures As New List(Of cv.Point)
+    Public Sub New()
+        akaze = XFeatures2D.AKAZE.Create()
+        matcher = New BFMatcher(NormTypes.Hamming, crossCheck:=False)
+        labels = {"", "", "Left image AKAZE features", "Right image nearest matches"}
+        desc = "Cursor.ai: Find AKAZE features in the left image and match each to the nearest feature in the right image."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        Dim leftKp As KeyPoint() = Nothing
+        Dim rightKp As KeyPoint() = Nothing
+        Dim leftDesc As New Mat()
+        Dim rightDesc As New Mat()
+        akaze.DetectAndCompute(task.leftView, Nothing, leftKp, leftDesc)
+        akaze.DetectAndCompute(task.rightView, Nothing, rightKp, rightDesc)
+
+        If task.leftView.Channels() = 1 Then
+            CvtColor(task.leftView, dst2, ColorConversionCodes.GRAY2BGR)
+        Else
+            dst2 = task.leftView.Clone
+        End If
+        If leftKp IsNot Nothing Then
+            For Each kp In leftKp
+                Circle(dst2, kp.Pt, task.DotSize, task.highlight, -1, task.lineType)
+            Next
+        End If
+
+        features.Clear()
+        lastFeatures.Clear()
+        If Not leftDesc.Empty() AndAlso Not rightDesc.Empty() AndAlso
+           leftKp IsNot Nothing AndAlso leftKp.Length > 0 AndAlso
+           rightKp IsNot Nothing AndAlso rightKp.Length > 0 Then
+
+            Dim knn = matcher.KnnMatch(leftDesc, rightDesc, k:=2)
+            Dim matches = Feature_MatchORB.getMatches(knn)
+
+            If task.rightView.Channels() = 1 Then
+                CvtColor(task.rightView, dst3, ColorConversionCodes.GRAY2BGR)
+            Else
+                dst3 = task.rightView.Clone
+            End If
+            Feature_MatchORB.DisplayMatches(dst3, matches, leftKp, rightKp, features, lastFeatures)
+
+            labels(2) = CStr(leftKp.Length) + " AKAZE features in the left image"
+            labels(3) = CStr(matches.Count) + " nearest matches in the right image (" +
+                        (matches.Count / leftKp.Length).ToString("0%") + ")"
+        Else
+            If task.rightView.Channels() = 1 Then
+                CvtColor(task.rightView, dst3, ColorConversionCodes.GRAY2BGR)
+            Else
+                dst3 = task.rightView.Clone
+            End If
+            labels(2) = "No AKAZE features found in the left and/or right image"
+            labels(3) = ""
+        End If
+
+        leftDesc.Dispose()
+        rightDesc.Dispose()
+    End Sub
+    Protected Overrides Sub Finalize()
+        If akaze IsNot Nothing Then akaze.Dispose()
+        If matcher IsNot Nothing Then matcher.Dispose()
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Feature_MatchBRISK : Inherits TaskParent
+    Implements IDisposable
+    Dim brisk As XFeatures2D.BRISK
+    Dim matcher As BFMatcher
+    Dim lastFrame As Mat
+    Dim lastKeyPoints As KeyPoint()
+    Dim lastDesc As New Mat
+    Public features As New List(Of cv.Point)
+    Public lastFeatures As New List(Of cv.Point)
+    Public Sub New()
+        brisk = XFeatures2D.BRISK.Create()
+        matcher = New BFMatcher(NormTypes.Hamming, crossCheck:=False)
+        desc = "Cursor.ai: Detect BRISK keypoints and match them to the next camera frame."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        Dim keyPoints As KeyPoint() = Nothing
+        Dim descMat As New Mat()
+        brisk.DetectAndCompute(task.gray, Nothing, keyPoints, descMat)
+
+        dst2 = Feature_MatchORB.displayMatches(dst2, keyPoints)
+
+        If Not lastDesc.Empty() AndAlso Not descMat.Empty() AndAlso
+           lastKeyPoints IsNot Nothing AndAlso lastKeyPoints.Length > 0 AndAlso
+           keyPoints IsNot Nothing AndAlso keyPoints.Length > 0 Then
+
+            Dim knn = matcher.KnnMatch(lastDesc, descMat, k:=2)
+            Dim matches = Feature_MatchORB.getMatches(knn)
+
+            dst3 = lastFrame.Clone
+            Feature_MatchORB.DisplayMatches(dst3, matches, lastKeyPoints, keyPoints, features, lastFeatures)
+
+            labels(2) = CStr(If(keyPoints Is Nothing, 0, keyPoints.Length)) + " BRISK keypoints on current frame"
+            labels(3) = (matches.Count / lastKeyPoints.Length).ToString("0%") + " matched to previous frame."
+        End If
+
+        If task.heartBeat Then Feature_MatchORB.captureState(lastFrame, lastDesc, descMat, lastKeyPoints, keyPoints)
+    End Sub
+    Protected Overrides Sub Finalize()
+        If brisk IsNot Nothing Then brisk.Dispose()
+        If matcher IsNot Nothing Then matcher.Dispose()
+        If lastDesc IsNot Nothing Then lastDesc.Dispose()
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Feature_MatchSIFT : Inherits TaskParent
+    Implements IDisposable
+    Dim sift As SIFT
+    Dim matcher As BFMatcher
+    Dim lastFrame As Mat
+    Dim lastKeyPoints As KeyPoint()
+    Dim lastDesc As New Mat
+    Public features As New List(Of cv.Point)
+    Public lastFeatures As New List(Of cv.Point)
+    Public Sub New()
+        sift = SIFT.Create()
+        matcher = New BFMatcher(NormTypes.L2, crossCheck:=False)
+        desc = "Cursor.ai: Detect SIFT keypoints and match them to the next camera frame."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        Dim keyPoints As KeyPoint() = Nothing
+        Dim descMat As New Mat()
+        sift.DetectAndCompute(task.gray, Nothing, keyPoints, descMat)
+
+        dst2 = Feature_MatchORB.displayMatches(dst2, keyPoints)
+
+        If Not lastDesc.Empty() AndAlso Not descMat.Empty() AndAlso
+           lastKeyPoints IsNot Nothing AndAlso lastKeyPoints.Length > 0 AndAlso
+           keyPoints IsNot Nothing AndAlso keyPoints.Length > 0 Then
+
+            Dim knn = matcher.KnnMatch(lastDesc, descMat, k:=2)
+            Dim matches = Feature_MatchORB.getMatches(knn)
+
+            dst3 = lastFrame.Clone
+            Feature_MatchORB.DisplayMatches(dst3, matches, lastKeyPoints, keyPoints, features, lastFeatures)
+
+            labels(2) = CStr(If(keyPoints Is Nothing, 0, keyPoints.Length)) + " SIFT keypoints on current frame"
+            labels(3) = (matches.Count / lastKeyPoints.Length).ToString("0%") + " matched to previous frame."
+        End If
+
+        If task.heartBeat Then Feature_MatchORB.captureState(lastFrame, lastDesc, descMat, lastKeyPoints, keyPoints)
+    End Sub
+    Protected Overrides Sub Finalize()
+        If sift IsNot Nothing Then sift.Dispose()
+        If matcher IsNot Nothing Then matcher.Dispose()
+        If lastDesc IsNot Nothing Then lastDesc.Dispose()
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Feature_MatchSURF : Inherits TaskParent
+    Implements IDisposable
+    Dim surf As XFeatures2D.SURF
+    Dim matcher As BFMatcher
+    Dim lastFrame As Mat
+    Dim lastKeyPoints As KeyPoint()
+    Dim lastDesc As New Mat
+    Public features As New List(Of cv.Point)
+    Public lastFeatures As New List(Of cv.Point)
+    Public Sub New()
+        surf = XFeatures2D.SURF.Create(2000)
+        matcher = New BFMatcher(NormTypes.L2, crossCheck:=False)
+        desc = "Cursor.ai: Detect SURF keypoints and match them to the next camera frame."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        Dim keyPoints As KeyPoint() = Nothing
+        Dim descMat As New Mat()
+        surf.DetectAndCompute(task.gray, Nothing, keyPoints, descMat)
+
+        dst2 = Feature_MatchORB.displayMatches(dst2, keyPoints)
+
+        If Not lastDesc.Empty() AndAlso Not descMat.Empty() AndAlso
+           lastKeyPoints IsNot Nothing AndAlso lastKeyPoints.Length > 0 AndAlso
+           keyPoints IsNot Nothing AndAlso keyPoints.Length > 0 Then
+
+            Dim knn = matcher.KnnMatch(lastDesc, descMat, k:=2)
+            Dim matches = Feature_MatchORB.getMatches(knn)
+
+            dst3 = lastFrame.Clone
+            Feature_MatchORB.DisplayMatches(dst3, matches, lastKeyPoints, keyPoints, features, lastFeatures)
+
+            labels(2) = CStr(If(keyPoints Is Nothing, 0, keyPoints.Length)) + " SURF keypoints on current frame"
+            labels(3) = (matches.Count / lastKeyPoints.Length).ToString("0%") + " matched to previous frame."
+        End If
+
+        If task.heartBeat Then Feature_MatchORB.captureState(lastFrame, lastDesc, descMat, lastKeyPoints, keyPoints)
+    End Sub
+    Protected Overrides Sub Finalize()
+        If surf IsNot Nothing Then surf.Dispose()
+        If matcher IsNot Nothing Then matcher.Dispose()
+        If lastDesc IsNot Nothing Then lastDesc.Dispose()
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Feature_MatchKAZE : Inherits TaskParent
+    Implements IDisposable
+    Dim kaze As XFeatures2D.KAZE
+    Dim matcher As BFMatcher
+    Dim lastFrame As Mat
+    Dim lastKeyPoints As KeyPoint()
+    Dim lastDesc As New Mat
+    Public features As New List(Of cv.Point)
+    Public lastFeatures As New List(Of cv.Point)
+    Public Sub New()
+        kaze = XFeatures2D.KAZE.Create()
+        matcher = New BFMatcher(NormTypes.L2, crossCheck:=False)
+        desc = "Cursor.ai: Detect KAZE keypoints and match them to the next camera frame."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        Dim keyPoints As KeyPoint() = Nothing
+        Dim descMat As New Mat()
+        kaze.DetectAndCompute(task.gray, Nothing, keyPoints, descMat)
+
+        dst2 = Feature_MatchORB.displayMatches(dst2, keyPoints)
+
+        If Not lastDesc.Empty() AndAlso Not descMat.Empty() AndAlso
+           lastKeyPoints IsNot Nothing AndAlso lastKeyPoints.Length > 0 AndAlso
+           keyPoints IsNot Nothing AndAlso keyPoints.Length > 0 Then
+
+            Dim knn = matcher.KnnMatch(lastDesc, descMat, k:=2)
+            Dim matches = Feature_MatchORB.getMatches(knn)
+
+            dst3 = lastFrame.Clone
+            Feature_MatchORB.DisplayMatches(dst3, matches, lastKeyPoints, keyPoints, features, lastFeatures)
+
+            labels(2) = CStr(If(keyPoints Is Nothing, 0, keyPoints.Length)) + " KAZE keypoints on current frame"
+            labels(3) = (matches.Count / lastKeyPoints.Length).ToString("0%") + " matched to previous frame."
+        End If
+
+        If task.heartBeat Then Feature_MatchORB.captureState(lastFrame, lastDesc, descMat, lastKeyPoints, keyPoints)
+    End Sub
+    Protected Overrides Sub Finalize()
+        If kaze IsNot Nothing Then kaze.Dispose()
+        If matcher IsNot Nothing Then matcher.Dispose()
+        If lastDesc IsNot Nothing Then lastDesc.Dispose()
+    End Sub
+End Class
+
+
+
+
+
 Public Class Feature_MatchORB : Inherits TaskParent
     Implements IDisposable
     Dim orb As ORB
     Dim matcher As BFMatcher
-    Dim options As New Options_ORB
     Dim lastFrame As Mat
     Dim lastKeyPoints As KeyPoint()
-    Dim lastDesc As Mat
-    Public matches As New List(Of DMatch)
+    Dim lastDesc As New Mat
     Public features As New List(Of cv.Point)
     Public lastFeatures As New List(Of cv.Point)
     Public Sub New()
+        matcher = New BFMatcher(NormTypes.Hamming2, crossCheck:=False)
         desc = "Cursor.ai: Detect ORB keypoints and match them to the next camera frame."
     End Sub
     Public Shared Sub DisplayMatches(dst As cv.Mat, good As List(Of DMatch), lastKeyPoints As KeyPoint(),
@@ -1156,57 +1411,57 @@ Public Class Feature_MatchORB : Inherits TaskParent
             Circle(dst, p1, task.DotSize + 1, Scalar.Red, -1, task.lineType)
         Next
     End Sub
-    Public Shared Sub captureState(ByRef lastframe As cv.Mat, ByRef lastdesc As cv.Mat, ByRef desc As cv.Mat,
+    Public Shared Sub captureState(ByRef lastframe As cv.Mat, ByRef lastdesc As cv.Mat, ByRef descMat As cv.Mat,
                                    ByRef lastKeyPoints As KeyPoint(), ByRef keypoints As KeyPoint())
         lastframe = task.color.Clone
         lastKeyPoints = keypoints
-        lastdesc = desc.Clone()
+        lastdesc = descMat.Clone()
     End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        options.Run()
-
-        Dim color = If(src.Channels() = 1, task.color.Clone, src.Clone)
-        Dim gray = If(src.Channels() = 1, src.Clone, task.gray.Clone)
-
-        If orb Is Nothing OrElse task.optionsChanged Then
-            If orb IsNot Nothing Then orb.Dispose()
-            orb = ORB.Create(options.desiredCount)
-        End If
-        If matcher Is Nothing Then matcher = New BFMatcher(NormTypes.Hamming2, crossCheck:=False)
-
-        Dim keyPoints As KeyPoint() = Nothing
-        Dim desc As New Mat()
-        orb.DetectAndCompute(gray, Nothing, keyPoints, desc)
-
-        dst2 = color.Clone
-        If keyPoints IsNot Nothing Then
-            For Each kp In keyPoints
-                Circle(dst2, kp.Pt, task.DotSize, task.highlight, -1, task.lineType)
+    Public Shared Function getMatches(knn As Object) As List(Of DMatch)
+        Dim good As New List(Of DMatch)
+        For Each pair In knn
+            If pair IsNot Nothing AndAlso pair.Length >= 2 Then
+                If pair(0).Distance < 0.75F * pair(1).Distance Then good.Add(pair(0))
+            End If
+        Next
+        Return good
+    End Function
+    Public Shared Function displayMatches(dst As cv.Mat, keypoints As KeyPoint()) As cv.Mat
+        dst = task.color.Clone
+        If keypoints IsNot Nothing Then
+            For Each kp In keypoints
+                Circle(dst, kp.Pt, task.DotSize, task.highlight, -1, task.lineType)
             Next
         End If
+        Return dst
+    End Function
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        If orb Is Nothing OrElse task.optionsChanged Then
+            If orb IsNot Nothing Then orb.Dispose()
+            orb = ORB.Create(task.fOptions.FeatureSizeSlider.Value)
+        End If
 
-        matches.Clear()
-        If lastDesc IsNot Nothing AndAlso Not lastDesc.Empty() AndAlso Not desc.Empty() AndAlso
+        Dim keyPoints As KeyPoint() = Nothing
+        Dim descMat As New Mat()
+        orb.DetectAndCompute(task.gray, Nothing, keyPoints, descMat)
+
+        dst2 = displayMatches(dst2, keyPoints)
+
+        If Not lastDesc.Empty() AndAlso Not descMat.Empty() AndAlso
            lastKeyPoints IsNot Nothing AndAlso lastKeyPoints.Length > 0 AndAlso
            keyPoints IsNot Nothing AndAlso keyPoints.Length > 0 Then
 
-            Dim knn = matcher.KnnMatch(lastDesc, desc, k:=2)
-            Dim good As New List(Of DMatch)
-            For Each pair In knn
-                If pair IsNot Nothing AndAlso pair.Length >= 2 Then
-                    If pair(0).Distance < 0.75F * pair(1).Distance Then good.Add(pair(0))
-                End If
-            Next
-            matches = good
+            Dim knn = matcher.KnnMatch(lastDesc, descMat, k:=2)
+            Dim matches = getMatches(knn)
 
             dst3 = lastFrame.Clone
-            DisplayMatches(dst3, good, lastKeyPoints, keyPoints, features, lastFeatures)
+            DisplayMatches(dst3, matches, lastKeyPoints, keyPoints, features, lastFeatures)
 
             labels(2) = CStr(If(keyPoints Is Nothing, 0, keyPoints.Length)) + " ORB keypoints on current frame"
-            labels(3) = (good.Count / lastKeyPoints.Length).ToString("0%") + " matched to previous frame."
+            labels(3) = (matches.Count / lastKeyPoints.Length).ToString("0%") + " matched to previous frame."
         End If
 
-        If task.heartBeat Then captureState(lastFrame, lastDesc, desc, lastKeyPoints, keyPoints)
+        If task.heartBeat Then captureState(lastFrame, lastDesc, descMat, lastKeyPoints, keyPoints)
     End Sub
     Protected Overrides Sub Finalize()
         If orb IsNot Nothing Then orb.Dispose()

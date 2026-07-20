@@ -239,9 +239,12 @@ Feature_Delaunay
 Feature_GoodFeatures
 Feature_KNN
 Feature_LeftRight
-Feature_LeftRightCorrelation
 Feature_MatchAKAZE
+Feature_MatchBRISK
+Feature_MatchKAZE
 Feature_MatchORB
+Feature_MatchSIFT
+Feature_MatchSURF
 Feature_PointsPath
 FeatureFlow_Basics
 FeatureFlow_LucasKanade
