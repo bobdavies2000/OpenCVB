@@ -1,4 +1,5 @@
 Imports System.Runtime.InteropServices
+Imports System.Security.Cryptography
 Imports OpenCvSharp
 Imports OpenCvSharp.Cv2
 Imports cv = OpenCvSharp
@@ -1106,17 +1107,7 @@ Public Class Feature_MatchAKAZE : Inherits TaskParent
             matches = good
 
             dst3 = lastFrame.Clone
-            features.Clear()
-            lastFeatures.Clear()
-            For Each m In good
-                Dim p0 = lastKeyPoints(m.QueryIdx).Pt
-                Dim p1 = keyPoints(m.TrainIdx).Pt
-                lastFeatures.Add(lastKeyPoints(m.QueryIdx).Pt)
-                features.Add(keyPoints(m.TrainIdx).Pt)
-                Line(dst3, p0, p1, task.highlight, task.lineWidth, task.lineType)
-                Circle(dst3, p0, task.DotSize, task.highlight, -1, task.lineType)
-                Circle(dst3, p1, task.DotSize + 1, Scalar.Red, -1, task.lineType)
-            Next
+            Feature_MatchORB.DisplayMatches(dst3, good, lastKeyPoints, keyPoints, features, lastFeatures)
 
             labels(2) = CStr(If(keyPoints Is Nothing, 0, keyPoints.Length)) + " AKAZE keypoints on current frame"
             labels(3) = (good.Count / lastKeyPoints.Length).ToString("0%") + " matched to previous frame."
@@ -1152,8 +1143,25 @@ Public Class Feature_MatchORB : Inherits TaskParent
     Dim lastKeyPoints As KeyPoint()
     Dim lastDesc As Mat
     Public matches As New List(Of DMatch)
+    Public features As New List(Of cv.Point)
+    Public lastFeatures As New List(Of cv.Point)
     Public Sub New()
         desc = "Cursor.ai: Detect ORB keypoints and match them to the next camera frame."
+    End Sub
+    Public Shared Sub DisplayMatches(dst As cv.Mat, good As List(Of DMatch), lastKeyPoints As KeyPoint(),
+                                     keypoints As KeyPoint(), features As List(Of cv.Point),
+                                     lastFeatures As List(Of cv.Point))
+        features.Clear()
+        lastFeatures.Clear()
+        For Each m In good
+            Dim p0 = lastKeyPoints(m.QueryIdx).Pt
+            Dim p1 = keypoints(m.TrainIdx).Pt
+            lastFeatures.Add(p0)
+            features.Add(p1)
+            Line(dst, p0, p1, task.highlight, task.lineWidth, task.lineType)
+            Circle(dst, p0, task.DotSize, task.highlight, -1, task.lineType)
+            Circle(dst, p1, task.DotSize + 1, Scalar.Red, -1, task.lineType)
+        Next
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
@@ -1193,13 +1201,7 @@ Public Class Feature_MatchORB : Inherits TaskParent
             matches = good
 
             dst3 = lastFrame.Clone
-            For Each m In good
-                Dim p0 = lastKeyPoints(m.QueryIdx).Pt
-                Dim p1 = keyPoints(m.TrainIdx).Pt
-                Line(dst3, p0, p1, task.highlight, task.lineWidth, task.lineType)
-                Circle(dst3, p0, task.DotSize, task.highlight, -1, task.lineType)
-                Circle(dst3, p1, task.DotSize + 1, Scalar.Red, -1, task.lineType)
-            Next
+            DisplayMatches(dst3, good, lastKeyPoints, keyPoints, features, lastFeatures)
 
             labels(2) = CStr(If(keyPoints Is Nothing, 0, keyPoints.Length)) + " ORB keypoints on current frame"
             labels(3) = (good.Count / lastKeyPoints.Length).ToString("0%") + " matched to previous frame."
