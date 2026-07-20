@@ -233,6 +233,7 @@ Entropy_Highest
 Entropy_Rectangle
 Erode_Basics
 ExPhoto_Inpaint
+Feature_AKAZEMatch
 Feature_Basics
 Feature_Bricks
 Feature_Delaunay

@@ -139,6 +139,108 @@ End Class
 
 
 
+Public Class Feature_AKAZEMatch : Inherits TaskParent
+    Implements IDisposable
+    Dim akaze As XFeatures2D.AKAZE
+    Dim matcher As BFMatcher
+    Dim lastColor As Mat
+    Dim lastKeyPoints As KeyPoint()
+    Dim lastDesc As Mat
+    Dim optionsRotate As New Options_Rotate
+    Public matches As New List(Of DMatch)
+    Public Sub New()
+        labels = {"", "", "AKAZE matches (previous | current)", "Current AKAZE keypoints"}
+        desc = "Detect AKAZE keypoints and match them to the next camera frame; descriptors stay valid under rotation."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        optionsRotate.Run()
+
+        Dim color = If(src.Channels() = 1, task.color.Clone, src.Clone)
+        Dim gray = If(src.Channels() = 1, src.Clone, task.gray.Clone)
+
+        ' Optional forced rotation of the current frame to demonstrate rotation invariance.
+        If Math.Abs(optionsRotate.rotateAngle) > 0.01 Then
+            Dim center = New Point2f(gray.Width / 2.0F, gray.Height / 2.0F)
+            Dim M = GetRotationMatrix2D(center, -optionsRotate.rotateAngle, 1)
+            WarpAffine(gray, gray, M, gray.Size())
+            WarpAffine(color, color, M, color.Size())
+        End If
+
+        If akaze Is Nothing Then akaze = XFeatures2D.AKAZE.Create()
+        If matcher Is Nothing Then matcher = New BFMatcher(NormTypes.Hamming, crossCheck:=False)
+
+        Dim keyPoints As KeyPoint() = Nothing
+        Dim desc As New Mat()
+        akaze.DetectAndCompute(gray, Nothing, keyPoints, desc)
+
+        dst3 = color.Clone
+        If keyPoints IsNot Nothing Then
+            For Each kp In keyPoints
+                Circle(dst3, kp.Pt, task.DotSize, task.highlight, -1, task.lineType)
+            Next
+        End If
+
+        matches.Clear()
+        If lastDesc IsNot Nothing AndAlso Not lastDesc.Empty() AndAlso Not desc.Empty() AndAlso
+           lastKeyPoints IsNot Nothing AndAlso lastKeyPoints.Length > 0 AndAlso
+           keyPoints IsNot Nothing AndAlso keyPoints.Length > 0 Then
+
+            Dim knn = matcher.KnnMatch(lastDesc, desc, k:=2)
+            Dim good As New List(Of DMatch)
+            For Each pair In knn
+                If pair IsNot Nothing AndAlso pair.Length >= 2 AndAlso
+                   pair(0).Distance < 0.75F * pair(1).Distance Then
+                    good.Add(pair(0))
+                End If
+            Next
+            matches = good
+
+            Dim matchImg As New Mat()
+            DrawMatches(lastColor, lastKeyPoints, color, keyPoints, good, matchImg,
+                        Nothing, Nothing, Nothing, DrawMatchesFlags.NotDrawSinglePoints)
+            Resize(matchImg, dst2, dst2.Size())
+
+            For Each m In good
+                Dim p1 = keyPoints(m.TrainIdx).Pt
+                Circle(dst3, p1, task.DotSize + 1, Scalar.Red, -1, task.lineType)
+                ' Motion vectors only when both frames share the same orientation.
+                If Math.Abs(optionsRotate.rotateAngle) <= 0.01 Then
+                    Dim p0 = lastKeyPoints(m.QueryIdx).Pt
+                    Line(dst3, p0, p1, Scalar.Green, task.lineWidth, task.lineType)
+                End If
+            Next
+
+            Dim rotNote = ""
+            If Math.Abs(optionsRotate.rotateAngle) > 0.01 Then
+                rotNote = " (current rotated " + optionsRotate.rotateAngle.ToString(fmt1) + " deg)"
+            End If
+            labels(2) = CStr(good.Count) + " matches of " + CStr(lastKeyPoints.Length) +
+                        " -> " + CStr(keyPoints.Length) + " AKAZE keypoints" + rotNote
+        Else
+            dst2 = color.Clone
+            labels(2) = "Waiting for next frame to match AKAZE features"
+        End If
+
+        labels(3) = CStr(If(keyPoints Is Nothing, 0, keyPoints.Length)) + " AKAZE keypoints on current frame"
+
+        lastColor = color
+        lastKeyPoints = keyPoints
+        If lastDesc IsNot Nothing Then lastDesc.Dispose()
+        lastDesc = desc.Clone()
+        desc.Dispose()
+    End Sub
+    Protected Overrides Sub Finalize()
+        If akaze IsNot Nothing Then akaze.Dispose()
+        If matcher IsNot Nothing Then matcher.Dispose()
+        If lastDesc IsNot Nothing Then lastDesc.Dispose()
+    End Sub
+End Class
+
+
+
+
+
+
 Public Class XR_Feature_Basics : Inherits TaskParent
     Implements IDisposable
     Public options As New Options_Features
