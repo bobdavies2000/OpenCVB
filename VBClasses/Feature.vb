@@ -1111,16 +1111,9 @@ Public Class Feature_MatchAKAZE : Inherits TaskParent
 
             labels(2) = CStr(If(keyPoints Is Nothing, 0, keyPoints.Length)) + " AKAZE keypoints on current frame"
             labels(3) = (good.Count / lastKeyPoints.Length).ToString("0%") + " matched to previous frame."
-        Else
-            dst3 = color.Clone
-            labels(2) = CStr(If(keyPoints Is Nothing, 0, keyPoints.Length)) + " AKAZE keypoints on current frame"
         End If
 
-        If task.heartBeat Then
-            lastFrame = color.Clone
-            lastKeyPoints = keyPoints
-            lastDesc = desc.Clone()
-        End If
+        If task.heartBeat Then Feature_MatchORB.captureState(lastFrame, lastDesc, desc, lastKeyPoints, keyPoints)
     End Sub
     Protected Overrides Sub Finalize()
         If akaze IsNot Nothing Then akaze.Dispose()
@@ -1162,6 +1155,12 @@ Public Class Feature_MatchORB : Inherits TaskParent
             Circle(dst, p0, task.DotSize, task.highlight, -1, task.lineType)
             Circle(dst, p1, task.DotSize + 1, Scalar.Red, -1, task.lineType)
         Next
+    End Sub
+    Public Shared Sub captureState(ByRef lastframe As cv.Mat, ByRef lastdesc As cv.Mat, ByRef desc As cv.Mat,
+                                   ByRef lastKeyPoints As KeyPoint(), ByRef keypoints As KeyPoint())
+        lastframe = task.color.Clone
+        lastKeyPoints = keypoints
+        lastdesc = desc.Clone()
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
@@ -1205,16 +1204,9 @@ Public Class Feature_MatchORB : Inherits TaskParent
 
             labels(2) = CStr(If(keyPoints Is Nothing, 0, keyPoints.Length)) + " ORB keypoints on current frame"
             labels(3) = (good.Count / lastKeyPoints.Length).ToString("0%") + " matched to previous frame."
-        Else
-            dst3 = color.Clone
-            labels(2) = CStr(If(keyPoints Is Nothing, 0, keyPoints.Length)) + " ORB keypoints on current frame"
         End If
 
-        If task.heartBeat Then
-            lastFrame = color.Clone
-            lastKeyPoints = keyPoints
-            lastDesc = desc.Clone()
-        End If
+        If task.heartBeat Then captureState(lastFrame, lastDesc, desc, lastKeyPoints, keyPoints)
     End Sub
     Protected Overrides Sub Finalize()
         If orb IsNot Nothing Then orb.Dispose()
