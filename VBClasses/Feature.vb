@@ -1164,14 +1164,6 @@ Public Class Feature_LeftRight : Inherits TaskParent
             labels(2) = CStr(leftKp.Length) + " AKAZE features in the left image"
             labels(3) = CStr(matches.Count) + " nearest matches in the right image (" +
                         (matches.Count / leftKp.Length).ToString("0%") + ")"
-        Else
-            If task.rightView.Channels() = 1 Then
-                CvtColor(task.rightView, dst3, ColorConversionCodes.GRAY2BGR)
-            Else
-                dst3 = task.rightView.Clone
-            End If
-            labels(2) = "No AKAZE features found in the left and/or right image"
-            labels(3) = ""
         End If
 
         leftDesc.Dispose()

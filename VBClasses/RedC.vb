@@ -333,6 +333,7 @@ Public Class RedC_NeighborHist : Inherits TaskParent
     Dim redC As New RedC_Basics
     Dim lastCenter As cv.Point
     Dim rcD As rcData
+    Public neighbors As New List(Of Integer)
     Public Sub New()
         If standalone Then task.gOptions.displayDst1.Checked = True
         desc = "Use a histogram to find the neighbors."
@@ -374,7 +375,8 @@ Public Class RedC_NeighborHist : Inherits TaskParent
         Dim histArray(histogram.Rows - 1) As Single
         histogram.GetArray(Of Single)(histArray)
 
-        Dim neighbors As New List(Of Integer)
+        neighbors.Clear()
+
         For i = 1 To histArray.Count - 1
             If histArray(i) > 0 Then neighbors.Add(i)
         Next
@@ -394,3 +396,7 @@ Public Class RedC_NeighborHist : Inherits TaskParent
         Circle(dst1, lastCenter, task.DotSize + 1, task.highlight, -1)
     End Sub
 End Class
+
+
+
+
