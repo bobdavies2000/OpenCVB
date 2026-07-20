@@ -1,5 +1,7 @@
 Imports System.Runtime.InteropServices
-Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
+Imports OpenCvSharp
+Imports OpenCvSharp.Cv2
+Imports cv = OpenCvSharp
 Public Class Feature_Basics : Inherits TaskParent
     Implements IDisposable
     Public options As New Options_Features
@@ -15,7 +17,7 @@ Public Class Feature_Basics : Inherits TaskParent
 
         If src.Channels <> 1 Then src = task.gray
 
-        Dim ptLatest As New List(Of Point2f)
+        Dim ptLatest As New List(Of cv.Point2f)
         Select Case task.fOptions.FeatureMethod.Text
             Case "AGAST"
                 If cPtr = 0 Then cPtr = Agast_Open()
@@ -29,7 +31,7 @@ Public Class Feature_Basics : Inherits TaskParent
 
                 Dim ptMat = Mat.FromPixelData(Agast_Count(cPtr), 1, MatType.CV_32FC2, imagePtr).Clone
                 For i = 0 To ptMat.Rows - 1
-                    Dim pt = ptMat.Get(Of Point2f)(i, 0)
+                    Dim pt = ptMat.Get(Of cv.Point2f)(i, 0)
                     ptLatest.Add(pt)
                     If standaloneTest() Then Circle(dst2, pt, task.DotSize, white, -1, task.lineType)
                 Next
@@ -330,14 +332,14 @@ Public Class Feature_Delaunay : Inherits TaskParent
 
         dst2 = src
         For Each pt In feat.features
-        Circle(dst2, pt, task.DotSize, task.highlight, -1, task.lineType)
+            Circle(dst2, pt, task.DotSize, task.highlight, -1, task.lineType)
         Next
 
         delaunay.bPoint.ptList = New List(Of cv.Point)(feat.features)
         delaunay.Run(src)
         dst3 = delaunay.dst2
         For Each pt In delaunay.bPoint.ptList
-        Circle(dst3, pt, task.DotSize, white, -1, task.lineType)
+            Circle(dst3, pt, task.DotSize, white, -1, task.lineType)
         Next
         labels(3) = "There were " + CStr(feat.features.Count) + " Delaunay contours"
     End Sub
@@ -362,7 +364,7 @@ Public Class XR_Feature_NoMotionTest : Inherits TaskParent
         feat.Run(src)
 
         For Each pt In feat.features
-        Circle(dst2, pt, task.DotSize, task.highlight, -1, task.lineType)
+            Circle(dst2, pt, task.DotSize, task.highlight, -1, task.lineType)
         Next
 
         labels(2) = feat.labels(2)
@@ -394,7 +396,7 @@ Public Class XR_Feature_LucasKanade : Inherits TaskParent
             Dim pt = New cv.Point(pyr.features(i).X, pyr.features(i).Y)
             ptList.Add(pt)
             If ptLast.Contains(pt) Then
-            Circle(dst3, pt, task.DotSize, task.highlight, -1, task.lineType)
+                Circle(dst3, pt, task.DotSize, task.highlight, -1, task.lineType)
                 stationary += 1
             Else
                 Line(dst3, pyr.lastFeatures(i), pyr.features(i), white, task.lineWidth, task.lineType)
@@ -432,12 +434,12 @@ Public Class XR_Feature_TraceDelaunay : Inherits TaskParent
         Next
         goodList.Add(ptList)
 
-        If goodList.Count >= task.fOptions.FrameHistoryCount.Value  Then goodList.RemoveAt(0)
+        If goodList.Count >= task.fOptions.FrameHistoryCount.Value Then goodList.RemoveAt(0)
 
         dst2.SetTo(0)
         For Each ptList In goodList
             For Each pt In ptList
-            Circle(task.color, pt, task.DotSize, task.highlight, -1, task.lineType)
+                Circle(task.color, pt, task.DotSize, task.highlight, -1, task.lineType)
                 Dim c = dst3.Get(Of Vec3b)(pt.Y, pt.X)
                 Circle(dst2, pt, task.DotSize + 1, c, -1, task.lineType)
             Next
@@ -469,11 +471,11 @@ Public Class XR_Feature_ShiTomasi : Inherits TaskParent
             shiTomasi.Run(task.leftView)
             Dim _cvtInline As New Mat
             CvtColor(shiTomasi.dst3, _cvtInline, ColorConversionCodes.BGR2GRAY)
-            dst2.SetTo(Scalar.White,_cvtInline)
+            dst2.SetTo(Scalar.White, _cvtInline)
 
             shiTomasi.Run(task.rightView)
             CvtColor(shiTomasi.dst3, _cvtInline, ColorConversionCodes.BGR2GRAY)
-            dst3.SetTo(task.highlight,_cvtInline)
+            dst3.SetTo(task.highlight, _cvtInline)
         Else
             harris.Run(task.leftView)
             dst2 = harris.dst2.Clone
@@ -558,15 +560,15 @@ Public Class XR_Feature_History : Inherits TaskParent
             Next
         Next
 
-        Dim threshold = If(task.fOptions.FrameHistoryCount.Value  = 1, 0, 1)
+        Dim threshold = If(task.fOptions.FrameHistoryCount.Value = 1, 0, 1)
         features.Clear()
         Dim whiteCount As Integer
         For i = 0 To newFeatures.Count - 1
             If gens(i) > threshold Then
                 Dim pt = newFeatures(i)
                 features.Add(pt)
-                If gens(i) < task.fOptions.FrameHistoryCount.Value  Then
-                Circle(dst2, pt, task.DotSize + 2, Scalar.Red, -1, task.lineType)
+                If gens(i) < task.fOptions.FrameHistoryCount.Value Then
+                    Circle(dst2, pt, task.DotSize + 2, Scalar.Red, -1, task.lineType)
                 Else
                     whiteCount += 1
                     Circle(dst2, pt, task.DotSize, task.highlight, -1, task.lineType)
@@ -574,11 +576,11 @@ Public Class XR_Feature_History : Inherits TaskParent
             End If
         Next
 
-        If featureHistory.Count > task.fOptions.FrameHistoryCount.Value  Then featureHistory.RemoveAt(0)
+        If featureHistory.Count > task.fOptions.FrameHistoryCount.Value Then featureHistory.RemoveAt(0)
         If task.heartBeat Then
             labels(2) = CStr(features.Count) + "/" + CStr(whiteCount) + " present/present on every frame" +
                             " Red is a recent addition, yellow is present on previous " +
-                            CStr(task.fOptions.FrameHistoryCount.Value ) + " frames"
+                            CStr(task.fOptions.FrameHistoryCount.Value) + " frames"
         End If
     End Sub
 End Class
@@ -602,7 +604,7 @@ Public Class XR_Feature_RedCloud : Inherits TaskParent
         labels(2) = redC.labels(2)
 
         For Each pt In feat.features
-        Circle(dst2, pt, task.DotSize, task.highlight, -1, task.lineType)
+            Circle(dst2, pt, task.DotSize, task.highlight, -1, task.lineType)
         Next
     End Sub
 End Class
@@ -627,7 +629,7 @@ Public Class XR_Feature_WithDepth : Inherits TaskParent
         For Each pt In feat.features
             Dim index = task.gridMap.Get(Of Integer)(pt.Y, pt.X)
             If bricks.brickList(index).depth > 0 Then
-            Circle(dst2, pt, task.DotSize, task.highlight, -1, task.lineType)
+                Circle(dst2, pt, task.DotSize, task.highlight, -1, task.lineType)
                 depthCount += 1
             End If
         Next
@@ -635,55 +637,6 @@ Public Class XR_Feature_WithDepth : Inherits TaskParent
     End Sub
 End Class
 
-
-
-
-
-Public Class Feature_Matching : Inherits TaskParent
-    Public features As New List(Of cv.Point)
-    Public motionPoints As New List(Of cv.Point)
-    Dim match As New Match_Basics
-    Dim feat As New Feature_Basics
-    Public Sub New()
-        task.fOptions.FeatureSizeSlider.Value = 150
-        desc = "Use correlation coefficient to keep features from frame to frame."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        Static fpLastSrc = src.Clone
-
-        Dim matched As New List(Of cv.Point)
-        motionPoints.Clear()
-        For Each pt In features
-            Dim val = task.motion.motionMask.Get(Of Byte)(pt.Y, pt.X)
-            If val = 0 Then
-                Dim index As Integer = task.gridMap.Get(Of Integer)(pt.Y, pt.X)
-                Dim r = task.gridRects(index)
-                match.template = fpLastSrc(r)
-                match.Run(src(r))
-                If match.correlation > task.fCorrThreshold Then matched.Add(pt)
-            Else
-                motionPoints.Add(pt)
-            End If
-        Next
-
-        labels(2) = "There were " + CStr(features.Count) + " features identified and " + CStr(matched.Count) +
-                        " were matched to the previous frame"
-
-        If matched.Count < task.fOptions.FeatureSizeSlider.Value / 2 Then
-            feat.Run(src)
-            features = feat.features
-        Else
-            features = New List(Of cv.Point)(matched)
-        End If
-
-        dst2 = src.Clone
-        For Each pt In features
-        Circle(dst2, pt, task.DotSize, task.highlight, -1, task.lineType)
-        Next
-
-        fpLastSrc = src.Clone
-    End Sub
-End Class
 
 
 
@@ -725,7 +678,7 @@ Public Class XR_Feature_SteadyCam : Inherits TaskParent
 
         dst2 = src
         For Each pt In features
-        Circle(dst2, pt, task.DotSize, task.highlight, -1, task.lineType)
+            Circle(dst2, pt, task.DotSize, task.highlight, -1, task.lineType)
         Next
 
         lastSrc = src.Clone
@@ -776,7 +729,7 @@ Public Class XR_Feature_Agast : Inherits TaskParent
         stablePoints = New List(Of Point2f)(newList)
         dst2 = src
         For Each pt In stablePoints
-        Circle(dst2, pt, task.DotSize, task.highlight, -1, task.lineType)
+            Circle(dst2, pt, task.DotSize, task.highlight, -1, task.lineType)
         Next
         labels(2) = $"Found {keypoints.Length} features with agast"
     End Sub
@@ -856,7 +809,7 @@ Public Class XR_Feature_StableVisual : Inherits TaskParent
         Dim stable As New List(Of cv.Point)
         For Each pt In feat.features
             If lastFeatures.Contains(pt) Then
-            Circle(dst2, pt, task.DotSize, task.highlight, -1, task.lineType)
+                Circle(dst2, pt, task.DotSize, task.highlight, -1, task.lineType)
                 stable.Add(pt)
             End If
         Next
@@ -865,7 +818,7 @@ Public Class XR_Feature_StableVisual : Inherits TaskParent
 
         dst2 = src.Clone
         For Each pt In stable
-        Circle(dst2, pt, task.DotSize, task.highlight, -1, task.lineType)
+            Circle(dst2, pt, task.DotSize, task.highlight, -1, task.lineType)
         Next
         labels(3) = "The " + CStr(stable.Count) + " points are present for more than one frame."
     End Sub
@@ -905,8 +858,8 @@ Public Class Feature_KNN : Inherits TaskParent
         src.CopyTo(dst2)
         dst3.SetTo(0)
         For Each pt In feat.features
-        Circle(dst2, pt, task.DotSize + 2, white, -1, task.lineType)
-        Circle(dst3, pt, task.DotSize + 2, white, -1, task.lineType)
+            Circle(dst2, pt, task.DotSize + 2, white, -1, task.lineType)
+            Circle(dst3, pt, task.DotSize + 2, white, -1, task.lineType)
         Next
 
         labels(2) = feat.labels(2)
@@ -998,7 +951,7 @@ Public Class Feature_LeftRightCorrelation : Inherits TaskParent
         dst3 = task.color.Clone
         Dim countNoDepth As Integer, countNoCorr As Integer
         For Each pt In feat.features
-        Circle(dst2, pt, task.DotSize, task.highlight, -1, task.lineType)
+            Circle(dst2, pt, task.DotSize, task.highlight, -1, task.lineType)
             Dim depth = task.pcSplit(2).Get(Of Single)(pt.Y, pt.X)
             If depth > 0 Then
                 Dim rect = task.gridRects(task.gridMap.Get(Of Integer)(pt.Y, pt.X))
@@ -1032,8 +985,59 @@ End Class
 
 
 
-Public Class Feature_Points : Inherits TaskParent
+Public Class XR_Feature_Matching : Inherits TaskParent
+    Public features As New List(Of cv.Point)
+    Public motionPoints As New List(Of cv.Point)
+    Dim match As New Match_Basics
     Dim feat As New Feature_Basics
+    Public Sub New()
+        task.fOptions.FeatureSizeSlider.Value = 150
+        desc = "Use correlation coefficient to keep features from frame to frame."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        Static fpLastSrc = src.Clone
+
+        Dim matched As New List(Of cv.Point)
+        motionPoints.Clear()
+        For Each pt In features
+            Dim val = task.motion.motionMask.Get(Of Byte)(pt.Y, pt.X)
+            If val = 0 Then
+                Dim index As Integer = task.gridMap.Get(Of Integer)(pt.Y, pt.X)
+                Dim r = task.gridRects(index)
+                match.template = fpLastSrc(r)
+                match.Run(src(r))
+                If match.correlation > task.fCorrThreshold Then matched.Add(pt)
+            Else
+                motionPoints.Add(pt)
+            End If
+        Next
+
+        labels(2) = "There were " + CStr(features.Count) + " features identified and " + CStr(matched.Count) +
+                    " were matched to the previous frame"
+
+        If matched.Count < task.fOptions.FeatureSizeSlider.Value / 2 Then
+            feat.Run(src)
+            features = feat.features
+        Else
+            features = New List(Of cv.Point)(matched)
+        End If
+
+        dst2 = src.Clone
+        For Each pt In features
+            Circle(dst2, pt, task.DotSize, task.highlight, -1, task.lineType)
+        Next
+
+        fpLastSrc = src.Clone
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Feature_PointsPath : Inherits TaskParent
+    Dim feat As New Feature_MatchAKAZE
     Public Sub New()
         labels(3) = "Features found in the image"
         desc = "Use the sorted list of Delaunay regions to find the top X points to track."
@@ -1059,10 +1063,12 @@ Public Class Feature_MatchAKAZE : Inherits TaskParent
     Implements IDisposable
     Dim akaze As XFeatures2D.AKAZE
     Dim matcher As BFMatcher
-    Dim lastColor As Mat
+    Dim lastFrame As Mat
     Dim lastKeyPoints As KeyPoint()
     Dim lastDesc As Mat
     Public matches As New List(Of DMatch)
+    Public features As New List(Of cv.Point)
+    Public lastFeatures As New List(Of cv.Point)
     Public Sub New()
         labels = {"", "", "Current AKAZE keypoints", "Matches connected to previous frame"}
         desc = "Cursor.ai: Detect AKAZE keypoints and match them to the next camera frame."
@@ -1099,11 +1105,15 @@ Public Class Feature_MatchAKAZE : Inherits TaskParent
             Next
             matches = good
 
-            dst3 = lastColor.Clone
+            dst3 = lastFrame.Clone
+            features.Clear()
+            lastFeatures.Clear()
             For Each m In good
                 Dim p0 = lastKeyPoints(m.QueryIdx).Pt
                 Dim p1 = keyPoints(m.TrainIdx).Pt
-                Line(dst3, p0, p1, Scalar.Green, task.lineWidth, task.lineType)
+                lastFeatures.Add(lastKeyPoints(m.QueryIdx).Pt)
+                features.Add(keyPoints(m.TrainIdx).Pt)
+                Line(dst3, p0, p1, task.highlight, task.lineWidth, task.lineType)
                 Circle(dst3, p0, task.DotSize, task.highlight, -1, task.lineType)
                 Circle(dst3, p1, task.DotSize + 1, Scalar.Red, -1, task.lineType)
             Next
@@ -1115,11 +1125,11 @@ Public Class Feature_MatchAKAZE : Inherits TaskParent
             labels(2) = CStr(If(keyPoints Is Nothing, 0, keyPoints.Length)) + " AKAZE keypoints on current frame"
         End If
 
-        lastColor = color
-        lastKeyPoints = keyPoints
-        If lastDesc IsNot Nothing Then lastDesc.Dispose()
-        lastDesc = desc.Clone()
-        desc.Dispose()
+        If task.heartBeat Then
+            lastFrame = color.Clone
+            lastKeyPoints = keyPoints
+            lastDesc = desc.Clone()
+        End If
     End Sub
     Protected Overrides Sub Finalize()
         If akaze IsNot Nothing Then akaze.Dispose()
@@ -1131,3 +1141,82 @@ End Class
 
 
 
+
+
+Public Class Feature_MatchORB : Inherits TaskParent
+    Implements IDisposable
+    Dim orb As ORB
+    Dim matcher As BFMatcher
+    Dim options As New Options_ORB
+    Dim lastFrame As Mat
+    Dim lastKeyPoints As KeyPoint()
+    Dim lastDesc As Mat
+    Public matches As New List(Of DMatch)
+    Public Sub New()
+        desc = "Cursor.ai: Detect ORB keypoints and match them to the next camera frame."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        options.Run()
+
+        Dim color = If(src.Channels() = 1, task.color.Clone, src.Clone)
+        Dim gray = If(src.Channels() = 1, src.Clone, task.gray.Clone)
+
+        If orb Is Nothing OrElse task.optionsChanged Then
+            If orb IsNot Nothing Then orb.Dispose()
+            orb = ORB.Create(options.desiredCount)
+        End If
+        If matcher Is Nothing Then matcher = New BFMatcher(NormTypes.Hamming2, crossCheck:=False)
+
+        Dim keyPoints As KeyPoint() = Nothing
+        Dim desc As New Mat()
+        orb.DetectAndCompute(gray, Nothing, keyPoints, desc)
+
+        dst2 = color.Clone
+        If keyPoints IsNot Nothing Then
+            For Each kp In keyPoints
+                Circle(dst2, kp.Pt, task.DotSize, task.highlight, -1, task.lineType)
+            Next
+        End If
+
+        matches.Clear()
+        If lastDesc IsNot Nothing AndAlso Not lastDesc.Empty() AndAlso Not desc.Empty() AndAlso
+           lastKeyPoints IsNot Nothing AndAlso lastKeyPoints.Length > 0 AndAlso
+           keyPoints IsNot Nothing AndAlso keyPoints.Length > 0 Then
+
+            Dim knn = matcher.KnnMatch(lastDesc, desc, k:=2)
+            Dim good As New List(Of DMatch)
+            For Each pair In knn
+                If pair IsNot Nothing AndAlso pair.Length >= 2 Then
+                    If pair(0).Distance < 0.75F * pair(1).Distance Then good.Add(pair(0))
+                End If
+            Next
+            matches = good
+
+            dst3 = lastFrame.Clone
+            For Each m In good
+                Dim p0 = lastKeyPoints(m.QueryIdx).Pt
+                Dim p1 = keyPoints(m.TrainIdx).Pt
+                Line(dst3, p0, p1, task.highlight, task.lineWidth, task.lineType)
+                Circle(dst3, p0, task.DotSize, task.highlight, -1, task.lineType)
+                Circle(dst3, p1, task.DotSize + 1, Scalar.Red, -1, task.lineType)
+            Next
+
+            labels(2) = CStr(If(keyPoints Is Nothing, 0, keyPoints.Length)) + " ORB keypoints on current frame"
+            labels(3) = (good.Count / lastKeyPoints.Length).ToString("0%") + " matched to previous frame."
+        Else
+            dst3 = color.Clone
+            labels(2) = CStr(If(keyPoints Is Nothing, 0, keyPoints.Length)) + " ORB keypoints on current frame"
+        End If
+
+        If task.heartBeat Then
+            lastFrame = color.Clone
+            lastKeyPoints = keyPoints
+            lastDesc = desc.Clone()
+        End If
+    End Sub
+    Protected Overrides Sub Finalize()
+        If orb IsNot Nothing Then orb.Dispose()
+        If matcher IsNot Nothing Then matcher.Dispose()
+        If lastDesc IsNot Nothing Then lastDesc.Dispose()
+    End Sub
+End Class
