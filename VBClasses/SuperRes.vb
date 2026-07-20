@@ -32,18 +32,21 @@ Public Class SuperRes_Basics : Inherits TaskParent
         dst2 = video.dst2
 
         If optFlow Is Nothing Then
-            Select Case options.method ' only one method available with OpenCVSharp...
+            ' OpenCvSharp5: SuperRes Farneback was renamed away from FarnebackOpticalFlow
+            ' (that name now belongs to the video-module DenseOpticalFlow wrapper).
+            Select Case options.method
                 Case "farneback"
-                    optFlow = FarnebackOpticalFlow.CreateFarneback
-                Case "brox"
-                    optFlow = BroxOpticalFlow.CreateFarneback
+                    optFlow = DenseOpticalFlowExt.CreateFarneback()
                 Case "tvl1"
-                    optFlow = DualTVL1OpticalFlow.CreateDualTVL1
+                    optFlow = DenseOpticalFlowExt.CreateDualTVL1()
+                Case "brox"
+                    optFlow = DenseOpticalFlowExt.CreateBrox_CUDA()
                 Case "pyrlk"
-                    optFlow = PyrLKOpticalFlow.CreateFarneback
+                    optFlow = DenseOpticalFlowExt.CreatePyrLK_CUDA()
             End Select
             If optFlow Is Nothing Then Exit Sub
             superres = SuperResolution.CreateBTVL1()
+            superres.OpticalFlow = optFlow
             superres.Iterations = options.iterations
             superres.Scale = 4
             superres.TemporalAreaRadius = 4

@@ -11,9 +11,9 @@ Public Class XR_Encode_Basics : Inherits TaskParent
         options.Run()
         If task.firstPass Then OptionParent.FindSlider("Encode Output Scaling").Value = 10
 
-        Dim encodeParams() As Integer = {options.encodeOption, options.qualityLevel}
+        Dim encodeParams As New ImageEncodingParam(options.encodeOption, options.qualityLevel)
         Dim buf As Byte() = Nothing
-        ImEncode(".jpg", src, buf, encodeParams)
+        ImEncode(".jpg", src, buf, {encodeParams})
         Dim image = Mat.FromPixelData(buf.Count, 1, MatType.CV_8U, buf)
         dst3 = ImDecode(image, ImreadModes.AnyColor)
 
@@ -39,9 +39,9 @@ Public Class XR_Encode_Scaling : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
 
-        Dim encodeParams() As Integer = {options.encodeOption, options.qualityLevel}
+        Dim encodeParams As New ImageEncodingParam(options.encodeOption, options.qualityLevel)
         Dim buf As Byte() = Nothing
-        ImEncode(".jpg", src, buf, encodeParams)
+        ImEncode(".jpg", src, buf, {encodeParams})
 
         Dim image = Mat.FromPixelData(buf.Count, 1, MatType.CV_8U, buf)
         dst3 = ImDecode(image, ImreadModes.AnyColor)

@@ -146,7 +146,7 @@ Public Class XR_Benford_JPEG : Inherits TaskParent
 
         Dim param = New ImageEncodingParam(ImwriteFlags.JpegQuality, options.quality)
         Dim jpeg As Byte() = Nothing
-        ImEncode(".jpg", src, jpeg, param)
+        ImEncode(".jpg", src, jpeg, {param})
         Dim tmp = Mat.FromPixelData(jpeg.Count, 1, MatType.CV_8U, jpeg)
         dst3 = ImDecode(tmp, ImreadModes.Color)
         benford.Run(tmp)
@@ -174,7 +174,7 @@ Public Class XR_Benford_JPEG99 : Inherits TaskParent
 
         Dim param = New ImageEncodingParam(ImwriteFlags.JpegQuality, options.quality)
         Dim jpeg As Byte() = Nothing
-        ImEncode(".jpg", src, jpeg, param)
+        ImEncode(".jpg", src, jpeg, {param})
         Dim tmp = Mat.FromPixelData(jpeg.Count, 1, MatType.CV_8U, jpeg)
         dst3 = ImDecode(tmp, ImreadModes.Color)
         benford.Run(tmp)
@@ -202,7 +202,7 @@ Public Class XR_Benford_PNG : Inherits TaskParent
 
         Dim param = New ImageEncodingParam(ImwriteFlags.JpegQuality, 90)
         Dim png As Byte() = Nothing
-        ImEncode(".jpg", src, png, param)
+        ImEncode(".jpg", src, png, {param})
         Dim tmp = Mat.FromPixelData(png.Count, 1, MatType.CV_8U, png)
         dst3 = ImDecode(tmp, ImreadModes.Color)
         benford.Run(tmp)
