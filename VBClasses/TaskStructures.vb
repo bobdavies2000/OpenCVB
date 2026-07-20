@@ -691,17 +691,19 @@ Public Module Structures
         Public Sub New(_mask As cv.Mat, _rect As cv.Rect, mapID As Integer)
             rect = _rect
             InRange(_mask, mapID, mapID, mask)
+            contourHull()
         End Sub
         Public Sub contourHull()
             contour = ContourBuild(mask)
             If contour.Count >= 3 Then ' need at least 3 points for a contour.
                 Dim listOfPoints = New List(Of List(Of cv.Point))({contour})
-                mask = New cv.Mat(mask.Size, cv.MatType.CV_8U, 0)
-                DrawContours(mask, listOfPoints, 0, cv.Scalar.All(mapID), -1, cv.LineTypes.Link4)
+                DrawContours(mask, listOfPoints, 0, cv.Scalar.All(255), -1, cv.LineTypes.Link4)
 
                 ' keep the hull points around (there aren't many of them.)
                 hull = ConvexHull(contour.ToArray, True).ToList
             End If
+            pixels = CountNonZero(mask)
+            maxDist = buildMaxDist(mask)
         End Sub
         Public Function buildMaxDist(ByVal mask As cv.Mat) As cv.Point
             ' Rectangle is definitely needed.  Test it again with MaxDist_NoRectangle to verify that the rectangle is essential.

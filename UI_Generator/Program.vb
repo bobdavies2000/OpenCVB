@@ -18,11 +18,17 @@ Module Program
             Dim vbClassesPath As String = Path.GetFullPath(Path.Combine(appPath, "..\..\..\..\..\VBClasses"))
             Dim vbClasses As New SortedList(Of String, String)
             Dim xoClasses As New SortedList(Of String, String)
-            Dim totalLinesRead As Integer = 0
+            Dim xrClasses As New SortedList(Of String, String)
+            Dim cursorClasses As New SortedList(Of String, String)
+            Dim displayClasses As New SortedList(Of String, String)
+            Dim allClasses As New SortedList(Of String, String)
+            Dim totalLinesRead As Integer
 
             ' Get all .vb files in the VBClasses directory
             Dim vbFiles() As String = Directory.GetFiles(vbClassesPath, "*.vb")
 
+            Dim toggleTotal As Integer
+            Dim currClassname As String = ""
             For Each vbFile As String In vbFiles
                 Dim lines() As String = File.ReadAllLines(vbFile)
 
@@ -31,22 +37,28 @@ Module Program
 
                     ' Count non-empty, non-comment lines
                     If Not String.IsNullOrEmpty(trimmedLine) And Not trimmedLine.StartsWith("'") Then
-                        totalLinesRead += 1
+                        If toggleTotal Then totalLinesRead += 1
                     End If
 
+                    If line.ToLower.Contains("cursor.ai") Then cursorClasses.Add(currClassname, currClassname)
                     If line.Contains(": Inherits TaskParent") Then
+                        toggleTotal = False
                         ' Parse the class name from lines like: "Public Class ClassName : Inherits " + parentName
-                        Dim className As String = ExtractClassName(line)
-                        If Not String.IsNullOrEmpty(className) Then
-                            ' If className.StartsWith("XO_") Or className.StartsWith("XR_") Then
-                            If className.StartsWith("XO_") Then
-                                If Not xoClasses.ContainsKey(className) Then
-                                    xoClasses.Add(className, className)
-                                End If
+                        currClassname = ExtractClassName(line)
+                        If Not String.IsNullOrEmpty(currClassname) Then
+                            allClasses.Add(currClassname, currClassname)
+                            If currClassname.StartsWith("XR_") Then
+                                xrClasses.Add(currClassname, currClassname)
+
+                                ' comment both of these lines to remove XR_ algorithms.
+                                'displayClasses.Add(currClassname, currClassname)
+                                'toggleTotal = True
+                            ElseIf currClassname.StartsWith("XO_") Then
+                                xoClasses.Add(currClassname, currClassname)
                             Else
-                                If Not vbClasses.ContainsKey(className) Then
-                                    vbClasses.Add(className, className)
-                                End If
+                                vbClasses.Add(currClassname, currClassname)
+                                displayClasses.Add(currClassname, currClassname)
+                                toggleTotal = True
                             End If
                         End If
                     End If
@@ -57,10 +69,10 @@ Module Program
             Dim dataPath As String = Path.GetFullPath(Path.Combine(appPath, "..\..\..\..\..\Data"))
             Dim countsFilePath As String = Path.Combine(dataPath, "AlgorithmCounts.txt")
             Dim countsContent As String = "CodeLineCount = " & totalLinesRead.ToString() & vbCrLf &
-                                          "AlgorithmCount = " & vbClasses.Count.ToString() & vbCrLf &
+                                          "AlgorithmCount = " & displayClasses.Count.ToString() & vbCrLf &
                                           "Reference algorithm count = " & xoClasses.Count.ToString() & vbCrLf &
-                                          "Average lines per algorithm = " &
-                                          (totalLinesRead \ (vbClasses.Count + xoClasses.Count)).ToString() & vbCrLf
+                                          "Average lines for displayed algorithm = " &
+                                          (totalLinesRead \ displayClasses.Count).ToString() & vbCrLf
             File.WriteAllText(countsFilePath, countsContent)
 
             ' Generate AlgorithmList.vb in the Main directory
@@ -75,7 +87,7 @@ Module Program
 
             sb.AppendLine(vbTab + "Public Function createAlgorithm(algorithmName as string) As TaskParent")
 
-            For Each className As String In vbClasses.Keys
+            For Each className As String In displayClasses.Keys
                 sb.AppendLine($"If algorithmName = ""{className}"" Then Return New {className}")
             Next
             sb.AppendLine(vbTab + vbTab + "Return Nothing")
@@ -90,7 +102,7 @@ Module Program
 
             ' Extract first tokens from class names and write to GroupButtons.txt
             Dim groupTokens As New SortedList(Of String, String)
-            For Each className As String In vbClasses.Keys
+            For Each className As String In displayClasses.Keys
                 Dim parts() As String = className.Split("_"c)
                 If parts.Length > 0 And Not String.IsNullOrEmpty(parts(0)) Then
                     If Not groupTokens.ContainsKey(parts(0)) Then
@@ -108,18 +120,20 @@ Module Program
 
             Dim AvailableAlgorithmsPath As String = Path.Combine(dataPath, "AvailableAlgorithms.txt")
             Dim algList As New System.Text.StringBuilder()
-            For Each token As String In vbClasses.Keys
+            For Each token As String In displayClasses.Keys
                 algList.AppendLine(token)
             Next
             File.WriteAllText(AvailableAlgorithmsPath, algList.ToString())
 
             Console.WriteLine()
             Console.WriteLine()
-            Console.WriteLine($"Found {vbClasses.Count} classes that inherit from TaskParent :")
-            Console.WriteLine($"Found {xoClasses.Count} XO_ classes that inherit from TaskParent :")
-            Console.WriteLine($"Total source lines read: {totalLinesRead}")
-            Console.WriteLine($"Reference algorithm count: {xoClasses.Count}")
-            Console.WriteLine($"Average lines per algorithm: " + (totalLinesRead \ (vbClasses.Count + xoClasses.Count)).ToString())
+            Console.WriteLine($"{displayClasses.Count} classes will be displayed:")
+            Console.WriteLine($"Total source lines for displayed classes: {totalLinesRead}")
+            Console.WriteLine($"XR_ Reference algorithm count: {xrClasses.Count}")
+            Console.WriteLine($"XO_ Reference algorithm count: {xoClasses.Count}")
+            Console.WriteLine($"Cursor.ai algorithms: {cursorClasses.Count}")
+            Console.WriteLine($"Total algorithms in development: { allClasses.Count}")
+            Console.WriteLine($"Average lines per displayed algorithm: " + (totalLinesRead \ displayClasses.Count).ToString())
             Console.WriteLine($"Algorithm groups: {groupTokens.Count}")
             Console.WriteLine()
             Console.WriteLine()

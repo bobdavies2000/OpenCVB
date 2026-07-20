@@ -7,6 +7,7 @@ Public Class RedC_Basics : Inherits TaskParent
     Dim rcListLast As New List(Of rcData)
     Public rcIndexMap As Mat = New Mat(dst2.Size, MatType.CV_32S, 0)
     Public Sub New()
+        labels(3) = "The tracked cell.  The dot is the maxDStable for the tracked cell."
         desc = "FloodFill each color8U output and create an rclist"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -38,8 +39,6 @@ Public Class RedC_Basics : Inherits TaskParent
                     If count > 10 Then
                         Dim rc = New rcData(floodMap(rect), rect, index)
                         rc.mapID = mapID
-                        rc.maxDist = rc.buildMaxDist(rc.mask)
-                        rc.pixels = CountNonZero(rc.mask)
                         If rc.pixels >= 10 Then sortList.Add(rc.pixels, rc)
                     End If
                 End If
@@ -148,7 +147,6 @@ Public Class RedC_TrackCell : Inherits TaskParent
     Dim redC As New RedC_Basics
     Dim rcLast As rcData = Nothing
     Dim lastClickPoint As cv.Point
-    Dim strCause As New List(Of String)
     Public Sub New()
         task.gOptions.displayDst1.Checked = True
         desc = "Track the selected cell even after maxDStable goes beyond the edge of the cell."
@@ -160,7 +158,6 @@ Public Class RedC_TrackCell : Inherits TaskParent
             If rcLast.rect.IntersectsWith(rc.rect) And rcLast.mapID = rc.mapID Then candidates.Add((rc.index, rc.mapID))
         Next
 
-        strCause.Add(CStr(candidates.Count) + " candidates were found")
         If candidates.Count > 0 Then rcD = redC.rcList(candidates(0).index)
         Return rcD
     End Function
@@ -172,8 +169,6 @@ Public Class RedC_TrackCell : Inherits TaskParent
 
         Dim rcD As rcData = rcLast
         If task.mouseClickFlag Then
-            strCause.Clear()
-            strCause.Add("Clicked on a new cell")
             Dim clickIndex = redC.rcIndexMap.Get(Of Integer)(task.clickPoint.Y, task.clickPoint.X)
             rcD = redC.rcList(clickIndex)
             If rcD.maxDStable = newPoint Then rcD.maxDStable = rcD.maxDist
@@ -186,7 +181,6 @@ Public Class RedC_TrackCell : Inherits TaskParent
             stablePoints.Add(rc.maxDStable)
         Next
 
-        If strCause.Count > 30 Then strCause.RemoveAt(0)
         Dim index = stablePoints.IndexOf(rcD.maxDStable)
         dst3.SetTo(0)
         If index >= 0 Then
@@ -194,13 +188,12 @@ Public Class RedC_TrackCell : Inherits TaskParent
         Else
             rcD = rcDFindCell(rcLast)
             If rcD Is Nothing Then
-                strCause.Add("Found using the last clickpoint")
                 Dim clickIndex = redC.rcIndexMap.Get(Of Integer)(lastClickPoint.Y, lastClickPoint.X)
                 rcD = redC.rcList(clickIndex)
             End If
         End If
 
-        rcLast = rcD
+        If rcD.index <> 0 Then rcLast = rcD Else rcD = redC.rcList(1)
 
         task.color(rcD.rect).SetTo(white, rcD.mask)
         dst3(rcD.rect).SetTo(task.scalarColors(rcD.mapID), rcD.mask)
@@ -208,11 +201,7 @@ Public Class RedC_TrackCell : Inherits TaskParent
         Circle(dst3, rcD.maxDStable, task.DotSize + 1, task.highlight, -1)
         Circle(dst1, rcLast.maxDist, task.DotSize + 1, task.highlight, -1)
 
-        strOut = rcD.displayCell() + vbCrLf + rcD.maxDist.ToString + vbCrLf + "No change: maxDStable" + vbCrLf + strCause(0)
-        For i = 0 To strCause.Count - 1
-            strOut += ", " + strCause(i)
-            If i Mod 3 = 0 Then strOut += vbCrLf
-        Next
+        strOut = rcD.displayCell() + vbCrLf + rcD.maxDist.ToString + vbCrLf
         SetTrueText(strOut, 1)
 
         task.rcD = rcD
@@ -244,7 +233,6 @@ Public Class RedC_TrackHull : Inherits TaskParent
         dst0.SetTo(0)
         For i = redC.rcList.Count - 1 To 0 Step -1
             Dim rc = redC.rcList(i)
-            rc.contourHull()
             FillPoly(dst0(rc.rect), {rc.hull}, rc.index)
         Next
 
@@ -298,7 +286,6 @@ Public Class RedC_NeighborHulls : Inherits TaskParent
         dst0.SetTo(0)
         For i = redC.rcList.Count - 1 To 0 Step -1
             Dim rc = redC.rcList(i)
-            rc.contourHull()
             FillPoly(dst0(rc.rect), {rc.hull}, rc.index)
         Next
 

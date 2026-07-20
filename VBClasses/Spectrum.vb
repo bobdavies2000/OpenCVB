@@ -1,12 +1,4 @@
-Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
-
-
-
-
-
-
-
-
+Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCvSharp
 Public Class Spectrum_X : Inherits TaskParent
     Public options As New Options_Spectrum
     Dim redC As New RedColor_Basics

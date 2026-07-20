@@ -260,8 +260,7 @@ Namespace MainApp
 
             infoLine = sr.ReadLine
             Split = Regex.Split(infoLine, "\W+")
-            Dim algorithmRefs = Split(3)
-            Dim algorithmCount = algorithmCountActive + algorithmRefs
+            Dim algorithmCount = algorithmCountActive
             sr.Close()
 
             Dim algList = New FileInfo(homeDir + "Data/AvailableAlgorithms.txt")
