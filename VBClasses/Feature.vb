@@ -10,9 +10,10 @@ Public Class Feature_Basics : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
+        dst2 = src.Clone
+        dst3 = src.Clone
 
         If src.Channels <> 1 Then src = task.gray
-        dst2 = task.color.Clone
 
         Dim ptLatest As New List(Of Point2f)
         Select Case task.fOptions.FeatureMethod.Text
@@ -112,7 +113,7 @@ End Class
 
 
 
-Public Class Feature_AKaze : Inherits TaskParent
+Public Class XR_Feature_AKaze : Inherits TaskParent
     Implements IDisposable
     Dim kazeKeyPoints As KeyPoint() = Nothing
     Dim kaze As XFeatures2D.AKAZE
@@ -1126,3 +1127,7 @@ Public Class Feature_MatchAKAZE : Inherits TaskParent
         If lastDesc IsNot Nothing Then lastDesc.Dispose()
     End Sub
 End Class
+
+
+
+
