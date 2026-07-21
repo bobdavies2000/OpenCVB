@@ -31,33 +31,34 @@ Public Class SuperRes_Basics : Inherits TaskParent
         video.Run(src)
         dst2 = video.dst2
 
-        If optFlow Is Nothing Then
-            ' OpenCvSharp5: SuperRes Farneback was renamed away from FarnebackOpticalFlow
-            ' (that name now belongs to the video-module DenseOpticalFlow wrapper).
-            Select Case options.method
-                Case "farneback"
-                    optFlow = DenseOpticalFlowExt.CreateFarneback()
-                Case "tvl1"
-                    optFlow = DenseOpticalFlowExt.CreateDualTVL1()
-                Case "brox"
-                    optFlow = DenseOpticalFlowExt.CreateBrox_CUDA()
-                Case "pyrlk"
-                    optFlow = DenseOpticalFlowExt.CreatePyrLK_CUDA()
-            End Select
-            If optFlow Is Nothing Then Exit Sub
-            superres = SuperResolution.CreateBTVL1()
-            superres.OpticalFlow = optFlow
-            superres.Iterations = options.iterations
-            superres.Scale = 4
-            superres.TemporalAreaRadius = 4
-            superres.SetInput(FrameSource.CreateFrameSource_Video(video.inputFileName))
-        End If
+        SetTrueText("OpenCVSharp5 has disabled some of these superRes options.  Disabled for now", 3)
+        'If optFlow Is Nothing Then
+        '    ' OpenCvSharp5: SuperRes Farneback was renamed away from FarnebackOpticalFlow
+        '    ' (that name now belongs to the video-module DenseOpticalFlow wrapper).
+        '    Select Case options.method
+        '        Case "farneback"
+        '            optFlow = DenseOpticalFlowExt.CreateFarneback()
+        '        Case "tvl1"
+        '            optFlow = DenseOpticalFlowExt.CreateDualTVL1()
+        '        Case "brox"
+        '            optFlow = DenseOpticalFlowExt.CreateBrox_CUDA()
+        '        Case "pyrlk"
+        '            optFlow = DenseOpticalFlowExt.CreatePyrLK_CUDA()
+        '    End Select
+        '    If optFlow Is Nothing Then Exit Sub
+        '    superres = SuperResolution.CreateBTVL1()
+        '    superres.OpticalFlow = optFlow
+        '    superres.Iterations = options.iterations
+        '    superres.Scale = 4
+        '    superres.TemporalAreaRadius = 4
+        '    superres.SetInput(FrameSource.CreateFrameSource_Video(video.inputFileName))
+        'End If
 
-        superres.NextFrame(dst3)
-        If dst3.Width = 0 Then
-            dst3 = dst2.Clone
-            optFlow = Nothing ' start over...
-        End If
+        'superres.NextFrame(dst3)
+        'If dst3.Width = 0 Then
+        '    dst3 = dst2.Clone
+        '    optFlow = Nothing ' start over...
+        'End If
     End Sub
     Protected Overrides Sub Finalize()
         If optFlow IsNot Nothing Then optFlow.Dispose()

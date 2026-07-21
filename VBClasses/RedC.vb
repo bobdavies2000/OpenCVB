@@ -131,7 +131,7 @@ Public Class RedC_Hulls : Inherits TaskParent
 
         For i = redC.rcList.Count - 1 To 0 Step -1
             Dim rc = redC.rcList(i)
-            FillPoly(dst1(rc.rect), {rc.hull}, rc.mapID)
+            If rc.hull IsNot Nothing Then FillPoly(dst1(rc.rect), {rc.hull}, rc.mapID)
         Next
 
         dst3 = Palettize(dst1)
@@ -233,7 +233,7 @@ Public Class RedC_TrackHull : Inherits TaskParent
         dst0.SetTo(0)
         For i = redC.rcList.Count - 1 To 0 Step -1
             Dim rc = redC.rcList(i)
-            FillPoly(dst0(rc.rect), {rc.hull}, rc.index)
+            If rc.hull IsNot Nothing Then FillPoly(dst0(rc.rect), {rc.hull}, rc.index)
         Next
 
         Dim index As Integer
@@ -286,7 +286,7 @@ Public Class RedC_NeighborHulls : Inherits TaskParent
         dst0.SetTo(0)
         For i = redC.rcList.Count - 1 To 0 Step -1
             Dim rc = redC.rcList(i)
-            FillPoly(dst0(rc.rect), {rc.hull}, rc.index)
+            If rc.hull IsNot Nothing Then FillPoly(dst0(rc.rect), {rc.hull}, rc.index)
         Next
 
         Dim index As Integer

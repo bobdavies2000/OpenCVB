@@ -541,7 +541,7 @@ End Class
 
 
 Public Class Options_SuperRes : Inherits OptionParent
-    Public method As String = "farneback"
+    Public method As String = "tvl1"
     Public iterations As Integer = 10
     Public restartWithNewOptions As Boolean = False
     Public Sub New()
@@ -551,7 +551,7 @@ Public Class Options_SuperRes : Inherits OptionParent
             radio.addRadio("tvl1")
             radio.addRadio("brox")
             radio.addRadio("pyrlk")
-            radio.check(0).Checked = True
+            radio.check(1).Checked = True
         End If
 
         If sliders.Setup(traceName) Then sliders.setupTrackBar("SuperRes Iterations", 10, 200, iterations)
