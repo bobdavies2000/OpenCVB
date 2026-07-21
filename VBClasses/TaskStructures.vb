@@ -678,6 +678,7 @@ Public Module Structures
 
     Public Class rcData
         Public contour As List(Of cv.Point)
+        Public depth As Single
         Public hull As List(Of cv.Point)
         Public index As Integer
         Public mapID As Integer
@@ -704,6 +705,7 @@ Public Module Structures
             End If
             pixels = CountNonZero(mask)
             maxDist = buildMaxDist(mask)
+            depth = Mean(task.pcSplit(2)(rect), task.depthmask(rect))
         End Sub
         Public Function buildMaxDist(ByVal mask As cv.Mat) As cv.Point
             ' Rectangle is definitely needed.  Test it again with MaxDist_NoRectangle to verify that the rectangle is essential.

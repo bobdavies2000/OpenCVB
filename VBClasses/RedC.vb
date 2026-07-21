@@ -330,9 +330,9 @@ End Class
 
 
 Public Class RedC_NeighborHist : Inherits TaskParent
-    Dim redC As New RedC_Basics
+    Public redC As New RedC_Basics
     Dim lastCenter As cv.Point
-    Dim rcD As rcData
+    Public rcD As rcData
     Public neighbors As New List(Of Integer)
     Public Sub New()
         If standalone Then task.gOptions.displayDst1.Checked = True
@@ -400,3 +400,124 @@ End Class
 
 
 
+
+
+Public Class RedC_MergeCells : Inherits TaskParent
+    Dim nabe As New RedC_NeighborHist
+    Public merged As New rcData
+    Public mergeList As New List(Of rcData)
+    Public Sub New()
+        If standalone Then task.gOptions.displayDst1.Checked = True
+        desc = "Merge the selected cell with neighbors that are at about the same depth."
+    End Sub
+    Private Function cellDepth(rc As rcData) As Single
+        If rc Is Nothing OrElse rc.mask.Width <= 1 OrElse rc.pixels = 0 Then Return 0
+        Dim depthMask As New Mat
+        BitwiseAnd(rc.mask, task.depthmask(rc.rect), depthMask)
+        If CountNonZero(depthMask) = 0 Then Return 0
+        Return CSng(Mean(task.pcSplit(2)(rc.rect), depthMask)(0))
+    End Function
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        nabe.Run(src)
+        dst1 = nabe.dst1
+        dst2 = nabe.dst2
+        labels(2) = nabe.labels(2)
+
+        mergeList.Clear()
+        Dim rcD = nabe.rcD
+        If rcD Is Nothing OrElse nabe.redC.rcList.Count <= 1 Then
+            dst3 = nabe.dst3
+            labels(3) = "No selected cell to merge."
+            Exit Sub
+        End If
+
+        Dim depth0 = cellDepth(rcD)
+        mergeList.Add(rcD)
+        For Each idx In nabe.neighbors
+            If idx = rcD.index OrElse idx <= 0 OrElse idx >= nabe.redC.rcList.Count Then Continue For
+            Dim rc = nabe.redC.rcList(idx)
+            Dim depth = cellDepth(rc)
+            If depth0 > 0 AndAlso depth > 0 AndAlso Math.Abs(depth - depth0) <= task.depthDiffMeters Then
+                mergeList.Add(rc)
+            End If
+        Next
+
+        Dim unionRect = mergeList(0).rect
+        For i = 1 To mergeList.Count - 1
+            unionRect = unionRect.Union(mergeList(i).rect)
+        Next
+        unionRect = ValidateRect(unionRect)
+
+        Dim fullMask As New Mat(dst2.Size(), MatType.CV_8U, Scalar.All(0))
+        For Each rc In mergeList
+            fullMask(rc.rect).SetTo(255, rc.mask)
+        Next
+
+        merged = New rcData()
+        merged.rect = unionRect
+        merged.mask = fullMask(unionRect).Clone()
+        merged.mapID = rcD.mapID
+        merged.index = rcD.index
+        merged.contourHull()
+        merged.maxDStable = merged.maxDist
+
+        dst3.SetTo(0)
+        For Each rc In mergeList
+            dst3(rc.rect).SetTo(task.scalarColors(rc.mapID), rc.mask)
+        Next
+        dst3(merged.rect).SetTo(task.highlight, merged.mask)
+        Rectangle(dst2, merged.rect, task.highlight, task.lineWidth)
+        Rectangle(dst3, merged.rect, task.highlight, task.lineWidth)
+        Circle(dst3, merged.maxDist, task.DotSize + 1, white, -1)
+
+        SetTrueText(merged.displayCell() + vbCrLf +
+                    "Selected depth = " + depth0.ToString(fmt2) + "m" + vbCrLf +
+                    "Merged " + CStr(mergeList.Count) + " cells within " +
+                    task.depthDiffMeters.ToString(fmt2) + "m", 1)
+
+        labels(3) = CStr(mergeList.Count) + " of " + CStr(nabe.neighbors.Count) +
+                    " neighbors merged (depth within " + task.depthDiffMeters.ToString(fmt2) + "m)"
+    End Sub
+End Class
+
+
+
+
+
+Public Class RedC_Depth : Inherits TaskParent
+    Dim redC As New RedC_Basics
+    Public Sub New()
+        If standalone Then task.gOptions.displayDst1.Checked = True
+        dst0 = New Mat(dst0.Size(), MatType.CV_8U, Scalar.All(0))
+        desc = "cursor.ai: Display the depth of each cell using the same colors as the DepthColorizer_Basics"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        redC.Run(src)
+        dst2 = redC.dst2
+        labels(2) = redC.labels(2)
+
+        dst0.SetTo(0)
+        Dim depthCount As Integer
+        For Each rc In redC.rcList
+            If rc.index = 0 Then Continue For
+            Dim depth8u = CByte(Math.Min(255, rc.depth * 255.0 / task.MaxZmeters))
+            dst0(rc.rect).SetTo(depth8u, rc.mask)
+            depthCount += 1
+        Next
+
+        ApplyColorMap(dst0, dst3, task.colorMapDepth)
+        dst3.SetTo(0, task.noDepthMask)
+
+        Dim clickIndex = redC.rcIndexMap.Get(Of Integer)(task.clickPoint.Y, task.clickPoint.X)
+        If clickIndex > 0 AndAlso clickIndex < redC.rcList.Count Then
+            Dim rc = redC.rcList(clickIndex)
+            SetTrueText(rc.displayCell() + vbCrLf + "Mean depth = " + rc.depth.ToString(fmt2) + "m", 1)
+            task.color(rc.rect).SetTo(white, rc.mask)
+            dst2(rc.rect).SetTo(task.highlight, rc.mask)
+            Rectangle(dst3, rc.rect, task.highlight, task.lineWidth)
+        End If
+
+        labels(3) = CStr(depthCount) + " cells colored by mean depth (0-" +
+                    task.MaxZmeters.ToString(fmt0) + "m DepthColorizer palette)"
+    End Sub
+End Class
