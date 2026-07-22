@@ -239,13 +239,8 @@ Feature_Delaunay
 Feature_GoodFeatures
 Feature_KNN
 Feature_LeftRight
-Feature_MatchAKAZE
-Feature_MatchBRISK
-Feature_MatchKAZE
-Feature_MatchORB
-Feature_MatchSIFT
-Feature_MatchSURF
 Feature_PointsPath
+Feature_StableVisual
 Feature_Tracker
 Feature_WarpAlign
 FeatureFlow_Basics
@@ -278,6 +273,12 @@ FeatureMap_Info
 FeatureMap_Motion
 FeatureMap_Periphery
 FeatureMap_StablePoints
+FeatureMatch_Basics
+FeatureMatch_BRISK
+FeatureMatch_KAZE
+FeatureMatch_ORB
+FeatureMatch_SIFT
+FeatureMatch_SURF
 Filter_Basics_Gray
 Filter_Basics_TA
 Filter_Equalize

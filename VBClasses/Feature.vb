@@ -790,7 +790,7 @@ Namespace VBClasses
 
 
 
-    Public Class XR_Feature_StableVisual : Inherits TaskParent
+    Public Class Feature_StableVisual : Inherits TaskParent
         Dim feat As New Feature_Basics
         Public fpStable As New List(Of fpData)
         Public ptStable As New List(Of cv.Point)
@@ -804,21 +804,21 @@ Namespace VBClasses
             dst3 = feat.dst2
 
             dst2.SetTo(0)
-            Dim stable As New List(Of cv.Point)
+            lastFeatures.Clear()
             For Each pt In feat.features
                 If lastFeatures.Contains(pt) Then
                     Circle(dst2, pt, task.DotSize, task.highlight, -1, task.lineType)
-                    stable.Add(pt)
+                    lastFeatures.Add(pt)
                 End If
             Next
-            lastFeatures = New List(Of cv.Point)(stable)
-            labels(2) = feat.labels(2) + " and " + CStr(stable.Count) + " appeared on earlier frames "
+
+            labels(2) = feat.labels(2) + " and " + CStr(lastFeatures.Count) + " appeared on earlier frames "
 
             dst2 = src.Clone
-            For Each pt In stable
+            For Each pt In lastFeatures
                 Circle(dst2, pt, task.DotSize, task.highlight, -1, task.lineType)
             Next
-            labels(3) = "The " + CStr(stable.Count) + " points are present for more than one frame."
+            labels(3) = "The " + CStr(lastFeatures.Count) + " points are present for more than one frame."
         End Sub
     End Class
 
@@ -1026,29 +1026,6 @@ Namespace VBClasses
             Next
 
             fpLastSrc = src.Clone
-        End Sub
-    End Class
-
-
-
-
-
-
-    Public Class Feature_PointsPath : Inherits TaskParent
-        Dim feat As New Feature_MatchAKAZE
-        Public Sub New()
-            labels(3) = "Features found in the image"
-            desc = "Use the sorted list of Delaunay regions to find the top X points to track."
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            feat.Run(task.gray)
-
-            If task.heartBeat Then dst2.SetTo(0)
-
-            For Each pt In feat.features
-                Circle(dst2, pt, task.DotSize, task.highlight, -1, task.lineType)
-            Next
-            labels(2) = CStr(feat.features.Count) + " targets were present with " + CStr(task.fOptions.FeatureSizeSlider.Value) + " requested."
         End Sub
     End Class
 End Namespace

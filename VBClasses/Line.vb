@@ -30,7 +30,7 @@ Namespace VBClasses
             Return lpList
         End Function
         Public Shared Function updateAgesAndLongest(inputList As List(Of lpData), lastList As List(Of lpData)) As Single
-            Static lpFind As New Line_FindClosest
+            Static lpFind As New Line_FindClosest With {.lpList = inputList, .LastList = lastList}
             lpFind.lpList = inputList
             lpFind.LastList = lastList
             For Each lp In inputList
@@ -57,13 +57,10 @@ Namespace VBClasses
                 lpFind.Run(emptyMat)
                 Dim lpTmp = lpFind.closestLine
 
-                If lpTmp Is Nothing Then
-                    noLineFound = True
-                Else
-                    task.longestLine = New lpData(lpTmp.ptE1, lpTmp.ptE2)
-                    task.longestLine.age = lpTmp.age
+                If lpTmp IsNot Nothing Then
+                    task.longestLine = New lpData(lpTmp.ptE1, lpTmp.ptE2) With {.age = lpTmp.age}
+                    noLineFound = False
                 End If
-                noLineFound = False
             End If
 
             If noLineFound Then
@@ -281,7 +278,7 @@ Namespace VBClasses
         Implements IDisposable
         Public lpList As New List(Of lpData)
         Public ld As FastLineDetector
-        Public motionMask As Mat = New Mat(dst2.Size, MatType.CV_8U, 255)
+        Public motionMask As New Mat(dst2.Size, MatType.CV_8U, 255)
         Dim edges As New Edge_Sobel
         Public edgeDuplicates As New List(Of lpData) ' lines that are dropped to help LineTrack algorithms.
         Dim tiers As New Depth_Tiers
@@ -399,7 +396,7 @@ Namespace VBClasses
     Public Class XR_Line_WithAging : Inherits TaskParent
         Implements IDisposable
         Public lpList As New List(Of lpData)
-        Public motionMask As Mat = New Mat(dst2.Size, MatType.CV_8U, 255)
+        Public motionMask As New Mat(dst2.Size, MatType.CV_8U, 255)
         Public ld As FastLineDetector
         Public removeOverlappingLines As Boolean = True
         Public overLappingCount As Integer
@@ -805,7 +802,7 @@ Namespace VBClasses
             labels = {"", "", "Left image: detected lines with stable track IDs", ""}
             desc = "Cursor.ai: Find all lines in the left image, identify each and track them."
         End Sub
-        Private Function matchScore(r As lpData, t As TrackedLine) As Single
+        Private Shared Function matchScore(r As lpData, t As TrackedLine) As Single
             Dim ad = Math.Abs(r.angle - t.lp.angle)
             If ad > 90 Then ad = 180 - ad
             If ad > angleThresh Then Return Single.MaxValue
@@ -857,11 +854,7 @@ Namespace VBClasses
             For Each r In raw
                 If usedRaw.Contains(r) Then Continue For
                 If tracked.Count >= maxTracked Then Exit For
-                Dim t As New TrackedLine With {
-                            .trackId = nextTrackId,
-                            .lp = r,
-                            .missedCount = 0
-                        }
+                Dim t As New TrackedLine With {.trackId = nextTrackId, .lp = r, .missedCount = 0}
                 r.color = t.lp.color
                 r.index = t.trackId
                 nextTrackId += 1
@@ -1040,7 +1033,7 @@ Namespace VBClasses
             dst3 = New Mat(dst3.Size, MatType.CV_8U, 0)
             desc = "Create a map with the lp.rect field."
         End Sub
-        Private Function fillTriangle(lp As lpData, p1 As cv.Point) As Boolean
+        Private Function fillTriangle(p1 As cv.Point) As Boolean
             Dim val = dst3.Get(Of Byte)(p1.Y, p1.X)
             If val > 0 Then
                 FloodFill(dst3, p1, 255)
@@ -1052,7 +1045,6 @@ Namespace VBClasses
             If task.lines.lpList.Count = 0 Then Exit Sub ' nothing to work on.
 
             Dim mmList As New List(Of mmData)
-            Dim pad = 5
             dst3.SetTo(0)
             dst0.SetTo(0)
             lpList.Clear()
@@ -1068,14 +1060,14 @@ Namespace VBClasses
             labels(2) = CStr(lpList.Count) + " non-overlapping lines were found."
 
             For Each lp In task.lines.lpList
-                If fillTriangle(lp, lp.rect.TopLeft) Then Continue For
-                If fillTriangle(lp, lp.rect.BottomRight) Then Continue For
+                If fillTriangle(lp.rect.TopLeft) Then Continue For
+                If fillTriangle(lp.rect.BottomRight) Then Continue For
 
                 Dim topRight As New cv.Point(CInt(lp.rect.X + lp.rect.Width), CInt(lp.rect.Top))
-                If fillTriangle(lp, topRight) Then Continue For
+                If fillTriangle(topRight) Then Continue For
 
                 Dim botleft As New cv.Point(CInt(lp.rect.X), CInt(lp.rect.Top + lp.rect.Height))
-                If fillTriangle(lp, botleft) Then Continue For
+                If fillTriangle(botleft) Then Continue For
             Next
 
             dst2 = Palettize(dst3, 0)
@@ -1123,17 +1115,8 @@ Namespace VBClasses
             dst3 = New Mat(dst3.Size, MatType.CV_8U, 0)
             desc = "Create a map with the lp.rect field."
         End Sub
-        Private Function fillTriangle(lp As lpData, p1 As cv.Point) As Boolean
-            Dim val = dst3.Get(Of Byte)(p1.Y, p1.X)
-            If val > 0 Then
-                FloodFill(dst3, p1, 255)
-                Return True
-            End If
-            Return False
-        End Function
         Public Overrides Sub RunAlg(src As cv.Mat)
             Dim mmList As New List(Of mmData)
-            Dim pad = 5
             dst3.SetTo(0)
             For Each lp In task.lines.lpList
                 Line(dst3, lp.p1, lp.p2, lp.index + 1, task.lineWidth * 3, LineTypes.Link8)
@@ -1423,7 +1406,7 @@ Namespace VBClasses
             ReDim pixels(side * side)
             desc = "Find lines within each brick."
         End Sub
-        Public Function findLines(pixels() As cv.Point) As List(Of lpData)
+        Public Shared Function findLines(pixels() As cv.Point) As List(Of lpData)
             Dim lpList As New List(Of lpData)
             Dim ptList As New List(Of cv.Point)
             For i = 1 To pixels.Length - 1
@@ -1463,9 +1446,6 @@ Namespace VBClasses
 
                 pixelMat.GetArray(Of cv.Point)(pixels)
 
-                ' use this line for debugging...
-                If task.drawRect.Contains(r.TopLeft) Then Dim k = 0
-
                 Dim lpList = findLines(pixels)
                 For Each lp In lpList
                     Line(dst3(r), lp.p1, lp.p2, task.highlight, task.lineWidth)
@@ -1493,7 +1473,7 @@ Namespace VBClasses
             labels(3) = "The vertical lines found in the previous heartbeat image."
             desc = "Track the vertical lines on the heartbeat."
         End Sub
-        Private Function getVerticals(lpList As List(Of lpData)) As List(Of lpData)
+        Private Shared Function getVerticals(lpList As List(Of lpData)) As List(Of lpData)
             Dim verticals As New List(Of lpData)
             For Each lp In lpList
                 If lp.ptE1.Y <> 0 And lp.ptE2.Y <> 0 Then Continue For
@@ -1867,9 +1847,6 @@ Namespace VBClasses
 
                 Dim lp = findLines(pixels)
 
-                ' use this line for debugging...
-                If task.drawRect.Contains(r.TopLeft) Then Dim k = 0
-
                 If lp IsNot Nothing Then
                     Line(dst2(r), lp.p1, lp.p2, task.highlight, task.lineWidth + 1)
                     dst0(r).Set(Of Byte)(lp.p1.Y, lp.p1.X, 255)
@@ -2035,20 +2012,14 @@ Namespace VBClasses
                 dst1(lp.rect).SetTo(0)
                 Line(dst1, lp.p1, lp.p2, 255, task.lineWidth)
 
-                If task.drawRect.Width > 0 Then
-                    If lp.rect.IntersectsWith(task.drawRect) Then
-                        Dim k = 0
-                    End If
-                End If
-
                 Dim ptArray() As cv.Point = Nothing
                 Dim _fnz As New Mat
                 FindNonZero(dst1(lp.rect), _fnz)
                 _fnz.GetArray(Of cv.Point)(ptArray)
 
-                Dim depth1 As Single = 0, depth2 As Single = 0
+                Dim depth1 As Single, depth2 As Single
                 Dim p1 As cv.Point = Nothing
-                Dim p2 As cv.Point = Nothing
+                Dim p2 As cv.Point
                 For Each p1 In ptArray
                     p1 = New cv.Point(CInt(lp.rect.X + p1.X), CInt(lp.rect.Y + p1.Y))
                     depth1 = task.pcSplit(2).Get(Of Single)(p1.Y, p1.X)

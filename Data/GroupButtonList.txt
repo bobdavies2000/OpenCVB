@@ -64,6 +64,7 @@ Feature
 FeatureFlow
 FeatureLess
 FeatureMap
+FeatureMatch
 Filter
 FindMinRect
 FindNonZero
