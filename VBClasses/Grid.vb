@@ -138,12 +138,11 @@ Public Class XR_Grid_Basics_TATest : Inherits TaskParent
         dst2.SetTo(white, task.gridMask)
 
         dst3.SetTo(0)
-        Parallel.For(0, task.gridRects.Count,
-             Sub(i)
-                 Dim r = task.gridRects(i)
-                 Subtract(meanVal, src(r), dst3(r))
-                 Line(dst3(r), New cv.Point(0, 0), New cv.Point(r.Width, r.Height), white, task.lineWidth, task.lineType)
-             End Sub)
+        For i = 0 To task.gridRects.Count - 1
+            Dim r = task.gridRects(i)
+            Subtract(meanVal, src(r), dst3(r))
+            Line(dst3(r), New cv.Point(0, 0), New cv.Point(r.Width, r.Height), white, task.lineWidth, task.lineType)
+        Next
     End Sub
 End Class
 
@@ -162,10 +161,9 @@ Public Class XR_Grid_List : Inherits TaskParent
         If standalone Then desc = "List the active threads"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        Parallel.ForEach(Of cv.Rect)(task.gridRects,
-             Sub(roi)
-                 dst3(roi).SetTo(0)
-             End Sub)
+        For Each roi In task.gridRects
+            dst3(roi).SetTo(0)
+        Next
         Dim CurrentProcess As Process = Process.GetCurrentProcess()
         Dim myThreads As ProcessThreadCollection = CurrentProcess.Threads
         Dim str = ""

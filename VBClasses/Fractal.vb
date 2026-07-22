@@ -141,13 +141,12 @@ Namespace VBClasses
                 rt = m.startX + (m.endX - m.startX) * task.mouseMovePoint.X / src.Width
                 mt = m.startY + (m.endY - m.startY) * task.mouseMovePoint.Y / src.Height
                 Dim c = New Complex(rt, mt)
-                Parallel.For(src.Width \ 2 - src.Height \ 2, src.Width \ 2 + src.Height \ 2,
-                    Sub(x)
-                        For y = 0 To src.Height - 1 Step detail
-                            Dim z = New Complex(2 * r * (x - src.Width \ 2) / src.Height, 2 * r * (y - src.Height / 2) / src.Height)
-                            julia_point(x, y, r, depth, depth, c, z)
-                        Next
-                    End Sub)
+                For x = src.Width \ 2 - src.Height \ 2 To src.Width \ 2 + src.Height \ 2 - 1
+                    For y = 0 To src.Height - 1 Step detail
+                        Dim z = New Complex(2 * r * (x - src.Width \ 2) / src.Height, 2 * r * (y - src.Height / 2) / src.Height)
+                        julia_point(x, y, r, depth, depth, c, z)
+                    Next
+                Next
                 dst2 = Palettize(dst2)
             End If
         End Sub

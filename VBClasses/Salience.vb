@@ -38,22 +38,21 @@ Public Class XR_Salience_Basics_MT : Inherits TaskParent
         Dim threads = 32
         Dim h = src.Height \ threads
         dst2 = New Mat(dst2.Size(), MatType.CV_8U, Scalar.All(0))
-        Parallel.For(0, threads,
-                Sub(i)
-                    Dim roi = New cv.Rect(0, i * h, src.Width, Math.Min(h, src.Height - i * h))
-                    If roi.Height <= 0 Then Exit Sub
+        For i = 0 To threads - 1
+            Dim roi = New cv.Rect(0, i * h, src.Width, Math.Min(h, src.Height - i * h))
+            If roi.Height <= 0 Then Continue For
 
-                    Dim cPtr = Salience_Open()
-                    Dim input = src(roi).Clone()
-                    Dim grayData(input.Total - 1) As Byte
-                    Dim grayHandle = GCHandle.Alloc(grayData, GCHandleType.Pinned)
-                    input.GetArray(Of Byte)(grayData)
-                    Dim imagePtr = Salience_Run(cPtr, salience.options.numScales, grayHandle.AddrOfPinnedObject, roi.Height, roi.Width)
-                    grayHandle.Free()
+            Dim cPtr = Salience_Open()
+            Dim input = src(roi).Clone()
+            Dim grayData(input.Total - 1) As Byte
+            Dim grayHandle = GCHandle.Alloc(grayData, GCHandleType.Pinned)
+            input.GetArray(Of Byte)(grayData)
+            Dim imagePtr = Salience_Run(cPtr, salience.options.numScales, grayHandle.AddrOfPinnedObject, roi.Height, roi.Width)
+            grayHandle.Free()
 
-                    dst2(roi) = Mat.FromPixelData(roi.Height, roi.Width, MatType.CV_8U, imagePtr).Clone
-                    If cPtr <> 0 Then cPtr = Salience_Close(cPtr)
-                End Sub)
+            dst2(roi) = Mat.FromPixelData(roi.Height, roi.Width, MatType.CV_8U, imagePtr).Clone
+            If cPtr <> 0 Then cPtr = Salience_Close(cPtr)
+        Next
     End Sub
 End Class
 

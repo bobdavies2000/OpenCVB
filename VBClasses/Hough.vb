@@ -116,16 +116,15 @@ Namespace VBClasses
             dst2 = task.edges.dst2
 
             Dim depth8uC3 = task.depthRGB
-            Parallel.ForEach(task.gridRects,
-            Sub(roi)
+            For Each roi In task.gridRects
                 Dim segments() = HoughLines(dst2(roi), options.rho, options.theta, options.threshold)
                 If segments.Count = 0 Then
                     dst3(roi) = depth8uC3(roi)
-                    Exit Sub
+                    Continue For
                 End If
                 dst3(roi).SetTo(0)
                 Hough_Basics.houghShowLines(dst3(roi), segments, 1)
-            End Sub)
+            Next
         End Sub
     End Class
 

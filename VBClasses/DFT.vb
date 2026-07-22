@@ -125,8 +125,7 @@ Namespace VBClasses
             dft.Run(src)
 
             If task.optionsChanged Then
-                Parallel.For(0, 2,
-                Sub(k)
+                For k = 0 To 1
                     Dim r = options.radius / (k + 1), rNext As Double
                     options.butterworthFilter(k) = New Mat(dft.complexImage.Size(), MatType.CV_32FC2)
                     Dim tmp As New Mat(options.butterworthFilter(k).Size(), MatType.CV_32F, Scalar.All(0))
@@ -139,14 +138,13 @@ Namespace VBClasses
                     Next
                     Dim tmpMerge() = {tmp, tmp}
                     Merge(tmpMerge, options.butterworthFilter(k))
-                End Sub)
+                Next
             End If
-            Parallel.For(0, 2,
-           Sub(k)
-               Dim complex As New Mat
-               MulSpectrums(options.butterworthFilter(k), dft.complexImage, complex, options.dftFlag)
-               If k = 0 Then dst2 = inverseDFT(complex) Else dst3 = inverseDFT(complex)
-           End Sub)
+            For k = 0 To 1
+                Dim complex As New Mat
+                MulSpectrums(options.butterworthFilter(k), dft.complexImage, complex, options.dftFlag)
+                If k = 0 Then dst2 = inverseDFT(complex) Else dst3 = inverseDFT(complex)
+            Next
         End Sub
     End Class
 

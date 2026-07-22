@@ -154,8 +154,7 @@ Namespace VBClasses
             End If
 
             If task.heartBeat Then dst3.SetTo(0)
-            Parallel.For(0, task.gridRects.Count,
-            Sub(i)
+            For i = 0 To task.gridRects.Count - 1
                 Dim r = task.gridRects(i)
                 Dim mm As mmData = GetMinMax(task.pcSplit(2)(r), task.depthmask(r))
                 If mm.minLoc.X < 0 Or mm.minLoc.Y < 0 Then mm.minLoc = New Point2f(0, 0)
@@ -169,7 +168,7 @@ Namespace VBClasses
                 Dim p2 = New cv.Point(mm.maxLoc.X + r.X, mm.maxLoc.Y + r.Y)
                 Circle(dst3, p1, task.DotSize, task.highlight, -1, task.lineType)
                 Circle(dst3, p2, task.DotSize, Scalar.Red, -1, task.lineType)
-            End Sub)
+            Next
         End Sub
     End Class
 
@@ -1205,21 +1204,20 @@ Namespace VBClasses
             If depthUnitsMeters = False Then src = (src * 0.001).ToMat
             Dim multX = task.pointCloud.Width / src.Width
             Dim multY = task.pointCloud.Height / src.Height
-            Parallel.ForEach(task.gridRects,
-                  Sub(roi)
-                      Dim xy As New Point3f
-                      For y = roi.Y To roi.Y + roi.Height - 1
-                          For x = roi.X To roi.X + roi.Width - 1
-                              xy.X = x * multX
-                              xy.Y = y * multY
-                              xy.Z = src.Get(Of Single)(y, x)
-                              If xy.Z <> 0 Then
-                                  Dim xyz = Cloud_Basics.worldCoordinates(xy)
-                                  dst3.Set(Of Point3f)(y, x, xyz)
-                              End If
-                          Next
-                      Next
-                  End Sub)
+            For Each roi In task.gridRects
+                Dim xy As New Point3f
+                For y = roi.Y To roi.Y + roi.Height - 1
+                    For x = roi.X To roi.X + roi.Width - 1
+                        xy.X = x * multX
+                        xy.Y = y * multY
+                        xy.Z = src.Get(Of Single)(y, x)
+                        If xy.Z <> 0 Then
+                            Dim xyz = Cloud_Basics.worldCoordinates(xy)
+                            dst3.Set(Of Point3f)(y, x, xyz)
+                        End If
+                    Next
+                Next
+            Next
             SetTrueText("OpenGL data prepared.")
         End Sub
     End Class

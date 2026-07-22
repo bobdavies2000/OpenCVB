@@ -71,13 +71,12 @@ Namespace VBClasses
                 dst2 = task.gray
             Else
                 dst2 = New Mat(src.Size(), MatType.CV_8U, Scalar.All(0))
-                Parallel.For(0, src.Rows,
-                    Sub(y)
-                        For x = 0 To src.Cols - 1
-                            Dim cc = src.Get(Of Vec3b)(y, x)
-                            dst2.Set(Of Byte)(y, x, CByte((cc(0) * 1140 + cc(1) * 5870 + cc(2) * 2989) / 10000))
-                        Next
-                    End Sub)
+                For y = 0 To src.Rows - 1
+                    For x = 0 To src.Cols - 1
+                        Dim cc = src.Get(Of Vec3b)(y, x)
+                        dst2.Set(Of Byte)(y, x, CByte((cc(0) * 1140 + cc(1) * 5870 + cc(2) * 2989) / 10000))
+                    Next
+                Next
             End If
         End Sub
     End Class
