@@ -2,7 +2,7 @@ Imports System.IO
 Imports System.Threading
 
 Module Program
-    Sub Main(args As String())
+    Sub Main()
         ' Ensure only one instance can run at a time using a named Mutex
         Dim mutexName As String = "Global\UI_Generator_SingleInstance"
         Dim createdNew As Boolean = False
@@ -17,7 +17,6 @@ Module Program
             Dim appPath As String = AppDomain.CurrentDomain.BaseDirectory
             Dim vbClassesPath As String = Path.GetFullPath(Path.Combine(appPath, "..\..\..\..\..\VBClasses"))
             Dim vbClasses As New SortedList(Of String, String)
-            Dim xoClasses As New SortedList(Of String, String)
             Dim xrClasses As New SortedList(Of String, String)
             Dim cursorClasses As New SortedList(Of String, String)
             Dim displayClasses As New SortedList(Of String, String)
@@ -29,22 +28,25 @@ Module Program
 
             Dim toggleTotal As Integer
             Dim currClassname As String = ""
+            Dim charQ As Char = "'"
             For Each vbFile As String In vbFiles
                 Dim lines() As String = File.ReadAllLines(vbFile)
 
                 For Each line As String In lines
                     Dim trimmedLine As String = line.Trim()
+                    If trimmedLine.StartsWith(charQ) Then Continue For
 
                     ' Count non-empty, non-comment lines
-                    If Not String.IsNullOrEmpty(trimmedLine) And Not trimmedLine.StartsWith("'") Then
-                        If toggleTotal Then totalLinesRead += 1
-                    End If
+                    If Not String.IsNullOrEmpty(trimmedLine) Then If toggleTotal Then totalLinesRead += 1
 
-                    If line.ToLower.Contains("cursor.ai") Then cursorClasses.Add(currClassname, currClassname)
-                    If line.Contains(": Inherits TaskParent") Then
+                    If currClassname <> "" Then
+                        Dim testLine = trimmedLine.ToLower
+                        If testLine.Contains("cursor.ai") Then cursorClasses.Add(currClassname, currClassname)
+                    End If
+                    If trimmedLine.Contains(": Inherits TaskParent") Then
                         toggleTotal = False
                         ' Parse the class name from lines like: "Public Class ClassName : Inherits " + parentName
-                        currClassname = ExtractClassName(line)
+                        currClassname = ExtractClassName(trimmedLine)
                         If Not String.IsNullOrEmpty(currClassname) Then
                             allClasses.Add(currClassname, currClassname)
                             If currClassname.StartsWith("XR_") Then
@@ -54,7 +56,7 @@ Module Program
                                 'displayClasses.Add(currClassname, currClassname)
                                 'toggleTotal = True
                             ElseIf currClassname.StartsWith("XO_") Then
-                                xoClasses.Add(currClassname, currClassname)
+                                ' skipping it now...
                             Else
                                 vbClasses.Add(currClassname, currClassname)
                                 displayClasses.Add(currClassname, currClassname)
@@ -70,7 +72,7 @@ Module Program
             Dim countsFilePath As String = Path.Combine(dataPath, "AlgorithmCounts.txt")
             Dim countsContent As String = "CodeLineCount = " & totalLinesRead.ToString() & vbCrLf &
                                           "AlgorithmCount = " & displayClasses.Count.ToString() & vbCrLf &
-                                          "Reference algorithm count = " & xoClasses.Count.ToString() & vbCrLf &
+                                          "Reference algorithm count = " & vbCrLf &
                                           "Average lines for displayed algorithm = " &
                                           (totalLinesRead \ displayClasses.Count).ToString() & vbCrLf
             File.WriteAllText(countsFilePath, countsContent)
@@ -130,7 +132,6 @@ Module Program
             Console.WriteLine($"{displayClasses.Count} classes will be displayed:")
             Console.WriteLine($"Total source lines for displayed classes: {totalLinesRead}")
             Console.WriteLine($"XR_ Reference algorithm count: {xrClasses.Count}")
-            Console.WriteLine($"XO_ Reference algorithm count: {xoClasses.Count}")
             Console.WriteLine($"Cursor.ai algorithms: {cursorClasses.Count}")
             Console.WriteLine($"Total algorithms in development: { allClasses.Count}")
             Console.WriteLine($"Average lines per displayed algorithm: " + (totalLinesRead \ displayClasses.Count).ToString())
@@ -142,16 +143,13 @@ Module Program
 
     Function ExtractClassName(line As String) As String
         ' Line format: "Public Class ClassName : Inherits TaskParent"
-        Dim trimmedLine As String = line.Trim()
-        If trimmedLine.StartsWith("'") Then Return Nothing
-
         ' Find "Class " and ": Inherits"
-        Dim classIndex As Integer = trimmedLine.IndexOf("Class ")
-        Dim inheritsIndex As Integer = trimmedLine.IndexOf(": Inherits")
+        Dim classIndex As Integer = line.IndexOf("Class ")
+        Dim inheritsIndex As Integer = line.IndexOf(": Inherits")
 
         If classIndex >= 0 And inheritsIndex > classIndex Then
             Dim startPos As Integer = classIndex + 6  ' Length of "Class "
-            Dim className As String = trimmedLine.Substring(startPos, inheritsIndex - startPos).Trim()
+            Dim className As String = line.Substring(startPos, inheritsIndex - startPos).Trim()
             Return className
         End If
 

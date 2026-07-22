@@ -2,8 +2,6 @@ AddWeighted_Accumulate
 AddWeighted_Basics
 Annealing_Basics_CPP
 ApproxPoly_Basics
-AsciiArt_Basics
-AsciiArt_Color
 BackProject_Basics
 BackProject_Depth
 BackProject_DepthMouse
@@ -20,8 +18,6 @@ BackProject2D_Filter
 BackProject2D_FilterSide
 BackProject2D_FilterTop
 BackProject2D_Grayscale
-Benford_Basics
-Bezier_Basics
 BGSubtract_Basics
 BGSubtract_MOG
 BGSubtract_MOG2
@@ -44,10 +40,6 @@ Bin4Way_UnstablePixels1
 Binarize_Basics
 Binarize_Simple
 BinNWay_Basics
-Bitmap_ToMat
-Blob_Basics
-Blob_Input
-Blob_RenderBlobs
 BlockMatching_Basics
 Blur_Basics
 Blur_Bilateral
@@ -557,7 +549,6 @@ Neighbor_Basics
 Neighbor_ColorOnly
 Neighbor_Intersects32S
 Neighbor_Intersects8u
-Neighbor_Precise
 OEX_CalcBackProject_Demo1
 OEX_PointPolygon
 OpAuto_Peaks2D

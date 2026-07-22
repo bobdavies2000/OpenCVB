@@ -38,7 +38,7 @@ Namespace VBClasses
 
 
     Public Class Options_SharpGL2 : Inherits OptionParent
-        Public eye As Vec3f = New Vec3f(0, 0, 0)
+        Public eye As New Vec3f(0, 0, 0)
         Public Sub New()
             If sliders.Setup(traceName) Then
                 sliders.setupTrackBar("SharpGL Eye X X10", -180, 180, eye(0) * 10)
@@ -59,8 +59,8 @@ Namespace VBClasses
 
 
     Public Class Options_Quaternion : Inherits OptionParent
-        Public q1 As Quaternion = New Quaternion
-        Public q2 As Quaternion = New Quaternion
+        Public q1 As New Quaternion
+        Public q2 As New Quaternion
         Public Sub New()
             If sliders.Setup(traceName) Then
                 sliders.setupTrackBar("quaternion A.x X100", -100, 100, -50)
@@ -137,7 +137,7 @@ Namespace VBClasses
 
     Public Class Options_CamShift : Inherits OptionParent
         Public camMax As Integer = 255
-        Public camSBins As Scalar = New Scalar(0, 40, 32)
+        Public camSBins As New Scalar(0, 40, 32)
         Public Sub New()
             If sliders.Setup(traceName) Then
                 sliders.setupTrackBar("CamShift vMin", 0, 255, camSBins(2))
@@ -772,7 +772,7 @@ Namespace VBClasses
 
 
     Public Class Options_DCT : Inherits OptionParent
-        Public dctFlag As DctFlags = New DctFlags
+        Public dctFlag As New DctFlags
         Public runLengthMin As Integer = 15
         Public removeFrequency As Integer = 1
         Public Sub New()
@@ -1185,7 +1185,7 @@ Namespace VBClasses
 
     Public Class Options_SymmetricalShapes : Inherits OptionParent
         Public rotateAngle As Double = 0
-        Public fillColor As Scalar = New Scalar(0, 0, 255)
+        Public fillColor As New Scalar(0, 0, 255)
         Public numPoints As Integer = 0
         Public nGenPer As Integer = 0
         Public radius1 As Integer = 0
@@ -1387,8 +1387,8 @@ Namespace VBClasses
         Public minDistance As Integer = 7
         Public blockSize As Integer = 7
         Public nightMode As Boolean = False
-        Public subPixWinSize As Size = New Size(10, 10)
-        Public winSize As Size = New Size(3, 3)
+        Public subPixWinSize As New Size(10, 10)
+        Public winSize As New Size(3, 3)
         Public Sub New()
             If sliders.Setup(traceName) Then
                 sliders.setupTrackBar("KLT - MaxCorners", 1, 200, maxCorners)
@@ -1430,7 +1430,7 @@ Namespace VBClasses
 
 
     Public Class Options_Laplacian : Inherits OptionParent
-        Public kernel As Size = New Size(3, 3)
+        Public kernel As New Size(3, 3)
         Public scale As Double = 1
         Public delta As Double = 0
         Public gaussianBlur As Boolean = False
@@ -1640,6 +1640,7 @@ Namespace VBClasses
     Public Class Options_RotatePoly : Inherits OptionParent
         Public changeCheck As CheckBox
         Public angleSlider As TrackBar
+        Public angle As Integer
         Public Sub New()
             If sliders.Setup(traceName) Then sliders.setupTrackBar("Amount to rotate triangle", -180, 180, 10)
 
@@ -1647,11 +1648,11 @@ Namespace VBClasses
                 check.Setup(traceName)
                 check.addCheckBox("Change center of rotation and triangle")
             End If
-
             angleSlider = OptionParent.FindSlider("Amount to rotate triangle")
             changeCheck = FindCheckBox("Change center of rotation and triangle")
         End Sub
         Public Sub Run()
+            angle = angleSlider.Value
         End Sub
     End Class
 
@@ -2195,8 +2196,6 @@ Namespace VBClasses
                 radio.check(1).Checked = True
             End If
         End Sub
-        Public Sub showIntercepts(mousePoint As cv.Point, dst As Mat)
-        End Sub
         Public Sub Run()
             Static interceptSlider = OptionParent.FindSlider("Intercept width range in pixels")
             interceptRange = interceptSlider.Value
@@ -2548,9 +2547,6 @@ Namespace VBClasses
                 radio.addRadio("Use Initialized Labels")
                 radio.check(2).Checked = True
             End If
-        End Sub
-        Public Sub setK(k As Integer)
-            OptionParent.FindSlider("KMeans k").Value = k
         End Sub
         Public Sub Run()
             Static frm = FindFrm(traceName + " Radio Buttons")
@@ -3175,7 +3171,7 @@ Namespace VBClasses
     Public Class Options_Complexity : Inherits OptionParent
         Public filename As FileInfo
         Public filenames As List(Of String)
-        Public plotColor As Scalar = New Scalar(255, 255, 0)
+        Public plotColor As New Scalar(255, 255, 0)
         Public Sub New()
             Dim fnames = Directory.GetFiles(task.homeDir + "Complexity")
             filenames = fnames.ToList
@@ -3195,7 +3191,7 @@ Namespace VBClasses
         End Sub
         Public Function setPlotColor() As Scalar
             Static frm = FindFrm(traceName + " Radio Buttons")
-            Dim index As Integer = 0
+            Dim index As Integer
             For index = 0 To filenames.Count - 1
                 If filename.FullName = filenames(index) Then Exit For
             Next
@@ -3898,7 +3894,7 @@ Namespace VBClasses
     Public Class Options_AsciiArt : Inherits OptionParent
         Public hStep As Double = 20
         Public wStep As Double = 20
-        Public size As Size = New Size(wStep, hStep)
+        Public size As New Size(wStep, hStep)
         Public Sub New()
             If sliders.Setup(traceName) Then
                 sliders.setupTrackBar("Character height in pixels", 20, 100, hStep)
@@ -3921,7 +3917,7 @@ Namespace VBClasses
 
 
     Public Class Options_MotionDetect : Inherits OptionParent
-        Public threadData As Vec3i = New Vec3i(0, 0, 0)
+        Public threadData As New Vec3i(0, 0, 0)
         Public CCthreshold As Double = 0
         Public pad As Integer = 0
         Public stdevThreshold As Integer = 0
@@ -4204,17 +4200,6 @@ Namespace VBClasses
             If radio.check(6).Checked Then linkAddress = "http://download.tensorflow.org/models/object_detection/faster_rcnn_inception_v2_coco_2018_01_28.tar.gz"
             If radio.check(7).Checked Then linkAddress = "http://download.tensorflow.org/models/object_detection/faster_rcnn_resnet50_coco_2018_01_28.tar.gz"
             If radio.check(8).Checked Then linkAddress = "http://download.tensorflow.org/models/object_detection/mask_rcnn_inception_v2_coco_2018_01_28.tar.gz"
-
-            Dim filename As String = ""
-            If radio.check(0).Checked Or downloadIndex = 0 Then filename = "ibug_300W_large_face_landmark_dataset.tar.gz"
-            If radio.check(1).Checked Or downloadIndex = 1 Then filename = "ssd_mobilenet_v1_coco_2017_11_17.tar.gz"
-            If radio.check(2).Checked Or downloadIndex = 2 Then filename = "ssd_mobilenet_v1_ppn_shared_box_predictor_300x300_coco14_sync_2018_07_03.tar.gz"
-            If radio.check(3).Checked Or downloadIndex = 3 Then filename = "ssd_mobilenet_v2_coco_2018_03_29.tar.gz"
-            If radio.check(4).Checked Or downloadIndex = 4 Then filename = "ssd_inception_v2_coco_2017_11_17.tar.gz"
-            If radio.check(5).Checked Or downloadIndex = 5 Then filename = "ssd_mobilenet_v3_large_coco_2020_01_14.tar.gz"
-            If radio.check(6).Checked Or downloadIndex = 6 Then filename = "faster_rcnn_inception_v2_coco_2018_01_28.tar.gz"
-            If radio.check(7).Checked Or downloadIndex = 7 Then filename = "faster_rcnn_resnet50_coco_2018_01_28.tar.gz"
-            If radio.check(8).Checked Or downloadIndex = 8 Then filename = "mask_rcnn_inception_v2_coco_2018_01_28.tar.gz"
         End Sub
     End Class
 
@@ -4372,8 +4357,8 @@ Namespace VBClasses
 
 
     Public Class Options_Blob : Inherits OptionParent
-        Dim blob As New Blob_Input
-        Public blobParams As SimpleBlobDetector.Params = New SimpleBlobDetector.Params
+        Dim blob As New XR_Blob_Input
+        Public blobParams As New SimpleBlobDetector.Params
         Public Sub New()
             blob.updateFrequency = 30
 
@@ -5290,6 +5275,8 @@ Namespace VBClasses
             Static fgFineTuning = findRadio("Selected rectangle is added to the foreground")
             Static clearCheck = findRadio("Clear all foreground and background fine tuning")
             Static saveRadio = fgFineTuning.checked
+            fineTuning = saveRadio.checked
+            clearAll = clearCheck.checked
         End Sub
     End Class
 
@@ -5811,8 +5798,8 @@ Namespace VBClasses
 
 
     Public Class Options_OEX : Inherits OptionParent
-        Public lows As Scalar = New Scalar(90, 50, 50)
-        Public highs As Scalar = New Scalar(180, 150, 150)
+        Public lows As New Scalar(90, 50, 50)
+        Public highs As New Scalar(180, 150, 150)
         Public Sub New()
             If sliders.Setup(traceName) Then
                 sliders.setupTrackBar("Hue low", 0, 180, lows(0))
@@ -6927,24 +6914,6 @@ Namespace VBClasses
 
 
 
-    Public Class Options_ColorMethod : Inherits OptionParent
-        Public Sub New()
-            If FindFrm(traceName + " CheckBox Options") Is Nothing Then
-                check.Setup(traceName)
-                For Each alg In task.fOptions.colorMethods
-                    check.addCheckBox(alg)
-                Next
-                check.Box(4).Checked = True
-            End If
-        End Sub
-        Public Sub Run()
-        End Sub
-    End Class
-
-
-
-
-
     Public Class Options_Outliers : Inherits OptionParent
         Public cutoffPercent As Single
         Public Sub New()
@@ -7134,7 +7103,7 @@ Namespace VBClasses
 
 
     Public Class Options_OpenGLFunctions : Inherits OptionParent
-        Public moveAmount As Scalar = New Scalar(0, 0, 0)
+        Public moveAmount As New Scalar(0, 0, 0)
         Public FOV As Double = 75
         Public yaw As Double = -3
         Public pitch As Double = 3
@@ -7142,8 +7111,8 @@ Namespace VBClasses
         Public zNear As Double = 0
         Public zFar As Double = 20.0
         Public zTrans As Double = 0.5
-        Public eye As Vec3f = New Vec3f(4, 20, -2)
-        Public scaleXYZ As Vec3f = New Vec3f(15, 30, 1)
+        Public eye As New Vec3f(4, 20, -2)
+        Public scaleXYZ As New Vec3f(15, 30, 1)
         Public pointSize As Integer = 5
         Public Sub New()
             If sliders.Setup(traceName) Then
@@ -7361,11 +7330,11 @@ Namespace VBClasses
 
 
     Public Class Options_OpenGL2 : Inherits OptionParent
-        Public moveAmount As Scalar = New Scalar(0, 0, 0)
+        Public moveAmount As New Scalar(0, 0, 0)
         Public FOV As Double = 80
         Public zNear As Double = 0
         Public zFar As Double = 20
-        Public eye As Vec3f = New Vec3f(4, 20, -2)
+        Public eye As New Vec3f(4, 20, -2)
         Public Sub New()
             If sliders.Setup(traceName) Then
                 sliders.setupTrackBar("OpenGL Eye X X100", -180, 180, eye(1))
@@ -7420,8 +7389,8 @@ Namespace VBClasses
 
 
     Public Class Options_OpenGL4 : Inherits OptionParent
-        Public moveAmount As Scalar = New Scalar(0, 0, 0)
-        Public scaleXYZ As Vec3f = New Vec3f(15, 30, 1)
+        Public moveAmount As New Scalar(0, 0, 0)
+        Public scaleXYZ As New Vec3f(15, 30, 1)
         Public Sub New()
             If sliders.Setup(traceName) Then
                 sliders.setupTrackBar("OpenGL shift left/right (X-axis) X100", -300, 300, 0)
@@ -7808,19 +7777,6 @@ Namespace VBClasses
 
             resyncThreshold = resyncSlider.value / 100
             agastThreshold = agastslider.value
-        End Sub
-    End Class
-
-
-
-
-    Public Class Options_History : Inherits OptionParent
-        Public Sub New()
-            If sliders.Setup(traceName) Then sliders.setupTrackBar("Frame History", 1, 35, 3)
-        End Sub
-        Public Sub Run()
-            Static histSlider = FindSlider("Frame History")
-            task.fOptions.FrameHistoryCount.Value = histSlider.value
         End Sub
     End Class
 

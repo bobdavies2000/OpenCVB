@@ -5,7 +5,6 @@ Namespace VBClasses
         Dim options As New Options_Boundary
         Public valleys(3) As Integer ' grayscale values for low points in the histogram.
         Dim scaleList As New List(Of Single)
-        Dim optionsHistory As New Options_History
         Public Sub New()
             OptionParent.FindSlider("Frame History").Value = 30
             task.gOptions.setHistogramBins(255)
@@ -14,7 +13,6 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
-            optionsHistory.Run()
 
             Dim vCount = options.desiredBoundaries
             Dim minDistance = options.peakDistance

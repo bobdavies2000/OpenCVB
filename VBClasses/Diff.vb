@@ -58,8 +58,8 @@ Namespace VBClasses
             diff.Run(src)
             Dim unstableGray = diff.dst2.Clone()
             depth.Run(task.depthRGB)
-            Dim unstableDepth As New Mat
-            Dim mask As New Mat
+            Dim unstableDepth As Mat
+            Dim mask As Mat
             unstableDepth = Not depth.dst3
             If unstableGray.Channels() = 3 Then CvtColor(unstableGray, unstableGray, ColorConversionCodes.BGR2GRAY)
             mask = unstableGray Or unstableDepth
@@ -77,15 +77,12 @@ Namespace VBClasses
     Public Class Diff_RGBAccum : Inherits TaskParent
         Dim diff As New Diff_Basics
         Dim history As New List(Of Mat)
-        Dim options As New Options_History
         Public Sub New()
             labels = {"", "", "Accumulated BGR image", "Mask of changed pixels"}
             dst2 = New Mat(dst2.Size(), MatType.CV_8U, Scalar.All(0))
             desc = "Run Diff_Basics and accumulate BGR diff data."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            options.Run()
-
             If task.optionsChanged Then history.Clear()
 
             diff.Run(src)

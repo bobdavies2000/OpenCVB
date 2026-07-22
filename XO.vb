@@ -16,63 +16,63 @@ Namespace VBClasses
     '            Return redList.dst2
     '        End Function
     '    End Module
-    Public Class XO_Model_FlatSurfaces : Inherits TaskParent
-        Public totalPixels As Integer
-        Dim floorList As New List(Of Single)
-        Dim ceilingList As New List(Of Single)
-        Public Sub New()
-            desc = "Minimalist approach to find a flat surface that is oriented to gravity (floor or ceiling)"
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            Dim ranges() = New cv.Rangef() {New cv.Rangef(-task.yRange, task.yRange), New cv.Rangef(0, task.MaxZmeters)}
-            CalcHist({task.pointCloud}, {1, 2}, New cv.Mat, dst0, 2,
-                                    {dst2.Height, dst2.Width}, ranges)
+    'Public Class XO_Model_FlatSurfaces : Inherits TaskParent
+    '    Public totalPixels As Integer
+    '    Dim floorList As New List(Of Single)
+    '    Dim ceilingList As New List(Of Single)
+    '    Public Sub New()
+    '        desc = "Minimalist approach to find a flat surface that is oriented to gravity (floor or ceiling)"
+    '    End Sub
+    '    Public Overrides Sub RunAlg(src As cv.Mat)
+    '        Dim ranges() = New cv.Rangef() {New cv.Rangef(-task.yRange, task.yRange), New cv.Rangef(0, task.MaxZmeters)}
+    '        CalcHist({task.pointCloud}, {1, 2}, New cv.Mat, dst0, 2,
+    '                                {dst2.Height, dst2.Width}, ranges)
 
-            Dim thicknessCMs = 0.1, rect As cv.Rect, nextY As Single
-            totalPixels = 0
-            For y = dst0.Height - 2 To 0 Step -1
-                rect = New cv.Rect(0, y, dst0.Width - 1, 1)
-                Dim count = CountNonZero(dst0(rect))
-                Dim pixelCount = Sum(dst0(rect))
-                totalPixels += pixelCount.Val0
-                If count > 10 Then
-                    nextY = -task.yRange * (task.sideCameraPoint.Y - y) / task.sideCameraPoint.Y - thicknessCMs
-                    Exit For
-                End If
-            Next
+    '        Dim thicknessCMs = 0.1, rect As cv.Rect, nextY As Single
+    '        totalPixels = 0
+    '        For y = dst0.Height - 2 To 0 Step -1
+    '            rect = New cv.Rect(0, y, dst0.Width - 1, 1)
+    '            Dim count = CountNonZero(dst0(rect))
+    '            Dim pixelCount = Sum(dst0(rect))
+    '            totalPixels += pixelCount.Val0
+    '            If count > 10 Then
+    '                nextY = -task.yRange * (task.sideCameraPoint.Y - y) / task.sideCameraPoint.Y - thicknessCMs
+    '                Exit For
+    '            End If
+    '        Next
 
-            Dim floorY = rect.Y
-            floorList.Add(nextY)
-            task.pcFloor = floorList.Average()
-            If floorList.Count > task.fOptions.FrameHistoryCount.Value Then floorList.RemoveAt(0)
-            labels(2) = "Y = " + task.pcFloor.ToString(fmt3) + " separates the floor.  Total pixels below floor level = " + totalPixels.ToString(fmt0)
+    '        Dim floorY = rect.Y
+    '        floorList.Add(nextY)
+    '        task.pcFloor = floorList.Average()
+    '        If floorList.Count > task.fOptions.FrameHistoryCount.Value Then floorList.RemoveAt(0)
+    '        labels(2) = "Y = " + task.pcFloor.ToString(fmt3) + " separates the floor.  Total pixels below floor level = " + totalPixels.ToString(fmt0)
 
-            For y = 0 To dst2.Height - 1
-                rect = New cv.Rect(0, y, dst0.Width - 1, 1)
-                Dim count = CountNonZero(dst0(rect))
-                Dim pixelCount = Sum(dst0(rect))
-                totalPixels += pixelCount.Val0
-                If count > 10 Then
-                    nextY = -task.yRange * (task.sideCameraPoint.Y - y) / task.sideCameraPoint.Y - thicknessCMs
-                    Exit For
-                End If
-            Next
+    '        For y = 0 To dst2.Height - 1
+    '            rect = New cv.Rect(0, y, dst0.Width - 1, 1)
+    '            Dim count = CountNonZero(dst0(rect))
+    '            Dim pixelCount = Sum(dst0(rect))
+    '            totalPixels += pixelCount.Val0
+    '            If count > 10 Then
+    '                nextY = -task.yRange * (task.sideCameraPoint.Y - y) / task.sideCameraPoint.Y - thicknessCMs
+    '                Exit For
+    '            End If
+    '        Next
 
-            Dim ceilingY = rect.Y
-            ceilingList.Add(nextY)
-            task.pcCeiling = ceilingList.Average()
-            If ceilingList.Count > task.fOptions.FrameHistoryCount.Value Then ceilingList.RemoveAt(0)
-            labels(3) = "Y = " + task.pcCeiling.ToString(fmt3) + " separates the ceiling.  Total pixels above ceiling level = " + totalPixels.ToString(fmt0)
+    '        Dim ceilingY = rect.Y
+    '        ceilingList.Add(nextY)
+    '        task.pcCeiling = ceilingList.Average()
+    '        If ceilingList.Count > task.fOptions.FrameHistoryCount.Value Then ceilingList.RemoveAt(0)
+    '        labels(3) = "Y = " + task.pcCeiling.ToString(fmt3) + " separates the ceiling.  Total pixels above ceiling level = " + totalPixels.ToString(fmt0)
 
-            If standaloneTest() Then
-                Threshold(dst0, dst2, 0, 255, cv.ThresholdTypes.Binary)
-                dst2.ConvertTo(dst2, cv.MatType.CV_8U)
-                CvtColor(dst2, dst2, cv.ColorConversionCodes.GRAY2BGR)
-                Line(dst2, New cv.Point(0, floorY), New cv.Point(dst2.Width, floorY), cv.Scalar.Red, task.lineWidth + 2, task.lineType)
-                Line(dst2, New cv.Point(0, ceilingY), New cv.Point(dst2.Width, ceilingY), cv.Scalar.Red, task.lineWidth + 2, task.lineType)
-            End If
-        End Sub
-    End Class
+    '        If standaloneTest() Then
+    '            Threshold(dst0, dst2, 0, 255, cv.ThresholdTypes.Binary)
+    '            dst2.ConvertTo(dst2, cv.MatType.CV_8U)
+    '            CvtColor(dst2, dst2, cv.ColorConversionCodes.GRAY2BGR)
+    '            Line(dst2, New cv.Point(0, floorY), New cv.Point(dst2.Width, floorY), cv.Scalar.Red, task.lineWidth + 2, task.lineType)
+    '            Line(dst2, New cv.Point(0, ceilingY), New cv.Point(dst2.Width, ceilingY), cv.Scalar.Red, task.lineWidth + 2, task.lineType)
+    '        End If
+    '    End Sub
+    'End Class
 
 
 
@@ -24372,7 +24372,7 @@ End Class
 
 
 
-Public Class XO_Match_VH : Inherits TaskParent
+Public Class Match_VH : Inherits TaskParent
     Public brickCells As New List(Of gravityLine)
     Dim match As New XO_Match_tCell
     Dim gLines As New XO_Line_GCloud
@@ -24446,7 +24446,7 @@ End Class
 
 
 
-Public Class XO_IMU_VerticalVerify : Inherits TaskParent
+Public Class IMU_VerticalVerify : Inherits TaskParent
     Public brickCells As New List(Of gravityLine)
     Dim linesVH As New Match_VH
     Dim options As New Options_VerticalVerify
@@ -24600,7 +24600,7 @@ End Class
 
 
 
-Public Class XO_Structured_LinearizeFloor : Inherits TaskParent
+Public Class XR_Structured_LinearizeFloor : Inherits TaskParent
     Public floor As New XO_Structured_FloorCeiling
     Dim kalman As New Kalman_VB_Basics
     Public sliceMask As Mat

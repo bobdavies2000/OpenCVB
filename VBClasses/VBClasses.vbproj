@@ -19,6 +19,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="XO.vb" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Import Include="System.Data" />
     <Import Include="System.Drawing" />
     <Import Include="System.Windows.Forms" />

@@ -1,761 +1,232 @@
-﻿Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
-Imports VBClasses
-Public Class Structured_Basics : Inherits TaskParent
-    Public lpListX As New List(Of lpData)
-    Public lpListY As New List(Of lpData)
-    Public lines As New Line_Basics
-    Dim struct As New Structured_Core
-    Public Sub New()
-        task.gOptions.highlight.SelectedItem = "Red"
-        task.gOptions.LineWidth.Value += 1
-        dst2 = New Mat(dst2.Size, MatType.CV_8U, 0)
-        desc = "Find the lines in the X-direction of the Structured_Core output"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        struct.Run(src)
-        lines.Run(struct.dst2)
+﻿Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCvSharp
+Namespace VBClasses
+    Public Class Structured_Basics : Inherits TaskParent
+        Public lpListX As New List(Of lpData)
+        Public lpListY As New List(Of lpData)
+        Public lines As New Line_Basics
+        Dim struct As New Structured_Core
+        Public Sub New()
+            task.gOptions.highlight.SelectedItem = "Red"
+            task.gOptions.LineWidth.Value += 1
+            dst2 = New Mat(dst2.Size, MatType.CV_8U, 0)
+            desc = "Find the lines in the X-direction of the Structured_Core output"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            struct.Run(src)
+            lines.Run(struct.dst2)
 
-        CvtColor(task.leftView, dst2, ColorConversionCodes.GRAY2BGR)
-        lpListX = New List(Of lpData)(lines.lpList)
-        For Each lp In lines.lpList
-            Line(dst2, lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
-        Next
-        labels(2) = struct.labels(2)
+            CvtColor(task.leftView, dst2, ColorConversionCodes.GRAY2BGR)
+            lpListX = New List(Of lpData)(lines.lpList)
+            For Each lp In lines.lpList
+                Line(dst2, lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
+            Next
+            labels(2) = struct.labels(2)
 
-        lines.Run(struct.dst3)
-        CvtColor(task.leftView, dst3, ColorConversionCodes.GRAY2BGR)
-        lpListY = New List(Of lpData)(lines.lpList)
-        For Each lp In lines.lpList
-            Line(dst3, lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
-        Next
-        labels(3) = struct.labels(3)
-    End Sub
-End Class
-
-
-
-
-
-Public Class Structured_Core : Inherits TaskParent
-    Public Sub New()
-        dst2 = New Mat(dst2.Size, MatType.CV_8U, 0)
-        dst3 = New Mat(dst3.Size, MatType.CV_8U, 0)
-        desc = "Build structured slices through the cv.Point cloud.  Use the global option 'Grid Square Size' to adjust pattern."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        dst2.SetTo(0)
-        Dim depthMask As New Mat
-        For yCoordinate = 0 To src.Height - 1 Step task.gridWH
-            Dim sliceY = -task.yRange * (task.sideCameraPoint.Y - yCoordinate) / task.sideCameraPoint.Y
-            If yCoordinate > task.sideCameraPoint.Y Then
-                sliceY = task.yRange * (yCoordinate - task.sideCameraPoint.Y) / (dst3.Height - task.sideCameraPoint.Y)
-            End If
-            Dim minVal = sliceY - task.metersPerPixel
-            Dim maxVal = sliceY + task.metersPerPixel
-            InRange(task.pcSplit(1), minVal, maxVal, depthMask)
-            dst2.SetTo(255, depthMask)
-            If minVal < 0 And maxVal > 0 Then dst2.SetTo(0, task.noDepthMask)
-        Next
-
-        dst3.SetTo(0)
-        For xCoordinate = 0 To src.Width - 1 Step task.gridWH
-            Dim sliceX = -task.xRange * (task.topCameraPoint.X - xCoordinate) / task.topCameraPoint.X
-            If xCoordinate > task.topCameraPoint.X Then
-                sliceX = task.xRange * (xCoordinate - task.topCameraPoint.X) / (dst3.Width - task.topCameraPoint.X)
-            End If
-            Dim minVal = sliceX - task.metersPerPixel
-            Dim maxVal = sliceX + task.metersPerPixel
-            InRange(task.pcSplit(0), minVal, maxVal, depthMask)
-            dst3.SetTo(255, depthMask)
-            If minVal < 0 And maxVal > 0 Then dst3.SetTo(0, task.noDepthMask)
-        Next
-        labels = {"", "", "Horizontal depth lines with cell size = " + CStr(task.gridWH), "Vertical depth lines with cell size = " + CStr(task.gridWH)}
-    End Sub
-End Class
+            lines.Run(struct.dst3)
+            CvtColor(task.leftView, dst3, ColorConversionCodes.GRAY2BGR)
+            lpListY = New List(Of lpData)(lines.lpList)
+            For Each lp In lines.lpList
+                Line(dst3, lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
+            Next
+            labels(3) = struct.labels(3)
+        End Sub
+    End Class
 
 
 
 
 
-
-
-
-Public Class XR_Structured_MultiSliceLines : Inherits TaskParent
-    Dim multi As New Structured_MultiSlice
-    Dim core As New Line_Core
-    Public Sub New()
-        desc = "Detect lines in the multiSlice output"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        multi.Run(src)
-        dst3 = multi.dst3
-
-        Dim _core_cvt As New Mat
-        CvtColor(dst3, _core_cvt, ColorConversionCodes.BGR2GRAY)
-        core.Run(_core_cvt)
-        dst2 = core.dst2
-    End Sub
-End Class
-
-
-
-
-
-
-
-
-Public Class XR_Structured_CountTop : Inherits TaskParent
-    Dim slice As New Structured_SliceV
-    Dim plot As New PlotBar_Basics
-    Dim counts As New List(Of Single)
-    Public Sub New()
-        If standalone Then task.gOptions.displayDst1.Checked = True
-        labels = {"", "Structured Slice heatmap input - red line is max", "Max Slice output - likely vertical surface", "Histogram of pixel counts in each slice"}
-        desc = "Count the number of pixels found in each slice of the cv.Point cloud data."
-    End Sub
-    Private Function makeXSlice(index As Integer) As Mat
-        Dim sliceMask As New Mat
-
-        Dim planeX = -task.xRange * (task.topCameraPoint.X - index) / task.topCameraPoint.X
-        If index > task.topCameraPoint.X Then planeX = task.xRange * (index - task.topCameraPoint.X) / (dst3.Width - task.topCameraPoint.X)
-
-        Dim minVal = planeX - task.metersPerPixel
-        Dim maxVal = planeX + task.metersPerPixel
-        InRange(task.pcSplit(0).Clone, minVal, maxVal, sliceMask)
-        If minVal < 0 And maxVal > 0 Then sliceMask.SetTo(0, task.noDepthMask) ' don't include zero depth locations
-        counts.Add(CountNonZero(sliceMask))
-        Return sliceMask
-    End Function
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        slice.Run(src)
-        dst1 = slice.dst3.Clone
-
-        counts.Clear()
-        For i = 0 To dst2.Width - 1
-            makeXSlice(i)
-        Next
-
-        Dim max = counts.Max
-        Dim index = counts.IndexOf(max)
-        dst0 = makeXSlice(index)
-        dst2 = task.color.Clone
-        dst2.SetTo(white, dst0)
-        Line(dst1, New cv.Point(index, 0), New cv.Point(index, dst1.Height), Scalar.Red, slice.options.sliceSize)
-
-        Dim hist As Mat = Mat.FromPixelData(dst0.Width, 1, MatType.CV_32F, counts.ToArray)
-        plot.Run(hist)
-
-        dst3 = plot.dst2
-    End Sub
-End Class
-
-
-
-
-
-
-
-
-Public Class XR_Structured_MultiSliceH : Inherits TaskParent
-    Public heat As New HeatMap_Basics
-    Public sliceMask As Mat
-    Dim options As New Options_Structured
-    Public Sub New()
-        OptionParent.FindCheckBox("Top View (Unchecked Side View)").Checked = False
-        desc = "Use slices through the cv.Point cloud to find straight lines indicating planes present in the depth data."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        options.Run()
-        Dim stepsize = options.stepSize
-
-        heat.Run(src)
-        dst3 = heat.dst3
-
-        sliceMask = New Mat(dst2.Size(), MatType.CV_8U, Scalar.All(0))
-        For yCoordinate = 0 To src.Height - 1 Step stepsize
-            Dim planeY = -task.yRange * (task.sideCameraPoint.Y - yCoordinate) / task.sideCameraPoint.Y
-            If yCoordinate > task.sideCameraPoint.Y Then planeY = task.yRange * (yCoordinate - task.sideCameraPoint.Y) / (dst3.Height - task.sideCameraPoint.Y)
+    Public Class Structured_Core : Inherits TaskParent
+        Public Sub New()
+            dst2 = New Mat(dst2.Size, MatType.CV_8U, 0)
+            dst3 = New Mat(dst3.Size, MatType.CV_8U, 0)
+            desc = "Build structured slices through the cv.Point cloud.  Use the global option 'Grid Square Size' to adjust pattern."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            dst2.SetTo(0)
             Dim depthMask As New Mat
-            Dim minVal As Double, maxVal As Double
-            minVal = planeY - task.metersPerPixel
-            maxVal = planeY + task.metersPerPixel
-            InRange(task.pcSplit(1).Clone, minVal, maxVal, depthMask)
-            sliceMask.SetTo(255, depthMask)
-            If minVal < 0 And maxVal > 0 Then sliceMask.SetTo(0, task.noDepthMask)
-        Next
+            For yCoordinate = 0 To src.Height - 1 Step task.gridWH
+                Dim sliceY = -task.yRange * (task.sideCameraPoint.Y - yCoordinate) / task.sideCameraPoint.Y
+                If yCoordinate > task.sideCameraPoint.Y Then
+                    sliceY = task.yRange * (yCoordinate - task.sideCameraPoint.Y) / (dst3.Height - task.sideCameraPoint.Y)
+                End If
+                Dim minVal = sliceY - task.metersPerPixel
+                Dim maxVal = sliceY + task.metersPerPixel
+                InRange(task.pcSplit(1), minVal, maxVal, depthMask)
+                dst2.SetTo(255, depthMask)
+                If minVal < 0 And maxVal > 0 Then dst2.SetTo(0, task.noDepthMask)
+            Next
 
-        dst2 = task.color.Clone
-        dst2.SetTo(white, sliceMask)
-        labels(3) = heat.labels(3)
-    End Sub
-End Class
+            dst3.SetTo(0)
+            For xCoordinate = 0 To src.Width - 1 Step task.gridWH
+                Dim sliceX = -task.xRange * (task.topCameraPoint.X - xCoordinate) / task.topCameraPoint.X
+                If xCoordinate > task.topCameraPoint.X Then
+                    sliceX = task.xRange * (xCoordinate - task.topCameraPoint.X) / (dst3.Width - task.topCameraPoint.X)
+                End If
+                Dim minVal = sliceX - task.metersPerPixel
+                Dim maxVal = sliceX + task.metersPerPixel
+                InRange(task.pcSplit(0), minVal, maxVal, depthMask)
+                dst3.SetTo(255, depthMask)
+                If minVal < 0 And maxVal > 0 Then dst3.SetTo(0, task.noDepthMask)
+            Next
+            labels = {"", "", "Horizontal depth lines with cell size = " + CStr(task.gridWH), "Vertical depth lines with cell size = " + CStr(task.gridWH)}
+        End Sub
+    End Class
 
 
 
 
 
 
-Public Class XR_Structured_SliceXPlot : Inherits TaskParent
-    Dim multi As New Structured_MultiSlice
-    Dim options As New Options_Structured
-    Public Sub New()
-        desc = "Find any plane around a peak value in the top-down histogram"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        options.Run()
 
-        multi.Run(src)
-        dst3 = multi.heat.dst2
 
-        Dim col = If(task.mouseMovePoint.X = 0, dst2.Width / 2, task.mouseMovePoint.X)
+    Public Class XR_Structured_MultiSliceLines : Inherits TaskParent
+        Dim multi As New Structured_MultiSlice
+        Dim core As New Line_Core
+        Public Sub New()
+            desc = "Detect lines in the multiSlice output"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            multi.Run(src)
+            dst3 = multi.dst3
 
-        Dim rect = New cv.Rect(col, 0, If(col + options.sliceSize >= dst3.Width, dst3.Width - col,
-                                   options.sliceSize), dst3.Height - 1)
-        Dim mm As mmData = GetMinMax(multi.heat.topframes.dst2(rect))
+            Dim _core_cvt As New Mat
+            CvtColor(dst3, _core_cvt, ColorConversionCodes.BGR2GRAY)
+            core.Run(_core_cvt)
+            dst2 = core.dst2
+        End Sub
+    End Class
 
-        Circle(dst3, New cv.Point(col, mm.maxLoc.Y), task.DotSize + 3, Scalar.Yellow, -1, task.lineType)
 
-        dst2 = task.color.Clone
-        Dim filterZ = (dst3.Height - mm.maxLoc.Y) / dst3.Height * task.MaxZmeters
-        If filterZ > 0 Then
-            Dim depthMask As New Mat
-            InRange(task.pcSplit(2), filterZ - 0.05, filterZ + 0.05, depthMask) ' a 10 cm buffer surrounding the z value
-            dst2.SetTo(white, depthMask)
-        End If
 
-        labels(3) = "Peak histogram count (" + mm.maxVal.ToString(fmt0) + ") at " + filterZ.ToString(fmt2) + " meters +-" + (5 / dst2.Height / task.MaxZmeters).ToString(fmt2) + " m"
-        SetTrueText("Use the mouse to move the yellow dot above.", New cv.Point(10, dst2.Height * 7 / 8), 3)
-    End Sub
-End Class
 
 
 
 
 
-
-
-Public Class XR_Structured_SliceYPlot : Inherits TaskParent
-    Dim multi As New Structured_MultiSlice
-    Dim options As New Options_Structured
-    Public Sub New()
-        desc = "Find any plane around a peak value in the side view histogram"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        options.Run()
-
-        multi.Run(src)
-        dst3 = multi.heat.dst3
-
-        Dim row = If(task.mouseMovePoint.Y = 0, dst2.Height / 2, task.mouseMovePoint.Y)
-
-        Dim rect = New cv.Rect(0, row, dst3.Width - 1, If(row + options.sliceSize >= dst3.Height,
-                                   dst3.Height - row, options.sliceSize))
-        Dim mm As mmData = GetMinMax(multi.heat.sideframes.dst2(rect))
-
-        If mm.maxVal > 0 Then
-            Circle(dst3, New cv.Point(mm.maxLoc.X, row), task.DotSize + 3, Scalar.Yellow, -1, task.lineType)
-            ' dst3.Line(New cv.Point(mm.maxLoc.X, 0), New cv.Point(mm.maxLoc.X, dst3.Height), task.highlight, task.lineWidth, task.lineType)
-            Dim filterZ = mm.maxLoc.X / dst3.Width * task.MaxZmeters
-
-            Dim depthMask As New Mat
-
-            InRange(task.pcSplit(2), filterZ - 0.05, filterZ + 0.05, depthMask) ' a 10 cm buffer surrounding the z value
-            dst2 = task.color.Clone
-            dst2.SetTo(white, depthMask)
-            Dim pixelsPerMeter = dst2.Width / task.MaxZmeters
-            labels(3) = "Peak histogram count (" + mm.maxVal.ToString(fmt0) + ") at " + filterZ.ToString(fmt2) + " meters +-" + (5 / pixelsPerMeter).ToString(fmt2) + " m"
-        End If
-        SetTrueText("Use the mouse to move the yellow dot above.", New cv.Point(10, dst2.Height * 7 / 8), 3)
-    End Sub
-End Class
-
-
-
-
-
-
-
-Public Class Structured_SliceEither : Inherits TaskParent
-    Public heat As New HeatMap_Basics
-    Public sliceMask As New Mat
-    Dim options As New Options_Structured
-    Public Sub New()
-        OptionParent.FindCheckBox("Top View (Unchecked Side View)").Checked = False
-        desc = "Create slices in top and side views"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        options.Run()
-        Static topRadio = OptionParent.FindCheckBox("Top View (Unchecked Side View)")
-        Dim topView = topRadio.checked
-
-        Dim sliceVal = If(topView, task.mouseMovePoint.X, task.mouseMovePoint.Y)
-        heat.Run(src)
-
-        Dim minVal As Double, maxVal As Double
-        If topView Then
-            Dim planeX = -task.xRange * (task.topCameraPoint.X - sliceVal) / task.topCameraPoint.X
-            If sliceVal > task.topCameraPoint.X Then planeX = task.xRange * (sliceVal - task.topCameraPoint.X) / (dst3.Width - task.topCameraPoint.X)
-            minVal = planeX - task.metersPerPixel
-            maxVal = planeX + task.metersPerPixel
-            InRange(task.pcSplit(0), minVal, maxVal, sliceMask)
-        Else
-            Dim planeY = -task.yRange * (task.sideCameraPoint.Y - sliceVal) / task.sideCameraPoint.Y
-            If sliceVal > task.sideCameraPoint.Y Then planeY = task.yRange * (sliceVal - task.sideCameraPoint.Y) / (dst3.Height - task.sideCameraPoint.Y)
-            minVal = planeY - task.metersPerPixel
-            maxVal = planeY + task.metersPerPixel
-            InRange(task.pcSplit(1), minVal, maxVal, sliceMask)
-        End If
-
-        If minVal < 0 And maxVal > 0 Then sliceMask.SetTo(0, task.noDepthMask)
-
-        labels(2) = "At offset " + CStr(sliceVal) + " x = " + ((maxVal + minVal) / 2).ToString(fmt2) + " with " +
-                     (Math.Abs(maxVal - minVal) * 100).ToString(fmt2) + " cm width"
-
-        labels(3) = heat.labels(3)
-
-        dst3 = heat.dst3
-        Circle(dst3, New cv.Point(task.topCameraPoint.X, dst3.Height), task.DotSize, Scalar.Yellow, -1, task.lineType)
-        If topView Then
-            Line(dst3, New cv.Point(sliceVal, 0), New cv.Point(sliceVal, dst3.Height),
-                          Scalar.Yellow, task.lineWidth)
-        Else
-            Dim yPlaneOffset = If(sliceVal < dst3.Height - options.sliceSize, CInt(sliceVal),
-                                      dst3.Height - options.sliceSize - 1)
-            Line(dst3, New cv.Point(0, yPlaneOffset), New cv.Point(dst3.Width, yPlaneOffset), Scalar.Yellow,
-                          options.sliceSize)
-        End If
-        If standaloneTest() Then
-            dst2 = src
-            dst2.SetTo(white, sliceMask)
-        End If
-    End Sub
-End Class
-
-
-
-
-
-
-
-
-
-
-Public Class XR_Structured_TransformH : Inherits TaskParent
-    Dim options As New Options_Structured
-    Dim histTop As New Projection_HistTop
-    Public Sub New()
-        labels(3) = "Top down view of the slice of the cv.Point cloud"
-        desc = "Find and isolate planes (floor and ceiling) in a TopView or SideView histogram."
-    End Sub
-    Public Function createSliceMaskH() As Mat
-        options.Run()
-
-        Dim sliceMask As New Mat
-        Dim ycoordinate = If(task.mouseMovePoint.Y = 0, dst2.Height / 2, task.mouseMovePoint.Y)
-
-        Dim planeY = -task.yRange * (task.sideCameraPoint.Y - ycoordinate) / task.sideCameraPoint.Y
-        If ycoordinate > task.sideCameraPoint.Y Then planeY = task.yRange * (ycoordinate - task.sideCameraPoint.Y) / (dst3.Height - task.sideCameraPoint.Y)
-
-        Dim thicknessMeters = options.sliceSize * task.metersPerPixel
-        Dim minVal = planeY - thicknessMeters
-        Dim maxVal = planeY + thicknessMeters
-        InRange(task.pcSplit(1), minVal, maxVal, sliceMask)
-
-        labels(2) = "At offset " + CStr(ycoordinate) + " y = " + ((maxVal + minVal) / 2).ToString(fmt2) + " with " +
-                        (Math.Abs(maxVal - minVal) * 100).ToString(fmt2) + " cm width"
-        If minVal < 0 And maxVal > 0 Then sliceMask.SetTo(0, task.noDepthMask)
-
-        Return sliceMask
-    End Function
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        Dim sliceMask = createSliceMaskH()
-
-        histTop.Run(task.pointCloud.SetTo(0, Not sliceMask))
-        dst3 = histTop.dst2
-
-        If standaloneTest() Then
-            dst2 = src
-            dst2.SetTo(white, sliceMask)
-        End If
-    End Sub
-End Class
-
-
-
-
-
-
-Public Class XR_Structured_TransformV : Inherits TaskParent
-    Dim options As New Options_Structured
-    Dim histSide As New Projection_HistSide
-    Public Sub New()
-        labels(3) = "Side view of the slice of the cv.Point cloud"
-        desc = "Find and isolate planes using the top view histogram data"
-    End Sub
-    Public Function createSliceMaskV() As Mat
-        options.Run()
-
-        Dim sliceMask As New Mat
-        If task.mouseMovePoint = newPoint Then task.mouseMovePoint = New cv.Point(dst2.Width / 2, dst2.Height)
-        Dim xCoordinate = If(task.mouseMovePoint.X = 0, dst2.Width / 2, task.mouseMovePoint.X)
-
-        Dim planeX = -task.xRange * (task.topCameraPoint.X - xCoordinate) / task.topCameraPoint.X
-        If xCoordinate > task.topCameraPoint.X Then planeX = task.xRange * (xCoordinate - task.topCameraPoint.X) / (dst3.Width - task.topCameraPoint.X)
-
-        Dim thicknessMeters = options.sliceSize * task.metersPerPixel
-        Dim minVal = planeX - thicknessMeters
-        Dim maxVal = planeX + thicknessMeters
-        InRange(task.pcSplit(0), minVal, maxVal, sliceMask)
-
-        labels(2) = "At offset " + CStr(xCoordinate) + " x = " + ((maxVal + minVal) / 2).ToString(fmt2) + " with " +
-                        (Math.Abs(maxVal - minVal) * 100).ToString(fmt2) + " cm width"
-
-        If minVal < 0 And maxVal > 0 Then sliceMask.SetTo(0, task.noDepthMask)
-
-        Return sliceMask
-    End Function
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        Dim sliceMask = createSliceMaskV()
-
-        histSide.Run(task.pointCloud.SetTo(0, Not sliceMask))
-        dst3 = histSide.dst2
-
-        If standaloneTest() Then
-            dst2 = src
-            dst2.SetTo(white, sliceMask)
-        End If
-    End Sub
-End Class
-
-
-
-
-
-
-Public Class XR_Structured_CountSide : Inherits TaskParent
-    Dim slice As New Structured_SliceH
-    Dim plot As New PlotBar_Basics
-    Dim rotate As New Rotate_Basics
-    Public counts As New List(Of Single)
-    Public maxCountIndex As Integer
-    Public yValues As New List(Of Single)
-    Public Sub New()
-        rotate.rotateCenter = New Point2f(dst2.Width / 2, dst2.Width / 2)
-        rotate.rotateAngle = -90
-        If standalone Then task.gOptions.displayDst1.Checked = True
-        labels = {"", "Max Slice output - likely flat surface", "Structured Slice heatmap input - red line is max", "Histogram of pixel counts in each slice"}
-        desc = "Count the number of pixels found in each slice of the cv.Point cloud data."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        slice.Run(src)
-        dst2 = slice.dst3
-
-        counts.Clear()
-        yValues.Clear()
-        For i = 0 To dst2.Height - 1
-            Dim planeY = task.yRange * (i - task.sideCameraPoint.Y) / task.sideCameraPoint.Y
-            Dim minVal = planeY - task.metersPerPixel, maxVal = planeY + task.metersPerPixel
-
+    Public Class XR_Structured_CountTop : Inherits TaskParent
+        Dim slice As New Structured_SliceV
+        Dim plot As New PlotBar_Basics
+        Dim counts As New List(Of Single)
+        Public Sub New()
+            If standalone Then task.gOptions.displayDst1.Checked = True
+            labels = {"", "Structured Slice heatmap input - red line is max", "Max Slice output - likely vertical surface", "Histogram of pixel counts in each slice"}
+            desc = "Count the number of pixels found in each slice of the cv.Point cloud data."
+        End Sub
+        Private Function makeXSlice(index As Integer) As Mat
             Dim sliceMask As New Mat
 
-            InRange(task.pcSplit(1), minVal, maxVal, sliceMask)
+            Dim planeX = -task.xRange * (task.topCameraPoint.X - index) / task.topCameraPoint.X
+            If index > task.topCameraPoint.X Then planeX = task.xRange * (index - task.topCameraPoint.X) / (dst3.Width - task.topCameraPoint.X)
+
+            Dim minVal = planeX - task.metersPerPixel
+            Dim maxVal = planeX + task.metersPerPixel
+            InRange(task.pcSplit(0).Clone, minVal, maxVal, sliceMask)
             If minVal < 0 And maxVal > 0 Then sliceMask.SetTo(0, task.noDepthMask) ' don't include zero depth locations
             counts.Add(CountNonZero(sliceMask))
-            yValues.Add(planeY)
-        Next
+            Return sliceMask
+        End Function
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            slice.Run(src)
+            dst1 = slice.dst3.Clone
 
-        Dim max = counts.Max
-        maxCountIndex = counts.IndexOf(max)
-        Line(dst2, New cv.Point(0, maxCountIndex), New cv.Point(dst2.Width, maxCountIndex), Scalar.Red, slice.options.sliceSize)
-
-        Dim hist As Mat = Mat.FromPixelData(dst0.Height, 1, MatType.CV_32F, counts.ToArray)
-        plot.dst2 = New Mat(dst2.Height, dst2.Height, MatType.CV_8UC3, Scalar.All(0))
-        plot.Run(hist)
-        dst3 = plot.dst2
-
-        Resize(dst3, dst3, New Size(dst2.Width, dst2.Width))
-        rotate.Run(dst3)
-        dst3 = rotate.dst2
-        SetTrueText("Max flat surface at: " + vbCrLf + yValues(maxCountIndex).ToString(fmt3), 2)
-    End Sub
-End Class
-
-
-
-
-
-Public Class XR_Structured_CountSideSum : Inherits TaskParent
-    Public counts As New List(Of Single)
-    Public maxCountIndex As Integer
-    Public yValues As New List(Of Single)
-    Public Sub New()
-        labels = {"", "Max Slice output - likely flat surface", "Structured Slice heatmap input - red line is max", "Histogram of pixel counts in each slice"}
-        desc = "Count the number of points found in each slice of the cv.Point cloud data."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        CalcHist({task.pointCloud}, task.channelsSide, New Mat, dst2, 2, task.bins2D, task.rangesSide)
-        dst2.Col(0).SetTo(0)
-
-        counts.Clear()
-        yValues.Clear()
-        Dim ratio = task.yRange / task.yRangeDefault
-        For i = 0 To dst2.Height - 1
-            Dim planeY = task.yRange * (i - task.sideCameraPoint.Y) / task.sideCameraPoint.Y
-            Dim sumRow As Single = Sum(dst2.Row(i))
-            counts.Add(sumRow)
-            yValues.Add(planeY * ratio)
-        Next
-
-        Threshold(dst2, dst2, 0, Scalar.White, ThresholdTypes.Binary)
-
-        Dim max = counts.Max
-        If max = 0 Then Exit Sub
-
-        Dim surfaces As New List(Of Single)
-        For i = 0 To counts.Count - 1
-            If counts(i) >= max / 2 Then
-                Line(dst2, New cv.Point(0, i), New cv.Point(dst2.Width, i), white, task.lineWidth, task.lineType)
-                surfaces.Add(yValues(i))
-            End If
-        Next
-
-        If task.heartBeat Then
-            strOut = "Flat surface at: "
-            For i = 0 To surfaces.Count - 1
-                strOut += surfaces(i).ToString(fmt3) + ", "
-                If i Mod 10 = 0 And i > 0 Then strOut += vbCrLf
+            counts.Clear()
+            For i = 0 To dst2.Width - 1
+                makeXSlice(i)
             Next
-        End If
-        SetTrueText(strOut, 2)
 
-        dst3.SetTo(Scalar.Red)
-        Dim barHeight = dst2.Height / counts.Count
-        For i = 0 To counts.Count - 1
-            Dim w = dst2.Width * counts(i) / max
-            Rectangle(dst3, New cv.Rect(0, i * barHeight, w, barHeight), Scalar.Black, -1)
-        Next
-    End Sub
-End Class
+            Dim max = counts.Max
+            Dim index = counts.IndexOf(max)
+            dst0 = makeXSlice(index)
+            dst2 = task.color.Clone
+            dst2.SetTo(white, dst0)
+            Line(dst1, New cv.Point(index, 0), New cv.Point(index, dst1.Height), Scalar.Red, slice.options.sliceSize)
 
+            Dim hist As Mat = Mat.FromPixelData(dst0.Width, 1, MatType.CV_32F, counts.ToArray)
+            plot.Run(hist)
 
-
-
-
+            dst3 = plot.dst2
+        End Sub
+    End Class
 
 
 
-Public Class Structured_SliceV : Inherits TaskParent
-    Public heat As New HeatMap_Basics
-    Public sliceMask As New Mat
-    Public options As New Options_Structured
-    Public Sub New()
-        OptionParent.FindCheckBox("Top View (Unchecked Side View)").Checked = True
-        desc = "Find and isolate planes using the top view histogram data"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        options.Run()
 
-        If task.mouseMovePoint = newPoint Then task.mouseMovePoint = New cv.Point(dst2.Width / 2, dst2.Height)
-        Dim xCoordinate = If(task.mouseMovePoint.X = 0, dst2.Width / 2, task.mouseMovePoint.X)
 
-        heat.Run(src)
 
-        Dim planeX = -task.xRange * (task.topCameraPoint.X - xCoordinate) / task.topCameraPoint.X
-        If xCoordinate > task.topCameraPoint.X Then planeX = task.xRange * (xCoordinate - task.topCameraPoint.X) / (dst3.Width - task.topCameraPoint.X)
 
-        Dim thicknessMeters = options.sliceSize * task.metersPerPixel
-        Dim minVal = planeX - thicknessMeters
-        Dim maxVal = planeX + thicknessMeters
-        InRange(task.pcSplit(0), minVal, maxVal, sliceMask)
-        If minVal < 0 And maxVal > 0 Then sliceMask.SetTo(0, task.noDepthMask)
 
-        labels(2) = "At offset " + CStr(xCoordinate) + " x = " + ((maxVal + minVal) / 2).ToString(fmt2) +
-                        " with " + (Math.Abs(maxVal - minVal) * 100).ToString(fmt2) + " cm width"
+    Public Class XR_Structured_MultiSliceH : Inherits TaskParent
+        Public heat As New HeatMap_Basics
+        Public sliceMask As Mat
+        Dim options As New Options_Structured
+        Public Sub New()
+            OptionParent.FindCheckBox("Top View (Unchecked Side View)").Checked = False
+            desc = "Use slices through the cv.Point cloud to find straight lines indicating planes present in the depth data."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            options.Run()
+            Dim stepsize = options.stepSize
 
-        labels(3) = heat.labels(3)
+            heat.Run(src)
+            dst3 = heat.dst3
 
-        dst3 = heat.dst2
-        Circle(dst3, New cv.Point(task.topCameraPoint.X, 0), task.DotSize, task.highlight, -1, task.lineType)
-        Line(dst3, New cv.Point(xCoordinate, 0), New cv.Point(xCoordinate, dst3.Height), task.highlight, options.sliceSize)
-        If standaloneTest() Then
-            dst2 = src
+            sliceMask = New Mat(dst2.Size(), MatType.CV_8U, Scalar.All(0))
+            For yCoordinate = 0 To src.Height - 1 Step stepsize
+                Dim planeY = -task.yRange * (task.sideCameraPoint.Y - yCoordinate) / task.sideCameraPoint.Y
+                If yCoordinate > task.sideCameraPoint.Y Then planeY = task.yRange * (yCoordinate - task.sideCameraPoint.Y) / (dst3.Height - task.sideCameraPoint.Y)
+                Dim depthMask As New Mat
+                Dim minVal As Double, maxVal As Double
+                minVal = planeY - task.metersPerPixel
+                maxVal = planeY + task.metersPerPixel
+                InRange(task.pcSplit(1).Clone, minVal, maxVal, depthMask)
+                sliceMask.SetTo(255, depthMask)
+                If minVal < 0 And maxVal > 0 Then sliceMask.SetTo(0, task.noDepthMask)
+            Next
+
+            dst2 = task.color.Clone
             dst2.SetTo(white, sliceMask)
-        End If
-    End Sub
-End Class
+            labels(3) = heat.labels(3)
+        End Sub
+    End Class
 
 
 
 
 
 
+    Public Class XR_Structured_SliceXPlot : Inherits TaskParent
+        Dim multi As New Structured_MultiSlice
+        Dim options As New Options_Structured
+        Public Sub New()
+            desc = "Find any plane around a peak value in the top-down histogram"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            options.Run()
 
-Public Class Structured_SliceH : Inherits TaskParent
-    Public heat As New HeatMap_Basics
-    Public sliceMask As New Mat
-    Public options As New Options_Structured
-    Public ycoordinate As Integer
-    Public Sub New()
-        desc = "Find and isolate planes (floor and ceiling) in a TopView or SideView histogram."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        options.Run()
+            multi.Run(src)
+            dst3 = multi.heat.dst2
 
-        heat.Run(src)
+            Dim col = If(task.mouseMovePoint.X = 0, dst2.Width / 2, task.mouseMovePoint.X)
 
-        If standaloneTest() Then ycoordinate = If(task.mouseMovePoint.Y = 0, dst2.Height / 2, task.mouseMovePoint.Y)
+            Dim rect = New cv.Rect(col, 0, If(col + options.sliceSize >= dst3.Width, dst3.Width - col,
+                                   options.sliceSize), dst3.Height - 1)
+            Dim mm As mmData = GetMinMax(multi.heat.topframes.dst2(rect))
 
-        Dim sliceY = -task.yRange * (task.sideCameraPoint.Y - ycoordinate) / task.sideCameraPoint.Y
-        If ycoordinate > task.sideCameraPoint.Y Then sliceY = task.yRange * (ycoordinate - task.sideCameraPoint.Y) / (dst3.Height - task.sideCameraPoint.Y)
+            Circle(dst3, New cv.Point(col, mm.maxLoc.Y), task.DotSize + 3, Scalar.Yellow, -1, task.lineType)
 
-        Dim thicknessMeters = options.sliceSize * task.metersPerPixel
-        Dim minVal = sliceY - thicknessMeters
-        Dim maxVal = sliceY + thicknessMeters
-        InRange(task.pcSplit(1), minVal, maxVal, sliceMask)
-
-        labels(2) = "At offset " + CStr(ycoordinate) + " y = " + ((maxVal + minVal) / 2).ToString(fmt2) +
-                        " with " + (Math.Abs(maxVal - minVal) * 100).ToString(fmt2) + " cm width"
-        If minVal <= 0 And maxVal >= 0 Then sliceMask.SetTo(0, task.noDepthMask)
-        labels(3) = heat.labels(2)
-
-        dst3 = heat.dst3
-        Dim yPlaneOffset = If(ycoordinate < dst3.Height - options.sliceSize, CInt(ycoordinate), dst3.Height - options.sliceSize - 1)
-        Circle(dst3, New cv.Point(0, task.sideCameraPoint.Y), task.DotSize, task.highlight, -1, task.lineType)
-        Line(dst3, New cv.Point(0, yPlaneOffset), New cv.Point(dst3.Width, yPlaneOffset), task.highlight, options.sliceSize)
-        If standaloneTest() Then
-            dst2 = src
-            dst2.SetTo(white, sliceMask)
-        End If
-    End Sub
-End Class
-
-
-
-
-
-
-
-Public Class XR_Structured_SurveyH : Inherits TaskParent
-    Public Sub New()
-        labels(2) = "Each slice represents cv.Point cloud pixels with the same Y-Range"
-        labels(3) = "Y-Range - compressed to increase the size of each slice.  Use Y-range slider to adjust the size of each slice."
-        desc = "Mark each horizontal slice with a separate color.  Y-Range determines how thick the slice is."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        If src.Type <> MatType.CV_32FC3 Then src = task.pointCloud
-
-        CalcHist({src}, task.channelsSide, New Mat, dst3, 2, task.bins2D, task.rangesSide)
-        dst3.Col(0).SetTo(0)
-        Threshold(dst3, dst3, 0, 255, ThresholdTypes.Binary)
-        dst3.ConvertTo(dst3, MatType.CV_8U)
-
-        Dim topRow As Integer
-        For topRow = 0 To dst2.Height - 1
-            If CountNonZero(dst3.Row(topRow)) Then Exit For
-        Next
-
-        Dim botRow As Integer
-        For botRow = dst2.Height - 1 To 0 Step -1
-            If CountNonZero(dst3.Row(botRow)) Then Exit For
-        Next
-
-        Dim index As Integer
-        dst2.SetTo(0)
-        For y = topRow To botRow
-            Dim sliceY = -task.yRange * (task.sideCameraPoint.Y - y) / task.sideCameraPoint.Y
-            If y > task.sideCameraPoint.Y Then sliceY = task.yRange * (y - task.sideCameraPoint.Y) / (dst3.Height - task.sideCameraPoint.Y)
-            Dim minVal = sliceY - task.metersPerPixel
-            Dim maxVal = sliceY + task.metersPerPixel
-            If minVal < 0 And maxVal > 0 Then Continue For
-            InRange(task.pcSplit(1), minVal, maxVal, dst0)
-            dst2.SetTo(task.scalarColors(index Mod 256), dst0)
-            index += 1
-        Next
-    End Sub
-End Class
-
-
-
-
-
-
-
-Public Class XR_Structured_SurveyV : Inherits TaskParent
-    Public Sub New()
-        labels(2) = "Each slice represents cv.Point cloud pixels with the same X-Range"
-        labels(3) = "X-Range - compressed to increase the size of each slice.  Use X-range slider to adjust the size of each slice."
-        desc = "Mark each vertical slice with a separate color.  X-Range determines how thick the slice is."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        If src.Type <> MatType.CV_32FC3 Then src = task.pointCloud
-
-        CalcHist({src}, task.channelsTop, New Mat, dst3, 2, task.bins2D, task.rangesTop)
-        dst3.Row(0).SetTo(0)
-        Threshold(dst3, dst3, 0, 255, ThresholdTypes.Binary)
-        dst3.ConvertTo(dst3, MatType.CV_8U)
-
-        Dim column As Integer
-        For column = 0 To dst2.Width - 1
-            If CountNonZero(dst3.Col(column)) Then Exit For
-        Next
-
-        Dim lastColumn As Integer
-        For lastColumn = dst2.Width - 1 To 0 Step -1
-            If CountNonZero(dst3.Col(lastColumn)) Then Exit For
-        Next
-
-        Dim index As Integer
-        dst2.SetTo(0)
-        For x = column To lastColumn
-            Dim sliceX = -task.xRange * (task.topCameraPoint.X - x) / task.topCameraPoint.X
-            If x > task.topCameraPoint.X Then sliceX = task.xRange * (x - task.topCameraPoint.X) / (dst3.Height - task.topCameraPoint.X)
-            Dim minVal = sliceX - task.metersPerPixel
-            Dim maxVal = sliceX + task.metersPerPixel
-            If minVal < 0 And maxVal > 0 Then Continue For
-            InRange(task.pcSplit(0), minVal, maxVal, dst0)
-            dst2.SetTo(task.scalarColors(index Mod 256), dst0)
-            index += 1
-        Next
-    End Sub
-End Class
-
-
-
-
-
-
-
-
-Public Class XR_Structured_MultiSlicePolygon : Inherits TaskParent
-    Dim multi As New Structured_MultiSlice
-    Dim options As New Options_StructuredMulti
-    Public Sub New()
-        labels(2) = "Input to FindContours"
-        labels(3) = "ApproxPolyDP 4-corner object from FindContours input"
-        desc = "Detect polygons in the multiSlice output"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        options.Run()
-
-        multi.Run(src)
-        dst2 = Not multi.dst3
-        If dst2.Channels <> 1 Then CvtColor(dst2, dst2, ColorConversionCodes.BGR2GRAY)
-        Dim rawContours = FindContoursAsArray(dst2, RetrievalModes.Tree,
-                                                          ContourApproximationModes.ApproxSimple)
-        Dim contours(rawContours.Length - 1)() As cv.Point
-        For j = 0 To rawContours.Length - 1
-            contours(j) = ApproxPolyDP(rawContours(j), 3, True)
-        Next
-
-        dst3.SetTo(0)
-        For i = 0 To contours.Length - 1
-            If contours(i).Length = 2 Then Continue For
-            If contours(i).Length <= options.maxSides Then
-                DrawContours(dst3, contours, i, New Scalar(0, 255, 255), task.lineWidth + 1, task.lineType)
+            dst2 = task.color.Clone
+            Dim filterZ = (dst3.Height - mm.maxLoc.Y) / dst3.Height * task.MaxZmeters
+            If filterZ > 0 Then
+                Dim depthMask As New Mat
+                InRange(task.pcSplit(2), filterZ - 0.05, filterZ + 0.05, depthMask) ' a 10 cm buffer surrounding the z value
+                dst2.SetTo(white, depthMask)
             End If
-        Next
-    End Sub
-End Class
+
+            labels(3) = "Peak histogram count (" + mm.maxVal.ToString(fmt0) + ") at " + filterZ.ToString(fmt2) + " meters +-" + (5 / dst2.Height / task.MaxZmeters).ToString(fmt2) + " m"
+            SetTrueText("Use the mouse to move the yellow dot above.", New cv.Point(10, dst2.Height * 7 / 8), 3)
+        End Sub
+    End Class
 
 
 
@@ -763,199 +234,642 @@ End Class
 
 
 
-Public Class Structured_MultiSlice : Inherits TaskParent
-    Public heat As New HeatMap_Basics
-    Public sliceMask As Mat
-    Public options As New Options_Structured
-    Public classCount As Integer
-    Public Sub New()
-        dst2 = New Mat(dst2.Size(), MatType.CV_8U)
-        desc = "Use slices through the cv.Point cloud to find straight lines indicating planes present in the depth data."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        options.Run()
-        Dim stepSize = options.stepSize
+    Public Class XR_Structured_SliceYPlot : Inherits TaskParent
+        Dim multi As New Structured_MultiSlice
+        Dim options As New Options_Structured
+        Public Sub New()
+            desc = "Find any plane around a peak value in the side view histogram"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            options.Run()
 
-        heat.Run(src)
+            multi.Run(src)
+            dst3 = multi.heat.dst3
 
-        dst2.SetTo(0)
-        classCount = 0
-        Dim minVal As Double, maxVal As Double
-        For xCoordinate = 0 To src.Width - 1 Step stepSize
-            Dim planeX = -task.xRange * (task.topCameraPoint.X - xCoordinate) / task.topCameraPoint.X
-            If xCoordinate > task.topCameraPoint.X Then
-                planeX = task.xRange * (xCoordinate - task.topCameraPoint.X) / (dst2.Width - task.topCameraPoint.X)
+            Dim row = If(task.mouseMovePoint.Y = 0, dst2.Height / 2, task.mouseMovePoint.Y)
+
+            Dim rect = New cv.Rect(0, row, dst3.Width - 1, If(row + options.sliceSize >= dst3.Height,
+                                   dst3.Height - row, options.sliceSize))
+            Dim mm As mmData = GetMinMax(multi.heat.sideframes.dst2(rect))
+
+            If mm.maxVal > 0 Then
+                Circle(dst3, New cv.Point(mm.maxLoc.X, row), task.DotSize + 3, Scalar.Yellow, -1, task.lineType)
+                ' dst3.Line(New cv.Point(mm.maxLoc.X, 0), New cv.Point(mm.maxLoc.X, dst3.Height), task.highlight, task.lineWidth, task.lineType)
+                Dim filterZ = mm.maxLoc.X / dst3.Width * task.MaxZmeters
+
+                Dim depthMask As New Mat
+
+                InRange(task.pcSplit(2), filterZ - 0.05, filterZ + 0.05, depthMask) ' a 10 cm buffer surrounding the z value
+                dst2 = task.color.Clone
+                dst2.SetTo(white, depthMask)
+                Dim pixelsPerMeter = dst2.Width / task.MaxZmeters
+                labels(3) = "Peak histogram count (" + mm.maxVal.ToString(fmt0) + ") at " + filterZ.ToString(fmt2) + " meters +-" + (5 / pixelsPerMeter).ToString(fmt2) + " m"
             End If
-            minVal = planeX - task.metersPerPixel
-            maxVal = planeX + task.metersPerPixel
-            Dim depthMask As New Mat
-            InRange(task.pcSplit(0), minVal, maxVal, depthMask)
-            dst2.SetTo(classCount, depthMask)
-            classCount += 1
-        Next
+            SetTrueText("Use the mouse to move the yellow dot above.", New cv.Point(10, dst2.Height * 7 / 8), 3)
+        End Sub
+    End Class
 
-        For yCoordinate = 0 To src.Height - 1 Step stepSize
-            Dim planeY = -task.yRange * (task.sideCameraPoint.Y - yCoordinate) / task.sideCameraPoint.Y
-            If yCoordinate > task.sideCameraPoint.Y Then
-                planeY = task.yRange * (yCoordinate - task.sideCameraPoint.Y) / (dst2.Height - task.sideCameraPoint.Y)
+
+
+
+
+
+
+    Public Class Structured_SliceEither : Inherits TaskParent
+        Public heat As New HeatMap_Basics
+        Public sliceMask As New Mat
+        Dim options As New Options_Structured
+        Public Sub New()
+            OptionParent.FindCheckBox("Top View (Unchecked Side View)").Checked = False
+            desc = "Create slices in top and side views"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            options.Run()
+            Static topRadio = OptionParent.FindCheckBox("Top View (Unchecked Side View)")
+            Dim topView = topRadio.checked
+
+            Dim sliceVal = If(topView, task.mouseMovePoint.X, task.mouseMovePoint.Y)
+            heat.Run(src)
+
+            Dim minVal As Double, maxVal As Double
+            If topView Then
+                Dim planeX = -task.xRange * (task.topCameraPoint.X - sliceVal) / task.topCameraPoint.X
+                If sliceVal > task.topCameraPoint.X Then planeX = task.xRange * (sliceVal - task.topCameraPoint.X) / (dst3.Width - task.topCameraPoint.X)
+                minVal = planeX - task.metersPerPixel
+                maxVal = planeX + task.metersPerPixel
+                InRange(task.pcSplit(0), minVal, maxVal, sliceMask)
+            Else
+                Dim planeY = -task.yRange * (task.sideCameraPoint.Y - sliceVal) / task.sideCameraPoint.Y
+                If sliceVal > task.sideCameraPoint.Y Then planeY = task.yRange * (sliceVal - task.sideCameraPoint.Y) / (dst3.Height - task.sideCameraPoint.Y)
+                minVal = planeY - task.metersPerPixel
+                maxVal = planeY + task.metersPerPixel
+                InRange(task.pcSplit(1), minVal, maxVal, sliceMask)
             End If
-            minVal = planeY - task.metersPerPixel
-            maxVal = planeY + task.metersPerPixel
-            Dim depthMask As New Mat
-            InRange(task.pcSplit(1), minVal, maxVal, depthMask)
-            dst2.SetTo(classCount, depthMask)
-            classCount += 1
-        Next
 
-        dst3 = Palettize(dst2)
-        labels(3) = "ClassCount = " + CStr(classCount)
-    End Sub
-End Class
+            If minVal < 0 And maxVal > 0 Then sliceMask.SetTo(0, task.noDepthMask)
+
+            labels(2) = "At offset " + CStr(sliceVal) + " x = " + ((maxVal + minVal) / 2).ToString(fmt2) + " with " +
+                     (Math.Abs(maxVal - minVal) * 100).ToString(fmt2) + " cm width"
+
+            labels(3) = heat.labels(3)
+
+            dst3 = heat.dst3
+            Circle(dst3, New cv.Point(task.topCameraPoint.X, dst3.Height), task.DotSize, Scalar.Yellow, -1, task.lineType)
+            If topView Then
+                Line(dst3, New cv.Point(sliceVal, 0), New cv.Point(sliceVal, dst3.Height),
+                          Scalar.Yellow, task.lineWidth)
+            Else
+                Dim yPlaneOffset = If(sliceVal < dst3.Height - options.sliceSize, CInt(sliceVal),
+                                      dst3.Height - options.sliceSize - 1)
+                Line(dst3, New cv.Point(0, yPlaneOffset), New cv.Point(dst3.Width, yPlaneOffset), Scalar.Yellow,
+                          options.sliceSize)
+            End If
+            If standaloneTest() Then
+                dst2 = src
+                dst2.SetTo(white, sliceMask)
+            End If
+        End Sub
+    End Class
 
 
 
 
 
 
-Public Class XR_Structured_MultiSliceV : Inherits TaskParent
-    Public heat As New HeatMap_Basics
-    Dim options As New Options_Structured
-    Public Sub New()
-        OptionParent.FindCheckBox("Top View (Unchecked Side View)").Checked = True
-        desc = "Use slices through the cv.Point cloud to find straight lines indicating planes present in the depth data."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        options.Run()
-        Dim stepsize = options.stepSize
 
-        heat.Run(src)
-        dst3 = heat.dst2
 
-        Dim sliceMask = New Mat(dst2.Size(), MatType.CV_8U, Scalar.All(0))
-        For xCoordinate = 0 To src.Width - 1 Step stepsize
+
+
+    Public Class XR_Structured_TransformH : Inherits TaskParent
+        Dim options As New Options_Structured
+        Dim histTop As New Projection_HistTop
+        Public Sub New()
+            labels(3) = "Top down view of the slice of the cv.Point cloud"
+            desc = "Find and isolate planes (floor and ceiling) in a TopView or SideView histogram."
+        End Sub
+        Public Function createSliceMaskH() As Mat
+            options.Run()
+
+            Dim sliceMask As New Mat
+            Dim ycoordinate = If(task.mouseMovePoint.Y = 0, dst2.Height / 2, task.mouseMovePoint.Y)
+
+            Dim planeY = -task.yRange * (task.sideCameraPoint.Y - ycoordinate) / task.sideCameraPoint.Y
+            If ycoordinate > task.sideCameraPoint.Y Then planeY = task.yRange * (ycoordinate - task.sideCameraPoint.Y) / (dst3.Height - task.sideCameraPoint.Y)
+
+            Dim thicknessMeters = options.sliceSize * task.metersPerPixel
+            Dim minVal = planeY - thicknessMeters
+            Dim maxVal = planeY + thicknessMeters
+            InRange(task.pcSplit(1), minVal, maxVal, sliceMask)
+
+            labels(2) = "At offset " + CStr(ycoordinate) + " y = " + ((maxVal + minVal) / 2).ToString(fmt2) + " with " +
+                        (Math.Abs(maxVal - minVal) * 100).ToString(fmt2) + " cm width"
+            If minVal < 0 And maxVal > 0 Then sliceMask.SetTo(0, task.noDepthMask)
+
+            Return sliceMask
+        End Function
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            Dim sliceMask = createSliceMaskH()
+
+            histTop.Run(task.pointCloud.SetTo(0, Not sliceMask))
+            dst3 = histTop.dst2
+
+            If standaloneTest() Then
+                dst2 = src
+                dst2.SetTo(white, sliceMask)
+            End If
+        End Sub
+    End Class
+
+
+
+
+
+
+    Public Class XR_Structured_TransformV : Inherits TaskParent
+        Dim options As New Options_Structured
+        Dim histSide As New Projection_HistSide
+        Public Sub New()
+            labels(3) = "Side view of the slice of the cv.Point cloud"
+            desc = "Find and isolate planes using the top view histogram data"
+        End Sub
+        Public Function createSliceMaskV() As Mat
+            options.Run()
+
+            Dim sliceMask As New Mat
+            If task.mouseMovePoint = newPoint Then task.mouseMovePoint = New cv.Point(dst2.Width / 2, dst2.Height)
+            Dim xCoordinate = If(task.mouseMovePoint.X = 0, dst2.Width / 2, task.mouseMovePoint.X)
+
             Dim planeX = -task.xRange * (task.topCameraPoint.X - xCoordinate) / task.topCameraPoint.X
             If xCoordinate > task.topCameraPoint.X Then planeX = task.xRange * (xCoordinate - task.topCameraPoint.X) / (dst3.Width - task.topCameraPoint.X)
-            Dim depthMask As New Mat
-            Dim minVal As Double, maxVal As Double
-            minVal = planeX - task.metersPerPixel
-            maxVal = planeX + task.metersPerPixel
-            InRange(task.pcSplit(0).Clone, minVal, maxVal, depthMask)
-            sliceMask.SetTo(255, depthMask)
+
+            Dim thicknessMeters = options.sliceSize * task.metersPerPixel
+            Dim minVal = planeX - thicknessMeters
+            Dim maxVal = planeX + thicknessMeters
+            InRange(task.pcSplit(0), minVal, maxVal, sliceMask)
+
+            labels(2) = "At offset " + CStr(xCoordinate) + " x = " + ((maxVal + minVal) / 2).ToString(fmt2) + " with " +
+                        (Math.Abs(maxVal - minVal) * 100).ToString(fmt2) + " cm width"
+
             If minVal < 0 And maxVal > 0 Then sliceMask.SetTo(0, task.noDepthMask)
-        Next
 
-        dst2 = task.color.Clone
-        dst2.SetTo(white, sliceMask)
-        labels(3) = heat.labels(3)
-    End Sub
-End Class
+            Return sliceMask
+        End Function
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            Dim sliceMask = createSliceMaskV()
 
+            histSide.Run(task.pointCloud.SetTo(0, Not sliceMask))
+            dst3 = histSide.dst2
 
-
-
-
-
-
-
-Public Class XR_Structured_LinearizeFloor : Inherits TaskParent
-    Public floor As New XO_Structured_FloorCeiling
-    Dim kalman As New Kalman_VB_Basics
-    Public sliceMask As Mat
-    Public floorYPlane As Single
-    Dim options As New Options_StructuredFloor
-    Public Sub New()
-        desc = "Using the mask for the floor create a better representation of the floor plane"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        options.Run()
-
-        floor.Run(src)
-        dst2 = floor.dst2
-        dst3 = floor.dst3
-        sliceMask = floor.slice.sliceMask
-
-        Dim imuPC = task.pointCloud.Clone
-        imuPC.SetTo(0, Not sliceMask)
-
-        If CountNonZero(sliceMask) > 0 Then
-            Dim splitMats() As Mat = Split(imuPC)
-            If options.xCheck Then
-                Dim mm As mmData = GetMinMax(splitMats(0), sliceMask)
-
-                Dim firstCol As Integer, lastCol As Integer
-                For firstCol = 0 To sliceMask.Width - 1
-                    If CountNonZero(sliceMask.Col(firstCol)) > 0 Then Exit For
-                Next
-                For lastCol = sliceMask.Width - 1 To 0 Step -1
-                    If CountNonZero(sliceMask.Col(lastCol)) Then Exit For
-                Next
-
-                Dim xIncr = (mm.maxVal - mm.minVal) / (lastCol - firstCol)
-                For i = firstCol To lastCol
-                    Dim maskCol = sliceMask.Col(i)
-                    If CountNonZero(maskCol) > 0 Then splitMats(0).Col(i).SetTo(mm.minVal + xIncr * i, maskCol)
-                Next
+            If standaloneTest() Then
+                dst2 = src
+                dst2.SetTo(white, sliceMask)
             End If
+        End Sub
+    End Class
 
-            If options.yCheck Then
-                Dim mm As mmData = GetMinMax(splitMats(1), sliceMask)
-                kalman.kInput = (mm.minVal + mm.maxVal) / 2
-                kalman.Run(src)
-                floorYPlane = kalman.kAverage
-                splitMats(1).SetTo(floorYPlane, sliceMask)
-            End If
 
-            If options.zCheck Then
-                Dim firstRow As Integer, lastRow As Integer
-                For firstRow = 0 To sliceMask.Height - 1
-                    If CountNonZero(sliceMask.Row(firstRow)) > 20 Then Exit For
-                Next
-                For lastRow = sliceMask.Height - 1 To 0 Step -1
-                    If CountNonZero(sliceMask.Row(lastRow)) > 20 Then Exit For
-                Next
 
-                If lastRow >= 0 And firstRow < sliceMask.Height Then
-                    Dim meanMin = Mean(splitMats(2).Row(lastRow), sliceMask.Row(lastRow))
-                    Dim meanMax = Mean(splitMats(2).Row(firstRow), sliceMask.Row(firstRow))
-                    Dim zIncr = (meanMax(0) - meanMin(0)) / Math.Abs(lastRow - firstRow)
-                    For i = firstRow To lastRow
-                        Dim maskRow = sliceMask.Row(i)
-                        Dim meanVal = Mean(splitMats(2).Row(i), maskRow)
-                        If CountNonZero(maskRow) > 0 Then
-                            splitMats(2).Row(i).SetTo(meanVal(0))
-                        End If
-                    Next
-                    Line(dst2, New cv.Point(0, firstRow), New cv.Point(dst2.Width, firstRow), Scalar.Yellow, task.lineWidth + 1)
-                    Line(dst2, New cv.Point(0, lastRow), New cv.Point(dst2.Width, lastRow), Scalar.Yellow, task.lineWidth + 1)
+
+
+
+    Public Class XR_Structured_CountSide : Inherits TaskParent
+        Dim slice As New Structured_SliceH
+        Dim plot As New PlotBar_Basics
+        Dim rotate As New Rotate_Basics
+        Public counts As New List(Of Single)
+        Public maxCountIndex As Integer
+        Public yValues As New List(Of Single)
+        Public Sub New()
+            rotate.rotateCenter = New Point2f(dst2.Width / 2, dst2.Width / 2)
+            rotate.rotateAngle = -90
+            If standalone Then task.gOptions.displayDst1.Checked = True
+            labels = {"", "Max Slice output - likely flat surface", "Structured Slice heatmap input - red line is max", "Histogram of pixel counts in each slice"}
+            desc = "Count the number of pixels found in each slice of the cv.Point cloud data."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            slice.Run(src)
+            dst2 = slice.dst3
+
+            counts.Clear()
+            yValues.Clear()
+            For i = 0 To dst2.Height - 1
+                Dim planeY = task.yRange * (i - task.sideCameraPoint.Y) / task.sideCameraPoint.Y
+                Dim minVal = planeY - task.metersPerPixel, maxVal = planeY + task.metersPerPixel
+
+                Dim sliceMask As New Mat
+
+                InRange(task.pcSplit(1), minVal, maxVal, sliceMask)
+                If minVal < 0 And maxVal > 0 Then sliceMask.SetTo(0, task.noDepthMask) ' don't include zero depth locations
+                counts.Add(CountNonZero(sliceMask))
+                yValues.Add(planeY)
+            Next
+
+            Dim max = counts.Max
+            maxCountIndex = counts.IndexOf(max)
+            Line(dst2, New cv.Point(0, maxCountIndex), New cv.Point(dst2.Width, maxCountIndex), Scalar.Red, slice.options.sliceSize)
+
+            Dim hist As Mat = Mat.FromPixelData(dst0.Height, 1, MatType.CV_32F, counts.ToArray)
+            plot.dst2 = New Mat(dst2.Height, dst2.Height, MatType.CV_8UC3, Scalar.All(0))
+            plot.Run(hist)
+            dst3 = plot.dst2
+
+            Resize(dst3, dst3, New Size(dst2.Width, dst2.Width))
+            rotate.Run(dst3)
+            dst3 = rotate.dst2
+            SetTrueText("Max flat surface at: " + vbCrLf + yValues(maxCountIndex).ToString(fmt3), 2)
+        End Sub
+    End Class
+
+
+
+
+
+    Public Class XR_Structured_CountSideSum : Inherits TaskParent
+        Public counts As New List(Of Single)
+        Public maxCountIndex As Integer
+        Public yValues As New List(Of Single)
+        Public Sub New()
+            labels = {"", "Max Slice output - likely flat surface", "Structured Slice heatmap input - red line is max", "Histogram of pixel counts in each slice"}
+            desc = "Count the number of points found in each slice of the cv.Point cloud data."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            CalcHist({task.pointCloud}, task.channelsSide, New Mat, dst2, 2, task.bins2D, task.rangesSide)
+            dst2.Col(0).SetTo(0)
+
+            counts.Clear()
+            yValues.Clear()
+            Dim ratio = task.yRange / task.yRangeDefault
+            For i = 0 To dst2.Height - 1
+                Dim planeY = task.yRange * (i - task.sideCameraPoint.Y) / task.sideCameraPoint.Y
+                Dim sumRow As Single = Sum(dst2.Row(i))
+                counts.Add(sumRow)
+                yValues.Add(planeY * ratio)
+            Next
+
+            Threshold(dst2, dst2, 0, Scalar.White, ThresholdTypes.Binary)
+
+            Dim max = counts.Max
+            If max = 0 Then Exit Sub
+
+            Dim surfaces As New List(Of Single)
+            For i = 0 To counts.Count - 1
+                If counts(i) >= max / 2 Then
+                    Line(dst2, New cv.Point(0, i), New cv.Point(dst2.Width, i), white, task.lineWidth, task.lineType)
+                    surfaces.Add(yValues(i))
                 End If
+            Next
+
+            If task.heartBeat Then
+                strOut = "Flat surface at: "
+                For i = 0 To surfaces.Count - 1
+                    strOut += surfaces(i).ToString(fmt3) + ", "
+                    If i Mod 10 = 0 And i > 0 Then strOut += vbCrLf
+                Next
             End If
+            SetTrueText(strOut, 2)
 
-            Merge(splitMats, imuPC)
+            dst3.SetTo(Scalar.Red)
+            Dim barHeight = dst2.Height / counts.Count
+            For i = 0 To counts.Count - 1
+                Dim w = dst2.Width * counts(i) / max
+                Rectangle(dst3, New cv.Rect(0, i * barHeight, w, barHeight), Scalar.Black, -1)
+            Next
+        End Sub
+    End Class
 
-            imuPC.CopyTo(task.pointCloud, sliceMask)
-        End If
-    End Sub
-End Class
 
 
 
 
 
-Public Class Structured_Mask : Inherits TaskParent
-    Dim struct As New Structured_Basics
-    Public Sub New()
-        dst2 = New Mat(dst2.Size, MatType.CV_8U)
-        desc = "Create a depth mask using the lines in Structured_Basics"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        struct.Run(src)
-        dst2.SetTo(0)
-        For Each lp In struct.lpListX
-            Line(dst2, lp.p1, lp.p2, 255, task.lineWidth, LineTypes.Link8)
-        Next
-        For Each lp In struct.lpListY
-            Line(dst2, lp.p1, lp.p2, 255, task.lineWidth, LineTypes.Link8)
-        Next
-    End Sub
-End Class
 
+
+    Public Class Structured_SliceV : Inherits TaskParent
+        Public heat As New HeatMap_Basics
+        Public sliceMask As New Mat
+        Public options As New Options_Structured
+        Public Sub New()
+            OptionParent.FindCheckBox("Top View (Unchecked Side View)").Checked = True
+            desc = "Find and isolate planes using the top view histogram data"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            options.Run()
+
+            If task.mouseMovePoint = newPoint Then task.mouseMovePoint = New cv.Point(dst2.Width / 2, dst2.Height)
+            Dim xCoordinate = If(task.mouseMovePoint.X = 0, dst2.Width / 2, task.mouseMovePoint.X)
+
+            heat.Run(src)
+
+            Dim planeX = -task.xRange * (task.topCameraPoint.X - xCoordinate) / task.topCameraPoint.X
+            If xCoordinate > task.topCameraPoint.X Then planeX = task.xRange * (xCoordinate - task.topCameraPoint.X) / (dst3.Width - task.topCameraPoint.X)
+
+            Dim thicknessMeters = options.sliceSize * task.metersPerPixel
+            Dim minVal = planeX - thicknessMeters
+            Dim maxVal = planeX + thicknessMeters
+            InRange(task.pcSplit(0), minVal, maxVal, sliceMask)
+            If minVal < 0 And maxVal > 0 Then sliceMask.SetTo(0, task.noDepthMask)
+
+            labels(2) = "At offset " + CStr(xCoordinate) + " x = " + ((maxVal + minVal) / 2).ToString(fmt2) +
+                        " with " + (Math.Abs(maxVal - minVal) * 100).ToString(fmt2) + " cm width"
+
+            labels(3) = heat.labels(3)
+
+            dst3 = heat.dst2
+            Circle(dst3, New cv.Point(task.topCameraPoint.X, 0), task.DotSize, task.highlight, -1, task.lineType)
+            Line(dst3, New cv.Point(xCoordinate, 0), New cv.Point(xCoordinate, dst3.Height), task.highlight, options.sliceSize)
+            If standaloneTest() Then
+                dst2 = src
+                dst2.SetTo(white, sliceMask)
+            End If
+        End Sub
+    End Class
+
+
+
+
+
+
+
+    Public Class Structured_SliceH : Inherits TaskParent
+        Public heat As New HeatMap_Basics
+        Public sliceMask As New Mat
+        Public options As New Options_Structured
+        Public ycoordinate As Integer
+        Public Sub New()
+            desc = "Find and isolate planes (floor and ceiling) in a TopView or SideView histogram."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            options.Run()
+
+            heat.Run(src)
+
+            If standaloneTest() Then ycoordinate = If(task.mouseMovePoint.Y = 0, dst2.Height / 2, task.mouseMovePoint.Y)
+
+            Dim sliceY = -task.yRange * (task.sideCameraPoint.Y - ycoordinate) / task.sideCameraPoint.Y
+            If ycoordinate > task.sideCameraPoint.Y Then sliceY = task.yRange * (ycoordinate - task.sideCameraPoint.Y) / (dst3.Height - task.sideCameraPoint.Y)
+
+            Dim thicknessMeters = options.sliceSize * task.metersPerPixel
+            Dim minVal = sliceY - thicknessMeters
+            Dim maxVal = sliceY + thicknessMeters
+            InRange(task.pcSplit(1), minVal, maxVal, sliceMask)
+
+            labels(2) = "At offset " + CStr(ycoordinate) + " y = " + ((maxVal + minVal) / 2).ToString(fmt2) +
+                        " with " + (Math.Abs(maxVal - minVal) * 100).ToString(fmt2) + " cm width"
+            If minVal <= 0 And maxVal >= 0 Then sliceMask.SetTo(0, task.noDepthMask)
+            labels(3) = heat.labels(2)
+
+            dst3 = heat.dst3
+            Dim yPlaneOffset = If(ycoordinate < dst3.Height - options.sliceSize, CInt(ycoordinate), dst3.Height - options.sliceSize - 1)
+            Circle(dst3, New cv.Point(0, task.sideCameraPoint.Y), task.DotSize, task.highlight, -1, task.lineType)
+            Line(dst3, New cv.Point(0, yPlaneOffset), New cv.Point(dst3.Width, yPlaneOffset), task.highlight, options.sliceSize)
+            If standaloneTest() Then
+                dst2 = src
+                dst2.SetTo(white, sliceMask)
+            End If
+        End Sub
+    End Class
+
+
+
+
+
+
+
+    Public Class XR_Structured_SurveyH : Inherits TaskParent
+        Public Sub New()
+            labels(2) = "Each slice represents cv.Point cloud pixels with the same Y-Range"
+            labels(3) = "Y-Range - compressed to increase the size of each slice.  Use Y-range slider to adjust the size of each slice."
+            desc = "Mark each horizontal slice with a separate color.  Y-Range determines how thick the slice is."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            If src.Type <> MatType.CV_32FC3 Then src = task.pointCloud
+
+            CalcHist({src}, task.channelsSide, New Mat, dst3, 2, task.bins2D, task.rangesSide)
+            dst3.Col(0).SetTo(0)
+            Threshold(dst3, dst3, 0, 255, ThresholdTypes.Binary)
+            dst3.ConvertTo(dst3, MatType.CV_8U)
+
+            Dim topRow As Integer
+            For topRow = 0 To dst2.Height - 1
+                If CountNonZero(dst3.Row(topRow)) Then Exit For
+            Next
+
+            Dim botRow As Integer
+            For botRow = dst2.Height - 1 To 0 Step -1
+                If CountNonZero(dst3.Row(botRow)) Then Exit For
+            Next
+
+            Dim index As Integer
+            dst2.SetTo(0)
+            For y = topRow To botRow
+                Dim sliceY = -task.yRange * (task.sideCameraPoint.Y - y) / task.sideCameraPoint.Y
+                If y > task.sideCameraPoint.Y Then sliceY = task.yRange * (y - task.sideCameraPoint.Y) / (dst3.Height - task.sideCameraPoint.Y)
+                Dim minVal = sliceY - task.metersPerPixel
+                Dim maxVal = sliceY + task.metersPerPixel
+                If minVal < 0 And maxVal > 0 Then Continue For
+                InRange(task.pcSplit(1), minVal, maxVal, dst0)
+                dst2.SetTo(task.scalarColors(index Mod 256), dst0)
+                index += 1
+            Next
+        End Sub
+    End Class
+
+
+
+
+
+
+
+    Public Class XR_Structured_SurveyV : Inherits TaskParent
+        Public Sub New()
+            labels(2) = "Each slice represents cv.Point cloud pixels with the same X-Range"
+            labels(3) = "X-Range - compressed to increase the size of each slice.  Use X-range slider to adjust the size of each slice."
+            desc = "Mark each vertical slice with a separate color.  X-Range determines how thick the slice is."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            If src.Type <> MatType.CV_32FC3 Then src = task.pointCloud
+
+            CalcHist({src}, task.channelsTop, New Mat, dst3, 2, task.bins2D, task.rangesTop)
+            dst3.Row(0).SetTo(0)
+            Threshold(dst3, dst3, 0, 255, ThresholdTypes.Binary)
+            dst3.ConvertTo(dst3, MatType.CV_8U)
+
+            Dim column As Integer
+            For column = 0 To dst2.Width - 1
+                If CountNonZero(dst3.Col(column)) Then Exit For
+            Next
+
+            Dim lastColumn As Integer
+            For lastColumn = dst2.Width - 1 To 0 Step -1
+                If CountNonZero(dst3.Col(lastColumn)) Then Exit For
+            Next
+
+            Dim index As Integer
+            dst2.SetTo(0)
+            For x = column To lastColumn
+                Dim sliceX = -task.xRange * (task.topCameraPoint.X - x) / task.topCameraPoint.X
+                If x > task.topCameraPoint.X Then sliceX = task.xRange * (x - task.topCameraPoint.X) / (dst3.Height - task.topCameraPoint.X)
+                Dim minVal = sliceX - task.metersPerPixel
+                Dim maxVal = sliceX + task.metersPerPixel
+                If minVal < 0 And maxVal > 0 Then Continue For
+                InRange(task.pcSplit(0), minVal, maxVal, dst0)
+                dst2.SetTo(task.scalarColors(index Mod 256), dst0)
+                index += 1
+            Next
+        End Sub
+    End Class
+
+
+
+
+
+
+
+
+    Public Class XR_Structured_MultiSlicePolygon : Inherits TaskParent
+        Dim multi As New Structured_MultiSlice
+        Dim options As New Options_StructuredMulti
+        Public Sub New()
+            labels(2) = "Input to FindContours"
+            labels(3) = "ApproxPolyDP 4-corner object from FindContours input"
+            desc = "Detect polygons in the multiSlice output"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            options.Run()
+
+            multi.Run(src)
+            dst2 = Not multi.dst3
+            If dst2.Channels <> 1 Then CvtColor(dst2, dst2, ColorConversionCodes.BGR2GRAY)
+            Dim rawContours = FindContoursAsArray(dst2, RetrievalModes.Tree,
+                                                          ContourApproximationModes.ApproxSimple)
+            Dim contours(rawContours.Length - 1)() As cv.Point
+            For j = 0 To rawContours.Length - 1
+                contours(j) = ApproxPolyDP(rawContours(j), 3, True)
+            Next
+
+            dst3.SetTo(0)
+            For i = 0 To contours.Length - 1
+                If contours(i).Length = 2 Then Continue For
+                If contours(i).Length <= options.maxSides Then
+                    DrawContours(dst3, contours, i, New Scalar(0, 255, 255), task.lineWidth + 1, task.lineType)
+                End If
+            Next
+        End Sub
+    End Class
+
+
+
+
+
+
+
+    Public Class Structured_MultiSlice : Inherits TaskParent
+        Public heat As New HeatMap_Basics
+        Public sliceMask As Mat
+        Public options As New Options_Structured
+        Public classCount As Integer
+        Public Sub New()
+            dst2 = New Mat(dst2.Size(), MatType.CV_8U)
+            desc = "Use slices through the cv.Point cloud to find straight lines indicating planes present in the depth data."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            options.Run()
+            Dim stepSize = options.stepSize
+
+            heat.Run(src)
+
+            dst2.SetTo(0)
+            classCount = 0
+            Dim minVal As Double, maxVal As Double
+            For xCoordinate = 0 To src.Width - 1 Step stepSize
+                Dim planeX = -task.xRange * (task.topCameraPoint.X - xCoordinate) / task.topCameraPoint.X
+                If xCoordinate > task.topCameraPoint.X Then
+                    planeX = task.xRange * (xCoordinate - task.topCameraPoint.X) / (dst2.Width - task.topCameraPoint.X)
+                End If
+                minVal = planeX - task.metersPerPixel
+                maxVal = planeX + task.metersPerPixel
+                Dim depthMask As New Mat
+                InRange(task.pcSplit(0), minVal, maxVal, depthMask)
+                dst2.SetTo(classCount, depthMask)
+                classCount += 1
+            Next
+
+            For yCoordinate = 0 To src.Height - 1 Step stepSize
+                Dim planeY = -task.yRange * (task.sideCameraPoint.Y - yCoordinate) / task.sideCameraPoint.Y
+                If yCoordinate > task.sideCameraPoint.Y Then
+                    planeY = task.yRange * (yCoordinate - task.sideCameraPoint.Y) / (dst2.Height - task.sideCameraPoint.Y)
+                End If
+                minVal = planeY - task.metersPerPixel
+                maxVal = planeY + task.metersPerPixel
+                Dim depthMask As New Mat
+                InRange(task.pcSplit(1), minVal, maxVal, depthMask)
+                dst2.SetTo(classCount, depthMask)
+                classCount += 1
+            Next
+
+            dst3 = Palettize(dst2)
+            labels(3) = "ClassCount = " + CStr(classCount)
+        End Sub
+    End Class
+
+
+
+
+
+
+    Public Class XR_Structured_MultiSliceV : Inherits TaskParent
+        Public heat As New HeatMap_Basics
+        Dim options As New Options_Structured
+        Public Sub New()
+            OptionParent.FindCheckBox("Top View (Unchecked Side View)").Checked = True
+            desc = "Use slices through the cv.Point cloud to find straight lines indicating planes present in the depth data."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            options.Run()
+            Dim stepsize = options.stepSize
+
+            heat.Run(src)
+            dst3 = heat.dst2
+
+            Dim sliceMask = New Mat(dst2.Size(), MatType.CV_8U, Scalar.All(0))
+            For xCoordinate = 0 To src.Width - 1 Step stepsize
+                Dim planeX = -task.xRange * (task.topCameraPoint.X - xCoordinate) / task.topCameraPoint.X
+                If xCoordinate > task.topCameraPoint.X Then planeX = task.xRange * (xCoordinate - task.topCameraPoint.X) / (dst3.Width - task.topCameraPoint.X)
+                Dim depthMask As New Mat
+                Dim minVal As Double, maxVal As Double
+                minVal = planeX - task.metersPerPixel
+                maxVal = planeX + task.metersPerPixel
+                InRange(task.pcSplit(0).Clone, minVal, maxVal, depthMask)
+                sliceMask.SetTo(255, depthMask)
+                If minVal < 0 And maxVal > 0 Then sliceMask.SetTo(0, task.noDepthMask)
+            Next
+
+            dst2 = task.color.Clone
+            dst2.SetTo(white, sliceMask)
+            labels(3) = heat.labels(3)
+        End Sub
+    End Class
+
+
+
+
+
+
+    Public Class Structured_Mask : Inherits TaskParent
+        Dim struct As New Structured_Basics
+        Public Sub New()
+            dst2 = New Mat(dst2.Size, MatType.CV_8U)
+            desc = "Create a depth mask using the lines in Structured_Basics"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            struct.Run(src)
+            dst2.SetTo(0)
+            For Each lp In struct.lpListX
+                Line(dst2, lp.p1, lp.p2, 255, task.lineWidth, LineTypes.Link8)
+            Next
+            For Each lp In struct.lpListY
+                Line(dst2, lp.p1, lp.p2, 255, task.lineWidth, LineTypes.Link8)
+            Next
+        End Sub
+    End Class
+End Namespace
