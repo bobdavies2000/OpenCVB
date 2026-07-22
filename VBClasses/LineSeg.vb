@@ -675,7 +675,7 @@ Public Class LineSeg_FLD : Inherits TaskParent
         Dim histArray = XR_LineSeg_Basics.lineHistogram(dst0, Math.Max(task.lines.lpList.Count, lSeg.lpList.Count))
 
         dst3.SetTo(0)
-        For i = 0 To Math.Min(histArray.Count, lSeg.lpList.Count) - 1
+        For i = 0 To Math.Min(histArray.Length, lSeg.lpList.Count) - 1
             If histArray(i) > 5 Then
                 Line(dst3, lSeg.lpList(i).p1, lSeg.lpList(i).p2, 255, task.lineWidth, task.lineType)
             End If
@@ -711,7 +711,7 @@ Public Class LineSeg_Detector : Inherits TaskParent
         Dim histArray = XR_LineSeg_Basics.lineHistogram(dst0, Math.Max(task.lines.lpList.Count, lSeg.lpList.Count))
 
         dst3.SetTo(0)
-        For i = 0 To Math.Min(histArray.Count, lSeg.lpList.Count) - 1
+        For i = 0 To Math.Min(histArray.Length, lSeg.lpList.Count) - 1
             If histArray(i) > 5 Then
                 Line(dst3, lSeg.lpList(i).p1, lSeg.lpList(i).p2, 255, task.lineWidth, task.lineType)
             End If

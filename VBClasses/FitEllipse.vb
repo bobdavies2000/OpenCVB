@@ -29,7 +29,7 @@ Namespace VBClasses
                 box = FitEllipse(inputPoints)
                 vertices = box.Points()
                 If standaloneTest() Then
-                    For i = 0 To vertices.Count - 1
+                    For i = 0 To vertices.Length - 1
                         If Single.IsNaN(vertices(i).X) Or Single.IsNaN(vertices(i).Y) Then Exit Sub ' can't draw the result...
                         Cv2.Line(dst2, vertices(i), vertices((i + 1) Mod 4), Scalar.Green, task.lineWidth, task.lineType)
                     Next
@@ -188,7 +188,7 @@ Namespace VBClasses
 
             rect = FitEllipse(ptList)
             vertices = rect.Points()
-            For i = 0 To vertices.Count - 1
+            For i = 0 To vertices.Length - 1
                 Cv2.Line(dst2, vertices(i), vertices((i + 1) Mod 4), 255, task.lineWidth, task.lineType)
             Next
         End Sub

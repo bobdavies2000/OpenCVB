@@ -154,7 +154,7 @@ Namespace VBClasses
             dst2 = hough.dst3
             dst3 = hough.dst0.Clone
 
-            If hough.segments.Count = 0 Then Exit Sub
+            If hough.segments.Length = 0 Then Exit Sub
             Dim leftIntercept As New List(Of Single), leftSlope As New List(Of Single), leftWeight As New List(Of Single)
             Dim rightIntercept As New List(Of Single), rightSlope As New List(Of Single), rightWeight As New List(Of Single)
             For Each line In hough.segments

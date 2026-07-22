@@ -519,7 +519,7 @@ Public Class IMU_PlotIMUFrameTime : Inherits TaskParent
         End If
 
         Dim maxval = Integer.MinValue
-        For i = 0 To histogramIMU.Count - 1
+        For i = 0 To histogramIMU.Length - 1
             If maxval < histogramIMU(i) Then
                 maxval = histogramIMU(i)
                 IMUanchor = i
@@ -552,7 +552,7 @@ Public Class IMU_PlotIMUFrameTime : Inherits TaskParent
             plot.plotData = New Scalar(task.IMU_FrameTime, task.CPU_FrameTime, IMUtoCaptureEstimate, IMUanchor)
             plot.Run(src)
 
-            If plot.maxScale - plot.minScale > histogramIMU.Count Then ReDim histogramIMU(plot.maxScale - plot.minScale)
+            If plot.maxScale - plot.minScale > histogramIMU.Length Then ReDim histogramIMU(plot.maxScale - plot.minScale)
 
             If plot.lastXdelta.Count > options.plotLastX Then
                 For i = 0 To plot.plotCount - 1
@@ -839,7 +839,7 @@ Public Class XR_IMU_PlotCompareIMU : Inherits TaskParent
         If standalone Then task.gOptions.displayDst1.Checked = True
         If standalone Then task.gOptions.displayDst1.Checked = True
 
-        For i = 0 To plot.Count - 1
+        For i = 0 To plot.Length - 1
             plot(i) = New PlotTime_Scalar
             plot(i).plotCount = 4
         Next
@@ -1017,7 +1017,7 @@ Public Class IMU_PlotHostFrameTimes : Inherits TaskParent
         If task.CPU_FrameTime < 0 Then task.CPU_FrameTime = 0
 
         Dim maxval = Integer.MinValue
-        For i = 0 To hist.Count - 1
+        For i = 0 To hist.Length - 1
             If maxval < hist(i) Then
                 maxval = hist(i)
                 CPUanchor = i
@@ -1050,7 +1050,7 @@ Public Class IMU_PlotHostFrameTimes : Inherits TaskParent
             plot.plotData = New Scalar(task.IMU_FrameTime, task.CPU_FrameTime, HostInterruptDelayEstimate, CPUanchor)
             plot.Run(src)
 
-            If plot.maxScale - plot.minScale > hist.Count Then ReDim hist(plot.maxScale - plot.minScale)
+            If plot.maxScale - plot.minScale > hist.Length Then ReDim hist(plot.maxScale - plot.minScale)
 
             If plot.lastXdelta.Count > options.plotLastX Then
                 For i = 0 To plot.plotCount - 1

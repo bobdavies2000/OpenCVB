@@ -1,4 +1,4 @@
-﻿Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
+Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 Public Class TrueText
     Declare Sub CopyClassToManagedCpp Lib "ManagedCppLibrary.dll" (dataPtr As IntPtr)
     Public text As String
@@ -42,7 +42,7 @@ Public Class TaskParent : Implements IDisposable
         Dim stackTrace = Environment.StackTrace
         Dim lines() = stackTrace.Split(vbCrLf)
         Dim callStack As String = ""
-        For i = 0 To lines.Count - 1
+        For i = 0 To lines.Length - 1
             If lines(i).Contains("  at System.Environment") Then Continue For
             If lines(i).Contains("  at TaskParent") Then Continue For
             lines(i) = Trim(lines(i))

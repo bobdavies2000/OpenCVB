@@ -313,7 +313,7 @@ Namespace VBClasses
 
             If OptionParent.FindFrm(traceName + " Radio Buttons") Is Nothing Then
                 radio.Setup(traceName)
-                For i = 0 To schemes.Count - 1
+                For i = 0 To schemes.Length - 1
                     radio.addRadio(Mid(schemes(i).Name, 1, Len(schemes(i).Name) - 4))
                     If schemes(i).Name = "schemeRandom" Then radio.check(i).Checked = True
                 Next
@@ -532,7 +532,7 @@ Namespace VBClasses
             tiers.Run(src)
 
             dst2.SetTo(0)
-            For i = 0 To binary.mats.mat.Count - 1
+            For i = 0 To binary.mats.mat.Length - 1
                 dst2.SetTo(i, binary.mats.mat(i))
             Next
 

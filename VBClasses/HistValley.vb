@@ -33,10 +33,10 @@ Namespace VBClasses
             If scaleList.Count > task.fOptions.FrameHistoryCount.Value Then scaleList.RemoveAt(0)
 
             Dim hArray = hist.histArray
-            Dim quartile = Math.Floor(hArray.Count / 4) ' note we really just want quartiles 
+            Dim quartile = Math.Floor(hArray.Length / 4) ' note we really just want quartiles 
             Dim threshold = avg(0) / 2
             ReDim valleys(3)
-            For i = 0 To valleys.Count - 1
+            For i = 0 To valleys.Length - 1
                 valleys(i) = quartile * i
                 Dim minVal = avg
                 For j = quartile * i To quartile * (i + 1) - 1
@@ -49,7 +49,7 @@ Namespace VBClasses
             Next
 
             Dim wPlot = dst2.Width / task.histogramBins
-            For i = 0 To valleys.Count - 1
+            For i = 0 To valleys.Length - 1
                 Dim col = valleys(i) * wPlot
                 Line(dst2, New cv.Point(col, 0), New cv.Point(col, dst2.Height), white, task.lineWidth + 1)
             Next
@@ -100,7 +100,7 @@ Namespace VBClasses
             If task.optionsChanged Then ReDim avgValley(valleyIndex.Count - 1)
 
             Dim depthPerBin = task.MaxZmeters / histList.Count
-            For i = 0 To Math.Min(avgValley.Count, valleyIndex.Count) - 1
+            For i = 0 To Math.Min(avgValley.Length, valleyIndex.Count) - 1
                 avgValley(i) = (avgValley(i) + valleyIndex(i) * depthPerBin) / 2
             Next
 
@@ -435,7 +435,7 @@ Namespace VBClasses
             Dim colorIndex As Integer
             Dim color = task.scalarColors(colorIndex Mod 256)
             Dim vals() = {-1, -1, -1}
-            For i = 0 To kalman.kOutput.Count - 1
+            For i = 0 To kalman.kOutput.Length - 1
                 Dim h = dst2.Height - kalman.kOutput(i)
                 vals(0) = vals(1)
                 vals(1) = vals(2)
@@ -481,12 +481,12 @@ Namespace VBClasses
             dst2.SetTo(0)
             Dim marks = valleys.avgValley
             marks(0) = 0
-            For i = 1 To marks.Count - 1
+            For i = 1 To marks.Length - 1
                 InRange(task.pcSplit(2), marks(i - 1), marks(i), dst0)
                 dst2.SetTo(i + 1, dst0)
             Next
-            InRange(task.pcSplit(2), marks(marks.Count - 1), 100, dst0)
-            dst2.SetTo(marks.Count, dst0)
+            InRange(task.pcSplit(2), marks(marks.Length - 1), 100, dst0)
+            dst2.SetTo(marks.Length, dst0)
 
             dst3 = Palettize(dst2)
         End Sub
@@ -598,7 +598,7 @@ Namespace VBClasses
             Dim lastentry As Integer
             Dim minEntries(3) As Integer
             Dim quartile = Math.Floor(hist.histogram.Rows / 4)
-            For i = 0 To hist.histArray.Count - 1
+            For i = 0 To hist.histArray.Length - 1
                 If hist.histArray(i) <> 0 And i > quartile / 4 Then
                     lastentry = hist.histArray(i)
                     minEntries(0) = i
@@ -607,12 +607,12 @@ Namespace VBClasses
                 End If
             Next
 
-            For i = start To hist.histArray.Count - 1
+            For i = start To hist.histArray.Length - 1
                 If hist.histArray(i) = 0 Then hist.histArray(i) = lastentry
                 lastentry = hist.histArray(i)
             Next
 
-            For i = 0 To minEntries.Count - 1
+            For i = 0 To minEntries.Length - 1
                 minEntries(i) = quartile * i
                 For j = quartile * i To quartile * (i + 1) - 1
                     If hist.histArray(minEntries(i)) >= hist.histArray(j) Then minEntries(i) = j
@@ -620,7 +620,7 @@ Namespace VBClasses
             Next
 
             Dim wPlot = dst2.Width / task.histogramBins
-            For i = 0 To minEntries.Count - 1
+            For i = 0 To minEntries.Length - 1
                 Dim col = minEntries(i) * wPlot
                 Line(dst2, New cv.Point(col, 0), New cv.Point(col, dst2.Height), white, task.lineWidth + 1)
             Next

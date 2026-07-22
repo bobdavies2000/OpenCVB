@@ -83,7 +83,7 @@ Public Class XR_InPaint_PointCloud : Inherits TaskParent
         dst2 = task.pointCloud.Clone
 
         Dim splitMats(2) As Mat
-        For i = 0 To task.pcSplit.Count - 1
+        For i = 0 To task.pcSplit.Length - 1
             splitMats(i) = New Mat
             Inpaint(task.pcSplit(i), task.noDepthMask, splitMats(i), 20,
                                 If(options.telea, InpaintTypes.Telea, InpaintTypes.NS))

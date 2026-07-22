@@ -18,7 +18,7 @@ Namespace VBClasses
             If imgDir.Exists = False Then imgDir.Create()
             Dim imgList As FileInfo() = imgDir.GetFiles("*.bmp")
 
-            If imgList.Count Then
+            If imgList.Length Then
                 For Each imgFile In imgList
                     My.Computer.FileSystem.DeleteFile(imgFile.FullName)
                 Next

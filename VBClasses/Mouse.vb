@@ -15,7 +15,7 @@ Namespace VBClasses
             Dim nextPt = task.mouseMovePoint
             Circle(dst2, nextPt, task.DotSize + 3, nextColor, -1, task.lineType)
             colorIndex += 1
-            If colorIndex >= task.scalarColors.Count Then colorIndex = 0
+            If colorIndex >= task.scalarColors.Length Then colorIndex = 0
         End Sub
     End Class
 

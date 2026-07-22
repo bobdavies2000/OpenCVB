@@ -281,7 +281,7 @@ Namespace VBClasses
             Next
 
             Dim lastVec = lutI(0)
-            For i = 1 To lutI.Count - 1
+            For i = 1 To lutI.Length - 1
                 Dim vec = lutI(i)
                 Dim diff = Math.Abs(vec(0) - lastVec(0)) + Math.Abs(vec(1) - lastVec(1)) + Math.Abs(vec(2) - lastVec(2))
                 If diff < options.lutThreshold Then
@@ -292,7 +292,7 @@ Namespace VBClasses
             Next
 
             Dim lut(255) As Vec3b
-            For i = 0 To lutI.Count - 1
+            For i = 0 To lutI.Length - 1
                 lut(i) = New Vec3b(lutI(i)(0), lutI(i)(1), lutI(i)(2))
             Next
 

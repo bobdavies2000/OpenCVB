@@ -1,4 +1,4 @@
-﻿Imports System.IO : Imports System.Numerics : Imports OpenCvSharp.ML
+Imports System.IO : Imports System.Numerics : Imports OpenCvSharp.ML
 Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Class Options_SharpGL : Inherits OptionParent
@@ -1151,7 +1151,7 @@ Namespace VBClasses
                                 "BayerRgb9bpp", "BayerRgb12bpp", "BayerRgb15bpp", "BayerRgb18bpp", "FSRgbNbpp", "Floyd-Steinberg",
                                 "FSRgb3bpp", "FSRgb6bpp", "FSRgb9bpp", "FSRgb12bpp", "FSRgb15bpp", "FSRgb18bpp",
                                 "SierraLiteRgbNbpp", "SierraLite", "SierraRgbNbpp", "Sierra"}
-                For i = 0 To radioChoices.Count - 1
+                For i = 0 To radioChoices.Length - 1
                     radio.addRadio(radioChoices(i))
                 Next
                 radio.check(4).Checked = True ' this one was interesting...

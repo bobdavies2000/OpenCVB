@@ -1,4 +1,4 @@
-﻿Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCvSharp
+Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 Namespace VBClasses
     Namespace PixelViewer
@@ -746,7 +746,7 @@ Namespace VBClasses
                 dst1.GetArray(Of Vec3b)(samples)
 
                 Dim sorted As New SortedList(Of Integer, Vec3b)(New compareAllowIdenticalIntegerInverted)
-                For i = 0 To samples.Count - 1 Step 3
+                For i = 0 To samples.Length - 1 Step 3
                     Dim vecA = samples(i)
                     Dim gPixel = CInt(vecA(2) * 0.299 + vecA(1) * 0.587 + vecA(0) * 0.114)
                     If sorted.ContainsKey(gPixel) = False Then sorted.Add(gPixel, vecA)
@@ -822,7 +822,7 @@ Namespace VBClasses
 
                 Dim vecs As New List(Of Point3f)
                 Dim vecs3b As New List(Of Byte)
-                For i = 0 To samples.Count - 1 Step 3
+                For i = 0 To samples.Length - 1 Step 3
                     vecs.Add(New Point3f(samples(i), samples(i + 1), samples(i + 2)))
                     vecs3b.Add(samples(i))
                     vecs3b.Add(samples(i + 1))
@@ -904,7 +904,7 @@ Namespace VBClasses
 
             Dim maxValue = counts.Max
             If pixels.Count > 0 Then
-                For i = 0 To counts.Count - 1
+                For i = 0 To counts.Length - 1
                     If counts(i) = maxValue Then
                         dominantGray = pixels.ElementAt(i)
                         Exit For
@@ -982,13 +982,13 @@ Namespace VBClasses
                 Marshal.Copy(mapper.colorMap.Data, samples, 0, samples.Length)
 
                 Dim vecs As New List(Of Integer)
-                For i = 0 To samples.Count - 1 Step 3
+                For i = 0 To samples.Length - 1 Step 3
                     vecs.Add(samples(i))
                     vecs.Add(samples(i + 1))
                     vecs.Add(samples(i + 2))
                 Next
 
-                For i = 0 To samples.Count - 1 Step 3
+                For i = 0 To samples.Length - 1 Step 3
                     If Math.Abs(vecs(i + 1) - vecs(i + 2)) < 10 And vecs(i) < vecs(i + 1) Then
                         vecs(i) = 0
                         vecs(i + 1) = 255

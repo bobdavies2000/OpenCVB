@@ -20,7 +20,7 @@ Namespace VBClasses
         Public restartRequested As Boolean = True
         Public Sub New()
             options = New Options_GeneticDrawing()
-            For i = 0 To brushes.Count - 1
+            For i = 0 To brushes.Length - 1
                 Dim _cvtInline As New Mat
                 CvtColor(ImRead(task.homeDir + "Data/GeneticDrawingBrushes/" + CStr(i) + ".jpg"), _cvtInline, ColorConversionCodes.BGR2GRAY)
                 brushes(i) = _cvtInline
@@ -33,7 +33,7 @@ Namespace VBClasses
         End Sub
         Private Function runDNAseq(dna() As DNAentry) As Mat
             Dim nextImage = imgGeneration.Clone()
-            For i = 0 To dna.Count - 1
+            For i = 0 To dna.Length - 1
                 Dim d = dna(i)
                 Dim brushImg = brushes(d.brushNumber)
 
@@ -128,12 +128,12 @@ Namespace VBClasses
                 Exit Sub
             End If
             ' evolve!
-            Dim nextDNA(DNAseq.Count - 1) As DNAentry
-            For i = 0 To DNAseq.Count - 1
+            Dim nextDNA(DNAseq.Length - 1) As DNAentry
+            For i = 0 To DNAseq.Length - 1
                 nextDNA(i) = DNAseq(i)
             Next
             Dim changes As Integer, childImg = imgGeneration.Clone, maxOption = 5, bestError As Single
-            For i = 0 To nextDNA.Count - 1
+            For i = 0 To nextDNA.Length - 1
                 Dim changeCount = msRNG.Next(0, maxOption) + 1
                 For j = 0 To changeCount - 1
                     Select Case msRNG.Next(0, maxOption)
@@ -208,7 +208,7 @@ Namespace VBClasses
 
             Dim restartRequested = restartCheck.checked
             restartCheck.checked = False
-            For i = 0 To splitMats.Count - 1
+            For i = 0 To splitMats.Length - 1
                 gDraw(i).restartRequested = restartRequested
                 gDraw(i).Run(splitMats(i))
                 splitMats(i) = gDraw(i).dst3
@@ -217,7 +217,7 @@ Namespace VBClasses
             dst3 = New Mat(dst2.Size(), MatType.CV_8U, 0)
             Merge(splitMats, dst3)
 
-            For i = 0 To splitMats.Count - 1
+            For i = 0 To splitMats.Length - 1
                 Dim _cvtInline As New Mat
                 CvtColor(gDraw(i).dst2, _cvtInline, ColorConversionCodes.BGR2GRAY)
                 splitMats(i) = If(gDraw(i).dst2.Channels() = 1, gDraw(i).dst2, _cvtInline)

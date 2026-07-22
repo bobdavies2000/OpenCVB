@@ -218,7 +218,7 @@ Public Class Sort_Integer : Inherits TaskParent
 
         vecList.Clear()
         vecList.Add(data(0))
-        For i = 1 To data.Count - 1
+        For i = 1 To data.Length - 1
             If data(i - 1) <> data(i) Then vecList.Add(data(i))
         Next
         labels(2) = "There were " + CStr(vecList.Count) + " unique 8UC3 pixels in the input."
@@ -247,7 +247,7 @@ Public Class XR_Sort_GrayScale1 : Inherits TaskParent
             Marshal.Copy(splitMats(i).Data, pixels(i), 0, pixels(i).Length)
         Next
 
-        Dim input(gray.Count - 1) As UInteger
+        Dim input(gray.Length - 1) As UInteger
         For i = 0 To gray.Length - 1
             input(i) = pixels(0)(i) * 65536 + pixels(1)(i) * 256 + pixels(2)(i)
         Next
@@ -258,7 +258,7 @@ Public Class XR_Sort_GrayScale1 : Inherits TaskParent
 
         Dim unique As New List(Of UInteger)
         unique.Add(sort.data(0))
-        For i = 1 To sort.data.Count - 1
+        For i = 1 To sort.data.Length - 1
             If sort.data(i - 1) <> sort.data(i) Then unique.Add(sort.data(i))
         Next
         labels(2) = "There were " + CStr(unique.Count) + " distinct pixels in the image."

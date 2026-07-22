@@ -15,8 +15,8 @@ Namespace VBClasses
 
             If saveDimension <> kInput.Length Then
                 If kalman IsNot Nothing Then
-                    If kalman.Count > 0 Then
-                        For i = 0 To kalman.Count - 1
+                    If kalman.Length > 0 Then
+                        For i = 0 To kalman.Length - 1
                             kalman(i).Dispose()
                         Next
                     End If
@@ -26,7 +26,7 @@ Namespace VBClasses
                 For i = 0 To kInput.Length - 1
                     kalman(i) = New Kalman_Simple()
                 Next
-                ReDim kOutput(kInput.Count - 1)
+                ReDim kOutput(kInput.Length - 1)
             End If
 
             If options.useKalman Then
@@ -69,14 +69,14 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             If task.optionsChanged Then
                 If kalman IsNot Nothing Then
-                    If kalman.Count > 0 Then
-                        For i = 0 To kalman.Count - 1
+                    If kalman.Length > 0 Then
+                        For i = 0 To kalman.Length - 1
                             kalman(i).Dispose()
                         Next
                     End If
                 End If
                 ReDim kalman(3 - 1)
-                For i = 0 To kalman.Count - 1
+                For i = 0 To kalman.Length - 1
                     kalman(i) = New Kalman_Single
                 Next
             End If
@@ -85,7 +85,7 @@ Namespace VBClasses
             plot.Run(src)
             dst2 = plot.dst2
 
-            For i = 0 To kalman.Count - 1
+            For i = 0 To kalman.Length - 1
                 kalman(i).inputReal = plot.plotData(i)
                 kalman(i).Run(src)
             Next
@@ -211,8 +211,8 @@ Namespace VBClasses
 
             If saveDimension <> input.Rows Then
                 If kalman IsNot Nothing Then
-                    If kalman.Count > 0 Then
-                        For i = 0 To kalman.Count - 1
+                    If kalman.Length > 0 Then
+                        For i = 0 To kalman.Length - 1
                             kalman(i).Dispose()
                         Next
                     End If

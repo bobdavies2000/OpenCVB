@@ -66,7 +66,7 @@ Public Class ProCon_Basics : Inherits TaskParent
         If options.buffer.Length <> options.bufferSize Then
             SyncLock mutex
                 ReDim options.buffer(options.bufferSize - 1)
-                For i = 0 To options.buffer.Count - 1
+                For i = 0 To options.buffer.Length - 1
                     options.buffer(i) = CDbl(i)
                 Next
                 frameCount = 0

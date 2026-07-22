@@ -808,7 +808,7 @@ Namespace VBClasses
             task.pcSplit = Split(task.pointCloud)
 
             If task.Settings.cameraName.StartsWith("StereoLabs") Then
-                For i = 0 To task.pcSplit.Count - 1
+                For i = 0 To task.pcSplit.Length - 1
                     Cv2.PatchNaNs(task.pcSplit(i), 0)
 
                     Dim posInfMask As New Mat()

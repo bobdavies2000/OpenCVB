@@ -98,7 +98,7 @@ Namespace VBClasses
 
             ' line end points guaranteed to have depth (line is tossed if not.)  LastDepth can be 0 on first pass.
             ptList.Clear()
-            For i = 0 To points.Count - 1
+            For i = 0 To points.Length - 1
                 ptList.Add(points(i))
             Next
 
@@ -142,7 +142,7 @@ Namespace VBClasses
 
             ' line end points guaranteed to have depth (line is tossed if not.)  LastDepth can be 0 on first pass.
             ptList.Clear()
-            For i = 0 To points.Count - 1
+            For i = 0 To points.Length - 1
                 ptList.Add(points(i))
             Next
             If ptList.Count = 0 Then Exit Sub

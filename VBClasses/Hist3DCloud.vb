@@ -25,17 +25,17 @@ Namespace VBClasses
             Marshal.Copy(histogram.Data, histArray, 0, histArray.Length)
 
             Dim threshold = src.Total * 0.001
-            For i = 0 To histArray.Count - 1
+            For i = 0 To histArray.Length - 1
                 If histArray(i) > threshold Then Exit For
                 histArray(i) = 0
             Next
-            histogram = Mat.FromPixelData(histArray.Count, 1, MatType.CV_32F, histArray)
+            histogram = Mat.FromPixelData(histArray.Length, 1, MatType.CV_32F, histArray)
 
             simK.Run(histogram)
-            histogram = Mat.FromPixelData(histArray.Count, 1, MatType.CV_32F, simK.histArray)
+            histogram = Mat.FromPixelData(histArray.Length, 1, MatType.CV_32F, simK.histArray)
             classCount = simK.classCount
 
-            CalcBackProject({src}, {2}, histogram, dst2, {task.rangesCloud(task.rangesCloud.Count - 1)})
+            CalcBackProject({src}, {2}, histogram, dst2, {task.rangesCloud(task.rangesCloud.Length - 1)})
             ConvertScaleAbs(dst2, dst2)
 
             dst2.SetTo(0, task.noDepthMask)
@@ -130,7 +130,7 @@ Namespace VBClasses
 
             Dim sortedHist As New SortedList(Of Single, Integer)(New compareAllowIdenticalSingleInverted)
 
-            For i = 0 To samples.Count - 1
+            For i = 0 To samples.Length - 1
                 sortedHist.Add(samples(i), i)
             Next
 
@@ -218,7 +218,7 @@ Namespace VBClasses
             ReDim histArray(hcloud.histogram.Total - 1)
             Marshal.Copy(hcloud.histogram.Data, histArray, 0, histArray.Length)
 
-            histogram = Mat.FromPixelData(histArray.Count, 1, MatType.CV_32F, histArray)
+            histogram = Mat.FromPixelData(histArray.Length, 1, MatType.CV_32F, histArray)
             plotHist.Run(histogram)
             dst2 = plotHist.dst2
 

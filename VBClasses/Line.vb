@@ -563,7 +563,7 @@ Namespace VBClasses
 
             dst2 = src
             Dim colorIndex As Integer = 1
-            For i = 0 To classes.Count - 1
+            For i = 0 To classes.Length - 1
                 If classes(i) Is Nothing Then Exit For
                 For j = 0 To classes(i).Count - 1
                     Dim lp = task.lines.lpList(classes(i).ElementAt(j) - 1)
@@ -1325,20 +1325,20 @@ Namespace VBClasses
             Dim testX As Boolean = True
             Dim testY As Boolean = True
 
-            For j = 1 To pixels.Count - 1
+            For j = 1 To pixels.Length - 1
                 If Math.Abs(pixels(j - 1).X - pixels(j).X) > 1 Then
                     testX = False
                     Exit For
                 End If
             Next
 
-            For j = 1 To pixels.Count - 1
+            For j = 1 To pixels.Length - 1
                 If Math.Abs(pixels(j - 1).Y - pixels(j).Y) > 1 Then
                     testX = False
                     Exit For
                 End If
             Next
-            If testX Or testY Then Return New lpData(pixels(0), pixels(pixels.Count - 1))
+            If testX Or testY Then Return New lpData(pixels(0), pixels(pixels.Length - 1))
             Return Nothing
         End Function
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -1426,7 +1426,7 @@ Namespace VBClasses
         Public Function findLines(pixels() As cv.Point) As List(Of lpData)
             Dim lpList As New List(Of lpData)
             Dim ptList As New List(Of cv.Point)
-            For i = 1 To pixels.Count - 1
+            For i = 1 To pixels.Length - 1
                 If pixels(i - 1).X > 0 Or pixels(i).X > 0 Then
                     If ptList.Count = 0 Then
                         ptList.Add(pixels(i - 1))
@@ -1816,7 +1816,7 @@ Namespace VBClasses
         Public Function findLines(pixels() As cv.Point) As lpData
             Dim ordered As Boolean = True
             Dim minX As Integer, maxX As Integer, minY = pixels(0).Y, maxY = pixels.Last.Y
-            For i = 1 To pixels.Count - 1
+            For i = 1 To pixels.Length - 1
                 If Math.Abs(pixels(i).Y - pixels(i - 1).Y) > 1 Then
                     ordered = False
                     Exit For
@@ -2056,7 +2056,7 @@ Namespace VBClasses
                 Next
 
                 If depth1 > 0 Then
-                    For i = ptArray.Count - 1 To 0 Step -1
+                    For i = ptArray.Length - 1 To 0 Step -1
                         p2 = New cv.Point(CInt(lp.rect.X + ptArray(i).X), CInt(lp.rect.Y + ptArray(i).Y))
                         depth2 = task.pcSplit(2).Get(Of Single)(p2.Y, p2.X)
                         If depth2 > 0 Then
@@ -2114,14 +2114,14 @@ Namespace VBClasses
                 FindNonZero(dst1(lp.rect), _fnz)
                 _fnz.GetArray(Of cv.Point)(ptArray)
 
-                Dim xIncr = (vec1.Item0 - vec2.Item0) / ptArray.Count
-                Dim yIncr = (vec1.Item1 - vec2.Item1) / ptArray.Count
-                Dim zIncr = (vec1.Item2 - vec2.Item2) / ptArray.Count
+                Dim xIncr = (vec1.Item0 - vec2.Item0) / ptArray.Length
+                Dim yIncr = (vec1.Item1 - vec2.Item1) / ptArray.Length
+                Dim zIncr = (vec1.Item2 - vec2.Item2) / ptArray.Length
 
                 Line(dst3, lp.p1, lp.p2, black, task.lineWidth + 4)
                 Line(dst2, lp.p1, lp.p2, black, task.lineWidth + 2)
                 Line(dst2, lp.p1, lp.p2, task.highlight, 1)
-                For i = 0 To ptArray.Count - 1
+                For i = 0 To ptArray.Length - 1
                     Dim pt = ptArray(i)
                     Dim vec = New Vec3f(vec1.Item0 + i * xIncr, vec1.Item1 + i * yIncr, vec1.Item2 + i * zIncr)
                     dst3.Set(Of Vec3f)(pt.Y, pt.X, vec)

@@ -91,7 +91,7 @@ Namespace VBClasses
                                 1, {edgeLine.rcList.Count}, ranges1)
                 histogram.GetArray(Of Single)(histarray)
 
-                For i = 1 To histarray.Count - 1
+                For i = 1 To histarray.Length - 1
                     If histarray(i) = 0 Then
                         Dim rc = edgeLine.rcList(i - 1)
                         rc.mapID = newList.Count + 1
@@ -194,7 +194,7 @@ Namespace VBClasses
             binary.Run(src)
 
             dst2.SetTo(0)
-            For i = 0 To binary.mats.mat.Count - 1
+            For i = 0 To binary.mats.mat.Length - 1
                 edges.Run(binary.mats.mat(i))
                 dst2 = dst2 Or edges.dst2
             Next

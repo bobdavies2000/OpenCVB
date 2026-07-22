@@ -772,9 +772,9 @@ Namespace VBClasses
             Next
 
             dst2 = src.Clone
-            For i = 0 To brickLines.Count - 1
+            For i = 0 To brickLines.Length - 1
                 If brickLines(i) Is Nothing Then Continue For
-                If brickLines.Count = 1 Then Continue For
+                If brickLines.Length = 1 Then Continue For
                 Dim pt = brickLines(i)(0)
                 If pt = brickLines(i).Last Then Continue For
                 Dim color = vecToScalar(task.lines.dst2.Get(Of Vec3b)(pt.Y, pt.X))

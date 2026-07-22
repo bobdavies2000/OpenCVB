@@ -15,7 +15,7 @@ Namespace VBClasses
             Dim encodeParams As New ImageEncodingParam(options.encodeOption, options.qualityLevel)
             Dim buf As Byte() = Nothing
             ImEncode(".jpg", src, buf, {encodeParams})
-            Dim image = Mat.FromPixelData(buf.Count, 1, MatType.CV_8U, buf)
+            Dim image = Mat.FromPixelData(buf.Length, 1, MatType.CV_8U, buf)
             dst3 = ImDecode(image, ImreadModes.AnyColor)
 
             Dim output As New Mat
@@ -44,7 +44,7 @@ Namespace VBClasses
             Dim buf As Byte() = Nothing
             ImEncode(".jpg", src, buf, {encodeParams})
 
-            Dim image = Mat.FromPixelData(buf.Count, 1, MatType.CV_8U, buf)
+            Dim image = Mat.FromPixelData(buf.Length, 1, MatType.CV_8U, buf)
             dst3 = ImDecode(image, ImreadModes.AnyColor)
 
             Dim output As New Mat

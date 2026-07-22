@@ -30,7 +30,7 @@ Namespace VBClasses
             Dim center As Integer = task.histogramBins / 2
             Dim centerAdjust As Integer = If(task.histogramBins Mod 2 = 0, 1, 0)
             ' this is a variation of guided backprojection.
-            For i = 0 To plotHist.histArray.Count - 1
+            For i = 0 To plotHist.histArray.Length - 1
                 If i >= center - bars And i <= center + bars + centerAdjust Then
                     plotHist.histArray(i) = 0
                 Else
@@ -38,7 +38,7 @@ Namespace VBClasses
                 End If
             Next
 
-            histogram = Mat.FromPixelData(plotHist.histArray.Count, 1, MatType.CV_32F, plotHist.histArray)
+            histogram = Mat.FromPixelData(plotHist.histArray.Length, 1, MatType.CV_32F, plotHist.histArray)
 
             Dim mask As New Mat
             CalcBackProject({subD.dst2(subD.options.rect1)}, {0}, histogram, mask, ranges)
@@ -119,13 +119,13 @@ Namespace VBClasses
             dst2 = plotHist.dst2
 
             Dim index As Integer = 1
-            For i = 0 To plotHist.histArray.Count - 1
+            For i = 0 To plotHist.histArray.Length - 1
                 If plotHist.histArray(i) <> 0 Then
                     plotHist.histArray(i) = index
                     index += 1
                 End If
             Next
-            dst1 = Mat.FromPixelData(plotHist.histArray.Count, 1, MatType.CV_32F, plotHist.histArray)
+            dst1 = Mat.FromPixelData(plotHist.histArray.Length, 1, MatType.CV_32F, plotHist.histArray)
 
             Dim barWidth = dst2.Width / task.histogramBins
             Dim histIndex = Math.Truncate(task.mouseMovePoint.X / barWidth)
@@ -220,7 +220,7 @@ Namespace VBClasses
             desc = "Display the X and Y derivatives for the whole image."
         End Sub
         Private Function derivClassCount(ByRef dst As Mat) As Integer
-            For i = 0 To deriv.plotHist.histArray.Count - 1
+            For i = 0 To deriv.plotHist.histArray.Length - 1
                 If deriv.plotHist.histArray(i) > 0 Then derivClassCount += 1
             Next
             dst = Palettize(deriv.dst0)

@@ -20,7 +20,7 @@ Namespace VBClasses
 
                 Dim histogram = hist.histArray
                 Dim third = src.Total / 3, accum As Single
-                For i = 0 To histogram.Count - 1
+                For i = 0 To histogram.Length - 1
                     accum += histogram(i)
                     If accum > third Then
                         If firstThird = 0 Then

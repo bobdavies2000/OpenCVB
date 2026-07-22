@@ -604,7 +604,7 @@ Namespace VBClasses
             Next
 
             kalman.Run(emptyMat)
-            For i = 0 To kalman.kOutput.Count - 1 Step 2
+            For i = 0 To kalman.kOutput.Length - 1 Step 2
                 currSet(i / 2) = New cv.Point(kalman.kOutput(i), kalman.kOutput(i + 1))
             Next
 

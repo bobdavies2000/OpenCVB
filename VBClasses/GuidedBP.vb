@@ -193,12 +193,12 @@ Namespace VBClasses
 
             Dim sortedHist As New SortedList(Of Single, Integer)(New compareAllowIdenticalSingleInverted)
 
-            For i = 0 To histArray.Count - 1
+            For i = 0 To histArray.Length - 1
                 sortedHist.Add(histArray(i), i)
             Next
 
             classCount = sortedHist.Values.Max
-            Dim newSamples(histArray.Count - 1) As Single
+            Dim newSamples(histArray.Length - 1) As Single
             For i = 0 To sortedHist.Count - 1
                 Dim index = sortedHist.ElementAt(i).Value
                 newSamples(index) = i + 1

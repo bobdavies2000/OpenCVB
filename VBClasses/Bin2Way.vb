@@ -18,7 +18,7 @@ Namespace VBClasses
 
             Dim histArray = hist.histArray
             Dim accum As Single
-            For i = 0 To histArray.Count - 1
+            For i = 0 To histArray.Length - 1
                 accum += histArray(i)
                 If accum > fraction Then
                     halfSplit = i
@@ -134,7 +134,7 @@ Namespace VBClasses
             mats(2) = bin2.mats.mat(0) And Not darkestMask
             mats(3) = bin2.mats.mat(1)
 
-            For i = 0 To mats.Count - 1
+            For i = 0 To mats.Length - 1
                 Dim index = CInt(255 / (i + 1))
                 dst3.SetTo(index, mats(i))
             Next
@@ -246,9 +246,9 @@ Namespace VBClasses
         Dim redCs(3) As RedColor_Basics
         Dim mats As New Mat_4to1
         Dim rclist As New List(Of rcDataOld)
-        Dim rcMap As Mat = New Mat(dst2.Size, MatType.CV_32S, 0)
+        Dim rcMap As New Mat(dst2.Size, MatType.CV_32S, 0)
         Public Sub New()
-            For i = 0 To redCs.Count - 1
+            For i = 0 To redCs.Length - 1
                 redCs(i) = New RedColor_Basics
             Next
             If standalone Then task.gOptions.displayDst1.Checked = True
@@ -260,7 +260,7 @@ Namespace VBClasses
             recurse.Run(src)
 
             Dim newList As New SortedList(Of Integer, rcDataOld)(New compareAllowIdenticalIntegerInverted)
-            For i = 0 To recurse.mats.mat.Count - 1
+            For i = 0 To recurse.mats.mat.Length - 1
                 Dim m = recurse.mats.mat(i)
 
                 redCs(i).Run(m)

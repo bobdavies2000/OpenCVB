@@ -14,11 +14,11 @@ Namespace VBClasses
     ' https://www.codeproject.com/Articles/215620/Detecting-Manipulations-in-Data-with-Benford-s-Law
     Public Class Benford_Basics : Inherits TaskParent
         Public expectedDistribution(10 - 1) As Single
-        Public counts(expectedDistribution.Count - 1) As Single
+        Public counts(expectedDistribution.Length - 1) As Single
         Dim plotHist As New PlotBar_Basics
         Dim use99 As Boolean
         Public Sub New()
-            For i = 1 To expectedDistribution.Count - 1
+            For i = 1 To expectedDistribution.Length - 1
                 expectedDistribution(i) = Math.Log10(1 + 1 / i) ' get the expected values.
             Next
 
@@ -27,10 +27,10 @@ Namespace VBClasses
         End Sub
         Public Sub setup99()
             ReDim expectedDistribution(100 - 1)
-            For i = 1 To expectedDistribution.Count - 1
+            For i = 1 To expectedDistribution.Length - 1
                 expectedDistribution(i) = Math.Log10(1 + 1 / i)
             Next
-            ReDim counts(expectedDistribution.Count - 1)
+            ReDim counts(expectedDistribution.Length - 1)
             use99 = True
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -42,7 +42,7 @@ Namespace VBClasses
             End If
 
             gray32f = gray32f.Reshape(1, gray32f.Width * gray32f.Height)
-            ReDim counts(expectedDistribution.Count - 1)
+            ReDim counts(expectedDistribution.Length - 1)
             If use99 = False Then
                 For i = 0 To gray32f.Rows - 1
                     Dim val = gray32f.At(Of Single)(i, 0)
@@ -72,7 +72,7 @@ Namespace VBClasses
             plotHist.backgroundColor = Scalar.Blue
             plotHist.Run(hist)
             dst3 = plotHist.dst2.Clone
-            For i = 0 To counts.Count - 1
+            For i = 0 To counts.Length - 1
                 counts(i) = gray32f.Cols * expectedDistribution(i)
             Next
 
@@ -148,7 +148,7 @@ Namespace VBClasses
             Dim param = New ImageEncodingParam(ImwriteFlags.JpegQuality, options.quality)
             Dim jpeg As Byte() = Nothing
             ImEncode(".jpg", src, jpeg, {param})
-            Dim tmp = Mat.FromPixelData(jpeg.Count, 1, MatType.CV_8U, jpeg)
+            Dim tmp = Mat.FromPixelData(jpeg.Length, 1, MatType.CV_8U, jpeg)
             dst3 = ImDecode(tmp, ImreadModes.Color)
             benford.Run(tmp)
             dst2 = benford.dst2
@@ -176,7 +176,7 @@ Namespace VBClasses
             Dim param = New ImageEncodingParam(ImwriteFlags.JpegQuality, options.quality)
             Dim jpeg As Byte() = Nothing
             ImEncode(".jpg", src, jpeg, {param})
-            Dim tmp = Mat.FromPixelData(jpeg.Count, 1, MatType.CV_8U, jpeg)
+            Dim tmp = Mat.FromPixelData(jpeg.Length, 1, MatType.CV_8U, jpeg)
             dst3 = ImDecode(tmp, ImreadModes.Color)
             benford.Run(tmp)
             dst2 = benford.dst2
@@ -204,7 +204,7 @@ Namespace VBClasses
             Dim param = New ImageEncodingParam(ImwriteFlags.JpegQuality, 90)
             Dim png As Byte() = Nothing
             ImEncode(".jpg", src, png, {param})
-            Dim tmp = Mat.FromPixelData(png.Count, 1, MatType.CV_8U, png)
+            Dim tmp = Mat.FromPixelData(png.Length, 1, MatType.CV_8U, png)
             dst3 = ImDecode(tmp, ImreadModes.Color)
             benford.Run(tmp)
             dst2 = benford.dst2

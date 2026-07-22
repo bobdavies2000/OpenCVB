@@ -260,10 +260,10 @@ Public Class XR_Grid_MinMaxDepth : Inherits TaskParent
         desc = "Find the min and max depth within each grid r."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If minMaxLocs.Count <> task.gridRects.Count Then ReDim minMaxLocs(task.gridRects.Count - 1)
-        If minMaxVals.Count <> task.gridRects.Count Then ReDim minMaxVals(task.gridRects.Count - 1)
+        If minMaxLocs.Length <> task.gridRects.Count Then ReDim minMaxLocs(task.gridRects.Count - 1)
+        If minMaxVals.Length <> task.gridRects.Count Then ReDim minMaxVals(task.gridRects.Count - 1)
         Dim mm As mmData
-        For i = 0 To minMaxLocs.Count - 1
+        For i = 0 To minMaxLocs.Length - 1
             Dim r = task.gridRects(i)
             MinMaxLoc(task.pcSplit(2)(r), mm.minVal, mm.maxVal, mm.minLoc, mm.maxLoc, task.depthmask(r))
             minMaxLocs(i) = New lpData(mm.minLoc, mm.maxLoc)
@@ -272,7 +272,7 @@ Public Class XR_Grid_MinMaxDepth : Inherits TaskParent
 
         If standaloneTest() Then
             dst2.SetTo(0)
-            For i = 0 To minMaxLocs.Count - 1
+            For i = 0 To minMaxLocs.Length - 1
                 Dim lp = minMaxLocs(i)
                 Circle(dst2(task.gridRects(i)), lp.p2, task.DotSize, Scalar.Red, -1, task.lineType)
                 Circle(dst2(task.gridRects(i)), lp.p1, task.DotSize, white, -1, task.lineType)

@@ -63,7 +63,7 @@ Namespace VBClasses
                 For y = 0 To bins - 1
                     For x = 0 To bins - 1
                         Dim index = x * bins * bins + y * bins + z
-                        If index < hColor.histArray.Count Then
+                        If index < hColor.histArray.Length Then
                             Dim val = hColor.histArray(x * bins * bins + y * bins + z)
                             If val > 0 Then
                                 pixels.Add(New Point3f(CInt(255 * x / bins), CInt(255 * y / bins), CInt(255 * z / bins)))
@@ -139,7 +139,7 @@ Namespace VBClasses
 
                 Dim boundaries As New List(Of Integer)
                 Dim zeroMode As Boolean
-                For i = 0 To histArray.Count - 1
+                For i = 0 To histArray.Length - 1
                     If histArray(i) = 0 And zeroMode = False Then
                         boundaries.Add(i)
                         zeroMode = True
@@ -157,7 +157,7 @@ Namespace VBClasses
                     classCount += 1
                 Next
 
-                For i = lastIndex To histArray.Count - 1
+                For i = lastIndex To histArray.Length - 1
                     histArray(i) = classCount
                 Next
                 classCount += 1
@@ -257,7 +257,7 @@ Namespace VBClasses
             If prepareImage Then
                 Dim histArray(histogram.Total - 1) As Single
                 histogram.GetArray(Of Single)(histArray)
-                histogram1D = Mat.FromPixelData(histArray.Count, 1, MatType.CV_32F, histArray)
+                histogram1D = Mat.FromPixelData(histArray.Length, 1, MatType.CV_32F, histArray)
 
                 simK.Run(histogram)
                 histogram = simK.dst2

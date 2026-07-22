@@ -253,7 +253,7 @@ Namespace VBClasses
                 Dim ptArray(points.Total * 2 - 1) As Integer
                 Marshal.Copy(points.Data, ptArray, 0, ptArray.Length)
 
-                For i = 0 To ptArray.Count - 2 Step 2
+                For i = 0 To ptArray.Length - 2 Step 2
                     Dim pt = New cv.Point(lp.rect.X + ptArray(i), lp.rect.Y + ptArray(i + 1))
                     ptList.Add(pt)
                 Next

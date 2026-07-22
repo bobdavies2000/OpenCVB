@@ -1,4 +1,4 @@
-﻿Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
+Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 Imports System.Runtime.InteropServices
 Namespace VBClasses
     ' https://www.learnopencvb.com/image-alignment-ecc-in-opencv-c-python/
@@ -153,7 +153,7 @@ Namespace VBClasses
                        New cv.Rect(0, options.pkImage.Height / 3, options.pkImage.Width, options.pkImage.Height / 3),
                        New cv.Rect(0, 2 * options.pkImage.Height / 3, options.pkImage.Width, options.pkImage.Height / 3)}
 
-            For i = 0 To r.Count - 1
+            For i = 0 To r.Length - 1
                 If options.useGradient Then
                     sobel.Run(options.pkImage(r(i)))
                     gradient(i) = sobel.dst2.Clone()
@@ -162,7 +162,7 @@ Namespace VBClasses
             Next
 
             If src.Width < rgb(0).Width Or src.Height < rgb(0).Height Then
-                For i = 0 To rgb.Count - 1
+                For i = 0 To rgb.Length - 1
                     Dim sz = New Size(src.Width * rgb(i).Height / rgb(i).Width, src.Height)
                     r(i) = New cv.Rect(0, 0, sz.Width, sz.Height)
                     Resize(rgb(i), rgb(i), sz)

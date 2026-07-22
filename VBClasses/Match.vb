@@ -1,4 +1,4 @@
-﻿Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
+Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 Imports System.Threading
 Imports VBClasses
 Public Class Match_Basics : Inherits TaskParent
@@ -635,7 +635,7 @@ Public Class XR_Match_LinePairTest : Inherits TaskParent
         dst3 = src.Clone
         dst2 = New Mat(dst2.Size(), MatType.CV_32FC1, 0)
 
-        For i = 0 To ptx.Count - 1
+        For i = 0 To ptx.Length - 1
             rect = ValidateRect(New cv.Rect(ptx(i).X - radius, ptx(i).Y - radius, task.gridWH, task.gridWH))
             Dim searchRect = ValidateRect(New cv.Rect(rect.X - task.gridWH, rect.Y - task.gridWH,
                                                           task.gridWH * 3, task.gridWH * 3))

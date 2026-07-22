@@ -229,7 +229,7 @@ Public Class XR_OEX_delaunay2 : Inherits TaskParent
 
                 Dim triangleList = subdiv.GetTriangleList()
                 Dim pts(3 - 1) As cv.Point
-                For i = 0 To triangleList.Count - 1
+                For i = 0 To triangleList.Length - 1
                     Dim t = triangleList(i)
                     pts(0) = New cv.Point(Math.Round(t(0)), Math.Round(t(1)))
                     pts(1) = New cv.Point(Math.Round(t(2)), Math.Round(t(3)))
@@ -248,7 +248,7 @@ Public Class XR_OEX_delaunay2 : Inherits TaskParent
                 Dim ifacet As New List(Of cv.Point)
                 Dim ifacets As New List(Of List(Of cv.Point))({ifacet})
 
-                For i = 0 To facets.Count - 1
+                For i = 0 To facets.Length - 1
                     ifacet.Clear()
                     ifacet.AddRange(facets(i).Select(Function(p) New cv.Point(p.X, p.Y)))
 
@@ -546,7 +546,7 @@ Public Class XR_OEX_Core_Split : Inherits TaskParent
         Marshal.Copy(d.Data, samples, 0, samples.Length)
 
         strOut = "Original 2x2 Mat"
-        For i = 0 To samples.Count - 1
+        For i = 0 To samples.Length - 1
             strOut += samples(i).ToString + ", "
         Next
         strOut += vbCrLf

@@ -305,7 +305,7 @@ Public Class RedC_NeighborHulls : Inherits TaskParent
             Dim tmp = dst0(rect).Clone
             Marshal.Copy(tmp.Data, pixels, 0, pixels.Length)
 
-            For i = 0 To pixels.Count - 1
+            For i = 0 To pixels.Length - 1
                 If pixels(i) = 0 Then Continue For
                 If neighbors.Contains(pixels(i)) = False Then neighbors.Add(pixels(i))
             Next
@@ -377,7 +377,7 @@ Public Class RedC_NeighborHist : Inherits TaskParent
 
         neighbors.Clear()
 
-        For i = 1 To histArray.Count - 1
+        For i = 1 To histArray.Length - 1
             If histArray(i) > 0 Then neighbors.Add(i)
         Next
 

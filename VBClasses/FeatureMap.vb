@@ -165,7 +165,7 @@ Namespace VBClasses
             Dim facets = New Point2f()() {Nothing}
             subdiv.GetVoronoiFacetList(New List(Of Integer)(), facets, Nothing)
 
-            For i = 0 To Math.Min(inputFeatures.Count, facets.Count) - 1
+            For i = 0 To Math.Min(inputFeatures.Count, facets.Length) - 1
                 Dim facetList = New List(Of cv.Point)
                 For Each pt In facets(i)
                     facetList.Add(New cv.Point(pt.X, pt.Y))
@@ -768,7 +768,7 @@ Namespace VBClasses
 
             fpList.Clear()
             dst2.SetTo(0)
-            For i = 0 To Math.Min(feat.features.Count, facets.Count) - 1
+            For i = 0 To Math.Min(feat.features.Count, facets.Length) - 1
                 Dim fp As New fpData
                 fp.pt = feat.features(i)
                 fp.ptHistory.Add(fp.pt)

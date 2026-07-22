@@ -1,4 +1,4 @@
-﻿Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCvSharp
+Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Class Profile_Basics : Inherits TaskParent
         Public ptLeft As Point3f, ptRight As Point3f, ptTop As Point3f, ptBot As Point3f, ptFront As Point3f, ptBack As Point3f
@@ -324,7 +324,7 @@ Namespace VBClasses
             Dim rc = task.rcOldD
             If rc Is Nothing Then rc = sides.redC.rcList(0)
 
-            If kalman.kInput.Count <> sides.corners.Count * 2 Then ReDim kalman.kInput(sides.corners.Count * 2 - 1)
+            If kalman.kInput.Length <> sides.corners.Count * 2 Then ReDim kalman.kInput(sides.corners.Count * 2 - 1)
             For i = 0 To sides.corners.Count - 1
                 kalman.kInput(i * 2) = sides.corners(i).X
                 kalman.kInput(i * 2 + 1) = sides.corners(i).Y

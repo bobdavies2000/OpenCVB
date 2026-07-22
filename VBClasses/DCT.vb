@@ -42,7 +42,7 @@ Namespace VBClasses
             Dim srcPlanes = Split(src)
 
             Dim freqPlanes(2) As Mat
-            For i = 0 To srcPlanes.Count - 1
+            For i = 0 To srcPlanes.Length - 1
                 Dim src32f As New Mat
                 srcPlanes(i).ConvertTo(src32f, MatType.CV_32FC3, 1 / 255)
                 freqPlanes(i) = New Mat

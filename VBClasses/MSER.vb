@@ -587,7 +587,7 @@ Namespace VBClasses
             For Each box In boxes
                 Rectangle(dst3, box, task.highlight, task.lineWidth + 1, task.lineType)
             Next
-            labels(2) = CStr(boxes.Count) + " regions were found using MSER"
+            labels(2) = CStr(boxes.Length) + " regions were found using MSER"
         End Sub
         Protected Overrides Sub Finalize()
             If mser IsNot Nothing Then mser.Dispose()

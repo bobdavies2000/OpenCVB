@@ -138,7 +138,7 @@ Namespace VBClasses
         Dim mats As New Mat_4Click
         Public Sub New()
             dst2 = New Mat(dst2.Size, MatType.CV_8U, 0)
-            For i = 0 To diff.Count - 1
+            For i = 0 To diff.Length - 1
                 diff(i) = New Diff_Basics
             Next
             labels(3) = "This is the diff of the grayscale image."

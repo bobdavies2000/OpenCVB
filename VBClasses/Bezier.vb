@@ -24,7 +24,7 @@ Public Class Bezier_Basics : Inherits TaskParent
     End Function
     Public Overrides Sub RunAlg(src As cv.Mat)
         Dim p1 As cv.Point
-        For i = 0 To points.Count - 4 Step 3
+        For i = 0 To points.Length - 4 Step 3
             For j = 0 To 100
                 Dim p2 = nextPoint(points, i, j / 100)
                 If j > 0 Then Line(dst2, p1, p2, task.highlight, task.lineWidth, task.lineWidth)
@@ -58,7 +58,7 @@ Public Class XR_Bezier_Example : Inherits TaskParent
             p1 = p2
         Next
 
-        For i = 0 To points.Count - 1
+        For i = 0 To points.Length - 1
             Circle(dst2, points(i), task.DotSize + 2, white, -1, task.lineType)
         Next
 

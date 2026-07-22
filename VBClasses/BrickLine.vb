@@ -30,7 +30,7 @@ Namespace VBClasses
 
             For Each brick In bricks.brickList
                 hist.Run(src(brick.rect))
-                For i = 1 To hist.histarray.Count - 1
+                For i = 1 To hist.histarray.Length - 1
                     If hist.histarray(i) > 0 Then
                         featList(i).Add(brick.index)
                     End If

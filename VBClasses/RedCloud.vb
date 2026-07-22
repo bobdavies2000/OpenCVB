@@ -1,4 +1,4 @@
-﻿Imports System.Runtime.InteropServices
+Imports System.Runtime.InteropServices
 Imports VBClasses
 Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 Public Class RedCloud_Basics : Inherits TaskParent
@@ -459,7 +459,7 @@ Public Class RedCloud_Flood_CPP : Inherits TaskParent
 
         Dim index As Integer = 1
         Dim newList As New SortedList(Of Integer, rcDataOld)(New compareAllowIdenticalIntegerInverted)
-        For i = 0 To rects.Count - 1
+        For i = 0 To rects.Length - 1
             Dim rc = New rcDataOld(dst0(rects(i)), rects(i), index)
             newList.Add(rc.pixels, rc)
             index += 1
@@ -560,7 +560,7 @@ Public Class RedCloud_MotionFilter : Inherits TaskParent
         histogram.GetArray(Of Single)(histArray)
 
         Dim rcMotionCells As New List(Of Integer)
-        For i = 1 To histArray.Count - 1
+        For i = 1 To histArray.Length - 1
             Dim rc = redC.rcList(i - 1)
             If histArray(i) > rc.pixels / 10 Then rcMotionCells.Add(i)
         Next

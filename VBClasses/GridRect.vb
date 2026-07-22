@@ -193,7 +193,7 @@ Namespace VBClasses
             dst2.SetTo(0, Not devGrid.dst2)
 
             strOut = "Categories:" + vbCrLf
-            For i = 1 To devGrid.categories.Count - 1
+            For i = 1 To devGrid.categories.Length - 1
                 Dim colorName = Choose(i, "black", "white", "gray", "yellow", "purple", "teal", "blue", "green", "red")
                 strOut += colorName + vbTab + CStr(devGrid.categories(i)) + vbCrLf
             Next

@@ -8,7 +8,7 @@ Public Class FrameRate_Basics : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         Static lastImages() As Mat = {task.color.Clone, task.leftView.Clone,
                                                  task.rightView.Clone, task.depthRGB.Clone}
-        For i = 0 To frameCounts.Count - 1
+        For i = 0 To frameCounts.Length - 1
             mats.mat(i) = Choose(i + 1, task.color, task.leftView, task.rightView, task.depthRGB).clone()
             mats.mat(i) -= lastImages(i)
             Dim count = Sum(mats.mat(i))
@@ -18,7 +18,7 @@ Public Class FrameRate_Basics : Inherits TaskParent
         Next
         If task.heartBeat Then
             strOut = ""
-            For i = 0 To frameCounts.Count - 1
+            For i = 0 To frameCounts.Length - 1
                 strOut += Choose(i + 1, "Color", "Left", "Right", "Depth") + vbTab + " image frameCount = " + vbTab
                 strOut += frameCounts(i).ToString(fmt0) + vbTab + " frameCount = " + CStr(task.frameCount) + vbCrLf
             Next
@@ -45,7 +45,7 @@ Public Class XR_FrameRate_BasicsGray : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         Static lastImages() As Mat = {task.color.Clone, task.leftView.Clone,
                                              task.rightView.Clone, task.depthRGB.Clone}
-        For i = 0 To frameCounts.Count - 1
+        For i = 0 To frameCounts.Length - 1
             mats.mat(i) = Choose(i + 1, task.color, task.leftView, task.rightView, task.depthRGB).clone()
             If mats.mat(i).Channels > 1 Then
                 CvtColor(mats.mat(i), mats.mat(i), ColorConversionCodes.BGR2GRAY)
@@ -61,7 +61,7 @@ Public Class XR_FrameRate_BasicsGray : Inherits TaskParent
         Next
         If task.heartBeat Then
             strOut = ""
-            For i = 0 To frameCounts.Count - 1
+            For i = 0 To frameCounts.Length - 1
                 strOut += Choose(i + 1, "Color", "Left", "Right", "Depth") + vbTab + " image frameCount = " + vbTab
                 strOut += frameCounts(i).ToString(fmt0) + vbTab + " frameCount = " + CStr(task.frameCount) + vbCrLf
             Next

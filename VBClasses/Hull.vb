@@ -49,14 +49,14 @@ Public Class XR_Hull_Defect : Inherits TaskParent
             hContour.Run(src)
             dst2 = hContour.dst2
             hull = hContour.hull
-            If hContour.contours1.sortContours.allContours.Count = 0 Then Exit Sub ' nothing to work on yet...
+            If hContour.contours1.sortContours.allContours.Length = 0 Then Exit Sub ' nothing to work on yet...
             contour = hContour.contours1.sortContours.allContours(0)
         End If
 
         Dim hullIndices = ConvexHullIndices(contour, False)
-        For i = 0 To contour.Count - 1
+        For i = 0 To contour.Length - 1
             Dim p1 = contour(i)
-            For j = i + 1 To contour.Count - 1
+            For j = i + 1 To contour.Length - 1
                 Dim p2 = contour(j)
                 If p1 = p2 Then
                     SetTrueText("Contour is self-intersecting and convexityDefects will fail.")
@@ -106,12 +106,12 @@ Public Class Hull_Contour : Inherits TaskParent
         contours2.Run(dst2)
 
         dst3.SetTo(0)
-        If contours1.sortContours.allContours.Count > 0 Then
-            If contours1.sortContours.allContours(0).Count > 0 Then
+        If contours1.sortContours.allContours.Length > 0 Then
+            If contours1.sortContours.allContours(0).Length > 0 Then
                 hull = ConvexHull(contours1.sortContours.allContours(0), True).ToList
 
-                If contours2.sortContours.allContours.Count > 0 Then
-                    If contours1.sortContours.allContours(0).Count > 0 Then
+                If contours2.sortContours.allContours.Length > 0 Then
+                    If contours1.sortContours.allContours(0).Length > 0 Then
                         DrawTour(dst3, contours2.sortContours.allContours(0).ToList, white, -1)
                         DrawTour(dst3, hull, white, task.lineWidth)
                     End If

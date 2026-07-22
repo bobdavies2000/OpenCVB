@@ -15,7 +15,7 @@ Namespace VBClasses
             If task.optionsChanged Then
                 ReDim binSplit(options.gradations)
                 Dim incr = 255 / options.gradations
-                For i = 0 To binSplit.Count - 1
+                For i = 0 To binSplit.Length - 1
                     binSplit(i) = i * incr
                 Next
                 labels(2) = CStr(options.gradations) + " separate RedColor inputs combined"

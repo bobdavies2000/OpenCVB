@@ -108,7 +108,7 @@ Public Module vbc
 
         Dim tourCount As New List(Of Integer)
         For Each tour In allContours
-            tourCount.Add(tour.Count)
+            tourCount.Add(tour.Length)
         Next
         If tourCount.Count > 0 Then
             Return New List(Of cv.Point)(allContours(tourCount.IndexOf(tourCount.Max)).ToList)

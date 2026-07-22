@@ -1,4 +1,4 @@
-﻿Public Class OptionsFeatures
+Public Class OptionsFeatures
     Public grayCheckbox() As RadioButton
     Public colorCheckbox() As RadioButton
     Public colorMethods() As String = {"BackProject_Full", "Bin4Way_Regions", "Hist3DColor_Basics",
@@ -29,8 +29,8 @@
 
         MatchCorrSlider.Value = 95
 
-        ReDim grayCheckbox(task.filterBasics.grayFilter.filterList.Count - 1)
-        For i = 0 To task.filterBasics.grayFilter.filterList.Count - 1
+        ReDim grayCheckbox(task.filterBasics.grayFilter.filterList.Length - 1)
+        For i = 0 To task.filterBasics.grayFilter.filterList.Length - 1
             Dim cb As New RadioButton
             cb.Text = task.filterBasics.grayFilter.filterList(i)
             cb.Location = New Point(20, 20 + i * 20)
@@ -42,8 +42,8 @@
         Next
         grayCheckbox(0).Checked = True
 
-        ReDim colorCheckbox(task.filterBasics.filterList.Count - 1)
-        For i = 0 To task.filterBasics.filterList.Count - 1
+        ReDim colorCheckbox(task.filterBasics.filterList.Length - 1)
+        For i = 0 To task.filterBasics.filterList.Length - 1
             Dim cb As New RadioButton
             cb.Text = task.filterBasics.filterList(i)
             cb.Location = New Point(20, 20 + i * 20)
@@ -55,7 +55,7 @@
         Next
         colorCheckbox(0).Checked = True
 
-        For i = 0 To colorMethods.Count - 1
+        For i = 0 To colorMethods.Length - 1
             Dim method = colorMethods(i)
             Color8USource.Items.Add(method)
         Next

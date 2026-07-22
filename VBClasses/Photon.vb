@@ -1,4 +1,4 @@
-﻿Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCvSharp
+Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCvSharp
 Namespace VBClasses
     'https://security.stackexchange.com/questions/42428/Is-generating-random-numbers-using-a-smartphone-camera-a-good-idea
     Public Class Photon_Basics : Inherits TaskParent
@@ -41,7 +41,7 @@ Namespace VBClasses
         Dim mats As New Mat_4to1
         Public Sub New()
             If standalone Then task.gOptions.displayDst1.Checked = True
-            For i = 0 To counts.Count - 1
+            For i = 0 To counts.Length - 1
                 counts(i) = New List(Of Integer)
             Next
             labels = {"", "", "5 color levels from reduction (black not shown)", "Selected distribution"}

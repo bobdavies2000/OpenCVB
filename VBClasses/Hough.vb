@@ -118,7 +118,7 @@ Namespace VBClasses
             Dim depth8uC3 = task.depthRGB
             For Each roi In task.gridRects
                 Dim segments() = HoughLines(dst2(roi), options.rho, options.theta, options.threshold)
-                If segments.Count = 0 Then
+                If segments.Length = 0 Then
                     dst3(roi) = depth8uC3(roi)
                     Continue For
                 End If
@@ -204,7 +204,7 @@ Namespace VBClasses
             maskFeat.SetTo(0)
             For Each roi In task.gridRects
                 Dim segments() = HoughLines(task.edges.dst2(roi), options.rho, options.theta, options.threshold)
-                If segments.Count = 0 Then maskFless(roi).SetTo(255)
+                If segments.Length = 0 Then maskFless(roi).SetTo(255)
                 If CountNonZero(task.edges.dst2(roi)) >= minSegments Then maskFeat(roi).SetTo(255)
             Next
 
@@ -296,7 +296,7 @@ Namespace VBClasses
             dst3.SetTo(0)
             For Each roi In task.gridRects
                 Dim segments = HoughLines(task.edges.dst2(roi), options.rho, options.theta, options.threshold)
-                If segments.Count = 0 Then Continue For
+                If segments.Length = 0 Then Continue For
                 Hough_Basics.houghShowLines(dst2(roi), segments, 2)
                 Hough_Basics.houghShowLines(dst3(roi), segments, 2)
             Next
@@ -400,7 +400,7 @@ Namespace VBClasses
                 Line(dst3, pt1, pt2, task.highlight, task.lineWidth, task.lineType)
             Next
 
-            labels(3) = CStr(lines.Count) + " lines were found."
+            labels(3) = CStr(lines.Length) + " lines were found."
         End Sub
     End Class
 End Namespace

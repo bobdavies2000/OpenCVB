@@ -1,4 +1,4 @@
-﻿Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCvSharp
+Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Class PlotMouse_Basics : Inherits TaskParent
         Public plotHist As New PlotBar_Basics
@@ -18,9 +18,9 @@ Namespace VBClasses
             Dim barWidth = dst2.Width / bins
             If task.heartBeat Then
                 If plotHist.histArray IsNot Nothing Then
-                    For i = plotHist.histArray.Count - 1 To 0 Step -1
+                    For i = plotHist.histArray.Length - 1 To 0 Step -1
                         If plotHist.histArray(i) > 0 Then
-                            bins = plotHist.histArray.Count - i
+                            bins = plotHist.histArray.Length - i
                             If bins = 1 Then bins = task.histogramBins
                             Exit For
                         End If
@@ -135,7 +135,7 @@ Namespace VBClasses
                 End If
             Next
 
-            Dim histInput As Mat = Mat.FromPixelData(histogram.Count, 1, MatType.CV_32F, histogram)
+            Dim histInput As Mat = Mat.FromPixelData(histogram.Length, 1, MatType.CV_32F, histogram)
             plotHist.Run(histInput)
             dst2 = plotHist.dst2
             labels(3) = plotHist.labels(2)

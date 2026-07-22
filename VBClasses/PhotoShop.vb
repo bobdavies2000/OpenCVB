@@ -329,7 +329,7 @@ Namespace VBClasses
             Threshold(mats.mat(3), mats.mat(3), threshSlider.Value, 255, ThresholdTypes.Binary)
 
             dst2.SetTo(0)
-            For i = 0 To mats.mat.Count - 1
+            For i = 0 To mats.mat.Length - 1
                 dst2 = mats.mat(i) Or dst2
             Next
 
@@ -384,7 +384,7 @@ Namespace VBClasses
                 If frm.check(switch1).Checked Then Exit For
             Next
 
-            For i = 0 To splitMats.Count - 1
+            For i = 0 To splitMats.Length - 1
                 If i = switch1 Or i = options.switchColor Then
                     LUT(splitMats(i), expMat, splitMats(i))
                 ElseIf duoCheck.Checked Then

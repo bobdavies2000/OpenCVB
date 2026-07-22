@@ -71,7 +71,7 @@ Namespace VBClasses
             options.Run()
             Dim r1 As cv.Rect, r2 As cv.Rect
 
-            For i = 0 To task.pcSplit.Count - 1
+            For i = 0 To task.pcSplit.Length - 1
                 pc = task.pcSplit(i)(roi)
 
                 ' toggle between the pixel to the right or below

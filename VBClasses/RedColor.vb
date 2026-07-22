@@ -304,7 +304,7 @@ Public Class XR_RedColor_CPP : Inherits TaskParent
         Dim minPixels As Integer = dst2.Total * 0.001
         Dim index As Integer = 1
         Dim newList As New SortedList(Of Integer, rcDataOld)(New compareAllowIdenticalIntegerInverted)
-        For i = 0 To rects.Count - 1
+        For i = 0 To rects.Length - 1
             Dim rc = New rcDataOld(dst0(rects(i)), rects(i), index)
             If rc.pixels < minPixels Then Continue For
             newList.Add(rc.pixels, rc)

@@ -357,7 +357,7 @@ Namespace VBClasses
             SetTrueText(vbTab + "Avg peaks: " + CStr(peakCount) + ".  Current: " + CStr(peaks.Count) + " peaks.", New cv.Point(0, 10), 3)
 
             Dim sortedPeaks = New SortedList(Of Integer, Integer)(New compareAllowIdenticalIntegerInverted)
-            For i = 0 To peakCounts.Count - 1
+            For i = 0 To peakCounts.Length - 1
                 sortedPeaks.Add(peakCounts(i), i)
             Next
 
@@ -558,7 +558,7 @@ Namespace VBClasses
             Dim rgb(2) As Mat
             Dim rgbEq() As Mat = Split(task.color)
 
-            For i = 0 To rgb.Count - 1
+            For i = 0 To rgb.Length - 1
                 EqualizeHist(rgbEq(i), rgbEq(i))
             Next
 
@@ -1251,7 +1251,7 @@ Namespace VBClasses
                     histogram.GetArray(Of Single)(histarray)
                 End If
             End If
-            If standalone And histarray.Count > 1 Then
+            If standalone And histarray.Length > 1 Then
                 Static plotHist As New PlotBar_Basics
                 plotHist.Run(histogram)
                 dst2 = plotHist.dst2
@@ -1404,10 +1404,10 @@ Namespace VBClasses
                     Dim histData(histogram.Total - 1) As Single
                     histogram.GetArray(Of Single)(histData)
 
-                    If histData.Count > 255 And task.histogramBins > 3 Then
+                    If histData.Length > 255 And task.histogramBins > 3 Then
                         task.histogramBins -= 1
                     End If
-                    If histData.Count < 128 And task.histogramBins < task.gOptions.HistBinBar.Maximum Then
+                    If histData.Length < 128 And task.histogramBins < task.gOptions.HistBinBar.Maximum Then
                         task.histogramBins += 1
                     End If
                     If task.gridRects.Count < histData.Length And task.gridWH > 2 Then

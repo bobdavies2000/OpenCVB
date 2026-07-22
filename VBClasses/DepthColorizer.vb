@@ -7,7 +7,7 @@ Namespace VBClasses
             cPtr = Depth_Colorizer_Open()
             Dim gradientWidth = Math.Min(dst2.Width, 256)
             Dim f As Double = 1.0
-            If saveVecColors.Count = 1 Then
+            If saveVecColors.Length = 1 Then
                 Dim initVal = 43
                 Dim rand = New Random(initVal) ' This will make colors consistent across runs and they seem to look ok...
                 Dim bgr(3) As Byte

@@ -47,7 +47,7 @@ Namespace VBClasses
             Absdiff(task.pcSplit(2)(r1), task.pcSplit(2)(r2), dst3(r3))
 
             dst = {dst1, dst2, dst3}
-            For i = 0 To dst.Count - 1
+            For i = 0 To dst.Length - 1
                 If masks(i) Is Nothing Then masks(i) = New Mat
                 Threshold(dst(i), masks(i), options1.pixelDiffThreshold, 255, ThresholdTypes.BinaryInv)
                 ConvertScaleAbs(masks(i), masks(i))

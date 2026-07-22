@@ -717,7 +717,7 @@ Namespace VBClasses
 
             dst3.SetTo(0)
             lpList.Clear()
-            For i = 1 To Math.Min(task.lines.lpList.Count, histArray.Count) - 1
+            For i = 1 To Math.Min(task.lines.lpList.Count, histArray.Length) - 1
                 If histArray(i) > 0 Then
                     Dim lp = task.lines.lpList(i)
                     Line(dst3, lp.p1, lp.p2, lp.color, task.lineWidth, task.lineType)
@@ -1735,7 +1735,7 @@ Namespace VBClasses
                 Dim histArray(histogram.Rows - 1) As Single
                 histogram.GetArray(Of Single)(histArray)
                 Dim histList As New List(Of Integer)
-                For j = 0 To histArray.Count - 1
+                For j = 0 To histArray.Length - 1
                     If histArray(j) > 0 Then histList.Add(j)
                 Next
                 histMapList.Add((task.fLess.indexList.Values(i), histList))

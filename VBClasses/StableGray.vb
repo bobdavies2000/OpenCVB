@@ -1,4 +1,4 @@
-﻿Imports System.Diagnostics.Metrics
+Imports System.Diagnostics.Metrics
 Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 Public Class StableGray_BasicsMin : Inherits TaskParent
     Public Sub New()
@@ -255,7 +255,7 @@ Public Class StableGray_Measure : Inherits TaskParent
 
         percentZero = 100 * plot.plotHist.histArray(0) / src.Total
         strOut = "Diff" + vbTab + "Count" + vbCrLf
-        For i = 0 To plot.plotHist.histArray.Count - 1
+        For i = 0 To plot.plotHist.histArray.Length - 1
             strOut += CStr(i) + vbTab + plot.plotHist.histArray(i).ToString(fmt0) + vbCrLf
         Next
         SetTrueText(strOut, 1)

@@ -21,7 +21,7 @@ Public Class HeartBeat_Basics_TA : Inherits TaskParent
             ms = ms1000
         End If
 
-        For i = 0 To task.quarter.Count - 1
+        For i = 0 To task.quarter.Length - 1
             If task.quarter(i) = False And ms > Choose(i + 1, 0.25, 0.5, 0.75, 1.0) Then
                 task.quarterBeat = True
                 If i = 1 Then task.midHeartBeat = True

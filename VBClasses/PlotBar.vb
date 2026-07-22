@@ -1,4 +1,4 @@
-﻿Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
+Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 Public Class PlotBar_Basics : Inherits TaskParent
     Public histogram As New Mat
     Public histArray() As Single
@@ -66,7 +66,7 @@ Public Class PlotBar_Basics : Inherits TaskParent
         If mm.minVal > -100000000 And mm.maxVal < 100000000 Then
             If Math.Abs(mm.maxVal - mm.minVal) > 0 And histogram.Cols > 0 Then
                 Dim color As Scalar
-                For i = 0 To histArray.Count - 1
+                For i = 0 To histArray.Length - 1
                     If Single.IsNaN(histArray(i)) Then histArray(i) = 0
                     If histArray(i) > 0 Then
                         Dim h As Single = histArray(i) * dst2.Height / mm.maxVal

@@ -9,7 +9,7 @@ Namespace VBClasses
         Public Sub New()
             If standalone Then task.gOptions.displayDst1.Checked = True
             dst0 = New Mat(dst0.Size(), MatType.CV_8U, Scalar.All(0))
-            For i = 0 To diff.Count - 1
+            For i = 0 To diff.Length - 1
                 diff(i) = New Diff_Basics
             Next
             labels = {"", "Quartiles for selected r.  Click in dst1 to see different r.", "4 brightness levels - darkest to lightest",
@@ -24,7 +24,7 @@ Namespace VBClasses
             If task.optionsChanged Then index = 0
 
             Dim matList(3) As Mat
-            For i = 0 To matList.Count - 1
+            For i = 0 To matList.Length - 1
                 mats.mat(i) = New Mat(mats.mat(i).Size(), MatType.CV_8U, Scalar.All(0))
                 binary.mats.mat(i) = New Mat(binary.mats.mat(i).Size(), MatType.CV_8U, Scalar.All(0))
             Next
@@ -38,7 +38,7 @@ Namespace VBClasses
             quadrant = binary.mats.quadrant
 
             dst0.SetTo(0)
-            For i = 0 To diff.Count - 1
+            For i = 0 To diff.Length - 1
                 diff(i).Run(binary.mats.mat(i))
                 dst0 = dst0 Or diff(i).dst2
             Next
@@ -57,16 +57,16 @@ Namespace VBClasses
                         contourCounts.Add(New List(Of Integer))
                         means.Add(New List(Of Single))
                     End If
-                    contourCounts(j).Add(allContours.Count)
+                    contourCounts(j).Add(allContours.Length)
                     means(j).Add(Mean(task.gray(r), tmp)(0))
-                    If i = quadrant Then SetTrueText(CStr(allContours.Count), r.TopLeft, 1)
-                    counts(i, j) = allContours.Count
+                    If i = quadrant Then SetTrueText(CStr(allContours.Length), r.TopLeft, 1)
+                    counts(i, j) = allContours.Length
                 Next
             Next
 
             Dim bump = 3
             Dim ratio = dst2.Height / task.gridRects(0).Height
-            For i = 0 To matList.Count - 1
+            For i = 0 To matList.Length - 1
                 Dim tmp As cv.Mat = matList(i)(grSave) * 0.5
                 Dim nextCount = CountNonZero(tmp)
                 Dim tmpVolatile As cv.Mat = dst0(grSave) And tmp
@@ -85,7 +85,7 @@ Namespace VBClasses
                 End If
             Next
 
-            For i = 0 To labelStr.Count - 1
+            For i = 0 To labelStr.Length - 1
                 SetTrueText(labelStr(i), points(i), 3)
             Next
 
@@ -246,7 +246,7 @@ Namespace VBClasses
 
             Dim pixels As New HashSet(Of Byte)
             Dim pixelSort As New SortedList(Of Byte, Integer)(New compareByte)
-            For i = 0 To pts.Count - 1 Step 2
+            For i = 0 To pts.Length - 1 Step 2
                 Dim val = task.gray.Get(Of Byte)(pts(i + 1), pts(i))
                 If pixels.Contains(val) = False Then
                     pixelSort.Add(val, 1)
@@ -345,7 +345,7 @@ Namespace VBClasses
 
             Dim pixels As New HashSet(Of Byte)
             Dim pixelSort As New SortedList(Of Byte, Integer)(New compareByte)
-            For i = 0 To pts.Count - 1 Step 2
+            For i = 0 To pts.Length - 1 Step 2
                 Dim val = task.gray.Get(Of Byte)(pts(i + 1), pts(i))
                 If pixels.Contains(val) = False Then
                     pixelSort.Add(val, 1)
@@ -364,7 +364,7 @@ Namespace VBClasses
                 Dim index = pixelSort.ElementAt(i).Key
                 If Math.Abs(lastIndex - index) > gapThreshold Then
                     strOut += vbCrLf
-                    If bIndex < boundaries.Count Then
+                    If bIndex < boundaries.Length Then
                         boundaries(bIndex) = index
                         bIndex += 1
                     End If
@@ -374,9 +374,9 @@ Namespace VBClasses
             Next
 
             gapValues.Clear()
-            For i = 1 To boundaries.Count - 1
+            For i = 1 To boundaries.Length - 1
                 Dim histValues As New List(Of Single)
-                For j = boundaries(i - 1) To Math.Min(boundaries(i), hist.histArray.Count) - 1
+                For j = boundaries(i - 1) To Math.Min(boundaries(i), hist.histArray.Length) - 1
                     histValues.Add(hist.histArray(j))
                 Next
                 If histValues.Count > 0 Then gapValues.Add(histValues.IndexOf(histValues.Min))
@@ -400,7 +400,7 @@ Namespace VBClasses
         Public mats As New Mat_4Click
         Dim diff(3) As Diff_Basics
         Public Sub New()
-            For i = 0 To diff.Count - 1
+            For i = 0 To diff.Length - 1
                 diff(i) = New Diff_Basics
                 mats.mat(i) = New Mat(dst2.Size(), MatType.CV_8U, Scalar.All(0))
             Next
@@ -413,13 +413,13 @@ Namespace VBClasses
             unstable.Run(task.gray)
 
             Dim lastVal As Integer = 255
-            For i = Math.Min(mats.mat.Count, unstable.gapValues.Count) - 1 To 0 Step -1
+            For i = Math.Min(mats.mat.Length, unstable.gapValues.Count) - 1 To 0 Step -1
                 InRange(task.gray, unstable.gapValues(i), lastVal, mats.mat(i))
                 lastVal = unstable.gapValues(i)
             Next
 
             dst1.SetTo(0)
-            For i = 0 To diff.Count - 1
+            For i = 0 To diff.Length - 1
                 diff(i).Run(mats.mat(i))
                 dst1 = dst1 Or diff(i).dst2
             Next
@@ -532,7 +532,7 @@ Namespace VBClasses
         Dim binary As New Bin4Way_SplitMean
         Dim diff(3) As Diff_Basics
         Public Sub New()
-            For i = 0 To diff.Count - 1
+            For i = 0 To diff.Length - 1
                 diff(i) = New Diff_Basics
             Next
             labels(2) = "Image separated into 4 levels - darkest to lightest"
@@ -543,7 +543,7 @@ Namespace VBClasses
             binary.Run(src)
             dst2 = binary.dst2
             dst3.SetTo(0)
-            For i = 0 To diff.Count - 1
+            For i = 0 To diff.Length - 1
                 diff(i).Run(binary.mats.mat(i))
                 dst3 = dst3 Or diff(i).dst2
             Next
@@ -567,7 +567,7 @@ Namespace VBClasses
         End Sub
         Private Sub rebuildMats()
             dst1 = New Mat(dst1.Size, MatType.CV_8U, 0)
-            For i = 0 To binary.mats.mat.Count - 1
+            For i = 0 To binary.mats.mat.Length - 1
                 binary.mats.mat(i) = New Mat(dst1.Size, MatType.CV_8UC1, 0)
             Next
         End Sub

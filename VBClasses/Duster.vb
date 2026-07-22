@@ -49,14 +49,14 @@ Namespace VBClasses
             Dim histArray = hist.histArray
 
             ' this insures that the depthClippedMask is separate from any previous cluster
-            histArray(histArray.Count - 1) = 0
+            histArray(histArray.Length - 1) = 0
 
             Dim start As Integer
             Dim clusters As New SortedList(Of Integer, Vec2i)(New compareAllowIdenticalIntegerInverted)
             Dim lastEntry As Single
             Dim sampleCount As Integer
 
-            For i = 0 To histArray.Count - 1
+            For i = 0 To histArray.Length - 1
                 If histArray(i) > 0 And lastEntry = 0 Then start = i
                 If histArray(i) = 0 And lastEntry > 0 Then
                     clusters.Add(sampleCount, New Vec2i(start, i))

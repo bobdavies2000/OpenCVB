@@ -54,24 +54,24 @@ Namespace VBClasses
 
             classCount = 1
             Dim index As Integer
-            For i = index To histArray.Count - 1
-                For index = index To histArray.Count - 1
+            For i = index To histArray.Length - 1
+                For index = index To histArray.Length - 1
                     If histArray(index) > threshold Then Exit For
                     histArray(index) = classCount
                 Next
                 classCount += 1
-                For index = index To histArray.Count - 1
+                For index = index To histArray.Length - 1
                     If histArray(index) <= threshold Then Exit For
                     histArray(index) = classCount
                 Next
 
-                If index >= histArray.Count Then Exit For
+                If index >= histArray.Length Then Exit For
             Next
 
             Dim minClass = histArray.Min - 1
             If minClass <> 0 Then
                 src -= minClass
-                For i = 0 To histArray.Count - 1
+                For i = 0 To histArray.Length - 1
                     histArray(i) -= minClass
                 Next
                 classCount -= minClass
@@ -194,7 +194,7 @@ Namespace VBClasses
             ReDim histArray(histogram.Total - 1)
             histogram.GetArray(Of Single)(histArray)
 
-            For i = 0 To histArray.Count - 1
+            For i = 0 To histArray.Length - 1
                 histArray(i) = i + 1
             Next
 
@@ -269,7 +269,7 @@ Namespace VBClasses
         End Function
         Private Function distanceN(vec1() As Single, vec2() As Single) As Double
             Dim accum As Double
-            For i = 0 To vec1.Count - 1
+            For i = 0 To vec1.Length - 1
                 accum += (vec1(i) - vec2(i)) * (vec1(i) - vec2(i))
             Next
             Return Math.Sqrt(accum)

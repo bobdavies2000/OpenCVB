@@ -1,4 +1,4 @@
-﻿Imports System.IO : Imports System.Runtime.InteropServices : Imports System.Threading
+Imports System.IO : Imports System.Runtime.InteropServices : Imports System.Threading
 Imports OpenCvSharp.ML : Imports cv = OpenCvSharp : Imports OpenCvSharp.Cv2 : Imports OpenCvSharp
 Namespace VBClasses
     Public Module moduleXO
@@ -806,7 +806,7 @@ Namespace VBClasses
             dst1 = src.Clone()
             dst1.SetTo(white, task.gridMask)
             Dim subdiv As New cv.Subdiv2D(New cv.Rect(0, 0, src.Width, src.Height))
-            For i = 0 To minList.Count - 1
+            For i = 0 To minList.Length - 1
                 Dim ptMin = minList(i)
                 subdiv.Insert(ptMin)
                 Circle(dst1, ptMin, task.DotSize, cv.Scalar.Red, -1, task.lineType)
@@ -1611,7 +1611,7 @@ Namespace VBClasses
                 p2 = New cv.Point(kalman.kOutput(2), kalman.kOutput(3))
             End If
             frameCount += 1
-            Line(dst2, p1, p2, gradientColors(frameCount Mod gradientColors.Count), task.lineWidth, task.lineType)
+            Line(dst2, p1, p2, gradientColors(frameCount Mod gradientColors.Length), task.lineWidth, task.lineType)
         End Sub
     End Class
 
@@ -1701,7 +1701,7 @@ Namespace VBClasses
                 CalcHist({lpRectMap}, {0}, emptyMat, histogram, 1, {lastList.Count}, New cv.Rangef() {New cv.Rangef(0, lastList.Count)})
                 histogram.GetArray(Of Single)(histarray)
 
-                For i = 1 To histarray.Count - 1
+                For i = 1 To histarray.Length - 1
                     If histarray(i) = 0 Then lpList.Add(lastList(i))
                 Next
             End If
@@ -1714,7 +1714,7 @@ Namespace VBClasses
             CalcHist({tmp}, {0}, emptyMat, histogram, 1, {lines.lpList.Count}, New cv.Rangef() {New cv.Rangef(0, lines.lpList.Count)})
             histogram.GetArray(Of Single)(histarray)
 
-            For i = 1 To histarray.Count - 1
+            For i = 1 To histarray.Length - 1
                 If histarray(i) > 0 Then lpList.Add(lines.lpList(i))
             Next
 
@@ -4765,13 +4765,13 @@ Namespace VBClasses
             Dim allContours As cv.Point()() = Nothing
             If src.Channels() <> 1 Then src = task.gray
             FindContours(src, allContours, Nothing, cv.RetrievalModes.External, options.ApproximationMode)
-            If allContours.Count = 0 Then Exit Sub
+            If allContours.Length = 0 Then Exit Sub
 
             dst2 = src
             For Each tour In allContours
                 DrawTour(dst2, tour.ToList, white, task.lineWidth)
             Next
-            labels(2) = $"There were {allContours.Count} contours found."
+            labels(2) = $"There were {allContours.Length} contours found."
         End Sub
     End Class
 
@@ -4807,7 +4807,7 @@ Namespace VBClasses
 
             Dim maxCount As Integer, maxIndex As Integer
             For i = 0 To contours.contourList.Count - 1
-                Dim len = CInt(contours.contourList(i).Count)
+                Dim len = CInt(contours.contourList(i).Length)
                 If len > maxCount Then
                     maxCount = len
                     maxIndex = i
@@ -4939,7 +4939,7 @@ Namespace VBClasses
             Next
 
             DrawTour(dst3(rc.rect), rc.contour, white)
-            For i = 0 To corners.Count - 1
+            For i = 0 To corners.Length - 1
                 Line(dst3(rc.rect), center, corners(i), white, task.lineWidth, task.lineType)
             Next
         End Sub
@@ -5367,14 +5367,14 @@ Namespace VBClasses
 
             Dim histArray = getLineCounts(lines.lpList)
             Dim newList As New List(Of lpData)
-            For i = histArray.Count - 1 To 0 Step -1
+            For i = histArray.Length - 1 To 0 Step -1
                 If histArray(i) = 0 Then newList.Add(lines.lpList(i))
             Next
 
             If src.Channels = 1 Then lines.Run(src) Else lines.Run(task.gray.Clone)
 
             histArray = getLineCounts(task.lines.lpList)
-            For i = histArray.Count - 1 To 1 Step -1
+            For i = histArray.Length - 1 To 1 Step -1
                 If histArray(i) Then
                     newList.Add(task.lines.lpList(i)) ' Add the lines in the motion mask.
                 End If
@@ -5845,7 +5845,7 @@ Namespace VBClasses
             Dim histArray(histogram.Total - 1) As Single
             histogram.GetArray(Of Single)(histArray)
 
-            For i = 0 To histArray.Count - 1
+            For i = 0 To histArray.Length - 1
                 histArray(i) = i
             Next
 
@@ -5882,7 +5882,7 @@ Namespace VBClasses
             prep.Run(src)
             dst3.ConvertTo(dst1, cv.MatType.CV_32SC1)
             FindContours(dst1, sortContours.allContours, Nothing, cv.RetrievalModes.FloodFill, mode)
-            If sortContours.allContours.Count <= 1 Then Exit Sub
+            If sortContours.allContours.Length <= 1 Then Exit Sub
 
             sortContours.Run(src)
 
@@ -5968,7 +5968,7 @@ Namespace VBClasses
                 histogram.GetArray(Of Single)(histarray)
                 ' if multiple lines intersect a grid rect, choose the largest redcloud cell containing them.
                 ' The largest will be the index of the first non-zero histogram entry.
-                For j = 1 To histarray.Count - 1
+                For j = 1 To histarray.Length - 1
                     If histarray(j) > 0 Then
                         Dim rc = redList.rclist(j)
                         dst3(gRect.rect).SetTo(rc.color)
@@ -10168,9 +10168,9 @@ Namespace VBClasses
 
             Dim ptList As New List(Of cv.Point)
             Dim indexMid As Integer = -1
-            For i = 0 To ptArray.Count - 2 Step 2
+            For i = 0 To ptArray.Length - 2 Step 2
                 Dim pt = New cv.Point(ptArray(i), ptArray(i + 1))
-                If i >= ptArray.Count / 4 And indexMid < 0 Then indexMid = ptList.Count
+                If i >= ptArray.Length / 4 And indexMid < 0 Then indexMid = ptList.Count
                 ptList.Add(pt)
             Next
 
@@ -10284,7 +10284,7 @@ Namespace VBClasses
         Dim diff(2) As XO_Motion_Diff
         Dim history(2) As History_Basics8U
         Public Sub New()
-            For i = 0 To diff.Count - 1
+            For i = 0 To diff.Length - 1
                 diff(i) = New XO_Motion_Diff
                 history(i) = New History_Basics8U
             Next
@@ -10296,7 +10296,7 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             dst3 = src.Clone
             dst2.SetTo(0)
-            For i = 0 To diff.Count - 1
+            For i = 0 To diff.Length - 1
                 diff(i).Run(src)
                 history(i).Run(diff(i).dst2)
                 dst2 = dst2 Or history(i).dst2
@@ -10358,7 +10358,7 @@ Namespace VBClasses
                 Dim histArray(histogram.Total - 1) As Single
                 histogram.GetArray(Of Single)(histArray)
 
-                For j = 0 To histArray.Count - 1
+                For j = 0 To histArray.Length - 1
                     histArray(j) = j
                 Next
 
@@ -10457,7 +10457,7 @@ Namespace VBClasses
 
             Dim mode = options.options2.ApproximationMode
             FindContours(dst1, sortContours.allContours, Nothing, cv.RetrievalModes.List, mode)
-            If sortContours.allContours.Count <= 1 Then Exit Sub
+            If sortContours.allContours.Length <= 1 Then Exit Sub
 
             sortContours.Run(src)
 
@@ -11700,7 +11700,7 @@ Namespace VBClasses
                 Dim index = rclist.Count
                 Dim c = dst1.Get(Of cv.Vec3b)(md.maxDist.Y, md.maxDist.X)
                 Dim color = New cv.Scalar(c(0), c(1), c(2))
-                For i = 1 To histArray.Count - 1
+                For i = 1 To histArray.Length - 1
                     If usedList.Contains(i) Then Continue For
                     If histArray(i) > 0 Then
                         Dim rc = redList.rclist(i)
@@ -11993,7 +11993,7 @@ Namespace VBClasses
             dst3 = XO_RedFlood_List.runRedList(src, labels(3))
 
             If task.optionsChanged Then
-                For i = 0 To rclist.Count - 1
+                For i = 0 To rclist.Length - 1
                     rclist(i) = New List(Of rcDataOld)
                     cellMaps(i) = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
                 Next
@@ -12149,7 +12149,7 @@ Namespace VBClasses
 
             dst3.SetTo(0)
             lpList.Clear()
-            For i = 0 To ptList.Count - 1
+            For i = 0 To ptList.Length - 1
                 If ptList(i) Is Nothing Then Continue For
                 Dim p1 = ptList(i)(0)
                 Dim p2 = ptList(i)(ptList(i).Count - 1)
@@ -12181,7 +12181,7 @@ Namespace VBClasses
             desc = "Isolate all motion In the scene"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If lastColor.Count <> task.gridRects.Count Then
+            If lastColor.Length <> task.gridRects.Count Then
                 ReDim lastColor(task.gridRects.Count - 1)
                 ReDim cellAge(task.gridRects.Count - 1)
             End If
@@ -12973,7 +12973,7 @@ Namespace VBClasses
 
             Dim pcUsed As New List(Of Integer)
             If task.heartBeat Then dst3 = dst2.Clone
-            For i = 1 To histArray.Count - 1
+            For i = 1 To histArray.Length - 1
                 If histArray(i) > 0 And pcUsed.Contains(i) = False Then
                     Dim rc = redC.rcList(i)
                     dst3(rc.rect).SetTo(task.scalarColors(rc.mapID), rc.mask)
@@ -13250,7 +13250,7 @@ Namespace VBClasses
             dst3 = redC.dst2
 
             If task.optionsChanged Then
-                For i = 0 To rclist.Count - 1
+                For i = 0 To rclist.Length - 1
                     rclist(i) = New List(Of rcDataOld)
                     cellMaps(i) = New cv.Mat(dst2.Size(), cv.MatType.CV_32S, 0)
                 Next
@@ -13304,7 +13304,7 @@ Namespace VBClasses
             dst3 = XO_RedFlood_List.runRedList(src, labels(3))
 
             If task.optionsChanged Then
-                For i = 0 To rclist.Count - 1
+                For i = 0 To rclist.Length - 1
                     rclist(i) = New List(Of rcDataOld)
                     cellMaps(i) = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
                 Next
@@ -13472,7 +13472,7 @@ Namespace VBClasses
 
             pointList.Clear()
 
-            For i = 0 To activeList.Count - 1
+            For i = 0 To activeList.Length - 1
                 If activeList(i) Then
                     Dim roi = task.gridRects(i)
                     pointList.Add(New cv.Point(roi.X + roi.Width / 2, roi.Y + roi.Height / 2))
@@ -13714,7 +13714,7 @@ Namespace VBClasses
             Dim mode = options.options2.ApproximationMode
             dst3.ConvertTo(dst1, cv.MatType.CV_32SC1)
             FindContours(dst1, sortContours.allContours, Nothing, cv.RetrievalModes.FloodFill, mode)
-            If sortContours.allContours.Count <= 1 Then Exit Sub
+            If sortContours.allContours.Length <= 1 Then Exit Sub
 
             sortContours.Run(src)
 
@@ -13746,7 +13746,7 @@ Namespace VBClasses
 
             Dim mode = options.options2.ApproximationMode
             FindContours(dst1, sortContours.allContours, Nothing, cv.RetrievalModes.List, mode)
-            If sortContours.allContours.Count <= 1 Then Exit Sub
+            If sortContours.allContours.Length <= 1 Then Exit Sub
 
             sortContours.Run(src)
 
@@ -13778,7 +13778,7 @@ Namespace VBClasses
             Dim mode = options.options2.ApproximationMode
             If dst1.Type <> cv.MatType.CV_8U Then CvtColor(dst1, dst1, cv.ColorConversionCodes.BGR2GRAY)
             FindContours(dst1, sortContours.allContours, Nothing, cv.RetrievalModes.Tree, mode)
-            If sortContours.allContours.Count <= 1 Then Exit Sub
+            If sortContours.allContours.Length <= 1 Then Exit Sub
 
             sortContours.Run(src)
 
@@ -14381,7 +14381,7 @@ Namespace VBClasses
             Absdiff(task.pcSplit(2)(r1), task.pcSplit(2)(r2), dst3(r3))
 
             dst = {dst1, dst2, dst3}
-            For i = 0 To dst.Count - 1
+            For i = 0 To dst.Length - 1
                 Threshold(dst(i), masks(i), options1.pixelDiffThreshold / 1000, 255, cv.ThresholdTypes.BinaryInv)
                 ConvertScaleAbs(masks(i), masks(i))
                 pcFiltered(i) = New cv.Mat(src.Size, cv.MatType.CV_32FC1, New cv.Scalar(0))
@@ -14763,7 +14763,7 @@ Namespace VBClasses
 
             hist.Run(dst1)
             Dim actualClasses As Integer
-            For i = 1 To hist.histArray.Count - 1
+            For i = 1 To hist.histArray.Length - 1
                 If hist.histArray(i) Then actualClasses += 1
             Next
             If task.gOptions.HistBinBar.Maximum >= actualClasses + 1 Then
@@ -14779,7 +14779,7 @@ Namespace VBClasses
                 hist.Run(tmp)
 
                 Dim colorIDs As New List(Of Integer)
-                For i = 1 To hist.histArray.Count - 1 ' ignore zeros
+                For i = 1 To hist.histArray.Length - 1 ' ignore zeros
                     If hist.histArray(i) Then colorIDs.Add(i)
                 Next
                 colorIDList.Add(colorIDs)
@@ -15016,7 +15016,7 @@ Namespace VBClasses
 
                 Dim distances As New List(Of Single)
                 Dim indexLast As New List(Of Integer)
-                For j = 1 To histArray.Count - 1
+                For j = 1 To histArray.Length - 1
                     If histArray(j) > 0 Then
                         lpMatch = lpListLast(j - 1)
                         'knn.trainInput.Add(lpMatch.p1.X)
@@ -15184,7 +15184,7 @@ Namespace VBClasses
 
                 knn.trainInput.Clear()
                 knn.queries.Clear()
-                For j = 1 To histArray.Count - 1
+                For j = 1 To histArray.Length - 1
                     If histArray(j) > 0 Then
                         lpMatch = lpListLast(j - 1)
                         'knn.trainInput.Add(lpMatch.p1.X)
@@ -16003,7 +16003,7 @@ Namespace VBClasses
         Private Function plotDiff(diffList As List(Of Integer), xyStr As String, labelImage As Integer, ByRef label As String) As Single
             Dim count = diffList.Max - diffList.Min + 1
             Dim hist(maxDistance - 1) As Single
-            Dim zeroLoc = hist.Count / 2
+            Dim zeroLoc = hist.Length / 2
             Dim nonZero As Integer
             Dim zeroCount As Integer
             For Each diff In diffList
@@ -16013,7 +16013,7 @@ Namespace VBClasses
                 If diff < 0 Then diff = 0
                 hist(diff) += 1
             Next
-            plot.Run(cv.Mat.FromPixelData(hist.Count, 1, cv.MatType.CV_32F, hist.ToArray))
+            plot.Run(cv.Mat.FromPixelData(hist.Length, 1, cv.MatType.CV_32F, hist.ToArray))
             Dim histList = hist.ToList
             Dim maxVal = histList.Max
             Dim maxIndex = histList.IndexOf(maxVal)
@@ -16284,7 +16284,7 @@ Namespace VBClasses
                 distances(intDistance) += 1
             Next
 
-            If distances.Count > 0 Then
+            If distances.Length > 0 Then
                 Dim distList = distances.ToList
                 Dim maxIndex = distList.IndexOf(distList.Max)
                 labels(2) = CStr(lpInput.Count * 2) + " edge points found.  Peak distance at " + CStr(maxIndex) + " pixels"
@@ -16731,7 +16731,7 @@ Namespace VBClasses
 
             Dim histBins = task.histogramBins
             Dim slotList(histBins) As List(Of Integer)
-            For i = 0 To slotList.Count - 1
+            For i = 0 To slotList.Length - 1
                 slotList(i) = New List(Of Integer)
             Next
             Dim hist(histBins - 1) As Single
@@ -16753,7 +16753,7 @@ Namespace VBClasses
 
             Dim barWidth = dst3.Width / histBins
             Dim histIndex = Math.Floor(task.mouseMovePoint.X / barWidth)
-            If histIndex >= slotList.Count() Then histIndex = slotList.Count() - 1
+            If histIndex >= slotList.Length Then histIndex = slotList.Length - 1
             Rectangle(dst3, New cv.Rect(CInt(histIndex * barWidth), 0, barWidth, dst3.Height), cv.Scalar.Yellow, task.lineWidth)
             For i = 0 To slotList(histIndex).Count - 1
                 Dim rc = redList.rclist(slotList(histIndex)(i))
@@ -17528,7 +17528,7 @@ Namespace VBClasses
             If src.Type = cv.MatType.CV_8U Then dst3 = src Else dst3 = edgeline.dst2
 
             sortContours.allContours = buildContours(dst3)
-            If sortContours.allContours.Count <= 1 Then Exit Sub
+            If sortContours.allContours.Length <= 1 Then Exit Sub
 
             sortContours.Run(src)
 
@@ -17862,7 +17862,7 @@ Namespace VBClasses
             dst3 = XO_RedFlood_List.runRedList(src, labels(3))
 
             If task.optionsChanged Then
-                For i = 0 To rclist.Count - 1
+                For i = 0 To rclist.Length - 1
                     rclist(i) = New List(Of rcDataOld)
                     cellMaps(i) = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
                 Next
@@ -17912,7 +17912,7 @@ Namespace VBClasses
             Dim accums As New List(Of Integer)({0, 0, 0, 0})
             Dim quartiles As New List(Of Integer)({0, 0, 0, 0})
             Dim index As Integer
-            For i = 0 To histArray.Count - 1
+            For i = 0 To histArray.Length - 1
                 accums(index) += histArray(i)
                 If accums(index) >= fraction Then
                     quartiles(index) = i
@@ -19097,7 +19097,7 @@ Namespace VBClasses
             Dim sizeThreshold = dst2.Total * 0.001 ' ignore regions less than 0.1% - 1/10th of 1%
             Dim lutArray(255) As Byte
             regionList.Clear()
-            For i = 1 To histArray.Count - 1
+            For i = 1 To histArray.Length - 1
                 If histArray(i) > sizeThreshold Then regionList.Add(i)
             Next
 
@@ -19333,7 +19333,7 @@ Namespace VBClasses
             If task.fOptions.ReductionColor.Value < 50 Then minPixels = 0
             Dim index As Integer = 1
             Dim newList As New SortedList(Of Integer, rcDataOld)(New compareAllowIdenticalIntegerInverted)
-            For i = 0 To rects.Count - 1
+            For i = 0 To rects.Length - 1
                 Dim rc = New rcDataOld(dst0(rects(i)), rects(i), index)
                 If rc.pixels < minPixels Then Continue For
                 newList.Add(rc.pixels, rc)
@@ -21168,7 +21168,7 @@ Namespace VBClasses
             Dim predictions(ml.testMat.Rows - 1) As Integer
 
             Marshal.Copy(ml.predictions.Data, tmp, 0, tmp.Length)
-            For i = 0 To predictions.Count - 1
+            For i = 0 To predictions.Length - 1
                 predictions(i) = CInt(tmp(i))
             Next
 
@@ -23190,7 +23190,7 @@ Namespace VBClasses
             Dim sizeThreshold = input.Total * 0.001 ' ignore regions less than 0.1% - 1/10th of 1%
             Dim lutArray(255) As Byte
             Dim regionList As New List(Of Integer)
-            For i = 1 To histArray.Count - 1
+            For i = 1 To histArray.Length - 1
                 If histArray(i) > sizeThreshold Then
                     regionList.Add(i)
                     lutArray(i) = regionList.Count
@@ -23315,7 +23315,7 @@ Namespace VBClasses
             Dim incr = mm.range / histBins
 
             dst1.SetTo(0)
-            For i = 0 To histArray.Count - 1
+            For i = 0 To histArray.Length - 1
                 Dim tmp As New cv.Mat
                 InRange(RedWGrid.prepData.reduced32f, mm.minVal + incr * i, mm.minVal + incr * (i + 1), tmp)
                 dst1.SetTo(i + 1, tmp)
@@ -24138,7 +24138,7 @@ Namespace VBClasses
                 Dim histArray(histogram.Total - 1) As Single
                 Marshal.Copy(histogram.Data, histArray, 0, histArray.Length)
 
-                For j = 0 To histArray.Count - 1
+                For j = 0 To histArray.Length - 1
                     If histArray(j) = 0 Then zeroCount += 1
                     histArray(j) = j
                 Next

@@ -235,7 +235,7 @@ Namespace VBClasses
                 End If
             Next
 
-            For i = 0 To fastCenters.Count - 1
+            For i = 0 To fastCenters.Length - 1
                 Circle(dst2, fastCenters(i), task.DotSize, Scalar.Yellow, -1, task.lineType)
             Next
             ' dst2.SetTo(white, task.gridMask)

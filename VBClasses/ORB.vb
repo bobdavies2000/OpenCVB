@@ -18,7 +18,7 @@ Public Class ORB_Basics : Inherits TaskParent
         For Each kpt In keypoints
         Circle(dst2, kpt.Pt, task.DotSize + 1, Scalar.Yellow, -1, task.lineType)
         Next
-        labels(2) = CStr(keypoints.Count) + " key points were identified"
+        labels(2) = CStr(keypoints.Length) + " key points were identified"
     End Sub
     Protected Overrides Sub Finalize()
         If orb IsNot Nothing Then orb.Dispose()

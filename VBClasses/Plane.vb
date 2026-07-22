@@ -1,4 +1,4 @@
-﻿Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCvSharp
+Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCvSharp
 Namespace VBClasses
     ' http://www.ilikebigbits.com/blog/2015/3/2/plane-from-points
     Public Class Plane_Basics : Inherits TaskParent
@@ -143,7 +143,7 @@ Namespace VBClasses
             ' a*x + b*y + c*z + k = 0 or k = -a*x - b*y - c*z
             k = -cross.X * input(0).X - cross.Y * input(0).Y - cross.Z * input(0).Z
             strOut = "Input: " + vbCrLf
-            For i = 0 To input.Count - 1
+            For i = 0 To input.Length - 1
                 strOut += "p" + CStr(i) + " = " + input(i).X.ToString(fmt3) + ", " + input(i).Y.ToString(fmt3) + ", " + input(i).Z.ToString(fmt3) + vbCrLf
             Next
 

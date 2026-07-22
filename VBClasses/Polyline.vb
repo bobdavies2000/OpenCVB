@@ -60,7 +60,7 @@ Namespace VBClasses
                 Dim pts As New List(Of List(Of cv.Point))
                 Dim points As New List(Of cv.Point)
                 points2f(0) = New Point2f(autorand.NextDouble() - 0.5, autorand.NextDouble() - 0.5)
-                For i = 1 To points2f.Count - 1
+                For i = 1 To points2f.Length - 1
                     points2f(i) = New Point2f(autorand.NextDouble() - 0.5 + points2f(i - 1).X, autorand.NextDouble() - 0.5 + points2f(i - 1).Y)
                     points.Add(New cv.Point(points2f(i).X * 10 + w \ 2, points2f(i).Y * 10 + h \ 2))
                 Next

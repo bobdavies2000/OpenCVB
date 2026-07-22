@@ -41,12 +41,12 @@ Namespace VBClasses
 
             dst2.SetTo(0)
 
-            Dim pMat As Mat = Mat.FromPixelData(hull.Count, 1, MatType.CV_32SC2, hull)
+            Dim pMat As Mat = Mat.FromPixelData(hull.Length, 1, MatType.CV_32SC2, hull)
             Dim sumVal = Sum(pMat)
             DrawTour(dst2, hullList, white, -1)
 
-            For i = 0 To hull.Count - 1
-                Line(dst2, hull(i), hull((i + 1) Mod hull.Count), white, task.lineWidth, task.lineWidth)
+            For i = 0 To hull.Length - 1
+                Line(dst2, hull(i), hull((i + 1) Mod hull.Length), white, task.lineWidth, task.lineWidth)
             Next
         End Sub
     End Class
@@ -142,7 +142,7 @@ Namespace VBClasses
                 newC.Add(c(v(1)))
                 lastV = v(1)
             Next
-            If defects.Count > 0 Then
+            If defects.Length > 0 Then
                 If lastV <> defects(0)(0) Then
                     For lastV = lastV To c.Count - 1
                         newC.Add(c(lastV))

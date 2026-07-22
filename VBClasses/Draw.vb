@@ -137,7 +137,7 @@ Namespace VBClasses
                 hull = ConvexHull(points, True)
                 listOfPoints = New List(Of List(Of cv.Point))
                 points = New List(Of cv.Point)
-                For j = 0 To hull.Count - 1
+                For j = 0 To hull.Length - 1
                     points.Add(New cv.Point(hull(j).X, hull(j).Y))
                 Next
                 listOfPoints.Add(points)
@@ -219,7 +219,7 @@ Namespace VBClasses
                 For i = 0 To options.numPoints - 1
                     Dim p1 = points(i)
                     Dim p2 = points((i + 1) Mod options.numPoints)
-                    Line(dst2, p1, p2, task.scalarColors(i Mod task.scalarColors.Count), task.lineWidth + 1, task.lineType)
+                    Line(dst2, p1, p2, task.scalarColors(i Mod task.scalarColors.Length), task.lineWidth + 1, task.lineType)
                 Next
 
                 If options.fillRequest Then FloodFill(dst2, center, options.fillColor)
@@ -448,7 +448,7 @@ Namespace VBClasses
 
             Dim vertices = rr.Points()
             dst2 = src
-            For i As Integer = 0 To vertices.Count - 1
+            For i As Integer = 0 To vertices.Length - 1
                 Line(dst2, vertices(i), vertices((i + 1) Mod 4), Scalar.Green, task.lineWidth, task.lineType)
             Next
         End Sub

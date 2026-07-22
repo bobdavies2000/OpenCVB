@@ -52,7 +52,7 @@ Public Class Contour_Basics : Inherits TaskParent
         End If
 
         sortContours.allContours = buildContours(dst3)
-        If sortContours.allContours.Count <= 1 Then Exit Sub
+        If sortContours.allContours.Length <= 1 Then Exit Sub
 
         sortContours.Run(src)
 
@@ -97,10 +97,10 @@ Public Class Contour_Regions : Inherits TaskParent
         Else
             FindContours(dst3, allContours, Nothing, options.retrievalMode, mode)
         End If
-        If allContours.Count <= 1 Then Exit Sub
+        If allContours.Length <= 1 Then Exit Sub
 
         Dim sortedList As New SortedList(Of Integer, Integer)(New compareAllowIdenticalIntegerInverted)
-        For i = 0 To allContours.Count - 1
+        For i = 0 To allContours.Length - 1
             If allContours(i).Length < 4 Then Continue For
             Dim count = ContourArea(allContours(i))
             If count > src.Total * 3 / 4 Then Continue For
@@ -296,7 +296,7 @@ Public Class XR_Contour_RemoveLines : Inherits TaskParent
         desc = "Remove the lines from an invoice image"
     End Sub
     Private Function scaleTour(tour()() As cv.Point) As cv.Point()()
-        For i = 0 To tour.Count - 1
+        For i = 0 To tour.Length - 1
             Dim tmpTour = New List(Of cv.Point)
             For Each pt In tour(i)
                 tmpTour.Add(New cv.Point(pt.X * options.scaleFactor, pt.Y))
@@ -321,7 +321,7 @@ Public Class XR_Contour_RemoveLines : Inherits TaskParent
         MorphologyEx(thresh, removedH, MorphTypes.Open, hkernel,, options.iterations)
         Dim tour = FindContoursAsArray(removedH, RetrievalModes.External, ContourApproximationModes.ApproxSimple)
         tour = scaleTour(tour)
-        For i = 0 To tour.Count - 1
+        For i = 0 To tour.Length - 1
             DrawContours(dst2, tour, i, Scalar.Black, task.lineWidth)
         Next
 
@@ -331,7 +331,7 @@ Public Class XR_Contour_RemoveLines : Inherits TaskParent
         MorphologyEx(thresh, removedV, MorphTypes.Open, vkernel,, options.iterations)
         tour = FindContoursAsArray(removedV, RetrievalModes.External, ContourApproximationModes.ApproxSimple)
         tour = scaleTour(tour)
-        For i = 0 To tour.Count - 1
+        For i = 0 To tour.Length - 1
             DrawContours(dst3, tour, i, Scalar.Black, task.lineWidth)
         Next
     End Sub
@@ -453,9 +453,9 @@ Public Class Contour_Largest : Inherits TaskParent
         End If
 
         Dim maxCount As Integer, maxIndex As Integer
-        If allContours.Count = 0 Then Exit Sub
-        For i = 0 To allContours.Count - 1
-            Dim len = CInt(allContours(i).Count)
+        If allContours.Length = 0 Then Exit Sub
+        For i = 0 To allContours.Length - 1
+            Dim len = CInt(allContours(i).Length)
             If len > maxCount Then
                 maxCount = len
                 maxIndex = i
@@ -888,7 +888,7 @@ Public Class Contour_RotateRect : Inherits TaskParent
 
         Dim contours = FindContoursAsArray(task.edges.dst2, RetrievalModes.Tree, ContourApproximationModes.ApproxSimple)
         Dim sortedTours As New SortedList(Of Integer, Tuple(Of RotatedRect, Integer))(New compareAllowIdenticalInteger)
-        For i = 0 To contours.Count - 1
+        For i = 0 To contours.Length - 1
             findRect.inputContour = contours(i)
             findRect.Run(emptyMat)
             Dim rr = findRect.minRect
