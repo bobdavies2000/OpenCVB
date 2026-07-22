@@ -6,6 +6,10 @@ Namespace VBClasses
         Public Sub Initialize(settings As jsonShared.Settings)
             task.Settings = settings
             Dim paintFreq = task.Settings.paintFrequency
+            task.gridRects = New List(Of cv.Rect)
+            task.optionsChanged = True
+            task.firstPass = True
+            task.useXYRange = True ' Most projections of pointcloud data can use the xRange and yRange to improve task.results..
 
             task.rows = settings.workRes.Height
             task.cols = settings.workRes.Width
@@ -275,10 +279,6 @@ Namespace VBClasses
         End Sub
         Public Sub New()
             Randomize() ' just in case anyone uses VB.Net's Rnd
-            task.gridRects = New List(Of cv.Rect)
-            task.optionsChanged = True
-            task.firstPass = True
-            task.useXYRange = True ' Most projections of pointcloud data can use the xRange and yRange to improve task.results..
         End Sub
         Public Sub Dispose() Implements IDisposable.Dispose
             If task.allOptions IsNot Nothing Then task.allOptions.Dispose()

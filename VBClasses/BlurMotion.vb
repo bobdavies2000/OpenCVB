@@ -34,14 +34,14 @@ Namespace VBClasses
     ' https://docs.opencvb.org/trunk/d1/dfd/tutorial_motion_deblur_filter.html
     Public Class XR_BlurMotion_Deblur : Inherits TaskParent
         Dim mblur As New BlurMotion_Basics_TA
-        Private Function calcPSF(filterSize As Size, len As Integer, theta As Double) As Mat
+        Private Shared Function calcPSF(filterSize As Size, len As Integer, theta As Double) As Mat
             Dim h As New Mat(filterSize, MatType.CV_32F, 0)
             Dim pt = New cv.Point(filterSize.Width / 2, filterSize.Height / 2)
             Ellipse(h, pt, New Size(0, CInt(len / 2)), 90 - theta, 0, 360, New Scalar(255), -1)
             Dim summa As Scalar = Sum(h)
             Return h / summa(0)
         End Function
-        Private Function calcWeinerFilter(input_h_PSF As Mat, nsr As Double) As Mat
+        Private Shared Function calcWeinerFilter(input_h_PSF As Mat, nsr As Double) As Mat
             Dim h_PSF_shifted = fftShift(input_h_PSF)
             Dim planes() = {h_PSF_shifted.Clone(), New Mat(h_PSF_shifted.Size(), MatType.CV_32F, Scalar.All(0))}
             Dim complexI As New Mat
@@ -55,7 +55,7 @@ Namespace VBClasses
             Divide(planes(0), denom, output_G)
             Return output_G
         End Function
-        Private Function fftShift(inputImg As Mat) As Mat
+        Private Shared Function fftShift(inputImg As Mat) As Mat
             Dim outputImg = inputImg.Clone()
             Dim cx = outputImg.Width / 2
             Dim cy = outputImg.Height / 2
@@ -71,7 +71,7 @@ Namespace VBClasses
             tmp.CopyTo(q2)
             Return outputImg
         End Function
-        Private Function edgeTaper(inputImg As Mat, gamma As Double, beta As Double) As Mat
+        Private Shared Function edgeTaper(inputImg As Mat, gamma As Double, beta As Double) As Mat
             Dim nx = inputImg.Width
             Dim ny = inputImg.Height
             Dim w1 As New Mat(1, nx, MatType.CV_32F, Scalar.All(0))
@@ -95,7 +95,7 @@ Namespace VBClasses
             Multiply(inputImg, w, outputImg)
             Return outputImg
         End Function
-        Private Function filter2DFreq(inputImg As Mat, H As Mat) As Mat
+        Private Shared Function filter2DFreq(inputImg As Mat, H As Mat) As Mat
             Dim planes() = {inputImg.Clone(), New Mat(inputImg.Size(), MatType.CV_32F, Scalar.All(0))}
             Dim complexI As New Mat
             Merge(planes, complexI)

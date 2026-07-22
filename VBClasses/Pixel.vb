@@ -1,190 +1,190 @@
 Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
+Namespace PixelViewer
+    Public Class Pixel_Viewer : Inherits TaskParent
+        Dim firstUpdate = True
+        Public viewerForm As New PixelViewerForm
+        Dim mouseLoc = New cv.Point(10, 10) ' assume 
+        Public dst0Input As New Mat(task.workRes, MatType.CV_8UC3, 0)
+        Public dst1Input As New Mat(task.workRes, MatType.CV_8UC3, 0)
+        Public dst2Input As New Mat(task.workRes, MatType.CV_8UC3, 0)
+        Public dst3Input As New Mat(task.workRes, MatType.CV_8UC3, 0)
+        Enum displayTypes
+            noType = -1
+            type8uC3 = 0
+            type8u = 1
+            type32F = 2
+            type32FC3 = 3
+            type32SC1 = 4
+            type32SC3 = 5
+        End Enum
+        Public Sub New()
+            desc = "Display pixels under the cursor"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            If standaloneTest() Then
+                task.dstList(0) = dst0Input
+                task.dstList(1) = dst1Input
+                task.dstList(2) = dst2Input
+                task.dstList(3) = dst3Input
+            End If
+
+            Dim dst = Choose(task.mousePicTag + 1, task.dstList(0), task.dstList(1), dst2Input, dst3Input)
+
+            Dim displayType = displayTypes.noType
+            If dst.Type = MatType.CV_8UC3 Then displayType = displayTypes.type8uC3
+            If dst.Type = MatType.CV_8U Then displayType = displayTypes.type8u
+            If dst.Type = MatType.CV_32F Then displayType = displayTypes.type32F
+            If dst.Type = MatType.CV_32FC3 Then displayType = displayTypes.type32FC3
+            If dst.Type = MatType.CV_32SC1 Then displayType = displayTypes.type32SC1
+            If dst.Type = MatType.CV_32SC3 Then displayType = displayTypes.type32SC3
+            If displayType < 0 Or dst.Channels() > 3 Then
+                SetTrueText("The pixel Viewer does not support this Mat!  Please add support.")
+                Exit Sub
+            End If
+
+            Dim formatType = Choose(displayType + 1, "8UC3", "8UC1", "32FC1", "32FC3", "32SC1", "32SC3")
+            viewerForm.Text = "Pixel Viewer for " + Choose(task.mousePicTag + 1, "Color", "RGB Depth", "dst2", "dst3") + " " + formatType
+
+            ' yeah, kind of a mess but lots of factors...
+            Dim drWidth As Integer = Choose(displayType + 1, 5, 17, 13, 3, 16, 5) * viewerForm.Width / 450 + 3
+            Dim drHeight As Integer = CInt(viewerForm.Height / 16) + If(viewerForm.Height < 400, -3, If(viewerForm.Height < 800, -1, 1))
+            If drHeight < 20 Then drHeight = 20
+
+            If viewerForm.mousePoint <> newPoint Then
+                task.mouseMovePoint += viewerForm.mousePoint
+                task.mouseMovePointUpdated = True
+                viewerForm.mousePoint = New cv.Point
+            End If
+            If task.mouseMovePoint.X Or task.mouseMovePoint.Y Then
+                Dim x As Integer = If(task.mouseMovePoint.X >= drWidth, task.mouseMovePoint.X - drWidth - 1, 0)
+                Dim y As Integer = If(task.mouseMovePoint.Y >= drHeight, task.mouseMovePoint.Y - drHeight - 1, 0)
+                If task.mouseMovePoint.X >= drWidth Then x += 2
+                If task.mouseMovePoint.Y >= drHeight Then y += 2
+                mouseLoc = New cv.Point(x, y)
+            End If
+
+            task.pixelViewerRect = New cv.Rect(0, 0, -1, -1)
+            task.pixelViewTag = task.mousePicTag
+            Dim dw = New cv.Rect(mouseLoc.x, mouseLoc.y, drWidth, drHeight)
+            dw = ValidateRect(dw)
+
+            Dim img = dst(dw).Clone
+
+            Dim mm As mmData
+            Dim format32f = "0000.0"
+            Dim format32S = "0000"
+            If img.Type = MatType.CV_32F Or img.Type = MatType.CV_32FC3 Then
+                If img.Channels() = 3 Then
+                    Dim tmp = img.Reshape(1)
+                    mm = GetMinMax(tmp)
+                Else
+                    mm = GetMinMax(img)
+                End If
+                If mm.minVal >= 0 Then
+                    If mm.maxVal < 1000 Then format32f = "000.00"
+                    If mm.maxVal < 100 Then format32f = "00.000"
+                    If mm.maxVal < 10 Then format32f = "0.0000"
+                Else
+                    mm.maxVal = Math.Max(-mm.minVal, mm.maxVal)
+                    format32f = " 0.000;-0.000"
+                    If mm.maxVal < 1000 Then format32f = " 000.0;-000.0"
+                    If mm.maxVal < 100 Then format32f = " 00.00;-00.00"
+                    If mm.maxVal < 10 Then format32f = " 0.000;-0.000"
+                End If
+            End If
+
+            Dim imgText = ""
+            Dim ClickPoint = New cv.Point(task.clickPoint.X - dw.X, task.clickPoint.Y - dw.Y)
+            Select Case displayType
+
+                Case displayTypes.type8uC3
+                    imgText += If(dw.X + drWidth > 1000, " col    ", " col    ") + CStr(dw.X) + " through " + CStr(dw.X + drWidth - 1) + vbLf
+                    For y = 0 To img.Height - 1
+                        imgText += "r" + (dw.Y + y).ToString("000") + "   "
+                        For x = 0 To img.Width - 1
+                            Dim vec = img.Get(Of Vec3b)(y, x)
+                            imgText += vec(0).ToString("000") + " " + vec(1).ToString("000") + " " + vec(2).ToString("000") + "   "
+                        Next
+                        imgText += vbLf
+                    Next
+
+                Case displayTypes.type8u
+                    imgText += If(dw.X + drWidth > 1000, " col    ", " col    ") + CStr(dw.X) + " through " + CStr(dw.X + drWidth - 1) + vbLf
+                    For y = 0 To img.Height - 1
+                        imgText += "r" + (dw.Y + y).ToString("000") + "   "
+                        For x = 0 To img.Width - 1
+                            If (task.toggleOn And y = ClickPoint.Y) And (x = ClickPoint.X - 1 Or x = ClickPoint.X) Then
+                                imgText += img.Get(Of Byte)(y, x).ToString("000") + If((dw.X + x) Mod 5 = 4, "***", "*")
+                            Else
+                                imgText += img.Get(Of Byte)(y, x).ToString("000") + If((dw.X + x) Mod 5 = 4, "   ", " ")
+                            End If
+                        Next
+                        imgText += vbLf
+                    Next
+
+                Case displayTypes.type32F
+                    imgText += If(dw.X + drWidth > 1000, " col    ", " col    ") + CStr(dw.X) + " through " + CStr(dw.X + drWidth - 1) + vbLf
+                    For y = 0 To img.Height - 1
+                        imgText += "r" + (dw.Y + y).ToString("000") + "   "
+                        For x = 0 To img.Width - 1
+                            imgText += img.Get(Of Single)(y, x).ToString(format32f) + If((dw.X + x) Mod 5 = 4, "   ", " ")
+                        Next
+                        imgText += vbLf
+                    Next
+
+                Case displayTypes.type32FC3
+                    imgText += If(dw.X + drWidth > 1000, " col    ", " col    ") + CStr(dw.X) + " through " + CStr(dw.X + drWidth - 1) + vbLf
+                    For y = 0 To img.Height - 1
+                        imgText += "r" + (dw.Y + y).ToString("000") + "   "
+                        For x = 0 To img.Width - 1
+                            Dim vec = img.Get(Of Vec3f)(y, x)
+                            imgText += vec(0).ToString(format32f) + " " + vec(1).ToString(format32f) + " " + vec(2).ToString(format32f) + "   "
+                        Next
+                        imgText += vbLf
+                    Next
+
+                Case displayTypes.type32SC1
+                    imgText += If(dw.X + drWidth > 1000, " col    ", " col    ") + CStr(dw.X) + " through " + CStr(dw.X + drWidth - 1) + vbLf
+                    For y = 0 To img.Height - 1
+                        imgText += "r" + (dw.Y + y).ToString("000") + "   "
+                        For x = 0 To img.Width - 1
+                            imgText += img.Get(Of Integer)(y, x).ToString(format32S) + "  "
+                        Next
+                        imgText += vbLf
+                    Next
+                Case displayTypes.type32SC3
+                    imgText += If(dw.X + drWidth > 1000, " col    ", " col    ") + CStr(dw.X) + " through " + CStr(dw.X + drWidth - 1) + vbLf
+                    For y = 0 To img.Height - 1
+                        imgText += "r" + (dw.Y + y).ToString("000") + "   "
+                        For x = 0 To img.Width - 1
+                            Dim vec = img.Get(Of Vec3i)(y, x)
+                            imgText += vec(0).ToString(format32S) + " " + vec(1).ToString(format32S) + " " + vec(2).ToString(format32S) + "   "
+                        Next
+                        imgText += vbLf
+                    Next
+            End Select
+            task.pixelViewerRect = dw
+
+            If viewerForm.rtb.Text <> imgText Then
+                If firstUpdate Then viewerForm.rtb.Text = imgText Else viewerForm.saveText = imgText
+                firstUpdate = False
+            End If
+
+            desc = "Display pixels under the cursor"
+            SetTrueText("Move the mouse to location that you want to inspect." + vbCrLf +
+                    "Click and hold the right-mouse button to move away from that location")
+        End Sub
+        Public Sub closeViewer()
+            If viewerForm IsNot Nothing Then viewerForm.Close()
+        End Sub
+    End Class
+End Namespace
+
+
+
+
 Namespace VBClasses
-    Namespace PixelViewer
-        Public Class Pixel_Viewer : Inherits TaskParent
-            Dim firstUpdate = True
-            Public viewerForm As New PixelViewerForm
-            Dim mouseLoc = New cv.Point(10, 10) ' assume 
-            Public dst0Input As New Mat(task.workRes, MatType.CV_8UC3, 0)
-            Public dst1Input As New Mat(task.workRes, MatType.CV_8UC3, 0)
-            Public dst2Input As New Mat(task.workRes, MatType.CV_8UC3, 0)
-            Public dst3Input As New Mat(task.workRes, MatType.CV_8UC3, 0)
-            Enum displayTypes
-                noType = -1
-                type8uC3 = 0
-                type8u = 1
-                type32F = 2
-                type32FC3 = 3
-                type32SC1 = 4
-                type32SC3 = 5
-            End Enum
-            Public Sub New()
-                desc = "Display pixels under the cursor"
-            End Sub
-            Public Overrides Sub RunAlg(src As cv.Mat)
-                If standaloneTest() Then
-                    task.dstList(0) = dst0Input
-                    task.dstList(1) = dst1Input
-                    task.dstList(2) = dst2Input
-                    task.dstList(3) = dst3Input
-                End If
-
-                Dim dst = Choose(task.mousePicTag + 1, task.dstList(0), task.dstList(1), dst2Input, dst3Input)
-
-                Dim displayType = displayTypes.noType
-                If dst.Type = MatType.CV_8UC3 Then displayType = displayTypes.type8uC3
-                If dst.Type = MatType.CV_8U Then displayType = displayTypes.type8u
-                If dst.Type = MatType.CV_32F Then displayType = displayTypes.type32F
-                If dst.Type = MatType.CV_32FC3 Then displayType = displayTypes.type32FC3
-                If dst.Type = MatType.CV_32SC1 Then displayType = displayTypes.type32SC1
-                If dst.Type = MatType.CV_32SC3 Then displayType = displayTypes.type32SC3
-                If displayType < 0 Or dst.Channels() > 3 Then
-                    SetTrueText("The pixel Viewer does not support this Mat!  Please add support.")
-                    Exit Sub
-                End If
-
-                Dim formatType = Choose(displayType + 1, "8UC3", "8UC1", "32FC1", "32FC3", "32SC1", "32SC3")
-                viewerForm.Text = "Pixel Viewer for " + Choose(task.mousePicTag + 1, "Color", "RGB Depth", "dst2", "dst3") + " " + formatType
-
-                ' yeah, kind of a mess but lots of factors...
-                Dim drWidth As Integer = Choose(displayType + 1, 5, 17, 13, 3, 16, 5) * viewerForm.Width / 450 + 3
-                Dim drHeight As Integer = CInt(viewerForm.Height / 16) + If(viewerForm.Height < 400, -3, If(viewerForm.Height < 800, -1, 1))
-                If drHeight < 20 Then drHeight = 20
-
-                If viewerForm.mousePoint <> newPoint Then
-                    task.mouseMovePoint += viewerForm.mousePoint
-                    task.mouseMovePointUpdated = True
-                    viewerForm.mousePoint = New cv.Point
-                End If
-                If task.mouseMovePoint.X Or task.mouseMovePoint.Y Then
-                    Dim x As Integer = If(task.mouseMovePoint.X >= drWidth, task.mouseMovePoint.X - drWidth - 1, 0)
-                    Dim y As Integer = If(task.mouseMovePoint.Y >= drHeight, task.mouseMovePoint.Y - drHeight - 1, 0)
-                    If task.mouseMovePoint.X >= drWidth Then x += 2
-                    If task.mouseMovePoint.Y >= drHeight Then y += 2
-                    mouseLoc = New cv.Point(x, y)
-                End If
-
-                task.pixelViewerRect = New cv.Rect(0, 0, -1, -1)
-                task.pixelViewTag = task.mousePicTag
-                Dim dw = New cv.Rect(mouseLoc.x, mouseLoc.y, drWidth, drHeight)
-                dw = ValidateRect(dw)
-
-                Dim img = dst(dw).Clone
-
-                Dim mm As mmData
-                Dim format32f = "0000.0"
-                Dim format32S = "0000"
-                If img.Type = MatType.CV_32F Or img.Type = MatType.CV_32FC3 Then
-                    If img.Channels() = 3 Then
-                        Dim tmp = img.Reshape(1)
-                        mm = GetMinMax(tmp)
-                    Else
-                        mm = GetMinMax(img)
-                    End If
-                    If mm.minVal >= 0 Then
-                        If mm.maxVal < 1000 Then format32f = "000.00"
-                        If mm.maxVal < 100 Then format32f = "00.000"
-                        If mm.maxVal < 10 Then format32f = "0.0000"
-                    Else
-                        mm.maxVal = Math.Max(-mm.minVal, mm.maxVal)
-                        format32f = " 0.000;-0.000"
-                        If mm.maxVal < 1000 Then format32f = " 000.0;-000.0"
-                        If mm.maxVal < 100 Then format32f = " 00.00;-00.00"
-                        If mm.maxVal < 10 Then format32f = " 0.000;-0.000"
-                    End If
-                End If
-
-                Dim imgText = ""
-                Dim ClickPoint = New cv.Point(task.clickPoint.X - dw.X, task.clickPoint.Y - dw.Y)
-                Select Case displayType
-
-                    Case displayTypes.type8uC3
-                        imgText += If(dw.X + drWidth > 1000, " col    ", " col    ") + CStr(dw.X) + " through " + CStr(dw.X + drWidth - 1) + vbLf
-                        For y = 0 To img.Height - 1
-                            imgText += "r" + (dw.Y + y).ToString("000") + "   "
-                            For x = 0 To img.Width - 1
-                                Dim vec = img.Get(Of Vec3b)(y, x)
-                                imgText += vec(0).ToString("000") + " " + vec(1).ToString("000") + " " + vec(2).ToString("000") + "   "
-                            Next
-                            imgText += vbLf
-                        Next
-
-                    Case displayTypes.type8u
-                        imgText += If(dw.X + drWidth > 1000, " col    ", " col    ") + CStr(dw.X) + " through " + CStr(dw.X + drWidth - 1) + vbLf
-                        For y = 0 To img.Height - 1
-                            imgText += "r" + (dw.Y + y).ToString("000") + "   "
-                            For x = 0 To img.Width - 1
-                                If (task.toggleOn And y = ClickPoint.Y) And (x = ClickPoint.X - 1 Or x = ClickPoint.X) Then
-                                    imgText += img.Get(Of Byte)(y, x).ToString("000") + If((dw.X + x) Mod 5 = 4, "***", "*")
-                                Else
-                                    imgText += img.Get(Of Byte)(y, x).ToString("000") + If((dw.X + x) Mod 5 = 4, "   ", " ")
-                                End If
-                            Next
-                            imgText += vbLf
-                        Next
-
-                    Case displayTypes.type32F
-                        imgText += If(dw.X + drWidth > 1000, " col    ", " col    ") + CStr(dw.X) + " through " + CStr(dw.X + drWidth - 1) + vbLf
-                        For y = 0 To img.Height - 1
-                            imgText += "r" + (dw.Y + y).ToString("000") + "   "
-                            For x = 0 To img.Width - 1
-                                imgText += img.Get(Of Single)(y, x).ToString(format32f) + If((dw.X + x) Mod 5 = 4, "   ", " ")
-                            Next
-                            imgText += vbLf
-                        Next
-
-                    Case displayTypes.type32FC3
-                        imgText += If(dw.X + drWidth > 1000, " col    ", " col    ") + CStr(dw.X) + " through " + CStr(dw.X + drWidth - 1) + vbLf
-                        For y = 0 To img.Height - 1
-                            imgText += "r" + (dw.Y + y).ToString("000") + "   "
-                            For x = 0 To img.Width - 1
-                                Dim vec = img.Get(Of Vec3f)(y, x)
-                                imgText += vec(0).ToString(format32f) + " " + vec(1).ToString(format32f) + " " + vec(2).ToString(format32f) + "   "
-                            Next
-                            imgText += vbLf
-                        Next
-
-                    Case displayTypes.type32SC1
-                        imgText += If(dw.X + drWidth > 1000, " col    ", " col    ") + CStr(dw.X) + " through " + CStr(dw.X + drWidth - 1) + vbLf
-                        For y = 0 To img.Height - 1
-                            imgText += "r" + (dw.Y + y).ToString("000") + "   "
-                            For x = 0 To img.Width - 1
-                                imgText += img.Get(Of Integer)(y, x).ToString(format32S) + "  "
-                            Next
-                            imgText += vbLf
-                        Next
-                    Case displayTypes.type32SC3
-                        imgText += If(dw.X + drWidth > 1000, " col    ", " col    ") + CStr(dw.X) + " through " + CStr(dw.X + drWidth - 1) + vbLf
-                        For y = 0 To img.Height - 1
-                            imgText += "r" + (dw.Y + y).ToString("000") + "   "
-                            For x = 0 To img.Width - 1
-                                Dim vec = img.Get(Of Vec3i)(y, x)
-                                imgText += vec(0).ToString(format32S) + " " + vec(1).ToString(format32S) + " " + vec(2).ToString(format32S) + "   "
-                            Next
-                            imgText += vbLf
-                        Next
-                End Select
-                task.pixelViewerRect = dw
-
-                If viewerForm.rtb.Text <> imgText Then
-                    If firstUpdate Then viewerForm.rtb.Text = imgText Else viewerForm.saveText = imgText
-                    firstUpdate = False
-                End If
-
-                desc = "Display pixels under the cursor"
-                SetTrueText("Move the mouse to location that you want to inspect." + vbCrLf +
-                        "Click and hold the right-mouse button to move away from that location")
-            End Sub
-            Public Sub closeViewer()
-                If viewerForm IsNot Nothing Then viewerForm.Close()
-            End Sub
-        End Class
-    End Namespace
-
-
-
-
     ' https://github.com/shimat/opencvsharp_samples/blob/cba08badef1d5ab3c81ab158a64828a918c73df5/SamplesCS/Samples/PixelAccess.cs
     Public Class XR_Pixel_GetSet : Inherits TaskParent
         Dim mats As New Mat_4Click
