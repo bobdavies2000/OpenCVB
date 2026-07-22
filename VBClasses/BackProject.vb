@@ -1,595 +1,596 @@
 Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCvSharp
-' https://docs.opencvb.org/3.4/dc/df6/tutorial_py_Histogram_backprojection.html
-Public Class BackProject_Basics : Inherits TaskParent
-    Public hist As New Histogram_Basics
-    Public minRange As Scalar, maxRange As Scalar
-    Public incr As Single
-    Public histIndex As Integer
-    Public Sub New()
-        labels(2) = "Move mouse to backproject a histogram column"
-        desc = "Mouse over any bin to see the histogram backprojected."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        If src.Channels <> 1 Then src = task.gray
-        hist.Run(src)
-        If hist.mm.minVal = hist.mm.maxVal Then
-            SetTrueText("The input image is empty - mm.minVal and mm.maxVal are both zero...")
-            Exit Sub
-        End If
-
-        dst2 = hist.dst2
-
-        Dim totalPixels = dst2.Total ' assume we are including zeros.
-        Dim colWidth As Integer = dst2.Width \ task.histogramBins
-        incr = (hist.mm.maxVal - hist.mm.minVal) / task.histogramBins
-        histIndex = Math.Floor(task.mouseMovePoint.X / colWidth)
-
-        minRange = New Scalar(histIndex * incr)
-        maxRange = New Scalar((histIndex + 1) * incr)
-        If histIndex + 1 = task.histogramBins Then maxRange = New Scalar(255)
-        InRange(src, minRange, maxRange, dst0)
-
-        Dim actualCount = CountNonZero(dst0)
-        dst3 = task.color.Clone
-        dst3.SetTo(Scalar.Yellow, dst0)
-        Dim count = hist.histogram.Get(Of Single)(CInt(histIndex), 0)
-        Dim histMax As mmData = GetMinMax(hist.histogram)
-        labels(3) = $"Highlight pixels {CInt(minRange(0))}-{CInt(maxRange(0))} with {CInt(count)} of {totalPixels}"
-        Rectangle(dst2, New cv.Rect(histIndex * colWidth, 0, colWidth, dst2.Height), Scalar.Yellow, task.lineWidth)
-    End Sub
-End Class
-
-
-
-
-
-
-
-Public Class XR_BackProject_Reduction : Inherits TaskParent
-    Dim reduction As New Reduction_Basics
-    Dim bProject As New BackProject_Basics
-    Public Sub New()
-        labels(3) = "Backprojection of highlighted histogram bin"
-        task.fOptions.ReductionColor.Value = 50
-        desc = "Use the histogram of a reduced BGR image to isolate featureless portions of an image."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        reduction.Run(src)
-
-        bProject.Run(reduction.dst2)
-        dst2 = bProject.dst2
-        dst3 = bProject.dst3
-        labels(2) = "Reduction = " + CStr(task.fOptions.ReductionColor.Value) + " and bins = " + CStr(task.histogramBins)
-    End Sub
-End Class
-
-
-
-
-
-Public Class XR_BackProject_PointCloud : Inherits TaskParent
-    Public hist As New Histogram_PointCloud_XZ_YZ
-    Public Sub New()
-        dst2 = New Mat(dst2.Size(), MatType.CV_32FC3, 0)
-        labels = {"", "", "Backprojection after histogram binning X and Z values", "Backprojection after histogram binning Y and Z values"}
-        desc = "Explore Backprojection of the cloud histogram."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        Dim thresholdVal = hist.options.threshold
-        hist.Run(src)
-
-        Threshold(hist.dst2, dst0, thresholdVal, 255, ThresholdTypes.Binary)
-        Threshold(hist.dst3, dst1, thresholdVal, 255, ThresholdTypes.Binary)
-
-        dst2 = New Mat(hist.dst2.Size(), MatType.CV_32F, Scalar.All(0))
-        dst3 = New Mat(hist.dst3.Size(), MatType.CV_32F, Scalar.All(0))
-
-        Dim mask As New Mat
-        CalcBackProject({task.pointCloud}, {0, 2}, dst0, mask, hist.rangesX)
-        mask.ConvertTo(mask, MatType.CV_8U)
-        task.pointCloud.CopyTo(dst2, mask)
-
-        CalcBackProject({task.pointCloud}, {1, 2}, dst1, mask, hist.rangesY)
-        mask.ConvertTo(mask, MatType.CV_8U)
-        task.pointCloud.CopyTo(dst3, mask)
-    End Sub
-End Class
-
-
-
-
-
-
-
-
-
-Public Class BackProject_DisplayColor : Inherits TaskParent
-    Dim backP As New BackProject_Full
-    Public Sub New()
-        task.gOptions.setHistogramBins(10)
-        labels = {"", "", "Back projection", ""}
-        desc = "Display the back projected color image"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        backP.Run(src)
-        dst2 = Palettize(backP.dst2 + 1)
-        labels(2) = backP.labels(2)
-    End Sub
-End Class
-
-
-
-
-
-
-
-
-' https://docs.opencvb.org/3.4/da/d7f/tutorial_back_projection.html
-Public Class BackProject_Full : Inherits TaskParent
-    Public classCount As Integer
-    Dim plotHist As New PlotBar_Basics
-    Dim index As Integer
-    Public Sub New()
-        task.gOptions.setHistogramBins(10)
-        plotHist.createHistogram = True
-        plotHist.removeZeroEntry = False
-        If standalone Then task.gOptions.displayDst1.Checked = True
-        desc = "Create a histogram for the grayscale image, uniquely identify each bin, and backproject it."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        If src.Channels <> 1 Then src = task.gray
-        classCount = task.histogramBins
-        plotHist.Run(src)
-        dst1 = plotHist.dst2
-
-        Dim histogram = plotHist.histogram
-        For i = 0 To classCount
-            histogram.Set(Of Single)(i, 0, i)
-        Next
-
-        CalcBackProject({src}, {0}, histogram, dst2, plotHist.ranges)
-        dst2.ConvertTo(dst2, MatType.CV_8U)
-        dst2 += 1 ' get away from zeros...
-        labels(2) = "CV_8U backprojection of the " + CStr(classCount) + " histogram bins."
-        If standaloneTest() Then
-            dst3 = Palettize(dst2)
-            labels(3) = "Class " + CStr(index) + " had " + CStr(plotHist.histArray(index)) + " pixels after backprojection."
-        End If
-    End Sub
-End Class
-
-
-
-
-
-
-Public Class XR_BackProject_Unstable : Inherits TaskParent
-    Dim backP As New BackProject_Full
-    Dim diff As New Diff_Basics
-    Public Sub New()
-        labels = {"", "", "Backprojection output", "Unstable pixels in the backprojection. " +
-                  "If flashing, set option 'Color Difference Threshold' higher."}
-        desc = "Highlight the unstable pixels in the backprojection."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        backP.Run(src)
-        dst2 = Palettize(backP.dst2)
-
-        diff.Run(dst2)
-        dst3 = diff.dst2
-    End Sub
-End Class
-
-
-
-
-
-
-Public Class BackProject_Side : Inherits TaskParent
-    Dim histSide As New Projection_HistSide
-    Public Sub New()
-        labels = {"", "", "Hotspots in the Side View", "Back projection of the hotspots in the Side View"}
-        desc = "Display the back projection of the hotspots in the Side View"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        histSide.Run(src)
-        dst2 = histSide.dst2
-
-        CalcBackProject({task.pointCloud}, task.channelsSide, histSide.histogram, dst3, task.rangesSide)
-        Dim _thr1 As New Mat
-        Threshold(dst3, dst3, 0, 255, ThresholdTypes.Binary)
-        ConvertScaleAbs(dst3, dst3)
-    End Sub
-End Class
-
-
-
-
-
-
-Public Class BackProject_Top : Inherits TaskParent
-    Dim histTop As New Projection_HistTop
-    Public Sub New()
-        labels = {"", "", "Hotspots in the Top View", "Back projection of the hotspots in the Top View"}
-        desc = "Display the back projection of the hotspots in the Top View"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        histTop.Run(src)
-        dst2 = histTop.dst2
-
-        CalcBackProject({task.pointCloud}, task.channelsTop, histTop.histogram, dst1, task.rangesTop)
-        ConvertScaleAbs(dst1, dst1)
-        dst1.ConvertTo(dst1, MatType.CV_8U)
-        dst3 = Palettize(dst1)
-    End Sub
-End Class
-
-
-
-
-
-
-
-Public Class XR_BackProject_Horizontal : Inherits TaskParent
-    Dim bpTop As New BackProject_Top
-    Dim bpSide As New BackProject_Side
-    Public Sub New()
-        desc = "Use both the BackProject_Top to improve the results of the BackProject_Side for finding flat surfaces."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        bpTop.Run(src)
-        task.pointCloud.SetTo(0, bpTop.dst3)
-
-        bpSide.Run(src)
-        dst2 = bpSide.dst3
-    End Sub
-End Class
-
-
-
-
-
-
-
-
-
-
-Public Class BackProject_SoloSide : Inherits TaskParent
-    Dim histSide As New Projection_HistSide
-    Public Sub New()
-        labels = {"", "", "Solo samples in the Side View", "Back projection of the solo samples in the Side View"}
-        desc = "Display the back projection of the solo samples in the Side View"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        histSide.Run(src)
-
-        Threshold(histSide.histogram, dst3, 1, 255, ThresholdTypes.TozeroInv)
-        ConvertScaleAbs(dst3, dst2, 255)
-
-        histSide.histogram.SetTo(0, Not dst2)
-        CalcBackProject({task.pointCloud}, task.channelsSide, histSide.histogram, dst3, task.rangesSide)
-        Threshold(dst3, dst3, 0, 255, ThresholdTypes.Binary)
-        ConvertScaleAbs(dst3, dst3)
-    End Sub
-End Class
-
-
-
-
-
-
-Public Class BackProject_SoloTop : Inherits TaskParent
-    Dim histTop As New Projection_HistTop
-    Public Sub New()
-        labels = {"", "", "Solo samples in the Top View", "Back projection of the solo samples in the Top View"}
-        desc = "Display the back projection of the solo samples in the Top View"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        histTop.Run(src)
-
-        Threshold(histTop.histogram, dst3, 1, 255, ThresholdTypes.TozeroInv)
-        ConvertScaleAbs(dst3, dst2, 255)
-
-        histTop.histogram.SetTo(0, Not dst2)
-        CalcBackProject({task.pointCloud}, task.channelsTop, histTop.histogram, dst3, task.rangesTop)
-        Threshold(dst3, dst3, 0, 255, ThresholdTypes.Binary)
-        ConvertScaleAbs(dst3, dst3)
-        ConvertScaleAbs(dst3, dst2, 255)
-    End Sub
-End Class
-
-
-
-
-
-
-' https://docs.opencvb.org/3.4/dc/df6/tutorial_py_Histogram_backprojection.html
-Public Class BackProject_Image : Inherits TaskParent
-    Public hist As New Histogram_Basics
-    Public mask As New Mat
-    Public useInrange As Boolean
-    Public kalman As New Kalman_Basics
-    Public Sub New()
-        labels(2) = "Move mouse to backproject each histogram column"
-        desc = "Explore Backprojection of each element of a grayscale histogram."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        hist.Run(task.gray)
-        If hist.mm.minVal = hist.mm.maxVal Then
-            SetTrueText("The input image is empty - mm.minval and mm.maxVal are both zero...")
-            Exit Sub ' the input image is empty...
-        End If
-        dst2 = hist.dst2
-
-        If kalman.kInput.Length <> 2 Then ReDim kalman.kInput(2 - 1)
-        kalman.kInput(0) = hist.mm.minVal
-        kalman.kInput(1) = hist.mm.maxVal
-        kalman.Run(emptyMat)
-        hist.mm.minVal = Math.Min(kalman.kOutput(0), kalman.kOutput(1))
-        hist.mm.maxVal = Math.Max(kalman.kOutput(0), kalman.kOutput(1))
-
-        Dim totalPixels = dst2.Total ' assume we are including zeros.
-        If hist.plotHist.removeZeroEntry Then totalPixels = CountNonZero(task.gray)
-
-        Dim brickWidth = dst2.Width / task.histogramBins
-        Dim incr = (hist.mm.maxVal - hist.mm.minVal) / task.histogramBins
-        Dim histIndex = Math.Floor(task.mouseMovePoint.X / brickWidth)
-
-        Dim minRange = New Scalar(histIndex * incr)
-        Dim maxRange = New Scalar((histIndex + 1) * incr + 1)
-        If histIndex + 1 = task.histogramBins Then
-            minRange = New Scalar(254)
-            maxRange = New Scalar(255)
-        End If
-        If useInrange Then
-            If histIndex = 0 And hist.plotHist.removeZeroEntry Then
-                mask = New Mat(task.gray.Size(), MatType.CV_8U, Scalar.All(0))
-            Else
-                InRange(task.gray, minRange, maxRange, mask)
+Namespace VBClasses
+    ' https://docs.opencvb.org/3.4/dc/df6/tutorial_py_Histogram_backprojection.html
+    Public Class BackProject_Basics : Inherits TaskParent
+        Public hist As New Histogram_Basics
+        Public minRange As Scalar, maxRange As Scalar
+        Public incr As Single
+        Public histIndex As Integer
+        Public Sub New()
+            labels(2) = "Move mouse to backproject a histogram column"
+            desc = "Mouse over any bin to see the histogram backprojected."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            If src.Channels <> 1 Then src = task.gray
+            hist.Run(src)
+            If hist.mm.minVal = hist.mm.maxVal Then
+                SetTrueText("The input image is empty - mm.minVal and mm.maxVal are both zero...")
+                Exit Sub
             End If
-        Else
-            Dim bRange = New Rangef(minRange(0), maxRange(0))
-            Dim ranges() = New Rangef() {bRange}
-            CalcBackProject({task.gray}, {0}, hist.histogram, mask, ranges)
-        End If
-        dst3 = src
-        If mask.Type <> MatType.CV_8U Then mask.ConvertTo(mask, MatType.CV_8U)
-        dst3.SetTo(Scalar.Yellow, mask)
-        Dim actualCount = CountNonZero(mask)
-        Dim count = hist.histogram.Get(Of Single)(histIndex, 0)
-        Dim histMax As mmData = GetMinMax(hist.histogram)
-        labels(3) = "Backprojecting " + CStr(CInt(minRange(0))) + " to " + CStr(CInt(maxRange(0))) + " with " +
-                     CStr(count) + " histogram samples and " + CStr(actualCount) + " mask count.  Histogram max count = " +
-                     CStr(CInt(histMax.maxVal))
-        Rectangle(dst2, New cv.Rect(CInt(histIndex * brickWidth), 0, brickWidth, dst2.Height), Scalar.Yellow, task.lineWidth)
-    End Sub
-End Class
+
+            dst2 = hist.dst2
+
+            Dim totalPixels = dst2.Total ' assume we are including zeros.
+            Dim colWidth As Integer = dst2.Width \ task.histogramBins
+            incr = (hist.mm.maxVal - hist.mm.minVal) / task.histogramBins
+            histIndex = Math.Floor(task.mouseMovePoint.X / colWidth)
+
+            minRange = New Scalar(histIndex * incr)
+            maxRange = New Scalar((histIndex + 1) * incr)
+            If histIndex + 1 = task.histogramBins Then maxRange = New Scalar(255)
+            InRange(src, minRange, maxRange, dst0)
+
+            Dim actualCount = CountNonZero(dst0)
+            dst3 = task.color.Clone
+            dst3.SetTo(Scalar.Yellow, dst0)
+            Dim count = hist.histogram.Get(Of Single)(CInt(histIndex), 0)
+            Dim histMax As mmData = GetMinMax(hist.histogram)
+            labels(3) = $"Highlight pixels {CInt(minRange(0))}-{CInt(maxRange(0))} with {CInt(count)} of {totalPixels}"
+            Rectangle(dst2, New cv.Rect(histIndex * colWidth, 0, colWidth, dst2.Height), Scalar.Yellow, task.lineWidth)
+        End Sub
+    End Class
 
 
 
 
 
-Public Class XR_BackProject_Mouse : Inherits TaskParent
-    Dim backP As New BackProject_Image
-    Public Sub New()
-        labels(2) = "Use the mouse to select what should be shown in the backprojection of the depth histogram"
-        desc = "Use the mouse to select what should be shown in the backprojection of the depth histogram"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        backP.Run(src)
-        dst2 = backP.dst2
-        dst3 = backP.dst3
-    End Sub
-End Class
+
+
+    Public Class XR_BackProject_Reduction : Inherits TaskParent
+        Dim reduction As New Reduction_Basics
+        Dim bProject As New BackProject_Basics
+        Public Sub New()
+            labels(3) = "Backprojection of highlighted histogram bin"
+            task.fOptions.ReductionColor.Value = 50
+            desc = "Use the histogram of a reduced BGR image to isolate featureless portions of an image."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            reduction.Run(src)
+
+            bProject.Run(reduction.dst2)
+            dst2 = bProject.dst2
+            dst3 = bProject.dst3
+            labels(2) = "Reduction = " + CStr(task.fOptions.ReductionColor.Value) + " and bins = " + CStr(task.histogramBins)
+        End Sub
+    End Class
 
 
 
 
 
-Public Class XR_BackProject_MeterByMeter : Inherits TaskParent
-    Dim histogram As New Mat
-    Public Sub New()
-        desc = "Backproject the depth data at 1 meter intervals without a histogram."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        If task.heartBeat Then
-            Dim histData As New List(Of Single)
-            For i = 0 To task.histogramBins - 1
-                histData.Add(i + 1)
+    Public Class XR_BackProject_PointCloud : Inherits TaskParent
+        Public hist As New Histogram_PointCloud_XZ_YZ
+        Public Sub New()
+            dst2 = New Mat(dst2.Size(), MatType.CV_32FC3, 0)
+            labels = {"", "", "Backprojection after histogram binning X and Z values", "Backprojection after histogram binning Y and Z values"}
+            desc = "Explore Backprojection of the cloud histogram."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            Dim thresholdVal = hist.options.threshold
+            hist.Run(src)
+
+            Threshold(hist.dst2, dst0, thresholdVal, 255, ThresholdTypes.Binary)
+            Threshold(hist.dst3, dst1, thresholdVal, 255, ThresholdTypes.Binary)
+
+            dst2 = New Mat(hist.dst2.Size(), MatType.CV_32F, Scalar.All(0))
+            dst3 = New Mat(hist.dst3.Size(), MatType.CV_32F, Scalar.All(0))
+
+            Dim mask As New Mat
+            CalcBackProject({task.pointCloud}, {0, 2}, dst0, mask, hist.rangesX)
+            mask.ConvertTo(mask, MatType.CV_8U)
+            task.pointCloud.CopyTo(dst2, mask)
+
+            CalcBackProject({task.pointCloud}, {1, 2}, dst1, mask, hist.rangesY)
+            mask.ConvertTo(mask, MatType.CV_8U)
+            task.pointCloud.CopyTo(dst3, mask)
+        End Sub
+    End Class
+
+
+
+
+
+
+
+
+
+    Public Class BackProject_DisplayColor : Inherits TaskParent
+        Dim backP As New BackProject_Full
+        Public Sub New()
+            task.gOptions.setHistogramBins(10)
+            labels = {"", "", "Back projection", ""}
+            desc = "Display the back projected color image"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            backP.Run(src)
+            dst2 = Palettize(backP.dst2 + 1)
+            labels(2) = backP.labels(2)
+        End Sub
+    End Class
+
+
+
+
+
+
+
+
+    ' https://docs.opencvb.org/3.4/da/d7f/tutorial_back_projection.html
+    Public Class BackProject_Full : Inherits TaskParent
+        Public classCount As Integer
+        Dim plotHist As New PlotBar_Basics
+        Dim index As Integer
+        Public Sub New()
+            task.gOptions.setHistogramBins(10)
+            plotHist.createHistogram = True
+            plotHist.removeZeroEntry = False
+            If standalone Then task.gOptions.displayDst1.Checked = True
+            desc = "Create a histogram for the grayscale image, uniquely identify each bin, and backproject it."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            If src.Channels <> 1 Then src = task.gray
+            classCount = task.histogramBins
+            plotHist.Run(src)
+            dst1 = plotHist.dst2
+
+            Dim histogram = plotHist.histogram
+            For i = 0 To classCount
+                histogram.Set(Of Single)(i, 0, i)
             Next
 
-            histogram = Mat.FromPixelData(task.histogramBins, 1, MatType.CV_32F, histData.ToArray)
-        End If
-        Dim ranges() = New Rangef() {New Rangef(0, task.histogramBins)}
-        CalcBackProject({task.pcSplit(2)}, {0}, histogram, dst2, ranges)
-
-        dst2.SetTo(0, task.noDepthMask)
-        ConvertScaleAbs(dst2, dst2, 255)
-        dst3 = Palettize(dst2)
-        labels(2) = "CV_8U backprojection up to " + CStr(task.histogramBins) + " meters."
-    End Sub
-End Class
-
-
-
-
-
-
-
-
-Public Class XR_BackProject_Hue : Inherits TaskParent
-    Dim hue As New OEX_CalcBackProject_Demo1
-    Public classCount As Integer
-    Public Sub New()
-        desc = "Create an 8UC1 image with a backprojection of the hue."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        hue.Run(src)
-        classCount = hue.classCount
-        dst2 = hue.dst2
-        dst3 = Palettize(dst2)
-    End Sub
-End Class
-
-
-
-
-
-
-
-
-Public Class XR_BackProject_MaskLines : Inherits TaskParent
-    Dim masks As New PlotMouse_MaskBackProject
-    Dim core As New Line_Core
-    Public Sub New()
-        If standalone Then task.gOptions.displayDst1.Checked = True
-        dst1 = New Mat(dst1.Size(), MatType.CV_8U, Scalar.All(0))
-        labels(2) = "Move mouse to see lines detected in the backprojection mask"
-        desc = "Inspect the lines from individual backprojection masks from a histogram"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        masks.Run(src)
-        dst2 = masks.dst2
-
-        core.Run(task.gray)
-        Dim lpList = core.lpList
-
-        dst1.SetTo(0)
-        For Each lp In lpList
-            Dim val = masks.dst3.Get(Of Byte)(lp.p1.Y, lp.p1.X)
-            If val = 255 Then Line(dst2, lp.p1, lp.p2, white, task.lineWidth, task.lineWidth)
-            Line(dst1, lp.p1, lp.p2, white, task.lineWidth, task.lineWidth)
-        Next
-        dst3 = masks.dst3
-        labels(3) = masks.labels(3) + " and " + CStr(lpList.Count) + " lines were found in the backprojection"
-    End Sub
-End Class
-
-
-
-
-
-Public Class XR_BackProject_MaskList : Inherits TaskParent
-    Public histList As New List(Of List(Of Single))
-    Public histogramList As New List(Of Mat)
-    Dim inputMatList As New List(Of Mat)
-    Dim histS As New Histogram_DepthSimple
-    Dim plotHist As New PlotBar_Basics
-    Public Sub New()
-        plotHist.addLabels = False
-        plotHist.removeZeroEntry = True
-        task.gOptions.setHistogramBins(40)
-        task.gOptions.DebugSlider.Minimum = 0
-        labels(2) = "Use the debug slider (global options) to test various depth levels."
-        labels(3) = "Depth mask used to build the depth histogram at left"
-        desc = "Create masks for each histogram bin backprojection"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        Dim bins = If(task.histogramBins <= 255, task.histogramBins - 1, 255)
-        Dim incr = 255 / bins
-        If bins <> task.gOptions.DebugSlider.Maximum Then
-            task.gOptions.DebugSlider.Value = 0
-            task.gOptions.DebugSlider.Maximum = bins
-        End If
-
-        If standalone Then
-            Static depthIndex As Integer
-            If task.heartBeat Then
-                depthIndex += 1
-                If depthIndex > 10 Then depthIndex = 0
-                task.gOptions.DebugSlider.Value = depthIndex
+            CalcBackProject({src}, {0}, histogram, dst2, plotHist.ranges)
+            dst2.ConvertTo(dst2, MatType.CV_8U)
+            dst2 += 1 ' get away from zeros...
+            labels(2) = "CV_8U backprojection of the " + CStr(classCount) + " histogram bins."
+            If standaloneTest() Then
+                dst3 = Palettize(dst2)
+                labels(3) = "Class " + CStr(index) + " had " + CStr(plotHist.histArray(index)) + " pixels after backprojection."
             End If
-        End If
-        histList.Clear()
-        histogramList.Clear()
-        inputMatList.Clear()
-        histS.ranges = {New Rangef(0 - 0.01, task.MaxZmeters + 0.01)}
-        For i = 0 To bins - 2
-            Dim minVal = i * incr
-            Dim maxVal = (i + 1) * incr
-            InRange(task.gray, minVal, maxVal, histS.inputOnlyMask)
-            histS.Run(task.pcSplit(2))
-            histList.Add(New List(Of Single)(histS.histList))
-            histogramList.Add(histS.histogram.Clone)
-            inputMatList.Add(histS.inputOnlyMask.Clone)
-        Next
-        Dim index = Math.Min(bins, task.gOptions.DebugSlider.Value)
-        If index >= inputMatList.Count Then index = inputMatList.Count - 1
-        Dim tmp As Mat = inputMatList(index)
-        If task.heartBeat Then strOut = CStr(CountNonZero(tmp)) + " mask pixels between " + CStr(incr * index) + " and " +
-                                        CStr(incr * (index + 1)) + " from " + CStr(CountNonZero(task.pcSplit(2))) + " depth pixels"
-        plotHist.Run(histogramList(index))
-        dst2 = plotHist.dst2
-        dst3 = inputMatList(index)
-    End Sub
-End Class
+        End Sub
+    End Class
 
 
 
 
 
-' https://docs.opencvb.org/3.4/da/d7f/tutorial_back_projection.html
-Public Class XR_BackProject_FullOld : Inherits TaskParent
-    Public classCount As Integer
-    Public ranges() As Rangef = New Rangef() {New Rangef(0, 255)}
-    Public Sub New()
-        task.gOptions.setHistogramBins(10)
-        labels = {"", "", "CV_8U format of the backprojection", "dst2 presented with a palette"}
-        desc = "Create a color histogram, normalize it, and backproject it with a palette."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        classCount = task.histogramBins
 
+    Public Class XR_BackProject_Unstable : Inherits TaskParent
+        Dim backP As New BackProject_Full
+        Dim diff As New Diff_Basics
+        Public Sub New()
+            labels = {"", "", "Backprojection output", "Unstable pixels in the backprojection. " +
+                  "If flashing, set option 'Color Difference Threshold' higher."}
+            desc = "Highlight the unstable pixels in the backprojection."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            backP.Run(src)
+            dst2 = Palettize(backP.dst2)
+
+            diff.Run(dst2)
+            dst3 = diff.dst2
+        End Sub
+    End Class
+
+
+
+
+
+
+    Public Class BackProject_Side : Inherits TaskParent
+        Dim histSide As New Projection_HistSide
+        Public Sub New()
+            labels = {"", "", "Hotspots in the Side View", "Back projection of the hotspots in the Side View"}
+            desc = "Display the back projection of the hotspots in the Side View"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            histSide.Run(src)
+            dst2 = histSide.dst2
+
+            CalcBackProject({task.pointCloud}, task.channelsSide, histSide.histogram, dst3, task.rangesSide)
+            Dim _thr1 As New Mat
+            Threshold(dst3, dst3, 0, 255, ThresholdTypes.Binary)
+            ConvertScaleAbs(dst3, dst3)
+        End Sub
+    End Class
+
+
+
+
+
+
+    Public Class BackProject_Top : Inherits TaskParent
+        Dim histTop As New Projection_HistTop
+        Public Sub New()
+            labels = {"", "", "Hotspots in the Top View", "Back projection of the hotspots in the Top View"}
+            desc = "Display the back projection of the hotspots in the Top View"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            histTop.Run(src)
+            dst2 = histTop.dst2
+
+            CalcBackProject({task.pointCloud}, task.channelsTop, histTop.histogram, dst1, task.rangesTop)
+            ConvertScaleAbs(dst1, dst1)
+            dst1.ConvertTo(dst1, MatType.CV_8U)
+            dst3 = Palettize(dst1)
+        End Sub
+    End Class
+
+
+
+
+
+
+
+    Public Class XR_BackProject_Horizontal : Inherits TaskParent
+        Dim bpTop As New BackProject_Top
+        Dim bpSide As New BackProject_Side
+        Public Sub New()
+            desc = "Use both the BackProject_Top to improve the results of the BackProject_Side for finding flat surfaces."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            bpTop.Run(src)
+            task.pointCloud.SetTo(0, bpTop.dst3)
+
+            bpSide.Run(src)
+            dst2 = bpSide.dst3
+        End Sub
+    End Class
+
+
+
+
+
+
+
+
+
+
+    Public Class BackProject_SoloSide : Inherits TaskParent
+        Dim histSide As New Projection_HistSide
+        Public Sub New()
+            labels = {"", "", "Solo samples in the Side View", "Back projection of the solo samples in the Side View"}
+            desc = "Display the back projection of the solo samples in the Side View"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            histSide.Run(src)
+
+            Threshold(histSide.histogram, dst3, 1, 255, ThresholdTypes.TozeroInv)
+            ConvertScaleAbs(dst3, dst2, 255)
+
+            histSide.histogram.SetTo(0, Not dst2)
+            CalcBackProject({task.pointCloud}, task.channelsSide, histSide.histogram, dst3, task.rangesSide)
+            Threshold(dst3, dst3, 0, 255, ThresholdTypes.Binary)
+            ConvertScaleAbs(dst3, dst3)
+        End Sub
+    End Class
+
+
+
+
+
+
+    Public Class BackProject_SoloTop : Inherits TaskParent
+        Dim histTop As New Projection_HistTop
+        Public Sub New()
+            labels = {"", "", "Solo samples in the Top View", "Back projection of the solo samples in the Top View"}
+            desc = "Display the back projection of the solo samples in the Top View"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            histTop.Run(src)
+
+            Threshold(histTop.histogram, dst3, 1, 255, ThresholdTypes.TozeroInv)
+            ConvertScaleAbs(dst3, dst2, 255)
+
+            histTop.histogram.SetTo(0, Not dst2)
+            CalcBackProject({task.pointCloud}, task.channelsTop, histTop.histogram, dst3, task.rangesTop)
+            Threshold(dst3, dst3, 0, 255, ThresholdTypes.Binary)
+            ConvertScaleAbs(dst3, dst3)
+            ConvertScaleAbs(dst3, dst2, 255)
+        End Sub
+    End Class
+
+
+
+
+
+
+    ' https://docs.opencvb.org/3.4/dc/df6/tutorial_py_Histogram_backprojection.html
+    Public Class BackProject_Image : Inherits TaskParent
+        Public hist As New Histogram_Basics
+        Public mask As New Mat
+        Public useInrange As Boolean
+        Public kalman As New Kalman_Basics
+        Public Sub New()
+            labels(2) = "Move mouse to backproject each histogram column"
+            desc = "Explore Backprojection of each element of a grayscale histogram."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            hist.Run(task.gray)
+            If hist.mm.minVal = hist.mm.maxVal Then
+                SetTrueText("The input image is empty - mm.minval and mm.maxVal are both zero...")
+                Exit Sub ' the input image is empty...
+            End If
+            dst2 = hist.dst2
+
+            If kalman.kInput.Length <> 2 Then ReDim kalman.kInput(2 - 1)
+            kalman.kInput(0) = hist.mm.minVal
+            kalman.kInput(1) = hist.mm.maxVal
+            kalman.Run(emptyMat)
+            hist.mm.minVal = Math.Min(kalman.kOutput(0), kalman.kOutput(1))
+            hist.mm.maxVal = Math.Max(kalman.kOutput(0), kalman.kOutput(1))
+
+            Dim totalPixels = dst2.Total ' assume we are including zeros.
+            If hist.plotHist.removeZeroEntry Then totalPixels = CountNonZero(task.gray)
+
+            Dim brickWidth = dst2.Width / task.histogramBins
+            Dim incr = (hist.mm.maxVal - hist.mm.minVal) / task.histogramBins
+            Dim histIndex = Math.Floor(task.mouseMovePoint.X / brickWidth)
+
+            Dim minRange = New Scalar(histIndex * incr)
+            Dim maxRange = New Scalar((histIndex + 1) * incr + 1)
+            If histIndex + 1 = task.histogramBins Then
+                minRange = New Scalar(254)
+                maxRange = New Scalar(255)
+            End If
+            If useInrange Then
+                If histIndex = 0 And hist.plotHist.removeZeroEntry Then
+                    mask = New Mat(task.gray.Size(), MatType.CV_8U, Scalar.All(0))
+                Else
+                    InRange(task.gray, minRange, maxRange, mask)
+                End If
+            Else
+                Dim bRange = New Rangef(minRange(0), maxRange(0))
+                Dim ranges() = New Rangef() {bRange}
+                CalcBackProject({task.gray}, {0}, hist.histogram, mask, ranges)
+            End If
+            dst3 = src
+            If mask.Type <> MatType.CV_8U Then mask.ConvertTo(mask, MatType.CV_8U)
+            dst3.SetTo(Scalar.Yellow, mask)
+            Dim actualCount = CountNonZero(mask)
+            Dim count = hist.histogram.Get(Of Single)(histIndex, 0)
+            Dim histMax As mmData = GetMinMax(hist.histogram)
+            labels(3) = "Backprojecting " + CStr(CInt(minRange(0))) + " to " + CStr(CInt(maxRange(0))) + " with " +
+                     CStr(count) + " histogram samples and " + CStr(actualCount) + " mask count.  Histogram max count = " +
+                     CStr(CInt(histMax.maxVal))
+            Rectangle(dst2, New cv.Rect(CInt(histIndex * brickWidth), 0, brickWidth, dst2.Height), Scalar.Yellow, task.lineWidth)
+        End Sub
+    End Class
+
+
+
+
+
+    Public Class XR_BackProject_Mouse : Inherits TaskParent
+        Dim backP As New BackProject_Image
+        Public Sub New()
+            labels(2) = "Use the mouse to select what should be shown in the backprojection of the depth histogram"
+            desc = "Use the mouse to select what should be shown in the backprojection of the depth histogram"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            backP.Run(src)
+            dst2 = backP.dst2
+            dst3 = backP.dst3
+        End Sub
+    End Class
+
+
+
+
+
+    Public Class XR_BackProject_MeterByMeter : Inherits TaskParent
         Dim histogram As New Mat
-        CalcHist({task.gray}, {0}, New Mat, histogram, 1, {classCount}, ranges)
-        Normalize(histogram, histogram, 0, classCount, NormTypes.MinMax)
+        Public Sub New()
+            desc = "Backproject the depth data at 1 meter intervals without a histogram."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            If task.heartBeat Then
+                Dim histData As New List(Of Single)
+                For i = 0 To task.histogramBins - 1
+                    histData.Add(i + 1)
+                Next
 
-        CalcBackProject({src}, {0}, histogram, dst2, ranges)
-        dst2.ConvertTo(dst2, MatType.CV_8U)
-        If standaloneTest() Then dst3 = Palettize(dst2)
-    End Sub
-End Class
+                histogram = Mat.FromPixelData(task.histogramBins, 1, MatType.CV_32F, histData.ToArray)
+            End If
+            Dim ranges() = New Rangef() {New Rangef(0, task.histogramBins)}
+            CalcBackProject({task.pcSplit(2)}, {0}, histogram, dst2, ranges)
 
-
-
-
-
-
-
-Public Class XR_BackProject_InRangeDepthTest : Inherits TaskParent
-    Public classCount As Integer
-    Public Sub New()
-        task.gOptions.setHistogramBins(4)
-        desc = "An alternative way to get the depth histogram using InRange instead of CalcHist.."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        classCount = task.histogramBins
-
-        Static index As Integer
-        Dim binSize = task.MaxZmeters / task.histogramBins
-        Dim maxRange = index * binSize
-        Dim minRange = (index - 1) * binSize
-        If index < 1 Then
-            minRange = 0
-            maxRange = 0
-        ElseIf index = 1 Then
-            minRange = 0.1
-        End If
-
-        If index = 0 Then
-            dst2 = task.noDepthMask
-        Else
-            InRange(task.pcSplit(2), minRange, maxRange, dst2)
+            dst2.SetTo(0, task.noDepthMask)
             ConvertScaleAbs(dst2, dst2, 255)
-            If maxRange >= task.MaxZmeters Then dst2 = dst2 Or task.depthClippedMask
-        End If
+            dst3 = Palettize(dst2)
+            labels(2) = "CV_8U backprojection up to " + CStr(task.histogramBins) + " meters."
+        End Sub
+    End Class
 
-        labels(2) = "Histogram bin " + CStr(index) + " for range from " + minRange.ToString(fmt1) + " m to " +
+
+
+
+
+
+
+
+    Public Class XR_BackProject_Hue : Inherits TaskParent
+        Dim hue As New OEX_CalcBackProject_Demo1
+        Public classCount As Integer
+        Public Sub New()
+            desc = "Create an 8UC1 image with a backprojection of the hue."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            hue.Run(src)
+            classCount = hue.classCount
+            dst2 = hue.dst2
+            dst3 = Palettize(dst2)
+        End Sub
+    End Class
+
+
+
+
+
+
+
+
+    Public Class XR_BackProject_MaskLines : Inherits TaskParent
+        Dim masks As New PlotMouse_MaskBackProject
+        Dim core As New Line_Core
+        Public Sub New()
+            If standalone Then task.gOptions.displayDst1.Checked = True
+            dst1 = New Mat(dst1.Size(), MatType.CV_8U, Scalar.All(0))
+            labels(2) = "Move mouse to see lines detected in the backprojection mask"
+            desc = "Inspect the lines from individual backprojection masks from a histogram"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            masks.Run(src)
+            dst2 = masks.dst2
+
+            core.Run(task.gray)
+            Dim lpList = core.lpList
+
+            dst1.SetTo(0)
+            For Each lp In lpList
+                Dim val = masks.dst3.Get(Of Byte)(lp.p1.Y, lp.p1.X)
+                If val = 255 Then Line(dst2, lp.p1, lp.p2, white, task.lineWidth, task.lineWidth)
+                Line(dst1, lp.p1, lp.p2, white, task.lineWidth, task.lineWidth)
+            Next
+            dst3 = masks.dst3
+            labels(3) = masks.labels(3) + " and " + CStr(lpList.Count) + " lines were found in the backprojection"
+        End Sub
+    End Class
+
+
+
+
+
+    Public Class XR_BackProject_MaskList : Inherits TaskParent
+        Public histList As New List(Of List(Of Single))
+        Public histogramList As New List(Of Mat)
+        Dim inputMatList As New List(Of Mat)
+        Dim histS As New Histogram_DepthSimple
+        Dim plotHist As New PlotBar_Basics
+        Public Sub New()
+            plotHist.addLabels = False
+            plotHist.removeZeroEntry = True
+            task.gOptions.setHistogramBins(40)
+            task.gOptions.DebugSlider.Minimum = 0
+            labels(2) = "Use the debug slider (global options) to test various depth levels."
+            labels(3) = "Depth mask used to build the depth histogram at left"
+            desc = "Create masks for each histogram bin backprojection"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            Dim bins = If(task.histogramBins <= 255, task.histogramBins - 1, 255)
+            Dim incr = 255 / bins
+            If bins <> task.gOptions.DebugSlider.Maximum Then
+                task.gOptions.DebugSlider.Value = 0
+                task.gOptions.DebugSlider.Maximum = bins
+            End If
+
+            If standalone Then
+                Static depthIndex As Integer
+                If task.heartBeat Then
+                    depthIndex += 1
+                    If depthIndex > 10 Then depthIndex = 0
+                    task.gOptions.DebugSlider.Value = depthIndex
+                End If
+            End If
+            histList.Clear()
+            histogramList.Clear()
+            inputMatList.Clear()
+            histS.ranges = {New Rangef(0 - 0.01, task.MaxZmeters + 0.01)}
+            For i = 0 To bins - 2
+                Dim minVal = i * incr
+                Dim maxVal = (i + 1) * incr
+                InRange(task.gray, minVal, maxVal, histS.inputOnlyMask)
+                histS.Run(task.pcSplit(2))
+                histList.Add(New List(Of Single)(histS.histList))
+                histogramList.Add(histS.histogram.Clone)
+                inputMatList.Add(histS.inputOnlyMask.Clone)
+            Next
+            Dim index = Math.Min(bins, task.gOptions.DebugSlider.Value)
+            If index >= inputMatList.Count Then index = inputMatList.Count - 1
+            Dim tmp As Mat = inputMatList(index)
+            If task.heartBeat Then strOut = CStr(CountNonZero(tmp)) + " mask pixels between " + CStr(incr * index) + " and " +
+                                        CStr(incr * (index + 1)) + " from " + CStr(CountNonZero(task.pcSplit(2))) + " depth pixels"
+            plotHist.Run(histogramList(index))
+            dst2 = plotHist.dst2
+            dst3 = inputMatList(index)
+        End Sub
+    End Class
+
+
+
+
+
+    ' https://docs.opencvb.org/3.4/da/d7f/tutorial_back_projection.html
+    Public Class XR_BackProject_FullOld : Inherits TaskParent
+        Public classCount As Integer
+        Public ranges() As Rangef = New Rangef() {New Rangef(0, 255)}
+        Public Sub New()
+            task.gOptions.setHistogramBins(10)
+            labels = {"", "", "CV_8U format of the backprojection", "dst2 presented with a palette"}
+            desc = "Create a color histogram, normalize it, and backproject it with a palette."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            classCount = task.histogramBins
+
+            Dim histogram As New Mat
+            CalcHist({task.gray}, {0}, New Mat, histogram, 1, {classCount}, ranges)
+            Normalize(histogram, histogram, 0, classCount, NormTypes.MinMax)
+
+            CalcBackProject({src}, {0}, histogram, dst2, ranges)
+            dst2.ConvertTo(dst2, MatType.CV_8U)
+            If standaloneTest() Then dst3 = Palettize(dst2)
+        End Sub
+    End Class
+
+
+
+
+
+
+
+    Public Class XR_BackProject_InRangeDepthTest : Inherits TaskParent
+        Public classCount As Integer
+        Public Sub New()
+            task.gOptions.setHistogramBins(4)
+            desc = "An alternative way to get the depth histogram using InRange instead of CalcHist.."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            classCount = task.histogramBins
+
+            Static index As Integer
+            Dim binSize = task.MaxZmeters / task.histogramBins
+            Dim maxRange = index * binSize
+            Dim minRange = (index - 1) * binSize
+            If index < 1 Then
+                minRange = 0
+                maxRange = 0
+            ElseIf index = 1 Then
+                minRange = 0.1
+            End If
+
+            If index = 0 Then
+                dst2 = task.noDepthMask
+            Else
+                InRange(task.pcSplit(2), minRange, maxRange, dst2)
+                ConvertScaleAbs(dst2, dst2, 255)
+                If maxRange >= task.MaxZmeters Then dst2 = dst2 Or task.depthClippedMask
+            End If
+
+            labels(2) = "Histogram bin " + CStr(index) + " for range from " + minRange.ToString(fmt1) + " m to " +
                     maxRange.ToString(fmt1) + " m had " + CStr(CountNonZero(dst2))
-        If task.heartBeatLT And task.fOptions.FrameHistoryCount.Value > 1 Then index += 1
-        If maxRange > task.MaxZmeters Then index = 0
-    End Sub
-End Class
+            If task.heartBeatLT And task.fOptions.FrameHistoryCount.Value > 1 Then index += 1
+            If maxRange > task.MaxZmeters Then index = 0
+        End Sub
+    End Class
 
 
 
@@ -598,128 +599,40 @@ End Class
 
 
 
-Public Class XR_BackProject_InRangeDepth : Inherits TaskParent
-    Public classCount As Integer
-    Public Sub New()
-        dst2 = New Mat(dst2.Size, MatType.CV_8U, 0)
-        desc = "An alternative way to get the depth histogram using InRange instead of CalcHist."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        classCount = task.histogramBins
+    Public Class XR_BackProject_InRangeDepth : Inherits TaskParent
+        Public classCount As Integer
+        Public Sub New()
+            dst2 = New Mat(dst2.Size, MatType.CV_8U, 0)
+            desc = "An alternative way to get the depth histogram using InRange instead of CalcHist."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            classCount = task.histogramBins
 
-        Dim binSize = task.MaxZmeters / task.histogramBins
-        Dim binCounts As New List(Of Integer)
-        For i = 1 To classCount
-            Dim maxRange = i * binSize
-            Dim minRange = (i - 1) * binSize
-            If i = 1 Then minRange = 0.01
-            InRange(task.pcSplit(2), minRange, maxRange, dst1)
-            ConvertScaleAbs(dst1, dst1, 255)
-            dst1 *= i
-            If maxRange >= task.MaxZmeters Then dst1 = dst1 Or task.depthClippedMask
-            binCounts.Add(CountNonZero(dst1))
-            dst2.SetTo(i, dst1)
-        Next
-        dst2.SetTo(0, task.noDepthMask)
+            Dim binSize = task.MaxZmeters / task.histogramBins
+            Dim binCounts As New List(Of Integer)
+            For i = 1 To classCount
+                Dim maxRange = i * binSize
+                Dim minRange = (i - 1) * binSize
+                If i = 1 Then minRange = 0.01
+                InRange(task.pcSplit(2), minRange, maxRange, dst1)
+                ConvertScaleAbs(dst1, dst1, 255)
+                dst1 *= i
+                If maxRange >= task.MaxZmeters Then dst1 = dst1 Or task.depthClippedMask
+                binCounts.Add(CountNonZero(dst1))
+                dst2.SetTo(i, dst1)
+            Next
+            dst2.SetTo(0, task.noDepthMask)
 
-        strOut = ""
-        For i = 0 To binCounts.Count - 1
-            strOut += "Class " + CStr(i) + " had " + CStr(binCounts(i)) + " pixels." + vbCrLf
-        Next
-        SetTrueText(strOut)
+            strOut = ""
+            For i = 0 To binCounts.Count - 1
+                strOut += "Class " + CStr(i) + " had " + CStr(binCounts(i)) + " pixels." + vbCrLf
+            Next
+            SetTrueText(strOut)
 
-        dst3 = Palettize(dst2)
-        labels(3) = "Below are the " + CStr(task.histogramBins) + " classes of depth data."
-    End Sub
-End Class
-
-
-
-
-
-
-
-
-Public Class XR_BackProject_Basics_Depth : Inherits TaskParent
-    Public bpDepth As New BackProject_Depth
-    Public Sub New()
-        task.gOptions.setHistogramBins(20)
-        desc = "Create a histogram for the depth image, uniquely identify each bin, and backproject it."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        bpDepth.Run(src)
-        dst2 = Palettize(bpDepth.dst2)
-        dst2.SetTo(0, task.noDepthMask)
-        labels(2) = bpDepth.labels(2)
-    End Sub
-End Class
-
-
-
-
-
-
-
-Public Class XR_BackProject_DepthSlider : Inherits TaskParent
-    Public bpDepth As New BackProject_Depth
-    Public Sub New()
-        task.gOptions.setHistogramBins(20)
-        desc = "Create a histogram for the depth image, uniquely identify each bin, and backproject it."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        bpDepth.Run(src)
-        dst2 = Palettize(bpDepth.dst2)
-        dst2.SetTo(0, task.noDepthMask)
-        labels(2) = bpDepth.labels(2)
-
-        Dim index = Math.Abs(task.gOptions.DebugSlider.Value)
-        If index >= task.histogramBins Then index = task.histogramBins - 1
-        InRange(bpDepth.dst2, index, index, dst3)
-        Dim count = CountNonZero(dst3)
-        labels(3) = "Class " + CStr(index) + " had " + CStr(count) + " pixels after backprojection."
-    End Sub
-End Class
-
-
-
-
-
-
-
-Public Class BackProject_FeatureLess : Inherits TaskParent
-    Dim bProject As New BackProject_Basics
-    Dim contours As New Contour_Basics
-    Public Sub New()
-        labels(3) = "Move mouse over the histogram to backproject a column"
-        desc = "Create a histogram of the featureless regions"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        contours.Run(src)
-        contours.contourMap.ConvertTo(dst1, MatType.CV_32F)
-        bProject.Run(dst1) ' calcHist doesn't support 32S
-        dst2 = bProject.dst2
-        dst3 = bProject.dst3
-        labels(2) = "Bins = " + CStr(task.histogramBins)
-    End Sub
-End Class
-
-
-
-
-
-Public Class BackProject_DepthMouse : Inherits TaskParent
-    Dim bProject As New BackProject_Basics
-    Public Sub New()
-        labels(3) = "Move mouse over the histogram to backproject a column"
-        desc = "Create a histogram of depth regions"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        bProject.Run(task.pcSplit(2))
-        dst2 = bProject.dst2
-        dst3 = bProject.dst3
-        labels(2) = bProject.labels(3)
-    End Sub
-End Class
+            dst3 = Palettize(dst2)
+            labels(3) = "Below are the " + CStr(task.histogramBins) + " classes of depth data."
+        End Sub
+    End Class
 
 
 
@@ -728,36 +641,125 @@ End Class
 
 
 
-Public Class BackProject_Depth : Inherits TaskParent
-    Dim plotHist As New PlotBar_Basics
-    Public Sub New()
-        task.gOptions.setHistogramBins(32)
-        plotHist.minRange = 0.01
-        plotHist.maxRange = task.MaxZmeters
-        plotHist.createHistogram = True
-        plotHist.removeZeroEntry = False
-        If standalone Then task.gOptions.displayDst1.Checked = True
-        desc = "Create a histogram for the depth image, uniquely identify each bin, and backproject it."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        If src.Type <> MatType.CV_32F Then src = task.pcSplit(2)
+    Public Class XR_BackProject_Basics_Depth : Inherits TaskParent
+        Public bpDepth As New BackProject_Depth
+        Public Sub New()
+            task.gOptions.setHistogramBins(20)
+            desc = "Create a histogram for the depth image, uniquely identify each bin, and backproject it."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            bpDepth.Run(src)
+            dst2 = Palettize(bpDepth.dst2)
+            dst2.SetTo(0, task.noDepthMask)
+            labels(2) = bpDepth.labels(2)
+        End Sub
+    End Class
 
-        plotHist.Run(src)
-        dst1 = plotHist.dst2
 
-        For i = 0 To task.histogramBins - 1
-            plotHist.histogram.Set(Of Single)(i, 0, i + 1)
-        Next
 
-        Dim histArray(plotHist.histogram.Rows - 1) As Single
-        plotHist.histogram.GetArray(Of Single)(histArray)
 
-        CalcBackProject({src}, {0}, plotHist.histogram, dst2, plotHist.ranges)
-        dst2.ConvertTo(dst2, MatType.CV_8U)
-        labels(2) = "CV_8U backprojection of the " + CStr(task.histogramBins) + " histogram bins."
 
-        dst3 = Palettize(dst2)
-        dst3.SetTo(0, task.noDepthMask)
-        labels(3) = "Palettized version of the data in dst2 showing " + CStr(task.histogramBins) + " tiers"
-    End Sub
-End Class
+
+
+    Public Class XR_BackProject_DepthSlider : Inherits TaskParent
+        Public bpDepth As New BackProject_Depth
+        Public Sub New()
+            task.gOptions.setHistogramBins(20)
+            desc = "Create a histogram for the depth image, uniquely identify each bin, and backproject it."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            bpDepth.Run(src)
+            dst2 = Palettize(bpDepth.dst2)
+            dst2.SetTo(0, task.noDepthMask)
+            labels(2) = bpDepth.labels(2)
+
+            Dim index = Math.Abs(task.gOptions.DebugSlider.Value)
+            If index >= task.histogramBins Then index = task.histogramBins - 1
+            InRange(bpDepth.dst2, index, index, dst3)
+            Dim count = CountNonZero(dst3)
+            labels(3) = "Class " + CStr(index) + " had " + CStr(count) + " pixels after backprojection."
+        End Sub
+    End Class
+
+
+
+
+
+
+
+    Public Class BackProject_FeatureLess : Inherits TaskParent
+        Dim bProject As New BackProject_Basics
+        Dim contours As New Contour_Basics
+        Public Sub New()
+            labels(3) = "Move mouse over the histogram to backproject a column"
+            desc = "Create a histogram of the featureless regions"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            contours.Run(src)
+            contours.contourMap.ConvertTo(dst1, MatType.CV_32F)
+            bProject.Run(dst1) ' calcHist doesn't support 32S
+            dst2 = bProject.dst2
+            dst3 = bProject.dst3
+            labels(2) = "Bins = " + CStr(task.histogramBins)
+        End Sub
+    End Class
+
+
+
+
+
+    Public Class BackProject_DepthMouse : Inherits TaskParent
+        Dim bProject As New BackProject_Basics
+        Public Sub New()
+            labels(3) = "Move mouse over the histogram to backproject a column"
+            desc = "Create a histogram of depth regions"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            bProject.Run(task.pcSplit(2))
+            dst2 = bProject.dst2
+            dst3 = bProject.dst3
+            labels(2) = bProject.labels(3)
+        End Sub
+    End Class
+
+
+
+
+
+
+
+
+    Public Class BackProject_Depth : Inherits TaskParent
+        Dim plotHist As New PlotBar_Basics
+        Public Sub New()
+            task.gOptions.setHistogramBins(32)
+            plotHist.minRange = 0.01
+            plotHist.maxRange = task.MaxZmeters
+            plotHist.createHistogram = True
+            plotHist.removeZeroEntry = False
+            If standalone Then task.gOptions.displayDst1.Checked = True
+            desc = "Create a histogram for the depth image, uniquely identify each bin, and backproject it."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            If src.Type <> MatType.CV_32F Then src = task.pcSplit(2)
+
+            plotHist.Run(src)
+            dst1 = plotHist.dst2
+
+            For i = 0 To task.histogramBins - 1
+                plotHist.histogram.Set(Of Single)(i, 0, i + 1)
+            Next
+
+            Dim histArray(plotHist.histogram.Rows - 1) As Single
+            plotHist.histogram.GetArray(Of Single)(histArray)
+
+            CalcBackProject({src}, {0}, plotHist.histogram, dst2, plotHist.ranges)
+            dst2.ConvertTo(dst2, MatType.CV_8U)
+            labels(2) = "CV_8U backprojection of the " + CStr(task.histogramBins) + " histogram bins."
+
+            dst3 = Palettize(dst2)
+            dst3.SetTo(0, task.noDepthMask)
+            labels(3) = "Palettized version of the data in dst2 showing " + CStr(task.histogramBins) + " tiers"
+        End Sub
+    End Class
+End Namespace

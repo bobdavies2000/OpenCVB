@@ -1,102 +1,39 @@
-Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
-Public Class HeatMap_Basics : Inherits TaskParent
-    Public topframes As New History_Basics
-    Public sideframes As New History_Basics
-    Public histogramTop As New Mat
-    Public histogramSide As New Mat
-    Dim options As New Options_HeatMap
-    Public Sub New()
-        desc = "Highlight concentrations of depth pixels in the side view"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        options.Run()
+Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCvSharp
+Namespace VBClasses
+    Public Class HeatMap_Basics : Inherits TaskParent
+        Public topframes As New History_Basics
+        Public sideframes As New History_Basics
+        Public histogramTop As New Mat
+        Public histogramSide As New Mat
+        Dim options As New Options_HeatMap
+        Public Sub New()
+            desc = "Highlight concentrations of depth pixels in the side view"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            options.Run()
 
-        If src.Type <> MatType.CV_32FC3 Then src = task.pointCloud
+            If src.Type <> MatType.CV_32FC3 Then src = task.pointCloud
 
-        CalcHist({src}, task.channelsTop, New Mat, histogramTop, 2, task.bins2D, task.rangesTop)
-        histogramTop.Row(0).SetTo(0)
+            CalcHist({src}, task.channelsTop, New Mat, histogramTop, 2, task.bins2D, task.rangesTop)
+            histogramTop.Row(0).SetTo(0)
 
-        CalcHist({src}, task.channelsSide, New Mat, histogramSide, 2, task.bins2D, task.rangesSide)
-        histogramSide.Col(0).SetTo(0)
+            CalcHist({src}, task.channelsSide, New Mat, histogramSide, 2, task.bins2D, task.rangesSide)
+            histogramSide.Col(0).SetTo(0)
 
-        topframes.Run(histogramTop)
-        dst0 = topframes.dst2
+            topframes.Run(histogramTop)
+            dst0 = topframes.dst2
 
-        sideframes.Run(histogramSide)
-        dst1 = sideframes.dst2
+            sideframes.Run(histogramSide)
+            dst1 = sideframes.dst2
 
-        ConvertScaleAbs(dst0, dst0)
-        dst2 = Palettize(dst0, 0)
-        ConvertScaleAbs(dst1, dst1)
-        dst3 = Palettize(dst1, 0)
-        labels(2) = "Top view of heat map with the last " + CStr(task.fOptions.FrameHistoryCount.Value) + " frames"
-        labels(3) = "Side view of heat map with the last " + CStr(task.fOptions.FrameHistoryCount.Value ) + " frames"
-    End Sub
-End Class
-
-
-
-
-
-
-
-
-Public Class XR_HeatMap_Grid : Inherits TaskParent
-    Dim heat As New HeatMap_Basics
-    Public Sub New()
-        task.gOptions.GridSlider.Value = 5
-        dst2 = New Mat(dst2.Size(), MatType.CV_8U, Scalar.All(0))
-        dst3 = New Mat(dst2.Size(), MatType.CV_8U, Scalar.All(0))
-        labels = {"", "", "Histogram mask for top-down view - original histogram in dst0", "Histogram mask for side view - original histogram in dst1"}
-        desc = "Apply a grid to the HeatMap_OverTime to isolate objects."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        If src.Type <> MatType.CV_32FC3 Then src = task.pointCloud
-
-        heat.Run(src)
-
-        dst2.SetTo(0)
-        dst3.SetTo(0)
-        Dim maxCount1 As Integer, maxCount2 As Integer
-        Dim sync1 As New Object, sync2 As New Object
-        For Each roi In task.gridRects
-            Dim count1 = CountNonZero(heat.histogramTop(roi))
-            dst2(roi).SetTo(count1)
-            If count1 > maxCount1 Then maxCount1 = count1
-
-            Dim count2 = CountNonZero(heat.histogramSide(roi))
-            dst3(roi).SetTo(count2)
-            If count2 > maxCount2 Then maxCount2 = count2
-        Next
-        dst2 *= 255 / maxCount1
-        dst3 *= 255 / maxCount2
-    End Sub
-End Class
-
-
-
-
-
-Public Class HeatMap_Hot : Inherits TaskParent
-    Dim histTop As New Projection_HistTop
-    Dim histSide As New Projection_HistSide
-    Public Sub New()
-        labels = {"", "", "Mask of hotter areas for the Top View", "Mask of hotter areas for the Side View"}
-        desc = "Isolate masks for just the hotspots in the heat map"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        histTop.Run(src)
-        dst2 = histTop.histogram
-
-        histSide.Run(src)
-        dst3 = histSide.histogram
-
-        Dim mmTop = GetMinMax(dst2)
-        Dim mmSide = GetMinMax(dst3)
-        labels(2) = CStr(mmTop.maxVal) + " max count " + CStr(CountNonZero(dst2)) + " pixels in the top down view"
-        labels(3) = CStr(mmSide.maxVal) + " max count " + CStr(CountNonZero(dst3)) + " pixels in the side view"
-    End Sub
-End Class
+            ConvertScaleAbs(dst0, dst0)
+            dst2 = Palettize(dst0, 0)
+            ConvertScaleAbs(dst1, dst1)
+            dst3 = Palettize(dst1, 0)
+            labels(2) = "Top view of heat map with the last " + CStr(task.fOptions.FrameHistoryCount.Value) + " frames"
+            labels(3) = "Side view of heat map with the last " + CStr(task.fOptions.FrameHistoryCount.Value) + " frames"
+        End Sub
+    End Class
 
 
 
@@ -105,50 +42,115 @@ End Class
 
 
 
-Public Class HeatMap_Cell : Inherits TaskParent
-    Dim flood As New Flood_Basics
-    Dim heat As New HeatMap_Hot
-    Public Sub New()
-        If standalone Then task.gOptions.displayDst1.Checked = True
-        desc = "Display the heat map for the selected cell"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        flood.Run(src)
-        dst2 = flood.dst2
-        labels(2) = flood.labels(2)
-        If flood.rcList.Count = 0 Then Exit Sub ' nothing to work on!
+    Public Class XR_HeatMap_Grid : Inherits TaskParent
+        Dim heat As New HeatMap_Basics
+        Public Sub New()
+            task.gOptions.GridSlider.Value = 5
+            dst2 = New Mat(dst2.Size(), MatType.CV_8U, Scalar.All(0))
+            dst3 = New Mat(dst2.Size(), MatType.CV_8U, Scalar.All(0))
+            labels = {"", "", "Histogram mask for top-down view - original histogram in dst0", "Histogram mask for side view - original histogram in dst1"}
+            desc = "Apply a grid to the HeatMap_OverTime to isolate objects."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            If src.Type <> MatType.CV_32FC3 Then src = task.pointCloud
 
-        strOut = Utility_Basics.selectCell(flood.rcMap, flood.rcList)
+            heat.Run(src)
 
-        dst0 = New Mat(dst2.Size(), MatType.CV_32FC3, 0)
-        If task.rcOldD IsNot Nothing Then task.pointCloud(task.rcOldD.rect).CopyTo(dst0(task.rcOldD.rect), task.rcOldD.mask)
+            dst2.SetTo(0)
+            dst3.SetTo(0)
+            Dim maxCount1 As Integer, maxCount2 As Integer
+            Dim sync1 As New Object, sync2 As New Object
+            For Each roi In task.gridRects
+                Dim count1 = CountNonZero(heat.histogramTop(roi))
+                dst2(roi).SetTo(count1)
+                If count1 > maxCount1 Then maxCount1 = count1
 
-        heat.Run(dst0)
-        dst1 = heat.dst2
-        dst3 = heat.dst3
-
-        labels(1) = heat.labels(2)
-        labels(3) = heat.labels(3)
-        SetTrueText("Click on any cell in dst2 to see the top and side view of the cell.", 3)
-    End Sub
-End Class
-
-
-
-
-
-
+                Dim count2 = CountNonZero(heat.histogramSide(roi))
+                dst3(roi).SetTo(count2)
+                If count2 > maxCount2 Then maxCount2 = count2
+            Next
+            dst2 *= 255 / maxCount1
+            dst3 *= 255 / maxCount2
+        End Sub
+    End Class
 
 
-Public Class XR_HeatMap_GuidedBP : Inherits TaskParent
-    Dim guided As New GuidedBP_Basics
-    Public Sub New()
-        desc = "This is just a placeholder to make it easy to find the GuidedBP_Basics which shows objects in top/side views."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        guided.Run(src)
-        dst2 = guided.dst2
-        dst3 = guided.dst3
-        labels = guided.labels
-    End Sub
-End Class
+
+
+
+    Public Class HeatMap_Hot : Inherits TaskParent
+        Dim histTop As New Projection_HistTop
+        Dim histSide As New Projection_HistSide
+        Public Sub New()
+            labels = {"", "", "Mask of hotter areas for the Top View", "Mask of hotter areas for the Side View"}
+            desc = "Isolate masks for just the hotspots in the heat map"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            histTop.Run(src)
+            dst2 = histTop.histogram
+
+            histSide.Run(src)
+            dst3 = histSide.histogram
+
+            Dim mmTop = GetMinMax(dst2)
+            Dim mmSide = GetMinMax(dst3)
+            labels(2) = CStr(mmTop.maxVal) + " max count " + CStr(CountNonZero(dst2)) + " pixels in the top down view"
+            labels(3) = CStr(mmSide.maxVal) + " max count " + CStr(CountNonZero(dst3)) + " pixels in the side view"
+        End Sub
+    End Class
+
+
+
+
+
+
+
+
+    Public Class HeatMap_Cell : Inherits TaskParent
+        Dim flood As New Flood_Basics
+        Dim heat As New HeatMap_Hot
+        Public Sub New()
+            If standalone Then task.gOptions.displayDst1.Checked = True
+            desc = "Display the heat map for the selected cell"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            flood.Run(src)
+            dst2 = flood.dst2
+            labels(2) = flood.labels(2)
+            If flood.rcList.Count = 0 Then Exit Sub ' nothing to work on!
+
+            strOut = Utility_Basics.selectCell(flood.rcMap, flood.rcList)
+
+            dst0 = New Mat(dst2.Size(), MatType.CV_32FC3, 0)
+            If task.rcOldD IsNot Nothing Then task.pointCloud(task.rcOldD.rect).CopyTo(dst0(task.rcOldD.rect), task.rcOldD.mask)
+
+            heat.Run(dst0)
+            dst1 = heat.dst2
+            dst3 = heat.dst3
+
+            labels(1) = heat.labels(2)
+            labels(3) = heat.labels(3)
+            SetTrueText("Click on any cell in dst2 to see the top and side view of the cell.", 3)
+        End Sub
+    End Class
+
+
+
+
+
+
+
+
+    Public Class XR_HeatMap_GuidedBP : Inherits TaskParent
+        Dim guided As New GuidedBP_Basics
+        Public Sub New()
+            desc = "This is just a placeholder to make it easy to find the GuidedBP_Basics which shows objects in top/side views."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            guided.Run(src)
+            dst2 = guided.dst2
+            dst3 = guided.dst3
+            labels = guided.labels
+        End Sub
+    End Class
+End Namespace

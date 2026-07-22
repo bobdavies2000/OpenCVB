@@ -1,91 +1,39 @@
-Imports System.IO
-Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
-' https://docs.opencvb.org/3.3.1/de/dd0/grabcut_8cpp-example.html
-Public Class GrabCut_Basics : Inherits TaskParent
-    Public fgFineTune As Mat
-    Public bgFineTune As Mat
-    Public fore As New XR_Foreground_KMeansDepth
-    Dim bgModel As Mat = New Mat(1, 65, MatType.CV_64F, Scalar.All(0))
-    Dim fgModel As Mat = New Mat(1, 65, MatType.CV_64F, Scalar.All(0))
-    Public Sub New()
-        desc = "Use Foreground_Basics to define the foreground for use in GrabCut."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        fore.Run(src)
-        dst2 = fore.dst2
-        dst3 = fore.dst3
+Imports System.IO : Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCvSharp
+Namespace VBClasses
+    ' https://docs.opencvb.org/3.3.1/de/dd0/grabcut_8cpp-example.html
+    Public Class GrabCut_Basics : Inherits TaskParent
+        Public fgFineTune As Mat
+        Public bgFineTune As Mat
+        Public fore As New XR_Foreground_KMeansDepth
+        Dim bgModel As Mat = New Mat(1, 65, MatType.CV_64F, Scalar.All(0))
+        Dim fgModel As Mat = New Mat(1, 65, MatType.CV_64F, Scalar.All(0))
+        Public Sub New()
+            desc = "Use Foreground_Basics to define the foreground for use in GrabCut."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            fore.Run(src)
+            dst2 = fore.dst2
+            dst3 = fore.dst3
 
-        dst0 = New Mat(dst0.Size(), MatType.CV_8U, GrabCutClasses.PR_BGD)
-        dst0.SetTo(GrabCutClasses.FGD, fore.fg)
-        dst0.SetTo(GrabCutClasses.BGD, fore.bg)
+            dst0 = New Mat(dst0.Size(), MatType.CV_8U, GrabCutClasses.PR_BGD)
+            dst0.SetTo(GrabCutClasses.FGD, fore.fg)
+            dst0.SetTo(GrabCutClasses.BGD, fore.bg)
 
-        ' GrabCut(src, dst0, New Rect, bgModel, fgModel, 1, GrabCutModes.InitWithMask)
+            ' GrabCut(src, dst0, New Rect, bgModel, fgModel, 1, GrabCutModes.InitWithMask)
 
-        fore.bg = Not fore.fg
+            fore.bg = Not fore.fg
 
-        If CountNonZero(fore.fg) Then
-            If fgFineTune IsNot Nothing Then dst0.SetTo(GrabCutClasses.FGD, fgFineTune)
-            If bgFineTune IsNot Nothing Then dst0.SetTo(GrabCutClasses.BGD, bgFineTune)
+            If CountNonZero(fore.fg) Then
+                If fgFineTune IsNot Nothing Then dst0.SetTo(GrabCutClasses.FGD, fgFineTune)
+                If bgFineTune IsNot Nothing Then dst0.SetTo(GrabCutClasses.BGD, bgFineTune)
 
-            GrabCut(src, dst0, New cv.Rect, bgModel, fgModel, 1, GrabCutModes.Eval)
-        End If
-        dst3.SetTo(0)
-        src.CopyTo(dst3, dst0)
-        labels(2) = "KMeans output defining the " + CStr(fore.classCount) + " classes."
-    End Sub
-End Class
-
-
-
-
-
-
-
-
-
-Public Class XR_GrabCut_FineTune : Inherits TaskParent
-    Dim basics As New GrabCut_Basics
-    Dim mats As New Mat_4to1
-    Dim options As New Options_GrabCut
-    Dim saveRadio As Boolean = True
-    Public Sub New()
-        labels(2) = "Foreground Mask, fg fine tuning, bg fine tuning, blank"
-        labels(3) = "Grabcut results after adding fine tuning selections"
-        desc = "There are probably mistakes in the initial Grabcut_Basics.  Use the checkbox to fine tune what is background and foreground"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        options.Run()
-
-        If options.clearAll Or basics.fgFineTune Is Nothing Then
-            basics.fgFineTune = New Mat(src.Size(), MatType.CV_8U, Scalar.All(0))
-            basics.bgFineTune = New Mat(src.Size(), MatType.CV_8U, Scalar.All(0))
-        End If
-
-        If saveRadio <> options.fineTuning Then
-            saveRadio = options.fineTuning
-            task.drawRectClear = True
-            Exit Sub
-        End If
-
-        If task.drawRect.Width <> 0 Then
-            If options.fineTuning Then
-                basics.fgFineTune(task.drawRect).SetTo(255)
-            Else
-                basics.bgFineTune(task.drawRect).SetTo(255)
+                GrabCut(src, dst0, New cv.Rect, bgModel, fgModel, 1, GrabCutModes.Eval)
             End If
-        End If
-
-        basics.Run(src)
-
-        mats.mat(0) = basics.dst2
-        mats.mat(1) = basics.fgFineTune
-        mats.mat(2) = basics.bgFineTune
-        mats.Run(emptyMat)
-        dst2 = mats.dst2
-
-        dst3 = basics.dst3
-    End Sub
-End Class
+            dst3.SetTo(0)
+            src.CopyTo(dst3, dst0)
+            labels(2) = "KMeans output defining the " + CStr(fore.classCount) + " classes."
+        End Sub
+    End Class
 
 
 
@@ -94,52 +42,50 @@ End Class
 
 
 
-Public Class XR_GrabCut_ImageRect : Inherits TaskParent
-    Dim bgModel As New Mat, fgModel As New Mat
-    Dim bgRect1 = New cv.Rect(482, 0, 128, 640)
-    Dim bgRect2 = New cv.Rect(0, 0, 162, 320)
-    Dim fgRect1 = New cv.Rect(196, 134, 212, 344)
-    Dim fgRect2 = New cv.Rect(133, 420, 284, 60)
-    Public Sub New()
-        If standalone Then task.gOptions.displayDst1.Checked = True
-        desc = "Grabcut example using a single image.  Fix this."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        If task.heartBeat = False Then Exit Sub
-        Dim fileInputName = New FileInfo(task.homeDir + "data/cat.jpg")
-        dst2 = ImRead(fileInputName.FullName)
 
-        dst0 = New Mat(dst2.Size(), MatType.CV_8U, GrabCutClasses.PR_BGD)
-        Dim tmp As Mat = dst0(bgRect1)
-        tmp.SetTo(GrabCutClasses.BGD)
-        tmp = dst0(bgRect2)
-        tmp.SetTo(GrabCutClasses.BGD)
-        tmp = dst0(fgRect1)
-        tmp.SetTo(GrabCutClasses.FGD)
-        tmp = dst0(fgRect2)
-        tmp.SetTo(GrabCutClasses.FGD)
+    Public Class XR_GrabCut_FineTune : Inherits TaskParent
+        Dim basics As New GrabCut_Basics
+        Dim mats As New Mat_4to1
+        Dim options As New Options_GrabCut
+        Dim saveRadio As Boolean = True
+        Public Sub New()
+            labels(2) = "Foreground Mask, fg fine tuning, bg fine tuning, blank"
+            labels(3) = "Grabcut results after adding fine tuning selections"
+            desc = "There are probably mistakes in the initial Grabcut_Basics.  Use the checkbox to fine tune what is background and foreground"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            options.Run()
 
-        If task.firstPass Then
-            GrabCut(dst2, dst0, bgRect1, bgModel, fgModel, 1, GrabCutModes.InitWithRect)
-            GrabCut(dst2, dst0, bgRect2, bgModel, fgModel, 1, GrabCutModes.InitWithRect)
-            GrabCut(dst2, dst0, fgRect1, bgModel, fgModel, 1, GrabCutModes.InitWithRect)
-            GrabCut(dst2, dst0, fgRect2, bgModel, fgModel, 1, GrabCutModes.InitWithRect)
-        End If
+            If options.clearAll Or basics.fgFineTune Is Nothing Then
+                basics.fgFineTune = New Mat(src.Size(), MatType.CV_8U, Scalar.All(0))
+                basics.bgFineTune = New Mat(src.Size(), MatType.CV_8U, Scalar.All(0))
+            End If
 
-        Dim rect As New cv.Rect
+            If saveRadio <> options.fineTuning Then
+                saveRadio = options.fineTuning
+                task.drawRectClear = True
+                Exit Sub
+            End If
 
-        GrabCut(dst2, dst0, rect, bgModel, fgModel, 1, GrabCutModes.Eval)
+            If task.drawRect.Width <> 0 Then
+                If options.fineTuning Then
+                    basics.fgFineTune(task.drawRect).SetTo(255)
+                Else
+                    basics.bgFineTune(task.drawRect).SetTo(255)
+                End If
+            End If
 
-        dst3.SetTo(0)
-        dst2.CopyTo(dst3, dst0 + 1)
+            basics.Run(src)
 
-        dst1.SetTo(0)
-        Rectangle(dst1, bgRect1, task.highlight, task.lineWidth)
-        Rectangle(dst1, bgRect2, task.highlight, task.lineWidth)
-        Rectangle(dst1, fgRect1, task.highlight, task.lineWidth)
-        Rectangle(dst1, fgRect2, task.highlight, task.lineWidth)
-    End Sub
-End Class
+            mats.mat(0) = basics.dst2
+            mats.mat(1) = basics.fgFineTune
+            mats.mat(2) = basics.bgFineTune
+            mats.Run(emptyMat)
+            dst2 = mats.dst2
+
+            dst3 = basics.dst3
+        End Sub
+    End Class
 
 
 
@@ -147,30 +93,85 @@ End Class
 
 
 
-Public Class XR_GrabCut_ImageMask : Inherits TaskParent
-    Dim image As Mat
-    Public Sub New()
-        Dim fileInputName = New FileInfo(task.homeDir + "data/cat.jpg")
-        image = ImRead(fileInputName.FullName)
-        desc = "Grabcut example using a single image. "
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        Static bgModel As New Mat, fgModel As New Mat
 
-        If task.heartBeat Then
-            dst2 = image
-            Dim _cvt1 As New Mat
-            CvtColor(dst2, _cvt1, ColorConversionCodes.BGR2GRAY)
-            Threshold(_cvt1, dst0, 50, 255, ThresholdTypes.Binary)
-            dst1 = New Mat(dst2.Size(), MatType.CV_8U, GrabCutClasses.PR_BGD)
-            dst1.SetTo(GrabCutClasses.FGD, dst0)
+    Public Class XR_GrabCut_ImageRect : Inherits TaskParent
+        Dim bgModel As New Mat, fgModel As New Mat
+        Dim bgRect1 = New cv.Rect(482, 0, 128, 640)
+        Dim bgRect2 = New cv.Rect(0, 0, 162, 320)
+        Dim fgRect1 = New cv.Rect(196, 134, 212, 344)
+        Dim fgRect2 = New cv.Rect(133, 420, 284, 60)
+        Public Sub New()
+            If standalone Then task.gOptions.displayDst1.Checked = True
+            desc = "Grabcut example using a single image.  Fix this."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            If task.heartBeat = False Then Exit Sub
+            Dim fileInputName = New FileInfo(task.homeDir + "data/cat.jpg")
+            dst2 = ImRead(fileInputName.FullName)
 
-            GrabCut(dst2, dst1, New cv.Rect, bgModel, fgModel, 1, GrabCutModes.InitWithMask)
-        Else
-            GrabCut(dst2, dst1, New cv.Rect, bgModel, fgModel, 5, GrabCutModes.Eval)
-        End If
+            dst0 = New Mat(dst2.Size(), MatType.CV_8U, GrabCutClasses.PR_BGD)
+            Dim tmp As Mat = dst0(bgRect1)
+            tmp.SetTo(GrabCutClasses.BGD)
+            tmp = dst0(bgRect2)
+            tmp.SetTo(GrabCutClasses.BGD)
+            tmp = dst0(fgRect1)
+            tmp.SetTo(GrabCutClasses.FGD)
+            tmp = dst0(fgRect2)
+            tmp.SetTo(GrabCutClasses.FGD)
 
-        dst3.SetTo(0)
-        dst2.CopyTo(dst3, dst1 + 1)
-    End Sub
-End Class
+            If task.firstPass Then
+                GrabCut(dst2, dst0, bgRect1, bgModel, fgModel, 1, GrabCutModes.InitWithRect)
+                GrabCut(dst2, dst0, bgRect2, bgModel, fgModel, 1, GrabCutModes.InitWithRect)
+                GrabCut(dst2, dst0, fgRect1, bgModel, fgModel, 1, GrabCutModes.InitWithRect)
+                GrabCut(dst2, dst0, fgRect2, bgModel, fgModel, 1, GrabCutModes.InitWithRect)
+            End If
+
+            Dim rect As New cv.Rect
+
+            GrabCut(dst2, dst0, rect, bgModel, fgModel, 1, GrabCutModes.Eval)
+
+            dst3.SetTo(0)
+            dst2.CopyTo(dst3, dst0 + 1)
+
+            dst1.SetTo(0)
+            Rectangle(dst1, bgRect1, task.highlight, task.lineWidth)
+            Rectangle(dst1, bgRect2, task.highlight, task.lineWidth)
+            Rectangle(dst1, fgRect1, task.highlight, task.lineWidth)
+            Rectangle(dst1, fgRect2, task.highlight, task.lineWidth)
+        End Sub
+    End Class
+
+
+
+
+
+
+
+    Public Class XR_GrabCut_ImageMask : Inherits TaskParent
+        Dim image As Mat
+        Public Sub New()
+            Dim fileInputName = New FileInfo(task.homeDir + "data/cat.jpg")
+            image = ImRead(fileInputName.FullName)
+            desc = "Grabcut example using a single image. "
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            Static bgModel As New Mat, fgModel As New Mat
+
+            If task.heartBeat Then
+                dst2 = image
+                Dim _cvt1 As New Mat
+                CvtColor(dst2, _cvt1, ColorConversionCodes.BGR2GRAY)
+                Threshold(_cvt1, dst0, 50, 255, ThresholdTypes.Binary)
+                dst1 = New Mat(dst2.Size(), MatType.CV_8U, GrabCutClasses.PR_BGD)
+                dst1.SetTo(GrabCutClasses.FGD, dst0)
+
+                GrabCut(dst2, dst1, New cv.Rect, bgModel, fgModel, 1, GrabCutModes.InitWithMask)
+            Else
+                GrabCut(dst2, dst1, New cv.Rect, bgModel, fgModel, 5, GrabCutModes.Eval)
+            End If
+
+            dst3.SetTo(0)
+            dst2.CopyTo(dst3, dst1 + 1)
+        End Sub
+    End Class
+End Namespace

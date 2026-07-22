@@ -16,6 +16,7 @@ Public Module vbc
     Public Const fmt3 = "0.000"
     Public Const fmt4 = "0.0000"
     Public newPoint As New cv.Point
+    Public newMat As New cv.Mat
     Public msRNG As New System.Random
     Public white As New Scalar(255, 255, 255), black As New Scalar(0, 0, 0)
     Public grayColor As New Scalar(127, 127, 127)

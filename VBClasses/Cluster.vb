@@ -1,117 +1,119 @@
-Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
-Public Class Cluster_Basics : Inherits TaskParent
-    Dim knn As New KNN_Basics
-    Public ptInput As New List(Of cv.Point)
-    Public ptList As New List(Of cv.Point)
-    Public clusterID As New List(Of Integer)
-    Public clusters As New SortedList(Of Integer, List(Of cv.Point))
-    Dim options As New Options_Features
-    Public feat As New Feature_Basics
-    Public Sub New()
-        OptionParent.FindSlider("Min Distance").Value = 10
-        desc = "Group feature points based on their proximity to each other."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        options.Run()
+Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCvSharp
+Namespace VBClasses
+    Public Class Cluster_Basics : Inherits TaskParent
+        Dim knn As New KNN_Basics
+        Public ptInput As New List(Of cv.Point)
+        Public ptList As New List(Of cv.Point)
+        Public clusterID As New List(Of Integer)
+        Public clusters As New SortedList(Of Integer, List(Of cv.Point))
+        Dim options As New Options_Features
+        Public feat As New Feature_Basics
+        Public Sub New()
+            OptionParent.FindSlider("Min Distance").Value = 10
+            desc = "Group feature points based on their proximity to each other."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            options.Run()
 
-        feat.Run(src)
-        ptInput.Clear()
-        For Each pt In feat.features
-            ptInput.Add(New cv.Point(CInt(pt.X), CInt(pt.Y)))
-        Next
+            feat.Run(src)
+            ptInput.Clear()
+            For Each pt In feat.features
+                ptInput.Add(New cv.Point(CInt(pt.X), CInt(pt.Y)))
+            Next
 
-        If ptInput.Count <= 3 Then Exit Sub
+            If ptInput.Count <= 3 Then Exit Sub
 
-        knn.queries.Clear()
-        For Each pt In ptInput
-            knn.queries.Add(New Point2f(pt.X, pt.Y))
-        Next
-        knn.trainInput = knn.queries
-        knn.Run(src)
+            knn.queries.Clear()
+            For Each pt In ptInput
+                knn.queries.Add(New Point2f(pt.X, pt.Y))
+            Next
+            knn.trainInput = knn.queries
+            knn.Run(src)
 
-        ptList.Clear()
-        clusterID.Clear()
-        clusters.Clear()
-        Dim groupID As Integer
-        For i = 0 To knn.queries.Count - 1
-            Dim p1 = New cv.Point(knn.queries(i).X, knn.queries(i).Y)
-            Dim p2 = New cv.Point(knn.queries(knn.result(i, 1)).X, knn.queries(knn.result(i, 1)).Y)
-            Dim index1 = ptList.IndexOf(p1)
-            Dim index2 = ptList.IndexOf(p2)
-            If index1 >= 0 And index2 >= 0 Then Continue For
-            If index1 < 0 And index2 < 0 Then
-                ptList.Add(p1)
-                ptList.Add(p2)
-                groupID = clusters.Count
-                Dim newList = New List(Of cv.Point)({p1, p2})
-                clusters.Add(groupID, newList)
-                clusterID.Add(groupID)
-                clusterID.Add(groupID)
-            Else
-                Dim pt = If(index1 < 0, p1, p2)
-                Dim index = If(index1 < 0, index2, index1)
-                groupID = clusterID(index)
-                ptList.Add(pt)
-                clusterID.Add(groupID)
-                clusters.ElementAt(groupID).Value.Add(pt)
-            End If
-        Next
+            ptList.Clear()
+            clusterID.Clear()
+            clusters.Clear()
+            Dim groupID As Integer
+            For i = 0 To knn.queries.Count - 1
+                Dim p1 = New cv.Point(knn.queries(i).X, knn.queries(i).Y)
+                Dim p2 = New cv.Point(knn.queries(knn.result(i, 1)).X, knn.queries(knn.result(i, 1)).Y)
+                Dim index1 = ptList.IndexOf(p1)
+                Dim index2 = ptList.IndexOf(p2)
+                If index1 >= 0 And index2 >= 0 Then Continue For
+                If index1 < 0 And index2 < 0 Then
+                    ptList.Add(p1)
+                    ptList.Add(p2)
+                    groupID = clusters.Count
+                    Dim newList = New List(Of cv.Point)({p1, p2})
+                    clusters.Add(groupID, newList)
+                    clusterID.Add(groupID)
+                    clusterID.Add(groupID)
+                Else
+                    Dim pt = If(index1 < 0, p1, p2)
+                    Dim index = If(index1 < 0, index2, index1)
+                    groupID = clusterID(index)
+                    ptList.Add(pt)
+                    clusterID.Add(groupID)
+                    clusters.ElementAt(groupID).Value.Add(pt)
+                End If
+            Next
 
-        dst2.SetTo(0)
-        For Each group In clusters
-            For i = 0 To group.Value.Count - 1
-                For j = 0 To group.Value.Count - 1
-                    Line(dst2, group.Value(i), group.Value(j), white, task.lineWidth, task.lineWidth)
+            dst2.SetTo(0)
+            For Each group In clusters
+                For i = 0 To group.Value.Count - 1
+                    For j = 0 To group.Value.Count - 1
+                        Line(dst2, group.Value(i), group.Value(j), white, task.lineWidth, task.lineWidth)
+                    Next
                 Next
             Next
-        Next
-        dst3 = src
-        For i = 0 To knn.queries.Count - 1
-        Circle(dst2, knn.queries(i), task.DotSize, Scalar.Red, -1, task.lineType)
-        Circle(dst3, knn.queries(i), task.DotSize, task.highlight, -1, task.lineType)
-        Next
-        labels(2) = CStr(clusters.Count) + " groups built from " + CStr(ptInput.Count) + " by combining each input cv.Point and its nearest neighbor."
-        labels(3) = CStr(ptInput.Count) + " input features found."
-    End Sub
-End Class
+            dst3 = src
+            For i = 0 To knn.queries.Count - 1
+                Circle(dst2, knn.queries(i), task.DotSize, Scalar.Red, -1, task.lineType)
+                Circle(dst3, knn.queries(i), task.DotSize, task.highlight, -1, task.lineType)
+            Next
+            labels(2) = CStr(clusters.Count) + " groups built from " + CStr(ptInput.Count) + " by combining each input cv.Point and its nearest neighbor."
+            labels(3) = CStr(ptInput.Count) + " input features found."
+        End Sub
+    End Class
 
 
 
 
 
 
-Public Class XR_Cluster_Hulls : Inherits TaskParent
-    Dim cluster As New Cluster_Basics
-    Public hulls As New List(Of List(Of cv.Point))
-    Dim bPoint As New BrickPoint_Basics
-    Public Sub New()
-        desc = "Create hulls for each cluster of feature points found in Cluster_Basics"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        If src.Channels <> 1 Then src = task.gray.Clone
-        bPoint.Run(src)
+    Public Class XR_Cluster_Hulls : Inherits TaskParent
+        Dim cluster As New Cluster_Basics
+        Public hulls As New List(Of List(Of cv.Point))
+        Dim bPoint As New BrickPoint_Basics
+        Public Sub New()
+            desc = "Create hulls for each cluster of feature points found in Cluster_Basics"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            If src.Channels <> 1 Then src = task.gray.Clone
+            bPoint.Run(src)
 
-        cluster.Run(src)
-        dst2 = cluster.dst2
-        dst3 = cluster.dst3
+            cluster.Run(src)
+            dst2 = cluster.dst2
+            dst3 = cluster.dst3
 
-        hulls.Clear()
-        For Each group In cluster.clusters
-            Dim hullPoints = ConvexHull(group.Value.ToArray, True).ToList
-            Dim hull As New List(Of cv.Point)
-            If hullPoints.Count > 2 Then
-                For Each pt In hullPoints
-                    hull.Add(New cv.Point(pt.X, pt.Y))
-                Next
-            ElseIf hullPoints.Count = 2 Then
-                Line(dst3, hullPoints(0), hullPoints(1), white, task.lineWidth, task.lineWidth)
-            Else
-            Circle(dst3, hullPoints(0), task.DotSize, task.highlight, -1, task.lineType)
-            End If
+            hulls.Clear()
+            For Each group In cluster.clusters
+                Dim hullPoints = ConvexHull(group.Value.ToArray, True).ToList
+                Dim hull As New List(Of cv.Point)
+                If hullPoints.Count > 2 Then
+                    For Each pt In hullPoints
+                        hull.Add(New cv.Point(pt.X, pt.Y))
+                    Next
+                ElseIf hullPoints.Count = 2 Then
+                    Line(dst3, hullPoints(0), hullPoints(1), white, task.lineWidth, task.lineWidth)
+                Else
+                    Circle(dst3, hullPoints(0), task.DotSize, task.highlight, -1, task.lineType)
+                End If
 
-            hulls.Add(hull)
-            If (hull.Count > 0) Then DrawTour(dst3, hull, white, task.lineWidth)
-        Next
-        labels(3) = bPoint.labels(2)
-    End Sub
-End Class
+                hulls.Add(hull)
+                If (hull.Count > 0) Then DrawTour(dst3, hull, white, task.lineWidth)
+            Next
+            labels(3) = bPoint.labels(2)
+        End Sub
+    End Class
+End Namespace

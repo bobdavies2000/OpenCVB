@@ -1,244 +1,246 @@
-﻿Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
-Public Class PlotMouse_Basics : Inherits TaskParent
-    Public plotHist As New PlotBar_Basics
-    Public histogram As New Mat
-    Public mask As New Mat
-    Public Sub New()
-        plotHist.removeZeroEntry = False
-        plotHist.createHistogram = True
-        task.gOptions.HistBinBar.Value = task.gOptions.HistBinBar.Maximum
-        desc = "Show CV_8U data as a histogram and use mouse movement to control the backprojection."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        Static bins As Single = task.histogramBins
-        If src.Channels <> 1 Then src = task.pcSplit(2)
+﻿Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCvSharp
+Namespace VBClasses
+    Public Class PlotMouse_Basics : Inherits TaskParent
+        Public plotHist As New PlotBar_Basics
+        Public histogram As New Mat
+        Public mask As New Mat
+        Public Sub New()
+            plotHist.removeZeroEntry = False
+            plotHist.createHistogram = True
+            task.gOptions.HistBinBar.Value = task.gOptions.HistBinBar.Maximum
+            desc = "Show CV_8U data as a histogram and use mouse movement to control the backprojection."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            Static bins As Single = task.histogramBins
+            If src.Channels <> 1 Then src = task.pcSplit(2)
 
-        If task.optionsChanged Then bins = task.histogramBins
-        Dim barWidth = dst2.Width / bins
-        If task.heartBeat Then
-            If plotHist.histArray IsNot Nothing Then
-                For i = plotHist.histArray.Count - 1 To 0 Step -1
-                    If plotHist.histArray(i) > 0 Then
-                        bins = plotHist.histArray.Count - i
-                        If bins = 1 Then bins = task.histogramBins
-                        Exit For
-                    End If
-                Next
+            If task.optionsChanged Then bins = task.histogramBins
+            Dim barWidth = dst2.Width / bins
+            If task.heartBeat Then
+                If plotHist.histArray IsNot Nothing Then
+                    For i = plotHist.histArray.Count - 1 To 0 Step -1
+                        If plotHist.histArray(i) > 0 Then
+                            bins = plotHist.histArray.Count - i
+                            If bins = 1 Then bins = task.histogramBins
+                            Exit For
+                        End If
+                    Next
+                End If
             End If
-        End If
-        dst3 = task.color.Clone
+            dst3 = task.color.Clone
 
-        plotHist.maxRange = task.MaxZmeters
-        plotHist.Run(src)
-        dst2 = plotHist.dst2
+            plotHist.maxRange = task.MaxZmeters
+            plotHist.Run(src)
+            dst2 = plotHist.dst2
 
-        Dim histIndex = Math.Floor(task.mouseMovePoint.X / barWidth)
+            Dim histIndex = Math.Floor(task.mouseMovePoint.X / barWidth)
 
-        Dim minRange = (plotHist.ranges(0).End - plotHist.ranges(0).Start) * histIndex / task.histogramBins
-        Dim maxRange = (plotHist.ranges(0).End - plotHist.ranges(0).Start) * (histIndex + 1) / task.histogramBins
-        Dim bpRanges = New Rangef() {New Rangef(minRange, maxRange)}
-        CalcBackProject({src}, {0}, plotHist.histogram, mask, bpRanges)
-        mask.ConvertTo(mask, MatType.CV_8U)
+            Dim minRange = (plotHist.ranges(0).End - plotHist.ranges(0).Start) * histIndex / task.histogramBins
+            Dim maxRange = (plotHist.ranges(0).End - plotHist.ranges(0).Start) * (histIndex + 1) / task.histogramBins
+            Dim bpRanges = New Rangef() {New Rangef(minRange, maxRange)}
+            CalcBackProject({src}, {0}, plotHist.histogram, mask, bpRanges)
+            mask.ConvertTo(mask, MatType.CV_8U)
 
-        If mask.Size = dst3.Size Then dst3.SetTo(task.highlight, mask)
-        Dim count = CountNonZero(mask)
-        labels(3) = "BackProjected pixel (% of image) = " + (count / src.Total).ToString("0%")
+            If mask.Size = dst3.Size Then dst3.SetTo(task.highlight, mask)
+            Dim count = CountNonZero(mask)
+            labels(3) = "BackProjected pixel (% of image) = " + (count / src.Total).ToString("0%")
 
-        Dim barCount = plotHist.histArray(histIndex)
-        labels(2) = "Selection highlighted is " + CStr(histIndex) + " and shows " + CStr(barCount) + " (or " +
-                    (barCount / src.Total).ToString("0%") + ") samples"
-                    Rectangle(dst2, New cv.Rect(CInt(histIndex) * barWidth, 0, barWidth, dst2.Height), Scalar.Yellow, task.lineWidth)
-    End Sub
-End Class
-
-
-
-
-Public Class PlotMouse_Basics32F : Inherits TaskParent
-    Public plotHist As New PlotBar_Basics
-    Public histogram As New Mat
-    Dim ranges() As Rangef
-    Public mask As New Mat
-    Public Sub New()
-        plotHist.minRange = -0.01
-        plotHist.maxRange = task.MaxZmeters
-        plotHist.removeZeroEntry = False
-        task.gOptions.MaxDepthBar.Value = 10
-        desc = "Show depth32F data as a histogram and allow mouse movement to control backprojection."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        dst3 = task.color.Clone
-
-        If src.Channels <> 1 Then src = task.pcSplit(2)
-
-        ranges = {New Rangef(0, task.MaxZmeters)}
-        CalcHist({src}, {0}, New Mat, histogram, 1, {task.histogramBins}, ranges)
-
-        plotHist.histogram = histogram
-        plotHist.Run(plotHist.histogram)
-        dst2 = plotHist.dst2
-
-        Dim stepsize = dst2.Width / task.MaxZmeters
-        For i = 1 To CInt(task.MaxZmeters) - 1
-            Line(dst2, New cv.Point(stepsize * i, 0), New cv.Point(stepsize * i, dst2.Height), white, Utility_Basics.getThickness)
-        Next
-
-        Dim barWidth = dst2.Width / task.histogramBins
-        Dim histIndex = Math.Floor(task.mouseMovePoint.X / barWidth)
-
-        Dim minRange = (ranges(0).End - ranges(0).Start) * histIndex / task.histogramBins
-        Dim maxRange = (ranges(0).End - ranges(0).Start) * (histIndex + 1) / task.histogramBins
-        Dim bpRanges = New Rangef() {New Rangef(minRange, maxRange)}
-        CalcBackProject({src}, {0}, histogram, mask, bpRanges)
-        mask.ConvertTo(mask, MatType.CV_8U)
-
-        Dim maskCount = CountNonZero(mask)
-        If mask.Size = dst3.Size Then dst3.SetTo(task.highlight, mask)
-        labels(3) = "BackProjected pixel (% of image) = " + (maskCount / src.Total).ToString("0%")
-
-        labels(2) = "Histogram Depth to " + task.MaxZmeters.ToString("0.0") + " m"
-        Rectangle(dst2, New cv.Rect(CInt(histIndex) * barWidth, 0, barWidth, dst2.Height), Scalar.Yellow, task.lineWidth)
-    End Sub
-End Class
+            Dim barCount = plotHist.histArray(histIndex)
+            labels(2) = "Selection highlighted is " + CStr(histIndex) + " and shows " + CStr(barCount) + " (or " +
+                        (barCount / src.Total).ToString("0%") + ") samples"
+            Rectangle(dst2, New cv.Rect(CInt(histIndex) * barWidth, 0, barWidth, dst2.Height), Scalar.Yellow, task.lineWidth)
+        End Sub
+    End Class
 
 
 
 
-Public Class PlotMouse_Correlation : Inherits TaskParent
-    Public plotHist As New PlotBar_Basics
-    Dim corr As New Correlation_BasicsPlot
-    Public Sub New()
-        dst1 = New Mat(dst1.Size, MatType.CV_8U, 0)
-        plotHist.minRange = 0
-        plotHist.maxRange = 2
-        plotHist.createHistogram = False
-        plotHist.shadeValues = False
-        labels(2) = "Move mouse to identify grid squares in the image."
-        desc = "Mouse over any bin to see the grid squares in the selected range."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        corr.Run(src)
+    Public Class PlotMouse_Basics32F : Inherits TaskParent
+        Public plotHist As New PlotBar_Basics
+        Public histogram As New Mat
+        Dim ranges() As Rangef
+        Public mask As New Mat
+        Public Sub New()
+            plotHist.minRange = -0.01
+            plotHist.maxRange = task.MaxZmeters
+            plotHist.removeZeroEntry = False
+            task.gOptions.MaxDepthBar.Value = 10
+            desc = "Show depth32F data as a histogram and allow mouse movement to control backprojection."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            dst3 = task.color.Clone
 
-        Dim histogram(task.histogramBins - 1) As Single
-        Dim ranges(task.histogramBins - 1) As List(Of Single)
-        Dim incr = 2 / task.histogramBins
-        dst1.SetTo(0)
-        For i = 0 To corr.cList.Count - 1
-            Dim bin = CInt(corr.cList(i) / incr) - 1
-            If bin > 0 Then
-                Dim r = task.gridRects(i)
-                dst1(r).SetTo(bin)
-                histogram(bin) += 1
-                If ranges(bin) Is Nothing Then ranges(bin) = New List(Of Single)
-                ranges(bin).Add(corr.mmRanges(i))
-            End If
-        Next
+            If src.Channels <> 1 Then src = task.pcSplit(2)
 
-        Dim histInput As Mat = Mat.FromPixelData(histogram.Count, 1, MatType.CV_32F, histogram)
-        plotHist.Run(histInput)
-        dst2 = plotHist.dst2
-        labels(3) = plotHist.labels(2)
+            ranges = {New Rangef(0, task.MaxZmeters)}
+            CalcHist({src}, {0}, New Mat, histogram, 1, {task.histogramBins}, ranges)
 
-        Dim totalPixels = dst2.Total ' assume we are including zeros.
-        Dim barWidth = dst2.Width / task.histogramBins
-        Dim histIndex = Math.Floor(task.mouseMovePoint.X / barWidth)
-                  InRange(dst1, histIndex, histIndex, dst0)
-        If ranges(histIndex) IsNot Nothing Then
-            labels(2) = "For bin " + CStr(histIndex) + " " + ranges(histIndex).Average.ToString(fmt1) +
+            plotHist.histogram = histogram
+            plotHist.Run(plotHist.histogram)
+            dst2 = plotHist.dst2
+
+            Dim stepsize = dst2.Width / task.MaxZmeters
+            For i = 1 To CInt(task.MaxZmeters) - 1
+                Line(dst2, New cv.Point(stepsize * i, 0), New cv.Point(stepsize * i, dst2.Height), white, Utility_Basics.getThickness)
+            Next
+
+            Dim barWidth = dst2.Width / task.histogramBins
+            Dim histIndex = Math.Floor(task.mouseMovePoint.X / barWidth)
+
+            Dim minRange = (ranges(0).End - ranges(0).Start) * histIndex / task.histogramBins
+            Dim maxRange = (ranges(0).End - ranges(0).Start) * (histIndex + 1) / task.histogramBins
+            Dim bpRanges = New Rangef() {New Rangef(minRange, maxRange)}
+            CalcBackProject({src}, {0}, histogram, mask, bpRanges)
+            mask.ConvertTo(mask, MatType.CV_8U)
+
+            Dim maskCount = CountNonZero(mask)
+            If mask.Size = dst3.Size Then dst3.SetTo(task.highlight, mask)
+            labels(3) = "BackProjected pixel (% of image) = " + (maskCount / src.Total).ToString("0%")
+
+            labels(2) = "Histogram Depth to " + task.MaxZmeters.ToString("0.0") + " m"
+            Rectangle(dst2, New cv.Rect(CInt(histIndex) * barWidth, 0, barWidth, dst2.Height), Scalar.Yellow, task.lineWidth)
+        End Sub
+    End Class
+
+
+
+
+    Public Class PlotMouse_Correlation : Inherits TaskParent
+        Public plotHist As New PlotBar_Basics
+        Dim corr As New Correlation_BasicsPlot
+        Public Sub New()
+            dst1 = New Mat(dst1.Size, MatType.CV_8U, 0)
+            plotHist.minRange = 0
+            plotHist.maxRange = 2
+            plotHist.createHistogram = False
+            plotHist.shadeValues = False
+            labels(2) = "Move mouse to identify grid squares in the image."
+            desc = "Mouse over any bin to see the grid squares in the selected range."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            corr.Run(src)
+
+            Dim histogram(task.histogramBins - 1) As Single
+            Dim ranges(task.histogramBins - 1) As List(Of Single)
+            Dim incr = 2 / task.histogramBins
+            dst1.SetTo(0)
+            For i = 0 To corr.cList.Count - 1
+                Dim bin = CInt(corr.cList(i) / incr) - 1
+                If bin > 0 Then
+                    Dim r = task.gridRects(i)
+                    dst1(r).SetTo(bin)
+                    histogram(bin) += 1
+                    If ranges(bin) Is Nothing Then ranges(bin) = New List(Of Single)
+                    ranges(bin).Add(corr.mmRanges(i))
+                End If
+            Next
+
+            Dim histInput As Mat = Mat.FromPixelData(histogram.Count, 1, MatType.CV_32F, histogram)
+            plotHist.Run(histInput)
+            dst2 = plotHist.dst2
+            labels(3) = plotHist.labels(2)
+
+            Dim totalPixels = dst2.Total ' assume we are including zeros.
+            Dim barWidth = dst2.Width / task.histogramBins
+            Dim histIndex = Math.Floor(task.mouseMovePoint.X / barWidth)
+            InRange(dst1, histIndex, histIndex, dst0)
+            If ranges(histIndex) IsNot Nothing Then
+                labels(2) = "For bin " + CStr(histIndex) + " " + ranges(histIndex).Average.ToString(fmt1) +
                     " average range and min/max " + ranges(histIndex).Min.ToString(fmt1) + "/" +
                     ranges(histIndex).Max.ToString(fmt1)
-        End If
+            End If
 
-        Dim actualCount = CountNonZero(dst0)
-        dst3 = task.color.Clone
-        dst3.SetTo(Scalar.Yellow, dst0)
-        Rectangle(dst2, New cv.Rect(CInt(histIndex) * barWidth, 0, barWidth, dst2.Height), Scalar.Yellow, task.lineWidth)
-    End Sub
-End Class
-
-
-
-
-
-
-Public Class PlotMouse_SobelDerivative : Inherits TaskParent
-    Dim deriv As New Derivative_Sobel
-    Public Sub New()
-        desc = "Plot of derivative in depth in X, Y, or Z."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        deriv.Run(task.pcSplit(2))
-        dst2 = deriv.dst2
-        dst3 = deriv.dst3
-        labels = deriv.labels
-    End Sub
-End Class
+            Dim actualCount = CountNonZero(dst0)
+            dst3 = task.color.Clone
+            dst3.SetTo(Scalar.Yellow, dst0)
+            Rectangle(dst2, New cv.Rect(CInt(histIndex) * barWidth, 0, barWidth, dst2.Height), Scalar.Yellow, task.lineWidth)
+        End Sub
+    End Class
 
 
 
 
 
 
-Public Class PlotMouse_StableGray : Inherits TaskParent
-    Dim plot As New PlotMouse_Basics
-    Public Sub New()
-        If standalone Then task.gOptions.displayDst0.Checked = True
-        desc = "Plot the stable grayscale image."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        If task.gOptions.stableDepthRGB.Checked Then
-            dst0 = task.stableGray.dst2
-            labels(0) = task.stableGray.labels(2)
-        Else
-            dst0 = task.gray
-            labels(0) = "Original task.gray - unchanged."
-        End If
-
-        plot.Run(dst0)
-        dst2 = plot.dst2
-        labels(2) = plot.labels(2)
-
-        dst3 = plot.dst3
-        labels(3) = plot.labels(3)
-    End Sub
-End Class
+    Public Class PlotMouse_SobelDerivative : Inherits TaskParent
+        Dim deriv As New Derivative_Sobel
+        Public Sub New()
+            desc = "Plot of derivative in depth in X, Y, or Z."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            deriv.Run(task.pcSplit(2))
+            dst2 = deriv.dst2
+            dst3 = deriv.dst3
+            labels = deriv.labels
+        End Sub
+    End Class
 
 
 
 
 
 
-Public Class PlotMouse_MaskBackProject : Inherits TaskParent
-    Public hist As New Histogram_Basics
-    Public histIndex As Integer
-    Public Sub New()
-        hist.plotHist.removeZeroEntry = False
-        labels(2) = "Histogram for the gray scale image.  Move mouse to see backprojection of each grayscale mask."
-        desc = "Create all the backprojection masks from a grayscale histogram"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        hist.Run(task.gray)
-        dst2 = hist.dst2
-        dst3 = task.color.Clone
+    Public Class PlotMouse_StableGray : Inherits TaskParent
+        Dim plot As New PlotMouse_Basics
+        Public Sub New()
+            If standalone Then task.gOptions.displayDst0.Checked = True
+            desc = "Plot the stable grayscale image."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            If task.gOptions.stableDepthRGB.Checked Then
+                dst0 = task.stableGray.dst2
+                labels(0) = task.stableGray.labels(2)
+            Else
+                dst0 = task.gray
+                labels(0) = "Original task.gray - unchanged."
+            End If
 
-        Dim barWidth = dst2.Width / task.histogramBins
-        Dim histIndex = Math.Floor(task.mouseMovePoint.X / barWidth)
+            plot.Run(dst0)
+            dst2 = plot.dst2
+            labels(2) = plot.labels(2)
 
-        Dim minRange = (hist.ranges(0).End - hist.ranges(0).Start) * histIndex / task.histogramBins
-        Dim maxRange = (hist.ranges(0).End - hist.ranges(0).Start) * (histIndex + 1) / task.histogramBins
-        Dim bpRanges = New Rangef() {New Rangef(minRange, maxRange)}
+            dst3 = plot.dst3
+            labels(3) = plot.labels(3)
+        End Sub
+    End Class
 
-        If Single.IsNaN(minRange) Or Single.IsInfinity(minRange) Or
+
+
+
+
+
+    Public Class PlotMouse_MaskBackProject : Inherits TaskParent
+        Public hist As New Histogram_Basics
+        Public histIndex As Integer
+        Public Sub New()
+            hist.plotHist.removeZeroEntry = False
+            labels(2) = "Histogram for the gray scale image.  Move mouse to see backprojection of each grayscale mask."
+            desc = "Create all the backprojection masks from a grayscale histogram"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            hist.Run(task.gray)
+            dst2 = hist.dst2
+            dst3 = task.color.Clone
+
+            Dim barWidth = dst2.Width / task.histogramBins
+            Dim histIndex = Math.Floor(task.mouseMovePoint.X / barWidth)
+
+            Dim minRange = (hist.ranges(0).End - hist.ranges(0).Start) * histIndex / task.histogramBins
+            Dim maxRange = (hist.ranges(0).End - hist.ranges(0).Start) * (histIndex + 1) / task.histogramBins
+            Dim bpRanges = New Rangef() {New Rangef(minRange, maxRange)}
+
+            If Single.IsNaN(minRange) Or Single.IsInfinity(minRange) Or
            Single.IsNaN(maxRange) Or Single.IsInfinity(maxRange) Then
-            SetTrueText("Input data has no values - exit " + traceName)
-            Exit Sub
-        End If
+                SetTrueText("Input data has no values - exit " + traceName)
+                Exit Sub
+            End If
 
-        Dim ranges() = New Rangef() {New Rangef(minRange, maxRange)}
+            Dim ranges() = New Rangef() {New Rangef(minRange, maxRange)}
 
-        CalcBackProject({task.gray}, {0}, hist.histogram, dst1, ranges)
-        dst3.SetTo(task.highlight, dst1)
-        Rectangle(dst2, New cv.Rect(CInt(histIndex * barWidth), 0, barWidth, dst2.Height), Scalar.Yellow, task.lineWidth)
-        labels(3) = CStr(CountNonZero(dst1)) + " pixels in the back projection."
-    End Sub
-End Class
+            CalcBackProject({task.gray}, {0}, hist.histogram, dst1, ranges)
+            dst3.SetTo(task.highlight, dst1)
+            Rectangle(dst2, New cv.Rect(CInt(histIndex * barWidth), 0, barWidth, dst2.Height), Scalar.Yellow, task.lineWidth)
+            labels(3) = CStr(CountNonZero(dst1)) + " pixels in the back projection."
+        End Sub
+    End Class
+End Namespace

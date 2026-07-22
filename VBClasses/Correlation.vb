@@ -1,154 +1,155 @@
-Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
-Public Class Correlation_Basics : Inherits TaskParent
-    Public fLessList As New List(of cv.Rect)
-    Public maxCorrelation As Single
-    Public Sub New()
-        dst2 = New Mat(dst2.Size, MatType.CV_8U, 0)
-        task.fOptions.MatchCorrSlider.Value = 90
-        desc = "Measure the correlation of all grid squares except where there is motion."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        If src.Channels <> 1 Then src = task.grayOriginal.Clone
+Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCvSharp
+Namespace VBClasses
+    Public Class Correlation_Basics : Inherits TaskParent
+        Public fLessList As New List(Of cv.Rect)
+        Public maxCorrelation As Single
+        Public Sub New()
+            dst2 = New Mat(dst2.Size, MatType.CV_8U, 0)
+            task.fOptions.MatchCorrSlider.Value = 90
+            desc = "Measure the correlation of all grid squares except where there is motion."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            If src.Channels <> 1 Then src = task.grayOriginal.Clone
 
-        Static lastFrame As Mat = src.Clone
-        dst2.SetTo(0)
-        Dim correlationMat As New Mat
-        maxCorrelation = task.fOptions.MatchCorrSlider.Value / 100.0 + 1
-        fLessList.Clear()
-        Dim motionList As New List(Of Integer)(task.motion.motionSort)
-        If motionList.Count = 0 Then motionList.Add(0) ' dummy entry so loops below works.
-        Dim index As Integer
-        For i = 0 To task.gridRects.Count - 1
-            Dim r = task.gridRects(i)
-            If r <> task.gridRects(motionList(index)) Then
-                MatchTemplate(src(r), lastFrame(r), correlationMat, TemplateMatchModes.CCoeffNormed)
-                Dim correlation = correlationMat.Get(Of Single)(0, 0) + 1
-                If correlation < maxCorrelation Then
-                Rectangle(dst2, r, white, -1)
-                    fLessList.Add(r)
-                End If
-            Else
-                If index + 1 < motionList.Count Then index += 1
-            End If
-        Next
-
-        lastFrame = src.Clone
-        labels(2) = CStr(fLessList.Count) + " rects < " + (maxCorrelation - 1).ToString(fmt2) +
-                            " correlation to last frame, indicating that they were featureless."
-        SetTrueText("Use Feature Options 'Match Correlation Threshold' to shrink/grow.", 3)
-    End Sub
-End Class
-
-
-
-
-Public Class Correlation_Validate : Inherits TaskParent
-    Public fLessList As New List(Of Integer)
-    Public Sub New()
-        task.gOptions.HistBinBar.Value = task.gOptions.HistBinBar.Maximum
-        desc = "Measure the correlation of all grid squares except where there is motion."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        If src.Channels <> 1 Then src = task.grayOriginal.Clone
-
-        Static lastsrc As Mat = src.Clone
-        dst2 = src.Clone
-        Dim correlationMat As New Mat
-        Dim corrThreshold = 2.0 - 2.0 / task.histogramBins
-        Dim motionIndex As Integer
-        Dim motionList As New List(Of Integer)(task.motion.motionSort)
-        Dim maxIndex = task.motion.motionSort.Count - 1
-        If maxIndex < 0 Then motionList.Add(-1) ' add a dummy value to avoid errors when there is no motion
-        fLessList.Clear()
-        For i = 0 To task.gridRects.Count - 1
-            If i <> motionList(motionIndex) Then
-                Dim r = task.gridRects(i)
-                MatchTemplate(src(r), lastsrc(r), correlationMat, TemplateMatchModes.CCoeffNormed)
-                Dim corr = correlationMat.Get(Of Single)(0, 0) + 1
-                If corr < corrThreshold Then
-                Rectangle(dst2, r, white, task.lineWidth)
-                    fLessList.Add(i)
-                End If
-            Else
-                If motionIndex < maxIndex Then motionIndex += 1
-            End If
-        Next
-
-        If standalone Then
-            dst3 = src
-            For Each index In fLessList
-                If task.motion.motionSort.Contains(index) Then
-                Rectangle(dst3, task.gridRects(index), white, task.lineWidth)
-                End If
-            Next
-        End If
-        lastsrc = src.Clone
-    End Sub
-End Class
-
-
-
-
-Public Class Correlation_BasicsPlot : Inherits TaskParent
-    Public cList As New List(Of Single)
-    Public maxCorrelation As Single
-    Public mmRanges As New List(Of Double)
-    Dim plotHist As New PlotBar_Basics
-    Public Sub New()
-        plotHist.createHistogram = True
-        plotHist.shadeValues = False
-        plotHist.minRange = -1
-        plotHist.maxRange = 1
-        task.gOptions.HistBinBar.Value = task.gOptions.HistBinBar.Maximum
-        If standalone Then task.gOptions.displayDst1.Checked = True
-        labels(1) = "Click on a rectangle to see the correlation of the current to last image."
-        desc = "Measure the correlation of all grid squares."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        Static lastsrc As Mat = task.grayOriginal.Clone
-        If src.Channels <> 1 Then src = task.grayOriginal.Clone
-        dst2 = task.gray.Clone
-        Dim correlationMat As New Mat
-        cList.Clear()
-        dst3 = src
-        Dim mmList As New List(Of mmData)
-        mmRanges.Clear()
-        For i = 0 To task.gridRects.Count - 1
-            Dim r = task.gridRects(i)
-            MatchTemplate(task.gray(r), lastsrc(r), correlationMat, TemplateMatchModes.CCoeffNormed)
-
-            Dim corr = correlationMat.Get(Of Single)(0, 0) + 1
-            cList.Add(corr)
-            Dim mm = GetMinMax(task.gray(r))
-            mmList.Add(mm)
-            mmRanges.Add(mm.range)
-        Next
-
-        lastsrc = task.gray.Clone
-
-        If cList.Count > 0 Then
-            Dim inputAdjusted = Mat.FromPixelData(cList.Count, 1, MatType.CV_32F, cList.ToArray) - 1
-            plotHist.Run(inputAdjusted)
-            dst3 = plotHist.dst2
-
-            Dim lastEntry = plotHist.histArray.Last
-            labels(2) = "Correlation Min = " + (cList.Min - 1).ToString(fmt1) + ", Max = " + (cList.Max - 1).ToString(fmt1)
-            labels(3) = CStr(lastEntry) + " (" + (lastEntry / task.gridRects.Count).ToString("0%") +
-                                ") had correlation >= " + (maxCorrelation - 1).ToString(fmt2) + "  Plot below ranges from -1 to 1"
-
-            maxCorrelation = 2.0 - 2.0 / task.histogramBins
-            Dim mmRangeTest As New List(Of Double)
+            Static lastFrame As Mat = src.Clone
+            dst2.SetTo(0)
+            Dim correlationMat As New Mat
+            maxCorrelation = task.fOptions.MatchCorrSlider.Value / 100.0 + 1
+            fLessList.Clear()
+            Dim motionList As New List(Of Integer)(task.motion.motionSort)
+            If motionList.Count = 0 Then motionList.Add(0) ' dummy entry so loops below works.
+            Dim index As Integer
             For i = 0 To task.gridRects.Count - 1
                 Dim r = task.gridRects(i)
-                If cList(i) < maxCorrelation Then
-                Rectangle(dst2, r, white, task.lineWidth)
-                    mmRangeTest.Add(mmRanges(i))
+                If r <> task.gridRects(motionList(index)) Then
+                    MatchTemplate(src(r), lastFrame(r), correlationMat, TemplateMatchModes.CCoeffNormed)
+                    Dim correlation = correlationMat.Get(Of Single)(0, 0) + 1
+                    If correlation < maxCorrelation Then
+                        Rectangle(dst2, r, white, -1)
+                        fLessList.Add(r)
+                    End If
+                Else
+                    If index + 1 < motionList.Count Then index += 1
                 End If
             Next
 
-            Dim index = task.gridMap.Get(Of Integer)(task.clickPoint.Y, task.clickPoint.X)
-            Dim mm = mmList(index)
-            strOut = "Click on any grid rect to see its grayscale range." + vbCrLf +
+            lastFrame = src.Clone
+            labels(2) = CStr(fLessList.Count) + " rects < " + (maxCorrelation - 1).ToString(fmt2) +
+                                " correlation to last frame, indicating that they were featureless."
+            SetTrueText("Use Feature Options 'Match Correlation Threshold' to shrink/grow.", 3)
+        End Sub
+    End Class
+
+
+
+
+    Public Class Correlation_Validate : Inherits TaskParent
+        Public fLessList As New List(Of Integer)
+        Public Sub New()
+            task.gOptions.HistBinBar.Value = task.gOptions.HistBinBar.Maximum
+            desc = "Measure the correlation of all grid squares except where there is motion."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            If src.Channels <> 1 Then src = task.grayOriginal.Clone
+
+            Static lastsrc As Mat = src.Clone
+            dst2 = src.Clone
+            Dim correlationMat As New Mat
+            Dim corrThreshold = 2.0 - 2.0 / task.histogramBins
+            Dim motionIndex As Integer
+            Dim motionList As New List(Of Integer)(task.motion.motionSort)
+            Dim maxIndex = task.motion.motionSort.Count - 1
+            If maxIndex < 0 Then motionList.Add(-1) ' add a dummy value to avoid errors when there is no motion
+            fLessList.Clear()
+            For i = 0 To task.gridRects.Count - 1
+                If i <> motionList(motionIndex) Then
+                    Dim r = task.gridRects(i)
+                    MatchTemplate(src(r), lastsrc(r), correlationMat, TemplateMatchModes.CCoeffNormed)
+                    Dim corr = correlationMat.Get(Of Single)(0, 0) + 1
+                    If corr < corrThreshold Then
+                        Rectangle(dst2, r, white, task.lineWidth)
+                        fLessList.Add(i)
+                    End If
+                Else
+                    If motionIndex < maxIndex Then motionIndex += 1
+                End If
+            Next
+
+            If standalone Then
+                dst3 = src
+                For Each index In fLessList
+                    If task.motion.motionSort.Contains(index) Then
+                        Rectangle(dst3, task.gridRects(index), white, task.lineWidth)
+                    End If
+                Next
+            End If
+            lastsrc = src.Clone
+        End Sub
+    End Class
+
+
+
+
+    Public Class Correlation_BasicsPlot : Inherits TaskParent
+        Public cList As New List(Of Single)
+        Public maxCorrelation As Single
+        Public mmRanges As New List(Of Double)
+        Dim plotHist As New PlotBar_Basics
+        Public Sub New()
+            plotHist.createHistogram = True
+            plotHist.shadeValues = False
+            plotHist.minRange = -1
+            plotHist.maxRange = 1
+            task.gOptions.HistBinBar.Value = task.gOptions.HistBinBar.Maximum
+            If standalone Then task.gOptions.displayDst1.Checked = True
+            labels(1) = "Click on a rectangle to see the correlation of the current to last image."
+            desc = "Measure the correlation of all grid squares."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            Static lastsrc As Mat = task.grayOriginal.Clone
+            If src.Channels <> 1 Then src = task.grayOriginal.Clone
+            dst2 = task.gray.Clone
+            Dim correlationMat As New Mat
+            cList.Clear()
+            dst3 = src
+            Dim mmList As New List(Of mmData)
+            mmRanges.Clear()
+            For i = 0 To task.gridRects.Count - 1
+                Dim r = task.gridRects(i)
+                MatchTemplate(task.gray(r), lastsrc(r), correlationMat, TemplateMatchModes.CCoeffNormed)
+
+                Dim corr = correlationMat.Get(Of Single)(0, 0) + 1
+                cList.Add(corr)
+                Dim mm = GetMinMax(task.gray(r))
+                mmList.Add(mm)
+                mmRanges.Add(mm.range)
+            Next
+
+            lastsrc = task.gray.Clone
+
+            If cList.Count > 0 Then
+                Dim inputAdjusted = Mat.FromPixelData(cList.Count, 1, MatType.CV_32F, cList.ToArray) - 1
+                plotHist.Run(inputAdjusted)
+                dst3 = plotHist.dst2
+
+                Dim lastEntry = plotHist.histArray.Last
+                labels(2) = "Correlation Min = " + (cList.Min - 1).ToString(fmt1) + ", Max = " + (cList.Max - 1).ToString(fmt1)
+                labels(3) = CStr(lastEntry) + " (" + (lastEntry / task.gridRects.Count).ToString("0%") +
+                                ") had correlation >= " + (maxCorrelation - 1).ToString(fmt2) + "  Plot below ranges from -1 to 1"
+
+                maxCorrelation = 2.0 - 2.0 / task.histogramBins
+                Dim mmRangeTest As New List(Of Double)
+                For i = 0 To task.gridRects.Count - 1
+                    Dim r = task.gridRects(i)
+                    If cList(i) < maxCorrelation Then
+                        Rectangle(dst2, r, white, task.lineWidth)
+                        mmRangeTest.Add(mmRanges(i))
+                    End If
+                Next
+
+                Dim index = task.gridMap.Get(Of Integer)(task.clickPoint.Y, task.clickPoint.X)
+                Dim mm = mmList(index)
+                strOut = "Click on any grid rect to see its grayscale range." + vbCrLf +
                              "Min gray = " + mm.minVal.ToString(fmt0) + vbCrLf +
                              "Max Gray = " + mm.maxVal.ToString(fmt0) + vbCrLf +
                              "Range = " + mm.range.ToString(fmt0) + vbCrLf + vbCrLf +
@@ -157,10 +158,10 @@ Public Class Correlation_BasicsPlot : Inherits TaskParent
                              "Min Range = 0" + vbCrLf + "Max Range = 0",
                              "Min Range = " + mmRangeTest.Min.ToString(fmt1) + vbCrLf +
                              "Max Range = " + mmRangeTest.Max.ToString(fmt1))
-            SetTrueText(strOut, 1)
-        End If
-    End Sub
-End Class
+                SetTrueText(strOut, 1)
+            End If
+        End Sub
+    End Class
 
 
 
@@ -168,140 +169,141 @@ End Class
 
 
 
-Public Class XR_Correlation_Basics : Inherits TaskParent
-    Dim kFlood As New KMeans_Edges
-    Dim options As New Options_FeatureMatch
-    Public Sub New()
-        labels(3) = "Plot of z (vertical scale) to x with ranges shown on the plot."
-        desc = "Compute a correlation for src rows (See also: Match.vb"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        options.Run()
+    Public Class XR_Correlation_Basics : Inherits TaskParent
+        Dim kFlood As New KMeans_Edges
+        Dim options As New Options_FeatureMatch
+        Public Sub New()
+            labels(3) = "Plot of z (vertical scale) to x with ranges shown on the plot."
+            desc = "Compute a correlation for src rows (See also: Match.vb"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            options.Run()
 
-        kFlood.Run(src)
-        dst1 = kFlood.dst2
-        dst2 = kFlood.dst3
+            kFlood.Run(src)
+            dst1 = kFlood.dst2
+            dst2 = kFlood.dst3
 
-        Dim row = task.mouseMovePoint.Y
-        If row = 0 Then SetTrueText("Move mouse across image to see the relationship between X and Z" + vbCrLf +
+            Dim row = task.mouseMovePoint.Y
+            If row = 0 Then SetTrueText("Move mouse across image to see the relationship between X and Z" + vbCrLf +
                                             "A linear relationship is a useful correlation", New cv.Point(0, 10), 3)
 
-        Dim dataX As New Mat(New Size(src.Width, src.Height), MatType.CV_32F, Scalar.All(0))
-        Dim dataY As New Mat(New Size(src.Width, src.Height), MatType.CV_32F, Scalar.All(0))
-        Dim dataZ As New Mat(New Size(src.Width, src.Height), MatType.CV_32F, Scalar.All(0))
+            Dim dataX As New Mat(New Size(src.Width, src.Height), MatType.CV_32F, Scalar.All(0))
+            Dim dataY As New Mat(New Size(src.Width, src.Height), MatType.CV_32F, Scalar.All(0))
+            Dim dataZ As New Mat(New Size(src.Width, src.Height), MatType.CV_32F, Scalar.All(0))
 
-        Dim mask As New Mat
-        CvtColor(kFlood.dst3, mask, ColorConversionCodes.BGR2GRAY)
-        task.pcSplit(0).CopyTo(dataX, mask)
-        task.pcSplit(1).CopyTo(dataY, mask)
-        task.pcSplit(2).CopyTo(dataZ, mask)
+            Dim mask As New Mat
+            CvtColor(kFlood.dst3, mask, ColorConversionCodes.BGR2GRAY)
+            task.pcSplit(0).CopyTo(dataX, mask)
+            task.pcSplit(1).CopyTo(dataY, mask)
+            task.pcSplit(2).CopyTo(dataZ, mask)
 
-        Dim row1 = dataX.Row(row)
-        Dim row2 = dataZ.Row(row)
-        Line(dst2, New cv.Point(0, row), New cv.Point(dst2.Width, row), Scalar.Yellow, task.lineWidth + 1)
+            Dim row1 = dataX.Row(row)
+            Dim row2 = dataZ.Row(row)
+            Line(dst2, New cv.Point(0, row), New cv.Point(dst2.Width, row), Scalar.Yellow, task.lineWidth + 1)
 
-        Dim correlationmat As New Mat
-        MatchTemplate(row1, row2, correlationmat, options.matchOption)
-        Dim correlation = correlationmat.Get(Of Single)(0, 0)
-        labels(2) = "Correlation of X to Z = " + correlation.ToString(fmt2)
+            Dim correlationmat As New Mat
+            MatchTemplate(row1, row2, correlationmat, options.matchOption)
+            Dim correlation = correlationmat.Get(Of Single)(0, 0)
+            labels(2) = "Correlation of X to Z = " + correlation.ToString(fmt2)
 
-        dst3.SetTo(0)
-        Dim plotX As New List(Of Single)
-        Dim plotZ As New List(Of Single)
-        For i = 0 To row1.Cols - 1
-            Dim x = row1.Get(Of Single)(0, i)
-            Dim z = row2.Get(Of Single)(0, i)
-            If x <> 0 And z <> 0 Then
-                plotX.Add(x)
-                plotZ.Add(z)
-            End If
-        Next
-
-        If plotX.Count > 0 Then
-            Dim minx = plotX.Min, maxx = plotX.Max
-            Dim minZ = plotZ.Min, maxZ = plotZ.Max
-            For i = 0 To plotX.Count - 1
-                Dim x = dst3.Width * (plotX(i) - minx) / (maxx - minx)
-                Dim y = dst3.Height * (plotZ(i) - minZ) / (maxZ - minZ)
-                Circle(dst3, New cv.Point(x, y), task.DotSize, Scalar.Yellow, -1, task.lineType)
+            dst3.SetTo(0)
+            Dim plotX As New List(Of Single)
+            Dim plotZ As New List(Of Single)
+            For i = 0 To row1.Cols - 1
+                Dim x = row1.Get(Of Single)(0, i)
+                Dim z = row2.Get(Of Single)(0, i)
+                If x <> 0 And z <> 0 Then
+                    plotX.Add(x)
+                    plotZ.Add(z)
+                End If
             Next
-            SetTrueText("Z-min " + minZ.ToString(fmt2), New cv.Point(10, 5), 3)
-            SetTrueText("Z-max " + maxZ.ToString(fmt2) + vbCrLf + vbTab + "X-min " + minx.ToString(fmt2), New cv.Point(0, dst3.Height - 20), 3)
-            SetTrueText("X-max " + maxx.ToString(fmt2), New cv.Point(dst3.Width - 40, dst3.Height - 10), 3)
-        End If
-    End Sub
-End Class
 
-
-
-
-Public Class Correlation_Interactive : Inherits TaskParent
-    Dim plot As New PlotMouse_Correlation
-    Public Sub New()
-        desc = "Plot the range of correlations and display their source - duplicate of PlotOpenCV_Interactive"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        plot.Run(src)
-        dst2 = plot.dst2
-        dst3 = plot.dst3
-        labels(2) = plot.labels(2)
-        labels(3) = plot.labels(3)
-    End Sub
-End Class
-
-
-
-
-Public Class Correlation_MinMaxRange : Inherits TaskParent
-    Public fLessList As New List(of cv.Rect)
-    Public Sub New()
-        dst2 = New Mat(dst2.Size, MatType.CV_8U, 0)
-        labels = {"", "", "FeatureLess regions", "Not Featureless Regions."}
-        desc = "Use range to find featureless-ness rather than correlation."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        If src.Channels <> 1 Then src = task.grayOriginal.Clone
-
-        Static lastsrc As Mat = src.Clone
-        dst2.SetTo(0)
-        Dim correlationMat As New Mat
-        fLessList.Clear()
-        For Each r In task.gridRects
-            Dim mm = GetMinMax(src(r))
-            If mm.range < 30 Then
-            Rectangle(dst2, r, white, -1)
-                fLessList.Add(r)
+            If plotX.Count > 0 Then
+                Dim minx = plotX.Min, maxx = plotX.Max
+                Dim minZ = plotZ.Min, maxZ = plotZ.Max
+                For i = 0 To plotX.Count - 1
+                    Dim x = dst3.Width * (plotX(i) - minx) / (maxx - minx)
+                    Dim y = dst3.Height * (plotZ(i) - minZ) / (maxZ - minZ)
+                    Circle(dst3, New cv.Point(x, y), task.DotSize, Scalar.Yellow, -1, task.lineType)
+                Next
+                SetTrueText("Z-min " + minZ.ToString(fmt2), New cv.Point(10, 5), 3)
+                SetTrueText("Z-max " + maxZ.ToString(fmt2) + vbCrLf + vbTab + "X-min " + minx.ToString(fmt2), New cv.Point(0, dst3.Height - 20), 3)
+                SetTrueText("X-max " + maxx.ToString(fmt2), New cv.Point(dst3.Width - 40, dst3.Height - 10), 3)
             End If
-        Next
-
-        dst3 = Not dst2
-        lastsrc = src.Clone
-    End Sub
-End Class
+        End Sub
+    End Class
 
 
 
 
+    Public Class Correlation_Interactive : Inherits TaskParent
+        Dim plot As New PlotMouse_Correlation
+        Public Sub New()
+            desc = "Plot the range of correlations and display their source - duplicate of PlotOpenCV_Interactive"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            plot.Run(src)
+            dst2 = plot.dst2
+            dst3 = plot.dst3
+            labels(2) = plot.labels(2)
+            labels(3) = plot.labels(3)
+        End Sub
+    End Class
 
-Public Class Correlation_LinesSimple : Inherits TaskParent
-    Dim correlation As Single = 0
-    Public Sub New()
-        desc = "Test the correlation of the current line image to the previous."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        SetTrueText("Correlation = " + correlation.ToString(fmt2), 3)
-        If task.heartBeatLT = False Then Exit Sub
 
-        Static lastImage As Mat = task.lines.dst3.Clone
 
-        dst2 = task.lines.dst3.Clone
 
-        Dim correlationMat As New Mat
-        MatchTemplate(task.lines.dst3, lastImage, correlationMat, TemplateMatchModes.CCoeffNormed)
+    Public Class Correlation_MinMaxRange : Inherits TaskParent
+        Public fLessList As New List(Of cv.Rect)
+        Public Sub New()
+            dst2 = New Mat(dst2.Size, MatType.CV_8U, 0)
+            labels = {"", "", "FeatureLess regions", "Not Featureless Regions."}
+            desc = "Use range to find featureless-ness rather than correlation."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            If src.Channels <> 1 Then src = task.grayOriginal.Clone
 
-        correlation = correlationMat.Get(Of Single)(0, 0)
+            Static lastsrc As Mat = src.Clone
+            dst2.SetTo(0)
+            Dim correlationMat As New Mat
+            fLessList.Clear()
+            For Each r In task.gridRects
+                Dim mm = GetMinMax(src(r))
+                If mm.range < 30 Then
+                    Rectangle(dst2, r, white, -1)
+                    fLessList.Add(r)
+                End If
+            Next
 
-        dst2.SetTo(128, lastImage)
-        lastImage = task.lines.dst3.Clone
-    End Sub
-End Class
+            dst3 = Not dst2
+            lastsrc = src.Clone
+        End Sub
+    End Class
+
+
+
+
+
+    Public Class Correlation_LinesSimple : Inherits TaskParent
+        Dim correlation As Single = 0
+        Public Sub New()
+            desc = "Test the correlation of the current line image to the previous."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            SetTrueText("Correlation = " + correlation.ToString(fmt2), 3)
+            If task.heartBeatLT = False Then Exit Sub
+
+            Static lastImage As Mat = task.lines.dst3.Clone
+
+            dst2 = task.lines.dst3.Clone
+
+            Dim correlationMat As New Mat
+            MatchTemplate(task.lines.dst3, lastImage, correlationMat, TemplateMatchModes.CCoeffNormed)
+
+            correlation = correlationMat.Get(Of Single)(0, 0)
+
+            dst2.SetTo(128, lastImage)
+            lastImage = task.lines.dst3.Clone
+        End Sub
+    End Class
+End Namespace

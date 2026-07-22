@@ -1,353 +1,354 @@
-Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
-Public Class Draw_Noise : Inherits TaskParent
-    Public addRandomColor As Boolean
-    Public noiseMask As Mat
-    Public options As New Options_DrawNoise
-    Public Sub New()
-        desc = "Add Noise to the color image"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        options.Run()
+Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCvSharp
+Namespace VBClasses
+    Public Class Draw_Noise : Inherits TaskParent
+        Public addRandomColor As Boolean
+        Public noiseMask As Mat
+        Public options As New Options_DrawNoise
+        Public Sub New()
+            desc = "Add Noise to the color image"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            options.Run()
 
-        src.CopyTo(dst2)
-        noiseMask = New Mat(src.Size(), MatType.CV_8UC1).SetTo(0)
-        For n = 0 To options.noiseCount - 1
-            Dim i = msRNG.Next(0, src.Cols - 1)
-            Dim j = msRNG.Next(0, src.Rows - 1)
-            Dim center = New Point2f(i, j)
-            Dim c = New Scalar(msRNG.Next(0, 255), msRNG.Next(0, 255), msRNG.Next(0, 255))
-            If addRandomColor = False Then c = Scalar.Black
-            Dim noiseWidth = msRNG.Next(1, options.noiseWidth)
-            Circle(dst2, center, noiseWidth, c, -1, task.lineType)
-            Circle(noiseMask, center, noiseWidth, white, -1, task.lineType)
-        Next
-    End Sub
-End Class
-
-
-
+            src.CopyTo(dst2)
+            noiseMask = New Mat(src.Size(), MatType.CV_8UC1).SetTo(0)
+            For n = 0 To options.noiseCount - 1
+                Dim i = msRNG.Next(0, src.Cols - 1)
+                Dim j = msRNG.Next(0, src.Rows - 1)
+                Dim center = New Point2f(i, j)
+                Dim c = New Scalar(msRNG.Next(0, 255), msRNG.Next(0, 255), msRNG.Next(0, 255))
+                If addRandomColor = False Then c = Scalar.Black
+                Dim noiseWidth = msRNG.Next(1, options.noiseWidth)
+                Circle(dst2, center, noiseWidth, c, -1, task.lineType)
+                Circle(noiseMask, center, noiseWidth, white, -1, task.lineType)
+            Next
+        End Sub
+    End Class
 
 
 
 
-Public Class Draw_Ellipses : Inherits TaskParent
-    Dim options As New Options_Draw
-    Public Sub New()
-        desc = "Draw the requested number of ellipses."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        options.Run()
-        If task.heartBeat Then
-            dst2.SetTo(Scalar.Black)
+
+
+
+    Public Class Draw_Ellipses : Inherits TaskParent
+        Dim options As New Options_Draw
+        Public Sub New()
+            desc = "Draw the requested number of ellipses."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            options.Run()
+            If task.heartBeat Then
+                dst2.SetTo(Scalar.Black)
+                For i = 0 To options.drawCount - 1
+                    Dim nPoint = New Point2f(msRNG.Next(src.Cols / 4, src.Cols * 3 / 4), msRNG.Next(src.Rows / 4, src.Rows * 3 / 4))
+                    Dim eSize = New Size2f(CSng(msRNG.Next(0, src.Cols - nPoint.X - 1)), CSng(msRNG.Next(0, src.Rows - nPoint.Y - 1)))
+                    Dim angle = 180.0F * CSng(msRNG.Next(0, 1000) / 1000.0F)
+                    Dim nextColor = New Scalar(task.vecColors(i)(0), task.vecColors(i)(1), task.vecColors(i)(2))
+                    Ellipse(dst2, New RotatedRect(nPoint, eSize, angle), nextColor, options.drawFilled)
+                Next
+            End If
+        End Sub
+    End Class
+
+
+
+
+
+    Public Class Draw_Circles : Inherits TaskParent
+        Dim options As New Options_Draw
+        Public Sub New()
+            desc = "Draw the requested number of circles."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            options.Run()
+            If task.heartBeat Then
+                dst2.SetTo(Scalar.Black)
+                For i = 0 To options.drawCount - 1
+                    Dim nPoint = New Point2f(msRNG.Next(src.Cols / 4, src.Cols * 3 / 4), msRNG.Next(src.Rows / 4, src.Rows * 3 / 4))
+                    Dim radius = msRNG.Next(10, 10 + msRNG.Next(src.Cols / 4))
+                    Dim nextColor = New Scalar(task.vecColors(i)(0), task.vecColors(i)(1), task.vecColors(i)(2))
+                    Circle(dst2, nPoint, radius, nextColor, options.drawFilled, task.lineType)
+                Next
+            End If
+        End Sub
+    End Class
+
+
+
+
+
+
+
+
+    Public Class Draw_Lines : Inherits TaskParent
+        Dim options As New Options_Draw
+        Public Sub New()
+            desc = "Draw the requested number of Lines."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            options.Run()
+            If task.heartBeat Then
+                dst2.SetTo(Scalar.Black)
+                For i = 0 To options.drawCount - 1
+                    Dim nPoint1 = New Point2f(msRNG.Next(src.Cols / 4, src.Cols * 3 / 4), msRNG.Next(src.Rows / 4, src.Rows * 3 / 4))
+                    Dim nPoint2 = New Point2f(msRNG.Next(src.Cols / 4, src.Cols * 3 / 4), msRNG.Next(src.Rows / 4, src.Rows * 3 / 4))
+                    Dim nextColor = New Scalar(task.vecColors(i)(0), task.vecColors(i)(1), task.vecColors(i)(2))
+                    Line(dst2, nPoint1, nPoint2, nextColor, options.drawFilled, task.lineType)
+                Next
+            End If
+        End Sub
+    End Class
+
+
+
+
+
+
+
+    Public Class Draw_Polygon : Inherits TaskParent
+        Dim options As New Options_Draw
+        Public Sub New()
+            desc = "Draw Polygon figures"
+            labels = {"", "", "Convex Hull for the same points", "Polylines output"}
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            options.Run()
+
+            If Not task.heartBeat Then Exit Sub
+            Dim height = src.Height / 8
+            Dim width = src.Width / 8
+            Dim polyColor = New Scalar(msRNG.Next(0, 255), msRNG.Next(0, 255), msRNG.Next(0, 255))
+            dst3.SetTo(Scalar.Black)
             For i = 0 To options.drawCount - 1
-                Dim nPoint = New Point2f(msRNG.Next(src.Cols / 4, src.Cols * 3 / 4), msRNG.Next(src.Rows / 4, src.Rows * 3 / 4))
-                Dim eSize = New Size2f(CSng(msRNG.Next(0, src.Cols - nPoint.X - 1)), CSng(msRNG.Next(0, src.Rows - nPoint.Y - 1)))
-                Dim angle = 180.0F * CSng(msRNG.Next(0, 1000) / 1000.0F)
-                Dim nextColor = New Scalar(task.vecColors(i)(0), task.vecColors(i)(1), task.vecColors(i)(2))
-                Ellipse(dst2, New RotatedRect(nPoint, eSize, angle), nextColor, options.drawFilled)
+                Dim points = New List(Of cv.Point)
+                Dim listOfPoints = New List(Of List(Of cv.Point))
+                For j = 0 To 10
+                    points.Add(New cv.Point(CInt(msRNG.Next(width, width * 7)), CInt(msRNG.Next(height, height * 7))))
+                Next
+                listOfPoints.Add(points)
+                If options.drawFilled <> -1 Then
+                    Polylines(dst3, listOfPoints, True, polyColor, task.lineWidth + 1, task.lineType)
+                Else
+                    FillPoly(dst3, listOfPoints, New Scalar(0, 0, 255))
+                End If
+
+                Dim hull() As cv.Point
+                hull = ConvexHull(points, True)
+                listOfPoints = New List(Of List(Of cv.Point))
+                points = New List(Of cv.Point)
+                For j = 0 To hull.Count - 1
+                    points.Add(New cv.Point(hull(j).X, hull(j).Y))
+                Next
+                listOfPoints.Add(points)
+                dst2.SetTo(Scalar.Black)
+                DrawContours(dst2, listOfPoints, 0, polyColor, options.drawFilled)
             Next
-        End If
-    End Sub
-End Class
+        End Sub
+    End Class
 
 
 
 
 
-Public Class Draw_Circles : Inherits TaskParent
-    Dim options As New Options_Draw
-    Public Sub New()
-        desc = "Draw the requested number of circles."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        options.Run()
-        If task.heartBeat Then
-            dst2.SetTo(Scalar.Black)
-            For i = 0 To options.drawCount - 1
-                Dim nPoint = New Point2f(msRNG.Next(src.Cols / 4, src.Cols * 3 / 4), msRNG.Next(src.Rows / 4, src.Rows * 3 / 4))
-                Dim radius = msRNG.Next(10, 10 + msRNG.Next(src.Cols / 4))
-                Dim nextColor = New Scalar(task.vecColors(i)(0), task.vecColors(i)(1), task.vecColors(i)(2))
-                Circle(dst2, nPoint, radius, nextColor, options.drawFilled, task.lineType)
+    ' https://github.com/opencv/opencv/blob/master/samples/cpp/falsecolor.cpp
+    Public Class Draw_Shapes : Inherits TaskParent
+        Public Sub New()
+            desc = "Use RNG to draw the same set of shapes every time"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            Dim offsetX = 25, offsetY = 25, lineLength = 25, thickness = 2
+
+            dst2.SetTo(0)
+            For i = 1 To 256
+                Dim p1 = New cv.Point(thickness * i + offsetX, offsetY)
+                Dim p2 = New cv.Point(thickness * i + offsetX, offsetY + lineLength)
+                Line(dst2, p1, p2, New Scalar(i, i, i), thickness)
             Next
-        End If
-    End Sub
-End Class
-
-
-
-
-
-
-
-
-Public Class Draw_Lines : Inherits TaskParent
-    Dim options As New Options_Draw
-    Public Sub New()
-        desc = "Draw the requested number of Lines."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        options.Run()
-        If task.heartBeat Then
-            dst2.SetTo(Scalar.Black)
-            For i = 0 To options.drawCount - 1
-                Dim nPoint1 = New Point2f(msRNG.Next(src.Cols / 4, src.Cols * 3 / 4), msRNG.Next(src.Rows / 4, src.Rows * 3 / 4))
-                Dim nPoint2 = New Point2f(msRNG.Next(src.Cols / 4, src.Cols * 3 / 4), msRNG.Next(src.Rows / 4, src.Rows * 3 / 4))
-                Dim nextColor = New Scalar(task.vecColors(i)(0), task.vecColors(i)(1), task.vecColors(i)(2))
-                Line(dst2, nPoint1, nPoint2, nextColor, options.drawFilled, task.lineType)
+            For i = 1 To 256
+                Dim color = New Scalar(msRNG.Next(0, 255), msRNG.Next(0, 255), msRNG.Next(0, 255))
+                Select Case msRNG.Next(0, 3)
+                    Case 0 ' circle
+                        Dim center = New cv.Point(msRNG.Next(offsetX, dst2.Cols - offsetX), msRNG.Next(offsetY + lineLength, dst2.Rows - offsetY))
+                        Dim radius = msRNG.Next(1, Math.Min(offsetX, offsetY))
+                        Circle(dst2, center, radius, color, -1, task.lineType)
+                    Case 1 ' Rectangle
+                        Dim center = New cv.Point(msRNG.Next(offsetX, dst2.Cols - offsetX), msRNG.Next(offsetY + lineLength, dst2.Rows - offsetY))
+                        Dim width = msRNG.Next(1, Math.Min(offsetX, offsetY))
+                        Dim height = msRNG.Next(1, Math.Min(offsetX, offsetY))
+                        Dim rcenter As cv.Rect = New cv.Rect(center.X - width, center.Y - height / 2, width, height)
+                        Rectangle(dst2, rcenter, color, -1, LineTypes.Link8)
+                    Case 2 ' Ellipse
+                        Dim center = New cv.Point(msRNG.Next(offsetX, dst2.Cols - offsetX), msRNG.Next(offsetY + lineLength, dst2.Rows - offsetY))
+                        Dim width = msRNG.Next(1, Math.Min(offsetX, offsetY))
+                        Dim height = msRNG.Next(1, Math.Min(offsetX, offsetY))
+                        Dim angle = msRNG.Next(0, 180)
+                        Ellipse(dst2, center, New Size(width / 2, height / 2), angle, 0, 360, color, -1, LineTypes.Link8)
+                End Select
             Next
-        End If
-    End Sub
-End Class
+        End Sub
+    End Class
+
+
+
+
+
+    Public Class Draw_SymmetricalShapes : Inherits TaskParent
+        Dim options As New Options_SymmetricalShapes
+        Public Sub New()
+            desc = "Generate shapes programmatically"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            options.Run()
+            If task.heartBeat Then
+                dst2.SetTo(Scalar.Black)
+                Dim pt As New cv.Point
+                Dim center As New cv.Point(src.Width / 2, src.Height / 2)
+                Dim points As New List(Of cv.Point)
+
+                For i = 0 To options.numPoints - 1
+                    Dim theta = i * options.dTheta
+                    Dim ripple = options.radius2 * Math.Cos(options.nGenPer * theta)
+                    If options.symmetricRipple = False Then ripple = Math.Abs(ripple)
+                    If options.reverseInOut Then ripple = -ripple
+                    pt.X = Math.Truncate(center.X + (options.radius1 + ripple) * Math.Cos(theta + options.rotateAngle) + 0.5)
+                    pt.Y = Math.Truncate(center.Y - (options.radius1 + ripple) * Math.Sin(theta + options.rotateAngle) + 0.5)
+                    points.Add(pt)
+                Next
+
+                For i = 0 To options.numPoints - 1
+                    Dim p1 = points(i)
+                    Dim p2 = points((i + 1) Mod options.numPoints)
+                    Line(dst2, p1, p2, task.scalarColors(i Mod task.scalarColors.Count), task.lineWidth + 1, task.lineType)
+                Next
+
+                If options.fillRequest Then FloodFill(dst2, center, options.fillColor)
+            End If
+        End Sub
+    End Class
 
 
 
 
 
 
+    Public Class Draw_Arc : Inherits TaskParent
+        Dim rect As cv.Rect
 
-Public Class Draw_Polygon : Inherits TaskParent
-    Dim options As New Options_Draw
-    Public Sub New()
-        desc = "Draw Polygon figures"
-        labels = {"", "", "Convex Hull for the same points", "Polylines output"}
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        options.Run()
+        Dim angle As Single
+        Dim startAngle As Single
+        Dim endAngle As Single
 
-        If Not task.heartBeat Then Exit Sub
-        Dim height = src.Height / 8
-        Dim width = src.Width / 8
-        Dim polyColor = New Scalar(msRNG.Next(0, 255), msRNG.Next(0, 255), msRNG.Next(0, 255))
-        dst3.SetTo(Scalar.Black)
-        For i = 0 To options.drawCount - 1
-            Dim points = New List(Of cv.Point)
-            Dim listOfPoints = New List(Of List(Of cv.Point))
-            For j = 0 To 10
-                points.Add(New cv.Point(CInt(msRNG.Next(width, width * 7)), CInt(msRNG.Next(height, height * 7))))
+        Dim colorIndex As Integer
+        Dim thickness As Integer
+        Dim options As New Options_DrawArc
+        Dim kalman As New Kalman_Basics
+        Public Sub New()
+            desc = "Use OpenCV's ellipse function to draw an arc"
+        End Sub
+        Public Shared Sub DrawRotatedOutline(rotatedRect As RotatedRect, dst2 As Mat, color As Scalar)
+            Dim pts = rotatedRect.Points()
+            Dim lastPt = pts(0)
+            For i = 1 To pts.Length
+                Dim index = i Mod pts.Length
+                Dim pt = New cv.Point(CInt(pts(index).X), CInt(pts(index).Y))
+                Line(dst2, pt, lastPt, task.highlight, task.lineWidth, task.lineType)
+                lastPt = pt
             Next
-            listOfPoints.Add(points)
-            If options.drawFilled <> -1 Then
-                Polylines(dst3, listOfPoints, True, polyColor, task.lineWidth + 1, task.lineType)
-            Else
-            FillPoly(dst3, listOfPoints, New Scalar(0, 0, 255))
+        End Sub
+        Public Shared Function InitRandomRect(margin As Integer) As cv.Rect
+            Return New cv.Rect(msRNG.Next(margin, task.workRes.Width - 2 * margin), msRNG.Next(margin, task.workRes.Height - 2 * margin),
+                                   msRNG.Next(margin, task.workRes.Width - 2 * margin), msRNG.Next(margin, task.workRes.Height - 2 * margin))
+        End Function
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            options.Run()
+            If task.heartBeat Then
+                rect = InitRandomRect(options.saveMargin)
+                angle = msRNG.Next(0, 360)
+                colorIndex = msRNG.Next(0, 255)
+                thickness = msRNG.Next(1, 5)
+                startAngle = msRNG.Next(1, 360)
+                endAngle = msRNG.Next(1, 360)
+
+                kalman.kInput = {rect.X, rect.Y, rect.Width, rect.Height, angle, startAngle, endAngle}
             End If
 
-            Dim hull() As cv.Point
-            hull = ConvexHull(points, True)
-            listOfPoints = New List(Of List(Of cv.Point))
-            points = New List(Of cv.Point)
-            For j = 0 To hull.Count - 1
-                points.Add(New cv.Point(hull(j).X, hull(j).Y))
-            Next
-            listOfPoints.Add(points)
-            dst2.SetTo(Scalar.Black)
-            DrawContours(dst2, listOfPoints, 0, polyColor, options.drawFilled)
-        Next
-    End Sub
-End Class
-
-
-
-
-
-' https://github.com/opencv/opencv/blob/master/samples/cpp/falsecolor.cpp
-Public Class Draw_Shapes : Inherits TaskParent
-    Public Sub New()
-        desc = "Use RNG to draw the same set of shapes every time"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        Dim offsetX = 25, offsetY = 25, lineLength = 25, thickness = 2
-
-        dst2.SetTo(0)
-        For i = 1 To 256
-            Dim p1 = New cv.Point(thickness * i + offsetX, offsetY)
-            Dim p2 = New cv.Point(thickness * i + offsetX, offsetY + lineLength)
-            Line(dst2, p1, p2, New Scalar(i, i, i), thickness)
-        Next
-        For i = 1 To 256
-            Dim color = New Scalar(msRNG.Next(0, 255), msRNG.Next(0, 255), msRNG.Next(0, 255))
-            Select Case msRNG.Next(0, 3)
-                Case 0 ' circle
-                    Dim center = New cv.Point(msRNG.Next(offsetX, dst2.Cols - offsetX), msRNG.Next(offsetY + lineLength, dst2.Rows - offsetY))
-                    Dim radius = msRNG.Next(1, Math.Min(offsetX, offsetY))
-                    Circle(dst2, center, radius, color, -1, task.lineType)
-                Case 1 ' Rectangle
-                    Dim center = New cv.Point(msRNG.Next(offsetX, dst2.Cols - offsetX), msRNG.Next(offsetY + lineLength, dst2.Rows - offsetY))
-                    Dim width = msRNG.Next(1, Math.Min(offsetX, offsetY))
-                    Dim height = msRNG.Next(1, Math.Min(offsetX, offsetY))
-                    Dim rcenter as cv.Rect = New cv.Rect(center.X - width, center.Y - height / 2, width, height)
-                    Rectangle(dst2, rcenter, color, -1, LineTypes.Link8)
-                Case 2 ' Ellipse
-                    Dim center = New cv.Point(msRNG.Next(offsetX, dst2.Cols - offsetX), msRNG.Next(offsetY + lineLength, dst2.Rows - offsetY))
-                    Dim width = msRNG.Next(1, Math.Min(offsetX, offsetY))
-                    Dim height = msRNG.Next(1, Math.Min(offsetX, offsetY))
-                    Dim angle = msRNG.Next(0, 180)
-                    Ellipse(dst2, center, New Size(width / 2, height / 2), angle, 0, 360, color, -1, LineTypes.Link8)
-            End Select
-        Next
-    End Sub
-End Class
-
-
-
-
-
-Public Class Draw_SymmetricalShapes : Inherits TaskParent
-    Dim options As New Options_SymmetricalShapes
-    Public Sub New()
-        desc = "Generate shapes programmatically"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        options.Run()
-        If task.heartBeat Then
-            dst2.SetTo(Scalar.Black)
-            Dim pt As New cv.Point
-            Dim center As New cv.Point(src.Width / 2, src.Height / 2)
-            Dim points As New List(Of cv.Point)
-
-            For i = 0 To options.numPoints - 1
-                Dim theta = i * options.dTheta
-                Dim ripple = options.radius2 * Math.Cos(options.nGenPer * theta)
-                If options.symmetricRipple = False Then ripple = Math.Abs(ripple)
-                If options.reverseInOut Then ripple = -ripple
-                pt.X = Math.Truncate(center.X + (options.radius1 + ripple) * Math.Cos(theta + options.rotateAngle) + 0.5)
-                pt.Y = Math.Truncate(center.Y - (options.radius1 + ripple) * Math.Sin(theta + options.rotateAngle) + 0.5)
-                points.Add(pt)
-            Next
-
-            For i = 0 To options.numPoints - 1
-                Dim p1 = points.ElementAt(i)
-                Dim p2 = points.ElementAt((i + 1) Mod options.numPoints)
-                Line(dst2, p1, p2, task.scalarColors(i Mod task.scalarColors.Count), task.lineWidth + 1, task.lineType)
-            Next
-
-            If options.fillRequest Then FloodFill(dst2, center, options.fillColor)
-        End If
-    End Sub
-End Class
-
-
-
-
-
-
-Public Class Draw_Arc : Inherits TaskParent
-    Dim rect as cv.Rect
-
-    Dim angle As Single
-    Dim startAngle As Single
-    Dim endAngle As Single
-
-    Dim colorIndex As Integer
-    Dim thickness As Integer
-    Dim options As New Options_DrawArc
-    Dim kalman As New Kalman_Basics
-    Public Sub New()
-        desc = "Use OpenCV's ellipse function to draw an arc"
-    End Sub
-    Public Shared Sub DrawRotatedOutline(rotatedRect As RotatedRect, dst2 As Mat, color As Scalar)
-        Dim pts = rotatedRect.Points()
-        Dim lastPt = pts(0)
-        For i = 1 To pts.Length
-            Dim index = i Mod pts.Length
-            Dim pt = New cv.Point(CInt(pts(index).X), CInt(pts(index).Y))
-            Line(dst2, pt, lastPt, task.highlight, task.lineWidth, task.lineType)
-            lastPt = pt
-        Next
-    End Sub
-    Public Shared Function InitRandomRect(margin As Integer) as cv.Rect
-        Return New cv.Rect(msRNG.Next(margin, task.workRes.Width - 2 * margin), msRNG.Next(margin, task.workRes.Height - 2 * margin),
-                                   msRNG.Next(margin, task.workRes.Width - 2 * margin), msRNG.Next(margin, task.workRes.Height - 2 * margin))
-    End Function
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        options.Run()
-        If task.heartBeat Then
-            rect = InitRandomRect(options.saveMargin)
-            angle = msRNG.Next(0, 360)
-            colorIndex = msRNG.Next(0, 255)
-            thickness = msRNG.Next(1, 5)
-            startAngle = msRNG.Next(1, 360)
-            endAngle = msRNG.Next(1, 360)
-
             kalman.kInput = {rect.X, rect.Y, rect.Width, rect.Height, angle, startAngle, endAngle}
-        End If
+            kalman.Run(emptyMat)
+            Dim r = New cv.Rect(kalman.kOutput(0), kalman.kOutput(1), kalman.kOutput(2), kalman.kOutput(3))
+            If r.Width <= 5 Then r.Width = 5
+            If r.Height <= 5 Then r.Height = 5
+            Dim rr = New RotatedRect(New Point2f(r.X, r.Y), New Size2f(r.Width, r.Height), angle)
+            Dim color = task.scalarColors(colorIndex)
 
-        kalman.kInput = {rect.X, rect.Y, rect.Width, rect.Height, angle, startAngle, endAngle}
-        kalman.Run(emptyMat)
-        Dim r = New cv.Rect(kalman.kOutput(0), kalman.kOutput(1), kalman.kOutput(2), kalman.kOutput(3))
-        If r.Width <= 5 Then r.Width = 5
-        If r.Height <= 5 Then r.Height = 5
-        Dim rr = New RotatedRect(New Point2f(r.X, r.Y), New Size2f(r.Width, r.Height), angle)
-        Dim color = task.scalarColors(colorIndex)
-
-        dst2.SetTo(white)
-        If options.drawFull Then
-            Ellipse(dst2, rr, color, thickness, task.lineType)
-            Draw_Arc.DrawRotatedOutline(rr, dst2, task.scalarColors(colorIndex))
-        Else
-            Dim angle = kalman.kOutput(4)
-            Dim startAngle = kalman.kOutput(5)
-            Dim endAngle = kalman.kOutput(6)
-            If options.drawFill Then thickness = -1
-            Dim r1 = rr.BoundingRect
-            Ellipse(dst2, New cv.Point(rr.Center.X, rr.Center.Y), New Size(r1.Width, r1.Height),
+            dst2.SetTo(white)
+            If options.drawFull Then
+                Ellipse(dst2, rr, color, thickness, task.lineType)
+                Draw_Arc.DrawRotatedOutline(rr, dst2, task.scalarColors(colorIndex))
+            Else
+                Dim angle = kalman.kOutput(4)
+                Dim startAngle = kalman.kOutput(5)
+                Dim endAngle = kalman.kOutput(6)
+                If options.drawFill Then thickness = -1
+                Dim r1 = rr.BoundingRect
+                Ellipse(dst2, New cv.Point(rr.Center.X, rr.Center.Y), New Size(r1.Width, r1.Height),
                              angle, startAngle, endAngle, color, thickness, task.lineType)
-        End If
-    End Sub
-End Class
+            End If
+        End Sub
+    End Class
 
 
 
 
 
 
-Public Class XR_Draw_ClipLine : Inherits TaskParent
-    Dim flow As New Font_FlowText
-    Dim pt1 As cv.Point
-    Dim pt2 As cv.Point
-    Dim rect as cv.Rect
-    Dim linenum As Integer = 0
-    Dim hitCount As Integer = 0
-    Dim kalman As New Kalman_Basics
-    Private Sub setup()
-        ReDim kalman.kInput(8)
-        Dim r = Draw_Arc.InitRandomRect(25)
-        pt1 = New cv.Point(r.X, r.Y)
-        pt2 = New cv.Point(r.X + r.Width, r.Y + r.Height)
-        rect = Draw_Arc.InitRandomRect(25)
-        flow.flowText.Add("--------------------------- setup ---------------------------")
-    End Sub
-    Public Sub New()
-        flow.parentData = Me
-        setup()
-        desc = "Demonstrate the use of the ClipLine function in Opencvb. " +
+    Public Class XR_Draw_ClipLine : Inherits TaskParent
+        Dim flow As New Font_FlowText
+        Dim pt1 As cv.Point
+        Dim pt2 As cv.Point
+        Dim rect As cv.Rect
+        Dim linenum As Integer = 0
+        Dim hitCount As Integer = 0
+        Dim kalman As New Kalman_Basics
+        Private Sub setup()
+            ReDim kalman.kInput(8)
+            Dim r = Draw_Arc.InitRandomRect(25)
+            pt1 = New cv.Point(r.X, r.Y)
+            pt2 = New cv.Point(r.X + r.Width, r.Y + r.Height)
+            rect = Draw_Arc.InitRandomRect(25)
+            flow.flowText.Add("--------------------------- setup ---------------------------")
+        End Sub
+        Public Sub New()
+            flow.parentData = Me
+            setup()
+            desc = "Demonstrate the use of the ClipLine function in Opencvb. " +
                    "NOTE: when clipline returns true, p1/p2 are clipped by the rectangle"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        dst3 = src
-        kalman.kInput = {pt1.X, pt1.Y, pt2.X, pt2.Y, rect.X, rect.Y, rect.Width, rect.Height}
-        kalman.Run(emptyMat)
-        Dim p1 = New cv.Point(CInt(kalman.kOutput(0)), CInt(kalman.kOutput(1)))
-        Dim p2 = New cv.Point(CInt(kalman.kOutput(2)), CInt(kalman.kOutput(3)))
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            dst3 = src
+            kalman.kInput = {pt1.X, pt1.Y, pt2.X, pt2.Y, rect.X, rect.Y, rect.Width, rect.Height}
+            kalman.Run(emptyMat)
+            Dim p1 = New cv.Point(CInt(kalman.kOutput(0)), CInt(kalman.kOutput(1)))
+            Dim p2 = New cv.Point(CInt(kalman.kOutput(2)), CInt(kalman.kOutput(3)))
 
-        If kalman.kOutput(6) < 5 Then kalman.kOutput(6) = 5 ' don't let the width/height get too small...
-        If kalman.kOutput(7) < 5 Then kalman.kOutput(7) = 5
-        Dim r = New cv.Rect(kalman.kOutput(4), kalman.kOutput(5), kalman.kOutput(6), kalman.kOutput(7))
+            If kalman.kOutput(6) < 5 Then kalman.kOutput(6) = 5 ' don't let the width/height get too small...
+            If kalman.kOutput(7) < 5 Then kalman.kOutput(7) = 5
+            Dim r = New cv.Rect(kalman.kOutput(4), kalman.kOutput(5), kalman.kOutput(6), kalman.kOutput(7))
 
-        Dim clipped = ClipLine(r, p1, p2) ' Returns false when the line and the rectangle don't intersect.
-        Line(dst3, p1, p2, If(clipped, white, Scalar.Black), task.lineWidth + 1, task.lineType)
-        Rectangle(dst3, r, If(clipped, Scalar.Yellow, Scalar.Red), task.lineWidth + 1, task.lineType)
+            Dim clipped = ClipLine(r, p1, p2) ' Returns false when the line and the rectangle don't intersect.
+            Line(dst3, p1, p2, If(clipped, white, Scalar.Black), task.lineWidth + 1, task.lineType)
+            Rectangle(dst3, r, If(clipped, Scalar.Yellow, Scalar.Red), task.lineWidth + 1, task.lineType)
 
-        flow.nextMsg = "(" + CStr(linenum) + ") line " + If(clipped, "interects rectangle", "does not intersect rectangle")
-        linenum += 1
+            flow.nextMsg = "(" + CStr(linenum) + ") line " + If(clipped, "interects rectangle", "does not intersect rectangle")
+            linenum += 1
 
-        hitCount += If(clipped, 1, 0)
-        SetTrueText("There were " + hitCount.ToString("N2") + " intersects and " + (linenum - hitCount).ToString() + " misses",
+            hitCount += If(clipped, 1, 0)
+            SetTrueText("There were " + hitCount.ToString("N2") + " intersects and " + (linenum - hitCount).ToString() + " misses",
                          New cv.Point(src.Width / 2, 200))
-        If r = rect Then setup()
-        flow.Run(src)
-    End Sub
-End Class
+            If r = rect Then setup()
+            flow.Run(src)
+        End Sub
+    End Class
 
 
 
@@ -356,29 +357,29 @@ End Class
 
 
 
-Public Class Draw_Line : Inherits TaskParent
-    Public p1 As cv.Point, p2 As cv.Point
-    Public externalUse As Boolean
-    Public Sub New()
-        desc = "Draw a line between the selected p1 and p2 - either by clicking twice in the image or externally providing p1 and p2."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        If p1 <> newPoint And p2 <> New cv.Point And task.clickPoint <> newPoint Then
-            p1 = newPoint
-            p2 = newPoint
-        End If
-        dst2 = src
-        If task.clickPoint <> New cv.Point Or externalUse Then
-            If p1 = New cv.Point Then p1 = task.clickPoint Else p2 = task.clickPoint
-        End If
-        If p1 <> newPoint And p2 = newPoint Then Circle(dst2, p1, task.DotSize, task.highlight, -1, task.lineType)
-        If p1 <> newPoint And p2 <> newPoint Then
-            Line(dst2, p1, p2, task.highlight, task.lineWidth, task.lineType)
-        End If
-        SetTrueText("Click twice in the image to provide the points below and they will be connected with a line" + vbCrLf +
+    Public Class Draw_Line : Inherits TaskParent
+        Public p1 As cv.Point, p2 As cv.Point
+        Public externalUse As Boolean
+        Public Sub New()
+            desc = "Draw a line between the selected p1 and p2 - either by clicking twice in the image or externally providing p1 and p2."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            If p1 <> newPoint And p2 <> New cv.Point And task.clickPoint <> newPoint Then
+                p1 = newPoint
+                p2 = newPoint
+            End If
+            dst2 = src
+            If task.clickPoint <> New cv.Point Or externalUse Then
+                If p1 = New cv.Point Then p1 = task.clickPoint Else p2 = task.clickPoint
+            End If
+            If p1 <> newPoint And p2 = newPoint Then Circle(dst2, p1, task.DotSize, task.highlight, -1, task.lineType)
+            If p1 <> newPoint And p2 <> newPoint Then
+                Line(dst2, p1, p2, task.highlight, task.lineWidth, task.lineType)
+            End If
+            SetTrueText("Click twice in the image to provide the points below and they will be connected with a line" + vbCrLf +
                         "P1 = " + p1.ToString + vbCrLf + "P2 = " + p2.ToString, 3)
-    End Sub
-End Class
+        End Sub
+    End Class
 
 
 
@@ -386,69 +387,70 @@ End Class
 
 
 
-Public Class XR_Draw_LineTest : Inherits TaskParent
-    Dim line As New Draw_Line
-    Public Sub New()
-        desc = "Test the external use of the Draw_Line algorithm - provide 2 points and draw the line..."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        If task.heartBeat Then
-            line.p1 = New cv.Point(msRNG.Next(0, src.Width), msRNG.Next(0, src.Height))
-            line.p2 = New cv.Point(msRNG.Next(0, src.Width), msRNG.Next(0, src.Height))
-        End If
-        line.Run(src)
-        dst2 = line.dst2
-    End Sub
-End Class
+    Public Class XR_Draw_LineTest : Inherits TaskParent
+        Dim line As New Draw_Line
+        Public Sub New()
+            desc = "Test the external use of the Draw_Line algorithm - provide 2 points and draw the line..."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            If task.heartBeat Then
+                line.p1 = New cv.Point(msRNG.Next(0, src.Width), msRNG.Next(0, src.Height))
+                line.p2 = New cv.Point(msRNG.Next(0, src.Width), msRNG.Next(0, src.Height))
+            End If
+            line.Run(src)
+            dst2 = line.dst2
+        End Sub
+    End Class
 
 
 
 
 
 
-Public Class Draw_Frustrum : Inherits TaskParent
-    Public xyzDepth As New Depth_WorldXYZ
-    Public Sub New()
-        xyzDepth.depthUnitsMeters = True
-        labels(3) = "Frustrum 3D pointcloud"
-        desc = "Draw a frustrum for a camera viewport"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        src = New Mat(New Size(task.workRes.Width, task.workRes.Height), MatType.CV_32F, Scalar.All(0))
+    Public Class Draw_Frustrum : Inherits TaskParent
+        Public xyzDepth As New Depth_WorldXYZ
+        Public Sub New()
+            xyzDepth.depthUnitsMeters = True
+            labels(3) = "Frustrum 3D pointcloud"
+            desc = "Draw a frustrum for a camera viewport"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            src = New Mat(New Size(task.workRes.Width, task.workRes.Height), MatType.CV_32F, Scalar.All(0))
 
-        Dim mid = src.Height / 2
-        Dim zIncr = task.MaxZmeters / mid
-        dst2 = src.Clone
-        Dim fRect = New cv.Rect((src.Width - src.Height) / 2, 0, src.Height, src.Height)
-        For i = 0 To src.Height / 2
-            Rectangle(dst2(fRect), New cv.Rect(mid - i, mid - i, i * 2, (i + 1) * 2), Scalar.All(i * zIncr), 1)
-        Next
-        xyzDepth.Run(dst2)
-        Resize(xyzDepth.dst2, dst3, New Size(task.workRes.Width, task.workRes.Height))
-    End Sub
-End Class
-
-
+            Dim mid = src.Height / 2
+            Dim zIncr = task.MaxZmeters / mid
+            dst2 = src.Clone
+            Dim fRect = New cv.Rect((src.Width - src.Height) / 2, 0, src.Height, src.Height)
+            For i = 0 To src.Height / 2
+                Rectangle(dst2(fRect), New cv.Rect(mid - i, mid - i, i * 2, (i + 1) * 2), Scalar.All(i * zIncr), 1)
+            Next
+            xyzDepth.Run(dst2)
+            Resize(xyzDepth.dst2, dst3, New Size(task.workRes.Width, task.workRes.Height))
+        End Sub
+    End Class
 
 
-Public Class Draw_RotatedRect : Inherits TaskParent
-    Public rr As RotatedRect
-    Public Sub New()
-        desc = "Draw an OpenCV rotated rect"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        If standalone Then
-            Static angle As Single = -10
-            rr = New RotatedRect(New Point2f(dst2.Width / 2, dst2.Height / 2),
+
+
+    Public Class Draw_RotatedRect : Inherits TaskParent
+        Public rr As RotatedRect
+        Public Sub New()
+            desc = "Draw an OpenCV rotated rect"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            If standalone Then
+                Static angle As Single = -10
+                rr = New RotatedRect(New Point2f(dst2.Width / 2, dst2.Height / 2),
                                         task.centerRect.Size, angle)
-            angle += 1
-            If angle > 10 Then angle = -10
-        End If
+                angle += 1
+                If angle > 10 Then angle = -10
+            End If
 
-        Dim vertices = rr.Points()
-        dst2 = src
-        For i As Integer = 0 To vertices.Count - 1
-            Line(dst2, vertices(i), vertices((i + 1) Mod 4), Scalar.Green, task.lineWidth, task.lineType)
-        Next
-    End Sub
-End Class
+            Dim vertices = rr.Points()
+            dst2 = src
+            For i As Integer = 0 To vertices.Count - 1
+                Line(dst2, vertices(i), vertices((i + 1) Mod 4), Scalar.Green, task.lineWidth, task.lineType)
+            Next
+        End Sub
+    End Class
+End Namespace

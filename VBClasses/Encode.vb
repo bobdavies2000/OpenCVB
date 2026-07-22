@@ -1,55 +1,57 @@
-Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
+Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCvSharp
 ' https://www.programcreek.com/python/example/70396/cv2.imencode
-Public Class XR_Encode_Basics : Inherits TaskParent
-    Dim options As New Options_Encode
-    Public Sub New()
-        desc = "Error Level Analysis - to verify a jpg image has not been modified."
-        labels(2) = "absDiff with original"
-        labels(3) = "Original decompressed"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        options.Run()
-        If task.firstPass Then OptionParent.FindSlider("Encode Output Scaling").Value = 10
+Namespace VBClasses
+    Public Class XR_Encode_Basics : Inherits TaskParent
+        Dim options As New Options_Encode
+        Public Sub New()
+            desc = "Error Level Analysis - to verify a jpg image has not been modified."
+            labels(2) = "absDiff with original"
+            labels(3) = "Original decompressed"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            options.Run()
+            If task.firstPass Then OptionParent.FindSlider("Encode Output Scaling").Value = 10
 
-        Dim encodeParams As New ImageEncodingParam(options.encodeOption, options.qualityLevel)
-        Dim buf As Byte() = Nothing
-        ImEncode(".jpg", src, buf, {encodeParams})
-        Dim image = Mat.FromPixelData(buf.Count, 1, MatType.CV_8U, buf)
-        dst3 = ImDecode(image, ImreadModes.AnyColor)
+            Dim encodeParams As New ImageEncodingParam(options.encodeOption, options.qualityLevel)
+            Dim buf As Byte() = Nothing
+            ImEncode(".jpg", src, buf, {encodeParams})
+            Dim image = Mat.FromPixelData(buf.Count, 1, MatType.CV_8U, buf)
+            dst3 = ImDecode(image, ImreadModes.AnyColor)
 
-        Dim output As New Mat
-        Absdiff(src, dst3, output)
+            Dim output As New Mat
+            Absdiff(src, dst3, output)
 
-        output.ConvertTo(dst2, MatType.CV_8UC3, options.scalingLevel)
-        Dim compressionRatio = buf.Length / (src.Rows * src.Cols * src.ElemSize)
-        labels(3) = "Original compressed to len=" + CStr(buf.Length) + " (" + compressionRatio.ToString("0.0%") + ")"
-    End Sub
-End Class
-
-
-
+            output.ConvertTo(dst2, MatType.CV_8UC3, options.scalingLevel)
+            Dim compressionRatio = buf.Length / (src.Rows * src.Cols * src.ElemSize)
+            labels(3) = "Original compressed to len=" + CStr(buf.Length) + " (" + compressionRatio.ToString("0.0%") + ")"
+        End Sub
+    End Class
 
 
-' https://answers.opencvb.org/question/31519/encode-image-in-jpg-with-opencv-avoiding-the-artifacts-effect/
-Public Class XR_Encode_Scaling : Inherits TaskParent
-    Dim options As New Options_Encode
-    Public Sub New()
-        desc = "JPEG Encoder"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        options.Run()
 
-        Dim encodeParams As New ImageEncodingParam(options.encodeOption, options.qualityLevel)
-        Dim buf As Byte() = Nothing
-        ImEncode(".jpg", src, buf, {encodeParams})
 
-        Dim image = Mat.FromPixelData(buf.Count, 1, MatType.CV_8U, buf)
-        dst3 = ImDecode(image, ImreadModes.AnyColor)
 
-        Dim output As New Mat
-        Absdiff(src, dst3, output)
+    ' https://answers.opencvb.org/question/31519/encode-image-in-jpg-with-opencv-avoiding-the-artifacts-effect/
+    Public Class XR_Encode_Scaling : Inherits TaskParent
+        Dim options As New Options_Encode
+        Public Sub New()
+            desc = "JPEG Encoder"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            options.Run()
 
-        output.ConvertTo(dst2, MatType.CV_8UC3, options.scalingLevel)
-        Dim compressionRatio = buf.Length / (src.Rows * src.Cols * src.ElemSize)
-    End Sub
-End Class
+            Dim encodeParams As New ImageEncodingParam(options.encodeOption, options.qualityLevel)
+            Dim buf As Byte() = Nothing
+            ImEncode(".jpg", src, buf, {encodeParams})
+
+            Dim image = Mat.FromPixelData(buf.Count, 1, MatType.CV_8U, buf)
+            dst3 = ImDecode(image, ImreadModes.AnyColor)
+
+            Dim output As New Mat
+            Absdiff(src, dst3, output)
+
+            output.ConvertTo(dst2, MatType.CV_8UC3, options.scalingLevel)
+            Dim compressionRatio = buf.Length / (src.Rows * src.Cols * src.ElemSize)
+        End Sub
+    End Class
+End Namespace

@@ -1,1617 +1,1054 @@
-Imports System.Runtime.InteropServices
-Imports System.Security.Cryptography
-Imports OpenCvSharp
-Imports OpenCvSharp.Cv2
-Imports cv = OpenCvSharp
-Public Class Feature_Basics : Inherits TaskParent
-    Implements IDisposable
-    Public options As New Options_Features
-    Public features As New List(Of cv.Point)
-    Public lastFeatures As New List(Of cv.Point)
-    Public Sub New()
-        desc = "Gather features from a list of sources - GoodFeatures, Agast, Brisk..."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        options.Run()
-        dst2 = src.Clone
-        dst3 = src.Clone
+Imports System.Runtime.InteropServices : Imports OpenCvSharp : Imports OpenCvSharp.Cv2 : Imports cv = OpenCvSharp
+Namespace VBClasses
+    Public Class Feature_Basics : Inherits TaskParent
+        Implements IDisposable
+        Public options As New Options_Features
+        Public features As New List(Of cv.Point)
+        Public lastFeatures As New List(Of cv.Point)
+        Public Sub New()
+            desc = "Gather features from a list of sources - GoodFeatures, Agast, Brisk..."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            options.Run()
+            dst2 = src.Clone
+            dst3 = src.Clone
 
-        If src.Channels <> 1 Then src = task.gray
+            If src.Channels <> 1 Then src = task.gray
 
-        Dim ptLatest As New List(Of cv.Point2f)
-        Select Case task.fOptions.FeatureMethod.Text
-            Case "AGAST"
-                If cPtr = 0 Then cPtr = Agast_Open()
-                src = task.color.Clone
-                Dim dataSrc(src.Total - 1) As Vec3b
-                src.GetArray(Of Vec3b)(dataSrc)
+            Dim ptLatest As New List(Of cv.Point2f)
+            Select Case task.fOptions.FeatureMethod.Text
+                Case "AGAST"
+                    If cPtr = 0 Then cPtr = Agast_Open()
+                    src = task.color.Clone
+                    Dim dataSrc(src.Total - 1) As Vec3b
+                    src.GetArray(Of Vec3b)(dataSrc)
 
-                Dim handleSrc = GCHandle.Alloc(dataSrc, GCHandleType.Pinned)
-                Dim imagePtr = Agast_Run(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, options.agastThreshold)
-                handleSrc.Free()
+                    Dim handleSrc = GCHandle.Alloc(dataSrc, GCHandleType.Pinned)
+                    Dim imagePtr = Agast_Run(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, options.agastThreshold)
+                    handleSrc.Free()
 
-                Dim ptMat = Mat.FromPixelData(Agast_Count(cPtr), 1, MatType.CV_32FC2, imagePtr).Clone
-                For i = 0 To ptMat.Rows - 1
-                    Dim pt = ptMat.Get(Of cv.Point2f)(i, 0)
-                    ptLatest.Add(pt)
-                    If standaloneTest() Then Circle(dst2, pt, task.DotSize, white, -1, task.lineType)
-                Next
+                    Dim ptMat = Mat.FromPixelData(Agast_Count(cPtr), 1, MatType.CV_32FC2, imagePtr).Clone
+                    For i = 0 To ptMat.Rows - 1
+                        Dim pt = ptMat.Get(Of cv.Point2f)(i, 0)
+                        ptLatest.Add(pt)
+                        If standaloneTest() Then Circle(dst2, pt, task.DotSize, white, -1, task.lineType)
+                    Next
 
-                strOut = "AGAST produced " + CStr(ptLatest.Count) + " features"
-            Case "AKAZE"
-                Static kaze As XFeatures2D.AKAZE = XFeatures2D.AKAZE.Create()
-                Dim kazeKeyPoints As KeyPoint() = Nothing
-                Dim kazeDescriptors As New Mat()
-                kaze.DetectAndCompute(src, Nothing, kazeKeyPoints, kazeDescriptors)
-                For i = 0 To kazeKeyPoints.Length - 1
-                    ptLatest.Add(kazeKeyPoints(i).Pt)
-                Next
-            Case "BrickPoint"
-                Static bPoint As New BrickPoint_MaxSobel
-                bPoint.Run(src)
-                For Each pt In bPoint.features
-                    ptLatest.Add(pt)
-                Next
-                strOut = bPoint.labels(2)
-            Case "BRISK"
-                Static brisk As New BRISK_Basics
-                brisk.Run(src)
-                ptLatest = brisk.features
-                strOut = "BRISK produced " + CStr(ptLatest.Count) + " features"
-            Case "FAST"
-                Static FAST As New Corner_Basics
-                FAST.Run(src)
-                ptLatest = FAST.features
-                strOut = "FAST produced " + CStr(ptLatest.Count) + " features"
-            Case "GoodFeatures"
-                ptLatest = GoodFeaturesToTrack(src, task.fOptions.FeatureSizeSlider.Value, options.quality,
+                    strOut = "AGAST produced " + CStr(ptLatest.Count) + " features"
+                Case "AKAZE"
+                    Static kaze As XFeatures2D.AKAZE = XFeatures2D.AKAZE.Create()
+                    Dim kazeKeyPoints As KeyPoint() = Nothing
+                    Dim kazeDescriptors As New Mat()
+                    kaze.DetectAndCompute(src, Nothing, kazeKeyPoints, kazeDescriptors)
+                    For i = 0 To kazeKeyPoints.Length - 1
+                        ptLatest.Add(kazeKeyPoints(i).Pt)
+                    Next
+                Case "BrickPoint"
+                    Static bPoint As New BrickPoint_MaxSobel
+                    bPoint.Run(src)
+                    For Each pt In bPoint.features
+                        ptLatest.Add(pt)
+                    Next
+                    strOut = bPoint.labels(2)
+                Case "BRISK"
+                    Static brisk As New BRISK_Basics
+                    brisk.Run(src)
+                    ptLatest = brisk.features
+                    strOut = "BRISK produced " + CStr(ptLatest.Count) + " features"
+                Case "FAST"
+                    Static FAST As New Corner_Basics
+                    FAST.Run(src)
+                    ptLatest = FAST.features
+                    strOut = "FAST produced " + CStr(ptLatest.Count) + " features"
+                Case "GoodFeatures"
+                    ptLatest = GoodFeaturesToTrack(src, task.fOptions.FeatureSizeSlider.Value, options.quality,
                                                       options.minDistance, New Mat,
                                                       options.blockSize, True, options.k).ToList
-                strOut = "GoodFeatures produced " + CStr(ptLatest.Count) + " features"
-            Case "Harris"
-                Static harris As New Corner_HarrisDetector_CPP
-                harris.Run(src)
-                ptLatest = harris.features
-                strOut = "Harris Detector produced " + CStr(ptLatest.Count) + " features"
-            Case "LineInput"
-                For Each lp In task.lines.lpList
-                    ptLatest.Add(lp.ptCenter)
-                Next
-        End Select
+                    strOut = "GoodFeatures produced " + CStr(ptLatest.Count) + " features"
+                Case "Harris"
+                    Static harris As New Corner_HarrisDetector_CPP
+                    harris.Run(src)
+                    ptLatest = harris.features
+                    strOut = "Harris Detector produced " + CStr(ptLatest.Count) + " features"
+                Case "LineInput"
+                    For Each lp In task.lines.lpList
+                        ptLatest.Add(lp.ptCenter)
+                    Next
+            End Select
 
-        lastFeatures = New List(Of cv.Point)(features)
-        Dim ptNext As New List(Of cv.Point)
-        For Each pt In features
-            Dim val = task.motion.motionMask.Get(Of Byte)(pt.Y, pt.X)
-            If val = 0 Then ptNext.Add(pt)
-        Next
-
-        For Each pt In ptLatest
-            Dim val = task.motion.motionMask.Get(Of Byte)(pt.Y, pt.X)
-            If val <> 0 Then ptNext.Add(pt)
-        Next
-
-        If ptNext.Count <= 3 Then
-            For Each pt In ptLatest
-                ptNext.Add(pt)
+            lastFeatures = New List(Of cv.Point)(features)
+            Dim ptNext As New List(Of cv.Point)
+            For Each pt In features
+                Dim val = task.motion.motionMask.Get(Of Byte)(pt.Y, pt.X)
+                If val = 0 Then ptNext.Add(pt)
             Next
-        End If
 
-        features = New List(Of cv.Point)(ptNext)
+            For Each pt In ptLatest
+                Dim val = task.motion.motionMask.Get(Of Byte)(pt.Y, pt.X)
+                If val <> 0 Then ptNext.Add(pt)
+            Next
 
-        For Each pt In features
-            If lastFeatures.Contains(pt) Then Circle(dst2, pt, task.DotSize, task.highlight, -1, task.lineType)
-        Next
+            If ptNext.Count <= 3 Then
+                For Each pt In ptLatest
+                    ptNext.Add(pt)
+                Next
+            End If
 
-        If features.Count = 0 Then features = New List(Of cv.Point)(ptNext)
+            features = New List(Of cv.Point)(ptNext)
 
-        labels(2) = strOut
-    End Sub
-    Protected Overrides Sub Finalize()
-        If cPtr <> 0 Then cPtr = Agast_Close(cPtr)
-    End Sub
-End Class
+            For Each pt In features
+                If lastFeatures.Contains(pt) Then Circle(dst2, pt, task.DotSize, task.highlight, -1, task.lineType)
+            Next
 
+            If features.Count = 0 Then features = New List(Of cv.Point)(ptNext)
 
-
-
-
-Public Class XR_Feature_AKaze : Inherits TaskParent
-    Implements IDisposable
-    Dim kazeKeyPoints As KeyPoint() = Nothing
-    Dim kaze As XFeatures2D.AKAZE
-    Public Sub New()
-        labels(2) = "AKAZE key points"
-        desc = "Find keypoints using AKAZE algorithm."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        dst2 = src.Clone()
-        If src.Channels() <> 1 Then src = task.gray
-        If kaze Is Nothing Then kaze = XFeatures2D.AKAZE.Create()
-        Dim kazeDescriptors As New Mat()
-        kaze.DetectAndCompute(src, Nothing, kazeKeyPoints, kazeDescriptors)
-        For i = 0 To kazeKeyPoints.Length - 1
-            Circle(dst2, kazeKeyPoints(i).Pt, task.DotSize, task.highlight, -1, task.lineType)
-        Next
-    End Sub
-    Protected Overrides Sub Finalize()
-        If kaze IsNot Nothing Then kaze.Dispose()
-    End Sub
-End Class
+            labels(2) = strOut
+        End Sub
+        Protected Overrides Sub Finalize()
+            If cPtr <> 0 Then cPtr = Agast_Close(cPtr)
+        End Sub
+    End Class
 
 
 
 
 
-Public Class Feature_GoodFeatures : Inherits TaskParent
-    Public options As New Options_Features
-    Public features As New List(Of cv.Point)
-    Public Sub New()
-        task.fOptions.FeatureSizeSlider.Value = 50
-        labels(2) = "Good features found with GoodFeaturesToTrack"
-        desc = "Cursor.ai: Find good features in the image using OpenCV GoodFeaturesToTrack."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        options.Run()
+    Public Class XR_Feature_AKaze : Inherits TaskParent
+        Implements IDisposable
+        Dim kazeKeyPoints As KeyPoint() = Nothing
+        Dim kaze As XFeatures2D.AKAZE
+        Public Sub New()
+            labels(2) = "AKAZE key points"
+            desc = "Find keypoints using AKAZE algorithm."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            dst2 = src.Clone()
+            If src.Channels() <> 1 Then src = task.gray
+            If kaze Is Nothing Then kaze = XFeatures2D.AKAZE.Create()
+            Dim kazeDescriptors As New Mat()
+            kaze.DetectAndCompute(src, Nothing, kazeKeyPoints, kazeDescriptors)
+            For i = 0 To kazeKeyPoints.Length - 1
+                Circle(dst2, kazeKeyPoints(i).Pt, task.DotSize, task.highlight, -1, task.lineType)
+            Next
+        End Sub
+        Protected Overrides Sub Finalize()
+            If kaze IsNot Nothing Then kaze.Dispose()
+        End Sub
+    End Class
 
-        Dim gray = If(src.Channels() = 1, src, task.gray)
-        Dim points = GoodFeaturesToTrack(gray, task.fOptions.FeatureSizeSlider.Value, options.quality,
+
+
+
+
+    Public Class Feature_GoodFeatures : Inherits TaskParent
+        Public options As New Options_Features
+        Public features As New List(Of cv.Point)
+        Public Sub New()
+            task.fOptions.FeatureSizeSlider.Value = 50
+            labels(2) = "Good features found with GoodFeaturesToTrack"
+            desc = "Cursor.ai: Find good features in the image using OpenCV GoodFeaturesToTrack."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            options.Run()
+
+            Dim gray = If(src.Channels() = 1, src, task.gray)
+            Dim points = GoodFeaturesToTrack(gray, task.fOptions.FeatureSizeSlider.Value, options.quality,
                                          options.minDistance, New Mat,
                                          options.blockSize, False, options.k)
 
-        features.Clear()
-        dst2 = If(src.Channels() = 1, task.color.Clone, src.Clone)
-        For Each pt In points
-            Dim feature = New cv.Point(CInt(pt.X), CInt(pt.Y))
-            features.Add(feature)
-            Circle(dst2, feature, task.DotSize, task.highlight, -1, task.lineType)
-        Next
+            features.Clear()
+            dst2 = If(src.Channels() = 1, task.color.Clone, src.Clone)
+            For Each pt In points
+                Dim feature = New cv.Point(CInt(pt.X), CInt(pt.Y))
+                features.Add(feature)
+                Circle(dst2, feature, task.DotSize, task.highlight, -1, task.lineType)
+            Next
 
-        labels(2) = CStr(features.Count) + " good features found; " +
+            labels(2) = CStr(features.Count) + " good features found; " +
                     CStr(task.fOptions.FeatureSizeSlider.Value) + " requested."
-    End Sub
-End Class
+        End Sub
+    End Class
 
 
 
 
 
-Public Class XR_Feature_Basics : Inherits TaskParent
-    Implements IDisposable
-    Public options As New Options_Features
-    Public features As New List(Of Point2f)
-    Public Sub New()
-        desc = "Gather features from a list of sources - GoodFeatures, Agast, Brisk..."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        options.Run()
+    Public Class XR_Feature_Basics : Inherits TaskParent
+        Implements IDisposable
+        Public options As New Options_Features
+        Public features As New List(Of Point2f)
+        Public Sub New()
+            desc = "Gather features from a list of sources - GoodFeatures, Agast, Brisk..."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            options.Run()
 
-        If src.Channels <> 1 Then src = task.gray
+            If src.Channels <> 1 Then src = task.gray
 
-        dst2 = task.color.Clone
+            dst2 = task.color.Clone
 
-        Dim ptNew As New List(Of Point2f)
+            Dim ptNew As New List(Of Point2f)
 
 
-        strOut = ""
-        Dim ptLatest As New List(Of Point2f)
-        Select Case task.fOptions.FeatureMethod.Text
-            Case "GoodFeatures"
-                ptLatest = GoodFeaturesToTrack(src, task.fOptions.FrameHistoryCount.Value, options.quality,
+            strOut = ""
+            Dim ptLatest As New List(Of Point2f)
+            Select Case task.fOptions.FeatureMethod.Text
+                Case "GoodFeatures"
+                    ptLatest = GoodFeaturesToTrack(src, task.fOptions.FrameHistoryCount.Value, options.quality,
                                                       options.minDistance, New Mat,
                                                       options.blockSize, True, options.k).ToList
-                strOut = "GoodFeatures produced " + CStr(ptLatest.Count) + " features"
-            Case "AGAST"
-                If cPtr = 0 Then cPtr = Agast_Open()
-                src = task.color.Clone
-                Dim dataSrc(src.Total - 1) As Vec3b
-                src.GetArray(Of Vec3b)(dataSrc)
+                    strOut = "GoodFeatures produced " + CStr(ptLatest.Count) + " features"
+                Case "AGAST"
+                    If cPtr = 0 Then cPtr = Agast_Open()
+                    src = task.color.Clone
+                    Dim dataSrc(src.Total - 1) As Vec3b
+                    src.GetArray(Of Vec3b)(dataSrc)
 
-                Dim handleSrc = GCHandle.Alloc(dataSrc, GCHandleType.Pinned)
-                Dim imagePtr = Agast_Run(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, options.agastThreshold)
-                handleSrc.Free()
+                    Dim handleSrc = GCHandle.Alloc(dataSrc, GCHandleType.Pinned)
+                    Dim imagePtr = Agast_Run(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, options.agastThreshold)
+                    handleSrc.Free()
 
-                Dim ptMat = Mat.FromPixelData(Agast_Count(cPtr), 1, MatType.CV_32FC2, imagePtr).Clone
-                For i = 0 To ptMat.Rows - 1
-                    Dim pt = ptMat.Get(Of Point2f)(i, 0)
-                    ptLatest.Add(pt)
-                    If standaloneTest() Then Circle(dst2, pt, task.DotSize, white, -1, task.lineType)
+                    Dim ptMat = Mat.FromPixelData(Agast_Count(cPtr), 1, MatType.CV_32FC2, imagePtr).Clone
+                    For i = 0 To ptMat.Rows - 1
+                        Dim pt = ptMat.Get(Of Point2f)(i, 0)
+                        ptLatest.Add(pt)
+                        If standaloneTest() Then Circle(dst2, pt, task.DotSize, white, -1, task.lineType)
+                    Next
+
+                    strOut = "GoodFeatures produced " + CStr(ptLatest.Count) + " features"
+                Case "BRISK"
+                    Static brisk As New BRISK_Basics
+                    brisk.Run(src)
+                    ptLatest = brisk.features
+                    strOut = "GoodFeatures produced " + CStr(ptLatest.Count) + " features"
+                Case "Harris"
+                    Static harris As New Corner_HarrisDetector_CPP
+                    harris.Run(src)
+                    ptLatest = harris.features
+                    strOut = "Harris Detector produced " + CStr(ptLatest.Count) + " features"
+                Case "FAST"
+                    Static FAST As New Corner_Basics
+                    FAST.Run(src)
+                    ptLatest = FAST.features
+                    strOut = "FAST produced " + CStr(ptLatest.Count) + " features"
+                Case "LineInput"
+                    For Each lp In task.lines.lpList
+                        ptLatest.Add(lp.ptCenter)
+                    Next
+                Case "BrickPoint"
+                    Static bPoint As New BrickPoint_MaxSobel
+                    bPoint.Run(src)
+                    For Each pt In bPoint.features
+                        ptLatest.Add(pt)
+                    Next
+                    strOut = bPoint.labels(2)
+            End Select
+
+            If task.optionsChanged Or ptNew.Count = 0 Then
+                For Each pt In ptLatest
+                    ptNew.Add(pt)
                 Next
-
-                strOut = "GoodFeatures produced " + CStr(ptLatest.Count) + " features"
-            Case "BRISK"
-                Static brisk As New BRISK_Basics
-                brisk.Run(src)
-                ptLatest = brisk.features
-                strOut = "GoodFeatures produced " + CStr(ptLatest.Count) + " features"
-            Case "Harris"
-                Static harris As New Corner_HarrisDetector_CPP
-                harris.Run(src)
-                ptLatest = harris.features
-                strOut = "Harris Detector produced " + CStr(ptLatest.Count) + " features"
-            Case "FAST"
-                Static FAST As New Corner_Basics
-                FAST.Run(src)
-                ptLatest = FAST.features
-                strOut = "FAST produced " + CStr(ptLatest.Count) + " features"
-            Case "LineInput"
-                For Each lp In task.lines.lpList
-                    ptLatest.Add(lp.ptCenter)
-                Next
-            Case "BrickPoint"
-                Static bPoint As New BrickPoint_MaxSobel
-                bPoint.Run(src)
-                For Each pt In bPoint.features
-                    ptLatest.Add(pt)
-                Next
-                strOut = bPoint.labels(2)
-        End Select
-
-        If task.optionsChanged Or ptNew.Count = 0 Then
-            For Each pt In ptLatest
-                ptNew.Add(pt)
-            Next
-        Else
-            For Each pt In ptLatest
-                Dim val = task.motion.motionMask.Get(Of Byte)(pt.Y, pt.X)
-                If val = 255 Then ptNew.Add(pt)
-            Next
-        End If
-
-        Dim sortByGrid As New SortedList(Of Single, Point2f)(New compareAllowIdenticalSingle)
-        For Each pt In ptNew
-            Dim index = task.gridMap.Get(Of Integer)(pt.Y, pt.X)
-            sortByGrid.Add(index, pt)
-        Next
-
-        features = New List(Of Point2f)(sortByGrid.Values)
-
-        For Each pt In features
-            Circle(dst2, pt, task.DotSize, task.highlight, -1, task.lineType)
-        Next
-
-        labels(2) = strOut
-    End Sub
-    Protected Overrides Sub Finalize()
-        If cPtr <> 0 Then cPtr = Agast_Close(cPtr)
-    End Sub
-End Class
-
-
-
-
-
-
-Public Class Feature_Bricks : Inherits TaskParent
-    Public features As New List(Of cv.Point)
-    Public feature2f As New List(Of Point2f)
-    Dim bPoint As New BrickPoint_MaxSobel
-    Public Sub New()
-        desc = "Gather features from the sobel grid square points and preserve those representing lines."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        Dim lastFeatures As New List(Of cv.Point)(bPoint.features)
-        bPoint.Run(src)
-
-        dst2 = src.Clone
-        feature2f.Clear()
-        For Each pt In bPoint.features
-            Dim index = lastFeatures.IndexOf(pt)
-            If index >= 0 Then feature2f.Add(New Point2f(pt.X, pt.Y))
-        Next
-
-        features.Clear()
-        For Each pt In feature2f
-            features.Add(New cv.Point(CInt(pt.X), CInt(pt.Y)))
-            Circle(dst2, pt, task.DotSize, task.highlight, -1, task.lineType)
-        Next
-
-        strOut = CStr(features.Count) + " features found ('BrickPoints' method). " +
-                         CStr(bPoint.features.Count - feature2f.Count) + " dropped."
-        labels(2) = strOut
-    End Sub
-End Class
-
-
-
-
-
-
-Public Class Feature_Delaunay : Inherits TaskParent
-    Dim delaunay As New Delaunay_Contours
-    Public feat As New Feature_Bricks
-    Dim options As New Options_Features
-    Public Sub New()
-        OptionParent.FindSlider("Min Distance").Value = 10
-        desc = "Divide the image into contours with Delaunay using features"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        options.Run()
-
-        feat.Run(src)
-        labels(2) = feat.labels(2)
-
-        dst2 = src
-        For Each pt In feat.features
-            Circle(dst2, pt, task.DotSize, task.highlight, -1, task.lineType)
-        Next
-
-        delaunay.bPoint.ptList = New List(Of cv.Point)(feat.features)
-        delaunay.Run(src)
-        dst3 = delaunay.dst2
-        For Each pt In delaunay.bPoint.ptList
-            Circle(dst3, pt, task.DotSize, white, -1, task.lineType)
-        Next
-        labels(3) = "There were " + CStr(feat.features.Count) + " Delaunay contours"
-    End Sub
-End Class
-
-
-
-
-
-
-' https://docs.opencv.org/3.4/d7/d8b/tutorial_py_lucas_kanade.html
-Public Class XR_Feature_NoMotionTest : Inherits TaskParent
-    Public options As New Options_Features
-    Dim feat As New Feature_Basics
-    Public Sub New()
-        desc = "Find good features to track in a BGR image without using correlation coefficients which produce more consistent sharedResults.images.."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        options.Run()
-        dst2 = src.Clone
-
-        feat.Run(src)
-
-        For Each pt In feat.features
-            Circle(dst2, pt, task.DotSize, task.highlight, -1, task.lineType)
-        Next
-
-        labels(2) = feat.labels(2)
-    End Sub
-End Class
-
-
-
-
-
-
-Public Class XR_Feature_LucasKanade : Inherits TaskParent
-    Dim pyr As New FeatureFlow_LucasKanade
-    Public ptList As New List(Of cv.Point)
-    Public ptLast As New List(Of cv.Point)
-    Public Sub New()
-        desc = "Provide a trace of the tracked features"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        pyr.Run(src)
-        dst2 = pyr.dst2
-        labels(2) = pyr.labels(2)
-
-        If task.heartBeat Then dst3.SetTo(0)
-
-        ptList.Clear()
-        Dim stationary As Integer, motion As Integer
-        For i = 0 To pyr.features.Count - 1
-            Dim pt = New cv.Point(pyr.features(i).X, pyr.features(i).Y)
-            ptList.Add(pt)
-            If ptLast.Contains(pt) Then
-                Circle(dst3, pt, task.DotSize, task.highlight, -1, task.lineType)
-                stationary += 1
             Else
-                Line(dst3, pyr.lastFeatures(i), pyr.features(i), white, task.lineWidth, task.lineType)
-                motion += 1
+                For Each pt In ptLatest
+                    Dim val = task.motion.motionMask.Get(Of Byte)(pt.Y, pt.X)
+                    If val = 255 Then ptNew.Add(pt)
+                Next
             End If
-        Next
 
-        labels(3) = CStr(stationary) + " features were stationary and " + CStr(motion) + " features had some motion."
-        ptLast = New List(Of cv.Point)(ptList)
-    End Sub
-End Class
-
-
-
-
-
-
-
-Public Class XR_Feature_TraceDelaunay : Inherits TaskParent
-    Dim features As New Feature_Delaunay
-    Public goodList As New List(Of List(Of Point2f)) ' stable points only
-    Public Sub New()
-        labels = {"Stable points highlighted", "", "", "Delaunay map of regions defined by the feature points"}
-        desc = "Trace the GoodFeatures points using only Delaunay - no KNN or RedCloud or Matching."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        features.Run(src)
-        dst3 = features.dst3
-
-        If task.optionsChanged Then goodList.Clear()
-
-        Dim ptList As New List(Of Point2f)
-        For Each pt In features.feat.features
-            ptList.Add(pt)
-        Next
-        goodList.Add(ptList)
-
-        If goodList.Count >= task.fOptions.FrameHistoryCount.Value Then goodList.RemoveAt(0)
-
-        dst2.SetTo(0)
-        For Each ptList In goodList
-            For Each pt In ptList
-                Circle(task.color, pt, task.DotSize, task.highlight, -1, task.lineType)
-                Dim c = dst3.Get(Of Vec3b)(pt.Y, pt.X)
-                Circle(dst2, pt, task.DotSize + 1, c, -1, task.lineType)
+            Dim sortByGrid As New SortedList(Of Single, Point2f)(New compareAllowIdenticalSingle)
+            For Each pt In ptNew
+                Dim index = task.gridMap.Get(Of Integer)(pt.Y, pt.X)
+                sortByGrid.Add(index, pt)
             Next
-        Next
-        labels(2) = CStr(ptList.Count) + " features were identified in the image."
-    End Sub
-End Class
+
+            features = New List(Of Point2f)(sortByGrid.Values)
+
+            For Each pt In features
+                Circle(dst2, pt, task.DotSize, task.highlight, -1, task.lineType)
+            Next
+
+            labels(2) = strOut
+        End Sub
+        Protected Overrides Sub Finalize()
+            If cPtr <> 0 Then cPtr = Agast_Close(cPtr)
+        End Sub
+    End Class
 
 
 
 
 
 
-Public Class XR_Feature_ShiTomasi : Inherits TaskParent
-    Dim harris As New Corner_HarrisDetector_CPP
-    Dim shiTomasi As New Corner_ShiTomasi_CPP
-    Dim options As New Options_ShiTomasi
-    Public Sub New()
-        OptionParent.FindSlider("Corner normalize threshold").Value = 15
-        labels = {"", "", "Features in the left camera image", "Features in the right camera image"}
-        desc = "Identify feature points in the left And right views"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        options.Run()
+    Public Class Feature_Bricks : Inherits TaskParent
+        Public features As New List(Of cv.Point)
+        Public feature2f As New List(Of Point2f)
+        Dim bPoint As New BrickPoint_MaxSobel
+        Public Sub New()
+            desc = "Gather features from the sobel grid square points and preserve those representing lines."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            Dim lastFeatures As New List(Of cv.Point)(bPoint.features)
+            bPoint.Run(src)
 
-        If options.useShiTomasi Then
-            dst2 = task.leftView
-            dst3 = task.rightView
-            shiTomasi.Run(task.leftView)
-            Dim _cvtInline As New Mat
-            CvtColor(shiTomasi.dst3, _cvtInline, ColorConversionCodes.BGR2GRAY)
-            dst2.SetTo(Scalar.White, _cvtInline)
+            dst2 = src.Clone
+            feature2f.Clear()
+            For Each pt In bPoint.features
+                Dim index = lastFeatures.IndexOf(pt)
+                If index >= 0 Then feature2f.Add(New Point2f(pt.X, pt.Y))
+            Next
 
-            shiTomasi.Run(task.rightView)
-            CvtColor(shiTomasi.dst3, _cvtInline, ColorConversionCodes.BGR2GRAY)
-            dst3.SetTo(task.highlight, _cvtInline)
-        Else
-            harris.Run(task.leftView)
-            dst2 = harris.dst2.Clone
-            harris.Run(task.rightView)
-            dst3 = harris.dst2
-        End If
-    End Sub
-End Class
-
-
-
-
-
-
-Public Class XR_Feature_Generations : Inherits TaskParent
-    Dim features As New List(Of cv.Point)
-    Dim gens As New List(Of Integer)
-    Dim feat As New Feature_Basics
-    Public Sub New()
-        desc = "Find feature age maximum and average."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        feat.Run(task.gray)
-
-        Dim newfeatures As New SortedList(Of Integer, cv.Point)(New compareAllowIdenticalIntegerInverted)
-        For Each pt In feat.features
-            Dim index = features.IndexOf(pt)
-            If index >= 0 Then newfeatures.Add(gens(index) + 1, pt) Else newfeatures.Add(1, pt)
-        Next
-
-        If task.heartBeat Then
             features.Clear()
-            gens.Clear()
-        End If
+            For Each pt In feature2f
+                features.Add(New cv.Point(CInt(pt.X), CInt(pt.Y)))
+                Circle(dst2, pt, task.DotSize, task.highlight, -1, task.lineType)
+            Next
 
-        features = New List(Of cv.Point)(newfeatures.Values)
-        gens = New List(Of Integer)(newfeatures.Keys)
-
-        dst2 = src
-        For i = 0 To features.Count - 1
-            If gens(i) = 1 Then Exit For
-            Dim pt = features(i)
-            Circle(dst2, pt, task.DotSize, white, -1, task.lineType)
-        Next
-
-        If task.heartBeat And gens.Count > 0 Then
-            labels(2) = CStr(features.Count) + " features found with max/average " + CStr(gens(0)) + "/" + gens.Average.ToString(fmt0) + " generations"
-        End If
-    End Sub
-End Class
+            strOut = CStr(features.Count) + " features found ('BrickPoints' method). " +
+                         CStr(bPoint.features.Count - feature2f.Count) + " dropped."
+            labels(2) = strOut
+        End Sub
+    End Class
 
 
 
 
-' https://docs.opencv.org/3.4/d7/d8b/tutorial_py_lucas_kanade.html
-Public Class XR_Feature_History : Inherits TaskParent
-    Public features As New List(Of cv.Point)
-    Dim featureHistory As New List(Of List(Of cv.Point))
-    Dim gens As New List(Of Integer)
-    Dim feat As New Feature_Basics
-    Public Sub New()
-        desc = "Find good features across multiple frames."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        feat.Run(task.gray)
 
-        dst2 = src.Clone
 
-        featureHistory.Add(New List(Of cv.Point)(feat.features))
+    Public Class Feature_Delaunay : Inherits TaskParent
+        Dim delaunay As New Delaunay_Contours
+        Public feat As New Feature_Bricks
+        Dim options As New Options_Features
+        Public Sub New()
+            OptionParent.FindSlider("Min Distance").Value = 10
+            desc = "Divide the image into contours with Delaunay using features"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            options.Run()
 
-        Dim newFeatures As New List(Of cv.Point)
-        gens.Clear()
-        For Each cList In featureHistory
-            For Each pt In cList
-                Dim index = newFeatures.IndexOf(pt)
-                If index >= 0 Then
-                    gens(index) += 1
+            feat.Run(src)
+            labels(2) = feat.labels(2)
+
+            dst2 = src
+            For Each pt In feat.features
+                Circle(dst2, pt, task.DotSize, task.highlight, -1, task.lineType)
+            Next
+
+            delaunay.bPoint.ptList = New List(Of cv.Point)(feat.features)
+            delaunay.Run(src)
+            dst3 = delaunay.dst2
+            For Each pt In delaunay.bPoint.ptList
+                Circle(dst3, pt, task.DotSize, white, -1, task.lineType)
+            Next
+            labels(3) = "There were " + CStr(feat.features.Count) + " Delaunay contours"
+        End Sub
+    End Class
+
+
+
+
+
+
+    ' https://docs.opencv.org/3.4/d7/d8b/tutorial_py_lucas_kanade.html
+    Public Class XR_Feature_NoMotionTest : Inherits TaskParent
+        Public options As New Options_Features
+        Dim feat As New Feature_Basics
+        Public Sub New()
+            desc = "Find good features to track in a BGR image without using correlation coefficients which produce more consistent sharedResults.images.."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            options.Run()
+            dst2 = src.Clone
+
+            feat.Run(src)
+
+            For Each pt In feat.features
+                Circle(dst2, pt, task.DotSize, task.highlight, -1, task.lineType)
+            Next
+
+            labels(2) = feat.labels(2)
+        End Sub
+    End Class
+
+
+
+
+
+
+    Public Class XR_Feature_LucasKanade : Inherits TaskParent
+        Dim pyr As New FeatureFlow_LucasKanade
+        Public ptList As New List(Of cv.Point)
+        Public ptLast As New List(Of cv.Point)
+        Public Sub New()
+            desc = "Provide a trace of the tracked features"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            pyr.Run(src)
+            dst2 = pyr.dst2
+            labels(2) = pyr.labels(2)
+
+            If task.heartBeat Then dst3.SetTo(0)
+
+            ptList.Clear()
+            Dim stationary As Integer, motion As Integer
+            For i = 0 To pyr.features.Count - 1
+                Dim pt = New cv.Point(pyr.features(i).X, pyr.features(i).Y)
+                ptList.Add(pt)
+                If ptLast.Contains(pt) Then
+                    Circle(dst3, pt, task.DotSize, task.highlight, -1, task.lineType)
+                    stationary += 1
                 Else
-                    newFeatures.Add(pt)
-                    gens.Add(1)
+                    Line(dst3, pyr.lastFeatures(i), pyr.features(i), white, task.lineWidth, task.lineType)
+                    motion += 1
                 End If
             Next
-        Next
 
-        Dim threshold = If(task.fOptions.FrameHistoryCount.Value = 1, 0, 1)
-        features.Clear()
-        Dim whiteCount As Integer
-        For i = 0 To newFeatures.Count - 1
-            If gens(i) > threshold Then
-                Dim pt = newFeatures(i)
-                features.Add(pt)
-                If gens(i) < task.fOptions.FrameHistoryCount.Value Then
-                    Circle(dst2, pt, task.DotSize + 2, Scalar.Red, -1, task.lineType)
-                Else
-                    whiteCount += 1
-                    Circle(dst2, pt, task.DotSize, task.highlight, -1, task.lineType)
-                End If
+            labels(3) = CStr(stationary) + " features were stationary and " + CStr(motion) + " features had some motion."
+            ptLast = New List(Of cv.Point)(ptList)
+        End Sub
+    End Class
+
+
+
+
+
+
+
+    Public Class XR_Feature_TraceDelaunay : Inherits TaskParent
+        Dim features As New Feature_Delaunay
+        Public goodList As New List(Of List(Of Point2f)) ' stable points only
+        Public Sub New()
+            labels = {"Stable points highlighted", "", "", "Delaunay map of regions defined by the feature points"}
+            desc = "Trace the GoodFeatures points using only Delaunay - no KNN or RedCloud or Matching."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            features.Run(src)
+            dst3 = features.dst3
+
+            If task.optionsChanged Then goodList.Clear()
+
+            Dim ptList As New List(Of Point2f)
+            For Each pt In features.feat.features
+                ptList.Add(pt)
+            Next
+            goodList.Add(ptList)
+
+            If goodList.Count >= task.fOptions.FrameHistoryCount.Value Then goodList.RemoveAt(0)
+
+            dst2.SetTo(0)
+            For Each ptList In goodList
+                For Each pt In ptList
+                    Circle(task.color, pt, task.DotSize, task.highlight, -1, task.lineType)
+                    Dim c = dst3.Get(Of Vec3b)(pt.Y, pt.X)
+                    Circle(dst2, pt, task.DotSize + 1, c, -1, task.lineType)
+                Next
+            Next
+            labels(2) = CStr(ptList.Count) + " features were identified in the image."
+        End Sub
+    End Class
+
+
+
+
+
+
+    Public Class XR_Feature_ShiTomasi : Inherits TaskParent
+        Dim harris As New Corner_HarrisDetector_CPP
+        Dim shiTomasi As New Corner_ShiTomasi_CPP
+        Dim options As New Options_ShiTomasi
+        Public Sub New()
+            OptionParent.FindSlider("Corner normalize threshold").Value = 15
+            labels = {"", "", "Features in the left camera image", "Features in the right camera image"}
+            desc = "Identify feature points in the left And right views"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            options.Run()
+
+            If options.useShiTomasi Then
+                dst2 = task.leftView
+                dst3 = task.rightView
+                shiTomasi.Run(task.leftView)
+                Dim _cvtInline As New Mat
+                CvtColor(shiTomasi.dst3, _cvtInline, ColorConversionCodes.BGR2GRAY)
+                dst2.SetTo(Scalar.White, _cvtInline)
+
+                shiTomasi.Run(task.rightView)
+                CvtColor(shiTomasi.dst3, _cvtInline, ColorConversionCodes.BGR2GRAY)
+                dst3.SetTo(task.highlight, _cvtInline)
+            Else
+                harris.Run(task.leftView)
+                dst2 = harris.dst2.Clone
+                harris.Run(task.rightView)
+                dst3 = harris.dst2
             End If
-        Next
+        End Sub
+    End Class
 
-        If featureHistory.Count > task.fOptions.FrameHistoryCount.Value Then featureHistory.RemoveAt(0)
-        If task.heartBeat Then
-            labels(2) = CStr(features.Count) + "/" + CStr(whiteCount) + " present/present on every frame" +
+
+
+
+
+
+    Public Class XR_Feature_Generations : Inherits TaskParent
+        Dim features As New List(Of cv.Point)
+        Dim gens As New List(Of Integer)
+        Dim feat As New Feature_Basics
+        Public Sub New()
+            desc = "Find feature age maximum and average."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            feat.Run(task.gray)
+
+            Dim newfeatures As New SortedList(Of Integer, cv.Point)(New compareAllowIdenticalIntegerInverted)
+            For Each pt In feat.features
+                Dim index = features.IndexOf(pt)
+                If index >= 0 Then newfeatures.Add(gens(index) + 1, pt) Else newfeatures.Add(1, pt)
+            Next
+
+            If task.heartBeat Then
+                features.Clear()
+                gens.Clear()
+            End If
+
+            features = New List(Of cv.Point)(newfeatures.Values)
+            gens = New List(Of Integer)(newfeatures.Keys)
+
+            dst2 = src
+            For i = 0 To features.Count - 1
+                If gens(i) = 1 Then Exit For
+                Dim pt = features(i)
+                Circle(dst2, pt, task.DotSize, white, -1, task.lineType)
+            Next
+
+            If task.heartBeat And gens.Count > 0 Then
+                labels(2) = CStr(features.Count) + " features found with max/average " + CStr(gens(0)) + "/" + gens.Average.ToString(fmt0) + " generations"
+            End If
+        End Sub
+    End Class
+
+
+
+
+    ' https://docs.opencv.org/3.4/d7/d8b/tutorial_py_lucas_kanade.html
+    Public Class XR_Feature_History : Inherits TaskParent
+        Public features As New List(Of cv.Point)
+        Dim featureHistory As New List(Of List(Of cv.Point))
+        Dim gens As New List(Of Integer)
+        Dim feat As New Feature_Basics
+        Public Sub New()
+            desc = "Find good features across multiple frames."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            feat.Run(task.gray)
+
+            dst2 = src.Clone
+
+            featureHistory.Add(New List(Of cv.Point)(feat.features))
+
+            Dim newFeatures As New List(Of cv.Point)
+            gens.Clear()
+            For Each cList In featureHistory
+                For Each pt In cList
+                    Dim index = newFeatures.IndexOf(pt)
+                    If index >= 0 Then
+                        gens(index) += 1
+                    Else
+                        newFeatures.Add(pt)
+                        gens.Add(1)
+                    End If
+                Next
+            Next
+
+            Dim threshold = If(task.fOptions.FrameHistoryCount.Value = 1, 0, 1)
+            features.Clear()
+            Dim whiteCount As Integer
+            For i = 0 To newFeatures.Count - 1
+                If gens(i) > threshold Then
+                    Dim pt = newFeatures(i)
+                    features.Add(pt)
+                    If gens(i) < task.fOptions.FrameHistoryCount.Value Then
+                        Circle(dst2, pt, task.DotSize + 2, Scalar.Red, -1, task.lineType)
+                    Else
+                        whiteCount += 1
+                        Circle(dst2, pt, task.DotSize, task.highlight, -1, task.lineType)
+                    End If
+                End If
+            Next
+
+            If featureHistory.Count > task.fOptions.FrameHistoryCount.Value Then featureHistory.RemoveAt(0)
+            If task.heartBeat Then
+                labels(2) = CStr(features.Count) + "/" + CStr(whiteCount) + " present/present on every frame" +
                             " Red is a recent addition, yellow is present on previous " +
                             CStr(task.fOptions.FrameHistoryCount.Value) + " frames"
-        End If
-    End Sub
-End Class
+            End If
+        End Sub
+    End Class
 
 
 
 
 
 
-Public Class XR_Feature_RedCloud : Inherits TaskParent
-    Dim feat As New Feature_Basics
-    Dim redC As New RedCloud_Basics
-    Public Sub New()
-        desc = "Show the feature points in the RedCloud output."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        feat.Run(src)
+    Public Class XR_Feature_RedCloud : Inherits TaskParent
+        Dim feat As New Feature_Basics
+        Dim redC As New RedCloud_Basics
+        Public Sub New()
+            desc = "Show the feature points in the RedCloud output."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            feat.Run(src)
 
-        redC.Run(src)
-        dst2 = redC.dst2
-        labels(2) = redC.labels(2)
+            redC.Run(src)
+            dst2 = redC.dst2
+            labels(2) = redC.labels(2)
 
-        For Each pt In feat.features
-            Circle(dst2, pt, task.DotSize, task.highlight, -1, task.lineType)
-        Next
-    End Sub
-End Class
-
-
-
-
-
-
-Public Class XR_Feature_WithDepth : Inherits TaskParent
-    Dim bricks As New Brick_Basics
-    Dim feat As New Feature_Basics
-    Public Sub New()
-        desc = "Show the feature points that have depth."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        bricks.Run(src)
-        feat.Run(task.gray)
-
-        dst2 = src
-        Dim depthCount As Integer
-        For Each pt In feat.features
-            Dim index = task.gridMap.Get(Of Integer)(pt.Y, pt.X)
-            If bricks.brickList(index).depth > 0 Then
+            For Each pt In feat.features
                 Circle(dst2, pt, task.DotSize, task.highlight, -1, task.lineType)
-                depthCount += 1
-            End If
-        Next
-        labels(2) = CStr(depthCount) + " features had depth or " + (depthCount / feat.features.Count).ToString("0%")
-    End Sub
-End Class
-
-
-
-
-
-
-
-Public Class XR_Feature_SteadyCam : Inherits TaskParent
-    Public options As New Options_Features
-    Dim feat As New Feature_Basics
-    Public Sub New()
-        OptionParent.FindSlider("Threshold Percent for Resync").Value = 50
-        desc = "Track features using correlation without the motion mask"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        options.Run()
-
-        feat.Run(task.gray)
-
-        Static features As New List(Of cv.Point)(feat.features)
-        Static lastSrc As Mat = src.Clone
-
-        Dim resync = features.Count / feat.features.Count < options.resyncThreshold
-        If task.heartBeat Or task.optionsChanged Or resync Then
-            features = New List(Of cv.Point)(feat.features)
-        End If
-
-        Dim ptList = New List(Of cv.Point)(features)
-        Dim correlationMat As New Mat
-        Dim mode = TemplateMatchModes.CCoeffNormed
-        features.Clear()
-        For Each pt In ptList
-            Dim index As Integer = task.gridMap.Get(Of Integer)(pt.Y, pt.X)
-            Dim r = task.gridRects(index)
-            MatchTemplate(src(r), lastSrc(r), correlationMat, mode)
-            If correlationMat.Get(Of Single)(0, 0) >= task.fCorrThreshold Then
-                features.Add(pt)
-            End If
-        Next
-
-        dst2 = src
-        For Each pt In features
-            Circle(dst2, pt, task.DotSize, task.highlight, -1, task.lineType)
-        Next
-
-        lastSrc = src.Clone
-        labels(2) = CStr(features.Count) + " features were validated by the correlation coefficient"
-    End Sub
-End Class
-
-
-
-
-
-
-Public Class XR_Feature_Agast : Inherits TaskParent
-    Implements IDisposable
-    Dim agastFD As XFeatures2D.AgastFeatureDetector
-    Dim stablePoints As New List(Of Point2f)
-    Dim options As New Options_Agast
-    Public Sub New()
-        desc = "Use the Agast Feature Detector in the OpenCV Contrib."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        options.Run()
-
-        If task.optionsChanged Then
-            If agastFD IsNot Nothing Then agastFD.Dispose()
-            agastFD = XFeatures2D.AgastFeatureDetector.Create(options.agastThreshold, options.useNonMaxSuppression,
-                                                         XFeatures2D.AgastFeatureDetector.DetectorType.OAST_9_16)
-        End If
-
-        Dim keypoints As KeyPoint() = agastFD.Detect(src)
-
-        Dim currPoints As New List(Of Point2f)
-        For Each kpt As KeyPoint In keypoints
-            currPoints.Add(kpt.Pt)
-        Next
-
-        Dim newList As New List(Of Point2f)
-        For Each pt In stablePoints
-            Dim val = task.motion.motionMask.Get(Of Byte)(pt.Y, pt.X)
-            If val = 0 Then newList.Add(pt)
-        Next
-
-        For Each pt In currPoints
-            Dim val = task.motion.motionMask.Get(Of Byte)(pt.Y, pt.X)
-            If val <> 0 Then newList.Add(pt)
-        Next
-
-        stablePoints = New List(Of Point2f)(newList)
-        dst2 = src
-        For Each pt In stablePoints
-            Circle(dst2, pt, task.DotSize, task.highlight, -1, task.lineType)
-        Next
-        labels(2) = $"Found {keypoints.Length} features with agast"
-    End Sub
-    Protected Overrides Sub Finalize()
-        If agastFD IsNot Nothing Then agastFD.Dispose()
-    End Sub
-End Class
-
-
-
-
-
-
-Public Class XR_Feature_BrickLine : Inherits TaskParent
-    Public features As New List(Of cv.Point)
-    Dim feat As New Feature_Bricks
-    Public Sub New()
-        task.gOptions.LineWidth.Value = 3
-        desc = "Find the lines implied in the grid square points."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        Dim sortByGrid As New SortedList(Of Integer, cv.Point)(New compareAllowIdenticalInteger)
-        For Each pt In feat.features
-            Dim lineIndex = task.lines.dst1.Get(Of Byte)(pt.Y, pt.X)
-            If lineIndex = 0 Then Continue For
-            Dim gridindex = task.gridMap.Get(Of Integer)(pt.Y, pt.X)
-            sortByGrid.Add(gridindex, pt)
-        Next
-
-        Dim brickLines(task.lines.lpList.Count - 1) As List(Of cv.Point)
-        dst3.SetTo(0)
-        features.Clear()
-        For Each pt In sortByGrid.Values
-            Dim lineIndex = task.lines.dst1.Get(Of Byte)(pt.Y, pt.X) - 1
-            If brickLines(lineIndex) Is Nothing Then
-                brickLines(lineIndex) = New List(Of cv.Point)({pt})
-            Else
-                brickLines(lineIndex).Add(pt)
-            End If
-
-            features.Add(pt)
-        Next
-
-        dst2 = src.Clone
-        For i = 0 To brickLines.Count - 1
-            If brickLines(i) Is Nothing Then Continue For
-            If brickLines.Count = 1 Then Continue For
-            Dim pt = brickLines(i)(0)
-            If pt = brickLines(i).Last Then Continue For
-            Dim color = vecToScalar(task.lines.dst2.Get(Of Vec3b)(pt.Y, pt.X))
-            Circle(dst3, pt, task.DotSize, color, -1, task.lineType)
-            Line(dst2, pt, brickLines(i).Last, color, task.lineWidth, task.lineType)
-            Line(dst3, pt, brickLines(i).Last, color, task.lineWidth, task.lineType)
-        Next
-    End Sub
-End Class
-
-
-
-
-
-
-Public Class XR_Feature_StableVisual : Inherits TaskParent
-    Dim feat As New Feature_Basics
-    Public fpStable As New List(Of fpData)
-    Public ptStable As New List(Of cv.Point)
-    Public Sub New()
-        desc = "Show only features present on this and the previous frame."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        Dim lastFeatures As New List(Of cv.Point)(feat.features)
-
-        feat.Run(src)
-        dst3 = feat.dst2
-
-        dst2.SetTo(0)
-        Dim stable As New List(Of cv.Point)
-        For Each pt In feat.features
-            If lastFeatures.Contains(pt) Then
-                Circle(dst2, pt, task.DotSize, task.highlight, -1, task.lineType)
-                stable.Add(pt)
-            End If
-        Next
-        lastFeatures = New List(Of cv.Point)(stable)
-        labels(2) = feat.labels(2) + " and " + CStr(stable.Count) + " appeared on earlier frames "
-
-        dst2 = src.Clone
-        For Each pt In stable
-            Circle(dst2, pt, task.DotSize, task.highlight, -1, task.lineType)
-        Next
-        labels(3) = "The " + CStr(stable.Count) + " points are present for more than one frame."
-    End Sub
-End Class
-
-
-
-
-
-
-' https://docs.opencv.org/3.4/d7/d8b/tutorial_py_lucas_kanade.html
-Public Class Feature_KNN : Inherits TaskParent
-    Dim knn As New KNN_Basics
-    Public feat As New Feature_Basics
-    Public Sub New()
-        dst3 = New Mat(dst3.Size(), MatType.CV_8U, Scalar.All(0))
-        desc = "Find good features to track in the image but use the same cv.Point if closer than a threshold"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        feat.Run(task.gray)
-
-        knn.ptListQuery = New List(Of cv.Point)(feat.features)
-        If knn.ptListTrain.Count = 0 Or task.gOptions.DebugCheckBox.Checked Then
-            knn.ptListTrain = New List(Of cv.Point)(knn.ptListQuery)
-            task.gOptions.DebugCheckBox.Checked = False
-        End If
-
-        knn.Run(src)
-
-        For i = 0 To knn.queries.Count - 1
-            Dim trainIndex = knn.result(i, 0) ' index of the matched train input
-            Dim pt = knn.ptListTrain(trainIndex)
-            Dim qPt = feat.features(i)
-            If pt.DistanceTo(qPt) > 2 Then knn.ptListTrain(trainIndex) = feat.features(i)
-        Next
-
-        src.CopyTo(dst2)
-        dst3.SetTo(0)
-        For Each pt In feat.features
-            Circle(dst2, pt, task.DotSize + 2, white, -1, task.lineType)
-            Circle(dst3, pt, task.DotSize + 2, white, -1, task.lineType)
-        Next
-
-        labels(2) = feat.labels(2)
-        labels(3) = feat.labels(2)
-    End Sub
-End Class
-
-
-
-
-
-Public Class XR_Feature_LeftRight : Inherits TaskParent
-    Dim pyrLeft As New Feature_Basics
-    Dim pyrRight As New Feature_Basics
-    Public features As New List(Of cv.Point)
-    Public lastFeatures As New List(Of cv.Point)
-    Public Sub New()
-        desc = "Find features in both the left and right images."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        pyrLeft.Run(task.leftView)
-        pyrRight.Run(task.rightView)
-
-        Dim ptLeft As New List(Of cv.Point)
-        CvtColor(task.leftView, dst2, ColorConversionCodes.GRAY2BGR)
-        Dim rightMatches As New List(Of cv.Point)
-        For i = 0 To pyrLeft.features.Count - 1
-            Dim pt = pyrLeft.features(i)
-            Dim depth = task.pcSplit(2).Get(Of Single)(pt.Y, pt.X)
-            If depth > 0 Then
-                ptLeft.Add(New cv.Point(pt.X, pt.Y))
-                Circle(dst2, pt, task.DotSize, task.highlight, -1, task.lineType)
-                Dim ptRight = pt
-                ptRight.X -= task.calibData.baseline * task.calibData.leftIntrinsics.fx / depth
-                rightMatches.Add(ptRight)
-            End If
-        Next
-
-        CvtColor(task.rightView, dst3, ColorConversionCodes.GRAY2BGR)
-        lastFeatures = New List(Of cv.Point)(features)
-        Dim newFeatures As New List(Of cv.Point)
-        For Each pt In pyrRight.features
-            Dim index = rightMatches.IndexOf(pt)
-            If index >= 0 Then
-                newFeatures.Add(ptLeft(index))
-                Circle(dst2, ptLeft(index), task.DotSize + 2, task.highlight, -1, task.lineType)
-                Circle(dst3, pt, task.DotSize + 2, task.highlight, -1, task.lineType)
-            End If
-        Next
-
-        If lastFeatures.Count > 0 Then
-            features.Clear()
-            For Each pt In newFeatures
-                If lastFeatures.Contains(pt) = False Then features.Add(pt)
             Next
-        Else
-            features = New List(Of cv.Point)(newFeatures)
-            lastFeatures = New List(Of cv.Point)(features)
-        End If
-
-        If task.quarterBeat Then
-            labels(2) = CStr(ptLeft.Count) + " features found in the left image."
-            labels(3) = CStr(features.Count) + " were confirmed present for 2 frames in both the left and right images."
-        End If
-    End Sub
-End Class
+        End Sub
+    End Class
 
 
 
 
 
 
-Public Class XR_Feature_LeftRightCorrelation : Inherits TaskParent
-    Dim feat As New Feature_Basics
-    Public features As New List(Of cv.Point)
-    Public lastFeatures As New List(Of cv.Point)
-    Dim match As New Match_Basics
-    Public Sub New()
-        task.fOptions.MatchCorrSlider.Value = 75
-        desc = "Find features in the left image and verify them with correlation."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        Dim maxCorr = task.fOptions.MatchCorrSlider.Value / 100
-        feat.Run(task.leftView)
+    Public Class XR_Feature_WithDepth : Inherits TaskParent
+        Dim bricks As New Brick_Basics
+        Dim feat As New Feature_Basics
+        Public Sub New()
+            desc = "Show the feature points that have depth."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            bricks.Run(src)
+            feat.Run(task.gray)
 
-        lastFeatures = New List(Of cv.Point)(features)
-        features.Clear()
-        dst2 = task.color.Clone
-        dst3 = task.color.Clone
-        Dim countNoDepth As Integer, countNoCorr As Integer
-        For Each pt In feat.features
-            Circle(dst2, pt, task.DotSize, task.highlight, -1, task.lineType)
-            Dim depth = task.pcSplit(2).Get(Of Single)(pt.Y, pt.X)
-            If depth > 0 Then
-                Dim rect = task.gridRects(task.gridMap.Get(Of Integer)(pt.Y, pt.X))
-                match.template = task.leftView(rect)
-                rect.X -= task.calibData.baseline * task.calibData.leftIntrinsics.fx / depth
-                rect = ValidateRect(rect)
-                match.Run(task.rightView(rect))
-                If match.correlation > maxCorr Then
-                    features.Add(New cv.Point(pt.X, pt.Y))
-                    Circle(dst2, pt, task.DotSize + 2, task.highlight, -1, task.lineType)
-                    Circle(dst3, pt, task.DotSize + 1, task.highlight, -1, task.lineType)
-                Else
-                    countNoCorr += 1
+            dst2 = src
+            Dim depthCount As Integer
+            For Each pt In feat.features
+                Dim index = task.gridMap.Get(Of Integer)(pt.Y, pt.X)
+                If bricks.brickList(index).depth > 0 Then
+                    Circle(dst2, pt, task.DotSize, task.highlight, -1, task.lineType)
+                    depthCount += 1
                 End If
-            Else
-                countNoDepth += 1
+            Next
+            labels(2) = CStr(depthCount) + " features had depth or " + (depthCount / feat.features.Count).ToString("0%")
+        End Sub
+    End Class
+
+
+
+
+
+
+
+    Public Class XR_Feature_SteadyCam : Inherits TaskParent
+        Public options As New Options_Features
+        Dim feat As New Feature_Basics
+        Public Sub New()
+            OptionParent.FindSlider("Threshold Percent for Resync").Value = 50
+            desc = "Track features using correlation without the motion mask"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            options.Run()
+
+            feat.Run(task.gray)
+
+            Static features As New List(Of cv.Point)(feat.features)
+            Static lastSrc As Mat = src.Clone
+
+            Dim resync = features.Count / feat.features.Count < options.resyncThreshold
+            If task.heartBeat Or task.optionsChanged Or resync Then
+                features = New List(Of cv.Point)(feat.features)
             End If
-        Next
 
-        If task.quarterBeat Then
-            labels(2) = CStr(features.Count) + " of " + CStr(feat.features.Count) +
-                        " features had depth and high correlation to the right image."
-            labels(3) = CStr(countNoDepth) + " features had no depth and " +
-                        CStr(countNoCorr) + " missed the correlation threshold of " + maxCorr.ToString(fmt2)
-        End If
-    End Sub
-End Class
-
-
-
-
-
-
-Public Class XR_Feature_Matching : Inherits TaskParent
-    Public features As New List(Of cv.Point)
-    Public motionPoints As New List(Of cv.Point)
-    Dim match As New Match_Basics
-    Dim feat As New Feature_Basics
-    Public Sub New()
-        task.fOptions.FeatureSizeSlider.Value = 150
-        desc = "Use correlation coefficient to keep features from frame to frame."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        Static fpLastSrc = src.Clone
-
-        Dim matched As New List(Of cv.Point)
-        motionPoints.Clear()
-        For Each pt In features
-            Dim val = task.motion.motionMask.Get(Of Byte)(pt.Y, pt.X)
-            If val = 0 Then
+            Dim ptList = New List(Of cv.Point)(features)
+            Dim correlationMat As New Mat
+            Dim mode = TemplateMatchModes.CCoeffNormed
+            features.Clear()
+            For Each pt In ptList
                 Dim index As Integer = task.gridMap.Get(Of Integer)(pt.Y, pt.X)
                 Dim r = task.gridRects(index)
-                match.template = fpLastSrc(r)
-                match.Run(src(r))
-                If match.correlation > task.fCorrThreshold Then matched.Add(pt)
-            Else
-                motionPoints.Add(pt)
-            End If
-        Next
+                MatchTemplate(src(r), lastSrc(r), correlationMat, mode)
+                If correlationMat.Get(Of Single)(0, 0) >= task.fCorrThreshold Then
+                    features.Add(pt)
+                End If
+            Next
 
-        labels(2) = "There were " + CStr(features.Count) + " features identified and " + CStr(matched.Count) +
+            dst2 = src
+            For Each pt In features
+                Circle(dst2, pt, task.DotSize, task.highlight, -1, task.lineType)
+            Next
+
+            lastSrc = src.Clone
+            labels(2) = CStr(features.Count) + " features were validated by the correlation coefficient"
+        End Sub
+    End Class
+
+
+
+
+
+
+    Public Class XR_Feature_Agast : Inherits TaskParent
+        Implements IDisposable
+        Dim agastFD As XFeatures2D.AgastFeatureDetector
+        Dim stablePoints As New List(Of Point2f)
+        Dim options As New Options_Agast
+        Public Sub New()
+            desc = "Use the Agast Feature Detector in the OpenCV Contrib."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            options.Run()
+
+            If task.optionsChanged Then
+                If agastFD IsNot Nothing Then agastFD.Dispose()
+                agastFD = XFeatures2D.AgastFeatureDetector.Create(options.agastThreshold, options.useNonMaxSuppression,
+                                                         XFeatures2D.AgastFeatureDetector.DetectorType.OAST_9_16)
+            End If
+
+            Dim keypoints As KeyPoint() = agastFD.Detect(src)
+
+            Dim currPoints As New List(Of Point2f)
+            For Each kpt As KeyPoint In keypoints
+                currPoints.Add(kpt.Pt)
+            Next
+
+            Dim newList As New List(Of Point2f)
+            For Each pt In stablePoints
+                Dim val = task.motion.motionMask.Get(Of Byte)(pt.Y, pt.X)
+                If val = 0 Then newList.Add(pt)
+            Next
+
+            For Each pt In currPoints
+                Dim val = task.motion.motionMask.Get(Of Byte)(pt.Y, pt.X)
+                If val <> 0 Then newList.Add(pt)
+            Next
+
+            stablePoints = New List(Of Point2f)(newList)
+            dst2 = src
+            For Each pt In stablePoints
+                Circle(dst2, pt, task.DotSize, task.highlight, -1, task.lineType)
+            Next
+            labels(2) = $"Found {keypoints.Length} features with agast"
+        End Sub
+        Protected Overrides Sub Finalize()
+            If agastFD IsNot Nothing Then agastFD.Dispose()
+        End Sub
+    End Class
+
+
+
+
+
+
+    Public Class XR_Feature_BrickLine : Inherits TaskParent
+        Public features As New List(Of cv.Point)
+        Dim feat As New Feature_Bricks
+        Public Sub New()
+            task.gOptions.LineWidth.Value = 3
+            desc = "Find the lines implied in the grid square points."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            Dim sortByGrid As New SortedList(Of Integer, cv.Point)(New compareAllowIdenticalInteger)
+            For Each pt In feat.features
+                Dim lineIndex = task.lines.dst1.Get(Of Byte)(pt.Y, pt.X)
+                If lineIndex = 0 Then Continue For
+                Dim gridindex = task.gridMap.Get(Of Integer)(pt.Y, pt.X)
+                sortByGrid.Add(gridindex, pt)
+            Next
+
+            Dim brickLines(task.lines.lpList.Count - 1) As List(Of cv.Point)
+            dst3.SetTo(0)
+            features.Clear()
+            For Each pt In sortByGrid.Values
+                Dim lineIndex = task.lines.dst1.Get(Of Byte)(pt.Y, pt.X) - 1
+                If brickLines(lineIndex) Is Nothing Then
+                    brickLines(lineIndex) = New List(Of cv.Point)({pt})
+                Else
+                    brickLines(lineIndex).Add(pt)
+                End If
+
+                features.Add(pt)
+            Next
+
+            dst2 = src.Clone
+            For i = 0 To brickLines.Count - 1
+                If brickLines(i) Is Nothing Then Continue For
+                If brickLines.Count = 1 Then Continue For
+                Dim pt = brickLines(i)(0)
+                If pt = brickLines(i).Last Then Continue For
+                Dim color = vecToScalar(task.lines.dst2.Get(Of Vec3b)(pt.Y, pt.X))
+                Circle(dst3, pt, task.DotSize, color, -1, task.lineType)
+                Line(dst2, pt, brickLines(i).Last, color, task.lineWidth, task.lineType)
+                Line(dst3, pt, brickLines(i).Last, color, task.lineWidth, task.lineType)
+            Next
+        End Sub
+    End Class
+
+
+
+
+
+
+    Public Class XR_Feature_StableVisual : Inherits TaskParent
+        Dim feat As New Feature_Basics
+        Public fpStable As New List(Of fpData)
+        Public ptStable As New List(Of cv.Point)
+        Public Sub New()
+            desc = "Show only features present on this and the previous frame."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            Dim lastFeatures As New List(Of cv.Point)(feat.features)
+
+            feat.Run(src)
+            dst3 = feat.dst2
+
+            dst2.SetTo(0)
+            Dim stable As New List(Of cv.Point)
+            For Each pt In feat.features
+                If lastFeatures.Contains(pt) Then
+                    Circle(dst2, pt, task.DotSize, task.highlight, -1, task.lineType)
+                    stable.Add(pt)
+                End If
+            Next
+            lastFeatures = New List(Of cv.Point)(stable)
+            labels(2) = feat.labels(2) + " and " + CStr(stable.Count) + " appeared on earlier frames "
+
+            dst2 = src.Clone
+            For Each pt In stable
+                Circle(dst2, pt, task.DotSize, task.highlight, -1, task.lineType)
+            Next
+            labels(3) = "The " + CStr(stable.Count) + " points are present for more than one frame."
+        End Sub
+    End Class
+
+
+
+
+
+
+    ' https://docs.opencv.org/3.4/d7/d8b/tutorial_py_lucas_kanade.html
+    Public Class Feature_KNN : Inherits TaskParent
+        Dim knn As New KNN_Basics
+        Public feat As New Feature_Basics
+        Public Sub New()
+            dst3 = New Mat(dst3.Size(), MatType.CV_8U, Scalar.All(0))
+            desc = "Find good features to track in the image but use the same cv.Point if closer than a threshold"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            feat.Run(task.gray)
+
+            knn.ptListQuery = New List(Of cv.Point)(feat.features)
+            If knn.ptListTrain.Count = 0 Or task.gOptions.DebugCheckBox.Checked Then
+                knn.ptListTrain = New List(Of cv.Point)(knn.ptListQuery)
+                task.gOptions.DebugCheckBox.Checked = False
+            End If
+
+            knn.Run(src)
+
+            For i = 0 To knn.queries.Count - 1
+                Dim trainIndex = knn.result(i, 0) ' index of the matched train input
+                Dim pt = knn.ptListTrain(trainIndex)
+                Dim qPt = feat.features(i)
+                If pt.DistanceTo(qPt) > 2 Then knn.ptListTrain(trainIndex) = feat.features(i)
+            Next
+
+            src.CopyTo(dst2)
+            dst3.SetTo(0)
+            For Each pt In feat.features
+                Circle(dst2, pt, task.DotSize + 2, white, -1, task.lineType)
+                Circle(dst3, pt, task.DotSize + 2, white, -1, task.lineType)
+            Next
+
+            labels(2) = feat.labels(2)
+            labels(3) = feat.labels(2)
+        End Sub
+    End Class
+
+
+
+
+
+    Public Class XR_Feature_LeftRight : Inherits TaskParent
+        Dim pyrLeft As New Feature_Basics
+        Dim pyrRight As New Feature_Basics
+        Public features As New List(Of cv.Point)
+        Public lastFeatures As New List(Of cv.Point)
+        Public Sub New()
+            desc = "Find features in both the left and right images."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            pyrLeft.Run(task.leftView)
+            pyrRight.Run(task.rightView)
+
+            Dim ptLeft As New List(Of cv.Point)
+            CvtColor(task.leftView, dst2, ColorConversionCodes.GRAY2BGR)
+            Dim rightMatches As New List(Of cv.Point)
+            For i = 0 To pyrLeft.features.Count - 1
+                Dim pt = pyrLeft.features(i)
+                Dim depth = task.pcSplit(2).Get(Of Single)(pt.Y, pt.X)
+                If depth > 0 Then
+                    ptLeft.Add(New cv.Point(pt.X, pt.Y))
+                    Circle(dst2, pt, task.DotSize, task.highlight, -1, task.lineType)
+                    Dim ptRight = pt
+                    ptRight.X -= task.calibData.baseline * task.calibData.leftIntrinsics.fx / depth
+                    rightMatches.Add(ptRight)
+                End If
+            Next
+
+            CvtColor(task.rightView, dst3, ColorConversionCodes.GRAY2BGR)
+            lastFeatures = New List(Of cv.Point)(features)
+            Dim newFeatures As New List(Of cv.Point)
+            For Each pt In pyrRight.features
+                Dim index = rightMatches.IndexOf(pt)
+                If index >= 0 Then
+                    newFeatures.Add(ptLeft(index))
+                    Circle(dst2, ptLeft(index), task.DotSize + 2, task.highlight, -1, task.lineType)
+                    Circle(dst3, pt, task.DotSize + 2, task.highlight, -1, task.lineType)
+                End If
+            Next
+
+            If lastFeatures.Count > 0 Then
+                features.Clear()
+                For Each pt In newFeatures
+                    If lastFeatures.Contains(pt) = False Then features.Add(pt)
+                Next
+            Else
+                features = New List(Of cv.Point)(newFeatures)
+                lastFeatures = New List(Of cv.Point)(features)
+            End If
+
+            If task.quarterBeat Then
+                labels(2) = CStr(ptLeft.Count) + " features found in the left image."
+                labels(3) = CStr(features.Count) + " were confirmed present for 2 frames in both the left and right images."
+            End If
+        End Sub
+    End Class
+
+
+
+
+
+
+    Public Class XR_Feature_LeftRightCorrelation : Inherits TaskParent
+        Dim feat As New Feature_Basics
+        Public features As New List(Of cv.Point)
+        Public lastFeatures As New List(Of cv.Point)
+        Dim match As New Match_Basics
+        Public Sub New()
+            task.fOptions.MatchCorrSlider.Value = 75
+            desc = "Find features in the left image and verify them with correlation."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            Dim maxCorr = task.fOptions.MatchCorrSlider.Value / 100
+            feat.Run(task.leftView)
+
+            lastFeatures = New List(Of cv.Point)(features)
+            features.Clear()
+            dst2 = task.color.Clone
+            dst3 = task.color.Clone
+            Dim countNoDepth As Integer, countNoCorr As Integer
+            For Each pt In feat.features
+                Circle(dst2, pt, task.DotSize, task.highlight, -1, task.lineType)
+                Dim depth = task.pcSplit(2).Get(Of Single)(pt.Y, pt.X)
+                If depth > 0 Then
+                    Dim rect = task.gridRects(task.gridMap.Get(Of Integer)(pt.Y, pt.X))
+                    match.template = task.leftView(rect)
+                    rect.X -= task.calibData.baseline * task.calibData.leftIntrinsics.fx / depth
+                    rect = ValidateRect(rect)
+                    match.Run(task.rightView(rect))
+                    If match.correlation > maxCorr Then
+                        features.Add(New cv.Point(pt.X, pt.Y))
+                        Circle(dst2, pt, task.DotSize + 2, task.highlight, -1, task.lineType)
+                        Circle(dst3, pt, task.DotSize + 1, task.highlight, -1, task.lineType)
+                    Else
+                        countNoCorr += 1
+                    End If
+                Else
+                    countNoDepth += 1
+                End If
+            Next
+
+            If task.quarterBeat Then
+                labels(2) = CStr(features.Count) + " of " + CStr(feat.features.Count) +
+                        " features had depth and high correlation to the right image."
+                labels(3) = CStr(countNoDepth) + " features had no depth and " +
+                        CStr(countNoCorr) + " missed the correlation threshold of " + maxCorr.ToString(fmt2)
+            End If
+        End Sub
+    End Class
+
+
+
+
+
+
+    Public Class XR_Feature_Matching : Inherits TaskParent
+        Public features As New List(Of cv.Point)
+        Public motionPoints As New List(Of cv.Point)
+        Dim match As New Match_Basics
+        Dim feat As New Feature_Basics
+        Public Sub New()
+            task.fOptions.FeatureSizeSlider.Value = 150
+            desc = "Use correlation coefficient to keep features from frame to frame."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            Static fpLastSrc = src.Clone
+
+            Dim matched As New List(Of cv.Point)
+            motionPoints.Clear()
+            For Each pt In features
+                Dim val = task.motion.motionMask.Get(Of Byte)(pt.Y, pt.X)
+                If val = 0 Then
+                    Dim index As Integer = task.gridMap.Get(Of Integer)(pt.Y, pt.X)
+                    Dim r = task.gridRects(index)
+                    match.template = fpLastSrc(r)
+                    match.Run(src(r))
+                    If match.correlation > task.fCorrThreshold Then matched.Add(pt)
+                Else
+                    motionPoints.Add(pt)
+                End If
+            Next
+
+            labels(2) = "There were " + CStr(features.Count) + " features identified and " + CStr(matched.Count) +
                     " were matched to the previous frame"
 
-        If matched.Count < task.fOptions.FeatureSizeSlider.Value / 2 Then
-            feat.Run(src)
-            features = feat.features
-        Else
-            features = New List(Of cv.Point)(matched)
-        End If
-
-        dst2 = src.Clone
-        For Each pt In features
-            Circle(dst2, pt, task.DotSize, task.highlight, -1, task.lineType)
-        Next
-
-        fpLastSrc = src.Clone
-    End Sub
-End Class
-
-
-
-
-
-
-Public Class Feature_PointsPath : Inherits TaskParent
-    Dim feat As New Feature_MatchAKAZE
-    Public Sub New()
-        labels(3) = "Features found in the image"
-        desc = "Use the sorted list of Delaunay regions to find the top X points to track."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        feat.Run(task.gray)
-
-        If task.heartBeat Then dst2.SetTo(0)
-
-        For Each pt In feat.features
-            Circle(dst2, pt, task.DotSize, task.highlight, -1, task.lineType)
-        Next
-        labels(2) = CStr(feat.features.Count) + " targets were present with " + CStr(task.fOptions.FeatureSizeSlider.Value) + " requested."
-    End Sub
-End Class
-
-
-
-
-
-
-Public Class Feature_MatchAKAZE : Inherits TaskParent
-    Implements IDisposable
-    Dim akaze As XFeatures2D.AKAZE
-    Dim matcher As BFMatcher
-    Dim lastFrame As Mat
-    Dim lastKeyPoints As KeyPoint()
-    Dim lastDesc As New Mat
-    Public features As New List(Of cv.Point)
-    Public lastFeatures As New List(Of cv.Point)
-    Public Sub New()
-        labels = {"", "", "Current AKAZE keypoints", "Matches connected to previous frame"}
-        desc = "Cursor.ai: Detect AKAZE keypoints and match them to the next camera frame."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        Dim color = If(src.Channels() = 1, task.color.Clone, src.Clone)
-        Dim gray = If(src.Channels() = 1, src.Clone, task.gray.Clone)
-
-        If akaze Is Nothing Then akaze = XFeatures2D.AKAZE.Create()
-        If matcher Is Nothing Then matcher = New BFMatcher(NormTypes.Hamming, crossCheck:=False)
-
-        Dim keyPoints = akaze.Detect(gray)
-        Dim maxFeat = task.fOptions.FeatureSizeSlider.Value
-        If keyPoints IsNot Nothing AndAlso keyPoints.Length > maxFeat Then
-            keyPoints = KeyPointsFilter.RetainBest(keyPoints, maxFeat)
-        End If
-
-        Dim descMat As New Mat()
-        If keyPoints IsNot Nothing AndAlso keyPoints.Length > 0 Then
-            akaze.Compute(gray, keyPoints, descMat)
-        End If
-
-        dst2 = Feature_MatchORB.displayMatches(dst2, keyPoints)
-
-        features.Clear()
-        lastFeatures.Clear()
-        If Not lastDesc.Empty() AndAlso Not descMat.Empty() AndAlso
-           lastKeyPoints IsNot Nothing AndAlso lastKeyPoints.Length > 0 AndAlso
-           keyPoints IsNot Nothing AndAlso keyPoints.Length > 0 Then
-
-            Dim knn = matcher.KnnMatch(lastDesc, descMat, k:=2)
-            Dim matches = Feature_MatchORB.getMatches(knn)
-
-            dst3 = lastFrame.Clone
-            Feature_MatchORB.DisplayMatches(dst3, matches, lastKeyPoints, keyPoints, features, lastFeatures)
-
-            labels(2) = CStr(If(keyPoints Is Nothing, 0, keyPoints.Length)) + " AKAZE keypoints (max " +
-                        CStr(maxFeat) + ") on current frame"
-            labels(3) = (matches.Count / lastKeyPoints.Length).ToString("0%") + " matched to previous frame."
-        End If
-
-        Feature_MatchORB.captureState(lastFrame, lastDesc, descMat, lastKeyPoints, keyPoints)
-    End Sub
-    Protected Overrides Sub Finalize()
-        If akaze IsNot Nothing Then akaze.Dispose()
-        If matcher IsNot Nothing Then matcher.Dispose()
-        If lastDesc IsNot Nothing Then lastDesc.Dispose()
-    End Sub
-End Class
-
-
-
-
-
-
-
-Public Class Feature_LeftRight : Inherits TaskParent
-    Implements IDisposable
-    Dim akaze As XFeatures2D.AKAZE
-    Dim matcher As BFMatcher
-    Public features As New List(Of cv.Point)
-    Public lastFeatures As New List(Of cv.Point)
-    Public Sub New()
-        akaze = XFeatures2D.AKAZE.Create()
-        matcher = New BFMatcher(NormTypes.Hamming, crossCheck:=False)
-        labels = {"", "", "Left image AKAZE features", "Right image nearest matches"}
-        desc = "Cursor.ai: Find AKAZE features in the left image and match each to the nearest feature in the right image."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        Dim leftKp As KeyPoint() = Nothing
-        Dim rightKp As KeyPoint() = Nothing
-        Dim leftDesc As New Mat()
-        Dim rightDesc As New Mat()
-        akaze.DetectAndCompute(task.leftView, Nothing, leftKp, leftDesc)
-        akaze.DetectAndCompute(task.rightView, Nothing, rightKp, rightDesc)
-
-        If task.leftView.Channels() = 1 Then
-            CvtColor(task.leftView, dst2, ColorConversionCodes.GRAY2BGR)
-        Else
-            dst2 = task.leftView.Clone
-        End If
-        If leftKp IsNot Nothing Then
-            For Each kp In leftKp
-                Circle(dst2, kp.Pt, task.DotSize, task.highlight, -1, task.lineType)
-            Next
-        End If
-
-        features.Clear()
-        lastFeatures.Clear()
-        If Not leftDesc.Empty() AndAlso Not rightDesc.Empty() AndAlso
-           leftKp IsNot Nothing AndAlso leftKp.Length > 0 AndAlso
-           rightKp IsNot Nothing AndAlso rightKp.Length > 0 Then
-
-            Dim knn = matcher.KnnMatch(leftDesc, rightDesc, k:=2)
-            Dim matches = Feature_MatchORB.getMatches(knn)
-
-            If task.rightView.Channels() = 1 Then
-                CvtColor(task.rightView, dst3, ColorConversionCodes.GRAY2BGR)
+            If matched.Count < task.fOptions.FeatureSizeSlider.Value / 2 Then
+                feat.Run(src)
+                features = feat.features
             Else
-                dst3 = task.rightView.Clone
+                features = New List(Of cv.Point)(matched)
             End If
-            Feature_MatchORB.DisplayMatches(dst3, matches, leftKp, rightKp, features, lastFeatures)
 
-            labels(2) = CStr(leftKp.Length) + " AKAZE features in the left image"
-            labels(3) = CStr(matches.Count) + " nearest matches in the right image (" +
-                        (matches.Count / leftKp.Length).ToString("0%") + ")"
-        End If
-
-        leftDesc.Dispose()
-        rightDesc.Dispose()
-    End Sub
-    Protected Overrides Sub Finalize()
-        If akaze IsNot Nothing Then akaze.Dispose()
-        If matcher IsNot Nothing Then matcher.Dispose()
-    End Sub
-End Class
-
-
-
-
-
-
-Public Class Feature_MatchBRISK : Inherits TaskParent
-    Implements IDisposable
-    Dim brisk As XFeatures2D.BRISK
-    Dim matcher As BFMatcher
-    Dim lastFrame As Mat
-    Dim lastKeyPoints As KeyPoint()
-    Dim lastDesc As New Mat
-    Public features As New List(Of cv.Point)
-    Public lastFeatures As New List(Of cv.Point)
-    Public Sub New()
-        brisk = XFeatures2D.BRISK.Create()
-        matcher = New BFMatcher(NormTypes.Hamming, crossCheck:=False)
-        desc = "Cursor.ai: Detect BRISK keypoints and match them to the next camera frame."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        Dim keyPoints As KeyPoint() = Nothing
-        Dim descMat As New Mat()
-        brisk.DetectAndCompute(task.gray, Nothing, keyPoints, descMat)
-
-        dst2 = Feature_MatchORB.displayMatches(dst2, keyPoints)
-
-        If Not lastDesc.Empty() AndAlso Not descMat.Empty() AndAlso
-           lastKeyPoints IsNot Nothing AndAlso lastKeyPoints.Length > 0 AndAlso
-           keyPoints IsNot Nothing AndAlso keyPoints.Length > 0 Then
-
-            Dim knn = matcher.KnnMatch(lastDesc, descMat, k:=2)
-            Dim matches = Feature_MatchORB.getMatches(knn)
-
-            dst3 = lastFrame.Clone
-            Feature_MatchORB.DisplayMatches(dst3, matches, lastKeyPoints, keyPoints, features, lastFeatures)
-
-            labels(2) = CStr(If(keyPoints Is Nothing, 0, keyPoints.Length)) + " BRISK keypoints on current frame"
-            labels(3) = (matches.Count / lastKeyPoints.Length).ToString("0%") + " matched to previous frame."
-        End If
-
-        If task.heartBeat Then Feature_MatchORB.captureState(lastFrame, lastDesc, descMat, lastKeyPoints, keyPoints)
-    End Sub
-    Protected Overrides Sub Finalize()
-        If brisk IsNot Nothing Then brisk.Dispose()
-        If matcher IsNot Nothing Then matcher.Dispose()
-        If lastDesc IsNot Nothing Then lastDesc.Dispose()
-    End Sub
-End Class
-
-
-
-
-
-
-Public Class Feature_MatchSIFT : Inherits TaskParent
-    Implements IDisposable
-    Dim sift As SIFT
-    Dim matcher As BFMatcher
-    Dim lastFrame As Mat
-    Dim lastKeyPoints As KeyPoint()
-    Dim lastDesc As New Mat
-    Public features As New List(Of cv.Point)
-    Public lastFeatures As New List(Of cv.Point)
-    Public Sub New()
-        sift = SIFT.Create()
-        matcher = New BFMatcher(NormTypes.L2, crossCheck:=False)
-        desc = "Cursor.ai: Detect SIFT keypoints and match them to the next camera frame."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        Dim keyPoints As KeyPoint() = Nothing
-        Dim descMat As New Mat()
-        sift.DetectAndCompute(task.gray, Nothing, keyPoints, descMat)
-
-        dst2 = Feature_MatchORB.displayMatches(dst2, keyPoints)
-
-        If Not lastDesc.Empty() AndAlso Not descMat.Empty() AndAlso
-           lastKeyPoints IsNot Nothing AndAlso lastKeyPoints.Length > 0 AndAlso
-           keyPoints IsNot Nothing AndAlso keyPoints.Length > 0 Then
-
-            Dim knn = matcher.KnnMatch(lastDesc, descMat, k:=2)
-            Dim matches = Feature_MatchORB.getMatches(knn)
-
-            dst3 = lastFrame.Clone
-            Feature_MatchORB.DisplayMatches(dst3, matches, lastKeyPoints, keyPoints, features, lastFeatures)
-
-            labels(2) = CStr(If(keyPoints Is Nothing, 0, keyPoints.Length)) + " SIFT keypoints on current frame"
-            labels(3) = (matches.Count / lastKeyPoints.Length).ToString("0%") + " matched to previous frame."
-        End If
-
-        If task.heartBeat Then Feature_MatchORB.captureState(lastFrame, lastDesc, descMat, lastKeyPoints, keyPoints)
-    End Sub
-    Protected Overrides Sub Finalize()
-        If sift IsNot Nothing Then sift.Dispose()
-        If matcher IsNot Nothing Then matcher.Dispose()
-        If lastDesc IsNot Nothing Then lastDesc.Dispose()
-    End Sub
-End Class
-
-
-
-
-
-
-Public Class Feature_MatchSURF : Inherits TaskParent
-    Implements IDisposable
-    Dim surf As XFeatures2D.SURF
-    Dim matcher As BFMatcher
-    Dim lastFrame As Mat
-    Dim lastKeyPoints As KeyPoint()
-    Dim lastDesc As New Mat
-    Public features As New List(Of cv.Point)
-    Public lastFeatures As New List(Of cv.Point)
-    Public Sub New()
-        surf = XFeatures2D.SURF.Create(2000)
-        matcher = New BFMatcher(NormTypes.L2, crossCheck:=False)
-        desc = "Cursor.ai: Detect SURF keypoints and match them to the next camera frame."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        Dim keyPoints As KeyPoint() = Nothing
-        Dim descMat As New Mat()
-        surf.DetectAndCompute(task.gray, Nothing, keyPoints, descMat)
-
-        dst2 = Feature_MatchORB.displayMatches(dst2, keyPoints)
-
-        If Not lastDesc.Empty() AndAlso Not descMat.Empty() AndAlso
-           lastKeyPoints IsNot Nothing AndAlso lastKeyPoints.Length > 0 AndAlso
-           keyPoints IsNot Nothing AndAlso keyPoints.Length > 0 Then
-
-            Dim knn = matcher.KnnMatch(lastDesc, descMat, k:=2)
-            Dim matches = Feature_MatchORB.getMatches(knn)
-
-            dst3 = lastFrame.Clone
-            Feature_MatchORB.DisplayMatches(dst3, matches, lastKeyPoints, keyPoints, features, lastFeatures)
-
-            labels(2) = CStr(If(keyPoints Is Nothing, 0, keyPoints.Length)) + " SURF keypoints on current frame"
-            labels(3) = (matches.Count / lastKeyPoints.Length).ToString("0%") + " matched to previous frame."
-        End If
-
-        If task.heartBeat Then Feature_MatchORB.captureState(lastFrame, lastDesc, descMat, lastKeyPoints, keyPoints)
-    End Sub
-    Protected Overrides Sub Finalize()
-        If surf IsNot Nothing Then surf.Dispose()
-        If matcher IsNot Nothing Then matcher.Dispose()
-        If lastDesc IsNot Nothing Then lastDesc.Dispose()
-    End Sub
-End Class
-
-
-
-
-
-
-Public Class Feature_MatchKAZE : Inherits TaskParent
-    Implements IDisposable
-    Dim kaze As XFeatures2D.KAZE
-    Dim matcher As BFMatcher
-    Dim lastFrame As Mat
-    Dim lastKeyPoints As KeyPoint()
-    Dim lastDesc As New Mat
-    Public features As New List(Of cv.Point)
-    Public lastFeatures As New List(Of cv.Point)
-    Public Sub New()
-        kaze = XFeatures2D.KAZE.Create()
-        matcher = New BFMatcher(NormTypes.L2, crossCheck:=False)
-        desc = "Cursor.ai: Detect KAZE keypoints and match them to the next camera frame."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        Dim keyPoints As KeyPoint() = Nothing
-        Dim descMat As New Mat()
-        kaze.DetectAndCompute(task.gray, Nothing, keyPoints, descMat)
-
-        dst2 = Feature_MatchORB.displayMatches(dst2, keyPoints)
-
-        If Not lastDesc.Empty() AndAlso Not descMat.Empty() AndAlso
-           lastKeyPoints IsNot Nothing AndAlso lastKeyPoints.Length > 0 AndAlso
-           keyPoints IsNot Nothing AndAlso keyPoints.Length > 0 Then
-
-            Dim knn = matcher.KnnMatch(lastDesc, descMat, k:=2)
-            Dim matches = Feature_MatchORB.getMatches(knn)
-
-            dst3 = lastFrame.Clone
-            Feature_MatchORB.DisplayMatches(dst3, matches, lastKeyPoints, keyPoints, features, lastFeatures)
-
-            labels(2) = CStr(If(keyPoints Is Nothing, 0, keyPoints.Length)) + " KAZE keypoints on current frame"
-            labels(3) = (matches.Count / lastKeyPoints.Length).ToString("0%") + " matched to previous frame."
-        End If
-
-        If task.heartBeat Then Feature_MatchORB.captureState(lastFrame, lastDesc, descMat, lastKeyPoints, keyPoints)
-    End Sub
-    Protected Overrides Sub Finalize()
-        If kaze IsNot Nothing Then kaze.Dispose()
-        If matcher IsNot Nothing Then matcher.Dispose()
-        If lastDesc IsNot Nothing Then lastDesc.Dispose()
-    End Sub
-End Class
-
-
-
-
-
-Public Class Feature_MatchORB : Inherits TaskParent
-    Implements IDisposable
-    Dim orb As ORB
-    Dim matcher As BFMatcher
-    Dim lastFrame As Mat
-    Dim lastKeyPoints As KeyPoint()
-    Dim lastDesc As New Mat
-    Public features As New List(Of cv.Point)
-    Public lastFeatures As New List(Of cv.Point)
-    Public Sub New()
-        matcher = New BFMatcher(NormTypes.Hamming2, crossCheck:=False)
-        desc = "Cursor.ai: Detect ORB keypoints and match them to the next camera frame."
-    End Sub
-    Public Shared Sub DisplayMatches(dst As cv.Mat, good As List(Of DMatch), lastKeyPoints As KeyPoint(),
-                                     keypoints As KeyPoint(), features As List(Of cv.Point),
-                                     lastFeatures As List(Of cv.Point))
-        features.Clear()
-        lastFeatures.Clear()
-        For Each m In good
-            Dim p0 = lastKeyPoints(m.QueryIdx).Pt
-            Dim p1 = keypoints(m.TrainIdx).Pt
-            lastFeatures.Add(p0)
-            features.Add(p1)
-            Line(dst, p0, p1, task.highlight, task.lineWidth, task.lineType)
-            Circle(dst, p0, task.DotSize, task.highlight, -1, task.lineType)
-            Circle(dst, p1, task.DotSize + 1, Scalar.Red, -1, task.lineType)
-        Next
-    End Sub
-    Public Shared Sub captureState(ByRef lastframe As cv.Mat, ByRef lastdesc As cv.Mat, ByRef descMat As cv.Mat,
-                                   ByRef lastKeyPoints As KeyPoint(), ByRef keypoints As KeyPoint())
-        lastframe = task.color.Clone
-        lastKeyPoints = keypoints
-        lastdesc = descMat.Clone()
-    End Sub
-    Public Shared Function getMatches(knn As Object) As List(Of DMatch)
-        Dim good As New List(Of DMatch)
-        For Each pair In knn
-            If pair IsNot Nothing AndAlso pair.Length >= 2 Then
-                If pair(0).Distance < 0.75F * pair(1).Distance Then good.Add(pair(0))
-            End If
-        Next
-        Return good
-    End Function
-    Public Shared Function displayMatches(dst As cv.Mat, keypoints As KeyPoint()) As cv.Mat
-        dst = task.color.Clone
-        If keypoints IsNot Nothing Then
-            For Each kp In keypoints
-                Circle(dst, kp.Pt, task.DotSize, task.highlight, -1, task.lineType)
-            Next
-        End If
-        Return dst
-    End Function
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        If orb Is Nothing OrElse task.optionsChanged Then
-            If orb IsNot Nothing Then orb.Dispose()
-            orb = ORB.Create(task.fOptions.FeatureSizeSlider.Value)
-        End If
-
-        Dim keyPoints As KeyPoint() = Nothing
-        Dim descMat As New Mat()
-        orb.DetectAndCompute(task.gray, Nothing, keyPoints, descMat)
-
-        dst2 = displayMatches(dst2, keyPoints)
-
-        If Not lastDesc.Empty() AndAlso Not descMat.Empty() AndAlso
-           lastKeyPoints IsNot Nothing AndAlso lastKeyPoints.Length > 0 AndAlso
-           keyPoints IsNot Nothing AndAlso keyPoints.Length > 0 Then
-
-            Dim knn = matcher.KnnMatch(lastDesc, descMat, k:=2)
-            Dim matches = getMatches(knn)
-
-            dst3 = lastFrame.Clone
-            DisplayMatches(dst3, matches, lastKeyPoints, keyPoints, features, lastFeatures)
-
-            labels(2) = CStr(If(keyPoints Is Nothing, 0, keyPoints.Length)) + " ORB keypoints on current frame"
-            labels(3) = (matches.Count / lastKeyPoints.Length).ToString("0%") + " matched to previous frame."
-        End If
-
-        If task.heartBeat Then captureState(lastFrame, lastDesc, descMat, lastKeyPoints, keyPoints)
-    End Sub
-    Protected Overrides Sub Finalize()
-        If orb IsNot Nothing Then orb.Dispose()
-        If matcher IsNot Nothing Then matcher.Dispose()
-        If lastDesc IsNot Nothing Then lastDesc.Dispose()
-    End Sub
-End Class
-
-
-
-
-
-
-Public Class Feature_Tracker : Inherits TaskParent
-    Dim feat As New Feature_MatchAKAZE
-    Const maxSamples As Integer = 30
-    Public tracks As New List(Of List(Of cv.Point))
-    Public Sub New()
-        labels = {"", "", "AKAZE features", "Feature tracks (up to 30 samples; dropped on lost track)"}
-        desc = "Cursor.ai: Track Feature_MatchAKAZE features for up to 30 samples; drop a track and its history when matching is lost."
-    End Sub
-    Private Function findPairIndex(tip As cv.Point, lastFeatures As List(Of cv.Point), used() As Boolean) As Integer
-        Dim best = -1
-        Dim bestDist = Double.MaxValue
-        For i = 0 To lastFeatures.Count - 1
-            If used(i) Then Continue For
-            Dim d = tip.DistanceTo(lastFeatures(i))
-            If d < bestDist Then
-                bestDist = d
-                best = i
-            End If
-        Next
-        If best >= 0 AndAlso bestDist <= 2 Then Return best
-        Return -1
-    End Function
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        If task.optionsChanged Then tracks.Clear()
-
-        feat.Run(src)
-        dst2 = feat.dst2
-        labels(2) = feat.labels(2)
-
-        Dim newTracks As New List(Of List(Of cv.Point))
-        If feat.lastFeatures.Count > 0 AndAlso feat.features.Count = feat.lastFeatures.Count Then
-            Dim used(feat.lastFeatures.Count - 1) As Boolean
-
-            For Each track In tracks
-                Dim idx = findPairIndex(track(track.Count - 1), feat.lastFeatures, used)
-                If idx < 0 Then Continue For ' lost track — drop history
-
-                used(idx) = True
-                track.Add(feat.features(idx))
-                If track.Count > maxSamples Then track.RemoveAt(1) ' keep track(0) as the origin
-                newTracks.Add(track)
+            dst2 = src.Clone
+            For Each pt In features
+                Circle(dst2, pt, task.DotSize, task.highlight, -1, task.lineType)
             Next
 
-            For i = 0 To feat.lastFeatures.Count - 1
-                If used(i) Then Continue For
-                Dim track As New List(Of cv.Point)
-                track.Add(feat.lastFeatures(i))
-                track.Add(feat.features(i))
-                newTracks.Add(track)
+            fpLastSrc = src.Clone
+        End Sub
+    End Class
+
+
+
+
+
+
+    Public Class Feature_PointsPath : Inherits TaskParent
+        Dim feat As New Feature_MatchAKAZE
+        Public Sub New()
+            labels(3) = "Features found in the image"
+            desc = "Use the sorted list of Delaunay regions to find the top X points to track."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            feat.Run(task.gray)
+
+            If task.heartBeat Then dst2.SetTo(0)
+
+            For Each pt In feat.features
+                Circle(dst2, pt, task.DotSize, task.highlight, -1, task.lineType)
             Next
-        End If
-        tracks = newTracks
-
-        dst3 = task.color.Clone
-        Dim longTracks As Integer
-        Dim averageDistance As Double
-        For Each track In tracks
-            Dim color = task.scalarColors(track.Count Mod 255)
-            For j = 1 To track.Count - 1
-                Line(dst3, track(j - 1), track(j), color, task.lineWidth, task.lineType)
-            Next
-            Circle(dst3, track(track.Count - 1), task.DotSize + 1, color, -1, task.lineType)
-            If track.Count >= maxSamples Then longTracks += 1
-            averageDistance += track(0).DistanceTo(track(track.Count - 1))
-        Next
-        If tracks.Count > 0 Then averageDistance /= tracks.Count
-
-        labels(3) = CStr(tracks.Count) + " tracks, " + CStr(longTracks) + " at " + CStr(maxSamples) +
-                    " samples, avg start-to-end = " + averageDistance.ToString(fmt1) + " px"
-    End Sub
-End Class
-
-
-
-
-Public Class Feature_WarpAlign : Inherits TaskParent
-    Dim tracker As New Feature_Tracker
-    Dim heartImage As Mat
-    Public Sub New()
-        desc = "Cursor.ai: Use Feature_Tracker travel to WarpAffine the current image onto the heartbeat image; unmapped edges are black."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        Dim color = If(src.Channels() = 1, task.color.Clone, src.Clone)
-
-        If task.heartBeatLT OrElse heartImage Is Nothing OrElse task.optionsChanged Then
-            heartImage = color.Clone
-            tracker.tracks.Clear()
-        End If
-
-        tracker.Run(src)
-        dst2 = heartImage.Clone
-
-        Dim srcPts As New List(Of Point2f)
-        Dim dstPts As New List(Of Point2f)
-        For Each track In tracker.tracks
-            If track.Count < 2 Then Continue For
-            Dim p0 = track(0)
-            Dim p1 = track.Last
-            srcPts.Add(New Point2f(p1.X, p1.Y)) ' current
-            dstPts.Add(New Point2f(p0.X, p0.Y)) ' heartbeat / track origin
-            Line(dst2, p0, p1, task.highlight, task.lineWidth, task.lineType)
-            Circle(dst2, p0, task.DotSize, task.highlight, -1, task.lineType)
-            Circle(dst2, p1, task.DotSize + 1, Scalar.Red, -1, task.lineType)
-        Next
-
-        If srcPts.Count < 3 Then
-            dst3 = color.Clone
-            labels(2) = "Heartbeat image — need at least 3 tracks to warp"
-            labels(3) = CStr(srcPts.Count) + " track(s) available"
-            Exit Sub
-        End If
-
-        Dim fromMat = Mat.FromPixelData(srcPts.Count, 1, MatType.CV_32FC2, srcPts.ToArray())
-        Dim toMat = Mat.FromPixelData(dstPts.Count, 1, MatType.CV_32FC2, dstPts.ToArray())
-        Dim inliers As New Mat
-        Dim affine = EstimateAffinePartial2D(fromMat, toMat, inliers)
-
-        If affine Is Nothing OrElse affine.Empty() Then
-            dst3 = color.Clone
-            labels(3) = "Affine estimate failed"
-            Exit Sub
-        End If
-
-        WarpAffine(color, dst1, affine, color.Size(), InterpolationFlags.Linear, BorderTypes.Constant, Scalar.All(0))
-
-        Dim dx = affine.Get(Of Double)(0, 2)
-        Dim dy = affine.Get(Of Double)(1, 2)
-        Dim da = Math.Atan2(affine.Get(Of Double)(1, 0), affine.Get(Of Double)(0, 0)) * 180 / Math.PI
-        Dim inlierCount = If(inliers.Empty(), 0, CountNonZero(inliers))
-
-        If Math.Abs(dx) > 0.1 Or Math.Abs(dy) > 0.1 Or Math.Abs(da) > 0.1 Then dst1.CopyTo(dst3)
-
-        labels(2) = "Heartbeat image with " + CStr(srcPts.Count) + " travel vectors"
-        labels(3) = "Warped to heartbeat — inliers " + CStr(inlierCount) + "/" + CStr(srcPts.Count) +
-                    ", dx=" + dx.ToString(fmt1) + " dy=" + dy.ToString(fmt1) + " deg=" + da.ToString(fmt1)
-    End Sub
-End Class
+            labels(2) = CStr(feat.features.Count) + " targets were present with " + CStr(task.fOptions.FeatureSizeSlider.Value) + " requested."
+        End Sub
+    End Class
+End Namespace

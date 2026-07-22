@@ -1,303 +1,304 @@
-Imports System.Runtime.InteropServices
-Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
-' https://github.com/opencv/opencv/blob/master/samples/cpp/falsecolor.cpp
-' https://docs.opencvb.org/2.4/modules/core/doc/operations_on_arrays.html
-Public Class LUT_Basics : Inherits TaskParent
-    Public classCount As Integer
-    Dim options As New Options_LUT
-    Public segment(255) As Byte
-    Dim myLut As New Mat
-    Public Sub New()
-        labels(3) = "Palettized version of dst2"
-        desc = "Divide the image into n-segments controlled with a slider."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        options.Run()
+Imports System.Runtime.InteropServices : Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCvSharp
+Namespace VBClasses
+    ' https://github.com/opencv/opencv/blob/master/samples/cpp/falsecolor.cpp
+    ' https://docs.opencvb.org/2.4/modules/core/doc/operations_on_arrays.html
+    Public Class LUT_Basics : Inherits TaskParent
+        Public classCount As Integer
+        Dim options As New Options_LUT
+        Public segment(255) As Byte
+        Dim myLut As New Mat
+        Public Sub New()
+            labels(3) = "Palettized version of dst2"
+            desc = "Divide the image into n-segments controlled with a slider."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            options.Run()
 
-        If classCount <> options.lutSegments Then
-            classCount = options.lutSegments
-            Dim incr = Math.Truncate(255 / classCount)
-            For i = 0 To classCount - 1
-                Dim val = CInt(i * incr)
-                For j = 0 To incr - 1
-                    segment(val + j) = val
+            If classCount <> options.lutSegments Then
+                classCount = options.lutSegments
+                Dim incr = Math.Truncate(255 / classCount)
+                For i = 0 To classCount - 1
+                    Dim val = CInt(i * incr)
+                    For j = 0 To incr - 1
+                        segment(val + j) = val
+                    Next
                 Next
-            Next
-            For i = incr * classCount To 255
-                segment(i) = 255
-            Next
-            myLut = Mat.FromPixelData(1, 256, MatType.CV_8U, segment)
-        End If
-        If src.Channels() <> 1 Or src.Type <> MatType.CV_8U Then src = task.gray
-        LUT(src, myLut, dst2)
-        dst2 *= classCount / 255
-        dst2 += 1 ' stay away from zero...
-
-        If standaloneTest() Then dst3 = Palettize(dst2)
-        labels(2) = "Image segmented into " + CStr(classCount + 1) + " divisions (0-" + CStr(classCount) + ")"
-    End Sub
-End Class
-
-
-
-
-
-
-
-Public Class XR_LUT_Sliders : Inherits TaskParent
-    Dim options As New Options_LUT
-    Public Sub New()
-        desc = "Use an OpenCV Lookup Table to define 5 regions in a grayscale image."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        options.Run()
-
-        Dim gray = If(src.Channels() = 1, src, task.gray)
-        Dim myLut As New Mat(1, 256, MatType.CV_8U)
-        Dim splitIndex As Integer
-        For i = 0 To 255
-            myLut.Set(Of Byte)(0, i, options.vals(splitIndex))
-            If i >= options.splits(splitIndex) Then splitIndex += 1
-        Next
-        LUT(gray, myLut, dst2)
-    End Sub
-End Class
-
-
-
-
-
-
-
-
-
-' https://github.com/opencv/opencv/blob/master/samples/cpp/falsecolor.cpp
-Public Class XR_LUT_Reduction : Inherits TaskParent
-    Public reduction As New Reduction_Basics
-    Dim vector As Mat = New Mat(256, 1, MatType.CV_8UC3, Scalar.All(0))
-    Public Sub New()
-        For i = 0 To 255
-            ' trying to avoid extreme colors... 
-            Dim vec = New Vec3b(msRNG.Next(50, 240), msRNG.Next(50, 240), msRNG.Next(50, 240))
-            vector.Set(Of Vec3b)(i, 0, vec)
-        Next
-        labels(3) = "Custom Color Lookup Table"
-        desc = "Build and use a custom color palette"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        reduction.Run(src)
-        CvtColor(reduction.dst2, dst2, ColorConversionCodes.GRAY2BGR)
-        LUT(dst2, vector, dst2)
-    End Sub
-End Class
-
-
-
-
-
-
-
-
-
-
-Public Class XR_LUT_RGBDepth : Inherits TaskParent
-    Dim lut As New LUT_Basics
-    Public Sub New()
-        desc = "Use a LUT on the RGBDepth to segregate depth data."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        Dim _lut_cvt As New Mat
-        CvtColor(task.depthRGB, _lut_cvt, ColorConversionCodes.BGR2GRAY)
-        lut.Run(_lut_cvt)
-        dst2 = lut.dst2 * 255 / lut.classCount
-        labels(2) = lut.labels(2)
-    End Sub
-End Class
-
-
-
-
-
-
-
-
-Public Class XR_LUT_Depth32f : Inherits TaskParent
-    Dim lut As New LUT_Basics
-    Public Sub New()
-        desc = "Use a LUT on the 32-bit depth to segregate depth data."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        Dim _nrm1 As New Mat
-        lut.Run(task.pcSplit(2))
-        Normalize(lut.dst2, lut.dst2, 255)
-        ConvertScaleAbs(lut.dst2, lut.dst2, 255)
-        dst2 = lut.dst2 * 255 / lut.classCount
-        dst2.SetTo(0, task.noDepthMask)
-        labels(2) = lut.labels(2)
-    End Sub
-End Class
-
-
-
-
-
-
-
-
-
-Public Class LUT_Equalized : Inherits TaskParent
-    Dim eq As New Histogram_EqualizeGray
-    Dim lut As New LUT_Basics
-    Public Sub New()
-        labels(2) = "Without Histogram Equalized"
-        labels(3) = "With Histogram Equalized"
-        desc = "Use LUT_Basics but with an equalized histogram image."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        lut.Run(src)
-        dst3 = lut.dst2 * 255 / lut.classCount
-
-        eq.dst3.SetTo(0)
-        eq.Run(src)
-        lut.Run(eq.dst2)
-        dst2 = lut.dst2 * 255 / lut.classCount
-    End Sub
-End Class
-
-
-
-
-
-
-
-
-
-Public Class XR_LUT_Watershed : Inherits TaskParent
-    Public wShed As New Watershed_Basics
-    Public lut As New LUT_Equalized
-    Public Sub New()
-        labels(3) = "LUT output with edges highlighted."
-        labels(2) = "Watershed Results - draw a rectangle to create a region"
-        wShed.UseCorners = True
-        desc = "Use watershed algorithm with LUT input to identify regions in the image"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        lut.Run(src)
-        CvtColor(lut.dst2, dst3, ColorConversionCodes.GRAY2BGR)
-
-        dst3.SetTo(white, task.edges.dst2)
-        labels(3) = task.edges.labels(2)
-
-        wShed.Run(dst3)
-        dst2 = wShed.dst3
-    End Sub
-End Class
-
-
-
-
-
-
-
-
-Public Class XR_LUT_Custom : Inherits TaskParent
-    Dim gradMap As New Palette_RandomColorMap
-    Public colorMap As New Mat
-    Dim saveColorCount = -1
-    Public Sub New()
-        OptionParent.FindSlider("Color transitions").Value = 5
-        labels(3) = "Custom Color Lookup Table"
-        desc = "Use a palette to provide the lookup table for LUT"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        Static colorSlider = OptionParent.FindSlider("Color transitions")
-        If task.optionsChanged Or task.heartBeat Then
-            If saveColorCount = 20 Then colorSlider.Value = 5 Else colorSlider.Value += 1
-            saveColorCount = colorSlider.Value
-            gradMap.Run(src)
-            Flip(gradMap.gradientColorMap, colorMap, FlipMode.X)
-        End If
-        LUT(src, colorMap, dst2)
-        Resize(colorMap, dst3, src.Size())
-    End Sub
-End Class
-
-
-
-
-
-
-Public Class XR_LUT_RedCloud : Inherits TaskParent
-    Dim sort3 As New Sort_3Channel
-    Dim redC As New RedCloud_Basics
-    Public Sub New()
-        If standalone Then task.gOptions.displayDst1.Checked = True
-        desc = "Use LUT on the grayscale image after masking with rc.mask"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        redC.Run(src)
-        dst2 = redC.dst2
-        labels(2) = redC.labels(2)
-
-        SetTrueText(redC.strOut, 3)
-
-        dst3.SetTo(0)
-        Dim rc = task.rcOldD
-        src(rc.rect).CopyTo(dst3(rc.rect), rc.mask)
-
-        sort3.Run(dst3)
-        dst1 = sort3.dst2
-    End Sub
-End Class
-
-
-
-
-
-
-Public Class XR_LUT_Create : Inherits TaskParent
-    Dim pixels(2)() As Byte
-    Dim options As New Options_LUT_Create
-    Public Sub New()
-        desc = "Create a LUT table that can map similar pixels to the same Value."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        options.Run()
-
-        Dim splitMats() As Mat = Split(src)
-        For i = 0 To 2
-            If task.firstPass Then ReDim pixels(i)(src.Total - 1)
-            Marshal.Copy(splitMats(i).Data, pixels(i), 0, pixels(i).Length)
-        Next
-
-        Dim totals(255) As Single
-        Dim lutI(255) As Vec3i
-        For i = 0 To src.Total - 1
-            Dim index = CInt(0.299 * pixels(2)(i) + 0.587 * pixels(1)(i) + 0.114 * pixels(0)(i))
-            totals(index) += 1
-            Dim v1 = lutI(index)
-            Dim v2 = New Vec3i(pixels(0)(i), pixels(1)(i), pixels(2)(i))
-            lutI(index) = New Vec3i((v1(0) + v2(0)) / 2, (v1(1) + v2(1)) / 2, (v1(2) + v2(2)) / 2)
-        Next
-
-        Dim lastVec = lutI(0)
-        For i = 1 To lutI.Count - 1
-            Dim vec = lutI(i)
-            Dim diff = Math.Abs(vec(0) - lastVec(0)) + Math.Abs(vec(1) - lastVec(1)) + Math.Abs(vec(2) - lastVec(2))
-            If diff < options.lutThreshold Then
-                lutI(i) = lastVec
-            Else
-                lastVec = vec
+                For i = incr * classCount To 255
+                    segment(i) = 255
+                Next
+                myLut = Mat.FromPixelData(1, 256, MatType.CV_8U, segment)
             End If
-        Next
+            If src.Channels() <> 1 Or src.Type <> MatType.CV_8U Then src = task.gray
+            LUT(src, myLut, dst2)
+            dst2 *= classCount / 255
+            dst2 += 1 ' stay away from zero...
 
-        Dim lut(255) As Vec3b
-        For i = 0 To lutI.Count - 1
-            lut(i) = New Vec3b(lutI(i)(0), lutI(i)(1), lutI(i)(2))
-        Next
+            If standaloneTest() Then dst3 = Palettize(dst2)
+            labels(2) = "Image segmented into " + CStr(classCount + 1) + " divisions (0-" + CStr(classCount) + ")"
+        End Sub
+    End Class
 
-        dst2 = task.gray
-        Dim myLut As Mat = Mat.FromPixelData(1, 256, MatType.CV_8U, lut)
-        Cv2.LUT(dst2, myLut, dst3)
-    End Sub
-End Class
+
+
+
+
+
+
+    Public Class XR_LUT_Sliders : Inherits TaskParent
+        Dim options As New Options_LUT
+        Public Sub New()
+            desc = "Use an OpenCV Lookup Table to define 5 regions in a grayscale image."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            options.Run()
+
+            Dim gray = If(src.Channels() = 1, src, task.gray)
+            Dim myLut As New Mat(1, 256, MatType.CV_8U)
+            Dim splitIndex As Integer
+            For i = 0 To 255
+                myLut.Set(Of Byte)(0, i, options.vals(splitIndex))
+                If i >= options.splits(splitIndex) Then splitIndex += 1
+            Next
+            LUT(gray, myLut, dst2)
+        End Sub
+    End Class
+
+
+
+
+
+
+
+
+
+    ' https://github.com/opencv/opencv/blob/master/samples/cpp/falsecolor.cpp
+    Public Class XR_LUT_Reduction : Inherits TaskParent
+        Public reduction As New Reduction_Basics
+        Dim vector As Mat = New Mat(256, 1, MatType.CV_8UC3, Scalar.All(0))
+        Public Sub New()
+            For i = 0 To 255
+                ' trying to avoid extreme colors... 
+                Dim vec = New Vec3b(msRNG.Next(50, 240), msRNG.Next(50, 240), msRNG.Next(50, 240))
+                vector.Set(Of Vec3b)(i, 0, vec)
+            Next
+            labels(3) = "Custom Color Lookup Table"
+            desc = "Build and use a custom color palette"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            reduction.Run(src)
+            CvtColor(reduction.dst2, dst2, ColorConversionCodes.GRAY2BGR)
+            LUT(dst2, vector, dst2)
+        End Sub
+    End Class
+
+
+
+
+
+
+
+
+
+
+    Public Class XR_LUT_RGBDepth : Inherits TaskParent
+        Dim lut As New LUT_Basics
+        Public Sub New()
+            desc = "Use a LUT on the RGBDepth to segregate depth data."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            Dim _lut_cvt As New Mat
+            CvtColor(task.depthRGB, _lut_cvt, ColorConversionCodes.BGR2GRAY)
+            lut.Run(_lut_cvt)
+            dst2 = lut.dst2 * 255 / lut.classCount
+            labels(2) = lut.labels(2)
+        End Sub
+    End Class
+
+
+
+
+
+
+
+
+    Public Class XR_LUT_Depth32f : Inherits TaskParent
+        Dim lut As New LUT_Basics
+        Public Sub New()
+            desc = "Use a LUT on the 32-bit depth to segregate depth data."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            Dim _nrm1 As New Mat
+            lut.Run(task.pcSplit(2))
+            Normalize(lut.dst2, lut.dst2, 255)
+            ConvertScaleAbs(lut.dst2, lut.dst2, 255)
+            dst2 = lut.dst2 * 255 / lut.classCount
+            dst2.SetTo(0, task.noDepthMask)
+            labels(2) = lut.labels(2)
+        End Sub
+    End Class
+
+
+
+
+
+
+
+
+
+    Public Class LUT_Equalized : Inherits TaskParent
+        Dim eq As New Histogram_EqualizeGray
+        Dim lut As New LUT_Basics
+        Public Sub New()
+            labels(2) = "Without Histogram Equalized"
+            labels(3) = "With Histogram Equalized"
+            desc = "Use LUT_Basics but with an equalized histogram image."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            lut.Run(src)
+            dst3 = lut.dst2 * 255 / lut.classCount
+
+            eq.dst3.SetTo(0)
+            eq.Run(src)
+            lut.Run(eq.dst2)
+            dst2 = lut.dst2 * 255 / lut.classCount
+        End Sub
+    End Class
+
+
+
+
+
+
+
+
+
+    Public Class XR_LUT_Watershed : Inherits TaskParent
+        Public wShed As New Watershed_Basics
+        Public lut As New LUT_Equalized
+        Public Sub New()
+            labels(3) = "LUT output with edges highlighted."
+            labels(2) = "Watershed Results - draw a rectangle to create a region"
+            wShed.UseCorners = True
+            desc = "Use watershed algorithm with LUT input to identify regions in the image"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            lut.Run(src)
+            CvtColor(lut.dst2, dst3, ColorConversionCodes.GRAY2BGR)
+
+            dst3.SetTo(white, task.edges.dst2)
+            labels(3) = task.edges.labels(2)
+
+            wShed.Run(dst3)
+            dst2 = wShed.dst3
+        End Sub
+    End Class
+
+
+
+
+
+
+
+
+    Public Class XR_LUT_Custom : Inherits TaskParent
+        Dim gradMap As New Palette_RandomColorMap
+        Public colorMap As New Mat
+        Dim saveColorCount = -1
+        Public Sub New()
+            OptionParent.FindSlider("Color transitions").Value = 5
+            labels(3) = "Custom Color Lookup Table"
+            desc = "Use a palette to provide the lookup table for LUT"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            Static colorSlider = OptionParent.FindSlider("Color transitions")
+            If task.optionsChanged Or task.heartBeat Then
+                If saveColorCount = 20 Then colorSlider.Value = 5 Else colorSlider.Value += 1
+                saveColorCount = colorSlider.Value
+                gradMap.Run(src)
+                Flip(gradMap.gradientColorMap, colorMap, FlipMode.X)
+            End If
+            LUT(src, colorMap, dst2)
+            Resize(colorMap, dst3, src.Size())
+        End Sub
+    End Class
+
+
+
+
+
+
+    Public Class XR_LUT_RedCloud : Inherits TaskParent
+        Dim sort3 As New Sort_3Channel
+        Dim redC As New RedCloud_Basics
+        Public Sub New()
+            If standalone Then task.gOptions.displayDst1.Checked = True
+            desc = "Use LUT on the grayscale image after masking with rc.mask"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            redC.Run(src)
+            dst2 = redC.dst2
+            labels(2) = redC.labels(2)
+
+            SetTrueText(redC.strOut, 3)
+
+            dst3.SetTo(0)
+            Dim rc = task.rcOldD
+            src(rc.rect).CopyTo(dst3(rc.rect), rc.mask)
+
+            sort3.Run(dst3)
+            dst1 = sort3.dst2
+        End Sub
+    End Class
+
+
+
+
+
+
+    Public Class XR_LUT_Create : Inherits TaskParent
+        Dim pixels(2)() As Byte
+        Dim options As New Options_LUT_Create
+        Public Sub New()
+            desc = "Create a LUT table that can map similar pixels to the same Value."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            options.Run()
+
+            Dim splitMats() As Mat = Split(src)
+            For i = 0 To 2
+                If task.firstPass Then ReDim pixels(i)(src.Total - 1)
+                Marshal.Copy(splitMats(i).Data, pixels(i), 0, pixels(i).Length)
+            Next
+
+            Dim totals(255) As Single
+            Dim lutI(255) As Vec3i
+            For i = 0 To src.Total - 1
+                Dim index = CInt(0.299 * pixels(2)(i) + 0.587 * pixels(1)(i) + 0.114 * pixels(0)(i))
+                totals(index) += 1
+                Dim v1 = lutI(index)
+                Dim v2 = New Vec3i(pixels(0)(i), pixels(1)(i), pixels(2)(i))
+                lutI(index) = New Vec3i((v1(0) + v2(0)) / 2, (v1(1) + v2(1)) / 2, (v1(2) + v2(2)) / 2)
+            Next
+
+            Dim lastVec = lutI(0)
+            For i = 1 To lutI.Count - 1
+                Dim vec = lutI(i)
+                Dim diff = Math.Abs(vec(0) - lastVec(0)) + Math.Abs(vec(1) - lastVec(1)) + Math.Abs(vec(2) - lastVec(2))
+                If diff < options.lutThreshold Then
+                    lutI(i) = lastVec
+                Else
+                    lastVec = vec
+                End If
+            Next
+
+            Dim lut(255) As Vec3b
+            For i = 0 To lutI.Count - 1
+                lut(i) = New Vec3b(lutI(i)(0), lutI(i)(1), lutI(i)(2))
+            Next
+
+            dst2 = task.gray
+            Dim myLut As Mat = Mat.FromPixelData(1, 256, MatType.CV_8U, lut)
+            Cv2.LUT(dst2, myLut, dst3)
+        End Sub
+    End Class
+End Namespace

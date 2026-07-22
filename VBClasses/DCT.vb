@@ -1,204 +1,206 @@
-Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
-Public Class DCT_Basics : Inherits TaskParent
-    Public options As New Options_DCT
-    Public Sub New()
-        labels(3) = "Difference from original"
-        desc = "Apply OpenCV's Discrete Cosine Transform to a grayscale image and use slider to remove the highest frequencies."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        options.Run()
+Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCvSharp
+Namespace VBClasses
+    Public Class DCT_Basics : Inherits TaskParent
+        Public options As New Options_DCT
+        Public Sub New()
+            labels(3) = "Difference from original"
+            desc = "Apply OpenCV's Discrete Cosine Transform to a grayscale image and use slider to remove the highest frequencies."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            options.Run()
 
-        Dim src32f As New Mat
-        task.gray.ConvertTo(src32f, MatType.CV_32F, 1 / 255)
-
-        Dim frequencies As New Mat
-        Dct(src32f, frequencies, options.removeFrequency)
-
-        Dim roi As New cv.Rect(0, 0, options.removeFrequency, src32f.Height)
-        If roi.Width > 0 Then frequencies(roi).SetTo(0)
-        labels(2) = "Frequencies below " + CStr(options.removeFrequency) + " removed"
-
-        Dct(frequencies, src32f, DctFlags.Inverse)
-        src32f.ConvertTo(dst2, MatType.CV_8UC1, 255)
-
-        Subtract(task.gray, dst2, dst3)
-    End Sub
-End Class
-
-
-
-
-
-Public Class XR_DCT_RGB : Inherits TaskParent
-    Public dct As New DCT_Basics
-    Public Sub New()
-        labels(3) = "Difference from original"
-        desc = "Apply OpenCV's Discrete Cosine Transform to a BGR image and use slider to remove the highest frequencies."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        dct.options.Run()
-
-        Dim srcPlanes = Split(src)
-
-        Dim freqPlanes(2) As Mat
-        For i = 0 To srcPlanes.Count - 1
             Dim src32f As New Mat
-            srcPlanes(i).ConvertTo(src32f, MatType.CV_32FC3, 1 / 255)
-            freqPlanes(i) = New Mat
-            Cv2.Dct(src32f, freqPlanes(i), DctFlags.None)
+            task.gray.ConvertTo(src32f, MatType.CV_32F, 1 / 255)
+
+            Dim frequencies As New Mat
+            Dct(src32f, frequencies, options.removeFrequency)
+
+            Dim roi As New cv.Rect(0, 0, options.removeFrequency, src32f.Height)
+            If roi.Width > 0 Then frequencies(roi).SetTo(0)
+            labels(2) = "Frequencies below " + CStr(options.removeFrequency) + " removed"
+
+            Dct(frequencies, src32f, DctFlags.Inverse)
+            src32f.ConvertTo(dst2, MatType.CV_8UC1, 255)
+
+            Subtract(task.gray, dst2, dst3)
+        End Sub
+    End Class
+
+
+
+
+
+    Public Class XR_DCT_RGB : Inherits TaskParent
+        Public dct As New DCT_Basics
+        Public Sub New()
+            labels(3) = "Difference from original"
+            desc = "Apply OpenCV's Discrete Cosine Transform to a BGR image and use slider to remove the highest frequencies."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            dct.options.Run()
+
+            Dim srcPlanes = Split(src)
+
+            Dim freqPlanes(2) As Mat
+            For i = 0 To srcPlanes.Count - 1
+                Dim src32f As New Mat
+                srcPlanes(i).ConvertTo(src32f, MatType.CV_32FC3, 1 / 255)
+                freqPlanes(i) = New Mat
+                Cv2.Dct(src32f, freqPlanes(i), DctFlags.None)
+
+                Dim roi As New cv.Rect(0, 0, dct.options.removeFrequency, src32f.Height)
+                If roi.Width > 0 Then freqPlanes(i)(roi).SetTo(0)
+
+                Cv2.Dct(freqPlanes(i), src32f, dct.options.dctFlag)
+                src32f.ConvertTo(srcPlanes(i), MatType.CV_8UC1, 255)
+            Next
+            labels(2) = dct.labels(2)
+
+            Merge(srcPlanes, dst2)
+
+            Subtract(src, dst2, dst3)
+        End Sub
+    End Class
+
+
+
+
+    Public Class XR_DCT_Depth : Inherits TaskParent
+        Dim dct As New DCT_Basics
+        Public Sub New()
+            labels(3) = "Subtract DCT inverse from Grayscale depth"
+            desc = "Find featureless surfaces in the depth data - expected to be useful only on the K4A for Azure camera."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            Dim frequencies As New Mat
+            Dim src32f As New Mat
+            task.gray.ConvertTo(src32f, MatType.CV_32F, 1 / 255)
+            Cv2.Dct(src32f, frequencies, dct.options.dctFlag)
 
             Dim roi As New cv.Rect(0, 0, dct.options.removeFrequency, src32f.Height)
-            If roi.Width > 0 Then freqPlanes(i)(roi).SetTo(0)
+            If roi.Width > 0 Then frequencies(roi).SetTo(0)
+            labels(2) = dct.labels(2)
 
-            Cv2.Dct(freqPlanes(i), src32f, dct.options.dctFlag)
-            src32f.ConvertTo(srcPlanes(i), MatType.CV_8UC1, 255)
-        Next
-        labels(2) = dct.labels(2)
+            Cv2.Dct(frequencies, src32f, DctFlags.Inverse)
+            src32f.ConvertTo(dst2, MatType.CV_8UC1, 255)
 
-        Merge(srcPlanes, dst2)
-
-        Subtract(src, dst2, dst3)
-    End Sub
-End Class
-
-
-
-
-Public Class XR_DCT_Depth : Inherits TaskParent
-    Dim dct As New DCT_Basics
-    Public Sub New()
-        labels(3) = "Subtract DCT inverse from Grayscale depth"
-        desc = "Find featureless surfaces in the depth data - expected to be useful only on the K4A for Azure camera."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        Dim frequencies As New Mat
-        Dim src32f As New Mat
-        task.gray.ConvertTo(src32f, MatType.CV_32F, 1 / 255)
-        Cv2.Dct(src32f, frequencies, dct.options.dctFlag)
-
-        Dim roi As New cv.Rect(0, 0, dct.options.removeFrequency, src32f.Height)
-        If roi.Width > 0 Then frequencies(roi).SetTo(0)
-        labels(2) = dct.labels(2)
-
-        Cv2.Dct(frequencies, src32f, DctFlags.Inverse)
-        src32f.ConvertTo(dst2, MatType.CV_8UC1, 255)
-
-        Subtract(task.gray, dst2, dst3)
-    End Sub
-End Class
+            Subtract(task.gray, dst2, dst3)
+        End Sub
+    End Class
 
 
 
 
 
-Public Class DCT_FeatureLess : Inherits TaskParent
-    Public dct As New DCT_Basics
-    Public Sub New()
-        desc = "Find surfaces that lack any texture.  Remove just the highest frequency from the DCT to get horizontal lines through the image."
-        labels(3) = "FeatureLess BGR regions"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        dct.Run(src)
+    Public Class DCT_FeatureLess : Inherits TaskParent
+        Public dct As New DCT_Basics
+        Public Sub New()
+            desc = "Find surfaces that lack any texture.  Remove just the highest frequency from the DCT to get horizontal lines through the image."
+            labels(3) = "FeatureLess BGR regions"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            dct.Run(src)
 
-        dst2.SetTo(0)
-        For i = 0 To dct.dst2.Rows - 1
-            Dim runLen = 0
-            Dim runStart = 0
-            For j = 1 To dct.dst2.Cols - 1
-                If dct.dst2.Get(Of Byte)(i, j) = dct.dst2.Get(Of Byte)(i, j - 1) Then
-                    runLen += 1
-                Else
-                    If runLen > dct.options.runLengthMin Then
-                        Dim roi = New cv.Rect(runStart, i, runLen, 1)
-                        dst2(roi).SetTo(255)
-                    End If
-                    runStart = j
-                    runLen = 1
-                End If
-            Next
-        Next
-
-        dst3.SetTo(0)
-        If dst2.Channels() = 3 Then
-            CvtColor(dst2, dst2, ColorConversionCodes.BGR2GRAY)
-            Threshold(dst2, dst2, 1, 255, ThresholdTypes.Binary)
-        Else
-            Threshold(dst2, dst2, 1, 255, ThresholdTypes.Binary)
-        End If
-        src.CopyTo(dst3, Not dst2)
-        labels(2) = "Mask of DCT with highest frequency removed"
-    End Sub
-End Class
-
-
-
-
-
-Public Class XR_DCT_Surfaces_debug : Inherits TaskParent
-    Dim mats As New Mat_4to1
-    Dim dct As New DCT_FeatureLess
-    Dim flow As New Font_FlowText
-    Dim plane As New Plane_CellColor
-    Public Sub New()
-        flow.parentData = Me
-        labels = {"", "", "Stats on the largest region below DCT threshold", "Various views of regions with DCT below threshold"}
-        If standalone Then task.gOptions.displayDst0.Checked = False
-        desc = "Find plane equation for a featureless surface - debugging one region for now."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        ' If task.heartBeat Then flow.msgs.Clear()
-
-        mats.mat(0) = src.Clone
-        mats.mat(0).SetTo(white, task.gridMask)
-
-        dct.Run(src)
-        Dim _cvt2 As New Mat
-        CvtColor(dct.dst2, _cvt2, ColorConversionCodes.GRAY2BGR)
-        mats.mat(1) = _cvt2.Clone()
-        mats.mat(2) = dct.dst3.Clone()
-
-        Dim mask = dct.dst2.Clone() ' result1 contains the DCT mask of featureless surfaces.
-        task.pcSplit(2).SetTo(0, Not mask) ' remove non-featureless surface depth data.
-
-        ' find the most featureless roi
-        Dim maxIndex As Integer
-        Dim grCounts(task.gridRects.Count - 1)
-        For i = 0 To task.gridRects.Count - 1
-            grCounts(i) = CountNonZero(mask(task.gridRects(i)))
-            If grCounts(i) > grCounts(maxIndex) Then maxIndex = i
-        Next
-
-        mats.mat(3) = New Mat(src.Size(), MatType.CV_8UC3, Scalar.All(0))
-        src(task.gridRects(maxIndex)).CopyTo(mats.mat(3)(task.gridRects(maxIndex)), mask(task.gridRects(maxIndex)))
-        mats.Run(emptyMat)
-        dst3 = mats.dst2
-        ' this is where the debug comes in.  We just want to look at one region which hopefully is a single plane.
-        Dim r = task.gridRects(maxIndex)
-        If r.X = task.gridRects(maxIndex).X And r.Y = task.gridRects(maxIndex).Y Then
-            If grCounts(maxIndex) > r.Width * r.Height / 4 Then
-                Dim fitPoints As New List(Of Point3f)
-                Dim minDepth = Single.MaxValue, maxDepth = Single.MinValue
-                For j = 0 To r.Height - 1
-                    For i = 0 To r.Width - 1
-                        Dim nextD = task.pcSplit(2)(r).Get(Of Single)(j, i)
-                        If nextD <> 0 Then
-                            If minDepth > nextD Then minDepth = nextD
-                            If maxDepth < nextD Then maxDepth = nextD
-                            Dim wpt = New Point3f(r.X + i, r.Y + j, nextD)
-                            fitPoints.Add(Cloud_Basics.worldCoordinates(wpt))
+            dst2.SetTo(0)
+            For i = 0 To dct.dst2.Rows - 1
+                Dim runLen = 0
+                Dim runStart = 0
+                For j = 1 To dct.dst2.Cols - 1
+                    If dct.dst2.Get(Of Byte)(i, j) = dct.dst2.Get(Of Byte)(i, j - 1) Then
+                        runLen += 1
+                    Else
+                        If runLen > dct.options.runLengthMin Then
+                            Dim roi = New cv.Rect(runStart, i, runLen, 1)
+                            dst2(roi).SetTo(255)
                         End If
-                    Next
+                        runStart = j
+                        runLen = 1
+                    End If
                 Next
-                If fitPoints.Count > 0 Then
-                    Dim eq = Plane_Basics.fitDepthPlane(fitPoints)
-                    If Single.IsNaN(eq(0)) = False Then
-                        flow.nextMsg = "a=" + eq(0).ToString(fmt2) + " b=" + eq(1).ToString(fmt2) + " c=" + Math.Abs(eq(2)).ToString(fmt2) +
+            Next
+
+            dst3.SetTo(0)
+            If dst2.Channels() = 3 Then
+                CvtColor(dst2, dst2, ColorConversionCodes.BGR2GRAY)
+                Threshold(dst2, dst2, 1, 255, ThresholdTypes.Binary)
+            Else
+                Threshold(dst2, dst2, 1, 255, ThresholdTypes.Binary)
+            End If
+            src.CopyTo(dst3, Not dst2)
+            labels(2) = "Mask of DCT with highest frequency removed"
+        End Sub
+    End Class
+
+
+
+
+
+    Public Class XR_DCT_Surfaces_debug : Inherits TaskParent
+        Dim mats As New Mat_4to1
+        Dim dct As New DCT_FeatureLess
+        Dim flow As New Font_FlowText
+        Dim plane As New Plane_CellColor
+        Public Sub New()
+            flow.parentData = Me
+            labels = {"", "", "Stats on the largest region below DCT threshold", "Various views of regions with DCT below threshold"}
+            If standalone Then task.gOptions.displayDst0.Checked = False
+            desc = "Find plane equation for a featureless surface - debugging one region for now."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            ' If task.heartBeat Then flow.msgs.Clear()
+
+            mats.mat(0) = src.Clone
+            mats.mat(0).SetTo(white, task.gridMask)
+
+            dct.Run(src)
+            Dim _cvt2 As New Mat
+            CvtColor(dct.dst2, _cvt2, ColorConversionCodes.GRAY2BGR)
+            mats.mat(1) = _cvt2.Clone()
+            mats.mat(2) = dct.dst3.Clone()
+
+            Dim mask = dct.dst2.Clone() ' result1 contains the DCT mask of featureless surfaces.
+            task.pcSplit(2).SetTo(0, Not mask) ' remove non-featureless surface depth data.
+
+            ' find the most featureless roi
+            Dim maxIndex As Integer
+            Dim grCounts(task.gridRects.Count - 1)
+            For i = 0 To task.gridRects.Count - 1
+                grCounts(i) = CountNonZero(mask(task.gridRects(i)))
+                If grCounts(i) > grCounts(maxIndex) Then maxIndex = i
+            Next
+
+            mats.mat(3) = New Mat(src.Size(), MatType.CV_8UC3, Scalar.All(0))
+            src(task.gridRects(maxIndex)).CopyTo(mats.mat(3)(task.gridRects(maxIndex)), mask(task.gridRects(maxIndex)))
+            mats.Run(emptyMat)
+            dst3 = mats.dst2
+            ' this is where the debug comes in.  We just want to look at one region which hopefully is a single plane.
+            Dim r = task.gridRects(maxIndex)
+            If r.X = task.gridRects(maxIndex).X And r.Y = task.gridRects(maxIndex).Y Then
+                If grCounts(maxIndex) > r.Width * r.Height / 4 Then
+                    Dim fitPoints As New List(Of Point3f)
+                    Dim minDepth = Single.MaxValue, maxDepth = Single.MinValue
+                    For j = 0 To r.Height - 1
+                        For i = 0 To r.Width - 1
+                            Dim nextD = task.pcSplit(2)(r).Get(Of Single)(j, i)
+                            If nextD <> 0 Then
+                                If minDepth > nextD Then minDepth = nextD
+                                If maxDepth < nextD Then maxDepth = nextD
+                                Dim wpt = New Point3f(r.X + i, r.Y + j, nextD)
+                                fitPoints.Add(Cloud_Basics.worldCoordinates(wpt))
+                            End If
+                        Next
+                    Next
+                    If fitPoints.Count > 0 Then
+                        Dim eq = Plane_Basics.fitDepthPlane(fitPoints)
+                        If Single.IsNaN(eq(0)) = False Then
+                            flow.nextMsg = "a=" + eq(0).ToString(fmt2) + " b=" + eq(1).ToString(fmt2) + " c=" + Math.Abs(eq(2)).ToString(fmt2) +
                                   vbTab + "depth=" + (-eq(3)).ToString(fmt2) + "m " + "r(x,y) = " + r.X.ToString("000") + "," +
                                   r.Y.ToString("000") + vbTab + "Min=" + minDepth.ToString(fmt1) + "m " + " Max=" + maxDepth.ToString(fmt1) + "m"
+                        End If
                     End If
                 End If
             End If
-        End If
-        flow.Run(src)
-    End Sub
-End Class
+            flow.Run(src)
+        End Sub
+    End Class
+End Namespace

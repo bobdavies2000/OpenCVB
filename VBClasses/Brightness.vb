@@ -1,81 +1,83 @@
-Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
-Public Class Brightness_Basics : Inherits TaskParent
-    Dim Options As New Options_BrightnessContrast
-    Public Sub New()
-        desc = "Implement brightness/contrast"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        Options.Run()
-        ConvertScaleAbs(src, dst2, Options.brightness, Options.contrast)
-        labels(3) = "Brightness level = " + CStr(Options.contrast)
-    End Sub
-End Class
+Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCvSharp
+Namespace VBClasses
+    Public Class Brightness_Basics : Inherits TaskParent
+        Dim Options As New Options_BrightnessContrast
+        Public Sub New()
+            desc = "Implement brightness/contrast"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            Options.Run()
+            ConvertScaleAbs(src, dst2, Options.brightness, Options.contrast)
+            labels(3) = "Brightness level = " + CStr(Options.contrast)
+        End Sub
+    End Class
 
 
 
 
 
 
-' https://github.com/spmallick/learnopencv/blob/master/Photoshop-Filters-in-OpenCV/brightness.cpp
-Public Class XR_Brightness_HSV : Inherits TaskParent
-    Dim options As New Options_BrightnessContrast
-    Public Sub New()
-        labels(3) = "HSV image"
-        desc = "Implement the brightness effect for HSV images"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        options.Run()
+    ' https://github.com/spmallick/learnopencv/blob/master/Photoshop-Filters-in-OpenCV/brightness.cpp
+    Public Class XR_Brightness_HSV : Inherits TaskParent
+        Dim options As New Options_BrightnessContrast
+        Public Sub New()
+            labels(3) = "HSV image"
+            desc = "Implement the brightness effect for HSV images"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            options.Run()
 
-        CvtColor(src, dst3, ColorConversionCodes.BGR2HSV)
-        Dim hsv64 As New Mat
-        dst3.ConvertTo(hsv64, MatType.CV_64F)
-        Dim splitMats() As Mat = Split(hsv64)
+            CvtColor(src, dst3, ColorConversionCodes.BGR2HSV)
+            Dim hsv64 As New Mat
+            dst3.ConvertTo(hsv64, MatType.CV_64F)
+            Dim splitMats() As Mat = Split(hsv64)
 
-        splitMats(1) *= options.hsvBrightness
-        Threshold(splitMats(1), splitMats(1), 255, 255, ThresholdTypes.Trunc)
+            splitMats(1) *= options.hsvBrightness
+            Threshold(splitMats(1), splitMats(1), 255, 255, ThresholdTypes.Trunc)
 
-        splitMats(2) *= options.hsvBrightness
-        Threshold(splitMats(2), splitMats(2), 255, 255, ThresholdTypes.Trunc)
+            splitMats(2) *= options.hsvBrightness
+            Threshold(splitMats(2), splitMats(2), 255, 255, ThresholdTypes.Trunc)
 
-        Merge(splitMats, hsv64)
-        hsv64.ConvertTo(dst2, MatType.CV_8UC3)
-        CvtColor(dst2, dst2, ColorConversionCodes.HSV2BGR)
-        labels(2) = "Brightness level = " + CStr(options.hsvBrightness)
-    End Sub
-End Class
-
-
+            Merge(splitMats, hsv64)
+            hsv64.ConvertTo(dst2, MatType.CV_8UC3)
+            CvtColor(dst2, dst2, ColorConversionCodes.HSV2BGR)
+            labels(2) = "Brightness level = " + CStr(options.hsvBrightness)
+        End Sub
+    End Class
 
 
 
 
 
-Public Class Brightness_Grid : Inherits TaskParent
-    Dim bright As New Brightness_Basics
-    Public brightRect As cv.Rect
-    Public Sub New()
-        desc = "Adjust the brightness to get all gray levels below X (here 200) - no whiteout."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        Static alphaSlider = OptionParent.FindSlider("Alpha (contrast)")
 
-        bright.Run(src)
-        dst2 = bright.dst2
 
-        Dim meanVals As New List(Of Single)
-        For Each r In task.gridRects
-            meanVals.Add(Mean(dst2(r))(0))
-        Next
+    Public Class Brightness_Grid : Inherits TaskParent
+        Dim bright As New Brightness_Basics
+        Public brightRect As cv.Rect
+        Public Sub New()
+            desc = "Adjust the brightness to get all gray levels below X (here 200) - no whiteout."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            Static alphaSlider = OptionParent.FindSlider("Alpha (contrast)")
 
-        Dim max = meanVals.Max
-        If max > 200 Then
-            Dim nextVal = alphaSlider.value - 10
-            If nextVal > 0 Then alphaSlider.value = nextVal
-        End If
-        brightRect = task.gridRects(meanVals.IndexOf(max))
-        If standaloneTest() Then
-            dst3.SetTo(0)
-            dst2(brightRect).CopyTo(dst3(brightRect))
-        End If
-    End Sub
-End Class
+            bright.Run(src)
+            dst2 = bright.dst2
+
+            Dim meanVals As New List(Of Single)
+            For Each r In task.gridRects
+                meanVals.Add(Mean(dst2(r))(0))
+            Next
+
+            Dim max = meanVals.Max
+            If max > 200 Then
+                Dim nextVal = alphaSlider.value - 10
+                If nextVal > 0 Then alphaSlider.value = nextVal
+            End If
+            brightRect = task.gridRects(meanVals.IndexOf(max))
+            If standaloneTest() Then
+                dst3.SetTo(0)
+                dst2(brightRect).CopyTo(dst3(brightRect))
+            End If
+        End Sub
+    End Class
+End Namespace
