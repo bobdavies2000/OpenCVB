@@ -246,6 +246,8 @@ Feature_MatchORB
 Feature_MatchSIFT
 Feature_MatchSURF
 Feature_PointsPath
+Feature_Tracker
+Feature_WarpAlign
 FeatureFlow_Basics
 FeatureFlow_LucasKanade
 FeatureLess_Basics_TA

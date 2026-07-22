@@ -1080,12 +1080,21 @@ Public Class Feature_MatchAKAZE : Inherits TaskParent
         If akaze Is Nothing Then akaze = XFeatures2D.AKAZE.Create()
         If matcher Is Nothing Then matcher = New BFMatcher(NormTypes.Hamming, crossCheck:=False)
 
-        Dim keyPoints As KeyPoint() = Nothing
+        Dim keyPoints = akaze.Detect(gray)
+        Dim maxFeat = task.fOptions.FeatureSizeSlider.Value
+        If keyPoints IsNot Nothing AndAlso keyPoints.Length > maxFeat Then
+            keyPoints = KeyPointsFilter.RetainBest(keyPoints, maxFeat)
+        End If
+
         Dim descMat As New Mat()
-        akaze.DetectAndCompute(gray, Nothing, keyPoints, descMat)
+        If keyPoints IsNot Nothing AndAlso keyPoints.Length > 0 Then
+            akaze.Compute(gray, keyPoints, descMat)
+        End If
 
         dst2 = Feature_MatchORB.displayMatches(dst2, keyPoints)
 
+        features.Clear()
+        lastFeatures.Clear()
         If Not lastDesc.Empty() AndAlso Not descMat.Empty() AndAlso
            lastKeyPoints IsNot Nothing AndAlso lastKeyPoints.Length > 0 AndAlso
            keyPoints IsNot Nothing AndAlso keyPoints.Length > 0 Then
@@ -1096,11 +1105,12 @@ Public Class Feature_MatchAKAZE : Inherits TaskParent
             dst3 = lastFrame.Clone
             Feature_MatchORB.DisplayMatches(dst3, matches, lastKeyPoints, keyPoints, features, lastFeatures)
 
-            labels(2) = CStr(If(keyPoints Is Nothing, 0, keyPoints.Length)) + " AKAZE keypoints on current frame"
+            labels(2) = CStr(If(keyPoints Is Nothing, 0, keyPoints.Length)) + " AKAZE keypoints (max " +
+                        CStr(maxFeat) + ") on current frame"
             labels(3) = (matches.Count / lastKeyPoints.Length).ToString("0%") + " matched to previous frame."
         End If
 
-        If task.heartBeat Then Feature_MatchORB.captureState(lastFrame, lastDesc, descMat, lastKeyPoints, keyPoints)
+        Feature_MatchORB.captureState(lastFrame, lastDesc, descMat, lastKeyPoints, keyPoints)
     End Sub
     Protected Overrides Sub Finalize()
         If akaze IsNot Nothing Then akaze.Dispose()
@@ -1108,6 +1118,7 @@ Public Class Feature_MatchAKAZE : Inherits TaskParent
         If lastDesc IsNot Nothing Then lastDesc.Dispose()
     End Sub
 End Class
+
 
 
 
@@ -1459,5 +1470,148 @@ Public Class Feature_MatchORB : Inherits TaskParent
         If orb IsNot Nothing Then orb.Dispose()
         If matcher IsNot Nothing Then matcher.Dispose()
         If lastDesc IsNot Nothing Then lastDesc.Dispose()
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Feature_Tracker : Inherits TaskParent
+    Dim feat As New Feature_MatchAKAZE
+    Const maxSamples As Integer = 30
+    Public tracks As New List(Of List(Of cv.Point))
+    Public Sub New()
+        labels = {"", "", "AKAZE features", "Feature tracks (up to 30 samples; dropped on lost track)"}
+        desc = "Cursor.ai: Track Feature_MatchAKAZE features for up to 30 samples; drop a track and its history when matching is lost."
+    End Sub
+    Private Function findPairIndex(tip As cv.Point, lastFeatures As List(Of cv.Point), used() As Boolean) As Integer
+        Dim best = -1
+        Dim bestDist = Double.MaxValue
+        For i = 0 To lastFeatures.Count - 1
+            If used(i) Then Continue For
+            Dim d = tip.DistanceTo(lastFeatures(i))
+            If d < bestDist Then
+                bestDist = d
+                best = i
+            End If
+        Next
+        If best >= 0 AndAlso bestDist <= 2 Then Return best
+        Return -1
+    End Function
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        If task.optionsChanged Then tracks.Clear()
+
+        feat.Run(src)
+        dst2 = feat.dst2
+        labels(2) = feat.labels(2)
+
+        Dim newTracks As New List(Of List(Of cv.Point))
+        If feat.lastFeatures.Count > 0 AndAlso feat.features.Count = feat.lastFeatures.Count Then
+            Dim used(feat.lastFeatures.Count - 1) As Boolean
+
+            For Each track In tracks
+                Dim idx = findPairIndex(track(track.Count - 1), feat.lastFeatures, used)
+                If idx < 0 Then Continue For ' lost track — drop history
+
+                used(idx) = True
+                track.Add(feat.features(idx))
+                If track.Count > maxSamples Then track.RemoveAt(1) ' keep track(0) as the origin
+                newTracks.Add(track)
+            Next
+
+            For i = 0 To feat.lastFeatures.Count - 1
+                If used(i) Then Continue For
+                Dim track As New List(Of cv.Point)
+                track.Add(feat.lastFeatures(i))
+                track.Add(feat.features(i))
+                newTracks.Add(track)
+            Next
+        End If
+        tracks = newTracks
+
+        dst3 = task.color.Clone
+        Dim longTracks As Integer
+        Dim averageDistance As Double
+        For Each track In tracks
+            Dim color = task.scalarColors(track.Count Mod 255)
+            For j = 1 To track.Count - 1
+                Line(dst3, track(j - 1), track(j), color, task.lineWidth, task.lineType)
+            Next
+            Circle(dst3, track(track.Count - 1), task.DotSize + 1, color, -1, task.lineType)
+            If track.Count >= maxSamples Then longTracks += 1
+            averageDistance += track(0).DistanceTo(track(track.Count - 1))
+        Next
+        If tracks.Count > 0 Then averageDistance /= tracks.Count
+
+        labels(3) = CStr(tracks.Count) + " tracks, " + CStr(longTracks) + " at " + CStr(maxSamples) +
+                    " samples, avg start-to-end = " + averageDistance.ToString(fmt1) + " px"
+    End Sub
+End Class
+
+
+
+
+Public Class Feature_WarpAlign : Inherits TaskParent
+    Dim tracker As New Feature_Tracker
+    Dim heartImage As Mat
+    Public Sub New()
+        desc = "Cursor.ai: Use Feature_Tracker travel to WarpAffine the current image onto the heartbeat image; unmapped edges are black."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        Dim color = If(src.Channels() = 1, task.color.Clone, src.Clone)
+
+        If task.heartBeatLT OrElse heartImage Is Nothing OrElse task.optionsChanged Then
+            heartImage = color.Clone
+            tracker.tracks.Clear()
+        End If
+
+        tracker.Run(src)
+        dst2 = heartImage.Clone
+
+        Dim srcPts As New List(Of Point2f)
+        Dim dstPts As New List(Of Point2f)
+        For Each track In tracker.tracks
+            If track.Count < 2 Then Continue For
+            Dim p0 = track(0)
+            Dim p1 = track.Last
+            srcPts.Add(New Point2f(p1.X, p1.Y)) ' current
+            dstPts.Add(New Point2f(p0.X, p0.Y)) ' heartbeat / track origin
+            Line(dst2, p0, p1, task.highlight, task.lineWidth, task.lineType)
+            Circle(dst2, p0, task.DotSize, task.highlight, -1, task.lineType)
+            Circle(dst2, p1, task.DotSize + 1, Scalar.Red, -1, task.lineType)
+        Next
+
+        If srcPts.Count < 3 Then
+            dst3 = color.Clone
+            labels(2) = "Heartbeat image — need at least 3 tracks to warp"
+            labels(3) = CStr(srcPts.Count) + " track(s) available"
+            Exit Sub
+        End If
+
+        Dim fromMat = Mat.FromPixelData(srcPts.Count, 1, MatType.CV_32FC2, srcPts.ToArray())
+        Dim toMat = Mat.FromPixelData(dstPts.Count, 1, MatType.CV_32FC2, dstPts.ToArray())
+        Dim inliers As New Mat
+        Dim affine = EstimateAffinePartial2D(fromMat, toMat, inliers)
+
+        If affine Is Nothing OrElse affine.Empty() Then
+            dst3 = color.Clone
+            labels(3) = "Affine estimate failed"
+            Exit Sub
+        End If
+
+        WarpAffine(color, dst1, affine, color.Size(), InterpolationFlags.Linear, BorderTypes.Constant, Scalar.All(0))
+
+        Dim dx = affine.Get(Of Double)(0, 2)
+        Dim dy = affine.Get(Of Double)(1, 2)
+        Dim da = Math.Atan2(affine.Get(Of Double)(1, 0), affine.Get(Of Double)(0, 0)) * 180 / Math.PI
+        Dim inlierCount = If(inliers.Empty(), 0, CountNonZero(inliers))
+
+        If Math.Abs(dx) > 0.1 Or Math.Abs(dy) > 0.1 Or Math.Abs(da) > 0.1 Then dst1.CopyTo(dst3)
+
+        labels(2) = "Heartbeat image with " + CStr(srcPts.Count) + " travel vectors"
+        labels(3) = "Warped to heartbeat — inliers " + CStr(inlierCount) + "/" + CStr(srcPts.Count) +
+                    ", dx=" + dx.ToString(fmt1) + " dy=" + dy.ToString(fmt1) + " deg=" + da.ToString(fmt1)
     End Sub
 End Class
