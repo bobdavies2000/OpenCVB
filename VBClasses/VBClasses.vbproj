@@ -22,6 +22,8 @@
     <Import Include="System.Data" />
     <Import Include="System.Drawing" />
     <Import Include="System.Windows.Forms" />
+    <!-- SDK-style VB ignores ImportedNamespaces for custom namespaces; Import is required so files outside Namespace VBClasses can see types inside it. -->
+    <Import Include="VBClasses" />
   </ItemGroup>
 
   <ItemGroup>

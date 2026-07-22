@@ -3,9 +3,9 @@ Namespace VBClasses
     ' https://stackoverflow.com/questions/22132510/opencv-approxpolydp-for-edge-maps-Not-contours
     ' https://docs.opencvb.org/4.x/js_contour_features_approxPolyDP.html
     Public Class ApproxPoly_Basics : Inherits TaskParent
-        Dim contour As New Contour_Largest
-        Dim rotatedRect As New Rectangle_Rotated
-        Dim options As New Options_ApproxPoly
+        ReadOnly contour As New Contour_Largest
+        ReadOnly rotatedRect As New Rectangle_Rotated
+        ReadOnly options As New Options_ApproxPoly
         Public Sub New()
             labels = {"", "", "Input to the ApproxPolyDP", "Output of ApproxPolyDP"}
             desc = "Using the input contours, create ApproxPoly output"
@@ -21,7 +21,7 @@ Namespace VBClasses
             contour.Run(dst2)
             dst2 = contour.dst2
 
-            If contour.allContours.Count > 0 Then
+            If contour.allContours.Length > 0 Then
                 Dim nextContour As cv.Point()
                 nextContour = ApproxPolyDP(contour.bestContour, options.epsilon, options.closedPoly)
                 dst3.SetTo(0)
@@ -42,7 +42,7 @@ Namespace VBClasses
 
     ' https://stackoverflow.com/questions/22132510/opencv-approxpolydp-for-edge-maps-Not-contours
     Public Class XR_ApproxPoly_FindandDraw : Inherits TaskParent
-        Dim rotatedRect As New Rectangle_Rotated
+        ReadOnly rotatedRect As New Rectangle_Rotated
         Public allContours As cv.Point()()
         Public Sub New()
             labels(2) = "FindandDraw input"
@@ -64,7 +64,7 @@ Namespace VBClasses
             Dim contours As New List(Of cv.Point())
             For Each tour In allContours
                 nextContour = ApproxPolyDP(tour, 3, True)
-                If nextContour.Count > 2 Then contours.Add(nextContour)
+                If nextContour.Length > 2 Then contours.Add(nextContour)
             Next
 
             DrawContours(dst3, contours, -1, New Scalar(0, 255, 255), task.lineWidth, task.lineType)
@@ -78,8 +78,8 @@ Namespace VBClasses
 
 
     Public Class XR_ApproxPoly_Hull : Inherits TaskParent
-        Dim hull As New Hull_Basics
-        Dim aPoly As New ApproxPoly_Basics
+        ReadOnly hull As New Hull_Basics
+        ReadOnly aPoly As New ApproxPoly_Basics
         Public Sub New()
             hull.useRandomPoints = True
             labels = {"", "", "Original Hull", "Hull after ApproxPoly"}

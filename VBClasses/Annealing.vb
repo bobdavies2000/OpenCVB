@@ -10,7 +10,7 @@ Namespace VBClasses
         Public energy As Single
         Public energyLast As Single
         Public circularPattern As Boolean = True
-        Public Sub drawMap()
+        Public Sub DrawMap()
             dst2.SetTo(0)
             For i = 0 To cityOrder.Length - 1
                 Circle(dst2, cityPositions(i), task.DotSize, white, -1, task.lineType)
@@ -18,7 +18,7 @@ Namespace VBClasses
             Next
             SetTrueText("Energy" + vbCrLf + energy.ToString(fmt0), New cv.Point(10, 100), 2)
         End Sub
-        Public Sub setup()
+        Public Sub Setup()
             ReDim cityOrder(numberOfCities - 1)
 
             Dim radius = dst2.Rows * 0.45
@@ -44,7 +44,7 @@ Namespace VBClasses
         End Sub
         Public Sub New()
             energy = -1
-            setup()
+            Setup()
             Open()
             desc = "Simulated annealing with traveling salesman.  NOTE: No guarantee simulated annealing will find the optimal solution."
         End Sub
@@ -56,7 +56,7 @@ Namespace VBClasses
 
             Dim msg = Marshal.PtrToStringAnsi(out)
             Dim split As String() = Regex.Split(msg, "\W+")
-            energy = CSng(split(split.Count - 2) + "." + split(split.Count - 1))
+            energy = CSng(split(split.Length - 2) + "." + split(split.Length - 1))
             If standaloneTest() Then
                 If energyLast = energy Or task.optionsChanged Then
                     Annealing_Basics_Close(cPtr)
@@ -66,7 +66,7 @@ Namespace VBClasses
                 energyLast = energy
             End If
 
-            drawMap()
+            DrawMap()
         End Sub
         Protected Overrides Sub Finalize()
             If cPtr <> 0 Then cPtr = Annealing_Basics_Close(cPtr)
@@ -81,21 +81,20 @@ Namespace VBClasses
 
 
     Public Class XR_Annealing_MT_CPP : Inherits TaskParent
-        Dim random As New Random_Basics
-        Dim anneal() As Annealing_Basics_CPP
-        Dim mats As New Mat_4to1
-        Dim options As New Options_Annealing
+        ReadOnly random As New Random_Basics
+        ReadOnly anneal() As Annealing_Basics_CPP
+        ReadOnly mats As New Mat_4to1
+        ReadOnly options As New Options_Annealing
         Dim startTime As DateTime
-        Private Sub setup()
+        Private Sub Setup()
             random.options.count = options.cityCount
             random.Run(emptyMat) ' get the city positions (may or may not be used below.)
 
             For i = 0 To anneal.Length - 1
-                anneal(i) = New Annealing_Basics_CPP()
-                anneal(i).numberOfCities = options.cityCount
-                anneal(i).cityPositions = random.PointList.ToArray
-                anneal(i).circularPattern = options.circularFlag
-                anneal(i).setup()
+                anneal(i) = New Annealing_Basics_CPP() With {.numberOfCities = options.cityCount,
+                                                              .cityPositions = random.PointList.ToArray(),
+                                                              .circularPattern = options.circularFlag}
+                anneal(i).Setup()
                 anneal(i).Open() ' this will initialize the C++ copy of the city positions.
             Next
             Dim timeSpent = Now.Subtract(startTime)
@@ -109,11 +108,10 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
-            If task.optionsChanged Then setup()
-            Parallel.For(0, anneal.Length,
-                Sub(i)
-                    anneal(i).Run(src)
-                End Sub)
+            If task.optionsChanged Then Setup()
+            For i = 0 To anneal.Length - 1
+                anneal(i).Run(src)
+            Next
 
             ' find the best result and start all the others with it.
             Dim bestList As New SortedList(Of Single, Integer)(New compareAllowIdenticalSingle)
@@ -147,7 +145,7 @@ Namespace VBClasses
 
             ' if the top X are all the same energy, then we are done.
             Dim workingCount As Integer, successCounter As Integer
-            For i = 0 To anneal.Count - 1
+            For i = 0 To anneal.Length - 1
                 Dim index = bestList.ElementAt(i).Value
                 If anneal(index).energy <> anneal(index).energyLast Then
                     anneal(index).energyLast = anneal(index).energy

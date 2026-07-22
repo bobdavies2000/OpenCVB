@@ -1,14 +1,16 @@
-Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
-'https://gist.github.com/kendricktan/93f0da88d0b25087d751ed2244cf770c
-'https://medium.com/@anuj_shah/through-the-eyes-of-gabor-filter-17d1fdb3ac97
-Public Class Gabor_Basics : Inherits TaskParent
-    Public options As New Options_Gabor
-    Public Sub New()
-        desc = "Explore Gabor kernel"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        options.Run()
+Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCvSharp
+Namespace VBClasses
+    'https://gist.github.com/kendricktan/93f0da88d0b25087d751ed2244cf770c
+    'https://medium.com/@anuj_shah/through-the-eyes-of-gabor-filter-17d1fdb3ac97
+    Public Class Gabor_Basics : Inherits TaskParent
+        Public options As New Options_Gabor
+        Public Sub New()
+            desc = "Explore Gabor kernel"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            options.Run()
 
-        Filter2D(src, dst2, MatType.CV_8UC3, options.gKernel)
-    End Sub
-End Class
+            Filter2D(src, dst2, MatType.CV_8UC3, options.gKernel)
+        End Sub
+    End Class
+End Namespace

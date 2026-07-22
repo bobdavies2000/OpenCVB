@@ -2,8 +2,8 @@ Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCvSharp
 Namespace VBClasses
     ' https://github.com/ncosentino/DevLeader/tree/master/AsciiArtGenerator
     Public Class AsciiArt_Basics : Inherits TaskParent
-        Dim asciiChars As String() = {"@", "%", "#", "*", "+", "=", "-", ":", ",", ".", " "}
-        Dim options As New Options_AsciiArt
+        ReadOnly asciiChars As String() = {"@", "%", "#", "*", "+", "=", "-", ":", ",", ".", " "}
+        ReadOnly options As New Options_AsciiArt
         Public Sub New()
             labels = {"", "", "Ascii version", "Grayscale input to ascii art"}
             desc = "Build an ascii art representation of the input stream."
@@ -58,8 +58,8 @@ Namespace VBClasses
 
 
     Public Class XR_AsciiArt_Diff : Inherits TaskParent
-        Dim grayAA As New AsciiArt_Color
-        Dim diff As New Diff_Basics
+        ReadOnly grayAA As New AsciiArt_Color
+        ReadOnly diff As New Diff_Basics
         Public Sub New()
             desc = "Display the instability in image pixels."
         End Sub

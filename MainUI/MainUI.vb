@@ -383,7 +383,7 @@ Namespace MainApp
             SendMessage(Me.Handle, WM_SETICON, CType(ICON_BIG, IntPtr), Me.Icon.Handle)
 
             If vbc.task IsNot Nothing Then vbc.task.Dispose()
-            vbc.task = New AlgorithmTask
+            vbc.task = New VBClasses.AlgorithmTask
 
             For i = 0 To pics.Count - 1
                 vbc.task.dstList(i) = New cv.Mat(settings.workRes, cv.MatType.CV_8UC3, 0)

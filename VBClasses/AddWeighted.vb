@@ -53,7 +53,7 @@ Namespace VBClasses
 
 
     Public Class XR_AddWeighted_DepthAccumulate : Inherits TaskParent
-        Dim options As New Options_AddWeighted
+        ReadOnly options As New Options_AddWeighted
         Public Sub New()
             dst2 = New Mat(dst2.Size, MatType.CV_32F, 0)
             desc = "Update a running average of the image"
@@ -61,7 +61,7 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
 
-            AccumulateWeighted(task.pcSplit(2) * 1000, dst2, options.accumWeighted, New Mat)
+            AccumulateWeighted(task.pcSplit(2) * 1000, dst2, CDbl(options.accumWeighted), New Mat)
         End Sub
     End Class
 

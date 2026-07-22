@@ -1,292 +1,294 @@
-Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
-Public Class Filter_Basics_TA : Inherits TaskParent
-    Public filterList As String() = {"Original", "PhotoShop_HSV", "PhotoShop_SharpenDetail", "PhotoShop_WhiteBalance"}
-    Dim filters(filterList.Count - 1) As Object
-    Public grayFilter As New Filter_Basics_Gray
-    Public Sub New()
-        desc = "Filter the input for algorithm or set the defaults."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        Dim filterIndex As Integer
-        For Each cb In task.fOptions.colorCheckbox
-            If cb.Checked Then
-                Select Case cb.Text
-                    Case "Original"
-                        dst2 = task.color.Clone
-                    Case "PhotoShop_WhiteBalance"
-                        If filters(cb.Tag) Is Nothing Then filters(cb.Tag) = New PhotoShop_WhiteBalance
-                    Case "PhotoShop_SharpenDetail"
-                        If filters(cb.Tag) Is Nothing Then filters(cb.Tag) = New PhotoShop_SharpenDetail
-                    Case "PhotoShop_HSV"
-                        If filters(cb.Tag) Is Nothing Then filters(cb.Tag) = New PhotoShop_HSV
-                End Select
-                filterIndex = cb.Tag
+Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCvSharp
+Namespace VBClasses
+    Public Class Filter_Basics_TA : Inherits TaskParent
+        Public filterList As String() = {"Original", "PhotoShop_HSV", "PhotoShop_SharpenDetail", "PhotoShop_WhiteBalance"}
+        Dim filters(filterList.Count - 1) As Object
+        Public grayFilter As New Filter_Basics_Gray
+        Public Sub New()
+            desc = "Filter the input for algorithm or set the defaults."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            Dim filterIndex As Integer
+            For Each cb In task.fOptions.colorCheckbox
+                If cb.Checked Then
+                    Select Case cb.Text
+                        Case "Original"
+                            dst2 = task.color.Clone
+                        Case "PhotoShop_WhiteBalance"
+                            If filters(cb.Tag) Is Nothing Then filters(cb.Tag) = New PhotoShop_WhiteBalance
+                        Case "PhotoShop_SharpenDetail"
+                            If filters(cb.Tag) Is Nothing Then filters(cb.Tag) = New PhotoShop_SharpenDetail
+                        Case "PhotoShop_HSV"
+                            If filters(cb.Tag) Is Nothing Then filters(cb.Tag) = New PhotoShop_HSV
+                    End Select
+                    filterIndex = cb.Tag
+                End If
+            Next
+
+            labels(2) = "Color input to all algorithms - " + task.fOptions.colorCheckbox(filterIndex).Text
+            If filterIndex > 0 Then
+                filters(filterIndex).run(dst2)
+                dst2 = filters(filterIndex).dst2
             End If
-        Next
 
-        labels(2) = "Color input to all algorithms - " + task.fOptions.colorCheckbox(filterIndex).Text
-        If filterIndex > 0 Then
-            filters(filterIndex).run(dst2)
-            dst2 = filters(filterIndex).dst2
-        End If
+            Dim _grayFilter_cvt As New Mat
+            CvtColor(dst2, _grayFilter_cvt, ColorConversionCodes.BGR2GRAY)
+            grayFilter.Run(_grayFilter_cvt)
+            labels(3) = grayFilter.labels(2)
+            dst3 = grayFilter.dst2
 
-        Dim _grayFilter_cvt As New Mat
-        CvtColor(dst2, _grayFilter_cvt, ColorConversionCodes.BGR2GRAY)
-        grayFilter.Run(_grayFilter_cvt)
-        labels(3) = grayFilter.labels(2)
-        dst3 = grayFilter.dst2
-
-        task.color = dst2
-    End Sub
-End Class
+            task.color = dst2
+        End Sub
+    End Class
 
 
 
 
 
-Public Class Filter_Basics_Gray : Inherits TaskParent
-    Public filterIndex As Integer
-    Public filterList As String() = {"Original", "Blur_Basics", "Dilate_Basics", "Erode_Basics",
+    Public Class Filter_Basics_Gray : Inherits TaskParent
+        Public filterIndex As Integer
+        Public filterList As String() = {"Original", "Blur_Basics", "Dilate_Basics", "Erode_Basics",
                                      "Filter_Equalize", "Filter_Laplacian", "MeanSubtraction_Gray", "PhotoShop_Gamma"}
-    Dim filters(filterList.Count - 1) As Object
-    Public Sub New()
-        desc = "Demo the RGB Filters selected in 'fOptions'.  If none selected, just the input is displayed."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        dst2 = src
-        For Each cb In task.fOptions.grayCheckbox
-            If cb.Checked Then
-                Select Case cb.Text
-                    Case "Original"
-                    Case "Blur_Basics"
-                        If filters(cb.Tag) Is Nothing Then filters(cb.Tag) = New Blur_Basics
-                    Case "Dilate_Basics"
-                        If filters(cb.Tag) Is Nothing Then filters(cb.Tag) = New Dilate_Basics
-                    Case "Erode_Basics"
-                        If filters(cb.Tag) Is Nothing Then filters(cb.Tag) = New Erode_Basics
-                    Case "Filter_Equalize"
-                        If filters(cb.Tag) Is Nothing Then filters(cb.Tag) = New Filter_Equalize
-                    Case "Filter_Equalize"
-                        If filters(cb.Tag) Is Nothing Then filters(cb.Tag) = New Filter_Laplacian
-                    Case "MeanSubtraction_Gray"
-                        If filters(cb.Tag) Is Nothing Then filters(cb.Tag) = New MeanSubtraction_Gray
-                    Case "PhotoShop_Gamma"
-                        If filters(cb.Tag) Is Nothing Then filters(cb.Tag) = New PhotoShop_Gamma
-                End Select
-                filterIndex = cb.Tag
-                Exit For
-            End If
-        Next
-
-        labels(2) = "Grayscale input to all algorithms - " + task.fOptions.grayCheckbox(filterIndex).Text
-        If filterIndex > 0 Then
-            filters(filterIndex).Run(dst2)
-            dst2 = filters(filterIndex).dst2
-            If dst2.Channels <> 1 Then
-                MessageBox.Show("Filter_Basics_Gray failure - " + filterList(filterIndex) + " needs to return " + vbCrLf +
-                           "an 8UC1 image, not 8UC3.  Reevaluate any new filters added above!")
-                Dim k = 0 ' if you set a breakpoint here when you get this message, you can debug it more easily.
-            End If
-        Else
+        Dim filters(filterList.Count - 1) As Object
+        Public Sub New()
+            desc = "Demo the RGB Filters selected in 'fOptions'.  If none selected, just the input is displayed."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
             dst2 = src
-        End If
-    End Sub
-End Class
+            For Each cb In task.fOptions.grayCheckbox
+                If cb.Checked Then
+                    Select Case cb.Text
+                        Case "Original"
+                        Case "Blur_Basics"
+                            If filters(cb.Tag) Is Nothing Then filters(cb.Tag) = New Blur_Basics
+                        Case "Dilate_Basics"
+                            If filters(cb.Tag) Is Nothing Then filters(cb.Tag) = New Dilate_Basics
+                        Case "Erode_Basics"
+                            If filters(cb.Tag) Is Nothing Then filters(cb.Tag) = New Erode_Basics
+                        Case "Filter_Equalize"
+                            If filters(cb.Tag) Is Nothing Then filters(cb.Tag) = New Filter_Equalize
+                        Case "Filter_Equalize"
+                            If filters(cb.Tag) Is Nothing Then filters(cb.Tag) = New Filter_Laplacian
+                        Case "MeanSubtraction_Gray"
+                            If filters(cb.Tag) Is Nothing Then filters(cb.Tag) = New MeanSubtraction_Gray
+                        Case "PhotoShop_Gamma"
+                            If filters(cb.Tag) Is Nothing Then filters(cb.Tag) = New PhotoShop_Gamma
+                    End Select
+                    filterIndex = cb.Tag
+                    Exit For
+                End If
+            Next
+
+            labels(2) = "Grayscale input to all algorithms - " + task.fOptions.grayCheckbox(filterIndex).Text
+            If filterIndex > 0 Then
+                filters(filterIndex).Run(dst2)
+                dst2 = filters(filterIndex).dst2
+                If dst2.Channels <> 1 Then
+                    MessageBox.Show("Filter_Basics_Gray failure - " + filterList(filterIndex) + " needs to return " + vbCrLf +
+                           "an 8UC1 image, not 8UC3.  Reevaluate any new filters added above!")
+                    Dim k = 0 ' if you set a breakpoint here when you get this message, you can debug it more easily.
+                End If
+            Else
+                dst2 = src
+            End If
+        End Sub
+    End Class
+
+
+
+
+
+    ' https://docs.opencvb.org/2.4/doc/tutorials/imgproc/imgtrans/laplace_operator/laplace_operator.html
+    Public Class Filter_Laplacian : Inherits TaskParent
+        Public Sub New()
+            labels(2) = "Sharpened image using Filter2D output"
+            labels(3) = "Output of Filter2D (approximated Laplacian)"
+            desc = "Use a filter to approximate the Laplacian derivative."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            Dim imgLaplacian As New Mat
+            Filter2D(src, imgLaplacian, MatType.CV_32F, Mat.FromPixelData(3, 3, MatType.CV_32FC1, New Single() {1, 1, 1, 1, -8, 1, 1, 1, 1}))
+            src.ConvertTo(dst1, MatType.CV_32F)
+            dst0 = (dst1 - imgLaplacian).ToMat
+            dst0.ConvertTo(dst2, src.Type)
+            imgLaplacian.ConvertTo(dst3, src.Type)
+        End Sub
+    End Class
+
+
+
 
 
 
+
+    Public Class XR_Filter_NormalizedKernel : Inherits TaskParent
+        Dim options As New Options_FilterNorm
+        Public Sub New()
+            desc = "Create a normalized kernel and use it."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            options.Run()
+
+            Dim sum As Double
+            For i = 0 To options.kernel.Width - 1
+                sum += Math.Abs(options.kernel.Get(Of Single)(0, i))
+            Next
+            labels(2) = "kernel sum = " + sum.ToString(fmt3)
 
+            Dim dst32f As New Mat
+            Filter2D(src, dst32f, MatType.CV_32FC1, options.kernel, anchor:=New cv.Point(0, 0))
+            dst32f.ConvertTo(dst2, MatType.CV_8UC3)
+        End Sub
+    End Class
 
-' https://docs.opencvb.org/2.4/doc/tutorials/imgproc/imgtrans/laplace_operator/laplace_operator.html
-Public Class Filter_Laplacian : Inherits TaskParent
-    Public Sub New()
-        labels(2) = "Sharpened image using Filter2D output"
-        labels(3) = "Output of Filter2D (approximated Laplacian)"
-        desc = "Use a filter to approximate the Laplacian derivative."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        Dim imgLaplacian As New Mat
-        Filter2D(src, imgLaplacian, MatType.CV_32F, Mat.FromPixelData(3, 3, MatType.CV_32FC1, New Single() {1, 1, 1, 1, -8, 1, 1, 1, 1}))
-        src.ConvertTo(dst1, MatType.CV_32F)
-        dst0 = (dst1 - imgLaplacian).ToMat
-        dst0.ConvertTo(dst2, src.Type)
-        imgLaplacian.ConvertTo(dst3, src.Type)
-    End Sub
-End Class
 
 
 
+
+
+    ' https://docs.opencvb.org/2.4/doc/tutorials/imgproc/imgtrans/filter_2d/filter_2d.html
+    Public Class XR_Filter_Normalized2D : Inherits TaskParent
+        Dim options As New Options_Filter
+        Public Sub New()
+            desc = "Create and apply a normalized kernel."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            options.Run()
+            Dim kernelSize As Integer = If(standaloneTest(), (task.frameCount Mod 20) + 1, options.kernelSize)
+            Dim kernel = New Mat(kernelSize, kernelSize, MatType.CV_32F).SetTo(1 / (kernelSize * kernelSize))
+            Filter2D(src, dst2, -1, kernel)
+            labels(2) = "Normalized KernelSize = " + CStr(kernelSize)
+        End Sub
+    End Class
 
 
 
 
-Public Class XR_Filter_NormalizedKernel : Inherits TaskParent
-    Dim options As New Options_FilterNorm
-    Public Sub New()
-        desc = "Create a normalized kernel and use it."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        options.Run()
 
-        Dim sum As Double
-        For i = 0 To options.kernel.Width - 1
-            sum += Math.Abs(options.kernel.Get(Of Single)(0, i))
-        Next
-        labels(2) = "kernel sum = " + sum.ToString(fmt3)
 
-        Dim dst32f As New Mat
-        Filter2D(src, dst32f, MatType.CV_32FC1, options.kernel, anchor:=New cv.Point(0, 0))
-        dst32f.ConvertTo(dst2, MatType.CV_8UC3)
-    End Sub
-End Class
 
 
+    'https://www.cc.gatech.edu/classes/AY2015/cs4475_summer/documents/smoothing_separable.py
+    Public Class XR_Filter_SepFilter2D : Inherits TaskParent
+        Dim options As New Options_SepFilter2D
+        Public Sub New()
+            labels(2) = "Gaussian Blur result"
+            desc = "Apply kernel X then kernel Y with OpenCV's SepFilter2D and compare to Gaussian blur"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            options.Run()
+            Dim kernel = GetGaussianKernel(options.xDim, options.sigma)
+            GaussianBlur(src, dst2, New Size(options.xDim, options.yDim), options.sigma)
+            SepFilter2D(src, dst3, MatType.CV_8UC3, kernel, kernel)
+            If options.diffCheck Then
+                Dim graySep As New Mat
+                CvtColor(dst3, graySep, ColorConversionCodes.BGR2GRAY)
+                Dim grayGauss As New Mat
+                CvtColor(dst2, grayGauss, ColorConversionCodes.BGR2GRAY)
+                Threshold((graySep - grayGauss).ToMat, dst3, 0, 255, ThresholdTypes.Binary)
+                labels(3) = "Gaussian - SepFilter2D " + CStr(CountNonZero(dst3)) + " pixels different."
+            Else
+                labels(3) = "SepFilter2D Result"
+            End If
+        End Sub
+    End Class
 
 
 
 
-' https://docs.opencvb.org/2.4/doc/tutorials/imgproc/imgtrans/filter_2d/filter_2d.html
-Public Class XR_Filter_Normalized2D : Inherits TaskParent
-    Dim options As New Options_Filter
-    Public Sub New()
-        desc = "Create and apply a normalized kernel."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        options.Run()
-        Dim kernelSize As Integer = If(standaloneTest(), (task.frameCount Mod 20) + 1, options.kernelSize)
-        Dim kernel = New Mat(kernelSize, kernelSize, MatType.CV_32F).SetTo(1 / (kernelSize * kernelSize))
-        Filter2D(src, dst2, -1, kernel)
-        labels(2) = "Normalized KernelSize = " + CStr(kernelSize)
-    End Sub
-End Class
 
 
+    ' https://datamahadev.com/filters-in-image-processing-using-opencv/
+    Public Class XR_Filter_Minimum : Inherits TaskParent
+        Dim options As New Options_Filter
+        Public Sub New()
+            desc = "Implement the Minimum Filter - use minimum value in kernel"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            options.Run()
+            Dim kernelSize As Integer = If(standaloneTest(), (task.frameCount Mod 20) + 1, options.kernelSize)
+            Dim element = GetStructuringElement(MorphShapes.Rect, New Size(kernelSize, kernelSize))
+            Erode(src, dst2, element)
+        End Sub
+    End Class
 
 
 
 
 
 
-'https://www.cc.gatech.edu/classes/AY2015/cs4475_summer/documents/smoothing_separable.py
-Public Class XR_Filter_SepFilter2D : Inherits TaskParent
-    Dim options As New Options_SepFilter2D
-    Public Sub New()
-        labels(2) = "Gaussian Blur result"
-        desc = "Apply kernel X then kernel Y with OpenCV's SepFilter2D and compare to Gaussian blur"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        options.Run()
-        Dim kernel = GetGaussianKernel(options.xDim, options.sigma)
-        GaussianBlur(src, dst2, New Size(options.xDim, options.yDim), options.sigma)
-        SepFilter2D(src, dst3, MatType.CV_8UC3, kernel, kernel)
-        If options.diffCheck Then
-            Dim graySep As New Mat
-            CvtColor(dst3, graySep, ColorConversionCodes.BGR2GRAY)
-            Dim grayGauss As New Mat
-            CvtColor(dst2, grayGauss, ColorConversionCodes.BGR2GRAY)
-            Threshold((graySep - grayGauss).ToMat, dst3, 0, 255, ThresholdTypes.Binary)
-            labels(3) = "Gaussian - SepFilter2D " + CStr(CountNonZero(dst3)) + " pixels different."
-        Else
-            labels(3) = "SepFilter2D Result"
-        End If
-    End Sub
-End Class
+    ' https://datamahadev.com/filters-in-image-processing-using-opencv/
+    Public Class XR_Filter_Maximum : Inherits TaskParent
+        Dim options As New Options_Filter
+        Public Sub New()
+            desc = "Implement the Maximum Filter - use maximum value in kernel"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            options.Run()
+            Dim kernelSize As Integer = If(standaloneTest(), (task.frameCount Mod 20) + 1, options.kernelSize)
+            Dim element = GetStructuringElement(MorphShapes.Rect, New Size(kernelSize, kernelSize))
+            Dilate(src, dst2, element)
+        End Sub
+    End Class
 
 
 
 
 
 
-' https://datamahadev.com/filters-in-image-processing-using-opencv/
-Public Class XR_Filter_Minimum : Inherits TaskParent
-    Dim options As New Options_Filter
-    Public Sub New()
-        desc = "Implement the Minimum Filter - use minimum value in kernel"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        options.Run()
-        Dim kernelSize As Integer = If(standaloneTest(), (task.frameCount Mod 20) + 1, options.kernelSize)
-        Dim element = GetStructuringElement(MorphShapes.Rect, New Size(kernelSize, kernelSize))
-        Erode(src, dst2, element)
-    End Sub
-End Class
+    ' https://datamahadev.com/filters-in-image-processing-using-opencv/
+    Public Class XR_Filter_Mean : Inherits TaskParent
+        Dim options As New Options_Filter
+        Public Sub New()
+            desc = "Implement the Mean Filter - use mean value in kernel"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            options.Run()
+            Dim kernelSize As Integer = If(standaloneTest(), (task.frameCount Mod 20) + 1, options.kernelSize)
+            Dim kernel = (Mat.Ones(MatType.CV_32FC1, kernelSize, kernelSize) / (kernelSize * kernelSize)).ToMat
+            Filter2D(src, dst2, -1, kernel)
+        End Sub
+    End Class
 
 
 
 
 
 
-' https://datamahadev.com/filters-in-image-processing-using-opencv/
-Public Class XR_Filter_Maximum : Inherits TaskParent
-    Dim options As New Options_Filter
-    Public Sub New()
-        desc = "Implement the Maximum Filter - use maximum value in kernel"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        options.Run()
-        Dim kernelSize As Integer = If(standaloneTest(), (task.frameCount Mod 20) + 1, options.kernelSize)
-        Dim element = GetStructuringElement(MorphShapes.Rect, New Size(kernelSize, kernelSize))
-        Dilate(src, dst2, element)
-    End Sub
-End Class
+    ' https://datamahadev.com/filters-in-image-processing-using-opencv/
+    Public Class XR_Filter_Median : Inherits TaskParent
+        Dim options As New Options_Filter
+        Public Sub New()
+            desc = "Implement the Median Filter - use median value in kernel"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            options.Run()
+            Dim kernelSize As Integer = If(standaloneTest(), (task.frameCount Mod 20) + 1, options.kernelSize)
+            If kernelSize Mod 2 = 0 Then kernelSize += 1
+            MedianBlur(src, dst2, kernelSize)
+        End Sub
+    End Class
 
 
 
 
 
 
-' https://datamahadev.com/filters-in-image-processing-using-opencv/
-Public Class XR_Filter_Mean : Inherits TaskParent
-    Dim options As New Options_Filter
-    Public Sub New()
-        desc = "Implement the Mean Filter - use mean value in kernel"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        options.Run()
-        Dim kernelSize As Integer = If(standaloneTest(), (task.frameCount Mod 20) + 1, options.kernelSize)
-        Dim kernel = (Mat.Ones(MatType.CV_32FC1, kernelSize, kernelSize) / (kernelSize * kernelSize)).ToMat
-        Filter2D(src, dst2, -1, kernel)
-    End Sub
-End Class
 
 
 
 
 
 
-' https://datamahadev.com/filters-in-image-processing-using-opencv/
-Public Class XR_Filter_Median : Inherits TaskParent
-    Dim options As New Options_Filter
-    Public Sub New()
-        desc = "Implement the Median Filter - use median value in kernel"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        options.Run()
-        Dim kernelSize As Integer = If(standaloneTest(), (task.frameCount Mod 20) + 1, options.kernelSize)
-        If kernelSize Mod 2 = 0 Then kernelSize += 1
-        MedianBlur(src, dst2, kernelSize)
-    End Sub
-End Class
 
-
-
-
-
-
-
-
-
-
-
-
-
-'https://docs.opencvb.org/master/d1/db7/tutorial_py_Histogram_begins.html
-Public Class Filter_Equalize : Inherits TaskParent
-    Public Sub New()
-        labels(2) = "Equalized image"
-        desc = "Create an equalized image of the grayscale input."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        If src.Channels = 1 Then EqualizeHist(src, dst2) Else EqualizeHist(task.gray, dst2)
-    End Sub
-End Class
+    'https://docs.opencvb.org/master/d1/db7/tutorial_py_Histogram_begins.html
+    Public Class Filter_Equalize : Inherits TaskParent
+        Public Sub New()
+            labels(2) = "Equalized image"
+            desc = "Create an equalized image of the grayscale input."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            If src.Channels = 1 Then EqualizeHist(src, dst2) Else EqualizeHist(task.gray, dst2)
+        End Sub
+    End Class
+End Namespace

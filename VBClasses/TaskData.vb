@@ -1,4 +1,4 @@
-Imports PixelViewer : Imports OpenCvSharp : Imports cv = OpenCvSharp
+Imports OpenCvSharp : Imports cv = OpenCvSharp
 Namespace VBClasses
     Partial Public Class AlgorithmTask
         Public Settings As jsonShared.Settings
@@ -90,7 +90,7 @@ Namespace VBClasses
 
         Public motionFeatures As Point2f
         Public palette As Palette_LoadColorMap
-        Public PixelViewer As Pixel_Viewer
+        Public PixelViewer As PixelViewer.Pixel_Viewer
         Public pixelViewerOn As Boolean
 
         Public GLRequest As Integer

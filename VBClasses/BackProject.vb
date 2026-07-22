@@ -47,8 +47,8 @@ Namespace VBClasses
 
 
     Public Class XR_BackProject_Reduction : Inherits TaskParent
-        Dim reduction As New Reduction_Basics
-        Dim bProject As New BackProject_Basics
+        ReadOnly reduction As New Reduction_Basics
+        ReadOnly bProject As New BackProject_Basics
         Public Sub New()
             labels(3) = "Backprojection of highlighted histogram bin"
             task.fOptions.ReductionColor.Value = 50

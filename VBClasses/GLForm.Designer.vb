@@ -1,57 +1,59 @@
-<Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()>
-Partial Class SharpGLForm
-    Inherits System.Windows.Forms.Form
+Namespace VBClasses
+    <Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()>
+    Partial Class SharpGLForm
+        Inherits System.Windows.Forms.Form
 
-    'Form overrides dispose to clean up the component list.
-    <System.Diagnostics.DebuggerNonUserCode()>
-    Protected Overrides Sub Dispose(ByVal disposing As Boolean)
-        Try
-            If disposing And components IsNot Nothing Then
-                components.Dispose()
-            End If
-        Finally
-            MyBase.Dispose(disposing)
-        End Try
-    End Sub
+        'Form overrides dispose to clean up the component list.
+        <System.Diagnostics.DebuggerNonUserCode()>
+        Protected Overrides Sub Dispose(ByVal disposing As Boolean)
+            Try
+                If disposing AndAlso components IsNot Nothing Then
+                    components.Dispose()
+                End If
+            Finally
+                MyBase.Dispose(disposing)
+            End Try
+        End Sub
 
-    'Required by the Windows Form Designer
-    Private components As System.ComponentModel.IContainer
+        'Required by the Windows Form Designer
+        Private components As System.ComponentModel.IContainer
 
-    'NOTE: The following procedure is required by the Windows Form Designer
-    'It can be modified using the Windows Form Designer.  
-    'Do not modify it using the code editor.
-    <System.Diagnostics.DebuggerStepThrough()>
-    Private Sub InitializeComponent()
-        GLControl = New SharpGL.OpenGLControl()
-        CType(GLControl, ComponentModel.ISupportInitialize).BeginInit()
-        SuspendLayout()
-        ' 
-        ' GLControl
-        ' 
-        GLControl.Dock = DockStyle.Fill
-        GLControl.DrawFPS = False
-        GLControl.FrameRate = 30
-        GLControl.Location = New Point(0, 0)
-        GLControl.Margin = New Padding(6, 5, 6, 5)
-        GLControl.Name = "GLControl"
-        GLControl.OpenGLVersion = SharpGL.Version.OpenGLVersion.OpenGL2_1
-        GLControl.RenderContextType = SharpGL.RenderContextType.FBO
-        GLControl.RenderTrigger = SharpGL.RenderTrigger.TimerBased
-        GLControl.Size = New Size(1199, 785)
-        GLControl.TabIndex = 0
-        ' 
-        ' SharpGLForm
-        ' 
-        AutoScaleDimensions = New SizeF(10.0F, 25.0F)
-        AutoScaleMode = AutoScaleMode.Font
-        ClientSize = New Size(1199, 785)
-        Controls.Add(GLControl)
-        Margin = New Padding(4, 5, 4, 5)
-        Name = "SharpGLForm"
-        Text = "SharpGLForm"
-        CType(GLControl, ComponentModel.ISupportInitialize).EndInit()
-        ResumeLayout(False)
-    End Sub
+        'NOTE: The following procedure is required by the Windows Form Designer
+        'It can be modified using the Windows Form Designer.  
+        'Do not modify it using the code editor.
+        <System.Diagnostics.DebuggerStepThrough()>
+        Private Sub InitializeComponent()
+            GLControl = New SharpGL.OpenGLControl()
+            CType(GLControl, ComponentModel.ISupportInitialize).BeginInit()
+            SuspendLayout()
+            ' 
+            ' GLControl
+            ' 
+            GLControl.Dock = DockStyle.Fill
+            GLControl.DrawFPS = False
+            GLControl.FrameRate = 30
+            GLControl.Location = New Point(0, 0)
+            GLControl.Margin = New Padding(6, 5, 6, 5)
+            GLControl.Name = "GLControl"
+            GLControl.OpenGLVersion = SharpGL.Version.OpenGLVersion.OpenGL2_1
+            GLControl.RenderContextType = SharpGL.RenderContextType.FBO
+            GLControl.RenderTrigger = SharpGL.RenderTrigger.TimerBased
+            GLControl.Size = New Size(1199, 785)
+            GLControl.TabIndex = 0
+            ' 
+            ' SharpGLForm
+            ' 
+            AutoScaleDimensions = New SizeF(10.0F, 25.0F)
+            AutoScaleMode = AutoScaleMode.Font
+            ClientSize = New Size(1199, 785)
+            Controls.Add(GLControl)
+            Margin = New Padding(4, 5, 4, 5)
+            Name = "SharpGLForm"
+            Text = "SharpGLForm"
+            CType(GLControl, ComponentModel.ISupportInitialize).EndInit()
+            ResumeLayout(False)
+        End Sub
 
-    Friend WithEvents GLControl As SharpGL.OpenGLControl
-End Class
+        Friend WithEvents GLControl As SharpGL.OpenGLControl
+    End Class
+End Namespace

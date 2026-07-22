@@ -1075,11 +1075,8 @@ Namespace VBClasses
             Dim trainLabels(rectCount - 1) As Single
             If task.heartBeatLT Then
                 Dim histogram As New Mat
-                Dim histInput As New cv.Mat
-                Dim histMats() As cv.Mat = {histInput}
-                Mat.FromPixelData(colorDepth.Count / 2, 1, MatType.CV_32FC2, colorDepth.ToArray).CopyTo(histInput)
-                Dim bins = task.histogramBins
-                CalcHist(histMats, {0, 1}, newMat, histogram, 2, {bins, bins}, ranges)
+                Dim histInput = Mat.FromPixelData(colorDepth.Count \ 2, 1, MatType.CV_32FC2, colorDepth.ToArray())
+                CalcHist({histInput}, {0, 1}, New Mat(), histogram, 2, {task.histogramBins, task.histogramBins}, ranges)
 
                 Threshold(histogram, histogram, 0, 255, ThresholdTypes.Binary)
 
@@ -1281,10 +1278,8 @@ Namespace VBClasses
             Merge(grayMats, features)
 
             Dim histogram As New Mat
-            Dim bins() As Integer = task.histogramBins
-            Dim featureMats() As cv.Mat = {features}
-            Dim channels() As Integer = {0, 1}
-            CalcHist(featureMats, channels, newMat, histogram, 2, {bins, bins}, ranges)
+            Dim bins = task.histogramBins
+            CalcHist({features}, {0, 1}, New Mat(), histogram, 2, {bins, bins}, ranges)
 
             Threshold(histogram, histogram, 0, 255, ThresholdTypes.Binary)
             Dim floodIndex As Integer = 1
@@ -1403,7 +1398,7 @@ Namespace VBClasses
                     val2 = If(x + task.gridWH >= dst2.Width, 0, dst1.Get(Of Byte)(y, x + task.gridWH))
                     If val1 <> val2 Or (x = 0 And val1 <> 0) Then
                         If val1 = 0 Then p1 = New cv.Point(x + task.gridWH, y)
-                        If val1 <> 0 And (x = 0 And val1 <> 0) Then p1 = New cv.Point(x, y)
+                        If val1 <> 0 And (x = 0 And val1 <> 0) Then p1 = New cv.Point(CInt(x), CInt(y))
                         If val2 = 0 Then p2 = New cv.Point(x + task.gridWH - 1, y)
                         If p1 <> newPoint And p2 <> newPoint Then
                             Dim lp = New lpData(p1, p2)
@@ -1445,7 +1440,7 @@ Namespace VBClasses
                     val2 = If(y + task.gridWH >= dst2.Height, 0, dst1.Get(Of Byte)(y + task.gridWH, x))
                     If val1 <> val2 Or (y = 0 And val1 <> 0) Then
                         If val1 = 0 Then p1 = New cv.Point(x, y + task.gridWH)
-                        If val1 <> 0 And (y = 0 And val1 <> 0) Then p1 = New cv.Point(x, y)
+                        If val1 <> 0 And (y = 0 And val1 <> 0) Then p1 = New cv.Point(CInt(x), CInt(y))
                         If val2 = 0 Then p2 = New cv.Point(x, y + task.gridWH - 1)
                         If p1 <> newPoint And p2 <> newPoint Then
                             Dim lp = New lpData(p1, p2)
