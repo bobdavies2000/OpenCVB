@@ -946,7 +946,7 @@ Namespace VBClasses
             dst1.SetTo(0)
             sobel.Run(task.gray)
             sobel.dst2(r).CopyTo(dst1(r), dst3(r))
-            DrawRect(dst1, r, black)
+            Rectangle(dst1, r, black, task.lineWidth, task.lineType)
 
             Dim allPoints As New List(Of cv.Point)
             Dim brickList As New List(Of cv.Rect)
@@ -996,7 +996,7 @@ Namespace VBClasses
             If standalone Then lp = lpOutput
 
             For Each r In brickList
-                DrawRect(dst3, r, white)
+                Rectangle(dst3, r, white, task.lineWidth, task.lineType)
             Next
         End Sub
     End Class

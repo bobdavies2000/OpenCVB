@@ -541,7 +541,7 @@ Namespace VBClasses
             For Each rect In task.gridRects
                 Dim mm = GetMinMax(src(rect))
                 Dim pt = New cv.Point(CInt(mm.maxLoc.X + rect.X), CInt(mm.maxLoc.Y + rect.Y))
-                If mm.maxVal >= options.sobelThreshold Then DrawRect(dst2, rect)
+                If mm.maxVal >= options.sobelThreshold Then Rectangle(dst2, rect, task.highlight, task.lineWidth, task.lineType)
             Next
         End Sub
     End Class

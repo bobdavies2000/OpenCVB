@@ -157,7 +157,7 @@ Namespace VBClasses
             fitE.Run(src)
             dst3.SetTo(0)
             dst3(task.rcOldD.rect).SetTo(white, task.rcOldD.mask)
-            DrawRect(dst3, task.rcOldD.rect, white)
+            Rectangle(dst3, task.rcOldD.rect, white, task.lineWidth, task.lineType)
             Cv2.Ellipse(dst3(task.rcOldD.rect), fitE.box, Scalar.Yellow, task.lineWidth, task.lineType)
         End Sub
     End Class

@@ -368,7 +368,7 @@ Namespace VBClasses
                 Normalize(match.dst0, dst0, 0, 255, NormTypes.MinMax)
                 dst3.SetTo(0)
                 dst0.CopyTo(dst3(New cv.Rect(inputRect.Width / 2, inputRect.Height / 2, dst0.Width, dst0.Height)))
-                DrawRect(dst3, inputRect, white)
+                Rectangle(dst3, inputRect, white, task.lineWidth, task.lineType)
                 dst2 = src
             End If
 
@@ -513,11 +513,11 @@ Namespace VBClasses
                 newRect.Y += deltaY
 
                 dst2 = task.gray.Clone
-                DrawRect(dst2, newRect, white)
-                DrawRect(dst2, task.gridNabeRects(gridIndex), white)
+                Rectangle(dst2, newRect, white, task.lineWidth, task.lineType)
+                Rectangle(dst2, task.gridNabeRects(gridIndex), white, task.lineWidth, task.lineType)
 
                 dst3 = lastImage
-                DrawRect(dst3, newRect, white)
+                Rectangle(dst3, newRect, white, task.lineWidth, task.lineType)
             End If
             labels(2) = "Delta X/Y = " + deltaX.ToString(fmt2) + "/" + deltaY.ToString(fmt2) + ", corr: " +
                          correlation.ToString(fmt3)

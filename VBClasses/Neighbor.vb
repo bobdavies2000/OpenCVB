@@ -1,4 +1,3 @@
-Imports System.Runtime.InteropServices
 Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Class Neighbor_Basics : Inherits TaskParent

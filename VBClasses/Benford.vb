@@ -1,5 +1,0 @@
-Imports System.Text.RegularExpressions
-Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCvSharp
-Namespace VBClasses
-
-End Namespace

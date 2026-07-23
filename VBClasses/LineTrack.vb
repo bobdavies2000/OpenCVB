@@ -109,8 +109,8 @@ Namespace VBClasses
                 dst3 = rFit.dst2
 
                 dst1 = src.Clone
-                DrawRect(dst1, nabeRect1)
-                DrawRect(dst1, nabeRect2)
+                Rectangle(dst1, nabeRect1, task.highlight, task.lineWidth, task.lineType)
+                Rectangle(dst1, nabeRect2, task.highlight, task.lineWidth, task.lineType)
             End If
 
             templateLast = match.template.Clone
@@ -163,7 +163,7 @@ Namespace VBClasses
 
 
     Public Class LineTrack_Match : Inherits TaskParent
-        Public lpListLast As List(Of lpData) = New List(Of lpData)(task.lines.lpList)
+        Public lpListLast As New List(Of lpData)(task.lines.lpList)
         Public lpList As New List(Of lpData)
         Public lpMatches As New List(Of lpData)
         Dim slices As New LineTrack_Slices
@@ -625,7 +625,6 @@ Namespace VBClasses
             desc = "Track each of the lines found in Line_Basics"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If src.Channels <> 1 Then src = task.gray.Clone
             If task.heartBeatLT Then
                 lpList = New List(Of lpData)(task.lines.lpList)
             End If
@@ -697,7 +696,6 @@ Namespace VBClasses
 
             strOut += "P2.x moved " + CStr(deltaX2) + ", P2.y moved " + CStr(deltaY2) + " pixels" + vbCrLf
 
-            If deltaX1 = -deltaX2 And deltaX1 <> 0 Then Dim k = 0
             lastImage = src.Clone
             Dim lp = New lpData(p1, p2)
 

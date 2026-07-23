@@ -26,6 +26,7 @@ BGSubtract_Synthetic_CPP
 Bin2Way_Basics
 Bin2Way_Gradation
 Bin2Way_RecurseOnce
+Bin2Way_RedCloudLightToDark
 Bin3Way_Basics
 Bin3Way_GrayScale
 Bin3Way_KMeans

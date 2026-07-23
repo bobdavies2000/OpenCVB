@@ -6,7 +6,7 @@ Namespace VBClasses
         Public valleys(3) As Integer ' grayscale values for low points in the histogram.
         Dim scaleList As New List(Of Single)
         Public Sub New()
-            OptionParent.FindSlider("Frame History").Value = 30
+            task.fOptions.FrameHistoryCount.Value = 30
             task.gOptions.setHistogramBins(255)
             labels(2) = "Histogram of the grayscale image.  White lines mark local minimum above threshold.  Yellow horizontal = histogram mean."
             desc = "Find the histogram valleys for a grayscale image."

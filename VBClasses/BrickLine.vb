@@ -229,10 +229,10 @@ Namespace VBClasses
 
             If standaloneTest() Then
                 For Each index In edges
-                    DrawRect(dst2, task.gridRects(index), white)
+                    Rectangle(dst2, task.gridRects(index), white, task.lineWidth, task.lineType)
                 Next
                 For Each index In noEdges
-                    DrawRect(dst3, task.gridRects(index), white)
+                    Rectangle(dst3, task.gridRects(index), white, task.lineWidth, task.lineType)
                 Next
             End If
 
@@ -266,7 +266,7 @@ Namespace VBClasses
             mats.mat(2) = fLess.dst2.Clone
             Dim leftEdges As New List(Of Integer)(fLess.edges)
             For Each index In leftEdges
-                DrawRect(mats.mat(2), task.gridRects(index), white)
+                Rectangle(mats.mat(2), task.gridRects(index), white, task.lineWidth, task.lineType)
             Next
 
             edgeline.Run(edges.dst3)
@@ -274,7 +274,7 @@ Namespace VBClasses
             mats.mat(3) = fLess.dst2.Clone
             Dim rightEdges As New List(Of Integer)(fLess.edges)
             For Each index In rightEdges
-                DrawRect(mats.mat(3), task.gridRects(index), white)
+                Rectangle(mats.mat(3), task.gridRects(index), white, task.lineWidth, task.lineType)
             Next
 
             '  mats.Run(emptyMat)
@@ -284,8 +284,7 @@ Namespace VBClasses
             Dim correlationMat As New Mat
             bestBricks.Clear()
             For Each index In leftEdges
-                Dim r As New brickData
-                r.rect = task.gridRects(index)
+                Dim r As New brickData With {.rect = task.gridRects(index)}
 
                 ' too close to the edges of the image
                 If task.gridNabeRects(index).Width + r.rect.X + task.gridWH * 2 > dst2.Width Then Continue For
@@ -303,8 +302,8 @@ Namespace VBClasses
 
                     r.correlation = correlationMat.Get(Of Single)(0, 0)
                     If r.correlation >= task.fCorrThreshold Then
-                        DrawRect(dst2, r.rect, white)
-                        DrawRect(dst3, r.rRect, red)
+                        Rectangle(dst2, r.rect, white, task.lineWidth, task.lineType)
+                        Rectangle(dst3, r.rRect, red, task.lineWidth, task.lineType)
                         bestBricks.Add(index)
                     End If
                 End If

@@ -241,15 +241,15 @@ Namespace VBClasses
 
 
 
-    Public Class XR_Bin2Way_RedCloudLightToDark : Inherits TaskParent
+    Public Class Bin2Way_RedCloudLightToDark : Inherits TaskParent
         Dim recurse As New Bin2Way_RecurseOnce
-        Dim redCs(3) As RedColor_Basics
+        Dim redCs(3) As RedC_Basics
         Dim mats As New Mat_4to1
-        Dim rclist As New List(Of rcDataOld)
+        Dim rclist As New List(Of rcData)
         Dim rcMap As New Mat(dst2.Size, MatType.CV_32S, 0)
         Public Sub New()
             For i = 0 To redCs.Length - 1
-                redCs(i) = New RedColor_Basics
+                redCs(i) = New RedC_Basics
             Next
             If standalone Then task.gOptions.displayDst1.Checked = True
             labels(2) = "4 separate RedColor runs - darkest to lightest."
@@ -259,7 +259,7 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             recurse.Run(src)
 
-            Dim newList As New SortedList(Of Integer, rcDataOld)(New compareAllowIdenticalIntegerInverted)
+            Dim newList As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
             For i = 0 To recurse.mats.mat.Length - 1
                 Dim m = recurse.mats.mat(i)
 
@@ -285,8 +285,7 @@ Namespace VBClasses
 
             dst3 = Palettize(rcMap)
 
-            strOut = Utility_Basics.selectCell(rcMap, rclist)
-            SetTrueText(strOut, 1)
+            'SetTrueText(task.rcD.displayCell, 1)
         End Sub
     End Class
 End Namespace

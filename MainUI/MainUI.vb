@@ -401,7 +401,7 @@ Namespace MainApp
             vbc.task.Initialize(settings)
             vbc.task.lowResDepth = New cv.Mat(vbc.task.workRes, cv.MatType.CV_32F)
             vbc.task.lowResColor = New cv.Mat(vbc.task.workRes, cv.MatType.CV_32F)
-            vbc.task.MainUI_Algorithm = createAlgorithm(settings.algorithm)
+            vbc.task.MainUI_Algorithm = CreateAlgorithm(settings.algorithm)
             SetAlgDescription(vbc.task.MainUI_Algorithm.desc)
             vbc.task.resolutionDetails = resolutionDetails
 

@@ -87,7 +87,7 @@ Module Program
 
             sb.AppendLine("Partial Public Class MainUI")
 
-            sb.AppendLine(vbTab + "Public Function createAlgorithm(algorithmName as string) As TaskParent")
+            sb.AppendLine(vbTab + "Public Function CreateAlgorithm(algorithmName as string) As TaskParent")
 
             For Each className As String In displayClasses.Keys
                 sb.AppendLine($"If algorithmName = ""{className}"" Then Return New {className}")

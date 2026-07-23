@@ -1,102 +1,103 @@
-﻿Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
-Public Class WarpAffine_Basics : Inherits TaskParent
-    Dim accum As New AddWeighted_Accumulate
-    Public baselineRoll As Single
-    Public baselinePitch As Single
-    Public Sub New()
-        If standalone Then task.gOptions.displayDst1.Checked = True
-        desc = "Given a delta X and delta Y, use WarpAffine to reorient the image to the previous frame."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        If standalone Then
-            SetTrueText("When standalone, no baseline roll/pitch has been provided.", 1)
-        End If
-        Dim graySrc = If(src.Channels = 1, src, task.gray)
+﻿Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCvSharp
+Namespace VBClasses
+    Public Class WarpAffine_Basics : Inherits TaskParent
+        Dim accum As New AddWeighted_Accumulate
+        Public baselineRoll As Single
+        Public baselinePitch As Single
+        Public Sub New()
+            If standalone Then task.gOptions.displayDst1.Checked = True
+            desc = "Given a delta X and delta Y, use WarpAffine to reorient the image to the previous frame."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            If standalone Then
+                SetTrueText("When standalone, no baseline roll/pitch has been provided.", 1)
+            End If
+            Dim graySrc = If(src.Channels = 1, src, task.gray)
 
-        Dim rollDelta = task.accRadians.Z - baselineRoll
-        Dim pitchDelta = task.accRadians.X - baselinePitch
+            Dim rollDelta = task.accRadians.Z - baselineRoll
+            Dim pitchDelta = task.accRadians.X - baselinePitch
 
-        Dim maxShift = task.gridWH
-        Dim angleDeg = -rollDelta * RadToDeg
-        Dim dx = CSng(-pitchDelta * PixelsPerRad - task.IMU_AngularVelocity.Y * 4.0F)
-        Dim dy = CSng(task.IMU_AngularVelocity.X * 4.0F)
-        dx = Math.Max(-maxShift, Math.Min(maxShift, dx))
-        dy = Math.Max(-maxShift, Math.Min(maxShift, dy))
+            Dim maxShift = task.gridWH
+            Dim angleDeg = -rollDelta * RadToDeg
+            Dim dx = CSng(-pitchDelta * PixelsPerRad - task.IMU_AngularVelocity.Y * 4.0F)
+            Dim dy = CSng(task.IMU_AngularVelocity.X * 4.0F)
+            dx = Math.Max(-maxShift, Math.Min(maxShift, dx))
+            dy = Math.Max(-maxShift, Math.Min(maxShift, dy))
 
-        Dim center = New Point2f(graySrc.Cols / 2.0F, graySrc.Rows / 2.0F)
-        Dim M = GetRotationMatrix2D(center, angleDeg, 1.0)
-        M.Set(Of Double)(0, 2, M.Get(Of Double)(0, 2) + dx)
-        M.Set(Of Double)(1, 2, M.Get(Of Double)(1, 2) + dy)
+            Dim center = New Point2f(graySrc.Cols / 2.0F, graySrc.Rows / 2.0F)
+            Dim M = GetRotationMatrix2D(center, angleDeg, 1.0)
+            M.Set(Of Double)(0, 2, M.Get(Of Double)(0, 2) + dx)
+            M.Set(Of Double)(1, 2, M.Get(Of Double)(1, 2) + dy)
 
-        WarpAffine(graySrc, dst2, M, graySrc.Size, InterpolationFlags.Linear, BorderTypes.Reflect101)
+            WarpAffine(graySrc, dst2, M, graySrc.Size, InterpolationFlags.Linear, BorderTypes.Reflect101)
 
-        accum.Run(dst3)
-        dst2 = accum.dst2.Clone
+            accum.Run(dst3)
+            dst2 = accum.dst2.Clone
 
-        labels(2) = "IMU stabilize + AddWeighted_Accumulate with weight = " + accum.options.accumWeighted.ToString(fmt1)
-        labels(3) = "Angle=" + angleDeg.ToString(fmt2) + " deg, dx=" + dx.ToString(fmt2) + ", dy=" + dy.ToString(fmt2)
-    End Sub
-End Class
-
-
-
-
-
-
-' http://opencvexamples.blogspot.com/
-Public Class WarpAffine_Rotation : Inherits TaskParent
-    Public options As New Options_Resize
-    Public optionsWarp As New Options_WarpAffine
-    Public rotateCenter As Point2f
-    Public rotateAngle As Single ' in degrees
-    Dim warpQT As New WarpAffine_BasicsQT
-    Public Sub New()
-        If sliders.Setup(traceName) Then sliders.setupTrackBar("Angle", 0, 360, 10)
-        desc = "Use WarpAffine to transform input images."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        options.Run()
-        optionsWarp.Run()
-
-        If standaloneTest() And task.heartBeat Then
-            rotateAngle = optionsWarp.angle
-            rotateCenter.X = msRNG.Next(0, dst2.Width)
-            rotateCenter.Y = msRNG.Next(0, dst2.Height)
-        End If
-
-        warpQT.rotateCenter = rotateCenter
-        warpQT.rotateAngle = rotateAngle
-        warpQT.Run(src)
-        labels = warpQT.labels
-        dst2 = warpQT.dst2
-    End Sub
-End Class
+            labels(2) = "IMU stabilize + AddWeighted_Accumulate with weight = " + accum.options.accumWeighted.ToString(fmt1)
+            labels(3) = "Angle=" + angleDeg.ToString(fmt2) + " deg, dx=" + dx.ToString(fmt2) + ", dy=" + dy.ToString(fmt2)
+        End Sub
+    End Class
 
 
 
 
 
 
+    ' http://opencvexamples.blogspot.com/
+    Public Class WarpAffine_Rotation : Inherits TaskParent
+        Public options As New Options_Resize
+        Public optionsWarp As New Options_WarpAffine
+        Public rotateCenter As Point2f
+        Public rotateAngle As Single ' in degrees
+        Dim warpQT As New WarpAffine_BasicsQT
+        Public Sub New()
+            If sliders.Setup(traceName) Then sliders.setupTrackBar("Angle", 0, 360, 10)
+            desc = "Use WarpAffine to transform input images."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            options.Run()
+            optionsWarp.Run()
 
-' http://opencvexamples.blogspot.com/
-Public Class WarpAffine_BasicsQT : Inherits TaskParent
-    Public rotateCenter As Point2f
-    Public rotateAngle As Single ' in degrees
-    Public Sub New()
-        desc = "Use WarpAffine to transform input images with no options."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        If standaloneTest() And task.heartBeat Then
-            SetTrueText("There is no output for the " + traceName + " algorithm.  Use WarpAffine_Basics to test.")
-            Exit Sub
-        End If
-        Dim rotationMatrix = GetRotationMatrix2D(rotateCenter, rotateAngle, 1.0)
-        WarpAffine(src, dst2, rotationMatrix, src.Size(), InterpolationFlags.Nearest)
+            If standaloneTest() And task.heartBeat Then
+                rotateAngle = optionsWarp.angle
+                rotateCenter.X = msRNG.Next(0, dst2.Width)
+                rotateCenter.Y = msRNG.Next(0, dst2.Height)
+            End If
 
-        labels(2) = "Rotated around yellow cv.Point " + rotateCenter.X.ToString(fmt0) + ", " + rotateCenter.Y.ToString(fmt0) +
+            warpQT.rotateCenter = rotateCenter
+            warpQT.rotateAngle = rotateAngle
+            warpQT.Run(src)
+            labels = warpQT.labels
+            dst2 = warpQT.dst2
+        End Sub
+    End Class
+
+
+
+
+
+
+
+    ' http://opencvexamples.blogspot.com/
+    Public Class WarpAffine_BasicsQT : Inherits TaskParent
+        Public rotateCenter As Point2f
+        Public rotateAngle As Single ' in degrees
+        Public Sub New()
+            desc = "Use WarpAffine to transform input images with no options."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            If standaloneTest() And task.heartBeat Then
+                SetTrueText("There is no output for the " + traceName + " algorithm.  Use WarpAffine_Basics to test.")
+                Exit Sub
+            End If
+            Dim rotationMatrix = GetRotationMatrix2D(rotateCenter, rotateAngle, 1.0)
+            WarpAffine(src, dst2, rotationMatrix, src.Size(), InterpolationFlags.Nearest)
+
+            labels(2) = "Rotated around yellow cv.Point " + rotateCenter.X.ToString(fmt0) + ", " + rotateCenter.Y.ToString(fmt0) +
                         " with Warpaffine with angle: " + CStr(rotateAngle)
-    End Sub
-End Class
+        End Sub
+    End Class
 
 
 
@@ -104,89 +105,87 @@ End Class
 
 
 
-' http://opencvexamples.blogspot.com/
-Public Class XR_WarpAffine_Captcha : Inherits TaskParent
-    Const charHeight = 40
-    Const charWidth = 30
-    Const captchaLength = 8
-    Dim rng As New System.Random
-    Public Sub New()
-        desc = "Use OpenCV to build a captcha Turing test."
-    End Sub
-    Private Sub addNoise(image As Mat)
-        For n = 0 To 100
-            Dim i = rng.Next(0, image.Cols - 1)
-            Dim j = rng.Next(0, image.Rows - 1)
-            Dim center = New cv.Point(i, j)
-            Dim c = New Scalar(rng.Next(0, 255), rng.Next(0, 255), rng.Next(0, 255))
-            Circle(image, center, rng.Next(1, 3), c, -1, task.lineType)
-        Next
-    End Sub
-    Private Sub addLines(ByRef image As Mat)
-        For i = 0 To captchaLength - 1
-            Dim startX = rng.Next(0, image.Cols - 1)
-            Dim endX = rng.Next(0, image.Cols - 1)
-            Dim startY = rng.Next(0, image.Rows - 1)
-            Dim endY = rng.Next(0, image.Rows - 1)
+    ' http://opencvexamples.blogspot.com/
+    Public Class XR_WarpAffine_Captcha : Inherits TaskParent
+        Const charHeight = 40
+        Const charWidth = 30
+        Const captchaLength = 8
+        Dim rng As New System.Random
+        Public Sub New()
+            desc = "Use OpenCV to build a captcha Turing test."
+        End Sub
+        Private Sub addNoise(image As Mat)
+            For n = 0 To 100
+                Dim i = rng.Next(0, image.Cols - 1)
+                Dim j = rng.Next(0, image.Rows - 1)
+                Dim center = New cv.Point(i, j)
+                Dim c = New Scalar(rng.Next(0, 255), rng.Next(0, 255), rng.Next(0, 255))
+                Circle(image, center, rng.Next(1, 3), c, -1, task.lineType)
+            Next
+        End Sub
+        Private Sub addLines(ByRef image As Mat)
+            For i = 0 To captchaLength - 1
+                Dim startX = rng.Next(0, image.Cols - 1)
+                Dim endX = rng.Next(0, image.Cols - 1)
+                Dim startY = rng.Next(0, image.Rows - 1)
+                Dim endY = rng.Next(0, image.Rows - 1)
 
-            Dim c = New Scalar(rng.Next(0, 255), rng.Next(0, 255), rng.Next(0, 255))
-            Line(image, New cv.Point(startX, startY), New cv.Point(endX, endY), c, rng.Next(1, 3), task.lineType)
-        Next
-    End Sub
+                Dim c = New Scalar(rng.Next(0, 255), rng.Next(0, 255), rng.Next(0, 255))
+                Line(image, New cv.Point(startX, startY), New cv.Point(endX, endY), c, rng.Next(1, 3), task.lineType)
+            Next
+        End Sub
 
-    Private Sub scaleImg(input As Mat, ByRef output As Mat)
-        Dim height = rng.Next(0, 19) * -1 + charHeight
-        Dim width = rng.Next(0, 19) * -1 + charWidth
-        Dim s = New Size(width, height)
-        Resize(input, output, s)
-    End Sub
-    Private Sub rotateImg(input As Mat, ByRef output As Mat)
-        Dim sign = CInt(rng.NextDouble())
-        If sign = 0 Then sign = -1
-        Dim angle = rng.Next(0, 29) * sign ' between -30 and 30
-        Dim center = New Point2f(input.Cols / 2, input.Rows / 2)
-        Dim rotationMatrix = GetRotationMatrix2D(center, angle, 1)
-        WarpAffine(input, output, rotationMatrix, input.Size(), InterpolationFlags.Linear, BorderTypes.Constant, white)
-    End Sub
-    Private Sub transformPerspective(ByRef charImage As Mat)
-        Dim srcPt() = {New Point2f(0, 0), New Point2f(0, charHeight), New Point2f(charWidth, 0), New Point2f(charWidth, charHeight)}
+        Private Sub scaleImg(input As Mat, ByRef output As Mat)
+            Dim height = rng.Next(0, 19) * -1 + charHeight
+            Dim width = rng.Next(0, 19) * -1 + charWidth
+            Dim s = New Size(width, height)
+            Resize(input, output, s)
+        End Sub
+        Private Sub rotateImg(input As Mat, ByRef output As Mat)
+            Dim sign = CInt(rng.NextDouble())
+            If sign = 0 Then sign = -1
+            Dim angle = rng.Next(0, 29) * sign ' between -30 and 30
+            Dim center = New Point2f(input.Cols / 2, input.Rows / 2)
+            Dim rotationMatrix = GetRotationMatrix2D(center, angle, 1)
+            WarpAffine(input, output, rotationMatrix, input.Size(), InterpolationFlags.Linear, BorderTypes.Constant, white)
+        End Sub
+        Private Sub transformPerspective(ByRef charImage As Mat)
+            Dim srcPt() = {New Point2f(0, 0), New Point2f(0, charHeight), New Point2f(charWidth, 0), New Point2f(charWidth, charHeight)}
 
-        Dim varWidth = charWidth / 2
-        Dim varHeight = charHeight / 2.0
-        Dim widthWarp = charHeight - varWidth + rng.NextDouble() * varWidth
-        Dim heightWarp = charHeight - varHeight + rng.NextDouble() * varHeight
+            Dim varWidth = charWidth / 2
+            Dim varHeight = charHeight / 2.0
+            Dim widthWarp = charHeight - varWidth + rng.NextDouble() * varWidth
+            Dim heightWarp = charHeight - varHeight + rng.NextDouble() * varHeight
 
-        Dim dstPt() = {New Point2f(0, 0), New Point2f(0, charHeight), New Point2f(charWidth, 0), New Point2f(widthWarp, heightWarp)}
+            Dim dstPt() = {New Point2f(0, 0), New Point2f(0, charHeight), New Point2f(charWidth, 0), New Point2f(widthWarp, heightWarp)}
 
-        Dim perpectiveTranx = GetPerspectiveTransform(srcPt, dstPt)
-        WarpPerspective(charImage, charImage, perpectiveTranx, New Size(charImage.Cols, charImage.Rows), InterpolationFlags.Cubic,
+            Dim perpectiveTranx = GetPerspectiveTransform(srcPt, dstPt)
+            WarpPerspective(charImage, charImage, perpectiveTranx, New Size(charImage.Cols, charImage.Rows), InterpolationFlags.Cubic,
                                    BorderTypes.Constant, white)
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        Dim characters() As String = {"a", "A", "b", "B", "c", "C", "D", "d", "e", "E", "f", "F", "g", "G", "h", "H", "j", "J", "k", "K", "m", "M", "n", "N", "q", "Q", "R", "t", "T", "w", "W", "x", "X", "y", "Y", "1", "2", "3", "4", "5", "6", "7", "8", "9"}
-        Dim charactersSize = characters.Length / characters(0).Length
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            Dim characters() As String = {"a", "A", "b", "B", "c", "C", "D", "d", "e", "E", "f", "F", "g", "G", "h", "H", "j", "J", "k", "K", "m", "M", "n", "N", "q", "Q", "R", "t", "T", "w", "W", "x", "X", "y", "Y", "1", "2", "3", "4", "5", "6", "7", "8", "9"}
+            Dim charactersSize = characters.Length / characters(0).Length
 
-        Dim outImage As New Mat(charHeight, charWidth * captchaLength, MatType.CV_8UC3, white)
+            Dim outImage As New Mat(charHeight, charWidth * captchaLength, MatType.CV_8UC3, white)
 
-        For i = 0 To captchaLength - 1
-            Dim charImage = New Mat(charHeight, charWidth, MatType.CV_8UC3, white)
-            Dim c = characters(rng.Next(0, characters.Length - 1))
-            PutText(charImage, c, New cv.Point(10, charHeight - 10), msRNG.Next(1, 6), msRNG.Next(3, 4),
+            For i = 0 To captchaLength - 1
+                Dim charImage = New Mat(charHeight, charWidth, MatType.CV_8UC3, white)
+                Dim c = characters(rng.Next(0, characters.Length - 1))
+                PutText(charImage, c, New cv.Point(10, charHeight - 10), msRNG.Next(1, 6), msRNG.Next(3, 4),
                                task.vecColors(i), msRNG.Next(1, 5), LineTypes.AntiAlias)
-            transformPerspective(charImage)
-            rotateImg(charImage, charImage)
-            scaleImg(charImage, charImage)
-            charImage.CopyTo(outImage(New cv.Rect(charWidth * i, 0, charImage.Cols, charImage.Rows)))
-        Next
+                transformPerspective(charImage)
+                rotateImg(charImage, charImage)
+                scaleImg(charImage, charImage)
+                charImage.CopyTo(outImage(New cv.Rect(charWidth * i, 0, charImage.Cols, charImage.Rows)))
+            Next
 
-        addLines(outImage)
-        addNoise(outImage)
-        Dim roi As New cv.Rect(0, src.Height / 2 - charHeight / 2, dst2.Cols, charHeight)
-        Resize(outImage, dst2(roi), New Size(dst2.Cols, charHeight))
-    End Sub
-End Class
-
-
+            addLines(outImage)
+            addNoise(outImage)
+            Dim roi As New cv.Rect(0, src.Height / 2 - charHeight / 2, dst2.Cols, charHeight)
+            Resize(outImage, dst2(roi), New Size(dst2.Cols, charHeight))
+        End Sub
+    End Class
 
 
 
@@ -194,117 +193,119 @@ End Class
 
 
 
-' https://docs.opencvb.org/3.0-beta/doc/py_tutorials/py_imgproc/py_geometric_transformations/py_geometric_transformations.html
-Public Class WarpAffine_Vec3f : Inherits TaskParent
-    Dim triangle As New Triangle_Find
-    Dim M As New Mat
-    Public Sub New()
-        desc = "Use 3 non-colinear points to build an affine transform and apply it to the color image."
-        labels(2) = "Triangles define the affine transform"
-        labels(3) = "Image with affine transform applied"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        If task.heartBeat Then
-            Dim triangles(1) As Mat
-            triangle.Run(src)
-            triangles(0) = triangle.triangle.Clone()
-            Dim srcPoints1 As New List(Of Point2f)(triangle.options.srcPoints)
-            triangle.Run(src)
-            triangles(1) = triangle.triangle.Clone()
-            Dim srcPoints2 As New List(Of Point2f)(triangle.options.srcPoints)
 
-            Dim tOriginal = Mat.FromPixelData(3, 1, MatType.CV_32FC2, New Single() {0, 0, 0, src.Height, src.Width, src.Height})
-            M = GetAffineTransform(tOriginal, triangles(1))
 
-            Dim wideMat = New Mat(src.Rows, src.Cols * 2, MatType.CV_8UC3, Scalar.All(0))
-            ' uncomment this line to see original pose of the left triangle
-            ' triangles(0) = tOriginal
-            For j = 0 To 1
-                For i = 0 To triangles(j).Rows - 1
-                    Dim p1 = triangles(j).Get(Of Point2f)(i) + New Point2f(j * src.Width, 0)
-                    Dim p2 = triangles(j).Get(Of Point2f)((i + 1) Mod 3) + New Point2f(j * src.Width, 0)
-                    Dim color = Choose(i + 1, Scalar.Red, Scalar.White, Scalar.Yellow)
-                    Line(wideMat, p1, p2, color, task.lineWidth + 3, task.lineType)
-                    If j = 0 Then
-                        Dim p3 = triangles(j + 1).Get(Of Point2f)(i) + New Point2f(src.Width, 0)
-                        Line(wideMat, p1, p3, white, task.lineWidth, task.lineType)
-                    End If
+    ' https://docs.opencvb.org/3.0-beta/doc/py_tutorials/py_imgproc/py_geometric_transformations/py_geometric_transformations.html
+    Public Class WarpAffine_Vec3f : Inherits TaskParent
+        Dim triangle As New Triangle_Find
+        Dim M As New Mat
+        Public Sub New()
+            desc = "Use 3 non-colinear points to build an affine transform and apply it to the color image."
+            labels(2) = "Triangles define the affine transform"
+            labels(3) = "Image with affine transform applied"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            If task.heartBeat Then
+                Dim triangles(1) As Mat
+                triangle.Run(src)
+                triangles(0) = triangle.triangle.Clone()
+                Dim srcPoints1 As New List(Of Point2f)(triangle.options.srcPoints)
+                triangle.Run(src)
+                triangles(1) = triangle.triangle.Clone()
+                Dim srcPoints2 As New List(Of Point2f)(triangle.options.srcPoints)
+
+                Dim tOriginal = Mat.FromPixelData(3, 1, MatType.CV_32FC2, New Single() {0, 0, 0, src.Height, src.Width, src.Height})
+                M = GetAffineTransform(tOriginal, triangles(1))
+
+                Dim wideMat = New Mat(src.Rows, src.Cols * 2, MatType.CV_8UC3, Scalar.All(0))
+                ' uncomment this line to see original pose of the left triangle
+                ' triangles(0) = tOriginal
+                For j = 0 To 1
+                    For i = 0 To triangles(j).Rows - 1
+                        Dim p1 = triangles(j).Get(Of Point2f)(i) + New Point2f(j * src.Width, 0)
+                        Dim p2 = triangles(j).Get(Of Point2f)((i + 1) Mod 3) + New Point2f(j * src.Width, 0)
+                        Dim color = Choose(i + 1, Scalar.Red, Scalar.White, Scalar.Yellow)
+                        Line(wideMat, p1, p2, color, task.lineWidth + 3, task.lineType)
+                        If j = 0 Then
+                            Dim p3 = triangles(j + 1).Get(Of Point2f)(i) + New Point2f(src.Width, 0)
+                            Line(wideMat, p1, p3, white, task.lineWidth, task.lineType)
+                        End If
+                    Next
                 Next
-            Next
 
-            Dim corner = triangles(0).Get(Of Point2f)(0)
-            Circle(wideMat, corner, task.DotSize + 5, Scalar.Yellow, -1, task.lineType)
-            corner = New Point2f(M.Get(Of Double)(0, 2) + src.Width, M.Get(Of Double)(1, 2))
-            Circle(wideMat, corner, task.DotSize + 5, Scalar.Yellow, -1, task.lineType)
+                Dim corner = triangles(0).Get(Of Point2f)(0)
+                Circle(wideMat, corner, task.DotSize + 5, Scalar.Yellow, -1, task.lineType)
+                corner = New Point2f(M.Get(Of Double)(0, 2) + src.Width, M.Get(Of Double)(1, 2))
+                Circle(wideMat, corner, task.DotSize + 5, Scalar.Yellow, -1, task.lineType)
 
-            dst2 = wideMat(New cv.Rect(0, 0, src.Width, src.Height))
-            dst3 = wideMat(New cv.Rect(src.Width, 0, src.Width, src.Height))
+                dst2 = wideMat(New cv.Rect(0, 0, src.Width, src.Height))
+                dst3 = wideMat(New cv.Rect(src.Width, 0, src.Width, src.Height))
 
-            Dim pt As cv.Point
-            For i = 0 To srcPoints1.Count - 1
-                pt = New cv.Point(CInt(srcPoints1(i).X), CInt(srcPoints1(i).Y))
-                Circle(dst2, pt, task.DotSize + 2, Scalar.White, -1, task.lineType)
-                pt = New cv.Point(CInt(srcPoints2(i).X), CInt(srcPoints2(i).Y))
-                Circle(dst3, pt, task.DotSize + 2, Scalar.White, -1, task.lineType)
-            Next
-        End If
-        SetTrueText("M defined as: " + vbCrLf +
+                Dim pt As cv.Point
+                For i = 0 To srcPoints1.Count - 1
+                    pt = New cv.Point(CInt(srcPoints1(i).X), CInt(srcPoints1(i).Y))
+                    Circle(dst2, pt, task.DotSize + 2, Scalar.White, -1, task.lineType)
+                    pt = New cv.Point(CInt(srcPoints2(i).X), CInt(srcPoints2(i).Y))
+                    Circle(dst3, pt, task.DotSize + 2, Scalar.White, -1, task.lineType)
+                Next
+            End If
+            SetTrueText("M defined as: " + vbCrLf +
                      M.Get(Of Double)(0, 0).ToString(fmt2) + vbTab +
                      M.Get(Of Double)(0, 1).ToString(fmt2) + vbTab +
                      M.Get(Of Double)(0, 2).ToString(fmt2) + vbCrLf +
                      M.Get(Of Double)(1, 0).ToString(fmt2) + vbTab +
                      M.Get(Of Double)(1, 1).ToString(fmt2) + vbTab +
                      M.Get(Of Double)(1, 2).ToString(fmt2))
-    End Sub
-End Class
+        End Sub
+    End Class
 
 
 
 
 
-' https://docs.opencvb.org/3.0-beta/doc/py_tutorials/py_imgproc/py_geometric_transformations/py_geometric_transformations.html
-Public Class WarpAffine_Vec4f : Inherits TaskParent
-    Dim mRect As New FindMinRect_Basics
-    Dim options As New Options_MinArea
-    Dim M As New Mat
-    Public Sub New()
-        desc = "Use 4 non-colinear points to build a perspective transform and apply it to the color image."
-        labels(2) = "Color image with perspective transform applied"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        If task.heartBeat Then
-            options.Run()
-            mRect.inputPoints = options.srcPoints
+    ' https://docs.opencvb.org/3.0-beta/doc/py_tutorials/py_imgproc/py_geometric_transformations/py_geometric_transformations.html
+    Public Class WarpAffine_Vec4f : Inherits TaskParent
+        Dim mRect As New FindMinRect_Basics
+        Dim options As New Options_MinArea
+        Dim M As New Mat
+        Public Sub New()
+            desc = "Use 4 non-colinear points to build a perspective transform and apply it to the color image."
+            labels(2) = "Color image with perspective transform applied"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            If task.heartBeat Then
+                options.Run()
+                mRect.inputPoints = options.srcPoints
 
-            Dim roi = New cv.Rect(50, src.Height / 2, src.Width / 6, src.Height / 6)
-            Resize(src, dst3(New cv.Rect(0, 0, roi.Width, roi.Height)), New Size(roi.Width, roi.Height))
-            Dim rectangles(1) As RotatedRect
-            mRect.Run(src)
-            rectangles(1) = mRect.minRect
-            rectangles(1).Center.X = src.Width - rectangles(0).Center.X - roi.Width
+                Dim roi = New cv.Rect(50, src.Height / 2, src.Width / 6, src.Height / 6)
+                Resize(src, dst3(New cv.Rect(0, 0, roi.Width, roi.Height)), New Size(roi.Width, roi.Height))
+                Dim rectangles(1) As RotatedRect
+                mRect.Run(src)
+                rectangles(1) = mRect.minRect
+                rectangles(1).Center.X = src.Width - rectangles(0).Center.X - roi.Width
 
-            rectangles(0) = New RotatedRect(New Point2f(src.Width / 2, src.Height / 2), New Size2f(src.Width, src.Height), 0)
-            M = GetPerspectiveTransform(rectangles(0).Points.ToArray, rectangles(1).Points.ToArray)
-            WarpPerspective(src, dst2, M, src.Size())
-            dst2(roi) = dst3(roi)
+                rectangles(0) = New RotatedRect(New Point2f(src.Width / 2, src.Height / 2), New Size2f(src.Width, src.Height), 0)
+                M = GetPerspectiveTransform(rectangles(0).Points.ToArray, rectangles(1).Points.ToArray)
+                WarpPerspective(src, dst2, M, src.Size())
+                dst2(roi) = dst3(roi)
 
-            ' comment this line to see the real original dimensions and location.
-            ' rectangles(0) = New RotatedRect(New Point2f(roi.X + roi.Width / 2, roi.Y + roi.Height / 2), New Size2f(roi.Width, roi.Height), 0)
-            For j = 0 To 1
-                For i = 0 To rectangles(j).Points.Length - 1
-                    Dim p1 = rectangles(j).Points(i)
-                    Dim p2 = rectangles(j).Points((i + 1) Mod rectangles(j).Points.Length)
-                    If j = 0 Then
-                        Dim p3 = rectangles(1).Points(i)
-                        Line(dst2, p1, p3, white, task.lineWidth, task.lineType)
-                    End If
-                    Dim color = Choose(i + 1, Scalar.Red, Scalar.White, Scalar.Yellow, Scalar.Green)
-                    Line(dst2, p1, p2, color, task.lineWidth + 3, task.lineType)
+                ' comment this line to see the real original dimensions and location.
+                ' rectangles(0) = New RotatedRect(New Point2f(roi.X + roi.Width / 2, roi.Y + roi.Height / 2), New Size2f(roi.Width, roi.Height), 0)
+                For j = 0 To 1
+                    For i = 0 To rectangles(j).Points.Length - 1
+                        Dim p1 = rectangles(j).Points(i)
+                        Dim p2 = rectangles(j).Points((i + 1) Mod rectangles(j).Points.Length)
+                        If j = 0 Then
+                            Dim p3 = rectangles(1).Points(i)
+                            Line(dst2, p1, p3, white, task.lineWidth, task.lineType)
+                        End If
+                        Dim color = Choose(i + 1, Scalar.Red, Scalar.White, Scalar.Yellow, Scalar.Green)
+                        Line(dst2, p1, p2, color, task.lineWidth + 3, task.lineType)
+                    Next
                 Next
-            Next
-        End If
+            End If
 
-        SetTrueText("M defined as: " + vbCrLf +
+            SetTrueText("M defined as: " + vbCrLf +
                      M.Get(Of Double)(0, 0).ToString(fmt2) + vbTab +
                      M.Get(Of Double)(0, 1).ToString(fmt2) + vbTab +
                      M.Get(Of Double)(0, 2).ToString(fmt2) + vbCrLf +
@@ -314,115 +315,116 @@ Public Class WarpAffine_Vec4f : Inherits TaskParent
                      M.Get(Of Double)(2, 0).ToString(fmt2) + vbTab +
                      M.Get(Of Double)(2, 1).ToString(fmt2) + vbTab +
                      M.Get(Of Double)(2, 2).ToString(fmt2) + vbCrLf)
-        Dim center As New Point2f(M.Get(Of Double)(0, 2), M.Get(Of Double)(1, 2))
-        Circle(dst2, center, task.DotSize + 5, Scalar.Yellow, -1, task.lineType)
-        center = New Point2f(50, src.Height / 2)
-        Circle(dst2, center, task.DotSize + 5, Scalar.Yellow, -1, task.lineType)
-    End Sub
-End Class
+            Dim center As New Point2f(M.Get(Of Double)(0, 2), M.Get(Of Double)(1, 2))
+            Circle(dst2, center, task.DotSize + 5, Scalar.Yellow, -1, task.lineType)
+            center = New Point2f(50, src.Height / 2)
+            Circle(dst2, center, task.DotSize + 5, Scalar.Yellow, -1, task.lineType)
+        End Sub
+    End Class
 
 
 
 
 
 
-' https://github.com/BhanuPrakashNani/Image_Processing/blob/master/Successive%20Rotations/rotation.py
-Public Class XR_WarpAffine_Repeated : Inherits TaskParent
-    Public Sub New()
-        labels = {"", "", "Rotated repeatedly 45 degrees - note the blur", "Rotated repeatedly 90 degrees"}
-        desc = "Compare an image before and after repeated and equivalent in degrees rotations."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        Dim rect = New cv.Rect(0, 0, dst2.Height, dst2.Height)
-        dst1 = task.gray
-        dst2 = dst1.Clone
-        dst3 = dst1.Clone
+    ' https://github.com/BhanuPrakashNani/Image_Processing/blob/master/Successive%20Rotations/rotation.py
+    Public Class XR_WarpAffine_Repeated : Inherits TaskParent
+        Public Sub New()
+            labels = {"", "", "Rotated repeatedly 45 degrees - note the blur", "Rotated repeatedly 90 degrees"}
+            desc = "Compare an image before and after repeated and equivalent in degrees rotations."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            Dim rect = New cv.Rect(0, 0, dst2.Height, dst2.Height)
+            dst1 = task.gray
+            dst2 = dst1.Clone
+            dst3 = dst1.Clone
 
-        Dim center = New cv.Point(rect.Width / 2, rect.Height / 2)
-        Dim angle45 = 45, angle90 = 90, scale = 1.0, h = rect.Height, w = rect.Width
+            Dim center = New cv.Point(rect.Width / 2, rect.Height / 2)
+            Dim angle45 = 45, angle90 = 90, scale = 1.0, h = rect.Height, w = rect.Width
 
-        Dim m1 = GetRotationMatrix2D(center, angle45, scale)
-        Dim m2 = GetRotationMatrix2D(center, angle90, scale)
+            Dim m1 = GetRotationMatrix2D(center, angle45, scale)
+            Dim m2 = GetRotationMatrix2D(center, angle90, scale)
 
-        Dim abs_cos = Math.Abs(m2.Get(Of Double)(0, 0))
-        Dim abs_sin = Math.Abs(m2.Get(Of Double)(0, 1))
+            Dim abs_cos = Math.Abs(m2.Get(Of Double)(0, 0))
+            Dim abs_sin = Math.Abs(m2.Get(Of Double)(0, 1))
 
-        Dim bound_w = CInt(h * abs_sin + w * abs_cos)
-        Dim bound_h = CInt(h * abs_cos + w * abs_sin)
+            Dim bound_w = CInt(h * abs_sin + w * abs_cos)
+            Dim bound_h = CInt(h * abs_cos + w * abs_sin)
 
-        Dim val = m1.Get(Of Double)(0, 2)
-        m1.Set(Of Double)(0, 2, val + bound_w / 2 - center.X)
-        val = m1.Get(Of Double)(1, 2)
-        m1.Set(Of Double)(1, 2, val + bound_h / 2 - center.Y)
+            Dim val = m1.Get(Of Double)(0, 2)
+            m1.Set(Of Double)(0, 2, val + bound_w / 2 - center.X)
+            val = m1.Get(Of Double)(1, 2)
+            m1.Set(Of Double)(1, 2, val + bound_h / 2 - center.Y)
 
-        val = m2.Get(Of Double)(0, 2)
-        m2.Set(Of Double)(0, 2, val + bound_w / 2 - center.X)
-        val = m2.Get(Of Double)(1, 2)
-        m2.Set(Of Double)(1, 2, val + bound_h / 2 - center.Y)
+            val = m2.Get(Of Double)(0, 2)
+            m2.Set(Of Double)(0, 2, val + bound_w / 2 - center.X)
+            val = m2.Get(Of Double)(1, 2)
+            m2.Set(Of Double)(1, 2, val + bound_h / 2 - center.Y)
 
-        WarpAffine(dst1(rect), dst2(rect), m1, New Size(bound_w, bound_h))
+            WarpAffine(dst1(rect), dst2(rect), m1, New Size(bound_w, bound_h))
 
-        For i = 0 To 6
-            WarpAffine(dst2(rect), dst2(rect), m1, New Size(bound_w, bound_h))
-        Next
+            For i = 0 To 6
+                WarpAffine(dst2(rect), dst2(rect), m1, New Size(bound_w, bound_h))
+            Next
 
-        WarpAffine(dst1(rect), dst3(rect), m2, New Size(bound_w, bound_h))
+            WarpAffine(dst1(rect), dst3(rect), m2, New Size(bound_w, bound_h))
 
-        For i = 0 To 2
-            WarpAffine(dst3(rect), dst3(rect), m2, New Size(bound_w, bound_h))
-        Next
-        DrawRect(dst2, rect, white)
-        DrawRect(dst3, rect, white)
-    End Sub
-End Class
-
-
+            For i = 0 To 2
+                WarpAffine(dst3(rect), dst3(rect), m2, New Size(bound_w, bound_h))
+            Next
+            Rectangle(dst2, rect, white, task.lineWidth, task.lineType)
+            Rectangle(dst3, rect, white, task.lineWidth, task.lineType)
+        End Sub
+    End Class
 
 
 
 
 
-' https://github.com/BhanuPrakashNani/Image_Processing/blob/master/Successive%20Rotations/rotation.py
-Public Class XR_WarpAffine_RepeatedExample8 : Inherits TaskParent
-    Public Sub New()
-        labels = {"", "", "Rotated repeatedly 45 degrees", "Rotated repeatedly 90 degrees"}
-        desc = "Compare an image before and after repeated rotations."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        Dim input = ImRead(task.homeDir + "Data/8.jpg", ImreadModes.Color)
 
-        Dim center = New cv.Point(input.Width / 2, input.Height / 2)
-        Dim angle45 = 45, angle90 = 90, scale = 1.0, h = input.Height, w = input.Width
 
-        Dim m1 = GetRotationMatrix2D(center, angle45, scale)
-        Dim m2 = GetRotationMatrix2D(center, angle90, scale)
+    ' https://github.com/BhanuPrakashNani/Image_Processing/blob/master/Successive%20Rotations/rotation.py
+    Public Class XR_WarpAffine_RepeatedExample8 : Inherits TaskParent
+        Public Sub New()
+            labels = {"", "", "Rotated repeatedly 45 degrees", "Rotated repeatedly 90 degrees"}
+            desc = "Compare an image before and after repeated rotations."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            Dim input = ImRead(task.homeDir + "Data/8.jpg", ImreadModes.Color)
 
-        Dim abs_cos = Math.Abs(m2.Get(Of Double)(0, 0))
-        Dim abs_sin = Math.Abs(m2.Get(Of Double)(0, 1))
+            Dim center = New cv.Point(input.Width / 2, input.Height / 2)
+            Dim angle45 = 45, angle90 = 90, scale = 1.0, h = input.Height, w = input.Width
 
-        Dim bound_w = CInt(h * abs_sin + w * abs_cos)
-        Dim bound_h = CInt(h * abs_cos + w * abs_sin)
+            Dim m1 = GetRotationMatrix2D(center, angle45, scale)
+            Dim m2 = GetRotationMatrix2D(center, angle90, scale)
 
-        Dim val = m1.Get(Of Double)(0, 2)
-        m1.Set(Of Double)(0, 2, val + bound_w / 2 - center.X)
-        val = m1.Get(Of Double)(1, 2)
-        m1.Set(Of Double)(1, 2, val + bound_h / 2 - center.Y)
+            Dim abs_cos = Math.Abs(m2.Get(Of Double)(0, 0))
+            Dim abs_sin = Math.Abs(m2.Get(Of Double)(0, 1))
 
-        val = m2.Get(Of Double)(0, 2)
-        m2.Set(Of Double)(0, 2, val + bound_w / 2 - center.X)
-        val = m2.Get(Of Double)(1, 2)
-        m2.Set(Of Double)(1, 2, val + bound_h / 2 - center.Y)
+            Dim bound_w = CInt(h * abs_sin + w * abs_cos)
+            Dim bound_h = CInt(h * abs_cos + w * abs_sin)
 
-        WarpAffine(input, dst2, m1, New Size(bound_w, bound_h))
+            Dim val = m1.Get(Of Double)(0, 2)
+            m1.Set(Of Double)(0, 2, val + bound_w / 2 - center.X)
+            val = m1.Get(Of Double)(1, 2)
+            m1.Set(Of Double)(1, 2, val + bound_h / 2 - center.Y)
 
-        For i = 0 To 6
-            WarpAffine(dst2, dst2, m1, New Size(bound_w, bound_h))
-        Next
+            val = m2.Get(Of Double)(0, 2)
+            m2.Set(Of Double)(0, 2, val + bound_w / 2 - center.X)
+            val = m2.Get(Of Double)(1, 2)
+            m2.Set(Of Double)(1, 2, val + bound_h / 2 - center.Y)
 
-        WarpAffine(input, dst3, m2, New Size(bound_w, bound_h))
+            WarpAffine(input, dst2, m1, New Size(bound_w, bound_h))
 
-        For i = 0 To 2
-            WarpAffine(dst3, dst3, m2, New Size(bound_w, bound_h))
-        Next
-    End Sub
-End Class
+            For i = 0 To 6
+                WarpAffine(dst2, dst2, m1, New Size(bound_w, bound_h))
+            Next
+
+            WarpAffine(input, dst3, m2, New Size(bound_w, bound_h))
+
+            For i = 0 To 2
+                WarpAffine(dst3, dst3, m2, New Size(bound_w, bound_h))
+            Next
+        End Sub
+    End Class
+End Namespace

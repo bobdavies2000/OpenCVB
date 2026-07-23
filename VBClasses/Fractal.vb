@@ -166,7 +166,7 @@ Namespace VBClasses
             labels = {"", "", "RedFlood_List output - select any region.", "The selected region (as a square)"}
             desc = "Compute the fractal dimension of the provided (square) image.  Algorithm is incomplete."
         End Sub
-        Public Function dimension(Input As Mat) As Double
+        Public Shared Function dimension(Input As Mat) As Double
             Dim tmp64f As New Mat
             Input.ConvertTo(tmp64f, MatType.CV_64F, 0, 0)
             Dim G = 256
@@ -174,7 +174,6 @@ Namespace VBClasses
 
             For j = 2 To Input.Width / 2 - 1
                 Dim h = Math.Max(1, Math.Floor(G / (Math.Floor(Input.Width / j))))
-                Dim nr = 0
                 Dim r = j / Input.Width
                 For i = 0 To Input.Width Step j
                     'Dim boxes() As 
@@ -221,7 +220,7 @@ Namespace VBClasses
             If task.rcOldD.rect.Width = 0 Or task.rcOldD.rect.Height = 0 Then Exit Sub
             task.rcOldD.mask.CopyTo(dst3(New cv.Rect(0, 0, task.rcOldD.rect.Width, task.rcOldD.rect.Height)))
             If rect.Width < rect.Height Then rect.Width = rect.Height Else rect.Height = rect.Width
-            DrawRect(dst3, rect, white)
+            Rectangle(dst3, rect, white, task.lineWidth, task.lineType)
         End Sub
     End Class
 End Namespace
