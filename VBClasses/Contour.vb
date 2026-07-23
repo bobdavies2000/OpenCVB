@@ -1005,7 +1005,7 @@ Namespace VBClasses
                 tour.points = New List(Of cv.Point)(ptArray)
                 If tour.pixels > task.color.Total * 3 / 4 Then Continue For ' toss this contour - it covers everything...
 
-                tour.rect = tour.buildRect(ptArray)
+                tour.rect = contourData.buildRect(ptArray)
                 If tour.rect.Width = 0 Or tour.rect.Height = 0 Then Continue For
 
                 tourMat(tour.rect).SetTo(0)
@@ -1181,7 +1181,7 @@ Namespace VBClasses
                 tour.points = New List(Of cv.Point)(ptArray)
                 If tour.pixels > task.color.Total * 3 / 4 Then Continue For ' toss this contour - it covers everything...
 
-                tour.rect = tour.buildRect(ptArray)
+                tour.rect = contourData.buildRect(ptArray)
                 If tour.rect.Width = 0 Or tour.rect.Height = 0 Then Continue For
 
                 tourMat(tour.rect).SetTo(0)

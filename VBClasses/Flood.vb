@@ -3,8 +3,8 @@ Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Class Flood_Basics : Inherits TaskParent
         Implements IDisposable
-        Public rcList As New List(Of rcDataOld)
-        Public rcMap As Mat = New Mat(dst2.Size, MatType.CV_32S, 0)
+        Public rcList As New List(Of rcData)
+        Public rcMap As New Mat(dst2.Size, MatType.CV_32S, 0)
         Public fLess As New FeatureLess_DepthFull
         Dim lastCenters As New HashSet(Of cv.Rect)
         Public Sub New()
@@ -36,7 +36,7 @@ Namespace VBClasses
             Dim rects(classCount - 1) As cv.Rect
             rectData.GetArray(Of cv.Rect)(rects)
 
-            Dim rcLastList = New List(Of rcDataOld)(rcList)
+            Dim rcLastList = New List(Of rcData)(rcList)
 
             rcList.Clear()
             rcMap.SetTo(0)
@@ -44,27 +44,18 @@ Namespace VBClasses
             For Each r In rects
                 ' skip the cells that are just one gridRect.
                 If r.Size <> task.gridRects(0).Size Then
-                    Dim rc = New rcDataOld(dst0(r), r, rcList.Count + 1)
+                    Dim rc = New rcData(dst0(r), r, rcList.Count + 1)
                     If rc.pixels > 0 Then
                         For i = 0 To lastCenters.Count - 1
                             Dim rect = lastCenters(i)
                             If rect.Contains(rc.maxDist) Then
                                 rc.age = rcLastList(i).age + 1
-                                rc.color = rcLastList(i).color
-                                Exit For
-                            End If
-                        Next
-                        If rc.age = 1 Then rc.color = task.scalarColors(rc.mapID)
-
-                        For Each rcTest In rcList
-                            If rc.color = rcTest.color Then
-                                rc.color = task.scalarColors(rc.mapID)
                                 Exit For
                             End If
                         Next
 
                         rcList.Add(rc)
-                        dst2(rc.rect).SetTo(rc.color, rc.mask)
+                        dst2(rc.rect).SetTo(task.scalarColors(rc.index), rc.mask)
                         rcMap(rc.rect).SetTo(rc.mapID, rc.mask)
                     End If
                 End If
@@ -72,12 +63,12 @@ Namespace VBClasses
 
             lastCenters.Clear()
             For Each rc In rcList
-                lastCenters.Add(task.gridNabeRects(rc.gridIndex))
+                lastCenters.Add(task.gridNabeRects(rc.index))
             Next
 
             If standalone Then
-                strOut = Utility_Basics.selectCell(rcMap, rcList)
-                SetTrueText(strOut, 3)
+                'strOut = Utility_Basics.selectCell(rcMap, rcList)
+                'SetTrueText(strOut, 3)
             End If
 
             labels(2) = CStr(rcList.Count) + " cells found. "
@@ -292,6 +283,86 @@ Namespace VBClasses
             dst3.SetTo(white, edges.dst2)
 
             SetTrueText(redC.strOut, 1)
+        End Sub
+    End Class
+
+
+
+
+    Public Class Flood_BasicsNew : Inherits TaskParent
+        Implements IDisposable
+        Public rcList As New List(Of rcData)
+        Public rcMap As New Mat(dst2.Size, MatType.CV_32S, 0)
+        Public fLess As New FeatureLess_DepthFull
+        Dim lastCenters As New HashSet(Of cv.Rect)
+        Public Sub New()
+            If standalone Then task.gOptions.displayDst1.Checked = True
+            cPtr = RedFlood_Open()
+            desc = "Match the previous featureLess regions as best as possible."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            fLess.Run(task.grayOriginal.Clone)
+            dst1 = fLess.dst1
+
+            Dim imagePtr As IntPtr
+            Dim inputData(src.Total - 1) As Byte
+            dst1.GetArray(Of Byte)(inputData)
+            Dim handleInput = GCHandle.Alloc(inputData, GCHandleType.Pinned)
+
+            Dim minSize = task.gridWH * task.gridWH
+            imagePtr = RedFlood_Run(cPtr, handleInput.AddrOfPinnedObject(), dst2.Rows, dst2.Cols, minSize)
+            handleInput.Free()
+
+            Dim rMask = New cv.Rect(1, 1, dst2.Width, dst2.Height)
+            Dim mask = Mat.FromPixelData(dst2.Rows + 2, dst2.Cols + 2, MatType.CV_8U, imagePtr)
+            dst0 = mask(rMask).Clone
+
+            Dim classCount = RedFlood_Count(cPtr)
+            If classCount = 0 Then Exit Sub ' no data to process.
+
+            Dim rectData = Mat.FromPixelData(classCount, 1, MatType.CV_32SC4, RedFlood_Rects(cPtr))
+            Dim rects(classCount - 1) As cv.Rect
+            rectData.GetArray(Of cv.Rect)(rects)
+
+            Dim rcLastList = New List(Of rcData)(rcList)
+
+            rcList.Clear()
+            rcMap.SetTo(0)
+            dst2.SetTo(0)
+            For Each r In rects
+                ' skip the cells that are just one gridRect.
+                If r.Size <> task.gridRects(0).Size Then
+                    Dim rc = New rcData(dst0(r), r, rcList.Count + 1)
+                    If rc.pixels > 0 Then
+                        For i = 0 To lastCenters.Count - 1
+                            Dim rect = lastCenters(i)
+                            If rect.Contains(rc.maxDist) Then
+                                rc.age = rcLastList(i).age + 1
+                                Exit For
+                            End If
+                        Next
+
+                        rcList.Add(rc)
+                        dst2(rc.rect).SetTo(task.scalarColors(rc.index), rc.mask)
+                        rcMap(rc.rect).SetTo(rc.mapID, rc.mask)
+                    End If
+                End If
+            Next
+
+            lastCenters.Clear()
+            For Each rc In rcList
+                lastCenters.Add(task.gridNabeRects(rc.index))
+            Next
+
+            If standalone Then
+                'strOut = Utility_Basics.selectCell(rcMap, rcList)
+                'SetTrueText(strOut, 3)
+            End If
+
+            labels(2) = CStr(rcList.Count) + " cells found. "
+        End Sub
+        Protected Overrides Sub Finalize()
+            If cPtr <> 0 Then cPtr = RedFlood_Close(cPtr)
         End Sub
     End Class
 End Namespace

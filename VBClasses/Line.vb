@@ -660,7 +660,7 @@ Namespace VBClasses
                 labels(2) = delaunay.labels(2)
                 dst2 = delaunay.dst2
             End If
-            strOut = task.lpD.lpDisplay(dst3)
+            strOut = task.lpD.lpDisplay()
             SetTrueText(strOut, 1) ' the line info is already prepped in strout in delaunay.
         End Sub
     End Class
@@ -1099,7 +1099,7 @@ Namespace VBClasses
             Else
                 If task.lpD Is Nothing Then task.lpD = task.lines.lpList(0)
             End If
-            SetTrueText(task.lpD.lpDisplay(dst1), 1)
+            SetTrueText(task.lpD.lpDisplay(), 1)
         End Sub
     End Class
 
@@ -1132,7 +1132,7 @@ Namespace VBClasses
                 Else
                     task.lpD = task.lines.lpList(index)
                 End If
-                task.lpD.lpDisplay(dst1)
+                task.lpD.lpDisplay()
             End If
         End Sub
     End Class

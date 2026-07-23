@@ -119,7 +119,7 @@ Namespace VBClasses
             labels(2) = flood.labels(2)
             If flood.rcList.Count = 0 Then Exit Sub ' nothing to work on!
 
-            strOut = Utility_Basics.selectCell(flood.rcMap, flood.rcList)
+            ' strOut = Utility_Basics.selectCell(flood.rcMap, flood.rcList)
 
             dst0 = New Mat(dst2.Size(), MatType.CV_32FC3, 0)
             If task.rcOldD IsNot Nothing Then task.pointCloud(task.rcOldD.rect).CopyTo(dst0(task.rcOldD.rect), task.rcOldD.mask)

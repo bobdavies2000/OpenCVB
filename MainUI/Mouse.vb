@@ -65,7 +65,7 @@ Namespace MainApp
             End If
 
             StatusLabel.Text = String.Format("X: {0}, Y: {1}    ", x, y)
-            vbc.task.mouseMovePoint = lpData.validatePoint(New cv.Point(x, y))
+            vbc.task.mouseMovePoint = validatePoint(New cv.Point(x, y))
             If vbc.task IsNot Nothing Then
                 StatusLabel.Text += String.Format("Last click: {0}, {1}    ", vbc.task.clickPoint.X, vbc.task.clickPoint.Y)
             End If
@@ -77,6 +77,14 @@ Namespace MainApp
             End If
             StatusLabel.Text += "  Current pixel: " + vbc.task.mousePixelValue.ToString
         End Sub
+        Private Shared Function validatePoint(pt As cv.Point2f) As cv.Point2f
+            If CInt(pt.X) < 0 Then pt.X = 0
+            If CInt(pt.X) >= task.color.Width Then pt.X = task.color.Width - 1
+            If CInt(pt.Y) < 0 Then pt.Y = 0
+            If CInt(pt.Y) >= task.color.Height Then pt.Y = task.color.Height - 1
+
+            Return pt
+        End Function
         Private Sub campic_DoubleClick(sender As Object, e As EventArgs)
             DrawingRectangle = False
         End Sub

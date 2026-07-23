@@ -31,8 +31,7 @@ Namespace VBClasses
             Dim tourMat As New Mat(task.workRes, MatType.CV_8U, 0)
             Dim minSize = src.Total * 0.01 ' we are only interested in contours with more than X% of the pixels.
             For Each ptArray In allContours
-                Dim tour = New keyData
-                tour.rect = tour.buildRect(ptArray)
+                Dim tour As New keyData With {.rect = contourData.buildRect(ptArray)}
                 If tour.rect.Width = 0 Or tour.rect.Height = 0 Then Continue For
 
                 tourMat(tour.rect).SetTo(0)
@@ -40,7 +39,7 @@ Namespace VBClasses
                 Dim listOfPoints = New List(Of List(Of cv.Point))({tour.contour})
                 DrawContours(tourMat, listOfPoints, 0, New Scalar(sortedList.Count), -1, LineTypes.Link8)
                 Threshold(tourMat(tour.rect), tour.mask, 0, 255, ThresholdTypes.Binary)
-                tour.maxDist = tour.GetMaxDistContour(tour)
+                tour.maxDist = keyData.GetMaxDistContour(tour)
                 tour.pixels = ContourArea(ptArray)
                 If tour.pixels >= minSize Then sortedList.Add(tour.pixels, tour)
             Next
@@ -107,8 +106,7 @@ Namespace VBClasses
             Dim tourMat As New Mat(task.workRes, MatType.CV_8U, 0)
             Dim minSize = src.Total * 0.01 ' we are only interested in contours with more than X% of the pixels.
             For Each ptArray In allContours
-                Dim tour = New keyData
-                tour.rect = tour.buildRect(ptArray)
+                Dim tour As New keyData With {.rect = contourData.buildRect(ptArray)}
                 If tour.rect.Width = 0 Or tour.rect.Height = 0 Then Continue For
 
                 tourMat(tour.rect).SetTo(0)
@@ -116,7 +114,7 @@ Namespace VBClasses
                 Dim listOfPoints = New List(Of List(Of cv.Point))({tour.contour})
                 DrawContours(tourMat, listOfPoints, 0, New Scalar(sortedList.Count), -1, LineTypes.Link8)
                 Threshold(tourMat(tour.rect), tour.mask, 0, 255, ThresholdTypes.Binary)
-                tour.maxDist = tour.GetMaxDistContour(tour)
+                tour.maxDist = keyData.GetMaxDistContour(tour)
                 tour.pixels = ContourArea(ptArray)
                 If tour.pixels >= minSize Then sortedList.Add(tour.pixels, tour)
             Next
@@ -204,7 +202,7 @@ Namespace VBClasses
 
 
     Public Class XR_KeyColor_Straight : Inherits TaskParent
-        Public rcList As New List(Of rcDataOld)
+        Public rcList As New List(Of rcData)
         Public rcMap As New Mat(dst2.Size, MatType.CV_8U, 0)
         Dim keyColors As New XR_KeyColor_Contours
         Public Sub New()
@@ -219,9 +217,7 @@ Namespace VBClasses
 
             keyColors.keyList.RemoveAt(0)
             For Each key In keyColors.keyList
-                Dim rc = New rcDataOld(key.mask, key.rect, -1)
-                rc.mapID = rcList.Count + 1
-                rc.contour = key.contour
+                Dim rc = New rcData(key.mask, key.rect, -1) With {.mapID = rcList.Count + 1, .contour = key.contour}
                 rcList.Add(rc)
                 rcMap(rc.rect).SetTo(rc.mapID, rc.mask)
             Next

@@ -61,9 +61,9 @@ Namespace VBClasses
 
 
 
-    Public Class XR_EdgeLine_Motion : Inherits TaskParent
+    Public Class EdgeLine_Motion : Inherits TaskParent
         Dim edgeLine As New EdgeLine_Basics
-        Public rcList As New List(Of rcDataOld)
+        Public rcList As New List(Of rcData)
         Public classCount As Integer
         Public Sub New()
             If standalone Then task.gOptions.showMotionMask.Checked = True
@@ -128,7 +128,7 @@ Namespace VBClasses
             dst2.ConvertTo(dst1, MatType.CV_8U)
             dst3 = Palettize(dst1, 0)
 
-            rcList = New List(Of rcDataOld)(newList)
+            rcList = New List(Of rcData)(newList)
             classCount = rcList.Count
 
             labels(2) = CStr(edgeLine.classCount) + " lines found. " +

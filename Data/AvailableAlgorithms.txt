@@ -217,6 +217,7 @@ EdgeLine_Basics
 EdgeLine_Compare
 EdgeLine_KeyColorOnly
 EdgeLine_LeftRightMotion
+EdgeLine_Motion
 Eigen_Input
 Eigen_Input3D
 EMax_Basics
@@ -285,6 +286,7 @@ FitLine_Conventional
 Flood_Basics
 Flood_BasicsDemo
 Flood_BasicsMask
+Flood_BasicsNew
 Flood_Edges
 Flood_FeatureLess
 Font_Basics

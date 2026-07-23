@@ -6,7 +6,7 @@ Namespace VBClasses
         Public brickList As New List(Of cv.Rect)
         Dim index As Integer
         Dim rect As cv.Rect
-        Public mask As Mat = New Mat(New Size(dst2.Width + 2, dst2.Height + 2), MatType.CV_8U, 0)
+        Public mask As New Mat(New Size(dst2.Width + 2, dst2.Height + 2), MatType.CV_8U, 0)
         Public Sub New()
             dst1 = New Mat(dst1.Size, MatType.CV_8U, 0)
             dst3 = New Mat(dst3.Size, MatType.CV_8U, 0)
@@ -83,7 +83,7 @@ Namespace VBClasses
             dst1 = New Mat(dst1.Size, MatType.CV_8U, 0)
             desc = "Identify featureless grid rects."
         End Sub
-        Public Function buildMap(brickList As List(Of cv.Rect), input As Mat) As Mat
+        Public Shared Function buildMap(brickList As List(Of cv.Rect), input As Mat) As Mat
             Dim index = 1
             Dim rect As cv.Rect
             Dim mask = New Mat(New Size(input.Width + 2, input.Height + 2), MatType.CV_8U, 0)
@@ -847,7 +847,6 @@ Namespace VBClasses
             task.color.CopyTo(dst2, Not dst1)
 
             For i = 1 To task.gridRects.Count - 1
-                If i = 9 Then Dim k = 0
                 Dim r1 = task.gridRects(i - 1)
                 Dim r2 = task.gridRects(i)
                 Dim p1 = r1.TopLeft
@@ -899,7 +898,7 @@ Namespace VBClasses
         Dim clusters As New FeatureLess_ClusterFlood
         Public clusterX As New List(Of List(Of Integer))
         Public clusterY As New List(Of List(Of Integer))
-        Public rcList As New List(Of rcDataOld)
+        Public rcList As New List(Of rcData)
         Public rcMap As New Mat(dst2.Size, MatType.CV_32S, 0)
         Public Sub New()
             If standalone Then task.gOptions.displayDst1.Checked = True
@@ -907,7 +906,7 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             Dim lastMap As Mat = rcMap.Clone
-            Dim rcLastList As New List(Of rcDataOld)(rcList)
+            Dim rcLastList As New List(Of rcData)(rcList)
 
             clusters.Run(task.gray)
             dst2 = clusters.dst2.Clone
@@ -933,7 +932,7 @@ Namespace VBClasses
                 clusterY(cIndex).Add(r.TopLeft.Y)
             Next
 
-            Dim sortList As New SortedList(Of Integer, rcDataOld)(New compareAllowIdenticalIntegerInverted)
+            Dim sortList As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
             For i = 1 To clusterX.Count - 1
                 Dim minX = clusterX(i).Min
                 Dim minY = clusterY(i).Min
@@ -943,7 +942,7 @@ Namespace VBClasses
 
                 Dim pt = New cv.Point(clusterX(i)(0), clusterY(i)(0))
                 Dim val = dst2.Get(Of Byte)(pt.Y, pt.X)
-                Dim rc = New rcDataOld(dst2(rect), rect, val)
+                Dim rc = New rcData(dst2(rect), rect, val)
                 sortList.Add(rc.pixels, rc)
             Next
 
@@ -965,7 +964,7 @@ Namespace VBClasses
 
             dst3 = Palettize(rcMap, 0)
 
-            strOut = Utility_Basics.selectCell(rcMap, rcList)
+            ' strOut = Utility_Basics.selectCell(rcMap, rcList)
             SetTrueText(strOut, 1)
         End Sub
     End Class
@@ -1131,7 +1130,7 @@ Namespace VBClasses
         Public featureList As New List(Of Single)
         Public idList As New List(Of Single)
         Public inputVariableCount As Integer = 5
-        Public rcList As New List(Of rcDataOld)
+        Public rcList As New List(Of rcData)
         Public Sub New()
             dst2 = New Mat(dst2.Size, MatType.CV_8U, 0)
             desc = "Expanded floodfill usage for the featureLess image."
@@ -1150,14 +1149,12 @@ Namespace VBClasses
                 If dst2.Get(Of Byte)(r.TopLeft.Y, r.TopLeft.X) = 255 Then
                     Dim flags = FloodFillFlags.FixedRange Or (index << 8)
                     Dim Count = FloodFill(dst2, mask, r.TopLeft, index, rect, 0, 0, flags)
-                    Dim rc = New rcDataOld(mask(rect), rect, index)
+                    Dim rc = New rcData(mask(rect), rect, index)
                     rcList.Add(rc)
 
                     idList.Add(CSng(index))
 
                     featureList.Add(Mean(src(rect), rc.mask)(0))
-                    featureList.Add(rc.wGrid.Z)
-
                     featureList.Add(rc.pixels)
                     featureList.Add(rc.maxDist.X)
                     featureList.Add(rc.maxDist.Y)
@@ -1181,16 +1178,9 @@ Namespace VBClasses
             knn.dimension = feat.inputVariableCount
             desc = "Predict the index for each featureLess region using the features Mat."
         End Sub
-        Private Function foundLast(rc As rcDataOld, lrc As rcDataOld) As rcDataOld
-            rc.age = lrc.age + 1
-            If rc.age >= 1000 Then rc.age = 10
-            rc.mapID = rc.indexLast
-            rc.color = lrc.color
-            Return rc
-        End Function
         Public Overrides Sub RunAlg(src As cv.Mat)
             Dim lastImage = feat.dst2.Clone
-            Dim lastList = New List(Of rcDataOld)(feat.rcList)
+            Dim lastList = New List(Of rcData)(feat.rcList)
 
             feat.Run(task.gray.Clone)
             dst2 = feat.dst2
@@ -1209,14 +1199,14 @@ Namespace VBClasses
             For Each rc In feat.rcList
                 Dim lastIndex = lastImage.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X) - 1
                 If lastIndex >= 0 And lastIndex < lastList.Count Then
-                    rc.indexLast = lastIndex
-                    rc = foundLast(rc, lastList(lastIndex))
+                    rc.age += 1
+                    If rc.age >= 1000 Then rc.age = 10
                 End If
             Next
 
             dst3.SetTo(0)
             For Each rc In feat.rcList
-                dst3(rc.rect).SetTo(rc.color, rc.mask)
+                dst3(rc.rect).SetTo(task.scalarColors(rc.index), rc.mask)
                 SetTrueText(CStr(rc.age), rc.maxDist, 3)
             Next
 
@@ -1224,11 +1214,10 @@ Namespace VBClasses
             For Each rc In feat.rcList
                 Rectangle(dst3, rc.rect, task.highlight, task.lineWidth)
                 maxDistList.Add(rc.maxDist)
-                If task.heartBeat Then rc.color = task.scalarColors(rc.mapID + 1)
             Next
 
-            strOut = Utility_Basics.selectCell(dst2, feat.rcList)
-            SetTrueText(strOut, 1)
+            'strOut = Utility_Basics.selectCell(dst2, feat.rcList)
+            'SetTrueText(strOut, 1)
 
             labels(2) = CStr(knn.trainMat.Rows) + " featureless clusters were found."
         End Sub
@@ -1317,7 +1306,6 @@ Namespace VBClasses
             desc = "Identify featureless gridrects that also have depth."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If src.Channels <> 1 Then src = task.gray.Clone
             labels(3) = task.edges.labels(2)
 
             dst1.SetTo(0)
@@ -1384,8 +1372,6 @@ Namespace VBClasses
             desc = "Find horizontal and vertical lines through the center of featureless grid rects."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If src.Channels <> 1 Then src = task.gray
-
             dst1 = task.fLess.dst3
             dst2 = task.fLess.dst2
 
@@ -1401,8 +1387,7 @@ Namespace VBClasses
                         If val1 <> 0 And (x = 0 And val1 <> 0) Then p1 = New cv.Point(CInt(x), CInt(y))
                         If val2 = 0 Then p2 = New cv.Point(x + task.gridWH - 1, y)
                         If p1 <> newPoint And p2 <> newPoint Then
-                            Dim lp = New lpData(p1, p2)
-                            lp.fLessID = If(val1 = 0, val2, val1)
+                            Dim lp As New lpData(p1, p2) With {.fLessID = If(val1 = 0, val2, val1)}
                             lpList.Add(lp)
                             Line(dst2, p1, p2, white, task.lineWidth)
                             p1 = newPoint
@@ -1426,8 +1411,6 @@ Namespace VBClasses
             desc = "Find horizontal and vertical lines through the center of featureless grid rects."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If src.Channels <> 1 Then src = task.gray
-
             dst1 = task.fLess.dst3
             dst2 = task.fLess.dst2
 
@@ -1443,8 +1426,7 @@ Namespace VBClasses
                         If val1 <> 0 And (y = 0 And val1 <> 0) Then p1 = New cv.Point(CInt(x), CInt(y))
                         If val2 = 0 Then p2 = New cv.Point(x, y + task.gridWH - 1)
                         If p1 <> newPoint And p2 <> newPoint Then
-                            Dim lp = New lpData(p1, p2)
-                            lp.fLessID = If(val1 = 0, val2, val1)
+                            Dim lp As New lpData(p1, p2) With {.fLessID = If(val1 = 0, val2, val1)}
                             lpList.Add(lp)
                             Line(dst2, p1, p2, white, task.lineWidth)
                             p1 = newPoint
@@ -1508,7 +1490,7 @@ Namespace VBClasses
             dst1 = New Mat(dst1.Size, MatType.CV_8U, 0)
             desc = "Identify featureless grid rects."
         End Sub
-        Public Function buildMap(brickList As List(Of cv.Rect), input As Mat) As Mat
+        Public Shared Function buildMap(brickList As List(Of cv.Rect), input As Mat) As Mat
             Dim index = 1
             Dim rect As cv.Rect
             Dim mask = New Mat(New Size(input.Width + 2, input.Height + 2), MatType.CV_8U, 0)
@@ -1684,7 +1666,7 @@ Namespace VBClasses
 
     Public Class FeatureLess_ReductionTest : Inherits TaskParent
         Dim color8u As New Color8U_Basics
-        Dim rcList As New List(Of rcDataOld)
+        Dim rcList As New List(Of rcData)
         Public Sub New()
             desc = "Identify each featureless region by index."
         End Sub
@@ -1697,7 +1679,7 @@ Namespace VBClasses
             rcList.Clear()
             For i = 0 To task.fLess.regions.Count - 1
                 Dim r = task.fLess.regions.Values(i)
-                rcList.Add(New rcDataOld(dst1(r), r, task.fLess.indexList.Values(i)))
+                rcList.Add(New rcData(dst1(r), r, task.fLess.indexList.Values(i)))
             Next
 
             Dim rcIndex = Math.Abs(task.gOptions.DebugSlider.Value)
