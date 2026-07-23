@@ -762,7 +762,7 @@ Namespace VBClasses
             dst2 = redC.dst2
             labels(2) = redC.labels(2)
 
-            dMap.rcList = New List(Of rcDataOld)(redC.rcList)
+            dMap.rcList = New List(Of rcData)(redC.rcList)
             dMap.Run(emptyMat)
 
             SetTrueText(redC.strOut, 3)

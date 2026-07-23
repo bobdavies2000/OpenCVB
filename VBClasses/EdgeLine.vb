@@ -3,7 +3,7 @@ Imports System.Runtime.InteropServices
 Namespace VBClasses
     Public Class EdgeLine_Basics : Inherits TaskParent
         Implements IDisposable
-        Public rcList As New List(Of rcDataOld)
+        Public rcList As New List(Of rcData)
         Public rcMap As New Mat
         Public classCount As Integer
         Public Sub New()
@@ -43,10 +43,10 @@ Namespace VBClasses
             For i = 0 To classCount - 1
                 Dim index = rcList.Count + 1
                 Dim mask = rcMap(rects(i))
-                Dim rc = New rcDataOld(mask, rects(i), index)
+                Dim rc = New rcData(mask, rects(i), index)
 
                 rcList.Add(rc)
-                If standaloneTest() Then dst3(rc.rect).SetTo(task.scalarColors(rc.gridIndex Mod 255), rc.mask)
+                If standaloneTest() Then dst3(rc.rect).SetTo(task.scalarColors(index Mod 255), rc.mask)
             Next
 
             labels(2) = CStr(classCount) + " line segments were found with motion threshold of " +
@@ -71,7 +71,7 @@ Namespace VBClasses
             dst2 = New Mat(dst2.Size, MatType.CV_32F, 0)
             desc = "Retain edges where there was no motion."
         End Sub
-        Private Sub rcDataDraw(rc As rcDataOld)
+        Private Sub rcDataDraw(rc As rcData)
             Static nextList = New List(Of List(Of cv.Point))
             Dim n = rc.contour.Count - 1
             nextList.Clear()
@@ -83,7 +83,7 @@ Namespace VBClasses
             Dim histarray(edgeLine.rcList.Count - 1) As Single
             If task.motion.motionSort.Count = 0 Then Exit Sub ' no change!
 
-            Dim newList As New List(Of rcDataOld)
+            Dim newList As New List(Of rcData)
             dst2.SetTo(0)
             If edgeLine.rcList.Count Then
                 Dim ranges1 = New Rangef() {New Rangef(0, edgeLine.rcList.Count)}
@@ -118,10 +118,6 @@ Namespace VBClasses
                     If histarray(rc.mapID - 1) > 0 And rc.contour.Count > 0 Then
                         count += 1
                         rc.mapID = newList.Count + 1
-                        If rc.contour.Count > 0 Then
-                            Dim gIndex = task.gridMap.Get(Of Integer)(rc.contour(0).Y, rc.contour(0).X)
-                            rc.color = task.vecColors(gIndex Mod 255)
-                        End If
                         newList.Add(rc)
 
                         rcDataDraw(rc)
@@ -348,10 +344,9 @@ Namespace VBClasses
             For Each segment In segments
                 If segment Is Nothing Then Continue For
                 classCount += 1
-                Dim p1 = segment(0)
+                Dim p1 As cv.Point2f
                 For Each p2 In segment
                     Circle(dst3, p2, task.DotSize, task.highlight, -1, task.lineType)
-                    ' dst3.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
                     p1 = p2
                 Next
             Next
@@ -469,9 +464,7 @@ Namespace VBClasses
             dst3.SetTo(0)
             keyList.Clear()
             For i = 0 To classCount - 1
-                Dim key As New keyData
-                key.rect = rects(i)
-                key.mask = rcMap(rects(i))
+                Dim key As New keyData With {.rect = rects(i), .mask = rcMap(rects(i))}
                 keyList.Add(key)
             Next
 
