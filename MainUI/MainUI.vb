@@ -11,7 +11,7 @@ Namespace MainApp
         Dim algHistory As New List(Of String)
         Dim recentMenu() As ToolStripMenuItem
         Dim labels As List(Of Label)
-        Public Shared pics As New List(Of PictureBox)
+        Private Shared pics As New List(Of PictureBox)
         Dim resolutionDetails As String
         Dim magnifyIndex As Integer
         Dim windowsFont = New System.Drawing.Font("Tahoma", 9)
@@ -224,8 +224,7 @@ Namespace MainApp
                 Dim w = Math.Abs(pt.X - vbc.task.mouseMagnifyEndPoint.X)
                 Dim h = Math.Abs(pt.Y - vbc.task.mouseMagnifyEndPoint.Y)
                 Dim r = New cv.Rect(pt.X, pt.Y, w, h)
-                Dim input As New cv.Mat
-                input = cvext.BitmapConverter.ToMat(pics(vbc.task.mouseMagnifyPicTag).Image)
+                Dim input = cvext.BitmapConverter.ToMat(pics(vbc.task.mouseMagnifyPicTag).Image)
                 r = validateRect(r, input.Width, input.Height)
                 If r.Width < 5 Or r.Height < 5 Then Exit Sub
                 Dim img As New cv.Mat
@@ -254,12 +253,9 @@ Namespace MainApp
             Dim Split = Regex.Split(infoLine, "\W+")
             Dim CodeLineCount As Integer = Split(1)
 
-            infoLine = sr.ReadLine
             Split = Regex.Split(infoLine, "\W+")
             Dim algorithmCountActive As Integer = Split(1)
 
-            infoLine = sr.ReadLine
-            Split = Regex.Split(infoLine, "\W+")
             Dim algorithmCount = algorithmCountActive
             sr.Close()
 
@@ -325,8 +321,8 @@ Namespace MainApp
         End Sub
         Private Sub TestAllButton_Click(sender As Object, e As EventArgs) Handles TestAllButton.Click
             TestAllTimer.Enabled = Not TestAllTimer.Enabled
-            Static testAllToolbarBitmap As Bitmap = New Bitmap(homeDir + "MainUI/Data/testall.png")
-            Static stopTestAll As Bitmap = New Bitmap(homeDir + "MainUI/Data/stopTestAll.png")
+            Static testAllToolbarBitmap As New Bitmap(homeDir + "MainUI/Data/testall.png")
+            Static stopTestAll As New Bitmap(homeDir + "MainUI/Data/stopTestAll.png")
             TestAllButton.Image = If(TestAllTimer.Enabled, stopTestAll, testAllToolbarBitmap)
             If TestAllTimer.Enabled Then
                 Debug.WriteLine("")
@@ -371,7 +367,7 @@ Namespace MainApp
 
             Dim timeEnd As DateTime = Now
             Dim elapsedTime = timeEnd.Ticks - timeStart.Ticks
-            Dim spanCopy As TimeSpan = New TimeSpan(elapsedTime)
+            Dim spanCopy As New TimeSpan(elapsedTime)
             vbc.task.cpu.paintTime += spanCopy.Ticks / TimeSpan.TicksPerMillisecond
         End Sub
         Private Sub startAlgorithm()
@@ -410,8 +406,7 @@ Namespace MainApp
             MainForm_Resize(Nothing, Nothing)
         End Sub
         Private Sub AtoZ_Click(sender As Object, e As EventArgs) Handles AtoZ.Click
-            Dim groupsForm As New AtoZ()
-            groupsForm.homeDir = New DirectoryInfo(homeDir + "\Data")
+            Dim groupsForm As New AtoZ() With {.homeDir = New DirectoryInfo(homeDir + "\Data")}
 
             If groupsForm.ShowDialog() = DialogResult.OK And Not String.IsNullOrEmpty(groupsForm.selectedGroup) Then
                 ' Find and select the first algorithm that starts with the selected group

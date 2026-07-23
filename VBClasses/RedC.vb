@@ -36,8 +36,7 @@ Namespace VBClasses
             Dim rect As cv.Rect
             Dim mask As New Mat(New Size(dst2.Width + 2, dst2.Height + 2), MatType.CV_8U, 0)
             Dim floodMap = rcMap.Clone
-            Dim sortList As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
-            sortList.Add(0, New rcData)
+            Dim sortList As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted) From {{0, New rcData}}
             For y = 0 To floodMap.Height - 1
                 For x = 0 To floodMap.Width - 1
                     If mask.Get(Of Byte)(y, x) = 0 Then

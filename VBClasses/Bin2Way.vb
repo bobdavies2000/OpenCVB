@@ -285,7 +285,7 @@ Namespace VBClasses
 
             dst3 = Palettize(rcMap)
 
-            'SetTrueText(task.rcD.displayCell, 1)
+            SetTrueText(task.rcD.displayCell, 1)
         End Sub
     End Class
 End Namespace

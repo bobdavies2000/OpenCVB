@@ -54,9 +54,11 @@ Namespace VBClasses
                 If lines(i).StartsWith("at Main") Then Continue For
                 If lines(i).StartsWith("at Startup") Then Continue For
                 If lines(i).StartsWith("at Windows") Then Continue For
+                If lines(i).StartsWith("TaskParent") Then Continue For
                 If lines(i).StartsWith("at ") Then lines(i) = lines(i).Replace("at ", "")
                 callStack = lines(i) + "\" + callStack
             Next
+            If callStack.StartsWith("AlgorithmTask") Then callStack = callStack.Replace("AlgorithmTask\", "")
 
             dst0 = New Mat(task.workRes, MatType.CV_8UC3, 0)
             dst1 = New Mat(task.workRes, MatType.CV_8UC3, 0)
@@ -67,12 +69,11 @@ Namespace VBClasses
             callStack = callStack.Replace("at Startup\", "")
             callStack = callStack.Replace("at Windows\", "")
 
-            If task.cpu.callTrace.Contains("AlgorithmTask") Then Dim k = 0
             'If callStack.StartsWith(task.Settings.algorithm) = False Then
             '    callStack = task.Settings.algorithm + "\" + task.Settings.algorithm + "\" + callStack
             'End If
 
-            task.cpu.callTrace.Add(callStack)
+            If task.cpu.callTrace.Contains(callStack) = False Then task.cpu.callTrace.Add(callStack)
 
             Dim newCallTrace As New List(Of String)({task.cpu.callTrace(0)})
             For i = 1 To task.cpu.callTrace.Count - 1
@@ -117,7 +118,8 @@ Namespace VBClasses
             Return output
         End Function
         Public Shared Function ShowAddweighted(src1 As Mat, src2 As Mat, ByRef label As String) As Mat
-            Static addw As New AddWeighted_Basics {.src2 = src2}
+            Static addw As New AddWeighted_Basics
+            addw.src2 = src2
             addw.Run(src1)
             Dim wt = addw.options.addWeighted
             label = "AddWeighted: src1 = " + wt.ToString("0%") + " vs. src2 = " + (1 - wt).ToString("0%")
@@ -146,6 +148,9 @@ Namespace VBClasses
         End Sub
         Public Overridable Sub RunAlg(src As cv.Mat)
             ' every algorithm overrides this Sub 
+        End Sub
+        Public Sub Dispose() Implements IDisposable.Dispose
+            GC.SuppressFinalize(Me)
         End Sub
     End Class
 End Namespace
