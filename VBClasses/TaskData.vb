@@ -80,7 +80,6 @@ Namespace VBClasses
         Public lines As Line_Basics_TA
         Public motion As Motion_Basics_TA
         ' Public motionStable As StableGray_Measure
-        Public fLess As FeatureLess_Basics_TA
         Public colorizer As DepthColorizer_Basics_TA
         Public stableDepth As StableDepth_Basics_TA
         Public stableGray As StableGray_Basics_TA

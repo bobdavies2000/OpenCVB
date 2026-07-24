@@ -120,7 +120,7 @@ Namespace VBClasses
 
     Public Class XR_CComp_Hulls : Inherits TaskParent
         Dim ccomp As New CComp_Both
-        Dim hulls As New RedColor_Hulls
+        Dim hulls As New XR_RedColor_Hulls
         Public Sub New()
             desc = "Create connected components using RedCloud Hulls"
         End Sub

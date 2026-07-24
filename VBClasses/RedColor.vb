@@ -125,85 +125,6 @@ Namespace VBClasses
 
 
 
-    Public Class RedColor_BrickList : Inherits TaskParent
-        Public rcList As New List(Of rcData)
-        Public rcMap As New Mat(dst2.Size, MatType.CV_32S, 0)
-        Public reduction As New Reduction_Basics
-        Public runSelectCell As Boolean = True
-        Dim bricks As New FeatureLess_BrickList
-        Public Sub New()
-            If standalone Then task.gOptions.displayDst1.Checked = True
-            desc = "Use the FeatureLess regions to improve the RedColor output."
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            If src.Channels <> 1 Then
-                reduction.Run(src)
-                src = reduction.dst2
-            End If
-
-            bricks.Run(src)
-
-            Dim rect As cv.Rect
-            Dim mask = New Mat(New Size(dst2.Width + 2, dst2.Height + 2), MatType.CV_8U, 0)
-            Dim rectSorted As New SortedList(Of Integer, (index As Integer, r As cv.Rect))(New compareAllowIdenticalInteger)
-            For Each r In bricks.brickList
-                Dim val = mask.Get(Of Byte)(r.Y, r.X)
-                If val = 0 Then
-                    Dim index As Integer = task.fLess.dst3.Get(Of Byte)(r.Y, r.X)
-                    If index > 0 Then
-                        Dim flags = FloodFillFlags.FixedRange Or FloodFillFlags.Link4 Or (index << 8)
-                        Dim count = FloodFill(src, mask, r.TopLeft, index, rect, 0, 0, flags)
-                        rect = ValidateRect(rect)
-                        If CountNonZero(mask(rect)) > 0 Then rectSorted.Add(index, (index, rect))
-                    End If
-                End If
-            Next
-
-            Dim rcSizeSort As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
-            For i = 0 To rectSorted.Count - 2
-                Dim r1 = rectSorted.ElementAt(i).Value.r
-                Dim r2 As cv.Rect
-                If rectSorted.ElementAt(i).Value.index = rectSorted.ElementAt(i + 1).Value.index Then
-                    For j = i To rectSorted.Count - 2
-                        r2 = rectSorted.ElementAt(j + 1).Value.r
-                        If rectSorted.ElementAt(j).Value.index = rectSorted.ElementAt(j + 1).Value.index Then
-                            r1 = r1.Union(r2)
-                        Else
-                            Dim rc = New rcData(src(r1), r1, rectSorted.ElementAt(j).Value.index)
-                            rcSizeSort.Add(rc.pixels, rc)
-                            i = j
-                            Exit For
-                        End If
-                    Next
-                Else
-                    Dim rc = New rcData(src(r1), r1, rectSorted.ElementAt(i).Value.index)
-                    rcSizeSort.Add(rc.pixels, rc)
-                End If
-            Next
-
-            rcMap.SetTo(0)
-            rcList.Clear()
-            For Each rc In rcSizeSort.Values
-                rc.mapID = rcList.Count + 1
-                rcMap(rc.rect).SetTo(rc.mapID, rc.mask)
-                rcList.Add(rc)
-            Next
-
-            If runSelectCell Then
-                strOut = Utility_Basics.selectCell(rcMap, rcList)
-                SetTrueText(strOut, 1)
-            End If
-
-            dst2 = Palettize(rcMap, 0)
-
-            labels(2) = CStr(rcList.Count) + " cells were identified."
-        End Sub
-    End Class
-
-
-
-
-
     Public Class XR_RedColor_CPP : Inherits TaskParent
         Implements IDisposable
         Public classCount As Integer
@@ -301,7 +222,7 @@ Namespace VBClasses
 
 
 
-    Public Class RedColor_LeftRight : Inherits TaskParent
+    Public Class XR_RedColor_LeftRight : Inherits TaskParent
         Dim redLeft As New RedColor_Basics
         Dim redRight As New RedColor_Basics
         Dim reduction As New Reduction_Basics
@@ -312,13 +233,13 @@ Namespace VBClasses
             reduction.Run(task.leftView)
 
             redLeft.Run(reduction.dst2)
-            dst2 = Palettize(redLeft.dst2)
+            dst2 = Palettize(redLeft.dst2, 0)
             labels(2) = redLeft.labels(2) + " in the left image"
 
             reduction.Run(task.rightView)
 
             redRight.Run(reduction.dst2)
-            dst3 = Palettize(redRight.dst2)
+            dst3 = Palettize(redRight.dst2, 0)
             labels(3) = redRight.labels(2) + " in the right image"
         End Sub
     End Class
@@ -348,7 +269,7 @@ Namespace VBClasses
 
 
 
-    Public Class RedColor_Bricks : Inherits TaskParent
+    Public Class XR_RedColor_Bricks : Inherits TaskParent
         Dim bricks As New Brick_Basics
         Dim color8u As New Color8U_Basics
         Public brickList As New List(Of brickData)
@@ -388,10 +309,10 @@ Namespace VBClasses
 
 
 
-    Public Class RedColor_Hulls : Inherits TaskParent
+    Public Class XR_RedColor_Hulls : Inherits TaskParent
         Public rclist As New List(Of rcData)
         Public rcMap As New Mat(dst2.Size, MatType.CV_32S, 0)
-        Dim redC As New RedC_Basics
+        Dim redC As New RedColor_Basics
         Public Sub New()
             labels = {"", "Cells where convexity defects failed", "", "Improved contour results Using OpenCV's ConvexityDefects"}
             desc = "Add hulls and improved contours using ConvexityDefects to each RedCloud cell"
@@ -420,7 +341,7 @@ Namespace VBClasses
             Next
             dst3 = Palettize(rcMap)
             labels(3) = CStr(rclist.Count) + " hulls identified below.  " + CStr(defectCount) +
-                        " hulls failed to build the defect list."
+                        " hulls failed building the defect list."
         End Sub
     End Class
 
@@ -494,7 +415,7 @@ Namespace VBClasses
 
 
     Public Class XR_RedColor_LineSingle : Inherits TaskParent
-        Dim track As New RedColor_Contour
+        Dim track As New XR_RedColor_Contour
         Dim leftMost As Integer, rightmost As Integer
         Dim leftCenter As cv.Point, rightCenter As cv.Point
         Public Sub New()
@@ -637,7 +558,7 @@ Namespace VBClasses
 
 
     Public Class XR_RedColor_Points : Inherits TaskParent
-        Dim track As New RedColor_Contour
+        Dim track As New XR_RedColor_Contour
         Public Sub New()
             dst3 = New Mat(dst3.Size(), MatType.CV_8U, Scalar.All(0))
             labels = {"", "", "RedCloudX_Track output", "Input to RedCloudX_Track"}
@@ -662,29 +583,8 @@ Namespace VBClasses
 
 
 
-    Public Class RedColor_Contours : Inherits TaskParent
-        Public contours As New Contour_Basics
-        Public redC As New RedColor_Basics
-        Public Sub New()
-            labels(3) = "Contour_Basics output that is input to RedColor_Basics."
-            desc = "Use the contour output as input to RedColor_Basics."
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            contours.Run(src)
-            CvtColor(contours.dst2, dst1, ColorConversionCodes.BGR2GRAY)
-            redC.Run(dst1)
-            dst2 = contours.dst2
-            labels(2) = redC.labels(2)
-        End Sub
-    End Class
 
-
-
-
-
-
-
-    Public Class RedColor_DelaunayMap : Inherits TaskParent
+    Public Class XR_RedColor_DelaunayMap : Inherits TaskParent
         Public dMap As New Delaunay_Map
         Dim redC As New RedColor_Basics
         Public Sub New()
@@ -696,8 +596,8 @@ Namespace VBClasses
             labels(2) = redC.labels(2)
 
             dMap.rcList = New List(Of rcData)(redC.rcList)
-            dMap.Run(emptyMat)
-
+            dMap.Run(task.gray)
+            dst3 = dMap.dst3
             SetTrueText(redC.strOut, 3)
         End Sub
     End Class
@@ -713,10 +613,10 @@ Namespace VBClasses
     ''' pick a salient cell at the image center that is not the dominant background, then composite that region onto a neutral backdrop.
     ''' Click a cell (task.rcD) when available to override the auto-picked subject.
     ''' </summary>
-    Public Class RedColor_Isolate : Inherits TaskParent
+    Public Class XR_RedColor_Isolate : Inherits TaskParent
         Dim redC As New RedColor_Basics
         Public Sub New()
-            desc = "Isolate subject via RedColor cells: auto-pick center cell (non-background size); use selected cell if set."
+            desc = "Cursor.ai: Isolate subject via RedColor cells: auto-pick center cell (non-background size); use selected cell if set."
         End Sub
         Private Shared Function Clip(v As Integer, lo As Integer, hi As Integer) As Integer
             If v < lo Then Return lo
@@ -826,15 +726,18 @@ Namespace VBClasses
 
 
 
-    Public Class RedColor_FeatureLess : Inherits TaskParent
+    Public Class XR_RedColor_FeatureLess : Inherits TaskParent
         Public redC As New RedC_Basics
+        Dim fLess As New FeatureLess_Basics_TA
         Public Sub New()
             If standalone Then task.gOptions.displayDst1.Checked = True
             desc = "Use the output of the FeatureLess_Basics as input the RedColor_Basics."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            dst3 = task.fLess.dst2
-            labels(3) = task.fLess.labels(2)
+            fLess.Run(task.gray)
+
+            dst3 = fLess.dst2
+            labels(3) = fLess.labels(2)
 
             redC.Run(dst3)
             dst2 = redC.dst2
@@ -848,7 +751,7 @@ Namespace VBClasses
 
 
 
-    Public Class RedColor_Contour : Inherits TaskParent
+    Public Class XR_RedColor_Contour : Inherits TaskParent
         Public redC As New RedColor_Basics
         Public Sub New()
             If New Size(task.workRes.Width, task.workRes.Height) <> New Size(168, 94) Then task.fOptions.FrameHistoryCount.Value = 1
@@ -866,28 +769,6 @@ Namespace VBClasses
                     If rc.mapID = task.rcD.mapID Then DrawTour(dst2(rc.rect), rc.contour, white, -1)
                 End If
             Next
-        End Sub
-    End Class
-
-
-
-
-
-
-
-    Public Class RedColor_BasicsLeftRight : Inherits TaskParent
-        Dim redC As New RedColor_Basics
-        Public Sub New()
-            desc = "Use RedColor_Basics on the left and right images."
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            redC.Run(task.leftView)
-            dst2 = redC.dst2
-            labels(2) = redC.labels(2)
-
-            redC.Run(task.rightView)
-            dst3 = redC.dst2
-            labels(3) = redC.labels(2)
         End Sub
     End Class
 End Namespace

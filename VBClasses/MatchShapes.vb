@@ -129,10 +129,10 @@ Namespace VBClasses
 
     Public Class XR_MatchShapes_Hulls : Inherits TaskParent
         Dim options As New Options_MatchShapes
-        Dim hulls As New RedColor_Hulls
+        Dim hulls As New XR_RedColor_Hulls
         Public Sub New()
             OptionParent.FindSlider("Match Threshold %").Value = 3
-            labels = {"", "", "Output of RedColor_Hulls", "All RedCloud cells that matched the selected cell with the current settings are below."}
+            labels = {"", "", "Output of XR_RedColor_Hulls", "All RedCloud cells that matched the selected cell with the current settings are below."}
             desc = "Find all RedCloud hull shapes similar to the one selected.  Use sliders and radio buttons to see impact."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -207,9 +207,9 @@ Namespace VBClasses
         Public bestCell As Integer
         Dim rc As New rcData
         Dim options As New Options_MatchShapes
-        Dim hulls As New RedColor_Hulls
+        Dim hulls As New XR_RedColor_Hulls
         Public Sub New()
-            labels = {"", "", "Output of RedColor_Hulls", "Cells similar to selected cell"}
+            labels = {"", "", "Output of XR_RedColor_Hulls", "Cells similar to selected cell"}
             desc = "MatchShapes: Find all the reasonable matches (< 1.0 for matchVal)"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)

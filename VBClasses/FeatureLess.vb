@@ -1343,37 +1343,16 @@ Namespace VBClasses
 
 
 
-    Public Class FeatureLess_Depth : Inherits TaskParent
-        Public brickList As New List(Of cv.Rect)
-        Public Sub New()
-            desc = "Same as FeatureLess_Basics but remove those grid rects with no depth"
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            dst1.SetTo(0)
-            brickList.Clear()
-            For Each r In task.fLess.brickList
-                If CountNonZero(task.depthmask(r)) = 0 Then Continue For
-                brickList.Add(r)
-                dst1(r).SetTo(255)
-            Next
-
-            dst2 = task.fLess.dst2
-            labels(2) = task.fLess.labels(2)
-        End Sub
-    End Class
-
-
-
-
-
     Public Class FeatureLess_XLines : Inherits TaskParent
         Public lpList As New List(Of lpData)
+        Dim fLess As New FeatureLess_Basics_TA
         Public Sub New()
             desc = "Find horizontal and vertical lines through the center of featureless grid rects."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            dst1 = task.fLess.dst3
-            dst2 = task.fLess.dst2
+            fLess.Run(task.gray)
+            dst1 = fLess.dst3
+            dst2 = fLess.dst2
 
             lpList.Clear()
             For y = task.gridWH To dst1.Height - 1 Step task.gridWH
@@ -1406,13 +1385,15 @@ Namespace VBClasses
 
     Public Class FeatureLess_YLines : Inherits TaskParent
         Public lpList As New List(Of lpData)
+        Dim fLess As New FeatureLess_Basics_TA
         Public Sub New()
             dst2 = New Mat(dst2.Size, MatType.CV_8U, 0)
             desc = "Find horizontal and vertical lines through the center of featureless grid rects."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            dst1 = task.fLess.dst3
-            dst2 = task.fLess.dst2
+            fLess.Run(task.gray)
+            dst1 = fLess.dst3
+            dst2 = fLess.dst2
 
             lpList.Clear()
             For x = task.gridWH To dst1.Width - 1 Step task.gridWH
@@ -1539,6 +1520,7 @@ Namespace VBClasses
     Public Class FeatureLess_Tracker : Inherits TaskParent
         Public regions As New List(Of (count As Integer, r As cv.Rect))
         Dim overlap As New FeatureLess_Overlap
+        Dim fLess As New FeatureLess_Basics_TA
         Public Sub New()
             dst1 = New Mat(dst1.Size, MatType.CV_8U, 0)
             dst3 = New Mat(dst3.Size, MatType.CV_8U, 0)
@@ -1553,7 +1535,7 @@ Namespace VBClasses
             overlap.Run(emptyMat)
 
             regions.Clear()
-            dst0 = task.fLess.dst1.Clone
+            dst0 = fLess.dst1.Clone
             Dim newCandidates As New List(Of cv.Rect)
             Dim floodRects As New List(Of cv.Rect)
             For Each r In task.gridRects
@@ -1583,8 +1565,8 @@ Namespace VBClasses
             dst2 = Palettize(dst0, 0)
             labels(2) = CStr(regions.Count) + " regions were found."
 
-            dst1 = task.fLess.dst1.Clone
-            If task.heartBeatLT Then dst3 = task.fLess.dst3.Clone
+            dst1 = fLess.dst1.Clone
+            If task.heartBeatLT Then dst3 = fLess.dst3.Clone
 
             For Each r In floodRects
                 Rectangle(dst2, r, task.highlight, task.lineWidth)
@@ -1597,19 +1579,20 @@ Namespace VBClasses
 
 
     Public Class FeatureLess_Overlap : Inherits TaskParent
+        Dim fLess As New FeatureLess_Basics_TA
         Public Sub New()
             dst1 = New Mat(dst1.Size, MatType.CV_8U, 0)
             labels = {"", "", "Grid rects that did not overlap", "Grid rects that overlapped."}
             desc = "Compare the current and previous featureless regions and define overlap and not overlap."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            dst0 = task.fLess.dst1.Clone
+            dst0 = fLess.dst1.Clone
 
             dst2 = dst0.Clone
             dst2.SetTo(0, dst1)
             dst3 = dst0 And dst1
 
-            dst1 = task.fLess.dst1.Clone
+            dst1 = fLess.dst1.Clone
         End Sub
     End Class
 
@@ -1667,19 +1650,22 @@ Namespace VBClasses
     Public Class FeatureLess_ReductionTest : Inherits TaskParent
         Dim color8u As New Color8U_Basics
         Dim rcList As New List(Of rcData)
+        Dim fLess As New FeatureLess_Basics_TA
         Public Sub New()
             desc = "Identify each featureless region by index."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
+            fLess.Run(task.gray)
+
             color8u.Run(task.gray)
-            dst1 = task.fLess.dst3
+            dst1 = fLess.dst3
             dst2 = color8u.dst3
-            dst3 = task.fLess.mask
+            dst3 = fLess.mask
 
             rcList.Clear()
-            For i = 0 To task.fLess.regions.Count - 1
-                Dim r = task.fLess.regions.Values(i)
-                rcList.Add(New rcData(dst1(r), r, task.fLess.indexList.Values(i)))
+            For i = 0 To fLess.regions.Count - 1
+                Dim r = fLess.regions.Values(i)
+                rcList.Add(New rcData(dst1(r), r, fLess.indexList.Values(i)))
             Next
 
             Dim rcIndex = Math.Abs(task.gOptions.DebugSlider.Value)
@@ -1699,19 +1685,20 @@ Namespace VBClasses
     Public Class FeatureLess_CalcHist : Inherits TaskParent
         Dim color8u As New Color8U_Basics
         Dim histMapList As New List(Of (Index As Integer, histList As List(Of Integer)))
+        Dim fLess As New FeatureLess_Basics_TA
         Public Sub New()
             dst0 = New Mat(dst0.Size, MatType.CV_8U, 0)
             desc = "Find the LUT values in each featureless region."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             color8u.Run(task.gray)
-            dst1 = task.fLess.dst3
+            dst1 = fLess.dst3
             dst2 = color8u.dst3
 
             Dim ranges() As Rangef = New Rangef() {New Rangef(0, 255)}
             histMapList.Clear()
-            For i = 0 To task.fLess.regions.Count - 1
-                Dim r = task.fLess.regions.Values(i)
+            For i = 0 To fLess.regions.Count - 1
+                Dim r = fLess.regions.Values(i)
                 Dim histogram As New Mat
                 CalcHist({dst1(r)}, {0}, New Mat, histogram, 1, {256}, ranges)
                 Dim histArray(histogram.Rows - 1) As Single
@@ -1720,7 +1707,7 @@ Namespace VBClasses
                 For j = 0 To histArray.Length - 1
                     If histArray(j) > 0 Then histList.Add(j)
                 Next
-                histMapList.Add((task.fLess.indexList.Values(i), histList))
+                histMapList.Add((fLess.indexList.Values(i), histList))
             Next
 
             dst0.SetTo(0)

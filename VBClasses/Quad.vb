@@ -131,7 +131,7 @@ Namespace VBClasses
         Public depthList As New List(Of List(Of Single))
         Public colorList As New List(Of Scalar)
         Public oglOptions As New Options_OpenGLFunctions
-        Dim hulls As New RedColor_Hulls
+        Dim hulls As New XR_RedColor_Hulls
         Const depthListMaxCount As Integer = 10
         Public Sub New()
             desc = "Create a triangle representation of the cv.Point cloud with RedCloud data"

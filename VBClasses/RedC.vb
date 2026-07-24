@@ -14,20 +14,11 @@ Namespace VBClasses
         End Sub
         Public Shared Function displayCell(rcIndexMap As cv.Mat, rcList As List(Of rcData)) As String
             Dim clickIndex = rcIndexMap.Get(Of Integer)(task.clickPoint.Y, task.clickPoint.X)
-            task.rcD = If(clickIndex <> 0, rcList(clickIndex), rcList(0))
+            task.rcD = rcList(clickIndex)
             task.color(task.rcD.rect).SetTo(white, task.rcD.mask)
+            If clickIndex = 0 Then Return task.rcD.displayCell() + vbCrLf + vbCrLf + "Unmapped region.  No cell present" + vbCrLf
             Return task.rcD.displayCell()
         End Function
-        'Public Shared Sub rcLastAdd(rcIndexMap As cv.Mat, rclist As List(Of rcData))
-        '    Dim tmp As New cv.Mat
-        '    InRange(rcIndexMap, 0, 0, tmp)
-        '    Dim pixelCount = CountNonZero(tmp)
-        '    If pixelCount > 0 Then
-        '        Dim rcOther As New rcData With {.mask = tmp.Clone, .rect = New cv.Rect(0, 0, tmp.Width, tmp.Height),
-        '                                        .mapID = rclist.Count, .index = rclist.Count, .pixels = pixelCount}
-        '        rclist.Add(rcOther)
-        '    End If
-        'End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             Dim rcMapLast As cv.Mat = rcMap.Clone
             Dim rcIndexMapLast As cv.Mat = rcIndexMap.Clone
@@ -73,8 +64,6 @@ Namespace VBClasses
                     rcList.Add(rc)
                 End If
             Next
-
-            ' rcLastAdd(rcIndexMap, rcList)
 
             For Each rc In rcList
                 Dim mapIDCurr = rcMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)

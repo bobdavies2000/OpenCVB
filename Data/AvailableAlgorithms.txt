@@ -244,7 +244,6 @@ FeatureLess_CalcHist
 FeatureLess_Cells
 FeatureLess_ClusterFlood
 FeatureLess_Correlation
-FeatureLess_Depth
 FeatureLess_DepthFull
 FeatureLess_FeatureLines
 FeatureLess_Features
@@ -663,17 +662,7 @@ RedCloud_MotionFilter
 RedCloud_Reliable
 RedCloud_RGB
 RedColor_Basics
-RedColor_BasicsLeftRight
-RedColor_BrickList
-RedColor_Bricks
-RedColor_Contour
-RedColor_Contours
-RedColor_DelaunayMap
-RedColor_FeatureLess
 RedColor_GridRects
-RedColor_Hulls
-RedColor_Isolate
-RedColor_LeftRight
 RedPrep_Basics
 RedPrep_Core
 RedPrep_Edges_CPP

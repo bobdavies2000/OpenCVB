@@ -46,7 +46,6 @@ Namespace VBClasses
             task.motion = New Motion_Basics_TA
             task.motion.standalone = False
             ' motionStable = New StableGray_Measure
-            task.fLess = New FeatureLess_Basics_TA
             task.heartBeats = New HeartBeat_Basics_TA
             task.edges = New Edge_Basics_TA
 
@@ -192,7 +191,6 @@ Namespace VBClasses
 
             task.foreground.Run(emptyMat)
             task.edges.Run(task.gray)
-            task.fLess.Run(src)
 
 
 
