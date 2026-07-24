@@ -1085,8 +1085,8 @@ Namespace VBClasses
             sortContours.allContours = Contour_Basics.buildContours(dst3)
             sortContours.Run(src)
 
-            contourList = sortContours.rcList
-            contourMap = sortContours.rcMap
+            contourList = sortContours.tourList
+            contourMap = sortContours.tourMap
             labels(2) = sortContours.labels(2)
             dst2 = sortContours.dst2
             strOut = sortContours.strOut
@@ -1150,12 +1150,12 @@ Namespace VBClasses
 
     Public Class Contour_SortTmp : Inherits TaskParent
         Public allContours As cv.Point()()
-        Public rcList As New List(Of contourData)
-        Public rcMap As New Mat(task.workRes, MatType.CV_32S, 0)
+        Public tourList As New List(Of contourData)
+        Public tourMap As New Mat(task.workRes, MatType.CV_32S, 0)
         Dim edgeline As New EdgeLine_Basics
         Public Sub New()
             dst1 = New Mat(dst1.Size, MatType.CV_8U, 0)
-            desc = "Sort the contours by size and prepare the contour map"
+            desc = "Sort the contours by size and prepare a contour map"
         End Sub
         Public Shared Function GetMaxDistContour(ByRef contour As contourData) As cv.Point
             Dim mask = contour.mask.Clone
@@ -1197,16 +1197,16 @@ Namespace VBClasses
                 sortedList.Add(tour.pixels, tour)
             Next
 
-            Dim contourLast As New List(Of contourData)(rcList)
-            Dim rcMapLast = rcMap.Clone
+            Dim contourLast As New List(Of contourData)(tourList)
+            Dim tourMapLast = tourMap.Clone
 
             dst2.SetTo(0)
-            rcList.Clear()
+            tourList.Clear()
             dst1.SetTo(0)
-            rcMap.SetTo(0)
+            tourMap.SetTo(0)
             For i = sortedList.Values.Count - 1 To 0 Step -1
                 Dim tour = sortedList.Values(i)
-                Dim idLast = CInt(rcMapLast.Get(Of Integer)(tour.maxDist.Y, tour.maxDist.X))
+                Dim idLast = CInt(tourMapLast.Get(Of Integer)(tour.maxDist.Y, tour.maxDist.X))
                 For Each tourLast In contourLast
                     If idLast = tourLast.ID And idLast > 0 Then
                         tour.age = tourLast.age + 1
@@ -1214,24 +1214,24 @@ Namespace VBClasses
                     End If
                 Next
 
-                rcList.Add(tour)
-                rcMap(tour.rect).SetTo(tour.ID, tour.mask)
+                tourList.Add(tour)
+                tourMap(tour.rect).SetTo(tour.ID, tour.mask)
                 dst1(tour.rect).SetTo(tour.ID Mod 255, tour.mask)
             Next
 
             dst2 = Palettize(dst1, 0)
             Dim matched As Integer
-            For Each tour In rcList
+            For Each tour In tourList
                 If tour.age > 1 Then matched += 1
             Next
 
-            If rcList.Count > 0 Then
-                strOut = XR_Contour_Info.contourDesc(rcMap, rcList)
+            If tourList.Count > 0 Then
+                strOut = XR_Contour_Info.contourDesc(tourMap, tourList)
                 If standaloneTest() Then SetTrueText(strOut, 3)
             End If
 
             If task.heartBeat Then
-                labels(2) = "Matched " + CStr(matched) + "/" + CStr(rcList.Count) + " contours to the previous generation"
+                labels(2) = "Matched " + CStr(matched) + "/" + CStr(tourList.Count) + " contours to the previous generation"
             End If
         End Sub
     End Class
