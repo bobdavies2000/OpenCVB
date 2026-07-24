@@ -486,7 +486,7 @@ Namespace VBClasses
 
 
     Public Class XR_Depth_MaxMask : Inherits TaskParent
-        Dim contour As New Contour_Regions
+        Dim contour As New XR_Contour_Regions
         Public Sub New()
             labels = {"", "", "Depth that is too far", "Contour of depth that is too far..."}
             desc = "Display the task.depthClippedMask and its contour containing depth that is greater than maxdepth (global setting)"
@@ -814,7 +814,7 @@ Namespace VBClasses
 
 
     Public Class XR_Depth_Contour : Inherits TaskParent
-        Dim contour As New Contour_Regions
+        Dim contour As New XR_Contour_Regions
         Public Sub New()
             dst2 = New Mat(dst2.Size(), MatType.CV_8U, Scalar.All(0))
             labels(2) = "task.depthMask contour"
@@ -839,7 +839,7 @@ Namespace VBClasses
 
 
     Public Class Depth_Outline : Inherits TaskParent
-        Dim contour As New Contour_Regions
+        Dim contour As New XR_Contour_Regions
         Public Sub New()
             dst2 = New Mat(dst2.Size(), MatType.CV_8U, Scalar.All(0))
             dst3 = New Mat(dst3.Size(), MatType.CV_8U, Scalar.All(0))
@@ -958,7 +958,7 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
-            Dim splitMats() As Mat = Nothing
+            Dim splitMats() As Mat
             If src.Type = MatType.CV_32FC3 Then splitMats = Split(src) Else splitMats = task.pcSplit
 
             If task.heartBeat Then
@@ -999,7 +999,7 @@ Namespace VBClasses
             Static warnings As New List(Of String)
             Static infWarnings As Integer
             If task.heartBeatLT Then
-                plane = plane + 1
+                plane += 1
                 If plane > 2 Then plane = 0
             End If
 
@@ -1111,7 +1111,7 @@ Namespace VBClasses
             labels(2) = "Colorized depth error estimate for the current image"
             desc = "Provide an estimate of the error based on the depth - a linear estimate based on the '2% at 2 meters' statement."
         End Sub
-        Public Function ErrorEstimate(depth As Single) As Single
+        Public Shared Function ErrorEstimate(depth As Single) As Single
             Dim depthError = 0.02 * depth / 2
             Return depthError
         End Function

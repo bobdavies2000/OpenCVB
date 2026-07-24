@@ -96,12 +96,7 @@ Color8U_Complementary
 Color8U_Hue
 Color8U_LeftRight
 Contour_Basics
-Contour_Basics_List
-Contour_Regions
-Contour_RotateRect
 Contour_Sort
-Contour_SortTmp
-Contour_Test
 Convex_Basics
 Convex_RedColorDefects
 Corner_Basics

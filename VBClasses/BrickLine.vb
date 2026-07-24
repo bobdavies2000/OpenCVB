@@ -14,7 +14,7 @@ Namespace VBClasses
             options.Run()
 
             If standalone Or edgeRequest Then
-                Static contour As New Contour_RotateRect
+                Static contour As New XR_Contour_RotateRect
                 contour.Run(task.gray)
                 src = contour.dst1.Clone
             End If
