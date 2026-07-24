@@ -26,7 +26,6 @@ BGSubtract_Synthetic_CPP
 Bin2Way_Basics
 Bin2Way_Gradation
 Bin2Way_RecurseOnce
-Bin2Way_RedCloudLightToDark
 Bin3Way_Basics
 Bin3Way_GrayScale
 Bin3Way_KMeans
@@ -238,7 +237,7 @@ Feature_Tracker
 Feature_WarpAlign
 FeatureFlow_Basics
 FeatureFlow_LucasKanade
-FeatureLess_Basics_TA
+FeatureLess_Basics
 FeatureLess_BrickList
 FeatureLess_CalcHist
 FeatureLess_Cells

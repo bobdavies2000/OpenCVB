@@ -5,7 +5,7 @@ Namespace VBClasses
         Public rcList As New List(Of rcData)
         Public rcMap As New Mat(dst2.Size, MatType.CV_32S, 0)
         Public rcIndexMap As New Mat(dst2.Size, MatType.CV_32S, 0)
-        Dim fLess As New FeatureLess_Basics_TA
+        Dim fLess As New FeatureLess_Basics
         Public Sub New()
             If standalone Then task.gOptions.displayDst1.Checked = True
             labels(3) = "The output of FeatureLess_Basics.  Note that cell colors match the RedColor output."
@@ -728,7 +728,7 @@ Namespace VBClasses
 
     Public Class XR_RedColor_FeatureLess : Inherits TaskParent
         Public redC As New RedC_Basics
-        Dim fLess As New FeatureLess_Basics_TA
+        Dim fLess As New FeatureLess_Basics
         Public Sub New()
             If standalone Then task.gOptions.displayDst1.Checked = True
             desc = "Use the output of the FeatureLess_Basics as input the RedColor_Basics."

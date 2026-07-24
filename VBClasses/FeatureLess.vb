@@ -1,6 +1,6 @@
 Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCvSharp
 Namespace VBClasses
-    Public Class FeatureLess_Basics_TA : Inherits TaskParent
+    Public Class FeatureLess_Basics : Inherits TaskParent
         Public regions As New SortedList(Of Integer, cv.Rect)(New compareAllowIdenticalIntegerInverted)
         Public indexList As New SortedList(Of Integer, Integer)(New compareAllowIdenticalIntegerInverted)
         Public brickList As New List(Of cv.Rect)
@@ -1345,7 +1345,7 @@ Namespace VBClasses
 
     Public Class FeatureLess_XLines : Inherits TaskParent
         Public lpList As New List(Of lpData)
-        Dim fLess As New FeatureLess_Basics_TA
+        Dim fLess As New FeatureLess_Basics
         Public Sub New()
             desc = "Find horizontal and vertical lines through the center of featureless grid rects."
         End Sub
@@ -1385,7 +1385,7 @@ Namespace VBClasses
 
     Public Class FeatureLess_YLines : Inherits TaskParent
         Public lpList As New List(Of lpData)
-        Dim fLess As New FeatureLess_Basics_TA
+        Dim fLess As New FeatureLess_Basics
         Public Sub New()
             dst2 = New Mat(dst2.Size, MatType.CV_8U, 0)
             desc = "Find horizontal and vertical lines through the center of featureless grid rects."
@@ -1520,7 +1520,7 @@ Namespace VBClasses
     Public Class FeatureLess_Tracker : Inherits TaskParent
         Public regions As New List(Of (count As Integer, r As cv.Rect))
         Dim overlap As New FeatureLess_Overlap
-        Dim fLess As New FeatureLess_Basics_TA
+        Dim fLess As New FeatureLess_Basics
         Public Sub New()
             dst1 = New Mat(dst1.Size, MatType.CV_8U, 0)
             dst3 = New Mat(dst3.Size, MatType.CV_8U, 0)
@@ -1579,7 +1579,7 @@ Namespace VBClasses
 
 
     Public Class FeatureLess_Overlap : Inherits TaskParent
-        Dim fLess As New FeatureLess_Basics_TA
+        Dim fLess As New FeatureLess_Basics
         Public Sub New()
             dst1 = New Mat(dst1.Size, MatType.CV_8U, 0)
             labels = {"", "", "Grid rects that did not overlap", "Grid rects that overlapped."}
@@ -1650,7 +1650,7 @@ Namespace VBClasses
     Public Class FeatureLess_ReductionTest : Inherits TaskParent
         Dim color8u As New Color8U_Basics
         Dim rcList As New List(Of rcData)
-        Dim fLess As New FeatureLess_Basics_TA
+        Dim fLess As New FeatureLess_Basics
         Public Sub New()
             desc = "Identify each featureless region by index."
         End Sub
@@ -1685,7 +1685,7 @@ Namespace VBClasses
     Public Class FeatureLess_CalcHist : Inherits TaskParent
         Dim color8u As New Color8U_Basics
         Dim histMapList As New List(Of (Index As Integer, histList As List(Of Integer)))
-        Dim fLess As New FeatureLess_Basics_TA
+        Dim fLess As New FeatureLess_Basics
         Public Sub New()
             dst0 = New Mat(dst0.Size, MatType.CV_8U, 0)
             desc = "Find the LUT values in each featureless region."

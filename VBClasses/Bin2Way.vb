@@ -241,7 +241,7 @@ Namespace VBClasses
 
 
 
-    Public Class Bin2Way_RedCloudLightToDark : Inherits TaskParent
+    Public Class XR_Bin2Way_RedCloudLightToDark : Inherits TaskParent
         Dim recurse As New Bin2Way_RecurseOnce
         Dim redCs(3) As RedC_Basics
         Dim mats As New Mat_4to1
@@ -275,6 +275,7 @@ Namespace VBClasses
             dst2 = mats.dst2
 
             rclist.Clear()
+            rclist.Add(New rcData)
             dst3.SetTo(0)
             rcMap.SetTo(0)
             For Each rc In newList.Values
