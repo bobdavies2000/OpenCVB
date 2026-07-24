@@ -126,10 +126,10 @@ Namespace VBClasses
             contours.Run(src)
             Static restartRequest As Boolean
             fcs.inputFeatures.Clear()
-            For Each contour In contours.contourList
+            For Each contour In contours.tourList
                 fcs.inputFeatures.Add(Distance_Basics.GetMaxDist(contour.mask, contour.rect))
             Next
-            If contours.contourList.Count <= 1 Then ' when the camera is starting up the image may be too dark to process... Restart if so.
+            If contours.tourList.Count <= 1 Then ' when the camera is starting up the image may be too dark to process... Restart if so.
                 restartRequest = True
                 Exit Sub
             End If

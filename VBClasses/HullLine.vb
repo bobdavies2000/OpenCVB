@@ -15,7 +15,7 @@ Public Class HullLine_BasicsOld_TA : Inherits TaskParent
         lpList.Clear()
         dst2 = dst3.Clone
         Dim maxLines = task.gOptions.DebugSlider.Value * 2
-        For Each contour In hulls.contourList
+        For Each contour In hulls.tourList
             Dim ptLast As cv.Point = contour.hull(0)
             For Each pt In contour.hull
                 Dim lp = New lpData(pt, ptLast)

@@ -497,7 +497,7 @@ Namespace VBClasses
             dst2.SetTo(white, task.depthClippedMask)
             contour.Run(task.depthClippedMask)
             dst3.SetTo(0)
-            For Each c In contour.contourList
+            For Each c In contour.tourList
                 Dim hull = ConvexHull(c, True).ToList
                 DrawTour(dst3, hull, white, -1)
             Next
@@ -824,7 +824,7 @@ Namespace VBClasses
             contour.Run(task.depthmask)
 
             dst2.SetTo(0)
-            For Each tour In contour.contourList
+            For Each tour In contour.tourList
                 DrawTour(dst2, tour.ToList, 255, -1)
             Next
         End Sub
@@ -851,7 +851,7 @@ Namespace VBClasses
             contour.Run(src)
 
             dst2.SetTo(0)
-            For Each tour In contour.contourList
+            For Each tour In contour.tourList
                 DrawTour(dst2, tour.ToList, 255, task.lineWidth)
             Next
 

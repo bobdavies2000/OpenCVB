@@ -320,8 +320,26 @@ Namespace VBClasses
                 Dim maxY As Single = tour.Max(Function(p) p.Y)
                 Return ValidateRect(New cv.Rect(minX, minY, maxX - minX, maxY - minY))
             End Function
+            Public Function GetMaxDistBuild() As cv.Point
+                Dim maskTest = mask.Clone
+                Rectangle(mask, New cv.Rect(0, 0, mask.Width, mask.Height), cv.Scalar.All(0), 1)
+                Dim distance32f As New cv.Mat
+                DistanceTransform(mask, distance32f, cv.DistanceTypes.L1, cv.DistanceTransformMasks.Precise, cv.MatType.CV_32F)
+                Dim mm As mmData = GetMinMax(distance32f)
+                mm.maxLoc.X += rect.X
+                mm.maxLoc.Y += rect.Y
+                Return mm.maxLoc
+            End Function
             Public Sub New()
             End Sub
+            Public Function displayData() As String
+                Dim cDesc As String = ""
+                cDesc += "ID = " + CStr(ID) + " (grid index of maxDist)" + vbCrLf
+                cDesc += "Depth = " + depth.ToString(fmt1) + " m" + vbCrLf
+                cDesc += "Number of pixels in the mask: " + CStr(pixels) + vbCrLf
+                cDesc += "MaxDist cv.Point = " + maxDist.ToString + vbCrLf
+                Return cDesc
+            End Function
         End Class
 
 

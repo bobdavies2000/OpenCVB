@@ -696,7 +696,7 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             contours.Run(src)
-            contours.contourMap.ConvertTo(dst1, MatType.CV_32F)
+            contours.tourMap.ConvertTo(dst1, MatType.CV_32F)
             bProject.Run(dst1) ' calcHist doesn't support 32S
             dst2 = bProject.dst2
             dst3 = bProject.dst3
