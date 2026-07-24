@@ -691,7 +691,7 @@ Namespace VBClasses
             dst2.SetTo(0)
             For Each rc In redC.rcList
                 task.color(rc.rect).CopyTo(dst2(rc.rect), rc.mask)
-                dst1(rc.rect).SetTo(rc.color, rc.mask)
+                dst1(rc.rect).SetTo(task.scalarColors(rc.index), rc.mask)
                 If rc.mapID <= maxRegion Then SetTrueText(CStr(rc.mapID), rc.maxDist, 2)
             Next
             labels(1) = redC.labels(3)
@@ -705,8 +705,8 @@ Namespace VBClasses
     Public Class Pixel_Vectors : Inherits TaskParent
         Dim hVector As New Hist3Dcolor_Vector
         Public pixelVector As New List(Of Single())
-        Public rclist As New List(Of rcDataOld)
-        Public redC As New RedColor_Basics
+        Public rclist As New List(Of rcData)
+        Public redC As New RedC_Basics
         Public Sub New()
             labels = {"", "", "RedFlood_List output", ""}
             desc = "Create a vector for each cell's 3D histogram."

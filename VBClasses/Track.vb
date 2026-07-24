@@ -1,6 +1,6 @@
 Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 Public Class Track_Basics : Inherits TaskParent
-    Dim redC As New RedColor_Basics
+    Dim redC As New RedC_Basics
     Public Sub New()
         desc = "Track the selected cell."
     End Sub
@@ -9,13 +9,13 @@ Public Class Track_Basics : Inherits TaskParent
         dst2 = redC.dst2
         labels(2) = redC.labels(2)
 
-        Static rclast As rcDataOld = task.rcOldD
+        Static rclast As rcData = task.rcD
 
-        If rclast.mapID <> task.rcOldD.mapID And task.mouseClickFlag = False Then
+        If rclast.mapID <> task.rcD.mapID And task.mouseClickFlag = False Then
             For Each rc In redC.rcList
                 If rc.mapID = rclast.mapID Then
                     If rc.rect.Contains(task.clickPoint) Then
-                        task.rcOldD = rc
+                        task.rcD = rc
                         Exit For
                     End If
                 End If
@@ -23,15 +23,15 @@ Public Class Track_Basics : Inherits TaskParent
         End If
 
         Dim clickIndex = redC.rcMap.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X)
-        Circle(dst2, task.rcOldD.maxDist, task.DotSize + 2, task.highlight, -1)
+        Circle(dst2, task.rcD.maxDist, task.DotSize + 2, task.highlight, -1)
 
-        task.clickPoint = task.rcOldD.maxDist
-        labels(3) = "Map ID = " + CStr(task.rcOldD.mapID)
+        task.clickPoint = task.rcD.maxDist
+        labels(3) = "Map ID = " + CStr(task.rcD.mapID)
 
         strOut = Utility_Basics.selectCell(redC.rcMap, redC.rcList)
         SetTrueText(strOut, 3)
 
-        If rclast.mapID = task.rcOldD.mapID Then rclast = task.rcOldD Else Dim k = 0
+        If rclast.mapID = task.rcD.mapID Then rclast = task.rcD Else Dim k = 0
     End Sub
 End Class
 
@@ -39,7 +39,7 @@ End Class
 
 
 Public Class Track_Simple : Inherits TaskParent
-    Dim redC As New RedColor_Basics
+    Dim redC As New RedC_Basics
     Dim lostCell As Boolean
     Public Sub New()
         desc = "Track the selected cell."
@@ -49,7 +49,7 @@ Public Class Track_Simple : Inherits TaskParent
         dst2 = redC.dst2
         labels(2) = redC.labels(2)
 
-        Static rclast As rcDataOld = task.rcOldD
+        Static rclast As rcData = task.rcD
 
         If lostCell And task.mouseClickFlag = False Then
             SetTrueText("Unable to find the cell" + vbCrLf + "Click any cell to start tracking again.", 3)
@@ -59,12 +59,12 @@ Public Class Track_Simple : Inherits TaskParent
         End If
 
         Dim clickIndex = redC.rcMap.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X)
-        Circle(dst2, task.rcOldD.maxDist, task.DotSize + 2, task.highlight, -1)
+        Circle(dst2, task.rcD.maxDist, task.DotSize + 2, task.highlight, -1)
 
-        task.clickPoint = task.rcOldD.maxDist
-        labels(3) = "Map ID = " + CStr(task.rcOldD.mapID)
+        task.clickPoint = task.rcD.maxDist
+        labels(3) = "Map ID = " + CStr(task.rcD.mapID)
 
-        If rclast.mapID <> task.rcOldD.mapID And task.mouseClickFlag = False Then
+        If rclast.mapID <> task.rcD.mapID And task.mouseClickFlag = False Then
             lostCell = True
             Exit Sub
         End If
@@ -72,7 +72,7 @@ Public Class Track_Simple : Inherits TaskParent
         strOut = Utility_Basics.selectCell(redC.rcMap, redC.rcList)
         SetTrueText(strOut, 3)
 
-        rclast = task.rcOldD
+        rclast = task.rcD
     End Sub
 End Class
 
@@ -80,25 +80,24 @@ End Class
 
 
 Public Class Track_FindNearest : Inherits TaskParent
-    Dim redC As New RedColor_Basics
+    Dim redC As New RedC_Basics
     Dim knn As New KNN_Basics
     Public Sub New()
-        redC.runSelectCell = False
         desc = "Find the nearest cell with the same mapID."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         redC.Run(task.gray)
         dst2 = redC.dst2
         labels(2) = redC.labels(2)
-        Static rclast As rcDataOld = task.rcOldD
+        Static rclast As rcData = task.rcD
 
         Dim clickIndex = redC.rcMap.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X)
-        Circle(dst2, task.rcOldD.maxDist, task.DotSize + 2, task.highlight, -1)
+        Circle(dst2, task.rcD.maxDist, task.DotSize + 2, task.highlight, -1)
 
         knn.trainInput.Clear()
         Dim indexList As New List(Of Integer)
         For Each rc In redC.rcList
-            If rc.mapID = task.rcOldD.mapID Then
+            If rc.mapID = task.rcD.mapID Then
                 knn.trainInput.Add(New Point2f(rc.maxDist.X, rc.maxDist.Y))
                 indexList.Add(rc.index)
             End If
@@ -120,10 +119,10 @@ Public Class Track_FindNearest : Inherits TaskParent
             SetTrueText(CStr(knn.result(0, i)), rc.maxDist)
             SetTrueText(CStr(knn.result(0, i)), rc.maxDist, 3)
         Next
-        task.clickPoint = task.rcOldD.maxDist
-        labels(3) = "Map ID = " + CStr(task.rcOldD.mapID)
+        task.clickPoint = task.rcD.maxDist
+        labels(3) = "Map ID = " + CStr(task.rcD.mapID)
         SetTrueText(redC.strOut, 1)
 
-        rclast = task.rcOldD
+        rclast = task.rcD
     End Sub
 End Class

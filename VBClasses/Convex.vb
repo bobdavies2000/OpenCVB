@@ -22,8 +22,8 @@ Namespace VBClasses
             options.Run()
 
             Dim hullList As New List(Of cv.Point)
-            If task.rcOldD IsNot Nothing Then
-                If task.rcOldD.contour IsNot Nothing Then hullList = task.rcOldD.contour
+            If task.rcD IsNot Nothing Then
+                If task.rcD.contour IsNot Nothing Then hullList = task.rcD.contour
             End If
 
             If standaloneTest() Then
@@ -70,12 +70,12 @@ Namespace VBClasses
 
             SetTrueText(redC.strOut, 3)
 
-            If task.rcOldD.contour IsNot Nothing Then
+            If task.rcD.contour IsNot Nothing Then
                 convex.Run(src)
 
                 dst3.SetTo(0)
-                dst3(task.rcOldD.rect) = convex.dst2(New cv.Rect(0, 0, task.rcOldD.rect.Width, task.rcOldD.rect.Height))
-                Circle(dst3, task.rcOldD.maxDist, task.DotSize, white, -1, task.lineType)
+                dst3(task.rcD.rect) = convex.dst2(New cv.Rect(0, 0, task.rcD.rect.Width, task.rcD.rect.Height))
+                Circle(dst3, task.rcD.maxDist, task.DotSize, white, -1, task.lineType)
             End If
         End Sub
     End Class
@@ -121,7 +121,7 @@ Namespace VBClasses
 
     Public Class Convex_RedColorDefects : Inherits TaskParent
         Dim contours As New Contour_Largest
-        Dim redC As New RedCloud_Basics
+        Dim redC As New RedC_Basics
         Public Sub New()
             If standalone Then task.gOptions.displayDst1.Checked = True
             labels(2) = "Hull outline in yellow, red is hull with defects removed.  Select any cell in the upper right..."
@@ -159,7 +159,7 @@ Namespace VBClasses
 
             Utility_Basics.selectCell(redC.rcMap, redC.rcList)
 
-            Dim rc = task.rcOldD
+            Dim rc = task.rcD
             Dim sz = New Size(dst2.Height * rc.mask.Width / rc.mask.Height, dst2.Height)
             If rc.mask.Width > rc.mask.Height Then
                 sz = New Size(dst2.Width, dst2.Height * rc.mask.Height / rc.mask.Width)

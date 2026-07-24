@@ -570,109 +570,109 @@ Namespace VBClasses
 
 
 
-        Public Class rcDataOld
-            Public age As Integer = 1
-            Public color As cv.Scalar
-            Public colorChange As Integer ' 0 no change, 1 , 
-            Public contour As List(Of cv.Point)
-            Public contour3D As New List(Of cv.Point3f) ' here for compatibility.
-            Public depthDelta As Single
-            Public eq As cv.Vec4f ' only here for compatibility
-            Public gridIndex As Integer
-            Public hull As List(Of cv.Point)
-            Public mapID As Integer
-            Public index As Integer
-            Public indexLast As Integer ' only here for compatibility
-            Public mask As New cv.Mat
-            Public maxDist As cv.Point
-            Public multiMask As Boolean ' indicates if RedWGrid found duplicate wGrid points in the rclist.
-            Public nabs As New List(Of Integer) ' here for compatibility.
-            Public pixels As Integer
-            Public rect As cv.Rect
-            Public wGrid As cv.Point3d
-            Public wcMean As cv.Scalar
-            Public Sub New()
-            End Sub
-            Public Sub New(_mask As cv.Mat, _rect As cv.Rect, _mapID As Integer)
-                Dim reduction As Integer = task.fOptions.ReductionDepth.Value
-                rect = _rect
-                If _mapID >= 0 Then
-                    InRange(_mask, _mapID, _mapID, mask)
-                    mapID = _mapID
-                Else
-                    mask = _mask.Clone
-                End If
-                contour = ContourBuild(mask)
-                If _mapID >= 0 Then
-                    If contour.Count >= 3 Then ' need at least 3 points for a contour.
-                        Dim listOfPoints = New List(Of List(Of cv.Point))({contour})
-                        mask = New cv.Mat(mask.Size, cv.MatType.CV_8U, 0)
-                        DrawContours(mask, listOfPoints, 0, cv.Scalar.All(mapID), -1, cv.LineTypes.Link4)
+        'Public Class rcData
+        '    Public age As Integer = 1
+        '    Public color As cv.Scalar
+        '    Public colorChange As Integer ' 0 no change, 1 , 
+        '    Public contour As List(Of cv.Point)
+        '    Public contour3D As New List(Of cv.Point3f) ' here for compatibility.
+        '    Public depthDelta As Single
+        '    Public eq As cv.Vec4f ' only here for compatibility
+        '    Public gridIndex As Integer
+        '    Public hull As List(Of cv.Point)
+        '    Public mapID As Integer
+        '    Public index As Integer
+        '    Public indexLast As Integer ' only here for compatibility
+        '    Public mask As New cv.Mat
+        '    Public maxDist As cv.Point
+        '    Public multiMask As Boolean ' indicates if RedWGrid found duplicate wGrid points in the rclist.
+        '    Public nabs As New List(Of Integer) ' here for compatibility.
+        '    Public pixels As Integer
+        '    Public rect As cv.Rect
+        '    Public wGrid As cv.Point3d
+        '    Public wcMean As cv.Scalar
+        '    Public Sub New()
+        '    End Sub
+        '    Public Sub New(_mask As cv.Mat, _rect As cv.Rect, _mapID As Integer)
+        '        Dim reduction As Integer = task.fOptions.ReductionDepth.Value
+        '        rect = _rect
+        '        If _mapID >= 0 Then
+        '            InRange(_mask, _mapID, _mapID, mask)
+        '            mapID = _mapID
+        '        Else
+        '            mask = _mask.Clone
+        '        End If
+        '        contour = ContourBuild(mask)
+        '        If _mapID >= 0 Then
+        '            If contour.Count >= 3 Then ' need at least 3 points for a contour.
+        '                Dim listOfPoints = New List(Of List(Of cv.Point))({contour})
+        '                mask = New cv.Mat(mask.Size, cv.MatType.CV_8U, 0)
+        '                DrawContours(mask, listOfPoints, 0, cv.Scalar.All(mapID), -1, cv.LineTypes.Link4)
 
-                        ' keep the hull points around (there aren't many of them.)
-                        hull = ConvexHull(contour.ToArray, True).ToList
-                    End If
-                End If
-                buildMaxDist()
+        '                ' keep the hull points around (there aren't many of them.)
+        '                hull = ConvexHull(contour.ToArray, True).ToList
+        '            End If
+        '        End If
+        '        buildMaxDist()
 
-                gridIndex = task.gridMap.Get(Of Integer)(maxDist.Y, maxDist.X)
-                If _mapID >= 0 Then color = task.scalarColors(mapID Mod 255)
-                pixels = CountNonZero(mask)
+        '        gridIndex = task.gridMap.Get(Of Integer)(maxDist.Y, maxDist.X)
+        '        If _mapID >= 0 Then color = task.scalarColors(mapID Mod 255)
+        '        pixels = CountNonZero(mask)
 
-                wcMean = Mean(task.pointCloud(rect), task.depthmask(rect))
-                Dim x = Math.Round(wcMean(0) * 1000 / reduction)
-                Dim y = Math.Round(wcMean(1) * 1000 / reduction)
-                Dim z = Math.Round(wcMean(2) * 1000 / reduction)
-                If Math.Abs(x) < 0.000000000001 Then x = 0
-                If Math.Abs(y) < 0.000000000001 Then y = 0
-                If Math.Abs(z) < 0.000000000001 Then z = 0
-                wGrid = New cv.Point3d(x, y, z)
-                If Single.IsInfinity(wcMean(2)) Then depthDelta = 0
-            End Sub
-            Public Shared Function getHullMask(hull As List(Of cv.Point), mask As cv.Mat) As cv.Mat
-                Dim hullMask = New cv.Mat(mask.Size, cv.MatType.CV_8U, 0)
-                Dim listOfPoints = New List(Of List(Of cv.Point))({hull})
-                DrawContours(hullMask, listOfPoints, 0, cv.Scalar.All(255), -1, cv.LineTypes.Link8)
-                Return hullMask
-            End Function
-            Public Sub buildMaxDist()
-                Dim tmp As cv.Mat = mask.Clone
-                ' Rectangle is definitely needed.  Test it again with MaxDist_NoRectangle to verify that the rectangle is essential.
-                Rectangle(tmp, New cv.Rect(0, 0, mask.Width, mask.Height), cv.Scalar.All(0), 1)
-                Dim distance32f As New cv.Mat
-                DistanceTransform(tmp, distance32f, cv.DistanceTypes.L1, cv.DistanceTransformMasks.Precise, cv.MatType.CV_32F)
-                Dim mm As mmData = GetMinMax(distance32f)
-                maxDist.X = mm.maxLoc.X + rect.X
-                maxDist.Y = mm.maxLoc.Y + rect.Y
-            End Sub
-            Public Function displayCell() As String
-                Dim strout = "Age = " + CStr(age) + vbCrLf
-                strout += "Color = " + color.ToString + vbCrLf
-                If contour IsNot Nothing Then
-                    strout += "Contour count = " + CStr(contour.Count) + vbCrLf
-                End If
-                If Single.IsNaN(depthDelta) = False Then
-                    strout += "DepthDelta (mm's) = " + CInt(depthDelta * 1000).ToString("00") + vbCrLf
-                    strout += "Hull count = " + If(hull Is Nothing, "0", CStr(hull.Count)) + vbCrLf
-                    strout += "mapID = " + CStr(mapID) + vbCrLf
-                    strout += "index = " + CStr(index) + vbCrLf
-                    strout += "MaxDist = " + CStr(maxDist.X) + "," + CStr(maxDist.Y) + vbCrLf
-                    strout += "Multi-Mask flag = " + CStr(multiMask) + vbCrLf
-                    strout += "Pixel count = " + CStr(pixels) + vbCrLf
-                    strout += "Rect: X = " + CStr(rect.X) + ", Y = " + CStr(rect.Y) + ", "
-                    strout += "width = " + CStr(rect.Width) + ", height = " + CStr(rect.Height) + vbCrLf
-                    strout += "World Coordinates = " + wcMean(0).ToString(fmt3) + " " +
-                                                   wcMean(1).ToString(fmt3) + " " +
-                                                   wcMean(2).ToString(fmt3) + vbCrLf
-                    strout += "World Grid coordinates = " + CStr(wGrid.X) + ", " + CStr(wGrid.Y) + vbCrLf
-                    strout += "ClickPoint = " + CStr(task.clickPoint.X) + ", " + CStr(task.clickPoint.Y) + vbCrLf
-                Else
-                    strout = "The depth data for this cell is NaN. StereoLabs specific problem."
-                End If
+        '        wcMean = Mean(task.pointCloud(rect), task.depthmask(rect))
+        '        Dim x = Math.Round(wcMean(0) * 1000 / reduction)
+        '        Dim y = Math.Round(wcMean(1) * 1000 / reduction)
+        '        Dim z = Math.Round(wcMean(2) * 1000 / reduction)
+        '        If Math.Abs(x) < 0.000000000001 Then x = 0
+        '        If Math.Abs(y) < 0.000000000001 Then y = 0
+        '        If Math.Abs(z) < 0.000000000001 Then z = 0
+        '        wGrid = New cv.Point3d(x, y, z)
+        '        If Single.IsInfinity(wcMean(2)) Then depthDelta = 0
+        '    End Sub
+        '    Public Shared Function getHullMask(hull As List(Of cv.Point), mask As cv.Mat) As cv.Mat
+        '        Dim hullMask = New cv.Mat(mask.Size, cv.MatType.CV_8U, 0)
+        '        Dim listOfPoints = New List(Of List(Of cv.Point))({hull})
+        '        DrawContours(hullMask, listOfPoints, 0, cv.Scalar.All(255), -1, cv.LineTypes.Link8)
+        '        Return hullMask
+        '    End Function
+        '    Public Sub buildMaxDist()
+        '        Dim tmp As cv.Mat = mask.Clone
+        '        ' Rectangle is definitely needed.  Test it again with MaxDist_NoRectangle to verify that the rectangle is essential.
+        '        Rectangle(tmp, New cv.Rect(0, 0, mask.Width, mask.Height), cv.Scalar.All(0), 1)
+        '        Dim distance32f As New cv.Mat
+        '        DistanceTransform(tmp, distance32f, cv.DistanceTypes.L1, cv.DistanceTransformMasks.Precise, cv.MatType.CV_32F)
+        '        Dim mm As mmData = GetMinMax(distance32f)
+        '        maxDist.X = mm.maxLoc.X + rect.X
+        '        maxDist.Y = mm.maxLoc.Y + rect.Y
+        '    End Sub
+        '    Public Function displayCell() As String
+        '        Dim strout = "Age = " + CStr(age) + vbCrLf
+        '        strout += "Color = " + color.ToString + vbCrLf
+        '        If contour IsNot Nothing Then
+        '            strout += "Contour count = " + CStr(contour.Count) + vbCrLf
+        '        End If
+        '        If Single.IsNaN(depthDelta) = False Then
+        '            strout += "DepthDelta (mm's) = " + CInt(depthDelta * 1000).ToString("00") + vbCrLf
+        '            strout += "Hull count = " + If(hull Is Nothing, "0", CStr(hull.Count)) + vbCrLf
+        '            strout += "mapID = " + CStr(mapID) + vbCrLf
+        '            strout += "index = " + CStr(index) + vbCrLf
+        '            strout += "MaxDist = " + CStr(maxDist.X) + "," + CStr(maxDist.Y) + vbCrLf
+        '            strout += "Multi-Mask flag = " + CStr(multiMask) + vbCrLf
+        '            strout += "Pixel count = " + CStr(pixels) + vbCrLf
+        '            strout += "Rect: X = " + CStr(rect.X) + ", Y = " + CStr(rect.Y) + ", "
+        '            strout += "width = " + CStr(rect.Width) + ", height = " + CStr(rect.Height) + vbCrLf
+        '            strout += "World Coordinates = " + wcMean(0).ToString(fmt3) + " " +
+        '                                           wcMean(1).ToString(fmt3) + " " +
+        '                                           wcMean(2).ToString(fmt3) + vbCrLf
+        '            strout += "World Grid coordinates = " + CStr(wGrid.X) + ", " + CStr(wGrid.Y) + vbCrLf
+        '            strout += "ClickPoint = " + CStr(task.clickPoint.X) + ", " + CStr(task.clickPoint.Y) + vbCrLf
+        '        Else
+        '            strout = "The depth data for this cell is NaN. StereoLabs specific problem."
+        '        End If
 
-                Return strout
-            End Function
-        End Class
+        '        Return strout
+        '    End Function
+        'End Class
 
 
 

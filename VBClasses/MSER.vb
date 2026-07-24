@@ -3,17 +3,17 @@ Namespace VBClasses
     ' https://github.com/opencv/opencv/blob/master/samples/cpp/detect_mser.cpp
     Public Class MSER_Basics : Inherits TaskParent
         Dim detect As New MSER_CPP
-        Public mserCells As New List(Of rcDataOld)
+        Public mserCells As New List(Of rcData)
         Public floodPoints As New List(Of cv.Point)
-        Public redC As New RedColor_Basics
+        Public redC As New RedC_Basics
         Public Sub New()
             desc = "Create cells for each region in MSER (Maximally Stable Extremal Region) output"
         End Sub
-        Public Function RebuildRCMap(rcMap As Mat, rclist As List(Of rcDataOld)) As Mat
+        Public Shared Function RebuildRCMap(rcMap As Mat, rclist As List(Of rcData)) As Mat
             Dim dst As New Mat(task.workRes, MatType.CV_8UC3, 0)
             For Each rc In rclist
                 rcMap(rc.rect).SetTo(rc.mapID, rc.mask)
-                dst(rc.rect).SetTo(rc.color, rc.mask)
+                dst(rc.rect).SetTo(task.scalarColors(rc.index Mod 255), rc.mask)
                 If rc.mapID >= 255 Then Exit For
             Next
             Return dst
@@ -32,15 +32,14 @@ Namespace VBClasses
             Next
             floodPoints = New List(Of cv.Point)(detect.floodPoints)
 
-            Dim sortedCells As New SortedList(Of Integer, rcDataOld)(New compareAllowIdenticalIntegerInverted)
+            Dim sortedCells As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
 
-            Dim matched As New SortedList(Of Integer, Integer)(New compareAllowIdenticalIntegerInverted)
+            Dim matched As New List(Of Integer)
 
             CvtColor(detect.dst2, dst0, ColorConversionCodes.BGR2GRAY)
             For i = 0 To boxes.Count - 1
                 Dim index = boxes.ElementAt(i).Value
-                Dim rc As New rcDataOld
-                rc.rect = boxInput(index)
+                Dim rc As New rcData With {.rect = boxInput(index)}
                 Dim val = dst0.Get(Of Byte)(floodPoints(index).Y, floodPoints(index).X)
                 InRange(dst0(rc.rect), val, val, rc.mask)
                 rc.pixels = detect.maskCounts(index)
@@ -48,21 +47,16 @@ Namespace VBClasses
                 rc.contour = ContourBuild(rc.mask)
                 DrawTour(rc.mask, rc.contour, 255, -1)
 
-                rc.indexLast = redC.rcMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
-                If rc.indexLast <> 0 And rc.indexLast < redC.rcList.Count Then
-                    Dim lrc = redC.rcList(rc.indexLast)
-                    rc.color = lrc.color
-                    matched.Add(rc.indexLast, rc.indexLast)
+                Dim indexLast = redC.rcMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
+                If indexLast <> 0 And indexLast < redC.rcList.Count Then
+                    Dim lrc = redC.rcList(indexLast)
+                    matched.Add(indexLast)
                 End If
 
-                Dim colorStdev As Scalar, colormean As Scalar
-                MeanStdDev(task.color(rc.rect), colormean, colorStdev, rc.mask)
-                rc.color = colormean
                 If rc.pixels > 0 Then sortedCells.Add(rc.pixels, rc)
             Next
 
-            redC.rcList = New List(Of rcDataOld)(sortedCells.Values)
-            dst2 = RebuildRCMap(redC.rcMap, redC.rcList)
+            redC.rcList = New List(Of rcData)(sortedCells.Values)
 
             labels(2) = CStr(redC.rcList.Count) + " cells were identified and " + CStr(matched.Count) + " were matched."
         End Sub
@@ -112,29 +106,28 @@ Namespace VBClasses
                 boxes.Add(r.Width * r.Height, i)
             Next
 
-            Dim rclist As New List(Of rcDataOld)({New rcDataOld})
+            Dim rclist As New List(Of rcData)({New rcData})
             dst1.SetTo(0)
             dst2.SetTo(0)
             Dim lastMap = cellMap.Clone
             cellMap.SetTo(0)
             Dim matchCount As Integer
             For i = 0 To floodPoints.Count - 1
-                Dim rc As New rcDataOld
-                rc.mapID = rclist.Count
+                Dim rc As New rcData With {.mapID = rclist.Count}
                 Dim val = dst3.Get(Of Byte)(floodPoints(i).Y, floodPoints(i).X)
                 rc.rect = boxInput(boxes.ElementAt(i).Value)
                 InRange(dst3(rc.rect), val, val, rc.mask)
                 dst1(rc.rect).SetTo(rc.mapID, rc.mask)
                 rc.pixels = detect.maskCounts(i)
 
-                rc.indexLast = lastMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
+                Dim indexLast = lastMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
 
-                rc.color = task.scalarColors(i Mod 255)
-                If rc.indexLast <> 0 Then matchCount += 1
+                Dim color = task.scalarColors(i Mod 255)
+                If indexLast <> 0 Then matchCount += 1
 
                 rclist.Add(rc)
                 cellMap(rc.rect).SetTo(rc.mapID, rc.mask)
-                dst2(rc.rect).SetTo(rc.color, rc.mask)
+                dst2(rc.rect).SetTo(task.scalarColors(rc.index), rc.mask)
             Next
 
             labels(2) = detect.labels(2) + " and " + CStr(matchCount) + " were matched to the previous frame"
@@ -188,7 +181,7 @@ Namespace VBClasses
         Public Sub New()
             desc = "Cursor.ai: Run the core MSER (Maximally Stable Extremal Region) algorithm"
         End Sub
-        Public Function DetectMSERLike(src As Mat,
+        Public Shared Function DetectMSERLike(src As Mat,
                                Optional minArea As Integer = 60,
                                Optional maxArea As Integer = 5000,
                                Optional stabilityThreshold As Double = 0.25) As List(Of cv.Rect)
@@ -226,8 +219,8 @@ Namespace VBClasses
 
                     Dim id As Integer = rect.GetHashCode()
 
-                    If prevAreas.ContainsKey(id) Then
-                        Dim prevArea As Integer = prevAreas(id)
+                    Dim prevArea As Integer
+                    If prevAreas.TryGetValue(id, prevArea) Then
                         Dim variation As Double = Math.Abs(area - prevArea) / prevArea
 
                         If variation < stabilityThreshold Then
@@ -268,14 +261,14 @@ Namespace VBClasses
 
     ' https://github.com/opencv/opencv/blob/master/samples/cpp/detect_mser.cpp
     Public Class MSER_SyntheticInput : Inherits TaskParent
-        Private Sub addNestedRectangles(img As Mat, p0 As cv.Point, width() As Integer, color() As Integer, n As Integer)
+        Private Shared Sub addNestedRectangles(img As Mat, p0 As cv.Point, width() As Integer, color() As Integer, n As Integer)
             For i = 0 To n - 1
                 Rectangle(img, New cv.Rect(p0.X, p0.Y, width(i), width(i)), Scalar.All(color(i)), 1)
                 p0 += New cv.Point((width(i) - width(i + 1)) / 2, (width(i) - width(i + 1)) / 2)
                 FloodFill(img, p0, color(i))
             Next
         End Sub
-        Private Sub addNestedCircles(img As Mat, p0 As cv.Point, width() As Integer, color() As Integer, n As Integer)
+        Private Shared Sub addNestedCircles(img As Mat, p0 As cv.Point, width() As Integer, color() As Integer, n As Integer)
             For i = 0 To n - 1
                 Circle(img, p0, width(i) / 2, color(i), -1, task.lineType)
                 FloodFill(img, p0, color(i))
@@ -394,7 +387,7 @@ Namespace VBClasses
             For Each rc In mser.redC.rcList
                 rc.hull = ConvexHull(rc.contour.ToArray, True).ToList
                 pixels += rc.pixels
-                DrawTour(dst3(rc.rect), rc.hull, rc.color, -1)
+                DrawTour(dst3(rc.rect), rc.hull, task.scalarColors(rc.index Mod 255), -1)
             Next
 
             labels(2) = CStr(mser.redC.rcList.Count) + " Regions with average size " +

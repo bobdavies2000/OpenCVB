@@ -876,7 +876,6 @@ Namespace VBClasses
             cloudY.Set(Of Single)(mm.maxLoc.Y, mm.maxLoc.X, saveMaxVal)
             cloudY = (cloudY - saveMinVal).ToMat
             ConvertScaleAbs(cloudY, cloudY, 255 / (-saveMinVal + saveMaxVal))
-            mm = GetMinMax(cloudY)
             cloudY.SetTo(0, task.noDepthMask)
             masks.Run(cloudY)
             dst2 = masks.dst2
@@ -1532,7 +1531,7 @@ Namespace VBClasses
 
     Public Class Histogram_Depth : Inherits TaskParent
         Public plotHist As New PlotBar_Basics
-        Public rc As rcDataOld
+        Public rc As rcData
         Public mm As mmData
         Public histogram As New Mat
         Public Sub New()

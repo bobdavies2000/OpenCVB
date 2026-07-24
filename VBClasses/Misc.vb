@@ -545,4 +545,104 @@ Namespace VBClasses
             End If
         End Sub
     End Class
+
+
+
+
+    Public Class XR_MaxDist_Basics : Inherits TaskParent
+        Dim redC As New RedC_Basics
+        Public Sub New()
+            labels(3) = "Below left shows hullMask while below shows the contour mask."
+            desc = "Find the cv.Point farthest from the edges of a mask."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            redC.Run(src)
+            dst2 = redC.dst2
+            labels(2) = redC.labels(2)
+
+            dst3.SetTo(0)
+            Dim index As Integer = 1
+            For Each rc In redC.rcList
+                Dim rcTest = New rcData(rc.mask, rc.rect, index)
+                If rcTest.mapID >= 0 Then
+                    dst3(rcTest.rect).SetTo(task.scalarColors(rc.index Mod 255), rcTest.mask)
+                    Circle(dst3, rc.maxDist, task.DotSize, task.highlight, -1)
+                    index += 1
+                End If
+            Next
+        End Sub
+    End Class
+
+
+
+
+
+    Public Class XR_MaxDist_NoRectangle : Inherits TaskParent
+        Dim redC As New RedC_Basics
+        Public Sub New()
+            labels(3) = "Below left shows hullMask while below shows the contour mask."
+            desc = "Does the mask need to have rectangle of zeros?  Answer: yes"
+        End Sub
+        Public Shared Function setCloudData(_mask As Mat, _rect As cv.Rect, _index As Integer,
+                                                    Optional zeroRectangle As Boolean = True) As rcData
+            Dim rc As New rcData
+            InRange(_mask, _index, _index, rc.mask)
+            rc.rect = _rect
+            rc.mapID = _index
+            Dim contour = ContourBuild(rc.mask)
+            If contour.Count < 3 Then Return Nothing
+            Dim listOfPoints = New List(Of List(Of cv.Point))({contour})
+            rc.mask = New Mat(rc.mask.Size, MatType.CV_8U, 0)
+            DrawContours(rc.mask, listOfPoints, 0, Scalar.All(255), -1, LineTypes.Link4)
+
+            If zeroRectangle Then
+                Dim tmp As Mat = rc.mask.Clone
+                ' see XR_MaxDist_NoRectangle below to confirm this is needed (it is.)
+                Rectangle(tmp, New cv.Rect(0, 0, rc.mask.Width, rc.mask.Height), Scalar.All(0), 1)
+                Dim distance32f As New Mat
+                DistanceTransform(tmp, distance32f, DistanceTypes.L1, DistanceTransformMasks.Precise, MatType.CV_32F)
+                Dim mm As mmData = vbc.GetMinMax(distance32f)
+                rc.maxDist.X = mm.maxLoc.X + rc.rect.X
+                rc.maxDist.Y = mm.maxLoc.Y + rc.rect.Y
+            End If
+
+            rc.hull = ConvexHull(contour.ToArray, True).ToList
+
+            rc.pixels = CountNonZero(rc.mask)
+            Return rc
+        End Function
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            redC.Run(src)
+            dst2 = redC.dst2
+            labels(2) = redC.labels(2)
+
+            Dim rcList As New List(Of rcData)
+            dst3.SetTo(0)
+            For Each rc In redC.rcList
+                ' This rcList will NOT use the rectangle of zeros (definitely need the rectangle!)
+                Dim rcTest = setCloudData(rc.mask, rc.rect, rcList.Count + 1, False)
+                If rcTest Is Nothing Then Continue For
+                If rcTest.mapID >= 0 Then
+                    dst3(rcTest.rect).SetTo(task.scalarColors(rc.index Mod 255), rcTest.mask)
+                    Circle(dst3, rc.maxDist, task.DotSize, task.highlight, -1)
+                    rcList.Add(rcTest)
+                End If
+            Next
+        End Sub
+    End Class
+
+
+
+
+
+    Public Class Magnify_Basics : Inherits TaskParent
+        Public Sub New()
+            task.drawRect = New cv.Rect(10, 10, 50, 50)
+            desc = "Magnify the drawn rectangle on dst2 and display it."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            dst2 = src
+            If task.drawRect.Width > 0 And task.drawRect.Height > 0 Then dst3 = src(task.drawRect)
+        End Sub
+    End Class
 End Namespace

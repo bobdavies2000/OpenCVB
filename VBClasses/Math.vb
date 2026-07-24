@@ -55,8 +55,7 @@ Namespace VBClasses
             medianVal = computeMedian(src, New Mat, src.Total, task.histogramBins, rangeMin, rangeMax)
 
             If standaloneTest() Then
-                Dim mask = New Mat
-                mask = src.GreaterThan(medianVal)
+                Dim mask = src.GreaterThan(medianVal)
 
                 dst2.SetTo(0)
                 src.CopyTo(dst2, mask)
@@ -355,29 +354,29 @@ Namespace VBClasses
 
 
     ' https://stackoverflow.com/questions/7572640/how-do-i-know-if-two-vectors-are-near-parallel
-    Public Class Math_DotProduct3D : Inherits TaskParent
-        Public v1 = New Point3f(1, 0, 0)
-        Public v2 = New Point3f(5, 0, 0)
-        Public showWork As Boolean = True
-        Public Sub New()
-            labels = {"", "", "Parallel Test Output", ""}
-            desc = "Test if 2 vectors are parallel"
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            v1 *= 1 / Math.Sqrt(v1.X * v1.X + v1.Y * v1.Y + v1.Z * v1.Z) ' normalize the input
-            v2 *= 1 / Math.Sqrt(v2.X * v2.X + v2.Y * v2.Y + v2.Z * v2.Z)
-            Dim n1 = Plane_Basics.dotProduct3D(v1, v2)
+    'Public Class Math_DotProduct3D : Inherits TaskParent
+    '    Public v1 = New Point3f(1, 0, 0)
+    '    Public v2 = New Point3f(5, 0, 0)
+    '    Public showWork As Boolean = True
+    '    Public Sub New()
+    '        labels = {"", "", "Parallel Test Output", ""}
+    '        desc = "Test if 2 vectors are parallel"
+    '    End Sub
+    '    Public Overrides Sub RunAlg(src As cv.Mat)
+    '        v1 *= 1 / Math.Sqrt(v1.X * v1.X + v1.Y * v1.Y + v1.Z * v1.Z) ' normalize the input
+    '        v2 *= 1 / Math.Sqrt(v2.X * v2.X + v2.Y * v2.Y + v2.Z * v2.Z)
+    '        Dim n1 = Plane_Basics.dotProduct3D(v1, v2)
 
-            If showWork Then
-                strOut = "Input: " + vbCrLf
-                strOut += "normalized v1" + " = " + v1.X.ToString(fmt3) + ", " + v1.Y.ToString(fmt3) + ", " + v1.Z.ToString(fmt3) + vbCrLf
-                strOut += "normalized v2" + " = " + v2.X.ToString(fmt3) + ", " + v2.Y.ToString(fmt3) + ", " + v2.Z.ToString(fmt3) + vbCrLf
+    '        If showWork Then
+    '            strOut = "Input: " + vbCrLf
+    '            strOut += "normalized v1" + " = " + v1.X.ToString(fmt3) + ", " + v1.Y.ToString(fmt3) + ", " + v1.Z.ToString(fmt3) + vbCrLf
+    '            strOut += "normalized v2" + " = " + v2.X.ToString(fmt3) + ", " + v2.Y.ToString(fmt3) + ", " + v2.Z.ToString(fmt3) + vbCrLf
 
-                strOut += "Dot Product = " + n1.ToString(fmt3) + " - if close to 1, the vectors are parallel" + vbCrLf
-                SetTrueText(strOut, 2)
-            End If
-        End Sub
-    End Class
+    '            strOut += "Dot Product = " + n1.ToString(fmt3) + " - if close to 1, the vectors are parallel" + vbCrLf
+    '            SetTrueText(strOut, 2)
+    '        End If
+    '    End Sub
+    'End Class
 
 
 

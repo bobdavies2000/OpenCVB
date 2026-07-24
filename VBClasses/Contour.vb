@@ -345,51 +345,51 @@ Namespace VBClasses
 
 
 
-    Public Class Contour_SidePoints : Inherits TaskParent
-        Public vecLeft As Vec3f, vecRight As Vec3f, vecTop As Vec3f, vecBot As Vec3f
-        Public ptLeft As cv.Point, ptRight As cv.Point, ptTop As cv.Point, ptBot As cv.Point
-        Public sides As New Profile_Basics
-        Public Sub New()
-            desc = "Find the left/right and top/bottom sides of a contour"
-        End Sub
-        Private Shared Function vec3fToString(v As Vec3f) As String
-            Return v(0).ToString(fmt3) + vbTab + v(1).ToString(fmt3) + vbTab + v(2).ToString(fmt3)
-        End Function
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            sides.Run(src)
-            dst2 = sides.dst2
-            Dim rc = task.rcOldD
+    'Public Class Contour_SidePoints : Inherits TaskParent
+    '    Public vecLeft As Vec3f, vecRight As Vec3f, vecTop As Vec3f, vecBot As Vec3f
+    '    Public ptLeft As cv.Point, ptRight As cv.Point, ptTop As cv.Point, ptBot As cv.Point
+    '    Public sides As New Profile_Basics
+    '    Public Sub New()
+    '        desc = "Find the left/right and top/bottom sides of a contour"
+    '    End Sub
+    '    Private Shared Function vec3fToString(v As Vec3f) As String
+    '        Return v(0).ToString(fmt3) + vbTab + v(1).ToString(fmt3) + vbTab + v(2).ToString(fmt3)
+    '    End Function
+    '    Public Overrides Sub RunAlg(src As cv.Mat)
+    '        sides.Run(src)
+    '        dst2 = sides.dst2
+    '        Dim rc = task.rcD
 
-            If sides.corners.Count > 0 And task.heartBeat Then
-                ptLeft = sides.corners(1)
-                ptRight = sides.corners(2)
-                ptTop = sides.corners(3)
-                ptBot = sides.corners(4)
+    '        If sides.corners.Count > 0 And task.heartBeat Then
+    '            ptLeft = sides.corners(1)
+    '            ptRight = sides.corners(2)
+    '            ptTop = sides.corners(3)
+    '            ptBot = sides.corners(4)
 
-                vecLeft = sides.corners3D(1)
-                vecRight = sides.corners3D(2)
+    '            vecLeft = sides.corners3D(1)
+    '            vecRight = sides.corners3D(2)
 
-                vecTop = sides.corners3D(3)
-                vecBot = sides.corners3D(4)
+    '            vecTop = sides.corners3D(3)
+    '            vecBot = sides.corners3D(4)
 
-                If rc.contour.Count > 0 Then
-                    dst3.SetTo(0)
-                    DrawTour(dst3(rc.rect), rc.contour, Scalar.Yellow)
-                    Line(dst3, ptLeft, ptRight, white, task.lineWidth, task.lineWidth)
-                    Line(dst3, ptTop, ptBot, white, task.lineWidth, task.lineWidth)
-                End If
-                If task.heartBeat Then
-                    strOut = "X     " + vbTab + "Y     " + vbTab + "Z " + vbTab + " 3D location (units=meters)" + vbCrLf
-                    strOut += vec3fToString(vecLeft) + vbTab + " Left side average (blue)" + vbCrLf
-                    strOut += vec3fToString(vecRight) + vbTab + " Right side average (red)" + vbCrLf
-                    strOut += vec3fToString(vecTop) + vbTab + " Top side average (green)" + vbCrLf
-                    strOut += vec3fToString(vecBot) + vbTab + " Bottom side average (white)" + vbCrLf + vbCrLf
-                    strOut += "The contour may show points further away but they don't have depth."
-                End If
-            End If
-            SetTrueText(strOut, 3)
-        End Sub
-    End Class
+    '            If rc.contour.Count > 0 Then
+    '                dst3.SetTo(0)
+    '                DrawTour(dst3(rc.rect), rc.contour, Scalar.Yellow)
+    '                Line(dst3, ptLeft, ptRight, white, task.lineWidth, task.lineWidth)
+    '                Line(dst3, ptTop, ptBot, white, task.lineWidth, task.lineWidth)
+    '            End If
+    '            If task.heartBeat Then
+    '                strOut = "X     " + vbTab + "Y     " + vbTab + "Z " + vbTab + " 3D location (units=meters)" + vbCrLf
+    '                strOut += vec3fToString(vecLeft) + vbTab + " Left side average (blue)" + vbCrLf
+    '                strOut += vec3fToString(vecRight) + vbTab + " Right side average (red)" + vbCrLf
+    '                strOut += vec3fToString(vecTop) + vbTab + " Top side average (green)" + vbCrLf
+    '                strOut += vec3fToString(vecBot) + vbTab + " Bottom side average (white)" + vbCrLf + vbCrLf
+    '                strOut += "The contour may show points further away but they don't have depth."
+    '            End If
+    '        End If
+    '        SetTrueText(strOut, 3)
+    '    End Sub
+    'End Class
 
 
 
@@ -491,14 +491,14 @@ Namespace VBClasses
 
             SetTrueText(redC.strOut, 3)
 
-            Dim tmp = task.rcOldD.mask.Clone
+            Dim tmp = task.rcD.mask.Clone
 
             Dim allContours As cv.Point()() = Nothing
             If options.retrievalMode = RetrievalModes.FloodFill Then tmp.ConvertTo(tmp, MatType.CV_32SC1)
             FindContours(tmp, allContours, Nothing, options.retrievalMode, options.ApproximationMode)
 
             dst3.SetTo(0)
-            DrawContours(dst3(task.rcOldD.rect), allContours, -1, Scalar.Yellow)
+            DrawContours(dst3(task.rcD.rect), allContours, -1, Scalar.Yellow)
         End Sub
     End Class
 
@@ -522,7 +522,7 @@ Namespace VBClasses
             SetTrueText(redC.strOut, 3)
 
             Utility_Basics.selectCell(redC.rcMap, redC.rcList)
-            Dim rc = task.rcOldD
+            Dim rc = task.rcD
 
             dst1.SetTo(0)
             dst3.SetTo(0)

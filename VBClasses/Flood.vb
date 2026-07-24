@@ -55,7 +55,7 @@ Namespace VBClasses
                         Next
 
                         rcList.Add(rc)
-                        dst2(rc.rect).SetTo(task.scalarColors(rc.index), rc.mask)
+                        dst2(rc.rect).SetTo(task.scalarColors(rc.index Mod 255), rc.mask)
                         rcMap(rc.rect).SetTo(rc.mapID, rc.mask)
                     End If
                 End If
@@ -210,7 +210,7 @@ Namespace VBClasses
             dst1.SetTo(0)
             If rcIndex >= rcList.Count Then rcIndex = 0
             Dim rc = rcList(rcIndex)
-            dst1(rc.rect).SetTo(rc.color, rc.mask)
+            dst1(rc.rect).SetTo(task.scalarColors(rc.index), rc.mask)
             If task.heartBeatLT Then
                 rcIndex += 1
                 If rcIndex >= rcList.Count Then rcIndex = 0
@@ -218,7 +218,7 @@ Namespace VBClasses
 
             dst2.SetTo(0)
             For Each rc In rcList
-                dst2(rc.rect).SetTo(rc.color, rc.mask)
+                dst2(rc.rect).SetTo(task.scalarColors(rc.index), rc.mask)
             Next
 
             labels(2) = CStr(rcList.Count) + " cells were found."
@@ -343,7 +343,7 @@ Namespace VBClasses
                         Next
 
                         rcList.Add(rc)
-                        dst2(rc.rect).SetTo(task.scalarColors(rc.index), rc.mask)
+                        dst2(rc.rect).SetTo(task.scalarColors(rc.index Mod 255), rc.mask)
                         rcMap(rc.rect).SetTo(rc.mapID, rc.mask)
                     End If
                 End If
@@ -365,4 +365,96 @@ Namespace VBClasses
             If cPtr <> 0 Then cPtr = RedFlood_Close(cPtr)
         End Sub
     End Class
+
+
+
+
+    'Public Class RedFlood_BasicsNew
+    '    Public src As Mat
+    '    Public result As Mat
+    '    Public cellRects As New List(Of Rect)
+    '    Public Sub New()
+    '    End Sub
+    '    Public Sub RunCPP(minSize As Integer)
+    '        ' result is (rows+2, cols+2) because OpenCV floodFill requires a padded mask
+    '        result = New Mat(src.Rows + 2, src.Cols + 2, MatType.CV_8U)
+    '        result.SetTo(0)
+
+    '        Dim maskFill As Integer = 255
+
+    '        ' Equivalent to C++: multimap<int, Point, greater<int>>
+    '        Dim sizeSorted As New SortedDictionary(Of Integer, List(Of Point))(Comparer(Of Integer).Create(Function(a, b) b.CompareTo(a)))
+
+    '        Dim floodFlag As Integer = FloodFillFlags.MaskOnly Or FloodFillFlags.FixedRange Or 4
+
+    '        For y = 0 To src.Rows - 1
+    '            For x = 0 To src.Cols - 1
+    '                If src.Get(Of Byte)(y, x) <> 0 Then
+    '                    Dim pt As New Point(x, y)
+
+    '                    Dim count As Integer =
+    '                    Cv2.FloodFill(
+    '                        src,
+    '                        result,
+    '                        pt,
+    '                        New Scalar(255),
+    '                        Nothing,
+    '                        New Scalar(0),
+    '                        New Scalar(0),
+    '                        floodFlag Or (maskFill << 8)
+    '                    )
+
+    '                    If count > minSize Then
+    '                        If Not sizeSorted.ContainsKey(count) Then sizeSorted(count) = New List(Of Point)
+    '                        sizeSorted(count).Add(pt)
+    '                    End If
+    '                End If
+    '            Next
+    '        Next
+
+    '        cellRects.Clear()
+    '        maskFill = 1
+    '        result.SetTo(0)
+
+    '        For Each kv In sizeSorted
+    '            For Each pt In kv.Value
+    '                Dim rect As Rect
+
+    '                Dim count As Integer =
+    '                Cv2.FloodFill(
+    '                    src,
+    '                    result,
+    '                    pt,
+    '                    New Scalar(255),
+    '                    rect,
+    '                    New Scalar(0),
+    '                    New Scalar(0),
+    '                    floodFlag Or (maskFill << 8)
+    '                )
+
+    '                If count >= 1 Then
+    '                    cellRects.Add(rect)
+
+    '                    If maskFill >= 255 Then Exit Sub
+    '                    maskFill += 1
+    '                End If
+    '            Next
+    '        Next
+    '    End Sub
+    'End Class
+
+
+
+
+
+    'Public Class RedFlood_BasicsNew : Inherits TaskParent
+    '    Public Sub New()
+    '        desc = "description"
+    '    End Sub
+    '    Public Overrides Sub RunAlg(src As cv.Mat)
+    '        CvtColor(src, src, cv.ColorConversionCodes.BGR2GRAY)
+    '    End Sub
+    'End Class
+
+
 End Namespace

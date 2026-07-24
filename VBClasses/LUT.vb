@@ -242,7 +242,7 @@ Namespace VBClasses
             SetTrueText(redC.strOut, 3)
 
             dst3.SetTo(0)
-            Dim rc = task.rcOldD
+            Dim rc = task.rcD
             src(rc.rect).CopyTo(dst3(rc.rect), rc.mask)
 
             sort3.Run(dst3)

@@ -2980,7 +2980,7 @@ Namespace VBClasses
             Dim pixels As New List(Of Integer)
             Dim counts As New List(Of Integer)
 
-            Dim rc = task.rcOldD
+            Dim rc = task.rcD
             Dim mask = rc.mask.Clone
             mask.SetTo(0, task.noDepthMask(rc.rect))
             For y = 0 To input.Height - 1
@@ -3055,7 +3055,7 @@ Namespace VBClasses
             Dim pixels As New List(Of Integer)
             Dim counts As New List(Of Integer)
 
-            Dim rc = task.rcOldD
+            Dim rc = task.rcD
             For y = 0 To input.Height - 1
                 For x = 0 To input.Width - 1
                     If rc.mask.Get(Of Byte)(y, x) > 0 Then

@@ -135,72 +135,72 @@ Namespace VBClasses
 
 
 
-    Public Class XR_DCT_Surfaces_debug : Inherits TaskParent
-        Dim mats As New Mat_4to1
-        Dim dct As New DCT_FeatureLess
-        Dim flow As New Font_FlowText
-        Dim plane As New Plane_CellColor
-        Public Sub New()
-            flow.parentData = Me
-            labels = {"", "", "Stats on the largest region below DCT threshold", "Various views of regions with DCT below threshold"}
-            If standalone Then task.gOptions.displayDst0.Checked = False
-            desc = "Find plane equation for a featureless surface - debugging one region for now."
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            ' If task.heartBeat Then flow.msgs.Clear()
+    'Public Class XR_DCT_Surfaces_debug : Inherits TaskParent
+    '    Dim mats As New Mat_4to1
+    '    Dim dct As New DCT_FeatureLess
+    '    Dim flow As New Font_FlowText
+    '    Dim plane As New Plane_CellColor
+    '    Public Sub New()
+    '        flow.parentData = Me
+    '        labels = {"", "", "Stats on the largest region below DCT threshold", "Various views of regions with DCT below threshold"}
+    '        If standalone Then task.gOptions.displayDst0.Checked = False
+    '        desc = "Find plane equation for a featureless surface - debugging one region for now."
+    '    End Sub
+    '    Public Overrides Sub RunAlg(src As cv.Mat)
+    '        ' If task.heartBeat Then flow.msgs.Clear()
 
-            mats.mat(0) = src.Clone
-            mats.mat(0).SetTo(white, task.gridMask)
+    '        mats.mat(0) = src.Clone
+    '        mats.mat(0).SetTo(white, task.gridMask)
 
-            dct.Run(src)
-            Dim _cvt2 As New Mat
-            CvtColor(dct.dst2, _cvt2, ColorConversionCodes.GRAY2BGR)
-            mats.mat(1) = _cvt2.Clone()
-            mats.mat(2) = dct.dst3.Clone()
+    '        dct.Run(src)
+    '        Dim _cvt2 As New Mat
+    '        CvtColor(dct.dst2, _cvt2, ColorConversionCodes.GRAY2BGR)
+    '        mats.mat(1) = _cvt2.Clone()
+    '        mats.mat(2) = dct.dst3.Clone()
 
-            Dim mask = dct.dst2.Clone() ' result1 contains the DCT mask of featureless surfaces.
-            task.pcSplit(2).SetTo(0, Not mask) ' remove non-featureless surface depth data.
+    '        Dim mask = dct.dst2.Clone() ' result1 contains the DCT mask of featureless surfaces.
+    '        task.pcSplit(2).SetTo(0, Not mask) ' remove non-featureless surface depth data.
 
-            ' find the most featureless roi
-            Dim maxIndex As Integer
-            Dim grCounts(task.gridRects.Count - 1)
-            For i = 0 To task.gridRects.Count - 1
-                grCounts(i) = CountNonZero(mask(task.gridRects(i)))
-                If grCounts(i) > grCounts(maxIndex) Then maxIndex = i
-            Next
+    '        ' find the most featureless roi
+    '        Dim maxIndex As Integer
+    '        Dim grCounts(task.gridRects.Count - 1)
+    '        For i = 0 To task.gridRects.Count - 1
+    '            grCounts(i) = CountNonZero(mask(task.gridRects(i)))
+    '            If grCounts(i) > grCounts(maxIndex) Then maxIndex = i
+    '        Next
 
-            mats.mat(3) = New Mat(src.Size(), MatType.CV_8UC3, Scalar.All(0))
-            src(task.gridRects(maxIndex)).CopyTo(mats.mat(3)(task.gridRects(maxIndex)), mask(task.gridRects(maxIndex)))
-            mats.Run(emptyMat)
-            dst3 = mats.dst2
-            ' this is where the debug comes in.  We just want to look at one region which hopefully is a single plane.
-            Dim r = task.gridRects(maxIndex)
-            If r.X = task.gridRects(maxIndex).X And r.Y = task.gridRects(maxIndex).Y Then
-                If grCounts(maxIndex) > r.Width * r.Height / 4 Then
-                    Dim fitPoints As New List(Of Point3f)
-                    Dim minDepth = Single.MaxValue, maxDepth = Single.MinValue
-                    For j = 0 To r.Height - 1
-                        For i = 0 To r.Width - 1
-                            Dim nextD = task.pcSplit(2)(r).Get(Of Single)(j, i)
-                            If nextD <> 0 Then
-                                If minDepth > nextD Then minDepth = nextD
-                                If maxDepth < nextD Then maxDepth = nextD
-                                Dim wpt = New Point3f(r.X + i, r.Y + j, nextD)
-                                fitPoints.Add(Cloud_Basics.worldCoordinates(wpt))
-                            End If
-                        Next
-                    Next
-                    If fitPoints.Count > 0 Then
-                        Dim eq = Plane_Basics.fitDepthPlane(fitPoints)
-                        If Single.IsNaN(eq(0)) = False Then
-                            flow.nextMsg = "a=" + eq(0).ToString(fmt2) + " b=" + eq(1).ToString(fmt2) + " c=" + Math.Abs(eq(2)).ToString(fmt2) +
-                                  vbTab + "depth=" + (-eq(3)).ToString(fmt2) + "m " + "r(x,y) = " + r.X.ToString("000") + "," +
-                                  r.Y.ToString("000") + vbTab + "Min=" + minDepth.ToString(fmt1) + "m " + " Max=" + maxDepth.ToString(fmt1) + "m"
-                        End If
-                    End If
-                End If
-            End If
-            flow.Run(src)
-        End Sub
-    End Class
+    '        mats.mat(3) = New Mat(src.Size(), MatType.CV_8UC3, Scalar.All(0))
+    '        src(task.gridRects(maxIndex)).CopyTo(mats.mat(3)(task.gridRects(maxIndex)), mask(task.gridRects(maxIndex)))
+    '        mats.Run(emptyMat)
+    '        dst3 = mats.dst2
+    '        ' this is where the debug comes in.  We just want to look at one region which hopefully is a single plane.
+    '        Dim r = task.gridRects(maxIndex)
+    '        If r.X = task.gridRects(maxIndex).X And r.Y = task.gridRects(maxIndex).Y Then
+    '            If grCounts(maxIndex) > r.Width * r.Height / 4 Then
+    '                Dim fitPoints As New List(Of Point3f)
+    '                Dim minDepth = Single.MaxValue, maxDepth = Single.MinValue
+    '                For j = 0 To r.Height - 1
+    '                    For i = 0 To r.Width - 1
+    '                        Dim nextD = task.pcSplit(2)(r).Get(Of Single)(j, i)
+    '                        If nextD <> 0 Then
+    '                            If minDepth > nextD Then minDepth = nextD
+    '                            If maxDepth < nextD Then maxDepth = nextD
+    '                            Dim wpt = New Point3f(r.X + i, r.Y + j, nextD)
+    '                            fitPoints.Add(Cloud_Basics.worldCoordinates(wpt))
+    '                        End If
+    '                    Next
+    '                Next
+    '                If fitPoints.Count > 0 Then
+    '                    Dim eq = Plane_Basics.fitDepthPlane(fitPoints)
+    '                    If Single.IsNaN(eq(0)) = False Then
+    '                        flow.nextMsg = "a=" + eq(0).ToString(fmt2) + " b=" + eq(1).ToString(fmt2) + " c=" + Math.Abs(eq(2)).ToString(fmt2) +
+    '                              vbTab + "depth=" + (-eq(3)).ToString(fmt2) + "m " + "r(x,y) = " + r.X.ToString("000") + "," +
+    '                              r.Y.ToString("000") + vbTab + "Min=" + minDepth.ToString(fmt1) + "m " + " Max=" + maxDepth.ToString(fmt1) + "m"
+    '                    End If
+    '                End If
+    '            End If
+    '        End If
+    '        flow.Run(src)
+    '    End Sub
+    'End Class
 End Namespace

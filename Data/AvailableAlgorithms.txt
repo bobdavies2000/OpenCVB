@@ -102,7 +102,6 @@ Contour_Hulls
 Contour_Largest
 Contour_Regions
 Contour_RotateRect
-Contour_SidePoints
 Contour_Sort
 Contour_SortTmp
 Contour_Test
@@ -507,12 +506,10 @@ Match_VH
 MatchShapes_Basics
 MatchShapes_Nearby
 Math_CrossProduct2D
-Math_DotProduct3D
 Math_ImageAverage
 Math_Intrinsics
 Math_Median_CDF
 Math_Stdev
-MaxDist_Basics
 MDScaling_Cities
 MeanShift_Basics
 MeanSubtraction_Basics
@@ -548,10 +545,6 @@ MSER_Detect
 MSER_Left
 MSER_Right
 MSER_SyntheticInput
-Neighbor_Basics
-Neighbor_ColorOnly
-Neighbor_Intersects32S
-Neighbor_Intersects8u
 OEX_CalcBackProject_Demo1
 OEX_PointPolygon
 OpAuto_Peaks2D
@@ -595,12 +588,6 @@ Pixel_Vector3D
 Pixel_Vectors
 Pixel_Viewer
 Pixel_Zoom
-Plane_Basics
-Plane_CellColor
-Plane_Equation
-Plane_From3Points
-Plane_OnlyPlanes
-Plane_Points
 PlotBar_Basics
 PlotBar_Depth
 PlotBar_HistCoreRange
@@ -626,9 +613,6 @@ PolyLine_BasicsOld_TA
 PongWars_Basics
 ProCon_Basics
 ProCon_Variation
-Profile_Basics
-Profile_ConcentrationTop
-Profile_Rotation
 Projection_Basics
 Projection_Cell
 Projection_HistSide
@@ -671,7 +655,6 @@ RedC_TrackHull
 RedCloud_Basics
 RedCloud_Core
 RedCloud_Flood_CPP
-RedCloud_Foreground
 RedCloud_KNN
 RedCloud_LeftRight
 RedCloud_Matched

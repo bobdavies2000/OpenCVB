@@ -1206,7 +1206,7 @@ Namespace VBClasses
 
             dst3.SetTo(0)
             For Each rc In feat.rcList
-                dst3(rc.rect).SetTo(task.scalarColors(rc.index), rc.mask)
+                dst3(rc.rect).SetTo(task.scalarColors(rc.index Mod 255), rc.mask)
                 SetTrueText(CStr(rc.age), rc.maxDist, 3)
             Next
 

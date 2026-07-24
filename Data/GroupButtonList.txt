@@ -122,7 +122,6 @@ Mat
 Match
 MatchShapes
 Math
-MaxDist
 MDScaling
 MeanShift
 MeanSubtraction
@@ -133,7 +132,6 @@ Moments
 Motion
 Mouse
 MSER
-Neighbor
 OEX
 OpAuto
 Open3D
@@ -146,7 +144,6 @@ PhaseCorrelate
 Photon
 PhotoShop
 Pixel
-Plane
 PlotBar
 PlotDots
 PlotMouse
@@ -156,7 +153,6 @@ PlyFormat
 PolyLine
 PongWars
 ProCon
-Profile
 Projection
 Puzzle
 Pyramid

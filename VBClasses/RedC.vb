@@ -132,6 +132,7 @@ Namespace VBClasses
 
     Public Class RedC_Hulls : Inherits TaskParent
         Dim redC As New RedC_Basics
+        Public rcList As New List(Of rcData)
         Public Sub New()
             dst1 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
             desc = "Display the hull for each cell."
@@ -146,6 +147,7 @@ Namespace VBClasses
                 If rc.hull IsNot Nothing Then FillPoly(dst1(rc.rect), {rc.hull}, rc.mapID)
             Next
 
+            rcList = New List(Of rcData)(redC.rcList)
             dst3 = Palettize(dst1)
         End Sub
     End Class

@@ -149,16 +149,16 @@ Namespace VBClasses
 
             SetTrueText(redC.strOut, 3)
 
-            If task.rcOldD.contour Is Nothing Then task.rcOldD = redC.rcList(0)
+            If task.rcD.contour Is Nothing Then task.rcD = redC.rcList(0)
             fitE.inputPoints.Clear()
-            For Each pt In task.rcOldD.contour
+            For Each pt In task.rcD.contour
                 fitE.inputPoints.Add(New Point2f(pt.X, pt.Y))
             Next
             fitE.Run(src)
             dst3.SetTo(0)
-            dst3(task.rcOldD.rect).SetTo(white, task.rcOldD.mask)
-            Rectangle(dst3, task.rcOldD.rect, white, task.lineWidth, task.lineType)
-            Cv2.Ellipse(dst3(task.rcOldD.rect), fitE.box, Scalar.Yellow, task.lineWidth, task.lineType)
+            dst3(task.rcD.rect).SetTo(white, task.rcD.mask)
+            Rectangle(dst3, task.rcD.rect, white, task.lineWidth, task.lineType)
+            Cv2.Ellipse(dst3(task.rcD.rect), fitE.box, Scalar.Yellow, task.lineWidth, task.lineType)
         End Sub
     End Class
 

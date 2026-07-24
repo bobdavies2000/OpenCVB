@@ -3,7 +3,7 @@ Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Class RedColor_Basics : Inherits TaskParent
         Dim color8u As New Color8U_Basics
-        Public rcList As New List(Of rcDataOld)
+        Public rcList As New List(Of rcData)
         Public rcMap As New Mat
         Public runSelectCell As Boolean = True
         Public Sub New()
@@ -23,12 +23,12 @@ Namespace VBClasses
                     Dim mapID As Integer = rcMap(r).Get(Of Byte)(0, 0)
                     Dim flags = FloodFillFlags.FixedRange Or FloodFillFlags.MaskOnly Or (255 << 8)
                     Dim count = FloodFill(rcMap, mask, r.TopLeft, mapID, rect, 0, 0, flags)
-                    If count > 0 Then rcList.Add(New rcDataOld(rcMap(rect), rect, mapID))
+                    If count > 0 Then rcList.Add(New rcData(rcMap(rect), rect, mapID))
                 End If
             Next
             dst2 = Palettize(rcMap)
 
-            If task.rcOldD IsNot Nothing And standaloneTest() Then Rectangle(dst2, task.rcOldD.rect, task.highlight, task.lineWidth)
+            If task.rcD IsNot Nothing And standaloneTest() Then Rectangle(dst2, task.rcD.rect, task.highlight, task.lineWidth)
 
             Dim rcIndex As Integer
             For Each rc In rcList
@@ -36,8 +36,8 @@ Namespace VBClasses
                 rcIndex += 1
             Next
 
-            strOut = Utility_Basics.selectCell(rcMap, rcList)
-            SetTrueText(strOut, 3)
+            'strOut = Utility_Basics.selectCell(rcMap, rcList)
+            'SetTrueText(strOut, 3)
 
             labels(2) = CStr(rcIndex) + " cells were found."
         End Sub
@@ -48,7 +48,7 @@ Namespace VBClasses
 
 
     Public Class RedColor_BasicsFeatureLess : Inherits TaskParent
-        Public rcList As New List(Of rcDataOld)
+        Public rcList As New List(Of rcData)
         Public rcMap As New Mat(dst2.Size, MatType.CV_32S, 0)
         Public color8U As New Color8U_Basics
         Public runSelectCell As Boolean = True
@@ -78,7 +78,7 @@ Namespace VBClasses
                 End If
             Next
 
-            Dim rcSizeSort As New SortedList(Of Integer, rcDataOld)(New compareAllowIdenticalIntegerInverted)
+            Dim rcSizeSort As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
             For i = 0 To rectSorted.Count - 2
                 Dim r1 = rectSorted.ElementAt(i).Value.r
                 If rectSorted.ElementAt(i).Key = rectSorted.ElementAt(i + 1).Key Then
@@ -87,14 +87,14 @@ Namespace VBClasses
                         If rectSorted.ElementAt(j).Key = rectSorted.ElementAt(j + 1).Key Then
                             r1 = r1.Union(r2)
                         Else
-                            Dim rc As New rcDataOld(src(r1), r1, rectSorted.ElementAt(j).Key) With {.mapID = rectSorted.ElementAt(j).Key}
+                            Dim rc As New rcData(src(r1), r1, rectSorted.ElementAt(j).Key) With {.mapID = rectSorted.ElementAt(j).Key}
                             rcSizeSort.Add(rectSorted.ElementAt(i).Value.count, rc)
                             i = j
                             Exit For
                         End If
                     Next
                 Else
-                    Dim rc As New rcDataOld(src(r1), r1, rectSorted.ElementAt(i).Key) With {.mapID = rectSorted.ElementAt(i).Key}
+                    Dim rc As New rcData(src(r1), r1, rectSorted.ElementAt(i).Key) With {.mapID = rectSorted.ElementAt(i).Key}
                     rcSizeSort.Add(rectSorted.ElementAt(i).Value.count, rc)
                 End If
             Next
@@ -109,7 +109,7 @@ Namespace VBClasses
             If runSelectCell Then
                 strOut = Utility_Basics.selectCell(rcMap, rcList)
                 SetTrueText(strOut, 1)
-                If task.rcOldD Is Nothing AndAlso rcList.Count > 0 Then task.rcOldD = rcList(0)
+                If task.rcD Is Nothing AndAlso rcList.Count > 0 Then task.rcD = rcList(0)
             End If
 
             dst2 = Palettize(rcMap, 0)
@@ -124,7 +124,7 @@ Namespace VBClasses
 
 
     Public Class RedColor_BrickList : Inherits TaskParent
-        Public rcList As New List(Of rcDataOld)
+        Public rcList As New List(Of rcData)
         Public rcMap As New Mat(dst2.Size, MatType.CV_32S, 0)
         Public reduction As New Reduction_Basics
         Public runSelectCell As Boolean = True
@@ -157,7 +157,7 @@ Namespace VBClasses
                 End If
             Next
 
-            Dim rcSizeSort As New SortedList(Of Integer, rcDataOld)(New compareAllowIdenticalIntegerInverted)
+            Dim rcSizeSort As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
             For i = 0 To rectSorted.Count - 2
                 Dim r1 = rectSorted.ElementAt(i).Value.r
                 Dim r2 As cv.Rect
@@ -167,14 +167,14 @@ Namespace VBClasses
                         If rectSorted.ElementAt(j).Value.index = rectSorted.ElementAt(j + 1).Value.index Then
                             r1 = r1.Union(r2)
                         Else
-                            Dim rc = New rcDataOld(src(r1), r1, rectSorted.ElementAt(j).Value.index)
+                            Dim rc = New rcData(src(r1), r1, rectSorted.ElementAt(j).Value.index)
                             rcSizeSort.Add(rc.pixels, rc)
                             i = j
                             Exit For
                         End If
                     Next
                 Else
-                    Dim rc = New rcDataOld(src(r1), r1, rectSorted.ElementAt(i).Value.index)
+                    Dim rc = New rcData(src(r1), r1, rectSorted.ElementAt(i).Value.index)
                     rcSizeSort.Add(rc.pixels, rc)
                 End If
             Next
@@ -203,7 +203,7 @@ Namespace VBClasses
 
 
     Public Class XR_RedColor_BasicsOld : Inherits TaskParent
-        Public rcList As New List(Of rcDataOld)
+        Public rcList As New List(Of rcData)
         Public rcMap As New Mat(dst2.Size, MatType.CV_32S, 0)
         Public redFlood As New RedCloud_Flood_CPP
         Public runSelectCell As Boolean = True
@@ -225,7 +225,7 @@ Namespace VBClasses
             labels(2) = redFlood.labels(2)
 
             rcMap = redFlood.rcMap.Clone
-            rcList = New List(Of rcDataOld)(redFlood.rcList)
+            rcList = New List(Of rcData)(redFlood.rcList)
 
             If runSelectCell Then
                 strOut = Utility_Basics.selectCell(rcMap, rcList)
@@ -239,7 +239,7 @@ Namespace VBClasses
 
 
     Public Class XR_RedColor_Basics : Inherits TaskParent
-        Public rcList As New List(Of rcDataOld)
+        Public rcList As New List(Of rcData)
         Public rcMap As New Mat(dst2.Size, MatType.CV_32S, 0)
         Public options As New Options_RedCloud
         Public redFlood As New RedColor_Basics
@@ -255,7 +255,7 @@ Namespace VBClasses
             labels(2) = redFlood.labels(2)
 
             rcMap = redFlood.rcMap.Clone
-            rcList = New List(Of rcDataOld)(redFlood.rcList)
+            rcList = New List(Of rcData)(redFlood.rcList)
 
             If runSelectCell Then
                 strOut = Utility_Basics.selectCell(rcMap, rcList)
@@ -270,7 +270,7 @@ Namespace VBClasses
     Public Class XR_RedColor_CPP : Inherits TaskParent
         Implements IDisposable
         Public classCount As Integer
-        Public rcList As New List(Of rcDataOld)
+        Public rcList As New List(Of rcData)
         Public rcMap As New Mat(dst2.Size, MatType.CV_8U, 0)
         Public Sub New()
             cPtr = RedCloudLined_Open()
@@ -296,14 +296,14 @@ Namespace VBClasses
             Dim rects(classCount - 1) As cv.Rect
             rectData.GetArray(Of cv.Rect)(rects)
 
-            Dim rcListLast = New List(Of rcDataOld)(rcList)
+            Dim rcListLast = New List(Of rcData)(rcList)
             Dim rcMapLast As Mat = rcMap.Clone
 
             Dim minPixels As Integer = dst2.Total * 0.001
             Dim index As Integer = 1
-            Dim newList As New SortedList(Of Integer, rcDataOld)(New compareAllowIdenticalIntegerInverted)
+            Dim newList As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
             For i = 0 To rects.Length - 1
-                Dim rc = New rcDataOld(dst0(rects(i)), rects(i), index)
+                Dim rc = New rcData(dst0(rects(i)), rects(i), index)
                 If rc.pixels < minPixels Then Continue For
                 newList.Add(rc.pixels, rc)
                 index += 1
@@ -312,7 +312,7 @@ Namespace VBClasses
             Dim r2 As cv.Rect
             Dim count As Integer
             rcList.Clear()
-            Dim usedColor As New List(Of Scalar)
+            Dim usedColor As New List(Of Integer)
             For Each rc In newList.Values
                 Dim r1 = rc.rect
                 r2 = New cv.Rect(0, 0, 1, 1) ' fake rect for conditional below...
@@ -325,16 +325,12 @@ Namespace VBClasses
                 End If
                 If indexLast >= 0 And r1.IntersectsWith(r2) And task.optionsChanged = False Then
                     rc.age = rcListLast(indexLast).age + 1
-                    rc.color = rcListLast(indexLast).color
                     If rc.age >= 1000 Then rc.age = 2
                     count += 1
                 End If
 
-                If usedColor.Contains(rc.color) Then
-                    rc.color = Palette_Basics.randomCellColor()
-                    rc.age = 1
-                End If
-                usedColor.Add(rc.color)
+                If usedColor.Contains(rc.index) Then rc.age = 1
+                usedColor.Add(rc.index)
 
                 rc.mapID = rcList.Count + 1
                 rcList.Add(rc)
@@ -345,8 +341,8 @@ Namespace VBClasses
             dst2.SetTo(0)
             For Each rc In rcList
                 InRange(rcMap(rc.rect), rc.mapID, rc.mapID, rc.mask)
-                rc.buildMaxDist()
-                dst2(rc.rect).SetTo(rc.color, rc.mask)
+                rc.buildMaxDist(rc.mask)
+                dst2(rc.rect).SetTo(task.scalarColors(rc.index), rc.mask)
                 Circle(dst2, rc.maxDist, task.DotSize, task.highlight, -1)
             Next
 
@@ -456,9 +452,9 @@ Namespace VBClasses
 
 
     Public Class RedColor_Hulls : Inherits TaskParent
-        Public rclist As New List(Of rcDataOld)
+        Public rclist As New List(Of rcData)
         Public rcMap As New Mat(dst2.Size, MatType.CV_32S, 0)
-        Dim redC As New RedColor_Basics
+        Dim redC As New RedC_Basics
         Public Sub New()
             labels = {"", "Cells where convexity defects failed", "", "Improved contour results Using OpenCV's ConvexityDefects"}
             desc = "Add hulls and improved contours using ConvexityDefects to each RedCloud cell"
@@ -472,7 +468,7 @@ Namespace VBClasses
             rcMap.SetTo(0)
             rclist.Clear()
             For Each rc In redC.rcList
-                If rc.contour.Count >= 3 Then
+                If rc.contour IsNot Nothing AndAlso rc.contour.Count >= 3 Then
                     rc.hull = ConvexHull(rc.contour.ToArray, True).ToList
                     Dim hullIndices = ConvexHullIndices(rc.hull.ToArray, False)
                     Try
@@ -516,7 +512,7 @@ Namespace VBClasses
                 Dim index = redC.rcMap.Get(Of Integer)(center.Y, center.X) - 1
                 If index >= redC.rcList.Count Or index < 0 Then Continue For
                 Dim rc = redC.rcList(index)
-                dst3(r).SetTo(rc.color)
+                dst3(r).SetTo(task.scalarColors(rc.index))
                 rcGridMap(r).SetTo(rc.mapID)
             Next
             strOut = Utility_Basics.selectCell(redC.rcMap, redC.rcList)
@@ -778,7 +774,7 @@ Namespace VBClasses
     ''' <summary>
     ''' Isolate a main subject from the scene (similar intent to iPhone "Copy Subject"): run RedColor segmentation,
     ''' pick a salient cell at the image center that is not the dominant background, then composite that region onto a neutral backdrop.
-    ''' Click a cell (task.rcOldD) when available to override the auto-picked subject.
+    ''' Click a cell (task.rcD) when available to override the auto-picked subject.
     ''' </summary>
     Public Class RedColor_Isolate : Inherits TaskParent
         Dim redC As New RedColor_Basics
@@ -790,7 +786,7 @@ Namespace VBClasses
             If v > hi Then Return hi
             Return v
         End Function
-        Private Shared Function CellMaskFull(rcMap As Mat, rc As rcDataOld) As Mat
+        Private Shared Function CellMaskFull(rcMap As Mat, rc As rcData) As Mat
             Dim m As New Mat(rcMap.Size, MatType.CV_8U, 0)
             Using roi = rcMap(rc.rect)
                 Dim part As New Mat
@@ -805,14 +801,14 @@ Namespace VBClasses
             Dim k = GetStructuringElement(MorphShapes.Rect, New Size(3, 3))
             MorphologyEx(mask, mask, MorphTypes.Open, k)
         End Sub
-        Private Shared Function PickSubject(rcMap As Mat, rcList As List(Of rcDataOld)) As rcDataOld
+        Private Shared Function PickSubject(rcMap As Mat, rcList As List(Of rcData)) As rcData
             Dim total = rcMap.Rows * rcMap.Cols
             Dim minPx = CInt(total * 0.003)
             Dim maxPx = CInt(total * 0.62)
 
-            If task.rcOldD IsNot Nothing And task.rcOldD.pixels > 0 Then
+            If task.rcD IsNot Nothing AndAlso task.rcD.pixels > 0 Then
                 For Each rc In rcList
-                    If rc.mapID = task.rcOldD.mapID Then Return rc
+                    If rc.mapID = task.rcD.mapID Then Return rc
                 Next
             End If
 
@@ -825,7 +821,7 @@ Namespace VBClasses
             End If
 
             Dim bestVotes As Integer = -1
-            Dim bestRc As rcDataOld = Nothing
+            Dim bestRc As rcData = Nothing
             Dim freq As New Dictionary(Of Integer, Integer)
             For dy = -4 To 4
                 For dx = -4 To 4
@@ -975,9 +971,9 @@ Namespace VBClasses
 
             dst2.SetTo(0)
             For Each rc In redC.rcList
-                DrawTour(dst2(rc.rect), rc.contour, rc.color, -1)
-                If task.rcOldD IsNot Nothing Then
-                    If rc.mapID = task.rcOldD.mapID Then DrawTour(dst2(rc.rect), rc.contour, white, -1)
+                DrawTour(dst2(rc.rect), rc.contour, task.scalarColors(rc.index), -1)
+                If task.rcD IsNot Nothing Then
+                    If rc.mapID = task.rcD.mapID Then DrawTour(dst2(rc.rect), rc.contour, white, -1)
                 End If
             Next
         End Sub

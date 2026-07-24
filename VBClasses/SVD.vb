@@ -53,7 +53,7 @@ Public Class XR_SVD_Example2 : Inherits TaskParent
         dst2 = redC.dst2
         labels(2) = redC.labels(2)
 
-        Dim rc = task.rcOldD
+        Dim rc = task.rcD
         If rc Is Nothing Then Exit Sub
         If redC.rcList.Count = 0 Then Exit Sub
         SetTrueText(redC.strOut, 1)

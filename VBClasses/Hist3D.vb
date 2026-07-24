@@ -131,8 +131,8 @@ Namespace VBClasses
             dst2 = redC.dst2
             labels(2) = redC.labels(2)
             If redC.rcList.Count > 0 Then
-                If task.rcOldD IsNot Nothing Then
-                    If task.rcOldD.pixels > 0 Then dst2(task.rcOldD.rect).SetTo(white, task.rcOldD.mask)
+                If task.rcD IsNot Nothing Then
+                    If task.rcD.pixels > 0 Then dst2(task.rcD.rect).SetTo(white, task.rcD.mask)
                 End If
             End If
         End Sub
@@ -224,7 +224,7 @@ Namespace VBClasses
             dst2 = redC.dst2
             labels(2) = redC.labels(2)
             SetTrueText(redC.strOut, 3)
-            If task.rcOldD IsNot Nothing AndAlso task.rcOldD.rect.Width > 0 Then dst2(task.rcOldD.rect).SetTo(white, task.rcOldD.mask)
+            If task.rcD IsNot Nothing AndAlso task.rcD.rect.Width > 0 Then dst2(task.rcD.rect).SetTo(white, task.rcD.mask)
         End Sub
     End Class
 
@@ -260,14 +260,14 @@ Namespace VBClasses
             dst3 = New Mat(dst3.Size, MatType.CV_32S, 0)
             desc = "Build RedCloud pixel vectors and then measure each grid element's distance to those vectors."
         End Sub
-        Private Function distanceN(vec1 As List(Of Single), vec2 As List(Of Single)) As Double
+        Private Shared Function distanceN(vec1 As List(Of Single), vec2 As List(Of Single)) As Double
             Dim accum As Double
             For i = 0 To vec1.Count - 1
                 accum += (vec1(i) - vec2(i)) * (vec1(i) - vec2(i))
             Next
             Return Math.Sqrt(accum)
         End Function
-        Private Function distanceN(vec1() As Single, vec2() As Single) As Double
+        Private Shared Function distanceN(vec1() As Single, vec2() As Single) As Double
             Dim accum As Double
             For i = 0 To vec1.Length - 1
                 accum += (vec1(i) - vec2(i)) * (vec1(i) - vec2(i))
@@ -305,15 +305,15 @@ Namespace VBClasses
                         If distances.Count > 0 Then
                             Dim index1 = candidates(distances.IndexOf(distances.Min)) - 1
                             If index1 < pixels.rclist.Count Then
-                                Dim cell = pixels.rclist(index1)
-                                dst1(gRect).SetTo(cell.color, dst3(gRect))
+                                Dim rc = pixels.rclist(index1)
+                                dst1(gRect).SetTo(task.scalarColors(rc.index Mod 255), dst3(gRect))
                             End If
                         End If
                     ElseIf candidates.Count = 1 Then
                         Dim index = candidates(0) - 1
                         If index < pixels.rclist.Count Then
-                            Dim cell = pixels.rclist(candidates(0) - 1)
-                            dst1(gRect).SetTo(cell.color, dst3(gRect))
+                            Dim rc = pixels.rclist(candidates(0) - 1)
+                            dst1(gRect).SetTo(task.scalarColors(rc.index Mod 255), dst3(gRect))
                         End If
                     End If
                 End If

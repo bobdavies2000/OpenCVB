@@ -326,27 +326,27 @@ Namespace VBClasses
 
 
 
-    Public Class XR_Corner_RedCloud : Inherits TaskParent
-        Dim corners As New Neighbor_Intersects32S
-        Dim redC As New RedCloud_Basics
-        Public Sub New()
-            labels = {"", "", "Grayscale", "Highlighted points show where more than 2 cells intersect."}
-            desc = "Find the corners for each RedCloud cell."
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            redC.Run(src)
-            dst2 = redC.dst2
-            labels(2) = redC.labels(2)
+    'Public Class XR_Corner_RedCloud : Inherits TaskParent
+    '    Dim corners As New Neighbor_Intersects32S
+    '    Dim redC As New RedCloud_Basics
+    '    Public Sub New()
+    '        labels = {"", "", "Grayscale", "Highlighted points show where more than 2 cells intersect."}
+    '        desc = "Find the corners for each RedCloud cell."
+    '    End Sub
+    '    Public Overrides Sub RunAlg(src As cv.Mat)
+    '        redC.Run(src)
+    '        dst2 = redC.dst2
+    '        labels(2) = redC.labels(2)
 
-            corners.Run(redC.rcMap)
+    '        corners.Run(redC.rcMap)
 
-            dst3 = task.color.Clone
-            For Each pt In corners.nPoints
-                Circle(dst2, pt, task.DotSize, task.highlight, -1, task.lineType)
-                Circle(dst3, pt, task.DotSize, Scalar.Yellow, -1, task.lineType)
-            Next
-        End Sub
-    End Class
+    '        dst3 = task.color.Clone
+    '        For Each pt In corners.nPoints
+    '            Circle(dst2, pt, task.DotSize, task.highlight, -1, task.lineType)
+    '            Circle(dst3, pt, task.DotSize, Scalar.Yellow, -1, task.lineType)
+    '        Next
+    '    End Sub
+    'End Class
 
 
 

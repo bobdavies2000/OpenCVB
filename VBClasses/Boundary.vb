@@ -55,8 +55,8 @@ Namespace VBClasses
             smallRects.Clear()
             smallContours.Clear()
             For i = bounds.redC.rcList.Count - 1 To CInt(bounds.redC.rcList.Count * options.percentRect) Step -1
-                task.rcOldD = bounds.redC.rcList(i)
-                Dim r = task.rcOldD.rect
+                task.rcD = bounds.redC.rcList(i)
+                Dim r = task.rcD.rect
                 Dim contained As Boolean = False
                 For Each rc In bounds.redC.rcList
                     If r = rc.rect Then Continue For
@@ -67,7 +67,7 @@ Namespace VBClasses
                 Next
 
                 If contained Then
-                    smallContours.Add(task.rcOldD.contour)
+                    smallContours.Add(task.rcD.contour)
                     smallRects.Add(r)
                 Else
                     rects.Add(r)

@@ -510,7 +510,7 @@ Namespace VBClasses
 
                 Dim rc = rcList(i)
                 FillConvexPoly(rcMap, nextFacet, rc.mapID, LineTypes.Link4)
-                FillConvexPoly(dst3, nextFacet, task.scalarColors(rc.index), LineTypes.Link4)
+                FillConvexPoly(dst3, nextFacet, task.scalarColors(rc.index Mod 255), LineTypes.Link4)
                 facetList.Add(nextFacet)
             Next
 
