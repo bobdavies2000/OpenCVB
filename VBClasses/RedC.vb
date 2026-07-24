@@ -12,13 +12,22 @@ Namespace VBClasses
             labels(3) = "The tracked cell.  The dot is the maxDStable for the tracked cell."
             desc = "FloodFill each color8U output and create an rclist"
         End Sub
-        Public Sub displayCell()
+        Public Shared Function displayCell(rcIndexMap As cv.Mat, rcList As List(Of rcData)) As String
             Dim clickIndex = rcIndexMap.Get(Of Integer)(task.clickPoint.Y, task.clickPoint.X)
-            task.rcD = If(clickIndex <> 0, rcList(clickIndex), rcList.Last)
-            strOut = task.rcD.displayCell()
+            task.rcD = If(clickIndex <> 0, rcList(clickIndex), rcList(0))
             task.color(task.rcD.rect).SetTo(white, task.rcD.mask)
-            SetTrueText(strOut, 1)
-        End Sub
+            Return task.rcD.displayCell()
+        End Function
+        'Public Shared Sub rcLastAdd(rcIndexMap As cv.Mat, rclist As List(Of rcData))
+        '    Dim tmp As New cv.Mat
+        '    InRange(rcIndexMap, 0, 0, tmp)
+        '    Dim pixelCount = CountNonZero(tmp)
+        '    If pixelCount > 0 Then
+        '        Dim rcOther As New rcData With {.mask = tmp.Clone, .rect = New cv.Rect(0, 0, tmp.Width, tmp.Height),
+        '                                        .mapID = rclist.Count, .index = rclist.Count, .pixels = pixelCount}
+        '        rclist.Add(rcOther)
+        '    End If
+        'End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             Dim rcMapLast As cv.Mat = rcMap.Clone
             Dim rcIndexMapLast As cv.Mat = rcIndexMap.Clone
@@ -65,13 +74,7 @@ Namespace VBClasses
                 End If
             Next
 
-            InRange(rcIndexMap, 0, 0, dst0)
-            Dim pixelCount = CountNonZero(dst0)
-            If pixelCount > 0 Then
-                Dim rcOther As New rcData With {.mask = dst0.Clone, .rect = New cv.Rect(0, 0, dst2.Width, dst2.Height),
-                                                .mapID = rcList.Count, .index = rcList.Count, .pixels = pixelCount}
-                rcList.Add(rcOther)
-            End If
+            ' rcLastAdd(rcIndexMap, rcList)
 
             For Each rc In rcList
                 Dim mapIDCurr = rcMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
@@ -88,7 +91,8 @@ Namespace VBClasses
                 End If
             Next
 
-            displayCell()
+            strOut = displayCell(rcIndexMap, rcList)
+            SetTrueText(strOut, 1)
 
             If task.heartBeat Then labels(2) = CStr(rcList.Count) + " RedColor cells were found."
         End Sub

@@ -34,12 +34,12 @@ Namespace VBClasses
 
                 If rc.age = 1 Then unMatched += 1 Else matchCount += 1
                 matchAverage += rc.age
-                rc.mapID = rcList.Count + 1
+                rc.mapID = keyColors.dst2.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
                 rcMap(rc.rect).SetTo(rc.mapID, rc.mask)
-
+                rc.index = rcList.Count
                 rcList.Add(rc)
 
-                dst2(rc.rect).SetTo(task.scalarColors(rc.index), rc.mask)
+                dst2(rc.rect).SetTo(task.scalarColors(rc.mapID Mod 255), rc.mask)
             Next
 
             If runSelectCell Then
@@ -52,10 +52,6 @@ Namespace VBClasses
             labels(2) = CStr(unMatched) + " were new cells and " + CStr(matchCount) + " were matched, " +
                                 "average age: " + (matchAverage / rcList.Count).ToString(fmt1)
             labels(3) = redCore.labels(3)
-
-            'If task.heartbeatFrame + task.gOptions.DebugSlider.Value = task.frameCount Then
-            '    dst3 = dst2.Clone
-            'End If
         End Sub
     End Class
 
@@ -87,7 +83,6 @@ Namespace VBClasses
                         If rect.Width > 0 And rect.Height > 0 Then
                             If count >= minSize Then
                                 rc = New rcData(input(rect), rect, index)
-                                If rc.mapID < 0 Then Continue For
                                 newList.Add(rc.pixels, rc)
                                 index += 1
                                 rc.mapID = newList.Count
@@ -401,109 +396,6 @@ Namespace VBClasses
         End Sub
     End Class
 
-
-
-
-
-
-    Public Class RedCloud_Flood_CPP : Inherits TaskParent
-        Implements IDisposable
-        Public classCount As Integer
-        Public rcList As New List(Of rcData)
-        Public rcMap As New Mat(dst2.Size, MatType.CV_32S, 0)
-        Public wGridList As New List(Of Point3f)
-        Public options As New Options_RedCloud
-        Public keyColors As New KeyColor_Reduction
-        Public Sub New()
-            cPtr = RedCloudFill_Open()
-            desc = "This is before matching to previous generation."
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            options.Run()
-            keyColors.Run(emptyMat)
-
-            If src.Channels <> 1 Then
-                Static prepData As New RedPrep_Core
-                prepData.Run(src)
-                Normalize(prepData.reduced32f, dst1, 255, 0, NormTypes.MinMax)
-                dst1.ConvertTo(dst1, MatType.CV_8U)
-            Else
-                dst1 = src
-            End If
-
-            Dim imagePtr As IntPtr
-            Dim inputData(dst1.Total - 1) As Byte
-            dst1.GetArray(Of Byte)(inputData)
-            Dim handleInput = GCHandle.Alloc(inputData, GCHandleType.Pinned)
-
-            imagePtr = RedCloudFill_Run(cPtr, handleInput.AddrOfPinnedObject(), dst1.Rows, dst1.Cols)
-            handleInput.Free()
-
-            Dim rMask = New cv.Rect(1, 1, dst1.Width, dst1.Height)
-            Dim mask = Mat.FromPixelData(dst1.Rows + 2, dst1.Cols + 2, MatType.CV_8U, imagePtr)
-            dst0 = mask(rMask).Clone
-
-            classCount = RedCloudFill_Count(cPtr)
-            If classCount = 0 Then Exit Sub ' no data to process.
-
-            Dim rectData = Mat.FromPixelData(classCount, 1, MatType.CV_32SC4, RedCloudFill_Rects(cPtr))
-            Dim rects(classCount - 1) As cv.Rect
-            rectData.GetArray(Of cv.Rect)(rects)
-
-            Dim rcListLast = New List(Of rcData)(rcList)
-            Dim rcMapLast As Mat = rcMap.Clone
-
-            Dim index As Integer = 1
-            Dim newList As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
-            For i = 0 To rects.Length - 1
-                Dim rc = New rcData(dst0(rects(i)), rects(i), index)
-                newList.Add(rc.pixels, rc)
-                index += 1
-            Next
-
-            rcList.Clear()
-            dst2 = New Mat(dst2.Size, MatType.CV_8UC3, 0)
-            Dim matchCount As Integer
-            Dim unMatched As Integer
-            Dim matchAverage As Single
-            dst3.SetTo(0)
-            Dim blackVec As New Vec3b
-            rcMap.SetTo(0)
-            For i = 0 To newList.Values.Count - 1
-                Dim rc = newList.Values(i)
-                Dim maxDist = rc.maxDist
-                rc = Utility_Basics.rcMatch(rc)
-
-                If rc.age = 1 Then unMatched += 1 Else matchCount += 1
-                matchAverage += rc.age
-
-                rc.mapID = rcList.Count + 1
-
-                Dim testIfClaimed = rcMap.Get(Of Integer)(rc.maxDist.Y, rc.maxDist.X)
-                If testIfClaimed <> 0 Then Continue For
-
-                rcList.Add(rc)
-
-                dst2(rc.rect).SetTo(task.scalarColors(rc.index), rc.mask)
-                rcMap(rc.rect).SetTo(rc.mapID, rc.mask)
-            Next
-
-            strOut = Utility_Basics.selectCell(rcMap, rcList)
-            SetTrueText(strOut, 3)
-
-            wGridList.Clear()
-            For Each rc In rcList
-                Dim depth3f = task.pointCloud.Get(Of cv.Point3f)(rc.maxDist.Y, rc.maxDist.X)
-                wGridList.Add(depth3f)
-            Next
-
-            labels(2) = CStr(unMatched) + " were new cells and " + CStr(matchCount) + " were matched, " +
-                                "average age: " + (matchAverage / rcList.Count).ToString(fmt1)
-        End Sub
-        Protected Overrides Sub Finalize()
-            If cPtr <> 0 Then cPtr = RedCloudFill_Close(cPtr)
-        End Sub
-    End Class
 
 
 

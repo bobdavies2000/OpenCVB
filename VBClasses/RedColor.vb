@@ -2,6 +2,85 @@ Imports System.Runtime.InteropServices
 Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Class RedColor_Basics : Inherits TaskParent
+        Public rcList As New List(Of rcData)
+        Public rcMap As New Mat(dst2.Size, MatType.CV_32S, 0)
+        Public rcIndexMap As New Mat(dst2.Size, MatType.CV_32S, 0)
+        Dim fLess As New FeatureLess_Basics_TA
+        Public Sub New()
+            If standalone Then task.gOptions.displayDst1.Checked = True
+            labels(3) = "The output of FeatureLess_Basics.  Note that cell colors match the RedColor output."
+            desc = "Use the FeatureLess regions to improve the RedColor output."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            If src.Channels <> 1 Then
+                Static color8U As New Color8U_Basics
+                color8U.Run(task.gray)
+                src = color8U.dst2
+            End If
+
+            fLess.Run(task.gray)
+
+            Dim rect As cv.Rect
+            Dim mask = New Mat(New Size(dst2.Width + 2, dst2.Height + 2), MatType.CV_8U, 0)
+            Dim rectSorted As New SortedList(Of Integer, (count As Integer, r As cv.Rect))(New compareAllowIdenticalInteger)
+            For Each r In fLess.brickList
+                Dim val = mask(r).Get(Of Byte)(0, 0)
+                If val = 0 Then
+                    Dim index As Integer = fLess.dst3(r).Get(Of Byte)(0, 0)
+                    If index > 0 Then
+                        Dim flags = FloodFillFlags.FixedRange Or FloodFillFlags.Link4 Or (index << 8)
+                        Dim count = FloodFill(src, mask, r.TopLeft, index, rect, 0, 0, flags)
+                        rectSorted.Add(index, (count, ValidateRect(rect)))
+                    End If
+                End If
+            Next
+
+            Dim rcSizeSort As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
+            For i = 0 To rectSorted.Count - 2
+                Dim r1 = rectSorted.ElementAt(i).Value.r
+                If rectSorted.ElementAt(i).Key = rectSorted.ElementAt(i + 1).Key Then
+                    For j = i To rectSorted.Count - 2
+                        Dim r2 = rectSorted.ElementAt(j + 1).Value.r
+                        If rectSorted.ElementAt(j).Key = rectSorted.ElementAt(j + 1).Key Then
+                            r1 = r1.Union(r2)
+                        Else
+                            Dim rc As New rcData(src(r1), r1, rectSorted.ElementAt(j).Key) With {.mapID = rectSorted.ElementAt(j).Key}
+                            rcSizeSort.Add(rectSorted.ElementAt(i).Value.count, rc)
+                            i = j
+                            Exit For
+                        End If
+                    Next
+                Else
+                    Dim rc As New rcData(src(r1), r1, rectSorted.ElementAt(i).Key) With {.mapID = rectSorted.ElementAt(i).Key}
+                    rcSizeSort.Add(rectSorted.ElementAt(i).Value.count, rc)
+                End If
+            Next
+
+            rcMap.SetTo(0)
+            rcIndexMap.SetTo(0)
+            rcList.Clear()
+            rcList.Add(New rcData)
+            For Each rc In rcSizeSort.Values
+                rc.index = rcList.Count
+                rcList.Add(rc)
+                rcIndexMap(rc.rect).SetTo(rc.index, rc.mask)
+                rcMap(rc.rect).SetTo(rc.mapID, rc.mask)
+            Next
+
+            dst2 = Palettize(rcMap, 0)
+            dst3 = fLess.dst2
+
+            SetTrueText(RedC_Basics.displayCell(rcIndexMap, rcList), 1)
+
+            labels(2) = CStr(rcList.Count) + " cells were identified."
+        End Sub
+    End Class
+
+
+
+
+
+    Public Class XR_RedColor_Basics : Inherits TaskParent
         Dim color8u As New Color8U_Basics
         Public rcList As New List(Of rcData)
         Public rcMap As New Mat
@@ -42,83 +121,6 @@ Namespace VBClasses
             labels(2) = CStr(rcIndex) + " cells were found."
         End Sub
     End Class
-
-
-
-
-
-    Public Class RedColor_BasicsFeatureLess : Inherits TaskParent
-        Public rcList As New List(Of rcData)
-        Public rcMap As New Mat(dst2.Size, MatType.CV_32S, 0)
-        Public color8U As New Color8U_Basics
-        Public runSelectCell As Boolean = True
-        Public Sub New()
-            If standalone Then task.gOptions.displayDst1.Checked = True
-            labels(3) = "The output of FeatureLess_Basics.  Note that cell colors match the RedColor output."
-            desc = "Use the FeatureLess regions to improve the RedColor output."
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            If src.Channels <> 1 Then
-                color8U.Run(task.gray)
-                src = color8U.dst2
-            End If
-
-            Dim rect As cv.Rect
-            Dim mask = New Mat(New Size(dst2.Width + 2, dst2.Height + 2), MatType.CV_8U, 0)
-            Dim rectSorted As New SortedList(Of Integer, (count As Integer, r As cv.Rect))(New compareAllowIdenticalInteger)
-            For Each r In task.fLess.brickList
-                Dim val = mask(r).Get(Of Byte)(0, 0)
-                If val = 0 Then
-                    Dim index As Integer = task.fLess.dst3(r).Get(Of Byte)(0, 0)
-                    If index > 0 Then
-                        Dim flags = FloodFillFlags.FixedRange Or FloodFillFlags.Link4 Or (index << 8)
-                        Dim count = FloodFill(src, mask, r.TopLeft, index, rect, 0, 0, flags)
-                        rectSorted.Add(index, (count, ValidateRect(rect)))
-                    End If
-                End If
-            Next
-
-            Dim rcSizeSort As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
-            For i = 0 To rectSorted.Count - 2
-                Dim r1 = rectSorted.ElementAt(i).Value.r
-                If rectSorted.ElementAt(i).Key = rectSorted.ElementAt(i + 1).Key Then
-                    For j = i To rectSorted.Count - 2
-                        Dim r2 = rectSorted.ElementAt(j + 1).Value.r
-                        If rectSorted.ElementAt(j).Key = rectSorted.ElementAt(j + 1).Key Then
-                            r1 = r1.Union(r2)
-                        Else
-                            Dim rc As New rcData(src(r1), r1, rectSorted.ElementAt(j).Key) With {.mapID = rectSorted.ElementAt(j).Key}
-                            rcSizeSort.Add(rectSorted.ElementAt(i).Value.count, rc)
-                            i = j
-                            Exit For
-                        End If
-                    Next
-                Else
-                    Dim rc As New rcData(src(r1), r1, rectSorted.ElementAt(i).Key) With {.mapID = rectSorted.ElementAt(i).Key}
-                    rcSizeSort.Add(rectSorted.ElementAt(i).Value.count, rc)
-                End If
-            Next
-
-            rcMap.SetTo(0)
-            rcList.Clear()
-            For Each rc In rcSizeSort.Values
-                rcList.Add(rc)
-                rcMap(rc.rect).SetTo(rc.mapID, rc.mask)
-            Next
-
-            If runSelectCell Then
-                strOut = Utility_Basics.selectCell(rcMap, rcList)
-                SetTrueText(strOut, 1)
-                If task.rcD Is Nothing AndAlso rcList.Count > 0 Then task.rcD = rcList(0)
-            End If
-
-            dst2 = Palettize(rcMap, 0)
-            dst3 = task.fLess.dst2
-
-            labels(2) = CStr(rcList.Count) + " cells were identified."
-        End Sub
-    End Class
-
 
 
 
@@ -198,71 +200,6 @@ Namespace VBClasses
         End Sub
     End Class
 
-
-
-
-
-    Public Class XR_RedColor_BasicsOld : Inherits TaskParent
-        Public rcList As New List(Of rcData)
-        Public rcMap As New Mat(dst2.Size, MatType.CV_32S, 0)
-        Public redFlood As New RedCloud_Flood_CPP
-        Public runSelectCell As Boolean = True
-        Dim tiers As New Depth_Tiers
-        Dim color8U As New Color8U_Basics
-        Public Sub New()
-            desc = "Run the C++ RedCloud interface without a mask"
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            color8U.Run(src)
-            dst3 = color8U.dst2
-
-            tiers.Run(src)
-
-            Dim input As Mat = dst3 + tiers.dst2 + 1
-            input.SetTo(0, task.edges.dst2)
-            redFlood.Run(input)
-            dst2 = redFlood.dst2
-            labels(2) = redFlood.labels(2)
-
-            rcMap = redFlood.rcMap.Clone
-            rcList = New List(Of rcData)(redFlood.rcList)
-
-            If runSelectCell Then
-                strOut = Utility_Basics.selectCell(rcMap, rcList)
-                SetTrueText(strOut, 3)
-            End If
-        End Sub
-    End Class
-
-
-
-
-
-    Public Class XR_RedColor_Basics : Inherits TaskParent
-        Public rcList As New List(Of rcData)
-        Public rcMap As New Mat(dst2.Size, MatType.CV_32S, 0)
-        Public options As New Options_RedCloud
-        Public redFlood As New RedColor_Basics
-        Public runSelectCell As Boolean = True
-        Public Sub New()
-            desc = "Run the C++ RedCloud interface without a mask"
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            options.Run()
-
-            redFlood.Run(Mat_Basics.srcMustBe8U(src) + 1)
-            dst2 = redFlood.dst2
-            labels(2) = redFlood.labels(2)
-
-            rcMap = redFlood.rcMap.Clone
-            rcList = New List(Of rcData)(redFlood.rcList)
-
-            If runSelectCell Then
-                strOut = Utility_Basics.selectCell(rcMap, rcList)
-                SetTrueText(strOut, 3)
-            End If
-        End Sub
-    End Class
 
 
 
@@ -889,55 +826,8 @@ Namespace VBClasses
 
 
 
-    Public Class RedColor_FLessCorrelation : Inherits TaskParent
-        Public redC As New RedCloud_Flood_CPP
-        Dim corr As New Correlation_Basics
-        Public Sub New()
-            If standalone Then task.gOptions.displayDst1.Checked = True
-            labels(3) = "Contour_Basics output that is input to RedColor_Basics."
-            desc = "Use the output of the Correlation_Basics as input the RedColor_Basics."
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            corr.Run(src)
-            dst3 = corr.dst2
-
-            redC.Run(dst3)
-            dst2 = redC.dst2
-            labels(2) = redC.labels(2)
-
-            SetTrueText(redC.strOut, 1)
-        End Sub
-    End Class
-
-
-
-
-    Public Class RedColor_FLessMinMaxRange : Inherits TaskParent
-        Public redC As New RedCloud_Flood_CPP
-        Dim corrRange As New Correlation_MinMaxRange
-        Public Sub New()
-            If standalone Then task.gOptions.displayDst1.Checked = True
-            labels(3) = "Contour_Basics output that is input to RedColor_Basics."
-            desc = "Use the output of the Correlation_Basics as input the RedColor_Basics."
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            corrRange.Run(src)
-            dst3 = corrRange.dst2
-
-            redC.Run(dst3)
-            dst2 = redC.dst2
-            labels(2) = redC.labels(2)
-
-            SetTrueText(redC.strOut, 1)
-        End Sub
-    End Class
-
-
-
-
-
     Public Class RedColor_FeatureLess : Inherits TaskParent
-        Public redC As New RedColor_Basics
+        Public redC As New RedC_Basics
         Public Sub New()
             If standalone Then task.gOptions.displayDst1.Checked = True
             desc = "Use the output of the FeatureLess_Basics as input the RedColor_Basics."

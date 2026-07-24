@@ -654,7 +654,6 @@ RedC_TrackCell
 RedC_TrackHull
 RedCloud_Basics
 RedCloud_Core
-RedCloud_Flood_CPP
 RedCloud_KNN
 RedCloud_LeftRight
 RedCloud_Matched
@@ -664,7 +663,6 @@ RedCloud_MotionFilter
 RedCloud_Reliable
 RedCloud_RGB
 RedColor_Basics
-RedColor_BasicsFeatureLess
 RedColor_BasicsLeftRight
 RedColor_BrickList
 RedColor_Bricks
@@ -672,8 +670,6 @@ RedColor_Contour
 RedColor_Contours
 RedColor_DelaunayMap
 RedColor_FeatureLess
-RedColor_FLessCorrelation
-RedColor_FLessMinMaxRange
 RedColor_GridRects
 RedColor_Hulls
 RedColor_Isolate
