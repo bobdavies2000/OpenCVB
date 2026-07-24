@@ -513,7 +513,7 @@ Namespace VBClasses
     Public Class XR_Depth_ForegroundOverTime : Inherits TaskParent
         Dim options As New Options_ForeGround
         Dim fore As New XR_Depth_Foreground
-        Dim contours As New Contour_Largest
+        Dim contours As New XR_Contour_Largest
         Dim lastFrames As New List(Of Mat)
         Public Sub New()
             labels = {"", "", "Foreground objects", "Edges for the Foreground Objects"}
@@ -607,7 +607,7 @@ Namespace VBClasses
 
     Public Class XR_Depth_Foreground : Inherits TaskParent
         Dim options As New Options_ForeGround
-        Dim contours As New Contour_Largest
+        Dim contours As New XR_Contour_Largest
         Public Sub New()
             labels(2) = "Foreground objects"
             dst2 = New Mat(dst2.Size(), MatType.CV_8U, Scalar.All(0))
@@ -644,7 +644,7 @@ Namespace VBClasses
 
     Public Class Depth_InRange : Inherits TaskParent
         Dim options As New Options_ForeGround
-        Dim contours As New Contour_Largest
+        Dim contours As New XR_Contour_Largest
         Public classCount As Integer = 1
         Public Sub New()
             labels = {"", "", "Looks empty! But the values are there - 0 to classcount.  Run standaloneTest() to see the palette output for this", "Edges between the depth regions."}

@@ -422,7 +422,7 @@ Namespace VBClasses
 
 
 
-    Public Class Contour_Largest : Inherits TaskParent
+    Public Class XR_Contour_Largest : Inherits TaskParent
         Public bestContour As New List(Of cv.Point)
         Public allContours As cv.Point()()
         Public options As New Options_Contours
@@ -706,9 +706,9 @@ Namespace VBClasses
 
 
     Public Class XR_Contour_Lines : Inherits TaskParent
-        Dim hulls As New Contour_Hulls
+        Dim hulls As New XR_Contour_Hulls
         Public Sub New()
-            desc = "Build a list of the lines in the output of Contour_Hulls"
+            desc = "Build a list of the lines in the output of XR_Contour_Hulls"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             hulls.Run(src)
@@ -763,7 +763,7 @@ Namespace VBClasses
 
 
 
-    Public Class Contour_Hulls : Inherits TaskParent
+    Public Class XR_Contour_Hulls : Inherits TaskParent
         Public tourList As New List(Of contourData)
         Public tourMap As New Mat(dst2.Size, MatType.CV_32F, 0)
         Dim contours As New Contour_Basics_List
@@ -785,7 +785,7 @@ Namespace VBClasses
             tourMap.SetTo(0)
             tourList.Clear()
             For Each tour In contours.tourList
-                tour.hull = ConvexHull(tour.points.ToArray, True).ToList
+                tour.hull = ConvexHull(tour.contour.ToArray, True).ToList
                 Dim index = contours.tourList.IndexOf(tour)
                 DrawTour(tourMap, tour.hull, tour.ID Mod 255, -1)
                 tourList.Add(tour)
@@ -988,7 +988,7 @@ Namespace VBClasses
             For Each ptArray In allContours
                 Dim tour As New contourData With {.pixels = ContourArea(ptArray)}
                 If tour.pixels < 5 Then Continue For
-                tour.points = New List(Of cv.Point)(ptArray)
+                tour.contour = New List(Of cv.Point)(ptArray)
                 If tour.pixels > task.color.Total * 3 / 4 Then Continue For ' toss this contour - it covers everything...
 
                 tour.rect = contourData.buildRect(ptArray)
@@ -1057,7 +1057,8 @@ Namespace VBClasses
         Public options As New Options_Contours
         Dim edgeline As New EdgeLine_Basics
         Public Sub New()
-            labels(3) = "Details for the selected contour."
+            If standalone Then task.gOptions.displayDst1.Checked = True
+            labels(1) = "Details for the selected contour."
             task.fOptions.Color8USource.SelectedItem = "EdgeLine_Basics"
             desc = "List retrieval mode contour finder"
         End Sub
@@ -1075,6 +1076,7 @@ Namespace VBClasses
             labels(2) = sortContours.labels(2)
             dst2 = sortContours.dst2
             strOut = sortContours.strOut
+            SetTrueText(strOut, 1)
         End Sub
     End Class
 
@@ -1163,7 +1165,7 @@ Namespace VBClasses
             For Each ptArray In allContours
                 Dim tour As New contourData With {.pixels = ContourArea(ptArray)}
                 If tour.pixels < 5 Then Continue For
-                tour.points = New List(Of cv.Point)(ptArray)
+                tour.contour = New List(Of cv.Point)(ptArray)
                 If tour.pixels > task.color.Total * 3 / 4 Then Continue For ' toss this contour - it covers everything...
 
                 tour.rect = contourData.buildRect(ptArray)

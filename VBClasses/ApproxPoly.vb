@@ -3,7 +3,7 @@ Namespace VBClasses
     ' https://stackoverflow.com/questions/22132510/opencv-approxpolydp-for-edge-maps-Not-contours
     ' https://docs.opencvb.org/4.x/js_contour_features_approxPolyDP.html
     Public Class ApproxPoly_Basics : Inherits TaskParent
-        ReadOnly contour As New Contour_Largest
+        ReadOnly contour As New XR_Contour_Largest
         ReadOnly rotatedRect As New Rectangle_Rotated
         ReadOnly options As New Options_ApproxPoly
         Public Sub New()

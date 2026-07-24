@@ -309,9 +309,8 @@ Namespace VBClasses
             Public ID As Integer
             Public mask As New cv.Mat
             Public maxDist As cv.Point
-            Public mm As mmData
             Public pixels As Integer
-            Public points As New List(Of cv.Point)
+            Public contour As New List(Of cv.Point)
             Public rect As New cv.Rect(0, 0, 1, 1)
             Public Shared Function buildRect(tour As cv.Point()) As cv.Rect
                 Dim minX As Single = tour.Min(Function(p) p.X)
