@@ -98,7 +98,7 @@ Namespace VBClasses
                         rc.mapID = newList.Count + 1
                         newList.Add(rc)
 
-                        rcDataDraw(rc)
+                        If rc.contour IsNot Nothing Then rcDataDraw(rc)
                     End If
                 Next
             End If
