@@ -185,7 +185,7 @@ Namespace VBClasses
             'For i = 0 To maskList.Count - 1
             '    If results(i) > 0 Then
             '        Dim rc = redList.rcList(maskList(i))
-            '        dst3(rc.rect).SetTo(task.scalarcolors(rc.index), rc.mask)
+            '        dst3(rc.rect).SetTo(task.scalarcolors(rc.index Mod 255), rc.mask)
             '        zeroOutput = False
             '    End If
             'Next

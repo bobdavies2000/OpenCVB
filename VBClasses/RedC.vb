@@ -92,6 +92,32 @@ Namespace VBClasses
 
 
 
+    Public Class RedC_Reliable : Inherits TaskParent
+        Dim redC As New RedC_Basics
+        Public Sub New()
+            desc = "Display only those cells that are consistently present since the last heartbeat."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            redC.Run(src)
+            dst2 = redC.dst2
+            labels(2) = redC.labels(2)
+
+            dst3.SetTo(0)
+            Dim count As Integer
+            For Each rc In redC.rcList
+                If rc.age > Math.Min(10, task.frameCount) Then
+                    dst3(rc.rect).SetTo(task.scalarColors(rc.index Mod 255), rc.mask)
+                    count += 1
+                End If
+            Next
+            labels(3) = CStr(count) + " were consistently present."
+        End Sub
+    End Class
+
+
+
+
+
     Public Class XR_RedC_Sizes : Inherits TaskParent
         Dim redC As New RedC_Basics
         Public Sub New()

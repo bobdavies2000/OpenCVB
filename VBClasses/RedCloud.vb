@@ -1,4 +1,3 @@
-Imports System.Runtime.InteropServices
 Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Class RedCloud_Basics : Inherits TaskParent
@@ -6,15 +5,19 @@ Namespace VBClasses
         Public rcList As New List(Of rcData)
         Public rcMap As New Mat(dst2.Size, MatType.CV_32S, 0)
         Public options As New Options_RedCloud
-        Public keyColors As New KeyColor_Reduction
+        Dim reduction As New Reduction_BasicsParmInput
         Public runSelectCell As Boolean = True
         Public Sub New()
+            reduction.reductionFactor = 50
             task.gOptions.stableDepthRGB.Checked = True
             desc = "Build contours for each cell"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
-            If task.quarterBeat Then keyColors.Run(task.gray)
+            If task.quarterBeat Then
+                reduction.Run(task.gray)
+                dst1 = reduction.dst2
+            End If
 
             redCore.Run(src)
             labels(3) = redCore.labels(3)
@@ -34,7 +37,7 @@ Namespace VBClasses
 
                 If rc.age = 1 Then unMatched += 1 Else matchCount += 1
                 matchAverage += rc.age
-                rc.mapID = keyColors.dst2.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
+                rc.mapID = dst1.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
                 rcMap(rc.rect).SetTo(rc.mapID, rc.mask)
                 rc.index = rcList.Count
                 rcList.Add(rc)
@@ -46,8 +49,6 @@ Namespace VBClasses
                 strOut = Utility_Basics.selectCell(rcMap, rcList)
                 SetTrueText(strOut, 3)
             End If
-
-            dst1 = keyColors.dst2
 
             labels(2) = CStr(unMatched) + " were new cells and " + CStr(matchCount) + " were matched, " +
                                 "average age: " + (matchAverage / rcList.Count).ToString(fmt1)
@@ -196,7 +197,7 @@ Namespace VBClasses
 
 
 
-    Public Class RedCloud_LeftRight : Inherits TaskParent
+    Public Class XR_RedCloud_LeftRight : Inherits TaskParent
         Dim bricks As New Brick_Basics
         Dim redC As New RedCloud_Basics
         Public Sub New()
@@ -226,7 +227,7 @@ Namespace VBClasses
 
 
 
-    Public Class RedCloud_KNN : Inherits TaskParent
+    Public Class XR_RedCloud_KNN : Inherits TaskParent
         Dim redC As New RedCloud_Basics
         Dim knn As New KNN_Basics
         Public hulls As New List(Of List(Of cv.Point))
@@ -257,7 +258,7 @@ Namespace VBClasses
                     hullList.Add(New cv.Point(rc.rect.X + pt.X, rc.rect.Y + pt.Y))
                 Next
                 listOfPoints.Add(hullList)
-                FillPoly(dst3, listOfPoints, task.scalarColors(rc.index))
+                FillPoly(dst3, listOfPoints, task.scalarColors(rc.index Mod 255))
             Next
         End Sub
     End Class
@@ -265,27 +266,7 @@ Namespace VBClasses
 
 
 
-    Public Class RedCloud_RGB : Inherits TaskParent
-        Dim redC As New RedCloud_Basics
-        Public Sub New()
-            desc = "Display the RGB data rather than the task.scalarcolors(rc.index)"
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            redC.Run(src)
-            dst2 = redC.dst2
-            labels(2) = redC.labels(2)
-
-            dst3.SetTo(0)
-            For Each rc In redC.rcList
-                src(rc.rect).CopyTo(dst3(rc.rect), rc.mask)
-            Next
-        End Sub
-    End Class
-
-
-
-
-    Public Class RedCloud_Matches : Inherits TaskParent
+    Public Class XR_RedCloud_Matches : Inherits TaskParent
         Dim redC As New RedCloud_Basics
         Public rcList As New List(Of rcData)
         Public Sub New()
@@ -301,8 +282,8 @@ Namespace VBClasses
             rcList.Clear()
             For Each rc In redC.rcList
                 If rc.age >= redC.options.ageThreshold Or rc.age = task.frameCount Then
-                    dst2(rc.rect).SetTo(task.scalarColors(rc.index), rc.mask)
-                    dst3(rc.rect).SetTo(task.scalarColors(rc.index), rc.mask)
+                    dst2(rc.rect).SetTo(task.scalarColors(rc.index Mod 255), rc.mask)
+                    dst3(rc.rect).SetTo(task.scalarColors(rc.index Mod 255), rc.mask)
                     rcList.Add(rc)
                 Else
                     dst2(rc.rect).SetTo(white, rc.mask)
@@ -314,42 +295,6 @@ Namespace VBClasses
             labels(3) = CStr(rcList.Count) + " matched cells below with > " + CStr(redC.options.ageThreshold) + " age"
         End Sub
     End Class
-
-
-
-
-
-    Public Class RedCloud_Matched : Inherits TaskParent
-        Dim redC As New RedCloud_Basics
-        Public rcList As New List(Of rcData)
-        Public Sub New()
-            If standalone Then task.gOptions.displayDst1.Checked = True
-            task.fOptions.ReductionColor.Value = 120
-            desc = "Use the first cell when age > 1"
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            redC.Run(src)
-            labels(2) = redC.labels(2).Replace("new cells", "new cells (white)")
-
-            dst2.SetTo(0)
-            rcList.Clear()
-            For Each rc In redC.rcList
-                If rc.age >= redC.options.ageThreshold Or rc.age = task.frameCount Then
-                    dst2(rc.rect).SetTo(task.scalarColors(rc.index), rc.mask)
-                    dst3(rc.rect).SetTo(task.scalarColors(rc.index), rc.mask)
-                    rcList.Add(rc)
-                Else
-                    dst2(rc.rect).SetTo(white, rc.mask)
-                End If
-            Next
-
-            If task.rcD IsNot Nothing Then Rectangle(dst2, task.rcD.rect, task.highlight, task.lineWidth)
-            SetTrueText(redC.strOut, 1)
-            labels(3) = CStr(rcList.Count) + " matched cells below with > " + CStr(redC.options.ageThreshold) + " age"
-        End Sub
-    End Class
-
-
 
 
 
@@ -373,35 +318,7 @@ Namespace VBClasses
 
 
 
-
-    Public Class RedCloud_Reliable : Inherits TaskParent
-        Dim redC As New RedCloud_Basics
-        Public Sub New()
-            desc = "Display only those cells that are consistently present since the last heartbeat."
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            redC.Run(src)
-            dst2 = redC.dst2
-            labels(2) = redC.labels(2)
-
-            dst3.SetTo(0)
-            Dim count As Integer
-            For Each rc In redC.rcList
-                If rc.age > Math.Min(10, task.frameCount) Then
-                    dst3(rc.rect).SetTo(task.scalarColors(rc.index), rc.mask)
-                    count += 1
-                End If
-            Next
-            labels(3) = CStr(count) + " were consistently present."
-        End Sub
-    End Class
-
-
-
-
-
-
-    Public Class RedCloud_MotionFilter : Inherits TaskParent
+    Public Class XR_RedCloud_MotionFilter : Inherits TaskParent
         Dim redC As New RedCloud_Basics
         Public rcList As New List(Of rcData)
         Public rcMap As New Mat(dst2.Size, MatType.CV_32S, 0)
@@ -445,7 +362,7 @@ Namespace VBClasses
             For Each rc In redC.rcList
                 If rc.age > 1 Then
                     If rcMotionCells.Contains(rc.mapID) = False Then
-                        dst3(rc.rect).SetTo(task.scalarColors(rc.index), rc.mask)
+                        dst3(rc.rect).SetTo(task.scalarColors(rc.index Mod 255), rc.mask)
                         rcMap(rc.rect).SetTo(rc.mapID, rc.mask)
                         rcList.Add(rc)
                     End If
@@ -458,7 +375,7 @@ Namespace VBClasses
 
 
 
-    Public Class RedCloud_Motion : Inherits TaskParent
+    Public Class XR_RedCloud_Motion : Inherits TaskParent
         Dim redC As New RedCloud_Basics
         Dim addw As New AddWeighted_Basics
         Dim pcMotion As New Motion_CloudPixel
@@ -501,7 +418,7 @@ Namespace VBClasses
     '        Dim maxDepth = task.foreground.splitValue
     '        For Each rc In redC.rcList
     '            If rc.wcMean(2) < maxDepth Then
-    '                dst3(rc.rect).SetTo(task.scalarColors(rc.index), rc.mask)
+    '                dst3(rc.rect).SetTo(task.scalarColors(rc.index Mod 255), rc.mask)
     '                count += 1
     '            End If
     '        Next

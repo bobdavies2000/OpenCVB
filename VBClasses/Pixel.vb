@@ -691,7 +691,7 @@ Namespace VBClasses
             dst2.SetTo(0)
             For Each rc In redC.rcList
                 task.color(rc.rect).CopyTo(dst2(rc.rect), rc.mask)
-                dst1(rc.rect).SetTo(task.scalarColors(rc.index), rc.mask)
+                dst1(rc.rect).SetTo(task.scalarColors(rc.index Mod 255), rc.mask)
                 If rc.mapID <= maxRegion Then SetTrueText(CStr(rc.mapID), rc.maxDist, 2)
             Next
             labels(1) = redC.labels(3)

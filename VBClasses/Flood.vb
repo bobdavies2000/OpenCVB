@@ -210,7 +210,7 @@ Namespace VBClasses
             dst1.SetTo(0)
             If rcIndex >= rcList.Count Then rcIndex = 0
             Dim rc = rcList(rcIndex)
-            dst1(rc.rect).SetTo(task.scalarColors(rc.index), rc.mask)
+            dst1(rc.rect).SetTo(task.scalarColors(rc.index Mod 255), rc.mask)
             If task.heartBeatLT Then
                 rcIndex += 1
                 If rcIndex >= rcList.Count Then rcIndex = 0
@@ -218,7 +218,7 @@ Namespace VBClasses
 
             dst2.SetTo(0)
             For Each rc In rcList
-                dst2(rc.rect).SetTo(task.scalarColors(rc.index), rc.mask)
+                dst2(rc.rect).SetTo(task.scalarColors(rc.index Mod 255), rc.mask)
             Next
 
             labels(2) = CStr(rcList.Count) + " cells were found."

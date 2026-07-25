@@ -71,7 +71,7 @@ Namespace VBClasses
 
                 Dim rc = redc.rcList(index)
 
-                If colorList(i) <> task.scalarColors(rc.index) Then
+                If colorList(i) <> task.scalarColors(rc.index Mod 255) Then
                     depthList1(i).Clear()
                     depthList2(i).Clear()
                 End If
@@ -79,7 +79,7 @@ Namespace VBClasses
                 Dim mm = GetMinMax(depth32s(gRect), task.depthmask(gRect))
                 depthList1(i).Add(mm.minVal / 1000)
                 depthList2(i).Add(mm.maxVal / 1000)
-                colorList(i) = task.scalarColors(rc.index)
+                colorList(i) = task.scalarColors(rc.index Mod 255)
 
                 Dim d1 = depthList1(i).Average
                 Dim d2 = depthList2(i).Average
@@ -90,7 +90,7 @@ Namespace VBClasses
                     Dim topLeft = Cloud_Basics.worldCoordinates(New Point3f(gRect.X, gRect.Y, depth))
                     Dim botRight = Cloud_Basics.worldCoordinates(New Point3f(gRect.X + gRect.Width, gRect.Y + gRect.Height, depth))
 
-                    Dim color = task.scalarColors(rc.index)
+                    Dim color = task.scalarColors(rc.index Mod 255)
                     dst3(gRect).SetTo(color)
                     quadData.Add(New Point3f(color(0), color(1), color(2)))
                     quadData.Add(New Point3f(topLeft.X + shift.X, topLeft.Y + shift.Y, depth + shift.Z))
@@ -255,7 +255,7 @@ Namespace VBClasses
                         depthMin = depthMinList(i).Average
                         Dim avg = depthMaxList(i).Average - depthMin
                         depthMax = depthMin + If(avg < 0.2, avg, 0.2) ' trim the max depth - often unreliable 
-                        Dim color = task.scalarColors(rc.index)
+                        Dim color = task.scalarColors(rc.index Mod 255)
                         quadData.Add(New Point3f(color(2) / 255, color(1) / 255, color(0) / 255))
                         For j = 0 To 4 - 1
                             Dim x = Choose(j + 1, gRect.X, gRect.X + gRect.Width, gRect.X + gRect.Width, gRect.X)

@@ -127,7 +127,7 @@ Namespace VBClasses
 
                 rclist.Add(rc)
                 cellMap(rc.rect).SetTo(rc.mapID, rc.mask)
-                dst2(rc.rect).SetTo(task.scalarColors(rc.index), rc.mask)
+                dst2(rc.rect).SetTo(task.scalarColors(rc.index Mod 255), rc.mask)
             Next
 
             labels(2) = detect.labels(2) + " and " + CStr(matchCount) + " were matched to the previous frame"

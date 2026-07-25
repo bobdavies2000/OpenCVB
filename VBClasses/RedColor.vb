@@ -200,7 +200,7 @@ Namespace VBClasses
             For Each rc In rcList
                 InRange(rcMap(rc.rect), rc.mapID, rc.mapID, rc.mask)
                 rc.buildMaxDist(rc.mask)
-                dst2(rc.rect).SetTo(task.scalarColors(rc.index), rc.mask)
+                dst2(rc.rect).SetTo(task.scalarColors(rc.index Mod 255), rc.mask)
                 Circle(dst2, rc.maxDist, task.DotSize, task.highlight, -1)
             Next
 
@@ -370,7 +370,7 @@ Namespace VBClasses
                 Dim index = redC.rcMap.Get(Of Integer)(center.Y, center.X) - 1
                 If index >= redC.rcList.Count Or index < 0 Then Continue For
                 Dim rc = redC.rcList(index)
-                dst3(r).SetTo(task.scalarColors(rc.index))
+                dst3(r).SetTo(task.scalarColors(rc.index Mod 255))
                 rcGridMap(r).SetTo(rc.mapID)
             Next
             strOut = Utility_Basics.selectCell(redC.rcMap, redC.rcList)
@@ -764,7 +764,7 @@ Namespace VBClasses
 
             dst2.SetTo(0)
             For Each rc In redC.rcList
-                DrawTour(dst2(rc.rect), rc.contour, task.scalarColors(rc.index), -1)
+                DrawTour(dst2(rc.rect), rc.contour, task.scalarColors(rc.index Mod 255), -1)
                 If task.rcD IsNot Nothing Then
                     If rc.mapID = task.rcD.mapID Then DrawTour(dst2(rc.rect), rc.contour, white, -1)
                 End If

@@ -619,7 +619,9 @@ Namespace VBClasses
                     Next
 
                     If goodDepth Then
-                        dataBuffer.Add(New Vec3f(task.scalarColors(rc.index)(2), task.scalarColors(rc.index)(1), task.scalarColors(rc.index)(0)))
+                        dataBuffer.Add(New Vec3f(task.scalarColors(rc.index Mod 255)(2),
+                                                 task.scalarColors(rc.index Mod 255)(1),
+                                                 task.scalarColors(rc.index Mod 255)(0)))
                         For j = 0 To vec.Length - 1
                             dataBuffer.Add(New Vec3f(vec(j)(0), vec(j)(1), vec(j)(2)))
                         Next

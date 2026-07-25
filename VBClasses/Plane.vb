@@ -591,7 +591,7 @@
 '            If standaloneTest() Then
 '                SetTrueText(strOut, 3)
 '                dst3.SetTo(0)
-'                DrawTour(dst3(rc.rect), rc.contour, task.scalarColors(rc.index), -1)
+'                DrawTour(dst3(rc.rect), rc.contour, task.scalarColors(rc.index Mod 255), -1)
 '            End If
 '        End Sub
 '    End Class
