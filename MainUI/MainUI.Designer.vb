@@ -44,7 +44,12 @@ Namespace MainApp
             fpsTimer = New Timer(components)
             TestAllTimer = New Timer(components)
             MagnifyTimer = New Timer(components)
+            MagnifierOptions = New ContextMenuStrip(components)
+            Magnify5X = New ToolStripMenuItem()
+            Magnify10X = New ToolStripMenuItem()
+            Magnify15X = New ToolStripMenuItem()
             MainToolStrip.SuspendLayout()
+            MagnifierOptions.SuspendLayout()
             SuspendLayout()
             ' 
             ' MainToolStrip
@@ -55,7 +60,6 @@ Namespace MainApp
             MainToolStrip.Name = "MainToolStrip"
             MainToolStrip.Padding = New Padding(0, 0, 3, 0)
             MainToolStrip.Size = New Size(1275, 39)
-            MainToolStrip.ShowItemToolTips = True
             MainToolStrip.TabIndex = 0
             MainToolStrip.Text = "MainToolStrip"
             ' 
@@ -85,7 +89,7 @@ Namespace MainApp
             Magnifier.Image = CType(resources.GetObject("Magnifier.Image"), Image)
             Magnifier.Name = "Magnifier"
             Magnifier.Size = New Size(34, 34)
-            Magnifier.ToolTipText = "Draw a rectangle anywhere"
+            Magnifier.ToolTipText = "Click the icon then draw a rectangle anywhere on any of the 4 images.  Right click for options."
             ' 
             ' ToolStripSeparator1
             ' 
@@ -136,8 +140,8 @@ Namespace MainApp
             AlgDescription.AutoSize = False
             AlgDescription.MaxLength = 200
             AlgDescription.Name = "AlgDescription"
-            AlgDescription.Size = New Size(499, 37)
             AlgDescription.ReadOnly = True
+            AlgDescription.Size = New Size(499, 37)
             AlgDescription.Text = "Description - hover if the description is too long to fit."
             AlgDescription.ToolTipText = "Description"
             ' 
@@ -199,6 +203,31 @@ Namespace MainApp
             ' MagnifyTimer
             ' 
             ' 
+            ' MagnifierOptions
+            ' 
+            MagnifierOptions.ImageScalingSize = New Size(24, 24)
+            MagnifierOptions.Items.AddRange(New ToolStripItem() {Magnify5X, Magnify10X, Magnify15X})
+            MagnifierOptions.Name = "MagnifierOptions"
+            MagnifierOptions.Size = New Size(203, 112)
+            ' 
+            ' Magnify5X
+            ' 
+            Magnify5X.Name = "Magnify5X"
+            Magnify5X.Size = New Size(202, 36)
+            Magnify5X.Text = "Magnify5X"
+            ' 
+            ' Magnify10X
+            ' 
+            Magnify10X.Name = "Magnify10X"
+            Magnify10X.Size = New Size(202, 36)
+            Magnify10X.Text = "Magnify10X"
+            ' 
+            ' Magnify15X
+            ' 
+            Magnify15X.Name = "Magnify15X"
+            Magnify15X.Size = New Size(202, 36)
+            Magnify15X.Text = "Magnify15X"
+            ' 
             ' MainUI
             ' 
             AutoScaleDimensions = New SizeF(12F, 30F)
@@ -216,6 +245,7 @@ Namespace MainApp
             Text = "Main Application"
             MainToolStrip.ResumeLayout(False)
             MainToolStrip.PerformLayout()
+            MagnifierOptions.ResumeLayout(False)
             ResumeLayout(False)
             PerformLayout()
         End Sub
@@ -239,6 +269,10 @@ Namespace MainApp
         Friend WithEvents fpsTimer As Timer
         Friend WithEvents TestAllTimer As Timer
         Friend WithEvents MagnifyTimer As Timer
+        Friend WithEvents MagnifierOptions As ContextMenuStrip
+        Friend WithEvents Magnify5X As ToolStripMenuItem
+        Friend WithEvents Magnify10X As ToolStripMenuItem
+        Friend WithEvents Magnify15X As ToolStripMenuItem
 
     End Class
 End Namespace

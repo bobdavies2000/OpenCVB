@@ -332,6 +332,7 @@ Hist2D_Basics
 Hist2D_BGR
 Hist2D_Cloud
 Hist2D_HSV
+Hist2D_Zoom
 Hist3D_Basics
 Hist3D_BuildHistogram
 Hist3D_Pixel
@@ -411,8 +412,6 @@ Kalman_Single
 Kalman_VB
 Kalman_VB_Basics
 Keyboard_Basics
-KeyColor_Basics
-KeyColor_Reduction
 KLT_Basics
 KMeans_Basics
 KMeans_Depth
@@ -481,7 +480,6 @@ LineTrack_Slices
 LineTrack_Triangle
 LUT_Basics
 LUT_Equalized
-Magnify_Basics
 Mat_2to1
 Mat_4Click
 Mat_4to1

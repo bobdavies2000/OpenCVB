@@ -16,6 +16,7 @@ Namespace MainApp
         Dim magnifyIndex As Integer
         Dim windowsFont = New System.Drawing.Font("Tahoma", 9)
         Dim pixelViewerRect As cv.Rect
+        Dim magnification As Integer = 5
         ''' <summary>ToolStripTextBox ignores ToolTipText; tooltip is set on the hosted TextBox.</summary>
         Private ReadOnly algDescToolTip As New ToolTip With {
             .AutoPopDelay = 32000,
@@ -214,7 +215,15 @@ Namespace MainApp
                 AvailableAlgorithms.Items.Add(nextline)
             Next
         End Sub
+        Private Sub Magnifier_MouseDown(sender As Object, e As MouseEventArgs) Handles Magnifier.MouseDown
+            If e.Button = MouseButtons.Right Then
+                ' Show the context menu at the cursor position
+                MagnifierOptions.Show(MainToolStrip.PointToScreen(New Point(e.X, e.Y)))
+            End If
+        End Sub
         Private Sub Magnifier_Click(sender As Object, e As EventArgs) Handles Magnifier.Click
+            vbc.task.mouseMagnifyEndPoint = New cv.Point
+            task.drawRect = New cv.Rect
             MagnifyTimer.Enabled = True
             magnifyIndex += 1
         End Sub
@@ -228,10 +237,24 @@ Namespace MainApp
                 r = validateRect(r, input.Width, input.Height)
                 If r.Width < 5 Or r.Height < 5 Then Exit Sub
                 Dim img As New cv.Mat
-                cv.Cv2.Resize(input(r), img, New cv.Size(vbc.task.drawRect.Width * 5, vbc.task.drawRect.Height * 5))
-                cv.Cv2.ImShow("Magnifier", img)
+                If magnification = 0 Then magnification = 5
+                cv.Cv2.Resize(input(r), img, New cv.Size(vbc.task.drawRect.Width * magnification,
+                                                         vbc.task.drawRect.Height * magnification))
+                cv.Cv2.ImShow("Magnifier " + CStr(magnification) + "X", img)
                 vbc.task.mouseMagnifyEndPoint = New cv.Point
             End If
+        End Sub
+        Private Sub Magnify5X_Click(sender As Object, e As EventArgs) Handles Magnify5X.Click
+            magnification = 5
+            Magnifier_Click(sender, e)
+        End Sub
+        Private Sub Magnify10X_Click(sender As Object, e As EventArgs) Handles Magnify10X.Click
+            magnification = 10
+            Magnifier_Click(sender, e)
+        End Sub
+        Private Sub Magnify15X_Click(sender As Object, e As EventArgs) Handles Magnify15X.Click
+            magnification = 15
+            Magnifier_Click(sender, e)
         End Sub
         Private Sub MainForm_Closing(sender As Object, e As FormClosingEventArgs) Handles Me.FormClosing
             If TestAllTimer.Enabled = False Then SaveJsonSettings()

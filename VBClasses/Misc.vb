@@ -635,14 +635,25 @@ Namespace VBClasses
 
 
 
-    Public Class Magnify_Basics : Inherits TaskParent
+    Public Class Keyboard_Basics : Inherits TaskParent
+        Public keyInput As New List(Of String)
+        Dim flow As New Font_FlowText
+        Public checkKeys As New OptionsKeyboardInput
         Public Sub New()
-            task.drawRect = New cv.Rect(10, 10, 50, 50)
-            desc = "Magnify the drawn rectangle on dst2 and display it."
+            flow.parentData = Me
+            checkKeys.Setup(traceName)
+            labels(2) = "Use the Options form to send in keystrokes"
+            desc = "Test the keyboard interface available to all algorithms"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            dst2 = src
-            If task.drawRect.Width > 0 And task.drawRect.Height > 0 Then dst3 = src(task.drawRect)
+            If standaloneTest() And checkKeys.inputText.Count > 0 Then
+                For Each txt In checkKeys.inputText
+                    flow.nextMsg += txt.ToString()
+                Next
+                flow.Run(src)
+            End If
+            checkKeys.inputText.Clear()
         End Sub
     End Class
+
 End Namespace

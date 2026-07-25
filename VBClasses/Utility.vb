@@ -284,6 +284,13 @@ Namespace VBClasses
             End If
             Return dMsg
         End Function
+        Public Shared Function Magnify(src As cv.Mat) As cv.Mat
+            If task.drawRect.Width > 0 And task.drawRect.Height > 0 Then
+                Dim dst As cv.Mat = src(task.drawRect)
+                Return dst
+            End If
+            Return src
+        End Function
         Public Overrides Sub RunAlg(src As cv.Mat)
             SetTrueText("Utility_Basics is to make some small 'Shared' utilities available.)", 3)
         End Sub

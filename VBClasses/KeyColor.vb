@@ -1,6 +1,6 @@
 Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 Namespace VBClasses
-    Public Class KeyColor_Basics : Inherits TaskParent
+    Public Class XR_KeyColor_Basics : Inherits TaskParent
         Dim keyList As New List(Of keyData)
         Dim keyMap As New Mat(task.workRes, MatType.CV_8U, 0)
         Dim edgeline As New EdgeLine_KeyColorOnly
@@ -57,21 +57,6 @@ Namespace VBClasses
         End Sub
     End Class
 
-
-
-
-    Public Class KeyColor_Reduction : Inherits TaskParent
-        Dim reduction As New Reduction_BasicsParmInput
-        Public Sub New()
-            reduction.reductionFactor = 50
-            dst1 = New Mat(dst1.Size, MatType.CV_8U, 0)
-            desc = "Identify the key colors using contours"
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            reduction.Run(task.gray)
-            dst2 = reduction.dst3
-        End Sub
-    End Class
 
 
 

@@ -104,7 +104,6 @@ Interpolate
 Intrinsics
 Kalman
 Keyboard
-KeyColor
 KLT
 KMeans
 KNN
@@ -117,7 +116,6 @@ LinearRegression
 LineSeg
 LineTrack
 LUT
-Magnify
 Mat
 Match
 MatchShapes
