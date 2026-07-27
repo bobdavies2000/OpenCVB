@@ -1,122 +1,156 @@
-Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
-Public Class Hull_Basics : Inherits TaskParent
-    Dim random As New Random_Basics
-    Public inputPoints As New List(Of Point2f)
-    Public hull As New List(Of cv.Point)
-    Public useRandomPoints As Boolean
-    Public Sub New()
-        labels = {"", "", "Input Points - draw a rectangle anywhere.  Enclosing rectangle in yellow.", ""}
-        If standalone Then random.range = New cv.Rect(100, 100, 50, 50)
-        desc = "Given a list of points, create a hull that encloses them."
-    End Sub
-    Private Function vbFloat2Int(ptList2f As List(Of Point2f)) As List(Of cv.Point)
-        Dim ptList As New List(Of cv.Point)
-        For Each pt In ptList2f
-            ptList.Add(New cv.Point(CInt(pt.X), CInt(pt.Y)))
-        Next
-        Return ptList
-    End Function
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        If (standaloneTest() And task.heartBeat) Or (useRandomPoints And task.heartBeat) Then
-            random.Run(src)
-            dst2.SetTo(0)
-            For Each pt In random.PointList
-            Circle(dst2, pt, task.DotSize, white, -1, task.lineType)
+Imports OpenCvSharp
+Imports OpenCvSharp.Cv2
+Imports cv = OpenCvSharp
+Namespace VBClasses
+    Public Class Hull_Basics : Inherits TaskParent
+        Dim redC As New RedC_Basics
+        Public hull As New List(Of cv.Point)
+        Public Sub New()
+            If standalone Then task.gOptions.displayDst1.Checked = True
+            desc = "Compare hulls and contours for the redC cells."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            redC.Run(src)
+            dst2 = redC.dst2
+            labels(2) = redC.labels(2)
+
+            Dim rc = task.rcD
+            If rc Is Nothing Then rc = redC.rcList(1)
+            If rc.contour Is Nothing Then Exit Sub
+
+            dst1.SetTo(0)
+            dst3.SetTo(0)
+
+            DrawTour(dst3(rc.rect), rc.contour, task.highlight, task.lineWidth)
+            DrawTour(dst1(rc.rect), rc.hull, task.highlight)
+
+            labels(2) = "Contour points count reduced from " + CStr(rc.contour.Count) + " to " + CStr(rc.hull.Count)
+        End Sub
+    End Class
+
+
+
+
+
+    Public Class XR_Hull_Basics : Inherits TaskParent
+        Dim random As New Random_Basics
+        Public inputPoints As New List(Of Point2f)
+        Public hull As New List(Of cv.Point)
+        Public useRandomPoints As Boolean
+        Public Sub New()
+            labels = {"", "", "Input Points - draw a rectangle anywhere.  Enclosing rectangle in yellow.", ""}
+            If standalone Then random.range = New cv.Rect(100, 100, 50, 50)
+            desc = "Given a list of points, create a hull that encloses them."
+        End Sub
+        Private Shared Function vbFloat2Int(ptList2f As List(Of Point2f)) As List(Of cv.Point)
+            Dim ptList As New List(Of cv.Point)
+            For Each pt In ptList2f
+                ptList.Add(New cv.Point(CInt(pt.X), CInt(pt.Y)))
             Next
-            inputPoints = New List(Of Point2f)(random.PointList)
-        End If
-        Dim hull2f = ConvexHull(inputPoints, True)
-        hull = vbFloat2Int(hull2f.ToList)
-        DrawTour(dst2, hull, Scalar.Yellow)
-    End Sub
-End Class
-
-
-
-
-
-
-
-Public Class XR_Hull_Defect : Inherits TaskParent
-    Public hull As New List(Of cv.Point)
-    Public contour As cv.Point()
-    Public Sub New()
-        desc = "Find defects in the hull provided."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        If standalone Then
-            Static hContour As New Hull_Contour
-            hContour.Run(src)
-            dst2 = hContour.dst2
-            hull = hContour.hull
-            If hContour.contours1.sortContours.allContours.Length = 0 Then Exit Sub ' nothing to work on yet...
-            contour = hContour.contours1.sortContours.allContours(0)
-        End If
-
-        Dim hullIndices = ConvexHullIndices(contour, False)
-        For i = 0 To contour.Length - 1
-            Dim p1 = contour(i)
-            For j = i + 1 To contour.Length - 1
-                Dim p2 = contour(j)
-                If p1 = p2 Then
-                    SetTrueText("Contour is self-intersecting and convexityDefects will fail.")
-                    Exit Sub
-                End If
-            Next
-        Next
-
-        Dim defects = ConvexityDefects(contour, hullIndices.ToList)
-
-        Dim lastV As Integer = -1
-        Dim newC As New List(Of cv.Point)
-        For Each v In defects
-            If v(0) <> lastV And lastV >= 0 Then
-                For i = lastV To v(0) - 1
-                    newC.Add(contour(i))
+            Return ptList
+        End Function
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            If (standaloneTest() And task.heartBeat) Or (useRandomPoints And task.heartBeat) Then
+                random.Run(src)
+                dst2.SetTo(0)
+                For Each pt In random.PointList
+                    Circle(dst2, pt, task.DotSize, white, -1, task.lineType)
                 Next
+                inputPoints = New List(Of Point2f)(random.PointList)
             End If
-            newC.Add(contour(v(0)))
-            newC.Add(contour(v(2)))
-            newC.Add(contour(v(1)))
-            lastV = v(1)
-        Next
-        dst3.SetTo(0)
-        DrawTour(dst3, newC, white)
-    End Sub
-End Class
+            Dim hull2f = ConvexHull(inputPoints, True)
+            hull = vbFloat2Int(hull2f.ToList)
+            DrawTour(dst2, hull, Scalar.Yellow)
+        End Sub
+    End Class
 
 
 
 
 
-Public Class Hull_Contour : Inherits TaskParent
-    Public hull As New List(Of cv.Point)
-    Public contours1 As New Contour_Basics
-    Public contours2 As New Contour_Basics
-    Public Sub New()
-        dst2 = New Mat(dst2.Size, MatType.CV_8U, 0)
-        desc = "Compare the hull to the contour of a contour cell"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        contours1.Run(src)
-        task.contourD = contours1.selectContour()
 
-        dst2.SetTo(0)
-        dst2(task.contourD.rect).SetTo(255, task.contourD.mask)
-        contours2.Run(dst2)
 
-        dst3.SetTo(0)
-        If contours1.sortContours.allContours.Length > 0 Then
-            If contours1.sortContours.allContours(0).Length > 0 Then
-                hull = ConvexHull(contours1.sortContours.allContours(0), True).ToList
+    Public Class XR_Hull_Defect : Inherits TaskParent
+        Public hull As New List(Of cv.Point)
+        Public contour As cv.Point()
+        Public Sub New()
+            desc = "Find defects in the hull provided."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            If standalone Then
+                Static hContour As New Hull_Contour
+                hContour.Run(src)
+                dst2 = hContour.dst2
+                hull = hContour.hull
+                If hContour.contours1.sortContours.allContours.Length = 0 Then Exit Sub ' nothing to work on yet...
+                contour = hContour.contours1.sortContours.allContours(0)
+            End If
 
-                If contours2.sortContours.allContours.Length > 0 Then
-                    If contours1.sortContours.allContours(0).Length > 0 Then
-                        DrawTour(dst3, contours2.sortContours.allContours(0).ToList, white, -1)
-                        DrawTour(dst3, hull, white, task.lineWidth)
+            Dim hullIndices = ConvexHullIndices(contour, False)
+            For i = 0 To contour.Length - 1
+                Dim p1 = contour(i)
+                For j = i + 1 To contour.Length - 1
+                    Dim p2 = contour(j)
+                    If p1 = p2 Then
+                        SetTrueText("Contour is self-intersecting and convexityDefects will fail.")
+                        Exit Sub
+                    End If
+                Next
+            Next
+
+            Dim defects = ConvexityDefects(contour, hullIndices.ToList)
+
+            Dim lastV As Integer = -1
+            Dim newC As New List(Of cv.Point)
+            For Each v In defects
+                If v(0) <> lastV And lastV >= 0 Then
+                    For i = lastV To v(0) - 1
+                        newC.Add(contour(i))
+                    Next
+                End If
+                newC.Add(contour(v(0)))
+                newC.Add(contour(v(2)))
+                newC.Add(contour(v(1)))
+                lastV = v(1)
+            Next
+            dst3.SetTo(0)
+            DrawTour(dst3, newC, white)
+        End Sub
+    End Class
+
+
+
+
+
+    Public Class Hull_Contour : Inherits TaskParent
+        Public hull As New List(Of cv.Point)
+        Public contours1 As New Contour_Basics
+        Public contours2 As New Contour_Basics
+        Public Sub New()
+            dst2 = New Mat(dst2.Size, MatType.CV_8U, 0)
+            desc = "Compare the hull to the contour of a contour cell"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            contours1.Run(src)
+            task.contourD = contours1.selectContour()
+
+            dst2.SetTo(0)
+            dst2(task.contourD.rect).SetTo(255, task.contourD.mask)
+            contours2.Run(dst2)
+
+            dst3.SetTo(0)
+            If contours1.sortContours.allContours.Length > 0 Then
+                If contours1.sortContours.allContours(0).Length > 0 Then
+                    hull = ConvexHull(contours1.sortContours.allContours(0), True).ToList
+
+                    If contours2.sortContours.allContours.Length > 0 Then
+                        If contours1.sortContours.allContours(0).Length > 0 Then
+                            DrawTour(dst3, contours2.sortContours.allContours(0).ToList, white, -1)
+                            DrawTour(dst3, hull, white, task.lineWidth)
+                        End If
                     End If
                 End If
             End If
-        End If
-    End Sub
-End Class
+        End Sub
+    End Class
+End Namespace

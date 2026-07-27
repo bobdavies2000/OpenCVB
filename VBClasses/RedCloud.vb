@@ -33,7 +33,7 @@ Namespace VBClasses
             Dim matchAverage As Single
             Dim blackVec As New Vec3b
             For Each rc In redCore.rcList
-                rc = Utility_Basics.rcDataMatch(rc)
+                ' rc = Utility_Basics.rcDataMatch(rc)
 
                 If rc.age = 1 Then unMatched += 1 Else matchCount += 1
                 matchAverage += rc.age
@@ -116,41 +116,6 @@ Namespace VBClasses
     End Class
 
 
-
-
-
-
-
-    Public Class XR_RedCloud_Basics : Inherits TaskParent
-        Public redC As New RedColor_Basics
-        Public rcList As New List(Of rcData)
-        Public rcMap As Mat
-        Public Sub New()
-            desc = "Assign abstract world coordinates to each RedCloud cell."
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            redC.Run(src)
-            dst2 = redC.dst2
-            labels(2) = redC.labels(2)
-
-            If task.rcD IsNot Nothing Then Rectangle(dst2, task.rcD.rect, task.highlight, task.lineWidth)
-            If strOut <> "" Then SetTrueText(redC.strOut, 3) Else SetTrueText("Click on any cell", 3)
-
-            Dim causeLabel = Utility_Basics.findCause(redC.rcMap)
-            If task.mouseClickFlag Then
-                causeLabel = ""
-                labels(3) = ""
-            End If
-
-            If causeLabel <> "" Then
-                If labels(3) = "" Then labels(3) = causeLabel Else labels(3) += ", " + causeLabel
-                If labels(3).Length > 80 Then labels(3) = causeLabel
-            End If
-
-            rcList = New List(Of rcData)(redC.rcList)
-            rcMap = redC.rcMap.Clone
-        End Sub
-    End Class
 
 
 
@@ -293,24 +258,6 @@ Namespace VBClasses
             If task.rcD IsNot Nothing Then Rectangle(dst2, task.rcD.rect, task.highlight, task.lineWidth)
             SetTrueText(redC.strOut, 3)
             labels(3) = CStr(rcList.Count) + " matched cells below with > " + CStr(redC.options.ageThreshold) + " age"
-        End Sub
-    End Class
-
-
-
-
-    Public Class XR_RedCloud_ColorChangeCause : Inherits TaskParent
-        Dim redC As New RedCloud_Basics
-        Public Sub New()
-            desc = "Click on a cell to determine why it is changing colors."
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            redC.Run(src)
-            dst2 = redC.dst2
-            labels(2) = redC.labels(2)
-            dst2.SetTo(0, task.noDepthMask)
-
-            labels(3) = Utility_Basics.findCause(redC.rcMap)
         End Sub
     End Class
 

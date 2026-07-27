@@ -715,7 +715,7 @@ Namespace VBClasses
                 contourHull()
             End Sub
             Public Sub contourHull()
-                contour = ContourBuild(mask)
+                contour = ContourBuild(mask, cv.ContourApproximationModes.ApproxSimple)
                 If contour.Count >= 3 Then ' need at least 3 points for a contour.
                     Dim listOfPoints = New List(Of List(Of cv.Point))({contour})
                     DrawContours(mask, listOfPoints, 0, cv.Scalar.All(255), -1, cv.LineTypes.Link4)
@@ -737,7 +737,7 @@ Namespace VBClasses
                 Dim maxDist As cv.Point
                 maxDist.X = mm.maxLoc.X + rect.X
                 maxDist.Y = mm.maxLoc.Y + rect.Y
-                maxDStable = newPoint
+                maxDStable = maxDist
 
                 Return maxDist
             End Function

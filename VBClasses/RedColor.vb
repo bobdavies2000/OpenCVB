@@ -70,7 +70,7 @@ Namespace VBClasses
             dst2 = Palettize(rcMap, 0)
             dst3 = fLess.dst2
 
-            SetTrueText(RedC_BasicsOld.displayCell(rcIndexMap, rcList), 1)
+            ' SetTrueText(RedC_BasicsOld.displayCell(rcIndexMap, rcList), 1)
 
             labels(2) = CStr(rcList.Count) + " cells were identified."
         End Sub

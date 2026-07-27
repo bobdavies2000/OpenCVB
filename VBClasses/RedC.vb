@@ -2,10 +2,10 @@ Imports OpenCvSharp : Imports OpenCvSharp.Cv2 : Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 Namespace VBClasses
     Public Class RedC_Basics : Inherits TaskParent
-        Dim flood As New Flood_Basics
         Public rcMap As New Mat(dst2.Size, MatType.CV_32S, 0)
         Public rcList As New List(Of rcData) ' includes cloud data.
         Dim maxDStableList As New List(Of cv.Point)
+        Dim flood As New Flood_Basics
         Public Sub New()
             If standalone Then task.gOptions.displayDst1.Checked = True
             desc = "Create the rcData representation of the image."
@@ -17,7 +17,7 @@ Namespace VBClasses
                 src = color8u.dst2
             End If
 
-            Dim maxLast = New List(Of cv.Point)(maxDStableList)
+            Dim maxDLast = New List(Of cv.Point)(maxDStableList)
             Dim rcMapLast = rcMap.Clone
             Dim rclistLast = New List(Of rcData)(rcList)
 
@@ -30,28 +30,27 @@ Namespace VBClasses
                 Dim index = flood.indexList(i)
                 Dim r = flood.rectList(i)
 
-                Dim rc As New rcData(flood.mask(r), r, index)
-                rc.maxDStable = rc.maxDist
-                rc.index = rcList.Count
+                Dim rc As New rcData(flood.mask(r), r, index) With {.index = rcList.Count}
+                rc.mapID = flood.dst1.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
                 rcMap(r).SetTo(rc.index, rc.mask)
                 rcList.Add(rc)
             Next
 
             maxDStableList.Clear()
+            maxDStableList.Add(newPoint)
             For Each rc In rcList
-                Dim maxIndex = rcMapLast.Get(Of Integer)(rc.maxDist.Y, rc.maxDist.X)
-                If maxIndex >= 0 And maxIndex < rclistLast.Count Then
-                    Dim rcD = rclistLast(maxIndex)
-                    Dim index = maxLast.IndexOf(rcD.maxDStable)
+                Dim maxDIndex = rcMapLast.Get(Of Integer)(rc.maxDist.Y, rc.maxDist.X)
+                If maxDIndex > 0 Then
+                    Dim rcD = rclistLast(maxDIndex)
+                    Dim index = maxDLast.IndexOf(rcD.maxDStable)
                     If index >= 0 Then
                         rc.age = rcD.age + 1
-                        If rc.age >= 1000 Then rc.age = 2
+                        If rc.age >= 1000 Then rc.age = 10
                         rc.maxDStable = rcD.maxDStable
                     End If
                 End If
                 maxDStableList.Add(rc.maxDStable)
             Next
-
 
             Static clickPoint As cv.Point
             If task.mouseClickFlag Then clickPoint = task.clickPoint
@@ -59,12 +58,13 @@ Namespace VBClasses
             If clickIndex <= 0 Then
                 SetTrueText("There is no cell defined for that point.", 1)
             Else
-                Dim rcD = rcList(clickIndex - 1)
-                task.color(rcD.rect).SetTo(white, rcD.mask)
-                dst2(rcD.rect).SetTo(white, rcD.mask)
-                SetTrueText(rcD.displayCell, 1)
+                task.rcD = rcList(clickIndex)
+                task.color(task.rcD.rect).SetTo(white, task.rcD.mask)
+                dst2(task.rcD.rect).SetTo(white, task.rcD.mask)
+                SetTrueText(task.rcD.displayCell, 1)
             End If
 
+            labels(2) = CStr(rcList.Count) + " cells were found."
         End Sub
     End Class
 
@@ -73,7 +73,7 @@ Namespace VBClasses
 
 
 
-    Public Class RedC_BasicsOld : Inherits TaskParent
+    Public Class XR_RedC_BasicsOld : Inherits TaskParent
         Dim color8u As New Color8U_Basics
         Public rcMap As New Mat(dst2.Size, MatType.CV_8U, 0)
         Public rcList As New List(Of rcData) ' includes cloud data.
@@ -339,7 +339,7 @@ Namespace VBClasses
 
 
     Public Class RedC_TrackCell : Inherits TaskParent
-        Dim redC As New RedC_BasicsOld
+        Dim redC As New RedC_Basics
         Dim rcLast As rcData = Nothing
         Dim lastClickPoint As cv.Point
         Public Sub New()
@@ -364,7 +364,7 @@ Namespace VBClasses
 
             Dim rcD As rcData = rcLast
             If task.mouseClickFlag Then
-                Dim clickIndex = redC.rcIndexMap.Get(Of Integer)(task.clickPoint.Y, task.clickPoint.X)
+                Dim clickIndex = redC.rcMap.Get(Of Integer)(task.clickPoint.Y, task.clickPoint.X)
                 rcD = redC.rcList(clickIndex)
                 If rcD.maxDStable = newPoint Then rcD.maxDStable = rcD.maxDist
                 rcLast = rcD
@@ -383,7 +383,7 @@ Namespace VBClasses
             Else
                 rcD = rcDFindCell(rcLast)
                 If rcD Is Nothing Then
-                    Dim clickIndex = redC.rcIndexMap.Get(Of Integer)(lastClickPoint.Y, lastClickPoint.X)
+                    Dim clickIndex = redC.rcMap.Get(Of Integer)(lastClickPoint.Y, lastClickPoint.X)
                     rcD = redC.rcList(clickIndex)
                 End If
             End If
@@ -525,7 +525,7 @@ Namespace VBClasses
 
 
     Public Class RedC_NeighborHist : Inherits TaskParent
-        Public redC As New RedC_BasicsOld
+        Public redC As New RedC_Basics
         Dim lastCenter As cv.Point
         Public rcD As rcData
         Public neighbors As New List(Of Integer)
@@ -541,7 +541,7 @@ Namespace VBClasses
 
             Dim index As Integer
             If task.mouseClickFlag Then lastCenter = task.clickPoint
-            index = redC.rcIndexMap.Get(Of Integer)(lastCenter.Y, lastCenter.X)
+            index = redC.rcMap.Get(Of Integer)(lastCenter.Y, lastCenter.X)
 
             If index > 0 Then
                 rcD = redC.rcList(index)
@@ -563,7 +563,7 @@ Namespace VBClasses
             Dim delta = task.gridWH / 2
             Dim r = New cv.Rect(rcD.rect.X - delta, rcD.rect.Y - delta, rcD.rect.Width + task.gridWH, rcD.rect.Height + task.gridWH)
             r = ValidateRect(r)
-            redC.rcIndexMap(r).ConvertTo(tmp, MatType.CV_8U)
+            redC.rcMap(r).ConvertTo(tmp, MatType.CV_8U)
             ' why did I need to add 1 to tmp?!!!
             CalcHist({tmp + 1}, {0}, New Mat, histogram, 1, {redC.rcList.Count}, ranges)
 
@@ -674,7 +674,7 @@ Namespace VBClasses
 
 
     Public Class RedC_Depth : Inherits TaskParent
-        Dim redC As New RedC_BasicsOld
+        Dim redC As New RedC_Basics
         Public Sub New()
             If standalone Then task.gOptions.displayDst1.Checked = True
             dst0 = New Mat(dst0.Size(), MatType.CV_8U, Scalar.All(0))
@@ -697,7 +697,7 @@ Namespace VBClasses
             ApplyColorMap(dst0, dst3, task.colorMapDepth)
             dst3.SetTo(0, task.noDepthMask)
 
-            Dim clickIndex = redC.rcIndexMap.Get(Of Integer)(task.clickPoint.Y, task.clickPoint.X)
+            Dim clickIndex = redC.rcMap.Get(Of Integer)(task.clickPoint.Y, task.clickPoint.X)
             If clickIndex > 0 AndAlso clickIndex < redC.rcList.Count Then
                 Dim rc = redC.rcList(clickIndex)
                 SetTrueText(rc.displayCell() + vbCrLf + "Mean depth = " + rc.depth.ToString(fmt2) + "m", 1)

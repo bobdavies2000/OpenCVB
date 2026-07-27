@@ -78,7 +78,7 @@ Namespace VBClasses
 
 
     Public Class XR_ApproxPoly_Hull : Inherits TaskParent
-        ReadOnly hull As New Hull_Basics
+        ReadOnly hull As New XR_Hull_Basics
         ReadOnly aPoly As New ApproxPoly_Basics
         Public Sub New()
             hull.useRandomPoints = True

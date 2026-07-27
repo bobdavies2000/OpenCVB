@@ -526,33 +526,34 @@ Namespace VBClasses
 
 
 
-    Public Class XR_Contour_Smoothing : Inherits TaskParent
+    Public Class Contour_Smoothing : Inherits TaskParent
         Dim options As New Options_Contours2
-        Dim redC As New RedCloud_Basics
+        Dim redC As New RedC_Basics
         Public Sub New()
+            If standalone Then task.gOptions.displayDst1.Checked = True
             labels(3) = "The white outline is the truest contour while the red is the selected approximation."
-            desc = "Compare contours of the selected cell. Cells are offset to help comparison."
+            desc = "Compare contours of the selected cell.  Approximation has a lot fewer points."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
+            options.Run()
+
             redC.Run(src)
             dst2 = redC.dst2
-            labels(2) = redC.labels(2)
-            SetTrueText(redC.strOut, 3)
 
-            Utility_Basics.selectCell(redC.rcMap, redC.rcList)
             Dim rc = task.rcD
+            If rc Is Nothing Then rc = redC.rcList(1)
+            If rc.contour Is Nothing Then Exit Sub
 
             dst1.SetTo(0)
             dst3.SetTo(0)
 
-            Dim bestContour = ContourBuild(rc.mask)
-            DrawTour(dst3(rc.rect), bestContour, white, task.lineWidth + 3)
+            Dim preciseContour = ContourBuild(rc.mask, cv.ContourApproximationModes.ApproxNone)
+            DrawTour(dst3(rc.rect), preciseContour, task.highlight, task.lineWidth)
 
             Dim approxContour = ContourBuild(rc.mask, options.ApproximationMode)
-            DrawTour(dst3(rc.rect), approxContour, Scalar.Red)
+            DrawTour(dst1(rc.rect), approxContour, task.highlight)
 
-            labels(2) = "Contour points count reduced from " + CStr(bestContour.Count) +
-                                               " to " + CStr(approxContour.Count)
+            labels(2) = "Contour points count reduced from " + CStr(rc.contour.Count) + " to " + CStr(approxContour.Count)
         End Sub
     End Class
 

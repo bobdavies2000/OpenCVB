@@ -5,8 +5,6 @@ Namespace VBClasses
         Public pixelCounts As New List(Of Integer)
         Public rectList As New List(Of cv.Rect)
         Public indexList As New List(Of Integer)
-        Public maskList As New List(Of cv.Mat)
-        Public rcMap As New Mat(dst2.Size, MatType.CV_32S, -1)
         Public mask As New Mat(New Size(dst2.Width + 2, dst2.Height + 2), MatType.CV_8U, 0)
         Public Sub New()
             If standalone Then task.gOptions.displayDst1.Checked = True
@@ -29,6 +27,7 @@ Namespace VBClasses
             Dim rect As cv.Rect
             Dim index As Integer = 1
 
+            mask.SetTo(0)
             For y = 0 To src.Height - 1
                 For x = 0 To src.Width - 1
                     If mask.Get(Of Byte)(y, x) = 0 Then ' it is surprising how much performance benefits from this statement.
@@ -46,24 +45,12 @@ Namespace VBClasses
             pixelCounts.Clear()
             rectList.Clear()
             indexList.Clear()
-            maskList.Clear()
             For Each item In sortList.Values
                 If item.count >= 10 Then
                     pixelCounts.Add(item.count)
                     rectList.Add(item.rect)
                     indexList.Add(item.index)
                 End If
-            Next
-
-            rcMap.SetTo(1)
-            For i = 0 To rectList.Count - 1
-                index = indexList(i)
-                Dim nextMask As New cv.Mat
-                Dim r = rectList(i)
-                InRange(mask(r), index, index, nextMask)
-                rcMap(r).SetTo(i + 1, nextMask)
-                Dim pixels = CountNonZero(nextMask)
-                maskList.Add(nextMask)
             Next
 
             labels(2) = CStr(rectList.Count) + " regions found, sorted by size"

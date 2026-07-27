@@ -96,6 +96,7 @@ Color8U_Complementary
 Color8U_Hue
 Color8U_LeftRight
 Contour_Basics
+Contour_Smoothing
 Contour_Sort
 Convex_Basics
 Convex_RedColorDefects
@@ -636,7 +637,6 @@ Rectangle_Fit
 Rectangle_Rotated
 RedC_Basics
 RedC_BasicsList
-RedC_BasicsOld
 RedC_Depth
 RedC_Hulls
 RedC_MergeCells
