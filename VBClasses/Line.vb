@@ -1352,7 +1352,7 @@ Namespace VBClasses
 
 
     Public Class XR_Line_RedFlood : Inherits TaskParent
-        Dim flood As New Flood_BasicsMask
+        Dim flood As New Flood_OriginalMask
         Public Sub New()
             flood.showSelected = False
             desc = "Use the edges as input to flood."

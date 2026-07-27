@@ -771,4 +771,35 @@ Namespace VBClasses
             Next
         End Sub
     End Class
+
+
+
+
+
+    Public Class RedColor_InRange : Inherits TaskParent
+        Public inputRemoved As New Mat
+        Public showSelected As Boolean = True
+        Public redC As New RedColor_Basics
+        Dim color8U As New Color8U_Basics
+        Public Sub New()
+            labels(3) = "The inputRemoved mask is used to limit how much of the image is processed."
+            desc = "Use InRange to prepare an 8U input image for RedColor_Basics"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            color8U.Run(src)
+            InRange(task.pcSplit(2), task.MaxZmeters, 1000, inputRemoved)
+            ConvertScaleAbs(inputRemoved, inputRemoved)
+            src = color8U.dst2
+
+            src.SetTo(0, inputRemoved)
+
+            redC.Run(src)
+            labels(2) = redC.labels(2)
+            dst2 = redC.dst2.SetTo(0, inputRemoved)
+
+            labels(2) = $"{redC.rcList.Count} cells identified"
+
+            If showSelected Then SetTrueText(redC.strOut, 3)
+        End Sub
+    End Class
 End Namespace

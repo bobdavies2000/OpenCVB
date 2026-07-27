@@ -13,7 +13,6 @@ Namespace MainApp
         Dim labels As List(Of Label)
         Private Shared pics As New List(Of PictureBox)
         Dim resolutionDetails As String
-        Dim magnifyIndex As Integer
         Dim windowsFont = New System.Drawing.Font("Tahoma", 9)
         Dim pixelViewerRect As cv.Rect
         Dim magnification As Integer = 5
@@ -225,7 +224,6 @@ Namespace MainApp
             vbc.task.mouseMagnifyEndPoint = New cv.Point
             task.drawRect = New cv.Rect
             MagnifyTimer.Enabled = True
-            magnifyIndex += 1
         End Sub
         Private Sub MagnifyTimer_Tick(sender As Object, e As EventArgs) Handles MagnifyTimer.Tick
             If vbc.task.mouseMagnifyEndPoint <> New cv.Point Then

@@ -2,6 +2,86 @@ Imports System.Runtime.InteropServices
 Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Class Flood_Basics : Inherits TaskParent
+        Public pixelCounts As New List(Of Integer)
+        Public rectList As New List(Of cv.Rect)
+        Public indexList As New List(Of Integer)
+        Public maskList As New List(Of cv.Mat)
+        Public rcMap As New Mat(dst2.Size, MatType.CV_32S, 0)
+        Public Sub New()
+            dst2 = New Mat(dst2.Size, MatType.CV_8U, 0)
+            dst3 = New Mat(dst3.Size, MatType.CV_8U, 0)
+            labels(3) = "FloodFill mask"
+            desc = "Cursor.ai: FloodFill the input and list regions sorted by pixel count."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            If src.Channels <> 1 Then
+                Static color8u As New Color8U_Basics
+                color8u.Run(src)
+                src = color8u.dst2
+            End If
+
+            Dim floodMap = src.Clone
+            Dim mask As New Mat(New Size(dst2.Width + 2, dst2.Height + 2), MatType.CV_8U, 0)
+            Dim sortList As New SortedList(Of Integer, (count As Integer, rect As cv.Rect, index As Integer))(
+                New compareAllowIdenticalIntegerInverted)
+            Dim rect As cv.Rect
+            Dim index As Integer = 1
+
+            For y = 0 To floodMap.Height - 1
+                For x = 0 To floodMap.Width - 1
+                    If mask.Get(Of Byte)(y, x) = 0 Then ' it is surprising how much performance benefits from this statement.
+                        Dim flags = FloodFillFlags.FixedRange Or (index << 8)
+                        Dim count = FloodFill(floodMap, mask, New cv.Point(x, y), index, rect, 0, 0, flags)
+                        If count >= 10 Then
+                            sortList.Add(count, (count, ValidateRect(rect), index))
+                            index += 1
+                            If index >= 255 Then index = 1
+                        End If
+                    End If
+                Next
+            Next
+
+            pixelCounts.Clear()
+            rectList.Clear()
+            indexList.Clear()
+            maskList.Clear()
+            For Each item In sortList.Values
+                If item.count >= 10 Then
+                    pixelCounts.Add(item.count)
+                    rectList.Add(item.rect)
+                    indexList.Add(item.index)
+                End If
+            Next
+
+            rcMap.SetTo(1)
+            For i = 0 To rectList.Count - 1
+                index = indexList(i)
+                Dim nextMask As New cv.Mat
+                Dim r = rectList(i)
+                InRange(mask(r), index, index, nextMask)
+                rcMap(r).SetTo(i + 1, nextMask)
+                Dim pixels = CountNonZero(nextMask)
+                maskList.Add(nextMask)
+            Next
+
+            dst2 = Palettize(src)
+
+            Static clickPoint As cv.Point
+            If task.mouseClickFlag Then clickPoint = task.clickPoint
+            Dim clickIndex = rcMap.Get(Of Integer)(clickPoint.Y, clickPoint.X) - 1
+            task.color(rectList(clickIndex)).SetTo(white, maskList(clickIndex))
+            dst2(rectList(clickIndex)).SetTo(white, maskList(clickIndex))
+
+            labels(2) = CStr(rectList.Count) + " regions found, sorted by size"
+        End Sub
+    End Class
+
+
+
+
+
+
+    Public Class Flood_Original : Inherits TaskParent
         Implements IDisposable
         Public rcList As New List(Of rcData)
         Public rcMap As New Mat(dst2.Size, MatType.CV_32S, 0)
@@ -39,12 +119,14 @@ Namespace VBClasses
             Dim rcLastList = New List(Of rcData)(rcList)
 
             rcList.Clear()
+            rcList.Add(New rcData)
             rcMap.SetTo(0)
             dst2.SetTo(0)
+            Dim gRectSize = New cv.Size(task.gridWH, task.gridWH)
             For Each r In rects
                 ' skip the cells that are just one gridRect.
-                If r.Size <> task.gridRects(0).Size Then
-                    Dim rc = New rcData(dst0(r), r, rcList.Count + 1)
+                If r.Size <> gRectSize Then
+                    Dim rc = New rcData(dst0(r), r, rcList.Count)
                     If rc.pixels > 0 Then
                         For i = 0 To lastCenters.Count - 1
                             Dim rect = lastCenters(i)
@@ -53,7 +135,7 @@ Namespace VBClasses
                                 Exit For
                             End If
                         Next
-
+                        rc.index = rcList.Count
                         rcList.Add(rc)
                         dst2(rc.rect).SetTo(task.scalarColors(rc.index Mod 255), rc.mask)
                         rcMap(rc.rect).SetTo(rc.mapID, rc.mask)
@@ -65,11 +147,6 @@ Namespace VBClasses
             For Each rc In rcList
                 lastCenters.Add(task.gridNabeRects(rc.index))
             Next
-
-            If standalone Then
-                'strOut = Utility_Basics.selectCell(rcMap, rcList)
-                'SetTrueText(strOut, 3)
-            End If
 
             labels(2) = CStr(rcList.Count) + " cells found. "
         End Sub
@@ -83,8 +160,8 @@ Namespace VBClasses
 
 
 
-    Public Class Flood_BasicsDemo : Inherits TaskParent
-        Dim flood As New Flood_Basics
+    Public Class Flood_OriginalDemo : Inherits TaskParent
+        Dim flood As New Flood_Original
         Public Sub New()
             labels(3) = "Edge_Canny output"
             desc = "Use color to connect FCS cells - visualize the data mostly."
@@ -126,12 +203,12 @@ Namespace VBClasses
 
 
     Public Class XR_Flood_Tiers : Inherits TaskParent
-        Dim flood As New Flood_BasicsMask
+        Dim flood As New Flood_OriginalMask
         Dim color8U As New Color8U_Basics
         Dim tiers As New Depth_Tiers
         Public Sub New()
             task.gOptions.displayDst1.Checked = True
-            desc = "Subdivide the Flood_Basics cells using depth tiers."
+            desc = "Subdivide the Flood_Original cells using depth tiers."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             Dim tier = task.gOptions.DebugSlider.Value
@@ -230,7 +307,7 @@ Namespace VBClasses
 
 
 
-    Public Class Flood_BasicsMask : Inherits TaskParent
+    Public Class Flood_OriginalMask : Inherits TaskParent
         Public inputRemoved As New Mat
         Public showSelected As Boolean = True
         Public redC As New RedColor_Basics
@@ -289,7 +366,7 @@ Namespace VBClasses
 
 
 
-    Public Class Flood_BasicsNew : Inherits TaskParent
+    Public Class Flood_OriginalNew : Inherits TaskParent
         Implements IDisposable
         Public rcList As New List(Of rcData)
         Public rcMap As New Mat(dst2.Size, MatType.CV_32S, 0)
@@ -369,7 +446,7 @@ Namespace VBClasses
 
 
 
-    'Public Class RedFlood_BasicsNew
+    'Public Class RedFlood_OriginalNew
     '    Public src As Mat
     '    Public result As Mat
     '    Public cellRects As New List(Of Rect)
@@ -447,7 +524,7 @@ Namespace VBClasses
 
 
 
-    'Public Class RedFlood_BasicsNew : Inherits TaskParent
+    'Public Class RedFlood_OriginalNew : Inherits TaskParent
     '    Public Sub New()
     '        desc = "description"
     '    End Sub

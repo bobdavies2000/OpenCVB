@@ -107,7 +107,7 @@ Namespace VBClasses
 
 
     Public Class HeatMap_Cell : Inherits TaskParent
-        Dim flood As New Flood_Basics
+        Dim flood As New Flood_Original
         Dim heat As New HeatMap_Hot
         Public Sub New()
             If standalone Then task.gOptions.displayDst1.Checked = True
