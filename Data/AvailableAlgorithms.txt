@@ -386,6 +386,7 @@ Hull_Basics
 Hull_Contour
 Hull_Defect
 Hull_Edges
+Hull_RedC
 IMU_Average
 IMU_Basics_TA
 IMU_GMatrix_TA

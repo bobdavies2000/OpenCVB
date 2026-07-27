@@ -321,8 +321,90 @@ Namespace VBClasses
             Next
 
             dst3.SetTo(0)
-            DrawTour(dst3(rc.rect), rc.contour, white, task.lineWidth)
-            DrawTour(dst3(rc.rect), tour, task.highlight, task.lineWidth)
+            DrawTour(dst3, rc.contour, white, task.lineWidth)
+            For Each d In defects
+                Dim startPt = rc.contour(d.Item0)
+                Dim endPt = rc.contour(d.Item1)
+                Dim farPt = rc.contour(d.Item2)
+
+                ' Start and end points
+                Cv2.Circle(dst3, startPt, task.DotSize, task.highlight, -1)
+                Cv2.Circle(dst3, endPt, task.DotSize, task.highlight, -1)
+
+                ' Far point (deepest defect)
+                Cv2.Circle(dst3, farPt, task.DotSize + 1, Scalar.Red, -1)
+
+                ' Optional: draw line from start → far → end
+                Cv2.Line(dst3, startPt, farPt, task.highlight, task.lineWidth)
+                Cv2.Line(dst3, farPt, endPt, task.highlight, task.lineWidth)
+            Next
+        End Sub
+    End Class
+
+
+
+
+
+
+    Public Class Hull_RedC : Inherits TaskParent
+        Dim redC As New RedC_Basics
+        Public rclist As New List(Of rcData)
+        Public rcMap As New Mat(dst2.Size, MatType.CV_32S, 0)
+        Public Sub New()
+            labels = {"", "Cells where convexity defects failed", "", "Defect regions filled for each RedC hull"}
+            desc = "Cursor.ai: Fill convexity defect regions for each hull in RedC.rcList"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            redC.Run(src)
+            dst2 = redC.dst2
+            labels(2) = redC.labels(2)
+
+            Dim defectCount As Integer
+            Dim filledDefects As Integer
+            rcMap.SetTo(0)
+            dst3.SetTo(0)
+            rclist.Clear()
+            For Each rc In redC.rcList
+                If rc.contour Is Nothing OrElse rc.contour.Count < 3 Then Continue For
+
+                If rc.hull Is Nothing OrElse rc.hull.Count < 3 Then
+                    rc.hull = ConvexHull(rc.contour.ToArray, True).ToList
+                End If
+
+                Dim color = task.scalarColors(rc.index Mod 255)
+                dst3(rc.rect).SetTo(color, rc.mask)
+                DrawTour(rcMap(rc.rect), rc.hull, rc.index, -1)
+
+                If Hull_Defect.indicesMayFail(rc.contour) Then
+                    defectCount += 1
+                Else
+                    Try
+                        Dim hullIndices = ConvexHullIndices(rc.contour, False)
+                        Dim defects = ConvexityDefects(rc.contour, hullIndices.ToList)
+                        ' Fill each defect triangle (start / far / end) into mask, map, and display.
+                        For Each d In defects
+                            Dim tri = New cv.Point() {
+                                rc.contour(d.Item0),
+                                rc.contour(d.Item2),
+                                rc.contour(d.Item1)
+                            }
+                            FillConvexPoly(dst3(rc.rect), tri, Scalar.All(255))
+                            filledDefects += 1
+                        Next
+                        rc.contour = Convex_RedColorDefects.betterContour(rc.contour, defects)
+                        rc.pixels = CountNonZero(rc.mask)
+                    Catch ex As Exception
+                        defectCount += 1
+                    End Try
+                End If
+
+                rclist.Add(rc)
+                If rc.index >= 10 Then Exit For
+            Next
+
+            labels(3) = CStr(rclist.Count) + " hulls, " + CStr(filledDefects) +
+                        " defect regions filled.  " + CStr(defectCount) +
+                        " hulls failed building the defect list."
         End Sub
     End Class
 End Namespace
