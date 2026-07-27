@@ -2,6 +2,168 @@ Imports OpenCvSharp : Imports OpenCvSharp.Cv2 : Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 Namespace VBClasses
     Public Class RedC_Basics : Inherits TaskParent
+        Dim flood As New Flood_Basics
+        Public rcMap As New Mat(dst2.Size, MatType.CV_32S, 0)
+        Public rcList As New List(Of rcData) ' includes cloud data.
+        Dim maxDStableList As New List(Of cv.Point)
+        Public Sub New()
+            If standalone Then task.gOptions.displayDst1.Checked = True
+            desc = "Create the rcData representation of the image."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            If src.Channels <> 1 Then
+                Static color8u As New Color8U_Basics
+                color8u.Run(task.gray)
+                src = color8u.dst2
+            End If
+
+            Dim maxLast = New List(Of cv.Point)(maxDStableList)
+            Dim rcMapLast = rcMap.Clone
+            Dim rclistLast = New List(Of rcData)(rcList)
+
+            flood.Run(src)
+            dst2 = flood.dst2
+            rcList.Clear()
+            rcList.Add(New rcData)
+            rcMap.SetTo(0)
+            For i = 0 To flood.rectList.Count - 1
+                Dim index = flood.indexList(i)
+                Dim r = flood.rectList(i)
+
+                Dim rc As New rcData(flood.mask(r), r, index)
+                rc.maxDStable = rc.maxDist
+                rc.index = rcList.Count
+                rcMap(r).SetTo(rc.index, rc.mask)
+                rcList.Add(rc)
+            Next
+
+            maxDStableList.Clear()
+            For Each rc In rcList
+                Dim maxIndex = rcMapLast.Get(Of Integer)(rc.maxDist.Y, rc.maxDist.X)
+                If maxIndex >= 0 And maxIndex < rclistLast.Count Then
+                    Dim rcD = rclistLast(maxIndex)
+                    Dim index = maxLast.IndexOf(rcD.maxDStable)
+                    If index >= 0 Then
+                        rc.age = rcD.age + 1
+                        If rc.age >= 1000 Then rc.age = 2
+                        rc.maxDStable = rcD.maxDStable
+                    End If
+                End If
+                maxDStableList.Add(rc.maxDStable)
+            Next
+
+
+            Static clickPoint As cv.Point
+            If task.mouseClickFlag Then clickPoint = task.clickPoint
+            Dim clickIndex = rcMap.Get(Of Integer)(clickPoint.Y, clickPoint.X)
+            If clickIndex <= 0 Then
+                SetTrueText("There is no cell defined for that point.", 1)
+            Else
+                Dim rcD = rcList(clickIndex - 1)
+                task.color(rcD.rect).SetTo(white, rcD.mask)
+                dst2(rcD.rect).SetTo(white, rcD.mask)
+                SetTrueText(rcD.displayCell, 1)
+            End If
+
+        End Sub
+    End Class
+
+
+
+
+
+
+    Public Class RedC_BasicsOld : Inherits TaskParent
+        Dim color8u As New Color8U_Basics
+        Public rcMap As New Mat(dst2.Size, MatType.CV_8U, 0)
+        Public rcList As New List(Of rcData) ' includes cloud data.
+        Dim rcListLast As New List(Of rcData)
+        Public rcIndexMap As New Mat(dst2.Size, MatType.CV_32S, 0)
+        Public Sub New()
+            If standalone Then task.gOptions.displayDst1.Checked = True
+            labels(3) = "The tracked cell.  The dot is the maxDStable for the tracked cell."
+            desc = "FloodFill each color8U output and create an rclist"
+        End Sub
+        Public Shared Function displayCell(rcIndexMap As cv.Mat, rcList As List(Of rcData)) As String
+            Dim clickIndex = rcIndexMap.Get(Of Integer)(task.clickPoint.Y, task.clickPoint.X)
+            task.rcD = rcList(clickIndex)
+            task.color(task.rcD.rect).SetTo(white, task.rcD.mask)
+            If clickIndex = 0 Then Return task.rcD.displayCell() + vbCrLf + vbCrLf + "Unmapped region.  No cell present" + vbCrLf
+            Return task.rcD.displayCell()
+        End Function
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            Dim rcMapLast As cv.Mat = rcMap.Clone
+            Dim rcIndexMapLast As cv.Mat = rcIndexMap.Clone
+            rcListLast = New List(Of rcData)(rcList)
+
+            If task.optionsChanged Then
+                rcMapLast.SetTo(0)
+                rcIndexMap.SetTo(0)
+                rcListLast.Clear()
+            End If
+
+            color8u.Run(task.gray)
+
+            rcMap = color8u.dst2.Clone + 1
+            Dim rect As cv.Rect
+            Dim mask As New Mat(New Size(dst2.Width + 2, dst2.Height + 2), MatType.CV_8U, 0)
+            Dim floodMap = rcMap.Clone
+            Dim sortList As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted) From {{0, New rcData}}
+            For y = 0 To floodMap.Height - 1
+                For x = 0 To floodMap.Width - 1
+                    If mask.Get(Of Byte)(y, x) = 0 Then
+                        Dim index As Integer = sortList.Count
+                        Dim mapID As Integer = rcMap.Get(Of Byte)(y, x)
+                        Dim flags = FloodFillFlags.FixedRange Or (index << 8) ' Or FloodFillFlags.MaskOnly
+                        Dim count = FloodFill(floodMap, mask, New cv.Point(x, y), index, rect, 0, 0, flags)
+                        If count > CInt(src.Total * 0.001) Then
+                            Dim rc As New rcData(floodMap(rect), rect, index) With {.mapID = mapID}
+                            If rc.pixels >= 10 Then sortList.Add(rc.pixels, rc)
+                        End If
+                    End If
+                Next
+            Next
+
+            dst2 = Palettize(rcMap, 0)
+
+            rcIndexMap.SetTo(0)
+            rcList.Clear()
+            rcList.Add(New rcData)
+            For Each rc In sortList.Values
+                If rc.pixels > 0 Then
+                    rc.index = rcList.Count
+                    rcIndexMap(rc.rect).SetTo(rc.index, rc.mask)
+                    rcList.Add(rc)
+                End If
+            Next
+
+            For Each rc In rcList
+                Dim mapIDCurr = rcMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
+                Dim mapIDLast = rcMapLast.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
+                Dim indexLast = rcIndexMapLast.Get(Of Integer)(rc.maxDist.Y, rc.maxDist.X)
+
+                If indexLast < rcListLast.Count Then
+                    rc.maxDStable = If(mapIDCurr = mapIDLast, rcListLast(indexLast).maxDStable, rc.maxDist)
+                    Dim color = dst2.Get(Of cv.Vec3b)(rc.maxDist.Y, rc.maxDist.X)
+                    Dim colorLast = dst2.Get(Of cv.Vec3b)(rc.maxDStable.Y, rc.maxDStable.X)
+                    If color <> colorLast Then rc.maxDStable = rc.maxDist
+                Else
+                    If task.firstPass Then rc.maxDStable = rc.maxDist
+                End If
+            Next
+
+            strOut = displayCell(rcIndexMap, rcList)
+            SetTrueText(strOut, 1)
+
+            If task.heartBeat Then labels(2) = CStr(rcList.Count) + " RedColor cells were found."
+        End Sub
+    End Class
+
+
+
+
+
+    Public Class RedC_BasicsList : Inherits TaskParent
         Dim color8u As New Color8U_Basics
         Public rcMap As New Mat(dst2.Size, MatType.CV_8U, 0)
         Public rcList As New List(Of rcData) ' includes cloud data.
@@ -177,7 +339,7 @@ Namespace VBClasses
 
 
     Public Class RedC_TrackCell : Inherits TaskParent
-        Dim redC As New RedC_Basics
+        Dim redC As New RedC_BasicsOld
         Dim rcLast As rcData = Nothing
         Dim lastClickPoint As cv.Point
         Public Sub New()
@@ -363,7 +525,7 @@ Namespace VBClasses
 
 
     Public Class RedC_NeighborHist : Inherits TaskParent
-        Public redC As New RedC_Basics
+        Public redC As New RedC_BasicsOld
         Dim lastCenter As cv.Point
         Public rcD As rcData
         Public neighbors As New List(Of Integer)
@@ -512,7 +674,7 @@ Namespace VBClasses
 
 
     Public Class RedC_Depth : Inherits TaskParent
-        Dim redC As New RedC_Basics
+        Dim redC As New RedC_BasicsOld
         Public Sub New()
             If standalone Then task.gOptions.displayDst1.Checked = True
             dst0 = New Mat(dst0.Size(), MatType.CV_8U, Scalar.All(0))

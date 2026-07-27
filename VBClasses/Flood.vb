@@ -6,8 +6,10 @@ Namespace VBClasses
         Public rectList As New List(Of cv.Rect)
         Public indexList As New List(Of Integer)
         Public maskList As New List(Of cv.Mat)
-        Public rcMap As New Mat(dst2.Size, MatType.CV_32S, 0)
+        Public rcMap As New Mat(dst2.Size, MatType.CV_32S, -1)
+        Public mask As New Mat(New Size(dst2.Width + 2, dst2.Height + 2), MatType.CV_8U, 0)
         Public Sub New()
+            If standalone Then task.gOptions.displayDst1.Checked = True
             dst2 = New Mat(dst2.Size, MatType.CV_8U, 0)
             dst3 = New Mat(dst3.Size, MatType.CV_8U, 0)
             labels(3) = "FloodFill mask"
@@ -19,19 +21,19 @@ Namespace VBClasses
                 color8u.Run(src)
                 src = color8u.dst2
             End If
+            dst1 = src.Clone
+            dst2 = Palettize(src)
 
-            Dim floodMap = src.Clone
-            Dim mask As New Mat(New Size(dst2.Width + 2, dst2.Height + 2), MatType.CV_8U, 0)
             Dim sortList As New SortedList(Of Integer, (count As Integer, rect As cv.Rect, index As Integer))(
                 New compareAllowIdenticalIntegerInverted)
             Dim rect As cv.Rect
             Dim index As Integer = 1
 
-            For y = 0 To floodMap.Height - 1
-                For x = 0 To floodMap.Width - 1
+            For y = 0 To src.Height - 1
+                For x = 0 To src.Width - 1
                     If mask.Get(Of Byte)(y, x) = 0 Then ' it is surprising how much performance benefits from this statement.
                         Dim flags = FloodFillFlags.FixedRange Or (index << 8)
-                        Dim count = FloodFill(floodMap, mask, New cv.Point(x, y), index, rect, 0, 0, flags)
+                        Dim count = FloodFill(src, mask, New cv.Point(x, y), index, rect, 0, 0, flags)
                         If count >= 10 Then
                             sortList.Add(count, (count, ValidateRect(rect), index))
                             index += 1
@@ -63,14 +65,6 @@ Namespace VBClasses
                 Dim pixels = CountNonZero(nextMask)
                 maskList.Add(nextMask)
             Next
-
-            dst2 = Palettize(src)
-
-            Static clickPoint As cv.Point
-            If task.mouseClickFlag Then clickPoint = task.clickPoint
-            Dim clickIndex = rcMap.Get(Of Integer)(clickPoint.Y, clickPoint.X) - 1
-            task.color(rectList(clickIndex)).SetTo(white, maskList(clickIndex))
-            dst2(rectList(clickIndex)).SetTo(white, maskList(clickIndex))
 
             labels(2) = CStr(rectList.Count) + " regions found, sorted by size"
         End Sub

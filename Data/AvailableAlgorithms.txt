@@ -635,6 +635,8 @@ Rectangle_EnclosingPoints
 Rectangle_Fit
 Rectangle_Rotated
 RedC_Basics
+RedC_BasicsList
+RedC_BasicsOld
 RedC_Depth
 RedC_Hulls
 RedC_MergeCells

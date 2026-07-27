@@ -710,7 +710,7 @@ Namespace VBClasses
             End Sub
             Public Sub New(_mask As cv.Mat, _rect As cv.Rect, mapID As Integer)
                 rect = _rect
-                InRange(_mask, mapID, mapID, mask)
+                If mapID >= 0 Then InRange(_mask, mapID, mapID, mask) Else mask = _mask.Clone
                 age = 1
                 contourHull()
             End Sub
