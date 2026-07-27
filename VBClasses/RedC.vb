@@ -323,13 +323,14 @@ Namespace VBClasses
             dst2 = redC.dst2
             labels(2) = redC.labels(2)
 
-            For i = redC.rcList.Count - 1 To 0 Step -1
+            For i = 0 To redC.rcList.Count - 1
                 Dim rc = redC.rcList(i)
                 If rc.hull IsNot Nothing Then FillPoly(dst1(rc.rect), {rc.hull}, rc.mapID)
             Next
 
             rcList = New List(Of rcData)(redC.rcList)
             dst3 = Palettize(dst1)
+            labels(3) = CStr(redC.rcList.Count) + " hulls with the smallest on top."
         End Sub
     End Class
 

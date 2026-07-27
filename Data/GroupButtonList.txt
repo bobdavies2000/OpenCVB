@@ -96,7 +96,6 @@ HOG
 Homography
 Hough
 Hull
-HullLine
 IMU
 Indexer
 InPaint

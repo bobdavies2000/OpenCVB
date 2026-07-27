@@ -384,8 +384,8 @@ Hough_Lines
 Hough_Lines_MT
 Hull_Basics
 Hull_Contour
-HullLine_BasicsOld_TA
-HullLine_EdgePoints
+Hull_Defect
+Hull_Edges
 IMU_Average
 IMU_Basics_TA
 IMU_GMatrix_TA

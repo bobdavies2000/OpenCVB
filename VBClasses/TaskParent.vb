@@ -118,15 +118,15 @@ Namespace VBClasses
             Return output
         End Function
         Public Shared Function ShowAddweighted(src1 As Mat, src2 As Mat, ByRef label As String) As Mat
-            Static addw As New AddWeighted_Basics
-            addw.src2 = src2
+            Static addw As New AddWeighted_Basics With {.src2 = src2}
             addw.Run(src1)
             Dim wt = addw.options.addWeighted
             label = "AddWeighted: src1 = " + wt.ToString("0%") + " vs. src2 = " + (1 - wt).ToString("0%")
             Return addw.dst2
         End Function
-        Public Shared Sub DrawTour(dst As Mat, contour As List(Of cv.Point), color As Scalar, Optional lineWidth As Integer = -1,
-                            Optional lineType As LineTypes = LineTypes.Link8)
+        Public Shared Sub DrawTour(dst As Mat, contour As List(Of cv.Point), color As Scalar,
+                                   Optional lineWidth As Integer = -1,
+                                   Optional lineType As LineTypes = LineTypes.Link8)
             If contour Is Nothing Then Exit Sub
             If contour.Count < 3 Then Exit Sub ' this is not enough to draw.
             Dim listOfPoints = New List(Of List(Of cv.Point))({contour})
