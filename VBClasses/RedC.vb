@@ -339,78 +339,7 @@ Namespace VBClasses
 
 
 
-    Public Class RedC_TrackCell : Inherits TaskParent
-        Dim redC As New RedC_Basics
-        Dim rcLast As rcData = Nothing
-        Dim lastClickPoint As cv.Point
-        Public Sub New()
-            task.gOptions.displayDst1.Checked = True
-            desc = "Track the selected cell even after maxDStable goes beyond the edge of the cell."
-        End Sub
-        Private Function rcDFindCell(rcLast As rcData) As rcData
-            Dim rcD As rcData = Nothing
-            Dim candidates As New List(Of (index As Integer, mapID As Byte))
-            For Each rc In redC.rcList
-                If rcLast.rect.IntersectsWith(rc.rect) And rcLast.mapID = rc.mapID Then candidates.Add((rc.index, rc.mapID))
-            Next
-
-            If candidates.Count > 0 Then rcD = redC.rcList(candidates(0).index)
-            Return rcD
-        End Function
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            If task.heartBeatLT Then dst1.SetTo(0)
-            redC.Run(src)
-            dst2 = redC.dst2
-            labels(2) = redC.labels(2)
-
-            Dim rcD As rcData = rcLast
-            If task.mouseClickFlag Then
-                Dim clickIndex = redC.rcMap.Get(Of Integer)(task.clickPoint.Y, task.clickPoint.X)
-                rcD = redC.rcList(clickIndex)
-                If rcD.maxDStable = newPoint Then rcD.maxDStable = rcD.maxDist
-                rcLast = rcD
-                lastClickPoint = task.clickPoint
-            End If
-
-            Dim stablePoints As New List(Of cv.Point)
-            For Each rc In redC.rcList
-                stablePoints.Add(rc.maxDStable)
-            Next
-
-            Dim index = stablePoints.IndexOf(rcD.maxDStable)
-            dst3.SetTo(0)
-            If index >= 0 Then
-                rcD = redC.rcList(index)
-            Else
-                rcD = rcDFindCell(rcLast)
-                If rcD Is Nothing Then
-                    Dim clickIndex = redC.rcMap.Get(Of Integer)(lastClickPoint.Y, lastClickPoint.X)
-                    rcD = redC.rcList(clickIndex)
-                End If
-            End If
-
-            If rcD.index <> 0 Then rcLast = rcD Else rcD = redC.rcList(1)
-
-            task.color(rcD.rect).SetTo(white, rcD.mask)
-            dst3(rcD.rect).SetTo(task.scalarColors(rcD.mapID), rcD.mask)
-            Rectangle(dst2, rcD.rect, task.highlight, task.lineWidth)
-            Circle(dst3, rcD.maxDStable, task.DotSize + 1, task.highlight, -1)
-            Circle(dst1, rcLast.maxDist, task.DotSize + 1, task.highlight, -1)
-
-            strOut = rcD.displayCell() + vbCrLf + rcD.maxDist.ToString + vbCrLf
-            SetTrueText(strOut, 1)
-
-            task.rcD = rcD
-        End Sub
-    End Class
-
-
-
-
-
-
-
-    Public Class RedC_TrackHull : Inherits TaskParent
+    Public Class XR_RedC_TrackHull : Inherits TaskParent
         Dim redC As New RedC_Basics
         Dim lastCenter As cv.Point
         Dim lastMapID As Byte
@@ -709,6 +638,75 @@ Namespace VBClasses
 
             labels(3) = CStr(depthCount) + " cells colored by mean depth (0-" +
                     task.MaxZmeters.ToString(fmt0) + "m DepthColorizer palette)"
+        End Sub
+    End Class
+
+
+
+
+
+    Public Class RedC_TrackCell : Inherits TaskParent
+        Dim redC As New RedC_Basics
+        Dim rcLast As rcData = Nothing
+        Dim lastClickPoint As cv.Point
+        Public Sub New()
+            task.gOptions.displayDst1.Checked = True
+            desc = "Track the selected cell even after maxDStable goes beyond the edge of the cell."
+        End Sub
+        Private Function rcDFindCell(rcLast As rcData) As rcData
+            Dim rcD As rcData = Nothing
+            Dim candidates As New List(Of (index As Integer, mapID As Byte))
+            For Each rc In redC.rcList
+                If rcLast.rect.IntersectsWith(rc.rect) And rcLast.mapID = rc.mapID Then candidates.Add((rc.index, rc.mapID))
+            Next
+
+            If candidates.Count > 0 Then rcD = redC.rcList(candidates(0).index)
+            Return rcD
+        End Function
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            If task.heartBeatLT Then dst1.SetTo(0)
+            redC.Run(src)
+            dst2 = redC.dst2
+            labels(2) = redC.labels(2)
+
+            Dim rcD As rcData = rcLast
+            If task.mouseClickFlag Then
+                Dim clickIndex = redC.rcMap.Get(Of Integer)(task.clickPoint.Y, task.clickPoint.X)
+                rcD = redC.rcList(clickIndex)
+                If rcD.maxDStable = newPoint Then rcD.maxDStable = rcD.maxDist
+                rcLast = rcD
+                lastClickPoint = task.clickPoint
+            End If
+
+            Dim stablePoints As New List(Of cv.Point)
+            For Each rc In redC.rcList
+                stablePoints.Add(rc.maxDStable)
+            Next
+
+            Dim index = stablePoints.IndexOf(rcD.maxDStable)
+            dst3.SetTo(0)
+            If index >= 0 Then
+                rcD = redC.rcList(index)
+            Else
+                rcD = rcDFindCell(rcLast)
+                If rcD Is Nothing Then
+                    Dim clickIndex = redC.rcMap.Get(Of Integer)(lastClickPoint.Y, lastClickPoint.X)
+                    rcD = redC.rcList(clickIndex)
+                End If
+            End If
+
+            If rcD.index <> 0 Then rcLast = rcD Else rcD = redC.rcList(1)
+
+            task.color(rcD.rect).SetTo(white, rcD.mask)
+            dst3(rcD.rect).SetTo(task.scalarColors(rcD.mapID), rcD.mask)
+            Rectangle(dst2, rcD.rect, task.highlight, task.lineWidth)
+            Circle(dst3, rcD.maxDStable, task.DotSize + 1, task.highlight, -1)
+            Circle(dst1, rcLast.maxDist, task.DotSize + 1, task.highlight, -1)
+
+            strOut = rcD.displayCell() + vbCrLf + rcD.maxDist.ToString + vbCrLf
+            SetTrueText(strOut, 1)
+
+            task.rcD = rcD
         End Sub
     End Class
 End Namespace
