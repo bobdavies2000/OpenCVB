@@ -83,7 +83,7 @@ Public Class RedPrep_Edges_CPP : Inherits TaskParent
         If standalone Then
             Static prep As New RedPrep_Core
             prep.Run(src)
-            dst2 = prep.dst2
+            dst2 = prep.dst1
             labels(2) = prep.labels(2)
         Else
             dst2 = src
@@ -96,15 +96,8 @@ Public Class RedPrep_Edges_CPP : Inherits TaskParent
         handleSrc.Free()
 
         dst3 = Mat.FromPixelData(src.Rows, src.Cols, MatType.CV_8U, imagePtr).Clone
-        If src.Size <> task.noDepthMask.Size Then
-            Resize(task.noDepthMask, task.noDepthMask, src.Size)
-            dst3.SetTo(255, task.noDepthMask)
-            Resize(dst2, dst2, src.Size)
-            dst2.SetTo(0, dst3)
-        Else
-            dst3.SetTo(255, task.noDepthMask)
-            dst2.SetTo(0, dst3)
-        End If
+        dst3.SetTo(255, task.noDepthMask)
+        dst2.SetTo(0, dst3)
     End Sub
     Protected Overrides Sub Finalize()
         RedPrep_CPP_Close(cPtr)
@@ -156,22 +149,12 @@ Public Class RedPrep_Core : Inherits TaskParent
 
         ' everything gets slammed between -1000 and 1000.  Good idea? I dunno...
         dst2 = (reduced32s - wcMinVal) * 254 / (wcMaxVal - wcMinVal)
-        dst2.ConvertTo(dst2, MatType.CV_8U)
-        dst2 += 1
+        Normalize(dst2, dst2, 255, 0, cv.NormTypes.MinMax)
         dst2.SetTo(0, task.noDepthMask)
 
         labels(2) = "Using reduction amount = " + CStr(reduction)
 
-        If standalone Then
-            Dim ranges = New Rangef() {New Rangef(-1, 256)}
-            Dim histogram As New Mat
-            CalcHist({dst2}, {0}, task.depthmask, histogram, 1, {256}, ranges)
-            Dim histArray(255) As Single
-            histogram.GetArray(Of Single)(histArray)
-            Dim histSum = Sum(histogram)(0)
-            If histSum <> CountNonZero(task.depthmask) Then Throw New Exception("can't happen.")
-        End If
-
+        dst2.ConvertTo(dst1, cv.MatType.CV_8U)
         dst3 = Palettize(dst2, 0)
     End Sub
 End Class
