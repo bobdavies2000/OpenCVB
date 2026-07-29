@@ -104,6 +104,7 @@ Namespace VBClasses
     Public Class Bin2Way_Gradation : Inherits TaskParent
         Dim bin2 As New Bin2Way_Basics
         Public mats(3) As Mat
+        Public classCount As Integer = 4
         Public Sub New()
             dst3 = New Mat(dst1.Size, MatType.CV_8U, 0)
             For Each m In mats
@@ -165,7 +166,7 @@ Namespace VBClasses
 
 
     Public Class XR_Bin2Way_RedCloudDarkest : Inherits TaskParent
-        Dim bin2 As New Bin2Way_RecurseOnce
+        Dim bin2 As New XR_Bin2Way_RecurseOnce
         Dim flood As New Flood_OriginalMask
         Public Sub New()
             desc = "Use RedCloud with the darkest regions"
@@ -186,7 +187,7 @@ Namespace VBClasses
 
 
     Public Class XR_Bin2Way_RedCloudLight : Inherits TaskParent
-        Dim bin2 As New Bin2Way_RecurseOnce
+        Dim bin2 As New XR_Bin2Way_RecurseOnce
         Dim flood As New Flood_OriginalMask
         Public Sub New()
             desc = "Use RedCloud with the lightest regions"
@@ -205,7 +206,7 @@ Namespace VBClasses
 
 
 
-    Public Class Bin2Way_RecurseOnce : Inherits TaskParent
+    Public Class XR_Bin2Way_RecurseOnce : Inherits TaskParent
         Dim bin2 As New Bin2Way_Basics
         Public mats As New Mat_4Click
         Public Sub New()
@@ -242,7 +243,7 @@ Namespace VBClasses
 
 
     Public Class XR_Bin2Way_RedCloudLightToDark : Inherits TaskParent
-        Dim recurse As New Bin2Way_RecurseOnce
+        Dim recurse As New XR_Bin2Way_RecurseOnce
         Dim redCs(3) As RedC_Basics
         Dim mats As New Mat_4to1
         Dim rclist As New List(Of rcData)

@@ -15,8 +15,10 @@ Namespace VBClasses
                 saveColorMethod = task.fOptions.Color8USource.Text
                 Dim index = task.fOptions.Color8USource.SelectedIndex
                 Select Case task.fOptions.Color8USource.Text
-                    Case "Bin4Way_Regions"
-                        If colorMethods(index) Is Nothing Then colorMethods(index) = New Bin4Way_Regions
+                    Case "Bin4Way_Basics"
+                        If colorMethods(index) Is Nothing Then colorMethods(index) = New Bin4Way_Basics
+                    Case "BinNWay_Basics"
+                        If colorMethods(index) Is Nothing Then colorMethods(index) = New BinNWay_Basics
                     Case "Hist3DColor_Basics"
                         If colorMethods(index) Is Nothing Then colorMethods(index) = New Hist3Dcolor_Basics
                     Case "KMeans_Basics"

@@ -1,7 +1,7 @@
 Public Class OptionsFeatures
     Public grayCheckbox() As RadioButton
     Public colorCheckbox() As RadioButton
-    Public colorMethods() As String = {"Bin4Way_Regions", "Hist3DColor_Basics",
+    Public colorMethods() As String = {"Bin4Way_Basics", "BinNWay_Basics", "Hist3DColor_Basics",
                                    "KMeans_Basics", "LUT_Basics", "Reduction_Basics", "PCA_NColor_CPP"}
     Private Sub OptionsFeatures_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         Me.MdiParent = task.allOptions

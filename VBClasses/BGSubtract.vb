@@ -318,7 +318,7 @@ Namespace VBClasses
 
     Public Class XR_BGSubtract_Synthetic : Inherits TaskParent
         Dim bgSub As New BGSubtract_Basics
-        Dim synth As New BGSubtract_Synthetic_CPP
+        Dim synth As New XR_BGSubtract_Synthetic_CPP
         Public Sub New()
             desc = "Demonstrate background subtraction algorithms with synthetic images"
         End Sub

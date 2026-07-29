@@ -2,6 +2,40 @@ Imports System.Runtime.InteropServices
 Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Class Bin4Way_Basics : Inherits TaskParent
+        Dim binary As New Bin4Way_SplitMean
+        Public classCount As Integer = 4 ' 4-way split 
+        Public Sub New()
+            dst2 = New Mat(dst1.Size, MatType.CV_8U, 0)
+            rebuildMats()
+            labels = {"", "", "CV_8U version of dst3 with values ranging from 1 to 4", "Palettized version of dst2"}
+            desc = "Add the 4-way split of images to define the different regions."
+        End Sub
+        Private Sub rebuildMats()
+            dst1 = New Mat(dst1.Size, MatType.CV_8U, 0)
+            For i = 0 To binary.mats.mat.Length - 1
+                binary.mats.mat(i) = New Mat(dst1.Size, MatType.CV_8UC1, 0)
+            Next
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            binary.Run(src)
+
+            dst2 = New Mat(dst2.Size(), MatType.CV_8U, 0)
+            dst2.SetTo(1, binary.mats.mat(0))
+            dst2.SetTo(2, binary.mats.mat(1))
+            dst2.SetTo(3, binary.mats.mat(2))
+            dst2.SetTo(4, binary.mats.mat(3))
+
+            If standaloneTest() Then dst3 = Palettize(dst2)
+        End Sub
+    End Class
+
+
+
+
+
+
+
+    Public Class Bin4Way_Contours : Inherits TaskParent
         Dim mats As New Mat_4to1
         Dim binary As New Bin4Way_SplitMean
         Dim diff(3) As Diff_Basics
@@ -201,9 +235,9 @@ Namespace VBClasses
 
 
 
-    Public Class Bin4Way_UnstableEdges : Inherits TaskParent
+    Public Class XR_Bin4Way_UnstableEdges : Inherits TaskParent
         Dim blurC As New Blur_Basics
-        Dim unstable As New Bin4Way_Unstable
+        Dim unstable As New XR_Bin4Way_Unstable
         Public Sub New()
             If standalone Then task.gOptions.displayDst1.Checked = True
             desc = "Find unstable pixels but remove those that are also edges."
@@ -229,7 +263,7 @@ Namespace VBClasses
 
 
     Public Class XR_Bin4Way_UnstablePixels : Inherits TaskParent
-        Dim unstable As New Bin4Way_UnstableEdges
+        Dim unstable As New XR_Bin4Way_UnstableEdges
         Public gapValues As New List(Of Byte)
         Public Sub New()
             desc = "Identify the unstable grayscale pixel values "
@@ -322,9 +356,9 @@ Namespace VBClasses
 
 
 
-    Public Class Bin4Way_UnstablePixels1 : Inherits TaskParent
+    Public Class XR_Bin4Way_UnstablePixels1 : Inherits TaskParent
         Dim hist As New Histogram_Basics
-        Dim unstable As New Bin4Way_UnstableEdges
+        Dim unstable As New XR_Bin4Way_UnstableEdges
         Public gapValues As New List(Of Byte)
         Dim boundaries(4) As Byte
         Public Sub New()
@@ -528,7 +562,7 @@ Namespace VBClasses
 
 
 
-    Public Class Bin4Way_Unstable : Inherits TaskParent
+    Public Class XR_Bin4Way_Unstable : Inherits TaskParent
         Dim binary As New Bin4Way_SplitMean
         Dim diff(3) As Diff_Basics
         Public Sub New()
@@ -550,42 +584,6 @@ Namespace VBClasses
             labels(3) = "There are " + CStr(CountNonZero(dst3)) + " unstable pixels"
         End Sub
     End Class
-
-
-
-
-
-
-    Public Class Bin4Way_Regions : Inherits TaskParent
-        Dim binary As New Bin4Way_SplitMean
-        Public classCount As Integer = 4 ' 4-way split 
-        Public Sub New()
-            dst2 = New Mat(dst1.Size, MatType.CV_8U, 0)
-            rebuildMats()
-            labels = {"", "", "CV_8U version of dst3 with values ranging from 1 to 4", "Palettized version of dst2"}
-            desc = "Add the 4-way split of images to define the different regions."
-        End Sub
-        Private Sub rebuildMats()
-            dst1 = New Mat(dst1.Size, MatType.CV_8U, 0)
-            For i = 0 To binary.mats.mat.Length - 1
-                binary.mats.mat(i) = New Mat(dst1.Size, MatType.CV_8UC1, 0)
-            Next
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            binary.Run(src)
-
-            dst2 = New Mat(dst2.Size(), MatType.CV_8U, 0)
-            dst2.SetTo(1, binary.mats.mat(0))
-            dst2.SetTo(2, binary.mats.mat(1))
-            dst2.SetTo(3, binary.mats.mat(2))
-            dst2.SetTo(4, binary.mats.mat(3))
-
-            If standaloneTest() Then dst3 = Palettize(dst2)
-        End Sub
-    End Class
-
-
-
 
 
 

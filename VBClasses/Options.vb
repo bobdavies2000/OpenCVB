@@ -7803,9 +7803,9 @@ Namespace VBClasses
 
 
     Public Class Options_BinNWay : Inherits OptionParent
-        Public gradations As Integer
+        Public gradations As Integer = 10
         Public Sub New()
-            If sliders.Setup(traceName) Then sliders.setupTrackBar("Number of Gradations", 1, 10, 4)
+            If sliders.Setup(traceName) Then sliders.setupTrackBar("Number of Gradations", 1, 20, gradations)
         End Sub
         Public Sub Run()
             Static nSlider = FindSlider("Number of Gradations")

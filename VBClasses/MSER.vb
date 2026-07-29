@@ -667,7 +667,7 @@ Namespace VBClasses
 
     Public Class XR_MSER_Binarize : Inherits TaskParent
         Dim mser As New MSER_Basics
-        Dim bin4 As New Bin4Way_Regions
+        Dim bin4 As New Bin4Way_Basics
         Public Sub New()
             desc = "Instead of a BGR src, try using the color output of Bin4Way_Regions"
         End Sub
