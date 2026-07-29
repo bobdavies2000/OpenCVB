@@ -2,7 +2,6 @@ Imports System.Runtime.InteropServices
 Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Class Flood_Basics : Inherits TaskParent
-        Public pixelCounts As New List(Of Integer)
         Public rectList As New List(Of cv.Rect)
         Public indexList As New List(Of Integer)
         Public mask As New Mat(New Size(dst2.Width + 2, dst2.Height + 2), MatType.CV_8U, 0)
@@ -42,12 +41,10 @@ Namespace VBClasses
                 Next
             Next
 
-            pixelCounts.Clear()
             rectList.Clear()
             indexList.Clear()
             For Each item In sortList.Values
                 If item.count >= 10 Then
-                    pixelCounts.Add(item.count)
                     rectList.Add(item.rect)
                     indexList.Add(item.index)
                 End If

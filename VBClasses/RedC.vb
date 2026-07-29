@@ -5,7 +5,7 @@ Namespace VBClasses
         Public rcMap As New Mat(dst2.Size, MatType.CV_32S, 0)
         Public rcList As New List(Of rcData) ' includes cloud data.
         Public maxDStableList As New List(Of cv.Point)
-        Dim flood As New Flood_Basics
+        Public flood As New Flood_Basics
         Public displayCell As Boolean = True
         Public Sub New()
             If standalone Then task.gOptions.displayDst1.Checked = True
@@ -41,7 +41,7 @@ Namespace VBClasses
             For Each rc In rcList
                 Dim maxDIndex = rcMapLast.Get(Of Integer)(rc.maxDist.Y, rc.maxDist.X)
                 If maxDIndex > 0 Then
-                    Dim rcD = rclistLast(maxDIndex)
+                    Dim rcD = rcListLast(maxDIndex)
                     Dim index = maxDLast.IndexOf(rcD.maxDStable)
                     If index >= 0 Then
                         rc.age = rcD.age + 1
@@ -61,8 +61,10 @@ Namespace VBClasses
                 task.rcD = rcList(clickIndex)
                 If displayCell Then
                     task.color(task.rcD.rect).SetTo(white, task.rcD.mask)
-                    dst2(task.rcD.rect).SetTo(white, task.rcD.mask)
+                    Circle(dst2, task.rcD.maxDist, task.DotSize + 1, white, -1)
+                    Circle(dst2, task.rcD.maxDStable, task.DotSize + 1, task.highlight, -1)
                     SetTrueText(task.rcD.displayCell, 1)
+                    SetTrueText(CStr(task.rcD.age), task.rcD.maxDist)
                 End If
             End If
 
@@ -658,7 +660,7 @@ Namespace VBClasses
             Dim rcD As rcData = Nothing
             Dim candidates As New List(Of (index As Integer, rc As rcData))
             For Each rc In redC.rcList
-                If rcLast.rect.IntersectsWith(rc.rect) And rcLast.mapID = rc.mapID Then candidates.Add((rc.index, rc))
+                If rcLast.mapID = rc.mapID Then candidates.Add((rc.index, rc))
             Next
 
             If candidates.Count > 0 Then
@@ -669,6 +671,8 @@ Namespace VBClasses
                     pixelsSorted.Add(rect.Width * rect.Height, rc)
                 Next
                 rcD = redC.rcList(candidates(0).index)
+                dst1.SetTo(0)
+                dst1(rcD.rect).SetTo(task.scalarColors(rcD.mapID), rcD.mask)
             End If
             Return rcD
         End Function
@@ -677,6 +681,12 @@ Namespace VBClasses
             dst2 = redC.dst2
             labels(2) = redC.labels(2)
             If task.rcD Is Nothing Then Exit Sub
+
+            Dim mapID = redC.flood.dst1.Get(Of Byte)(task.rcD.maxDStable.Y, task.rcD.maxDStable.X)
+            If mapID <> task.rcD.mapID Then
+                task.rcD = rcDFindCell(task.rcD)
+                task.rcD.maxDStable = task.rcD.maxDist
+            End If
 
             Dim index = redC.maxDStableList.IndexOf(task.rcD.maxDStable)
             dst3.SetTo(0)
