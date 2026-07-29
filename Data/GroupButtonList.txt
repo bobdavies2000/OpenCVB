@@ -196,3 +196,4 @@ WarpModel
 WarpPerspective
 Watershed
 XFeatures2D
+XR

@@ -53,8 +53,8 @@ Module Program
                                 xrClasses.Add(currClassname, currClassname)
 
                                 ' comment both of these lines to remove XR_ algorithms.
-                                'displayClasses.Add(currClassname, currClassname)
-                                'toggleTotal = True
+                                displayClasses.Add(currClassname, currClassname)
+                                toggleTotal = True
                             ElseIf currClassname.StartsWith("XO_") Then
                                 ' skipping it now...
                             Else
@@ -72,7 +72,7 @@ Module Program
             Dim countsFilePath As String = Path.Combine(dataPath, "AlgorithmCounts.txt")
             Dim countsContent As String = "CodeLineCount = " & totalLinesRead.ToString() & vbCrLf &
                                           "AlgorithmCount = " & displayClasses.Count.ToString() & vbCrLf &
-                                          "Reference algorithm count = " & vbCrLf &
+                                          "Reference algorithm count = " & CStr(displayClasses.Count) & vbCrLf &
                                           "Average lines for displayed algorithm = " &
                                           (totalLinesRead \ displayClasses.Count).ToString() & vbCrLf
             File.WriteAllText(countsFilePath, countsContent)

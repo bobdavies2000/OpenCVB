@@ -274,6 +274,7 @@ Namespace MainApp
             Dim Split = Regex.Split(infoLine, "\W+")
             Dim CodeLineCount As Integer = Split(1)
 
+            infoLine = sr.ReadLine
             Split = Regex.Split(infoLine, "\W+")
             Dim algorithmCountActive As Integer = Split(1)
 
