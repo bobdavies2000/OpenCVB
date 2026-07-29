@@ -1024,7 +1024,7 @@ Namespace VBClasses
     Public Class XR_Line_MapRects : Inherits TaskParent
         Public lpList As New List(Of lpData) ' the list of non-overlapping lines.
         Public pointCloud As New Mat
-        Dim depthToWorld As New Cloud_DepthToWorld
+        Dim depthToWorld As New XR_Cloud_DepthToWorld
         Public Sub New()
             If standalone Then task.gOptions.displayDst1.Checked = True
             labels(1) = "Move mouse over any image to see line."

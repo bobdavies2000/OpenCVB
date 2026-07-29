@@ -3,7 +3,7 @@ Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 Imports jsonShared
 Namespace VBClasses
     Public Class AlgorithmTask : Implements IDisposable
-        Public Sub Initialize(settings As jsonShared.Settings)
+        Public Shared Sub Initialize(settings As jsonShared.Settings)
             task.Settings = settings
             Dim paintFreq = task.Settings.paintFrequency
             task.gridRects = New List(Of cv.Rect)
@@ -43,16 +43,13 @@ Namespace VBClasses
             task.gravityMatrix = New IMU_GMatrix_TA
             task.gravityBasics = New Gravity_Basics_TA
             task.imuBasics = New IMU_Basics_TA
-            task.motion = New Motion_Basics_TA
-            task.motion.standalone = False
-            ' motionStable = New StableGray_Measure
+            task.motion = New Motion_Basics_TA With {.standalone = False}
             task.heartBeats = New HeartBeat_Basics_TA
             task.edges = New Edge_Basics_TA
 
             task.stableDepth = New StableDepth_Basics_TA
             task.stableGray = New StableGray_Basics_TA
 
-            task.prepCloud = New Cloud_Gravity_TA
             task.grid = New Grid_Basics_TA
             task.lines = New Line_Basics_TA
             task.filterBasics = New Filter_Basics_TA
@@ -126,6 +123,7 @@ Namespace VBClasses
             task.filterBasics.Run(Color.Clone)
             task.gray = task.filterBasics.dst3
             task.grayOriginal = task.gray.Clone
+            task.originalPointCloud = task.pointCloud.clone
             task.leftRightBrightness.Run(emptyMat)
             task.leftView = task.leftRightBrightness.dst2
             task.rightView = task.leftRightBrightness.dst3
@@ -177,7 +175,10 @@ Namespace VBClasses
                 End If
             End If
 
-            task.prepCloud.Run(emptyMat) '******* this may rotate for gravity if gravity is selected *******
+            '******* rotate for gravity if gravityPointCloud is selected *******
+            If task.gOptions.gravityPointCloud.Checked Then Cloud_Gravity.rotatePointCloud()
+            Cloud_Gravity.preparePointCloud()
+
             If task.gOptions.stableDepthRGB.Checked Then
                 task.stableDepth.Run(emptyMat)
                 task.depthRGB = task.stableDepth.dst2
@@ -241,11 +242,7 @@ Namespace VBClasses
                 Next
             End If
 
-            If task.gOptions.CrossHairs.Checked Then
-                Gravity_Basics_TA.showVectors(task.dstList(0))
-                Dim lp = If(task.lpGravity IsNot Nothing, task.lpGravity, task.lines.lpList(0))
-                pt = New Point2f((lp.ptE1.X + lp.ptE2.X) / 2 + 5, (lp.ptE1.Y + lp.ptE2.Y) / 2)
-            End If
+            If task.gOptions.CrossHairs.Checked Then Gravity_Basics_TA.showVectors(task.dstList(0))
 
             task.trueData.Clear()
             task.trueData.Add(New TrueText(task.depthAndDepthRange,
@@ -279,6 +276,7 @@ Namespace VBClasses
             Randomize() ' just in case anyone uses VB.Net's Rnd
         End Sub
         Public Sub Dispose() Implements IDisposable.Dispose
+            GC.SuppressFinalize(Me)
             If task.allOptions IsNot Nothing Then task.allOptions.Dispose()
 
             task.fOptions.Close()

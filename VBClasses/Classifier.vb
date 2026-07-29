@@ -1,7 +1,7 @@
 Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 Imports System.Runtime.InteropServices
 Namespace VBClasses
-    Public Class Classifier_Basics_CPP : Inherits TaskParent
+    Public Class XR_Classifier_Basics_CPP : Inherits TaskParent
         Implements IDisposable
         Dim options As New Options_Classifier
         Public Sub New()
@@ -102,97 +102,6 @@ Namespace VBClasses
         End Sub
         Protected Overrides Sub Finalize()
             OEX_Points_Classifier_Close(cPtr)
-        End Sub
-    End Class
-
-
-
-
-
-
-
-
-
-
-    Public Class Classifier_BayesianTest : Inherits TaskParent
-        Implements IDisposable
-        'Dim nabs As New Neighbor_Precise
-        Dim redC As New RedCloud_Basics
-        Public Sub New()
-            dst1 = New Mat(dst1.Size(), MatType.CV_8U, Scalar.All(0))
-            labels = {"", "Mask of the neighbors to the selected cell", "RedFlood_List output", "Classifier_Bayesian output"}
-            If standalone Then task.gOptions.displayDst1.Checked = True
-            cPtr = Classifier_Bayesian_Open()
-            desc = "Classify the neighbor cells to be similar to the selected cell or not."
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            redC.Run(src)
-            dst2 = redC.dst2
-            labels(2) = redC.labels(2)
-
-
-            SetTrueText("Review the Neighbor_Precise algorithm")
-            'nabs.rcList = redList.rcList
-            'nabs.Run(redList.rcMap)
-
-            'Dim trainList As New List(Of Scalar)
-            'Dim responseList As New List(Of Integer)
-            'For Each rc In redList.rcList
-            '    trainList.Add(rc.depth)
-            '    responseList.Add(0)
-            'Next
-
-            'dst1.SetTo(0)
-            'For Each index In nabs.nabList(task.rcD.index)
-            '    Dim rc = redList.rcList(index)
-            '    dst1(rc.rect).SetTo(255, rc.mask)
-            '    strOut += CStr(index) + ","
-            '    responseList(index) = -1
-            'Next
-
-            'responseList(task.rcD.index) = 1
-
-            'Dim queryList As New List(Of Scalar)
-            'Dim maskList As New List(Of Integer)
-            'For i = responseList.Count - 1 To 0 Step -1
-            '    If responseList(i) = -1 Then
-            '        responseList.RemoveAt(i)
-            '        queryList.Add(trainList(i))
-            '        trainList.RemoveAt(i)
-            '        maskList.Add(i)
-            '    End If
-            'Next
-
-            'Dim vecs = trainList.ToArray
-            'Dim resp = responseList.ToArray
-            'Dim handleTrainInput = GCHandle.Alloc(vecs, GCHandleType.Pinned)
-            'Dim handleResponse = GCHandle.Alloc(resp, GCHandleType.Pinned)
-            'Classifier_Bayesian_Train(cPtr, handleTrainInput.AddrOfPinnedObject(), handleResponse.AddrOfPinnedObject(), responseList.Count)
-            'handleResponse.Free()
-            'handleTrainInput.Free()
-
-            'Dim results(queryList.Count - 1) As Integer
-            'If queryList.Count > 0 Then
-            '    Dim queries = queryList.ToArray
-            '    Dim handleQueryInput = GCHandle.Alloc(queries, GCHandleType.Pinned)
-            '    Dim resultsPtr = Classifier_Bayesian_RunCPP(cPtr, handleQueryInput.AddrOfPinnedObject(), queries.Count)
-            '    handleQueryInput.Free()
-
-            '    Marshal.Copy(resultsPtr, results, 0, task.results.Length)
-            'End If
-            'dst3.SetTo(0)
-            'Dim zeroOutput As Boolean = True
-            'For i = 0 To maskList.Count - 1
-            '    If results(i) > 0 Then
-            '        Dim rc = redList.rcList(maskList(i))
-            '        dst3(rc.rect).SetTo(task.scalarcolors(rc.index Mod 255), rc.mask)
-            '        zeroOutput = False
-            '    End If
-            'Next
-            'If zeroOutput Then SetTrueText("None of the neighbors were as similar to the selected cell.", 3)
-        End Sub
-        Protected Overrides Sub Finalize()
-            If cPtr <> 0 Then Classifier_Bayesian_Close(cPtr)
         End Sub
     End Class
 End Namespace

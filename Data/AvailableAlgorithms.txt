@@ -36,15 +36,10 @@ Brightness_Basics
 CComp_Basics
 CComp_Both
 CComp_Stats
-CellularAutomata_Basics
-CellularAutomata_Life
-Classifier_Basics_CPP
-Classifier_BayesianTest
-Clone_Basics
 Cloud_Basics
-Cloud_Consistency
-Cloud_DepthToWorld
-Cloud_Gravity_TA
+Cloud_Gravity
+Cloud_GravityRGB
+Cloud_GravityRotateRGB
 Cloud_ReduceSplit2
 Cloud_SetupSide
 Cloud_SetupTop
@@ -63,10 +58,9 @@ Contour_Basics
 Contour_Smoothing
 Contour_Sort
 Convex_Basics
-Convex_RedColorDefects
+Convex_RedCDefects
 Corner_Basics
 Corner_Core
-Corner_Harris
 Corner_HarrisDetector_CPP
 Corner_RedPrepData
 Corner_ShiTomasi_CPP
@@ -354,6 +348,7 @@ Hull_Edges
 Hull_RedC
 IMU_Average
 IMU_Basics_TA
+IMU_Fixup
 IMU_GMatrix_TA
 IMU_GMatrix_TAWithOptions
 IMU_GravityComplementary
@@ -874,10 +869,14 @@ XR_Cartoonify_Basics
 XR_CComp_Hulls
 XR_CComp_Shapes
 XR_CellularAutomata_All256
+XR_CellularAutomata_Basics
+XR_CellularAutomata_Life
 XR_CellularAutomata_LifeColor
 XR_CellularAutomata_LifePopulation
 XR_CellularAutomata_MultiPoint
+XR_Classifier_Basics_CPP
 XR_Classifier_Bayesian
+XR_Clone_Basics
 XR_Clone_ColorChange
 XR_Clone_Eagle
 XR_Clone_IlluminationChange
@@ -886,6 +885,7 @@ XR_Clone_TextureFlattening
 XR_Cloud_Continuous_GridX
 XR_Cloud_Continuous_GridXY
 XR_Cloud_Continuous_VB
+XR_Cloud_DepthToWorld
 XR_Cloud_Display
 XR_Cloud_FrustrumSide
 XR_Cloud_FrustrumTop
@@ -944,6 +944,7 @@ XR_Convex_Defects
 XR_Convex_RedColor
 XR_Corner_BasicsCentroid
 XR_Corner_BasicsCentroids
+XR_Corner_Harris
 XR_Corner_Harris_CPP
 XR_Corner_PreCornerDetect
 XR_Corner_SubPix
@@ -1162,6 +1163,7 @@ XR_FitLine_Grid
 XR_FitLine_Lines
 XR_FitLine_Simple
 XR_FitLine_Simple3D
+XR_Flood_DarkLight
 XR_Flood_Minimal
 XR_Flood_SimpleRedColor
 XR_Flood_Tiers

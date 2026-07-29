@@ -13,9 +13,6 @@ Brick
 BrickPoint
 Brightness
 CComp
-CellularAutomata
-Classifier
-Clone
 Cloud
 Cluster
 Coherence

@@ -512,4 +512,27 @@ Namespace VBClasses
     'End Class
 
 
+
+
+
+    Public Class XR_Flood_DarkLight : Inherits TaskParent
+        Dim redC As New RedC_Basics
+        Dim options As New Options_CComp
+        Public Sub New()
+            desc = "FloodFill the light half of the image."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            options.Run()
+
+            Threshold(task.gray, dst1, options.light, 255, ThresholdTypes.Binary)
+            redC.Run(dst1)
+            dst2 = Palettize(redC.rcMap, 0)
+            labels(2) = redC.labels(2)
+
+            redC.Run(Not dst1)
+            dst3 = Palettize(redC.rcMap, 0)
+            labels(3) = redC.labels(2)
+        End Sub
+    End Class
+
 End Namespace

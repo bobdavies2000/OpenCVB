@@ -391,7 +391,7 @@ Namespace VBClasses
                             FillConvexPoly(dst3(rc.rect), tri, Scalar.All(255))
                             filledDefects += 1
                         Next
-                        rc.contour = Convex_RedColorDefects.betterContour(rc.contour, defects)
+                        rc.contour = Convex_RedCDefects.betterContour(rc.contour, defects)
                         rc.pixels = CountNonZero(rc.mask)
                     Catch ex As Exception
                         defectCount += 1

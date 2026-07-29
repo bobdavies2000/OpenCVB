@@ -2,38 +2,34 @@ Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Class Cloud_Basics : Inherits TaskParent
         Dim bricks As New Brick_Basics
-        Public Shared ppx = task.calibData.leftIntrinsics.ppx
-        Public Shared ppy = task.calibData.leftIntrinsics.ppy
-        Public Shared fx = task.calibData.leftIntrinsics.fx
-        Public Shared fy = task.calibData.leftIntrinsics.fy
         Public Sub New()
             dst2 = New Mat(dst2.Size, MatType.CV_32FC3, 0)
             labels = {"", "", "Recomputed cv.Point cloud from the depth image data", "PointCloud from camera."}
             desc = "Convert depth values to a cv.Point cloud - just proving that the formulas work."
         End Sub
         Public Shared Function worldCoordinates(p As Point3f) As Point3f
-            Dim x = (p.X - ppx) / fx
-            Dim y = (p.Y - ppy) / fy
+            Dim x = (p.X - task.calibData.leftIntrinsics.ppx) / task.calibData.leftIntrinsics.fx
+            Dim y = (p.Y - task.calibData.leftIntrinsics.ppy) / task.calibData.leftIntrinsics.fy
             Return New Point3f(x * p.Z, y * p.Z, p.Z)
         End Function
         Public Shared Function worldCoordinates(p As Vec3f) As Vec3f
-            Dim x = (p(0) - ppx) / fx
-            Dim y = (p(1) - ppy) / fy
+            Dim x = (p(0) - task.calibData.leftIntrinsics.ppx) / task.calibData.leftIntrinsics.fxx
+            Dim y = (p(1) - task.calibData.leftIntrinsics.ppy) / task.calibData.leftIntrinsics.fy
             Return New Point3f(x * p(2), y * p(2), p(2))
         End Function
         Public Shared Function worldCoordinates(p As cv.Point, depth As Single) As Point3f
-            Dim x = (p.X - ppx) / fx
-            Dim y = (p.Y - ppy) / fy
+            Dim x = (p.X - task.calibData.leftIntrinsics.ppx) / task.calibData.leftIntrinsics.fx
+            Dim y = (p.Y - task.calibData.leftIntrinsics.ppy) / task.calibData.leftIntrinsics.fy
             Return New Point3f(x * depth, y * depth, depth)
         End Function
         Public Shared Function worldCoordinates(_x As Integer, _y As Integer, depth As Single) As Point3f
-            Dim x = (_x - ppx) / fx
-            Dim y = (_y - ppy) / fy
+            Dim x = (_x - task.calibData.leftIntrinsics.ppx) / task.calibData.leftIntrinsics.fx
+            Dim y = (_y - task.calibData.leftIntrinsics.ppy) / task.calibData.leftIntrinsics.fy
             Return New Point3f(x * depth, y * depth, depth)
         End Function
-        Public Function invert(x As Integer, y As Integer, depth As Single) As Point3f
-            Dim u = CInt((x * fx / depth) + ppx)
-            Dim v = CInt((y * fy / depth) + ppy)
+        Public Shared Function invert(x As Integer, y As Integer, depth As Single) As Point3f
+            Dim u = CInt((x * task.calibData.leftIntrinsics.fx / depth) + task.calibData.leftIntrinsics.ppx)
+            Dim v = CInt((y * task.calibData.leftIntrinsics.fy / depth) + task.calibData.leftIntrinsics.ppy)
 
             If u >= 0 And u < task.workRes.Width And v >= 0 And v < task.workRes.Height Then
                 Return New Point3f(u, v, depth)
@@ -41,8 +37,8 @@ Namespace VBClasses
             Return New Point3f
         End Function
         Public Shared Function invert(vec As Point3f) As Point3f
-            Dim u = CInt((vec.X * fx / vec.Z) + ppx)
-            Dim v = CInt((vec.Y * fy / vec.Z) + ppy)
+            Dim u = CInt((vec.X * task.calibData.leftIntrinsics.fx / vec.Z) + task.calibData.leftIntrinsics.ppx)
+            Dim v = CInt((vec.Y * task.calibData.leftIntrinsics.fy / vec.Z) + task.calibData.leftIntrinsics.ppy)
 
             If u >= 0 And u < task.workRes.Width And v >= 0 And v < task.workRes.Height Then
                 Return New Point3f(u, v, vec.Z)
@@ -64,7 +60,7 @@ Namespace VBClasses
 
 
 
-    Public Class Cloud_DepthToWorld : Inherits TaskParent
+    Public Class XR_Cloud_DepthToWorld : Inherits TaskParent
         Public Sub New()
             desc = "Update the world coordinates with the new depth for the mask provided."
         End Sub
@@ -169,11 +165,11 @@ Namespace VBClasses
             Dim offset = Math.Sin(task.accRadians.X) * marker.Y
             If task.gOptions.gravityPointCloud.Checked Then
                 If task.accRadians.X > 0 Then
-                    markerLeft.Y = markerLeft.Y - offset
-                    markerRight.Y = markerRight.Y + offset
+                    markerLeft.Y -= offset
+                    markerRight.Y += offset
                 Else
-                    markerLeft.Y = markerLeft.Y + offset
-                    markerRight.Y = markerRight.Y - offset
+                    markerLeft.Y += offset
+                    markerRight.Y -= offset
                 End If
 
                 markerLeft = New cv.Point(markerLeft.X - cam.X, markerLeft.Y - cam.Y) ' Change the origin
@@ -244,11 +240,11 @@ Namespace VBClasses
             Dim offset = Math.Sin(task.accRadians.Z) * topLen
             If task.gOptions.gravityPointCloud.Checked Then
                 If task.accRadians.Z > 0 Then
-                    markerLeft.X = markerLeft.X - offset
-                    markerRight.X = markerRight.X + offset
+                    markerLeft.X -= offset
+                    markerRight.X += offset
                 Else
-                    markerLeft.X = markerLeft.X + offset
-                    markerRight.X = markerRight.X - offset
+                    markerLeft.X += offset
+                    markerRight.X -= offset
                 End If
             End If
 
@@ -427,9 +423,6 @@ Namespace VBClasses
             bricks.Run(src)
 
             Dim cLine = task.mouseMovePoint.X
-
-            Dim input = src
-            If input.Type <> MatType.CV_32F Then input = task.pcSplit(2)
 
             Dim topPt = New Point2f(cLine, 0)
             Dim botPt = New Point2f(cLine, dst2.Height)
@@ -662,9 +655,6 @@ Namespace VBClasses
             options.Run()
             bricks.Run(src)
 
-            Dim input = src
-            If input.Type <> MatType.CV_32F Then input = task.pcSplit(2)
-
             dst2.SetTo(0)
             dst3.SetTo(0)
             Dim brickPrev = bricks.brickList(0)
@@ -699,9 +689,6 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
             bricks.Run(src)
-
-            Dim input = src
-            If input.Type <> MatType.CV_32F Then input = task.pcSplit(2)
 
             dst2.SetTo(0)
             Dim brickPrev = bricks.brickList(0)
@@ -779,32 +766,11 @@ Namespace VBClasses
 
 
 
-    Public Class Cloud_Gravity_TA : Inherits TaskParent
-        Public originalPointcloud As Mat
+    Public Class Cloud_Gravity : Inherits TaskParent
         Public Sub New()
             desc = "Rebuild the cv.Point cloud with knowledge of gravity (if the option is requested.)"
         End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            originalPointcloud = task.pointCloud.Clone
-
-            If task.optionsChanged Then
-                If task.rangesCloud Is Nothing Then
-                    Dim rx = New Vec2f(-task.xRangeDefault, task.xRangeDefault)
-                    Dim ry = New Vec2f(-task.yRangeDefault, task.yRangeDefault)
-                    Dim rz = New Vec2f(0, task.MaxZmeters)
-                    task.rangesCloud = New Rangef() {New Rangef(rx.Item0, rx.Item1),
-                                                    New Rangef(ry.Item0, ry.Item1),
-                                                    New Rangef(rz.Item0, rz.Item1)}
-                End If
-            End If
-
-            If task.gOptions.gravityPointCloud.Checked Then
-                '******* this is the gravity rotation (" * task.gMatrix") *******
-                task.gravityCloud = (task.pointCloud.Reshape(1,
-                                        task.rows * task.cols) * task.gMatrix).ToMat.Reshape(3, task.rows)
-                task.pointCloud = task.gravityCloud
-            End If
-
+        Public Shared Sub preparePointCloud()
             task.pcSplit = Split(task.pointCloud)
 
             If task.Settings.cameraName.StartsWith("StereoLabs") Then
@@ -840,31 +806,111 @@ Namespace VBClasses
             InRange(task.pcSplit(2), task.MaxZmeters, 10000, task.depthClippedMask)
             ConvertScaleAbs(task.depthClippedMask, task.depthClippedMask)
         End Sub
+        Public Shared Sub rotatePointCloud()
+            If task.optionsChanged Then
+                If task.rangesCloud Is Nothing Then
+                    Dim rx = New Vec2f(-task.xRangeDefault, task.xRangeDefault)
+                    Dim ry = New Vec2f(-task.yRangeDefault, task.yRangeDefault)
+                    Dim rz = New Vec2f(0, task.MaxZmeters)
+                    task.rangesCloud = New Rangef() {New Rangef(rx.Item0, rx.Item1),
+                                                     New Rangef(ry.Item0, ry.Item1),
+                                                     New Rangef(rz.Item0, rz.Item1)}
+                End If
+            End If
+
+            '******* this is the gravity rotation (" * task.gMatrix") *******
+            task.gravityCloud = (task.pointCloud.Reshape(1, task.rows * task.cols) * task.gMatrix).ToMat.Reshape(3, task.rows)
+            task.pointCloud = task.gravityCloud
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            SetTrueText(traceName + " algorithm contains some shared functions to rotate and prepare the pointcloud.")
+        End Sub
     End Class
 
 
 
 
 
-    Public Class Cloud_Consistency : Inherits TaskParent
-        Public pointcloud As New Mat(dst2.Size, MatType.CV_32FC3, 0)
-        Public pcSplit(2) As Mat
+    Public Class Cloud_GravityRGB : Inherits TaskParent
         Public Sub New()
-            desc = "A cloud pixel is only real if it is present in 2 consecutive frames."
+            If standalone Then task.gOptions.displayDst1.Checked = True
+            labels = {"", "", "Original RGB", "RGB rotated with IMU gravity data"}
+            desc = "Cursor.ai: Rotate the RGB image using the same IMU gravity data used by Cloud_Gravity."
+        End Sub
+        Public Shared Function rotateRGB(src As Mat, angle As Double) As cv.Mat
+            If Math.Abs(angle) > 90 Then angle = angle Mod 90
+            Dim center = New Point2f(src.Width / 2.0F, src.Height / 2.0F)
+            Dim M = GetRotationMatrix2D(center, -angle, 1)
+            Dim dst As New Mat(src.Size, src.Type)
+            WarpAffine(src, dst, M, src.Size(), InterpolationFlags.Nearest)
+            Return dst
+        End Function
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            If src.Channels() <> 1 Then src = task.gray
+            dst2 = src
+            dst3 = rotateRGB(src, task.verticalizeAngle)
+
+            strOut = "Same IMU gravity data used by Cloud_Gravity (gMatrix):" + vbCrLf +
+                     "verticalizeAngle = " + task.verticalizeAngle.ToString(fmt2) + " deg" + vbCrLf +
+                     "accRadians X = " + task.accRadians.X.ToString(fmt3) + vbCrLf +
+                     "accRadians Y = " + task.accRadians.Y.ToString(fmt3) + vbCrLf +
+                     "accRadians Z = " + task.accRadians.Z.ToString(fmt3)
+            SetTrueText(strOut, 1)
+        End Sub
+    End Class
+
+
+
+
+    Public Class Cloud_GravityRotateRGB : Inherits TaskParent
+        Public bestAngle As Double
+        Public angleOffset As Double
+        Dim center As cv.Point2f
+        Public Sub New()
+            center = New Point2f(dst2.Width / 2, dst2.Height / 2)
+            If standalone Then task.gOptions.displayDst1.Checked = True
+            labels = {"", "Inverse WarpAffine result", "Lines rotated at corrected gravity angle",
+                      "AbsDiff of inverse vs original lines (jagged residual)"}
+            desc = "Cursor.ai: Correct the gravity WarpAffine using jagged edges in task.lines.dst3: rotateRGB, inverse WarpAffine, compare to original."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            Static lastDepth As Mat = task.pcSplit(2).Clone
-            Dim lastMask As New Mat
-            Threshold(lastDepth, lastMask, 0.001, 255, ThresholdTypes.Binary)
-            ConvertScaleAbs(lastMask, lastMask)
+            Dim lines = task.lines.dst3
 
-            Dim mask = lastMask And task.depthmask
-            task.pointCloud.CopyTo(pointcloud, mask)
-            pcSplit = Split(pointcloud)
+            Dim reconstructed As New Mat
+            Dim diff As New Mat
+            Dim sortScores As New SortedList(Of Integer, Double)(New compareAllowIdenticalInteger)
 
-            dst2 = pointcloud
+            ' Search near the IMU gravity angle for the rotation that leaves the least jagged residual
+            ' after rotateRGB + inverse WarpAffine compared to the original lines image.
+            For i = -100 To 100
+                Dim angle = task.verticalizeAngle + i * 0.01
+                dst3 = Cloud_GravityRGB.rotateRGB(lines, angle)
 
-            lastDepth = pcSplit(2).Clone
+                ' Inverse of rotateRGB's WarpAffine (forward used GetRotationMatrix2D(center, -angle, 1))
+                Dim Minv = GetRotationMatrix2D(center, angle, 1)
+                WarpAffine(dst3, reconstructed, Minv, lines.Size(), InterpolationFlags.Nearest)
+
+                Absdiff(reconstructed, lines, diff)
+                Threshold(diff, diff, 0, 255, ThresholdTypes.Binary)
+                sortScores.Add(CountNonZero(diff), angle)
+            Next
+
+            bestAngle = sortScores.Values(0)
+            angleOffset = bestAngle - task.verticalizeAngle
+
+            dst2 = Cloud_GravityRGB.rotateRGB(lines, bestAngle)
+
+            Dim MinvBest = GetRotationMatrix2D(center, bestAngle, 1)
+            WarpAffine(dst2, dst1, MinvBest, lines.Size(), InterpolationFlags.Nearest)
+            Absdiff(dst1, lines, dst3)
+            Threshold(dst3, dst3, 0, 255, ThresholdTypes.Binary)
+
+            strOut = "IMU verticalizeAngle = " + task.verticalizeAngle.ToString(fmt3) + " deg" + vbCrLf +
+                     "Corrected bestAngle = " + bestAngle.ToString(fmt3) + " deg" + vbCrLf +
+                     "angleOffset = " + angleOffset.ToString(fmt3) + " deg" + vbCrLf +
+                     "Jagged residual pixels = " + CStr(CountNonZero(dst3))
+            SetTrueText(strOut, 1)
+            labels(2) = "Best gravity angle = " + bestAngle.ToString("0.000") + " (offset " + angleOffset.ToString("0.000") + ")"
         End Sub
     End Class
 End Namespace

@@ -1,7 +1,7 @@
 Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCvSharp
 Namespace VBClasses
     ' https://github.com/opencv/opencv/blob/master/samples/cpp/cloning_demo.cpp
-    Public Class Clone_Basics : Inherits TaskParent
+    Public Class XR_Clone_Basics : Inherits TaskParent
         Public colorChangeValues As Vec3f
         Public illuminationChangeValues As Vec2f
         Public textureFlatteningValues As Vec2f
@@ -38,7 +38,7 @@ Namespace VBClasses
 
 
     Public Class XR_Clone_ColorChange : Inherits TaskParent
-        Dim clone As New Clone_Basics
+        Dim clone As New XR_Clone_Basics
         Dim options As New Options_Clone
         Public Sub New()
             labels(2) = "Draw anywhere to select different clone region"
@@ -60,7 +60,7 @@ Namespace VBClasses
 
 
     Public Class XR_Clone_IlluminationChange : Inherits TaskParent
-        Dim clone As New Clone_Basics
+        Dim clone As New XR_Clone_Basics
         Dim options As New Options_Clone
         Public Sub New()
             labels(2) = "Draw anywhere to select different clone region"
@@ -83,7 +83,7 @@ Namespace VBClasses
 
 
     Public Class XR_Clone_TextureFlattening : Inherits TaskParent
-        Dim clone As New Clone_Basics
+        Dim clone As New XR_Clone_Basics
         Dim options As New Options_Clone
         Public Sub New()
             labels(2) = "Draw anywhere to select different clone region"

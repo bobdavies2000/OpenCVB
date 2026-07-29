@@ -80,7 +80,7 @@ Namespace VBClasses
 
 
     ' https://docs.opencvb.org/2.4/doc/tutorials/features2d/trackingmotion/generic_corner_detector/generic_corner_detector.html
-    Public Class Corner_Harris : Inherits TaskParent
+    Public Class XR_Corner_Harris : Inherits TaskParent
         Dim options As New Options_HarrisCorners
         Dim gray As New Mat
         Dim mc As New Mat, mm As mmData
@@ -328,7 +328,7 @@ Namespace VBClasses
 
     'Public Class XR_Corner_RedCloud : Inherits TaskParent
     '    Dim corners As New Neighbor_Intersects32S
-    '    Dim redC As New RedCloud_Basics
+    '    Dim redC As New RedC_Basics
     '    Public Sub New()
     '        labels = {"", "", "Grayscale", "Highlighted points show where more than 2 cells intersect."}
     '        desc = "Find the corners for each RedCloud cell."

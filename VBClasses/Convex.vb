@@ -119,7 +119,7 @@ Namespace VBClasses
 
 
 
-    Public Class Convex_RedColorDefects : Inherits TaskParent
+    Public Class Convex_RedCDefects : Inherits TaskParent
         Dim contours As New XR_Contour_Largest
         Dim redC As New RedC_Basics
         Public Sub New()
@@ -160,7 +160,9 @@ Namespace VBClasses
             Utility_Basics.selectCell(redC.rcMap, redC.rcList)
 
             Dim rc = task.rcD
-            Dim sz = New Size(dst2.Height * rc.mask.Width / rc.mask.Height, dst2.Height)
+            If rc Is Nothing Then Exit Sub
+
+            Dim sz As New Size(dst2.Height * rc.mask.Width / rc.mask.Height, dst2.Height)
             If rc.mask.Width > rc.mask.Height Then
                 sz = New Size(dst2.Width, dst2.Height * rc.mask.Height / rc.mask.Width)
             End If

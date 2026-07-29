@@ -449,7 +449,7 @@ Namespace VBClasses
 
 
     Public Class XR_OEX_Points_Classifier : Inherits TaskParent
-        Dim basics As New Classifier_Basics_CPP
+        Dim basics As New XR_Classifier_Basics_CPP
         Public Sub New()
             desc = "OpenCV Example Points_Classifier became Classifier_Basics"
         End Sub

@@ -16,7 +16,7 @@ Namespace VBClasses
             Line(dst, task.lpHorizon.ptE1, task.lpHorizon.ptE2, white, task.lineWidth, task.lineType)
         End Sub
         ''' <summary>Compute two image points for the line through (cx,cy) in direction of gravity projection (gx,gy), extended to rect [0,w] x [0,h].</summary>
-        Public Function GravityVectorToLineEndpoints(gravityVec As Point3f, width As Integer, height As Integer) As (p1 As Point2f, p2 As Point2f)
+        Public Shared Function GravityVectorToLineEndpoints(gravityVec As Point3f, width As Integer, height As Integer) As (p1 As Point2f, p2 As Point2f)
             Dim cx = width / 2.0F
             Dim cy = height / 2.0F
             Dim dx = gravityVec.X
@@ -58,7 +58,7 @@ Namespace VBClasses
         End Function
 
         ''' <summary>Unit gravity in body frame from tilt angles (same convention as IMU_GMatrix_TA: roll=X, pitch=Y, yaw=Z).</summary>
-        Public Function AnglesToGravityVector(accRadians As Point3f) As Point3f
+        Public Shared Function AnglesToGravityVector(accRadians As Point3f) As Point3f
             Dim cx = CSng(Math.Cos(accRadians.X))
             Dim sx = CSng(Math.Sin(accRadians.X))
             Dim cy = CSng(Math.Cos(accRadians.Y))
@@ -329,7 +329,7 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             Static rotateAngle As Double = task.verticalizeAngle - 2
-            Static rotateCenter As Point2f = New Point2f(dst2.Width / 2, dst2.Height / 2)
+            Static rotateCenter As New Point2f(dst2.Width / 2, dst2.Height / 2)
 
             rotateAngle += 0.1
             If rotateAngle >= task.verticalizeAngle + 2 Then rotateAngle = task.verticalizeAngle - 2
@@ -365,7 +365,7 @@ Namespace VBClasses
             bricks.Run(src)
             Dim angle = Math.Abs(task.verticalizeAngle)
             Static rotateAngle As Double = -angle
-            Static rotateCenter As Point2f = New Point2f(dst2.Width / 2, dst2.Height / 2)
+            Static rotateCenter As New Point2f(dst2.Width / 2, dst2.Height / 2)
 
             rotateAngle += 0.1
             If rotateAngle >= angle Then rotateAngle = -angle

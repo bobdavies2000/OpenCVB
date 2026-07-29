@@ -17,6 +17,7 @@ Namespace VBClasses
         Public grayOriginal As New Mat
         Public leftView As New Mat
         Public rightView As New Mat
+        Public originalPointCloud As New cv.Mat
         Public pointCloud As New Mat
         Public gravityCloud As New Mat
         Public sharpDepth As Mat
@@ -83,7 +84,6 @@ Namespace VBClasses
         Public colorizer As DepthColorizer_Basics_TA
         Public stableDepth As StableDepth_Basics_TA
         Public stableGray As StableGray_Basics_TA
-        Public prepCloud As Cloud_Gravity_TA
         Public heartBeats As HeartBeat_Basics_TA
         Public edges As Edge_Basics_TA
 

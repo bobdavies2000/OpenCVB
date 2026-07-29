@@ -64,7 +64,7 @@ Public Class StableDepth_Max : Inherits TaskParent
         desc = "Stabilize X, Y, and Z of the cv.Point cloud using the maximum depth encountered."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        Split(task.prepCloud.originalPointcloud, pcsplit)
+        Split(task.originalPointcloud, pcsplit)
         Static lastDepth As Mat = pcSplit(2).Clone
 
         Dim myHeartbeat = task.heartBeat Or task.optionsChanged

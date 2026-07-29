@@ -331,7 +331,7 @@ Namespace VBClasses
                     Dim hullIndices = ConvexHullIndices(rc.hull.ToArray, False)
                     Try
                         Dim defects = ConvexityDefects(rc.contour, hullIndices)
-                        rc.contour = Convex_RedColorDefects.betterContour(rc.contour, defects)
+                        rc.contour = Convex_RedCDefects.betterContour(rc.contour, defects)
                     Catch ex As Exception
                         defectCount += 1
                     End Try

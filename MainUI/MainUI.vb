@@ -416,7 +416,7 @@ Namespace MainApp
 
             vbc.task.main_hwnd = Me.Handle
 
-            vbc.task.Initialize(settings)
+            VBClasses.AlgorithmTask.Initialize(settings)
             vbc.task.lowResDepth = New cv.Mat(vbc.task.workRes, cv.MatType.CV_32F)
             vbc.task.lowResColor = New cv.Mat(vbc.task.workRes, cv.MatType.CV_32F)
             vbc.task.MainUI_Algorithm = CreateAlgorithm(settings.algorithm)
