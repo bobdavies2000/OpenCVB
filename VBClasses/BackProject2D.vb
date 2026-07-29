@@ -287,7 +287,7 @@ Namespace VBClasses
 
 
 
-    Public Class BackProject2D_Grayscale : Inherits TaskParent
+    Public Class XR_BackProject2D_Grayscale : Inherits TaskParent
         Dim histBar As New PlotBar_Histogram2D
         Dim colorFmt As New Color_Basics
         Dim channels() As Integer = {0, 1}
@@ -307,15 +307,15 @@ Namespace VBClasses
             histBar.Run(colorSrc)
             dst2 = histBar.dst2
 
-            Dim backP As New Mat
-            CalcBackProject({colorSrc}, channels, histBar.histogram, backP, histBar.ranges)
-            Normalize(backP, dst3, 0, 255, NormTypes.MinMax)
-            dst3.ConvertTo(dst3, MatType.CV_8U)
+            CalcBackProject({colorSrc}, channels, histBar.histogram, dst3, histBar.ranges)
 
             If standaloneTest() Then
-                labels(3) = "Backprojection min/max " + GetMinMax(backP).minVal.ToString(fmt2) + "/" +
-                GetMinMax(backP).maxVal.ToString(fmt2)
+                labels(3) = "Backprojection min/max " + GetMinMax(dst3).minVal.ToString(fmt2) + "/" +
+                GetMinMax(dst3).maxVal.ToString(fmt2)
             End If
+
+            ' Normalize(dst3, dst3, 0, 255, NormTypes.MinMax)
+            dst3.ConvertTo(dst3, MatType.CV_8U)
         End Sub
     End Class
 End Namespace

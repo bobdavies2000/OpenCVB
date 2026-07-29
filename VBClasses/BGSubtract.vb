@@ -282,7 +282,7 @@ Namespace VBClasses
 
 
 
-    Public Class BGSubtract_Synthetic_CPP : Inherits TaskParent
+    Public Class XR_BGSubtract_Synthetic_CPP : Inherits TaskParent
         Implements IDisposable
         Dim options As New Options_BGSubtractSynthetic
         Public Sub New()
@@ -316,7 +316,7 @@ Namespace VBClasses
 
 
 
-    Public Class BGSubtract_Synthetic : Inherits TaskParent
+    Public Class XR_BGSubtract_Synthetic : Inherits TaskParent
         Dim bgSub As New BGSubtract_Basics
         Dim synth As New BGSubtract_Synthetic_CPP
         Public Sub New()

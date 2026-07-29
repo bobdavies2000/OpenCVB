@@ -5,7 +5,6 @@ BackProject_Basics
 BackProject_DepthMouse
 BackProject_Image
 BackProject2D_Basics
-BackProject2D_Grayscale
 BackProject2D_Side
 BackProject2D_SideAndTop
 BackProject2D_Top
