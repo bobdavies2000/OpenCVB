@@ -244,7 +244,7 @@ Namespace VBClasses
 
 
 
-    Public Class Brick_LeftRightMouse : Inherits TaskParent
+    Public Class XR_Brick_LeftRightMouse : Inherits TaskParent
         Dim bricks As New Brick_Basics
         Public means As New List(Of Single)
         Dim myBricks As New HashSet(Of Integer)

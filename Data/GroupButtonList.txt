@@ -10,12 +10,8 @@ Binarize
 BinNWay
 Blur
 Brick
-BrickLine
 BrickPoint
 Brightness
-BRISK
-CamShift
-Cartoonify
 CComp
 CellularAutomata
 Classifier

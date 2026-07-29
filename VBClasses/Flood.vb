@@ -22,7 +22,7 @@ Namespace VBClasses
             dst2 = Palettize(src)
 
             Dim sortList As New SortedList(Of Integer, (count As Integer, rect As cv.Rect, index As Integer))(
-                New compareAllowIdenticalIntegerInverted)
+                                           New compareAllowIdenticalIntegerInverted)
             Dim rect As cv.Rect
             Dim index As Integer = 1
 

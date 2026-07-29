@@ -1670,7 +1670,7 @@ Namespace VBClasses
         Dim find As New Line_Finder
         Dim lines As New Line_Basics
         Public Sub New()
-            desc = "Find lines in the brickline_find output"
+            desc = "Find lines in the Line_finder output"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             find.Run(task.gray)

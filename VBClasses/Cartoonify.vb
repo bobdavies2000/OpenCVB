@@ -1,7 +1,7 @@
 Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCvSharp
 Namespace VBClasses
     ' https://github.com/davemk99/Cartoonify-Image/blob/master/main.cpp
-    Public Class Cartoonify_Basics : Inherits TaskParent
+    Public Class XR_Cartoonify_Basics : Inherits TaskParent
         Dim options As New Options_Cartoonify
         Public Sub New()
             labels(2) = "Mask for Cartoon"

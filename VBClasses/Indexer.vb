@@ -1,94 +1,105 @@
-Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
-Public Class Indexer_Basics : Inherits TaskParent
-    Public prep As New RedPrep_Core
-    Public Sub New()
-        desc = "Find edges in the reduced cv.Point cloud output using indexers"
-    End Sub
-    Public Shared Function buildEdges(Input As Mat) As Mat
-        Dim horizontalMat = Input.Clone
-        For y = 0 To horizontalMat.Rows - 1
-            For x = 1 To horizontalMat.Cols - 1
-                If horizontalMat.At(Of Byte)(y, x) = horizontalMat.At(Of Byte)(y, x - 1) Then horizontalMat.At(Of Byte)(y, x - 1) = 0
+Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCvSharp
+Namespace VBClasses
+    Public Class Indexer_Basics : Inherits TaskParent
+        Public prep As New RedPrep_Core
+        Public Sub New()
+            desc = "Find edges in the reduced cv.Point cloud output using indexers"
+        End Sub
+        Public Shared Function buildEdges(Input As Mat) As Mat
+            Dim horizontalMat = Input.Clone
+            For y = 0 To horizontalMat.Rows - 1
+                For x = 1 To horizontalMat.Cols - 1
+                    If horizontalMat.At(Of Byte)(y, x) = horizontalMat.At(Of Byte)(y, x - 1) Then
+                        horizontalMat.At(Of Byte)(y, x - 1) = 0
+                    End If
+                Next
             Next
-        Next
 
-        Dim verticalMat = Input.Clone
-        For x = 0 To verticalMat.Cols - 1
-            For y = 1 To verticalMat.Rows - 1
-                If verticalMat.At(Of Byte)(y, x) = verticalMat.At(Of Byte)(y - 1, x) Then verticalMat.At(Of Byte)(y, x - 1) = 0
+            Dim verticalMat = Input.Clone
+            For x = 0 To verticalMat.Cols - 1
+                For y = 1 To verticalMat.Rows - 1
+                    If verticalMat.At(Of Byte)(y, x) = verticalMat.At(Of Byte)(y - 1, x) Then
+                        verticalMat.At(Of Byte)(y, x - 1) = 0
+                    End If
+                Next
             Next
-        Next
 
-        Input.SetTo(0)
-        Input.SetTo(255, horizontalMat)
-        Input.SetTo(255, verticalMat)
-        Return Input
-    End Function
+            Input.SetTo(0)
 
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        If src.Channels <> 1 Then
-            prep.Run(src)
-            dst2 = prep.dst2.Clone
-            labels(2) = prep.labels(2)
-        Else
-            dst2 = src
-        End If
+            ConvertScaleAbs(horizontalMat, horizontalMat)
+            Input.SetTo(255, horizontalMat)
 
-        dst2 = buildEdges(dst2)
-        dst2.SetTo(255, task.noDepthMask)
-    End Sub
-End Class
+            ConvertScaleAbs(verticalMat, verticalMat)
+            Input.SetTo(255, verticalMat)
 
+            Return Input
+        End Function
 
-
-
-
-Public Class Indexer_Corners : Inherits TaskParent
-    Dim vals As New List(Of Byte)
-    Dim indexBasics As New Indexer_Basics
-    Public Sub New()
-        dst1 = New Mat(dst1.Size, MatType.CV_8U, 0)
-        If standalone Then task.gOptions.displayDst1.Checked = True
-        desc = "Find the corners in the RedPrep XY data and clip.  Identical to Indexer_Basics"
-    End Sub
-    Private Sub addVal(val As Byte)
-        If vals.Contains(val) = False Then vals.Add(val)
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        indexBasics.Run(src)
-        dst2 = indexBasics.dst2
-        labels(2) = indexBasics.labels(2)
-
-        dst3 = indexBasics.prep.dst2.Clone
-        Dim rectList As New List(of cv.Rect)
-        For y = 1 To dst3.Rows - 3
-            For x = 1 To dst3.Cols - 3
-                vals.Clear()
-                vals.Add(dst3.At(Of Byte)(y - 1, x - 1))
-                addVal(dst3.At(Of Byte)(y - 1, x))
-                addVal(dst3.At(Of Byte)(y - 1, x + 1))
-                addVal(dst3.At(Of Byte)(y, x - 1))
-                addVal(dst3.At(Of Byte)(y, x))
-                addVal(dst3.At(Of Byte)(y, x + 1))
-                addVal(dst3.At(Of Byte)(y + 1, x - 1))
-                addVal(dst3.At(Of Byte)(y + 1, x))
-                addVal(dst3.At(Of Byte)(y + 1, x + 1))
-                If vals.Count > 2 Then rectList.Add(New cv.Rect(x - 1, y - 1, 3, 3))
-            Next
-        Next
-
-        Dim count As Integer
-        dst1.SetTo(0)
-        For Each r In rectList
-            Dim val = dst3.At(Of Byte)(r.Y, r.X)
-            If val <> 0 Then
-                dst1(r).SetTo(255)
-                dst3(r).SetTo(0)
-                count += 1
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            If src.Channels <> 1 Then
+                prep.Run(src)
+                dst2 = prep.dst2.Clone
+                labels(2) = prep.labels(2)
+            Else
+                dst2 = src
             End If
-        Next
 
-        dst2.SetTo(255, dst1)
-        labels(3) = CStr(count) + " corners found"
-    End Sub
-End Class
+            dst2 = buildEdges(dst2)
+            dst2.SetTo(255, task.noDepthMask)
+        End Sub
+    End Class
+
+
+
+
+
+    Public Class Indexer_Corners : Inherits TaskParent
+        Dim vals As New List(Of Byte)
+        Dim indexBasics As New Indexer_Basics
+        Public Sub New()
+            dst1 = New Mat(dst1.Size, MatType.CV_8U, 0)
+            If standalone Then task.gOptions.displayDst1.Checked = True
+            desc = "Find the corners in the RedPrep XY data and clip.  Identical to Indexer_Basics"
+        End Sub
+        Private Sub addVal(val As Byte)
+            If vals.Contains(val) = False Then vals.Add(val)
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            indexBasics.Run(src)
+            dst2 = indexBasics.dst2
+            labels(2) = indexBasics.labels(2)
+
+            dst3 = indexBasics.prep.dst2.Clone
+            Dim rectList As New List(Of cv.Rect)
+            For y = 1 To dst3.Rows - 3
+                For x = 1 To dst3.Cols - 3
+                    vals.Clear()
+                    vals.Add(dst3.At(Of Byte)(y - 1, x - 1))
+                    addVal(dst3.At(Of Byte)(y - 1, x))
+                    addVal(dst3.At(Of Byte)(y - 1, x + 1))
+                    addVal(dst3.At(Of Byte)(y, x - 1))
+                    addVal(dst3.At(Of Byte)(y, x))
+                    addVal(dst3.At(Of Byte)(y, x + 1))
+                    addVal(dst3.At(Of Byte)(y + 1, x - 1))
+                    addVal(dst3.At(Of Byte)(y + 1, x))
+                    addVal(dst3.At(Of Byte)(y + 1, x + 1))
+                    If vals.Count > 2 Then rectList.Add(New cv.Rect(x - 1, y - 1, 3, 3))
+                Next
+            Next
+
+            Dim count As Integer
+            dst1.SetTo(0)
+            For Each r In rectList
+                Dim val = dst3.At(Of Byte)(r.Y, r.X)
+                If val <> 0 Then
+                    dst1(r).SetTo(255)
+                    dst3(r).SetTo(0)
+                    count += 1
+                End If
+            Next
+
+            dst2.SetTo(255, dst1)
+            labels(3) = CStr(count) + " corners found"
+        End Sub
+    End Class
+End Namespace

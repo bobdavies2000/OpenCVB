@@ -5,8 +5,9 @@ Namespace VBClasses
         Public connectedComponents As ConnectedComponents
         Public rects As New List(Of cv.Rect)
         Public centroids As New List(Of Point2f)
-        Dim lastImage As Mat
-        Dim options As New Options_CComp
+        Public options As New Options_CComp
+        Public rectList As New List(Of cv.Rect)
+        Public indexList As New List(Of Integer)
         Public Sub New()
             dst3 = New Mat(dst3.Size(), MatType.CV_8U, Scalar.All(0))
             labels(2) = "Input to ConnectedComponenetsEx"
@@ -24,8 +25,9 @@ Namespace VBClasses
             connectedComponents.RenderBlobs(dst3)
 
             Dim count As Integer = 0
+            Dim rect As cv.Rect
             For Each blob In connectedComponents.Blobs
-                Dim rect = ValidateRect(blob.Rect)
+                rect = ValidateRect(blob.Rect)
                 Dim m = Cv2.Moments(dst2(rect), True)
                 If m.M00 = 0 Then Continue For ' avoid divide by zero...
                 rects.Add(rect)
@@ -33,7 +35,27 @@ Namespace VBClasses
                 count += 1
             Next
 
-            lastImage = dst2
+            Dim mask As New Mat(New Size(dst2.Width + 2, dst2.Height + 2), MatType.CV_8U, 0)
+            Dim index As Integer = 1
+            rectList.Clear()
+            indexList.Clear()
+            dst1 = dst2.Clone
+            For Each pt In centroids
+                If mask.Get(Of Byte)(pt.Y, pt.X) = 0 Then
+                    Dim flags = FloodFillFlags.FixedRange Or (index << 8)
+                    Dim fCount = FloodFill(dst1, mask, New cv.Point(pt.X, pt.Y), index, rect, 0, 0, flags)
+                    If fCount >= 10 Then
+                        rectList.Add(Rect)
+                        indexList.Add(index)
+                        index += 1
+                        If index >= 255 Then index = 1
+                    End If
+                End If
+            Next
+
+            For Each r In rectList
+                Rectangle(dst3, r, task.highlight, task.lineWidth)
+            Next
             labels(3) = CStr(count) + " items found "
         End Sub
     End Class
@@ -87,54 +109,6 @@ Namespace VBClasses
             dst3 = mats.dst3
         End Sub
     End Class
-
-
-
-
-
-
-    'https://github.com/oreillymedia/Learning-OpenCV-3_examples/blob/master/example_14-03.cpp
-    Public Class CComp_Both : Inherits TaskParent
-        Dim ccomp As New CComp_Stats
-        Public Sub New()
-            labels = {"", "", "Connected components in both the lighter and darker halves", "Connected components in the darker half of the image"}
-            desc = "Prepare the connected components for both above and below the threshold"
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            ccomp.options.Run()
-
-            Dim light As New Mat
-            Threshold(src, light, ccomp.options.light, 255, ThresholdTypes.Binary)
-            ccomp.Run(light)
-            dst2 = ccomp.dst3
-            dst1 = ccomp.dst1
-            labels(3) = ccomp.labels(3)
-        End Sub
-    End Class
-
-
-
-
-
-
-
-    Public Class XR_CComp_Hulls : Inherits TaskParent
-        Dim ccomp As New CComp_Both
-        Dim hulls As New XR_RedColor_Hulls
-        Public Sub New()
-            desc = "Create connected components using RedCloud Hulls"
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            ccomp.Run(task.gray)
-            dst2 = ccomp.dst3
-            ccomp.dst1.ConvertTo(dst1, MatType.CV_8U)
-            hulls.Run(dst1)
-            dst2 = hulls.dst3
-            labels(2) = hulls.labels(3)
-        End Sub
-    End Class
-
-
 
 
 
@@ -202,6 +176,51 @@ Namespace VBClasses
             dst1.ConvertTo(dst0, MatType.CV_8U)
             dst3 = Palettize(dst0)
             labels(3) = CStr(masks.Count) + " Connected Components"
+        End Sub
+    End Class
+
+
+
+
+
+
+    'https://github.com/oreillymedia/Learning-OpenCV-3_examples/blob/master/example_14-03.cpp
+    Public Class CComp_Both : Inherits TaskParent
+        Dim ccomp As New CComp_Basics
+        Public Sub New()
+            labels = {"", "", "Connected components in both the lighter and darker halves", "Connected components in the darker half of the image"}
+            desc = "Prepare the connected components for both above and below the threshold"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            ccomp.options.Run()
+
+            Threshold(task.gray, dst1, ccomp.options.light, 255, ThresholdTypes.Binary)
+            ccomp.Run(dst1)
+            dst2 = ccomp.dst2
+            dst3 = ccomp.dst1
+            labels(3) = ccomp.labels(3)
+        End Sub
+    End Class
+
+
+
+
+
+
+
+    Public Class XR_CComp_Hulls : Inherits TaskParent
+        Dim ccomp As New CComp_Both
+        Dim hulls As New XR_RedColor_Hulls
+        Public Sub New()
+            desc = "Create connected components using RedCloud Hulls"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            ccomp.Run(task.gray)
+            dst2 = ccomp.dst3
+            ccomp.dst1.ConvertTo(dst1, MatType.CV_8U)
+            hulls.Run(dst1)
+            dst2 = hulls.dst3
+            labels(2) = hulls.labels(3)
         End Sub
     End Class
 End Namespace

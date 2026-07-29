@@ -44,14 +44,14 @@ Namespace VBClasses
                         ptLatest.Add(kazeKeyPoints(i).Pt)
                     Next
                 Case "BrickPoint"
-                    Static bPoint As New BrickPoint_MaxSobel
+                    Static bPoint As New BrickPoint_Basics
                     bPoint.Run(src)
-                    For Each pt In bPoint.features
+                    For Each pt In bPoint.ptList
                         ptLatest.Add(pt)
                     Next
                     strOut = bPoint.labels(2)
                 Case "BRISK"
-                    Static brisk As New BRISK_Basics
+                    Static brisk As New Feature_BRISK
                     brisk.Run(src)
                     ptLatest = brisk.features
                     strOut = "BRISK produced " + CStr(ptLatest.Count) + " features"
@@ -217,7 +217,7 @@ Namespace VBClasses
 
                     strOut = "GoodFeatures produced " + CStr(ptLatest.Count) + " features"
                 Case "BRISK"
-                    Static brisk As New BRISK_Basics
+                    Static brisk As New Feature_BRISK
                     brisk.Run(src)
                     ptLatest = brisk.features
                     strOut = "GoodFeatures produced " + CStr(ptLatest.Count) + " features"
@@ -236,9 +236,9 @@ Namespace VBClasses
                         ptLatest.Add(lp.ptCenter)
                     Next
                 Case "BrickPoint"
-                    Static bPoint As New BrickPoint_MaxSobel
+                    Static bPoint As New BrickPoint_Basics
                     bPoint.Run(src)
-                    For Each pt In bPoint.features
+                    For Each pt In bPoint.ptList
                         ptLatest.Add(pt)
                     Next
                     strOut = bPoint.labels(2)
@@ -282,7 +282,7 @@ Namespace VBClasses
     Public Class Feature_Bricks : Inherits TaskParent
         Public features As New List(Of cv.Point)
         Public feature2f As New List(Of Point2f)
-        Dim bPoint As New BrickPoint_MaxSobel
+        Dim bPoint As New XR_BrickPoint_MaxSobel
         Public Sub New()
             desc = "Gather features from the sobel grid square points and preserve those representing lines."
         End Sub
@@ -1026,6 +1026,39 @@ Namespace VBClasses
             Next
 
             fpLastSrc = src.Clone
+        End Sub
+    End Class
+
+
+
+
+    Public Class Feature_BRISK : Inherits TaskParent
+        Implements IDisposable
+        Dim brisk As XFeatures2D.BRISK
+        Public features As New List(Of Point2f)
+        Dim options As New Options_Features
+        Public Sub New()
+            brisk = XFeatures2D.BRISK.Create()
+            desc = "Detect features with BRISK"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            options.Run()
+
+            src.CopyTo(dst2)
+
+            Dim keyPoints = brisk.Detect(src)
+
+            features.Clear()
+            For Each pt In keyPoints
+                If pt.Size > options.minDistance Then
+                    features.Add(New Point2f(pt.Pt.X, pt.Pt.Y))
+                    Circle(dst2, pt.Pt, task.DotSize + 1, task.highlight, -1, task.lineType)
+                End If
+            Next
+            labels(2) = CStr(features.Count) + " features found with BRISK"
+        End Sub
+        Protected Overrides Sub Finalize()
+            brisk.Dispose()
         End Sub
     End Class
 End Namespace

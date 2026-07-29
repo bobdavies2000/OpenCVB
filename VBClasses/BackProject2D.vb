@@ -133,8 +133,8 @@ Namespace VBClasses
 
     Public Class BackProject2D_SideAndTop : Inherits TaskParent
         Public thresholdVal As Integer
-        Public histogramSide As cv.Mat = Nothing
-        Public histogramTop As cv.Mat = Nothing
+        Public histogramSide As New cv.Mat
+        Public histogramTop As New cv.Mat
         Public Sub New()
             task.gOptions.setHistogramBins(100) ' extra bins to help isolate the stragglers.
             desc = "Prepare the side and top views of the depth data."

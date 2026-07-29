@@ -2,9 +2,9 @@ Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCvSharp
 Namespace VBClasses
     ' https://docs.opencvb.org/3.4.1/d2/dc1/camshiftdemo_8cpp-example.html
     ' https://docs.opencvb.org/3.4/d7/d00/tutorial_meanshift.html
-    Public Class CamShift_Basics : Inherits TaskParent
+    Public Class XR_CamShift_Basics : Inherits TaskParent
         Public trackBox As New RotatedRect
-        Dim redHue As New CamShift_RedHue
+        Dim redHue As New XR_CamShift_RedHue
         Dim roi As New cv.Rect
         Dim histogram As New cv.Mat
         Public Sub New()
@@ -60,7 +60,7 @@ Namespace VBClasses
 
 
 
-    Public Class CamShift_RedHue : Inherits TaskParent
+    Public Class XR_CamShift_RedHue : Inherits TaskParent
         Dim options As New Options_CamShift
         Public Sub New()
             labels = {"", "Hue", "Image regions with red hue", "Mask for hue regions"}

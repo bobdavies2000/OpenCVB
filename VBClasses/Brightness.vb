@@ -51,7 +51,7 @@ Namespace VBClasses
 
 
 
-    Public Class Brightness_Grid : Inherits TaskParent
+    Public Class XR_Brightness_Grid : Inherits TaskParent
         Dim bright As New Brightness_Basics
         Public brightRect As cv.Rect
         Public Sub New()

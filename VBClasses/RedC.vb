@@ -7,6 +7,9 @@ Namespace VBClasses
         Public maxDStableList As New List(Of cv.Point)
         Public flood As New Flood_Basics
         Public displayCell As Boolean = True
+        Dim rcMapLast As New cv.Mat(dst2.Size, cv.MatType.CV_32S, 0)
+        Dim rcListLast As New List(Of rcData)
+        Dim maxDLast = New List(Of cv.Point)
         Public Sub New()
             If standalone Then task.gOptions.displayDst1.Checked = True
             desc = "Create the rcData representation of the image."
@@ -17,10 +20,6 @@ Namespace VBClasses
                 color8u.Run(task.gray)
                 src = color8u.dst2
             End If
-
-            Dim maxDLast = New List(Of cv.Point)(maxDStableList)
-            Dim rcMapLast = rcMap.Clone
-            Dim rcListLast = New List(Of rcData)(rcList)
 
             flood.Run(src)
             dst2 = flood.dst2
@@ -67,6 +66,10 @@ Namespace VBClasses
                     SetTrueText(CStr(task.rcD.age), task.rcD.maxDist)
                 End If
             End If
+
+            maxDLast = New List(Of cv.Point)(maxDStableList)
+            rcMapLast = rcMap.Clone
+            rcListLast = New List(Of rcData)(rcList)
 
             labels(2) = CStr(rcList.Count) + " cells were found."
         End Sub

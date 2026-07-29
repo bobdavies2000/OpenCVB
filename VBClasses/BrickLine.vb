@@ -1,6 +1,6 @@
 Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCvSharp
 Namespace VBClasses
-    Public Class BrickLine_Basics : Inherits TaskParent
+    Public Class XR_BrickLine_Basics : Inherits TaskParent
         Dim bricks As New Brick_Basics
         Dim hist As New Histogram_GridCell
         Public edgeRequest As Boolean
@@ -82,8 +82,8 @@ Namespace VBClasses
 
 
 
-    Public Class BrickLine_Edges : Inherits TaskParent
-        Dim findCells As New BrickLine_Basics
+    Public Class XR_BrickLine_Edges : Inherits TaskParent
+        Dim findCells As New XR_BrickLine_Basics
         Public Sub New()
             findCells.edgeRequest = True
             labels(3) = "Use the 'Feature' option 'Selected Feature' to highlight different edges."
@@ -103,8 +103,8 @@ Namespace VBClasses
 
 
 
-    Public Class BrickLine_DepthGap : Inherits TaskParent
-        Dim findCells As New BrickLine_Basics
+    Public Class XR_BrickLine_DepthGap : Inherits TaskParent
+        Dim findCells As New XR_BrickLine_Basics
         Dim bricks As New Brick_Basics
         Public Sub New()
             labels(2) = "Cells highlighted below have a significant gap in depth from their neighbors."
@@ -156,8 +156,8 @@ Namespace VBClasses
 
 
 
-    Public Class XR_BrickLine_DepthGaps : Inherits TaskParent
-        Dim findCells As New BrickLine_DepthGap
+    Public Class XR_XR_BrickLine_DepthGaps : Inherits TaskParent
+        Dim findCells As New XR_BrickLine_DepthGap
         Public Sub New()
             dst1 = New Mat(dst1.Size, MatType.CV_8U, 0)
             labels(3) = "Use the 'Feature' option 'Selected Feature' to highlight different lines."
@@ -181,8 +181,8 @@ Namespace VBClasses
 
 
 
-    Public Class XR_BrickLine_Lines : Inherits TaskParent
-        Dim findCells As New BrickLine_Basics
+    Public Class XR_XR_BrickLine_Lines : Inherits TaskParent
+        Dim findCells As New XR_BrickLine_Basics
         Public Sub New()
             dst1 = New Mat(dst1.Size, MatType.CV_8U, 0)
             labels(3) = "Use the 'Feature' option 'Selected Feature' to highlight different lines."
@@ -205,7 +205,7 @@ Namespace VBClasses
 
 
 
-    Public Class BrickLine_EdgesNoEdges : Inherits TaskParent
+    Public Class XR_BrickLine_EdgesNoEdges : Inherits TaskParent
         Public edges As New List(Of Integer)
         Public noEdges As New List(Of Integer)
         Dim edgeline As New EdgeLine_Basics
@@ -246,9 +246,9 @@ Namespace VBClasses
 
 
 
-    Public Class BrickLine_LeftRightMotion : Inherits TaskParent
+    Public Class XR_BrickLine_LeftRightMotion : Inherits TaskParent
         Dim edges As New EdgeLine_LeftRightMotion
-        Dim fLess As New BrickLine_EdgesNoEdges
+        Dim fLess As New XR_BrickLine_EdgesNoEdges
         Dim mats As New Mat_4Click
         Public bestBricks As New List(Of Integer)
         Dim edgeline As New EdgeLine_Basics

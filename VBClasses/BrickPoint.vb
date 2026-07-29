@@ -71,7 +71,7 @@ Namespace VBClasses
 
 
 
-    Public Class BrickPoint_Plot : Inherits TaskParent
+    Public Class XR_BrickPoint_Plot : Inherits TaskParent
         Dim plotHist As New PlotBar_Basics
         Dim bPoint As New BrickPoint_Basics
         Public Sub New()
@@ -452,7 +452,7 @@ Namespace VBClasses
 
 
 
-    Public Class BrickPoint_MaxSobel : Inherits TaskParent
+    Public Class XR_BrickPoint_MaxSobel : Inherits TaskParent
         Public sobel As New Edge_Sobel
         Public features As New List(Of cv.Point)
         Public options As New Options_Sobel

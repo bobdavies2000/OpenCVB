@@ -48,7 +48,7 @@ End Class
 
 
 Public Class XR_LeftRight_BRISK : Inherits TaskParent
-    Dim brisk As New BRISK_Basics
+    Dim brisk As New Feature_BRISK
     Dim options As New Options_Features
     Public Sub New()
         OptionParent.FindSlider("Min Distance").Value = 20
