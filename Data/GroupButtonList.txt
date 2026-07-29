@@ -1,6 +1,5 @@
 AddWeighted
 Annealing
-ApproxPoly
 BackProject
 BackProject2D
 BGSubtract

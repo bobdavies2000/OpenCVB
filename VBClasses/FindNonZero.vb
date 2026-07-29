@@ -45,8 +45,8 @@ Namespace VBClasses
 
 
     Public Class XR_FindNonZero_SoloPoints : Inherits TaskParent
-        Dim hotTop As New BackProject_SoloTop
-        Dim hotSide As New BackProject_SoloSide
+        Dim hotTop As New XR_BackProject_SoloTop
+        Dim hotSide As New XR_BackProject_SoloSide
         Dim nZero As New FindNonZero_Basics
         Public soloPoints As New List(Of cv.Point)
         Public Sub New()

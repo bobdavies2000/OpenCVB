@@ -104,8 +104,8 @@ Namespace VBClasses
 
 
 
-    Public Class BackProject_DisplayColor : Inherits TaskParent
-        Dim backP As New BackProject_Full
+    Public Class XR_BackProject_DisplayColor : Inherits TaskParent
+        Dim backP As New XR_BackProject_Full
         Public Sub New()
             task.gOptions.setHistogramBins(10)
             labels = {"", "", "Back projection", ""}
@@ -126,7 +126,7 @@ Namespace VBClasses
 
 
     ' https://docs.opencvb.org/3.4/da/d7f/tutorial_back_projection.html
-    Public Class BackProject_Full : Inherits TaskParent
+    Public Class XR_BackProject_Full : Inherits TaskParent
         Public classCount As Integer
         Dim plotHist As New PlotBar_Basics
         Dim index As Integer
@@ -165,7 +165,7 @@ Namespace VBClasses
 
 
     Public Class XR_BackProject_Unstable : Inherits TaskParent
-        Dim backP As New BackProject_Full
+        Dim backP As New XR_BackProject_Full
         Dim diff As New Diff_Basics
         Public Sub New()
             labels = {"", "", "Backprojection output", "Unstable pixels in the backprojection. " +
@@ -186,7 +186,7 @@ Namespace VBClasses
 
 
 
-    Public Class BackProject_Side : Inherits TaskParent
+    Public Class XR_BackProject_Side : Inherits TaskParent
         Dim histSide As New Projection_HistSide
         Public Sub New()
             labels = {"", "", "Hotspots in the Side View", "Back projection of the hotspots in the Side View"}
@@ -208,7 +208,7 @@ Namespace VBClasses
 
 
 
-    Public Class BackProject_Top : Inherits TaskParent
+    Public Class XR_BackProject_Top : Inherits TaskParent
         Dim histTop As New Projection_HistTop
         Public Sub New()
             labels = {"", "", "Hotspots in the Top View", "Back projection of the hotspots in the Top View"}
@@ -232,10 +232,10 @@ Namespace VBClasses
 
 
     Public Class XR_BackProject_Horizontal : Inherits TaskParent
-        Dim bpTop As New BackProject_Top
-        Dim bpSide As New BackProject_Side
+        Dim bpTop As New XR_BackProject_Top
+        Dim bpSide As New XR_BackProject_Side
         Public Sub New()
-            desc = "Use both the BackProject_Top to improve the results of the BackProject_Side for finding flat surfaces."
+            desc = "Use both the BackProject_Top to improve the results of the XR_BackProject_Side for finding flat surfaces."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             bpTop.Run(src)
@@ -255,7 +255,7 @@ Namespace VBClasses
 
 
 
-    Public Class BackProject_SoloSide : Inherits TaskParent
+    Public Class XR_BackProject_SoloSide : Inherits TaskParent
         Dim histSide As New Projection_HistSide
         Public Sub New()
             labels = {"", "", "Solo samples in the Side View", "Back projection of the solo samples in the Side View"}
@@ -279,7 +279,7 @@ Namespace VBClasses
 
 
 
-    Public Class BackProject_SoloTop : Inherits TaskParent
+    Public Class XR_BackProject_SoloTop : Inherits TaskParent
         Dim histTop As New Projection_HistTop
         Public Sub New()
             labels = {"", "", "Solo samples in the Top View", "Back projection of the solo samples in the Top View"}
@@ -642,7 +642,7 @@ Namespace VBClasses
 
 
     Public Class XR_BackProject_Basics_Depth : Inherits TaskParent
-        Public bpDepth As New BackProject_Depth
+        Public bpDepth As New XR_BackProject_Depth
         Public Sub New()
             task.gOptions.setHistogramBins(20)
             desc = "Create a histogram for the depth image, uniquely identify each bin, and backproject it."
@@ -662,7 +662,7 @@ Namespace VBClasses
 
 
     Public Class XR_BackProject_DepthSlider : Inherits TaskParent
-        Public bpDepth As New BackProject_Depth
+        Public bpDepth As New XR_BackProject_Depth
         Public Sub New()
             task.gOptions.setHistogramBins(20)
             desc = "Create a histogram for the depth image, uniquely identify each bin, and backproject it."
@@ -687,7 +687,7 @@ Namespace VBClasses
 
 
 
-    Public Class BackProject_FeatureLess : Inherits TaskParent
+    Public Class XR_BackProject_FeatureLess : Inherits TaskParent
         Dim bProject As New BackProject_Basics
         Dim contours As New Contour_Basics
         Public Sub New()
@@ -729,7 +729,7 @@ Namespace VBClasses
 
 
 
-    Public Class BackProject_Depth : Inherits TaskParent
+    Public Class XR_BackProject_Depth : Inherits TaskParent
         Dim plotHist As New PlotBar_Basics
         Public Sub New()
             task.gOptions.setHistogramBins(32)

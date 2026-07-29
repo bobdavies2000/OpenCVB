@@ -15,8 +15,6 @@ Namespace VBClasses
                 saveColorMethod = task.fOptions.Color8USource.Text
                 Dim index = task.fOptions.Color8USource.SelectedIndex
                 Select Case task.fOptions.Color8USource.Text
-                    Case "BackProject_Full"
-                        If colorMethods(index) Is Nothing Then colorMethods(index) = New BackProject_Full
                     Case "Bin4Way_Regions"
                         If colorMethods(index) Is Nothing Then colorMethods(index) = New Bin4Way_Regions
                     Case "Hist3DColor_Basics"
@@ -29,8 +27,6 @@ Namespace VBClasses
                         If colorMethods(index) Is Nothing Then colorMethods(index) = New Reduction_Basics
                     Case "PCA_NColor_CPP"
                         If colorMethods(index) Is Nothing Then colorMethods(index) = New PCA_NColor_CPP
-                    Case "MeanSubtraction_Gray"
-                        If colorMethods(index) Is Nothing Then colorMethods(index) = New MeanSubtraction_Gray
                 End Select
                 classifier = colorMethods(index)
             End If
@@ -347,8 +343,8 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             Dim hsv As New Mat
             CvtColor(src, hsv, ColorConversionCodes.BGR2HSV)
-            Dim loBins As Scalar = New Scalar(0, 40, 32)
-            Dim hiBins As Scalar = New Scalar(180, 255, 255)
+            Dim loBins As New Scalar(0, 40, 32)
+            Dim hiBins As New Scalar(180, 255, 255)
             InRange(hsv, loBins, hiBins, dst2)
         End Sub
     End Class

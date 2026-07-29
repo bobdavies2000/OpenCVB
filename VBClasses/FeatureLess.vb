@@ -541,7 +541,7 @@ Namespace VBClasses
 
 
     Public Class XR_FeatureLess_Histogram : Inherits TaskParent
-        Dim backP As New BackProject_FeatureLess
+        Dim backP As New XR_BackProject_FeatureLess
         Public Sub New()
             desc = "Create a histogram of the featureless regions"
         End Sub

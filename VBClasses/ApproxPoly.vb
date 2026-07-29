@@ -2,7 +2,7 @@ Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCvSharp
 Namespace VBClasses
     ' https://stackoverflow.com/questions/22132510/opencv-approxpolydp-for-edge-maps-Not-contours
     ' https://docs.opencvb.org/4.x/js_contour_features_approxPolyDP.html
-    Public Class ApproxPoly_Basics : Inherits TaskParent
+    Public Class XR_ApproxPoly_Basics : Inherits TaskParent
         ReadOnly contour As New XR_Contour_Largest
         ReadOnly rotatedRect As New Rectangle_Rotated
         ReadOnly options As New Options_ApproxPoly
@@ -79,7 +79,7 @@ Namespace VBClasses
 
     Public Class XR_ApproxPoly_Hull : Inherits TaskParent
         ReadOnly hull As New XR_Hull_Basics
-        ReadOnly aPoly As New ApproxPoly_Basics
+        ReadOnly aPoly As New XR_ApproxPoly_Basics
         Public Sub New()
             hull.useRandomPoints = True
             labels = {"", "", "Original Hull", "Hull after ApproxPoly"}

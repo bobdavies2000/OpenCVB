@@ -1,9 +1,8 @@
 Public Class OptionsFeatures
     Public grayCheckbox() As RadioButton
     Public colorCheckbox() As RadioButton
-    Public colorMethods() As String = {"BackProject_Full", "Bin4Way_Regions", "Hist3DColor_Basics",
-                                       "KMeans_Basics", "LUT_Basics", "Reduction_Basics", "PCA_NColor_CPP",
-                                       "MeanSubtraction_Gray"}
+    Public colorMethods() As String = {"Bin4Way_Regions", "Hist3DColor_Basics",
+                                   "KMeans_Basics", "LUT_Basics", "Reduction_Basics", "PCA_NColor_CPP"}
     Private Sub OptionsFeatures_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         Me.MdiParent = task.allOptions
         Me.Left = 0
@@ -31,11 +30,8 @@ Public Class OptionsFeatures
 
         ReDim grayCheckbox(task.filterBasics.grayFilter.filterList.Length - 1)
         For i = 0 To task.filterBasics.grayFilter.filterList.Length - 1
-            Dim cb As New RadioButton
-            cb.Text = task.filterBasics.grayFilter.filterList(i)
-            cb.Location = New Point(20, 20 + i * 20)
-            cb.AutoSize = True
-            cb.Tag = i
+            Dim cb As New RadioButton With {.Text = task.filterBasics.grayFilter.filterList(i),
+                                            .Location = New Point(20, 20 + i * 20), .AutoSize = True, .Tag = i}
             AddHandler cb.CheckedChanged, AddressOf CheckBox_CheckedChanged
             GrayGroup.Controls.Add(cb)
             grayCheckbox(i) = cb
@@ -44,11 +40,8 @@ Public Class OptionsFeatures
 
         ReDim colorCheckbox(task.filterBasics.filterList.Length - 1)
         For i = 0 To task.filterBasics.filterList.Length - 1
-            Dim cb As New RadioButton
-            cb.Text = task.filterBasics.filterList(i)
-            cb.Location = New Point(20, 20 + i * 20)
-            cb.AutoSize = True
-            cb.Tag = i
+            Dim cb As New RadioButton With {.Text = task.filterBasics.filterList(i),
+                                            .Location = New Point(20, 20 + i * 20), .AutoSize = True, .Tag = i}
             AddHandler cb.CheckedChanged, AddressOf CheckBox_CheckedChanged
             ColorGroup.Controls.Add(cb)
             colorCheckbox(i) = cb

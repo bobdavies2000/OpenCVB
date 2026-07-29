@@ -4,7 +4,7 @@ Namespace VBClasses
     Public Class BackProject2D_Basics : Inherits TaskParent
         Public hist2d As New Hist2D_Basics
         Public colorFmt As New Color_Basics
-        Public backProjectByGrid As Boolean = True
+        Public backProjectByGrid As Boolean = False
         Public classCount As Integer
         Public Sub New()
             desc = "A 2D histogram is built from 2 channels of any 3-channel input and the results are displayed."
@@ -18,14 +18,14 @@ Namespace VBClasses
 
             Dim r As cv.Rect = task.gridRects(index)
 
-            Dim histogram As New Mat
+            Dim histogram As Mat
             If backProjectByGrid Then
                 histogram = task.gridMap.Clone
             Else
                 histogram = New Mat(hist2d.histogram.Size, MatType.CV_32F, Scalar.All(0))
                 hist2d.histogram(r).CopyTo(histogram(r))
             End If
-            CalcBackProject({colorFmt.dst2}, hist2d.channels, histogram, dst0, hist2d.ranges)
+            CalcBackProject({colorFmt.dst2}, task.channels, histogram, dst0, hist2d.ranges)
 
             Dim bpCount = CountNonZero(hist2d.histogram(r))
 
@@ -131,20 +131,20 @@ Namespace VBClasses
 
 
 
-    Public Class BackProject2D_Filter : Inherits TaskParent
+    Public Class BackProject2D_SideAndTop : Inherits TaskParent
         Public thresholdVal As Integer
-        Public histogram As New Mat
+        Public histogramSide As cv.Mat = Nothing
+        Public histogramTop As cv.Mat = Nothing
         Public Sub New()
-            dst2 = New Mat(dst2.Size(), MatType.CV_32FC3, 0)
             task.gOptions.setHistogramBins(100) ' extra bins to help isolate the stragglers.
-            desc = "Filter a 2D histogram for the backprojection."
+            desc = "Prepare the side and top views of the depth data."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If standaloneTest() Then
-                CalcHist({task.pointCloud}, task.channelsSide, New Mat, histogram, 2, task.bins2D, task.rangesSide)
-            End If
-            'histogram.Col(0).SetTo(0)
-            Threshold(histogram, dst2, thresholdVal, 255, ThresholdTypes.Binary)
+            CalcHist({task.pointCloud}, task.channelsSide, New Mat, histogramSide, 2, task.bins2D, task.rangesSide)
+            Threshold(histogramSide, dst2, thresholdVal, 255, ThresholdTypes.Binary)
+
+            CalcHist({task.pointCloud}, task.channelsTop, New Mat, histogramTop, 2, task.bins2D, task.rangesTop)
+            Threshold(histogramTop, dst3, thresholdVal, 255, ThresholdTypes.Binary)
         End Sub
     End Class
 
@@ -154,8 +154,7 @@ Namespace VBClasses
 
 
 
-    Public Class BackProject2D_FilterSide : Inherits TaskParent
-        Public filter As New BackProject2D_Filter
+    Public Class BackProject2D_Side : Inherits TaskParent
         Dim options As New Options_HistXD
         Public Sub New()
             desc = "Backproject the output of the Side View after removing low sample bins."
@@ -165,12 +164,9 @@ Namespace VBClasses
 
             Dim histogram As New Mat
             CalcHist({task.pointCloud}, task.channelsSide, New Mat, histogram, 2, task.bins2D, task.rangesSide)
+            Threshold(histogram, dst2, options.sideThreshold, 255, ThresholdTypes.Binary)
 
-            filter.thresholdVal = options.sideThreshold
-            filter.histogram = histogram
-            filter.Run(src)
-
-            CalcBackProject({task.pointCloud}, task.channelsSide, filter.histogram, dst1, task.rangesSide)
+            CalcBackProject({task.pointCloud}, task.channelsSide, histogram, dst1, task.rangesSide)
             dst1.ConvertTo(dst1, MatType.CV_8U)
 
             dst2.SetTo(0)
@@ -185,50 +181,23 @@ Namespace VBClasses
 
 
 
-    Public Class BackProject2D_FilterTop : Inherits TaskParent
-        Dim filter As New BackProject2D_Filter
+    Public Class BackProject2D_Top : Inherits TaskParent
         Dim options As New Options_HistXD
         Public Sub New()
             desc = "Backproject the output of the Side View after removing low sample bins."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
+            dst3 = task.pointCloud.Clone
 
             Dim histogram As New Mat
             CalcHist({task.pointCloud}, task.channelsSide, New Mat, histogram, 2, task.bins2D, task.rangesSide)
+            Threshold(histogram, dst2, options.topThreshold, 255, ThresholdTypes.Binary)
 
-            filter.thresholdVal = options.topThreshold
-            filter.histogram = histogram
-            filter.Run(src)
-
-            CalcBackProject({task.pointCloud}, task.channelsTop, filter.dst2, dst1, task.rangesTop)
+            CalcBackProject({task.pointCloud}, task.channelsTop, dst2, dst1, task.rangesTop)
             dst1.ConvertTo(dst1, MatType.CV_8U)
 
-            dst2.SetTo(0)
-            task.pointCloud.CopyTo(dst2, dst1)
-        End Sub
-    End Class
-
-
-
-
-
-
-
-
-    Public Class XR_BackProject2D_FilterBoth : Inherits TaskParent
-        Dim filterSide As New BackProject2D_FilterSide
-        Dim filterTop As New BackProject2D_FilterTop
-        Public Sub New()
-            desc = "Backproject the output of the both the top and side views after removing low sample bins."
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            filterSide.Run(src)
-            filterTop.Run(src)
-
-            dst2.SetTo(0)
-            task.pointCloud.CopyTo(dst2, filterSide.dst1)
-            task.pointCloud.CopyTo(dst3, filterTop.dst1)
+            ' dst3.SetTo(0, Not dst1)
         End Sub
     End Class
 
@@ -293,7 +262,7 @@ Namespace VBClasses
             backp.hist2d.histogram(rect).CopyTo(histData(rect))
 
             Dim ranges() = backp.hist2d.ranges
-            CalcBackProject({task.color}, backp.hist2d.channels, histData, dst1, ranges)
+            CalcBackProject({task.color}, task.channels, histData, dst1, ranges)
 
             dst3.SetTo(0)
             dst3.SetTo(Scalar.Yellow, dst1)

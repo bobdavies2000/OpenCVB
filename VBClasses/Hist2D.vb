@@ -5,8 +5,8 @@ Namespace VBClasses
         Public histRowsCols() As Integer
         Public ranges() As Rangef
         Public histogram As New Mat
-        Public channels() As Integer = {0, 2}
         Public Sub New()
+            task.channels = {0, 2}
             histRowsCols = {dst2.Height, dst2.Width}
             labels = {"", "", "All non-zero entries in the 2D histogram", ""}
             desc = "Create a 2D histogram from the input."
@@ -30,8 +30,8 @@ Namespace VBClasses
                 New Rangef(mmY.minVal - histDelta, mmY.maxVal + histDelta)}
         End Function
         Public Overrides Sub RunAlg(src As cv.Mat)
-            ranges = GetHist2Dminmax(src, channels(0), channels(1))
-            CalcHist({src}, channels, New Mat(), histogram, 2, histRowsCols, ranges)
+            ranges = GetHist2Dminmax(src, task.channels(0), task.channels(1))
+            CalcHist({src}, task.channels, New Mat(), histogram, 2, histRowsCols, ranges)
             Threshold(histogram, dst2, 0, 255, ThresholdTypes.Binary)
             dst2.ConvertTo(dst2, MatType.CV_8U)
         End Sub
