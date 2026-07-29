@@ -3143,8 +3143,8 @@ Namespace VBClasses
 
 
     Public Class Options_HistXD : Inherits OptionParent
-        Public sideThreshold As Integer = 5
-        Public topThreshold As Integer = 15
+        Public sideThreshold As Integer = 1
+        Public topThreshold As Integer = 1
         Public threshold3D As Integer = 40
         Public Sub New()
             If sliders.Setup(traceName) Then

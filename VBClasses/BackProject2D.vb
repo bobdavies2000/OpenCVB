@@ -161,16 +161,16 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
+            dst3 = task.pointCloud.Clone
 
             Dim histogram As New Mat
             CalcHist({task.pointCloud}, task.channelsSide, New Mat, histogram, 2, task.bins2D, task.rangesSide)
             Threshold(histogram, dst2, options.sideThreshold, 255, ThresholdTypes.Binary)
 
-            CalcBackProject({task.pointCloud}, task.channelsSide, histogram, dst1, task.rangesSide)
+            CalcBackProject({task.pointCloud}, task.channelsSide, dst2, dst1, task.rangesSide)
             dst1.ConvertTo(dst1, MatType.CV_8U)
 
-            dst2.SetTo(0)
-            task.pointCloud.CopyTo(dst2, dst1)
+            dst3.SetTo(0, Not dst1)
         End Sub
     End Class
 
@@ -191,13 +191,13 @@ Namespace VBClasses
             dst3 = task.pointCloud.Clone
 
             Dim histogram As New Mat
-            CalcHist({task.pointCloud}, task.channelsSide, New Mat, histogram, 2, task.bins2D, task.rangesSide)
+            CalcHist({task.pointCloud}, task.channelsTop, New Mat, histogram, 2, task.bins2D, task.rangesTop)
             Threshold(histogram, dst2, options.topThreshold, 255, ThresholdTypes.Binary)
 
             CalcBackProject({task.pointCloud}, task.channelsTop, dst2, dst1, task.rangesTop)
             dst1.ConvertTo(dst1, MatType.CV_8U)
 
-            ' dst3.SetTo(0, Not dst1)
+            dst3.SetTo(0, Not dst1)
         End Sub
     End Class
 

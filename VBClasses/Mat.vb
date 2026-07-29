@@ -512,7 +512,7 @@ Namespace VBClasses
                 CvtColor(dst, dst, ColorConversionCodes.BGR2GRAY)
                 dst = Mat_32f_To_8UC3(dst)
             ElseIf src.Type = MatType.CV_32FC3 Then
-                ConvertScaleAbs(src, dst)
+                src.ConvertTo(dst, MatType.CV_8UC3, 255.0)
             Else
                 dst = src.Clone
             End If
