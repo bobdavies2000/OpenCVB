@@ -880,7 +880,7 @@ Namespace VBClasses
 
 
 
-    Public Class Brick_Variability : Inherits TaskParent
+    Public Class XR_Brick_Variability : Inherits TaskParent
         Dim bricks As New Brick_Basics
         Dim depthList As New List(Of Single)
         Dim options As New Options_DiffDepth
@@ -933,7 +933,7 @@ Namespace VBClasses
 
 
 
-    Public Class Brick_Ranges : Inherits TaskParent
+    Public Class XR_Brick_Ranges : Inherits TaskParent
         Dim bricks As New Brick_Basics
         Dim options As New Options_DiffDepth
         Public rangeJumpers As New List(Of Integer)
@@ -1002,7 +1002,7 @@ Namespace VBClasses
 
 
 
-    Public Class XR_Brick_Plot : Inherits TaskParent
+    Public Class XR_Brick_Plot1 : Inherits TaskParent
         Dim bricks As New Brick_Basics
         Dim plotHist As New PlotBar_Basics
         Public Sub New()
@@ -1051,7 +1051,7 @@ Namespace VBClasses
 
 
 
-    Public Class Brick_Plot : Inherits TaskParent
+    Public Class XR_Brick_Plot : Inherits TaskParent
         Dim bricks As New Brick_Basics
         Dim plotHist As New PlotBar_Basics
         Public Sub New()

@@ -1,7 +1,7 @@
 Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCvSharp
 Namespace VBClasses
     'https://github.com/opencv/opencv/blob/master/samples/cpp/stereo_match.cpp
-    Public Class BlockMatching_Basics : Inherits TaskParent
+    Public Class XR_BlockMatching_Basics : Inherits TaskParent
         Implements IDisposable
         Dim colorizer As New DepthColorizer_CPP
         Dim options As New Options_BlockMatching

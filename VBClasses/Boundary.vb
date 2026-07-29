@@ -1,7 +1,7 @@
 Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCvSharp
 Namespace VBClasses
-    Public Class Boundary_Basics : Inherits TaskParent
-        Public redC As New RedColor_Basics
+    Public Class XR_Boundary_Basics : Inherits TaskParent
+        Public redC As New RedC_Basics
         Dim color8U As New Color8U_Basics
         Public Sub New()
             task.fOptions.Color8USource.SelectedItem = "Bin4Way_Regions"
@@ -27,8 +27,8 @@ Namespace VBClasses
 
 
 
-    Public Class Boundary_Rectangles : Inherits TaskParent
-        Public bounds As New Boundary_Basics
+    Public Class XR_Boundary_Rectangles : Inherits TaskParent
+        Public bounds As New XR_Boundary_Basics
         Public rects As New List(Of cv.Rect)
         Public smallRects As New List(Of cv.Rect)
         Public smallContours As New List(Of List(Of cv.Point))
@@ -91,7 +91,7 @@ Namespace VBClasses
 
 
     Public Class XR_Boundary_RemovedRects : Inherits TaskParent
-        Public bRects As New Boundary_Rectangles
+        Public bRects As New XR_Boundary_Rectangles
         Public Sub New()
             If standalone Then task.gOptions.displayDst1.Checked = True
             desc = "Build the boundaries for rcList and remove interior rectangles"
@@ -118,7 +118,7 @@ Namespace VBClasses
 
     Public Class XR_Boundary_GuidedBP : Inherits TaskParent
         Dim guided As New GuidedBP_Depth
-        Dim redC As New RedColor_Basics
+        Dim redC As New RedC_Basics
         Public Sub New()
             task.gOptions.setHistogramBins(100)
             dst3 = New Mat(dst2.Size(), MatType.CV_8U, Scalar.All(0))
@@ -145,11 +145,11 @@ Namespace VBClasses
 
 
 
-    Public Class Boundary_RedColor : Inherits TaskParent
+    Public Class XR_Boundary_RedC : Inherits TaskParent
         Dim prep As New RedPrep_Basics
         Public Sub New()
             dst3 = New Mat(dst2.Size(), MatType.CV_8U, Scalar.All(0))
-            desc = "Find the RedCloud cell contours"
+            desc = "Find the RedC cell contours"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             prep.Run(src)

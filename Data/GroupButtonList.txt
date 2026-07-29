@@ -8,10 +8,7 @@ Bin3Way
 Bin4Way
 Binarize
 BinNWay
-BlockMatching
 Blur
-BlurMotion
-Boundary
 Brick
 BrickLine
 BrickPoint
