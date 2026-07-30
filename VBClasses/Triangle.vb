@@ -86,7 +86,7 @@ Namespace VBClasses
 
     Public Class XR_Triangle_Cell : Inherits TaskParent
         Public triangles As New List(Of Point3f)
-        Dim redC As New RedCloud_Basics
+        Dim redC As New RedC_Basics
         Public Sub New()
             If standalone Then task.gOptions.displayDst1.Checked = True
             labels = {"", "", "RedFlood_List output", "Selected contour - each pixel has depth"}
@@ -100,6 +100,7 @@ Namespace VBClasses
             SetTrueText(redC.strOut, 1)
 
             Dim rc = task.rcD
+            If rc Is Nothing Then Exit Sub
             If rc.mapID = 0 Then Exit Sub
 
             dst3.SetTo(0)
@@ -147,7 +148,7 @@ Namespace VBClasses
 
     Public Class XR_Triangle_Mask : Inherits TaskParent
         Public triangles As New List(Of Point3f)
-        Dim redC As New RedCloud_Basics
+        Dim redC As New RedC_Basics
         Public Sub New()
             If standalone Then task.gOptions.displayDst1.Checked = True
             labels = {"", "", "RedFlood_List output", "Selected rc.mask - each pixel has depth. Red dot is maxDist."}
@@ -162,6 +163,7 @@ Namespace VBClasses
             SetTrueText(redC.strOut, 1)
 
             Dim rc = task.rcD
+            If rc Is Nothing Then Exit Sub
             If rc.mapID = 0 Then Exit Sub
 
             dst3.SetTo(0)

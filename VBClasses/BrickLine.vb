@@ -156,7 +156,7 @@ Namespace VBClasses
 
 
 
-    Public Class XR_XR_BrickLine_DepthGaps : Inherits TaskParent
+    Public Class XR_BrickLine_DepthGaps : Inherits TaskParent
         Dim findCells As New XR_BrickLine_DepthGap
         Public Sub New()
             dst1 = New Mat(dst1.Size, MatType.CV_8U, 0)
@@ -181,7 +181,7 @@ Namespace VBClasses
 
 
 
-    Public Class XR_XR_BrickLine_Lines : Inherits TaskParent
+    Public Class XR_BrickLine_Lines : Inherits TaskParent
         Dim findCells As New XR_BrickLine_Basics
         Public Sub New()
             dst1 = New Mat(dst1.Size, MatType.CV_8U, 0)

@@ -211,6 +211,7 @@ Namespace VBClasses
             SetTrueText(redC.strOut, 3)
 
             dst3.SetTo(0)
+            If task.rcD Is Nothing Then Exit Sub
 
             Static rect = New cv.Rect(0, 0, task.rcD.rect.Width, task.rcD.rect.Height)
             If task.optionsChanged Or task.mouseClickFlag Then

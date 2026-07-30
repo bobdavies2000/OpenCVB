@@ -148,6 +148,7 @@ Namespace VBClasses
             labels(2) = redC.labels(2)
 
             SetTrueText(redC.strOut, 3)
+            If task.rcD Is Nothing Then Exit Sub
 
             If task.rcD.contour Is Nothing Then task.rcD = redC.rcList(0)
             fitE.inputPoints.Clear()

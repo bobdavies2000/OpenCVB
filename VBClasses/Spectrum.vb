@@ -347,7 +347,7 @@ Namespace VBClasses
             dst3.SetTo(0)
             For Each task.rcD In redC.rcList
                 breakdown.Run(src)
-                dst3(task.rcD.rect).SetTo(task.scalarColors(task.rcD.index), task.rcD.mask)
+                dst3(task.rcD.rect).SetTo(task.scalarColors(task.rcD.index Mod 255), task.rcD.mask)
             Next
         End Sub
     End Class

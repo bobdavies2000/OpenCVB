@@ -124,9 +124,9 @@ Namespace VBClasses
 
 
 
-    Public Class XR_RedCloud_CellDepthHistogram : Inherits TaskParent
+    Public Class XR_RedC_CellDepthHistogram : Inherits TaskParent
         Dim plot As New PlotBar_Basics
-        Dim redC As New RedCloud_Basics
+        Dim redC As New RedC_Basics
         Public Sub New()
             task.gOptions.setHistogramBins(100)
             If standalone Then task.gOptions.displayDst1.Checked = True
@@ -137,6 +137,7 @@ Namespace VBClasses
             redC.Run(src)
             dst2 = redC.dst2
             labels(2) = redC.labels(2)
+            If task.rcD Is Nothing Then Exit Sub
 
             SetTrueText(redC.strOut, 1)
 

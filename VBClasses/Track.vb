@@ -6,12 +6,18 @@ Namespace VBClasses
             desc = "Track the selected cell."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            redC.Run(task.gray)
+            If src.Channels <> 1 Then
+                Static color8u As New Color8U_Basics
+                color8u.Run(src)
+                src = color8u.dst2
+            End If
+
+            redC.Run(src)
             dst2 = redC.dst2
             labels(2) = redC.labels(2)
 
             Static rclast As rcData = task.rcD
-
+            If rclast Is Nothing Then Exit Sub
             If rclast.mapID <> task.rcD.mapID And task.mouseClickFlag = False Then
                 For Each rc In redC.rcList
                     If rc.mapID = rclast.mapID Then
@@ -44,7 +50,13 @@ Namespace VBClasses
             desc = "Track the selected cell."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            redC.Run(task.gray)
+            If src.Channels <> 1 Then
+                Static color8u As New Color8U_Basics
+                color8u.Run(src)
+                src = color8u.dst2
+            End If
+
+            redC.Run(src)
             dst2 = redC.dst2
             labels(2) = redC.labels(2)
 
@@ -85,10 +97,17 @@ Namespace VBClasses
             desc = "Find the nearest cell with the same mapID."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            redC.Run(task.gray)
+            If src.Channels <> 1 Then
+                Static color8u As New Color8U_Basics
+                color8u.Run(src)
+                src = color8u.dst2
+            End If
+
+            redC.Run(src)
             dst2 = redC.dst2
             labels(2) = redC.labels(2)
             Static rclast As rcData = task.rcD
+            If task.rcD Is Nothing Then Exit Sub
 
             Dim clickIndex = redC.rcMap.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X)
             Circle(dst2, task.rcD.maxDist, task.DotSize + 2, task.highlight, -1)

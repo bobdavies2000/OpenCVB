@@ -843,9 +843,11 @@ XR_Brick_Search
 XR_Brick_Variability
 XR_BrickLine_Basics
 XR_BrickLine_DepthGap
+XR_BrickLine_DepthGaps
 XR_BrickLine_Edges
 XR_BrickLine_EdgesNoEdges
 XR_BrickLine_LeftRightMotion
+XR_BrickLine_Lines
 XR_BrickPoint_Best
 XR_BrickPoint_Blocks
 XR_BrickPoint_Busiest
@@ -941,7 +943,7 @@ XR_ContourPlane_X
 XR_Contrast_Basics
 XR_Contrast_POW
 XR_Convex_Defects
-XR_Convex_RedColor
+XR_Convex_RedC
 XR_Corner_BasicsCentroid
 XR_Corner_BasicsCentroids
 XR_Corner_Harris
@@ -1379,7 +1381,6 @@ XR_Line_Longest
 XR_Line_LongestTest
 XR_Line_Map
 XR_Line_MapRects
-XR_Line_Parallel
 XR_Line_RawFLD
 XR_Line_RedFlood
 XR_Line_Select
@@ -1409,7 +1410,7 @@ XR_LineTrack_Top3
 XR_LUT_Create
 XR_LUT_Custom
 XR_LUT_Depth32f
-XR_LUT_RedCloud
+XR_LUT_RedC
 XR_LUT_Reduction
 XR_LUT_RGBDepth
 XR_LUT_Sliders
@@ -1563,9 +1564,9 @@ XR_Rectangle_Overlap
 XR_Rectangle_Union
 XR_RecursiveBilateralFilter_CPP
 XR_RedC_BasicsOld
+XR_RedC_CellDepthHistogram
 XR_RedC_Sizes
 XR_RedC_TrackHull
-XR_RedCloud_CellDepthHistogram
 XR_RedCloud_KNN
 XR_RedCloud_LeftRight
 XR_RedCloud_Matches
@@ -1673,5 +1674,3 @@ XR_WarpAffine_Repeated
 XR_WarpAffine_RepeatedExample8
 XR_Watershed_DepthAuto
 XR_Watershed_DepthReduction
-XR_XR_BrickLine_DepthGaps
-XR_XR_BrickLine_Lines

@@ -56,9 +56,9 @@ Namespace VBClasses
 
 
 
-    Public Class XR_Convex_RedColor : Inherits TaskParent
+    Public Class XR_Convex_RedC : Inherits TaskParent
         Dim convex As New Convex_Basics
-        Dim redC As New RedCloud_Basics
+        Dim redC As New RedC_Basics
         Public Sub New()
             labels = {"", "", "Selected contour - line shows hull with white is contour.  Click to select another contour.", "RedCloud cells"}
             desc = "Get lots of odd shapes from the Convex_Basics output and use ConvexHull to simplify them."
@@ -69,7 +69,7 @@ Namespace VBClasses
             labels(2) = redC.labels(2)
 
             SetTrueText(redC.strOut, 3)
-
+            If task.rcD Is Nothing Then Exit Sub
             If task.rcD.contour IsNot Nothing Then
                 convex.Run(src)
 

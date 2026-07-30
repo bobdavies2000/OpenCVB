@@ -5274,8 +5274,7 @@ Namespace VBClasses
         Public Sub Run()
             Static fgFineTuning = findRadio("Selected rectangle is added to the foreground")
             Static clearCheck = findRadio("Clear all foreground and background fine tuning")
-            Static saveRadio = fgFineTuning.checked
-            fineTuning = saveRadio.checked
+            fineTuning = fgFineTuning.checked
             clearAll = clearCheck.checked
         End Sub
     End Class

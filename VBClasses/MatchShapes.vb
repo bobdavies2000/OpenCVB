@@ -165,7 +165,7 @@ Namespace VBClasses
 
     Public Class XR_MatchShapes_Contours : Inherits TaskParent
         Dim options As New Options_MatchShapes
-        Dim redC As New RedColor_Basics
+        Dim redC As New RedC_Basics
         Public Sub New()
             If standalone Then task.gOptions.displayDst1.Checked = True
             OptionParent.FindSlider("Match Threshold %").Value = 3
@@ -183,6 +183,7 @@ Namespace VBClasses
             SetTrueText(redC.strOut, 1)
 
             Dim rcX = task.rcD
+            If task.rcD Is Nothing Then Exit Sub
             If rcX Is Nothing Then rcX = redC.rcList(0)
             For Each rc In redC.rcList
                 If rc.contour Is Nothing Then Continue For

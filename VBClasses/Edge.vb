@@ -1238,6 +1238,7 @@ Namespace VBClasses
             prep.Run(src)
             dst2 = prep.dst2
 
+            If dst2.Type <> cv.MatType.CV_32F Then dst2.ConvertTo(dst2, cv.MatType.CV_32F)
             edges.Run(dst2)
             dst3 = edges.dst2
         End Sub

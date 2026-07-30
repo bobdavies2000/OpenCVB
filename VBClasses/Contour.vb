@@ -496,7 +496,7 @@ Namespace VBClasses
 
     Public Class XR_Contour_Compare : Inherits TaskParent
         Public options As New Options_Contours
-        Dim redC As New RedCloud_Basics
+        Dim redC As New RedC_Basics
         Public Sub New()
             desc = "Compare findContours options - ApproxSimple, ApproxNone, etc."
         End Sub
@@ -508,7 +508,7 @@ Namespace VBClasses
             labels(2) = redC.labels(2)
 
             SetTrueText(redC.strOut, 3)
-
+            If task.rcD Is Nothing Then Exit Sub
             Dim tmp = task.rcD.mask.Clone
 
             Dim allContours As cv.Point()() = Nothing

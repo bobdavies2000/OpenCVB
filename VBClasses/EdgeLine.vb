@@ -373,6 +373,7 @@ Namespace VBClasses
 
             segments.Clear()
             For Each rc In edgeline.rcList
+                If rc.contour Is Nothing Then Continue For
                 Dim nextSeg As New List(Of cv.Point)
                 Dim lastDepth = -1
                 For Each pt In rc.contour

@@ -523,63 +523,63 @@ Namespace VBClasses
 
 
 
-    Public Class XR_Line_Parallel : Inherits TaskParent
-        Public classes() As List(Of Integer) ' groups of lines that are parallel
-        Public unParallel As New List(Of Integer) ' lines which are not parallel
-        Public Sub New()
-            labels(2) = "Text shows the parallel Class With 0 being unparallel."
-            desc = "Identify lines that are parallel (Or nearly so), perpendicular, And Not parallel."
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            dst2 = src.Clone
-            Dim parallels As New SortedList(Of Single, Integer)(New compareAllowIdenticalSingleInverted)
-            For Each lp In task.lines.lpList
-                parallels.Add(lp.angle, lp.index)
-            Next
+    'Public Class XR_Line_Parallel : Inherits TaskParent
+    '    Public classes() As List(Of Integer) ' groups of lines that are parallel
+    '    Public unParallel As New List(Of Integer) ' lines which are not parallel
+    '    Public Sub New()
+    '        labels(2) = "Text shows the parallel Class With 0 being unparallel."
+    '        desc = "Identify lines that are parallel (Or nearly so), perpendicular, And Not parallel."
+    '    End Sub
+    '    Public Overrides Sub RunAlg(src As cv.Mat)
+    '        dst2 = src.Clone
+    '        Dim parallels As New SortedList(Of Single, Integer)(New compareAllowIdenticalSingleInverted)
+    '        For Each lp In task.lines.lpList
+    '            parallels.Add(lp.angle, lp.index)
+    '        Next
 
-            If parallels.Count <= 1 Then Exit Sub ' no lines...
+    '        If parallels.Count <= 1 Then Exit Sub ' no lines...
 
-            ReDim classes(task.lines.lpList.Count - 1)
-            Dim index As Integer, j As Integer
-            unParallel.Clear()
-            For i = 0 To parallels.Count - 1
-                Dim lp1 = task.lines.lpList(parallels.ElementAt(i).Value - 1)
-                For j = i + 1 To parallels.Count - 1
-                    Dim lp2 = task.lines.lpList(parallels.ElementAt(j).Value - 1)
-                    If Math.Abs(lp1.angle - lp2.angle) < AngleThreshold Then
-                        If classes(index) Is Nothing Then classes(index) = New List(Of Integer)({lp1.index})
-                        classes(index).Add(lp2.index)
-                    Else
-                        Exit For
-                    End If
-                Next
-                If classes(index) Is Nothing Then unParallel.Add(lp1.index)
-                If j > i + 1 Then index += 1
-                i = j - 1
-            Next
+    '        ReDim classes(task.lines.lpList.Count - 1)
+    '        Dim index As Integer, j As Integer
+    '        unParallel.Clear()
+    '        For i = 0 To parallels.Count - 1
+    '            Dim lp1 = task.lines.lpList(parallels.ElementAt(i).Value - 1)
+    '            For j = i + 1 To parallels.Count - 1
+    '                Dim lp2 = task.lines.lpList(parallels.ElementAt(j).Value - 1)
+    '                If Math.Abs(lp1.angle - lp2.angle) < AngleThreshold Then
+    '                    If classes(index) Is Nothing Then classes(index) = New List(Of Integer)({lp1.index})
+    '                    classes(index).Add(lp2.index)
+    '                Else
+    '                    Exit For
+    '                End If
+    '            Next
+    '            If classes(index) Is Nothing Then unParallel.Add(lp1.index)
+    '            If j > i + 1 Then index += 1
+    '            i = j - 1
+    '        Next
 
-            dst2 = src
-            Dim colorIndex As Integer = 1
-            For i = 0 To classes.Length - 1
-                If classes(i) Is Nothing Then Exit For
-                For j = 0 To classes(i).Count - 1
-                    Dim lp = task.lines.lpList(classes(i).ElementAt(j) - 1)
-                    Line(dst2, lp.p1, lp.p2, lp.color, task.lineWidth * 2, task.lineType)
-                    SetTrueText(CStr(colorIndex), lp.ptCenter)
-                Next
-                colorIndex += 1
-            Next
+    '        dst2 = src
+    '        Dim colorIndex As Integer = 1
+    '        For i = 0 To classes.Length - 1
+    '            If classes(i) Is Nothing Then Exit For
+    '            For j = 0 To classes(i).Count - 1
+    '                Dim lp = task.lines.lpList(classes(i).ElementAt(j) - 1)
+    '                Line(dst2, lp.p1, lp.p2, lp.color, task.lineWidth * 2, task.lineType)
+    '                SetTrueText(CStr(colorIndex), lp.ptCenter)
+    '            Next
+    '            colorIndex += 1
+    '        Next
 
-            For Each index In unParallel
-                Dim lp = task.lines.lpList(index - 1)
-                Line(dst2, lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
-                SetTrueText("0", lp.ptCenter)
-            Next
+    '        For Each index In unParallel
+    '            Dim lp = task.lines.lpList(index - 1)
+    '            Line(dst2, lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
+    '            SetTrueText("0", lp.ptCenter)
+    '        Next
 
-            dst3 = task.lines.dst2
-            labels(3) = task.lines.labels(2)
-        End Sub
-    End Class
+    '        dst3 = task.lines.dst2
+    '        labels(3) = task.lines.labels(2)
+    '    End Sub
+    'End Class
 
 
 
