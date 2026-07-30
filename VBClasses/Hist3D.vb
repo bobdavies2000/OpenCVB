@@ -89,9 +89,9 @@ Namespace VBClasses
 
 
 
-    Public Class XR_Hist3D_RedCloud : Inherits TaskParent
+    Public Class XR_Hist3D_RedC : Inherits TaskParent
         Dim hist3D As New Hist3D_Basics
-        Dim redC As New RedColor_Basics
+        Dim redC As New RedC_Basics
         Public Sub New()
             If standalone Then task.gOptions.displayDst1.Checked = True
             desc = "Run RedFlood_List on the combined Hist3D color/cloud output."
@@ -116,11 +116,11 @@ Namespace VBClasses
 
 
 
-    Public Class XR_Hist3D_RedColor : Inherits TaskParent
+    Public Class XR_Hist3D_RedC1 : Inherits TaskParent
         Dim hColor As New Hist3Dcolor_Basics
-        Dim redC As New RedColor_Basics
+        Dim redC As New RedC_Basics
         Public Sub New()
-            desc = "Use the Hist3D color classes to segment the image with RedFlood_List"
+            desc = "Use the Hist3D color classes to segment the image with RedC_Basics"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             hColor.Run(src)
@@ -206,27 +206,6 @@ Namespace VBClasses
         End Sub
     End Class
 
-
-
-
-
-
-    Public Class XR_Hist3D_PixelClassify : Inherits TaskParent
-        Dim pixel As New Hist3D_Pixel
-        Dim redC As New RedColor_Basics
-        Public Sub New()
-            desc = "Classify each pixel with a 3D histogram backprojection and run RedFlood_List on the output."
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            pixel.Run(src)
-
-            redC.Run(pixel.dst2)
-            dst2 = redC.dst2
-            labels(2) = redC.labels(2)
-            SetTrueText(redC.strOut, 3)
-            If task.rcD IsNot Nothing AndAlso task.rcD.rect.Width > 0 Then dst2(task.rcD.rect).SetTo(white, task.rcD.mask)
-        End Sub
-    End Class
 
 
 

@@ -774,10 +774,10 @@ XR_BGSubtract_Video
 XR_Bin2Way_GradationEdges
 XR_Bin2Way_KMeans
 XR_Bin2Way_RecurseOnce
+XR_Bin2Way_RedC
 XR_Bin2Way_RedCloudDarkest
 XR_Bin2Way_RedCloudLight
 XR_Bin2Way_RedCloudLightToDark
-XR_Bin2Way_RedColor
 XR_Bin3Way_RedColorDarkest
 XR_Bin3Way_RedColorLightest
 XR_Bin3Way_RedColorOther
@@ -1060,7 +1060,7 @@ XR_Edge_NoDepth
 XR_Edge_Preserving
 XR_Edge_Projection
 XR_Edge_RandomForest_CPP
-XR_Edge_RedCloud
+XR_Edge_RedC
 XR_Edge_Reduction
 XR_Edge_Scharr
 XR_Edge_SobelCustomLeftRight
@@ -1105,14 +1105,12 @@ XR_Feature_LeftRightCorrelation
 XR_Feature_LucasKanade
 XR_Feature_Matching
 XR_Feature_NoMotionTest
-XR_Feature_RedCloud
+XR_Feature_RedC
 XR_Feature_ShiTomasi
 XR_Feature_SteadyCam
 XR_Feature_TraceDelaunay
 XR_Feature_WithDepth
-XR_FeatureLess_Basics
 XR_FeatureLess_BasicsOld
-XR_FeatureLess_BasicsRedC
 XR_FeatureLess_BasicsTest
 XR_FeatureLess_BasicsTest2
 XR_FeatureLess_ClustersHist2D
@@ -1139,7 +1137,7 @@ XR_FeatureMap_InfoTest
 XR_FeatureMap_Lines
 XR_FeatureMap_MotionDirection
 XR_FeatureMap_PeripheryNot
-XR_FeatureMap_RedCloud1
+XR_FeatureMap_RedC
 XR_FeatureMap_ViewLeft
 XR_FeatureMap_ViewRight
 XR_FeatureMap_WithAge
@@ -1158,7 +1156,7 @@ XR_FindNonZero_SoloPoints
 XR_FitEllipse_AMS_CPP
 XR_FitEllipse_Direct_CPP
 XR_FitEllipse_Rectangle
-XR_FitEllipse_RedCloud
+XR_FitEllipse_RedC
 XR_FitLine_BasicsOld_TA3D
 XR_FitLine_Example2D
 XR_FitLine_Grid
@@ -1167,7 +1165,6 @@ XR_FitLine_Simple
 XR_FitLine_Simple3D
 XR_Flood_DarkLight
 XR_Flood_Minimal
-XR_Flood_SimpleRedColor
 XR_Flood_Tiers
 XR_Font_FlowMsgs
 XR_Foreground_Basics_TA
@@ -1236,11 +1233,10 @@ XR_HeatMap_GuidedBP
 XR_Hist2D_Depth
 XR_Hist2D_PlotHistogram1D
 XR_Hist3D_DepthWithMask
-XR_Hist3D_PixelClassify
 XR_Hist3D_PixelDiffMask
-XR_Hist3D_RedCloud
+XR_Hist3D_RedC
+XR_Hist3D_RedC1
 XR_Hist3D_RedCloudGrid
-XR_Hist3D_RedColor
 XR_Hist3Dcloud_BP_Filter
 XR_Hist3Dcloud_DepthSplit
 XR_Hist3Dcloud_Highlights
@@ -1305,7 +1301,7 @@ XR_HullLine_SelectHull
 XR_Image_Basics
 XR_Image_Icon
 XR_Image_MSER
-XR_Image_RedCloudColor
+XR_Image_RedC
 XR_Image_Series
 XR_ImageOffset_Basics
 XR_ImageOffset_Cloud
@@ -1433,7 +1429,6 @@ XR_Match_LinePairTest
 XR_Match_Motion
 XR_Match_RandomTest
 XR_Match_TraceRedC
-XR_Match_TraceRedC1
 XR_MatchShapes_Contours
 XR_MatchShapes_Hulls
 XR_MatchShapes_NearbyHull

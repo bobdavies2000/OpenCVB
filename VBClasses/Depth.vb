@@ -1069,7 +1069,7 @@ Namespace VBClasses
 
     Public Class XR_Depth_CellTiers : Inherits TaskParent
         Public valley As New HistValley_Count
-        Dim redC As New RedCloud_Basics
+        Dim redC As New RedC_Basics
         Public Sub New()
             desc = "Find the number of valleys (tiers) in a RedCloud cell."
         End Sub
@@ -1091,7 +1091,13 @@ Namespace VBClasses
                     task.clickPoint = rc.maxDist
                     SetTrueText(redC.strOut, 3)
                 End If
-                If task.heartBeat Then SetTrueText(CStr(valley.classCount) + " classes", rc.maxDist)
+                If task.heartBeat Then
+                    If valley.classCount <= 1 Then
+                        SetTrueText(CStr(valley.classCount) + " class", rc.maxDist)
+                    Else
+                        SetTrueText(CStr(valley.classCount) + " classes", rc.maxDist)
+                    End If
+                End If
             Next
 
             Static saveTrueText As New List(Of TrueText)

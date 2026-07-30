@@ -588,11 +588,11 @@ Namespace VBClasses
 
 
 
-    Public Class XR_Feature_RedCloud : Inherits TaskParent
+    Public Class XR_Feature_RedC : Inherits TaskParent
         Dim feat As New Feature_Basics
-        Dim redC As New RedCloud_Basics
+        Dim redC As New RedC_Basics
         Public Sub New()
-            desc = "Show the feature points in the RedCloud output."
+            desc = "Show the feature points in the RedC output."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             feat.Run(src)

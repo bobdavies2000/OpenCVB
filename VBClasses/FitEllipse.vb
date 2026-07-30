@@ -132,9 +132,9 @@ Namespace VBClasses
 
 
 
-    Public Class XR_FitEllipse_RedCloud : Inherits TaskParent
+    Public Class XR_FitEllipse_RedC : Inherits TaskParent
         Dim fitE As New FitEllipse_Basics
-        Dim redC As New RedCloud_Basics
+        Dim redC As New RedC_Basics
         Public Sub New()
             desc = "Create an ellipse from a contour"
         End Sub

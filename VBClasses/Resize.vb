@@ -51,7 +51,7 @@ End Class
 
 Public Class Resize_Proportional : Inherits TaskParent
     Dim options As New Options_Spectrum
-    Dim redC As New RedColor_Basics
+    Dim redC As New RedC_Basics
     Public Sub New()
         desc = "Resize the input but keep the results proportional to the original."
     End Sub

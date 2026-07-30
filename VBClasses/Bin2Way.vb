@@ -72,18 +72,15 @@ Namespace VBClasses
 
 
 
-    Public Class XR_Bin2Way_RedColor : Inherits TaskParent
+    Public Class XR_Bin2Way_RedC : Inherits TaskParent
         Dim bin2 As New Bin2Way_Gradation
-        Dim redC As New RedColor_Basics
+        Dim redC As New RedC_Basics
         Public Sub New()
             dst1 = New Mat(dst1.Size, MatType.CV_8U, 0)
             desc = "Identify 4 gradations of light and combine them for input to RedColor"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             bin2.Run(src)
-
-            redC.Run(bin2.dst3)
-            labels(2) = redC.labels(2)
 
             redC.Run(bin2.dst3)
             labels(2) = redC.labels(2)

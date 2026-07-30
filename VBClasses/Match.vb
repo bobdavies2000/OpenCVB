@@ -299,44 +299,6 @@ Namespace VBClasses
 
 
 
-    Public Class XR_Match_TraceRedC1 : Inherits TaskParent
-        Dim frameList As New List(Of Mat)
-        Dim redC As New RedColor_Basics
-        Public Sub New()
-            dst0 = New Mat(dst0.Size(), MatType.CV_32S, 0)
-            dst1 = New Mat(dst1.Size(), MatType.CV_32S, 0)
-            dst2 = New Mat(dst2.Size(), MatType.CV_8U, Scalar.All(0))
-            desc = "Track each RedCloud cell center to highlight zones of RedCloud cell instability.  Look for clusters of points in dst2."
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            redC.Run(src)
-            dst3 = redC.dst2
-            labels(3) = redC.labels(2)
-
-            If task.heartBeat Then dst2.SetTo(0)
-            If task.optionsChanged Then frameList.Clear()
-
-            dst0.SetTo(0)
-            Dim points As New List(Of cv.Point)
-
-            For Each rc In redC.rcList
-                dst0.Set(Of Byte)(rc.maxDist.Y, rc.maxDist.X, 1)
-            Next
-            labels(2) = CStr(redC.rcList.Count) + " cells added"
-
-            frameList.Add(dst0.Clone)
-            If frameList.Count >= task.fOptions.FrameHistoryCount.Value Then
-                dst1 = dst1.Subtract(frameList(0))
-                frameList.RemoveAt(0)
-            End If
-            dst1 = dst1.Add(dst0)
-            dst1.ConvertTo(dst2, MatType.CV_8U)
-            Threshold(dst2, dst2, 0, 255, ThresholdTypes.Binary)
-        End Sub
-    End Class
-
-
-
 
 
 

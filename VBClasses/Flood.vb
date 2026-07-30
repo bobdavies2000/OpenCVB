@@ -160,24 +160,6 @@ Namespace VBClasses
 
 
 
-    Public Class XR_Flood_SimpleRedColor : Inherits TaskParent
-        Public redC As New RedColor_Basics
-        Public Sub New()
-            desc = "Build the RedColor cells with the grayscale input."
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            redC.Run(src)
-            dst2 = redC.dst2
-            labels(2) = redC.labels(2)
-
-            SetTrueText(redC.strOut, 3)
-        End Sub
-    End Class
-
-
-
-
-
 
 
     Public Class XR_Flood_Tiers : Inherits TaskParent
@@ -288,7 +270,7 @@ Namespace VBClasses
     Public Class Flood_OriginalMask : Inherits TaskParent
         Public inputRemoved As New Mat
         Public showSelected As Boolean = True
-        Public redC As New RedColor_Basics
+        Public redC As New RedC_Basics
         Dim color8U As New Color8U_Basics
         Public Sub New()
             labels(3) = "The inputRemoved mask is used to limit how much of the image is processed."
@@ -317,10 +299,9 @@ Namespace VBClasses
 
     Public Class Flood_FeatureLess : Inherits TaskParent
         Dim fLess As New FeatureLess_DepthFull
-        Dim redC As New RedColor_Basics
+        Dim redC As New RedC_Basics
         Dim edges As New Edge_Basics_TA
         Public Sub New()
-            If standalone Then task.gOptions.displayDst1.Checked = True
             desc = "Match flooded cells with FeatureLess clusters"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)

@@ -3,6 +3,26 @@ Namespace VBClasses
     ' https://github.com/opencv/opencv/blob/master/samples/cpp/detect_mser.cpp
     Public Class MSER_Basics : Inherits TaskParent
         Dim detect As New MSER_CPP
+        Public redC As New RedColor_Basics
+        Public Sub New()
+            labels(3) = "MSER (Maximally Stable Extremal Region) output that is input to RedColor."
+            desc = "Create cells for each region in MSER (Maximally Stable Extremal Region) output"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            detect.Run(src)
+            CvtColor(detect.dst2, dst3, ColorConversionCodes.BGR2GRAY)
+            redC.Run(src)
+            dst2 = redC.dst2
+            labels(2) = redC.labels(2)
+        End Sub
+    End Class
+
+
+
+
+
+    Public Class MSER_Basics1 : Inherits TaskParent
+        Dim detect As New MSER_CPP
         Public mserCells As New List(Of rcData)
         Public floodPoints As New List(Of cv.Point)
         Public redC As New RedC_Basics
@@ -61,27 +81,6 @@ Namespace VBClasses
             labels(2) = CStr(redC.rcList.Count) + " cells were identified and " + CStr(matched.Count) + " were matched."
         End Sub
     End Class
-
-
-
-
-
-    Public Class MSER_Basics1 : Inherits TaskParent
-        Dim detect As New MSER_CPP
-        Dim redC As New RedColor_Basics
-        Public Sub New()
-            labels(3) = "MSER (Maximally Stable Extremal Region) output that is input to RedColor."
-            desc = "Create cells for each region in MSER (Maximally Stable Extremal Region) output"
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            detect.Run(src)
-            CvtColor(detect.dst2, dst3, ColorConversionCodes.BGR2GRAY)
-            redC.Run(src)
-            dst2 = redC.dst2
-            labels(2) = redC.labels(2)
-        End Sub
-    End Class
-
 
 
 
@@ -594,7 +593,7 @@ Namespace VBClasses
 
     Public Class XR_MSER_RedCloud : Inherits TaskParent
         Dim mser As New MSER_Basics
-        Dim redC As New RedColor_Basics
+        Dim redC As New RedCloud_Basics
         Public Sub New()
             desc = "Use the MSER_Basics output as input to RedFlood_List"
         End Sub

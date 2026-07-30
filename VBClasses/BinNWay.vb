@@ -40,7 +40,7 @@ Namespace VBClasses
 
                 SetTrueText(redC.strOut, 1)
             End If
-            labels(3) = CStr(classCount) + " of the motion-adjusted gray image."
+            labels(3) = CStr(classCount) + " classes in the motion-adjusted gray image."
         End Sub
     End Class
 End Namespace

@@ -301,9 +301,9 @@ Namespace VBClasses
 
 
 
-    Public Class XR_FeatureMap_RedCloud1 : Inherits TaskParent
+    Public Class XR_FeatureMap_RedC : Inherits TaskParent
         Dim fcs As New FeatureMap_CreateList
-        Dim redC As New RedCloud_Basics
+        Dim redC As New RedC_Basics
         Public Sub New()
             If standalone Then task.gOptions.displayDst1.Checked = True
             labels(1) = "Output of FeatureMap_CreateList."
@@ -769,10 +769,8 @@ Namespace VBClasses
             fpList.Clear()
             dst2.SetTo(0)
             For i = 0 To Math.Min(feat.features.Count, facets.Length) - 1
-                Dim fp As New fpData
-                fp.pt = feat.features(i)
+                Dim fp As New fpData With {.pt = feat.features(i), .index = i}
                 fp.ptHistory.Add(fp.pt)
-                fp.index = i
 
                 Dim brickIndex = task.gridMap.Get(Of Integer)(fp.pt.Y, fp.pt.X)
                 Dim brick = bricks.brickList(brickIndex)

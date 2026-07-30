@@ -160,7 +160,7 @@ Namespace VBClasses
 
     ' https://github.com/brian-xu/FractalDimension/blob/master/FractalDimension.py
     Public Class XR_Fractal_Dimension : Inherits TaskParent
-        Dim redC As New RedCloud_Basics
+        Dim redC As New RedC_Basics
         Public Sub New()
             dst3 = New Mat(dst3.Size(), MatType.CV_8U, Scalar.All(0))
             labels = {"", "", "RedFlood_List output - select any region.", "The selected region (as a square)"}
