@@ -1,77 +1,53 @@
-Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
-Public Class Watershed_Basics : Inherits TaskParent
-    Dim rects As New List(of cv.Rect)
-    Public UseCorners As Boolean
-    Public Sub New()
-        labels(2) = "Draw rectangle to add another marker"
-        labels(3) = "Mask for watershed (selected regions)."
-        desc = "Watershed API experiment.  Draw on the image to test."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        If task.drawRect.Width > 0 And task.drawRect.Height > 0 Then rects.Add(task.drawRect)
+Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCvSharp
+Namespace VBClasses
+    Public Class Watershed_Basics : Inherits TaskParent
+        Dim rects As New List(Of cv.Rect)
+        Public UseCorners As Boolean
+        Public Sub New()
+            labels(2) = "Draw rectangle to add another marker"
+            labels(3) = "Mask for watershed (selected regions)."
+            desc = "Watershed API experiment.  Draw on the image to test."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            If task.drawRect.Width > 0 And task.drawRect.Height > 0 Then rects.Add(task.drawRect)
 
-        If (standaloneTest() Or UseCorners) And task.optionsChanged Then
-            For i = 0 To 4 - 1
-                Dim r As New cv.Rect(0, 0, src.Width / 10, src.Height / 10)
-                Select Case i
-                    Case 1
-                        r.X = src.Width - src.Width / 10
-                    Case 2
-                        r.X = src.Width - src.Width / 10
-                        r.Y = src.Height - src.Height / 10
-                    Case 3
-                        r.Y = src.Height - src.Height / 10
-                End Select
-                rects.Add(r)
-            Next
-        End If
+            If (standaloneTest() Or UseCorners) And task.optionsChanged Then
+                For i = 0 To 4 - 1
+                    Dim r As New cv.Rect(0, 0, src.Width / 10, src.Height / 10)
+                    Select Case i
+                        Case 1
+                            r.X = src.Width - src.Width / 10
+                        Case 2
+                            r.X = src.Width - src.Width / 10
+                            r.Y = src.Height - src.Height / 10
+                        Case 3
+                            r.Y = src.Height - src.Height / 10
+                    End Select
+                    rects.Add(r)
+                Next
+            End If
 
-        If rects.Count > 0 Then
-            Dim markers = New Mat(src.Size(), MatType.CV_32S, 0)
-            For i = 0 To rects.Count - 1
-                Rectangle(markers, rects.ElementAt(i), Scalar.All(i + 1), -1)
-            Next
+            If rects.Count > 0 Then
+                Dim markers = New Mat(src.Size(), MatType.CV_32S, 0)
+                For i = 0 To rects.Count - 1
+                    Rectangle(markers, rects.ElementAt(i), Scalar.All(i + 1), -1)
+                Next
 
-            Watershed(src, markers)
+                Watershed(src.Clone, markers)
 
-            markers *= Math.Truncate(255 / rects.Count)
-            Dim tmp As New Mat
-            markers.ConvertTo(tmp, MatType.CV_8U)
-            dst3 = Palettize(tmp)
+                markers *= Math.Truncate(255 / rects.Count)
+                Dim tmp As New Mat
+                markers.ConvertTo(tmp, MatType.CV_8U)
+                dst3 = Palettize(tmp)
 
-            dst2 = ShowAddweighted(dst3, src, labels(2))
-        Else
-            dst2 = src
-        End If
-        task.drawRect = New cv.Rect
-        labels(2) = "There were " + CStr(rects.Count) + " regions defined as input"
-    End Sub
-End Class
-
-
-
-
-
-
-
-Public Class XR_Watershed_DepthReduction : Inherits TaskParent
-    Dim watershed As New Watershed_Basics
-    Dim reduction As New Reduction_Basics
-    Public Sub New()
-        watershed.UseCorners = True
-        labels(3) = "Reduction input to WaterShed"
-        desc = "Watershed the depth image using shadow, close, and far points."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        reduction.Run(task.depthRGB)
-        dst3 = reduction.dst3
-
-        watershed.Run(dst3)
-        dst2 = watershed.dst2
-        labels(2) = watershed.labels(2)
-        SetTrueText("Draw anywhere in dst2 to add regions.", 3)
-    End Sub
-End Class
+                dst2 = ShowAddweighted(dst3, src, labels(2))
+            Else
+                dst2 = src
+            End If
+            task.drawRect = New cv.Rect
+            labels(2) = "There were " + CStr(rects.Count) + " regions defined as input"
+        End Sub
+    End Class
 
 
 
@@ -79,16 +55,22 @@ End Class
 
 
 
+    Public Class XR_Watershed_DepthReduction : Inherits TaskParent
+        Dim watershed As New Watershed_Basics
+        Dim reduction As New Reduction_Basics
+        Public Sub New()
+            watershed.UseCorners = True
+            labels(3) = "Reduction input to WaterShed"
+            desc = "Watershed the depth image using shadow, close, and far points."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            reduction.Run(task.depthRGB)
+            dst3 = reduction.dst3
 
-Public Class XR_Watershed_DepthAuto : Inherits TaskParent
-    Dim watershed As New Watershed_Basics
-    Public Sub New()
-        watershed.UseCorners = True
-        desc = "Watershed the four corners of the depth image."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        watershed.Run(task.depthRGB)
-        dst2 = watershed.dst2
-        labels(2) = watershed.labels(2)
-    End Sub
-End Class
+            watershed.Run(dst3)
+            dst2 = watershed.dst2
+            labels(2) = watershed.labels(2)
+            SetTrueText("Draw anywhere in dst2 to add regions.", 3)
+        End Sub
+    End Class
+End Namespace

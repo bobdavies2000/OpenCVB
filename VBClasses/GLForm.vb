@@ -345,7 +345,6 @@ Namespace VBClasses
                     Dim pts(2) As cv.Point
                     Dim triangleCount As Integer
                     For Each rc In hulls.rcList
-                        If rc.hull Is Nothing Then Continue For
                         Dim count As Single = rc.hull.Count
                         For i = 0 To rc.hull.Count - 1
                             Dim goodDepth As Boolean = True

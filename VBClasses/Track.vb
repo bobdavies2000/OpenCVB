@@ -70,16 +70,17 @@ Namespace VBClasses
             End If
 
             Dim clickIndex = redC.rcMap.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X)
-            Circle(dst2, task.rcD.maxDist, task.DotSize + 2, task.highlight, -1)
+            If task.rcD IsNot Nothing Then
+                Circle(dst2, task.rcD.maxDist, task.DotSize + 2, task.highlight, -1)
 
-            task.clickPoint = task.rcD.maxDist
-            labels(3) = "Map ID = " + CStr(task.rcD.mapID)
+                task.clickPoint = task.rcD.maxDist
+                labels(3) = "Map ID = " + CStr(task.rcD.mapID)
 
-            If rclast.mapID <> task.rcD.mapID And task.mouseClickFlag = False Then
-                lostCell = True
-                Exit Sub
+                If rclast.mapID <> task.rcD.mapID And task.mouseClickFlag = False Then
+                    lostCell = True
+                    Exit Sub
+                End If
             End If
-
             strOut = Utility_Basics.selectCell(redC.rcMap, redC.rcList)
             SetTrueText(strOut, 3)
 

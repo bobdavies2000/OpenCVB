@@ -365,37 +365,34 @@ Namespace VBClasses
             dst3.SetTo(0)
             rclist.Clear()
             For Each rc In redC.rcList
-                If rc.contour Is Nothing OrElse rc.contour.Count < 3 Then Continue For
-
-                If rc.hull Is Nothing OrElse rc.hull.Count < 3 Then
+                If rc.contour.Count >= 3 Then
                     rc.hull = ConvexHull(rc.contour.ToArray, True).ToList
-                End If
+                    Dim color = task.scalarColors(rc.index Mod 255)
+                    dst3(rc.rect).SetTo(color, rc.mask)
+                    DrawTour(rcMap(rc.rect), rc.hull, rc.index, -1)
 
-                Dim color = task.scalarColors(rc.index Mod 255)
-                dst3(rc.rect).SetTo(color, rc.mask)
-                DrawTour(rcMap(rc.rect), rc.hull, rc.index, -1)
-
-                If Hull_Defect.indicesMayFail(rc.contour) Then
-                    defectCount += 1
-                Else
-                    Try
-                        Dim hullIndices = ConvexHullIndices(rc.contour, False)
-                        Dim defects = ConvexityDefects(rc.contour, hullIndices.ToList)
-                        ' Fill each defect triangle (start / far / end) into mask, map, and display.
-                        For Each d In defects
-                            Dim tri = New cv.Point() {
-                                rc.contour(d.Item0),
-                                rc.contour(d.Item2),
-                                rc.contour(d.Item1)
-                            }
-                            FillConvexPoly(dst3(rc.rect), tri, Scalar.All(255))
-                            filledDefects += 1
-                        Next
-                        rc.contour = Convex_RedCDefects.betterContour(rc.contour, defects)
-                        rc.pixels = CountNonZero(rc.mask)
-                    Catch ex As Exception
+                    If Hull_Defect.indicesMayFail(rc.contour) Then
                         defectCount += 1
-                    End Try
+                    Else
+                        Try
+                            Dim hullIndices = ConvexHullIndices(rc.contour, False)
+                            Dim defects = ConvexityDefects(rc.contour, hullIndices.ToList)
+                            ' Fill each defect triangle (start / far / end) into mask, map, and display.
+                            For Each d In defects
+                                Dim tri = New cv.Point() {
+                                    rc.contour(d.Item0),
+                                    rc.contour(d.Item2),
+                                    rc.contour(d.Item1)
+                                }
+                                FillConvexPoly(dst3(rc.rect), tri, Scalar.All(255))
+                                filledDefects += 1
+                            Next
+                            rc.contour = Convex_RedCDefects.betterContour(rc.contour, defects)
+                            rc.pixels = CountNonZero(rc.mask)
+                        Catch ex As Exception
+                            defectCount += 1
+                        End Try
+                    End If
                 End If
 
                 rclist.Add(rc)

@@ -599,7 +599,6 @@ Namespace VBClasses
             Dim dataBuffer As New List(Of Vec3f)
             Dim vec(2) As Vec3f, pt As cv.Point
             For Each rc In redC.rcList
-                If rc.hull Is Nothing Then Continue For
                 Dim count As Single = rc.hull.Count
                 For i = 0 To rc.hull.Count - 1
                     Dim goodDepth As Boolean = True

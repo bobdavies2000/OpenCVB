@@ -695,6 +695,8 @@ Triangle_Basics
 Triangle_Find
 Triangle_HullContour
 Utility_Basics
+VH_Basics
+VH_Explore
 Video_Basics
 Video_MinRect
 Vignetting_Basics
@@ -1667,5 +1669,4 @@ XR_Vignetting_VB
 XR_WarpAffine_Captcha
 XR_WarpAffine_Repeated
 XR_WarpAffine_RepeatedExample8
-XR_Watershed_DepthAuto
 XR_Watershed_DepthReduction

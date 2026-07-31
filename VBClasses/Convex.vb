@@ -178,9 +178,13 @@ Namespace VBClasses
             dst2.SetTo(0)
             DrawTour(dst2, hull.ToList, task.highlight, -1)
 
-            Dim defects = ConvexityDefects(c, hullIndices.ToList)
-            rc.contour = betterContour(c, defects)
-            ' SetTrueText("Convexity defects will sometimes fail due to self-intersection.", 3)
+            ' check if self-intersecting...
+            If Hull_Defect.indicesMayFail(rc.contour) Then
+                Dim defects = ConvexityDefects(c, hullIndices.ToList)
+                rc.contour = betterContour(c, defects)
+            Else
+                SetTrueText("Convexity defects will sometimes fail due to self-intersection.", 3)
+            End If
 
             DrawTour(dst2, rc.contour, Scalar.Red)
         End Sub

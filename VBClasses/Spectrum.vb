@@ -18,7 +18,7 @@ Namespace VBClasses
                 SetTrueText(redC.strOut, 1)
             End If
 
-            If task.heartBeat And task.rcD.mapID > 0 Then
+            If task.heartBeat AndAlso task.rcD IsNot Nothing AndAlso task.rcD.mapID > 0 Then
                 Dim ranges = options.buildDepthRanges(task.pcSplit(0)(task.rcD.rect).Clone, " pointcloud X ")
                 strOut = options.strOut
             End If
@@ -50,7 +50,7 @@ Namespace VBClasses
                 SetTrueText(redC.strOut, 1)
             End If
 
-            If task.heartBeat And task.rcD.mapID > 0 Then
+            If task.heartBeat AndAlso task.rcD IsNot Nothing AndAlso task.rcD.mapID > 0 Then
                 Dim ranges = options.buildDepthRanges(task.pcSplit(1)(task.rcD.rect).Clone, " pointcloud Y ")
                 strOut = options.strOut
             End If
@@ -81,11 +81,9 @@ Namespace VBClasses
                 SetTrueText(redC.strOut, 1)
             End If
 
-            If task.rcD IsNot Nothing Then
-                If task.heartBeat And task.rcD.mapID > 0 Then
-                    Dim ranges = options.buildDepthRanges(task.pcSplit(2)(task.rcD.rect).Clone, " pointcloud Z ")
-                    strOut = options.strOut
-                End If
+            If task.heartBeat AndAlso task.rcD IsNot Nothing AndAlso task.rcD.mapID > 0 Then
+                Dim ranges = options.buildDepthRanges(task.pcSplit(2)(task.rcD.rect).Clone, " pointcloud Z ")
+                strOut = options.strOut
             End If
             SetTrueText(strOut, 3)
         End Sub
@@ -396,12 +394,13 @@ Namespace VBClasses
             labels(2) = redC.labels(2)
 
             SetTrueText(redC.strOut, 1)
-
-            Dim input = src(task.rcD.rect)
-            If input.Type <> MatType.CV_8U Then CvtColor(input, input, ColorConversionCodes.BGR2GRAY)
-            Dim ranges = options.buildColorRanges(input, typeSpec)
-            strOut = options.strOut
-            SetTrueText(strOut, 3)
+            If task.rcD IsNot Nothing Then
+                Dim input = src(task.rcD.rect)
+                If input.Type <> MatType.CV_8U Then CvtColor(input, input, ColorConversionCodes.BGR2GRAY)
+                Dim ranges = options.buildColorRanges(input, typeSpec)
+                strOut = options.strOut
+                SetTrueText(strOut, 3)
+            End If
         End Sub
     End Class
 End Namespace

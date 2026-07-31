@@ -145,7 +145,7 @@ Namespace VBClasses
             If task.rcD IsNot Nothing Then
                 Dim rcX = task.rcD
                 For Each rc In hulls.rclist
-                    If rc.hull Is Nothing Or rcX.hull Is Nothing Then Continue For
+                    If rc.hull.Count = 0 Or rcX.hull.Count = 0 Then Continue For
                     Dim matchVal = MatchShapes(rcX.hull, rc.hull, options.matchOption)
                     If matchVal < options.matchThreshold Then DrawTour(dst3(rc.rect), rc.hull, white, -1)
                 Next
@@ -229,7 +229,7 @@ Namespace VBClasses
 
                 Dim minMatch As Single = Single.MaxValue
                 For Each rc2 In hulls.rclist
-                    If rc2.hull Is Nothing Or rc.hull Is Nothing Then Continue For
+                    If rc.hull.Count = 0 Or rc2.hull.Count = 0 Then Continue For
                     If Math.Abs(rc2.maxDist.Y - rc.maxDist.Y) > options.maxYdelta Then Continue For
                     Dim matchVal = MatchShapes(rc.hull, rc2.hull, options.matchOption)
                     If matchVal < options.matchThreshold Then
