@@ -248,7 +248,7 @@ Namespace VBClasses
                     drawQuads()
 
                 Case oCase.draw3DLines
-                    label = drawCloud(pointcloud, RGB)
+                    drawCloud(pointcloud, RGB)
                     label = draw3DLines(lpList)
 
                 Case oCase.draw3DLinesAndCloud

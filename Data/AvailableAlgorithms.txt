@@ -695,8 +695,9 @@ Triangle_Basics
 Triangle_Find
 Triangle_HullContour
 Utility_Basics
-VH_Basics
-VH_Explore
+Vertical_Basics
+Vertical_Explore
+Vertical_Longest
 Video_Basics
 Video_MinRect
 Vignetting_Basics

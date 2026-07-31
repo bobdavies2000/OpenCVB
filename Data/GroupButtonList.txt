@@ -181,7 +181,7 @@ Track
 TrackOpenCV
 Triangle
 Utility
-VH
+Vertical
 Video
 Vignetting
 Volume

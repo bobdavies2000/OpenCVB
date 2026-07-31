@@ -1,6 +1,6 @@
 ﻿Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCvSharp
 Namespace VBClasses
-    Public Class VH_Basics : Inherits TaskParent
+    Public Class Vertical_Basics : Inherits TaskParent
         Dim lines As New LineSeg_Core
         Dim lpList As New List(Of lpData)
         Public Sub New()
@@ -36,7 +36,7 @@ Namespace VBClasses
 
 
 
-    Public Class VH_Explore : Inherits TaskParent
+    Public Class Vertical_Explore : Inherits TaskParent
         Dim lines As New LineSeg_Core
         Dim lpList As New List(Of lpData)
         Dim sortScores As New SortedList(Of Single, Integer)(New compareAllowIdenticalSingleInverted)
@@ -69,4 +69,58 @@ Namespace VBClasses
             If sortScores.Count >= 200 Then sortScores.RemoveAt(0)
         End Sub
     End Class
+
+
+
+
+
+    Public Class Vertical_Longest : Inherits TaskParent
+        Public Sub New()
+            dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+            dst3 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+            labels = {"", "", "Longest line", "longest line aligned with Gravity"}
+            desc = "Rotate the longest line's lp.rect to gravity with verticalizeAngle and run Line_Basics_TA on it."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            Dim lp = task.longestLine
+            dst2.SetTo(0)
+            Line(dst2, lp.p1, lp.p2, white, task.lineWidth, cv.LineTypes.Link8)
+
+            dst1 = Cloud_GravityRGB.rotateRGB(dst2(lp.rect), task.verticalizeAngle)
+
+            Dim aspectRect = lp.rect.Width / CSng(lp.rect.Height)
+            Dim aspect = dst3.Width / CSng(dst3.Height)
+            Dim r As cv.Rect
+            If aspectRect > aspect Then
+                r = New cv.Rect(0, 0, dst3.Width, CInt(lp.rect.Height * dst3.Width / CSng(lp.rect.Width)))
+            Else
+                r = New cv.Rect(0, 0, CInt(lp.rect.Width * dst3.Height / CSng(lp.rect.Height)), dst3.Height)
+            End If
+            r = ValidateRect(r)
+
+            Resize(dst1, dst1(r), r.Size)
+
+            Dim topX As Integer, botX As Integer
+            For x = 0 To r.Width - 1
+                If dst1.Row(0).Get(Of Byte)(0, x) Then
+                    topX = x
+                    Exit For
+                End If
+            Next
+            For x = 0 To r.Width - 1
+                If dst1.Row(dst1.Height - 1).Get(Of Byte)(0, x) Then
+                    botX = x
+                    Exit For
+                End If
+            Next
+
+            dst3.SetTo(0)
+            lp = New lpData(New cv.Point(topX, 0), New cv.Point(botX, dst3.Height - 1))
+            Line(dst3, lp.p1, lp.p2, white, task.lineWidth, cv.LineTypes.Link4)
+            SetTrueText(CStr(topX), New cv.Point(topX + 4, 0), 3)
+            SetTrueText(CStr(botX), New cv.Point(botX + 4, dst3.Height - 10), 3)
+        End Sub
+    End Class
+
+
 End Namespace
