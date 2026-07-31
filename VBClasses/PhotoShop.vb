@@ -114,14 +114,12 @@ Namespace VBClasses
             MinMaxLoc(rgb32f, minVal, maxVal)
 
             Dim planes() = Split(rgb32f)
-            Dim sum32f = New Mat(src.Size(), MatType.CV_32F)
-            sum32f = planes(0) + planes(1) + planes(2)
+            Dim sum32f = planes(0) + planes(1) + planes(2)
             src = sum32f
             hist.Run(src)
             dst3 = hist.dst2
 
             Dim sum As Single
-            thresholdVal = 0
             For i = hist.histRaw(0).Rows - 1 To 0 Step -1
                 sum += hist.histRaw(0).Get(Of Single)(i, 0)
                 If sum > src.Rows * src.Cols * thresholdVal Then
@@ -247,8 +245,8 @@ Namespace VBClasses
             labels(3) = "Embossed output"
             desc = "Use the video stream to make it appear like an embossed paper image."
         End Sub
-        Public Function kernelGenerator(size As Integer) As Mat
-            Dim kernel As Mat = New Mat(size, size, MatType.CV_8S, Scalar.All(0))
+        Public Shared Function kernelGenerator(size As Integer) As Mat
+            Dim kernel As New Mat(size, size, MatType.CV_8S, Scalar.All(0))
             For i = 0 To size - 1
                 For j = 0 To size - 1
                     If i < j Then kernel.Set(Of SByte)(j, i, -1) Else If i > j Then kernel.Set(Of SByte)(j, i, 1)
@@ -306,7 +304,7 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             Static threshSlider = OptionParent.FindSlider("Emboss threshold")
-            Dim kernel = emboss.kernelGenerator(sizeSlider.Value)
+            Dim kernel = PhotoShop_Emboss.kernelGenerator(sizeSlider.Value)
 
             dst2 = task.gray
             Filter2D(dst2, dst3, -1, kernel)
@@ -499,15 +497,14 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             If src.Channels() <> 1 Then src = task.gray
-            Dim grayinv As New Mat
-            grayinv = Not src
+            Dim grayinv As cv.Mat = Not src
             Static kernelSlider = OptionParent.FindSlider("Blur kernel size")
             Dim ksize As Integer = kernelSlider.Value Or 1
             Dim blurMat As New Mat
             Blur(grayinv, blurMat, New Size(ksize, ksize), New cv.Point(ksize / 2, ksize / 2))
             Divide(src, 255 - blurMat, dst2, 256)
 
-            Dim index As Integer = -1
+            Dim index As Integer
             Static frm = OptionParent.FindFrm(traceName + " Radio Buttons")
             For index = 0 To frm.check.Count - 1
                 If radio.check(index).Checked Then Exit For

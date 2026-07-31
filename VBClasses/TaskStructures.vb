@@ -538,7 +538,6 @@ Namespace VBClasses
                 p1 = New cv.Point2f()
                 p2 = New cv.Point2f()
             End Sub
-
             Private Shared Function PointsEqual(a As cv.Point2f, b As cv.Point2f) As Boolean
                 Return Math.Abs(a.X - b.X) <= pointEps And Math.Abs(a.Y - b.Y) <= pointEps
             End Function

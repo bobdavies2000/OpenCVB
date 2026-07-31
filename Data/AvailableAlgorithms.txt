@@ -482,6 +482,7 @@ Motion_Correlation
 Motion_CorrelationToLast
 Motion_Featureless
 Motion_Left
+Motion_Lines
 Motion_Right
 Motion_Throttle
 Motion_Validate
@@ -697,6 +698,8 @@ Triangle_HullContour
 Utility_Basics
 Vertical_Basics
 Vertical_Explore
+Vertical_Gravity
+Vertical_Image
 Vertical_Longest
 Video_Basics
 Video_MinRect

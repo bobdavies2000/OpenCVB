@@ -74,7 +74,7 @@ Namespace VBClasses
     ' https://github.com/opencv/opencv/blob/master/samples/cpp/falsecolor.cpp
     Public Class XR_LUT_Reduction : Inherits TaskParent
         Public reduction As New Reduction_Basics
-        Dim vector As Mat = New Mat(256, 1, MatType.CV_8UC3, Scalar.All(0))
+        Dim vector As New Mat(256, 1, MatType.CV_8UC3, Scalar.All(0))
         Public Sub New()
             For i = 0 To 255
                 ' trying to avoid extreme colors... 

@@ -646,7 +646,7 @@ Namespace VBClasses
             If Not task.heartBeat Then Exit Sub
             options.Run()
 
-            Dim ptMat As Mat = New Mat(1, 1, MatType.CV_32FC2)
+            Dim ptMat As New Mat(1, 1, MatType.CV_32FC2)
             dst2.SetTo(0)
             clusters.Clear()
             clusterLabels.Clear()

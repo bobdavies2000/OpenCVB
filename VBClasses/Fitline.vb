@@ -269,7 +269,7 @@ Namespace VBClasses
              }
 
             ' Convert to Mat
-            Dim pointMat As Mat = New Mat(points.Count, 1, MatType.CV_32FC2)
+            Dim pointMat As New Mat(points.Count, 1, MatType.CV_32FC2)
             For i = 0 To points.Count - 1
                 pointMat.Set(Of Point2f)(i, 0, points(i))
             Next

@@ -3,8 +3,8 @@ Namespace VBClasses
     Public Class Motion_Basics_TA : Inherits TaskParent
         Public motionSort As New List(Of Integer) ' sorted in order of grid rect index (without actually sorting.)
         Public diff As New Diff_Basics
-        Public motionMask As Mat = New Mat(dst2.Size, MatType.CV_8U, 255)
-        Public motionRightMask As Mat = New Mat(dst2.Size, MatType.CV_8U, 255) ' motion in the right image.
+        Public motionMask As New Mat(dst2.Size, MatType.CV_8U, 255)
+        Public motionRightMask As New Mat(dst2.Size, MatType.CV_8U, 255) ' motion in the right image.
         Public Sub New()
             If standalone Then task.gOptions.displayDst1.Checked = True
             dst2 = New Mat(dst2.Size, MatType.CV_8U, 0)
@@ -22,7 +22,6 @@ Namespace VBClasses
                 motionMask.SetTo(255)
                 Exit Sub
             End If
-            'If task.optionsChanged Then dst2 = src.Clone
 
             diff.lastFrame = dst2
             diff.Run(src)
@@ -120,7 +119,7 @@ Namespace VBClasses
     Public Class XR_Motion_Basics : Inherits TaskParent
         Public motionSort As New List(Of Integer)
         Public diff As New Diff_Basics
-        Public motionMask As Mat = New Mat(dst2.Size, MatType.CV_8U, 255)
+        Public motionMask As New Mat(dst2.Size, MatType.CV_8U, 255)
         Public Sub New()
             If standalone Then task.gOptions.showMotionMask.Checked = True
             dst2 = New Mat(dst2.Size, MatType.CV_8U, 0)
@@ -141,7 +140,7 @@ Namespace VBClasses
                 Dim diffCount = CountNonZero(diff.dst2(r))
                 If diffCount >= task.motionThreshold Then
                     For Each index In task.gridNabes(i)
-                        If gridList.Keys.Contains(index) = False Then gridList.Add(index, index)
+                        If gridList.ContainsKey(index) = False Then gridList.Add(index, index)
                     Next
                 End If
             Next
@@ -371,7 +370,7 @@ Namespace VBClasses
             ' only check no more than once a heartbeat..
             If task.heartBeat Then
 
-                Dim nextMsg As String = ""
+                Dim nextMsg As String
                 motionPlot.Run(task.gray.Clone)
                 If motionPlot.plotHist.histArray Is Nothing Then Exit Sub
 
@@ -547,4 +546,16 @@ Namespace VBClasses
             SetTrueText(edges.strOut, 3)
         End Sub
     End Class
+
+
+
+
+    Public Class Motion_Lines : Inherits TaskParent
+        Public Sub New()
+            desc = "Compare all the lines found compared to the previous frame."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+        End Sub
+    End Class
+
 End Namespace

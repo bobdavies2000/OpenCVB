@@ -75,6 +75,7 @@ Namespace VBClasses
 
 
     Public Class Vertical_Longest : Inherits TaskParent
+        Public longestLine As lpData
         Public Sub New()
             dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
             dst3 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
@@ -82,7 +83,8 @@ Namespace VBClasses
             desc = "Rotate the longest line's lp.rect to gravity with verticalizeAngle and run Line_Basics_TA on it."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            Dim lp = task.longestLine
+            If longestLine Is Nothing Then longestLine = task.longestLine
+            Dim lp As lpData = longestLine
             dst2.SetTo(0)
             Line(dst2, lp.p1, lp.p2, white, task.lineWidth, cv.LineTypes.Link8)
 
@@ -98,17 +100,17 @@ Namespace VBClasses
             End If
             r = ValidateRect(r)
 
-            Resize(dst1, dst1(r), r.Size)
+            Resize(dst1, dst0(r), r.Size)
 
             Dim topX As Integer, botX As Integer
             For x = 0 To r.Width - 1
-                If dst1.Row(0).Get(Of Byte)(0, x) Then
+                If dst0.Row(0).Get(Of Byte)(0, x) Then
                     topX = x
                     Exit For
                 End If
             Next
             For x = 0 To r.Width - 1
-                If dst1.Row(dst1.Height - 1).Get(Of Byte)(0, x) Then
+                If dst0.Row(dst0.Height - 1).Get(Of Byte)(0, x) Then
                     botX = x
                     Exit For
                 End If
@@ -122,5 +124,70 @@ Namespace VBClasses
         End Sub
     End Class
 
+
+
+
+    Public Class Vertical_Gravity : Inherits TaskParent
+        Dim gravity As New Cloud_GravityRGB
+        Dim lines As New Line_Core
+        Public Sub New()
+            desc = "Cursor.ai: Find longest vertical line after rotating using the IMU data."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            gravity.Run(task.gray)
+            lines.Run(gravity.dst3)
+
+            Dim sortList As New SortedList(Of Single, lpData)(New compareAllowIdenticalSingleInverted)
+            For Each lpC In lines.lpList
+                If Math.Abs(lpC.p1.X - lpC.p2.X) <= 2 Then sortList.Add(lpC.length, lpC)
+            Next
+            If sortList.Count = 0 Then
+                SetTrueText("No near-vertical lines found.", 3)
+                Return
+            End If
+
+            Dim lp = sortList.Values(0)
+
+            ' If the line is almost vertical but p1.X and p2.X still differ by 1 or 2 pixels,
+            ' nudge verticalizeAngle by the rotation needed to make p1.X = p2.X.
+            Dim dx = lp.p2.X - lp.p1.X
+            Dim absDx = Math.Abs(dx)
+            If absDx >= 1 AndAlso absDx <= 2 Then
+                Dim dy = lp.p2.Y - lp.p1.Y
+                If dy = 0 Then dy = 1
+                Dim deltaAngle = Math.Atan2(dx, dy) * RadToDeg
+                task.verticalizeAngle += deltaAngle
+                strOut = "Adjusted verticalizeAngle by " + deltaAngle.ToString(fmt3) + " deg" + vbCrLf +
+                         "dx=" + dx.ToString(fmt1) + "  new verticalizeAngle=" + task.verticalizeAngle.ToString(fmt3)
+            Else
+                strOut = "No adjustment (dx=" + dx.ToString(fmt1) + ")" + vbCrLf +
+                         "verticalizeAngle=" + task.verticalizeAngle.ToString(fmt3)
+            End If
+
+            If standalone Then
+                labels(2) = CStr(sortList.Count) + " vertical lines found.  The longest EP line is shown."
+                dst3.SetTo(0)
+                dst3(lp.rect).SetTo(0)
+                Line(dst3, lp.ptE1, lp.ptE2, white, task.lineWidth, cv.LineTypes.Link4)
+                SetTrueText(CStr(lp.p1.X), New cv.Point(lp.p1.X + 4, 0), 3)
+                SetTrueText(CStr(lp.p2.X), New cv.Point(lp.p2.X + 4, dst3.Height - 10), 3)
+                SetTrueText(strOut, 2)
+            End If
+        End Sub
+    End Class
+
+
+
+
+    Public Class Vertical_Image : Inherits TaskParent
+        Dim vert As New Vertical_Gravity
+        Public Sub New()
+            desc = "Display the verticalized image after the IMU angle has been tweaked by Vertical_Gravity"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            vert.Run(task.gray)
+            dst2 = Cloud_GravityRGB.rotateRGB(task.color, task.verticalizeAngle)
+        End Sub
+    End Class
 
 End Namespace

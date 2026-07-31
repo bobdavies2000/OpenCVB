@@ -5,8 +5,8 @@ Namespace VBClasses
         Public fgFineTune As Mat
         Public bgFineTune As Mat
         Public fore As New XR_Foreground_KMeansDepth
-        Dim bgModel As Mat = New Mat(1, 65, MatType.CV_64F, Scalar.All(0))
-        Dim fgModel As Mat = New Mat(1, 65, MatType.CV_64F, Scalar.All(0))
+        Dim bgModel As New Mat(1, 65, MatType.CV_64F, Scalar.All(0))
+        Dim fgModel As New Mat(1, 65, MatType.CV_64F, Scalar.All(0))
         Public Sub New()
             desc = "Use Foreground_Basics to define the foreground for use in GrabCut."
         End Sub
