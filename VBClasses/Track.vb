@@ -61,29 +61,30 @@ Namespace VBClasses
             labels(2) = redC.labels(2)
 
             Static rclast As rcData = task.rcD
+            If rclast IsNot Nothing Then
 
-            If lostCell And task.mouseClickFlag = False Then
-                SetTrueText("Unable to find the cell" + vbCrLf + "Click any cell to start tracking again.", 3)
-                Exit Sub
-            Else
-                lostCell = False
-            End If
-
-            Dim clickIndex = redC.rcMap.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X)
-            If task.rcD IsNot Nothing Then
-                Circle(dst2, task.rcD.maxDist, task.DotSize + 2, task.highlight, -1)
-
-                task.clickPoint = task.rcD.maxDist
-                labels(3) = "Map ID = " + CStr(task.rcD.mapID)
-
-                If rclast.mapID <> task.rcD.mapID And task.mouseClickFlag = False Then
-                    lostCell = True
+                If lostCell And task.mouseClickFlag = False Then
+                    SetTrueText("Unable to find the cell" + vbCrLf + "Click any cell to start tracking again.", 3)
                     Exit Sub
+                Else
+                    lostCell = False
                 End If
-            End If
-            strOut = Utility_Basics.selectCell(redC.rcMap, redC.rcList)
-            SetTrueText(strOut, 3)
 
+                Dim clickIndex = redC.rcMap.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X)
+                If task.rcD IsNot Nothing Then
+                    Circle(dst2, task.rcD.maxDist, task.DotSize + 2, task.highlight, -1)
+
+                    task.clickPoint = task.rcD.maxDist
+                    labels(3) = "Map ID = " + CStr(task.rcD.mapID)
+
+                    If rclast.mapID <> task.rcD.mapID And task.mouseClickFlag = False Then
+                        lostCell = True
+                        Exit Sub
+                    End If
+                End If
+                strOut = Utility_Basics.selectCell(redC.rcMap, redC.rcList)
+                SetTrueText(strOut, 3)
+            End If
             rclast = task.rcD
         End Sub
     End Class
@@ -108,7 +109,7 @@ Namespace VBClasses
             dst2 = redC.dst2
             labels(2) = redC.labels(2)
             Static rclast As rcData = task.rcD
-            If task.rcD Is Nothing Then Exit Sub
+            If task.rcD Is Nothing Or rclast Is Nothing Then Exit Sub
 
             Dim clickIndex = redC.rcMap.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X)
             Circle(dst2, task.rcD.maxDist, task.DotSize + 2, task.highlight, -1)

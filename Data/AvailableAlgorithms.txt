@@ -415,10 +415,12 @@ Line_DepthUpdate
 Line_FindClosest
 Line_Finder
 Line_Intersection
+Line_Intersections
 Line_LeftRight
 Line_LeftRightZED
 Line_Perpendicular
 Line_RightOnly
+Line_TopLines
 Line3D_Basics
 Line3D_DrawLines
 Line3D_DrawLines_Debug
@@ -1278,7 +1280,6 @@ XR_Histogram_PointCloudXYZ
 XR_Histogram_ToggleFeatureLess
 XR_History_BasicsDiff
 XR_History_Cloud
-XR_HistPeak2D_Edges
 XR_HistPeak2D_HotSide
 XR_HistPeak2D_HotTop
 XR_HistPeak2D_HSV
@@ -1383,6 +1384,7 @@ XR_Line_Longest
 XR_Line_LongestTest
 XR_Line_Map
 XR_Line_MapRects
+XR_Line_Matcher
 XR_Line_RawFLD
 XR_Line_RedFlood
 XR_Line_Select

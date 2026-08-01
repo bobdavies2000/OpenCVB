@@ -1342,7 +1342,7 @@ public:
     int aperture = 3;
     float HarrisParm = 0.01f;
     Harris_Features() {}
-    void Run()
+    const void Run()
     {
         Mat cornerStrength;
         cornerHarris(src, cornerStrength, neighborhood, aperture, HarrisParm);
@@ -1554,7 +1554,7 @@ public:
     Mat src;
     Mat histogram;
     Histogram_1D() {}
-    void RunCPP(int bins) {
+    const void RunCPP(int bins) {
         float hRange[] = { 0, 256 };
         int hbins[] = { bins };
         const float* range[] = { hRange };
@@ -1917,7 +1917,7 @@ public:
     vector<Point>floodPoints;
 
     PlotOpenCV() {}
-    void RunCPP() {
+    const void RunCPP() {
         Mat result;
         Ptr<plot::Plot2d> plot = plot::Plot2d::create(srcX, srcY);
         plot->setInvertOrientation(true);
@@ -2095,7 +2095,7 @@ public:
         {
             for (int x = 0; x < src.cols; x++)
             {
-                auto val = src.at<Vec3b>(y, x);
+                Vec3b val = src.at<Vec3b>(y, x);
                 if (count(pixelList.begin(), pixelList.end(), val) == 0)
                     pixelList.push_back(val);
             }

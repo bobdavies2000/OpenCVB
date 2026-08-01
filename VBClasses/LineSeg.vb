@@ -21,7 +21,7 @@ Namespace VBClasses
 
             dst3 = task.lines.dst2
             For Each lp In task.lines.lpList
-                SetTrueText(CStr(lp.age), New cv.Point(lp.ptCenter.X + 2, lp.ptCenter.Y + 2), 3)
+                SetTrueText(CStr(lp.age), New cv.Point(lp.ptCenter.X + 5, lp.ptCenter.Y + 5), 3)
             Next
             task.lines.lpList = New List(Of lpData)(lpList)
         End Sub

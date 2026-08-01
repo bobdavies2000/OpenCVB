@@ -31,8 +31,6 @@ Namespace VBClasses
             histogram.SetTo(0, Not mask)
 
             If ranges Is Nothing Or task.optionsChanged Then
-                ' the pcsplit arrays have been patched for inf and nan's already in task.vb.
-                If task.Settings.cameraName.StartsWith("StereoLabs") Then Merge(task.pcSplit, src)
                 ranges = Hist2D_Basics.GetHist2Dminmax(src, task.channels(0), task.channels(1))
             End If
 
@@ -102,33 +100,6 @@ Namespace VBClasses
             peak.histogram = histTop.histogram
             peak.Run(task.pointCloud)
             dst2 = peak.dst2
-        End Sub
-    End Class
-
-
-
-
-
-
-
-    Public Class XR_HistPeak2D_Edges : Inherits TaskParent
-        Dim peak As New HistPeak2D_Basics
-        Dim histTop As New Projection_HistTop
-        Dim edges As New Edge_Basics_TA
-        Public Sub New()
-            desc = "Display the HistPeak2D_Basics edges in the RGB image"
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            histTop.Run(src)
-
-            Threshold(histTop.histogram, dst3, task.projectionThreshold, 255, ThresholdTypes.Binary)
-            peak.histogram = histTop.histogram
-            peak.Run(task.pointCloud)
-            dst2 = peak.dst2
-
-            edges.Run(dst2)
-            dst3 = src
-            dst3.SetTo(white, edges.dst2)
         End Sub
     End Class
 
@@ -215,17 +186,17 @@ Namespace VBClasses
             histSide.Run(src)
             dst3 = histSide.histogram
 
-            For i = 0 To peak.auto.clusterPoints.Count - 1
-                Dim pt = peak.auto.clusterPoints(i)
-                Circle(dst3, pt, task.DotSize * 3, white, -1, task.lineType)
-            Next
-
             peak.histogram = histSide.histogram
             peak.ranges = task.rangesSide
             task.channels = task.channelsSide
             peak.Run(task.pointCloud)
             dst2 = peak.dst2
             dst2.SetTo(0, task.noDepthMask)
+
+            For i = 0 To peak.auto.clusterPoints.Count - 1
+                Dim pt = peak.auto.clusterPoints(i)
+                Circle(dst2, pt, task.DotSize * 3, white, -1, task.lineType)
+            Next
         End Sub
     End Class
 
@@ -245,17 +216,17 @@ Namespace VBClasses
             histTop.Run(src)
             dst3 = histTop.histogram
 
-            For i = 0 To peak.auto.clusterPoints.Count - 1
-                Dim pt = peak.auto.clusterPoints(i)
-                Circle(dst3, pt, task.DotSize * 3, white, -1, task.lineType)
-            Next
-
             peak.histogram = histTop.histogram
             peak.ranges = task.rangesTop
             task.channels = task.channelsTop
             peak.Run(task.pointCloud)
             dst2 = peak.dst2
             dst2.SetTo(0, task.noDepthMask)
+
+            For i = 0 To peak.auto.clusterPoints.Count - 1
+                Dim pt = peak.auto.clusterPoints(i)
+                Circle(dst2, pt, task.DotSize * 3, white, -1, task.lineType)
+            Next
         End Sub
     End Class
 End Namespace

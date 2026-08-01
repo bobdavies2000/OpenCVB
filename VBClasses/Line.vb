@@ -2,7 +2,6 @@ Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCvSharp : Impor
 Namespace VBClasses
     Public Class Line_Basics_TA : Inherits TaskParent
         Public lpList As New List(Of lpData)
-        Public lpLast As New List(Of lpData)
         Public Sub New()
             dst3 = New Mat(dst3.Size, MatType.CV_8U, 0)
             desc = "Run FLD (Fast Line Detector) with sobel input."
@@ -75,9 +74,6 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             If src.Channels <> 1 Or src.Type <> MatType.CV_8U Then src = task.gray.Clone
 
-            lpLast = New List(Of lpData)(lpList)
-            If task.optionsChanged Then lpLast.Clear()
-
             If task.fOptions.LineCombo.Text = "Fast Line Detection" Then
                 Static basicsFLD As New Line_Basics
                 basicsFLD.Run(src)
@@ -95,7 +91,7 @@ Namespace VBClasses
                 Line(dst3, lp.p1, lp.p2, 255, task.lineWidth)
             Next
 
-            Line(dst3, task.longestLine.p1, task.longestLine.p2, 255, task.lineWidth + 1)
+            ' Line(dst3, task.longestLine.p1, task.longestLine.p2, 255, task.lineWidth + 1)
             labels(3) = CStr(task.lines.lpList.Count) + " lines.  Highlighted line is the current longest line."
 
             For Each lp In lpList
@@ -136,33 +132,6 @@ Namespace VBClasses
         End Sub
     End Class
 
-
-
-
-
-
-    Public Class XR_Line_RawFLD : Inherits TaskParent
-        Public lpList As New List(Of lpData)
-        Public core As New Line_Core
-        Public Sub New()
-            desc = "Run FLD (Fast Line Detector) With sobel input."
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            dst2 = task.color.Clone
-            If src.Channels <> 1 Or src.Type <> MatType.CV_8U Then src = task.gray.Clone
-
-            core.Run(src)
-            lpList = New List(Of lpData)(core.lpList)
-
-            If standaloneTest() Then
-                For Each lp In lpList
-                    Line(dst2, lp.p1, lp.p2, task.highlight, task.lineWidth)
-                Next
-            End If
-
-            labels(2) = CStr(lpList.Count) + " lines found."
-        End Sub
-    End Class
 
 
 
@@ -218,6 +187,33 @@ Namespace VBClasses
         End Sub
     End Class
 
+
+
+
+
+
+    Public Class XR_Line_RawFLD : Inherits TaskParent
+        Public lpList As New List(Of lpData)
+        Public core As New Line_Core
+        Public Sub New()
+            desc = "Run FLD (Fast Line Detector) With sobel input."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            dst2 = task.color.Clone
+            If src.Channels <> 1 Or src.Type <> MatType.CV_8U Then src = task.gray.Clone
+
+            core.Run(src)
+            lpList = New List(Of lpData)(core.lpList)
+
+            If standaloneTest() Then
+                For Each lp In lpList
+                    Line(dst2, lp.p1, lp.p2, task.highlight, task.lineWidth)
+                Next
+            End If
+
+            labels(2) = CStr(lpList.Count) + " lines found."
+        End Sub
+    End Class
 
 
 
@@ -581,66 +577,6 @@ Namespace VBClasses
     '    End Sub
     'End Class
 
-
-
-
-
-
-    ' https://stackoverflow.com/questions/7446126/opencv-2d-line-intersection-helper-function
-    Public Class Line_Intersection : Inherits TaskParent
-        Public lp1 As lpData, lp2 As lpData
-        Public intersectionPoint As Point2f
-        Public Sub New()
-            desc = "Determine If 2 lines intersect, where the cv.Point Is, And If that cv.Point Is In the image."
-        End Sub
-        Public Shared Function IntersectTest(p1 As Point2f, p2 As Point2f, p3 As Point2f, p4 As Point2f) As Point2f
-            Dim x = p3 - p1
-            Dim d1 = p2 - p1
-            Dim d2 = p4 - p3
-            Dim cross = d1.X * d2.Y - d1.Y * d2.X
-            If Math.Abs(cross) < 0.000001 Then Return New Point2f
-            Dim t1 = (x.X * d2.Y - x.Y * d2.X) / cross
-            Dim pt = p1 + d1 * t1
-            Return pt
-        End Function
-        Public Shared Function IntersectTest(lp1 As lpData, lp2 As lpData) As Point2f
-            Dim x = lp2.p1 - lp1.p1
-            Dim d1 = lp1.p2 - lp1.p1
-            Dim d2 = lp2.p2 - lp2.p1
-            Dim cross = d1.X * d2.Y - d1.Y * d2.X
-            If Math.Abs(cross) < 0.000001 Then Return New Point2f
-            Dim t1 = (x.X * d2.Y - x.Y * d2.X) / cross
-            Dim pt = lp1.p1 + d1 * t1
-            Return pt
-        End Function
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            If standalone Then
-                If task.heartBeat Then
-                    lp1 = New lpData(New Point2f(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height)),
-                                     New Point2f(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height)))
-                    lp2 = New lpData(New Point2f(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height)),
-                                     New Point2f(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height)))
-                End If
-            End If
-
-            intersectionPoint = Line_Intersection.IntersectTest(lp1, lp2)
-
-            If standaloneTest() Then
-                dst2.SetTo(0)
-                Line(dst2, lp1.p1, lp1.p2, Scalar.Yellow, task.lineWidth, task.lineType)
-                Line(dst2, lp2.p1, lp2.p2, Scalar.Yellow, task.lineWidth, task.lineType)
-                If intersectionPoint <> New Point2f Then
-                    Circle(dst2, intersectionPoint, task.DotSize + 4, white, -1, task.lineType)
-                    labels(2) = "Intersection cv.Point = " + CStr(CInt(intersectionPoint.X)) + " x " + CStr(CInt(intersectionPoint.Y))
-                Else
-                    labels(2) = "Parallel!!!"
-                End If
-                If intersectionPoint.X < 0 Or intersectionPoint.X > dst2.Width Or intersectionPoint.Y < 0 Or intersectionPoint.Y > dst2.Height Then
-                    labels(2) += " (off screen)"
-                End If
-            End If
-        End Sub
-    End Class
 
 
 
@@ -1053,7 +989,7 @@ Namespace VBClasses
                 If val = 0 Then
                     Rectangle(dst0, lp.rect, Scalar.All(lp.index + 1), -1)
                     Rectangle(dst3, lp.rect, Scalar.All(lp.index + 1), -1)
-                    Line(dst3, lp.p1.x, lp.p1.y, lp.p2.x, lp.p2.y, 0, task.lineWidth, LineTypes.Link8)
+                    Line(dst3, lp.p1.X, lp.p1.Y, lp.p2.X, lp.p2.Y, 0, task.lineWidth, LineTypes.Link8)
                     lpList.Add(lp)
                 End If
             Next
@@ -1812,7 +1748,7 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             dst2.SetTo(0)
             For Each lp In task.lines.lpList
-                Line(dst2, lp.p1.x, lp.p1.y, lp.p2.x, lp.p2.y, 255, task.lineWidth, task.lineType)
+                Line(dst2, lp.p1.X, lp.p1.Y, lp.p2.X, lp.p2.Y, 255, task.lineWidth, task.lineType)
                 SetTrueText(CStr(lp.age), New cv.Point(CInt(lp.ptCenter.X + 2), CInt(lp.ptCenter.Y + 2)), 2)
             Next
             labels(2) = CStr(task.lines.lpList.Count) + " lines in the left image."
@@ -2069,6 +2005,7 @@ Namespace VBClasses
 
 
 
+
     Public Class Line_FindClosest : Inherits TaskParent
         Public inputLine As lpData
         Public closestLine As lpData
@@ -2108,7 +2045,203 @@ Namespace VBClasses
             Next
 
             closestLine = candidates(distances.IndexOf(distances.Min))
+            LastList.RemoveAt(LastList.IndexOf(closestLine)) ' can't match it again later. 
             Line(dst2, closestLine.ptE1, closestLine.ptE2, task.highlight, task.lineWidth + 2)
         End Sub
     End Class
+
+
+
+
+
+    Public Class XR_Line_Matcher : Inherits TaskParent
+        Public lpList As New List(Of lpData)
+        Public lpLastList As New List(Of lpData)
+        Public matchCount As Integer
+        Public Sub New()
+            labels = {"", "", "Matched lines with age", "Unmatched lines from previous frame"}
+            desc = "Cursor.ai: Match each line in lpList to lpLastList; matched lines get age+1 and are removed from lpLastList."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            If standalone Then
+                If lpList.Count = 0 Then
+                    lpLastList = New List(Of lpData)(task.lines.lpList)
+                Else
+                    lpLastList = New List(Of lpData)(lpList)
+                End If
+                lpList = New List(Of lpData)(task.lines.lpList)
+            End If
+
+            matchCount = 0
+            Dim remaining = New List(Of lpData)(lpLastList)
+
+            For Each lp In lpList
+                Dim candidates As New List(Of lpData)
+                For Each lpLast In remaining
+                    If lp.ptCenter.DistanceTo(lpLast.ptCenter) < lpLast.length Then
+                        If Math.Abs(lpLast.angle - lp.angle) < 2 Then candidates.Add(lpLast)
+                    End If
+                Next
+                If candidates.Count = 0 Then Continue For
+
+                Dim distances As New List(Of Single)
+                For Each lpLast In candidates
+                    Dim distance = lp.p1.DistanceTo(lpLast.p1) + lp.p2.DistanceTo(lpLast.p2)
+                    If distance < lpLast.length Then
+                        distance = lp.p1.DistanceTo(lpLast.p2) + lp.p2.DistanceTo(lpLast.p1)
+                    End If
+                    distances.Add(distance)
+                Next
+
+                Dim matched = candidates(distances.IndexOf(distances.Min))
+                lp.age = matched.age + 1
+                If lp.age >= 1000 Then lp.age = 10
+                remaining.Remove(matched)
+                matchCount += 1
+            Next
+
+            lpLastList = remaining
+
+            If standaloneTest() Then
+                dst2 = task.color.Clone
+                For Each lp In lpList
+                    Line(dst2, lp.p1, lp.p2, lp.color, task.lineWidth, task.lineType)
+                    SetTrueText(CStr(lp.age), New cv.Point(CInt(lp.ptCenter.X + 2), CInt(lp.ptCenter.Y + 2)), 2)
+                Next
+
+                dst3.SetTo(0)
+                For Each lp In lpLastList
+                    Line(dst3, lp.p1, lp.p2, white, task.lineWidth)
+                Next
+            End If
+
+            labels(2) = CStr(matchCount) + " of " + CStr(lpList.Count) + " lines matched.  Ages updated."
+            labels(3) = CStr(lpLastList.Count) + " unmatched lines remain in lpLastList."
+        End Sub
+    End Class
+
+
+
+
+
+
+    ' https://stackoverflow.com/questions/7446126/opencv-2d-line-intersection-helper-function
+    Public Class Line_Intersection : Inherits TaskParent
+        Public lp1 As lpData, lp2 As lpData
+        Public intersectionPoint As Point2f
+        Public Sub New()
+            desc = "Determine If 2 lines intersect, where the cv.Point Is, And If that cv.Point Is In the image."
+        End Sub
+        Public Shared Function IntersectTest(p1 As Point2f, p2 As Point2f, p3 As Point2f, p4 As Point2f) As Point2f
+            Dim x = p3 - p1
+            Dim d1 = p2 - p1
+            Dim d2 = p4 - p3
+            Dim cross = d1.X * d2.Y - d1.Y * d2.X
+            If Math.Abs(cross) < 0.000001 Then Return New Point2f
+            Dim t1 = (x.X * d2.Y - x.Y * d2.X) / cross
+            Dim pt = p1 + d1 * t1
+            Return pt
+        End Function
+        Public Shared Function IntersectTest(lp1 As lpData, lp2 As lpData) As Point2f
+            Dim x = lp2.p1 - lp1.p1
+            Dim d1 = lp1.p2 - lp1.p1
+            Dim d2 = lp2.p2 - lp2.p1
+            Dim cross = d1.X * d2.Y - d1.Y * d2.X
+            If Math.Abs(cross) < 0.000001 Then Return New Point2f
+            Dim t1 = (x.X * d2.Y - x.Y * d2.X) / cross
+            Dim pt = lp1.p1 + d1 * t1
+            Return pt
+        End Function
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            If standalone Then
+                If task.heartBeatLT Then
+                    lp1 = New lpData(New Point2f(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height)),
+                                     New Point2f(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height)))
+                    lp2 = New lpData(New Point2f(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height)),
+                                     New Point2f(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height)))
+                End If
+            End If
+
+            intersectionPoint = Line_Intersection.IntersectTest(lp1, lp2)
+
+            If standaloneTest() Then
+                dst2.SetTo(0)
+                Line(dst2, lp1.p1, lp1.p2, Scalar.Yellow, task.lineWidth, task.lineType)
+                Line(dst2, lp2.p1, lp2.p2, Scalar.Yellow, task.lineWidth, task.lineType)
+                If intersectionPoint <> New Point2f Then
+                    Circle(dst2, intersectionPoint, task.DotSize + 2, white, -1, task.lineType)
+                    labels(2) = "Intersection cv.Point = " + CStr(CInt(intersectionPoint.X)) + " x " + CStr(CInt(intersectionPoint.Y))
+                Else
+                    labels(2) = "Parallel!!!"
+                End If
+                If intersectionPoint.X < 0 Or intersectionPoint.X > dst2.Width Or intersectionPoint.Y < 0 Or intersectionPoint.Y > dst2.Height Then
+                    labels(2) += " (off screen)"
+                End If
+            End If
+        End Sub
+    End Class
+
+
+
+
+    Public Class Line_TopLines : Inherits TaskParent
+        Public lpList As New List(Of lpData)
+        Dim lpListLast As New List(Of lpData)
+        Public Sub New()
+            desc = "Find the top 3 longest lines"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            dst2.SetTo(0)
+            labels(2) = task.lines.labels(2)
+
+            lpList.Clear()
+            Dim intersections As New List(Of cv.Point)
+            For Each lp In task.lines.lpList
+                Line(dst2, lp.p1, lp.p2, white, task.lineWidth)
+                lpList.Add(lp)
+                For Each lpX In lpListLast
+                    Dim pt = Line_Intersection.IntersectTest(lpX, lp)
+                    If Math.Abs(pt.X) > 1000 Or Math.Abs(pt.Y) > 1000 Then intersections.Add(pt)
+                Next
+                If lpList.Count >= 100 Then Exit For
+            Next
+            lpListLast = New List(Of lpData)(task.lines.lpList)
+        End Sub
+    End Class
+
+
+
+
+
+    Public Class Line_Intersections : Inherits TaskParent
+        Dim lpListLast As New List(Of lpData)
+        Public Sub New()
+            desc = "Find the top 3 longest lines"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            dst2.SetTo(0)
+            labels(2) = task.lines.labels(2)
+
+            Dim intersections As New List(Of cv.Point)
+            Dim lp = task.lines.lpList(0) ' longest line.
+            lp = New lpData(lp.ptE1, lp.ptE2)
+            Line(dst2, lp.p1, lp.p2, white, task.lineWidth)
+            For Each lpX In lpListLast
+                Dim pt = Line_Intersection.IntersectTest(lpX, lp)
+                If pt = newPoint Then Continue For
+                If Math.Abs(pt.X) > dst2.Width Or Math.Abs(pt.Y) > dst2.Height Then
+                    Line(dst2, lpX.p1, lpX.p2, white, task.lineWidth)
+                    intersections.Add(pt)
+                End If
+            Next
+
+            dst3.SetTo(0)
+            For Each pt In intersections
+                Circle(dst3, pt, task.DotSize + 2, white, -1, task.lineType)
+            Next
+
+            lpListLast = New List(Of lpData)(task.lines.lpList)
+        End Sub
+    End Class
+
 End Namespace
