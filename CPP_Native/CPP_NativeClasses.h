@@ -1,22 +1,28 @@
 #pragma once
 #include <string.h>
 #include <Windows.h>
-#include <OleAuto.h>
 #include <cstdlib>
-#include <cstdio>
 #include <iostream>
 #include <algorithm>
 #include <opencv2/core.hpp>
-#include <opencv2/ximgproc.hpp>
-#include <opencv2/highgui.hpp>
-#include "opencv2/core/utility.hpp"
-#include "opencv2/ml/ml.hpp "
+#include <opencv2/ximgproc/deriche_filter.hpp>
+#include <opencv2/ximgproc/edge_drawing.hpp>
+#include <opencv2/ximgproc/seeds.hpp>
+#include <opencv2/ximgproc/structured_edge_detection.hpp>
+#include <opencv2/core/base.hpp>
+#include <opencv2/core/cvdef.h>
+#include <opencv2/core/cvstd_wrapper.hpp>
+#include <opencv2/core/fast_math.hpp>
+#include <opencv2/core/hal/interface.h>
+#include <opencv2/core/mat.hpp>
+#include <opencv2/core/mat.inl.hpp>
+#include <opencv2/core/matx.hpp>
+#include <opencv2/core/matx.inl.hpp>
+#include <opencv2/core/operations.hpp>
+#include <opencv2/core/saturate.hpp>
+#include <opencv2/core/types.hpp>
+#include <opencv2/ml/ml.inl.hpp>
 #include "opencv2/imgproc.hpp"
-#include "opencv2/videoio.hpp"
-#include <numeric>
-#include <iomanip>
-#include <sstream>
-#include <memory>
 #include <vector>
 #include <random>
 #include "opencv2/video/tracking.hpp"
@@ -1342,6 +1348,7 @@ public:
     int aperture = 3;
     float HarrisParm = 0.01f;
     Harris_Features() {}
+    // NOLINT(readability-const-return-type)
     const void Run()
     {
         Mat cornerStrength;
@@ -1554,6 +1561,7 @@ public:
     Mat src;
     Mat histogram;
     Histogram_1D() {}
+    // NOLINT(readability-const-return-type)
     const void RunCPP(int bins) {
         float hRange[] = { 0, 256 };
         int hbins[] = { bins };
@@ -2140,7 +2148,7 @@ public:
     SuperPixels() {}
     void Run()
     {
-        Mat hsv;
+        //Mat hsv;
         //cvtColor(src, hsv, ColorConversionCodes::COLOR_BGR2HSV);
         seeds->iterate(src);
         seeds->getLabelContourMask(dst, false);
@@ -2189,8 +2197,8 @@ int* SuperPixel_Run(SuperPixels* cPtr, int* srcPtr)
 
 
 // Parameters for Kalman Filter
-#define Q1 0.004
-#define R1 0.5
+constexpr double Q1 = 0.004;
+constexpr double R1 = 0.5;
 
 
 
@@ -3873,15 +3881,16 @@ int* Annealing_Basics_Close(CitySolver* cPtr)
 {
     delete cPtr;
     return (int*)0;
-}
+} 
 
 extern "C" __declspec(dllexport)
 char* Annealing_Basics_Run(CitySolver* cPtr, int* cityOrder, int count)
 {
     cPtr->cityOrder.assign(cityOrder, cityOrder + count);
+    double cityMult = cityMultiplier * count;
     int changesApplied = ml::simulatedAnnealingSolver(*cPtr, cPtr->currentTemperature,
         cPtr->currentTemperature * 0.97, 0.99,
-        cityMultiplier * count, &cPtr->currentTemperature, cPtr->rng);
+        cityMult, &cPtr->currentTemperature, cPtr->rng);
     copy(cPtr->cityOrder.begin(), cPtr->cityOrder.end(), cityOrder);
     string msg = " changesApplied=" + to_string(changesApplied) + " temp=" + to_string(cPtr->currentTemperature) + " result = " + to_string(cPtr->energy());
     strcpy_s(cPtr->outMsg, msg.c_str());

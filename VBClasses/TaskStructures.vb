@@ -389,10 +389,8 @@ Namespace VBClasses
 
             Public fLessID As Integer
 
-            Public p1Depth As cv.Scalar
-            Public p2Depth As cv.Scalar
-
             Public index As Integer
+            Public rightImage As Boolean ' if true, the line came from the right image.
             Public length As Single
 
             Public p1 As cv.Point2f

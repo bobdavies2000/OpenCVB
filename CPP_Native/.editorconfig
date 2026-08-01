@@ -1,0 +1,6 @@
+# Suppress C++ IntelliSense linter nags for this native OpenCVB project.
+# Rule: lnt-make-member-function-const ("Member function can be made const")
+# Note: Visual Studio also requires Tools > Options > Text Editor > C/C++ >
+# Code Style > Linter > "Make Member Function Const" = None for Error List silence.
+[*.{c,cc,cpp,cxx,h,hh,hpp,hxx,inl,ipp}]
+dotnet_diagnostic.lnt-make-member-function-const.severity = none

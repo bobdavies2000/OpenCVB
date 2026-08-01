@@ -1,0 +1,4 @@
+# Project-local clang-tidy: silence the equivalent of VS lnt-make-member-function-const
+Checks: '-*,-readability-make-member-function-const'
+WarningsAsErrors: ''
+HeaderFilterRegex: ''

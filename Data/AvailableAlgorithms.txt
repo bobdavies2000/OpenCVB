@@ -257,7 +257,6 @@ GL_BasicsLineMap
 GL_DisplayPC
 GL_DrawLineDepth
 GL_Featureless
-GL_FeatureLessVLines
 GL_LogicalLines
 GL_LogicalLines1
 GL_PlotHist
@@ -415,9 +414,10 @@ Line_DepthUpdate
 Line_FindClosest
 Line_Finder
 Line_Intersection
-Line_Intersections
 Line_LeftRight
-Line_LeftRightZED
+Line_LeftRightx
+Line_Parallel
+Line_ParallelLR
 Line_Perpendicular
 Line_RightOnly
 Line_TopLines

@@ -1738,34 +1738,6 @@ Namespace VBClasses
 
 
 
-    Public Class Line_LeftRightZED : Inherits TaskParent
-        Public rightOnly As New Line_RightOnly
-        Public Sub New()
-            dst2 = New Mat(dst2.Size, MatType.CV_8U, 0)
-            dst3 = New Mat(dst2.Size, MatType.CV_8U, 0)
-            desc = "Find the lines in the left and right images.  Left image is already found for StereoLabs..."
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            dst2.SetTo(0)
-            For Each lp In task.lines.lpList
-                Line(dst2, lp.p1.X, lp.p1.Y, lp.p2.X, lp.p2.Y, 255, task.lineWidth, task.lineType)
-                SetTrueText(CStr(lp.age), New cv.Point(CInt(lp.ptCenter.X + 2), CInt(lp.ptCenter.Y + 2)), 2)
-            Next
-            labels(2) = CStr(task.lines.lpList.Count) + " lines in the left image."
-
-            rightOnly.Run(emptyMat)
-            labels(3) = rightOnly.labels(2)
-
-            dst3.SetTo(0)
-            For Each lp In rightOnly.lpList
-                Line(dst3, lp.p1, lp.p2, 255, task.lineWidth, task.lineType)
-                SetTrueText(CStr(lp.age), New cv.Point(lp.ptCenter.X + 2, lp.ptCenter.Y + 2), 3)
-            Next
-        End Sub
-    End Class
-
-
-
 
     Public Class Line_DepthSimple : Inherits TaskParent
         Dim lineLR As New Line_LeftRight
@@ -1910,56 +1882,65 @@ Namespace VBClasses
             desc = "Find the lines in the left and right images - use StableGray_LeftRight for left/right images."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If task.Settings.cameraName.StartsWith("StereoLabs") Then
-                Static lrZED As New Line_LeftRightZED
-                lrZED.Run(emptyMat)
-                dst2 = lrZED.dst2
-                dst3 = lrZED.dst3
-                labels = lrZED.labels
+            Static stableLR As New StableGray_LeftRight
+            Static linesLeft As New Line_Core
+            Static linesRight As New Line_Core
+            stableLR.Run(emptyMat)
 
-                leftList = New List(Of lpData)(task.lines.lpList)
-                rightList = New List(Of lpData)(lrZED.rightOnly.lpList)
+            Dim lastList = New List(Of lpData)(linesLeft.lpList)
+            linesLeft.Run(stableLR.dst2)
+            linesLeft.lpList = Line_Basics_TA.removeDuplicates(linesLeft.lpList)
+            Dim averageAgeLeft = Line_Basics_TA.updateAgesAndLongest(linesLeft.lpList, lastList)
 
-                For Each lp In leftList
-                    SetTrueText(CStr(lp.age), New cv.Point(lp.ptCenter.X + 2, lp.ptCenter.Y + 2), 2)
-                Next
+            dst2.SetTo(0)
+            For Each lp In linesLeft.lpList
+                Line(dst2, lp.p1, lp.p2, 255, task.lineWidth, task.lineType)
+                SetTrueText(CStr(lp.age), New cv.Point(lp.ptCenter.X + 2, lp.ptCenter.Y + 2), 2)
+            Next
+            labels(2) = CStr(linesLeft.lpList.Count) + " lines in the left image.  Highlighted line is the current longest line."
 
-                For Each lp In rightList
-                    SetTrueText(CStr(lp.age), New cv.Point(lp.ptCenter.X + 2, lp.ptCenter.Y + 2), 3)
-                Next
-            Else
-                Static stableLR As New StableGray_LeftRight
-                Static linesLeft As New Line_Core
-                Static linesRight As New Line_Core
-                stableLR.Run(emptyMat)
+            lastList = New List(Of lpData)(linesRight.lpList)
+            linesRight.Run(stableLR.dst3)
+            linesRight.lpList = Line_Basics_TA.removeDuplicates(linesRight.lpList)
+            Dim averageAgeRight = Line_Basics_TA.updateAgesAndLongest(linesRight.lpList, lastList)
 
-                Dim lastList = New List(Of lpData)(linesLeft.lpList)
-                linesLeft.Run(stableLR.dst2)
-                linesLeft.lpList = Line_Basics_TA.removeDuplicates(linesLeft.lpList)
-                Dim averageAgeLeft = Line_Basics_TA.updateAgesAndLongest(linesLeft.lpList, lastList)
-
-                dst2.SetTo(0)
-                For Each lp In linesLeft.lpList
-                    Line(dst2, lp.p1, lp.p2, 255, task.lineWidth, task.lineType)
-                    SetTrueText(CStr(lp.age), New cv.Point(lp.ptCenter.X + 2, lp.ptCenter.Y + 2), 2)
-                Next
-                labels(2) = CStr(linesLeft.lpList.Count) + " lines in the left image.  Highlighted line is the current longest line."
-
-                lastList = New List(Of lpData)(linesRight.lpList)
-                linesRight.Run(stableLR.dst3)
-                linesRight.lpList = Line_Basics_TA.removeDuplicates(linesRight.lpList)
-                Dim averageAgeRight = Line_Basics_TA.updateAgesAndLongest(linesRight.lpList, lastList)
-
-                dst3.SetTo(0)
-                For Each lp In linesRight.lpList
-                    Line(dst3, lp.p1, lp.p2, 255, task.lineWidth, task.lineType)
-                    SetTrueText(CStr(lp.age), New cv.Point(lp.ptCenter.X + 2, lp.ptCenter.Y + 2), 3)
-                Next
-                labels(3) = CStr(linesRight.lpList.Count) + " lines in the right image."
-            End If
+            dst3.SetTo(0)
+            For Each lp In linesRight.lpList
+                Line(dst3, lp.p1, lp.p2, 255, task.lineWidth, task.lineType)
+                SetTrueText(CStr(lp.age), New cv.Point(lp.ptCenter.X + 2, lp.ptCenter.Y + 2), 3)
+            Next
+            labels(3) = CStr(linesRight.lpList.Count) + " lines in the right image."
         End Sub
     End Class
 
+
+
+
+    Public Class Line_LeftRightx : Inherits TaskParent
+        Public rightOnly As New Line_RightOnly
+        Public Sub New()
+            dst2 = New Mat(dst2.Size, MatType.CV_8U, 0)
+            dst3 = New Mat(dst2.Size, MatType.CV_8U, 0)
+            desc = "Find the lines in the left and right images.  Left image is already found for StereoLabs..."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            dst2.SetTo(0)
+            For Each lp In task.lines.lpList
+                Line(dst2, lp.p1.X, lp.p1.Y, lp.p2.X, lp.p2.Y, 255, task.lineWidth, task.lineType)
+                SetTrueText(CStr(lp.age), New cv.Point(CInt(lp.ptCenter.X + 2), CInt(lp.ptCenter.Y + 2)), 2)
+            Next
+            labels(2) = CStr(task.lines.lpList.Count) + " lines in the left image."
+
+            rightOnly.Run(emptyMat)
+            labels(3) = rightOnly.labels(2)
+
+            dst3.SetTo(0)
+            For Each lp In rightOnly.lpList
+                Line(dst3, lp.p1, lp.p2, 255, task.lineWidth, task.lineType)
+                SetTrueText(CStr(lp.age), New cv.Point(lp.ptCenter.X + 2, lp.ptCenter.Y + 2), 3)
+            Next
+        End Sub
+    End Class
 
 
 
@@ -2213,35 +2194,89 @@ Namespace VBClasses
 
 
 
-    Public Class Line_Intersections : Inherits TaskParent
-        Dim lpListLast As New List(Of lpData)
+    Public Class Line_Parallel : Inherits TaskParent
         Public Sub New()
-            desc = "Find the top 3 longest lines"
+            desc = "Find the parallel lines"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            dst2.SetTo(0)
-            labels(2) = task.lines.labels(2)
+            If task.heartBeatLT = False Then Exit Sub
+            Dim interList As New SortedList(Of Integer, List(Of Integer))(New compareAllowIdenticalIntegerInverted)
+            For Each lp In task.lines.lpList
+                Dim intersections As New List(Of Integer)
+                For Each lpX In task.lines.lpList
+                    If Math.Abs(lpX.angle - lp.angle) > 2 Then Continue For
+                    If lpX.index = lp.index Then Continue For
+                    Dim pt = Line_Intersection.IntersectTest(lpX, lp)
+                    If pt = newPoint Then Continue For
+                    If Math.Abs(pt.X) > dst2.Width * 2 And Math.Abs(pt.Y) > dst2.Height * 2 Then
+                        intersections.Add(task.lines.lpList.IndexOf(lpX))
+                    End If
+                Next
 
-            Dim intersections As New List(Of cv.Point)
-            Dim lp = task.lines.lpList(0) ' longest line.
-            lp = New lpData(lp.ptE1, lp.ptE2)
-            Line(dst2, lp.p1, lp.p2, white, task.lineWidth)
-            For Each lpX In lpListLast
-                Dim pt = Line_Intersection.IntersectTest(lpX, lp)
-                If pt = newPoint Then Continue For
-                If Math.Abs(pt.X) > dst2.Width Or Math.Abs(pt.Y) > dst2.Height Then
-                    Line(dst2, lpX.p1, lpX.p2, white, task.lineWidth)
-                    intersections.Add(pt)
+                If intersections.Count > 1 Then
+                    interList.Add(intersections.Count, intersections)
                 End If
             Next
 
-            dst3.SetTo(0)
-            For Each pt In intersections
-                Circle(dst3, pt, task.DotSize + 2, white, -1, task.lineType)
+            dst2.SetTo(0)
+            For Each index In interList.Values(0)
+                If index = 0 Then Continue For
+                Dim lp = task.lines.lpList(index)
+                Line(dst2, lp.p1, lp.p2, white, task.lineWidth)
             Next
 
-            lpListLast = New List(Of lpData)(task.lines.lpList)
+            labels(2) = CStr(task.lines.lpList.Count) + " lines found and as many as " +
+                        CStr(interList.Values(0).Count) + " are parallel."
         End Sub
     End Class
 
+
+
+
+
+    Public Class Line_ParallelLR : Inherits TaskParent
+        Dim linesLR As New Line_LeftRight
+        Dim lpList As New List(Of lpData)
+        Public Sub New()
+            desc = "Find the parallel lines in the left and right images."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            linesLR.Run(emptyMat)
+            ' If task.heartBeatLT = False Then Exit Sub
+
+            lpList = New List(Of lpData)(task.lines.lpList)
+            For Each lp In linesLR.rightList
+                lp.rightImage = True
+                lpList.Add(lp)
+            Next
+
+            Dim interList As New SortedList(Of Integer, List(Of Integer))(New compareAllowIdenticalIntegerInverted)
+            For Each lp In lpList
+                Dim intersections As New List(Of Integer)
+                For Each lpX In lpList
+                    If Math.Abs(lpX.angle - lp.angle) > 2 Then Continue For
+                    If lpX.index = lp.index Then Continue For
+                    Dim pt = Line_Intersection.IntersectTest(lpX, lp)
+                    If pt = newPoint Then Continue For
+                    If Math.Abs(pt.X) > dst2.Width * 2 And Math.Abs(pt.Y) > dst2.Height * 2 Then
+                        intersections.Add(lpList.IndexOf(lpX))
+                    End If
+                Next
+
+                If intersections.Count > 1 Then
+                    interList.Add(intersections.Count, intersections)
+                End If
+            Next
+
+            dst2.SetTo(0)
+            For Each index In interList.Values(0)
+                If index = 0 Then Continue For
+                Dim lp = lpList(index)
+                Line(dst2, lp.p1, lp.p2, If(lp.rightImage, white, task.highlight), task.lineWidth)
+            Next
+
+            labels(2) = CStr(lpList.Count) + " lines found and as many as " +
+                        CStr(interList.Values(0).Count) + " are parallel.  White is right image, left yellow."
+        End Sub
+    End Class
 End Namespace

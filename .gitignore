@@ -369,7 +369,7 @@ Hunter/
 Orb
 survey/
 eigen/
-Temp/*.ply
+Temp/*.*
 depthai-core/
 PythonDebug/env/
 PythonDebug/env1/

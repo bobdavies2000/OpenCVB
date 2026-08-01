@@ -26,6 +26,10 @@
     <ClCompile Include="CPP_Algorithms.cpp" />
     <ClCompile Include="CPP_IncludeOnly.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include=".editorconfig" />
+    <None Include=".clang-tidy" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>
     <ProjectGuid>{F867E11C-A392-4EA0-9F32-6CCBE3E753FC}</ProjectGuid>

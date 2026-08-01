@@ -8,4 +8,8 @@
     <ClInclude Include="..\CPP_Native\PragmaLibs.h" />
     <ClInclude Include="CPP_NativeClasses.h" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include=".editorconfig" />
+    <None Include=".clang-tidy" />
+  </ItemGroup>
 </Project>
