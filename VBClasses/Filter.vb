@@ -67,7 +67,7 @@ Namespace VBClasses
                             If filters(cb.Tag) Is Nothing Then filters(cb.Tag) = New Erode_Basics
                         Case "Filter_Equalize"
                             If filters(cb.Tag) Is Nothing Then filters(cb.Tag) = New Filter_Equalize
-                        Case "Filter_Equalize"
+                        Case "Filter_Laplacian"
                             If filters(cb.Tag) Is Nothing Then filters(cb.Tag) = New Filter_Laplacian
                         Case "MeanSubtraction_Gray"
                             If filters(cb.Tag) Is Nothing Then filters(cb.Tag) = New MeanSubtraction_Gray

@@ -60,6 +60,8 @@ Namespace VBClasses
 
 
 
+
+
     Public Class XR_Cloud_DepthToWorld : Inherits TaskParent
         Public Sub New()
             desc = "Update the world coordinates with the new depth for the mask provided."
@@ -842,7 +844,7 @@ Namespace VBClasses
             Dim center = New Point2f(src.Width / 2.0F, src.Height / 2.0F)
             Dim M = GetRotationMatrix2D(center, -angle, 1)
             Dim dst As New Mat(src.Size, src.Type)
-            WarpAffine(src, dst, M, src.Size(), InterpolationFlags.Nearest)
+            WarpAffine(src, dst, M, src.Size(), InterpolationFlags.Cubic)
             Return dst
         End Function
         Public Overrides Sub RunAlg(src As cv.Mat)

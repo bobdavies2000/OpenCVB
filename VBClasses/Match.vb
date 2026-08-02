@@ -8,8 +8,9 @@ Namespace VBClasses
         Public newRect As New cv.Rect
         Public mm As mmData
         Public Sub New()
+            dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
             desc = "Find the requested template in an image.  Managing template is responsibility of caller " +
-                       "(allows multiple targets per image.)"
+                   "(allows multiple targets per image.)"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             If standalone Then
@@ -17,8 +18,13 @@ Namespace VBClasses
                 Exit Sub
             End If
 
-            MatchTemplate(template, src, dst0, TemplateMatchModes.CCoeffNormed)
-            mm = GetMinMax(dst0)
+            Dim tmp As New cv.Mat
+            MatchTemplate(template, src, tmp, TemplateMatchModes.CCoeffNormed)
+            mm = GetMinMax(tmp)
+
+            Dim rect = New cv.Rect(0, 0, tmp.Width, tmp.Height)
+            dst3.SetTo(0)
+            ConvertScaleAbs(tmp, dst3(rect), 255, -mm.minVal)
 
             correlation = mm.maxVal
             labels(2) = "Template (at right) has " + correlation.ToString(fmt3) + " Correlation to the src input"
@@ -26,9 +32,10 @@ Namespace VBClasses
             newCenter = New cv.Point(mm.maxLoc.X + w / 2, mm.maxLoc.Y + h / 2)
             newRect = New cv.Rect(mm.maxLoc.X, mm.maxLoc.Y, w, h)
             If standaloneTest() Then
-                dst2 = task.gray.Clone
+                dst2.SetTo(0)
+                Dim r = New cv.Rect(0, 0, src.Width, src.Height)
+                dst2(r) = src
                 Rectangle(dst2, newRect, white, task.lineWidth)
-                Line(dst2, task.lines.lpList(0).p1, task.lines.lpList(0).p2, white, task.lineWidth, task.lineType)
             End If
         End Sub
     End Class
@@ -37,7 +44,7 @@ Namespace VBClasses
 
 
 
-    Public Class Match_Basics1 : Inherits TaskParent
+    Public Class XR_Match_Basics1 : Inherits TaskParent
         Public template As New Mat ' caller provides this!
         Public correlation As Single
         Public newRect As New cv.Rect
@@ -329,7 +336,8 @@ Namespace VBClasses
             If standaloneTest() Or showOutput Then
                 Normalize(match.dst0, dst0, 0, 255, NormTypes.MinMax)
                 dst3.SetTo(0)
-                dst0.CopyTo(dst3(New cv.Rect(inputRect.Width / 2, inputRect.Height / 2, dst0.Width, dst0.Height)))
+                Dim r = ValidateRect(New cv.Rect(inputRect.Width / 2, inputRect.Height / 2, dst0.Width, dst0.Height))
+                dst0.CopyTo(dst3(r))
                 Rectangle(dst3, inputRect, white, task.lineWidth, task.lineType)
                 dst2 = src
             End If
@@ -443,7 +451,7 @@ Namespace VBClasses
 
 
     Public Class Match_Brick : Inherits TaskParent
-        Public match As New Match_Basics1
+        Public match As New Match_Basics
         Public gridIndex As Integer ' provide this - it identifies the gRect 
         Public correlation As Single
         Public deltaX As Single, deltaY As Single

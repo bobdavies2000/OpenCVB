@@ -413,9 +413,11 @@ Line_DepthSimple
 Line_DepthUpdate
 Line_FindClosest
 Line_Finder
+Line_GravityRGB
 Line_Intersection
 Line_LeftRight
 Line_LeftRightx
+Line_Match
 Line_Parallel
 Line_ParallelLR
 Line_Perpendicular
@@ -451,7 +453,6 @@ Mat_4to1
 Mat_Basics
 Mat_Convert
 Match_Basics
-Match_Basics1
 Match_Brick
 Match_DrawRect
 Match_LinesKNN
@@ -1429,6 +1430,7 @@ XR_Mat_PointToMat
 XR_Mat_RowColRange
 XR_Mat_Transpose
 XR_Mat_Tricks
+XR_Match_Basics1
 XR_Match_BasicsTest
 XR_Match_BestEntropy
 XR_Match_Duplicate

@@ -2105,7 +2105,6 @@ Namespace VBClasses
 
 
 
-
     ' https://stackoverflow.com/questions/7446126/opencv-2d-line-intersection-helper-function
     Public Class Line_Intersection : Inherits TaskParent
         Public lp1 As lpData, lp2 As lpData
@@ -2195,21 +2194,23 @@ Namespace VBClasses
 
 
     Public Class Line_Parallel : Inherits TaskParent
+        Public lpList As New List(Of lpData)
+        Public interList As New SortedList(Of Integer, List(Of Integer))(New compareAllowIdenticalIntegerInverted)
         Public Sub New()
             desc = "Find the parallel lines"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If task.heartBeatLT = False Then Exit Sub
-            Dim interList As New SortedList(Of Integer, List(Of Integer))(New compareAllowIdenticalIntegerInverted)
-            For Each lp In task.lines.lpList
+            If standalone Then lpList = task.lines.lpList
+            interList.Clear()
+            For Each lp In lpList
                 Dim intersections As New List(Of Integer)
-                For Each lpX In task.lines.lpList
+                For Each lpX In lpList
                     If Math.Abs(lpX.angle - lp.angle) > 2 Then Continue For
-                    If lpX.index = lp.index Then Continue For
+                    If lp.index > 0 AndAlso lpX.index = lp.index Then Continue For
                     Dim pt = Line_Intersection.IntersectTest(lpX, lp)
                     If pt = newPoint Then Continue For
                     If Math.Abs(pt.X) > dst2.Width * 2 And Math.Abs(pt.Y) > dst2.Height * 2 Then
-                        intersections.Add(task.lines.lpList.IndexOf(lpX))
+                        intersections.Add(lpList.IndexOf(lpX))
                     End If
                 Next
 
@@ -2218,14 +2219,16 @@ Namespace VBClasses
                 End If
             Next
 
+            If interList.Count = 0 Then Exit Sub
+
             dst2.SetTo(0)
             For Each index In interList.Values(0)
                 If index = 0 Then Continue For
-                Dim lp = task.lines.lpList(index)
+                Dim lp = lpList(index)
                 Line(dst2, lp.p1, lp.p2, white, task.lineWidth)
             Next
 
-            labels(2) = CStr(task.lines.lpList.Count) + " lines found and as many as " +
+            labels(2) = CStr(lpList.Count) + " lines found and as many as " +
                         CStr(interList.Values(0).Count) + " are parallel."
         End Sub
     End Class
@@ -2242,7 +2245,6 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             linesLR.Run(emptyMat)
-            ' If task.heartBeatLT = False Then Exit Sub
 
             lpList = New List(Of lpData)(task.lines.lpList)
             For Each lp In linesLR.rightList
@@ -2279,4 +2281,177 @@ Namespace VBClasses
                         CStr(interList.Values(0).Count) + " are parallel.  White is right image, left yellow."
         End Sub
     End Class
+
+
+
+
+
+    Public Class Line_Match : Inherits TaskParent
+        Public lpTracked As lpData
+        Public p1Correlation As Single
+        Public p2Correlation As Single
+        Dim match1 As New Match_Basics
+        Dim match2 As New Match_Basics
+        Dim lastGray As Mat
+        Dim templateRect1 As cv.Rect
+        Dim templateRect2 As cv.Rect
+        Public Sub New()
+            desc = "Cursor.ai: Track the longest line using MatchTemplate at p1 and p2 (seedSize/searchSize around each endpoint)."
+        End Sub
+        Private Function CenterRect(pt As cv.Point2f, size As Integer) As cv.Rect
+            Dim half = size \ 2
+            Dim r = ValidateRect(New cv.Rect(CInt(Math.Round(pt.X)) - half, CInt(Math.Round(pt.Y)) - half, size, size))
+            If r.Width <> size Then
+                r.X -= size - r.Width
+                r.Width = size
+            End If
+
+            If r.Height <> size Then
+                r.Y -= size - r.Height
+                r.Height = size
+            End If
+            Return r
+        End Function
+        Private Sub SeedFromLongest(seedSize As Integer)
+            If task.lines.lpList.Count = 0 Then
+                lpTracked = Nothing
+                Return
+            End If
+            lpTracked = task.lines.lpList(0)
+            templateRect1 = CenterRect(lpTracked.p1, seedSize)
+            templateRect2 = CenterRect(lpTracked.p2, seedSize)
+        End Sub
+        Private Function MatchEndpoint(gray As Mat, prevPt As cv.Point2f, searchPt As cv.Point2f,
+                                       seedSize As Integer, searchSize As Integer,
+                                       match As Match_Basics, ByRef correlation As Single,
+                                       ByRef templateRect As cv.Rect) As cv.Point2f
+            templateRect = CenterRect(prevPt, seedSize)
+            Dim searchRect = CenterRect(searchPt, searchSize)
+            If templateRect.Width >= searchRect.Width OrElse templateRect.Height >= searchRect.Height OrElse
+               templateRect.Width < 2 OrElse templateRect.Height < 2 Then
+                correlation = 0
+                Return prevPt
+            End If
+
+            match.template = lastGray(templateRect).Clone
+            match.Run(gray(searchRect))
+            correlation = match.correlation
+            If correlation < task.fCorrThreshold Then Return prevPt
+
+            Dim newRect = New cv.Rect(searchRect.X + match.newRect.X, searchRect.Y + match.newRect.Y,
+                                      match.newRect.Width, match.newRect.Height)
+            Dim dx = newRect.X - templateRect.X
+            Dim dy = newRect.Y - templateRect.Y
+            Return New cv.Point2f(prevPt.X + dx, prevPt.Y + dy)
+        End Function
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            If task.lines.lpList.Count = 0 AndAlso lpTracked Is Nothing Then Exit Sub
+            Dim gray = If(src.Channels <> 1, task.gray, src)
+            Dim seedSize = task.gridWH * 3
+            Dim searchSize = task.gridWH * 6
+
+            If lastGray Is Nothing OrElse lastGray.Size <> gray.Size OrElse task.optionsChanged Then
+                lastGray = gray.Clone
+                SeedFromLongest(seedSize)
+            ElseIf task.heartBeatlt OrElse lpTracked Is Nothing Then
+                SeedFromLongest(seedSize)
+            ElseIf task.lines.lpList.Count = 0 Then
+                ' Keep last track when Line_Basics misses this frame.
+            Else
+                Dim newP1 = MatchEndpoint(gray, lpTracked.p1, task.lines.lpList(0).p1, seedSize, searchSize,
+                                          match1, p1Correlation, templateRect1)
+                Dim newP2 = MatchEndpoint(gray, lpTracked.p2, task.lines.lpList(0).p2, seedSize, searchSize,
+                                          match2, p2Correlation, templateRect2)
+
+                If p1Correlation >= task.fCorrThreshold AndAlso p2Correlation >= task.fCorrThreshold Then
+                    Dim age = lpTracked.age + 1
+                    If age >= 1000 Then age = 10
+                    lpTracked = New lpData(newP1, newP2) With {.age = age}
+                    templateRect1 = CenterRect(lpTracked.p1, seedSize)
+                    templateRect2 = CenterRect(lpTracked.p2, seedSize)
+                End If
+            End If
+
+            lastGray = gray.Clone
+
+            dst2 = task.color.Clone
+            dst3 = task.color.Clone
+            If lpTracked IsNot Nothing Then
+                task.longestLine = lpTracked
+
+                Dim s1 = If(task.lines.lpList.Count > 0, task.lines.lpList(0).p1, lpTracked.p1)
+                Dim s2 = If(task.lines.lpList.Count > 0, task.lines.lpList(0).p2, lpTracked.p2)
+                Rectangle(dst3, CenterRect(s1, searchSize), task.highlight, task.lineWidth)
+                Rectangle(dst3, CenterRect(s2, searchSize), task.highlight, task.lineWidth)
+                Rectangle(dst3, templateRect1, white, 1)
+                Rectangle(dst3, templateRect2, white, 1)
+                Line(dst3, lpTracked.p1, lpTracked.p2, task.highlight, task.lineWidth, task.lineType)
+
+                Line(dst2, lpTracked.p1, lpTracked.p2, task.highlight, task.lineWidth + 1, task.lineType)
+                Line(task.depthRGB, task.longestLine.p1, task.longestLine.p2, task.highlight, task.lineWidth + 1, task.lineType)
+                Circle(dst2, lpTracked.p1, task.DotSize + 2, white, -1, task.lineType)
+                Circle(dst2, lpTracked.p2, task.DotSize + 2, white, -1, task.lineType)
+                SetTrueText(CStr(lpTracked.age), New cv.Point(CInt(lpTracked.ptCenter.X + 2), CInt(lpTracked.ptCenter.Y + 2)), 2)
+
+                labels(2) = "Tracked age=" + CStr(lpTracked.age) +
+                            "  p1 corr=" + p1Correlation.ToString(fmt3) +
+                            "  p2 corr=" + p2Correlation.ToString(fmt3) +
+                            "  len=" + lpTracked.length.ToString(fmt1)
+                labels(3) = "White = endpoint templates (seedSize), yellow = search (searchSize) at lpList(0) p1/p2"
+            Else
+                labels(2) = "Waiting for a longest line seed from Line_Basics"
+                labels(3) = ""
+            End If
+        End Sub
+    End Class
+
+
+
+
+    Public Class Line_GravityRGB : Inherits TaskParent
+        Dim lines As New Line_Core
+        Dim para As New Line_Parallel
+        Public Sub New()
+            If standalone Then task.gOptions.displayDst1.Checked = True
+            dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
+            desc = "Find the lines in the gravity-rotated grayscale image."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            dst2 = Cloud_GravityRGB.rotateRGB(task.gray, task.verticalizeAngle)
+
+            lines.Run(dst2)
+
+            Static lineHistory As New List(Of cv.Mat)
+            lineHistory.Add(lines.dst2.Clone)
+            dst1 = lineHistory(0)
+            For i = 1 To lineHistory.Count - 1
+                dst1 = dst1 Or lineHistory(i)
+            Next
+            If lineHistory.Count > task.fOptions.FrameHistoryCount.Value Then lineHistory.RemoveAt(0)
+
+            para.lpList = lines.lpList
+            para.Run(task.gray)
+
+            Dim indexList As List(Of Integer) = Nothing
+            For Each intersections In para.interList.Values
+                For Each index In intersections
+                    Dim lp = lines.lpList(index)
+                    If Math.Abs(lp.p1.X - lp.p2.X) <= 1 Then
+                        indexList = intersections
+                        Exit For
+                    End If
+                Next
+                If indexList IsNot Nothing Then Exit For
+            Next
+
+            If indexList Is Nothing Then Exit Sub ' no parallel vertical lines found
+            If task.heartBeat Then dst3.SetTo(0)
+            For Each index In indexList
+                Dim lp = lines.lpList(index)
+                Line(dst3, lp.p1, lp.p2, white, task.lineWidth, cv.LineTypes.AntiAlias)
+            Next
+
+        End Sub
+    End Class
+
 End Namespace
