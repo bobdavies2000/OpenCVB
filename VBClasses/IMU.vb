@@ -2,8 +2,13 @@ Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCvSharp
 Namespace VBClasses
     ' https://github.com/IntelRealSense/librealsense/tree/master/examples/motion
     Public Class IMU_Basics_TA : Inherits TaskParent
+        Public noCameraMotion As Boolean
+        Public imuStabilityMeasure As Single = 0 ' 
         Dim lastTimeStamp As Double
+        Dim imuCheck As New IMU_Vertical
+        Dim plot As New PlotTime_Scalar
         Public Sub New()
+            plot.plotCount = 1
             desc = "Read and display the IMU data"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -53,13 +58,78 @@ Namespace VBClasses
                           "cy = " + task.gravityMatrix.cy.ToString(fmt3) + " sy = " + task.gravityMatrix.sy.ToString(fmt3) + vbCrLf +
                           "cz = " + task.gravityMatrix.cz.ToString(fmt3) + " sz = " + task.gravityMatrix.sz.ToString(fmt3)
 
+            strOut += vbCrLf + vbCrLf + imuStabilityMeasure.ToString("0.0%")
             task.accRadians = task.theta
             If task.accRadians.Y > PI / 2 Then task.accRadians.Y -= PI / 2
             task.accRadians.Z += PI / 2
 
             SetTrueText(strOut)
+
+            imuCheck.run(emptyMat)
+            imuStabilityMeasure = imuCheck.avgStable
+            noCameraMotion = imuStabilityMeasure >= 0.95
+
+            If standaloneTest() Then
+                plot.plotData = New Scalar(imuStabilityMeasure, 0, 0)
+                plot.Run(emptyMat)
+                dst3 = plot.mats.mat(0)
+            End If
         End Sub
     End Class
+
+
+
+
+
+
+    Public Class IMU_Vertical : Inherits TaskParent
+        Public avgStable As Single
+        Public stableStr As String
+        Dim stableCount As New List(Of Integer) ' indicates how stable the IMU readings are...
+        Dim angleXValue As New List(Of Single)
+        Dim angleYValue As New List(Of Single)
+        Dim lastAngleX As Single, lastAngleY As Single
+        Public Sub New()
+            desc = "Use the IMU angular velocity to determine if the camera is moving or stable."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            angleXValue.Add(task.accRadians.X)
+            angleYValue.Add(task.accRadians.Y)
+
+            strOut = "IMU X" + vbTab + "IMU Y" + vbTab + "IMU Z" + vbCrLf
+            strOut += (task.accRadians.X * RadToDeg).ToString(fmt3) + vbTab + (task.accRadians.Y * RadToDeg).ToString(fmt3) + vbTab +
+                      (task.accRadians.Z * RadToDeg).ToString(fmt3) + vbCrLf
+            Dim avgX = angleXValue.Average
+            Dim avgY = angleYValue.Average
+            If task.firstPass Then
+                lastAngleX = avgX
+                lastAngleY = avgY
+            End If
+            strOut += "Angle X" + vbTab + "Angle Y" + vbCrLf
+            strOut += avgX.ToString(fmt3) + vbTab + avgY.ToString(fmt3) + vbCrLf
+
+            Dim angle = 90 - avgY * RadToDeg
+            If avgX < 0 Then angle *= -1
+            labels(2) = "stabilizer_Vertical Angle = " + angle.ToString(fmt1)
+
+            Dim stableTest = Math.Abs(lastAngleX - avgX) < 0.01 And Math.Abs(lastAngleY - avgY) < 0.01
+            stableCount.Add(If(stableTest, 1, 0))
+            avgStable = stableCount.Average
+            stableStr = "IMU stable = " + avgStable.ToString("0.0%") + " of the time"
+            If stableCount.Count > 25 Then stableCount.RemoveAt(0)
+
+            SetTrueText(strOut + vbCrLf + stableStr, 2)
+
+            lastAngleX = avgX
+            lastAngleY = avgY
+
+            If angleXValue.Count >= task.fOptions.FrameHistoryCount.Value Then angleXValue.RemoveAt(0)
+            If angleYValue.Count >= task.fOptions.FrameHistoryCount.Value Then angleYValue.RemoveAt(0)
+
+        End Sub
+    End Class
+
+
 
 
     ''' <summary>Compute the gravity vector using the complementary filter: fuse gyro (fast, drifts) with accelerometer (slow, stable).</summary>
@@ -289,57 +359,6 @@ Namespace VBClasses
         End Sub
     End Class
 
-
-
-
-
-
-    Public Class IMU_Vertical : Inherits TaskParent
-        Public stableTest As Boolean
-        Public stableStr As String
-        Dim angleXValue As New List(Of Single)
-        Dim angleYValue As New List(Of Single)
-        Dim stableCount As New List(Of Integer)
-        Dim lastAngleX As Single, lastAngleY As Single
-        Public Sub New()
-            desc = "Use the IMU angular velocity to determine if the camera is moving or stable."
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            angleXValue.Add(task.accRadians.X)
-            angleYValue.Add(task.accRadians.Y)
-
-            strOut = "IMU X" + vbTab + "IMU Y" + vbTab + "IMU Z" + vbCrLf
-            strOut += (task.accRadians.X * RadToDeg).ToString(fmt3) + vbTab + (task.accRadians.Y * RadToDeg).ToString(fmt3) + vbTab +
-                      (task.accRadians.Z * RadToDeg).ToString(fmt3) + vbCrLf
-            Dim avgX = angleXValue.Average
-            Dim avgY = angleYValue.Average
-            If task.firstPass Then
-                lastAngleX = avgX
-                lastAngleY = avgY
-            End If
-            strOut += "Angle X" + vbTab + "Angle Y" + vbCrLf
-            strOut += avgX.ToString(fmt3) + vbTab + avgY.ToString(fmt3) + vbCrLf
-
-            Dim angle = 90 - avgY * RadToDeg
-            If avgX < 0 Then angle *= -1
-            labels(2) = "stabilizer_Vertical Angle = " + angle.ToString(fmt1)
-
-            stableTest = Math.Abs(lastAngleX - avgX) < 0.001 And Math.Abs(lastAngleY - avgY) < 0.01
-            stableCount.Add(If(stableTest, 1, 0))
-            If task.heartBeat Then
-                Dim avgStable = stableCount.Average
-                stableStr = "IMU stable = " + avgStable.ToString("0.0%") + " of the time"
-                stableCount.Clear()
-            End If
-            SetTrueText(strOut + vbCrLf + stableStr, 2)
-
-            lastAngleX = avgX
-            lastAngleY = avgY
-
-            If angleXValue.Count >= task.fOptions.FrameHistoryCount.Value Then angleXValue.RemoveAt(0)
-            If angleYValue.Count >= task.fOptions.FrameHistoryCount.Value Then angleYValue.RemoveAt(0)
-        End Sub
-    End Class
 
 
 

@@ -1,5 +1,6 @@
-﻿Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
-Public Class PlotTime_Basics : Inherits TaskParent
+﻿Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCvSharp
+Namespace VBClasses
+    Public Class PlotTime_Basics : Inherits TaskParent
     Public plotData As Scalar
     Public plotCount As Integer = 3
     Public plotColors() As Scalar = {Scalar.Blue, Scalar.LawnGreen, Scalar.Red, white}
@@ -156,7 +157,7 @@ Public Class PlotTime_Scalar : Inherits TaskParent
     Public plotData As Scalar
     Public plotCount As Integer = 3
     Public plotList As New List(Of PlotTime_Single)
-    Dim mats As New Mat_4Click
+    Public mats As New Mat_4Click
     Public Sub New()
         For i = 0 To 3
             plotList.Add(New PlotTime_Single)
@@ -184,90 +185,91 @@ End Class
 
 
 
-Public Class PlotTime_FixedScale : Inherits TaskParent
-    Public plotData As Scalar
-    Public plotCount As Integer = 3
-    Public plotColors() As Scalar = {Scalar.Blue, Scalar.Green, Scalar.Red, white}
-    Public backColor = Scalar.DarkGray
-    Public minScale As Integer = 50
-    Public maxScale As Integer = 200
-    Public plotTriggerRescale = 50
-    Public columnIndex As Integer
-    Public offChartCount As Integer
-    Public lastXdelta As New List(Of Scalar)
-    Public controlScale As Boolean ' Use this to programmatically control the scale (rather than let the automated way below keep the scale.)
-    Public showScale As Boolean = True
-    Public fixedScale As Boolean
-    Public Sub New()
-        desc = "Plot an input variable over time"
-        task.gOptions.LineWidth.Value = 1
-        task.gOptions.DotSizeSlider.Value = 2
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        Const plotSeriesCount = 100
-        lastXdelta.Add(plotData)
+    Public Class PlotTime_FixedScale : Inherits TaskParent
+        Public plotData As Scalar
+        Public plotCount As Integer = 3
+        Public plotColors() As Scalar = {Scalar.Blue, Scalar.Green, Scalar.Red, white}
+        Public backColor = Scalar.DarkGray
+        Public minScale As Integer = 50
+        Public maxScale As Integer = 200
+        Public plotTriggerRescale = 50
+        Public columnIndex As Integer
+        Public offChartCount As Integer
+        Public lastXdelta As New List(Of Scalar)
+        Public controlScale As Boolean ' Use this to programmatically control the scale (rather than let the automated way below keep the scale.)
+        Public showScale As Boolean = True
+        Public fixedScale As Boolean
+        Public Sub New()
+            desc = "Plot an input variable over time"
+            task.gOptions.LineWidth.Value = 1
+            task.gOptions.DotSizeSlider.Value = 2
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            Const plotSeriesCount = 100
+            lastXdelta.Add(plotData)
 
-        If columnIndex + task.DotSize >= dst2.Width Then
-            dst2.ColRange(columnIndex, dst2.Width).SetTo(backColor)
-            columnIndex = 1
-        End If
-        dst2.ColRange(columnIndex, columnIndex + task.DotSize).SetTo(backColor)
-        If standaloneTest() Then plotData = Mean(task.color)
-
-        For i = 0 To plotCount - 1
-            If Math.Floor(plotData(i)) < minScale Or Math.Ceiling(plotData(i)) > maxScale Then
-                offChartCount += 1
-                Exit For
+            If columnIndex + task.DotSize >= dst2.Width Then
+                dst2.ColRange(columnIndex, dst2.Width).SetTo(backColor)
+                columnIndex = 1
             End If
-        Next
+            dst2.ColRange(columnIndex, columnIndex + task.DotSize).SetTo(backColor)
+            If standaloneTest() Then plotData = Mean(task.color)
 
-        If fixedScale = False Then
-            ' if enough points are off the charted area or if manually requested, then redo the scale.
-            If (offChartCount > plotTriggerRescale And lastXdelta.Count >= plotSeriesCount And controlScale = False) Then
-                If Not task.firstPass Then
-                    maxScale = Integer.MinValue
-                    minScale = Integer.MaxValue
-                    For i = 0 To lastXdelta.Count - 1
-                        Dim nextVal = lastXdelta(i)
-                        For j = 0 To plotCount - 1
-                            If Math.Floor(nextVal(j)) < minScale Then minScale = Math.Floor(nextVal(j))
-                            If Math.Floor(nextVal(j)) > maxScale Then maxScale = Math.Ceiling(nextVal(j))
-                        Next
-                    Next
+            For i = 0 To plotCount - 1
+                If Math.Floor(plotData(i)) < minScale Or Math.Ceiling(plotData(i)) > maxScale Then
+                    offChartCount += 1
+                    Exit For
                 End If
-                lastXdelta.Clear()
-                offChartCount = 0
-                columnIndex = 1 ' restart at the left side of the chart
+            Next
+
+            If fixedScale = False Then
+                ' if enough points are off the charted area or if manually requested, then redo the scale.
+                If (offChartCount > plotTriggerRescale And lastXdelta.Count >= plotSeriesCount And controlScale = False) Then
+                    If Not task.firstPass Then
+                        maxScale = Integer.MinValue
+                        minScale = Integer.MaxValue
+                        For i = 0 To lastXdelta.Count - 1
+                            Dim nextVal = lastXdelta(i)
+                            For j = 0 To plotCount - 1
+                                If Math.Floor(nextVal(j)) < minScale Then minScale = Math.Floor(nextVal(j))
+                                If Math.Floor(nextVal(j)) > maxScale Then maxScale = Math.Ceiling(nextVal(j))
+                            Next
+                        Next
+                    End If
+                    lastXdelta.Clear()
+                    offChartCount = 0
+                    columnIndex = 1 ' restart at the left side of the chart
+                End If
             End If
-        End If
 
-        If lastXdelta.Count >= plotSeriesCount Then lastXdelta.RemoveAt(0)
+            If lastXdelta.Count >= plotSeriesCount Then lastXdelta.RemoveAt(0)
 
-        If task.heartBeat Then
-            Line(dst2, New cv.Point(columnIndex, 0), New cv.Point(columnIndex, dst2.Height), white, task.lineWidth)
-        End If
-
-        For i = 0 To plotCount - 1
-            If plotData(i) <> 0 Then
-                Dim y = 1 - (plotData(i) - minScale) / (maxScale - minScale)
-                y *= dst2.Height - 1
-                Dim c As New cv.Point(columnIndex - task.DotSize, y - task.DotSize)
-                If c.X < 1 Then c.X = 1
-                Circle(dst2, c, task.DotSize, plotColors(i), -1, task.lineType)
+            If task.heartBeat Then
+                Line(dst2, New cv.Point(columnIndex, 0), New cv.Point(columnIndex, dst2.Height), white, task.lineWidth)
             End If
-        Next
 
-        columnIndex += 1
-        dst2.Col(columnIndex).SetTo(0)
-        labels(2) = "Blue = " + plotData(0).ToString(fmt1) + " Green = " + plotData(1).ToString(fmt1) +
+            For i = 0 To plotCount - 1
+                If plotData(i) <> 0 Then
+                    Dim y = 1 - (plotData(i) - minScale) / (maxScale - minScale)
+                    y *= dst2.Height - 1
+                    Dim c As New cv.Point(columnIndex - task.DotSize, y - task.DotSize)
+                    If c.X < 1 Then c.X = 1
+                    Circle(dst2, c, task.DotSize, plotColors(i), -1, task.lineType)
+                End If
+            Next
+
+            columnIndex += 1
+            dst2.Col(columnIndex).SetTo(0)
+            labels(2) = "Blue = " + plotData(0).ToString(fmt1) + " Green = " + plotData(1).ToString(fmt1) +
                 " Red = " + plotData(2).ToString(fmt1) + " Yellow = " + plotData(3).ToString(fmt1)
-        strOut = "Blue = " + plotData(0).ToString(fmt1) + vbCrLf
-        strOut += "Green = " + plotData(1).ToString(fmt1) + vbCrLf
-        strOut += "Red = " + plotData(2).ToString(fmt1) + vbCrLf
-        strOut += "White = " + plotData(3).ToString(fmt1) + vbCrLf
-        SetTrueText(strOut, 3)
-        Dim lineCount = CInt(maxScale - minScale - 1)
-        If lineCount > 3 Or lineCount < 0 Then lineCount = 3
-        If showScale Then Utility_Basics.AddPlotScale(dst2, minScale, maxScale, lineCount)
-    End Sub
-End Class
+            strOut = "Blue = " + plotData(0).ToString(fmt1) + vbCrLf
+            strOut += "Green = " + plotData(1).ToString(fmt1) + vbCrLf
+            strOut += "Red = " + plotData(2).ToString(fmt1) + vbCrLf
+            strOut += "White = " + plotData(3).ToString(fmt1) + vbCrLf
+            SetTrueText(strOut, 3)
+            Dim lineCount = CInt(maxScale - minScale - 1)
+            If lineCount > 3 Or lineCount < 0 Then lineCount = 3
+            If showScale Then Utility_Basics.AddPlotScale(dst2, minScale, maxScale, lineCount)
+        End Sub
+    End Class
+End Namespace

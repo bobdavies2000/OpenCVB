@@ -484,8 +484,8 @@ Motion_CloudPixel
 Motion_Correlation
 Motion_CorrelationToLast
 Motion_Featureless
+Motion_GravityRGB
 Motion_Left
-Motion_Lines
 Motion_Right
 Motion_Throttle
 Motion_Validate

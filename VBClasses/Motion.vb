@@ -6,8 +6,9 @@ Namespace VBClasses
         Public motionMask As New Mat(dst2.Size, MatType.CV_8U, 255)
         Public motionRightMask As New Mat(dst2.Size, MatType.CV_8U, 255) ' motion in the right image.
         Public Sub New()
-            If standalone Then task.gOptions.displayDst1.Checked = True
+            ' If standalone Then task.gOptions.displayDst1.Checked = True
             dst2 = New Mat(dst2.Size, MatType.CV_8U, 0)
+            dst3 = New Mat(dst3.Size, MatType.CV_8U, 0)
             desc = "Find all the grid rects that had motion since the last frame."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -33,7 +34,7 @@ Namespace VBClasses
             Next
 
             motionMask.SetTo(0)
-            ' The following loop adds the list4 Neighbors - it is an alternative way to reduce artifacts.
+            ' The following loop adds the list4 Neighbors - it is an just a way to reduce artifacts.
             Dim nabeList As New HashSet(Of Integer)
             For Each index In motionSort
                 For Each nabeIndex In task.gridNabes(index)
@@ -53,7 +54,6 @@ Namespace VBClasses
             Else
                 labels(2) = "Image below is accumulated using motion mask.  Grid rects with motion: " + CStr(nabeList.Count)
             End If
-            dst3 = motionMask
 
             'dst1 = task.rightView.Clone
             'motionRight.Run(task.rightView)
@@ -550,11 +550,28 @@ Namespace VBClasses
 
 
 
-    Public Class Motion_Lines : Inherits TaskParent
+    Public Class Motion_GravityRGB : Inherits TaskParent
         Public Sub New()
-            desc = "Compare all the lines found compared to the previous frame."
+            labels(3) = "Gravity rotation on every frame - contrast with the dst2 image."
+            desc = "Rotate just the motion grid cells using the gravity warpaffine."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
+            Static fullRotateCount As New List(Of Integer)
+
+            dst3 = Cloud_GravityRGB.rotateRGB(task.gray, task.verticalizeAngle)
+            dst1 = Cloud_GravityRGB.rotateRGB(task.motion.motionMask, task.verticalizeAngle)
+            If task.heartBeatLT Or task.imuBasics.imuStabilityMeasure < 0.95 Then
+                dst2 = dst3.Clone
+                fullRotateCount.Add(1)
+            Else
+                dst3.CopyTo(dst2, dst1)
+                fullRotateCount.Add(0)
+            End If
+
+            If fullRotateCount.Count > 100 Then fullRotateCount.RemoveAt(0)
+
+            Dim avgFullRotate = fullRotateCount.Average
+            labels(2) = avgFullRotate.ToString("0.0%") + " of the frames were complete rotations of task.gray"
         End Sub
     End Class
 
