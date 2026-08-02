@@ -2298,7 +2298,7 @@ Namespace VBClasses
         Public Sub New()
             desc = "Cursor.ai: Track the longest line using MatchTemplate at p1 and p2 (seedSize/searchSize around each endpoint)."
         End Sub
-        Private Function CenterRect(pt As cv.Point2f, size As Integer) As cv.Rect
+        Private Shared Function CenterRect(pt As cv.Point2f, size As Integer) As cv.Rect
             Dim half = size \ 2
             Dim r = ValidateRect(New cv.Rect(CInt(Math.Round(pt.X)) - half, CInt(Math.Round(pt.Y)) - half, size, size))
             If r.Width <> size Then
@@ -2421,9 +2421,9 @@ Namespace VBClasses
 
             lines.Run(dst2)
 
-            Static lineHistory As New List(Of cv.Mat)
-            lineHistory.Add(lines.dst2.Clone)
+            Static lineHistory As New List(Of cv.Mat)({lines.dst2})
             dst1 = lineHistory(0)
+            lineHistory.Add(lines.dst2.Clone)
             For i = 1 To lineHistory.Count - 1
                 dst1 = dst1 Or lineHistory(i)
             Next
@@ -2436,7 +2436,7 @@ Namespace VBClasses
             For Each intersections In para.interList.Values
                 For Each index In intersections
                     Dim lp = lines.lpList(index)
-                    If Math.Abs(lp.p1.X - lp.p2.X) <= 1 Then
+                    If Math.Abs(lp.p1.X - lp.p2.X) <= 2 Then
                         indexList = intersections
                         Exit For
                     End If

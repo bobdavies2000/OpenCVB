@@ -86,7 +86,7 @@ Namespace VBClasses
                 If dst2.Channels <> 1 Then
                     MessageBox.Show("Filter_Basics_Gray failure - " + filterList(filterIndex) + " needs to return " + vbCrLf +
                            "an 8UC1 image, not 8UC3.  Reevaluate any new filters added above!")
-                    Dim k = 0 ' if you set a breakpoint here when you get this message, you can debug it more easily.
+                    ' Dim  k = 0 ' if you set a breakpoint here when you get this message, you can debug it more easily.
                 End If
             Else
                 dst2 = src
